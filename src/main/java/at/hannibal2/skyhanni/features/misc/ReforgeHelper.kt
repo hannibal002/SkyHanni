@@ -8,7 +8,6 @@ import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.InventoryCloseEvent
 import at.hannibal2.skyhanni.events.InventoryFullyOpenedEvent
 import at.hannibal2.skyhanni.events.LorenzChatEvent
-import at.hannibal2.skyhanni.events.RepositoryReloadEvent
 import at.hannibal2.skyhanni.utils.DelayedRun
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName
 import at.hannibal2.skyhanni.utils.ItemUtils.getItemCategoryOrNull
@@ -27,7 +26,6 @@ import net.minecraft.client.Minecraft
 import net.minecraft.inventory.Container
 import net.minecraft.item.ItemStack
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
-import java.util.EnumMap
 import java.util.concurrent.atomic.AtomicBoolean
 import kotlin.time.DurationUnit
 import kotlin.time.toDuration
@@ -39,115 +37,6 @@ fun Double.toStringWithPlus() = (if (this >= 0) "+" else "") + this.toString()
 
 class ReforgeHelper {
 
-    enum class StatType(val icon: String) {
-        Damage("§c❁"),
-        Health("§c❤"),
-        Defense("§a❈"),
-        Strength("§c❁"),
-        Intelligence("§b✎"),
-        Crit_Damage("§9☠"),
-        Crit_Chance("§9☣"),
-        Ferocity("§c⫽"),
-        Bonus_Attack_Speed("§e⚔"),
-        Ability_Damage("§c๑"),
-        Health_Regen("§c❣"),
-        Vitality("§4♨"),
-        Mending("§a☄"),
-        True_Defence("§7❂"),
-        Swing_Range("§eⓈ"),
-        Speed("§f✦"),
-        Sea_Creature_Chance("§3α"),
-        Magic_Find("§b✯"),
-        Pet_Luck("§d♣"),
-        Fishing_Speed("§b☂"),
-        Bonus_Pest_Chance("§2ൠ"),
-        Combat_Wisdom("§3☯"),
-        Mining_Wisdom("§3☯"),
-        Farming_Wisdom("§3☯"),
-        Foraging_Wisdom("§3☯"),
-        Fishing_Wisdom("§3☯"),
-        Enchanting_Wisdom("§3☯"),
-        Alchemy_Wisdom("§3☯"),
-        Carpentry_Wisdom("§3☯"),
-        Runecrafting_Wisdom("§3☯"),
-        Social_Wisdom("§3☯"),
-        Taming_Wisdom("§3☯"),
-        Mining_Speed("§6⸕"),
-        Breaking_Power("§2Ⓟ"),
-        Pristine("§5✧"),
-        Foraging_Fortune("§☘"),
-        Farming_Fortune("§6☘"),
-        Mining_Fortune("§6☘"),
-        Fear("§a☠")
-        ;
-
-        val iconWithName = icon + " " + name.replace("_", " ")
-
-        fun asString(value: Int) = (if (value > 0) "+" else "") + value.toString() + " " + this.icon
-    }
-
-
-    class StatList : EnumMap<StatType, Double>(StatType::class.java) {
-        operator fun minus(other: StatList): StatList {
-            return StatList().apply {
-                for ((key, value) in this@StatList) {
-                    this[key] = value - (other[key] ?: 0.0)
-                }
-                for ((key, value) in other) {
-                    if (this[key] == null) {
-                        this[key] = (this@StatList[key] ?: 0.0) - value
-                    }
-                }
-            }
-        }
-
-        fun print(current: StatList?): List<String> {
-            val numbersInSpaces = 2
-            val fontRender = Minecraft.getMinecraft().fontRendererObj
-            val diff = current?.let { this - it }
-            return listOf("§6Reforge Stats") + (diff?.mapNotNull {
-                val value = it.value
-                val key = it.key
-                if (key == null || value == null) return@mapNotNull null
-                buildString {
-                    append("§9")
-                    append((this@StatList[key] ?: 0.0).toStringWithPlus())
-                    while (this.length < 8) {
-                        append(specialSpaceNumber)
-                    }
-                    append(if (value < 0) "§c" else "§a+")
-                    append(value)
-                    while (this.length < 16) {
-                        append(specialSpaceNumber)
-                    }
-                    append(" ")
-                    append(key.iconWithName)
-                }
-            } ?: this.mapNotNull {
-                val value = it.value
-                val key = it.key
-                if (key == null || value == null) return@mapNotNull null
-                buildString {
-                    append("§9")
-                    append(value.toStringWithPlus())
-                    while (this.length < 8) {
-                        append(specialSpaceNumber)
-                    }
-                    append(" ")
-                    append(key.iconWithName)
-                }
-            })
-        }
-
-
-        companion object {
-            fun mapOf(vararg list: Pair<StatType, Double>) = StatList().apply {
-                for ((key, value) in list) {
-                    this[key] = value
-                }
-            }
-        }
-    }
 
     val reforgeMenu by RepoPattern.pattern("menu.reforge", "Reforge Item")
     val reforgeHexMenu by RepoPattern.pattern("menu.reforge.hex", "The Hex ➜ Reforges")
@@ -340,9 +229,42 @@ class ReforgeHelper {
         }
     }
 
-    @SubscribeEvent
-    fun onRepo(event: RepositoryReloadEvent) {
-
+    private fun ReforgeAPI.StatList.print(current: ReforgeAPI.StatList?): List<String> {
+        val numbersInSpaces = 2
+        val fontRender = Minecraft.getMinecraft().fontRendererObj
+        val diff = current?.let { this - it }
+        return listOf("§6Reforge Stats") + (diff?.mapNotNull {
+            val value = it.value
+            val key = it.key
+            if (key == null || value == null) return@mapNotNull null
+            buildString {
+                append("§9")
+                append((this@print[key] ?: 0.0).toStringWithPlus())
+                while (this.length < 8) {
+                    append(specialSpaceNumber)
+                }
+                append(if (value < 0) "§c" else "§a+")
+                append(value)
+                while (this.length < 16) {
+                    append(specialSpaceNumber)
+                }
+                append(" ")
+                append(key.iconWithName)
+            }
+        } ?: this.mapNotNull {
+            val value = it.value
+            val key = it.key
+            if (key == null || value == null) return@mapNotNull null
+            buildString {
+                append("§9")
+                append(value.toStringWithPlus())
+                while (this.length < 8) {
+                    append(specialSpaceNumber)
+                }
+                append(" ")
+                append(key.iconWithName)
+            }
+        })
     }
 }
 

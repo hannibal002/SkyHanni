@@ -2,7 +2,6 @@ package at.hannibal2.skyhanni.api
 
 import at.hannibal2.skyhanni.data.jsonobjects.repo.ReforgesJson
 import at.hannibal2.skyhanni.events.RepositoryReloadEvent
-import at.hannibal2.skyhanni.features.misc.ReforgeHelper
 import at.hannibal2.skyhanni.utils.ItemCategory
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName
 import at.hannibal2.skyhanni.utils.ItemUtils.getItemCategoryOrNull
@@ -11,6 +10,7 @@ import at.hannibal2.skyhanni.utils.NEUInternalName
 import at.hannibal2.skyhanni.utils.NEUInternalName.Companion.asInternalName
 import net.minecraft.item.ItemStack
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
+import java.util.EnumMap
 
 object ReforgeAPI {
 
@@ -26,7 +26,7 @@ object ReforgeAPI {
     class Reforge(
         val name: String,
         val type: ReforgeType,
-        val stats: Map<LorenzRarity, ReforgeHelper.StatList>,
+        val stats: Map<LorenzRarity, StatList>,
         val reforgeStone: NEUInternalName? = null,
         val specialItems: List<NEUInternalName>? = null,
         val extraPropertyText: String? = null, // '$' will be replaced by the custom stat
@@ -106,9 +106,81 @@ object ReforgeAPI {
         reforgeList = event.getConstant<ReforgesJson>("Reforges").reforges.mapNotNull {
             val value = it.value
             Reforge(it.key, ReforgeType.valueOf(value.type), value.stats.mapNotNull {
-                LorenzRarity.valueOf(it.key) to ReforgeHelper.StatList().apply { it.value.forEach { this[ReforgeHelper.StatType.valueOf(it.key)] = it.value } }
+                LorenzRarity.valueOf(it.key) to StatList().apply { it.value.forEach { this[StatType.valueOf(it.key)] = it.value } }
             }.toMap(), value.reforgeStone?.asInternalName(), value.specialItems?.mapNotNull { it.asInternalName() }, value.extraProperty, value.customStat?.mapNotNull { LorenzRarity.valueOf(it.key) to it.value }?.toMap())
         }
 
+    }
+
+    enum class StatType(val icon: String) {
+        Damage("§c❁"),
+        Health("§c❤"),
+        Defense("§a❈"),
+        Strength("§c❁"),
+        Intelligence("§b✎"),
+        Crit_Damage("§9☠"),
+        Crit_Chance("§9☣"),
+        Ferocity("§c⫽"),
+        Bonus_Attack_Speed("§e⚔"),
+        Ability_Damage("§c๑"),
+        Health_Regen("§c❣"),
+        Vitality("§4♨"),
+        Mending("§a☄"),
+        True_Defence("§7❂"),
+        Swing_Range("§eⓈ"),
+        Speed("§f✦"),
+        Sea_Creature_Chance("§3α"),
+        Magic_Find("§b✯"),
+        Pet_Luck("§d♣"),
+        Fishing_Speed("§b☂"),
+        Bonus_Pest_Chance("§2ൠ"),
+        Combat_Wisdom("§3☯"),
+        Mining_Wisdom("§3☯"),
+        Farming_Wisdom("§3☯"),
+        Foraging_Wisdom("§3☯"),
+        Fishing_Wisdom("§3☯"),
+        Enchanting_Wisdom("§3☯"),
+        Alchemy_Wisdom("§3☯"),
+        Carpentry_Wisdom("§3☯"),
+        Runecrafting_Wisdom("§3☯"),
+        Social_Wisdom("§3☯"),
+        Taming_Wisdom("§3☯"),
+        Mining_Speed("§6⸕"),
+        Breaking_Power("§2Ⓟ"),
+        Pristine("§5✧"),
+        Foraging_Fortune("§☘"),
+        Farming_Fortune("§6☘"),
+        Mining_Fortune("§6☘"),
+        Fear("§a☠")
+        ;
+
+        val iconWithName = icon + " " + name.replace("_", " ")
+
+        fun asString(value: Int) = (if (value > 0) "+" else "") + value.toString() + " " + this.icon
+    }
+
+
+    class StatList : EnumMap<StatType, Double>(StatType::class.java) {
+        operator fun minus(other: StatList): StatList {
+            return StatList().apply {
+                for ((key, value) in this@StatList) {
+                    this[key] = value - (other[key] ?: 0.0)
+                }
+                for ((key, value) in other) {
+                    if (this[key] == null) {
+                        this[key] = (this@StatList[key] ?: 0.0) - value
+                    }
+                }
+            }
+        }
+
+
+        companion object {
+            fun mapOf(vararg list: Pair<StatType, Double>) = StatList().apply {
+                for ((key, value) in list) {
+                    this[key] = value
+                }
+            }
+        }
     }
 }
