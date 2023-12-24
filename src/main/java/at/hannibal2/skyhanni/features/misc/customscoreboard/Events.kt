@@ -405,6 +405,15 @@ enum class Events(private val displayLine: Supplier<List<String>>, private val s
                 }
             }
 
+            // raffle
+            if (ScoreboardData.sidebarLinesFormatted.any { it.startsWith("Tickets: §a") }) {
+                list += "§6Raffle"
+                list += ScoreboardData.sidebarLinesFormatted.firstOrNull { it.startsWith("Tickets: §a") }
+                    ?: "<hidden>"
+                list += ScoreboardData.sidebarLinesFormatted.firstOrNull { it.startsWith("Pool: §6") }
+                    ?: "<hidden>"
+            }
+
             if (list.size == 0) when (config.informationFilteringConfig.hideEmptyLines) {
                 true -> listOf("<hidden>")
                 false -> listOf("§cNo Mining Event")

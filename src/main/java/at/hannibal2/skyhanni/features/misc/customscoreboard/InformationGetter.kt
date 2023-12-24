@@ -164,7 +164,12 @@ class InformationGetter {
             "Current Item:",
             "Effigies: ",
             "§cThe boss is reforming!",
-            "§7Boss Health:"
+            "§7Boss Health:",
+            "Find tickets on the",
+            "ground and bring them",
+            "to the raffle box",
+            "Tickets: §a",
+            "Pool: §6"
         )
 
         unknownLines = sidebarLines.filter { line -> !knownLines.any { line.trim().contains(it) } }
