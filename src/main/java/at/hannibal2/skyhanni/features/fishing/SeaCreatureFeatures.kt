@@ -42,6 +42,7 @@ class SeaCreatureFeatures {
         val entity = event.entity as? EntityLivingBase ?: return
         if (DamageIndicatorManager.isBoss(entity)) return
 
+        // TODO remove workaround by change derpy logic either in hasMaxHealth or in EntityMaxHealthUpdateEvent
         val maxHealth = event.maxHealth.ignoreDerpy()
         for (creatureType in RareSeaCreatureType.entries) {
             if (!creatureType.health.any { entity.hasMaxHealth(it, false, maxHealth) }) continue
