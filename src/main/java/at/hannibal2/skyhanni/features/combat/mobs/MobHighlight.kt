@@ -51,21 +51,23 @@ class MobHighlight {
             RenderLivingEntityHelper.setNoHurtTime(entity) { config.corleoneHighlighter }
         }
 
-        if (config.zealotBruiserHighlighter) {
-            val isZealot = maxHealth == 13_000 || maxHealth == 13_000 * 4 // runic
-            val isBruiser = maxHealth == 65_000 || maxHealth == 65_000 * 4 // runic
-            if ((isZealot || isBruiser) && entity is EntityEnderman) {
-                RenderLivingEntityHelper.setEntityColor(entity, LorenzColor.DARK_AQUA.toColor().withAlpha(127))
-                { config.zealotBruiserHighlighter }
-                RenderLivingEntityHelper.setNoHurtTime(entity) { config.zealotBruiserHighlighter }
+        if (entity is EntityEnderman) {
+            if (config.zealotBruiserHighlighter) {
+                val isZealot = maxHealth == 13_000 || maxHealth == 13_000 * 4 // runic
+                val isBruiser = maxHealth == 65_000 || maxHealth == 65_000 * 4 // runic
+                if (isZealot || isBruiser) {
+                    RenderLivingEntityHelper.setEntityColor(entity, LorenzColor.DARK_AQUA.toColor().withAlpha(127))
+                    { config.zealotBruiserHighlighter }
+                    RenderLivingEntityHelper.setNoHurtTime(entity) { config.zealotBruiserHighlighter }
+                }
             }
-        }
 
-        // Special Zealots are not impacted by derpy
-        if (config.specialZealotHighlighter && maxHealth.ignoreDerpy() == 2_000 && entity is EntityEnderman) {
-            RenderLivingEntityHelper.setEntityColor(entity, LorenzColor.DARK_RED.toColor().withAlpha(50))
-            { config.specialZealotHighlighter }
-            RenderLivingEntityHelper.setNoHurtTime(entity) { config.specialZealotHighlighter }
+            // Special Zealots are not impacted by derpy
+            if (config.specialZealotHighlighter && maxHealth.ignoreDerpy() == 2_000) {
+                RenderLivingEntityHelper.setEntityColor(entity, LorenzColor.DARK_RED.toColor().withAlpha(50))
+                { config.specialZealotHighlighter }
+                RenderLivingEntityHelper.setNoHurtTime(entity) { config.specialZealotHighlighter }
+            }
         }
 
         if (config.arachneBossHighlighter && entity is EntitySpider) {
