@@ -55,9 +55,10 @@ public class GardenConfig {
     public EliteFarmingWeightConfig eliteFarmingWeights = new EliteFarmingWeightConfig();
 
     @Expose
-    @ConfigOption(name = "Dicer Counter", desc = "")
+    @ConfigOption(name = "Dicer RNG Drop Tracker", desc = "")
     @Accordion
-    public DicerCounterConfig dicerCounters = new DicerCounterConfig();
+    // TODO rename to dicerRngDropTracker
+    public DicerRngDropTrackerConfig dicerCounters = new DicerRngDropTrackerConfig();
 
     @Expose
     @ConfigOption(name = "Money per Hour", desc = "")
@@ -70,10 +71,10 @@ public class GardenConfig {
     public NextJacobContestConfig nextJacobContests = new NextJacobContestConfig();
 
     @Expose
-    @ConfigOption(name = "Farming Armor Drops", desc = "")
-
+    @ConfigOption(name = "Armor Drop Tracker", desc = "")
     @Accordion
-    public FarmingArmorDropsConfig farmingArmorDrop = new FarmingArmorDropsConfig();
+    // TODO renmae to armorDropTracker
+    public ArmorDropTrackerConfig farmingArmorDrop = new ArmorDropTrackerConfig();
 
     @Expose
     @ConfigOption(name = "Anita Shop", desc = "")
