@@ -21,6 +21,12 @@ public class DisplayConfig {
     public boolean displayNumbersFirst = false;
 
     @Expose
+    @ConfigOption(name = "Show unclaimed bits", desc = "Show the amount of available Bits that can still be claimed.")
+    @ConfigEditorBoolean
+    @FeatureToggle
+    public boolean showUnclaimedBits = false;
+
+    @Expose
     @ConfigOption(name = "Show all active events", desc = "Show all active events in the scoreboard instead of one.")
     @ConfigEditorBoolean
     @FeatureToggle
@@ -35,10 +41,4 @@ public class DisplayConfig {
     @ConfigOption(name = "Title and Footer Options", desc = "")
     @Accordion
     public TitleAndFooterConfig titleAndFooter = new TitleAndFooterConfig();
-
-    @Expose
-    @ConfigOption(name = "Show unclaimed bits", desc = "Shows the amount of unclaimed bits left to claim")
-    @ConfigEditorBoolean
-    @FeatureToggle
-    public boolean showUnclaimedBits = false;
 }
