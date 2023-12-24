@@ -130,7 +130,7 @@ object FrozenTreasureTracker {
 
     private fun drawDisplay(data: Data) = buildList<List<Any>> {
         calculateIce(data)
-        addAsSingletonList("§1§lFrozen Treasure Tracker")
+        addAsSingletonList("§e§lFrozen Treasure Tracker")
         addAsSingletonList("§6${formatNumber(data.treasuresMined)} Treasures Mined")
         addAsSingletonList("§3${formatNumber(estimatedIce)} Total Ice")
         addAsSingletonList("§3${formatNumber(icePerHour)} Ice/hr")
