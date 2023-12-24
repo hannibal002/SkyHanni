@@ -125,9 +125,25 @@ class SkyHanniItemTracker<Data : ItemTrackerData>(
             }
         }
 
-        for (text in items.sortedDesc().keys) {
+        val limitList = config.hideCheapItems
+        var pos = 0
+        var hiddenItems = 0
+        for ((text, pricePer) in items.sortedDesc()) {
+            pos++
+            if (limitList.enabled.get()) {
+                if (pos > limitList.alwaysShowBest.get()) {
+                    if (pricePer < limitList.minPrice.get() * 1000) {
+                        hiddenItems++
+                        continue
+                    }
+                }
+            }
             lists.addAsSingletonList(text)
         }
+        if (hiddenItems > 0) {
+            lists.addAsSingletonList(" §7$hiddenItems cheap items are hidden.")
+        }
+
         return profit
     }
 
