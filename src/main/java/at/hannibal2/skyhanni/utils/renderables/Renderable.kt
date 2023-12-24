@@ -84,7 +84,7 @@ interface Renderable {
 
         fun clickAndHover(
             text: String,
-            tips: List<String>,
+            tips: List<Any>,
             bypassChecks: Boolean = false,
             onClick: () -> Unit,
             onHover: () -> Unit = {},
