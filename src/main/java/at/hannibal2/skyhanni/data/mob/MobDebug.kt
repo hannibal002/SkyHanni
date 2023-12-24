@@ -25,12 +25,15 @@ class MobDebug {
     private fun HowToShow.isName() =
         this == HowToShow.ONLY_NAME || this == HowToShow.NAME_AND_HIGHLIGHT
 
-    private fun MobData.MobSet.highlight(event: LorenzRenderWorldEvent, color: (Mob) -> (LorenzColor)) = this.forEach {
-        event.drawFilledBoundingBox_nea(it.boundingBox.expandBlock(), color.invoke(it).toColor(), 0.3f)
-    }
+    private fun Mob.isNotInvisible() = mobDebugConfig.showInvisible || !this.baseEntity.isInvisible
+
+    private fun MobData.MobSet.highlight(event: LorenzRenderWorldEvent, color: (Mob) -> (LorenzColor)) =
+        this.filter { it.isNotInvisible() }.forEach {
+            event.drawFilledBoundingBox_nea(it.boundingBox.expandBlock(), color.invoke(it).toColor(), 0.3f)
+        }
 
     private fun MobData.MobSet.showName(event: LorenzRenderWorldEvent) =
-        this.filter { it.canBeSeen() }.map { it.boundingBox.getTopCenter() to it.name }.forEach {
+        this.filter { it.canBeSeen() && it.isNotInvisible() }.map { it.boundingBox.getTopCenter() to it.name }.forEach {
             event.drawString(
                 it.first.add(y = 0.5), "§5" + it.second, seeThroughBlocks = true
             )

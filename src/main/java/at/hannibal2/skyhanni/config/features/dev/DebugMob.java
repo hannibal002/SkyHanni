@@ -43,6 +43,7 @@ public class DebugMob {
         @ConfigEditorBoolean
         public boolean showRayHit = false;
 
+
         @Expose
         @ConfigOption(name = "Player Highlight", desc = "Highlight each entity that is a real Player in blue. (Yourself is also include in the list but won't be Highlighted for obvious reason)")
         @ConfigEditorBoolean
@@ -67,5 +68,10 @@ public class DebugMob {
         @ConfigOption(name = "Special", desc = "Shows the internal Mobs that are 'Special' as Highlight (in aqua) or the name")
         @ConfigEditorDropdown
         public HowToShow special = HowToShow.OFF;
+
+        @Expose
+        @ConfigOption(name = "Show Invisible", desc = "Shows the mob even though they are invisible (Not trough Blocks only if the have the invisibility effect). This is very dangerous so don't use unless you want to debug invisible mobs")
+        @ConfigEditorBoolean
+        public boolean showInvisible = false;
     }
 }
