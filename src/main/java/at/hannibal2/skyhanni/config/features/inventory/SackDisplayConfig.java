@@ -15,7 +15,7 @@ public class SackDisplayConfig {
     @ConfigOption(name = "Enabled", desc = "Show contained items inside a sack inventory.")
     @ConfigEditorBoolean
     @FeatureToggle
-    public boolean enabled = true;
+    public boolean enabled = false;
 
     @Expose
     @ConfigOption(
