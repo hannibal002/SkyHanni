@@ -44,10 +44,11 @@ object QuiverAPI {
     var currentAmount: Int = 0
     var arrowAmount: MutableMap<Arrows, Float> = mutableMapOf()
 
-    private val selectPattern by RepoPattern.pattern("data.quiver.chat.select", "§aYou set your selected arrow type to §f(?<arrow>.*)§a!")
-    private val fillUpJaxPattern by RepoPattern.pattern("data.quiver.chat.fillupjax", "§aJax forged §f(?<type>.*)§8 x(?<amount>.*) §afor §6(?<coins>.*) Coins§a!")
-    private val fillUpPattern by RepoPattern.pattern("data.quiver.chat.fillup", "§aYou filled your quiver with §f(?<flintAmount>.*) §aextra arrows!")
-    private val clearedPattern by RepoPattern.pattern("data.quiver.chat.cleared", "§aCleared your quiver!")
+    private val group = RepoPattern.group("data.quiver.chat")
+    private val selectPattern by group.pattern("select", "§aYou set your selected arrow type to §f(?<arrow>.*)§a!")
+    private val fillUpJaxPattern by group.pattern("fillupjax", "§aJax forged §f(?<type>.*)§8 x(?<amount>.*) §afor §6(?<coins>.*) Coins§a!")
+    private val fillUpPattern by group.pattern("fillup", "§aYou filled your quiver with §f(?<flintAmount>.*) §aextra arrows!")
+    private val clearedPattern by group.pattern("cleared", "§aCleared your quiver!")
 
     @SubscribeEvent
     fun onChat(event: LorenzChatEvent) {
