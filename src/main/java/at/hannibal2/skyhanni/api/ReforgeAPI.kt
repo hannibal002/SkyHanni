@@ -37,6 +37,15 @@ object ReforgeAPI {
         val extraProperty = if (extraPropertyText != null) customStat?.map { it.key to extraPropertyText.replace("$", it.value.toString()) }?.toMap()
             ?: LorenzRarity.entries.associateWith { extraPropertyText } else null
 
+        private val internalNameToRawName = "(_.)".toRegex()
+        val rawReforgeStoneName = reforgeStone?.asString()?.lowercase()?.let {
+            internalNameToRawName.replace(it) {
+                " " + it.groupValues[1][1].uppercase()
+            }.replaceFirstChar { it.uppercase() }
+        }
+
+        val lowercaseName = name.lowercase()
+
         fun isValid(itemStack: ItemStack) = isValid(itemStack.getItemCategoryOrNull(), itemStack.getInternalName())
 
         fun isValid(itemCategory: ItemCategory?, internalName: NEUInternalName) =
@@ -87,7 +96,7 @@ object ReforgeAPI {
         }
 
         override fun toString(): String {
-            return "Reforge($name)"
+            return "Reforge $name"
         }
 
     }
