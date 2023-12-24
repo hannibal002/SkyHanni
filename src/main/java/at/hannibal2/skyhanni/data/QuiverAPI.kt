@@ -100,7 +100,8 @@ object QuiverAPI {
 
         // clear to prevent duplicates
         currentAmount = 0
-        arrowAmount.clear()
+        if (arrowAmount.isNotEmpty())
+            arrowAmount.clear()
 
         val stacks = event.inventoryItems
         for (stack in stacks.values) {
@@ -173,9 +174,11 @@ object QuiverAPI {
 
     private fun saveArrowAmount() {
         val config = ProfileStorageData.profileSpecific ?: return
-        config.arrows.arrowAmount = arrowAmount
+
+        if (arrowAmount != null)
+            config.arrows.arrowAmount = arrowAmount
 
         if (arrowAmount.isNotEmpty())
-            currentAmount = arrowAmount[currentArrow]!!.toInt()
+            currentAmount = arrowAmount[currentArrow]?.toInt() ?: 0
     }
 }
