@@ -26,5 +26,11 @@ public class BingoConfig {
     public boolean minionCraftHelperEnabled = true;
 
     @Expose
+    @ConfigOption(name = "Show Progress to T1", desc = "Show tier 1 Minion Crafts in the Helper display even if needed items are not fully collected.")
+    @ConfigEditorBoolean
+    @FeatureToggle
+    public boolean minionCraftHelperProgressFirst = false;
+
+    @Expose
     public Position minionCraftHelperPos = new Position(10, 10, false, true);
 }

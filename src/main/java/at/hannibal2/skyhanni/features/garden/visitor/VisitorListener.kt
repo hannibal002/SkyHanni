@@ -1,6 +1,7 @@
 package at.hannibal2.skyhanni.features.garden.visitor
 
 import at.hannibal2.skyhanni.data.ItemRenderBackground.Companion.background
+import at.hannibal2.skyhanni.config.features.garden.visitor.VisitorConfig
 import at.hannibal2.skyhanni.events.CheckRenderEntityEvent
 import at.hannibal2.skyhanni.events.GuiContainerEvent
 import at.hannibal2.skyhanni.events.InventoryCloseEvent
@@ -218,7 +219,7 @@ class VisitorListener {
     fun onCheckRender(event: CheckRenderEntityEvent<*>) {
         if (!GardenAPI.inGarden()) return
         if (!GardenAPI.onBarnPlot) return
-        if (config.highlightStatus != 1 && config.highlightStatus != 2) return
+        if (config.highlightStatus != VisitorConfig.HighlightMode.NAME && config.highlightStatus != VisitorConfig.HighlightMode.BOTH) return
 
         val entity = event.entity
         if (entity is EntityArmorStand && entity.name == "§e§lCLICK") {
@@ -230,7 +231,7 @@ class VisitorListener {
     fun onRenderWorld(event: LorenzRenderWorldEvent) {
         if (!GardenAPI.inGarden()) return
         if (!GardenAPI.onBarnPlot) return
-        if (config.highlightStatus != 1 && config.highlightStatus != 2) return
+        if (config.highlightStatus != VisitorConfig.HighlightMode.NAME && config.highlightStatus != VisitorConfig.HighlightMode.BOTH) return
 
         for (visitor in VisitorAPI.getVisitors()) {
             visitor.getNameTagEntity()?.let {

@@ -9,11 +9,11 @@ import io.github.moulberry.moulconfig.annotations.ConfigOption;
 
 public class OptimalSpeedConfig {
     @Expose
-    @ConfigOption(name = "Enabled", desc = "Show the optimal speed for your current tool in the hand.\n" +
+    @ConfigOption(name = "Show on HUD", desc = "Show the optimal speed for your current tool in the hand.\n" +
         "(Thanks MelonKingDE for the default values).")
     @ConfigEditorBoolean
     @FeatureToggle
-    public boolean enabled = true;
+    public boolean showOnHUD = false;
 
     @Expose
     @ConfigOption(name = "Warning Title", desc = "Warn via title when you don't have the optimal speed.")
