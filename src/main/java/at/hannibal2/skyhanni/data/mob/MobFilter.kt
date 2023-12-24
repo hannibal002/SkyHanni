@@ -56,7 +56,7 @@ object MobFilter {
     val bossMobNameFilter = "^. (\\[(.*)\\] )?(.*) ([\\d\\/Mk.,❤]+|█+) .$".toRegex()
     val dungeonNameFilter = "^(?:(✯)\\s)?(?:(${DungeonAttribute.toRegexLine})\\s)?(?:\\[[\\w\\d]+\\]\\s)?(.+)\\s[^\\s]+$".toRegex()
     val petCareNameRegex = "^\\[\\w+ (\\d+)\\] (.*)".toRegex()
-    val wokeSleepingGolemRegex = "(?:Woke)|(?:Sleeping) Golem".toRegex()
+    val wokeSleepingGolemRegex = "(?:Woke|Sleeping) Golem".toRegex()
 
     val summonRegex = "^(\\w+)'s (.*) \\d+".toRegex()
     val summonOwnerRegex = "Spawned by: (.*)".toRegex()
