@@ -26,6 +26,8 @@ private const val infinityQuiverLevelMultiplier = 0.03f
 
 enum class Arrows(val arrow: String, val internalName: NEUInternalName) {
     NONE("None", "NONE".asInternalName()),
+    SLIME_BALL("Slime Ball", "SLIME_BALL".asInternalName()),
+    PRISMARINE_SHARD("Prismarine Shard", "PRISMARINE_SHARD".asInternalName()),
     FLINT("Flint Arrow", "ARROW".asInternalName()),
     REINFORCED_IRON_ARROW("Reinforced Iron Arrow", "REINFORCED_IRON_ARROW".asInternalName()),
     GOLD_TIPPED_ARROW("Gold-tipped Arrow", "GOLD_TIPPED_ARROW".asInternalName()),
