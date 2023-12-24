@@ -23,7 +23,10 @@
   + Option to only show the time while holding vacuum in the hand.
 + Mark the plots with pests on them in the world. - hannibal2
 + Press the key to warp to the nearest plot with pests on it. - hannibal2
-+ Draw plot borders when holding the Sprayonator. - HiZe
++ Draw plot borders when holding the Sprayonator. - HiZe 
++ Added Spray Display and Spray Expiration Notice. - appable
+  + Show the active spray and duration for your current plot.
+  + Show a notification in chat when a spray runs out in any plot. Only active in the Garden.
 
 #### Fishing Features
 
@@ -67,6 +70,9 @@
 
 + Added bottle of Jyrre time overlay in stack size feature. - HiZe
 + Added show special edition number as stack size when below 1k. - hannibal2
++ Added Copy Underbid Price. - hannibal2
+  + Copies the price of an item in the "Create BIN Auction" minus 1 coin into the clipboard for faster under-bidding.
++ Highlight your own lowest BIN auctions that are outbid. - hannibal2
 
 #### Minion Features
 
@@ -80,6 +86,7 @@
 #### Event Features
 
 + Added Waypoints for 2023 Lobby Presents. - walker
++ Added New Year Cake Reminder. - hannibal2
 
 #### Stranded Featuers
 
@@ -89,8 +96,17 @@
 
 + Added Diana Profit Tracker. - hannibal2
   + Same options as slayer and fising trackers.
++ Added highlight for the Minos Inquisitors to make them easier to see. - Cad
++ Added Mythological Mob Tracker. - hannibal2
+    + Counts the different mythological mobs you have dug up.
+    + Show percentage how often what mob spawned.
+    + Hide the chat messages when digging up a mythological mob.
++ Added Diana Chat hider. - hannibal2
+    + Hide chat messages around griffin burrow chains and griffin feather drops and coin drops.
 
-#### 
+#### Rift Features
+
++ Added Vermin Tracker. - walker
 
 ### Changes
 
@@ -114,6 +130,14 @@
 + Added command /shclearcontestdata to Reset Jacob's Contest Data. - martimavocado
 + Display Farming Fortune reduction from pests on the HUD. - alexia
 + Allow showing optimal speed warning without HUD enabled. - alexia
++ Highlight Rancher Boots speed in green when a Racing Helmet is equipped. — walker
++ Show the closest plot border when outside a garden plot. - hannibal2 
+  + Especially useful when building farms.
++ Show the garden build limit with F3+G on. - hannibal2
++ Added an option to show if the plot is not sprayed. - alexia
++ Changed pest spawn message format. - hannibal2
++ Improve the precision of the compost empty timer. - appable
++ Added Harvest Harbinger and Pest Repellent non-god effects. - alexia
 
 #### Fishing Changes
 
@@ -138,6 +162,15 @@
 + Added the community goal percentage to the bingo card display. - hannibal2
 + Saving minion craft helper crafted tier 1 minions and bingo card goals per bingo session/month. - hannibal2
 
+#### Diana Changes
+
++ Resetting the guess and burrow locations when clearing the burrows at Diana NPC. - hannibal2
++ Removed Diana "Smooth Transition" and replaced it with "Line to Next". - hannibal2
+
+#### Inventory Changes
+
++ Copy Underbid Price now supports stack sizes of more than one. - hannibal2
+
 #### Misc Changes
 
 + Titles sent by SkyHanni look better now. - Cad
@@ -152,6 +185,12 @@
 + Not only Slayer, also Fishing and Diana item drops will now show in chat & title when over a custom defined price. - hannibal2
 + Added Support to read Badlion sendcoords format. - Cad
 + Added an option to not show cooldown when ability is ready. - Obsidian
++ Added an option to highlight dungeon perm/vc parties. - Cad
++ Added Glowing Mush Mixin support to the Non-God Pod display. - jani
++ Added options to hide cheap items in item profit trackers. - hannibal2
++ Bazaar Best Sell Method now warns if an unknown bazaar item is detected. - hannibal2
++ SkyHanni position editor hotkey now work outside SkyBlock as well. - hannibal2
++ Dungeon party finder highlight features now works outside Dungeon Hub as well. - hannibal2
 
 ### Fixes
 
@@ -181,6 +220,15 @@
 + Ignoring custom NEU items like copper that causes wrong coins per copper price. - hannibal2
 + Fixed rancher boots speed stack size. - walker
 + Fixed overflow garden level detection. - hannibal2
++ Fixed pet level up check in /ff. - alexia
++ Fixed next visitor time while farming. - alexia
++ Fixed sixth visitor warning title showing when disabled. - alexia
++ Show not revealed brackets in the Jacob Contest time needed display. - hannibal2
++ Fixed wrong Rancher Boots item stack size color in combination with Black Cat or Racing Helmet.- hannibal2
++ Fixed showing medal icons in Jacob inventory. - hannibal2
++ Fixed SkyMart items showing the wrong profit when having other items as costs. - hannibal2
++ Hide "Not sprayed!" text while in the barn or outside the garden area. - hannibal2
++ Fixed armor drop tracker not instantly visible. - hannibal2
 
 #### Bingo Fixes
 
@@ -198,11 +246,25 @@
 #### Fishing Fixes
 
 + Fixed Water Hydra warning showing up multiple times. - Cad
++ Fixed Shark Message missing a color code. - jani
++ Fixed /shresetfishingtracker description - absterge
++ Fixed barn fishing reset hotkey triggering while inside a GUI. - hannibal2
 
 #### Diana Fixes
 
 + Fixed the closest burrow warp point being off, especially for the castle. - hannibal2
 + Fixed show inquisitor waypoints outside the hub. - Cad
++ Fixed Minos Inquisitor highlighting not working while the mob is getting damage. - hannibal2
+
+#### Chat Fixes
+
++ Fixed an error message on /pt. - nea
++ Fixed the fire sale filter when a rune is selling. - j10a1n15
++ Fixed bestiary compact message. - hannibal2
+
+#### Dungeon Fixes
+
++ Fixed Hide Healer Fairy. - hannibal2
 
 #### Misc Fixes
 
@@ -221,6 +283,11 @@
 + Fixed finished city project still reminding and suggests buying items. - hannibal2
   + Open the city project inventory once again to fix warnings correctly.
 + Fixed kick alert triggering instantly. - alexia
++ Fixed daily boss kill detection in Crimson Isle Reputation Helper. - hannibal2
++ Fixed Estimated Item Value error in Jerry's Island Deliveries menu. - hannibal2
++ Fixed the /gfs command counting in the Slayer Profit Tracker.  - hannibal2
++ Fixed the Fire Veil effect and item ability cooldown not working when clicking in the air. - hannibal2
++ Fixed broken area mini boss highlight during Derpy. - hannibal2
 
 #### Config Fixes
 
@@ -270,6 +337,11 @@
 + Migrate Deprecated Config Values to Enums. - walker
 + Migrate Config Value in EliteFarmingWeight. - walker
 + Add limbo time PB. - mar
++ Added helper functions for armor. - walker
++ Created PetAPI.isCurrentPet. - hannibal2
++ Refactored Duplicate Code in SkyHanniInstallerFrame. - walker
++ Removed unnecessary non-capturing groups. - walker
++ ComposterOverlay now uses NEUInternalName. - walker
 
 ## Version 0.21.1
 

@@ -15,7 +15,9 @@ import at.hannibal2.skyhanni.features.combat.endernodetracker.EnderNodeTracker
 import at.hannibal2.skyhanni.features.combat.ghostcounter.GhostUtil
 import at.hannibal2.skyhanni.features.commands.PartyCommands
 import at.hannibal2.skyhanni.features.event.diana.BurrowWarpHelper
+import at.hannibal2.skyhanni.features.event.diana.DianaProfitTracker
 import at.hannibal2.skyhanni.features.event.diana.InquisitorWaypointShare
+import at.hannibal2.skyhanni.features.event.diana.MythologicalMobTracker
 import at.hannibal2.skyhanni.features.event.jerry.frozentreasure.FrozenTreasureTracker
 import at.hannibal2.skyhanni.features.fame.AccountUpgradeReminder
 import at.hannibal2.skyhanni.features.fame.CityProjectFeatures
@@ -186,7 +188,7 @@ object Commands {
         ) { FrozenTreasureTracker.resetCommand(it) }
         registerCommand(
             "shresetfishingtracker",
-            "Resets the Frozen Treasure Tracker"
+            "Resets the Fishing Profit Tracker"
         ) { FishingProfitTracker.resetCommand(it) }
         registerCommand("shbingotoggle", "Toggle the bingo card display mode") { BingoCardDisplay.toggleCommand() }
         registerCommand(
@@ -208,6 +210,14 @@ object Commands {
             "shresetvermintracker",
             "Resets the Vermin Tracker"
         ) { VerminTracker.resetCommand(it) }
+        registerCommand(
+            "shresetdianaprofittracker",
+            "Resets the Diana Profit Tracker"
+        ) { DianaProfitTracker.resetCommand(it) }
+        registerCommand(
+            "shresetmythologicalmobtracker",
+            "Resets the Mythological Mob Tracker"
+        ) { MythologicalMobTracker.resetCommand(it) }
     }
 
     private fun usersBugFix() {

@@ -36,6 +36,7 @@ import java.util.List;
 public class Features extends Config {
     public static final ResourceLocation DISCORD = new ResourceLocation("notenoughupdates:social/discord.png");
     public static final ResourceLocation GITHUB = new ResourceLocation("notenoughupdates:social/github.png");
+    public static final ResourceLocation PATREON = new ResourceLocation("notenoughupdates:social/patreon.png");
 
     @Override
     public boolean shouldAutoFocusSearchbar() {
@@ -45,8 +46,9 @@ public class Features extends Config {
     @Override
     public List<Social> getSocials() {
         return Arrays.asList(
-            Social.forLink("Join our Discord", DISCORD, "https://discord.com/invite/skyhanni-997079228510117908"),
-            Social.forLink("Look at the code", GITHUB, "https://github.com/hannibal002/SkyHanni")
+            Social.forLink("Discord", DISCORD, "https://discord.com/invite/skyhanni-997079228510117908"),
+            Social.forLink("GitHub", GITHUB, "https://github.com/hannibal002/SkyHanni"),
+            Social.forLink("Patreon", PATREON, "https://www.patreon.com/hannibal2")
         );
     }
 
