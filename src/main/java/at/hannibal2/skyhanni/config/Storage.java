@@ -1,6 +1,7 @@
 package at.hannibal2.skyhanni.config;
 
 import at.hannibal2.skyhanni.data.Arrows;
+import at.hannibal2.skyhanni.data.Fame;
 import at.hannibal2.skyhanni.data.Powers;
 import at.hannibal2.skyhanni.data.model.ComposterUpgrade;
 import at.hannibal2.skyhanni.features.bingo.card.goals.BingoGoal;
@@ -131,6 +132,20 @@ public class Storage {
 
             @Expose
             public Map<Arrows, Float> arrowAmount = new HashMap<>();
+        }
+
+        @Expose
+        public BitsStorage bits = new BitsStorage();
+
+        public static class BitsStorage {
+            @Expose
+            public int bits = -1;
+
+            @Expose
+            public Fame currentFameRank = null;
+
+            @Expose
+            public int bitsToClaim = -1;
         }
 
         @Expose
