@@ -1,6 +1,7 @@
 package at.hannibal2.skyhanni.features.misc.customscoreboard
 
 import at.hannibal2.skyhanni.SkyHanniMod
+import at.hannibal2.skyhanni.data.BitsAPI
 import at.hannibal2.skyhanni.data.HypixelData
 import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.data.MaxwellAPI
@@ -14,6 +15,7 @@ import at.hannibal2.skyhanni.mixins.hooks.replaceString
 import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.LorenzUtils.inDungeons
 import at.hannibal2.skyhanni.utils.LorenzUtils.nextAfter
+import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.RenderUtils.AlignmentEnum
 import at.hannibal2.skyhanni.utils.StringUtils.firstLetterUppercase
 import at.hannibal2.skyhanni.utils.TimeUnit
@@ -145,11 +147,28 @@ private fun getBankDisplayPair() = when {
 
 private fun getBankShowWhen() = !listOf(IslandType.THE_RIFT).contains(HypixelData.skyBlockIsland)
 
-private fun getBitsDisplayPair() = when {
-    config.informationFilteringConfig.hideEmptyLines && bits == "0" -> listOf("<hidden>")
-    config.displayConfig.displayNumbersFirst -> listOf("§b$bits Bits")
-    else -> listOf("Bits: §b$bits")
-}.map { it to AlignmentEnum.LEFT }
+private fun getBitsDisplayPair(): List<Pair<String, AlignmentEnum>> {
+    val bitsDisplay = when {
+        config.informationFilteringConfig.hideEmptyLines && bits == "0" -> listOf("<hidden>")
+        config.displayConfig.displayNumbersFirst -> {
+            val bitsText = if (config.displayConfig.showUnclaimedBits) {
+                "§b$bits§7/${if (BitsAPI.bitsToClaim == 0) "§10" else "§b${BitsAPI.bitsToClaim.addSeparators()}"} §bBits"
+            } else {
+                "§b$bits Bits"
+            }
+            listOf(bitsText)
+        }
+        else -> {
+            val bitsText = if (config.displayConfig.showUnclaimedBits) {
+                "Bits: §b$bits§7/${if (BitsAPI.bitsToClaim == 0) "§10" else "§b${BitsAPI.bitsToClaim.addSeparators()}"}"
+            } else {
+                "Bits: §b$bits"
+            }
+            listOf(bitsText)
+        }
+    }
+    return bitsDisplay.map { it to AlignmentEnum.LEFT }
+}
 
 private fun getBitsShowWhen() = !listOf(IslandType.THE_RIFT, IslandType.CATACOMBS).contains(HypixelData.skyBlockIsland)
 

@@ -35,4 +35,10 @@ public class DisplayConfig {
     @ConfigOption(name = "Title and Footer Options", desc = "")
     @Accordion
     public TitleAndFooterConfig titleAndFooter = new TitleAndFooterConfig();
+
+    @Expose
+    @ConfigOption(name = "Show unclaimed bits", desc = "Shows the amount of unclaimed bits left to claim")
+    @ConfigEditorBoolean
+    @FeatureToggle
+    public boolean showUnclaimedBits = false;
 }
