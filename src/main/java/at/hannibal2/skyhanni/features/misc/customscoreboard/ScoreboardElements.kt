@@ -305,10 +305,13 @@ private fun getSlayerShowWhen() = listOf(
     IslandType.THE_RIFT
 ).contains(HypixelData.skyBlockIsland)
 
-private fun getQuiverDisplayPair() = when (config.displayConfig.displayNumbersFirst) {
-    true -> listOf("${QuiverAPI.currentAmount} ${QuiverAPI.currentArrow?.arrow ?: "unknown type"} ")
-    false -> listOf("${QuiverAPI.currentArrow?.arrow ?: ("unknown type")} §f${QuiverAPI.currentAmount} Arrows")
-}.map { it to AlignmentEnum.LEFT }
+private fun getQuiverDisplayPair(): List<Pair<String, AlignmentEnum>> {
+    if (QuiverAPI.currentArrow == null) return listOf("§cChange your Arrow once" to AlignmentEnum.LEFT)
+    return when (config.displayConfig.displayNumbersFirst) {
+        true -> listOf("${QuiverAPI.currentAmount} ${QuiverAPI.currentArrow?.arrow} ")
+        false -> listOf("${QuiverAPI.currentArrow?.arrow} §f${QuiverAPI.currentAmount} Arrows")
+    }.map { it to AlignmentEnum.LEFT }
+}
 
 private fun getPowderDisplayPair() = when (config.displayConfig.displayNumbersFirst) {
     true -> listOf("§9§lPowder") + (" §7- §2$mithrilPowder Mithril") + (" §7- §d$gemstonePowder Gemstone")
