@@ -225,6 +225,10 @@ object MobFilter {
                 else -> null
             }
 
+            IslandType.DEEP_CAVERNS -> when {
+                baseEntity is EntityCreeper && baseEntity.baseMaxHealth.derpy() == 120 -> MobResult.found(Mob(baseEntity, Mob.Type.Basic, name = "Sneaky Creeper", levelOrTier = 3))
+                else -> null
+            }
 
             IslandType.DWARVEN_MINES -> when {
                 baseEntity is EntityCreeper && baseEntity.baseMaxHealth.derpy() == 1_000_000 -> MobResult.found(MobFactories.basic(baseEntity, "Ghost"))
@@ -298,7 +302,7 @@ object MobFilter {
     }
 
     fun EntityLivingBase.isFarmMob() =
-        this is EntityAnimal && (this.maxHealth == 50.0f || this.maxHealth == 20.0f || this.maxHealth == 130.0f) && LorenzUtils.skyBlockIsland != IslandType.PRIVATE_ISLAND
+        this is EntityAnimal && this.baseMaxHealth.derpy().let { it == 50 || it == 20 || it == 130 } && LorenzUtils.skyBlockIsland != IslandType.PRIVATE_ISLAND
 
     private fun createFarmMobs(baseEntity: EntityLivingBase): Mob? = when (baseEntity) {
         is EntityMooshroom -> MobFactories.basic(baseEntity, "Farm Mooshroom")
