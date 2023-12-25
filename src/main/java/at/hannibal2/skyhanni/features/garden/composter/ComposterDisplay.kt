@@ -80,7 +80,7 @@ class ComposterDisplay {
         return if (emptyTime != null) {
             GardenAPI.storage?.composterEmptyTime = System.currentTimeMillis() + emptyTime.inWholeMilliseconds
             val format = emptyTime.format()
-            listOf(NEUItems.getItemStack("BUCKET"), "§b$format")
+            listOf(bucket, "§b$format")
         } else {
             listOf("§cOpen Composter Upgrades!")
         }
