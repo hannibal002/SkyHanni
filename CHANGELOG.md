@@ -361,7 +361,7 @@
 + Added Config Transform function. - walker
 + Migrate Deprecated Config Values to Enums. - walker
 + Migrate Config Value in EliteFarmingWeight. - walker
-+ Add limbo time PB. - mar
++ Add limbo time PB. - martimavocado
 + Added helper functions for armor. - walker
 + Created PetAPI.isCurrentPet. - hannibal2
 + Refactored Duplicate Code in SkyHanniInstallerFrame. - walker
