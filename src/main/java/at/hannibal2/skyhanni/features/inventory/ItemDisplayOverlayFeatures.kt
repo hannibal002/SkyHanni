@@ -204,6 +204,12 @@ object ItemDisplayOverlayFeatures {
 
         if (VACUUM_GARDEN.isSelected() && item.getInternalNameOrNull() in PestAPI.vacuumVariants) {
             for (line in lore) {
+                if (line.contains("Click to trade!") || line.contains("Starting bid:") || line.contains("Buy it now:")) {
+                    return ""
+                }
+            }
+
+            for (line in lore) {
                 gardenVacuumPatterm.matchMatcher(line) {
                     val pests = group("amount").formatNumber()
                     return if (config.vacuumBagCap) {
