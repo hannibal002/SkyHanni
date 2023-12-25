@@ -227,7 +227,7 @@
 + Fixed visitor reward item refuse inconsistencies. - hannibal2
 + Fixed wrong base 100ff calculations in the farming fortune needed display. - alexia
 + Fixed showing Sprayanator plot grid overlay outside garden. - HiZe
-+ Fixed an error message in the composter inventory when hovering over some items.- hannibal2
++ Fixed an error message in the composter inventory when hovering over some items. - hannibal2
 + Correctly load the plot names of locked plots from inventory. - hannibal2
 + Fixed the boosted crop not being highlighted during contest participation. - alexia
 + Fixed farming weight leaderboard showing new position as -1 sometimes. - alexia
@@ -241,7 +241,7 @@
 + Fixed next visitor time while farming. - alexia
 + Fixed sixth visitor warning title showing when disabled. - alexia
 + Show not revealed brackets in the Jacob Contest time needed display. - hannibal2
-+ Fixed wrong Rancher Boots item stack size color in combination with Black Cat or Racing Helmet.- hannibal2
++ Fixed wrong Rancher Boots item stack size color in combination with Black Cat or Racing Helmet. - hannibal2
 + Fixed showing medal icons in Jacob inventory. - hannibal2
 + Fixed SkyMart items showing the wrong profit when having other items as costs. - hannibal2
 + Hide "Not sprayed!" text while in the barn or outside the garden area. - hannibal2
