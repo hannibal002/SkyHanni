@@ -66,6 +66,18 @@
   + If at least one goal is highlighted, non-highlighted goals will be hidden.
 + Send a chat message with the change of community goal percentages after opening the bingo card inventory. - hannibal2
 
+#### Diana Features
+
++ Added Diana Profit Tracker. - hannibal2
+    + Same options as slayer and fising trackers.
++ Added highlight for the Minos Inquisitors to make them easier to see. - Cad
++ Added Mythological Mob Tracker. - hannibal2
+    + Counts the different mythological mobs you have dug up.
+    + Show percentage how often what mob spawned.
+    + Hide the chat messages when digging up a mythological mob.
++ Added Diana Chat hider. - hannibal2
+    + Hide chat messages around griffin burrow chains and griffin feather drops and coin drops.
+
 #### Inventory Features
 
 + Added bottle of Jyrre time overlay in stack size feature. - HiZe
@@ -82,7 +94,6 @@
 
 + Hide the repeating fire sale reminder chat messages. - hannibal2
 
-
 #### Event Features
 
 + Added Waypoints for 2023 Lobby Presents. - walker
@@ -91,18 +102,6 @@
 #### Stranded Featuers
 
 + Highlights NPCs in the stranded menu that are placeable but havent been placed. - walker
-
-#### Diana Features
-
-+ Added Diana Profit Tracker. - hannibal2
-  + Same options as slayer and fising trackers.
-+ Added highlight for the Minos Inquisitors to make them easier to see. - Cad
-+ Added Mythological Mob Tracker. - hannibal2
-    + Counts the different mythological mobs you have dug up.
-    + Show percentage how often what mob spawned.
-    + Hide the chat messages when digging up a mythological mob.
-+ Added Diana Chat hider. - hannibal2
-    + Hide chat messages around griffin burrow chains and griffin feather drops and coin drops.
 
 #### Rift Features
 
