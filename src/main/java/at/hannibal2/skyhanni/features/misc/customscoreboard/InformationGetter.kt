@@ -64,7 +64,8 @@ object InformationGetter {
             bits = "0"
         }
 
-        val knownLines = listOf<String>(
+        // I know this could maybe be solved better but honestly idc anymore
+        val knownLines = listOf(
             "§7⏣ ",
             "§5ф ",
             "Purse: §6",
