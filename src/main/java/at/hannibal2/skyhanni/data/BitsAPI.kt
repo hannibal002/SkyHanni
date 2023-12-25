@@ -49,10 +49,12 @@ object BitsAPI {
 
     private val group = RepoPattern.group("data.BitsAPI")
     private val bitsScoreboardPattern by group.pattern("scoreboard.bits", "Bits: §b(?<amount>.*) §3\\(\\+(?<earned>.*)\\)")
-    private val bitsFameRankUpChatPattern by group.pattern("chat.fameRankup", "§eYou gained §3(?<amount>.*) Bits Available §ecompounded from all your §epreviously eaten §6cookies§e! Click here to open §6cookie menu§e!")
+    private val bitsFromFameRankUpChatPattern by group.pattern("chat.bitsFromFameRankup", "§eYou gained §3(?<amount>.*) Bits Available §ecompounded from all your §epreviously eaten §6cookies§e! Click here to open §6cookie menu§e!")
     private val bitsEarnedChatPattern by group.pattern("chat.earned", "§f\\s+§8\\+§b(?<amount>.*)\\s+Bits\n")
     private val boosterCookieAte by group.pattern("chat.boosterCookieAte", "§eYou consumed a §6Booster Cookie§e! §d.+")
     private val bitsAvailableMenu by group.pattern("gui.bitsAvailableMenu", "§7Bits Available: §b(?<toClaim>[\\w,]+)(§3.+)?")
+    private val fameRankSbmenu by group.pattern("gui.FameRankSbmenu", "§7Your rank: §e(?<rank>.*)")
+    private val fameRankCommunityShop by group.pattern("gui.FameRankCommunityShop", "§7Fame Rank: §e(?<rank>.*)")
 
     @SubscribeEvent
     fun onScoreboardChange(event: ScoreboardChangeEvent){
@@ -74,7 +76,7 @@ object BitsAPI {
     fun onChat(event: LorenzChatEvent) {
         val message = event.message.trimWhiteSpaceAndResets().removeResets()
 
-        bitsFameRankUpChatPattern.matchMatcher(message) {
+        bitsFromFameRankUpChatPattern.matchMatcher(message) {
             val amount = group("amount").formatNumber().toInt()
             bitsToClaim += amount
 
@@ -106,7 +108,7 @@ object BitsAPI {
     @SubscribeEvent
     fun onInventoryFullyLoaded(event: InventoryFullyOpenedEvent) {
         if (!LorenzUtils.inSkyBlock) return
-        val allowedNames = listOf("SkyBlock Menu", "Booster Cookie")
+        val allowedNames = listOf("SkyBlock Menu", "Booster Cookie", "Community Shop")
         if (!allowedNames.contains(event.inventoryName)) return
 
         val stacks = event.inventoryItems
@@ -119,7 +121,19 @@ object BitsAPI {
                     val toClaim = group("toClaim").formatNumber().toInt()
                     bitsToClaim = toClaim
 
-                    LorenzUtils.chat("§a $toClaim bits to claim")
+                    save()
+                }
+
+                fameRankSbmenu.matchMatcher(line) {
+                    val rank = group("rank")
+                    currentFameRank = Fame.entries.firstOrNull { it.rank == rank } ?: Fame.NEW_PLAYER
+
+                    save()
+                }
+
+                fameRankCommunityShop.matchMatcher(line) {
+                    val rank = group("rank")
+                    currentFameRank = Fame.entries.firstOrNull { it.rank == rank } ?: Fame.NEW_PLAYER
 
                     save()
                 }
