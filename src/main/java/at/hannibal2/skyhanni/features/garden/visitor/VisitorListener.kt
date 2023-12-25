@@ -208,7 +208,8 @@ class VisitorListener {
         event.toolTip.clear()
 
         for (line in copiedTooltip) {
-            if (!line.contains("minecraft:") && !line.contains("NBT:")) event.toolTip.add("§7" + line.removeColor())
+            if (line.contains("§aAccept Offer")) event.toolTip.add("§7Accept Offer")
+                else if (!line.contains("minecraft:") && !line.contains("NBT:")) event.toolTip.add("§8" + line.removeColor())
         }
         event.toolTip.add("")
         event.toolTip.add(blockReason)

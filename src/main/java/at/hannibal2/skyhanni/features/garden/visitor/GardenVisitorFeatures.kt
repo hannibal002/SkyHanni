@@ -281,6 +281,7 @@ class GardenVisitorFeatures {
             readToolTip(visitor, event.itemStack)
         }
 
+        toolTip.add("§aAccept Offer")
         toolTip.addAll(visitor.lastLore)
     }
 
