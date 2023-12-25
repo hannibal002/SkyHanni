@@ -13,7 +13,7 @@ import at.hannibal2.skyhanni.utils.LorenzUtils.editCopy
 import at.hannibal2.skyhanni.utils.LorenzUtils.nextAfter
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.NumberUtil.formatNumber
-import at.hannibal2.skyhanni.utils.NumberUtil.romanToDecimalIfNeeded
+import at.hannibal2.skyhanni.utils.NumberUtil.romanToDecimalIfNecessary
 import at.hannibal2.skyhanni.utils.OSUtils
 import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.StringUtils.matches
@@ -75,7 +75,7 @@ object GardenCropMilestonesCommunityFix {
     ) {
         val name = stack.name ?: return
         val rawNumber = name.removeColor().replace(crop.cropName, "").trim()
-        val realTier = if (rawNumber == "") 0 else rawNumber.romanToDecimalIfNeeded()
+        val realTier = if (rawNumber == "") 0 else rawNumber.romanToDecimalIfNecessary()
 
         val lore = stack.getLore()
         val next = lore.nextAfter({ GardenCropMilestones.totalPattern.matches(it) }, 3) ?: return

@@ -73,6 +73,10 @@ You can write in the description of the pr the wording for the changelog as well
 - Don't forget to add `@FeatureToggle` to new standalone features (not options to that feature) in the config.
 - Do not use `e.printStackTrace()`, use `CopyErrorCommand.logError(e, "explanation for users")` instead.
 - Do not use `MinecraftForge.EVENT_BUS.post(event)`, use `event.postAndCatch()` instead.
+- Do not use `toRegex()` or `toPattern()`, use `RepoPattern` instead.
+    - See [RepoPattern.kt](https://github.com/walkerselby/SkyHanni/blob/beta/src/main/java/at/hannibal2/skyhanni/utils/repopatterns/RepoPattern.kt)
+    for more information and usages.
+- Please use Regex instead of String comparison when it is likely Hypixel will change the message in the future.
 
 ## Software Used in SkyHanni
 

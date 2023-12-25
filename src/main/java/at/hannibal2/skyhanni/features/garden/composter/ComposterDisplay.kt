@@ -14,12 +14,11 @@ import at.hannibal2.skyhanni.utils.NEUItems.getItemStack
 import at.hannibal2.skyhanni.utils.RenderUtils.renderStringsAndItems
 import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.TimeUtils
+import at.hannibal2.skyhanni.utils.TimeUtils.format
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import java.util.Collections
-import kotlin.math.floor
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.seconds
-import kotlin.time.DurationUnit
 
 class ComposterDisplay {
     private val config get() = GardenAPI.config.composters
@@ -52,32 +51,10 @@ class ComposterDisplay {
         readData(event.tabList)
 
         if (tabListData.isNotEmpty()) {
-            calculateEmptyTime()
+            composterEmptyTime = ComposterAPI.estimateEmptyTimeFromTab()
             updateDisplay()
             sendNotify()
         }
-    }
-
-    private fun calculateEmptyTime() {
-        val organicMatter = ComposterAPI.getOrganicMatter()
-        val fuel = ComposterAPI.getFuel()
-
-        if (ComposterAPI.composterUpgrades.isNullOrEmpty()) {
-            composterEmptyTime = null
-            return
-        }
-
-        val timePerCompost = ComposterAPI.timePerCompost(null)
-
-        val organicMatterRequired = ComposterAPI.organicMatterRequiredPer(null)
-        val fuelRequired = ComposterAPI.fuelRequiredPer(null)
-
-        val organicMatterRemaining = floor(organicMatter / organicMatterRequired)
-        val fuelRemaining = floor(fuel / fuelRequired)
-
-        val endOfOrganicMatter = timePerCompost * organicMatterRemaining
-        val endOfFuel = timePerCompost * fuelRemaining
-        composterEmptyTime = if (endOfOrganicMatter > endOfFuel) endOfFuel else endOfOrganicMatter
     }
 
     private fun updateDisplay() {
@@ -101,10 +78,9 @@ class ComposterDisplay {
 
     private fun addComposterEmptyTime(emptyTime: Duration?): List<Any> {
         return if (emptyTime != null) {
-            val millis = emptyTime.toDouble(DurationUnit.MILLISECONDS).toLong()
-            GardenAPI.storage?.composterEmptyTime = System.currentTimeMillis() + millis
-            val format = TimeUtils.formatDuration(millis, maxUnits = 2)
-            listOf(bucket, "§b$format")
+            GardenAPI.storage?.composterEmptyTime = System.currentTimeMillis() + emptyTime.inWholeMilliseconds
+            val format = emptyTime.format()
+            listOf(NEUItems.getItemStack("BUCKET"), "§b$format")
         } else {
             listOf("§cOpen Composter Upgrades!")
         }
@@ -180,19 +156,11 @@ class ComposterDisplay {
             val duration = storage.composterEmptyTime - System.currentTimeMillis()
             if (duration > 0) {
                 if (duration < 1000 * 60 * 20) {
-                    if (IslandType.GARDEN.isInIsland()) {
-                        warn("Your composter is almost empty!")
-                    } else {
-                        warn("Your composter in the garden is almost empty!")
-                    }
+                    warn("Your composter in the garden is almost empty!")
                 }
                 TimeUtils.formatDuration(duration, maxUnits = 3)
             } else {
-                if (IslandType.GARDEN.isInIsland()) {
-                    warn("Your composter is empty!")
-                } else {
-                    warn("Your composter in the garden is empty!")
-                }
+                warn("Your composter is empty!")
                 "§cComposter is empty!"
             }
         } else "?"

@@ -24,6 +24,11 @@ public class WinterConfig {
     @ConfigOption(name = "Unique Gift Counter", desc = "Keep track how many unique players you have given gifts to.")
     public UniqueGiftConfig uniqueGiftCounter = new UniqueGiftConfig();
 
+    @Accordion
+    @Expose
+    @ConfigOption(name = "Refined Bottle of Jyrre Timer", desc = "")
+    public JyrreTimerConfig jyrreTimer = new JyrreTimerConfig();
+
     @Expose
     @ConfigOption(name = "Island Close Time", desc = "While on the Winter Island, show a timer until Jerry's Workshop closes.")
     @ConfigEditorBoolean
@@ -32,5 +37,11 @@ public class WinterConfig {
 
     @Expose
     public Position islandCloseTimePosition = new Position(10, 10, false, true);
+
+    @Expose
+    @ConfigOption(name = "New Year Cake Reminder", desc = "Reminds while the new year cake can be collected in the hub.")
+    @ConfigEditorBoolean
+    @FeatureToggle
+    public boolean newYearCakeReminder = true;
 
 }

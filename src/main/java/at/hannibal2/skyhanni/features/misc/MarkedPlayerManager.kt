@@ -9,7 +9,6 @@ import at.hannibal2.skyhanni.events.RenderMobColoredEvent
 import at.hannibal2.skyhanni.events.ResetEntityHurtEvent
 import at.hannibal2.skyhanni.events.withAlpha
 import at.hannibal2.skyhanni.utils.EntityUtils
-import at.hannibal2.skyhanni.utils.LorenzColor
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import net.minecraft.client.Minecraft
 import net.minecraft.client.entity.EntityOtherPlayerMP
@@ -92,7 +91,7 @@ class MarkedPlayerManager {
 
         val entity = event.entity
         if (entity in markedPlayers.values) {
-            event.color = LorenzColor.YELLOW.toColor().withAlpha(127)
+            event.color = config.entityColor.toColor().withAlpha(127)
         }
     }
 

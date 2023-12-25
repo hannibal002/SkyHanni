@@ -243,14 +243,23 @@ object GardenCropMilestoneDisplay {
     }
 
     private fun addMushroomCowData() {
-        val lineMap = HashMap<Int, List<Any>>()
-        val counter = CropType.MUSHROOM.getCounter()
+        val mushroom = CropType.MUSHROOM
+        if (mushroom.isMaxed()) {
+            mushroomCowPerkDisplay = listOf(
+                listOf("§6Mooshroom Cow Perk"),
+                listOf("§eMushroom crop is maxed!"),
+            )
+            return
+        }
 
-        val currentTier = GardenCropMilestones.getTierForCropCount(counter, CropType.MUSHROOM)
+        val lineMap = HashMap<Int, List<Any>>()
+        val counter = mushroom.getCounter()
+
+        val currentTier = GardenCropMilestones.getTierForCropCount(counter, mushroom)
         val nextTier = currentTier + 1
 
-        val cropsForCurrentTier = GardenCropMilestones.getCropsForTier(currentTier, CropType.MUSHROOM)
-        val cropsForNextTier = GardenCropMilestones.getCropsForTier(nextTier, CropType.MUSHROOM)
+        val cropsForCurrentTier = GardenCropMilestones.getCropsForTier(currentTier, mushroom)
+        val cropsForNextTier = GardenCropMilestones.getCropsForTier(nextTier, mushroom)
 
         val have = counter - cropsForCurrentTier
         val need = cropsForNextTier - cropsForCurrentTier
@@ -263,7 +272,7 @@ object GardenCropMilestoneDisplay {
         lineMap[0] = Collections.singletonList("§6Mooshroom Cow Perk")
 
         val list = mutableListOf<Any>()
-        list.addCropIcon(CropType.MUSHROOM)
+        list.addCropIcon(mushroom)
         list.add("§7Mushroom Tier $nextTier")
         lineMap[1] = list
 

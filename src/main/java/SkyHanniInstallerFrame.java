@@ -213,14 +213,7 @@ public class SkyHanniInstallerFrame extends JFrame implements ActionListener, Mo
 
                 descriptionText = new JTextArea();
                 descriptionText.setName("TextArea");
-                descriptionText.setBounds(x + margin, y + margin, w - margin * 2, h - margin);
-                descriptionText.setEditable(false);
-                descriptionText.setHighlighter(null);
-                descriptionText.setEnabled(true);
-                descriptionText.setFont(new Font(Font.DIALOG, Font.PLAIN, 12));
-                descriptionText.setLineWrap(true);
-                descriptionText.setOpaque(false);
-                descriptionText.setPreferredSize(new Dimension(w - margin * 2, h - margin));
+                setStandardFormatting(descriptionText);
                 descriptionText.setText(
                     "This installer will copy SkyHanni into your forge mods folder for you, and replace any old versions that already exist. " +
                         "Close this if you prefer to do this yourself!");
@@ -234,6 +227,17 @@ public class SkyHanniInstallerFrame extends JFrame implements ActionListener, Mo
         return descriptionText;
     }
 
+    private void setStandardFormatting(JTextArea descriptionText) {
+        descriptionText.setBounds(x + margin, y + margin, w - margin * 2, h - margin);
+        descriptionText.setEditable(false);
+        descriptionText.setHighlighter(null);
+        descriptionText.setEnabled(true);
+        descriptionText.setFont(new Font(Font.DIALOG, Font.PLAIN, 12));
+        descriptionText.setLineWrap(true);
+        descriptionText.setOpaque(false);
+        descriptionText.setPreferredSize(new Dimension(w - margin * 2, h - margin));
+    }
+
     private JTextArea getForgeTextArea() {
         if (forgeDescriptionText == null) {
             try {
@@ -242,14 +246,7 @@ public class SkyHanniInstallerFrame extends JFrame implements ActionListener, Mo
 
                 forgeDescriptionText = new JTextArea();
                 forgeDescriptionText.setName("TextAreaForge");
-                forgeDescriptionText.setBounds(x + margin, y + margin, w - margin * 2, h - margin);
-                forgeDescriptionText.setEditable(false);
-                forgeDescriptionText.setHighlighter(null);
-                forgeDescriptionText.setEnabled(true);
-                forgeDescriptionText.setFont(new Font(Font.DIALOG, Font.PLAIN, 12));
-                forgeDescriptionText.setLineWrap(true);
-                forgeDescriptionText.setOpaque(false);
-                forgeDescriptionText.setPreferredSize(new Dimension(w - margin * 2, h - margin));
+                setStandardFormatting(forgeDescriptionText);
                 forgeDescriptionText.setText(
                     "However, you still need to install Forge client in order to be able to run this mod. Click here to visit the download page for Forge 1.8.9!");
                 forgeDescriptionText.setForeground(Color.BLUE.darker());
@@ -430,7 +427,7 @@ public class SkyHanniInstallerFrame extends JFrame implements ActionListener, Mo
         if (e.getSource() == getForgeTextArea()) {
             try {
                 Desktop.getDesktop().browse(new URI(
-                    "http://files.minecraftforge.net/maven/net/minecraftforge/forge/index_1.8.9.html"));
+                    "https://files.minecraftforge.net/maven/net/minecraftforge/forge/index_1.8.9.html"));
             } catch (IOException | URISyntaxException ex) {
                 showErrorPopup(ex);
             }

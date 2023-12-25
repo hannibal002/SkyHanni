@@ -1,9 +1,14 @@
 package at.hannibal2.skyhanni.features.garden.pests
 
+import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
+import at.hannibal2.skyhanni.config.features.garden.pests.PestSpawnConfig
+import at.hannibal2.skyhanni.config.features.garden.pests.PestSpawnConfig.ChatMessageFormatEntry
 import at.hannibal2.skyhanni.events.LorenzChatEvent
 import at.hannibal2.skyhanni.events.garden.pests.PestSpawnEvent
 import at.hannibal2.skyhanni.features.garden.GardenAPI
+import at.hannibal2.skyhanni.utils.ConfigUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils
+import at.hannibal2.skyhanni.utils.StringUtils
 import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import kotlin.time.Duration.Companion.seconds
@@ -35,23 +40,29 @@ class PestSpawn {
             }
         }
 
-        if (blocked && config.chatMessageFormat != 0) {
+        if (blocked && config.chatMessageFormat != PestSpawnConfig.ChatMessageFormatEntry.HYPIXEL) {
             event.blockedReason = "pests_spawn"
         }
     }
 
     private fun pestSpawn(amount: Int, plotName: String) {
         PestSpawnEvent(amount, plotName).postAndCatch()
+        val pestName = StringUtils.canBePlural(amount, "Pest", "Pests")
+        val message = "§e$amount §a$pestName Spawned in §b$plotName§a!"
 
         if (config.showTitle) {
-            LorenzUtils.sendTitle("§aPest Spawn! §e$amount §ain §b$plotName§a!", 7.seconds)
+            LorenzUtils.sendTitle(message, 7.seconds)
         }
 
-        if (config.chatMessageFormat == 1) {
-            LorenzUtils.clickableChat(
-                "§aPest Spawn! §e$amount §ain §b$plotName§a!",
-                "tptoplot $plotName"
-            )
+        if (config.chatMessageFormat == PestSpawnConfig.ChatMessageFormatEntry.COMPACT) {
+            LorenzUtils.clickableChat(message, "tptoplot $plotName")
+        }
+    }
+
+    @SubscribeEvent
+    fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
+        event.transform(15, "garden.pests.pestSpawn.chatMessageFormat") { element ->
+            ConfigUtils.migrateIntToEnum(element, ChatMessageFormatEntry::class.java)
         }
     }
 }
