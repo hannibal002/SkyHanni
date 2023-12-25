@@ -37,9 +37,8 @@ class ReforgeHelper {
 
     val reforgeMenu by RepoPattern.pattern("menu.reforge", "Reforge Item")
     val reforgeHexMenu by RepoPattern.pattern("menu.reforge.hex", "The Hex ➜ Reforges")
-    val reforgeChatMessage by RepoPattern.pattern("chat.reforge.message", "§aYou reforged your .* §r§ainto a .*!")
-    val reforgeChatFail by RepoPattern.pattern("chat.reforge.fail", "§cWait a moment before reforging again!")
-    val reforgeChatFail2 by RepoPattern.pattern("chat.reforge.fail2", "§cWhoa! Slow down there!")
+    val reforgeChatMessage by RepoPattern.pattern("chat.reforge.message", "§aYou reforged your .* §r§ainto a .*!|§aYou applied a .* §r§ato your .*!")
+    val reforgeChatFail by RepoPattern.pattern("chat.reforge.fail", "§cWait a moment before reforging again!|§cWhoa! Slow down there!")
 
     var isInReforgeMenu = false
     var isInHexReforgeMenu = false
@@ -81,8 +80,15 @@ class ReforgeHelper {
     var hoverdReforgeStone: String? = null
 
     fun itemUpdate() {
-        item = inventory?.getSlot(reforgeItem)?.stack
-        currentReforge = item?.getReforgeName()?.let { name -> ReforgeAPI.reforgeList.firstOrNull { it.lowercaseName == name } }
+        val newItem = inventory?.getSlot(reforgeItem)?.stack
+        if (newItem?.getInternalName() != item?.getInternalName()) {
+            reforgeToSearch = null
+        }
+        item = newItem
+        val newReforgeName = item?.getReforgeName() ?: ""
+        if (newReforgeName == currentReforge?.lowercaseName) return
+        currentReforge = ReforgeAPI.reforgeList.firstOrNull { it.lowercaseName == newReforgeName }
+        updateDisplay()
     }
 
     @SubscribeEvent
@@ -109,7 +115,6 @@ class ReforgeHelper {
 
         DelayedRun.runNextTick {
             itemUpdate()
-            updateDisplay()
         }
     }
 
@@ -126,7 +131,7 @@ class ReforgeHelper {
                 }
             }
 
-            reforgeChatFail.matches(event.message) || reforgeChatFail2.matches(event.message) -> {
+            reforgeChatFail.matches(event.message) -> {
                 DelayedRun.runDelayed(2.tick) {
                     waitForChat.set(false)
                 }
@@ -142,7 +147,6 @@ class ReforgeHelper {
                 isInHexReforgeMenu = true
                 DelayedRun.runDelayed(2.tick) {
                     itemUpdate()
-                    updateDisplay()
                 }
             }
 
@@ -197,7 +201,7 @@ class ReforgeHelper {
                         ?: listOf(""), onClick = { reforgeToSearch = reforge }, onHover = if (!isInHexReforgeMenu) {
                     {}
                 } else {
-                    { hoverdReforgeStone = reforge.rawReforgeStoneName }
+                    { hoverdReforgeStone = reforge.rawReforgeStoneName ?: "Random Basic Reforge" }
                 }
                 )
             }
@@ -215,6 +219,7 @@ class ReforgeHelper {
 
     val hoverColor = LorenzColor.GOLD.addOpacity(50).rgb
     val selectedColor = LorenzColor.BLUE.addOpacity(100).rgb
+    val finishedColor = LorenzColor.GREEN.addOpacity(75).rgb
 
     @SubscribeEvent
     fun onRender(event: GuiRenderEvent.ChestGuiOverlayRenderEvent) {
@@ -223,13 +228,17 @@ class ReforgeHelper {
         posList.renderRenderables(display, posLabel = "Reforge Overlay")
         if (hoverdReforgeStone != null) {
             colorReforgeStone(hoverColor, hoverdReforgeStone)
+            hoverdReforgeStone = null
         }
-        if (reforgeToSearch != null && reforgeToSearch != currentReforge) {
+        if (reforgeToSearch == null) return
+        if (reforgeToSearch != currentReforge) {
             if (reforgeToSearch?.isReforgeStone == true) {
                 colorReforgeStone(selectedColor, reforgeToSearch?.rawReforgeStoneName)
             } else {
                 inventory?.inventory?.get(reforgeButton)?.background = selectedColor
             }
+        } else {
+            inventory?.inventory?.get(reforgeItem)?.background = finishedColor
         }
     }
 

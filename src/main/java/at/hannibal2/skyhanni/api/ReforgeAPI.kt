@@ -38,11 +38,16 @@ object ReforgeAPI {
             ?: LorenzRarity.entries.associateWith { extraPropertyText } else null
 
         private val internalNameToRawName = "(_.)".toRegex()
-        val rawReforgeStoneName = reforgeStone?.asString()?.lowercase()?.let {
-            internalNameToRawName.replace(it) {
-                " " + it.groupValues[1][1].uppercase()
-            }.replaceFirstChar { it.uppercase() }
+        val rawReforgeStoneName = when (reforgeStone) {
+            "SKYMART_BROCHURE".asInternalName() -> "SkyMart Brochure"
+            "FULL-JAW_FANGING_KIT".asInternalName() -> "Full-Jaw Fanging Kit"
+            else -> reforgeStone?.asString()?.lowercase()?.let {
+                internalNameToRawName.replace(it) {
+                    " " + it.groupValues[1][1].uppercase()
+                }.replaceFirstChar { it.uppercase() }
+            }
         }
+
 
         val lowercaseName = name.lowercase()
 
