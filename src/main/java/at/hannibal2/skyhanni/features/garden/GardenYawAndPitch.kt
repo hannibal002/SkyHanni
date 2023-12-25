@@ -1,6 +1,5 @@
 package at.hannibal2.skyhanni.features.garden
 
-import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.config.enums.OutsideSbFeature
 import at.hannibal2.skyhanni.events.GardenToolChangeEvent
@@ -61,6 +60,6 @@ class GardenYawAndPitch {
 
     @SubscribeEvent
     fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
-        event.move(11, "garden.yawPitchDisplay.everywhere", "garden.yawPitchDisplay.showOutsideGarden")
+        event.move(13, "garden.yawPitchDisplay.everywhere", "garden.yawPitchDisplay.showOutsideGarden")
     }
 }

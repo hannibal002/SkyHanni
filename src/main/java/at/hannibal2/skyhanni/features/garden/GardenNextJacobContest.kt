@@ -574,10 +574,9 @@ object GardenNextJacobContest {
         event.move(3, "garden.nextJacobContestWarnPopup", "garden.nextJacobContests.warnPopup")
         event.move(3, "garden.nextJacobContestPos", "garden.nextJacobContests.pos")
 
-        event.move(11, "garden.nextJacobContests.everywhere", "garden.nextJacobContests.showOutsideGarden")
-
         event.transform(15, "garden.nextJacobContests.shareAutomatically") { element ->
             ConfigUtils.migrateIntToEnum(element, ShareContestsEntry::class.java)
         }
+        event.move(18, "garden.nextJacobContests.everywhere", "garden.nextJacobContests.showOutsideGarden")
     }
 }
