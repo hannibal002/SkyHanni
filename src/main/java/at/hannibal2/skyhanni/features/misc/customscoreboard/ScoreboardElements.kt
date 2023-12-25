@@ -117,7 +117,10 @@ enum class ScoreboardElements(
 
 private fun getTitleDisplayPair() = when (config.displayConfig.titleAndFooter.useHypixelTitleAnimation) {
     true -> listOf(ScoreboardData.objectiveTitle to getTitleAndFooterAlignment())
-    false -> listOf(config.displayConfig.titleAndFooter.customTitle.get().toString().replace("&", "§") to getTitleAndFooterAlignment())
+    false -> listOf(
+        config.displayConfig.titleAndFooter.customTitle.get().toString()
+            .replace("&", "§") to getTitleAndFooterAlignment()
+    )
 }
 
 private fun getProfileDisplayPair() =
@@ -158,6 +161,7 @@ private fun getBitsDisplayPair(): List<Pair<String, AlignmentEnum>> {
             }
             listOf(bitsText)
         }
+
         else -> {
             val bitsText = if (config.displayConfig.showUnclaimedBits) {
                 "Bits: §b$bits§7/${if (BitsAPI.bitsToClaim == 0) "§10" else "§b${BitsAPI.bitsToClaim.addSeparators()}"}"
@@ -242,6 +246,7 @@ private fun getPowerDisplayPair() = when (MaxwellAPI.currentPower == null) {
                 false -> listOf("${MaxwellAPI.currentPower?.power} Power" to AlignmentEnum.LEFT)
                 null -> listOf("${MaxwellAPI.currentPower?.power} Power" to AlignmentEnum.LEFT)
             }
+
             false -> listOf("Power: ${MaxwellAPI.currentPower?.power}" to AlignmentEnum.LEFT)
         }
 }
@@ -375,7 +380,10 @@ private fun getPartyShowWhen() = when (inDungeons) {
 }
 
 private fun getFooterDisplayPair(): List<Pair<String, AlignmentEnum>> {
-    return listOf(config.displayConfig.titleAndFooter.customFooter.get().toString().replace("&", "§") to getTitleAndFooterAlignment())
+    return listOf(
+        config.displayConfig.titleAndFooter.customFooter.get().toString()
+            .replace("&", "§") to getTitleAndFooterAlignment()
+    )
 }
 
 private fun getExtraDisplayPair(): List<Pair<String, AlignmentEnum>> {

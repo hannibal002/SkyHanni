@@ -5,26 +5,24 @@ import at.hannibal2.skyhanni.features.misc.customscoreboard.CustomScoreboardUtil
 import at.hannibal2.skyhanni.utils.LorenzUtils.nextAfter
 import at.hannibal2.skyhanni.utils.TabListData
 
-class InformationGetter {
-    companion object {
-        val dungeonClassList = listOf(
-            "§e[M] ",
-            "§a[M] ",
-            "§c[M] ",
-            "§e[A] ",
-            "§a[A] ",
-            "§c[A] ",
-            "§e[B] ",
-            "§a[B] ",
-            "§c[B] ",
-            "§e[H] ",
-            "§a[H] ",
-            "§c[H] ",
-            "§e[T] ",
-            "§a[T] ",
-            "§c[T] ",
-        )
-    }
+object InformationGetter {
+    val dungeonClassList = listOf(
+        "§e[M] ",
+        "§a[M] ",
+        "§c[M] ",
+        "§e[A] ",
+        "§a[A] ",
+        "§c[A] ",
+        "§e[B] ",
+        "§a[B] ",
+        "§c[B] ",
+        "§e[H] ",
+        "§a[H] ",
+        "§c[H] ",
+        "§e[T] ",
+        "§a[T] ",
+        "§c[T] ",
+    )
 
     fun getInformation() {
         val sidebarLines = ScoreboardData.sidebarLinesFormatted
@@ -179,7 +177,9 @@ class InformationGetter {
 
         // remove objectives kuudra
         unknownLines = unknownLines.filter { sidebarLines.nextAfter("§fObjective") != it }
-        unknownLines = unknownLines.filter { sidebarLines.nextAfter("§fObjective", 2) != it && !extraObjectiveKuudraLines.contains(it) }
+        unknownLines = unknownLines.filter {
+            sidebarLines.nextAfter("§fObjective", 2) != it && !extraObjectiveKuudraLines.contains(it)
+        }
 
         // remove objectives
         val objectiveLine =

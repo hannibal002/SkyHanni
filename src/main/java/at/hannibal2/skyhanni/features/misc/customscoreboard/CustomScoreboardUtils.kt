@@ -56,8 +56,8 @@ object CustomScoreboardUtils {
     }
 
     fun getTitleAndFooterAlignment() = when (config.displayConfig.titleAndFooter.centerTitleAndFooter) {
-            true -> AlignmentEnum.CENTER
-            false -> AlignmentEnum.LEFT
+        true -> AlignmentEnum.CENTER
+        false -> AlignmentEnum.LEFT
     }
 
     class UndetectedScoreboardLines(message: String) : Exception(message)

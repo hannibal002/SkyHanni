@@ -48,8 +48,14 @@ object QuiverAPI {
 
     private val group = RepoPattern.group("data.quiver.chat")
     private val selectPattern by group.pattern("select", "§aYou set your selected arrow type to §f(?<arrow>.*)§a!")
-    private val fillUpJaxPattern by group.pattern("fillupjax", "§aJax forged §f(?<type>.*)§8 x(?<amount>.*) §afor §6(?<coins>.*) Coins§a!")
-    private val fillUpPattern by group.pattern("fillup", "§aYou filled your quiver with §f(?<flintAmount>.*) §aextra arrows!")
+    private val fillUpJaxPattern by group.pattern(
+        "fillupjax",
+        "§aJax forged §f(?<type>.*)§8 x(?<amount>.*) §afor §6(?<coins>.*) Coins§a!"
+    )
+    private val fillUpPattern by group.pattern(
+        "fillup",
+        "§aYou filled your quiver with §f(?<flintAmount>.*) §aextra arrows!"
+    )
     private val clearedPattern by group.pattern("cleared", "§aCleared your quiver!")
 
     @SubscribeEvent

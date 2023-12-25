@@ -48,16 +48,25 @@ object BitsAPI {
     private const val defaultcookiebits = 4800
 
     private val group = RepoPattern.group("data.BitsAPI")
-    private val bitsScoreboardPattern by group.pattern("scoreboard.bits", "Bits: §b(?<amount>.*) §3\\(\\+(?<earned>.*)\\)")
-    private val bitsFromFameRankUpChatPattern by group.pattern("chat.bitsFromFameRankup", "§eYou gained §3(?<amount>.*) Bits Available §ecompounded from all your §epreviously eaten §6cookies§e! Click here to open §6cookie menu§e!")
+    private val bitsScoreboardPattern by group.pattern(
+        "scoreboard.bits",
+        "Bits: §b(?<amount>.*) §3\\(\\+(?<earned>.*)\\)"
+    )
+    private val bitsFromFameRankUpChatPattern by group.pattern(
+        "chat.bitsFromFameRankup",
+        "§eYou gained §3(?<amount>.*) Bits Available §ecompounded from all your §epreviously eaten §6cookies§e! Click here to open §6cookie menu§e!"
+    )
     private val bitsEarnedChatPattern by group.pattern("chat.earned", "§f\\s+§8\\+§b(?<amount>.*)\\s+Bits\n")
     private val boosterCookieAte by group.pattern("chat.boosterCookieAte", "§eYou consumed a §6Booster Cookie§e! §d.+")
-    private val bitsAvailableMenu by group.pattern("gui.bitsAvailableMenu", "§7Bits Available: §b(?<toClaim>[\\w,]+)(§3.+)?")
+    private val bitsAvailableMenu by group.pattern(
+        "gui.bitsAvailableMenu",
+        "§7Bits Available: §b(?<toClaim>[\\w,]+)(§3.+)?"
+    )
     private val fameRankSbmenu by group.pattern("gui.FameRankSbmenu", "§7Your rank: §e(?<rank>.*)")
     private val fameRankCommunityShop by group.pattern("gui.FameRankCommunityShop", "§7Fame Rank: §e(?<rank>.*)")
 
     @SubscribeEvent
-    fun onScoreboardChange(event: ScoreboardChangeEvent){
+    fun onScoreboardChange(event: ScoreboardChangeEvent) {
         for (line in event.newList) {
             val message = line.trimWhiteSpaceAndResets().removeResets()
 

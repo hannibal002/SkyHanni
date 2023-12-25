@@ -12,7 +12,7 @@ import at.hannibal2.skyhanni.utils.StringUtils.trimWhiteSpaceAndResets
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
-enum class Powers (val power: String) {
+enum class Powers(val power: String) {
     // Standard
     NO_POWER("No Power"),
     FORTUITOUS("Fortuitous"),
@@ -51,10 +51,14 @@ enum class Powers (val power: String) {
     UNKNOWN("Unknown"),
     ;
 }
-object MaxwellAPI {
-    var currentPower : Powers? = null
 
-    private val pattern by RepoPattern.pattern("data.maxwell.chat.power", "§eYou selected the §a(?<power>.*) §efor your §aAccessory Bag§e!")
+object MaxwellAPI {
+    var currentPower: Powers? = null
+
+    private val pattern by RepoPattern.pattern(
+        "data.maxwell.chat.power",
+        "§eYou selected the §a(?<power>.*) §efor your §aAccessory Bag§e!"
+    )
 
     @SubscribeEvent
     fun onConfigLoad(event: ConfigLoadEvent) {
@@ -79,7 +83,8 @@ object MaxwellAPI {
         if (!event.inventoryName.contains("Accessory Bag Thaumaturgy")) return
 
         val stacks = event.inventoryItems
-        val selectedPower = stacks.values.find { it.getLore().isNotEmpty() && it.getLore().last() == "§aPower is selected!" } ?: return
+        val selectedPower =
+            stacks.values.find { it.getLore().isNotEmpty() && it.getLore().last() == "§aPower is selected!" } ?: return
 
         currentPower = Powers.entries.find { selectedPower.displayName.contains(it.power) }
         savePower(currentPower!!)

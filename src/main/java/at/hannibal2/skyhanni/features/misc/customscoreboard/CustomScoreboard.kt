@@ -51,7 +51,7 @@ class CustomScoreboard {
         display = createLines()
 
         // Get Information
-        InformationGetter().getInformation()
+        InformationGetter.getInformation()
     }
 
     private fun createLines() = buildList<Pair<String, AlignmentEnum>> {
