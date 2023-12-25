@@ -384,7 +384,11 @@ enum class Events(private val displayLine: Supplier<List<String>>, private val s
             }
 
             // Zone Events
-            if (ScoreboardData.sidebarLinesFormatted.any { it.startsWith("Event: ") } && ScoreboardData.sidebarLinesFormatted.any { it.startsWith("Zone: ") }) {
+            if (ScoreboardData.sidebarLinesFormatted.any { it.startsWith("Event: ") } && ScoreboardData.sidebarLinesFormatted.any {
+                    it.startsWith(
+                        "Zone: "
+                    )
+                }) {
                 val fixName = listOf(
                     "GLOBIRAID" to "GOBLIN RAID",
                     "MITHR GOURMAND" to "MITHRIL GOURMAND",
@@ -397,12 +401,18 @@ enum class Events(private val displayLine: Supplier<List<String>>, private val s
                     list += "§fin " + (ScoreboardData.sidebarLinesFormatted.firstOrNull { it.startsWith("Zone: ") }
                         ?.removePrefix("Zone: ") ?: "<hidden>")
                 }
-                if (ScoreboardData.sidebarLinesFormatted.any { it.startsWith("Remaining: §a") }) {
-                    list += ScoreboardData.sidebarLinesFormatted.firstOrNull { it.startsWith("Remaining: §a") }
-                        ?: "<hidden>"
-                    list += ScoreboardData.sidebarLinesFormatted.firstOrNull { it.startsWith("Your Tasty Mithr") }
-                        ?: "<hidden>"
-                }
+            }
+
+            if (ScoreboardData.sidebarLinesFormatted.any { it.startsWith("Remaining: §a") } && ScoreboardData.sidebarLinesFormatted.any {
+                    it.startsWith(
+                        "Your Tasty Mithril: §c"
+                    )
+                }) {
+                list += "§6Mithril Gourmand"
+                list += ScoreboardData.sidebarLinesFormatted.firstOrNull { it.startsWith("Remaining: §a") }
+                    ?: "<hidden>"
+                list += ScoreboardData.sidebarLinesFormatted.firstOrNull { it.startsWith("Your Tasty Mithril: §c") }
+                    ?: "<hidden>"
             }
 
             // raffle
