@@ -7,50 +7,50 @@
 #### Garden Features
 
 + Added Garden Vacuum Pests in Pest bag to item number as stack size. - hannibal2
-  + Enable via /sh vacuum.
+    + Enable via /sh vacuum.
 + Added Pests to Damage Indicator. - hannibal2
-  + Enable Damage Indicator and select Garden Pests.
+    + Enable Damage Indicator and select Garden Pests.
 + Change how the pest spawn chat message should be formatted. - hannibal2
-  + Unchanged, compact or hide the message entirely.
+    + Unchanged, compact or hide the message entirely.
 + Show a Title when a pest spawns. - hannibal2
 + Show the time since the last pest spawned in your garden. - hannibal2
-  + Option to only show the time while holding vacuum in the hand.
+    + Option to only show the time while holding vacuum in the hand.
 + Show the pests that are attracted when changing the selected material of the Sprayanator. - hannibal2
 + Added Garden only commands /home, /barn and /tp, and hotkeys. - hannibal2
 + Showing a better plot name in the scoreboard. Updates faster and doesn't hide when pests are spawned. - hannibal2
 + Show a display with all known pest locations. - hannibal2
-  + Click to warp to the plot.
-  + Option to only show the time while holding vacuum in the hand.
+    + Click to warp to the plot.
+    + Option to only show the time while holding vacuum in the hand.
 + Mark the plots with pests on them in the world. - hannibal2
 + Press the key to warp to the nearest plot with pests on it. - hannibal2
-+ Draw plot borders when holding the Sprayonator. - HiZe 
++ Draw plot borders when holding the Sprayonator. - HiZe
 + Added Spray Display and Spray Expiration Notice. - appable
-  + Show the active spray and duration for your current plot.
-  + Show a notification in chat when a spray runs out in any plot. Only active in the Garden.
+    + Show the active spray and duration for your current plot.
+    + Show a notification in chat when a spray runs out in any plot. Only active in the Garden.
 
 #### Fishing Features
 
 + Added Barn Fishing Timer to Jerry's Workshop and Crimson Isle. - martimavocado
 + Added Fishing Tracker and changed trackers in general. - hannibal2
-  + This tracker GUI behaves the same way as the Slayer Tracker: Allows for single item remove or hide
-  + Counts coin drops from chat.
-  + Mark the amount in green when recently gained the item.
-  + Option to hide the Fishing Tracker while moving.
-  + Option to hide all Trackers while Estimated Item Value is visible.
-  + Option to change the default display mode for all trackers.
-  + The hidden flag for items in Item Trackers is now shared between total view and session view.
-  + Option to exclude hidden items in the total price calculation.
-  + Option to change the display mode that gets shown on default: Total, Current or remember last.
+    + This tracker GUI behaves the same way as the Slayer Tracker: Allows for single item remove or hide
+    + Counts coin drops from chat.
+    + Mark the amount in green when recently gained the item.
+    + Option to hide the Fishing Tracker while moving.
+    + Option to hide all Trackers while Estimated Item Value is visible.
+    + Option to change the default display mode for all trackers.
+    + The hidden flag for items in Item Trackers is now shared between total view and session view.
+    + Option to exclude hidden items in the total price calculation.
+    + Option to change the display mode that gets shown on default: Total, Current or remember last.
 
 #### Winter Features
 
 + Added Unique Gifting Opportunities. - nea
-  + Highlight players who you haven't given gifts to yet.
-  + Only highlight ungifted players while holding a gift.
-  + Make use of armor stands to stop highlighting players. This is a bit inaccurate, but it can help with people you gifted before this feature was used.
+    + Highlight players who you haven't given gifts to yet.
+    + Only highlight ungifted players while holding a gift.
+    + Make use of armor stands to stop highlighting players. This is a bit inaccurate, but it can help with people you gifted before this feature was used.
 + Added Unique Gifted users counter. - hannibal2
-  + Show in a display how many unique players you have given gifts to in the winter 2023 event.
-  + Run command /opengenerowmenu to sync up.
+    + Show in a display how many unique players you have given gifts to in the winter 2023 event.
+    + Run command /opengenerowmenu to sync up.
 + Jyrre Timer for Bottle of Jyrre. - walker
     + A timer showing the remaining duration of your intelligence boost.
     + Option to show the timer when inactive rather than removing it.
@@ -63,7 +63,7 @@
 + Added Bingo Goal Rank as stack size in Bingo Card. - Erymanthus
 + Added the option to only show tier 1 Minion Crafts in the Helper display when their items needed are fully collected. - hannibal2
 + Added the option to click in the bingo card viewer on goals to mark them as highlighted. - hannibal2
-  + If at least one goal is highlighted, non-highlighted goals will be hidden.
+    + If at least one goal is highlighted, non-highlighted goals will be hidden.
 + Send a chat message with the change of community goal percentages after opening the bingo card inventory. - hannibal2
 
 #### Diana Features
@@ -83,7 +83,7 @@
 + Added bottle of Jyrre time overlay in stack size feature. - HiZe
 + Added show special edition number as stack size when below 1k. - hannibal2
 + Added Copy Underbid Price. - hannibal2
-  + Copies the price of an item in the "Create BIN Auction" minus 1 coin into the clipboard for faster under-bidding.
+    + Copies the price of an item in the "Create BIN Auction" minus 1 coin into the clipboard for faster under-bidding.
 + Highlight your own lowest BIN auctions that are outbid. - hannibal2
 
 #### Minion Features
@@ -114,7 +114,7 @@
 + Added option to enable/disable the vacuum bag item number being capped to 40. - hannibal2
 + Automatic unlocking /shmouselock when teleporting in the garden. - hannibal2
 + Don't hide messages from Jacob. - alexia
-  + This is a workaround for wrongly hidden Jakob messages.
+    + This is a workaround for wrongly hidden Jakob messages.
 + Show the hint to open Configure Plot only if the pest display is incorrect. - hannibal2
 + Added the "plot" word to the sidebar again (only if there are no pests in garden). - hannibal2
 + Hide the Composter Overlay in composter inventory while the Estimated Item Value is visible. - hannibal2
@@ -130,8 +130,8 @@
 + Display Farming Fortune reduction from pests on the HUD. - alexia
 + Allow showing optimal speed warning without HUD enabled. - alexia
 + Highlight Rancher Boots speed in green when a Racing Helmet is equipped. — walker
-+ Show the closest plot border when outside a garden plot. - hannibal2 
-  + Especially useful when building farms.
++ Show the closest plot border when outside a garden plot. - hannibal2
+    + Especially useful when building farms.
 + Show the garden build limit with F3+G on. - hannibal2
 + Added an option to show if the plot is not sprayed. - alexia
 + Changed pest spawn message format. - hannibal2
@@ -142,14 +142,14 @@
 + Default disabled Anita Shop, SkyMart and Sacks display. - hannibal2
 + Default disabled Farming Weight feature: Show LB Change. - hannibal2
 + Default disabled many garden features: - hannibal2
-  + Composter Display
-  + Best Crop Time
-  + Optimal Speed Display
-  + True Farming Fortune
-  + Garden Level Display
-  + Armor Drop Tracker
-  + Dicer Drop Tracker
-  + Money Per Hour
+    + Composter Display
+    + Best Crop Time
+    + Optimal Speed Display
+    + True Farming Fortune
+    + Garden Level Display
+    + Armor Drop Tracker
+    + Dicer Drop Tracker
+    + Money Per Hour
 + Renamed Farming Armor Drops to Armor Drop Tracker. - hannibal2
 + Renamed RNG Drop Counter to Dicer RNG Drop Tracker. - hannibal2
 
@@ -174,7 +174,7 @@
 
 + Option to remove the background difficulty color in the bingo card inventory when the goal is done. - hannibal2
 + Mark the background difficulty gray for unknown goals. - hannibal2
-  + This is no longer needed as all 20 hidden goals are known now, but we now have this support for the next extreme bingo with hidden goals.
+    + This is no longer needed as all 20 hidden goals are known now, but we now have this support for the next extreme bingo with hidden goals.
 + Added the community goal percentage to the bingo card display. - hannibal2
 + Saving minion craft helper crafted tier 1 minions and bingo card goals per bingo session/month. - hannibal2
 
@@ -195,7 +195,7 @@
 + Added support for the new item rarity "Ultimate Cosmetic". - hannibal2
 + Hide "Winter Island Close" timer during the month of December. - hannibal2
 + Changes Ctrl+V in signs to better sign editing. - Obsidian
-  +  Allows pasting (Ctrl+V), copying (Ctrl+C), and deleting whole words/lines (Ctrl+Backspace/Ctrl+Shift+Backspace) in signs.
+    +  Allows pasting (Ctrl+V), copying (Ctrl+C), and deleting whole words/lines (Ctrl+Backspace/Ctrl+Shift+Backspace) in signs.
 + Improve accuracy of movement speed display. - alexia
 + Added toggle to hide autopet messages. - CalMWolfs
 + Not only Slayer, also Fishing and Diana item drops will now show in chat & title when over a custom defined price. - hannibal2
@@ -301,7 +301,7 @@
 + Fixed an error message when closing the wheat minion in the Hub. - Thunderblade73
 + Fixed locraw sending outside Hypixel. - walker
 + Fixed finished city project still reminding and suggests buying items. - hannibal2
-  + Open the city project inventory once again to fix warnings correctly.
+    + Open the city project inventory once again to fix warnings correctly.
 + Fixed kick alert triggering instantly. - alexia
 + Fixed daily boss kill detection in Crimson Isle Reputation Helper. - hannibal2
 + Fixed Estimated Item Value error in Jerry's Island Deliveries menu. - hannibal2
@@ -331,7 +331,7 @@
 + Auto-removing all labels of PRs on merging/closing. - hannibal2
 + Changed OwnInventoryItemUpdateEvent to be called synced to the main thread. - hannibal2
 + romanToDecimalIfNeeded -> romanToDecimalIfNecessary. - hannibal2
-  + For more context: https://chat.openai.com/share/502571b5-8851-4047-b343-3b1475ca8a88
+    + For more context: https://chat.openai.com/share/502571b5-8851-4047-b343-3b1475ca8a88
 + Added the debug feature SkyHanni Event Counter. - hannibal2
 + Fix Consecutive Spaces in RegEx. - walker
 + No longer creating new regex pattern elements each time in DungeonDeathCounter. - walker
@@ -352,7 +352,7 @@
 + Added test command /shsendtitle - Cad
 + Saving bingo goal data into the config. - hannibal2
 + Added WorldEdit region selection preview support. - nea
-  + Command /shworldedit and rigth/left clicking with a wood axe work.
+    + Command /shworldedit and rigth/left clicking with a wood axe work.
 + Fixed error message in the "/shconfig set" command. - Thunderblade73
 + Add a check for the SkyHanni repository ID in publish. - walker
 + Cleanup getItemsInOpenChest. - walker
@@ -397,10 +397,10 @@
 
 + Added /shwhereami command to show the current island. - martimavocado
 + Tons of code clean-ups over the whole project. - walker & hannibal2
-  + Added ItemAddEvent. - hannibal2
+    + Added ItemAddEvent. - hannibal2
 + Gets called when the user collects an item into inventory or sacks.
 + Created SkyHanniItemTracker. - hannibal2
-  + This is a Special variant of SkyHanniTracker, that has item specific functions (hide or remove) and different price variants.
+    + This is a Special variant of SkyHanniTracker, that has item specific functions (hide or remove) and different price variants.
 + Migrated slayer profit data into SkyHanniTracker format. - hannibal2
 
 #### Garden Changes
