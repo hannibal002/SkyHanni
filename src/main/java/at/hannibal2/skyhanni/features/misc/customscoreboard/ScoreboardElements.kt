@@ -313,8 +313,8 @@ private fun getSlayerShowWhen() = listOf(
 private fun getQuiverDisplayPair(): List<Pair<String, AlignmentEnum>> {
     if (QuiverAPI.currentArrow == null) return listOf("§cChange your Arrow once" to AlignmentEnum.LEFT)
     return when (config.displayConfig.displayNumbersFirst) {
-        true -> listOf("${QuiverAPI.currentAmount} ${QuiverAPI.currentArrow?.arrow} ")
-        false -> listOf("${QuiverAPI.currentArrow?.arrow} §f${QuiverAPI.currentAmount} Arrows")
+        true -> listOf("${QuiverAPI.currentAmount.addSeparators()} ${QuiverAPI.currentArrow?.arrow} ")
+        false -> listOf("§f${QuiverAPI.currentArrow?.arrow} ${QuiverAPI.currentAmount.addSeparators()} Arrows")
     }.map { it to AlignmentEnum.LEFT }
 }
 
