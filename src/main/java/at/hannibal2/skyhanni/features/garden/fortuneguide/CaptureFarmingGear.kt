@@ -37,6 +37,9 @@ class CaptureFarmingGear {
 
     private val cakePattern = "(?:Big )?Yum! You (?:gain|refresh) [+]5☘ Farming Fortune for 48 hours!".toPattern()
 
+    private val tierPattern = "§7Progress to Tier (?<nextTier>\\d+):.*".toPattern()
+    private val tierProgressPattern = ".* §e(?<having>.*)§6/(?<total>.*)".toPattern()
+
     companion object {
         private val strengthPattern = " Strength: §r§c❁(?<strength>.*)".toPattern()
         private val farmingSets = arrayListOf(
@@ -89,6 +92,16 @@ class CaptureFarmingGear {
             val storage = GardenAPI.storage?.fortune ?: return
             storage.pumpkinFortune = !storage.pumpkinFortune
             LorenzUtils.chat("Toggled expired pumpkin fortune to: ${storage.pumpkinFortune}")
+        }
+
+        private fun getUniqueVisitorsForTier(tier: Int, progress: Int): Int {
+            return when {
+                tier == 0 -> 0
+                tier == 1 -> 1
+                tier == 2 -> 5
+                tier >= 3 -> 10 * (tier - 2)
+                else -> throw IllegalStateException("Unexpected unique visitors tier: $tier")
+            } + progress
         }
     }
 
@@ -212,6 +225,25 @@ class CaptureFarmingGear {
                 storage.anitaUpgrade = 15
             } else {
                 storage.anitaUpgrade = level
+            }
+        }
+        if (event.inventoryName.contains("Visitor Milestones")) {
+            for ((_, item) in event.inventoryItems) {
+                if (item.displayName == "§aUnique Visitors Served") {
+                    var tier = -1
+                    var tierProgress = -1
+                    for (line in item.getLore()) {
+                        tierPattern.matchMatcher(line) {
+                            tier = group("nextTier").toInt() - 1
+                        }
+                        tierProgressPattern.matchMatcher(line) {
+                            tierProgress = group("having").toInt()
+                        }
+                    }
+                    if (tier > -1 && tierProgress > -1) {
+                        GardenAPI.storage?.uniqueVisitors = getUniqueVisitorsForTier(tier, tierProgress)
+                    }
+                }
             }
         }
     }
