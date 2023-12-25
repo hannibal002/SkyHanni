@@ -36,16 +36,18 @@ class WikiManager {
         if (!(message.startsWith("/wiki"))) return
         event.isCanceled = true
         if (message == "/wiki") {
-            LorenzUtils.clickableLinkChat("Click to open the wiki!", urlPrefix,config.autoOpenWiki,"Open the wiki!")
+            LorenzUtils.clickableLinkChat("Click to open the wiki!", urlPrefix, config.autoOpenWiki, "Open the wiki!")
         } else if (message.startsWith("/wiki ") || message == ("/wikithis")) { //conditional to see if we need Special:Search page
             if (message == ("/wikithis")) {
                 val itemInHand = InventoryUtils.getItemInHand() ?: return
-                wikiTheItem(itemInHand,config.autoOpenWiki)
+                wikiTheItem(itemInHand, config.autoOpenWiki)
             } else {
                 val search = event.message.split("/wiki ").last()
                 val wikiUrlCustom = "$urlSearchPrefix$search"
-                LorenzUtils.clickableLinkChat("Click to search for §a${search}§e on the wiki!",
-                    wikiUrlCustom.replace(' ', '+'),config.autoOpenWiki,"Search for §a$search§e on the wiki!")
+                LorenzUtils.clickableLinkChat(
+                    "Click to search for §a${search}§e on the wiki!",
+                    wikiUrlCustom.replace(' ', '+'), config.autoOpenWiki, "Search for §a$search§e on the wiki!"
+                )
             }
         }
     }
@@ -58,7 +60,7 @@ class WikiManager {
         val stack = gui.slotUnderMouse?.stack ?: return
 
         if (!config.wikiKeybind.isKeyHeld()) return
-        wikiTheItem(stack,config.menuOpenWiki)
+        wikiTheItem(stack, config.menuOpenWiki)
     }
 
     private fun wikiTheItem(item: ItemStack, autoOpen: Boolean) {
@@ -69,8 +71,10 @@ class WikiManager {
         val internalName = item.getInternalName().asString()
         val wikiUrlSearch = if (internalName != "NONE") "$urlSearchPrefix$internalName"
         else "$urlSearchPrefix${itemDisplayName.removeColor()}"
-        LorenzUtils.clickableLinkChat("Click to search for §a$itemDisplayName§e on the wiki!",
-            wikiUrlSearch.replace(' ', '+'),autoOpen,"Search for §a$itemDisplayName§e on the wiki!")
+        LorenzUtils.clickableLinkChat(
+            "Click to search for §a$itemDisplayName§e on the wiki!",
+            wikiUrlSearch.replace(' ', '+'), autoOpen, "Search for §a$itemDisplayName§e on the wiki!"
+        )
     }
 
     private fun isEnabled() = config.enabled
