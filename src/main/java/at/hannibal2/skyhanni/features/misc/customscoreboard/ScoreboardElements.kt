@@ -75,7 +75,7 @@ enum class ScoreboardElements(
         "§cSlayer\n §7- §cVoidgloom Seraph III\n §7- §e12§7/§c120 §7Kills"
     ),
     EMPTY_LINE3({ getEmptyLineDisplayPair() }, { true }, ""),
-    QUIVER({ getQuiverDisplayPair() }, { true }, "Flint Arrow: §f1,234"),
+    QUIVER({ getQuiverDisplayPair() }, { getQuiverShowWhen() }, "Flint Arrow: §f1,234"),
     POWDER(
         { getPowderDisplayPair() },
         { getPowderShowWhen() },
@@ -317,6 +317,8 @@ private fun getQuiverDisplayPair(): List<Pair<String, AlignmentEnum>> {
         false -> listOf("§f${QuiverAPI.currentArrow?.arrow} ${QuiverAPI.currentAmount.addSeparators()} Arrows")
     }.map { it to AlignmentEnum.LEFT }
 }
+
+private fun getQuiverShowWhen() = !listOf(IslandType.THE_RIFT).contains(HypixelData.skyBlockIsland)
 
 private fun getPowderDisplayPair() = when (config.displayConfig.displayNumbersFirst) {
     true -> listOf("§9§lPowder") + (" §7- §2$mithrilPowder Mithril") + (" §7- §d$gemstonePowder Gemstone")
