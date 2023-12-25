@@ -79,6 +79,8 @@ class ReforgeHelper {
 
     var hoverdReforgeStone: String? = null
 
+    var sortAfter: ReforgeAPI.StatType? = null
+
     fun itemUpdate() {
         val newItem = inventory?.getSlot(reforgeItem)?.stack
         if (newItem?.getInternalName() != item?.getInternalName()) {
@@ -176,6 +178,7 @@ class ReforgeHelper {
         reforgeToSearch = null
         currentReforge = null
         hoverdReforgeStone = null
+        sortAfter = null
         updateDisplay()
     }
 
@@ -185,26 +188,40 @@ class ReforgeHelper {
         val internalName = item.getInternalName()
         val itemType = item.getItemCategoryOrNull()
         val itemRarity = item.getItemRarityOrNull()
-        val list = (if (isInHexReforgeMenu) ReforgeAPI.reforgeList else ReforgeAPI.nonePowerStoneReforge
-            ).filter { it.isValid(itemType, internalName) }.map { reforge ->
-                Renderable.clickAndHover(
-                    (if (reforge.isReforgeStone) "§9" else "§7") + reforge.name,
-                    itemRarity?.let { rarity ->
-                        if (currentReforge == reforge) listOf(Renderable.string("§3Reforge is currently applied!")) else
-                            (reforge.stats[rarity]?.print(currentReforge?.stats?.get(rarity)) ?: emptyList()) +
-                                (currentReforge?.extraProperty?.get(rarity)?.split('\n')?.map { Renderable.string(it) }?.let { listOf(Renderable.string("§cRemoves Effect:")) + it }
-                                    ?: emptyList()) +
-                                (reforge.extraProperty?.get(rarity)?.split('\n')?.map { Renderable.string(it) }?.let { listOf(Renderable.string("§aAdds Effect:")) + it }
-                                    ?: emptyList())
-
-                    }
-                        ?: listOf(""), onClick = { reforgeToSearch = reforge }, onHover = if (!isInHexReforgeMenu) {
-                    {}
-                } else {
-                    { hoverdReforgeStone = reforge.rawReforgeStoneName ?: "Random Basic Reforge" }
-                }
-                )
+        val reforgeList = (if (isInHexReforgeMenu) ReforgeAPI.reforgeList else ReforgeAPI.nonePowerStoneReforge).filter { it.isValid(itemType, internalName) }
+        val statTypes = reforgeList.mapNotNull { it.stats[itemRarity]?.map { it.key } }.flatten().toSet()
+        val statButton = { it: ReforgeAPI.StatType? ->
+            val string = Renderable.string(it?.icon ?: "A")
+            if (sortAfter == it) {
+                Renderable.underlined(string)
+            } else {
+                Renderable.clickable(string, { sortAfter = it; DelayedRun.runNextTick { updateDisplay() } })
             }
+        }
+        val statTypeButtons = (listOf(statButton.invoke(null)) + statTypes.map { statButton.invoke(it) }).chunked(8)
+        this.add(Renderable.table(statTypeButtons, xPadding = 3, yPadding = 2))
+        for (i in 2..statTypeButtons.size) { // TODO fix renderRenderables to work with diffrent hight after that remove this for
+            this.add(Renderable.placeholder(1))
+        }
+        val list = reforgeList.map { reforge ->
+            Renderable.clickAndHover(
+                (if (reforge.isReforgeStone) "§9" else "§7") + reforge.name,
+                itemRarity?.let { rarity ->
+                    if (currentReforge == reforge) listOf(Renderable.string("§3Reforge is currently applied!")) else
+                        (reforge.stats[rarity]?.print(currentReforge?.stats?.get(rarity)) ?: emptyList()) +
+                            (currentReforge?.extraProperty?.get(rarity)?.split('\n')?.map { Renderable.string(it) }?.let { listOf(Renderable.string("§cRemoves Effect:")) + it }
+                                ?: emptyList()) +
+                            (reforge.extraProperty?.get(rarity)?.split('\n')?.map { Renderable.string(it) }?.let { listOf(Renderable.string("§aAdds Effect:")) + it }
+                                ?: emptyList())
+
+                }
+                    ?: listOf(""), onClick = { reforgeToSearch = reforge }, onHover = if (!isInHexReforgeMenu) {
+                {}
+            } else {
+                { hoverdReforgeStone = reforge.rawReforgeStoneName ?: "Random Basic Reforge" }
+            }
+            )
+        }
         this.addAll(list)
         if (itemType == null) {
             reforgeToSearch = null
