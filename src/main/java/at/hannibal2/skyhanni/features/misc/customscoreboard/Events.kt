@@ -384,18 +384,10 @@ enum class Events(private val displayLine: Supplier<List<String>>, private val s
 
             // Zone Events
             if (ScoreboardData.sidebarLinesFormatted.any { it.startsWith("Event: ") } && ScoreboardData.sidebarLinesFormatted.any {
-                    it.startsWith(
-                        "Zone: "
-                    )
+                    it.startsWith("Zone: ")
                 }) {
-                val fixName = listOf(
-                    "GLOBIRAID" to "GOBLIN RAID",
-                    "MITHR GOURMAND" to "MITHRIL GOURMAND",
-                )
                 list += ScoreboardData.sidebarLinesFormatted.firstOrNull { it.startsWith("Event: ") }
-                    ?.removePrefix("Event: ")?.let { name ->
-                        fixName.firstOrNull { it.first == name }?.second ?: name
-                    } ?: "<hidden>"
+                    ?.removePrefix("Event: ") ?: "<hidden>"
                 if (ScoreboardData.sidebarLinesFormatted.any { it.startsWith("Zone: ") }) {
                     list += "§fin " + (ScoreboardData.sidebarLinesFormatted.firstOrNull { it.startsWith("Zone: ") }
                         ?.removePrefix("Zone: ") ?: "<hidden>")
