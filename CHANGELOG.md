@@ -138,6 +138,21 @@
 + Changed pest spawn message format. - hannibal2
 + Improve the precision of the compost empty timer. - appable
 + Added Harvest Harbinger and Pest Repellent non-god effects. - alexia
++ Draw Plot Border change: Pest Finder now always renders over the Spray Selector or Garden Plot Border. - hannibal2
++ Make the vacuum bag show 40+ instead of 40 when capped. - alexia
++ Default disabled Anita Shop, SkyMart and Sacks display. - hannibal2
++ Default disabled Farming Weight feature: Show LB Change. - hannibal2
++ Default disabled many garden features: - hannibal2
+  + Composter Display
+  + Best Crop Time
+  + Optimal Speed Display
+  + True Farming Fortune
+  + Garden Level Display
+  + Armor Drop Tracker
+  + Dicer Drop Tracker
+  + Money Per Hour
++ Renamed Farming Armor Drops to Armor Drop Tracker. - hannibal2
++ Renamed RNG Drop Counter to Dicer RNG Drop Tracker. - hannibal2
 
 #### Fishing Changes
 
@@ -147,6 +162,8 @@
 #### Winter Changes
 
 + Hiding Unique Gifted Players Highlighting for ironman and bingo while not on those modes. - Thunderblade73
++ Make the Unique Gift Counter and Unique Gifting Opportunities highlight only active during December. - hannibal2
++ Added Frozen Bait and Einary's Red Hoodie to Frozen Treasure Tracker. - hannibal2
 
 #### Chat Changes
 
@@ -191,6 +208,7 @@
 + Bazaar Best Sell Method now warns if an unknown bazaar item is detected. - hannibal2
 + SkyHanni position editor hotkey now work outside SkyBlock as well. - hannibal2
 + Dungeon party finder highlight features now works outside Dungeon Hub as well. - hannibal2
++ Added Rogue Sword item ability support. - hannibal2
 
 ### Fixes
 
@@ -229,6 +247,7 @@
 + Fixed SkyMart items showing the wrong profit when having other items as costs. - hannibal2
 + Hide "Not sprayed!" text while in the barn or outside the garden area. - hannibal2
 + Fixed armor drop tracker not instantly visible. - hannibal2
++ Fixed Jacob Contest Warning. - hannibal2
 
 #### Bingo Fixes
 
@@ -249,6 +268,7 @@
 + Fixed Shark Message missing a color code. - jani
 + Fixed /shresetfishingtracker description - absterge
 + Fixed barn fishing reset hotkey triggering while inside a GUI. - hannibal2
++ Fixed Rare Sea Creature Warning/Highlight during Derpy. - hannibal2
 
 #### Diana Fixes
 
@@ -261,6 +281,7 @@
 + Fixed an error message on /pt. - nea
 + Fixed the fire sale filter when a rune is selling. - j10a1n15
 + Fixed bestiary compact message. - hannibal2
++ Fixed a typo in the Player Chat Symbol config. - walker
 
 #### Dungeon Fixes
 
@@ -288,6 +309,11 @@
 + Fixed the /gfs command counting in the Slayer Profit Tracker.  - hannibal2
 + Fixed the Fire Veil effect and item ability cooldown not working when clicking in the air. - hannibal2
 + Fixed broken area mini boss highlight during Derpy. - hannibal2
++ Fixed Special Zealot Highlight during Derpy. - hannibal2
++ Fixed the left-click ability detection of the Gyro Wand. - hannibal2
++ Fixed non-god pot effects display staying after profile switch. - hannibal2
++ Fixed broken percent to tier icon in bestiary display when bestiary is maxed. - hannibal2
++ Fixed config migration errors with Chroma, Crop Milestones, Chest Value and Item Trackers. - hannibal2
 
 #### Config Fixes
 
@@ -342,6 +368,7 @@
 + Refactored Duplicate Code in SkyHanniInstallerFrame. - walker
 + Removed unnecessary non-capturing groups. - walker
 + ComposterOverlay now uses NEUInternalName. - walker
++ Added the debug command /shfindnullconfig. - hannibal2
 
 ## Version 0.21.1
 
