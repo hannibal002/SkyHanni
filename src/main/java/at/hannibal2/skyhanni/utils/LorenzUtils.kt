@@ -350,6 +350,34 @@ object LorenzUtils {
         Minecraft.getMinecraft().thePlayer.addChatMessage(text)
     }
 
+    /**
+     * Sends a message to the user that they can click and run a command
+     * @param message The message to be sent
+     * @param url The url to be opened
+     * @param autoOpen Automatically opens the url as well as sending the clickable link message
+     * @param hover The message to be shown when the message is hovered
+     * @param prefix Whether to prefix the message with the chat prefix, default true
+     * @param prefixColor Color that the prefix should be, default yellow (§e)
+     *
+     * @see CHAT_PREFIX
+     */
+    fun clickableLinkChat(
+        message: String,
+        url: String,
+        autoOpen: Boolean = false,
+        hover: String = "",
+        prefix: Boolean = true,
+        prefixColor: String = "§e"
+    ) {
+        val msgPrefix = if (prefix) prefixColor + CHAT_PREFIX else ""
+        val text = ChatComponentText(msgPrefix + message)
+        text.chatStyle.chatClickEvent = ClickEvent(ClickEvent.Action.OPEN_URL, url)
+        text.chatStyle.chatHoverEvent =  HoverEvent(HoverEvent.Action.SHOW_TEXT,
+            ChatComponentText(if (hover == "") "§eOpen $url" else "§e$hover"))
+        Minecraft.getMinecraft().thePlayer.addChatMessage(text)
+        if (autoOpen) OSUtils.openBrowser(url)
+    }
+
     fun <K, V> Map<K, V>.moveEntryToTop(matcher: (Map.Entry<K, V>) -> Boolean): Map<K, V> {
         val entry = entries.find(matcher)
         if (entry != null) {

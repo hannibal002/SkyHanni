@@ -9,7 +9,6 @@ import at.hannibal2.skyhanni.utils.ItemUtils.nameWithEnchantment
 import at.hannibal2.skyhanni.utils.KeyboardManager.isKeyHeld
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.NEUItems
-import at.hannibal2.skyhanni.utils.OSUtils
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import net.minecraft.client.gui.inventory.GuiContainer
 import net.minecraft.item.ItemStack
@@ -18,12 +17,7 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
 class WikiManager {
 
-    private val config get() = SkyHanniMod.feature.commands.fandomWiki
-
-    companion object {
-        private val urlPrefix = "https://hypixel-skyblock.fandom.com/wiki/"
-        val urlSearchPrefix = "${urlPrefix}Special:Search?query="
-    }
+    private val config get() = SkyHanniMod.feature.commands.betterWiki
 
     @SubscribeEvent
     fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
@@ -35,21 +29,23 @@ class WikiManager {
         if (!LorenzUtils.inSkyBlock) return
         if (!isEnabled()) return
 
+        val urlPrefix = if (config.useFandom) "https://hypixel-skyblock.fandom.com/wiki/" else "https://wiki.hypixel.net/"
+        val urlSearchPrefix = if (config.useFandom) "${urlPrefix}Special:Search?query=" else "${urlPrefix}index.php?search="
+
         val message = event.message.lowercase()
         if (!(message.startsWith("/wiki"))) return
         event.isCanceled = true
         if (message == "/wiki") {
-            LorenzUtils.chat("Opening the Fandom Wiki..")
-            OSUtils.openBrowser("${urlPrefix}Hypixel_SkyBlock_Wiki")
+            LorenzUtils.clickableLinkChat("Click to open the wiki!", urlPrefix,config.autoOpenWiki,"Open the wiki!")
         } else if (message.startsWith("/wiki ") || message == ("/wikithis")) { //conditional to see if we need Special:Search page
             if (message == ("/wikithis")) {
                 val itemInHand = InventoryUtils.getItemInHand() ?: return
-                wikiTheItem(itemInHand)
+                wikiTheItem(itemInHand,config.autoOpenWiki)
             } else {
                 val search = event.message.split("/wiki ").last()
-                LorenzUtils.chat("Searching the Fandom Wiki for §a$search")
-                val wikiUrlCustom = "$urlSearchPrefix$search&scope=internal"
-                OSUtils.openBrowser(wikiUrlCustom.replace(' ', '+'))
+                val wikiUrlCustom = "$urlSearchPrefix$search"
+                LorenzUtils.clickableLinkChat("Click to search for §a${search}§e on the wiki!",
+                    wikiUrlCustom.replace(' ', '+'),config.autoOpenWiki,"Search for §a$search§e on the wiki!")
             }
         }
     }
@@ -61,17 +57,20 @@ class WikiManager {
         if (NEUItems.neuHasFocus()) return //because good heavens if this worked on neuitems...
         val stack = gui.slotUnderMouse?.stack ?: return
 
-        if (!config.fandomWikiKeybind.isKeyHeld()) return
-        wikiTheItem(stack)
+        if (!config.wikiKeybind.isKeyHeld()) return
+        wikiTheItem(stack,config.menuOpenWiki)
     }
 
-    private fun wikiTheItem(item: ItemStack) {
+    private fun wikiTheItem(item: ItemStack, autoOpen: Boolean) {
+        val urlPrefix = if (config.useFandom) "https://hypixel-skyblock.fandom.com/wiki/" else "https://wiki.hypixel.net/"
+        val urlSearchPrefix = if (config.useFandom) "${urlPrefix}Special:Search?query=" else "${urlPrefix}index.php?search="
+
         val itemDisplayName = (item.nameWithEnchantment ?: return).replace("§a✔ ", "").replace("§c✖ ", "")
         val internalName = item.getInternalName().asString()
-        LorenzUtils.chat("Searching the Fandom Wiki for §a$itemDisplayName")
-        val wikiUrlSearch = if (internalName != "NONE") "$urlSearchPrefix$internalName&scope=internal"
-        else "$urlSearchPrefix${itemDisplayName.removeColor()}&scope=internal"
-        OSUtils.openBrowser(wikiUrlSearch.replace(' ', '+'))
+        val wikiUrlSearch = if (internalName != "NONE") "$urlSearchPrefix$internalName"
+        else "$urlSearchPrefix${itemDisplayName.removeColor()}"
+        LorenzUtils.clickableLinkChat("Click to search for §a$itemDisplayName§e on the wiki!",
+            wikiUrlSearch.replace(' ', '+'),autoOpen,"Search for §a$itemDisplayName§e on the wiki!")
     }
 
     private fun isEnabled() = config.enabled

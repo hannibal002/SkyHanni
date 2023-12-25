@@ -13,10 +13,10 @@ public class CommandsConfig {
     @Expose
     public TabCompleteConfig tabComplete = new TabCompleteConfig();
 
-    @ConfigOption(name = "Fandom Wiki for §e/wiki", desc = "")
+    @ConfigOption(name = "Better §e/wiki", desc = "")
     @Accordion
     @Expose
-    public FandomWikiCommandConfig fandomWiki = new FandomWikiCommandConfig();
+    public BetterWikiCommandConfig betterWiki = new BetterWikiCommandConfig();
 
     @ConfigOption(name = "Party Commands", desc = "Shortens party commands and allows tab-completing for them. " +
         "\n§eCommands: /pt /pp /pko /pk §7SkyBlock command §e/pt §7to check the play time still works.")

@@ -14,9 +14,9 @@ import io.github.moulberry.notenoughupdates.events.SlotClickEvent
 import net.minecraftforge.fml.common.eventhandler.EventPriority
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
-class FandomWikiFromMenus {
+class BetterWikiFromMenus {
 
-    private val config get() = SkyHanniMod.feature.commands.fandomWiki
+    private val config get() = SkyHanniMod.feature.commands.betterWiki
 
     @SubscribeEvent
     fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
@@ -27,6 +27,10 @@ class FandomWikiFromMenus {
     fun onSlotClick(event: SlotClickEvent) {
         if (!LorenzUtils.inSkyBlock) return
         if (!isEnabled()) return
+
+        val urlSearchPrefix = if (config.useFandom) "https://hypixel-skyblock.fandom.com/wiki/Special:Search?query="
+        else "https://wiki.hypixel.net/index.php?search="
+
         val chestName = InventoryUtils.openInventoryName()
 
         if (chestName.isEmpty()) return
@@ -42,7 +46,7 @@ class FandomWikiFromMenus {
         val inWikiInventory = // TODO better name for this inventory
             event.slotId == 11 && itemClickedName.contains("Wiki Command") && chestName.contains("Wiki")
         if ((itemInHandName == "") || inWikiInventory) {
-            LorenzUtils.clickableChat("Click here to visit the Hypixel Skyblock Fandom Wiki!", "wiki")
+            LorenzUtils.clickableLinkChat("Click here to visit the Hypixel Skyblock Fandom Wiki!", "https://hypixel-skyblock.fandom.com/wiki")
             return
         }
 
@@ -56,22 +60,22 @@ class FandomWikiFromMenus {
             //.lowercase() to match "Wiki!" and ".*wiki.*" lore lines in one fell swoop
             val inThirdWikiInventory = // TODO better name for this inventory
                 (itemClickedStack.getLore()
-                    .let { it.any { line -> line == "§7§eClick to view on the SkyBlock" } && it.last() == "§eWiki!" })
+                    .let { it.any { line -> line == "§7§eClick to view on the SkyBlock Wiki!" }})
             if (inThirdWikiInventory) {
                 wikiDisplayName = itemClickedName.removeColor().replace("✔ ", "").replace("✖ ", "")
                 wikiInternalName = wikiDisplayName
             } else return
         }
 
-        if (!config.skipWikiChat) {
+        if (!config.menuOpenWiki) {
             LorenzUtils.clickableChat(
                 "Click here to search for $wikiDisplayName §eon the Hypixel Skyblock Fandom Wiki!",
                 "wiki $wikiInternalName"
             )
         } else {
-            LorenzUtils.chat("Searching the Fandom Wiki for §a$wikiDisplayName")
-            val wikiUrlCustom = "${WikiManager.urlSearchPrefix}$wikiInternalName&scope=internal"
-            OSUtils.openBrowser(wikiUrlCustom.replace(' ', '+'))
+            val wikiUrlCustom = "${urlSearchPrefix}$wikiInternalName&scope=internal"
+            LorenzUtils.clickableLinkChat("Click to search the wiki for §a$wikiDisplayName§e!",
+                wikiUrlCustom.replace(' ', '+'),config.menuOpenWiki,"Search §a$wikiDisplayName§e on the wiki!")
         }
         event.isCanceled = true
     }
