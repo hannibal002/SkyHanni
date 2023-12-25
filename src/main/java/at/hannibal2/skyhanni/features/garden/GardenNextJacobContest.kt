@@ -329,7 +329,8 @@ object GardenNextJacobContest {
 
         val boostedCrop = calculateBoostedCrop(nextContest)
 
-        if (duration < contestDuration) {
+        val activeContest = duration < contestDuration
+        if (activeContest) {
             list.add("§aActive: ")
         } else {
             list.add("§eNext: ")
@@ -340,7 +341,9 @@ object GardenNextJacobContest {
             list.addCropIcon(crop, highlight = (crop == boostedCrop))
             nextContestCrops.add(crop)
         }
-        warn(duration, nextContest.crops, boostedCrop)
+        if (!activeContest) {
+            warn(duration, nextContest.crops, boostedCrop)
+        }
         val format = duration.format()
         list.add("§7(§b$format§7)")
 
