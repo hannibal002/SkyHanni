@@ -5,6 +5,8 @@ import at.hannibal2.skyhanni.data.HypixelData
 import at.hannibal2.skyhanni.data.ScoreboardData
 import at.hannibal2.skyhanni.mixins.transformers.AccessorGuiPlayerTabOverlay
 import at.hannibal2.skyhanni.utils.RenderUtils.AlignmentEnum
+import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
+import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraft.client.Minecraft
 
 private val config get() = SkyHanniMod.feature.gui.customScoreboard
@@ -32,9 +34,13 @@ object CustomScoreboardUtils {
     }
 
     fun extractLobbyCode(input: String): String? {
-        val regex = Regex("§(\\d{3}/\\d{2}/\\d{2}) §([A-Za-z0-9]+)$")
-        val matchResult = regex.find(input)
-        return matchResult?.groupValues?.lastOrNull()
+        val pattern by RepoPattern.pattern ("features.misc.customscoreboard.lobbycode", "§(\\d{3}/\\d{2}/\\d{2}) §(?<code>.*)$")
+
+        pattern.matchMatcher(input) {
+            return group("code")
+        }
+
+        return null
     }
 
     fun getProfileTypeSymbol(): String {
