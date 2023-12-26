@@ -98,7 +98,7 @@ public class ComposterConfig {
     )
     @ConfigEditorBoolean
     @FeatureToggle
-    public boolean displayEnabled = true;
+    public boolean displayEnabled = false;
 
     @Expose
     @ConfigOption(
