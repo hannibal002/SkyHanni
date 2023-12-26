@@ -47,7 +47,8 @@
 + Added Unique Gifting Opportunities. - nea
     + Highlight players who you haven't given gifts to yet.
     + Only highlight ungifted players while holding a gift.
-    + Make use of armor stands to stop highlighting players. This is a bit inaccurate, but it can help with people you gifted before this feature was used.
+    + Make use of armor stands to stop highlighting players. This is a bit inaccurate, but it can help with people you
+      gifted before this feature was used.
 + Added Unique Gifted users counter. - hannibal2
     + Show in a display how many unique players you have given gifts to in the winter 2023 event.
     + Run command /opengenerowmenu to sync up.
@@ -61,7 +62,8 @@
 + Added support for tips in hidden bingo card display. - hannibal2
 + Added support for 'found by' info in bingo card. - hannibal2
 + Added Bingo Goal Rank as stack size in Bingo Card. - Erymanthus
-+ Added the option to only show tier 1 Minion Crafts in the Helper display when their items needed are fully collected. - hannibal2
++ Added the option to only show tier 1 Minion Crafts in the Helper display when their items needed are fully
+  collected. - hannibal2
 + Added the option to click in the bingo card viewer on goals to mark them as highlighted. - hannibal2
     + If at least one goal is highlighted, non-highlighted goals will be hidden.
 + Send a chat message with the change of community goal percentages after opening the bingo card inventory. - hannibal2
@@ -174,7 +176,8 @@
 
 + Option to remove the background difficulty color in the bingo card inventory when the goal is done. - hannibal2
 + Mark the background difficulty gray for unknown goals. - hannibal2
-    + This is no longer needed as all 20 hidden goals are known now, but we now have this support for the next extreme bingo with hidden goals.
+    + This is no longer needed as all 20 hidden goals are known now, but we now have this support for the next extreme
+      bingo with hidden goals.
 + Added the community goal percentage to the bingo card display. - hannibal2
 + Saving minion craft helper crafted tier 1 minions and bingo card goals per bingo session/month. - hannibal2
 
@@ -195,10 +198,12 @@
 + Added support for the new item rarity "Ultimate Cosmetic". - hannibal2
 + Hide "Winter Island Close" timer during the month of December. - hannibal2
 + Changes Ctrl+V in signs to better sign editing. - Obsidian
-    +  Allows pasting (Ctrl+V), copying (Ctrl+C), and deleting whole words/lines (Ctrl+Backspace/Ctrl+Shift+Backspace) in signs.
+    + Allows pasting (Ctrl+V), copying (Ctrl+C), and deleting whole words/lines (Ctrl+Backspace/Ctrl+Shift+Backspace) in
+      signs.
 + Improve accuracy of movement speed display. - alexia
 + Added toggle to hide autopet messages. - CalMWolfs
-+ Not only Slayer, also Fishing and Diana item drops will now show in chat & title when over a custom defined price. - hannibal2
++ Not only Slayer, also Fishing and Diana item drops will now show in chat & title when over a custom defined price. -
+  hannibal2
 + Added Support to read Badlion sendcoords format. - Cad
 + Added an option to not show cooldown when ability is ready. - Obsidian
 + Added an option to highlight dungeon perm/vc parties. - Cad
@@ -291,7 +296,8 @@
 + Fixed Item Tracker not ignoring manual sack movements. - hannibal2
 + Fixed showing yourself green with Unique Gifting Opportunities. - hannibal2
 + Fixed NPC messages getting detected as player messages. - CalMWolfs
-+ Hide Scavenger 5 on an Ice Spray Wand and Replenish on an Advanced Gardening Hoe/Axe for the Estimated Item Value. - hannibal2
++ Hide Scavenger 5 on an Ice Spray Wand and Replenish on an Advanced Gardening Hoe/Axe for the Estimated Item Value. -
+  hannibal2
 + Fixed an error when the king talisman helper does not find the king in range. - hannibal2
 + Fixed control/modifier key logic on Apple devices. - walker
 + Fixed lag spikes when downloading updates. - nea
@@ -305,7 +311,7 @@
 + Fixed kick alert triggering instantly. - alexia
 + Fixed daily boss kill detection in Crimson Isle Reputation Helper. - hannibal2
 + Fixed Estimated Item Value error in Jerry's Island Deliveries menu. - hannibal2
-+ Fixed the /gfs command counting in the Slayer Profit Tracker.  - hannibal2
++ Fixed the /gfs command counting in the Slayer Profit Tracker. - hannibal2
 + Fixed the Fire Veil effect and item ability cooldown not working when clicking in the air. - hannibal2
 + Fixed broken area mini boss highlight during Derpy. - hannibal2
 + Fixed Special Zealot Highlight during Derpy. - hannibal2
@@ -400,7 +406,8 @@
     + Added ItemAddEvent. - hannibal2
 + Gets called when the user collects an item into inventory or sacks.
 + Created SkyHanniItemTracker. - hannibal2
-    + This is a Special variant of SkyHanniTracker, that has item specific functions (hide or remove) and different price variants.
+    + This is a Special variant of SkyHanniTracker, that has item specific functions (hide or remove) and different
+      price variants.
 + Migrated slayer profit data into SkyHanniTracker format. - hannibal2
 
 #### Garden Changes
