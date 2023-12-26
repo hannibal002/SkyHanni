@@ -13,18 +13,19 @@
 
 #### Rift Changes
 
-+ Rift time now updates correctly in wizard tower and instantly updates the format when toggling max time or percentage. - hannibal2
++ Rift time now updates correctly in wizard tower and instantly updates the format when toggling max time or
+  percentage. - hannibal2
 
 #### Fishing Fixes
 
-+ Fixed Reindrake mob, Frosty NPC and frosty the snow blaster shop counting as sea creatures in the barn fishing timer. - hannibal2
++ Fixed Reindrake mob, Frosty NPC and frosty the snow blaster shop counting as sea creatures in the barn fishing
+  timer. - hannibal2
 
 ### Fixes
 
 #### Rift Fixes
 
 + Fixed vampire slayer damage indicator not working during Derpy. - hannibal2
-
 
 ### Technical Changes
 
