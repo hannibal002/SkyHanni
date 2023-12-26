@@ -18,7 +18,6 @@ import at.hannibal2.skyhanni.utils.NumberUtil.romanToDecimalIfNecessary
 import at.hannibal2.skyhanni.utils.RenderUtils.renderStrings
 import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
-import io.github.moulberry.notenoughupdates.NotEnoughUpdates
 import io.github.moulberry.notenoughupdates.recipes.CraftingRecipe
 import net.minecraft.client.Minecraft
 import net.minecraft.item.ItemStack
@@ -145,7 +144,7 @@ class MinionCraftHelper {
 
         allIngredients.clear()
 
-        for (internalId in NotEnoughUpdates.INSTANCE.manager.itemInformation.keys) {
+        for (internalId in NEUItems.allNeuRepoItems().keys) {
             val internalName = internalId.asInternalName()
             if (internalName.endsWith("_GENERATOR_1")) {
                 if (internalName == "REVENANT_GENERATOR_1".asInternalName() ||

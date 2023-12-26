@@ -45,7 +45,6 @@ import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.TimeUtils
 import at.hannibal2.skyhanni.utils.renderables.Renderable
-import io.github.moulberry.notenoughupdates.NotEnoughUpdates
 import net.minecraftforge.fml.common.eventhandler.EventPriority
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import java.util.Collections
@@ -551,7 +550,7 @@ object ComposterOverlay {
 
     private fun updateOrganicMatterFactors(baseValues: Map<NEUInternalName, Double>): Map<NEUInternalName, Double> {
         val map = mutableMapOf<NEUInternalName, Double>()
-        for ((internalName, _) in NotEnoughUpdates.INSTANCE.manager.itemInformation) {
+        for ((internalName, _) in NEUItems.allNeuRepoItems()) {
             if (internalName == "POTION_AFFINITY_TALISMAN"
                 || internalName == "CROPIE_TALISMAN"
                 || internalName.endsWith("_BOOTS")
