@@ -174,7 +174,7 @@ private fun getBitsDisplayPair(): List<Pair<String, AlignmentEnum>> {
     return bitsDisplay.map { it to AlignmentEnum.LEFT }
 }
 
-private fun getBitsShowWhen() = !listOf(IslandType.THE_RIFT, IslandType.CATACOMBS).contains(HypixelData.skyBlockIsland)
+private fun getBitsShowWhen() = !listOf(IslandType.CATACOMBS).contains(HypixelData.skyBlockIsland)
 
 private fun getCopperDisplayPair() = when {
     config.informationFilteringConfig.hideEmptyLines && copper == "0" -> listOf("<hidden>")
