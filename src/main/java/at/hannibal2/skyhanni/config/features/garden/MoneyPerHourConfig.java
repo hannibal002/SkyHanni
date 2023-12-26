@@ -24,7 +24,7 @@ public class MoneyPerHourConfig {
             "Supports Bountiful, Mushroom Cow Perk, Armor Crops and Dicer Drops. Their toggles are below.")
     @ConfigEditorBoolean
     @FeatureToggle
-    public boolean display = true;
+    public boolean display = false;
 
     // TODO moulconfig runnable support
     @Expose

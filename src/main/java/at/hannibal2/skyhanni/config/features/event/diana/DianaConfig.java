@@ -70,7 +70,8 @@ public class DianaConfig {
     public DianaProfitTrackerConfig dianaProfitTracker = new DianaProfitTrackerConfig();
 
     @Expose
-    @ConfigOption(name = "Mythological Mob Tracker", desc = "")
+    @ConfigOption(name = "Mythological Creature Tracker", desc = "")
     @Accordion
+    // TODO renmae
     public MythologicalMobTrackerConfig mythologicalMobtracker = new MythologicalMobTrackerConfig();
 }
