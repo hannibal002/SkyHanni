@@ -232,6 +232,8 @@ Use `/sh` or `/skyhanni` to open the SkyHanni config in game.
 + **Fishing Bait Warnings.** - cimbraien
     + Option to warn when no bait is used.
     + Option to warn when used bait is changed.
++ Added Sea Creature Tracker. - hannibal2
+    + Allows to only show single variants, e.g. water or lava or winter.
 
 </details>
 <details open><summary>
