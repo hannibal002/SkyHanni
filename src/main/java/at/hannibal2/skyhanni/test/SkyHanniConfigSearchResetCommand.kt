@@ -37,8 +37,9 @@ object SkyHanniConfigSearchResetCommand {
             "reset" -> resetCommand(args)
             "search" -> searchCommand(args)
             "set" -> setCommand(args)
+            "toggle" -> toggleCommand(args)
 
-            else -> "§c/shconfig <search;reset;set>"
+            else -> "§c/shconfig <search;reset;set;toggle>"
         }
     }
 
@@ -107,10 +108,37 @@ object SkyHanniConfigSearchResetCommand {
         val shimmy = Shimmy.makeShimmy(root, list) ?: return "§cCould not change config element '$term', not found!"
         return try {
             shimmy.setJson(element)
-            "§eChanged config element $term."
+            "§eChanged config element $term to $rawJson."
         } catch (e: Exception) {
             ErrorManager.logError(e, "Could not change config element '$term' to '$rawJson'")
             "§cCould not change config element '$term' to '$rawJson'"
+        }
+    }
+
+    private suspend fun toggleCommand(args: Array<String>): String {
+        if (args.size < 2 || args.size == 3) return "§c/shconfig toggle <config name> [value 1] [value 2]"
+
+        val path = args[1]
+        val rawJson1 = if (args[2] == "clipboard") OSUtils.readFromClipboard() ?: return "§cClipboard has no string!" else args[2]
+        val rawJson2 = if (args[3] == "clipboard") OSUtils.readFromClipboard() ?: return "§cClipboard has no string!" else args[3]
+
+        return try {
+            val (argsFilter) = createFilter(true) { path.lowercase() }
+            val (classFilter) = createFilter(false) {path.lowercase()}
+
+            val currentValue = findConfigElements(argsFilter, classFilter,true).toString()
+            val newValue = when (currentValue) {
+                "[true]" -> "false"
+                "[false]" -> "true"
+                 "[$rawJson1]" -> rawJson2
+                 "[$rawJson2]" -> rawJson1
+                else -> rawJson1
+            }
+            setCommand(arrayOf("set", path, newValue))
+
+        } catch (e: Exception) {
+            ErrorManager.logError(e, "Error while trying to toggle config")
+            "§cError while trying to toggle config"
         }
     }
 
@@ -146,6 +174,7 @@ object SkyHanniConfigSearchResetCommand {
     private fun findConfigElements(
         configFilter: (String) -> Boolean,
         classFilter: (String) -> Boolean,
+        onlyValue: Boolean = false
     ): MutableList<String> {
         val list = mutableListOf<String>()
 
@@ -185,13 +214,19 @@ object SkyHanniConfigSearchResetCommand {
                         objectName.startsWith("at.hannibal2.skyhanni.config.Storage"))
                 ) {
                     "<category>"
+                } else if (onlyValue){
+                    objectName
                 } else {
                     "$className = $objectName"
                 }
             } else "null"
 
             if (configFilter(name)) {
-                list.add("$name $description")
+                if (onlyValue) {
+                    list.add(description)
+                } else {
+                    list.add("$name $description")
+                }
             }
         }
         return list
