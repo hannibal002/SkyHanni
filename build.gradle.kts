@@ -95,24 +95,24 @@ dependencies {
 
     modRuntimeOnly("me.djtheredstoner:DevAuth-forge-legacy:1.1.0")
 
-    modCompileOnly("com.github.hannibal002:notenoughupdates:4957f0b:all") {
-        exclude(module = "unspecified")
-        isTransitive = false
-    }
-    devenvMod("com.github.NotEnoughUpdates:NotEnoughUpdates:v2.1.1-pre4:all") {
-        exclude(module = "unspecified")
-        isTransitive = false
-    }
+//    modCompileOnly("com.github.hannibal002:notenoughupdates:4957f0b:all") {
+//        exclude(module = "unspecified")
+//        isTransitive = false
+//    }
+//    devenvMod("com.github.NotEnoughUpdates:NotEnoughUpdates:v2.1.1-pre4:all") {
+//        exclude(module = "unspecified")
+//        isTransitive = false
+//    }
 
     shadowModImpl(libs.moulconfig)
     shadowImpl(libs.libautoupdate)
     shadowImpl("org.jetbrains.kotlin:kotlin-reflect:1.9.0")
 
 //    testImplementation(kotlin("test"))
-    testImplementation("com.github.NotEnoughUpdates:NotEnoughUpdates:v2.1.1-pre4:all") {
-        exclude(module = "unspecified")
-        isTransitive = false
-    }
+//    testImplementation("com.github.NotEnoughUpdates:NotEnoughUpdates:v2.1.1-pre4:all") {
+//        exclude(module = "unspecified")
+//        isTransitive = false
+//    }
     testImplementation("org.junit.jupiter:junit-jupiter:5.10.0")
     testImplementation("io.mockk:mockk:1.12.5")
 }

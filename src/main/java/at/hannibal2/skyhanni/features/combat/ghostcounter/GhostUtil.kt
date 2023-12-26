@@ -7,7 +7,7 @@ import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.NumberUtil
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.NumberUtil.roundToPrecision
-import io.github.moulberry.notenoughupdates.util.Utils
+import at.hannibal2.skyhanni.utils.StringUtils
 import java.io.FileReader
 
 object GhostUtil {
@@ -90,21 +90,21 @@ object GhostUtil {
 
     fun String.formatText(option: GhostData.Option) = formatText(option.getInt(), option.getInt(true))
 
-    fun String.formatText(value: Int, session: Int = -1) = Utils.chromaStringByColourCode(
+    fun String.formatText(value: Int, session: Int = -1) = StringUtils.chromaStringByColourCode(
         this.replace("%value%", value.addSeparators())
             .replace("%session%", session.addSeparators())
             .replace("&", "§")
     )
 
-    fun String.formatText(t: String) = Utils.chromaStringByColourCode(this.replace("%value%", t).replace("&", "§"))
+    fun String.formatText(t: String) = StringUtils.chromaStringByColourCode(this.replace("%value%", t).replace("&", "§"))
 
     fun String.preFormat(t: String, level: Int, nextLevel: Int) = if (nextLevel == 26) {
-        Utils.chromaStringByColourCode(
+        StringUtils.chromaStringByColourCode(
             replace("%value%", t)
                 .replace("%display%", "25")
         )
     } else {
-        Utils.chromaStringByColourCode(
+        StringUtils.chromaStringByColourCode(
             this.replace("%value%", t)
                 .replace(
                     "%display%",
@@ -113,7 +113,7 @@ object GhostUtil {
         )
     }
 
-    fun String.formatText(value: Double, session: Double) = Utils.chromaStringByColourCode(
+    fun String.formatText(value: Double, session: Double) = StringUtils.chromaStringByColourCode(
         this.replace("%value%", value.roundToPrecision(2).addSeparators())
             .replace("%session%", session.roundToPrecision(2).addSeparators())
             .replace("&", "§")
@@ -126,7 +126,7 @@ object GhostUtil {
         val nextLevel = bestiaryNextLevel?.let { if (GhostCounter.config.showMax) "25" else "${it.toInt()}" }
             ?: "§cNo Bestiary Level data!"
 
-        return Utils.chromaStringByColourCode(
+        return StringUtils.chromaStringByColourCode(
             this.replace(
                 "%currentKill%",
                 if (GhostCounter.config.showMax) GhostCounter.bestiaryCurrentKill.addSeparators() else currentKill.addSeparators()

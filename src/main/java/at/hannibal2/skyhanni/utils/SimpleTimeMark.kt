@@ -1,6 +1,5 @@
 package at.hannibal2.skyhanni.utils
 
-import io.github.moulberry.notenoughupdates.util.SkyBlockTime
 import java.time.Instant
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.milliseconds

@@ -1,7 +1,8 @@
 package at.hannibal2.skyhanni.utils.renderables
 
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
-import io.github.moulberry.notenoughupdates.util.Utils
+import at.hannibal2.skyhanni.utils.LorenzUtils
+import at.hannibal2.skyhanni.utils.StringUtils
 import net.minecraft.client.Minecraft
 import net.minecraft.client.gui.ScaledResolution
 import net.minecraft.client.renderer.GlStateManager
@@ -14,16 +15,16 @@ import java.awt.Color
 object RenderLineTooltips {
 
     fun drawHoveringText(
-        posX: Int, posY: Int, tips: List<String?>, stack: ItemStack? = null,
-        mouseX: Int = Utils.getMouseX(),
-        mouseY: Int = Utils.getMouseY()
+        posX: Int, posY: Int, tips: List<String>, stack: ItemStack? = null,
+        mouseX: Int = LorenzUtils.getMouseX(),
+        mouseY: Int = LorenzUtils.getMouseY()
     ) {
         if (tips.isNotEmpty()) {
             var textLines = tips
             val x = mouseX + 12 - posX
             val y = mouseY - 10 - posY
             val color: Char = stack?.getLore()?.lastOrNull()?.take(4)?.get(1)
-                ?: Utils.getPrimaryColourCode(textLines[0])
+                ?: StringUtils.getPrimaryColourCode(textLines[0])
             val colourInt = Minecraft.getMinecraft().fontRendererObj.getColorCode(color)
             val borderColorStart = Color(colourInt).darker().rgb and 0x00FFFFFF or (200 shl 24)
             val font = Minecraft.getMinecraft().fontRendererObj

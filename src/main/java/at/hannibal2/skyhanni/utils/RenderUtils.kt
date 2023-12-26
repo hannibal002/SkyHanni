@@ -10,7 +10,6 @@ import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.LorenzUtils.addAsSingletonList
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 import io.github.moulberry.moulconfig.internal.TextRenderUtils
-import io.github.moulberry.notenoughupdates.util.Utils
 import net.minecraft.client.Minecraft
 import net.minecraft.client.gui.FontRenderer
 import net.minecraft.client.gui.Gui
@@ -358,8 +357,8 @@ object RenderUtils {
     fun Position.transform(): Pair<Int, Int> {
         GlStateManager.translate(getAbsX().toFloat(), getAbsY().toFloat(), 0F)
         GlStateManager.scale(effectiveScale, effectiveScale, 1F)
-        val x = ((Utils.getMouseX() - getAbsX()) / effectiveScale).toInt()
-        val y = ((Utils.getMouseY() - getAbsY()) / effectiveScale).toInt()
+        val x = ((LorenzUtils.getMouseX() - getAbsX()) / effectiveScale).toInt()
+        val y = ((LorenzUtils.getMouseY() - getAbsY()) / effectiveScale).toInt()
         return x to y
     }
 

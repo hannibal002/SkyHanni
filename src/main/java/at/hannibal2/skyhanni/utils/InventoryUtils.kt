@@ -1,7 +1,5 @@
 package at.hannibal2.skyhanni.utils
 
-import at.hannibal2.skyhanni.test.command.ErrorManager
-import io.github.moulberry.notenoughupdates.NotEnoughUpdates
 import net.minecraft.client.Minecraft
 import net.minecraft.client.gui.inventory.GuiChest
 import net.minecraft.client.gui.inventory.GuiContainer
@@ -56,18 +54,18 @@ object InventoryUtils {
 
 
     val isNeuStorageEnabled = RecalculatingValue(10.seconds) {
-        try {
-            val config = NotEnoughUpdates.INSTANCE.config
-
-            val storageField = config.javaClass.getDeclaredField("storageGUI")
-            val storage = storageField.get(config)
-
-            val booleanField = storage.javaClass.getDeclaredField("enableStorageGUI3")
-            booleanField.get(storage) as Boolean
-        } catch (e: Throwable) {
-            ErrorManager.logError(e, "Could not read NEU config to determine if the neu storage is emabled.")
+//        try {
+//            val config = NotEnoughUpdates.INSTANCE.config
+//
+//            val storageField = config.javaClass.getDeclaredField("storageGUI")
+//            val storage = storageField.get(config)
+//
+//            val booleanField = storage.javaClass.getDeclaredField("enableStorageGUI3")
+//            booleanField.get(storage) as Boolean
+//        } catch (e: Throwable) {
+//            ErrorManager.logError(e, "Could not read NEU config to determine if the neu storage is emabled.")
             false
-        }
+//        }
     }
 
     fun isSlotInPlayerInventory(itemStack: ItemStack): Boolean {

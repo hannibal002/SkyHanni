@@ -56,7 +56,6 @@ import at.hannibal2.skyhanni.features.bazaar.BazaarOpenPriceWebsite
 import at.hannibal2.skyhanni.features.bazaar.BazaarOrderHelper
 import at.hannibal2.skyhanni.features.bingo.BingoAPI
 import at.hannibal2.skyhanni.features.bingo.CompactBingoChat
-import at.hannibal2.skyhanni.features.bingo.MinionCraftHelper
 import at.hannibal2.skyhanni.features.bingo.card.BingoCardDisplay
 import at.hannibal2.skyhanni.features.bingo.card.BingoCardReader
 import at.hannibal2.skyhanni.features.bingo.card.BingoCardTips
@@ -338,8 +337,8 @@ import at.hannibal2.skyhanni.test.command.CopyNearbyParticlesCommand
 import at.hannibal2.skyhanni.utils.EntityOutlineRenderer
 import at.hannibal2.skyhanni.utils.KeyboardManager
 import at.hannibal2.skyhanni.utils.MinecraftConsoleFilter.Companion.initLogging
-import at.hannibal2.skyhanni.utils.NEUVersionCheck.checkIfNeuIsLoaded
 import at.hannibal2.skyhanni.utils.TabListData
+import at.hannibal2.skyhanni.utils.XPInformation
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPatternManager
 import kotlinx.coroutines.CoroutineName
 import kotlinx.coroutines.CoroutineScope
@@ -367,7 +366,7 @@ import org.apache.logging.log4j.Logger
 class SkyHanniMod {
     @Mod.EventHandler
     fun preInit(event: FMLPreInitializationEvent?) {
-        checkIfNeuIsLoaded()
+//        checkIfNeuIsLoaded()
 
         // data
         loadModule(this)
@@ -419,6 +418,7 @@ class SkyHanniMod {
         loadModule(BingoCardReader())
         loadModule(GardenBestCropTime())
         loadModule(TrackerManager)
+        loadModule(XPInformation)
 
         // APIs
         loadModule(BazaarApi())
@@ -535,7 +535,7 @@ class SkyHanniMod {
         loadModule(BasketWaypoints())
         loadModule(BingoCardDisplay())
         loadModule(BingoNextStepHelper())
-        loadModule(MinionCraftHelper())
+//        loadModule(MinionCraftHelper())
         loadModule(TpsCounter())
         loadModule(ParticleHider())
         loadModule(MiscFeatures())

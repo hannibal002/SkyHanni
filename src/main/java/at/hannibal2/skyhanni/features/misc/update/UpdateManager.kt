@@ -7,8 +7,8 @@ import at.hannibal2.skyhanni.events.LorenzTickEvent
 import at.hannibal2.skyhanni.utils.LorenzLogger
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils.onToggle
+import at.hannibal2.skyhanni.utils.MinecraftExecutor
 import io.github.moulberry.moulconfig.processor.MoulConfigProcessor
-import io.github.moulberry.notenoughupdates.util.MinecraftExecutor
 import moe.nea.libautoupdate.CurrentVersion
 import moe.nea.libautoupdate.PotentialUpdate
 import moe.nea.libautoupdate.UpdateContext
@@ -57,9 +57,9 @@ object UpdateManager {
     }
 
     fun injectConfigProcessor(processor: MoulConfigProcessor<*>) {
-        processor.registerConfigEditor(ConfigVersionDisplay::class.java) { option, _ ->
-            GuiOptionEditorUpdateCheck(option)
-        }
+//        processor.registerConfigEditor(ConfigVersionDisplay::class.java) { option, _ ->
+//            GuiOptionEditorUpdateCheck(option)
+//        }
     }
 
     fun isCurrentlyBeta(): Boolean {

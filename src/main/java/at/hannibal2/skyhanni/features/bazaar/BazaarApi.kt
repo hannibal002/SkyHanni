@@ -41,7 +41,8 @@ class BazaarApi {
 
         fun isBazaarItem(stack: ItemStack) = stack.getInternalName().isBazaarItem()
 
-        fun NEUInternalName.isBazaarItem() = NEUItems.manager.auctionManager.getBazaarInfo(asString()) != null
+//        fun NEUInternalName.isBazaarItem() = NEUItems.manager.auctionManager.getBazaarInfo(asString()) != null
+        fun NEUInternalName.isBazaarItem(): Boolean = false
 
         fun searchForBazaarItem(displayName: String, amount: Int = -1) {
             if (!LorenzUtils.inSkyBlock) return

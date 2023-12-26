@@ -18,18 +18,13 @@ import at.hannibal2.skyhanni.utils.LorenzUtils.addAsSingletonList
 import at.hannibal2.skyhanni.utils.LorenzUtils.onToggle
 import at.hannibal2.skyhanni.utils.NEUInternalName
 import at.hannibal2.skyhanni.utils.NEUItems.getItemStackOrNull
-import at.hannibal2.skyhanni.utils.NEUItems.manager
 import at.hannibal2.skyhanni.utils.NumberUtil
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.RenderUtils.renderStringsAndItems
-import com.google.gson.reflect.TypeToken
-import io.github.moulberry.notenoughupdates.events.RepositoryReloadEvent
-import io.github.moulberry.notenoughupdates.profileviewer.GuiProfileViewer
 import net.minecraft.client.Minecraft
 import net.minecraft.init.Items
 import net.minecraft.item.ItemStack
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
-import java.io.File
 import kotlin.math.roundToLong
 
 object EstimatedItemValue {
@@ -42,33 +37,33 @@ object EstimatedItemValue {
 
     fun isCurrentlyShowing() = currentlyShowing && Minecraft.getMinecraft().currentScreen != null
 
-    @SubscribeEvent
-    fun onRepoReload(event: RepositoryReloadEvent) {
-        val data = manager.getJsonFromFile(File(manager.repoLocation, "constants/gemstonecosts.json"))
-
-        if (data != null)
-        // item_internal_names -> gemstone_slots -> ingredients_array
-            gemstoneUnlockCosts =
-                ConfigManager.gson.fromJson(
-                    data,
-                    object : TypeToken<HashMap<NEUInternalName, HashMap<String, List<String>>>>() {}.type
-                )
-        else
-            LorenzUtils.error("Gemstone Slot Unlock Costs failed to load!")
-    }
+//    @SubscribeEvent
+//    fun onRepoReload(event: RepositoryReloadEvent) {
+//        val data = manager.getJsonFromFile(File(manager.repoLocation, "constants/gemstonecosts.json"))
+//
+//        if (data != null)
+//        // item_internal_names -> gemstone_slots -> ingredients_array
+//            gemstoneUnlockCosts =
+//                ConfigManager.gson.fromJson(
+//                    data,
+//                    object : TypeToken<HashMap<NEUInternalName, HashMap<String, List<String>>>>() {}.type
+//                )
+//        else
+//            LorenzUtils.error("Gemstone Slot Unlock Costs failed to load!")
+//    }
 
     @SubscribeEvent
     fun onTooltip(event: LorenzToolTipEvent) {
         if (!LorenzUtils.inSkyBlock) return
         if (!config.enabled) return
 
-        if (Minecraft.getMinecraft().currentScreen is GuiProfileViewer) {
-            if (renderedItems == 0) {
-                updateItem(event.itemStack)
-            }
-            tryRendering()
-            renderedItems++
-        }
+//        if (Minecraft.getMinecraft().currentScreen is GuiProfileViewer) {
+//            if (renderedItems == 0) {
+//                updateItem(event.itemStack)
+//            }
+//            tryRendering()
+//            renderedItems++
+//        }
     }
 
     /**

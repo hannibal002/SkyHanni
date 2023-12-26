@@ -3,7 +3,6 @@ package at.hannibal2.skyhanni.features.misc.massconfiguration
 import io.github.moulberry.moulconfig.internal.GlScissorStack
 import io.github.moulberry.moulconfig.internal.RenderUtils
 import io.github.moulberry.moulconfig.internal.TextRenderUtils
-import io.github.moulberry.notenoughupdates.util.Utils
 import net.minecraft.client.gui.GuiScreen
 import net.minecraft.client.gui.ScaledResolution
 import net.minecraft.client.renderer.GlStateManager
@@ -178,9 +177,9 @@ class DefaultConfigOptionGui(
 
         GlStateManager.popMatrix()
         GlScissorStack.pop(scaledResolution)
-        if (hoveringTextToDraw != null) {
-            Utils.drawHoveringText(hoveringTextToDraw, mouseX, mouseY, width, height, 100, mc.fontRendererObj)
-        }
+//        if (hoveringTextToDraw != null) {
+//            Utils.drawHoveringText(hoveringTextToDraw, mouseX, mouseY, width, height, 100, mc.fontRendererObj)
+//        }
 
     }
 

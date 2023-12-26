@@ -6,6 +6,7 @@ import at.hannibal2.skyhanni.events.InventoryCloseEvent
 import at.hannibal2.skyhanni.events.InventoryFullyOpenedEvent
 import at.hannibal2.skyhanni.events.LorenzChatEvent
 import at.hannibal2.skyhanni.events.LorenzRenderWorldEvent
+import at.hannibal2.skyhanni.events.ReplaceItemEvent
 import at.hannibal2.skyhanni.events.RepositoryReloadEvent
 import at.hannibal2.skyhanni.features.rift.RiftAPI
 import at.hannibal2.skyhanni.test.GriffinUtils.drawWaypointFilled
@@ -18,9 +19,6 @@ import at.hannibal2.skyhanni.utils.NEUItems
 import at.hannibal2.skyhanni.utils.RenderUtils.drawDynamicText
 import at.hannibal2.skyhanni.utils.RenderUtils.highlight
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
-import io.github.moulberry.notenoughupdates.events.ReplaceItemEvent
-import io.github.moulberry.notenoughupdates.events.SlotClickEvent
-import io.github.moulberry.notenoughupdates.util.Utils
 import net.minecraft.client.gui.inventory.GuiChest
 import net.minecraft.client.player.inventory.ContainerLocalMenu
 import net.minecraft.inventory.ContainerChest
@@ -37,7 +35,7 @@ object EnigmaSoulWaypoints {
 
     private val item by lazy {
         val neuItem = NEUItems.getItemStack("SKYBLOCK_ENIGMA_SOUL")
-        Utils.createItemStack(
+        NEUItems.createItemStack(
             neuItem.item,
             "§5Toggle Missing",
             "§7Click here to toggle",
@@ -78,7 +76,7 @@ object EnigmaSoulWaypoints {
     }
 
     @SubscribeEvent(priority = EventPriority.HIGH)
-    fun onSlotClick(event: SlotClickEvent) {
+    fun onSlotClick(event: GuiContainerEvent.SlotClickEvent) {
         if (!inInventory || !isEnabled()) return
 
         if (event.slotId == 31 && inventoryUnfound.isNotEmpty()) {
@@ -92,7 +90,7 @@ object EnigmaSoulWaypoints {
             }
         }
 
-        if (event.slot.stack == null) return
+        if (event.slot?.stack == null) return
         val split = event.slot.stack.displayName.split("Enigma: ")
         if (split.size == 2) {
             event.usePickblockInstead()

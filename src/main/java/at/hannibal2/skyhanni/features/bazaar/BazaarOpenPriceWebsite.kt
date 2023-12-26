@@ -1,13 +1,12 @@
 package at.hannibal2.skyhanni.features.bazaar
 
 import at.hannibal2.skyhanni.SkyHanniMod
+import at.hannibal2.skyhanni.events.GuiContainerEvent
+import at.hannibal2.skyhanni.events.ReplaceItemEvent
 import at.hannibal2.skyhanni.utils.NEUInternalName
 import at.hannibal2.skyhanni.utils.NEUItems
 import at.hannibal2.skyhanni.utils.OSUtils
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
-import io.github.moulberry.notenoughupdates.events.ReplaceItemEvent
-import io.github.moulberry.notenoughupdates.events.SlotClickEvent
-import io.github.moulberry.notenoughupdates.util.Utils
 import net.minecraft.entity.player.InventoryPlayer
 import net.minecraftforge.fml.common.eventhandler.EventPriority
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
@@ -19,7 +18,7 @@ class BazaarOpenPriceWebsite {
 
     private val item by lazy {
         val neuItem = NEUItems.getItemStack("PAPER")
-        Utils.createItemStack(
+        NEUItems.createItemStack(
             neuItem.item,
             "§bPrice History",
             "§7Click here to open",
@@ -40,7 +39,7 @@ class BazaarOpenPriceWebsite {
     }
 
     @SubscribeEvent(priority = EventPriority.HIGH)
-    fun onStackClick(event: SlotClickEvent) {
+    fun onStackClick(event: GuiContainerEvent.SlotClickEvent) {
         if (!isEnabled()) return
         val lastItem = BazaarApi.currentlyOpenedProduct ?: return
 

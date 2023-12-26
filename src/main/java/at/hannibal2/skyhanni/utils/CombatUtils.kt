@@ -2,8 +2,6 @@ package at.hannibal2.skyhanni.utils
 
 import at.hannibal2.skyhanni.features.combat.ghostcounter.GhostCounter
 import at.hannibal2.skyhanni.features.combat.ghostcounter.GhostData
-import io.github.moulberry.notenoughupdates.core.util.lerp.LerpUtils
-import io.github.moulberry.notenoughupdates.util.XPInformation
 
 object CombatUtils {
 
@@ -32,7 +30,7 @@ object CombatUtils {
         lastUpdate = System.currentTimeMillis()
         xpGainHourLast = xpGainHour
         skillInfoLast = skillInfo
-        skillInfo = XPInformation.getInstance().getSkillInfo(SKILL_TYPE) ?: return
+        skillInfo = XPInformation.instance.getSkillInfo(SKILL_TYPE) ?: return
         val totalXp: Float = skillInfo!!.totalXp
         if (lastTotalXp > 0) {
             val delta: Float = totalXp - lastTotalXp

@@ -12,9 +12,6 @@
         ],
         "credits": "https://github.com/hannibal002/SkyHanni/graphs/contributors",
         "logoFile": "assets/skyhanni/logo.png",
-        "screenshots": [],
-        "dependencies": [
-            "NotEnoughUpdates"
-        ]
+        "screenshots": []
     }
 ]

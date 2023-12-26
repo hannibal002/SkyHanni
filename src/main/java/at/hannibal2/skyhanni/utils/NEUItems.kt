@@ -1,47 +1,39 @@
 package at.hannibal2.skyhanni.utils
 
-import at.hannibal2.skyhanni.config.ConfigManager
 import at.hannibal2.skyhanni.features.bazaar.BazaarDataHolder
 import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.ItemBlink.checkBlinkItem
-import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName
 import at.hannibal2.skyhanni.utils.NEUInternalName.Companion.asInternalName
 import at.hannibal2.skyhanni.utils.NumberUtil.romanToDecimal
 import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import com.google.gson.JsonObject
-import com.google.gson.JsonPrimitive
-import io.github.moulberry.notenoughupdates.NEUManager
-import io.github.moulberry.notenoughupdates.NEUOverlay
-import io.github.moulberry.notenoughupdates.NotEnoughUpdates
-import io.github.moulberry.notenoughupdates.overlays.AuctionSearchOverlay
-import io.github.moulberry.notenoughupdates.overlays.BazaarSearchOverlay
-import io.github.moulberry.notenoughupdates.recipes.CraftingRecipe
-import io.github.moulberry.notenoughupdates.recipes.Ingredient
-import io.github.moulberry.notenoughupdates.recipes.NeuRecipe
-import io.github.moulberry.notenoughupdates.util.ItemResolutionQuery
-import io.github.moulberry.notenoughupdates.util.Utils
+import net.minecraft.block.Block
 import net.minecraft.client.Minecraft
 import net.minecraft.client.renderer.GlStateManager
 import net.minecraft.client.renderer.RenderHelper
 import net.minecraft.init.Blocks
 import net.minecraft.init.Items
+import net.minecraft.item.Item
 import net.minecraft.item.ItemStack
 import net.minecraft.nbt.NBTTagCompound
+import net.minecraft.nbt.NBTTagList
+import net.minecraft.nbt.NBTTagString
 import java.util.regex.Pattern
 
 object NEUItems {
-    val manager: NEUManager get() = NotEnoughUpdates.INSTANCE.manager
+    //    val manager: NEUManager get() = NotEnoughUpdates.INSTANCE.manager
     private val itemNameCache = mutableMapOf<String, NEUInternalName>() // item name -> internal name
     private val multiplierCache = mutableMapOf<NEUInternalName, Pair<NEUInternalName, Int>>()
-    private val recipesCache = mutableMapOf<NEUInternalName, Set<NeuRecipe>>()
-    private val ingredientsCache = mutableMapOf<NeuRecipe, Set<Ingredient>>()
+
+    //    private val recipesCache = mutableMapOf<NEUInternalName, Set<NeuRecipe>>()
+//    private val ingredientsCache = mutableMapOf<NeuRecipe, Set<Ingredient>>()
     private val enchantmentNamePattern = Pattern.compile("^(?<format>(?:§.)+)(?<name>[^§]+) (?<level>[IVXL]+)$")
     var allItemsCache = mapOf<String, NEUInternalName>() // item name -> internal name
     var allInternalNames = mutableListOf<NEUInternalName>()
 
     private val fallbackItem by lazy {
-        Utils.createItemStack(
+        createItemStack(
             ItemStack(Blocks.barrier).item,
             "§cMissing Repo Item",
             "§cYour NEU repo seems to be out of date"
@@ -78,12 +70,12 @@ object NEUItems {
     fun readAllNeuItems(): Map<String, NEUInternalName> {
         allInternalNames.clear()
         val map = mutableMapOf<String, NEUInternalName>()
-        for (rawInternalName in manager.itemInformation.keys) {
-            val name = manager.createItem(rawInternalName).displayName.removeColor().lowercase()
-            val internalName = rawInternalName.asInternalName()
-            map[name] = internalName
-            allInternalNames.add(internalName)
-        }
+//        for (rawInternalName in manager.itemInformation.keys) {
+//            val name = manager.createItem(rawInternalName).displayName.removeColor().lowercase()
+//            val internalName = rawInternalName.asInternalName()
+//            map[name] = internalName
+//            allInternalNames.add(internalName)
+//        }
         return map
     }
 
@@ -103,16 +95,17 @@ object NEUItems {
             itemNameCache[itemName] = enchantmentName
             return enchantmentName
         }
-        var rawInternalName = ItemResolutionQuery.findInternalNameByDisplayName(itemName, false) ?: return null
-
-        // This fixes a NEU bug with §9Hay Bale (cosmetic item)
-        // TODO remove workaround when this is fixed in neu
-        rawInternalName = if (rawInternalName == "HAY_BALE") "HAY_BLOCK" else rawInternalName
-
-        val internalName = rawInternalName.asInternalName()
-
-        itemNameCache[lowercase] = internalName
-        return internalName
+//        var rawInternalName = ItemResolutionQuery.findInternalNameByDisplayName(itemName, false) ?: return null
+//
+//        // This fixes a NEU bug with §9Hay Bale (cosmetic item)
+//        // TODO remove workaround when this is fixed in neu
+//        rawInternalName = if (rawInternalName == "HAY_BALE") "HAY_BLOCK" else rawInternalName
+//
+//        val internalName = rawInternalName.asInternalName()
+//
+//        itemNameCache[lowercase] = internalName
+//        return internalName
+        return null
     }
 
     // Workaround for duplex
@@ -133,13 +126,15 @@ object NEUItems {
         return text
     }
 
-    fun getInternalName(itemStack: ItemStack) = ItemResolutionQuery(manager)
-        .withCurrentGuiContext()
-        .withItemStack(itemStack)
-        .resolveInternalName()
+    fun getInternalName(itemStack: ItemStack): String? = null
+//    fun getInternalName(itemStack: ItemStack) = ItemResolutionQuery(manager)
+//        .withCurrentGuiContext()
+//        .withItemStack(itemStack)
+//        .resolveInternalName()
 
-    fun getInternalNameOrNull(nbt: NBTTagCompound) =
-        ItemResolutionQuery(manager).withItemNBT(nbt).resolveInternalName()?.asInternalName()
+    fun getInternalNameOrNull(nbt: NBTTagCompound): NEUInternalName? = null
+//    fun getInternalNameOrNull(nbt: NBTTagCompound) =
+//        ItemResolutionQuery(manager).withItemNBT(nbt).resolveInternalName()?.asInternalName()
 
     fun NEUInternalName.getPrice(useSellingPrice: Boolean = false) = getPriceOrNull(useSellingPrice) ?: -1.0
 
@@ -159,7 +154,8 @@ object NEUItems {
         if (equals("WISP_POTION")) {
             return 20_000.0
         }
-        val result = manager.auctionManager.getBazaarOrBin(asString(), useSellingPrice)
+//        val result = manager.auctionManager.getBazaarOrBin(asString(), useSellingPrice)
+        val result = -1.0
         if (result != -1.0) return result
 
         if (equals("JACK_O_LANTERN")) {
@@ -175,9 +171,10 @@ object NEUItems {
     fun getPrice(internalName: String, useSellingPrice: Boolean = false) =
         internalName.asInternalName().getPrice(useSellingPrice)
 
-    fun NEUInternalName.getItemStackOrNull() = ItemResolutionQuery(manager)
-        .withKnownInternalName(asString())
-        .resolveToItemStack()?.copy()
+    fun NEUInternalName.getItemStackOrNull(): ItemStack? = null
+//    fun NEUInternalName.getItemStackOrNull() = ItemResolutionQuery(manager)
+//        .withKnownInternalName(asString())
+//        .resolveToItemStack()?.copy()
 
     fun getItemStackOrNull(internalName: String) = internalName.asInternalName().getItemStackOrNull()
 
@@ -198,7 +195,8 @@ object NEUItems {
             fallbackItem
         }
 
-    fun isVanillaItem(item: ItemStack) = manager.auctionManager.isVanillaItem(item.getInternalName().asString())
+    //    fun isVanillaItem(item: ItemStack) = manager.auctionManager.isVanillaItem(item.getInternalName().asString())
+    fun isVanillaItem(item: ItemStack) = false
 
     fun ItemStack.renderOnScreen(x: Float, y: Float, scaleMultiplier: Double = 1.0) {
         val item = checkBlinkItem()
@@ -242,48 +240,48 @@ object NEUItems {
             )
             return Pair(internalName, 1)
         }
-        for (recipe in getRecipes(internalName)) {
-            if (recipe !is CraftingRecipe) continue
-
-            val map = mutableMapOf<NEUInternalName, Int>()
-            for (ingredient in recipe.getCachedIngredients()) {
-                val count = ingredient.count.toInt()
-                var internalItemId = ingredient.internalItemId.asInternalName()
-                // ignore cactus green
-                if (internalName == "ENCHANTED_CACTUS_GREEN".asInternalName() && internalItemId == "INK_SACK-2".asInternalName()) {
-                    internalItemId = "CACTUS".asInternalName()
-                }
-
-                // ignore wheat in enchanted cookie
-                if (internalName == "ENCHANTED_COOKIE".asInternalName() && internalItemId == "WHEAT".asInternalName()) {
-                    continue
-                }
-
-                // ignore golden carrot in enchanted golden carrot
-                if (internalName == "ENCHANTED_GOLDEN_CARROT".asInternalName() && internalItemId == "GOLDEN_CARROT".asInternalName()) {
-                    continue
-                }
-
-                // ignore rabbit hide in leather
-                if (internalName == "LEATHER".asInternalName() && internalItemId == "RABBIT_HIDE".asInternalName()) {
-                    continue
-                }
-
-                val old = map.getOrDefault(internalItemId, 0)
-                map[internalItemId] = old + count
-            }
-            if (map.size != 1) continue
-            val current = map.iterator().next().toPair()
-            val id = current.first
-            return if (current.second > 1) {
-                val child = getMultiplier(id, tryCount + 1)
-                val result = Pair(child.first, child.second * current.second)
-                multiplierCache[internalName] = result
-                result
-            } else {
-                Pair(internalName, 1)
-            }
-        }
+//        for (recipe in getRecipes(internalName)) {
+//            if (recipe !is CraftingRecipe) continue
+//
+//            val map = mutableMapOf<NEUInternalName, Int>()
+//            for (ingredient in recipe.getCachedIngredients()) {
+//                val count = ingredient.count.toInt()
+//                var internalItemId = ingredient.internalItemId.asInternalName()
+//                // ignore cactus green
+//                if (internalName == "ENCHANTED_CACTUS_GREEN".asInternalName() && internalItemId == "INK_SACK-2".asInternalName()) {
+//                    internalItemId = "CACTUS".asInternalName()
+//                }
+//
+//                // ignore wheat in enchanted cookie
+//                if (internalName == "ENCHANTED_COOKIE".asInternalName() && internalItemId == "WHEAT".asInternalName()) {
+//                    continue
+//                }
+//
+//                // ignore golden carrot in enchanted golden carrot
+//                if (internalName == "ENCHANTED_GOLDEN_CARROT".asInternalName() && internalItemId == "GOLDEN_CARROT".asInternalName()) {
+//                    continue
+//                }
+//
+//                // ignore rabbit hide in leather
+//                if (internalName == "LEATHER".asInternalName() && internalItemId == "RABBIT_HIDE".asInternalName()) {
+//                    continue
+//                }
+//
+//                val old = map.getOrDefault(internalItemId, 0)
+//                map[internalItemId] = old + count
+//            }
+//            if (map.size != 1) continue
+//            val current = map.iterator().next().toPair()
+//            val id = current.first
+//            return if (current.second > 1) {
+//                val child = getMultiplier(id, tryCount + 1)
+//                val result = Pair(child.first, child.second * current.second)
+//                multiplierCache[internalName] = result
+//                result
+//            } else {
+//                Pair(internalName, 1)
+//            }
+//        }
 
         val result = Pair(internalName, 1)
         multiplierCache[internalName] = result
@@ -297,22 +295,22 @@ object NEUItems {
         return Pair(pair.first.asString(), pair.second)
     }
 
-    fun getRecipes(internalName: NEUInternalName): Set<NeuRecipe> {
-        if (recipesCache.contains(internalName)) {
-            return recipesCache[internalName]!!
-        }
-        val recipes = manager.getRecipesFor(internalName.asString())
-        recipesCache[internalName] = recipes
-        return recipes
-    }
+//    fun getRecipes(internalName: NEUInternalName): Set<NeuRecipe> {
+//        if (recipesCache.contains(internalName)) {
+//            return recipesCache[internalName]!!
+//        }
+//        val recipes = manager.getRecipesFor(internalName.asString())
+//        recipesCache[internalName] = recipes
+//        return recipes
+//    }
 
-    fun NeuRecipe.getCachedIngredients() = ingredientsCache.getOrPut(this) { ingredients }
+//    fun NeuRecipe.getCachedIngredients() = ingredientsCache.getOrPut(this) { ingredients }
 
     fun neuHasFocus(): Boolean {
-        if (AuctionSearchOverlay.shouldReplace()) return true
-        if (BazaarSearchOverlay.shouldReplace()) return true
-        if (InventoryUtils.inStorage() && InventoryUtils.isNeuStorageEnabled.getValue()) return true
-        if (NEUOverlay.searchBarHasFocus) return true
+//        if (AuctionSearchOverlay.shouldReplace()) return true
+//        if (BazaarSearchOverlay.shouldReplace()) return true
+//        if (InventoryUtils.inStorage() && InventoryUtils.isNeuStorageEnabled.getValue()) return true
+//        if (NEUOverlay.searchBarHasFocus) return true
 
         return false
     }
@@ -329,18 +327,78 @@ object NEUItems {
 
     //Uses NEU
     fun saveNBTData(item: ItemStack, removeLore: Boolean = true): String {
-        val jsonObject = manager.getJsonForItem(item)
-        if (!jsonObject.has("internalname")) {
-            jsonObject.add("internalname", JsonPrimitive("_"))
-        }
-        if (removeLore && jsonObject.has("lore")) jsonObject.remove("lore")
-        val jsonString = jsonObject.toString()
-        return StringUtils.encodeBase64(jsonString)
+        return "{abc}"
+//        val jsonObject = manager.getJsonForItem(item)
+//        if (!jsonObject.has("internalname")) {
+//            jsonObject.add("internalname", JsonPrimitive("_"))
+//        }
+//        if (removeLore && jsonObject.has("lore")) jsonObject.remove("lore")
+//        val jsonString = jsonObject.toString()
+//        return StringUtils.encodeBase64(jsonString)
     }
 
     fun loadNBTData(encoded: String): ItemStack {
-        val jsonString = StringUtils.decodeBase64(encoded)
-        val jsonObject = ConfigManager.gson.fromJson(jsonString, JsonObject::class.java)
-        return manager.jsonToStack(jsonObject, false)
+//        val jsonString = StringUtils.decodeBase64(encoded)
+//        val jsonObject = ConfigManager.gson.fromJson(jsonString, JsonObject::class.java)
+//        return manager.jsonToStack(jsonObject, false)
+        return ItemStack(Items.wooden_hoe)
+    }
+
+    fun createItemStack(item: Item?, displayName: String?, vararg lore: String?): ItemStack {
+        return createItemStack(item, displayName, 0, *lore)
+    }
+
+    fun createItemStackArray(item: Item?, displayName: String?, lore: Array<String?>): ItemStack {
+        return createItemStack(item, displayName, 0, *lore)
+    }
+
+    fun createItemStack(item: Block?, displayName: String?, vararg lore: String?): ItemStack {
+        return createItemStack(Item.getItemFromBlock(item), displayName, *lore)
+    }
+
+    fun createItemStack(item: Item?, displayName: String?, damage: Int, vararg lore: String?): ItemStack {
+        val stack = ItemStack(item, 1, damage)
+        val tag = NBTTagCompound()
+        addNameAndLore(tag, displayName, *lore)
+        tag.setInteger("HideFlags", 254)
+        stack.tagCompound = tag
+        return stack
+    }
+
+    private fun addNameAndLore(tag: NBTTagCompound, displayName: String?, vararg lore: String?) {
+        val display = NBTTagCompound()
+        display.setString("Name", displayName)
+        if (lore != null) {
+            val tagLore = NBTTagList()
+            for (line in lore) {
+                tagLore.appendTag(NBTTagString(line))
+            }
+            display.setTag("Lore", tagLore)
+        }
+        tag.setTag("display", display)
+    }
+
+    fun editItemStackInfo(
+        itemStack: ItemStack,
+        displayName: String?,
+        disableNeuToolTips: Boolean,
+        vararg lore: String?
+    ): ItemStack {
+        var tag = itemStack.tagCompound
+        if (tag == null) tag = NBTTagCompound()
+        val display = tag.getCompoundTag("display")
+        val Lore = NBTTagList()
+        for (line in lore) {
+            Lore.appendTag(NBTTagString(line))
+        }
+        display.setString("Name", displayName)
+        display.setTag("Lore", Lore)
+        tag.setTag("display", display)
+        tag.setInteger("HideFlags", 254)
+        if (disableNeuToolTips) {
+            tag.setBoolean("disableNeuTooltip", true)
+        }
+        itemStack.tagCompound = tag
+        return itemStack
     }
 }

@@ -3,9 +3,9 @@ package at.hannibal2.skyhanni.utils.renderables
 import at.hannibal2.skyhanni.config.core.config.gui.GuiPositionEditor
 import at.hannibal2.skyhanni.data.ToolTipData
 import at.hannibal2.skyhanni.utils.LorenzLogger
+import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.NEUItems.renderOnScreen
 import io.github.moulberry.moulconfig.gui.GuiScreenElementWrapper
-import io.github.moulberry.notenoughupdates.util.Utils
 import net.minecraft.client.Minecraft
 import net.minecraft.client.gui.Gui
 import net.minecraft.client.gui.GuiChat
@@ -144,8 +144,8 @@ interface Renderable {
                             RenderLineTooltips.drawHoveringText(
                                 posX, posY, tips,
                                 stack,
-                                currentRenderPassMousePosition?.first ?: Utils.getMouseX(),
-                                currentRenderPassMousePosition?.second ?: Utils.getMouseY(),
+                                currentRenderPassMousePosition?.first ?: LorenzUtils.getMouseX(),
+                                currentRenderPassMousePosition?.second ?: LorenzUtils.getMouseY(),
                             )
                             GlStateManager.popMatrix()
                         }

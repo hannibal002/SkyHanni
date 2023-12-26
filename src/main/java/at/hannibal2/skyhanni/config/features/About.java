@@ -1,6 +1,5 @@
 package at.hannibal2.skyhanni.config.features;
 
-import at.hannibal2.skyhanni.features.misc.update.ConfigVersionDisplay;
 import at.hannibal2.skyhanni.utils.OSUtils;
 import com.google.gson.annotations.Expose;
 import io.github.moulberry.moulconfig.annotations.Accordion;
@@ -12,9 +11,9 @@ import io.github.moulberry.moulconfig.observer.Property;
 
 public class About {
 
-    @ConfigOption(name = "Current Version", desc = "This is the SkyHanni version you are running currently")
-    @ConfigVersionDisplay
-    public transient Void currentVersion = null;
+//    @ConfigOption(name = "Current Version", desc = "This is the SkyHanni version you are running currently")
+//    @ConfigVersionDisplay
+//    public transient Void currentVersion = null;
 
     @ConfigOption(name = "Auto Updates", desc = "Automatically check for updates on each startup")
     @Expose

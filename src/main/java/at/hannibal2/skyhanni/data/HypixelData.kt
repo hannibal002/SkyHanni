@@ -16,13 +16,11 @@ import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.TabListData
 import com.google.gson.JsonObject
-import io.github.moulberry.notenoughupdates.NotEnoughUpdates
 import net.minecraft.client.Minecraft
 import net.minecraftforge.client.event.ClientChatReceivedEvent
 import net.minecraftforge.fml.common.eventhandler.EventPriority
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import net.minecraftforge.fml.common.network.FMLNetworkEvent
-import kotlin.concurrent.thread
 
 class HypixelData {
     // TODO USE SH-REPO
@@ -112,24 +110,24 @@ class HypixelData {
 
     @SubscribeEvent
     fun onTick(event: LorenzTickEvent) {
-        if (!LorenzUtils.inSkyBlock) {
-            // Modified from NEU.
-            // NEU does not send locraw when not in SkyBlock.
-            // So, as requested by Hannibal, use locraw from
-            // NEU and have NEU send it.
-            // Remove this when NEU dependency is removed
-            val currentTime = System.currentTimeMillis()
-            if (LorenzUtils.onHypixel &&
-                locrawData == null &&
-                currentTime - lastLocRaw > 15000
-            ) {
-                lastLocRaw = System.currentTimeMillis()
-                thread(start = true) {
-                    Thread.sleep(1000)
-                    NotEnoughUpdates.INSTANCE.sendChatMessage("/locraw")
-                }
-            }
-        }
+//         if (!LorenzUtils.inSkyBlock) {
+//             // Modified from NEU.
+//             // NEU does not send locraw when not in SkyBlock.
+//             // So, as requested by Hannibal, use locraw from
+//             // NEU and have NEU send it.
+//             // Remove this when NEU dependency is removed
+//             val currentTime = System.currentTimeMillis()
+//             if (LorenzUtils.onHypixel &&
+//                 locrawData == null &&
+//                 currentTime - lastLocRaw > 15000
+//             ) {
+//                 lastLocRaw = System.currentTimeMillis()
+//                 thread(start = true) {
+//                     Thread.sleep(1000)
+//                     NotEnoughUpdates.INSTANCE.sendChatMessage("/locraw")
+//                 }
+//             }
+//         }
 
         if (event.isMod(2) && LorenzUtils.inSkyBlock) {
             val originalLocation = ScoreboardData.sidebarLinesFormatted

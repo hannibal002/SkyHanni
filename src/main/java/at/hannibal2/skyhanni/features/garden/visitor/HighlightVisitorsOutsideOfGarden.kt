@@ -14,8 +14,6 @@ import at.hannibal2.skyhanni.utils.LorenzColor
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.LorenzVec
 import at.hannibal2.skyhanni.utils.getLorenzVec
-import at.hannibal2.skyhanni.utils.toLorenzVec
-import io.github.moulberry.notenoughupdates.util.SBInfo
 import net.minecraft.client.Minecraft
 import net.minecraft.entity.Entity
 import net.minecraft.entity.EntityLivingBase
@@ -51,13 +49,14 @@ class HighlightVisitorsOutsideOfGarden {
     }
 
     private fun isVisitor(entity: Entity): Boolean {
-        val mode = SBInfo.getInstance().getLocation()
-        val possibleJsons = visitorJson[mode] ?: return false
-        val skinOrType = getSkinOrTypeFor(entity)
-        return possibleJsons.any {
-            (it.position == null || it.position!!.distance(entity.position.toLorenzVec()) < 1)
-                && it.skinOrType == skinOrType
-        }
+        return false
+//        val mode = SBInfo.getInstance().getLocation()
+//        val possibleJsons = visitorJson[mode] ?: return false
+//        val skinOrType = getSkinOrTypeFor(entity)
+//        return possibleJsons.any {
+//            (it.position == null || it.position!!.distance(entity.position.toLorenzVec()) < 1)
+//                && it.skinOrType == skinOrType
+//        }
     }
 
     @SubscribeEvent

@@ -1,7 +1,7 @@
 package at.hannibal2.skyhanni.test
 
 import at.hannibal2.skyhanni.test.NEUDependent.test
-import io.github.moulberry.notenoughupdates.util.SkyBlockTime
+import at.hannibal2.skyhanni.utils.SkyBlockTime
 import io.mockk.every
 import io.mockk.mockkObject
 import org.junit.jupiter.api.Test

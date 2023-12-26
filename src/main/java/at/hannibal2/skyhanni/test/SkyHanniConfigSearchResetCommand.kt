@@ -10,8 +10,8 @@ import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils.makeAccessible
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.OSUtils
+import at.hannibal2.skyhanni.utils.Shimmy
 import com.google.gson.JsonElement
-import io.github.moulberry.notenoughupdates.util.Shimmy
 import kotlinx.coroutines.launch
 import java.lang.reflect.Field
 import java.lang.reflect.Modifier

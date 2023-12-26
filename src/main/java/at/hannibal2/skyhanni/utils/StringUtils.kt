@@ -284,4 +284,91 @@ object StringUtils {
     fun Pattern.matches(string: String) = matcher(string).matches()
 
     fun Pattern.find(string: String) = matcher(string).find()
+
+
+    private val CHROMA_REPLACE_PATTERN = Pattern.compile("\u00a7z(.+?)(?=\u00a7|$)")
+
+    fun chromaString(str: String): String {
+        return chromaString(str, 0f, false)
+    }
+
+    fun chromaStringByColourCode(str: String): String {
+        var str = str
+        if (str.contains("\u00a7z")) {
+            val matcher = CHROMA_REPLACE_PATTERN.matcher(str)
+            val sb = StringBuffer()
+            while (matcher.find()) {
+                matcher.appendReplacement(
+                    sb,
+                    chromaString(matcher.group(1))
+                        .replace("\\", "\\\\")
+                        .replace("$", "\\$")
+                )
+            }
+            matcher.appendTail(sb)
+            str = sb.toString()
+        }
+        return str
+    }
+
+    fun chromaString(str: String, offset: Float, bold: Boolean): String {
+        return chromaString(str, offset, if (bold) "§l" else "")
+    }
+
+    fun chromaString(str: String, offset: Float, extraFormatting: String): String {
+        return str
+//        var str = str
+//        str = Utils.cleanColour(str)
+//        val bold = extraFormatting.contains("§l")
+//        val currentTimeMillis = System.currentTimeMillis()
+//        if (Utils.startTime == 0L) Utils.startTime = currentTimeMillis
+//        var chromaSpeed = NotEnoughUpdates.INSTANCE.config.misc.chromaSpeed
+//        if (chromaSpeed < 10) chromaSpeed = 10
+//        if (chromaSpeed > 5000) chromaSpeed = 5000
+//        val rainbowText = java.lang.StringBuilder()
+//        var len = 0
+//        for (i in 0 until str.length) {
+//            val c = str[i]
+//            var index =
+//                (offset + len / 12f - (currentTimeMillis - Utils.startTime) / chromaSpeed).toInt() % Utils.rainbow.size
+//            len += Minecraft.getMinecraft().fontRendererObj.getCharWidth(c)
+//            if (bold) len++
+//            if (index < 0) index += Utils.rainbow.size
+//            rainbowText.append(Utils.rainbow[index])
+//            rainbowText.append(extraFormatting)
+//            rainbowText.append(c)
+//        }
+//        return rainbowText.toString()
+    }
+
+    fun getPrimaryColourCode(displayName: String): Char {
+        var lastColourCode = -99
+        var currentColour = 0
+        val mostCommon = intArrayOf(0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0)
+        for (i in 0 until displayName.length) {
+            val c = displayName[i]
+            if (c == '\u00A7') {
+                lastColourCode = i
+            } else if (lastColourCode == i - 1) {
+                val colIndex = "0123456789abcdef".indexOf(c)
+                currentColour = if (colIndex >= 0) {
+                    colIndex
+                } else {
+                    0
+                }
+            } else if ("abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ".indexOf(c) >= 0) {
+                if (currentColour > 0) {
+                    mostCommon[currentColour]++
+                }
+            }
+        }
+        var mostCommonCount = 0
+        for (index in mostCommon.indices) {
+            if (mostCommon[index] > mostCommonCount) {
+                mostCommonCount = mostCommon[index]
+                currentColour = index
+            }
+        }
+        return "0123456789abcdef"[currentColour]
+    }
 }

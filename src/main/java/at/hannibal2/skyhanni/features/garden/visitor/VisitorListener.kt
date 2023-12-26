@@ -2,6 +2,7 @@ package at.hannibal2.skyhanni.features.garden.visitor
 
 import at.hannibal2.skyhanni.config.features.garden.visitor.VisitorConfig
 import at.hannibal2.skyhanni.events.CheckRenderEntityEvent
+import at.hannibal2.skyhanni.events.GuiContainerEvent
 import at.hannibal2.skyhanni.events.InventoryCloseEvent
 import at.hannibal2.skyhanni.events.InventoryFullyOpenedEvent
 import at.hannibal2.skyhanni.events.LorenzRenderWorldEvent
@@ -23,7 +24,6 @@ import at.hannibal2.skyhanni.utils.LorenzLogger
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.RenderUtils.exactLocation
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
-import io.github.moulberry.notenoughupdates.events.SlotClickEvent
 import net.minecraft.client.Minecraft
 import net.minecraft.client.gui.inventory.GuiContainer
 import net.minecraft.entity.item.EntityArmorStand
@@ -126,14 +126,14 @@ class VisitorListener {
     }
 
     @SubscribeEvent(priority = EventPriority.HIGH)
-    fun onStackClick(event: SlotClickEvent) {
+    fun onStackClick(event: GuiContainerEvent.SlotClickEvent) {
         if (!VisitorAPI.inInventory) return
         if (event.clickType != 0) return
 
         val visitor = VisitorAPI.getVisitor(lastClickedNpc) ?: return
 
         if (event.slotId == VISITOR_REFUSE_ITEM_SLOT) {
-            if (event.slot.stack?.name != "§cRefuse Offer") return
+            if (event.slot?.stack?.name != "§cRefuse Offer") return
 
             visitor.hasReward()?.let {
                 if (config.rewardWarning.preventRefusing) {
@@ -158,7 +158,7 @@ class VisitorListener {
             VisitorAPI.changeStatus(visitor, VisitorStatus.REFUSED, "refused")
             return
         }
-        if (event.slotId == VISITOR_ACCEPT_ITEM_SLOT && event.slot.stack?.getLore()
+        if (event.slotId == VISITOR_ACCEPT_ITEM_SLOT && event.slot?.stack?.getLore()
                 ?.any { it == "§eClick to give!" } == true
         ) {
             VisitorAPI.changeStatus(visitor, VisitorStatus.ACCEPTED, "accepted")

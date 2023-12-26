@@ -53,5 +53,11 @@ abstract class GuiContainerEvent(open val gui: GuiContainer, open val container:
         val slotId: Int,
         val clickedButton: Int,
         val clickType: Int
-    ) : GuiContainerEvent(gui, container)
+    ) : GuiContainerEvent(gui, container) {
+        var usePickblockInstead = false
+
+        fun usePickblockInstead() {
+            usePickblockInstead = true
+        }
+    }
 }

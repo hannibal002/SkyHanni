@@ -9,13 +9,11 @@ import at.hannibal2.skyhanni.utils.ItemUtils.name
 import at.hannibal2.skyhanni.utils.KeyboardManager
 import at.hannibal2.skyhanni.utils.LorenzRarity
 import at.hannibal2.skyhanni.utils.LorenzUtils
-import at.hannibal2.skyhanni.utils.LorenzUtils.makeAccessible
 import at.hannibal2.skyhanni.utils.LorenzUtils.round
 import at.hannibal2.skyhanni.utils.NumberUtil
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getPetExp
 import at.hannibal2.skyhanni.utils.StringUtils
-import io.github.moulberry.notenoughupdates.NotEnoughUpdates
 import net.minecraftforge.event.entity.player.ItemTooltipEvent
 import net.minecraftforge.fml.common.eventhandler.EventPriority
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
@@ -86,16 +84,18 @@ class PetExpTooltip {
         return null
     }
 
-    private val isNeuExtendedExpEnabled get() = fieldPetExtendExp.get(objectNeuTooltipTweaks) as Boolean
+    private val isNeuExtendedExpEnabled = false
 
-    private val objectNeuTooltipTweaks by lazy {
-        val field = NotEnoughUpdates.INSTANCE.config.javaClass.getDeclaredField("tooltipTweaks")
-        field.makeAccessible().get(NotEnoughUpdates.INSTANCE.config)
-    }
-
-    private val fieldPetExtendExp by lazy {
-        objectNeuTooltipTweaks.javaClass.getDeclaredField("petExtendExp").makeAccessible()
-    }
+//    private val isNeuExtendedExpEnabled get() = fieldPetExtendExp.get(objectNeuTooltipTweaks) as Boolean
+//
+//    private val objectNeuTooltipTweaks by lazy {
+//        val field = NotEnoughUpdates.INSTANCE.config.javaClass.getDeclaredField("tooltipTweaks")
+//        field.makeAccessible().get(NotEnoughUpdates.INSTANCE.config)
+//    }
+//
+//    private val fieldPetExtendExp by lazy {
+//        objectNeuTooltipTweaks.javaClass.getDeclaredField("petExtendExp").makeAccessible()
+//    }
 
     private fun getMaxValues(petName: String, petExperience: Double): Pair<Int, Int> {
         val useGoldenDragonLevels =

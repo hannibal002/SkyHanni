@@ -49,11 +49,11 @@ import at.hannibal2.skyhanni.utils.NumberUtil.romanToDecimal
 import at.hannibal2.skyhanni.utils.NumberUtil.roundToPrecision
 import at.hannibal2.skyhanni.utils.OSUtils
 import at.hannibal2.skyhanni.utils.RenderUtils.renderStringsAndItems
+import at.hannibal2.skyhanni.utils.StringUtils
 import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
+import at.hannibal2.skyhanni.utils.XPInformation
 import at.hannibal2.skyhanni.utils.renderables.Renderable
-import io.github.moulberry.notenoughupdates.util.Utils
-import io.github.moulberry.notenoughupdates.util.XPInformation
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import java.io.File
 import java.text.NumberFormat
@@ -216,7 +216,7 @@ object GhostCounter {
             }
         }
 
-        addAsSingletonList(Utils.chromaStringByColourCode(textFormatting.titleFormat.replace("&", "§")))
+        addAsSingletonList(StringUtils.chromaStringByColourCode(textFormatting.titleFormat.replace("&", "§")))
         addAsSingletonList(textFormatting.ghostKilledFormat.formatText(KILLS))
         addAsSingletonList(textFormatting.sorrowsFormat.formatText(Option.SORROWCOUNT))
         addAsSingletonList(textFormatting.ghostSinceSorrowFormat.formatText(Option.GHOSTSINCESORROW.getInt()))
@@ -336,7 +336,7 @@ object GhostCounter {
                 if (skillPercent) {
                     percent = nf.parse(group("percent")).toFloat()
                     val level =
-                        if (currentSkill == "Combat" && currentSkillLevel != -1) currentSkillLevel else XPInformation.getInstance()
+                        if (currentSkill == "Combat" && currentSkillLevel != -1) currentSkillLevel else XPInformation.instance
                             .getSkillInfo(skillName)?.level ?: 0
                     if (level > 0) {
                         totalSkillXp = SkillExperience.getExpForNextLevel(level)

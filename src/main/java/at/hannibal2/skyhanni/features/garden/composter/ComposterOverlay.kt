@@ -45,7 +45,6 @@ import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.TimeUtils
 import at.hannibal2.skyhanni.utils.renderables.Renderable
-import io.github.moulberry.notenoughupdates.NotEnoughUpdates
 import net.minecraftforge.fml.common.eventhandler.EventPriority
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import java.util.Collections
@@ -527,10 +526,10 @@ object ComposterOverlay {
         return price
     }
 
-    @SubscribeEvent
-    fun onRepoReload(event: io.github.moulberry.notenoughupdates.events.RepositoryReloadEvent) {
-        updateOrganicMatterFactors()
-    }
+//    @SubscribeEvent
+//    fun onRepoReload(event: io.github.moulberry.notenoughupdates.events.RepositoryReloadEvent) {
+//        updateOrganicMatterFactors()
+//    }
 
     @SubscribeEvent
     fun onRepoReload(event: RepositoryReloadEvent) {

@@ -13,7 +13,6 @@ import at.hannibal2.skyhanni.utils.LorenzRarity
 import at.hannibal2.skyhanni.utils.LorenzUtils.sortedDesc
 import at.hannibal2.skyhanni.utils.NEUInternalName
 import at.hannibal2.skyhanni.utils.NEUInternalName.Companion.asInternalName
-import at.hannibal2.skyhanni.utils.NEUItems
 import at.hannibal2.skyhanni.utils.NEUItems.getItemStackOrNull
 import at.hannibal2.skyhanni.utils.NEUItems.getPrice
 import at.hannibal2.skyhanni.utils.NEUItems.getPriceOrNull
@@ -49,8 +48,6 @@ import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.isRecombobulated
 import at.hannibal2.skyhanni.utils.StringUtils.firstLetterUppercase
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import com.google.gson.JsonObject
-import io.github.moulberry.notenoughupdates.recipes.Ingredient
-import io.github.moulberry.notenoughupdates.util.Constants
 import net.minecraft.item.ItemStack
 import java.util.Locale
 
@@ -167,23 +164,23 @@ object EstimatedItemValueCalculator {
     private fun addReforgeStone(stack: ItemStack, list: MutableList<String>): Double {
         val rawReforgeName = stack.getReforgeName() ?: return 0.0
 
-        for ((rawInternalName, values) in Constants.REFORGESTONES.entrySet()) {
-            val stoneJson = values.asJsonObject
-            val reforgeName = stoneJson.get("reforgeName").asString
-            if (rawReforgeName == reforgeName.lowercase() || rawReforgeName == rawInternalName.lowercase()) {
-                val internalName = rawInternalName.asInternalName()
-                val reforgeStonePrice = internalName.getPrice()
-                val reforgeStoneName = internalName.getItemName()
-
-                val reforgeCosts = stoneJson.get("reforgeCosts").asJsonObject
-                val applyCost = getReforgeStoneApplyCost(stack, reforgeCosts, internalName) ?: return 0.0
-
-                list.add("§7Reforge: §9$reforgeName")
-                list.add("  §7Stone $reforgeStoneName §7(§6" + NumberUtil.format(reforgeStonePrice) + "§7)")
-                list.add("  §7Apply cost: (§6" + NumberUtil.format(applyCost) + "§7)")
-                return reforgeStonePrice + applyCost
-            }
-        }
+//        for ((rawInternalName, values) in Constants.REFORGESTONES.entrySet()) {
+//            val stoneJson = values.asJsonObject
+//            val reforgeName = stoneJson.get("reforgeName").asString
+//            if (rawReforgeName == reforgeName.lowercase() || rawReforgeName == rawInternalName.lowercase()) {
+//                val internalName = rawInternalName.asInternalName()
+//                val reforgeStonePrice = internalName.getPrice()
+//                val reforgeStoneName = internalName.getItemName()
+//
+//                val reforgeCosts = stoneJson.get("reforgeCosts").asJsonObject
+//                val applyCost = getReforgeStoneApplyCost(stack, reforgeCosts, internalName) ?: return 0.0
+//
+//                list.add("§7Reforge: §9$reforgeName")
+//                list.add("  §7Stone $reforgeStoneName §7(§6" + NumberUtil.format(reforgeStonePrice) + "§7)")
+//                list.add("  §7Apply cost: (§6" + NumberUtil.format(applyCost) + "§7)")
+//                return reforgeStonePrice + applyCost
+//            }
+//        }
 
         return 0.0
     }
@@ -681,15 +678,15 @@ object EstimatedItemValueCalculator {
             if (!unlockedSlots.contains(slot.key)) continue
 
             val previousTotal = totalPrice
-            for (ingredients in slot.value) {
-                val ingredient = Ingredient(NEUItems.manager, ingredients)
-
-                totalPrice += if (ingredient.isCoins) {
-                    ingredient.count
-                } else {
-                    getPrice(ingredient.internalItemId) * ingredient.count
-                }
-            }
+//            for (ingredients in slot.value) {
+//                val ingredient = Ingredient(NEUItems.manager, ingredients)
+//
+//                totalPrice += if (ingredient.isCoins) {
+//                    ingredient.count
+//                } else {
+//                    getPrice(ingredient.internalItemId) * ingredient.count
+//                }
+//            }
 
             val splitSlot = slot.key.split("_") // eg. SAPPHIRE_1
             val colorCode = SkyBlockItemModifierUtils.GemstoneSlotType.getColorCode(splitSlot[0])

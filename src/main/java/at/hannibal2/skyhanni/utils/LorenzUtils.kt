@@ -16,8 +16,8 @@ import at.hannibal2.skyhanni.utils.renderables.Renderable
 import com.google.gson.JsonPrimitive
 import io.github.moulberry.moulconfig.observer.Observer
 import io.github.moulberry.moulconfig.observer.Property
-import io.github.moulberry.notenoughupdates.util.SkyBlockTime
 import net.minecraft.client.Minecraft
+import net.minecraft.client.gui.ScaledResolution
 import net.minecraft.client.gui.inventory.GuiEditSign
 import net.minecraft.entity.EntityLivingBase
 import net.minecraft.entity.SharedMonsterAttributes
@@ -26,6 +26,7 @@ import net.minecraft.event.HoverEvent
 import net.minecraft.launchwrapper.Launch
 import net.minecraft.util.ChatComponentText
 import net.minecraftforge.fml.common.FMLCommonHandler
+import org.lwjgl.input.Mouse
 import java.awt.Color
 import java.lang.reflect.Field
 import java.lang.reflect.Modifier
@@ -521,8 +522,8 @@ object LorenzUtils {
 
         val tileSign = (this as AccessorGuiEditSign).tileSign
         return (tileSign.signText[1].unformattedText.removeColor() == "^^^^^^"
-            && tileSign.signText[2].unformattedText.removeColor() == "Set your"
-            && tileSign.signText[3].unformattedText.removeColor() == "speed cap!")
+                && tileSign.signText[2].unformattedText.removeColor() == "Set your"
+                && tileSign.signText[3].unformattedText.removeColor() == "speed cap!")
     }
 
     fun IslandType.isInIsland() = inSkyBlock && (skyBlockIsland == this || this == IslandType.CATACOMBS && inDungeons)
@@ -652,5 +653,15 @@ object LorenzUtils {
      */
     fun Matcher.groupOrNull(groupName: String): String? {
         return runCatching { this.group(groupName) }.getOrNull()
+    }
+
+    val scale = ScaledResolution(Minecraft.getMinecraft())
+    fun getMouseY(): Int {
+        val height = scale.scaledHeight
+        return height - Mouse.getY() * height / Minecraft.getMinecraft().displayHeight - 1
+    }
+
+    fun getMouseX(): Int {
+        return Mouse.getX() * scale.scaledWidth / Minecraft.getMinecraft().displayWidth
     }
 }
