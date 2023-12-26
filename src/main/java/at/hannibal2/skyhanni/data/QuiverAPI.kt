@@ -1,10 +1,12 @@
 package at.hannibal2.skyhanni.data
 
+import at.hannibal2.skyhanni.data.jsonobjects.repo.ItemsJson
 import at.hannibal2.skyhanni.events.ConfigLoadEvent
 import at.hannibal2.skyhanni.events.InventoryFullyOpenedEvent
 import at.hannibal2.skyhanni.events.LorenzChatEvent
 import at.hannibal2.skyhanni.events.PlaySoundEvent
 import at.hannibal2.skyhanni.events.ProfileJoinEvent
+import at.hannibal2.skyhanni.events.RepositoryReloadEvent
 import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalNameOrNull
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
@@ -22,7 +24,7 @@ import net.minecraft.item.ItemBow
 import net.minecraftforge.fml.common.eventhandler.EventPriority
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
-private const val infinityQuiverLevelMultiplier = 0.03f
+private var infinityQuiverLevelMultiplier = 0.03f
 
 enum class Arrows(val arrow: String, val internalName: NEUInternalName) {
     NONE("None", "NONE".asInternalName()),
@@ -159,6 +161,12 @@ object QuiverAPI {
     }
 
     // Handle Storage data
+    @SubscribeEvent
+    fun onRepoReload(event: RepositoryReloadEvent) {
+        val data = event.getConstant<ItemsJson>("Items")
+        infinityQuiverLevelMultiplier = data.enchant_multiplier["infinite_quiver"] ?: 0.03f
+    }
+
     @SubscribeEvent
     fun onConfigLoad(event: ConfigLoadEvent) {
         val config = ProfileStorageData.profileSpecific ?: return
