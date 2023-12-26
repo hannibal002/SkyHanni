@@ -39,7 +39,7 @@ class BazaarApi {
             holder.getData(this)
         } else null
 
-        fun isBazaarItem(stack: ItemStack) = stack.getInternalName().isBazaarItem()
+        fun isBazaarItem(stack: ItemStack): Boolean = stack.getInternalName().isBazaarItem()
 
         fun NEUInternalName.isBazaarItem() = NEUItems.manager.auctionManager.getBazaarInfo(asString()) != null
 
