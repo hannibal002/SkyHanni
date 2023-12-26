@@ -169,7 +169,7 @@ class GardenVisitorTimer {
             SoundUtils.playBeepSound()
         }
 
-        val formatDuration = TimeUtils.formatDuration(millis)
+        val formatDuration = millis.format()
         val next = if (queueFull && (!isSixthVisitorEnabled() || millis.isNegative())) "§cQueue Full!" else {
             "Next in §$formatColor$formatDuration$extraSpeed"
         }

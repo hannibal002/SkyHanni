@@ -11,7 +11,7 @@ import at.hannibal2.skyhanni.utils.NEUItems.getItemStack
 import at.hannibal2.skyhanni.utils.RenderUtils.addItemIcon
 import at.hannibal2.skyhanni.utils.RenderUtils.renderSingleLineWithItems
 import at.hannibal2.skyhanni.utils.StringUtils.matches
-import at.hannibal2.skyhanni.utils.TimeUtils
+import at.hannibal2.skyhanni.utils.TimeUtils.format
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import kotlin.concurrent.fixedRateTimer
@@ -82,7 +82,7 @@ class JyrreTimer {
             if (duration <= 0.seconds && config.showInactive) {
                 add("§cInactive!")
             } else {
-                val format = TimeUtils.formatDuration(duration)
+                val format = duration.format()
                 add("§b$format")
             }
         }

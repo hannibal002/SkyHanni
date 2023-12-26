@@ -55,7 +55,7 @@ object RenderLineTooltips {
             }
             if (needsWrap) {
                 var wrappedTooltipWidth = 0
-                val wrappedTextLines: MutableList<String?> = ArrayList()
+                val wrappedTextLines = mutableListOf<String>()
                 for (i in textLines.indices) {
                     val textLine = textLines[i]
                     val wrappedLine = font.listFormattedStringToWidth(textLine, tooltipTextWidth)

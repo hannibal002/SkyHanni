@@ -17,6 +17,7 @@ import at.hannibal2.skyhanni.utils.LorenzColor
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils.baseMaxHealth
 import at.hannibal2.skyhanni.utils.LorenzUtils.editCopy
+import at.hannibal2.skyhanni.utils.LorenzUtils.ignoreDerpy
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.SoundUtils
 import net.minecraft.entity.Entity
@@ -41,7 +42,8 @@ class SeaCreatureFeatures {
         val entity = event.entity as? EntityLivingBase ?: return
         if (DamageIndicatorManager.isBoss(entity)) return
 
-        val maxHealth = event.maxHealth
+        // TODO remove workaround by change derpy logic either in hasMaxHealth or in EntityMaxHealthUpdateEvent
+        val maxHealth = event.maxHealth.ignoreDerpy()
         for (creatureType in RareSeaCreatureType.entries) {
             if (!creatureType.health.any { entity.hasMaxHealth(it, false, maxHealth) }) continue
             if (!creatureType.clazz.isInstance(entity)) continue
