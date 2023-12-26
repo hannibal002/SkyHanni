@@ -11,7 +11,7 @@ public class GardenLevelConfig {
     @ConfigOption(name = "Display", desc = "Show the current Garden level and progress to the next level.")
     @ConfigEditorBoolean
     @FeatureToggle
-    public boolean display = true;
+    public boolean display = false;
 
     @Expose
     public Position pos = new Position(390, 40, false, true);
