@@ -17,7 +17,7 @@ import com.google.gson.annotations.Expose
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import java.util.regex.Pattern
 
-object MythologicalMobTracker {
+object MythologicalCreatureTracker {
 
     private val group = RepoPattern.group("event.diana.mythological.tracker")
 
@@ -33,7 +33,7 @@ object MythologicalMobTracker {
 
     private val config get() = SkyHanniMod.feature.event.diana.mythologicalMobtracker
 
-    private val tracker = SkyHanniTracker("Mythological Mob Tracker", { Data() }, { it.diana.mythologicalMobTracker })
+    private val tracker = SkyHanniTracker("Mythological Creature Tracker", { Data() }, { it.diana.mythologicalMobTracker })
     { drawDisplay(it) }
 
     class Data : TrackerData() {
@@ -42,10 +42,10 @@ object MythologicalMobTracker {
         }
 
         @Expose
-        var count: MutableMap<MythologicalMobType, Int> = mutableMapOf()
+        var count: MutableMap<MythologicalCreatureType, Int> = mutableMapOf()
     }
 
-    enum class MythologicalMobType(val displayName: String, val pattern: Pattern) {
+    enum class MythologicalCreatureType(val displayName: String, val pattern: Pattern) {
         MINOTAUR("§2Minotaur", minotaurPattern),
         GAIA_CONSTRUCT("§2Gaia Construct", gaiaConstructPattern),
         MINOS_CHAMPION("§2Minos Champion", minosChampionPattern),
@@ -56,30 +56,30 @@ object MythologicalMobTracker {
 
     @SubscribeEvent
     fun onChat(event: LorenzChatEvent) {
-        MythologicalMobType.entries.forEach { mobType ->
-            if (mobType.pattern.matches(event.message)) {
-                tracker.modify { it.count.addOrPut(mobType, 1) }
+        MythologicalCreatureType.entries.forEach { creatureType ->
+            if (creatureType.pattern.matches(event.message)) {
+                tracker.modify { it.count.addOrPut(creatureType, 1) }
 
                 if (config.hideChat) {
-                    event.blockedReason = "mythological_mob_dug"
+                    event.blockedReason = "mythological_creature_dug"
                 }
             }
         }
     }
 
     private fun drawDisplay(data: Data): List<List<Any>> = buildList {
-        addAsSingletonList("§7Mythological Mob Tracker:")
+        addAsSingletonList("§7Mythological Creature Tracker:")
         val total = data.count.sumAllValues()
-        data.count.entries.sortedByDescending { it.value }.forEach { (mobType, amount) ->
+        data.count.entries.sortedByDescending { it.value }.forEach { (creatureType, amount) ->
 
             val percentageSuffix = if (config.showPercentage.get()) {
                 val percentage = LorenzUtils.formatPercentage(amount.toDouble() / total)
                 " §7$percentage"
             } else ""
 
-            addAsSingletonList(" §7- §e${amount.addSeparators()} ${mobType.displayName}$percentageSuffix")
+            addAsSingletonList(" §7- §e${amount.addSeparators()} ${creatureType.displayName}$percentageSuffix")
         }
-        addAsSingletonList(" §7- §e${total.addSeparators()} §bTotal Mobs")
+        addAsSingletonList(" §7- §e${total.addSeparators()} §7Total Mythological Creatures")
     }
 
     @SubscribeEvent
@@ -97,7 +97,7 @@ object MythologicalMobTracker {
     }
 
     fun resetCommand(args: Array<String>) {
-        tracker.resetCommand(args, "shresetmythologicalmobtracker")
+        tracker.resetCommand(args, "shresetmythologicalcreatureracker")
     }
 
     private fun isEnabled() = DianaAPI.isDoingDiana() && config.enabled

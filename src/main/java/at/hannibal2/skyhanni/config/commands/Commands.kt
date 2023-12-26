@@ -17,11 +17,12 @@ import at.hannibal2.skyhanni.features.commands.PartyCommands
 import at.hannibal2.skyhanni.features.event.diana.BurrowWarpHelper
 import at.hannibal2.skyhanni.features.event.diana.DianaProfitTracker
 import at.hannibal2.skyhanni.features.event.diana.InquisitorWaypointShare
-import at.hannibal2.skyhanni.features.event.diana.MythologicalMobTracker
+import at.hannibal2.skyhanni.features.event.diana.MythologicalCreatureTracker
 import at.hannibal2.skyhanni.features.event.jerry.frozentreasure.FrozenTreasureTracker
 import at.hannibal2.skyhanni.features.fame.AccountUpgradeReminder
 import at.hannibal2.skyhanni.features.fame.CityProjectFeatures
 import at.hannibal2.skyhanni.features.fishing.tracker.FishingProfitTracker
+import at.hannibal2.skyhanni.features.fishing.tracker.SeaCreatureTracker
 import at.hannibal2.skyhanni.features.garden.GardenAPI
 import at.hannibal2.skyhanni.features.garden.GardenCropTimeCommand
 import at.hannibal2.skyhanni.features.garden.GardenNextJacobContest
@@ -215,9 +216,13 @@ object Commands {
             "Resets the Diana Profit Tracker"
         ) { DianaProfitTracker.resetCommand(it) }
         registerCommand(
-            "shresetmythologicalmobtracker",
-            "Resets the Mythological Mob Tracker"
-        ) { MythologicalMobTracker.resetCommand(it) }
+            "shresetmythologicalcreatureracker",
+            "Resets the Mythological Creature Tracker"
+        ) { MythologicalCreatureTracker.resetCommand(it) }
+        registerCommand(
+            "shresetseacreaturetracker",
+            "Resets the Sea Creature Tracker"
+        ) { SeaCreatureTracker.resetCommand(it) }
     }
 
     private fun usersBugFix() {
