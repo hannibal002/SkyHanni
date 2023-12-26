@@ -6,15 +6,15 @@ import com.google.gson.annotations.Expose;
 import io.github.moulberry.moulconfig.annotations.ConfigEditorBoolean;
 import io.github.moulberry.moulconfig.annotations.ConfigOption;
 
-public class FarmingArmorDropsConfig {
+public class DicerRngDropTrackerConfig {
     @Expose
-    @ConfigOption(name = "Show Counter", desc = "Count all §9Cropie§7, §5Squash §7and §6Fermento §7dropped.")
+    @ConfigOption(name = "Enable Tracker", desc = "Track RNG drops for Melon Dicer and Pumpkin Dicer.")
     @ConfigEditorBoolean
     @FeatureToggle
-    public boolean enabled = true;
+    public boolean display = true;
 
     @Expose
-    @ConfigOption(name = "Hide Chat", desc = "Hide the chat message when receiving a farming armor drop.")
+    @ConfigOption(name = "Hide Chat", desc = "Hide the chat message when dropping a RNG Dicer drop.")
     @ConfigEditorBoolean
     @FeatureToggle
     public boolean hideChat = false;
