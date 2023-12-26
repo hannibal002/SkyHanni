@@ -1,8 +1,10 @@
 package at.hannibal2.skyhanni.features.misc.customscoreboard
 
+import at.hannibal2.skyhanni.data.BitsAPI
 import at.hannibal2.skyhanni.data.ScoreboardData
 import at.hannibal2.skyhanni.features.misc.customscoreboard.CustomScoreboardUtils.extractLobbyCode
 import at.hannibal2.skyhanni.utils.LorenzUtils.nextAfter
+import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.TabListData
 
 object InformationGetter {
@@ -52,16 +54,14 @@ object InformationGetter {
                 extractLobbyCode(line) is String -> lobbyCode =
                     extractLobbyCode(line)?.substring(1) ?: "<hidden>" //removes first char (number of color code)
                 line.startsWith("Heat: ") -> heat = line.removePrefix("Heat: ")
-                line.startsWith("Bits: §b") -> bits = line.removePrefix("Bits: §b")
                 line.startsWith("Copper: §c") -> copper = line.removePrefix("Copper: §c")
             }
         }
 
+        bits = BitsAPI.bits.addSeparators()
+
         if (sidebarLines.none { it.startsWith(("Heat: ")) }) {
             heat = "§c♨ 0"
-        }
-        if (sidebarLines.none { it.startsWith(("Bits: §b")) }) {
-            bits = "0"
         }
 
         // I know this could maybe be solved better but honestly idc anymore
