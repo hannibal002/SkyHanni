@@ -13,7 +13,7 @@ public class OptimalSpeedConfig {
         "(Thanks MelonKingDE for the default values).")
     @ConfigEditorBoolean
     @FeatureToggle
-    public boolean showOnHUD = true;
+    public boolean showOnHUD = false;
 
     @Expose
     @ConfigOption(name = "Warning Title", desc = "Warn via title when you don't have the optimal speed.")

@@ -3,6 +3,7 @@ package at.hannibal2.skyhanni.features.event
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.data.HypixelData
 import at.hannibal2.skyhanni.data.ProfileStorageData
+import at.hannibal2.skyhanni.data.WinterAPI
 import at.hannibal2.skyhanni.events.EntityCustomNameUpdateEvent
 import at.hannibal2.skyhanni.events.LorenzChatEvent
 import at.hannibal2.skyhanni.events.RenderMobColoredEvent
@@ -36,7 +37,7 @@ object UniqueGiftingOpportunitiesFeatures {
 
     private val config get() = SkyHanniMod.feature.event.winter.giftingOpportunities
 
-    private fun isEnabled() = LorenzUtils.inSkyBlock && config.enabled &&
+    private fun isEnabled() = LorenzUtils.inSkyBlock && config.enabled && WinterAPI.isDecember() &&
         (InventoryUtils.itemInHandId.endsWith("_GIFT")
             || !config.highlighWithGiftOnly)
 
@@ -70,8 +71,11 @@ object UniqueGiftingOpportunitiesFeatures {
         if (!isEnabled()) return
         val entity = event.entity
         if (entity is EntityPlayerSP) return
-        if (entity is EntityPlayer && !entity.isNPC() && !isIronman(entity) && !isBingo(entity) && !hasGiftedPlayer(entity))
+        if (entity is EntityPlayer && !entity.isNPC() && !isIronman(entity) && !isBingo(entity) &&
+            !hasGiftedPlayer(entity)
+        ) {
             event.color = LorenzColor.DARK_GREEN.toColor().withAlpha(127)
+        }
     }
 
     private fun isBingo(entity: EntityLivingBase) =
