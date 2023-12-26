@@ -136,7 +136,7 @@ class FishingTimer {
         val barnTimerAlertTime = config.alertTime * 1_000
         val color = if (duration > barnTimerAlertTime) "§c" else "§e"
         val timeFormat = TimeUtils.formatDuration(duration, biggestUnit = TimeUnit.MINUTE)
-        val name = StringUtils.optionalPlural(currentCount, "sea creature", "sea creatures")
+        val name = StringUtils.canBePlural(currentCount, "sea creature", "sea creatures")
         val text = "$color$timeFormat §8(§e$currentCount §b$name§8)"
 
         config.pos.renderString(text, posLabel = "BarnTimer")

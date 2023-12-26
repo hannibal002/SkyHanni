@@ -114,6 +114,12 @@ object SeaCreatureTracker {
             )
         }
 
+        return if (currentCategory == nameAll) {
+            { true }
+        } else filterCurrentCategory()
+    }
+
+    private fun filterCurrentCategory(): (String) -> Boolean {
         val items = SeaCreatureManager.allVariants[currentCategory] ?: run {
             ErrorManager.logErrorStateWithData(
                 "Sea Creature Tracker can not find all sea creature variants",
@@ -123,12 +129,7 @@ object SeaCreatureTracker {
             )
             return { true }
         }
-        val filter: (String) -> Boolean = if (currentCategory == nameAll) {
-            { true }
-        } else {
-            { it in items }
-        }
-        return filter
+        return { it in items }
     }
 
     @SubscribeEvent
