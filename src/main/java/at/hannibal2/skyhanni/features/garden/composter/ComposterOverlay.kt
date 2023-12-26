@@ -550,7 +550,7 @@ object ComposterOverlay {
 
     private fun updateOrganicMatterFactors(baseValues: Map<NEUInternalName, Double>): Map<NEUInternalName, Double> {
         val map = mutableMapOf<NEUInternalName, Double>()
-        for ((internalName, _) in NotEnoughUpdates.INSTANCE.manager.itemInformation) {
+        for ((internalName, _) in NEUItems.allNeuRepoItems()) {
             if (internalName == "POTION_AFFINITY_TALISMAN"
                 || internalName == "CROPIE_TALISMAN"
                 || internalName.endsWith("_BOOTS")

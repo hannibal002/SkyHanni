@@ -70,7 +70,7 @@ object NEUItems {
     fun readAllNeuItems(): Map<String, NEUInternalName> {
         allInternalNames.clear()
         val map = mutableMapOf<String, NEUInternalName>()
-//        for (rawInternalName in manager.itemInformation.keys) {
+//        for (rawInternalName in allNeuRepoItems().keys) {
 //            val name = manager.createItem(rawInternalName).displayName.removeColor().lowercase()
 //            val internalName = rawInternalName.asInternalName()
 //            map[name] = internalName
@@ -127,13 +127,13 @@ object NEUItems {
     }
 
     fun getInternalName(itemStack: ItemStack): String? = null
-//    fun getInternalName(itemStack: ItemStack) = ItemResolutionQuery(manager)
+//    fun getInternalName(itemStack: ItemStack): String? = ItemResolutionQuery(manager)
 //        .withCurrentGuiContext()
 //        .withItemStack(itemStack)
 //        .resolveInternalName()
 
     fun getInternalNameOrNull(nbt: NBTTagCompound): NEUInternalName? = null
-//    fun getInternalNameOrNull(nbt: NBTTagCompound) =
+//    fun getInternalNameOrNull(nbt: NBTTagCompound): NEUInternalName? =
 //        ItemResolutionQuery(manager).withItemNBT(nbt).resolveInternalName()?.asInternalName()
 
     fun NEUInternalName.getPrice(useSellingPrice: Boolean = false) = getPriceOrNull(useSellingPrice) ?: -1.0
@@ -147,7 +147,7 @@ object NEUItems {
         return BazaarDataHolder.getNpcPrice(this)
     }
 
-    fun transHypixelNameToInternalName(hypixelId: String) =
+    fun transHypixelNameToInternalName(hypixelId: String): NEUInternalName =
         manager.auctionManager.transformHypixelBazaarToNEUItemId(hypixelId).asInternalName()
 
     fun NEUInternalName.getPriceOrNull(useSellingPrice: Boolean = false): Double? {
@@ -168,11 +168,11 @@ object NEUItems {
         return getNpcPriceOrNull()
     }
 
-    fun getPrice(internalName: String, useSellingPrice: Boolean = false) =
+    fun getPrice(internalName: String, useSellingPrice: Boolean = false): Double =
         internalName.asInternalName().getPrice(useSellingPrice)
 
     fun NEUInternalName.getItemStackOrNull(): ItemStack? = null
-//    fun NEUInternalName.getItemStackOrNull() = ItemResolutionQuery(manager)
+//    fun NEUInternalName.getItemStackOrNull(): ItemStack? = ItemResolutionQuery(manager)
 //        .withKnownInternalName(asString())
 //        .resolveToItemStack()?.copy()
 
@@ -189,13 +189,14 @@ object NEUItems {
             ErrorManager.logError(
                 IllegalStateException("Something went wrong!"),
                 "Encountered an error getting the item for §7$this§c. " +
-                    "This may be because your NEU repo is outdated. Please ask in the SkyHanni " +
-                    "Discord if this is the case"
+                        "This may be because your NEU repo is outdated. Please ask in the SkyHanni " +
+                        "Discord if this is the case"
             )
             fallbackItem
         }
 
-    //    fun isVanillaItem(item: ItemStack) = manager.auctionManager.isVanillaItem(item.getInternalName().asString())
+    //    fun isVanillaItem(item: ItemStack): Boolean =
+        manager.auctionManager.isVanillaItem(item.getInternalName().asString())
     fun isVanillaItem(item: ItemStack) = false
 
     fun ItemStack.renderOnScreen(x: Float, y: Float, scaleMultiplier: Double = 1.0) {
@@ -227,6 +228,8 @@ object NEUItems {
 
         GlStateManager.popMatrix()
     }
+
+    fun allNeuRepoItems(): Map<String, JsonObject> = NotEnoughUpdates.INSTANCE.manager.itemInformation
 
     fun getMultiplier(internalName: NEUInternalName, tryCount: Int = 0): Pair<NEUInternalName, Int> {
         if (multiplierCache.contains(internalName)) {
@@ -321,8 +324,8 @@ object NEUItems {
             val name = group("name").trim { it <= ' ' }
             val ultimate = group("format").lowercase().contains("§l")
             ((if (ultimate && name != "Ultimate Wise") "ULTIMATE_" else "")
-                + turboCheck(name).replace(" ", "_").replace("-", "_").uppercase()
-                + ";" + group("level").romanToDecimal())
+                    + turboCheck(name).replace(" ", "_").replace("-", "_").uppercase()
+                    + ";" + group("level").romanToDecimal())
         }
 
     //Uses NEU
