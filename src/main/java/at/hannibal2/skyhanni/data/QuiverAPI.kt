@@ -145,7 +145,7 @@ object QuiverAPI {
                     true -> 1.0f
                     false -> {
                         when (infiniteQuiverLevel) {
-                            in 1..10 -> infinityQuiverLevelMultiplier * infiniteQuiverLevel
+                            in 1..10 -> 1 - (infinityQuiverLevelMultiplier * infiniteQuiverLevel)
                             else -> 1.0f
                         }
                     }
