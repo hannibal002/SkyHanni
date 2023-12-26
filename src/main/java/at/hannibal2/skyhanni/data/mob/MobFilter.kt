@@ -34,6 +34,7 @@ import net.minecraft.entity.monster.EntityIronGolem
 import net.minecraft.entity.monster.EntityMagmaCube
 import net.minecraft.entity.monster.EntityPigZombie
 import net.minecraft.entity.monster.EntitySlime
+import net.minecraft.entity.monster.EntitySnowman
 import net.minecraft.entity.monster.EntityWitch
 import net.minecraft.entity.monster.EntityZombie
 import net.minecraft.entity.passive.EntityAnimal
@@ -108,6 +109,7 @@ object MobFilter {
     }) || (this is EntityVillager && this.maxHealth == 20.0f) // Villager NPCs in the Village
         || (this is EntityWitch && this.entityId <= 500) // Alchemist NPC
         || (this is EntityCow && this.entityId <= 500) // Shania NPC (in Rift and Outside)
+        || (this is EntitySnowman && this.entityId <= 500) // Sherry NPC (in Jerry Island)
 
     internal fun createDisplayNPC(entity: EntityLivingBase): Boolean =
         MobUtils.getArmorStandByRangeAll(entity, 1.5).firstOrNull { armorStand ->
