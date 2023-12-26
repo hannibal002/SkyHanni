@@ -1,5 +1,35 @@
 # SkyHanni - Change Log
 
+## Version 0.22 (Unreleased)
+
+### New Features
+
+#### Fishing Features
+
++ Added Sea Creature Tracker. - hannibal2
+    + Allows to only show single variants, e.g. water or lava or winter.
+
+### Changed
+
+#### Rift Changes
+
++ Rift time now updates correctly in wizard tower and instantly updates the format when toggling max time or percentage. - hannibal2
+
+#### Fishing Fixes
+
++ Fixed Reindrake mob, Frosty NPC and frosty the snow blaster shop counting as sea creatures in the barn fishing timer. - hannibal2
+
+### Fixes
+
+#### Rift Fixes
+
++ Fixed vampire slayer damage indicator not working during Derpy. - hannibal2
+
+
+### Technical Changes
+
++ Migrate Hypixel API to v2. - hannibal2
+
 ## Version 0.22
 
 ### New Features
