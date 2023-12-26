@@ -372,7 +372,7 @@ enum class Events(private val displayLine: Supplier<List<String>>, private val s
             // Wind
             if (ScoreboardData.sidebarLinesFormatted.any { it == "§9Wind Compass" }) {
                 list += "§9Wind Compass"
-                list += ScoreboardData.sidebarLinesFormatted.nextAfter("§9Wind Compass")?.replace("a", "§a")
+                list += ScoreboardData.sidebarLinesFormatted.nextAfter("§9Wind Compass")
                     ?: "§7No Wind Compass for some reason"
             }
 
@@ -417,7 +417,7 @@ enum class Events(private val displayLine: Supplier<List<String>>, private val s
             }
 
             // raid
-            if (ScoreboardData.sidebarLinesFormatted.any { it.startsWith("Remaining: §a") && it.endsWith("goblins")}) {
+            if (ScoreboardData.sidebarLinesFormatted.any { it.startsWith("Remaining: §a") && it.endsWith("goblins") }) {
                 list += "§cGoblin Raid"
                 list += ScoreboardData.sidebarLinesFormatted.firstOrNull { it.startsWith("Remaining: §a") }
                     ?: "<hidden>"
