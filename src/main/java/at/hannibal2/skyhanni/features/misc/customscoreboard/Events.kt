@@ -394,6 +394,7 @@ enum class Events(private val displayLine: Supplier<List<String>>, private val s
                 }
             }
 
+            // Mithril Gourmand
             if (ScoreboardData.sidebarLinesFormatted.any { it.startsWith("Remaining: §a") } && ScoreboardData.sidebarLinesFormatted.any {
                     it.startsWith(
                         "Your Tasty Mithril: §c"
@@ -412,6 +413,15 @@ enum class Events(private val displayLine: Supplier<List<String>>, private val s
                 list += ScoreboardData.sidebarLinesFormatted.firstOrNull { it.startsWith("Tickets: §a") }
                     ?: "<hidden>"
                 list += ScoreboardData.sidebarLinesFormatted.firstOrNull { it.startsWith("Pool: §6") }
+                    ?: "<hidden>"
+            }
+
+            // raid
+            if (ScoreboardData.sidebarLinesFormatted.any { it.startsWith("Remaining: §a") && it.endsWith("goblins")}) {
+                list += "§cGoblin Raid"
+                list += ScoreboardData.sidebarLinesFormatted.firstOrNull { it.startsWith("Remaining: §a") }
+                    ?: "<hidden>"
+                list += ScoreboardData.sidebarLinesFormatted.firstOrNull { it.startsWith("Your kills: §c") }
                     ?: "<hidden>"
             }
 
