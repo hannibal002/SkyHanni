@@ -119,8 +119,12 @@ object SkyHanniConfigSearchResetCommand {
         if (args.size < 2 || args.size == 3) return "§c/shconfig toggle <config name> [value 1] [value 2]"
 
         val path = args[1]
-        val rawJson1 = if (args[2] == "clipboard") OSUtils.readFromClipboard() ?: return "§cClipboard has no string!" else args[2]
-        val rawJson2 = if (args[3] == "clipboard") OSUtils.readFromClipboard() ?: return "§cClipboard has no string!" else args[3]
+        val rawJson1 = if (args.size > 2)
+            if (args[2] == "clipboard") OSUtils.readFromClipboard() ?: return "§cClipboard has no string!" else args[2]
+        else "true"
+        val rawJson2 = if (args.size > 2)
+            if (args[3] == "clipboard") OSUtils.readFromClipboard() ?: return "§cClipboard has no string!" else args[3]
+        else "false"
 
         return try {
             val (argsFilter) = createFilter(true) { path.lowercase() }
@@ -128,8 +132,6 @@ object SkyHanniConfigSearchResetCommand {
 
             val currentValue = findConfigElements(argsFilter, classFilter,true).toString()
             val newValue = when (currentValue) {
-                "[true]" -> "false"
-                "[false]" -> "true"
                  "[$rawJson1]" -> rawJson2
                  "[$rawJson2]" -> rawJson1
                 else -> rawJson1
