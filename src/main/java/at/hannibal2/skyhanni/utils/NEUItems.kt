@@ -148,7 +148,8 @@ object NEUItems {
     }
 
     fun transHypixelNameToInternalName(hypixelId: String): NEUInternalName =
-        manager.auctionManager.transformHypixelBazaarToNEUItemId(hypixelId).asInternalName()
+        hypixelId.uppercase().asInternalName()
+//         manager.auctionManager.transformHypixelBazaarToNEUItemId(hypixelId).asInternalName()
 
     fun NEUInternalName.getPriceOrNull(useSellingPrice: Boolean = false): Double? {
         if (equals("WISP_POTION")) {
@@ -195,9 +196,9 @@ object NEUItems {
             fallbackItem
         }
 
-    //    fun isVanillaItem(item: ItemStack): Boolean =
-        manager.auctionManager.isVanillaItem(item.getInternalName().asString())
-    fun isVanillaItem(item: ItemStack) = false
+       fun isVanillaItem(item: ItemStack): Boolean = false
+//         manager.auctionManager.isVanillaItem(item.getInternalName().asString())
+//     fun isVanillaItem(item: ItemStack) = false
 
     fun ItemStack.renderOnScreen(x: Float, y: Float, scaleMultiplier: Double = 1.0) {
         val item = checkBlinkItem()
@@ -229,7 +230,7 @@ object NEUItems {
         GlStateManager.popMatrix()
     }
 
-    fun allNeuRepoItems(): Map<String, JsonObject> = NotEnoughUpdates.INSTANCE.manager.itemInformation
+    fun allNeuRepoItems(): Map<String, JsonObject> = emptyMap()
 
     fun getMultiplier(internalName: NEUInternalName, tryCount: Int = 0): Pair<NEUInternalName, Int> {
         if (multiplierCache.contains(internalName)) {
