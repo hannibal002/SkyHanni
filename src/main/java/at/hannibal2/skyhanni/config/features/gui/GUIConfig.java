@@ -26,13 +26,14 @@ public class GUIConfig {
     public int keyBindOpen = Keyboard.KEY_NONE;
 
     @Expose
-    @Category(name = "Custom Scoreboard", desc = "Custom Scoreboard Settings")
-    public CustomScoreboardConfig customScoreboard = new CustomScoreboardConfig();
-
-    @Expose
     @ConfigOption(name = "Global GUI Scale", desc = "Globally scale all SkyHanni GUIs.")
     @ConfigEditorSlider(minValue = 0.1F, maxValue = 10, minStep = 0.05F)
     public float globalScale = 1F;
+
+
+    @Expose
+    @Category(name = "Custom Scoreboard", desc = "Custom Scoreboard Settings")
+    public CustomScoreboardConfig customScoreboard = new CustomScoreboardConfig();
 
     @Expose
     @ConfigOption(name = "Modify Visual Words", desc = "")
