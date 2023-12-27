@@ -4,6 +4,7 @@ import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.data.HypixelData
 import at.hannibal2.skyhanni.data.ScoreboardData
 import at.hannibal2.skyhanni.mixins.transformers.AccessorGuiPlayerTabOverlay
+import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.RenderUtils.AlignmentEnum
 import net.minecraft.client.Minecraft
 
@@ -25,7 +26,7 @@ object CustomScoreboardUtils {
     fun getTablistFooter(): String {
         val tabList = Minecraft.getMinecraft().ingameGUI.tabList as AccessorGuiPlayerTabOverlay
         if (tabList.footer_skyhanni == null) return ""
-        return tabList.footer_skyhanni.formattedText.replace("§r", "")
+        return LorenzUtils.stripVanillaMessage(tabList.footer_skyhanni.formattedText)
     }
 
     fun getTitleAndFooterAlignment() = when (config.displayConfig.titleAndFooter.centerTitleAndFooter) {
