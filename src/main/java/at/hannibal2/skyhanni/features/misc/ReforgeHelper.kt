@@ -65,6 +65,7 @@ class ReforgeHelper {
             formattedReforgeToSearch = if (value == null) "" else "§7Goal: §9${value.name}"
         }
 
+    var hoverdReforge: ReforgeAPI.Reforge? = null
 
     var formattedCurrentReforge = ""
     var formattedReforgeToSearch = ""
@@ -76,8 +77,6 @@ class ReforgeHelper {
 
     var waitForChat = AtomicBoolean(false)
     var waitDelay = false
-
-    var hoverdReforgeStone: String? = null
 
     var sortAfter: ReforgeAPI.StatType? = null
 
@@ -177,9 +176,13 @@ class ReforgeHelper {
         isInHexReforgeMenu = false
         reforgeToSearch = null
         currentReforge = null
-        hoverdReforgeStone = null
+        hoverdReforge = null
         sortAfter = null
         updateDisplay()
+    }
+
+    fun updateDisplay() {
+        display = generateDisplay()
     }
 
     fun generateDisplay() = buildList<Renderable> {
@@ -191,16 +194,26 @@ class ReforgeHelper {
         val reforgeList = (if (isInHexReforgeMenu) ReforgeAPI.reforgeList else ReforgeAPI.nonePowerStoneReforge).filter { it.isValid(itemType, internalName) }
         val statTypes = reforgeList.mapNotNull { it.stats[itemRarity]?.map { it.key } }.flatten().toSet()
         val statButton = { it: ReforgeAPI.StatType? ->
-            val string = Renderable.string(it?.icon ?: "§7D")
+            val string = Renderable.hoverTips(
+                it?.icon ?: "§7D", listOf(
+                "§6Sort after:",
+                it?.iconWithName ?: "§7Default"
+            )
+            )
             if (sortAfter == it) {
                 Renderable.underlined(string)
             } else {
-                Renderable.clickable(string, { sortAfter = it; DelayedRun.runNextTick { updateDisplay() } })
+                Renderable.clickable(string, { sortAfter = it; updateDisplay() })
             }
         }
         val statTypeButtons = (listOf(statButton.invoke(null)) + statTypes.map { statButton.invoke(it) }).chunked(9)
         this.add(Renderable.table(statTypeButtons, xPadding = 3, yPadding = 2))
-        val list = reforgeList.map { reforge ->
+        val sortSelector: (ReforgeAPI.Reforge) -> Comparable<Any?> = if (sortAfter != null) {
+            { -(it.stats[itemRarity]?.get(sortAfter) ?: 0.0) as Comparable<Any?> }
+        } else {
+            { (it.isReforgeStone) as Comparable<Any?> }
+        }
+        val list = reforgeList.sortedBy(sortSelector).map { reforge ->
             Renderable.clickAndHover(
                 (if (reforge.isReforgeStone) "§9" else "§7") + reforge.name,
                 itemRarity?.let { rarity ->
@@ -215,7 +228,7 @@ class ReforgeHelper {
                     ?: listOf(""), onClick = { reforgeToSearch = reforge }, onHover = if (!isInHexReforgeMenu) {
                 {}
             } else {
-                { hoverdReforgeStone = reforge.rawReforgeStoneName ?: "Random Basic Reforge" }
+                { hoverdReforge = reforge }
             }
             )
         }
@@ -225,24 +238,25 @@ class ReforgeHelper {
         }
     }
 
-    fun updateDisplay() {
-        display = generateDisplay()
-    }
-
     var display: List<Renderable> = generateDisplay()
 
     val hoverColor = LorenzColor.GOLD.addOpacity(50).rgb
     val selectedColor = LorenzColor.BLUE.addOpacity(100).rgb
     val finishedColor = LorenzColor.GREEN.addOpacity(75).rgb
+    val finishedColorLow = LorenzColor.GREEN.addOpacity(50).rgb
 
     @SubscribeEvent
     fun onRender(event: GuiRenderEvent.ChestGuiOverlayRenderEvent) {
         if (!enable()) return
         posCurrent.renderStrings(listOf(formattedReforgeToSearch, formattedCurrentReforge), posLabel = "Reforge Notify")
         posList.renderRenderables(display, posLabel = "Reforge Overlay")
-        if (hoverdReforgeStone != null) {
-            colorReforgeStone(hoverColor, hoverdReforgeStone)
-            hoverdReforgeStone = null
+        if (hoverdReforge != null) {
+            if (hoverdReforge != currentReforge) {
+                colorReforgeStone(hoverColor, hoverdReforge?.rawReforgeStoneName ?: "Random Basic Reforge")
+            } else {
+                inventory?.inventory?.get(reforgeItem)?.background = finishedColorLow
+            }
+            hoverdReforge = null
         }
         if (reforgeToSearch == null) return
         if (reforgeToSearch != currentReforge) {
