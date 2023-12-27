@@ -39,7 +39,7 @@ class BazaarApi {
             holder.getData(this)
         } else null
 
-        fun isBazaarItem(stack: ItemStack) = stack.getInternalName().isBazaarItem()
+        fun isBazaarItem(stack: ItemStack): Boolean = stack.getInternalName().isBazaarItem()
 
         fun NEUInternalName.isBazaarItem() = NEUItems.manager.auctionManager.getBazaarInfo(asString()) != null
 
@@ -58,20 +58,20 @@ class BazaarApi {
     fun onInventoryOpen(event: InventoryFullyOpenedEvent) {
         inBazaarInventory = checkIfInBazaar(event)
         if (inBazaarInventory) {
-            val openedProduct = getOpenedProduct(event.inventoryItems) ?: return
+            val itemName = getOpenedProduct(event.inventoryItems) ?: return
+            val openedProduct = NEUItems.getInternalNameOrNull(itemName)
             currentlyOpenedProduct = openedProduct
             BazaarOpenedProductEvent(openedProduct, event).postAndCatch()
         }
     }
 
-    private fun getOpenedProduct(inventoryItems: Map<Int, ItemStack>): NEUInternalName? {
+    private fun getOpenedProduct(inventoryItems: Map<Int, ItemStack>): String? {
         val buyInstantly = inventoryItems[10] ?: return null
 
         if (buyInstantly.displayName != "§aBuy Instantly") return null
         val bazaarItem = inventoryItems[13] ?: return null
 
-        val itemName = bazaarItem.displayName
-        return NEUItems.getInternalNameOrNull(itemName)
+        return bazaarItem.displayName
     }
 
     @SubscribeEvent

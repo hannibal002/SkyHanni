@@ -12,7 +12,7 @@ public class SkyMartConfig {
     @ConfigOption(name = "Copper Price", desc = "Show copper to coin prices inside the SkyMart inventory.")
     @ConfigEditorBoolean
     @FeatureToggle
-    public boolean copperPrice = true;
+    public boolean copperPrice = false;
 
     @Expose
     @ConfigOption(name = "Advanced Stats", desc = "Show the BIN price and copper price for every item.")

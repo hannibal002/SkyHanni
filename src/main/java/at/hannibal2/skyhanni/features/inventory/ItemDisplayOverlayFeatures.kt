@@ -293,7 +293,7 @@ object ItemDisplayOverlayFeatures {
             gardenVacuumPattern.matchMatcher(line) {
                 val pests = group("amount").formatNumber()
                 return if (config.vacuumBagCap) {
-                    if (pests > 39) "§640" else "$pests"
+                        if (pests > 39) "§640+" else "$pests"
                 } else {
                     when {
                         pests < 40 -> "$pests"
