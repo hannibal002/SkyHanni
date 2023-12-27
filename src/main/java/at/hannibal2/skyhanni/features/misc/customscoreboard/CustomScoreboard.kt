@@ -70,7 +70,7 @@ class CustomScoreboard {
         for (element in config.scoreboardEntries) {
             lineMap[element.ordinal]?.let {
                 // Hide consecutive empty lines
-                if (config.informationFilteringConfig.hideConsecutiveEmptyLines && it[0].first == "<empty>" && newList.last().first == "") {
+                if (config.informationFilteringConfig.hideConsecutiveEmptyLines && it[0].first == "<empty>" && newList.last().first.isEmpty()) {
                     continue
                 }
 
