@@ -20,6 +20,7 @@ import at.hannibal2.skyhanni.utils.RenderUtils.renderStrings
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getReforgeName
 import at.hannibal2.skyhanni.utils.StringUtils.matches
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
+import at.hannibal2.skyhanni.utils.TimeUtils.tick
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraft.client.Minecraft
@@ -27,13 +28,10 @@ import net.minecraft.inventory.Container
 import net.minecraft.item.ItemStack
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import java.util.concurrent.atomic.AtomicBoolean
-import kotlin.time.DurationUnit
-import kotlin.time.toDuration
 
 fun Double.toStringWithPlus() = (if (this >= 0) "+" else "") + this.toString()
 
 class ReforgeHelper {
-
 
     val reforgeMenu by RepoPattern.pattern("menu.reforge", "Reforge Item")
     val reforgeHexMenu by RepoPattern.pattern("menu.reforge.hex", "The Hex ➜ Reforges")
@@ -80,6 +78,13 @@ class ReforgeHelper {
 
     var sortAfter: ReforgeAPI.StatType? = null
 
+    var display: List<Renderable> = generateDisplay()
+
+    val hoverColor = LorenzColor.GOLD.addOpacity(50).rgb
+    val selectedColor = LorenzColor.BLUE.addOpacity(100).rgb
+    val finishedColor = LorenzColor.GREEN.addOpacity(75).rgb
+    val finishedColorLow = LorenzColor.GREEN.addOpacity(50).rgb
+
     fun itemUpdate() {
         val newItem = inventory?.getSlot(reforgeItem)?.stack
         if (newItem?.getInternalName() != item?.getInternalName()) {
@@ -118,8 +123,6 @@ class ReforgeHelper {
             itemUpdate()
         }
     }
-
-    inline val Int.tick get() = (this * 50 * 2).toDuration(DurationUnit.MILLISECONDS) // Remove the x2 when NeaTickEvent is implemented
 
     @SubscribeEvent
     fun onChat(event: LorenzChatEvent) {
@@ -237,13 +240,6 @@ class ReforgeHelper {
             reforgeToSearch = null
         }
     }
-
-    var display: List<Renderable> = generateDisplay()
-
-    val hoverColor = LorenzColor.GOLD.addOpacity(50).rgb
-    val selectedColor = LorenzColor.BLUE.addOpacity(100).rgb
-    val finishedColor = LorenzColor.GREEN.addOpacity(75).rgb
-    val finishedColorLow = LorenzColor.GREEN.addOpacity(50).rgb
 
     @SubscribeEvent
     fun onRender(event: GuiRenderEvent.ChestGuiOverlayRenderEvent) {

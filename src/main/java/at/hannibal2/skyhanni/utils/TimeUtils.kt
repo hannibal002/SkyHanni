@@ -19,7 +19,7 @@ object TimeUtils {
         biggestUnit: TimeUnit = TimeUnit.YEAR,
         showMilliSeconds: Boolean = false,
         longName: Boolean = false,
-        maxUnits: Int = -1
+        maxUnits: Int = -1,
     ): String = formatDuration(
         inWholeMilliseconds - 999, biggestUnit, showMilliSeconds, longName, maxUnits
     )
@@ -36,7 +36,7 @@ object TimeUtils {
         biggestUnit: TimeUnit = TimeUnit.YEAR,
         showMilliSeconds: Boolean = false,
         longName: Boolean = false,
-        maxUnits: Int = -1
+        maxUnits: Int = -1,
     ): String {
         // TODO: if this weird offset gets removed, also remove that subtraction from formatDuration(kotlin.time.Duration)
         var milliseconds = millis + 999
@@ -142,6 +142,8 @@ object TimeUtils {
     }
 
     fun getCurrentLocalDate(): LocalDate = LocalDate.now(ZoneId.of("UTC"))
+
+    inline val Int.tick get() = (this * 50 * 2).toDuration(DurationUnit.MILLISECONDS) // Remove the x2 when NeaTickEvent is implemented
 }
 
 private const val FACTOR_SECONDS = 1000L
