@@ -5,6 +5,7 @@ import at.hannibal2.skyhanni.config.ConfigFileType
 import at.hannibal2.skyhanni.config.ConfigGuiManager
 import at.hannibal2.skyhanni.config.ConfigManager
 import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
+import at.hannibal2.skyhanni.config.core.config.Position
 import at.hannibal2.skyhanni.data.HypixelData
 import at.hannibal2.skyhanni.api.SlayerAPI
 import at.hannibal2.skyhanni.events.GuiRenderEvent
@@ -134,6 +135,48 @@ class SkyHanniDebugsAndTests {
 //            for (line in TabListUtils.getTabList()) {
 //                println("tablist: '$line'")
 //            }
+        }
+
+        fun findNullConfig(args: Array<String>) {
+            println("start null finder")
+            findNull(SkyHanniMod.feature, "config")
+            println("stop null finder")
+        }
+
+        private fun findNull(obj: Any, path: String) {
+
+            val blockedNames = listOf(
+                "TRUE",
+                "FALSE",
+                "SIZE",
+                "MIN_VALUE",
+                "MAX_VALUE",
+                "BYTES",
+                "POSITIVE_INFINITY",
+                "NEGATIVE_INFINITY",
+                "NaN",
+                "MIN_NORMAL",
+            )
+
+            val javaClass = obj.javaClass
+            if (javaClass.isEnum) return
+            for (field in javaClass.fields) {
+                val name = field.name
+                if (name in blockedNames) continue
+
+                // funny thing
+                if (obj is Position) {
+                    if (name == "internalName") continue
+                }
+
+                val other = field.makeAccessible().get(obj)
+                val newName = "$path.$name"
+                if (other == null) {
+                    println("config null at $newName")
+                } else {
+                    findNull(other, newName)
+                }
+            }
         }
 
         fun configManagerResetCommand(args: Array<String>) {

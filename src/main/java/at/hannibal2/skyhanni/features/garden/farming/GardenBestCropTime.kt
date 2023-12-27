@@ -140,7 +140,7 @@ class GardenBestCropTime {
         event.move(3, "garden.cropMilestoneBestCompact", "garden.cropMilestones.next.bestCompact")
         event.move(3, "garden.cropMilestoneBestHideTitle", "garden.cropMilestones.next.bestHideTitle")
 
-        event.transform(15, "garden.cropMilestones.next.bestType") { element ->
+        event.transform(17, "garden.cropMilestones.next.bestType") { element ->
             ConfigUtils.migrateIntToEnum(element, BestTypeEntry::class.java)
         }
     }

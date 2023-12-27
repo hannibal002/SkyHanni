@@ -8,7 +8,7 @@ import io.github.moulberry.moulconfig.annotations.ConfigEditorBoolean;
 import io.github.moulberry.moulconfig.annotations.ConfigEditorDropdown;
 import io.github.moulberry.moulconfig.annotations.ConfigOption;
 
-public class InventoryValueConfig {
+public class RiftInventoryValueConfig {
     @Expose
     @ConfigOption(name = "Inventory Value", desc = "Show total Motes NPC price for the current opened inventory.")
     @ConfigEditorBoolean

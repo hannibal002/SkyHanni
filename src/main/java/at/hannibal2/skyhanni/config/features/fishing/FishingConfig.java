@@ -56,6 +56,11 @@ public class FishingConfig {
     public FishingProfitTrackerConfig fishingProfitTracker = new FishingProfitTrackerConfig();
 
     @Expose
+    @ConfigOption(name = "Sea Creature Tracker", desc = "")
+    @Accordion
+    public SeaCreatureTrackerConfig seaCreatureTracker = new SeaCreatureTrackerConfig();
+
+    @Expose
     @ConfigOption(
         name = "Shark Fish Counter",
         desc = "Counts how many Sharks have been caught."

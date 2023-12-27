@@ -14,6 +14,7 @@ import at.hannibal2.skyhanni.utils.LocationUtils.distanceToPlayer
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils.baseMaxHealth
 import at.hannibal2.skyhanni.utils.LorenzUtils.derpy
+import at.hannibal2.skyhanni.utils.LorenzUtils.ignoreDerpy
 import at.hannibal2.skyhanni.utils.LorenzUtils.isInIsland
 import at.hannibal2.skyhanni.utils.LorenzVec
 import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
@@ -246,12 +247,14 @@ class MobFinder {
             }
 
             if (entity.name == "Bloodfiend ") {
+                // there is no derpy in rift
+                val hp = entity.baseMaxHealth.ignoreDerpy()
                 when {
-                    entity.hasMaxHealth(625, true) -> return EntityResult(bossType = BossType.SLAYER_BLOODFIEND_1)
-                    entity.hasMaxHealth(1_100, true) -> return EntityResult(bossType = BossType.SLAYER_BLOODFIEND_2)
-                    entity.hasMaxHealth(1_800, true) -> return EntityResult(bossType = BossType.SLAYER_BLOODFIEND_3)
-                    entity.hasMaxHealth(2_400, true) -> return EntityResult(bossType = BossType.SLAYER_BLOODFIEND_4)
-                    entity.hasMaxHealth(3_000, true) -> return EntityResult(bossType = BossType.SLAYER_BLOODFIEND_5)
+                    entity.hasMaxHealth(625, true, hp) -> return EntityResult(bossType = BossType.SLAYER_BLOODFIEND_1)
+                    entity.hasMaxHealth(1_100, true, hp) -> return EntityResult(bossType = BossType.SLAYER_BLOODFIEND_2)
+                    entity.hasMaxHealth(1_800, true, hp) -> return EntityResult(bossType = BossType.SLAYER_BLOODFIEND_3)
+                    entity.hasMaxHealth(2_400, true, hp) -> return EntityResult(bossType = BossType.SLAYER_BLOODFIEND_4)
+                    entity.hasMaxHealth(3_000, true, hp) -> return EntityResult(bossType = BossType.SLAYER_BLOODFIEND_5)
                 }
             }
         }
@@ -263,7 +266,7 @@ class MobFinder {
 
     private fun tryAddEntityBlaze(entity: EntityLivingBase) = when {
         entity.name != "Dinnerbone" && entity.hasNameTagWith(2, "§e﴾ §8[§7Lv200§8] §l§8§lAshfang§r ") &&
-                entity.hasMaxHealth(50_000_000, true) -> {
+            entity.hasMaxHealth(50_000_000, true) -> {
             EntityResult(bossType = BossType.NETHER_ASHFANG)
         }
 
@@ -381,7 +384,7 @@ class MobFinder {
 
     private fun tryAddEntityMagmaCube(entity: EntityLivingBase) = when {
         entity.hasNameTagWith(15, "§e﴾ §8[§7Lv500§8] §l§4§lMagma Boss§r ")
-                && entity.hasMaxHealth(200_000_000, true) -> {
+            && entity.hasMaxHealth(200_000_000, true) -> {
             EntityResult(bossType = BossType.NETHER_MAGMA_BOSS, ignoreBlocks = true)
         }
 
@@ -390,7 +393,7 @@ class MobFinder {
 
     private fun tryAddEntityHorse(entity: EntityLivingBase) = when {
         entity.hasNameTagWith(15, "§8[§7Lv100§8] §c§6Headless Horseman§r ") &&
-                entity.hasMaxHealth(3_000_000, true) -> {
+            entity.hasMaxHealth(3_000_000, true) -> {
             EntityResult(bossType = BossType.HUB_HEADLESS_HORSEMAN)
         }
 
@@ -589,7 +592,7 @@ class MobFinder {
             }
         }
 
-            correctLividPattern.matchMatcher(message) {
+        correctLividPattern.matchMatcher(message) {
             floor5lividEntity = null
         }
     }

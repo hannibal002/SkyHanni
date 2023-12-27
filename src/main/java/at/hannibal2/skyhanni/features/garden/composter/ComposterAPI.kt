@@ -4,6 +4,8 @@ import at.hannibal2.skyhanni.data.model.ComposterUpgrade
 import at.hannibal2.skyhanni.features.garden.GardenAPI
 import at.hannibal2.skyhanni.utils.NumberUtil.formatNumber
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
+import at.hannibal2.skyhanni.utils.TimeUtils
+import kotlin.math.floor
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.minutes
 
@@ -13,6 +15,41 @@ object ComposterAPI {
 
     fun ComposterUpgrade.getLevel(addOne: ComposterUpgrade?) =
         (composterUpgrades?.get(this) ?: 0) + if (addOne == this) 1 else 0
+
+    fun estimateEmptyTimeFromTab(): Duration? {
+        if (composterUpgrades.isNullOrEmpty()) {
+            return null
+        }
+
+        val nextCompostTime = tabListData[ComposterDisplay.DataType.TIME_LEFT]?.removeColor()?.let {
+            if (it != "INACTIVE") TimeUtils.getDuration(it) else null
+        } ?: Duration.ZERO
+
+        val timePerCompost = timePerCompost(null)
+        val fractionRemaining = nextCompostTime / timePerCompost
+
+        val remainingTimeByOrganicMatter = getDurationUntilEndOfResource(
+            getOrganicMatter(), fractionRemaining, organicMatterRequiredPer(null), timePerCompost
+        )
+
+        val remainingTimeByFuel = getDurationUntilEndOfResource(
+            getFuel(), fractionRemaining, fuelRequiredPer(null), timePerCompost
+        )
+
+        return nextCompostTime +  minOf(remainingTimeByOrganicMatter, remainingTimeByFuel)
+    }
+
+    private fun getDurationUntilEndOfResource(
+        amount: Long,
+        fractionOfCompostRemaining: Double,
+        requiredPer: Double,
+        timePerCompost: Duration
+    ): Duration {
+        val resourceConsumedByNextCompost = fractionOfCompostRemaining * requiredPer
+        val resourceRemainingAfterNextCompostFinishes = amount - resourceConsumedByNextCompost
+        val compostRemainingAfterNextCompostFinishes = floor(resourceRemainingAfterNextCompostFinishes / requiredPer)
+        return timePerCompost * compostRemainingAfterNextCompostFinishes
+    }
 
     fun getFuel() = tabListData[ComposterDisplay.DataType.FUEL]?.removeColor()?.formatNumber() ?: 0
 
