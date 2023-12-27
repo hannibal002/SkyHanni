@@ -12,48 +12,8 @@ import at.hannibal2.skyhanni.utils.StringUtils.trimWhiteSpaceAndResets
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
-enum class Powers(val power: String) {
-    // Standard
-    NO_POWER("No Power"),
-    FORTUITOUS("Fortuitous"),
-    PRETTY("Pretty"),
-    PROTECTED("Protected"),
-    SIMPLE("Simple"),
-    WARRIOR("Warrior"),
-    COMMANDO("Commando"),
-    DISCIPLINED("Disciplined"),
-    INSPIRED("Inspired"),
-    OMINOUS("Ominous"),
-    PREPARED("Prepared"),
-
-    // Unlockable
-    SILKY("Silky"),
-    SWEET("Sweet"),
-    BLOODY("Bloody"),
-    ITCHY("Itchy"),
-    SIGHTED("Sighted"),
-    ADEPT("Adept"),
-    MYTHICAL("Mythical"),
-    FORCEFUL("Forceful"),
-    SHADED("Shaded"),
-    STRONG("Strong"),
-    DEMONIC("Demonic"),
-    PLEASANT("Pleasant"),
-    HURTFUL("Hurtful"),
-    BIZARRE("Bizarre"),
-    HEALTHY("Healthy"),
-    SLENDER("Slender"),
-    SCORCHING("Scorching"),
-    CRUMBLY("Crumbly"),
-    BUBBA("Bubba"),
-    SANGUISUGE("Sanguisuge"),
-
-    UNKNOWN("Unknown"),
-    ;
-}
-
 object MaxwellAPI {
-    var currentPower: Powers? = null
+    var currentPower: MaxwellPowers? = null
 
     private val pattern by RepoPattern.pattern(
         "data.maxwell.chat.power",
@@ -72,8 +32,8 @@ object MaxwellAPI {
 
         pattern.matchMatcher(message) {
             val power = group("power")
-            currentPower = Powers.entries.find { power.contains(it.power) } ?: Powers.UNKNOWN
-            savePower(currentPower!!)
+            currentPower = MaxwellPowers.entries.find { power.contains(it.power) } ?: MaxwellPowers.UNKNOWN
+            savePower(currentPower)
         }
     }
 
@@ -86,8 +46,8 @@ object MaxwellAPI {
         val selectedPower =
             stacks.values.find { it.getLore().isNotEmpty() && it.getLore().last() == "§aPower is selected!" } ?: return
 
-        currentPower = Powers.entries.find { selectedPower.displayName.contains(it.power) }
-        savePower(currentPower!!)
+        currentPower = MaxwellPowers.entries.find { selectedPower.displayName.contains(it.power) }
+        savePower(currentPower)
     }
 
     @SubscribeEvent
@@ -96,7 +56,8 @@ object MaxwellAPI {
         currentPower = config.currentPower ?: return
     }
 
-    private fun savePower(power: Powers) {
+    private fun savePower(power: MaxwellPowers?) {
+        if (power == null) return
         val config = ProfileStorageData.profileSpecific ?: return
         config.currentPower = power
     }

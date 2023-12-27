@@ -2,6 +2,7 @@ package at.hannibal2.skyhanni.config;
 
 import at.hannibal2.skyhanni.data.Arrows;
 import at.hannibal2.skyhanni.data.Fame;
+import at.hannibal2.skyhanni.data.MaxwellPowers;
 import at.hannibal2.skyhanni.data.Powers;
 import at.hannibal2.skyhanni.data.model.ComposterUpgrade;
 import at.hannibal2.skyhanni.features.bingo.card.goals.BingoGoal;
@@ -122,7 +123,7 @@ public class Storage {
         public String currentPet = "";
 
         @Expose
-        public Powers currentPower = null;
+        public MaxwellPowers currentPower = null;
 
         @Expose
         public ArrowsStorage arrows = new ArrowsStorage();
