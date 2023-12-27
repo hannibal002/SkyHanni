@@ -125,6 +125,7 @@ import at.hannibal2.skyhanni.features.event.winter.NewYearCakeReminder
 import at.hannibal2.skyhanni.features.event.winter.UniqueGiftCounter
 import at.hannibal2.skyhanni.features.fame.AccountUpgradeReminder
 import at.hannibal2.skyhanni.features.fame.CityProjectFeatures
+import at.hannibal2.skyhanni.features.fame.FameCost
 import at.hannibal2.skyhanni.features.fishing.ChumBucketHider
 import at.hannibal2.skyhanni.features.fishing.FishingAPI
 import at.hannibal2.skyhanni.features.fishing.FishingBaitWarnings
@@ -690,6 +691,7 @@ class SkyHanniMod {
         loadModule(NewYearCakeReminder())
         loadModule(HighlightInquisitors())
         loadModule(VerminTracker)
+        loadModule(FameCost)
 
         init()
 

@@ -185,6 +185,12 @@ public class MiscConfig {
     public boolean accountUpgradeReminder = true;
 
     @Expose
+    @ConfigOption(name = "Fame Cost", desc = "Show cost equivalent for your fame in the lore of your fame rank")
+    @ConfigEditorBoolean
+    @FeatureToggle
+    public boolean fameCost = false;
+
+    @Expose
     @ConfigOption(name = "Superpairs Clicks Alert", desc = "Display an alert when you reach the maximum clicks gained from Chronomatron or Ultrasequencer.")
     @ConfigEditorBoolean
     @FeatureToggle
