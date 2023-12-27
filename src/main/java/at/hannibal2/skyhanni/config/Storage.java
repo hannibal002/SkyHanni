@@ -9,9 +9,10 @@ import at.hannibal2.skyhanni.features.combat.endernodetracker.EnderNodeTracker;
 import at.hannibal2.skyhanni.features.combat.ghostcounter.GhostData;
 import at.hannibal2.skyhanni.features.dungeon.DungeonAPI;
 import at.hannibal2.skyhanni.features.event.diana.DianaProfitTracker;
-import at.hannibal2.skyhanni.features.event.diana.MythologicalMobTracker;
+import at.hannibal2.skyhanni.features.event.diana.MythologicalCreatureTracker;
 import at.hannibal2.skyhanni.features.event.jerry.frozentreasure.FrozenTreasureTracker;
 import at.hannibal2.skyhanni.features.fishing.tracker.FishingProfitTracker;
+import at.hannibal2.skyhanni.features.fishing.tracker.SeaCreatureTracker;
 import at.hannibal2.skyhanni.features.fishing.trophy.TrophyRarity;
 import at.hannibal2.skyhanni.features.garden.CropAccessory;
 import at.hannibal2.skyhanni.features.garden.CropType;
@@ -474,6 +475,9 @@ public class Storage {
             @Expose
             public FishingProfitTracker.Data fishingProfitTracker = new FishingProfitTracker.Data();
 
+            @Expose
+            public SeaCreatureTracker.Data seaCreatureTracker = new SeaCreatureTracker.Data();
+
         }
 
         @Expose
@@ -486,7 +490,8 @@ public class Storage {
             public DianaProfitTracker.Data dianaProfitTracker = new DianaProfitTracker.Data();
 
             @Expose
-            public MythologicalMobTracker.Data mythologicalMobTracker = new MythologicalMobTracker.Data();
+            // TODO renmae
+            public MythologicalCreatureTracker.Data mythologicalMobTracker = new MythologicalCreatureTracker.Data();
 
         }
     }
