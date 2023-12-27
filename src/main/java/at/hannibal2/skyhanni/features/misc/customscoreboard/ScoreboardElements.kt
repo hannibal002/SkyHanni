@@ -5,7 +5,7 @@ import at.hannibal2.skyhanni.data.BitsAPI
 import at.hannibal2.skyhanni.data.HypixelData
 import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.data.MaxwellAPI
-import at.hannibal2.skyhanni.data.MayorElection
+import at.hannibal2.skyhanni.data.MayorAPI
 import at.hannibal2.skyhanni.data.PartyAPI
 import at.hannibal2.skyhanni.data.QuiverAPI
 import at.hannibal2.skyhanni.data.ScoreboardData
@@ -339,22 +339,22 @@ private fun getEventsShowWhen() = Events.getEvent().isNotEmpty()
 
 private fun getMayorDisplayPair(): List<Pair<String, AlignmentEnum>> {
     return listOf(
-        (MayorElection.currentCandidate?.name?.let { CustomScoreboardUtils.mayorNameToColorCode(it) }
+        (MayorAPI.currentMayor?.name?.let { MayorAPI.mayorNameToColorCode(it) }
             ?: "<hidden>") +
             (if (config.mayorConfig.showTimeTillNextMayor) {
-                "§7 (§e${TimeUtils.formatDuration(MayorElection.timeTillNextMayor, TimeUnit.DAY)}§7)"
+                "§7 (§e${TimeUtils.formatDuration(MayorAPI.timeTillNextMayor, TimeUnit.DAY)}§7)"
             } else {
                 ""
             }) to AlignmentEnum.LEFT
     ) + (if (config.mayorConfig.showMayorPerks) {
-        MayorElection.currentCandidate?.perks?.map { " §7- §e${it.name}" to AlignmentEnum.LEFT } ?: emptyList()
+        MayorAPI.currentMayor?.perks?.map { " §7- §e${it.name}" to AlignmentEnum.LEFT } ?: emptyList()
     } else {
         emptyList()
     })
 }
 
 private fun getMayorShowWhen() =
-    !listOf(IslandType.THE_RIFT).contains(HypixelData.skyBlockIsland) && MayorElection.currentCandidate != null
+    !listOf(IslandType.THE_RIFT).contains(HypixelData.skyBlockIsland) && MayorAPI.currentMayor != null
 
 private fun getPartyDisplayPair() =
     if (PartyAPI.partyMembers.isEmpty() && informationFilteringConfig.hideEmptyLines) {
