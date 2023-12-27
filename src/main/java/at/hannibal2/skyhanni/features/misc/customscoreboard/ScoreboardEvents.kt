@@ -323,13 +323,12 @@ private fun getGardenPastingShowWhen(): Boolean {
 
 private fun getFlightDurationLines(): List<String> {
     return listOf(
-        getSbLines().firstOrNull { it.startsWith("Flight Duration:") }
-            ?: "<hidden>"
+        getSbLines().first { SbPattern.flightDurationPattern.matches(it) },
     )
 }
 
 private fun getFlightDurationShowWhen(): Boolean {
-    return getSbLines().any { it.startsWith("Flight Duration:") }
+    return getSbLines().any { SbPattern.flightDurationPattern.matches(it) }
 }
 
 private fun getWinterLines(): List<String> {

@@ -2,6 +2,7 @@ package at.hannibal2.skyhanni.features.misc.customscoreboard
 
 import at.hannibal2.skyhanni.data.BitsAPI
 import at.hannibal2.skyhanni.data.ScoreboardData
+import at.hannibal2.skyhanni.features.rift.area.stillgorechateau.RiftBloodEffigies
 import at.hannibal2.skyhanni.utils.LorenzUtils.nextAfter
 import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.StringUtils.matches
@@ -41,7 +42,6 @@ object InformationGetter {
             "Your Cube Damage",
             "§6Spooky Festival§f",
             "§dNew Year Event",
-            "§9Wind Compass",
             "Nearby Players:",
             "Event: ",
             "Zone: ",
@@ -49,7 +49,6 @@ object InformationGetter {
             "§7Give Tasty Mithril to Don!",
             "Remaining: §a",
             "Your Tasty Mithr",
-            "Flight Duration:",
             "Points: ",
             "Challenge:",
             "Pelts: §5",
@@ -112,9 +111,10 @@ object InformationGetter {
         unknownLines = unknownLines.filter { !ScoreboardPattern.essencePattern.matches(it) }
         unknownLines = unknownLines.filter { !ScoreboardPattern.brokenRedstonePattern.matches(it) }
         unknownLines = unknownLines.filter { !ScoreboardPattern.visitingPattern.matches(it) }
+        unknownLines = unknownLines.filter { !ScoreboardPattern.flightDurationPattern.matches(it) }
         unknownLines = unknownLines.filter { !ScoreboardPattern.travelingZooPattern.matches(it) }
         unknownLines = unknownLines.filter { !ScoreboardPattern.riftDimensionPattern.matches(it) }
-        unknownLines = unknownLines.filter { !ScoreboardPattern.effigiesPattern.matches(it) }
+        unknownLines = unknownLines.filter { !RiftBloodEffigies.heartsPattern.matches(it) }
 
 
         /*
@@ -134,9 +134,6 @@ object InformationGetter {
         unknownLines = unknownLines.filter { sidebarLines.nextAfter(objectiveLine) != it }
         unknownLines =
             unknownLines.filter { sidebarLines.nextAfter(objectiveLine, 2) != it && !extraObjectiveLines.contains(it) }
-
-        // remove wind compass
-        unknownLines = unknownLines.filter { sidebarLines.nextAfter("§9Wind Compass") != it }
 
         // Remove jacobs contest
         for (i in 0..3)

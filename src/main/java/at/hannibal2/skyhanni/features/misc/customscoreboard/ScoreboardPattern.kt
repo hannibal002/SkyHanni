@@ -65,13 +65,13 @@ object ScoreboardPattern {
     val essencePattern by miscSb.pattern("essence", "Essence: §d(?<essence>-?\\d+(:?,\\d{3})*(?:\\.\\d+)?)$")
     val brokenRedstonePattern by miscSb.pattern("brokenredstone", "\\s*e: §e§b\\d{1,3}%\$")
     val visitingPattern by miscSb.pattern("visiting", "§a✌ §7\\(§a\\d+§7/\\d+\\)$")
+    val flightDurationPattern by miscSb.pattern("flightduration", "Flight Duration: §a(:?\\d{1,3})*$")
     // events
     private val eventsSb = scoreboardGroup.group("events")
     val travelingZooPattern by eventsSb.pattern("travelingzoo", "§aTraveling Zoo§f \\d{0,2}:\\d{2}$")
     // rift
     private val riftSb = scoreboardGroup.group("rift")
     val riftDimensionPattern by riftSb.pattern("dimension", "§fRift Dimension$")
-    val effigiesPattern by riftSb.pattern("effigies", "Effigies: ((§[7c])?⧯)*")
 
 
     // Stats from the tablist
