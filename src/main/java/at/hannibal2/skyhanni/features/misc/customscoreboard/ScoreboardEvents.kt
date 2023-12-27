@@ -532,11 +532,11 @@ private fun getEssenceShowWhen(): Boolean {
 }
 
 private fun getEffigiesLines(): List<String> {
-    return listOf(getSbLines().firstOrNull { it.startsWith("Effigies: ") } ?: "<hidden>")
+    return listOf(getSbLines().first { SbPattern.effigiesPattern.matches(it) })
 }
 
 private fun getEffigiesShowWhen(): Boolean {
-    return getSbLines().any { it.startsWith("Effigies: ") }
+    return getSbLines().any { SbPattern.effigiesPattern.matches(it) }
 }
 
 private fun getNoneLines(): List<String> {

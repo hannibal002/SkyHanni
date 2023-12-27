@@ -71,6 +71,7 @@ object ScoreboardPattern {
     // rift
     private val riftSb = scoreboardGroup.group("rift")
     val riftDimensionPattern by riftSb.pattern("dimension", "§fRift Dimension$")
+    val effigiesPattern by riftSb.pattern("effigies", "Effigies: ((§[7c])?⧯)*")
 
 
     // Stats from the tablist

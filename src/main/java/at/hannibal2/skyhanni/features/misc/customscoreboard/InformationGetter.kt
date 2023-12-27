@@ -114,6 +114,7 @@ object InformationGetter {
         unknownLines = unknownLines.filter { !ScoreboardPattern.visitingPattern.matches(it) }
         unknownLines = unknownLines.filter { !ScoreboardPattern.travelingZooPattern.matches(it) }
         unknownLines = unknownLines.filter { !ScoreboardPattern.riftDimensionPattern.matches(it) }
+        unknownLines = unknownLines.filter { !ScoreboardPattern.effigiesPattern.matches(it) }
 
 
         /*
