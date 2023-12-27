@@ -163,6 +163,13 @@ public class InventoryConfig {
     public boolean powerStoneGuide = true;
 
     @Expose
+    @ConfigOption(name = "Highlight Bids",
+        desc = "Highlight own bids that are won in green, outbid in gold, and expired in red.")
+    @ConfigEditorBoolean
+    @FeatureToggle
+    public boolean highlightBids = true;
+
+    @Expose
     @ConfigOption(name = "Highlight Auctions",
         desc = "Highlight own items that are sold in green and that are expired in red.")
     @ConfigEditorBoolean
