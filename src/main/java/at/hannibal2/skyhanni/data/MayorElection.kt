@@ -55,7 +55,7 @@ class MayorElection {
         if (System.currentTimeMillis() > lastUpdate + 60_000 * 5) {
             lastUpdate = System.currentTimeMillis()
             SkyHanniMod.coroutineScope.launch {
-                val url = "https://api.hypixel.net/resources/skyblock/election"
+                val url = "https://api.hypixel.net/v2/resources/skyblock/election"
                 val jsonObject = withContext(dispatcher) { APIUtil.getJSONResponse(url) }
                 rawMayorData = ConfigManager.gson.fromJson(jsonObject, MayorJson::class.java)
                 val data = rawMayorData ?: return@launch
