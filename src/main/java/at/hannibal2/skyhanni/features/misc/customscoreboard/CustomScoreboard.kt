@@ -19,7 +19,6 @@ package at.hannibal2.skyhanni.features.misc.customscoreboard
 
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.events.GuiRenderEvent
-import at.hannibal2.skyhanni.events.LorenzChatEvent
 import at.hannibal2.skyhanni.events.LorenzTickEvent
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.RenderUtils.AlignmentEnum
@@ -97,14 +96,6 @@ class CustomScoreboard {
     fun onRenderScoreboard(event: RenderGameOverlayEvent.Post) {
         if (event.type == RenderGameOverlayEvent.ElementType.HELMET) {
             GuiIngameForge.renderObjective = !isHideVanillaScoreboardEnabled()
-        }
-    }
-
-    @SubscribeEvent
-    fun onChatMessage(event: LorenzChatEvent) {
-        // Reset Bits - We need this bc if another profile has 0 bits, it won't show the bits line
-        if (event.message.startsWith("§aYour profile was changed to:")) {
-            bits = "0"
         }
     }
 
