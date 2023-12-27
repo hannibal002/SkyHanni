@@ -5,6 +5,8 @@ import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.LorenzChatEvent
 import at.hannibal2.skyhanni.events.LorenzTickEvent
 import at.hannibal2.skyhanni.events.LorenzWorldChangeEvent
+import at.hannibal2.skyhanni.events.MessageSendToServerEvent
+import at.hannibal2.skyhanni.features.commands.LimboCommands
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils.round
 import at.hannibal2.skyhanni.utils.RenderUtils.renderString
@@ -19,7 +21,6 @@ class LimboTimeTracker {
     private val config get() = SkyHanniMod.feature.misc
 
     private var limboJoinTime = SimpleTimeMark.farPast()
-    private var inLimbo = false
     private var shownPB = false
     private var oldPB: Duration = 0.seconds
     private var userLuck: Double = 0.0
@@ -29,13 +30,20 @@ class LimboTimeTracker {
     fun onChat(event: LorenzChatEvent) {
         if (event.message == "§cYou are AFK. Move around to return from AFK." || event.message == "§cYou were spawned in Limbo.") {
             limboJoinTime = SimpleTimeMark.now()
-            inLimbo = true
+        }
+    }
+
+    @SubscribeEvent
+    fun catchPlaytime(event: MessageSendToServerEvent) {
+        if (event.message.startsWith("/playtime") && LimboCommands.inLimbo) {
+            event.isCanceled
+            LimboCommands.printPlaytime()
         }
     }
 
     @SubscribeEvent
     fun onTick(event: LorenzTickEvent) {
-        if (inLimbo && !shownPB && limboJoinTime.passedSince() >= config.limboTimePB.seconds && config.limboTimePB != 0) {
+        if (LimboCommands.inLimbo && !shownPB && limboJoinTime.passedSince() >= config.limboTimePB.seconds && config.limboTimePB != 0) {
             shownPB = true
             oldPB = config.limboTimePB.seconds
             LorenzUtils.chat("§d§lPERSONAL BEST§f! You've surpassed your previous record of §e$oldPB§f!")
@@ -45,14 +53,14 @@ class LimboTimeTracker {
 
     @SubscribeEvent
     fun onWorldChange(event: LorenzWorldChangeEvent) {
-        if (!inLimbo) return
+        if (!LimboCommands.inLimbo) return
         leaveLimbo()
     }
 
     @SubscribeEvent
     fun onRenderOverlay(event: GuiRenderEvent.GuiOverlayRenderEvent) {
         if (!isEnabled()) return
-        if (!inLimbo) return
+        if (!LimboCommands.inLimbo) return
 
         if (LorenzUtils.inSkyBlock) {
             leaveLimbo()
@@ -64,7 +72,7 @@ class LimboTimeTracker {
     }
 
     private fun leaveLimbo() {
-        inLimbo = false
+        LimboCommands.inLimbo = false
         if (!isEnabled()) return
         val passedSince = limboJoinTime.passedSince()
         val duration = passedSince.format()
@@ -81,12 +89,4 @@ class LimboTimeTracker {
     }
 
     fun isEnabled() = config.showTimeInLimbo
-
-    object LimboCommands {
-        fun printPB() {
-            val limboPB = SkyHanniMod.feature.misc.limboTimePB.seconds
-            val userLuck = SkyHanniMod.feature.misc.limboTimePB * 0.000810185
-            LorenzUtils.chat("§fYour current limbo PB is §e$limboPB§f, granting you §a+${userLuck.round(2)}✴ SkyHanni User Luck§f!")
-        }
-    }
 }

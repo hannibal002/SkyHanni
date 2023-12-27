@@ -13,6 +13,7 @@ import at.hannibal2.skyhanni.features.bingo.card.nextstephelper.BingoNextStepHel
 import at.hannibal2.skyhanni.features.chat.Translator
 import at.hannibal2.skyhanni.features.combat.endernodetracker.EnderNodeTracker
 import at.hannibal2.skyhanni.features.combat.ghostcounter.GhostUtil
+import at.hannibal2.skyhanni.features.commands.LimboCommands
 import at.hannibal2.skyhanni.features.commands.PartyCommands
 import at.hannibal2.skyhanni.features.event.diana.BurrowWarpHelper
 import at.hannibal2.skyhanni.features.event.diana.DianaProfitTracker
@@ -227,7 +228,11 @@ object Commands {
         registerCommand(
             "shlimbopb",
             "Prints your Limbo Personal Best"
-        ) { LimboTimeTracker.LimboCommands.printPB() }
+        ) { LimboCommands.printPB() }
+        registerCommand(
+            "shlimboplaytime",
+            "Prints your Limbo Playtime"
+        ) { LimboCommands.printPlaytime() }
     }
 
     private fun usersBugFix() {

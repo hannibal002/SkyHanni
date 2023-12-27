@@ -31,6 +31,10 @@ object PartyCommands {
 
     fun transfer(args: Array<String>) {
         if (args.isEmpty()) {
+            if (LimboCommands.inLimbo) {
+                LimboCommands.printPlaytime()
+                return
+            }
             LorenzUtils.sendCommandToServer("pt")
             return
         }

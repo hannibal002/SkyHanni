@@ -222,4 +222,7 @@ public class MiscConfig {
 
     @Expose
     public int limboTimePB = 0;
+
+    @Expose
+    public int limboPlaytime = 0;
 }
