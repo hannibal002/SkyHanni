@@ -1,5 +1,6 @@
 package at.hannibal2.skyhanni.config.features.gui.customscoreboard;
 
+import at.hannibal2.skyhanni.config.FeatureToggle;
 import at.hannibal2.skyhanni.config.core.config.Position;
 import at.hannibal2.skyhanni.features.misc.customscoreboard.ScoreboardElements;
 import com.google.gson.annotations.Expose;
@@ -19,6 +20,7 @@ public class CustomScoreboardConfig {
         desc = "Show a custom scoreboard instead of the vanilla one."
     )
     @ConfigEditorBoolean
+    @FeatureToggle
     public boolean enabled = false;
 
     @Expose
