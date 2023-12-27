@@ -15,16 +15,16 @@ object ScoreboardPattern {
     val motesPattern by mainSb.pattern("motes", "^Motes: §[5d](?<motes>-?\\d+(:?,\\d{3})*(?:\\.\\d+)?)$")
     val heatPattern by mainSb.pattern("heat", "^Heat: (?<heat>.*)$") // this line is weird (either text or number), ill leave it as is; it even has different colors?
     val copperPattern by mainSb.pattern("copper", "^Copper: §c(?<copper>-?\\d+(:?,\\d{3})*(?:\\.\\d+)?)$")
-    val locationPattern by mainSb.pattern("location", "(?<location> (§7⏣|§5ф) .*)$")
-    val lobbyCodePattern by mainSb.pattern ("lobbycode", "§(\\d{3}/\\d{2}/\\d{2}) §8(?<code>.*)$")
-    val datePattern by mainSb.pattern("date", "(Late |Early )?(Spring|Summer|Autumn|Winter) \\d{1,2}(st|nd|rd|th)?")
-    val timePattern by mainSb.pattern("time", "§7\\d{1,2}:\\d{2}(?:am|pm) (§b☽|§e☀|⚡|☔)$")
+    val locationPattern by mainSb.pattern("location", "^\\s*(?<location> (§7⏣|§5ф) .*)$")
+    val lobbyCodePattern by mainSb.pattern ("lobbycode", "^\\s*§(\\d{3}/\\d{2}/\\d{2}) §8(?<code>.*)$")
+    val datePattern by mainSb.pattern("date", "^\\s*(Late |Early )?(Spring|Summer|Autumn|Winter) \\d{1,2}(st|nd|rd|th)?")
+    val timePattern by mainSb.pattern("time", "^\\s*§7\\d{1,2}:\\d{2}(?:am|pm) (§b☽|§e☀|⚡|☔)$")
     val footerPattern by mainSb.pattern("footer", "§e(www|alpha).hypixel.net\$")
     val yearVotesPattern by mainSb.pattern("yearvotes", "(?<yearvotes>^§6Year \\d+ Votes\$)")
     val votesPattern by mainSb.pattern("votes", "(?<votes>§[caebd]\\|+§f\\|+ §(.+)\$)")
     val waitingForVotePattern by mainSb.pattern("waitingforvote", "(§7Waiting for|§7your vote\\.\\.\\.)$")
     val northstarsPattern by mainSb.pattern("northstars", "North Stars: §d(?<northstars>\\d{1,3})$")
-    val profileTypePattern by mainSb.pattern("profiletype", "(§7♲ §7Ironman|§a☀ §aStranded|§.Ⓑ §.Bingo)$")
+    val profileTypePattern by mainSb.pattern("profiletype", "^\\s*(§7♲ §7Ironman|§a☀ §aStranded|§.Ⓑ §.Bingo)$")
     // multi use
     private val multiUseSb = scoreboardGroup.group("multiuse")
     val autoClosingPattern by multiUseSb.pattern("autoclosing", "Auto-closing in: §c\\d{0}:\\d{2}$")
@@ -39,9 +39,9 @@ object ScoreboardPattern {
     // farming
     private val farmingSb = scoreboardGroup.group("farming")
     val medalsPattern by farmingSb.pattern("medals", "§[6fc]§l(GOLD|SILVER|BRONZE) §fmedals: §[6fc]\\d+$")
-    val lockedPattern by farmingSb.pattern("locked", "§cLocked$")
-    val cleanUpPattern by farmingSb.pattern("cleanup", "§fCleanup§7: \\d{1,3}%$")
-    val pastingPattern by farmingSb.pattern("pasting", "§f(Barn )?Pasting§7: §e\\d{1,3}(\\.\\d)?%$")
+    val lockedPattern by farmingSb.pattern("locked", "^\\s*§cLocked$")
+    val cleanUpPattern by farmingSb.pattern("cleanup", "^\\s*§fCleanup§7: \\d{1,3}%$")
+    val pastingPattern by farmingSb.pattern("pasting", "^\\s*§f(Barn )?Pasting§7: §e\\d{1,3}(\\.\\d)?%$")
     // mining
     private val miningSb = scoreboardGroup.group("mining")
     val powderPattern by miningSb.pattern("powder", "§[2d]᠅ §f(Gemstone|Mithril) Powder§f: §[2d]-?\\d+(:?,\\d{3})*(?:\\.\\d+)?$")
@@ -62,16 +62,16 @@ object ScoreboardPattern {
     val bossDamagePattern by combatSb.pattern("bossdamage", "^Your Damage: §c(,?\\d{1,3}(\\.\\d)?)*$")
     // misc
     private val miscSb = scoreboardGroup.group("misc")
-    val essencePattern by miscSb.pattern("essence", "Essence: §d(?<essence>-?\\d+(:?,\\d{3})*(?:\\.\\d+)?)$")
+    val essencePattern by miscSb.pattern("essence", "^\\s*Essence: §d(?<essence>-?\\d+(:?,\\d{3})*(?:\\.\\d+)?)$")
     val brokenRedstonePattern by miscSb.pattern("brokenredstone", "\\s*e: §e§b\\d{1,3}%\$")
-    val visitingPattern by miscSb.pattern("visiting", "§a✌ §7\\(§a\\d+§7/\\d+\\)$")
-    val flightDurationPattern by miscSb.pattern("flightduration", "Flight Duration: §a(:?\\d{1,3})*$")
+    val visitingPattern by miscSb.pattern("visiting", "^\\s*§a✌ §7\\(§a\\d+§7/\\d+\\)$")
+    val flightDurationPattern by miscSb.pattern("flightduration", "^\\s*Flight Duration: §a(:?\\d{1,3})*$")
     // events
     private val eventsSb = scoreboardGroup.group("events")
     val travelingZooPattern by eventsSb.pattern("travelingzoo", "§aTraveling Zoo§f \\d{0,2}:\\d{2}$")
     // rift
     private val riftSb = scoreboardGroup.group("rift")
-    val riftDimensionPattern by riftSb.pattern("dimension", "§fRift Dimension$")
+    val riftDimensionPattern by riftSb.pattern("dimension", "^\\s*§fRift Dimension$")
 
 
     // Stats from the tablist
