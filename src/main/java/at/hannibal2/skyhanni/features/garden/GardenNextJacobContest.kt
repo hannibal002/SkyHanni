@@ -134,7 +134,7 @@ object GardenNextJacobContest {
         if (backName != "§aGo Back") return
         val lore = backItem.getLore()
         if (lore.size != 1) return
-        if (lore[0] != "§7To Calendar and ScoreboardEvents") return
+        if (lore[0] != "§7To Calendar and Events") return
 
         inCalendar = true
 
