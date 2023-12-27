@@ -306,7 +306,7 @@ interface Renderable {
                     row.forEachIndexed { index, renderable ->
                         GlStateManager.pushMatrix()
                         GlStateManager.translate(xOffsets[index].toFloat(), yOffsets[rowIndex].toFloat(), 0F)
-                        renderable?.render(posX, posY)
+                        renderable?.render(posX + xOffsets[index], posY + yOffsets[rowIndex])
                         GlStateManager.popMatrix()
                     }
                 }
