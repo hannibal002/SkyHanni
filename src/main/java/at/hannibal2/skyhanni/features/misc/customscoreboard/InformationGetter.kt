@@ -2,107 +2,61 @@ package at.hannibal2.skyhanni.features.misc.customscoreboard
 
 import at.hannibal2.skyhanni.data.BitsAPI
 import at.hannibal2.skyhanni.data.ScoreboardData
-import at.hannibal2.skyhanni.features.misc.customscoreboard.CustomScoreboardUtils.extractLobbyCode
 import at.hannibal2.skyhanni.utils.LorenzUtils.nextAfter
-import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
+import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
+import at.hannibal2.skyhanni.utils.StringUtils.matches
+import at.hannibal2.skyhanni.utils.StringUtils.removeResets
+import at.hannibal2.skyhanni.utils.StringUtils.trimWhiteSpaceAndResets
 import at.hannibal2.skyhanni.utils.TabListData
 
 object InformationGetter {
-    val dungeonClassList = listOf(
-        "§e[M] ",
-        "§a[M] ",
-        "§c[M] ",
-        "§e[A] ",
-        "§a[A] ",
-        "§c[A] ",
-        "§e[B] ",
-        "§a[B] ",
-        "§c[B] ",
-        "§e[H] ",
-        "§a[H] ",
-        "§c[H] ",
-        "§e[T] ",
-        "§a[T] ",
-        "§c[T] ",
-    )
-
     fun getInformation() {
         val sidebarLines = ScoreboardData.sidebarLinesFormatted
 
-        // Gets some values from the tablist
-        for (line in TabListData.getTabList()) {
-            when {
-                line.startsWith(" Gems: §r§a") -> gems = line.removePrefix(" Gems: §r§a")
-                line.startsWith(" Bank: §r§6") -> bank = line.removePrefix(" Bank: §r§6")
-                line.startsWith(" §r§fMithril Powder: §r§2") -> mithrilPowder =
-                    line.removePrefix(" §r§fMithril Powder: §r§2")
+        for (quirkyLine in sidebarLines) {
+            val line = quirkyLine.trimWhiteSpaceAndResets().removeResets()
 
-                line.startsWith(" §r§fGemstone Powder: §r§d") -> gemstonePowder =
-                    line.removePrefix(" §r§fGemstone Powder: §r§d")
+            ScoreboardPattern.heatPattern.matchMatcher(line) {
+                heat = group("heat")
+            }
+            ScoreboardPattern.locationPattern.matchMatcher(line) {
+                location = group("location")
+            }
+            ScoreboardPattern.lobbyCodePattern.matchMatcher(line) {
+                lobbyCode = group("code")
             }
         }
 
-        // Gets some values from the scoreboard
-        for (line in sidebarLines) {
-            when {
-                line.startsWith(" §7⏣ ") || line.startsWith(" §5ф ") -> location = line
-                line.startsWith("Purse: §6") || line.startsWith("Piggy: §6") -> purse =
-                    line.removePrefix("Purse: §6").removePrefix("Piggy: §6")
+        for (quirkyLine in TabListData.getTabList()) {
+            val line = quirkyLine.trimWhiteSpaceAndResets().removeResets()
 
-                line.startsWith("Motes: §5") -> motes = line.removePrefix("Motes: §5")
-                line.startsWith("Motes: §d") -> motes = line.removePrefix("Motes: §d")
-                extractLobbyCode(line) is String -> lobbyCode =
-                    extractLobbyCode(line)?.substring(1) ?: "<hidden>" //removes first char (number of color code)
-                line.startsWith("Heat: ") -> heat = line.removePrefix("Heat: ")
-                line.startsWith("Copper: §c") -> copper = line.removePrefix("Copper: §c")
+            ScoreboardPattern.gemsPattern.matchMatcher(line) {
+                gems = group("gems")
+            }
+            ScoreboardPattern.bankPattern.matchMatcher(line) {
+                bank = group("bank")
+            }
+            ScoreboardPattern.mithrilPowderPattern.matchMatcher(line) {
+                mithrilPowder = group("mithrilpowder")
+            }
+            ScoreboardPattern.gemstonePowderPattern.matchMatcher(line) {
+                gemstonePowder = group("gemstonepowder")
             }
         }
 
-        bits = BitsAPI.bits.addSeparators()
-
-        if (sidebarLines.none { it.startsWith(("Heat: ")) }) {
+        if (sidebarLines.none { ScoreboardPattern.heatPattern.matches(it) }) {
             heat = "§c♨ 0"
         }
 
         // I know this could maybe be solved better but honestly idc anymore
         val knownLines = listOf(
-            "§7⏣ ",
-            "§5ф ",
-            "Purse: §6",
-            "Piggy: §6",
-            "Motes: §5",
-            "Motes: §d",
-            "Heat: ",
-            "Bits: §b",
-            "Copper: §c",
-            "Spring",
-            "Summer",
-            "Autumn",
-            "Winter",
-            lobbyCode,
-            "§ewww.hyp",
-            "§ealpha.hyp",
             "§cServer closing: ",
-            "§cServer closing§8",
-            "Auto-closing in:",
-            "Starting in:",
-            "Keys: ",
-            "Time Elapsed:",
-            "§rCleared: ",
-            "Cleared: ",
             "Instance Shutdow",
-            "Time Elapsed: ",
             "§f§lWave: §c§l",
             "§fTokens: ",
             "Submerges In: §e",
             "§fObjective",
             "Objective",
-            "§eJacob's Contest",
-            "Â§eJacob's Contes",
-            "§6§lGOLD §fmedals",
-            "§f§lSILVER §fmedals",
-            "§c§lBRONZE §fmedals",
-            "North Stars: §d",
             "Event Start: §a",
             "Next Wave: §a",
             "§cWave",
@@ -119,46 +73,17 @@ object InformationGetter {
             "Protector HP: §a",
             "Dragon HP: §a",
             "Your Damage: §c",
-            "Essence: ",
-            "§e☀",
-            "§b☽",
-            "☔",
-            "⚡",
-            "Ⓑ",
-            "§a☀",
-            "§7♲",
-            "Slayer Quest",
             "§4Broodmother§7:",
             "§7Give Tasty Mithril to Don!",
             "Remaining: §a",
             "Your Tasty Mithr",
-            "§3§lSolo",
             "§fRift Dimension",
-            "§d᠅ §fGemstone",
-            "§2᠅ §fMithril",
-            "Revenant Horror",
-            "Tarantula Broodfa",
-            "Sven Packm",
-            "Voidgloom Seraph",
-            "Inferno Demo",
-            "Combat XP",
             "Flight Duration:",
             "§a✌ §",
             "Points: ",
             "Challenge:",
-            *dungeonClassList.toTypedArray(),
-            "§cLocked",
-            "§fCleanup§7:",
-            "§fPasting§7: ",
-            "§fBarn Pasting§7:",
-            "§6Year ",
-            "§7Waiting for",
-            "§7your vote...",
             "Pelts: §5",
             "Tracker Mob Location:",
-            "§7Boss: §",
-            "§7Damage Soaked:",
-            "§6Kill the Magmas:",
             "Time Left: §b",
             "Current Item:",
             "Effigies: ",
@@ -171,10 +96,59 @@ object InformationGetter {
             "Pool: §6"
         )
 
-        unknownLines = sidebarLines.filter { line -> !knownLines.any { line.trim().contains(it) } }
+        unknownLines = sidebarLines.toMutableList().filter { it.isNotBlank() }.map { it.replace("§r", "") }
 
-        // filter empty lines
-        unknownLines = unknownLines.filter { it.isNotBlank() }
+        /*
+         * remove with pattern
+        */
+        unknownLines = unknownLines.filter { !ScoreboardPattern.pursePattern.matches(it) }
+        unknownLines = unknownLines.filter { !ScoreboardPattern.motesPattern.matches(it) }
+        unknownLines = unknownLines.filter { !BitsAPI.bitsScoreboardPattern.matches(it) }
+        unknownLines = unknownLines.filter { !ScoreboardPattern.heatPattern.matches(it) }
+        unknownLines = unknownLines.filter { !ScoreboardPattern.copperPattern.matches(it) }
+        unknownLines = unknownLines.filter { !ScoreboardPattern.locationPattern.matches(it) }
+        unknownLines = unknownLines.filter { !ScoreboardPattern.lobbyCodePattern.matches(it) }
+        unknownLines = unknownLines.filter { !ScoreboardPattern.datePattern.matches(it) }
+        unknownLines = unknownLines.filter { !ScoreboardPattern.timePattern.matches(it) }
+        unknownLines = unknownLines.filter { !ScoreboardPattern.footerPattern.matches(it) }
+        unknownLines = unknownLines.filter { !ScoreboardPattern.yearVotesPattern.matches(it) }
+        unknownLines = unknownLines.filter { !ScoreboardPattern.votesPattern.matches(it) }
+        unknownLines = unknownLines.filter { !ScoreboardPattern.waitingForVotePattern.matches(it) }
+        unknownLines = unknownLines.filter { !ScoreboardPattern.northstarsPattern.matches(it) }
+        unknownLines = unknownLines.filter { !ScoreboardPattern.profileTypePattern.matches(it) }
+        unknownLines = unknownLines.filter { !ScoreboardPattern.autoClosingPattern.matches(it) }
+        unknownLines = unknownLines.filter { !ScoreboardPattern.startingInPattern.matches(it) }
+        unknownLines = unknownLines.filter { !ScoreboardPattern.timeElapsedPattern.matches(it) }
+        unknownLines = unknownLines.filter { !ScoreboardPattern.keysPattern.matches(it) }
+        unknownLines = unknownLines.filter { !ScoreboardPattern.clearedPattern.matches(it) }
+        unknownLines = unknownLines.filter { !ScoreboardPattern.soloPattern.matches(it) }
+        unknownLines = unknownLines.filter { !ScoreboardPattern.teammatesPattern.matches(it) }
+        unknownLines = unknownLines.filter { !ScoreboardPattern.medalsPattern.matches(it) }
+        unknownLines = unknownLines.filter { !ScoreboardPattern.lockedPattern.matches(it) }
+        unknownLines = unknownLines.filter { !ScoreboardPattern.cleanUpPattern.matches(it) }
+        unknownLines = unknownLines.filter { !ScoreboardPattern.pastingPattern.matches(it) }
+        unknownLines = unknownLines.filter { !ScoreboardPattern.powderPattern.matches(it) }
+        unknownLines = unknownLines.filter { !ScoreboardPattern.windCompassPattern.matches(it) }
+        unknownLines = unknownLines.filter { !ScoreboardPattern.windCompassArrowPattern.matches(it) }
+        unknownLines = unknownLines.filter { !ScoreboardPattern.magmaBossPattern.matches(it) }
+        unknownLines = unknownLines.filter { !ScoreboardPattern.damageSoakedPattern.matches(it) }
+        unknownLines = unknownLines.filter { !ScoreboardPattern.damagedSoakedBarPattern.matches(it) }
+        unknownLines = unknownLines.filter { !ScoreboardPattern.killMagmasPattern.matches(it) }
+        unknownLines = unknownLines.filter { !ScoreboardPattern.killMagmasBarPattern.matches(it) }
+        unknownLines = unknownLines.filter { !ScoreboardPattern.reformingPattern.matches(it) }
+        unknownLines = unknownLines.filter { !ScoreboardPattern.bossHealthPattern.matches(it) }
+        unknownLines = unknownLines.filter { !ScoreboardPattern.bossHealthBarPattern.matches(it) }
+        unknownLines = unknownLines.filter { !ScoreboardPattern.broodmotherPattern.matches(it) }
+        unknownLines = unknownLines.filter { !ScoreboardPattern.essencePattern.matches(it) }
+        unknownLines = unknownLines.filter { !ScoreboardPattern.brokenRedstonePattern.matches(it) }
+        unknownLines = unknownLines.filter { !ScoreboardPattern.visitingPattern.matches(it) }
+        unknownLines = unknownLines.filter { !ScoreboardPattern.pastingPattern.matches(it) }
+
+
+        /*
+         * remove known text
+        */
+        unknownLines = unknownLines.filter { line -> !knownLines.any { line.trim().contains(it) } }
 
         // remove objectives kuudra
         unknownLines = unknownLines.filter { sidebarLines.nextAfter("§fObjective") != it }
@@ -193,31 +167,17 @@ object InformationGetter {
         unknownLines = unknownLines.filter { sidebarLines.nextAfter("§9Wind Compass") != it }
 
         // Remove jacobs contest
-        for (i in 1..3)
+        for (i in 0..3)
             unknownLines = unknownLines.filter { sidebarLines.nextAfter("§eJacob's Contest", i) != it }
 
         // Remove slayer
-        unknownLines = unknownLines.filter { sidebarLines.nextAfter("Slayer Quest", 1) != it }
-        unknownLines = unknownLines.filter { sidebarLines.nextAfter("Slayer Quest", 2) != it }
-
-        // remove voting lines
-        val votedLine = sidebarLines.firstOrNull { it.startsWith("§6Year ") } ?: "§6Year "
-        for (i in 1 until 6) {
-            unknownLines = unknownLines.filter { sidebarLines.nextAfter(votedLine, i) != it }
-        }
+        for (i in 0..2)
+            unknownLines = unknownLines.filter { sidebarLines.nextAfter("Slayer Quest", i) != it }
 
         // remove trapper mob location
         unknownLines = unknownLines.filter { sidebarLines.nextAfter("Tracker Mob Location:", 1) != it }
 
-        // magma boss
-        unknownLines = unknownLines.filter { sidebarLines.nextAfter("§7Damage Soaked:") != it }
-        unknownLines = unknownLines.filter { sidebarLines.nextAfter("§6Kill the Magmas:") != it }
-        unknownLines = unknownLines.filter { sidebarLines.nextAfter("§7Boss Health:") != it }
-
         // da
         unknownLines = unknownLines.filter { sidebarLines.nextAfter("Current Item:") != it }
-
-        // remove that buggy redstone line wth hypixel
-        unknownLines = unknownLines.filter { "^\\s*e: §e§b(\\d{1,2}|100)%\$".toPattern().matcher(it).matches() }
     }
 }

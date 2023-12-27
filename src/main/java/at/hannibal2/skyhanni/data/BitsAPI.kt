@@ -48,9 +48,9 @@ object BitsAPI {
     private const val defaultcookiebits = 4800
 
     private val group = RepoPattern.group("data.BitsAPI")
-    private val bitsScoreboardPattern by group.pattern(
+    val bitsScoreboardPattern by group.pattern(
         "scoreboard.bits",
-        "Bits: §b(?<amount>.*) §3\\(\\+(?<earned>.*)\\)"
+        "^Bits: §b(?<amount>(,?\\d{1,3})*)( §3\\(\\+(?<earned>.*)\\))?$"
     )
     private val bitsFromFameRankUpChatPattern by group.pattern(
         "chat.bitsFromFameRankup",
@@ -72,7 +72,7 @@ object BitsAPI {
 
             bitsScoreboardPattern.matchMatcher(message) {
                 val amount = group("amount").formatNumber().toInt()
-                val earned = group("earned").formatNumber().toInt()
+                val earned = group("earned")?.formatNumber()?.toInt() ?: 0
                 bits = amount
                 bitsToClaim -= earned
 

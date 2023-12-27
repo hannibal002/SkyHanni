@@ -11,6 +11,7 @@ import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalNameOrNull
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.LorenzUtils
+import at.hannibal2.skyhanni.utils.NEUInternalName.Companion.asInternalName
 import at.hannibal2.skyhanni.utils.NumberUtil.formatNumber
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getEnchantments
 import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
@@ -28,6 +29,8 @@ object QuiverAPI {
     var currentArrow: QuiverArrowType? = null
     var currentAmount: Int = 0
     var arrowAmount: MutableMap<QuiverArrowType, Float> = mutableMapOf()
+
+    private val fakeBows = listOf("BOSS_SPIRIT_BOW".asInternalName())
 
     private val group = RepoPattern.group("data.quiver.chat")
     private val selectPattern by group.pattern("select", "§aYou set your selected arrow type to §f(?<arrow>.*)§a!")
@@ -114,7 +117,9 @@ object QuiverAPI {
     @SubscribeEvent(priority = EventPriority.HIGHEST)
     // Inspired by SkyblockFeatures - https://github.com/MrFast-js/SkyblockFeatures/
     fun onPlaySound(event: PlaySoundEvent) {
-        val holdingBow = InventoryUtils.getItemInHand()?.item is ItemBow
+        val holdingBow = InventoryUtils.getItemInHand()?.item is ItemBow && !fakeBows.contains(
+            InventoryUtils.getItemInHand()?.getInternalNameOrNull()
+        )
 
         if (event.soundName == "random.bow" && holdingBow) {
             val arrowType = currentArrow ?: return

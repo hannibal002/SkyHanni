@@ -6,10 +6,20 @@ import at.hannibal2.skyhanni.data.ScoreboardData
 import at.hannibal2.skyhanni.mixins.transformers.AccessorGuiPlayerTabOverlay
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.RenderUtils.AlignmentEnum
+import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
 import net.minecraft.client.Minecraft
+import java.util.regex.Pattern
 
 object CustomScoreboardUtils {
     private val config get() = SkyHanniMod.feature.gui.customScoreboard
+
+    fun getGroupFromPattern(pattern: Pattern, group: String): String {
+        return ScoreboardData.sidebarLinesFormatted.firstNotNullOfOrNull { line ->
+            pattern.matchMatcher(line) {
+                group(group)
+            }
+        } ?: "0"
+    }
 
     fun getProfileTypeSymbol(): String {
         return when {

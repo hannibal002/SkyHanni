@@ -1,5 +1,6 @@
 package at.hannibal2.skyhanni.data
 
+import at.hannibal2.skyhanni.events.ConfigLoadEvent
 import at.hannibal2.skyhanni.events.InventoryFullyOpenedEvent
 import at.hannibal2.skyhanni.events.LorenzChatEvent
 import at.hannibal2.skyhanni.events.ProfileJoinEvent
@@ -38,6 +39,12 @@ object MaxwellAPI {
 
         currentPower = MaxwellPowers.entries.find { selectedPower.displayName.contains(it.power) }
         savePower(currentPower)
+    }
+
+    @SubscribeEvent
+    fun onConfigLoad(event: ConfigLoadEvent) {
+        val config = ProfileStorageData.profileSpecific ?: return
+        currentPower = config.currentPower
     }
 
     @SubscribeEvent
