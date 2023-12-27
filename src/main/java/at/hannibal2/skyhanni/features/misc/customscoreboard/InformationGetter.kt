@@ -55,7 +55,6 @@ object InformationGetter {
             "Tracker Mob Location:",
             "Time Left: §b",
             "Current Item:",
-            "Effigies: ",
             "Find tickets on the",
             "ground and bring them",
             "to the raffle box",
