@@ -22,6 +22,8 @@ class LimboTimeTracker {
     private var inLimbo = false
     private var shownPB = false
     private var oldPB: Duration = 0.seconds
+    private var userLuck: Double = 0.0
+    private val userLuckMultiplier = 0.000810185
 
     @SubscribeEvent
     fun onChat(event: LorenzChatEvent) {
@@ -66,18 +68,25 @@ class LimboTimeTracker {
         if (!isEnabled()) return
         val passedSince = limboJoinTime.passedSince()
         val duration = passedSince.format()
-        val userLuckMultiplier = 0.000810185
         val currentPB = config.limboTimePB.seconds
         if (passedSince > currentPB) {
             oldPB = currentPB
             config.limboTimePB = passedSince.toInt(DurationUnit.SECONDS)
             LorenzUtils.chat("§fYou were AFK in Limbo for §e$duration§f! §d§lPERSONAL BEST§r§f!")
             LorenzUtils.chat("§fYour previous Personal Best was §e$oldPB.")
-            val userLuck = config.limboTimePB * userLuckMultiplier
+            userLuck = config.limboTimePB * userLuckMultiplier
             LorenzUtils.chat("§fYour §aPersonal Bests§f perk is now granting you §a+${userLuck.round(2)}✴ SkyHanni User Luck§f!")
         } else LorenzUtils.chat("§fYou were AFK in Limbo for §e$duration§f.")
         shownPB = false
     }
 
     fun isEnabled() = config.showTimeInLimbo
+
+    object LimboCommands {
+        fun printPB() {
+            val limboPB = SkyHanniMod.feature.misc.limboTimePB.seconds
+            val userLuck = SkyHanniMod.feature.misc.limboTimePB * 0.000810185
+            LorenzUtils.chat("§fYour current limbo PB is §e$limboPB§f, granting you §a+${userLuck.round(2)}✴ SkyHanni User Luck§f!")
+        }
+    }
 }
