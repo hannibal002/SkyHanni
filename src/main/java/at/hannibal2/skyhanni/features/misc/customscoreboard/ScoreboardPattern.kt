@@ -77,7 +77,7 @@ object ScoreboardPattern {
     // Stats from the tablist
     private val tablistGroup = group.group("tablist")
     val gemsPattern by tablistGroup.pattern("gems", "^Gems: §a(?<gems>\\d*,?(\\.\\d+)?[a-zA-Z]?)$")
-    val bankPattern by tablistGroup.pattern("bank", "^Bank: §6(?<bank>\\d*,?(\\.\\d+)?[a-zA-Z]?)$")
+    val bankPattern by tablistGroup.pattern("bank", "^Bank: §6(?<bank>\\d*,?(\\.\\d+)?[a-zA-Z]?(/\\d*,?(\\.\\d+)?[a-zA-Z]?)?)$")
     val mithrilPowderPattern by tablistGroup.pattern("mithrilpowder", "^§fMithril Powder: §2(?<mithrilpowder>.*)$")
     val gemstonePowderPattern by tablistGroup.pattern("gemstonepowder", "^§fGemstone Powder: §d(?<gemstonepowder>.*)$")
 }
