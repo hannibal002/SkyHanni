@@ -10,14 +10,11 @@ import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
 import net.minecraft.client.Minecraft
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
-class PurseAPI {
+object PurseAPI {
     // TODO USE SH-REPO
     private val pattern = "(Piggy|Purse): §6(?<coins>[\\d,]*).*".toPattern()
     private var inventoryCloseTime = 0L
-
-    companion object {
-        var currentPurse = 0.0
-    }
+    var currentPurse = 0.0
 
     @SubscribeEvent
     fun onInventoryClose(event: InventoryCloseEvent) {

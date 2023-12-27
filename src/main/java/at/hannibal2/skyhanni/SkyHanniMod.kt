@@ -408,7 +408,6 @@ class SkyHanniMod {
         loadModule(GuiEditManager())
         loadModule(UpdateManager)
         loadModule(CropAccessoryData())
-        loadModule(MayorAPI())
         loadModule(GardenComposterUpgradesData())
         loadModule(ActionBarStatsData)
         loadModule(GardenCropMilestoneInventory())
@@ -438,7 +437,7 @@ class SkyHanniMod {
         loadModule(PartyAPI)
         loadModule(GuildAPI)
         loadModule(SlayerAPI)
-        loadModule(PurseAPI())
+        loadModule(PurseAPI)
         loadModule(RiftAPI)
         loadModule(SackAPI)
         loadModule(BingoAPI)
@@ -446,6 +445,7 @@ class SkyHanniMod {
         loadModule(MaxwellAPI)
         loadModule(QuiverAPI)
         loadModule(BitsAPI)
+        loadModule(MayorAPI)
 
         // features
         loadModule(BazaarOrderHelper())
