@@ -58,6 +58,8 @@ object ScoreboardPattern {
     val bossHealthPattern by combatSb.pattern("bosshealth", "^§7Boss Health:$")
     val bossHealthBarPattern by combatSb.pattern("bosshealthBar", "^§[ae](\\d{1,2}(\\.\\d)?M|\\d{1,3}k)§f/§a10M§c❤$")
     val broodmotherPattern by combatSb.pattern("broodmother", "^§4Broodmother§7: §[e64](Slain|Dormant|Soon|Awakening|Imminent|Alive!)$")
+    val bossHPPattern by combatSb.pattern("bosshp", "^(Protector|Dragon) HP: §a(,?\\d{1,3})* §c❤$")
+    val bossDamagePattern by combatSb.pattern("bossdamage", "^Your Damage: §c(,?\\d{1,3}(\\.\\d)?)*$")
     // misc
     private val miscSb = scoreboardGroup.group("misc")
     val essencePattern by miscSb.pattern("essence", "Essence: §d(?<essence>-?\\d+(:?,\\d{3})*(?:\\.\\d+)?)$")
@@ -66,6 +68,9 @@ object ScoreboardPattern {
     // events
     private val eventsSb = scoreboardGroup.group("events")
     val travelingZooPattern by eventsSb.pattern("travelingzoo", "§aTraveling Zoo§f \\d{0,2}:\\d{2}$")
+    // rift
+    private val riftSb = scoreboardGroup.group("rift")
+    val riftDimensionPattern by riftSb.pattern("dimension", "§fRift Dimension$")
 
 
     // Stats from the tablist

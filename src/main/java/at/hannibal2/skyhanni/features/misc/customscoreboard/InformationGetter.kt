@@ -41,21 +41,15 @@ object InformationGetter {
             "Your Cube Damage",
             "§6Spooky Festival§f",
             "§dNew Year Event",
-            "§aTraveling Zoo",
             "§9Wind Compass",
             "Nearby Players:",
             "Event: ",
             "Zone: ",
-            "Protector HP: §a",
-            "Dragon HP: §a",
-            "Your Damage: §c",
             "§4Broodmother§7:",
             "§7Give Tasty Mithril to Don!",
             "Remaining: §a",
             "Your Tasty Mithr",
-            "§fRift Dimension",
             "Flight Duration:",
-            "§a✌ §",
             "Points: ",
             "Challenge:",
             "Pelts: §5",
@@ -63,8 +57,6 @@ object InformationGetter {
             "Time Left: §b",
             "Current Item:",
             "Effigies: ",
-            "§cThe boss is reforming!",
-            "§7Boss Health:",
             "Find tickets on the",
             "ground and bring them",
             "to the raffle box",
@@ -115,10 +107,13 @@ object InformationGetter {
         unknownLines = unknownLines.filter { !ScoreboardPattern.bossHealthPattern.matches(it) }
         unknownLines = unknownLines.filter { !ScoreboardPattern.bossHealthBarPattern.matches(it) }
         unknownLines = unknownLines.filter { !ScoreboardPattern.broodmotherPattern.matches(it) }
+        unknownLines = unknownLines.filter { !ScoreboardPattern.bossHPPattern.matches(it) }
+        unknownLines = unknownLines.filter { !ScoreboardPattern.bossDamagePattern.matches(it) }
         unknownLines = unknownLines.filter { !ScoreboardPattern.essencePattern.matches(it) }
         unknownLines = unknownLines.filter { !ScoreboardPattern.brokenRedstonePattern.matches(it) }
         unknownLines = unknownLines.filter { !ScoreboardPattern.visitingPattern.matches(it) }
-        unknownLines = unknownLines.filter { !ScoreboardPattern.pastingPattern.matches(it) }
+        unknownLines = unknownLines.filter { !ScoreboardPattern.travelingZooPattern.matches(it) }
+        unknownLines = unknownLines.filter { !ScoreboardPattern.riftDimensionPattern.matches(it) }
 
 
         /*

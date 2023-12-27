@@ -342,8 +342,8 @@ private fun getQuiverDisplayPair(): List<Pair<String, AlignmentEnum>> {
 private fun getQuiverShowWhen() = !listOf(IslandType.THE_RIFT).contains(HypixelData.skyBlockIsland)
 
 private fun getPowderDisplayPair(): List<Pair<String, AlignmentEnum>> {
-    val mithrilPowder = getGroupFromPattern(TabListData.getTabList(), ScoreboardPattern.powderPattern, "mithrilPowder")
-    val gemstonePowder = getGroupFromPattern(TabListData.getTabList(), ScoreboardPattern.powderPattern, "gemstonePowder")
+    val mithrilPowder = getGroupFromPattern(TabListData.getTabList(), ScoreboardPattern.mithrilPowderPattern, "mithrilpowder")
+    val gemstonePowder = getGroupFromPattern(TabListData.getTabList(), ScoreboardPattern.gemstonePowderPattern, "gemstonepowder")
 
     return when (displayConfig.displayNumbersFirst) {
         true -> listOf("§9§lPowder") + (" §7- §2$mithrilPowder Mithril") + (" §7- §d$gemstonePowder Gemstone")

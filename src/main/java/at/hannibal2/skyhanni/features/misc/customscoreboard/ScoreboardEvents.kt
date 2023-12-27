@@ -117,7 +117,8 @@ enum class ScoreboardEvents(private val displayLine: Supplier<List<String>>, pri
     ),
     EFFIGIES(
         ::getEffigiesLines,
-        ::getEffigiesShowWhen),
+        ::getEffigiesShowWhen
+    ),
 
     NONE( // maybe use default state tablist: "Events: smth"
         ::getNoneLines,
@@ -372,9 +373,9 @@ private fun getWinterShowWhen(): Boolean {
 private fun getSpookyLines(): List<String> {
     return listOf(getSbLines().firstOrNull { it.startsWith("§6Spooky Festival§f") }
         ?: "<hidden>") + // Time
-            ("§7Your Candy: ") +
-            (CustomScoreboardUtils.getTablistFooter().split("\n").firstOrNull { it.startsWith("§7Your Candy:") }
-                ?.removePrefix("§7Your Candy:") ?: "§cCandy not found") // Candy
+        ("§7Your Candy: ") +
+        (CustomScoreboardUtils.getTablistFooter().split("\n").firstOrNull { it.startsWith("§7Your Candy:") }
+            ?.removePrefix("§7Your Candy:") ?: "§cCandy not found") // Candy
 }
 
 private fun getSpookyShowWhen(): Boolean {
@@ -495,16 +496,12 @@ private fun getMiningEventsShowWhen(): Boolean {
 }
 
 private fun getDamageLines(): List<String> {
-    return listOf(getSbLines().firstOrNull {
-        it.startsWith("Protector HP: §a") || it.startsWith(
-            "Dragon HP: §a"
-        )
-    } ?: "<hidden>") +
-        (getSbLines().firstOrNull { it.startsWith("Your Damage: §c") } ?: "<hidden>")
+    return listOf(getSbLines().first { SbPattern.bossHPPattern.matches(it) }) +
+        (getSbLines().first { SbPattern.bossDamagePattern.matches(it) })
 }
 
 private fun getDamageShowWhen(): Boolean {
-    return getSbLines().any { it.startsWith("Your Damage: §c") }
+    return getSbLines().any { SbPattern.bossHPPattern.matches(it) || SbPattern.bossDamagePattern.matches(it) }
 }
 
 private fun getMagmaBossLines(): List<String> {
