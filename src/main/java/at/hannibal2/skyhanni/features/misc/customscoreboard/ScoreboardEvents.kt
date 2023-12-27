@@ -22,435 +22,106 @@ private val config get() = SkyHanniMod.feature.gui.customScoreboard
  * because they are visible for a maximum of like 1 minute every 5 days and ~12 hours.
  */
 
+private fun getSbLines(): List<String> {
+    return ScoreboardData.sidebarLinesFormatted
+}
+
 enum class ScoreboardEvents(private val displayLine: Supplier<List<String>>, private val showWhen: () -> Boolean) {
     VOTING(
-        {
-            val list = mutableListOf<String>()
-
-            list += getSbLines().first { SbPattern.yearVotesPattern.matches(it) }
-
-            if (getSbLines().nextAfter(list[0]) == "§7Waiting for") {
-                list += "§7Waiting for"
-                list += "§7your vote..."
-            } else {
-                if (getSbLines().any { SbPattern.votesPattern.matches(it) }) {
-                    list += getSbLines().filter { SbPattern.votesPattern.matches(it) }
-                }
-            }
-
-            list
-        },
-        {
-            getSbLines().any { SbPattern.yearVotesPattern.matches(it) }
-        }
+        ::getVotingLines,
+        ::getVotingShowWhen
     ),
     SERVER_CLOSE(
-        {
-            listOf(getSbLines().first { it.startsWith("§cServer closing: ") })
-        },
-        {
-            getSbLines().any { it.startsWith("§cServer closing: ") }
-        }
+        ::getServerCloseLines,
+        ::getServerCloseShowWhen
     ),
     DUNGEONS(
-        {
-            val list = mutableListOf<String>()
-
-            list += getSbLines().first { SbPattern.autoClosingPattern.matches(it) }
-            list += getSbLines().first { SbPattern.startingInPattern.matches(it) }
-            list += getSbLines().first { SbPattern.keysPattern.matches(it) }
-            list += getSbLines().first { SbPattern.timeElapsedPattern.matches(it) }
-            list += getSbLines().first { SbPattern.clearedPattern.matches(it) }
-            list += getSbLines().first { SbPattern.soloPattern.matches(it) }
-            list += getSbLines().first { SbPattern.teammatesPattern.matches(it) }
-
-            if (list.size == 0) when (config.informationFilteringConfig.hideEmptyLines) {
-                true -> listOf("<hidden>")
-                false -> listOf("§cNo Dungeon Data")
-            } else list
-        },
-        {
-            IslandType.CATACOMBS.isInIsland() || inDungeons
-        }
+        ::getDungeonsLines,
+        ::getDungeonsShowWhen
     ),
     KUUDRA(
-        {
-            val list = mutableListOf<String>()
-
-            list += getSbLines().first { SbPattern.autoClosingPattern.matches(it) }
-            list += getSbLines().first { SbPattern.startingInPattern.matches(it) }
-            list += getSbLines().first { SbPattern.timeElapsedPattern.matches(it) }
-            if (getSbLines().any { it.startsWith("Instance Shutdow") }) {
-                list += getSbLines().firstOrNull { it.startsWith("Instance Shutdow") }
-                    ?: "<hidden>"
-            }
-            list += ""
-            if (getSbLines().any { it.startsWith("§f§lWave: §c§l") }) {
-                list += getSbLines().firstOrNull { it.startsWith("§f§lWave: §c§l") }
-                    ?: "<hidden>"
-            }
-            if (getSbLines().any { it.startsWith("§fTokens: ") }) {
-                list += getSbLines().firstOrNull { it.startsWith("§fTokens: ") } ?: "<hidden>"
-            }
-            if (getSbLines().any { it.startsWith("Submerges In: §e") }) {
-                list += getSbLines().firstOrNull { it.startsWith("Submerges In: §e") }
-                    ?: "<hidden>"
-            }
-            list += ""
-            if (getSbLines().any { it == "§fObjective:" }) {
-                list += "§fObjective:"
-                list += getSbLines().nextAfter("§fObjective:") ?: "§cNo Objective"
-                if (extraObjectiveKuudraLines.any {
-                        it == getSbLines().nextAfter(
-                            "§fObjective:",
-                            2
-                        )
-                    }) {
-                    list += getSbLines().nextAfter("§fObjective:", 2) ?: "§cNo Objective"
-                }
-            }
-
-            if (list.size == 0) when (config.informationFilteringConfig.hideEmptyLines) {
-                true -> listOf("<hidden>")
-                false -> listOf("§cNo Kuudra Data")
-            } else list
-        },
-        {
-            IslandType.KUUDRA_ARENA.isInIsland()
-        }
+        ::getKuudraLines,
+        ::getKuudraShowWhen
     ),
     DOJO(
-        {
-            val list = mutableListOf<String>()
-
-            if (getSbLines().any { it.startsWith("Challenge: ") }) {
-                list += getSbLines().first { it.startsWith("Challenge: ") }
-            }
-
-            if (getSbLines().any { it.startsWith("Points: ") }) {
-                list += getSbLines().first { it.startsWith("Points: ") }
-            }
-
-            if (list.size == 0) when (config.informationFilteringConfig.hideEmptyLines) {
-                true -> listOf("<hidden>")
-                false -> listOf("§cNo Dojo Data")
-            } else list
-        },
-        {
-            getSbLines().any { it.startsWith("Challenge: ") }
-        }
+        ::getDojoLines,
+        ::getDojoShowWhen
     ),
     DARK_AUCTION( // this will get an update once the darkauction islandtype pr is merged
-        {
-            val list = mutableListOf<String>()
-            if (getSbLines().any { it.startsWith("Time Left: §b") }) {
-                list += getSbLines().firstOrNull { it.startsWith("Time Left: §b") }
-                    ?: "<hidden>"
-            }
-            list += "Current Item:"
-            list += getSbLines().nextAfter("Current Item:") ?: "<hidden>"
-
-            list
-        },
-        {
-            getSbLines().any { it == "Current Item:" }
-        }
+        ::getDarkAuctionLines,
+        ::getDarkAuctionShowWhen
     ),
     JACOB_CONTEST(
-        {
-            val list = mutableListOf<String>()
-
-            list += "§eJacob's Contest"
-            list += getSbLines().nextAfter("§eJacob's Contest") ?: "§7No Event"
-            list += getSbLines().nextAfter("§eJacob's Contest", 2) ?: "§7No Ranking"
-            list += getSbLines().nextAfter("§eJacob's Contest", 3) ?: "§7No Amount for next"
-
-            list
-        },
-        {
-            getSbLines().any { it.startsWith("§e○ §f") || it.startsWith("§6☘ §f") }
-        }
+        ::getJacobContestLines,
+        ::getJacobContestShowWhen
     ),
     JACOB_MEDALS(
-        {
-            getSbLines().filter { SbPattern.medalsPattern.matches(it) }
-        },
-        {
-            getSbLines().any { SbPattern.medalsPattern.matches(it) }
-        }
+        ::getJacobMedalsLines,
+        ::getJacobMedalsShowWhen
     ),
     TRAPPER(
-        {
-            val list = mutableListOf<String>()
-
-            if (getSbLines().any { it.startsWith("Pelts: §5") }) {
-                list += getSbLines().firstOrNull { it.startsWith("Pelts: §5") }
-                    ?: "<hidden>"
-            }
-            if (getSbLines().any { it == "Tracker Mob Location:" }) {
-                list += "Tracker Mob Location:"
-                list += getSbLines().nextAfter("Tracker Mob Location:") ?: "<hidden>"
-            }
-
-            list
-        },
-        {
-            getSbLines().any { it.startsWith("Pelts: §5") || it == "Tracker Mob Location:" }
-        }
+        ::getTrapperLines,
+        ::getTrapperShowWhen
     ),
     GARDEN_CLEAN_UP(
-        {
-            listOf(getSbLines().first { SbPattern.cleanUpPattern.matches(it) })
-        },
-        {
-            getSbLines().any { SbPattern.cleanUpPattern.matches(it) }
-        }
+        ::getGardenCleanUpLines,
+        ::getGardenCleanUpShowWhen
     ),
     GARDEN_PASTING(
-        {
-            listOf(getSbLines().first { SbPattern.pastingPattern.matches(it) })
-        },
-        {
-            getSbLines().any { SbPattern.pastingPattern.matches(it) }
-        }
+        ::getGardenPastingLines,
+        ::getGardenPastingShowWhen
     ),
     FLIGHT_DURATION(
-        {
-            listOf(
-                getSbLines().firstOrNull { it.startsWith("Flight Duration:") }
-                    ?: "<hidden>"
-            )
-        },
-        {
-            getSbLines().any { it.startsWith("Flight Duration:") }
-        }
+        ::getFlightDurationLines,
+        ::getFlightDurationShowWhen
     ),
     WINTER(
-        {
-            val list = mutableListOf<String>()
-            val sidebarLines = getSbLines()
-
-            list += getSbLines().first { SbPattern.northstarsPattern.matches(it) }
-
-            if (sidebarLines.any { it.startsWith("Event Start: §a") }) {
-                list += sidebarLines.firstOrNull { it.startsWith("Event Start: §a") }
-                    ?: "<hidden>"
-            }
-            if (sidebarLines.any { it.startsWith("Next Wave: §a") && it != "Next Wave: §aSoon!" }) {
-                list += sidebarLines.firstOrNull { it.startsWith("Next Wave: §a") }
-                    ?: "<hidden>"
-            }
-            list += ""
-            if (sidebarLines.any { it.startsWith("§cWave ") }) {
-                list += sidebarLines.firstOrNull { it.startsWith("§cWave ") } ?: "<hidden>"
-            }
-            if (sidebarLines.any { it.startsWith("Magma Cubes Left") }) {
-                list += sidebarLines.firstOrNull { it.startsWith("Magma Cubes Left") }
-                    ?: "<hidden>"
-            }
-            if (sidebarLines.any { it.startsWith("Your Total Dama") }) {
-                list += sidebarLines.firstOrNull { it.startsWith("Your Total Dama") }
-                    ?: "<hidden>"
-            }
-            if (sidebarLines.any { it.startsWith("Your Cube Damage") }) {
-                list += sidebarLines.firstOrNull { it.startsWith("Your Cube Damage") }
-                    ?: "<hidden>"
-            }
-
-            list
-        },
-        {
-            IslandType.WINTER.isInIsland()
-        }
+        ::getWinterLines,
+        ::getWinterShowWhen
     ),
     SPOOKY(
-        {
-            listOf(getSbLines().firstOrNull { it.startsWith("§6Spooky Festival§f") }
-                ?: "<hidden>") + // Time
-                ("§7Your Candy: ") +
-                (CustomScoreboardUtils.getTablistFooter().split("\n").firstOrNull { it.startsWith("§7Your Candy:") }
-                    ?.removePrefix("§7Your Candy:") ?: "§cCandy not found") // Candy
-        },
-        {
-            getSbLines().any { it.startsWith("§6Spooky Festival§f") }
-        }
+        ::getSpookyLines,
+        ::getSpookyShowWhen
     ),
     MARINA(
-        {
-            listOf(
-                "§bFishing Festival: " + TabListData.getTabList().nextAfter("§e§lEvent: §r§bFishing Festival")
-                    ?.removePrefix(" Ends In: ")
-            )
-        },
-        {
-            TabListData.getTabList()
-                .any { it.startsWith("§e§lEvent: §r§bFishing Festival") } && TabListData.getTabList()
-                .nextAfter("§e§lEvent: §r§bFishing Festival")?.startsWith(" Ends In: ") == true
-        }
+        ::getMarinaLines,
+        ::getMarinaShowWhen
     ),
     BROODMOTHER(
-        {
-            listOf(getSbLines().first { SbPattern.broodmotherPattern.matches(it) })
-        },
-        {
-            getSbLines().any { SbPattern.broodmotherPattern.matches(it) }
-        }
+        ::getBroodmotherLines,
+        ::getBroodmotherShowWhen
     ),
     NEW_YEAR(
-        {
-            listOf(getSbLines().firstOrNull { it.startsWith("§dNew Year Event") } ?: "<hidden>")
-        },
-        {
-            getSbLines().any { it.startsWith("§dNew Year Event") }
-        }
+        ::getNewYearLines,
+        ::getNewYearShowWhen
     ),
     ORINGO(
-        {
-            listOf(getSbLines().first { SbPattern.travelingZooPattern.matches(it) })
-        },
-        {
-            getSbLines().any { SbPattern.travelingZooPattern.matches(it) }
-        }
+        ::getOringoLines,
+        ::getOringoShowWhen
     ),
     MINING_EVENTS(
-        {
-            val list = mutableListOf<String>()
-
-            // Mining Fiesta
-            if (TabListData.getTabList().any { it == "§e§lEvent: §r§6Mining Fiesta" }
-                && TabListData.getTabList().nextAfter("§e§lEvent: §r§6Mining Fiesta")
-                    ?.startsWith(" Ends In:") == true) {
-                list += "§6Mining Fiesta: " + TabListData.getTabList().nextAfter("§e§lEvent: §r§6Mining Fiesta")
-                    ?.removePrefix(" Ends In: ")
-            }
-
-            // Wind
-            if (getSbLines().any { SbPattern.windCompassPattern.matches(it) }) {
-                list += getSbLines().first { SbPattern.windCompassPattern.matches(it) }
-                list += getSbLines().first { SbPattern.windCompassArrowPattern.matches(it) }
-            }
-
-            // Better Together
-            if (getSbLines().any { it.startsWith("Nearby Players:") }) {
-                list += "§9Better Together"
-                list += (" " + getSbLines().firstOrNull { it.startsWith("Nearby Players:") })
-            }
-
-            // Zone ScoreboardEvents
-            if (getSbLines().any { it.startsWith("Event: ") } && getSbLines().any {
-                    it.startsWith("Zone: ")
-                }) {
-                list += getSbLines().firstOrNull { it.startsWith("Event: ") }
-                    ?.removePrefix("Event: ") ?: "<hidden>"
-                if (getSbLines().any { it.startsWith("Zone: ") }) {
-                    list += "§fin " + (getSbLines().firstOrNull { it.startsWith("Zone: ") }
-                        ?.removePrefix("Zone: ") ?: "<hidden>")
-                }
-            }
-
-            // Mithril Gourmand
-            if (getSbLines().any { it.startsWith("Remaining: §a") } && getSbLines().any {
-                    it.startsWith(
-                        "Your Tasty Mithril: §c"
-                    )
-                }) {
-                list += "§6Mithril Gourmand"
-                list += getSbLines().firstOrNull { it.startsWith("Remaining: §a") }
-                    ?: "<hidden>"
-                list += getSbLines().firstOrNull { it.startsWith("Your Tasty Mithril: §c") }
-                    ?: "<hidden>"
-            }
-
-            // raffle
-            if (getSbLines().any { it.startsWith("Tickets: §a") }) {
-                list += "§6Raffle"
-                list += getSbLines().firstOrNull { it.startsWith("Tickets: §a") }
-                    ?: "<hidden>"
-                list += getSbLines().firstOrNull { it.startsWith("Pool: §6") }
-                    ?: "<hidden>"
-            }
-
-            // raid
-            if (getSbLines().any { it.startsWith("Remaining: §a") && it.endsWith("goblins") }) {
-                list += "§cGoblin Raid"
-                list += getSbLines().firstOrNull { it.startsWith("Remaining: §a") }
-                    ?: "<hidden>"
-                list += getSbLines().firstOrNull { it.startsWith("Your kills: §c") }
-                    ?: "<hidden>"
-            }
-
-            if (list.size == 0) when (config.informationFilteringConfig.hideEmptyLines) {
-                true -> listOf("<hidden>")
-                false -> listOf("§cNo Mining Event")
-            } else list
-        },
-        {
-            IslandType.DWARVEN_MINES.isInIsland() || IslandType.CRYSTAL_HOLLOWS.isInIsland()
-        }
+        ::getMiningEventsLines,
+        ::getMiningEventsShowWhen
     ),
     DAMAGE(
-        {
-            listOf(getSbLines().firstOrNull {
-                it.startsWith("Protector HP: §a") || it.startsWith(
-                    "Dragon HP: §a"
-                )
-            } ?: "<hidden>") +
-                (getSbLines().firstOrNull { it.startsWith("Your Damage: §c") } ?: "<hidden>")
-        },
-        {
-            getSbLines().any { it.startsWith("Your Damage: §c") }
-        }
+        ::getDamageLines,
+        ::getDamageShowWhen
     ),
     MAGMA_BOSS(
-        {
-            val list = mutableListOf<String>()
-
-            list += getSbLines().first { SbPattern.magmaBossPattern.matches(it) }
-            list += getSbLines().first { SbPattern.damageSoakedPattern.matches(it) }
-            list += getSbLines().first { SbPattern.damagedSoakedBarPattern.matches(it) }
-            list += getSbLines().first { SbPattern.killMagmasPattern.matches(it) }
-            list += getSbLines().first { SbPattern.killMagmasBarPattern.matches(it) }
-            list += getSbLines().first { SbPattern.reformingPattern.matches(it) }
-            list += getSbLines().first { SbPattern.bossHealthPattern.matches(it) }
-            list += getSbLines().first { SbPattern.bossHealthBarPattern.matches(it) }
-
-            if (list.size == 0) when (config.informationFilteringConfig.hideEmptyLines) {
-                true -> listOf("<hidden>")
-                false -> listOf("§cNo Magma Boss Data")
-            } else
-                list
-        },
-        {
-            at.hannibal2.skyhanni.data.HypixelData.skyBlockArea == "Magma Chamber"
-        }
+        ::getMagmaBossLines,
+        ::getMagmaBossShowWhen
     ),
     ESSENCE(
-        {
-            listOf(getSbLines().first { SbPattern.essencePattern.matches(it) })
-        },
-        {
-            getSbLines().any { SbPattern.essencePattern.matches(it) }
-        }
+        ::getEssenceLines,
+        ::getEssenceShowWhen
     ),
     EFFIGIES(
-        {
-            listOf(getSbLines().firstOrNull { it.startsWith("Effigies: ") } ?: "<hidden>")
-        },
-        {
-            getSbLines().any { it.startsWith("Effigies: ") }
-        }
-    ),
+        ::getEffigiesLines,
+        ::getEffigiesShowWhen),
 
     NONE( // maybe use default state tablist: "Events: smth"
-        {
-            when {
-                config.informationFilteringConfig.hideEmptyLines -> listOf("<hidden>")
-                else -> listOf("§cNo Event")
-            }
-        },
-        {
-            false
-        }
+        ::getNoneLines,
+        { false }
     );
 
     fun getLines(): List<String> {
@@ -467,6 +138,413 @@ enum class ScoreboardEvents(private val displayLine: Supplier<List<String>>, pri
     }
 }
 
-private fun getSbLines(): List<String> {
-    return ScoreboardData.sidebarLinesFormatted
+private fun getVotingLines(): List<String> {
+    val list = mutableListOf<String>()
+
+    list += getSbLines().first { SbPattern.yearVotesPattern.matches(it) }
+
+    if (getSbLines().nextAfter(list[0]) == "§7Waiting for") {
+        list += "§7Waiting for"
+        list += "§7your vote..."
+    } else {
+        if (getSbLines().any { SbPattern.votesPattern.matches(it) }) {
+            list += getSbLines().filter { SbPattern.votesPattern.matches(it) }
+        }
+    }
+
+    return list
+}
+
+private fun getVotingShowWhen(): Boolean {
+    return getSbLines().any { SbPattern.yearVotesPattern.matches(it) }
+}
+
+private fun getServerCloseLines(): List<String> {
+    return listOf(getSbLines().first { it.startsWith("§cServer closing: ") })
+}
+
+private fun getServerCloseShowWhen(): Boolean {
+    return getSbLines().any { it.startsWith("§cServer closing: ") }
+}
+
+private fun getDungeonsLines(): List<String> {
+    val list = mutableListOf<String>()
+
+    list += getSbLines().first { SbPattern.autoClosingPattern.matches(it) }
+    list += getSbLines().first { SbPattern.startingInPattern.matches(it) }
+    list += getSbLines().first { SbPattern.keysPattern.matches(it) }
+    list += getSbLines().first { SbPattern.timeElapsedPattern.matches(it) }
+    list += getSbLines().first { SbPattern.clearedPattern.matches(it) }
+    list += getSbLines().first { SbPattern.soloPattern.matches(it) }
+    list += getSbLines().first { SbPattern.teammatesPattern.matches(it) }
+
+    return list
+}
+
+private fun getDungeonsShowWhen(): Boolean {
+    return IslandType.CATACOMBS.isInIsland() || inDungeons
+}
+
+private fun getKuudraLines(): List<String> {
+    val list = mutableListOf<String>()
+
+    list += getSbLines().first { SbPattern.autoClosingPattern.matches(it) }
+    list += getSbLines().first { SbPattern.startingInPattern.matches(it) }
+    list += getSbLines().first { SbPattern.timeElapsedPattern.matches(it) }
+    if (getSbLines().any { it.startsWith("Instance Shutdow") }) {
+        list += getSbLines().firstOrNull { it.startsWith("Instance Shutdow") }
+            ?: "<hidden>"
+    }
+    list += ""
+    if (getSbLines().any { it.startsWith("§f§lWave: §c§l") }) {
+        list += getSbLines().firstOrNull { it.startsWith("§f§lWave: §c§l") }
+            ?: "<hidden>"
+    }
+    if (getSbLines().any { it.startsWith("§fTokens: ") }) {
+        list += getSbLines().firstOrNull { it.startsWith("§fTokens: ") } ?: "<hidden>"
+    }
+    if (getSbLines().any { it.startsWith("Submerges In: §e") }) {
+        list += getSbLines().firstOrNull { it.startsWith("Submerges In: §e") }
+            ?: "<hidden>"
+    }
+    list += ""
+    if (getSbLines().any { it == "§fObjective:" }) {
+        list += "§fObjective:"
+        list += getSbLines().nextAfter("§fObjective:") ?: "§cNo Objective"
+        if (extraObjectiveKuudraLines.any {
+                it == getSbLines().nextAfter(
+                    "§fObjective:",
+                    2
+                )
+            }) {
+            list += getSbLines().nextAfter("§fObjective:", 2) ?: "§cNo Objective"
+        }
+    }
+
+    return list
+}
+
+private fun getKuudraShowWhen(): Boolean {
+    return IslandType.KUUDRA_ARENA.isInIsland()
+}
+
+private fun getDojoLines(): List<String> {
+    val list = mutableListOf<String>()
+
+    if (getSbLines().any { it.startsWith("Challenge: ") }) {
+        list += getSbLines().first { it.startsWith("Challenge: ") }
+    }
+
+    if (getSbLines().any { it.startsWith("Points: ") }) {
+        list += getSbLines().first { it.startsWith("Points: ") }
+    }
+
+    return list
+}
+
+private fun getDojoShowWhen(): Boolean {
+    return getSbLines().any { it.startsWith("Challenge: ") }
+}
+
+private fun getDarkAuctionLines(): List<String> {
+    val list = mutableListOf<String>()
+    if (getSbLines().any { it.startsWith("Time Left: §b") }) {
+        list += getSbLines().firstOrNull { it.startsWith("Time Left: §b") }
+            ?: "<hidden>"
+    }
+    list += "Current Item:"
+    list += getSbLines().nextAfter("Current Item:") ?: "<hidden>"
+
+    return list
+}
+
+private fun getDarkAuctionShowWhen(): Boolean {
+    return getSbLines().any { it == "Current Item:" }
+}
+
+private fun getJacobContestLines(): List<String> {
+    val list = mutableListOf<String>()
+
+    list += "§eJacob's Contest"
+    list += getSbLines().nextAfter("§eJacob's Contest") ?: "§7No Event"
+    list += getSbLines().nextAfter("§eJacob's Contest", 2) ?: "§7No Ranking"
+    list += getSbLines().nextAfter("§eJacob's Contest", 3) ?: "§7No Amount for next"
+
+    return list
+}
+
+private fun getJacobContestShowWhen(): Boolean {
+    return getSbLines().any { it.startsWith("§e○ §f") || it.startsWith("§6☘ §f") }
+}
+
+private fun getJacobMedalsLines(): List<String> {
+    return getSbLines().filter { SbPattern.medalsPattern.matches(it) }
+}
+
+private fun getJacobMedalsShowWhen(): Boolean {
+    return getSbLines().any { SbPattern.medalsPattern.matches(it) }
+}
+
+private fun getTrapperLines(): List<String> {
+    val list = mutableListOf<String>()
+
+    if (getSbLines().any { it.startsWith("Pelts: §5") }) {
+        list += getSbLines().firstOrNull { it.startsWith("Pelts: §5") }
+            ?: "<hidden>"
+    }
+    if (getSbLines().any { it == "Tracker Mob Location:" }) {
+        list += "Tracker Mob Location:"
+        list += getSbLines().nextAfter("Tracker Mob Location:") ?: "<hidden>"
+    }
+
+    return list
+}
+
+private fun getTrapperShowWhen(): Boolean {
+    return getSbLines().any { it.startsWith("Pelts: §5") || it == "Tracker Mob Location:" }
+}
+
+private fun getGardenCleanUpLines(): List<String> {
+    return listOf(getSbLines().first { SbPattern.cleanUpPattern.matches(it) })
+}
+
+private fun getGardenCleanUpShowWhen(): Boolean {
+    return getSbLines().any { SbPattern.cleanUpPattern.matches(it) }
+}
+
+private fun getGardenPastingLines(): List<String> {
+    return listOf(getSbLines().first { SbPattern.pastingPattern.matches(it) })
+}
+
+private fun getGardenPastingShowWhen(): Boolean {
+    return getSbLines().any { SbPattern.pastingPattern.matches(it) }
+}
+
+private fun getFlightDurationLines(): List<String> {
+    return listOf(
+        getSbLines().firstOrNull { it.startsWith("Flight Duration:") }
+            ?: "<hidden>"
+    )
+}
+
+private fun getFlightDurationShowWhen(): Boolean {
+    return getSbLines().any { it.startsWith("Flight Duration:") }
+}
+
+private fun getWinterLines(): List<String> {
+    val list = mutableListOf<String>()
+    val sidebarLines = getSbLines()
+
+    list += getSbLines().first { SbPattern.northstarsPattern.matches(it) }
+
+    if (sidebarLines.any { it.startsWith("Event Start: §a") }) {
+        list += sidebarLines.firstOrNull { it.startsWith("Event Start: §a") }
+            ?: "<hidden>"
+    }
+    if (sidebarLines.any { it.startsWith("Next Wave: §a") && it != "Next Wave: §aSoon!" }) {
+        list += sidebarLines.firstOrNull { it.startsWith("Next Wave: §a") }
+            ?: "<hidden>"
+    }
+    list += ""
+    if (sidebarLines.any { it.startsWith("§cWave ") }) {
+        list += sidebarLines.firstOrNull { it.startsWith("§cWave ") } ?: "<hidden>"
+    }
+    if (sidebarLines.any { it.startsWith("Magma Cubes Left") }) {
+        list += sidebarLines.firstOrNull { it.startsWith("Magma Cubes Left") }
+            ?: "<hidden>"
+    }
+    if (sidebarLines.any { it.startsWith("Your Total Dama") }) {
+        list += sidebarLines.firstOrNull { it.startsWith("Your Total Dama") }
+            ?: "<hidden>"
+    }
+    if (sidebarLines.any { it.startsWith("Your Cube Damage") }) {
+        list += sidebarLines.firstOrNull { it.startsWith("Your Cube Damage") }
+            ?: "<hidden>"
+    }
+
+    return list
+}
+
+private fun getWinterShowWhen(): Boolean {
+    return IslandType.WINTER.isInIsland()
+}
+
+private fun getSpookyLines(): List<String> {
+    return listOf(getSbLines().firstOrNull { it.startsWith("§6Spooky Festival§f") }
+        ?: "<hidden>") + // Time
+            ("§7Your Candy: ") +
+            (CustomScoreboardUtils.getTablistFooter().split("\n").firstOrNull { it.startsWith("§7Your Candy:") }
+                ?.removePrefix("§7Your Candy:") ?: "§cCandy not found") // Candy
+}
+
+private fun getSpookyShowWhen(): Boolean {
+    return getSbLines().any { it.startsWith("§6Spooky Festival§f") }
+}
+
+private fun getMarinaLines(): List<String> {
+    return listOf(
+        "§bFishing Festival: " + TabListData.getTabList().nextAfter("§e§lEvent: §r§bFishing Festival")
+            ?.removePrefix(" Ends In: ")
+    )
+}
+
+private fun getMarinaShowWhen(): Boolean {
+    return TabListData.getTabList()
+        .any { it.startsWith("§e§lEvent: §r§bFishing Festival") } && TabListData.getTabList()
+        .nextAfter("§e§lEvent: §r§bFishing Festival")?.startsWith(" Ends In: ") == true
+}
+
+private fun getBroodmotherLines(): List<String> {
+    return listOf(getSbLines().first { SbPattern.broodmotherPattern.matches(it) })
+}
+
+private fun getBroodmotherShowWhen(): Boolean {
+    return getSbLines().any { SbPattern.broodmotherPattern.matches(it) }
+}
+
+private fun getNewYearLines(): List<String> {
+    return listOf(getSbLines().firstOrNull { it.startsWith("§dNew Year Event") } ?: "<hidden>")
+}
+
+private fun getNewYearShowWhen(): Boolean {
+    return getSbLines().any { it.startsWith("§dNew Year Event") }
+}
+
+private fun getOringoLines(): List<String> {
+    return listOf(getSbLines().first { SbPattern.travelingZooPattern.matches(it) })
+}
+
+private fun getOringoShowWhen(): Boolean {
+    return getSbLines().any { SbPattern.travelingZooPattern.matches(it) }
+}
+
+private fun getMiningEventsLines(): List<String> {
+    val list = mutableListOf<String>()
+
+    // Mining Fiesta
+    if (TabListData.getTabList().any { it == "§e§lEvent: §r§6Mining Fiesta" }
+        && TabListData.getTabList().nextAfter("§e§lEvent: §r§6Mining Fiesta")
+            ?.startsWith(" Ends In:") == true) {
+        list += "§6Mining Fiesta: " + TabListData.getTabList().nextAfter("§e§lEvent: §r§6Mining Fiesta")
+            ?.removePrefix(" Ends In: ")
+    }
+
+    // Wind
+    if (getSbLines().any { SbPattern.windCompassPattern.matches(it) }) {
+        list += getSbLines().first { SbPattern.windCompassPattern.matches(it) }
+        list += getSbLines().first { SbPattern.windCompassArrowPattern.matches(it) }
+    }
+
+    // Better Together
+    if (getSbLines().any { it.startsWith("Nearby Players:") }) {
+        list += "§9Better Together"
+        list += (" " + getSbLines().firstOrNull { it.startsWith("Nearby Players:") })
+    }
+
+    // Zone ScoreboardEvents
+    if (getSbLines().any { it.startsWith("Event: ") } && getSbLines().any {
+            it.startsWith("Zone: ")
+        }) {
+        list += getSbLines().firstOrNull { it.startsWith("Event: ") }
+            ?.removePrefix("Event: ") ?: "<hidden>"
+        if (getSbLines().any { it.startsWith("Zone: ") }) {
+            list += "§fin " + (getSbLines().firstOrNull { it.startsWith("Zone: ") }
+                ?.removePrefix("Zone: ") ?: "<hidden>")
+        }
+    }
+
+    // Mithril Gourmand
+    if (getSbLines().any { it.startsWith("Remaining: §a") } && getSbLines().any {
+            it.startsWith(
+                "Your Tasty Mithril: §c"
+            )
+        }) {
+        list += "§6Mithril Gourmand"
+        list += getSbLines().firstOrNull { it.startsWith("Remaining: §a") }
+            ?: "<hidden>"
+        list += getSbLines().firstOrNull { it.startsWith("Your Tasty Mithril: §c") }
+            ?: "<hidden>"
+    }
+
+    // raffle
+    if (getSbLines().any { it.startsWith("Tickets: §a") }) {
+        list += "§6Raffle"
+        list += getSbLines().firstOrNull { it.startsWith("Tickets: §a") }
+            ?: "<hidden>"
+        list += getSbLines().firstOrNull { it.startsWith("Pool: §6") }
+            ?: "<hidden>"
+    }
+
+    // raid
+    if (getSbLines().any { it.startsWith("Remaining: §a") && it.endsWith("goblins") }) {
+        list += "§cGoblin Raid"
+        list += getSbLines().firstOrNull { it.startsWith("Remaining: §a") }
+            ?: "<hidden>"
+        list += getSbLines().firstOrNull { it.startsWith("Your kills: §c") }
+            ?: "<hidden>"
+    }
+
+    return if (list.size == 0) when (config.informationFilteringConfig.hideEmptyLines) {
+        true -> listOf("<hidden>")
+        false -> listOf("§cNo Mining Event")
+    } else list
+}
+
+private fun getMiningEventsShowWhen(): Boolean {
+    return IslandType.DWARVEN_MINES.isInIsland() || IslandType.CRYSTAL_HOLLOWS.isInIsland()
+}
+
+private fun getDamageLines(): List<String> {
+    return listOf(getSbLines().firstOrNull {
+        it.startsWith("Protector HP: §a") || it.startsWith(
+            "Dragon HP: §a"
+        )
+    } ?: "<hidden>") +
+        (getSbLines().firstOrNull { it.startsWith("Your Damage: §c") } ?: "<hidden>")
+}
+
+private fun getDamageShowWhen(): Boolean {
+    return getSbLines().any { it.startsWith("Your Damage: §c") }
+}
+
+private fun getMagmaBossLines(): List<String> {
+    val list = mutableListOf<String>()
+
+    list += getSbLines().first { SbPattern.magmaBossPattern.matches(it) }
+    list += getSbLines().first { SbPattern.damageSoakedPattern.matches(it) }
+    list += getSbLines().first { SbPattern.damagedSoakedBarPattern.matches(it) }
+    list += getSbLines().first { SbPattern.killMagmasPattern.matches(it) }
+    list += getSbLines().first { SbPattern.killMagmasBarPattern.matches(it) }
+    list += getSbLines().first { SbPattern.reformingPattern.matches(it) }
+    list += getSbLines().first { SbPattern.bossHealthPattern.matches(it) }
+    list += getSbLines().first { SbPattern.bossHealthBarPattern.matches(it) }
+
+    return list
+}
+
+private fun getMagmaBossShowWhen(): Boolean {
+    return at.hannibal2.skyhanni.data.HypixelData.skyBlockArea == "Magma Chamber"
+}
+
+private fun getEssenceLines(): List<String> {
+    return listOf(getSbLines().first { SbPattern.essencePattern.matches(it) })
+}
+
+private fun getEssenceShowWhen(): Boolean {
+    return getSbLines().any { SbPattern.essencePattern.matches(it) }
+}
+
+private fun getEffigiesLines(): List<String> {
+    return listOf(getSbLines().firstOrNull { it.startsWith("Effigies: ") } ?: "<hidden>")
+}
+
+private fun getEffigiesShowWhen(): Boolean {
+    return getSbLines().any { it.startsWith("Effigies: ") }
+}
+
+private fun getNoneLines(): List<String> {
+    return when {
+        config.informationFilteringConfig.hideEmptyLines -> listOf("<hidden>")
+        else -> listOf("§cNo Event")
+    }
 }
