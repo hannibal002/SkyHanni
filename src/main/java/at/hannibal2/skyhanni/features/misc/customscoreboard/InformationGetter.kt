@@ -27,7 +27,6 @@ object InformationGetter {
 
         // I know this could maybe be solved better but honestly idc anymore
         val knownLines = listOf(
-            "§cServer closing: ",
             /*"Instance Shutdow",
             "§f§lWave: §c§l",
             "§fTokens: ",

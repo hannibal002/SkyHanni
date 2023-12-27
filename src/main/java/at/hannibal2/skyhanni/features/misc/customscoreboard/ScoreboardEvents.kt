@@ -3,6 +3,7 @@ package at.hannibal2.skyhanni.features.misc.customscoreboard
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.data.ScoreboardData
+import at.hannibal2.skyhanni.features.misc.ServerRestartTitle
 import at.hannibal2.skyhanni.features.misc.customscoreboard.ScoreboardEvents.VOTING
 import at.hannibal2.skyhanni.features.rift.area.stillgorechateau.RiftBloodEffigies
 import at.hannibal2.skyhanni.utils.LorenzUtils.inDungeons
@@ -162,11 +163,11 @@ private fun getVotingShowWhen(): Boolean {
 }
 
 private fun getServerCloseLines(): List<String> {
-    return listOf(getSbLines().first { it.startsWith("§cServer closing: ") })
+    return listOf(getSbLines().first { ServerRestartTitle.restartingPattern.matches(it) })
 }
 
 private fun getServerCloseShowWhen(): Boolean {
-    return getSbLines().any { it.startsWith("§cServer closing: ") }
+    return getSbLines().any { ServerRestartTitle.restartingPattern.matches(it) }
 }
 
 private fun getDungeonsLines(): List<String> {
