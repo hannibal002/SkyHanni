@@ -51,9 +51,9 @@ class GuiEditManager {
     }
 
     companion object {
-        var currentPositions = mutableMapOf<String, Position>()
+        val currentPositions = mutableMapOf<String, Position>()
         private var latestPositions = mapOf<String, Position>()
-        private var currentBorderSize = mutableMapOf<String, Pair<Int, Int>>()
+        private val currentBorderSize = mutableMapOf<String, Pair<Int, Int>>()
 
         @JvmStatic
         fun add(position: Position, posLabel: String, x: Int, y: Int) {
@@ -77,8 +77,8 @@ class GuiEditManager {
                 lastHotkeyReminded = SimpleTimeMark.now()
                 LorenzUtils.chat(
                     "§eTo edit hidden GUI elements:\n" +
-                            " §7- §e1. Set a key in /sh edit.\n" +
-                            " §7- §e2. Click that key while the GUI element is visible."
+                        " §7- §e1. Set a key in /sh edit.\n" +
+                        " §7- §e2. Click that key while the GUI element is visible."
                 )
             }
         }

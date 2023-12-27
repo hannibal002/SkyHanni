@@ -7,7 +7,6 @@ import at.hannibal2.skyhanni.data.GuiEditManager.Companion.getAbsY
 import at.hannibal2.skyhanni.events.GuiRenderItemEvent
 import at.hannibal2.skyhanni.events.LorenzRenderWorldEvent
 import at.hannibal2.skyhanni.test.command.ErrorManager
-import at.hannibal2.skyhanni.utils.LorenzUtils.addAsSingletonList
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 import io.github.moulberry.moulconfig.internal.TextRenderUtils
 import io.github.moulberry.notenoughupdates.util.Utils
@@ -173,30 +172,22 @@ object RenderUtils {
         val d12 = -1.0 + d1
         val d13 = height + d12
         worldrenderer.begin(7, DefaultVertexFormats.POSITION_TEX_COLOR)
-        worldrenderer.pos(x + 0.2, y + topOffset, z + 0.2).tex(1.0, d13).color(r, g, b, 0.25f * alphaMultiplier)
-            .endVertex()
+        worldrenderer.pos(x + 0.2, y + topOffset, z + 0.2).tex(1.0, d13).color(r, g, b, 0.25f * alphaMultiplier).endVertex()
         worldrenderer.pos(x + 0.2, y + bottomOffset, z + 0.2).tex(1.0, d12).color(r, g, b, 0.25f).endVertex()
         worldrenderer.pos(x + 0.8, y + bottomOffset, z + 0.2).tex(0.0, d12).color(r, g, b, 0.25f).endVertex()
-        worldrenderer.pos(x + 0.8, y + topOffset, z + 0.2).tex(0.0, d13).color(r, g, b, 0.25f * alphaMultiplier)
-            .endVertex()
-        worldrenderer.pos(x + 0.8, y + topOffset, z + 0.8).tex(1.0, d13).color(r, g, b, 0.25f * alphaMultiplier)
-            .endVertex()
+        worldrenderer.pos(x + 0.8, y + topOffset, z + 0.2).tex(0.0, d13).color(r, g, b, 0.25f * alphaMultiplier).endVertex()
+        worldrenderer.pos(x + 0.8, y + topOffset, z + 0.8).tex(1.0, d13).color(r, g, b, 0.25f * alphaMultiplier).endVertex()
         worldrenderer.pos(x + 0.8, y + bottomOffset, z + 0.8).tex(1.0, d12).color(r, g, b, 0.25f).endVertex()
         worldrenderer.pos(x + 0.2, y + bottomOffset, z + 0.8).tex(0.0, d12).color(r, g, b, 0.25f).endVertex()
-        worldrenderer.pos(x + 0.2, y + topOffset, z + 0.8).tex(0.0, d13).color(r, g, b, 0.25f * alphaMultiplier)
-            .endVertex()
-        worldrenderer.pos(x + 0.8, y + topOffset, z + 0.2).tex(1.0, d13).color(r, g, b, 0.25f * alphaMultiplier)
-            .endVertex()
+        worldrenderer.pos(x + 0.2, y + topOffset, z + 0.8).tex(0.0, d13).color(r, g, b, 0.25f * alphaMultiplier).endVertex()
+        worldrenderer.pos(x + 0.8, y + topOffset, z + 0.2).tex(1.0, d13).color(r, g, b, 0.25f * alphaMultiplier).endVertex()
         worldrenderer.pos(x + 0.8, y + bottomOffset, z + 0.2).tex(1.0, d12).color(r, g, b, 0.25f).endVertex()
         worldrenderer.pos(x + 0.8, y + bottomOffset, z + 0.8).tex(0.0, d12).color(r, g, b, 0.25f).endVertex()
-        worldrenderer.pos(x + 0.8, y + topOffset, z + 0.8).tex(0.0, d13).color(r, g, b, 0.25f * alphaMultiplier)
-            .endVertex()
-        worldrenderer.pos(x + 0.2, y + topOffset, z + 0.8).tex(1.0, d13).color(r, g, b, 0.25f * alphaMultiplier)
-            .endVertex()
+        worldrenderer.pos(x + 0.8, y + topOffset, z + 0.8).tex(0.0, d13).color(r, g, b, 0.25f * alphaMultiplier).endVertex()
+        worldrenderer.pos(x + 0.2, y + topOffset, z + 0.8).tex(1.0, d13).color(r, g, b, 0.25f * alphaMultiplier).endVertex()
         worldrenderer.pos(x + 0.2, y + bottomOffset, z + 0.8).tex(1.0, d12).color(r, g, b, 0.25f).endVertex()
         worldrenderer.pos(x + 0.2, y + bottomOffset, z + 0.2).tex(0.0, d12).color(r, g, b, 0.25f).endVertex()
-        worldrenderer.pos(x + 0.2, y + topOffset, z + 0.2).tex(0.0, d13).color(r, g, b, 0.25f * alphaMultiplier)
-            .endVertex()
+        worldrenderer.pos(x + 0.2, y + topOffset, z + 0.2).tex(0.0, d13).color(r, g, b, 0.25f * alphaMultiplier).endVertex()
         tessellator.draw()
     }
 
@@ -254,10 +245,7 @@ object RenderUtils {
         GL11.glNormal3f(0.0f, 1.0f, 0.0f)
         GlStateManager.rotate(-Minecraft.getMinecraft().renderManager.playerViewY, 0.0f, 1.0f, 0.0f)
         GlStateManager.rotate(
-            Minecraft.getMinecraft().renderManager.playerViewX,
-            1.0f,
-            0.0f,
-            0.0f
+            Minecraft.getMinecraft().renderManager.playerViewX, 1.0f, 0.0f, 0.0f
         )
         GlStateManager.scale(-f1, -f1, f1)
         GlStateManager.disableLighting()
@@ -299,14 +287,11 @@ object RenderUtils {
     ) {
         val minecraft = Minecraft.getMinecraft()
         val player = minecraft.thePlayer
-        val x =
-            pos.x - player.lastTickPosX + (pos.x - player.posX - (pos.x - player.lastTickPosX)) * partialTicks
-        val y =
-            pos.y - player.lastTickPosY + (pos.y - player.posY - (pos.y - player.lastTickPosY)) * partialTicks
-        val z =
-            pos.z - player.lastTickPosZ + (pos.z - player.posZ - (pos.z - player.lastTickPosZ)) * partialTicks
+        val x = pos.x - player.lastTickPosX + (pos.x - player.posX - (pos.x - player.lastTickPosX)) * partialTicks
+        val y = pos.y - player.lastTickPosY + (pos.y - player.posY - (pos.y - player.lastTickPosY)) * partialTicks
+        val z = pos.z - player.lastTickPosZ + (pos.z - player.posZ - (pos.z - player.lastTickPosZ)) * partialTicks
 
-        //7 – 25
+        // 7 – 25
 
         val translate = LorenzVec(x, y, z)
         val length = translate.length().toFloat()
@@ -341,11 +326,7 @@ object RenderUtils {
         GlStateManager.tryBlendFuncSeparate(770, 771, 1, 0)
         GlStateManager.enableTexture2D()
         minecraft.fontRendererObj.drawString(
-            finalText,
-            (-width).toFloat(),
-            yOff,
-            LorenzColor.WHITE.toColor().rgb,
-            shadow
+            finalText, (-width).toFloat(), yOff, LorenzColor.WHITE.toColor().rgb, shadow
         )
         GlStateManager.disableBlend()
         GlStateManager.popMatrix()
@@ -413,15 +394,27 @@ object RenderUtils {
     fun Position.renderRenderables(
         renderables: List<Renderable>,
         extraSpace: Int = 0,
-        itemScale: Double = 1.0,
         posLabel: String,
     ) {
         if (renderables.isEmpty()) return
-        val list = mutableListOf<List<Any>>()
+        var longestY = 0
+        var longestX = 0
         for (line in renderables) {
-            list.addAsSingletonList(line)
+            GlStateManager.pushMatrix()
+            val (x, y) = transform()
+            GlStateManager.translate(0f, longestY.toFloat(), 0F)
+            Renderable.withMousePosition(x, y) {
+                line.render(0, longestY)
+            }
+
+            longestY += line.height + extraSpace + 2
+
+            if (line.width > longestX) {
+                longestX = line.width
+            }
+            GlStateManager.popMatrix()
         }
-        renderStringsAndItems(list, extraSpace, itemScale, posLabel)
+        GuiEditManager.add(this, posLabel, longestX, longestY)
     }
 
     /**
@@ -497,8 +490,7 @@ object RenderUtils {
             add(item)
         } catch (e: NullPointerException) {
             ErrorManager.logErrorWithData(
-                e, "Add item icon to renderable list",
-                "item" to item
+                e, "Add item icon to renderable list", "item" to item
             )
         }
     }
@@ -527,12 +519,9 @@ object RenderUtils {
             GL11.glLineWidth(2F)
             worldRenderer.begin(1, DefaultVertexFormats.POSITION)
             val renderManager = Minecraft.getMinecraft().renderManager
-            val x: Double =
-                entity.lastTickPosX + (entity.posX - entity.lastTickPosX) * partialTicks - renderManager.viewerPosX
-            val y: Double =
-                entity.lastTickPosY + (entity.posY - entity.lastTickPosY) * partialTicks - renderManager.viewerPosY
-            val z: Double =
-                entity.lastTickPosZ + (entity.posZ - entity.lastTickPosZ) * partialTicks - renderManager.viewerPosZ
+            val x: Double = entity.lastTickPosX + (entity.posX - entity.lastTickPosX) * partialTicks - renderManager.viewerPosX
+            val y: Double = entity.lastTickPosY + (entity.posY - entity.lastTickPosY) * partialTicks - renderManager.viewerPosY
+            val z: Double = entity.lastTickPosZ + (entity.posZ - entity.lastTickPosZ) * partialTicks - renderManager.viewerPosZ
             val pix2 = Math.PI * 2.0
             for (i in 0..90) {
                 color.bindColor()
@@ -579,12 +568,9 @@ object RenderUtils {
         var y1 = y
         var z1 = z
         val renderViewEntity = Minecraft.getMinecraft().renderViewEntity
-        val viewX =
-            renderViewEntity.prevPosX + (renderViewEntity.posX - renderViewEntity.prevPosX) * partialTicks.toDouble()
-        val viewY =
-            renderViewEntity.prevPosY + (renderViewEntity.posY - renderViewEntity.prevPosY) * partialTicks.toDouble()
-        val viewZ =
-            renderViewEntity.prevPosZ + (renderViewEntity.posZ - renderViewEntity.prevPosZ) * partialTicks.toDouble()
+        val viewX = renderViewEntity.prevPosX + (renderViewEntity.posX - renderViewEntity.prevPosX) * partialTicks.toDouble()
+        val viewY = renderViewEntity.prevPosY + (renderViewEntity.posY - renderViewEntity.prevPosY) * partialTicks.toDouble()
+        val viewZ = renderViewEntity.prevPosZ + (renderViewEntity.posZ - renderViewEntity.prevPosZ) * partialTicks.toDouble()
         x1 -= viewX
         y1 -= viewY
         z1 -= viewZ
@@ -650,10 +636,9 @@ object RenderUtils {
         val renderOffsetZ = render.lastTickPosZ + (render.posZ - render.lastTickPosZ) * partialTicks
         val eyeHeight = thePlayer.eyeHeight
 
-        val distToPlayerSq =
-            (x - renderOffsetX) * (x - renderOffsetX) + (y - (renderOffsetY + eyeHeight)) * (y - (renderOffsetY + eyeHeight)) + (z - renderOffsetZ) * (z - renderOffsetZ)
+        val distToPlayerSq = (x - renderOffsetX) * (x - renderOffsetX) + (y - (renderOffsetY + eyeHeight)) * (y - (renderOffsetY + eyeHeight)) + (z - renderOffsetZ) * (z - renderOffsetZ)
         var distToPlayer = sqrt(distToPlayerSq)
-        //TODO this is optional maybe?
+        // TODO this is optional maybe?
         distToPlayer = distToPlayer.coerceAtLeast(smallestDistanceVew)
 
         if (distToPlayer < hideTooCloseAt) return
@@ -661,8 +646,7 @@ object RenderUtils {
         val distRender = distToPlayer.coerceAtMost(50.0)
 
         val resultX = renderOffsetX + (x + 0.5 - renderOffsetX) / (distToPlayer / distRender)
-        val resultY =
-            (renderOffsetY + eyeHeight) + (y + 20 * distToPlayer / 300 - (renderOffsetY + eyeHeight)) / (distToPlayer / distRender)
+        val resultY = (renderOffsetY + eyeHeight) + (y + 20 * distToPlayer / 300 - (renderOffsetY + eyeHeight)) / (distToPlayer / distRender)
         val resultZ = renderOffsetZ + (z + 0.5 - renderOffsetZ) / (distToPlayer / distRender)
 
         val renderLocation = LorenzVec(resultX, resultY, resultZ)
@@ -692,9 +676,7 @@ object RenderUtils {
         val renderManager = minecraft.renderManager
 
         GlStateManager.translate(
-            location.x - renderManager.viewerPosX,
-            location.y - renderManager.viewerPosY,
-            location.z - renderManager.viewerPosZ
+            location.x - renderManager.viewerPosX, location.y - renderManager.viewerPosY, location.z - renderManager.viewerPosZ
         )
         GlStateManager.color(1f, 1f, 1f, 0.5f)
         GlStateManager.rotate(-renderManager.playerViewY, 0.0f, 1.0f, 0.0f)
@@ -703,17 +685,11 @@ object RenderUtils {
         val stringWidth = fontRenderer.getStringWidth(text)
         if (shadow) {
             fontRenderer.drawStringWithShadow(
-                text,
-                (-stringWidth / 2).toFloat(),
-                yOff,
-                0
+                text, (-stringWidth / 2).toFloat(), yOff, 0
             )
         } else {
             fontRenderer.drawString(
-                text,
-                -stringWidth / 2,
-                0,
-                0
+                text, -stringWidth / 2, 0, 0
             )
         }
         GlStateManager.color(1f, 1f, 1f)
@@ -787,7 +763,7 @@ object RenderUtils {
         val worldRenderer = tessellator.worldRenderer
         GlStateManager.color(c.red / 255f, c.green / 255f, c.blue / 255f, c.alpha / 255f * alphaMultiplier)
 
-        //vertical
+        // vertical
         worldRenderer.begin(GL11.GL_QUADS, DefaultVertexFormats.POSITION)
         worldRenderer.pos(aabb.minX, aabb.minY, aabb.minZ).endVertex()
         worldRenderer.pos(aabb.maxX, aabb.minY, aabb.minZ).endVertex()
@@ -801,13 +777,10 @@ object RenderUtils {
         worldRenderer.pos(aabb.minX, aabb.maxY, aabb.minZ).endVertex()
         tessellator.draw()
         GlStateManager.color(
-            c.red / 255f * 0.8f,
-            c.green / 255f * 0.8f,
-            c.blue / 255f * 0.8f,
-            c.alpha / 255f * alphaMultiplier
+            c.red / 255f * 0.8f, c.green / 255f * 0.8f, c.blue / 255f * 0.8f, c.alpha / 255f * alphaMultiplier
         )
 
-        //x
+        // x
         worldRenderer.begin(GL11.GL_QUADS, DefaultVertexFormats.POSITION)
         worldRenderer.pos(aabb.minX, aabb.minY, aabb.maxZ).endVertex()
         worldRenderer.pos(aabb.minX, aabb.maxY, aabb.maxZ).endVertex()
@@ -821,12 +794,9 @@ object RenderUtils {
         worldRenderer.pos(aabb.maxX, aabb.minY, aabb.maxZ).endVertex()
         tessellator.draw()
         GlStateManager.color(
-            c.red / 255f * 0.9f,
-            c.green / 255f * 0.9f,
-            c.blue / 255f * 0.9f,
-            c.alpha / 255f * alphaMultiplier
+            c.red / 255f * 0.9f, c.green / 255f * 0.9f, c.blue / 255f * 0.9f, c.alpha / 255f * alphaMultiplier
         )
-        //z
+        // z
         worldRenderer.begin(GL11.GL_QUADS, DefaultVertexFormats.POSITION)
         worldRenderer.pos(aabb.minX, aabb.maxY, aabb.minZ).endVertex()
         worldRenderer.pos(aabb.maxX, aabb.maxY, aabb.minZ).endVertex()
@@ -853,7 +823,7 @@ object RenderUtils {
          * If set to `false`, will be relativized to [RenderUtils.getViewerPos].
          */
         renderRelativeToCamera: Boolean = false,
-        drawVerticalBarriers: Boolean = true
+        drawVerticalBarriers: Boolean = true,
     ) {
         drawFilledBoundingBox_nea(aabb, c, alphaMultiplier, renderRelativeToCamera, drawVerticalBarriers, partialTicks)
     }
@@ -953,7 +923,7 @@ object RenderUtils {
         val tessellator = Tessellator.getInstance()
         val worldRenderer = tessellator.worldRenderer
 
-        //vertical
+        // vertical
         if (drawVerticalBarriers) {
             GlStateManager.color(c.red / 255f, c.green / 255f, c.blue / 255f, c.alpha / 255f * alphaMultiplier)
             worldRenderer.begin(GL11.GL_QUADS, DefaultVertexFormats.POSITION)
@@ -972,13 +942,10 @@ object RenderUtils {
             }
         }
         GlStateManager.color(
-            c.red / 255f * 0.8f,
-            c.green / 255f * 0.8f,
-            c.blue / 255f * 0.8f,
-            c.alpha / 255f * alphaMultiplier
+            c.red / 255f * 0.8f, c.green / 255f * 0.8f, c.blue / 255f * 0.8f, c.alpha / 255f * alphaMultiplier
         )
 
-        //x
+        // x
         worldRenderer.begin(GL11.GL_QUADS, DefaultVertexFormats.POSITION)
         with(effectiveAABB) {
             worldRenderer.pos(minX, minY, maxZ).endVertex()
@@ -994,12 +961,9 @@ object RenderUtils {
         }
         tessellator.draw()
         GlStateManager.color(
-            c.red / 255f * 0.9f,
-            c.green / 255f * 0.9f,
-            c.blue / 255f * 0.9f,
-            c.alpha / 255f * alphaMultiplier
+            c.red / 255f * 0.9f, c.green / 255f * 0.9f, c.blue / 255f * 0.9f, c.alpha / 255f * alphaMultiplier
         )
-        //z
+        // z
         worldRenderer.begin(GL11.GL_QUADS, DefaultVertexFormats.POSITION)
         with(effectiveAABB) {
             worldRenderer.pos(minX, maxY, minZ).endVertex()
@@ -1023,7 +987,7 @@ object RenderUtils {
         boundingBox: AxisAlignedBB,
         lineWidth: Int,
         colour: Color,
-        depth: Boolean
+        depth: Boolean,
     ) {
         val cornerOne = LorenzVec(boundingBox.minX, boundingBox.maxY, boundingBox.minZ)
         val cornerTwo = LorenzVec(boundingBox.minX, boundingBox.maxY, boundingBox.maxZ)
@@ -1037,7 +1001,7 @@ object RenderUtils {
 
     // TODO nea please merge with 'draw3DLine'
     fun LorenzRenderWorldEvent.draw3DLine_nea(
-        p1: LorenzVec, p2: LorenzVec, color: Color, lineWidth: Int, depth: Boolean
+        p1: LorenzVec, p2: LorenzVec, color: Color, lineWidth: Int, depth: Boolean,
     ) {
         GlStateManager.disableDepth()
         GlStateManager.disableCull()
@@ -1082,13 +1046,11 @@ object RenderUtils {
         offset: Float = 0f,
         saturation: Float = 1F,
         brightness: Float = 0.8F,
-        timeOverride: Long = System.currentTimeMillis()
+        timeOverride: Long = System.currentTimeMillis(),
     ): Color {
         return Color(
             Color.HSBtoRGB(
-                ((offset + timeOverride / timeTillRepeat.toDouble(DurationUnit.MILLISECONDS)) % 1).toFloat(),
-                saturation,
-                brightness
+                ((offset + timeOverride / timeTillRepeat.toDouble(DurationUnit.MILLISECONDS)) % 1).toFloat(), saturation, brightness
             )
         )
     }
@@ -1097,7 +1059,7 @@ object RenderUtils {
         xPos: Int,
         yPos: Int,
         text: String,
-        scale: Float
+        scale: Float,
     ) {
         val fontRenderer = Minecraft.getMinecraft().fontRendererObj
 
