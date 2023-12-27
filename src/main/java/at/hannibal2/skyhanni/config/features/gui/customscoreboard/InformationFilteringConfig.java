@@ -11,7 +11,7 @@ public class InformationFilteringConfig {
     public boolean hideEmptyLines = true;
 
     @Expose
-    @ConfigOption(name = "Hide Info not relevant to location", desc = "Hide lines that are not relevant to the current location, like hiding copper while not in garden.")
+    @ConfigOption(name = "Hide non relevant info", desc = "Hide lines that are not relevant to the current location, like hiding copper while not in garden.")
     @ConfigEditorBoolean
     public boolean hideIrrelevantLines = true;
 
