@@ -7,6 +7,7 @@ import at.hannibal2.skyhanni.features.rift.RiftAPI
 import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
+import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils.addAsSingletonList
 import at.hannibal2.skyhanni.utils.LorenzUtils.addOrPut
 import at.hannibal2.skyhanni.utils.NEUInternalName.Companion.asInternalName
@@ -125,6 +126,11 @@ object VerminTracker {
     @SubscribeEvent
     fun onRenderOverlay(event: GuiRenderEvent) {
         if (!isEnabled()) return
+        if (!config.showOutsideWestVillage &&
+            !LorenzUtils.skyBlockArea.let { it == "Infested House" || it == "West Village" }) return
+        if (!config.showWithoutVacuum &&
+            !InventoryUtils.getItemsInOwnInventory().any { it.getInternalName() == "TURBOMAX_VACUUM".asInternalName() }) return
+
 
         tracker.renderDisplay(config.position)
     }
