@@ -1,19 +1,17 @@
 package at.hannibal2.skyhanni.data
 
-import at.hannibal2.skyhanni.events.ConfigLoadEvent
 import at.hannibal2.skyhanni.events.InventoryFullyOpenedEvent
 import at.hannibal2.skyhanni.events.LorenzChatEvent
 import at.hannibal2.skyhanni.events.ProfileJoinEvent
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
-import at.hannibal2.skyhanni.utils.StringUtils.removeResets
-import at.hannibal2.skyhanni.utils.StringUtils.trimWhiteSpaceAndResets
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
 object MaxwellAPI {
-    var currentPower: MaxwellPowers? = null
+    val config = ProfileStorageData.profileSpecific
+    var currentPower: MaxwellPowers? = config?.currentPower
 
     private val pattern by RepoPattern.pattern(
         "data.maxwell.chat.power",
@@ -21,18 +19,10 @@ object MaxwellAPI {
     )
 
     @SubscribeEvent
-    fun onConfigLoad(event: ConfigLoadEvent) {
-        val config = ProfileStorageData.profileSpecific ?: return
-        currentPower = config.currentPower ?: return
-    }
-
-    @SubscribeEvent
     fun onChat(event: LorenzChatEvent) {
-        val message = event.message.trimWhiteSpaceAndResets().removeResets()
-
-        pattern.matchMatcher(message) {
-            val power = group("power")
-            currentPower = MaxwellPowers.entries.find { power.contains(it.power) } ?: MaxwellPowers.UNKNOWN
+        pattern.matchMatcher(event.message) {
+            currentPower = MaxwellPowers.entries.find { group("power").contains(it.power) }
+                ?: MaxwellPowers.UNKNOWN
             savePower(currentPower)
         }
     }
@@ -52,13 +42,11 @@ object MaxwellAPI {
 
     @SubscribeEvent
     fun onProfileJoin(event: ProfileJoinEvent) {
-        val config = ProfileStorageData.profileSpecific ?: return
-        currentPower = config.currentPower ?: return
+        currentPower = config?.currentPower ?: return
     }
 
     private fun savePower(power: MaxwellPowers?) {
         if (power == null) return
-        val config = ProfileStorageData.profileSpecific ?: return
-        config.currentPower = power
+        config?.currentPower = power
     }
 }
