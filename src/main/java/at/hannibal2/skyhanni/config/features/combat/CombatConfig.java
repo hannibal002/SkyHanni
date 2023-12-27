@@ -40,6 +40,12 @@ public class CombatConfig {
     public EnderNodeConfig enderNodeTracker = new EnderNodeConfig();
 
     @Expose
+    @ConfigOption(name = "Dragon Features", desc = "")
+    @Accordion
+    public DragonConfig dragon = new DragonConfig();
+
+
+    @Expose
     @ConfigOption(name = "Hide Damage Splash", desc = "Hide all damage splashes anywhere in SkyBlock.")
     @ConfigEditorBoolean
     @FeatureToggle

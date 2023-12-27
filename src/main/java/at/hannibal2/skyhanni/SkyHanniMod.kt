@@ -71,6 +71,7 @@ import at.hannibal2.skyhanni.features.chat.WatchdogHider
 import at.hannibal2.skyhanni.features.chat.playerchat.PlayerChatFilter
 import at.hannibal2.skyhanni.features.chat.playerchat.PlayerChatModifier
 import at.hannibal2.skyhanni.features.combat.BestiaryData
+import at.hannibal2.skyhanni.features.combat.DragonFeatures
 import at.hannibal2.skyhanni.features.combat.HideDamageSplash
 import at.hannibal2.skyhanni.features.combat.damageindicator.DamageIndicatorManager
 import at.hannibal2.skyhanni.features.combat.endernodetracker.EnderNodeTracker
@@ -567,6 +568,7 @@ class SkyHanniMod {
         loadModule(AnitaExtraFarmingFortune())
         loadModule(ComposterDisplay())
         loadModule(GardenComposterInventoryFeatures())
+        loadModule(DragonFeatures())
         loadModule(MinionCollectLogic())
         loadModule(BetterSignEditing())
         loadModule(PatcherSendCoordinates())
