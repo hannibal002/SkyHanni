@@ -15,9 +15,9 @@ import net.minecraft.client.renderer.GlStateManager
 import net.minecraft.util.ResourceLocation
 import org.lwjgl.opengl.GL11
 
-private val config get() = SkyHanniMod.feature.gui.customScoreboard
-
 class RenderBackground {
+    private val config get() = SkyHanniMod.feature.gui.customScoreboard
+
     fun renderBackground() {
         val position = config.position
         val border = 5
@@ -55,8 +55,8 @@ class RenderBackground {
         val textureLocation = ResourceLocation("skyhanni", "scoreboard.png")
 
         // Save the current color state
-        GlStateManager.pushMatrix();
-        GlStateManager.pushAttrib();
+        GlStateManager.pushMatrix()
+        GlStateManager.pushAttrib()
 
         GlStateManager.color(1f, 1f, 1f, 1f)
 
@@ -82,7 +82,7 @@ class RenderBackground {
         }
 
         // Restore the original color state
-        GlStateManager.popMatrix();
-        GlStateManager.popAttrib();
+        GlStateManager.popMatrix()
+        GlStateManager.popAttrib()
     }
 }

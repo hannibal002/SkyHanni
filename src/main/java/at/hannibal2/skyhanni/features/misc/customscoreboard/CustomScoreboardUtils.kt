@@ -8,9 +8,9 @@ import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.RenderUtils.AlignmentEnum
 import net.minecraft.client.Minecraft
 
-private val config get() = SkyHanniMod.feature.gui.customScoreboard
-
 object CustomScoreboardUtils {
+    private val config get() = SkyHanniMod.feature.gui.customScoreboard
+
     fun getProfileTypeSymbol(): String {
         return when {
             HypixelData.ironman -> "§7♲ " // Ironman

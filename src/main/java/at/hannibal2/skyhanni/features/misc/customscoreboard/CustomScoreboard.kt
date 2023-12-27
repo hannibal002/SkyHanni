@@ -29,10 +29,10 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
 typealias ScoreboardElement = Pair<String, AlignmentEnum>
 
-private val config get() = SkyHanniMod.feature.gui.customScoreboard
-private var display = emptyList<ScoreboardElement>()
-
 class CustomScoreboard {
+    private val config get() = SkyHanniMod.feature.gui.customScoreboard
+    private var display = emptyList<ScoreboardElement>()
+
     @SubscribeEvent
     fun onRenderOverlay(event: GuiRenderEvent.GuiOverlayRenderEvent) {
         if (!isCustomScoreboardEnabled()) return
