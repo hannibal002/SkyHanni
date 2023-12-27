@@ -191,18 +191,15 @@ class ReforgeHelper {
         val reforgeList = (if (isInHexReforgeMenu) ReforgeAPI.reforgeList else ReforgeAPI.nonePowerStoneReforge).filter { it.isValid(itemType, internalName) }
         val statTypes = reforgeList.mapNotNull { it.stats[itemRarity]?.map { it.key } }.flatten().toSet()
         val statButton = { it: ReforgeAPI.StatType? ->
-            val string = Renderable.string(it?.icon ?: "A")
+            val string = Renderable.string(it?.icon ?: "§7D")
             if (sortAfter == it) {
                 Renderable.underlined(string)
             } else {
                 Renderable.clickable(string, { sortAfter = it; DelayedRun.runNextTick { updateDisplay() } })
             }
         }
-        val statTypeButtons = (listOf(statButton.invoke(null)) + statTypes.map { statButton.invoke(it) }).chunked(8)
+        val statTypeButtons = (listOf(statButton.invoke(null)) + statTypes.map { statButton.invoke(it) }).chunked(9)
         this.add(Renderable.table(statTypeButtons, xPadding = 3, yPadding = 2))
-        for (i in 2..statTypeButtons.size) { // TODO fix renderRenderables to work with diffrent hight after that remove this for
-            this.add(Renderable.placeholder(1))
-        }
         val list = reforgeList.map { reforge ->
             Renderable.clickAndHover(
                 (if (reforge.isReforgeStone) "§9" else "§7") + reforge.name,
