@@ -16,7 +16,7 @@ object PartyAPI {
     private val youJoinedPartyPattern = "§eYou have joined (?<name>.*)'s §eparty!".toPattern()
     private val othersJoinedPartyPattern = "(?<name>.*) §ejoined the party.".toPattern()
     // §dParty Finder §f> §bSkirtwearer §ejoined the group! (§3Combat Level 46§e)
-    private val kuudraFinderJoinPattern = "§dParty Finder §f> (?<name>.*?) §ejoined the group! \\(§[a-fA-F0-9]+Combat Level (\\d+)§e\\)".toPattern()
+    private val kuudraFinderJoinPattern = "§dParty Finder §f> (?<name>.*?) §ejoined the group! \\(§[a-fA-F0-9]+Combat Level \\d+§e\\)".toPattern()
     // §dParty Finder §f> §bSkirtwearer §ejoined the dungeon group! (§bArcher Level 22§e)
     private val dungeonFinderJoinPattern = "§dParty Finder §f> (?<name>.*?) §ejoined the dungeon group! \\(§[a-fA-F0-9].* Level \\d+§[a-fA-F0-9]\\)".toPattern()
     private val othersInThePartyPattern = "§eYou'll be partying with: (?<names>.*)".toPattern()
