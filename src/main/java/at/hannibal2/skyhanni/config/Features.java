@@ -105,7 +105,7 @@ public class Features extends Config {
     public DungeonConfig dungeon = new DungeonConfig();
 
     @Expose
-    @Category(name = "ScoreboardEvents", desc = "Stuff that is not always available.")
+    @Category(name = "Events", desc = "Stuff that is not always available.")
     public EventConfig event = new EventConfig();
 
     @Expose
