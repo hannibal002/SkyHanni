@@ -37,19 +37,20 @@ class CustomScoreboard {
     fun onRenderOverlay(event: GuiRenderEvent.GuiOverlayRenderEvent) {
         if (!isCustomScoreboardEnabled()) return
         if (display.isEmpty()) return
-        val position = config.position
 
         RenderBackground().renderBackground()
 
-        position.renderStringsAlignedWidth(display, posLabel = "Custom Scoreboard")
+        config.position.renderStringsAlignedWidth(display, posLabel = "Custom Scoreboard")
     }
 
     @SubscribeEvent
     fun onTick(event: LorenzTickEvent) {
         if (!isCustomScoreboardEnabled()) return
 
-        // Creates the lines
-        display = createLines()
+        // Creating the lines
+        if (event.isMod(5)) {
+            display = createLines()
+        }
 
         // Get Information
         InformationGetter.getInformation()
