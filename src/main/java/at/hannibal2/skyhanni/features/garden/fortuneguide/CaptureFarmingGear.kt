@@ -256,5 +256,13 @@ class CaptureFarmingGear {
         if (msg == "PUMPKINS EXPORTATION COMPLETE!") {
             storage.pumpkinFortune = true
         }
+        if (msg == "[NPC] Carrolyn: Thank you for the carrots.") {
+            storage.carrotFortune = true
+            LorenzUtils.chat("§aYou have already given Carrolyn enough Exportable Carrots. Marked carrot fortune as completed.")
+        }
+        if (msg == "[NPC] Carrolyn: Thank you for the pumpkins.") {
+            storage.pumpkinFortune = true
+            LorenzUtils.chat("§aYou have already given Carrolyn enough Expired Pumpkin. Marked pumpkin fortune as completed.")
+        }
     }
 }
