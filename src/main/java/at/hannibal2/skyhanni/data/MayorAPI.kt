@@ -26,7 +26,7 @@ object MayorAPI {
         currentCandidate.name == mayor && currentCandidate.perks.any { it.name == perk }
     } ?: false
 
-    /*
+    /**
      * @param input: The name of the mayor
      * @return: The neu color of the mayor + the name of the mayor; If no mayor was found, it will return "§cUnknown Mayor: §7$input"
      */
@@ -55,7 +55,7 @@ object MayorAPI {
         if (!LorenzUtils.onHypixel) return
 
         if (event.repeatSeconds(3)) {
-            check()
+            checkHypixelAPI()
             getTimeTillNextMayor()
         }
     }
@@ -73,7 +73,7 @@ object MayorAPI {
         timeTillNextMayor = nextMayorTime - System.currentTimeMillis()
     }
 
-    private fun check() {
+    private fun checkHypixelAPI() {
         if (System.currentTimeMillis() > lastUpdate + 60_000 * 5) {
             lastUpdate = System.currentTimeMillis()
             SkyHanniMod.coroutineScope.launch {
