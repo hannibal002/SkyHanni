@@ -20,10 +20,10 @@ class MayorElection {
     companion object {
         var rawMayorData: MayorJson? = null
         var candidates = mapOf<Int, MayorJson.Candidate>()
-        var currentCandidate: MayorJson.Candidate? = null  //todo: should it not be called currentMayor?
+        var currentMayor: MayorJson.Candidate? = null
         var timeTillNextMayor = 0L
 
-        fun isPerkActive(mayor: String, perk: String) = currentCandidate?.let { currentCandidate ->
+        fun isPerkActive(mayor: String, perk: String) = currentMayor?.let { currentCandidate ->
             currentCandidate.name == mayor && currentCandidate.perks.any { it.name == perk }
         } ?: false
     }
@@ -82,7 +82,7 @@ class MayorElection {
         if (nextMayorTime > System.currentTimeMillis()) {
             currentYear--
         }
-        currentCandidate = candidates[currentYear]
+        currentMayor = candidates[currentYear]
     }
 
     private fun MayorJson.Election.getPairs() = year + 1 to candidates.bestCandidate()
