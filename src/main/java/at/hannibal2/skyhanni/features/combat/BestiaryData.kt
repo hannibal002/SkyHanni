@@ -30,7 +30,6 @@ import at.hannibal2.skyhanni.utils.renderables.Renderable
 import net.minecraft.item.ItemStack
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
-
 object BestiaryData {
 
     private val config get() = SkyHanniMod.feature.combat.bestiary
@@ -464,38 +463,25 @@ object BestiaryData {
 
         fun percentToMaxFormatted() = LorenzUtils.formatPercentage(percentToMax())
 
-        fun percentToTier() = currentKillToNextLevel.toDouble() / killNeededForNextLevel
+        fun percentToTier() =
+            if (killNeededForNextLevel == 0L) 1.0 else currentKillToNextLevel.toDouble() / killNeededForNextLevel
 
         fun percentToTierFormatted() = LorenzUtils.formatPercentage(percentToTier())
 
         fun getNextLevel() = level.getNextLevel()
     }
 
-
     private fun String.romanOrInt() = romanToDecimalIfNecessary().let {
         if (config.replaceRoman || it == 0) it.toString() else it.toRoman()
     }
 
-    fun Any.getNextLevel(): String {
-        return when (this) {
-            is Int -> {
-                (this + 1).toString().romanOrInt()
-            }
-
-            is String -> {
-                if (this == "0") {
-                    "I".romanOrInt()
-                } else {
-                    val intValue = romanToDecimalIfNecessary()
-                    (intValue + 1).toRoman().romanOrInt()
-                }
-            }
-
-            else -> {
-                "Unsupported type: ${this::class.simpleName}"
-            }
+    private fun String.getNextLevel() =
+        if (this == "0") {
+            "I".romanOrInt()
+        } else {
+            val intValue = romanToDecimalIfNecessary()
+            (intValue + 1).toRoman().romanOrInt()
         }
-    }
 
     private fun isEnabled() = LorenzUtils.inSkyBlock && config.enabled
 

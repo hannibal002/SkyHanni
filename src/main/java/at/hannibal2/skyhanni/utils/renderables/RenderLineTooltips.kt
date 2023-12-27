@@ -125,7 +125,6 @@ object RenderLineTooltips {
             GlStateManager.translate(x.toFloat(), tooltipY.toFloat(), 0f)
             var yTranslateSum = 0
             for (line in tips) {
-                // TODO
                 line?.render(x, tooltipY)
                 val y = line?.height ?: 0
                 GlStateManager.translate(0f, y.toFloat(), 0f)

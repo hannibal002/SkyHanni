@@ -115,7 +115,7 @@ public class InventoryConfig {
     }
 
     @Expose
-    @ConfigOption(name = " Vacuum Bag Cap", desc = "Capping the Garden Vacuum Bag item number display to 40.")
+    @ConfigOption(name = " Vacuum Bag Cap", desc = "Cap the Garden Vacuum Bag item number display to 40.")
     @ConfigEditorBoolean
     public boolean vacuumBagCap = true;
 
