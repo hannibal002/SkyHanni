@@ -5,41 +5,11 @@ import at.hannibal2.skyhanni.data.HypixelData
 import at.hannibal2.skyhanni.data.ScoreboardData
 import at.hannibal2.skyhanni.mixins.transformers.AccessorGuiPlayerTabOverlay
 import at.hannibal2.skyhanni.utils.RenderUtils.AlignmentEnum
-import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
 import net.minecraft.client.Minecraft
 
 private val config get() = SkyHanniMod.feature.gui.customScoreboard
 
 object CustomScoreboardUtils {
-    fun mayorNameToColorCode(input: String): String {
-        return when (input) {
-            // Normal Mayors
-            "Aatrox" -> "§3$input"
-            "Cole" -> "§e$input"
-            "Diana" -> "§2$input"
-            "Diaz" -> "§6$input"
-            "Finnegan" -> "§c$input"
-            "Foxy" -> "§d$input"
-            "Marina" -> "§b$input"
-            "Paul" -> "§c$input"
-
-            // Special Mayors
-            "Scorpius" -> "§d$input"
-            "Jerry" -> "§d$input"
-            "Derpy" -> "§d$input"
-            "Dante" -> "§d$input"
-            else -> "§cUnknown Mayor: §7$input"
-        }
-    }
-
-    fun extractLobbyCode(input: String): String? {
-        ScoreboardPattern.lobbycodePattern.matchMatcher(input) {
-            return group("code")
-        }
-
-        return null
-    }
-
     fun getProfileTypeSymbol(): String {
         return when {
             HypixelData.ironman -> "§7♲ " // Ironman
