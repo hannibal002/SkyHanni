@@ -18,6 +18,7 @@ import at.hannibal2.skyhanni.utils.LorenzUtils.nextAfter
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.RenderUtils.AlignmentEnum
 import at.hannibal2.skyhanni.utils.StringUtils.firstLetterUppercase
+import at.hannibal2.skyhanni.utils.StringUtils.matches
 import at.hannibal2.skyhanni.utils.TimeUnit
 import at.hannibal2.skyhanni.utils.TimeUtils
 import at.hannibal2.skyhanni.utils.TimeUtils.formatted
@@ -25,6 +26,8 @@ import io.github.moulberry.notenoughupdates.util.SkyBlockTime
 import java.util.function.Supplier
 
 private val config get() = SkyHanniMod.feature.gui.customScoreboard
+private val displayConfig get() = config.displayConfig
+private val informationFilteringConfig get() = config.informationFilteringConfig
 
 // Stats / Numbers
 var purse = "0"
@@ -109,16 +112,16 @@ enum class ScoreboardElements(
     }
 
     fun isVisible(): Boolean {
-        if (!config.informationFilteringConfig.hideIrrelevantLines) return true
+        if (!informationFilteringConfig.hideIrrelevantLines) return true
         return showWhen()
     }
 }
 
 
-private fun getTitleDisplayPair() = when (config.displayConfig.titleAndFooter.useHypixelTitleAnimation) {
+private fun getTitleDisplayPair() = when (displayConfig.titleAndFooter.useHypixelTitleAnimation) {
     true -> listOf(ScoreboardData.objectiveTitle to getTitleAndFooterAlignment())
     false -> listOf(
-        config.displayConfig.titleAndFooter.customTitle.get().toString()
+        displayConfig.titleAndFooter.customTitle.get().toString()
             .replace("&", "§") to getTitleAndFooterAlignment()
     )
 }
@@ -127,24 +130,24 @@ private fun getProfileDisplayPair() =
     listOf(CustomScoreboardUtils.getProfileTypeSymbol() + HypixelData.profileName.firstLetterUppercase() to AlignmentEnum.LEFT)
 
 private fun getPurseDisplayPair() = when {
-    config.informationFilteringConfig.hideEmptyLines && purse == "0" -> listOf("<hidden>")
-    config.displayConfig.displayNumbersFirst -> listOf("§6$purse Purse")
+    informationFilteringConfig.hideEmptyLines && purse == "0" -> listOf("<hidden>")
+    displayConfig.displayNumbersFirst -> listOf("§6$purse Purse")
     else -> listOf("Purse: §6$purse")
 }.map { it to AlignmentEnum.LEFT }
 
 private fun getPurseShowWhen() = !listOf(IslandType.THE_RIFT).contains(HypixelData.skyBlockIsland)
 
 private fun getMotesDisplayPair() = when {
-    config.informationFilteringConfig.hideEmptyLines && motes == "0" -> listOf("<hidden>")
-    config.displayConfig.displayNumbersFirst -> listOf("§d$motes Motes")
+    informationFilteringConfig.hideEmptyLines && motes == "0" -> listOf("<hidden>")
+    displayConfig.displayNumbersFirst -> listOf("§d$motes Motes")
     else -> listOf("Motes: §d$motes")
 }.map { it to AlignmentEnum.LEFT }
 
 private fun getMotesShowWhen() = listOf(IslandType.THE_RIFT).contains(HypixelData.skyBlockIsland)
 
 private fun getBankDisplayPair() = when {
-    config.informationFilteringConfig.hideEmptyLines && bank == "0" -> listOf("<hidden>")
-    config.displayConfig.displayNumbersFirst -> listOf("§6$bank Bank")
+    informationFilteringConfig.hideEmptyLines && bank == "0" -> listOf("<hidden>")
+    displayConfig.displayNumbersFirst -> listOf("§6$bank Bank")
     else -> listOf("Bank: §6$bank")
 }.map { it to AlignmentEnum.LEFT }
 
@@ -152,9 +155,9 @@ private fun getBankShowWhen() = !listOf(IslandType.THE_RIFT).contains(HypixelDat
 
 private fun getBitsDisplayPair(): List<Pair<String, AlignmentEnum>> {
     val bitsDisplay = when {
-        config.informationFilteringConfig.hideEmptyLines && bits == "0" -> listOf("<hidden>")
-        config.displayConfig.displayNumbersFirst -> {
-            val bitsText = if (config.displayConfig.showUnclaimedBits) {
+        informationFilteringConfig.hideEmptyLines && bits == "0" -> listOf("<hidden>")
+        displayConfig.displayNumbersFirst -> {
+            val bitsText = if (displayConfig.showUnclaimedBits) {
                 "§b$bits§7/${if (BitsAPI.bitsToClaim == 0) "§10" else "§b${BitsAPI.bitsToClaim.addSeparators()}"} §bBits"
             } else {
                 "§b$bits Bits"
@@ -163,7 +166,7 @@ private fun getBitsDisplayPair(): List<Pair<String, AlignmentEnum>> {
         }
 
         else -> {
-            val bitsText = if (config.displayConfig.showUnclaimedBits) {
+            val bitsText = if (displayConfig.showUnclaimedBits) {
                 "Bits: §b$bits§7/${if (BitsAPI.bitsToClaim == 0) "§10" else "§b${BitsAPI.bitsToClaim.addSeparators()}"}"
             } else {
                 "Bits: §b$bits"
@@ -177,24 +180,24 @@ private fun getBitsDisplayPair(): List<Pair<String, AlignmentEnum>> {
 private fun getBitsShowWhen() = !listOf(IslandType.CATACOMBS).contains(HypixelData.skyBlockIsland)
 
 private fun getCopperDisplayPair() = when {
-    config.informationFilteringConfig.hideEmptyLines && copper == "0" -> listOf("<hidden>")
-    config.displayConfig.displayNumbersFirst -> listOf("§c$copper Copper")
+    informationFilteringConfig.hideEmptyLines && copper == "0" -> listOf("<hidden>")
+    displayConfig.displayNumbersFirst -> listOf("§c$copper Copper")
     else -> listOf("Copper: §c$copper")
 }.map { it to AlignmentEnum.LEFT }
 
 private fun getCopperShowWhen() = listOf(IslandType.GARDEN).contains(HypixelData.skyBlockIsland)
 
 private fun getGemsDisplayPair() = when {
-    config.informationFilteringConfig.hideEmptyLines && gems == "0" -> listOf("<hidden>")
-    config.displayConfig.displayNumbersFirst -> listOf("§a$gems Gems")
+    informationFilteringConfig.hideEmptyLines && gems == "0" -> listOf("<hidden>")
+    displayConfig.displayNumbersFirst -> listOf("§a$gems Gems")
     else -> listOf("Gems: §a$gems")
 }.map { it to AlignmentEnum.LEFT }
 
 private fun getGemsShowWhen() = !listOf(IslandType.THE_RIFT, IslandType.CATACOMBS).contains(HypixelData.skyBlockIsland)
 
 private fun getHeatDisplayPair() = when {
-    config.informationFilteringConfig.hideEmptyLines && heat == "§c♨ 0" -> listOf("<hidden>")
-    config.displayConfig.displayNumbersFirst -> listOf(if (heat == "§c♨ 0") "§c♨ 0 Heat" else "$heat Heat")
+    informationFilteringConfig.hideEmptyLines && heat == "§c♨ 0" -> listOf("<hidden>")
+    displayConfig.displayNumbersFirst -> listOf(if (heat == "§c♨ 0") "§c♨ 0 Heat" else "$heat Heat")
     else -> listOf(if (heat == "§c♨ 0") "Heat: §c♨ 0" else "Heat: $heat")
 }.map { it to AlignmentEnum.LEFT }
 
@@ -223,16 +226,15 @@ private fun getDateDisplayPair() =
 
 
 private fun getTimeDisplayPair(): List<Pair<String, AlignmentEnum>> {
-    val symbols = listOf("☔", "⚡", "§e☀", "§b☽")
-    return if (ScoreboardData.sidebarLinesFormatted.any { line -> symbols.any { line.contains(it) } }) {
-        listOf(ScoreboardData.sidebarLinesFormatted.first { line -> symbols.any { line.contains(it) } }
-            .trim() to AlignmentEnum.LEFT)
-    } else {
-        listOf(
-            "§7" + SkyBlockTime.now()
-                .formatted(dayAndMonthElement = false, yearElement = false) to AlignmentEnum.LEFT
-        )
+    for (line in ScoreboardData.sidebarLinesFormatted) {
+        if (ScoreboardPattern.timePattern.matches(line)) {
+            return listOf(line.trim() to AlignmentEnum.LEFT)
+        }
     }
+    return listOf(
+        "§7a" + SkyBlockTime.now()
+            .formatted(dayAndMonthElement = false, yearElement = false) to AlignmentEnum.LEFT
+    )
 }
 
 private fun getLobbyDisplayPair() = listOf("§8$lobbyCode" to AlignmentEnum.LEFT)
@@ -240,7 +242,7 @@ private fun getLobbyDisplayPair() = listOf("§8$lobbyCode" to AlignmentEnum.LEFT
 private fun getPowerDisplayPair() = when (MaxwellAPI.currentPower == null) {
     true -> listOf("§c§lPlease visit Maxwell!" to AlignmentEnum.LEFT)
     false ->
-        when (config.displayConfig.displayNumbersFirst) {
+        when (displayConfig.displayNumbersFirst) {
             true -> when (MaxwellAPI.currentPower?.power?.endsWith("Power")) {
                 true -> listOf("${MaxwellAPI.currentPower?.power}" to AlignmentEnum.LEFT)
                 false -> listOf("${MaxwellAPI.currentPower?.power} Power" to AlignmentEnum.LEFT)
@@ -265,7 +267,7 @@ private fun getCookieDisplayPair(): List<Pair<String, AlignmentEnum>> {
     }
 }
 
-private fun getCookieShowWhen() = when (config.informationFilteringConfig.hideEmptyLines) {
+private fun getCookieShowWhen() = when (informationFilteringConfig.hideEmptyLines) {
     true -> CustomScoreboardUtils.getTablistFooter().split("\n").any {
         CustomScoreboardUtils.getTablistFooter().split("\n").nextAfter("§d§lCookie Buff")?.contains(it)
             ?: false
@@ -312,7 +314,7 @@ private fun getSlayerShowWhen() = listOf(
 
 private fun getQuiverDisplayPair(): List<Pair<String, AlignmentEnum>> {
     if (QuiverAPI.currentArrow == null) return listOf("§cChange your Arrow once" to AlignmentEnum.LEFT)
-    return when (config.displayConfig.displayNumbersFirst) {
+    return when (displayConfig.displayNumbersFirst) {
         true -> listOf("${QuiverAPI.currentAmount.addSeparators()} ${QuiverAPI.currentArrow?.arrow} ")
         false -> listOf("§f${QuiverAPI.currentArrow?.arrow} ${QuiverAPI.currentAmount.addSeparators()} Arrows")
     }.map { it to AlignmentEnum.LEFT }
@@ -320,7 +322,7 @@ private fun getQuiverDisplayPair(): List<Pair<String, AlignmentEnum>> {
 
 private fun getQuiverShowWhen() = !listOf(IslandType.THE_RIFT).contains(HypixelData.skyBlockIsland)
 
-private fun getPowderDisplayPair() = when (config.displayConfig.displayNumbersFirst) {
+private fun getPowderDisplayPair() = when (displayConfig.displayNumbersFirst) {
     true -> listOf("§9§lPowder") + (" §7- §2$mithrilPowder Mithril") + (" §7- §d$gemstonePowder Gemstone")
     false -> listOf("§9§lPowder") + (" §7- §fMithril: §2$mithrilPowder") + (" §7- §fGemstone: §d$gemstonePowder")
 }.map { it to AlignmentEnum.LEFT }
@@ -355,7 +357,7 @@ private fun getMayorShowWhen() =
     !listOf(IslandType.THE_RIFT).contains(HypixelData.skyBlockIsland) && MayorElection.currentCandidate != null
 
 private fun getPartyDisplayPair() =
-    if (PartyAPI.partyMembers.isEmpty() && config.informationFilteringConfig.hideEmptyLines) {
+    if (PartyAPI.partyMembers.isEmpty() && informationFilteringConfig.hideEmptyLines) {
         listOf("<hidden>" to AlignmentEnum.LEFT)
     } else {
         val title =
@@ -383,7 +385,7 @@ private fun getPartyShowWhen() = when (inDungeons) {
 
 private fun getFooterDisplayPair(): List<Pair<String, AlignmentEnum>> {
     return listOf(
-        config.displayConfig.titleAndFooter.customFooter.get().toString()
+        displayConfig.titleAndFooter.customFooter.get().toString()
             .replace("&", "§") to getTitleAndFooterAlignment()
     )
 }
