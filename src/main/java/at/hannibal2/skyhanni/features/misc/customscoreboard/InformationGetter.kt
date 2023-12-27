@@ -28,11 +28,11 @@ object InformationGetter {
         // I know this could maybe be solved better but honestly idc anymore
         val knownLines = listOf(
             "§cServer closing: ",
-            "Instance Shutdow",
+            /*"Instance Shutdow",
             "§f§lWave: §c§l",
             "§fTokens: ",
             "Submerges In: §e",
-            "§fObjective",
+            "§fObjective",*/
             "Objective",
             "Event Start: §a",
             "Next Wave: §a",
@@ -62,7 +62,7 @@ object InformationGetter {
             "Pool: §6"
         )
 
-        unknownLines = sidebarLines.toMutableList().filter { it.isNotBlank() }.map { it.replace("§r", "") }
+        unknownLines = sidebarLines.toMutableList().filter { it.isNotBlank() }.map { it.removeResets() }
 
         /*
          * remove with pattern
