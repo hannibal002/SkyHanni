@@ -13,20 +13,6 @@ object InformationGetter {
     fun getInformation() {
         val sidebarLines = ScoreboardData.sidebarLinesFormatted
 
-        for (quirkyLine in sidebarLines) {
-            val line = quirkyLine.trimWhiteSpaceAndResets().removeResets()
-
-            ScoreboardPattern.heatPattern.matchMatcher(line) {
-                heat = group("heat")
-            }
-            ScoreboardPattern.locationPattern.matchMatcher(line) {
-                location = group("location")
-            }
-            ScoreboardPattern.lobbyCodePattern.matchMatcher(line) {
-                lobbyCode = group("code")
-            }
-        }
-
         for (quirkyLine in TabListData.getTabList()) {
             val line = quirkyLine.trimWhiteSpaceAndResets().removeResets()
 
@@ -36,16 +22,6 @@ object InformationGetter {
             ScoreboardPattern.bankPattern.matchMatcher(line) {
                 bank = group("bank")
             }
-            ScoreboardPattern.mithrilPowderPattern.matchMatcher(line) {
-                mithrilPowder = group("mithrilpowder")
-            }
-            ScoreboardPattern.gemstonePowderPattern.matchMatcher(line) {
-                gemstonePowder = group("gemstonepowder")
-            }
-        }
-
-        if (sidebarLines.none { ScoreboardPattern.heatPattern.matches(it) }) {
-            heat = "§c♨ 0"
         }
 
         // I know this could maybe be solved better but honestly idc anymore

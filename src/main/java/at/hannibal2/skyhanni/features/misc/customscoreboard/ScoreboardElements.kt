@@ -20,6 +20,7 @@ import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.RenderUtils.AlignmentEnum
 import at.hannibal2.skyhanni.utils.StringUtils.firstLetterUppercase
 import at.hannibal2.skyhanni.utils.StringUtils.matches
+import at.hannibal2.skyhanni.utils.TabListData
 import at.hannibal2.skyhanni.utils.TimeUnit
 import at.hannibal2.skyhanni.utils.TimeUtils
 import at.hannibal2.skyhanni.utils.TimeUtils.formatted
@@ -33,11 +34,6 @@ private val informationFilteringConfig get() = config.informationFilteringConfig
 // Stats / Numbers
 var bank = "0"
 var gems = "0"
-var location = "None"
-var lobbyCode = "None"
-var heat = "0"
-var mithrilPowder = "0"
-var gemstonePowder = "0"
 var unknownLines = listOf<String>()
 
 val extraObjectiveLines = listOf("§7(§e", "§f Mages", "§f Barbarians")
@@ -131,7 +127,7 @@ private fun getProfileDisplayPair() =
     listOf(CustomScoreboardUtils.getProfileTypeSymbol() + HypixelData.profileName.firstLetterUppercase() to AlignmentEnum.LEFT)
 
 private fun getPurseDisplayPair(): List<Pair<String, AlignmentEnum>> {
-    val purse = getGroupFromPattern(ScoreboardPattern.pursePattern, "purse")
+    val purse = getGroupFromPattern(ScoreboardData.sidebarLinesFormatted, ScoreboardPattern.pursePattern, "purse")
 
     return when {
         informationFilteringConfig.hideEmptyLines && purse == "0" -> listOf("<hidden>")
@@ -143,7 +139,7 @@ private fun getPurseDisplayPair(): List<Pair<String, AlignmentEnum>> {
 private fun getPurseShowWhen() = !listOf(IslandType.THE_RIFT).contains(HypixelData.skyBlockIsland)
 
 private fun getMotesDisplayPair(): List<Pair<String, AlignmentEnum>> {
-    val motes = getGroupFromPattern(ScoreboardPattern.motesPattern, "motes")
+    val motes = getGroupFromPattern(ScoreboardData.sidebarLinesFormatted, ScoreboardPattern.motesPattern, "motes")
 
     return when {
         informationFilteringConfig.hideEmptyLines && motes == "0" -> listOf("<hidden>")
@@ -191,7 +187,7 @@ private fun getBitsDisplayPair(): List<Pair<String, AlignmentEnum>> {
 private fun getBitsShowWhen() = !listOf(IslandType.CATACOMBS).contains(HypixelData.skyBlockIsland)
 
 private fun getCopperDisplayPair(): List<Pair<String, AlignmentEnum>> {
-    val copper = getGroupFromPattern(ScoreboardPattern.copperPattern, "copper")
+    val copper = getGroupFromPattern(ScoreboardData.sidebarLinesFormatted, ScoreboardPattern.copperPattern, "copper")
 
     return when {
         informationFilteringConfig.hideEmptyLines && copper == "0" -> listOf("<hidden>")
@@ -210,11 +206,15 @@ private fun getGemsDisplayPair() = when {
 
 private fun getGemsShowWhen() = !listOf(IslandType.THE_RIFT, IslandType.CATACOMBS).contains(HypixelData.skyBlockIsland)
 
-private fun getHeatDisplayPair() = when {
-    informationFilteringConfig.hideEmptyLines && heat == "§c♨ 0" -> listOf("<hidden>")
-    displayConfig.displayNumbersFirst -> listOf(if (heat == "§c♨ 0") "§c♨ 0 Heat" else "$heat Heat")
-    else -> listOf(if (heat == "§c♨ 0") "Heat: §c♨ 0" else "Heat: $heat")
-}.map { it to AlignmentEnum.LEFT }
+private fun getHeatDisplayPair(): List<Pair<String, AlignmentEnum>> {
+    val heat = getGroupFromPattern(ScoreboardData.sidebarLinesFormatted, ScoreboardPattern.heatPattern, "heat")
+
+    return when {
+        informationFilteringConfig.hideEmptyLines && heat == "§c♨ 0" -> listOf("<hidden>")
+        displayConfig.displayNumbersFirst -> listOf(if (heat == "§c♨ 0") "§c♨ 0 Heat" else "$heat Heat")
+        else -> listOf(if (heat == "§c♨ 0") "Heat: §c♨ 0" else "Heat: $heat")
+    }.map { it to AlignmentEnum.LEFT }
+}
 
 private fun getHeatShowWhen() = listOf(IslandType.CRYSTAL_HOLLOWS).contains(HypixelData.skyBlockIsland)
 
@@ -225,7 +225,10 @@ private fun getIslandDisplayPair() =
         .joinToString(" ") { it.firstLetterUppercase() } to AlignmentEnum.LEFT)
 
 private fun getLocationDisplayPair() =
-    listOf((replaceString(location)?.trim() ?: "<hidden>") to AlignmentEnum.LEFT)
+    listOf(
+        (replaceString(getGroupFromPattern(ScoreboardData.sidebarLinesFormatted, ScoreboardPattern.locationPattern, "location"))?.trim()
+            ?: "<hidden>") to AlignmentEnum.LEFT
+    )
 
 
 private fun getVisitDisplayPair() =
@@ -247,12 +250,13 @@ private fun getTimeDisplayPair(): List<Pair<String, AlignmentEnum>> {
         }
     }
     return listOf(
-        "§7a" + SkyBlockTime.now()
+        "§7" + SkyBlockTime.now()
             .formatted(dayAndMonthElement = false, yearElement = false) to AlignmentEnum.LEFT
     )
 }
 
-private fun getLobbyDisplayPair() = listOf("§8$lobbyCode" to AlignmentEnum.LEFT)
+private fun getLobbyDisplayPair() =
+    listOf("§8${getGroupFromPattern(ScoreboardData.sidebarLinesFormatted, ScoreboardPattern.lobbyCodePattern, "code")}" to AlignmentEnum.LEFT)
 
 private fun getPowerDisplayPair() = when (MaxwellAPI.currentPower) {
     null -> listOf("§c§lVisit Maxwell!" to AlignmentEnum.LEFT)
@@ -337,10 +341,15 @@ private fun getQuiverDisplayPair(): List<Pair<String, AlignmentEnum>> {
 
 private fun getQuiverShowWhen() = !listOf(IslandType.THE_RIFT).contains(HypixelData.skyBlockIsland)
 
-private fun getPowderDisplayPair() = when (displayConfig.displayNumbersFirst) {
-    true -> listOf("§9§lPowder") + (" §7- §2$mithrilPowder Mithril") + (" §7- §d$gemstonePowder Gemstone")
-    false -> listOf("§9§lPowder") + (" §7- §fMithril: §2$mithrilPowder") + (" §7- §fGemstone: §d$gemstonePowder")
-}.map { it to AlignmentEnum.LEFT }
+private fun getPowderDisplayPair(): List<Pair<String, AlignmentEnum>> {
+    val mithrilPowder = getGroupFromPattern(TabListData.getTabList(), ScoreboardPattern.powderPattern, "mithrilPowder")
+    val gemstonePowder = getGroupFromPattern(TabListData.getTabList(), ScoreboardPattern.powderPattern, "gemstonePowder")
+
+    return when (displayConfig.displayNumbersFirst) {
+        true -> listOf("§9§lPowder") + (" §7- §2$mithrilPowder Mithril") + (" §7- §d$gemstonePowder Gemstone")
+        false -> listOf("§9§lPowder") + (" §7- §fMithril: §2$mithrilPowder") + (" §7- §fGemstone: §d$gemstonePowder")
+    }.map { it to AlignmentEnum.LEFT }
+}
 
 private fun getPowderShowWhen() =
     listOf(IslandType.CRYSTAL_HOLLOWS, IslandType.DWARVEN_MINES).contains(HypixelData.skyBlockIsland)

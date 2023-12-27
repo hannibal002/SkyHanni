@@ -7,18 +7,21 @@ import at.hannibal2.skyhanni.mixins.transformers.AccessorGuiPlayerTabOverlay
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.RenderUtils.AlignmentEnum
 import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
+import at.hannibal2.skyhanni.utils.StringUtils.removeResets
+import at.hannibal2.skyhanni.utils.StringUtils.trimWhiteSpaceAndResets
 import net.minecraft.client.Minecraft
 import java.util.regex.Pattern
 
 object CustomScoreboardUtils {
     private val config get() = SkyHanniMod.feature.gui.customScoreboard
 
-    fun getGroupFromPattern(pattern: Pattern, group: String): String {
-        return ScoreboardData.sidebarLinesFormatted.firstNotNullOfOrNull { line ->
-            pattern.matchMatcher(line) {
-                group(group)
-            }
-        } ?: "0"
+    fun getGroupFromPattern(list: List<String>, pattern: Pattern, group: String): String {
+        return list.map { it.removeResets().trimWhiteSpaceAndResets().removeResets() }
+            .firstNotNullOfOrNull { line ->
+                pattern.matchMatcher(line) {
+                    group(group)
+                }
+            } ?: "0"
     }
 
     fun getProfileTypeSymbol(): String {
