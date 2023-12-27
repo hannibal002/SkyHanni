@@ -4,6 +4,7 @@ import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.data.ScoreboardData
 import at.hannibal2.skyhanni.features.misc.customscoreboard.ScoreboardEvents.VOTING
+import at.hannibal2.skyhanni.features.rift.area.stillgorechateau.RiftBloodEffigies
 import at.hannibal2.skyhanni.utils.LorenzUtils.inDungeons
 import at.hannibal2.skyhanni.utils.LorenzUtils.isInIsland
 import at.hannibal2.skyhanni.utils.LorenzUtils.nextAfter
@@ -531,11 +532,11 @@ private fun getEssenceShowWhen(): Boolean {
 }
 
 private fun getEffigiesLines(): List<String> {
-    return listOf(getSbLines().first { SbPattern.effigiesPattern.matches(it) })
+    return listOf(getSbLines().first { RiftBloodEffigies.heartsPattern.matches(it) })
 }
 
 private fun getEffigiesShowWhen(): Boolean {
-    return getSbLines().any { SbPattern.effigiesPattern.matches(it) }
+    return getSbLines().any { RiftBloodEffigies.heartsPattern.matches(it) }
 }
 
 private fun getNoneLines(): List<String> {
