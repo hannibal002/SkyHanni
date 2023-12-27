@@ -53,7 +53,7 @@ object QuiverAPI {
             currentArrow = QuiverArrowType.entries.find { arrow.contains(it.arrow) } ?: QuiverArrowType.NONE
             currentAmount = arrowAmount[currentArrow]?.toInt() ?: 0
 
-            saveArrowType()
+            return saveArrowType()
         }
 
         fillUpJaxPattern.matchMatcher(message) {
@@ -66,7 +66,7 @@ object QuiverAPI {
             val newAmount = existingAmount + amount
             arrowAmount[filledUpType] = newAmount
 
-            saveArrowAmount()
+            return saveArrowAmount()
         }
 
         fillUpPattern.matchMatcher(message) {
@@ -76,7 +76,7 @@ object QuiverAPI {
 
             arrowAmount[QuiverArrowType.FLINT] = newAmount
 
-            saveArrowAmount()
+            return saveArrowAmount()
         }
 
         clearedPattern.matchMatcher(message) {
