@@ -108,7 +108,7 @@ class CustomScoreboard {
         }
     }
 
-    private fun isCustomScoreboardEnabled() = config.enabled && LorenzUtils.inSkyBlock
+    private fun isCustomScoreboardEnabled() = LorenzUtils.inSkyBlock && config.enabled
     private fun isHideVanillaScoreboardEnabled() =
-        config.displayConfig.hideVanillaScoreboard && LorenzUtils.inSkyBlock && config.enabled
+        LorenzUtils.inSkyBlock && config.enabled && config.displayConfig.hideVanillaScoreboard
 }
