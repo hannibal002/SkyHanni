@@ -20,6 +20,5 @@ public class PartyConfig {
     @Expose
     @ConfigOption(name = "Show Party everywhere", desc = "Show the party list everywhere.\nIf disabled, it will only show in Dungeon hub, Crimson Isle & Kuudra")
     @ConfigEditorBoolean
-    @FeatureToggle
     public boolean showPartyEverywhere = false;
 }

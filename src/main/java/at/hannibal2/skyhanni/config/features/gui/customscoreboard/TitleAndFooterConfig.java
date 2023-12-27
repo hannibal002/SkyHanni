@@ -1,6 +1,5 @@
 package at.hannibal2.skyhanni.config.features.gui.customscoreboard;
 
-import at.hannibal2.skyhanni.config.FeatureToggle;
 import com.google.gson.annotations.Expose;
 import io.github.moulberry.moulconfig.annotations.ConfigEditorBoolean;
 import io.github.moulberry.moulconfig.annotations.ConfigEditorText;
@@ -11,7 +10,6 @@ public class TitleAndFooterConfig {
     @Expose
     @ConfigOption(name = "Center Title and Footer", desc = "Center the title and footer to the scoreboard width.")
     @ConfigEditorBoolean
-    @FeatureToggle
     public boolean centerTitleAndFooter = false;
 
     @Expose
@@ -22,7 +20,6 @@ public class TitleAndFooterConfig {
     @Expose
     @ConfigOption(name = "Use Hypixel's Title Animation", desc = "Will overwrite the custom title with Hypixel's title animation.")
     @ConfigEditorBoolean
-    @FeatureToggle
     public boolean useHypixelTitleAnimation = false;
 
     @Expose

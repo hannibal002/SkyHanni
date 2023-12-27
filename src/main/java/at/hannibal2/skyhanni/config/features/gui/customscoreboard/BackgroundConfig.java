@@ -1,6 +1,5 @@
 package at.hannibal2.skyhanni.config.features.gui.customscoreboard;
 
-import at.hannibal2.skyhanni.config.FeatureToggle;
 import com.google.gson.annotations.Expose;
 import io.github.moulberry.moulconfig.annotations.ConfigEditorBoolean;
 import io.github.moulberry.moulconfig.annotations.ConfigEditorColour;
@@ -14,7 +13,6 @@ public class BackgroundConfig {
         desc = "Show a background behind the scoreboard."
     )
     @ConfigEditorBoolean
-    @FeatureToggle
     public boolean enabled = true;
 
     @Expose
@@ -31,7 +29,6 @@ public class BackgroundConfig {
         desc = "Put that image into a resource pack, using the path \"skyhanni/scoreboard.png\"."
     )
     @ConfigEditorBoolean
-    @FeatureToggle
     public boolean useCustomBackgroundImage = false;
 
     @Expose

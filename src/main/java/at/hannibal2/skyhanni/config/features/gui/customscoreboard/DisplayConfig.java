@@ -17,19 +17,16 @@ public class DisplayConfig {
     @ConfigOption(name = "Display Numbers First", desc = "Determines whether the number or line name displays first. " +
         "§eNote: Will not update the preview above!")
     @ConfigEditorBoolean
-    @FeatureToggle
     public boolean displayNumbersFirst = false;
 
     @Expose
     @ConfigOption(name = "Show unclaimed bits", desc = "Show the amount of available Bits that can still be claimed.")
     @ConfigEditorBoolean
-    @FeatureToggle
     public boolean showUnclaimedBits = false;
 
     @Expose
     @ConfigOption(name = "Show all active events", desc = "Show all active events in the scoreboard instead of one.")
     @ConfigEditorBoolean
-    @FeatureToggle
     public boolean showAllActiveEvents = false;
 
     @Expose
