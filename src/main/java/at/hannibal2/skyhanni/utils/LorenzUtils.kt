@@ -3,7 +3,7 @@ package at.hannibal2.skyhanni.utils
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.data.HypixelData
 import at.hannibal2.skyhanni.data.IslandType
-import at.hannibal2.skyhanni.data.MayorElection
+import at.hannibal2.skyhanni.data.MayorAPI
 import at.hannibal2.skyhanni.data.TitleManager
 import at.hannibal2.skyhanni.features.dungeon.DungeonAPI
 import at.hannibal2.skyhanni.mixins.transformers.AccessorGuiEditSign
@@ -516,6 +516,28 @@ object LorenzUtils {
         return null
     }
 
+    fun List<String>.removeNextAfter(after: String, skip: Int = 1) = removeNextAfter({ it == after }, skip)
+
+    fun List<String>.removeNextAfter(after: (String) -> Boolean, skip: Int = 1): List<String> {
+        val newList = mutableListOf<String>()
+        var missing = -1
+        for (line in this) {
+            if (after(line)) {
+                missing = skip - 1
+                continue
+            }
+            if (missing == 0) {
+                missing--
+                continue
+            }
+            if (missing != -1) {
+                missing--
+            }
+            newList.add(line)
+        }
+        return newList
+    }
+
     fun GuiEditSign.isRancherSign(): Boolean {
         if (this !is AccessorGuiEditSign) return false
 
@@ -596,7 +618,7 @@ object LorenzUtils {
     fun <T> List<T>.indexOfFirst(vararg args: T) = args.map { indexOf(it) }.firstOrNull { it != -1 }
 
     private val recalculateDerpy =
-        RecalculatingValue(1.seconds) { MayorElection.isPerkActive("Derpy", "DOUBLE MOBS HP!!!") }
+        RecalculatingValue(1.seconds) { MayorAPI.isPerkActive("Derpy", "DOUBLE MOBS HP!!!") }
 
     val isDerpy get() = recalculateDerpy.getValue()
 
