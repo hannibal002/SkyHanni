@@ -208,7 +208,7 @@ object DiscordRPCManager : IPCListener {
         }
     }
 
-    // ScoreboardEvents that change things in DiscordStatus
+    // Events that change things in DiscordStatus
     @SubscribeEvent
     fun onKeybind(event: LorenzKeyPressEvent) {
         if (!isEnabled() || !PriorityEntry.AFK.isSelected()) return // autoPriority 4 is dynamic afk
