@@ -111,7 +111,7 @@ class MinionXp {
             val name = item.name
             val xp = xpInfoMap[name] ?: return@forEach
 
-            // TODO add wisdom and temporary skill exp (ScoreboardEvents) to calculation
+            // TODO add wisdom and temporary skill exp (Events) to calculation
             val baseXp = xp.amount * item.stackSize
             val xpAmount = if (MayorAPI.isPerkActive("Derpy", "MOAR SKILLZ!!!")) {
                 baseXp * 1.5
