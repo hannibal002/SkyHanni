@@ -28,7 +28,7 @@ import at.hannibal2.skyhanni.data.ItemRenderBackground
 import at.hannibal2.skyhanni.data.ItemTipHelper
 import at.hannibal2.skyhanni.data.LocationFixData
 import at.hannibal2.skyhanni.data.MaxwellAPI
-import at.hannibal2.skyhanni.data.MayorElection
+import at.hannibal2.skyhanni.data.MayorAPI
 import at.hannibal2.skyhanni.data.MinecraftData
 import at.hannibal2.skyhanni.data.OtherInventoryData
 import at.hannibal2.skyhanni.data.OwnInventoryData
@@ -408,7 +408,7 @@ class SkyHanniMod {
         loadModule(GuiEditManager())
         loadModule(UpdateManager)
         loadModule(CropAccessoryData())
-        loadModule(MayorElection())
+        loadModule(MayorAPI())
         loadModule(GardenComposterUpgradesData())
         loadModule(ActionBarStatsData)
         loadModule(GardenCropMilestoneInventory())

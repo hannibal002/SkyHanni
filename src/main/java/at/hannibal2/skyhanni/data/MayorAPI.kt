@@ -13,21 +13,43 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
-class MayorElection {
+object MayorAPI {
     private var lastUpdate = 0L
     private var dispatcher = Dispatchers.IO
 
-    companion object {
-        var rawMayorData: MayorJson? = null
-        var candidates = mapOf<Int, MayorJson.Candidate>()
-        var currentMayor: MayorJson.Candidate? = null
-        var timeTillNextMayor = 0L
+    var rawMayorData: MayorJson? = null
+    var candidates = mapOf<Int, MayorJson.Candidate>()
+    var currentMayor: MayorJson.Candidate? = null
+    var timeTillNextMayor = 0L
 
-        fun isPerkActive(mayor: String, perk: String) = currentMayor?.let { currentCandidate ->
-            currentCandidate.name == mayor && currentCandidate.perks.any { it.name == perk }
-        } ?: false
+    fun isPerkActive(mayor: String, perk: String) = currentMayor?.let { currentCandidate ->
+        currentCandidate.name == mayor && currentCandidate.perks.any { it.name == perk }
+    } ?: false
+
+    /*
+     * @param input: The name of the mayor
+     * @return: The neu color of the mayor + the name of the mayor; If no mayor was found, it will return "§cUnknown Mayor: §7$input"
+     */
+    fun mayorNameToColorCode(input: String): String {
+        return when (input) {
+            // Normal Mayors
+            "Aatrox" -> "§3$input"
+            "Cole" -> "§e$input"
+            "Diana" -> "§2$input"
+            "Diaz" -> "§6$input"
+            "Finnegan" -> "§c$input"
+            "Foxy" -> "§d$input"
+            "Marina" -> "§b$input"
+            "Paul" -> "§c$input"
+
+            // Special Mayors
+            "Scorpius" -> "§d$input"
+            "Jerry" -> "§d$input"
+            "Derpy" -> "§d$input"
+            "Dante" -> "§d$input"
+            else -> "§cUnknown Mayor: §7$input"
+        }
     }
-
     @SubscribeEvent
     fun onTick(event: LorenzTickEvent) {
         if (!LorenzUtils.onHypixel) return
