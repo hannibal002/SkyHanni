@@ -11,8 +11,6 @@ import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalNameOrNull
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.LorenzUtils
-import at.hannibal2.skyhanni.utils.NEUInternalName
-import at.hannibal2.skyhanni.utils.NEUInternalName.Companion.asInternalName
 import at.hannibal2.skyhanni.utils.NumberUtil.formatNumber
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getEnchantments
 import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
@@ -26,27 +24,10 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
 private var infinityQuiverLevelMultiplier = 0.03f
 
-enum class Arrows(val arrow: String, val internalName: NEUInternalName) {
-    NONE("None", "NONE".asInternalName()),
-    SLIME_BALL("Slime Ball", "SLIME_BALL".asInternalName()),
-    PRISMARINE_SHARD("Prismarine Shard", "PRISMARINE_SHARD".asInternalName()),
-    FLINT("Flint Arrow", "ARROW".asInternalName()),
-    REINFORCED_IRON_ARROW("Reinforced Iron Arrow", "REINFORCED_IRON_ARROW".asInternalName()),
-    GOLD_TIPPED_ARROW("Gold-tipped Arrow", "GOLD_TIPPED_ARROW".asInternalName()),
-    REDSTONE_TIPPED_ARROW("Redstone-tipped Arrow", "REDSTONE_TIPPED_ARROW".asInternalName()),
-    EMERALD_TIPPED_ARROW("Emerald-tipped Arrow", "EMERALD_TIPPED_ARROW".asInternalName()),
-    BOUNCY_ARROW("Bouncy Arrow", "BOUNCY_ARROW".asInternalName()),
-    ICY_ARROW("Icy Arrow", "ICY_ARROW".asInternalName()),
-    ARMORSHRED_ARROW("Armorshred Arrow", "ARMORSHRED_ARROW".asInternalName()),
-    EXPLOSIVE_ARROW("Explosive Arrow", "EXPLOSIVE_ARROW".asInternalName()),
-    GLUE_ARROW("Glue Arrow", "GLUE_ARROW".asInternalName()),
-    NANSORB_ARROW("Nansorb Arrow", "NANSORB_ARROW".asInternalName()),
-}
-
 object QuiverAPI {
-    var currentArrow: Arrows? = null
+    var currentArrow: QuiverArrowType? = null
     var currentAmount: Int = 0
-    var arrowAmount: MutableMap<Arrows, Float> = mutableMapOf()
+    var arrowAmount: MutableMap<QuiverArrowType, Float> = mutableMapOf()
 
     private val group = RepoPattern.group("data.quiver.chat")
     private val selectPattern by group.pattern("select", "§aYou set your selected arrow type to §f(?<arrow>.*)§a!")
@@ -66,7 +47,7 @@ object QuiverAPI {
 
         selectPattern.matchMatcher(message) {
             val arrow = group("arrow")
-            currentArrow = Arrows.entries.find { arrow.contains(it.arrow) } ?: Arrows.NONE
+            currentArrow = QuiverArrowType.entries.find { arrow.contains(it.arrow) } ?: QuiverArrowType.NONE
             currentAmount = arrowAmount[currentArrow]?.toInt() ?: 0
 
             saveArrowType()
@@ -76,7 +57,7 @@ object QuiverAPI {
             val type = group("type")
             val amount = group("amount").formatNumber().toFloat()
 
-            val filledUpType = Arrows.entries.find { type.contains(it.arrow) } ?: return
+            val filledUpType = QuiverArrowType.entries.find { type.contains(it.arrow) } ?: return
 
             val existingAmount = arrowAmount[filledUpType] ?: 0f
             val newAmount = existingAmount + amount
@@ -87,10 +68,10 @@ object QuiverAPI {
 
         fillUpPattern.matchMatcher(message) {
             val flintAmount = group("flintAmount").formatNumber().toFloat()
-            val existingAmount = arrowAmount[Arrows.FLINT] ?: 0.0f
+            val existingAmount = arrowAmount[QuiverArrowType.FLINT] ?: 0.0f
             val newAmount = existingAmount + flintAmount
 
-            arrowAmount[Arrows.FLINT] = newAmount
+            arrowAmount[QuiverArrowType.FLINT] = newAmount
 
             saveArrowAmount()
         }
@@ -121,7 +102,7 @@ object QuiverAPI {
             val arrow = stack.getInternalNameOrNull() ?: continue
             val amount = stack.stackSize
 
-            val arrowType = Arrows.entries.find { arrow == it.internalName } ?: continue
+            val arrowType = QuiverArrowType.entries.find { arrow == it.internalName } ?: continue
             val arrowAmount = amount + (this.arrowAmount[arrowType] ?: 0.0f)
 
             this.arrowAmount[arrowType] = arrowAmount
