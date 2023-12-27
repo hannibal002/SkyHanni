@@ -21,6 +21,7 @@ class LimboTimeTracker {
     private val config get() = SkyHanniMod.feature.misc
 
     private var limboJoinTime = SimpleTimeMark.farPast()
+    private var inLimbo = false
     private var shownPB = false
     private var oldPB: Duration = 0.seconds
     private var userLuck: Double = 0.0
@@ -30,20 +31,22 @@ class LimboTimeTracker {
     fun onChat(event: LorenzChatEvent) {
         if (event.message == "§cYou are AFK. Move around to return from AFK." || event.message == "§cYou were spawned in Limbo.") {
             limboJoinTime = SimpleTimeMark.now()
+            inLimbo = true
+            LimboCommands.enterLimbo(limboJoinTime)
         }
     }
 
     @SubscribeEvent
     fun catchPlaytime(event: MessageSendToServerEvent) {
-        if (event.message.startsWith("/playtime") && LimboCommands.inLimbo) {
+        if (event.message.startsWith("/playtime") && inLimbo) {
             event.isCanceled
-            LimboCommands.printPlaytime()
+            LimboCommands.printPlaytime(true)
         }
     }
 
     @SubscribeEvent
     fun onTick(event: LorenzTickEvent) {
-        if (LimboCommands.inLimbo && !shownPB && limboJoinTime.passedSince() >= config.limboTimePB.seconds && config.limboTimePB != 0) {
+        if (inLimbo && !shownPB && limboJoinTime.passedSince() >= config.limboTimePB.seconds && config.limboTimePB != 0) {
             shownPB = true
             oldPB = config.limboTimePB.seconds
             LorenzUtils.chat("§d§lPERSONAL BEST§f! You've surpassed your previous record of §e$oldPB§f!")
@@ -53,14 +56,14 @@ class LimboTimeTracker {
 
     @SubscribeEvent
     fun onWorldChange(event: LorenzWorldChangeEvent) {
-        if (!LimboCommands.inLimbo) return
+        if (!inLimbo) return
         leaveLimbo()
     }
 
     @SubscribeEvent
     fun onRenderOverlay(event: GuiRenderEvent.GuiOverlayRenderEvent) {
         if (!isEnabled()) return
-        if (!LimboCommands.inLimbo) return
+        if (!inLimbo) return
 
         if (LorenzUtils.inSkyBlock) {
             leaveLimbo()
@@ -72,9 +75,9 @@ class LimboTimeTracker {
     }
 
     private fun leaveLimbo() {
-        LimboCommands.inLimbo = false
+        inLimbo = false
         if (!isEnabled()) return
-        val passedSince = limboJoinTime.passedSince()
+        var passedSince = limboJoinTime.passedSince()
         val duration = passedSince.format()
         val currentPB = config.limboTimePB.seconds
         if (passedSince > currentPB) {
@@ -85,6 +88,8 @@ class LimboTimeTracker {
             userLuck = config.limboTimePB * userLuckMultiplier
             LorenzUtils.chat("§fYour §aPersonal Bests§f perk is now granting you §a+${userLuck.round(2)}✴ SkyHanni User Luck§f!")
         } else LorenzUtils.chat("§fYou were AFK in Limbo for §e$duration§f.")
+        config.limboPlaytime += passedSince.toInt(DurationUnit.SECONDS)
+        passedSince = 0.seconds
         shownPB = false
     }
 

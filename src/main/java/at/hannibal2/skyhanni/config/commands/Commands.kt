@@ -233,6 +233,10 @@ object Commands {
             "shlimboplaytime",
             "Prints your Limbo Playtime"
         ) { LimboCommands.printPlaytime() }
+        registerCommand(
+            "shlimbopt",
+            "Prints your Limbo Playtime"
+        ) { LimboCommands.printPlaytime() }
     }
 
     private fun usersBugFix() {
