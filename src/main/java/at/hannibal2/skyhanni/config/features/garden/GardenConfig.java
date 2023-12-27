@@ -120,6 +120,11 @@ public class GardenConfig {
     public GardenCommandsConfig gardenCommands = new GardenCommandsConfig();
 
     @Expose
+    @ConfigOption(name = "Jacob Contest Stats", desc = "")
+    @Accordion
+    public JacobContestStatsConfig jacobContestStats = new JacobContestStatsConfig();
+
+    @Expose
     @ConfigOption(name = "Plot Price", desc = "Show the price of the plot in coins when inside the Configure Plots inventory.")
     @ConfigEditorBoolean
     @FeatureToggle
@@ -190,15 +195,6 @@ public class GardenConfig {
 
     @Expose
     public Position jacobContextTimesPos = new Position(-359, 149, false, true);
-
-    @Expose
-    @ConfigOption(
-        name = "Contest Summary",
-        desc = "Show the average Blocks Per Second and blocks clicked at the end of a Jacob Farming Contest in chat."
-    )
-    @ConfigEditorBoolean
-    @FeatureToggle
-    public boolean jacobContestSummary = true;
 
     @Expose
     @ConfigOption(name = "Always Finnegan", desc = "Forcefully set the Finnegan Farming Simulator perk to be active. This is useful if the auto mayor detection fails.")
