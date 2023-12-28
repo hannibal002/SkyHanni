@@ -39,66 +39,72 @@ object UnknownLinesHandler {
         /*
          * remove with pattern
         */
-        unknownLines = unknownLines.filter { !PurseAPI.pursePattern.matches(it) }
-        unknownLines = unknownLines.filter { !ScoreboardPattern.motesPattern.matches(it) }
-        unknownLines = unknownLines.filter { !BitsAPI.bitsScoreboardPattern.matches(it) }
-        unknownLines = unknownLines.filter { !ScoreboardPattern.heatPattern.matches(it) }
-        unknownLines = unknownLines.filter { !ScoreboardPattern.copperPattern.matches(it) }
-        unknownLines = unknownLines.filter { !ScoreboardPattern.locationPattern.matches(it) }
-        unknownLines = unknownLines.filter { !ScoreboardPattern.lobbyCodePattern.matches(it) }
-        unknownLines = unknownLines.filter { !ScoreboardPattern.datePattern.matches(it) }
-        unknownLines = unknownLines.filter { !ScoreboardPattern.timePattern.matches(it) }
-        unknownLines = unknownLines.filter { !ScoreboardPattern.footerPattern.matches(it) }
-        unknownLines = unknownLines.filter { !ScoreboardPattern.yearVotesPattern.matches(it) }
-        unknownLines = unknownLines.filter { !ScoreboardPattern.votesPattern.matches(it) }
-        unknownLines = unknownLines.filter { !ScoreboardPattern.waitingForVotePattern.matches(it) }
-        unknownLines = unknownLines.filter { !ScoreboardPattern.northstarsPattern.matches(it) }
-        unknownLines = unknownLines.filter { !ScoreboardPattern.profileTypePattern.matches(it) }
-        unknownLines = unknownLines.filter { !ScoreboardPattern.autoClosingPattern.matches(it) }
-        unknownLines = unknownLines.filter { !ScoreboardPattern.startingInPattern.matches(it) }
-        unknownLines = unknownLines.filter { !ScoreboardPattern.timeElapsedPattern.matches(it) }
-        unknownLines = unknownLines.filter { !ScoreboardPattern.keysPattern.matches(it) }
-        unknownLines = unknownLines.filter { !ScoreboardPattern.clearedPattern.matches(it) }
-        unknownLines = unknownLines.filter { !ScoreboardPattern.soloPattern.matches(it) }
-        unknownLines = unknownLines.filter { !ScoreboardPattern.teammatesPattern.matches(it) }
-        unknownLines = unknownLines.filter { !ScoreboardPattern.medalsPattern.matches(it) }
-        unknownLines = unknownLines.filter { !ScoreboardPattern.lockedPattern.matches(it) }
-        unknownLines = unknownLines.filter { !ScoreboardPattern.cleanUpPattern.matches(it) }
-        unknownLines = unknownLines.filter { !ScoreboardPattern.pastingPattern.matches(it) }
-        unknownLines = unknownLines.filter { !ScoreboardPattern.powderPattern.matches(it) }
-        unknownLines = unknownLines.filter { !ScoreboardPattern.windCompassPattern.matches(it) }
-        unknownLines = unknownLines.filter { !ScoreboardPattern.windCompassArrowPattern.matches(it) }
-        unknownLines = unknownLines.filter { !ScoreboardPattern.miningEventPattern.matches(it) }
-        unknownLines = unknownLines.filter { !ScoreboardPattern.miningEventZonePattern.matches(it) }
-        unknownLines = unknownLines.filter { !ScoreboardPattern.raffleUselessPattern.matches(it) }
-        unknownLines = unknownLines.filter { !ScoreboardPattern.raffleTicketsPattern.matches(it) }
-        unknownLines = unknownLines.filter { !ScoreboardPattern.rafflePool.matches(it) }
-        unknownLines = unknownLines.filter { !ScoreboardPattern.mithrilUselessPattern.matches(it) }
-        unknownLines = unknownLines.filter { !ScoreboardPattern.mithrilRemainingPattern.matches(it) }
-        unknownLines = unknownLines.filter { !ScoreboardPattern.mithrilYourMithrilPattern.matches(it) }
-        unknownLines = unknownLines.filter { !ScoreboardPattern.magmaBossPattern.matches(it) }
-        unknownLines = unknownLines.filter { !ScoreboardPattern.damageSoakedPattern.matches(it) }
-        unknownLines = unknownLines.filter { !ScoreboardPattern.damagedSoakedBarPattern.matches(it) }
-        unknownLines = unknownLines.filter { !ScoreboardPattern.killMagmasPattern.matches(it) }
-        unknownLines = unknownLines.filter { !ScoreboardPattern.killMagmasBarPattern.matches(it) }
-        unknownLines = unknownLines.filter { !ScoreboardPattern.reformingPattern.matches(it) }
-        unknownLines = unknownLines.filter { !ScoreboardPattern.bossHealthPattern.matches(it) }
-        unknownLines = unknownLines.filter { !ScoreboardPattern.bossHealthBarPattern.matches(it) }
-        unknownLines = unknownLines.filter { !ScoreboardPattern.broodmotherPattern.matches(it) }
-        unknownLines = unknownLines.filter { !ScoreboardPattern.bossHPPattern.matches(it) }
-        unknownLines = unknownLines.filter { !ScoreboardPattern.bossDamagePattern.matches(it) }
-        unknownLines = unknownLines.filter { !ScoreboardPattern.essencePattern.matches(it) }
-        unknownLines = unknownLines.filter { !ScoreboardPattern.brokenRedstonePattern.matches(it) }
-        unknownLines = unknownLines.filter { !ScoreboardPattern.visitingPattern.matches(it) }
-        unknownLines = unknownLines.filter { !ScoreboardPattern.flightDurationPattern.matches(it) }
-        unknownLines = unknownLines.filter { !ScoreboardPattern.dojoChallengePattern.matches(it) }
-        unknownLines = unknownLines.filter { !ScoreboardPattern.dojoDifficultyPattern.matches(it) }
-        unknownLines = unknownLines.filter { !ScoreboardPattern.dojoPointsPattern.matches(it) }
-        unknownLines = unknownLines.filter { !ScoreboardPattern.dojoTimePattern.matches(it) }
-        unknownLines = unknownLines.filter { !ScoreboardPattern.objectivePattern.matches(it) }
-        unknownLines = unknownLines.filter { !ScoreboardPattern.travelingZooPattern.matches(it) }
-        unknownLines = unknownLines.filter { !ScoreboardPattern.riftDimensionPattern.matches(it) }
-        unknownLines = unknownLines.filter { !RiftBloodEffigies.heartsPattern.matches(it) }
+        val patternsToExclude = listOf(
+            PurseAPI.pursePattern,
+            ScoreboardPattern.motesPattern,
+            BitsAPI.bitsScoreboardPattern,
+            ScoreboardPattern.heatPattern,
+            ScoreboardPattern.copperPattern,
+            ScoreboardPattern.locationPattern,
+            ScoreboardPattern.lobbyCodePattern,
+            ScoreboardPattern.datePattern,
+            ScoreboardPattern.timePattern,
+            ScoreboardPattern.footerPattern,
+            ScoreboardPattern.yearVotesPattern,
+            ScoreboardPattern.votesPattern,
+            ScoreboardPattern.waitingForVotePattern,
+            ScoreboardPattern.northstarsPattern,
+            ScoreboardPattern.profileTypePattern,
+            ScoreboardPattern.autoClosingPattern,
+            ScoreboardPattern.startingInPattern,
+            ScoreboardPattern.timeElapsedPattern,
+            ScoreboardPattern.keysPattern,
+            ScoreboardPattern.clearedPattern,
+            ScoreboardPattern.soloPattern,
+            ScoreboardPattern.teammatesPattern,
+            ScoreboardPattern.medalsPattern,
+            ScoreboardPattern.lockedPattern,
+            ScoreboardPattern.cleanUpPattern,
+            ScoreboardPattern.pastingPattern,
+            ScoreboardPattern.powderPattern,
+            ScoreboardPattern.windCompassPattern,
+            ScoreboardPattern.windCompassArrowPattern,
+            ScoreboardPattern.miningEventPattern,
+            ScoreboardPattern.miningEventZonePattern,
+            ScoreboardPattern.raffleUselessPattern,
+            ScoreboardPattern.raffleTicketsPattern,
+            ScoreboardPattern.rafflePool,
+            ScoreboardPattern.mithrilUselessPattern,
+            ScoreboardPattern.mithrilRemainingPattern,
+            ScoreboardPattern.mithrilYourMithrilPattern,
+            ScoreboardPattern.magmaBossPattern,
+            ScoreboardPattern.damageSoakedPattern,
+            ScoreboardPattern.damagedSoakedBarPattern,
+            ScoreboardPattern.killMagmasPattern,
+            ScoreboardPattern.killMagmasBarPattern,
+            ScoreboardPattern.reformingPattern,
+            ScoreboardPattern.bossHealthPattern,
+            ScoreboardPattern.bossHealthBarPattern,
+            ScoreboardPattern.broodmotherPattern,
+            ScoreboardPattern.bossHPPattern,
+            ScoreboardPattern.bossDamagePattern,
+            ScoreboardPattern.essencePattern,
+            ScoreboardPattern.brokenRedstonePattern,
+            ScoreboardPattern.visitingPattern,
+            ScoreboardPattern.flightDurationPattern,
+            ScoreboardPattern.dojoChallengePattern,
+            ScoreboardPattern.dojoDifficultyPattern,
+            ScoreboardPattern.dojoPointsPattern,
+            ScoreboardPattern.dojoTimePattern,
+            ScoreboardPattern.objectivePattern,
+            ScoreboardPattern.travelingZooPattern,
+            ScoreboardPattern.riftDimensionPattern,
+            RiftBloodEffigies.heartsPattern
+        )
+
+        unknownLines = unknownLines.filter { line ->
+            patternsToExclude.none { pattern -> pattern.matches(line) }
+        }
 
 
         /*
