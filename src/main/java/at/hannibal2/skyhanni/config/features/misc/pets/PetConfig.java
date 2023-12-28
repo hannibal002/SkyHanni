@@ -28,4 +28,10 @@ public class PetConfig {
     @ConfigEditorBoolean
     @FeatureToggle
     public boolean hideAutopet = false;
+
+    @Expose
+    @ConfigOption(name = "Show Exp Share", desc = "Shows an §5⚘ §7by a pet when an exp share is equipped")
+    @ConfigEditorBoolean
+    @FeatureToggle
+    public boolean expShare = false;
 }

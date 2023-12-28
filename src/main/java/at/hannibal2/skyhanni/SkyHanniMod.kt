@@ -244,6 +244,7 @@ import at.hannibal2.skyhanni.features.misc.ParticleHider
 import at.hannibal2.skyhanni.features.misc.PartyMemberOutlines
 import at.hannibal2.skyhanni.features.misc.PatcherSendCoordinates
 import at.hannibal2.skyhanni.features.misc.PetCandyUsedDisplay
+import at.hannibal2.skyhanni.features.misc.PetExpShareDisplay
 import at.hannibal2.skyhanni.features.misc.PetExpTooltip
 import at.hannibal2.skyhanni.features.misc.PlayerChatSymbols
 import at.hannibal2.skyhanni.features.misc.PocketSackInASackDisplay
@@ -570,6 +571,7 @@ class SkyHanniMod {
         loadModule(MinionCollectLogic())
         loadModule(BetterSignEditing())
         loadModule(PatcherSendCoordinates())
+        loadModule(PetExpShareDisplay())
         loadModule(EstimatedItemValue)
         loadModule(EstimatedWardrobePrice())
         loadModule(ComposterInventoryNumbers())
