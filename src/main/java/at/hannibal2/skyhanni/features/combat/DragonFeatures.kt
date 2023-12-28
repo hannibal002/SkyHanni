@@ -30,6 +30,7 @@ class DragonFeatures {
     val dragonNamesAsRegex = dragonNames.joinToString("|")
     val dragonNamesUpperCaseAsRegex = dragonNames.joinToString("|") { it.uppercase() }
 
+    val protectorRepoGroup = RepoPattern.group("combat.boss.protector")
     val repoGroup = RepoPattern.group("combat.boss.dragon")
     val chatGroup = repoGroup.group("chat")
     val scoreBoardGroup = repoGroup.group("scoreboard")
@@ -40,15 +41,17 @@ class DragonFeatures {
 
     val eggSpawned by chatGroup.pattern("egg.spawn", "§5☬ §r§dThe Dragon Egg has spawned!")
     val endStartLineDragon by chatGroup.pattern("end.boss", "§f +§r§6§l(?<Dragon>${dragonNamesUpperCaseAsRegex}) DRAGON DOWN!")
-    val endStartLineProtector by RepoPattern.pattern("combat.boss.protector.chat.end.boss", "§f +§r§6§l ENDSTONE PROTECTOR DOWN!")
+    val endStartLineProtector by protectorRepoGroup.pattern("chat.end.boss", "§f +§r§6§l ENDSTONE PROTECTOR DOWN!")
     val endPosition by chatGroup.pattern("end.position", "§f +§r§eYour Damage: §r§a(?<Damage>[\\d.,]+) (?:§r§d§l\\(NEW RECORD!\\) )?§r§7\\(Position #(?<Position>\\d+)\\)")
 
     // val endFinalHit by chatGroup.pattern("end.final", "§f                 §r§b[^ ]+ (?<Name>.*)§r§f §r§7dealt the final blow.")
     val endLeaderboard by chatGroup.pattern("end.place", "§f +§r§.§l(?<Position>\\d+).. Damager §r§7- §r§.(?:\\[[^ ]+\\] )?(?<Name>.*)§r§. §r§7- §r§e(?<Damage>[\\d.,]+)")
-    val endZealots by RepoPattern.pattern("combat.boss.protector.chat.end.zealot", "§f +§r§eZealots Contributed: §r§a(?<Amount>\\d+)§r§e/100")
+    val endZealots by protectorRepoGroup.pattern("chat.end.zealot", "§f +§r§eZealots Contributed: §r§a(?<Amount>\\d+)§r§e/100")
     val dragonSpawn by chatGroup.pattern("spawn", "§5☬ §r§d§lThe §r§5§c§l(?<Dragon>${dragonNamesAsRegex}) Dragon§r§d§l has spawned!")
     val scoreDamage by scoreBoardGroup.pattern("damage", "Your Damage: §c(?<Damage>[\\w,.]+)")
     val scoreDragon by scoreBoardGroup.pattern("dragon", "Dragon HP: .*")
+
+    // val scoreProtector by protectorRepoGroup.pattern("scoreboard.protector", "Protector HP: .*")
     val fightInfo by tabListGroup.pattern("fight.info", "§b§lDragon Fight: §r§f\\(\\w+\\)")
     val tabDamage by tabListGroup.pattern("fight.player", ".*§r§f(?<Name>.+): §r§c(?<Damage>[\\d.]+)(?<Unit>[kM])?❤")
 
