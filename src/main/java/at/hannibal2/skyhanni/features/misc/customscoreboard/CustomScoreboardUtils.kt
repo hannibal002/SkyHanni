@@ -4,6 +4,7 @@ import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.data.HypixelData
 import at.hannibal2.skyhanni.data.ScoreboardData
 import at.hannibal2.skyhanni.mixins.transformers.AccessorGuiPlayerTabOverlay
+import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.RenderUtils.AlignmentEnum
 import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
@@ -16,12 +17,26 @@ object CustomScoreboardUtils {
     private val config get() = SkyHanniMod.feature.gui.customScoreboard
 
     fun getGroupFromPattern(list: List<String>, pattern: Pattern, group: String): String {
-        return list.map { it.removeResets().trimWhiteSpaceAndResets().removeResets() }
+        val matchedLine = list.map { it.removeResets().trimWhiteSpaceAndResets().removeResets() }
             .firstNotNullOfOrNull { line ->
                 pattern.matchMatcher(line) {
                     group(group)
                 }
-            } ?: "0"
+            }
+
+        return if (matchedLine != null) {
+            matchedLine
+        } else {
+            // Log error and return "0"
+            ErrorManager.logErrorWithData(
+                GroupNotFoundException("Could not find group $group in pattern"),
+                "Could not find group $group in pattern",
+                "Pattern" to pattern.pattern(),
+                "Group" to group,
+                "List" to list
+            )
+            "0"
+        }
     }
 
     fun getProfileTypeSymbol(): String {
@@ -48,4 +63,6 @@ object CustomScoreboardUtils {
     }
 
     class UndetectedScoreboardLines(message: String) : Exception(message)
+
+    class GroupNotFoundException(message: String) : Exception(message)
 }
