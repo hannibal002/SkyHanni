@@ -79,7 +79,7 @@ class JacobContestStatsSummary {
             }
         }
 
-        predictedScore = ((amount / (1200 - timeLeft - startTimeIntoContest)) * 1199) // 1199 seems to be more accurate than 1200
+        predictedScore = ((amount / (1200 - timeLeft - startTimeIntoContest)) * 1200)
         update()
     }
 
