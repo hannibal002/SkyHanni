@@ -5,26 +5,12 @@ import at.hannibal2.skyhanni.data.PurseAPI
 import at.hannibal2.skyhanni.data.ScoreboardData
 import at.hannibal2.skyhanni.features.rift.area.stillgorechateau.RiftBloodEffigies
 import at.hannibal2.skyhanni.utils.LorenzUtils.nextAfter
-import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.StringUtils.matches
 import at.hannibal2.skyhanni.utils.StringUtils.removeResets
-import at.hannibal2.skyhanni.utils.StringUtils.trimWhiteSpaceAndResets
-import at.hannibal2.skyhanni.utils.TabListData
 
 object InformationGetter {
     fun getInformation() {
         val sidebarLines = ScoreboardData.sidebarLinesFormatted
-
-        for (quirkyLine in TabListData.getTabList()) {
-            val line = quirkyLine.trimWhiteSpaceAndResets().removeResets()
-
-            ScoreboardPattern.gemsPattern.matchMatcher(line) {
-                gems = group("gems")
-            }
-            ScoreboardPattern.bankPattern.matchMatcher(line) {
-                bank = group("bank")
-            }
-        }
 
         // I know this could maybe be solved better but honestly idc anymore
         // - Update I care or rather hanni wants me to do that idk I dont want to get removed as Contrib

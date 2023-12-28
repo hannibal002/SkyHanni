@@ -32,9 +32,6 @@ private val config get() = SkyHanniMod.feature.gui.customScoreboard
 private val displayConfig get() = config.displayConfig
 private val informationFilteringConfig get() = config.informationFilteringConfig
 
-// Stats / Numbers
-var bank = "0"
-var gems = "0"
 var unknownLines = listOf<String>()
 
 val extraObjectiveLines = listOf("§7(§e", "§f Mages", "§f Barbarians")
@@ -151,11 +148,15 @@ private fun getMotesDisplayPair(): List<Pair<String, AlignmentEnum>> {
 
 private fun getMotesShowWhen() = listOf(IslandType.THE_RIFT).contains(HypixelData.skyBlockIsland)
 
-private fun getBankDisplayPair() = when {
-    informationFilteringConfig.hideEmptyLines && bank == "0" -> listOf("<hidden>")
-    displayConfig.displayNumbersFirst -> listOf("§6$bank Bank")
-    else -> listOf("Bank: §6$bank")
-}.map { it to AlignmentEnum.LEFT }
+private fun getBankDisplayPair(): List<Pair<String, AlignmentEnum>> {
+    val bank = getGroupFromPattern(TabListData.getTabList(), ScoreboardPattern.bankPattern, "bank")
+
+    return when {
+        informationFilteringConfig.hideEmptyLines && bank == "0" -> listOf("<hidden>")
+        displayConfig.displayNumbersFirst -> listOf("§6$bank Bank")
+        else -> listOf("Bank: §6$bank")
+    }.map { it to AlignmentEnum.LEFT }
+}
 
 private fun getBankShowWhen() = !listOf(IslandType.THE_RIFT).contains(HypixelData.skyBlockIsland)
 
@@ -199,11 +200,15 @@ private fun getCopperDisplayPair(): List<Pair<String, AlignmentEnum>> {
 
 private fun getCopperShowWhen() = listOf(IslandType.GARDEN).contains(HypixelData.skyBlockIsland)
 
-private fun getGemsDisplayPair() = when {
-    informationFilteringConfig.hideEmptyLines && gems == "0" -> listOf("<hidden>")
-    displayConfig.displayNumbersFirst -> listOf("§a$gems Gems")
-    else -> listOf("Gems: §a$gems")
-}.map { it to AlignmentEnum.LEFT }
+private fun getGemsDisplayPair(): List<Pair<String, AlignmentEnum> > {
+    val gems = getGroupFromPattern(TabListData.getTabList(), ScoreboardPattern.gemsPattern, "gems")
+
+    return when {
+        informationFilteringConfig.hideEmptyLines && gems == "0" -> listOf("<hidden>")
+        displayConfig.displayNumbersFirst -> listOf("§a$gems Gems")
+        else -> listOf("Gems: §a$gems")
+    }.map { it to AlignmentEnum.LEFT }
+}
 
 private fun getGemsShowWhen() = !listOf(IslandType.THE_RIFT, IslandType.CATACOMBS).contains(HypixelData.skyBlockIsland)
 
