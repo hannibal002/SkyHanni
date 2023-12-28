@@ -18,9 +18,7 @@ object UnknownLinesHandler {
             /*"Instance Shutdow",   leaving them like this because I want people to report them so I can get the
             "§f§lWave: §c§l",       exact lines (i really dont want to run kuudra myself)
             "§fTokens: ",
-            "Submerges In: §e",
-            "§fObjective",*/
-            "Objective",
+            "Submerges In: §e"*/
             "Event Start: §a",
             "Next Wave: §a",
             "§cWave",
@@ -97,6 +95,7 @@ object UnknownLinesHandler {
         unknownLines = unknownLines.filter { !ScoreboardPattern.dojoDifficultyPattern.matches(it) }
         unknownLines = unknownLines.filter { !ScoreboardPattern.dojoPointsPattern.matches(it) }
         unknownLines = unknownLines.filter { !ScoreboardPattern.dojoTimePattern.matches(it) }
+        unknownLines = unknownLines.filter { !ScoreboardPattern.objectivePattern.matches(it) }
         unknownLines = unknownLines.filter { !ScoreboardPattern.travelingZooPattern.matches(it) }
         unknownLines = unknownLines.filter { !ScoreboardPattern.riftDimensionPattern.matches(it) }
         unknownLines = unknownLines.filter { !RiftBloodEffigies.heartsPattern.matches(it) }
@@ -107,18 +106,15 @@ object UnknownLinesHandler {
         */
         unknownLines = unknownLines.filter { line -> !knownLines.any { line.trim().contains(it) } }
 
-        // remove objectives kuudra
-        unknownLines = unknownLines.filter { sidebarLines.nextAfter("§fObjective") != it }
-        unknownLines = unknownLines.filter {
-            sidebarLines.nextAfter("§fObjective", 2) != it && !extraObjectiveKuudraLines.contains(it)
-        }
-
         // remove objectives
         val objectiveLine =
-            ScoreboardData.sidebarLinesFormatted.firstOrNull { it.startsWith("Objective") } ?: "Objective"
-        unknownLines = unknownLines.filter { sidebarLines.nextAfter(objectiveLine) != it }
+            ScoreboardData.sidebarLinesFormatted.first { ScoreboardPattern.objectivePattern.matches(it) }
         unknownLines =
-            unknownLines.filter { sidebarLines.nextAfter(objectiveLine, 2) != it && !extraObjectiveLines.contains(it) }
+            unknownLines.filter {
+                sidebarLines.nextAfter(objectiveLine, 2) != it
+                    && (!extraObjectiveLines.contains(it)
+                    || !extraObjectiveKuudraLines.contains(it))
+            }
 
         // Remove jacobs contest
         for (i in 0..3)

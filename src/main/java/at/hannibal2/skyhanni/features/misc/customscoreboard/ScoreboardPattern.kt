@@ -77,6 +77,7 @@ object ScoreboardPattern {
     val dojoDifficultyPattern by miscSb.pattern("dojodifficulty", "^(§.)*Difficulty: (§.)*(?<difficulty>[\\w ]+)$")
     val dojoPointsPattern by miscSb.pattern("dojopoints", "^(§.)*Points: (§.)*(?<points>[\\w,.]+)( (§.)*\\((§.)*[+-](§.)*(?<difference>[\\w,.]+)(§.)*\\))?$")
     val dojoTimePattern by miscSb.pattern("dojotime", "^(§.)*Time: (§.)*(?<time>(?<seconds>\\w+s))( (§.)*\\((§.)*[+-](§.)*(?<difference>[\\w,.]+)(§.)*\\))?$")
+    val objectivePattern by miscSb.pattern("objective", "^(§.)*Objective:?(\\w*)?")
     // events
     private val eventsSb = scoreboardGroup.group("events")
     val travelingZooPattern by eventsSb.pattern("travelingzoo", "§aTraveling Zoo§f \\d{0,2}:\\d{2}$")
