@@ -11,11 +11,11 @@ object ScoreboardPattern {
     private val scoreboardGroup = group.group("scoreboard")
     // main scoreboard
     private val mainSb = scoreboardGroup.group("main")
-    val pursePattern by mainSb.pattern("purse", "^(?:Purse|Piggy): §6(?<purse>-?\\d+(:?,\\d{3})*(?:\\.\\d+)?)( §e\\(\\+\\d+\\))?$")
-    val motesPattern by mainSb.pattern("motes", "^Motes: §[5d](?<motes>-?\\d+(:?,\\d{3})*(?:\\.\\d+)?)$")
+    val pursePattern by mainSb.pattern("purse", "^(§.)*(Purse|Piggy): (§.)*(?<purse>[\\d,]+)( (§.)*\\([+-](?<diff>[\\w,.]+)\\))?$")
+    val motesPattern by mainSb.pattern("motes", "^(§.)*Motes: (§.)*(?<motes>[\\d,]+)( (§.)*\\([+-](?<diff>[\\w,.]+)\\))?$")
     val heatPattern by mainSb.pattern("heat", "^Heat: (?<heat>.*)$") // this line is weird (either text or number), ill leave it as is; it even has different colors?
-    val copperPattern by mainSb.pattern("copper", "^Copper: §c(?<copper>-?\\d+(:?,\\d{3})*(?:\\.\\d+)?)$")
-    val locationPattern by mainSb.pattern("location", "^\\s*(?<location> (§7⏣|§5ф) .*)$")
+    val copperPattern by mainSb.pattern("copper", "^(§.)*Copper: (§.)*(?<copper>[\\d,]+)( (§.)*\\([+-](?<diff>[\\w,.]+)\\))?$")
+    val locationPattern by mainSb.pattern("location", "^\\s*(?<location>(§7⏣|§5ф) .*)$")
     val lobbyCodePattern by mainSb.pattern ("lobbycode", "^\\s*§(\\d{3}/\\d{2}/\\d{2}) §8(?<code>.*)$")
     val datePattern by mainSb.pattern("date", "^\\s*(Late |Early )?(Spring|Summer|Autumn|Winter) \\d{1,2}(st|nd|rd|th)?")
     val timePattern by mainSb.pattern("time", "^\\s*§7\\d{1,2}:\\d{2}(?:am|pm) (§b☽|§e☀|⚡|☔)$")
@@ -44,9 +44,12 @@ object ScoreboardPattern {
     val pastingPattern by farmingSb.pattern("pasting", "^\\s*§f(Barn )?Pasting§7: §e\\d{1,3}(\\.\\d)?%$")
     // mining
     private val miningSb = scoreboardGroup.group("mining")
-    val powderPattern by miningSb.pattern("powder", "§[2d]᠅ §f(Gemstone|Mithril) Powder§f: §[2d]-?\\d+(:?,\\d{3})*(?:\\.\\d+)?$")
+    val powderPattern by miningSb.pattern("powder", "§[2d]᠅ §f(Gemstone|Mithril)( Powder)?§f: §[2d](,?\\d{1,3})*$")
     val windCompassPattern by miningSb.pattern("windcompass", "§9Wind Compass$")
     val windCompassArrowPattern by miningSb.pattern("windcompassarrow", "(\\s*)?(§[a-zA-Z0-9]+)?[⋖⋗≈]?(\\s)*\$")
+    val raffleUselessPattern by miningSb.pattern("raffleuseless", "^(Find tickets on the|ground and bring them|to the raffle box)$")
+    val raffleTicketsPattern by miningSb.pattern("raffletickets", "^Tickets: §a\\d{1,3}\$")
+    val rafflePool by miningSb.pattern("rafflepool", "^Pool: §6\\d{1,3}\$")
     // combat
     private val combatSb = scoreboardGroup.group("combat")
     val magmaBossPattern by combatSb.pattern("magmaboss", "^§7Boss: §[c6e]\\d{1,3}%$")

@@ -226,7 +226,13 @@ private fun getIslandDisplayPair() =
 
 private fun getLocationDisplayPair() =
     listOf(
-        (replaceString(getGroupFromPattern(ScoreboardData.sidebarLinesFormatted, ScoreboardPattern.locationPattern, "location"))?.trim()
+        (replaceString(
+            getGroupFromPattern(
+                ScoreboardData.sidebarLinesFormatted,
+                ScoreboardPattern.locationPattern,
+                "location"
+            )
+        )?.trim()
             ?: "<hidden>") to AlignmentEnum.LEFT
     )
 
@@ -256,7 +262,15 @@ private fun getTimeDisplayPair(): List<Pair<String, AlignmentEnum>> {
 }
 
 private fun getLobbyDisplayPair() =
-    listOf("§8${getGroupFromPattern(ScoreboardData.sidebarLinesFormatted, ScoreboardPattern.lobbyCodePattern, "code")}" to AlignmentEnum.LEFT)
+    listOf(
+        "§8${
+            getGroupFromPattern(
+                ScoreboardData.sidebarLinesFormatted,
+                ScoreboardPattern.lobbyCodePattern,
+                "code"
+            )
+        }" to AlignmentEnum.LEFT
+    )
 
 private fun getPowerDisplayPair() = when (MaxwellAPI.currentPower) {
     null -> listOf("§c§lVisit Maxwell!" to AlignmentEnum.LEFT)
@@ -342,8 +356,10 @@ private fun getQuiverDisplayPair(): List<Pair<String, AlignmentEnum>> {
 private fun getQuiverShowWhen() = !listOf(IslandType.THE_RIFT).contains(HypixelData.skyBlockIsland)
 
 private fun getPowderDisplayPair(): List<Pair<String, AlignmentEnum>> {
-    val mithrilPowder = getGroupFromPattern(TabListData.getTabList(), ScoreboardPattern.mithrilPowderPattern, "mithrilpowder")
-    val gemstonePowder = getGroupFromPattern(TabListData.getTabList(), ScoreboardPattern.gemstonePowderPattern, "gemstonepowder")
+    val mithrilPowder =
+        getGroupFromPattern(TabListData.getTabList(), ScoreboardPattern.mithrilPowderPattern, "mithrilpowder")
+    val gemstonePowder =
+        getGroupFromPattern(TabListData.getTabList(), ScoreboardPattern.gemstonePowderPattern, "gemstonepowder")
 
     return when (displayConfig.displayNumbersFirst) {
         true -> listOf("§9§lPowder") + (" §7- §2$mithrilPowder Mithril") + (" §7- §d$gemstonePowder Gemstone")

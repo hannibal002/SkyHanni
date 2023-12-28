@@ -54,11 +54,6 @@ object InformationGetter {
             "Tracker Mob Location:",
             "Time Left: §b",
             "Current Item:",
-            "Find tickets on the",
-            "ground and bring them",
-            "to the raffle box",
-            "Tickets: §a",
-            "Pool: §6"
         )
 
         unknownLines = sidebarLines.toMutableList().filter { it.isNotBlank() }.map { it.removeResets() }
@@ -95,6 +90,9 @@ object InformationGetter {
         unknownLines = unknownLines.filter { !ScoreboardPattern.powderPattern.matches(it) }
         unknownLines = unknownLines.filter { !ScoreboardPattern.windCompassPattern.matches(it) }
         unknownLines = unknownLines.filter { !ScoreboardPattern.windCompassArrowPattern.matches(it) }
+        unknownLines = unknownLines.filter { !ScoreboardPattern.raffleUselessPattern.matches(it) }
+        unknownLines = unknownLines.filter { !ScoreboardPattern.raffleTicketsPattern.matches(it) }
+        unknownLines = unknownLines.filter { !ScoreboardPattern.rafflePool.matches(it) }
         unknownLines = unknownLines.filter { !ScoreboardPattern.magmaBossPattern.matches(it) }
         unknownLines = unknownLines.filter { !ScoreboardPattern.damageSoakedPattern.matches(it) }
         unknownLines = unknownLines.filter { !ScoreboardPattern.damagedSoakedBarPattern.matches(it) }

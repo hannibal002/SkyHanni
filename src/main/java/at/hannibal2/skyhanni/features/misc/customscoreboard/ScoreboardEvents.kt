@@ -5,6 +5,7 @@ import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.data.ScoreboardData
 import at.hannibal2.skyhanni.features.misc.ServerRestartTitle
 import at.hannibal2.skyhanni.features.misc.customscoreboard.ScoreboardEvents.VOTING
+import at.hannibal2.skyhanni.features.misc.customscoreboard.ScoreboardPattern
 import at.hannibal2.skyhanni.features.rift.area.stillgorechateau.RiftBloodEffigies
 import at.hannibal2.skyhanni.utils.LorenzUtils.inDungeons
 import at.hannibal2.skyhanni.utils.LorenzUtils.isInIsland
@@ -469,12 +470,10 @@ private fun getMiningEventsLines(): List<String> {
     }
 
     // raffle
-    if (getSbLines().any { it.startsWith("Tickets: §a") }) {
+    if (getSbLines().any { ScoreboardPattern.raffleTicketsPattern.matches(it) && ScoreboardPattern.rafflePool.matches(it) }) {
         list += "§6Raffle"
-        list += getSbLines().firstOrNull { it.startsWith("Tickets: §a") }
-            ?: "<hidden>"
-        list += getSbLines().firstOrNull { it.startsWith("Pool: §6") }
-            ?: "<hidden>"
+        list += getSbLines().first { ScoreboardPattern.raffleTicketsPattern.matches(it) }
+        list += getSbLines().first { ScoreboardPattern.rafflePool.matches(it) }
     }
 
     // raid
