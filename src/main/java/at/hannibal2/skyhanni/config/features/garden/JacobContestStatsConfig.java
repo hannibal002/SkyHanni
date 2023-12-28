@@ -56,5 +56,5 @@ public class JacobContestStatsConfig {
     }
 
     @Expose
-    public Position pos = new Position(-112, -143, false, true);
+    public Position pos = new Position(0, 240, false, true);
 }
