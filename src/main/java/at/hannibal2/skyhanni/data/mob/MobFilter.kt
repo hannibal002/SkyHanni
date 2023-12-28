@@ -57,7 +57,7 @@ object MobFilter {
     val bossMobNameFilter = "^. (\\[(.*)\\] )?(.*) ([\\d\\/Mk.,❤]+|█+) .$".toRegex()
     val dungeonNameFilter = "^(?:(✯)\\s)?(?:(${DungeonAttribute.toRegexLine})\\s)?(?:\\[[\\w\\d]+\\]\\s)?(.+)\\s[^\\s]+$".toRegex()
     val petCareNameRegex = "^\\[\\w+ (\\d+)\\] (.*)".toRegex()
-    val wokeSleepingGolemRegex = "(?:Woke|Sleeping) Golem".toRegex()
+    val wokeSleepingGolemRegex = "(?:§c§lWoke|§5§lSleeping) Golem§r".toRegex()
 
     val summonRegex = "^(\\w+)'s (.*) \\d+".toRegex()
     val summonOwnerRegex = "Spawned by: (.*)".toRegex()
@@ -201,7 +201,7 @@ object MobFilter {
                 baseEntity is EntityOtherPlayerMP && baseEntity.isNPC() && (nextEntity is EntityGiantZombie || nextEntity == null) && baseEntity.name.contains("Livid") -> MobUtils.getClosedArmorStandWithName(baseEntity, 6.0, "﴾ Livid").makeMobResult { MobFactories.boss(baseEntity, it, overriddenName = "Real Livid") }
                 baseEntity is EntityIronGolem && wokeSleepingGolemRegex.matches(
                     armorStand?.name ?: ""
-                ) -> MobResult.found(Mob(baseEntity, Mob.Type.Dungeon, armorStand, "Woke Golem")) // Consistency fix
+                ) -> MobResult.found(Mob(baseEntity, Mob.Type.Dungeon, armorStand, "Sleeping Golem")) // Consistency fix
                 else -> null
             }
         } else when (LorenzUtils.skyBlockIsland) {
