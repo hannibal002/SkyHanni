@@ -221,16 +221,15 @@ class DragonFeatures {
     @SubscribeEvent
     fun onScoreBoard(event: ScoreboardChangeEvent) {
         if (!(enableDisplay())) return
-        val index = event.newList.indexOfFirst {
-            scoreDamage.matchMatcher(it) {
-                currentDamage = this.group("Damage").replace(",", "").toDouble()
-                true
-            } ?: false
-        }
-        if (dragonSpawned || index == -1) return
-        if (egg && scoreDragon.matches(event.newList[index - 1])) {
+        val index = event.newList.indexOfFirst { scoreDragon.matches(it) }
+        if (index == -1) return
+        if (egg) {
             dragonSpawned = true
         }
+        scoreDamage.matchMatcher(event.newList[index + 1]) {
+            currentDamage = this.group("Damage").replace(",", "").toDouble()
+        }
+
     }
 
     @SubscribeEvent
