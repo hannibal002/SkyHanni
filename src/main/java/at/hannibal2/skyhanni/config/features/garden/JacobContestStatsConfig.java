@@ -36,12 +36,12 @@ public class JacobContestStatsConfig {
     ));
 
     public enum ContestStatsTextEntry {
-        TITLE("§e§lWheat Contest Stats"),
-        TIME_PARTICIPATED("§7Participating for §b18m 23s"),
-        BLOCKS_BROKEN("§7Blocks Broken: §e21,972"),
-        BPS("§7Blocks per Second: §c19.92"),
-        POSITION("§7Estimated Position: §b5th §7§7(Top §b0.4% §7◆ 1.1k)"),
-        PREDICTED_SCORE("§7Predicted Score: §e432,123");
+        TITLE("§e§lSugar Cane Contest Stats"),
+        TIME_PARTICIPATED("§7Started §b3s §7into contest"),
+        BLOCKS_BROKEN("§7Blocks Broken: §e14,781"),
+        BPS("§7Blocks per Second: §c19.94"),
+        POSITION("§7Estimated Position: §b2nd §7§7(Top §b0.1% §7◆675)"),
+        PREDICTED_SCORE("§7Predicted Score: §e915,600");
 
         private final String str;
 
