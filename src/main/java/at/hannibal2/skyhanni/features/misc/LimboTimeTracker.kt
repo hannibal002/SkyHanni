@@ -114,11 +114,11 @@ class LimboTimeTracker {
         if (passedSince > currentPB) {
             oldPB = currentPB
             config.limboTimePB = passedSince.toInt(DurationUnit.SECONDS)
-            LorenzUtils.chat("§fYou were AFK in Limbo for §e$duration§f! §d§lPERSONAL BEST§r§f!")
+            LorenzUtils.chat("§fYou were in Limbo for §e$duration§f! §d§lPERSONAL BEST§r§f!")
             LorenzUtils.chat("§fYour previous Personal Best was §e$oldPB.")
             userLuck = config.limboTimePB * userLuckMultiplier
             LorenzUtils.chat("§fYour §aPersonal Bests§f perk is now granting you §a+${userLuck.round(2)}✴ SkyHanni User Luck§f!")
-        } else LorenzUtils.chat("§fYou were AFK in Limbo for §e$duration§f.")
+        } else LorenzUtils.chat("§fYou were in Limbo for §e$duration§f.")
         config.limboPlaytime += passedSince.toInt(DurationUnit.SECONDS)
         shownPB = false
     }
