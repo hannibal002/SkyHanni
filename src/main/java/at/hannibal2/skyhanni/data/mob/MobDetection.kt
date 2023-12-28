@@ -17,6 +17,7 @@ import at.hannibal2.skyhanni.utils.LorenzUtils.forEachPolling
 import at.hannibal2.skyhanni.utils.getLorenzVec
 import net.minecraft.entity.EntityLivingBase
 import net.minecraft.entity.item.EntityArmorStand
+import net.minecraft.entity.monster.EntityCreeper
 import net.minecraft.entity.passive.EntityBat
 import net.minecraft.entity.passive.EntityVillager
 import net.minecraft.entity.player.EntityPlayer
@@ -134,16 +135,17 @@ class MobDetection {
 
     private val batFromPacket = ConcurrentLinkedQueue<Int>()
     private val villagerFromPacket = ConcurrentLinkedQueue<Int>()
+    private val creeperFromPacket = ConcurrentLinkedQueue<Int>()
 
     private fun handleMobsFromPacket() {
         batFromPacket.forEachPolling { id ->
-            val entity = EntityUtils.getEntityByID(id) as? EntityLivingBase ?: return@forEachPolling
+            val entity = EntityUtils.getEntityByID(id) as? EntityBat ?: return@forEachPolling
             if (MobData.entityToMob[entity] != null) return@forEachPolling
             MobData.retries.remove(MobData.RetryEntityInstancing(entity))
             MobEvent.Spawn.Projectile(MobFactories.projectile(entity, "Spirit Scepter Bat")).postAndCatch() // Needs different handling because 6 is default health of Bat
         }
         villagerFromPacket.forEachPolling { id ->
-            val entity = EntityUtils.getEntityByID(id) as? EntityLivingBase ?: return@forEachPolling
+            val entity = EntityUtils.getEntityByID(id) as? EntityVillager ?: return@forEachPolling
             val mob = MobData.entityToMob[entity]
             if (mob != null && mob.mobType == Mob.Type.DisplayNPC) {
                 MobEvent.DeSpawn.DisplayNPC(mob)
@@ -158,15 +160,29 @@ class MobDetection {
                 }
             }
         }
+        creeperFromPacket.forEachPolling { id ->
+            val entity = EntityUtils.getEntityByID(id) as? EntityCreeper ?: return@forEachPolling
+            if (MobData.entityToMob[entity] != null) return@forEachPolling
+            if (!entity.powered) return@forEachPolling
+            MobData.retries.remove(MobData.RetryEntityInstancing(entity))
+            MobEvent.Spawn.Special(MobFactories.special(entity, "Creeper Veil")).postAndCatch() // Needs different handling because 6 is default health of Bat
+        }
     }
 
     @SubscribeEvent
     fun onEntityHealthUpdateEvent(event: EntityHealthUpdateEvent) {
-        if (event.entity is EntityBat && event.health == 6) {
-            batFromPacket.add(event.entity.entityId)
-        }
-        if (event.entity is EntityVillager && event.health != 20) {
-            villagerFromPacket.add(event.entity.entityId)
+        when {
+            event.entity is EntityBat && event.health == 6 -> {
+                batFromPacket.add(event.entity.entityId)
+            }
+
+            event.entity is EntityVillager && event.health != 20 -> {
+                villagerFromPacket.add(event.entity.entityId)
+            }
+
+            event.entity is EntityCreeper && event.health == 20 -> {
+                creeperFromPacket.add(event.entity.entityId)
+            }
         }
     }
 
