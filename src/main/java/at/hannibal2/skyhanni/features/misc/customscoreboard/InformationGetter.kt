@@ -1,6 +1,7 @@
 package at.hannibal2.skyhanni.features.misc.customscoreboard
 
 import at.hannibal2.skyhanni.data.BitsAPI
+import at.hannibal2.skyhanni.data.PurseAPI
 import at.hannibal2.skyhanni.data.ScoreboardData
 import at.hannibal2.skyhanni.features.rift.area.stillgorechateau.RiftBloodEffigies
 import at.hannibal2.skyhanni.utils.LorenzUtils.nextAfter
@@ -60,7 +61,7 @@ object InformationGetter {
         /*
          * remove with pattern
         */
-        unknownLines = unknownLines.filter { !ScoreboardPattern.pursePattern.matches(it) }
+        unknownLines = unknownLines.filter { !PurseAPI.pursePattern.matches(it) }
         unknownLines = unknownLines.filter { !ScoreboardPattern.motesPattern.matches(it) }
         unknownLines = unknownLines.filter { !BitsAPI.bitsScoreboardPattern.matches(it) }
         unknownLines = unknownLines.filter { !ScoreboardPattern.heatPattern.matches(it) }

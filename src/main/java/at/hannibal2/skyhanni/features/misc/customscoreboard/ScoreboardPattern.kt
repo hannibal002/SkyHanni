@@ -11,7 +11,6 @@ object ScoreboardPattern {
     private val scoreboardGroup = group.group("scoreboard")
     // main scoreboard
     private val mainSb = scoreboardGroup.group("main")
-    val pursePattern by mainSb.pattern("purse", "^(§.)*(Purse|Piggy): (§.)*(?<purse>[\\d,]+)( (§.)*\\([+-](?<diff>[\\w,.]+)\\))?$")
     val motesPattern by mainSb.pattern("motes", "^(§.)*Motes: (§.)*(?<motes>[\\d,]+)( (§.)*\\([+-](?<diff>[\\w,.]+)\\))?$")
     val heatPattern by mainSb.pattern("heat", "^Heat: (?<heat>.*)$") // this line is weird (either text or number), ill leave it as is; it even has different colors?
     val copperPattern by mainSb.pattern("copper", "^(§.)*Copper: (§.)*(?<copper>[\\d,]+)( (§.)*\\([+-](?<diff>[\\w,.]+)\\))?$")

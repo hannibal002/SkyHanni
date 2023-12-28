@@ -7,6 +7,7 @@ import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.data.MaxwellAPI
 import at.hannibal2.skyhanni.data.MayorAPI
 import at.hannibal2.skyhanni.data.PartyAPI
+import at.hannibal2.skyhanni.data.PurseAPI
 import at.hannibal2.skyhanni.data.QuiverAPI
 import at.hannibal2.skyhanni.data.ScoreboardData
 import at.hannibal2.skyhanni.data.SlayerAPI
@@ -127,7 +128,7 @@ private fun getProfileDisplayPair() =
     listOf(CustomScoreboardUtils.getProfileTypeSymbol() + HypixelData.profileName.firstLetterUppercase() to AlignmentEnum.LEFT)
 
 private fun getPurseDisplayPair(): List<Pair<String, AlignmentEnum>> {
-    val purse = getGroupFromPattern(ScoreboardData.sidebarLinesFormatted, ScoreboardPattern.pursePattern, "purse")
+    val purse = getGroupFromPattern(ScoreboardData.sidebarLinesFormatted, PurseAPI.pursePattern, "purse")
 
     return when {
         informationFilteringConfig.hideEmptyLines && purse == "0" -> listOf("<hidden>")
