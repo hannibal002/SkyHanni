@@ -22,7 +22,7 @@ object ViewRecipeCommand {
 
     val list by lazy {
         val list = mutableListOf<String>()
-        for ((key, value) in NEUItems.manager.itemInformation) {
+        for ((key, value) in NEUItems.allNeuRepoItems()) {
             if (value.has("recipe")) {
                 list.add(key.lowercase())
             }

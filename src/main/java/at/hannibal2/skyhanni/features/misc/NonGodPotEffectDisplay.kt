@@ -2,12 +2,14 @@ package at.hannibal2.skyhanni.features.misc
 
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
+import at.hannibal2.skyhanni.data.ProfileStorageData
 import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.InventoryFullyOpenedEvent
 import at.hannibal2.skyhanni.events.LorenzChatEvent
 import at.hannibal2.skyhanni.events.LorenzTickEvent
 import at.hannibal2.skyhanni.events.LorenzWorldChangeEvent
 import at.hannibal2.skyhanni.events.PacketEvent
+import at.hannibal2.skyhanni.events.PreProfileSwitchEvent
 import at.hannibal2.skyhanni.features.rift.RiftAPI
 import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
@@ -57,12 +59,23 @@ class NonGodPotEffectDisplay {
         DEEP_TERROR("§4Deepterror", true),
 
         GREAT_SPOOK("§fGreat Spook I", inventoryItemName = "§fGreat Spook Potion"),
+
+        HARVEST_HARBINGER("§6Harvest Harbinger V"),
+
+        PEST_REPELLENT("§6Pest Repellent I§r"),
+        PEST_REPELLENT_MAX("§6Pest Repellent II"),
         ;
     }
 
     // TODO USE SH-REPO
     private var patternEffectsCount = "§7You have §e(?<name>\\d+) §7non-god effects\\.".toPattern()
     private var totalEffectsCount = 0
+
+    @SubscribeEvent
+    fun onPreProfileSwitch(event: PreProfileSwitchEvent) {
+        effectDuration.clear()
+        display = emptyList()
+    }
 
     // todo : cleanup and add support for poison candy I, and add support for splash / other formats
     @SubscribeEvent
@@ -92,6 +105,18 @@ class NonGodPotEffectDisplay {
             update()
         }
 
+        if (event.message == "§a§lBUFF! §fYou have gained §r§6Harvest Harbinger V§r§f! Press TAB or type /effects to view your active effects!") {
+            effectDuration[NonGodPotEffect.HARVEST_HARBINGER] = Timer(25.minutes)
+            update()
+        }
+
+        if (event.message == "§a§lYUM! §r§6Pests §r§7will now spawn §r§a2x §r§7less while you break crops for the next §r§a60m§r§7!") {
+            effectDuration[NonGodPotEffect.PEST_REPELLENT] = Timer(1.hours)
+        }
+
+        if (event.message == "§a§lYUM! §r§6Pests §r§7will now spawn §r§a4x §r§7less while you break crops for the next §r§a60m§r§7!") {
+            effectDuration[NonGodPotEffect.PEST_REPELLENT_MAX] = Timer(1.hours)
+        }
 
         if (event.message == "§e[NPC] §6King Yolkar§f: §rThese eggs will help me stomach my pain.") {
             effectDuration[NonGodPotEffect.GOBLIN] = Timer(20.minutes)
@@ -142,6 +167,7 @@ class NonGodPotEffectDisplay {
     fun onTick(event: LorenzTickEvent) {
         if (!isEnabled()) return
         if (!event.repeatSeconds(1)) return
+        if (!ProfileStorageData.loaded) return
 
         update()
     }
@@ -197,7 +223,7 @@ class NonGodPotEffectDisplay {
             for (line in lines) {
                 for (effect in NonGodPotEffect.entries) {
                     val tabListName = effect.tabListName
-                    if (line.startsWith(tabListName)) {
+                    if ("$line§r".startsWith(tabListName)) {
                         val string = line.substring(tabListName.length)
                         try {
                             val duration = TimeUtils.getMillis(string.split("§f")[1])

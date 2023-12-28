@@ -4,7 +4,7 @@ import at.hannibal2.skyhanni.data.jsonobjects.repo.FishingProfitItemsJson
 import at.hannibal2.skyhanni.events.RepositoryReloadEvent
 import at.hannibal2.skyhanni.utils.NEUInternalName
 import at.hannibal2.skyhanni.utils.NEUInternalName.Companion.asInternalName
-import io.github.moulberry.notenoughupdates.NotEnoughUpdates
+import at.hannibal2.skyhanni.utils.NEUItems
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
 object FishingTrackerCategoryManager {
@@ -28,7 +28,7 @@ object FishingTrackerCategoryManager {
     fun onNeuRepoReload(event: io.github.moulberry.notenoughupdates.events.RepositoryReloadEvent) {
         val totalDrops = mutableListOf<String>()
         val dropCategories = mutableMapOf<String, MutableList<NEUInternalName>>()
-        for ((seaCreature, data) in NotEnoughUpdates.INSTANCE.manager.itemInformation.filter { it.key.endsWith("_SC") }) {
+        for ((seaCreature, data) in NEUItems.allNeuRepoItems().filter { it.key.endsWith("_SC") }) {
             val asJsonObject = data.getAsJsonArray("recipes")[0].asJsonObject
             val drops = asJsonObject.getAsJsonArray("drops")
                 .map { it.asJsonObject.get("id").asString }.map { it.split(":").first() }

@@ -17,7 +17,7 @@ public class NextConfig {
         desc = "Lists all crops and their ETA till next milestone. Sorts for best crop for getting garden or SkyBlock levels.")
     @ConfigEditorBoolean
     @FeatureToggle
-    public boolean bestDisplay = true;
+    public boolean bestDisplay = false;
 
     // TODO moulconfig runnable support
     @Expose
