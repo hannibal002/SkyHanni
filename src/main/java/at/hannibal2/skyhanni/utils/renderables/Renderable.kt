@@ -4,6 +4,7 @@ import at.hannibal2.skyhanni.config.core.config.gui.GuiPositionEditor
 import at.hannibal2.skyhanni.data.ToolTipData
 import at.hannibal2.skyhanni.utils.LorenzLogger
 import at.hannibal2.skyhanni.utils.NEUItems.renderOnScreen
+import at.hannibal2.skyhanni.utils.RenderUtils
 import io.github.moulberry.moulconfig.gui.GuiScreenElementWrapper
 import io.github.moulberry.notenoughupdates.util.Utils
 import net.minecraft.client.Minecraft
@@ -13,6 +14,7 @@ import net.minecraft.client.gui.inventory.GuiEditSign
 import net.minecraft.client.renderer.GlStateManager
 import net.minecraft.item.ItemStack
 import org.lwjgl.input.Mouse
+import java.awt.Color
 import java.util.Collections
 import kotlin.math.max
 
@@ -62,7 +64,7 @@ interface Renderable {
             text: String,
             onClick: () -> Unit,
             bypassChecks: Boolean = false,
-            condition: () -> Boolean = { true }
+            condition: () -> Boolean = { true },
         ): Renderable =
             link(string(text), onClick, bypassChecks, condition)
 
@@ -70,7 +72,7 @@ interface Renderable {
             renderable: Renderable,
             onClick: () -> Unit,
             bypassChecks: Boolean = false,
-            condition: () -> Boolean = { true }
+            condition: () -> Boolean = { true },
         ): Renderable {
             return clickable(
                 hoverable(underlined(renderable), renderable, bypassChecks, condition = condition),
@@ -85,7 +87,7 @@ interface Renderable {
             text: String,
             tips: List<String>,
             bypassChecks: Boolean = false,
-            onClick: () -> Unit
+            onClick: () -> Unit,
         ): Renderable {
             return clickable(hoverTips(text, tips, bypassChecks = bypassChecks), onClick, bypassChecks = bypassChecks)
         }
@@ -95,7 +97,7 @@ interface Renderable {
             onClick: () -> Unit,
             button: Int = 0,
             bypassChecks: Boolean = false,
-            condition: () -> Boolean = { true }
+            condition: () -> Boolean = { true },
         ) =
             object : Renderable {
                 override val width: Int
@@ -124,7 +126,7 @@ interface Renderable {
             indexes: List<Int> = listOf(),
             stack: ItemStack? = null,
             bypassChecks: Boolean = false,
-            condition: () -> Boolean = { true }
+            condition: () -> Boolean = { true },
         ): Renderable {
 
             val render = string(text)
@@ -211,7 +213,7 @@ interface Renderable {
             hovered: Renderable,
             unhovered: Renderable,
             bypassChecks: Boolean = false,
-            condition: () -> Boolean = { true }
+            condition: () -> Boolean = { true },
         ) =
             object : Renderable {
                 override val width: Int
@@ -251,6 +253,24 @@ interface Renderable {
 
             override fun render(posX: Int, posY: Int) {
                 Minecraft.getMinecraft().fontRendererObj.drawStringWithShadow("§f$string", 1f, 1f, 0)
+            }
+        }
+
+        fun drawInsideRoundedRect(
+            input: Renderable,
+            color: Color,
+            padding: Int = 2,
+            radius: Int = 10,
+            smoothness: Int = 2,
+        ) = object : Renderable {
+            override val width = input.width + padding * 2
+            override val height = input.height + padding * 2
+
+            override fun render(posX: Int, posY: Int) {
+                RenderUtils.drawRoundRect(0, 0, width, height, color.rgb, radius, smoothness)
+                GlStateManager.translate(padding.toFloat(), padding.toFloat(), 0f)
+                input.render(posX + padding, posY + padding)
+                GlStateManager.translate(-padding.toFloat(), -padding.toFloat(), 0f)
             }
         }
 
