@@ -212,12 +212,13 @@ private fun getHeatDisplayPair(): List<Pair<String, AlignmentEnum>> {
 
     return when {
         informationFilteringConfig.hideEmptyLines && heat == "§c♨ 0" -> listOf("<hidden>")
-        displayConfig.displayNumbersFirst -> listOf(if (heat == "§c♨ 0") "§c♨ 0 Heat" else "$heat Heat")
-        else -> listOf(if (heat == "§c♨ 0") "Heat: §c♨ 0" else "Heat: $heat")
+        displayConfig.displayNumbersFirst -> listOf(if (heat == "0") "§c♨ 0 Heat" else "$heat Heat")
+        else -> listOf(if (heat == "0") "Heat: §c♨ 0" else "Heat: $heat")
     }.map { it to AlignmentEnum.LEFT }
 }
 
 private fun getHeatShowWhen() = listOf(IslandType.CRYSTAL_HOLLOWS).contains(HypixelData.skyBlockIsland)
+    && ScoreboardData.sidebarLinesFormatted.any { ScoreboardPattern.heatPattern.matches(it) }
 
 private fun getEmptyLineDisplayPair() = listOf("<empty>" to AlignmentEnum.LEFT)
 
