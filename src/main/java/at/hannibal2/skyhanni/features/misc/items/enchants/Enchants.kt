@@ -6,8 +6,6 @@ import at.hannibal2.skyhanni.utils.NumberUtil.toRoman
 import java.util.TreeSet
 import kotlin.collections.HashMap
 
-private const val COLOR_CODES = "0123456789abcdefZ"
-
 class Enchants {
     var NORMAL: HashMap<String, Enchant.Normal> = hashMapOf()
     var ULTIMATE: HashMap<String, Enchant.Ultimate> = hashMapOf()
@@ -55,10 +53,10 @@ open class Enchant : Comparable<Enchant> {
     open fun getFormat(level: Int) : String {
         val config = SkyHanniMod.feature.enchantParsing.colorEnchants
 
-        if (level >= maxLevel) return "§" + COLOR_CODES[config.perfectEnchantColor]
-        if (level > goodLevel) return "§" + COLOR_CODES[config.greatEnchantColor]
-        if (level == goodLevel) return "§" + COLOR_CODES[config.goodEnchantColor]
-        return "§" + COLOR_CODES[config.poorEnchantColor]
+        if (level >= maxLevel) return config.perfectEnchantColor.getChatColor()
+        if (level > goodLevel) return config.greatEnchantColor.getChatColor()
+        if (level == goodLevel) return config.goodEnchantColor.getChatColor()
+        return config.poorEnchantColor.getChatColor()
     }
 
     override fun toString() = "$nbtName $goodLevel $maxLevel\n"

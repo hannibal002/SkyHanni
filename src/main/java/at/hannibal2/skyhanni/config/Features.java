@@ -2,6 +2,7 @@ package at.hannibal2.skyhanni.config;
 
 import at.hannibal2.skyhanni.SkyHanniMod;
 import at.hannibal2.skyhanni.config.features.About;
+import at.hannibal2.skyhanni.config.features.enchantparsing.EnchantParsingConfig;
 import at.hannibal2.skyhanni.config.features.bazaar.BazaarConfig;
 import at.hannibal2.skyhanni.config.features.chat.ChatConfig;
 import at.hannibal2.skyhanni.config.features.chroma.ChromaConfig;
@@ -23,6 +24,7 @@ import at.hannibal2.skyhanni.config.features.misc.MiscConfig;
 import at.hannibal2.skyhanni.config.features.rift.RiftConfig;
 import at.hannibal2.skyhanni.config.features.slayer.SlayerConfig;
 import at.hannibal2.skyhanni.config.features.stranded.StrandedConfig;
+import at.hannibal2.skyhanni.features.misc.items.enchants.EnchantParser;
 import com.google.gson.annotations.Expose;
 import io.github.moulberry.moulconfig.Config;
 import io.github.moulberry.moulconfig.Social;
@@ -55,6 +57,7 @@ public class Features extends Config {
     @Override
     public void saveNow() {
         SkyHanniMod.configManager.saveConfig(ConfigFileType.FEATURES, "close-gui");
+        EnchantParser.INSTANCE.markCacheDirty();
     }
 
     @Override
@@ -103,6 +106,10 @@ public class Features extends Config {
     @Expose
     @Category(name = "Dungeon", desc = "Features that change the Dungeons experience in The Catacombs.")
     public DungeonConfig dungeon = new DungeonConfig();
+
+    @Expose
+    @Category(name = "Enchant Parsing", desc = "Settings for SkyHanni's Enchant Parsing")
+    public EnchantParsingConfig enchantParsing = new EnchantParsingConfig();
 
     @Expose
     @Category(name = "Events", desc = "Stuff that is not always available.")

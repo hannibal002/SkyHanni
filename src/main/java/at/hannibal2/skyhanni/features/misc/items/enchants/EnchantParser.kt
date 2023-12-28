@@ -1,6 +1,9 @@
 package at.hannibal2.skyhanni.features.misc.items.enchants
 
 import at.hannibal2.skyhanni.SkyHanniMod
+import at.hannibal2.skyhanni.config.ConfigManager
+import at.hannibal2.skyhanni.config.features.enchantparsing.EnchantParsingConfig
+import at.hannibal2.skyhanni.config.features.enchantparsing.EnchantParsingConfig.ColorEnchants.CommaFormat
 import at.hannibal2.skyhanni.events.ChatHoverEvent
 import at.hannibal2.skyhanni.events.LorenzToolTipEvent
 import at.hannibal2.skyhanni.events.RepositoryReloadEvent
@@ -11,21 +14,23 @@ import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getEnchantments
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
+import java.io.File
+import java.io.FileInputStream
+import java.io.InputStreamReader
+import java.util.*
+import java.util.regex.Pattern
 import net.minecraft.event.HoverEvent
 import net.minecraft.item.ItemStack
 import net.minecraft.util.ChatComponentText
 import net.minecraft.util.IChatComponent
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
-import java.io.File
-import java.io.FileInputStream
-import java.io.InputStreamReader
-import java.util.TreeSet
-import java.util.regex.Pattern
 
 /**
  * Modified Enchant Parser from [SkyblockAddons](https://github.com/BiscuitDevelopment/SkyblockAddons/blob/main/src/main/java/codes/biscuit/skyblockaddons/features/enchants/EnchantManager.java)
  */
 object EnchantParser {
+
+    private val config get() = SkyHanniMod.feature.enchantParsing
 
     val ENCHANTMENT_PATTERN: Pattern = Pattern.compile("(?<enchant>[A-Za-z][A-Za-z -]+) (?<levelNumeral>[IVXLCDM]+)(?<stacking>, |\$| \\d{1,3}(,\\d{3})*)")
     private val GRAY_ENCHANT_PATTERN = Pattern.compile("^(Respiration|Aqua Affinity|Depth Strider|Efficiency).*")
@@ -42,17 +47,17 @@ object EnchantParser {
     fun onRepoReload(event: RepositoryReloadEvent) {
         val enchantsType = object : TypeToken<Enchants>(){}.type
         val inputStreamReader = InputStreamReader(
-            FileInputStream(File(SkyHanniMod.configManager.configDirectory, "/repo/constants/Enchants.json")))
+            FileInputStream(File(ConfigManager.configDirectory, "/repo/constants/Enchants.json")))
         val data = gson.fromJson<Enchants>(inputStreamReader, enchantsType)
         enchants = data
     }
 
     @SubscribeEvent
     fun onTooltipEvent(event: LorenzToolTipEvent) {
-        // If enchants doesn't have enchant data then we have no data to parse enchants correctly
+        // If enchants doesn't have any enchant data then we have no data to parse enchants correctly
         if (!isEnabled() || !enchants.hasEnchantData()) return
 
-        // The enchants we expect to find in the lore
+        // The enchants we expect to find in the lore, found from the items NBT data
         val enchants = event.itemStack.getEnchantments() ?: return
 
         // Check for any vanilla gray enchants at the top of the tooltip
@@ -91,8 +96,7 @@ object EnchantParser {
         // Find where the enchants start and end
         val startIndex = if (indexOfLastGrayEnchant == -1) 0 else indexOfLastGrayEnchant + 1
         for (i in startIndex until loreList.size) {
-            val line = loreList[i]
-            val strippedLine = line.removeColor()
+            val strippedLine = loreList[i].removeColor()
 
             if (startEnchant == -1) {
                 if (this.enchants.containsEnchantment(enchants, strippedLine)) startEnchant = i
@@ -104,19 +108,24 @@ object EnchantParser {
             return
         }
 
-        var hasLore = false
+        loreLines = mutableListOf()
+
         // Stacking enchants with their progress visible should have the
         // enchants stacked in a single column
         var shouldBeSingleColumn = false
         val orderedEnchants: TreeSet<FormattedEnchant> = TreeSet()
         var lastEnchant: FormattedEnchant? = null
-        loreLines = mutableListOf()
+
+        // Used to determine how many enchants are used on each line
+        // for this particular item, since consistency is not Hypixel's strong point
+        var maxEnchantsPerLine = 0
 
         // Order all enchants
         for (i in startEnchant..endEnchant) {
             val unformattedLine = loreList[i].removeColor()
             val matcher = ENCHANTMENT_PATTERN.matcher(unformattedLine)
             var containsEnchant = false
+            var enchantsOnThisLine = 0
 
             while (matcher.find()) {
                 // Pull enchant, enchant level and stacking amount if applicable
@@ -140,12 +149,14 @@ object EnchantParser {
                 }
 
                 containsEnchant = true
+                enchantsOnThisLine++
             }
+
+            maxEnchantsPerLine = if (enchantsOnThisLine > maxEnchantsPerLine) enchantsOnThisLine else maxEnchantsPerLine
 
             if (!containsEnchant && lastEnchant != null) {
                 lastEnchant.addLore(loreList[i])
                 loreLines.add(loreList[i])
-                hasLore = true
             }
         }
 
@@ -154,9 +165,9 @@ object EnchantParser {
             return
         }
 
-        // If we have color parsing off and hide enchant descriptions, remove them and return from method
-        if (!SkyHanniMod.feature.enchantParsing.colorEnchants.colorParsing) {
-            if (SkyHanniMod.feature.enchantParsing.hideEnchantDescriptions) {
+        // If we have color parsing off and hide enchant descriptions on, remove them and return from method
+        if (!config.colorEnchants.colorParsing) {
+            if (config.hideEnchantDescriptions) {
                 loreList.removeAll(loreLines)
                 loreCache.updateAfter(loreList)
                 if (chatComponent != null) editChatComponent(chatComponent, loreList)
@@ -169,15 +180,41 @@ object EnchantParser {
         loreList.subList(startEnchant, endEnchant + 1).clear()
 
         val insertEnchants: MutableList<String> = mutableListOf()
+        val commaFormat = config.colorEnchants.commaFormat
 
-        // Check we don't have any enchants with description lore
-        if (!hasLore && !shouldBeSingleColumn) {
-            val commaFormat = SkyHanniMod.feature.enchantParsing.colorEnchants.commaFormat
-
+        // Normal is leaving the formatting as Hypixel provides it
+        if (config.format == EnchantParsingConfig.EnchantFormat.NORMAL) {
             var builder = StringBuilder()
 
             for ((i, orderedEnchant: FormattedEnchant) in orderedEnchants.withIndex()) {
-                val comma = if (commaFormat == 0) ", " else "§9, "
+                val comma = if (commaFormat == CommaFormat.COPY_ENCHANT) ", " else "§9, "
+
+                builder.append(orderedEnchant.getFormattedString())
+                if (i % maxEnchantsPerLine != maxEnchantsPerLine - 1) {
+                    builder.append(comma)
+                } else {
+                    insertEnchants.add(builder.toString())
+
+                    // This will only add enchant descriptions if there were any to begin with
+                    if (!config.hideEnchantDescriptions) insertEnchants.addAll(orderedEnchant.getLore())
+
+                    builder = StringBuilder()
+                }
+            }
+
+            if (builder.isNotEmpty()) insertEnchants.add(builder.toString())
+
+            // Check if there is a trailing space (therefore also a comma) and remove the last 2 chars
+            if (insertEnchants.last().last() == ' ') {
+                insertEnchants[insertEnchants.lastIndex] = insertEnchants.last().dropLast(if (commaFormat == CommaFormat.COPY_ENCHANT) 2 else 4)
+            }
+
+        // Compressed is always forcing 3 enchants per line, except when there is stacking enchant progress visible
+        } else if (config.format == EnchantParsingConfig.EnchantFormat.COMPRESSED && !shouldBeSingleColumn) {
+            var builder = StringBuilder()
+
+            for ((i, orderedEnchant: FormattedEnchant) in orderedEnchants.withIndex()) {
+                val comma = if (commaFormat == CommaFormat.COPY_ENCHANT) ", " else "§9, "
 
                 builder.append(orderedEnchant.getFormattedString())
                 if (i % 3 != 2) {
@@ -190,14 +227,14 @@ object EnchantParser {
 
             if (builder.isNotEmpty()) insertEnchants.add(builder.toString())
 
-            // Check if there is a trailing space (i.e. also a comma) and remove the last 2 chars
+            // Check if there is a trailing space (therefore also a comma) and remove the last 2 chars
             if (insertEnchants.last().last() == ' ') {
-                insertEnchants[insertEnchants.lastIndex] = insertEnchants.last().dropLast(if (commaFormat == 0) 2 else 4)
+                insertEnchants[insertEnchants.lastIndex] = insertEnchants.last().dropLast(if (commaFormat == CommaFormat.COPY_ENCHANT) 2 else 4)
             }
-        }
-        // else add enchants unstacked
-        else {
-            if (!SkyHanniMod.feature.enchantParsing.hideEnchantDescriptions) {
+
+        // Stacked is always forcing 1 enchant per line
+        } else {
+            if (!config.hideEnchantDescriptions) {
                 for (enchant: FormattedEnchant in orderedEnchants) {
                     insertEnchants.add(enchant.getFormattedString())
                     insertEnchants.addAll(enchant.getLore())
@@ -238,7 +275,7 @@ object EnchantParser {
         if (!item.isEnchanted() || item.enchantmentTagList.tagCount() == 0) return -1
 
         var lastGrayEnchant = -1
-        val removeGrayEnchants = SkyHanniMod.feature.enchantParsing.hideVanillaEnchants
+        val removeGrayEnchants = config.hideVanillaEnchants
 
         var i = 1
         for (total in 0 until (1 + item.enchantmentTagList.tagCount())) {
@@ -255,7 +292,7 @@ object EnchantParser {
         return if (removeGrayEnchants) -1 else lastGrayEnchant
     }
 
-    fun isEnabled() = LorenzUtils.inSkyBlock && SkyHanniMod.feature.enchantParsing.enabled
+    fun isEnabled() = LorenzUtils.inSkyBlock && config.enabled
 
     fun markCacheDirty() {
         loreCache.configChanged = true

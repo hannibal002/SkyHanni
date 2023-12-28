@@ -1,6 +1,7 @@
-package at.hannibal2.skyhanni.config.features;
+package at.hannibal2.skyhanni.config.features.enchantparsing;
 
 import at.hannibal2.skyhanni.config.FeatureToggle;
+import at.hannibal2.skyhanni.utils.LorenzColor;
 import com.google.gson.annotations.Expose;
 import io.github.moulberry.moulconfig.annotations.Accordion;
 import io.github.moulberry.moulconfig.annotations.ConfigEditorBoolean;
@@ -28,6 +29,28 @@ public class EnchantParsingConfig {
     public boolean hideEnchantDescriptions = false;
 
     @Expose
+    @ConfigOption(name = "Format", desc = "The way the enchants are formatted in the tooltip.")
+    @ConfigEditorDropdown()
+    public EnchantFormat format = EnchantFormat.NORMAL;
+
+    public enum EnchantFormat {
+        NORMAL("Normal"),
+        COMPRESSED("Compressed"),
+        STACKED("Stacked");
+
+        public final String str;
+
+        EnchantFormat(String str) {
+            this.str = str;
+        }
+
+        @Override
+        public String toString() {
+            return str;
+        }
+    }
+
+    @Expose
     @ConfigOption(name = "Enchant Coloring", desc = "")
     @Accordion
     public ColorEnchants colorEnchants = new ColorEnchants();
@@ -42,36 +65,44 @@ public class EnchantParsingConfig {
 
         @Expose
         @ConfigOption(name = "Perfect Enchantment Color", desc = "The color an enchantment will be at max level.")
-        @ConfigEditorDropdown(values = {"§0Black", "§1Dark Blue", "§2Dark Green", "§3Dark Aqua", "§4Dark Red",
-            "§5Dark Purple", "§6Gold", "§7Gray", "§8Dark Gray", "§9Blue", "§aGreen", "§bAqua",
-            "§cRed", "§dPink", "§eYellow", "§fWhite", "§ZChroma"})
-        public int perfectEnchantColor = 16;
+        @ConfigEditorDropdown()
+        public LorenzColor perfectEnchantColor = LorenzColor.CHROMA;
 
         @Expose
         @ConfigOption(name = "Great Enchantment Color", desc = "The color an enchantment will be at a great level.")
-        @ConfigEditorDropdown(values = {"§0Black", "§1Dark Blue", "§2Dark Green", "§3Dark Aqua", "§4Dark Red",
-            "§5Dark Purple", "§6Gold", "§7Gray", "§8Dark Gray", "§9Blue", "§aGreen", "§bAqua",
-            "§cRed", "§dPink", "§eYellow", "§fWhite", "§ZChroma"})
-        public int greatEnchantColor = 6;
+        @ConfigEditorDropdown()
+        public LorenzColor greatEnchantColor = LorenzColor.GOLD;
 
         @Expose
         @ConfigOption(name = "Good Enchantment Color", desc = "The color an enchantment will be at a good level.")
-        @ConfigEditorDropdown(values = {"§0Black", "§1Dark Blue", "§2Dark Green", "§3Dark Aqua", "§4Dark Red",
-            "§5Dark Purple", "§6Gold", "§7Gray", "§8Dark Gray", "§9Blue", "§aGreen", "§bAqua",
-            "§cRed", "§dPink", "§eYellow", "§fWhite", "§ZChroma"})
-        public int goodEnchantColor = 9;
+        @ConfigEditorDropdown()
+        public LorenzColor goodEnchantColor = LorenzColor.BLUE;
 
         @Expose
         @ConfigOption(name = "Poor Enchantment Color", desc = "The color an enchantment will be at a poor level.")
-        @ConfigEditorDropdown(values = {"§0Black", "§1Dark Blue", "§2Dark Green", "§3Dark Aqua", "§4Dark Red",
-            "§5Dark Purple", "§6Gold", "§7Gray", "§8Dark Gray", "§9Blue", "§aGreen", "§bAqua",
-            "§cRed", "§dPink", "§eYellow", "§fWhite", "§ZChroma"})
-        public int poorEnchantColor = 7;
+        @ConfigEditorDropdown()
+        public LorenzColor poorEnchantColor = LorenzColor.GRAY;
 
         @Expose
         @ConfigOption(name = "Comma Format", desc = "Change the format of the comma after each enchant.")
-        @ConfigEditorDropdown(values = {"Copy enchant format", "Default (Blue)"})
-        public int commaFormat = 0;
+        @ConfigEditorDropdown()
+        public CommaFormat commaFormat = CommaFormat.COPY_ENCHANT;
+
+        public enum CommaFormat {
+            COPY_ENCHANT("Copy enchant format"),
+            DEFAULT("Default (Blue)");
+
+            public final String str;
+
+            CommaFormat(String str) {
+                this.str = str;
+            }
+
+            @Override
+            public String toString() {
+                return str;
+            }
+        }
 
     }
 }
