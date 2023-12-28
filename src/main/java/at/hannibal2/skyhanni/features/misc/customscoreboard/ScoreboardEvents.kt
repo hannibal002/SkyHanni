@@ -445,15 +445,14 @@ private fun getMiningEventsLines(): List<String> {
     }
 
     // Zone ScoreboardEvents
-    if (getSbLines().any { it.startsWith("Event: ") } && getSbLines().any {
-            it.startsWith("Zone: ")
-        }) {
-        list += getSbLines().firstOrNull { it.startsWith("Event: ") }
-            ?.removePrefix("Event: ") ?: "<hidden>"
-        if (getSbLines().any { it.startsWith("Zone: ") }) {
-            list += "§fin " + (getSbLines().firstOrNull { it.startsWith("Zone: ") }
-                ?.removePrefix("Zone: ") ?: "<hidden>")
-        }
+    if (
+        getSbLines().any { ScoreboardPattern.miningEventPattern.matches(it) }
+        && getSbLines().any { ScoreboardPattern.miningEventZonePattern.matches(it) }
+    ) {
+        list += getSbLines().first { ScoreboardPattern.miningEventPattern.matches(it) }
+            .removePrefix("Event: ")
+        list += "in " + getSbLines().first { ScoreboardPattern.miningEventZonePattern.matches(it) }
+            .removePrefix("Zone: ")
     }
 
     // Mithril Gourmand
