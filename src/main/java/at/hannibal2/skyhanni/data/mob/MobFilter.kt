@@ -295,6 +295,7 @@ object MobFilter {
         when {
             armorStand.name.endsWith("'s Armadillo") -> return MobResult.illegal // Armadillo Pet
             armorStand.name.endsWith("'s Rat") -> return MobResult.illegal // Rat Pet
+            baseEntity.riddenByEntity is EntityPlayer && MobUtils.getArmorStand(baseEntity, 2)?.inventory?.get(4)?.getSkullTexture() == RatSkull -> return MobResult.illegal // Rat Morph
         }
         when (armorStand.inventory?.get(4)?.getSkullTexture()) {
             HellwispTentacleSkull -> return MobResult.illegal // Hellwisp Tentacle
