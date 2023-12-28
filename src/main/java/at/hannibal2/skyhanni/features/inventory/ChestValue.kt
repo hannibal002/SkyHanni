@@ -1,6 +1,9 @@
 package at.hannibal2.skyhanni.features.inventory
 
 import at.hannibal2.skyhanni.SkyHanniMod
+import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
+import at.hannibal2.skyhanni.config.features.inventory.ChestValueConfig.NumberFormatEntry
+import at.hannibal2.skyhanni.config.features.inventory.ChestValueConfig.SortingTypeEntry
 import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.events.GuiContainerEvent
 import at.hannibal2.skyhanni.events.GuiRenderEvent
@@ -9,6 +12,7 @@ import at.hannibal2.skyhanni.events.InventoryOpenEvent
 import at.hannibal2.skyhanni.events.LorenzTickEvent
 import at.hannibal2.skyhanni.features.misc.items.EstimatedItemValue
 import at.hannibal2.skyhanni.features.misc.items.EstimatedItemValueCalculator
+import at.hannibal2.skyhanni.utils.ConfigUtils
 import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalNameOrNull
 import at.hannibal2.skyhanni.utils.LorenzUtils
@@ -45,7 +49,7 @@ class ChestValue {
         if (InventoryUtils.openInventoryName() == "") return
 
         if (!config.showDuringEstimatedItemValue) {
-            if (EstimatedItemValue.currentlyShowing) return
+            if (EstimatedItemValue.isCurrentlyShowing()) return
         }
 
         if (inInventory) {
@@ -126,11 +130,11 @@ class ChestValue {
             val textAmount = " §7x$amount:"
             val width = Minecraft.getMinecraft().fontRendererObj.getStringWidth(textAmount)
             val name = "${stack.displayName.reduceStringLength((config.nameLength - width), ' ')} $textAmount"
-            val price = "§b${(total).formatPrice()}"
+            val price = "§6${(total).formatPrice()}"
             val text = if (config.alignedDisplay)
                 "$name $price"
             else
-                "${stack.displayName} §7x$amount: §b${total.formatPrice()}"
+                "${stack.displayName} §7x$amount: §6${total.formatPrice()}"
             newDisplay.add(buildList {
                 val renderable = Renderable.hoverTips(
                     text,
@@ -144,27 +148,29 @@ class ChestValue {
             })
             rendered++
         }
-        newDisplay.addAsSingletonList("§6Total value : §b${totalPrice.formatPrice()}")
+        newDisplay.addAsSingletonList("§aTotal value: §6${totalPrice.formatPrice()} coins")
     }
 
     private fun sortedList() = when (config.sortingType) {
-        0 -> chestItems.values.sortedByDescending { it.total }
-        1 -> chestItems.values.sortedBy { it.total }
+        SortingTypeEntry.DESCENDING -> chestItems.values.sortedByDescending { it.total }
+        SortingTypeEntry.ASCENDING -> chestItems.values.sortedBy { it.total }
         else -> chestItems.values.sortedByDescending { it.total }
     }.toMutableList()
 
     private fun addButton(newDisplay: MutableList<List<Any>>) {
         newDisplay.addButton("§7Sorted By: ",
-            getName = SortType.entries[config.sortingType].longName,
+            getName = SortType.entries[config.sortingType.ordinal].longName, // todo avoid ordinal
             onChange = {
-                config.sortingType = (config.sortingType + 1) % 2
+                // todo avoid ordinals
+                config.sortingType = SortingTypeEntry.entries[(config.sortingType.ordinal + 1) % 2]
                 update()
             })
 
         newDisplay.addButton("§7Value format: ",
-            getName = FormatType.entries[config.formatType].type,
+            getName = FormatType.entries[config.formatType.ordinal].type, // todo avoid ordinal
             onChange = {
-                config.formatType = (config.formatType + 1) % 2
+                // todo avoid ordinal
+                config.formatType = NumberFormatEntry.entries[(config.formatType.ordinal + 1) % 2]
                 update()
             })
 
@@ -197,7 +203,7 @@ class ChestValue {
                 val key = "$internalName+$total"
                 if (stack.item == Items.enchanted_book)
                     total /= 2
-                list.add("§aTotal: §6§l${total.formatPrice()}")
+                list.add("§aTotal: §6§l${total.formatPrice()} coins")
                 if (total == 0.0) continue
                 val item = chestItems.getOrPut(key) {
                     Item(mutableListOf(), 0, stack, 0.0, list)
@@ -211,8 +217,11 @@ class ChestValue {
 
     private fun Double.formatPrice(): String {
         return when (config.formatType) {
-            0 -> if (this > 1_000_000_000) NumberUtil.format(this, true) else NumberUtil.format(this)
-            1 -> this.addSeparators()
+            NumberFormatEntry.SHORT -> if (this > 1_000_000_000) NumberUtil.format(this, true) else NumberUtil.format(
+                this
+            )
+
+            NumberFormatEntry.LONG -> this.addSeparators()
             else -> "0"
         }
     }
@@ -280,4 +289,14 @@ class ChestValue {
     )
 
     private fun isEnabled() = LorenzUtils.inSkyBlock && config.enabled
+
+    @SubscribeEvent
+    fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
+        event.transform(17, "inventory.chestValueConfig.formatType") { element ->
+            ConfigUtils.migrateIntToEnum(element, NumberFormatEntry::class.java)
+        }
+        event.transform(15, "inventory.chestValueConfig.sortingType") { element ->
+            ConfigUtils.migrateIntToEnum(element, SortingTypeEntry::class.java)
+        }
+    }
 }

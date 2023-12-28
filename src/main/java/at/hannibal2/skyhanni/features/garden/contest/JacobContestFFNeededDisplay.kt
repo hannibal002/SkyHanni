@@ -1,11 +1,11 @@
 package at.hannibal2.skyhanni.features.garden.contest
 
-import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.InventoryCloseEvent
 import at.hannibal2.skyhanni.events.RenderItemTooltipEvent
 import at.hannibal2.skyhanni.features.garden.CropType
 import at.hannibal2.skyhanni.features.garden.FarmingFortuneDisplay.Companion.getLatestTrueFarmingFortune
+import at.hannibal2.skyhanni.features.garden.GardenAPI
 import at.hannibal2.skyhanni.features.garden.farming.GardenCropSpeed.getLatestBlocksPerSecond
 import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.name
@@ -19,7 +19,7 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import kotlin.math.ceil
 
 class JacobContestFFNeededDisplay {
-    private val config get() = SkyHanniMod.feature.garden
+    private val config get() = GardenAPI.config
     private var display = emptyList<List<Any>>()
     private var lastToolTipTime = 0L
     private val cache = mutableMapOf<ItemStack, List<List<Any>>>()
@@ -95,7 +95,7 @@ class JacobContestFFNeededDisplay {
         if (blocksPerSecond == null || trueFF == null) {
             add(listOf("§cMissing data from above!"))
         } else {
-            val predictedScore = (trueFF * blocksPerSecond * crop.baseDrops * 20 * 60 / 100).toInt().addSeparators()
+            val predictedScore = ((100.0 + trueFF) * blocksPerSecond * crop.baseDrops * 20 * 60 / 100).toInt().addSeparators()
             add(listOf("§6Predicted ", crop.icon, "§6crops: $predictedScore"))
         }
     }
@@ -106,8 +106,9 @@ class JacobContestFFNeededDisplay {
         val counter = map[bracket] ?: return " ${bracket.displayName}§f: §8Not found!"
         val blocksPerSecond = crop.getRealBlocksPerSecond()
         val cropsPerSecond = counter.toDouble() / blocksPerSecond / 60
-        val farmingFortune = formatFarmingFortune(cropsPerSecond * 100 / 20 / crop.baseDrops)
-        return " ${bracket.displayName}§f: §6$farmingFortune FF §7(${counter.addSeparators()} crops)"
+        val farmingFortune = (cropsPerSecond * 100 / 20 / crop.baseDrops) - 100
+        val format = formatFarmingFortune(farmingFortune.coerceAtLeast(0.0))
+        return " ${bracket.displayName}§f: §6$format FF §7(${counter.addSeparators()} crops)"
     }
 
     @SubscribeEvent

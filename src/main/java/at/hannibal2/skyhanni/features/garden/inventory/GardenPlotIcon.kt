@@ -1,6 +1,5 @@
 package at.hannibal2.skyhanni.features.garden.inventory
 
-import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.events.InventoryCloseEvent
 import at.hannibal2.skyhanni.events.InventoryFullyOpenedEvent
 import at.hannibal2.skyhanni.events.LorenzToolTipEvent
@@ -20,7 +19,7 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
 object GardenPlotIcon {
 
-    private val config get() = SkyHanniMod.feature.garden.plotIcon
+    private val config get() = GardenAPI.config.plotIcon
     private val plotList get() = GardenAPI.storage?.plotIcon?.plotList
     private var inInventory = false
     private var copyStack: ItemStack? = null

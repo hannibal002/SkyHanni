@@ -15,7 +15,7 @@ public class AnitaShopConfig {
     )
     @ConfigEditorBoolean
     @FeatureToggle
-    public boolean medalProfitEnabled = true;
+    public boolean medalProfitEnabled = false;
 
     @Expose
     @ConfigOption(

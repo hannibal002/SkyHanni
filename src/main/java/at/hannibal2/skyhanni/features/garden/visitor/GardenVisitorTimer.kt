@@ -1,6 +1,5 @@
 package at.hannibal2.skyhanni.features.garden.visitor
 
-import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.events.CropClickEvent
 import at.hannibal2.skyhanni.events.GuiRenderEvent
@@ -23,14 +22,15 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import kotlin.concurrent.fixedRateTimer
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.milliseconds
+import kotlin.time.Duration.Companion.minutes
 import kotlin.time.Duration.Companion.seconds
 import kotlin.time.DurationUnit
 import kotlin.time.toDuration
 
 class GardenVisitorTimer {
-    private val config get() = SkyHanniMod.feature.garden.visitors.timer
+    private val config get() = GardenAPI.config.visitors.timer
     private val pattern = "§b§lVisitors: §r§f\\((?<time>.*)\\)".toPattern()
-    private var render = ""
+    private var display = ""
     private var lastMillis = 0.seconds
     private var sixthVisitorArrivalTime = SimpleTimeMark.farPast()
     private var visitorJustArrived = false
@@ -73,7 +73,7 @@ class GardenVisitorTimer {
 
     @SubscribeEvent
     fun onPreProfileSwitch(event: PreProfileSwitchEvent) {
-        render = ""
+        display = ""
         lastMillis = 0.seconds
         sixthVisitorArrivalTime = SimpleTimeMark.farPast()
         visitorJustArrived = false
@@ -93,7 +93,7 @@ class GardenVisitorTimer {
                 continue
             }
             if (line == "§b§lVisitors: §r§f(§r§cNot Unlocked!§r§f)") {
-                render = ""
+                display = ""
                 return
             }
 
@@ -129,9 +129,11 @@ class GardenVisitorTimer {
             if (isSixthVisitorEnabled() && millis.isNegative()) {
                 visitorsAmount++
                 if (!sixthVisitorReady) {
-                    LorenzUtils.sendTitle("§a6th Visitor Ready", 5.seconds)
                     sixthVisitorReady = true
-                    if (isSixthVisitorWarningEnabled()) SoundUtils.playBeepSound()
+                    if (isSixthVisitorWarningEnabled()) {
+                        LorenzUtils.sendTitle("§a6th Visitor Ready", 5.seconds)
+                        SoundUtils.playBeepSound()
+                    }
                 }
             }
         }
@@ -160,27 +162,26 @@ class GardenVisitorTimer {
         }
 
         val extraSpeed = if (diff in 2.seconds..10.seconds) {
-            val factor = diff.inWholeSeconds.toDouble()
-            val duration = millis / factor
+            val duration = millis / 3
             "§7/§$formatColor" + duration.format()
         } else ""
         if (config.newVisitorPing && millis < 10.seconds) {
             SoundUtils.playBeepSound()
         }
 
-        val formatDuration = TimeUtils.formatDuration(millis)
+        val formatDuration = millis.format()
         val next = if (queueFull && (!isSixthVisitorEnabled() || millis.isNegative())) "§cQueue Full!" else {
             "Next in §$formatColor$formatDuration$extraSpeed"
         }
         val visitorLabel = if (visitorsAmount == 1) "visitor" else "visitors"
-        render = "§b$visitorsAmount $visitorLabel §7($next§7)"
+        display = "§b$visitorsAmount $visitorLabel §7($next§7)"
     }
 
     @SubscribeEvent
     fun onRenderOverlay(event: GuiRenderEvent.GuiOverlayRenderEvent) {
         if (!isEnabled()) return
 
-        config.pos.renderString(render, posLabel = "Garden Visitor Timer")
+        config.pos.renderString(display, posLabel = "Garden Visitor Timer")
     }
 
     @SubscribeEvent
@@ -200,7 +201,11 @@ class GardenVisitorTimer {
     fun onBlockBreak(event: CropClickEvent) {
         if (!isEnabled()) return
         sixthVisitorArrivalTime -= 100.milliseconds
-        lastTimerUpdate -= 100.milliseconds
+
+        // We only need manually retracting the time when hypixel shows 6 minutes or above
+        if (lastMillis > 5.minutes) {
+            lastTimerUpdate -= 100.milliseconds
+        }
     }
 
     private fun updateSixthVisitorArrivalTime() {

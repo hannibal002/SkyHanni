@@ -2,12 +2,14 @@ package at.hannibal2.skyhanni.features.mining.powdertracker
 
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
+import at.hannibal2.skyhanni.config.features.mining.PowderTrackerConfig.PowderDisplayEntry
 import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.events.ConfigLoadEvent
 import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.LorenzChatEvent
 import at.hannibal2.skyhanni.events.LorenzTickEvent
 import at.hannibal2.skyhanni.events.LorenzWorldChangeEvent
+import at.hannibal2.skyhanni.utils.ConfigUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils.addAsSingletonList
 import at.hannibal2.skyhanni.utils.LorenzUtils.afterChange
 import at.hannibal2.skyhanni.utils.LorenzUtils.isInIsland
@@ -172,16 +174,17 @@ object PowderTracker {
     @SubscribeEvent
     fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
         event.move(2, "misc.powderTrackerConfig", "mining.powderTracker")
-
-        event.move(8, "#profile.powderTracker", "#profile.powderTracker") { old ->
-            old.asJsonObject.get("0")
+        event.transform(8, "#profile.powderTracker") { old -> old.asJsonObject.get("0") }
+        event.transform(11, "mining.powderTracker.textFormat") { element ->
+            ConfigUtils.migrateIntArrayListToEnumArrayList(element, PowderDisplayEntry::class.java)
         }
     }
 
     private fun formatDisplay(map: List<List<Any>>) = buildList {
         if (map.isEmpty()) return@buildList
         for (index in config.textFormat.get()) {
-            add(map[index])
+            // TODO, change functionality to use enum rather than ordinals
+            add(map[index.ordinal])
         }
     }
 

@@ -2,18 +2,21 @@ package at.hannibal2.skyhanni.features.event.jerry.frozentreasure
 
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
+import at.hannibal2.skyhanni.config.features.event.winter.FrozenTreasureConfig.FrozenTreasureDisplayEntry
 import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.data.ProfileStorageData
 import at.hannibal2.skyhanni.data.ScoreboardData
 import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.LorenzChatEvent
 import at.hannibal2.skyhanni.events.LorenzWorldChangeEvent
+import at.hannibal2.skyhanni.utils.ConfigUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils.addAsSingletonList
 import at.hannibal2.skyhanni.utils.LorenzUtils.addOrPut
 import at.hannibal2.skyhanni.utils.LorenzUtils.isInIsland
 import at.hannibal2.skyhanni.utils.NumberUtil
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
+import at.hannibal2.skyhanni.utils.StringUtils.matches
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.tracker.SkyHanniTracker
 import at.hannibal2.skyhanni.utils.tracker.TrackerData
@@ -96,7 +99,8 @@ object FrozenTreasureTracker {
     private fun formatDisplay(map: List<List<Any>>): List<List<Any>> {
         val newList = mutableListOf<List<Any>>()
         for (index in config.textFormat) {
-            newList.add(map[index])
+            // TODO, change functionality to use enum rather than ordinals
+            newList.add(map[index.ordinal])
         }
         return newList
     }
@@ -115,20 +119,18 @@ object FrozenTreasureTracker {
             if (config.hideMessages) event.blockedReason = "frozen treasure tracker"
         }
 
-        for (treasure in FrozenTreasure.entries) {
-            if ("FROZEN TREASURE! You found ${treasure.displayName.removeColor()}!".toRegex().matches(message)) {
-                tracker.modify {
-                    it.treasuresMined += 1
-                    it.treasureCount.addOrPut(treasure, 1)
-                }
-                if (config.hideMessages) event.blockedReason = "frozen treasure tracker"
+        for (treasure in FrozenTreasure.entries.filter { it.pattern.matches(message) }) {
+            tracker.modify {
+                it.treasuresMined += 1
+                it.treasureCount.addOrPut(treasure, 1)
             }
+            if (config.hideMessages) event.blockedReason = "frozen treasure tracker"
         }
     }
 
     private fun drawDisplay(data: Data) = buildList<List<Any>> {
         calculateIce(data)
-        addAsSingletonList("§1§lFrozen Treasure Tracker")
+        addAsSingletonList("§e§lFrozen Treasure Tracker")
         addAsSingletonList("§6${formatNumber(data.treasuresMined)} Treasures Mined")
         addAsSingletonList("§3${formatNumber(estimatedIce)} Total Ice")
         addAsSingletonList("§3${formatNumber(icePerHour)} Ice/hr")
@@ -168,6 +170,13 @@ object FrozenTreasureTracker {
     @SubscribeEvent
     fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
         event.move(2, "misc.frozenTreasureTracker", "event.winter.frozenTreasureTracker")
+        event.move(
+            11,
+            "event.winter.frozenTreasureTracker.textFormat",
+            "event.winter.frozenTreasureTracker.textFormat"
+        ) { element ->
+            ConfigUtils.migrateIntArrayListToEnumArrayList(element, FrozenTreasureDisplayEntry::class.java)
+        }
     }
 
     private fun onJerryWorkshop() = IslandType.WINTER.isInIsland()

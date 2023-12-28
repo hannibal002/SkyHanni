@@ -1,6 +1,8 @@
 package at.hannibal2.skyhanni.features.misc.trevor
 
 import at.hannibal2.skyhanni.SkyHanniMod
+import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
+import at.hannibal2.skyhanni.config.features.misc.TrevorTheTrapperConfig.TrackerEntry
 import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.data.ScoreboardData
 import at.hannibal2.skyhanni.events.CheckRenderEntityEvent
@@ -14,6 +16,7 @@ import at.hannibal2.skyhanni.features.garden.farming.GardenCropSpeed
 import at.hannibal2.skyhanni.mixins.hooks.RenderLivingEntityHelper
 import at.hannibal2.skyhanni.test.GriffinUtils.drawWaypointFilled
 import at.hannibal2.skyhanni.test.command.ErrorManager
+import at.hannibal2.skyhanni.utils.ConfigUtils
 import at.hannibal2.skyhanni.utils.EntityUtils
 import at.hannibal2.skyhanni.utils.LocationUtils.distanceToPlayer
 import at.hannibal2.skyhanni.utils.LorenzColor
@@ -67,16 +70,16 @@ object TrevorFeatures {
 
     init {
         fixedRateTimer(name = "skyhanni-update-trapper", period = 1000L) {
-            Minecraft.getMinecraft().addScheduledTask {
-                try {
-                    if (config.trapperSolver && onFarmingIsland()) {
+            if (onFarmingIsland() && config.trapperSolver) {
+                Minecraft.getMinecraft().addScheduledTask {
+                    try {
                         updateTrapper()
-                        TrevorTracker.saveAndUpdate()
+                        TrevorTracker.update()
                         TrevorTracker.calculatePeltsPerHour()
                         if (questActive) TrevorSolver.findMob()
+                    } catch (error: Throwable) {
+                        ErrorManager.logError(error, "Encountered an error when updating the trapper solver")
                     }
-                } catch (error: Throwable) {
-                    ErrorManager.logError(error, "Encountered an error when updating the trapper solver")
                 }
             }
         }
@@ -158,7 +161,6 @@ object TrevorFeatures {
         )
     }
 
-
     private fun updateTrapper() {
         timeUntilNextReady -= 1
         if (trapperReady && timeUntilNextReady > 0) {
@@ -220,7 +222,7 @@ object TrevorFeatures {
             { config.trapperTalkCooldown }
             entityTrapper.getLorenzVec().let {
                 if (it.distanceToPlayer() < 15) {
-                    event.drawString(it.add(0.0, 2.23, 0.0), currentLabel)
+                    event.drawString(it.add(y = 2.23), currentLabel)
                 }
             }
         }
@@ -236,11 +238,11 @@ object TrevorFeatures {
                     TrevorSolver.currentMob!!.mobName
                 }
                 location = TrevorSolver.mobCoordinates
-                event.drawWaypointFilled(location.add(0, -2, 0), LorenzColor.GREEN.toColor(), true, true)
-                event.drawDynamicText(location.add(0, 1, 0), displayName, 1.5)
+                event.drawWaypointFilled(location.add(y = -2), LorenzColor.GREEN.toColor(), true, true)
+                event.drawDynamicText(location.add(y = 1), displayName, 1.5)
             } else {
                 event.drawWaypointFilled(location, LorenzColor.GOLD.toColor(), true, true)
-                event.drawDynamicText(location.add(0, 1, 0), TrevorSolver.mobLocation.location, 1.5)
+                event.drawDynamicText(location.add(y = 1), TrevorSolver.mobLocation.location, 1.5)
             }
         }
     }
@@ -302,4 +304,11 @@ object TrevorFeatures {
     fun onFarmingIsland() = IslandType.THE_FARMING_ISLANDS.isInIsland()
 
     fun inTrapperDen() = ScoreboardData.sidebarLinesFormatted.contains(" §7⏣ §bTrapper's Den")
+
+    @SubscribeEvent
+    fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
+        event.transform(11, "misc.trevorTheTrapper.textFormat") { element ->
+            ConfigUtils.migrateIntArrayListToEnumArrayList(element, TrackerEntry::class.java)
+        }
+    }
 }

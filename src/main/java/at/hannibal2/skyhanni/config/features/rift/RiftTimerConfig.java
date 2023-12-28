@@ -5,6 +5,7 @@ import at.hannibal2.skyhanni.config.core.config.Position;
 import com.google.gson.annotations.Expose;
 import io.github.moulberry.moulconfig.annotations.ConfigEditorBoolean;
 import io.github.moulberry.moulconfig.annotations.ConfigOption;
+import io.github.moulberry.moulconfig.observer.Property;
 
 public class RiftTimerConfig {
 
@@ -17,12 +18,12 @@ public class RiftTimerConfig {
     @Expose
     @ConfigOption(name = "Max Time", desc = "Show max time.")
     @ConfigEditorBoolean
-    public boolean maxTime = true;
+    public Property<Boolean> maxTime = Property.of(true);
 
     @Expose
     @ConfigOption(name = "Percentage", desc = "Show percentage.")
     @ConfigEditorBoolean
-    public boolean percentage = true;
+    public Property<Boolean> percentage = Property.of(true);
 
     @Expose
     public Position timerPosition = new Position(10, 10, false, true);

@@ -121,6 +121,8 @@ object SkyBlockItemModifierUtils {
 
     fun ItemStack.getFungiCutterMode() = getAttributeString("fungi_cutter_mode")
 
+    fun ItemStack.getRanchersSpeed() = getAttributeInt("ranchers_speed")
+
     fun ItemStack.getRune(): NEUInternalName? {
         val runesMap = getExtraAttributes()?.getCompoundTag("runes") ?: return null
         val runesList = runesMap.keySet.associateWith { runesMap.getInteger(it) }.toList()
@@ -178,6 +180,10 @@ object SkyBlockItemModifierUtils {
     fun ItemStack.hasArtOfPeace() = getAttributeBoolean("artOfPeaceApplied")
 
     fun ItemStack.getLivingMetalProgress() = getAttributeInt("lm_evo")
+
+    fun ItemStack.getBottleOfJyrreSeconds() = getAttributeInt("bottle_of_jyrre_seconds")
+
+    fun ItemStack.getEdition() = getAttributeInt("edition")
 
     fun ItemStack.getEnchantments() = getExtraAttributes()?.takeIf { it.hasKey("enchantments") }?.run {
         val enchantments = this.getCompoundTag("enchantments")

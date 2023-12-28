@@ -5,6 +5,7 @@ import at.hannibal2.skyhanni.config.core.config.Position;
 import at.hannibal2.skyhanni.config.features.garden.composter.ComposterConfig;
 import at.hannibal2.skyhanni.config.features.garden.cropmilestones.CropMilestonesConfig;
 import at.hannibal2.skyhanni.config.features.garden.optimalspeed.OptimalSpeedConfig;
+import at.hannibal2.skyhanni.config.features.garden.pests.PestsConfig;
 import at.hannibal2.skyhanni.config.features.garden.visitor.VisitorConfig;
 import com.google.gson.annotations.Expose;
 import io.github.moulberry.moulconfig.annotations.Accordion;
@@ -54,9 +55,10 @@ public class GardenConfig {
     public EliteFarmingWeightConfig eliteFarmingWeights = new EliteFarmingWeightConfig();
 
     @Expose
-    @ConfigOption(name = "Dicer Counter", desc = "")
+    @ConfigOption(name = "Dicer RNG Drop Tracker", desc = "")
     @Accordion
-    public DicerCounterConfig dicerCounters = new DicerCounterConfig();
+    // TODO rename to dicerRngDropTracker
+    public DicerRngDropTrackerConfig dicerCounters = new DicerRngDropTrackerConfig();
 
     @Expose
     @ConfigOption(name = "Money per Hour", desc = "")
@@ -69,10 +71,10 @@ public class GardenConfig {
     public NextJacobContestConfig nextJacobContests = new NextJacobContestConfig();
 
     @Expose
-    @ConfigOption(name = "Farming Armor Drops", desc = "")
-
+    @ConfigOption(name = "Armor Drop Tracker", desc = "")
     @Accordion
-    public FarmingArmorDropsConfig farmingArmorDrop = new FarmingArmorDropsConfig();
+    // TODO renmae to armorDropTracker
+    public ArmorDropTrackerConfig farmingArmorDrop = new ArmorDropTrackerConfig();
 
     @Expose
     @ConfigOption(name = "Anita Shop", desc = "")
@@ -82,6 +84,10 @@ public class GardenConfig {
     @Expose
     @Category(name = "Composter", desc = "Composter Settings")
     public ComposterConfig composters = new ComposterConfig();
+
+    @Expose
+    @Category(name = "Pests", desc = "Pests Settings")
+    public PestsConfig pests = new PestsConfig();
 
     @Expose
     @ConfigOption(name = "Farming Fortune Display", desc = "")
@@ -107,6 +113,11 @@ public class GardenConfig {
     @ConfigOption(name = "Garden Plot Icon", desc = "")
     @Accordion
     public PlotIconConfig plotIcon = new PlotIconConfig();
+
+    @Expose
+    @ConfigOption(name = "Garden Commands", desc = "")
+    @Accordion
+    public GardenCommandsConfig gardenCommands = new GardenCommandsConfig();
 
     @Expose
     @ConfigOption(name = "Plot Price", desc = "Show the price of the plot in coins when inside the Configure Plots inventory.")
@@ -202,6 +213,12 @@ public class GardenConfig {
     @ConfigEditorBoolean
     @FeatureToggle
     public boolean plotBorders = true;
+
+    @Expose
+    @ConfigOption(name = "Plot Name in Scoreboard", desc = "Showing a more compact plot name in scoreboard. Updates faster and doesnt hide when pests are spawned.")
+    @ConfigEditorBoolean
+    @FeatureToggle
+    public boolean plotNameInScoreboard = true;
 
     @Expose
     @ConfigOption(name = "Copy Milestone Data", desc = "Copy wrong crop milestone data in clipboard when opening the crop milestone menu. Please share this data in SkyHanni discord.")

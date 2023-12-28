@@ -1,22 +1,28 @@
 package at.hannibal2.skyhanni.config;
 
 import at.hannibal2.skyhanni.data.model.ComposterUpgrade;
+import at.hannibal2.skyhanni.features.bingo.card.goals.BingoGoal;
 import at.hannibal2.skyhanni.features.combat.endernodetracker.EnderNodeTracker;
 import at.hannibal2.skyhanni.features.combat.ghostcounter.GhostData;
 import at.hannibal2.skyhanni.features.dungeon.DungeonAPI;
+import at.hannibal2.skyhanni.features.event.diana.DianaProfitTracker;
+import at.hannibal2.skyhanni.features.event.diana.MythologicalCreatureTracker;
 import at.hannibal2.skyhanni.features.event.jerry.frozentreasure.FrozenTreasureTracker;
-import at.hannibal2.skyhanni.features.fishing.FishingProfitTracker;
+import at.hannibal2.skyhanni.features.fishing.tracker.FishingProfitTracker;
+import at.hannibal2.skyhanni.features.fishing.tracker.SeaCreatureTracker;
 import at.hannibal2.skyhanni.features.fishing.trophy.TrophyRarity;
 import at.hannibal2.skyhanni.features.garden.CropAccessory;
 import at.hannibal2.skyhanni.features.garden.CropType;
+import at.hannibal2.skyhanni.features.garden.GardenPlotAPI;
 import at.hannibal2.skyhanni.features.garden.farming.ArmorDropTracker;
-import at.hannibal2.skyhanni.features.garden.farming.DicerDropTracker;
+import at.hannibal2.skyhanni.features.garden.farming.DicerRngDropTracker;
 import at.hannibal2.skyhanni.features.garden.fortuneguide.FarmingItems;
 import at.hannibal2.skyhanni.features.garden.visitor.VisitorReward;
 import at.hannibal2.skyhanni.features.mining.powdertracker.PowderTracker;
 import at.hannibal2.skyhanni.features.misc.trevor.TrevorTracker;
 import at.hannibal2.skyhanni.features.misc.visualwords.VisualWord;
-import at.hannibal2.skyhanni.features.rift.area.westvillage.KloonTerminal;
+import at.hannibal2.skyhanni.features.rift.area.westvillage.VerminTracker;
+import at.hannibal2.skyhanni.features.rift.area.westvillage.kloon.KloonTerminal;
 import at.hannibal2.skyhanni.features.slayer.SlayerProfitTracker;
 import at.hannibal2.skyhanni.utils.LorenzVec;
 import at.hannibal2.skyhanni.utils.NEUInternalName;
@@ -26,8 +32,10 @@ import net.minecraft.item.ItemStack;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.UUID;
 
 public class Storage {
@@ -76,6 +84,33 @@ public class Storage {
 
         @Expose
         public List<String> guildMembers = new ArrayList<>();
+
+        @Expose
+        public WinterStorage winter = new WinterStorage();
+
+        public static class WinterStorage {
+
+            @Expose
+            public Set<String> playersThatHaveBeenGifted = new HashSet<>();
+
+            @Expose
+            public int amountGifted = 0;
+
+            @Expose
+            public int cakeCollectedYear = 0;
+        }
+
+        @Expose
+        public Map<Long, BingoSession> bingoSessions = new HashMap<>();
+
+        public static class BingoSession {
+
+            @Expose
+            public List<String> tierOneMinionsDone = new ArrayList<>();
+
+            @Expose
+            public Map<Integer, BingoGoal> goals = new HashMap<>();
+        }
     }
 
     public static class ProfileSpecific {
@@ -97,9 +132,9 @@ public class Storage {
             @Override
             public String toString() {
                 return "MinionConfig{" +
-                    "displayName='" + displayName + '\'' +
-                    ", lastClicked=" + lastClicked +
-                    '}';
+                        "displayName='" + displayName + '\'' +
+                        ", lastClicked=" + lastClicked +
+                        '}';
             }
         }
 
@@ -148,7 +183,7 @@ public class Storage {
             public CropAccessory savedCropAccessory = null;
 
             @Expose
-            public DicerDropTracker.Data dicerDropTracker = new DicerDropTracker.Data();
+            public DicerRngDropTracker.Data dicerDropTracker = new DicerRngDropTracker.Data();
 
             @Expose
             public long informedAboutLowMatter = 0;
@@ -172,10 +207,10 @@ public class Storage {
             public Map<CropType, Boolean> toolWithBountiful = new HashMap<>();
 
             @Expose
-            public String composterCurrentOrganicMatterItem = "";
+            public NEUInternalName composterCurrentOrganicMatterItem = NEUInternalName.Companion.getNONE();
 
             @Expose
-            public String composterCurrentFuelItem = "";
+            public NEUInternalName composterCurrentFuelItem = NEUInternalName.Companion.getNONE();
 
             @Expose
             public int uniqueVisitors = 0;
@@ -225,6 +260,9 @@ public class Storage {
                 @Expose
                 public Map<Integer, NEUInternalName> plotList = new HashMap<>();
             }
+
+            @Expose
+            public Map<Integer, GardenPlotAPI.PlotData> plotData = new HashMap<>();
 
             @Expose
             public Map<CropType, LorenzVec> cropStartLocations = new HashMap<>();
@@ -323,6 +361,9 @@ public class Storage {
             @Expose
             public List<KloonTerminal> completedKloonTerminals = new ArrayList<>();
 
+            @Expose
+            public VerminTracker.Data verminTracker = new VerminTracker.Data();
+
         }
 
         @Expose
@@ -348,11 +389,11 @@ public class Storage {
             @Override
             public String toString() {
                 return "SlayerRngMeterStorage{" +
-                    "currentMeter=" + currentMeter +
-                    ", gainPerBoss=" + gainPerBoss +
-                    ", goalNeeded=" + goalNeeded +
-                    ", itemGoal='" + itemGoal + '\'' +
-                    '}';
+                        "currentMeter=" + currentMeter +
+                        ", gainPerBoss=" + gainPerBoss +
+                        ", goalNeeded=" + goalNeeded +
+                        ", itemGoal='" + itemGoal + '\'' +
+                        '}';
             }
         }
 
@@ -402,6 +443,24 @@ public class Storage {
 
             @Expose
             public FishingProfitTracker.Data fishingProfitTracker = new FishingProfitTracker.Data();
+
+            @Expose
+            public SeaCreatureTracker.Data seaCreatureTracker = new SeaCreatureTracker.Data();
+
+        }
+
+        @Expose
+        public DianaStorage diana = new DianaStorage();
+
+        public static class DianaStorage {
+
+            @Expose
+            // TODO rename to 'profitTracker'
+            public DianaProfitTracker.Data dianaProfitTracker = new DianaProfitTracker.Data();
+
+            @Expose
+            // TODO renmae
+            public MythologicalCreatureTracker.Data mythologicalMobTracker = new MythologicalCreatureTracker.Data();
 
         }
     }

@@ -1,5 +1,6 @@
 package at.hannibal2.skyhanni.features.rift.everywhere
 
+import at.hannibal2.skyhanni.data.jsonobjects.repo.EnigmaSoulsJson
 import at.hannibal2.skyhanni.events.GuiContainerEvent
 import at.hannibal2.skyhanni.events.InventoryCloseEvent
 import at.hannibal2.skyhanni.events.InventoryFullyOpenedEvent
@@ -17,7 +18,6 @@ import at.hannibal2.skyhanni.utils.NEUItems
 import at.hannibal2.skyhanni.utils.RenderUtils.drawDynamicText
 import at.hannibal2.skyhanni.utils.RenderUtils.highlight
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
-import at.hannibal2.skyhanni.utils.jsonobjects.EnigmaSoulsJson
 import io.github.moulberry.notenoughupdates.events.ReplaceItemEvent
 import io.github.moulberry.notenoughupdates.events.SlotClickEvent
 import io.github.moulberry.notenoughupdates.util.Utils
@@ -137,7 +137,7 @@ object EnigmaSoulWaypoints {
         for (soul in trackedSouls) {
             soulLocations[soul]?.let {
                 event.drawWaypointFilled(it, LorenzColor.DARK_PURPLE.toColor(), seeThroughBlocks = true, beacon = true)
-                event.drawDynamicText(it.add(0, 1, 0), "§5$soul Soul", 1.5)
+                event.drawDynamicText(it.add(y = 1), "§5$soul Soul", 1.5)
             }
         }
     }

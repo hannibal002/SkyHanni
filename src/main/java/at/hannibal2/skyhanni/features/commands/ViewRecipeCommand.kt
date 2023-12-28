@@ -1,32 +1,28 @@
 package at.hannibal2.skyhanni.features.commands
 
 import at.hannibal2.skyhanni.SkyHanniMod
-import at.hannibal2.skyhanni.events.PacketEvent
+import at.hannibal2.skyhanni.events.MessageSendToServerEvent
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.NEUItems
-import net.minecraft.network.play.client.C01PacketChatMessage
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
 object ViewRecipeCommand {
     private val config get() = SkyHanniMod.feature.commands
 
     @SubscribeEvent
-    fun onSendPacket(event: PacketEvent.SendEvent) {
+    fun onMessageSendToServer(event: MessageSendToServerEvent) {
         if (!config.viewRecipeLowerCase) return
-        val packet = event.packet
-        if (packet is C01PacketChatMessage) {
-            val message = packet.message
-            if (message == message.uppercase()) return
-            if (message.startsWith("/viewrecipe ", ignoreCase = true)) {
-                event.isCanceled = true
-                LorenzUtils.sendMessageToServer(message.uppercase())
-            }
+        val message = event.message
+        if (message == message.uppercase()) return
+        if (message.startsWith("/viewrecipe ", ignoreCase = true)) {
+            event.isCanceled = true
+            LorenzUtils.sendMessageToServer(message.uppercase())
         }
     }
 
     val list by lazy {
         val list = mutableListOf<String>()
-        for ((key, value) in NEUItems.manager.itemInformation) {
+        for ((key, value) in NEUItems.allNeuRepoItems()) {
             if (value.has("recipe")) {
                 list.add(key.lowercase())
             }

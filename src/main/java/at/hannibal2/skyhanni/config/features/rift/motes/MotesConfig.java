@@ -23,5 +23,5 @@ public class MotesConfig {
     @Expose
     @ConfigOption(name = "Inventory Value", desc = "")
     @Accordion
-    public InventoryValueConfig inventoryValue = new InventoryValueConfig();
+    public RiftInventoryValueConfig inventoryValue = new RiftInventoryValueConfig();
 }

@@ -1,14 +1,17 @@
 package at.hannibal2.skyhanni.features.garden.farming
 
-import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
+import at.hannibal2.skyhanni.config.features.garden.cropmilestones.NextConfig
+import at.hannibal2.skyhanni.config.features.garden.cropmilestones.NextConfig.BestTypeEntry
 import at.hannibal2.skyhanni.data.GardenCropMilestones
 import at.hannibal2.skyhanni.data.GardenCropMilestones.getCounter
 import at.hannibal2.skyhanni.data.GardenCropMilestones.isMaxed
 import at.hannibal2.skyhanni.features.garden.CropType
+import at.hannibal2.skyhanni.features.garden.GardenAPI
 import at.hannibal2.skyhanni.features.garden.GardenAPI.addCropIcon
 import at.hannibal2.skyhanni.features.garden.GardenNextJacobContest
 import at.hannibal2.skyhanni.features.garden.farming.GardenCropSpeed.getSpeed
+import at.hannibal2.skyhanni.utils.ConfigUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils.addAsSingletonList
 import at.hannibal2.skyhanni.utils.LorenzUtils.sorted
 import at.hannibal2.skyhanni.utils.TimeUnit
@@ -19,7 +22,7 @@ class GardenBestCropTime {
     var display = emptyList<List<Any>>()
 
     companion object {
-        private val config get() = SkyHanniMod.feature.garden.cropMilestones
+        private val config get() = GardenAPI.config.cropMilestones
         val timeTillNextCrop = mutableMapOf<CropType, Long>()
 
         fun reset() {
@@ -56,7 +59,7 @@ class GardenBestCropTime {
             updateTimeTillNextCrop()
         }
 
-        val gardenExp = config.next.bestType == 0
+        val gardenExp = config.next.bestType == NextConfig.BestTypeEntry.GARDEN_EXP
         val sorted = if (gardenExp) {
             val helpMap = mutableMapOf<CropType, Long>()
             for ((crop, time) in timeTillNextCrop) {
@@ -95,7 +98,8 @@ class GardenBestCropTime {
         for (crop in sorted.keys) {
             if (crop.isMaxed()) continue
             val millis = timeTillNextCrop[crop]!!
-            val biggestUnit = TimeUnit.entries[config.highestTimeFormat.get()]
+            // TODO, change functionality to use enum rather than ordinals
+            val biggestUnit = TimeUnit.entries[config.highestTimeFormat.get().ordinal]
             val duration = TimeUtils.formatDuration(millis, biggestUnit, maxUnits = 2)
             val isCurrent = crop == currentCrop
             number++
@@ -135,5 +139,9 @@ class GardenBestCropTime {
         event.move(3, "garden.cropMilestoneShowCurrent", "garden.cropMilestones.next.showCurrent")
         event.move(3, "garden.cropMilestoneBestCompact", "garden.cropMilestones.next.bestCompact")
         event.move(3, "garden.cropMilestoneBestHideTitle", "garden.cropMilestones.next.bestHideTitle")
+
+        event.transform(17, "garden.cropMilestones.next.bestType") { element ->
+            ConfigUtils.migrateIntToEnum(element, BestTypeEntry::class.java)
+        }
     }
 }

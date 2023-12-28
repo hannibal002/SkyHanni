@@ -1,6 +1,5 @@
 package at.hannibal2.skyhanni.features.garden.composter
 
-import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.TabListUpdateEvent
@@ -11,15 +10,14 @@ import at.hannibal2.skyhanni.utils.NEUItems
 import at.hannibal2.skyhanni.utils.RenderUtils.renderStringsAndItems
 import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.TimeUtils
+import at.hannibal2.skyhanni.utils.TimeUtils.format
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import java.util.Collections
-import kotlin.math.floor
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.seconds
-import kotlin.time.DurationUnit
 
 class ComposterDisplay {
-    private val config get() = SkyHanniMod.feature.garden.composters
+    private val config get() = GardenAPI.config.composters
     private val storage get() = GardenAPI.storage
     private var display = emptyList<List<Any>>()
     private var composterEmptyTime: Duration? = null
@@ -50,32 +48,10 @@ class ComposterDisplay {
         readData(event.tabList)
 
         if (tabListData.isNotEmpty()) {
-            calculateEmptyTime()
+            composterEmptyTime = ComposterAPI.estimateEmptyTimeFromTab()
             updateDisplay()
             sendNotify()
         }
-    }
-
-    private fun calculateEmptyTime() {
-        val organicMatter = ComposterAPI.getOrganicMatter()
-        val fuel = ComposterAPI.getFuel()
-
-        if (ComposterAPI.composterUpgrades.isNullOrEmpty()) {
-            composterEmptyTime = null
-            return
-        }
-
-        val timePerCompost = ComposterAPI.timePerCompost(null)
-
-        val organicMatterRequired = ComposterAPI.organicMatterRequiredPer(null)
-        val fuelRequired = ComposterAPI.fuelRequiredPer(null)
-
-        val organicMatterRemaining = floor(organicMatter / organicMatterRequired)
-        val fuelRemaining = floor(fuel / fuelRequired)
-
-        val endOfOrganicMatter = timePerCompost * organicMatterRemaining
-        val endOfFuel = timePerCompost * fuelRemaining
-        composterEmptyTime = if (endOfOrganicMatter > endOfFuel) endOfFuel else endOfOrganicMatter
     }
 
     private fun updateDisplay() {
@@ -99,9 +75,8 @@ class ComposterDisplay {
 
     private fun addComposterEmptyTime(emptyTime: Duration?): List<Any> {
         return if (emptyTime != null) {
-            val millis = emptyTime.toDouble(DurationUnit.MILLISECONDS).toLong()
-            GardenAPI.storage?.composterEmptyTime = System.currentTimeMillis() + millis
-            val format = TimeUtils.formatDuration(millis, maxUnits = 2)
+            GardenAPI.storage?.composterEmptyTime = System.currentTimeMillis() + emptyTime.inWholeMilliseconds
+            val format = emptyTime.format()
             listOf(NEUItems.getItemStack("BUCKET"), "§b$format")
         } else {
             listOf("§cOpen Composter Upgrades!")

@@ -46,7 +46,7 @@ import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.hasEtherwarp
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.hasJalapenoBook
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.hasWoodSingularity
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.isRecombobulated
-import at.hannibal2.skyhanni.utils.StringUtils.firstLetterUppercase
+import at.hannibal2.skyhanni.utils.StringUtils.allLettersFirstUppercase
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import com.google.gson.JsonObject
 import io.github.moulberry.notenoughupdates.recipes.Ingredient
@@ -122,7 +122,7 @@ object EstimatedItemValueCalculator {
             if (price != null) {
                 list.add(
                     "§7Attribute §9${
-                        attributes[0].first.fixMending().split("_").joinToString(" ") { it.firstLetterUppercase() }
+                        attributes[0].first.fixMending().allLettersFirstUppercase()
                     } ${attributes[0].second}§7: (§6${NumberUtil.format(price)}§7)"
                 )
                 return price
@@ -148,7 +148,7 @@ object EstimatedItemValueCalculator {
             val displayName = attr.first.fixMending()
             list.add(
                 "  §9${
-                    displayName.split("_").joinToString(" ") { it.firstLetterUppercase() }
+                    displayName.allLettersFirstUppercase()
                 } ${attr.second}§7: §6${if (price != null) NumberUtil.format(price) else "Unknown"}"
             )
         }
@@ -527,6 +527,7 @@ object EstimatedItemValueCalculator {
         return price
     }
 
+    // TODO repo
     private val hasAlwaysScavenger = listOf(
         "CRYPT_DREADLORD_SWORD".asInternalName(),
         "ZOMBIE_SOLDIER_CUTLASS".asInternalName(),
@@ -535,6 +536,12 @@ object EstimatedItemValueCalculator {
         "ZOMBIE_KNIGHT_SWORD".asInternalName(),
         "SILENT_DEATH".asInternalName(),
         "ZOMBIE_COMMANDER_WHIP".asInternalName(),
+        "ICE_SPRAY_WAND".asInternalName(),
+    )
+
+    private val hasAlwaysReplenish = listOf(
+        "ADVANCED_GARDENING_HOE".asInternalName(),
+        "ADVANCED_GARDENING_AXE".asInternalName(),
     )
 
     private fun addEnchantments(stack: ItemStack, list: MutableList<String>): Double {
@@ -551,6 +558,10 @@ object EstimatedItemValueCalculator {
             if (rawName == "efficiency") continue
 
             if (rawName == "scavenger" && rawLevel == 5 && internalName in hasAlwaysScavenger) {
+                continue
+            }
+
+            if (rawName == "replenish" && rawLevel == 1 && internalName in hasAlwaysReplenish) {
                 continue
             }
 
