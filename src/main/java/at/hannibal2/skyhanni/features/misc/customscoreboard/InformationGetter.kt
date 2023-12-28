@@ -26,9 +26,10 @@ object InformationGetter {
         }
 
         // I know this could maybe be solved better but honestly idc anymore
+        // - Update I care or rather hanni wants me to do that idk I dont want to get removed as Contrib
         val knownLines = listOf(
-            /*"Instance Shutdow", leaving them like this because I want people to report them so I can get the
-            "§f§lWave: §c§l",     exact lines (i really dont want to run kuudra myself)
+            /*"Instance Shutdow",   leaving them like this because I want people to report them so I can get the
+            "§f§lWave: §c§l",       exact lines (i really dont want to run kuudra myself)
             "§fTokens: ",
             "Submerges In: §e",
             "§fObjective",*/
