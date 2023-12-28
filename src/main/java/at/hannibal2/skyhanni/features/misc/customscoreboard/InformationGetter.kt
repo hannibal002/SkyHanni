@@ -43,8 +43,6 @@ object InformationGetter {
             "§6Spooky Festival§f",
             "§dNew Year Event",
             "Nearby Players:",
-            "Event: ",
-            "Zone: ",
             "§4Broodmother§7:",
             "§7Give Tasty Mithril to Don!",
             "Remaining: §a",
@@ -91,6 +89,8 @@ object InformationGetter {
         unknownLines = unknownLines.filter { !ScoreboardPattern.powderPattern.matches(it) }
         unknownLines = unknownLines.filter { !ScoreboardPattern.windCompassPattern.matches(it) }
         unknownLines = unknownLines.filter { !ScoreboardPattern.windCompassArrowPattern.matches(it) }
+        unknownLines = unknownLines.filter { !ScoreboardPattern.miningEventPattern.matches(it) }
+        unknownLines = unknownLines.filter { !ScoreboardPattern.miningEventZonePattern.matches(it) }
         unknownLines = unknownLines.filter { !ScoreboardPattern.raffleUselessPattern.matches(it) }
         unknownLines = unknownLines.filter { !ScoreboardPattern.raffleTicketsPattern.matches(it) }
         unknownLines = unknownLines.filter { !ScoreboardPattern.rafflePool.matches(it) }
