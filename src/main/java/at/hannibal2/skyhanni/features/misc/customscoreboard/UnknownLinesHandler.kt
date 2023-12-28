@@ -8,8 +8,8 @@ import at.hannibal2.skyhanni.utils.LorenzUtils.nextAfter
 import at.hannibal2.skyhanni.utils.StringUtils.matches
 import at.hannibal2.skyhanni.utils.StringUtils.removeResets
 
-object InformationGetter {
-    fun getInformation() {
+object UnknownLinesHandler {
+    fun handleUnknownLines() {
         val sidebarLines = ScoreboardData.sidebarLinesFormatted
 
         // I know this could maybe be solved better but honestly idc anymore

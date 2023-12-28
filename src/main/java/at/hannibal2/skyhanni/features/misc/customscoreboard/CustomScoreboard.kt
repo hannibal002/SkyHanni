@@ -52,8 +52,8 @@ class CustomScoreboard {
             display = createLines()
         }
 
-        // Get Information
-        InformationGetter.getInformation()
+        // Remove Known Lines, so we can get the unknown ones
+        UnknownLinesHandler.handleUnknownLines()
     }
 
     private fun createLines() = buildList<ScoreboardElement> {
