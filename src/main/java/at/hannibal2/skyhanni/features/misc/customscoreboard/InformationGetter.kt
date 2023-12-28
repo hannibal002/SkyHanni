@@ -27,8 +27,8 @@ object InformationGetter {
 
         // I know this could maybe be solved better but honestly idc anymore
         val knownLines = listOf(
-            /*"Instance Shutdow",
-            "§f§lWave: §c§l",
+            /*"Instance Shutdow", leaving them like this because I want people to report them so I can get the
+            "§f§lWave: §c§l",     exact lines (i really dont want to run kuudra myself)
             "§fTokens: ",
             "Submerges In: §e",
             "§fObjective",*/
