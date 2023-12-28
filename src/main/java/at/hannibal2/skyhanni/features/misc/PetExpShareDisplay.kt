@@ -16,7 +16,7 @@ class PetExpShareDisplay {
         if (!SkyHanniMod.feature.misc.pets.expShare) return
 
         val petItem = stack.getPetItem() ?: return
-        if (petCandyUsed != "PET_ITEM_EXP_SHARE") return
+        if (petItem != "PET_ITEM_EXP_SHARE") return
 
         val stackTip = "§5⚘"
         val x = event.x + 17
