@@ -2,159 +2,107 @@ package at.hannibal2.skyhanni.data
 
 import at.hannibal2.skyhanni.events.CropMilestoneUpdateEvent
 import at.hannibal2.skyhanni.events.InventoryFullyOpenedEvent
+import at.hannibal2.skyhanni.events.RepositoryReloadEvent
 import at.hannibal2.skyhanni.features.garden.CropType
 import at.hannibal2.skyhanni.features.garden.GardenAPI
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
+import at.hannibal2.skyhanni.utils.NumberUtil.formatNumber
 import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
+import at.hannibal2.skyhanni.data.jsonobjects.repo.GardenJson
+import net.minecraft.item.ItemStack
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
-class GardenCropMilestones {
+object GardenCropMilestones {
+    // TODO USE SH-REPO
     private val cropPattern = "§7Harvest §f(?<name>.*) §7on .*".toPattern()
-    private val totalPattern = "§7Total: §a(?<name>.*)".toPattern()
+    val totalPattern = "§7Total: §a(?<name>.*)".toPattern()
 
-    // Add when api support is there
-//    @SubscribeEvent
-//    fun onProfileDataLoad(event: ProfileApiDataLoadedEvent) {
-//        val profileData = event.profileData
-//        for ((key, value) in profileData.entrySet()) {
-//            if (key.startsWith("experience_skill_")) {
-//                val label = key.substring(17)
-//                val exp = value.asLong
-//                gardenExp[label] = exp
-//            }
-//        }
-//    }
+    fun getCropTypeByLore(itemStack: ItemStack): CropType? {
+        for (line in itemStack.getLore()) {
+            cropPattern.matchMatcher(line) {
+                val name = group("name")
+                return CropType.getByNameOrNull(name)
+            }
+        }
+        return null
+    }
 
     @SubscribeEvent
     fun onInventoryOpen(event: InventoryFullyOpenedEvent) {
         if (event.inventoryName != "Crop Milestones") return
 
         for ((_, stack) in event.inventoryItems) {
-            var crop: CropType? = null
+            val crop = getCropTypeByLore(stack) ?: continue
             for (line in stack.getLore()) {
-                cropPattern.matchMatcher(line) {
-                    val name = group("name")
-                    crop = CropType.getByNameOrNull(name)
-                }
                 totalPattern.matchMatcher(line) {
-                    val amount = group("name").replace(",", "").toLong()
-                    crop?.setCounter(amount)
+                    val amount = group("name").formatNumber()
+                    crop.setCounter(amount)
                 }
             }
         }
         CropMilestoneUpdateEvent().postAndCatch()
+        GardenCropMilestonesCommunityFix.openInventory(event.inventoryItems)
     }
 
-    companion object {
-        val cropCounter: MutableMap<CropType, Long>? get() = GardenAPI.config?.cropCounter
+    var cropMilestoneData: Map<CropType, List<Int>> = emptyMap()
 
-        // TODO make nullable
-        fun CropType.getCounter() = cropCounter?.get(this) ?: 0
+    val cropCounter: MutableMap<CropType, Long>? get() = GardenAPI.storage?.cropCounter
 
-        fun CropType.setCounter(counter: Long) {
-            cropCounter?.set(this, counter)
-        }
+    // TODO make nullable
+    fun CropType.getCounter() = cropCounter?.get(this) ?: 0
 
-        fun CropType.isMaxed() = getCounter() >= 1_000_000_000
-
-        fun getTierForCrops(crops: Long): Int {
-            var tier = 0
-            var totalCrops = 0L
-            for (tierCrops in cropMilestone) {
-                totalCrops += tierCrops
-                if (totalCrops > crops) {
-                    return tier
-                }
-                tier++
-            }
-
-            return tier
-        }
-
-        fun getCropsForTier(requestedTier: Int): Long {
-            var totalCrops = 0L
-            var tier = 0
-            for (tierCrops in cropMilestone) {
-                totalCrops += tierCrops
-                tier++
-                if (tier == requestedTier) {
-                    return totalCrops
-                }
-            }
-
-            return 0
-        }
-
-        fun CropType.progressToNextLevel(): Double {
-            val progress = getCounter()
-            val startTier = getTierForCrops(progress)
-            val startCrops = getCropsForTier(startTier)
-            val end = getCropsForTier(startTier + 1).toDouble()
-            return (progress - startCrops) / (end - startCrops)
-        }
-
-        // TODO use repo
-        private val cropMilestone = listOf(
-            100,
-            150,
-            250,
-            500,
-            1500,
-            2500,
-            5000,
-            5000,
-            10000,
-            25000,
-            25000,
-            25000,
-            30000,
-            70000,
-            100000,
-            200000,
-            250000,
-            250000,
-            500000,
-            1000000,
-            1500000,
-            2000000,
-            3000000,
-            4000000,
-            7000000,
-            10000000,
-            20000000,
-            25000000,
-            25000000,
-            50000000,
-            50000000,
-            50000000,
-            50000000,
-            50000000,
-            50000000,
-            50000000,
-            50000000,
-            50000000,
-            50000000,
-            50000000,
-            50000000,
-            50000000,
-            50000000,
-            50000000,
-            50000000,
-            100000000,
-        )
+    fun CropType.setCounter(counter: Long) {
+        cropCounter?.set(this, counter)
     }
-}
 
-// TODO delete?
-private fun String.formatNumber(): Long {
-    var text = replace(",", "")
-    val multiplier = if (text.endsWith("k")) {
-        text = text.substring(0, text.length - 1)
-        1_000
-    } else if (text.endsWith("m")) {
-        text = text.substring(0, text.length - 1)
-        1_000_000
-    } else 1
-    val d = text.toDouble()
-    return (d * multiplier).toLong()
+    fun CropType.isMaxed(): Boolean {
+        // TODO change 1b
+        val maxValue = cropMilestoneData[this]?.sum() ?: 1_000_000_000 // 1 bil for now
+        return getCounter() >= maxValue
+    }
+
+    fun getTierForCropCount(count: Long, crop: CropType): Int {
+        var tier = 0
+        var totalCrops = 0L
+        val cropMilestone = cropMilestoneData[crop] ?: return 0
+        for (tierCrops in cropMilestone) {
+            totalCrops += tierCrops
+            if (totalCrops > count) {
+                return tier
+            }
+            tier++
+        }
+
+        return tier
+    }
+
+    fun getMaxTier() = cropMilestoneData.values.firstOrNull()?.size ?: 0
+
+    fun getCropsForTier(requestedTier: Int, crop: CropType): Long {
+        var totalCrops = 0L
+        var tier = 0
+        val cropMilestone = cropMilestoneData[crop] ?: return 0
+        for (tierCrops in cropMilestone) {
+            totalCrops += tierCrops
+            tier++
+            if (tier == requestedTier) {
+                return totalCrops
+            }
+        }
+
+        return 0
+    }
+
+    fun CropType.progressToNextLevel(): Double {
+        val progress = getCounter()
+        val startTier = getTierForCropCount(progress, this)
+        val startCrops = getCropsForTier(startTier, this)
+        val end = getCropsForTier(startTier + 1, this).toDouble()
+        return (progress - startCrops) / (end - startCrops)
+    }
+
+    @SubscribeEvent
+    fun onRepoReload(event: RepositoryReloadEvent) {
+        cropMilestoneData = event.getConstant<GardenJson>("Garden").crop_milestones
+    }
 }

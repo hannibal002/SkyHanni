@@ -1,12 +1,23 @@
 package at.hannibal2.skyhanni.features.bazaar
 
 import at.hannibal2.skyhanni.SkyHanniMod
-import at.hannibal2.skyhanni.events.*
-import at.hannibal2.skyhanni.utils.*
+import at.hannibal2.skyhanni.events.BazaarOpenedProductEvent
+import at.hannibal2.skyhanni.events.GuiContainerEvent
+import at.hannibal2.skyhanni.events.InventoryCloseEvent
+import at.hannibal2.skyhanni.events.InventoryFullyOpenedEvent
+import at.hannibal2.skyhanni.events.LorenzChatEvent
+import at.hannibal2.skyhanni.events.LorenzTickEvent
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.ItemUtils.name
+import at.hannibal2.skyhanni.utils.LorenzColor
+import at.hannibal2.skyhanni.utils.LorenzUtils
+import at.hannibal2.skyhanni.utils.NEUInternalName
+import at.hannibal2.skyhanni.utils.NEUItems
+import at.hannibal2.skyhanni.utils.OSUtils
 import at.hannibal2.skyhanni.utils.RenderUtils.highlight
+import at.hannibal2.skyhanni.utils.StringUtils.equalsIgnoreColor
+import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import net.minecraft.client.gui.inventory.GuiChest
 import net.minecraft.inventory.ContainerChest
@@ -21,13 +32,15 @@ class BazaarApi {
         var inBazaarInventory = false
         private var currentSearchedItem = ""
 
+        var currentlyOpenedProduct: NEUInternalName? = null
+
         fun getBazaarDataByName(name: String): BazaarData? = NEUItems.getInternalNameOrNull(name)?.getBazaarData()
 
         fun NEUInternalName.getBazaarData() = if (isBazaarItem()) {
             holder.getData(this)
         } else null
 
-        fun isBazaarItem(stack: ItemStack) = stack.getInternalName().isBazaarItem()
+        fun isBazaarItem(stack: ItemStack): Boolean = stack.getInternalName().isBazaarItem()
 
         fun NEUInternalName.isBazaarItem() = NEUItems.manager.auctionManager.getBazaarInfo(asString()) != null
 
@@ -45,6 +58,21 @@ class BazaarApi {
     @SubscribeEvent
     fun onInventoryOpen(event: InventoryFullyOpenedEvent) {
         inBazaarInventory = checkIfInBazaar(event)
+        if (inBazaarInventory) {
+            val itemName = getOpenedProduct(event.inventoryItems) ?: return
+            val openedProduct = NEUItems.getInternalNameOrNull(itemName)
+            currentlyOpenedProduct = openedProduct
+            BazaarOpenedProductEvent(openedProduct, event).postAndCatch()
+        }
+    }
+
+    private fun getOpenedProduct(inventoryItems: Map<Int, ItemStack>): String? {
+        val buyInstantly = inventoryItems[10] ?: return null
+
+        if (buyInstantly.displayName != "§aBuy Instantly") return null
+        val bazaarItem = inventoryItems[13] ?: return null
+
+        return bazaarItem.displayName
     }
 
     @SubscribeEvent
@@ -83,22 +111,18 @@ class BazaarApi {
 
     @SubscribeEvent
     fun onChat(event: LorenzChatEvent) {
-        if ("\\[Bazaar] (Buy Order Setup!|Bought).*$currentSearchedItem.*".toRegex()
-                .matches(event.message.removeColor())
-        ) {
-            currentSearchedItem = ""
-        }
+        if (!LorenzUtils.inSkyBlock) return
+        if (!inBazaarInventory) return
+        // TODO USE SH-REPO
+        // TODO remove dynamic pattern
+        "\\[Bazaar] (Buy Order Setup!|Bought).*$currentSearchedItem.*".toPattern()
+            .matchMatcher(event.message.removeColor()) { currentSearchedItem = "" }
     }
 
     private fun checkIfInBazaar(event: InventoryFullyOpenedEvent): Boolean {
-        val returnItem = event.inventorySize - 5
-        for ((slot, item) in event.inventoryItems) {
-            if (slot == returnItem && item.name?.removeColor().let { it == "Go Back" }) {
-                val lore = item.getLore()
-                if (lore.getOrNull(0)?.removeColor().let { it == "To Bazaar" }) {
-                    return true
-                }
-            }
+        val items = event.inventorySize.let { listOf(it - 5, it - 6) }.mapNotNull { event.inventoryItems[it] }
+        if (items.any { it.name.equalsIgnoreColor("Go Back") && it.getLore().firstOrNull() == "§7To Bazaar" }) {
+            return true
         }
 
         if (event.inventoryName.startsWith("Bazaar ➜ ")) return true
@@ -118,5 +142,6 @@ class BazaarApi {
     @SubscribeEvent
     fun onInventoryClose(event: InventoryCloseEvent) {
         inBazaarInventory = false
+        currentlyOpenedProduct = null
     }
 }

@@ -5,11 +5,18 @@ package at.hannibal2.skyhanni.features.misc.discordrpc
 import at.hannibal2.skyhanni.SkyHanniMod.Companion.consoleLog
 import at.hannibal2.skyhanni.SkyHanniMod.Companion.coroutineScope
 import at.hannibal2.skyhanni.SkyHanniMod.Companion.feature
+import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
+import at.hannibal2.skyhanni.config.features.misc.DiscordRPCConfig.LineEntry
+import at.hannibal2.skyhanni.config.features.misc.DiscordRPCConfig.PriorityEntry
 import at.hannibal2.skyhanni.events.ConfigLoadEvent
+import at.hannibal2.skyhanni.events.LorenzKeyPressEvent
 import at.hannibal2.skyhanni.events.LorenzTickEvent
 import at.hannibal2.skyhanni.events.LorenzWorldChangeEvent
+import at.hannibal2.skyhanni.test.command.ErrorManager
+import at.hannibal2.skyhanni.utils.ConfigUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils.onToggle
+import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import com.google.gson.JsonObject
 import com.jagrosh.discordipc.IPCClient
 import com.jagrosh.discordipc.IPCListener
@@ -17,7 +24,8 @@ import com.jagrosh.discordipc.entities.RichPresence
 import kotlinx.coroutines.launch
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import net.minecraftforge.fml.common.network.FMLNetworkEvent
-import java.util.*
+import java.util.Timer
+import java.util.TimerTask
 import java.util.concurrent.Executors
 import java.util.concurrent.ScheduledExecutorService
 import java.util.concurrent.TimeUnit
@@ -46,20 +54,20 @@ object DiscordRPCManager : IPCListener {
                     return@launch
                 }
                 consoleLog("Starting Discord RPC...")
-
-                firstLine = getStatusByConfigId(config.firstLine.get())
-                secondLine = getStatusByConfigId(config.secondLine.get())
+                // TODO, change functionality to use enum rather than ordinals
+                firstLine = getStatusByConfigId(config.firstLine.get().ordinal)
+                secondLine = getStatusByConfigId(config.secondLine.get().ordinal)
                 startTimestamp = System.currentTimeMillis()
                 client = IPCClient(applicationID)
                 client?.setListener(this@DiscordRPCManager)
 
                 try {
                     client?.connect()
-                    if (fromCommand) LorenzUtils.chat("§a[SkyHanni] Successfully started Rich Presence!") // confirm that /shrpcstart worked
+                    if (fromCommand) LorenzUtils.chat("Successfully started Rich Presence!", prefixColor = "§a") // confirm that /shrpcstart worked
                 } catch (ex: Exception) {
                     consoleLog("Warn: Failed to connect to RPC!")
                     consoleLog(ex.toString())
-                    LorenzUtils.clickableChat("§e[SkyHanni] Discord Rich Presence was unable to start! " +
+                    LorenzUtils.clickableChat("Discord Rich Presence was unable to start! " +
                             "This usually happens when you join SkyBlock when Discord is not started. " +
                             "Please run /shrpcstart to retry once you have launched Discord.", "shrpcstart")
                 }
@@ -102,9 +110,9 @@ object DiscordRPCManager : IPCListener {
     fun updatePresence() {
         val location = DiscordStatus.LOCATION.getDisplayString()
         val discordIconKey = DiscordLocationKey.getDiscordIconKey(location)
-
-        secondLine = getStatusByConfigId(config.secondLine.get())
-        firstLine = getStatusByConfigId(config.firstLine.get())
+        // TODO, change functionality to use enum rather than ordinals
+        secondLine = getStatusByConfigId(config.secondLine.get().ordinal)
+        firstLine = getStatusByConfigId(config.firstLine.get().ordinal)
         val presence: RichPresence = RichPresence.Builder()
             .setDetails(firstLine.getDisplayString())
             .setState(secondLine.getDisplayString())
@@ -152,7 +160,7 @@ object DiscordRPCManager : IPCListener {
 
     @SubscribeEvent
     fun onTick(event: LorenzTickEvent) {
-        if (startOnce || !isEnabled()) return // the mod has already started the connection process. this variable is my way of running a function when the player joins skyblock but only running it again once they join and leave.
+        if (startOnce || !isEnabled()) return // the mod has already started the connection process. this variable is my way of running a function when the player joins SkyBlock but only running it again once they join and leave.
         if (LorenzUtils.inSkyBlock) {
             start()
             startOnce = true
@@ -180,20 +188,48 @@ object DiscordRPCManager : IPCListener {
 
     fun startCommand() {
         if (!config.enabled.get()) {
-            LorenzUtils.chat("§c[SkyHanni] Discord Rich Presence is disabled. Enable it in the config §e/sh discord")
+            LorenzUtils.userError("Discord Rich Presence is disabled. Enable it in the config §e/sh discord")
             return
         }
 
         if (isActive()) {
-            LorenzUtils.chat("§e[SkyHanni] Discord Rich Presence is already active!")
+            LorenzUtils.userError("Discord Rich Presence is already active!")
             return
         }
 
-        LorenzUtils.chat("§e[SkyHanni] Attempting to start Discord Rich Presence...")
+        LorenzUtils.chat("Attempting to start Discord Rich Presence...")
         try {
             start(true)
         } catch (e: Exception) {
-            LorenzUtils.chat("§c[SkyHanni] Unable to start Discord Rich Presence! Please report this on Discord and ping NetheriteMiner#6267.")
+            ErrorManager.logError(
+                e,
+                "Unable to start Discord Rich Presence! Please report this on Discord and ping @netheriteminer."
+            )
         }
     }
+
+    // Events that change things in DiscordStatus
+    @SubscribeEvent
+    fun onKeybind(event: LorenzKeyPressEvent) {
+        if (!isEnabled() || !PriorityEntry.AFK.isSelected()) return // autoPriority 4 is dynamic afk
+        beenAfkFor = SimpleTimeMark.now()
+    }
+
+    @SubscribeEvent
+    fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
+        event.transform(11, "misc.discordRPC.firstLine") { element ->
+            ConfigUtils.migrateIntToEnum(element, LineEntry::class.java)
+        }
+        event.transform(11, "misc.discordRPC.secondLine") { element ->
+            ConfigUtils.migrateIntToEnum(element, LineEntry::class.java)
+        }
+        event.transform(11, "misc.discordRPC.auto") { element ->
+            ConfigUtils.migrateIntToEnum(element, LineEntry::class.java)
+        }
+        event.transform(11, "misc.discordRPC.autoPriority") { element ->
+            ConfigUtils.migrateIntArrayListToEnumArrayList(element, PriorityEntry::class.java)
+        }
+    }
+
+    private fun PriorityEntry.isSelected() = config.autoPriority.contains(this)
 }

@@ -9,7 +9,11 @@ import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils.onToggle
 import io.github.moulberry.moulconfig.processor.MoulConfigProcessor
 import io.github.moulberry.notenoughupdates.util.MinecraftExecutor
-import moe.nea.libautoupdate.*
+import moe.nea.libautoupdate.CurrentVersion
+import moe.nea.libautoupdate.PotentialUpdate
+import moe.nea.libautoupdate.UpdateContext
+import moe.nea.libautoupdate.UpdateSource
+import moe.nea.libautoupdate.UpdateTarget
 import net.minecraft.client.Minecraft
 import net.minecraftforge.common.MinecraftForge
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
@@ -58,11 +62,11 @@ object UpdateManager {
         }
     }
 
-    fun isBetaRelease(): Boolean {
+    fun isCurrentlyBeta(): Boolean {
         return getCurrentVersion().contains("beta", ignoreCase = true)
     }
 
-    val config get() = SkyHanniMod.feature.about
+    private val config get() = SkyHanniMod.feature.about
 
     fun reset() {
         updateState = UpdateState.NONE
@@ -78,7 +82,7 @@ object UpdateManager {
         }
         logger.log("Starting update check")
         var updateStream = config.updateStream.get()
-        if (updateStream == About.UpdateStream.RELEASES && isBetaRelease()) {
+        if (updateStream == About.UpdateStream.RELEASES && isCurrentlyBeta()) {
             updateStream = About.UpdateStream.BETA
         }
         activePromise = context.checkUpdate(updateStream.stream)
@@ -92,8 +96,8 @@ object UpdateManager {
                 if (it.isUpdateAvailable) {
                     updateState = UpdateState.AVAILABLE
                     LorenzUtils.clickableChat(
-                        "§e[SkyHanni] §aSkyhanni found a new update: ${it.update.versionName}. " +
-                                "Go check §b/sh download update §afor more info.",
+                        "§aSkyHanni found a new update: ${it.update.versionName}. " +
+                                "Check §b/sh download update §afor more info.",
                         "sh"
                     )
                 }
@@ -111,12 +115,12 @@ object UpdateManager {
         }.thenAcceptAsync({
             logger.log("Update download completed, setting exit hook")
             updateState = UpdateState.DOWNLOADED
-            potentialUpdate!!.executeUpdate()
+            potentialUpdate!!.executePreparedUpdate()
         }, MinecraftExecutor.OnThread)
     }
 
-    val context = UpdateContext(
-        UpdateSource.githubUpdateSource("hannibal002", "Skyhanni"),
+    private val context = UpdateContext(
+        UpdateSource.githubUpdateSource("hannibal002", "SkyHanni"),
         UpdateTarget.deleteAndSaveInTheSameFolder(UpdateManager::class.java),
         CurrentVersion.ofTag(SkyHanniMod.version),
         SkyHanniMod.MODID,
@@ -133,5 +137,5 @@ object UpdateManager {
         NONE
     }
 
-    var potentialUpdate: PotentialUpdate? = null
+    private var potentialUpdate: PotentialUpdate? = null
 }

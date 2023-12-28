@@ -1,23 +1,28 @@
 package at.hannibal2.skyhanni.features.garden.farming
 
-import at.hannibal2.skyhanni.SkyHanniMod
+import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
+import at.hannibal2.skyhanni.config.features.garden.cropmilestones.NextConfig
+import at.hannibal2.skyhanni.config.features.garden.cropmilestones.NextConfig.BestTypeEntry
 import at.hannibal2.skyhanni.data.GardenCropMilestones
-import at.hannibal2.skyhanni.data.GardenCropMilestones.Companion.getCounter
-import at.hannibal2.skyhanni.data.GardenCropMilestones.Companion.isMaxed
+import at.hannibal2.skyhanni.data.GardenCropMilestones.getCounter
+import at.hannibal2.skyhanni.data.GardenCropMilestones.isMaxed
 import at.hannibal2.skyhanni.features.garden.CropType
+import at.hannibal2.skyhanni.features.garden.GardenAPI
 import at.hannibal2.skyhanni.features.garden.GardenAPI.addCropIcon
 import at.hannibal2.skyhanni.features.garden.GardenNextJacobContest
 import at.hannibal2.skyhanni.features.garden.farming.GardenCropSpeed.getSpeed
+import at.hannibal2.skyhanni.utils.ConfigUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils.addAsSingletonList
 import at.hannibal2.skyhanni.utils.LorenzUtils.sorted
 import at.hannibal2.skyhanni.utils.TimeUnit
 import at.hannibal2.skyhanni.utils.TimeUtils
+import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
 class GardenBestCropTime {
     var display = emptyList<List<Any>>()
 
     companion object {
-        private val config get() = SkyHanniMod.feature.garden
+        private val config get() = GardenAPI.config.cropMilestones
         val timeTillNextCrop = mutableMapOf<CropType, Long>()
 
         fun reset() {
@@ -31,11 +36,11 @@ class GardenBestCropTime {
                 if (crop.isMaxed()) continue
 
                 val counter = crop.getCounter()
-                val currentTier = GardenCropMilestones.getTierForCrops(counter)
+                val currentTier = GardenCropMilestones.getTierForCropCount(counter, crop)
 
-                val cropsForCurrentTier = GardenCropMilestones.getCropsForTier(currentTier)
-                val nextTier = if (config.cropMilestoneBestShowMaxedNeeded.get()) 46 else currentTier + 1
-                val cropsForNextTier = GardenCropMilestones.getCropsForTier(nextTier)
+                val cropsForCurrentTier = GardenCropMilestones.getCropsForTier(currentTier, crop)
+                val nextTier = if (config.bestShowMaxedNeeded.get()) 46 else currentTier + 1
+                val cropsForNextTier = GardenCropMilestones.getCropsForTier(nextTier, crop)
 
                 val have = counter - cropsForCurrentTier
                 val need = cropsForNextTier - cropsForCurrentTier
@@ -54,12 +59,12 @@ class GardenBestCropTime {
             updateTimeTillNextCrop()
         }
 
-        val gardenExp = config.cropMilestoneBestType == 0
+        val gardenExp = config.next.bestType == NextConfig.BestTypeEntry.GARDEN_EXP
         val sorted = if (gardenExp) {
             val helpMap = mutableMapOf<CropType, Long>()
             for ((crop, time) in timeTillNextCrop) {
                 if (crop.isMaxed()) continue
-                val currentTier = GardenCropMilestones.getTierForCrops(crop.getCounter())
+                val currentTier = GardenCropMilestones.getTierForCropCount(crop.getCounter(), crop)
                 val gardenExpForTier = getGardenExpForTier(currentTier + 1)
                 val fakeTime = time / gardenExpForTier
                 helpMap[crop] = fakeTime
@@ -70,16 +75,16 @@ class GardenBestCropTime {
         }
 
 
-        if (!config.cropMilestoneBestHideTitle) {
+        if (!config.next.bestHideTitle) {
             val title = if (gardenExp) "§2Garden Experience" else "§bSkyBlock Level"
-            if (config.cropMilestoneBestCompact) {
+            if (config.next.bestCompact) {
                 newList.addAsSingletonList("§eBest Crop Time")
             } else {
                 newList.addAsSingletonList("§eBest Crop Time §7($title§7)")
             }
         }
 
-        if (!config.cropMilestoneProgress) {
+        if (!config.progress) {
             newList.addAsSingletonList("§cCrop Milestone Progress Display is disabled!")
             return newList
         }
@@ -93,29 +98,30 @@ class GardenBestCropTime {
         for (crop in sorted.keys) {
             if (crop.isMaxed()) continue
             val millis = timeTillNextCrop[crop]!!
-            val biggestUnit = TimeUnit.entries[config.cropMilestoneHighestTimeFormat.get()]
+            // TODO, change functionality to use enum rather than ordinals
+            val biggestUnit = TimeUnit.entries[config.highestTimeFormat.get().ordinal]
             val duration = TimeUtils.formatDuration(millis, biggestUnit, maxUnits = 2)
             val isCurrent = crop == currentCrop
             number++
-            if (number > config.cropMilestoneShowOnlyBest && (!config.cropMilestoneShowCurrent || !isCurrent)) continue
+            if (number > config.next.showOnlyBest && (!config.next.showCurrent || !isCurrent)) continue
 
             val list = mutableListOf<Any>()
-            if (!config.cropMilestoneBestCompact) {
+            if (!config.next.bestCompact) {
                 list.add("§7$number# ")
             }
             list.addCropIcon(crop)
 
             val color = if (isCurrent) "§e" else "§7"
             val contestFormat = if (GardenNextJacobContest.isNextCrop(crop)) "§n" else ""
-            val currentTier = GardenCropMilestones.getTierForCrops(crop.getCounter())
-            val nextTier = if (config.cropMilestoneBestShowMaxedNeeded.get()) 46 else currentTier + 1
+            val currentTier = GardenCropMilestones.getTierForCropCount(crop.getCounter(), crop)
+            val nextTier = if (config.bestShowMaxedNeeded.get()) 46 else currentTier + 1
 
 
-            val cropName = if (!config.cropMilestoneBestCompact) crop.cropName + " " else ""
-            val tier = if (!config.cropMilestoneBestCompact) "$currentTier➜$nextTier§r " else ""
+            val cropName = if (!config.next.bestCompact) crop.cropName + " " else ""
+            val tier = if (!config.next.bestCompact) "$currentTier➜$nextTier§r " else ""
             list.add("$color$contestFormat$cropName$tier§b$duration")
 
-            if (gardenExp && !config.cropMilestoneBestCompact) {
+            if (gardenExp && !config.next.bestCompact) {
                 val gardenExpForTier = getGardenExpForTier(nextTier)
                 list.add(" §7(§2$gardenExpForTier §7Exp)")
             }
@@ -125,4 +131,17 @@ class GardenBestCropTime {
     }
 
     private fun getGardenExpForTier(gardenLevel: Int) = if (gardenLevel > 30) 300 else gardenLevel * 10
+
+    @SubscribeEvent
+    fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
+        event.move(3, "garden.cropMilestoneBestType", "garden.cropMilestones.next.bestType")
+        event.move(3, "garden.cropMilestoneShowOnlyBest", "garden.cropMilestones.next.showOnlyBest")
+        event.move(3, "garden.cropMilestoneShowCurrent", "garden.cropMilestones.next.showCurrent")
+        event.move(3, "garden.cropMilestoneBestCompact", "garden.cropMilestones.next.bestCompact")
+        event.move(3, "garden.cropMilestoneBestHideTitle", "garden.cropMilestones.next.bestHideTitle")
+
+        event.transform(17, "garden.cropMilestones.next.bestType") { element ->
+            ConfigUtils.migrateIntToEnum(element, BestTypeEntry::class.java)
+        }
+    }
 }

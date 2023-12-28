@@ -1,10 +1,17 @@
 package at.hannibal2.skyhanni.data
 
 import at.hannibal2.skyhanni.SkyHanniMod
+import at.hannibal2.skyhanni.config.SackData
 import at.hannibal2.skyhanni.config.Storage
-import at.hannibal2.skyhanni.events.*
+import at.hannibal2.skyhanni.events.ConfigLoadEvent
+import at.hannibal2.skyhanni.events.HypixelJoinEvent
+import at.hannibal2.skyhanni.events.LorenzChatEvent
+import at.hannibal2.skyhanni.events.LorenzTickEvent
+import at.hannibal2.skyhanni.events.LorenzWorldChangeEvent
+import at.hannibal2.skyhanni.events.PreProfileSwitchEvent
+import at.hannibal2.skyhanni.events.ProfileJoinEvent
+import at.hannibal2.skyhanni.events.TabListUpdateEvent
 import at.hannibal2.skyhanni.utils.LorenzUtils
-import at.hannibal2.skyhanni.utils.LorenzVec
 import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
 import net.minecraftforge.fml.common.eventhandler.EventPriority
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
@@ -17,9 +24,15 @@ object ProfileStorageData {
 
     private var nextProfile: String? = null
 
+    // TODO USE SH-REPO
+    private val profileSwitchPattern = "§7Switching to profile (?<name>.*)\\.\\.\\.".toPattern()
+
+    private var sackPlayers: SackData.PlayerSpecific? = null
+    var sackProfiles: SackData.ProfileSpecific? = null
+
     @SubscribeEvent(priority = EventPriority.HIGHEST)
     fun onChat(event: LorenzChatEvent) {
-        "§7Switching to profile (?<name>.*)\\.\\.\\.".toPattern().matchMatcher(event.message) {
+        profileSwitchPattern.matchMatcher(event.message) {
             nextProfile = group("name").lowercase()
             loaded = false
             PreProfileSwitchEvent().postAndCatch()
@@ -32,25 +45,35 @@ object ProfileStorageData {
         nextProfile = null
 
         val playerSpecific = playerSpecific
+        val sackPlayers = sackPlayers
         if (playerSpecific == null) {
             LorenzUtils.error("profileSpecific after profile swap can not be set: playerSpecific is null!")
             return
         }
-        loadProfileSpecific(playerSpecific, profileName, "profile swap (chat message)")
+        if (sackPlayers == null) {
+            LorenzUtils.error("sackPlayers after profile swap can not be set: sackPlayers is null!")
+            return
+        }
+        loadProfileSpecific(playerSpecific, sackPlayers, profileName)
         ConfigLoadEvent().postAndCatch()
     }
 
     @SubscribeEvent(priority = EventPriority.HIGHEST)
     fun onProfileJoin(event: ProfileJoinEvent) {
         val playerSpecific = playerSpecific
+        val sackPlayers = sackPlayers
         if (playerSpecific == null) {
             LorenzUtils.error("playerSpecific is null in ProfileJoinEvent!")
+            return
+        }
+        if (sackPlayers == null) {
+            LorenzUtils.error("sackPlayers is null in sackPlayers!")
             return
         }
 
         if (profileSpecific == null) {
             val profileName = event.name
-            loadProfileSpecific(playerSpecific, profileName, "first join (chat message)")
+            loadProfileSpecific(playerSpecific, sackPlayers, profileName)
         }
     }
 
@@ -58,11 +81,12 @@ object ProfileStorageData {
     fun onTabListUpdate(event: TabListUpdateEvent) {
         if (profileSpecific != null) return
         val playerSpecific = playerSpecific ?: return
+        val sackPlayers = sackPlayers ?: return
         for (line in event.tabList) {
             val pattern = "§e§lProfile: §r§a(?<name>.*)".toPattern()
             pattern.matchMatcher(line) {
                 val profileName = group("name").lowercase()
-                loadProfileSpecific(playerSpecific, profileName, "tab list")
+                loadProfileSpecific(playerSpecific, sackPlayers, profileName)
                 nextProfile = null
                 return
             }
@@ -81,100 +105,29 @@ object ProfileStorageData {
         if (System.currentTimeMillis() > noTabListTime + 3_000) {
             noTabListTime = System.currentTimeMillis()
             LorenzUtils.chat(
-                "§c[SkyHanni] Extra Information from Tab list not found! " +
-                        "Enable it: SkyBlock Menu ➜ Settings ➜ Personal ➜ User Interface ➜ Player List Info"
+                "Extra Information from Tab list not found! " +
+                    "Enable it: SkyBlock Menu ➜ Settings ➜ Personal ➜ User Interface ➜ Player List Info"
             )
         }
     }
 
-    private fun loadProfileSpecific(playerSpecific: Storage.PlayerSpecific, profileName: String, reason: String) {
+    private fun loadProfileSpecific(
+        playerSpecific: Storage.PlayerSpecific,
+        sackProfile: SackData.PlayerSpecific,
+        profileName: String
+    ) {
         noTabListTime = -1
         profileSpecific = playerSpecific.profiles.getOrPut(profileName) { Storage.ProfileSpecific() }
-        tryMigrateProfileSpecific()
-        ConfigLoadEvent().postAndCatch()
+        sackProfiles = sackProfile.profiles.getOrPut(profileName) { SackData.ProfileSpecific() }
         loaded = true
+        ConfigLoadEvent().postAndCatch()
     }
 
     @SubscribeEvent
     fun onHypixelJoin(event: HypixelJoinEvent) {
         val playerUuid = LorenzUtils.getRawPlayerUuid()
         playerSpecific = SkyHanniMod.feature.storage.players.getOrPut(playerUuid) { Storage.PlayerSpecific() }
-        migratePlayerSpecific()
+        sackPlayers = SkyHanniMod.sackData.players.getOrPut(playerUuid) { SackData.PlayerSpecific() }
         ConfigLoadEvent().postAndCatch()
-    }
-
-    private fun migratePlayerSpecific() {
-        val oldHidden = SkyHanniMod.feature.hidden
-        if (oldHidden.isMigrated) return
-
-        SkyHanniMod.feature.storage.apiKey = oldHidden.apiKey
-
-        SkyHanniMod.feature.storage?.let {
-            it.gardenJacobFarmingContestTimes = oldHidden.gardenJacobFarmingContestTimes
-        }
-    }
-
-    private fun tryMigrateProfileSpecific() {
-        val oldHidden = SkyHanniMod.feature.hidden
-        if (oldHidden.isMigrated) return
-
-        profileSpecific?.let {
-            it.currentPet = oldHidden.currentPet
-
-            for ((rawLocation, minionName) in oldHidden.minionName) {
-                val lastClick = oldHidden.minionLastClick[rawLocation] ?: -1
-                val location = LorenzVec.decodeFromString(rawLocation)
-                val minionConfig = Storage.ProfileSpecific.MinionConfig()
-                minionConfig.displayName = minionName
-                minionConfig.lastClicked = lastClick
-                it.minions[location] = minionConfig
-            }
-        }
-
-        profileSpecific?.crimsonIsle?.let {
-            it.quests = oldHidden.crimsonIsleQuests
-            it.latestTrophyFishInInventory = oldHidden.crimsonIsleLatestTrophyFishInInventory
-            it.miniBossesDoneToday = oldHidden.crimsonIsleMiniBossesDoneToday
-            it.kuudraTiersDone = oldHidden.crimsonIsleKuudraTiersDone
-        }
-
-        profileSpecific?.garden?.let {
-            it.experience = oldHidden.gardenExp
-            it.cropCounter = oldHidden.gardenCropCounter
-            it.cropUpgrades = oldHidden.gardenCropUpgrades
-
-            for ((crop, speed) in oldHidden.gardenCropsPerSecond) {
-                if (speed != -1) {
-                    it.cropsPerSecond[crop] = speed
-                }
-            }
-
-            it.latestBlocksPerSecond = oldHidden.gardenLatestBlocksPerSecond
-            it.latestTrueFarmingFortune = oldHidden.gardenLatestTrueFarmingFortune
-            it.savedCropAccessory = oldHidden.savedCropAccessory
-            it.dicerRngDrops = oldHidden.gardenDicerRngDrops
-            it.informedAboutLowMatter = oldHidden.informedAboutLowMatter
-            it.informedAboutLowFuel = oldHidden.informedAboutLowFuel
-            it.visitorInterval = oldHidden.visitorInterval
-            it.nextSixthVisitorArrival = oldHidden.nextSixthVisitorArrival
-            it.farmArmorDrops = oldHidden.gardenFarmingArmorDrops
-            it.composterUpgrades = oldHidden.gardenComposterUpgrades
-            it.toolWithBountiful = oldHidden.gardenToolHasBountiful
-            it.composterCurrentOrganicMatterItem = oldHidden.gardenComposterCurrentOrganicMatterItem
-            it.composterCurrentFuelItem = oldHidden.gardenComposterCurrentFuelItem
-        }
-
-        profileSpecific?.garden?.visitorDrops?.let {
-            val old = oldHidden.visitorDrops
-            it.acceptedVisitors = old.acceptedVisitors
-            it.deniedVisitors = old.deniedVisitors
-            it.visitorRarities = old.visitorRarities
-            it.copper = old.copper
-            it.farmingExp = old.farmingExp
-            it.coinsSpent = old.coinsSpent
-            it.rewardsCount = old.rewardsCount
-        }
-
-        oldHidden.isMigrated = true
     }
 }

@@ -15,43 +15,4 @@ enum class SlayerType(val displayName: String, val clazz: Class<*>) {
     INFERNO("Inferno Demonlord", EntityBlaze::class.java),
     VAMPIRE("Riftstalker Bloodfiend", EntityOtherPlayerMP::class.java)
     ;
-
-    companion object {
-        fun getByArea(skyBlockArea: String): SlayerType? {
-            return when (skyBlockArea) {
-                "Graveyard",
-                "Coal Mine",
-                -> REVENANT
-
-                "Spider Mound",
-                "Arachne's Burrow",
-                "Arachne's Sanctuary",
-                -> TARANTULA
-
-                "Ruins",
-                "Howling Cave",
-                -> SVEN
-
-                "The End",
-                "Void Sepulture",
-                "Zealot Bruiser Hideout",
-                -> VOID
-
-                "Stronghold",
-                "The Wasteland",
-                "Smoldering Tomb",
-                -> INFERNO
-
-                "Stillgore Château",
-                "Oubliette",
-                -> VAMPIRE
-
-                else -> return null
-            }
-        }
-
-        fun getByDisplayName(text: String): SlayerType? {
-            return entries.firstOrNull { text.startsWith(it.displayName) }
-        }
-    }
 }

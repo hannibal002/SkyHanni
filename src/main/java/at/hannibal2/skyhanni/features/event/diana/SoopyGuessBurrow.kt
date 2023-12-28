@@ -1,40 +1,45 @@
 package at.hannibal2.skyhanni.features.event.diana
 
 import at.hannibal2.skyhanni.SkyHanniMod
-import at.hannibal2.skyhanni.data.IslandType
+import at.hannibal2.skyhanni.events.BurrowGuessEvent
 import at.hannibal2.skyhanni.events.LorenzWorldChangeEvent
 import at.hannibal2.skyhanni.events.PlaySoundEvent
 import at.hannibal2.skyhanni.events.ReceiveParticleEvent
-import at.hannibal2.skyhanni.events.SoopyGuessBurrowEvent
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.LorenzVec
 import at.hannibal2.skyhanni.utils.toLorenzVec
 import net.minecraft.util.EnumParticleTypes
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
-import kotlin.math.*
+import kotlin.math.abs
+import kotlin.math.atan
+import kotlin.math.cos
+import kotlin.math.floor
+import kotlin.math.hypot
+import kotlin.math.pow
+import kotlin.math.sin
 
 /**
  * Taken and ported from Soopyboo32's javascript module SoopyV2
  */
 class SoopyGuessBurrow {
 
-    var dingIndex = 0
-    var lastDing = 0L
-    var lastDingPitch = 0f
-    var firstPitch = 0f
-    var lastParticlePoint: LorenzVec? = null
-    var lastParticlePoint2: LorenzVec? = null
-    var firstParticlePoint: LorenzVec? = null
-    var particlePoint: LorenzVec? = null
-    var guessPoint: LorenzVec? = null
+    private var dingIndex = 0
+    private var lastDing = 0L
+    private var lastDingPitch = 0f
+    private var firstPitch = 0f
+    private var lastParticlePoint: LorenzVec? = null
+    private var lastParticlePoint2: LorenzVec? = null
+    private var firstParticlePoint: LorenzVec? = null
+    private var particlePoint: LorenzVec? = null
+    private var guessPoint: LorenzVec? = null
 
-    var lastSoundPoint: LorenzVec? = null
-    var locs = mutableListOf<LorenzVec>()
+    private var lastSoundPoint: LorenzVec? = null
+    private var locs = mutableListOf<LorenzVec>()
 
-    var dingSlope = mutableListOf<Float>()
+    private var dingSlope = mutableListOf<Float>()
 
     var distance: Double? = null
-    var distance2: Double? = null
+    private var distance2: Double? = null
 
     @SubscribeEvent
     fun onWorldChange(event: LorenzWorldChangeEvent) {
@@ -238,7 +243,7 @@ class SoopyGuessBurrow {
                         } else {
                             LorenzVec(floor(p2.x), 255.0, floor(p2.z))
                         }
-                        SoopyGuessBurrowEvent(finalLocation).postAndCatch()
+                        BurrowGuessEvent(finalLocation).postAndCatch()
                     }
                 }
             }
@@ -253,7 +258,6 @@ class SoopyGuessBurrow {
             particlePoint = currLoc.clone()
 
             if (lastParticlePoint2 == null || firstParticlePoint == null || distance2 == null || lastSoundPoint == null) return
-
 
             val lineDist = lastParticlePoint2?.distance(particlePoint!!)!!
 
@@ -275,7 +279,5 @@ class SoopyGuessBurrow {
         }
     }
 
-    private fun isEnabled(): Boolean {
-        return LorenzUtils.inSkyBlock && LorenzUtils.skyBlockIsland == IslandType.HUB && SkyHanniMod.feature.diana.burrowsSoopyGuess
-    }
+    private fun isEnabled() = DianaAPI.isDoingDiana() && SkyHanniMod.feature.event.diana.burrowsSoopyGuess
 }

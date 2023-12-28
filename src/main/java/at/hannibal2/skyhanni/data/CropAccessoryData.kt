@@ -1,22 +1,27 @@
 package at.hannibal2.skyhanni.data
 
-import at.hannibal2.skyhanni.events.*
+import at.hannibal2.skyhanni.events.InventoryCloseEvent
+import at.hannibal2.skyhanni.events.InventoryFullyOpenedEvent
+import at.hannibal2.skyhanni.events.LorenzTickEvent
+import at.hannibal2.skyhanni.events.ProfileJoinEvent
 import at.hannibal2.skyhanni.features.garden.CropAccessory
 import at.hannibal2.skyhanni.features.garden.GardenAPI
 import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.NEUItems
+import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
 import com.google.gson.JsonElement
 import net.minecraft.item.ItemStack
 import net.minecraft.nbt.CompressedStreamTools
 import net.minecraftforge.client.event.GuiScreenEvent
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import java.io.ByteArrayInputStream
-import java.util.*
+import java.util.Base64
 
 class CropAccessoryData {
-    private val accessoryBagNamePattern = "Accessory Bag \\((\\d)/(\\d)\\)".toRegex()
+    // TODO USE SH-REPO
+    private val accessoryBagNamePattern = "Accessory Bag \\((?<current>\\d)/(?<total>\\d)\\)".toPattern()
     private var loadedAccessoryThisProfile = false
     private var ticks = 0
     private var accessoryInBag: CropAccessory? = null
@@ -32,17 +37,6 @@ class CropAccessoryData {
         accessoryPage.clear()
     }
 
-    @SubscribeEvent
-    fun onProfileDataLoad(event: ProfileApiDataLoadedEvent) {
-        if (loadedAccessoryThisProfile) return
-        val inventoryData = event.profileData["inv_contents"] ?: return
-        val accessories = getCropAccessories(event.profileData["talisman_bag"]).also {
-            it.addAll(getCropAccessories(inventoryData))
-        }
-        cropAccessory = accessories.maxOrNull() ?: CropAccessory.NONE
-        loadedAccessoryThisProfile = true
-    }
-
     // Handle accessory bag detection
     @SubscribeEvent
     fun onInventoryOpen(event: InventoryFullyOpenedEvent) {
@@ -55,10 +49,11 @@ class CropAccessoryData {
             return
         }
 
-        val groups = accessoryBagNamePattern.matchEntire(event.inventoryName)?.groups ?: return
-        isLoadingAccessories = true
-        accessoryBagPageCount = groups[2]!!.value.toInt()
-        accessoryBagPageNumber = groups[1]!!.value.toInt()
+        accessoryBagNamePattern.matchMatcher(event.inventoryName) {
+            isLoadingAccessories = true
+            accessoryBagPageNumber = group("current").toInt()
+            accessoryBagPageCount = group("total").toInt()
+        } ?: return
     }
 
     @SubscribeEvent
@@ -111,9 +106,9 @@ class CropAccessoryData {
         val pagesLoaded get() = accessoryPage.size
 
         var cropAccessory: CropAccessory?
-            get() = GardenAPI.config?.savedCropAccessory
+            get() = GardenAPI.storage?.savedCropAccessory
             private set(accessory) {
-                GardenAPI.config?.savedCropAccessory = accessory
+                GardenAPI.storage?.savedCropAccessory = accessory
             }
 
         // Derived partially from NotEnoughUpdates/NotEnoughUpdates, ProfileViewer.Profile#getInventoryInfo

@@ -3,6 +3,7 @@ package at.hannibal2.skyhanni.data
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.events.LorenzActionBarEvent
 import at.hannibal2.skyhanni.events.LorenzChatEvent
+import at.hannibal2.skyhanni.events.MessageSendToServerEvent
 import at.hannibal2.skyhanni.events.PacketEvent
 import at.hannibal2.skyhanni.features.chat.ChatFilterGui
 import at.hannibal2.skyhanni.utils.IdentityCharacteristics
@@ -13,6 +14,7 @@ import net.minecraft.client.Minecraft
 import net.minecraft.client.gui.ChatLine
 import net.minecraft.client.gui.GuiNewChat
 import net.minecraft.event.HoverEvent
+import net.minecraft.network.play.client.C01PacketChatMessage
 import net.minecraft.network.play.server.S02PacketChat
 import net.minecraft.util.EnumChatFormatting
 import net.minecraft.util.IChatComponent
@@ -63,15 +65,23 @@ object ChatManager {
 
     @SubscribeEvent(priority = EventPriority.LOW, receiveCanceled = true)
     fun onActionBarPacket(event: PacketEvent.ReceiveEvent) {
-        val packet = event.packet
-        if (packet !is S02PacketChat) return
-        val messageComponent = packet.chatComponent
+        val packet = event.packet as? S02PacketChat ?: return
 
+        val messageComponent = packet.chatComponent
         val message = LorenzUtils.stripVanillaMessage(messageComponent.formattedText)
         if (packet.type.toInt() == 2) {
             val actionBarEvent = LorenzActionBarEvent(message)
             actionBarEvent.postAndCatch()
         }
+
+    }
+
+    @SubscribeEvent
+    fun onSendMessageToServerPacket(event: PacketEvent.SendEvent) {
+        val packet = event.packet as? C01PacketChatMessage ?: return
+
+        val message = packet.message
+        event.isCanceled = MessageSendToServerEvent(message).postAndCatch()
     }
 
     @SubscribeEvent(receiveCanceled = true)
@@ -156,8 +166,8 @@ object ChatManager {
         val chatGUI = Minecraft.getMinecraft().ingameGUI.chatGUI
 
         @Suppress("UNCHECKED_CAST")
-        val chatLines = chatLinesField.invokeExact(chatGUI) as MutableList<ChatLine>
-        if (!chatLines.removeIf { it.chatComponent === message }) return
+        val chatLines = chatLinesField.invokeExact(chatGUI) as MutableList<ChatLine?>? ?: return
+        if (!chatLines.removeIf { it?.chatComponent === message }) return
         chatGUI.refreshChat()
 
         val history = messageHistory[IdentityCharacteristics(message)] ?: return

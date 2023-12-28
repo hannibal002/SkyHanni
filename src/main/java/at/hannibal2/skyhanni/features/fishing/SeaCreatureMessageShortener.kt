@@ -15,17 +15,14 @@ class SeaCreatureMessageShortener {
         val seaCreature = event.seaCreature
         event.chatEvent.blockedReason = "sea_creature_caught"
 
-        var message = if (config.shortenFishingMessage) {
-            "§9You caught a $seaCreature§9!"
+        val doubleHookPrefix = if (config.compactDoubleHook && event.doubleHook) "§e§lDOUBLE HOOK! " else ""
+        val message = doubleHookPrefix + if (config.shortenFishingMessage) {
+            "§9You caught a ${seaCreature.displayName}§9!"
         } else event.chatEvent.message
-
-        if (config.compactDoubleHook && event.doubleHook) {
-            message = "§e§lDOUBLE HOOK! $message"
-        }
-        LorenzUtils.chat(message)
+        LorenzUtils.chat(message, false)
 
         if (seaCreature.fishingExperience == 0) {
-            LorenzUtils.debug("no fishing exp set for " + seaCreature.displayName)
+            LorenzUtils.debug("no fishing exp set for " + seaCreature.name)
         }
     }
 }

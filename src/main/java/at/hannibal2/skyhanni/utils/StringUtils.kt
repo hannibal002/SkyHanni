@@ -1,15 +1,33 @@
 package at.hannibal2.skyhanni.utils
 
+import at.hannibal2.skyhanni.SkyHanniMod
+import at.hannibal2.skyhanni.mixins.transformers.AccessorChatComponentText
 import at.hannibal2.skyhanni.utils.GuiRenderUtils.darkenColor
+import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import net.minecraft.client.Minecraft
 import net.minecraft.client.gui.GuiUtilRenderComponents
 import net.minecraft.util.ChatComponentText
-import org.intellij.lang.annotations.Language
-import java.util.*
+import net.minecraft.util.IChatComponent
+import java.util.Base64
+import java.util.NavigableMap
+import java.util.UUID
+import java.util.function.Predicate
 import java.util.regex.Matcher
 import java.util.regex.Pattern
 
 object StringUtils {
+    // TODO USE SH-REPO
+    private val playerChatPattern = "(?<important>.*?)(?:§[f7r])*: .*".toPattern()
+    private val chatUsernamePattern =
+        "^(?:§\\w\\[§\\w\\d+§\\w] )?(?:(?:§\\w)+\\S )?(?<rankedName>(?:§\\w\\[\\w.+] )?(?:§\\w)?(?<username>\\w+))(?: (?:§\\w)?\\[.+?])?".toPattern()
+    private val whiteSpaceResetPattern = "^(?:\\s|§r)*|(?:\\s|§r)*$".toPattern()
+    private val whiteSpacePattern = "^\\s*|\\s*$".toPattern()
+    private val resetPattern = "(?i)§R".toPattern()
+
+    fun String.trimWhiteSpaceAndResets(): String = whiteSpaceResetPattern.matcher(this).replaceAll("")
+    fun String.trimWhiteSpace(): String = whiteSpacePattern.matcher(this).replaceAll("")
+    fun String.removeResets(): String = resetPattern.matcher(this).replaceAll("")
+
     fun String.firstLetterUppercase(): String {
         if (isEmpty()) return this
 
@@ -18,21 +36,27 @@ object StringUtils {
         return first + lowercase.substring(1)
     }
 
-    fun String.removeColor(): String {
-//        return replace("(?i)\\u00A7.", "")
+    private val formattingChars by lazy { "kmolnr".toCharArray() + "kmolnr".uppercase().toCharArray() }
 
-        val builder = StringBuilder()
-        var skipNext = false
-        for (c in this.toCharArray()) {
-            if (c == '§') {
-                skipNext = true
-                continue
+    /**
+     * Removes color and optionally formatting codes from the given string, leaving plain text.
+     *
+     * @param keepFormatting Boolean indicating whether to retain non-color formatting codes (default: false).
+     * @return A string with color codes removed (and optionally formatting codes if specified).
+     */
+    fun String.removeColor(keepFormatting: Boolean = false): String {
+        val builder = StringBuilder(this.length)
+
+        var counter = 0
+        while (counter < this.length) {
+            if (this[counter] == '§') {
+                if (!keepFormatting || this[counter + 1] !in formattingChars) {
+                    counter += 2
+                    continue
+                }
             }
-            if (skipNext) {
-                skipNext = false
-                continue
-            }
-            builder.append(c)
+            builder.append(this[counter])
+            counter++
         }
 
         return builder.toString()
@@ -59,22 +83,36 @@ object StringUtils {
         return toString().replace("-", "")
     }
 
-    fun String.matchRegex(@Language("RegExp") regex: String): Boolean = regex.toRegex().matches(this)
-
-    private fun String.removeAtBeginning(text: String): String =
-        if (this.startsWith(text)) substring(text.length) else this
-
     // TODO find better name for this method
     inline fun <T> Pattern.matchMatcher(text: String, consumer: Matcher.() -> T) =
         matcher(text).let { if (it.matches()) consumer(it) else null }
 
-    fun String.cleanPlayerName(): String {
-        val split = split(" ")
+    private fun String.internalCleanPlayerName(): String {
+        val split = trim().split(" ")
         return if (split.size > 1) {
             split[1].removeColor()
         } else {
             split[0].removeColor()
         }
+    }
+
+    fun String.cleanPlayerName(displayName: Boolean = false): String {
+        return if (displayName) {
+            if (SkyHanniMod.feature.chat.playerMessage.playerRankHider) {
+                "§b" + internalCleanPlayerName()
+            } else this
+        } else {
+            internalCleanPlayerName()
+        }
+    }
+
+    inline fun <T> List<Pattern>.matchMatchers(text: String, consumer: Matcher.() -> T): T? {
+        for (pattern in iterator()) {
+            pattern.matchMatcher<T>(text) {
+                return consumer()
+            }
+        }
+        return null
     }
 
     fun getColor(string: String, default: Int, darker: Boolean = true): Int {
@@ -108,7 +146,6 @@ object StringUtils {
         }
     }
 
-
     fun String.removeWordsAtEnd(i: Int) = split(" ").dropLast(i).joinToString(" ")
 
     fun String.splitLines(width: Int): String {
@@ -124,4 +161,131 @@ object StringUtils {
             } ?: text
         }
     }
+
+    /**
+     * Creates a comma-separated list using natural formatting (a, b, and c).
+     * @param list - the list of strings to join into a string, containing 0 or more elements.
+     * @param delimiterColor - the color code of the delimiter, inserted before each delimiter (commas and "and").
+     * @return a string representing the list joined with the Oxford comma and the word "and".
+     */
+    fun createCommaSeparatedList(list: List<String>, delimiterColor: String = ""): String {
+        if (list.isEmpty()) return ""
+        if (list.size == 1) return list[0]
+        if (list.size == 2) return "${list[0]}$delimiterColor and ${list[1]}"
+        val lastIndex = list.size - 1
+        val allButLast = list.subList(0, lastIndex).joinToString("$delimiterColor, ")
+        return "$allButLast$delimiterColor, and ${list[lastIndex]}"
+    }
+
+    fun optionalPlural(number: Int, singular: String, plural: String) =
+        "${number.addSeparators()} " + canBePlural(number, singular, plural)
+
+    fun canBePlural(number: Int, singular: String, plural: String) =
+        if (number == 1) singular else plural
+
+    fun progressBar(percentage: Double, steps: Int = 24): Any {
+        //'§5§o§2§l§m §l§m §l§m §l§m §l§m §l§m §l§m §l§m §l§m §l§m §f§l§m §l§m §l§m §l§m §l§m §l§m §l§m §l§m §l§m §l§m §l§m §l§m §l§m §l§m §l§m §r §e348,144.3§6/§e936k'
+        val prefix = "§5§o§2"
+        val step = "§l§m "
+        val missing = "§f"
+        val end = "§r"
+
+        val builder = StringBuilder()
+        var inMissingArea = false
+        builder.append(prefix)
+        for (i in 0..steps) {
+            val toDouble = i.toDouble()
+            val stepPercentage = toDouble / steps
+            if (stepPercentage >= percentage && !inMissingArea) {
+                builder.append(missing)
+                inMissingArea = true
+            }
+            builder.append(step)
+        }
+        builder.append(end)
+        return builder.toString()
+    }
+
+    fun String.capAtMinecraftLength(limit: Int) =
+        capAtLength(limit) { Minecraft.getMinecraft().fontRendererObj.getCharWidth(it) }
+
+    private fun String.capAtLength(limit: Int, lengthJudger: (Char) -> Int): String {
+        var i = 0
+        return takeWhile {
+            i += lengthJudger(it)
+            i < limit
+        }
+    }
+
+    // recursively goes through the chat component until an action is completed
+    fun modifyFirstChatComponent(chatComponent: IChatComponent, action: Predicate<IChatComponent>): Boolean {
+        if (action.test(chatComponent)) {
+            return true
+        }
+        for (sibling in chatComponent.siblings) {
+            if (modifyFirstChatComponent(sibling, action)) {
+                return true
+            }
+        }
+        return false
+    }
+
+    // replaces a word without breaking any chat components
+    fun replaceFirstChatText(chatComponent: IChatComponent, toReplace: String, replacement: String): IChatComponent {
+        modifyFirstChatComponent(chatComponent) { component ->
+            if (component is ChatComponentText) {
+                component as AccessorChatComponentText
+                if (component.text_skyhanni().contains(toReplace)) {
+                    component.setText_skyhanni(component.text_skyhanni().replace(toReplace, replacement))
+                    return@modifyFirstChatComponent true
+                }
+                return@modifyFirstChatComponent false
+            }
+            return@modifyFirstChatComponent false
+        }
+        return chatComponent
+    }
+
+    fun String.getPlayerNameFromChatMessage(): String? {
+        val matcher = matchPlayerChatMessage(this) ?: return null
+        return matcher.group("username")
+    }
+
+    fun String.getPlayerNameAndRankFromChatMessage(): String? {
+        val matcher = matchPlayerChatMessage(this) ?: return null
+        return matcher.group("rankedName")
+    }
+
+    private fun matchPlayerChatMessage(string: String): Matcher? {
+        var username = ""
+        var matcher = playerChatPattern.matcher(string)
+        if (matcher.matches()) {
+            username = matcher.group("important").removeResets()
+        }
+        if (username == "") return null
+
+        if (username.contains("[NPC]")) {
+            return null
+        }
+
+        if (username.contains(">")) {
+            username = username.substring(username.indexOf('>') + 1).trim()
+        }
+
+        username = username.removePrefix("§dFrom ")
+        username = username.removePrefix("§dTo ")
+
+        matcher = chatUsernamePattern.matcher(username)
+        return if (matcher.matches()) matcher else null
+    }
+
+    fun String.convertToFormatted(): String = this.replace("&&", "§")
+
+    fun Pattern.matches(string: String) = matcher(string).matches()
+
+    fun Pattern.find(string: String) = matcher(string).find()
+
+    fun String.allLettersFirstUppercase() = split("_").joinToString(" ") { it.firstLetterUppercase() }
+
+    fun String?.equalsIgnoreColor(string: String?) = this?.let { it.removeColor() == string?.removeColor() } ?: false
 }

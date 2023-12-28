@@ -2,15 +2,35 @@ package at.hannibal2.skyhanni.features.nether.reputationhelper.dailyquest
 
 import at.hannibal2.skyhanni.config.Storage
 import at.hannibal2.skyhanni.events.InventoryFullyOpenedEvent
-import at.hannibal2.skyhanni.features.nether.reputationhelper.dailyquest.quest.*
+import at.hannibal2.skyhanni.features.nether.reputationhelper.dailyquest.quest.DojoQuest
+import at.hannibal2.skyhanni.features.nether.reputationhelper.dailyquest.quest.FetchQuest
+import at.hannibal2.skyhanni.features.nether.reputationhelper.dailyquest.quest.KuudraQuest
+import at.hannibal2.skyhanni.features.nether.reputationhelper.dailyquest.quest.MiniBossQuest
+import at.hannibal2.skyhanni.features.nether.reputationhelper.dailyquest.quest.ProgressQuest
+import at.hannibal2.skyhanni.features.nether.reputationhelper.dailyquest.quest.Quest
+import at.hannibal2.skyhanni.features.nether.reputationhelper.dailyquest.quest.QuestState
+import at.hannibal2.skyhanni.features.nether.reputationhelper.dailyquest.quest.RescueMissionQuest
+import at.hannibal2.skyhanni.features.nether.reputationhelper.dailyquest.quest.TrophyFishQuest
+import at.hannibal2.skyhanni.features.nether.reputationhelper.dailyquest.quest.UnknownQuest
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.TabListData
+import at.hannibal2.skyhanni.data.jsonobjects.repo.CrimsonIsleReputationJson.ReputationQuest
 
 class QuestLoader(private val dailyQuestHelper: DailyQuestHelper) {
 
+    companion object {
+        val quests = mutableMapOf<String, Pair<String, ReputationQuest>>()
+        fun loadQuests(data: Map<String, ReputationQuest>, questType: String) {
+            for ((questName, questInfo) in data) {
+                quests[questName] = Pair(questType, questInfo)
+            }
+        }
+    }
+
     fun loadFromTabList() {
         var i = -1
+        dailyQuestHelper.greatSpook = false
         for (line in TabListData.getTabList()) {
             if (line.contains("Faction Quests:")) {
                 i = 0
@@ -20,6 +40,7 @@ class QuestLoader(private val dailyQuestHelper: DailyQuestHelper) {
 
             i++
             readQuest(line)
+            if (dailyQuestHelper.greatSpook) return
             if (i == 5) {
                 break
             }
@@ -27,6 +48,11 @@ class QuestLoader(private val dailyQuestHelper: DailyQuestHelper) {
     }
 
     private fun readQuest(line: String) {
+        if (line.contains("The Great Spook")) {
+            dailyQuestHelper.greatSpook = true
+            dailyQuestHelper.update()
+            return
+        }
         var text = line.substring(3)
         val green = text.startsWith("§a")
         text = text.substring(2)
@@ -49,12 +75,10 @@ class QuestLoader(private val dailyQuestHelper: DailyQuestHelper) {
     private fun checkQuest(name: String, green: Boolean, needAmount: Int) {
         val oldQuest = getQuestByName(name)
         if (oldQuest != null) {
-            if (green) {
-                if (oldQuest.state != QuestState.READY_TO_COLLECT && oldQuest.state != QuestState.COLLECTED) {
-                    oldQuest.state = QuestState.READY_TO_COLLECT
-                    dailyQuestHelper.update()
-                    LorenzUtils.debug("Reputation Helper: Tab-List updated ${oldQuest.internalName} (This should not happen)")
-                }
+            if (green && oldQuest.state != QuestState.READY_TO_COLLECT && oldQuest.state != QuestState.COLLECTED) {
+                oldQuest.state = QuestState.READY_TO_COLLECT
+                dailyQuestHelper.update()
+                LorenzUtils.debug("Reputation Helper: Tab-List updated ${oldQuest.internalName} (This should not happen)")
             }
             return
         }
@@ -76,33 +100,29 @@ class QuestLoader(private val dailyQuestHelper: DailyQuestHelper) {
                 return KuudraQuest(kuudraTier, state)
             }
         }
+        var questName = name
+        var dojoGoal = ""
 
-        val repoData = dailyQuestHelper.reputationHelper.repoData ?: return UnknownQuest(name)
-        for (entry in repoData.entrySet()) {
-            val categoryName = entry.key
-            val category = entry.value.asJsonObject
-            for ((entryName, extraData) in category.entrySet()) {
-                val data = extraData.asJsonObject
-                val displayItem = data["item"]?.asString
-                val location = dailyQuestHelper.reputationHelper.readLocationData(data)
-                if (name.startsWith("$entryName Rank ")) {
-                    val split = name.split(" Rank ")
-                    val dojoName = split[0]
-                    val dojoRankGoal = split[1]
-                    return DojoQuest(dojoName, location, displayItem, dojoRankGoal, state)
-                }
-
-                if (name == entryName) {
-                    when (categoryName) {
-                        "FISHING" -> return TrophyFishQuest(name, location, displayItem, state, needAmount)
-                        "RESCUE" -> return RescueMissionQuest(displayItem, location, state)
-                        "FETCH" -> return FetchQuest(name, location, displayItem, state, needAmount)
-                    }
-                }
-            }
+        if (name.contains(" Rank ")) {
+            val split = name.split(" Rank ")
+            questName = split[0]
+            dojoGoal = split[1]
         }
 
-        println("Unknown quest: '$name'")
+        if (questName in quests) {
+            val questInfo = quests[questName] ?: return UnknownQuest(name)
+            val locationInfo = questInfo.second.location
+            val location = dailyQuestHelper.reputationHelper.readLocationData(locationInfo)
+            val displayItem = questInfo.second.item
+
+            when (questInfo.first) {
+                "FISHING" -> return TrophyFishQuest(name, location, displayItem, state, needAmount)
+                "RESCUE" -> return RescueMissionQuest(displayItem, location, state)
+                "FETCH" -> return FetchQuest(name, location, displayItem, state, needAmount)
+                "DOJO" -> return DojoQuest(questName, location, displayItem, dojoGoal, state)
+            }
+        }
+        LorenzUtils.error("Unknown Crimson Isle quest: '$name'")
         return UnknownQuest(name)
     }
 
@@ -122,43 +142,51 @@ class QuestLoader(private val dailyQuestHelper: DailyQuestHelper) {
             val stack = event.inventoryItems[22] ?: continue
 
             val completed = stack.getLore().any { it.contains("Completed!") }
-            if (completed) {
-                if (quest.state != QuestState.COLLECTED) {
-                    quest.state = QuestState.COLLECTED
-                    dailyQuestHelper.update()
-                }
+            if (completed && quest.state != QuestState.COLLECTED) {
+                quest.state = QuestState.COLLECTED
+                dailyQuestHelper.update()
             }
 
             val accepted = !stack.getLore().any { it.contains("Click to start!") }
-            if (accepted) {
-                if (quest.state == QuestState.NOT_ACCEPTED) {
-                    quest.state = QuestState.ACCEPTED
-                    dailyQuestHelper.update()
-                }
+            if (accepted && quest.state == QuestState.NOT_ACCEPTED) {
+                quest.state = QuestState.ACCEPTED
+                dailyQuestHelper.update()
             }
         }
     }
 
     fun loadConfig(storage: Storage.ProfileSpecific.CrimsonIsleStorage) {
+        if (dailyQuestHelper.greatSpook) return
+        if (storage.quests.toList().any { hasGreatSpookLine(it) }) {
+            dailyQuestHelper.greatSpook = true
+            return
+        }
         for (text in storage.quests.toList()) {
             val split = text.split(":")
             val name = split[0]
             val state = QuestState.valueOf(split[1])
             val needAmount = split[2].toInt()
             val quest = addQuest(name, state, needAmount)
-            if (quest is ProgressQuest) {
-                if (split.size == 4) {
-                    try {
-                        val haveAmount = split[3].toInt()
-                        quest.haveAmount = haveAmount
-                    } catch (e: IndexOutOfBoundsException) {
-                        println("text: '$text'")
-                        e.printStackTrace()
-                    }
+            if (quest is ProgressQuest && split.size == 4) {
+                try {
+                    val haveAmount = split[3].toInt()
+                    quest.haveAmount = haveAmount
+                } catch (e: IndexOutOfBoundsException) {
+                    println("text: '$text'")
+                    e.printStackTrace()
                 }
             }
             addQuest(quest)
         }
+    }
+
+    private fun hasGreatSpookLine(text: String) = when {
+        text.contains("The Great Spook") -> true
+        text.contains(" Days") -> true
+        text.contains("Fear: §r") -> true
+        text.contains("Primal Fears") -> true
+
+        else -> false
     }
 
     private fun addQuest(element: Quest) {

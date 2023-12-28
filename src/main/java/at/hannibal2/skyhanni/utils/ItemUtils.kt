@@ -1,24 +1,47 @@
 package at.hannibal2.skyhanni.utils
 
+import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.NEUInternalName.Companion.asInternalName
 import at.hannibal2.skyhanni.utils.NEUItems.getItemStack
+import at.hannibal2.skyhanni.utils.NumberUtil.formatNumber
+import at.hannibal2.skyhanni.utils.SimpleTimeMark.Companion.asTimeMark
+import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.cachedData
+import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getEnchantments
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.isRecombobulated
-import at.hannibal2.skyhanni.utils.StringUtils.matchRegex
+import at.hannibal2.skyhanni.utils.StringUtils.matches
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import com.google.gson.GsonBuilder
 import com.google.gson.JsonObject
 import net.minecraft.client.Minecraft
 import net.minecraft.init.Items
 import net.minecraft.item.ItemStack
+import net.minecraft.nbt.NBTTagCompound
+import net.minecraft.nbt.NBTTagList
+import net.minecraft.nbt.NBTTagString
 import net.minecraftforge.common.util.Constants
-import java.util.*
+import java.util.LinkedList
+import java.util.regex.Matcher
+import kotlin.time.Duration.Companion.seconds
 
 object ItemUtils {
 
+    // TODO USE SH-REPO
+    private val patternInFront = "(?: *§8(\\+§\\w)?(?<amount>[\\d.km,]+)(x )?)?(?<name>.*)".toPattern()
+    private val patternBehind = "(?<name>(?:['\\w-]+ ?)+)(?:§8x(?<amount>[\\d,]+))?".toPattern()
+    private val petLevelPattern = "\\[Lvl (.*)] (.*)".toPattern()
+
+    private val ignoredPetStrings = listOf(
+        "Archer",
+        "Berserk",
+        "Mage",
+        "Tank",
+        "Healer",
+        "➡",
+    )
+
     fun ItemStack.cleanName() = this.displayName.removeColor()
 
-    fun isSack(name: String): Boolean =
-        name.endsWith(" Sack")//TODO use item id or api or something? or dont, its working fine now
+    fun isSack(stack: ItemStack) = stack.getInternalName().endsWith("_SACK") && stack.cleanName().endsWith(" Sack")
 
     fun ItemStack.getLore(): List<String> {
         val tagCompound = this.tagCompound ?: return emptyList()
@@ -42,14 +65,7 @@ object ItemUtils {
 
     fun isRecombobulated(stack: ItemStack) = stack.isRecombobulated()
 
-    fun isPet(name: String): Boolean = name.matchRegex("\\[Lvl (.*)] (.*)") && !listOf(
-        "Archer",
-        "Berserk",
-        "Mage",
-        "Tank",
-        "Healer",
-        "➡",
-    ).any { name.contains(it) }
+    fun isPet(name: String): Boolean = petLevelPattern.matches(name) && !ignoredPetStrings.any { name.contains(it) }
 
     fun maxPetLevel(name: String) = if (name.contains("Golden Dragon")) 200 else 100
 
@@ -57,7 +73,7 @@ object ItemUtils {
         val list: LinkedList<ItemStack> = LinkedList()
         val player = Minecraft.getMinecraft().thePlayer
         if (player == null) {
-            LorenzUtils.warning("getItemsInInventoryWithSlots: player is null!")
+            LorenzUtils.error("getItemsInInventoryWithSlots: player is null!")
             return list
         }
         for (slot in player.openContainer.inventorySlots) {
@@ -66,12 +82,8 @@ object ItemUtils {
             }
         }
 
-        if (withCursorItem) {
-            if (player.inventory != null) {
-                if (player.inventory.itemStack != null) {
-                    list.add(player.inventory.itemStack)
-                }
-            }
+        if (withCursorItem && player.inventory != null && player.inventory.itemStack != null) {
+            list.add(player.inventory.itemStack)
         }
         return list
     }
@@ -80,7 +92,7 @@ object ItemUtils {
         val map: LinkedHashMap<ItemStack, Int> = LinkedHashMap()
         val player = Minecraft.getMinecraft().thePlayer
         if (player == null) {
-            LorenzUtils.warning("getItemsInInventoryWithSlots: player is null!")
+            LorenzUtils.error("getItemsInInventoryWithSlots: player is null!")
             return map
         }
         for (slot in player.openContainer.inventorySlots) {
@@ -89,14 +101,9 @@ object ItemUtils {
             }
         }
 
-        if (withCursorItem) {
-            if (player.inventory != null) {
-                if (player.inventory.itemStack != null) {
-                    map[player.inventory.itemStack] = -1
-                }
-            }
+        if (withCursorItem && player.inventory != null && player.inventory.itemStack != null) {
+            map[player.inventory.itemStack] = -1
         }
-
         return map
     }
 
@@ -117,9 +124,6 @@ object ItemUtils {
         return false
     }
 
-    // TODO remove
-    fun ItemStack.getInternalName_old() = getInternalName().asString()
-
     fun ItemStack.getInternalName() = getInternalNameOrNull() ?: NEUInternalName.NONE
 
     fun ItemStack.getInternalNameOrNull() = getRawInternalName()?.asInternalName()
@@ -133,7 +137,11 @@ object ItemUtils {
 
     fun ItemStack.isVanilla() = NEUItems.isVanillaItem(this)
 
+    // Checks for the enchantment glint as part of the minecraft enchantments
     fun ItemStack.isEnchanted() = isItemEnchanted
+
+    // Checks for hypixel enchantments in the attributes
+    fun ItemStack.hasEnchantments() = getEnchantments()?.isNotEmpty() ?: false
 
     fun ItemStack.getSkullTexture(): String? {
         if (item != Items.skull) return null
@@ -152,20 +160,84 @@ object ItemUtils {
         return nbt.getCompoundTag("SkullOwner").getString("Id")
     }
 
-    fun ItemStack.getItemRarity(): Int {
-        //todo make into an enum in future
-        return when (this.getLore().lastOrNull()?.take(4)) {
-            "§f§l" -> 0     // common
-            "§a§l" -> 1     // uncommon
-            "§9§l" -> 2     // rare
-            "§5§l" -> 3     // epic
-            "§6§l" -> 4     // legendary
-            "§d§l" -> 5     // mythic
-            "§b§l" -> 6     // divine
-            "§4§l" -> 7     // supreme
-            "§c§l" -> 8     // special/very special
-            else -> -1      // unknown
+    // Taken from NEU
+    fun createSkull(displayName: String, uuid: String, value: String): ItemStack {
+        return createSkull(displayName, uuid, value, null)
+    }
+
+    // Taken from NEU
+    fun createSkull(displayName: String, uuid: String, value: String, lore: Array<String>?): ItemStack {
+        val render = ItemStack(Items.skull, 1, 3)
+        val tag = NBTTagCompound()
+        val skullOwner = NBTTagCompound()
+        val properties = NBTTagCompound()
+        val textures = NBTTagList()
+        val textures0 = NBTTagCompound()
+
+        skullOwner.setString("Id", uuid)
+        skullOwner.setString("Name", uuid)
+        textures0.setString("Value", value)
+
+        textures.appendTag(textures0)
+
+        addNameAndLore(tag, displayName, lore)
+
+        properties.setTag("textures", textures)
+        skullOwner.setTag("Properties", properties)
+        tag.setTag("SkullOwner", skullOwner)
+        render.tagCompound = tag
+        return render
+    }
+
+    // Taken from NEU
+    private fun addNameAndLore(tag: NBTTagCompound, displayName: String, lore: Array<String>?) {
+        val display = NBTTagCompound()
+        display.setString("Name", displayName)
+        if (lore != null) {
+            val tagLore = NBTTagList()
+            for (line in lore) {
+                tagLore.appendTag(NBTTagString(line))
+            }
+            display.setTag("Lore", tagLore)
         }
+        tag.setTag("display", display)
+    }
+
+    fun ItemStack.getItemRarityOrCommon() = getItemRarityOrNull() ?: LorenzRarity.COMMON
+
+    fun ItemStack.getItemRarityOrNull(logError: Boolean = true): LorenzRarity? {
+        val data = cachedData
+        if (data.itemRarityLastCheck.asTimeMark().passedSince() < 1.seconds) {
+            return data.itemRarity
+        }
+        data.itemRarityLastCheck = SimpleTimeMark.now().toMillis()
+
+        val internalName = getInternalName()
+        if (internalName == NEUInternalName.NONE) {
+            data.itemRarity = null
+            return null
+        }
+
+
+        if (isPet(cleanName())) {
+            val petRarity = getPetRarity(this)
+            data.itemRarity = petRarity
+            return petRarity
+        }
+
+        val rarity = LorenzRarity.readItemRarity(this)
+        data.itemRarity = rarity
+        if (rarity == null && logError) {
+            ErrorManager.logErrorStateWithData(
+                "Could not read rarity for item $name",
+                "Failed to read rarity from item rarity via item lore",
+                "internal name" to internalName,
+                "item name" to name,
+                "inventory name" to InventoryUtils.openInventoryName(),
+                "lore" to getLore(),
+            )
+        }
+        return rarity
     }
 
     //extra method for shorter name and kotlin nullability logic
@@ -182,14 +254,16 @@ object ItemUtils {
             } else it
         }
 
-    fun isSkyBlockMenuItem(stack: ItemStack?): Boolean = stack?.getInternalName_old() == "SKYBLOCK_MENU"
-
-    private val patternInFront = "(?: *§8(?<amount>[\\d,]+)x )?(?<name>.*)".toPattern()
-    private val patternBehind = "(?<name>(?:['\\w-]+ ?)+)(?:§8x(?<amount>[\\d,]+))?".toPattern()
+    fun isSkyBlockMenuItem(stack: ItemStack?): Boolean = stack?.getInternalName()?.equals("SKYBLOCK_MENU") ?: false
 
     private val itemAmountCache = mutableMapOf<String, Pair<String, Int>>()
 
-    fun readItemAmount(input: String): Pair<String?, Int> {
+    fun readItemAmount(originalInput: String): Pair<String, Int>? {
+        // This workaround fixes 'Tubto Cacti I Book'
+        val input = if (originalInput.endsWith(" Book")) {
+            originalInput.replace(" Book", "")
+        } else originalInput
+
         if (itemAmountCache.containsKey(input)) {
             return itemAmountCache[input]!!
         }
@@ -198,10 +272,7 @@ object ItemUtils {
         if (matcher.matches()) {
             val itemName = matcher.group("name")
             if (!itemName.contains("§8x")) {
-                val amount = matcher.group("amount")?.replace(",", "")?.toInt() ?: 1
-                val pair = Pair(itemName.trim(), amount)
-                itemAmountCache[input] = pair
-                return pair
+                return makePair(input, itemName.trim(), matcher)
             }
         }
 
@@ -213,11 +284,16 @@ object ItemUtils {
             println("")
             println("input: '$input'")
             println("string: '$string'")
-            return Pair(null, 0)
+            return null
         }
 
         val itemName = color + matcher.group("name").trim()
-        val amount = matcher.group("amount")?.replace(",", "")?.toInt() ?: 1
+        return makePair(input, itemName, matcher)
+    }
+
+    private fun makePair(input: String, itemName: String, matcher: Matcher): Pair<String, Int> {
+        val matcherAmount = matcher.group("amount")
+        val amount = matcherAmount?.formatNumber()?.toInt() ?: 1
         val pair = Pair(itemName, amount)
         itemAmountCache[input] = pair
         return pair
@@ -232,5 +308,22 @@ object ItemUtils {
             return "§fWisp's Ice-Flavored Water"
         }
         return getItemStack().nameWithEnchantment ?: error("Could not find item name for $this")
+    }
+
+    private fun getPetRarity(pet: ItemStack): LorenzRarity? {
+        val rarityId = pet.getInternalName().asString().split(";").last().toInt()
+        val rarity = LorenzRarity.getById(rarityId)
+        val name = pet.name
+        if (rarity == null) {
+            ErrorManager.logErrorStateWithData(
+                "Could not read rarity for pet $name",
+                "Failed to read rarity from pet item via internal name",
+                "internal name" to pet.getInternalName(),
+                "item name" to name,
+                "rarity id" to rarityId,
+                "inventory name" to InventoryUtils.openInventoryName()
+            )
+        }
+        return rarity
     }
 }

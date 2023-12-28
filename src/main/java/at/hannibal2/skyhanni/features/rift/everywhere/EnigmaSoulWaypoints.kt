@@ -1,6 +1,12 @@
 package at.hannibal2.skyhanni.features.rift.everywhere
 
-import at.hannibal2.skyhanni.events.*
+import at.hannibal2.skyhanni.data.jsonobjects.repo.EnigmaSoulsJson
+import at.hannibal2.skyhanni.events.GuiContainerEvent
+import at.hannibal2.skyhanni.events.InventoryCloseEvent
+import at.hannibal2.skyhanni.events.InventoryFullyOpenedEvent
+import at.hannibal2.skyhanni.events.LorenzChatEvent
+import at.hannibal2.skyhanni.events.LorenzRenderWorldEvent
+import at.hannibal2.skyhanni.events.RepositoryReloadEvent
 import at.hannibal2.skyhanni.features.rift.RiftAPI
 import at.hannibal2.skyhanni.test.GriffinUtils.drawWaypointFilled
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
@@ -12,14 +18,12 @@ import at.hannibal2.skyhanni.utils.NEUItems
 import at.hannibal2.skyhanni.utils.RenderUtils.drawDynamicText
 import at.hannibal2.skyhanni.utils.RenderUtils.highlight
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
-import at.hannibal2.skyhanni.utils.jsonobjects.EnigmaSoulsJson
 import io.github.moulberry.notenoughupdates.events.ReplaceItemEvent
 import io.github.moulberry.notenoughupdates.events.SlotClickEvent
 import io.github.moulberry.notenoughupdates.util.Utils
 import net.minecraft.client.gui.inventory.GuiChest
 import net.minecraft.client.player.inventory.ContainerLocalMenu
 import net.minecraft.inventory.ContainerChest
-import net.minecraftforge.client.event.RenderWorldLastEvent
 import net.minecraftforge.fml.common.eventhandler.EventPriority
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
@@ -32,7 +36,7 @@ object EnigmaSoulWaypoints {
     private var adding = true
 
     private val item by lazy {
-        val neuItem = NEUItems.getItemStack("SKYBLOCK_ENIGMA_SOUL", true)
+        val neuItem = NEUItems.getItemStack("SKYBLOCK_ENIGMA_SOUL")
         Utils.createItemStack(
             neuItem.item,
             "§5Toggle Missing",
@@ -60,10 +64,8 @@ object EnigmaSoulWaypoints {
 
         for (stack in event.inventoryItems.values) {
             val split = stack.displayName.split("Enigma: ")
-            if (split.size == 2) {
-                if (stack.getLore().last() == "§8✖ Not completed yet!") {
-                    inventoryUnfound.add(split.last())
-                }
+            if (split.size == 2 && stack.getLore().last() == "§8✖ Not completed yet!") {
+                inventoryUnfound.add(split.last())
             }
         }
     }
@@ -96,11 +98,11 @@ object EnigmaSoulWaypoints {
             event.usePickblockInstead()
             if (soulLocations.contains(split.last())) {
                 if (!trackedSouls.contains(split.last())) {
-                    LorenzUtils.chat("§5Tracking the ${split.last()} Enigma Soul!")
+                    LorenzUtils.chat("§5Tracking the ${split.last()} Enigma Soul!", prefixColor = "§5")
                     trackedSouls.add(split.last())
                 } else {
                     trackedSouls.remove(split.last())
-                    LorenzUtils.chat("§5No longer tracking the ${split.last()} Enigma Soul!")
+                    LorenzUtils.chat("§5No longer tracking the ${split.last()} Enigma Soul!", prefixColor = "§5")
                 }
             }
         }
@@ -130,19 +132,19 @@ object EnigmaSoulWaypoints {
     }
 
     @SubscribeEvent
-    fun onRenderWorld(event: RenderWorldLastEvent) {
+    fun onRenderWorld(event: LorenzRenderWorldEvent) {
         if (!isEnabled()) return
         for (soul in trackedSouls) {
             soulLocations[soul]?.let {
                 event.drawWaypointFilled(it, LorenzColor.DARK_PURPLE.toColor(), seeThroughBlocks = true, beacon = true)
-                event.drawDynamicText(it.add(0, 1, 0), "§5$soul Soul", 1.5)
+                event.drawDynamicText(it.add(y = 1), "§5$soul Soul", 1.5)
             }
         }
     }
 
     @SubscribeEvent
     fun onRepoReload(event: RepositoryReloadEvent) {
-        val data = event.getConstant<EnigmaSoulsJson>("EnigmaSouls") ?: return
+        val data = event.getConstant<EnigmaSoulsJson>("EnigmaSouls")
         val areas = data.areas ?: error("'areas' is null in EnigmaSouls!")
         soulLocations = buildMap {
             for ((area, locations) in areas) {
@@ -174,7 +176,7 @@ object EnigmaSoulWaypoints {
         }
         if (closestSoul in trackedSouls) {
             trackedSouls.remove(closestSoul)
-            LorenzUtils.chat("§5Found the $closestSoul Enigma Soul!")
+            LorenzUtils.chat("§5Found the $closestSoul Enigma Soul!", prefixColor = "§5")
         }
     }
 

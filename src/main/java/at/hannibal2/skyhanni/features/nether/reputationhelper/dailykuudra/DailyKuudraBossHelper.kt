@@ -1,10 +1,10 @@
 package at.hannibal2.skyhanni.features.nether.reputationhelper.dailykuudra
 
-import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.config.Storage
 import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.data.ScoreboardData
 import at.hannibal2.skyhanni.events.LorenzChatEvent
+import at.hannibal2.skyhanni.events.LorenzRenderWorldEvent
 import at.hannibal2.skyhanni.features.nether.reputationhelper.CrimsonIsleReputationHelper
 import at.hannibal2.skyhanni.test.GriffinUtils.drawWaypointFilled
 import at.hannibal2.skyhanni.utils.LorenzColor
@@ -13,7 +13,7 @@ import at.hannibal2.skyhanni.utils.LorenzUtils.addAsSingletonList
 import at.hannibal2.skyhanni.utils.LorenzVec
 import at.hannibal2.skyhanni.utils.NEUItems
 import at.hannibal2.skyhanni.utils.RenderUtils.drawDynamicText
-import net.minecraftforge.client.event.RenderWorldLastEvent
+import at.hannibal2.skyhanni.data.jsonobjects.repo.CrimsonIsleReputationJson.ReputationQuest
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
 class DailyKuudraBossHelper(private val reputationHelper: CrimsonIsleReputationHelper) {
@@ -23,11 +23,11 @@ class DailyKuudraBossHelper(private val reputationHelper: CrimsonIsleReputationH
     private var allKuudraDone = true
 
     @SubscribeEvent
-    fun onRenderWorld(event: RenderWorldLastEvent) {
+    fun onRenderWorld(event: LorenzRenderWorldEvent) {
         if (!LorenzUtils.inSkyBlock) return
         if (LorenzUtils.skyBlockIsland != IslandType.CRIMSON_ISLE) return
-        if (!SkyHanniMod.feature.misc.crimsonIsleReputationHelper) return
-        if (!SkyHanniMod.feature.misc.crimsonIsleReputationLocation) return
+        if (!reputationHelper.config.enabled) return
+        if (!reputationHelper.showLocations()) return
         if (allKuudraDone) return
 
         kuudraLocation?.let {
@@ -40,14 +40,14 @@ class DailyKuudraBossHelper(private val reputationHelper: CrimsonIsleReputationH
     fun onChat(event: LorenzChatEvent) {
         if (!LorenzUtils.inSkyBlock) return
         if (LorenzUtils.skyBlockIsland != IslandType.KUUDRA_ARENA) return
-        if (!SkyHanniMod.feature.misc.crimsonIsleReputationHelper) return
+        if (!reputationHelper.config.enabled) return
 
         val message = event.message
         if (!message.contains("KUUDRA DOWN!") || message.contains(":")) return
 
         for (line in ScoreboardData.sidebarLines) {
-            if(line.contains("Kuudra's") && line.contains("Hollow") && line.contains("(")){
-                val tier = line.substringAfter("(T").substring(0,1).toInt()
+            if (line.contains("Kuudra's") && line.contains("Hollow") && line.contains("(")) {
+                val tier = line.substringAfter("(T").substring(0, 1).toInt()
                 val kuudraTier = getByTier(tier)!!
                 finished(kuudraTier)
                 return
@@ -99,26 +99,23 @@ class DailyKuudraBossHelper(private val reputationHelper: CrimsonIsleReputationH
             .forEach { storage.kuudraTiersDone.add(it.name) }
     }
 
-    fun load(storage: Storage.ProfileSpecific.CrimsonIsleStorage) {
+    fun onRepoReload(data: Map<String, ReputationQuest>) {
         kuudraTiers.clear()
-
-        //Repo
-        val repoData = reputationHelper.repoData ?: return
-        val jsonElement = repoData["KUUDRA"]
         var tier = 1
-        for ((displayName, extraData) in jsonElement.asJsonObject.entrySet()) {
-            val data = extraData.asJsonObject
-            val displayItem = data["item"]?.asString
-            val location = reputationHelper.readLocationData(data)
-            kuudraTiers.add(KuudraTier(displayName, displayItem, location, tier))
+        for ((displayName, kuudraTier) in data) {
+            val displayItem = kuudraTier.item
+            val location = reputationHelper.readLocationData(kuudraTier.location)
             if (location != null) {
                 kuudraLocation = location
             }
+            kuudraTiers.add(KuudraTier(displayName, displayItem, location, tier))
 
             tier++
         }
+    }
 
-        //Config
+    fun loadData(storage: Storage.ProfileSpecific.CrimsonIsleStorage) {
+        if (kuudraTiers.isEmpty()) return
         for (name in storage.kuudraTiersDone) {
             getByDisplayName(name)!!.doneToday = true
         }

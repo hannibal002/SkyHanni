@@ -2,7 +2,7 @@ package at.hannibal2.skyhanni.features.garden.fortuneguide
 
 import at.hannibal2.skyhanni.data.CropAccessoryData
 import at.hannibal2.skyhanni.data.GardenCropMilestones
-import at.hannibal2.skyhanni.data.GardenCropMilestones.Companion.getCounter
+import at.hannibal2.skyhanni.data.GardenCropMilestones.getCounter
 import at.hannibal2.skyhanni.features.garden.CropAccessory
 import at.hannibal2.skyhanni.features.garden.CropType
 import at.hannibal2.skyhanni.features.garden.CropType.Companion.getTurboCrop
@@ -11,9 +11,9 @@ import at.hannibal2.skyhanni.features.garden.GardenAPI
 import at.hannibal2.skyhanni.features.garden.GardenAPI.getCropType
 import at.hannibal2.skyhanni.features.garden.fortuneguide.FFGuideGUI.Companion.currentPet
 import at.hannibal2.skyhanni.features.garden.fortuneguide.FFGuideGUI.Companion.getItem
-import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName_old
+import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName
 import at.hannibal2.skyhanni.utils.ItemUtils.getItemName
-import at.hannibal2.skyhanni.utils.ItemUtils.getItemRarity
+import at.hannibal2.skyhanni.utils.ItemUtils.getItemRarityOrCommon
 import at.hannibal2.skyhanni.utils.NEUItems
 import at.hannibal2.skyhanni.utils.NumberUtil.addSuffix
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getEnchantments
@@ -31,22 +31,22 @@ object FortuneUpgrades {
     val cropSpecificUpgrades = mutableListOf<FortuneUpgrade>()
 
     fun generateGenericUpgrades() {
-        val hidden = GardenAPI.config?.fortune ?: return
+        val storage = GardenAPI.storage?.fortune ?: return
         genericUpgrades.clear()
 
-        if (hidden.plotsUnlocked != -1 && hidden.plotsUnlocked != 24) {
+        if (storage.plotsUnlocked != -1 && storage.plotsUnlocked != 24) {
             genericUpgrades.add(
                 FortuneUpgrade(
-                    "§7Unlock your ${(hidden.plotsUnlocked + 1).addSuffix()} §7plot",
-                    null, "COMPOST", compostNeeded[hidden.plotsUnlocked], 3.0
+                    "§7Unlock your ${(storage.plotsUnlocked + 1).addSuffix()} §7plot",
+                    null, "COMPOST", compostNeeded[storage.plotsUnlocked], 3.0
                 )
             )
         }
-        if (hidden.anitaUpgrade != -1 && hidden.anitaUpgrade != 15) {
+        if (storage.anitaUpgrade != -1 && storage.anitaUpgrade != 15) {
             genericUpgrades.add(
                 FortuneUpgrade(
-                    "§7Upgrade Anita bonus to level ${hidden.anitaUpgrade + 1}",
-                    null, "JACOBS_TICKET", anitaTicketsNeeded[hidden.anitaUpgrade], 2.0
+                    "§7Upgrade Anita bonus to level ${storage.anitaUpgrade + 1}",
+                    null, "JACOBS_TICKET", anitaTicketsNeeded[storage.anitaUpgrade], 4.0
                 )
             )
         }
@@ -91,11 +91,11 @@ object FortuneUpgrades {
     }
 
     private fun getEquipmentUpgrades() {
-        val visitors = GardenAPI.config?.uniqueVisitors?.toDouble() ?: 0.0
+        val visitors = GardenAPI.storage?.uniqueVisitors?.toDouble() ?: 0.0
         for (piece in equipment) {
             val item = piece.getItem()
             //todo tell them to buy the missing item
-            if (!item.getInternalName_old().contains("LOTUS")) return
+            if (!item.getInternalName().contains("LOTUS")) return
             val enchantments = item.getEnchantments() ?: emptyMap()
             val greenThumbLvl = enchantments["green_thumb"] ?: 0
             if (greenThumbLvl != 5 && visitors != 0.0) {
@@ -126,6 +126,8 @@ object FortuneUpgrades {
             val item = piece.getItem()
             //todo skip if it doesnt exist -> tell them to buy it later
 
+            if (FFGuideGUI.isFallbackItem(item)) return
+
             recombobulateItem(item, genericUpgrades)
             when (item.getReforgeName()) {
                 "mossy" -> {}
@@ -142,7 +144,7 @@ object FortuneUpgrades {
 
     //todo needs to be called when switching pets
     private fun getPetUpgrades() {
-        if (currentPet.getItem().getInternalName_old().contains(";")) {
+        if (currentPet.getItem().getInternalName().contains(";")) {
             when (FFStats.currentPetItem) {
                 "GREEN_BANDANA" -> {}
                 "YELLOW_BANDANA" -> {
@@ -168,11 +170,18 @@ object FortuneUpgrades {
         val farmingForDummiesCount = tool.getFarmingForDummiesCount() ?: 0
         if (crop in axeCrops) {
             val sunderLvl = enchantments["sunder"] ?: 0
-            if (sunderLvl != 5) {
+            if (sunderLvl < 5) {
                 cropSpecificUpgrades.add(
                     FortuneUpgrade(
                         "§7Enchant your ${tool.displayName} §7with Sunder ${sunderLvl + 1}",
                         10, "SUNDER;1", getNeededBooks(sunderLvl), 12.5
+                    )
+                )
+            } else if (sunderLvl == 5) {
+                cropSpecificUpgrades.add(
+                    FortuneUpgrade(
+                        "§7Enchant your ${tool.displayName} §7with Sunder 6",
+                        10, "SUNDER;6", 1, 12.5
                     )
                 )
             }
@@ -198,7 +207,7 @@ object FortuneUpgrades {
                 )
             )
         }
-        val cropMilestone = GardenCropMilestones.getTierForCrops(crop.getCounter())
+        val cropMilestone = GardenCropMilestones.getTierForCropCount(crop.getCounter(), crop)
         if (dedicationLvl != 4 && cropMilestone > 0) {
             val dedicationMultiplier = listOf(0.5, 0.75, 1.0, 2.0)[dedicationLvl]
             val dedicationIncrease =
@@ -221,7 +230,7 @@ object FortuneUpgrades {
         }
         if (cultivatingLvl == 0) {
             cropSpecificUpgrades.add(
-                FortuneUpgrade("§7Enchant your ${tool.displayName} §7with Cultivating", null, "CULTIVATING;1", 1, 6.0)
+                FortuneUpgrade("§7Enchant your ${tool.displayName} §7with Cultivating", null, "CULTIVATING;1", 1, 12.0)
             )
         }
         if (turboCropLvl != 5) {
@@ -254,7 +263,7 @@ object FortuneUpgrades {
         } ?: return
 
         FarmingFortuneDisplay.loadFortuneLineData(item, 0.0)
-        val increase = reforge[item.getItemRarity() + 1, FarmingFortuneDisplay.reforgeFortune] ?: return
+        val increase = reforge[item.getItemRarityOrCommon().id + 1, FarmingFortuneDisplay.reforgeFortune] ?: return
         list.add(
             FortuneUpgrade("§7Recombobulate your ${item.displayName}", null, "RECOMBOBULATOR_3000", 1, increase)
         )
@@ -267,7 +276,7 @@ object FortuneUpgrades {
         copperPrice: Int? = null
     ) {
         FarmingFortuneDisplay.loadFortuneLineData(item, 0.0)
-        val increase = reforge[item.getItemRarity(), FarmingFortuneDisplay.reforgeFortune] ?: return
+        val increase = reforge[item.getItemRarityOrCommon().id, FarmingFortuneDisplay.reforgeFortune] ?: return
         list.add(
             FortuneUpgrade(
                 "§7Reforge your ${item.displayName} §7to ${reforge.reforgeName}",
@@ -276,14 +285,12 @@ object FortuneUpgrades {
         )
     }
 
-    private fun getNeededBooks(currentLvl: Int): Int {
-        return when (currentLvl) {
-            0 -> 1
-            1 -> 1
-            2 -> 2
-            3 -> 4
-            else -> 8
-        }
+    private fun getNeededBooks(currentLvl: Int) = when (currentLvl) {
+        0 -> 1
+        1 -> 1
+        2 -> 2
+        3 -> 4
+        else -> 8
     }
 
     private val cropUpgrades = listOf(5, 10, 20, 50, 100, 500, 1000, 5000, 10000)

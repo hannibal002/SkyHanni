@@ -1,6 +1,7 @@
 package at.hannibal2.skyhanni.features.mining
 
 import at.hannibal2.skyhanni.SkyHanniMod
+import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.events.EntityMaxHealthUpdateEvent
 import at.hannibal2.skyhanni.events.LorenzTickEvent
@@ -11,6 +12,7 @@ import at.hannibal2.skyhanni.utils.EntityUtils
 import at.hannibal2.skyhanni.utils.EntityUtils.hasMaxHealth
 import at.hannibal2.skyhanni.utils.LorenzColor
 import at.hannibal2.skyhanni.utils.LorenzUtils.isInIsland
+import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import net.minecraft.entity.EntityLivingBase
 import net.minecraft.entity.monster.EntityEndermite
 import net.minecraft.entity.monster.EntityIronGolem
@@ -19,7 +21,7 @@ import net.minecraft.entity.monster.EntitySlime
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
 class HighlightMiningCommissionMobs {
-    private val config get() = SkyHanniMod.feature.misc.mining
+    private val config get() = SkyHanniMod.feature.mining
     private var active = listOf<MobType>()
 
     enum class MobType(val commissionName: String, val isMob: (EntityLivingBase) -> Boolean) {
@@ -28,7 +30,7 @@ class HighlightMiningCommissionMobs {
         DWARVEN_GOBLIN_SLAYER("Goblin Slayer", { it.name == "Goblin " }),
         STAR_PUNCHER("Star Sentry Puncher", { it.name == "Crystal Sentry" }),
         ICE_WALKER("Ice Walker Slayer", { it.name == "Ice Walker" }),
-        GOLDEN_GOBLIN("Golden Goblin Slayer", { it.name.contains("Golden Goblin") }), // TODO test
+        GOLDEN_GOBLIN("Golden Goblin Slayer", { it.name.contains("Golden Goblin") }),
 
         // Crystal Hollows
         AUTOMATON("Automaton Slayer", { it is EntityIronGolem }),
@@ -62,7 +64,9 @@ class HighlightMiningCommissionMobs {
         if (!isEnabled()) return
 
         MobType.entries.filter { type ->
-            event.tabList.find { line -> line.contains(type.commissionName) }?.let { !it.endsWith("§aDONE") } ?: false
+            event.tabList.findLast { line -> line.removeColor().trim().startsWith(type.commissionName) }
+                ?.let { !it.endsWith("§aDONE") }
+                ?: false
         }.let {
             if (it != active) {
                 active = it
@@ -83,6 +87,11 @@ class HighlightMiningCommissionMobs {
         }
     }
 
+    @SubscribeEvent
+    fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
+        event.move(2, "misc.mining", "mining")
+    }
+
     fun isEnabled() = config.highlightCommissionMobs &&
-            (IslandType.DWARVEN_MINES.isInIsland() || IslandType.CRYSTAL_HOLLOWS.isInIsland())
+        (IslandType.DWARVEN_MINES.isInIsland() || IslandType.CRYSTAL_HOLLOWS.isInIsland())
 }

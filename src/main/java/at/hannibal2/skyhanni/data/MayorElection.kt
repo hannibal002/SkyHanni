@@ -2,11 +2,11 @@ package at.hannibal2.skyhanni.data
 
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.config.ConfigManager
+import at.hannibal2.skyhanni.data.jsonobjects.local.MayorJson
 import at.hannibal2.skyhanni.events.LorenzTickEvent
 import at.hannibal2.skyhanni.utils.APIUtil
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils.put
-import at.hannibal2.skyhanni.utils.jsonobjects.MayorJson
 import io.github.moulberry.notenoughupdates.util.SkyBlockTime
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -15,18 +15,16 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
 class MayorElection {
     private var lastUpdate = 0L
+    private var dispatcher = Dispatchers.IO
 
     companion object {
         var rawMayorData: MayorJson? = null
         var candidates = mapOf<Int, MayorJson.Candidate>()
         var currentCandidate: MayorJson.Candidate? = null
 
-        fun isPerkActive(mayor: String, perk: String): Boolean {
-            return currentCandidate?.let { currentCandidate ->
-                currentCandidate.name == mayor && currentCandidate.perks.any { it.name == perk }
-            } ?: false
-        }
-
+        fun isPerkActive(mayor: String, perk: String) = currentCandidate?.let { currentCandidate ->
+            currentCandidate.name == mayor && currentCandidate.perks.any { it.name == perk }
+        } ?: false
     }
 
     @SubscribeEvent
@@ -42,8 +40,8 @@ class MayorElection {
         if (System.currentTimeMillis() > lastUpdate + 60_000 * 5) {
             lastUpdate = System.currentTimeMillis()
             SkyHanniMod.coroutineScope.launch {
-                val url = "https://api.hypixel.net/resources/skyblock/election"
-                val jsonObject = withContext(Dispatchers.IO) { APIUtil.getJSONResponse(url) }
+                val url = "https://api.hypixel.net/v2/resources/skyblock/election"
+                val jsonObject = withContext(dispatcher) { APIUtil.getJSONResponse(url) }
                 rawMayorData = ConfigManager.gson.fromJson(jsonObject, MayorJson::class.java)
                 val data = rawMayorData ?: return@launch
                 val map = mutableMapOf<Int, MayorJson.Candidate>()
@@ -61,7 +59,7 @@ class MayorElection {
     private fun checkCurrentMayor() {
         var currentYear = SkyBlockTime.now().year
 
-        // The time in the current skyblock year when the election circle will restart
+        // The time in the current SkyBlock year when the election circle will restart
         val month = 3 // Late Spring
         val nextMayorTime = SkyBlockTime(currentYear, month, day = 27).toMillis()
 

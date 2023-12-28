@@ -1,41 +1,65 @@
 package at.hannibal2.skyhanni.features.garden.composter
 
-import at.hannibal2.skyhanni.SkyHanniMod
+import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
+import at.hannibal2.skyhanni.config.features.garden.composter.ComposterConfig
+import at.hannibal2.skyhanni.config.features.garden.composter.ComposterConfig.OverlayPriceTypeEntry
+import at.hannibal2.skyhanni.config.features.garden.composter.ComposterConfig.RetrieveFromEntry
+import at.hannibal2.skyhanni.data.SackAPI
+import at.hannibal2.skyhanni.data.SackStatus
+import at.hannibal2.skyhanni.data.jsonobjects.repo.GardenJson
 import at.hannibal2.skyhanni.data.model.ComposterUpgrade
-import at.hannibal2.skyhanni.events.*
+import at.hannibal2.skyhanni.events.GuiRenderEvent
+import at.hannibal2.skyhanni.events.InventoryCloseEvent
+import at.hannibal2.skyhanni.events.InventoryFullyOpenedEvent
+import at.hannibal2.skyhanni.events.LorenzTickEvent
+import at.hannibal2.skyhanni.events.LorenzToolTipEvent
+import at.hannibal2.skyhanni.events.RepositoryReloadEvent
+import at.hannibal2.skyhanni.events.TabListUpdateEvent
 import at.hannibal2.skyhanni.features.bazaar.BazaarApi
 import at.hannibal2.skyhanni.features.garden.GardenAPI
 import at.hannibal2.skyhanni.features.garden.composter.ComposterAPI.getLevel
+import at.hannibal2.skyhanni.features.misc.items.EstimatedItemValue
+import at.hannibal2.skyhanni.utils.ConfigUtils
+import at.hannibal2.skyhanni.utils.InventoryUtils
+import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName
 import at.hannibal2.skyhanni.utils.ItemUtils.name
+import at.hannibal2.skyhanni.utils.KeyboardManager
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils.addAsSingletonList
 import at.hannibal2.skyhanni.utils.LorenzUtils.addSelector
 import at.hannibal2.skyhanni.utils.LorenzUtils.round
 import at.hannibal2.skyhanni.utils.LorenzUtils.sortedDesc
+import at.hannibal2.skyhanni.utils.NEUInternalName
+import at.hannibal2.skyhanni.utils.NEUInternalName.Companion.NONE
+import at.hannibal2.skyhanni.utils.NEUInternalName.Companion.asInternalName
 import at.hannibal2.skyhanni.utils.NEUItems
+import at.hannibal2.skyhanni.utils.NEUItems.getItemStack
+import at.hannibal2.skyhanni.utils.NEUItems.getPrice
 import at.hannibal2.skyhanni.utils.NumberUtil
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
-import at.hannibal2.skyhanni.utils.NumberUtil.romanToDecimalIfNeeded
+import at.hannibal2.skyhanni.utils.NumberUtil.romanToDecimalIfNecessary
 import at.hannibal2.skyhanni.utils.RenderUtils.renderStringsAndItems
+import at.hannibal2.skyhanni.utils.SimpleTimeMark
+import at.hannibal2.skyhanni.utils.SoundUtils
 import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.TimeUtils
-import at.hannibal2.skyhanni.utils.jsonobjects.GardenJson
 import at.hannibal2.skyhanni.utils.renderables.Renderable
-import io.github.moulberry.notenoughupdates.NotEnoughUpdates
-import net.minecraftforge.event.entity.player.ItemTooltipEvent
 import net.minecraftforge.fml.common.eventhandler.EventPriority
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
-import java.util.*
+import java.util.Collections
 import kotlin.math.ceil
+import kotlin.math.floor
 import kotlin.time.Duration
+import kotlin.time.Duration.Companion.milliseconds
 import kotlin.time.DurationUnit
 
-class ComposterOverlay {
-    private var organicMatterFactors: Map<String, Double> = emptyMap()
-    private var fuelFactors: Map<String, Double> = emptyMap()
+object ComposterOverlay {
+    private var organicMatterFactors: Map<NEUInternalName, Double> = emptyMap()
+    private var fuelFactors: Map<NEUInternalName, Double> = emptyMap()
+    private var organicMatter: Map<NEUInternalName, Double> = emptyMap()
 
-    private val config get() = SkyHanniMod.feature.garden
+    private val config get() = GardenAPI.config.composters
     private var organicMatterDisplay = emptyList<List<Any>>()
     private var fuelExtraDisplay = emptyList<List<Any>>()
 
@@ -50,35 +74,32 @@ class ComposterOverlay {
 
     private var maxLevel = false
     private var lastHovered = 0L
+    private var lastAttemptTime = SimpleTimeMark.farPast()
 
-    companion object {
-        var currentOrganicMatterItem: String?
-            get() = GardenAPI.config?.composterCurrentOrganicMatterItem
-            private set(value) {
-                GardenAPI.config?.composterCurrentOrganicMatterItem = value
-            }
+    var inInventory = false
 
-        var currentFuelItem: String?
-            get() = GardenAPI.config?.composterCurrentFuelItem
-            private set(value) {
-                GardenAPI.config?.composterCurrentFuelItem = value
-            }
+    private var testOffset = 0
 
-        var testOffset = 0
-
-        fun onCommand(args: Array<String>) {
-            if (args.size != 1) {
-                LorenzUtils.chat("§cUsage: /shtestcomposter <offset>")
-                return
-            }
-            testOffset = args[0].toInt()
-            LorenzUtils.chat("§e[SkyHanni] Composter test offset set to $testOffset.")
+    var currentOrganicMatterItem: NEUInternalName?
+        get() = GardenAPI.storage?.composterCurrentOrganicMatterItem
+        private set(value) {
+            GardenAPI.storage?.composterCurrentOrganicMatterItem = value
         }
 
-        var inInventory = false
-    }
+    var currentFuelItem: NEUInternalName?
+        get() = GardenAPI.storage?.composterCurrentFuelItem
+        private set(value) {
+            GardenAPI.storage?.composterCurrentFuelItem = value
+        }
 
-    var garden: GardenJson? = null
+    fun onCommand(args: Array<String>) {
+        if (args.size != 1) {
+            LorenzUtils.userError("Usage: /shtestcomposter <offset>")
+            return
+        }
+        testOffset = args[0].toInt()
+        LorenzUtils.chat("Composter test offset set to $testOffset.")
+    }
 
     @SubscribeEvent
     fun onInventoryClose(event: InventoryCloseEvent) {
@@ -95,21 +116,16 @@ class ComposterOverlay {
     @SubscribeEvent
     fun onTick(event: LorenzTickEvent) {
         if (!GardenAPI.inGarden()) return
-        if (inComposterUpgrades) {
-            if (extraComposterUpgrade != null) {
-//                if (System.currentTimeMillis() > lastHovered + 30) {
-                if (System.currentTimeMillis() > lastHovered + 200) {
-                    extraComposterUpgrade = null
-                    update()
-                }
-            }
+        if (inComposterUpgrades && extraComposterUpgrade != null && System.currentTimeMillis() > lastHovered + 200) {
+            extraComposterUpgrade = null
+            update()
         }
     }
 
     @SubscribeEvent
     fun onInventoryOpen(event: InventoryFullyOpenedEvent) {
         if (!GardenAPI.inGarden()) return
-        if (!config.composterOverlay) return
+        if (!config.overlay) return
         inComposter = event.inventoryName == "Composter"
         inComposterUpgrades = event.inventoryName == "Composter Upgrades"
         if (!inComposter && !inComposterUpgrades) return
@@ -119,26 +135,25 @@ class ComposterOverlay {
     }
 
     @SubscribeEvent
-    fun onTooltip(event: ItemTooltipEvent) {
-        if (inComposterUpgrades) {
-            update()
-            for (upgrade in ComposterUpgrade.entries) {
-                event.itemStack?.name?.let {
-                    if (it.contains(upgrade.displayName)) {
-                        maxLevel = ComposterUpgrade.regex.matchMatcher(it) {
-                            group("level")?.romanToDecimalIfNeeded() ?: 0
-                        } == 25
-                        extraComposterUpgrade = upgrade
-                        update()
-                        return
-                    }
+    fun onTooltip(event: LorenzToolTipEvent) {
+        if (!inComposterUpgrades) return
+        update()
+        for (upgrade in ComposterUpgrade.entries) {
+            event.itemStack.name?.let {
+                if (it.contains(upgrade.displayName)) {
+                    maxLevel = ComposterUpgrade.regex.matchMatcher(it) {
+                        group("level")?.romanToDecimalIfNecessary() ?: 0
+                    } == 25
+                    extraComposterUpgrade = upgrade
+                    update()
+                    return
                 }
             }
-            if (extraComposterUpgrade != null) {
-                extraComposterUpgrade = null
-                maxLevel = false
-                update()
-            }
+        }
+        if (extraComposterUpgrade != null) {
+            extraComposterUpgrade = null
+            maxLevel = false
+            update()
         }
     }
 
@@ -163,8 +178,10 @@ class ComposterOverlay {
                 )
             return
         }
-        if (currentOrganicMatterItem.let { it !in organicMatterFactors.keys && it != "" }) currentOrganicMatterItem = ""
-        if (currentFuelItem.let { it !in fuelFactors.keys && it != "" }) currentFuelItem = ""
+        if (currentOrganicMatterItem.let { it !in organicMatterFactors.keys && it != NONE }) {
+            currentOrganicMatterItem = NONE
+        }
+        if (currentFuelItem.let { it !in fuelFactors.keys && it != NONE }) currentFuelItem = NONE
 
         if (inComposter) {
             organicMatterDisplay = drawOrganicMatterDisplay()
@@ -200,9 +217,9 @@ class ComposterOverlay {
         val matterPer = ComposterAPI.organicMatterRequiredPer(null)
         val matterPerPreview = ComposterAPI.organicMatterRequiredPer(upgrade)
 
-        val matterMaxDuration = ComposterAPI.timePerCompost(null) * (maxOrganicMatter / matterPer)
+        val matterMaxDuration = ComposterAPI.timePerCompost(null) * floor(maxOrganicMatter / matterPer)
         val matterMaxDurationPreview =
-            ComposterAPI.timePerCompost(upgrade) * (maxOrganicMatterPreview / matterPerPreview)
+            ComposterAPI.timePerCompost(upgrade) * floor(maxOrganicMatterPreview / matterPerPreview)
 
         var format = formatTime(matterMaxDuration)
         var formatPreview =
@@ -216,9 +233,9 @@ class ComposterOverlay {
         val fuelRequiredPer = ComposterAPI.fuelRequiredPer(null)
         val fuelRequiredPerPreview = ComposterAPI.fuelRequiredPer(upgrade)
 
-        val fuelMaxDuration = ComposterAPI.timePerCompost(null) * (maxFuel / fuelRequiredPer)
+        val fuelMaxDuration = ComposterAPI.timePerCompost(null) * floor(maxFuel / fuelRequiredPer)
         val fuelMaxDurationPreview =
-            ComposterAPI.timePerCompost(upgrade) * (maxFuelPreview / fuelRequiredPerPreview)
+            ComposterAPI.timePerCompost(upgrade) * floor(maxFuelPreview / fuelRequiredPerPreview)
 
         format = formatTime(fuelMaxDuration)
         formatPreview =
@@ -242,7 +259,7 @@ class ComposterOverlay {
             currentOrganicMatterItem = it
             update()
         }
-        if (currentOrganicMatterItem == "") {
+        if (currentOrganicMatterItem == NONE) {
             currentOrganicMatterItem = fillList
             update()
         }
@@ -263,7 +280,7 @@ class ComposterOverlay {
                 currentFuelItem = it
                 update()
             }
-            if (currentFuelItem == "") {
+            if (currentFuelItem == NONE) {
                 currentFuelItem = fillList
                 update()
             }
@@ -274,7 +291,7 @@ class ComposterOverlay {
     private fun addExtraData(newList: MutableList<List<Any>>) {
         val organicMatterItem = currentOrganicMatterItem ?: return
         val fuelItem = currentFuelItem ?: return
-        if (organicMatterItem == "" || fuelItem == "") return
+        if (organicMatterItem == NONE || fuelItem == NONE) return
 
         newList.addSelector<TimeType>(
             "§7Per ",
@@ -288,9 +305,9 @@ class ComposterOverlay {
 
         val list = mutableListOf<Any>()
         list.add("§7Using: ")
-        list.add(NEUItems.getItemStack(organicMatterItem))
+        list.add(organicMatterItem.getItemStack())
         list.add("§7and ")
-        list.add(NEUItems.getItemStack(fuelItem))
+        list.add(fuelItem.getItemStack())
         newList.add(list)
 
         val timePerCompost = ComposterAPI.timePerCompost(null).toLong(DurationUnit.MILLISECONDS)
@@ -319,7 +336,6 @@ class ComposterOverlay {
             if (currentTimeType == TimeType.COMPOST) "Compost multiplier" else "Composts per $timeText"
         newList.addAsSingletonList(" §7$compostPerTitle: §e${multiplier.round(2)}$compostPerTitlePreview")
 
-
         val organicMatterPrice = getPrice(organicMatterItem)
         val organicMatterFactor = organicMatterFactors[organicMatterItem]!!
 
@@ -347,10 +363,10 @@ class ComposterOverlay {
             " §7Material costs per $timeText: §6${NumberUtil.format(totalCost)}$materialCostFormatPreview"
         newList.addAsSingletonList(materialCostFormat)
 
-
         val priceCompost = getPrice("COMPOST")
-        val profit = (priceCompost - (fuelPricePer + organicMatterPricePer)) * multiplier
-        val profitPreview = (priceCompost - (fuelPricePerPreview + organicMatterPricePerPreview)) * multiplierPreview
+        val profit = ((priceCompost * multiDropFactor) - (fuelPricePer + organicMatterPricePer)) * timeMultiplier
+        val profitPreview =
+            ((priceCompost * multiDropFactorPreview) - (fuelPricePerPreview + organicMatterPricePerPreview)) * timeMultiplierPreview
 
         val profitFormatPreview = if (profit != profitPreview) " §c➜ §6" + NumberUtil.format(profitPreview) else ""
         val profitFormat = " §7Profit per $timeText: §6${NumberUtil.format(profit)}$profitFormatPreview"
@@ -361,58 +377,23 @@ class ComposterOverlay {
 
     private fun fillList(
         bigList: MutableList<List<Any>>,
-        factors: Map<String, Double>,
+        factors: Map<NEUInternalName, Double>,
         missing: Double,
         testOffset_: Int = 0,
-        onClick: (String) -> Unit,
-    ): String {
-        val map = mutableMapOf<String, Double>()
+        onClick: (NEUInternalName) -> Unit,
+    ): NEUInternalName {
+        val map = mutableMapOf<NEUInternalName, Double>()
         for ((internalName, factor) in factors) {
             map[internalName] = factor / getPrice(internalName)
         }
 
         val testOffset = if (testOffset_ > map.size) {
-            LorenzUtils.chat("§cSkyHanni] Invalid Composter Overlay Offset! $testOffset cannot be greather than ${map.size}!")
+            LorenzUtils.error("Invalid Composter Overlay Offset! $testOffset cannot be greater than ${map.size}!")
             ComposterOverlay.testOffset = 0
             0
         } else testOffset_
 
-        var i = 0
-        var first: String? = null
-        for (internalName in map.sortedDesc().keys) {
-            i++
-            if (i < testOffset) continue
-            if (first == null) first = internalName
-            val factor = factors[internalName]!!
-
-            val item = NEUItems.getItemStack(internalName)
-            val itemName = item.name!!
-            val price = getPrice(internalName)
-            val itemsNeeded = ceil(missing / factor)
-            val totalPrice = itemsNeeded * price
-
-            val list = mutableListOf<Any>()
-            if (testOffset != 0) {
-                list.add("#$i ")
-            }
-            list.add(item)
-            val format = NumberUtil.format(totalPrice)
-            val selected =
-                if (internalName == currentOrganicMatterItem || internalName == currentFuelItem) "§n" else ""
-            val rawItemName = itemName.removeColor()
-            val name = itemName.substring(0, 2) + selected + rawItemName
-            list.add(Renderable.link("$name§r §8x${itemsNeeded.addSeparators()} §7(§6$format§7)") {
-                onClick(internalName)
-                if (LorenzUtils.isControlKeyDown()) {
-                    inInventory = false
-                    BazaarApi.searchForBazaarItem(itemName, itemsNeeded.toInt())
-                }
-            })
-            bigList.add(list)
-
-
-            if (i == 10 + testOffset) break
-        }
+        val first: NEUInternalName? = calculateFirst(map, testOffset, factors, missing, onClick, bigList)
         if (testOffset != 0) {
             bigList.addAsSingletonList(Renderable.link("testOffset = $testOffset") {
                 ComposterOverlay.testOffset = 0
@@ -423,10 +404,124 @@ class ComposterOverlay {
         return first ?: error("First is empty!")
     }
 
-    private fun getPrice(internalName: String): Double {
-        val useSellPrice = config.composterOverlayPriceType == 1
-        val price = NEUItems.getPrice(internalName, useSellPrice)
-        if (internalName == "BIOFUEL" && price > 20_000) return 20_000.0
+    private fun calculateFirst(
+        map: MutableMap<NEUInternalName, Double>,
+        testOffset: Int,
+        factors: Map<NEUInternalName, Double>,
+        missing: Double,
+        onClick: (NEUInternalName) -> Unit,
+        bigList: MutableList<List<Any>>
+    ): NEUInternalName? {
+        var i = 0
+        var first: NEUInternalName? = null
+        for (internalName in map.sortedDesc().keys) {
+            i++
+            if (i < testOffset) continue
+            if (first == null) first = internalName
+            val factor = factors[internalName]!!
+
+            val item = internalName.getItemStack()
+            val itemName = item.name!!
+            val price = getPrice(internalName)
+            val itemsNeeded = if (config.roundDown) {
+                val amount = missing / factor
+                if (amount > .75 && amount < 1.0) {
+                    1.0
+                } else {
+                    floor(amount)
+                }
+            } else {
+                ceil(missing / factor)
+            }
+            val totalPrice = itemsNeeded * price
+
+            val list = mutableListOf<Any>()
+            if (testOffset != 0) {
+                list.add("#$i ")
+            }
+            list.add(item)
+            formatPrice(totalPrice, internalName, itemName, list, itemsNeeded, onClick)
+            bigList.add(list)
+            if (i == 10 + testOffset) break
+        }
+        return first
+    }
+
+    private fun formatPrice(
+        totalPrice: Double,
+        internalName: NEUInternalName,
+        itemName: String,
+        list: MutableList<Any>,
+        itemsNeeded: Double,
+        onClick: (NEUInternalName) -> Unit
+    ) {
+        val format = NumberUtil.format(totalPrice)
+        val selected = if (internalName == currentOrganicMatterItem || internalName == currentFuelItem) "§n" else ""
+        val rawItemName = itemName.removeColor()
+        val name = itemName.substring(0, 2) + selected + rawItemName
+        list.add(Renderable.link("$name §8x${itemsNeeded.addSeparators()} §7(§6$format§7)") {
+            onClick(internalName)
+            if (KeyboardManager.isModifierKeyDown() && lastAttemptTime.passedSince() > 500.milliseconds) {
+                lastAttemptTime = SimpleTimeMark.now()
+                retrieveMaterials(internalName, itemName, itemsNeeded.toInt())
+            }
+        })
+    }
+
+    private fun retrieveMaterials(internalName: NEUInternalName, itemName: String, itemsNeeded: Int) {
+        if (itemsNeeded == 0 || internalName.equals("BIOFUEL")) return
+        if (config.retrieveFrom == ComposterConfig.RetrieveFromEntry.BAZAAR && !LorenzUtils.noTradeMode) {
+            BazaarApi.searchForBazaarItem(itemName, itemsNeeded)
+            return
+        }
+        val having = InventoryUtils.countItemsInLowerInventory { it.getInternalName() == internalName }
+        if (having >= itemsNeeded) {
+            LorenzUtils.chat("$itemName §8x${itemsNeeded} §ealready found in inventory!")
+            return
+        }
+
+        val sackItem = SackAPI.fetchSackItem(internalName)
+        val amountInSacks = sackItem.amount
+        val sackStatus = sackItem.getStatus()
+
+        if (sackStatus == SackStatus.MISSING || sackStatus == SackStatus.OUTDATED) {
+            if (sackStatus == SackStatus.OUTDATED) LorenzUtils.sendCommandToServer("gfs ${internalName.asString()} ${itemsNeeded - having}")
+            // TODO Add sack type repo data
+            val sackType = if (internalName.equals("VOLTA") || internalName.equals("OIL_BARREL")) "Mining"
+            else "Enchanted Agronomy"
+            LorenzUtils.clickableChat(
+                "Sacks could not be loaded. Click here and open your §9$sackType Sack §eto update the data!",
+                "sax"
+            )
+            return
+        } else if (amountInSacks == 0L) {
+            SoundUtils.playErrorSound()
+            if (LorenzUtils.noTradeMode) {
+                LorenzUtils.chat("No $itemName §efound in sacks.")
+            } else {
+                LorenzUtils.chat("No $itemName §efound in sacks. Opening Bazaar.")
+                BazaarApi.searchForBazaarItem(itemName, itemsNeeded)
+            }
+            return
+        }
+
+        LorenzUtils.sendCommandToServer("gfs ${internalName.asString()} ${itemsNeeded - having}")
+        if (amountInSacks <= itemsNeeded - having) {
+            if (LorenzUtils.noTradeMode) {
+                LorenzUtils.chat("You're out of $itemName §ein your sacks!")
+            } else {
+                LorenzUtils.clickableChat(
+                    "You're out of $itemName §ein your sacks! Click here to buy more on the Bazaar!",
+                    "bz ${itemName.removeColor()}"
+                )
+            }
+        }
+    }
+
+    private fun getPrice(internalName: NEUInternalName): Double {
+        val useSellPrice = config.overlayPriceType == ComposterConfig.OverlayPriceTypeEntry.BUY_ORDER
+        val price = internalName.getPrice(useSellPrice)
+        if (internalName.equals("BIOFUEL") && price > 20_000) return 20_000.0
 
         return price
     }
@@ -438,57 +533,57 @@ class ComposterOverlay {
 
     @SubscribeEvent
     fun onRepoReload(event: RepositoryReloadEvent) {
-        garden = event.getConstant<GardenJson>("Garden")
+        val data = event.getConstant<GardenJson>("Garden")
+        organicMatter = data.organic_matter
+        fuelFactors = data.fuel
         updateOrganicMatterFactors()
     }
 
     private fun updateOrganicMatterFactors() {
         try {
-            val garden = this.garden ?: return
-            organicMatterFactors = updateOrganicMatterFactors(garden.organic_matter)
-            fuelFactors = garden.fuel
-
+            organicMatterFactors = updateOrganicMatterFactors(organicMatter)
         } catch (e: Exception) {
             e.printStackTrace()
             LorenzUtils.error("error in RepositoryReloadEvent")
         }
     }
 
-    private fun updateOrganicMatterFactors(baseValues: Map<String, Double>): Map<String, Double> {
-        val map = mutableMapOf<String, Double>()
-        for ((internalName, _) in NotEnoughUpdates.INSTANCE.manager.itemInformation) {
-            if (internalName == "POTION_AFFINITY_TALISMAN") continue
-            if (internalName == "CROPIE_TALISMAN") continue
-            if (internalName.endsWith("_BOOTS")) continue
-            if (internalName.endsWith("_HELMET")) continue
-            if (internalName.endsWith("_CHESTPLATE")) continue
-            if (internalName.endsWith("_LEGGINGS")) continue
-            if (internalName == "SPEED_TALISMAN") continue
-            if (internalName == "SIMPLE_CARROT_CANDY") continue
-            val (newId, amount) = NEUItems.getMultiplier(internalName)
-            if (amount <= 9) continue
-            val finalAmount =
-                if (internalName == "ENCHANTED_HUGE_MUSHROOM_1" || internalName == "ENCHANTED_HUGE_MUSHROOM_2") {
-                    //  160 * 8 * 4 is 5120 and not 5184, but hypixel made an error, so we have to copy the error
-                    5184
-                } else amount
+    private fun updateOrganicMatterFactors(baseValues: Map<NEUInternalName, Double>): Map<NEUInternalName, Double> {
+        val map = mutableMapOf<NEUInternalName, Double>()
+        for ((internalName, _) in NEUItems.allNeuRepoItems()) {
+            if (internalName == "POTION_AFFINITY_TALISMAN"
+                || internalName == "CROPIE_TALISMAN"
+                || internalName.endsWith("_BOOTS")
+                || internalName.endsWith("_HELMET")
+                || internalName.endsWith("_CHESTPLATE")
+                || internalName.endsWith("_LEGGINGS")
+                || internalName == "SPEED_TALISMAN"
+                || internalName == "SIMPLE_CARROT_CANDY"
+            ) continue
 
-            baseValues[newId]?.let {
-                val d = it * finalAmount
-                map[internalName] = d
+            var (newId, amount) = NEUItems.getMultiplier(internalName)
+            if (amount <= 9) continue
+            if (internalName == "ENCHANTED_HUGE_MUSHROOM_1" || internalName == "ENCHANTED_HUGE_MUSHROOM_2") {
+                //  160 * 8 * 4 is 5120 and not 5184, but hypixel made an error, so we have to copy the error
+                amount = 5184
+            }
+            baseValues[newId.asInternalName()]?.let {
+                map[internalName.asInternalName()] = it * amount
             }
         }
         return map
     }
 
     @SubscribeEvent
-    fun onBackgroundDraw(event: GuiRenderEvent.ChestBackgroundRenderEvent) {
+    fun onBackgroundDraw(event: GuiRenderEvent.ChestGuiOverlayRenderEvent) {
+        if (EstimatedItemValue.isCurrentlyShowing()) return
+
         if (inInventory) {
-            config.composterOverlayOrganicMatterPos.renderStringsAndItems(
+            config.overlayOrganicMatterPos.renderStringsAndItems(
                 organicMatterDisplay,
                 posLabel = "Composter Overlay Organic Matter"
             )
-            config.composterOverlayFuelExtrasPos.renderStringsAndItems(
+            config.overlayFuelExtrasPos.renderStringsAndItems(
                 fuelExtraDisplay,
                 posLabel = "Composter Overlay Fuel Extras"
             )
@@ -499,5 +594,21 @@ class ComposterOverlay {
         COMPOST("Compost", 1),
         HOUR("Hour", 60 * 60),
         DAY("Day", 60 * 60 * 24),
+    }
+
+    @SubscribeEvent
+    fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
+        event.move(3, "garden.composterOverlay", "garden.composters.overlay")
+        event.move(3, "garden.composterOverlayPriceType", "garden.composters.overlayPriceType")
+        event.move(3, "garden.composterOverlayRetrieveFrom", "garden.composters.retrieveFrom")
+        event.move(3, "garden.composterOverlayOrganicMatterPos", "garden.composters.overlayOrganicMatterPos")
+        event.move(3, "garden.composterOverlayFuelExtrasPos", "garden.composters.overlayFuelExtrasPos")
+        event.move(3, "garden.composterRoundDown", "garden.composters.roundDown")
+        event.transform(15, "garden.composters.overlayPriceType") { element ->
+            ConfigUtils.migrateIntToEnum(element, OverlayPriceTypeEntry::class.java)
+        }
+        event.transform(15, "garden.composters.retrieveFrom") { element ->
+            ConfigUtils.migrateIntToEnum(element, RetrieveFromEntry::class.java)
+        }
     }
 }

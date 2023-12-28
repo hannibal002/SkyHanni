@@ -1,6 +1,12 @@
 package at.hannibal2.skyhanni.data
 
-import at.hannibal2.skyhanni.events.*
+import at.hannibal2.skyhanni.events.ItemInHandChangeEvent
+import at.hannibal2.skyhanni.events.LorenzTickEvent
+import at.hannibal2.skyhanni.events.LorenzWorldChangeEvent
+import at.hannibal2.skyhanni.events.PacketEvent
+import at.hannibal2.skyhanni.events.PlaySoundEvent
+import at.hannibal2.skyhanni.events.ReceiveParticleEvent
+import at.hannibal2.skyhanni.utils.DelayedRun
 import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName
 import at.hannibal2.skyhanni.utils.LorenzUtils
@@ -13,7 +19,7 @@ import net.minecraftforge.event.world.WorldEvent
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import net.minecraftforge.fml.common.gameevent.TickEvent
 
-class MinecraftData {
+object MinecraftData {
 
     @SubscribeEvent(receiveCanceled = true)
     fun onSoundPacket(event: PacketEvent.ReceiveEvent) {
@@ -59,22 +65,23 @@ class MinecraftData {
         }
     }
 
-    private var tick = 0
+    var totalTicks = 0
 
     @SubscribeEvent
     fun onTick(event: TickEvent.ClientTickEvent) {
         Minecraft.getMinecraft().thePlayer ?: return
-        tick++
-        LorenzTickEvent(tick).postAndCatch()
+        totalTicks++
+        LorenzTickEvent(totalTicks).postAndCatch()
     }
 
     @SubscribeEvent
     fun onTick(event: LorenzTickEvent) {
+        DelayedRun.checkRuns()
         if (!LorenzUtils.inSkyBlock) return
         val hand = InventoryUtils.getItemInHand()
         val newItem = hand?.getInternalName() ?: NEUInternalName.NONE
-        if (newItem != InventoryUtils.itemInHandId) {
-            ItemInHandChangeEvent(newItem, hand).postAndCatch()
+        val oldItem = InventoryUtils.itemInHandId
+        if (newItem != oldItem) {
 
             InventoryUtils.recentItemsInHand.keys.removeIf { it + 30_000 > System.currentTimeMillis() }
             if (newItem != NEUInternalName.NONE) {
@@ -82,6 +89,7 @@ class MinecraftData {
             }
             InventoryUtils.itemInHandId = newItem
             InventoryUtils.latestItemInHand = hand
+            ItemInHandChangeEvent(newItem, oldItem).postAndCatch()
         }
     }
 

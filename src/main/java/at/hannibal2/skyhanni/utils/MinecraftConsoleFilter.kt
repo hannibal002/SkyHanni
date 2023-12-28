@@ -1,7 +1,9 @@
 package at.hannibal2.skyhanni.utils
 
 import at.hannibal2.skyhanni.SkyHanniMod
+import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
+import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import org.apache.logging.log4j.Level
 import org.apache.logging.log4j.LogManager
 import org.apache.logging.log4j.Marker
@@ -12,6 +14,9 @@ import org.apache.logging.log4j.core.LoggerContext
 import org.apache.logging.log4j.message.Message
 
 class MinecraftConsoleFilter(private val loggerConfigName: String) : Filter {
+
+    private val config get() = SkyHanniMod.feature.dev.minecraftConsoles
+    private val filterConfig get() = config.consoleFilter
 
     private val loggerFiltered = LorenzLogger("debug/mc_console/filtered")
     private val loggerUnfiltered = LorenzLogger("debug/mc_console/unfiltered")
@@ -39,33 +44,25 @@ class MinecraftConsoleFilter(private val loggerConfigName: String) : Filter {
         val formattedMessage = message.formattedMessage
         val thrown = event.thrown
 
-        if (SkyHanniMod.feature.dev.filterChat) {
-            if (formattedMessage.startsWith("[CHAT] ")) {
-                filterConsole("chat")
-                return Filter.Result.DENY
-            }
+        if (filterConfig.filterChat && formattedMessage.startsWith("[CHAT] ")) {
+            filterConsole("chat")
+            return Filter.Result.DENY
         }
-        if (SkyHanniMod.feature.dev.filterGrowBuffer) {
-            if (formattedMessage.startsWith("Needed to grow BufferBuilder buffer: Old size ")) {
-                filterConsole("Grow BufferBuilder buffer")
-                return Filter.Result.DENY
-            }
+        if (filterConfig.filterGrowBuffer && formattedMessage.startsWith("Needed to grow BufferBuilder buffer: Old size ")) {
+            filterConsole("Grow BufferBuilder buffer")
+            return Filter.Result.DENY
         }
-        if (SkyHanniMod.feature.dev.filterUnknownSound) {
-            if (formattedMessage.startsWith("Unable to play unknown soundEvent: minecraft:")) {
-                filterConsole("Unknown soundEvent (minecraft:)")
-                return Filter.Result.DENY
-            }
+        if (filterConfig.filterUnknownSound && formattedMessage.startsWith("Unable to play unknown soundEvent: minecraft:")) {
+            filterConsole("Unknown soundEvent (minecraft:)")
+            return Filter.Result.DENY
         }
         //TODO testing
-        if (SkyHanniMod.feature.dev.filterParticleVillagerHappy) {
-            if (formattedMessage == "Could not spawn particle effect VILLAGER_HAPPY") {
-                filterConsole("particle VILLAGER_HAPPY")
-                return Filter.Result.DENY
-            }
+        if (filterConfig.filterParticleVillagerHappy && formattedMessage == "Could not spawn particle effect VILLAGER_HAPPY") {
+            filterConsole("particle VILLAGER_HAPPY")
+            return Filter.Result.DENY
         }
 
-        if (SkyHanniMod.feature.dev.filterOptiFine) {
+        if (filterConfig.filterOptiFine) {
             if (formattedMessage.startsWith("[OptiFine] CustomItems: ")) {
                 filterConsole("OptiFine CustomItems")
                 return Filter.Result.DENY
@@ -75,18 +72,14 @@ class MinecraftConsoleFilter(private val loggerConfigName: String) : Filter {
                 return Filter.Result.DENY
             }
         }
-        if (loggerName == "AsmHelper") {
-            if (SkyHanniMod.feature.dev.filterAmsHelperTransformer) {
-                if (formattedMessage.startsWith("Transforming class ")) {
-                    filterConsole("AsmHelper Transforming")
-                    return Filter.Result.DENY
-                }
+        if (loggerName == "AsmHelper" && filterConfig.filterAmsHelperTransformer) {
+            if (formattedMessage.startsWith("Transforming class ")) {
+                filterConsole("AsmHelper Transforming")
+                return Filter.Result.DENY
             }
-            if (SkyHanniMod.feature.dev.filterAsmHelperApplying) {
-                if (formattedMessage.startsWith("Applying AsmWriter ModifyWriter")) {
-                    filterConsole("AsmHelper Applying AsmWriter")
-                    return Filter.Result.DENY
-                }
+            if (filterConfig.filterAsmHelperApplying && formattedMessage.startsWith("Applying AsmWriter ModifyWriter")) {
+                filterConsole("AsmHelper Applying AsmWriter")
+                return Filter.Result.DENY
             }
         }
 
@@ -118,49 +111,43 @@ class MinecraftConsoleFilter(private val loggerConfigName: String) : Filter {
 //                return Filter.Result.DENY
 //            }
 //        }
-        if (SkyHanniMod.feature.dev.filterBiomeIdBounds) {
+        if (filterConfig.filterBiomeIdBounds) {
             patternBiomeIdBounds.matchMatcher(formattedMessage) {
                 filterConsole("Biome ID bounds")
                 return Filter.Result.DENY
             }
         }
 
-        if (thrown != null) {
+        if (thrown != null && filterConfig.filterScoreboardErrors) {
             val cause = thrown.cause
-            if (cause != null) {
-                if (cause.stackTrace.isNotEmpty()) {
-                    val first = cause.stackTrace[0]
-                    if (SkyHanniMod.feature.dev.filterScoreboardErrors) {
-                        val firstName = first.toString()
-                        if (firstName == "net.minecraft.scoreboard.Scoreboard.removeTeam(Scoreboard.java:229)" ||
-                            firstName == "net.minecraft.scoreboard.Scoreboard.removeTeam(Scoreboard.java:262)"
-                        ) {
-                            filterConsole("NullPointerException at Scoreboard.removeTeam")
-                            return Filter.Result.DENY
-                        }
-                        if (firstName == "net.minecraft.scoreboard.Scoreboard.createTeam(Scoreboard.java:218)") {
-                            filterConsole("IllegalArgumentException at Scoreboard.createTeam")
-                            return Filter.Result.DENY
-                        }
-                        if (firstName == "net.minecraft.scoreboard.Scoreboard.removeObjective(Scoreboard.java:179)" ||
-                            firstName == "net.minecraft.scoreboard.Scoreboard.removeObjective(Scoreboard.java:198)"
-                        ) {
-                            filterConsole("IllegalArgumentException at Scoreboard.removeObjective")
-                            return Filter.Result.DENY
-                        }
-                    }
+            if (cause != null && cause.stackTrace.isNotEmpty()) {
+                val first = cause.stackTrace[0]
+                val firstName = first.toString()
+                if (firstName == "net.minecraft.scoreboard.Scoreboard.removeTeam(Scoreboard.java:229)" ||
+                    firstName == "net.minecraft.scoreboard.Scoreboard.removeTeam(Scoreboard.java:262)"
+                ) {
+                    filterConsole("NullPointerException at Scoreboard.removeTeam")
+                    return Filter.Result.DENY
                 }
-            }
-            if (SkyHanniMod.feature.dev.filterScoreboardErrors) {
-                if (thrown.toString().contains(" java.lang.IllegalArgumentException: A team with the name '")) {
-                    filterConsole("IllegalArgumentException because scoreboard team already exists")
+                if (firstName == "net.minecraft.scoreboard.Scoreboard.createTeam(Scoreboard.java:218)") {
+                    filterConsole("IllegalArgumentException at Scoreboard.createTeam")
+                    return Filter.Result.DENY
+                }
+                if (firstName == "net.minecraft.scoreboard.Scoreboard.removeObjective(Scoreboard.java:179)" ||
+                    firstName == "net.minecraft.scoreboard.Scoreboard.removeObjective(Scoreboard.java:198)"
+                ) {
+                    filterConsole("IllegalArgumentException at Scoreboard.removeObjective")
                     return Filter.Result.DENY
                 }
             }
+            if (thrown.toString().contains(" java.lang.IllegalArgumentException: A team with the name '")) {
+                filterConsole("IllegalArgumentException because scoreboard team already exists")
+                return Filter.Result.DENY
+            }
         }
 
-        if (!SkyHanniMod.feature.dev.printUnfilteredDebugs) return Filter.Result.ACCEPT
-        if (!SkyHanniMod.feature.dev.printUnfilteredDebugsOutsideSkyBlock && !LorenzUtils.inSkyBlock) return Filter.Result.ACCEPT
+        if (!config.printUnfilteredDebugs) return Filter.Result.ACCEPT
+        if (!config.printUnfilteredDebugsOutsideSkyBlock && !LorenzUtils.inSkyBlock) return Filter.Result.ACCEPT
         if (formattedMessage == "filtered console: ") return Filter.Result.ACCEPT
 
         debug(" ")
@@ -178,19 +165,17 @@ class MinecraftConsoleFilter(private val loggerConfigName: String) : Filter {
             debug("marker is null")
         }
         debug("thrown: '$thrown'")
-        if (thrown != null) {
-            if (thrown.stackTrace.isNotEmpty()) {
-                var element = thrown.stackTrace[0]
-                debug("thrown first element: '$element'")
-                val cause = thrown.cause
-                if (cause != null) {
-                    debug("throw cause: '$cause'")
-                    if (cause.stackTrace.isNotEmpty()) {
-                        element = cause.stackTrace[0]
-                        debug("thrown cause first element: '$element'")
-                    } else {
-                        debug("thrown cause has no elements")
-                    }
+        if (thrown != null && thrown.stackTrace.isNotEmpty()) {
+            var element = thrown.stackTrace[0]
+            debug("thrown first element: '$element'")
+            val cause = thrown.cause
+            if (cause != null) {
+                debug("throw cause: '$cause'")
+                if (cause.stackTrace.isNotEmpty()) {
+                    element = cause.stackTrace[0]
+                    debug("thrown cause first element: '$element'")
+                } else {
+                    debug("thrown cause has no elements")
                 }
             }
         }
@@ -200,7 +185,7 @@ class MinecraftConsoleFilter(private val loggerConfigName: String) : Filter {
     }
 
     private fun debug(text: String) {
-        if (SkyHanniMod.feature.dev.logUnfilteredFile) {
+        if (config.logUnfilteredFile) {
             loggerUnfiltered.log(text)
         } else {
             LorenzUtils.consoleLog(text)
@@ -209,7 +194,7 @@ class MinecraftConsoleFilter(private val loggerConfigName: String) : Filter {
 
     private fun filterConsole(message: String) {
         loggerFiltered.log(message)
-        if (SkyHanniMod.feature.dev.printFilteredReason) {
+        if (config.printFilteredReason) {
             LorenzUtils.consoleLog("filtered console: $message")
         }
     }
@@ -250,5 +235,34 @@ class MinecraftConsoleFilter(private val loggerConfigName: String) : Filter {
         t: Throwable?,
     ): Filter.Result {
         return Filter.Result.ACCEPT
+    }
+
+    @SubscribeEvent
+    fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
+        event.move(3, "dev.printUnfilteredDebugs", "dev.minecraftConsoles.printUnfilteredDebugs")
+        event.move(3, "dev.logUnfilteredFile", "dev.minecraftConsoles.logUnfilteredFile")
+        event.move(
+            3,
+            "dev.printUnfilteredDebugsOutsideSkyBlock",
+            "dev.minecraftConsoles.printUnfilteredDebugsOutsideSkyBlock"
+        )
+        event.move(3, "dev.printFilteredReason", "dev.minecraftConsoles.printFilteredReason")
+        event.move(3, "dev.filterChat", "dev.minecraftConsoles.consoleFilter.filterChat")
+        event.move(3, "dev.filterGrowBuffer", "dev.minecraftConsoles.consoleFilter.filterGrowBuffer")
+        event.move(3, "dev.filterUnknownSound", "dev.minecraftConsoles.consoleFilter.filterUnknownSound")
+        event.move(
+            3,
+            "dev.filterParticleVillagerHappy",
+            "dev.minecraftConsoles.consoleFilter.filterParticleVillagerHappy"
+        )
+        event.move(
+            3,
+            "dev.filterAmsHelperTransformer",
+            "dev.minecraftConsoles.consoleFilter.filterAmsHelperTransformer"
+        )
+        event.move(3, "dev.filterAsmHelperApplying", "dev.minecraftConsoles.consoleFilter.filterAsmHelperApplying")
+        event.move(3, "dev.filterBiomeIdBounds", "dev.minecraftConsoles.consoleFilter.filterBiomeIdBounds")
+        event.move(3, "dev.filterScoreboardErrors", "dev.minecraftConsoles.consoleFilter.filterScoreboardErrors")
+        event.move(3, "dev.filterOptiFine", "dev.minecraftConsoles.consoleFilter.filterOptiFine")
     }
 }

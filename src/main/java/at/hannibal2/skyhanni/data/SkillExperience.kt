@@ -2,8 +2,8 @@ package at.hannibal2.skyhanni.data
 
 import at.hannibal2.skyhanni.events.InventoryFullyOpenedEvent
 import at.hannibal2.skyhanni.events.LorenzActionBarEvent
-import at.hannibal2.skyhanni.events.ProfileApiDataLoadedEvent
 import at.hannibal2.skyhanni.events.ProfileJoinEvent
+import at.hannibal2.skyhanni.events.SkillExpGainEvent
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.ItemUtils.name
 import at.hannibal2.skyhanni.utils.LorenzUtils
@@ -14,20 +14,10 @@ import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
 class SkillExperience {
+    // TODO USE SH-REPO
     private val actionBarPattern = ".*§3\\+.* (?<skill>.*) \\((?<overflow>.*)/(?<needed>.*)\\).*".toPattern()
     private val inventoryPattern = ".* §e(?<number>.*)§6/.*".toPattern()
-
-    @SubscribeEvent
-    fun onProfileDataLoad(event: ProfileApiDataLoadedEvent) {
-        val profileData = event.profileData
-        for ((key, value) in profileData.entrySet()) {
-            if (key.startsWith("experience_skill_")) {
-                val label = key.substring(17)
-                val exp = value.asLong
-                skillExp[label] = exp
-            }
-        }
-    }
+    private val actionBarLowLevelPattern = ".*§3+(?<add>.+) (?<skill>.*) \\((?<percentage>.*)%\\).*".toPattern()
 
     @SubscribeEvent
     fun onProfileJoin(event: ProfileJoinEvent) {
@@ -44,7 +34,13 @@ class SkillExperience {
             val neededForNextLevel = group("needed").formatNumber()
             val nextLevel = getLevelForExpExactly(neededForNextLevel)
             val baseExp = getExpForLevel(nextLevel - 1)
-            skillExp[skill] = baseExp + overflow
+            val totalExp = baseExp + overflow
+            skillExp[skill] = totalExp
+            SkillExpGainEvent(skill).postAndCatch()
+        }
+        actionBarLowLevelPattern.matchMatcher(event.message) {
+            val skill = group("skill").lowercase()
+            SkillExpGainEvent(skill).postAndCatch()
         }
     }
 

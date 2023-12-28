@@ -1,6 +1,5 @@
 package at.hannibal2.skyhanni.features.garden.contest
 
-import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.data.ClickType
 import at.hannibal2.skyhanni.events.CropClickEvent
 import at.hannibal2.skyhanni.events.FarmingContestEvent
@@ -12,7 +11,7 @@ import at.hannibal2.skyhanni.utils.TimeUtils
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
 class JacobContestStatsSummary {
-    private val config get() = SkyHanniMod.feature.garden
+    private val config get() = GardenAPI.config
     private var blocksBroken = 0
     private var startTime = 0L
 
@@ -21,10 +20,8 @@ class JacobContestStatsSummary {
         if (!isEnabled()) return
         if (event.clickType != ClickType.LEFT_CLICK) return
 
-        if (FarmingContestAPI.inContest) {
-            if (event.crop == FarmingContestAPI.contestCrop) {
-                blocksBroken++
-            }
+        if (FarmingContestAPI.inContest && event.crop == FarmingContestAPI.contestCrop) {
+            blocksBroken++
         }
     }
 
@@ -34,23 +31,25 @@ class JacobContestStatsSummary {
 
         when (event.phase) {
             FarmingContestPhase.START -> {
-                LorenzUtils.chat("§e[SkyHanni] Started tracking your Jacob Contest Blocks Per Second!")
+                LorenzUtils.chat("Started tracking your Jacob Contest Blocks Per Second!")
                 startTime = System.currentTimeMillis()
             }
+
             FarmingContestPhase.STOP -> {
                 val duration = System.currentTimeMillis() - startTime
                 val durationInSeconds = duration.toDouble() / 1000
                 val blocksPerSecond = (blocksBroken.toDouble() / durationInSeconds).round(2)
                 val cropName = event.crop.cropName
-                LorenzUtils.chat("§e[SkyHanni] Stats for $cropName Contest:")
+                LorenzUtils.chat("Stats for $cropName Contest:")
                 val time = TimeUtils.formatDuration(duration - 999)
-                LorenzUtils.chat("§e[SkyHanni] §7Blocks Broken in total: §e${blocksBroken.addSeparators()}")
+                LorenzUtils.chat("§7Blocks Broken in total: §e${blocksBroken.addSeparators()}")
                 val color = getBlocksPerSecondColor(blocksPerSecond)
-                LorenzUtils.chat("§e[SkyHanni] §7Average Blocks Per Second: $color$blocksPerSecond")
-                LorenzUtils.chat("§e[SkyHanni] §7Participated for §b$time")
+                LorenzUtils.chat("§7Average Blocks Per Second: $color$blocksPerSecond")
+                LorenzUtils.chat("§7Participated for §b$time")
             }
+
             FarmingContestPhase.CHANGE -> {
-                LorenzUtils.chat("§e[SkyHanni] You changed the crop during the contest, resetting the Blocks Per Second calculation..")
+                LorenzUtils.chat("You changed the crop during the contest, resetting the Blocks Per Second calculation..")
                 startTime = System.currentTimeMillis()
             }
         }

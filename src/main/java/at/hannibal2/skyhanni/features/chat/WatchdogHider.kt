@@ -1,6 +1,7 @@
 package at.hannibal2.skyhanni.features.chat
 
 import at.hannibal2.skyhanni.SkyHanniMod
+import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.data.ChatManager
 import at.hannibal2.skyhanni.events.LorenzChatEvent
 import at.hannibal2.skyhanni.utils.LorenzUtils
@@ -15,18 +16,20 @@ class WatchdogHider {
 
     @SubscribeEvent
     fun onChatMessage(event: LorenzChatEvent) {
-        if (!LorenzUtils.onHypixel || !SkyHanniMod.feature.chat.watchDog) return
+        if (!LorenzUtils.onHypixel || !SkyHanniMod.feature.chat.filterType.watchDog) return
 
         when (event.message) {
             watchdogStartLine -> {
                 startLineComponent = event.chatComponent
                 blockedLines = 0
             }
+
             watchdogAnnouncementLine -> {
                 ChatManager.retractMessage(startLineComponent, "watchdog")
                 startLineComponent = null
                 inWatchdog = true
             }
+
             watchdogEndLine -> {
                 event.blockedReason = "watchdog"
                 inWatchdog = false
@@ -47,6 +50,11 @@ class WatchdogHider {
         private const val watchdogStartLine = "§f"
         private const val watchdogAnnouncementLine = "§4[WATCHDOG ANNOUNCEMENT]"
         private const val watchdogEndLine = "§c"
+    }
+
+    @SubscribeEvent
+    fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
+        event.move(3, "chat.watchDog", "chat.filterType.watchDog")
     }
 }
 

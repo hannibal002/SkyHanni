@@ -12,6 +12,7 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 class ScoreboardData {
 
     companion object {
+        // TODO USE SH-REPO
         private val splitIcons = listOf(
             "\uD83C\uDF6B",
             "\uD83D\uDCA3",
@@ -27,6 +28,7 @@ class ScoreboardData {
             "\uD83C\uDF81",
             "\uD83C\uDF89",
             "\uD83C\uDF82",
+            "\uD83D\uDD2B",
         )
 
         fun formatLines(rawList: List<String>): List<String> {
@@ -49,6 +51,7 @@ class ScoreboardData {
 
         var sidebarLines: List<String> = emptyList() // TODO rename to raw
         var sidebarLinesRaw: List<String> = emptyList() // TODO delete
+        var objectiveTitle = ""
     }
 
     @SubscribeEvent(priority = EventPriority.HIGHEST)
@@ -76,6 +79,7 @@ class ScoreboardData {
     private fun fetchScoreboardLines(): List<String> {
         val scoreboard = Minecraft.getMinecraft().theWorld?.scoreboard ?: return emptyList()
         val objective = scoreboard.getObjectiveInDisplaySlot(1) ?: return emptyList()
+        objectiveTitle = objective.displayName
         var scores = scoreboard.getSortedScores(objective)
         val list = scores.filter { input: Score? ->
             input != null && input.playerName != null && !input.playerName.startsWith("#")

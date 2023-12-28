@@ -1,16 +1,17 @@
 package at.hannibal2.skyhanni.features.garden.farming
 
-import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.data.ClickType
-import at.hannibal2.skyhanni.data.TitleUtils
 import at.hannibal2.skyhanni.events.CropClickEvent
 import at.hannibal2.skyhanni.events.GardenToolChangeEvent
 import at.hannibal2.skyhanni.events.LorenzChatEvent
 import at.hannibal2.skyhanni.features.garden.CropType
-import at.hannibal2.skyhanni.utils.ItemUtils.getLore
+import at.hannibal2.skyhanni.features.garden.GardenAPI
+import at.hannibal2.skyhanni.utils.LorenzUtils
+import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getFungiCutterMode
 import at.hannibal2.skyhanni.utils.SoundUtils
 import net.minecraft.item.ItemStack
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
+import kotlin.time.Duration.Companion.seconds
 
 class WrongFungiCutterWarning {
     private var mode = FungiMode.UNKNOWN
@@ -22,7 +23,7 @@ class WrongFungiCutterWarning {
         if (message == "§eFungi Cutter Mode: §r§cRed Mushrooms") {
             mode = FungiMode.RED
         }
-        if (message == "§eFungi Cutter Mode: §r§cBrown Mushrooms") {
+        if (message == "§eFungi Cutter Mode: §r§6Brown Mushrooms") {
             mode = FungiMode.BROWN
         }
     }
@@ -33,22 +34,18 @@ class WrongFungiCutterWarning {
         if (event.crop != CropType.MUSHROOM) return
 
         val toString = event.blockState.toString()
-        if (toString == "minecraft:red_mushroom") {
-            if (mode == FungiMode.BROWN) {
-                notifyWrong()
-            }
+        if (toString == "minecraft:red_mushroom" && mode == FungiMode.BROWN) {
+            notifyWrong()
         }
-        if (toString == "minecraft:brown_mushroom") {
-            if (mode == FungiMode.RED) {
-                notifyWrong()
-            }
+        if (toString == "minecraft:brown_mushroom" && mode == FungiMode.RED) {
+            notifyWrong()
         }
     }
 
     private fun notifyWrong() {
-        if (!SkyHanniMod.feature.garden.fungiCutterWarn) return
+        if (!GardenAPI.config.fungiCutterWarn) return
 
-        TitleUtils.sendTitle("§cWrong Fungi Cutter Mode!", 2_000)
+        LorenzUtils.sendTitle("§cWrong Fungi Cutter Mode!", 2.seconds)
         if (System.currentTimeMillis() > lastPlaySoundTime + 3_00) {
             lastPlaySoundTime = System.currentTimeMillis()
             SoundUtils.playBeepSound()
@@ -58,27 +55,27 @@ class WrongFungiCutterWarning {
     @SubscribeEvent
     fun onGardenToolChange(event: GardenToolChangeEvent) {
         if (event.crop == CropType.MUSHROOM) {
-            readItem(event.toolItem!!)
+            readItem(event.toolItem ?: error("Tool item is null"))
         } else {
             mode = FungiMode.UNKNOWN
         }
     }
 
     private fun readItem(item: ItemStack) {
-        for (line in item.getLore()) {
-            if (line == "§eMode: §cRed Mushrooms") {
-                mode = FungiMode.RED
-            }
-
-            if (line == "§eMode: §cBrown Mushrooms") {
-                mode = FungiMode.BROWN
-            }
-        }
+        // The fungi cutter mode is not set into the item nbt data immediately after purchasing it.
+        val rawMode = item.getFungiCutterMode() ?: return
+        mode = FungiMode.getOrNull(rawMode)
     }
 
     enum class FungiMode {
         RED,
         BROWN,
-        UNKNOWN
+        UNKNOWN,
+        ;
+
+        companion object {
+            fun getOrNull(mode: String) =
+                entries.firstOrNull { it.name == mode } ?: error("Unknown fungi mode: '$mode'")
+        }
     }
 }

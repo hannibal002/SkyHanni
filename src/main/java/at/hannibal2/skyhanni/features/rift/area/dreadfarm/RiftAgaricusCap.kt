@@ -1,16 +1,21 @@
 package at.hannibal2.skyhanni.features.rift.area.dreadfarm
 
+import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
+import at.hannibal2.skyhanni.events.LorenzRenderWorldEvent
 import at.hannibal2.skyhanni.events.LorenzTickEvent
 import at.hannibal2.skyhanni.features.rift.RiftAPI
-import at.hannibal2.skyhanni.utils.*
+import at.hannibal2.skyhanni.utils.BlockUtils
 import at.hannibal2.skyhanni.utils.BlockUtils.getBlockStateAt
-import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName_old
+import at.hannibal2.skyhanni.utils.InventoryUtils
+import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName
+import at.hannibal2.skyhanni.utils.LorenzUtils
+import at.hannibal2.skyhanni.utils.LorenzVec
 import at.hannibal2.skyhanni.utils.RenderUtils.drawDynamicText
-import net.minecraftforge.client.event.RenderWorldLastEvent
+import at.hannibal2.skyhanni.utils.TimeUtils
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
 class RiftAgaricusCap {
-    private val config get() = RiftAPI.config.area.dreadfarmConfig
+    private val config get() = RiftAPI.config.area.dreadfarm
     private var startTime = 0L
     private var location: LorenzVec? = null
 
@@ -24,7 +29,7 @@ class RiftAgaricusCap {
     }
 
     private fun updateLocation(): LorenzVec? {
-        if (InventoryUtils.getItemInHand()?.getInternalName_old() != "FARMING_WAND") return null
+        if (InventoryUtils.getItemInHand()?.getInternalName() != RiftAPI.farmingTool) return null
         val currentLocation = BlockUtils.getBlockLookingAt() ?: return null
 
         when (currentLocation.getBlockStateAt().toString()) {
@@ -51,10 +56,10 @@ class RiftAgaricusCap {
     }
 
     @SubscribeEvent
-    fun onRenderWorld(event: RenderWorldLastEvent) {
+    fun onRenderWorld(event: LorenzRenderWorldEvent) {
         if (!isEnabled()) return
 
-        val location = location?.add(0.0, 0.6, 0.0) ?: return
+        val location = location?.add(y = 0.6) ?: return
 
         if (startTime == -1L) {
             event.drawDynamicText(location, "§cClick!", 1.5)
@@ -67,4 +72,9 @@ class RiftAgaricusCap {
     }
 
     fun isEnabled() = RiftAPI.inRift() && config.agaricusCap
+
+    @SubscribeEvent
+    fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
+        event.move(9, "rift.area.dreadfarmConfig", "rift.area.dreadfarm")
+    }
 }

@@ -3,6 +3,7 @@ package at.hannibal2.skyhanni.mixins.hooks
 import at.hannibal2.skyhanni.events.LorenzWorldChangeEvent
 import at.hannibal2.skyhanni.events.RenderMobColoredEvent
 import at.hannibal2.skyhanni.events.ResetEntityHurtEvent
+import at.hannibal2.skyhanni.test.SkyHanniDebugsAndTests
 import net.minecraft.entity.EntityLivingBase
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
@@ -40,6 +41,7 @@ class RenderLivingEntityHelper {
         }
 
         fun <T : EntityLivingBase> setColorMultiplier(entity: T): Int {
+            if (!SkyHanniDebugsAndTests.globalRender) return 0
             if (entityColorMap.containsKey(entity)) {
                 val condition = entityColorCondition[entity]!!
                 if (condition.invoke()) {
@@ -48,12 +50,14 @@ class RenderLivingEntityHelper {
             }
 
             //TODO remove event
+            if (!SkyHanniDebugsAndTests.globalRender) return 0
             val event = RenderMobColoredEvent(entity, 0)
             event.postAndCatch()
             return event.color
         }
 
         fun <T : EntityLivingBase> changeHurtTime(entity: T): Int {
+            if (!SkyHanniDebugsAndTests.globalRender) return 0
             if (entityNoHurTime.contains(entity)) {
                 val condition = entityNoHurTimeCondition[entity]!!
                 if (condition.invoke()) {

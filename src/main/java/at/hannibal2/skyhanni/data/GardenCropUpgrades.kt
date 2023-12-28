@@ -12,6 +12,7 @@ import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
 class GardenCropUpgrades {
+    // TODO USE SH-REPO
     private val tierPattern = "§7Current Tier: §[0-9a-e](\\d)§7/§a9".toRegex()
     private val chatUpgradePattern = " {2}§r§6§lCROP UPGRADE §e§f([\\w ]+)§7 #(\\d)".toRegex()
 
@@ -38,7 +39,7 @@ class GardenCropUpgrades {
     }
 
     companion object {
-        private val cropUpgrades: MutableMap<CropType, Int>? get() = GardenAPI.config?.cropUpgrades
+        private val cropUpgrades: MutableMap<CropType, Int>? get() = GardenAPI.storage?.cropUpgrades
 
         fun CropType.getUpgradeLevel() = cropUpgrades?.get(this)
 

@@ -1,6 +1,11 @@
 package at.hannibal2.skyhanni.data
 
-import at.hannibal2.skyhanni.events.*
+import at.hannibal2.skyhanni.events.GuiContainerEvent
+import at.hannibal2.skyhanni.events.InventoryCloseEvent
+import at.hannibal2.skyhanni.events.InventoryFullyOpenedEvent
+import at.hannibal2.skyhanni.events.InventoryUpdatedEvent
+import at.hannibal2.skyhanni.events.LorenzTickEvent
+import at.hannibal2.skyhanni.events.PacketEvent
 import net.minecraft.item.ItemStack
 import net.minecraft.network.play.server.S2DPacketOpenWindow
 import net.minecraft.network.play.server.S2EPacketCloseWindow
@@ -17,9 +22,9 @@ object OtherInventoryData {
         close()
     }
 
-    fun close() {
+    fun close(reopenSameName: Boolean = false) {
         currentInventory?.let {
-            InventoryCloseEvent(it).postAndCatch()
+            InventoryCloseEvent(it, reopenSameName).postAndCatch()
             currentInventory = null
         }
     }
@@ -44,7 +49,8 @@ object OtherInventoryData {
             val windowId = packet.windowId
             val title = packet.windowTitle.unformattedText
             val slotCount = packet.slotCount
-            close()
+            val reopenSameName = title == currentInventory?.title
+            close(reopenSameName)
 
             currentInventory = Inventory(windowId, title, slotCount)
             acceptItems = true
@@ -89,6 +95,7 @@ object OtherInventoryData {
 
     private fun done(inventory: Inventory) {
         InventoryFullyOpenedEvent(inventory).postAndCatch()
+        inventory.fullyOpenedOnce = true
         InventoryUpdatedEvent(inventory).postAndCatch()
         acceptItems = false
     }
@@ -98,5 +105,6 @@ object OtherInventoryData {
         val title: String,
         val slotCount: Int,
         val items: MutableMap<Int, ItemStack> = mutableMapOf(),
+        var fullyOpenedOnce: Boolean = false
     )
 }

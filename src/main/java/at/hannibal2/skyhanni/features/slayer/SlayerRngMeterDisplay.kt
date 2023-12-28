@@ -4,9 +4,12 @@ import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.config.Storage
 import at.hannibal2.skyhanni.data.ProfileStorageData
 import at.hannibal2.skyhanni.data.SlayerAPI
-import at.hannibal2.skyhanni.data.TitleUtils
-import at.hannibal2.skyhanni.events.*
-import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName_old
+import at.hannibal2.skyhanni.events.GuiRenderEvent
+import at.hannibal2.skyhanni.events.InventoryFullyOpenedEvent
+import at.hannibal2.skyhanni.events.LorenzChatEvent
+import at.hannibal2.skyhanni.events.LorenzTickEvent
+import at.hannibal2.skyhanni.events.SlayerChangeEvent
+import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.ItemUtils.nameWithEnchantment
 import at.hannibal2.skyhanni.utils.LorenzUtils
@@ -19,12 +22,13 @@ import at.hannibal2.skyhanni.utils.StringUtils.removeWordsAtEnd
 import io.github.moulberry.notenoughupdates.util.Constants
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import kotlin.math.ceil
+import kotlin.time.Duration.Companion.seconds
 
 class SlayerRngMeterDisplay {
     private val config get() = SkyHanniMod.feature.slayer.rngMeterDisplay
     private var display = ""
     private val inventoryNamePattern = "(?<name>.*) RNG Meter".toPattern()
-    private val updatePattern = "   §dRNG Meter §f- §d(?<exp>.*) Stored XP".toPattern()
+    private val updatePattern = " {3}§dRNG Meter §f- §d(?<exp>.*) Stored XP".toPattern()
     private val changedItemPattern = "§aYou set your §r.* RNG Meter §r§ato drop §r.*§a!".toPattern()
     private var lastItemDroppedTime = 0L
 
@@ -32,13 +36,9 @@ class SlayerRngMeterDisplay {
     fun onTick(event: LorenzTickEvent) {
         if (!isEnabled()) return
 
-        if (event.repeatSeconds(1)) {
-            if (lastItemDroppedTime != 0L) {
-                if (System.currentTimeMillis() > lastItemDroppedTime + 4_000) {
-                    lastItemDroppedTime = 0L
-                    update()
-                }
-            }
+        if (event.repeatSeconds(1) && lastItemDroppedTime != 0L && System.currentTimeMillis() > lastItemDroppedTime + 4_000) {
+            lastItemDroppedTime = 0L
+            update()
         }
     }
 
@@ -52,11 +52,9 @@ class SlayerRngMeterDisplay {
 
         if (!isEnabled()) return
 
-        if (config.hideChat) {
-            if (SlayerAPI.isInSlayerArea) {
-                changedItemPattern.matchMatcher(event.message) {
-                    event.blockedReason = "slayer_rng_meter"
-                }
+        if (config.hideChat && SlayerAPI.isInCorrectArea) {
+            changedItemPattern.matchMatcher(event.message) {
+                event.blockedReason = "slayer_rng_meter"
             }
         }
 
@@ -71,11 +69,9 @@ class SlayerRngMeterDisplay {
         if (old != -1L) {
             val item = storage.itemGoal
             val hasItemSelected = item != "" && item != "?"
-            if (!hasItemSelected) {
-                if (config.warnEmpty) {
-                    LorenzUtils.warning("§c[Skyhanni] No Slayer RNG Meter Item selected!")
-                    TitleUtils.sendTitle("§cNo RNG Meter Item!", 3_000)
-                }
+            if (!hasItemSelected && config.warnEmpty) {
+                LorenzUtils.userError("No Slayer RNG Meter Item selected!")
+                LorenzUtils.sendTitle("§cNo RNG Meter Item!", 3.seconds)
             }
             var blockChat = config.hideChat && hasItemSelected
             val diff = currentMeter - old
@@ -90,7 +86,7 @@ class SlayerRngMeterDisplay {
                 var rawPercentage = old.toDouble() / storage.goalNeeded
                 if (rawPercentage > 1) rawPercentage = 1.0
                 val percentage = LorenzUtils.formatPercentage(rawPercentage)
-                LorenzUtils.chat("§e[SkyHanni] §dRNG Meter §7dropped at §e$percentage §7XP ($from/${to}§7)")
+                LorenzUtils.chat("§dRNG Meter §7dropped at §e$percentage §7XP ($from/${to}§7)")
                 lastItemDroppedTime = System.currentTimeMillis()
             }
             if (blockChat) {
@@ -120,14 +116,15 @@ class SlayerRngMeterDisplay {
 
         val storage = getStorage() ?: return
 
-        val selectedItem = event.inventoryItems.values.find { item -> item.getLore().any { it.contains("§aSELECTED") } }
+        val selectedItem =
+            event.inventoryItems.values.find { item -> item.getLore().any { it.contains("§a§lSELECTED") } }
         if (selectedItem == null) {
             storage.itemGoal = ""
             storage.goalNeeded = -1
         } else {
             storage.itemGoal = selectedItem.nameWithEnchantment
             val jsonObject = Constants.RNGSCORE["slayer"].asJsonObject.get(getCurrentSlayer()).asJsonObject
-            storage.goalNeeded = jsonObject.get(selectedItem.getInternalName_old()).asLong
+            storage.goalNeeded = jsonObject.get(selectedItem.getInternalName().asString()).asLong
         }
         update()
     }
@@ -168,12 +165,12 @@ class SlayerRngMeterDisplay {
     }
 
     @SubscribeEvent
-    fun onRenderOverlay(event: GuiRenderEvent.GameOverlayRenderEvent) {
+    fun onRenderOverlay(event: GuiRenderEvent.GuiOverlayRenderEvent) {
         if (!isEnabled()) return
-        if (!SlayerAPI.isInSlayerArea) return
+        if (!SlayerAPI.isInCorrectArea) return
         if (!SlayerAPI.hasActiveSlayerQuest()) return
 
-        config.pos.renderString(display, posLabel = "Rng Meter Display")
+        config.pos.renderString(display, posLabel = "RNG Meter Display")
     }
 
     fun isEnabled() = LorenzUtils.inSkyBlock && config.enabled

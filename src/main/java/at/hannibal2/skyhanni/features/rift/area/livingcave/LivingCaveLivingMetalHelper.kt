@@ -2,6 +2,7 @@ package at.hannibal2.skyhanni.features.rift.area.livingcave
 
 import at.hannibal2.skyhanni.data.ClickType
 import at.hannibal2.skyhanni.events.BlockClickEvent
+import at.hannibal2.skyhanni.events.LorenzRenderWorldEvent
 import at.hannibal2.skyhanni.events.ReceiveParticleEvent
 import at.hannibal2.skyhanni.events.ServerBlockChangeEvent
 import at.hannibal2.skyhanni.events.TitleReceivedEvent
@@ -10,11 +11,10 @@ import at.hannibal2.skyhanni.test.GriffinUtils.drawWaypointFilled
 import at.hannibal2.skyhanni.utils.LocationUtils.distanceToPlayer
 import at.hannibal2.skyhanni.utils.LorenzColor
 import at.hannibal2.skyhanni.utils.LorenzVec
-import net.minecraftforge.client.event.RenderWorldLastEvent
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
 class LivingCaveLivingMetalHelper {
-    private val config get() = RiftAPI.config.area.livingCaveConfig.livingCaveLivingMetalConfig
+    private val config get() = RiftAPI.config.area.livingCave.livingCaveLivingMetalConfig
     private var lastClicked: LorenzVec? = null
     private var pair: Pair<LorenzVec, LorenzVec>? = null
     private var startTime = 0L
@@ -56,7 +56,7 @@ class LivingCaveLivingMetalHelper {
     }
 
     @SubscribeEvent
-    fun onRenderWorld(event: RenderWorldLastEvent) {
+    fun onRenderWorld(event: LorenzRenderWorldEvent) {
         if (!isEnabled()) return
         val (a, b) = pair ?: return
         if (System.currentTimeMillis() > startTime + 5_000) return
@@ -67,7 +67,11 @@ class LivingCaveLivingMetalHelper {
             val percentage = diff.toDouble() / maxTime
             a.slope(b, 1 - percentage)
         } else b
-        event.drawWaypointFilled(location, LorenzColor.AQUA.toColor(), seeThroughBlocks = location.distanceToPlayer() < 10)
+        event.drawWaypointFilled(
+            location,
+            LorenzColor.AQUA.toColor(),
+            seeThroughBlocks = location.distanceToPlayer() < 10
+        )
     }
 
     @SubscribeEvent

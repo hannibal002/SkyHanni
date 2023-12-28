@@ -1,13 +1,36 @@
 package at.hannibal2.skyhanni.features.garden.visitor
 
-import java.util.regex.Pattern
+import at.hannibal2.skyhanni.config.HasLegacyId
+import at.hannibal2.skyhanni.utils.NEUInternalName
+import at.hannibal2.skyhanni.utils.NEUInternalName.Companion.asInternalName
+import at.hannibal2.skyhanni.utils.NEUItems.getItemStack
 
-enum class VisitorReward(val displayName: String, val internalName: String, val pattern: Pattern) {
-    FLOWERING_BOUQUET("§9Flowering Bouquet", "FLOWERING_BOUQUET", "Flowering Bouquet".toPattern()),
-    OVERGROWN_GRASS("§9Overgrown Grass", "OVERGROWN_GRASS", "Overgrown Grass".toPattern()),
-    GREEN_BANDANA("§9Green Bandana", "GREEN_BANDANA", "Green Bandana".toPattern()),
-    DEDICATION("§9Dedication IV", "DEDICATION;4", "Dedication (IV|4) Book".toPattern()),
-    MUSIC_RUNE("§9Music Rune", "MUSIC_RUNE;1", "◆ Music Rune [1I]".toPattern()),
-    SPACE_HELMET("§cSpace Helmet", "DCTR_SPACE_HELM", "Space Helmet".toPattern()),
-    // Pretty sure that the symbol is ◆ but not 100%
+enum class VisitorReward(private val rawInternalName: String, val displayName: String, private val legacyId: Int = -1) : HasLegacyId {
+    FLOWERING_BOUQUET("FLOWERING_BOUQUET", "§9Flowering Bouquet", legacyId = 0),
+    OVERGROWN_GRASS("OVERGROWN_GRASS", "§9Overgrown Grass", legacyId = 1),
+    GREEN_BANDANA("GREEN_BANDANA", "§9Green Bandana", legacyId = 2),
+    DEDICATION("DEDICATION;4", "§9Dedication IV", legacyId = 3),
+    MUSIC_RUNE("MUSIC_RUNE;1", "§9Music Rune", legacyId = 4),
+    SPACE_HELMET("DCTR_SPACE_HELM", "§cSpace Helmet", legacyId = 5),
+    CULTIVATING("CULTIVATING;1", "§9Cultivating I", legacyId = 6),
+    REPLENISH("REPLENISH;1", "§9Replenish I", legacyId = 7),
+    DELICATE("DELICATE;5", "§9Delicate V"),
+    ;
+
+    private val internalName by lazy { rawInternalName.asInternalName() }
+    val itemStack by lazy { internalName.getItemStack() }
+    // TODO use this instead of hard coded item names once moulconfig no longer calls toString before the neu repo gets loaded
+//     val displayName by lazy { itemStack.nameWithEnchantment ?: internalName.asString() }
+
+    companion object {
+        fun getByInternalName(internalName: NEUInternalName) = entries.firstOrNull { it.internalName == internalName }
+    }
+
+    override fun getLegacyId(): Int {
+        return legacyId
+    }
+
+    override fun toString(): String {
+        return displayName
+    }
 }

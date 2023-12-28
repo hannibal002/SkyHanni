@@ -1,16 +1,24 @@
 package at.hannibal2.skyhanni.features.garden.contest
 
 import at.hannibal2.skyhanni.data.ScoreboardData
-import at.hannibal2.skyhanni.events.*
+import at.hannibal2.skyhanni.events.FarmingContestEvent
+import at.hannibal2.skyhanni.events.GuiContainerEvent
+import at.hannibal2.skyhanni.events.InventoryCloseEvent
+import at.hannibal2.skyhanni.events.InventoryFullyOpenedEvent
+import at.hannibal2.skyhanni.events.LorenzTickEvent
 import at.hannibal2.skyhanni.features.garden.CropType
 import at.hannibal2.skyhanni.features.garden.GardenAPI
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.LorenzUtils
+import at.hannibal2.skyhanni.utils.LorenzUtils.addOrPut
+import at.hannibal2.skyhanni.utils.LorenzUtils.nextAfter
 import at.hannibal2.skyhanni.utils.LorenzUtils.sortedDesc
+import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
 import io.github.moulberry.notenoughupdates.util.SkyBlockTime
 import net.minecraft.item.ItemStack
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
+import kotlin.time.Duration.Companion.minutes
 
 object FarmingContestAPI {
     private val timePattern = "§a(?<month>.*) (?<day>.*)(?:rd|st|nd|th), Year (?<year>.*)".toPattern()
@@ -18,7 +26,8 @@ object FarmingContestAPI {
     private val cropPattern = "§8(?<crop>.*) Contest".toPattern()
     var inContest = false
     var contestCrop: CropType? = null
-    private val sidebarCropPattern = "§e○ §f(?<crop>.*) §a.*".toPattern()
+    private var startTime = SimpleTimeMark.farPast()
+    private val sidebarCropPattern = "(?:§e○|§6☘) §f(?<crop>.*) §a.*".toPattern()
 
     var inInventory = false
 
@@ -33,39 +42,38 @@ object FarmingContestAPI {
     }
 
     private fun checkActiveContest() {
+        if (inContest && startTime.passedSince() > 20.minutes) {
+            FarmingContestEvent(contestCrop!!, FarmingContestPhase.STOP).postAndCatch()
+            inContest = false
+        }
+
         val currentCrop = readCurrentCrop()
         val currentContest = currentCrop != null
 
         if (inContest != currentContest) {
             if (currentContest) {
                 FarmingContestEvent(currentCrop!!, FarmingContestPhase.START).postAndCatch()
+                startTime = SimpleTimeMark.now()
             } else {
-                FarmingContestEvent(contestCrop!!, FarmingContestPhase.STOP).postAndCatch()
+                if (startTime.passedSince() > 2.minutes) {
+                    FarmingContestEvent(contestCrop!!, FarmingContestPhase.STOP).postAndCatch()
+                }
             }
             inContest = currentContest
         } else {
-            if (currentCrop != contestCrop) {
-                FarmingContestEvent(currentCrop!!, FarmingContestPhase.CHANGE).postAndCatch()
+            if (currentCrop != contestCrop && currentCrop != null) {
+                FarmingContestEvent(currentCrop, FarmingContestPhase.CHANGE).postAndCatch()
+                startTime = SimpleTimeMark.now()
             }
         }
         contestCrop = currentCrop
     }
 
     private fun readCurrentCrop(): CropType? {
-        var next = false
-        for (line in ScoreboardData.sidebarLinesFormatted) {
-            if (line == "§eJacob's Contest") {
-                next = true
-                continue
-            }
-            if (next) {
-                sidebarCropPattern.matchMatcher(line) {
-                    return CropType.getByName(group("crop"))
-                }
-            }
+        val line = ScoreboardData.sidebarLinesFormatted.nextAfter("§eJacob's Contest") ?: return null
+        return sidebarCropPattern.matchMatcher(line) {
+            CropType.getByName(group("crop"))
         }
-
-        return null
     }
 
     @SubscribeEvent
@@ -104,12 +112,15 @@ object FarmingContestAPI {
             cropPattern.matchMatcher(it) { CropType.getByName(group("crop")) }
         } ?: error("Crop not found in lore!")
 
-        val brackets = ContestBracket.entries.associateWith { bracket ->
-            lore.firstNotNullOfOrNull {
-                bracket.pattern.matchMatcher(it) {
-                    group("amount").replace(",", "").toInt()
-                }
-            } ?: error("Farming contest bracket not found in lore!")
+        val brackets = buildMap {
+            for (bracket in ContestBracket.entries) {
+                val amount = lore.firstNotNullOfOrNull {
+                    bracket.pattern.matchMatcher(it) {
+                        group("amount").replace(",", "").toInt()
+                    }
+                } ?: continue
+                put(bracket, amount)
+            }
         }
 
         return FarmingContest(time, crop, brackets)
@@ -121,15 +132,18 @@ object FarmingContestAPI {
 
     fun calculateAverages(crop: CropType): Pair<Int, Map<ContestBracket, Int>> {
         var amount = 0
-        val map = mutableMapOf<ContestBracket, Int>()
+        val crops = mutableMapOf<ContestBracket, Int>()
+        val contests = mutableMapOf<ContestBracket, Int>()
         for (contest in getContestsOfType(crop).associateWith { it.time }.sortedDesc().keys) {
             amount++
-            for ((bracket, count) in contest.brackets) {
-                val old = map.getOrDefault(bracket, 0)
-                map[bracket] = count + old
+            val brackets = contest.brackets
+            for ((bracket, count) in brackets) {
+                val old = crops.getOrDefault(bracket, 0)
+                crops[bracket] = count + old
+                contests.addOrPut(bracket, 1)
             }
             if (amount == 10) break
         }
-        return Pair(amount, map.mapValues { (_, counter) -> counter / amount })
+        return Pair(amount, crops.mapValues { (bracket, counter) -> counter / contests[bracket]!! })
     }
 }

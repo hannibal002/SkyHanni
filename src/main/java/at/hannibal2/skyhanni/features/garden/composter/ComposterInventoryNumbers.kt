@@ -1,6 +1,6 @@
 package at.hannibal2.skyhanni.features.garden.composter
 
-import at.hannibal2.skyhanni.SkyHanniMod
+import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.events.RenderInventoryItemTipEvent
 import at.hannibal2.skyhanni.features.garden.GardenAPI
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
@@ -11,13 +11,13 @@ import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
 class ComposterInventoryNumbers {
-    private val valuePattern = "(?:.*) §e(?<having>.*)§6\\/(?<total>.*)".toPattern()
+    private val valuePattern = ".* §e(?<having>.*)§6/(?<total>.*)".toPattern()
     private val compostsPattern = "§7§7Compost Available: §a(?<amount>.*)".toPattern()
 
     @SubscribeEvent
     fun onRenderItemTip(event: RenderInventoryItemTipEvent) {
         if (!GardenAPI.inGarden()) return
-        if (!SkyHanniMod.feature.garden.composterInventoryNumbers) return
+        if (!GardenAPI.config.composters.inventoryNumbers) return
 
         if (event.inventoryName != "Composter") return
 
@@ -65,5 +65,10 @@ class ComposterInventoryNumbers {
                 }
             }
         }
+    }
+
+    @SubscribeEvent
+    fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
+        event.move(3, "garden.composterInventoryNumbers", "garden.composters.inventoryNumbers")
     }
 }

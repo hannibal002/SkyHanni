@@ -11,6 +11,7 @@ enum class ComposterUpgrade(val displayName: String, val slotNumber: Int) {
     companion object {
         private fun regexValues() = entries.joinToString("|") { it.displayName }
 
+        // TODO USE SH-REPO
         val regex = "§a(?<name>${regexValues()})(?: (?<level>.*))?".toPattern()
 
         fun getByName(name: String) = entries.firstOrNull { it.displayName == name }

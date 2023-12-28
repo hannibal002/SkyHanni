@@ -8,14 +8,14 @@ import at.hannibal2.skyhanni.features.garden.FarmingFortuneDisplay
 import at.hannibal2.skyhanni.features.garden.GardenAPI
 import at.hannibal2.skyhanni.features.garden.fortuneguide.FFGuideGUI.Companion.getItem
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName
-import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName_old
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getFarmingForDummiesCount
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getPetItem
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getPetLevel
 import net.minecraft.item.ItemStack
+import kotlin.math.floor
 
 object FFStats {
-    private val toolHasBountiful get() = GardenAPI.config?.toolWithBountiful
+    private val toolHasBountiful get() = GardenAPI.storage?.toolWithBountiful
 
     private val mathCrops =
         listOf(CropType.WHEAT, CropType.CARROT, CropType.POTATO, CropType.SUGAR_CANE, CropType.NETHER_WART)
@@ -25,7 +25,6 @@ object FFStats {
 
     var cakeExpireTime = 0L
 
-    // todo maybe these could be maps
     val necklaceFF = mutableMapOf<FFTypes, Double>()
     val cloakFF = mutableMapOf<FFTypes, Double>()
     val beltFF = mutableMapOf<FFTypes, Double>()
@@ -42,6 +41,7 @@ object FFStats {
     val elephantFF = mutableMapOf<FFTypes, Double>()
     val mooshroomFF = mutableMapOf<FFTypes, Double>()
     val rabbitFF = mutableMapOf<FFTypes, Double>()
+    val beeFF = mutableMapOf<FFTypes, Double>()
     var currentPetItem = ""
 
     var baseFF = mutableMapOf<FFTypes, Double>()
@@ -51,7 +51,7 @@ object FFStats {
     val cropPage = mutableMapOf<FortuneStats, Pair<Double, Double>>()
 
     fun loadFFData() {
-        cakeExpireTime = GardenAPI.config?.fortune?.cakeExpiring ?: -1L
+        cakeExpireTime = GardenAPI.storage?.fortune?.cakeExpiring ?: -1L
 
         getEquipmentFFData(FarmingItems.NECKLACE.getItem(), necklaceFF)
         getEquipmentFFData(FarmingItems.CLOAK.getItem(), cloakFF)
@@ -73,11 +73,12 @@ object FFStats {
                 { it.second }).map { (key, values) -> key to values.sum() }
                 .toMap() as MutableMap<FFTypes, Double>
 
-        usingSpeedBoots = FarmingItems.BOOTS.getItem().getInternalName_old() in farmingBoots
+        usingSpeedBoots = FarmingItems.BOOTS.getItem().getInternalName().asString() in farmingBoots
 
         getPetFFData(FarmingItems.ELEPHANT.getItem(), elephantFF)
         getPetFFData(FarmingItems.MOOSHROOM_COW.getItem(), mooshroomFF)
         getPetFFData(FarmingItems.RABBIT.getItem(), rabbitFF)
+        getPetFFData(FarmingItems.BEE.getItem(), beeFF)
 
         getGenericFF(baseFF)
 
@@ -86,13 +87,13 @@ object FFStats {
 
     fun getCropStats(crop: CropType, tool: ItemStack) {
         cropPage.clear()
-        cropPage[FortuneStats.BASE] = Pair(totalBaseFF[FFTypes.TOTAL] ?: 100.0, 1250.0)
+        cropPage[FortuneStats.BASE] = Pair(totalBaseFF[FFTypes.TOTAL] ?: 100.0, 1277.0)
         cropPage[FortuneStats.CROP_UPGRADE] = Pair((crop.getUpgradeLevel()?.toDouble() ?: 0.0) * 5.0, 45.0)
         cropPage[FortuneStats.ACCESSORY] = Pair(CropAccessoryData.cropAccessory?.getFortune(crop) ?: 0.0, 30.0)
         cropPage[FortuneStats.FFD] = Pair((tool.getFarmingForDummiesCount() ?: 0).toDouble(), 5.0)
         cropPage[FortuneStats.TURBO] = Pair(FarmingFortuneDisplay.getTurboCropFortune(tool, crop), 25.0)
         cropPage[FortuneStats.DEDICATION] = Pair(FarmingFortuneDisplay.getDedicationFortune(tool, crop), 92.0)
-        cropPage[FortuneStats.CULTIVATING] = Pair(FarmingFortuneDisplay.getCultivatingFortune(tool), 10.0)
+        cropPage[FortuneStats.CULTIVATING] = Pair(FarmingFortuneDisplay.getCultivatingFortune(tool), 20.0)
 
         FarmingFortuneDisplay.loadFortuneLineData(tool, 0.0)
 
@@ -110,7 +111,7 @@ object FFStats {
             }
 
             in dicerCrops -> {
-                cropPage[FortuneStats.SUNDER] = Pair(FarmingFortuneDisplay.getSunderFortune(tool), 62.5)
+                cropPage[FortuneStats.SUNDER] = Pair(FarmingFortuneDisplay.getSunderFortune(tool), 75.0)
                 if (toolHasBountiful?.get(crop) == true) {
                     cropPage[FortuneStats.REFORGE] = Pair(FarmingFortuneDisplay.reforgeFortune, 10.0)
                 } else {
@@ -130,7 +131,7 @@ object FFStats {
 
             CropType.COCOA_BEANS -> {
                 cropPage[FortuneStats.BASE_TOOL] = Pair(FarmingFortuneDisplay.getToolFortune(tool), 20.0)
-                cropPage[FortuneStats.SUNDER] = Pair(FarmingFortuneDisplay.getSunderFortune(tool), 62.5)
+                cropPage[FortuneStats.SUNDER] = Pair(FarmingFortuneDisplay.getSunderFortune(tool), 75.0)
                 if (toolHasBountiful?.get(crop) == true) {
                     cropPage[FortuneStats.REFORGE] = Pair(FarmingFortuneDisplay.reforgeFortune, 7.0)
                 } else {
@@ -149,14 +150,20 @@ object FFStats {
 
             else -> {}
         }
+        if (crop == CropType.CARROT) {
+            val storage = GardenAPI.storage?.fortune ?: return
+            val carrotFortune = if (storage.carrotFortune) 12.0 else 0.0
+            cropPage[FortuneStats.EXPORTED_CARROT] = Pair(carrotFortune, 12.0)
+        }
+        if (crop == CropType.PUMPKIN) {
+            val storage = GardenAPI.storage?.fortune ?: return
+            val pumpkinFortune = if (storage.pumpkinFortune) 12.0 else 0.0
+            cropPage[FortuneStats.EXPIRED_PUMPKIN] = Pair(pumpkinFortune, 12.0)
+        }
 
         cropPage[FortuneStats.CROP_TOTAL] = Pair(
             cropPage.toList().sumOf { it.second.first },
             cropPage.toList().sumOf { it.second.second })
-
-        if (tool.getInternalName_old().contains("DICER")) {
-            cropPage[FortuneStats.DICER] = Pair(33.0, 33.0)
-        }
     }
 
     private fun getEquipmentFFData(item: ItemStack, out: MutableMap<FFTypes, Double>) {
@@ -179,7 +186,7 @@ object FFStats {
     }
 
     private fun getPetFFData(item: ItemStack, out: MutableMap<FFTypes, Double>) {
-        val gardenLvl = GardenAPI.getLevelForExp((GardenAPI.config?.experience ?: -1).toLong())
+        val gardenLvl = GardenAPI.getGardenLevel()
         out[FFTypes.TOTAL] = 0.0
         out[FFTypes.BASE] = getPetFF(item)
         out[FFTypes.PET_ITEM] = when (item.getPetItem()) {
@@ -192,13 +199,13 @@ object FFStats {
     }
 
     private fun getGenericFF(out: MutableMap<FFTypes, Double>) {
-        val savedStats = GardenAPI.config?.fortune ?: return
+        val storage = GardenAPI.storage?.fortune ?: return
         out[FFTypes.TOTAL] = 0.0
         out[FFTypes.BASE_FF] = 100.0
-        out[FFTypes.FARMING_LVL] = savedStats.farmingLevel.toDouble() * 4
+        out[FFTypes.FARMING_LVL] = storage.farmingLevel.toDouble() * 4
         out[FFTypes.COMMUNITY_SHOP] = (ProfileStorageData.playerSpecific?.gardenCommunityUpgrade ?: -1).toDouble() * 4
-        out[FFTypes.PLOTS] = savedStats.plotsUnlocked.toDouble() * 3
-        out[FFTypes.ANITA] = savedStats.anitaUpgrade.toDouble() * 2
+        out[FFTypes.PLOTS] = storage.plotsUnlocked.toDouble() * 3
+        out[FFTypes.ANITA] = storage.anitaUpgrade.toDouble() * 4
         if (cakeExpireTime - System.currentTimeMillis() > 0 || cakeExpireTime == -1L) {
             out[FFTypes.CAKE] = 5.0
         } else {
@@ -222,6 +229,10 @@ object FFStats {
                 petList = rabbitFF
             }
 
+            FarmingItems.BEE -> {
+                petList = beeFF
+            }
+
             else -> {}
         }
         currentPetItem = FFGuideGUI.currentPet.getItem().getPetItem().toString()
@@ -234,16 +245,20 @@ object FFStats {
 
     private fun getPetFF(pet: ItemStack): Double {
         val petLevel = pet.getPetLevel()
-        val strength = (GardenAPI.config?.fortune?.farmingStrength)
+        val strength = (GardenAPI.storage?.fortune?.farmingStrength)
         if (strength != null) {
             val rawInternalName = pet.getInternalName()
-            return if (rawInternalName.contains("ELEPHANT;4")) {
-                1.8 * petLevel
-            } else if (rawInternalName.contains("MOOSHROOM_COW;4")) {
-                (10 + petLevel).toDouble() + strength / (40 - petLevel * .2)
-            } else if (rawInternalName.contains("MOOSHROOM")) {
-                (10 + petLevel).toDouble()
-            } else 0.0
+            return when {
+                rawInternalName.contains("ELEPHANT;4") -> 1.5 * petLevel
+                rawInternalName.contains("MOOSHROOM_COW;4") -> {
+                    (10 + petLevel).toDouble() + floor(floor(strength / (40 - petLevel * .2)) * .7)
+                }
+
+                rawInternalName.contains("MOOSHROOM") -> (10 + petLevel).toDouble()
+                rawInternalName.contains("BEE;2") -> 0.2 * petLevel
+                rawInternalName.contains("BEE;3") || rawInternalName.contains("BEE;4") -> 0.3 * petLevel
+                else -> 0.0
+            }
         }
         return 0.0
     }

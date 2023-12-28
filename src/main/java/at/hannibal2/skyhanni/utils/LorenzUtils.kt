@@ -3,15 +3,19 @@ package at.hannibal2.skyhanni.utils
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.data.HypixelData
 import at.hannibal2.skyhanni.data.IslandType
-import at.hannibal2.skyhanni.features.dungeon.DungeonData
+import at.hannibal2.skyhanni.data.MayorElection
+import at.hannibal2.skyhanni.data.TitleManager
+import at.hannibal2.skyhanni.features.dungeon.DungeonAPI
+import at.hannibal2.skyhanni.mixins.transformers.AccessorGuiEditSign
 import at.hannibal2.skyhanni.test.TestBingo
 import at.hannibal2.skyhanni.utils.NEUItems.getItemStackOrNull
+import at.hannibal2.skyhanni.utils.StringUtils.capAtMinecraftLength
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.StringUtils.toDashlessUUID
 import at.hannibal2.skyhanni.utils.renderables.Renderable
+import com.google.gson.JsonPrimitive
 import io.github.moulberry.moulconfig.observer.Observer
 import io.github.moulberry.moulconfig.observer.Property
-import io.github.moulberry.notenoughupdates.mixins.AccessorGuiEditSign
 import io.github.moulberry.notenoughupdates.util.SkyBlockTime
 import net.minecraft.client.Minecraft
 import net.minecraft.client.gui.inventory.GuiEditSign
@@ -19,19 +23,25 @@ import net.minecraft.entity.EntityLivingBase
 import net.minecraft.entity.SharedMonsterAttributes
 import net.minecraft.event.ClickEvent
 import net.minecraft.event.HoverEvent
+import net.minecraft.launchwrapper.Launch
 import net.minecraft.util.ChatComponentText
-import org.lwjgl.input.Keyboard
+import net.minecraftforge.fml.common.FMLCommonHandler
 import java.awt.Color
 import java.lang.reflect.Field
 import java.lang.reflect.Modifier
 import java.text.DecimalFormat
 import java.text.NumberFormat
 import java.text.SimpleDateFormat
-import java.util.*
+import java.util.Collections
+import java.util.Timer
+import java.util.TimerTask
+import java.util.regex.Matcher
 import kotlin.properties.ReadWriteProperty
 import kotlin.reflect.KMutableProperty1
 import kotlin.reflect.KProperty
 import kotlin.reflect.KProperty0
+import kotlin.time.Duration
+import kotlin.time.Duration.Companion.seconds
 
 object LorenzUtils {
 
@@ -41,8 +51,13 @@ object LorenzUtils {
 
     val inSkyBlock get() = onHypixel && HypixelData.skyBlock
 
-    val inDungeons get() = inSkyBlock && DungeonData.inDungeon()
+    val inHypixelLobby get() = onHypixel && HypixelData.inLobby
 
+    val inDungeons get() = inSkyBlock && DungeonAPI.inDungeon()
+
+    /**
+     * Consider using IslandType.isInIsland() instead
+     */
     val skyBlockIsland get() = HypixelData.skyBlockIsland
 
     val skyBlockArea get() = if (inSkyBlock) HypixelData.skyBlockArea else "?"
@@ -51,34 +66,84 @@ object LorenzUtils {
 
     val noTradeMode get() = HypixelData.noTrade
 
+    val isStrandedProfile get() = HypixelData.stranded
+
     val isBingoProfile get() = inSkyBlock && (HypixelData.bingo || TestBingo.testBingo)
 
     val lastWorldSwitch get() = HypixelData.joinedWorld
 
-    const val DEBUG_PREFIX = "[SkyHanni Debug] §7"
+    // TODO log based on chat category (error, warning, debug, user error, normal)
     private val log = LorenzLogger("chat/mod_sent")
     var lastButtonClicked = 0L
 
+    private const val DEBUG_PREFIX = "[SkyHanni Debug] §7"
+    private const val USER_ERROR_PREFIX = "§c[SkyHanni] "
+    private val ERROR_PREFIX by lazy { "§c[SkyHanni-${SkyHanniMod.version}] " }
+    private const val CHAT_PREFIX = "[SkyHanni] "
+
+    /**
+     * Sends a debug message to the chat and the console.
+     * This is only sent if the debug feature is enabled.
+     *
+     * @param message The message to be sent
+     *
+     * @see DEBUG_PREFIX
+     */
     fun debug(message: String) {
-        if (SkyHanniMod.feature.dev.debugEnabled) {
-            if (internalChat(DEBUG_PREFIX + message)) {
-                consoleLog("[Debug] $message")
-            }
+        if (SkyHanniMod.feature.dev.debug.enabled && internalChat(DEBUG_PREFIX + message)) {
+            consoleLog("[Debug] $message")
         }
     }
 
-    // TODO remove ig?
-    fun warning(message: String) {
-        internalChat("§cWarning! $message")
+    /**
+     * Sends a message to the user that they did something incorrectly.
+     * We should tell them what to do instead as well.
+     *
+     * @param message The message to be sent
+     *
+     * @see USER_ERROR_PREFIX
+     */
+    fun userError(message: String) {
+        internalChat(USER_ERROR_PREFIX + message)
     }
 
+    /**
+     * Sends a message to the user that an error occurred caused by something in the code.
+     * This should be used for errors that are not caused by the user.
+     *
+     * Why deprecate this? Even if this message is descriptive for the user and the developer,
+     * we don't want inconsitencies in errors, and we would need to search
+     * for the code line where this error gets printed any way.
+     * so it's better to use the stack trace still.
+     *
+     * @param message The message to be sent
+     * @param prefix Whether to prefix the message with the error prefix, default true
+     *
+     * @see ERROR_PREFIX
+     */
+    @Deprecated(
+        "Do not send the user a non clickable non stacktrace containing error message.",
+        ReplaceWith("ErrorManager")
+    )
     fun error(message: String) {
         println("error: '$message'")
-        internalChat("§c$message")
+        internalChat(ERROR_PREFIX + message)
     }
 
-    fun chat(message: String) {
-        internalChat(message)
+    /**
+     * Sends a message to the user
+     * @param message The message to be sent
+     * @param prefix Whether to prefix the message with the chat prefix, default true
+     * @param prefixColor Color that the prefix should be, default yellow (§e)
+     *
+     * @see CHAT_PREFIX
+     */
+    fun chat(message: String, prefix: Boolean = true, prefixColor: String = "§e") {
+        if (prefix) {
+            internalChat(prefixColor + CHAT_PREFIX + message)
+        } else {
+            internalChat(message)
+        }
     }
 
     private fun internalChat(message: String): Boolean {
@@ -116,26 +181,32 @@ object LorenzUtils {
     fun Double.round(decimals: Int): Double {
         var multiplier = 1.0
         repeat(decimals) { multiplier *= 10 }
-        return kotlin.math.round(this * multiplier) / multiplier
+        val result = kotlin.math.round(this * multiplier) / multiplier
+        val a = result.toString()
+        val b = toString()
+        return if (a.length > b.length) this else result
     }
 
-    fun Float.round(decimals: Int): Double {
+    fun Float.round(decimals: Int): Float {
         var multiplier = 1.0
         repeat(decimals) { multiplier *= 10 }
-        return kotlin.math.round(this * multiplier) / multiplier
+        val result = kotlin.math.round(this * multiplier) / multiplier
+        val a = result.toString().length
+        val b = toString().length
+        return if (a > b) this else result.toFloat()
     }
 
     // TODO replace all calls with regex
+    @Deprecated("Do not use complicated string operations", ReplaceWith("Regex"))
     fun String.between(start: String, end: String): String = this.split(start, end)[1]
 
-    //TODO change to Int
+    // TODO use derpy() on every use case
     val EntityLivingBase.baseMaxHealth: Int
         get() = this.getEntityAttribute(SharedMonsterAttributes.maxHealth).baseValue.toInt()
 
     fun formatPercentage(percentage: Double): String = formatPercentage(percentage, "0.00")
 
     fun formatPercentage(percentage: Double, format: String?): String =
-//        NumberFormat.getPercentInstance().format(percentage)
         DecimalFormat(format).format(percentage * 100).replace(',', '.') + "%"
 
     fun formatInteger(i: Int): String = formatInteger(i.toLong())
@@ -191,7 +262,7 @@ object LorenzUtils {
 
     fun getRawPlayerUuid() = Minecraft.getMinecraft().thePlayer.uniqueID
 
-    fun getPlayerName() = Minecraft.getMinecraft().thePlayer.name
+    fun getPlayerName(): String = Minecraft.getMinecraft().thePlayer.name
 
     fun <E> MutableList<List<E>>.addAsSingletonList(text: E) {
         add(Collections.singletonList(text))
@@ -216,28 +287,64 @@ object LorenzUtils {
         }
     }
 
-    fun setTextIntoSign(text: String) {
+    fun setTextIntoSign(text: String, line: Int = 0) {
         val gui = Minecraft.getMinecraft().currentScreen
-        if (gui !is GuiEditSign) return
-        gui as AccessorGuiEditSign
-        gui.tileSign.signText[0] = ChatComponentText(text)
+        if (gui !is AccessorGuiEditSign) return
+        gui.tileSign.signText[line] = ChatComponentText(text)
     }
 
-    fun clickableChat(message: String, command: String) {
-        val text = ChatComponentText(message)
-        text.chatStyle.chatClickEvent = ClickEvent(ClickEvent.Action.RUN_COMMAND, "/${command.removePrefix("/")}")
+    fun addTextIntoSign(addedText: String) {
+        val gui = Minecraft.getMinecraft().currentScreen
+        if (gui !is AccessorGuiEditSign) return
+        val lines = gui.tileSign.signText
+        val index = gui.editLine
+        val text = lines[index].unformattedText + addedText
+        lines[index] = ChatComponentText(text.capAtMinecraftLength(91))
+    }
+
+    /**
+     * Sends a message to the user that they can click and run a command
+     * @param message The message to be sent
+     * @param command The command to be executed when the message is clicked
+     * @param prefix Whether to prefix the message with the chat prefix, default true
+     * @param prefixColor Color that the prefix should be, default yellow (§e)
+     *
+     * @see CHAT_PREFIX
+     */
+    fun clickableChat(message: String, command: String, prefix: Boolean = true, prefixColor: String = "§e") {
+        val msgPrefix = if (prefix) prefixColor + CHAT_PREFIX else ""
+        val text = ChatComponentText(msgPrefix + message)
+        val fullCommand = "/" + command.removePrefix("/")
+        text.chatStyle.chatClickEvent = ClickEvent(ClickEvent.Action.RUN_COMMAND, fullCommand)
         text.chatStyle.chatHoverEvent =
-            HoverEvent(HoverEvent.Action.SHOW_TEXT, ChatComponentText("§eExecute /${command.removePrefix("/")}"))
+            HoverEvent(HoverEvent.Action.SHOW_TEXT, ChatComponentText("§eExecute $fullCommand"))
         Minecraft.getMinecraft().thePlayer.addChatMessage(text)
     }
 
-    fun hoverableChat(message: String, hover: List<String>, command: String? = null) {
-        val text = ChatComponentText(message)
+    /**
+     * Sends a message to the user that they can click and run a command
+     * @param message The message to be sent
+     * @param hover The message to be shown when the message is hovered
+     * @param command The command to be executed when the message is clicked
+     * @param prefix Whether to prefix the message with the chat prefix, default true
+     * @param prefixColor Color that the prefix should be, default yellow (§e)
+     *
+     * @see CHAT_PREFIX
+     */
+    fun hoverableChat(
+        message: String,
+        hover: List<String>,
+        command: String? = null,
+        prefix: Boolean = true,
+        prefixColor: String = "§e"
+    ) {
+        val msgPrefix = if (prefix) prefixColor + CHAT_PREFIX else ""
+        val text = ChatComponentText(msgPrefix + message)
         text.chatStyle.chatHoverEvent =
             HoverEvent(HoverEvent.Action.SHOW_TEXT, ChatComponentText(hover.joinToString("\n")))
 
-        if (command != null) {
-            text.chatStyle.chatClickEvent = ClickEvent(ClickEvent.Action.RUN_COMMAND, "/${command.removePrefix("/")}")
+        command?.let {
+            text.chatStyle.chatClickEvent = ClickEvent(ClickEvent.Action.RUN_COMMAND, "/${it.removePrefix("/")}")
         }
 
         Minecraft.getMinecraft().thePlayer.addChatMessage(text)
@@ -260,16 +367,12 @@ object LorenzUtils {
     }
 
     fun sendMessageToServer(message: String) {
-        if (System.currentTimeMillis() > lastMessageSent + 2_000) {
+        if (System.currentTimeMillis() > lastMessageSent + 1_000) {
             lastMessageSent = System.currentTimeMillis()
             val thePlayer = Minecraft.getMinecraft().thePlayer
             thePlayer.sendChatMessage(message)
         }
     }
-
-    fun isShiftKeyDown() = Keyboard.isKeyDown(Keyboard.KEY_LSHIFT) || Keyboard.isKeyDown(Keyboard.KEY_RSHIFT)
-
-    fun isControlKeyDown() = Keyboard.isKeyDown(Keyboard.KEY_LCONTROL) || Keyboard.isKeyDown(Keyboard.KEY_RCONTROL)
 
     // MoulConfig is in Java, I don't want to downgrade this logic
     fun <T> onChange(vararg properties: Property<out T>, observer: Observer<T>) {
@@ -316,22 +419,29 @@ object LorenzUtils {
         isCurrent: (T) -> Boolean,
         crossinline onChange: (T) -> Unit,
     ) {
-        add(buildList {
-            add(prefix)
-            for (entry in enumValues<T>()) {
-                val display = getName(entry)
-                if (isCurrent(entry)) {
-                    add("§a[$display]")
-                } else {
-                    add("§e[")
-                    add(Renderable.link("§e$display") {
-                        onChange(entry)
-                    })
-                    add("§e]")
-                }
-                add(" ")
+        add(buildSelector<T>(prefix, getName, isCurrent, onChange))
+    }
+
+    inline fun <reified T : Enum<T>> buildSelector(
+        prefix: String,
+        getName: (T) -> String,
+        isCurrent: (T) -> Boolean,
+        crossinline onChange: (T) -> Unit
+    ) = buildList {
+        add(prefix)
+        for (entry in enumValues<T>()) {
+            val display = getName(entry)
+            if (isCurrent(entry)) {
+                add("§a[$display]")
+            } else {
+                add("§e[")
+                add(Renderable.link("§e$display") {
+                    onChange(entry)
+                })
+                add("§e]")
             }
-        })
+            add(" ")
+        }
     }
 
     inline fun MutableList<List<Any>>.addButton(
@@ -387,10 +497,12 @@ object LorenzUtils {
             }
         }
 
-    fun List<String>.nextAfter(after: String, skip: Int = 1): String? {
+    fun List<String>.nextAfter(after: String, skip: Int = 1) = nextAfter({ it == after }, skip)
+
+    fun List<String>.nextAfter(after: (String) -> Boolean, skip: Int = 1): String? {
         var missing = -1
         for (line in this) {
-            if (line == after) {
+            if (after(line)) {
                 missing = skip - 1
                 continue
             }
@@ -413,24 +525,30 @@ object LorenzUtils {
             && tileSign.signText[3].unformattedText.removeColor() == "speed cap!")
     }
 
-    fun inIsland(island: IslandType) = inSkyBlock && skyBlockIsland == island
+    fun IslandType.isInIsland() = inSkyBlock && (skyBlockIsland == this || this == IslandType.CATACOMBS && inDungeons)
 
-    fun IslandType.isInIsland() = inIsland(this)
-
-    fun <K, N : Number> MutableMap<K, N>.addOrPut(item: K, amount: N): N {
-        val old = this[item] ?: 0
-        val new = when (old) {
-            is Double -> old + amount.toDouble()
-            is Float -> old + amount.toFloat()
-            is Long -> old + amount.toLong()
-            else -> old.toInt() + amount.toInt()
-        }
-        @Suppress("UNCHECKED_CAST")
-        this[item] = new as N
-        return new
+    fun <K> MutableMap<K, Int>.addOrPut(key: K, number: Int): Int {
+        val currentValue = this[key] ?: 0
+        val newValue = currentValue + number
+        this[key] = newValue
+        return newValue
     }
 
-    fun <K, N : Number> MutableMap<K, N>.sumAllValues(): Double {
+    fun <K> MutableMap<K, Long>.addOrPut(key: K, number: Long): Long {
+        val currentValue = this[key] ?: 0L
+        val newValue = currentValue + number
+        this[key] = newValue
+        return newValue
+    }
+
+    fun <K> MutableMap<K, Double>.addOrPut(key: K, number: Double): Double {
+        val currentValue = this[key] ?: 0.0
+        val newValue = currentValue + number
+        this[key] = newValue
+        return newValue
+    }
+
+    fun <K, N : Number> Map<K, N>.sumAllValues(): Double {
         if (values.isEmpty()) return 0.0
 
         return when (values.first()) {
@@ -459,7 +577,7 @@ object LorenzUtils {
 
     // Taken and modified from Skytils
     @JvmStatic
-    fun Any.equalsOneOf(vararg other: Any): Boolean {
+    fun <T> T.equalsOneOf(vararg other: T): Boolean {
         for (obj in other) {
             if (this == obj) return true
         }
@@ -473,5 +591,66 @@ object LorenzUtils {
     fun Field.removeFinal(): Field {
         javaClass.getDeclaredField("modifiers").makeAccessible().set(this, modifiers and (Modifier.FINAL.inv()))
         return this
+    }
+
+    fun <T> List<T>.indexOfFirst(vararg args: T) = args.map { indexOf(it) }.firstOrNull { it != -1 }
+
+    private val recalculateDerpy =
+        RecalculatingValue(1.seconds) { MayorElection.isPerkActive("Derpy", "DOUBLE MOBS HP!!!") }
+
+    val isDerpy get() = recalculateDerpy.getValue()
+
+    fun Int.derpy() = if (isDerpy) this / 2 else this
+
+    fun Int.ignoreDerpy() = if (isDerpy) this * 2 else this
+
+    fun runDelayed(duration: Duration, runnable: () -> Unit) {
+        Timer().schedule(object : TimerTask() {
+            override fun run() {
+                runnable()
+            }
+        }, duration.inWholeMilliseconds)
+    }
+
+    val JsonPrimitive.asIntOrNull get() = takeIf { it.isNumber }?.asInt
+
+    fun <T> T.transformIf(condition: T.() -> Boolean, transofmration: T.() -> T) =
+        if (condition()) transofmration(this) else this
+
+    fun <T> T.conditionalTransform(condition: Boolean, ifTrue: T.() -> Any, ifFalse: T.() -> Any) =
+        if (condition) ifTrue(this) else ifFalse(this)
+
+    fun sendTitle(text: String, duration: Duration, height: Double = 1.8) {
+        TitleManager.sendTitle(text, duration, height)
+    }
+
+    @Deprecated("Dont use this approach at all. check with regex or equals instead.", ReplaceWith("Regex or equals"))
+    fun Iterable<String>.anyContains(element: String) = any { it.contains(element) }
+
+    inline fun <reified T : Enum<T>> enumValueOfOrNull(name: String): T? {
+        val enums = enumValues<T>()
+        return enums.firstOrNull { it.name == name }
+    }
+
+    inline fun <reified T : Enum<T>> enumValueOf(name: String) =
+        enumValueOfOrNull<T>(name)
+            ?: kotlin.error("Unknown enum constant for ${enumValues<T>().first().name.javaClass.simpleName}: '$name'")
+
+    fun isInDevEnviromen() = Launch.blackboard["fml.deobfuscatedEnvironment"] as Boolean
+
+    fun shutdownMinecraft(reason: String? = null) {
+        System.err.println("SkyHanni-${SkyHanniMod.version} forced the game to shutdown.")
+        reason?.let {
+            System.err.println("Reason: $it")
+        }
+        FMLCommonHandler.instance().handleExit(-1)
+    }
+
+    /**
+     * Get the group, otherwise, return null
+     * @param groupName The group name in the pattern
+     */
+    fun Matcher.groupOrNull(groupName: String): String? {
+        return runCatching { this.group(groupName) }.getOrNull()
     }
 }

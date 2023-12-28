@@ -9,6 +9,6 @@ enum class CurrentMobArea(val location: String, val coordinates: LorenzVec) {
     SETTLEMENT("Desert Settlement", LorenzVec(184.0, 86.0, -384.0)),
     GLOWING("Glowing Mushroom Cave", LorenzVec(199.0, 50.0, -512.0)),
     MOUNTAIN("Desert Mountain", LorenzVec(255.0, 148.0, -518.0)),
-    FOUND("Mob Location", LorenzVec(0.0, 0.0, 0.0)),
+    FOUND("    ", LorenzVec(0.0, 0.0, 0.0)),
     NONE("   ", LorenzVec(0.0, 0.0, 0.0)),
 }

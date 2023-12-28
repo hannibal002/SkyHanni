@@ -1,6 +1,7 @@
 package at.hannibal2.skyhanni.features.inventory
 
 import at.hannibal2.skyhanni.SkyHanniMod
+import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.events.GuiContainerEvent
 import at.hannibal2.skyhanni.events.RenderItemTipEvent
 import at.hannibal2.skyhanni.utils.InventoryUtils
@@ -16,17 +17,17 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
 class RngMeterInventory {
 
+    private val config get() = SkyHanniMod.feature.inventory.rngMeter
+
     @SubscribeEvent
     fun onRenderItemTip(event: RenderItemTipEvent) {
         val chestName = InventoryUtils.openInventoryName()
 
         val stack = event.stack
-        if (SkyHanniMod.feature.inventory.rngMeterFloorName) {
-            if (chestName == "Catacombs RNG Meter") {
-                val name = stack.name ?: return
-                if (name.removeColor() == "RNG Meter") {
-                    event.stackTip = stack.getLore()[0].between("(", ")")
-                }
+        if (config.floorName && chestName == "Catacombs RNG Meter") {
+            val name = stack.name ?: return
+            if (name.removeColor() == "RNG Meter") {
+                event.stackTip = stack.getLore()[0].between("(", ")")
             }
         }
     }
@@ -36,26 +37,30 @@ class RngMeterInventory {
         if (!LorenzUtils.inSkyBlock) return
 
         val chestName = InventoryUtils.openInventoryName()
-        if (SkyHanniMod.feature.inventory.rngMeterNoDrop) {
-            if (chestName == "Catacombs RNG Meter") {
-                for (slot in InventoryUtils.getItemsInOpenChest()) {
-                    val stack = slot.stack
-                    if (stack.getLore().any { it.contains("You don't have an RNG drop") }) {
-                        slot highlight LorenzColor.RED
-                    }
+        if (config.noDrop && chestName == "Catacombs RNG Meter") {
+            for (slot in InventoryUtils.getItemsInOpenChest()) {
+                val stack = slot.stack
+                if (stack.getLore().any { it.contains("You don't have an RNG drop") }) {
+                    slot highlight LorenzColor.RED
                 }
             }
         }
 
-        if (SkyHanniMod.feature.inventory.rngMeterSelectedDrop) {
-            if (chestName.endsWith(" RNG Meter")) {
-                for (slot in InventoryUtils.getItemsInOpenChest()) {
-                    val stack = slot.stack
-                    if (stack.getLore().any { it.contains("§aSELECTED") }) {
-                        slot highlight LorenzColor.YELLOW
-                    }
+        if (config.selectedDrop && chestName.endsWith(" RNG Meter")) {
+            for (slot in InventoryUtils.getItemsInOpenChest()) {
+                val stack = slot.stack
+                if (stack.getLore().any { it.contains("§a§lSELECTED") }) {
+                    slot highlight LorenzColor.YELLOW
                 }
             }
         }
+    }
+
+    @SubscribeEvent
+    fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
+        event.move(3, "inventory.rngMeterFloorName", "inventory.rngMeter.floorName")
+        event.move(3, "inventory.rngMeterNoDrop", "inventory.rngMeter.noDrop")
+        event.move(3, "inventory.rngMeterSelectedDrop", "inventory.rngMeter.selectedDrop")
+
     }
 }

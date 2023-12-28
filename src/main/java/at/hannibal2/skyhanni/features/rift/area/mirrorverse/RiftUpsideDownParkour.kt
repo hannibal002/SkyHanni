@@ -3,22 +3,22 @@ package at.hannibal2.skyhanni.features.rift.area.mirrorverse
 import at.hannibal2.skyhanni.events.CheckRenderEntityEvent
 import at.hannibal2.skyhanni.events.ConfigLoadEvent
 import at.hannibal2.skyhanni.events.LorenzChatEvent
+import at.hannibal2.skyhanni.events.LorenzRenderWorldEvent
 import at.hannibal2.skyhanni.events.RepositoryReloadEvent
 import at.hannibal2.skyhanni.features.rift.RiftAPI
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils.toChromaColor
 import at.hannibal2.skyhanni.utils.ParkourHelper
-import at.hannibal2.skyhanni.utils.jsonobjects.ParkourJson
-import net.minecraftforge.client.event.RenderWorldLastEvent
+import at.hannibal2.skyhanni.data.jsonobjects.repo.ParkourJson
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
 class RiftUpsideDownParkour {
-    private val config get() = RiftAPI.config.area.mirrorVerseConfig.upsideDownParkour
+    private val config get() = RiftAPI.config.area.mirrorverse.upsideDownParkour
     private var parkourHelper: ParkourHelper? = null
 
     @SubscribeEvent
     fun onRepoReload(event: RepositoryReloadEvent) {
-        val data = event.getConstant<ParkourJson>("RiftUpsideDownParkour") ?: return
+        val data = event.getConstant<ParkourJson>("RiftUpsideDownParkour")
         parkourHelper = ParkourHelper(
             data.locations.map { it.add(-1.0, -1.0, -1.0) },// TODO remove offset. change repo instead
             data.shortCuts,
@@ -66,7 +66,7 @@ class RiftUpsideDownParkour {
     }
 
     @SubscribeEvent
-    fun onRenderWorld(event: RenderWorldLastEvent) {
+    fun onRenderWorld(event: LorenzRenderWorldEvent) {
         if (!isEnabled()) return
 
         parkourHelper?.render(event)

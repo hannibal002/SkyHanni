@@ -14,10 +14,8 @@ class RiftHorsezookaHider {
         if (!RiftAPI.inRift()) return
         if (!SkyHanniMod.feature.rift.horsezookaHider) return
 
-        if (event.entity is EntityHorse) {
-            if (InventoryUtils.itemInHandId.equals("HORSEZOOKA")) {
-                event.isCanceled = true
-            }
+        if (event.entity is EntityHorse && InventoryUtils.itemInHandId.equals("HORSEZOOKA")) {
+            event.isCanceled = true
         }
     }
 }

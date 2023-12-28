@@ -9,25 +9,25 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
 class CompactBestiaryChatMessage {
 
-    var inBestiary = false
-    var bestiaryDescription = mutableListOf<String>()
-    var acceptMoreDescription = true
+    private var inBestiary = false
+    private var bestiaryDescription = mutableListOf<String>()
+    private var acceptMoreDescription = true
     var command = ""
     private var blockedLines = 0
 
-    var lastBorder: IChatComponent? = null
-    var lastEmpty: IChatComponent? = null
+    private var lastBorder: IChatComponent? = null
+    private var lastEmpty: IChatComponent? = null
 
-    var milestoneMessage: String? = null
+    private var milestoneMessage: String? = null
 
-    val milestonePattern = "^.+(§8\\d{1,3}➡§e\\d{1,3})$".toRegex()
+    private val milestonePattern = "^.+(§8\\d{1,3}➡§e\\d{1,3})$".toRegex()
 
     @SubscribeEvent
     fun onChatMessage(event: LorenzChatEvent) {
         if (!LorenzUtils.inSkyBlock) return
         if (!SkyHanniMod.feature.chat.compactBestiaryMessage) return
 
-        val titleMessage = "                                  §6§lBESTIARY"
+        val titleMessage = "§f                                  §6§lBESTIARY"
         val border = "§3§l▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬"
 
         val message = event.message
@@ -54,7 +54,7 @@ class CompactBestiaryChatMessage {
             }
             inBestiary = true
             blockedLines = 0
-            bestiaryDescription.add(message.trim())
+            bestiaryDescription.add(message)
         } else if (inBestiary) {
             event.blockedReason = "bestiary"
             blockedLines++
@@ -65,14 +65,15 @@ class CompactBestiaryChatMessage {
             if (message == border) {
                 inBestiary = false
 
-                val title = bestiaryDescription[1]
-                LorenzUtils.hoverableChat("§6§lBESTIARY §r$title", bestiaryDescription.dropLast(1), command)
+                val list = bestiaryDescription.map { it.replace("§f", "").trim() }
+                val title = list[1]
+                LorenzUtils.hoverableChat("§6§lBESTIARY §r$title", list.dropLast(1), command, false)
                 bestiaryDescription.clear()
                 acceptMoreDescription = true
 
             } else {
                 milestoneMessage?.let {
-                    LorenzUtils.chat("§6§lBESTIARY MILESTONE $it")
+                    LorenzUtils.chat("§6§lBESTIARY MILESTONE $it", false)
                     milestoneMessage = null
                 }
                 milestonePattern.matchEntire(message)?.let {
@@ -80,7 +81,7 @@ class CompactBestiaryChatMessage {
                     milestoneMessage = it.groups[1]!!.value
                 }
                 if (acceptMoreDescription) {
-                    bestiaryDescription.add(message.trim())
+                    bestiaryDescription.add(message)
                 }
             }
         }

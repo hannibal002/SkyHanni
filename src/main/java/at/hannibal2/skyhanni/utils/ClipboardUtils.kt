@@ -1,7 +1,7 @@
 package at.hannibal2.skyhanni.utils
 
 import at.hannibal2.skyhanni.SkyHanniMod
-import at.hannibal2.skyhanni.test.command.CopyErrorCommand
+import at.hannibal2.skyhanni.test.command.ErrorManager
 import kotlinx.coroutines.CompletableDeferred
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -11,14 +11,13 @@ import java.awt.datatransfer.Clipboard
 import java.awt.datatransfer.DataFlavor
 import java.awt.datatransfer.StringSelection
 import java.awt.datatransfer.UnsupportedFlavorException
-import java.util.*
-import kotlin.time.Duration
 import kotlin.time.Duration.Companion.milliseconds
 
 object ClipboardUtils {
+    private var dispatcher = Dispatchers.IO
     private var lastClipboardAccessTime = SimpleTimeMark.farPast()
 
-    private fun canAccessClibpard(): Boolean {
+    private fun canAccessClipboard(): Boolean {
         val result = lastClipboardAccessTime.passedSince() > 10.milliseconds
         if (result) {
             lastClipboardAccessTime = SimpleTimeMark.now()
@@ -26,20 +25,12 @@ object ClipboardUtils {
         return result
     }
 
-    private fun runDelayed(duration: Duration, runnable: () -> Unit) {
-        Timer().schedule(object : TimerTask() {
-            override fun run() {
-                runnable()
-            }
-        }, duration.inWholeMilliseconds)
-    }
-
     private suspend fun getClipboard(): Clipboard? {
         val deferred = CompletableDeferred<Clipboard?>()
-        if (canAccessClibpard()) {
+        if (canAccessClipboard()) {
             deferred.complete(Toolkit.getDefaultToolkit().systemClipboard)
         } else {
-            runDelayed(5.milliseconds) {
+            LorenzUtils.runDelayed(5.milliseconds) {
                 SkyHanniMod.coroutineScope.launch {
                     deferred.complete(getClipboard())
                 }
@@ -54,7 +45,7 @@ object ClipboardUtils {
                 getClipboard()?.setContents(StringSelection(text), null)
             } catch (e: Exception) {
                 if (step == 3) {
-                    CopyErrorCommand.logError(e, "Error while trying to access the clipboard.")
+                    ErrorManager.logError(e, "Error while trying to access the clipboard.")
                 } else {
                     copyToClipboard(text, step + 1)
                 }
@@ -65,7 +56,7 @@ object ClipboardUtils {
     suspend fun readFromClipboard(step: Int = 0): String? {
         try {
             return try {
-                withContext(Dispatchers.IO) {
+                withContext(dispatcher) {
                     getClipboard()?.getData(DataFlavor.stringFlavor)?.toString()
                 }
             } catch (e: UnsupportedFlavorException) {
@@ -73,7 +64,7 @@ object ClipboardUtils {
             }
         } catch (e: Exception) {
             return if (step == 3) {
-                CopyErrorCommand.logError(e, "Error while trying to access the clipboard.")
+                ErrorManager.logError(e, "Error while trying to access the clipboard.")
                 null
             } else {
                 readFromClipboard(step + 1)

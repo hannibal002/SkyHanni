@@ -19,6 +19,7 @@
 
 package at.hannibal2.skyhanni.config.core.config;
 
+import at.hannibal2.skyhanni.SkyHanniMod;
 import com.google.gson.annotations.Expose;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.ScaledResolution;
@@ -29,6 +30,11 @@ public class Position {
     @Expose
     private int y;
     @Expose
+    private float scale = 1F;
+    @Expose
+    private boolean center = false;
+
+    @Expose
     private boolean centerX;
     @Expose
     private boolean centerY;
@@ -38,6 +44,23 @@ public class Position {
 
     public Position(int x, int y) {
         this(x, y, false, false);
+    }
+
+    public Position(int x, int y, float scale) {
+        this.x = x;
+        this.y = y;
+        this.centerX = false;
+        this.centerY = true;
+        this.scale = scale;
+    }
+
+    public Position(int x, int y, float scale, boolean center) {
+        this.x = x;
+        this.y = y;
+        this.centerX = false;
+        this.centerY = true;
+        this.scale = scale;
+        this.center = center;
     }
 
     public Position(int x, int y, boolean centerX, boolean centerY) {
@@ -52,6 +75,25 @@ public class Position {
         this.y = other.y;
         this.centerX = other.centerX;
         this.centerY = other.centerY;
+        this.scale = other.getScale();
+        this.center = other.isCenter();
+    }
+
+    public float getEffectiveScale() {
+        return Math.max(Math.min(getScale() * SkyHanniMod.getFeature().gui.globalScale, 10F), 0.1F);
+    }
+
+    public float getScale() {
+        if (scale == 0) return 1f;
+        return scale;
+    }
+
+    public boolean isCenter() {
+        return center;
+    }
+
+    public void setScale(float newScale) {
+        scale = Math.max(Math.min(10F, newScale), 0.1f);
     }
 
     public int getRawX() {
@@ -73,27 +115,23 @@ public class Position {
     public int getAbsX0(int objWidth) {
         int width = new ScaledResolution(Minecraft.getMinecraft()).getScaledWidth();
 
-        int ret = x;
-        if (x < 0) {
-            ret = width + x - objWidth;
-        }
-
-        if (ret < 0) ret = 0;
-        if (ret > width - objWidth) ret = width - objWidth;
-
-        return ret;
+        return calcAbs0(x, width, objWidth);
     }
 
     public int getAbsY0(int objHeight) {
         int height = new ScaledResolution(Minecraft.getMinecraft()).getScaledHeight();
 
-        int ret = y;
-        if (y < 0) {
-            ret = height + y - objHeight;
+        return calcAbs0(y, height, objHeight);
+    }
+
+    private int calcAbs0(int axis, int length, int objLength) {
+        int ret = axis;
+        if (axis < 0) {
+            ret = length + axis - objLength;
         }
 
         if (ret < 0) ret = 0;
-        if (ret > height - objHeight) ret = height - objHeight;
+        if (ret > length - objLength) ret = length - objLength;
 
         return ret;
     }

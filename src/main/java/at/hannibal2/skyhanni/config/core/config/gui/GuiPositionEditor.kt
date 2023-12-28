@@ -24,7 +24,8 @@ import at.hannibal2.skyhanni.data.GuiEditManager.Companion.getAbsY
 import at.hannibal2.skyhanni.data.GuiEditManager.Companion.getDummySize
 import at.hannibal2.skyhanni.data.OtherInventoryData
 import at.hannibal2.skyhanni.utils.GuiRenderUtils
-import at.hannibal2.skyhanni.utils.LorenzUtils
+import at.hannibal2.skyhanni.utils.KeyboardManager
+import at.hannibal2.skyhanni.utils.LorenzUtils.round
 import net.minecraft.client.Minecraft
 import net.minecraft.client.gui.GuiScreen
 import net.minecraft.client.gui.ScaledResolution
@@ -57,10 +58,8 @@ class GuiPositionEditor(private val positions: List<Position>, private val borde
         GuiRenderUtils.drawStringCentered("§cSkyHanni Position Editor", getScaledWidth() / 2, 8)
 
         var displayPos = -1
-        if (clickedPos != -1) {
-            if (positions[clickedPos].clicked) {
-                displayPos = clickedPos
-            }
+        if (clickedPos != -1 && positions[clickedPos].clicked) {
+            displayPos = clickedPos
         }
         if (displayPos == -1) {
             displayPos = hoveredPos
@@ -86,7 +85,7 @@ class GuiPositionEditor(private val positions: List<Position>, private val borde
         }
 
         val pos = positions[displayPos]
-        val location = "§7x: §e${pos.rawX}§7, y: §e${pos.rawY}"
+        val location = "§7x: §e${pos.rawX}§7, y: §e${pos.rawY}§7, scale: §e${pos.scale.round(2)}"
         GuiRenderUtils.drawStringCentered("§b" + pos.internalName, getScaledWidth() / 2, 18)
         GuiRenderUtils.drawStringCentered(location, getScaledWidth() / 2, 28)
     }
@@ -148,25 +147,24 @@ class GuiPositionEditor(private val positions: List<Position>, private val borde
             val elementHeight = position.getDummySize().y
             val x = position.getAbsX()
             val y = position.getAbsY()
-            if (!position.clicked) {
-                if (GuiRenderUtils.isPointInRect(
+            if (!position.clicked &&
+                GuiRenderUtils.isPointInRect(
 
-                        mouseX,
-                        mouseY,
-                        x - border,
-                        y - border,
-                        elementWidth + border * 2,
-                        elementHeight + border * 2
+                    mouseX,
+                    mouseY,
+                    x - border,
+                    y - border,
+                    elementWidth + border * 2,
+                    elementHeight + border * 2
 
-                    )
+                )
 
-                ) {
-                    clickedPos = i
-                    position.clicked = true
-                    grabbedX = mouseX
-                    grabbedY = mouseY
-                    break
-                }
+            ) {
+                clickedPos = i
+                position.clicked = true
+                grabbedX = mouseX
+                grabbedY = mouseY
+                break
             }
         }
     }
@@ -179,7 +177,7 @@ class GuiPositionEditor(private val positions: List<Position>, private val borde
         val position = positions[clickedPos]
         if (position.clicked) return
 
-        val dist = if (LorenzUtils.isShiftKeyDown()) 10 else 1
+        val dist = if (KeyboardManager.isShiftKeyDown()) 10 else 1
         val elementWidth = position.getDummySize(true).x
         val elementHeight = position.getDummySize(true).y
         when (keyCode) {
@@ -187,6 +185,10 @@ class GuiPositionEditor(private val positions: List<Position>, private val borde
             Keyboard.KEY_UP -> position.moveY(-dist, elementHeight)
             Keyboard.KEY_LEFT -> position.moveX(-dist, elementWidth)
             Keyboard.KEY_RIGHT -> position.moveX(dist, elementWidth)
+            Keyboard.KEY_MINUS -> position.scale -= .1F
+            Keyboard.KEY_EQUALS -> position.scale += .1F
+            Keyboard.KEY_SUBTRACT -> position.scale -= .1F
+            Keyboard.KEY_ADD -> position.scale += .1F
         }
     }
 
@@ -211,5 +213,26 @@ class GuiPositionEditor(private val positions: List<Position>, private val borde
             grabbedX += position.moveX(mouseX - grabbedX, elementWidth)
             grabbedY += position.moveY(mouseY - grabbedY, elementHeight)
         }
+    }
+
+    override fun handleMouseInput() {
+        super.handleMouseInput()
+        val mw = Mouse.getEventDWheel()
+        if (mw == 0) return
+        val mx = Mouse.getEventX() * width / mc.displayWidth
+        val my = height - Mouse.getEventY() * height / mc.displayHeight - 1
+        val hovered = positions.firstOrNull { it.clicked }
+            ?: positions.lastOrNull {
+                val size = it.getDummySize()
+                GuiRenderUtils.isPointInRect(
+                    mx, my,
+                    it.getAbsX() - border, it.getAbsY() - border,
+                    size.x + border * 2, size.y + border * 2
+                )
+            } ?: return
+        if (mw < 0)
+            hovered.scale -= .1F
+        else
+            hovered.scale += .1F
     }
 }

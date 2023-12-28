@@ -8,45 +8,46 @@ import at.hannibal2.skyhanni.features.garden.FarmingFortuneDisplay
 import at.hannibal2.skyhanni.features.garden.GardenAPI
 import at.hannibal2.skyhanni.features.garden.GardenAPI.getCropType
 import at.hannibal2.skyhanni.utils.InventoryUtils
-import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName_old
+import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName
+import at.hannibal2.skyhanni.utils.ItemUtils.getItemRarityOrNull
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.NumberUtil.romanToDecimal
-import at.hannibal2.skyhanni.utils.NumberUtil.romanToDecimalIfNeeded
+import at.hannibal2.skyhanni.utils.NumberUtil.romanToDecimalIfNecessary
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getEnchantments
 import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.TabListData
-import net.minecraft.client.Minecraft
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import kotlin.math.round
+import kotlin.time.Duration.Companion.days
 
 class CaptureFarmingGear {
-    private val farmingItems get() = GardenAPI.config?.fortune?.farmingItems
-    private val outdatedItems get() = GardenAPI.config?.fortune?.outdatedItems
+    private val farmingItems get() = GardenAPI.storage?.fortune?.farmingItems
+    private val outdatedItems get() = GardenAPI.storage?.fortune?.outdatedItems
 
+    // TODO USE SH-REPO
     private val farmingLevelUpPattern = "SKILL LEVEL UP Farming .*➜(?<level>.*)".toPattern()
     private val fortuneUpgradePattern = "You claimed the Garden Farming Fortune (?<level>.*) upgrade!".toPattern()
     private val anitaBuffPattern = "You tiered up the Extra Farming Drops upgrade to [+](?<level>.*)%!".toPattern()
-    private val anitaMenuPattern = "You have: [+](?<level>.*)%".toPattern()
+    private val anitaMenuPattern = "§7You have: §6\\+(?<level>.*)☘ Farming Fortune".toPattern()
 
     private val lotusUpgradePattern = "Lotus (?<piece>.*) upgraded to [+].*☘!".toPattern()
     private val petLevelUpPattern = "Your (?<pet>.*) leveled up to level .*!".toPattern()
 
+    private val cakePattern = "(?:Big )?Yum! You (?:gain|refresh) [+]5☘ Farming Fortune for 48 hours!".toPattern()
+
     companion object {
         private val strengthPattern = " Strength: §r§c❁(?<strength>.*)".toPattern()
-        private val farmingSets = arrayListOf("FERMENTO", "SQUASH", "CROPIE", "MELON", "FARM",
-            "RANCHERS", "FARMER", "RABBIT")
-        private val farmingItems get() = GardenAPI.config?.fortune?.farmingItems
+        private val farmingSets = arrayListOf(
+            "FERMENTO", "SQUASH", "CROPIE", "MELON", "FARM",
+            "RANCHERS", "FARMER", "RABBIT"
+        )
+        private val farmingItems get() = GardenAPI.storage?.fortune?.farmingItems
 
         fun captureFarmingGear() {
             val farmingItems = farmingItems ?: return
-            val resultList = mutableListOf<String>()
-
-            val itemStack = Minecraft.getMinecraft().thePlayer.inventory.getCurrentItem() ?: return
-            val itemID = itemStack.getInternalName_old()
-            resultList.add(itemStack.displayName.toString())
-            resultList.add(itemID)
+            val itemStack = InventoryUtils.getItemInHand() ?: return
 
             val currentCrop = itemStack.getCropType()
 
@@ -62,7 +63,7 @@ class CaptureFarmingGear {
             }
             for (armor in InventoryUtils.getArmor()) {
                 if (armor == null) continue
-                val split = armor.getInternalName_old().split("_")
+                val split = armor.getInternalName().asString().split("_")
                 if (split.first() in farmingSets) {
                     for (item in FarmingItems.entries) {
                         if (item.name == split.last()) {
@@ -73,9 +74,21 @@ class CaptureFarmingGear {
             }
             for (line in TabListData.getTabList()) {
                 strengthPattern.matchMatcher(line) {
-                    GardenAPI.config?.fortune?.farmingStrength = group("strength").toInt()
+                    GardenAPI.storage?.fortune?.farmingStrength = group("strength").toInt()
                 }
             }
+        }
+
+        fun reverseCarrotFortune() {
+            val storage = GardenAPI.storage?.fortune ?: return
+            storage.carrotFortune = !storage.carrotFortune
+            LorenzUtils.chat("Toggled exportable carrot fortune to: ${storage.carrotFortune}")
+        }
+
+        fun reversePumpkinFortune() {
+            val storage = GardenAPI.storage?.fortune ?: return
+            storage.pumpkinFortune = !storage.pumpkinFortune
+            LorenzUtils.chat("Toggled expired pumpkin fortune to: ${storage.pumpkinFortune}")
         }
     }
 
@@ -87,12 +100,12 @@ class CaptureFarmingGear {
     @SubscribeEvent
     fun onInventoryOpen(event: InventoryFullyOpenedEvent) {
         if (!LorenzUtils.inSkyBlock) return
-        val hidden = GardenAPI.config?.fortune ?: return
+        val storage = GardenAPI.storage?.fortune ?: return
         val farmingItems = farmingItems ?: return
         val outdatedItems = outdatedItems ?: return
         if (event.inventoryName == "Your Equipment and Stats") {
             for ((_, slot) in event.inventoryItems) {
-                val split = slot.getInternalName_old().split("_")
+                val split = slot.getInternalName().asString().split("_")
                 if (split.first() == "LOTUS") {
                     for (item in FarmingItems.entries) {
                         if (item.name == split.last()) {
@@ -103,41 +116,53 @@ class CaptureFarmingGear {
                     FarmingFortuneDisplay.loadFortuneLineData(slot, 0.0)
                     val enchantments = slot.getEnchantments() ?: emptyMap()
                     val greenThumbLvl = (enchantments["green_thumb"] ?: continue)
-                    GardenAPI.config?.uniqueVisitors = round(FarmingFortuneDisplay.greenThumbFortune / (greenThumbLvl * 0.05)).toInt()
+                    val visitors = FarmingFortuneDisplay.greenThumbFortune / (greenThumbLvl * 0.05)
+                    GardenAPI.storage?.uniqueVisitors = round(visitors).toInt()
                 }
             }
         }
         if (event.inventoryName.contains("Pets")) {
             // If they've 2 of same pet, one will be overwritten
-            farmingItems[FarmingItems.ELEPHANT] = FFGuideGUI.getFallbackItem(FarmingItems.ELEPHANT)
-            farmingItems[FarmingItems.MOOSHROOM_COW] = FFGuideGUI.getFallbackItem(FarmingItems.MOOSHROOM_COW)
-            farmingItems[FarmingItems.RABBIT] = FFGuideGUI.getFallbackItem(FarmingItems.RABBIT)
-            var highestElephantLvl = -1
-            var highestMooshroomLvl = -1
-            var highestRabbitLvl = -1
+            // optimize
+
+            for (pet in listOf(
+                FarmingItems.ELEPHANT,
+                FarmingItems.MOOSHROOM_COW,
+                FarmingItems.RABBIT,
+                FarmingItems.BEE
+            )) {
+                if (farmingItems[pet] == null) {
+                    farmingItems[pet] = FFGuideGUI.getFallbackItem(pet)
+                }
+            }
+
+            // setting to current saved level -1 to stop later pages saving low rarity pets
+            var highestElephantRarity = (farmingItems[FarmingItems.ELEPHANT]?.getItemRarityOrNull()?.id ?: -1) - 1
+            var highestMooshroomRarity = (farmingItems[FarmingItems.MOOSHROOM_COW]?.getItemRarityOrNull()?.id ?: -1) - 1
+            var highestRabbitRarity = (farmingItems[FarmingItems.RABBIT]?.getItemRarityOrNull()?.id ?: -1) - 1
+            var highestBeeRarity = (farmingItems[FarmingItems.BEE]?.getItemRarityOrNull()?.id ?: -1) - 1
 
             for ((_, item) in event.inventoryItems) {
-                val split = item.getInternalName_old().split(";")
-                if (split.first() == "ELEPHANT") {
-                    if (split.last().toInt() > highestElephantLvl) {
-                        farmingItems[FarmingItems.ELEPHANT] = item
-                        outdatedItems[FarmingItems.ELEPHANT] = false
-                        highestElephantLvl = split.last().toInt()
-                    }
+                val split = item.getInternalName().asString().split(";")
+                if (split.first() == "ELEPHANT" && split.last().toInt() > highestElephantRarity) {
+                    farmingItems[FarmingItems.ELEPHANT] = item
+                    outdatedItems[FarmingItems.ELEPHANT] = false
+                    highestElephantRarity = split.last().toInt()
                 }
-                if (split.first() == "MOOSHROOM_COW") {
-                    if (split.last().toInt() > highestMooshroomLvl) {
-                        farmingItems[FarmingItems.MOOSHROOM_COW] = item
-                        outdatedItems[FarmingItems.MOOSHROOM_COW] = false
-                        highestMooshroomLvl = split.last().toInt()
-                    }
+                if (split.first() == "MOOSHROOM_COW" && split.last().toInt() > highestMooshroomRarity) {
+                    farmingItems[FarmingItems.MOOSHROOM_COW] = item
+                    outdatedItems[FarmingItems.MOOSHROOM_COW] = false
+                    highestMooshroomRarity = split.last().toInt()
                 }
-                if (split.first() == "RABBIT") {
-                    if (split.last().toInt() > highestRabbitLvl) {
-                        farmingItems[FarmingItems.RABBIT] = item
-                        outdatedItems[FarmingItems.RABBIT] = false
-                        highestRabbitLvl = split.last().toInt()
-                    }
+                if (split.first() == "RABBIT" && split.last().toInt() > highestRabbitRarity) {
+                    farmingItems[FarmingItems.RABBIT] = item
+                    outdatedItems[FarmingItems.RABBIT] = false
+                    highestRabbitRarity = split.last().toInt()
+                }
+                if (split.first() == "BEE" && split.last().toInt() > highestBeeRarity) {
+                    farmingItems[FarmingItems.BEE] = item
+                    outdatedItems[FarmingItems.BEE] = false
+                    highestBeeRarity = split.last().toInt()
                 }
             }
         }
@@ -145,7 +170,7 @@ class CaptureFarmingGear {
         if (event.inventoryName.contains("Your Skills")) {
             for ((_, item) in event.inventoryItems) {
                 if (item.displayName.contains("Farming ")) {
-                    hidden.farmingLevel = item.displayName.split(" ").last().romanToDecimalIfNeeded()
+                    storage.farmingLevel = item.displayName.split(" ").last().romanToDecimalIfNecessary()
                 }
             }
         }
@@ -169,24 +194,24 @@ class CaptureFarmingGear {
                     plotsUnlocked -= 1
                 }
             }
-            hidden.plotsUnlocked = plotsUnlocked
+            storage.plotsUnlocked = plotsUnlocked
         }
         if (event.inventoryName.contains("Anita")) {
             var level = -1
             for ((_, item) in event.inventoryItems) {
-                if (item.displayName.contains("Extra Farming Drops")) {
+                if (item.displayName.contains("Extra Farming Fortune")) {
                     level = 0
                     for (line in item.getLore()) {
-                        anitaMenuPattern.matchMatcher(line.removeColor()) {
-                            level = group("level").toInt() / 2
+                        anitaMenuPattern.matchMatcher(line) {
+                            level = group("level").toInt() / 4
                         }
                     }
                 }
             }
             if (level == -1) {
-                hidden.anitaUpgrade = 15
+                storage.anitaUpgrade = 15
             } else {
-                hidden.anitaUpgrade = level
+                storage.anitaUpgrade = level
             }
         }
     }
@@ -194,17 +219,17 @@ class CaptureFarmingGear {
     @SubscribeEvent
     fun onChat(event: LorenzChatEvent) {
         if (!LorenzUtils.inSkyBlock) return
-        val hidden = GardenAPI.config?.fortune ?: return
+        val storage = GardenAPI.storage?.fortune ?: return
         val outdatedItems = outdatedItems ?: return
         val msg = event.message.removeColor().trim()
         fortuneUpgradePattern.matchMatcher(msg) {
             ProfileStorageData.playerSpecific?.gardenCommunityUpgrade = group("level").romanToDecimal()
         }
         farmingLevelUpPattern.matchMatcher(msg) {
-            hidden.farmingLevel = group("level").romanToDecimalIfNeeded()
+            storage.farmingLevel = group("level").romanToDecimalIfNecessary()
         }
         anitaBuffPattern.matchMatcher(msg) {
-            hidden.anitaUpgrade = group("level").toInt() / 2
+            storage.anitaUpgrade = group("level").toInt() / 4
         }
         lotusUpgradePattern.matchMatcher(msg) {
             val piece = group("piece").uppercase()
@@ -215,18 +240,21 @@ class CaptureFarmingGear {
             }
         }
         petLevelUpPattern.matchMatcher(msg) {
-            val pet = group("pet").uppercase()
+            val pet = group("pet").uppercase().replace("✦", "").trim().replace(" ", "_")
             for (item in FarmingItems.entries) {
                 if (item.name.contains(pet)) {
                     outdatedItems[item] = true
                 }
             }
         }
-        if (msg == "Yum! You gain +5☘ Farming Fortune for 48 hours!") {
-            hidden.cakeExpiring = System.currentTimeMillis() + 172800000
+        cakePattern.matchMatcher(msg) {
+            storage.cakeExpiring = System.currentTimeMillis() + 2.days.inWholeMilliseconds
         }
         if (msg == "CARROTS EXPORTATION COMPLETE!") {
-            hidden.carrotFortune = true
+            storage.carrotFortune = true
+        }
+        if (msg == "PUMPKINS EXPORTATION COMPLETE!") {
+            storage.pumpkinFortune = true
         }
     }
 }

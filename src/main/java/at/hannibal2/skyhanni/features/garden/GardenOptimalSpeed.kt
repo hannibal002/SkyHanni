@@ -1,7 +1,6 @@
 package at.hannibal2.skyhanni.features.garden
 
-import at.hannibal2.skyhanni.SkyHanniMod
-import at.hannibal2.skyhanni.data.TitleUtils
+import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.events.GardenToolChangeEvent
 import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.TabListUpdateEvent
@@ -16,10 +15,11 @@ import net.minecraft.client.gui.inventory.GuiEditSign
 import net.minecraftforge.client.event.GuiOpenEvent
 import net.minecraftforge.client.event.GuiScreenEvent.DrawScreenEvent
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
+import kotlin.time.Duration.Companion.seconds
 
 class GardenOptimalSpeed {
-    private val config get() = SkyHanniMod.feature.garden
-    private val configCustomSpeed get() = config.optimalSpeedCustom
+    private val config get() = GardenAPI.config.optimalSpeeds
+    private val configCustomSpeed get() = config.customSpeed
     private var currentSpeed = 100
     private var optimalSpeed = -1
     private val currentSpeedPattern = " Speed: §r§f✦(?<speed>.*)".toPattern()
@@ -51,7 +51,7 @@ class GardenOptimalSpeed {
         val gui = event.gui
         if (gui !is GuiEditSign) return
         if (!gui.isRancherSign()) return
-        config.optimalSpeedSignPosition.renderStringsAndItems(
+        config.signPosition.renderStringsAndItems(
             rancherOverlayList,
             posLabel = "Optimal Speed Rancher Overlay"
         )
@@ -60,9 +60,7 @@ class GardenOptimalSpeed {
     @SubscribeEvent
     fun onGardenToolChange(event: GardenToolChangeEvent) {
         cropInHand = event.crop
-        if (isEnabled()) {
-            optimalSpeed = cropInHand.let { it?.getOptimalSpeed() ?: -1 }
-        }
+        optimalSpeed = cropInHand.let { it?.getOptimalSpeed() ?: -1 }
     }
 
     private fun CropType.getOptimalSpeed() = when (this) {
@@ -70,8 +68,8 @@ class GardenOptimalSpeed {
         CropType.CARROT -> configCustomSpeed.carrot
         CropType.POTATO -> configCustomSpeed.potato
         CropType.NETHER_WART -> configCustomSpeed.netherWart
-        CropType.PUMPKIN ->  configCustomSpeed.pumpkin
-        CropType.MELON ->  configCustomSpeed.melon
+        CropType.PUMPKIN -> configCustomSpeed.pumpkin
+        CropType.MELON -> configCustomSpeed.melon
         CropType.COCOA_BEANS -> configCustomSpeed.cocoaBeans
         CropType.SUGAR_CANE -> configCustomSpeed.sugarCane
         CropType.CACTUS -> configCustomSpeed.cactus
@@ -79,33 +77,55 @@ class GardenOptimalSpeed {
     }
 
     @SubscribeEvent
-    fun onRenderOverlay(event: GuiRenderEvent.GameOverlayRenderEvent) {
-        if (!isEnabled()) return
+    fun onRenderOverlay(event: GuiRenderEvent.GuiOverlayRenderEvent) {
+        if (!GardenAPI.inGarden()) return
 
         if (optimalSpeed == -1) return
 
+        if (GardenAPI.hideExtraGuis()) return
+
         val text = "Optimal Speed: §f$optimalSpeed"
         if (optimalSpeed != currentSpeed) {
-            config.optimalSpeedPos.renderString("§c$text", posLabel = "Garden Optimal Speed")
-             warn()
+            if (config.showOnHUD) config.pos.renderString("§c$text", posLabel = "Garden Optimal Speed")
+            warn()
         } else {
-            config.optimalSpeedPos.renderString("§a$text", posLabel = "Garden Optimal Speed")
+            if (config.showOnHUD) config.pos.renderString("§a$text", posLabel = "Garden Optimal Speed")
         }
     }
 
     private fun warn() {
-        if (!config.optimalSpeedWarning) return
+        if (!config.warning) return
         if (!Minecraft.getMinecraft().thePlayer.onGround) return
         if (GardenAPI.onBarnPlot) return
         if (System.currentTimeMillis() < lastWarnTime + 20_000) return
 
         lastWarnTime = System.currentTimeMillis()
-        TitleUtils.sendTitle("§cWrong speed!", 3_000)
+        LorenzUtils.sendTitle("§cWrong speed!", 3.seconds)
         cropInHand?.let {
-            LorenzUtils.chat("§e[SkyHanni] Wrong speed for ${it.cropName}: §f$currentSpeed §e(§f$optimalSpeed §eis optimal)")
+            LorenzUtils.chat("Wrong speed for ${it.cropName}: §f$currentSpeed §e(§f$optimalSpeed §eis optimal)")
         }
     }
 
-    private fun isRancherOverlayEnabled() = GardenAPI.inGarden() && config.optimalSpeedSignEnabled
-    private fun isEnabled() = GardenAPI.inGarden() && config.optimalSpeedEnabled
+    private fun isRancherOverlayEnabled() = GardenAPI.inGarden() && config.signEnabled
+
+    @SubscribeEvent
+    fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
+        event.move(3, "garden.optimalSpeedEnabled", "garden.optimalSpeeds.enabled")
+        event.move(3, "garden.optimalSpeedWarning", "garden.optimalSpeeds.warning")
+        event.move(3, "garden.optimalSpeedSignEnabled", "garden.optimalSpeeds.signEnabled")
+        event.move(3, "garden.optimalSpeedSignPosition", "garden.optimalSpeeds.signPosition")
+        event.move(3, "garden.optimalSpeedPos", "garden.optimalSpeeds.pos")
+        event.move(3, "garden.optimalSpeedCustom.wheat", "garden.optimalSpeeds.customSpeed.wheat")
+        event.move(3, "garden.optimalSpeedCustom.carrot", "garden.optimalSpeeds.customSpeed.carrot")
+        event.move(3, "garden.optimalSpeedCustom.potato", "garden.optimalSpeeds.customSpeed.potato")
+        event.move(3, "garden.optimalSpeedCustom.netherWart", "garden.optimalSpeeds.customSpeed.netherWart")
+        event.move(3, "garden.optimalSpeedCustom.pumpkin", "garden.optimalSpeeds.customSpeed.pumpkin")
+        event.move(3, "garden.optimalSpeedCustom.melon", "garden.optimalSpeeds.customSpeed.melon")
+        event.move(3, "garden.optimalSpeedCustom.cocoaBeans", "garden.optimalSpeeds.customSpeed.cocoaBeans")
+        event.move(3, "garden.optimalSpeedCustom.sugarCane", "garden.optimalSpeeds.customSpeed.sugarCane")
+        event.move(3, "garden.optimalSpeedCustom.cactus", "garden.optimalSpeeds.customSpeed.cactus")
+        event.move(3, "garden.optimalSpeedCustom.mushroom", "garden.optimalSpeeds.customSpeed.mushroom")
+
+        event.move(14, "garden.optimalSpeeds.enabled", "garden.optimalSpeeds.showOnHUD")
+    }
 }
