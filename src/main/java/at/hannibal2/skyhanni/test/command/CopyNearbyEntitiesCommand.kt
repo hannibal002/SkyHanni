@@ -24,6 +24,7 @@ import net.minecraft.entity.Entity
 import net.minecraft.entity.EntityLivingBase
 import net.minecraft.entity.item.EntityArmorStand
 import net.minecraft.entity.item.EntityItem
+import net.minecraft.entity.monster.EntityCreeper
 import net.minecraft.entity.monster.EntityEnderman
 import net.minecraft.entity.monster.EntityMagmaCube
 import net.minecraft.entity.player.EntityPlayer
@@ -146,6 +147,16 @@ object CopyNearbyEntitiesCommand {
 
                         val skinTexture = entity.getSkinTexture()
                         resultList.add("-  skin texture: $skinTexture")
+                    }
+
+                    is EntityCreeper -> {
+                        resultList.add("EntityCreeper:")
+                        val creeperState = entity.creeperState
+                        val ignite = entity.hasIgnited()
+                        val powered = entity.powered
+                        resultList.add("-  creeperState: '$creeperState'")
+                        resultList.add("-  ignite: '$ignite'")
+                        resultList.add("-  powered: '$powered'")
                     }
                 }
                 resultList.add("")
