@@ -258,6 +258,13 @@ object MobFilter {
                 else -> null
             }
 
+            IslandType.KUUDRA_ARENA -> when {
+                baseEntity is EntityMagmaCube && nextEntity is EntityMagmaCube -> MobResult.illegal
+                baseEntity is EntityZombie && nextEntity is EntityZombie -> MobResult.illegal
+                baseEntity is EntityZombie && nextEntity is EntityGiantZombie -> MobResult.illegal
+                else -> null
+            }
+
             else -> null
         }
     }
