@@ -134,7 +134,6 @@ class JacobContestStatsSummary {
                 LorenzUtils.chat("Started tracking your Jacob Contest Blocks Per Second!")
                 startTime = System.currentTimeMillis()
                 startTimeIntoContest = ((startTime % 3600000) - 900000) / 1000
-                LorenzUtils.chat("starttime: $startTime intocontest: $startTimeIntoContest")
             }
 
             FarmingContestPhase.STOP -> {
