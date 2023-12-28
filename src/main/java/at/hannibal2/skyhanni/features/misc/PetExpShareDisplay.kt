@@ -15,7 +15,7 @@ class PetExpShareDisplay {
         if (!LorenzUtils.inSkyBlock || stack.stackSize != 1) return
         if (!SkyHanniMod.feature.misc.pets.expShare) return
 
-        val petCandyUsed = stack.getPetItem() ?: return
+        val petItem = stack.getPetItem() ?: return
         if (petCandyUsed != "PET_ITEM_EXP_SHARE") return
 
         val stackTip = "§5⚘"
