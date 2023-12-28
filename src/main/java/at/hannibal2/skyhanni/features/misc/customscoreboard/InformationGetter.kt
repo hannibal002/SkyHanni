@@ -44,12 +44,6 @@ object InformationGetter {
             "§6Spooky Festival§f",
             "§dNew Year Event",
             "Nearby Players:",
-            "§4Broodmother§7:",
-            "§7Give Tasty Mithril to Don!",
-            "Remaining: §a",
-            "Your Tasty Mithr",
-            "Points: ",
-            "Challenge:",
             "Pelts: §5",
             "Tracker Mob Location:",
             "Time Left: §b",
@@ -95,6 +89,9 @@ object InformationGetter {
         unknownLines = unknownLines.filter { !ScoreboardPattern.raffleUselessPattern.matches(it) }
         unknownLines = unknownLines.filter { !ScoreboardPattern.raffleTicketsPattern.matches(it) }
         unknownLines = unknownLines.filter { !ScoreboardPattern.rafflePool.matches(it) }
+        unknownLines = unknownLines.filter { !ScoreboardPattern.mithrilUselessPattern.matches(it) }
+        unknownLines = unknownLines.filter { !ScoreboardPattern.mithrilRemainingPattern.matches(it) }
+        unknownLines = unknownLines.filter { !ScoreboardPattern.mithrilYourMithrilPattern.matches(it) }
         unknownLines = unknownLines.filter { !ScoreboardPattern.magmaBossPattern.matches(it) }
         unknownLines = unknownLines.filter { !ScoreboardPattern.damageSoakedPattern.matches(it) }
         unknownLines = unknownLines.filter { !ScoreboardPattern.damagedSoakedBarPattern.matches(it) }
@@ -110,6 +107,10 @@ object InformationGetter {
         unknownLines = unknownLines.filter { !ScoreboardPattern.brokenRedstonePattern.matches(it) }
         unknownLines = unknownLines.filter { !ScoreboardPattern.visitingPattern.matches(it) }
         unknownLines = unknownLines.filter { !ScoreboardPattern.flightDurationPattern.matches(it) }
+        unknownLines = unknownLines.filter { !ScoreboardPattern.dojoChallengePattern.matches(it) }
+        unknownLines = unknownLines.filter { !ScoreboardPattern.dojoDifficultyPattern.matches(it) }
+        unknownLines = unknownLines.filter { !ScoreboardPattern.dojoPointsPattern.matches(it) }
+        unknownLines = unknownLines.filter { !ScoreboardPattern.dojoTimePattern.matches(it) }
         unknownLines = unknownLines.filter { !ScoreboardPattern.travelingZooPattern.matches(it) }
         unknownLines = unknownLines.filter { !ScoreboardPattern.riftDimensionPattern.matches(it) }
         unknownLines = unknownLines.filter { !RiftBloodEffigies.heartsPattern.matches(it) }

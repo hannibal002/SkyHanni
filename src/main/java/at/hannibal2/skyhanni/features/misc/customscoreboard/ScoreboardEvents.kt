@@ -235,19 +235,16 @@ private fun getKuudraShowWhen(): Boolean {
 private fun getDojoLines(): List<String> {
     val list = mutableListOf<String>()
 
-    if (getSbLines().any { it.startsWith("Challenge: ") }) {
-        list += getSbLines().first { it.startsWith("Challenge: ") }
-    }
-
-    if (getSbLines().any { it.startsWith("Points: ") }) {
-        list += getSbLines().first { it.startsWith("Points: ") }
-    }
+    list += getSbLines().first { SbPattern.dojoChallengePattern.matches(it) }
+    list += getSbLines().first { SbPattern.dojoDifficultyPattern.matches(it) }
+    list += getSbLines().first { SbPattern.dojoPointsPattern.matches(it) }
+    list += getSbLines().first { SbPattern.dojoTimePattern.matches(it) }
 
     return list
 }
 
 private fun getDojoShowWhen(): Boolean {
-    return getSbLines().any { it.startsWith("Challenge: ") }
+    return getSbLines().any { ScoreboardPattern.dojoChallengePattern.matches(it) }
 }
 
 private fun getDarkAuctionLines(): List<String> {
@@ -444,7 +441,7 @@ private fun getMiningEventsLines(): List<String> {
         list += (" " + getSbLines().firstOrNull { it.startsWith("Nearby Players:") })
     }
 
-    // Zone ScoreboardEvents
+    // Zone Events
     if (
         getSbLines().any { ScoreboardPattern.miningEventPattern.matches(it) }
         && getSbLines().any { ScoreboardPattern.miningEventZonePattern.matches(it) }
@@ -455,29 +452,32 @@ private fun getMiningEventsLines(): List<String> {
             .removePrefix("Zone: ")
     }
 
+    // Zone Events but no Zone Line
+    if (
+        getSbLines().any { ScoreboardPattern.miningEventPattern.matches(it) }
+        && getSbLines().none { ScoreboardPattern.miningEventZonePattern.matches(it) }
+    ) {
+        list += getSbLines().first { ScoreboardPattern.miningEventPattern.matches(it) }
+            .removePrefix("Event: ")
+    }
+
     // Mithril Gourmand
-    if (getSbLines().any { it.startsWith("Remaining: §a") } && getSbLines().any {
-            it.startsWith(
-                "Your Tasty Mithril: §c"
-            )
-        }) {
-        list += "§6Mithril Gourmand"
-        list += getSbLines().firstOrNull { it.startsWith("Remaining: §a") }
-            ?: "<hidden>"
-        list += getSbLines().firstOrNull { it.startsWith("Your Tasty Mithril: §c") }
-            ?: "<hidden>"
+    if (
+        getSbLines().any { ScoreboardPattern.mithrilRemainingPattern.matches(it) }
+        && getSbLines().any { ScoreboardPattern.mithrilYourMithrilPattern.matches(it) }
+    ) {
+        list += getSbLines().first { ScoreboardPattern.mithrilRemainingPattern.matches(it) }
+        list += getSbLines().first { ScoreboardPattern.mithrilYourMithrilPattern.matches(it) }
     }
 
     // raffle
     if (getSbLines().any { ScoreboardPattern.raffleTicketsPattern.matches(it) && ScoreboardPattern.rafflePool.matches(it) }) {
-        list += "§6Raffle"
         list += getSbLines().first { ScoreboardPattern.raffleTicketsPattern.matches(it) }
         list += getSbLines().first { ScoreboardPattern.rafflePool.matches(it) }
     }
 
     // raid
     if (getSbLines().any { it.startsWith("Remaining: §a") && it.endsWith("goblins") }) {
-        list += "§cGoblin Raid"
         list += getSbLines().firstOrNull { it.startsWith("Remaining: §a") }
             ?: "<hidden>"
         list += getSbLines().firstOrNull { it.startsWith("Your kills: §c") }
