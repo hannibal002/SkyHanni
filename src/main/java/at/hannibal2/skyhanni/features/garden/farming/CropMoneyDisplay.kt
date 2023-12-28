@@ -398,7 +398,7 @@ object CropMoneyDisplay {
 
         SkyHanniMod.coroutineScope.launch {
             val map = mutableMapOf<NEUInternalName, Int>()
-            for ((rawInternalName, _) in NEUItems.manager.itemInformation) {
+            for ((rawInternalName, _) in NEUItems.allNeuRepoItems()) {
                 if (rawInternalName == "ENCHANTED_PAPER") continue
                 if (rawInternalName == "ENCHANTED_BREAD") continue
                 if (rawInternalName == "SIMPLE_CARROT_CANDY") continue
@@ -441,7 +441,7 @@ object CropMoneyDisplay {
         event.move(3, "garden.moneyPerHourDicer", "garden.moneyPerHours.dicer")
         event.move(3, "garden.moneyPerHourHideTitle", "garden.moneyPerHours.hideTitle")
         event.move(3, "garden.moneyPerHourPos", "garden.moneyPerHours.pos")
-        event.move(11, "garden.moneyPerHours.customFormat") { element ->
+        event.transform(11, "garden.moneyPerHours.customFormat") { element ->
             ConfigUtils.migrateIntArrayListToEnumArrayList(element, CustomFormatEntry::class.java)
         }
     }

@@ -6,20 +6,14 @@ import io.github.moulberry.notenoughupdates.util.SkyBlockTime
 import java.time.LocalDate
 import java.time.ZoneId
 import kotlin.time.Duration
+import kotlin.time.Duration.Companion.minutes
+import kotlin.time.Duration.Companion.seconds
 import kotlin.time.DurationUnit
 import kotlin.time.toDuration
 
 object TimeUtils {
     private val pattern =
         "(?:(?<y>\\d+) ?y(?:\\w* ?)?)?(?:(?<d>\\d+) ?d(?:\\w* ?)?)?(?:(?<h>\\d+) ?h(?:\\w* ?)?)?(?:(?<m>\\d+) ?m(?:\\w* ?)?)?(?:(?<s>\\d+) ?s(?:\\w* ?)?)?".toPattern()
-
-    fun formatDuration(
-        duration: Duration,
-        biggestUnit: TimeUnit = TimeUnit.YEAR,
-        showMilliSeconds: Boolean = false,
-        longName: Boolean = false,
-        maxUnits: Int = -1
-    ): String = duration.format(biggestUnit, showMilliSeconds, longName, maxUnits)
 
     fun Duration.format(
         biggestUnit: TimeUnit = TimeUnit.YEAR,
@@ -29,6 +23,13 @@ object TimeUtils {
     ): String = formatDuration(
         inWholeMilliseconds - 999, biggestUnit, showMilliSeconds, longName, maxUnits
     )
+
+    fun Duration.timerColor(default: String = "§f") = when (this) {
+        in 0.seconds..60.seconds -> "§c"
+        in 60.seconds..3.minutes -> "§6"
+        in 3.minutes..10.minutes -> "§e"
+        else -> default
+    }
 
     fun formatDuration(
         millis: Long,

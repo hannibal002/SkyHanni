@@ -129,9 +129,11 @@ class GardenVisitorTimer {
             if (isSixthVisitorEnabled() && millis.isNegative()) {
                 visitorsAmount++
                 if (!sixthVisitorReady) {
-                    LorenzUtils.sendTitle("§a6th Visitor Ready", 5.seconds)
                     sixthVisitorReady = true
-                    if (isSixthVisitorWarningEnabled()) SoundUtils.playBeepSound()
+                    if (isSixthVisitorWarningEnabled()) {
+                        LorenzUtils.sendTitle("§a6th Visitor Ready", 5.seconds)
+                        SoundUtils.playBeepSound()
+                    }
                 }
             }
         }
@@ -160,15 +162,14 @@ class GardenVisitorTimer {
         }
 
         val extraSpeed = if (diff in 2.seconds..10.seconds) {
-            val factor = diff.inWholeSeconds.toDouble()
-            val duration = millis / factor
+            val duration = millis / 3
             "§7/§$formatColor" + duration.format()
         } else ""
         if (config.newVisitorPing && millis < 10.seconds) {
             SoundUtils.playBeepSound()
         }
 
-        val formatDuration = TimeUtils.formatDuration(millis)
+        val formatDuration = millis.format()
         val next = if (queueFull && (!isSixthVisitorEnabled() || millis.isNegative())) "§cQueue Full!" else {
             "Next in §$formatColor$formatDuration$extraSpeed"
         }

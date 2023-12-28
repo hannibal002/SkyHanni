@@ -6,12 +6,12 @@ import com.google.gson.annotations.Expose;
 import io.github.moulberry.moulconfig.annotations.ConfigEditorBoolean;
 import io.github.moulberry.moulconfig.annotations.ConfigOption;
 
-public class FarmingArmorDropsConfig {
+public class ArmorDropTrackerConfig {
     @Expose
-    @ConfigOption(name = "Show Counter", desc = "Count all §9Cropie§7, §5Squash §7and §6Fermento §7dropped.")
+    @ConfigOption(name = "Enabled", desc = "Track all §9Cropie§7, §5Squash §7and §6Fermento §7dropped.")
     @ConfigEditorBoolean
     @FeatureToggle
-    public boolean enabled = true;
+    public boolean enabled = false;
 
     @Expose
     @ConfigOption(name = "Hide Chat", desc = "Hide the chat message when receiving a farming armor drop.")

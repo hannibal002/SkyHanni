@@ -1,6 +1,7 @@
 package at.hannibal2.skyhanni.config.features.garden.cropmilestones;
 
 import at.hannibal2.skyhanni.config.FeatureToggle;
+import at.hannibal2.skyhanni.config.HasLegacyId;
 import at.hannibal2.skyhanni.config.core.config.Position;
 import com.google.gson.annotations.Expose;
 import io.github.moulberry.moulconfig.annotations.ConfigEditorBoolean;
@@ -12,17 +13,45 @@ import io.github.moulberry.moulconfig.annotations.ConfigOption;
 public class NextConfig {
     @Expose
     @ConfigOption(
-        name = "Best Display",
+        name = "Best Crop Time",
         desc = "Lists all crops and their ETA till next milestone. Sorts for best crop for getting garden or SkyBlock levels.")
     @ConfigEditorBoolean
     @FeatureToggle
-    public boolean bestDisplay = true;
+    public boolean bestDisplay = false;
 
     // TODO moulconfig runnable support
     @Expose
     @ConfigOption(name = "Sort Type", desc = "Sort the crops by either garden or SkyBlock EXP.")
-    @ConfigEditorDropdown(values = {"Garden Exp", "SkyBlock Exp"})
-    public int bestType = 0;
+    @ConfigEditorDropdown()
+    public BestTypeEntry bestType = BestTypeEntry.GARDEN_EXP;
+
+    public enum BestTypeEntry implements HasLegacyId {
+        GARDEN_EXP("Garden Exp", 0),
+        SKYBLOCK_EXP("SkyBlock Exp", 1),
+        ;
+        private final String str;
+        private final int legacyId;
+
+        BestTypeEntry(String str, int legacyId) {
+            this.str = str;
+            this.legacyId = legacyId;
+        }
+
+        // Constructor if new enum elements are added post-migration
+        BestTypeEntry(String str) {
+            this(str, -1);
+        }
+
+        @Override
+        public int getLegacyId() {
+            return legacyId;
+        }
+
+        @Override
+        public String toString() {
+            return str;
+        }
+    }
 
     // TODO moulconfig runnable support
     @Expose

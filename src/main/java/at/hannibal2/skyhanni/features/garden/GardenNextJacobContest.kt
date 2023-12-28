@@ -3,6 +3,7 @@ package at.hannibal2.skyhanni.features.garden
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.config.ConfigFileType
 import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
+import at.hannibal2.skyhanni.config.features.garden.NextJacobContestConfig.ShareContestsEntry
 import at.hannibal2.skyhanni.events.ConfigLoadEvent
 import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.InventoryCloseEvent
@@ -11,6 +12,7 @@ import at.hannibal2.skyhanni.events.LorenzTickEvent
 import at.hannibal2.skyhanni.events.TabListUpdateEvent
 import at.hannibal2.skyhanni.features.garden.GardenAPI.addCropIcon
 import at.hannibal2.skyhanni.utils.APIUtil
+import at.hannibal2.skyhanni.utils.ConfigUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.ItemUtils.name
 import at.hannibal2.skyhanni.utils.LorenzUtils
@@ -18,11 +20,12 @@ import at.hannibal2.skyhanni.utils.RenderUtils.renderSingleLineWithItems
 import at.hannibal2.skyhanni.utils.RenderUtils.renderStrings
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.SimpleTimeMark.Companion.asTimeMark
+import at.hannibal2.skyhanni.utils.SimpleTimeMark.Companion.now
 import at.hannibal2.skyhanni.utils.SoundUtils
 import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.TabListData
-import at.hannibal2.skyhanni.utils.TimeUtils
+import at.hannibal2.skyhanni.utils.TimeUtils.format
 import com.google.gson.Gson
 import io.github.moulberry.notenoughupdates.util.SkyBlockTime
 import kotlinx.coroutines.Dispatchers
@@ -57,7 +60,7 @@ object GardenNextJacobContest {
     private const val maxContestsPerYear = 124
     private val contestDuration = 20.minutes
 
-    private var lastWarningTime = 0L
+    private var lastWarningTime = SimpleTimeMark.farPast()
     private var loadedContestsYear = -1
     private var nextContestsAvailableAt = -1L
 
@@ -238,7 +241,7 @@ object GardenNextJacobContest {
     fun shareContestConfirmed(array: Array<String>) {
         if (array.size == 1) {
             if (array[0] == "enable") {
-                config.shareAutomatically = 1
+                config.shareAutomatically = ShareContestsEntry.AUTO
                 SkyHanniMod.feature.storage.contestSendingAsked = true
                 LorenzUtils.chat("§2Enabled automatic sharing of future contests!")
             }
@@ -247,7 +250,7 @@ object GardenNextJacobContest {
         if (contests.size == maxContestsPerYear) {
             sendContests()
         }
-        if (!SkyHanniMod.feature.storage.contestSendingAsked && config.shareAutomatically == 0) {
+        if (!SkyHanniMod.feature.storage.contestSendingAsked && config.shareAutomatically == ShareContestsEntry.ASK) {
             LorenzUtils.clickableChat(
                 "§2Click here to automatically share future contests!",
                 "shsendcontests enable"
@@ -326,19 +329,22 @@ object GardenNextJacobContest {
 
         val boostedCrop = calculateBoostedCrop(nextContest)
 
-        if (duration < contestDuration) {
+        val activeContest = duration < contestDuration
+        if (activeContest) {
             list.add("§aActive: ")
         } else {
             list.add("§eNext: ")
             duration -= contestDuration
-            warn(duration, nextContest.crops, boostedCrop)
         }
         for (crop in nextContest.crops) {
             list.add(" ")
             list.addCropIcon(crop, highlight = (crop == boostedCrop))
             nextContestCrops.add(crop)
         }
-        val format = TimeUtils.formatDuration(duration)
+        if (!activeContest) {
+            warn(duration, nextContest.crops, boostedCrop)
+        }
+        val format = duration.format()
         list.add("§7(§b$format§7)")
 
         return list
@@ -363,16 +369,18 @@ object GardenNextJacobContest {
         if (config.warnTime.seconds <= duration) return
         if (!warnForCrop()) return
 
-        if (System.currentTimeMillis() < lastWarningTime) return
-        lastWarningTime = System.currentTimeMillis() + 60_000 * 40
+        // Check that it only gets called once for the current event
+        if (lastWarningTime.passedSince() < config.warnTime.seconds) return
 
+        lastWarningTime = now()
         val cropText = crops.joinToString("§7, ") { (if (it == boostedCrop) "§6" else "§a") + it.cropName }
         LorenzUtils.chat("Next farming contest: $cropText")
         LorenzUtils.sendTitle("§eFarming Contest!", 5.seconds)
         SoundUtils.playBeepSound()
 
         val cropTextNoColor = crops.joinToString(", ") {
-            if (it == boostedCrop) "<b>${it.cropName}</b>" else it.cropName }
+            if (it == boostedCrop) "<b>${it.cropName}</b>" else it.cropName
+        }
         if (config.warnPopup && !Display.isActive()) {
             SkyHanniMod.coroutineScope.launch {
                 openPopupWindow(
@@ -451,9 +459,11 @@ object GardenNextJacobContest {
         && (GardenAPI.inGarden() || config.everywhere)
 
     private fun isFetchEnabled() = isEnabled() && config.fetchAutomatically
-    private fun isSendEnabled() = isFetchEnabled() && config.shareAutomatically != 2 // 2 = Disabled
+    private fun isSendEnabled() =
+        isFetchEnabled() && config.shareAutomatically != ShareContestsEntry.DISABLED
+
     private fun askToSendContests() =
-        config.shareAutomatically == 0 // 0 = Ask, 1 = Send (Only call if isSendEnabled())
+        config.shareAutomatically == ShareContestsEntry.ASK // (Only call if isSendEnabled())
 
     private fun fetchContestsIfAble() {
         if (isFetchingContests || contests.size == maxContestsPerYear || !isFetchEnabled()) return
@@ -564,5 +574,9 @@ object GardenNextJacobContest {
         event.move(3, "garden.nextJacobContestWarnTime", "garden.nextJacobContests.warnTime")
         event.move(3, "garden.nextJacobContestWarnPopup", "garden.nextJacobContests.warnPopup")
         event.move(3, "garden.nextJacobContestPos", "garden.nextJacobContests.pos")
+
+        event.transform(15, "garden.nextJacobContests.shareAutomatically") { element ->
+            ConfigUtils.migrateIntToEnum(element, ShareContestsEntry::class.java)
+        }
     }
 }
