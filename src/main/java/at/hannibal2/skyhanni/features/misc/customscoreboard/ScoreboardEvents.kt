@@ -50,7 +50,7 @@ enum class ScoreboardEvents(private val displayLine: Supplier<List<String>>, pri
         ::getDojoLines,
         ::getDojoShowWhen
     ),
-    DARK_AUCTION( // this will get an update once the darkauction islandtype pr is merged
+    DARK_AUCTION( // This will use regex once PR #823 is merged
         ::getDarkAuctionLines,
         ::getDarkAuctionShowWhen
     ),
