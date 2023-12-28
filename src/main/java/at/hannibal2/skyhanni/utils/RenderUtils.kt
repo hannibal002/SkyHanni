@@ -7,8 +7,10 @@ import at.hannibal2.skyhanni.data.GuiEditManager.Companion.getAbsY
 import at.hannibal2.skyhanni.events.GuiRenderItemEvent
 import at.hannibal2.skyhanni.events.LorenzRenderWorldEvent
 import at.hannibal2.skyhanni.test.command.ErrorManager
+import at.hannibal2.skyhanni.features.misc.RoundedRectangleShader
 import at.hannibal2.skyhanni.utils.LorenzUtils.addAsSingletonList
 import at.hannibal2.skyhanni.utils.renderables.Renderable
+import at.hannibal2.skyhanni.utils.shader.ShaderManager
 import io.github.moulberry.moulconfig.internal.TextRenderUtils
 import io.github.moulberry.notenoughupdates.util.Utils
 import net.minecraft.client.Minecraft
@@ -26,6 +28,8 @@ import net.minecraft.util.MathHelper
 import net.minecraft.util.ResourceLocation
 import org.lwjgl.opengl.GL11
 import java.awt.Color
+import net.minecraft.client.gui.ScaledResolution
+import org.lwjgl.input.Keyboard
 import kotlin.math.cos
 import kotlin.math.sin
 import kotlin.math.sqrt
@@ -1117,5 +1121,33 @@ object RenderUtils {
 
         GlStateManager.enableLighting()
         GlStateManager.enableDepth()
+    }
+
+    /**
+     * Method to draw a rounded rectangle.
+     *
+     * @param color color of rect
+     * @param radius the radius of the corners (default 10)
+     * @param smoothness how smooth the corners will appear (default 2)
+     */
+    fun drawRoundRect(x: Int, y: Int, width: Int, height: Int, color: Int, radius: Int = 10, smoothness: Int = 2) {
+        val scaledRes = ScaledResolution(Minecraft.getMinecraft())
+        val widthIn = width * scaledRes.scaleFactor
+        val heightIn = height * scaledRes.scaleFactor
+        val xIn = x * scaledRes.scaleFactor
+        val yIn = y * scaledRes.scaleFactor
+
+        RoundedRectangleShader.radius = radius.toFloat()
+        RoundedRectangleShader.smoothness = smoothness.toFloat()
+        RoundedRectangleShader.halfSize = floatArrayOf(widthIn / 2f, heightIn / 2f)
+        RoundedRectangleShader.centerPos = floatArrayOf(xIn + (widthIn / 2f), yIn + (heightIn / 2f))
+
+        GlStateManager.pushMatrix()
+        ShaderManager.enableShader("rounded_rect")
+
+        Gui.drawRect(x, y, x + widthIn, y + heightIn, color)
+
+        ShaderManager.disableShader()
+        GlStateManager.popMatrix()
     }
 }
