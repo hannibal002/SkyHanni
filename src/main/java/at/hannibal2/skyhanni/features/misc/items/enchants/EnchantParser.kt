@@ -17,7 +17,7 @@ import com.google.gson.reflect.TypeToken
 import java.io.File
 import java.io.FileInputStream
 import java.io.InputStreamReader
-import java.util.*
+import java.util.TreeSet
 import java.util.regex.Pattern
 import net.minecraft.event.HoverEvent
 import net.minecraft.item.ItemStack
