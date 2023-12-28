@@ -23,13 +23,14 @@ import kotlin.time.Duration.Companion.seconds
 class DragonFeatures {
 
     val config get() = SkyHanniMod.configManager.features.combat.dragon
+    val configProtector get() = SkyHanniMod.configManager.features.combat.endstoneProtectorChat
 
     val dragonNames = listOf("Protector", "Old", "Wise", "Unstable", "Young", "Strong", "Superior")
 
     val dragonNamesAsRegex = dragonNames.joinToString("|")
     val dragonNamesUpperCaseAsRegex = dragonNames.joinToString("|") { it.uppercase() }
 
-    val repoGroup = RepoPattern.group("combat.dragon")
+    val repoGroup = RepoPattern.group("combat.boss.dragon")
     val chatGroup = repoGroup.group("chat")
     val scoreBoardGroup = repoGroup.group("scoreboard")
     val tabListGroup = repoGroup.group("tablist")
@@ -38,11 +39,13 @@ class DragonFeatures {
     val eyeRemoved by chatGroup.pattern("eye.removed.you", "§5You recovered a Summoning Eye!")
 
     val eggSpawned by chatGroup.pattern("egg.spawn", "§5☬ §r§dThe Dragon Egg has spawned!")
-    val endStartLine by chatGroup.pattern("end.boss", "§f +§r§6§l(?<Dragon>${dragonNamesUpperCaseAsRegex}) DRAGON DOWN!")
+    val endStartLineDragon by chatGroup.pattern("end.boss", "§f +§r§6§l(?<Dragon>${dragonNamesUpperCaseAsRegex}) DRAGON DOWN!")
+    val endStartLineProtector by RepoPattern.pattern("combat.boss.protector.chat.end.boss", "§f +§r§6§l ENDSTONE PROTECTOR DOWN!")
     val endPosition by chatGroup.pattern("end.position", "§f +§r§eYour Damage: §r§a(?<Damage>[\\d.,]+) (?:§r§d§l\\(NEW RECORD!\\) )?§r§7\\(Position #(?<Position>\\d+)\\)")
 
     // val endFinalHit by chatGroup.pattern("end.final", "§f                 §r§b[^ ]+ (?<Name>.*)§r§f §r§7dealt the final blow.")
-    val endPlace by chatGroup.pattern("end.place", "§f +§r§.§l(?<Position>\\d+).. Damager §r§7- §r§.(?:\\[[^ ]+\\] )?(?<Name>.*)§r§. §r§7- §r§e(?<Damage>[\\d.,]+)")
+    val endLeaderboard by chatGroup.pattern("end.place", "§f +§r§.§l(?<Position>\\d+).. Damager §r§7- §r§.(?:\\[[^ ]+\\] )?(?<Name>.*)§r§. §r§7- §r§e(?<Damage>[\\d.,]+)")
+    val endZealots by RepoPattern.pattern("combat.boss.protector.chat.end.zealot", "§f +§r§eZealots Contributed: §r§a(?<Amount>\\d+)§r§e/100")
     val dragonSpawn by chatGroup.pattern("spawn", "§5☬ §r§d§lThe §r§5§c§l(?<Dragon>${dragonNamesAsRegex}) Dragon§r§d§l has spawned!")
     val scoreDamage by scoreBoardGroup.pattern("damage", "Your Damage: §c(?<Damage>[\\w,.]+)")
     val scoreDragon by scoreBoardGroup.pattern("dragon", "Dragon HP: .*")
@@ -60,8 +63,14 @@ class DragonFeatures {
             }
         }
 
-    var endText = false
+    private enum class Type {
+        golem, dragon
+    }
+
+    private var endType: Type? = null
     var endTopDamage = 0.0
+    var endDamage = 0.0
+    var endPlace = 0
 
     var currentDamage = 0.0
     var currentTopDamage = 0.0
@@ -69,9 +78,15 @@ class DragonFeatures {
     var egg = true
 
 
-    fun reset() {
-        endText = false
+    fun resetEnd() {
+        endType = null
         endTopDamage = 0.0
+        endDamage = 0.0
+        endPlace = 0
+    }
+
+    fun reset() {
+        resetEnd()
         dragonSpawned = false
         currentTopDamage = 0.0
         currentDamage = 0.0
@@ -83,7 +98,7 @@ class DragonFeatures {
 
     fun enableDisplay() = enable() && config.display
 
-    fun weightMap(place: Int) = when (place) {
+    fun dragonWeightMap(place: Int) = when (place) {
         -1 -> 10
         1 -> 300
         2 -> 250
@@ -96,16 +111,33 @@ class DragonFeatures {
         else -> 70
     }
 
-    fun calculateWeight(eyes: Int, place: Int, firstDamage: Double, yourDamage: Double) =
-        weightMap(if (yourDamage == 0.0) -1 else place) + 100 * (eyes + yourDamage / (firstDamage.takeIf { it != 0.0 }
+    fun protectorWeightMap(place: Int) = when (place) {
+        -1 -> 10
+        1 -> 200
+        2 -> 175
+        3 -> 150
+        4 -> 125
+        5 -> 110
+        6, 7, 8 -> 100
+        9, 10 -> 90
+        11, 12 -> 80
+        else -> 70
+    }
+
+    fun calculateDragonWeight(eyes: Int, place: Int, firstDamage: Double, yourDamage: Double) =
+        dragonWeightMap(if (yourDamage == 0.0) -1 else place) + 100 * (eyes + yourDamage / (firstDamage.takeIf { it != 0.0 }
             ?: 1.0))
+
+    fun calculateProtectorWeight(zealots: Int, place: Int, firstDamage: Double, yourDamage: Double) =
+        protectorWeightMap(if (yourDamage == 0.0) -1 else place) + 50 * (yourDamage / (firstDamage.takeIf { it != 0.0 }
+            ?: 1.0)) + if (zealots > 100) 100 else zealots
 
 
     @SubscribeEvent
     fun onChat(event: LorenzChatEvent) {
         if (!enable()) return
         val message = event.message
-        if (!config.chat && !config.display && !config.superiorNotify) return
+        if (!config.chat && !config.display && !config.superiorNotify && !configProtector) return
         dragonSpawn.matchMatcher(message) {
             dragonSpawned = true
             if (config.superiorNotify && this.group("Dragon") == "Superior") {
@@ -113,7 +145,7 @@ class DragonFeatures {
             }
             return
         }
-        if (!config.chat && !config.display) return
+        if (!config.chat && !config.display && !configProtector) return
         when {
             eyePlaced.matches(message) -> {
                 yourEyes++
@@ -127,32 +159,63 @@ class DragonFeatures {
                 egg = true
             }
 
-            endStartLine.matches(message) -> {
-                endText = true
+            endStartLineDragon.matches(message) -> {
+                if (!config.chat) {
+                    reset()
+                    return
+                }
+                endType = Type.dragon
+            }
+
+            endStartLineProtector.matches(message) -> {
+                if (!configProtector) return
+                endType = Type.golem
             }
 
             else -> {
-                endPlace.matchMatcher(message) {
-                    if (!endText) return@matchMatcher
+                endLeaderboard.matchMatcher(message) {
+                    if (endType == null) return@matchMatcher
                     if (this.group("Position") != "1") return@matchMatcher
                     endTopDamage = this.group("Damage").replace(",", "").toDouble()
                     return
                 }
                 endPosition.matchMatcher(message) {
-                    if (!endText) return@matchMatcher
-                    val weight = calculateWeight(
-                        yourEyes, this.group("Position")?.toInt()
-                        ?: -1, endTopDamage, this.group("Damage").replace(",", "").toDouble()
-                    )
-                    if (config.chat) {
-                        LorenzUtils.chat("§f                §r§eYour Weight: §r§a${formatDouble(weight)}")
+                    if (endType == null) return@matchMatcher
+                    endPlace = this.group("Position")?.toInt() ?: -1
+                    endDamage = this.group("Damage").replace(",", "").toDouble()
+                    when (endType) {
+                        Type.dragon -> {
+                            val weight = calculateDragonWeight(
+                                yourEyes, endPlace, endTopDamage, endDamage
+                            )
+
+                            printWeight(weight)
+                            reset()
+                        }
+
+                        Type.golem -> {
+
+                            // NO reset because of Zealot Line
+                        }
+
+                        null -> return@matchMatcher
                     }
-                    reset()
                     return
+                }
+                endZealots.matchMatcher(message) {
+                    if (endType != Type.golem) return@matchMatcher
+                    val zealots = this.group("Amount").toInt()
+                    val weight = calculateProtectorWeight(zealots, endPlace, endTopDamage, endDamage)
+                    printWeight(weight)
+                    resetEnd()
                 }
             }
         }
 
+    }
+
+    private fun printWeight(weight: Double) {
+        LorenzUtils.chat("§f                §r§eYour Weight: §r§a${formatDouble(weight)}")
     }
 
     @SubscribeEvent
@@ -197,7 +260,7 @@ class DragonFeatures {
     @SubscribeEvent
     fun onRender(event: GuiRenderEvent) {
         if (!(enableDisplay() && dragonSpawned)) return
-        config.displayPosition.renderRenderables(listOf(Renderable.hoverTips("§6Current Weight: §f${formatDouble(calculateWeight(yourEyes, currentPlace ?: 6, currentTopDamage, currentDamage))}", listOf("Eyes: $yourEyes", "Place: ${currentPlace ?: if (currentDamage != 0.0) "unknown, assuming 6th" else "not damaged yet"}", "Damage Ratio: ${formatPercentage(currentDamage / (currentTopDamage.takeIf { it != 0.0 } ?: 1.0))}%"))), posLabel = "Dragon Weight")
+        config.displayPosition.renderRenderables(listOf(Renderable.hoverTips("§6Current Weight: §f${formatDouble(calculateDragonWeight(yourEyes, currentPlace ?: 6, currentTopDamage, currentDamage))}", listOf("Eyes: $yourEyes", "Place: ${currentPlace ?: if (currentDamage != 0.0) "unknown, assuming 6th" else "not damaged yet"}", "Damage Ratio: ${formatPercentage(currentDamage / (currentTopDamage.takeIf { it != 0.0 } ?: 1.0))}%"))), posLabel = "Dragon Weight")
     }
 
     @SubscribeEvent
