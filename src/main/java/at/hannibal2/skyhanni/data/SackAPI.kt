@@ -7,6 +7,7 @@ import at.hannibal2.skyhanni.events.InventoryCloseEvent
 import at.hannibal2.skyhanni.events.InventoryFullyOpenedEvent
 import at.hannibal2.skyhanni.events.LorenzChatEvent
 import at.hannibal2.skyhanni.events.SackChangeEvent
+import at.hannibal2.skyhanni.events.SackDataUpdateEvent
 import at.hannibal2.skyhanni.features.fishing.FishingAPI
 import at.hannibal2.skyhanni.features.fishing.trophy.TrophyRarity
 import at.hannibal2.skyhanni.features.inventory.SackDisplay
@@ -300,6 +301,8 @@ object SackAPI {
     private fun saveSackData() {
         ProfileStorageData.sackProfiles?.sackContents = sackData
         SkyHanniMod.configManager.saveConfig(ConfigFileType.SACKS, "saving-data")
+
+        SackDataUpdateEvent().postAndCatch()
     }
 
     data class SackGemstone(
