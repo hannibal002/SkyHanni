@@ -289,20 +289,24 @@ private fun getJacobMedalsShowWhen(): Boolean {
 private fun getTrapperLines(): List<String> {
     val list = mutableListOf<String>()
 
-    if (getSbLines().any { it.startsWith("Pelts: §5") }) {
-        list += getSbLines().firstOrNull { it.startsWith("Pelts: §5") }
-            ?: "<hidden>"
-    }
-    if (getSbLines().any { it == "Tracker Mob Location:" }) {
+    list += getSbLines().first { SbPattern.peltsPattern.matches(it) }
+
+    if (getSbLines().any { SbPattern.mobLocationPattern.matches(it) }) {
         list += "Tracker Mob Location:"
-        list += getSbLines().nextAfter("Tracker Mob Location:") ?: "<hidden>"
+        list += getSbLines().nextAfter(ScoreboardData.sidebarLinesFormatted.first {
+            ScoreboardPattern.mobLocationPattern.matches(it)
+        }) ?: "<hidden>"
     }
 
     return list
 }
 
 private fun getTrapperShowWhen(): Boolean {
-    return getSbLines().any { it.startsWith("Pelts: §5") || it == "Tracker Mob Location:" }
+    return getSbLines().any {
+        ScoreboardPattern.peltsPattern.matches(it) || ScoreboardPattern.mobLocationPattern.matches(
+            it
+        )
+    }
 }
 
 private fun getGardenCleanUpLines(): List<String> {
@@ -471,9 +475,13 @@ private fun getMiningEventsLines(): List<String> {
     }
 
     // raffle
-    if (getSbLines().any { ScoreboardPattern.raffleTicketsPattern.matches(it) && ScoreboardPattern.rafflePool.matches(it) }) {
+    if (getSbLines().any {
+            ScoreboardPattern.raffleTicketsPattern.matches(it) && ScoreboardPattern.rafflePoolPattern.matches(
+                it
+            )
+        }) {
         list += getSbLines().first { ScoreboardPattern.raffleTicketsPattern.matches(it) }
-        list += getSbLines().first { ScoreboardPattern.rafflePool.matches(it) }
+        list += getSbLines().first { ScoreboardPattern.rafflePoolPattern.matches(it) }
     }
 
     // raid

@@ -41,6 +41,8 @@ object ScoreboardPattern {
     val lockedPattern by farmingSb.pattern("locked", "^\\s*§cLocked$")
     val cleanUpPattern by farmingSb.pattern("cleanup", "^\\s*§fCleanup§7: \\d{1,3}%$")
     val pastingPattern by farmingSb.pattern("pasting", "^\\s*§f(Barn )?Pasting§7: §e\\d{1,3}(\\.\\d)?%$")
+    val peltsPattern by farmingSb.pattern("pelts", "^(§.)*Pelts: (§.)*(?<pelts>[\\d,]+)( (§.)*\\([+-](?<diff>[\\w,.]+)\\))?\$")
+    val mobLocationPattern by farmingSb.pattern("moblocation", "^(§.)*Tracker Mob Location:")
     // mining
     private val miningSb = scoreboardGroup.group("mining")
     val powderPattern by miningSb.pattern("powder", "§[2d]᠅ §f(Gemstone|Mithril)( Powder)?§f: §[2d](,?\\d{1,3})*$")
@@ -50,7 +52,7 @@ object ScoreboardPattern {
     val miningEventZonePattern by miningSb.pattern("miningeventzone", "^Zone: §.*$")
     val raffleUselessPattern by miningSb.pattern("raffleuseless", "^(Find tickets on the|ground and bring them|to the raffle box)$")
     val raffleTicketsPattern by miningSb.pattern("raffletickets", "^Tickets: §a\\d{1,3} §7\\(\\d{1,3}\\.\\d%\\)$")
-    val rafflePool by miningSb.pattern("rafflepool", "^Pool: §6\\d{1,3}§8/500$")
+    val rafflePoolPattern by miningSb.pattern("rafflepool", "^Pool: §6\\d{1,3}§8/500$")
     val mithrilUselessPattern by miningSb.pattern("mithriluseless", "^§7Give Tasty Mithril to Don!$")
     val mithrilRemainingPattern by miningSb.pattern("mithrilremaining", "^Remaining: §a(\\d{1,3} Tasty Mithril|FULL)$")
     val mithrilYourMithrilPattern by miningSb.pattern("mithrilyourmithril", "^Your Tasty Mithril: §c\\d{1,3}( §a\\(\\+\\d{1,3}\\))?$")
