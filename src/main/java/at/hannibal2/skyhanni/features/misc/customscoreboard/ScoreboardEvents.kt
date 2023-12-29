@@ -436,9 +436,9 @@ private fun getMiningEventsLines(): List<String> {
     }
 
     // Better Together
-    if (getSbLines().any { it.startsWith("Nearby Players:") }) {
+    if (getSbLines().any { ScoreboardPattern.nearbyPlayersPattern.matches(it) }) {
         list += "§9Better Together"
-        list += (" " + getSbLines().firstOrNull { it.startsWith("Nearby Players:") })
+        list += (" " + getSbLines().first { ScoreboardPattern.nearbyPlayersPattern.matches(it) })
     }
 
     // Zone Events
