@@ -167,7 +167,7 @@ private fun getBitsDisplayPair(): List<Pair<String, AlignmentEnum>> {
         informationFilteringConfig.hideEmptyLines && bits == "0" -> listOf("<hidden>")
         displayConfig.displayNumbersFirst -> {
             val bitsText = if (displayConfig.showUnclaimedBits) {
-                "§b$bits§7/${if (BitsAPI.bitsToClaim == 0) "§10" else "§b${BitsAPI.bitsToClaim.addSeparators()}"} §bBits"
+                "§b$bits§7/${if (BitsAPI.bitsToClaim == 0) "§90" else "§b${BitsAPI.bitsToClaim.addSeparators()}"} §bBits"
             } else {
                 "§b$bits Bits"
             }
@@ -176,7 +176,7 @@ private fun getBitsDisplayPair(): List<Pair<String, AlignmentEnum>> {
 
         else -> {
             val bitsText = if (displayConfig.showUnclaimedBits) {
-                "Bits: §b$bits§7/${if (BitsAPI.bitsToClaim == 0) "§10" else "§b${BitsAPI.bitsToClaim.addSeparators()}"}"
+                "Bits: §b$bits§7/${if (BitsAPI.bitsToClaim == 0) "§90" else "§b${BitsAPI.bitsToClaim.addSeparators()}"}"
             } else {
                 "Bits: §b$bits"
             }
