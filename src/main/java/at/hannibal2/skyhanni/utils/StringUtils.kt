@@ -1,12 +1,13 @@
 package at.hannibal2.skyhanni.utils
 
+import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.mixins.transformers.AccessorChatComponentText
 import at.hannibal2.skyhanni.utils.GuiRenderUtils.darkenColor
+import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import net.minecraft.client.Minecraft
 import net.minecraft.client.gui.GuiUtilRenderComponents
 import net.minecraft.util.ChatComponentText
 import net.minecraft.util.IChatComponent
-import org.intellij.lang.annotations.Language
 import java.util.Base64
 import java.util.NavigableMap
 import java.util.UUID
@@ -15,12 +16,16 @@ import java.util.regex.Matcher
 import java.util.regex.Pattern
 
 object StringUtils {
-    private val playerChatPattern = ".*§[f7]: .*".toPattern()
-    private val chatUsernamePattern = "^(?:\\[\\d+] )?(?:\\S )?(?:\\[\\w.+] )?(?<username>\\w+)(?: \\[.+?])?\$".toPattern()
+    // TODO USE SH-REPO
+    private val playerChatPattern = "(?<important>.*?)(?:§[f7r])*: .*".toPattern()
+    private val chatUsernamePattern =
+        "^(?:§\\w\\[§\\w\\d+§\\w] )?(?:(?:§\\w)+\\S )?(?<rankedName>(?:§\\w\\[\\w.+] )?(?:§\\w)?(?<username>\\w+))(?: (?:§\\w)?\\[.+?])?".toPattern()
     private val whiteSpaceResetPattern = "^(?:\\s|§r)*|(?:\\s|§r)*$".toPattern()
+    private val whiteSpacePattern = "^\\s*|\\s*$".toPattern()
     private val resetPattern = "(?i)§R".toPattern()
 
     fun String.trimWhiteSpaceAndResets(): String = whiteSpaceResetPattern.matcher(this).replaceAll("")
+    fun String.trimWhiteSpace(): String = whiteSpacePattern.matcher(this).replaceAll("")
     fun String.removeResets(): String = resetPattern.matcher(this).replaceAll("")
 
     fun String.firstLetterUppercase(): String {
@@ -31,14 +36,24 @@ object StringUtils {
         return first + lowercase.substring(1)
     }
 
-    fun String.removeColor(): String {
+    private val formattingChars by lazy { "kmolnr".toCharArray() + "kmolnr".uppercase().toCharArray() }
+
+    /**
+     * Removes color and optionally formatting codes from the given string, leaving plain text.
+     *
+     * @param keepFormatting Boolean indicating whether to retain non-color formatting codes (default: false).
+     * @return A string with color codes removed (and optionally formatting codes if specified).
+     */
+    fun String.removeColor(keepFormatting: Boolean = false): String {
         val builder = StringBuilder(this.length)
 
         var counter = 0
         while (counter < this.length) {
             if (this[counter] == '§') {
-                counter += 2
-                continue
+                if (!keepFormatting || this[counter + 1] !in formattingChars) {
+                    counter += 2
+                    continue
+                }
             }
             builder.append(this[counter])
             counter++
@@ -68,22 +83,36 @@ object StringUtils {
         return toString().replace("-", "")
     }
 
-    fun String.matchRegex(@Language("RegExp") regex: String): Boolean = regex.toRegex().matches(this)
-
-    private fun String.removeAtBeginning(text: String): String =
-        if (this.startsWith(text)) substring(text.length) else this
-
     // TODO find better name for this method
     inline fun <T> Pattern.matchMatcher(text: String, consumer: Matcher.() -> T) =
         matcher(text).let { if (it.matches()) consumer(it) else null }
 
-    fun String.cleanPlayerName(): String {
+    private fun String.internalCleanPlayerName(): String {
         val split = trim().split(" ")
         return if (split.size > 1) {
             split[1].removeColor()
         } else {
             split[0].removeColor()
         }
+    }
+
+    fun String.cleanPlayerName(displayName: Boolean = false): String {
+        return if (displayName) {
+            if (SkyHanniMod.feature.chat.playerMessage.playerRankHider) {
+                "§b" + internalCleanPlayerName()
+            } else this
+        } else {
+            internalCleanPlayerName()
+        }
+    }
+
+    inline fun <T> List<Pattern>.matchMatchers(text: String, consumer: Matcher.() -> T): T? {
+        for (pattern in iterator()) {
+            pattern.matchMatcher<T>(text) {
+                return consumer()
+            }
+        }
+        return null
     }
 
     fun getColor(string: String, default: Int, darker: Boolean = true): Int {
@@ -117,7 +146,6 @@ object StringUtils {
         }
     }
 
-
     fun String.removeWordsAtEnd(i: Int) = split(" ").dropLast(i).joinToString(" ")
 
     fun String.splitLines(width: Int): String {
@@ -134,8 +162,26 @@ object StringUtils {
         }
     }
 
+    /**
+     * Creates a comma-separated list using natural formatting (a, b, and c).
+     * @param list - the list of strings to join into a string, containing 0 or more elements.
+     * @param delimiterColor - the color code of the delimiter, inserted before each delimiter (commas and "and").
+     * @return a string representing the list joined with the Oxford comma and the word "and".
+     */
+    fun createCommaSeparatedList(list: List<String>, delimiterColor: String = ""): String {
+        if (list.isEmpty()) return ""
+        if (list.size == 1) return list[0]
+        if (list.size == 2) return "${list[0]}$delimiterColor and ${list[1]}"
+        val lastIndex = list.size - 1
+        val allButLast = list.subList(0, lastIndex).joinToString("$delimiterColor, ")
+        return "$allButLast$delimiterColor, and ${list[lastIndex]}"
+    }
+
     fun optionalPlural(number: Int, singular: String, plural: String) =
-        "$number " + if (number == 1) singular else plural
+        "${number.addSeparators()} " + canBePlural(number, singular, plural)
+
+    fun canBePlural(number: Int, singular: String, plural: String) =
+        if (number == 1) singular else plural
 
     fun progressBar(percentage: Double, steps: Int = 24): Any {
         //'§5§o§2§l§m §l§m §l§m §l§m §l§m §l§m §l§m §l§m §l§m §l§m §f§l§m §l§m §l§m §l§m §l§m §l§m §l§m §l§m §l§m §l§m §l§m §l§m §l§m §l§m §l§m §r §e348,144.3§6/§e936k'
@@ -201,27 +247,45 @@ object StringUtils {
     }
 
     fun String.getPlayerNameFromChatMessage(): String? {
-        if (!playerChatPattern.matcher(this).matches()) return null
+        val matcher = matchPlayerChatMessage(this) ?: return null
+        return matcher.group("username")
+    }
 
-        var username = this.removeColor().split(":")[0]
+    fun String.getPlayerNameAndRankFromChatMessage(): String? {
+        val matcher = matchPlayerChatMessage(this) ?: return null
+        return matcher.group("rankedName")
+    }
+
+    private fun matchPlayerChatMessage(string: String): Matcher? {
+        var username = ""
+        var matcher = playerChatPattern.matcher(string)
+        if (matcher.matches()) {
+            username = matcher.group("important").removeResets()
+        }
+        if (username == "") return null
+
+        if (username.contains("[NPC]")) {
+            return null
+        }
 
         if (username.contains(">")) {
             username = username.substring(username.indexOf('>') + 1).trim()
         }
-        if (username.startsWith("From ")) {
-            username = username.removePrefix("From ")
-        }
-        if (username.startsWith("To ")) {
-            username = username.removePrefix("To ")
-        }
 
-        val matcher = chatUsernamePattern.matcher(username)
+        username = username.removePrefix("§dFrom ")
+        username = username.removePrefix("§dTo ")
 
-        if (!matcher.matches()) return null
-        return matcher.group("username")
+        matcher = chatUsernamePattern.matcher(username)
+        return if (matcher.matches()) matcher else null
     }
 
-    fun String.convertToFormatted(): String {
-        return this.replace("&&", "§")
-    }
+    fun String.convertToFormatted(): String = this.replace("&&", "§")
+
+    fun Pattern.matches(string: String) = matcher(string).matches()
+
+    fun Pattern.find(string: String) = matcher(string).find()
+
+    fun String.allLettersFirstUppercase() = split("_").joinToString(" ") { it.firstLetterUppercase() }
+
+    fun String?.equalsIgnoreColor(string: String?) = this?.let { it.removeColor() == string?.removeColor() } ?: false
 }

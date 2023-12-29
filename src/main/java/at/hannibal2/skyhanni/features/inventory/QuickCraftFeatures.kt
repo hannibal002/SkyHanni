@@ -24,7 +24,7 @@ class QuickCraftFeatures {
 
     @SubscribeEvent
     fun onRepoReload(event: RepositoryReloadEvent) {
-        quickCraftableItems = event.getConstant<List<String>>("QuickCraftableItems") ?: emptyList()
+        quickCraftableItems = event.getConstant<List<String>>("QuickCraftableItems")
     }
 
     @SubscribeEvent
@@ -32,14 +32,19 @@ class QuickCraftFeatures {
         if (!isEnabled() || !quickCraftSlots.contains(event.slot.slotNumber)) return
 
         if (needsQuickCraftConfirmation(event.itemStack)) {
-            event.toolTip.replaceAll { it.replace("Click to craft!", "§cCtrl+Click to craft!") }
+            event.toolTip.replaceAll {
+                it.replace(
+                    "Click to craft!",
+                    "§c${KeyboardManager.getModifierKeyName()} + Click to craft!"
+                )
+            }
         }
     }
 
     @SubscribeEvent
     fun onBackgroundDrawn(event: GuiContainerEvent.BackgroundDrawnEvent) {
         if (!isEnabled()) return
-        if (KeyboardManager.isControlKeyDown()) return
+        if (KeyboardManager.isModifierKeyDown()) return
         if (event.gui !is GuiChest) return
         val chest = event.gui.inventorySlots as ContainerChest
 
@@ -62,7 +67,7 @@ class QuickCraftFeatures {
 
         val clickedItem = event.slot?.stack ?: return
 
-        if (!KeyboardManager.isControlKeyDown() && needsQuickCraftConfirmation(clickedItem)) {
+        if (!KeyboardManager.isModifierKeyDown() && needsQuickCraftConfirmation(clickedItem)) {
             event.isCanceled = true
         }
     }

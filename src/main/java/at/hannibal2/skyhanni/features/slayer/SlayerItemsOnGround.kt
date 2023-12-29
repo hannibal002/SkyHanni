@@ -5,11 +5,10 @@ import at.hannibal2.skyhanni.data.SlayerAPI
 import at.hannibal2.skyhanni.events.LorenzRenderWorldEvent
 import at.hannibal2.skyhanni.utils.EntityUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName
-import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName_old
-import at.hannibal2.skyhanni.utils.ItemUtils.name
 import at.hannibal2.skyhanni.utils.LocationUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.LorenzVec
+import at.hannibal2.skyhanni.utils.NEUInternalName
 import at.hannibal2.skyhanni.utils.RenderUtils.drawString
 import at.hannibal2.skyhanni.utils.RenderUtils.exactLocation
 import com.google.common.cache.CacheBuilder
@@ -33,15 +32,14 @@ class SlayerItemsOnGround {
         if (!SlayerAPI.hasActiveSlayerQuest()) return
 
         for (entityItem in EntityUtils.getEntities<EntityItem>()) {
-            val location = event.exactLocation(entityItem).add(0.0, 0.8, 0.0)
+            val location = event.exactLocation(entityItem).add(y = 0.8)
             if (location.distance(LocationUtils.playerLocation()) > 15) continue
 
             val itemStack = entityItem.entityItem
-            val name = itemStack.name ?: continue
-            if (SlayerAPI.ignoreSlayerDrop(name)) continue
             // happens in spiders den sometimes
             if (itemStack.item == Items.spawn_egg) continue
-            if (itemStack.getInternalName_old() == "") continue
+            if (itemStack.getInternalName().equals("")) continue // TODO remove, should never happen
+            if (itemStack.getInternalName() == NEUInternalName.NONE) continue
 
             val (itemName, price) = SlayerAPI.getItemNameAndPrice(itemStack.getInternalName(), itemStack.stackSize)
             if (config.minimumPrice > price) continue

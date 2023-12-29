@@ -17,6 +17,10 @@ object ErrorManager {
     private var cache =
         CacheBuilder.newBuilder().expireAfterWrite(10, TimeUnit.MINUTES).build<Pair<String, Int>, Unit>()
 
+    fun resetCache() {
+        cache.asMap().clear()
+    }
+
     fun skyHanniError(message: String): Nothing {
         val exception = IllegalStateException(message)
         logError(exception, message)
@@ -25,56 +29,102 @@ object ErrorManager {
 
     fun command(array: Array<String>) {
         if (array.size != 1) {
-            LorenzUtils.chat("§cUse /shcopyerror <error id>")
+            LorenzUtils.userError("Use /shcopyerror <error id>")
             return
         }
 
         val id = array[0]
-        val fullErrorMessage = KeyboardManager.isControlKeyDown()
+        val fullErrorMessage = KeyboardManager.isModifierKeyDown()
         val errorMessage = if (fullErrorMessage) {
             fullErrorMessages[id]
         } else {
             errorMessages[id]
         }
-        val name = if (fullErrorMessage) "Ful error" else "Error"
+        val name = if (fullErrorMessage) "Full error" else "Error"
         LorenzUtils.chat(errorMessage?.let {
             OSUtils.copyToClipboard(it)
-            "§e[SkyHanni] $name copied into the clipboard, please report it on the SkyHanni discord!"
-        } ?: "§c[SkyHanni] Error id not found!")
+            "$name copied into the clipboard, please report it on the SkyHanni discord!"
+        } ?: "Error id not found!")
     }
 
+    @Deprecated("Use data as well", ReplaceWith("logErrorStateWithData()"))
     fun logErrorState(userMessage: String, internalMessage: String) {
-        logError(IllegalStateException(internalMessage), userMessage)
+        logError(IllegalStateException(internalMessage), userMessage, false)
     }
 
+    fun logErrorStateWithData(userMessage: String, internalMessage: String, vararg extraData: Pair<String, Any?>) {
+        logError(IllegalStateException(internalMessage), userMessage, false, *extraData)
+    }
+
+    @Deprecated("Use data as well", ReplaceWith("logErrorWithData()"))
     fun logError(throwable: Throwable, message: String) {
+        logError(throwable, message, false)
+    }
+
+    fun logErrorWithData(throwable: Throwable, message: String, vararg extraData: Pair<String, Any?>) {
+        logError(throwable, message, false, *extraData)
+    }
+
+    fun logError(
+        throwable: Throwable,
+        message: String,
+        ignoreErrorCache: Boolean,
+        vararg extraData: Pair<String, Any?>
+    ) {
         val error = Error(message, throwable)
-        Minecraft.getMinecraft().thePlayer ?: throw error
         error.printStackTrace()
+        Minecraft.getMinecraft().thePlayer ?: return
 
-        val pair = if (throwable.stackTrace.isNotEmpty()) {
-            throwable.stackTrace[0].let { it.fileName to it.lineNumber }
-        } else message to 0
-        if (cache.getIfPresent(pair) != null) return
-        cache.put(pair, Unit)
+        if (!ignoreErrorCache) {
+            val pair = if (throwable.stackTrace.isNotEmpty()) {
+                throwable.stackTrace[0].let { it.fileName to it.lineNumber }
+            } else message to 0
+            if (cache.getIfPresent(pair) != null) return
+            cache.put(pair, Unit)
+        }
 
-        val fullStackTrace = throwable.getExactStackTrace(true).joinToString("\n")
-        val stackTrace = throwable.getExactStackTrace(false).joinToString("\n").removeSpam()
+        val fullStackTrace = throwable.getCustomStackTrace(true).joinToString("\n")
+        val stackTrace = throwable.getCustomStackTrace(false).joinToString("\n").removeSpam()
         val randomId = UUID.randomUUID().toString()
 
+        val extraDataString = buildExtraDataString(extraData)
         val rawMessage = message.removeColor()
-        errorMessages[randomId] = "```\nSkyHanni ${SkyHanniMod.version}: $rawMessage\n \n$stackTrace\n```"
+        errorMessages[randomId] =
+            "```\nSkyHanni ${SkyHanniMod.version}: $rawMessage\n \n$stackTrace\n$extraDataString```"
         fullErrorMessages[randomId] =
-            "```\nSkyHanni ${SkyHanniMod.version}: $rawMessage\n(full stack trace)\n \n$fullStackTrace\n```"
+            "```\nSkyHanni ${SkyHanniMod.version}: $rawMessage\n(full stack trace)\n \n$fullStackTrace\n$extraDataString```"
 
         LorenzUtils.clickableChat(
-            "§c[SkyHanni ${SkyHanniMod.version}]: $message§c. Click here to copy the error into the clipboard.",
-            "shcopyerror $randomId"
+            "§c[SkyHanni-${SkyHanniMod.version}]: $message§c. Click here to copy the error into the clipboard.",
+            "shcopyerror $randomId",
+            false
         )
+    }
+
+    private fun buildExtraDataString(extraData: Array<out Pair<String, Any?>>): String {
+        val extraDataString = if (extraData.isNotEmpty()) {
+            val builder = StringBuilder()
+            for ((key, value) in extraData) {
+                builder.append(key)
+                builder.append(": ")
+                if (value is Iterable<*>) {
+                    builder.append("\n")
+                    for (line in value) {
+                        builder.append(" - '$line'")
+                        builder.append("\n")
+                    }
+                } else {
+                    builder.append("'$value'")
+                }
+                builder.append("\n")
+            }
+            "\nExtra data:\n$builder"
+        } else ""
+        return extraDataString
     }
 }
 
-private fun Throwable.getExactStackTrace(full: Boolean, parent: List<String> = emptyList()): List<String> = buildList {
+private fun Throwable.getCustomStackTrace(full: Boolean, parent: List<String> = emptyList()): List<String> = buildList {
     add("Caused by " + javaClass.name + ": $message")
 
     val breakAfter = listOf(
@@ -83,6 +133,8 @@ private fun Throwable.getExactStackTrace(full: Boolean, parent: List<String> = e
     val replace = mapOf(
         "io.mouberry,notenoughupdates" to "NEU",
         "at.hannibal2.skyhanni" to "SH",
+        "net.minecraft." to "MC.",
+        "net.minecraftforge.fml." to "FML.",
     )
 
     for (traceElement in stackTrace) {
@@ -103,8 +155,13 @@ private fun Throwable.getExactStackTrace(full: Boolean, parent: List<String> = e
         }
     }
 
+    if (this === cause) {
+        add("Infinite recurring causes")
+        return@buildList
+    }
+
     cause?.let {
-        addAll(it.getExactStackTrace(full, this))
+        addAll(it.getCustomStackTrace(full, this))
     }
 }
 
@@ -121,11 +178,14 @@ private fun String.removeSpam(): String {
         "at net.minecraft.client.Minecraft.addScheduledTask(",
         "at java.lang.reflect.",
         "at at.hannibal2.skyhanni.config.commands.Commands\$",
-        "CopyErrorCommand.logErrorState(CopyErrorCommand.kt:46)",
+        ".ErrorManager.logErrorState(ErrorManager.kt:51)",
         "LorenzEvent.postWithoutCatch(LorenzEvent.kt:24)",
         "LorenzEvent.postAndCatch(LorenzEvent.kt:15)",
         "at net.minecraft.launchwrapper.",
         "at net.fabricmc.devlaunchinjector.",
+        "at SH.events.LorenzEvent.postAndCatchAndBlock(LorenzEvent.kt:28)",
+        "at SH.events.LorenzEvent.postAndCatchAndBlock\$default(LorenzEvent.kt:18)",
+        "at SH.events.LorenzEvent.postAndCatch(LorenzEvent.kt:16)",
     )
     return split("\n").filter { line -> !ignored.any { line.contains(it) } }.joinToString("\n")
 }

@@ -11,10 +11,11 @@ import at.hannibal2.skyhanni.events.RenderMobColoredEvent
 import at.hannibal2.skyhanni.events.ServerBlockChangeEvent
 import at.hannibal2.skyhanni.events.withAlpha
 import at.hannibal2.skyhanni.test.GriffinUtils.drawWaypointFilled
+import at.hannibal2.skyhanni.utils.EntityUtils.canBeSeen
 import at.hannibal2.skyhanni.utils.EntityUtils.getBlockInHand
 import at.hannibal2.skyhanni.utils.ItemUtils.getSkullTexture
 import at.hannibal2.skyhanni.utils.ItemUtils.name
-import at.hannibal2.skyhanni.utils.LocationUtils
+import at.hannibal2.skyhanni.utils.LocationUtils.canBeSeen
 import at.hannibal2.skyhanni.utils.LocationUtils.distanceToPlayer
 import at.hannibal2.skyhanni.utils.LorenzColor
 import at.hannibal2.skyhanni.utils.LorenzLogger
@@ -39,7 +40,7 @@ import kotlin.time.Duration.Companion.seconds
 
 class EndermanSlayerFeatures {
     private val config get() = SkyHanniMod.feature.slayer.endermen
-    private val beaconConfig get() = config.endermanBeaconConfig
+    private val beaconConfig get() = config.beacon
     private val endermenWithBeacons = mutableListOf<EntityEnderman>()
     private var flyingBeacons = listOf<EntityArmorStand>()
     private val nukekubiSkulls = mutableListOf<EntityArmorStand>()
@@ -54,7 +55,7 @@ class EndermanSlayerFeatures {
         val entity = event.entity
         if (entity in endermenWithBeacons || entity in flyingBeacons) return
 
-        if (entity is EntityEnderman && showBeacon() && hasBeaconInHand(entity) && canSee(LocationUtils.playerEyeLocation(), entity.getLorenzVec())) {
+        if (entity is EntityEnderman && showBeacon() && hasBeaconInHand(entity) && entity.canBeSeen(15.0)) {
             endermenWithBeacons.add(entity)
             logger.log("Added enderman with beacon at ${entity.getLorenzVec()}")
         }
@@ -62,7 +63,7 @@ class EndermanSlayerFeatures {
         if (entity is EntityArmorStand) {
             if (showBeacon()) {
                 val stack = entity.inventory[4] ?: return
-                if (stack.name == "Beacon" && canSee(LocationUtils.playerEyeLocation(), entity.getLorenzVec())) {
+                if (stack.name == "Beacon" && entity.canBeSeen(15.0)) {
                     flyingBeacons = flyingBeacons.editCopy {
                         add(entity)
                     }
@@ -82,7 +83,7 @@ class EndermanSlayerFeatures {
 
     private fun hasBeaconInHand(enderman: EntityEnderman) = enderman.getBlockInHand()?.block == Blocks.beacon
 
-    private fun canSee(a: LorenzVec, b: LorenzVec) = LocationUtils.canSee(a, b) || a.distance(b) < 15
+    private fun canSee(b: LorenzVec) = b.canBeSeen(15.0)
 
     private fun showBeacon() = beaconConfig.highlightBeacon || beaconConfig.showWarning || beaconConfig.showLine
 
@@ -128,14 +129,14 @@ class EndermanSlayerFeatures {
                 val durationFormat = duration.format(showMilliSeconds = true)
                 event.drawColor(location, beaconConfig.beaconColor.toChromaColor(), alpha = 1f)
                 event.drawWaypointFilled(location, beaconConfig.beaconColor.toChromaColor(), true, true)
-                event.drawDynamicText(location.add(0, 1, 0), "§4Beacon §b$durationFormat", 1.8)
+                event.drawDynamicText(location.add(y = 1), "§4Beacon §b$durationFormat", 1.8)
             }
         }
         for (beacon in flyingBeacons) {
             if (beacon.isDead) continue
             if (beaconConfig.highlightBeacon) {
                 val beaconLocation = event.exactLocation(beacon)
-                event.drawDynamicText(beaconLocation.add(0, 1, 0), "§4Beacon", 1.8)
+                event.drawDynamicText(beaconLocation.add(y = 1), "§4Beacon", 1.8)
             }
 
             if (beaconConfig.showLine) {
@@ -226,5 +227,6 @@ class EndermanSlayerFeatures {
         event.move(3, "slayer.endermanBeaconConfig.lneColor", "slayer.endermen.endermanBeaconConfig.lineColor")
         event.move(3, "slayer.endermanBeaconConfig.lineWidth", "slayer.endermen.endermanBeaconConfig.lineWidth")
         event.move(3, "slayer.endermanHighlightNukekebi", "slayer.endermen.highlightNukekebi")
+        event.move(9, "slayer.enderman.endermanBeaconConfig", "slayer.endermen.beacon")
     }
 }

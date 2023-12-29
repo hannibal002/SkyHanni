@@ -7,6 +7,7 @@ import at.hannibal2.skyhanni.events.LorenzWorldChangeEvent
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.RenderUtils.renderString
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
+import at.hannibal2.skyhanni.utils.SoundUtils
 import at.hannibal2.skyhanni.utils.TimeUtils.format
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import kotlin.time.Duration.Companion.minutes
@@ -15,17 +16,29 @@ import kotlin.time.Duration.Companion.seconds
 class SkyBlockKickDuration {
     private val config get() = SkyHanniMod.feature.misc.kickDuration
 
-    var kickMessage = false
-    var showTime = false
-    var lastKickTime = SimpleTimeMark.farPast()
-    var hasWarned = false
+    private var kickMessage = false
+    private var showTime = false
+    private var lastKickTime = SimpleTimeMark.farPast()
+    private var hasWarned = false
 
     @SubscribeEvent
     fun onChat(event: LorenzChatEvent) {
         if (!isEnabled()) return
         if (event.message == "§cYou were kicked while joining that server!") {
-            //if is in hub: enable rn
-            kickMessage = true
+
+            if (LorenzUtils.onHypixel && !LorenzUtils.inSkyBlock) {
+                kickMessage = false
+                showTime = true
+                lastKickTime = SimpleTimeMark.now()
+            } else {
+                kickMessage = true
+            }
+        }
+
+        if (event.message == "§cThere was a problem joining SkyBlock, try again in a moment!") {
+            kickMessage = false
+            showTime = true
+            lastKickTime = SimpleTimeMark.now()
         }
     }
 
@@ -35,7 +48,7 @@ class SkyBlockKickDuration {
         if (kickMessage) {
             kickMessage = false
             showTime = true
-            lastKickTime = SimpleTimeMark.farPast()
+            lastKickTime = SimpleTimeMark.now()
         }
         hasWarned = false
     }
@@ -70,6 +83,7 @@ class SkyBlockKickDuration {
 
     private fun warn() {
         LorenzUtils.sendTitle("§eTry rejoining SkyBlock now!", 3.seconds)
+        SoundUtils.playBeepSound()
     }
 
     fun isEnabled() = config.enabled

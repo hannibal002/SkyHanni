@@ -41,10 +41,10 @@ object CopyNearbyParticlesCommand {
         if (resultList.isEmpty() && tickTime == 0L) tickTime = System.currentTimeMillis()
 
         if (System.currentTimeMillis() > tickTime + 30) {
-            if (counter == 0) LorenzUtils.chat("§e[SkyHanni] No particles found nearby, try a larger search radius") else {
+            if (counter == 0) LorenzUtils.chat("No particles found nearby, try a larger search radius") else {
                 val string = resultList.joinToString("\n")
                 OSUtils.copyToClipboard(string)
-                LorenzUtils.chat("§e[SkyHanni] $counter particles copied into the clipboard!")
+                LorenzUtils.chat("$counter particles copied into the clipboard!")
             }
             saveNextTick = false
             return
@@ -65,7 +65,7 @@ object CopyNearbyParticlesCommand {
             resultList.add("particle arguments: ${packet.particleArgs.asList()}")
             resultList.add("")
             resultList.add("")
-            counter ++
+            counter++
         }
     }
 }

@@ -13,10 +13,14 @@ import at.hannibal2.skyhanni.utils.LorenzUtils.isInIsland
 import at.hannibal2.skyhanni.utils.LorenzVec
 import at.hannibal2.skyhanni.utils.RenderUtils.renderString
 import at.hannibal2.skyhanni.utils.SoundUtils
+import at.hannibal2.skyhanni.utils.StringUtils
 import at.hannibal2.skyhanni.utils.TimeUnit
 import at.hannibal2.skyhanni.utils.TimeUtils
+import at.hannibal2.skyhanni.utils.getLorenzVec
+import net.minecraft.client.Minecraft
 import net.minecraft.entity.item.EntityArmorStand
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
+import kotlin.time.Duration.Companion.seconds
 
 class FishingTimer {
     private val config get() = SkyHanniMod.feature.fishing.barnTimer
@@ -40,7 +44,9 @@ class FishingTimer {
 
         if (event.isMod(5)) checkMobs()
         if (event.isMod(7)) tryPlaySound()
-        if (config.manualResetTimer.isKeyHeld()) startTime = System.currentTimeMillis()
+        if (config.manualResetTimer.isKeyHeld() && Minecraft.getMinecraft().currentScreen == null) {
+            startTime = System.currentTimeMillis()
+        }
     }
 
     private fun tryPlaySound() {
@@ -67,18 +73,36 @@ class FishingTimer {
 
         if (inHollows && newCount >= 60 && config.wormLimitAlert) {
             SoundUtils.playBeepSound()
+            LorenzUtils.sendTitle("§cWORM CAP FULL!!!", 2.seconds)
         }
     }
 
-    private fun countMobs() = EntityUtils.getEntities<EntityArmorStand>()
-        .map { entity ->
-            val name = entity.name
-            val isSummonedSoul = name.contains("'")
-            val hasFishingMobName = SeaCreatureManager.allFishingMobs.keys.any { name.contains(it) }
-            if (hasFishingMobName && !isSummonedSoul) {
-                if (name == "Sea Emperor" || name == "Rider of the Deep") 2 else 1
-            } else 0
-        }.sum()
+    private fun countMobs() = EntityUtils.getEntities<EntityArmorStand>().map { entity -> amount(entity) }.sum()
+
+    private fun amount(entity: EntityArmorStand): Int {
+        val name = entity.name
+        // a dragon, will always be fought
+        if (name == "Reindrake") return 0
+
+        // a npc shop
+        if (name == "§5Frosty the Snow Blaster") return 0
+
+        if (name == "Frosty") {
+            val npcLocation = LorenzVec(-1.5, 76.0, 92.5)
+            if (entity.getLorenzVec().distance(npcLocation) < 1) {
+                return 0
+            }
+        }
+
+        val isSummonedSoul = name.contains("'")
+        val hasFishingMobName = SeaCreatureManager.allFishingMobs.keys.any { name.contains(it) }
+        if (!hasFishingMobName || isSummonedSoul) return 0
+
+        if (name == "Sea Emperor" || name == "Rider of the Deep") {
+            return 2
+        }
+        return 1
+    }
 
     private fun isRightLocation(): Boolean {
         inHollows = false
@@ -89,6 +113,10 @@ class FishingTimer {
             inHollows = true
             return true
         }
+
+        if (config.crimsonIsle && IslandType.CRIMSON_ISLE.isInIsland()) return true
+
+        if (config.winterIsland && IslandType.WINTER.isInIsland()) return true
 
         if (!IslandType.THE_FARMING_ISLANDS.isInIsland()) {
             return LocationUtils.playerLocation().distance(barnLocation) < 50
@@ -108,7 +136,7 @@ class FishingTimer {
         val barnTimerAlertTime = config.alertTime * 1_000
         val color = if (duration > barnTimerAlertTime) "§c" else "§e"
         val timeFormat = TimeUtils.formatDuration(duration, biggestUnit = TimeUnit.MINUTE)
-        val name = if (currentCount == 1) "sea creature" else "sea creatures"
+        val name = StringUtils.canBePlural(currentCount, "sea creature", "sea creatures")
         val text = "$color$timeFormat §8(§e$currentCount §b$name§8)"
 
         config.pos.renderString(text, posLabel = "BarnTimer")

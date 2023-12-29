@@ -13,6 +13,8 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 // heavily inspired by SBA code
 object TabListReader {
     private val config get() = SkyHanniMod.feature.misc.compactTabList
+
+    // TODO USE SH-REPO
     var hypixelAdvertisingString = "HYPIXEL.NET"
     private val godPotPattern = "You have a God Potion active! (?<timer>[\\w ]+)".toPattern()
     private val activeEffectPattern = "Active Effects(?:§.)*(?:\\n(?:§.)*§7.+)*".toPattern()

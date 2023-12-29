@@ -8,25 +8,42 @@ import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.StringUtils.removeResets
 import at.hannibal2.skyhanni.utils.StringUtils.trimWhiteSpaceAndResets
-import net.minecraft.client.Minecraft
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import kotlin.random.Random
 
-class PartyAPI {
-    companion object {
-        fun listMembers() {
-            LorenzUtils.chat("§a[SkyHanni] Tracked party members §7(${partyMembers.size}) §f:")
-            for (member in partyMembers) {
-                LorenzUtils.chat(" §a- §7$member")
-            }
+object PartyAPI {
+    // TODO USE SH-REPO
+    private val youJoinedPartyPattern = "§eYou have joined (?<name>.*)'s §eparty!".toPattern()
+    private val othersJoinedPartyPattern = "(?<name>.*) §ejoined the party.".toPattern()
+    private val othersInThePartyPattern = "§eYou'll be partying with: (?<names>.*)".toPattern()
+    private val otherLeftPattern = "(?<name>.*) §ehas left the party.".toPattern()
+    private val otherKickedPattern = "(?<name>.*) §ehas been removed from the party.".toPattern()
+    private val otherOfflineKickedPattern = "§eKicked (?<name>.*) because they were offline.".toPattern()
+    private val otherDisconnectedPattern =
+        "(?<name>.*) §ewas removed from your party because they disconnected.".toPattern()
+    private val transferPattern = "The party was transferred to .* because (?<name>.*) left".toPattern()
+    private val disbandedPattern = ".* §ehas disbanded the party!".toPattern()
+    private val kickedPattern = "§eYou have been kicked from the party by .* §e".toPattern()
+    private val partyMembersStartPattern = "§6Party Members \\(\\d+\\)".toPattern()
+    private val partyMemberListPattern = "Party (?:Leader|Moderators|Members): (?<names>.*)".toPattern()
 
-            if (Random.nextDouble() < 0.1) {
-                OSUtils.openBrowser("https://www.youtube.com/watch?v=iANP7ib7CPA")
-                LorenzUtils.hoverableChat("§7Are You Ready To Party?", listOf("§b~Spongebob"))
-            }
+    val partyMembers = mutableListOf<String>()
+
+    fun listMembers() {
+        val size = partyMembers.size
+        if (size == 0) {
+            LorenzUtils.chat("No tracked party members!")
+            return
+        }
+        LorenzUtils.chat("Tracked party members §7($size) §f:", prefixColor = "§a")
+        for (member in partyMembers) {
+            LorenzUtils.chat(" §a- §7$member", false)
         }
 
-        val partyMembers = mutableListOf<String>()
+        if (Random.nextDouble() < 0.1) {
+            OSUtils.openBrowser("https://www.youtube.com/watch?v=iANP7ib7CPA")
+            LorenzUtils.hoverableChat("§7Are You Ready To Party?", listOf("§b~Spongebob"), prefix = false)
+        }
     }
 
     @SubscribeEvent
@@ -34,15 +51,16 @@ class PartyAPI {
         val message = event.message.trimWhiteSpaceAndResets().removeResets()
 
         // new member joined
-        "§eYou have joined (?<name>.*)'s §eparty!".toPattern().matchMatcher(message) {
+
+        youJoinedPartyPattern.matchMatcher(message) {
             val name = group("name").cleanPlayerName()
             if (!partyMembers.contains(name)) partyMembers.add(name)
         }
-        "(?<name>.*) §ejoined the party.".toPattern().matchMatcher(message) {
+        othersJoinedPartyPattern.matchMatcher(message) {
             val name = group("name").cleanPlayerName()
             if (!partyMembers.contains(name)) partyMembers.add(name)
         }
-        "§eYou'll be partying with: (?<names>.*)".toPattern().matchMatcher(message) {
+        othersInThePartyPattern.matchMatcher(message) {
             for (name in group("names").split(", ")) {
                 val playerName = name.cleanPlayerName()
                 if (!partyMembers.contains(playerName)) partyMembers.add(playerName)
@@ -50,32 +68,32 @@ class PartyAPI {
         }
 
         // one member got removed
-        "(?<name>.*) §ehas left the party.".toPattern().matchMatcher(message) {
+        otherLeftPattern.matchMatcher(message) {
             val name = group("name").cleanPlayerName()
             partyMembers.remove(name)
         }
-        "(?<name>.*) §ehas been removed from the party.".toPattern().matchMatcher(message) {
+        otherKickedPattern.matchMatcher(message) {
             val name = group("name").cleanPlayerName()
             partyMembers.remove(name)
         }
-        "§eKicked (?<name>.*) because they were offline.".toPattern().matchMatcher(message) {
+        otherOfflineKickedPattern.matchMatcher(message) {
             val name = group("name").cleanPlayerName()
             partyMembers.remove(name)
         }
-        "(?<name>.*) §ewas removed from your party because they disconnected.".toPattern().matchMatcher(message) {
+        otherDisconnectedPattern.matchMatcher(message) {
             val name = group("name").cleanPlayerName()
             partyMembers.remove(name)
         }
-        "The party was transferred to .* because (?<name>.*) left".toPattern().matchMatcher(message.removeColor()) {
+        transferPattern.matchMatcher(message.removeColor()) {
             val name = group("name").cleanPlayerName()
             partyMembers.remove(name)
         }
 
         // party disbanded
-        ".* §ehas disbanded the party!".toPattern().matchMatcher(message) {
+        disbandedPattern.matchMatcher(message) {
             partyMembers.clear()
         }
-        "§eYou have been kicked from the party by .* §e".toPattern().matchMatcher(message) {
+        kickedPattern.matchMatcher(message) {
             partyMembers.clear()
         }
         if (message == "§eYou left the party." ||
@@ -86,14 +104,14 @@ class PartyAPI {
         }
 
         // party list
-        "§6Party Members \\(\\d+\\)".toPattern().matchMatcher(message.removeResets()) {
+        partyMembersStartPattern.matchMatcher(message.removeResets()) {
             partyMembers.clear()
         }
 
-        "Party (?:Leader|Moderators|Members): (?<names>.*)".toPattern().matchMatcher(message.removeColor()) {
+        partyMemberListPattern.matchMatcher(message.removeColor()) {
             for (name in group("names").split(" ● ")) {
                 val playerName = name.replace(" ●", "").cleanPlayerName()
-                if (playerName == Minecraft.getMinecraft().thePlayer.name) continue
+                if (playerName == LorenzUtils.getPlayerName()) continue
                 if (!partyMembers.contains(playerName)) partyMembers.add(playerName)
             }
         }

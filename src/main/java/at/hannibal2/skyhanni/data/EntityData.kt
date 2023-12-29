@@ -8,7 +8,6 @@ import at.hannibal2.skyhanni.events.PacketEvent
 import at.hannibal2.skyhanni.utils.EntityUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils.baseMaxHealth
 import at.hannibal2.skyhanni.utils.LorenzUtils.derpy
-import net.minecraft.client.Minecraft
 import net.minecraft.client.entity.EntityOtherPlayerMP
 import net.minecraft.client.entity.EntityPlayerSP
 import net.minecraft.entity.EntityLivingBase
@@ -50,8 +49,7 @@ class EntityData {
         val watchableObjects = packet.func_149376_c() ?: return
         val entityId = packet.entityId
 
-        val theWorld = Minecraft.getMinecraft().theWorld ?: return
-        val entity = theWorld.getEntityByID(entityId) ?: return
+        val entity = EntityUtils.getEntityByID(entityId) ?: return
         if (entity is EntityArmorStand) return
         if (entity is EntityXPOrb) return
         if (entity is EntityItem) return

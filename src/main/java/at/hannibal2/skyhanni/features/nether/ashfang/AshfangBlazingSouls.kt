@@ -5,8 +5,8 @@ import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.events.LorenzRenderWorldEvent
 import at.hannibal2.skyhanni.events.LorenzTickEvent
 import at.hannibal2.skyhanni.events.LorenzWorldChangeEvent
-import at.hannibal2.skyhanni.features.damageindicator.BossType
-import at.hannibal2.skyhanni.features.damageindicator.DamageIndicatorManager
+import at.hannibal2.skyhanni.features.combat.damageindicator.BossType
+import at.hannibal2.skyhanni.features.combat.damageindicator.DamageIndicatorManager
 import at.hannibal2.skyhanni.test.GriffinUtils.drawWaypointFilled
 import at.hannibal2.skyhanni.utils.EntityUtils
 import at.hannibal2.skyhanni.utils.EntityUtils.hasSkullTexture
@@ -48,7 +48,7 @@ class AshfangBlazingSouls {
             event.drawWaypointFilled(orbLocation.add(-0.5, 1.25, -0.5), color, extraSize = -0.15)
             if (orbLocation.distance(playerLocation) < 10) {
                 //TODO find way to dynamically change color
-                event.drawString(orbLocation.add(0.0, 2.5, 0.0), "§bBlazing Soul")
+                event.drawString(orbLocation.add(y = 2.5), "§bBlazing Soul")
             }
         }
     }
@@ -65,5 +65,5 @@ class AshfangBlazingSouls {
     }
 
     private fun isEnabled() = LorenzUtils.inSkyBlock && config.enabled &&
-            DamageIndicatorManager.isBossSpawned(BossType.NETHER_ASHFANG)
+        DamageIndicatorManager.isBossSpawned(BossType.NETHER_ASHFANG)
 }

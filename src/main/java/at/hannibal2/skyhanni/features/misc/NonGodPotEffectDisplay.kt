@@ -2,12 +2,14 @@ package at.hannibal2.skyhanni.features.misc
 
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
+import at.hannibal2.skyhanni.data.ProfileStorageData
 import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.InventoryFullyOpenedEvent
 import at.hannibal2.skyhanni.events.LorenzChatEvent
 import at.hannibal2.skyhanni.events.LorenzTickEvent
 import at.hannibal2.skyhanni.events.LorenzWorldChangeEvent
 import at.hannibal2.skyhanni.events.PacketEvent
+import at.hannibal2.skyhanni.events.PreProfileSwitchEvent
 import at.hannibal2.skyhanni.features.rift.RiftAPI
 import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
@@ -18,11 +20,11 @@ import at.hannibal2.skyhanni.utils.RenderUtils.renderStrings
 import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.TimeUnit
 import at.hannibal2.skyhanni.utils.TimeUtils
+import at.hannibal2.skyhanni.utils.TimeUtils.timerColor
 import at.hannibal2.skyhanni.utils.Timer
 import net.minecraft.network.play.server.S47PacketPlayerListHeaderFooter
 import net.minecraftforge.fml.common.eventhandler.EventPriority
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
-import kotlin.time.Duration
 import kotlin.time.Duration.Companion.hours
 import kotlin.time.Duration.Companion.milliseconds
 import kotlin.time.Duration.Companion.minutes
@@ -34,27 +36,48 @@ class NonGodPotEffectDisplay {
     private val effectDuration = mutableMapOf<NonGodPotEffect, Timer>()
     private var display = emptyList<String>()
 
-    enum class NonGodPotEffect(val apiName: String, val displayName: String, val isMixin: Boolean = false) {
-        SMOLDERING("smoldering_polarization", "§aSmoldering Polarization I"),
-        GLOWY("mushed_glowy_tonic", "§2Mushed Glowy Tonic I"),
-        WISP("wisp_ice", "§bWisp's Ice-Flavored Water I"),
-        GOBLIN("goblin_king_scent", "§2King's Scent I"),
+    // TODO move the whole list into the repo
+    enum class NonGodPotEffect(
+        val tabListName: String,
+        val isMixin: Boolean = false,
+        val inventoryItemName: String = tabListName
+    ) {
+        SMOLDERING("§aSmoldering Polarization I"),
+        GLOWY("§2Mushed Glowy Tonic I"),
+        WISP("§bWisp's Ice-Flavored Water I"),
+        GOBLIN("§2King's Scent I"),
 
-        INVISIBILITY("invisibility", "§8Invisibility I"), // when wearing sorrow armor
+        INVISIBILITY("§8Invisibility I"), // when wearing sorrow armor
 
-        REV("ZOMBIE_BRAIN", "§cZombie Brain Mixin", true),
-        TARA("SPIDER_EGG", "§6Spider Egg Mixin", true),
-        SVEN("WOLF_FUR", "§bWolf Fur Mixin", true),
-        VOID("END_PORTAL_FUMES", "§6Ender Portal Fumes", true),
-        BLAZE("GABAGOEY", "§fGabagoey", true),
+        REV("§cZombie Brain Mixin", true),
+        TARA("§6Spider Egg Mixin", true),
+        SVEN("§bWolf Fur Mixin", true),
+        VOID("§6Ender Portal Fumes", true),
+        BLAZE("§fGabagoey", true),
+        GLOWING_MUSH("§2Glowing Mush Mixin", true),
 
-        DEEP_TERROR("DEEPTERROR", "§4Deepterror", true),
+        DEEP_TERROR("§4Deepterror", true),
+
+        GREAT_SPOOK("§fGreat Spook I", inventoryItemName = "§fGreat Spook Potion"),
+
+        HARVEST_HARBINGER("§6Harvest Harbinger V"),
+
+        PEST_REPELLENT("§6Pest Repellent I§r"),
+        PEST_REPELLENT_MAX("§6Pest Repellent II"),
         ;
     }
 
+    // TODO USE SH-REPO
     private var patternEffectsCount = "§7You have §e(?<name>\\d+) §7non-god effects\\.".toPattern()
     private var totalEffectsCount = 0
 
+    @SubscribeEvent
+    fun onPreProfileSwitch(event: PreProfileSwitchEvent) {
+        effectDuration.clear()
+        display = emptyList()
+    }
+
+    // todo : cleanup and add support for poison candy I, and add support for splash / other formats
     @SubscribeEvent
     fun onChatMessage(event: LorenzChatEvent) {
         if (event.message == "§aYou cleared all of your active effects!") {
@@ -63,48 +86,60 @@ class NonGodPotEffectDisplay {
         }
 
         if (event.message == "§aYou ate a §r§aRe-heated Gummy Polar Bear§r§a!") {
-            checkFooter = true
             effectDuration[NonGodPotEffect.SMOLDERING] = Timer(1.hours)
             update()
         }
 
         if (event.message == "§a§lBUFF! §fYou have gained §r§2Mushed Glowy Tonic I§r§f! Press TAB or type /effects to view your active effects!") {
-            checkFooter = true
             effectDuration[NonGodPotEffect.GLOWY] = Timer(1.hours)
             update()
         }
 
         if (event.message == "§a§lBUFF! §fYou splashed yourself with §r§bWisp's Ice-Flavored Water I§r§f! Press TAB or type /effects to view your active effects!") {
-            checkFooter = true
             effectDuration[NonGodPotEffect.WISP] = Timer(5.minutes)
             update()
         }
 
+        if (event.message == "§eYou consumed a §r§fGreat Spook Potion§r§e!") {
+            effectDuration[NonGodPotEffect.GREAT_SPOOK] = Timer(24.hours)
+            update()
+        }
+
+        if (event.message == "§a§lBUFF! §fYou have gained §r§6Harvest Harbinger V§r§f! Press TAB or type /effects to view your active effects!") {
+            effectDuration[NonGodPotEffect.HARVEST_HARBINGER] = Timer(25.minutes)
+            update()
+        }
+
+        if (event.message == "§a§lYUM! §r§6Pests §r§7will now spawn §r§a2x §r§7less while you break crops for the next §r§a60m§r§7!") {
+            effectDuration[NonGodPotEffect.PEST_REPELLENT] = Timer(1.hours)
+        }
+
+        if (event.message == "§a§lYUM! §r§6Pests §r§7will now spawn §r§a4x §r§7less while you break crops for the next §r§a60m§r§7!") {
+            effectDuration[NonGodPotEffect.PEST_REPELLENT_MAX] = Timer(1.hours)
+        }
 
         if (event.message == "§e[NPC] §6King Yolkar§f: §rThese eggs will help me stomach my pain.") {
-            checkFooter = true
             effectDuration[NonGodPotEffect.GOBLIN] = Timer(20.minutes)
             update()
         }
+
         if (event.message == "§cThe Goblin King's §r§afoul stench §r§chas dissipated!") {
-            checkFooter = true
             effectDuration.remove(NonGodPotEffect.GOBLIN)
             update()
         }
     }
 
     private fun update() {
-        val now = System.currentTimeMillis()
         if (effectDuration.values.removeIf { it.ended }) {
             //to fetch the real amount of active pots
             totalEffectsCount = 0
             checkFooter = true
         }
 
-        display = drawDisplay(now)
+        display = drawDisplay()
     }
 
-    private fun drawDisplay(now: Long): MutableList<String> {
+    private fun drawDisplay(): MutableList<String> {
         val newDisplay = mutableListOf<String>()
         for ((effect, time) in effectDuration.sorted()) {
             if (time.ended) continue
@@ -114,9 +149,9 @@ class NonGodPotEffectDisplay {
 
             val remaining = time.remaining.coerceAtLeast(0.seconds)
             val format = TimeUtils.formatDuration(remaining.inWholeMilliseconds, TimeUnit.HOUR)
-            val color = colorForTime(remaining)
+            val color = remaining.timerColor()
 
-            val displayName = effect.displayName
+            val displayName = effect.tabListName
             newDisplay.add("$displayName $color$format")
         }
         val diff = totalEffectsCount - effectDuration.size
@@ -128,17 +163,11 @@ class NonGodPotEffectDisplay {
         return newDisplay
     }
 
-    private fun colorForTime(duration: Duration) = when (duration) {
-        in 0.seconds..60.seconds -> "§c"
-        in 60.seconds..3.minutes -> "§6"
-        in 3.minutes..10.minutes -> "§e"
-        else -> "§f"
-    }
-
     @SubscribeEvent
     fun onTick(event: LorenzTickEvent) {
         if (!isEnabled()) return
         if (!event.repeatSeconds(1)) return
+        if (!ProfileStorageData.loaded) return
 
         update()
     }
@@ -156,7 +185,7 @@ class NonGodPotEffectDisplay {
         for (stack in event.inventoryItems.values) {
             val name = stack.name ?: continue
             for (effect in NonGodPotEffect.entries) {
-                if (!name.contains(effect.displayName)) continue
+                if (!name.contains(effect.inventoryItemName)) continue
                 for (line in stack.getLore()) {
                     if (line.contains("Remaining") &&
                         line != "§7Time Remaining: §aCompleted!" &&
@@ -193,9 +222,11 @@ class NonGodPotEffectDisplay {
             var effectsCount = 0
             for (line in lines) {
                 for (effect in NonGodPotEffect.entries) {
-                    if (line.startsWith(effect.displayName)) {
+                    val tabListName = effect.tabListName
+                    if ("$line§r".startsWith(tabListName)) {
+                        val string = line.substring(tabListName.length)
                         try {
-                            val duration = TimeUtils.getMillis(line.split("§f")[1])
+                            val duration = TimeUtils.getMillis(string.split("§f")[1])
                             effectDuration[effect] = Timer(duration.milliseconds)
                             update()
                         } catch (e: IndexOutOfBoundsException) {

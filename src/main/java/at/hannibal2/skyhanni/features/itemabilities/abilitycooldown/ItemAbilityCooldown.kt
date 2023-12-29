@@ -2,7 +2,6 @@ package at.hannibal2.skyhanni.features.itemabilities.abilitycooldown
 
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.data.ItemRenderBackground.Companion.background
-import at.hannibal2.skyhanni.events.BlockClickEvent
 import at.hannibal2.skyhanni.events.ItemClickEvent
 import at.hannibal2.skyhanni.events.LorenzActionBarEvent
 import at.hannibal2.skyhanni.events.LorenzChatEvent
@@ -31,10 +30,13 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import kotlin.math.max
 
 class ItemAbilityCooldown {
+    private val config get() = SkyHanniMod.feature.itemAbilities
+
     private var lastAbility = ""
     private var items = mapOf<ItemStack, List<ItemText>>()
     private var abilityItems = mapOf<ItemStack, MutableList<ItemAbility>>()
     private val youAlignedOthersPattern = "§eYou aligned §r§a.* §r§eother player(s)?!".toPattern()
+    private val youBuffedYourselfPattern = "§aYou buffed yourself for §r§c\\+\\d+❁ Strength".toPattern()
     private val WEIRD_TUBA = "WEIRD_TUBA".asInternalName()
     private val WEIRDER_TUBA = "WEIRDER_TUBA".asInternalName()
     private val VOODOO_DOLL_WILTED = "VOODOO_DOLL_WILTED".asInternalName()
@@ -156,11 +158,6 @@ class ItemAbilityCooldown {
     }
 
     @SubscribeEvent
-    fun onBlockClickSend(event: BlockClickEvent) {
-        handleItemClick(event.itemInHand)
-    }
-
-    @SubscribeEvent
     fun onItemClick(event: ItemClickEvent) {
         handleItemClick(event.itemInHand)
     }
@@ -185,11 +182,13 @@ class ItemAbilityCooldown {
                     ItemAbility.RAGNAROCK_AXE.activate(LorenzColor.WHITE, 3_000)
                 }
             }
+
             message.contains("§lCASTING") -> {
                 if (ItemAbility.RAGNAROCK_AXE.specialColor != LorenzColor.DARK_PURPLE) {
                     ItemAbility.RAGNAROCK_AXE.activate(LorenzColor.DARK_PURPLE, 10_000)
                 }
             }
+
             message.contains("§c§lCANCELLED") -> {
                 ItemAbility.RAGNAROCK_AXE.activate(null, 17_000)
             }
@@ -212,9 +211,7 @@ class ItemAbilityCooldown {
         lastAbility = ""
     }
 
-    private fun isEnabled(): Boolean {
-        return LorenzUtils.inSkyBlock && SkyHanniMod.feature.itemAbilities.itemAbilityCooldown
-    }
+    private fun isEnabled(): Boolean = LorenzUtils.inSkyBlock && config.itemAbilityCooldown
 
     private fun click(ability: ItemAbility) {
         if (ability.actionBarDetection) {
@@ -239,11 +236,10 @@ class ItemAbilityCooldown {
 
     private fun createItemText(ability: ItemAbility): ItemText {
         val specialColor = ability.specialColor
+        val readyText = if (config.itemAbilityShowWhenReady) "R" else ""
         return if (ability.isOnCooldown()) {
-            val duration: Long =
-                ability.lastActivation + ability.getCooldown() - System.currentTimeMillis()
-            val color =
-                specialColor ?: if (duration < 600) LorenzColor.RED else LorenzColor.YELLOW
+            val duration: Long = ability.lastActivation + ability.getCooldown() - System.currentTimeMillis()
+            val color = specialColor ?: if (duration < 600) LorenzColor.RED else LorenzColor.YELLOW
             ItemText(color, ability.getDurationText(), true, ability.alternativePosition)
         } else {
             if (specialColor != null) {
@@ -251,7 +247,7 @@ class ItemAbilityCooldown {
                 tryHandleNextPhase(ability, specialColor)
                 return createItemText(ability)
             }
-            ItemText(LorenzColor.GREEN, "R", false, ability.alternativePosition)
+            ItemText(LorenzColor.GREEN, readyText, false, ability.alternativePosition)
         }
     }
 
@@ -273,7 +269,7 @@ class ItemAbilityCooldown {
         val guiOpen = Minecraft.getMinecraft().currentScreen != null
         val uuid = stack.getIdentifier() ?: return
         val list = items.filter { (it.key.getIdentifier()) == uuid }
-             .firstNotNullOfOrNull { it.value } ?: return
+            .firstNotNullOfOrNull { it.value } ?: return
 
         for (itemText in list) {
             if (guiOpen && !itemText.onCooldown) continue
@@ -286,10 +282,11 @@ class ItemAbilityCooldown {
             event.renderObjects.add(renderObject)
 
             // fix multiple problems when having multiple abilities
-            if (SkyHanniMod.feature.itemAbilities.itemAbilityCooldownBackground) {
+            if (config.itemAbilityCooldownBackground) {
                 var opacity = 130
                 if (color == LorenzColor.GREEN) {
                     opacity = 80
+                    if (!config.itemAbilityShowWhenReady) return
                 }
                 stack.background = color.addOpacity(opacity).rgb
             }
@@ -323,6 +320,9 @@ class ItemAbilityCooldown {
         }
         if (message == "§cRagnarock was cancelled due to being hit!") {
             ItemAbility.RAGNAROCK_AXE.activate(null, 17_000)
+        }
+        youBuffedYourselfPattern.matchMatcher(message) {
+            ItemAbility.SWORD_OF_BAD_HEALTH.activate()
         }
     }
 

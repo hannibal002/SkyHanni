@@ -5,7 +5,7 @@ import at.hannibal2.skyhanni.events.EntityMaxHealthUpdateEvent
 import at.hannibal2.skyhanni.events.LorenzRenderWorldEvent
 import at.hannibal2.skyhanni.events.LorenzWorldChangeEvent
 import at.hannibal2.skyhanni.events.withAlpha
-import at.hannibal2.skyhanni.features.damageindicator.DamageIndicatorManager
+import at.hannibal2.skyhanni.features.combat.damageindicator.DamageIndicatorManager
 import at.hannibal2.skyhanni.mixins.hooks.RenderLivingEntityHelper
 import at.hannibal2.skyhanni.utils.EntityUtils.hasMaxHealth
 import at.hannibal2.skyhanni.utils.LocationUtils.distanceToPlayer
@@ -60,7 +60,7 @@ class SlayerMiniBossFeatures {
 
             event.draw3DLine(
                 event.exactPlayerEyeLocation(),
-                mob.getLorenzVec().add(0, 1, 0),
+                mob.getLorenzVec().add(y = 1),
                 LorenzColor.AQUA.toColor(),
                 3,
                 true

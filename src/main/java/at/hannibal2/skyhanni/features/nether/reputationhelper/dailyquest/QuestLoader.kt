@@ -15,11 +15,22 @@ import at.hannibal2.skyhanni.features.nether.reputationhelper.dailyquest.quest.U
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.TabListData
+import at.hannibal2.skyhanni.data.jsonobjects.repo.CrimsonIsleReputationJson.ReputationQuest
 
 class QuestLoader(private val dailyQuestHelper: DailyQuestHelper) {
 
+    companion object {
+        val quests = mutableMapOf<String, Pair<String, ReputationQuest>>()
+        fun loadQuests(data: Map<String, ReputationQuest>, questType: String) {
+            for ((questName, questInfo) in data) {
+                quests[questName] = Pair(questType, questInfo)
+            }
+        }
+    }
+
     fun loadFromTabList() {
         var i = -1
+        dailyQuestHelper.greatSpook = false
         for (line in TabListData.getTabList()) {
             if (line.contains("Faction Quests:")) {
                 i = 0
@@ -29,6 +40,7 @@ class QuestLoader(private val dailyQuestHelper: DailyQuestHelper) {
 
             i++
             readQuest(line)
+            if (dailyQuestHelper.greatSpook) return
             if (i == 5) {
                 break
             }
@@ -36,6 +48,11 @@ class QuestLoader(private val dailyQuestHelper: DailyQuestHelper) {
     }
 
     private fun readQuest(line: String) {
+        if (line.contains("The Great Spook")) {
+            dailyQuestHelper.greatSpook = true
+            dailyQuestHelper.update()
+            return
+        }
         var text = line.substring(3)
         val green = text.startsWith("§a")
         text = text.substring(2)
@@ -83,32 +100,29 @@ class QuestLoader(private val dailyQuestHelper: DailyQuestHelper) {
                 return KuudraQuest(kuudraTier, state)
             }
         }
+        var questName = name
+        var dojoGoal = ""
 
-        val repoData = dailyQuestHelper.reputationHelper.repoData ?: return UnknownQuest(name)
-        for (entry in repoData.entrySet()) {
-            val categoryName = entry.key
-            val category = entry.value.asJsonObject
-            for ((entryName, extraData) in category.entrySet()) {
-                val data = extraData.asJsonObject
-                val displayItem = data["item"]?.asString
-                val location = dailyQuestHelper.reputationHelper.readLocationData(data)
-                if (name.startsWith("$entryName Rank ")) {
-                    val split = name.split(" Rank ")
-                    val dojoName = split[0]
-                    val dojoRankGoal = split[1]
-                    return DojoQuest(dojoName, location, displayItem, dojoRankGoal, state)
-                }
+        if (name.contains(" Rank ")) {
+            val split = name.split(" Rank ")
+            questName = split[0]
+            dojoGoal = split[1]
+        }
 
-                if (name == entryName) {
-                    when (categoryName) {
-                        "FISHING" -> return TrophyFishQuest(name, location, displayItem, state, needAmount)
-                        "RESCUE" -> return RescueMissionQuest(displayItem, location, state)
-                        "FETCH" -> return FetchQuest(name, location, displayItem, state, needAmount)
-                    }
-                }
+        if (questName in quests) {
+            val questInfo = quests[questName] ?: return UnknownQuest(name)
+            val locationInfo = questInfo.second.location
+            val location = dailyQuestHelper.reputationHelper.readLocationData(locationInfo)
+            val displayItem = questInfo.second.item
+
+            when (questInfo.first) {
+                "FISHING" -> return TrophyFishQuest(name, location, displayItem, state, needAmount)
+                "RESCUE" -> return RescueMissionQuest(displayItem, location, state)
+                "FETCH" -> return FetchQuest(name, location, displayItem, state, needAmount)
+                "DOJO" -> return DojoQuest(questName, location, displayItem, dojoGoal, state)
             }
         }
-        LorenzUtils.chat("§c[SkyHanni] Unknown Crimson Isle quest: '$name'")
+        LorenzUtils.error("Unknown Crimson Isle quest: '$name'")
         return UnknownQuest(name)
     }
 
@@ -142,6 +156,11 @@ class QuestLoader(private val dailyQuestHelper: DailyQuestHelper) {
     }
 
     fun loadConfig(storage: Storage.ProfileSpecific.CrimsonIsleStorage) {
+        if (dailyQuestHelper.greatSpook) return
+        if (storage.quests.toList().any { hasGreatSpookLine(it) }) {
+            dailyQuestHelper.greatSpook = true
+            return
+        }
         for (text in storage.quests.toList()) {
             val split = text.split(":")
             val name = split[0]
@@ -159,6 +178,15 @@ class QuestLoader(private val dailyQuestHelper: DailyQuestHelper) {
             }
             addQuest(quest)
         }
+    }
+
+    private fun hasGreatSpookLine(text: String) = when {
+        text.contains("The Great Spook") -> true
+        text.contains(" Days") -> true
+        text.contains("Fear: §r") -> true
+        text.contains("Primal Fears") -> true
+
+        else -> false
     }
 
     private fun addQuest(element: Quest) {

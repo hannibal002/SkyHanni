@@ -6,14 +6,16 @@ import at.hannibal2.skyhanni.events.RepositoryReloadEvent
 import at.hannibal2.skyhanni.features.garden.CropType
 import at.hannibal2.skyhanni.features.garden.GardenAPI
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
+import at.hannibal2.skyhanni.utils.NumberUtil.formatNumber
 import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
-import at.hannibal2.skyhanni.utils.jsonobjects.GardenJson
+import at.hannibal2.skyhanni.data.jsonobjects.repo.GardenJson
 import net.minecraft.item.ItemStack
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
 object GardenCropMilestones {
+    // TODO USE SH-REPO
     private val cropPattern = "§7Harvest §f(?<name>.*) §7on .*".toPattern()
-    private val totalPattern = "§7Total: §a(?<name>.*)".toPattern()
+    val totalPattern = "§7Total: §a(?<name>.*)".toPattern()
 
     fun getCropTypeByLore(itemStack: ItemStack): CropType? {
         for (line in itemStack.getLore()) {
@@ -33,17 +35,18 @@ object GardenCropMilestones {
             val crop = getCropTypeByLore(stack) ?: continue
             for (line in stack.getLore()) {
                 totalPattern.matchMatcher(line) {
-                    val amount = group("name").replace(",", "").toLong()
+                    val amount = group("name").formatNumber()
                     crop.setCounter(amount)
                 }
             }
         }
         CropMilestoneUpdateEvent().postAndCatch()
+        GardenCropMilestonesCommunityFix.openInventory(event.inventoryItems)
     }
 
-    private var cropMilestoneData: Map<CropType, List<Int>>? = null
+    var cropMilestoneData: Map<CropType, List<Int>> = emptyMap()
 
-    val cropCounter: MutableMap<CropType, Long>? get() = GardenAPI.config?.cropCounter
+    val cropCounter: MutableMap<CropType, Long>? get() = GardenAPI.storage?.cropCounter
 
     // TODO make nullable
     fun CropType.getCounter() = cropCounter?.get(this) ?: 0
@@ -53,14 +56,15 @@ object GardenCropMilestones {
     }
 
     fun CropType.isMaxed(): Boolean {
-        val maxValue = cropMilestoneData?.get(this)?.sum() ?: 1_000_000_000 // 1 bil for now
+        // TODO change 1b
+        val maxValue = cropMilestoneData[this]?.sum() ?: 1_000_000_000 // 1 bil for now
         return getCounter() >= maxValue
     }
 
     fun getTierForCropCount(count: Long, crop: CropType): Int {
         var tier = 0
         var totalCrops = 0L
-        val cropMilestone = cropMilestoneData?.get(crop) ?: return 0
+        val cropMilestone = cropMilestoneData[crop] ?: return 0
         for (tierCrops in cropMilestone) {
             totalCrops += tierCrops
             if (totalCrops > count) {
@@ -72,12 +76,12 @@ object GardenCropMilestones {
         return tier
     }
 
-    fun getMaxTier() = cropMilestoneData?.values?.firstOrNull()?.size ?: 0
+    fun getMaxTier() = cropMilestoneData.values.firstOrNull()?.size ?: 0
 
     fun getCropsForTier(requestedTier: Int, crop: CropType): Long {
         var totalCrops = 0L
         var tier = 0
-        val cropMilestone = cropMilestoneData?.get(crop) ?: return 0
+        val cropMilestone = cropMilestoneData[crop] ?: return 0
         for (tierCrops in cropMilestone) {
             totalCrops += tierCrops
             tier++
@@ -99,7 +103,6 @@ object GardenCropMilestones {
 
     @SubscribeEvent
     fun onRepoReload(event: RepositoryReloadEvent) {
-        val data = event.getConstant<GardenJson>("Garden") ?: return
-        cropMilestoneData = data.crop_milestones
+        cropMilestoneData = event.getConstant<GardenJson>("Garden").crop_milestones
     }
 }

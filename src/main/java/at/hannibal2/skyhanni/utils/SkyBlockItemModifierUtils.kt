@@ -2,7 +2,7 @@ package at.hannibal2.skyhanni.utils
 
 import at.hannibal2.skyhanni.config.ConfigManager
 import at.hannibal2.skyhanni.mixins.hooks.ItemStackCachedData
-import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName_old
+import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.ItemUtils.name
 import at.hannibal2.skyhanni.utils.NEUInternalName.Companion.asInternalName
@@ -16,6 +16,8 @@ import java.util.Locale
 
 object SkyBlockItemModifierUtils {
     private val drillPartTypes = listOf("drill_part_upgrade_module", "drill_part_engine", "drill_part_fuel_tank")
+
+    // TODO USE SH-REPO
     private val petLevelPattern = "§7\\[Lvl (?<level>.*)\\] .*".toPattern()
 
     fun ItemStack.getHotPotatoCount() = getAttributeInt("hot_potato_count")
@@ -23,6 +25,8 @@ object SkyBlockItemModifierUtils {
     fun ItemStack.getFarmingForDummiesCount() = getAttributeInt("farming_for_dummies_count")
 
     fun ItemStack.getPolarvoidBookCount() = getAttributeInt("polarvoid")
+
+    fun ItemStack.getBookwormBookCount() = getAttributeInt("bookworm_books")
 
     fun ItemStack.getCultivatingCounter() = getAttributeLong("farmed_cultivating")
 
@@ -32,7 +36,7 @@ object SkyBlockItemModifierUtils {
         it - 5 - getBaseSilexCount()
     }?.takeIf { it > 0 }
 
-    private fun ItemStack.getBaseSilexCount() = when (getInternalName_old()) {
+    private fun ItemStack.getBaseSilexCount() = when (getInternalName().asString()) {
         "STONK_PICKAXE" -> 1
         "PROMISING_SPADE" -> 5
 
@@ -115,6 +119,10 @@ object SkyBlockItemModifierUtils {
 
     fun ItemStack.getArmorDye() = getAttributeString("dye_item")?.asInternalName()
 
+    fun ItemStack.getFungiCutterMode() = getAttributeString("fungi_cutter_mode")
+
+    fun ItemStack.getRanchersSpeed() = getAttributeInt("ranchers_speed")
+
     fun ItemStack.getRune(): NEUInternalName? {
         val runesMap = getExtraAttributes()?.getCompoundTag("runes") ?: return null
         val runesList = runesMap.keySet.associateWith { runesMap.getInteger(it) }.toList()
@@ -172,6 +180,10 @@ object SkyBlockItemModifierUtils {
     fun ItemStack.hasArtOfPeace() = getAttributeBoolean("artOfPeaceApplied")
 
     fun ItemStack.getLivingMetalProgress() = getAttributeInt("lm_evo")
+
+    fun ItemStack.getBottleOfJyrreSeconds() = getAttributeInt("bottle_of_jyrre_seconds")
+
+    fun ItemStack.getEdition() = getAttributeInt("edition")
 
     fun ItemStack.getEnchantments() = getExtraAttributes()?.takeIf { it.hasKey("enchantments") }?.run {
         val enchantments = this.getCompoundTag("enchantments")

@@ -20,13 +20,13 @@ class DungeonRankTabListColor {
             val playerName = group("playerName")
             val split = playerName.split(" ")
             val sbLevel = split[0]
-            val cleanName = split[1].cleanPlayerName()
+            val cleanName = split[1].cleanPlayerName(displayName = true)
 
             val className = group("className")
             val level = group("classLevel").romanToDecimal()
             val color = getColor(level)
 
-            event.text = "$sbLevel §b$cleanName §7(§e$className $color$level§7)"
+            event.text = "$sbLevel $cleanName §7(§e$className $color$level§7)"
         }
     }
 

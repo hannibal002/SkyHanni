@@ -10,7 +10,7 @@ import at.hannibal2.skyhanni.data.GardenCropMilestones.isMaxed
 import at.hannibal2.skyhanni.data.GardenCropMilestones.progressToNextLevel
 import at.hannibal2.skyhanni.data.HypixelData
 import at.hannibal2.skyhanni.data.IslandType
-import at.hannibal2.skyhanni.data.ProfileStorageData
+import at.hannibal2.skyhanni.data.PetAPI
 import at.hannibal2.skyhanni.data.ScoreboardData
 import at.hannibal2.skyhanni.features.dungeon.DungeonAPI
 import at.hannibal2.skyhanni.features.garden.GardenAPI.getCropType
@@ -18,17 +18,20 @@ import at.hannibal2.skyhanni.features.rift.RiftAPI
 import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils.colorCodeToRarity
-import at.hannibal2.skyhanni.utils.LorenzUtils.formatted
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
+import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.StringUtils.firstLetterUppercase
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.TabListData.Companion.getTabList
+import at.hannibal2.skyhanni.utils.TimeUtils.format
+import at.hannibal2.skyhanni.utils.TimeUtils.formatted
 import io.github.moulberry.notenoughupdates.miscfeatures.PetInfoOverlay.getCurrentPet
 import io.github.moulberry.notenoughupdates.util.SkyBlockTime
 import net.minecraft.item.ItemStack
 import net.minecraft.nbt.NBTTagCompound
 import java.util.function.Supplier
 import java.util.regex.Pattern
+import kotlin.time.Duration.Companion.minutes
 
 var lastKnownDisplayStrings: MutableMap<DiscordStatus, String> =
     mutableMapOf() // if the displayMessageSupplier is ever a placeholder, return from this instead
@@ -91,6 +94,8 @@ private fun getVisitingName(): String {
     }
     return "Someone"
 }
+
+var beenAfkFor = SimpleTimeMark.now()
 
 enum class DiscordStatus(private val displayMessageSupplier: Supplier<String>?) {
 
@@ -253,7 +258,8 @@ enum class DiscordStatus(private val displayMessageSupplier: Supplier<String>?) 
     AUTO({
         var autoReturn = ""
         for (statusID in SkyHanniMod.feature.misc.discordRPC.autoPriority) { // for every dynamic that the user wants to see...
-            val autoStatus = AutoStatus.entries[statusID]
+            // TODO, change functionality to use enum rather than ordinals
+            val autoStatus = AutoStatus.entries[statusID.ordinal]
             val result =
                 autoStatus.correspondingDiscordStatus.getDisplayString() // get what would happen if we were to display it
             if (result != autoStatus.placeholderText) { // if that value is useful, display it
@@ -264,7 +270,7 @@ enum class DiscordStatus(private val displayMessageSupplier: Supplier<String>?) 
         if (autoReturn == "") { // if we didn't find any useful information, display the fallback
             val statusNoAuto = DiscordStatus.entries.toMutableList()
             statusNoAuto.remove(AUTO)
-            autoReturn = statusNoAuto[SkyHanniMod.feature.misc.discordRPC.auto.get()].getDisplayString()
+            autoReturn = statusNoAuto[SkyHanniMod.feature.misc.discordRPC.auto.get().ordinal].getDisplayString()
         }
         autoReturn
     }),
@@ -279,12 +285,12 @@ enum class DiscordStatus(private val displayMessageSupplier: Supplier<String>?) 
         } ?: 100 // percentage to next milestone
 
         if (tier != null) {
-            "${crop.cropName}: ${if (!crop.isMaxed()) "Milestone $tier ($progress)" else "MAXED (${cropCounter.addSeparators()} crops collected"})"
+            "${crop.cropName}: ${if (!crop.isMaxed()) "Milestone $tier ($progress)" else "MAXED (${cropCounter.addSeparators()} crops collected)"}"
         } else AutoStatus.CROP_MILESTONES.placeholderText
     }),
 
     PETS({
-        ProfileStorageData.profileSpecific?.currentPet?.let {
+        PetAPI.currentPet?.let {
             val colorCode = it.substring(1..2).first()
             val petName = it.substring(2)
             val petLevel = getCurrentPet()?.petLevel?.currentLevel ?: "?"
@@ -363,6 +369,13 @@ enum class DiscordStatus(private val displayMessageSupplier: Supplier<String>?) 
                 "$floor Kills: $amountKills ($time)"
             }
         }
+    }),
+
+    AFK({
+        if (beenAfkFor.passedSince() > 5.minutes) {
+            val format = beenAfkFor.passedSince().format(maxUnits = 1, longName = true)
+            "AFK for $format"
+        } else AutoStatus.AFK.placeholderText
     })
     ;
 
@@ -372,11 +385,14 @@ enum class DiscordStatus(private val displayMessageSupplier: Supplier<String>?) 
         }
         return ""
     }
+
 }
 
 enum class AutoStatus(val placeholderText: String, val correspondingDiscordStatus: DiscordStatus) {
     CROP_MILESTONES("Not farming!", DiscordStatus.CROP_MILESTONES),
     SLAYER("Planning to do a slayer quest", DiscordStatus.SLAYER),
     STACKING("Stacking placeholder (should never be visible)", DiscordStatus.STACKING),
-    DUNGEONS("Dungeons placeholder (should never be visible)", DiscordStatus.DUNGEONS);
+    DUNGEONS("Dungeons placeholder (should never be visible)", DiscordStatus.DUNGEONS),
+    AFK("This person is not afk (should never be visible)", DiscordStatus.AFK),
+    ;
 }

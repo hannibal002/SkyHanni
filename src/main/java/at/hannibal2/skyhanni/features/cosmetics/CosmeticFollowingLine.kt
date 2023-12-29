@@ -1,6 +1,7 @@
 package at.hannibal2.skyhanni.features.cosmetics
 
 import at.hannibal2.skyhanni.SkyHanniMod
+import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.events.LorenzRenderWorldEvent
 import at.hannibal2.skyhanni.events.LorenzTickEvent
 import at.hannibal2.skyhanni.events.LorenzWorldChangeEvent
@@ -19,7 +20,7 @@ import kotlin.time.Duration.Companion.milliseconds
 import kotlin.time.Duration.Companion.seconds
 
 class CosmeticFollowingLine {
-    private val config get() = SkyHanniMod.feature.misc.cosmeticConfig.followingLineConfig
+    private val config get() = SkyHanniMod.feature.misc.cosmetic.followingLine
 
     private var locations = mapOf<LorenzVec, LocationSpot>()
     private var latestLocations = mapOf<LorenzVec, LocationSpot>()
@@ -68,7 +69,7 @@ class CosmeticFollowingLine {
     }
 
     private fun updateClose(event: LorenzRenderWorldEvent) {
-        val playerLocation = event.exactLocation(Minecraft.getMinecraft().thePlayer).add(0.0, 0.3, 0.0)
+        val playerLocation = event.exactLocation(Minecraft.getMinecraft().thePlayer).add(y = 0.3)
 
         latestLocations = latestLocations.editCopy {
             val locationSpot = LocationSpot(SimpleTimeMark.now(), Minecraft.getMinecraft().thePlayer.onGround)
@@ -109,7 +110,7 @@ class CosmeticFollowingLine {
         }
 
         if (event.isMod(2)) {
-            val playerLocation = LocationUtils.playerLocation().add(0.0, 0.3, 0.0)
+            val playerLocation = LocationUtils.playerLocation().add(y = 0.3)
 
             locations.keys.lastOrNull()?.let {
                 if (it.distance(playerLocation) < 0.1) return
@@ -119,5 +120,12 @@ class CosmeticFollowingLine {
                 this[playerLocation] = LocationSpot(SimpleTimeMark.now(), Minecraft.getMinecraft().thePlayer.onGround)
             }
         }
+    }
+
+    @SubscribeEvent
+    fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
+        event.move(9, "misc.cosmeticConfig", "misc.cosmetic")
+        event.move(9, "misc.cosmeticConfig.followingLineConfig", "misc.cosmetic.followingLine")
+        event.move(9, "misc.cosmeticConfig.arrowTrailConfig", "misc.cosmetic.arrowTrail")
     }
 }

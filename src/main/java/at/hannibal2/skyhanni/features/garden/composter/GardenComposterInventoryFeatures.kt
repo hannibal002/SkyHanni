@@ -1,8 +1,8 @@
 package at.hannibal2.skyhanni.features.garden.composter
 
-import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.events.GuiContainerEvent
+import at.hannibal2.skyhanni.events.LorenzToolTipEvent
 import at.hannibal2.skyhanni.features.garden.GardenAPI
 import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.ItemUtils
@@ -15,14 +15,13 @@ import at.hannibal2.skyhanni.utils.NumberUtil
 import at.hannibal2.skyhanni.utils.RenderUtils.highlight
 import net.minecraft.client.gui.inventory.GuiChest
 import net.minecraft.inventory.ContainerChest
-import net.minecraftforge.event.entity.player.ItemTooltipEvent
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
 class GardenComposterInventoryFeatures {
-    private val config get() = SkyHanniMod.feature.garden.composters
+    private val config get() = GardenAPI.config.composters
 
     @SubscribeEvent
-    fun onTooltip(event: ItemTooltipEvent) {
+    fun onTooltip(event: LorenzToolTipEvent) {
         if (!GardenAPI.inGarden()) return
         if (!config.upgradePrice) return
 
@@ -34,9 +33,8 @@ class GardenComposterInventoryFeatures {
         var indexFullCost = 0
         var fullPrice = 0.0
         var amountItems = 0
-        for (originalLine in list) {
+        for (line in event.toolTipRemovedPrefix()) {
             i++
-            val line = originalLine.substring(4)
             if (line == "§7Upgrade Cost:") {
                 next = true
                 indexFullCost = i
@@ -46,17 +44,15 @@ class GardenComposterInventoryFeatures {
             if (next) {
                 if (line.endsWith(" Copper")) continue
                 if (line == "") break
-                val pair = ItemUtils.readItemAmount(line)
-                if (pair == null) {
-                    LorenzUtils.error("§c[SkyHanni] Could not read item '$line'")
+                val (itemName, amount) = ItemUtils.readItemAmount(line) ?: run {
+                    LorenzUtils.error("Could not read item '$line'")
                     continue
                 }
-                val (itemName, amount) = pair
                 val internalName = NEUItems.getInternalNameOrNull(itemName)
                 if (internalName == null) {
-                    LorenzUtils.chat(
-                        "§c[SkyHanni] Error reading internal name for item '$itemName§c' " +
-                                "(in GardenComposterInventoryFeatures)"
+                    LorenzUtils.error(
+                        "Error reading internal name for item '$itemName§c' " +
+                            "(in GardenComposterInventoryFeatures)"
                     )
                     continue
                 }

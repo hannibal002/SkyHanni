@@ -1,7 +1,7 @@
 package at.hannibal2.skyhanni.utils
 
-import at.hannibal2.skyhanni.features.misc.ghostcounter.GhostCounter
-import at.hannibal2.skyhanni.features.misc.ghostcounter.GhostData
+import at.hannibal2.skyhanni.features.combat.ghostcounter.GhostCounter
+import at.hannibal2.skyhanni.features.combat.ghostcounter.GhostData
 import io.github.moulberry.notenoughupdates.core.util.lerp.LerpUtils
 import io.github.moulberry.notenoughupdates.util.XPInformation
 
@@ -72,8 +72,8 @@ object CombatUtils {
         lastKillUpdate = System.currentTimeMillis()
         killGainHourLast = killGainHour
 
-        GhostCounter.hidden?.bestiaryNextLevel?.toInt()?.let { nextLevel ->
-            GhostCounter.hidden?.bestiaryCurrentKill?.toInt()?.let { kill ->
+        GhostCounter.storage?.bestiaryNextLevel?.toInt()?.let { nextLevel ->
+            GhostCounter.storage?.bestiaryCurrentKill?.toInt()?.let { kill ->
                 val sum = GhostData.bestiaryData.filterKeys { it <= nextLevel - 1 }.values.sum()
                 val cKill = sum + kill
                 val totalKill = if (GhostCounter.config.showMax) GhostCounter.bestiaryCurrentKill else cKill

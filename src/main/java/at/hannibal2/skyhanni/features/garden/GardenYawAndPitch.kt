@@ -1,6 +1,5 @@
 package at.hannibal2.skyhanni.features.garden
 
-import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.events.GardenToolChangeEvent
 import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.utils.LorenzUtils
@@ -12,7 +11,7 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import kotlin.time.Duration.Companion.seconds
 
 class GardenYawAndPitch {
-    private val config get() = SkyHanniMod.feature.garden.yawPitchDisplay
+    private val config get() = GardenAPI.config.yawPitchDisplay
     private var lastChange = SimpleTimeMark.farPast()
     private var lastYaw = 0f
     private var lastPitch = 0f
@@ -21,6 +20,7 @@ class GardenYawAndPitch {
     fun onRenderOverlay(event: GuiRenderEvent.GuiOverlayRenderEvent) {
         if (!LorenzUtils.inSkyBlock) return
         if (!config.enabled) return
+        if (GardenAPI.hideExtraGuis()) return
         if (!GardenAPI.inGarden() && !config.showEverywhere) return
         if (GardenAPI.toolInHand == null && !config.showWithoutTool) return
 

@@ -3,6 +3,7 @@ package at.hannibal2.skyhanni.features.misc
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.data.IslandType
+import at.hannibal2.skyhanni.data.WinterAPI
 import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils.isInIsland
@@ -32,11 +33,13 @@ class TimeFeatures {
         if (!LorenzUtils.inSkyBlock) return
 
         if (config.realTime) {
-            val currentTime = (if (config.realTimeFormatToggle) timeFormat12h else timeFormat24h).format(System.currentTimeMillis())
+            val currentTime =
+                (if (config.realTimeFormatToggle) timeFormat12h else timeFormat24h).format(System.currentTimeMillis())
             config.realTimePosition.renderString(currentTime, posLabel = "Real Time")
         }
 
         if (winterConfig.islandCloseTime && IslandType.WINTER.isInIsland()) {
+            if (WinterAPI.isDecember()) return
             val timeTillNextYear = startOfNextYear.getValue().timeUntil()
             val alreadyInNextYear = timeTillNextYear > 5.days
             val text = if (alreadyInNextYear) {

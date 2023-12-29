@@ -2,33 +2,33 @@ package at.hannibal2.skyhanni.features.slayer.blaze
 
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
+import at.hannibal2.skyhanni.config.core.config.gui.GuiPositionEditor
+import at.hannibal2.skyhanni.config.features.slayer.blaze.BlazeHellionConfig.FirstDaggerEntry
 import at.hannibal2.skyhanni.data.ClickType
 import at.hannibal2.skyhanni.events.BlockClickEvent
 import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.LorenzChatEvent
 import at.hannibal2.skyhanni.events.LorenzTickEvent
 import at.hannibal2.skyhanni.events.TitleReceivedEvent
+import at.hannibal2.skyhanni.utils.ConfigUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.ItemUtils.name
 import at.hannibal2.skyhanni.utils.LocationUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils
-import at.hannibal2.skyhanni.utils.NumberUtil.roundToPrecision
-import at.hannibal2.skyhanni.utils.StringUtils.matchRegex
+import at.hannibal2.skyhanni.utils.RenderUtils.renderString
+import at.hannibal2.skyhanni.utils.StringUtils.matches
 import at.hannibal2.skyhanni.utils.getLorenzVec
-import io.github.moulberry.moulconfig.internal.TextRenderUtils
 import net.minecraft.client.Minecraft
-import net.minecraft.client.gui.ScaledResolution
-import net.minecraft.client.renderer.GlStateManager
 import net.minecraft.item.ItemStack
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
 class BlazeSlayerDaggerHelper {
+    private val config get() = SkyHanniMod.feature.slayer.blazes.hellion
+    private val attunementPattern = "§cStrike using the §r(.+) §r§cattunement on your dagger!".toPattern()
 
     private var clientSideClicked = false
-    private var textTopLeft = ""
-    private var textTopRight = ""
-    private var textBottomLeft = ""
-    private var textBottomRight = ""
+    private var textTop = ""
+    private var textBottom = ""
 
     private var lastDaggerCheck = 0L
     private var lastNearestCheck = 0L
@@ -37,12 +37,10 @@ class BlazeSlayerDaggerHelper {
     @SubscribeEvent
     fun onChatMessage(event: LorenzChatEvent) {
         if (!LorenzUtils.inSkyBlock) return
-        if (!SkyHanniMod.feature.slayer.blazes.hellion.hideDaggerWarning) return
+        if (!config.hideDaggerWarning) return
 
         val message = event.message
-        if (message.matchRegex("§cStrike using the §r(.+) §r§cattunement on your dagger!") ||
-            message == "§cYour hit was reduced by Hellion Shield!"
-        ) {
+        if (attunementPattern.matches(message) || message == "§cYour hit was reduced by Hellion Shield!") {
             event.blockedReason = "blaze_slayer_dagger"
         }
     }
@@ -58,27 +56,23 @@ class BlazeSlayerDaggerHelper {
             return
         }
 
-        textTopLeft = ""
-        textTopRight = ""
-        textBottomLeft = ""
-        textBottomRight = ""
+        textTop = ""
+        textBottom = ""
     }
 
     private fun setDaggerText(holding: Dagger) {
         checkActiveDagger()
         lastNearest = findNearest()
 
-        val first = Dagger.entries[SkyHanniMod.feature.slayer.blazes.hellion.firstDagger]
+        val first = Dagger.entries[config.firstDagger.ordinal] // todo avoid ordinal
         val second = first.other()
 
-        textTopLeft = format(holding, true, first)
-        textTopRight = format(holding, true, second)
-        textBottomLeft = format(holding, false, first)
-        textBottomRight = format(holding, false, second)
+        textTop = format(holding, true, first) + " " + format(holding, true, second)
+        textBottom = format(holding, false, first) + " " + format(holding, false, second)
     }
 
     private fun findNearest(): HellionShield? {
-        if (!SkyHanniMod.feature.slayer.blazes.hellion.markRightHellionShield) return null
+        if (!config.markRightHellionShield) return null
 
         if (lastNearestCheck + 100 > System.currentTimeMillis()) return lastNearest
         lastNearestCheck = System.currentTimeMillis()
@@ -194,7 +188,7 @@ class BlazeSlayerDaggerHelper {
     }
 
     private fun isEnabled(): Boolean {
-        return LorenzUtils.inSkyBlock && SkyHanniMod.feature.slayer.blazes.hellion.daggers
+        return LorenzUtils.inSkyBlock && config.daggers
     }
 
     @SubscribeEvent
@@ -242,75 +236,13 @@ class BlazeSlayerDaggerHelper {
     @SubscribeEvent
     fun onRenderOverlay(event: GuiRenderEvent.GuiOverlayRenderEvent) {
         if (!isEnabled()) return
-        if (textTopLeft.isEmpty()) return
 
-        if (Minecraft.getMinecraft().currentScreen != null) return
+        if (textTop == "") return
+        val currentScreen = Minecraft.getMinecraft().currentScreen
+        if (currentScreen != null && currentScreen !is GuiPositionEditor) return
 
-        val scaledResolution = ScaledResolution(Minecraft.getMinecraft())
-        val width = scaledResolution.scaledWidth
-        val height = scaledResolution.scaledHeight
-
-        val sizeFactor = (width.toFloat() / 960f).roundToPrecision(3)
-
-        GlStateManager.enableBlend()
-        GlStateManager.tryBlendFuncSeparate(770, 771, 1, 0)
-        val renderer = Minecraft.getMinecraft().fontRendererObj
-
-        GlStateManager.pushMatrix()
-        GlStateManager.translate(((width / 2) / 1.18).toFloat(), (height / 3.8).toFloat(), 0.0f)
-        GlStateManager.scale(4.0f, 4.0f, 4.0f)
-        TextRenderUtils.drawStringCenteredScaledMaxWidth(
-            textTopLeft,
-            renderer,
-            0f,
-            0f,
-            false,
-            (60f * sizeFactor).toInt(),
-            0
-        )
-        GlStateManager.popMatrix()
-
-        GlStateManager.pushMatrix()
-        GlStateManager.translate(((width / 2) * 1.18).toFloat(), (height / 3.8).toFloat(), 0.0f)
-        GlStateManager.scale(4.0f, 4.0f, 4.0f)
-        TextRenderUtils.drawStringCenteredScaledMaxWidth(
-            textTopRight,
-            renderer,
-            0f,
-            0f,
-            false,
-            (60f * sizeFactor).toInt(),
-            0
-        )
-        GlStateManager.popMatrix()
-
-        GlStateManager.pushMatrix()
-        GlStateManager.translate(((width / 2) / 1.18).toFloat(), (height / 3.0).toFloat(), 0.0f)
-        GlStateManager.scale(4.0f, 4.0f, 4.0f)
-        TextRenderUtils.drawStringCenteredScaledMaxWidth(
-            textBottomLeft,
-            renderer,
-            0f,
-            0f,
-            false,
-            (20f * sizeFactor).toInt(),
-            0
-        )
-        GlStateManager.popMatrix()
-
-        GlStateManager.pushMatrix()
-        GlStateManager.translate(((width / 2) * 1.18).toFloat(), (height / 3.0).toFloat(), 0.0f)
-        GlStateManager.scale(4.0f, 4.0f, 4.0f)
-        TextRenderUtils.drawStringCenteredScaledMaxWidth(
-            textBottomRight,
-            renderer,
-            0f,
-            0f,
-            false,
-            (20f * sizeFactor).toInt(),
-            0
-        )
-        GlStateManager.popMatrix()
+        config.positionTop.renderString(textTop, posLabel = "Blaze Slayer Dagger Top")
+        config.positionBottom.renderString(textBottom, posLabel = "Blaze Slayer Dagger Bottom")
     }
 
     @SubscribeEvent
@@ -319,6 +251,10 @@ class BlazeSlayerDaggerHelper {
         event.move(3, "slayer.blazeMarkRightHellionShield", "slayer.blazes.hellion.markRightHellionShield")
         event.move(3, "slayer.blazeFirstDagger", "slayer.blazes.hellion.firstDagger")
         event.move(3, "slayer.blazeHideDaggerWarning", "slayer.blazes.hellion.hideDaggerWarning")
+
+        event.transform(15, "slayer.blazes.hellion.firstDagger") { element ->
+            ConfigUtils.migrateIntToEnum(element, FirstDaggerEntry::class.java)
+        }
     }
 
 }

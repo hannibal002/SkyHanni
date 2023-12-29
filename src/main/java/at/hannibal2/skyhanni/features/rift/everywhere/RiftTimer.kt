@@ -1,5 +1,6 @@
 package at.hannibal2.skyhanni.features.rift.everywhere
 
+import at.hannibal2.skyhanni.events.ConfigLoadEvent
 import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.LorenzActionBarEvent
 import at.hannibal2.skyhanni.events.LorenzWorldChangeEvent
@@ -12,8 +13,13 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
 class RiftTimer {
     private val config get() = RiftAPI.config.timer
+
+    // TODO USE SH-REPO
+    val pattern = "§(?<color>[a7])(?<time>.*)ф Left.*".toPattern()
+
     private var display = emptyList<String>()
     private var maxTime = 0L
+    private var currentTime = 0L
     private var latestTime = 0L
     private val changes = mutableMapOf<Long, String>()
 
@@ -22,43 +28,42 @@ class RiftTimer {
         display = emptyList()
         maxTime = 0
         latestTime = 0
+        currentTime = 0
     }
 
     @SubscribeEvent
     fun onActionBar(event: LorenzActionBarEvent) {
         if (!isEnabled()) return
-
-        val message = event.message
-        for (entry in message.split("     ")) {
-            "§(?<color>[a7])(?<time>.*)ф Left.*".toPattern().matchMatcher(entry) {
+        for (entry in event.message.split("     ")) {
+            pattern.matchMatcher(entry) {
                 val color = group("color")
+                val newTime = getTime(group("time"))
                 if (color == "7") {
-                    val currentTime = getTime(group("time"))
-                    if (currentTime > maxTime) {
-                        maxTime = currentTime
-                        update(currentTime)
+                    if (newTime > maxTime) {
+                        maxTime = newTime
                     }
-                    return
                 }
-                update(getTime(group("time")))
+                currentTime = newTime
+                update()
             }
         }
     }
 
     private fun getTime(time: String) = TimeUtils.getMillis(time.replace("m", "m "))
 
-    private fun update(currentTime: Long) {
-        if (currentTime == latestTime) return
-        val diff = (currentTime - latestTime) + 1000
-        latestTime = currentTime
-        if (latestTime != maxTime) {
-            addDiff(diff)
+    private fun update() {
+        if (currentTime != latestTime) {
+            val diff = (currentTime - latestTime) + 1000
+            latestTime = currentTime
+            if (latestTime != maxTime) {
+                addDiff(diff)
+            }
         }
 
         val currentFormat = TimeUtils.formatDuration(currentTime)
         val percentage = LorenzUtils.formatPercentage(currentTime.toDouble() / maxTime)
-        val percentageFormat = if (config.percentage) " §7($percentage)" else ""
-        val maxTimeFormat = if (config.maxTime) "§7/§b" + TimeUtils.formatDuration(maxTime) else ""
+        val percentageFormat = if (config.percentage.get()) " §7($percentage)" else ""
+        val maxTimeFormat = if (config.maxTime.get()) "§7/§b" + TimeUtils.formatDuration(maxTime) else ""
         val color = if (currentTime <= 60_000) "§c" else if (currentTime <= 60_000 * 5) "§e" else "§b"
         val firstLine = "§eRift Timer: $color$currentFormat$maxTimeFormat$percentageFormat"
 
@@ -79,6 +84,18 @@ class RiftTimer {
         } else return
 
         changes[System.currentTimeMillis()] = diffFormat
+    }
+
+    @SubscribeEvent
+    fun onConfigLoad(event: ConfigLoadEvent) {
+        LorenzUtils.onToggle(
+            config.percentage,
+            config.maxTime,
+        ) {
+            if (isEnabled()) {
+                update()
+            }
+        }
     }
 
     @SubscribeEvent

@@ -8,7 +8,6 @@ import at.hannibal2.skyhanni.features.garden.FarmingFortuneDisplay
 import at.hannibal2.skyhanni.features.garden.GardenAPI
 import at.hannibal2.skyhanni.features.garden.fortuneguide.FFGuideGUI.Companion.getItem
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName
-import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName_old
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getFarmingForDummiesCount
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getPetItem
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getPetLevel
@@ -16,7 +15,7 @@ import net.minecraft.item.ItemStack
 import kotlin.math.floor
 
 object FFStats {
-    private val toolHasBountiful get() = GardenAPI.config?.toolWithBountiful
+    private val toolHasBountiful get() = GardenAPI.storage?.toolWithBountiful
 
     private val mathCrops =
         listOf(CropType.WHEAT, CropType.CARROT, CropType.POTATO, CropType.SUGAR_CANE, CropType.NETHER_WART)
@@ -52,7 +51,7 @@ object FFStats {
     val cropPage = mutableMapOf<FortuneStats, Pair<Double, Double>>()
 
     fun loadFFData() {
-        cakeExpireTime = GardenAPI.config?.fortune?.cakeExpiring ?: -1L
+        cakeExpireTime = GardenAPI.storage?.fortune?.cakeExpiring ?: -1L
 
         getEquipmentFFData(FarmingItems.NECKLACE.getItem(), necklaceFF)
         getEquipmentFFData(FarmingItems.CLOAK.getItem(), cloakFF)
@@ -74,7 +73,7 @@ object FFStats {
                 { it.second }).map { (key, values) -> key to values.sum() }
                 .toMap() as MutableMap<FFTypes, Double>
 
-        usingSpeedBoots = FarmingItems.BOOTS.getItem().getInternalName_old() in farmingBoots
+        usingSpeedBoots = FarmingItems.BOOTS.getItem().getInternalName().asString() in farmingBoots
 
         getPetFFData(FarmingItems.ELEPHANT.getItem(), elephantFF)
         getPetFFData(FarmingItems.MOOSHROOM_COW.getItem(), mooshroomFF)
@@ -112,7 +111,7 @@ object FFStats {
             }
 
             in dicerCrops -> {
-                cropPage[FortuneStats.SUNDER] = Pair(FarmingFortuneDisplay.getSunderFortune(tool), 62.5)
+                cropPage[FortuneStats.SUNDER] = Pair(FarmingFortuneDisplay.getSunderFortune(tool), 75.0)
                 if (toolHasBountiful?.get(crop) == true) {
                     cropPage[FortuneStats.REFORGE] = Pair(FarmingFortuneDisplay.reforgeFortune, 10.0)
                 } else {
@@ -132,7 +131,7 @@ object FFStats {
 
             CropType.COCOA_BEANS -> {
                 cropPage[FortuneStats.BASE_TOOL] = Pair(FarmingFortuneDisplay.getToolFortune(tool), 20.0)
-                cropPage[FortuneStats.SUNDER] = Pair(FarmingFortuneDisplay.getSunderFortune(tool), 62.5)
+                cropPage[FortuneStats.SUNDER] = Pair(FarmingFortuneDisplay.getSunderFortune(tool), 75.0)
                 if (toolHasBountiful?.get(crop) == true) {
                     cropPage[FortuneStats.REFORGE] = Pair(FarmingFortuneDisplay.reforgeFortune, 7.0)
                 } else {
@@ -152,9 +151,14 @@ object FFStats {
             else -> {}
         }
         if (crop == CropType.CARROT) {
-            val hidden = GardenAPI.config?.fortune ?: return
-            val carrotFortune = if (hidden.carrotFortune) 12.0 else 0.0
+            val storage = GardenAPI.storage?.fortune ?: return
+            val carrotFortune = if (storage.carrotFortune) 12.0 else 0.0
             cropPage[FortuneStats.EXPORTED_CARROT] = Pair(carrotFortune, 12.0)
+        }
+        if (crop == CropType.PUMPKIN) {
+            val storage = GardenAPI.storage?.fortune ?: return
+            val pumpkinFortune = if (storage.pumpkinFortune) 12.0 else 0.0
+            cropPage[FortuneStats.EXPIRED_PUMPKIN] = Pair(pumpkinFortune, 12.0)
         }
 
         cropPage[FortuneStats.CROP_TOTAL] = Pair(
@@ -195,13 +199,13 @@ object FFStats {
     }
 
     private fun getGenericFF(out: MutableMap<FFTypes, Double>) {
-        val savedStats = GardenAPI.config?.fortune ?: return
+        val storage = GardenAPI.storage?.fortune ?: return
         out[FFTypes.TOTAL] = 0.0
         out[FFTypes.BASE_FF] = 100.0
-        out[FFTypes.FARMING_LVL] = savedStats.farmingLevel.toDouble() * 4
+        out[FFTypes.FARMING_LVL] = storage.farmingLevel.toDouble() * 4
         out[FFTypes.COMMUNITY_SHOP] = (ProfileStorageData.playerSpecific?.gardenCommunityUpgrade ?: -1).toDouble() * 4
-        out[FFTypes.PLOTS] = savedStats.plotsUnlocked.toDouble() * 3
-        out[FFTypes.ANITA] = savedStats.anitaUpgrade.toDouble() * 4
+        out[FFTypes.PLOTS] = storage.plotsUnlocked.toDouble() * 3
+        out[FFTypes.ANITA] = storage.anitaUpgrade.toDouble() * 4
         if (cakeExpireTime - System.currentTimeMillis() > 0 || cakeExpireTime == -1L) {
             out[FFTypes.CAKE] = 5.0
         } else {
@@ -241,7 +245,7 @@ object FFStats {
 
     private fun getPetFF(pet: ItemStack): Double {
         val petLevel = pet.getPetLevel()
-        val strength = (GardenAPI.config?.fortune?.farmingStrength)
+        val strength = (GardenAPI.storage?.fortune?.farmingStrength)
         if (strength != null) {
             val rawInternalName = pet.getInternalName()
             return when {

@@ -7,11 +7,14 @@ import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.data.ProfileStorageData
 import at.hannibal2.skyhanni.events.InventoryCloseEvent
 import at.hannibal2.skyhanni.events.InventoryFullyOpenedEvent
+import at.hannibal2.skyhanni.events.InventoryUpdatedEvent
 import at.hannibal2.skyhanni.events.LorenzChatEvent
 import at.hannibal2.skyhanni.events.LorenzRenderWorldEvent
 import at.hannibal2.skyhanni.events.LorenzTickEvent
 import at.hannibal2.skyhanni.events.LorenzWorldChangeEvent
+import at.hannibal2.skyhanni.events.MinionCloseEvent
 import at.hannibal2.skyhanni.events.MinionOpenEvent
+import at.hannibal2.skyhanni.events.MinionStorageOpenEvent
 import at.hannibal2.skyhanni.test.GriffinUtils.drawWaypointFilled
 import at.hannibal2.skyhanni.utils.BlockUtils.getBlockStateAt
 import at.hannibal2.skyhanni.utils.InventoryUtils
@@ -19,19 +22,23 @@ import at.hannibal2.skyhanni.utils.ItemUtils.cleanName
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.ItemUtils.name
 import at.hannibal2.skyhanni.utils.LocationUtils
+import at.hannibal2.skyhanni.utils.LocationUtils.canBeSeen
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils.editCopy
 import at.hannibal2.skyhanni.utils.LorenzUtils.formatInteger
+import at.hannibal2.skyhanni.utils.LorenzUtils.isInIsland
 import at.hannibal2.skyhanni.utils.LorenzVec
 import at.hannibal2.skyhanni.utils.NumberUtil.romanToDecimal
-import at.hannibal2.skyhanni.utils.NumberUtil.romanToDecimalIfNeeded
+import at.hannibal2.skyhanni.utils.NumberUtil.romanToDecimalIfNecessary
 import at.hannibal2.skyhanni.utils.RenderUtils.drawString
 import at.hannibal2.skyhanni.utils.RenderUtils.renderString
 import at.hannibal2.skyhanni.utils.SpecialColour
+import at.hannibal2.skyhanni.utils.StringUtils.find
 import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
-import at.hannibal2.skyhanni.utils.StringUtils.matchRegex
+import at.hannibal2.skyhanni.utils.StringUtils.matches
 import at.hannibal2.skyhanni.utils.TimeUtils
 import at.hannibal2.skyhanni.utils.getLorenzVec
+import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import at.hannibal2.skyhanni.utils.toLorenzVec
 import net.minecraft.client.Minecraft
 import net.minecraft.client.gui.inventory.GuiChest
@@ -50,20 +57,20 @@ import java.awt.Color
 class MinionFeatures {
     private val config get() = SkyHanniMod.feature.minions
     private var lastClickedEntity: LorenzVec? = null
-    private var lastMinion: LorenzVec? = null
     private var newMinion: LorenzVec? = null
     private var newMinionName: String? = null
     private var lastMinionOpened = 0L
-    private var minionInventoryOpen = false
 
     private var lastInventoryClosed = 0L
     private var coinsPerDay = ""
-    private val minionUpgradePattern = "§aYou have upgraded your Minion to Tier (?<tier>.*)".toPattern()
+    private val minionUpgradePattern by RepoPattern.pattern("minion.chat.upgrade", "§aYou have upgraded your Minion to Tier (?<tier>.*)")
+    private val minionCoinPattern by RepoPattern.pattern("minion.chat.coin", "§aYou received §r§6(.*) coins§r§a!")
+    private val minionTitlePattern by RepoPattern.pattern("minion.title", "Minion [^➜]")
+    private val minionCollectItemPattern by RepoPattern.pattern("minion.item.collect", "^§aCollect All$")
 
     @SubscribeEvent
     fun onPlayerInteract(event: PlayerInteractEvent) {
-        if (!LorenzUtils.inSkyBlock) return
-        if (LorenzUtils.skyBlockIsland != IslandType.PRIVATE_ISLAND) return
+        if (!enable()) return
         if (event.action != PlayerInteractEvent.Action.RIGHT_CLICK_BLOCK) return
 
         val lookingAt = event.pos.offset(event.face).toLorenzVec()
@@ -80,8 +87,7 @@ class MinionFeatures {
 
     @SubscribeEvent
     fun onClick(event: InputEvent.MouseInputEvent) {
-        if (!LorenzUtils.inSkyBlock) return
-        if (LorenzUtils.skyBlockIsland != IslandType.PRIVATE_ISLAND) return
+        if (!enableWithHub()) return
 
         if (!Mouse.getEventButtonState()) return
         if (Mouse.getEventButton() != 1) return
@@ -90,13 +96,16 @@ class MinionFeatures {
         val entity = minecraft.pointedEntity
         if (entity != null) {
             lastClickedEntity = entity.getLorenzVec()
+            return
+        }
+        minecraft.thePlayer.rayTrace(16.0, 1.0f)?.let {
+            lastStorage = it.blockPos.toLorenzVec()
         }
     }
 
     @SubscribeEvent
     fun onRenderLastClickedMinion(event: LorenzRenderWorldEvent) {
-        if (!LorenzUtils.inSkyBlock) return
-        if (LorenzUtils.skyBlockIsland != IslandType.PRIVATE_ISLAND) return
+        if (!enableWithHub()) return
         if (!config.lastClickedMinion.display) return
 
         val special = config.lastClickedMinion.color
@@ -120,14 +129,25 @@ class MinionFeatures {
 
     @SubscribeEvent
     fun onInventoryOpen(event: InventoryFullyOpenedEvent) {
-        if (!LorenzUtils.inSkyBlock) return
-        if (LorenzUtils.skyBlockIsland != IslandType.PRIVATE_ISLAND) return
-        if (!event.inventoryName.contains(" Minion ")) return
+        if (!enableWithHub()) return
+        if (!minionTitlePattern.find(event.inventoryName)) return
 
         event.inventoryItems[48]?.let {
-            if ("§aCollect All" == it.name) {
+            if (minionCollectItemPattern.matches(it.name ?: "")) {
                 MinionOpenEvent(event.inventoryName, event.inventoryItems).postAndCatch()
+                return
             }
+        }
+
+        MinionStorageOpenEvent(lastStorage, event.inventoryItems).postAndCatch()
+        minionStorageInventoryOpen = true
+    }
+
+    @SubscribeEvent
+    fun onInventoryUpdated(event: InventoryUpdatedEvent) {
+        if (!enableWithHub()) return
+        if (minionInventoryOpen) {
+            MinionOpenEvent(event.inventoryName, event.inventoryItems).postAndCatch()
         }
     }
 
@@ -138,7 +158,7 @@ class MinionFeatures {
 
         val openInventory = event.inventoryName
         val name = getMinionName(openInventory)
-        if (!minions.contains(entity)) {
+        if (!minions.contains(entity) && LorenzUtils.skyBlockIsland != IslandType.HUB) {
             MinionFeatures.minions = minions.editCopy {
                 this[entity] = Storage.ProfileSpecific.MinionConfig().apply {
                     displayName = name
@@ -146,8 +166,10 @@ class MinionFeatures {
                 }
             }
         } else {
-            if (minions[entity]!!.displayName != name) {
-                minions[entity]!!.displayName = name
+            minions[entity]?.let {
+                if (it.displayName != name) {
+                    it.displayName = name
+                }
             }
         }
         lastMinion = entity
@@ -158,6 +180,9 @@ class MinionFeatures {
 
     @SubscribeEvent
     fun onInventoryClose(event: InventoryCloseEvent) {
+        if (event.reopenSameName) return
+
+        minionStorageInventoryOpen = false
         if (!minionInventoryOpen) return
         val minions = minions ?: return
 
@@ -166,16 +191,19 @@ class MinionFeatures {
         coinsPerDay = ""
         lastInventoryClosed = System.currentTimeMillis()
 
-        val location = lastMinion ?: return
+        if (IslandType.PRIVATE_ISLAND.isInIsland()) {
+            val location = lastMinion ?: return
 
-        if (location !in minions) {
-            minions[location]!!.lastClicked = 0
+            if (location !in minions) {
+                minions[location]?.lastClicked = 0
+            }
         }
+        MinionCloseEvent().postAndCatch()
     }
 
     @SubscribeEvent
     fun onTick(event: LorenzTickEvent) {
-        if (LorenzUtils.skyBlockIsland != IslandType.PRIVATE_ISLAND) return
+        if (!enable()) return
         if (coinsPerDay != "") return
 
         if (Minecraft.getMinecraft().currentScreen is GuiChest && config.hopperProfitDisplay) {
@@ -223,19 +251,18 @@ class MinionFeatures {
         lastMinion = null
         lastMinionOpened = 0L
         minionInventoryOpen = false
+        minionStorageInventoryOpen = false
     }
 
     @SubscribeEvent
     fun onChatMessage(event: LorenzChatEvent) {
-        if (!LorenzUtils.inSkyBlock) return
-        if (LorenzUtils.skyBlockIsland != IslandType.PRIVATE_ISLAND) return
+        if (!enable()) return
 
         val message = event.message
-        if (message.matchRegex("§aYou received §r§6(.*) coins§r§a!") && System.currentTimeMillis() - lastInventoryClosed < 2_000) {
-                minions?.get(lastMinion)?.let {
+        if (minionCoinPattern.matches(message) && System.currentTimeMillis() - lastInventoryClosed < 2_000) {
+            minions?.get(lastMinion)?.let {
                 it.lastClicked = System.currentTimeMillis()
             }
-
         }
         if (message.startsWith("§aYou picked up a minion!") && lastMinion != null) {
             minions = minions?.editCopy { remove(lastMinion) }
@@ -244,18 +271,18 @@ class MinionFeatures {
             lastMinionOpened = 0L
         }
         if (message.startsWith("§bYou placed a minion!") && newMinion != null) {
-                minions = minions?.editCopy {
-                    this[newMinion!!] = Storage.ProfileSpecific.MinionConfig().apply {
-                        displayName = newMinionName
-                        lastClicked = 0
-                    }
+            minions = minions?.editCopy {
+                this[newMinion!!] = Storage.ProfileSpecific.MinionConfig().apply {
+                    displayName = newMinionName
+                    lastClicked = 0
                 }
-                newMinion = null
-                newMinionName = null
+            }
+            newMinion = null
+            newMinionName = null
         }
 
         minionUpgradePattern.matchMatcher(message) {
-            val newTier = group("tier").romanToDecimalIfNeeded()
+            val newTier = group("tier").romanToDecimalIfNecessary()
             minions?.get(lastMinion)?.let {
                 val minionName = getMinionName(it.displayName, newTier)
                 it.displayName = minionName
@@ -265,15 +292,13 @@ class MinionFeatures {
 
     @SubscribeEvent
     fun onRenderLastEmptied(event: LorenzRenderWorldEvent) {
-        if (!LorenzUtils.inSkyBlock) return
-        if (LorenzUtils.skyBlockIsland != IslandType.PRIVATE_ISLAND) return
+        if (!enable()) return
 
         val playerLocation = LocationUtils.playerLocation()
-        val playerEyeLocation = LocationUtils.playerEyeLocation()
         val minions = minions ?: return
         for (minion in minions) {
-            val location = minion.key.add(0.0, 1.0, 0.0)
-            if (!LocationUtils.canSee(playerEyeLocation, location)) continue
+            val location = minion.key.add(y = 1.0)
+            if (!location.canBeSeen()) continue
 
             val lastEmptied = minion.value.lastClicked
             if (playerLocation.distance(location) >= config.emptiedTime.distance) continue
@@ -283,22 +308,21 @@ class MinionFeatures {
                 val name = "§6" + if (config.nameOnlyTier) {
                     displayName.split(" ").last()
                 } else displayName
-                event.drawString(location.add(0.0, 0.65, 0.0), name, true)
+                event.drawString(location.add(y = 0.65), name, true)
             }
 
             if (config.emptiedTime.display && lastEmptied != 0L) {
                 val duration = System.currentTimeMillis() - lastEmptied
                 val format = TimeUtils.formatDuration(duration, longName = true) + " ago"
                 val text = "§eHopper Emptied: $format"
-                event.drawString(location.add(0.0, 1.15, 0.0), text, true)
+                event.drawString(location.add(y = 1.15), text, true)
             }
         }
     }
 
     @SubscribeEvent(priority = EventPriority.HIGH)
     fun onRenderLiving(event: RenderLivingEvent.Specials.Pre<EntityLivingBase>) {
-        if (!LorenzUtils.inSkyBlock) return
-        if (LorenzUtils.skyBlockIsland != IslandType.PRIVATE_ISLAND) return
+        if (!enable()) return
         if (!config.hideMobsNametagNearby) return
 
         val entity = event.entity
@@ -315,6 +339,10 @@ class MinionFeatures {
         }
     }
 
+    private fun enable() = IslandType.PRIVATE_ISLAND.isInIsland()
+
+    private fun enableWithHub() = enable() || IslandType.HUB.isInIsland()
+
     @SubscribeEvent(priority = EventPriority.LOWEST)
     fun renderOverlay(event: GuiScreenEvent.BackgroundDrawnEvent) {
         if (!LorenzUtils.inSkyBlock) return
@@ -326,6 +354,12 @@ class MinionFeatures {
     }
 
     companion object {
+
+        var lastMinion: LorenzVec? = null
+        var lastStorage: LorenzVec? = null
+        var minionInventoryOpen = false
+        var minionStorageInventoryOpen = false
+
         private var minions: Map<LorenzVec, Storage.ProfileSpecific.MinionConfig>?
             get() {
                 return ProfileStorageData.profileSpecific?.minions
@@ -336,7 +370,7 @@ class MinionFeatures {
 
         fun clearMinionData() {
             minions = mutableMapOf()
-            LorenzUtils.chat("§e[SkyHanni] Manually reset all private island minion location data!")
+            LorenzUtils.chat("Manually reset all private island minion location data!")
         }
     }
 

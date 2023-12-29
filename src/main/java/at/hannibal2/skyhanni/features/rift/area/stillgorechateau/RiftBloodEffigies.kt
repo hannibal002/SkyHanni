@@ -1,5 +1,6 @@
 package at.hannibal2.skyhanni.features.rift.area.stillgorechateau
 
+import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.events.LorenzRenderWorldEvent
 import at.hannibal2.skyhanni.events.LorenzTickEvent
 import at.hannibal2.skyhanni.events.LorenzWorldChangeEvent
@@ -18,12 +19,12 @@ import at.hannibal2.skyhanni.utils.RenderUtils.drawDynamicText
 import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.TimeUtils
 import at.hannibal2.skyhanni.utils.getLorenzVec
-import at.hannibal2.skyhanni.utils.jsonobjects.RiftEffigiesJson
+import at.hannibal2.skyhanni.data.jsonobjects.repo.RiftEffigiesJson
 import net.minecraft.entity.item.EntityArmorStand
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
 class RiftBloodEffigies {
-    private val config get() = RiftAPI.config.area.stillgoreChateauConfig.bloodEffigies
+    private val config get() = RiftAPI.config.area.stillgoreChateau.bloodEffigies
     private var locations: List<LorenzVec> = emptyList()
     private var effigiesTimes = mapOf(
         0 to -1L,
@@ -34,6 +35,7 @@ class RiftBloodEffigies {
         5 to -1L,
     )
 
+    // TODO USE SH-REPO
     private val effigiesTimerPattern = "§eRespawn §c(?<time>.*) §7\\(or click!\\)".toPattern()
 
     @SubscribeEvent
@@ -50,12 +52,11 @@ class RiftBloodEffigies {
 
     @SubscribeEvent
     fun onRepoReload(event: RepositoryReloadEvent) {
-        event.getConstant<RiftEffigiesJson>("RiftEffigies")?.locations?.let {
-            if (it.size != 6) {
-                error("Invalid rift effigies size: ${it.size} (expeced 6)")
-            }
-            locations = it
+        val newLocations = event.getConstant<RiftEffigiesJson>("RiftEffigies").locations
+        if (newLocations.size != 6) {
+            error("Invalid rift effigies size: ${newLocations.size} (expeced 6)")
         }
+        locations = newLocations
     }
 
     @SubscribeEvent
@@ -74,12 +75,12 @@ class RiftBloodEffigies {
             if (diff < 0L) {
                 if (s == "7") {
                     if (time != 0L) {
-                        LorenzUtils.chat("§e[SkyHanni] Effigy #${index + 1} respawned!")
+                        LorenzUtils.chat("Effigy #${index + 1} respawned!")
                         effigiesTimes = effigiesTimes.editCopy { this[index] = 0L }
                     }
                 } else {
                     if (time != -1L) {
-                        LorenzUtils.chat("§e[SkyHanni] Effigy #${index + 1} is broken!")
+                        LorenzUtils.chat("Effigy #${index + 1} is broken!")
                         val endTime = System.currentTimeMillis() + 1_000 * 60 * 20
                         effigiesTimes = effigiesTimes.editCopy { this[index] = endTime }
                     }
@@ -95,7 +96,7 @@ class RiftBloodEffigies {
 
         for (entity in EntityUtils.getEntitiesNearby<EntityArmorStand>(LocationUtils.playerLocation(), 6.0)) {
             effigiesTimerPattern.matchMatcher(entity.name) {
-                val nearest = locations.sortedBy { it.distanceSq(entity.getLorenzVec()) }.firstOrNull() ?: return
+                val nearest = locations.minByOrNull { it.distanceSq(entity.getLorenzVec()) } ?: return
                 val index = locations.indexOf(nearest)
 
                 val string = group("time")
@@ -142,4 +143,9 @@ class RiftBloodEffigies {
     }
 
     fun isEnabled() = RiftAPI.inRift() && RiftAPI.inStillgoreChateau() && config.enabled
+
+    @SubscribeEvent
+    fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
+        event.move(9, "rift.area.stillgoreChateauConfig", "rift.area.stillgoreChateau")
+    }
 }

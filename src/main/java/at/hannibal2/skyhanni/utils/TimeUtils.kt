@@ -2,19 +2,18 @@ package at.hannibal2.skyhanni.utils
 
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
+import io.github.moulberry.notenoughupdates.util.SkyBlockTime
+import java.time.LocalDate
+import java.time.ZoneId
 import kotlin.time.Duration
+import kotlin.time.Duration.Companion.minutes
+import kotlin.time.Duration.Companion.seconds
+import kotlin.time.DurationUnit
+import kotlin.time.toDuration
 
 object TimeUtils {
     private val pattern =
         "(?:(?<y>\\d+) ?y(?:\\w* ?)?)?(?:(?<d>\\d+) ?d(?:\\w* ?)?)?(?:(?<h>\\d+) ?h(?:\\w* ?)?)?(?:(?<m>\\d+) ?m(?:\\w* ?)?)?(?:(?<s>\\d+) ?s(?:\\w* ?)?)?".toPattern()
-
-    fun formatDuration(
-        duration: Duration,
-        biggestUnit: TimeUnit = TimeUnit.YEAR,
-        showMilliSeconds: Boolean = false,
-        longName: Boolean = false,
-        maxUnits: Int = -1
-    ): String = duration.format(biggestUnit, showMilliSeconds, longName, maxUnits)
 
     fun Duration.format(
         biggestUnit: TimeUnit = TimeUnit.YEAR,
@@ -24,6 +23,13 @@ object TimeUtils {
     ): String = formatDuration(
         inWholeMilliseconds - 999, biggestUnit, showMilliSeconds, longName, maxUnits
     )
+
+    fun Duration.timerColor(default: String = "§f") = when (this) {
+        in 0.seconds..60.seconds -> "§c"
+        in 60.seconds..3.minutes -> "§6"
+        in 3.minutes..10.minutes -> "§e"
+        else -> default
+    }
 
     fun formatDuration(
         millis: Long,
@@ -72,8 +78,10 @@ object TimeUtils {
         return builder.toString().trim()
     }
 
-    // TODO: use kotlin Duration
-    fun getMillis(string: String) = getMillis_(string.replace("m", "m ").replace("  ", " "))
+    @Deprecated("Do no longer use long for time", ReplaceWith("getDuration()"))
+    fun getMillis(string: String) = getDuration(string).inWholeMilliseconds
+
+    fun getDuration(string: String) = getMillis_(string.replace("m", "m ").replace("  ", " ").trim())
 
     private fun getMillis_(string: String) = pattern.matchMatcher(string.lowercase().trim()) {
         val years = group("y")?.toLong() ?: 0L
@@ -89,10 +97,10 @@ object TimeUtils {
         millis += days * 24 * 60 * 60 * 1000
         millis += (years * 365.25 * 24 * 60 * 60 * 1000).toLong()
 
-        millis
+        millis.toDuration(DurationUnit.MILLISECONDS)
     } ?: tryAlternativeFormat(string)
 
-    private fun tryAlternativeFormat(string: String): Long {
+    private fun tryAlternativeFormat(string: String): Duration {
         val split = string.split(":")
         return when (split.size) {
             3 -> {
@@ -115,8 +123,25 @@ object TimeUtils {
             else -> {
                 throw RuntimeException("Invalid format: '$string'")
             }
-        }.toLong()
+        }.toLong().toDuration(DurationUnit.MILLISECONDS)
     }
+
+    fun SkyBlockTime.formatted(): String {
+        val hour = if (this.hour > 12) this.hour - 12 else this.hour
+        val timeOfDay = if (this.hour > 11) "pm" else "am" // hooray for 12-hour clocks
+        var minute = this.minute.toString()
+        if (minute.length != 2) {
+            minute = minute.padStart(2, '0')
+        }
+
+        val month = SkyBlockTime.monthName(this.month)
+        val day = this.day
+        val daySuffix = SkyBlockTime.daySuffix(day)
+        val year = this.year
+        return "$month $day$daySuffix, Year $year $hour:${minute}$timeOfDay" // Early Winter 1st Year 300, 12:03pm
+    }
+
+    fun getCurrentLocalDate(): LocalDate = LocalDate.now(ZoneId.of("UTC"))
 }
 
 private const val FACTOR_SECONDS = 1000L

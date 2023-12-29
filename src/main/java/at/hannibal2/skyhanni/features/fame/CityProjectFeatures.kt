@@ -34,13 +34,15 @@ class CityProjectFeatures {
     private var display = emptyList<List<Any>>()
     private var inInventory = false
     private var lastReminderSend = 0L
+
+    // TODO USE SH-REPO
     private val contributeAgainPattern = "§7Contribute again: §e(?<time>.*)".toPattern()
 
     companion object {
         private val config get() = SkyHanniMod.feature.event.cityProject
         fun disable() {
             config.dailyReminder = false
-            LorenzUtils.chat("§c[SkyHanni] Disabled city project reminder messages!")
+            LorenzUtils.chat("Disabled city project reminder messages!")
         }
     }
 
@@ -66,7 +68,7 @@ class CityProjectFeatures {
         lastReminderSend = System.currentTimeMillis()
 
         LorenzUtils.clickableChat(
-            "§e[SkyHanni] Daily City Project Reminder! (Click here to disable this reminder)",
+            "Daily City Project Reminder! (Click here to disable this reminder)",
             "shstopcityprojectreminder"
         )
     }
@@ -80,9 +82,8 @@ class CityProjectFeatures {
     fun onInventoryOpen(event: InventoryFullyOpenedEvent) {
         if (!LorenzUtils.inSkyBlock) return
 
-        val lore = event.inventoryItems[4]?.getLore() ?: return
-        if (lore.isEmpty()) return
-        if (lore[0] != "§8City Project") return
+        inInventory = false
+        if (!inCityProject(event)) return
         inInventory = true
 
         if (config.showMaterials) {
@@ -102,9 +103,13 @@ class CityProjectFeatures {
             for ((_, item) in event.inventoryItems) {
                 val itemName = item.name ?: continue
 
-                for (line in item.getLore()) {
+                val lore = item.getLore()
+                if (lore.lastOrNull() == "§aProject is being built!") continue
+                for (line in lore) {
                     contributeAgainPattern.matchMatcher(line) {
-                        val duration = TimeUtils.getMillis(group("time"))
+                        val rawTime = group("time")
+                        if (rawTime.contains("Soon!")) return@matchMatcher
+                        val duration = TimeUtils.getMillis(rawTime)
                         val endTime = System.currentTimeMillis() + duration
                         if (endTime < nextTime) {
                             nextTime = endTime
@@ -116,6 +121,13 @@ class CityProjectFeatures {
             }
             ProfileStorageData.playerSpecific?.nextCityProjectParticipationTime = nextTime
         }
+    }
+
+    private fun inCityProject(event: InventoryFullyOpenedEvent): Boolean {
+        val lore = event.inventoryItems[4]?.getLore() ?: return false
+        if (lore.isEmpty()) return false
+        if (lore[0] != "§8City Project") return false
+        return true
     }
 
     private fun buildList(materials: MutableMap<String, Int>) = buildList<List<Any>> {
@@ -150,7 +162,9 @@ class CityProjectFeatures {
 
     private fun fetchMaterials(item: ItemStack, materials: MutableMap<String, Int>) {
         var next = false
-        for (line in item.getLore()) {
+        val lore = item.getLore()
+        if (lore.lastOrNull() == "§aProject is being built!") return
+        for (line in lore) {
             if (line == "§7Cost") {
                 next = true
                 continue

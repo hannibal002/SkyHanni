@@ -9,7 +9,8 @@ enum class TabStringType {
     PLAYER;
 
     companion object {
-        val usernamePattern = "^\\[(?<sblevel>\\d+)] (?:\\[\\w+] )?(?<username>\\w+)".toPattern()
+        // TODO USE SH-REPO
+        private val usernamePattern = "^\\[(?<sblevel>\\d+)] (?:\\[\\w+] )?(?<username>\\w+)".toPattern()
 
         fun fromLine(line: String): TabStringType {
             val strippedLine: String = line.removeColor()

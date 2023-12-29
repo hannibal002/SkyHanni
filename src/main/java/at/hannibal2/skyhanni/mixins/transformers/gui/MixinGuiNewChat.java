@@ -1,6 +1,6 @@
 package at.hannibal2.skyhanni.mixins.transformers.gui;
 
-import at.hannibal2.skyhanni.features.misc.ChatPeek;
+import at.hannibal2.skyhanni.features.chat.ChatPeek;
 import net.minecraft.client.gui.GuiNewChat;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;

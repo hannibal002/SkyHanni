@@ -6,7 +6,7 @@ import at.hannibal2.skyhanni.events.ReceiveParticleEvent
 import at.hannibal2.skyhanni.features.rift.RiftAPI
 import at.hannibal2.skyhanni.utils.BlockUtils.getBlockAt
 import at.hannibal2.skyhanni.utils.InventoryUtils
-import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName_old
+import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName
 import at.hannibal2.skyhanni.utils.LocationUtils
 import at.hannibal2.skyhanni.utils.LocationUtils.distanceToPlayer
 import at.hannibal2.skyhanni.utils.LorenzUtils.editCopy
@@ -21,7 +21,7 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import java.awt.Color
 
 class RiftWiltedBerberisHelper {
-    private val config get() = RiftAPI.config.area.dreadfarmConfig.wiltedBerberis
+    private val config get() = RiftAPI.config.area.dreadfarm.wiltedBerberis
     private var isOnFarmland = false
     private var hasFarmingToolInHand = false
     private var list = listOf<WiltedBerberis>()
@@ -40,20 +40,18 @@ class RiftWiltedBerberisHelper {
 
         list = list.editCopy { removeIf { System.currentTimeMillis() > it.lastTime + 500 } }
 
-        hasFarmingToolInHand = InventoryUtils.getItemInHand()?.getInternalName_old()?.let {
-            it == "FARMING_WAND"
-        } ?: false
+        hasFarmingToolInHand = InventoryUtils.getItemInHand()?.getInternalName() == RiftAPI.farmingTool
 
         if (Minecraft.getMinecraft().thePlayer.onGround) {
-            val block = LocationUtils.playerLocation().add(0, -1, 0).getBlockAt().toString()
+            val block = LocationUtils.playerLocation().add(y = -1).getBlockAt().toString()
             val currentY = LocationUtils.playerLocation().y
             isOnFarmland = block == "Block{minecraft:farmland}" && (currentY % 1 == 0.0)
         }
     }
 
-    fun nearestBerberis(location: LorenzVec): WiltedBerberis? {
+    private fun nearestBerberis(location: LorenzVec): WiltedBerberis? {
         return list.filter { it.currentParticles.distanceSq(location) < 8 }
-            .sortedBy { it.currentParticles.distanceSq(location) }.firstOrNull()
+            .minByOrNull { it.currentParticles.distanceSq(location) }
     }
 
     @SubscribeEvent
@@ -101,7 +99,6 @@ class RiftWiltedBerberisHelper {
         }
     }
 
-
     @SubscribeEvent
     fun onRenderWorld(event: LorenzRenderWorldEvent) {
         if (!isEnabled()) return
@@ -117,7 +114,7 @@ class RiftWiltedBerberisHelper {
                 val location = currentParticles.fixLocation(berberis)
                 if (!moving) {
                     event.drawFilledBoundingBox_nea(axisAlignedBB(location), Color.YELLOW, 0.7f)
-                    event.drawDynamicText(location.add(0, 1, 0), "§eWilted Berberis", 1.5, ignoreBlocks = false)
+                    event.drawDynamicText(location.add(y = 1), "§eWilted Berberis", 1.5, ignoreBlocks = false)
                 } else {
                     event.drawFilledBoundingBox_nea(axisAlignedBB(location), Color.WHITE, 0.5f)
                     previous?.fixLocation(berberis)?.let {
