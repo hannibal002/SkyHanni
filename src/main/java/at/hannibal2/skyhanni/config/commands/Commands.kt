@@ -57,6 +57,7 @@ import at.hannibal2.skyhanni.test.command.CopyNearbyParticlesCommand
 import at.hannibal2.skyhanni.test.command.CopyScoreboardCommand
 import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.test.command.TestChatCommand
+import at.hannibal2.skyhanni.test.command.TrackSoundsCommand
 import at.hannibal2.skyhanni.utils.APIUtil
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.SoundUtils
@@ -332,6 +333,10 @@ object Commands {
             "shcopyentities",
             "Copies entities in the specified radius around the player to the clipboard"
         ) { CopyNearbyEntitiesCommand.command(it) }
+        registerCommand(
+            "shtracksounds",
+            "Tracks the sounds for the specified duration (in seconds) and copies it to the clipboard"
+        ) { TrackSoundsCommand.command(it) }
         registerCommand("shcopytablist", "Copies the tab list data to the clipboard") { TabListData.copyCommand(it) }
         registerCommand(
             "shcopyscoreboard",

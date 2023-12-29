@@ -336,6 +336,7 @@ import at.hannibal2.skyhanni.test.TestExportTools
 import at.hannibal2.skyhanni.test.TestShowSlotNumber
 import at.hannibal2.skyhanni.test.WorldEdit
 import at.hannibal2.skyhanni.test.command.CopyNearbyParticlesCommand
+import at.hannibal2.skyhanni.test.command.TrackSoundsCommand
 import at.hannibal2.skyhanni.utils.EntityOutlineRenderer
 import at.hannibal2.skyhanni.utils.KeyboardManager
 import at.hannibal2.skyhanni.utils.MinecraftConsoleFilter.Companion.initLogging
@@ -700,6 +701,7 @@ class SkyHanniMod {
         // test stuff
         loadModule(SkyHanniDebugsAndTests())
         loadModule(CopyNearbyParticlesCommand)
+        loadModule(TrackSoundsCommand)
         loadModule(ButtonOnPause())
         loadModule(PacketTest())
         loadModule(TestBingo)
