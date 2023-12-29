@@ -12,7 +12,7 @@ import net.minecraft.client.Minecraft
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
 object PurseAPI {
-    val pursePattern by RepoPattern.pattern("data.purseapi", "(Piggy|Purse): §6(?<coins>[\\\\d,]*).*")
+    val pursePattern by RepoPattern.pattern("data.purseapi", "(Piggy|Purse): §6(?<coins>[\\d,]*).*")
     private var inventoryCloseTime = 0L
     var currentPurse = 0.0
 

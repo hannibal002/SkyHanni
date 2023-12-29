@@ -115,7 +115,9 @@ object UnknownLinesHandler {
 
         // remove objectives
         val objectiveLine =
-            ScoreboardData.sidebarLinesFormatted.first { ScoreboardPattern.objectivePattern.matches(it) }
+            ScoreboardData.sidebarLinesFormatted.firstOrNull { ScoreboardPattern.objectivePattern.matches(it) }
+                ?: "Objective"
+        unknownLines = unknownLines.filter { sidebarLines.nextAfter(objectiveLine) != it }
         unknownLines =
             unknownLines.filter {
                 sidebarLines.nextAfter(objectiveLine, 2) != it
