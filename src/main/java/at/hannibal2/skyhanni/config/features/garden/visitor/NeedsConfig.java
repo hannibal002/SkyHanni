@@ -33,6 +33,12 @@ public class NeedsConfig {
     public boolean showPrice = true;
 
     @Expose
+    @ConfigOption(name = "Show Sack Count", desc = "Show the amount of this item that you already have in your sacks. " +
+        "§eOnly updates on sack change messages.")
+    @ConfigEditorBoolean
+    public boolean showSackCount = true;
+
+    @Expose
     @ConfigOption(name = "Item Preview", desc = "Show the base type for the required items next to new visitors. §cNote that some visitors may require any crop.")
     @ConfigEditorBoolean
     @FeatureToggle

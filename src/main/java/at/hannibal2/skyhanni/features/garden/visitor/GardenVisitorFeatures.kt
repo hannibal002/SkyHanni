@@ -3,11 +3,14 @@ package at.hannibal2.skyhanni.features.garden.visitor
 import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.config.features.garden.visitor.VisitorConfig.HighlightMode
 import at.hannibal2.skyhanni.data.IslandType
+import at.hannibal2.skyhanni.data.SackAPI
+import at.hannibal2.skyhanni.data.SackStatus
 import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.LorenzChatEvent
 import at.hannibal2.skyhanni.events.LorenzTickEvent
 import at.hannibal2.skyhanni.events.OwnInventoryItemUpdateEvent
 import at.hannibal2.skyhanni.events.PreProfileSwitchEvent
+import at.hannibal2.skyhanni.events.SackDataUpdateEvent
 import at.hannibal2.skyhanni.events.garden.visitor.VisitorAcceptEvent
 import at.hannibal2.skyhanni.events.garden.visitor.VisitorAcceptedEvent
 import at.hannibal2.skyhanni.events.garden.visitor.VisitorArrivalEvent
@@ -177,6 +180,18 @@ class GardenVisitorFeatures {
                     list.add(" §7(§6$format§7)")
                 }
 
+                if (config.needs.showSackCount) {
+                    val sackItemData = SackAPI.fetchSackItem(internalName)
+                    val itemStatus = sackItemData.getStatus()
+                    val itemAmount = sackItemData.amount
+                    if (itemStatus == SackStatus.OUTDATED) {
+                        list.add(" §cdata outdated, open sacks")
+                    } else {
+                        val textColour = if (itemAmount > amount) "a" else "e"
+                        list.add(" §${textColour}x${sackItemData.amount.addSeparators()} §7in your sack")
+                    }
+                }
+
                 add(list)
             }
             if (totalPrice > 0) {
@@ -237,6 +252,11 @@ class GardenVisitorFeatures {
         if (GardenAPI.onBarnPlot) {
             update()
         }
+    }
+
+    @SubscribeEvent
+    fun onSackUpdate(event: SackDataUpdateEvent) {
+        update()
     }
 
     @SubscribeEvent
