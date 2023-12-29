@@ -90,6 +90,7 @@ object UnknownLinesHandler {
             ScoreboardPattern.bossDamagePattern,
             ScoreboardPattern.essencePattern,
             ScoreboardPattern.brokenRedstonePattern,
+            ScoreboardPattern.redstonePattern,
             ScoreboardPattern.visitingPattern,
             ScoreboardPattern.flightDurationPattern,
             ScoreboardPattern.dojoChallengePattern,
