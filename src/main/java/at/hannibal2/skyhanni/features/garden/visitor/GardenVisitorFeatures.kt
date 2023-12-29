@@ -184,9 +184,7 @@ class GardenVisitorFeatures {
                     val sackItemData = SackAPI.fetchSackItem(internalName)
                     val itemStatus = sackItemData.getStatus()
                     val itemAmount = sackItemData.amount
-                    if (itemStatus == SackStatus.OUTDATED) {
-                        list.add(" §cdata outdated, open sacks")
-                    } else {
+                    if (itemStatus != SackStatus.OUTDATED) {
                         val textColour = if (itemAmount > amount) "a" else "e"
                         list.add(" §${textColour}x${sackItemData.amount.addSeparators()} §7in your sack")
                     }
