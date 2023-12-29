@@ -144,7 +144,11 @@ object UnknownLinesHandler {
             }
 
         // remove trapper mob location
-        unknownLines = unknownLines.filter { sidebarLines.nextAfter("Tracker Mob Location:", 1) != it }
+        unknownLines = unknownLines.filter {
+            ScoreboardData.sidebarLinesFormatted.nextAfter(ScoreboardData.sidebarLinesFormatted.first { line ->
+                ScoreboardPattern.mobLocationPattern.matches(line)
+            }, 1) != it
+        }
 
         // da
         unknownLines = unknownLines.filter { sidebarLines.nextAfter("Current Item:") != it }
