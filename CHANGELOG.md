@@ -6,17 +6,36 @@
 
 #### Fishing Features
 
++ Show sack item amount to the visitor shopping list. - CalMWolfs
+
+#### Fishing Features
+
 + Added Sea Creature Tracker. - hannibal2
     + Allows to only show single variants, e.g. water or lava or winter.
 
 ### Changed
+
+#### Garden Changes
+
++ Renamed Visitor Items Needed to Visitor Shopping List. - hannibal2
++ Added biofuel support to the Composter Overlay get from sack logic. - obsidian
 
 #### Rift Changes
 
 + Rift time now updates correctly in wizard tower and instantly updates the format when toggling max time or
   percentage. - hannibal2
 
+#### Fishing Changes
+
++ Odger highlight feature tells in description that it is only useful for users without abiphone. - hannibal2
+
 ### Fixes
+
+#### Garden Fixes
+
++ Fixed mushrooms being counted with Common/Uncommon Mooshroom Cow Pet. - alexia
++ Fixed progress to maxed milestone appearing twice in the crop milestone menu when having milestone 20. - Empa
++ Fixed max crop milestone display being too long in the crop milestone menu. - obsidian
 
 #### Rift Fixes
 
@@ -27,9 +46,16 @@
 + Fixed Reindrake mob, Frosty NPC and frosty the snow blaster shop counting as sea creatures in the barn fishing
   timer. - hannibal2
 
+#### Invenory Fixes
+
++ Fixed hide non-clickable items not working in some bazaar pages. - hannibal2
++ Fixed rogue sword ability taking into account mage cooldown reduction. - Empa
+
 ### Technical Changes
 
 + Migrate Hypixel API to v2. - hannibal2
++ Added SackDataUpdateEvent. - CalMWolfs
++ Fixing a mac crash in dev environment automatically. - CalMWolfs
 
 ## Version 0.22
 
