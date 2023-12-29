@@ -125,7 +125,7 @@ private fun getProfileDisplayPair() =
     listOf(CustomScoreboardUtils.getProfileTypeSymbol() + HypixelData.profileName.firstLetterUppercase() to AlignmentEnum.LEFT)
 
 private fun getPurseDisplayPair(): List<Pair<String, AlignmentEnum>> {
-    val purse = getGroupFromPattern(ScoreboardData.sidebarLinesFormatted, PurseAPI.pursePattern, "purse")
+    val purse = getGroupFromPattern(ScoreboardData.sidebarLinesFormatted, PurseAPI.pursePattern, "coins")
 
     return when {
         informationFilteringConfig.hideEmptyLines && purse == "0" -> listOf("<hidden>")
