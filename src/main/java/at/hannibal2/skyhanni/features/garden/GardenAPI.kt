@@ -29,9 +29,7 @@ import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName
 import at.hannibal2.skyhanni.utils.ItemUtils.getItemRarityOrNull
 import at.hannibal2.skyhanni.utils.LocationUtils.isPlayerInside
-import at.hannibal2.skyhanni.utils.LorenzRarity.EPIC
-import at.hannibal2.skyhanni.utils.LorenzRarity.LEGENDARY
-import at.hannibal2.skyhanni.utils.LorenzRarity.RARE
+import at.hannibal2.skyhanni.utils.LorenzRarity
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils.isInIsland
 import at.hannibal2.skyhanni.utils.LorenzVec
@@ -50,8 +48,10 @@ object GardenAPI {
     var toolInHand: String? = null
     var itemInHand: ItemStack? = null
     var cropInHand: CropType? = null
-    val mushroomCowPet get() = PetAPI.isCurrentPet("Mooshroom Cow") &&
-            GardenAPI.storage?.fortune?.farmingItems[FarmingItems.MOOSHROOM_COW]?.getItemRarityOrNull() in listOf(RARE, EPIC, LEGENDARY)
+    val mushroomCowPet
+        get() = PetAPI.isCurrentPet("Mooshroom Cow") &&
+            storage?.fortune?.farmingItems?.get(FarmingItems.MOOSHROOM_COW)
+                ?.let { it.getItemRarityOrNull()?.isAtLeast(LorenzRarity.RARE) } ?: false
     private var inBarn = false
     val onBarnPlot get() = inBarn && inGarden()
     val storage get() = ProfileStorageData.profileSpecific?.garden

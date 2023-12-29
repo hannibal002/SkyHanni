@@ -51,6 +51,8 @@ enum class LorenzRarity(val color: LorenzColor, val id: Int) {
         return rarityBelow
     }
 
+    fun isAtLeast(other: LorenzRarity): Boolean = this.ordinal >= other.ordinal
+
     companion object {
         fun getById(id: Int) = entries.firstOrNull { it.ordinal == id }
         fun getByName(name: String) = entries.firstOrNull { it.name == name }
