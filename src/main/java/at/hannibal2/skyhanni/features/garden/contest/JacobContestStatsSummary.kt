@@ -102,7 +102,7 @@ class JacobContestStatsSummary {
 
         val unsortedList = buildList<List<Any>> {
             addAsSingletonList("§e§l$cropName Contest Stats")
-            addAsSingletonList("§7Started §b${TimeUtils.formatDuration((startTimeIntoContest * 1000 - 999).toLong(), showMilliSeconds = true)} §7into contest (${startTimeIntoContest})")
+            addAsSingletonList("§7Started §b${TimeUtils.formatDuration((startTimeIntoContest * 1000 - 999).toLong(), showMilliSeconds = true)} §7into contest")
             addAsSingletonList("§7Blocks Broken: §e${blocksBroken.addSeparators()}")
             addAsSingletonList("§7Blocks per Second: §c$blocksPerSecond")
             if (percent == 0.0 && participants == 0)
