@@ -20,6 +20,7 @@ import at.hannibal2.skyhanni.utils.RenderUtils.renderSingleLineWithItems
 import at.hannibal2.skyhanni.utils.RenderUtils.renderStrings
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.SimpleTimeMark.Companion.asTimeMark
+import at.hannibal2.skyhanni.utils.SimpleTimeMark.Companion.now
 import at.hannibal2.skyhanni.utils.SoundUtils
 import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
@@ -59,7 +60,7 @@ object GardenNextJacobContest {
     private const val maxContestsPerYear = 124
     private val contestDuration = 20.minutes
 
-    private var lastWarningTime = 0L
+    private var lastWarningTime = SimpleTimeMark.farPast()
     private var loadedContestsYear = -1
     private var nextContestsAvailableAt = -1L
 
@@ -328,17 +329,20 @@ object GardenNextJacobContest {
 
         val boostedCrop = calculateBoostedCrop(nextContest)
 
-        if (duration < contestDuration) {
+        val activeContest = duration < contestDuration
+        if (activeContest) {
             list.add("§aActive: ")
         } else {
             list.add("§eNext: ")
             duration -= contestDuration
-            warn(duration, nextContest.crops, boostedCrop)
         }
         for (crop in nextContest.crops) {
             list.add(" ")
             list.addCropIcon(crop, highlight = (crop == boostedCrop))
             nextContestCrops.add(crop)
+        }
+        if (!activeContest) {
+            warn(duration, nextContest.crops, boostedCrop)
         }
         val format = duration.format()
         list.add("§7(§b$format§7)")
@@ -365,16 +369,18 @@ object GardenNextJacobContest {
         if (config.warnTime.seconds <= duration) return
         if (!warnForCrop()) return
 
-        if (System.currentTimeMillis() < lastWarningTime) return
-        lastWarningTime = System.currentTimeMillis() + 60_000 * 40
+        // Check that it only gets called once for the current event
+        if (lastWarningTime.passedSince() < config.warnTime.seconds) return
 
+        lastWarningTime = now()
         val cropText = crops.joinToString("§7, ") { (if (it == boostedCrop) "§6" else "§a") + it.cropName }
         LorenzUtils.chat("Next farming contest: $cropText")
         LorenzUtils.sendTitle("§eFarming Contest!", 5.seconds)
         SoundUtils.playBeepSound()
 
         val cropTextNoColor = crops.joinToString(", ") {
-            if (it == boostedCrop) "<b>${it.cropName}</b>" else it.cropName }
+            if (it == boostedCrop) "<b>${it.cropName}</b>" else it.cropName
+        }
         if (config.warnPopup && !Display.isActive()) {
             SkyHanniMod.coroutineScope.launch {
                 openPopupWindow(
@@ -455,6 +461,7 @@ object GardenNextJacobContest {
     private fun isFetchEnabled() = isEnabled() && config.fetchAutomatically
     private fun isSendEnabled() =
         isFetchEnabled() && config.shareAutomatically != ShareContestsEntry.DISABLED
+
     private fun askToSendContests() =
         config.shareAutomatically == ShareContestsEntry.ASK // (Only call if isSendEnabled())
 

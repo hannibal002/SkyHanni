@@ -1,3 +1,4 @@
+import org.apache.commons.lang3.SystemUtils
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 import java.io.ByteArrayOutputStream
 
@@ -12,7 +13,7 @@ plugins {
 }
 
 group = "at.hannibal2.skyhanni"
-version = "0.22.Beta.17"
+version = "0.23.Beta.2"
 
 val gitHash by lazy {
     val baos = ByteArrayOutputStream()
@@ -153,6 +154,11 @@ loom {
         defaultRefmapName.set("mixins.skyhanni.refmap.json")
     }
     runConfigs {
+        "client" {
+            if (SystemUtils.IS_OS_MAC_OSX) {
+                vmArgs.remove("-XstartOnFirstThread")
+            }
+        }
         "server" {
             isIdeConfigGenerated = false
         }

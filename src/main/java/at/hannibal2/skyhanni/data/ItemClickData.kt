@@ -10,6 +10,7 @@ import at.hannibal2.skyhanni.utils.toLorenzVec
 import net.minecraft.client.Minecraft
 import net.minecraft.network.play.client.C07PacketPlayerDigging
 import net.minecraft.network.play.client.C08PacketPlayerBlockPlacement
+import net.minecraft.network.play.client.C0APacketAnimation
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import net.minecraftforge.fml.common.gameevent.InputEvent
 import org.lwjgl.input.Mouse
@@ -29,7 +30,11 @@ class ItemClickData {
         }
         if (packet is C07PacketPlayerDigging && packet.status == C07PacketPlayerDigging.Action.START_DESTROY_BLOCK) {
             val position = packet.position.toLorenzVec()
-            event.isCanceled = BlockClickEvent(ClickType.LEFT_CLICK, position, InventoryUtils.getItemInHand()).postAndCatch()
+            event.isCanceled = BlockClickEvent(ClickType.LEFT_CLICK, position, InventoryUtils.getItemInHand()).postAndCatch() ||
+                ItemClickEvent(InventoryUtils.getItemInHand(), ClickType.RIGHT_CLICK).postAndCatch()
+        }
+        if (packet is C0APacketAnimation) {
+            event.isCanceled = ItemClickEvent(InventoryUtils.getItemInHand(), ClickType.LEFT_CLICK).postAndCatch()
         }
     }
 
