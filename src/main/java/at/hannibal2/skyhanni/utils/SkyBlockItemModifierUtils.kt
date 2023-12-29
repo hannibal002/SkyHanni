@@ -8,6 +8,7 @@ import at.hannibal2.skyhanni.utils.ItemUtils.name
 import at.hannibal2.skyhanni.utils.NEUInternalName.Companion.asInternalName
 import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
+import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import com.google.gson.JsonObject
 import net.minecraft.item.Item
 import net.minecraft.item.ItemStack
@@ -17,8 +18,7 @@ import java.util.Locale
 object SkyBlockItemModifierUtils {
     private val drillPartTypes = listOf("drill_part_upgrade_module", "drill_part_engine", "drill_part_fuel_tank")
 
-    // TODO USE SH-REPO
-    private val petLevelPattern = "(?:§f§f)?§7\\[Lvl (?<level>\\d+)] .*".toPattern()
+    private val petLevelPattern by RepoPattern.pattern("utils.item.petlevel", "(?:§f§f)?§7\\[Lvl (?<level>\\d+)] .*")
 
     fun ItemStack.getHotPotatoCount() = getAttributeInt("hot_potato_count")
 
