@@ -43,6 +43,7 @@ object ScoreboardPattern {
     val pastingPattern by farmingSb.pattern("pasting", "^\\s*§f(Barn )?Pasting§7: §e\\d{1,3}(\\.\\d)?%$")
     val peltsPattern by farmingSb.pattern("pelts", "^(§.)*Pelts: (§.)*(?<pelts>[\\d,]+)( (§.)*\\([+-](?<diff>[\\w,.]+)\\))?\$")
     val mobLocationPattern by farmingSb.pattern("moblocation", "^(§.)*Tracker Mob Location:")
+    val jacobsContestPattern by farmingSb.pattern("jacobscontest", "^§eJacob's Contest$")
     // mining
     private val miningSb = scoreboardGroup.group("mining")
     val powderPattern by miningSb.pattern("powder", "§[2d]᠅ §f(Gemstone|Mithril)( Powder)?§f: §[2d](,?\\d{1,3})*$")

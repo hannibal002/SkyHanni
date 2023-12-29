@@ -65,6 +65,7 @@ object UnknownLinesHandler {
             ScoreboardPattern.pastingPattern,
             ScoreboardPattern.peltsPattern,
             ScoreboardPattern.mobLocationPattern,
+            ScoreboardPattern.jacobsContestPattern,
             ScoreboardPattern.powderPattern,
             ScoreboardPattern.windCompassPattern,
             ScoreboardPattern.windCompassArrowPattern,
@@ -128,11 +129,19 @@ object UnknownLinesHandler {
 
         // Remove jacobs contest
         for (i in 1..3)
-            unknownLines = unknownLines.filter { sidebarLines.nextAfter("§eJacob's Contest", i) != it }
+            unknownLines = unknownLines.filter {
+                ScoreboardData.sidebarLinesFormatted.nextAfter(ScoreboardData.sidebarLinesFormatted.first { line ->
+                    ScoreboardPattern.jacobsContestPattern.matches(line)
+                }, i) != it
+            }
 
         // Remove slayer
         for (i in 1..2)
-            unknownLines = unknownLines.filter { sidebarLines.nextAfter("Slayer Quest", i) != it }
+            unknownLines = unknownLines.filter {
+                ScoreboardData.sidebarLinesFormatted.nextAfter(ScoreboardData.sidebarLinesFormatted.first { line ->
+                    ScoreboardPattern.slayerQuestPattern.matches(line)
+                }, i) != it
+            }
 
         // remove trapper mob location
         unknownLines = unknownLines.filter { sidebarLines.nextAfter("Tracker Mob Location:", 1) != it }
