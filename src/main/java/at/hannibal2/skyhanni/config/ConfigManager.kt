@@ -7,6 +7,7 @@ import at.hannibal2.skyhanni.data.jsonobjects.local.JacobContestsJson
 import at.hannibal2.skyhanni.data.jsonobjects.local.KnownFeaturesJson
 import at.hannibal2.skyhanni.features.fishing.trophy.TrophyRarity
 import at.hannibal2.skyhanni.features.misc.update.UpdateManager
+import at.hannibal2.skyhanni.utils.FeatureTogglesByDefaultAdapter
 import at.hannibal2.skyhanni.utils.KotlinTypeAdapterFactory
 import at.hannibal2.skyhanni.utils.LorenzLogger
 import at.hannibal2.skyhanni.utils.LorenzRarity
@@ -21,6 +22,7 @@ import at.hannibal2.skyhanni.utils.tracker.SkyHanniTracker
 import com.google.gson.GsonBuilder
 import com.google.gson.JsonObject
 import com.google.gson.TypeAdapter
+import com.google.gson.TypeAdapterFactory
 import com.google.gson.stream.JsonReader
 import com.google.gson.stream.JsonWriter
 import io.github.moulberry.moulconfig.observer.PropertyTypeAdapterFactory
@@ -44,12 +46,19 @@ import kotlin.concurrent.fixedRateTimer
 
 typealias TrackerDisplayMode = SkyHanniTracker.DefaultDisplayMode
 
+private fun GsonBuilder.reigsterIfBeta(create: TypeAdapterFactory): GsonBuilder {
+    val isBeta = SkyHanniMod.version.contains("beta", ignoreCase = true)
+    return if (isBeta) {
+        registerTypeAdapterFactory(create)
+    } else this
+}
+
 class ConfigManager {
     companion object {
         val gson = GsonBuilder().setPrettyPrinting()
             .excludeFieldsWithoutExposeAnnotation()
             .serializeSpecialFloatingPointValues()
-            .registerTypeAdapterFactory(FeatureTogglesByDefaultAdapter)
+            .reigsterIfBeta(FeatureTogglesByDefaultAdapter)
             .registerTypeAdapterFactory(PropertyTypeAdapterFactory())
             .registerTypeAdapterFactory(KotlinTypeAdapterFactory())
             .registerTypeAdapter(UUID::class.java, object : TypeAdapter<UUID>() {

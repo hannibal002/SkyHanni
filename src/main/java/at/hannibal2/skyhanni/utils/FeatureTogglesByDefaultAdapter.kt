@@ -22,7 +22,7 @@ object FeatureTogglesByDefaultAdapter : TypeAdapterFactory {
 
     class Adapter<T>(
         val originalWrite: TypeAdapter<T>,
-        val t: Class<T>,
+        val clazz: Class<T>,
         val gson: Gson,
         val type: TypeToken<T>,
     ) : TypeAdapter<T>() {
@@ -34,32 +34,32 @@ object FeatureTogglesByDefaultAdapter : TypeAdapterFactory {
         override fun read(reader: JsonReader): T {
             reader.beginObject()
             // Create a default initialized instance
-            val inst = t.newInstance()
+            val obj = clazz.newInstance()
 
             // Overwrite the default with true (or false) for feature toggles
-            t.fields.forEach {
+            clazz.fields.forEach {
                 val featureToggle = it.getAnnotation(FeatureToggle::class.java)
                 val adapt = gson.getAdapter(TypeToken.get(getType(type, it)))
                 if (featureToggle != null)
-                    it.set(inst, adapt.read(JsonTreeReader(JsonPrimitive(featureToggle.trueIsEnabled))))
+                    it.set(obj, adapt.read(JsonTreeReader(JsonPrimitive(featureToggle.trueIsEnabled))))
                 if (adapt is Adapter) {
-                    it.set(inst, adapt.read(JsonTreeReader(JsonObject())))
+                    it.set(obj, adapt.read(JsonTreeReader(JsonObject())))
                 }
             }
 
             // Read the actual JSON Object
             while (reader.peek() != JsonToken.END_OBJECT) {
                 val name = reader.nextName()
-                val field = t.getDeclaredField(name)
+                val field = clazz.getDeclaredField(name)
                 val fieldType = gson.getAdapter(TypeToken.get(getType(type, field)))
                 // Read the field data
                 val data = fieldType.read(reader)
                 // Set the field or override the feature toggle with the saved data, leaving only the unset feature toggles to deviate from their defaults
-                field.set(inst, data)
+                field.set(obj, data)
             }
 
             reader.endObject()
-            return inst
+            return obj
         }
     }
 
@@ -68,18 +68,10 @@ object FeatureTogglesByDefaultAdapter : TypeAdapterFactory {
         val t = type.rawType
 
         // Check if this object has any feature toggles present
-        if (
-            t.fields.none {
-                it.isAnnotationPresent(FeatureToggle::class.java) || gson.getAdapter(
-                    TypeToken.get(
-                        getType(
-                            type,
-                            it
-                        )
-                    )
-                ) is Adapter
-            }
-        ) return null
+        if (t.fields.none {
+                it.isAnnotationPresent(FeatureToggle::class.java) ||
+                        gson.getAdapter(TypeToken.get(getType(type, it))) is Adapter
+            }) return null
 
         val originalWrite = gson.getDelegateAdapter(this, type)
         return Adapter(originalWrite, t as Class<T>, gson, type)
