@@ -26,15 +26,15 @@ object ScoreboardPattern {
     val profileTypePattern by mainSb.pattern("profiletype", "^\\s*(§7♲ §7Ironman|§a☀ §aStranded|§.Ⓑ §.Bingo)$")
     // multi use
     private val multiUseSb = scoreboardGroup.group("multiuse")
-    val autoClosingPattern by multiUseSb.pattern("autoclosing", "Auto-closing in: §c\\d{0}:\\d{2}$")
-    val startingInPattern by multiUseSb.pattern("startingin", "Starting in: §a\\d{0}:\\d{2}$")
-    val timeElapsedPattern by multiUseSb.pattern("timeelapsed", "Time Elapsed:( )?(?:(?<minutes>\\d+)m)? (?<seconds>\\d+)s")
+    val autoClosingPattern by multiUseSb.pattern("autoclosing", "Auto-closing in: §c(\\d{1,2}:)?\\d{2}$")
+    val startingInPattern by multiUseSb.pattern("startingin", "Starting in: §a(\\d{1,2}:)?\\d{2}$")
+    val timeElapsedPattern by multiUseSb.pattern("timeelapsed", "Time Elapsed:( )?§a(\\d+m )?(\\d+s)?$")
     // dungeon scoreboard
     private val dungeonSb = scoreboardGroup.group("dungeon")
-    val keysPattern by dungeonSb.pattern("keys", "Keys: §.■ §.✗ §.■ §a.x$")
-    val clearedPattern by dungeonSb.pattern("cleared", "(§r)?Cleared: §c\\d{1,3}% §7\\(§b\\d{1,3}§7\\)$")
+    val keysPattern by dungeonSb.pattern("keys", "Keys: §.■ §.[✗✓] §.■ §a.x$")
+    val clearedPattern by dungeonSb.pattern("cleared", "(§r)?Cleared: §.\\d+% §.\\((§.)?\\d+(§.)?\\)$")
     val soloPattern by dungeonSb.pattern("solo", "§3§lSolo$")
-    val teammatesPattern by dungeonSb.pattern("teammates", "§[eac]\\[[MABHT]] §.+ §7\\[Lv\\d{1,3}]\$")
+    val teammatesPattern by dungeonSb.pattern("teammates", "§[eac]\\[[MABHT]] §.+ ((§7)?\\[Lv\\d{1,3}]|§.[\\w,]*(§c❤)?)$")
     // farming
     private val farmingSb = scoreboardGroup.group("farming")
     val medalsPattern by farmingSb.pattern("medals", "§[6fc]§l(GOLD|SILVER|BRONZE) §fmedals: §[6fc]\\d+$")

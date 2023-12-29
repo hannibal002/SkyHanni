@@ -145,7 +145,7 @@ enum class ScoreboardEvents(private val displayLine: Supplier<List<String>>, pri
 private fun getVotingLines(): List<String> {
     val list = mutableListOf<String>()
 
-    list += getSbLines().first { SbPattern.yearVotesPattern.matches(it) }
+    getSbLines().firstOrNull { SbPattern.yearVotesPattern.matches(it) }?.let { list.add(it) }
 
     if (getSbLines().nextAfter(list[0]) == "§7Waiting for") {
         list += "§7Waiting for"
@@ -174,13 +174,14 @@ private fun getServerCloseShowWhen(): Boolean {
 private fun getDungeonsLines(): List<String> {
     val list = mutableListOf<String>()
 
-    list += getSbLines().first { SbPattern.autoClosingPattern.matches(it) }
-    list += getSbLines().first { SbPattern.startingInPattern.matches(it) }
-    list += getSbLines().first { SbPattern.keysPattern.matches(it) }
-    list += getSbLines().first { SbPattern.timeElapsedPattern.matches(it) }
-    list += getSbLines().first { SbPattern.clearedPattern.matches(it) }
-    list += getSbLines().first { SbPattern.soloPattern.matches(it) }
-    list += getSbLines().first { SbPattern.teammatesPattern.matches(it) }
+    getSbLines().firstOrNull { SbPattern.autoClosingPattern.matches(it) }?.let { list.add(it) }
+    getSbLines().firstOrNull { SbPattern.startingInPattern.matches(it) }?.let { list.add(it) }
+    getSbLines().firstOrNull { SbPattern.keysPattern.matches(it) }?.let { list.add(it) }
+    getSbLines().firstOrNull { SbPattern.timeElapsedPattern.matches(it) }?.let { list.add(it) }
+    // BetterMap adds a random §r at the start, making it go black
+    getSbLines().firstOrNull { SbPattern.clearedPattern.matches(it) }?.let { list.add(it.replace("§r", "")) }
+    getSbLines().firstOrNull { SbPattern.soloPattern.matches(it) }?.let { list.add(it) }
+    list.addAll(getSbLines().filter { SbPattern.teammatesPattern.matches(it) })
 
     return list
 }
@@ -192,9 +193,10 @@ private fun getDungeonsShowWhen(): Boolean {
 private fun getKuudraLines(): List<String> {
     val list = mutableListOf<String>()
 
-    list += getSbLines().first { SbPattern.autoClosingPattern.matches(it) }
-    list += getSbLines().first { SbPattern.startingInPattern.matches(it) }
-    list += getSbLines().first { SbPattern.timeElapsedPattern.matches(it) }
+    getSbLines().firstOrNull { SbPattern.autoClosingPattern.matches(it) }?.let { list.add(it) }
+    getSbLines().firstOrNull { SbPattern.startingInPattern.matches(it) }?.let { list.add(it) }
+    getSbLines().firstOrNull { SbPattern.timeElapsedPattern.matches(it) }?.let { list.add(it) }
+
     if (getSbLines().any { it.startsWith("Instance Shutdow") }) {
         list += getSbLines().firstOrNull { it.startsWith("Instance Shutdow") }
             ?: "<hidden>"
@@ -235,10 +237,10 @@ private fun getKuudraShowWhen(): Boolean {
 private fun getDojoLines(): List<String> {
     val list = mutableListOf<String>()
 
-    list += getSbLines().first { SbPattern.dojoChallengePattern.matches(it) }
-    list += getSbLines().first { SbPattern.dojoDifficultyPattern.matches(it) }
-    list += getSbLines().first { SbPattern.dojoPointsPattern.matches(it) }
-    list += getSbLines().first { SbPattern.dojoTimePattern.matches(it) }
+    getSbLines().firstOrNull { SbPattern.dojoChallengePattern.matches(it) }?.let { list.add(it) }
+    getSbLines().firstOrNull { SbPattern.dojoDifficultyPattern.matches(it) }?.let { list.add(it) }
+    getSbLines().firstOrNull { SbPattern.dojoPointsPattern.matches(it) }?.let { list.add(it) }
+    getSbLines().firstOrNull { SbPattern.dojoTimePattern.matches(it) }?.let { list.add(it) }
 
     return list
 }
@@ -289,7 +291,7 @@ private fun getJacobMedalsShowWhen(): Boolean {
 private fun getTrapperLines(): List<String> {
     val list = mutableListOf<String>()
 
-    list += getSbLines().first { SbPattern.peltsPattern.matches(it) }
+    getSbLines().firstOrNull { SbPattern.peltsPattern.matches(it) }?.let { list.add(it) }
 
     if (getSbLines().any { SbPattern.mobLocationPattern.matches(it) }) {
         list += "Tracker Mob Location:"
@@ -476,9 +478,8 @@ private fun getMiningEventsLines(): List<String> {
 
     // raffle
     if (getSbLines().any {
-            ScoreboardPattern.raffleTicketsPattern.matches(it) && ScoreboardPattern.rafflePoolPattern.matches(
-                it
-            )
+            ScoreboardPattern.raffleTicketsPattern.matches(it)
+            && ScoreboardPattern.rafflePoolPattern.matches(it)
         }) {
         list += getSbLines().first { ScoreboardPattern.raffleTicketsPattern.matches(it) }
         list += getSbLines().first { ScoreboardPattern.rafflePoolPattern.matches(it) }

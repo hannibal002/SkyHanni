@@ -105,8 +105,8 @@ object UnknownLinesHandler {
             RiftBloodEffigies.heartsPattern
         )
 
-        unknownLines = unknownLines.filter { line ->
-            patternsToExclude.none { pattern -> pattern.matches(line) }
+        unknownLines = unknownLines.filterNot { line ->
+            patternsToExclude.any { pattern -> pattern.matches(line) }
         }
 
 
@@ -130,24 +130,24 @@ object UnknownLinesHandler {
         // Remove jacobs contest
         for (i in 1..3)
             unknownLines = unknownLines.filter {
-                ScoreboardData.sidebarLinesFormatted.nextAfter(ScoreboardData.sidebarLinesFormatted.first { line ->
+                ScoreboardData.sidebarLinesFormatted.nextAfter(ScoreboardData.sidebarLinesFormatted.firstOrNull { line ->
                     ScoreboardPattern.jacobsContestPattern.matches(line)
-                }, i) != it
+                } ?: "§eJacob's Contest", i) != it
             }
 
         // Remove slayer
         for (i in 1..2)
             unknownLines = unknownLines.filter {
-                ScoreboardData.sidebarLinesFormatted.nextAfter(ScoreboardData.sidebarLinesFormatted.first { line ->
+                ScoreboardData.sidebarLinesFormatted.nextAfter(ScoreboardData.sidebarLinesFormatted.firstOrNull { line ->
                     ScoreboardPattern.slayerQuestPattern.matches(line)
-                }, i) != it
+                } ?: "Slayer Quest", i) != it
             }
 
         // remove trapper mob location
         unknownLines = unknownLines.filter {
-            ScoreboardData.sidebarLinesFormatted.nextAfter(ScoreboardData.sidebarLinesFormatted.first { line ->
+            ScoreboardData.sidebarLinesFormatted.nextAfter(ScoreboardData.sidebarLinesFormatted.firstOrNull { line ->
                 ScoreboardPattern.mobLocationPattern.matches(line)
-            }, 1) != it
+            } ?: "Tracker Mob Location:", 1) != it
         }
 
         // da
