@@ -46,11 +46,7 @@ class RenderBackground {
 
         if (GuiEditManager.isInGui()) return
 
-        /*if (config.backgroundConfig.enabled) {
-            ShaderManager.enableShader("rounded_rectangle")
-        } else {
-            ShaderManager.disableShader()
-        }*/
+        // Insert Rounded Rectangle Shader here (https://github.com/hannibal002/SkyHanni/pull/851)
 
         val textureLocation = ResourceLocation("skyhanni", "scoreboard.png")
 
