@@ -59,6 +59,9 @@ object ScoreboardPattern {
     val mithrilRemainingPattern by miningSb.pattern("mithrilremaining", "^Remaining: §a(\\d{1,3} Tasty Mithril|FULL)$")
     val mithrilYourMithrilPattern by miningSb.pattern("mithrilyourmithril", "^Your Tasty Mithril: §c\\d{1,3}( §a\\(\\+\\d{1,3}\\))?$")
     val nearbyPlayersPattern by miningSb.pattern("nearbyplayers", "^Nearby Players: §.\\d*$")
+    val uselessGoblinPattern by miningSb.pattern("uselessgoblin", "^§7Kill goblins!$")
+    val remainingGoblinPattern by miningSb.pattern("remaininggoblin", "^Remaining: §a\\d+ goblins$")
+    val yourGoblinKillsPattern by miningSb.pattern("yourgoblin", "^Your kills: §c\\d+ ☠( §a\\(\\+1\\))?$")
     // combat
     private val combatSb = scoreboardGroup.group("combat")
     val magmaBossPattern by combatSb.pattern("magmaboss", "^§7Boss: §[c6e]\\d{1,3}%$")

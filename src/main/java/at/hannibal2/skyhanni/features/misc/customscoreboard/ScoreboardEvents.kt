@@ -476,20 +476,21 @@ private fun getMiningEventsLines(): List<String> {
     }
 
     // raffle
-    if (getSbLines().any {
-            ScoreboardPattern.raffleTicketsPattern.matches(it)
-            && ScoreboardPattern.rafflePoolPattern.matches(it)
-        }) {
+    if (
+        getSbLines().any {ScoreboardPattern.raffleTicketsPattern.matches(it) }
+        && getSbLines().any { ScoreboardPattern.rafflePoolPattern.matches(it) }
+    ) {
         list += getSbLines().first { ScoreboardPattern.raffleTicketsPattern.matches(it) }
         list += getSbLines().first { ScoreboardPattern.rafflePoolPattern.matches(it) }
     }
 
     // raid
-    if (getSbLines().any { it.startsWith("Remaining: §a") && it.endsWith("goblins") }) {
-        list += getSbLines().firstOrNull { it.startsWith("Remaining: §a") }
-            ?: "<hidden>"
-        list += getSbLines().firstOrNull { it.startsWith("Your kills: §c") }
-            ?: "<hidden>"
+    if (
+        getSbLines().any { ScoreboardPattern.yourGoblinKillsPattern.matches(it) }
+        && getSbLines().any { ScoreboardPattern.remainingGoblinPattern.matches(it) }
+    ) {
+        list += getSbLines().first { ScoreboardPattern.yourGoblinKillsPattern.matches(it) }
+        list += getSbLines().first { ScoreboardPattern.remainingGoblinPattern.matches(it) }
     }
 
     return if (list.size == 0) when (config.informationFilteringConfig.hideEmptyLines) {
