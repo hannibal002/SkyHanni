@@ -3,6 +3,7 @@ package at.hannibal2.skyhanni.features.misc.customscoreboard
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 
 // "Regex is torture" ~J10a1n15 (26.12.2023)
+// Thank you Ery for helping with some regexes!
 
 object ScoreboardPattern {
     val group = RepoPattern.group("features.misc.customscoreboard")
@@ -28,13 +29,13 @@ object ScoreboardPattern {
     private val multiUseSb = scoreboardGroup.group("multiuse")
     val autoClosingPattern by multiUseSb.pattern("autoclosing", "Auto-closing in: §c(\\d{1,2}:)?\\d{2}$")
     val startingInPattern by multiUseSb.pattern("startingin", "Starting in: §a(\\d{1,2}:)?\\d{2}$")
-    val timeElapsedPattern by multiUseSb.pattern("timeelapsed", "Time Elapsed:( )?§a(\\d+m )?(\\d+s)?$")
+    val timeElapsedPattern by multiUseSb.pattern("timeelapsed", "(§.)*Time Elapsed: (§.)*(?<time>(\\w+[ydhms] ?)+)$")
     // dungeon scoreboard
     private val dungeonSb = scoreboardGroup.group("dungeon")
     val keysPattern by dungeonSb.pattern("keys", "Keys: §.■ §.[✗✓] §.■ §a.x$")
-    val clearedPattern by dungeonSb.pattern("cleared", "(§r)?Cleared: §.\\d+% §.\\((§.)?\\d+(§.)?\\)$")
+    val clearedPattern by dungeonSb.pattern("cleared", "(§.)*Cleared: (§.)*(?<percent>[\\w,.]+)% (§.)*\\((§.)*(?<score>[\\w,.]+)(§.)*\\)$")
     val soloPattern by dungeonSb.pattern("solo", "§3§lSolo$")
-    val teammatesPattern by dungeonSb.pattern("teammates", "§[eac]\\[[MABHT]] §.+ ((§7)?\\[Lv\\d{1,3}]|§.[\\w,]*(§c❤)?)$")
+    val teammatesPattern by dungeonSb.pattern("teammates", "(§.)*(?<classAbbv>\\[\\w\\]) (§.)*(?<username>[a-zA-Z0-9_]{2,16}) ((§.)*(?<classLevel>\\[Lvl?(?<level>[\\w,.]+)\\]?)|(§.)*(?<health>[\\w,.]+)(§.)*.?)$")
     // farming
     private val farmingSb = scoreboardGroup.group("farming")
     val medalsPattern by farmingSb.pattern("medals", "§[6fc]§l(GOLD|SILVER|BRONZE) §fmedals: §[6fc]\\d+$")

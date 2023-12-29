@@ -78,7 +78,7 @@ enum class ScoreboardElements(
     EVENTS(
         ::getEventsDisplayPair,
         ::getEventsShowWhen,
-        "§7Wide Range of ScoreboardEvents\n§7(too much for this here)"
+        "§7Wide Range of Events\n§7(too much for this here)"
     ),
     MAYOR(
         ::getMayorDisplayPair,

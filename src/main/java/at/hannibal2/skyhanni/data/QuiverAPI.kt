@@ -10,6 +10,7 @@ import at.hannibal2.skyhanni.events.RepositoryReloadEvent
 import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalNameOrNull
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
+import at.hannibal2.skyhanni.utils.LocationUtils.distanceToPlayer
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.NEUInternalName.Companion.asInternalName
 import at.hannibal2.skyhanni.utils.NumberUtil.formatNumber
@@ -120,6 +121,10 @@ object QuiverAPI {
         val holdingBow = InventoryUtils.getItemInHand()?.item is ItemBow && !fakeBows.contains(
             InventoryUtils.getItemInHand()?.getInternalNameOrNull()
         )
+
+        // check if sound location is more than 1 block away from player
+        val soundLocation = event.location
+        if (soundLocation.distanceToPlayer() > 1.0) return
 
         if (event.soundName == "random.bow" && holdingBow) {
             val arrowType = currentArrow ?: return
