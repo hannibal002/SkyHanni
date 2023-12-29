@@ -442,7 +442,7 @@ private fun getMiningEventsLines(): List<String> {
 
     // Better Together
     if (getSbLines().any { ScoreboardPattern.nearbyPlayersPattern.matches(it) }) {
-        list += "§9Better Together"
+        list += "§dBetter Together"
         list += (" " + getSbLines().first { ScoreboardPattern.nearbyPlayersPattern.matches(it) })
     }
 
