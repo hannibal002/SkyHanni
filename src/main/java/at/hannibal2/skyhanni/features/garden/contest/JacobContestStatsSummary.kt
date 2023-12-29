@@ -18,12 +18,13 @@ import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.TimeUtils
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import kotlin.math.roundToInt
+import kotlin.math.roundToLong
 
 class JacobContestStatsSummary {
     private val config get() = GardenAPI.config.jacobContestStats
     private var blocksBroken = 0
     private var startTime = 0L
-    private var startTimeIntoContest = 0L
+    private var startTimeIntoContest = 0.0
     private var percent = 0.0
     private var participants = 0
     private var medalColor = ""
@@ -68,7 +69,7 @@ class JacobContestStatsSummary {
         if (!FarmingContestAPI.inContest) return
 
         var timeLeft = 0L
-        var amount = 0L
+        var amount = 0.0
 
         for (line in event.newList) {
             scoreboardContestTimeLeftPattern.matchMatcher(line) {
@@ -79,15 +80,15 @@ class JacobContestStatsSummary {
             }
         }
 
-        predictedScore = ((amount / (1200 - timeLeft - startTimeIntoContest)) * 1200)
+        predictedScore = ((amount / (1200 - timeLeft - startTimeIntoContest)) * (1200 - startTimeIntoContest)).roundToLong()
         update()
     }
 
-    private fun String.fixScoreAmount() =
+    private fun String.fixScoreAmount(): Double =
         this.formatNumber() * when (this.split(',').last().length) {
-            2 -> 10
-            1 -> 100
-            else -> 1
+            2 -> 10.0
+            1 -> 100.0
+            else -> 1.0
         }
 
     fun update() {
@@ -101,7 +102,7 @@ class JacobContestStatsSummary {
 
         val unsortedList = buildList<List<Any>> {
             addAsSingletonList("§e§l$cropName Contest Stats")
-            addAsSingletonList("§7Started §b${TimeUtils.formatDuration(startTimeIntoContest*1000)} §7into contest")
+            addAsSingletonList("§7Started §b${TimeUtils.formatDuration((startTimeIntoContest * 1000).toLong(), showMilliSeconds = true)} §7into contest (${startTimeIntoContest})")
             addAsSingletonList("§7Blocks Broken: §e${blocksBroken.addSeparators()}")
             addAsSingletonList("§7Blocks per Second: §c$blocksPerSecond")
             if (percent == 0.0 && participants == 0)
@@ -133,7 +134,7 @@ class JacobContestStatsSummary {
             FarmingContestPhase.START -> {
                 LorenzUtils.chat("Started tracking your Jacob Contest Blocks Per Second!")
                 startTime = System.currentTimeMillis()
-                startTimeIntoContest = ((startTime % 3600000) - 900000) / 1000
+                startTimeIntoContest = ((startTime.toDouble() % 3600000) - 900000) / 1000
             }
 
             FarmingContestPhase.STOP -> {
@@ -155,7 +156,7 @@ class JacobContestStatsSummary {
             FarmingContestPhase.CHANGE -> {
                 LorenzUtils.chat("You changed the crop during the contest, resetting the Blocks Per Second calculation..")
                 startTime = System.currentTimeMillis()
-                startTimeIntoContest = ((startTime % 3600000) - 900000) / 1000
+                startTimeIntoContest = ((startTime.toDouble() % 3600000) - 900000) / 1000
             }
         }
         blocksBroken = 0
