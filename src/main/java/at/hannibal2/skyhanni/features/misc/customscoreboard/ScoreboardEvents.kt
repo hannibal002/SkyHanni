@@ -504,18 +504,19 @@ private fun getDamageShowWhen(): Boolean {
 }
 
 private fun getMagmaBossLines(): List<String> {
-    val list = mutableListOf<String>()
-
-    list += getSbLines().first { SbPattern.magmaBossPattern.matches(it) }
-    list += getSbLines().first { SbPattern.damageSoakedPattern.matches(it) }
-    list += getSbLines().first { SbPattern.damagedSoakedBarPattern.matches(it) }
-    list += getSbLines().first { SbPattern.killMagmasPattern.matches(it) }
-    list += getSbLines().first { SbPattern.killMagmasBarPattern.matches(it) }
-    list += getSbLines().first { SbPattern.reformingPattern.matches(it) }
-    list += getSbLines().first { SbPattern.bossHealthPattern.matches(it) }
-    list += getSbLines().first { SbPattern.bossHealthBarPattern.matches(it) }
-
-    return list
+    return listOf(
+        SbPattern.magmaBossPattern,
+        SbPattern.damageSoakedPattern,
+        SbPattern.damagedSoakedBarPattern,
+        SbPattern.killMagmasPattern,
+        SbPattern.killMagmasBarPattern,
+        SbPattern.reformingPattern,
+        SbPattern.bossHealthPattern,
+        SbPattern.bossHealthBarPattern
+    )
+        .mapNotNull { pattern ->
+            getSbLines().firstOrNull { pattern.matches(it) }
+        }
 }
 
 private fun getMagmaBossShowWhen(): Boolean {
