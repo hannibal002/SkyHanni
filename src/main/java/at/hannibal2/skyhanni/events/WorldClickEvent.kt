@@ -5,4 +5,4 @@ import net.minecraft.item.ItemStack
 import net.minecraftforge.fml.common.eventhandler.Cancelable
 
 @Cancelable
-class ItemClickEvent(itemInHand: ItemStack?, clickType: ClickType) : WorldClickEvent(itemInHand, clickType)
+open class WorldClickEvent(val itemInHand: ItemStack?, val clickType: ClickType) : LorenzEvent()

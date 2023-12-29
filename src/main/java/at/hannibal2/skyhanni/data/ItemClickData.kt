@@ -22,14 +22,14 @@ class ItemClickData {
         if (packet is C08PacketPlayerBlockPlacement) {
             if (packet.placedBlockDirection != 255) {
                 val position = packet.position.toLorenzVec()
-                BlockClickEvent(ClickType.RIGHT_CLICK, position, packet.stack).postAndCatch()
+                event.isCanceled = BlockClickEvent(ClickType.RIGHT_CLICK, position, packet.stack).postAndCatch()
             } else {
-                ItemClickEvent(InventoryUtils.getItemInHand(), ClickType.RIGHT_CLICK).postAndCatch()
+                event.isCanceled = ItemClickEvent(InventoryUtils.getItemInHand(), ClickType.RIGHT_CLICK).postAndCatch()
             }
         }
         if (packet is C07PacketPlayerDigging && packet.status == C07PacketPlayerDigging.Action.START_DESTROY_BLOCK) {
             val position = packet.position.toLorenzVec()
-            BlockClickEvent(ClickType.LEFT_CLICK, position, InventoryUtils.getItemInHand()).postAndCatch()
+            event.isCanceled = BlockClickEvent(ClickType.LEFT_CLICK, position, InventoryUtils.getItemInHand()).postAndCatch()
         }
     }
 
@@ -48,6 +48,6 @@ class ItemClickData {
             else -> return
         }
 
-        EntityClickEvent(clickType, clickedEntity).postAndCatch()
+        event.isCanceled = EntityClickEvent(clickType, clickedEntity, InventoryUtils.getItemInHand()).postAndCatch()
     }
 }

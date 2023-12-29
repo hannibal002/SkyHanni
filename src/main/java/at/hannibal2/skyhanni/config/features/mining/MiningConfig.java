@@ -29,4 +29,10 @@ public class MiningConfig {
     @ConfigEditorBoolean
     @FeatureToggle
     public boolean crystalHollowsNamesInCore = false;
+
+    @Expose
+    @ConfigOption(name = "Private Island Ability Block", desc = "Blocks the mining ability when on private island")
+    @ConfigEditorBoolean
+    @FeatureToggle
+    public boolean privateIslandNoPickaxeAbility = false;
 }
