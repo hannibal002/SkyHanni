@@ -1,6 +1,7 @@
 package at.hannibal2.skyhanni.features.fishing
 
 import at.hannibal2.skyhanni.events.FishingBobberCastEvent
+import at.hannibal2.skyhanni.events.IslandChangeEvent
 import at.hannibal2.skyhanni.events.ItemInHandChangeEvent
 import at.hannibal2.skyhanni.events.SkillExpGainEvent
 import at.hannibal2.skyhanni.features.fishing.tracker.FishingProfitTracker
@@ -61,6 +62,11 @@ object FishingAPI {
                 lastActiveFishingTime = SimpleTimeMark.farPast()
             }
         }
+    }
+
+    @SubscribeEvent
+    fun onIslandChange(event: IslandChangeEvent) {
+        lastActiveFishingTime = SimpleTimeMark.farPast()
     }
 
     fun hasFishingRodInHand() = InventoryUtils.itemInHandId.isFishingRod()

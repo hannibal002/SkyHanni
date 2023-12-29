@@ -284,4 +284,8 @@ object StringUtils {
     fun Pattern.matches(string: String) = matcher(string).matches()
 
     fun Pattern.find(string: String) = matcher(string).find()
+
+    fun String.allLettersFirstUppercase() = split("_").joinToString(" ") { it.firstLetterUppercase() }
+
+    fun String?.equalsIgnoreColor(string: String?) = this?.let { it.removeColor() == string?.removeColor() } ?: false
 }

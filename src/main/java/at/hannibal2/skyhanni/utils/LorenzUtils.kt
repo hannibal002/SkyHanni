@@ -548,7 +548,7 @@ object LorenzUtils {
         return newValue
     }
 
-    fun <K, N : Number> MutableMap<K, N>.sumAllValues(): Double {
+    fun <K, N : Number> Map<K, N>.sumAllValues(): Double {
         if (values.isEmpty()) return 0.0
 
         return when (values.first()) {
