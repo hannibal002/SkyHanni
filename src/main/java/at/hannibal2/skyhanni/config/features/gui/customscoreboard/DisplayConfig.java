@@ -4,6 +4,7 @@ import at.hannibal2.skyhanni.config.FeatureToggle;
 import com.google.gson.annotations.Expose;
 import io.github.moulberry.moulconfig.annotations.Accordion;
 import io.github.moulberry.moulconfig.annotations.ConfigEditorBoolean;
+import io.github.moulberry.moulconfig.annotations.ConfigEditorDropdown;
 import io.github.moulberry.moulconfig.annotations.ConfigOption;
 
 public class DisplayConfig {
@@ -28,6 +29,28 @@ public class DisplayConfig {
     @ConfigOption(name = "Show all active events", desc = "Show all active events in the scoreboard instead of one.")
     @ConfigEditorBoolean
     public boolean showAllActiveEvents = false;
+
+    @Expose
+    @ConfigOption(name = "Number Format", desc = "")
+    @ConfigEditorDropdown
+    public NumberFormat numberFormat = NumberFormat.LONG;
+
+    public enum NumberFormat {
+        LONG("1,234,567"),
+        SHORT("1.2M")
+        ;
+
+        private final String str;
+
+        NumberFormat(String str) {
+            this.str = str;
+        }
+
+        @Override
+        public String toString() {
+            return str;
+        }
+    }
 
     @Expose
     @ConfigOption(name = "Alignment Options", desc = "")
