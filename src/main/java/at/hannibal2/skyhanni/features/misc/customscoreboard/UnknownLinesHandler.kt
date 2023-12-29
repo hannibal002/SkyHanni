@@ -88,6 +88,7 @@ object UnknownLinesHandler {
             ScoreboardPattern.broodmotherPattern,
             ScoreboardPattern.bossHPPattern,
             ScoreboardPattern.bossDamagePattern,
+            ScoreboardPattern.slayerQuestPattern,
             ScoreboardPattern.essencePattern,
             ScoreboardPattern.brokenRedstonePattern,
             ScoreboardPattern.redstonePattern,
@@ -126,11 +127,11 @@ object UnknownLinesHandler {
             }
 
         // Remove jacobs contest
-        for (i in 0..3)
+        for (i in 1..3)
             unknownLines = unknownLines.filter { sidebarLines.nextAfter("§eJacob's Contest", i) != it }
 
         // Remove slayer
-        for (i in 0..2)
+        for (i in 1..2)
             unknownLines = unknownLines.filter { sidebarLines.nextAfter("Slayer Quest", i) != it }
 
         // remove trapper mob location

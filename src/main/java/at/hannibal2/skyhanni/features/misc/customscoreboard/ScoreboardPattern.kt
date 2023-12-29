@@ -70,6 +70,7 @@ object ScoreboardPattern {
     val broodmotherPattern by combatSb.pattern("broodmother", "^§4Broodmother§7: §[e64](Slain|Dormant|Soon|Awakening|Imminent|Alive!)$")
     val bossHPPattern by combatSb.pattern("bosshp", "^(Protector|Dragon) HP: §a(,?\\d{1,3})* §c❤$")
     val bossDamagePattern by combatSb.pattern("bossdamage", "^Your Damage: §c(,?\\d{1,3}(\\.\\d)?)*$")
+    val slayerQuestPattern by combatSb.pattern("slayerquest", "^Slayer Quest$")
     // misc
     private val miscSb = scoreboardGroup.group("misc")
     val essencePattern by miscSb.pattern("essence", "^\\s*Essence: §d(?<essence>-?\\d+(:?,\\d{3})*(?:\\.\\d+)?)$")
