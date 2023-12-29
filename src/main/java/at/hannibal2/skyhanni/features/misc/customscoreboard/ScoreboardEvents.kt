@@ -376,15 +376,14 @@ private fun getWinterShowWhen(): Boolean {
 }
 
 private fun getSpookyLines(): List<String> {
-    return listOf(getSbLines().firstOrNull { it.startsWith("§6Spooky Festival§f") }
-        ?: "<hidden>") + // Time
+    return listOf(getSbLines().first { ScoreboardPattern.spookyPattern.matches(it) }) + // Time
         ("§7Your Candy: ") +
         (CustomScoreboardUtils.getTablistFooter().split("\n").firstOrNull { it.startsWith("§7Your Candy:") }
             ?.removePrefix("§7Your Candy:") ?: "§cCandy not found") // Candy
 }
 
 private fun getSpookyShowWhen(): Boolean {
-    return getSbLines().any { it.startsWith("§6Spooky Festival§f") }
+    return getSbLines().any { ScoreboardPattern.spookyPattern.matches(it) }
 }
 
 private fun getMarinaLines(): List<String> {

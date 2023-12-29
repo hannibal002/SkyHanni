@@ -101,6 +101,7 @@ object UnknownLinesHandler {
             ScoreboardPattern.dojoTimePattern,
             ScoreboardPattern.objectivePattern,
             ScoreboardPattern.travelingZooPattern,
+            ScoreboardPattern.spookyPattern,
             ScoreboardPattern.riftDimensionPattern,
             RiftBloodEffigies.heartsPattern
         )
