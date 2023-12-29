@@ -1,3 +1,4 @@
+import org.apache.commons.lang3.SystemUtils
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 import java.io.ByteArrayOutputStream
 
@@ -153,6 +154,11 @@ loom {
         defaultRefmapName.set("mixins.skyhanni.refmap.json")
     }
     runConfigs {
+        "client" {
+            if (SystemUtils.IS_OS_MAC_OSX) {
+                vmArgs.remove("-XstartOnFirstThread")
+            }
+        }
         "server" {
             isIdeConfigGenerated = false
         }
