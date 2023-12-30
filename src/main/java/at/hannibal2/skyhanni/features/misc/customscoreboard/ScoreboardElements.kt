@@ -270,16 +270,18 @@ private fun getTimeDisplayPair(): List<Pair<String, AlignmentEnum>> {
     )
 }
 
-private fun getLobbyDisplayPair() =
-    listOf(
-        "§8${
-            getGroupFromPattern(
-                ScoreboardData.sidebarLinesFormatted,
-                ScoreboardPattern.lobbyCodePattern,
-                "code"
-            )
-        }" to AlignmentEnum.LEFT
+private fun getLobbyDisplayPair(): List<Pair<String, AlignmentEnum>> {
+    val lobbyCode = getGroupFromPattern(
+        ScoreboardData.sidebarLinesFormatted,
+        ScoreboardPattern.lobbyCodePattern,
+        "code"
     )
+
+    val displayValue = if (lobbyCode == "0") "<hidden>" else "§8$lobbyCode"
+
+    return listOf(displayValue to AlignmentEnum.LEFT)
+
+}
 
 private fun getPowerDisplayPair() = when (MaxwellAPI.currentPower) {
     null -> listOf("§c§lVisit Maxwell!" to AlignmentEnum.LEFT)
