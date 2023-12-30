@@ -65,6 +65,8 @@ import at.hannibal2.skyhanni.features.chat.ArachneChatMessageHider
 import at.hannibal2.skyhanni.features.chat.ChatFilter
 import at.hannibal2.skyhanni.features.chat.CompactBestiaryChatMessage
 import at.hannibal2.skyhanni.features.chat.CompactSplashPotionMessage
+import at.hannibal2.skyhanni.features.chat.EmojiColorer
+import at.hannibal2.skyhanni.features.chat.EmojiReplacer
 import at.hannibal2.skyhanni.features.chat.PlayerDeathMessages
 import at.hannibal2.skyhanni.features.chat.Translator
 import at.hannibal2.skyhanni.features.chat.WatchdogHider
@@ -694,6 +696,8 @@ class SkyHanniMod {
         loadModule(NewYearCakeReminder())
         loadModule(HighlightInquisitors())
         loadModule(VerminTracker)
+        loadModule(EmojiReplacer())
+        loadModule(EmojiColorer())
 
         init()
 

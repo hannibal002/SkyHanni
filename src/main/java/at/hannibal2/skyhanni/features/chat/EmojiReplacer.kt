@@ -1,9 +1,9 @@
 package at.hannibal2.skyhanni.features.chat
 
 import at.hannibal2.skyhanni.SkyHanniMod
+import at.hannibal2.skyhanni.events.LorenzChatEvent
 import at.hannibal2.skyhanni.events.MessageSendToServerEvent
 import at.hannibal2.skyhanni.utils.LorenzUtils
-import net.minecraft.network.play.client.C01PacketChatMessage
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
 class EmojiReplacer {
@@ -33,7 +33,7 @@ class EmojiReplacer {
     )
 
     private val gifted5 = arrayOf(
-        "^-^" to "^-^",
+//        "^-^" to "^-^",
         ":cute:" to "(✿◠‿◠)"
     )
 
@@ -56,16 +56,20 @@ class EmojiReplacer {
         ":snow:" to "☃"
     )
 
-    private val config = SkyHanniMod.feature.chat.EmojiConfig
+    private val config get() = SkyHanniMod.feature.chat.EmojiConfig
 
     @SubscribeEvent
     fun onChatSend(event: MessageSendToServerEvent) {
-        if (config.enabled && config.emojiReplace.mvp) chatEdit(event, mvpPlusPlus)
-        if (config.enabled && config.emojiReplace.five) chatEdit(event, gifted5)
-        if (config.enabled && config.emojiReplace.twenty) chatEdit(event, gifted20)
-        if (config.enabled && config.emojiReplace.fifty) chatEdit(event, gifted50)
-        if (config.enabled && config.emojiReplace.hundred) chatEdit(event, gifted100)
-        if (config.enabled && config.emojiReplace.twoHundred) chatEdit(event, gifted200)
+        if (config.enabled) {
+            var arrayFinal: Array<Pair<String, String>> = emptyArray()
+            if (config.emojiReplace.mvp) arrayFinal += mvpPlusPlus
+            if (config.emojiReplace.five) arrayFinal += gifted5
+            if (config.emojiReplace.twenty) arrayFinal += gifted20
+            if (config.emojiReplace.fifty) arrayFinal += gifted50
+            if (config.emojiReplace.hundred) arrayFinal += gifted100
+            if (config.emojiReplace.twoHundred) arrayFinal += gifted200
+            chatEdit(event, arrayFinal)
+        }
     }
 
     private fun chatEdit(event: MessageSendToServerEvent, array: Array<Pair<String, String>>) {
@@ -79,12 +83,13 @@ class EmojiReplacer {
         } else return
     }
 
-    private fun inArray(input: String, array: Array<Pair<String, String>>): Boolean {
-        for ((leftHalf, _) in array) {
-            if (input.contains(leftHalf)) {
-                return true
+    companion object {
+        fun inArray(input: String, array: Array<Pair<String, String>>): Boolean {
+            for ((leftHalf, _) in array) {
+                if (input.contains(leftHalf)) return true
             }
+            return false
         }
-        return false
+
     }
 }
