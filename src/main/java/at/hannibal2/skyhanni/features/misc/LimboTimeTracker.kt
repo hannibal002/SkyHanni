@@ -33,12 +33,12 @@ class LimboTimeTracker {
 
 
     //bedwars limbo coords, maybe move this somewhere else
-    val minX = -662.0
-    val minY = 43.0
-    val minZ = -76.0
-    val maxX = -619.0
-    val maxY = 86.0
-    val maxZ = -27.0
+    private val minX = -662.0
+    private val minY = 43.0
+    private val minZ = -76.0
+    private val maxX = -619.0
+    private val maxY = 86.0
+    private val maxZ = -27.0
 
     @SubscribeEvent
     fun onChat(event: LorenzChatEvent) {
