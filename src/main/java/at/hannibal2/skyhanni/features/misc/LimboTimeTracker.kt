@@ -2,6 +2,7 @@ package at.hannibal2.skyhanni.features.misc
 
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.data.HypixelData
+import at.hannibal2.skyhanni.events.ConfigLoadEvent
 import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.LorenzChatEvent
 import at.hannibal2.skyhanni.events.LorenzTickEvent
@@ -46,6 +47,14 @@ class LimboTimeTracker {
             limboJoinTime = SimpleTimeMark.now()
             inLimbo = true
             LimboCommands.enterLimbo(limboJoinTime)
+        }
+    }
+
+    @SubscribeEvent
+    fun onConfigLoad(event: ConfigLoadEvent) {
+        if (config.limboPlaytime < config.limboTimePB) {
+            config.limboPlaytime = config.limboTimePB
+            LorenzUtils.debug("Setting limboPlaytime = limboTimePB, since limboPlaytime was lower.")
         }
     }
 
