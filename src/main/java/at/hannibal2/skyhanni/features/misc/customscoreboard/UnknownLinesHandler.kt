@@ -3,6 +3,7 @@ package at.hannibal2.skyhanni.features.misc.customscoreboard
 import at.hannibal2.skyhanni.data.BitsAPI
 import at.hannibal2.skyhanni.data.PurseAPI
 import at.hannibal2.skyhanni.data.ScoreboardData
+import at.hannibal2.skyhanni.features.misc.ServerRestartTitle
 import at.hannibal2.skyhanni.features.rift.area.stillgorechateau.RiftBloodEffigies
 import at.hannibal2.skyhanni.utils.LorenzUtils.nextAfter
 import at.hannibal2.skyhanni.utils.StringUtils.matches
@@ -103,6 +104,7 @@ object UnknownLinesHandler {
             ScoreboardPattern.dojoPointsPattern,
             ScoreboardPattern.dojoTimePattern,
             ScoreboardPattern.objectivePattern,
+            ServerRestartTitle.restartingPattern,
             ScoreboardPattern.travelingZooPattern,
             ScoreboardPattern.spookyPattern,
             ScoreboardPattern.riftDimensionPattern,
