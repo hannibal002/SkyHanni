@@ -8,10 +8,12 @@ import at.hannibal2.skyhanni.SkyHanniMod.Companion.feature
 import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.config.features.misc.DiscordRPCConfig.LineEntry
 import at.hannibal2.skyhanni.config.features.misc.DiscordRPCConfig.PriorityEntry
+import at.hannibal2.skyhanni.data.jsonobjects.repo.StackingEnchantJson
 import at.hannibal2.skyhanni.events.ConfigLoadEvent
 import at.hannibal2.skyhanni.events.LorenzKeyPressEvent
 import at.hannibal2.skyhanni.events.LorenzTickEvent
 import at.hannibal2.skyhanni.events.LorenzWorldChangeEvent
+import at.hannibal2.skyhanni.events.RepositoryReloadEvent
 import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.ConfigUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils
@@ -46,6 +48,8 @@ object DiscordRPCManager : IPCListener {
     private var connected = false
 
     private val DiscordLocationKey = DiscordLocationKey()
+
+    var stackingEnchants: Map<String, StackingEnchantJson.StackingEnchantData> = emptyMap()
 
     fun start(fromCommand: Boolean = false) {
         coroutineScope.launch {
@@ -107,6 +111,12 @@ object DiscordRPCManager : IPCListener {
             }
         }
     }
+
+    @SubscribeEvent
+    fun onRepoReload(event: RepositoryReloadEvent) {
+        stackingEnchants = event.getConstant<StackingEnchantJson>("StackingEnchants").enchants
+    }
+
     fun updatePresence() {
         val location = DiscordStatus.LOCATION.getDisplayString()
         val discordIconKey = DiscordLocationKey.getDiscordIconKey(location)

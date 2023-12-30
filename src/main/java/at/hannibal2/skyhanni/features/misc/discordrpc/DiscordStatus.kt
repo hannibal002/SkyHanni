@@ -40,49 +40,6 @@ val purseRegex = Regex("""(?:Purse|Piggy): ([\d,]+)[\d.]*""")
 val motesRegex = Regex("""Motes: ([\d,]+)""")
 val bitsRegex = Regex("""Bits: ([\d|,]+)[\d|.]*""")
 
-val stackingEnchants = mapOf(
-    "compact" to mapOf(
-        "levels" to listOf(0, 100, 500, 1500, 5000, 15000, 50000, 150000, 500000, 1000000),
-        "nbtNum" to "compact_blocks"
-    ),
-    "cultivating" to mapOf(
-        "levels" to listOf(
-            0,
-            1000,
-            5000,
-            25000,
-            100000,
-            300000,
-            1500000,
-            5000000,
-            20000000,
-            100000000
-        ), "nbtNum" to "farmed_cultivating"
-    ),
-    "expertise" to mapOf(
-        "levels" to listOf(0, 50, 100, 250, 500, 1000, 2500, 5500, 10000, 15000),
-        "nbtNum" to "expertise_kills"
-    ),
-    "hecatomb" to mapOf(
-        "levels" to listOf(0, 2, 5, 10, 20, 30, 40, 60, 80, 100),
-        "nbtNum" to "hecatomb_s_runs"
-    ),
-    "champion" to mapOf(
-        "levels" to listOf(
-            0,
-            50000,
-            100000,
-            250000,
-            500000,
-            1000000,
-            1500000,
-            2000000,
-            2500000,
-            3000000
-        ), "nbtNum" to "champion_combat_xp"
-    )
-) // nbtNum is the id of the enchantment in the nbt data
-
 private fun getVisitingName(): String {
     val tabData = getTabList()
     val ownerRegex = Regex(".*Owner: (\\w+).*")
@@ -315,11 +272,9 @@ enum class DiscordStatus(private val displayMessageSupplier: Supplier<String>?) 
         val extraAttributes = getExtraAttributes(itemInHand)
 
         fun getProgressPercent(amount: Int, levels: List<Int>): String {
-            var currentLevel = 0
             var percent = "MAXED"
             for (level in levels.indices) {
                 if (amount > levels[level]) {
-                    currentLevel++
                     continue
                 }
                 percent = if (amount.toDouble() == 0.0) {
@@ -336,15 +291,15 @@ enum class DiscordStatus(private val displayMessageSupplier: Supplier<String>?) 
         if (extraAttributes != null) {
             val enchantments = extraAttributes.getCompoundTag("enchantments")
             var stackingEnchant = ""
-            for (enchant in stackingEnchants.keys) {
-                if (extraAttributes.hasKey(stackingEnchants[enchant]?.get("nbtNum").toString())) {
-                    stackingEnchant = enchant
+            for (enchant in DiscordRPCManager.stackingEnchants) {
+                if (extraAttributes.hasKey(enchant.value.statName)) {
+                    stackingEnchant = enchant.key
                     break
                 }
             }
-            val levels = stackingEnchants[stackingEnchant]?.get("levels") as? List<Int> ?: listOf(0)
+            val levels = DiscordRPCManager.stackingEnchants[stackingEnchant]?.levels ?: listOf(0)
             val level = enchantments.getInteger(stackingEnchant)
-            val amount = extraAttributes.getInteger(stackingEnchants[stackingEnchant]?.get("nbtNum").toString())
+            val amount = extraAttributes.getInteger(DiscordRPCManager.stackingEnchants[stackingEnchant]?.statName)
             val stackingPercent = getProgressPercent(amount, levels)
 
             stackingReturn =
