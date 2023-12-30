@@ -2,6 +2,7 @@ package at.hannibal2.skyhanni.utils.renderables
 
 import at.hannibal2.skyhanni.config.core.config.gui.GuiPositionEditor
 import at.hannibal2.skyhanni.data.ToolTipData
+import at.hannibal2.skyhanni.utils.LorenzColor
 import at.hannibal2.skyhanni.utils.LorenzLogger
 import at.hannibal2.skyhanni.utils.NEUItems.renderOnScreen
 import io.github.moulberry.moulconfig.gui.GuiScreenElementWrapper
@@ -62,7 +63,7 @@ interface Renderable {
             text: String,
             onClick: () -> Unit,
             bypassChecks: Boolean = false,
-            condition: () -> Boolean = { true }
+            condition: () -> Boolean = { true },
         ): Renderable =
             link(string(text), onClick, bypassChecks, condition)
 
@@ -70,7 +71,7 @@ interface Renderable {
             renderable: Renderable,
             onClick: () -> Unit,
             bypassChecks: Boolean = false,
-            condition: () -> Boolean = { true }
+            condition: () -> Boolean = { true },
         ): Renderable {
             return clickable(
                 hoverable(underlined(renderable), renderable, bypassChecks, condition = condition),
@@ -83,11 +84,12 @@ interface Renderable {
 
         fun clickAndHover(
             text: String,
-            tips: List<String>,
+            tips: List<Any>,
             bypassChecks: Boolean = false,
-            onClick: () -> Unit
+            onClick: () -> Unit,
+            onHover: () -> Unit = {},
         ): Renderable {
-            return clickable(hoverTips(text, tips, bypassChecks = bypassChecks), onClick, bypassChecks = bypassChecks)
+            return clickable(hoverTips(text, tips, bypassChecks = bypassChecks, onHover = onHover), onClick, bypassChecks = bypassChecks)
         }
 
         fun clickable(
@@ -95,7 +97,7 @@ interface Renderable {
             onClick: () -> Unit,
             button: Int = 0,
             bypassChecks: Boolean = false,
-            condition: () -> Boolean = { true }
+            condition: () -> Boolean = { true },
         ) =
             object : Renderable {
                 override val width: Int
@@ -120,11 +122,13 @@ interface Renderable {
 
         fun hoverTips(
             text: String,
-            tips: List<String>,
+            tips: List<Any>,
             indexes: List<Int> = listOf(),
             stack: ItemStack? = null,
+            color: LorenzColor? = null,
             bypassChecks: Boolean = false,
-            condition: () -> Boolean = { true }
+            condition: () -> Boolean = { true },
+            onHover: () -> Unit = {},
         ): Renderable {
 
             val render = string(text)
@@ -133,17 +137,23 @@ interface Renderable {
                     get() = render.width
                 override val height = 11
 
+                val tipsRender = tips.mapNotNull { fromAny(it) }
+
                 override fun render(posX: Int, posY: Int) {
                     render.render(posX, posY)
                     if (isHovered(posX, posY)) {
                         if (condition() && shouldAllowLink(true, bypassChecks)) {
+                            onHover.invoke()
                             list[Pair(posX, posY)] = indexes
                             GlStateManager.pushMatrix()
                             GlStateManager.translate(0F, 0F, 400F)
 
                             RenderLineTooltips.drawHoveringText(
-                                posX, posY, tips,
+                                posX,
+                                posY,
+                                tipsRender,
                                 stack,
+                                color,
                                 currentRenderPassMousePosition?.first ?: Utils.getMouseX(),
                                 currentRenderPassMousePosition?.second ?: Utils.getMouseY(),
                             )
@@ -211,7 +221,7 @@ interface Renderable {
             hovered: Renderable,
             unhovered: Renderable,
             bypassChecks: Boolean = false,
-            condition: () -> Boolean = { true }
+            condition: () -> Boolean = { true },
         ) =
             object : Renderable {
                 override val width: Int
@@ -254,9 +264,9 @@ interface Renderable {
             }
         }
 
-        fun placeholder(width: Int) = object : Renderable {
-            override val width: Int = width
-            override val height = 10
+        fun placeholder(width: Int, height: Int = 10) = object : Renderable {
+            override val width = width
+            override val height = height
 
             override fun render(posX: Int, posY: Int) {
             }

@@ -116,12 +116,12 @@ open class SkyHanniTracker<Data : TrackerData>(
             "§ccurrent session of",
             "§c$name"
         ),
-    ) {
-        if (sessionResetTime.passedSince() > 3.seconds) {
-            reset(DisplayMode.SESSION, "Reset this session of $name!")
-            sessionResetTime = SimpleTimeMark.now()
-        }
-    }
+        onClick = {
+            if (sessionResetTime.passedSince() > 3.seconds) {
+                reset(DisplayMode.SESSION, "Reset this session of $name!")
+                sessionResetTime = SimpleTimeMark.now()
+            }
+        })
 
     private fun buildDisplayModeView() = LorenzUtils.buildSelector<DisplayMode>(
         "§7Display Mode: ",

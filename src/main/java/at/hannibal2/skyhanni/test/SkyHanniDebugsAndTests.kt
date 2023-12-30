@@ -512,7 +512,7 @@ class SkyHanniDebugsAndTests {
 //        val pitch = event.pitch
 //        val volume = event.volume
 
-        //background music
+        // background music
 //        if (soundName == "note.harp") {
 ////                if (distance < 2) {
 //
@@ -547,7 +547,7 @@ class SkyHanniDebugsAndTests {
 //            }
 //        }
 
-        //diana ancestral spade
+        // diana ancestral spade
 //        if (soundName == "note.harp") {
 //            val list = mutableListOf<Float>()
 //            list.add(0.52380955f)
@@ -622,7 +622,7 @@ class SkyHanniDebugsAndTests {
 //            }
 //        }
 
-        //use ancestral spade
+        // use ancestral spade
 //        if (soundName == "mob.zombie.infect") {
 //            if (pitch == 1.968254f) {
 //                if (volume == 0.3f) {
@@ -632,7 +632,7 @@ class SkyHanniDebugsAndTests {
 //            }
 //        }
 
-        //wither shield activated
+        // wither shield activated
 //        if (soundName == "mob.zombie.remedy") {
 //            if (pitch == 0.6984127f) {
 //                if (volume == 1f) {
@@ -641,7 +641,7 @@ class SkyHanniDebugsAndTests {
 //            }
 //        }
 
-        //wither shield cooldown over
+        // wither shield cooldown over
 //        if (soundName == "random.levelup") {
 //            if (pitch == 3f) {
 //                if (volume == 1f) {
@@ -650,21 +650,21 @@ class SkyHanniDebugsAndTests {
 //            }
 //        }
 
-        //teleport (hyp or aote)
+        // teleport (hyp or aote)
 //        if (soundName == "mob.endermen.portal") {
 //            if (pitch == 1f && volume == 1f) {
 //                return
 //            }
 //        }
 
-        //hyp wither impact
+        // hyp wither impact
 //        if (soundName == "random.explode") {
 //            if (pitch == 1f && volume == 1f) {
 //                return
 //            }
 //        }
 
-        //pick coins up
+        // pick coins up
 //        if (soundName == "random.orb") {
 //            if (pitch == 1.4920635f && volume == 1f) {
 //                return
