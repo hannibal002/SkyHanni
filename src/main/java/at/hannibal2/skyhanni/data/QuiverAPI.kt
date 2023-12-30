@@ -124,7 +124,7 @@ object QuiverAPI {
 
         // check if sound location is more than 1 block away from player
         val soundLocation = event.location
-        if (soundLocation.distanceToPlayer() > 1.0) return
+        if (soundLocation.distanceToPlayer() > 5.0) return
 
         if (event.soundName == "random.bow" && holdingBow) {
             val arrowType = currentArrow ?: return
