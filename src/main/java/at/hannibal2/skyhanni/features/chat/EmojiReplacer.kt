@@ -18,7 +18,7 @@ class EmojiReplacer {
         ":shrug:" to "¯\\_(ツ)_/¯",
         ":tableflip:" to "(╯°□°）╯︵┻━┻",
         "o/" to "( ﾟ◡ﾟ)/",
-//        ":123:" to "",
+//        ":123:" to "123",
         ":totem:" to "☉_☉",
         ":typing:" to "✎...",
         ":maths:" to "√(π+x)=L",
