@@ -477,7 +477,7 @@ private fun getMiningEventsLines(): List<String> {
 
     // raffle
     if (
-        getSbLines().any {ScoreboardPattern.raffleTicketsPattern.matches(it) }
+        getSbLines().any { ScoreboardPattern.raffleTicketsPattern.matches(it) }
         && getSbLines().any { ScoreboardPattern.rafflePoolPattern.matches(it) }
     ) {
         list += getSbLines().first { ScoreboardPattern.raffleTicketsPattern.matches(it) }
@@ -513,7 +513,7 @@ private fun getDamageShowWhen(): Boolean {
 }
 
 private fun getMagmaBossLines(): List<String> {
-    return listOf(
+    val list = listOf(
         SbPattern.magmaBossPattern,
         SbPattern.damageSoakedPattern,
         SbPattern.damagedSoakedBarPattern,
@@ -526,6 +526,13 @@ private fun getMagmaBossLines(): List<String> {
         .mapNotNull { pattern ->
             getSbLines().firstOrNull { pattern.matches(it) }
         }
+
+    return list.ifEmpty {
+        when (config.informationFilteringConfig.hideEmptyLines) {
+            true -> listOf("<hidden>")
+            false -> listOf("§cNo Mining Event")
+        }
+    }
 }
 
 private fun getMagmaBossShowWhen(): Boolean {
