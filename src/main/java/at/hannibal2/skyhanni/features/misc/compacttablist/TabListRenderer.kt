@@ -1,6 +1,7 @@
 package at.hannibal2.skyhanni.features.misc.compacttablist
 
 import at.hannibal2.skyhanni.SkyHanniMod
+import at.hannibal2.skyhanni.events.SkipTabListLineEvent
 import at.hannibal2.skyhanni.mixins.transformers.AccessorGuiPlayerTabOverlay
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import net.minecraft.client.Minecraft
@@ -91,18 +92,31 @@ object TabListRenderer {
         }
 
         var middleX = x
+        var lastTitle = null as TabLine?
+        var lastSubTitle = null as TabLine?
         for (column in columns) {
             var middleY = if (config.hideAdverts) headerY else headerY + padding + 2
+
+            val filteredColumn = column.lines.filterTo(mutableListOf()) { tabLine ->
+                if (tabLine.type == TabStringType.TITLE) {
+                    lastSubTitle = null
+                    lastTitle = tabLine
+                }
+                if (tabLine.type == TabStringType.SUB_TITLE) {
+                    lastSubTitle = tabLine
+                }
+                !SkipTabListLineEvent(tabLine, lastSubTitle, lastTitle).postAndCatch()
+            }.let(::RenderColumn)
 
             Gui.drawRect(
                 middleX - padding + 1,
                 middleY - padding + 1,
-                middleX + column.getMaxWidth() + padding - 2,
-                middleY + column.size() * lineHeight + padding - 2,
+                middleX + filteredColumn.getMaxWidth() + padding - 2,
+                middleY + filteredColumn.size() * lineHeight + padding - 2,
                 0x20AAAAAA
             )
 
-            for (tabLine in column.lines) {
+            for (tabLine in filteredColumn.lines) {
                 val savedX = middleX
 
                 val hideIcons = config.advancedPlayerList.hidePlayerIcons && !AdvancedPlayerList.ignoreCustomTabList()
@@ -125,7 +139,7 @@ object TabListRenderer {
                 if (tabLine.type == TabStringType.TITLE) {
                     minecraft.fontRendererObj.drawStringWithShadow(
                         text,
-                        middleX + column.getMaxWidth() / 2f - tabLine.getWidth() / 2f,
+                        middleX + filteredColumn.getMaxWidth() / 2f - tabLine.getWidth() / 2f,
                         middleY.toFloat(),
                         0xFFFFFF
                     )
@@ -140,7 +154,7 @@ object TabListRenderer {
                 middleY += lineHeight
                 middleX = savedX
             }
-            middleX += column.getMaxWidth() + columnSpacing
+            middleX += filteredColumn.getMaxWidth() + columnSpacing
         }
 
         if (footer.isNotEmpty()) {
@@ -156,4 +170,12 @@ object TabListRenderer {
             }
         }
     }
+
+    @SubscribeEvent
+    fun hideFireFromTheTabListBecauseWhoWantsThose(event: SkipTabListLineEvent) {
+        if (config.hideFiresales && event.lastSubTitle != null && event.lastSubTitle.text.contains("Fire Sales:")) {
+            event.cancel()
+        }
+    }
+
 }
