@@ -11,6 +11,7 @@ import at.hannibal2.skyhanni.data.PurseAPI
 import at.hannibal2.skyhanni.data.QuiverAPI
 import at.hannibal2.skyhanni.data.ScoreboardData
 import at.hannibal2.skyhanni.data.SlayerAPI
+import at.hannibal2.skyhanni.features.misc.customscoreboard.CustomScoreboardUtils.formatNum
 import at.hannibal2.skyhanni.features.misc.customscoreboard.CustomScoreboardUtils.getGroupFromPattern
 import at.hannibal2.skyhanni.features.misc.customscoreboard.CustomScoreboardUtils.getTitleAndFooterAlignment
 import at.hannibal2.skyhanni.mixins.hooks.replaceString
@@ -126,6 +127,7 @@ private fun getProfileDisplayPair() =
 
 private fun getPurseDisplayPair(): List<Pair<String, AlignmentEnum>> {
     val purse = getGroupFromPattern(ScoreboardData.sidebarLinesFormatted, PurseAPI.pursePattern, "coins")
+        .formatNum()
 
     return when {
         informationFilteringConfig.hideEmptyLines && purse == "0" -> listOf("<hidden>")
@@ -138,6 +140,7 @@ private fun getPurseShowWhen() = !listOf(IslandType.THE_RIFT).contains(HypixelDa
 
 private fun getMotesDisplayPair(): List<Pair<String, AlignmentEnum>> {
     val motes = getGroupFromPattern(ScoreboardData.sidebarLinesFormatted, ScoreboardPattern.motesPattern, "motes")
+        .formatNum()
 
     return when {
         informationFilteringConfig.hideEmptyLines && motes == "0" -> listOf("<hidden>")
@@ -161,15 +164,14 @@ private fun getBankDisplayPair(): List<Pair<String, AlignmentEnum>> {
 private fun getBankShowWhen() = !listOf(IslandType.THE_RIFT).contains(HypixelData.skyBlockIsland)
 
 private fun getBitsDisplayPair(): List<Pair<String, AlignmentEnum>> {
-    var bits = BitsAPI.bits.addSeparators()
-
-
+    val bits = BitsAPI.bits.formatNum()
+    val bitsToClaim = BitsAPI.bitsToClaim.formatNum()
 
     val bitsDisplay = when {
         informationFilteringConfig.hideEmptyLines && bits == "0" -> listOf("<hidden>")
         displayConfig.displayNumbersFirst -> {
             val bitsText = if (displayConfig.showUnclaimedBits) {
-                "§b$bits§7/${if (BitsAPI.bitsToClaim == 0) "§30" else "§b${BitsAPI.bitsToClaim.addSeparators()}"} §bBits"
+                "§b$bits§7/${if (bitsToClaim == "0") "§30" else "§b${bitsToClaim}"} §bBits"
             } else {
                 "§b$bits Bits"
             }
@@ -178,7 +180,7 @@ private fun getBitsDisplayPair(): List<Pair<String, AlignmentEnum>> {
 
         else -> {
             val bitsText = if (displayConfig.showUnclaimedBits) {
-                "Bits: §b$bits§7/${if (BitsAPI.bitsToClaim == 0) "§30" else "§b${BitsAPI.bitsToClaim.addSeparators()}"}"
+                "Bits: §b$bits§7/${if (bitsToClaim == "0") "§30" else "§b${bitsToClaim}"}"
             } else {
                 "Bits: §b$bits"
             }
@@ -192,6 +194,7 @@ private fun getBitsShowWhen() = !listOf(IslandType.CATACOMBS).contains(HypixelDa
 
 private fun getCopperDisplayPair(): List<Pair<String, AlignmentEnum>> {
     val copper = getGroupFromPattern(ScoreboardData.sidebarLinesFormatted, ScoreboardPattern.copperPattern, "copper")
+        .formatNum()
 
     return when {
         informationFilteringConfig.hideEmptyLines && copper == "0" -> listOf("<hidden>")
@@ -367,8 +370,10 @@ private fun getQuiverShowWhen() = !listOf(IslandType.THE_RIFT).contains(HypixelD
 private fun getPowderDisplayPair(): List<Pair<String, AlignmentEnum>> {
     val mithrilPowder =
         getGroupFromPattern(TabListData.getTabList(), ScoreboardPattern.mithrilPowderPattern, "mithrilpowder")
+            .formatNum()
     val gemstonePowder =
         getGroupFromPattern(TabListData.getTabList(), ScoreboardPattern.gemstonePowderPattern, "gemstonepowder")
+            .formatNum()
 
     return when (displayConfig.displayNumbersFirst) {
         true -> listOf("§9§lPowder") + (" §7- §2$mithrilPowder Mithril") + (" §7- §d$gemstonePowder Gemstone")
