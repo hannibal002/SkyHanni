@@ -1,7 +1,9 @@
 package at.hannibal2.skyhanni.config.features.chat.Emojis;
 
+import at.hannibal2.skyhanni.config.features.chat.ChatSymbols;
 import com.google.gson.annotations.Expose;
 import io.github.moulberry.moulconfig.annotations.ConfigEditorBoolean;
+import io.github.moulberry.moulconfig.annotations.ConfigEditorDropdown;
 import io.github.moulberry.moulconfig.annotations.ConfigOption;
 
 public class EmojiReplacerConfig {
@@ -11,27 +13,28 @@ public class EmojiReplacerConfig {
     public boolean mvp = true;
 
     @Expose
-    @ConfigOption(name = "5 Gifted Ranks", desc = "Enables using emojis unlocked by gifting 5 ranks.")
-    @ConfigEditorBoolean
-    public boolean five = true;
+    @ConfigOption(name = "Gifted Ranks", desc = "Determines which emojis will be replaced. " +
+        "For the best results, choose the amount of gifted ranks you have.")
+    @ConfigEditorDropdown()
+    public emojiRanksGifted giftedRanks = emojiRanksGifted.ZERO;
 
-    @Expose
-    @ConfigOption(name = "20 Gifted Ranks", desc = "Enables using emojis unlocked by gifting 20 ranks.")
-    @ConfigEditorBoolean
-    public boolean twenty = true;
+    public enum emojiRanksGifted {
+        ZERO("None"),
+        FIVE("5 Gifted Ranks"),
+        TWENTY("20 Gifted Ranks"),
+        FIFTY("50 Gifted Ranks"),
+        ONE_HUNDRED("100 Gifted Ranks"),
+        TWO_HUNDRED("200 Gifted Ranks");
 
-    @Expose
-    @ConfigOption(name = "50 Gifted Ranks", desc = "Enables using emojis unlocked by gifting 50 ranks.")
-    @ConfigEditorBoolean
-    public boolean fifty = true;
+        private final String str;
 
-    @Expose
-    @ConfigOption(name = "100 Gifted Ranks", desc = "Enables using emojis unlocked by gifting 100 ranks.")
-    @ConfigEditorBoolean
-    public boolean hundred = true;
+        emojiRanksGifted(String str) {
+            this.str = str;
+        }
 
-    @Expose
-    @ConfigOption(name = "200 Gifted Ranks", desc = "Enables using emojis unlocked by gifting 200 ranks.")
-    @ConfigEditorBoolean
-    public boolean twoHundred = true;
+        @Override
+        public String toString() {
+            return str;
+        }
+    }
 }

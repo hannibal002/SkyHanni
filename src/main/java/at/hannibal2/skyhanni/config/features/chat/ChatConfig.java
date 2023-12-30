@@ -34,7 +34,7 @@ public class ChatConfig {
     public ChatSymbols chatSymbols = new ChatSymbols();
 
     @Expose
-    @Category(name = "Emojis", desc = "§lTODO!! get a description for this")
+    @Category(name = "Emojis", desc = "Settings for chat emojis.")
     @Accordion
     public EmojiConfig EmojiConfig = new EmojiConfig();
 
