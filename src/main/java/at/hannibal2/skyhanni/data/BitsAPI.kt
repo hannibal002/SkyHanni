@@ -106,8 +106,6 @@ object BitsAPI {
         boosterCookieAte.matchMatcher(message) {
             bitsToClaim += (defaultcookiebits * currentFameRank.bitsMultiplier).toInt()
 
-            LorenzUtils.chat("You ate a cookie, adding ${(defaultcookiebits * currentFameRank.bitsMultiplier).toInt()} bits to claim.")
-
             save()
         }
     }
