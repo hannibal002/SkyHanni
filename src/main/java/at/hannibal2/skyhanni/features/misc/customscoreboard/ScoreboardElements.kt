@@ -58,7 +58,7 @@ enum class ScoreboardElements(
     LOCATION(::getLocationDisplayPair, { true }, "§7⏣ §bVillage"),
     VISITING(::getVisitDisplayPair, ::getVisitShowWhen, " §a✌ §7(§a1§7/6)"),
     DATE(::getDateDisplayPair, { true }, "Late Summer 11th"),
-    TIME(::getTimeDisplayPair, { true }, "§710:40pm"),
+    TIME(::getTimeDisplayPair, { true }, "§710:40pm §b☽"),
     LOBBY_CODE(::getLobbyDisplayPair, { true }, "§8m77CK"),
     POWER(::getPowerDisplayPair, ::getPowerShowWhen, "Power: Sighted"),
     COOKIE(::getCookieDisplayPair, ::getCookieShowWhen, "§d§lCookie Buff\n §f3days, 17hours"),
@@ -262,14 +262,11 @@ private fun getDateDisplayPair() =
 
 
 private fun getTimeDisplayPair(): List<Pair<String, AlignmentEnum>> {
-    for (line in ScoreboardData.sidebarLinesFormatted) {
-        if (ScoreboardPattern.timePattern.matches(line)) {
-            return listOf(line.trim() to AlignmentEnum.LEFT)
-        }
-    }
+    var symbol = getGroupFromPattern(ScoreboardData.sidebarLinesFormatted, ScoreboardPattern.timePattern, "symbol")
+    if (symbol == "0") symbol = ""
     return listOf(
         "§7" + SkyBlockTime.now()
-            .formatted(dayAndMonthElement = false, yearElement = false) to AlignmentEnum.LEFT
+            .formatted(dayAndMonthElement = false, yearElement = false) + " $symbol" to AlignmentEnum.LEFT
     )
 }
 
