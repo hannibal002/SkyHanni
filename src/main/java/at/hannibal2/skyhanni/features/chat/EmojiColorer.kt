@@ -4,8 +4,6 @@ import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.events.LorenzChatEvent
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
-import net.minecraft.util.ChatComponentText
-import net.minecraft.util.IChatComponent
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
 class EmojiColorer {
@@ -77,7 +75,7 @@ class EmojiColorer {
 
     @SubscribeEvent
     fun onChatReceive(event: LorenzChatEvent) {
-        if (config.colorEmoji) {
+        if (config.colorEmoji && EmojiReplacer.inArray(event.message.removeColor(), emojis)) {
             val newMessage = replace(event, emojis)
             event.blockedReason = "Emoji"
             LorenzUtils.chat(newMessage, false)
