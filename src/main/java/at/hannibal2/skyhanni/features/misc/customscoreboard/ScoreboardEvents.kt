@@ -122,7 +122,10 @@ enum class ScoreboardEvents(private val displayLine: Supplier<List<String>>, pri
         ::getEffigiesLines,
         ::getEffigiesShowWhen
     ),
-
+    REDSTONE(
+        ::getRedstoneLines,
+        ::getRedstoneShowWhen
+    ),
     NONE( // maybe use default state tablist: "Events: smth"
         ::getNoneLines,
         { false }
@@ -553,6 +556,14 @@ private fun getEffigiesLines(): List<String> {
 
 private fun getEffigiesShowWhen(): Boolean {
     return getSbLines().any { RiftBloodEffigies.heartsPattern.matches(it) }
+}
+
+private fun getRedstoneLines(): List<String> {
+    return listOf(getSbLines().first { SbPattern.redstonePattern.matches(it) })
+}
+
+private fun getRedstoneShowWhen(): Boolean {
+    return getSbLines().any { SbPattern.redstonePattern.matches(it) }
 }
 
 private fun getNoneLines(): List<String> {
