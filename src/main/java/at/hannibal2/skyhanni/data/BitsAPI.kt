@@ -57,7 +57,7 @@ object BitsAPI {
         "§eYou gained §3(?<amount>.*) Bits Available §ecompounded from all your §epreviously eaten §6cookies§e! Click here to open §6cookie menu§e!"
     )
     private val bitsEarnedChatPattern by group.pattern("chat.earned", "§f\\s+§8\\+§b(?<amount>.*)\\s+Bits\n")
-    private val boosterCookieAte by group.pattern("chat.boosterCookieAte", "§eYou consumed a §6Booster Cookie§e! §d.+")
+    private val boosterCookieAte by group.pattern("chat.boosterCookieAte", "§eYou consumed a §6Booster Cookie§e! §d.*")
     private val bitsAvailableMenu by group.pattern(
         "gui.bitsAvailableMenu",
         "§7Bits Available: §b(?<toClaim>[\\w,]+)(§3.+)?"
@@ -100,15 +100,13 @@ object BitsAPI {
             bits += amount
             bitsToClaim -= amount
 
-            LorenzUtils.chat("§a +$amount bits, to claim: $bitsToClaim")
-
             save()
         }
 
         boosterCookieAte.matchMatcher(message) {
             bitsToClaim += (defaultcookiebits * currentFameRank.bitsMultiplier).toInt()
 
-            LorenzUtils.chat("§a +${(defaultcookiebits * currentFameRank.bitsMultiplier).toInt()} bits to claim")
+            LorenzUtils.chat("You ate a cookie, adding ${(defaultcookiebits * currentFameRank.bitsMultiplier).toInt()} bits to claim.")
 
             save()
         }
