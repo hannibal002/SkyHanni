@@ -393,11 +393,11 @@ private fun getBroodmotherShowWhen(): Boolean {
 }
 
 private fun getNewYearLines(): List<String> {
-    return listOf(getSbLines().firstOrNull { it.startsWith("§dNew Year Event") } ?: "<hidden>")
+    return listOf(getSbLines().first { SbPattern.newYearPattern.matches(it) })
 }
 
 private fun getNewYearShowWhen(): Boolean {
-    return getSbLines().any { it.startsWith("§dNew Year Event") }
+    return getSbLines().any { SbPattern.newYearPattern.matches(it) }
 }
 
 private fun getOringoLines(): List<String> {

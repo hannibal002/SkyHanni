@@ -20,7 +20,6 @@ object UnknownLinesHandler {
             "§f§lWave: §c§l",       exact lines (i really dont want to run kuudra myself)
             "§fTokens: ",
             "Submerges In: §e"*/
-            "§dNew Year Event",
             "Time Left: §b",
             "Current Item:",
         )
@@ -99,6 +98,7 @@ object UnknownLinesHandler {
             ScoreboardPattern.objectivePattern,
             ServerRestartTitle.restartingPattern,
             ScoreboardPattern.travelingZooPattern,
+            ScoreboardPattern.newYearPattern,
             ScoreboardPattern.spookyPattern,
             ScoreboardPattern.winterEventStartPattern,
             ScoreboardPattern.winterNextWavePattern,

@@ -91,7 +91,8 @@ object ScoreboardPattern {
     // events
     private val eventsSb = scoreboardGroup.group("events")
     val travelingZooPattern by eventsSb.pattern("travelingzoo", "§aTraveling Zoo§f \\d{0,2}:\\d{2}$")
-    val spookyPattern by eventsSb.pattern("spooky", "§aSpooky Festival§f \\d{0,2}:?\\d{2}$")
+    val newYearPattern by eventsSb.pattern("newyear", "§dNew Year Event!§f \\d{0,2}?:?\\d{2}$")
+    val spookyPattern by eventsSb.pattern("spooky", "§aSpooky Festival§f \\d{0,2}?:?\\d{2}$")
     val winterEventStartPattern by eventsSb.pattern("wintereventstart", "(§.)*Event Start: §.\\d+:\\d+$")
     val winterNextWavePattern by eventsSb.pattern("wintereventnextwave", "(§.)*Next Wave: §.\\d+:\\d+$")
     val winterWavePattern by eventsSb.pattern("wintereventwave", "(§.)*Wave \\d+$")
