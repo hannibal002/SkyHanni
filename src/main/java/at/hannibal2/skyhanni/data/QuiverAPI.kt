@@ -161,16 +161,16 @@ object QuiverAPI {
     @SubscribeEvent
     fun onConfigLoad(event: ConfigLoadEvent) {
         val config = ProfileStorageData.profileSpecific ?: return
-        currentArrow = config.arrows.currentArrow ?: return
-        arrowAmount = config.arrows.arrowAmount ?: return
+        currentArrow = config.arrows.currentArrow ?: QuiverArrowType.FLINT
+        arrowAmount = config.arrows.arrowAmount ?: mutableMapOf()
         currentAmount = arrowAmount[currentArrow]?.toInt() ?: 0
     }
 
     @SubscribeEvent
     fun onProfileJoin(event: ProfileJoinEvent) {
         val config = ProfileStorageData.profileSpecific ?: return
-        currentArrow = config.arrows.currentArrow ?: return
-        arrowAmount = config.arrows.arrowAmount ?: return
+        currentArrow = config.arrows.currentArrow ?: QuiverArrowType.FLINT
+        arrowAmount = config.arrows.arrowAmount ?: mutableMapOf()
         currentAmount = arrowAmount[currentArrow]?.toInt() ?: 0
     }
 
