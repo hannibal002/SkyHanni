@@ -123,9 +123,9 @@ object FFStats {
                 cropPage[FortuneStats.BASE_TOOL] = Pair(FarmingFortuneDisplay.getToolFortune(tool), 30.0)
                 cropPage[FortuneStats.HARVESTING] = Pair(FarmingFortuneDisplay.getHarvestingFortune(tool), 75.0)
                 if (toolHasBountiful?.get(crop) == true) {
-                    cropPage[FortuneStats.REFORGE] = Pair(FarmingFortuneDisplay.reforgeFortune, 5.0)
+                    cropPage[FortuneStats.REFORGE] = Pair(FarmingFortuneDisplay.reforgeFortune, 7.0)
                 } else {
-                    cropPage[FortuneStats.REFORGE] = Pair(FarmingFortuneDisplay.reforgeFortune, 13.0)
+                    cropPage[FortuneStats.REFORGE] = Pair(FarmingFortuneDisplay.reforgeFortune, 16.0)
                 }
             }
 
