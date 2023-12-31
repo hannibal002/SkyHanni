@@ -13,8 +13,6 @@ object UnknownLinesHandler {
     fun handleUnknownLines() {
         val sidebarLines = ScoreboardData.sidebarLinesFormatted
 
-        // I know this could maybe be solved better but honestly idc anymore
-        // - Update I care or rather hanni wants me to do that idk I dont want to get removed as Contrib
         val knownLines = listOf(
             /*"Instance Shutdow",   leaving them like this because I want people to report them so I can get the
             "§f§lWave: §c§l",       exact lines (i really dont want to run kuudra myself)
@@ -23,6 +21,16 @@ object UnknownLinesHandler {
             "Time Left: §b",
             "Current Item:",
         )
+
+        /**
+        * Dark auction will come once DarkAuction IslandType is merged
+        *
+        *    Starting in: §a0:02
+        *
+        *    'Time Left: §b11'
+        *    'Current Item:'
+        *    ' §5Hocus-Pocus Cipher'
+        */
 
         unknownLines = sidebarLines.toMutableList().filter { it.isNotBlank() }.map { it.removeResets() }
 
@@ -52,6 +60,7 @@ object UnknownLinesHandler {
             ScoreboardPattern.clearedPattern,
             ScoreboardPattern.soloPattern,
             ScoreboardPattern.teammatesPattern,
+            ScoreboardPattern.floor3GuardiansPattern,
             ScoreboardPattern.medalsPattern,
             ScoreboardPattern.lockedPattern,
             ScoreboardPattern.cleanUpPattern,

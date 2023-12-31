@@ -186,6 +186,7 @@ private fun getDungeonsLines(): List<String> {
     getSbLines().firstOrNull { SbPattern.clearedPattern.matches(it) }?.let { list.add(it.replace("§r", "")) }
     getSbLines().firstOrNull { SbPattern.soloPattern.matches(it) }?.let { list.add(it) }
     list.addAll(getSbLines().filter { SbPattern.teammatesPattern.matches(it) })
+    list.addAll(getSbLines().filter { SbPattern.floor3GuardiansPattern.matches(it) })
 
     return list
 }

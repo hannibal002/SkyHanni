@@ -36,6 +36,7 @@ object ScoreboardPattern {
     val clearedPattern by dungeonSb.pattern("cleared", "(§.)*Cleared: (§.)*(?<percent>[\\w,.]+)% (§.)*\\((§.)*(?<score>[\\w,.]+)(§.)*\\)$")
     val soloPattern by dungeonSb.pattern("solo", "§3§lSolo$")
     val teammatesPattern by dungeonSb.pattern("teammates", "(§.)*(?<classAbbv>\\[\\w\\]) (§.)*(?<username>[a-zA-Z0-9_]{2,16}) ((§.)*(?<classLevel>\\[Lvl?(?<level>[\\w,.]+)\\]?)|(§.)*(?<health>[\\w,.]+)(§.)*.?)$")
+    val floor3GuardiansPattern by dungeonSb.pattern("floor3guardians", "^§. - §.(Healthy|Reinforced|Laser|Chaos)§a ([\\d\\w,.]?)+§c❤$")
     // farming
     private val farmingSb = scoreboardGroup.group("farming")
     val medalsPattern by farmingSb.pattern("medals", "§[6fc]§l(GOLD|SILVER|BRONZE) §fmedals: §[6fc]\\d+$")
