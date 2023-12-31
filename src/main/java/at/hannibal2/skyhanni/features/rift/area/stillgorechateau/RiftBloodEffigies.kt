@@ -7,7 +7,6 @@ import at.hannibal2.skyhanni.events.LorenzTickEvent
 import at.hannibal2.skyhanni.events.LorenzWorldChangeEvent
 import at.hannibal2.skyhanni.events.RepositoryReloadEvent
 import at.hannibal2.skyhanni.events.ScoreboardRawChangeEvent
-import at.hannibal2.skyhanni.features.misc.customscoreboard.ScoreboardPattern.group
 import at.hannibal2.skyhanni.features.rift.RiftAPI
 import at.hannibal2.skyhanni.test.GriffinUtils.drawWaypointFilled
 import at.hannibal2.skyhanni.utils.EntityUtils
@@ -37,10 +36,9 @@ class RiftBloodEffigies {
         5 to -1L,
     )
 
-    val group = RepoPattern.group("features.rift.area.stillgoreChateau.bloodEffigies")
-    val effigiesTimerPattern by group.pattern("effigiesTimer", "§eRespawn §c(?<time>.*) §7\\(or click!\\)")
-
     companion object {
+        private val group = RepoPattern.group("features.rift.area.stillgoreChateau.bloodEffigies")
+        val effigiesTimerPattern by group.pattern("effigiesTimer", "§eRespawn §c(?<time>.*) §7\\(or click!\\)")
         val heartsPattern by group.pattern("hearts","Effigies: (?<hearts>((§[7c])?⧯)*)")
     }
 
