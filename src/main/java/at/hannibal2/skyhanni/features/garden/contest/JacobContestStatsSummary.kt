@@ -14,6 +14,7 @@ import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.NumberUtil.formatNumber
 import at.hannibal2.skyhanni.utils.NumberUtil.format
 import at.hannibal2.skyhanni.utils.RenderUtils.renderStringsAndItems
+import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.TimeUtils
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
@@ -31,9 +32,18 @@ class JacobContestStatsSummary {
     private var predictedScore = 0L
     private var contestStats = emptyList<List<Any>>()
 
-    private val tabContestPattern = " §r(§e○|§6☘) §r§f(?<crop>.+) §r§f◆ §r§f§lTOP §r(?<color>§.)§l(?<percent>(\\d|[.])+)% §r§f◆ (?<participants>.+) ☻".toPattern()
-    private val scoreboardContestTimeLeftPattern = "(§e○|§6☘) §f(?<crop>.+) §a(?<time>\\d+m\\d+s)".toPattern()
-    private val scoreboardContestScorePattern = " (Collected|(?<medal>§b§lDIAMOND|§3§lPLATINUM|§6§lGOLD|§f§lSILVER|§c§lBRONZE) §fwith) §e(?<amount>.+)".toPattern()
+    private val tabContestPattern by RepoPattern.pattern(
+        "garden.jacob.contest.tab.data",
+        " §r(§e○|§6☘) §r§f(?<crop>.+) §r§f◆ §r§f§lTOP §r(?<color>§.)§l(?<percent>(\\d|[.])+)% §r§f◆ (?<participants>.+) ☻"
+    )
+    private val scoreboardContestTimeLeftPattern by RepoPattern.pattern(
+        "garden.jacob.contest.scoreboard.time.left",
+        "(§e○|§6☘) §f(?<crop>.+) §a(?<time>\\d+m\\d+s)"
+    )
+    private val scoreboardContestScorePattern by RepoPattern.pattern(
+        "garden.jacob.contest.scoreboard.score",
+        " (Collected|(?<medal>§b§lDIAMOND|§3§lPLATINUM|§6§lGOLD|§f§lSILVER|§c§lBRONZE) §fwith) §e(?<amount>.+)"
+    )
 
     @SubscribeEvent
     fun onBlockClick(event: CropClickEvent) {
