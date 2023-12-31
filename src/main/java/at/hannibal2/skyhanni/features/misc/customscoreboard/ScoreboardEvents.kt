@@ -343,40 +343,21 @@ private fun getFlightDurationShowWhen(): Boolean {
 
 private fun getWinterLines(): List<String> {
     val list = mutableListOf<String>()
-    val sidebarLines = getSbLines()
 
-    list += getSbLines().first { SbPattern.northstarsPattern.matches(it) }
-
-    if (sidebarLines.any { it.startsWith("Event Start: §a") }) {
-        list += sidebarLines.firstOrNull { it.startsWith("Event Start: §a") }
-            ?: "<hidden>"
-    }
-    if (sidebarLines.any { it.startsWith("Next Wave: §a") && it != "Next Wave: §aSoon!" }) {
-        list += sidebarLines.firstOrNull { it.startsWith("Next Wave: §a") }
-            ?: "<hidden>"
-    }
-    list += ""
-    if (sidebarLines.any { it.startsWith("§cWave ") }) {
-        list += sidebarLines.firstOrNull { it.startsWith("§cWave ") } ?: "<hidden>"
-    }
-    if (sidebarLines.any { it.startsWith("Magma Cubes Left") }) {
-        list += sidebarLines.firstOrNull { it.startsWith("Magma Cubes Left") }
-            ?: "<hidden>"
-    }
-    if (sidebarLines.any { it.startsWith("Your Total Dama") }) {
-        list += sidebarLines.firstOrNull { it.startsWith("Your Total Dama") }
-            ?: "<hidden>"
-    }
-    if (sidebarLines.any { it.startsWith("Your Cube Damage") }) {
-        list += sidebarLines.firstOrNull { it.startsWith("Your Cube Damage") }
-            ?: "<hidden>"
-    }
+    getSbLines().firstOrNull { SbPattern.winterEventStartPattern.matches(it) }?.let { list.add(it) }
+    getSbLines().firstOrNull { SbPattern.winterNextWavePattern.matches(it) && !it.endsWith("Soon!") }?.let { list.add(it) }
+    getSbLines().firstOrNull { SbPattern.winterWavePattern.matches(it) }?.let { list.add(it) }
+    getSbLines().firstOrNull { SbPattern.winterMagmaLeftPattern.matches(it) }?.let { list.add(it) }
+    getSbLines().firstOrNull { SbPattern.winterTotalDmgPattern.matches(it) }?.let { list.add(it) }
+    getSbLines().firstOrNull { SbPattern.winterCubeDmgPattern.matches(it) }?.let { list.add(it) }
 
     return list
 }
 
 private fun getWinterShowWhen(): Boolean {
-    return IslandType.WINTER.isInIsland()
+    return getSbLines().any { ScoreboardPattern.winterEventStartPattern.matches(it) }
+        || getSbLines().any { ScoreboardPattern.winterNextWavePattern.matches(it) && !it.endsWith("Soon!") }
+        || getSbLines().any { ScoreboardPattern.winterWavePattern.matches(it) }
 }
 
 private fun getSpookyLines(): List<String> {

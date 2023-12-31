@@ -20,13 +20,6 @@ object UnknownLinesHandler {
             "§f§lWave: §c§l",       exact lines (i really dont want to run kuudra myself)
             "§fTokens: ",
             "Submerges In: §e"*/
-            "Event Start: §a",
-            "Next Wave: §a",
-            "§cWave",
-            "Magma Cubes Left",
-            "Your Total Damag",
-            "Your Cube Damage",
-            "§6Spooky Festival§f",
             "§dNew Year Event",
             "Time Left: §b",
             "Current Item:",
@@ -107,6 +100,12 @@ object UnknownLinesHandler {
             ServerRestartTitle.restartingPattern,
             ScoreboardPattern.travelingZooPattern,
             ScoreboardPattern.spookyPattern,
+            ScoreboardPattern.winterEventStartPattern,
+            ScoreboardPattern.winterNextWavePattern,
+            ScoreboardPattern.winterWavePattern,
+            ScoreboardPattern.winterMagmaLeftPattern,
+            ScoreboardPattern.winterTotalDmgPattern,
+            ScoreboardPattern.winterCubeDmgPattern,
             ScoreboardPattern.riftDimensionPattern,
             RiftBloodEffigies.heartsPattern
         )

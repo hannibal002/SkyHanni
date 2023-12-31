@@ -92,6 +92,12 @@ object ScoreboardPattern {
     private val eventsSb = scoreboardGroup.group("events")
     val travelingZooPattern by eventsSb.pattern("travelingzoo", "§aTraveling Zoo§f \\d{0,2}:\\d{2}$")
     val spookyPattern by eventsSb.pattern("spooky", "§aSpooky Festival§f \\d{0,2}:?\\d{2}$")
+    val winterEventStartPattern by eventsSb.pattern("wintereventstart", "(§.)*Event Start: §.\\d+:\\d+$")
+    val winterNextWavePattern by eventsSb.pattern("wintereventnextwave", "(§.)*Next Wave: §.\\d+:\\d+$")
+    val winterWavePattern by eventsSb.pattern("wintereventwave", "(§.)*Wave \\d+$")
+    val winterMagmaLeftPattern by eventsSb.pattern("wintereventmagmaleft", "(§.)*Magma Cubes Left: §.\\d+$")
+    val winterTotalDmgPattern by eventsSb.pattern("wintereventtotaldmg", "(§.)*Your Total Damage: §.\\d+( §e\\(#\\d+\\)?)?$")
+    val winterCubeDmgPattern by eventsSb.pattern("wintereventcubedmg", "(§.)*Your Cube Damage: §.\\d+$")
     // rift
     private val riftSb = scoreboardGroup.group("rift")
     val riftDimensionPattern by riftSb.pattern("dimension", "^\\s*§fRift Dimension$")

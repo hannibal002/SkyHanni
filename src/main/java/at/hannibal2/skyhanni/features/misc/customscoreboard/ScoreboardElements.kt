@@ -53,6 +53,7 @@ enum class ScoreboardElements(
     COPPER(::getCopperDisplayPair, ::getCopperShowWhen, "Copper: §c23,495"),
     GEMS(::getGemsDisplayPair, ::getGemsShowWhen, "Gems: §a57,873"),
     HEAT(::getHeatDisplayPair, ::getHeatShowWhen, "Heat: §c♨ 0"),
+    NORTH_STARS(::getNorthStarsDisplayPair, ::getNorthStarsShowWhen, "North Stars: §d756"),
     EMPTY_LINE(::getEmptyLineDisplayPair, { true }, ""),
     ISLAND(::getIslandDisplayPair, { true }, "§7㋖ §aHub"),
     LOCATION(::getLocationDisplayPair, { true }, "§7⏣ §bVillage"),
@@ -229,6 +230,18 @@ private fun getHeatDisplayPair(): List<Pair<String, AlignmentEnum>> {
 
 private fun getHeatShowWhen() = listOf(IslandType.CRYSTAL_HOLLOWS).contains(HypixelData.skyBlockIsland)
     && ScoreboardData.sidebarLinesFormatted.any { ScoreboardPattern.heatPattern.matches(it) }
+
+private fun getNorthStarsDisplayPair(): List<Pair<String, AlignmentEnum>> {
+    val northStars = getGroupFromPattern(ScoreboardData.sidebarLinesFormatted, ScoreboardPattern.northstarsPattern, "northstars")
+
+    return when {
+        informationFilteringConfig.hideEmptyLines && northStars == "0" -> listOf("<hidden>")
+        displayConfig.displayNumbersFirst -> listOf("§d$northStars North Stars")
+        else -> listOf("North Stars: §d$northStars")
+    }.map { it to AlignmentEnum.LEFT }
+}
+
+private fun getNorthStarsShowWhen() = ScoreboardData.sidebarLinesFormatted.any { ScoreboardPattern.northstarsPattern.matches(it) }
 
 private fun getEmptyLineDisplayPair() = listOf("<empty>" to AlignmentEnum.LEFT)
 
