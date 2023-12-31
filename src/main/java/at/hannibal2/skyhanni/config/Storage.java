@@ -1,6 +1,6 @@
 package at.hannibal2.skyhanni.config;
 
-import at.hannibal2.skyhanni.data.Fame;
+import at.hannibal2.skyhanni.data.FameRank;
 import at.hannibal2.skyhanni.data.MaxwellPowers;
 import at.hannibal2.skyhanni.data.QuiverArrowType;
 import at.hannibal2.skyhanni.data.model.ComposterUpgrade;
@@ -143,7 +143,7 @@ public class Storage {
             public int bits = -1;
 
             @Expose
-            public Fame currentFameRank = null;
+            public FameRank currentFameRank = null;
 
             @Expose
             public int bitsToClaim = -1;
