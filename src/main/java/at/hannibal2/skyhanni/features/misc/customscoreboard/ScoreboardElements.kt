@@ -171,8 +171,18 @@ private fun getBankDisplayPair(): List<Pair<String, AlignmentEnum>> {
 private fun getBankShowWhen() = !listOf(IslandType.THE_RIFT).contains(HypixelData.skyBlockIsland)
 
 private fun getBitsDisplayPair(): List<Pair<String, AlignmentEnum>> {
-    val bits = BitsAPI.bits.formatNum()
-    val bitsToClaim = BitsAPI.bitsToClaim.formatNum()
+    val bits = if (BitsAPI.bits == -1) {
+        "0"
+    } else {
+        BitsAPI.bits.formatNum()
+    }
+    val bitsToClaim = if (BitsAPI.bitsToClaim == -1) {
+        "§cOpen Sbmenu§b"
+    } else if (BitsAPI.bitsToClaim < -1) {
+        "0"
+    } else {
+        BitsAPI.bitsToClaim.formatNum()
+    }
 
     val bitsDisplay = when {
         informationFilteringConfig.hideEmptyLines && bits == "0" -> listOf("<hidden>")
