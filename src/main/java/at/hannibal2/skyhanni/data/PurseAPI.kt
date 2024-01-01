@@ -23,7 +23,6 @@ object PurseAPI {
 
     @SubscribeEvent
     fun onTick(event: LorenzTickEvent) {
-
         for (line in ScoreboardData.sidebarLinesFormatted) {
             val newPurse = pursePattern.matchMatcher(line) {
                 group("coins").formatNumber().toDouble()

@@ -7,6 +7,7 @@ import at.hannibal2.skyhanni.data.ScoreboardData
 import at.hannibal2.skyhanni.mixins.transformers.AccessorGuiPlayerTabOverlay
 import at.hannibal2.skyhanni.utils.NumberUtil
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
+import at.hannibal2.skyhanni.utils.NumberUtil.formatNumber
 import at.hannibal2.skyhanni.utils.RenderUtils.AlignmentEnum
 import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.StringUtils.removeResets
@@ -59,7 +60,7 @@ object CustomScoreboardUtils {
     }
 
     fun String.formatNum(): String {
-        val number = this.replace(",", "").toIntOrNull() ?: return "0"
+        val number = this.formatNumber()//replace(",", "").toIntOrNull() ?: return "0"
 
         return when (numberFormat) {
             DisplayConfig.NumberFormat.SHORT -> NumberUtil.format(number)
