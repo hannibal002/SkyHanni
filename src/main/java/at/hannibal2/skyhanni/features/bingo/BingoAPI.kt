@@ -17,7 +17,7 @@ import java.time.ZoneOffset
 
 object BingoAPI {
     private var ranks = mapOf<String, Int>()
-    private var tips: Map<String, BingoJson.BingoTip> = emptyMap()
+    private var data: Map<String, BingoJson.BingoData> = emptyMap()
 
     val bingoGoals get() = bingoStorage.goals
     val personalGoals get() = bingoGoals.values.filter { it.type == GoalType.PERSONAL }
@@ -27,7 +27,7 @@ object BingoAPI {
     @SubscribeEvent
     fun onRepoReload(event: RepositoryReloadEvent) {
         ranks = event.getConstant<BingoRanksJson>("BingoRanks").ranks
-        tips = event.getConstant<BingoJson>("Bingo").bingo_tips
+        data = event.getConstant<BingoJson>("Bingo").bingo_tips
     }
 
     fun getRank(text: String) = ranks.entries.find { text.contains(it.key) }?.value
@@ -35,13 +35,13 @@ object BingoAPI {
     fun getIcon(searchRank: Int) = ranks.entries.find { it.value == searchRank }?.key
 
     // We added the suffix (Community Goal) so that older skyhanni versions don't crash with the new repo data.
-    fun getTip(itemName: String) =
-        tips.filter { itemName.startsWith(it.key.split(" (Community Goal)")[0]) }.values.firstOrNull()
+    fun getData(itemName: String) =
+        data.filter { itemName.startsWith(it.key.split(" (Community Goal)")[0]) }.values.firstOrNull()
 
-    fun BingoGoal.getTip(): BingoJson.BingoTip? = if (type == GoalType.COMMUNITY) {
-        getTip(displayName)
+    fun BingoGoal.getData(): BingoJson.BingoData? = if (type == GoalType.COMMUNITY) {
+        getData(displayName)
     } else {
-        tips[displayName]
+        data[displayName]
     }
 
     val bingoStorage: BingoSession by lazy {
