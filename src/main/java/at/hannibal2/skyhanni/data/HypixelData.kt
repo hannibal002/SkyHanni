@@ -15,6 +15,7 @@ import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.TabListData
+import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import com.google.gson.JsonObject
 import io.github.moulberry.notenoughupdates.NotEnoughUpdates
 import net.minecraft.client.Minecraft
@@ -25,9 +26,10 @@ import net.minecraftforge.fml.common.network.FMLNetworkEvent
 import kotlin.concurrent.thread
 
 class HypixelData {
-    // TODO USE SH-REPO
-    private val tabListProfilePattern = "§e§lProfile: §r§a(?<profile>.*)".toPattern()
-    private val lobbyTypePattern = "(?<lobbyType>.*lobby)\\d+".toPattern()
+    private val group = RepoPattern.group("data.hypixeldata")
+    private val tabListProfilePattern by group.pattern("tabListProfilePattern", "§e§lProfile: §r§a(?<profile>.*)")
+    private val lobbyTypePattern by group.pattern("lobbyTypePattern", "(?<lobbyType>.*lobby)\\d+")
+    private val islandNamePattern by group.pattern("islandNamePattern", "§b§l(Area|Dungeon): §r§7(?<island>.*)")
 
     private var lastLocRaw = 0L
 
@@ -209,9 +211,12 @@ class HypixelData {
         var newIsland = ""
         var guesting = false
         for (line in TabListData.getTabList()) {
-            if (line.startsWith("§b§lArea: ") || line.startsWith("§b§lDungeon: ")) {
-                newIsland = line.split(": ")[1].removeColor()
+            islandNamePattern.matchMatcher(line) {
+                newIsland = group("island")
             }
+            /*if (line.startsWith("§b§lArea: ") || line.startsWith("§b§lDungeon: ")) {
+                newIsland = line.split(": ")[1].removeColor()
+            }*/
             if (line == " Status: §r§9Guest") {
                 guesting = true
             }
