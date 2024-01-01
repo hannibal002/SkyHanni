@@ -23,13 +23,11 @@ class TiaRelayWaypoints {
         if (!config.nextWaypoint) return
 
         val message = event.message
-        for (relay in Relay.entries) {
-            if (relay.chatMessage == message) {
-                waypoint = relay.waypoint
-                waypointName = relay.relayName
-                island = relay.island
-                return
-            }
+        Relay.entries.firstOrNull { it.checkChatMessage(message) }?.let { relay ->
+            waypoint = relay.waypoint
+            waypointName = relay.relayName
+            island = relay.island
+            return
         }
 
         if (message == "§aYou completed the maintenance on the relay!") {
