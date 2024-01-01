@@ -423,7 +423,7 @@ private fun getMiningEventsLines(): List<String> {
     // Wind
     if (getSbLines().any { SbPattern.windCompassPattern.matches(it) }) {
         list += getSbLines().first { SbPattern.windCompassPattern.matches(it) }
-        list += getSbLines().first { SbPattern.windCompassArrowPattern.matches(it) }
+        list += ("|" + getSbLines().first { SbPattern.windCompassArrowPattern.matches(it) } + "|")
     }
 
     // Better Together
