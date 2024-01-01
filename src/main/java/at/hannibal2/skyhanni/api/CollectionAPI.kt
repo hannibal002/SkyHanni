@@ -14,12 +14,22 @@ import at.hannibal2.skyhanni.utils.NEUItems.getItemStackOrNull
 import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.StringUtils.matches
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
+import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
-class CollectionAPI {
-    // TODO USE SH-REPO
-    private val counterPattern = ".* §e(?<amount>.*)§6/.*".toPattern()
-    private val singleCounterPattern = "§7Total Collected: §e(?<amount>.*)".toPattern()
+object CollectionAPI {
+    private val counterPattern by RepoPattern.pattern(
+        "collection.api.counter",
+        ".* §e(?<amount>.*)§6/.*"
+    )
+    private val singleCounterPattern by RepoPattern.pattern(
+        "collection.api.singlecounter",
+        "§7Total Collected: §e(?<amount>.*)"
+    )
+    private val collectionTier0Pattern by RepoPattern.pattern(
+        "collection.api.tierzero",
+        "§7Progress to .* I: .*"
+    )
 
     @SubscribeEvent
     fun onProfileJoin(event: ProfileJoinEvent) {
@@ -82,13 +92,9 @@ class CollectionAPI {
         collectionValue.addOrPut(internalName, event.amount.toLong())
     }
 
-    companion object {
-        // TODO USE SH-REPO
-        val collectionValue = mutableMapOf<NEUInternalName, Long>()
-        private val collectionTier0Pattern = "§7Progress to .* I: .*".toPattern()
+    fun isCollectionTier0(lore: List<String>) = lore.any { collectionTier0Pattern.matches(it) }
 
-        fun isCollectionTier0(lore: List<String>) = lore.any { collectionTier0Pattern.matches(it) }
+    val collectionValue = mutableMapOf<NEUInternalName, Long>()
 
-        fun getCollectionCounter(internalName: NEUInternalName): Long? = collectionValue[internalName]
-    }
+    fun getCollectionCounter(internalName: NEUInternalName): Long? = collectionValue[internalName]
 }

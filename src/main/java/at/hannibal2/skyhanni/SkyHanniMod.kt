@@ -426,7 +426,7 @@ class SkyHanniMod {
         loadModule(GardenAPI)
         loadModule(GardenPlotAPI)
         loadModule(DataWatcherAPI())
-        loadModule(CollectionAPI())
+        loadModule(CollectionAPI)
         loadModule(FarmingContestAPI)
         loadModule(FriendAPI)
         loadModule(PartyAPI)
