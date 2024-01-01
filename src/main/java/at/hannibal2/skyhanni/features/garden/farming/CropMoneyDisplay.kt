@@ -398,7 +398,7 @@ object CropMoneyDisplay {
 
         SkyHanniMod.coroutineScope.launch {
             val map = mutableMapOf<NEUInternalName, Int>()
-            for ((rawInternalName, _) in NEUItems.manager.itemInformation) {
+            for ((rawInternalName, _) in NEUItems.allNeuRepoItems()) {
                 if (rawInternalName == "ENCHANTED_PAPER") continue
                 if (rawInternalName == "ENCHANTED_BREAD") continue
                 if (rawInternalName == "SIMPLE_CARROT_CANDY") continue

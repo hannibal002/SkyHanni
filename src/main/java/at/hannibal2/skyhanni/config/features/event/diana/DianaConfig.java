@@ -29,9 +29,9 @@ public class DianaConfig {
     public boolean burrowsNearbyDetection = false;
 
     @Expose
-    @ConfigOption(name = "Smooth Transition", desc = "Show the way from one burrow to another smoothly.")
+    @ConfigOption(name = "Line To Next", desc = "Show a line to the closest burrow or guess location.")
     @ConfigEditorBoolean
-    public boolean burrowSmoothTransition = false;
+    public boolean lineToNext = true;
 
     @Expose
     @ConfigOption(name = "Nearest Warp", desc = "Warps to the nearest warp point on the hub, if closer to the next burrow.")
@@ -70,7 +70,8 @@ public class DianaConfig {
     public DianaProfitTrackerConfig dianaProfitTracker = new DianaProfitTrackerConfig();
 
     @Expose
-    @ConfigOption(name = "Mythological Mob Tracker", desc = "")
+    @ConfigOption(name = "Mythological Creature Tracker", desc = "")
     @Accordion
+    // TODO renmae
     public MythologicalMobTrackerConfig mythologicalMobtracker = new MythologicalMobTrackerConfig();
 }

@@ -166,7 +166,7 @@ object ItemDisplayOverlayFeatures {
 
         if (RANCHERS_BOOTS_SPEED.isSelected() && itemName.contains("Rancher's Boots")) {
             item.getRanchersSpeed()?.let {
-                return if (it > 400 && (PetAPI.isCurrentPet("Black Cat") ||
+                return if (it > 400 && !(PetAPI.isCurrentPet("Black Cat") ||
                         InventoryUtils.getHelmet()?.getInternalName() == "RACING_HELMET".asInternalName())
                 ) {
                     "§c$it"
@@ -207,7 +207,7 @@ object ItemDisplayOverlayFeatures {
                 gardenVacuumPatterm.matchMatcher(line) {
                     val pests = group("amount").formatNumber()
                     return if (config.vacuumBagCap) {
-                        if (pests > 39) "§640" else "$pests"
+                        if (pests > 39) "§640+" else "$pests"
                     } else {
                         when {
                             pests < 40 -> "$pests"

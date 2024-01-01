@@ -66,9 +66,11 @@ object LorenzUtils {
 
     val noTradeMode get() = HypixelData.noTrade
 
-    val isStrandedProfile get() = HypixelData.stranded
+    val isStrandedProfile get() = inSkyBlock && HypixelData.stranded
 
     val isBingoProfile get() = inSkyBlock && (HypixelData.bingo || TestBingo.testBingo)
+
+    val isIronmanProfile get() = inSkyBlock && HypixelData.ironman
 
     val lastWorldSwitch get() = HypixelData.joinedWorld
 
@@ -548,7 +550,7 @@ object LorenzUtils {
         return newValue
     }
 
-    fun <K, N : Number> MutableMap<K, N>.sumAllValues(): Double {
+    fun <K, N : Number> Map<K, N>.sumAllValues(): Double {
         if (values.isEmpty()) return 0.0
 
         return when (values.first()) {
@@ -601,6 +603,8 @@ object LorenzUtils {
     val isDerpy get() = recalculateDerpy.getValue()
 
     fun Int.derpy() = if (isDerpy) this / 2 else this
+
+    fun Int.ignoreDerpy() = if (isDerpy) this * 2 else this
 
     fun runDelayed(duration: Duration, runnable: () -> Unit) {
         Timer().schedule(object : TimerTask() {

@@ -17,19 +17,21 @@ class TiaRelayWaypoints {
     private var waypointName: String? = null
     private var island = IslandType.NONE
 
+    init {
+        Relay.entries.forEach { it.chatPattern }
+    }
+
     @SubscribeEvent
     fun onChatMessage(event: LorenzChatEvent) {
         if (!LorenzUtils.inSkyBlock) return
         if (!config.nextWaypoint) return
 
         val message = event.message
-        for (relay in Relay.entries) {
-            if (relay.chatMessage == message) {
-                waypoint = relay.waypoint
-                waypointName = relay.relayName
-                island = relay.island
-                return
-            }
+        Relay.entries.firstOrNull { it.checkChatMessage(message) }?.let { relay ->
+            waypoint = relay.waypoint
+            waypointName = relay.relayName
+            island = relay.island
+            return
         }
 
         if (message == "§aYou completed the maintenance on the relay!") {
