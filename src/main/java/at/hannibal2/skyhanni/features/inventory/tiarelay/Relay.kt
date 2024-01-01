@@ -9,7 +9,7 @@ enum class Relay(
     val relayName: String,
     val waypoint: LorenzVec,
     val island: IslandType,
-    private val chatMessage: String,
+    chatMessage: String,
 ) {
     RELAY_1(
         "1st Relay", LorenzVec(143.5, 108.0, 93.0), IslandType.HUB,
