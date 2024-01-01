@@ -18,7 +18,7 @@ object GardenCropMilestones {
         "data.garden.milestone.crop",
         "§7Harvest §f(?<name>.*) §7on .*"
     )
-    private val totalPattern by RepoPattern.pattern(
+    val totalPattern by RepoPattern.pattern(
         "data.garden.milestone.total",
         "§7Total: §a(?<name>.*)"
     )
