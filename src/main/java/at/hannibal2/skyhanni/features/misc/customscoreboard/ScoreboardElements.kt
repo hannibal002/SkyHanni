@@ -44,34 +44,124 @@ enum class ScoreboardElements(
     private val showWhen: () -> Boolean,
     private val configLine: String
 ) {
-    TITLE(::getTitleDisplayPair, { true }, "§6§lSKYBLOCK"),
-    PROFILE(::getProfileDisplayPair, { true }, "§7♲ Blueberry"),
-    PURSE(::getPurseDisplayPair, ::getPurseShowWhen, "Purse: §652,763,737"),
-    MOTES(::getMotesDisplayPair, ::getMotesShowWhen, "Motes: §d64,647"),
-    BANK(::getBankDisplayPair, ::getBankShowWhen, "Bank: §6249M"),
-    BITS(::getBitsDisplayPair, ::getBitsShowWhen, "Bits: §b59,264"),
-    COPPER(::getCopperDisplayPair, ::getCopperShowWhen, "Copper: §c23,495"),
-    GEMS(::getGemsDisplayPair, ::getGemsShowWhen, "Gems: §a57,873"),
-    HEAT(::getHeatDisplayPair, ::getHeatShowWhen, "Heat: §c♨ 0"),
-    NORTH_STARS(::getNorthStarsDisplayPair, ::getNorthStarsShowWhen, "North Stars: §d756"),
-    EMPTY_LINE(::getEmptyLineDisplayPair, { true }, ""),
-    ISLAND(::getIslandDisplayPair, { true }, "§7㋖ §aHub"),
-    LOCATION(::getLocationDisplayPair, { true }, "§7⏣ §bVillage"),
-    VISITING(::getVisitDisplayPair, ::getVisitShowWhen, " §a✌ §7(§a1§7/6)"),
-    DATE(::getDateDisplayPair, { true }, "Late Summer 11th"),
-    TIME(::getTimeDisplayPair, { true }, "§710:40pm §b☽"),
-    LOBBY_CODE(::getLobbyDisplayPair, { true }, "§8m77CK"),
-    POWER(::getPowerDisplayPair, ::getPowerShowWhen, "Power: Sighted"),
-    COOKIE(::getCookieDisplayPair, ::getCookieShowWhen, "§d§lCookie Buff\n §f3days, 17hours"),
-    EMPTY_LINE2(::getEmptyLineDisplayPair, { true }, ""),
-    OBJECTIVE(::getObjectiveDisplayPair, { true }, "Objective:\n§eUpdate SkyHanni"),
+    TITLE(
+        ::getTitleDisplayPair,
+        { true },
+        "§6§lSKYBLOCK"
+    ),
+    PROFILE(
+        ::getProfileDisplayPair,
+        { true },
+        "§7♲ Blueberry"
+    ),
+    PURSE(
+        ::getPurseDisplayPair,
+        ::getPurseShowWhen,
+        "Purse: §652" +
+            ",763,737"),
+    MOTES(
+        ::getMotesDisplayPair,
+        ::getMotesShowWhen,
+        "Motes: §d64,647"
+    ),
+    BANK(
+        ::getBankDisplayPair,
+        ::getBankShowWhen,
+        "Bank: §6249M"
+    ),
+    BITS(
+        ::getBitsDisplayPair,
+        ::getBitsShowWhen,
+        "Bits: §b59,264"
+    ),
+    COPPER(
+        ::getCopperDisplayPair,
+        ::getCopperShowWhen,
+        "Copper: §c23,495"
+    ),
+    GEMS(
+        ::getGemsDisplayPair,
+        ::getGemsShowWhen,
+        "Gems: §a57,873"
+    ),
+    HEAT(
+        ::getHeatDisplayPair,
+        ::getHeatShowWhen,
+        "Heat: §c♨ 0"
+    ),
+    NORTH_STARS(
+        ::getNorthStarsDisplayPair,
+        ::getNorthStarsShowWhen,
+        "North Stars: §d756"
+    ),
+    EMPTY_LINE(
+        ::getEmptyLineDisplayPair,
+        { true }, ""
+    ),
+    ISLAND(
+        ::getIslandDisplayPair,
+        { true },
+        "§7㋖ §aHub"
+    ),
+    LOCATION(
+        ::getLocationDisplayPair,
+        { true },
+        "§7⏣ §bVillage"
+    ),
+    VISITING(
+        ::getVisitDisplayPair,
+        ::getVisitShowWhen,
+        " §a✌ §7(§a1§7/6)"
+    ),
+    DATE(
+        ::getDateDisplayPair,
+        { true },
+        "Late Summer 11th"
+    ),
+    TIME(
+        ::getTimeDisplayPair,
+        { true },
+        "§710:40pm §b☽"
+    ),
+    LOBBY_CODE(
+        ::getLobbyDisplayPair,
+        { true },
+        "§8m77CK"
+    ),
+    POWER(
+        ::getPowerDisplayPair,
+        ::getPowerShowWhen,
+        "Power: Sighted"
+    ),
+    COOKIE(
+        ::getCookieDisplayPair,
+        ::getCookieShowWhen,
+        "§d§lCookie Buff\n §f3days, 17hours"
+    ),
+    EMPTY_LINE2(
+        ::getEmptyLineDisplayPair,
+        { true }, ""
+    ),
+    OBJECTIVE(
+        ::getObjectiveDisplayPair,
+        { true },
+        "Objective:\n§eUpdate SkyHanni"
+    ),
     SLAYER(
         ::getSlayerDisplayPair,
         ::getSlayerShowWhen,
         "§cSlayer\n §7- §cVoidgloom Seraph III\n §7- §e12§7/§c120 §7Kills"
     ),
-    EMPTY_LINE3(::getEmptyLineDisplayPair, { true }, ""),
-    QUIVER(::getQuiverDisplayPair, ::getQuiverShowWhen, "Flint Arrow: §f1,234"),
+    EMPTY_LINE3(
+        ::getEmptyLineDisplayPair,
+        { true },
+        ""
+    ),
+    QUIVER(
+        ::getQuiverDisplayPair,
+        ::getQuiverShowWhen,
+        "Flint Arrow: §f1,234"
+    ),
     POWDER(
         ::getPowderDisplayPair,
         ::getPowderShowWhen,
@@ -92,8 +182,16 @@ enum class ScoreboardElements(
         ::getPartyShowWhen,
         "§9§lParty (4):\n §7- §fhannibal2\n §7- §fMoulberry\n §7- §fVahvl\n §7- §fJ10a1n15"
     ),
-    FOOTER(::getFooterDisplayPair, { true }, "§ewww.hypixel.net"),
-    EXTRA(::getExtraDisplayPair, ::getExtraShowWhen, "§cUnknown lines the mod is not detecting"),
+    FOOTER(
+        ::getFooterDisplayPair,
+        { true },
+        "§ewww.hypixel.net"
+    ),
+    EXTRA(
+        ::getExtraDisplayPair,
+        ::getExtraShowWhen,
+        "§cUnknown lines the mod is not detecting"
+    ),
     ;
 
     override fun toString(): String {
