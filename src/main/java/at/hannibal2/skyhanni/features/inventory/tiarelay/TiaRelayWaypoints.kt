@@ -17,6 +17,10 @@ class TiaRelayWaypoints {
     private var waypointName: String? = null
     private var island = IslandType.NONE
 
+    init {
+        Relay.entries.forEach { it.chatPattern }
+    }
+
     @SubscribeEvent
     fun onChatMessage(event: LorenzChatEvent) {
         if (!LorenzUtils.inSkyBlock) return
