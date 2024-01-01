@@ -25,7 +25,7 @@ class MobDebug {
     private fun HowToShow.isName() =
         this == HowToShow.ONLY_NAME || this == HowToShow.NAME_AND_HIGHLIGHT
 
-    private fun Mob.isNotInvisible() = mobDebugConfig.showInvisible || !this.baseEntity.isInvisible
+    private fun Mob.isNotInvisible() = mobDebugConfig.showInvisible || !this.isInvisible()
 
     private fun MobData.MobSet.highlight(event: LorenzRenderWorldEvent, color: (Mob) -> (LorenzColor)) =
         this.filter { it.isNotInvisible() }.forEach {

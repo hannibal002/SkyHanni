@@ -14,6 +14,7 @@ import at.hannibal2.skyhanni.utils.MobUtils
 import at.hannibal2.skyhanni.utils.RenderUtils.expandBlock
 import net.minecraft.entity.EntityLivingBase
 import net.minecraft.entity.item.EntityArmorStand
+import net.minecraft.entity.monster.EntityZombie
 import net.minecraft.util.AxisAlignedBB
 
 /**
@@ -91,6 +92,8 @@ class Mob(
     fun isInRender() = baseEntity.distanceToPlayer() < MobData.ENTITY_RENDER_RANGE_IN_BLOCKS
 
     fun canBeSeen() = baseEntity.canBeSeen()
+
+    fun isInvisible() = if (baseEntity !is EntityZombie) baseEntity.isInvisible else false
 
     override fun equals(other: Any?): Boolean {
         if (this === other) return true
