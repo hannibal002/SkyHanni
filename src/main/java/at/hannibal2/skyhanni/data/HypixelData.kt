@@ -214,9 +214,6 @@ class HypixelData {
             islandNamePattern.matchMatcher(line) {
                 newIsland = group("island")
             }
-            /*if (line.startsWith("§b§lArea: ") || line.startsWith("§b§lDungeon: ")) {
-                newIsland = line.split(": ")[1].removeColor()
-            }*/
             if (line == " Status: §r§9Guest") {
                 guesting = true
             }
