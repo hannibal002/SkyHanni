@@ -9,7 +9,9 @@ import at.hannibal2.skyhanni.features.bingo.card.goals.BingoGoal
 import at.hannibal2.skyhanni.features.bingo.card.goals.GoalType
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
+import at.hannibal2.skyhanni.utils.StringUtils.matches
 import at.hannibal2.skyhanni.utils.TimeUtils
+import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import java.time.LocalTime
 import java.time.OffsetDateTime
@@ -24,11 +26,15 @@ object BingoAPI {
     val communityGoals get() = bingoGoals.values.filter { it.type == GoalType.COMMUNITY }
     var lastBingoCardOpenTime = SimpleTimeMark.farPast()
 
+    private val detectionPattern by RepoPattern.pattern("bingo.detection.scoreboard", " §.Ⓑ §.Bingo")
+
     @SubscribeEvent
     fun onRepoReload(event: RepositoryReloadEvent) {
         ranks = event.getConstant<BingoRanksJson>("BingoRanks").ranks
         data = event.getConstant<BingoJson>("Bingo").bingo_tips
     }
+
+    fun getRankFromScoreboard(text: String) = if (detectionPattern.matches(text)) getRank(text) else null
 
     fun getRank(text: String) = ranks.entries.find { text.contains(it.key) }?.value
 
