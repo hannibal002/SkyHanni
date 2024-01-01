@@ -48,6 +48,6 @@ enum class Relay(
         "§e[NPC] §dTia the Fairy§f: §b✆ §f§r§fThe next relay is on top of the Auction House."
     );
 
-    val chatPattern by RepoPattern.pattern("relay.chat" + relayName.takeWhile { it != ' ' }, chatMessage)
+    val chatPattern by RepoPattern.pattern("relay.chat." + relayName.takeWhile { it != ' ' }, chatMessage)
     fun checkChatMessage(string: String) = chatPattern.matches(string)
 }
