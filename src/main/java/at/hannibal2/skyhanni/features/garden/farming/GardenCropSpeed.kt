@@ -42,7 +42,7 @@ object GardenCropSpeed {
         fixedRateTimer(name = "skyhanni-crop-milestone-speed", period = 1000L) {
             if (isEnabled()) {
                 if (GardenAPI.mushroomCowPet) {
-                    CropType.MUSHROOM.setCounter(CropType.MUSHROOM.getCounter() + blocksBroken)
+                    CropType.MUSHROOM.setCounter(CropType.MUSHROOM.getCounter() + blocksBroken * (lastBrokenCrop?.multiplier ?: 1))
                 }
                 checkSpeed()
                 update()
