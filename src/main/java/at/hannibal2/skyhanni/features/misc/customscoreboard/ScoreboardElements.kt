@@ -55,8 +55,8 @@ enum class ScoreboardElements(
     PURSE(
         ::getPurseDisplayPair,
         ::getPurseShowWhen,
-        "Purse: §652" +
-            ",763,737"),
+        "Purse: §652,763,737"
+    ),
     MOTES(
         ::getMotesDisplayPair,
         ::getMotesShowWhen,

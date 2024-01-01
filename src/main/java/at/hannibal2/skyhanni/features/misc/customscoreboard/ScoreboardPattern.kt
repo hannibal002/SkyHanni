@@ -94,7 +94,7 @@ object ScoreboardPattern {
     val dojoDifficultyPattern by miscSb.pattern("dojodifficulty", "^(§.)*Difficulty: (§.)*(?<difficulty>[\\w ]+)$")
     val dojoPointsPattern by miscSb.pattern("dojopoints", "^(§.)*Points: (§.)*(?<points>[\\w,.]+)( (§.)*\\((§.)*[+-](§.)*(?<difference>[\\w,.]+)(§.)*\\))?$")
     val dojoTimePattern by miscSb.pattern("dojotime", "^(§.)*Time: (§.)*(?<time>(?<seconds>\\w+s))( (§.)*\\((§.)*[+-](§.)*(?<difference>[\\w,.]+)(§.)*\\))?$")
-    val objectivePattern by miscSb.pattern("objective", "^(§.)*Objectives?:?(\\w*)?")
+    val objectivePattern by miscSb.pattern("objective", "^(§.)*Objective.*")
     // this thirdObjectiveLinePattern includes all those weird objective lines that go into a third scoreboard line
     val thirdObjectiveLinePattern by miscSb.pattern("thirdobjectiveline", "(§7\\(\\w+/\\w+\\)|§f Mages.*|§f Barbarians.*|§edefeat Kuudra|§eand stun him)")
     // events
