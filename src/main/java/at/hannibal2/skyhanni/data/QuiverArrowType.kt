@@ -5,6 +5,7 @@ import at.hannibal2.skyhanni.utils.NEUInternalName.Companion.asInternalName
 
 enum class QuiverArrowType(val arrow: String, val internalName: NEUInternalName) {
     NONE("None", "NONE".asInternalName()),
+
     SLIME_BALL("Slime Ball", "SLIME_BALL".asInternalName()),
     PRISMARINE_SHARD("Prismarine Shard", "PRISMARINE_SHARD".asInternalName()),
     FLINT("Flint Arrow", "ARROW".asInternalName()),
