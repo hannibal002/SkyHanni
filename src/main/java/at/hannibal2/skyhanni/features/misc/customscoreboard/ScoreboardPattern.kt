@@ -23,7 +23,7 @@ object ScoreboardPattern {
     val yearVotesPattern by mainSb.pattern("yearvotes", "(?<yearvotes>^§6Year \\d+ Votes\$)")
     val votesPattern by mainSb.pattern("votes", "(?<votes>§[caebd]\\|+§f\\|+ §(.+)\$)")
     val waitingForVotePattern by mainSb.pattern("waitingforvote", "(§7Waiting for|§7your vote\\.\\.\\.)$")
-    val northstarsPattern by mainSb.pattern("northstars", "North Stars: §d(?<northstars>\\d{1,3})$")
+    val northstarsPattern by mainSb.pattern("northstars", "North Stars: §d(?<northstars>[\\w,]+)$")
     val profileTypePattern by mainSb.pattern("profiletype", "^\\s*(§7♲ §7Ironman|§a☀ §aStranded|§.Ⓑ §.Bingo)$")
     // multi use
     private val multiUseSb = scoreboardGroup.group("multiuse")

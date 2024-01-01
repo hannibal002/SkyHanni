@@ -345,6 +345,7 @@ private fun getHeatShowWhen() = listOf(IslandType.CRYSTAL_HOLLOWS).contains(Hypi
 
 private fun getNorthStarsDisplayPair(): List<Pair<String, AlignmentEnum>> {
     val northStars = getGroupFromPattern(ScoreboardData.sidebarLinesFormatted, ScoreboardPattern.northstarsPattern, "northstars")
+        .formatNum()
 
     return when {
         informationFilteringConfig.hideEmptyLines && northStars == "0" -> listOf("<hidden>")
