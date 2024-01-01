@@ -19,15 +19,15 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
 object CollectionAPI {
     private val counterPattern by RepoPattern.pattern(
-        "collection.api.counter",
+        "data.collection.api.counter",
         ".* §e(?<amount>.*)§6/.*"
     )
     private val singleCounterPattern by RepoPattern.pattern(
-        "collection.api.singlecounter",
+        "data.collection.api.singlecounter",
         "§7Total Collected: §e(?<amount>.*)"
     )
     private val collectionTier0Pattern by RepoPattern.pattern(
-        "collection.api.tierzero",
+        "data.collection.api.tierzero",
         "§7Progress to .* I: .*"
     )
 
