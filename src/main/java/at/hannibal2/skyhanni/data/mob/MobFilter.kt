@@ -18,7 +18,10 @@ import at.hannibal2.skyhanni.utils.LorenzUtils.takeWhileInclusive
 import at.hannibal2.skyhanni.utils.MobUtils
 import at.hannibal2.skyhanni.utils.MobUtils.isDefaultValue
 import at.hannibal2.skyhanni.utils.MobUtils.takeNonDefault
+import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
+import at.hannibal2.skyhanni.utils.StringUtils.matches
 import at.hannibal2.skyhanni.utils.getLorenzVec
+import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraft.client.entity.EntityOtherPlayerMP
 import net.minecraft.entity.Entity
 import net.minecraft.entity.EntityLivingBase
@@ -52,16 +55,19 @@ import net.minecraft.entity.player.EntityPlayer
 
 object MobFilter {
 
-    val mobNameFilter = "(\\[\\w+([0-9]+)\\] )?(.Corrupted )?(.*) [\\d❤]+".toRegex()
-    val slayerNameFilter = "^. (.*) ([IV]+) \\d+".toRegex()
-    val bossMobNameFilter = "^. (\\[(.*)\\] )?(.*) ([\\d\\/Mk.,❤]+|█+) .$".toRegex()
-    val dungeonNameFilter = "^(?:(✯)\\s)?(?:(${DungeonAttribute.toRegexLine})\\s)?(?:\\[[\\w\\d]+\\]\\s)?(.+)\\s[^\\s]+$".toRegex()
-    val petCareNameRegex = "^\\[\\w+ (\\d+)\\] (.*)".toRegex()
-    val wokeSleepingGolemRegex = "(?:§c§lWoke|§5§lSleeping) Golem§r".toRegex()
+    private val repoGroup = RepoPattern.group("mob.detection")
 
-    val summonRegex = "^(\\w+)'s (.*) \\d+".toRegex()
-    val summonOwnerRegex = "Spawned by: (.*)".toRegex()
-    val dojoFilter = "^(?:(\\d+) pts|(\\w+))$".toRegex()
+    val mobNameFilter by repoGroup.pattern("filter.basic", "(\\[\\w+([0-9]+)\\] )?(.Corrupted )?(.*) [\\d❤]+")
+    val slayerNameFilter by repoGroup.pattern("filter.slayer", "^. (.*) ([IV]+) \\d+.*")
+    val bossMobNameFilter by repoGroup.pattern("filter.boss", "^. (\\[(.*)\\] )?(.*) ([\\d\\/Mk.,❤]+|█+) .$")
+    val dungeonNameFilter by repoGroup.pattern("filter.dungeon", "^(?:(✯)\\s)?(?:(${DungeonAttribute.toRegexLine})\\s)?(?:\\[[\\w\\d]+\\]\\s)?(.+)\\s[^\\s]+$")
+    val summonFilter by repoGroup.pattern("filter.summon", "^(\\w+)'s (.*) \\d+.*")
+    val dojoFilter by repoGroup.pattern("filter.dojo", "^(?:(\\d+) pts|(\\w+))$")
+
+    val petCareNamePattern by repoGroup.pattern("pattern.petcare", "^\\[\\w+ (\\d+)\\] (.*)")
+    val wokeSleepingGolemPattern by repoGroup.pattern("pattern.dungeon.woke.golem", "(?:§c§lWoke|§5§lSleeping) Golem§r")
+    val summonOwnerPattern by repoGroup.pattern("pattern.summon.owner", ".*Spawned by: (.*).*")
+
 
     private val RatSkull = "ewogICJ0aW1lc3RhbXAiIDogMTYxODQxOTcwMTc1MywKICAicHJvZmlsZUlkIiA6ICI3MzgyZGRmYmU0ODU0NTVjODI1ZjkwMGY4OGZkMzJmOCIsCiAgInByb2ZpbGVOYW1lIiA6ICJCdUlJZXQiLAogICJzaWduYXR1cmVSZXF1aXJlZCIgOiB0cnVlLAogICJ0ZXh0dXJlcyIgOiB7CiAgICAiU0tJTiIgOiB7CiAgICAgICJ1cmwiIDogImh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvYThhYmI0NzFkYjBhYjc4NzAzMDExOTc5ZGM4YjQwNzk4YTk0MWYzYTRkZWMzZWM2MWNiZWVjMmFmOGNmZmU4IiwKICAgICAgIm1ldGFkYXRhIiA6IHsKICAgICAgICAibW9kZWwiIDogInNsaW0iCiAgICAgIH0KICAgIH0KICB9Cn0="
     private val HellwispTentacleSkull = "ewogICJ0aW1lc3RhbXAiIDogMTY0OTM4MzAyMTQxNiwKICAicHJvZmlsZUlkIiA6ICIzYjgwOTg1YWU4ODY0ZWZlYjA3ODg2MmZkOTRhMTVkOSIsCiAgInByb2ZpbGVOYW1lIiA6ICJLaWVyYW5fVmF4aWxpYW4iLAogICJzaWduYXR1cmVSZXF1aXJlZCIgOiB0cnVlLAogICJ0ZXh0dXJlcyIgOiB7CiAgICAiU0tJTiIgOiB7CiAgICAgICJ1cmwiIDogImh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvZDI3MDQ2Mzg0OTM2MzhiODVjMzhkZDYzZmZkYmUyMjJmZTUzY2ZkNmE1MDk3NzI4NzU2MTE5MzdhZTViNWUyMiIsCiAgICAgICJtZXRhZGF0YSIgOiB7CiAgICAgICAgIm1vZGVsIiA6ICJzbGltIgogICAgICB9CiAgICB9CiAgfQp9"
@@ -164,7 +170,7 @@ object MobFilter {
         baseEntity.isFarmMob() -> createFarmMobs(baseEntity)?.let { MobResult.found(it) }
         baseEntity is EntityDragon -> MobResult.found(MobFactories.basic(baseEntity, baseEntity.cleanName()))
         baseEntity is EntityGiantZombie && baseEntity.name == "Dinnerbone" -> MobResult.found(MobFactories.projectile(baseEntity, "Giant Sword")) // Will false trigger if there is another Dinnerbone Giant
-        baseEntity is EntityCaveSpider -> MobUtils.getArmorStand(baseEntity, -1)?.takeIf { it.cleanName().matches(summonOwnerRegex) }?.let { MobData.entityToMob[MobUtils.getNextEntity(baseEntity, -4)]?.internalAddEntity(baseEntity)?.let { MobResult.illegal } }
+        baseEntity is EntityCaveSpider -> MobUtils.getArmorStand(baseEntity, -1)?.takeIf { summonOwnerPattern.matches(it.cleanName()) }?.let { MobData.entityToMob[MobUtils.getNextEntity(baseEntity, -4)]?.internalAddEntity(baseEntity)?.let { MobResult.illegal } }
 
         baseEntity is EntityWither && baseEntity.invulTime == 800 -> MobResult.found(MobFactories.special(baseEntity, "Mini Wither"))
         else -> null
@@ -199,7 +205,7 @@ object MobFilter {
                 baseEntity is EntityOtherPlayerMP && baseEntity.isNPC() && baseEntity.name == "Shadow Assassin" -> MobUtils.getClosedArmorStandWithName(baseEntity, 3.0, "Shadow Assassin").makeMobResult { MobFactories.dungeon(baseEntity, it) }
                 baseEntity is EntityOtherPlayerMP && baseEntity.isNPC() && baseEntity.name == "The Professor" -> MobUtils.getArmorStand(baseEntity, 9).makeMobResult { MobFactories.boss(baseEntity, it) }
                 baseEntity is EntityOtherPlayerMP && baseEntity.isNPC() && (nextEntity is EntityGiantZombie || nextEntity == null) && baseEntity.name.contains("Livid") -> MobUtils.getClosedArmorStandWithName(baseEntity, 6.0, "﴾ Livid").makeMobResult { MobFactories.boss(baseEntity, it, overriddenName = "Real Livid") }
-                baseEntity is EntityIronGolem && wokeSleepingGolemRegex.matches(
+                baseEntity is EntityIronGolem && wokeSleepingGolemPattern.matches(
                     armorStand?.name ?: ""
                 ) -> MobResult.found(Mob(baseEntity, Mob.Type.Dungeon, armorStand, "Sleeping Golem")) // Consistency fix
                 else -> null
@@ -272,10 +278,10 @@ object MobFilter {
     private fun petCareHandler(baseEntity: EntityLivingBase): MobResult {
         val extraEntityList = listOf(1, 2, 3, 4).mapNotNull { MobUtils.getArmorStand(baseEntity, it) }
         if (extraEntityList.size != 4) return MobResult.notYetFound
-        return petCareNameRegex.find(extraEntityList[1].cleanName())?.groupValues?.let {
+        return petCareNamePattern.matchMatcher(extraEntityList[1].cleanName()) {
             MobResult.found(
                 Mob(
-                    baseEntity, Mob.Type.Special, armorStand = extraEntityList[1], name = it[2], additionalEntities = extraEntityList, levelOrTier = it[1].toInt()
+                    baseEntity, Mob.Type.Special, armorStand = extraEntityList[1], name = this.group(2), additionalEntities = extraEntityList, levelOrTier = this.group(1).toInt()
                 ),
             )
         } ?: MobResult.somethingWentWrong

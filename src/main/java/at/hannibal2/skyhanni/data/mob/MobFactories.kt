@@ -2,32 +2,34 @@ package at.hannibal2.skyhanni.data.mob
 
 import at.hannibal2.skyhanni.utils.EntityUtils.cleanName
 import at.hannibal2.skyhanni.utils.NumberUtil.romanToDecimal
+import at.hannibal2.skyhanni.utils.StringUtils.findMatcher
+import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
 import net.minecraft.entity.EntityLivingBase
 import net.minecraft.entity.item.EntityArmorStand
 
 object MobFactories {
     fun slayer(baseEntity: EntityLivingBase, armorStand: EntityArmorStand, extraEntityList: List<EntityLivingBase>): Mob? =
-        MobFilter.slayerNameFilter.find(armorStand.cleanName())?.let {
-            Mob(baseEntity = baseEntity, mobType = Mob.Type.Slayer, armorStand = armorStand, name = it.groupValues[1], additionalEntities = extraEntityList, levelOrTier = it.groupValues[2].romanToDecimal())
+        MobFilter.slayerNameFilter.matchMatcher(armorStand.cleanName()) {
+            Mob(baseEntity = baseEntity, mobType = Mob.Type.Slayer, armorStand = armorStand, name = this.group(1), additionalEntities = extraEntityList, levelOrTier = this.group(2).romanToDecimal())
         }
 
     fun boss(baseEntity: EntityLivingBase, armorStand: EntityArmorStand, extraEntityList: List<EntityLivingBase> = emptyList(), overriddenName: String? = null): Mob? =
-        MobFilter.bossMobNameFilter.find(armorStand.cleanName())?.let {
+        MobFilter.bossMobNameFilter.matchMatcher(armorStand.cleanName()) {
             Mob(
                 baseEntity = baseEntity, mobType = Mob.Type.Boss, armorStand = armorStand, name = overriddenName
-                ?: it.groupValues[3], additionalEntities = extraEntityList
+                ?: this.group(3), additionalEntities = extraEntityList
             )
         }
 
     fun dungeon(baseEntity: EntityLivingBase, armorStand: EntityArmorStand, extraEntityList: List<EntityLivingBase> = emptyList()): Mob? =
-        MobFilter.dungeonNameFilter.find(armorStand.cleanName())?.let {
-            Mob(baseEntity, Mob.Type.Dungeon, armorStand, it.groupValues[3], extraEntityList, hasStar = it.groupValues[1].isNotEmpty(), attribute = it.groupValues[2].takeIf { it.isNotEmpty() }
+        MobFilter.dungeonNameFilter.matchMatcher(armorStand.cleanName()) {
+            Mob(baseEntity, Mob.Type.Dungeon, armorStand, this.group(3), extraEntityList, hasStar = this.group(1).isNotEmpty(), attribute = this.group(2).takeIf { it.isNotEmpty() }
                 ?.let { MobFilter.DungeonAttribute.valueOf(it) })
         }
 
     fun basic(baseEntity: EntityLivingBase, armorStand: EntityArmorStand, extraEntityList: List<EntityLivingBase>? = null): Mob? =
-        MobFilter.mobNameFilter.find(armorStand.cleanName())?.let {
-            Mob(baseEntity = baseEntity, mobType = Mob.Type.Basic, armorStand = armorStand, name = it.groupValues[4].removeCorruptedSuffix(it.groupValues[3].isNotEmpty()), additionalEntities = extraEntityList, levelOrTier = it.groupValues[2].takeIf { it.isNotEmpty() }
+        MobFilter.mobNameFilter.findMatcher(armorStand.cleanName()) {
+            Mob(baseEntity = baseEntity, mobType = Mob.Type.Basic, armorStand = armorStand, name = this.group(4).removeCorruptedSuffix(this.group(3).isNotEmpty()), additionalEntities = extraEntityList, levelOrTier = this.group(2).takeIf { it.isNotEmpty() }
                 ?.toInt() ?: -1)
         }
 
@@ -35,8 +37,8 @@ object MobFactories {
         Mob(baseEntity = baseEntity, mobType = Mob.Type.Basic, name = name)
 
     fun summon(baseEntity: EntityLivingBase, armorStand: EntityArmorStand, extraEntityList: List<EntityLivingBase>): Mob? =
-        MobFilter.summonRegex.find(armorStand.cleanName())?.let {
-            Mob(baseEntity = baseEntity, mobType = Mob.Type.Summon, armorStand = armorStand, name = it.groupValues[2], additionalEntities = extraEntityList, ownerName = it.groupValues[1])
+        MobFilter.summonFilter.matchMatcher(armorStand.cleanName()) {
+            Mob(baseEntity = baseEntity, mobType = Mob.Type.Summon, armorStand = armorStand, name = this.group(2), additionalEntities = extraEntityList, ownerName = this.group(1))
         }
 
     fun displayNPC(baseEntity: EntityLivingBase, armorStand: EntityArmorStand): Mob =
@@ -51,9 +53,9 @@ object MobFactories {
 
     private fun String.removeCorruptedSuffix(case: Boolean) = if (case) this.dropLast(1) else this
     fun dojo(baseEntity: EntityLivingBase, armorStand: EntityArmorStand): Mob? =
-        MobFilter.dojoFilter.find(armorStand.cleanName())?.let {
+        MobFilter.dojoFilter.matchMatcher(armorStand.cleanName()) {
             Mob(
-                baseEntity = baseEntity, mobType = Mob.Type.Special, armorStand = armorStand, name = if (it.groupValues[1].isNotEmpty()) "Points: " + it.groupValues[1] else it.groupValues[2]
+                baseEntity = baseEntity, mobType = Mob.Type.Special, armorStand = armorStand, name = if (this.group(1).isNotEmpty()) "Points: " + this.group(1) else this.group(2)
             )
         }
 

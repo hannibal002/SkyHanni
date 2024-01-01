@@ -1,7 +1,7 @@
 package at.hannibal2.skyhanni.data.mob
 
 import at.hannibal2.skyhanni.data.mob.Mob.Type
-import at.hannibal2.skyhanni.data.mob.MobFilter.summonOwnerRegex
+import at.hannibal2.skyhanni.data.mob.MobFilter.summonOwnerPattern
 import at.hannibal2.skyhanni.events.MobEvent
 import at.hannibal2.skyhanni.utils.EntityUtils.canBeSeen
 import at.hannibal2.skyhanni.utils.EntityUtils.cleanName
@@ -12,6 +12,7 @@ import at.hannibal2.skyhanni.utils.LocationUtils.union
 import at.hannibal2.skyhanni.utils.LorenzUtils.toSingletonListOrEmpty
 import at.hannibal2.skyhanni.utils.MobUtils
 import at.hannibal2.skyhanni.utils.RenderUtils.expandBlock
+import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
 import net.minecraft.entity.EntityLivingBase
 import net.minecraft.entity.item.EntityArmorStand
 import net.minecraft.entity.monster.EntityZombie
@@ -115,7 +116,7 @@ class Mob(
         relativeBoundingBox = makeRelativeBoundingBox()
 
         owner = (ownerName ?: if (mobType == Type.Slayer) hologram2?.let {
-            summonOwnerRegex.find(it.cleanName())?.groupValues?.get(1)
+            summonOwnerPattern.matchMatcher(it.cleanName()) { this.group(1) }
         } else null)?.let { MobUtils.OwnerShip(it) }
     }
 

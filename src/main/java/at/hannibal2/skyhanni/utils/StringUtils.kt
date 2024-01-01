@@ -87,6 +87,9 @@ object StringUtils {
     inline fun <T> Pattern.matchMatcher(text: String, consumer: Matcher.() -> T) =
         matcher(text).let { if (it.matches()) consumer(it) else null }
 
+    inline fun <T> Pattern.findMatcher(text: String, consumer: Matcher.() -> T) =
+        matcher(text).let { if (it.find()) consumer(it) else null }
+
     private fun String.internalCleanPlayerName(): String {
         val split = trim().split(" ")
         return if (split.size > 1) {
