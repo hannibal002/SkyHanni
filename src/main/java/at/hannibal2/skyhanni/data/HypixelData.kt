@@ -188,7 +188,7 @@ class HypixelData {
         bingo = false
 
         for (line in ScoreboardData.sidebarLinesFormatted) {
-            if (BingoAPI.getRank(line) != null) {
+            if (BingoAPI.getRankFromScoreboard(line) != null) {
                 bingo = true
             }
             when (line) {
