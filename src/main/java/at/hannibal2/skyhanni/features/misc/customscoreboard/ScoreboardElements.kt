@@ -35,10 +35,7 @@ private val displayConfig get() = config.displayConfig
 private val informationFilteringConfig get() = config.informationFilteringConfig
 
 var unknownLines = listOf<String>()
-
-val extraObjectiveLines = listOf("§7(§e", "§f Mages", "§f Barbarians")
-val extraObjectiveKuudraLines = listOf("§edefeat Kuudra")
-var amountOfExtraLines = 0
+var amountOfUnknownLines = 0
 
 enum class ScoreboardElements(
     private val displayPair: Supplier<List<Pair<String, AlignmentEnum>>>,
@@ -451,15 +448,12 @@ private fun getCookieShowWhen() = when (informationFilteringConfig.hideEmptyLine
 private fun getObjectiveDisplayPair(): List<Pair<String, AlignmentEnum>> {
     val objective = mutableListOf<String>()
 
-    objective += ScoreboardData.sidebarLinesFormatted.first { it.startsWith("Objective") }
+    objective += ScoreboardData.sidebarLinesFormatted.first { ScoreboardPattern.objectivePattern.matches(it) }
 
     objective += ScoreboardData.sidebarLinesFormatted.nextAfter(objective[0]) ?: "<hidden>"
 
-    if (extraObjectiveLines.any {
-            ScoreboardData.sidebarLinesFormatted.nextAfter(objective[0], 2)?.contains(it) == true
-        }) {
+    if (ScoreboardData.sidebarLinesFormatted.any { ScoreboardPattern.thirdObjectiveLinePattern.matches(it) }){
         objective += ScoreboardData.sidebarLinesFormatted.nextAfter(objective[0], 2).toString()
-            .replace(")", "§7)")
     }
 
     return objective.map { it to AlignmentEnum.LEFT }
@@ -575,7 +569,7 @@ private fun getFooterDisplayPair(): List<Pair<String, AlignmentEnum>> {
 private fun getExtraDisplayPair(): List<Pair<String, AlignmentEnum>> {
     if (unknownLines.isEmpty()) return listOf("<hidden>" to AlignmentEnum.LEFT)
 
-    if (amountOfExtraLines != unknownLines.size && config.unknownLinesWarning) {
+    if (amountOfUnknownLines != unknownLines.size && config.unknownLinesWarning) {
         ErrorManager.logErrorWithData(
             CustomScoreboardUtils.UndetectedScoreboardLines("CustomScoreboard detected ${unknownLines.size} unknown line${if (unknownLines.size > 1) "s" else ""}"),
             "CustomScoreboard detected ${unknownLines.size} unknown line${if (unknownLines.size > 1) "s" else ""}",
@@ -583,7 +577,7 @@ private fun getExtraDisplayPair(): List<Pair<String, AlignmentEnum>> {
             "Island" to HypixelData.skyBlockIsland,
             "Area" to HypixelData.skyBlockArea
         )
-        amountOfExtraLines = unknownLines.size
+        amountOfUnknownLines = unknownLines.size
     }
 
     return listOf("§cUndetected Lines:" to AlignmentEnum.LEFT) + unknownLines.map { it to AlignmentEnum.LEFT }
@@ -591,7 +585,7 @@ private fun getExtraDisplayPair(): List<Pair<String, AlignmentEnum>> {
 
 private fun getExtraShowWhen(): Boolean {
     if (unknownLines.isEmpty()) {
-        amountOfExtraLines = 0
+        amountOfUnknownLines = 0
     }
     return unknownLines.isNotEmpty()
 }

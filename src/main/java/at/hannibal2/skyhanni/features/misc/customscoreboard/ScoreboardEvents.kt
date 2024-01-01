@@ -201,34 +201,18 @@ private fun getKuudraLines(): List<String> {
     getSbLines().firstOrNull { SbPattern.autoClosingPattern.matches(it) }?.let { list.add(it) }
     getSbLines().firstOrNull { SbPattern.startingInPattern.matches(it) }?.let { list.add(it) }
     getSbLines().firstOrNull { SbPattern.timeElapsedPattern.matches(it) }?.let { list.add(it) }
+    getSbLines().firstOrNull { SbPattern.instanceShutdownPattern.matches(it) }?.let { list.add(it) }
+    getSbLines().firstOrNull { SbPattern.wavePattern.matches(it) }?.let { list.add(it) }
+    getSbLines().firstOrNull { SbPattern.tokensPattern.matches(it) }?.let { list.add(it) }
+    getSbLines().firstOrNull { SbPattern.submergesPattern.matches(it) }?.let { list.add(it) }
+    list += ""
 
-    if (getSbLines().any { it.startsWith("Instance Shutdow") }) {
-        list += getSbLines().firstOrNull { it.startsWith("Instance Shutdow") }
-            ?: "<hidden>"
-    }
-    list += ""
-    if (getSbLines().any { it.startsWith("§f§lWave: §c§l") }) {
-        list += getSbLines().firstOrNull { it.startsWith("§f§lWave: §c§l") }
-            ?: "<hidden>"
-    }
-    if (getSbLines().any { it.startsWith("§fTokens: ") }) {
-        list += getSbLines().firstOrNull { it.startsWith("§fTokens: ") } ?: "<hidden>"
-    }
-    if (getSbLines().any { it.startsWith("Submerges In: §e") }) {
-        list += getSbLines().firstOrNull { it.startsWith("Submerges In: §e") }
-            ?: "<hidden>"
-    }
-    list += ""
-    if (getSbLines().any { it == "§fObjective:" }) {
-        list += "§fObjective:"
-        list += getSbLines().nextAfter("§fObjective:") ?: "§cNo Objective"
-        if (extraObjectiveKuudraLines.any {
-                it == getSbLines().nextAfter(
-                    "§fObjective:",
-                    2
-                )
-            }) {
-            list += getSbLines().nextAfter("§fObjective:", 2) ?: "§cNo Objective"
+    if (getSbLines().any { ScoreboardPattern.thirdObjectiveLinePattern.matches(it) }) {
+        val objectiveLine = getSbLines().first { ScoreboardPattern.thirdObjectiveLinePattern.matches(it) }
+        list += objectiveLine
+        list += getSbLines().nextAfter(objectiveLine) ?: "§cNo Objective"
+        if (getSbLines().any { ScoreboardPattern.thirdObjectiveLinePattern.matches(it) }) {
+            list += getSbLines().nextAfter(objectiveLine, 2) ?: "§cNo Objective"
         }
     }
 
@@ -346,7 +330,8 @@ private fun getWinterLines(): List<String> {
     val list = mutableListOf<String>()
 
     getSbLines().firstOrNull { SbPattern.winterEventStartPattern.matches(it) }?.let { list.add(it) }
-    getSbLines().firstOrNull { SbPattern.winterNextWavePattern.matches(it) && !it.endsWith("Soon!") }?.let { list.add(it) }
+    getSbLines().firstOrNull { SbPattern.winterNextWavePattern.matches(it) && !it.endsWith("Soon!") }
+        ?.let { list.add(it) }
     getSbLines().firstOrNull { SbPattern.winterWavePattern.matches(it) }?.let { list.add(it) }
     getSbLines().firstOrNull { SbPattern.winterMagmaLeftPattern.matches(it) }?.let { list.add(it) }
     getSbLines().firstOrNull { SbPattern.winterTotalDmgPattern.matches(it) }?.let { list.add(it) }

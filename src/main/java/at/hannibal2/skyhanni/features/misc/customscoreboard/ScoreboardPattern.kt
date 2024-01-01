@@ -27,9 +27,10 @@ object ScoreboardPattern {
     val profileTypePattern by mainSb.pattern("profiletype", "^\\s*(§7♲ §7Ironman|§a☀ §aStranded|§.Ⓑ §.Bingo)$")
     // multi use
     private val multiUseSb = scoreboardGroup.group("multiuse")
-    val autoClosingPattern by multiUseSb.pattern("autoclosing", "Auto-closing in: §c(\\d{1,2}:)?\\d{2}$")
-    val startingInPattern by multiUseSb.pattern("startingin", "Starting in: §a(\\d{1,2}:)?\\d{2}$")
+    val autoClosingPattern by multiUseSb.pattern("autoclosing", "(§.)*Auto-closing in: §c(\\d{1,2}:)?\\d{1,2}$")
+    val startingInPattern by multiUseSb.pattern("startingin", "(§.)*Starting in: §a(\\d{1,2}:)?\\d{1,2}$")
     val timeElapsedPattern by multiUseSb.pattern("timeelapsed", "(§.)*Time Elapsed: (§.)*(?<time>(\\w+[ydhms] ?)+)$")
+    val instanceShutdownPattern by multiUseSb.pattern("instanceshutdown", "(§.)*Instance Shutdown: (§.)*(\\d{1,2}:)?\\d{1,2}$")
     // dungeon scoreboard
     private val dungeonSb = scoreboardGroup.group("dungeon")
     val keysPattern by dungeonSb.pattern("keys", "Keys: §.■ §.[✗✓] §.■ §a.x$")
@@ -37,6 +38,11 @@ object ScoreboardPattern {
     val soloPattern by dungeonSb.pattern("solo", "§3§lSolo$")
     val teammatesPattern by dungeonSb.pattern("teammates", "(§.)*(?<classAbbv>\\[\\w]) (§.)*(?<username>[a-zA-Z0-9_]{2,16}) ((§.)*(?<classLevel>\\[Lvl?(?<level>[\\w,.]+)\\]?)|(§.)*(?<health>[\\w,.]+)(§.)*.?)$")
     val floor3GuardiansPattern by dungeonSb.pattern("floor3guardians", "^§. - §.(Healthy|Reinforced|Laser|Chaos)§a ([\\w,.]?)+§c❤$")
+    // kuudra
+    private val kuudraSb = scoreboardGroup.group("kuudra")
+    val wavePattern by kuudraSb.pattern("wave", "^(§.)*Wave: (§.)*\\d+(§.)*( §.- §.\\d+:\\d+)?$")
+    val tokensPattern by kuudraSb.pattern("tokens", "^(§.)*Tokens: §.[\\w,]+$")
+    val submergesPattern by kuudraSb.pattern("submerges", "^(§.)*Submerges In: (§.)*[\\w,]+$")
     // farming
     private val farmingSb = scoreboardGroup.group("farming")
     val medalsPattern by farmingSb.pattern("medals", "§[6fc]§l(GOLD|SILVER|BRONZE) §fmedals: §[6fc]\\d+$")
@@ -89,6 +95,8 @@ object ScoreboardPattern {
     val dojoPointsPattern by miscSb.pattern("dojopoints", "^(§.)*Points: (§.)*(?<points>[\\w,.]+)( (§.)*\\((§.)*[+-](§.)*(?<difference>[\\w,.]+)(§.)*\\))?$")
     val dojoTimePattern by miscSb.pattern("dojotime", "^(§.)*Time: (§.)*(?<time>(?<seconds>\\w+s))( (§.)*\\((§.)*[+-](§.)*(?<difference>[\\w,.]+)(§.)*\\))?$")
     val objectivePattern by miscSb.pattern("objective", "^(§.)*Objectives?:?(\\w*)?")
+    // this thirdObjectiveLinePattern includes all those weird objective lines that go into a third scoreboard line
+    val thirdObjectiveLinePattern by miscSb.pattern("thirdobjectiveline", "(§7\\(\\w+/\\w+\\)|§f Mages.*|§f Barbarians.*|§edefeat Kuudra|§eand stun him)")
     // events
     private val eventsSb = scoreboardGroup.group("events")
     val travelingZooPattern by eventsSb.pattern("travelingzoo", "§aTraveling Zoo§f \\d{0,2}:\\d{2}$")

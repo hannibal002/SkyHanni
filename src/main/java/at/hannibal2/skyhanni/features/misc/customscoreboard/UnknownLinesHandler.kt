@@ -14,10 +14,6 @@ object UnknownLinesHandler {
         val sidebarLines = ScoreboardData.sidebarLinesFormatted
 
         val knownLines = listOf(
-            /*"Instance Shutdow",   leaving them like this because I want people to report them so I can get the
-            "§f§lWave: §c§l",       exact lines (i really dont want to run kuudra myself)
-            "§fTokens: ",
-            "Submerges In: §e"*/
             "Time Left: §b",
             "Current Item:",
         )
@@ -134,11 +130,9 @@ object UnknownLinesHandler {
             ScoreboardData.sidebarLinesFormatted.firstOrNull { ScoreboardPattern.objectivePattern.matches(it) }
                 ?: "Objective"
         unknownLines = unknownLines.filter { sidebarLines.nextAfter(objectiveLine) != it }
-        unknownLines =
-            unknownLines.filter {
+        unknownLines = unknownLines.filter {
                 sidebarLines.nextAfter(objectiveLine, 2) != it
-                    && (!extraObjectiveLines.contains(it)
-                    || !extraObjectiveKuudraLines.contains(it))
+                    && !ScoreboardPattern.thirdObjectiveLinePattern.matches(it)
             }
 
         // Remove jacobs contest
