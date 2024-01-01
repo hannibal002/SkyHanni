@@ -82,7 +82,7 @@ object ScoreboardPattern {
     val essencePattern by miscSb.pattern("essence", "^\\s*Essence: §d(?<essence>-?\\d+(:?,\\d{3})*(?:\\.\\d+)?)$")
     val brokenRedstonePattern by miscSb.pattern("brokenredstone", "\\s*e: §e§b\\d{1,3}%$")
     val redstonePattern by miscSb.pattern("redstone", "\\s*(§.)*⚡ §cRedstone: (§.)*\\d{1,3}%$")
-    val visitingPattern by miscSb.pattern("visiting", "^\\s*§a✌ §7\\(§a\\d+§7/\\d+\\)$")
+    val visitingPattern by miscSb.pattern("visiting", "^\\s*§a✌ §7\\(§.\\d+(§.)?/\\d+(§.)?\\)$")
     val flightDurationPattern by miscSb.pattern("flightduration", "^\\s*Flight Duration: §a(:?\\d{1,3})*$")
     val dojoChallengePattern by miscSb.pattern("dojochallenge", "^(§.)*Challenge: (§.)*(?<challenge>[\\w ]+)$")
     val dojoDifficultyPattern by miscSb.pattern("dojodifficulty", "^(§.)*Difficulty: (§.)*(?<difficulty>[\\w ]+)$")
