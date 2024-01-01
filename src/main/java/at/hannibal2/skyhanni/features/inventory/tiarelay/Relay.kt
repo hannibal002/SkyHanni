@@ -5,8 +5,6 @@ import at.hannibal2.skyhanni.utils.LorenzVec
 import at.hannibal2.skyhanni.utils.StringUtils.matches
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 
-private val repoGroup = RepoPattern.group("relay.chat")
-
 enum class Relay(
     val relayName: String,
     val waypoint: LorenzVec,
@@ -50,6 +48,6 @@ enum class Relay(
         "§e[NPC] §dTia the Fairy§f: §b✆ §f§r§fThe next relay is on top of the Auction House."
     );
 
-    val chatPattern by repoGroup.pattern(relayName.takeWhile { it != ' ' }, chatMessage)
+    val chatPattern by RepoPattern.pattern("relay.chat" + relayName.takeWhile { it != ' ' }, chatMessage)
     fun checkChatMessage(string: String) = chatPattern.matches(string)
 }
