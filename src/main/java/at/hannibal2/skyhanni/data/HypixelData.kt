@@ -220,8 +220,8 @@ class HypixelData {
         var newIsland = ""
         var guesting = false
         for (line in TabListData.getTabList()) {
-            if (line.startsWith("§b§lArea: ")) {
-                newIsland = line.split(": ")[1].removeColor()
+            islandNamePattern.matchMatcher(line) {
+                newIsland = group("island")
             }
             if (line == " Status: §r§9Guest") {
                 guesting = true
