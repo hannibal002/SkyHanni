@@ -420,12 +420,12 @@ private fun getPowerDisplayPair() = when (MaxwellAPI.currentPower) {
     else ->
         when (displayConfig.displayNumbersFirst) {
             true -> listOf(
-                "${MaxwellAPI.currentPower?.power?.replace("Power","")}" +
-                    " Power §7(§6${MaxwellAPI.magicalPower}§7)" to AlignmentEnum.LEFT
+                "${MaxwellAPI.currentPower?.power?.replace("Power","")} Power " +
+                    "§7(§6${MaxwellAPI.magicalPower}§7)" to AlignmentEnum.LEFT
             )
 
             false -> listOf(
-                "Power: ${MaxwellAPI.currentPower?.power?.replace("Power","")}" +
+                "Power: ${MaxwellAPI.currentPower?.power?.replace("Power","")} " +
                     "§7(§6${MaxwellAPI.magicalPower}§7)" to AlignmentEnum.LEFT
             )
         }
