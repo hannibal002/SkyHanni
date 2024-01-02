@@ -194,15 +194,15 @@ object SackDisplay {
         if (SackAPI.gemstoneItem.isNotEmpty()) {
             newDisplay.addAsSingletonList("§7Gemstones:")
             for ((name, gem) in SackAPI.gemstoneItem) {
-                val (internalName, rough, flawed, fine, flawless, roughprice, flawedprice, fineprice, flawlessprice) = gem
+                val (internalName, rough, flawed, fine, roughprice, flawedprice, fineprice) = gem
                 newDisplay.add(buildList {
                     add(" §7- ")
                     add(internalName.getItemStack())
                     add(Renderable.optionalLink("$name: ", {
                         BazaarApi.searchForBazaarItem(name.dropLast(1))
                     }) { !NEUItems.neuHasFocus() })
-                    add(" ($rough-§a$flawed-§9$fine-§5$flawless)")
-                    val price = roughprice + flawedprice + fineprice + flawlessprice
+                    add(" ($rough-§a$flawed-§9$fine)")
+                    val price = roughprice + flawedprice + fineprice
                     totalPrice += price
                     if (config.showPrice && price != 0L) add(" §7(§6${format(price)}§7)")
                 })
