@@ -303,7 +303,11 @@ private fun getBitsDisplayPair(): List<Pair<String, AlignmentEnum>> {
     return bitsDisplay.map { it to AlignmentEnum.LEFT }
 }
 
-private fun getBitsShowWhen() = !listOf(IslandType.CATACOMBS).contains(HypixelData.skyBlockIsland)
+private fun getBitsShowWhen(): Boolean {
+    if (HypixelData.bingo) return false
+
+    return !listOf(IslandType.CATACOMBS).contains(HypixelData.skyBlockIsland)
+}
 
 private fun getCopperDisplayPair(): List<Pair<String, AlignmentEnum>> {
     val copper = getGroupFromPattern(ScoreboardData.sidebarLinesFormatted, ScoreboardPattern.copperPattern, "copper")
