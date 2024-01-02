@@ -10,14 +10,16 @@ import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.RenderUtils.renderString
 import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.TimeUtils
+import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
 class AshfangFreezeCooldown {
     private val config get() = SkyHanniMod.feature.crimsonIsle.ashfang
 
-    // TODO USE SH-REPO
-    private val cryogenicBlastPattern = "§cAshfang Follower's Cryogenic Blast hit you for (.*) damage!".toPattern()
-
+    private val cryogenicBlastPattern by RepoPattern.pattern(
+        "ashfang.freeze.cryogenic",
+        "§cAshfang Follower's Cryogenic Blast hit you for .* damage!"
+    )
     private var lastHit = 0L
 
     @SubscribeEvent
