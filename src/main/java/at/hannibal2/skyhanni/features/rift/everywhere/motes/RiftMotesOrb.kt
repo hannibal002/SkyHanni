@@ -13,14 +13,17 @@ import at.hannibal2.skyhanni.utils.LorenzUtils.round
 import at.hannibal2.skyhanni.utils.LorenzVec
 import at.hannibal2.skyhanni.utils.RenderUtils.drawDynamicText
 import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
+import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraft.util.EnumParticleTypes
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
 class RiftMotesOrb {
     private val config get() = RiftAPI.config.motesOrbs
 
-    // TODO USE SH-REPO
-    private val pattern = "§5§lORB! §r§dPicked up §r§5+.* Motes§r§d.*".toPattern()
+    private val motesPattern by RepoPattern.pattern(
+        "rift.everywhere.motesorb",
+        "§5§lORB! §r§dPicked up §r§5+.* Motes§r§d.*"
+    )
 
     private var motesOrbs = emptyList<MotesOrb>()
 
@@ -56,7 +59,7 @@ class RiftMotesOrb {
 
     @SubscribeEvent
     fun onChatMessage(event: LorenzChatEvent) {
-        pattern.matchMatcher(event.message) {
+        motesPattern.matchMatcher(event.message) {
             motesOrbs.minByOrNull { it.location.distanceToPlayer() }?.let {
                 it.pickedUp = true
             }
