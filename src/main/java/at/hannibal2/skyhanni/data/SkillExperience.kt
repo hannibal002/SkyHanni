@@ -15,16 +15,17 @@ import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
 class SkillExperience {
-    private val actionBarPattern by RepoPattern.pattern(
-        "data.skill.actionbar",
+    private val patternGroup = RepoPattern.group("data.skill")
+    private val actionBarPattern by patternGroup.pattern(
+        "actionbar",
         ".*§3\\+.* (?<skill>.*) \\((?<overflow>.*)/(?<needed>.*)\\).*"
     )
-    private val inventoryPattern by RepoPattern.pattern(
-        "data.skill.inventory",
+    private val inventoryPattern by patternGroup.pattern(
+        "inventory",
         ".* §e(?<number>.*)§6/.*"
     )
-    private val actionBarLowLevelPattern by RepoPattern.pattern(
-        "data.skill.actionbarlow",
+    private val actionBarLowLevelPattern by patternGroup.pattern(
+        "actionbarlow",
         ".*§3+(?<add>.+) (?<skill>.*) \\((?<percentage>.*)%\\).*"
     )
 

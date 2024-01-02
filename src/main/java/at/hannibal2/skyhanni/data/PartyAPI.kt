@@ -13,53 +13,54 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import kotlin.random.Random
 
 object PartyAPI {
-    private val youJoinedPartyPattern by RepoPattern.pattern(
-        "data.party.you.joined",
+    private val patternGroup = RepoPattern.group("data.party")
+    private val youJoinedPartyPattern by patternGroup.pattern(
+        "you.joined",
         "§eYou have joined (?<name>.*)'s §eparty!"
     )
-    private val othersJoinedPartyPattern by RepoPattern.pattern(
-        "data.party.others.joined",
+    private val othersJoinedPartyPattern by patternGroup.pattern(
+        "others.joined",
         "(?<name>.*) §ejoined the party\\."
     )
-    private val othersInThePartyPattern by RepoPattern.pattern(
-        "data.party.others.inparty",
+    private val othersInThePartyPattern by patternGroup.pattern(
+        "others.inparty",
         "§eYou'll be partying with: (?<names>.*)"
     )
-    private val otherLeftPattern by RepoPattern.pattern(
-        "data.party.others.left",
+    private val otherLeftPattern by patternGroup.pattern(
+        "others.left",
         "(?<name>.*) §ehas left the party\\."
     )
-    private val otherKickedPattern by RepoPattern.pattern(
-        "data.party.others.kicked",
+    private val otherKickedPattern by patternGroup.pattern(
+        "others.kicked",
         "(?<name>.*) §ehas been removed from the party\\."
     )
-    private val otherOfflineKickedPattern by RepoPattern.pattern(
-        "data.party.others.offline",
+    private val otherOfflineKickedPattern by patternGroup.pattern(
+        "others.offline",
         "§eKicked (?<name>.*) because they were offline\\."
     )
-    private val otherDisconnectedPattern by RepoPattern.pattern(
-        "data.party.others.disconnect",
+    private val otherDisconnectedPattern by patternGroup.pattern(
+        "others.disconnect",
         "(?<name>.*) §ewas removed from your party because they disconnected\\."
     )
-    private val transferPattern by RepoPattern.pattern(
-        "data.party.others.transfer",
+    private val transferPattern by patternGroup.pattern(
+        "others.transfer",
         "The party was transferred to .* because (?<name>.*) left"
     )
-    private val disbandedPattern by RepoPattern.pattern(
-        "data.party.others.disband",
+    private val disbandedPattern by patternGroup.pattern(
+        "others.disband",
         ".* §ehas disbanded the party!"
     )
-    private val kickedPattern by RepoPattern.pattern(
-        "data.party.you.kicked",
+    private val kickedPattern by patternGroup.pattern(
+        "you.kicked",
         "§eYou have been kicked from the party by .* §e"
     )
-    private val partyMembersStartPattern by RepoPattern.pattern(
-        "data.party.members.start",
+    private val partyMembersStartPattern by patternGroup.pattern(
+        "members.start",
         "§6Party Members \\(\\d+\\)"
     )
 
-    private val partyMemberListPattern by RepoPattern.pattern(
-        "data.party.members.list",
+    private val partyMemberListPattern by patternGroup.pattern(
+        "members.list",
         "Party (?:Leader|Moderators|Members): (?<names>.*)"
     )
 

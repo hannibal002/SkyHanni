@@ -14,12 +14,13 @@ import net.minecraft.item.ItemStack
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
 object GardenCropMilestones {
-    private val cropPattern by RepoPattern.pattern(
-        "data.garden.milestone.crop",
+    private val patternGroup = RepoPattern.group("data.garden.milestone")
+    private val cropPattern by patternGroup.pattern(
+        "crop",
         "§7Harvest §f(?<name>.*) §7on .*"
     )
-    val totalPattern by RepoPattern.pattern(
-        "data.garden.milestone.total",
+    val totalPattern by patternGroup.pattern(
+        "total",
         "§7Total: §a(?<name>.*)"
     )
 

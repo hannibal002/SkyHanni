@@ -36,16 +36,17 @@ object SackAPI {
 
     var inSackInventory = false
 
-    private val sackPattern by RepoPattern.pattern(
-        "data.sacks.sack",
+    private val patternGroup = RepoPattern.group("data.sacks")
+    private val sackPattern by patternGroup.pattern(
+        "sack",
         "^(.* Sack|Enchanted .* Sack)\$"
     )
-    private val numPattern by RepoPattern.pattern(
-        "data.sacks.number",
+    private val numPattern by patternGroup.pattern(
+        "number",
         "(?:(?:§[0-9a-f](?<level>I{1,3})§7:)?|(?:§7Stored:)?) (?<color>§[0-9a-f])(?<stored>[0-9.,kKmMbB]+)§7/(?<total>\\d+(?:[0-9.,]+)?[kKmMbB]?)"
     )
-    private val gemstonePattern by RepoPattern.pattern(
-        "data.sacks.gemstone",
+    private val gemstonePattern by patternGroup.pattern(
+        "gemstone",
         " §[0-9a-f](?<gemrarity>[A-z]*): §[0-9a-f](?<stored>\\d+(?:\\.\\d+)?(?:(?:,\\d+)?)+[kKmM]?)(?: §[0-9a-f]\\(\\d+(?:\\.\\d+)?(?:(?:,\\d+)?)+[kKmM]?\\))?"
     )
 

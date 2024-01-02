@@ -16,28 +16,29 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import java.util.UUID
 
 object FriendAPI {
-    private val removedFriendPattern by RepoPattern.pattern(
-        "data.friends.remove",
+    private val patternGroup = RepoPattern.group("data.friends")
+    private val removedFriendPattern by patternGroup.pattern(
+        "remove",
         ".*\n§r§eYou removed §r(?<name>.*)§e from your friends list!§r§9§m\n.*"
     )
-    private val addedFriendPattern by RepoPattern.pattern(
-        "data.friends.add",
+    private val addedFriendPattern by patternGroup.pattern(
+        "add",
         "§aYou are now friends with (?<name>.*)"
     )
-    private val noBestFriendPattern by RepoPattern.pattern(
-        "data.friends.removebest",
+    private val noBestFriendPattern by patternGroup.pattern(
+        "removebest",
         ".*\n§r(?<name>.*)§e is no longer a best friend!§r§9§m\n.*"
     )
-    private val bestFriendPattern by RepoPattern.pattern(
-        "data.friends.addbest",
+    private val bestFriendPattern by patternGroup.pattern(
+        "addbest",
         ".*\n(?<name>.*)§a is now a best friend!§r§9§m\n.*"
     )
-    private val rawNamePattern by RepoPattern.pattern(
-        "data.friends.rawname",
+    private val rawNamePattern by patternGroup.pattern(
+        "rawname",
         "\\n§eClick to view §.(?<name>.*)§e's profile"
     )
-    private val readFriendListPattern by RepoPattern.pattern(
-        "data.friends.readfriends",
+    private val readFriendListPattern by patternGroup.pattern(
+        "readfriends",
         "/viewprofile (?<uuid>.*)"
     )
 
