@@ -466,7 +466,7 @@ private fun getObjectiveDisplayPair(): List<ScoreboardElement> {
     objective += ScoreboardData.sidebarLinesFormatted.nextAfter(objective[0]) ?: "<hidden>"
 
     if (ScoreboardData.sidebarLinesFormatted.any { ScoreboardPattern.thirdObjectiveLinePattern.matches(it) }) {
-        objective += ScoreboardData.sidebarLinesFormatted.nextAfter(objective[0], 2).toString()
+        objective += ScoreboardData.sidebarLinesFormatted.nextAfter(objective[0], 2) ?: "Second objective here"
     }
 
     return objective.map { it to AlignmentEnum.LEFT }
@@ -477,9 +477,9 @@ private fun getSlayerDisplayPair(): List<ScoreboardElement> {
         (if (SlayerAPI.hasActiveSlayerQuest()) "§cSlayer" else "<hidden>") to AlignmentEnum.LEFT
     ) + (
         " §7- §e${SlayerAPI.latestSlayerCategory.trim()}" to AlignmentEnum.LEFT
-        ) + (
+    ) + (
         " §7- §e${SlayerAPI.latestSlayerProgress.trim()}" to AlignmentEnum.LEFT
-        )
+    )
 }
 
 private fun getSlayerShowWhen() = listOf(

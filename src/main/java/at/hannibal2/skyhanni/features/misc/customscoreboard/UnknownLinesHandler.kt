@@ -112,7 +112,8 @@ object UnknownLinesHandler {
             ScoreboardPattern.winterTotalDmgPattern,
             ScoreboardPattern.winterCubeDmgPattern,
             ScoreboardPattern.riftDimensionPattern,
-            RiftBloodEffigies.heartsPattern
+            RiftBloodEffigies.heartsPattern,
+            ScoreboardPattern.wtfAreThoseLinesPattern
         )
 
         unknownLines = unknownLines.filterNot { line ->
