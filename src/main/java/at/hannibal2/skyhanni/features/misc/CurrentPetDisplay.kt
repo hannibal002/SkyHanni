@@ -12,17 +12,33 @@ import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.RenderUtils.renderString
 import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.StringUtils.matches
+import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
 class CurrentPetDisplay {
     private val config get() = SkyHanniMod.feature.misc.pets
 
-    // TODO USE SH-REPO
-    private val inventoryNamePattern = "Pets( \\(\\d+/\\d+\\) )?".toPattern()
-    private val inventorySelectedPetPattern = "§7§7Selected pet: (?<pet>.*)".toPattern()
-    private val chatSpawnPattern = "§aYou summoned your §r(?<pet>.*)§r§a!".toPattern()
-    private val chatDespawnPattern = "§aYou despawned your §r.*§r§a!".toPattern()
-    private val chatPetRulePattern = "§cAutopet §eequipped your §7\\[Lvl .*] (?<pet>.*)! §a§lVIEW RULE".toPattern()
+    private val patternGroup = RepoPattern.group("misc.currentpet")
+    private val inventoryNamePattern by patternGroup.pattern(
+        "inventory.name",
+        "Pets( \\(\\d+/\\d+\\) )?"
+    )
+    private val inventorySelectedPetPattern by patternGroup.pattern(
+        "inventory.selected",
+        "§7§7Selected pet: (?<pet>.*)"
+    )
+    private val chatSpawnPattern by patternGroup.pattern(
+        "chat.spawn",
+        "§aYou summoned your §r(?<pet>.*)§r§a!"
+    )
+    private val chatDespawnPattern by patternGroup.pattern(
+        "chat.despawn",
+        "§aYou despawned your §r.*§r§a!"
+    )
+    private val chatPetRulePattern by patternGroup.pattern(
+        "chat.rule",
+        "§cAutopet §eequipped your §7\\[Lvl .*] (?<pet>.*)! §a§lVIEW RULE"
+    )
 
     @SubscribeEvent
     fun onChatMessage(event: LorenzChatEvent) {
