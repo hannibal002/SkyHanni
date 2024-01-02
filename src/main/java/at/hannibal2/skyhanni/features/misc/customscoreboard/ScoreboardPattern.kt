@@ -73,7 +73,7 @@ object ScoreboardPattern {
     private val combatSb = scoreboardGroup.group("combat")
     val magmaBossPattern by combatSb.pattern("magmaboss", "^§7Boss: §[c6e]\\d{1,3}%$")
     val damageSoakedPattern by combatSb.pattern("damagesoaked", "^§7Damage Soaked:")
-    val damagedSoakedBarPattern by combatSb.pattern("damagedSoakedBar", "^§.?(▎+)?§7(▎+)?$")
+    val damagedSoakedBarPattern by combatSb.pattern("damagedsoakedbar", "^§.?(▎+)?§7(▎+)?$")
     val killMagmasPattern by combatSb.pattern("killmagmas", "^§6Kill the Magmas:$")
     val killMagmasBarPattern by combatSb.pattern("killmagmasBar", "^§.?(▎+)?§7(▎+)?$")
     val reformingPattern by combatSb.pattern("reforming", "^§cThe boss is reforming!$")
