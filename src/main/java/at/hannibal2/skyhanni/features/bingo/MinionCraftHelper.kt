@@ -18,6 +18,7 @@ import at.hannibal2.skyhanni.utils.NumberUtil.romanToDecimalIfNecessary
 import at.hannibal2.skyhanni.utils.RenderUtils.renderStrings
 import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
+import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import io.github.moulberry.notenoughupdates.recipes.CraftingRecipe
 import net.minecraft.client.Minecraft
 import net.minecraft.item.ItemStack
@@ -27,8 +28,11 @@ import kotlin.time.Duration.Companion.seconds
 class MinionCraftHelper {
     private val config get() = SkyHanniMod.feature.event.bingo
 
-    // TODO USE SH-REPO
-    private var minionNamePattern = "(?<name>.*) Minion (?<number>.*)".toPattern()
+    private val minionNamePattern by RepoPattern.pattern(
+        "bingo.minion.name",
+        "(?<name>.*) Minion (?<number>.*)"
+    )
+
     private var display = emptyList<String>()
     private var hasMinionInInventory = false
     private var hasItemsForMinion = false
