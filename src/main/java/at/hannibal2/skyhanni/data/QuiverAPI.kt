@@ -1,5 +1,6 @@
 package at.hannibal2.skyhanni.data
 
+import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.data.jsonobjects.repo.ItemsJson
 import at.hannibal2.skyhanni.events.ConfigLoadEvent
 import at.hannibal2.skyhanni.events.InventoryFullyOpenedEvent
@@ -124,7 +125,7 @@ object QuiverAPI {
 
         // check if sound location is more than 1 block away from player
         val soundLocation = event.location
-        if (soundLocation.distanceToPlayer() > 5.0) return
+        if (soundLocation.distanceToPlayer() > SkyHanniMod.feature.dev.bowSoundDistance) return
 
         if (event.soundName == "random.bow" && holdingBow) {
             val arrowType = currentArrow ?: return
