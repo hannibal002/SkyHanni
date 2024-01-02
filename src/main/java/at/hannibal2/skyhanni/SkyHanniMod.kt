@@ -595,7 +595,7 @@ class SkyHanniMod {
         loadModule(TrevorTracker)
         loadModule(BingoCardTips())
         loadModule(GardenVisitorDropStatistics)
-        loadModule(CaptureFarmingGear())
+        loadModule(CaptureFarmingGear)
         loadModule(SackDisplay)
         loadModule(GardenStartLocation)
         loadModule(PetCandyUsedDisplay())

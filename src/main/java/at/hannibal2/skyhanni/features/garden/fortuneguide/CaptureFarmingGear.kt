@@ -18,78 +18,98 @@ import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getEnchantments
 import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.TabListData
+import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import kotlin.math.round
 import kotlin.time.Duration.Companion.days
 
-class CaptureFarmingGear {
+object CaptureFarmingGear {
     private val farmingItems get() = GardenAPI.storage?.fortune?.farmingItems
     private val outdatedItems get() = GardenAPI.storage?.fortune?.outdatedItems
 
-    // TODO USE SH-REPO
-    private val farmingLevelUpPattern = "SKILL LEVEL UP Farming .*➜(?<level>.*)".toPattern()
-    private val fortuneUpgradePattern = "You claimed the Garden Farming Fortune (?<level>.*) upgrade!".toPattern()
-    private val anitaBuffPattern = "You tiered up the Extra Farming Drops upgrade to [+](?<level>.*)%!".toPattern()
-    private val anitaMenuPattern = "§7You have: §6\\+(?<level>.*)☘ Farming Fortune".toPattern()
+    private val patternGroup = RepoPattern.group("garden.fortuneguide.capture")
+    private val farmingLevelUpPattern by patternGroup.pattern(
+        "farminglevel",
+        "SKILL LEVEL UP Farming .*➜(?<level>.*)"
+    )
+    private val fortuneUpgradePattern by patternGroup.pattern(
+        "fortuneupgrade",
+        "You claimed the Garden Farming Fortune (?<level>.*) upgrade!"
+    )
+    private val anitaBuffPattern by patternGroup.pattern(
+        "anitabuff",
+        "You tiered up the Extra Farming Drops upgrade to [+](?<level>.*)%!"
+    )
+    private val anitaMenuPattern by patternGroup.pattern(
+        "anitamenu",
+        "§7You have: §6\\+(?<level>.*)☘ Farming Fortune"
+    )
+    private val lotusUpgradePattern by patternGroup.pattern(
+        "lotusupgrade",
+        "Lotus (?<piece>.*) upgraded to [+].*☘!"
+    )
+    private val petLevelUpPattern by patternGroup.pattern(
+        "petlevelup",
+        "Your (?<pet>.*) leveled up to level .*!"
+    )
+    private val cakePattern by patternGroup.pattern(
+        "cake",
+        "(?:Big )?Yum! You (?:gain|refresh) [+]5☘ Farming Fortune for 48 hours!"
+    )
+    private val strengthPattern by patternGroup.pattern(
+        "strength",
+        " Strength: §r§c❁(?<strength>.*)"
+    )
 
-    private val lotusUpgradePattern = "Lotus (?<piece>.*) upgraded to [+].*☘!".toPattern()
-    private val petLevelUpPattern = "Your (?<pet>.*) leveled up to level .*!".toPattern()
+    private val farmingSets = arrayListOf(
+        "FERMENTO", "SQUASH", "CROPIE", "MELON", "FARM",
+        "RANCHERS", "FARMER", "RABBIT"
+    )
 
-    private val cakePattern = "(?:Big )?Yum! You (?:gain|refresh) [+]5☘ Farming Fortune for 48 hours!".toPattern()
+    fun captureFarmingGear() {
+        val farmingItems = farmingItems ?: return
+        val itemStack = InventoryUtils.getItemInHand() ?: return
 
-    companion object {
-        private val strengthPattern = " Strength: §r§c❁(?<strength>.*)".toPattern()
-        private val farmingSets = arrayListOf(
-            "FERMENTO", "SQUASH", "CROPIE", "MELON", "FARM",
-            "RANCHERS", "FARMER", "RABBIT"
-        )
-        private val farmingItems get() = GardenAPI.storage?.fortune?.farmingItems
+        val currentCrop = itemStack.getCropType()
 
-        fun captureFarmingGear() {
-            val farmingItems = farmingItems ?: return
-            val itemStack = InventoryUtils.getItemInHand() ?: return
-
-            val currentCrop = itemStack.getCropType()
-
-            if (currentCrop == null) {
-                //todo better fall back items
-                //todo Daedalus axe
-            } else {
+        if (currentCrop == null) {
+            //todo better fall back items
+            //todo Daedalus axe
+        } else {
+            for (item in FarmingItems.entries) {
+                if (item.name == currentCrop.name) {
+                    farmingItems[item] = itemStack
+                }
+            }
+        }
+        for (armor in InventoryUtils.getArmor()) {
+            if (armor == null) continue
+            val split = armor.getInternalName().asString().split("_")
+            if (split.first() in farmingSets) {
                 for (item in FarmingItems.entries) {
-                    if (item.name == currentCrop.name) {
-                        farmingItems[item] = itemStack
+                    if (item.name == split.last()) {
+                        farmingItems[item] = armor
                     }
                 }
             }
-            for (armor in InventoryUtils.getArmor()) {
-                if (armor == null) continue
-                val split = armor.getInternalName().asString().split("_")
-                if (split.first() in farmingSets) {
-                    for (item in FarmingItems.entries) {
-                        if (item.name == split.last()) {
-                            farmingItems[item] = armor
-                        }
-                    }
-                }
-            }
-            for (line in TabListData.getTabList()) {
-                strengthPattern.matchMatcher(line) {
-                    GardenAPI.storage?.fortune?.farmingStrength = group("strength").toInt()
-                }
+        }
+        for (line in TabListData.getTabList()) {
+            strengthPattern.matchMatcher(line) {
+                GardenAPI.storage?.fortune?.farmingStrength = group("strength").toInt()
             }
         }
+    }
 
-        fun reverseCarrotFortune() {
-            val storage = GardenAPI.storage?.fortune ?: return
-            storage.carrotFortune = !storage.carrotFortune
-            LorenzUtils.chat("Toggled exportable carrot fortune to: ${storage.carrotFortune}")
-        }
+    fun reverseCarrotFortune() {
+        val storage = GardenAPI.storage?.fortune ?: return
+        storage.carrotFortune = !storage.carrotFortune
+        LorenzUtils.chat("Toggled exportable carrot fortune to: ${storage.carrotFortune}")
+    }
 
-        fun reversePumpkinFortune() {
-            val storage = GardenAPI.storage?.fortune ?: return
-            storage.pumpkinFortune = !storage.pumpkinFortune
-            LorenzUtils.chat("Toggled expired pumpkin fortune to: ${storage.pumpkinFortune}")
-        }
+    fun reversePumpkinFortune() {
+        val storage = GardenAPI.storage?.fortune ?: return
+        storage.pumpkinFortune = !storage.pumpkinFortune
+        LorenzUtils.chat("Toggled expired pumpkin fortune to: ${storage.pumpkinFortune}")
     }
 
     @SubscribeEvent
