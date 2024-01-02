@@ -109,10 +109,11 @@ class JacobContestStatsSummary {
         val blocksPerSecond = (blocksBroken.toDouble() / durationInSeconds).round(2)
         val position = (percent * participants).roundToInt() + 1
         val formattedPercent = (percent * 100).round(1)
+        val startTime = TimeUtils.formatDuration((startTimeIntoContest * 1000 - 999).toLong(), showMilliSeconds = true)
 
         val unsortedList = mutableListOf<String>()
         unsortedList.add("§e§l$cropName Contest Stats")
-        unsortedList.add("§7Started §b${TimeUtils.formatDuration((startTimeIntoContest * 1000 - 999).toLong(), showMilliSeconds = true)} §7into contest")
+        unsortedList.add("§7Started §b$startTime §7into contest")
         unsortedList.add("§7Blocks Broken: §e${blocksBroken.addSeparators()}")
         unsortedList.add("§7Blocks per Second: §c$blocksPerSecond")
         if (percent == 0.0 && participants == 0)
@@ -142,7 +143,7 @@ class JacobContestStatsSummary {
             FarmingContestPhase.START -> {
                 LorenzUtils.chat("Started tracking your Jacob Contest Blocks Per Second!")
                 startTime = System.currentTimeMillis()
-                startTimeIntoContest = ((startTime.toDouble() % 3600000) - 900000) / 1000
+                startTimeIntoContest = ((startTime.toDouble() % 3600000) - 900000) / 1000 // TODO test if this breaks for non whole hr time zones (gmt+0.5 etc)
             }
 
             FarmingContestPhase.STOP -> {
@@ -150,7 +151,7 @@ class JacobContestStatsSummary {
                 val duration = System.currentTimeMillis() - startTime
                 val durationInSeconds = duration.toDouble() / 1000
                 val blocksPerSecond = (blocksBroken.toDouble() / durationInSeconds).round(2)
-                val time = TimeUtils.formatDuration(duration - 999)
+                val time = TimeUtils.formatDuration(duration - 999, showMilliSeconds = true)
                 val position = (percent * participants).roundToInt() + 1
                 val formattedPercent = (percent * 100).round(1)
 
