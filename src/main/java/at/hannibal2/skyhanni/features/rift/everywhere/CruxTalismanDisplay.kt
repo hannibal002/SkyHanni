@@ -13,14 +13,16 @@ import at.hannibal2.skyhanni.utils.NumberUtil.roundToPrecision
 import at.hannibal2.skyhanni.utils.RenderUtils.renderStringsAndItems
 import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
+import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
 object CruxTalismanDisplay {
     private val config get() = RiftAPI.config.cruxTalisman
 
-    // TODO USE SH-REPO
-    private val progressPattern =
-        ".*(?<tier>§[0-9a-z][IV1-4-]+)\\s+(?<name>§[0-9a-z]\\w+)§[0-9a-z]:\\s*(?<progress>§[0-9a-z](?:§[0-9a-z])?MAXED|§[0-9a-z]\\d+§[0-9a-z]/§[0-9a-z]\\d+).*".toPattern()
+    private val progressPattern by RepoPattern.pattern(
+        "rift.everywhere.crux.progress",
+        ".*(?<tier>§[0-9a-z][IV1-4-]+)\\s+(?<name>§[0-9a-z]\\w+)§[0-9a-z]:\\s*(?<progress>§[0-9a-z](?:§[0-9a-z])?MAXED|§[0-9a-z]\\d+§[0-9a-z]/§[0-9a-z]\\d+).*"
+    )
 
     private val partialName = "CRUX_TALISMAN"
     private var display = emptyList<List<Any>>()
