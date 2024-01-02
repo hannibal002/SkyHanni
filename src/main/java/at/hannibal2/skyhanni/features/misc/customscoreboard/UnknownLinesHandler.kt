@@ -19,14 +19,14 @@ object UnknownLinesHandler {
         )
 
         /**
-        * Dark auction will come once DarkAuction IslandType is merged
-        *
-        *    Starting in: §a0:02
-        *
-        *    'Time Left: §b11'
-        *    'Current Item:'
-        *    ' §5Hocus-Pocus Cipher'
-        */
+         * Dark auction will come once DarkAuction IslandType is merged
+         *
+         *    Starting in: §a0:02
+         *
+         *    'Time Left: §b11'
+         *    'Current Item:'
+         *    ' §5Hocus-Pocus Cipher'
+         */
 
         unknownLines = sidebarLines.toMutableList().filter { it.isNotBlank() }.map { it.removeResets() }
 
@@ -131,9 +131,9 @@ object UnknownLinesHandler {
                 ?: "Objective"
         unknownLines = unknownLines.filter { sidebarLines.nextAfter(objectiveLine) != it }
         unknownLines = unknownLines.filter {
-                sidebarLines.nextAfter(objectiveLine, 2) != it
-                    && !ScoreboardPattern.thirdObjectiveLinePattern.matches(it)
-            }
+            sidebarLines.nextAfter(objectiveLine, 2) != it
+                && !ScoreboardPattern.thirdObjectiveLinePattern.matches(it)
+        }
 
         // Remove jacobs contest
         for (i in 1..3)
