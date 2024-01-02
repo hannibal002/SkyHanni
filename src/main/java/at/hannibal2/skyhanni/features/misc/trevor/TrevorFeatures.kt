@@ -33,6 +33,7 @@ import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.TabListData
 import at.hannibal2.skyhanni.utils.getLorenzVec
+import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraft.client.Minecraft
 import net.minecraft.entity.EntityLivingBase
 import net.minecraft.entity.item.EntityArmorStand
@@ -43,14 +44,23 @@ import kotlin.time.Duration.Companion.milliseconds
 import kotlin.time.Duration.Companion.seconds
 
 object TrevorFeatures {
-    // TODO USE SH-REPO
-    private val trapperPattern =
-        "\\[NPC] Trevor: You can find your (?<rarity>.*) animal near the (?<location>.*).".toPattern()
-    private val talbotPatternAbove =
-        "The target is around (?<height>.*) blocks above, at a (?<angle>.*) degrees angle!".toPattern()
-    private val talbotPatternBelow =
-        "The target is around (?<height>.*) blocks below, at a (?<angle>.*) degrees angle!".toPattern()
-    private val locationPattern = "Zone: (?<zone>.*)".toPattern()
+    private val patternGroup = RepoPattern.group("misc.trevor")
+    private val trapperPattern by patternGroup.pattern(
+        "trapper",
+        "\\[NPC] Trevor: You can find your (?<rarity>.*) animal near the (?<location>.*)."
+    )
+    private val talbotPatternAbove by patternGroup.pattern(
+        "above",
+        "The target is around (?<height>.*) blocks above, at a (?<angle>.*) degrees angle!"
+    )
+    private val talbotPatternBelow by patternGroup.pattern(
+        "below",
+        "The target is around (?<height>.*) blocks below, at a (?<angle>.*) degrees angle!"
+    )
+    private val locationPattern by patternGroup.pattern(
+        "zone",
+        "Zone: (?<zone>.*)"
+    )
 
     private var timeUntilNextReady = 0
     private var trapperReady: Boolean = true
