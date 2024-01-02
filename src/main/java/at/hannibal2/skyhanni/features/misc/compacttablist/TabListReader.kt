@@ -17,19 +17,39 @@ object TabListReader {
 
     private val patternGroup = RepoPattern.group("misc.compacttablist")
     val usernamePattern by patternGroup.pattern(
-        "misc.compacttablist.username",
+        "username",
         "^\\[(?<sblevel>\\d+)] (?:\\[\\w+] )?(?<username>\\w+)"
     )
+    private val godPotPattern by patternGroup.pattern(
+        "effects.godpot",
+        "You have a God Potion active! (?<timer>[\\w ]+)"
+    )
+    private val activeEffectPattern by patternGroup.pattern(
+        "effects.active",
+        "Active Effects(?:§.)*(?:\\n(?:§.)*§7.+)*"
+    )
+    private val effectCountPattern by patternGroup.pattern(
+        "effects.count",
+        "You have (?<effectCount>[0-9]+) active effect"
+    )
+    private val cookiePattern by patternGroup.pattern(
+        "cookie",
+        "Cookie Buff(?:§.)*(?:\\n(§.)*§7.+)*"
+    )
+    private val dungeonBuffPattern by patternGroup.pattern(
+        "dungeonbuff",
+        "Dungeon Buffs(?:§.)*(?:\\n(§.)*§7.+)*"
+    )
+    private val upgradesPattern by patternGroup.pattern(
+        "upgrades",
+        "(?<firstPart>§e[A-Za-z ]+)(?<secondPart> §f[\\w ]+)"
+    )
+    private val tabListSPattern by patternGroup.pattern(
+        "sformatting",
+        "(?i)§S"
+    )
 
-    // TODO USE SH-REPO
     var hypixelAdvertisingString = "HYPIXEL.NET"
-    private val godPotPattern = "You have a God Potion active! (?<timer>[\\w ]+)".toPattern()
-    private val activeEffectPattern = "Active Effects(?:§.)*(?:\\n(?:§.)*§7.+)*".toPattern()
-    private val effectCountPattern = "You have (?<effectCount>[0-9]+) active effect".toPattern()
-    private val cookiePattern = "Cookie Buff(?:§.)*(?:\\n(§.)*§7.+)*".toPattern()
-    private val dungeonBuffPattern = "Dungeon Buffs(?:§.)*(?:\\n(§.)*§7.+)*".toPattern()
-    private val upgradesPattern = "(?<firstPart>§e[A-Za-z ]+)(?<secondPart> §f[\\w ]+)".toPattern()
-    private val tabListSPattern = "(?i)§S".toPattern()
 
     val renderColumns = mutableListOf<RenderColumn>()
 
