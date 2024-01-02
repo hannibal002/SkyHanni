@@ -5,6 +5,7 @@ import at.hannibal2.skyhanni.events.LorenzChatEvent
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
+import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
 class CompactBingoChat {
@@ -15,19 +16,28 @@ class CompactBingoChat {
     private var inCollectionLevelUp = false
     private var collectionLevelUpLastLine: String? = null
     private var newArea = 0//0 = nothing, 1 = after first message, 2 = after second message
-    private val healthPattern = " {3}§r§7§8\\+§a.* §c❤ Health".toPattern()
-    private val strengthPattern = " {3}§r§7§8\\+§a. §c❁ Strength".toPattern()
 
-    // TODO USE SH-REPO
+    private val patternGroup = RepoPattern.group("bingo.compactchat")
+    private val healthPattern by patternGroup.pattern(
+        "health",
+        " {3}§r§7§8\\+§a.* §c❤ Health"
+    )
+    private val strengthPattern by patternGroup.pattern(
+        "strength",
+        " {3}§r§7§8\\+§a. §c❁ Strength"
+    )
+    private val borderPattern by patternGroup.pattern(
+        "border",
+        "§[e3]§l▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬"
+    )
+
     @SubscribeEvent
     fun onChatMessage(event: LorenzChatEvent) {
         if (!config.enabled) return
         if (!LorenzUtils.isBingoProfile && !config.outsideBingo) return
 
         val message = event.message
-        if (message == "§3§l▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬" ||
-            message == "§e§l▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬"
-        ) {
+        borderPattern.matchMatcher(message) {
             inSkillLevelUp = false
             inSkyBlockLevelUp = false
             inCollectionLevelUp = false
@@ -43,6 +53,7 @@ class CompactBingoChat {
         if (onNewAreaDiscovered(message)) event.blockedReason = "compact_new_area_discovered"
     }
 
+    // TODO USE SH-REPO
     private fun onSkillLevelUp(message: String): Boolean {
         if (message.startsWith("  §r§b§lSKILL LEVEL UP ")) {
             inSkillLevelUp = true
@@ -72,7 +83,7 @@ class CompactBingoChat {
                 return true
             }
 
-            // No Bazaar and Community Shopin bingo
+            // No Bazaar and Community Shop in bingo
             if (message == "   §r§7§6Access to Bazaar") return true
             if (message == "   §r§7§bAccess to Community Shop") return true
 
