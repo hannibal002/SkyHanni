@@ -130,7 +130,7 @@ object TrevorTracker {
     @SubscribeEvent
     fun onRenderOverlay(event: GuiRenderEvent.GuiOverlayRenderEvent) {
         if (!shouldDisplay()) return
-        config.position.renderStringsAndItems(display, posLabel = "Frozen Treasure Tracker")
+        config.position.renderStringsAndItems(display, posLabel = "Trevor Tracker")
     }
 
     private fun shouldDisplay(): Boolean {
