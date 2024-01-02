@@ -496,7 +496,8 @@ private fun getQuiverDisplayPair(): List<ScoreboardElement> {
     if (QuiverAPI.currentArrow == QuiverArrowType.NONE) return listOf("No Arrows selected" to AlignmentEnum.LEFT)
     return when (displayConfig.displayNumbersFirst) {
         true -> listOf("${QuiverAPI.currentAmount.addSeparators()} ${QuiverAPI.currentArrow?.arrow} ")
-        false -> listOf("§f${QuiverAPI.currentArrow?.arrow} ${QuiverAPI.currentAmount.addSeparators()} Arrows")
+        false -> listOf("§f${QuiverAPI.currentArrow?.arrow?.replace("Arrow", "")}: " +
+            "${QuiverAPI.currentAmount.addSeparators()} Arrows")
     }.map { it to AlignmentEnum.LEFT }
 }
 
