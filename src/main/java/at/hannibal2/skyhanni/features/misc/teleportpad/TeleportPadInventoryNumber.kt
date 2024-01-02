@@ -7,6 +7,7 @@ import at.hannibal2.skyhanni.events.RenderInventoryItemTipEvent
 import at.hannibal2.skyhanni.utils.ItemUtils.name
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
+import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
 class TeleportPadInventoryNumber {
@@ -60,8 +61,10 @@ class TeleportPadInventoryNumber {
 
     private var inTeleportPad = false
 
-    // TODO USE SH-REPO
-    private val pattern = "§.(?<number>.*) teleport pad".toPattern()
+    private val padNumberPattern by RepoPattern.pattern(
+        "misc.teleportpad.number",
+        "§.(?<number>.*) teleport pad"
+    )
 
     @SubscribeEvent
     fun onInventoryOpen(event: InventoryFullyOpenedEvent) {
@@ -76,7 +79,7 @@ class TeleportPadInventoryNumber {
 
         val name = event.stack.name?.lowercase() ?: return
 
-        pattern.matchMatcher(name) {
+        padNumberPattern.matchMatcher(name) {
             val text = group("number")
             numbers[text]?.let {
                 event.stackTip = "$it"
