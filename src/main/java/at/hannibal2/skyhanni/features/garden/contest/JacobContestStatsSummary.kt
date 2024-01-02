@@ -8,12 +8,12 @@ import at.hannibal2.skyhanni.events.ScoreboardChangeEvent
 import at.hannibal2.skyhanni.events.TabListUpdateEvent
 import at.hannibal2.skyhanni.features.garden.GardenAPI
 import at.hannibal2.skyhanni.utils.LorenzUtils
-import at.hannibal2.skyhanni.utils.LorenzUtils.addAsSingletonList
 import at.hannibal2.skyhanni.utils.LorenzUtils.round
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
+import at.hannibal2.skyhanni.utils.NumberUtil.addSuffix
 import at.hannibal2.skyhanni.utils.NumberUtil.formatNumber
 import at.hannibal2.skyhanni.utils.NumberUtil.format
-import at.hannibal2.skyhanni.utils.RenderUtils.renderStringsAndItems
+import at.hannibal2.skyhanni.utils.RenderUtils.renderStrings
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.TimeUtils
@@ -30,7 +30,7 @@ class JacobContestStatsSummary {
     private var participants = 0
     private var medalColor = ""
     private var predictedScore = 0L
-    private var contestStats = emptyList<List<Any>>()
+    private var contestStats = mutableListOf<String>()
 
     private val tabContestPattern by RepoPattern.pattern(
         "garden.jacob.contest.tab.data",
@@ -102,7 +102,7 @@ class JacobContestStatsSummary {
         }
 
     fun update() {
-        contestStats = emptyList()
+        contestStats.clear()
         val cropName = FarmingContestAPI.contestCrop?.cropName
         val duration = System.currentTimeMillis() - startTime
         val durationInSeconds = duration.toDouble() / 1000
@@ -110,22 +110,20 @@ class JacobContestStatsSummary {
         val position = (percent * participants).roundToInt() + 1
         val formattedPercent = (percent * 100).round(1)
 
-        val unsortedList = buildList<List<Any>> {
-            addAsSingletonList("§e§l$cropName Contest Stats")
-            addAsSingletonList("§7Started §b${TimeUtils.formatDuration((startTimeIntoContest * 1000 - 999).toLong(), showMilliSeconds = true)} §7into contest")
-            addAsSingletonList("§7Blocks Broken: §e${blocksBroken.addSeparators()}")
-            addAsSingletonList("§7Blocks per Second: §c$blocksPerSecond")
-            if (percent == 0.0 && participants == 0)
-                addAsSingletonList("§7Est. Position: §eNo data yet")
-            else addAsSingletonList("§7Est. Position: $medalColor$position §7(Top $medalColor$formattedPercent% §7◆ ${format(participants)})")
-            addAsSingletonList("§7Predicted Score: §e${predictedScore.addSeparators()}")
-        }
+        val unsortedList = mutableListOf<String>()
+        unsortedList.add("§e§l$cropName Contest Stats")
+        unsortedList.add("§7Started §b${TimeUtils.formatDuration((startTimeIntoContest * 1000 - 999).toLong(), showMilliSeconds = true)} §7into contest")
+        unsortedList.add("§7Blocks Broken: §e${blocksBroken.addSeparators()}")
+        unsortedList.add("§7Blocks per Second: §c$blocksPerSecond")
+        if (percent == 0.0 && participants == 0)
+            unsortedList.add("§7Est. Position: §eNo data yet")
+        else unsortedList.add("§7Est. Position: $medalColor${position.addSuffix()} §7(Top $medalColor$formattedPercent% §7◆ ${format(participants)})")
+        unsortedList.add("§7Predicted Score: §e${predictedScore.addSeparators()}")
 
-        val sortedList = mutableListOf<List<Any>>()
+
         for (index in config.text) {
-            sortedList.add(unsortedList[index.ordinal])
+            contestStats.add(unsortedList[index.ordinal])
         }
-        contestStats = sortedList
     }
 
     @SubscribeEvent
@@ -133,7 +131,7 @@ class JacobContestStatsSummary {
         if (!isEnabled()) return
         if (!FarmingContestAPI.inContest) return
 
-        config.pos.renderStringsAndItems(contestStats, posLabel = "Jacob Contest Stats")
+        config.pos.renderStrings(contestStats, 2, "Jacob Contest Stats")
     }
 
     @SubscribeEvent
