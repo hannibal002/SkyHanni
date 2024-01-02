@@ -64,7 +64,7 @@ object MaxwellAPI {
                 for (line in lore) {
                     inventoryPowerPattern.matchMatcher(line) {
                         val power = group("power")
-                        currentPower =MaxwellPowers.entries.find {power.contains(it.power)}
+                        currentPower = MaxwellPowers.entries.find { power.contains(it.power) }
                         savePower(currentPower)
                     }
                     inventoryMPPattern.matchMatcher(line) {
