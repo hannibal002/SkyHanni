@@ -225,7 +225,10 @@ object Commands {
             "Resets the Sea Creature Tracker"
         ) { SeaCreatureTracker.resetCommand(it) }
         registerCommand0("shcalccrop", "Calculate how many crops need to be farmed between different crop milestones.", {
-            FarmingMilestoneCommand.onCommand(it.getOrNull(0), it.getOrNull(1), it.getOrNull(2))
+            FarmingMilestoneCommand.onCommand(it.getOrNull(0), it.getOrNull(1), it.getOrNull(2), false)
+        }, FarmingMilestoneCommand::onComplete)
+        registerCommand0("shcalccroptime", "Calculate how long you need to farm crops between different crop milestones.", {
+            FarmingMilestoneCommand.onCommand(it.getOrNull(0), it.getOrNull(1), it.getOrNull(2), true)
         }, FarmingMilestoneCommand::onComplete)
     }
 

@@ -2,13 +2,15 @@ package at.hannibal2.skyhanni.features.garden
 
 import at.hannibal2.skyhanni.data.GardenCropMilestones
 import at.hannibal2.skyhanni.data.GardenCropMilestones.getCounter
+import at.hannibal2.skyhanni.features.garden.farming.GardenCropSpeed.getSpeed
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
+import at.hannibal2.skyhanni.utils.TimeUtils
 import net.minecraft.command.CommandBase
 
 object FarmingMilestoneCommand {
 
-    fun onCommand(crop: String?, current: String?, target: String?) {
+    fun onCommand(crop: String?, current: String?, target: String?, needsTime: Boolean) {
         if (crop == null) {
             LorenzUtils.chat("No crop type entered")
             return
@@ -25,16 +27,16 @@ object FarmingMilestoneCommand {
         if (currentMilestone == null) {
             val currentProgress = enteredCrop.getCounter()
             val currentCropMilestone = GardenCropMilestones.getTierForCropCount(currentProgress, enteredCrop) + 1
-            val cropsNeeded = GardenCropMilestones.getCropsForTier(currentCropMilestone, enteredCrop) - currentProgress
+            val output = (GardenCropMilestones.getCropsForTier(currentCropMilestone, enteredCrop) - currentProgress).formatOutput(needsTime, enteredCrop)
 
-            LorenzUtils.chat("§a${enteredCrop.cropName} needed for you to reach the next milestone ($currentCropMilestone) is ${cropsNeeded.addSeparators()}")
+            LorenzUtils.chat("§7$output needed for you to reach the next milestone")
             return
         }
 
         if (targetMilestone == null) {
-            val cropsNeeded = GardenCropMilestones.getCropsForTier(currentMilestone, enteredCrop)
+            val output = GardenCropMilestones.getCropsForTier(currentMilestone, enteredCrop).formatOutput(needsTime, enteredCrop)
 
-            LorenzUtils.chat("§a${enteredCrop.cropName} needed to reach milestone $currentMilestone is ${cropsNeeded.addSeparators()}")
+            LorenzUtils.chat("§7$output needed for milestone §7$currentMilestone")
             return
         }
         if (currentMilestone >= targetMilestone) {
@@ -44,9 +46,9 @@ object FarmingMilestoneCommand {
 
         val currentAmount = GardenCropMilestones.getCropsForTier(currentMilestone, enteredCrop)
         val targetAmount = GardenCropMilestones.getCropsForTier(targetMilestone, enteredCrop)
-        val cropsNeeded = targetAmount - currentAmount
+        val output = (targetAmount - currentAmount).formatOutput(needsTime, enteredCrop)
 
-        LorenzUtils.chat("§a${enteredCrop.cropName} needed to reach milestone $targetMilestone from milestone $currentMilestone is ${cropsNeeded.addSeparators()}")
+        LorenzUtils.chat("§7$output needed for milestone §7$currentMilestone §a-> §7$targetMilestone")
     }
 
     fun onComplete(strings: Array<String>): List<String> {
@@ -71,5 +73,12 @@ object FarmingMilestoneCommand {
         if (result > 46) result = 46
 
         return result
+    }
+
+    private fun Long.formatOutput(needsTime: Boolean, crop: CropType): String {
+        if (!needsTime) return "${this.addSeparators()} §a${crop.cropName}"
+        val speed = crop.getSpeed() ?: -1
+        val missingTimeSeconds = this / speed
+        return "${TimeUtils.formatDuration(missingTimeSeconds * 1000)}§a"
     }
 }
