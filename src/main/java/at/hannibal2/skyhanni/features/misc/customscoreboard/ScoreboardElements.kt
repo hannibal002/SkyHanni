@@ -318,7 +318,7 @@ private fun getCopperDisplayPair(): List<Pair<String, AlignmentEnum>> {
 
 private fun getCopperShowWhen() = listOf(IslandType.GARDEN).contains(HypixelData.skyBlockIsland)
 
-private fun getGemsDisplayPair(): List<Pair<String, AlignmentEnum> > {
+private fun getGemsDisplayPair(): List<Pair<String, AlignmentEnum>> {
     val gems = getGroupFromPattern(TabListData.getTabList(), ScoreboardPattern.gemsPattern, "gems")
 
     return when {
@@ -344,8 +344,9 @@ private fun getHeatShowWhen() = listOf(IslandType.CRYSTAL_HOLLOWS).contains(Hypi
     && ScoreboardData.sidebarLinesFormatted.any { ScoreboardPattern.heatPattern.matches(it) }
 
 private fun getNorthStarsDisplayPair(): List<Pair<String, AlignmentEnum>> {
-    val northStars = getGroupFromPattern(ScoreboardData.sidebarLinesFormatted, ScoreboardPattern.northstarsPattern, "northstars")
-        .formatNum()
+    val northStars =
+        getGroupFromPattern(ScoreboardData.sidebarLinesFormatted, ScoreboardPattern.northstarsPattern, "northstars")
+            .formatNum()
 
     return when {
         informationFilteringConfig.hideEmptyLines && northStars == "0" -> listOf("<hidden>")
@@ -354,7 +355,8 @@ private fun getNorthStarsDisplayPair(): List<Pair<String, AlignmentEnum>> {
     }.map { it to AlignmentEnum.LEFT }
 }
 
-private fun getNorthStarsShowWhen() = ScoreboardData.sidebarLinesFormatted.any { ScoreboardPattern.northstarsPattern.matches(it) }
+private fun getNorthStarsShowWhen() =
+    ScoreboardData.sidebarLinesFormatted.any { ScoreboardPattern.northstarsPattern.matches(it) }
 
 private fun getEmptyLineDisplayPair() = listOf("<empty>" to AlignmentEnum.LEFT)
 
@@ -437,13 +439,16 @@ private fun getCookieDisplayPair(): List<Pair<String, AlignmentEnum>> {
     }
 }
 
-private fun getCookieShowWhen() = when (informationFilteringConfig.hideEmptyLines) {
-    true -> CustomScoreboardUtils.getTablistFooter().split("\n").any {
-        CustomScoreboardUtils.getTablistFooter().split("\n").nextAfter("§d§lCookie Buff")?.contains(it)
-            ?: false
-    }
+private fun getCookieShowWhen(): Boolean {
+    if (HypixelData.bingo) return false
 
-    false -> true
+    return when (informationFilteringConfig.hideEmptyLines) {
+        true -> CustomScoreboardUtils.getTablistFooter().split("\n").any {
+            CustomScoreboardUtils.getTablistFooter().split("\n").nextAfter("§d§lCookie Buff")?.contains(it)
+                ?: false
+        }
+        false -> true
+    }
 }
 
 private fun getObjectiveDisplayPair(): List<Pair<String, AlignmentEnum>> {
@@ -453,7 +458,7 @@ private fun getObjectiveDisplayPair(): List<Pair<String, AlignmentEnum>> {
 
     objective += ScoreboardData.sidebarLinesFormatted.nextAfter(objective[0]) ?: "<hidden>"
 
-    if (ScoreboardData.sidebarLinesFormatted.any { ScoreboardPattern.thirdObjectiveLinePattern.matches(it) }){
+    if (ScoreboardData.sidebarLinesFormatted.any { ScoreboardPattern.thirdObjectiveLinePattern.matches(it) }) {
         objective += ScoreboardData.sidebarLinesFormatted.nextAfter(objective[0], 2).toString()
     }
 
