@@ -23,12 +23,19 @@ import kotlin.time.Duration
 
 class BingoCardReader {
     private val config get() = SkyHanniMod.feature.event.bingo.bingoCard
-
-    private val percentagePattern by RepoPattern.pattern("bingo.card.percentage", " {2}§8Top §.(?<percentage>.*)%")
-
-    // TODO USE SH-REPO
-    private val goalCompletePattern = "§6§lBINGO GOAL COMPLETE! §r§e(?<name>.*)".toPattern()
-    private val personalHiddenGoalPattern = ".*§7§eThe next hint will unlock in (?<time>.*)".toPattern()
+    private val patternGroup = RepoPattern.group("bingo.card")
+    private val percentagePattern by patternGroup.pattern(
+        "percentage",
+        " {2}§8Top §.(?<percentage>.*)%"
+    )
+    private val goalCompletePattern by patternGroup.pattern(
+        "goalcomplete",
+        "§6§lBINGO GOAL COMPLETE! §r§e(?<name>.*)"
+    )
+    private val personalHiddenGoalPattern by patternGroup.pattern(
+        "hiddengoal",
+        ".*§7§eThe next hint will unlock in (?<time>.*)"
+    )
 
     @SubscribeEvent
     fun onInventoryOpen(event: InventoryUpdatedEvent) {
