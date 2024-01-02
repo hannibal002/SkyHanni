@@ -419,13 +419,15 @@ private fun getPowerDisplayPair() = when (MaxwellAPI.currentPower) {
     null -> listOf("§cOpen \"Your Bags\"!" to AlignmentEnum.LEFT)
     else ->
         when (displayConfig.displayNumbersFirst) {
-            true -> when (MaxwellAPI.currentPower?.power?.endsWith("Power")) {
-                true -> listOf("${MaxwellAPI.currentPower?.power} §7(§6${MaxwellAPI.magicalPower}§7)§f" to AlignmentEnum.LEFT)
-                false -> listOf("${MaxwellAPI.currentPower?.power} §7(§6${MaxwellAPI.magicalPower}§7)§f Power" to AlignmentEnum.LEFT)
-                null -> listOf("${MaxwellAPI.currentPower?.power} §7(§6${MaxwellAPI.magicalPower}§7)§f Power" to AlignmentEnum.LEFT)
-            }
+            true -> listOf(
+                "${MaxwellAPI.currentPower?.power?.replace("Power","")}" +
+                    " Power §7(§6${MaxwellAPI.magicalPower}§7)" to AlignmentEnum.LEFT
+            )
 
-            false -> listOf("Power: ${MaxwellAPI.currentPower?.power} §7(§6${MaxwellAPI.magicalPower}§7)" to AlignmentEnum.LEFT)
+            false -> listOf(
+                "Power: ${MaxwellAPI.currentPower?.power?.replace("Power","")}" +
+                    "§7(§6${MaxwellAPI.magicalPower}§7)" to AlignmentEnum.LEFT
+            )
         }
 }
 
