@@ -56,7 +56,7 @@ object ScoreboardPattern {
     private val miningSb = scoreboardGroup.group("mining")
     val powderPattern by miningSb.pattern("powder", "(§.)*᠅ §f(Gemstone|Mithril)( Powder)?§f:.*$")
     val windCompassPattern by miningSb.pattern("windcompass", "§9Wind Compass$")
-    val windCompassArrowPattern by miningSb.pattern("windcompassarrow", "((\\s*)?(§[a-zA-Z0-9]+)?[⋖⋗≈]?)+$")
+    val windCompassArrowPattern by miningSb.pattern("windcompassarrow", "([§a-zA-Z0-9⋖⋗≈]+)(\\s)+")
     val miningEventPattern by miningSb.pattern("miningevent", "^Event: §.§L.*$")
     val miningEventZonePattern by miningSb.pattern("miningeventzone", "^Zone: §.*$")
     val raffleUselessPattern by miningSb.pattern("raffleuseless", "^(Find tickets on the|ground and bring them|to the raffle box)$")
