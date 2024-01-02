@@ -10,16 +10,22 @@ import at.hannibal2.skyhanni.utils.LorenzUtils.addAsSingletonList
 import at.hannibal2.skyhanni.utils.LorenzUtils.editCopy
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.RenderUtils.renderStringsAndItems
+import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import java.util.regex.Matcher
 
 object TrevorTracker {
     private val config get() = SkyHanniMod.feature.misc.trevorTheTrapper
 
-    // TODO USE SH-REPO
-    private val selfKillMobPattern =
-        "§aYour mob died randomly, you are rewarded §r§5(?<pelts>.*) pelts§r§a.".toPattern()
-    private val killMobPattern = "§aKilling the animal rewarded you §r§5(?<pelts>.*) pelts§r§a.".toPattern()
+    private val patternGroup = RepoPattern.group("misc.trevor")
+    private val selfKillMobPattern by patternGroup.pattern(
+        "selfkill",
+        "§aYour mob died randomly, you are rewarded §r§5(?<pelts>.*) pelts§r§a."
+    )
+    private val killMobPattern by patternGroup.pattern(
+        "kill",
+        "§aKilling the animal rewarded you §r§5(?<pelts>.*) pelts§r§a."
+    )
 
     private var display = emptyList<List<Any>>()
 
