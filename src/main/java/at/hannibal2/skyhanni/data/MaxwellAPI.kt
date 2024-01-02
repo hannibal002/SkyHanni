@@ -68,8 +68,9 @@ object MaxwellAPI {
                         savePower(currentPower)
                     }
                     inventoryMPPattern.matchMatcher(line) {
-                        val mp = group("mp").replace(",", "").toIntOrNull()
-                        saveMP(mp)
+                        val mp = group("mp")
+                        magicalPower = mp.replace(",", "").toIntOrNull() ?: return
+                        saveMP(magicalPower)
                     }
                 }
             }
