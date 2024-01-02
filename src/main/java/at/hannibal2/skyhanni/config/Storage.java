@@ -122,7 +122,15 @@ public class Storage {
         public String currentPet = "";
 
         @Expose
-        public MaxwellPowers currentPower = null;
+        public MaxwellPowerStorage maxwell = new MaxwellPowerStorage();
+
+        public static class MaxwellPowerStorage {
+            @Expose
+            public MaxwellPowers currentPower = null;
+
+            @Expose
+            public int magicalPower = -1;
+        }
 
         @Expose
         public ArrowsStorage arrows = new ArrowsStorage();

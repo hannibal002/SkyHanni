@@ -5,6 +5,7 @@ import at.hannibal2.skyhanni.data.BitsAPI
 import at.hannibal2.skyhanni.data.HypixelData
 import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.data.MaxwellAPI
+import at.hannibal2.skyhanni.data.MaxwellPowers
 import at.hannibal2.skyhanni.data.MayorAPI
 import at.hannibal2.skyhanni.data.PartyAPI
 import at.hannibal2.skyhanni.data.PurseAPI
@@ -38,7 +39,7 @@ var unknownLines = listOf<String>()
 var amountOfUnknownLines = 0
 
 enum class ScoreboardElements(
-    private val displayPair: Supplier<List<Pair<String, AlignmentEnum>>>,
+    private val displayPair: Supplier<List<ScoreboardElement>>,
     private val showWhen: () -> Boolean,
     private val configLine: String
 ) {
@@ -196,7 +197,7 @@ enum class ScoreboardElements(
         return configLine
     }
 
-    fun getPair(): List<Pair<String, AlignmentEnum>> {
+    fun getPair(): List<ScoreboardElement> {
         return try {
             displayPair.get()
         } catch (e: NoSuchElementException) {
@@ -222,7 +223,7 @@ private fun getTitleDisplayPair() = when (displayConfig.titleAndFooter.useHypixe
 private fun getProfileDisplayPair() =
     listOf(CustomScoreboardUtils.getProfileTypeSymbol() + HypixelData.profileName.firstLetterUppercase() to AlignmentEnum.LEFT)
 
-private fun getPurseDisplayPair(): List<Pair<String, AlignmentEnum>> {
+private fun getPurseDisplayPair(): List<ScoreboardElement> {
     var purse = PurseAPI.currentPurse.toString().formatNum()
 
     val earned = getGroupFromPattern(ScoreboardData.sidebarLinesFormatted, PurseAPI.pursePattern, "earned")
@@ -241,7 +242,7 @@ private fun getPurseDisplayPair(): List<Pair<String, AlignmentEnum>> {
 
 private fun getPurseShowWhen() = !listOf(IslandType.THE_RIFT).contains(HypixelData.skyBlockIsland)
 
-private fun getMotesDisplayPair(): List<Pair<String, AlignmentEnum>> {
+private fun getMotesDisplayPair(): List<ScoreboardElement> {
     val motes = getGroupFromPattern(ScoreboardData.sidebarLinesFormatted, ScoreboardPattern.motesPattern, "motes")
         .formatNum()
 
@@ -254,7 +255,7 @@ private fun getMotesDisplayPair(): List<Pair<String, AlignmentEnum>> {
 
 private fun getMotesShowWhen() = listOf(IslandType.THE_RIFT).contains(HypixelData.skyBlockIsland)
 
-private fun getBankDisplayPair(): List<Pair<String, AlignmentEnum>> {
+private fun getBankDisplayPair(): List<ScoreboardElement> {
     val bank = getGroupFromPattern(TabListData.getTabList(), ScoreboardPattern.bankPattern, "bank")
 
     return when {
@@ -266,7 +267,7 @@ private fun getBankDisplayPair(): List<Pair<String, AlignmentEnum>> {
 
 private fun getBankShowWhen() = !listOf(IslandType.THE_RIFT).contains(HypixelData.skyBlockIsland)
 
-private fun getBitsDisplayPair(): List<Pair<String, AlignmentEnum>> {
+private fun getBitsDisplayPair(): List<ScoreboardElement> {
     val bits = if (BitsAPI.bits == -1) {
         "0"
     } else {
@@ -309,7 +310,7 @@ private fun getBitsShowWhen(): Boolean {
     return !listOf(IslandType.CATACOMBS).contains(HypixelData.skyBlockIsland)
 }
 
-private fun getCopperDisplayPair(): List<Pair<String, AlignmentEnum>> {
+private fun getCopperDisplayPair(): List<ScoreboardElement> {
     val copper = getGroupFromPattern(ScoreboardData.sidebarLinesFormatted, ScoreboardPattern.copperPattern, "copper")
         .formatNum()
 
@@ -322,7 +323,7 @@ private fun getCopperDisplayPair(): List<Pair<String, AlignmentEnum>> {
 
 private fun getCopperShowWhen() = listOf(IslandType.GARDEN).contains(HypixelData.skyBlockIsland)
 
-private fun getGemsDisplayPair(): List<Pair<String, AlignmentEnum>> {
+private fun getGemsDisplayPair(): List<ScoreboardElement> {
     val gems = getGroupFromPattern(TabListData.getTabList(), ScoreboardPattern.gemsPattern, "gems")
 
     return when {
@@ -334,7 +335,7 @@ private fun getGemsDisplayPair(): List<Pair<String, AlignmentEnum>> {
 
 private fun getGemsShowWhen() = !listOf(IslandType.THE_RIFT, IslandType.CATACOMBS).contains(HypixelData.skyBlockIsland)
 
-private fun getHeatDisplayPair(): List<Pair<String, AlignmentEnum>> {
+private fun getHeatDisplayPair(): List<ScoreboardElement> {
     val heat = getGroupFromPattern(ScoreboardData.sidebarLinesFormatted, ScoreboardPattern.heatPattern, "heat")
 
     return when {
@@ -347,7 +348,7 @@ private fun getHeatDisplayPair(): List<Pair<String, AlignmentEnum>> {
 private fun getHeatShowWhen() = listOf(IslandType.CRYSTAL_HOLLOWS).contains(HypixelData.skyBlockIsland)
     && ScoreboardData.sidebarLinesFormatted.any { ScoreboardPattern.heatPattern.matches(it) }
 
-private fun getNorthStarsDisplayPair(): List<Pair<String, AlignmentEnum>> {
+private fun getNorthStarsDisplayPair(): List<ScoreboardElement> {
     val northStars =
         getGroupFromPattern(ScoreboardData.sidebarLinesFormatted, ScoreboardPattern.northstarsPattern, "northstars")
             .formatNum()
@@ -393,7 +394,7 @@ private fun getDateDisplayPair() =
     listOf(SkyBlockTime.now().formatted(yearElement = false, hoursAndMinutesElement = false) to AlignmentEnum.LEFT)
 
 
-private fun getTimeDisplayPair(): List<Pair<String, AlignmentEnum>> {
+private fun getTimeDisplayPair(): List<ScoreboardElement> {
     var symbol = getGroupFromPattern(ScoreboardData.sidebarLinesFormatted, ScoreboardPattern.timePattern, "symbol")
     if (symbol == "0") symbol = ""
     return listOf(
@@ -402,7 +403,7 @@ private fun getTimeDisplayPair(): List<Pair<String, AlignmentEnum>> {
     )
 }
 
-private fun getLobbyDisplayPair(): List<Pair<String, AlignmentEnum>> {
+private fun getLobbyDisplayPair(): List<ScoreboardElement> {
     val lobbyCode = getGroupFromPattern(
         ScoreboardData.sidebarLinesFormatted,
         ScoreboardPattern.lobbyCodePattern,
@@ -410,28 +411,27 @@ private fun getLobbyDisplayPair(): List<Pair<String, AlignmentEnum>> {
     )
 
     val displayValue = if (lobbyCode == "0") "<hidden>" else "§8$lobbyCode"
-
     return listOf(displayValue to AlignmentEnum.LEFT)
-
 }
 
 private fun getPowerDisplayPair() = when (MaxwellAPI.currentPower) {
-    null -> listOf("§c§lVisit Maxwell!" to AlignmentEnum.LEFT)
+    MaxwellPowers.UNKNOWN -> listOf("§cOpen \"Your Bags\"!" to AlignmentEnum.LEFT)
+    null -> listOf("§cOpen \"Your Bags\"!" to AlignmentEnum.LEFT)
     else ->
         when (displayConfig.displayNumbersFirst) {
             true -> when (MaxwellAPI.currentPower?.power?.endsWith("Power")) {
-                true -> listOf("${MaxwellAPI.currentPower?.power}" to AlignmentEnum.LEFT)
-                false -> listOf("${MaxwellAPI.currentPower?.power} Power" to AlignmentEnum.LEFT)
-                null -> listOf("${MaxwellAPI.currentPower?.power} Power" to AlignmentEnum.LEFT)
+                true -> listOf("${MaxwellAPI.currentPower?.power} §7(§6${MaxwellAPI.magicalPower}§7)§f" to AlignmentEnum.LEFT)
+                false -> listOf("${MaxwellAPI.currentPower?.power} §7(§6${MaxwellAPI.magicalPower}§7)§f Power" to AlignmentEnum.LEFT)
+                null -> listOf("${MaxwellAPI.currentPower?.power} §7(§6${MaxwellAPI.magicalPower}§7)§f Power" to AlignmentEnum.LEFT)
             }
 
-            false -> listOf("Power: ${MaxwellAPI.currentPower?.power}" to AlignmentEnum.LEFT)
+            false -> listOf("Power: ${MaxwellAPI.currentPower?.power} §7(§6${MaxwellAPI.magicalPower}§7)" to AlignmentEnum.LEFT)
         }
 }
 
 private fun getPowerShowWhen() = !listOf(IslandType.THE_RIFT).contains(HypixelData.skyBlockIsland)
 
-private fun getCookieDisplayPair(): List<Pair<String, AlignmentEnum>> {
+private fun getCookieDisplayPair(): List<ScoreboardElement> {
     val timeLine = CustomScoreboardUtils.getTablistFooter().split("\n")
         .nextAfter("§d§lCookie Buff") ?: "<hidden>"
 
@@ -451,11 +451,12 @@ private fun getCookieShowWhen(): Boolean {
             CustomScoreboardUtils.getTablistFooter().split("\n").nextAfter("§d§lCookie Buff")?.contains(it)
                 ?: false
         }
+
         false -> true
     }
 }
 
-private fun getObjectiveDisplayPair(): List<Pair<String, AlignmentEnum>> {
+private fun getObjectiveDisplayPair(): List<ScoreboardElement> {
     val objective = mutableListOf<String>()
 
     objective += ScoreboardData.sidebarLinesFormatted.first { ScoreboardPattern.objectivePattern.matches(it) }
@@ -469,7 +470,7 @@ private fun getObjectiveDisplayPair(): List<Pair<String, AlignmentEnum>> {
     return objective.map { it to AlignmentEnum.LEFT }
 }
 
-private fun getSlayerDisplayPair(): List<Pair<String, AlignmentEnum>> {
+private fun getSlayerDisplayPair(): List<ScoreboardElement> {
     return listOf(
         (if (SlayerAPI.hasActiveSlayerQuest()) "§cSlayer" else "<hidden>") to AlignmentEnum.LEFT
     ) + (
@@ -488,7 +489,7 @@ private fun getSlayerShowWhen() = listOf(
     IslandType.THE_RIFT
 ).contains(HypixelData.skyBlockIsland)
 
-private fun getQuiverDisplayPair(): List<Pair<String, AlignmentEnum>> {
+private fun getQuiverDisplayPair(): List<ScoreboardElement> {
     if (QuiverAPI.currentArrow == null) return listOf("§cChange your Arrow once" to AlignmentEnum.LEFT)
     if (QuiverAPI.currentArrow == QuiverArrowType.NONE) return listOf("No Arrows selected" to AlignmentEnum.LEFT)
     return when (displayConfig.displayNumbersFirst) {
@@ -499,7 +500,7 @@ private fun getQuiverDisplayPair(): List<Pair<String, AlignmentEnum>> {
 
 private fun getQuiverShowWhen() = !listOf(IslandType.THE_RIFT).contains(HypixelData.skyBlockIsland)
 
-private fun getPowderDisplayPair(): List<Pair<String, AlignmentEnum>> {
+private fun getPowderDisplayPair(): List<ScoreboardElement> {
     val mithrilPowder =
         getGroupFromPattern(TabListData.getTabList(), ScoreboardPattern.mithrilPowderPattern, "mithrilpowder")
             .formatNum()
@@ -516,14 +517,14 @@ private fun getPowderDisplayPair(): List<Pair<String, AlignmentEnum>> {
 private fun getPowderShowWhen() =
     listOf(IslandType.CRYSTAL_HOLLOWS, IslandType.DWARVEN_MINES).contains(HypixelData.skyBlockIsland)
 
-private fun getEventsDisplayPair(): List<Pair<String, AlignmentEnum>> {
+private fun getEventsDisplayPair(): List<ScoreboardElement> {
     if (ScoreboardEvents.getEvent().isEmpty()) return listOf("<hidden>" to AlignmentEnum.LEFT)
     return ScoreboardEvents.getEvent().flatMap { it.getLines().map { i -> i to AlignmentEnum.LEFT } }
 }
 
 private fun getEventsShowWhen() = ScoreboardEvents.getEvent().isNotEmpty()
 
-private fun getMayorDisplayPair(): List<Pair<String, AlignmentEnum>> {
+private fun getMayorDisplayPair(): List<ScoreboardElement> {
     return listOf(
         (MayorAPI.currentMayor?.name?.let { MayorAPI.mayorNameToColorCode(it) }
             ?: "<hidden>") +
@@ -569,14 +570,14 @@ private fun getPartyShowWhen() = when (inDungeons) {
     }
 }
 
-private fun getFooterDisplayPair(): List<Pair<String, AlignmentEnum>> {
+private fun getFooterDisplayPair(): List<ScoreboardElement> {
     return listOf(
         displayConfig.titleAndFooter.customFooter.get().toString()
             .replace("&", "§") to getTitleAndFooterAlignment()
     )
 }
 
-private fun getExtraDisplayPair(): List<Pair<String, AlignmentEnum>> {
+private fun getExtraDisplayPair(): List<ScoreboardElement> {
     if (unknownLines.isEmpty()) return listOf("<hidden>" to AlignmentEnum.LEFT)
 
     if (amountOfUnknownLines != unknownLines.size && config.unknownLinesWarning) {
