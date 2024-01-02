@@ -15,6 +15,7 @@ import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.TabListData
+import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import com.google.gson.JsonObject
 import io.github.moulberry.notenoughupdates.NotEnoughUpdates
 import net.minecraft.client.Minecraft
@@ -25,9 +26,15 @@ import net.minecraftforge.fml.common.network.FMLNetworkEvent
 import kotlin.concurrent.thread
 
 class HypixelData {
-    // TODO USE SH-REPO
-    private val tabListProfilePattern = "§e§lProfile: §r§a(?<profile>.*)".toPattern()
-    private val lobbyTypePattern = "(?<lobbyType>.*lobby)\\d+".toPattern()
+    private val patternGroup = RepoPattern.group("data.hypixel.general")
+    private val tabListProfilePattern by patternGroup.pattern(
+        "tabprofile",
+        "§e§lProfile: §r§a(?<profile>.*)"
+    )
+    private val lobbyTypePattern by patternGroup.pattern(
+        "lobbytype",
+        "(?<lobbyType>.*lobby)\\d+"
+    )
 
     private var lastLocRaw = 0L
 
