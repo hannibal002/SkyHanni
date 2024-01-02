@@ -27,9 +27,9 @@ import kotlin.concurrent.thread
 
 class HypixelData {
     private val group = RepoPattern.group("data.hypixeldata")
-    private val tabListProfilePattern by group.pattern("tabListProfilePattern", "§e§lProfile: §r§a(?<profile>.*)")
-    private val lobbyTypePattern by group.pattern("lobbyTypePattern", "(?<lobbyType>.*lobby)\\d+")
-    private val islandNamePattern by group.pattern("islandNamePattern", "§b§l(Area|Dungeon): §r§7(?<island>.*)")
+    private val tabListProfilePattern by group.pattern("tabListprofile", "§e§lProfile: §r§a(?<profile>.*)")
+    private val lobbyTypePattern by group.pattern("lobbytype", "(?<lobbyType>.*lobby)\\d+")
+    private val islandNamePattern by group.pattern("islandname", "§b§l(Area|Dungeon): §r§7(?<island>.*)")
 
     private var lastLocRaw = 0L
 
