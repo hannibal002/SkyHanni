@@ -7,12 +7,19 @@ import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.StringUtils.removeResets
 import at.hannibal2.skyhanni.utils.StringUtils.trimWhiteSpaceAndResets
 import at.hannibal2.skyhanni.utils.TabListData
+import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraft.client.Minecraft
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
 // heavily inspired by SBA code
 object TabListReader {
     private val config get() = SkyHanniMod.feature.misc.compactTabList
+
+    private val patternGroup = RepoPattern.group("misc.compacttablist")
+    val usernamePattern by patternGroup.pattern(
+        "misc.compacttablist.username",
+        "^\\[(?<sblevel>\\d+)] (?:\\[\\w+] )?(?<username>\\w+)"
+    )
 
     // TODO USE SH-REPO
     var hypixelAdvertisingString = "HYPIXEL.NET"
