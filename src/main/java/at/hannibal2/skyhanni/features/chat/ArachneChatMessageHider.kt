@@ -5,15 +5,26 @@ import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.events.LorenzChatEvent
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
+import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
 class ArachneChatMessageHider {
     private val config get() = SkyHanniMod.feature.chat
     private var hideArachneDeadMessage = false
 
-    // TODO USE SH-REPO
-    private val arachneCallingPattern = "§4☄ §r.* §r§eplaced an §r§9Arachne's Calling§r§e!.*".toPattern()
-    private val arachneCrystalPattern = "§4☄ §r.* §r§eplaced an Arachne Crystal! Something is awakening!".toPattern()
+    private val patternGroup = RepoPattern.group("chat.arachne")
+    private val arachneCallingPattern by patternGroup.pattern(
+        "calling",
+        "§4☄ §r.* §r§eplaced an §r§9Arachne's Calling§r§e!.*"
+    )
+    private val arachneCrystalPattern by patternGroup.pattern(
+        "crystal",
+        "§4☄ §r.* §r§eplaced an Arachne Crystal! Something is awakening!"
+    )
+    private val arachneSpawnPattern by patternGroup.pattern(
+        "spawn",
+        "§c\\[BOSS] Arachne§r§f: (?:The Era of Spiders begins now\\.|Ahhhh\\.\\.\\.A Calling\\.\\.\\.)"
+    )
 
     @SubscribeEvent
     fun onChat(event: LorenzChatEvent) {
@@ -35,8 +46,9 @@ class ArachneChatMessageHider {
             return true
         }
 
-        if (message == "§c[BOSS] Arachne§r§f: Ahhhh...A Calling...") return true
-        if (message == "§c[BOSS] Arachne§r§f: The Era of Spiders begins now.") return true
+        arachneSpawnPattern.matchMatcher(message) {
+            return true
+        }
 
         if (message == "§a§l▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬") {
             hideArachneDeadMessage = !hideArachneDeadMessage
