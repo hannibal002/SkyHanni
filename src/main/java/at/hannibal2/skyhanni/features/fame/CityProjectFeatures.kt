@@ -23,6 +23,7 @@ import at.hannibal2.skyhanni.utils.RenderUtils.renderStringsAndItems
 import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.TimeUtils
 import at.hannibal2.skyhanni.utils.renderables.Renderable
+import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraft.client.Minecraft
 import net.minecraft.client.gui.inventory.GuiChest
 import net.minecraft.client.gui.inventory.GuiEditSign
@@ -35,9 +36,10 @@ class CityProjectFeatures {
     private var inInventory = false
     private var lastReminderSend = 0L
 
-    // TODO USE SH-REPO
-    private val contributeAgainPattern = "§7Contribute again: §e(?<time>.*)".toPattern()
-
+    private val contributeAgainPattern by RepoPattern.pattern(
+        "fame.projects.contribute",
+        "§7Contribute again: §e(?<time>.*)"
+    )
     companion object {
         private val config get() = SkyHanniMod.feature.event.cityProject
         fun disable() {
