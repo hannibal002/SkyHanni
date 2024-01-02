@@ -16,7 +16,7 @@ object ScoreboardPattern {
     val heatPattern by mainSb.pattern("heat", "^Heat: (?<heat>.*)$") // this line is weird (either text or number), ill leave it as is; it even has different colors?
     val copperPattern by mainSb.pattern("copper", "^(§.)*Copper: (§.)*(?<copper>[\\d,]+)( (§.)*\\([+-](?<diff>[\\w,.]+)\\))?$")
     val locationPattern by mainSb.pattern("location", "^\\s*(?<location>(§7⏣|§5ф) .*)$")
-    val lobbyCodePattern by mainSb.pattern ("lobbycode", "^\\s*§(\\d{3}/\\d{2}/\\d{2}) §8(?<code>.*)$")
+    val lobbyCodePattern by mainSb.pattern ("lobbycode", "^\\s*§.((\\d{2}/\\d{2}/\\d{2})|Server closing: [\\d:]+) §8(?<code>.*)\$")
     val datePattern by mainSb.pattern("date", "^\\s*(Late |Early )?(Spring|Summer|Autumn|Winter) \\d{1,2}(st|nd|rd|th)?")
     val timePattern by mainSb.pattern("time", "^\\s*§7\\d{1,2}:\\d{2}(?:am|pm) (?<symbol>(§b☽|§e☀|§.⚡|§.☔))$")
     val footerPattern by mainSb.pattern("footer", "§e(www|alpha).hypixel.net\$")

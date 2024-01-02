@@ -168,7 +168,7 @@ private fun getVotingShowWhen(): Boolean {
 }
 
 private fun getServerCloseLines(): List<String> {
-    return listOf(getSbLines().first { ServerRestartTitle.restartingPattern.matches(it) })
+    return listOf(getSbLines().first { ServerRestartTitle.restartingPattern.matches(it) }.split("§8")[0])
 }
 
 private fun getServerCloseShowWhen(): Boolean {
