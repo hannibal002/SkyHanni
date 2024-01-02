@@ -18,6 +18,7 @@ import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils.isInIsland
 import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
+import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import com.google.common.cache.CacheBuilder
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import java.util.concurrent.TimeUnit
@@ -26,8 +27,10 @@ import kotlin.random.Random
 object AdvancedPlayerList {
     private val config get() = SkyHanniMod.feature.misc.compactTabList.advancedPlayerList
 
-    // TODO USE SH-REPO
-    private val pattern = ".*\\[(?<level>.*)] §r(?<name>.*)".toPattern()
+    private val levelPattern by RepoPattern.pattern(
+        "misc.compacttablist.advanced.level",
+        ".*\\[(?<level>.*)] §r(?<name>.*)"
+    )
 
     private var playerDatas = mutableMapOf<String, PlayerData>()
 
@@ -55,7 +58,7 @@ object AdvancedPlayerList {
                 extraTitles++
                 continue
             }
-            pattern.matchMatcher(line) {
+            levelPattern.matchMatcher(line) {
                 val levelText = group("level")
                 val removeColor = levelText.removeColor()
                 try {
