@@ -26,14 +26,18 @@ import net.minecraftforge.fml.common.network.FMLNetworkEvent
 import kotlin.concurrent.thread
 
 class HypixelData {
-    private val patternGroup = RepoPattern.group("data.hypixel.general")
+    private val patternGroup = RepoPattern.group("data.hypixeldata")
     private val tabListProfilePattern by patternGroup.pattern(
-        "tabprofile",
+        "tablistprofile",
         "§e§lProfile: §r§a(?<profile>.*)"
     )
     private val lobbyTypePattern by patternGroup.pattern(
         "lobbytype",
         "(?<lobbyType>.*lobby)\\d+"
+    )
+    private val islandNamePattern by patternGroup.pattern(
+        "islandname",
+        "§b§l(Area|Dungeon): §r§7(?<island>.*)"
     )
 
     private var lastLocRaw = 0L
