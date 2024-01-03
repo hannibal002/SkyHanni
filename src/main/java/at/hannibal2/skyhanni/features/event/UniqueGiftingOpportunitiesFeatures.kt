@@ -1,7 +1,6 @@
 package at.hannibal2.skyhanni.features.event
 
 import at.hannibal2.skyhanni.SkyHanniMod
-import at.hannibal2.skyhanni.data.HypixelData
 import at.hannibal2.skyhanni.data.ProfileStorageData
 import at.hannibal2.skyhanni.data.WinterAPI
 import at.hannibal2.skyhanni.events.EntityCustomNameUpdateEvent
@@ -79,7 +78,7 @@ object UniqueGiftingOpportunitiesFeatures {
     }
 
     private fun isBingo(entity: EntityLivingBase) =
-        !HypixelData.bingo && entity.displayName.formattedText.endsWith("Ⓑ§r")
+        !LorenzUtils.isBingoProfile && entity.displayName.formattedText.endsWith("Ⓑ§r")
 
     private fun isIronman(entity: EntityLivingBase) =
         !LorenzUtils.noTradeMode && entity.displayName.formattedText.endsWith("♲§r")
