@@ -19,6 +19,7 @@ import at.hannibal2.skyhanni.utils.RenderUtils.renderString
 import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.StringUtils.removeWordsAtEnd
+import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import io.github.moulberry.notenoughupdates.util.Constants
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import kotlin.math.ceil
@@ -26,10 +27,22 @@ import kotlin.time.Duration.Companion.seconds
 
 class SlayerRngMeterDisplay {
     private val config get() = SkyHanniMod.feature.slayer.rngMeterDisplay
+
+    private val patternGroup = RepoPattern.group("slayer.rngmeter")
+    private val inventoryNamePattern by patternGroup.pattern(
+        "inventoryname",
+        "(?<name>.*) RNG Meter"
+    )
+    private val updatePattern by patternGroup.pattern(
+        "update",
+        " {3}§dRNG Meter §f- §d(?<exp>.*) Stored XP"
+    )
+    private val changedItemPattern by patternGroup.pattern(
+        "changeditem",
+        "§aYou set your §r.* RNG Meter §r§ato drop §r.*§a!"
+    )
+
     private var display = ""
-    private val inventoryNamePattern = "(?<name>.*) RNG Meter".toPattern()
-    private val updatePattern = " {3}§dRNG Meter §f- §d(?<exp>.*) Stored XP".toPattern()
-    private val changedItemPattern = "§aYou set your §r.* RNG Meter §r§ato drop §r.*§a!".toPattern()
     private var lastItemDroppedTime = 0L
 
     @SubscribeEvent
