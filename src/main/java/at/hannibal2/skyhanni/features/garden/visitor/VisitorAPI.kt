@@ -108,7 +108,7 @@ object VisitorAPI {
         var nameTagEntityId: Int = -1,
         var status: VisitorStatus,
         var inSacks: Boolean = false,
-        val items: MutableMap<NEUInternalName, Int> = mutableMapOf(),
+        val shoppingList: MutableMap<NEUInternalName, Int> = mutableMapOf(),
         var offer: VisitorOffer? = null,
     ) {
         var lore: List<String> = emptyList()

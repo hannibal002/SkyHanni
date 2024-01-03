@@ -6,30 +6,78 @@
 
 #### Fishing Features
 
++ Show sack item amount to the visitor shopping list. - CalMWolfs
+
+#### Fishing Features
+
 + Added Sea Creature Tracker. - hannibal2
     + Allows to only show single variants, e.g. water or lava or winter.
 
 ### Changed
+
+#### Garden Changes
+
++ Renamed Visitor Items Needed to Visitor Shopping List. - hannibal2
++ Added biofuel support to the Composter Overlay get from sack logic. - obsidian
++ Updated max reforge fortune for Fungi Cutter. - alexia
+    + Hypixel has increased the base rarity to Epic.
 
 #### Rift Changes
 
 + Rift time now updates correctly in wizard tower and instantly updates the format when toggling max time or
   percentage. - hannibal2
 
-#### Fishing Fixes
+#### Fishing Changes
 
-+ Fixed Reindrake mob, Frosty NPC and frosty the snow blaster shop counting as sea creatures in the barn fishing
-  timer. - hannibal2
++ Odger highlight feature tells in description that it is only useful for users without abiphone. - hannibal2
+
+#### Bingo Changes
+
++ Show the guide text when hovering over the missing bingo goal list. - hannibal2
+
+#### Inventory Changes
+
++ Removed flawless gemstones from sack display. - CalMWolfs
+    + Hypixel removed them from sacks.
 
 ### Fixes
+
+#### Garden Fixes
+
++ Fixed mushrooms being counted with Common/Uncommon Mooshroom Cow Pet. - alexia
++ Fixed progress to maxed milestone appearing twice in the crop milestone menu when having milestone 20. - Empa
++ Fixed max crop milestone display being too long in the crop milestone menu. - obsidian
++ Fixed Mooshroom Cow Perk counter when farming sugar cane/cactus with Mooshroom Cow. - alexia
 
 #### Rift Fixes
 
 + Fixed vampire slayer damage indicator not working during Derpy. - hannibal2
 
+#### Fishing Fixes
+
++ Fixed Reindrake mob, Frosty NPC and frosty the snow blaster shop counting as sea creatures in the barn fishing
+  timer. - hannibal2
+
+#### Invenory Fixes
+
++ Fixed hide non-clickable items not working in some bazaar pages. - hannibal2
++ Fixed rogue sword ability taking into account mage cooldown reduction. - Empa
+
+#### Bingo Fixes
+
++ Fixed detecting bingo profile while visiting other players bingo island. - hannibal2
+
+#### Misc Fixes
+
++ Maybe fixed Tia Relay Helper. - Thunderblade73
+
 ### Technical Changes
 
 + Migrate Hypixel API to v2. - hannibal2
++ Added SackDataUpdateEvent. - CalMWolfs
++ Fixing a mac crash in dev environment automatically. - CalMWolfs
++ Bingo repo change: Make note of an alternative title, and create a guide field for the actual guide text. - hannibal2
++ Moved Tia Relay Helper chat messages into repo patterns. - Thunderblade73
 
 ## Version 0.22
 

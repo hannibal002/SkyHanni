@@ -13,6 +13,9 @@ class BingoGoal {
     var description = ""
 
     @Expose
+    var guide = emptyList<String>()
+
+    @Expose
     var done = false
 
     @Expose
