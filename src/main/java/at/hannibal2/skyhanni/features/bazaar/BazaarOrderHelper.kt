@@ -9,15 +9,26 @@ import at.hannibal2.skyhanni.utils.LorenzColor
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.RenderUtils.highlight
 import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
+import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraft.client.gui.inventory.GuiChest
 import net.minecraft.inventory.ContainerChest
 import net.minecraft.inventory.Slot
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
 class BazaarOrderHelper {
-    private val bazaarItemNamePattern = "§.§l(?<type>BUY|SELL) (?<name>.*)".toPattern()
-    private val filledPattern = "§7Filled: §[a6].*§7/.* §a§l100%!".toPattern()
-    private val pricePattern = "§7Price per unit: §6(?<number>.*) coins".toPattern()
+    private val patternGroup = RepoPattern.group("bazaar.orderhelper")
+    private val bazaarItemNamePattern by patternGroup.pattern(
+        "itemname",
+        "§.§l(?<type>BUY|SELL) (?<name>.*)"
+    )
+    private val filledPattern by patternGroup.pattern(
+        "filled",
+        "§7Filled: §[a6].*§7/.* §a§l100%!"
+    )
+    private val pricePattern by patternGroup.pattern(
+        "price",
+        "§7Price per unit: §6(?<number>.*) coins"
+    )
 
     companion object {
         fun isBazaarOrderInventory(inventoryName: String): Boolean = when (inventoryName) {
