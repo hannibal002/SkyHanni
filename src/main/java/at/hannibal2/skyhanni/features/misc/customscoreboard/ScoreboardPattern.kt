@@ -92,7 +92,7 @@ object ScoreboardPattern {
     val flightDurationPattern by miscSb.pattern("flightduration", "^\\s*Flight Duration: §a(:?\\d{1,3})*$")
     val dojoChallengePattern by miscSb.pattern("dojochallenge", "^(§.)*Challenge: (§.)*(?<challenge>[\\w ]+)$")
     val dojoDifficultyPattern by miscSb.pattern("dojodifficulty", "^(§.)*Difficulty: (§.)*(?<difficulty>[\\w ]+)$")
-    val dojoPointsPattern by miscSb.pattern("dojopoints", "^(§.)*Points: (§.)*(?<points>[\\w,.]+)( (§.)*\\((§.)*[+-](§.)*(?<difference>[\\w,.]+)(§.)*\\))?$")
+    val dojoPointsPattern by miscSb.pattern("dojopoints", "^(§.)*Points: (§.)*(?<points>[\\w,.]+) ?( (§.)*\\((§.)*[+-](§.)*(?<difference>[\\w,.]+)(§.)*\\))?\$")
     val dojoTimePattern by miscSb.pattern("dojotime", "^(§.)*Time: (§.)*(?<time>(?<seconds>\\w+s))( (§.)*\\((§.)*[+-](§.)*(?<difference>[\\w,.]+)(§.)*\\))?$")
     val objectivePattern by miscSb.pattern("objective", "^(§.)*(Objective|Quest).*")
     // this thirdObjectiveLinePattern includes all those weird objective lines that go into a third scoreboard line
