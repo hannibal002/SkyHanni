@@ -83,9 +83,12 @@ object StringUtils {
         return toString().replace("-", "")
     }
 
-    // TODO find better name for this method
+
     inline fun <T> Pattern.matchMatcher(text: String, consumer: Matcher.() -> T) =
         matcher(text).let { if (it.matches()) consumer(it) else null }
+
+    inline fun <T> Pattern.findMatcher(text: String, consumer: Matcher.() -> T) =
+        matcher(text).let { if (it.find()) consumer(it) else null }
 
     private fun String.internalCleanPlayerName(): String {
         val split = trim().split(" ")
