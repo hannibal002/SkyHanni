@@ -18,12 +18,17 @@ import at.hannibal2.skyhanni.utils.OSUtils
 import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.StringUtils.matches
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
+import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import kotlinx.coroutines.launch
 import net.minecraft.item.ItemStack
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
 object GardenCropMilestonesCommunityFix {
-    private val pattern = ".*§e(?<having>.*)§6/§e(?<max>.*)".toPattern()
+    private val amountPattern by RepoPattern.pattern(
+        "data.garden.milestonefix.amount",
+        ".*§e(?<having>.*)§6/§e(?<max>.*)"
+    )
+
     private var showWrongData = false
     private var showWhenAllCorrect = false
 
@@ -90,7 +95,7 @@ object GardenCropMilestonesCommunityFix {
             crop
         ) - GardenCropMilestones.getCropsForTier(realTier, crop)
 //         debug("guessNextMax: ${guessNextMax.addSeparators()}")
-        val nextMax = pattern.matchMatcher(next) {
+        val nextMax = amountPattern.matchMatcher(next) {
             group("max").formatNumber()
         } ?: return
 //         debug("nextMax real: ${nextMax.addSeparators()}")
@@ -101,7 +106,7 @@ object GardenCropMilestonesCommunityFix {
 
         val guessTotalMax = GardenCropMilestones.getCropsForTier(46, crop)
 //         println("guessTotalMax: ${guessTotalMax.addSeparators()}")
-        val totalMax = pattern.matchMatcher(total) {
+        val totalMax = amountPattern.matchMatcher(total) {
             group("max").formatNumber()
         } ?: return
 //         println("totalMax real: ${totalMax.addSeparators()}")
