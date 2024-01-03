@@ -433,7 +433,7 @@ class SkyHanniMod {
         loadModule(PartyAPI)
         loadModule(GuildAPI)
         loadModule(SlayerAPI)
-        loadModule(PurseAPI())
+        loadModule(PurseAPI)
         loadModule(RiftAPI)
         loadModule(SackAPI)
         loadModule(BingoAPI)
