@@ -16,6 +16,7 @@ import at.hannibal2.skyhanni.utils.LorenzColor
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.RenderUtils.drawDynamicText
 import at.hannibal2.skyhanni.utils.StringUtils.matches
+import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
 // todo: create abstract class for this and BasketWaypoints
@@ -28,10 +29,19 @@ class PresentWaypoints {
     private val presentSet get() = presentLocations[HypixelData.lobbyType]
     private val presentEntranceSet get() = presentEntranceLocations[HypixelData.lobbyType]
 
-    // TODO use repo pattern
-    private val presentAlreadyFoundPattern = "§cYou have already found this present!".toPattern()
-    private val presentFoundPattern = "§aYou found a.*present! §r§e\\(§r§b\\d+§r§e/§r§b\\d+§r§e\\)".toPattern()
-    private val allFoundPattern = "§aCongratulations! You found all the presents in every lobby!".toPattern()
+    private val patternGroup = RepoPattern.group("event.lobby.waypoint.presents")
+    private  val presentAlreadyFoundPattern by patternGroup.pattern(
+        "foundalready",
+        "§cYou have already found this present!"
+    )
+    private val presentFoundPattern by patternGroup.pattern(
+        "found",
+        "§aYou found a.*present! §r§e\\(§r§b\\d+§r§e/§r§b\\d+§r§e\\)"
+    )
+    private val allFoundPattern by patternGroup.pattern(
+        "foundall",
+        "§aCongratulations! You found all the presents in every lobby!"
+    )
 
     @SubscribeEvent
     fun onWorldChange(event: LorenzWorldChangeEvent) {
