@@ -551,6 +551,7 @@ Use `/sh` or `/skyhanni` to open the SkyHanni config in game.
     + If you don't want to share anything, you can disable the chat message in the config with /sh copy milestone data.
 + Garden Vacuum Pests in Pest bag to item number as stack size. - hannibal2
     + Enable via /sh vacuum.
++ Show sack item amount to the visitor shopping list. - CalMWolfs
 
 ### Garden Pests
 
