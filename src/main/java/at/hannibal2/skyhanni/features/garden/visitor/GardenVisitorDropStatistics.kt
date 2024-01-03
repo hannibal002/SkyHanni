@@ -22,6 +22,7 @@ import at.hannibal2.skyhanni.utils.NumberUtil.formatNumber
 import at.hannibal2.skyhanni.utils.RenderUtils.renderStringsAndItems
 import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
+import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
 object GardenVisitorDropStatistics {
@@ -35,13 +36,36 @@ object GardenVisitorDropStatistics {
 
     var lastAccept = 0L
 
-    private val acceptPattern = "OFFER ACCEPTED with (?<visitor>.*) [(](?<rarity>.*)[)]".toPattern()
-    private val copperPattern = "[+](?<amount>.*) Copper".toPattern()
-    private val gardenExpPattern = "[+](?<amount>.*) Garden Experience".toPattern()
-    private val farmingExpPattern = "[+](?<amount>.*) Farming XP".toPattern()
-    private val bitsPattern = "[+](?<amount>.*) Bits".toPattern()
-    private val mithrilPowderPattern = "[+](?<amount>.*) Mithril Powder".toPattern()
-    private val gemstonePowderPattern = "[+](?<amount>.*) Gemstone Powder".toPattern()
+    private val patternGroup = RepoPattern.group("garden.visitor.droptracker")
+    private val acceptPattern by patternGroup.pattern(
+        "accept",
+        "OFFER ACCEPTED with (?<visitor>.*) [(](?<rarity>.*)[)]"
+    )
+    private val copperPattern by patternGroup.pattern(
+        "copper",
+        "[+](?<amount>.*) Copper"
+    )
+    private val gardenExpPattern by patternGroup.pattern(
+        "gardenexp",
+        "[+](?<amount>.*) Garden Experience"
+    )
+    private val farmingExpPattern by patternGroup.pattern(
+        "farmingexp",
+        "[+](?<amount>.*) Farming XP"
+    )
+    private val bitsPattern by patternGroup.pattern(
+        "bits",
+        "[+](?<amount>.*) Bits"
+    )
+    private val mithrilPowderPattern by patternGroup.pattern(
+        "powder.mithril",
+        "[+](?<amount>.*) Mithril Powder"
+    )
+    private val gemstonePowderPattern by patternGroup.pattern(
+        "powder.gemstone",
+        "[+](?<amount>.*) Gemstone Powder"
+    )
+
     private var rewardsCount = mapOf<VisitorReward, Int>()
 
     private fun formatDisplay(map: List<List<Any>>): List<List<Any>> {
