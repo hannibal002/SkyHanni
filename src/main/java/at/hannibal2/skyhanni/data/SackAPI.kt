@@ -7,6 +7,7 @@ import at.hannibal2.skyhanni.events.InventoryCloseEvent
 import at.hannibal2.skyhanni.events.InventoryFullyOpenedEvent
 import at.hannibal2.skyhanni.events.LorenzChatEvent
 import at.hannibal2.skyhanni.events.SackChangeEvent
+import at.hannibal2.skyhanni.events.SackDataUpdateEvent
 import at.hannibal2.skyhanni.features.fishing.FishingAPI
 import at.hannibal2.skyhanni.features.fishing.trophy.TrophyRarity
 import at.hannibal2.skyhanni.features.inventory.SackDisplay
@@ -138,12 +139,6 @@ object SackAPI {
                                 "Fine" -> {
                                     gem.fine = stored
                                     gem.finePrice = internalName.sackPrice(stored)
-                                    if (savingSacks) setSackItem(internalName, stored.formatNumber())
-                                }
-
-                                "Flawless" -> {
-                                    gem.flawless = stored
-                                    gem.flawlessPrice = internalName.sackPrice(stored)
                                     if (savingSacks) setSackItem(internalName, stored.formatNumber())
                                 }
                             }
@@ -300,6 +295,8 @@ object SackAPI {
     private fun saveSackData() {
         ProfileStorageData.sackProfiles?.sackContents = sackData
         SkyHanniMod.configManager.saveConfig(ConfigFileType.SACKS, "saving-data")
+
+        SackDataUpdateEvent().postAndCatch()
     }
 
     data class SackGemstone(
@@ -307,11 +304,9 @@ object SackAPI {
         var rough: String = "0",
         var flawed: String = "0",
         var fine: String = "0",
-        var flawless: String = "0",
         var roughPrice: Long = 0,
         var flawedPrice: Long = 0,
         var finePrice: Long = 0,
-        var flawlessPrice: Long = 0,
     )
 
     data class SackRune(
