@@ -188,16 +188,20 @@ class BingoCardDisplay {
                 val clickName = if (currentlyHighlighted) "remove" else "add"
                 Renderable.clickAndHover(
                     display,
-                    listOf(
-                        "§a" + it.displayName,
-                        "",
-                        "§eClick to $clickName this goal as highlight!",
-                    ),
+                    buildList {
+                        add("§a" + it.displayName)
+                        for (s in it.guide) {
+                            add(s)
+                        }
+                        add("")
+                        add("§eClick to $clickName this goal as highlight!")
+                    },
                     onClick = {
                         if (lastClick.passedSince() < 300.milliseconds) return@clickAndHover
                         lastClick = SimpleTimeMark.now()
 
                         it.highlight = !currentlyHighlighted
+                        it.displayName
                         update()
                     }
                 )
