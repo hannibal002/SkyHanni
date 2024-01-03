@@ -119,9 +119,14 @@ All data sent is anonymonized and opt-in.
 ### Mixin
 
 A system to inject code into the original Minecraft code.
-This library is not part of SkyHanni itself; it comes preinstalled with Forge.
+This library is not part of SkyHanni or Forge, but we bundle it.
 
-For more information, see https://github.com/SpongePowered/Mixin.
+It allows to easily modify methods in Minecraft itself, without conflicting with other mods.
+
+For more information, see https://github.com/SpongePowered/Mixin or [our existing mixins](https://github.com/hannibal002/SkyHanni/tree/beta/src/main/java/at/hannibal2/skyhanni/mixins/transformers).
+
+When creating new Mixins, try to keep the code inside of the mixin as small as possible, and calling a hook as soon as
+possible.
 
 ### Repo
 
@@ -143,7 +148,7 @@ at [DiscordRPCManager.kt](https://github.com/hannibal002/SkyHanni/blob/beta/src/
 
 ### Auto Updater
 
-We use the [auto update library](https://repo.nea.moe/#/releases/moe/nea/libautoupdate) from nea.
+We use the [auto update library](https://github.com/nea89o/libautoupdate) from nea89.
 
 ## Additional Useful Developement Tools
 
