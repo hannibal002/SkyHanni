@@ -14,7 +14,9 @@ import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.LorenzColor
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
+import at.hannibal2.skyhanni.utils.StringUtils.matches
 import at.hannibal2.skyhanni.utils.getLorenzVec
+import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraft.client.entity.EntityPlayerSP
 import net.minecraft.entity.EntityLivingBase
 import net.minecraft.entity.item.EntityArmorStand
@@ -26,7 +28,15 @@ object UniqueGiftingOpportunitiesFeatures {
     private val playerList: MutableSet<String>?
         get() = ProfileStorageData.playerSpecific?.winter?.playersThatHaveBeenGifted
 
-    private val pattern = "§6\\+1 Unique Gift given! To ([^§]+)§r§6!".toPattern()
+    private val patternGroup = RepoPattern.group("event.uniquegifts")
+    private val giftedPattern by patternGroup.pattern(
+        "gifted",
+        "§6\\+1 Unique Gift given! To ([^§]+)§r§6!"
+    )
+    private val giftNamePattern by patternGroup.pattern(
+        "giftname",
+        "(?:WHITE|RED|GREEN)_GIFT\$"
+    )
 
     private fun hasGiftedPlayer(player: EntityPlayer) = playerList?.contains(player.name) == true
 
@@ -37,8 +47,7 @@ object UniqueGiftingOpportunitiesFeatures {
     private val config get() = SkyHanniMod.feature.event.winter.giftingOpportunities
 
     private fun isEnabled() = LorenzUtils.inSkyBlock && config.enabled && WinterAPI.isDecember() &&
-        (InventoryUtils.itemInHandId.endsWith("_GIFT")
-            || !config.highlighWithGiftOnly)
+        (giftNamePattern.matches(InventoryUtils.itemInHandId.asString()) || !config.highlighWithGiftOnly)
 
     private val hasNotGiftedNametag = "§a§lꤥ"
     private val hasGiftedNametag = "§c§lꤥ"
@@ -85,7 +94,7 @@ object UniqueGiftingOpportunitiesFeatures {
 
     @SubscribeEvent
     fun onChat(event: LorenzChatEvent) {
-        pattern.matchMatcher(event.message) {
+        giftedPattern.matchMatcher(event.message) {
             addGiftedPlayer(group(1))
             UniqueGiftCounter.addUniqueGift()
         }
