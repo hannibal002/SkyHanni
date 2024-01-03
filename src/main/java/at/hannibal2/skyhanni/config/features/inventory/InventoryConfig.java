@@ -2,6 +2,7 @@ package at.hannibal2.skyhanni.config.features.inventory;
 
 import at.hannibal2.skyhanni.config.FeatureToggle;
 import at.hannibal2.skyhanni.config.HasLegacyId;
+import at.hannibal2.skyhanni.config.core.config.Position;
 import at.hannibal2.skyhanni.config.features.inventory.helper.HelperConfig;
 import com.google.gson.annotations.Expose;
 import io.github.moulberry.moulconfig.annotations.Accordion;
@@ -181,5 +182,14 @@ public class InventoryConfig {
     @ConfigEditorBoolean
     @FeatureToggle
     public boolean shiftClickForEquipment = false;
+
+    @Expose
+    @ConfigOption(name = "Max Items With Purse", desc = "Calculates the maximum amount of items that can be purchased from the Bazaar for the amount of coins in your purse.")
+    @ConfigEditorBoolean
+    @FeatureToggle
+    public boolean maxPurseItems = false;
+
+    @Expose
+    public Position purseItemsPos = new Position(30, 10, true, false);
 
 }
