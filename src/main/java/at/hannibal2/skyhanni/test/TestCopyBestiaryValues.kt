@@ -12,6 +12,7 @@ import at.hannibal2.skyhanni.utils.NumberUtil.formatNumber
 import at.hannibal2.skyhanni.utils.OSUtils
 import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
+import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import com.google.gson.GsonBuilder
 import com.google.gson.annotations.Expose
 import net.minecraft.item.ItemStack
@@ -40,7 +41,10 @@ object TestCopyBestiaryValues {
         var bracket: Int = 0
     }
 
-    val pattern = "\\[Lv(?<lvl>.*)] (?<text>.*)".toPattern()
+    private val bestiaryTypePattern by RepoPattern.pattern(
+        "test.bestiary.type",
+        "\\[Lv(?<lvl>.*)] (?<text>.*)"
+    )
 
     @SubscribeEvent(priority = EventPriority.LOW)
     fun onLateInventoryOpen(event: InventoryUpdatedEvent) {
@@ -84,7 +88,7 @@ object TestCopyBestiaryValues {
         for (i in 10..43) {
             val stack = inventoryItems[i] ?: continue
             val stackName = stack.name ?: continue
-            pattern.matchMatcher(stackName.removeColor()) {
+            bestiaryTypePattern.matchMatcher(stackName.removeColor()) {
                 val lvl = group("lvl").toInt()
                 var text = group("text").lowercase().replace(" ", "_")
 
