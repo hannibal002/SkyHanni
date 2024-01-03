@@ -403,7 +403,7 @@ object RenderUtils {
         transform()
         val minecraft = Minecraft.getMinecraft()
         val renderer = minecraft.renderManager.fontRenderer
-        val width = this.getDummySize().x
+        val width = this.getDummySize().x  / this.scale
 
         GlStateManager.translate(offsetX + 1.0, offsetY + 1.0, 0.0)
 
