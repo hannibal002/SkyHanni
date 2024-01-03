@@ -67,9 +67,11 @@ object LorenzUtils {
 
     val noTradeMode get() = HypixelData.noTrade
 
-    val isStrandedProfile get() = HypixelData.stranded
+    val isStrandedProfile get() = inSkyBlock && HypixelData.stranded
 
     val isBingoProfile get() = inSkyBlock && (HypixelData.bingo || TestBingo.testBingo)
+
+    val isIronmanProfile get() = inSkyBlock && HypixelData.ironman
 
     val lastWorldSwitch get() = HypixelData.joinedWorld
 
@@ -532,7 +534,7 @@ object LorenzUtils {
             && tileSign.signText[3].unformattedText.removeColor() == "speed cap!")
     }
 
-    fun IslandType.isInIsland() = inSkyBlock && (skyBlockIsland == this || this == IslandType.CATACOMBS && inDungeons)
+    fun IslandType.isInIsland() = inSkyBlock && skyBlockIsland == this
 
     fun <K> MutableMap<K, Int>.addOrPut(key: K, number: Int): Int {
         val currentValue = this[key] ?: 0
