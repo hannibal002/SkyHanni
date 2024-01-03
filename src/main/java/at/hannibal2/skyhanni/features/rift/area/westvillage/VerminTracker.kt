@@ -3,6 +3,7 @@ package at.hannibal2.skyhanni.features.rift.area.westvillage
 import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.InventoryFullyOpenedEvent
 import at.hannibal2.skyhanni.events.LorenzChatEvent
+import at.hannibal2.skyhanni.events.LorenzTickEvent
 import at.hannibal2.skyhanni.features.rift.RiftAPI
 import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName
@@ -29,6 +30,7 @@ object VerminTracker {
     private val flyPattern by group.pattern("fly", ".*§eYou vacuumed a §.*Fly.*")
     private val verminBinPattern by group.pattern("binline", "§fVermin Bin: §\\w(?<count>\\d+) (?<vermin>\\w+)")
     private val verminBagPattern by group.pattern("bagline", "§fVacuum Bag: §\\w(?<count>\\d+) (?<vermin>\\w+)")
+    private var hasVacuum = false
 
     private val config get() = RiftAPI.config.area.westVillage.verminTracker
 
@@ -48,6 +50,19 @@ object VerminTracker {
         SILVERFISH("§aSilverfish", silverfishPattern),
         SPIDER("§aSpiders", spiderPattern),
         FLY("§aFlies", flyPattern),
+    }
+
+    @SubscribeEvent
+    fun onTick(event: LorenzTickEvent) {
+        if (!RiftAPI.inRift()) return
+        if (event.repeatSeconds(1)) {
+            checkVacuum()
+        }
+    }
+
+    private fun checkVacuum() {
+        hasVacuum = InventoryUtils.getItemsInOwnInventory()
+            .any { it.getInternalName() == "TURBOMAX_VACUUM".asInternalName()}
     }
 
     @SubscribeEvent
@@ -128,9 +143,7 @@ object VerminTracker {
         if (!isEnabled()) return
         if (!config.showOutsideWestVillage &&
             !LorenzUtils.skyBlockArea.let { it == "Infested House" || it == "West Village" }) return
-        if (!config.showWithoutVacuum &&
-            !InventoryUtils.getItemsInOwnInventory().any { it.getInternalName() == "TURBOMAX_VACUUM".asInternalName() }) return
-
+        if (!config.showWithoutVacuum && !hasVacuum) return
 
         tracker.renderDisplay(config.position)
     }
