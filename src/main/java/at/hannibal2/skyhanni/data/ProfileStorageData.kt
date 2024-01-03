@@ -25,10 +25,16 @@ object ProfileStorageData {
 
     private var nextProfile: String? = null
 
-    private val profileSwitchPattern by RepoPattern.pattern(
-        "data.profile.switch",
+    private val patternGroup = RepoPattern.group("data.profile")
+    private val profileSwitchPattern by patternGroup.pattern(
+        "switch",
         "§7Switching to profile (?<name>.*)\\.\\.\\."
     )
+    private val profileNamePattern by patternGroup.pattern(
+        "name",
+        "§e§lProfile: §r§a(?<name>.*)"
+    )
+
 
     private var sackPlayers: SackData.PlayerSpecific? = null
     var sackProfiles: SackData.ProfileSpecific? = null
@@ -86,8 +92,7 @@ object ProfileStorageData {
         val playerSpecific = playerSpecific ?: return
         val sackPlayers = sackPlayers ?: return
         for (line in event.tabList) {
-            val pattern = "§e§lProfile: §r§a(?<name>.*)".toPattern()
-            pattern.matchMatcher(line) {
+            profileNamePattern.matchMatcher(line) {
                 val profileName = group("name").lowercase()
                 loadProfileSpecific(playerSpecific, sackPlayers, profileName)
                 nextProfile = null
