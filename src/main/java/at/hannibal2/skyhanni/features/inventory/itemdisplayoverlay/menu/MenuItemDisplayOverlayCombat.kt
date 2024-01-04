@@ -6,21 +6,22 @@ import at.hannibal2.skyhanni.features.inventory.itemdisplayoverlay.AbstractMenuS
 import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.cleanName
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
+import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
 import net.minecraft.item.ItemStack
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
 class MenuItemDisplayOverlayCombat : AbstractMenuStackSize() {
     // private val genericPercentPattern = ".* (§.)?(?<percent>[0-9]+)(\\.[0-9]*)?(§.)?%".toPattern()
-    private val bestiaryChestNamePattern = (("Bestiary.*").toPattern())
-    private val bestiaryMilestoneItemNamePattern = (("Bestiary Milestone (?<milestone>[\\w]+)").toPattern())
-    private val familiesCompletedOverallProgressPercentLoreLinePattern = ((".*(Families Completed|Overall Progress):.* (§.)?(?<percent>[0-9]+)(\\.[0-9]*)?(§.)?%.*").toPattern())
-    private val slayerLevelLoreLinePattern = (("(§.)*(?<mobType>[\\w]+) Slayer: (§.)*LVL (?<level>[\\w]+)").toPattern())
-    private val slayerLevelOtherLoreLinePattern = (("(§.)*Current LVL: (§.)*(?<level>[\\w]+)").toPattern())
-    private val combatWisdomBuffLoreLinePattern = (("(§.)*Total buff: (§.)*\\+(?<combatWise>[\\w]+). Combat Wisdom").toPattern())
-    private val rngMeterProgressPercentLoreLinePattern = ((".*(§.)+Progress:.* (§.)?(?<percent>[0-9]+)(\\.[0-9]*)?(§.)?%.*").toPattern())
-    private val unlockedSlayerRecipesLoreLinePattern = ((".*(§.)*Unlocked: (§.)*(?<recipes>[\\w]+) recipes.*").toPattern())
-    private val overallProgressToggleLoreLinePattern = (("(§.)*Overall Progress: (§.)*(?<status>[\\w]+)").toPattern())
+    private val bestiaryChestNamePattern by RepoPattern.pattern(("itemstacksize.combat.bestiary.chestname"), ("Bestiary.*"))
+    private val bestiaryMilestoneItemNamePattern by RepoPattern.pattern(("itemstacksize.combat.bestiarymilestone.itemname"), ("Bestiary Milestone (?<milestone>[\\w]+)"))
+    private val familiesCompletedOverallProgressPercentLoreLinePattern by RepoPattern.pattern(("itemstacksize.combat.familiescompletedoverallprogresspercent.loreline"), (".*(Families Completed|Overall Progress):.* (§.)?(?<percent>[0-9]+)(\\.[0-9]*)?(§.)?%.*"))
+    private val slayerLevelLoreLinePattern by RepoPattern.pattern(("itemstacksize.combat.slayerlevel.loreline"), ("(§.)*(?<mobType>[\\w]+) Slayer: (§.)*LVL (?<level>[\\w]+)"))
+    private val slayerLevelOtherLoreLinePattern by RepoPattern.pattern(("itemstacksize.combat.slayerlevelother.loreline"), ("(§.)*Current LVL: (§.)*(?<level>[\\w]+)"))
+    private val combatWisdomBuffLoreLinePattern by RepoPattern.pattern(("itemstacksize.combat.combatwisdombuff.loreline"), ("(§.)*Total buff: (§.)*\\+(?<combatWise>[\\w]+). Combat Wisdom"))
+    private val rngMeterProgressPercentLoreLinePattern by RepoPattern.pattern(("itemstacksize.combat.rngmeterprogresspercent.loreline"), (".*(§.)+Progress:.* (§.)?(?<percent>[0-9]+)(\\.[0-9]*)?(§.)?%.*"))
+    private val unlockedSlayerRecipesLoreLinePattern by RepoPattern.pattern(("itemstacksize.combat.unlockedslayerrecipes.loreline"), (".*(§.)*Unlocked: (§.)*(?<recipes>[\\w]+) recipes.*"))
+    private val overallProgressToggleLoreLinePattern by RepoPattern.pattern(("itemstacksize.combat.overallprogresstoggle.loreline"), ("(§.)*Overall Progress: (§.)*(?<status>[\\w]+)"))
 
     @SubscribeEvent
     override fun onRenderItemTip(event: RenderItemTipEvent) {
