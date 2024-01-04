@@ -6,18 +6,19 @@ import at.hannibal2.skyhanni.features.inventory.itemdisplayoverlay.AbstractMenuS
 import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.cleanName
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
+import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
 import net.minecraft.item.ItemStack
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
 class MenuItemDisplayOverlayFarming : AbstractMenuStackSize() {
     // private val genericPercentPattern = ".* (§.)?(?<percent>[0-9]+)(\\.[0-9]*)?(§.)?%".toPattern()
-    private val totallingCountResourceLoreLinePattern = ".*(§.)Totalling ((§.)+)(?<resourceCount>[\\w]+) (?<resourceType>[ \\w]+)(§.)\\..*".toPattern()
-    private val jacobFarmingContestMedalInventoryLoreLinePattern = (("(?<colorCode>§.)(?<bold>§l)+(?<medal>[\\w]+) (§.)*(m|M)edals: (§.)*(?<count>[\\w]+)").toPattern())
-    private val nextVisitorCountdownLoreLinePattern = (("(§.)*Next Visitor: (§.)*(?<time>[\\w]+)(m|s).*").toPattern())
-    private val insertResourceFromLocationItemNamePattern = (("Insert (?<resource>[\\w]+) from (?<inventorySacks>[\\w]+)").toPattern())
-    private val visitorLogbookNPCRarityLoreLinePattern = (("§.§(L|l)(UNCOMMON|RARE|LEGENDARY|SPECIAL|MYTHIC)").toPattern())
-    private val visitorMilestonePercentProgressLoreLinePattern = (("(§.)*Progress to Tier (?<tier>[\\w]+):.* (§.)*(?<percent>[0-9]+)(\\.[0-9]*)?(§.)?%").toPattern())
+    private val totallingCountResourceLoreLinePattern by RepoPattern.pattern(("itemstacksize.farming.totallingcountresource.loreline"), (".*(§.)Totalling ((§.)+)(?<resourceCount>[\\w]+) (?<resourceType>[ \\w]+)(§.)\\..*"))
+    private val jacobFarmingContestMedalInventoryLoreLinePattern by RepoPattern.pattern(("itemstacksize.farming.jacobfarmingcontestmedalinventory.loreline"), ("(?<colorCode>§.)(?<bold>§l)+(?<medal>[\\w]+) (§.)*(m|M)edals: (§.)*(?<count>[\\w]+)"))
+    private val nextVisitorCountdownLoreLinePattern by RepoPattern.pattern(("itemstacksize.farming.nextvisitorcountdown.loreline"), ("(§.)*Next Visitor: (§.)*(?<time>[\\w]+)(m|s).*"))
+    private val insertResourceFromLocationItemNamePattern by RepoPattern.pattern(("itemstacksize.farming.insertresourcefromlocation.itemname"), ("Insert (?<resource>[\\w]+) from (?<inventorySacks>[\\w]+)"))
+    private val visitorLogbookNPCRarityLoreLinePattern by RepoPattern.pattern(("itemstacksize.farming.visitorlogbooknpcrarity.loreline"), ("§.§(L|l)(UNCOMMON|RARE|LEGENDARY|SPECIAL|MYTHIC)"))
+    private val visitorMilestonePercentProgressLoreLinePattern by RepoPattern.pattern(("itemstacksize.farming.visitormilestonepercentprogress.loreline"), ("(§.)*Progress to Tier (?<tier>[\\w]+):.* (§.)*(?<percent>[0-9]+)(\\.[0-9]*)?(§.)?%"))
 
     @SubscribeEvent
     override fun onRenderItemTip(event: RenderItemTipEvent) {
