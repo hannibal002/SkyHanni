@@ -13,41 +13,42 @@ import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.NumberUtil
 import at.hannibal2.skyhanni.utils.NumberUtil.formatNumber
 import at.hannibal2.skyhanni.utils.NumberUtil.romanToDecimalIfNecessary
+import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
 import net.minecraft.init.Items
 import net.minecraft.item.ItemStack
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
 class MenuItemDisplayOverlayPlayer : AbstractMenuStackSize() {
-    // private val genericPercentPattern = ".* (§.)?(?<percent>[0-9]+)(\\.[0-9]*)?(§.)?%".toPattern()
-    private val museumDonationLoreLinePattern = (("§7Items Donated: §.(?<amount>[0-9.]+).*").toPattern())
-    private val skyblockLevelLoreLinePattern = (("§7Your SkyBlock Level: §.?\\[§.?(?<sblvl>[0-9]{0,3})§.?].*").toPattern())
-    private val skillAvgLoreLinePattern = (("§[0-9](?<avg>[0-9]{1,2}(\\.[0-9])?) Skill Avg\\..*").toPattern())
-    private val dungeonClassLevelItemNamePattern = (("(?<class>[A-z ]+)( )(?<level>[0-9]+)").toPattern())
-    private val dungeonEssenceRewardItemNamePattern = (("(§.)?(?<type>[A-z]+) (Essence) (§.)?x(?<amount>[0-9]+)").toPattern())
-    private val essenceCountLoreLinePattern = (("(§.)?Your (?<essencetype>.+) Essence: (§.)?(?<total>(?<useful>[0-9]+)(,[0-9]+)*)").toPattern())
-    private val essenceCountOtherLoreLinePattern = ((".*(§.)You currently own (§.)(?<total>(?<useful>[0-9]+)(,[0-9]+)*)(§.(?<essencetype>[\\w]+))?.*").toPattern())
-    private val profileIconVariantOneDisplayNamePattern = (("(((§.)*(?<icon>[^A-z])? (§.)*(?<type>.+)?) ?(§.)*(?<profile>Profile: )(§.)*(?<fruit>.+))").toPattern())
-    private val profileIconVariantTwoDisplayNamePattern = (("(§.)*(Profile: )(§.)*(?<fruit>[\\w]+)").toPattern())
-    private val skyblockLevelingItemNamePattern = ((".* Leveling").toPattern())
-    private val skillLevelItemNamePattern = (("(?<skillReal>([\\w]+(?<!Dungeoneering))) (?<level>[\\w]+)").toPattern())
-    private val gardenLevelSkillLevelItemNamePattern = (("Garden Level (?<level>[\\w]+)").toPattern())
-    private val collectionsChestNameItemNamePattern = ((".*Collections").toPattern())
-    private val collectionLevelItemNamePattern = ((".*(§.)+(?<collection>[\\w ]+) (?<tier>[MDCLXVI]+)").toPattern())
-    private val collectionsPercentLoreLinePattern = ((".*Collections .*: (§.)?(?<percent>[0-9]+)(\\.[0-9]*)?(§.)?%".toPattern()))
-    private val craftMoreMinionsLoreLinePattern = (("(§.)*Craft (§.)*(?<count>[\\w]+) (§.)*more (§.)*unique.*").toPattern())
-    private val clickToViewLoreLinePattern = (("§eClick to view .*").toPattern())
-    private val minionTierCraftProgressLoreLinePattern = ((".* Tier .*").toPattern())
-    private val minionTierNotYetCraftedLoreLinePattern = ((".*§c.* Tier .*").toPattern())
-    private val petsItemNamePattern = ((".*Pets.*").toPattern())
-    private val noPetLoreLinePattern = (("(§.)*Selected (p|P)et: (§.)*None").toPattern())
-    private val petsChestNamePattern = (("Pets.*").toPattern())
-    private val yourPetScoreLoreLinePattern = ((".*(§.)*Your Pet Score: (§.)*(?<score>[\\w]+).*").toPattern())
-    private val minionMenuChestNamePattern = ((".* Minion .*").toPattern())
-    private val quickUpgradeItemNamePattern = (("Quick.Upgrade Minion").toPattern())
-    private val youNeedXMoreMaterialsLoreLinePattern = ((".*(§.)+You need (§.)*(?<needed>[\\w]+).*").toPattern())
-    private val doesNotContainArrowsChestNamePattern = (("^((?! ➜ ).)*\$").toPattern())
-    private val canDisplayEssenceChestNameItemNamePattern = ((".*Essence( Guide.*| Shop)?").toPattern())
+    // private val genericPercentPattern = ((".* (§.)?(?<percent>[0-9]+)(\\.[0-9]*)?(§.)?%").toPattern())
+    private val museumDonationLoreLinePattern by RepoPattern.pattern(("itemstacksize.player.general.museumdonation.loreline"), ("§7Items Donated: §.(?<amount>[0-9.]+).*"))
+    private val skyblockLevelLoreLinePattern by RepoPattern.pattern(("itemstacksize.player.general.skyblocklevel.loreline"), ("§7Your SkyBlock Level: §.?\\[§.?(?<sblvl>[0-9]{0,3})§.?].*"))
+    private val skillAvgLoreLinePattern by RepoPattern.pattern(("itemstacksize.player.general.skillavg.loreline"), ("§[0-9](?<avg>[0-9]{1,2}(\\.[0-9])?) Skill Avg\\..*"))
+    private val dungeonClassLevelItemNamePattern by RepoPattern.pattern(("itemstacksize.player.general.dungeonclasslevel.itemname"), ("(?<class>[A-z ]+)( )(?<level>[0-9]+)"))
+    private val dungeonEssenceRewardItemNamePattern by RepoPattern.pattern(("itemstacksize.player.general.dungeonessencereward.itemname"), ("(§.)?(?<type>[A-z]+) (Essence) (§.)?x(?<amount>[0-9]+)"))
+    private val essenceCountLoreLinePattern by RepoPattern.pattern(("itemstacksize.player.general.essencecount.loreline"), ("(§.)?Your (?<essencetype>.+) Essence: (§.)?(?<total>(?<useful>[0-9]+)(,[0-9]+)*)"))
+    private val essenceCountOtherLoreLinePattern by RepoPattern.pattern(("itemstacksize.player.general.essencecountother.loreline"), (".*(§.)You currently own (§.)(?<total>(?<useful>[0-9]+)(,[0-9]+)*)(§.(?<essencetype>[\\w]+))?.*"))
+    private val profileIconVariantOneDisplayNamePattern by RepoPattern.pattern(("itemstacksize.player.general.profileiconvariantone.displayname"), ("(((§.)*(?<icon>[^A-z])? (§.)*(?<type>.+)?) ?(§.)*(?<profile>Profile: )(§.)*(?<fruit>.+))"))
+    private val profileIconVariantTwoDisplayNamePattern by RepoPattern.pattern(("itemstacksize.player.general.profileiconvarianttwo.displayname"), ("(§.)*(Profile: )(§.)*(?<fruit>[\\w]+)"))
+    private val skyblockLevelingItemNamePattern by RepoPattern.pattern(("itemstacksize.player.general.skyblockleveling.itemname"), (".* Leveling"))
+    private val skillLevelItemNamePattern by RepoPattern.pattern(("itemstacksize.player.general.skilllevel.itemname"), ("(?<skillReal>([\\w]+(?<!Dungeoneering))) (?<level>[\\w]+)"))
+    private val gardenLevelSkillLevelItemNamePattern by RepoPattern.pattern(("itemstacksize.player.general.gardenlevelskilllevel.itemname"), ("Garden Level (?<level>[\\w]+)"))
+    private val collectionsChestNameItemNamePattern by RepoPattern.pattern(("itemstacksize.player.general.collectionschestname.itemname"), (".*Collections"))
+    private val collectionLevelItemNamePattern by RepoPattern.pattern(("itemstacksize.player.general.collectionlevel.itemname"), (".*(§.)+(?<collection>[\\w ]+) (?<tier>[MDCLXVI]+)"))
+    private val collectionsPercentLoreLinePattern by RepoPattern.pattern(("itemstacksize.player.general.collectionspercent.loreline"), (".*Collections .*: (§.)?(?<percent>[0-9]+)(\\.[0-9]*)?(§.)?%"))
+    private val craftMoreMinionsLoreLinePattern by RepoPattern.pattern(("itemstacksize.player.general.craftmoreminions.loreline"), ("(§.)*Craft (§.)*(?<count>[\\w]+) (§.)*more (§.)*unique.*"))
+    private val clickToViewLoreLinePattern by RepoPattern.pattern(("itemstacksize.player.general.clicktoview.loreline"), ("§eClick to view .*"))
+    private val minionTierCraftProgressLoreLinePattern by RepoPattern.pattern(("itemstacksize.player.general.miniontiercraftprogress.loreline"), (".* Tier .*"))
+    private val minionTierNotYetCraftedLoreLinePattern by RepoPattern.pattern(("itemstacksize.player.general.miniontiernotyetcrafted.loreline"), (".*§c.* Tier .*"))
+    private val petsItemNamePattern by RepoPattern.pattern(("itemstacksize.player.general.pets.itemname"), (".*Pets.*"))
+    private val petsNoPetLoreLinePattern by RepoPattern.pattern(("itemstacksize.player.general.petsnopet.loreline"), ("(§.)*Selected (p|P)et: (§.)*None"))
+    private val petsChestNamePattern by RepoPattern.pattern(("itemstacksize.player.general.pets.chestname"), ("Pets.*"))
+    private val yourPetScoreLoreLinePattern by RepoPattern.pattern(("itemstacksize.player.general.yourpetscore.loreline"), (".*(§.)*Your Pet Score: (§.)*(?<score>[\\w]+).*"))
+    private val minionMenuChestNamePattern by RepoPattern.pattern(("itemstacksize.player.general.minionmenu.chestname"), (".* Minion .*"))
+    private val quickUpgradeItemNamePattern by RepoPattern.pattern(("itemstacksize.player.general.quickupgrade.itemname"), ("Quick.Upgrade Minion"))
+    private val youNeedXMoreMaterialsLoreLinePattern by RepoPattern.pattern(("itemstacksize.player.general.youneedxmorematerials.loreline"), (".*(§.)+You need (§.)*(?<needed>[\\w]+).*"))
+    private val doesNotContainArrowsChestNamePattern by RepoPattern.pattern(("itemstacksize.player.general.doesnotcontainarrows.chestname"), ("^((?! ➜ ).)*\$"))
+    private val canDisplayEssenceChestNameItemNamePattern by RepoPattern.pattern(("itemstacksize.player.general.candisplayessence.chestnameitemname"), (".*Essence( Guide.*| Shop)?"))
     private val museumItemNamesList = listOf(
         "Museum",
         "Rarities",
@@ -175,7 +176,7 @@ class MenuItemDisplayOverlayPlayer : AbstractMenuStackSize() {
             if ((chestName.lowercase() == "skyblock menu")) {
                 petsItemNamePattern.matchMatcher(itemName) {
                     for (line in item.getLore()) {
-                        noPetLoreLinePattern.matchMatcher(line) { return "§c§l✖" }
+                        petsNoPetLoreLinePattern.matchMatcher(line) { return "§c§l✖" }
                     }
                 }
             }
