@@ -487,9 +487,8 @@ private fun getMagmaBossLines(): List<String> {
     val list = listOf(
         SbPattern.magmaBossPattern,
         SbPattern.damageSoakedPattern,
-        SbPattern.damagedSoakedBarPattern,
         SbPattern.killMagmasPattern,
-        SbPattern.killMagmasBarPattern,
+        SbPattern.killMagmasDamagedSoakedBarPattern,
         SbPattern.reformingPattern,
         SbPattern.bossHealthPattern,
         SbPattern.bossHealthBarPattern
@@ -501,7 +500,7 @@ private fun getMagmaBossLines(): List<String> {
     return list.ifEmpty {
         when (config.informationFilteringConfig.hideEmptyLines) {
             true -> listOf("<hidden>")
-            false -> listOf("§cNo Mining Event")
+            false -> listOf("§cNo Magma Boss")
         }
     }
 }
