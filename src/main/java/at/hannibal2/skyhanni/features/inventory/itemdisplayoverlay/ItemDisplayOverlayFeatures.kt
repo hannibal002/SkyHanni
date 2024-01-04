@@ -54,6 +54,7 @@ import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getFruitBowlNames
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getNecronHandlesFound
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getPrehistoricEggBlocksWalked
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getRanchersSpeed
+import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.StringUtils.matches
 import at.hannibal2.skyhanni.utils.matches
@@ -69,33 +70,33 @@ object ItemDisplayOverlayFeatures : AbstractStackSize() {
 
     // TODO repo
     // private val xOutOfYNoColorRequiredPattern = ((".*: (§.)?(?<useful>[0-9]+)(§.)?\\/(§.)?(?<total>[0-9]+).*").toPattern())
-    private val masterStarPattern = (("(?<tier>[A-Z])+_MASTER_STAR").toPattern())
-    private val petLevelItemNamePattern = (("\\[Lvl (?<level>.*)] .*").toPattern())
-    private val shredderBonusDamageLoreLinePattern = (("(§.)?Bonus Damage \\([0-9]+ cap\\): (§.)?(?<dmgbonus>[0-9]+)").toPattern())
-    private val bottleOfJerryLoreLinePattern = (("(§.)?Intelligence Bonus: (§.)?(?<intelbonus>[0-9]+)").toPattern())
-    private val gardenVacuumLoreLinePattern = (("§7Vacuum Bag: §6(?<amount>[0-9,]+) Pests?").toPattern())
-    private val masterSkullInternalNamePattern = (("MASTER_SKULL_TIER_(?<tier>\\d)").toPattern())
-    private val dungeonBossHeadInternalNamePattern = (("(GOLD(EN)?|DIAMOND)_(?<dungeonBoss>[\\w]+)_HEAD").toPattern())
-    private val minionTierItemNamePattern = (("([\\w]+ Minion [\\w]+).*(?<!Recipes)\$").toPattern())
-    private val enchantedItemSackItemNamePattern = (("Enchanted .*").toPattern())
-    private val kuudraKeyItemNamePattern = (("([\\w ]+)?Kuudra Key").toPattern())
-    private val kuudraKeyInternalNamePattern = (("KUUDRA_(?<tier>[\\w]+)_KEY").toPattern())
-    private val larvaHookLoreLinePattern = (("§7§7You may harvest §6(?<amount>.).*").toPattern())
-    private val armadilloRarityLorePattern = (("(§.)*(?<rarity>COMMON|UNCOMMON|RARE|EPIC|LEGENDARY)").toPattern())
-    private val beastmasterCrestInternalNamePattern = (("BEASTMASTER_CREST_[\\w]*").toPattern())
-    private val beastmasterCrestKillsProgressPattern = (("(§.)*Your kills: (§.)*(?<progress>[\\w,]+)(§.)*\\/(?<total>[\\w,]+)").toPattern())
-    private val campfireTalismanTierInternalNamePattern = (("CAMPFIRE_TALISMAN_(?<tier>[\\d]+)").toPattern())
-    private val isNotAuctionHouseChestNamePattern = (("^(?:(?!Auction).)*\$").toPattern())
-    private val internalizedSoulflowLoreLinePattern = (("(§.)*Internalized: (§.)*(?<leading>[0-9]+)(?<trailing>,[0-9]{0,3})⸎ Soulflow").toPattern())
-    private val storageChestInternalNamePattern = ((".*_ENCHANTED_CHEST").toPattern())
-    private val storageChestItemNamePattern = ((".* Storage").toPattern())
-    private val personalCompactorDeletorChestNamePattern = (("Personal (Compactor .*|Deletor .*)").toPattern())
-    private val personalCompactorDeletorEnabledItemNamePattern = (("(§.)*(Compactor|Deletor) Currently O(?<toggle>FF|N)!").toPattern())
-    private val personalCompactorDeletorInternalNamePattern = (("PERSONAL_(COMPACTOR|DELETOR)_(?<thousands>[\\w]+)(000)").toPattern())
-    private val personalCompactorDeletorItemNamePattern = (("Personal (Compactor|Deletor) (?<thousands>[\\w]+)(000)").toPattern())
-    private val abiphoneInternalNamePattern = (("ABIPHONE_.*").toPattern())
-    private val doesNotIncludeDungeonStarsItemNamePattern = (("^(?:(?!✪).)*\$").toPattern())
-    private val soulflowAccessoryInternalNamePattern = (("SOULFLOW_.*").toPattern())
+    private val masterStarInternalNamePattern by RepoPattern.pattern(("itemstacksize.itemdisplayoverlay.masterstar.internalname"), ("(?<tier>[A-Z])+_MASTER_STAR"))
+    private val petLevelItemNamePattern by RepoPattern.pattern(("itemstacksize.itemdisplayoverlay.petlevel.itemname"), ("\\[Lvl (?<level>.*)] .*"))
+    private val shredderBonusDamageLoreLinePattern by RepoPattern.pattern(("itemstacksize.itemdisplayoverlay.shredderbonusdamage.loreline"), ("(§.)?Bonus Damage \\([0-9]+ cap\\): (§.)?(?<dmgbonus>[0-9]+)"))
+    private val bottleOfJerryLoreLinePattern by RepoPattern.pattern(("itemstacksize.itemdisplayoverlay.bottleofjerry.loreline"), ("(§.)?Intelligence Bonus: (§.)?(?<intelbonus>[0-9]+)"))
+    private val gardenVacuumLoreLinePattern by RepoPattern.pattern(("itemstacksize.itemdisplayoverlay.gardenvacuum.loreline"), ("§7Vacuum Bag: §6(?<amount>[0-9,]+) Pests?"))
+    private val masterSkullInternalNamePattern by RepoPattern.pattern(("itemstacksize.itemdisplayoverlay.masterskull.internalname"), ("MASTER_SKULL_TIER_(?<tier>\\d)"))
+    private val dungeonBossHeadInternalNamePattern by RepoPattern.pattern(("itemstacksize.itemdisplayoverlay.dungeonbosshead.internalname"), ("(GOLD(EN)?|DIAMOND)_(?<dungeonBoss>[\\w]+)_HEAD"))
+    private val minionTierItemNamePattern by RepoPattern.pattern(("itemstacksize.itemdisplayoverlay.miniontier.itemname"), ("([\\w]+ Minion [\\w]+).*(?<!Recipes)\$"))
+    private val enchantedItemSackItemNamePattern by RepoPattern.pattern(("itemstacksize.itemdisplayoverlay.enchanteditemsack.itemname"), ("Enchanted .*"))
+    private val kuudraKeyItemNamePattern by RepoPattern.pattern(("itemstacksize.itemdisplayoverlay.kuudrakey.itemname"), ("([\\w ]+)?Kuudra Key"))
+    private val kuudraKeyInternalNamePattern by RepoPattern.pattern(("itemstacksize.itemdisplayoverlay.kuudrakey.internalname"), ("KUUDRA_(?<tier>[\\w]+)_KEY"))
+    private val larvaHookLoreLinePattern by RepoPattern.pattern(("itemstacksize.itemdisplayoverlay.larvahook.loreline"), ("§7§7You may harvest §6(?<amount>.).*"))
+    private val armadilloRarityLoreLinePattern by RepoPattern.pattern(("itemstacksize.itemdisplayoverlay.armadillorarity.loreline"), ("(§.)*(?<rarity>COMMON|UNCOMMON|RARE|EPIC|LEGENDARY)"))
+    private val beastmasterCrestInternalNamePattern by RepoPattern.pattern(("itemstacksize.itemdisplayoverlay.beastmastercrest.internalname"), ("BEASTMASTER_CREST_[\\w]*"))
+    private val beastmasterCrestKillsProgressLoreLinePattern by RepoPattern.pattern(("itemstacksize.itemdisplayoverlay.beastmastercrestkillsprogress.loreline"), ("(§.)*Your kills: (§.)*(?<progress>[\\w,]+)(§.)*\\/(?<total>[\\w,]+)"))
+    private val campfireTalismanTierInternalNamePattern by RepoPattern.pattern(("itemstacksize.itemdisplayoverlay.campfiretalismantier.internalname"), ("CAMPFIRE_TALISMAN_(?<tier>[\\d]+)"))
+    private val isNotAuctionHouseChestNamePattern by RepoPattern.pattern(("itemstacksize.itemdisplayoverlay.isnotauctionhouse.chestname"), ("^(?:(?!Auction).)*\$"))
+    private val internalizedSoulflowLoreLinePattern by RepoPattern.pattern(("itemstacksize.itemdisplayoverlay.internalizedsoulflow.loreline"), ("(§.)*Internalized: (§.)*(?<leading>[0-9]+)(?<trailing>,[0-9]{0,3})⸎ Soulflow"))
+    private val storageChestInternalNamePattern by RepoPattern.pattern(("itemstacksize.itemdisplayoverlay.storagechest.internalname"), (".*_ENCHANTED_CHEST"))
+    private val storageChestItemNamePattern by RepoPattern.pattern(("itemstacksize.itemdisplayoverlay.storagechest.itemname"), (".* Storage"))
+    private val personalCompactorDeletorChestNamePattern by RepoPattern.pattern(("itemstacksize.itemdisplayoverlay.personalcompactordeletor.chestname"), ("Personal (Compactor .*|Deletor .*)"))
+    private val personalCompactorDeletorEnabledItemNamePattern by RepoPattern.pattern(("itemstacksize.itemdisplayoverlay.personalcompactordeletorenabled.itemname"), ("(§.)*(Compactor|Deletor) Currently O(?<toggle>FF|N)!"))
+    private val personalCompactorDeletorInternalNamePattern by RepoPattern.pattern(("itemstacksize.itemdisplayoverlay.personalcompactordeletor.internalname"), ("PERSONAL_(COMPACTOR|DELETOR)_(?<thousands>[\\w]+)(000)"))
+    private val personalCompactorDeletorItemNamePattern by RepoPattern.pattern(("itemstacksize.itemdisplayoverlay.personalcompactordeletor.itemname"), ("Personal (Compactor|Deletor) (?<thousands>[\\w]+)(000)"))
+    private val abiphoneInternalNamePattern by RepoPattern.pattern(("itemstacksize.itemdisplayoverlay.abiphone.internalname"), ("ABIPHONE_.*"))
+    private val doesNotIncludeDungeonStarsItemNamePattern by RepoPattern.pattern(("itemstacksize.itemdisplayoverlay.doesnotincludedungeonstars.itemname"), ("^(?:(?!✪).)*\$"))
+    private val soulflowAccessoryInternalNamePattern by RepoPattern.pattern(("itemstacksize.itemdisplayoverlay.soulflowaccessory.internalname"), ("SOULFLOW_.*"))
 
     private val newYearCakeInternalName = (("NEW_YEAR_CAKE").asInternalName())
     private val ranchersBootsInternalName = (("RANCHERS_BOOTS").asInternalName())
@@ -174,10 +175,10 @@ object ItemDisplayOverlayFeatures : AbstractStackSize() {
     }
 
     // <editor-fold desc="Stack Size Implementations">
-    private fun isMasterStar(internalName: NEUInternalName): Boolean = MASTER_STAR_TIER.isSelected() && masterStarPattern.matches(internalName)
+    private fun isMasterStar(internalName: NEUInternalName): Boolean = MASTER_STAR_TIER.isSelected() && masterStarInternalNamePattern.matches(internalName)
     private fun getMasterStarTip(internalName: NEUInternalName): String {
         var tier = ""
-        masterStarPattern.matchMatcher(internalName.asString()) { tier = group("tier") }
+        masterStarInternalNamePattern.matchMatcher(internalName.asString()) { tier = group("tier") }
         return when (tier) {
             "FIRST" -> "1"
             "SECOND" -> "2"
@@ -384,7 +385,7 @@ object ItemDisplayOverlayFeatures : AbstractStackSize() {
         val blocksWalked = item.getPrehistoricEggBlocksWalked() ?: return ""
         var rarity = ""
         for (line in lore) {
-            armadilloRarityLorePattern.matchMatcher(line) { rarity = group("rarity") }
+            armadilloRarityLoreLinePattern.matchMatcher(line) { rarity = group("rarity") }
         }
         val threshold = when (rarity) {
             "COMMMON" -> 4_000F
@@ -417,7 +418,7 @@ object ItemDisplayOverlayFeatures : AbstractStackSize() {
                 val denom = line.removeColor().replace("Your kills: ", "").replace(",", "").split("/").last()
                 return (((num.toFloat() / denom.toFloat()) * 100).toString().take(2))
             } */
-            beastmasterCrestKillsProgressPattern.matchMatcher(line) {
+            beastmasterCrestKillsProgressLoreLinePattern.matchMatcher(line) {
                 return "${((group("progress").formatNumber().toFloat() / group("total").formatNumber().toFloat()) * 100)}".take(2)
             }
         }
