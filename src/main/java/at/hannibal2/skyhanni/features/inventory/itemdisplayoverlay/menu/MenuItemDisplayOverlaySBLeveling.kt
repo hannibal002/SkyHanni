@@ -7,19 +7,20 @@ import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.cleanName
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.ItemUtils.name
+import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
 import net.minecraft.item.ItemStack
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
 class MenuItemDisplayOverlaySBLeveling : AbstractMenuStackSize() {
-    private val guideTaskChestNamePattern = ((".*(Guide |Task).*").toPattern())
-    private val progressPatternLoreLinePattern = ((".*Progress.*: (§.)?(?<percent>[0-9]+)(\\.[0-9]*)?(§.)?%").toPattern())
-    private val checkmarkItemNamePattern = (("✔.*").toPattern())
-    private val progressToCompleteCategoryPercentLorePattern = ((".*(§.)?Progress to Complete Category: (§.)?(?<percent>[0-9]+)(\\.[0-9]*)?(§.)?%").toPattern())
-    private val rewardsSkyblockLevelingChestNamePattern = ((".*(rewards|skyblock leveling).*").toPattern())
-    private val progressToRewardsUnlockedPatternLorePattern = ((".*(Progress to .*|Rewards Unlocked:) (§.)?(?<percent>[0-9]+)(\\.[0-9]*)?(§.)?%").toPattern())
-    private val greenItemNamePattern = (("^§a(\\S*)\$").toPattern())
-    private val emblemsUnlockedLorePattern = (("(§.)?(?<emblems>[\\d]+) Unlocked").toPattern())
+    private val guideTaskChestNamePattern by RepoPattern.pattern(("itemstacksize.sbleveling.guidetask.chestname"), (".*(Guide |Task).*"))
+    private val progressPatternLoreLinePattern by RepoPattern.pattern(("itemstacksize.sbleveling.progresspattern.loreline"), (".*Progress.*: (§.)?(?<percent>[0-9]+)(\\.[0-9]*)?(§.)?%"))
+    private val checkmarkItemNamePattern by RepoPattern.pattern(("itemstacksize.sbleveling.checkmark.itemname"), ("✔.*"))
+    private val progressToCompleteCategoryPercentLoreLinePattern by RepoPattern.pattern(("itemstacksize.sbleveling.progresstocompletecategorypercent.loreline"), (".*(§.)?Progress to Complete Category: (§.)?(?<percent>[0-9]+)(\\.[0-9]*)?(§.)?%"))
+    private val rewardsSkyblockLevelingChestNamePattern by RepoPattern.pattern(("itemstacksize.sbleveling.rewardsskyblockleveling.chestname"), (".*(rewards|skyblock leveling).*"))
+    private val progressToRewardsUnlockedPatternLoreLinePattern by RepoPattern.pattern(("itemstacksize.sbleveling.progresstorewardsunlockedpattern.loreline"), (".*(Progress to .*|Rewards Unlocked:) (§.)?(?<percent>[0-9]+)(\\.[0-9]*)?(§.)?%"))
+    private val greenItemNamePattern by RepoPattern.pattern(("itemstacksize.sbleveling.green.itemname"), ("^§a(\\S*)\$"))
+    private val emblemsUnlockedLoreLinePattern by RepoPattern.pattern(("itemstacksize.sbleveling.emblemsunlocked.loreline"), ("(§.)?(?<emblems>[\\d]+) Unlocked"))
 
     @SubscribeEvent
     override fun onRenderItemTip(event: RenderItemTipEvent) {
@@ -49,7 +50,7 @@ class MenuItemDisplayOverlaySBLeveling : AbstractMenuStackSize() {
 
         if (stackSizeConfig.contains(StackSizeMenuConfig.SBLeveling.WAYS_TO_LEVEL_UP_PROGRESS)) {
             for (line in item.getLore()) {
-                progressToCompleteCategoryPercentLorePattern.matchMatcher(line) {
+                progressToCompleteCategoryPercentLoreLinePattern.matchMatcher(line) {
                     return group("percent").replace("100", "§a✔")
                 }
             }
@@ -59,7 +60,7 @@ class MenuItemDisplayOverlaySBLeveling : AbstractMenuStackSize() {
             if ((itemName.isNotEmpty())) {
                 rewardsSkyblockLevelingChestNamePattern.matchMatcher(chestName.lowercase()) {
                     for (line in item.getLore()) {
-                        progressToRewardsUnlockedPatternLorePattern.matchMatcher(line) {
+                        progressToRewardsUnlockedPatternLoreLinePattern.matchMatcher(line) {
                             return group("percent").replace("100", "§a✔")
                         }
                     }
@@ -71,7 +72,7 @@ class MenuItemDisplayOverlaySBLeveling : AbstractMenuStackSize() {
             val nameWithColor = item.name ?: return ""
             if ((chestName == ("Emblems"))) {
                 greenItemNamePattern.matchMatcher(nameWithColor) {
-                    emblemsUnlockedLorePattern.matchMatcher(item.getLore().first()) {
+                    emblemsUnlockedLoreLinePattern.matchMatcher(item.getLore().first()) {
                         return group("emblems")
                     }
                 }
