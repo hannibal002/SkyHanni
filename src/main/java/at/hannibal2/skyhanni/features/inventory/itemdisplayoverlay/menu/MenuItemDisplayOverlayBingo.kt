@@ -8,16 +8,17 @@ import at.hannibal2.skyhanni.utils.ItemUtils.cleanName
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.NumberUtil
 import at.hannibal2.skyhanni.utils.NumberUtil.formatNumber
+import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
 import net.minecraft.item.ItemStack
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
 class MenuItemDisplayOverlayBingo : AbstractMenuStackSize() {
 
-    private val secretBingoDiscoveryLoreLinePattern = (("(§.)*You were the (§.)*(?<rank>[\\w]+)(?<ordinal>(st|nd|rd|th)) (§.)*to").toPattern())
-    private val rowColumnDiagonalItemNamePattern = (("(§.)*((Community )?Diagonal|Row #.|Column #.)").toPattern())
-    private val topBlankPercentContribLoreLinePattern = (("((  )?(§.)?)?Top (§.)*(?<toUse>[\\w]{0,2})(.(?<decimal>[\\w]+))?%").toPattern())
-    private val communityPersonalGoalLoreLinePattern = (("(§.)*(?<goalType>Community|Personal) Goal").toPattern())
+    private val secretBingoDiscoveryLoreLinePattern by RepoPattern.pattern(("itemstacksize.bingo.secretbingodiscovery.loreline"), ("(§.)*You were the (§.)*(?<rank>[\\w]+)(?<ordinal>(st|nd|rd|th)) (§.)*to"))
+    private val rowColumnDiagonalItemNamePattern by RepoPattern.pattern(("itemstacksize.bingo.rowcolumndiagonal.itemname"), ("(§.)*((Community )?Diagonal|Row #.|Column #.)"))
+    private val topBlankPercentContribLoreLinePattern by RepoPattern.pattern(("itemstacksize.bingo.topblankpercentcontrib.loreline"), ("((  )?(§.)?)?Top (§.)*(?<toUse>[\\w]{0,2})(.(?<decimal>[\\w]+))?%"))
+    private val communityPersonalGoalLoreLinePattern by RepoPattern.pattern(("itemstacksize.bingo.communitypersonalgoal.loreline"), ("(§.)*(?<goalType>Community|Personal) Goal"))
 
     @SubscribeEvent
     override fun onRenderItemTip(event: RenderItemTipEvent) {
