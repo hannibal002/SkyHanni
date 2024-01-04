@@ -7,28 +7,29 @@ import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.cleanName
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.ItemUtils.name
+import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
 import net.minecraft.item.ItemStack
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
 class MenuItemDisplayOverlayMining : AbstractMenuStackSize() {
     // private val genericPercentPattern = ".* (§.)?(?<percent>[0-9]+)(\\.[0-9]*)?(§.)?%".toPattern()
-    private val hotmPerkLevelXOutOfYLoreLinePattern = "(§.).* (?<useful>[0-9]+)(§.)?(\\/(§.)?(?<total>[0-9]+))?.*".toPattern()
-    private val rightClickToEnableDisableLoreLinePattern = (("(§.)*Right.?click to (§.)*disable(§.)*!").toPattern())
-    private val skyMallCurrentEffectLoreLinePattern = ((".*(§.)*Your Current Effect.*").toPattern())
-    private val theSkymallCurrentEffectInQuestionLoreLinePattern = (("(§.)*.*■ (§.)*(?<thePerk>.+)").toPattern())
-    private val hotmPerkEnabledDisabledInProgressItemNamePattern = (("§(a|e|c).*").toPattern())
-    private val isNotHOTMPerkFirstCheckLoreLinePattern = (("^((?!(§.)*Level ).)*\$").toPattern())
-    private val isNotHOTMPerkSecondCheckLoreLinePattern = (("^((?!(§.)*(Right|Left).click to ).)*\$").toPattern())
-    private val lockedHOTMPerkLoreLinePattern = ((".*(§.)*(Requires .*|.*the Mountain!).*").toPattern())
-    private val isHOTMPerkMaxedItemNamePattern = (("§a.*").toPattern())
-    private val isHOTMPerkDisabledLoreLinePattern = (("(§.)*(.*)click to (§.)*(enable).*").toPattern())
-    private val isHOTMTierItemNamePattern = (("Tier (?<tier>[\\w]+)").toPattern())
-    private val isHOTMTierUnlockedItemNamePattern = (("§aTier (?<tier>[\\w]+)").toPattern())
-    private val hotmLevelPercentProgressLoreLinePattern = ((".*Progress.*: (§.)?(?<percent>[0-9]+)(\\.[0-9]*)?(§.)?%").toPattern())
-    private val crystalsNotForCrystalNucleusLoreLinePattern = ((".*(Your Other Crystals|Jasper|Ruby).*").toPattern())
-    private val crystalNotPlacedLoreLinePattern = ((".* §e✖ Not Placed").toPattern())
-    private val crystalNotFoundLoreLinePattern = ((".* §c✖ Not Found").toPattern())
+    private val hotmPerkLevelXOutOfYLoreLinePattern by RepoPattern.pattern(("itemstacksize.mining.hotmperklevelxoutofy.loreline"), ("(§.).* (?<useful>[0-9]+)(§.)?(\\/(§.)?(?<total>[0-9]+))?.*"))
+    private val rightClickToEnableDisableLoreLinePattern by RepoPattern.pattern(("itemstacksize.mining.rightclicktoenabledisable.loreline"), ("(§.)*Right.?click to (§.)*disable(§.)*!"))
+    private val skyMallCurrentEffectLoreLinePattern by RepoPattern.pattern(("itemstacksize.mining.skymallcurrenteffect.loreline"), (".*(§.)*Your Current Effect.*"))
+    private val theSkymallCurrentEffectInQuestionLoreLinePattern by RepoPattern.pattern(("itemstacksize.mining.theskymallcurrenteffectinquestion.loreline"), ("(§.)*.*■ (§.)*(?<thePerk>.+)"))
+    private val hotmPerkEnabledDisabledInProgressItemNamePattern by RepoPattern.pattern(("itemstacksize.mining.hotmperkenableddisabledinprogress.itemname"), ("§(a|e|c).*"))
+    private val isNotHOTMPerkFirstCheckLoreLinePattern by RepoPattern.pattern(("itemstacksize.mining.isnothotmperkfirstcheck.loreline"), ("^((?!(§.)*Level ).)*\$"))
+    private val isNotHOTMPerkSecondCheckLoreLinePattern by RepoPattern.pattern(("itemstacksize.mining.isnothotmperksecondcheck.loreline"), ("^((?!(§.)*(Right|Left).click to ).)*\$"))
+    private val lockedHOTMPerkLoreLinePattern by RepoPattern.pattern(("itemstacksize.mining.lockedhotmperk.loreline"), (".*(§.)*(Requires .*|.*the Mountain!).*"))
+    private val isHOTMPerkMaxedItemNamePattern by RepoPattern.pattern(("itemstacksize.mining.ishotmperkmaxed.itemname"), ("§a.*"))
+    private val isHOTMPerkDisabledLoreLinePattern by RepoPattern.pattern(("itemstacksize.mining.ishotmperkdisabled.loreline"), ("(§.)*(.*)click to (§.)*(enable).*"))
+    private val isHOTMTierItemNamePattern by RepoPattern.pattern(("itemstacksize.mining.ishotmtier.itemname"), ("Tier (?<tier>[\\w]+)"))
+    private val isHOTMTierUnlockedItemNamePattern by RepoPattern.pattern(("itemstacksize.mining.ishotmtierunlocked.itemname"), ("§aTier (?<tier>[\\w]+)"))
+    private val hotmLevelPercentProgressLoreLinePattern by RepoPattern.pattern(("itemstacksize.mining.hotmlevelpercentprogress.loreline"), (".*Progress.*: (§.)?(?<percent>[0-9]+)(\\.[0-9]*)?(§.)?%"))
+    private val crystalsNotForCrystalNucleusLoreLinePattern by RepoPattern.pattern(("itemstacksize.mining.crystalsnotforcrystalnucleus.loreline"), (".*(Your Other Crystals|Jasper|Ruby).*"))
+    private val crystalNotPlacedLoreLinePattern by RepoPattern.pattern(("itemstacksize.mining.crystalnotplaced.loreline"), (".* §e✖ Not Placed"))
+    private val crystalNotFoundLoreLinePattern by RepoPattern.pattern(("itemstacksize.mining.crystalnotfound.loreline"), (".* §c✖ Not Found"))
 
     @SubscribeEvent
     override fun onRenderItemTip(event: RenderItemTipEvent) {
