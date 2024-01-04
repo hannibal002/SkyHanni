@@ -32,7 +32,7 @@ public class ChatConfig {
     public ChatSymbols chatSymbols = new ChatSymbols();
 
     @Expose
-    @ConfigOption(name = "Dungeon Filter", desc = "Hide annoying messages in Dungeons.")
+    @ConfigOption(name = "Dungeon Filter", desc = "Hides pickup, reminder, buff, damage, ability, puzzle and end messages in Dungeons.")
     @ConfigEditorBoolean
     @FeatureToggle
     public boolean dungeonMessages = true;
