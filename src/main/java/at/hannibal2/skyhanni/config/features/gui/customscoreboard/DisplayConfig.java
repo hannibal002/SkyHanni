@@ -31,14 +31,19 @@ public class DisplayConfig {
     public boolean showAllActiveEvents = false;
 
     @Expose
+    @ConfigOption(name = "Cache Scoreboard on Island Switch",
+        desc = "Will stop the Scoreboard from updating while switching islands.\nRemoves the shaking when loading data.")
+    @ConfigEditorBoolean
+    public boolean cacheScoreboardOnIslandSwitch = false;
+
+    @Expose
     @ConfigOption(name = "Number Format", desc = "")
     @ConfigEditorDropdown
     public NumberFormat numberFormat = NumberFormat.LONG;
 
     public enum NumberFormat {
         LONG("1,234,567"),
-        SHORT("1.2M")
-        ;
+        SHORT("1.2M");
 
         private final String str;
 

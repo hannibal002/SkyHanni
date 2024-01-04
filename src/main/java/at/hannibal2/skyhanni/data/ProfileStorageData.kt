@@ -26,6 +26,7 @@ object ProfileStorageData {
 
     // TODO USE SH-REPO
     private val profileSwitchPattern = "§7Switching to profile (?<name>.*)\\.\\.\\.".toPattern()
+    val profileTablistPattern = "§e§lProfile: §r§a(?<name>.*)".toPattern()
 
     private var sackPlayers: SackData.PlayerSpecific? = null
     var sackProfiles: SackData.ProfileSpecific? = null
@@ -83,8 +84,7 @@ object ProfileStorageData {
         val playerSpecific = playerSpecific ?: return
         val sackPlayers = sackPlayers ?: return
         for (line in event.tabList) {
-            val pattern = "§e§lProfile: §r§a(?<name>.*)".toPattern()
-            pattern.matchMatcher(line) {
+            profileTablistPattern.matchMatcher(line) {
                 val profileName = group("name").lowercase()
                 loadProfileSpecific(playerSpecific, sackPlayers, profileName)
                 nextProfile = null

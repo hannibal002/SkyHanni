@@ -23,6 +23,7 @@ import at.hannibal2.skyhanni.events.LorenzTickEvent
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.RenderUtils.AlignmentEnum
 import at.hannibal2.skyhanni.utils.RenderUtils.renderStringsAlignedWidth
+import at.hannibal2.skyhanni.utils.TabListData
 import net.minecraftforge.client.GuiIngameForge
 import net.minecraftforge.client.event.RenderGameOverlayEvent
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
@@ -32,6 +33,7 @@ typealias ScoreboardElement = Pair<String, AlignmentEnum>
 class CustomScoreboard {
     private val config get() = SkyHanniMod.feature.gui.customScoreboard
     private var display = emptyList<ScoreboardElement>()
+    private var cache = emptyList<ScoreboardElement>()
 
     @SubscribeEvent
     fun onRenderOverlay(event: GuiRenderEvent.GuiOverlayRenderEvent) {
@@ -40,7 +42,12 @@ class CustomScoreboard {
 
         RenderBackground().renderBackground()
 
-        config.position.renderStringsAlignedWidth(display, posLabel = "Custom Scoreboard")
+        if (!TabListData.fullyLoaded && config.displayConfig.cacheScoreboardOnIslandSwitch) {
+            config.position.renderStringsAlignedWidth(cache, posLabel = "Custom Scoreboard")
+        } else {
+            config.position.renderStringsAlignedWidth(display, posLabel = "Custom Scoreboard")
+            cache = display
+        }
     }
 
     @SubscribeEvent
