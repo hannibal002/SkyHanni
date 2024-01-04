@@ -11,12 +11,13 @@ public class InformationFilteringConfig {
     public boolean hideEmptyLines = true;
 
     @Expose
-    @ConfigOption(name = "Hide non relevant info", desc = "Hide lines that are not relevant to the current location, like hiding copper while not in garden.")
-    @ConfigEditorBoolean
-    public boolean hideIrrelevantLines = true;
-
-    @Expose
     @ConfigOption(name = "Hide consecutive empty lines", desc = "Hide lines that are empty and have an empty line above them.")
     @ConfigEditorBoolean
     public boolean hideConsecutiveEmptyLines = true;
+
+    @Expose
+    @ConfigOption(name = "Hide non relevant info", desc = "Hide lines that are not relevant to the current location." +
+        "\n§cIt's generally not recommended to turn this off.")
+    @ConfigEditorBoolean
+    public boolean hideIrrelevantLines = true;
 }
