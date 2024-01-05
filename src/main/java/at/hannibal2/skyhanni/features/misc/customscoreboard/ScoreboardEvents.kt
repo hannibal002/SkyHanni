@@ -301,7 +301,7 @@ private fun getTrapperShowWhen(): Boolean {
 }
 
 private fun getGardenCleanUpLines(): List<String> {
-    return listOf(getSbLines().first { SbPattern.cleanUpPattern.matches(it) })
+    return listOf(getSbLines().first { SbPattern.cleanUpPattern.matches(it) }.trim())
 }
 
 private fun getGardenCleanUpShowWhen(): Boolean {
@@ -309,7 +309,7 @@ private fun getGardenCleanUpShowWhen(): Boolean {
 }
 
 private fun getGardenPastingLines(): List<String> {
-    return listOf(getSbLines().first { SbPattern.pastingPattern.matches(it) })
+    return listOf(getSbLines().first { SbPattern.pastingPattern.matches(it) }.trim())
 }
 
 private fun getGardenPastingShowWhen(): Boolean {
@@ -317,9 +317,7 @@ private fun getGardenPastingShowWhen(): Boolean {
 }
 
 private fun getFlightDurationLines(): List<String> {
-    return listOf(
-        getSbLines().first { SbPattern.flightDurationPattern.matches(it) },
-    )
+    return listOf(getSbLines().first { SbPattern.flightDurationPattern.matches(it) }.trim(),)
 }
 
 private fun getFlightDurationShowWhen(): Boolean {
