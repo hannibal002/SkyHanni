@@ -315,7 +315,7 @@ private fun getGardenPastingShowWhen(): Boolean {
 }
 
 private fun getFlightDurationLines(): List<String> {
-    return listOf(getSbLines().first { SbPattern.flightDurationPattern.matches(it) }.trim(),)
+    return listOf(getSbLines().first { SbPattern.flightDurationPattern.matches(it) }.trim())
 }
 
 private fun getFlightDurationShowWhen(): Boolean {
