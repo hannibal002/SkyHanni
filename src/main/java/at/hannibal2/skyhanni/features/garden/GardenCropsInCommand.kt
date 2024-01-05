@@ -16,7 +16,7 @@ object GardenCropsInCommand {
 
     fun onCommand(args: Array<String>) {
         if (!config.display) {
-            LorenzUtils.userError("shcroptime requires 'Show money per Hour' feature to be enabled to work!")
+            LorenzUtils.userError("shcropsin requires 'Show money per Hour' feature to be enabled to work!")
             return
         }
 
