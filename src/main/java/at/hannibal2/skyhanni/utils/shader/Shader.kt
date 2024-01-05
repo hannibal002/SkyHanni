@@ -1,10 +1,12 @@
 package at.hannibal2.skyhanni.utils.shader
 
+import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.LorenzUtils
+import java.util.function.Supplier
 import net.minecraft.client.shader.ShaderLinkHelper
 import org.apache.commons.lang3.StringUtils
 import org.lwjgl.opengl.GL11
-import java.util.function.Supplier
+import org.lwjgl.opengl.OpenGLException
 
 /**
  * Superclass for shader objects to compile and attach vertex and fragment shaders to the shader program
@@ -18,23 +20,39 @@ abstract class Shader(vertex: String, fragment: String) {
     var shaderProgram: Int = ShaderLinkHelper.getStaticShaderLinkHelper().createProgram()
     private val uniforms: MutableList<Uniform<*>> = mutableListOf()
 
+    var created = false
+
     init {
-        val vertexShaderID = ShaderManager.loadShader(ShaderType.VERTEX, vertex)
-        ShaderManager.attachShader(shaderProgram, vertexShaderID)
-        val fragmentShaderID = ShaderManager.loadShader(ShaderType.FRAGMENT, fragment)
-        ShaderManager.attachShader(shaderProgram, fragmentShaderID)
+        run {
+            val vertexShaderID = ShaderManager.loadShader(ShaderType.VERTEX, vertex).also { if (it == -1) return@run }
+            ShaderManager.attachShader(shaderProgram, vertexShaderID)
 
-        ShaderHelper.glLinkProgram(shaderProgram)
+            val fragmentShaderID = ShaderManager.loadShader(ShaderType.FRAGMENT, fragment).also { if (it == -1) return@run }
+            ShaderManager.attachShader(shaderProgram, fragmentShaderID)
 
-        val linkStatus = ShaderHelper.glGetProgrami(shaderProgram, ShaderHelper.GL_LINK_STATUS)
-        if (linkStatus == GL11.GL_FALSE) {
-            LorenzUtils.consoleLog(
-                "Error occurred when linking program with Vertex Shader: $vertex and Fragment Shader: $fragment : " +
-                    StringUtils.trim(ShaderHelper.glGetProgramInfoLog(shaderProgram, 1024))
-            )
+            ShaderHelper.glLinkProgram(shaderProgram)
+
+            if (ShaderHelper.glGetProgrami(shaderProgram, ShaderHelper.GL_LINK_STATUS) == GL11.GL_FALSE) {
+                val errorMessage = "Failed to link vertex shader $vertex and fragment shader $fragment. Features that " +
+                        "utilise this shader will not work correctly, if at all."
+                val errorLog = StringUtils.trim(ShaderHelper.glGetShaderInfoLog(shaderProgram, 1024))
+
+                if (ShaderManager.inWorld()) {
+                    ErrorManager.logErrorWithData(
+                            OpenGLException("Shader linking error."),
+                            errorMessage,
+                            "Link Error:\n" to errorLog
+                    )
+                } else {
+                    LorenzUtils.consoleLog("$errorMessage $errorLog")
+                }
+
+                return@run
+            }
+
+            this.registerUniforms()
+            created = true
         }
-
-        this.registerUniforms()
     }
 
     abstract fun registerUniforms()

@@ -9,6 +9,7 @@ object RoundedRectangleShader : Shader("rounded_rect", "rounded_rect") {
     val INSTANCE: RoundedRectangleShader
         get() = this
 
+    var scaleFactor: Float = 0f
     var radius: Float = 0f
     var smoothness: Float = 0f
     var halfSize: FloatArray = floatArrayOf(0f, 0f)
@@ -18,6 +19,7 @@ object RoundedRectangleShader : Shader("rounded_rect", "rounded_rect") {
         }
 
     override fun registerUniforms() {
+        registerUniform(Uniform.UniformType.FLOAT, "scaleFactor") { scaleFactor }
         registerUniform(Uniform.UniformType.FLOAT, "radius") { radius }
         registerUniform(Uniform.UniformType.FLOAT, "smoothness") { smoothness }
         registerUniform(Uniform.UniformType.VEC2, "halfSize") { halfSize }
