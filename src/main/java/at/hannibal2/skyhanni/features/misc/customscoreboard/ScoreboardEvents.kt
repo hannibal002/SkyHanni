@@ -294,9 +294,7 @@ private fun getTrapperLines(): List<String> {
 
 private fun getTrapperShowWhen(): Boolean {
     return getSbLines().any {
-        ScoreboardPattern.peltsPattern.matches(it) || ScoreboardPattern.mobLocationPattern.matches(
-            it
-        )
+        ScoreboardPattern.peltsPattern.matches(it) || ScoreboardPattern.mobLocationPattern.matches(it)
     }
 }
 
