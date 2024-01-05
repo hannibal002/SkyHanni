@@ -123,14 +123,14 @@ class MenuItemDisplayOverlayPlayer : AbstractMenuStackSize() {
             if (chestName.lowercase() == "skyblock menu") {
                 if (itemName == "Collections") {
                     for (line in item.getLore()) {
-                        collectionsPercentLoreLinePattern.matchMatcher(line) { return group("percent").replace("100", "§a✔") }
+                        collectionsPercentLoreLinePattern.returnPercentFromLoreLineAsStackSize(line)
                     }
                 }
             }
             collectionsChestNameItemNamePattern.matchMatcher(chestName) {
                 collectionsChestNameItemNamePattern.matchMatcher(itemName) {
                     for (line in item.getLore()) {
-                        collectionsPercentLoreLinePattern.matchMatcher(line) { return group("percent").replace("100", "§a✔") }
+                        collectionsPercentLoreLinePattern.returnPercentFromLoreLineAsStackSize(line)
                     }
                 }
             }
