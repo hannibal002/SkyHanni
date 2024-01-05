@@ -366,8 +366,7 @@ private fun getNorthStarsShowWhen() =
 private fun getEmptyLineDisplayPair() = listOf("<empty>" to AlignmentEnum.LEFT)
 
 private fun getIslandDisplayPair() =
-    listOf("§7㋖ §a" + HypixelData.skyBlockIsland.toString().split("_")
-        .joinToString(" ") { it.firstLetterUppercase() } to AlignmentEnum.LEFT)
+    listOf("§7㋖ §a" + HypixelData.skyBlockIsland.displayName to AlignmentEnum.LEFT)
 
 private fun getLocationDisplayPair() =
     listOf(
