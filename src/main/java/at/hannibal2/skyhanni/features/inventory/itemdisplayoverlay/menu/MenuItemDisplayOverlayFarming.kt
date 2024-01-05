@@ -53,9 +53,7 @@ class MenuItemDisplayOverlayFarming : AbstractMenuStackSize() {
             val lore = item.getLore()
             if (lore.isNotEmpty()) {
                 for (line in lore) {
-                    visitorMilestonePercentProgressLoreLinePattern.matchMatcher(line) {
-                        return group("percent").replace("100", "§a✔")
-                    }
+                    visitorMilestonePercentProgressLoreLinePattern.returnPercentFromLoreLineAsStackSize(line)
                 }
             }
         }
