@@ -24,7 +24,7 @@ object ScoreboardPattern {
     val votesPattern by mainSb.pattern("votes", "(?<votes>§[caebd]\\|+§f\\|+ §(.+)\$)")
     val waitingForVotePattern by mainSb.pattern("waitingforvote", "(§7Waiting for|§7your vote\\.\\.\\.)$")
     val northstarsPattern by mainSb.pattern("northstars", "North Stars: §d(?<northstars>[\\w,]+).*$")
-    val profileTypePattern by mainSb.pattern("profiletype", "^\\s*(§7♲ §7Ironman|§a☀ §aStranded|§.Ⓑ §.Bingo)$")
+    val profileTypePattern by mainSb.pattern("profiletype", "^\\s*(§7♲ §7Ironman|§a☀ §aStranded|§.Ⓑ §.Bingo).*$")
     // multi use
     private val multiUseSb = scoreboardGroup.group("multiuse")
     val autoClosingPattern by multiUseSb.pattern("autoclosing", "(§.)*Auto-closing in: §c(\\d{1,2}:)?\\d{1,2}$")
