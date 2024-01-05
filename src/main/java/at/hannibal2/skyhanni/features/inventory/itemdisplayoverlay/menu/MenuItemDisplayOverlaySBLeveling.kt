@@ -37,9 +37,7 @@ class MenuItemDisplayOverlaySBLeveling : AbstractMenuStackSize() {
             guideTaskChestNamePattern.matchMatcher(chestName) {
                 if (itemName.isNotEmpty()) {
                     for (line in item.getLore()) {
-                        progressPatternLoreLinePattern.matchMatcher(line) {
-                            return group("percent").replace("100", "§a✔")
-                        }
+                        progressPatternLoreLinePattern.returnPercentFromLoreLineAsStackSize(line)
                     }
                     checkmarkItemNamePattern.matchMatcher(itemName) {
                         return "§a✔"
@@ -50,9 +48,7 @@ class MenuItemDisplayOverlaySBLeveling : AbstractMenuStackSize() {
 
         if (stackSizeConfig.contains(StackSizeMenuConfig.SBLeveling.WAYS_TO_LEVEL_UP_PROGRESS)) {
             for (line in item.getLore()) {
-                progressToCompleteCategoryPercentLoreLinePattern.matchMatcher(line) {
-                    return group("percent").replace("100", "§a✔")
-                }
+                progressToCompleteCategoryPercentLoreLinePattern.returnPercentFromLoreLineAsStackSize(line)
             }
         }
 
@@ -60,9 +56,7 @@ class MenuItemDisplayOverlaySBLeveling : AbstractMenuStackSize() {
             if ((itemName.isNotEmpty())) {
                 rewardsSkyblockLevelingChestNamePattern.matchMatcher(chestName.lowercase()) {
                     for (line in item.getLore()) {
-                        progressToRewardsUnlockedPatternLoreLinePattern.matchMatcher(line) {
-                            return group("percent").replace("100", "§a✔")
-                        }
+                        progressToRewardsUnlockedPatternLoreLinePattern.returnPercentFromLoreLineAsStackSize(line)
                     }
                 }
             }
