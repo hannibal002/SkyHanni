@@ -48,7 +48,7 @@ object BitsAPI {
                 val amount = group("amount").formatNumber().toInt()
                 val earned = group("earned")?.formatNumber()?.toInt() ?: 0
                 bits = amount
-                bitsToClaim -= earned
+                if (earned > 0) bitsToClaim -= earned
 
                 save()
             }
