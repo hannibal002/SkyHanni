@@ -7,6 +7,7 @@ import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils.sorted
 import at.hannibal2.skyhanni.utils.NEUItems
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
+import at.hannibal2.skyhanni.utils.NumberUtil.formatNumber
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.TimeUtils
 
@@ -26,7 +27,7 @@ object GardenCropTimeCommand {
 
         val rawAmount = args[0]
         val amount = try {
-            rawAmount.toInt()
+            rawAmount.formatNumber().toInt()
         } catch (e: NumberFormatException) {
             LorenzUtils.userError("Not a valid number: '$rawAmount'")
             return
@@ -63,7 +64,7 @@ object GardenCropTimeCommand {
         }
 
         if (map.isEmpty()) {
-            LorenzUtils.error("No crop item found for '$rawSearchName'.")
+            LorenzUtils.userError("No crop item found for '$rawSearchName'.")
             return
         }
 
