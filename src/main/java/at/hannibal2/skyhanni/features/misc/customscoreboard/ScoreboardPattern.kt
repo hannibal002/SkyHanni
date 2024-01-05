@@ -12,9 +12,9 @@ object ScoreboardPattern {
     private val scoreboardGroup = group.group("scoreboard")
     // main scoreboard
     private val mainSb = scoreboardGroup.group("main")
-    val motesPattern by mainSb.pattern("motes", "^(§.)*Motes: (§.)*(?<motes>[\\d,]+)( (§.)*\\([+-](?<diff>[\\w,.]+)\\))?$")
+    val motesPattern by mainSb.pattern("motes", "^(§.)*Motes: (§.)*(?<motes>[\\d,]+).*$")
     val heatPattern by mainSb.pattern("heat", "^Heat: (?<heat>.*)$") // this line is weird (either text or number), ill leave it as is; it even has different colors?
-    val copperPattern by mainSb.pattern("copper", "^(§.)*Copper: (§.)*(?<copper>[\\d,]+)( (§.)*\\([+-](?<diff>[\\w,.]+)\\))?$")
+    val copperPattern by mainSb.pattern("copper", "^(§.)*Copper: (§.)*(?<copper>[\\d,]+).*$")
     val locationPattern by mainSb.pattern("location", "^\\s*(?<location>(§7⏣|§5ф) .*)$")
     val lobbyCodePattern by mainSb.pattern ("lobbycode", "^\\s*§.((\\d{2}/\\d{2}/\\d{2})|Server closing: [\\d:]+) §8(?<code>.*)\$")
     val datePattern by mainSb.pattern("date", "^\\s*(Late |Early )?(Spring|Summer|Autumn|Winter) \\d{1,2}(st|nd|rd|th)?")
@@ -23,7 +23,7 @@ object ScoreboardPattern {
     val yearVotesPattern by mainSb.pattern("yearvotes", "(?<yearvotes>^§6Year \\d+ Votes\$)")
     val votesPattern by mainSb.pattern("votes", "(?<votes>§[caebd]\\|+§f\\|+ §(.+)\$)")
     val waitingForVotePattern by mainSb.pattern("waitingforvote", "(§7Waiting for|§7your vote\\.\\.\\.)$")
-    val northstarsPattern by mainSb.pattern("northstars", "North Stars: §d(?<northstars>[\\w,]+)$")
+    val northstarsPattern by mainSb.pattern("northstars", "North Stars: §d(?<northstars>[\\w,]+).*$")
     val profileTypePattern by mainSb.pattern("profiletype", "^\\s*(§7♲ §7Ironman|§a☀ §aStranded|§.Ⓑ §.Bingo)$")
     // multi use
     private val multiUseSb = scoreboardGroup.group("multiuse")
