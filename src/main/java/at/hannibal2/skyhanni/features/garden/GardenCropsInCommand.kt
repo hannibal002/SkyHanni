@@ -10,11 +10,6 @@ import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.TimeUtils
 
-/*
- * What I need ot do,
- *  - get the crop rate / h
- *  - find some time standard to use
- */
 
 object GardenCropsInCommand {
     private val config get() = GardenAPI.config.moneyPerHours
