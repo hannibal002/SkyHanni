@@ -54,9 +54,7 @@ class MenuItemDisplayOverlayCombat : AbstractMenuStackSize() {
                 }
                 if (itemName.isNotEmpty()) {
                     for (line in lore) {
-                        familiesCompletedOverallProgressPercentLoreLinePattern.matchMatcher(line) {
-                            return group("percent").replace("100", "§a✔")
-                        }
+                        familiesCompletedOverallProgressPercentLoreLinePattern.returnPercentFromLoreLineAsStackSize(line)
                     }
                 }
             }
@@ -92,9 +90,7 @@ class MenuItemDisplayOverlayCombat : AbstractMenuStackSize() {
 
         if (stackSizeConfig.contains(StackSizeMenuConfig.Combat.RNG_METER_PROGRESS) && itemName == ("RNG Meter")) {
             for (line in item.getLore()) {
-                rngMeterProgressPercentLoreLinePattern.matchMatcher(line) {
-                    return group("percent").replace("100", "§a✔")
-                }
+                rngMeterProgressPercentLoreLinePattern.returnPercentFromLoreLineAsStackSize(line)
             }
         }
 
