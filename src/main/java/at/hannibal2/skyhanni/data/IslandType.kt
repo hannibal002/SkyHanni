@@ -12,6 +12,7 @@ enum class IslandType(val displayName: String, val modeName: String = "null") {
     CATACOMBS("Catacombs", "dungeon"),
 
     HUB("Hub", "village"),
+    DARK_AUCTION("Dark Auction"),
     THE_FARMING_ISLANDS("The Farming Islands"),
     CRYSTAL_HOLLOWS("Crystal Hollows"),
     THE_PARK("The Park", "floating_islands_1"),
@@ -20,7 +21,7 @@ enum class IslandType(val displayName: String, val modeName: String = "null") {
     GARDEN("Garden"),
     GARDEN_GUEST("Garden Guest"),
     SPIDER_DEN("Spider's Den"),
-    WINTER("Jerry's Workshop"), //todo confirm
+    WINTER("Jerry's Workshop"),
     THE_RIFT("The Rift"),
 
     NONE(""),
