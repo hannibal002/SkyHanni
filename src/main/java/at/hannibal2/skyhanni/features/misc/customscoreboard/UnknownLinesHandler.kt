@@ -8,25 +8,11 @@ import at.hannibal2.skyhanni.features.rift.area.stillgorechateau.RiftBloodEffigi
 import at.hannibal2.skyhanni.utils.LorenzUtils.nextAfter
 import at.hannibal2.skyhanni.utils.StringUtils.matches
 import at.hannibal2.skyhanni.utils.StringUtils.removeResets
+import at.hannibal2.skyhanni.features.misc.customscoreboard.ScoreboardPattern as SbPattern
 
 object UnknownLinesHandler {
     fun handleUnknownLines() {
         val sidebarLines = ScoreboardData.sidebarLinesFormatted
-
-        val knownLines = listOf(
-            "Time Left: §b",
-            "Current Item:",
-        )
-
-        /**
-         * Dark auction will come once DarkAuction IslandType is merged
-         *
-         *    Starting in: §a0:02
-         *
-         *    'Time Left: §b11'
-         *    'Current Item:'
-         *    ' §5Hocus-Pocus Cipher'
-         */
 
         unknownLines = sidebarLines.toMutableList().filter { it.isNotBlank() }.map { it.removeResets() }
 
@@ -35,84 +21,84 @@ object UnknownLinesHandler {
         */
         val patternsToExclude = listOf(
             PurseAPI.pursePattern,
-            ScoreboardPattern.motesPattern,
+            SbPattern.motesPattern,
             BitsAPI.bitsScoreboardPattern,
-            ScoreboardPattern.heatPattern,
-            ScoreboardPattern.copperPattern,
-            ScoreboardPattern.locationPattern,
-            ScoreboardPattern.lobbyCodePattern,
-            ScoreboardPattern.datePattern,
-            ScoreboardPattern.timePattern,
-            ScoreboardPattern.footerPattern,
-            ScoreboardPattern.yearVotesPattern,
-            ScoreboardPattern.votesPattern,
-            ScoreboardPattern.waitingForVotePattern,
-            ScoreboardPattern.northstarsPattern,
-            ScoreboardPattern.profileTypePattern,
-            ScoreboardPattern.autoClosingPattern,
-            ScoreboardPattern.startingInPattern,
-            ScoreboardPattern.timeElapsedPattern,
-            ScoreboardPattern.keysPattern,
-            ScoreboardPattern.clearedPattern,
-            ScoreboardPattern.soloPattern,
-            ScoreboardPattern.teammatesPattern,
-            ScoreboardPattern.floor3GuardiansPattern,
-            ScoreboardPattern.medalsPattern,
-            ScoreboardPattern.lockedPattern,
-            ScoreboardPattern.cleanUpPattern,
-            ScoreboardPattern.pastingPattern,
-            ScoreboardPattern.peltsPattern,
-            ScoreboardPattern.mobLocationPattern,
-            ScoreboardPattern.jacobsContestPattern,
-            ScoreboardPattern.powderPattern,
-            ScoreboardPattern.windCompassPattern,
-            ScoreboardPattern.windCompassArrowPattern,
-            ScoreboardPattern.miningEventPattern,
-            ScoreboardPattern.miningEventZonePattern,
-            ScoreboardPattern.raffleUselessPattern,
-            ScoreboardPattern.raffleTicketsPattern,
-            ScoreboardPattern.rafflePoolPattern,
-            ScoreboardPattern.mithrilUselessPattern,
-            ScoreboardPattern.mithrilRemainingPattern,
-            ScoreboardPattern.mithrilYourMithrilPattern,
-            ScoreboardPattern.nearbyPlayersPattern,
-            ScoreboardPattern.uselessGoblinPattern,
-            ScoreboardPattern.remainingGoblinPattern,
-            ScoreboardPattern.yourGoblinKillsPattern,
-            ScoreboardPattern.magmaBossPattern,
-            ScoreboardPattern.damageSoakedPattern,
-            ScoreboardPattern.killMagmasPattern,
-            ScoreboardPattern.killMagmasDamagedSoakedBarPattern,
-            ScoreboardPattern.reformingPattern,
-            ScoreboardPattern.bossHealthPattern,
-            ScoreboardPattern.bossHealthBarPattern,
-            ScoreboardPattern.broodmotherPattern,
-            ScoreboardPattern.bossHPPattern,
-            ScoreboardPattern.bossDamagePattern,
-            ScoreboardPattern.slayerQuestPattern,
-            ScoreboardPattern.essencePattern,
-            ScoreboardPattern.brokenRedstonePattern,
-            ScoreboardPattern.redstonePattern,
-            ScoreboardPattern.visitingPattern,
-            ScoreboardPattern.flightDurationPattern,
-            ScoreboardPattern.dojoChallengePattern,
-            ScoreboardPattern.dojoDifficultyPattern,
-            ScoreboardPattern.dojoPointsPattern,
-            ScoreboardPattern.dojoTimePattern,
-            ScoreboardPattern.objectivePattern,
+            SbPattern.heatPattern,
+            SbPattern.copperPattern,
+            SbPattern.locationPattern,
+            SbPattern.lobbyCodePattern,
+            SbPattern.datePattern,
+            SbPattern.timePattern,
+            SbPattern.footerPattern,
+            SbPattern.yearVotesPattern,
+            SbPattern.votesPattern,
+            SbPattern.waitingForVotePattern,
+            SbPattern.northstarsPattern,
+            SbPattern.profileTypePattern,
+            SbPattern.autoClosingPattern,
+            SbPattern.startingInPattern,
+            SbPattern.timeElapsedPattern,
+            SbPattern.keysPattern,
+            SbPattern.clearedPattern,
+            SbPattern.soloPattern,
+            SbPattern.teammatesPattern,
+            SbPattern.floor3GuardiansPattern,
+            SbPattern.medalsPattern,
+            SbPattern.lockedPattern,
+            SbPattern.cleanUpPattern,
+            SbPattern.pastingPattern,
+            SbPattern.peltsPattern,
+            SbPattern.mobLocationPattern,
+            SbPattern.jacobsContestPattern,
+            SbPattern.powderPattern,
+            SbPattern.windCompassPattern,
+            SbPattern.windCompassArrowPattern,
+            SbPattern.miningEventPattern,
+            SbPattern.miningEventZonePattern,
+            SbPattern.raffleUselessPattern,
+            SbPattern.raffleTicketsPattern,
+            SbPattern.rafflePoolPattern,
+            SbPattern.mithrilUselessPattern,
+            SbPattern.mithrilRemainingPattern,
+            SbPattern.mithrilYourMithrilPattern,
+            SbPattern.nearbyPlayersPattern,
+            SbPattern.uselessGoblinPattern,
+            SbPattern.remainingGoblinPattern,
+            SbPattern.yourGoblinKillsPattern,
+            SbPattern.magmaBossPattern,
+            SbPattern.damageSoakedPattern,
+            SbPattern.killMagmasPattern,
+            SbPattern.killMagmasDamagedSoakedBarPattern,
+            SbPattern.reformingPattern,
+            SbPattern.bossHealthPattern,
+            SbPattern.bossHealthBarPattern,
+            SbPattern.broodmotherPattern,
+            SbPattern.bossHPPattern,
+            SbPattern.bossDamagePattern,
+            SbPattern.slayerQuestPattern,
+            SbPattern.essencePattern,
+            SbPattern.brokenRedstonePattern,
+            SbPattern.redstonePattern,
+            SbPattern.visitingPattern,
+            SbPattern.flightDurationPattern,
+            SbPattern.dojoChallengePattern,
+            SbPattern.dojoDifficultyPattern,
+            SbPattern.dojoPointsPattern,
+            SbPattern.dojoTimePattern,
+            SbPattern.objectivePattern,
             ServerRestartTitle.restartingPattern,
-            ScoreboardPattern.travelingZooPattern,
-            ScoreboardPattern.newYearPattern,
-            ScoreboardPattern.spookyPattern,
-            ScoreboardPattern.winterEventStartPattern,
-            ScoreboardPattern.winterNextWavePattern,
-            ScoreboardPattern.winterWavePattern,
-            ScoreboardPattern.winterMagmaLeftPattern,
-            ScoreboardPattern.winterTotalDmgPattern,
-            ScoreboardPattern.winterCubeDmgPattern,
-            ScoreboardPattern.riftDimensionPattern,
+            SbPattern.travelingZooPattern,
+            SbPattern.newYearPattern,
+            SbPattern.spookyPattern,
+            SbPattern.winterEventStartPattern,
+            SbPattern.winterNextWavePattern,
+            SbPattern.winterWavePattern,
+            SbPattern.winterMagmaLeftPattern,
+            SbPattern.winterTotalDmgPattern,
+            SbPattern.winterCubeDmgPattern,
+            SbPattern.riftDimensionPattern,
             RiftBloodEffigies.heartsPattern,
-            ScoreboardPattern.wtfAreThoseLinesPattern
+            SbPattern.wtfAreThoseLinesPattern
         )
 
         unknownLines = unknownLines.filterNot { line ->
@@ -123,42 +109,42 @@ object UnknownLinesHandler {
         /*
          * remove known text
         */
-        unknownLines = unknownLines.filter { line -> !knownLines.any { line.trim().contains(it) } }
-
         // remove objectives
         val objectiveLine =
-            ScoreboardData.sidebarLinesFormatted.firstOrNull { ScoreboardPattern.objectivePattern.matches(it) }
+            sidebarLines.firstOrNull { SbPattern.objectivePattern.matches(it) }
                 ?: "Objective"
         unknownLines = unknownLines.filter { sidebarLines.nextAfter(objectiveLine) != it }
         unknownLines = unknownLines.filter {
             sidebarLines.nextAfter(objectiveLine, 2) != it
-                && !ScoreboardPattern.thirdObjectiveLinePattern.matches(it)
+                && !SbPattern.thirdObjectiveLinePattern.matches(it)
         }
 
         // Remove jacobs contest
         for (i in 1..3)
             unknownLines = unknownLines.filter {
-                ScoreboardData.sidebarLinesFormatted.nextAfter(ScoreboardData.sidebarLinesFormatted.firstOrNull { line ->
-                    ScoreboardPattern.jacobsContestPattern.matches(line)
+                sidebarLines.nextAfter(sidebarLines.firstOrNull { line ->
+                    SbPattern.jacobsContestPattern.matches(line)
                 } ?: "§eJacob's Contest", i) != it
             }
 
         // Remove slayer
         for (i in 1..2)
             unknownLines = unknownLines.filter {
-                ScoreboardData.sidebarLinesFormatted.nextAfter(ScoreboardData.sidebarLinesFormatted.firstOrNull { line ->
-                    ScoreboardPattern.slayerQuestPattern.matches(line)
+                sidebarLines.nextAfter(sidebarLines.firstOrNull { line ->
+                    SbPattern.slayerQuestPattern.matches(line)
                 } ?: "Slayer Quest", i) != it
             }
 
         // remove trapper mob location
         unknownLines = unknownLines.filter {
-            ScoreboardData.sidebarLinesFormatted.nextAfter(ScoreboardData.sidebarLinesFormatted.firstOrNull { line ->
-                ScoreboardPattern.mobLocationPattern.matches(line)
-            } ?: "Tracker Mob Location:", 1) != it
+            sidebarLines.nextAfter(sidebarLines.firstOrNull { line ->
+                SbPattern.mobLocationPattern.matches(line)
+            } ?: "Tracker Mob Location:") != it
         }
 
         // da
-        unknownLines = unknownLines.filter { sidebarLines.nextAfter("Current Item:") != it }
+        unknownLines = unknownLines.filter { sidebarLines.nextAfter(sidebarLines.firstOrNull { line ->
+            SbPattern.daCurrentItemPattern.matches(line)
+        } ?: "Current Item:") != it }
     }
 }

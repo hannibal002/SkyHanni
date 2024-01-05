@@ -240,18 +240,24 @@ private fun getDojoShowWhen(): Boolean {
 
 private fun getDarkAuctionLines(): List<String> {
     val list = mutableListOf<String>()
-    if (getSbLines().any { it.startsWith("Time Left: §b") }) {
-        list += getSbLines().firstOrNull { it.startsWith("Time Left: §b") }
-            ?: "<hidden>"
-    }
-    list += "Current Item:"
-    list += getSbLines().nextAfter("Current Item:") ?: "<hidden>"
 
-    return list
+    getSbLines().firstOrNull { SbPattern.startingInPattern.matches(it) }?.let { list.add(it) }
+    getSbLines().firstOrNull { SbPattern.timeLeftPattern.matches(it) }?.let { list.add(it) }
+    if (getSbLines().any { SbPattern.daCurrentItemPattern.matches(it) }) {
+        list += getSbLines().first { SbPattern.daCurrentItemPattern.matches(it) }
+        list += getSbLines().nextAfter(
+            getSbLines().first { SbPattern.daCurrentItemPattern.matches(it) }
+        ) ?: "§7No Item"
+    }
+
+    return if (list.size == 0) when (config.informationFilteringConfig.hideEmptyLines) {
+        true -> listOf("<hidden>")
+        false -> listOf("§cNo DarkAuction Lines")
+    } else list
 }
 
 private fun getDarkAuctionShowWhen(): Boolean {
-    return getSbLines().any { it == "Current Item:" }
+    return IslandType.DARK_AUCTION.isInIsland()
 }
 
 private fun getJacobContestLines(): List<String> {

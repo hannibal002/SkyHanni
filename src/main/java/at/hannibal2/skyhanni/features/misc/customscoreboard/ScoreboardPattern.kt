@@ -28,9 +28,10 @@ object ScoreboardPattern {
     // multi use
     private val multiUseSb = scoreboardGroup.group("multiuse")
     val autoClosingPattern by multiUseSb.pattern("autoclosing", "(§.)*Auto-closing in: §c(\\d{1,2}:)?\\d{1,2}$")
-    val startingInPattern by multiUseSb.pattern("startingin", "(§.)*Starting in: §a(\\d{1,2}:)?\\d{1,2}$")
+    val startingInPattern by multiUseSb.pattern("startingin", "(§.)*Starting in: §.(\\d{1,2}:)?\\d{1,2}$")
     val timeElapsedPattern by multiUseSb.pattern("timeelapsed", "(§.)*Time Elapsed: (§.)*(?<time>(\\w+[ydhms] ?)+)$")
     val instanceShutdownPattern by multiUseSb.pattern("instanceshutdown", "(§.)*Instance Shutdown: (§.)*(\\d{1,2}:)?\\d{1,2}$")
+    val timeLeftPattern by multiUseSb.pattern("timeleft", "(§.)*Time Left: (§.)*[\\w:,.]*$")
     // dungeon scoreboard
     private val dungeonSb = scoreboardGroup.group("dungeon")
     val keysPattern by dungeonSb.pattern("keys", "Keys: §.■ §.[✗✓] §.■ §a.x$")
@@ -98,6 +99,7 @@ object ScoreboardPattern {
     val thirdObjectiveLinePattern by miscSb.pattern("thirdobjectiveline", "(\\s*§.\\(§.\\w+§./§.\\w+§.\\)|§f Mages.*|§f Barbarians.*|§edefeat Kuudra|§eand stun him)")
     // collection of lines that just randomly exist and I have no clue how on earth to effectively remove them
     val wtfAreThoseLinesPattern by miscSb.pattern("wtfarethoselines", "^§eMine 10 Rubies$")
+    val daCurrentItemPattern by miscSb.pattern("dacurrentitem", "^Current Item:$")
     // events
     private val eventsSb = scoreboardGroup.group("events")
     val travelingZooPattern by eventsSb.pattern("travelingzoo", "§aTraveling Zoo§f \\d{0,2}:\\d{2}$")
