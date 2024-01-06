@@ -130,13 +130,15 @@ class MenuItemDisplayOverlayPlayerAdvanced : AbstractMenuStackSize() {
         if (stackSizeConfig.contains(StackSizeMenuConfig.PlayerAdvanced.UNLOCKED_RECIPES)) {
             if (chestName.lowercase() == ("skyblock menu") && (itemName == "Recipe Book")) {
                 for (line in item.getLore()) {
-                    recipeBookUnlockedPercentLoreLinePattern.returnPercentFromLoreLineAsStackSize(line)
+                    recipeBookUnlockedPercentLoreLinePattern.matchMatcher(line) { return group("percent").replace("100", "§a✔") }
                 }
             }
             recipeBookOrRecipesChestNamePattern.matchMatcher(chestName) {
                 recipesCategoryItemNamePattern.matchMatcher(itemName) {
                     for (line in item.getLore()) {
-                        recipesUnlockedPercentProgressLoreLinePattern.returnPercentFromLoreLineAsStackSize(line)
+                        recipesUnlockedPercentProgressLoreLinePattern.matchMatcher(
+                            line
+                        ) { return group("percent").replace("100", "§a✔") }
                     }
                 }
             }
@@ -173,7 +175,7 @@ class MenuItemDisplayOverlayPlayerAdvanced : AbstractMenuStackSize() {
         if (stackSizeConfig.contains(StackSizeMenuConfig.PlayerAdvanced.TRADES_UNLOCKED) && (itemName == "Trades")) {
             val lore = item.getLore()
             for (line in lore) {
-                tradesUnlockedPercentLoreLinePattern.returnPercentFromLoreLineAsStackSize(line)
+                tradesUnlockedPercentLoreLinePattern.matchMatcher(line) { return group("percent").replace("100", "§a✔") }
             }
         }
         
