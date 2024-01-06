@@ -54,7 +54,6 @@ import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getFruitBowlNames
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getNecronHandlesFound
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getPrehistoricEggBlocksWalked
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getRanchersSpeed
-import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.StringUtils.matches
 import at.hannibal2.skyhanni.utils.matches
@@ -67,38 +66,39 @@ object ItemDisplayOverlayFeatures : AbstractStackSize() {
 
     // TODO USE SH-REPO
     private val config get() = configItemStackSize
+    private val itemDisplayOverlaySubgroup = itemStackSizeGroup.group("itemdisplayoverlay")
 
     // TODO repo
     // private val xOutOfYNoColorRequiredPattern = ((".*: (§.)?(?<useful>[0-9]+)(§.)?\\/(§.)?(?<total>[0-9]+).*").toPattern())
-    private val masterStarInternalNamePattern by RepoPattern.pattern(("itemstacksize.itemdisplayoverlay.masterstar.internalname"), ("(?<tier>[A-Z])+_MASTER_STAR"))
-    private val petLevelItemNamePattern by RepoPattern.pattern(("itemstacksize.itemdisplayoverlay.petlevel.itemname"), ("\\[Lvl (?<level>.*)] .*"))
-    private val shredderBonusDamageLoreLinePattern by RepoPattern.pattern(("itemstacksize.itemdisplayoverlay.shredderbonusdamage.loreline"), ("(§.)?Bonus Damage \\([0-9]+ cap\\): (§.)?(?<dmgbonus>[0-9]+)"))
-    private val bottleOfJerryLoreLinePattern by RepoPattern.pattern(("itemstacksize.itemdisplayoverlay.bottleofjerry.loreline"), ("(§.)?Intelligence Bonus: (§.)?(?<intelbonus>[0-9]+)"))
-    private val gardenVacuumLoreLinePattern by RepoPattern.pattern(("itemstacksize.itemdisplayoverlay.gardenvacuum.loreline"), ("§7Vacuum Bag: §6(?<amount>[0-9,]+) Pests?"))
-    private val masterSkullInternalNamePattern by RepoPattern.pattern(("itemstacksize.itemdisplayoverlay.masterskull.internalname"), ("MASTER_SKULL_TIER_(?<tier>\\d)"))
-    private val dungeonBossHeadInternalNamePattern by RepoPattern.pattern(("itemstacksize.itemdisplayoverlay.dungeonbosshead.internalname"), ("(GOLD(EN)?|DIAMOND)_(?<dungeonBoss>[\\w]+)_HEAD"))
-    private val minionTierItemNamePattern by RepoPattern.pattern(("itemstacksize.itemdisplayoverlay.miniontier.itemname"), ("([\\w]+ Minion [\\w]+).*(?<!Recipes)\$"))
-    private val enchantedItemSackItemNamePattern by RepoPattern.pattern(("itemstacksize.itemdisplayoverlay.enchanteditemsack.itemname"), ("Enchanted .*"))
-    private val kuudraKeyItemNamePattern by RepoPattern.pattern(("itemstacksize.itemdisplayoverlay.kuudrakey.itemname"), ("([\\w ]+)?Kuudra Key"))
-    private val kuudraKeyInternalNamePattern by RepoPattern.pattern(("itemstacksize.itemdisplayoverlay.kuudrakey.internalname"), ("KUUDRA_(?<tier>[\\w]+)_KEY"))
-    private val larvaHookLoreLinePattern by RepoPattern.pattern(("itemstacksize.itemdisplayoverlay.larvahook.loreline"), ("§7§7You may harvest §6(?<amount>.).*"))
-    private val armadilloRarityLoreLinePattern by RepoPattern.pattern(("itemstacksize.itemdisplayoverlay.armadillorarity.loreline"), ("(§.)*(?<rarity>COMMON|UNCOMMON|RARE|EPIC|LEGENDARY)"))
-    private val beastmasterCrestInternalNamePattern by RepoPattern.pattern(("itemstacksize.itemdisplayoverlay.beastmastercrest.internalname"), ("BEASTMASTER_CREST_[\\w]*"))
-    private val beastmasterCrestKillsProgressLoreLinePattern by RepoPattern.pattern(("itemstacksize.itemdisplayoverlay.beastmastercrestkillsprogress.loreline"), ("(§.)*Your kills: (§.)*(?<progress>[\\w,]+)(§.)*\\/(?<total>[\\w,]+)"))
-    private val campfireTalismanTierInternalNamePattern by RepoPattern.pattern(("itemstacksize.itemdisplayoverlay.campfiretalismantier.internalname"), ("CAMPFIRE_TALISMAN_(?<tier>[\\d]+)"))
-    private val isNotAuctionHouseChestNamePattern by RepoPattern.pattern(("itemstacksize.itemdisplayoverlay.isnotauctionhouse.chestname"), ("^(?:(?!Auction).)*\$"))
-    private val internalizedSoulflowLoreLinePattern by RepoPattern.pattern(("itemstacksize.itemdisplayoverlay.internalizedsoulflow.loreline"), ("(§.)*Internalized: (§.)*(?<leading>[0-9]+)(?<trailing>,[0-9]{0,3})⸎ Soulflow"))
-    private val storageChestInternalNamePattern by RepoPattern.pattern(("itemstacksize.itemdisplayoverlay.storagechest.internalname"), (".*_ENCHANTED_CHEST"))
-    private val storageChestItemNamePattern by RepoPattern.pattern(("itemstacksize.itemdisplayoverlay.storagechest.itemname"), (".* Storage"))
-    private val personalCompactorDeletorChestNamePattern by RepoPattern.pattern(("itemstacksize.itemdisplayoverlay.personalcompactordeletor.chestname"), ("Personal (Compactor .*|Deletor .*)"))
-    private val personalCompactorDeletorEnabledItemNamePattern by RepoPattern.pattern(("itemstacksize.itemdisplayoverlay.personalcompactordeletorenabled.itemname"), ("(§.)*(Compactor|Deletor) Currently O(?<toggle>FF|N)!"))
-    private val personalCompactorDeletorInternalNamePattern by RepoPattern.pattern(("itemstacksize.itemdisplayoverlay.personalcompactordeletor.internalname"), ("PERSONAL_(COMPACTOR|DELETOR)_(?<thousands>[\\w]+)(000)"))
-    private val personalCompactorDeletorItemNamePattern by RepoPattern.pattern(("itemstacksize.itemdisplayoverlay.personalcompactordeletor.itemname"), ("Personal (Compactor|Deletor) (?<thousands>[\\w]+)(000)"))
-    private val abiphoneInternalNamePattern by RepoPattern.pattern(("itemstacksize.itemdisplayoverlay.abiphone.internalname"), ("ABIPHONE_.*"))
-    private val doesNotIncludeDungeonStarsItemNamePattern by RepoPattern.pattern(("itemstacksize.itemdisplayoverlay.doesnotincludedungeonstars.itemname"), ("^(?:(?!✪).)*\$"))
-    private val soulflowAccessoryInternalNamePattern by RepoPattern.pattern(("itemstacksize.itemdisplayoverlay.soulflowaccessory.internalname"), ("SOULFLOW_.*"))
-    private val isInPlayerTradingMenuChestNamePattern by RepoPattern.pattern(("itemstacksize.itemdisplayoverlay.isinplayertradingmenu.chestname"), ("(You([\\t ]){2,}(?<theirName>[a-zA-Z0-9_]{2,16}))")) // see https://regex101.com/r/UDCQwR/1 for reference. -ery
-    private val isAVacuumInsideAuctionHouseOrNPCShopLoreLinePattern by RepoPattern.pattern(("itemstacksize.itemdisplayoverlay.isavacuuminsideauctionhouseornpcshop.loreline"), ("(((§.)*Ends in: (§.)*(?<time>([\\d.,]+[ywdhms]+( )?)+))|Click to [tT]rade.)")) // see https://regex101.com/r/hyJEEe/1 for reference. -ery
+    private val masterStarInternalNamePattern by itemDisplayOverlaySubgroup.pattern(("masterstar.internalname"), ("(?<tier>[A-Z])+_MASTER_STAR"))
+    private val petLevelItemNamePattern by itemDisplayOverlaySubgroup.pattern(("petlevel.itemname"), ("\\[Lvl (?<level>.*)] .*"))
+    private val shredderBonusDamageLoreLinePattern by itemDisplayOverlaySubgroup.pattern(("shredderbonusdamage.loreline"), ("(§.)?Bonus Damage \\([0-9]+ cap\\): (§.)?(?<dmgbonus>[0-9]+)"))
+    private val bottleOfJerryLoreLinePattern by itemDisplayOverlaySubgroup.pattern(("bottleofjerry.loreline"), ("(§.)?Intelligence Bonus: (§.)?(?<intelbonus>[0-9]+)"))
+    private val gardenVacuumLoreLinePattern by itemDisplayOverlaySubgroup.pattern(("gardenvacuum.loreline"), ("§7Vacuum Bag: §6(?<amount>[0-9,]+) Pests?"))
+    private val masterSkullInternalNamePattern by itemDisplayOverlaySubgroup.pattern(("masterskull.internalname"), ("MASTER_SKULL_TIER_(?<tier>\\d)"))
+    private val dungeonBossHeadInternalNamePattern by itemDisplayOverlaySubgroup.pattern(("dungeonbosshead.internalname"), ("(GOLD(EN)?|DIAMOND)_(?<dungeonBoss>[\\w]+)_HEAD"))
+    private val minionTierItemNamePattern by itemDisplayOverlaySubgroup.pattern(("miniontier.itemname"), ("([\\w]+ Minion [\\w]+).*(?<!Recipes)\$"))
+    private val enchantedItemSackItemNamePattern by itemDisplayOverlaySubgroup.pattern(("enchanteditemsack.itemname"), ("Enchanted .*"))
+    private val kuudraKeyItemNamePattern by itemDisplayOverlaySubgroup.pattern(("kuudrakey.itemname"), ("([\\w ]+)?Kuudra Key"))
+    private val kuudraKeyInternalNamePattern by itemDisplayOverlaySubgroup.pattern(("kuudrakey.internalname"), ("KUUDRA_(?<tier>[\\w]+)_KEY"))
+    private val larvaHookLoreLinePattern by itemDisplayOverlaySubgroup.pattern(("larvahook.loreline"), ("§7§7You may harvest §6(?<amount>.).*"))
+    private val armadilloRarityLoreLinePattern by itemDisplayOverlaySubgroup.pattern(("armadillorarity.loreline"), ("(§.)*(?<rarity>COMMON|UNCOMMON|RARE|EPIC|LEGENDARY)"))
+    private val beastmasterCrestInternalNamePattern by itemDisplayOverlaySubgroup.pattern(("beastmastercrest.internalname"), ("BEASTMASTER_CREST_[\\w]*"))
+    private val beastmasterCrestKillsProgressLoreLinePattern by itemDisplayOverlaySubgroup.pattern(("beastmastercrestkillsprogress.loreline"), ("(§.)*Your kills: (§.)*(?<progress>[\\w,]+)(§.)*\\/(?<total>[\\w,]+)"))
+    private val campfireTalismanTierInternalNamePattern by itemDisplayOverlaySubgroup.pattern(("campfiretalismantier.internalname"), ("CAMPFIRE_TALISMAN_(?<tier>[\\d]+)"))
+    private val isNotAuctionHouseChestNamePattern by itemDisplayOverlaySubgroup.pattern(("isnotauctionhouse.chestname"), ("^(?:(?!Auction).)*\$"))
+    private val internalizedSoulflowLoreLinePattern by itemDisplayOverlaySubgroup.pattern(("internalizedsoulflow.loreline"), ("(§.)*Internalized: (§.)*(?<leading>[0-9]+)(?<trailing>,[0-9]{0,3})⸎ Soulflow"))
+    private val storageChestInternalNamePattern by itemDisplayOverlaySubgroup.pattern(("storagechest.internalname"), (".*_ENCHANTED_CHEST"))
+    private val storageChestItemNamePattern by itemDisplayOverlaySubgroup.pattern(("storagechest.itemname"), (".* Storage"))
+    private val personalCompactorDeletorChestNamePattern by itemDisplayOverlaySubgroup.pattern(("personalcompactordeletor.chestname"), ("Personal (Compactor .*|Deletor .*)"))
+    private val personalCompactorDeletorEnabledItemNamePattern by itemDisplayOverlaySubgroup.pattern(("personalcompactordeletorenabled.itemname"), ("(§.)*(Compactor|Deletor) Currently O(?<toggle>FF|N)!"))
+    private val personalCompactorDeletorInternalNamePattern by itemDisplayOverlaySubgroup.pattern(("personalcompactordeletor.internalname"), ("PERSONAL_(COMPACTOR|DELETOR)_(?<thousands>[\\w]+)(000)"))
+    private val personalCompactorDeletorItemNamePattern by itemDisplayOverlaySubgroup.pattern(("personalcompactordeletor.itemname"), ("Personal (Compactor|Deletor) (?<thousands>[\\w]+)(000)"))
+    private val abiphoneInternalNamePattern by itemDisplayOverlaySubgroup.pattern(("abiphone.internalname"), ("ABIPHONE_.*"))
+    private val doesNotIncludeDungeonStarsItemNamePattern by itemDisplayOverlaySubgroup.pattern(("doesnotincludedungeonstars.itemname"), ("^(?:(?!✪).)*\$"))
+    private val soulflowAccessoryInternalNamePattern by itemDisplayOverlaySubgroup.pattern(("soulflowaccessory.internalname"), ("SOULFLOW_.*"))
+    private val isTradingWithPlayerChestNamePattern by itemDisplayOverlaySubgroup.pattern(("isinplayertradingmenu.chestname"), ("(You([\\t ]){2,}(?<theirName>[a-zA-Z0-9_]{2,16}))")) // see https://regex101.com/r/UDCQwR/1 for reference. -ery
+    private val isInAHOrNPCShopLoreLinePattern by itemDisplayOverlaySubgroup.pattern(("isavacuuminsideauctionhouseornpcshop.loreline"), ("(((§.)*Ends in: (§.)*(?<time>([\\d.,]+[ywdhms]+( )?)+))|Click to [tT]rade.)")) // see https://regex101.com/r/hyJEEe/1 for reference. -ery
 
     private val newYearCakeInternalName = (("NEW_YEAR_CAKE").asInternalName())
     private val ranchersBootsInternalName = (("RANCHERS_BOOTS").asInternalName())
@@ -314,7 +314,7 @@ object ItemDisplayOverlayFeatures : AbstractStackSize() {
         }
     }
 
-    private fun isVacuumGardenAndIsOwnVaccum(item: ItemStack, lore: List<String>, chestName: String): Boolean = VACUUM_GARDEN.isSelected() && item.getInternalNameOrNull() in PestAPI.vacuumVariants && lore.none { isAVacuumInsideAuctionHouseOrNPCShopLoreLinePattern.matches(it) } && !(isInPlayerTradingMenuChestNamePattern.matches(chestName))
+    private fun isVacuumGardenAndIsOwnVaccum(item: ItemStack, lore: List<String>, chestName: String): Boolean = VACUUM_GARDEN.isSelected() && item.getInternalNameOrNull() in PestAPI.vacuumVariants && lore.none { isInAHOrNPCShopLoreLinePattern.matches(it) } && !(isTradingWithPlayerChestNamePattern.matches(chestName))
     private fun getVacuumGardenTip(lore: List<String>): String {
         for (line in lore) {
             gardenVacuumLoreLinePattern.matchMatcher(line) {
