@@ -14,4 +14,6 @@ abstract class AbstractStackSize {
     }
     abstract fun getStackTip(item: ItemStack): String
     val itemStackSizeGroup = RepoPattern.group("itemstacksize")
+    val greenCheckmark: String = "§a✔"
+    val bigRedCross: String = "§c§l✖"
 }
