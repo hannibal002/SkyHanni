@@ -49,7 +49,7 @@ class MenuItemDisplayOverlayBingo : AbstractMenuStackSize() {
                         return "§a§z✔"
                     }
                     else if (lore.lastOrNull() == "§cINCOMPLETE") {
-                        return "§c§l✖"
+                        return bigRedCross
                     }
                 }
             }
