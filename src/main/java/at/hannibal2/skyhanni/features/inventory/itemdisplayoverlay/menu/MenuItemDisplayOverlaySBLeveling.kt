@@ -7,20 +7,21 @@ import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.cleanName
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.ItemUtils.name
-import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
 import net.minecraft.item.ItemStack
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
 class MenuItemDisplayOverlaySBLeveling : AbstractMenuStackSize() {
-    private val guideTaskChestNamePattern by RepoPattern.pattern(("itemstacksize.sbleveling.guidetask.chestname"), (".*(Guide |Task).*"))
-    private val progressPatternLoreLinePattern by RepoPattern.pattern(("itemstacksize.sbleveling.progresspattern.loreline"), (".*Progress.*: (§.)?(?<percent>[0-9]+)(\\.[0-9]*)?(§.)?%"))
-    private val checkmarkItemNamePattern by RepoPattern.pattern(("itemstacksize.sbleveling.checkmark.itemname"), ("✔.*"))
-    private val progressToCompleteCategoryPercentLoreLinePattern by RepoPattern.pattern(("itemstacksize.sbleveling.progresstocompletecategorypercent.loreline"), (".*(§.)?Progress to Complete Category: (§.)?(?<percent>[0-9]+)(\\.[0-9]*)?(§.)?%"))
-    private val rewardsSkyblockLevelingChestNamePattern by RepoPattern.pattern(("itemstacksize.sbleveling.rewardsskyblockleveling.chestname"), (".*(rewards|skyblock leveling).*"))
-    private val progressToRewardsUnlockedPatternLoreLinePattern by RepoPattern.pattern(("itemstacksize.sbleveling.progresstorewardsunlockedpattern.loreline"), (".*(Progress to .*|Rewards Unlocked:) (§.)?(?<percent>[0-9]+)(\\.[0-9]*)?(§.)?%"))
-    private val greenItemNamePattern by RepoPattern.pattern(("itemstacksize.sbleveling.green.itemname"), ("^§a(\\S*)\$"))
-    private val emblemsUnlockedLoreLinePattern by RepoPattern.pattern(("itemstacksize.sbleveling.emblemsunlocked.loreline"), ("(§.)?(?<emblems>[\\d]+) Unlocked"))
+    private val sbLevelingSubgroup = itemStackSizeGroup.group("sbleveling")
+    
+    private val guideTaskChestNamePattern by sbLevelingSubgroup.pattern(("guidetask.chestname"), (".*(Guide |Task).*"))
+    private val progressPatternLoreLinePattern by sbLevelingSubgroup.pattern(("progresspattern.loreline"), (".*Progress.*: (§.)?(?<percent>[0-9]+)(\\.[0-9]*)?(§.)?%"))
+    private val checkmarkItemNamePattern by sbLevelingSubgroup.pattern(("checkmark.itemname"), ("✔.*"))
+    private val progressToCompleteCategoryPercentLoreLinePattern by sbLevelingSubgroup.pattern(("progresstocompletecategorypercent.loreline"), (".*(§.)?Progress to Complete Category: (§.)?(?<percent>[0-9]+)(\\.[0-9]*)?(§.)?%"))
+    private val rewardsSkyblockLevelingChestNamePattern by sbLevelingSubgroup.pattern(("rewardsskyblockleveling.chestname"), (".*(rewards|skyblock leveling).*"))
+    private val progressToRewardsUnlockedPatternLoreLinePattern by sbLevelingSubgroup.pattern(("progresstorewardsunlockedpattern.loreline"), (".*(Progress to .*|Rewards Unlocked:) (§.)?(?<percent>[0-9]+)(\\.[0-9]*)?(§.)?%"))
+    private val greenItemNamePattern by sbLevelingSubgroup.pattern(("green.itemname"), ("^§a(\\S*)\$"))
+    private val emblemsUnlockedLoreLinePattern by sbLevelingSubgroup.pattern(("emblemsunlocked.loreline"), ("(§.)?(?<emblems>[\\d]+) Unlocked"))
 
     @SubscribeEvent
     override fun onRenderItemTip(event: RenderItemTipEvent) {
