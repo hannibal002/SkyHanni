@@ -71,6 +71,10 @@ public class ChatConfig {
             // If the list does not contain the key, filter it
             return this.whitelist.isEmpty() || !this.whitelist.contains(key);
         }
+
+        public Boolean isOff() {
+            return this == DungeonFilterMode.OFF;
+        }
     }
 
     @Expose

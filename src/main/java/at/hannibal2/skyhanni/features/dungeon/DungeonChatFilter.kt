@@ -1,7 +1,6 @@
 package at.hannibal2.skyhanni.features.dungeon
 
 import at.hannibal2.skyhanni.SkyHanniMod
-import at.hannibal2.skyhanni.config.features.chat.ChatConfig
 import at.hannibal2.skyhanni.events.LorenzChatEvent
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.StringUtils.matches
@@ -192,7 +191,7 @@ class DungeonChatFilter {
 
     @SubscribeEvent
     fun onChatMessage(event: LorenzChatEvent) {
-        if (!LorenzUtils.onHypixel || config.dungeonChatFilter == ChatConfig.DungeonFilterMode.OFF) return
+        if (!LorenzUtils.onHypixel || config.dungeonChatFilter.isOff) return
 
         // Workaround since the potion message gets always sent at that moment when SkyBlock is set as false
         if (!LorenzUtils.inSkyBlock && !event.message.startsWith("§aYour active Potion Effects")) return
