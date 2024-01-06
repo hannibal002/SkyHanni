@@ -13,7 +13,6 @@ import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.NumberUtil
 import at.hannibal2.skyhanni.utils.NumberUtil.formatNumber
 import at.hannibal2.skyhanni.utils.NumberUtil.romanToDecimalIfNecessary
-import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
 import net.minecraft.init.Items
 import net.minecraft.item.ItemStack
@@ -155,7 +154,7 @@ class MenuItemDisplayOverlayPlayer : AbstractMenuStackSize() {
                         minionTierCraftProgressLoreLinePattern.matchMatcher(line) { totalTiers++ } //§c
                         minionTierNotYetCraftedLoreLinePattern.matchMatcher(line) { tiersToSubtract++ }
                     }
-                    return "${totalTiers - tiersToSubtract}".replace("$totalTiers", "§a✔")
+                    return "${totalTiers - tiersToSubtract}".replace("$totalTiers", greenCheckmark)
                 }
             }
         }
@@ -178,7 +177,7 @@ class MenuItemDisplayOverlayPlayer : AbstractMenuStackSize() {
             if ((chestName.lowercase() == "skyblock menu")) {
                 petsItemNamePattern.matchMatcher(itemName) {
                     for (line in item.getLore()) {
-                        petsNoPetLoreLinePattern.matchMatcher(line) { return "§c§l✖" }
+                        petsNoPetLoreLinePattern.matchMatcher(line) { return bigRedCross }
                     }
                 }
             }
