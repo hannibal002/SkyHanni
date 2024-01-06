@@ -48,7 +48,7 @@ class MenuItemDisplayOverlaySBLeveling : AbstractMenuStackSize() {
                             }
                         }
                         checkmarkItemNamePattern.matchMatcher(itemName) {
-                            return "§a✔"
+                            return greenCheckmark
                         }
                     }
                 }
