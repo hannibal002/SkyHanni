@@ -32,12 +32,17 @@ object GardenCropTimeCommand {
             LorenzUtils.userError("Not a valid number: '$rawAmount'")
             return
         }
+        val multipliers = CropMoneyDisplay.multipliers
+        if (multipliers.isEmpty()) {
+            LorenzUtils.userError("Data not loaded yet. Join the garden and display the money per hour display.")
+            return
+        }
 
         val rawSearchName = args.toMutableList().drop(1).joinToString(" ")
         val searchName = rawSearchName.lowercase()
 
         val map = mutableMapOf<String, Long>()
-        for (entry in CropMoneyDisplay.multipliers) {
+        for (entry in multipliers) {
             val internalName = entry.key
             val itemName = internalName.getItemName()
             if (itemName.removeColor().lowercase().contains(searchName)) {
