@@ -66,9 +66,11 @@ object LorenzUtils {
 
     val noTradeMode get() = HypixelData.noTrade
 
-    val isStrandedProfile get() = HypixelData.stranded
+    val isStrandedProfile get() = inSkyBlock && HypixelData.stranded
 
     val isBingoProfile get() = inSkyBlock && (HypixelData.bingo || TestBingo.testBingo)
+
+    val isIronmanProfile get() = inSkyBlock && HypixelData.ironman
 
     val lastWorldSwitch get() = HypixelData.joinedWorld
 
@@ -287,10 +289,10 @@ object LorenzUtils {
         }
     }
 
-    fun setTextIntoSign(text: String) {
+    fun setTextIntoSign(text: String, line: Int = 0) {
         val gui = Minecraft.getMinecraft().currentScreen
         if (gui !is AccessorGuiEditSign) return
-        gui.tileSign.signText[0] = ChatComponentText(text)
+        gui.tileSign.signText[line] = ChatComponentText(text)
     }
 
     fun addTextIntoSign(addedText: String) {
@@ -299,7 +301,7 @@ object LorenzUtils {
         val lines = gui.tileSign.signText
         val index = gui.editLine
         val text = lines[index].unformattedText + addedText
-        lines[index] = ChatComponentText(text.capAtMinecraftLength(90))
+        lines[index] = ChatComponentText(text.capAtMinecraftLength(91))
     }
 
     /**
@@ -525,7 +527,7 @@ object LorenzUtils {
             && tileSign.signText[3].unformattedText.removeColor() == "speed cap!")
     }
 
-    fun IslandType.isInIsland() = inSkyBlock && (skyBlockIsland == this || this == IslandType.CATACOMBS && inDungeons)
+    fun IslandType.isInIsland() = inSkyBlock && skyBlockIsland == this
 
     fun <K> MutableMap<K, Int>.addOrPut(key: K, number: Int): Int {
         val currentValue = this[key] ?: 0
@@ -548,7 +550,7 @@ object LorenzUtils {
         return newValue
     }
 
-    fun <K, N : Number> MutableMap<K, N>.sumAllValues(): Double {
+    fun <K, N : Number> Map<K, N>.sumAllValues(): Double {
         if (values.isEmpty()) return 0.0
 
         return when (values.first()) {
@@ -601,6 +603,8 @@ object LorenzUtils {
     val isDerpy get() = recalculateDerpy.getValue()
 
     fun Int.derpy() = if (isDerpy) this / 2 else this
+
+    fun Int.ignoreDerpy() = if (isDerpy) this * 2 else this
 
     fun runDelayed(duration: Duration, runnable: () -> Unit) {
         Timer().schedule(object : TimerTask() {

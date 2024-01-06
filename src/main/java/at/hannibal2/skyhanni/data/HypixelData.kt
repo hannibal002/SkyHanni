@@ -15,6 +15,7 @@ import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.TabListData
+import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import com.google.gson.JsonObject
 import io.github.moulberry.notenoughupdates.NotEnoughUpdates
 import net.minecraft.client.Minecraft
@@ -24,11 +25,11 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import net.minecraftforge.fml.common.network.FMLNetworkEvent
 import kotlin.concurrent.thread
 
-
 class HypixelData {
-    // TODO USE SH-REPO
-    private val tabListProfilePattern = "§e§lProfile: §r§a(?<profile>.*)".toPattern()
-    private val lobbyTypePattern = "(?<lobbyType>.*lobby)\\d+".toPattern()
+    private val group = RepoPattern.group("data.hypixeldata")
+    private val tabListProfilePattern by group.pattern("tablistprofile", "§e§lProfile: §r§a(?<profile>.*)")
+    private val lobbyTypePattern by group.pattern("lobbytype", "(?<lobbyType>.*lobby)\\d+")
+    private val islandNamePattern by group.pattern("islandname", "(?:§.)*(Area|Dungeon): (?:§.)*(?<island>.*)")
 
     private var lastLocRaw = 0L
 
@@ -120,8 +121,7 @@ class HypixelData {
             // NEU and have NEU send it.
             // Remove this when NEU dependency is removed
             val currentTime = System.currentTimeMillis()
-            if (Minecraft.getMinecraft().thePlayer != null &&
-                Minecraft.getMinecraft().theWorld != null &&
+            if (LorenzUtils.onHypixel &&
                 locrawData == null &&
                 currentTime - lastLocRaw > 15000
             ) {
@@ -190,7 +190,7 @@ class HypixelData {
         bingo = false
 
         for (line in ScoreboardData.sidebarLinesFormatted) {
-            if (BingoAPI.getRank(line) != null) {
+            if (BingoAPI.getRankFromScoreboard(line) != null) {
                 bingo = true
             }
             when (line) {
@@ -211,8 +211,8 @@ class HypixelData {
         var newIsland = ""
         var guesting = false
         for (line in TabListData.getTabList()) {
-            if (line.startsWith("§b§lArea: ")) {
-                newIsland = line.split(": ")[1].removeColor()
+            islandNamePattern.matchMatcher(line) {
+                newIsland = group("island").removeColor()
             }
             if (line == " Status: §r§9Guest") {
                 guesting = true

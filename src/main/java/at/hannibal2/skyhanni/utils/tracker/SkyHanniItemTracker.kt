@@ -3,6 +3,7 @@ package at.hannibal2.skyhanni.utils.tracker
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.config.Storage
 import at.hannibal2.skyhanni.config.features.misc.TrackerConfig.PriceFromEntry
+import at.hannibal2.skyhanni.data.SlayerAPI
 import at.hannibal2.skyhanni.test.PriceSource
 import at.hannibal2.skyhanni.utils.ItemUtils.getNameWithEnchantment
 import at.hannibal2.skyhanni.utils.KeyboardManager
@@ -35,15 +36,22 @@ class SkyHanniItemTracker<Data : ItemTrackerData>(
         addItem(SKYBLOCK_COIN, coins)
     }
 
-    fun addItem(internalName: NEUInternalName, stackSize: Int) {
+    fun addItem(internalName: NEUInternalName, amount: Int) {
         modify {
-            it.additem(internalName, stackSize)
+            it.additem(internalName, amount)
         }
         getSharedTracker()?.let {
             val hidden = it.get(DisplayMode.TOTAL).items[internalName]!!.hidden
             it.get(DisplayMode.SESSION).items[internalName]!!.hidden = hidden
         }
 
+        val (itemName, price) = SlayerAPI.getItemNameAndPrice(internalName, amount)
+        if (config.warnings.chat && price >= config.warnings.minimumChat) {
+            LorenzUtils.chat("§a+Tracker Drop§7: §r$itemName")
+        }
+        if (config.warnings.title && price >= config.warnings.minimumTitle) {
+            LorenzUtils.sendTitle("§a+ $itemName", 5.seconds)
+        }
     }
 
     fun addPriceFromButton(lists: MutableList<List<Any>>) {
@@ -117,9 +125,25 @@ class SkyHanniItemTracker<Data : ItemTrackerData>(
             }
         }
 
-        for (text in items.sortedDesc().keys) {
+        val limitList = config.hideCheapItems
+        var pos = 0
+        var hiddenItems = 0
+        for ((text, pricePer) in items.sortedDesc()) {
+            pos++
+            if (limitList.enabled.get()) {
+                if (pos > limitList.alwaysShowBest.get()) {
+                    if (pricePer < limitList.minPrice.get() * 1000) {
+                        hiddenItems++
+                        continue
+                    }
+                }
+            }
             lists.addAsSingletonList(text)
         }
+        if (hiddenItems > 0) {
+            lists.addAsSingletonList(" §7$hiddenItems cheap items are hidden.")
+        }
+
         return profit
     }
 

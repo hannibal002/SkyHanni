@@ -240,7 +240,7 @@ class CaptureFarmingGear {
             }
         }
         petLevelUpPattern.matchMatcher(msg) {
-            val pet = group("pet").uppercase()
+            val pet = group("pet").uppercase().replace("✦", "").trim().replace(" ", "_")
             for (item in FarmingItems.entries) {
                 if (item.name.contains(pet)) {
                     outdatedItems[item] = true

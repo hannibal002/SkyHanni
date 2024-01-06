@@ -55,7 +55,7 @@ public class ComposterConfig {
     @Expose
     @ConfigOption(name = "Retrieve From", desc = "Change where to retrieve the materials from in the composter overlay: The Bazaar or Sacks.")
     @ConfigEditorDropdown()
-    public RetrieveFromEntry retrieveFrom = RetrieveFromEntry.BAZAAR;
+    public RetrieveFromEntry retrieveFrom = RetrieveFromEntry.SACKS;
 
     public enum RetrieveFromEntry implements HasLegacyId {
         BAZAAR("Bazaar", 0),
@@ -98,7 +98,7 @@ public class ComposterConfig {
     )
     @ConfigEditorBoolean
     @FeatureToggle
-    public boolean displayEnabled = true;
+    public boolean displayEnabled = false;
 
     @Expose
     @ConfigOption(

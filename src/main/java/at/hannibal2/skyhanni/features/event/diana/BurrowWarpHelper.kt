@@ -20,7 +20,7 @@ class BurrowWarpHelper {
 
     @SubscribeEvent
     fun onKeyClick(event: LorenzKeyPressEvent) {
-        if (!DianaAPI.featuresEnabled()) return
+        if (!DianaAPI.isDoingDiana()) return
         if (!config.burrowNearestWarp) return
 
         if (event.keyCode != config.keyBindWarp) return
