@@ -1,7 +1,9 @@
 package at.hannibal2.skyhanni.features.rift.area.westvillage
 
+import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.InventoryFullyOpenedEvent
+import at.hannibal2.skyhanni.events.IslandChangeEvent
 import at.hannibal2.skyhanni.events.LorenzChatEvent
 import at.hannibal2.skyhanni.events.LorenzTickEvent
 import at.hannibal2.skyhanni.features.rift.RiftAPI
@@ -147,6 +149,13 @@ object VerminTracker {
         if (!config.showWithoutVacuum && !hasVacuum) return
 
         tracker.renderDisplay(config.position)
+    }
+
+    @SubscribeEvent
+    fun onIslandChange(event: IslandChangeEvent) {
+        if (event.newIsland == IslandType.THE_RIFT) {
+            tracker.firstUpdate()
+        }
     }
 
     fun resetCommand(args: Array<String>) {
