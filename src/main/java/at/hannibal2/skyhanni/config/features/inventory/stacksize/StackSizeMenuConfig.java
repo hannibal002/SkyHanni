@@ -9,6 +9,7 @@ import java.util.Arrays;
 import java.util.List;
 
 public class StackSizeMenuConfig {
+    private final String stackSizeConfigDesc = "Showing various pieces of information as a stack size for these menu items.\nSome values may be truncated percentages or §a✔§r§7s.\n§c§lWARNING§r§c: If you have any respect for your FPS, §4§l§oplease don't enable everything at once§r§c!";
 
     @Expose
     @ConfigOption(
