@@ -14,11 +14,13 @@ abstract class AbstractStackSize {
     }
     abstract fun getStackTip(item: ItemStack): String
     val itemStackSizeGroup = RepoPattern.group("itemstacksize")
+    val greenCheckmark: String = "§a✔"
+    val bigRedCross: String = "§c§l✖"
 }
 
 abstract class AbstractMenuStackSize : AbstractStackSize()  {
     val configMenuStackSize get() = configItemStackSize.stackSize.menu
     fun String.convertPercentToGreenCheckmark(): String {
-        return this.replace("100", "§a✔")
+        return this.replace("100", super.greenCheckmark)
     }
 }
