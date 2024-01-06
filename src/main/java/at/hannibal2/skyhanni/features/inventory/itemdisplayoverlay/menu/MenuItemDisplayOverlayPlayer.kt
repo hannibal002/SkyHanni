@@ -123,14 +123,14 @@ class MenuItemDisplayOverlayPlayer : AbstractMenuStackSize() {
             if (chestName.lowercase() == "skyblock menu") {
                 if (itemName == "Collections") {
                     for (line in item.getLore()) {
-                        collectionsPercentLoreLinePattern.matchMatcher(line) { return group("percent").replace("100", "§a✔") }
+                        collectionsPercentLoreLinePattern.matchMatcher(line) { return group("percent").convertPercentToGreenCheckmark() }
                     }
                 }
             }
             collectionsChestNameItemNamePattern.matchMatcher(chestName) {
                 collectionsChestNameItemNamePattern.matchMatcher(itemName) {
                     for (line in item.getLore()) {
-                        collectionsPercentLoreLinePattern.matchMatcher(line) { return group("percent").replace("100", "§a✔") }
+                        collectionsPercentLoreLinePattern.matchMatcher(line) { return group("percent").convertPercentToGreenCheckmark() }
                     }
                 }
             }
@@ -160,7 +160,7 @@ class MenuItemDisplayOverlayPlayer : AbstractMenuStackSize() {
 
         if (stackSizeConfig.contains(StackSizeMenuConfig.PlayerGeneral.MUSEUM_PROGRESS) && chestName == ("Your Museum") && museumItemNamesList.contains(itemName)) {
             for (line in item.getLore()) {
-                museumDonationLoreLinePattern.matchMatcher(line) { return group("amount").toDouble().toInt().toString().replace("100", "§a✔") }
+                museumDonationLoreLinePattern.matchMatcher(line) { return group("amount").toDouble().toInt().toString().convertPercentToGreenCheckmark() }
             }
         }
 
