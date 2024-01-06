@@ -50,7 +50,7 @@ class MenuItemDisplayOverlayAbiphone : AbstractMenuStackSize() {
                     val lore = item.getLore()
                     for (line in lore) {
                         if (line == ("§cDo Not Disturb enabled!")) {
-                            return "§c§l✖"
+                            return bigRedCross
                         }
                     }
                 }
