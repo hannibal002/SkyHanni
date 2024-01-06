@@ -119,7 +119,9 @@ class MenuItemDisplayOverlayMining : AbstractMenuStackSize() {
                 val lore = item.getLore()
                 if (lore.isNotEmpty()) {
                     for (line in lore) {
-                        hotmLevelPercentProgressLoreLinePattern.returnPercentFromLoreLineAsStackSize(line)
+                        hotmLevelPercentProgressLoreLinePattern.matchMatcher(line) {
+                            return group("percent").replace("100", "§a✔")
+                        }
                     }
                 }
             }
