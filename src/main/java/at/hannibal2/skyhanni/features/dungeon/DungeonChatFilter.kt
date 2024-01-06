@@ -1,6 +1,7 @@
 package at.hannibal2.skyhanni.features.dungeon
 
 import at.hannibal2.skyhanni.SkyHanniMod
+import at.hannibal2.skyhanni.config.features.chat.ChatConfig
 import at.hannibal2.skyhanni.events.LorenzChatEvent
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.StringUtils.matches
@@ -191,7 +192,7 @@ class DungeonChatFilter {
 
     @SubscribeEvent
     fun onChatMessage(event: LorenzChatEvent) {
-        if (!LorenzUtils.onHypixel || !config.dungeonMessages) return
+        if (!LorenzUtils.onHypixel || config.dungeonChatFilter == ChatConfig.DungeonFilterMode.OFF) return
 
         // Workaround since the potion message gets always sent at that moment when SkyBlock is set as false
         if (!LorenzUtils.inSkyBlock && !event.message.startsWith("§aYour active Potion Effects")) return
@@ -204,24 +205,28 @@ class DungeonChatFilter {
 
     private fun block(message: String): String {
         when {
-            message.isPresent("prepare") -> return "prepare"
-            message.isPresent("start") -> return "start"
+            message.shouldFilter("prepare") -> return "prepare"
+            message.shouldFilter("start") -> return "start"
         }
 
         if (!LorenzUtils.inDungeons) return ""
 
         return when {
-            message.isPresent("unsorted") -> "unsorted"
-            message.isPresent("pickup") -> "pickup"
-            message.isPresent("reminder") -> "reminder"
-            message.isPresent("buff") -> "buff"
-            message.isPresent("not_possible") -> "not_possible"
-            message.isPresent("damage") -> "damage"
-            message.isPresent("ability") -> "ability"
-            message.isPresent("puzzle") -> "puzzle"
-            message.isPresent("end") -> "end"
+            message.shouldFilter("unsorted") -> "unsorted"
+            message.shouldFilter("pickup") -> "pickup"
+            message.shouldFilter("reminder") -> "reminder"
+            message.shouldFilter("buff") -> "buff"
+            message.shouldFilter("not_possible") -> "not_possible"
+            message.shouldFilter("damage") -> "damage"
+            message.shouldFilter("ability") -> "ability"
+            message.shouldFilter ("puzzle") -> "puzzle"
+            message.shouldFilter ("end") -> "end"
             else -> ""
         }
+    }
+
+    private fun String.shouldFilter(key: String) : Boolean {
+        return this.isPresent(key) && config.dungeonChatFilter.isFiltered(key)
     }
 
     /**
