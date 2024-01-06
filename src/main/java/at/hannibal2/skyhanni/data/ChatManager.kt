@@ -9,6 +9,7 @@ import at.hannibal2.skyhanni.features.chat.ChatFilterGui
 import at.hannibal2.skyhanni.utils.IdentityCharacteristics
 import at.hannibal2.skyhanni.utils.LorenzLogger
 import at.hannibal2.skyhanni.utils.LorenzUtils
+import at.hannibal2.skyhanni.utils.LorenzUtils.chat
 import at.hannibal2.skyhanni.utils.LorenzUtils.makeAccessible
 import net.minecraft.client.Minecraft
 import net.minecraft.client.gui.ChatLine
@@ -120,6 +121,14 @@ object ChatManager {
             messageHistory[key] = MessageFilteringResult(original, ActionKind.MODIFIED, null, modified)
         } else {
             messageHistory[key] = MessageFilteringResult(original, ActionKind.ALLOWED, null, null)
+        }
+
+        // TODO: Handle this with ChatManager.retractMessage or some other way for logging and /shchathistory purposes?
+        if (chatEvent.chatLineId != 0) {
+            event.isCanceled = true
+            Minecraft.getMinecraft().ingameGUI.chatGUI.printChatMessageWithOptionalDeletion(
+                event.message, chatEvent.chatLineId
+            )
         }
     }
 

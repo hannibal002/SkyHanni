@@ -117,7 +117,7 @@ class MinionCraftHelper {
             }
         }
 
-        firstMinionTier(otherItems, minions)
+            FirstMinionTier.firstMinionTier(otherItems, minions, tierOneMinions, tierOneMinionsDone)
         return Pair(minions, otherItems)
     }
 
@@ -165,27 +165,6 @@ class MinionCraftHelper {
                             allIngredients.add(id)
                         }
                     }
-                }
-            }
-        }
-    }
-
-    private fun firstMinionTier(otherItems: Map<NEUInternalName, Int>, minions: MutableMap<String, NEUInternalName>) {
-        val help = otherItems.filter { !it.key.startsWith("WOOD_") }
-        val tierOneMinionsFiltered = tierOneMinions.filter { it.asString() !in tierOneMinionsDone }
-        for (minionId in tierOneMinionsFiltered) {
-            val prefix = minionId.asString().dropLast(1)
-            if (minions.any { it.value.startsWith(prefix) }) {
-                tierOneMinionsDone.add(minionId.toString())
-            }
-        }
-        for (minionId in tierOneMinionsFiltered) {
-            for (recipe in NEUItems.getRecipes(minionId)) {
-                if (recipe !is CraftingRecipe) continue
-                if (recipe.getCachedIngredients().any { help.contains(it.internalItemId.asInternalName()) }) {
-                    val name = recipe.output.itemStack.name!!.removeColor()
-                    val abc = name.replace(" I", " 0")
-                    minions[abc] = minionId.replace("_1", "_0")
                 }
             }
         }

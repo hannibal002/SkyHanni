@@ -14,6 +14,18 @@ public class VerminTrackerConfig {
     public boolean enabled = true;
 
     @Expose
+    @ConfigOption(name = "Show Outside West Village", desc = "Show the Vermin Tracker in other areas of The Rift.")
+    @ConfigEditorBoolean
+    @FeatureToggle
+    public boolean showOutsideWestVillage = false;
+
+    @Expose
+    @ConfigOption(name = "Show without Vacuum", desc = "Requires you to have Turbomax Vacuum in your inventory.")
+    @ConfigEditorBoolean
+    @FeatureToggle
+    public boolean showWithoutVacuum = false;
+
+    @Expose
     @ConfigOption(name = "Hide Chat", desc = "Hide the chat message when vacuuming a vermin.")
     @ConfigEditorBoolean
     @FeatureToggle
