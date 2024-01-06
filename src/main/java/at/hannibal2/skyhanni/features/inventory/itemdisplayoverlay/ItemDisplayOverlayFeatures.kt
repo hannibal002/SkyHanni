@@ -97,6 +97,8 @@ object ItemDisplayOverlayFeatures : AbstractStackSize() {
     private val abiphoneInternalNamePattern by RepoPattern.pattern(("itemstacksize.itemdisplayoverlay.abiphone.internalname"), ("ABIPHONE_.*"))
     private val doesNotIncludeDungeonStarsItemNamePattern by RepoPattern.pattern(("itemstacksize.itemdisplayoverlay.doesnotincludedungeonstars.itemname"), ("^(?:(?!✪).)*\$"))
     private val soulflowAccessoryInternalNamePattern by RepoPattern.pattern(("itemstacksize.itemdisplayoverlay.soulflowaccessory.internalname"), ("SOULFLOW_.*"))
+    private val isInPlayerTradingMenuChestNamePattern by RepoPattern.pattern(("itemstacksize.itemdisplayoverlay.isinplayertradingmenu.chestname"), ("(You([\\t ]){2,}(?<theirName>[a-zA-Z0-9_]{2,16}))")) // see https://regex101.com/r/UDCQwR/1 for reference. -ery
+    private val isAVacuumInsideAuctionHouseOrNPCShopLoreLinePattern by RepoPattern.pattern(("itemstacksize.itemdisplayoverlay.isavacuuminsideauctionhouseornpcshop.loreline"), ("(((§.)*Ends in: (§.)*(?<time>([\\d.,]+[ywdhms]+( )?)+))|Click to [tT]rade.)")) // see https://regex101.com/r/hyJEEe/1 for reference. -ery
 
     private val newYearCakeInternalName = (("NEW_YEAR_CAKE").asInternalName())
     private val ranchersBootsInternalName = (("RANCHERS_BOOTS").asInternalName())
@@ -150,7 +152,7 @@ object ItemDisplayOverlayFeatures : AbstractStackSize() {
             isRanchersBoots(internalName) -> getRanchersBootsTip(item)
             isLarvaHook(internalName) -> getLarvaHookTip(lore)
             isDungeonPotion(item, internalName) -> getDungeonPotionTip(item)
-            isVacuumGarden(item) -> getVacuumGardenTip(lore)
+            isVacuumGardenAndIsOwnVaccum(item, lore, chestName) -> getVacuumGardenTip(lore)
             isBottleOfJyrre(internalName) -> getBottleOfJyrreTip(item)
             isLegacyBottleOfJyrre(internalName) -> getLegacyBottleOfJyrreTip(lore)
             isEditionNumber(item) -> getEditionNumberTip(item)
@@ -312,7 +314,7 @@ object ItemDisplayOverlayFeatures : AbstractStackSize() {
         }
     }
 
-    private fun isVacuumGarden(item: ItemStack): Boolean = VACUUM_GARDEN.isSelected() && item.getInternalNameOrNull() in PestAPI.vacuumVariants
+    private fun isVacuumGardenAndIsOwnVaccum(item: ItemStack, lore: List<String>, chestName: String): Boolean = VACUUM_GARDEN.isSelected() && item.getInternalNameOrNull() in PestAPI.vacuumVariants && lore.none { isAVacuumInsideAuctionHouseOrNPCShopLoreLinePattern.matches(it) } && !(isInPlayerTradingMenuChestNamePattern.matches(chestName))
     private fun getVacuumGardenTip(lore: List<String>): String {
         for (line in lore) {
             gardenVacuumLoreLinePattern.matchMatcher(line) {
