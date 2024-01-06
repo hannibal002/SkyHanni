@@ -24,6 +24,7 @@ class MenuItemDisplayOverlaySBLeveling : AbstractMenuStackSize() {
     private val greenItemNamePattern by sbLevelingSubgroup.pattern(("green.itemname"), ("^§a(\\S*)\$"))
     private val emblemsUnlockedLoreLinePattern by sbLevelingSubgroup.pattern(("emblemsunlocked.loreline"), ("(§.)?(?<emblems>[\\d]+) Unlocked"))
     private val emblemPreviewItemNamePattern by sbLevelingSubgroup.pattern(("emblempreview.itemname"), ("(?<status>§.)+(?<emblemName>[\\S ]+) (?<theEmblem>(§.)+.+)")) // https://regex101.com/r/w3A9Lm/1 -ery
+    private val isAnEmblemLoreLinePattern by sbLevelingSubgroup.pattern(("isAnEmblem.loreline"), ("((§.)§8([\\S][^:][\\S ]+)|§8Locked)"))// https://regex101.com/r/WRelB7/1 -ery
 
     @SubscribeEvent
     override fun onRenderItemTip(event: RenderItemTipEvent) {
@@ -37,54 +38,56 @@ class MenuItemDisplayOverlaySBLeveling : AbstractMenuStackSize() {
         val chestName = InventoryUtils.openInventoryName()
         val lore = item.getLore()
 
-        if (stackSizeConfig.contains(StackSizeMenuConfig.SBLeveling.GUIDE_PROGRESS)) {
-            guideTaskChestNamePattern.matchMatcher(chestName) {
-                if (itemName.isNotEmpty()) {
-                    for (line in lore) {
-                        progressPatternLoreLinePattern.matchMatcher(line) {
-                            return group("percent").convertPercentToGreenCheckmark()
+        if (lore.isNotEmpty()) {
+            if (stackSizeConfig.contains(StackSizeMenuConfig.SBLeveling.GUIDE_PROGRESS)) {
+                guideTaskChestNamePattern.matchMatcher(chestName) {
+                    if (itemName.isNotEmpty()) {
+                        for (line in lore) {
+                            progressPatternLoreLinePattern.matchMatcher(line) {
+                                return group("percent").convertPercentToGreenCheckmark()
+                            }
                         }
-                    }
-                    checkmarkItemNamePattern.matchMatcher(itemName) {
-                        return "§a✔"
-                    }
-                }
-            }
-        }
-
-        if (stackSizeConfig.contains(StackSizeMenuConfig.SBLeveling.WAYS_TO_LEVEL_UP_PROGRESS)) {
-            for (line in lore) {
-                progressToCompleteCategoryPercentLoreLinePattern.matchMatcher(line) {
-                    return group("percent").convertPercentToGreenCheckmark()
-                }
-            }
-        }
-
-        if (stackSizeConfig.contains(StackSizeMenuConfig.SBLeveling.SB_LEVELING_REWARDS)) {
-            if ((itemName.isNotEmpty())) {
-                rewardsSkyblockLevelingChestNamePattern.matchMatcher(chestName.lowercase()) {
-                    for (line in lore) {
-                        progressToRewardsUnlockedPatternLoreLinePattern.matchMatcher(line) {
-                            return group("percent").convertPercentToGreenCheckmark()
+                        checkmarkItemNamePattern.matchMatcher(itemName) {
+                            return "§a✔"
                         }
                     }
                 }
             }
-        }
 
-        if (stackSizeConfig.contains(StackSizeMenuConfig.SBLeveling.EMBLEMS_UNLOCKED) && (chestName == ("Emblems"))) {
-            val nameWithColor = item.name ?: return ""
-            greenItemNamePattern.matchMatcher(nameWithColor) {
-                emblemsUnlockedLoreLinePattern.matchMatcher(lore.first()) {
-                    return group("emblems")
+            if (stackSizeConfig.contains(StackSizeMenuConfig.SBLeveling.WAYS_TO_LEVEL_UP_PROGRESS)) {
+                for (line in lore) {
+                    progressToCompleteCategoryPercentLoreLinePattern.matchMatcher(line) {
+                        return group("percent").convertPercentToGreenCheckmark()
+                    }
                 }
             }
-        }
 
-        if (stackSizeConfig.contains(StackSizeMenuConfig.SBLeveling.EMBLEM_PREVIEW) && (chestName == ("Emblems")) && !(emblemsUnlockedLoreLinePattern.matches(lore.first()))) {
-            val nameWithColor = item.name ?: return ""
-            emblemPreviewItemNamePattern.matchMatcher(nameWithColor) {
-                return group("theEmblem")
+            if (stackSizeConfig.contains(StackSizeMenuConfig.SBLeveling.SB_LEVELING_REWARDS)) {
+                if ((itemName.isNotEmpty())) {
+                    rewardsSkyblockLevelingChestNamePattern.matchMatcher(chestName.lowercase()) {
+                        for (line in lore) {
+                            progressToRewardsUnlockedPatternLoreLinePattern.matchMatcher(line) {
+                                return group("percent").convertPercentToGreenCheckmark()
+                            }
+                        }
+                    }
+                }
+            }
+
+            if (stackSizeConfig.contains(StackSizeMenuConfig.SBLeveling.EMBLEMS_UNLOCKED) && (chestName == ("Emblems"))) {
+                val nameWithColor = item.name ?: return ""
+                greenItemNamePattern.matchMatcher(nameWithColor) {
+                    emblemsUnlockedLoreLinePattern.matchMatcher(lore.first()) {
+                        return group("emblems")
+                    }
+                }
+            }
+
+            if (stackSizeConfig.contains(StackSizeMenuConfig.SBLeveling.EMBLEM_PREVIEW) && (chestName == ("Emblems")) && !(emblemsUnlockedLoreLinePattern.matches(lore.first())) && (isAnEmblemLoreLinePattern.matches(lore.first()))) {
+                val nameWithColor = item.name ?: return ""
+                emblemPreviewItemNamePattern.matchMatcher(nameWithColor) {
+                    return group("theEmblem")
+                }
             }
         }
 
