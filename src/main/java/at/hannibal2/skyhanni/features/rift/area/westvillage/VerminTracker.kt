@@ -31,6 +31,7 @@ object VerminTracker {
     private val verminBinPattern by group.pattern("binline", "§fVermin Bin: §\\w(?<count>\\d+) (?<vermin>\\w+)")
     private val verminBagPattern by group.pattern("bagline", "§fVacuum Bag: §\\w(?<count>\\d+) (?<vermin>\\w+)")
     private var hasVacuum = false
+    private val TURBOMAX_VACUUM = "TURBOMAX_VACUUM".asInternalName()
 
     private val config get() = RiftAPI.config.area.westVillage.verminTracker
 
@@ -62,7 +63,7 @@ object VerminTracker {
 
     private fun checkVacuum() {
         hasVacuum = InventoryUtils.getItemsInOwnInventory()
-            .any { it.getInternalName() == "TURBOMAX_VACUUM".asInternalName()}
+            .any { it.getInternalName() == TURBOMAX_VACUUM}
     }
 
     @SubscribeEvent
@@ -84,7 +85,7 @@ object VerminTracker {
 
         val bin = event.inventoryItems[13]?.getLore() ?: return
         val bag = InventoryUtils.getItemsInOwnInventory()
-            .firstOrNull { it.getInternalName() == "TURBOMAX_VACUUM".asInternalName() }
+            .firstOrNull { it.getInternalName() == TURBOMAX_VACUUM }
             ?.getLore() ?: emptyList()
 
         val binCounts = countVermin(bin, verminBinPattern)
