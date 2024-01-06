@@ -67,6 +67,11 @@ public class DebugConfig {
     public int copyItemDataCompressed = Keyboard.KEY_NONE;
 
     @Expose
+    @ConfigOption(name = "Copy Chest Name", desc = "Copies the chest name on key press in a GUI to clipboard.")
+    @ConfigEditorKeybind(defaultKey = Keyboard.KEY_NONE)
+    public int copyChestName = Keyboard.KEY_NONE;
+
+    @Expose
     @ConfigOption(name = "Copy RNG Meter", desc = "Copies internal names and maxed XP needed from RNG meter inventories as json to clipboard.")
     @ConfigEditorBoolean
     public boolean copyRngMeter = false;

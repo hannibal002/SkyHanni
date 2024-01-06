@@ -2,6 +2,7 @@ package at.hannibal2.skyhanni.test
 
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
+import at.hannibal2.skyhanni.test.command.CopyChestNameCommand.copyChestName
 import at.hannibal2.skyhanni.test.command.CopyItemCommand.copyItemToClipboard
 import at.hannibal2.skyhanni.utils.ItemStackTypeAdapterFactory
 import at.hannibal2.skyhanni.utils.KSerializable
@@ -52,8 +53,12 @@ object TestExportTools {
 
     @SubscribeEvent
     fun onKeybind(event: GuiScreenEvent.KeyboardInputEvent.Post) {
-        if (!config.copyItemDataCompressed.isKeyHeld() && !config.copyItemData.isKeyHeld()) return
+        if (!config.copyItemDataCompressed.isKeyHeld() && !config.copyItemData.isKeyHeld() && !config.copyChestName.isKeyHeld()) return
         val gui = event.gui as? GuiContainer ?: return
+        if (config.copyChestName.isKeyHeld()) {
+            copyChestName()
+            return
+        }
         val stack = gui.slotUnderMouse?.stack ?: return
         if (config.copyItemData.isKeyHeld()) {
             copyItemToClipboard(stack)

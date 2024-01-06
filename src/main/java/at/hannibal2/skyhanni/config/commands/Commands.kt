@@ -51,6 +51,7 @@ import at.hannibal2.skyhanni.test.SkyHanniConfigSearchResetCommand
 import at.hannibal2.skyhanni.test.SkyHanniDebugsAndTests
 import at.hannibal2.skyhanni.test.TestBingo
 import at.hannibal2.skyhanni.test.WorldEdit
+import at.hannibal2.skyhanni.test.command.CopyChestNameCommand
 import at.hannibal2.skyhanni.test.command.CopyItemCommand
 import at.hannibal2.skyhanni.test.command.CopyNearbyEntitiesCommand
 import at.hannibal2.skyhanni.test.command.CopyNearbyParticlesCommand
@@ -345,6 +346,10 @@ object Commands {
             "shcopyparticles",
             "Copied information about the particles that spawn in the next 50ms to the clipboard"
         ) { CopyNearbyParticlesCommand.command(it) }
+        registerCommand(
+            "shcopychestname",
+            "Copies the chest name to the clipboard."
+        ) { CopyChestNameCommand.command() }
         registerCommand("shtestpacket", "Logs incoming and outgoing packets to the console") { PacketTest.toggle() }
         registerCommand(
             "shtestmessage",
