@@ -306,7 +306,7 @@ class MenuItemDisplayOverlayPlayerAdvanced : AbstractMenuStackSize() {
             val lore = item.getLore()
             isElectionMenuChestNamePattern.matchMatcher(chestName) {
                 if (item.item == Item.getItemFromBlock(Blocks.glass_pane) || item.item == Item.getItemFromBlock(Blocks.stained_glass_pane)) return ""
-                isDictatorDanteItemNamePattern.matchMatcher(itemName.lowercase()) { return "§c§l✖" } //all of my homies possess a strong dislike towards dante
+                isDictatorDanteItemNamePattern.matchMatcher(itemName.lowercase()) { return bigRedCross } //all of my homies possess a strong dislike towards dante
                 val colorCode = item.name?.take(2)
                 val candidates = MayorElection.rawMayorData?.current?.candidates ?: return ""
                 for (candidate in candidates) {
@@ -342,7 +342,7 @@ class MenuItemDisplayOverlayPlayerAdvanced : AbstractMenuStackSize() {
                     return grabPerkpocalypseMayor(lore)
                 }
                 mayorBlankItemNamePattern.matchMatcher(itemName) {
-                    isDictatorDanteItemNamePattern.matchMatcher(itemName.lowercase()) { return "§c§l✖" }
+                    isDictatorDanteItemNamePattern.matchMatcher(itemName.lowercase()) { return bigRedCross }
                     for (line in lore) {
                         perkpocalypsePerksLoreLinePattern.matchMatcher(line) {
                             return grabPerkpocalypseMayor(lore)
@@ -480,7 +480,7 @@ class MenuItemDisplayOverlayPlayerAdvanced : AbstractMenuStackSize() {
             mayorFoxyPerksForJerryPerkapocalypseLoreLinePattern.matchMatcher(line) { return "§bFxy" }
             mayorMarinaPerksForJerryPerkapocalypseLoreLinePattern.matchMatcher(line) { return "§bMrn" }
             mayorPaulPerksForJerryPerkapocalypseLoreLinePattern.matchMatcher(line) { return "§bPul" }
-            mayorDiazPerksForJerryPerkapocalypseLoreLinePattern.matchMatcher(line) { return "§c§l✖" } //diaz gets an automatic X.
+            mayorDiazPerksForJerryPerkapocalypseLoreLinePattern.matchMatcher(line) { return bigRedCross } //diaz gets an automatic X.
         }
         return "§c?"
     }
