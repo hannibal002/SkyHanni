@@ -27,6 +27,7 @@ public class StackSizeMenuConfig {
         WAYS_TO_LEVEL_UP_PROGRESS("§bSkyblock Ways To Level Up Tasks"), //(%)
         SB_LEVELING_REWARDS("§bSkyblock Leveling Rewards Progress"), //(%)
         EMBLEMS_UNLOCKED("§bEmblems Unlocked"), // (#)
+        EMBLEM_PREVIEW("§bEmblem Preview")
         ;
 
         final String str;
