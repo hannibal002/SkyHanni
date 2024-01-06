@@ -479,8 +479,8 @@ object ItemDisplayOverlayFeatures : AbstractStackSize() {
     private fun getCompactorOrDeletorStatusTip(itemName: String): String {
         personalCompactorDeletorEnabledItemNamePattern.matchMatcher(itemName) {
             return when (group("toggle")) {
-                "N" ->"§a✔"
-                else -> "§c§l✖"
+                "N" -> greenCheckmark
+                else -> bigRedCross
             }
         }
         return ""
