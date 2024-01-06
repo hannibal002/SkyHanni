@@ -16,4 +16,7 @@ abstract class AbstractStackSize {
 
 abstract class AbstractMenuStackSize : AbstractStackSize()  {
     val configMenuStackSize get() = configItemStackSize.stackSize.menu
+    fun String.convertPercentToGreenCheckmark(): String {
+        return this.replace("100", "§a✔")
+    }
 }
