@@ -4,9 +4,13 @@ import at.hannibal2.skyhanni.config.FeatureToggle;
 import com.google.gson.annotations.Expose;
 import io.github.moulberry.moulconfig.annotations.Accordion;
 import io.github.moulberry.moulconfig.annotations.ConfigEditorBoolean;
+import io.github.moulberry.moulconfig.annotations.ConfigEditorDraggableList;
 import io.github.moulberry.moulconfig.annotations.ConfigEditorKeybind;
 import io.github.moulberry.moulconfig.annotations.ConfigOption;
 import org.lwjgl.input.Keyboard;
+
+import java.util.Collections;
+import java.util.List;
 
 public class ChatConfig {
 
@@ -32,10 +36,42 @@ public class ChatConfig {
     public ChatSymbols chatSymbols = new ChatSymbols();
 
     @Expose
-    @ConfigOption(name = "Dungeon Filter", desc = "Hides pickup, reminder, buff, damage, ability, puzzle and end messages in Dungeons.")
-    @ConfigEditorBoolean
-    @FeatureToggle
-    public boolean dungeonMessages = true;
+    @ConfigOption(name = "Dungeon Filter", desc = "Hide specific message types in Dungeons.")
+    @ConfigEditorDraggableList()
+    public List<DungeonMessageTypes> dungeonFilteredMessageTypes = Collections.emptyList();
+
+    public enum DungeonMessageTypes {
+        PREPARE("§bPreparation", "prepare"),
+        START("§aClass Buffs §r/ §cMort Dialog", "start"),
+        AMBIENCE("§bAmbience", "ambience"),
+        PICKUP("§ePickup", "pickup"),
+        REMINDER("§cReminder", "reminder"),
+        BUFF("§dBlessings", "buff"),
+        NOT_POSSIBLE("§cNot possible", "not_possible"),
+        DAMAGE("§cDamage", "damage"),
+        ABILITY("§dAbilities", "ability"),
+        PUZZLE("§dPuzzle §r/ §cQuiz", "puzzle"),
+        END("§7Essences§r/§aExperience", "end");
+
+        private final String name;
+        private final String key;
+
+        DungeonMessageTypes(String name, String key) {
+            this.name = name;
+            this.key = key;
+        }
+
+        public Boolean hasKey(String key) {
+            return this.key.equals(key);
+        }
+
+        @Override
+        public String toString() {
+            return name;
+        }
+
+
+    }
 
     @Expose
     @ConfigOption(name = "Dungeon Boss Messages", desc = "Hide messages from the Watcher and bosses in the Dungeon.")

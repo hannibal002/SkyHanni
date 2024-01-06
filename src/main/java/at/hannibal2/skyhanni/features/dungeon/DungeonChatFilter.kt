@@ -110,10 +110,7 @@ class DungeonChatFilter {
         "§4[STATUE] Oruo the Omniscient§r§f: §r§fI've had enough of you and your party fiddling with my buttons. Scram!",
         "§4[STATUE] Oruo the Omniscient§r§f: §r§fEnough! My buttons are not to be pressed with such lack of grace!"
     )
-    private val unsortedBlockedPatterns = listOf( // TODO sort out and filter separately
-        "(.*) §r§ehas obtained §r§a§r§9Beating Heart§r§e!".toPattern()
-    )
-    private val unsortedBlockedMessages = listOf(
+    private val ambienceMessages = listOf(
         "§5A shiver runs down your spine..."
     )
     private val reminderMessages = listOf(
@@ -133,7 +130,8 @@ class DungeonChatFilter {
         "§c(.*) §r§eYou picked up a Ability Damage Orb from (.*) §r§ehealing you for §r§c(.*) §r§eand granting you +§r§c(.*)% §r§eAbility Damage for §r§b10 §r§eseconds.".toPattern(),
         "§c(.*) §r§eYou picked up a Damage Orb from (.*) §r§ehealing you for §r§c(.*) §r§eand granting you +§r§c(.*)% §r§eDamage for §r§b10 §r§eseconds.".toPattern(),
         "(.*) §r§ehas obtained §r§a§r§9Premium Flesh§r§e!".toPattern(),
-        "§6§lRARE DROP! §r§9Beating Heart §r§b(.*)".toPattern()
+        "§6§lRARE DROP! §r§9Beating Heart §r§b(.*)".toPattern(),
+        "(.*) §r§ehas obtained §r§a§r§9Beating Heart§r§e!".toPattern()
     )
     private val pickupMessages = listOf(
         "§fYou found a §r§dWither Essence§r§f! Everyone gains an extra essence!"
@@ -164,7 +162,7 @@ class DungeonChatFilter {
     private val messagesMap: Map<String, List<String>> = mapOf(
         "prepare" to prepareMessages,
         "start" to startMessages,
-        "unsorted" to unsortedBlockedMessages,
+        "ambience" to ambienceMessages,
         "pickup" to pickupMessages,
         "reminder" to reminderMessages,
         "buff" to buffMessages,
@@ -176,7 +174,6 @@ class DungeonChatFilter {
     private val patternsMap: Map<String, List<Pattern>> = mapOf(
         "prepare" to preparePatterns,
         "start" to startPatterns,
-        "unsorted" to unsortedBlockedPatterns,
         "pickup" to pickupPatterns,
         "buff" to buffPatterns,
         "damage" to damagePatterns,
@@ -191,7 +188,7 @@ class DungeonChatFilter {
 
     @SubscribeEvent
     fun onChatMessage(event: LorenzChatEvent) {
-        if (!LorenzUtils.onHypixel || !config.dungeonMessages) return
+        if (!LorenzUtils.onHypixel || config.dungeonFilteredMessageTypes.isEmpty()) return
 
         // Workaround since the potion message gets always sent at that moment when SkyBlock is set as false
         if (!LorenzUtils.inSkyBlock && !event.message.startsWith("§aYour active Potion Effects")) return
@@ -204,24 +201,28 @@ class DungeonChatFilter {
 
     private fun block(message: String): String {
         when {
-            message.isPresent("prepare") -> return "prepare"
-            message.isPresent("start") -> return "start"
+            message.isFiltered("prepare") -> return "prepare"
+            message.isFiltered("start") -> return "start"
         }
 
         if (!LorenzUtils.inDungeons) return ""
 
         return when {
-            message.isPresent("unsorted") -> "unsorted"
-            message.isPresent("pickup") -> "pickup"
-            message.isPresent("reminder") -> "reminder"
-            message.isPresent("buff") -> "buff"
-            message.isPresent("not_possible") -> "not_possible"
-            message.isPresent("damage") -> "damage"
-            message.isPresent("ability") -> "ability"
-            message.isPresent("puzzle") -> "puzzle"
-            message.isPresent("end") -> "end"
+            message.isFiltered("ambience") -> "ambience"
+            message.isFiltered("pickup") -> "pickup"
+            message.isFiltered("reminder") -> "reminder"
+            message.isFiltered("buff") -> "buff"
+            message.isFiltered("not_possible") -> "not_possible"
+            message.isFiltered("damage") -> "damage"
+            message.isFiltered("ability") -> "ability"
+            message.isFiltered("puzzle") -> "puzzle"
+            message.isFiltered("end") -> "end"
             else -> ""
         }
+    }
+
+    private fun String.isFiltered(key: String) : Boolean {
+        return config.dungeonFilteredMessageTypes.any { it.hasKey(key) } && this.isPresent(key)
     }
 
     /**
