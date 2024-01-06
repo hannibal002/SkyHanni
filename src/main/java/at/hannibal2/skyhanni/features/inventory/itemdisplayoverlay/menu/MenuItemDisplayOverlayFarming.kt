@@ -54,7 +54,7 @@ class MenuItemDisplayOverlayFarming : AbstractMenuStackSize() {
             if (lore.isNotEmpty()) {
                 for (line in lore) {
                     visitorMilestonePercentProgressLoreLinePattern.matchMatcher(line) {
-                        return group("percent").replace("100", "§a✔")
+                        return group("percent").convertPercentToGreenCheckmark()
                     }
                 }
             }
