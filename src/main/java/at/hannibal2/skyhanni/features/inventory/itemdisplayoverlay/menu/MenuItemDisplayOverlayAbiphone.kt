@@ -7,21 +7,22 @@ import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.cleanName
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.ItemUtils.name
-import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import at.hannibal2.skyhanni.utils.StringUtils.firstLetterUppercase
 import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
 import net.minecraft.item.ItemStack
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
 class MenuItemDisplayOverlayAbiphone : AbstractMenuStackSize() {
-    private val abiphoneContactsDirectoryChestNamePattern by RepoPattern.pattern(("itemstacksize.abiphone.abiphonecontactsdirectory.chestname"), ("(.*A.iphone.*|Contacts Directory)"))
-    private val yourContactsLoreLinePattern by RepoPattern.pattern(("itemstacksize.abiphone.yourcontacts.loreline"), ("(§.)?Your contacts: (§.)?(?<useful>[0-9]+)(§.)?\\/(§.)?(?<total>[0-9]+).*"))
-    private val isAContactItemNamePattern by RepoPattern.pattern(("itemstacksize.abiphone.isacontact.itemname"), (".*§f§.*"))
-    private val upgradedAllRelaysLoreLinePattern by RepoPattern.pattern(("itemstacksize.abiphone.upgradedallrelays.loreline"), ("(§.)?Upgraded Relays: (§.).*ALL!.*"))
-    private val upgradedPartialRelaysLoreLinePattern by RepoPattern.pattern(("itemstacksize.abiphone.upgradedpartialrelays.loreline"), ("(§.)?Upgraded Relays: (§.)?(?<useful>[0-9]+)(§.)?\\/(§.)?(?<total>[0-9]+).*"))
-    private val selectedRingtoneLoreLinePattern by RepoPattern.pattern(("itemstacksize.abiphone.selectedringtone.loreline"), ("(§.)*Selected Ringtone: (§.)*(?<ringtone>.+)"))
-    private val abiphoneMinigameStatsLoreLinePattern by RepoPattern.pattern(("itemstacksize.abiphone.abiphoneminigamestats.loreline"), ("(§.)*(?<type>.+): (§.)*(?<count>[\\w]+)"))
-    private val tilerSortAbiphoneOnlyLoreLinePattern by RepoPattern.pattern(("itemstacksize.abiphone.tilersortabiphoneonly.loreline"), (".*(?<colorCode>§.)*▶.?(?<category>[\\w ]+).*"))
+    private val abiphoneSubgroup = itemStackSizeGroup.group("abiphone")
+    
+    private val abiphoneContactsDirectoryChestNamePattern by abiphoneSubgroup.pattern(("abiphonecontactsdirectory.chestname"), ("(.*A.iphone.*|Contacts Directory)"))
+    private val yourContactsLoreLinePattern by abiphoneSubgroup.pattern(("yourcontacts.loreline"), ("(§.)?Your contacts: (§.)?(?<useful>[0-9]+)(§.)?\\/(§.)?(?<total>[0-9]+).*"))
+    private val isAContactItemNamePattern by abiphoneSubgroup.pattern(("isacontact.itemname"), (".*§f§.*"))
+    private val upgradedAllRelaysLoreLinePattern by abiphoneSubgroup.pattern(("upgradedallrelays.loreline"), ("(§.)?Upgraded Relays: (§.).*ALL!.*"))
+    private val upgradedPartialRelaysLoreLinePattern by abiphoneSubgroup.pattern(("upgradedpartialrelays.loreline"), ("(§.)?Upgraded Relays: (§.)?(?<useful>[0-9]+)(§.)?\\/(§.)?(?<total>[0-9]+).*"))
+    private val selectedRingtoneLoreLinePattern by abiphoneSubgroup.pattern(("selectedringtone.loreline"), ("(§.)*Selected Ringtone: (§.)*(?<ringtone>.+)"))
+    private val abiphoneMinigameStatsLoreLinePattern by abiphoneSubgroup.pattern(("abiphoneminigamestats.loreline"), ("(§.)*(?<type>.+): (§.)*(?<count>[\\w]+)"))
+    private val tilerSortAbiphoneOnlyLoreLinePattern by abiphoneSubgroup.pattern(("tilersortabiphoneonly.loreline"), (".*(?<colorCode>§.)*▶.?(?<category>[\\w ]+).*"))
 
     @SubscribeEvent
     override fun onRenderItemTip(event: RenderItemTipEvent) {
