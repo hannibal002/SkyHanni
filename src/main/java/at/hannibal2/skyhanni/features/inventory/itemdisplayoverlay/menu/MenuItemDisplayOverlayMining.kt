@@ -120,7 +120,7 @@ class MenuItemDisplayOverlayMining : AbstractMenuStackSize() {
                 if (lore.isNotEmpty()) {
                     for (line in lore) {
                         hotmLevelPercentProgressLoreLinePattern.matchMatcher(line) {
-                            return group("percent").replace("100", "§a✔")
+                            return group("percent").convertPercentToGreenCheckmark()
                         }
                     }
                 }
