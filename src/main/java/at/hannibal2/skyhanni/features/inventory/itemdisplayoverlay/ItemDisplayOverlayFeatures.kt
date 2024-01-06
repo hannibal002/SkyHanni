@@ -177,10 +177,10 @@ object ItemDisplayOverlayFeatures : AbstractStackSize() {
     }
 
     // <editor-fold desc="Stack Size Implementations">
-    private fun isMasterStar(internalName: NEUInternalName): Boolean = MASTER_STAR_TIER.isSelected() && masterStarPattern.matches(internalName)
+    private fun isMasterStar(internalName: NEUInternalName): Boolean = MASTER_STAR_TIER.isSelected() && masterStarInternalNamePattern.matches(internalName)
     private fun getMasterStarTip(internalName: NEUInternalName): String {
         var tier = ""
-        masterStarPattern.matchMatcher(internalName.asString()) { tier = group("tier") }
+        masterStarInternalNamePattern.matchMatcher(internalName.asString()) { tier = group("tier") }
         return when (tier) {
             "FIRST" -> "1"
             "SECOND" -> "2"
@@ -387,7 +387,7 @@ object ItemDisplayOverlayFeatures : AbstractStackSize() {
         val blocksWalked = item.getPrehistoricEggBlocksWalked() ?: return ""
         var rarity = ""
         for (line in lore) {
-            armadilloRarityLorePattern.matchMatcher(line) { rarity = group("rarity") }
+            armadilloRarityLoreLinePattern.matchMatcher(line) { rarity = group("rarity") }
         }
         val threshold = when (rarity) {
             "COMMMON" -> 4_000F
@@ -420,7 +420,7 @@ object ItemDisplayOverlayFeatures : AbstractStackSize() {
                 val denom = line.removeColor().replace("Your kills: ", "").replace(",", "").split("/").last()
                 return (((num.toFloat() / denom.toFloat()) * 100).toString().take(2))
             } */
-            beastmasterCrestKillsProgressPattern.matchMatcher(line) {
+            beastmasterCrestKillsProgressLoreLinePattern.matchMatcher(line) {
                 return "${((group("progress").formatNumber().toFloat() / group("total").formatNumber().toFloat()) * 100)}".take(2)
             }
         }
