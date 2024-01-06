@@ -27,7 +27,7 @@ object GardenCropTimeCommand {
 
         val rawAmount = args[0]
         val amount = try {
-            rawAmount.formatNumber().toInt()
+            rawAmount.formatNumber()
         } catch (e: NumberFormatException) {
             LorenzUtils.userError("Not a valid number: '$rawAmount'")
             return
@@ -45,7 +45,7 @@ object GardenCropTimeCommand {
                 val baseName = baseId.getItemName()
                 val crop = CropType.getByName(baseName.removeColor())
 
-                val fullAmount = baseAmount.toLong() * amount.toLong()
+                val fullAmount = baseAmount.toLong() * amount
                 val text = if (baseAmount == 1) {
                     "§e${amount.addSeparators()}x $itemName"
                 } else {
