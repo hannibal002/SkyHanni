@@ -7,29 +7,28 @@ import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils.sorted
 import at.hannibal2.skyhanni.utils.NEUItems
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
-import at.hannibal2.skyhanni.utils.NumberUtil.formatNumber
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.TimeUtils
 
-object GardenCropTimeCommand {
+object GardenCropsInCommand {
     private val config get() = GardenAPI.config.moneyPerHours
 
     fun onCommand(args: Array<String>) {
         if (!config.display) {
-            LorenzUtils.userError("shcroptime requires 'Show money per Hour' feature to be enabled to work!")
+            LorenzUtils.userError("shcropsin requires 'Show money per Hour' feature to be enabled to work!")
             return
         }
 
         if (args.size < 2) {
-            LorenzUtils.userError("Usage: /shcroptime <amount> <item>")
+            LorenzUtils.userError("Usage: /shcropsin <time> <item>")
             return
         }
 
-        val rawAmount = args[0]
-        val amount = try {
-            rawAmount.formatNumber()
+        val rawTime = args[0]
+        val seconds = try {
+            TimeUtils.getDuration(rawTime).inWholeSeconds
         } catch (e: NumberFormatException) {
-            LorenzUtils.userError("Not a valid number: '$rawAmount'")
+            LorenzUtils.userError("Not a valid time: '$rawTime'")
             return
         }
         val multipliers = CropMoneyDisplay.multipliers
@@ -50,29 +49,22 @@ object GardenCropTimeCommand {
                 val baseName = baseId.getItemName()
                 val crop = CropType.getByName(baseName.removeColor())
 
-                val fullAmount = baseAmount.toLong() * amount
-                val text = if (baseAmount == 1) {
-                    "§e${amount.addSeparators()}x $itemName"
-                } else {
-                    "§e${amount.addSeparators()}x $itemName §7(§e${fullAmount.addSeparators()}x $baseName§7)"
-                }
-
                 val speed = crop.getSpeed()
-                if (speed == null) {
-                    map["$text §cNo speed data!"] = -1
+
+                if (speed == null){
+                    map["$itemName §cNo speed data!"] = -1
                 } else {
-                    val missingTimeSeconds = fullAmount / speed
-                    val duration = TimeUtils.formatDuration(missingTimeSeconds * 1000)
-                    map["$text §b$duration"] = missingTimeSeconds
+                    val fullAmount = seconds * speed / baseAmount
+                    map["$itemName §b${fullAmount.addSeparators()}x"] = fullAmount
                 }
             }
         }
 
         if (map.isEmpty()) {
-            LorenzUtils.userError("No crop item found for '$rawSearchName'.")
+            LorenzUtils.userError("No crops found for '$rawSearchName'")
             return
         }
 
-        LorenzUtils.chat("Crop Speed for ${map.size} items:\n" + map.sorted().keys.joinToString("\n"))
+        LorenzUtils.chat("Crops farmed in $rawTime:\n" + map.sorted().keys.joinToString("\n"))
     }
 }
