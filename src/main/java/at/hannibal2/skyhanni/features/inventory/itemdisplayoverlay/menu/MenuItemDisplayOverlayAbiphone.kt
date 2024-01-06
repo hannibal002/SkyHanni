@@ -22,7 +22,7 @@ class MenuItemDisplayOverlayAbiphone : AbstractMenuStackSize() {
     private val upgradedPartialRelaysLoreLinePattern by abiphoneSubgroup.pattern(("upgradedpartialrelays.loreline"), ("(§.)?Upgraded Relays: (§.)?(?<useful>[0-9]+)(§.)?\\/(§.)?(?<total>[0-9]+).*"))
     private val selectedRingtoneLoreLinePattern by abiphoneSubgroup.pattern(("selectedringtone.loreline"), ("(§.)*Selected Ringtone: (§.)*(?<ringtone>.+)"))
     private val abiphoneMinigameStatsLoreLinePattern by abiphoneSubgroup.pattern(("abiphoneminigamestats.loreline"), ("(§.)*(?<type>.+): (§.)*(?<count>[\\w]+)"))
-    private val tilerSortAbiphoneOnlyLoreLinePattern by abiphoneSubgroup.pattern(("tilersortabiphoneonly.loreline"), (".*(?<colorCode>§.)*▶.?(?<category>[\\w ]+).*"))
+    private val filterSortAbiphoneOnlyLoreLinePattern by abiphoneSubgroup.pattern(("filtersortabiphoneonly.loreline"), (".*(?<colorCode>§.)*▶.?(?<category>[\\w ]+).*"))
 
     @SubscribeEvent
     override fun onRenderItemTip(event: RenderItemTipEvent) {
@@ -110,7 +110,7 @@ class MenuItemDisplayOverlayAbiphone : AbstractMenuStackSize() {
 
             if ((stackSizeConfig.contains(StackSizeMenuConfig.Abiphone.NAVIGATION)) && ((itemName == ("Filter")) || itemName == ("Sort"))) {
                 for (line in item.getLore()) {
-                    tilerSortAbiphoneOnlyLoreLinePattern.matchMatcher(line) {
+                    filterSortAbiphoneOnlyLoreLinePattern.matchMatcher(line) {
                         return when (val placeholder = group("category").replace(" ", "").lowercase()) {
                             "alphabetical" -> "ABC"
                             "donotdisturbfirst" -> "§cDND"
