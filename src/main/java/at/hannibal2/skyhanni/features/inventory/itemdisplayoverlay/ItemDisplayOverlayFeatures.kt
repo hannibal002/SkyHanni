@@ -92,7 +92,7 @@ object ItemDisplayOverlayFeatures : AbstractStackSize() {
     private val personalCompactorDeletorEnabledItemNamePattern by itemDisplayOverlaySubgroup.pattern(("personalcompactordeletorenabled.itemname"), ("(§.)*(Compactor|Deletor) Currently O(?<toggle>FF|N)!"))
     private val personalCompactorDeletorInternalNamePattern by itemDisplayOverlaySubgroup.pattern(("personalcompactordeletor.internalname"), ("PERSONAL_(COMPACTOR|DELETOR)_(?<thousands>[\\w]+)(000)"))
     private val personalCompactorDeletorItemNamePattern by itemDisplayOverlaySubgroup.pattern(("personalcompactordeletor.itemname"), ("Personal (Compactor|Deletor) (?<thousands>[\\w]+)(000)"))
-    private val abiphoneInternalNamePattern by itemDisplayOverlaySubgroup.pattern(("abiphone.internalname"), ("ABIPHONE_.*"))
+    private val abiphoneInternalNamePattern by itemDisplayOverlaySubgroup.pattern(("abiphone.internalname"), ("ABI(?:NGO)?PHONE_?.*"))
     private val doesNotIncludeDungeonStarsItemNamePattern by itemDisplayOverlaySubgroup.pattern(("doesnotincludedungeonstars.itemname"), ("^(?:(?!✪).)*\$"))
     private val soulflowAccessoryInternalNamePattern by itemDisplayOverlaySubgroup.pattern(("soulflowaccessory.internalname"), ("SOULFLOW_.*"))
     private val isTradingWithPlayerChestNamePattern by itemDisplayOverlaySubgroup.pattern(("isinplayertradingmenu.chestname"), ("(You([\\t ]){2,}(?<theirName>[a-zA-Z0-9_]{2,16}))")) // see https://regex101.com/r/UDCQwR/1 for reference. -ery
@@ -503,6 +503,7 @@ object ItemDisplayOverlayFeatures : AbstractStackSize() {
             "ABIPHONE_FLIP_DRAGON" -> "Fl§b§zD"
             "ABIPHONE_FLIP_NUCLEUS" -> "Fl§b§zN"
             "ABIPHONE_FLIP_VOLCANO" -> "Fl§b§zV"
+            "ABINGOPHONE" -> "Ⓑ"
             else -> ""
         }
     }
