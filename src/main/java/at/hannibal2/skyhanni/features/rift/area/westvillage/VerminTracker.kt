@@ -1,12 +1,16 @@
 package at.hannibal2.skyhanni.features.rift.area.westvillage
 
+import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.InventoryFullyOpenedEvent
+import at.hannibal2.skyhanni.events.IslandChangeEvent
 import at.hannibal2.skyhanni.events.LorenzChatEvent
+import at.hannibal2.skyhanni.events.LorenzTickEvent
 import at.hannibal2.skyhanni.features.rift.RiftAPI
 import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
+import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils.addAsSingletonList
 import at.hannibal2.skyhanni.utils.LorenzUtils.addOrPut
 import at.hannibal2.skyhanni.utils.NEUInternalName.Companion.asInternalName
@@ -28,6 +32,8 @@ object VerminTracker {
     private val flyPattern by group.pattern("fly", ".*§eYou vacuumed a §.*Fly.*")
     private val verminBinPattern by group.pattern("binline", "§fVermin Bin: §\\w(?<count>\\d+) (?<vermin>\\w+)")
     private val verminBagPattern by group.pattern("bagline", "§fVacuum Bag: §\\w(?<count>\\d+) (?<vermin>\\w+)")
+    private var hasVacuum = false
+    private val TURBOMAX_VACUUM = "TURBOMAX_VACUUM".asInternalName()
 
     private val config get() = RiftAPI.config.area.westVillage.verminTracker
 
@@ -50,6 +56,19 @@ object VerminTracker {
     }
 
     @SubscribeEvent
+    fun onTick(event: LorenzTickEvent) {
+        if (!RiftAPI.inRift()) return
+        if (event.repeatSeconds(1)) {
+            checkVacuum()
+        }
+    }
+
+    private fun checkVacuum() {
+        hasVacuum = InventoryUtils.getItemsInOwnInventory()
+            .any { it.getInternalName() == TURBOMAX_VACUUM}
+    }
+
+    @SubscribeEvent
     fun onChat(event: LorenzChatEvent) {
         VerminType.entries.forEach { verminType ->
             if (verminType.pattern.matches(event.message)) {
@@ -68,7 +87,7 @@ object VerminTracker {
 
         val bin = event.inventoryItems[13]?.getLore() ?: return
         val bag = InventoryUtils.getItemsInOwnInventory()
-            .firstOrNull { it.getInternalName() == "TURBOMAX_VACUUM".asInternalName() }
+            .firstOrNull { it.getInternalName() == TURBOMAX_VACUUM }
             ?.getLore() ?: emptyList()
 
         val binCounts = countVermin(bin, verminBinPattern)
@@ -125,8 +144,18 @@ object VerminTracker {
     @SubscribeEvent
     fun onRenderOverlay(event: GuiRenderEvent) {
         if (!isEnabled()) return
+        if (!config.showOutsideWestVillage &&
+            !LorenzUtils.skyBlockArea.let { it == "Infested House" || it == "West Village" }) return
+        if (!config.showWithoutVacuum && !hasVacuum) return
 
         tracker.renderDisplay(config.position)
+    }
+
+    @SubscribeEvent
+    fun onIslandChange(event: IslandChangeEvent) {
+        if (event.newIsland == IslandType.THE_RIFT) {
+            tracker.firstUpdate()
+        }
     }
 
     fun resetCommand(args: Array<String>) {
