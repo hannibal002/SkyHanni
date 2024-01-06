@@ -14,7 +14,7 @@ public class StackSizeMenuConfig {
     @Expose
     @ConfigOption(
         name = "General",
-        desc = "Showing various pieces of information as a stack size for these menu items.\nSome values may be truncated percentages or §a✔§r§7s.\n§c§lWARNING§r§c: If you have any respect for your FPS, please §l§odon't§r§c enable §l§oeverything§r§c at once."
+        desc = stackSizeConfigDesc
     )
     @ConfigEditorDraggableList
     public List<PlayerGeneral> player = new ArrayList<>(Arrays.asList(
