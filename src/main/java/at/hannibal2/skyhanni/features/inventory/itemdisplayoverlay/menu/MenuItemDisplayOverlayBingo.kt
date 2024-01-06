@@ -14,11 +14,12 @@ import net.minecraft.item.ItemStack
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
 class MenuItemDisplayOverlayBingo : AbstractMenuStackSize() {
+    private val bingoSubgroup = itemStackSizeGroup.group("bingo")
 
-    private val secretBingoDiscoveryLoreLinePattern by RepoPattern.pattern(("itemstacksize.bingo.secretbingodiscovery.loreline"), ("(§.)*You were the (§.)*(?<rank>[\\w]+)(?<ordinal>(st|nd|rd|th)) (§.)*to"))
-    private val rowColumnDiagonalItemNamePattern by RepoPattern.pattern(("itemstacksize.bingo.rowcolumndiagonal.itemname"), ("(§.)*((Community )?Diagonal|Row #.|Column #.)"))
-    private val topBlankPercentContribLoreLinePattern by RepoPattern.pattern(("itemstacksize.bingo.topblankpercentcontrib.loreline"), ("((  )?(§.)?)?Top (§.)*(?<toUse>[\\w]{0,2})(.(?<decimal>[\\w]+))?%"))
-    private val communityPersonalGoalLoreLinePattern by RepoPattern.pattern(("itemstacksize.bingo.communitypersonalgoal.loreline"), ("(§.)*(?<goalType>Community|Personal) Goal"))
+    private val secretBingoDiscoveryLoreLinePattern by bingoSubgroup.pattern(("secretbingodiscovery.loreline"), ("(§.)*You were the (§.)*(?<rank>[\\w]+)(?<ordinal>(st|nd|rd|th)) (§.)*to"))
+    private val rowColumnDiagonalItemNamePattern by bingoSubgroup.pattern(("rowcolumndiagonal.itemname"), ("(§.)*((Community )?Diagonal|Row #.|Column #.)"))
+    private val topBlankPercentContribLoreLinePattern by bingoSubgroup.pattern(("topblankpercentcontrib.loreline"), ("((  )?(§.)?)?Top (§.)*(?<toUse>[\\w]{0,2})(.(?<decimal>[\\w]+))?%"))
+    private val communityPersonalGoalLoreLinePattern by bingoSubgroup.pattern(("communitypersonalgoal.loreline"), ("(§.)*(?<goalType>Community|Personal) Goal"))
 
     @SubscribeEvent
     override fun onRenderItemTip(event: RenderItemTipEvent) {
