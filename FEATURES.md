@@ -716,6 +716,8 @@ Use `/sh` or `/skyhanni` to open the SkyHanni config in game.
 + **/shcropspeedmeter** - Helps calculate the real farming fortune with the formula crops broken per block.
 + **/shcroptime <amount> <item>** Displays the estimated time it will take to gather the requested quantity of a
   particular item based on the current crop speed.
++ **/shcropsin <time> <item>**. - DylanBruner
+    + Shows the number of items you gain when farming in the garden for the given time.
 + `/pt <player>` as alias for `/party transfer <player>`
     + SkyBlock Command `/tp` to check the play time still works
 + **/shfarmingprofile [player name]**
