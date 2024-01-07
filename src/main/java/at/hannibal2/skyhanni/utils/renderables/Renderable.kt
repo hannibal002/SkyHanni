@@ -4,6 +4,10 @@ import at.hannibal2.skyhanni.config.core.config.gui.GuiPositionEditor
 import at.hannibal2.skyhanni.data.ToolTipData
 import at.hannibal2.skyhanni.utils.LorenzLogger
 import at.hannibal2.skyhanni.utils.NEUItems.renderOnScreen
+import at.hannibal2.skyhanni.utils.renderables.RenderableUtils.calculateTableXOffsets
+import at.hannibal2.skyhanni.utils.renderables.RenderableUtils.calculateTableYOffsets
+import at.hannibal2.skyhanni.utils.renderables.RenderableUtils.renderXAligned
+import at.hannibal2.skyhanni.utils.renderables.RenderableUtils.renderXYAligned
 import io.github.moulberry.moulconfig.gui.GuiScreenElementWrapper
 import io.github.moulberry.notenoughupdates.util.Utils
 import net.minecraft.client.Minecraft
@@ -26,6 +30,22 @@ interface Renderable {
         x in (posX..posX + width)
             && y in (posY..posY + height) // TODO: adjust for variable height?
     } ?: false
+
+    fun scrollInput(scrollOld: Int, posX: Int, posY: Int, button: Int?, minHeight: Int, maxHeight: Int, velocity: Double) =
+        if (isHovered(posX, posY)) {
+            var scroll = scrollOld
+            if (button != null && Mouse.isButtonDown(button)) {
+                scroll += (Mouse.getEventDY() * 0.5 * velocity).toInt()
+                // LorenzDebug.log(Mouse.getEventDY().toString())
+            }
+            scroll += (Mouse.getEventDWheel() * velocity * 0.02).toInt()
+
+            when {
+                scroll > maxHeight -> maxHeight
+                scroll < minHeight -> minHeight
+                else -> scroll
+            }
+        } else scrollOld
 
     /**
      * Pos x and pos y are relative to the mouse position.
@@ -295,6 +315,107 @@ interface Renderable {
 
             override fun render(posX: Int, posY: Int) {
             }
+        }
+
+        fun scrollList(
+            list: List<Renderable>,
+            height: Int,
+            velocity: Double = 1.0,
+            button: Int? = null,
+            horizontalAlign: HorizontalAlignment = HorizontalAlignment.Left,
+            verticalAlign: VerticalAlignment = VerticalAlignment.Top,
+        ) = object : Renderable {
+            override val width = list.maxOf { it.width }
+            override val height = height
+            override val horizontalAlign = horizontalAlign
+            override val verticalAlign = verticalAlign
+
+            private val virtualHeight = list.maxOf { it.height }
+
+            var scroll = 0
+
+            private val end get() = scroll + height
+
+            override fun render(posX: Int, posY: Int) {
+                scroll = scrollInput(scroll, posX, posY, button, 0, virtualHeight - height, velocity)
+                var renderY = 0
+                var virtualY = 0
+                list.forEach {
+                    if (virtualY in scroll..end) {
+                        it.renderXAligned(posX, posY + renderY, width)
+                        GlStateManager.translate(0f, it.height.toFloat(), 0f)
+                        renderY += it.height
+                    }
+                    virtualY += it.height
+                }
+                GlStateManager.translate(0f, -renderY.toFloat(), 0f)
+            }
+
+        }
+
+        fun scrollTable(
+            content: List<List<Renderable?>>,
+            height: Int,
+            velocity: Double = 1.0,
+            button: Int? = null,
+            xPadding: Int = 1,
+            yPadding: Int = 0,
+            hasHeader: Boolean = false,
+            horizontalAlign: HorizontalAlignment = HorizontalAlignment.Left,
+            verticalAlign: VerticalAlignment = VerticalAlignment.Top,
+        ) = object : Renderable {
+
+            val xOffsets: List<Int> = calculateTableXOffsets(content, xPadding)
+            val yOffsets: List<Int> = calculateTableYOffsets(content, yPadding)
+
+            override val width = xOffsets.last() - xPadding
+            override val height = height
+            override val horizontalAlign = horizontalAlign
+            override val verticalAlign = verticalAlign
+
+            private val virtualHeight = yOffsets.last() - yPadding
+
+            private val end get() = scroll + height - yPadding - 2 // TODO fix the -2 "fix"
+            private val minHeight = if (hasHeader) yOffsets[1] else 0
+
+            var scroll = minHeight
+
+            override fun render(posX: Int, posY: Int) {
+                scroll = if (virtualHeight > height)
+                    scrollInput(scroll, posX, posY, button, minHeight, virtualHeight - height, velocity)
+                else minHeight
+                var renderY = 0
+                if (hasHeader) {
+                    content[0].forEachIndexed { index, renderable ->
+                        GlStateManager.translate(xOffsets[index].toFloat(), 0f, 0f)
+                        renderable?.renderXYAligned(posX + xOffsets[index], posY + renderY, xOffsets[index + 1] - xOffsets[index], yOffsets[1])
+                        GlStateManager.translate(-xOffsets[index].toFloat(), 0f, 0f)
+                    }
+                    val yShift = yOffsets[1] - yOffsets[0]
+                    GlStateManager.translate(0f, yShift.toFloat(), 0f)
+                    renderY += yShift
+                }
+                val range = yOffsets.indexOfFirst { it >= scroll }..<(yOffsets.indexOfFirst { it >= end }.takeIf { it > 0 }
+                    ?: (yOffsets.size - 1))
+                for (rowIndex in range) {
+                    content[rowIndex].forEachIndexed { index, renderable ->
+                        GlStateManager.translate(xOffsets[index].toFloat(), 0f, 0f)
+                        /* val buffer: FloatBuffer = ByteBuffer.allocateDirect(16 * java.lang.Float.BYTES)
+                            .order(ByteOrder.nativeOrder()).asFloatBuffer()
+                        GL11.glGetFloat(GL11.GL_MODELVIEW_MATRIX, buffer)
+                        buffer.flip()
+                        LorenzDebug.log(buffer[14].toString()) */
+
+                        renderable?.renderXYAligned(posX + xOffsets[index], posY + renderY, xOffsets[index + 1] - xOffsets[index], yOffsets[rowIndex + 1] - yOffsets[rowIndex])
+                        GlStateManager.translate(-xOffsets[index].toFloat(), 0f, 0f)
+                    }
+                    val yShift = yOffsets[rowIndex + 1] - yOffsets[rowIndex]
+                    GlStateManager.translate(0f, yShift.toFloat(), 0f)
+                    renderY += yShift
+                }
+                GlStateManager.translate(0f, -renderY.toFloat(), 0f)
+            }
+
         }
     }
 }
