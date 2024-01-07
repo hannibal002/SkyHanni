@@ -1,6 +1,7 @@
 package at.hannibal2.skyhanni.features.dungeon
 
 import at.hannibal2.skyhanni.SkyHanniMod
+import at.hannibal2.skyhanni.config.features.chat.ChatConfig
 import at.hannibal2.skyhanni.events.LorenzChatEvent
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.StringUtils.matches
@@ -159,30 +160,30 @@ class DungeonChatFilter {
         "§aYou can no longer consume or splash any potions during the remainder of this Dungeon run!",
     )
 
-    private val messagesMap: Map<String, List<String>> = mapOf(
-        "prepare" to prepareMessages,
-        "start" to startMessages,
-        "ambience" to ambienceMessages,
-        "pickup" to pickupMessages,
-        "reminder" to reminderMessages,
-        "buff" to buffMessages,
-        "not_possible" to notPossibleMessages,
-        "damage" to damageMessages,
-        "ability" to abilityMessages,
-        "puzzle" to puzzleMessages,
+    private val messagesMap: Map<ChatConfig.DungeonMessageTypes, List<String>> = mapOf(
+        ChatConfig.DungeonMessageTypes.PREPARE to prepareMessages,
+        ChatConfig.DungeonMessageTypes.START to startMessages,
+        ChatConfig.DungeonMessageTypes.AMBIENCE to ambienceMessages,
+        ChatConfig.DungeonMessageTypes.PICKUP to pickupMessages,
+        ChatConfig.DungeonMessageTypes.REMINDER to reminderMessages,
+        ChatConfig.DungeonMessageTypes.BUFF to buffMessages,
+        ChatConfig.DungeonMessageTypes.NOT_POSSIBLE to notPossibleMessages,
+        ChatConfig.DungeonMessageTypes.DAMAGE to damageMessages,
+        ChatConfig.DungeonMessageTypes.ABILITY to abilityMessages,
+        ChatConfig.DungeonMessageTypes.PUZZLE to puzzleMessages,
     )
-    private val patternsMap: Map<String, List<Pattern>> = mapOf(
-        "prepare" to preparePatterns,
-        "start" to startPatterns,
-        "pickup" to pickupPatterns,
-        "buff" to buffPatterns,
-        "damage" to damagePatterns,
-        "ability" to abilityPatterns,
-        "puzzle" to puzzlePatterns,
-        "end" to endPatterns,
+    private val patternsMap: Map<ChatConfig.DungeonMessageTypes, List<Pattern>> = mapOf(
+        ChatConfig.DungeonMessageTypes.PREPARE to preparePatterns,
+        ChatConfig.DungeonMessageTypes.START to startPatterns,
+        ChatConfig.DungeonMessageTypes.PICKUP to pickupPatterns,
+        ChatConfig.DungeonMessageTypes.BUFF to buffPatterns,
+        ChatConfig.DungeonMessageTypes.DAMAGE to damagePatterns,
+        ChatConfig.DungeonMessageTypes.ABILITY to abilityPatterns,
+        ChatConfig.DungeonMessageTypes.PUZZLE to puzzlePatterns,
+        ChatConfig.DungeonMessageTypes.END to endPatterns,
     )
-    private val messagesEndsWithMap: Map<String, List<String>> = mapOf(
-        "end" to endMessagesEndWith,
+    private val messagesEndsWithMap: Map<ChatConfig.DungeonMessageTypes, List<String>> = mapOf(
+        ChatConfig.DungeonMessageTypes.END to endMessagesEndWith,
     )
     /// </editor-fold>
 
@@ -201,28 +202,28 @@ class DungeonChatFilter {
 
     private fun block(message: String): String {
         when {
-            message.isFiltered("prepare") -> return "prepare"
-            message.isFiltered("start") -> return "start"
+            message.isFiltered(ChatConfig.DungeonMessageTypes.PREPARE) -> return "prepare"
+            message.isFiltered(ChatConfig.DungeonMessageTypes.START) -> return "start"
         }
 
         if (!LorenzUtils.inDungeons) return ""
 
         return when {
-            message.isFiltered("ambience") -> "ambience"
-            message.isFiltered("pickup") -> "pickup"
-            message.isFiltered("reminder") -> "reminder"
-            message.isFiltered("buff") -> "buff"
-            message.isFiltered("not_possible") -> "not_possible"
-            message.isFiltered("damage") -> "damage"
-            message.isFiltered("ability") -> "ability"
-            message.isFiltered("puzzle") -> "puzzle"
-            message.isFiltered("end") -> "end"
+            message.isFiltered(ChatConfig.DungeonMessageTypes.AMBIENCE) -> "ambience"
+            message.isFiltered(ChatConfig.DungeonMessageTypes.PICKUP) -> "pickup"
+            message.isFiltered(ChatConfig.DungeonMessageTypes.REMINDER) -> "reminder"
+            message.isFiltered(ChatConfig.DungeonMessageTypes.BUFF) -> "buff"
+            message.isFiltered(ChatConfig.DungeonMessageTypes.NOT_POSSIBLE) -> "not_possible"
+            message.isFiltered(ChatConfig.DungeonMessageTypes.DAMAGE) -> "damage"
+            message.isFiltered(ChatConfig.DungeonMessageTypes.ABILITY) -> "ability"
+            message.isFiltered(ChatConfig.DungeonMessageTypes.PUZZLE) -> "puzzle"
+            message.isFiltered(ChatConfig.DungeonMessageTypes.END) -> "end"
             else -> ""
         }
     }
 
-    private fun String.isFiltered(key: String) : Boolean {
-        return config.dungeonFilteredMessageTypes.any { it.hasKey(key) } && this.isPresent(key)
+    private fun String.isFiltered(key: ChatConfig.DungeonMessageTypes) : Boolean {
+        return config.dungeonFilteredMessageTypes.contains(key) && this.isPresent(key)
     }
 
     /**
@@ -235,7 +236,7 @@ class DungeonChatFilter {
      * @see patternsMap
      * @see messagesEndsWithMap
      */
-    private fun String.isPresent(key: String): Boolean {
+    private fun String.isPresent(key: ChatConfig.DungeonMessageTypes): Boolean {
         return this in (messagesMap[key] ?: emptyList()) ||
             (patternsMap[key] ?: emptyList()).any { it.matches(this) } ||
             (messagesEndsWithMap[key] ?: emptyList()).any { this.endsWith(it) }

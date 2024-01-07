@@ -41,36 +41,28 @@ public class ChatConfig {
     public List<DungeonMessageTypes> dungeonFilteredMessageTypes = Collections.emptyList();
 
     public enum DungeonMessageTypes {
-        PREPARE("§bPreparation", "prepare"),
-        START("§aClass Buffs §r/ §cMort Dialog", "start"),
-        AMBIENCE("§bAmbience", "ambience"),
-        PICKUP("§ePickup", "pickup"),
-        REMINDER("§cReminder", "reminder"),
-        BUFF("§dBlessings", "buff"),
-        NOT_POSSIBLE("§cNot possible", "not_possible"),
-        DAMAGE("§cDamage", "damage"),
-        ABILITY("§dAbilities", "ability"),
-        PUZZLE("§dPuzzle §r/ §cQuiz", "puzzle"),
-        END("§cEnd", "end");
+        PREPARE("§bPreparation"),
+        START("§aClass Buffs §r/ §cMort Dialog"),
+        AMBIENCE("§bAmbience"),
+        PICKUP("§ePickup"),
+        REMINDER("§cReminder"),
+        BUFF("§dBlessings"),
+        NOT_POSSIBLE("§cNot possible"),
+        DAMAGE("§cDamage"),
+        ABILITY("§dAbilities"),
+        PUZZLE("§dPuzzle §r/ §cQuiz"),
+        END("§cEnd §a(End of run spam)");
 
         private final String name;
-        private final String key;
 
-        DungeonMessageTypes(String name, String key) {
+        DungeonMessageTypes(String name) {
             this.name = name;
-            this.key = key;
-        }
-
-        public Boolean hasKey(String key) {
-            return this.key.equals(key);
         }
 
         @Override
         public String toString() {
             return name;
         }
-
-
     }
 
     @Expose
