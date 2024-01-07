@@ -521,6 +521,7 @@ private fun getPowderShowWhen() =
 
 private fun getEventsDisplayPair(): List<ScoreboardElement> {
     if (ScoreboardEvents.getEvent().isEmpty()) return listOf("<hidden>" to AlignmentEnum.LEFT)
+    if (ScoreboardEvents.getEvent().flatMap { it.getLines() }.isEmpty()) return listOf("<hidden>" to AlignmentEnum.LEFT)
     return ScoreboardEvents.getEvent().flatMap { it.getLines().map { i -> i to AlignmentEnum.LEFT } }
 }
 

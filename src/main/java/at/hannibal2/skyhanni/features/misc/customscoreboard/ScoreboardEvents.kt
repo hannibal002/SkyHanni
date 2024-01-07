@@ -250,10 +250,7 @@ private fun getDarkAuctionLines(): List<String> {
         ) ?: "§7No Item"
     }
 
-    return if (list.size == 0) when (config.informationFilteringConfig.hideEmptyLines) {
-        true -> listOf("<hidden>")
-        false -> listOf("§cNo DarkAuction Lines")
-    } else list
+    return list
 }
 
 private fun getDarkAuctionShowWhen(): Boolean {
@@ -466,10 +463,7 @@ private fun getMiningEventsLines(): List<String> {
         list += getSbLines().first { ScoreboardPattern.remainingGoblinPattern.matches(it) }
     }
 
-    return if (list.size == 0) when (config.informationFilteringConfig.hideEmptyLines) {
-        true -> listOf("<hidden>")
-        false -> listOf("§cNo Mining Event")
-    } else list
+    return list
 }
 
 private fun getMiningEventsShowWhen(): Boolean {
@@ -499,12 +493,7 @@ private fun getMagmaBossLines(): List<String> {
             getSbLines().firstOrNull { pattern.matches(it) }
         }
 
-    return list.ifEmpty {
-        when (config.informationFilteringConfig.hideEmptyLines) {
-            true -> listOf("<hidden>")
-            false -> listOf("§cNo Magma Boss")
-        }
-    }
+    return list
 }
 
 private fun getMagmaBossShowWhen(): Boolean {
