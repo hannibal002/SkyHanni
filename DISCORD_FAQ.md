@@ -22,9 +22,7 @@ _Frequently Asked Questions_
 > Switching from 1.8.9 to 1.19 will take some time, and we plan to discontinue support for 1.8.9 afterward since we won't support multiple versions at once.
 
 > **7: My Jacob Contest Display crops are wrong, how do I fix this?**
-> 1. Close your minecraft.
-> 2. Delete ".minecraft\config\skyhanni\jacob_contests.json".
-> 3. Open minecraft.
+> Run the command `/shclearcontestdata` to clear the Jacob contenst data.
 
 > **8: How can I get bigger crop hit boxes?**
 > Use [Patcher](<https://sk1er.club/mods/patcher>) to have 1.12 hit boxes in 1.8.9.
