@@ -43,6 +43,9 @@ Please use a prefix for the name of the PR (E.g. Feature, Fix, Backend, Change).
 
 You can write in the description of the pr the wording for the changelog as well (optional).
 
+If your PR relies on another PR, please include this information at the beginning of the description. Consider using a
+format like "- #821" to illustrate the dependency.
+
 ## Coding Styles and Conventions
 
 - Follow the [Hypixel Rules](https://hypixel.net/rules).
