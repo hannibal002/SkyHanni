@@ -20,16 +20,21 @@ class ItemClickData {
     @SubscribeEvent
     fun onItemClickSend(event: PacketEvent.SendEvent) {
         val packet = event.packet
-        if (packet is C08PacketPlayerBlockPlacement && packet.placedBlockDirection != 255) {
-            val position = packet.position.toLorenzVec()
-            BlockClickEvent(ClickType.RIGHT_CLICK, position, packet.stack).postAndCatch()
+        if (packet is C08PacketPlayerBlockPlacement) {
+            if (packet.placedBlockDirection != 255) {
+                val position = packet.position.toLorenzVec()
+                BlockClickEvent(ClickType.RIGHT_CLICK, position, packet.stack).postAndCatch()
+            } else {
+                ItemClickEvent(InventoryUtils.getItemInHand(), ClickType.RIGHT_CLICK).postAndCatch()
+            }
         }
         if (packet is C07PacketPlayerDigging && packet.status == C07PacketPlayerDigging.Action.START_DESTROY_BLOCK) {
             val position = packet.position.toLorenzVec()
             BlockClickEvent(ClickType.LEFT_CLICK, position, InventoryUtils.getItemInHand()).postAndCatch()
+            ItemClickEvent(InventoryUtils.getItemInHand(), ClickType.RIGHT_CLICK).postAndCatch()
         }
         if (packet is C0APacketAnimation) {
-            ItemClickEvent(InventoryUtils.getItemInHand()).postAndCatch()
+            ItemClickEvent(InventoryUtils.getItemInHand(), ClickType.LEFT_CLICK).postAndCatch()
         }
     }
 

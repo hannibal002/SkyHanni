@@ -34,7 +34,7 @@ public class EliteFarmingWeightConfig {
     @Expose
     @ConfigOption(name = "Show LB Change", desc = "Show the change of your position in the farming weight leaderboard while you were offline.")
     @ConfigEditorBoolean
-    public boolean showLbChange = true;
+    public boolean showLbChange = false;
 
     @Expose
     @ConfigOption(name = "Always ETA", desc = "Show the Overtake ETA always, even when not farming at the moment.")

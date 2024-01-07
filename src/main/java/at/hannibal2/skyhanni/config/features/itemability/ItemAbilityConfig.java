@@ -12,12 +12,18 @@ public class ItemAbilityConfig {
     @ConfigOption(name = "Ability Cooldown", desc = "Show the cooldown of item abilities.")
     @ConfigEditorBoolean
     @FeatureToggle
+    // TODO rename to "enabled"
     public boolean itemAbilityCooldown = false;
 
     @Expose
     @ConfigOption(name = "Ability Cooldown Background", desc = "Show the cooldown color of item abilities in the background.")
     @ConfigEditorBoolean
     public boolean itemAbilityCooldownBackground = false;
+
+    @Expose
+    @ConfigOption(name = "Show When Ready", desc = "Show the R and background (if enabled) when the ability is ready.")
+    @ConfigEditorBoolean
+    public boolean itemAbilityShowWhenReady = true;
 
     @Expose
     @ConfigOption(name = "Fire Veil", desc = "")

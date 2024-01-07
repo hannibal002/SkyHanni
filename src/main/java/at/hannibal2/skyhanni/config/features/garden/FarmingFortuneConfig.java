@@ -16,7 +16,7 @@ public class FarmingFortuneConfig {
     )
     @ConfigEditorBoolean
     @FeatureToggle
-    public boolean display = true;
+    public boolean display = false;
 
     @ConfigOption(name = "Farming Fortune Guide", desc = "Opens a guide that breaks down your Farming Fortune.\n§eCommand: /ff")
     @ConfigEditorButton(buttonText = "Open")

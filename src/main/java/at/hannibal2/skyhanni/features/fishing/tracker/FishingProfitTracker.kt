@@ -112,7 +112,7 @@ object FishingProfitTracker {
             )
         )
 
-        val profitFormat = NumberUtil.format(profit)
+        val profitFormat = profit.addSeparators()
         val profitPrefix = if (profit < 0) "§c" else "§6"
 
         val profitPerCatch = profit / data.totalCatchAmount

@@ -10,4 +10,9 @@ public class WestVillageConfig {
     @Accordion
     @Expose
     public KloonHackingConfig hacking = new KloonHackingConfig();
+
+    @ConfigOption(name = "Vermin Tracker", desc = "infested")
+    @Accordion
+    @Expose
+    public VerminTrackerConfig verminTracker = new VerminTrackerConfig();
 }

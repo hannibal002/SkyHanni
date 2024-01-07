@@ -58,7 +58,7 @@ class GardenCropMilestoneInventory {
 
         val crop = GardenCropMilestones.getCropTypeByLore(event.itemStack) ?: return
         val tier = GardenCropMilestones.getTierForCropCount(crop.getCounter(), crop)
-        if (tier > 20) return
+        if (tier >= 20) return
 
         val maxTier = GardenCropMilestones.getMaxTier()
         val maxCounter = GardenCropMilestones.getCropsForTier(maxTier, crop)
@@ -72,7 +72,7 @@ class GardenCropMilestoneInventory {
         val percentageFormat = LorenzUtils.formatPercentage(percentage)
 
         event.toolTip.add(index, " ")
-        val progressBar = StringUtils.progressBar(percentage)
+        val progressBar = StringUtils.progressBar(percentage, 19)
         event.toolTip.add(index, "$progressBar §e${counter.addSeparators()}§6/§e${NumberUtil.format(maxCounter)}")
         event.toolTip.add(index, "§7Progress to Tier $maxTier: §e$percentageFormat")
     }

@@ -25,7 +25,7 @@ class GriffinBurrowParticleFinder {
 
     @SubscribeEvent(priority = EventPriority.LOW, receiveCanceled = true)
     fun onChatPacket(event: PacketEvent.ReceiveEvent) {
-        if (!DianaAPI.featuresEnabled()) return
+        if (!isEnabled()) return
         if (!config.burrowsSoopyGuess) return
         val packet = event.packet
 
@@ -96,7 +96,7 @@ class GriffinBurrowParticleFinder {
 
     @SubscribeEvent
     fun onChatMessage(event: LorenzChatEvent) {
-        if (!DianaAPI.featuresEnabled()) return
+        if (!isEnabled()) return
         if (!config.burrowsSoopyGuess) return
         val message = event.message
         if (message.startsWith("§eYou dug out a Griffin Burrow!") ||
@@ -117,7 +117,7 @@ class GriffinBurrowParticleFinder {
 
     @SubscribeEvent
     fun onBlockClick(event: BlockClickEvent) {
-        if (!DianaAPI.featuresEnabled()) return
+        if (!isEnabled()) return
         if (!config.burrowsSoopyGuess) return
 
         val pos = event.position
@@ -145,4 +145,6 @@ class GriffinBurrowParticleFinder {
             }
         }
     }
+
+    private fun isEnabled() = DianaAPI.isDoingDiana()
 }
