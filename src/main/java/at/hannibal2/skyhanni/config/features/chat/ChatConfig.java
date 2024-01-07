@@ -51,7 +51,7 @@ public class ChatConfig {
         DAMAGE("§cDamage", "damage"),
         ABILITY("§dAbilities", "ability"),
         PUZZLE("§dPuzzle §r/ §cQuiz", "puzzle"),
-        END("§7Essences§r/§aExperience", "end");
+        END("§cEnd", "end");
 
         private final String name;
         private final String key;
