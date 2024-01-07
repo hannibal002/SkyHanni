@@ -37,5 +37,17 @@ _Frequently Asked Questions_
 > To reset a tracker, use the in-game command /shcommands <tracker type>.
 > Execute the obtained command to reset the tracker
 
-*This FAQ was last updated on December 08th, 2023.
+> **10: How do I remove SkyHanni GUI elements?**
+> 1. Type `/sh gui`
+> 2. Hover over the UI element
+> 3. See the element name in the top center of screen
+> 4. Search for that element with /sh name
+> 5. Disable this feature
+  
+> **11: How do I reset a tracker?**
+> To reset a tracker, use the in-game command /shcommands <tracker type>.
+> Execute the obtained command to reset the tracker
+
+
+*This FAQ was last updated on January 7th, 2024.
 If you believe there's something that should be added to this list, please tell us, so we can add it.*

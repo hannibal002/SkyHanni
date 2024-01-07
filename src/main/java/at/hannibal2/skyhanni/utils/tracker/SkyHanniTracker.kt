@@ -1,14 +1,13 @@
 package at.hannibal2.skyhanni.utils.tracker
 
 import at.hannibal2.skyhanni.SkyHanniMod
-import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.config.Storage
 import at.hannibal2.skyhanni.config.core.config.Position
 import at.hannibal2.skyhanni.config.features.misc.TrackerConfig.PriceFromEntry
 import at.hannibal2.skyhanni.data.ProfileStorageData
+import at.hannibal2.skyhanni.data.TrackerManager
 import at.hannibal2.skyhanni.features.bazaar.BazaarApi.Companion.getBazaarData
 import at.hannibal2.skyhanni.features.misc.items.EstimatedItemValue
-import at.hannibal2.skyhanni.utils.ConfigUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils.addAsSingletonList
 import at.hannibal2.skyhanni.utils.NEUInternalName
@@ -19,7 +18,6 @@ import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 import net.minecraft.client.Minecraft
 import net.minecraft.client.gui.inventory.GuiInventory
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import kotlin.time.Duration.Companion.seconds
 
 open class SkyHanniTracker<Data : TrackerData>(
@@ -87,7 +85,7 @@ open class SkyHanniTracker<Data : TrackerData>(
             update()
         }
 
-        if (dirty) {
+        if (dirty || TrackerManager.dirty) {
             display = getSharedTracker()?.let {
                 buildFinalDisplay(drawDisplay(it.get(getDisplayMode())))
             } ?: emptyList()
@@ -189,12 +187,5 @@ open class SkyHanniTracker<Data : TrackerData>(
         ;
 
         override fun toString() = display
-    }
-
-    @SubscribeEvent
-    fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
-        event.transform(15, "misc.tracker.priceFrom") { element ->
-            ConfigUtils.migrateIntToEnum(element, PriceFromEntry::class.java)
-        }
     }
 }

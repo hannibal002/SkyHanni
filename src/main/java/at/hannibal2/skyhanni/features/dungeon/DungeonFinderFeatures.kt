@@ -92,7 +92,7 @@ class DungeonFinderFeatures {
 
     @SubscribeEvent
     fun onBackgroundDrawn(event: GuiContainerEvent.BackgroundDrawnEvent) {
-        if (!LorenzUtils.inSkyBlock || LorenzUtils.skyBlockArea != "Dungeon Hub") return
+        if (!LorenzUtils.inSkyBlock) return
         if (event.gui !is GuiChest) return
 
         val chest = event.gui.inventorySlots as ContainerChest

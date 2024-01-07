@@ -6,15 +6,16 @@ import at.hannibal2.skyhanni.features.combat.endernodetracker.EnderNodeTracker;
 import at.hannibal2.skyhanni.features.combat.ghostcounter.GhostData;
 import at.hannibal2.skyhanni.features.dungeon.DungeonAPI;
 import at.hannibal2.skyhanni.features.event.diana.DianaProfitTracker;
-import at.hannibal2.skyhanni.features.event.diana.MythologicalMobTracker;
+import at.hannibal2.skyhanni.features.event.diana.MythologicalCreatureTracker;
 import at.hannibal2.skyhanni.features.event.jerry.frozentreasure.FrozenTreasureTracker;
 import at.hannibal2.skyhanni.features.fishing.tracker.FishingProfitTracker;
+import at.hannibal2.skyhanni.features.fishing.tracker.SeaCreatureTracker;
 import at.hannibal2.skyhanni.features.fishing.trophy.TrophyRarity;
 import at.hannibal2.skyhanni.features.garden.CropAccessory;
 import at.hannibal2.skyhanni.features.garden.CropType;
 import at.hannibal2.skyhanni.features.garden.GardenPlotAPI;
 import at.hannibal2.skyhanni.features.garden.farming.ArmorDropTracker;
-import at.hannibal2.skyhanni.features.garden.farming.DicerDropTracker;
+import at.hannibal2.skyhanni.features.garden.farming.DicerRngDropTracker;
 import at.hannibal2.skyhanni.features.garden.fortuneguide.FarmingItems;
 import at.hannibal2.skyhanni.features.garden.visitor.VisitorReward;
 import at.hannibal2.skyhanni.features.mining.powdertracker.PowderTracker;
@@ -182,7 +183,7 @@ public class Storage {
             public CropAccessory savedCropAccessory = null;
 
             @Expose
-            public DicerDropTracker.Data dicerDropTracker = new DicerDropTracker.Data();
+            public DicerRngDropTracker.Data dicerDropTracker = new DicerRngDropTracker.Data();
 
             @Expose
             public long informedAboutLowMatter = 0;
@@ -206,10 +207,10 @@ public class Storage {
             public Map<CropType, Boolean> toolWithBountiful = new HashMap<>();
 
             @Expose
-            public String composterCurrentOrganicMatterItem = "";
+            public NEUInternalName composterCurrentOrganicMatterItem = NEUInternalName.Companion.getNONE();
 
             @Expose
-            public String composterCurrentFuelItem = "";
+            public NEUInternalName composterCurrentFuelItem = NEUInternalName.Companion.getNONE();
 
             @Expose
             public int uniqueVisitors = 0;
@@ -443,6 +444,9 @@ public class Storage {
             @Expose
             public FishingProfitTracker.Data fishingProfitTracker = new FishingProfitTracker.Data();
 
+            @Expose
+            public SeaCreatureTracker.Data seaCreatureTracker = new SeaCreatureTracker.Data();
+
         }
 
         @Expose
@@ -455,7 +459,8 @@ public class Storage {
             public DianaProfitTracker.Data dianaProfitTracker = new DianaProfitTracker.Data();
 
             @Expose
-            public MythologicalMobTracker.Data mythologicalMobTracker = new MythologicalMobTracker.Data();
+            // TODO renmae
+            public MythologicalCreatureTracker.Data mythologicalMobTracker = new MythologicalCreatureTracker.Data();
 
         }
     }

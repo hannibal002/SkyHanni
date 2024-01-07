@@ -293,7 +293,7 @@ class ChatFilter {
     )
     private val fireSalePatterns = listOf(
         "§c♨ §eFire Sales for .* §eare starting soon!".toPattern(),
-        "§c {3}♨ .* Skin §e\\(.* §eleft\\)§c".toPattern(),
+        "§c {3}♨ .* (Skin|Rune) §e\\(.* §eleft\\)§c".toPattern(),
         "§c♨ §eVisit the Community Shop in the next §c.* §eto grab yours! §a§l\\[WARP]".toPattern(),
         "§c♨ §eA Fire Sale for .* §eis starting soon!".toPattern(),
     )

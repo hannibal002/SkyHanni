@@ -135,8 +135,14 @@ object EstimatedItemValue {
             return
         }
 
-        if (InventoryUtils.openInventoryName().startsWith("Museum ")) {
+        val openInventoryName = InventoryUtils.openInventoryName()
+        if (openInventoryName.startsWith("Museum ")) {
             if (item.getLore().any { it.contains("Armor Set") }) {
+                return
+            }
+        }
+        if (openInventoryName == "Island Deliveries") {
+            if (item.getLore().any { it == "§eClick to collect!" }) {
                 return
             }
         }

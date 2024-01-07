@@ -117,8 +117,6 @@ class DamageIndicatorManager {
         GlStateManager.disableDepth()
         GlStateManager.disableCull()
 
-        val player = Minecraft.getMinecraft().thePlayer
-
         //TODO config to define between 100ms and 5 sec
         val filter = data.filter {
             val waitForRemoval = if (it.value.dead && !noDeathDisplay(it.value.bossType)) 4_000 else 100

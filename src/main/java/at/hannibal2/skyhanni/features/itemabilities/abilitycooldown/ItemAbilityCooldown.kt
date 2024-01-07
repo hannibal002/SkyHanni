@@ -2,11 +2,11 @@ package at.hannibal2.skyhanni.features.itemabilities.abilitycooldown
 
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.data.ItemRenderBackground.Companion.background
-import at.hannibal2.skyhanni.events.BlockClickEvent
 import at.hannibal2.skyhanni.events.ItemClickEvent
 import at.hannibal2.skyhanni.events.LorenzActionBarEvent
 import at.hannibal2.skyhanni.events.LorenzChatEvent
 import at.hannibal2.skyhanni.events.LorenzTickEvent
+import at.hannibal2.skyhanni.events.LorenzWorldChangeEvent
 import at.hannibal2.skyhanni.events.PlaySoundEvent
 import at.hannibal2.skyhanni.events.RenderItemTipEvent
 import at.hannibal2.skyhanni.events.RenderObject
@@ -159,11 +159,6 @@ class ItemAbilityCooldown {
     }
 
     @SubscribeEvent
-    fun onBlockClickSend(event: BlockClickEvent) {
-        handleItemClick(event.itemInHand)
-    }
-
-    @SubscribeEvent
     fun onItemClick(event: ItemClickEvent) {
         handleItemClick(event.itemInHand)
     }
@@ -172,6 +167,14 @@ class ItemAbilityCooldown {
         if (!LorenzUtils.inSkyBlock) return
         itemInHand?.getInternalName()?.run {
             ItemAbility.getByInternalName(this)?.setItemClick()
+        }
+    }
+
+    @SubscribeEvent
+    fun onIslandChange(event: LorenzWorldChangeEvent) {
+        for (ability in ItemAbility.entries) {
+            ability.lastActivation = 0L
+            ability.specialColor = null
         }
     }
 
