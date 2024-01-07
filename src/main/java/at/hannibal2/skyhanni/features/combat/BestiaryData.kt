@@ -41,6 +41,7 @@ object BestiaryData {
     private val titlePattern = "^(?:\\(\\d+/\\d+\\) )?(Bestiary|.+) ➜ (.+)$".toPattern()
     private var inInventory = false
     private var isCategory = false
+    private var overallProgressEnabled = false;
     private var indexes = listOf(
         10, 11, 12, 13, 14, 15, 16,
         19, 20, 21, 22, 23, 24, 25,
@@ -71,6 +72,9 @@ object BestiaryData {
                 if (lore.any { it == "§7Overall Progress: §b100% §7(§c§lMAX!§7)" || it == "§7Families Completed: §a100%" }) {
                     slot highlight LorenzColor.GREEN
                 }
+                if (lore.any { it == "§7Overall Progress: §cHIDDEN" } && !overallProgressEnabled) {
+                    slot highlight LorenzColor.RED
+                }
             }
         }
     }
@@ -88,6 +92,8 @@ object BestiaryData {
             isCategory = inventoryName == "Bestiary ➜ Fishing" || inventoryName == "Bestiary"
             stackList.putAll(event.inventoryItems)
             inInventory = true
+            overallProgressEnabled = event.inventoryItems[52]?.getLore()?.any { it == "§7Overall Progress: §aSHOWN" }
+                ?: false
             update()
         }
     }
@@ -204,6 +210,14 @@ object BestiaryData {
 
     private fun drawDisplay(): List<List<Any>> {
         val newDisplay = mutableListOf<List<Any>>()
+
+        if (!overallProgressEnabled) {
+            newDisplay.addAsSingletonList("§7Bestiary Data")
+            newDisplay.addAsSingletonList(" §cPlease enable Overall Progress")
+            newDisplay.addAsSingletonList(" §cUsing the Eye of Ender highlighted in red.")
+            return newDisplay
+        }
+
         init()
 
         addCategories(newDisplay)
@@ -221,13 +235,13 @@ object BestiaryData {
         val sortedMobList = when (config.displayType) {
             DisplayTypeEntry.GLOBAL_MAX -> mobList.sortedBy { it.percentToMax() }
             DisplayTypeEntry.GLOBAL_NEXT -> mobList.sortedBy { it.percentToTier() }
-            DisplayTypeEntry.LOWEST_TOTAL -> mobList.sortedBy { it.totalKills }
-            DisplayTypeEntry.HIGHEST_TOTAL -> mobList.sortedByDescending { it.totalKills }
+            DisplayTypeEntry.LOWEST_TOTAL -> mobList.sortedBy { it.actualRealTotalKill }
+            DisplayTypeEntry.HIGHEST_TOTAL -> mobList.sortedByDescending { it.actualRealTotalKill }
             DisplayTypeEntry.LOWEST_MAX -> mobList.sortedBy { it.killNeededToMax() }
             DisplayTypeEntry.HIGHEST_MAX -> mobList.sortedByDescending { it.killNeededToMax() }
             DisplayTypeEntry.LOWEST_NEXT -> mobList.sortedBy { it.killNeededToNextLevel() }
             DisplayTypeEntry.HIGHEST_NEXT -> mobList.sortedByDescending { it.killNeededToNextLevel() }
-            else -> mobList.sortedBy { it.totalKills }
+            else -> mobList.sortedBy { it.actualRealTotalKill }
         }.toMutableList()
         return sortedMobList
     }
@@ -237,7 +251,7 @@ object BestiaryData {
 
         newDisplay.addAsSingletonList("§7Bestiary Data")
         for (mob in sortedMobList) {
-            val isUnlocked = mob.totalKills != 0.toLong()
+            val isUnlocked = mob.actualRealTotalKill != 0.toLong()
             val isMaxed = mob.percentToMax() >= 1
             if (!isUnlocked) {
                 newDisplay.add(buildList {
@@ -275,7 +289,7 @@ object BestiaryData {
         val displayType = config.displayType
         var text = ""
         text += " §7- "
-        text += "${mob.name} ${mob.level.romanOrInt()} "
+        text += "${mob.name} ${mob.level.romanOrInt()}: "
         text += if (isMaxed) {
             "§c§lMAXED! §7(§b${mob.actualRealTotalKill.formatNumber()}§7 kills)"
         } else {
@@ -292,15 +306,16 @@ object BestiaryData {
                         else -> 0
                     }
                     "§7(§b${currentKill.formatNumber()}§7/§b${killNeeded.formatNumber()}§7) §a${
-                        ((currentKill.toDouble() / killNeeded) * 100).roundToPrecision(
+                        ((currentKill.toDouble()
+                            / killNeeded)
+                            * 100).roundToPrecision(
                             2
                         )
                     }§6% ${if (displayType == DisplayTypeEntry.GLOBAL_NEXT) "§ato level ${mob.getNextLevel()}" else ""}"
                 }
 
                 DisplayTypeEntry.LOWEST_TOTAL, DisplayTypeEntry.HIGHEST_TOTAL -> {
-
-                    "§6${mob.totalKills.formatNumber()} §7total kills"
+                    "§6${mob.actualRealTotalKill.formatNumber()} §7total kills"
                 }
 
                 DisplayTypeEntry.LOWEST_MAX, DisplayTypeEntry.HIGHEST_MAX -> {
@@ -452,14 +467,14 @@ object BestiaryData {
     ) {
 
         fun killNeededToMax(): Long {
-            return 0L.coerceAtLeast(killToMax - totalKills)
+            return 0L.coerceAtLeast(killToMax - actualRealTotalKill)
         }
 
         fun killNeededToNextLevel(): Long {
             return 0L.coerceAtLeast(killNeededForNextLevel - currentKillToNextLevel)
         }
 
-        fun percentToMax() = totalKills.toDouble() / killToMax
+        fun percentToMax() = actualRealTotalKill.toDouble() / killToMax
 
         fun percentToMaxFormatted() = LorenzUtils.formatPercentage(percentToMax())
 
