@@ -41,7 +41,7 @@ object BestiaryData {
     private val titlePattern = "^(?:\\(\\d+/\\d+\\) )?(Bestiary|.+) ➜ (.+)$".toPattern()
     private var inInventory = false
     private var isCategory = false
-    private var overallProgressEnabled = false;
+    private var overallProgressEnabled = false
     private var indexes = listOf(
         10, 11, 12, 13, 14, 15, 16,
         19, 20, 21, 22, 23, 24, 25,
@@ -54,10 +54,7 @@ object BestiaryData {
         if (!isEnabled()) return
         if (inInventory) {
             config.position.renderStringsAndItems(
-                display,
-                extraSpace = -1,
-                itemScale = 1.3,
-                posLabel = "Bestiary Data"
+                display, extraSpace = -1, itemScale = 1.3, posLabel = "Bestiary Data"
             )
         }
     }
@@ -83,19 +80,15 @@ object BestiaryData {
     fun onInventoryOpen(event: InventoryFullyOpenedEvent) {
         if (!isEnabled()) return
         val inventoryName = event.inventoryName
-        val stack = event.inventoryItems[4] ?: return
-        if ((inventoryName == "Bestiary ➜ Fishing" || inventoryName == "Bestiary") || isBestiaryGui(
-                stack,
-                inventoryName
-            )
-        ) {
-            isCategory = inventoryName == "Bestiary ➜ Fishing" || inventoryName == "Bestiary"
-            stackList.putAll(event.inventoryItems)
-            inInventory = true
-            overallProgressEnabled = event.inventoryItems[52]?.getLore()?.any { it == "§7Overall Progress: §aSHOWN" }
-                ?: false
-            update()
-        }
+        val items = event.inventoryItems
+        val stack = items[4] ?: return
+        val bestiaryGui = isBestiaryGui(stack, inventoryName)
+        if (!(inventoryName == "Bestiary ➜ Fishing" || inventoryName == "Bestiary") && !bestiaryGui) return
+        isCategory = inventoryName == "Bestiary ➜ Fishing" || inventoryName == "Bestiary"
+        stackList.putAll(items)
+        inInventory = true
+        overallProgressEnabled = items[52]?.getLore()?.any { it == "§7Overall Progress: §aSHOWN" } ?: false
+        update()
     }
 
     @SubscribeEvent
@@ -175,9 +168,7 @@ object BestiaryData {
             for ((lineIndex, line) in stack.getLore().withIndex()) {
                 val loreLine = line.removeColor()
                 if (loreLine.startsWith("Kills: ")) {
-                    actualRealTotalKill =
-                        "([0-9,.]+)".toRegex().find(loreLine)?.groupValues?.get(1)?.formatNumber()
-                            ?: 0
+                    actualRealTotalKill = "([0-9,.]+)".toRegex().find(loreLine)?.groupValues?.get(1)?.formatNumber() ?: 0
                 }
                 if (!loreLine.startsWith("                    ")) continue
                 val previousLine = stack.getLore()[lineIndex - 1]
@@ -282,36 +273,29 @@ object BestiaryData {
         "§7More info thing"
     )
 
-    private fun getMobLine(
-        mob: BestiaryMob,
-        isMaxed: Boolean
-    ): String {
-        val displayType = config.displayType
+    private fun getMobLine(mob: BestiaryMob, isMaxed: Boolean): String {
+        val type = config.displayType
         var text = ""
         text += " §7- "
         text += "${mob.name} ${mob.level.romanOrInt()}: "
         text += if (isMaxed) {
             "§c§lMAXED! §7(§b${mob.actualRealTotalKill.formatNumber()}§7 kills)"
         } else {
-            when (displayType) {
+            when (type) {
                 DisplayTypeEntry.GLOBAL_MAX, DisplayTypeEntry.GLOBAL_NEXT -> {
-                    val currentKill = when (displayType) {
+                    val currentKill = when (type) {
                         DisplayTypeEntry.GLOBAL_MAX -> mob.totalKills
                         DisplayTypeEntry.GLOBAL_NEXT -> mob.currentKillToNextLevel
                         else -> 0
                     }
-                    val killNeeded = when (displayType) {
+                    val killNeeded = when (type) {
                         DisplayTypeEntry.GLOBAL_MAX -> mob.killToMax
                         DisplayTypeEntry.GLOBAL_NEXT -> mob.killNeededForNextLevel
                         else -> 0
                     }
-                    "§7(§b${currentKill.formatNumber()}§7/§b${killNeeded.formatNumber()}§7) §a${
-                        ((currentKill.toDouble()
-                            / killNeeded)
-                            * 100).roundToPrecision(
-                            2
-                        )
-                    }§6% ${if (displayType == DisplayTypeEntry.GLOBAL_NEXT) "§ato level ${mob.getNextLevel()}" else ""}"
+                    val percentage = ((currentKill.toDouble() / killNeeded) * 100).roundToPrecision(2)
+                    val suffix = if (type == DisplayTypeEntry.GLOBAL_NEXT) "§ato level ${mob.getNextLevel()}" else ""
+                    "§7(§b${currentKill.formatNumber()}§7/§b${killNeeded.formatNumber()}§7) §a$percentage§6% $suffix"
                 }
 
                 DisplayTypeEntry.LOWEST_TOTAL, DisplayTypeEntry.HIGHEST_TOTAL -> {
@@ -490,13 +474,12 @@ object BestiaryData {
         if (config.replaceRoman || it == 0) it.toString() else it.toRoman()
     }
 
-    private fun String.getNextLevel() =
-        if (this == "0") {
-            "I".romanOrInt()
-        } else {
-            val intValue = romanToDecimalIfNecessary()
-            (intValue + 1).toRoman().romanOrInt()
-        }
+    private fun String.getNextLevel() = if (this == "0") {
+        "I".romanOrInt()
+    } else {
+        val intValue = romanToDecimalIfNecessary()
+        (intValue + 1).toRoman().romanOrInt()
+    }
 
     private fun isEnabled() = LorenzUtils.inSkyBlock && config.enabled
 
