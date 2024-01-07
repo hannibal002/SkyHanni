@@ -1,6 +1,7 @@
 package at.hannibal2.skyhanni.features.bingo
 
 import at.hannibal2.skyhanni.SkyHanniMod
+import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.InventoryFullyOpenedEvent
 import at.hannibal2.skyhanni.events.LorenzTickEvent
@@ -18,6 +19,8 @@ import at.hannibal2.skyhanni.utils.NumberUtil.romanToDecimalIfNecessary
 import at.hannibal2.skyhanni.utils.RenderUtils.renderStrings
 import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
+import com.google.gson.JsonArray
+import com.google.gson.JsonObject
 import io.github.moulberry.notenoughupdates.recipes.CraftingRecipe
 import net.minecraft.client.Minecraft
 import net.minecraft.item.ItemStack
@@ -117,7 +120,7 @@ class MinionCraftHelper {
             }
         }
 
-            FirstMinionTier.firstMinionTier(otherItems, minions, tierOneMinions, tierOneMinionsDone)
+        FirstMinionTier.firstMinionTier(otherItems, minions, tierOneMinions, tierOneMinionsDone)
         return Pair(minions, otherItems)
     }
 
@@ -265,4 +268,30 @@ class MinionCraftHelper {
             }
         }
     }
+
+    @SubscribeEvent
+    fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
+        event.transform(19, "#player.bingoSessions") { element ->
+            for ((_, data) in element.asJsonObject.entrySet()) {
+                fixTierOneMinions(data.asJsonObject)
+            }
+            element
+        }
+    }
+
+    private fun fixTierOneMinions(data: JsonObject) {
+        val newList = JsonArray()
+        var i = 0
+        for (entry in data["tierOneMinionsDone"].asJsonArray) {
+            val name = entry.asString
+            if (!name.startsWith("INTERNALNAME:")) {
+                newList.add(entry)
+            } else {
+                i++
+            }
+        }
+        println("fixTierOneMinions: removed $i wrong entries.")
+        data.add("tierOneMinionsDone", newList)
+    }
+
 }
