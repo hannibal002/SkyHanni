@@ -4,6 +4,8 @@ import at.hannibal2.skyhanni.config.core.config.gui.GuiPositionEditor
 import at.hannibal2.skyhanni.data.ToolTipData
 import at.hannibal2.skyhanni.utils.LorenzLogger
 import at.hannibal2.skyhanni.utils.NEUItems.renderOnScreen
+import at.hannibal2.skyhanni.utils.renderables.RenderableUtils.calculateTableXOffsets
+import at.hannibal2.skyhanni.utils.renderables.RenderableUtils.calculateTableYOffsets
 import io.github.moulberry.moulconfig.gui.GuiScreenElementWrapper
 import io.github.moulberry.notenoughupdates.util.Utils
 import net.minecraft.client.Minecraft
@@ -300,28 +302,17 @@ interface Renderable {
         /**
          * @param content the list of rows the table should render
          */
-        fun table(content: List<List<Renderable?>>, xPadding: Int = 1, yPadding: Int = 0) = object : Renderable {
-            val xOffsets: List<Int> = let {
-                var buffer = 0
-                var index = 0
-                buildList {
-                    add(0)
-                    while (true) {
-                        buffer += content.map { it.getOrNull(index) }.takeIf { it.any { it != null } }?.maxOf {
-                            it?.width ?: 0
-                        }?.let { it + xPadding } ?: break
-                        add(buffer)
-                        index++
-                    }
-                }
-            }
-            val yOffsets: List<Int> = let {
-                var buffer = 0
-                listOf(0) + content.map { row ->
-                    buffer += row.maxOf { it?.height ?: 0 } + yPadding
-                    buffer
-                }
-            }
+        fun table(
+            content: List<List<Renderable?>>,
+            xPadding: Int = 1,
+            yPadding: Int = 0,
+            horizontalAlign: HorizontalAlignment = HorizontalAlignment.Left,
+            verticalAlign: VerticalAlignment = VerticalAlignment.Top,
+        ) = object : Renderable {
+            val xOffsets: List<Int> = calculateTableXOffsets(content, xPadding)
+            val yOffsets: List<Int> = calculateTableYOffsets(content, yPadding)
+            override val horizontalAlign = horizontalAlign
+            override val verticalAlign = verticalAlign
 
             override val width = xOffsets.last() - xPadding
             override val height = yOffsets.last() - yPadding
