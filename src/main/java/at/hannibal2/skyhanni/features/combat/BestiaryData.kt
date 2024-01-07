@@ -72,10 +72,8 @@ object BestiaryData {
                 if (lore.any { it == "§7Overall Progress: §b100% §7(§c§lMAX!§7)" || it == "§7Families Completed: §a100%" }) {
                     slot highlight LorenzColor.GREEN
                 }
-                if (!overallProgressEnabled) {
-                    if (lore.any { it == "§7Families Found: §a100%" }) {
-                        slot highlight LorenzColor.GREEN
-                    }
+                if (lore.any { it == "§7Overall Progress: §cHIDDEN" } && !overallProgressEnabled) {
+                    slot highlight LorenzColor.RED
                 }
             }
         }
@@ -212,6 +210,13 @@ object BestiaryData {
 
     private fun drawDisplay(): List<List<Any>> {
         val newDisplay = mutableListOf<List<Any>>()
+
+        if (!overallProgressEnabled) {
+            newDisplay.addAsSingletonList("§7Bestiary Data")
+            newDisplay.addAsSingletonList(" §cPlease enable Overall Progress")
+            newDisplay.addAsSingletonList(" §cUsing the Eye of Ender highlighted in red.")
+            return newDisplay
+        }
 
         init()
 
@@ -371,11 +376,10 @@ object BestiaryData {
                 newDisplay.add(buildList {
                     add(" §7- ${cat.name}§7: ")
                     val element = when {
-                        overallProgressEnabled && cat.familiesCompleted == cat.totalFamilies -> "§c§lCompleted!"
-                        overallProgressEnabled && cat.familiesFound == cat.totalFamilies -> "§b${cat.familiesCompleted}§7/§b${cat.totalFamilies} §7completed"
-                        overallProgressEnabled && cat.familiesFound < cat.totalFamilies ->
+                        cat.familiesCompleted == cat.totalFamilies -> "§c§lCompleted!"
+                        cat.familiesFound == cat.totalFamilies -> "§b${cat.familiesCompleted}§7/§b${cat.totalFamilies} §7completed"
+                        cat.familiesFound < cat.totalFamilies ->
                             "§b${cat.familiesFound}§7/§b${cat.totalFamilies} §7found, §b${cat.familiesCompleted}§7/§b${cat.totalFamilies} §7completed"
-                        !overallProgressEnabled -> "§b${cat.familiesFound}§7/§b${cat.totalFamilies} §c§lfound!"
 
                         else -> continue
                     }
