@@ -43,6 +43,9 @@ Please use a prefix for the name of the PR (E.g. Feature, Fix, Backend, Change).
 
 You can write in the description of the pr the wording for the changelog as well (optional).
 
+If your PR relies on another PR, please include this information at the beginning of the description. Consider using a
+format like "- #821" to illustrate the dependency.
+
 ## Coding Styles and Conventions
 
 - Follow the [Hypixel Rules](https://hypixel.net/rules).
@@ -56,7 +59,7 @@ You can write in the description of the pr the wording for the changelog as well
 - All new classes should be written in Kotlin, with a few exceptions:
     - Config files in `at.hannibal2.skyhanni.config.features`
     - Mixin classes in `at.hannibal2.skyhanni.mixins.transformers`
-  - Java classes that represent JSON data objects in `at.hannibal2.skyhanni.data.jsonobjects`
+    - Java classes that represent JSON data objects in `at.hannibal2.skyhanni.data.jsonobjects`
 - Please use the existing event system, or expand on it. Do not use Forge events.
     - (We inject the calls with Mixin)
 - Please use existing utils methods.
@@ -74,8 +77,9 @@ You can write in the description of the pr the wording for the changelog as well
 - Do not use `e.printStackTrace()`, use `CopyErrorCommand.logError(e, "explanation for users")` instead.
 - Do not use `MinecraftForge.EVENT_BUS.post(event)`, use `event.postAndCatch()` instead.
 - Do not use `toRegex()` or `toPattern()`, use `RepoPattern` instead.
-    - See [RepoPattern.kt](https://github.com/walkerselby/SkyHanni/blob/beta/src/main/java/at/hannibal2/skyhanni/utils/repopatterns/RepoPattern.kt)
-    for more information and usages.
+  -
+  See [RepoPattern.kt](https://github.com/walkerselby/SkyHanni/blob/beta/src/main/java/at/hannibal2/skyhanni/utils/repopatterns/RepoPattern.kt)
+  for more information and usages.
 - Please use Regex instead of String comparison when it is likely Hypixel will change the message in the future.
 
 ## Software Used in SkyHanni
@@ -123,7 +127,8 @@ This library is not part of SkyHanni or Forge, but we bundle it.
 
 It allows to easily modify methods in Minecraft itself, without conflicting with other mods.
 
-For more information, see https://github.com/SpongePowered/Mixin or [our existing mixins](https://github.com/hannibal002/SkyHanni/tree/beta/src/main/java/at/hannibal2/skyhanni/mixins/transformers).
+For more information, see https://github.com/SpongePowered/Mixin
+or [our existing mixins](https://github.com/hannibal002/SkyHanni/tree/beta/src/main/java/at/hannibal2/skyhanni/mixins/transformers).
 
 When creating new Mixins, try to keep the code inside of the mixin as small as possible, and calling a hook as soon as
 possible.
@@ -141,7 +146,8 @@ folder for how to properly do this. You also may have to disable repo auto updat
 ### Discord IPC
 
 DiscordIPC is a service that SkyHanni uses to send information from SkyBlock to Discord in Rich Presence. <br>
-Specifically, we use [NetheriteMiner's Fork](https://github.com/NetheriteMiner/DiscordIPC) of a fork of a fork of a fork of
+Specifically, we use [NetheriteMiner's Fork](https://github.com/NetheriteMiner/DiscordIPC) of a fork of a fork of a fork
+of
 the [original](https://github.com/jagrosh/DiscordIPC).
 For info on usage, look
 at [DiscordRPCManager.kt](https://github.com/hannibal002/SkyHanni/blob/beta/src/main/java/at/hannibal2/skyhanni/features/misc/discordrpc/DiscordRPCManager.kt)
