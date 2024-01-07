@@ -69,7 +69,7 @@ object BestiaryData {
                 if (lore.any { it == "§7Overall Progress: §b100% §7(§c§lMAX!§7)" || it == "§7Families Completed: §a100%" }) {
                     slot highlight LorenzColor.GREEN
                 }
-                if (lore.any { it == "§7Overall Progress: §cHIDDEN" } && !overallProgressEnabled) {
+                if (!overallProgressEnabled && lore.any { it == "§7Overall Progress: §cHIDDEN" }) {
                     slot highlight LorenzColor.RED
                 }
             }
