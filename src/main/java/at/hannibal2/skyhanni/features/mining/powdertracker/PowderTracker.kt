@@ -6,6 +6,7 @@ import at.hannibal2.skyhanni.config.features.mining.PowderTrackerConfig.PowderDi
 import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.events.ConfigLoadEvent
 import at.hannibal2.skyhanni.events.GuiRenderEvent
+import at.hannibal2.skyhanni.events.IslandChangeEvent
 import at.hannibal2.skyhanni.events.LorenzChatEvent
 import at.hannibal2.skyhanni.events.LorenzTickEvent
 import at.hannibal2.skyhanni.events.LorenzWorldChangeEvent
@@ -190,6 +191,13 @@ object PowderTracker {
                 }
             }
             newList
+        }
+    }
+
+    @SubscribeEvent
+    fun onIslandChange(event: IslandChangeEvent) {
+        if (event.newIsland == IslandType.CRYSTAL_HOLLOWS) {
+            tracker.firstUpdate()
         }
     }
 
