@@ -18,6 +18,8 @@ import at.hannibal2.skyhanni.utils.NumberUtil.formatNumber
 import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.tracker.SkyHanniTracker
 import at.hannibal2.skyhanni.utils.tracker.TrackerData
+import com.google.gson.JsonArray
+import com.google.gson.JsonNull
 import com.google.gson.annotations.Expose
 import net.minecraft.entity.boss.BossStatus
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
@@ -178,10 +180,24 @@ object PowderTracker {
         event.transform(11, "mining.powderTracker.textFormat") { element ->
             ConfigUtils.migrateIntArrayListToEnumArrayList(element, PowderDisplayEntry::class.java)
         }
+
+        event.transform(20, "mining.powderTracker.textFormat") { element ->
+            val newList = JsonArray()
+            for (entry in element.asJsonArray) {
+                if (entry is JsonNull) continue
+                if (entry.asString.let { it != "TITLE" && it != "DISPLAY_MODE" }) {
+                    newList.add(entry)
+                }
+            }
+            newList
+        }
     }
 
-    private fun formatDisplay(map: List<List<Any>>) = buildList {
+    private fun formatDisplay(map: List<List<Any>>) = buildList<List<Any>> {
         if (map.isEmpty()) return@buildList
+
+        addAsSingletonList("§b§lPowder Tracker")
+
         for (index in config.textFormat.get()) {
             // TODO, change functionality to use enum rather than ordinals
             add(map[index.ordinal])
@@ -194,12 +210,6 @@ object PowderTracker {
         calculate(data, diamondEssenceInfo, PowderChestReward.DIAMOND_ESSENCE)
         calculate(data, goldEssenceInfo, PowderChestReward.GOLD_ESSENCE)
         calculateChest(data)
-
-        addAsSingletonList("§b§lPowder Tracker")
-
-        if (!tracker.isInventoryOpen()) {
-            addAsSingletonList("")
-        }
 
         val chestPerHour = format(chestInfo.perHour)
         addAsSingletonList("§d${data.totalChestPicked.addSeparators()} Total Chests Picked §7($chestPerHour/h)")
