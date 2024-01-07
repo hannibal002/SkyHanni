@@ -33,10 +33,6 @@ _Frequently Asked Questions_
 > Check if the item goes directly into your sacks. If it does, enable the sack pickup chat message from Hypixel.
 > You can use SkyHanni's own setting to still hide the message from chat.
 
-> **10: How do I reset a tracker?**
-> To reset a tracker, use the in-game command /shcommands <tracker type>.
-> Execute the obtained command to reset the tracker
-
 > **10: How do I remove SkyHanni GUI elements?**
 > 1. Type `/sh gui`
 > 2. Hover over the UI element
