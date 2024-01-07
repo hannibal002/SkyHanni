@@ -15,8 +15,6 @@ import net.minecraft.item.ItemStack
 import kotlin.math.floor
 
 object FFStats {
-    private val toolHasBountiful get() = GardenAPI.storage?.toolWithBountiful
-
     private val mathCrops =
         listOf(CropType.WHEAT, CropType.CARROT, CropType.POTATO, CropType.SUGAR_CANE, CropType.NETHER_WART)
     private val dicerCrops = listOf(CropType.PUMPKIN, CropType.MELON)
@@ -103,49 +101,29 @@ object FFStats {
                 cropPage[FortuneStats.COUNTER] = Pair(FarmingFortuneDisplay.getCounterFortune(tool), 96.0)
                 cropPage[FortuneStats.HARVESTING] = Pair(FarmingFortuneDisplay.getHarvestingFortune(tool), 75.0)
                 cropPage[FortuneStats.COLLECTION] = Pair(FarmingFortuneDisplay.getCollectionFortune(tool), 48.0)
-                if (toolHasBountiful?.get(crop) == true) {
-                    cropPage[FortuneStats.REFORGE] = Pair(FarmingFortuneDisplay.reforgeFortune, 10.0)
-                } else {
-                    cropPage[FortuneStats.REFORGE] = Pair(FarmingFortuneDisplay.reforgeFortune, 20.0)
-                }
+                cropPage[FortuneStats.REFORGE] = Pair(FarmingFortuneDisplay.reforgeFortune, 20.0)
             }
 
             in dicerCrops -> {
                 cropPage[FortuneStats.SUNDER] = Pair(FarmingFortuneDisplay.getSunderFortune(tool), 75.0)
-                if (toolHasBountiful?.get(crop) == true) {
-                    cropPage[FortuneStats.REFORGE] = Pair(FarmingFortuneDisplay.reforgeFortune, 10.0)
-                } else {
-                    cropPage[FortuneStats.REFORGE] = Pair(FarmingFortuneDisplay.reforgeFortune, 20.0)
-                }
+                cropPage[FortuneStats.REFORGE] = Pair(FarmingFortuneDisplay.reforgeFortune, 20.0)
             }
 
             CropType.MUSHROOM -> {
                 cropPage[FortuneStats.BASE_TOOL] = Pair(FarmingFortuneDisplay.getToolFortune(tool), 30.0)
                 cropPage[FortuneStats.HARVESTING] = Pair(FarmingFortuneDisplay.getHarvestingFortune(tool), 75.0)
-                if (toolHasBountiful?.get(crop) == true) {
-                    cropPage[FortuneStats.REFORGE] = Pair(FarmingFortuneDisplay.reforgeFortune, 5.0)
-                } else {
-                    cropPage[FortuneStats.REFORGE] = Pair(FarmingFortuneDisplay.reforgeFortune, 13.0)
-                }
+                cropPage[FortuneStats.REFORGE] = Pair(FarmingFortuneDisplay.reforgeFortune, 16.0)
             }
 
             CropType.COCOA_BEANS -> {
                 cropPage[FortuneStats.BASE_TOOL] = Pair(FarmingFortuneDisplay.getToolFortune(tool), 20.0)
                 cropPage[FortuneStats.SUNDER] = Pair(FarmingFortuneDisplay.getSunderFortune(tool), 75.0)
-                if (toolHasBountiful?.get(crop) == true) {
-                    cropPage[FortuneStats.REFORGE] = Pair(FarmingFortuneDisplay.reforgeFortune, 7.0)
-                } else {
-                    cropPage[FortuneStats.REFORGE] = Pair(FarmingFortuneDisplay.reforgeFortune, 16.0)
-                }
+                cropPage[FortuneStats.REFORGE] = Pair(FarmingFortuneDisplay.reforgeFortune, 16.0)
             }
 
             CropType.CACTUS -> {
                 cropPage[FortuneStats.HARVESTING] = Pair(FarmingFortuneDisplay.getHarvestingFortune(tool), 75.0)
-                if (toolHasBountiful?.get(crop) == true) {
-                    cropPage[FortuneStats.REFORGE] = Pair(FarmingFortuneDisplay.reforgeFortune, 7.0)
-                } else {
-                    cropPage[FortuneStats.REFORGE] = Pair(FarmingFortuneDisplay.reforgeFortune, 16.0)
-                }
+                cropPage[FortuneStats.REFORGE] = Pair(FarmingFortuneDisplay.reforgeFortune, 16.0)
             }
 
             else -> {}

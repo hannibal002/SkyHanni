@@ -1,8 +1,17 @@
 # SkyHanni - Change Log
 
-## Version 0.22 (Unreleased)
+## Version 0.23 (Unreleased)
 
 ### New Features
+
+#### Garden Features
+
++ Added command /shcropsin <time> <item>. - DylanBruner
+    + Shows the number of items you gain when farming in the garden for the given time.
+
+#### Fishing Features
+
++ Show sack item amount to the visitor shopping list. - CalMWolfs
 
 #### Fishing Features
 
@@ -11,25 +20,90 @@
 
 ### Changed
 
+#### Garden Changes
+
++ Renamed Visitor Items Needed to Visitor Shopping List. - hannibal2
++ Added biofuel support to the Composter Overlay get from sack logic. - obsidian
++ Updated max reforge fortune for Fungi Cutter. - alexia
+    + Hypixel has increased the base rarity to Epic.
++ Don't count Bountiful as a max reforge fortune on tools. - alexia
++ /shcroptime now supports k, m and b numbers. - DylanBruner
++ Only show the Garden Vacuum Bag on your own vacuums. - alexia
+
 #### Rift Changes
 
 + Rift time now updates correctly in wizard tower and instantly updates the format when toggling max time or
   percentage. - hannibal2
++ Added options to only show the Rift Vermin Tracker with vacuum on inventory and only in West Village. - Empa
+    + This now hides the Vermin Tracker by default when not in the surrounding area.
++ Show the Vermin Tracker immediately after joining the rift. - hannibal2
+
+#### Fishing Changes
+
++ Odger highlight feature tells in description that it is only useful for users without abiphone. - hannibal2
+
+#### Bingo Changes
+
++ Show the guide text when hovering over the missing bingo goal list. - hannibal2
+
+#### Inventory Changes
+
++ Removed flawless gemstones from sack display. - CalMWolfs
+    + Hypixel removed them from sacks.
+
+#### Dungeon Changes
+
++ Changed the description of the Dungeon Chat Filter feature to be more descriptive. - Wambo
+
+#### Misc Changes
+
++ Tia Relay Helper: Suggest /togglemusic. - alexia
+
+### Fixes
+
+#### Garden Fixes
+
++ Fixed mushrooms being counted with Common/Uncommon Mooshroom Cow Pet. - alexia
++ Fixed progress to maxed milestone appearing twice in the crop milestone menu when having milestone 20. - Empa
++ Fixed max crop milestone display being too long in the crop milestone menu. - obsidian
++ Fixed Mooshroom Cow Perk counter when farming sugar cane/cactus with Mooshroom Cow. - alexia
++ Show an error message for the commands /shcropsin and /shcroptime if show money per hour display is not loaded. - hannibal2
++ Auto-fixing plots marked as pests when killing all pests without SkyHanni earlier. - hannibal2
+
+#### Rift Fixes
+
++ Fixed vampire slayer damage indicator not working during Derpy. - hannibal2
 
 #### Fishing Fixes
 
 + Fixed Reindrake mob, Frosty NPC and frosty the snow blaster shop counting as sea creatures in the barn fishing
   timer. - hannibal2
 
-### Fixes
+#### Invenory Fixes
 
-#### Rift Fixes
++ Fixed hide non-clickable items not working in some bazaar pages. - hannibal2
++ Fixed rogue sword ability taking into account mage cooldown reduction. - Empa
++ Reset item ability cooldowns on the world switch. - hannibal2
 
-+ Fixed vampire slayer damage indicator not working during Derpy. - hannibal2
+#### Bingo Fixes
+
++ Fixed detecting bingo profile while visiting other players bingo island. - hannibal2
+
+#### Misc Fixes
+
++ Maybe fixed Tia Relay Helper. - Thunderblade73
 
 ### Technical Changes
 
 + Migrate Hypixel API to v2. - hannibal2
++ Added SackDataUpdateEvent. - CalMWolfs
++ Fixing a mac crash in dev environment automatically. - CalMWolfs
++ Bingo repo change: Make note of an alternative title, and create a guide field for the actual guide text. - hannibal2
++ Moved Tia Relay Helper chat messages into repo patterns. - Thunderblade73
++ Added Dark Auction as IslandType and fixed IslandType detection for dungeons. - j10a1n15
++ Modify instead of blocking trophy fishing and sea creature chat messages. - appable
++ Changed regex in case Hypixel changes color codes for island names in the tab list. - Empa
++ Extract FirstMinionTier logic from the Bingo Minion Craft Helper to better analyze the performance problems some users have. - hannibal2
 
 ## Version 0.22
 
