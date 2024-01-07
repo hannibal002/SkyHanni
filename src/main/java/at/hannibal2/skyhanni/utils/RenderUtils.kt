@@ -8,6 +8,7 @@ import at.hannibal2.skyhanni.events.GuiRenderItemEvent
 import at.hannibal2.skyhanni.events.LorenzRenderWorldEvent
 import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.renderables.Renderable
+import at.hannibal2.skyhanni.utils.renderables.RenderableUtils.renderXAligned
 import io.github.moulberry.moulconfig.internal.TextRenderUtils
 import io.github.moulberry.notenoughupdates.util.Utils
 import net.minecraft.client.Minecraft
@@ -398,20 +399,17 @@ object RenderUtils {
     ) {
         if (renderables.isEmpty()) return
         var longestY = 0
-        var longestX = 0
+        val longestX = renderables.maxOf { it.width }
         for (line in renderables) {
             GlStateManager.pushMatrix()
             val (x, y) = transform()
             GlStateManager.translate(0f, longestY.toFloat(), 0F)
             Renderable.withMousePosition(x, y) {
-                line.render(0, longestY)
+                line.renderXAligned(0, longestY, longestX)
             }
 
             longestY += line.height + extraSpace + 2
 
-            if (line.width > longestX) {
-                longestX = line.width
-            }
             GlStateManager.popMatrix()
         }
         GuiEditManager.add(this, posLabel, longestX, longestY)
