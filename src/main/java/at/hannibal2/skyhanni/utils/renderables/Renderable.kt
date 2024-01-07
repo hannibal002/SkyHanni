@@ -19,6 +19,9 @@ import kotlin.math.max
 interface Renderable {
     val width: Int
     val height: Int
+
+    val horizontalAlign: HorizontalAlignment
+    val verticalAlign: VerticalAlignment
     fun isHovered(posX: Int, posY: Int) = currentRenderPassMousePosition?.let { (x, y) ->
         x in (posX..posX + width)
             && y in (posY..posY + height) // TODO: adjust for variable height?
@@ -46,6 +49,10 @@ interface Renderable {
                 currentRenderPassMousePosition = last
             }
         }
+
+        enum class HorizontalAlignment { Left, Center, Right }
+        enum class VerticalAlignment { Top, Center, Bottom }
+
 
         fun fromAny(any: Any?, itemScale: Double = 1.0): Renderable? = when (any) {
             null -> placeholder(12)
@@ -98,9 +105,10 @@ interface Renderable {
             condition: () -> Boolean = { true },
         ) =
             object : Renderable {
-                override val width: Int
-                    get() = render.width
-                override val height = 10
+                override val width = render.width
+                override val height = render.height
+                override val horizontalAlign = render.horizontalAlign
+                override val verticalAlign = render.verticalAlign
 
                 private var wasDown = false
 
@@ -129,9 +137,10 @@ interface Renderable {
 
             val render = string(text)
             return object : Renderable {
-                override val width: Int
-                    get() = render.width
-                override val height = 11
+                override val width = render.width
+                override val height = render.height
+                override val horizontalAlign = render.horizontalAlign
+                override val verticalAlign = render.verticalAlign
 
                 override fun render(posX: Int, posY: Int) {
                     render.render(posX, posY)
@@ -199,6 +208,8 @@ interface Renderable {
             override val width: Int
                 get() = renderable.width
             override val height = 10
+            override val horizontalAlign = renderable.horizontalAlign
+            override val verticalAlign = renderable.verticalAlign
 
             override fun render(posX: Int, posY: Int) {
                 Gui.drawRect(0, 10, width, 11, 0xFFFFFFFF.toInt())
@@ -217,19 +228,34 @@ interface Renderable {
                 override val width: Int
                     get() = max(hovered.width, unhovered.width)
                 override val height = 10
+                override val horizontalAlign get() = if (isHovered) hovered.horizontalAlign else unhovered.horizontalAlign
+                override val verticalAlign get() = if (isHovered) hovered.verticalAlign else unhovered.verticalAlign
+
+                var isHovered = false
 
                 override fun render(posX: Int, posY: Int) {
-                    if (isHovered(posX, posY) && condition() && shouldAllowLink(true, bypassChecks))
+                    if (isHovered(posX, posY) && condition() && shouldAllowLink(true, bypassChecks)) {
                         hovered.render(posX, posY)
-                    else
+                        isHovered = true
+                    } else {
                         unhovered.render(posX, posY)
+                        isHovered = false
+                    }
+
                 }
             }
 
-        fun itemStack(any: ItemStack, scale: Double = 1.0) = object : Renderable {
+        fun itemStack(
+            any: ItemStack,
+            scale: Double = 1.0,
+            horizontalAlign: HorizontalAlignment = HorizontalAlignment.Left,
+            verticalAlign: VerticalAlignment = VerticalAlignment.Top,
+        ) = object : Renderable {
             override val width: Int
                 get() = 12
             override val height = 10
+            override val horizontalAlign = horizontalAlign
+            override val verticalAlign = verticalAlign
 
             override fun render(posX: Int, posY: Int) {
                 GlStateManager.pushMatrix()
@@ -244,19 +270,28 @@ interface Renderable {
             return Collections.singletonList(string(string))
         }
 
-        fun string(string: String) = object : Renderable {
+        fun string(
+            text: String,
+            horizontalAlign: HorizontalAlignment = HorizontalAlignment.Left,
+            verticalAlign: VerticalAlignment = VerticalAlignment.Top,
+        ) = object : Renderable {
+
             override val width: Int
-                get() = Minecraft.getMinecraft().fontRendererObj.getStringWidth(string)
+                get() = Minecraft.getMinecraft().fontRendererObj.getStringWidth(text)
             override val height = 10
+            override val horizontalAlign = horizontalAlign
+            override val verticalAlign = verticalAlign
 
             override fun render(posX: Int, posY: Int) {
-                Minecraft.getMinecraft().fontRendererObj.drawStringWithShadow("§f$string", 1f, 1f, 0)
+                Minecraft.getMinecraft().fontRendererObj.drawStringWithShadow("§f$text", 1f, 1f, 0)
             }
         }
 
-        fun placeholder(width: Int) = object : Renderable {
-            override val width: Int = width
-            override val height = 10
+        fun placeholder(width: Int, height: Int = 10) = object : Renderable {
+            override val width = width
+            override val height = height
+            override val horizontalAlign = HorizontalAlignment.Left
+            override val verticalAlign = VerticalAlignment.Top
 
             override fun render(posX: Int, posY: Int) {
             }
