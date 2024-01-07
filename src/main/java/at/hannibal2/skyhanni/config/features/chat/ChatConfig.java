@@ -39,7 +39,7 @@ public class ChatConfig {
     public EmojiConfig EmojiConfig = new EmojiConfig();
 
     @Expose
-    @ConfigOption(name = "Dungeon Filter", desc = "Hide annoying messages in Dungeons.")
+    @ConfigOption(name = "Dungeon Filter", desc = "Hides pickup, reminder, buff, damage, ability, puzzle and end messages in Dungeons.")
     @ConfigEditorBoolean
     @FeatureToggle
     public boolean dungeonMessages = true;
