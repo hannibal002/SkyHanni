@@ -88,8 +88,10 @@ class LimboTimeTracker {
                 inFakeLimbo = true
             }
             else {
-                if (!inLimbo) return
-                leaveLimbo()
+                if (inLimbo) {
+                    leaveLimbo()
+                    inFakeLimbo = false
+                }
             }
         }
     }
@@ -123,10 +125,16 @@ class LimboTimeTracker {
         if (passedSince > currentPB) {
             oldPB = currentPB
             config.limboTimePB = passedSince.toInt(DurationUnit.SECONDS)
-            LorenzUtils.chat("§fYou were in Limbo for §e$duration§f! §d§lPERSONAL BEST§r§f!")
-            LorenzUtils.chat("§fYour previous Personal Best was §e$oldPB.")
             userLuck = config.limboTimePB * userLuckMultiplier
-            LorenzUtils.chat("§fYour §aPersonal Bests§f perk is now granting you §a+${userLuck.round(2)}✴ SkyHanni User Luck§f!")
+            if (passedSince.toInt(DurationUnit.SECONDS) == config.limboTimePB) { //need to come up with a good message for this
+                LorenzUtils.chat("§fYou were in Limbo for §e$duration§f! §d§lPERSONAL BEST§r§f!")
+                LorenzUtils.chat("§fYour previous Personal Best was §e$oldPB.")
+                LorenzUtils.chat("§fYour §aPersonal Bests§f perk is now granting you §a+${userLuck.round(2)}✴ SkyHanni User Luck§f!")
+            } else {
+                LorenzUtils.chat("§fYou were in Limbo for §e$duration§f! §d§lPERSONAL BEST§r§f!")
+                LorenzUtils.chat("§fYour previous Personal Best was §e$oldPB.")
+                LorenzUtils.chat("§fYour §aPersonal Bests§f perk is now granting you §a+${userLuck.round(2)}✴ SkyHanni User Luck§f!")
+            }
         } else LorenzUtils.chat("§fYou were in Limbo for §e$duration§f.")
         config.limboPlaytime += passedSince.toInt(DurationUnit.SECONDS)
         shownPB = false
