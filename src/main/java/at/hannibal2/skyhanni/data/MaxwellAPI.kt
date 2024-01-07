@@ -6,6 +6,7 @@ import at.hannibal2.skyhanni.events.LorenzChatEvent
 import at.hannibal2.skyhanni.events.ProfileJoinEvent
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.LorenzUtils
+import at.hannibal2.skyhanni.utils.LorenzUtils.isInIsland
 import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.StringUtils.removeResets
 import at.hannibal2.skyhanni.utils.StringUtils.trimWhiteSpaceAndResets
@@ -68,6 +69,9 @@ object MaxwellAPI {
                         savePower(currentPower)
                     }
                     inventoryMPPattern.matchMatcher(line) {
+                        // Mp is boosted in catacombs
+                        if (IslandType.CATACOMBS.isInIsland()) return
+
                         val mp = group("mp")
                         magicalPower = mp.replace(",", "").toIntOrNull() ?: return
                         saveMP(magicalPower)
