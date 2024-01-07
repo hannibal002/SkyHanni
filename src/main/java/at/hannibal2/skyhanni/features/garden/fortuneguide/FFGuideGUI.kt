@@ -8,8 +8,10 @@ import at.hannibal2.skyhanni.features.garden.fortuneguide.pages.UpgradePage
 import at.hannibal2.skyhanni.utils.GuiRenderUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.name
 import at.hannibal2.skyhanni.utils.SoundUtils
+import at.hannibal2.skyhanni.utils.guide.GuideGUI
+import at.hannibal2.skyhanni.utils.guide.GuidePage
+import at.hannibal2.skyhanni.utils.renderables.Renderable
 import net.minecraft.client.Minecraft
-import net.minecraft.client.gui.GuiScreen
 import net.minecraft.client.renderer.GlStateManager
 import net.minecraft.init.Blocks
 import net.minecraft.init.Items
@@ -17,21 +19,19 @@ import net.minecraft.item.ItemStack
 import org.lwjgl.input.Mouse
 import java.io.IOException
 
-open class FFGuideGUI : GuiScreen() {
+open class FFGuideGUI : GuideGUI<FFGuideGUI.FortuneGuidePage>(FortuneGuidePage.OVERVIEW) {
+
+    override val sizeX = 360
+    override val sizeY = 180
+
     companion object {
-        val pages = mutableMapOf<FortuneGuidePage, FFGuidePage>()
 
         var guiLeft = 0
         var guiTop = 0
-        var screenHeight = 0
 
-        const val sizeX = 360
-        const val sizeY = 180
-
-        var selectedPage = FortuneGuidePage.OVERVIEW
         var currentCrop: CropType? = null
 
-        //todo set this to what they have equip
+        // todo set this to what they have equip
         var currentPet = FarmingItems.ELEPHANT
         var currentArmor = 0
         var currentEquipment = 0
@@ -71,10 +71,6 @@ open class FFGuideGUI : GuiScreen() {
         FFStats.loadFFData()
         FortuneUpgrades.generateGenericUpgrades()
 
-        pages[FortuneGuidePage.OVERVIEW] = OverviewPage()
-        pages[FortuneGuidePage.CROP] = CropPage()
-        pages[FortuneGuidePage.UPGRADES] = UpgradePage()
-
         if (currentCrop != null) {
             for (item in FarmingItems.entries) {
                 if (item.name == currentCrop?.name) {
@@ -82,23 +78,62 @@ open class FFGuideGUI : GuiScreen() {
                 }
             }
         }
+
+
+        // New Code
+        pageList = mapOf(
+            FortuneGuidePage.OVERVIEW to OverviewPage(),
+            FortuneGuidePage.CROP to CropPage(),
+            FortuneGuidePage.UPGRADES to UpgradePage(sizeX, sizeY),
+        )
+        verticalTabs = listOf(
+            vTab(ItemStack(Items.gold_ingot), Renderable.string("§eBreakdown")) {
+                currentPage = if (currentCrop == null) FortuneGuidePage.OVERVIEW else FortuneGuidePage.CROP
+            },
+            vTab(ItemStack(Items.map), Renderable.string("§eUpgrades")) {
+                currentPage = FortuneGuidePage.UPGRADES
+            }
+        )
+        horizontalTabs = buildList {
+            add(hTab(ItemStack(Blocks.grass), Renderable.string("§eOverview")) {
+                currentCrop = null
+
+                // Double Click Logic
+                if (it.isSelected()) {
+                    verticalTabs.first { it != lastVerticalTabWrapper.tab }.fakeClick()
+                }
+            })
+            for (crop in CropType.entries) {
+                add(hTab(crop.icon, Renderable.string("§e${crop.cropName}")) {
+
+                    currentCrop = crop
+                    for (item in FarmingItems.entries) {
+                        if (item.name == crop.name) {
+                            FFStats.getCropStats(crop, item.getItem())
+                            FortuneUpgrades.getCropSpecific(item.getItem())
+                        }
+                    }
+
+                    // Double Click Logic
+                    if (it.isSelected()) {
+                        verticalTabs.first { it != lastVerticalTabWrapper.tab }.fakeClick()
+                    }
+                })
+            }
+        }
+        horizontalTabs.firstOrNull()?.fakeClick()
+        verticalTabs.firstOrNull()?.fakeClick()
     }
 
     override fun drawScreen(unusedX: Int, unusedY: Int, partialTicks: Float) {
         super.drawScreen(unusedX, unusedY, partialTicks)
-        drawDefaultBackground()
-        screenHeight = height
         guiLeft = (width - sizeX) / 2
         guiTop = (height - sizeY) / 2
 
         mouseX = Mouse.getX() * width / Minecraft.getMinecraft().displayWidth
         mouseY = height - Mouse.getY() * height / Minecraft.getMinecraft().displayHeight - 1
 
-        GlStateManager.pushMatrix()
-        drawRect(guiLeft, guiTop, guiLeft + sizeX, guiTop + sizeY, 0x50000000)
-        renderTabs()
-
-        if (selectedPage == FortuneGuidePage.UPGRADES) {
+        if (this.currentPage == FortuneGuidePage.UPGRADES) {
             //
         } else {
             GuiRenderUtils.drawStringCentered("§7SkyHanni", guiLeft + 325, guiTop + 170)
@@ -222,7 +257,6 @@ open class FFGuideGUI : GuiScreen() {
                 )
             }
         }
-        pages[selectedPage]?.drawPage(mouseX, mouseY, partialTicks)
 
         GlStateManager.popMatrix()
 
@@ -248,29 +282,29 @@ open class FFGuideGUI : GuiScreen() {
     fun mouseClickEvent() {
         var x = guiLeft + 15
         var y = guiTop - 28
-        if (isMouseIn(x, y, 25, 28)) {
-            SoundUtils.playClickSound()
+        /* if (isMouseIn(x, y, 25, 28)) {
+            // SoundUtils.playClickSound()
             if (currentCrop != null) {
                 currentCrop = null
-                if (selectedPage != FortuneGuidePage.UPGRADES) {
-                    selectedPage = FortuneGuidePage.OVERVIEW
+                if (this.currentPage != FortuneGuidePage.UPGRADES) {
+                    this.currentPage = FortuneGuidePage.OVERVIEW
                 }
             } else {
-                if (selectedPage == FortuneGuidePage.UPGRADES) {
-                    selectedPage = FortuneGuidePage.OVERVIEW
+                if (this.currentPage == FortuneGuidePage.UPGRADES) {
+                    this.currentPage = FortuneGuidePage.OVERVIEW
                 } else {
-                    selectedPage = FortuneGuidePage.UPGRADES
+                    this.currentPage = FortuneGuidePage.UPGRADES
                 }
             }
         }
         for (crop in CropType.entries) {
             x += 30
             if (isMouseIn(x, y, 25, 28)) {
-                SoundUtils.playClickSound()
+                // SoundUtils.playClickSound()
                 if (currentCrop != crop) {
                     currentCrop = crop
-                    if (selectedPage == FortuneGuidePage.OVERVIEW) {
-                        selectedPage = FortuneGuidePage.CROP
+                    if (this.currentPage == FortuneGuidePage.OVERVIEW) {
+                        this.currentPage = FortuneGuidePage.CROP
                     }
                     for (item in FarmingItems.entries) {
                         if (item.name == crop.name) {
@@ -279,15 +313,15 @@ open class FFGuideGUI : GuiScreen() {
                         }
                     }
                 } else {
-                    if (selectedPage == FortuneGuidePage.CROP) {
-                        selectedPage = FortuneGuidePage.UPGRADES
+                    if (this.currentPage == FortuneGuidePage.CROP) {
+                        this.currentPage = FortuneGuidePage.UPGRADES
                         for (item in FarmingItems.entries) {
                             if (item.name == crop.name) {
                                 FortuneUpgrades.getCropSpecific(item.getItem())
                             }
                         }
                     } else {
-                        selectedPage = FortuneGuidePage.CROP
+                        this.currentPage = FortuneGuidePage.CROP
                         for (item in FarmingItems.entries) {
                             if (item.name == crop.name) {
                                 FFStats.getCropStats(crop, item.getItem())
@@ -301,22 +335,22 @@ open class FFGuideGUI : GuiScreen() {
         x = guiLeft - 28
         y = guiTop + 15
         if (isMouseIn(x, y, 28, 25) &&
-            selectedPage != FortuneGuidePage.CROP && selectedPage != FortuneGuidePage.OVERVIEW
+            this.currentPage != FortuneGuidePage.CROP && this.currentPage != FortuneGuidePage.OVERVIEW
         ) {
             SoundUtils.playClickSound()
-            selectedPage = if (currentCrop == null) {
+            this.currentPage = if (currentCrop == null) {
                 FortuneGuidePage.OVERVIEW
             } else {
                 FortuneGuidePage.CROP
             }
         }
         y += 30
-        if (isMouseIn(x, y, 28, 25) && selectedPage != FortuneGuidePage.UPGRADES) {
-            selectedPage = FortuneGuidePage.UPGRADES
+        if (isMouseIn(x, y, 28, 25) && this.currentPage != FortuneGuidePage.UPGRADES) {
+            this.currentPage = FortuneGuidePage.UPGRADES
             SoundUtils.playClickSound()
-        }
+        } */
 
-        if (selectedPage != FortuneGuidePage.UPGRADES) {
+        if (this.currentPage != FortuneGuidePage.UPGRADES) {
             if (currentCrop == null) {
                 when {
                     isMouseInRect(guiLeft + 142, guiTop + 130) && currentPet != FarmingItems.ELEPHANT -> {
@@ -422,57 +456,13 @@ open class FFGuideGUI : GuiScreen() {
     private fun isMouseIn(x: Int, y: Int, width: Int, height: Int) =
         GuiRenderUtils.isPointInRect(mouseX, mouseY, x, y, width, height)
 
-    private fun renderTabs() {
-        var x = guiLeft + 15
-        var y = guiTop - 28
-        val selectedColor = 0x50000000
-        val notSelectedColor = 0x50303030
-        drawRect(x, y, x + 25, y + 28, if (currentCrop == null) selectedColor else notSelectedColor)
-        GuiRenderUtils.renderItemStack(ItemStack(Blocks.grass), x + 5, y + 5)
-        if (isMouseIn(x, y, 25, 28)) {
-            tooltipToDisplay.add("§eOverview")
-        }
-
-        for (crop in CropType.entries) {
-            x += 30
-            drawRect(x, y, x + 25, y + 28, if (currentCrop == crop) selectedColor else notSelectedColor)
-            GuiRenderUtils.renderItemStack(crop.icon, x + 5, y + 5)
-            if (isMouseIn(x, y, 25, 28)) {
-                tooltipToDisplay.add("§e${crop.cropName}")
-            }
-        }
-
-        x = guiLeft - 28
-        y = guiTop + 15
-
-        drawRect(
-            x, y,
-            x + 28, y + 25,
-            if (selectedPage != FortuneGuidePage.UPGRADES) selectedColor else notSelectedColor
-        )
-        GuiRenderUtils.renderItemStack(ItemStack(Items.gold_ingot), x + 5, y + 5)
-        if (isMouseIn(x, y, 28, 25)) {
-            tooltipToDisplay.add("§eBreakdown")
-        }
-        y += 30
-        drawRect(
-            x, y,
-            x + 28, y + 25,
-            if (selectedPage == FortuneGuidePage.UPGRADES) selectedColor else notSelectedColor
-        )
-        GuiRenderUtils.renderItemStack(ItemStack(Items.map), x + 5, y + 5)
-        if (isMouseIn(x, y, 28, 25)) {
-            tooltipToDisplay.add("§eUpgrades")
-        }
-    }
-
     enum class FortuneGuidePage {
         OVERVIEW,
         CROP,
         UPGRADES
     }
 
-    abstract class FFGuidePage {
-        abstract fun drawPage(mouseX: Int, mouseY: Int, partialTicks: Float)
+    abstract class FFGuidePage : GuidePage() {
+        override fun onSwitch() {}
     }
 }

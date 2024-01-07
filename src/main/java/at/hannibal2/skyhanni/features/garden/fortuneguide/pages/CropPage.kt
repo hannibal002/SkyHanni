@@ -10,7 +10,7 @@ import at.hannibal2.skyhanni.utils.StringUtils.firstLetterUppercase
 
 class CropPage : FFGuideGUI.FFGuidePage() {
 
-    override fun drawPage(mouseX: Int, mouseY: Int, partialTicks: Float) {
+    override fun drawPage(mouseX: Int, mouseY: Int) {
         for (item in FarmingItems.entries) {
             if (item.name == FFGuideGUI.currentCrop?.name) {
                 GuiRenderUtils.renderItemAndTip(

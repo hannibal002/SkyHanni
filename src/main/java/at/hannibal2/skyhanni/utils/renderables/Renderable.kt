@@ -112,7 +112,7 @@ interface Renderable {
         }
 
         fun clickAndHover(
-            text: String,
+            text: Any,
             tips: List<Any>,
             bypassChecks: Boolean = false,
             onClick: () -> Unit,
@@ -151,7 +151,7 @@ interface Renderable {
             }
 
         fun hoverTips(
-            text: String,
+            text: Any,
             tips: List<Any>,
             indexes: List<Int> = listOf(),
             stack: ItemStack? = null,
@@ -161,7 +161,7 @@ interface Renderable {
             onHover: () -> Unit = {},
         ): Renderable {
 
-            val render = string(text)
+            val render = fromAny(text) ?: string("Error")
             return object : Renderable {
                 override val width = render.width
                 override val height = render.height
@@ -283,9 +283,8 @@ interface Renderable {
             horizontalAlign: HorizontalAlignment = HorizontalAlignment.Left,
             verticalAlign: VerticalAlignment = VerticalAlignment.Top,
         ) = object : Renderable {
-            override val width: Int
-                get() = 12
-            override val height = 10
+            override val width = (12 * scale).toInt()
+            override val height = (10 * scale).toInt()
             override val horizontalAlign = horizontalAlign
             override val verticalAlign = verticalAlign
 
@@ -293,7 +292,7 @@ interface Renderable {
                 GlStateManager.pushMatrix()
                 if (Minecraft.getMinecraft().currentScreen == null || Minecraft.getMinecraft().currentScreen is GuiChat)
                     GlStateManager.translate(0F, 0F, -145F)
-                any.renderOnScreen(0F, 0F, scaleMultiplier = scale)
+                any.renderOnScreen(0F, 0F, scaleMultiplier = scale) // TODO fix the misalignment from the renderable Bounding Box (positon, width, height) to the render
                 GlStateManager.popMatrix()
             }
         }
@@ -327,49 +326,10 @@ interface Renderable {
         fun placeholder(width: Int, height: Int = 10) = object : Renderable {
             override val width = width
             override val height = height
+            override val horizontalAlign = HorizontalAlignment.Left
+            override val verticalAlign = VerticalAlignment.Top
 
             override fun render(posX: Int, posY: Int) {
-            }
-        }
-
-        /**
-         * @param content the list of rows the table should render
-         */
-        fun table(content: List<List<Renderable?>>, xPadding: Int = 1, yPadding: Int = 0) = object : Renderable {
-            val xOffsets: List<Int> = let {
-                var buffer = 0
-                var index = 0
-                buildList {
-                    add(0)
-                    while (true) {
-                        buffer += content.map { it.getOrNull(index) }.takeIf { it.any { it != null } }?.maxOf {
-                            it?.width ?: 0
-                        }?.let { it + xPadding } ?: break
-                        add(buffer)
-                        index++
-                    }
-                }
-            }
-            val yOffsets: List<Int> = let {
-                var buffer = 0
-                listOf(0) + content.map { row ->
-                    buffer += row.maxOf { it?.height ?: 0 } + yPadding
-                    buffer
-                }
-            }
-
-            override val width = xOffsets.last() - xPadding
-            override val height = yOffsets.last() - yPadding
-
-            override fun render(posX: Int, posY: Int) {
-                content.forEachIndexed { rowIndex, row ->
-                    row.forEachIndexed { index, renderable ->
-                        GlStateManager.pushMatrix()
-                        GlStateManager.translate(xOffsets[index].toFloat(), yOffsets[rowIndex].toFloat(), 0F)
-                        renderable?.render(posX + xOffsets[index], posY + yOffsets[rowIndex])
-                        GlStateManager.popMatrix()
-                    }
-                }
             }
         }
 
@@ -474,6 +434,36 @@ interface Renderable {
 
         }
 
+        /**
+         * @param content the list of rows the table should render
+         */
+        fun table(
+            content: List<List<Renderable?>>,
+            xPadding: Int = 1,
+            yPadding: Int = 0,
+            horizontalAlign: HorizontalAlignment = HorizontalAlignment.Left,
+            verticalAlign: VerticalAlignment = VerticalAlignment.Top,
+        ) = object : Renderable {
+            val xOffsets: List<Int> = calculateTableXOffsets(content, xPadding)
+            val yOffsets: List<Int> = calculateTableYOffsets(content, yPadding)
+            override val horizontalAlign = horizontalAlign
+            override val verticalAlign = verticalAlign
+
+            override val width = xOffsets.last() - xPadding
+            override val height = yOffsets.last() - yPadding
+
+            override fun render(posX: Int, posY: Int) {
+                content.forEachIndexed { rowIndex, row ->
+                    row.forEachIndexed { index, renderable ->
+                        GlStateManager.pushMatrix()
+                        GlStateManager.translate(xOffsets[index].toFloat(), yOffsets[rowIndex].toFloat(), 0F)
+                        renderable?.renderXYAligned(posX + xOffsets[index], posY + yOffsets[rowIndex], xOffsets[index + 1] - xOffsets[index], yOffsets[rowIndex + 1] - yOffsets[rowIndex])
+                        GlStateManager.popMatrix()
+                    }
+                }
+            }
+        }
+
         fun progressBar(
             percent: Double,
             startColor: Color = Color(255, 0, 0),
@@ -524,6 +514,71 @@ interface Renderable {
                     fontRenderer.drawStringWithShadow(text, inverseScale, inverseScale + index * 10.0f, 0)
                 }
                 GlStateManager.scale(inverseScale, inverseScale, 1.0f)
+            }
+        }
+
+
+        fun calculateStretchXPadding(content: List<List<Renderable?>>, xSpace: Int): Int {
+            if (content.isEmpty()) return xSpace
+            val xWidth = content.maxOf { it.sumOf { it?.width ?: 0 } }
+            val xLength = content.maxOf { it.size }
+            val emptySpace = xSpace - xWidth
+            if (emptySpace < 0) {
+//                throw IllegalArgumentException("Not enough space for content")
+            }
+            return emptySpace / xLength
+        }
+
+        fun itemStackWithTip(
+            item: ItemStack,
+            scale: Double = 1.0,
+            horizontalAlign: HorizontalAlignment = HorizontalAlignment.Left,
+            verticalAlign: VerticalAlignment = VerticalAlignment.Top,
+        ) =
+            hoverTips(itemStack(item, scale, horizontalAlign, verticalAlign), item.getTooltip(Minecraft.getMinecraft().thePlayer, false), stack = item)
+
+        fun leftRightBox(
+            // TODO find a more general solution
+            left: Renderable,
+            right: Renderable,
+            width: Int,
+            horizontalAlign: HorizontalAlignment = HorizontalAlignment.Left,
+            verticalAlign: VerticalAlignment = VerticalAlignment.Top,
+        ) = object : Renderable {
+            override val width = width
+            override val height = max(left.height, right.height)
+            override val horizontalAlign = horizontalAlign
+            override val verticalAlign = verticalAlign
+
+            val rightOffset = width - right.width
+
+            override fun render(posX: Int, posY: Int) {
+                left.render(posX, posY)
+                GlStateManager.translate(rightOffset.toFloat(), 0f, 0f)
+                right.render(posX + rightOffset, posY)
+                GlStateManager.translate(-rightOffset.toFloat(), 0f, 0f)
+            }
+        }
+
+        fun verticalList(
+            list: List<Renderable>,
+            horizontalAlign: HorizontalAlignment = HorizontalAlignment.Left,
+            verticalAlign: VerticalAlignment = VerticalAlignment.Top,
+        ) = object : Renderable {
+            override val width = list.maxOf { it.width }
+            override val height = list.maxOf { it.height }
+            override val horizontalAlign = horizontalAlign
+            override val verticalAlign = verticalAlign
+
+            override fun render(posX: Int, posY: Int) {
+                var yOffset = 0
+                list.forEach {
+                    it.render(posX, posY + yOffset)
+                    val yShift = it.height
+                    GlStateManager.translate(0f, yShift.toFloat(), 0f)
+                    yOffset += yShift
+                }
+                GlStateManager.translate(0f, -yOffset.toFloat(), 0f)
             }
         }
 
