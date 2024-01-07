@@ -56,7 +56,7 @@ object FirstMinionTier {
         for (minionId in tierOneMinionsFiltered) {
             val prefix = minionId.asString().dropLast(1)
             if (minions.any { it.value.startsWith(prefix) }) {
-                tierOneMinionsDone.add(minionId.toString())
+                tierOneMinionsDone.add(minionId.asString())
             }
         }
     }
