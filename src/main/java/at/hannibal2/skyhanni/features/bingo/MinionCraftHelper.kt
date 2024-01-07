@@ -151,10 +151,11 @@ class MinionCraftHelper {
             val internalName = internalId.asInternalName()
             if (internalName.endsWith("_GENERATOR_1")) {
                 if (internalName == "REVENANT_GENERATOR_1".asInternalName() ||
-                internalName == "TARANTULA_GENERATOR_1".asInternalName() ||
-                internalName == "VOIDLING_GENERATOR_1".asInternalName() ||
-                internalName == "INFERNO_GENERATOR_1".asInternalName() ||
-                internalName == "VAMPIRE_GENERATOR_1".asInternalName()) continue
+                    internalName == "TARANTULA_GENERATOR_1".asInternalName() ||
+                    internalName == "VOIDLING_GENERATOR_1".asInternalName() ||
+                    internalName == "INFERNO_GENERATOR_1".asInternalName() ||
+                    internalName == "VAMPIRE_GENERATOR_1".asInternalName()
+                ) continue
                 tierOneMinions.add(internalName)
             }
 
@@ -281,16 +282,18 @@ class MinionCraftHelper {
 
     private fun fixTierOneMinions(data: JsonObject) {
         val newList = JsonArray()
-        var i = 0
+        var counter = 0
         for (entry in data["tierOneMinionsDone"].asJsonArray) {
             val name = entry.asString
             if (!name.startsWith("INTERNALNAME:")) {
                 newList.add(entry)
             } else {
-                i++
+                counter++
             }
         }
-        println("fixTierOneMinions: removed $i wrong entries.")
+        if (counter > 0) {
+            println("Removed $counter wrong entries in fixTierOneMinions.")
+        }
         data.add("tierOneMinionsDone", newList)
     }
 
