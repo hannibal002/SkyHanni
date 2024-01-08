@@ -37,7 +37,7 @@ public class ChatConfig {
 
     @Expose
     @ConfigOption(name = "Dungeon Filter", desc = "Hide specific message types in Dungeons.")
-    @ConfigEditorDraggableList()
+    @ConfigEditorDraggableList
     public List<DungeonMessageTypes> dungeonFilteredMessageTypes = Collections.emptyList();
 
     public enum DungeonMessageTypes {
