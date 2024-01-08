@@ -6,6 +6,7 @@ import at.hannibal2.skyhanni.data.WinterAPI
 import at.hannibal2.skyhanni.events.EntityCustomNameUpdateEvent
 import at.hannibal2.skyhanni.events.LorenzChatEvent
 import at.hannibal2.skyhanni.events.LorenzTickEvent
+import at.hannibal2.skyhanni.events.LorenzWorldChangeEvent
 import at.hannibal2.skyhanni.events.RenderMobColoredEvent
 import at.hannibal2.skyhanni.events.withAlpha
 import at.hannibal2.skyhanni.features.event.winter.UniqueGiftCounter
@@ -111,5 +112,10 @@ object UniqueGiftingOpportunitiesFeatures {
         if (!WinterAPI.isDecember()) return
 
         holdingGift = !config.highlighWithGiftOnly || giftNamePattern.matches(InventoryUtils.itemInHandId.asString())
+    }
+
+    @SubscribeEvent
+    fun onWorldChange(event: LorenzWorldChangeEvent) {
+        holdingGift = false
     }
 }
