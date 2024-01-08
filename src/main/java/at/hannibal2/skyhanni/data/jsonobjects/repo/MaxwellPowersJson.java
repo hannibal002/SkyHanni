@@ -6,5 +6,5 @@ import java.util.List;
 
 public class MaxwellPowersJson {
     @Expose
-    public List<String> maxwell_powers;
+    public List<String> powers;
 }

@@ -89,7 +89,7 @@ object MaxwellAPI {
     @SubscribeEvent
     fun onRepoLoad(event: RepositoryReloadEvent) {
         val data = event.getConstant<MaxwellPowersJson>("MaxwellPowers")
-        powers = data.maxwell_powers
+        powers = data.powers
     }
 
     @SubscribeEvent

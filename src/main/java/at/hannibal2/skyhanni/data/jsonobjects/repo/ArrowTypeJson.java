@@ -6,5 +6,5 @@ import java.util.List;
 
 public class ArrowTypeJson {
     @Expose
-    public List<ArrowType> arrow_type;
+    public List<ArrowType> arrows;
 }
