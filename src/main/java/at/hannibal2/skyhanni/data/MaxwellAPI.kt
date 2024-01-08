@@ -38,8 +38,7 @@ object MaxwellAPI {
 
         chatPowerpattern.matchMatcher(message) {
             val power = group("power")
-            currentPower = MaxwellPowers.entries.find { power.contains(it.power) }
-                ?: MaxwellPowers.UNKNOWN
+            currentPower = byNameOrNull(power) ?: return
             savePower(currentPower)
         }
     }
@@ -54,7 +53,7 @@ object MaxwellAPI {
                 stacks.values.find { it.getLore().isNotEmpty() && it.getLore().last() == "§aPower is selected!" }
                     ?: return
 
-            currentPower = MaxwellPowers.entries.find { selectedPower.displayName.contains(it.power) }
+            currentPower = byNameOrNull(selectedPower.getLore().first()) ?: return
             savePower(currentPower)
 
         } else if (event.inventoryName.contains("Your Bags")) {
@@ -65,7 +64,7 @@ object MaxwellAPI {
                 for (line in lore) {
                     inventoryPowerPattern.matchMatcher(line) {
                         val power = group("power")
-                        currentPower = MaxwellPowers.entries.find { power.contains(it.power) }
+                        currentPower = byNameOrNull(power) ?: return
                         savePower(currentPower)
                     }
                     inventoryMPPattern.matchMatcher(line) {
@@ -81,6 +80,9 @@ object MaxwellAPI {
         }
     }
 
+    fun byNameOrNull(name: String) = MaxwellPowers.entries.find { it.power == name }
+
+    // Handle storage
     @SubscribeEvent
     fun onConfigLoad(event: ConfigLoadEvent) {
         val config = ProfileStorageData.profileSpecific ?: return
@@ -91,7 +93,7 @@ object MaxwellAPI {
     @SubscribeEvent
     fun onProfileJoin(event: ProfileJoinEvent) {
         val config = ProfileStorageData.profileSpecific ?: return
-        currentPower = config.maxwell.currentPower ?: MaxwellPowers.UNKNOWN
+        currentPower = config.maxwell.currentPower ?: null
         magicalPower = config.maxwell.magicalPower
     }
 
