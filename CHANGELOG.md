@@ -18,7 +18,7 @@
 + Added Sea Creature Tracker. - hannibal2
     + Allows to only show single variants, e.g. water or lava or winter.
 
-### Changed
+### Changes
 
 #### Garden Changes
 
@@ -42,6 +42,10 @@
 
 + Odger highlight feature tells in description that it is only useful for users without abiphone. - hannibal2
 
+#### Mining Changes
+
++ Show Powder Tracker immediately after joining the Crystal Hollows. - hannibal2
+
 #### Bingo Changes
 
 + Show the guide text when hovering over the missing bingo goal list. - hannibal2
@@ -50,10 +54,15 @@
 
 + Removed flawless gemstones from sack display. - CalMWolfs
     + Hypixel removed them from sacks.
++ Show a warning in Bestiary Display when Overall Progress is not enabled. - HiZe
 
 #### Dungeon Changes
 
 + Changed the description of the Dungeon Chat Filter feature to be more descriptive. - Wambo
+
+#### Chat Changes
+
++ Hide new Fire Sale message format. - Thunderblade73
 
 #### Misc Changes
 
@@ -67,8 +76,14 @@
 + Fixed progress to maxed milestone appearing twice in the crop milestone menu when having milestone 20. - Empa
 + Fixed max crop milestone display being too long in the crop milestone menu. - obsidian
 + Fixed Mooshroom Cow Perk counter when farming sugar cane/cactus with Mooshroom Cow. - alexia
-+ Show an error message for the commands /shcropsin and /shcroptime if show money per hour display is not loaded. - hannibal2
++ Show an error message for the commands /shcropsin and /shcroptime if show money per hour display is not loaded. -
+  hannibal2
 + Auto-fixing plots marked as pests when killing all pests without SkyHanni earlier. - hannibal2
++ Fixed error message that nearest pests cannot get removed properly. - hannibal2
+
+#### Mining Fixes
+
++ Fixed an error when showing all elements in Powder Tracker. - hannibal2
 
 #### Rift Fixes
 
@@ -88,10 +103,13 @@
 #### Bingo Fixes
 
 + Fixed detecting bingo profile while visiting other players bingo island. - hannibal2
++ Fixed performance issues with Bingo Minion Craft Helper. - hannibal2
++ Fixed Bingo Minion Craft Helper not detecting crafted tier one minion. - hannibal2
 
 #### Misc Fixes
 
 + Maybe fixed Tia Relay Helper. - Thunderblade73
++ Fixed wording in trackers when the item is newly obtained. - hannibal2
 
 ### Technical Changes
 
@@ -103,7 +121,11 @@
 + Added Dark Auction as IslandType and fixed IslandType detection for dungeons. - j10a1n15
 + Modify instead of blocking trophy fishing and sea creature chat messages. - appable
 + Changed regex in case Hypixel changes color codes for island names in the tab list. - Empa
-+ Extract FirstMinionTier logic from the Bingo Minion Craft Helper to better analyze the performance problems some users have. - hannibal2
++ Extract FirstMinionTier logic from the Bingo Minion Craft Helper to better analyze the performance problems some users
+  have. - hannibal2
++ Moving minion craft helper fully over to neu internal names. - hannibal2
++ Added information about trackers to the Discord FAQ. - j10a1n15
++ Defined the way how dependent PRs should be written in contributing.md. - Thunderblade73
 
 ## Version 0.22
 
