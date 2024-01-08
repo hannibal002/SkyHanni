@@ -106,7 +106,7 @@ public class Storage {
         public static class BingoSession {
 
             @Expose
-            public List<String> tierOneMinionsDone = new ArrayList<>();
+            public List<NEUInternalName> tierOneMinionsDone = new ArrayList<>();
 
             @Expose
             public Map<Integer, BingoGoal> goals = new HashMap<>();
