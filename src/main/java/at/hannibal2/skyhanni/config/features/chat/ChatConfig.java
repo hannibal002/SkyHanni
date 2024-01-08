@@ -51,7 +51,8 @@ public class ChatConfig {
         DAMAGE("§cDamage"),
         ABILITY("§dAbilities"),
         PUZZLE("§dPuzzle §r/ §cQuiz"),
-        END("§cEnd §a(End of run spam)");
+        END("§cEnd §a(End of run spam)"),
+        ;
 
         private final String name;
 
