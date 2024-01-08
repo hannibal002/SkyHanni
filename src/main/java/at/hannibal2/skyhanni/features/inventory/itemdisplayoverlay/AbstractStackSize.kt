@@ -2,6 +2,7 @@ package at.hannibal2.skyhanni.features.inventory.itemdisplayoverlay
 
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.config.features.inventory.InventoryConfig
+import at.hannibal2.skyhanni.config.features.inventory.stacksize.StackSizeMenuConfig
 import at.hannibal2.skyhanni.events.RenderItemTipEvent
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPatternGroup
@@ -21,7 +22,7 @@ abstract class AbstractStackSize {
 }
 
 abstract class AbstractMenuStackSize : AbstractStackSize()  {
-    val configMenuStackSize get() = configItemStackSize.stackSize.menu
+    val configMenuStackSize: StackSizeMenuConfig get() = configItemStackSize.stackSize.menu
     fun String.convertPercentToGreenCheckmark(): String {
         return this.replace("100", super.greenCheckmark)
     }
