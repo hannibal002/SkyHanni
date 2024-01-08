@@ -1,9 +1,11 @@
 package at.hannibal2.skyhanni.data
 
+import at.hannibal2.skyhanni.data.jsonobjects.repo.MaxwellPowersJson
 import at.hannibal2.skyhanni.events.ConfigLoadEvent
 import at.hannibal2.skyhanni.events.InventoryFullyOpenedEvent
 import at.hannibal2.skyhanni.events.LorenzChatEvent
 import at.hannibal2.skyhanni.events.ProfileJoinEvent
+import at.hannibal2.skyhanni.events.RepositoryReloadEvent
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils.isInIsland
@@ -15,8 +17,9 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
 object MaxwellAPI {
     val config = ProfileStorageData.profileSpecific
-    var currentPower: MaxwellPowers? = null
+    var currentPower: String? = null
     var magicalPower = -1
+    var powers = mutableListOf<String>()
 
     private val group = RepoPattern.group("data.maxwell")
     private val chatPowerpattern by group.pattern(
@@ -80,9 +83,15 @@ object MaxwellAPI {
         }
     }
 
-    fun byNameOrNull(name: String) = MaxwellPowers.entries.find { it.power == name }
+    fun byNameOrNull(name: String) = powers.find { it == name }
 
     // Handle storage
+    @SubscribeEvent
+    fun onRepoLoad(event: RepositoryReloadEvent) {
+        val data = event.getConstant<MaxwellPowersJson>("MaxwellPowers")
+        powers = data.maxwellPowers
+    }
+
     @SubscribeEvent
     fun onConfigLoad(event: ConfigLoadEvent) {
         val config = ProfileStorageData.profileSpecific ?: return
@@ -97,7 +106,7 @@ object MaxwellAPI {
         magicalPower = config.maxwell.magicalPower
     }
 
-    private fun savePower(power: MaxwellPowers?) {
+    private fun savePower(power: String?) {
         if (power == null) return
         val config = ProfileStorageData.profileSpecific ?: return
         config.maxwell.currentPower = power

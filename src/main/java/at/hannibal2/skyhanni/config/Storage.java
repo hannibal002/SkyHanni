@@ -1,7 +1,6 @@
 package at.hannibal2.skyhanni.config;
 
 import at.hannibal2.skyhanni.data.FameRank;
-import at.hannibal2.skyhanni.data.MaxwellPowers;
 import at.hannibal2.skyhanni.data.QuiverArrowType;
 import at.hannibal2.skyhanni.data.model.ComposterUpgrade;
 import at.hannibal2.skyhanni.features.bingo.card.goals.BingoGoal;
@@ -126,7 +125,7 @@ public class Storage {
 
         public static class MaxwellPowerStorage {
             @Expose
-            public MaxwellPowers currentPower = null;
+            public String currentPower = null;
 
             @Expose
             public int magicalPower = -1;
