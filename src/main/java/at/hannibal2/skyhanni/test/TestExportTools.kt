@@ -53,7 +53,7 @@ object TestExportTools {
 
     @SubscribeEvent
     fun onKeybind(event: GuiScreenEvent.KeyboardInputEvent.Post) {
-        if (!config.copyItemDataCompressed.isKeyHeld() && !config.copyItemData.isKeyHeld() && !config.copyChestName.isKeyHeld()) return
+        if (noKeysHeld()) return
         val gui = event.gui as? GuiContainer ?: return
         if (config.copyChestName.isKeyHeld()) {
             copyChestName()
@@ -68,6 +68,10 @@ object TestExportTools {
         OSUtils.copyToClipboard(json)
         LorenzUtils.chat("Compressed item info copied into the clipboard!")
     }
+
+    private fun noKeysHeld(): Boolean = noCopyItemKeysHeld() && noChestNameKeyHeld()
+    private fun noChestNameKeyHeld(): Boolean = !config.copyChestName.isKeyHeld()
+    private fun noCopyItemKeysHeld(): Boolean = !config.copyItemDataCompressed.isKeyHeld() && !config.copyItemData.isKeyHeld()
 
     inline fun <reified T> getTestData(category: Key<T>, name: String): T {
         val reader = InputStreamReader(javaClass.getResourceAsStream("/testdata/${category.name}/$name.json")!!)
