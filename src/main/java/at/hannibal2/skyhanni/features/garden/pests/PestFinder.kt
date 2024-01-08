@@ -141,11 +141,29 @@ class PestFinder {
             }
         }
 
-        if (newPests == PestAPI.scoreboardPests) return
+        if (newPests != PestAPI.scoreboardPests) {
+            removePests(PestAPI.scoreboardPests - newPests)
+            PestAPI.scoreboardPests = newPests
+            update()
+        }
 
-        removePests(PestAPI.scoreboardPests - newPests)
-        PestAPI.scoreboardPests = newPests
-        update()
+        resetAllPests(newPests)
+    }
+
+    // Auto fixing plots marked as pests when killing all pests without SkyHanni earlier.
+    private fun resetAllPests(newPests: Int) {
+        if (newPests != 0) return
+
+        var fixed = false
+        for (plot in GardenPlotAPI.plots) {
+            if (plot.pests > 0) {
+                fixed = true
+                plot.pests = 0
+            }
+        }
+        if (fixed) {
+            LorenzUtils.debug("Auto fixed all plots with pests.")
+        }
     }
 
     private fun removePests(removedPests: Int) {

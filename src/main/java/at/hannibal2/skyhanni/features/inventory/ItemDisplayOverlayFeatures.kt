@@ -220,7 +220,7 @@ object ItemDisplayOverlayFeatures {
             }
         }
 
-        if (VACUUM_GARDEN.isSelected() && item.getInternalNameOrNull() in PestAPI.vacuumVariants) {
+        if (VACUUM_GARDEN.isSelected() && item.getInternalNameOrNull() in PestAPI.vacuumVariants && isOwnVacuum(lore)) {
             for (line in lore) {
                 gardenVacuumPatterm.matchMatcher(line) {
                     val pests = group("amount").formatNumber()
@@ -262,6 +262,9 @@ object ItemDisplayOverlayFeatures {
 
         return ""
     }
+
+    private fun isOwnVacuum(lore: List<String>) =
+        lore.none { it.contains("Click to trade!") || it.contains("Starting bid:") || it.contains("Buy it now:") }
 
     var done = false
 
