@@ -5,6 +5,7 @@ import at.hannibal2.skyhanni.data.ProfileStorageData
 import at.hannibal2.skyhanni.data.WinterAPI
 import at.hannibal2.skyhanni.events.EntityCustomNameUpdateEvent
 import at.hannibal2.skyhanni.events.LorenzChatEvent
+import at.hannibal2.skyhanni.events.LorenzTickEvent
 import at.hannibal2.skyhanni.events.RenderMobColoredEvent
 import at.hannibal2.skyhanni.events.withAlpha
 import at.hannibal2.skyhanni.features.event.winter.UniqueGiftCounter
@@ -28,7 +29,7 @@ object UniqueGiftingOpportunitiesFeatures {
     private val playerList: MutableSet<String>?
         get() = ProfileStorageData.playerSpecific?.winter?.playersThatHaveBeenGifted
 
-    private val patternGroup = RepoPattern.group("event.uniquegifts")
+    private val patternGroup = RepoPattern.group("event.winter.uniquegifts")
     private val giftedPattern by patternGroup.pattern(
         "gifted",
         "§6\\+1 Unique Gift given! To ([^§]+)§r§6!"
@@ -38,6 +39,8 @@ object UniqueGiftingOpportunitiesFeatures {
         "(?:WHITE|RED|GREEN)_GIFT\$"
     )
 
+    private var holdingGift = false
+
     private fun hasGiftedPlayer(player: EntityPlayer) = playerList?.contains(player.name) == true
 
     private fun addGiftedPlayer(playerName: String) {
@@ -46,8 +49,7 @@ object UniqueGiftingOpportunitiesFeatures {
 
     private val config get() = SkyHanniMod.feature.event.winter.giftingOpportunities
 
-    private fun isEnabled() = LorenzUtils.inSkyBlock && config.enabled && WinterAPI.isDecember() &&
-        (giftNamePattern.matches(InventoryUtils.itemInHandId.asString()) || !config.highlighWithGiftOnly)
+    private fun isEnabled() = LorenzUtils.inSkyBlock && config.enabled && WinterAPI.isDecember() && holdingGift
 
     private val hasNotGiftedNametag = "§a§lꤥ"
     private val hasGiftedNametag = "§c§lꤥ"
@@ -98,5 +100,10 @@ object UniqueGiftingOpportunitiesFeatures {
             addGiftedPlayer(group(1))
             UniqueGiftCounter.addUniqueGift()
         }
+    }
+
+    @SubscribeEvent
+    fun onTick(event: LorenzTickEvent) {
+        holdingGift = !config.highlighWithGiftOnly || giftNamePattern.matches(InventoryUtils.itemInHandId.asString())
     }
 }
