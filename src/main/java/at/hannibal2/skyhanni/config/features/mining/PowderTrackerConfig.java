@@ -16,7 +16,6 @@ import java.util.List;
 import static at.hannibal2.skyhanni.config.features.mining.PowderTrackerConfig.PowderDisplayEntry.AMBER;
 import static at.hannibal2.skyhanni.config.features.mining.PowderTrackerConfig.PowderDisplayEntry.AMETHYST;
 import static at.hannibal2.skyhanni.config.features.mining.PowderTrackerConfig.PowderDisplayEntry.DIAMOND_ESSENCE;
-import static at.hannibal2.skyhanni.config.features.mining.PowderTrackerConfig.PowderDisplayEntry.DISPLAY_MODE;
 import static at.hannibal2.skyhanni.config.features.mining.PowderTrackerConfig.PowderDisplayEntry.DOUBLE_POWDER;
 import static at.hannibal2.skyhanni.config.features.mining.PowderTrackerConfig.PowderDisplayEntry.ELECTRON;
 import static at.hannibal2.skyhanni.config.features.mining.PowderTrackerConfig.PowderDisplayEntry.FTX;
@@ -29,7 +28,6 @@ import static at.hannibal2.skyhanni.config.features.mining.PowderTrackerConfig.P
 import static at.hannibal2.skyhanni.config.features.mining.PowderTrackerConfig.PowderDisplayEntry.SAPPHIRE;
 import static at.hannibal2.skyhanni.config.features.mining.PowderTrackerConfig.PowderDisplayEntry.SPACER_1;
 import static at.hannibal2.skyhanni.config.features.mining.PowderTrackerConfig.PowderDisplayEntry.SPACER_2;
-import static at.hannibal2.skyhanni.config.features.mining.PowderTrackerConfig.PowderDisplayEntry.TITLE;
 import static at.hannibal2.skyhanni.config.features.mining.PowderTrackerConfig.PowderDisplayEntry.TOPAZ;
 import static at.hannibal2.skyhanni.config.features.mining.PowderTrackerConfig.PowderDisplayEntry.TOTAL_CHESTS;
 
@@ -58,8 +56,6 @@ public class PowderTrackerConfig {
     )
     @ConfigEditorDraggableList()
     public Property<List<PowderDisplayEntry>> textFormat = Property.of(new ArrayList<>(Arrays.asList(
-        TITLE,
-        DISPLAY_MODE,
         TOTAL_CHESTS,
         DOUBLE_POWDER,
         MITHRIL_POWDER,
@@ -80,8 +76,6 @@ public class PowderTrackerConfig {
     )));
 
     public enum PowderDisplayEntry implements HasLegacyId {
-        TITLE("§b§lPowder Tracker", 0),
-        DISPLAY_MODE("§7Display Mode: §a[Total] §e[This Session]", 1),
         TOTAL_CHESTS("§d852 Total chests Picked §7(950/h)", 2),
         DOUBLE_POWDER("§bx2 Powder: §aActive!", 3),
         MITHRIL_POWDER("§b250,420 §aMithril Powder §7(350,000/h)", 4),
