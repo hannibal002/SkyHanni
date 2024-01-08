@@ -1,6 +1,6 @@
 package at.hannibal2.skyhanni.utils.shader
 
-import java.util.*
+import java.util.Objects
 import java.util.function.Supplier
 
 /**

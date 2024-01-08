@@ -194,16 +194,18 @@ object NumberUtil {
             1_000.0
         } else if (text.endsWith("m")) {
             text = text.substring(0, text.length - 1)
-            1.milion
+            1.million
         } else if (text.endsWith("b")) {
             text = text.substring(0, text.length - 1)
-            1.bilion
+            1.billion
         } else 1.0
         val d = text.toDouble()
         return (d * multiplier).toLong()
     }
 
-    val Int.milion get() = this * 1_000_000.0
-    private val Int.bilion get() = this * 1_000_000_000.0
-    val Double.milion get() = (this * 1_000_000.0).toLong()
+    // The classic milionaire and bilionaire club, where typos make you richer!
+    // Sometimes we just take an L, never find it and forget to write it down
+    val Int.million get() = this * 1_000_000.0
+    private val Int.billion get() = this * 1_000_000_000.0
+    val Double.million get() = (this * 1_000_000.0).toLong()
 }

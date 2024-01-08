@@ -1,5 +1,8 @@
 package at.hannibal2.skyhanni.config;
 
+import at.hannibal2.skyhanni.data.FameRank;
+import at.hannibal2.skyhanni.data.MaxwellPowers;
+import at.hannibal2.skyhanni.data.QuiverArrowType;
 import at.hannibal2.skyhanni.data.model.ComposterUpgrade;
 import at.hannibal2.skyhanni.features.bingo.card.goals.BingoGoal;
 import at.hannibal2.skyhanni.features.combat.endernodetracker.EnderNodeTracker;
@@ -117,6 +120,42 @@ public class Storage {
 
         @Expose
         public String currentPet = "";
+
+        @Expose
+        public MaxwellPowerStorage maxwell = new MaxwellPowerStorage();
+
+        public static class MaxwellPowerStorage {
+            @Expose
+            public MaxwellPowers currentPower = null;
+
+            @Expose
+            public int magicalPower = -1;
+        }
+
+        @Expose
+        public ArrowsStorage arrows = new ArrowsStorage();
+
+        public static class ArrowsStorage {
+            @Expose
+            public QuiverArrowType currentArrow = null;
+
+            @Expose
+            public Map<QuiverArrowType, Float> arrowAmount = new HashMap<>();
+        }
+
+        @Expose
+        public BitsStorage bits = new BitsStorage();
+
+        public static class BitsStorage {
+            @Expose
+            public int bits = -1;
+
+            @Expose
+            public FameRank currentFameRank = null;
+
+            @Expose
+            public int bitsToClaim = -1;
+        }
 
         @Expose
         public Map<LorenzVec, MinionConfig> minions = new HashMap<>();

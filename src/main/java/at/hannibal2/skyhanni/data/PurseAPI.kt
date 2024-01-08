@@ -5,16 +5,16 @@ import at.hannibal2.skyhanni.events.LorenzTickEvent
 import at.hannibal2.skyhanni.events.PurseChangeCause
 import at.hannibal2.skyhanni.events.PurseChangeEvent
 import at.hannibal2.skyhanni.utils.NumberUtil.formatNumber
-import at.hannibal2.skyhanni.utils.NumberUtil.milion
+import at.hannibal2.skyhanni.utils.NumberUtil.million
 import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
+import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraft.client.Minecraft
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
-class PurseAPI {
-    // TODO USE SH-REPO
-    private val pattern = "(Piggy|Purse): §6(?<coins>[\\d,]*).*".toPattern()
-    private var currentPurse = 0.0
+object PurseAPI {
+    val pursePattern by RepoPattern.pattern("data.purse.coins", "(Piggy|Purse): §6(?<coins>[\\d,]*(\\.\\d)?)( ?(§.)*\\([+-](?<earned>[\\w,.]+)\\)?|.*)?$")
     private var inventoryCloseTime = 0L
+    var currentPurse = 0.0
 
     @SubscribeEvent
     fun onInventoryClose(event: InventoryCloseEvent) {
@@ -23,9 +23,8 @@ class PurseAPI {
 
     @SubscribeEvent
     fun onTick(event: LorenzTickEvent) {
-
         for (line in ScoreboardData.sidebarLinesFormatted) {
-            val newPurse = pattern.matchMatcher(line) {
+            val newPurse = pursePattern.matchMatcher(line) {
                 group("coins").formatNumber().toDouble()
             } ?: continue
             val diff = newPurse - currentPurse
@@ -43,7 +42,7 @@ class PurseAPI {
                 return PurseChangeCause.GAIN_TALISMAN_OF_COINS
             }
 
-            if (diff == 15.milion || diff == 100.milion) {
+            if (diff == 15.million || diff == 100.million) {
                 return PurseChangeCause.GAIN_DICE_ROLL
             }
 

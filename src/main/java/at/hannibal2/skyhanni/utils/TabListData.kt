@@ -1,12 +1,14 @@
 package at.hannibal2.skyhanni.utils
 
 import at.hannibal2.skyhanni.SkyHanniMod
+import at.hannibal2.skyhanni.data.ProfileStorageData
 import at.hannibal2.skyhanni.events.LorenzTickEvent
 import at.hannibal2.skyhanni.events.TabListUpdateEvent
 import at.hannibal2.skyhanni.mixins.hooks.tabListGuard
 import at.hannibal2.skyhanni.mixins.transformers.AccessorGuiPlayerTabOverlay
 import at.hannibal2.skyhanni.utils.LorenzUtils.conditionalTransform
 import at.hannibal2.skyhanni.utils.LorenzUtils.transformIf
+import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import com.google.common.collect.ComparisonChain
 import com.google.common.collect.Ordering
@@ -23,6 +25,7 @@ class TabListData {
     companion object {
         private var cache = emptyList<String>()
         private var debugCache: List<String>? = null
+        var fullyLoaded = false
 
         // TODO replace with TabListUpdateEvent
         fun getTabList() = debugCache ?: cache
@@ -102,5 +105,16 @@ class TabListData {
             cache = tabList
             TabListUpdateEvent(getTabList()).postAndCatch()
         }
+    }
+
+    @SubscribeEvent
+    fun onTabListUpdate(event: TabListUpdateEvent) {
+        for (line in event.tabList) {
+            ProfileStorageData.profileTablistPattern.matchMatcher(line) {
+                fullyLoaded = true
+                return
+            }
+        }
+        fullyLoaded = false
     }
 }
