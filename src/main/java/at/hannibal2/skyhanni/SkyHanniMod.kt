@@ -165,6 +165,7 @@ import at.hannibal2.skyhanni.features.garden.contest.JacobContestFFNeededDisplay
 import at.hannibal2.skyhanni.features.garden.contest.JacobContestStatsSummary
 import at.hannibal2.skyhanni.features.garden.contest.JacobContestTimeNeeded
 import at.hannibal2.skyhanni.features.garden.contest.JacobFarmingContestsInventory
+import at.hannibal2.skyhanni.features.garden.contest.OpenContestInElitebotDev
 import at.hannibal2.skyhanni.features.garden.farming.ArmorDropTracker
 import at.hannibal2.skyhanni.features.garden.farming.CropMoneyDisplay
 import at.hannibal2.skyhanni.features.garden.farming.CropSpeedMeter
@@ -562,6 +563,7 @@ class SkyHanniMod {
         loadModule(JoinCrystalHollows())
         loadModule(CrystalHollowsNamesInCore())
         loadModule(GardenVisitorColorNames)
+        loadModule(OpenContestInElitebotDev())
         loadModule(TeleportPadCompactName())
         loadModule(AnitaMedalProfit())
         loadModule(AnitaExtraFarmingFortune())
