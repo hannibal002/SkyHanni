@@ -206,9 +206,10 @@ enum class DiscordStatus(private val displayMessageSupplier: Supplier<String>?) 
         var profile = "SkyBlock Level: [$sbLevel] on "
 
         profile += when {
-            HypixelData.ironman -> "♲"
-            HypixelData.bingo -> "Ⓑ"
-            HypixelData.stranded -> "☀"
+
+            LorenzUtils.isIronmanProfile -> "♲"
+            LorenzUtils.isBingoProfile -> "Ⓑ"
+            LorenzUtils.isStrandedProfile -> "☀"
             else -> ""
         }
 
