@@ -36,6 +36,6 @@ class PetCandyUsedDisplay {
 
     @SubscribeEvent
     fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
-        event.move(19, "misc.petCandyUsed", "misc.petCandy.showCandy")
+        event.move(22, "misc.petCandyUsed", "misc.petCandy.showCandy")
     }
 }
