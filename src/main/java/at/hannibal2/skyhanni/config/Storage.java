@@ -1,7 +1,7 @@
 package at.hannibal2.skyhanni.config;
 
 import at.hannibal2.skyhanni.data.FameRank;
-import at.hannibal2.skyhanni.data.QuiverArrowType;
+import at.hannibal2.skyhanni.data.jsonobjects.repo.ArrowType;
 import at.hannibal2.skyhanni.data.model.ComposterUpgrade;
 import at.hannibal2.skyhanni.features.bingo.card.goals.BingoGoal;
 import at.hannibal2.skyhanni.features.combat.endernodetracker.EnderNodeTracker;
@@ -136,10 +136,10 @@ public class Storage {
 
         public static class ArrowsStorage {
             @Expose
-            public QuiverArrowType currentArrow = null;
+            public ArrowType currentArrow = null;
 
             @Expose
-            public Map<QuiverArrowType, Float> arrowAmount = new HashMap<>();
+            public Map<ArrowType, Float> arrowAmount = new HashMap<>();
         }
 
         @Expose

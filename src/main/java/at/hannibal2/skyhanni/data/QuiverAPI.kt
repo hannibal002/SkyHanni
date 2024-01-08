@@ -1,6 +1,8 @@
 package at.hannibal2.skyhanni.data
 
 import at.hannibal2.skyhanni.SkyHanniMod
+import at.hannibal2.skyhanni.data.jsonobjects.repo.ArrowType
+import at.hannibal2.skyhanni.data.jsonobjects.repo.ArrowTypeJson
 import at.hannibal2.skyhanni.data.jsonobjects.repo.ItemsJson
 import at.hannibal2.skyhanni.events.ConfigLoadEvent
 import at.hannibal2.skyhanni.events.InventoryFullyOpenedEvent
@@ -13,6 +15,7 @@ import at.hannibal2.skyhanni.utils.ItemUtils.getInternalNameOrNull
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.LocationUtils.distanceToPlayer
 import at.hannibal2.skyhanni.utils.LorenzUtils
+import at.hannibal2.skyhanni.utils.NEUInternalName
 import at.hannibal2.skyhanni.utils.NEUInternalName.Companion.asInternalName
 import at.hannibal2.skyhanni.utils.NumberUtil.formatNumber
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getEnchantments
@@ -28,9 +31,10 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 private var infinityQuiverLevelMultiplier = 0.03f
 
 object QuiverAPI {
-    var currentArrow: QuiverArrowType? = null
+    var currentArrow: ArrowType? = null
     var currentAmount: Int = 0
-    var arrowAmount: MutableMap<QuiverArrowType, Float> = mutableMapOf()
+    var arrowAmount: MutableMap<ArrowType, Float> = mutableMapOf()
+    var arrows: List<ArrowType> = listOf()
 
     private val fakeBows = listOf("BOSS_SPIRIT_BOW".asInternalName())
 
@@ -52,7 +56,7 @@ object QuiverAPI {
 
         selectPattern.matchMatcher(message) {
             val arrow = group("arrow")
-            currentArrow = QuiverArrowType.entries.find { arrow.contains(it.arrow) } ?: QuiverArrowType.NONE
+            currentArrow = getByNameOrNull(arrow) ?: return
             currentAmount = arrowAmount[currentArrow]?.toInt() ?: 0
 
             return saveArrowType()
@@ -62,7 +66,7 @@ object QuiverAPI {
             val type = group("type")
             val amount = group("amount").formatNumber().toFloat()
 
-            val filledUpType = QuiverArrowType.entries.find { type.contains(it.arrow) } ?: return
+            val filledUpType = getByNameOrNull(type) ?: return
 
             val existingAmount = arrowAmount[filledUpType] ?: 0f
             val newAmount = existingAmount + amount
@@ -73,10 +77,10 @@ object QuiverAPI {
 
         fillUpPattern.matchMatcher(message) {
             val flintAmount = group("flintAmount").formatNumber().toFloat()
-            val existingAmount = arrowAmount[QuiverArrowType.FLINT] ?: 0.0f
+            val existingAmount = arrowAmount[getByNameOrNull("ARROW".asInternalName())] ?: 0f
             val newAmount = existingAmount + flintAmount
 
-            arrowAmount[QuiverArrowType.FLINT] = newAmount
+            arrowAmount[getByNameOrFlint("ARROW".asInternalName())] = newAmount
 
             return saveArrowAmount()
         }
@@ -107,7 +111,7 @@ object QuiverAPI {
             val arrow = stack.getInternalNameOrNull() ?: continue
             val amount = stack.stackSize
 
-            val arrowType = QuiverArrowType.entries.find { arrow == it.internalName } ?: continue
+            val arrowType = getByNameOrNull(arrow) ?: continue
             val arrowAmount = amount + (this.arrowAmount[arrowType] ?: 0.0f)
 
             this.arrowAmount[arrowType] = arrowAmount
@@ -152,17 +156,36 @@ object QuiverAPI {
         }
     }
 
+    fun getByNameOrNull(name: String): ArrowType? {
+        return arrows.firstOrNull { it.arrow == name }
+    }
+    fun getByNameOrNull(internalName: NEUInternalName): ArrowType? {
+        return arrows.firstOrNull { it.internalName == internalName.asString() }
+    }
+
+    fun getByNameOrFlint(name: String): ArrowType {
+        return getByNameOrNull(name) ?: getByNameOrNull("ARROW".asInternalName())!!
+    }
+
+    fun getByNameOrFlint(internalName: NEUInternalName): ArrowType {
+        return getByNameOrNull(internalName) ?: getByNameOrNull("ARROW".asInternalName())!!
+    }
+
+
     // Handle Storage data
     @SubscribeEvent
     fun onRepoReload(event: RepositoryReloadEvent) {
-        val data = event.getConstant<ItemsJson>("Items")
-        infinityQuiverLevelMultiplier = data.enchant_multiplier["infinite_quiver"] ?: 0.03f
+        val itemData = event.getConstant<ItemsJson>("Items")
+        infinityQuiverLevelMultiplier = itemData.enchant_multiplier["infinite_quiver"] ?: 0.03f
+
+        val arrowData = event.getConstant<ArrowTypeJson>("ArrowTypes")
+        arrows = arrowData.arrow_type
     }
 
     @SubscribeEvent
     fun onConfigLoad(event: ConfigLoadEvent) {
         val config = ProfileStorageData.profileSpecific ?: return
-        currentArrow = config.arrows.currentArrow ?: QuiverArrowType.FLINT
+        currentArrow = config.arrows.currentArrow ?: null
         arrowAmount = config.arrows.arrowAmount ?: mutableMapOf()
         currentAmount = arrowAmount[currentArrow]?.toInt() ?: 0
     }
@@ -170,7 +193,7 @@ object QuiverAPI {
     @SubscribeEvent
     fun onProfileJoin(event: ProfileJoinEvent) {
         val config = ProfileStorageData.profileSpecific ?: return
-        currentArrow = config.arrows.currentArrow ?: QuiverArrowType.FLINT
+        currentArrow = config.arrows.currentArrow ?: null
         arrowAmount = config.arrows.arrowAmount ?: mutableMapOf()
         currentAmount = arrowAmount[currentArrow]?.toInt() ?: 0
     }

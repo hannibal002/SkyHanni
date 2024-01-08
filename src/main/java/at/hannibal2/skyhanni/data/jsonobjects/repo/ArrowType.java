@@ -2,9 +2,10 @@ package at.hannibal2.skyhanni.data.jsonobjects.repo;
 
 import com.google.gson.annotations.Expose;
 
-import java.util.List;
-
-public class MaxwellPowersJson {
+public class ArrowType {
     @Expose
-    public List<String> maxwell_powers;
+    public String arrow;
+
+    @Expose
+    public String internalName;
 }

@@ -4,7 +4,7 @@ import com.google.gson.annotations.Expose;
 
 import java.util.List;
 
-public class MaxwellPowersJson {
+public class ArrowTypeJson {
     @Expose
-    public List<String> maxwell_powers;
+    public List<ArrowType> arrow_type;
 }
