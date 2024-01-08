@@ -141,13 +141,13 @@ class PestFinder {
             }
         }
 
+        if (newPests != PestAPI.scoreboardPests) {
+            removePests(PestAPI.scoreboardPests - newPests)
+            PestAPI.scoreboardPests = newPests
+            update()
+        }
+
         resetAllPests(newPests)
-
-        if (newPests == PestAPI.scoreboardPests) return
-
-        removePests(PestAPI.scoreboardPests - newPests)
-        PestAPI.scoreboardPests = newPests
-        update()
     }
 
     // Auto fixing plots marked as pests when killing all pests without SkyHanni earlier.
