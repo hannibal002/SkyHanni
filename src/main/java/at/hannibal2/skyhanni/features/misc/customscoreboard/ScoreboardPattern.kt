@@ -75,7 +75,7 @@ object ScoreboardPattern {
     val magmaBossPattern by combatSb.pattern("magmaboss", "^§7Boss: §[c6e]\\d{1,3}%$")
     val damageSoakedPattern by combatSb.pattern("damagesoaked", "^§7Damage Soaked:")
     val killMagmasPattern by combatSb.pattern("killmagmas", "^§6Kill the Magmas:$")
-    val killMagmasDamagedSoakedBarPattern by combatSb.pattern("killmagmasbar", "^((§.)?▎+)+.*$")
+    val killMagmasDamagedSoakedBarPattern by combatSb.pattern("killmagmasbar", "^((§.)*▎+)+.*$")
     val reformingPattern by combatSb.pattern("reforming", "^§cThe boss is reforming!$")
     val bossHealthPattern by combatSb.pattern("bosshealth", "^§7Boss Health:$")
     val bossHealthBarPattern by combatSb.pattern("bosshealthbar", "^§.(\\d{1,2}(\\.\\d)?M|\\d{1,3}k)§f/§a10M§c❤$")
