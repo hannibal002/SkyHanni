@@ -49,7 +49,7 @@ object UniqueGiftingOpportunitiesFeatures {
 
     private val config get() = SkyHanniMod.feature.event.winter.giftingOpportunities
 
-    private fun isEnabled() = LorenzUtils.inSkyBlock && config.enabled && WinterAPI.isDecember() && holdingGift
+    private fun isEnabled() = holdingGift
 
     private val hasNotGiftedNametag = "§a§lꤥ"
     private val hasGiftedNametag = "§c§lꤥ"
@@ -104,6 +104,12 @@ object UniqueGiftingOpportunitiesFeatures {
 
     @SubscribeEvent
     fun onTick(event: LorenzTickEvent) {
+        holdingGift = false
+
+        if (!LorenzUtils.inSkyBlock) return
+        if (!config.enabled) return
+        if (!WinterAPI.isDecember()) return
+
         holdingGift = !config.highlighWithGiftOnly || giftNamePattern.matches(InventoryUtils.itemInHandId.asString())
     }
 }
