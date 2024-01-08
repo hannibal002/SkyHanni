@@ -5,12 +5,11 @@ import at.hannibal2.skyhanni.data.BitsAPI
 import at.hannibal2.skyhanni.data.HypixelData
 import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.data.MaxwellAPI
-import at.hannibal2.skyhanni.data.MaxwellPowers
 import at.hannibal2.skyhanni.data.MayorAPI
 import at.hannibal2.skyhanni.data.PartyAPI
 import at.hannibal2.skyhanni.data.PurseAPI
 import at.hannibal2.skyhanni.data.QuiverAPI
-import at.hannibal2.skyhanni.data.QuiverArrowType
+import at.hannibal2.skyhanni.data.QuiverAPI.getByNameOrNull
 import at.hannibal2.skyhanni.data.ScoreboardData
 import at.hannibal2.skyhanni.data.SlayerAPI
 import at.hannibal2.skyhanni.features.misc.customscoreboard.CustomScoreboardUtils.formatNum
@@ -20,6 +19,7 @@ import at.hannibal2.skyhanni.mixins.hooks.replaceString
 import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.LorenzUtils.inDungeons
 import at.hannibal2.skyhanni.utils.LorenzUtils.nextAfter
+import at.hannibal2.skyhanni.utils.NEUInternalName.Companion.asInternalName
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.RenderUtils.AlignmentEnum
 import at.hannibal2.skyhanni.utils.StringUtils.firstLetterUppercase
@@ -414,17 +414,16 @@ private fun getLobbyDisplayPair(): List<ScoreboardElement> {
 }
 
 private fun getPowerDisplayPair() = when (MaxwellAPI.currentPower) {
-    MaxwellPowers.UNKNOWN -> listOf("§cOpen \"Your Bags\"!" to AlignmentEnum.LEFT)
     null -> listOf("§cOpen \"Your Bags\"!" to AlignmentEnum.LEFT)
     else ->
         when (displayConfig.displayNumbersFirst) {
             true -> listOf(
-                "${MaxwellAPI.currentPower?.power?.replace("Power","")} Power " +
+                "${MaxwellAPI.currentPower?.replace("Power", "")} Power " +
                     "§7(§6${MaxwellAPI.magicalPower}§7)" to AlignmentEnum.LEFT
             )
 
             false -> listOf(
-                "Power: ${MaxwellAPI.currentPower?.power?.replace("Power","")} " +
+                "Power: ${MaxwellAPI.currentPower?.replace("Power", "")} " +
                     "§7(§6${MaxwellAPI.magicalPower}§7)" to AlignmentEnum.LEFT
             )
         }
@@ -476,9 +475,9 @@ private fun getSlayerDisplayPair(): List<ScoreboardElement> {
         (if (SlayerAPI.hasActiveSlayerQuest()) "§cSlayer" else "<hidden>") to AlignmentEnum.LEFT
     ) + (
         " §7- §e${SlayerAPI.latestSlayerCategory.trim()}" to AlignmentEnum.LEFT
-    ) + (
+        ) + (
         " §7- §e${SlayerAPI.latestSlayerProgress.trim()}" to AlignmentEnum.LEFT
-    )
+        )
 }
 
 private fun getSlayerShowWhen() = listOf(
@@ -491,12 +490,17 @@ private fun getSlayerShowWhen() = listOf(
 ).contains(HypixelData.skyBlockIsland)
 
 private fun getQuiverDisplayPair(): List<ScoreboardElement> {
-    if (QuiverAPI.currentArrow == null) return listOf("§cChange your Arrow once" to AlignmentEnum.LEFT)
-    if (QuiverAPI.currentArrow == QuiverArrowType.NONE) return listOf("No Arrows selected" to AlignmentEnum.LEFT)
+    if (QuiverAPI.currentArrow == null)
+        return listOf("§cChange your Arrow once" to AlignmentEnum.LEFT)
+    if (QuiverAPI.currentArrow == getByNameOrNull("NONE".asInternalName()))
+        return listOf("No Arrows selected" to AlignmentEnum.LEFT)
+
     return when (displayConfig.displayNumbersFirst) {
         true -> listOf("${QuiverAPI.currentAmount.addSeparators()} ${QuiverAPI.currentArrow?.arrow} ")
-        false -> listOf("§f${QuiverAPI.currentArrow?.arrow?.replace("Arrow", "")}: " +
-            "${QuiverAPI.currentAmount.addSeparators()} Arrows")
+        false -> listOf(
+            "§f${QuiverAPI.currentArrow?.arrow?.replace("Arrow", "")}: " +
+                "${QuiverAPI.currentAmount.addSeparators()} Arrows"
+        )
     }.map { it to AlignmentEnum.LEFT }
 }
 
