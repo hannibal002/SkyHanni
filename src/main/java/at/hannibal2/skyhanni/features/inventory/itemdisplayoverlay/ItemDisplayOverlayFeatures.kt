@@ -71,7 +71,7 @@ object ItemDisplayOverlayFeatures : AbstractStackSize() {
     private val masterStarInternalNamePattern by itemDisplayOverlaySubgroup.pattern(("masterstar.internalname"), ("(?<tier>[A-Z])+_MASTER_STAR"))
     private val petLevelItemNamePattern by itemDisplayOverlaySubgroup.pattern(("petlevel.itemname"), ("\\[Lvl (?<level>.*)] .*"))
     private val shredderBonusDamageLoreLinePattern by itemDisplayOverlaySubgroup.pattern(("shredderbonusdamage.loreline"), ("(§.)?Bonus Damage \\([0-9]+ cap\\): (§.)?(?<dmgbonus>[0-9]+)"))
-    private val bottleOfJerryLoreLinePattern by itemDisplayOverlaySubgroup.pattern(("bottleofjerry.loreline"), ("(§.)?Intelligence Bonus: (§.)?(?<intelbonus>[0-9]+)"))
+    private val legacyBottleOfJerryIntelBonusLoreLinePattern by itemDisplayOverlaySubgroup.pattern(("legacybottleofjerryintelbonus.loreline"), ("(§.)?Intelligence Bonus: (§.)?(?<intelbonus>[0-9]+)"))
     private val gardenVacuumLoreLinePattern by itemDisplayOverlaySubgroup.pattern(("gardenvacuum.loreline"), ("§7Vacuum Bag: §6(?<amount>[0-9,]+) Pests?"))
     private val masterSkullInternalNamePattern by itemDisplayOverlaySubgroup.pattern(("masterskull.internalname"), ("MASTER_SKULL_TIER_(?<tier>\\d)"))
     private val dungeonBossHeadInternalNamePattern by itemDisplayOverlaySubgroup.pattern(("dungeonbosshead.internalname"), ("(GOLD(EN)?|DIAMOND)_(?<dungeonBoss>[\\w]+)_HEAD"))
@@ -340,7 +340,7 @@ object ItemDisplayOverlayFeatures : AbstractStackSize() {
     private fun isLegacyBottleOfJyrre(internalName: NEUInternalName): Boolean = BOTTLE_OF_JYRRE.isSelected() && internalName == legacyBottleOfJyrreInternalName
     private fun getLegacyBottleOfJyrreTip(lore: List<String>): String {
         for (line in lore) {
-            bottleOfJerryLoreLinePattern.matchMatcher(line) { return "§2${group("intelbonus")}" } //2 is a darker shade of color code a
+            legacyBottleOfJerryIntelBonusLoreLinePattern.matchMatcher(line) { return "§2${group("intelbonus")}" } //2 is a darker shade of color code a
         }
         return ""
     }
