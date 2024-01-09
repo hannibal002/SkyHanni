@@ -4,7 +4,6 @@ import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 
 enum class PowderChestReward(val displayName: String, pattern: String) {
 
-
     MITHRIL_POWDER("§aMithril Powder", "§aYou received §r§b[+](?<amount>.*) §r§aMithril Powder."),
     GEMSTONE_POWDER("§dGemstone Powder", "§aYou received §r§b[+](?<amount>.*) §r§aGemstone Powder."),
 
@@ -152,5 +151,5 @@ enum class PowderChestReward(val displayName: String, pattern: String) {
 
     val chatPattern by RepoPattern.pattern("mining.powder.tracker.reward." + this.patternName(), pattern)
 
-    private fun PowderChestReward.patternName() = name.lowercase().replace("_", "")
+    private fun patternName() = name.lowercase().replace("_", "")
 }
