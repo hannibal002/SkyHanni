@@ -427,13 +427,7 @@ object ItemDisplayOverlayFeatures : AbstractStackSize() {
 
     private fun isYetiRod(internalName: NEUInternalName): Boolean = YETI_ROD.isSelected() && internalName == yetiRodInternalName
     private fun getYetiRodTip(item: ItemStack): String {
-        val kills = "${item.getFishesCaught()}"
-        if (kills == "null") { return "" }
-        return if (kills.length >= 4) {
-            "100"
-        } else {
-            (kills.dropLast(1))
-        }
+        item.getFishesCaught().let { return if ("$it" == "null") "" else if ("$it".length >= 4) "100" else "$it".dropLast(1) }
     }
 
     private fun isShredder(internalName: NEUInternalName): Boolean = SHREDDER.isSelected() && internalName == shredderInternalName
@@ -510,12 +504,10 @@ object ItemDisplayOverlayFeatures : AbstractStackSize() {
 
     private fun isQualifiedForStacking(itemName: String): Boolean = STACKING_ENCHANTMENT.isSelected() && doesNotIncludeDungeonStarsItemNamePattern.matches(itemName)
     private fun getStackingEnchantmentTierTip(item: ItemStack): String {
-        val possibleEnchantments = item.getEnchantments()
-        if (possibleEnchantments != null) {
+        item.getEnchantments().let {
             for (enchant in tieredEnchants) {
-                if (possibleEnchantments[enchant] != null && possibleEnchantments[enchant] != -1) {
-                    return "${possibleEnchantments[enchant]}"
-                }
+                val theEnchant = it?.get(enchant)
+                if (theEnchant != null && theEnchant != -1) return "$theEnchant"
             }
         }
         return ""
