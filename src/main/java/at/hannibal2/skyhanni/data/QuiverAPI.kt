@@ -41,7 +41,7 @@ object QuiverAPI {
     private val selectPattern by group.pattern("select", "§aYou set your selected arrow type to §f(?<arrow>.*)§a!")
     private val fillUpJaxPattern by group.pattern(
         "fillupjax",
-        "§aJax forged §f(?<type>.*)§8 x(?<amount>.*) §afor §6(?<coins>.*) Coins§a!"
+        "(§.)*Jax forged (§.)*(?<type>.*)(§.)* x(?<amount>.*)( (§.)*for (§.)*(?<coins>.*) Coins)?(§.)*!"
     )
     private val fillUpPattern by group.pattern(
         "fillup",
