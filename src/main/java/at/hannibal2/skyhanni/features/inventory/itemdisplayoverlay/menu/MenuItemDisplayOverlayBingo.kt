@@ -44,12 +44,7 @@ class MenuItemDisplayOverlayBingo : AbstractMenuStackSize() {
 
             if (stackSizeConfig.contains(StackSizeMenuConfig.Bingo.ROW_COLUMN_DIAGONAL_PROGRESS)) {
                 rowColumnDiagonalItemNamePattern.matchMatcher(itemName) {
-                    if (lore.lastOrNull() == "§aBINGO!") {
-                        return /* if (SkyHanniMod.feature.chroma.enabled) "§z✔" else */ greenCheckmark
-                    }
-                    else if (lore.lastOrNull() == "§cINCOMPLETE") {
-                        return bigRedCross
-                    }
+                    return if (lore.lastOrNull() == "§aBINGO!") greenCheckmark else if (lore.lastOrNull() == "§cINCOMPLETE") bigRedCross else ""
                 }
             }
 
