@@ -227,7 +227,6 @@ private fun getPurseDisplayPair(): List<ScoreboardElement> {
     var purse = PurseAPI.currentPurse.toString().formatNum()
 
     val earned = getGroupFromPattern(ScoreboardData.sidebarLinesFormatted, PurseAPI.pursePattern, "earned")
-        .formatNum()
 
     if (earned != "0") {
         purse += " §7(§e+$earned§7)§6"
