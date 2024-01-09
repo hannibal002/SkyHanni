@@ -1,7 +1,7 @@
 package at.hannibal2.skyhanni.config;
 
+import at.hannibal2.skyhanni.data.ArrowType;
 import at.hannibal2.skyhanni.data.FameRank;
-import at.hannibal2.skyhanni.data.jsonobjects.repo.ArrowType;
 import at.hannibal2.skyhanni.data.model.ComposterUpgrade;
 import at.hannibal2.skyhanni.features.bingo.card.goals.BingoGoal;
 import at.hannibal2.skyhanni.features.combat.endernodetracker.EnderNodeTracker;
@@ -30,8 +30,6 @@ import at.hannibal2.skyhanni.utils.LorenzVec;
 import at.hannibal2.skyhanni.utils.NEUInternalName;
 import at.hannibal2.skyhanni.utils.tracker.SkyHanniTracker;
 import com.google.gson.annotations.Expose;
-import net.minecraft.item.ItemStack;
-
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -39,6 +37,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
+import net.minecraft.item.ItemStack;
 
 public class Storage {
 
@@ -170,9 +169,9 @@ public class Storage {
             @Override
             public String toString() {
                 return "MinionConfig{" +
-                        "displayName='" + displayName + '\'' +
-                        ", lastClicked=" + lastClicked +
-                        '}';
+                    "displayName='" + displayName + '\'' +
+                    ", lastClicked=" + lastClicked +
+                    '}';
             }
         }
 
@@ -427,11 +426,11 @@ public class Storage {
             @Override
             public String toString() {
                 return "SlayerRngMeterStorage{" +
-                        "currentMeter=" + currentMeter +
-                        ", gainPerBoss=" + gainPerBoss +
-                        ", goalNeeded=" + goalNeeded +
-                        ", itemGoal='" + itemGoal + '\'' +
-                        '}';
+                    "currentMeter=" + currentMeter +
+                    ", gainPerBoss=" + gainPerBoss +
+                    ", goalNeeded=" + goalNeeded +
+                    ", itemGoal='" + itemGoal + '\'' +
+                    '}';
             }
         }
 

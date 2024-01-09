@@ -1,7 +1,6 @@
 package at.hannibal2.skyhanni.data
 
 import at.hannibal2.skyhanni.SkyHanniMod
-import at.hannibal2.skyhanni.data.jsonobjects.repo.ArrowType
 import at.hannibal2.skyhanni.data.jsonobjects.repo.ArrowTypeJson
 import at.hannibal2.skyhanni.data.jsonobjects.repo.ItemsJson
 import at.hannibal2.skyhanni.events.ConfigLoadEvent
@@ -159,6 +158,7 @@ object QuiverAPI {
     fun getByNameOrNull(name: String): ArrowType? {
         return arrows.firstOrNull { it.arrow == name }
     }
+
     fun getByNameOrNull(internalName: NEUInternalName): ArrowType? {
         return arrows.firstOrNull { it.internalName == internalName.asString() }
     }
@@ -179,7 +179,7 @@ object QuiverAPI {
         infinityQuiverLevelMultiplier = itemData.enchant_multiplier["infinite_quiver"] ?: 0.03f
 
         val arrowData = event.getConstant<ArrowTypeJson>("ArrowTypes")
-        arrows = arrowData.arrows
+        arrows = arrowData.arrows.map { ArrowType(it.key, it.value.internalName) }
     }
 
     @SubscribeEvent
