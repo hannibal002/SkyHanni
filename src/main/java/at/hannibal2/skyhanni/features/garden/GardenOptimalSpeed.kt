@@ -20,7 +20,12 @@ import kotlin.time.Duration.Companion.seconds
 class GardenOptimalSpeed {
     private val config get() = GardenAPI.config.optimalSpeeds
     private val configCustomSpeed get() = config.customSpeed
-    private var currentSpeed = 100
+    private var _currentSpeed = 100
+    private var currentSpeed: Int
+        get() = (_currentSpeed * (if (Minecraft.getMinecraft().thePlayer.isSneaking) 0.3 else 1.0)).toInt()
+        set(value) {
+            _currentSpeed = value
+        }
     private var optimalSpeed = -1
     private val currentSpeedPattern = " Speed: §r§f✦(?<speed>.*)".toPattern()
     private var lastWarnTime = 0L
