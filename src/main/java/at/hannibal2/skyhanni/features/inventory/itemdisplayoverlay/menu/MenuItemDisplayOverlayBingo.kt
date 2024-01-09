@@ -8,7 +8,6 @@ import at.hannibal2.skyhanni.utils.ItemUtils.cleanName
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.NumberUtil
 import at.hannibal2.skyhanni.utils.NumberUtil.formatNumber
-import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
 import net.minecraft.item.ItemStack
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
@@ -46,7 +45,7 @@ class MenuItemDisplayOverlayBingo : AbstractMenuStackSize() {
             if (stackSizeConfig.contains(StackSizeMenuConfig.Bingo.ROW_COLUMN_DIAGONAL_PROGRESS)) {
                 rowColumnDiagonalItemNamePattern.matchMatcher(itemName) {
                     if (lore.lastOrNull() == "§aBINGO!") {
-                        return "§a§z✔"
+                        return /* if (SkyHanniMod.feature.chroma.enabled) "§z✔" else */ greenCheckmark
                     }
                     else if (lore.lastOrNull() == "§cINCOMPLETE") {
                         return bigRedCross
