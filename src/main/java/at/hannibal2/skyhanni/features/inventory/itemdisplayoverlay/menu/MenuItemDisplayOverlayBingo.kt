@@ -36,8 +36,7 @@ class MenuItemDisplayOverlayBingo : AbstractMenuStackSize() {
             if (stackSizeConfig.contains(StackSizeMenuConfig.Bingo.SECRET_BINGO_DISCOVERY) && (lore.lastOrNull() == "§aGOAL REACHED")) {
                 for (line in lore) {
                     secretBingoDiscoveryLoreLinePattern.matchMatcher(line) {
-                        val nth = group("rank").formatNumber()
-                        if (nth < 10000) return "§6${NumberUtil.format(nth)}"
+                        group("rank").formatNumber().let { if (it < 10000) return "§6${NumberUtil.format(it)}" }
                     }
                 }
             }
