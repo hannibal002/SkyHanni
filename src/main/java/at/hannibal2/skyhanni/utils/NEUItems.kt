@@ -192,8 +192,8 @@ object NEUItems {
             ErrorManager.logError(
                 IllegalStateException("Something went wrong!"),
                 "Encountered an error getting the item for §7$this§c. " +
-                        "This may be because your NEU repo is outdated. Please ask in the SkyHanni " +
-                        "Discord if this is the case"
+                    "This may be because your NEU repo is outdated. Please ask in the SkyHanni " +
+                    "Discord if this is the case"
             )
             fallbackItem
         }
@@ -221,7 +221,7 @@ object NEUItems {
 
         GlStateManager.pushMatrix()
 
-        GlStateManager.translate(translateX, translateY, 1F)
+        GlStateManager.translate(translateX, translateY, -100f)
         GlStateManager.scale(finalScale, finalScale, 1.0)
 
         RenderHelper.enableGUIStandardItemLighting()
@@ -326,11 +326,11 @@ object NEUItems {
             val name = group("name").trim { it <= ' ' }
             val ultimate = group("format").lowercase().contains("§l")
             ((if (ultimate && name != "Ultimate Wise") "ULTIMATE_" else "")
-                    + turboCheck(name).replace(" ", "_").replace("-", "_").uppercase()
-                    + ";" + group("level").romanToDecimal())
+                + turboCheck(name).replace(" ", "_").replace("-", "_").uppercase()
+                + ";" + group("level").romanToDecimal())
         }
 
-    //Uses NEU
+    // Uses NEU
     fun saveNBTData(item: ItemStack, removeLore: Boolean = true): String {
         val jsonObject = manager.getJsonForItem(item)
         if (!jsonObject.has("internalname")) {
