@@ -497,7 +497,7 @@ private fun getQuiverDisplayPair(): List<ScoreboardElement> {
     return when (displayConfig.displayNumbersFirst) {
         true -> listOf("${QuiverAPI.currentAmount.addSeparators()} ${QuiverAPI.currentArrow?.arrow} ")
         false -> listOf(
-            "§f${QuiverAPI.currentArrow?.arrow?.replace("Arrow", "")}: " +
+            "§f${QuiverAPI.currentArrow?.arrow?.replace(" Arrow", "")}: " +
                 "${QuiverAPI.currentAmount.addSeparators()} Arrows"
         )
     }.map { it to AlignmentEnum.LEFT }
