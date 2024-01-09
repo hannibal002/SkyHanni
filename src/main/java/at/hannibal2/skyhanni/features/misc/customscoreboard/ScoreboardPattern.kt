@@ -17,7 +17,7 @@ object ScoreboardPattern {
     val copperPattern by mainSb.pattern("copper", "^(§.)*Copper: (§.)*(?<copper>[\\d,]+).*$")
     val locationPattern by mainSb.pattern("location", "^\\s*(?<location>(§7⏣|§5ф) .*)$")
     val lobbyCodePattern by mainSb.pattern ("lobbycode", "^\\s*§.((\\d{2}/\\d{2}/\\d{2})|Server closing: [\\d:]+) §8(?<code>.*)\$")
-    val datePattern by mainSb.pattern("date", "^\\s*(Late |Early )?(Spring|Summer|Autumn|Winter) \\d{1,2}(st|nd|rd|th)?")
+    val datePattern by mainSb.pattern("date", "^\\s*(Late |Early )?(Spring|Summer|Autumn|Winter) \\d{1,2}(st|nd|rd|th)?.*")
     val timePattern by mainSb.pattern("time", "^\\s*§7\\d{1,2}:\\d{2}(?:am|pm) (?<symbol>(§b☽|§e☀|§.⚡|§.☔)).*$")
     val footerPattern by mainSb.pattern("footer", "§e(www|alpha).hypixel.net\$")
     val yearVotesPattern by mainSb.pattern("yearvotes", "(?<yearvotes>^§6Year \\d+ Votes\$)")
