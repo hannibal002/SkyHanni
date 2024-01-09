@@ -179,7 +179,7 @@ object QuiverAPI {
         infinityQuiverLevelMultiplier = itemData.enchant_multiplier["infinite_quiver"] ?: 0.03f
 
         val arrowData = event.getConstant<ArrowTypeJson>("ArrowTypes")
-        arrows = arrowData.arrows.map { ArrowType(it.key, it.value.internalName) }
+        arrows = arrowData.arrows.map { ArrowType(it.value.arrow, it.key) }
     }
 
     @SubscribeEvent

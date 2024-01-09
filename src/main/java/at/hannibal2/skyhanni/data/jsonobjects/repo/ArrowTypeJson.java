@@ -9,6 +9,6 @@ public class ArrowTypeJson {
 
     public static class ArrowAttributes {
         @Expose
-        public String internalName;
+        public String arrow;
     }
 }
