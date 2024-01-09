@@ -22,12 +22,15 @@ import io.github.moulberry.notenoughupdates.recipes.NeuRecipe
 import io.github.moulberry.notenoughupdates.util.ItemResolutionQuery
 import io.github.moulberry.notenoughupdates.util.Utils
 import net.minecraft.client.Minecraft
+import net.minecraft.client.renderer.GLAllocation
 import net.minecraft.client.renderer.GlStateManager
 import net.minecraft.client.renderer.RenderHelper
 import net.minecraft.init.Blocks
 import net.minecraft.init.Items
 import net.minecraft.item.ItemStack
 import net.minecraft.nbt.NBTTagCompound
+import org.lwjgl.opengl.GL11
+import java.nio.FloatBuffer
 import java.util.regex.Pattern
 
 object NEUItems {
@@ -201,6 +204,15 @@ object NEUItems {
     fun isVanillaItem(item: ItemStack): Boolean =
         manager.auctionManager.isVanillaItem(item.getInternalName().asString())
 
+    val itemLightBuffer = GLAllocation.createDirectFloatBuffer(16);
+
+    private fun setColorBuffer(f: Float, g: Float, h: Float, i: Float): FloatBuffer {
+        itemLightBuffer.clear()
+        itemLightBuffer.put(f).put(g).put(h).put(i)
+        itemLightBuffer.flip()
+        return itemLightBuffer
+    }
+
     fun ItemStack.renderOnScreen(x: Float, y: Float, scaleMultiplier: Double = 1.0) {
         val item = checkBlinkItem()
         val isSkull = item.item === Items.skull
@@ -221,10 +233,17 @@ object NEUItems {
 
         GlStateManager.pushMatrix()
 
-        GlStateManager.translate(translateX, translateY, -100f)
-        GlStateManager.scale(finalScale, finalScale, 1.0)
+        GlStateManager.translate(translateX, translateY, -19f)
+        GlStateManager.scale(finalScale, finalScale, 0.2)
+        GL11.glNormal3f(0f, 0f, 1f / 0.2f)
 
         RenderHelper.enableGUIStandardItemLighting()
+        val lightIntensity = 2f // Adjust as needed
+        val g = 0.6f // Value taken from RenderHelper
+
+        GL11.glLight(16384, 4609, setColorBuffer(g * lightIntensity, g * lightIntensity, g * lightIntensity, 1.0f))
+        GL11.glLight(16385, 4609, setColorBuffer(g * lightIntensity, g * lightIntensity, g * lightIntensity, 1.0f))
+
         Minecraft.getMinecraft().renderItem.renderItemIntoGUI(item, 0, 0)
         RenderHelper.disableStandardItemLighting()
 
