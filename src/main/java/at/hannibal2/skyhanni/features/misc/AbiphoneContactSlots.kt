@@ -17,14 +17,14 @@ class AbiphoneContactSlots {
     private val couldNotCalculateNotice: String = " §8Could not calculate contact slots. [SkyHanni]"
     private val abiphoneContactSlotsGroup = RepoPattern.group("abiphone.contact.slots")
     private val isAbiphoneInternalNamePattern by abiphoneContactSlotsGroup.pattern(("isabiphone.internalname"), ("ABIPHONE_.*")) //is it even worth it (assuming, well, *possible at all*) to increase contact slots on the abingohpone?
-    private val maximumContactSlotsLoreLinePattern by abiphoneContactSlotsGroup.pattern(("maximumcontactslots.loreline"), ("(?: )?(?:§.)Maximum Contacts: (?:(?:§.)+(?<base>[\\d]+))(?: ?)(?:(?:§.)*\\(\\+(?<one>[\\d]+)\\)(?:§.)*)?(?: ?)(?:(?:§.)*\\(\\+(?<two>[\\d]+)\\)(?:§.)*)?(?: ?)(?:(?:§.)*\\(\\+(?<three>[\\d]+)\\)(?:§.)*)?(?: ?)(?:(?:§.)*\\(\\+(?<four>[\\d]+)\\)(?:§.)*)?")) // https://regex101.com/r/Lk6fc2/1 -ery
+    private val maximumContactSlotsLoreLinePattern by abiphoneContactSlotsGroup.pattern(("maximumcontactslots.loreline"), ("(?: )?(?:§.)Maximum Contacts: (?:(?:§.)*\\+?(?<base>[\\d]+))(?: ?)(?:(?:§.)*(?:(?:\\[|\\()\\+?)(?<one>[\\d]+)(?:(?:\\]|\\)))(?:§.)*)?(?: ?)(?:(?:§.)*(?:(?:\\[|\\()\\+?)(?<two>[\\d]+)(?:(?:\\]|\\)))(?:§.)*)?(?: ?)(?:(?:§.)*(?:(?:\\[|\\()\\+?)(?<three>[\\d]+)(?:(?:\\]|\\)))(?:§.)*)?(?: ?)(?:(?:§.)*(?:(?:\\[|\\()\\+?)(?<four>[\\d]+)(?:(?:\\]|\\)))(?:§.)*)?(?: ?)")) // https://regex101.com/r/iOKPgy/1 -ery
 
     @SubscribeEvent
     fun onTooltip(event: ItemTooltipEvent) {
         if (!LorenzUtils.inSkyBlock) return
         if (!SkyHanniMod.feature.misc.abiphoneContactsProgress) return
-        if (Minecraft.getMinecraft().currentScreen == null) return
-        if (Minecraft.getMinecraft().currentScreen is GuiEditSign) return
+        val currScreen = Minecraft.getMinecraft().currentScreen ?: return
+        if (currScreen is GuiEditSign) return
         val itemStack = event.itemStack
         if (!(isAbiphoneInternalNamePattern.matches(itemStack.getInternalName().asString()))) return
         val itemLore = itemStack.getLore()
@@ -38,10 +38,10 @@ class AbiphoneContactSlots {
         if (trueIndex == -1) return
         val index = trueIndex + 2
         maximumContactSlotsLoreLinePattern.matchMatcher(itemLore[trueIndex]) {
-            val contactsBeforeSplit = "${group("base") ?: 0} ${group("one") ?: 0} ${group("two") ?: 0} ${group("three") ?: 0}"
+            val contactsBeforeSplit = "${group("base") ?: 0} ${group("one") ?: 0} ${group("two") ?: 0} ${group("three") ?: 0}" // ${group("four") ?: 0}"
             val contacts = contactsBeforeSplit.split(" ")
             for (eachInt in contacts) if (eachInt.toIntOrNull() != null) total += eachInt.toInt()
-            if (total > -1) {
+            if (total > 0) {
                 event.toolTip.add(
                     index,
                     " §7Contacts Progress: §b$total§7/§b${(allPossibleUpgrades.sum() + contacts.first().toInt())}"
