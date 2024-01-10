@@ -26,6 +26,7 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
 class RiftBloodEffigies {
     private val config get() = RiftAPI.config.area.stillgoreChateau.bloodEffigies
+
     private var locations: List<LorenzVec> = emptyList()
     private var effigiesTimes = mapOf(
         0 to -1L,
@@ -36,9 +37,14 @@ class RiftBloodEffigies {
         5 to -1L,
     )
 
-    private val effigiesTimerPattern by RepoPattern.pattern(
-        "rift.area.stillgore.effegies",
+    private val patternGroup = RepoPattern.group("rift.area.stillgore.effegies")
+    private val effigiesTimerPattern by patternGroup.pattern(
+        "respawn",
         "§eRespawn §c(?<time>.*) §7\\(or click!\\)"
+    )
+    private val effegieHeartPattern by patternGroup.pattern(
+        "heart",
+        "Effigies: (?<hearts>.*)"
     )
 
     @SubscribeEvent
@@ -67,7 +73,7 @@ class RiftBloodEffigies {
         if (!isEnabled()) return
 
         val line = event.newList.firstOrNull { it.startsWith("Effigies:") } ?: return
-        val hearts = "Effigies: (?<hearts>.*)".toPattern().matchMatcher(line) {
+        val hearts = effegieHeartPattern.matchMatcher(line) {
             group("hearts")
         } ?: return
 
