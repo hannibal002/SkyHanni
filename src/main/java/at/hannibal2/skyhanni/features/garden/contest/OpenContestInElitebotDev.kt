@@ -128,27 +128,28 @@ class OpenContestInElitebotDev {
         if (!isEnabled()) return
         if (!config.eliteWebsiteKeybind.isKeyHeld()) return
         val gui = event.gui as? GuiContainer ?: return
-        val stack = gui.slotUnderMouse?.stack ?: return
+        val item = gui.slotUnderMouse?.stack ?: return
         val chestName = InventoryUtils.openInventoryName()
-        val itemName = stack.cleanName()
-        if ((itemName == ("Upcoming Contests")) && (chestName == ("Jacob's Farming Contests")) && (stack.getLore().first() == ("§8Schedule"))) {
+        val itemName = item.cleanName()
+        if ((itemName == ("Upcoming Contests")) && (chestName == ("Jacob's Farming Contests")) && (item.getLore().first() == ("§8Schedule"))) {
             openUpcoming()
-        } else if ((chestName == ("Your Contests")) && blankContestsFirstLoreLinePattern.matches(stack.getLore().first())) {
+        } else if ((chestName == ("Your Contests")) && blankContestsFirstLoreLinePattern.matches(item.getLore().first())) {
             calendarDateChestNameItemNamePattern.matchMatcher(itemName) {
                 val year = group("year").formatNumber()
                 val month = group("month").convertMonthNameToInt()
                 val day = group("date").formatNumber().toInt()
                 openPastContestAfterSanityCheck(year, month, day, group("sbTime"))
             }
-        } else if (jacobsFarmingContestSBCalendarFirstLoreLinePattern.matches(stack.getLore().first())) {
+        } else if (jacobsFarmingContestSBCalendarFirstLoreLinePattern.matches(item.getLore().first())) {
             calendarDateChestNameItemNamePattern.matchMatcher(chestName) {
                 val origYearString = group("year")
                 val origMonthString = group("month")
                 val year = origYearString.formatNumber()
                 val month = origMonthString.convertMonthNameToInt()
                 dayBlankItemNamePattern.matchMatcher(itemName) {
-                    val day = group("day").formatNumber().toInt()
-                    openPastContestAfterSanityCheck(year, month, day, "$origMonthString $day $origYearString")
+                    val origDayString = group("day")
+                    val day = origDayString.formatNumber().toInt()
+                    openPastContestAfterSanityCheck(year, month, day, "$origMonthString $origDayString $origYearString")
                 }
             }
         }
