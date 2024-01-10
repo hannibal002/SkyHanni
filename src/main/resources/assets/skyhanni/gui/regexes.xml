@@ -7,14 +7,14 @@
                 <TextField value="@search"/>
                 <Text text="@poll"/>
             </Row>
-            <ScrollPanel width="360" height="266">
+            <ScrollPanel width="560" height="400">
                 <Array data="@searchResults">
                     <Row>
                         <Hover lines="@keyW">
-                            <Text text="@key" width="100"/>
+                            <Text text="@key" width="200"/>
                         </Hover>
                         <Hover lines="@hoverRegex">
-                            <Text text="@regex" width="200"/>
+                            <Text text="@regex" width="300"/>
                         </Hover>
                         <Text text="@overriden" width="50"/>
                     </Row>
