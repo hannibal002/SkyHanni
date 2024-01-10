@@ -30,7 +30,6 @@ import net.minecraft.init.Items
 import net.minecraft.item.ItemStack
 import net.minecraft.nbt.NBTTagCompound
 import org.lwjgl.opengl.GL11
-import java.nio.FloatBuffer
 import java.util.regex.Pattern
 
 object NEUItems {
@@ -204,14 +203,6 @@ object NEUItems {
     fun isVanillaItem(item: ItemStack): Boolean =
         manager.auctionManager.isVanillaItem(item.getInternalName().asString())
 
-    val itemLightBuffer = GLAllocation.createDirectFloatBuffer(16);
-
-    private fun setColorBuffer(f: Float, g: Float, h: Float, i: Float): FloatBuffer {
-        itemLightBuffer.clear()
-        itemLightBuffer.put(f).put(g).put(h).put(i)
-        itemLightBuffer.flip()
-        return itemLightBuffer
-    }
 
     fun ItemStack.renderOnScreen(x: Float, y: Float, scaleMultiplier: Double = 1.0) {
         val item = checkBlinkItem()
@@ -235,19 +226,35 @@ object NEUItems {
 
         GlStateManager.translate(translateX, translateY, -19f)
         GlStateManager.scale(finalScale, finalScale, 0.2)
-        GL11.glNormal3f(0f, 0f, 1f / 0.2f)
+        GL11.glNormal3f(0f, 0f, 1f / 0.2f) // Compensate for z scaling
 
         RenderHelper.enableGUIStandardItemLighting()
-        val lightIntensity = 2.47f // Adjust as needed
-        val g = 0.6f // Value taken from RenderHelper
 
-        GL11.glLight(16384, 4609, setColorBuffer(g * lightIntensity, g * lightIntensity, g * lightIntensity, 1.0f))
-        GL11.glLight(16385, 4609, setColorBuffer(g * lightIntensity, g * lightIntensity, g * lightIntensity, 1.0f))
+        AdjustStandardItemLighting.adjust() // Compensate for z scaling
 
         Minecraft.getMinecraft().renderItem.renderItemIntoGUI(item, 0, 0)
         RenderHelper.disableStandardItemLighting()
 
         GlStateManager.popMatrix()
+    }
+
+    private object AdjustStandardItemLighting {
+
+        private const val lightScaling = 2.47f // Adjust as needed
+        private const val g = 0.6f // Original Value taken from RenderHelper
+        private const val lightIntensity = lightScaling * g
+        private val itemLightBuffer = GLAllocation.createDirectFloatBuffer(16);
+
+        init {
+            itemLightBuffer.clear()
+            itemLightBuffer.put(lightIntensity).put(lightIntensity).put(lightIntensity).put(1.0f)
+            itemLightBuffer.flip()
+        }
+
+        fun adjust() {
+            GL11.glLight(16384, 4609, itemLightBuffer)
+            GL11.glLight(16385, 4609, itemLightBuffer)
+        }
     }
 
     fun allNeuRepoItems(): Map<String, JsonObject> = NotEnoughUpdates.INSTANCE.manager.itemInformation
