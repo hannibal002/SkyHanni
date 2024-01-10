@@ -128,7 +128,7 @@ class OpenContestInElitebotDev {
         if (!isEnabled()) return
         if (!config.eliteWebsiteKeybind.isKeyHeld()) return
         val gui = event.gui as? GuiContainer ?: return
-        val item = gui.slotUnderMouse?.stack ?: return
+        val item = event.slot?.stack ?: return
         val chestName = InventoryUtils.openInventoryName()
         val itemName = item.cleanName()
         if ((itemName == ("Upcoming Contests")) && (chestName == ("Jacob's Farming Contests")) && (item.getLore().first() == ("§8Schedule"))) {
