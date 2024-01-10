@@ -214,8 +214,9 @@ object ItemUtils {
             RegexData.rarityLoreLinePattern.matchMatcher(line) {
                 val itemCategory = group("ItemCategory").replace(" ", "_")
                 val rarity = group("Rarity").replace(" ", "_")
-                try {
-                    return LorenzRarity.valueOf(rarity) to if (itemCategory.isEmpty()) {
+
+                val itemCategoryEnum = try {
+                    if (itemCategory.isEmpty()) {
                         when {
                             RegexData.abiPhonePattern.matches(name) -> ItemCategory.ABIPHONE
                             isPet(cleanName) -> ItemCategory.PET
@@ -237,8 +238,24 @@ object ItemUtils {
                             "lore" to getLore(),
                         )
                     }
-                    return LorenzRarity.valueOf(rarity) to null
+                    null
                 }
+                val itemRarityEnum = try {
+                    LorenzRarity.valueOf(rarity)
+                } catch (e: IllegalArgumentException) {
+                    if (logError) {
+                        ErrorManager.logErrorStateWithData(
+                            "Could not read rarity for item $name",
+                            "Failed to read rarity from item rarity via item lore",
+                            "internal name" to getInternalName(),
+                            "item name" to name,
+                            "inventory name" to InventoryUtils.openInventoryName(),
+                            "lore" to getLore(),
+                        )
+                    }
+                    null
+                }
+                return itemRarityEnum to itemCategoryEnum
             }
         }
         if (isPet(cleanName)) {
@@ -259,16 +276,6 @@ object ItemUtils {
         val pair = this.readItemCategoryAndRarity(logError)
         data.itemRarity = pair.first
         data.itemCategory = pair.second
-        if (data.itemRarity == null && logError) {
-            ErrorManager.logErrorStateWithData(
-                "Could not read rarity for item $name",
-                "Failed to read rarity from item rarity via item lore",
-                "internal name" to internalName,
-                "item name" to name,
-                "inventory name" to InventoryUtils.openInventoryName(),
-                "lore" to getLore(),
-            )
-        }
     }
 
     fun ItemStack.getItemCategoryOrNull(logError: Boolean = true): ItemCategory? {
