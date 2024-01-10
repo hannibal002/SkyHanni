@@ -13,7 +13,7 @@ import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.StringUtils.matches
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import io.github.moulberry.notenoughupdates.util.SkyBlockTime
-import net.minecraft.client.gui.inventory.GuiContainer
+import net.minecraft.client.gui.inventory.GuiChest
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
 class OpenContestInElitebotDev {
@@ -127,7 +127,7 @@ class OpenContestInElitebotDev {
         if (!LorenzUtils.inSkyBlock) return
         if (!isEnabled()) return
         if (!config.eliteWebsiteKeybind.isKeyHeld()) return
-        val gui = event.gui as? GuiContainer ?: return
+        if (event.gui !is GuiChest) return
         val item = event.slot?.stack ?: return
         val chestName = InventoryUtils.openInventoryName()
         val itemName = item.cleanName()
