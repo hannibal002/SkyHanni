@@ -238,7 +238,7 @@ object NEUItems {
         GL11.glNormal3f(0f, 0f, 1f / 0.2f)
 
         RenderHelper.enableGUIStandardItemLighting()
-        val lightIntensity = 2f // Adjust as needed
+        val lightIntensity = 2.47f // Adjust as needed
         val g = 0.6f // Value taken from RenderHelper
 
         GL11.glLight(16384, 4609, setColorBuffer(g * lightIntensity, g * lightIntensity, g * lightIntensity, 1.0f))
