@@ -8,6 +8,14 @@ object UtilsPatterns {
         "item.petlevel",
         "(?:§f§f)?§7\\[Lvl (?<level>\\d+)] .*"
     )
+    val amountFrontPattern by patternGroup.pattern(
+        "item.amount.front",
+        "(?: *§8(\\+§\\w)?(?<amount>[\\d.km,]+)(x )?)?(?<name>.*)"
+    )
+    val amountBehindPattern by patternGroup.pattern(
+        "item.amount.behind",
+        "(?<name>(?:['\\w-]+ ?)+)(?:§8x(?<amount>[\\d,]+))?"
+    )
 
     val timeAmountPattern by patternGroup.pattern(
         "time.amount",

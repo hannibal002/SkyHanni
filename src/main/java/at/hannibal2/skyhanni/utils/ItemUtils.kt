@@ -25,11 +25,6 @@ import kotlin.time.Duration.Companion.seconds
 
 object ItemUtils {
 
-    // TODO USE SH-REPO
-    private val patternInFront = "(?: *§8(\\+§\\w)?(?<amount>[\\d.km,]+)(x )?)?(?<name>.*)".toPattern()
-    private val patternBehind = "(?<name>(?:['\\w-]+ ?)+)(?:§8x(?<amount>[\\d,]+))?".toPattern()
-    private val petLevelPattern = "\\[Lvl (.*)] (.*)".toPattern()
-
     private val ignoredPetStrings = listOf(
         "Archer",
         "Berserk",
@@ -65,7 +60,7 @@ object ItemUtils {
 
     fun isRecombobulated(stack: ItemStack) = stack.isRecombobulated()
 
-    fun isPet(name: String): Boolean = petLevelPattern.matches(name) && !ignoredPetStrings.any { name.contains(it) }
+    fun isPet(name: String): Boolean = UtilsPatterns.petLevelPattern.matches(name) && !ignoredPetStrings.any { name.contains(it) }
 
     fun maxPetLevel(name: String) = if (name.contains("Golden Dragon")) 200 else 100
 
@@ -268,7 +263,7 @@ object ItemUtils {
             return itemAmountCache[input]!!
         }
 
-        var matcher = patternInFront.matcher(input)
+        var matcher = UtilsPatterns.amountFrontPattern.matcher(input)
         if (matcher.matches()) {
             val itemName = matcher.group("name")
             if (!itemName.contains("§8x")) {
@@ -279,7 +274,7 @@ object ItemUtils {
         var string = input.trim()
         val color = string.substring(0, 2)
         string = string.substring(2)
-        matcher = patternBehind.matcher(string)
+        matcher = UtilsPatterns.amountBehindPattern.matcher(string)
         if (!matcher.matches()) {
             println("")
             println("input: '$input'")
