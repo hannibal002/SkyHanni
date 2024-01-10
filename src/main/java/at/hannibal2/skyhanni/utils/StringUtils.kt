@@ -16,13 +16,10 @@ import java.util.regex.Matcher
 import java.util.regex.Pattern
 
 object StringUtils {
-    // TODO USE SH-REPO
-    private val playerChatPattern = "(?<important>.*?)(?:§[f7r])*: .*".toPattern()
-    private val chatUsernamePattern =
-        "^(?:§\\w\\[§\\w\\d+§\\w] )?(?:(?:§\\w)+\\S )?(?<rankedName>(?:§\\w\\[\\w.+] )?(?:§\\w)?(?<username>\\w+))(?: (?:§\\w)?\\[.+?])?".toPattern()
     private val whiteSpaceResetPattern = "^(?:\\s|§r)*|(?:\\s|§r)*$".toPattern()
     private val whiteSpacePattern = "^\\s*|\\s*$".toPattern()
     private val resetPattern = "(?i)§R".toPattern()
+    private val stringColourPattern = "§[0123456789abcdef].*".toPattern()
 
     fun String.trimWhiteSpaceAndResets(): String = whiteSpaceResetPattern.matcher(this).replaceAll("")
     fun String.trimWhiteSpace(): String = whiteSpacePattern.matcher(this).replaceAll("")
@@ -119,9 +116,7 @@ object StringUtils {
     }
 
     fun getColor(string: String, default: Int, darker: Boolean = true): Int {
-        val stringPattern = "§[0123456789abcdef].*".toPattern()
-
-        val matcher = stringPattern.matcher(string)
+        val matcher = stringColourPattern.matcher(string)
         if (matcher.matches()) {
             val colorInt = Minecraft.getMinecraft().fontRendererObj.getColorCode(string[1])
             return if (darker) {
@@ -261,7 +256,7 @@ object StringUtils {
 
     private fun matchPlayerChatMessage(string: String): Matcher? {
         var username = ""
-        var matcher = playerChatPattern.matcher(string)
+        var matcher = UtilsPatterns.playerChatPattern.matcher(string)
         if (matcher.matches()) {
             username = matcher.group("important").removeResets()
         }
@@ -278,7 +273,7 @@ object StringUtils {
         username = username.removePrefix("§dFrom ")
         username = username.removePrefix("§dTo ")
 
-        matcher = chatUsernamePattern.matcher(username)
+        matcher = UtilsPatterns.chatUsernamePattern.matcher(username)
         return if (matcher.matches()) matcher else null
     }
 

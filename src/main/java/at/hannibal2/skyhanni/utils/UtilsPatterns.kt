@@ -8,9 +8,18 @@ object UtilsPatterns {
         "item.petlevel",
         "(?:§f§f)?§7\\[Lvl (?<level>\\d+)] .*"
     )
+
     val timeAmountPattern by patternGroup.pattern(
         "time.amount",
         "(?:(?<y>\\d+) ?y(?:\\w* ?)?)?(?:(?<d>\\d+) ?d(?:\\w* ?)?)?(?:(?<h>\\d+) ?h(?:\\w* ?)?)?(?:(?<m>\\d+) ?m(?:\\w* ?)?)?(?:(?<s>\\d+) ?s(?:\\w* ?)?)?"
     )
 
+    val playerChatPattern by patternGroup.pattern(
+        "string.playerchat",
+        "(?<important>.*?)(?:§[f7r])*: .*"
+    )
+    val chatUsernamePattern by patternGroup.pattern(
+        "string.chatusername",
+        "^(?:§\\w\\[§\\w\\d+§\\w] )?(?:(?:§\\w)+\\S )?(?<rankedName>(?:§\\w\\[\\w.+] )?(?:§\\w)?(?<username>\\w+))(?: (?:§\\w)?\\[.+?])?"
+    )
 }
