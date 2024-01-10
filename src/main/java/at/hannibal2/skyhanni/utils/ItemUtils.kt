@@ -1,6 +1,5 @@
 package at.hannibal2.skyhanni.utils
 
-import at.hannibal2.skyhanni.data.RegexData
 import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.NEUInternalName.Companion.asInternalName
 import at.hannibal2.skyhanni.utils.NEUItems.getItemStack
@@ -211,16 +210,16 @@ object ItemUtils {
         val name = this.name ?: ""
         val cleanName = this.cleanName()
         for (line in this.getLore().reversed()) {
-            RegexData.rarityLoreLinePattern.matchMatcher(line) {
+            UtilsPatterns.rarityLoreLinePattern.matchMatcher(line) {
                 val itemCategory = group("ItemCategory").replace(" ", "_")
                 val rarity = group("Rarity").replace(" ", "_")
 
                 val itemCategoryEnum = try {
                     if (itemCategory.isEmpty()) {
                         when {
-                            RegexData.abiPhonePattern.matches(name) -> ItemCategory.ABIPHONE
+                            UtilsPatterns.abiPhonePattern.matches(name) -> ItemCategory.ABIPHONE
                             isPet(cleanName) -> ItemCategory.PET
-                            RegexData.enchantedBookPattern.matches(name) -> ItemCategory.ENCHANTED_BOOK
+                            UtilsPatterns.enchantedBookPattern.matches(name) -> ItemCategory.ENCHANTED_BOOK
                             else -> ItemCategory.NONE
                         }
                     } else {
