@@ -13,10 +13,11 @@ import net.minecraftforge.event.entity.player.ItemTooltipEvent
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
 class AbiphoneContactSlots {
+    private val allPossibleUpgrades: List<Int> = listOf<Int>(36, 2, 2) //36: Contacts Trio, 2: GG Abicase, 2: Abiphone relays. see https://antifandom.com/hypixel-skyblock/wiki/Abiphones#Contact_Slots
+    private val couldNotCalculateNotice: String = " §8Could not calculate contact slots. [SkyHanni]"
     private val abiphoneContactSlotsGroup = RepoPattern.group("abiphone.contact.slots")
-    private val allPossibleUpgrades: List<Int> = listOf<Int>(36, 2, 2) //36: Contacts Trio, 2: GG Abicase, 2: Abiphone relays. see https://antifandom.com/hypixel-skyblock/wiki/Abiphones#A%E2%92%B7iphone
-    private val isAbiphoneInternalNamePattern by abiphoneContactSlotsGroup.pattern(("isabiphone.internalname"), ("ABIPHONE_.*"))
-    private val maximumContactSlotsLoreLinePattern by abiphoneContactSlotsGroup.pattern(("maximumcontactslots.loreline"), ("(?: )?(?:§.)Maximum Contacts: (?:(?:§.)(?<base>[\\d]+)) ?(?:(?:§.)\\(\\+(?<one>[\\d]+)\\))? ?(?:(?:§.)\\(\\+(?<two>[\\d]+)\\))? ?(?:(?:§.)\\(\\+(?<three>[\\d]+)\\))? ?")) // https://regex101.com/r/NsPIm2/1 -ery
+    private val isAbiphoneInternalNamePattern by abiphoneContactSlotsGroup.pattern(("isabiphone.internalname"), ("ABIPHONE_.*")) //is it even worth it (assuming, well, *possible at all*) to increase contact slots on the abingohpone?
+    private val maximumContactSlotsLoreLinePattern by abiphoneContactSlotsGroup.pattern(("maximumcontactslots.loreline"), ("(?: )?(?:§.)Maximum Contacts: (?:(?:§.)+(?<base>[\\d]+))(?: ?)(?:(?:§.)*\\(\\+(?<one>[\\d]+)\\)(?:§.)*)?(?: ?)(?:(?:§.)*\\(\\+(?<two>[\\d]+)\\)(?:§.)*)?(?: ?)(?:(?:§.)*\\(\\+(?<three>[\\d]+)\\)(?:§.)*)?(?: ?)(?:(?:§.)*\\(\\+(?<four>[\\d]+)\\)(?:§.)*)?")) // https://regex101.com/r/Lk6fc2/1 -ery
 
     @SubscribeEvent
     fun onTooltip(event: ItemTooltipEvent) {
@@ -39,19 +40,14 @@ class AbiphoneContactSlots {
         maximumContactSlotsLoreLinePattern.matchMatcher(itemLore[trueIndex]) {
             val contactsBeforeSplit = "${group("base") ?: 0} ${group("one") ?: 0} ${group("two") ?: 0} ${group("three") ?: 0}"
             val contacts = contactsBeforeSplit.split(" ")
-            if (contacts.first() == contactsBeforeSplit) {
-                //this is in case hypixel changes their formatting of the maximum contacts lore line and things go terribly wrong
-                event.toolTip.add(index, " §8Could not calculate contact slots. [SkyHanni]")
-            } else {
-                for (eachInt in contacts) if (eachInt.toIntOrNull() != null) total += eachInt.toInt()
-                if (total > -1) {
-                    event.toolTip.add(
-                        index,
-                        " §7Contacts Progress: §b$total§7/§b${(allPossibleUpgrades.sum() + contacts.first().toInt())}"
-                    )
-                } else { //this is in case hypixel changes formatting but still keeps spaces somehow
-                    event.toolTip.add(index, " §8Could not calculate contact slots. [SkyHanni]")
-                }
+            for (eachInt in contacts) if (eachInt.toIntOrNull() != null) total += eachInt.toInt()
+            if (total > -1) {
+                event.toolTip.add(
+                    index,
+                    " §7Contacts Progress: §b$total§7/§b${(allPossibleUpgrades.sum() + contacts.first().toInt())}"
+                )
+            } else { //this is in case hypixel changes formatting but still keeps spaces somehow
+                event.toolTip.add(index, couldNotCalculateNotice)
             }
         }
     }
