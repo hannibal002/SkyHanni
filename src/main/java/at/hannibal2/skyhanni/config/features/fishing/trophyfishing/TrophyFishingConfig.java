@@ -20,7 +20,11 @@ public class TrophyFishingConfig {
     public boolean filletTooltip = true;
 
     @Expose
-    @ConfigOption(name = "Odger Waypoint", desc = "Show the Odger waypoint when Trophy Fishes are in the inventory and no lava rod in hand.")
+    @ConfigOption(
+        name = "Odger Waypoint",
+        desc = "Show the Odger waypoint when Trophy Fishes are in the inventory and no lava rod in hand. " +
+            "§cOnly useful for users without abiohone contact."
+    )
     @ConfigEditorBoolean
     @FeatureToggle
     public boolean odgerLocation = true;

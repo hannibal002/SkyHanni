@@ -22,9 +22,7 @@ _Frequently Asked Questions_
 > Switching from 1.8.9 to 1.19 will take some time, and we plan to discontinue support for 1.8.9 afterward since we won't support multiple versions at once.
 
 > **7: My Jacob Contest Display crops are wrong, how do I fix this?**
-> 1. Close your minecraft.
-> 2. Delete ".minecraft\config\skyhanni\jacob_contests.json".
-> 3. Open minecraft.
+> Run the command `/shclearcontestdata` to clear the Jacob contenst data.
 
 > **8: How can I get bigger crop hit boxes?**
 > Use [Patcher](<https://sk1er.club/mods/patcher>) to have 1.12 hit boxes in 1.8.9.
@@ -39,6 +37,11 @@ _Frequently Asked Questions_
 > 3. See the element name in the top center of screen
 > 4. Search for that element with /sh name
 > 5. Disable this feature
+  
+> **11: How do I reset a tracker?**
+> To reset a tracker, use the in-game command /shcommands <tracker type>.
+> Execute the obtained command to reset the tracker
 
-*This FAQ was last updated on December 17th, 2023.
+
+*This FAQ was last updated on January 7th, 2024.
 If you believe there's something that should be added to this list, please tell us, so we can add it.*

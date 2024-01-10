@@ -2,12 +2,14 @@ package at.hannibal2.skyhanni.features.misc
 
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
+import at.hannibal2.skyhanni.data.ProfileStorageData
 import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.InventoryFullyOpenedEvent
 import at.hannibal2.skyhanni.events.LorenzChatEvent
 import at.hannibal2.skyhanni.events.LorenzTickEvent
 import at.hannibal2.skyhanni.events.LorenzWorldChangeEvent
 import at.hannibal2.skyhanni.events.PacketEvent
+import at.hannibal2.skyhanni.events.PreProfileSwitchEvent
 import at.hannibal2.skyhanni.features.rift.RiftAPI
 import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
@@ -68,6 +70,12 @@ class NonGodPotEffectDisplay {
     // TODO USE SH-REPO
     private var patternEffectsCount = "§7You have §e(?<name>\\d+) §7non-god effects\\.".toPattern()
     private var totalEffectsCount = 0
+
+    @SubscribeEvent
+    fun onPreProfileSwitch(event: PreProfileSwitchEvent) {
+        effectDuration.clear()
+        display = emptyList()
+    }
 
     // todo : cleanup and add support for poison candy I, and add support for splash / other formats
     @SubscribeEvent
@@ -159,6 +167,7 @@ class NonGodPotEffectDisplay {
     fun onTick(event: LorenzTickEvent) {
         if (!isEnabled()) return
         if (!event.repeatSeconds(1)) return
+        if (!ProfileStorageData.loaded) return
 
         update()
     }
