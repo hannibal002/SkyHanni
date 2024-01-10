@@ -4,6 +4,8 @@ import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.events.SkipTabListLineEvent
 import at.hannibal2.skyhanni.mixins.transformers.AccessorGuiPlayerTabOverlay
 import at.hannibal2.skyhanni.utils.LorenzUtils
+import at.hannibal2.skyhanni.utils.StringUtils.matches
+import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraft.client.Minecraft
 import net.minecraft.client.gui.Gui
 import net.minecraft.client.gui.ScaledResolution
@@ -171,9 +173,11 @@ object TabListRenderer {
         }
     }
 
+    val fireSaleRegex by RepoPattern.pattern("tablist.firesaletitle", "^§b§lFire Sales: §r§f\\([0-9]+\\)$")
+
     @SubscribeEvent
     fun hideFireFromTheTabListBecauseWhoWantsThose(event: SkipTabListLineEvent) {
-        if (config.hideFiresales && event.lastSubTitle != null && event.lastSubTitle.text.contains("Fire Sales:")) {
+        if (config.hideFiresales && event.lastSubTitle != null && fireSaleRegex.matches(event.lastSubTitle.text)) {
             event.cancel()
         }
     }
