@@ -46,16 +46,16 @@ class OpenContestInElitebotDev {
     
     private val ELITEBOT_DOMAIN: String = "https://elitebot.dev"
     private val ELITEBOT_CONTESTS: String = "$ELITEBOT_DOMAIN/contests"
+    private val ELITEBOT_UPCOMING: String = "$ELITEBOT_CONTESTS/upcoming"
 
-    private val elitebotDevGroup = RepoPattern.group("elitebotdev")
+    private val elitebotDevRepoGroup = RepoPattern.group("elitebotdev")
 
     // private val jacobsFarmingContestChestNamePattern by elitebotDevGroup.pattern(("jacobsfarmingcontest.chestname"), ("(?:(?:Jacob's Farming |Your )Contests)")) // https://regex101.com/r/6dhLMl/1 -ery
-    private val calendarDateChestNameItemNamePattern by elitebotDevGroup.pattern(("calendardate.chestnameitemname"), ("(?<sbTime>(?<month>(?:Early |Late )?(?:Winter|Spring|Summer|Autumn|Fall))(?: (?<date>[\\d]+)(?:nd|rd|th|st))?, Year (?<year>[\\d,.]+))")) // https://regex101.com/r/5rZqFd/1 -ery
-    private val blankContestsFirstLoreLinePattern by elitebotDevGroup.pattern(("blankcontests.firstloreline"), ("((?:§.)+(?<crop>[\\S ]+)+ Contests?)")) // https://regex101.com/r/7o9eU0/1 -ery
-    private val dayBlankItemNamePattern by elitebotDevGroup.pattern(("dayblank.itemname"), ("Day (?<day>[\\d.,]+)")) // https://regex101.com/r/0lS3yW/1 -ery
-    private val jacobsFarmingContestSBCalendarFirstLoreLinePattern by elitebotDevGroup.pattern(("jacobsfarmingcontestsbcalendar.firstloreline"), ("(?:(?:§.)*(?:[\\S ]+)?(?:[\\d]+):(?:[\\d]+) [ap]m(?:-|[\\S ]+)(?:[\\d]+):(?:[\\d]+) [ap]m: (?:§.)*Jacob's Farming Contest(?:§.)*(?: \\((?:§.)*(?:[\\d]+[ywhm] )*(?:[\\d]+s)(?:§.)*\\)| \\((?:§.)*(?:[\\S ]+)(?:§.)*\\))?)")) // https://regex101.com/r/1lvgAr/2 -ery
+    private val calendarDateChestNameItemNamePattern by elitebotDevRepoGroup.pattern(("calendardate.chestnameitemname"), ("(?<sbTime>(?<month>(?:Early |Late )?(?:Winter|Spring|Summer|Autumn|Fall))(?: (?<date>[\\d]+)(?:nd|rd|th|st))?, Year (?<year>[\\d,.]+))")) // https://regex101.com/r/5rZqFd/1 -ery
+    private val blankContestsFirstLoreLinePattern by elitebotDevRepoGroup.pattern(("blankcontests.firstloreline"), ("((?:§.)+(?<crop>[\\S ]+)+ Contests?)")) // https://regex101.com/r/7o9eU0/1 -ery
+    private val dayBlankItemNamePattern by elitebotDevRepoGroup.pattern(("dayblank.itemname"), ("Day (?<day>[\\d.,]+)")) // https://regex101.com/r/0lS3yW/1 -ery
+    private val jacobsFarmingContestSBCalendarFirstLoreLinePattern by elitebotDevRepoGroup.pattern(("jacobsfarmingcontestsbcalendar.firstloreline"), ("(?:(?:§.)*(?:[\\S ]+)?(?:[\\d]+):(?:[\\d]+) [ap]m(?:-|[\\S ]+)(?:[\\d]+):(?:[\\d]+) [ap]m: (?:§.)*Jacob's Farming Contest(?:§.)*(?: \\((?:§.)*(?:[\\d]+[ywhm] )*(?:[\\d]+s)(?:§.)*\\)| \\((?:§.)*(?:[\\S ]+)(?:§.)*\\))?)")) // https://regex101.com/r/1lvgAr/2 -ery
 
-    private val eliteWebsiteUpcomingContests: String = "$ELITEBOT_CONTESTS/upcoming"
     /*
     {
         id: "minecraft:dye",
@@ -157,7 +157,7 @@ class OpenContestInElitebotDev {
 
     private fun openUpcoming() {
         LorenzUtils.chat("Opening the upcoming contests page on EliteWebsite.")
-        OSUtils.openBrowser(eliteWebsiteUpcomingContests)
+        OSUtils.openBrowser(ELITEBOT_UPCOMING)
     }
     
     private fun openPastContestAfterSanityCheck(year: Long, month: Int, day: Int, origSBTime: String) {
