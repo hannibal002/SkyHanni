@@ -25,6 +25,7 @@ import at.hannibal2.skyhanni.features.fishing.tracker.FishingProfitTracker
 import at.hannibal2.skyhanni.features.fishing.tracker.SeaCreatureTracker
 import at.hannibal2.skyhanni.features.garden.GardenAPI
 import at.hannibal2.skyhanni.features.garden.GardenCropTimeCommand
+import at.hannibal2.skyhanni.features.garden.GardenCropsInCommand
 import at.hannibal2.skyhanni.features.garden.GardenNextJacobContest
 import at.hannibal2.skyhanni.features.garden.composter.ComposterOverlay
 import at.hannibal2.skyhanni.features.garden.farming.ArmorDropTracker
@@ -152,6 +153,10 @@ object Commands {
             "shcroptime",
             "Calculates with your current crop per second speed how long you need to farm a crop to collect this amount of items"
         ) { GardenCropTimeCommand.onCommand(it) }
+        registerCommand(
+            "shcropsin",
+            "Calculates with your current crop per second how many items you can collect in this amount of time"
+        ) { GardenCropsInCommand.onCommand(it) }
         registerCommand(
             "shrpcstart",
             "Manually starts the Discord Rich Presence feature"

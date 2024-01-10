@@ -1,8 +1,13 @@
 # SkyHanni - Change Log
 
-## Version 0.22 (Unreleased)
+## Version 0.23 (Unreleased)
 
 ### New Features
+
+#### Garden Features
+
++ Added command /shcropsin <time> <item>. - DylanBruner
+    + Shows the number of items you gain when farming in the garden for the given time.
 
 #### Fishing Features
 
@@ -13,21 +18,56 @@
 + Added Sea Creature Tracker. - hannibal2
     + Allows to only show single variants, e.g. water or lava or winter.
 
-### Changed
+### Changes
 
 #### Garden Changes
 
 + Renamed Visitor Items Needed to Visitor Shopping List. - hannibal2
 + Added biofuel support to the Composter Overlay get from sack logic. - obsidian
++ Updated max reforge fortune for Fungi Cutter. - alexia
+    + Hypixel has increased the base rarity to Epic.
++ Don't count Bountiful as a max reforge fortune on tools. - alexia
++ /shcroptime now supports k, m and b numbers. - DylanBruner
++ Only show the Garden Vacuum Bag on your own vacuums. - alexia
 
 #### Rift Changes
 
 + Rift time now updates correctly in wizard tower and instantly updates the format when toggling max time or
   percentage. - hannibal2
++ Added options to only show the Rift Vermin Tracker with vacuum on inventory and only in West Village. - Empa
+    + This now hides the Vermin Tracker by default when not in the surrounding area.
++ Show the Vermin Tracker immediately after joining the rift. - hannibal2
 
 #### Fishing Changes
 
 + Odger highlight feature tells in description that it is only useful for users without abiphone. - hannibal2
+
+#### Mining Changes
+
++ Show Powder Tracker immediately after joining the Crystal Hollows. - hannibal2
+
+#### Bingo Changes
+
++ Show the guide text when hovering over the missing bingo goal list. - hannibal2
+
+#### Inventory Changes
+
++ Removed flawless gemstones from sack display. - CalMWolfs
+    + Hypixel removed them from sacks.
++ Show a warning in Bestiary Display when Overall Progress is not enabled. - HiZe
++ Added option to hide pet candy count on maxed out pets. - CalMWolfs
+
+#### Dungeon Changes
+
++ Changed the description of the Dungeon Chat Filter feature to be more descriptive. - Wambo
+
+#### Chat Changes
+
++ Hide new Fire Sale message format. - Thunderblade73
+
+#### Misc Changes
+
++ Tia Relay Helper: Suggest /togglemusic. - alexia
 
 ### Fixes
 
@@ -36,6 +76,20 @@
 + Fixed mushrooms being counted with Common/Uncommon Mooshroom Cow Pet. - alexia
 + Fixed progress to maxed milestone appearing twice in the crop milestone menu when having milestone 20. - Empa
 + Fixed max crop milestone display being too long in the crop milestone menu. - obsidian
++ Fixed Mooshroom Cow Perk counter when farming sugar cane/cactus with Mooshroom Cow. - alexia
++ Show an error message for the commands /shcropsin and /shcroptime if show money per hour display is not loaded. -
+  hannibal2
++ Auto-fixing plots marked as pests when killing all pests without SkyHanni earlier. - hannibal2
++ Fixed error message that nearest pests cannot get removed properly. - hannibal2
+
+#### Combat Fixes
+
++ Fixed corrupted Kada Knight getting detected as Revenant Slayer mini boss. - hannibal2
+
+#### Mining Fixes
+
++ Fixed an error when showing all elements in Powder Tracker. - hannibal2
++ Fixed powder tracker detecting gemstone chat messages. - CalMWolfs
 
 #### Rift Fixes
 
@@ -45,17 +99,45 @@
 
 + Fixed Reindrake mob, Frosty NPC and frosty the snow blaster shop counting as sea creatures in the barn fishing
   timer. - hannibal2
++ Fixed trophy fish chat message detection. - Empa
 
 #### Invenory Fixes
 
 + Fixed hide non-clickable items not working in some bazaar pages. - hannibal2
 + Fixed rogue sword ability taking into account mage cooldown reduction. - Empa
++ Reset item ability cooldowns on the world switch. - hannibal2
+
+#### Bingo Fixes
+
++ Fixed detecting bingo profile while visiting other players bingo island. - hannibal2
++ Fixed performance issues with Bingo Minion Craft Helper. - hannibal2
++ Fixed Bingo Minion Craft Helper not detecting crafted tier one minion. - hannibal2
+
+#### Chat Fixes
+
++ Fixed poisoned candy potion chat message not getting compacted. - alexia
+
+#### Misc Fixes
+
++ Maybe fixed Tia Relay Helper. - Thunderblade73
++ Fixed wording in trackers when the item is newly obtained. - hannibal2
++ Fixed titles not showing above other SkyHanni GUI elements all the time. - Thunderblade73
 
 ### Technical Changes
 
 + Migrate Hypixel API to v2. - hannibal2
 + Added SackDataUpdateEvent. - CalMWolfs
 + Fixing a mac crash in dev environment automatically. - CalMWolfs
++ Bingo repo change: Make note of an alternative title, and create a guide field for the actual guide text. - hannibal2
++ Moved Tia Relay Helper chat messages into repo patterns. - Thunderblade73
++ Added Dark Auction as IslandType and fixed IslandType detection for dungeons. - j10a1n15
++ Modify instead of blocking trophy fishing and sea creature chat messages. - appable
++ Changed regex in case Hypixel changes color codes for island names in the tab list. - Empa
++ Extract FirstMinionTier logic from the Bingo Minion Craft Helper to better analyze the performance problems some users
+  have. - hannibal2
++ Moving minion craft helper fully over to neu internal names. - hannibal2
++ Added information about trackers to the Discord FAQ. - j10a1n15
++ Defined the way how dependent PRs should be written in contributing.md. - Thunderblade73
 
 ## Version 0.22
 
