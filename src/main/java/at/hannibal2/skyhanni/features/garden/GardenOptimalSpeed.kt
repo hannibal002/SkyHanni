@@ -20,9 +20,10 @@ import kotlin.time.Duration.Companion.seconds
 class GardenOptimalSpeed {
     private val config get() = GardenAPI.config.optimalSpeeds
     private val configCustomSpeed get() = config.customSpeed
+    private val sneaking get() = Minecraft.getMinecraft().thePlayer.isSneaking
     private var _currentSpeed = 100
     private var currentSpeed: Int
-        get() = (_currentSpeed * (if (Minecraft.getMinecraft().thePlayer.isSneaking) 0.3 else 1.0)).toInt()
+        get() = (_currentSpeed * (if (sneaking) 0.3 else 1.0)).toInt()
         set(value) {
             _currentSpeed = value
         }
@@ -91,7 +92,10 @@ class GardenOptimalSpeed {
 
         var text = "Optimal Speed: §f$optimalSpeed"
         if (optimalSpeed != currentSpeed) {
-            text += " (§eCurrent: §f$currentSpeed)"
+            text += " (§eCurrent: §f$currentSpeed"
+            if (sneaking) text += " §7[Sneaking]"
+            text += "§f)"
+
             if (config.showOnHUD) config.pos.renderString("§c$text", posLabel = "Garden Optimal Speed")
             warn()
         } else {
@@ -108,7 +112,11 @@ class GardenOptimalSpeed {
         lastWarnTime = System.currentTimeMillis()
         LorenzUtils.sendTitle("§cWrong speed!", 3.seconds)
         cropInHand?.let {
-            LorenzUtils.chat("Wrong speed for ${it.cropName}: §f$currentSpeed §e(§f$optimalSpeed §eis optimal)")
+            var text = "Wrong speed for ${it.cropName}: §f$currentSpeed"
+            if (sneaking) text += " §7[Sneaking]"
+            text += " §e(§f$optimalSpeed §eis optimal)"
+
+            LorenzUtils.chat(text)
         }
     }
 
