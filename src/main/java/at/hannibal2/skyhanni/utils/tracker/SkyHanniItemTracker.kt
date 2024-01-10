@@ -161,7 +161,7 @@ class SkyHanniItemTracker<Data : ItemTrackerData>(
         }
         add("")
         if (newDrop) {
-            add("§aYou caught this item recently.")
+            add("§aYou obtained this item recently.")
             add("")
         }
         add("§eClick to " + (if (hidden) "show" else "hide") + "!")
