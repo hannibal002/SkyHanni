@@ -460,7 +460,7 @@ class GardenVisitorFeatures {
         }
 
         partialAcceptedPattern.matchMatcher(event.message) {
-            LorenzUtils.chat("Open visitor inventory again to update the number of items needed!")
+            LorenzUtils.chat("Talk to the visitor again to update the number of items needed!")
         }
     }
 
