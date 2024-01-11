@@ -62,7 +62,7 @@ object LorenzUtils {
 
     val skyBlockArea get() = if (inSkyBlock) HypixelData.skyBlockArea else "?"
 
-    val inKuudraFight get() = skyBlockIsland == IslandType.KUUDRA_ARENA
+    val inKuudraFight get() = IslandType.KUUDRA_ARENA.isInIsland()
 
     val noTradeMode get() = HypixelData.noTrade
 
