@@ -194,7 +194,7 @@ object GardenNextJacobContest {
                     sendContests()
                 } else {
                     LorenzUtils.clickableChat(
-                        "§2Click here to submit this years farming contests, thank you for helping everyone out!",
+                        "§2Click here to submit this year's farming contests. Thank you for helping everyone out!",
                         "shsendcontests"
                     )
                 }
@@ -294,7 +294,7 @@ object GardenNextJacobContest {
             if (isCloseToNewYear()) {
                 list.add(closeToNewYear)
             } else {
-                list.add("§cOpen calendar to read jacob contest times!")
+                list.add("§cOpen calendar to read Jacob contest times!")
             }
             return list
         }
@@ -308,7 +308,7 @@ object GardenNextJacobContest {
         if (isCloseToNewYear()) {
             list.add(closeToNewYear)
         } else {
-            list.add("§cOpen calendar to read jacob contest times!")
+            list.add("§cOpen calendar to read Jacob contest times!")
         }
 
         fetchedFromElite = false
@@ -503,7 +503,8 @@ object GardenNextJacobContest {
                     newContests[timeMark + contestDuration] = FarmingContest(timeMark + contestDuration, crops)
                 }
             } else {
-                LorenzUtils.chat("This years contests aren't available to fetch automatically yet, please load them from your calender or wait 10 minutes!")
+                LorenzUtils.chat("This year's contests aren't available to fetch automatically yet, please load them from your calendar or wait 10 minutes.")
+                LorenzUtils.clickableChat("Click here to open your calendar!", "calendar")
             }
 
             if (newContests.count() == maxContestsPerYear) {
