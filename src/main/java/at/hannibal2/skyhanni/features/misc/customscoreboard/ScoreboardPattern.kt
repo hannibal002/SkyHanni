@@ -37,7 +37,7 @@ object ScoreboardPattern {
     val keysPattern by dungeonSb.pattern("keys", "Keys: §.■ §.[✗✓] §.■ §a.x$")
     val clearedPattern by dungeonSb.pattern("cleared", "(§.)*Cleared: (§.)*(?<percent>[\\w,.]+)% (§.)*\\((§.)*(?<score>[\\w,.]+)(§.)*\\)$")
     val soloPattern by dungeonSb.pattern("solo", "§3§lSolo$")
-    val teammatesPattern by dungeonSb.pattern("teammates", "(§.)*(?<classAbbv>\\[\\w]) (§.)*(?<username>[a-zA-Z0-9_]{2,16}) ((§.)*(?<classLevel>\\[Lvl?(?<level>[\\w,.]+)\\]?)|(§.)*(?<health>[\\w,.]+)(§.)*.?)$")
+    val teammatesPattern by dungeonSb.pattern("teammates", "(§.)*(?<classAbbv>\\[\\w]) (§.)*(?<username>[a-zA-Z0-9_]{2,16}) ((§.)*(?<classLevel>\\[Lvl?(?<level>[\\w,.]+)?]?)|(§.)*(?<health>[\\w,.]+)(§.)*.?)$")
     val floor3GuardiansPattern by dungeonSb.pattern("floor3guardians", "^§. - §.(Healthy|Reinforced|Laser|Chaos)§a ([\\w,.]?)+§c❤$")
     // kuudra
     private val kuudraSb = scoreboardGroup.group("kuudra")
