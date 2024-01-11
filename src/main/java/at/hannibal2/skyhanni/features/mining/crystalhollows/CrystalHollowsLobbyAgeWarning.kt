@@ -51,7 +51,7 @@ class CrystalHollowsLobbyAgeWarning {
         val lobbyAge = getLobbyAgeInMinecraftDays()
         if (oldLobbyAge == lobbyAge) return //avoid sending chat msgs more than necessary
         oldLobbyAge = lobbyAge //set new cache value
-        if (config.lobbyAgeReminders && !lobbyIsPastAgeThreshold) LorenzUtils.chat("§aThis Crystal Hollows lobby is currently at Day $lobbyAge, ${abs(config.minLobbyAgeThreshold - lobbyAge)} days away from Day ${config.minLobbyAgeThreshold}.")
+        if (config.lobbyAgeReminders && !lobbyIsPastAgeThreshold) LorenzUtils.chat("§aThis Crystal Hollows lobby is currently at Day $lobbyAge, ${abs(config.minLobbyAgeThreshold - lobbyAge)} day(s) away from Day ${config.minLobbyAgeThreshold}.")
         if (lobbyAge in config.minLobbyAgeThreshold..< config.maxLobbyAgeThreshold && !lobbyIsPastAgeThreshold) {
             lobbyIsPastAgeThreshold = true //prevent sending message multiple times (see preceding conditional)
             LorenzUtils.chat("This Crystal Hollows lobby has reached Day ${config.minLobbyAgeThreshold}. It no longer accepts new players, §cand will shut down on Day ${config.maxLobbyAgeThreshold} or when there are fewer than ${config.minPlayers} people left §e(whichever happens first).")
