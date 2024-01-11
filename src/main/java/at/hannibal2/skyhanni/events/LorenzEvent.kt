@@ -66,4 +66,8 @@ abstract class LorenzEvent : Event() {
     }
 
     fun postWithoutCatch() = MinecraftForge.EVENT_BUS.post(this)
+
+    fun cancel() {
+        isCanceled = true
+    }
 }
