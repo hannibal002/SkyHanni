@@ -395,7 +395,16 @@ object ItemDisplayOverlayFeatures : AbstractStackSize() {
             "LEGENDARY" -> 100_000F
             else -> 1F
         }
-        return if (threshold != 1F) { "${((blocksWalked.toFloat() / threshold) * 100).toInt()}" } else ""
+
+        val colorCode = when (rarity) {
+            "COMMMON" -> "§f"
+            "UNCOMMON" -> "§a"
+            "RARE" -> "§9"
+            "EPIC" -> "§5"
+            "LEGENDARY" -> "§6"
+            else -> ""
+        }
+        return if (threshold != 1F) { "$colorCode${((blocksWalked.toFloat() / threshold) * 100).toInt()}" } else ""
     }
 
     private fun isCampfireAccessory(internalName: NEUInternalName): Boolean = CAMPFIRE.isSelected() && campfireTalismanTierInternalNamePattern.matches(internalName)
