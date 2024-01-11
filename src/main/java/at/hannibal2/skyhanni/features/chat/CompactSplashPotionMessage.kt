@@ -18,9 +18,9 @@ class CompactSplashPotionMessage {
 
         // Fix for Hypixel having a different message for Poisoned Candy.
         // Did not make the first pattern optional to prevent conflicts with Dungeon Buffs/other things
-        "§a§lBUFF! §fYou have gained §r(?<effectName>§2Poisoned Candy I)§r§f!§r".toPattern(),
-        "§a§lBUFF! §fYou splashed yourself with §r(?<effectName>§2Poisoned Candy I)§r§f!§r".toPattern(),
-        "§a§lBUFF! §fYou were splashed by (?<playerName>.*) §fwith §r(?<effectName>§2Poisoned Candy I)§r§f!§r".toPattern()
+        "§a§lBUFF! §fYou have gained §r(?<effectName>§2Poisoned Candy I)§r§f!".toPattern(),
+        "§a§lBUFF! §fYou splashed yourself with §r(?<effectName>§2Poisoned Candy I)§r§f!".toPattern(),
+        "§a§lBUFF! §fYou were splashed by (?<playerName>.*) §fwith §r(?<effectName>§2Poisoned Candy I)§r§f!".toPattern()
     )
 
     @SubscribeEvent

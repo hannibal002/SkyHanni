@@ -55,6 +55,7 @@
 + Removed flawless gemstones from sack display. - CalMWolfs
     + Hypixel removed them from sacks.
 + Show a warning in Bestiary Display when Overall Progress is not enabled. - HiZe
++ Added option to hide pet candy count on maxed out pets. - CalMWolfs
 
 #### Dungeon Changes
 
@@ -81,9 +82,14 @@
 + Auto-fixing plots marked as pests when killing all pests without SkyHanni earlier. - hannibal2
 + Fixed error message that nearest pests cannot get removed properly. - hannibal2
 
+#### Combat Fixes
+
++ Fixed corrupted Kada Knight getting detected as Revenant Slayer mini boss. - hannibal2
+
 #### Mining Fixes
 
 + Fixed an error when showing all elements in Powder Tracker. - hannibal2
++ Fixed powder tracker detecting gemstone chat messages. - CalMWolfs
 
 #### Rift Fixes
 
@@ -93,6 +99,7 @@
 
 + Fixed Reindrake mob, Frosty NPC and frosty the snow blaster shop counting as sea creatures in the barn fishing
   timer. - hannibal2
++ Fixed trophy fish chat message detection. - Empa
 
 #### Invenory Fixes
 
@@ -106,10 +113,15 @@
 + Fixed performance issues with Bingo Minion Craft Helper. - hannibal2
 + Fixed Bingo Minion Craft Helper not detecting crafted tier one minion. - hannibal2
 
+#### Chat Fixes
+
++ Fixed poisoned candy potion chat message not getting compacted. - alexia
+
 #### Misc Fixes
 
 + Maybe fixed Tia Relay Helper. - Thunderblade73
 + Fixed wording in trackers when the item is newly obtained. - hannibal2
++ Fixed titles not showing above other SkyHanni GUI elements all the time. - Thunderblade73
 
 ### Technical Changes
 

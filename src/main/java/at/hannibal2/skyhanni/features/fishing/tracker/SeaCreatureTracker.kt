@@ -42,7 +42,7 @@ object SeaCreatureTracker {
         if (!isEnabled()) return
 
         tracker.modify {
-            val amount = if (event.doubleHook) 2 else 1
+            val amount = if (event.doubleHook && config.countDouble) 2 else 1
             it.amount.addOrPut(event.seaCreature.name, amount)
         }
 
