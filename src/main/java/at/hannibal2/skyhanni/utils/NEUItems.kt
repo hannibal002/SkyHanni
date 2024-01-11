@@ -22,12 +22,14 @@ import io.github.moulberry.notenoughupdates.recipes.NeuRecipe
 import io.github.moulberry.notenoughupdates.util.ItemResolutionQuery
 import io.github.moulberry.notenoughupdates.util.Utils
 import net.minecraft.client.Minecraft
+import net.minecraft.client.renderer.GLAllocation
 import net.minecraft.client.renderer.GlStateManager
 import net.minecraft.client.renderer.RenderHelper
 import net.minecraft.init.Blocks
 import net.minecraft.init.Items
 import net.minecraft.item.ItemStack
 import net.minecraft.nbt.NBTTagCompound
+import org.lwjgl.opengl.GL11
 import java.util.regex.Pattern
 
 object NEUItems {
@@ -78,7 +80,7 @@ object NEUItems {
     fun readAllNeuItems(): Map<String, NEUInternalName> {
         allInternalNames.clear()
         val map = mutableMapOf<String, NEUInternalName>()
-        for (rawInternalName in manager.itemInformation.keys) {
+        for (rawInternalName in allNeuRepoItems().keys) {
             val name = manager.createItem(rawInternalName).displayName.removeColor().lowercase()
             val internalName = rawInternalName.asInternalName()
             map[name] = internalName
@@ -133,12 +135,12 @@ object NEUItems {
         return text
     }
 
-    fun getInternalName(itemStack: ItemStack) = ItemResolutionQuery(manager)
+    fun getInternalName(itemStack: ItemStack): String? = ItemResolutionQuery(manager)
         .withCurrentGuiContext()
         .withItemStack(itemStack)
         .resolveInternalName()
 
-    fun getInternalNameOrNull(nbt: NBTTagCompound) =
+    fun getInternalNameOrNull(nbt: NBTTagCompound): NEUInternalName? =
         ItemResolutionQuery(manager).withItemNBT(nbt).resolveInternalName()?.asInternalName()
 
     fun NEUInternalName.getPrice(useSellingPrice: Boolean = false) = getPriceOrNull(useSellingPrice) ?: -1.0
@@ -152,7 +154,7 @@ object NEUItems {
         return BazaarDataHolder.getNpcPrice(this)
     }
 
-    fun transHypixelNameToInternalName(hypixelId: String) =
+    fun transHypixelNameToInternalName(hypixelId: String): NEUInternalName =
         manager.auctionManager.transformHypixelBazaarToNEUItemId(hypixelId).asInternalName()
 
     fun NEUInternalName.getPriceOrNull(useSellingPrice: Boolean = false): Double? {
@@ -172,10 +174,10 @@ object NEUItems {
         return getNpcPriceOrNull()
     }
 
-    fun getPrice(internalName: String, useSellingPrice: Boolean = false) =
+    fun getPrice(internalName: String, useSellingPrice: Boolean = false): Double =
         internalName.asInternalName().getPrice(useSellingPrice)
 
-    fun NEUInternalName.getItemStackOrNull() = ItemResolutionQuery(manager)
+    fun NEUInternalName.getItemStackOrNull(): ItemStack? = ItemResolutionQuery(manager)
         .withKnownInternalName(asString())
         .resolveToItemStack()?.copy()
 
@@ -198,7 +200,9 @@ object NEUItems {
             fallbackItem
         }
 
-    fun isVanillaItem(item: ItemStack) = manager.auctionManager.isVanillaItem(item.getInternalName().asString())
+    fun isVanillaItem(item: ItemStack): Boolean =
+        manager.auctionManager.isVanillaItem(item.getInternalName().asString())
+
 
     fun ItemStack.renderOnScreen(x: Float, y: Float, scaleMultiplier: Double = 1.0) {
         val item = checkBlinkItem()
@@ -220,15 +224,40 @@ object NEUItems {
 
         GlStateManager.pushMatrix()
 
-        GlStateManager.translate(translateX, translateY, 1F)
-        GlStateManager.scale(finalScale, finalScale, 1.0)
+        GlStateManager.translate(translateX, translateY, -19f)
+        GlStateManager.scale(finalScale, finalScale, 0.2)
+        GL11.glNormal3f(0f, 0f, 1f / 0.2f) // Compensate for z scaling
 
         RenderHelper.enableGUIStandardItemLighting()
+
+        AdjustStandardItemLighting.adjust() // Compensate for z scaling
+
         Minecraft.getMinecraft().renderItem.renderItemIntoGUI(item, 0, 0)
         RenderHelper.disableStandardItemLighting()
 
         GlStateManager.popMatrix()
     }
+
+    private object AdjustStandardItemLighting {
+
+        private const val lightScaling = 2.47f // Adjust as needed
+        private const val g = 0.6f // Original Value taken from RenderHelper
+        private const val lightIntensity = lightScaling * g
+        private val itemLightBuffer = GLAllocation.createDirectFloatBuffer(16);
+
+        init {
+            itemLightBuffer.clear()
+            itemLightBuffer.put(lightIntensity).put(lightIntensity).put(lightIntensity).put(1.0f)
+            itemLightBuffer.flip()
+        }
+
+        fun adjust() {
+            GL11.glLight(16384, 4609, itemLightBuffer)
+            GL11.glLight(16385, 4609, itemLightBuffer)
+        }
+    }
+
+    fun allNeuRepoItems(): Map<String, JsonObject> = NotEnoughUpdates.INSTANCE.manager.itemInformation
 
     fun getMultiplier(internalName: NEUInternalName, tryCount: Int = 0): Pair<NEUInternalName, Int> {
         if (multiplierCache.contains(internalName)) {
@@ -327,7 +356,7 @@ object NEUItems {
                 + ";" + group("level").romanToDecimal())
         }
 
-    //Uses NEU
+    // Uses NEU
     fun saveNBTData(item: ItemStack, removeLore: Boolean = true): String {
         val jsonObject = manager.getJsonForItem(item)
         if (!jsonObject.has("internalname")) {

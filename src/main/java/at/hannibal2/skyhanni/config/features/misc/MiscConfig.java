@@ -3,6 +3,7 @@ package at.hannibal2.skyhanni.config.features.misc;
 import at.hannibal2.skyhanni.config.FeatureToggle;
 import at.hannibal2.skyhanni.config.core.config.Position;
 import at.hannibal2.skyhanni.config.enums.OutsideSbFeature;
+import at.hannibal2.skyhanni.config.enums.OutsideSbFeature;
 import at.hannibal2.skyhanni.config.features.misc.compacttablist.CompactTabListConfig;
 import at.hannibal2.skyhanni.config.features.misc.cosmetic.CosmeticConfig;
 import at.hannibal2.skyhanni.config.features.misc.pets.PetConfig;
@@ -10,7 +11,11 @@ import com.google.gson.annotations.Expose;
 import io.github.moulberry.moulconfig.annotations.Accordion;
 import io.github.moulberry.moulconfig.annotations.Category;
 import io.github.moulberry.moulconfig.annotations.ConfigEditorBoolean;
+import io.github.moulberry.moulconfig.annotations.ConfigEditorDraggableList;
 import io.github.moulberry.moulconfig.annotations.ConfigOption;
+
+import java.util.ArrayList;
+import java.util.List;
 import io.github.moulberry.moulconfig.annotations.ConfigEditorDraggableList;
 
 import java.util.ArrayList;
@@ -98,6 +103,11 @@ public class MiscConfig {
     @ConfigOption(name = "Tracker", desc = "Tracker Config")
     @Accordion
     public TrackerConfig tracker = new TrackerConfig();
+
+    @Expose
+    @ConfigOption(name = "Pet Candy Display", desc = "")
+    @Accordion
+    public PetCandyDisplayConfig petCandy = new PetCandyDisplayConfig();
 
     @Expose
     @ConfigOption(name = "Show Outside SB", desc = "Show these features outside of SkyBlock.")

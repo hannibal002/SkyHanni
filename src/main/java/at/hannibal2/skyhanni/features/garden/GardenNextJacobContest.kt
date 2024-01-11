@@ -195,7 +195,7 @@ object GardenNextJacobContest {
                     sendContests()
                 } else {
                     LorenzUtils.clickableChat(
-                        "§2Click here to submit this years farming contests, thank you for helping everyone out!",
+                        "§2Click here to submit this year's farming contests. Thank you for helping everyone out!",
                         "shsendcontests"
                     )
                 }
@@ -295,7 +295,7 @@ object GardenNextJacobContest {
             if (isCloseToNewYear()) {
                 list.add(closeToNewYear)
             } else {
-                list.add("§cOpen calendar to read jacob contest times!")
+                list.add("§cOpen calendar to read Jacob contest times!")
             }
             return list
         }
@@ -309,7 +309,7 @@ object GardenNextJacobContest {
         if (isCloseToNewYear()) {
             list.add(closeToNewYear)
         } else {
-            list.add("§cOpen calendar to read jacob contest times!")
+            list.add("§cOpen calendar to read Jacob contest times!")
         }
 
         fetchedFromElite = false
@@ -330,7 +330,8 @@ object GardenNextJacobContest {
 
         val boostedCrop = calculateBoostedCrop(nextContest)
 
-        if (duration < contestDuration) {
+        val activeContest = duration < contestDuration
+        if (activeContest) {
             list.add("§aActive: ")
         } else {
             list.add("§eNext: ")
@@ -341,7 +342,9 @@ object GardenNextJacobContest {
             list.addCropIcon(crop, highlight = (crop == boostedCrop))
             nextContestCrops.add(crop)
         }
-        warn(duration, nextContest.crops, boostedCrop)
+        if (!activeContest) {
+            warn(duration, nextContest.crops, boostedCrop)
+        }
         val format = duration.format()
         list.add("§7(§b$format§7)")
 
@@ -502,7 +505,8 @@ object GardenNextJacobContest {
                     newContests[timeMark + contestDuration] = FarmingContest(timeMark + contestDuration, crops)
                 }
             } else {
-                LorenzUtils.chat("This years contests aren't available to fetch automatically yet, please load them from your calender or wait 10 minutes!")
+                LorenzUtils.chat("This year's contests aren't available to fetch automatically yet, please load them from your calendar or wait 10 minutes.")
+                LorenzUtils.clickableChat("Click here to open your calendar!", "calendar")
             }
 
             if (newContests.count() == maxContestsPerYear) {
