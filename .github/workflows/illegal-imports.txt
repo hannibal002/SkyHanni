@@ -3,4 +3,4 @@
 # Every other line needs to be in the format
 # <directory without src/main/java prefix> <illegal import>
 
-at/hannibal2/skyhanni/features/ at.hannibal2.skyhanni.config
+at/hannibal2/skyhanni/ scala.
