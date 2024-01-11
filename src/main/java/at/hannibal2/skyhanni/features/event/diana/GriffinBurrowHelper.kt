@@ -3,6 +3,7 @@ package at.hannibal2.skyhanni.features.event.diana
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.data.EntityMovementData
+import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.events.BurrowDetectEvent
 import at.hannibal2.skyhanni.events.BurrowDugEvent
 import at.hannibal2.skyhanni.events.BurrowGuessEvent
@@ -18,6 +19,7 @@ import at.hannibal2.skyhanni.utils.LocationUtils.distanceToPlayer
 import at.hannibal2.skyhanni.utils.LorenzColor
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils.editCopy
+import at.hannibal2.skyhanni.utils.LorenzUtils.isInIsland
 import at.hannibal2.skyhanni.utils.LorenzVec
 import at.hannibal2.skyhanni.utils.RenderUtils.draw3DLine
 import at.hannibal2.skyhanni.utils.RenderUtils.drawColor
@@ -246,4 +248,46 @@ object GriffinBurrowHelper {
     }
 
     private fun isEnabled() = DianaAPI.isDoingDiana()
+
+    fun setTestBurrow(strings: Array<String>) {
+        if (!IslandType.HUB.isInIsland()) {
+            LorenzUtils.userError("You can only create test burrows on the hub island!")
+            return
+        }
+
+        if (!isEnabled()) {
+            if (!config.alwaysDiana) {
+                LorenzUtils.clickableChat("§cEnable Always Diana in the config!", "sh always diana")
+            } else {
+                LorenzUtils.userError("Have an Ancestral Spade in the inventory!")
+            }
+            return
+        }
+
+        if (strings.size != 1) {
+            LorenzUtils.userError("/shtestburrow <type>")
+            return
+        }
+
+        val type: BurrowType = when (strings[0].lowercase()) {
+            "reset" -> {
+                particleBurrows = emptyMap()
+                update()
+                LorenzUtils.chat("Manually reset all burrow waypoints.")
+                return
+            }
+            "1", "start" -> BurrowType.START
+            "2", "mob" -> BurrowType.MOB
+            "3", "treasure" -> BurrowType.TREASURE
+            else -> {
+                LorenzUtils.userError("Unknown burrow type! Try 1-3 instead.")
+                return
+            }
+        }
+
+        EntityMovementData.addToTrack(Minecraft.getMinecraft().thePlayer)
+        val location = LocationUtils.playerLocation().roundLocation()
+        particleBurrows = particleBurrows.editCopy { this[location] = type }
+        update()
+    }
 }

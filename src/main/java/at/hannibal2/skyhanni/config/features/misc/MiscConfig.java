@@ -205,6 +205,14 @@ public class MiscConfig {
 
     @Expose
     @ConfigOption(
+        name = "Lesser Orb of Healing Hider",
+        desc = "Hides the Lesser Orb of Healing.")
+    @ConfigEditorBoolean
+    @FeatureToggle
+    public boolean lesserOrbHider = false;
+
+    @Expose
+    @ConfigOption(
         name = "Lock Mouse Message",
         desc = "Show a message in chat when toggling the /shmouselock.")
     @ConfigEditorBoolean
