@@ -565,7 +565,7 @@ class SkyHanniMod {
         loadModule(JoinCrystalHollows())
         loadModule(CrystalHollowsNamesInCore())
         loadModule(GardenVisitorColorNames)
-        loadModule(OpenContestInElitebotDev())
+        loadModule(OpenContestInElitebotDev)
         loadModule(TeleportPadCompactName())
         loadModule(AnitaMedalProfit())
         loadModule(AnitaExtraFarmingFortune())
