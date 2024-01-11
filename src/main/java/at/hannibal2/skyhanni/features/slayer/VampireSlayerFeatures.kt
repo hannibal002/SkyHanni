@@ -32,8 +32,6 @@ import at.hannibal2.skyhanni.utils.RenderUtils.exactPlayerEyeLocation
 import at.hannibal2.skyhanni.utils.SoundUtils
 import at.hannibal2.skyhanni.utils.SoundUtils.playSound
 import at.hannibal2.skyhanni.utils.toLorenzVec
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import net.minecraft.client.Minecraft
@@ -208,7 +206,7 @@ object VampireSlayerFeatures {
     }
 
     private fun playTwinclawsSound() {
-        CoroutineScope(Dispatchers.Default).launch {
+        SkyHanniMod.coroutineScope.launch {
             repeat(15) {
                 delay(50)
                 SoundUtils.createSound("random.orb", 0.5f).playSound()

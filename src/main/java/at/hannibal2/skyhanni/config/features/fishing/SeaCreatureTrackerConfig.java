@@ -27,4 +27,9 @@ public class SeaCreatureTrackerConfig {
     @ConfigOption(name = "Hide Chat", desc = "Hide the chat messages when catching a sea creature.")
     @ConfigEditorBoolean
     public boolean hideChat = false;
+
+    @Expose
+    @ConfigOption(name = "Count Double", desc = "Count double hook catches as two catches.")
+    @ConfigEditorBoolean
+    public boolean countDouble = true;
 }
