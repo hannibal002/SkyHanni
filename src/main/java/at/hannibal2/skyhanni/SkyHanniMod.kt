@@ -518,7 +518,7 @@ class SkyHanniMod {
         loadModule(SoopyGuessBurrow())
         loadModule(DianaProfitTracker)
         loadModule(MythologicalCreatureTracker)
-        loadModule(ShiftClickNPCSell())
+        loadModule(ShiftClickNPCSell)
         loadModule(HighlightJerries())
         loadModule(TheGreatSpook())
         loadModule(GriffinBurrowHelper)

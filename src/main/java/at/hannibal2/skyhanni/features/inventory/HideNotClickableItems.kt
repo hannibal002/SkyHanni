@@ -6,7 +6,6 @@ import at.hannibal2.skyhanni.data.ItemRenderBackground.Companion.background
 import at.hannibal2.skyhanni.data.ItemRenderBackground.Companion.borderLine
 import at.hannibal2.skyhanni.data.jsonobjects.repo.HideNotClickableItemsJson
 import at.hannibal2.skyhanni.data.jsonobjects.repo.HideNotClickableItemsJson.SalvageFilter
-import at.hannibal2.skyhanni.data.jsonobjects.repo.MultiFilterJson
 import at.hannibal2.skyhanni.events.GuiContainerEvent
 import at.hannibal2.skyhanni.events.RepositoryReloadEvent
 import at.hannibal2.skyhanni.features.bazaar.BazaarApi
@@ -49,16 +48,12 @@ class HideNotClickableItems {
 
     private val hideNpcSellFilter = MultiFilter()
     private val hideInStorageFilter = MultiFilter()
-    private val tradeNpcFilter = MultiFilter()
     private val itemsToSalvage = mutableListOf<String>()
     private val hidePlayerTradeFilter = MultiFilter()
     private val notAuctionableFilter = MultiFilter()
 
     @SubscribeEvent
     fun onRepoReload(event: RepositoryReloadEvent) {
-        val data = event.getConstant<MultiFilterJson>("TradeNpcs")
-        tradeNpcFilter.load(data)
-
         val hideNotClickable = event.getConstant<HideNotClickableItemsJson>("HideNotClickableItems")
         hideNpcSellFilter.load(hideNotClickable.hide_npc_sell)
         hideInStorageFilter.load(hideNotClickable.hide_in_storage)
@@ -260,7 +255,7 @@ class HideNotClickableItems {
             "BRACELET"
         )
         for (type in list) {
-            if (stack.getLore().any { it.contains("§l") && it.contains(type) }) {//todo use item api
+            if (stack.getLore().any { it.contains("§l") && it.contains(type) }) {// todo use item api
                 reverseColor = true
                 return false
             }
@@ -289,7 +284,7 @@ class HideNotClickableItems {
     private fun hidePrivateIslandChest(chestName: String, stack: ItemStack): Boolean {
         if (chestName != "Chest" && chestName != "Large Chest") return false
 
-        //TODO make check if player is on private island
+        // TODO make check if player is on private island
 
         if (!ItemUtils.isSoulBound(stack)) return false
 
@@ -379,7 +374,7 @@ class HideNotClickableItems {
     }
 
     private fun hideNpcSell(chestName: String, stack: ItemStack): Boolean {
-        if (!tradeNpcFilter.match(chestName)) return false
+        if (!ShiftClickNPCSell.inInventory) return false
         if (VisitorAPI.inInventory) return false
         reverseColor = true
 

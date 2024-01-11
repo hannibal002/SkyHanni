@@ -11,7 +11,7 @@ import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraft.client.Minecraft
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
-class ShiftClickNPCSell {
+object ShiftClickNPCSell {
 
     private val config get() = SkyHanniMod.feature.inventory.shiftClickNPCSell
 
@@ -21,13 +21,14 @@ class ShiftClickNPCSell {
         "§7them to this Shop!|§eClick to buyback!"
     )
 
-    private var inInventory = false
+    var inInventory = false
+        private set
 
     fun isEnabled() = LorenzUtils.inSkyBlock && config
 
     @SubscribeEvent
     fun onOpen(event: InventoryFullyOpenedEvent) {
-        if (!isEnabled()) return
+        if (!LorenzUtils.inSkyBlock) return
         inInventory = lastLoreLineOfSellPattern.matches(event.inventoryItems[sellSlot]?.getLore()?.lastOrNull() ?: "")
     }
 
