@@ -3,8 +3,8 @@ package at.hannibal2.skyhanni.utils
 object RegistryUtil {
 
     private const val PREFIX: String = "REG"
-    private const val SUCCESS_CODE: Int = 0;
-    private const val FAILURE_CODE: Int = 1;
+    private const val SUCCESS_CODE: Int = 0
+    private const val FAILURE_CODE: Int = 1
 
     fun addKey(runtime: Runtime, location: RegistryPaths, key: String) : Boolean {
         val proc: Process = runtime.exec("$PREFIX ADD ${location.path}\\$key")
