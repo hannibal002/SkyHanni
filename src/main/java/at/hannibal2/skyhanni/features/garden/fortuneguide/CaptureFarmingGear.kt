@@ -262,7 +262,7 @@ class CaptureFarmingGear {
         }
         if (msg == "[NPC] Carrolyn: Thank you for the pumpkins.") {
             storage.pumpkinFortune = true
-            LorenzUtils.chat("§aYou have already given Carrolyn enough Expired Pumpkin.")
+            LorenzUtils.chat("§aYou have already given Carrolyn enough Expired Pumpkins.")
         }
     }
 }
