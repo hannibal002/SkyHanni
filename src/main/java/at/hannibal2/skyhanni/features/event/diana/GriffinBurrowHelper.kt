@@ -255,6 +255,15 @@ object GriffinBurrowHelper {
             return
         }
 
+        if (!isEnabled()) {
+            if (!config.alwaysDiana) {
+                LorenzUtils.userError("Enable Always Diana in the config!")
+            } else {
+                LorenzUtils.userError("Have an Ancestral Spade in the inventory!")
+            }
+            return
+        }
+
         if (strings.size != 1) {
             LorenzUtils.userError("/shtestburrow <type>")
             return
@@ -275,7 +284,6 @@ object GriffinBurrowHelper {
                 return
             }
         }
-
 
         EntityMovementData.addToTrack(Minecraft.getMinecraft().thePlayer)
         val location = LocationUtils.playerLocation().roundLocation()
