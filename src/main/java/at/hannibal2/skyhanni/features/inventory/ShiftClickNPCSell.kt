@@ -16,16 +16,19 @@ class ShiftClickNPCSell {
     val config get() = SkyHanniMod.feature.inventory.shiftClickNPCSell
 
     val sellSlot = 49
-    val lastLoreLineOfSell by RepoPattern.pattern("inventory.npc.sell.lore", "§7them to this Shop!|§eClick to buyback!")
+    val lastLoreLineOfSellPattern by RepoPattern.pattern(
+        "inventory.npc.sell.lore",
+        "§7them to this Shop!|§eClick to buyback!"
+    )
 
     var isInNPCSell = false
 
-    fun enable() = LorenzUtils.inSkyBlock && config
+    fun enabled() = LorenzUtils.inSkyBlock && config
 
     @SubscribeEvent
     fun onOpen(event: InventoryFullyOpenedEvent) {
-        if (!enable()) return
-        isInNPCSell = lastLoreLineOfSell.matches(event.inventoryItems[sellSlot]?.getLore()?.lastOrNull() ?: "")
+        if (!enabled()) return
+        isInNPCSell = lastLoreLineOfSellPattern.matches(event.inventoryItems[sellSlot]?.getLore()?.lastOrNull() ?: "")
     }
 
     @SubscribeEvent
@@ -35,7 +38,7 @@ class ShiftClickNPCSell {
 
     @SubscribeEvent
     fun onSlotClick(event: GuiContainerEvent.SlotClickEvent) {
-        if (!enable()) return
+        if (!enabled()) return
         if (!isInNPCSell) return
 
         val slot = event.slot ?: return
