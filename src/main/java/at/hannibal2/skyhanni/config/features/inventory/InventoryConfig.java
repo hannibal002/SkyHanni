@@ -183,13 +183,13 @@ public class InventoryConfig {
     public boolean copyUnderbidPrice = false;
 
     @Expose
-    @ConfigOption(name = "Shift Click Equipment", desc = "Makes normal clicks to shift clicks in equipment inventory")
+    @ConfigOption(name = "Shift Click Equipment", desc = "Makes normal clicks to shift clicks in equipment inventory.")
     @ConfigEditorBoolean
     @FeatureToggle
     public boolean shiftClickForEquipment = false;
 
     @Expose
-    @ConfigOption(name = "Shift Click NPC sell", desc = "Makes normal clicks to shift clicks in npc inventory for selling")
+    @ConfigOption(name = "Shift Click NPC sell", desc = "Makes normal clicks to shift clicks in npc inventory for selling.")
     @ConfigEditorBoolean
     @FeatureToggle
     public boolean shiftClickNPCSell = false;

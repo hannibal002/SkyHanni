@@ -13,33 +13,33 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
 class ShiftClickNPCSell {
 
-    val config get() = SkyHanniMod.feature.inventory.shiftClickNPCSell
+    private val config get() = SkyHanniMod.feature.inventory.shiftClickNPCSell
 
-    val sellSlot = 49
-    val lastLoreLineOfSellPattern by RepoPattern.pattern(
+    private val sellSlot = 49
+    private val lastLoreLineOfSellPattern by RepoPattern.pattern(
         "inventory.npc.sell.lore",
         "§7them to this Shop!|§eClick to buyback!"
     )
 
-    var isInNPCSell = false
+    private var inInventory = false
 
     fun enabled() = LorenzUtils.inSkyBlock && config
 
     @SubscribeEvent
     fun onOpen(event: InventoryFullyOpenedEvent) {
         if (!enabled()) return
-        isInNPCSell = lastLoreLineOfSellPattern.matches(event.inventoryItems[sellSlot]?.getLore()?.lastOrNull() ?: "")
+        inInventory = lastLoreLineOfSellPattern.matches(event.inventoryItems[sellSlot]?.getLore()?.lastOrNull() ?: "")
     }
 
     @SubscribeEvent
     fun onClose(event: InventoryCloseEvent) {
-        isInNPCSell = false
+        inInventory = false
     }
 
     @SubscribeEvent
     fun onSlotClick(event: GuiContainerEvent.SlotClickEvent) {
         if (!enabled()) return
-        if (!isInNPCSell) return
+        if (!inInventory) return
 
         val slot = event.slot ?: return
 
