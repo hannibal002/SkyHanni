@@ -27,6 +27,7 @@ import net.minecraft.launchwrapper.Launch
 import net.minecraft.util.ChatComponentText
 import net.minecraftforge.fml.common.FMLCommonHandler
 import java.awt.Color
+import java.lang.reflect.Constructor
 import java.lang.reflect.Field
 import java.lang.reflect.Modifier
 import java.text.DecimalFormat
@@ -577,6 +578,8 @@ object LorenzUtils {
     }
 
     fun Field.makeAccessible() = also { isAccessible = true }
+
+    fun <T> Constructor<T>.makeAccessible() = also { isAccessible = true }
 
     // Taken and modified from Skytils
     @JvmStatic
