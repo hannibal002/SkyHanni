@@ -1,6 +1,8 @@
 package at.hannibal2.skyhanni.features.rift.area.mirrorverse
 
+import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
+import at.hannibal2.skyhanni.data.jsonobjects.repo.DanceRoomInstructionsJson
 import at.hannibal2.skyhanni.events.CheckRenderEntityEvent
 import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.LorenzTickEvent
@@ -12,9 +14,6 @@ import at.hannibal2.skyhanni.features.rift.RiftAPI
 import at.hannibal2.skyhanni.utils.LocationUtils.isPlayerInside
 import at.hannibal2.skyhanni.utils.RenderUtils.renderStrings
 import at.hannibal2.skyhanni.utils.StringUtils.firstLetterUppercase
-import at.hannibal2.skyhanni.data.jsonobjects.repo.DanceRoomInstructionsJson
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.isActive
@@ -142,7 +141,7 @@ object DanceRoomHelper {
         val countdownString = "%01d:%03d".format(seconds, milliseconds)
         countdown = countdownString
 
-        CoroutineScope(Dispatchers.Default).launch {
+        SkyHanniMod.coroutineScope.launch {
             delay(1)
             var updatedSeconds = seconds
             var updatedMilliseconds = milliseconds - 1
@@ -170,7 +169,7 @@ object DanceRoomHelper {
     }
 
     fun start(interval: Long): Job {
-        return CoroutineScope(Dispatchers.Default).launch {
+        return SkyHanniMod.coroutineScope.launch {
             while (isActive && found) {
                 index++
                 startCountdown(0, 500)
