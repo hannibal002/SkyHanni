@@ -22,12 +22,14 @@ import io.github.moulberry.notenoughupdates.recipes.NeuRecipe
 import io.github.moulberry.notenoughupdates.util.ItemResolutionQuery
 import io.github.moulberry.notenoughupdates.util.Utils
 import net.minecraft.client.Minecraft
+import net.minecraft.client.renderer.GLAllocation
 import net.minecraft.client.renderer.GlStateManager
 import net.minecraft.client.renderer.RenderHelper
 import net.minecraft.init.Blocks
 import net.minecraft.init.Items
 import net.minecraft.item.ItemStack
 import net.minecraft.nbt.NBTTagCompound
+import org.lwjgl.opengl.GL11
 import java.util.regex.Pattern
 
 object NEUItems {
@@ -192,14 +194,15 @@ object NEUItems {
             ErrorManager.logError(
                 IllegalStateException("Something went wrong!"),
                 "Encountered an error getting the item for §7$this§c. " +
-                        "This may be because your NEU repo is outdated. Please ask in the SkyHanni " +
-                        "Discord if this is the case"
+                    "This may be because your NEU repo is outdated. Please ask in the SkyHanni " +
+                    "Discord if this is the case"
             )
             fallbackItem
         }
 
     fun isVanillaItem(item: ItemStack): Boolean =
         manager.auctionManager.isVanillaItem(item.getInternalName().asString())
+
 
     fun ItemStack.renderOnScreen(x: Float, y: Float, scaleMultiplier: Double = 1.0) {
         val item = checkBlinkItem()
@@ -221,14 +224,37 @@ object NEUItems {
 
         GlStateManager.pushMatrix()
 
-        GlStateManager.translate(translateX, translateY, 1F)
-        GlStateManager.scale(finalScale, finalScale, 1.0)
+        GlStateManager.translate(translateX, translateY, -19f)
+        GlStateManager.scale(finalScale, finalScale, 0.2)
+        GL11.glNormal3f(0f, 0f, 1f / 0.2f) // Compensate for z scaling
 
         RenderHelper.enableGUIStandardItemLighting()
+
+        AdjustStandardItemLighting.adjust() // Compensate for z scaling
+
         Minecraft.getMinecraft().renderItem.renderItemIntoGUI(item, 0, 0)
         RenderHelper.disableStandardItemLighting()
 
         GlStateManager.popMatrix()
+    }
+
+    private object AdjustStandardItemLighting {
+
+        private const val lightScaling = 2.47f // Adjust as needed
+        private const val g = 0.6f // Original Value taken from RenderHelper
+        private const val lightIntensity = lightScaling * g
+        private val itemLightBuffer = GLAllocation.createDirectFloatBuffer(16);
+
+        init {
+            itemLightBuffer.clear()
+            itemLightBuffer.put(lightIntensity).put(lightIntensity).put(lightIntensity).put(1.0f)
+            itemLightBuffer.flip()
+        }
+
+        fun adjust() {
+            GL11.glLight(16384, 4609, itemLightBuffer)
+            GL11.glLight(16385, 4609, itemLightBuffer)
+        }
     }
 
     fun allNeuRepoItems(): Map<String, JsonObject> = NotEnoughUpdates.INSTANCE.manager.itemInformation
@@ -326,11 +352,11 @@ object NEUItems {
             val name = group("name").trim { it <= ' ' }
             val ultimate = group("format").lowercase().contains("§l")
             ((if (ultimate && name != "Ultimate Wise") "ULTIMATE_" else "")
-                    + turboCheck(name).replace(" ", "_").replace("-", "_").uppercase()
-                    + ";" + group("level").romanToDecimal())
+                + turboCheck(name).replace(" ", "_").replace("-", "_").uppercase()
+                + ";" + group("level").romanToDecimal())
         }
 
-    //Uses NEU
+    // Uses NEU
     fun saveNBTData(item: ItemStack, removeLore: Boolean = true): String {
         val jsonObject = manager.getJsonForItem(item)
         if (!jsonObject.has("internalname")) {
