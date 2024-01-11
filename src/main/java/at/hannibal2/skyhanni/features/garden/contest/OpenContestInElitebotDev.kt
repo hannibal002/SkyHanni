@@ -40,9 +40,9 @@ class OpenContestInElitebotDev {
 
     private val config get() = SkyHanniMod.feature.garden.eliteWebsite
 
-    private val EARLIEST_CONTEST_YEAR: Long = 100L
-    private val EARLIEST_CONTEST_MONTH: Int = 6
-    private val EARLIEST_CONTEST_DATE: Int = 18
+    private val EARLIEST_CONTEST_YEAR_KNOWN_TO_ELITEWEBSITE: Long = 100L
+    private val EARLIEST_CONTEST_MONTH_KNOWN_TO_ELITEWEBSITE: Int = 6
+    private val EARLIEST_CONTEST_DATE_KNOWN_TO_ELITEWEBSITE: Int = 18
     
     private val ELITEBOT_DOMAIN: String = "https://elitebot.dev"
     private val ELITEBOT_CONTESTS: String = "$ELITEBOT_DOMAIN/contests"
@@ -149,27 +149,35 @@ class OpenContestInElitebotDev {
                 dayBlankItemNamePattern.matchMatcher(itemName) {
                     val origDayString = group("day")
                     val day = origDayString.formatNumber().toInt()
-                    openPastContestAfterSanityCheck(year, month, day, "$origMonthString $origDayString $origYearString")
+                    openPastContestAfterSanityCheck(year, month, day, "$origMonthString $origDayString, Year $origYearString")
                 }
             }
         }
     }
 
     private fun openUpcoming() {
-        LorenzUtils.chat("Opening the upcoming contests page on EliteWebsite.")
+        LorenzUtils.chat("§aOpening the upcoming contests page on EliteWebsite.")
         OSUtils.openBrowser(ELITEBOT_UPCOMING)
     }
     
     private fun openPastContestAfterSanityCheck(year: Long, month: Int, day: Int, origSBTime: String) {
         if (calendarDateSanityCheck(year, month, day, SkyBlockTime.now())) {
-            LorenzUtils.chat("Opening the farming contests page for $origSBTime on EliteWebsite.")
+            LorenzUtils.chat("§aOpening the farming contests page for $origSBTime on EliteWebsite.")
             OSUtils.openBrowser("$ELITEBOT_CONTESTS/$year/$month/$day")
         } else {
-            LorenzUtils.chat("There is no farming contests page for $origSBTime on EliteWebsite. Try again with a different farming contest date.")
+            LorenzUtils.chat("There is no farming contests page for §a$origSBTime §eon EliteWebsite. Try again with a different farming contest date.")
+            LorenzUtils.chat("§c$year VS ${SkyBlockTime.now().year} | $month VS ${SkyBlockTime.now().month} | $day VS ${SkyBlockTime.now().day}")
         }
     }
 
-    private fun calendarDateSanityCheck(year: Long, month: Int, day: Int, currentSBTime: SkyBlockTime): Boolean = ((year in EARLIEST_CONTEST_YEAR..currentSBTime.year) && (month in EARLIEST_CONTEST_MONTH..currentSBTime.month) && (day in EARLIEST_CONTEST_DATE..currentSBTime.day))
+    private fun calendarDateSanityCheck(year: Long, month: Int, day: Int, currentSBTime: SkyBlockTime): Boolean {
+        if (year !in EARLIEST_CONTEST_YEAR_KNOWN_TO_ELITEWEBSITE..currentSBTime.year) return false
+        if (year == EARLIEST_CONTEST_YEAR_KNOWN_TO_ELITEWEBSITE && month !in 1..EARLIEST_CONTEST_MONTH_KNOWN_TO_ELITEWEBSITE) return false
+        if (year == EARLIEST_CONTEST_YEAR_KNOWN_TO_ELITEWEBSITE && month == EARLIEST_CONTEST_MONTH_KNOWN_TO_ELITEWEBSITE && day !in 1..EARLIEST_CONTEST_DATE_KNOWN_TO_ELITEWEBSITE) return false
+        if (year == currentSBTime.year.toLong() && month !in 1..currentSBTime.month) return false
+        if (year == currentSBTime.year.toLong() && month == currentSBTime.month && day !in 1..currentSBTime.day) return false
+        return true
+    }
 
     private fun String.convertMonthNameToInt(): Int = when (this) {
         "Early Spring" -> 1
