@@ -33,7 +33,11 @@ object HarpFeatures {
     }
 
     private val buttonColors = listOf('d', 'e', 'a', '2', '5', '9', 'b')
-    private val inventoryTitleRegex by RepoPattern.pattern("harp.inventory", "^Harp.*")
+
+    private val inventoryTitleRegex by RepoPattern.pattern(
+        "harp.inventory",
+        "^Harp.*"
+    )
 
     private fun isHarpGui() = inventoryTitleRegex.matches(openInventoryName())
 

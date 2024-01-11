@@ -23,10 +23,13 @@ import kotlin.time.Duration.Companion.minutes
 
 object GardenPlotAPI {
 
-    private val plotNamePattern by RepoPattern.pattern("garden.plot.name", "§.Plot §7- §b(?<name>.*)")
-
-    private val plotSprayedPattern by RepoPattern.pattern(
-        "garden.plot.spray.target",
+    private val patternGroup = RepoPattern.group("garden.plot")
+    private val plotNamePattern by patternGroup.pattern(
+        "name",
+        "§.Plot §7- §b(?<name>.*)"
+    )
+    private val plotSprayedPattern by patternGroup.pattern(
+        "spray.target",
         "§a§lSPRAYONATOR! §r§7You sprayed §r§aPlot §r§7- §r§b(?<plot>.*) §r§7with §r§a(?<spray>.*)§r§7!"
     )
 

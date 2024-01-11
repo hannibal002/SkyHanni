@@ -58,7 +58,6 @@ object PartyAPI {
         "members.start",
         "§6Party Members \\(\\d+\\)"
     )
-
     private val partyMemberListPattern by patternGroup.pattern(
         "members.list",
         "Party (?:Leader|Moderators|Members): (?<names>.*)"

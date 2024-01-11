@@ -40,6 +40,7 @@ class CityProjectFeatures {
         "fame.projects.contribute",
         "§7Contribute again: §e(?<time>.*)"
     )
+
     companion object {
         private val config get() = SkyHanniMod.feature.event.cityProject
         fun disable() {
