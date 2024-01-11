@@ -18,26 +18,26 @@ import kotlin.math.abs
 class CrystalHollowsLobbyAgeWarning {
     private val mc get() = Minecraft.getMinecraft()
 
+    private val THE_CRYSTAL_HOLLOWS = IslandType.CRYSTAL_HOLLOWS
+
     private val TICKS_PER_MC_DAY_MINECRAFT: Long = 24000L
 
     private val crystalHollowsLobbyRepoGroup = RepoPattern.group("crystalhollows.lobbyage")
     private val playerCountTabListPattern by crystalHollowsLobbyRepoGroup.pattern(("playercount.tablist"), (" *(?:§.)*Players[\\S ]*[\\(\\[\\{](?<playerCount>[\\S ]+)[\\)\\]\\}]"))
 
     private var lobbyIsPastAgeThreshold: Boolean = false
-    private var oldPlayerCount: Long = 0L
-    private var oldLobbyAge: Long = 0L
+    private var oldPlayerCount: Long = 0L //caching old values for less frequent processing
+    private var oldLobbyAge: Long = 0L //caching old values for less frequent processing
 
-    private fun getLobbyAgeInMinecraftDays(): Long {
-        return (mc.theWorld.worldTime) / TICKS_PER_MC_DAY_MINECRAFT
-    }
+    private fun getLobbyAgeInMinecraftDays(): Long = (mc.theWorld.worldTime) / TICKS_PER_MC_DAY_MINECRAFT //to save everyone from insanity: this changes during each 6AM in skyblock time -ery
 
     private fun processPlayerCount() {
-        if (!isInCrystalHollows()) return
+        if (!isInCrystalHollows()) return //avoid incredibly fringe race condition that somehow only happens in the dwarven mines -ery
         for (line in TabListData.getTabList()) {
             playerCountTabListPattern.matchMatcher(line) {
                 val playerCount = group("playerCount").formatNumber()
-                if (oldPlayerCount == playerCount) return
-                oldPlayerCount = playerCount
+                if (oldPlayerCount == playerCount) return //avoid sending chat msgs more than necessary
+                oldPlayerCount = playerCount //set new cache value
                 if (config.playerCountReminders) LorenzUtils.chat("§a$playerCount players are currently in this Crystal Hollows lobby.")
                 if (!lobbyIsPastAgeThreshold) return
                 if (playerCount in 1..config.minPlayers) LorenzUtils.chat("§cThere are $playerCount players remaining in this Crystal Hollows lobby. §4§lIt will shut down very soon.")
@@ -47,13 +47,13 @@ class CrystalHollowsLobbyAgeWarning {
     }
 
     private fun processLobbyAge() {
-        if (!isInCrystalHollows()) return
+        if (!isInCrystalHollows()) return //avoid incredibly fringe race condition that somehow only happens in the dwarven mines -ery
         val lobbyAge = getLobbyAgeInMinecraftDays()
-        if (oldLobbyAge == lobbyAge) return
-        oldLobbyAge = lobbyAge
+        if (oldLobbyAge == lobbyAge) return //avoid sending chat msgs more than necessary
+        oldLobbyAge = lobbyAge //set new cache value
         if (config.lobbyAgeReminders && !lobbyIsPastAgeThreshold) LorenzUtils.chat("§aThis Crystal Hollows lobby is currently at Day $lobbyAge, ${abs(config.minLobbyAgeThreshold - lobbyAge)} days away from Day ${config.minLobbyAgeThreshold}.")
         if (lobbyAge in config.minLobbyAgeThreshold..< config.maxLobbyAgeThreshold && !lobbyIsPastAgeThreshold) {
-            lobbyIsPastAgeThreshold = true
+            lobbyIsPastAgeThreshold = true //prevent sending message multiple times (see preceding conditional)
             LorenzUtils.chat("This Crystal Hollows lobby has reached Day ${config.minLobbyAgeThreshold}. It no longer accepts new players, §cand will shut down on Day ${config.maxLobbyAgeThreshold} or when there are fewer than ${config.minPlayers} people left §e(whichever happens first).")
         } else if (lobbyAge >= config.maxLobbyAgeThreshold) LorenzUtils.chat("§cThis Crystal Hollows lobby has reached Day ${config.maxLobbyAgeThreshold}. §4§lIt will shut down very soon.")
     }
@@ -75,13 +75,14 @@ class CrystalHollowsLobbyAgeWarning {
 
     @SubscribeEvent
     fun onIslandChange(event: IslandChangeEvent) {
-        if (event.newIsland != IslandType.CRYSTAL_HOLLOWS) {
-            lobbyIsPastAgeThreshold = false
-            oldPlayerCount = 0L
+        if (event.newIsland != THE_CRYSTAL_HOLLOWS) {
+            lobbyIsPastAgeThreshold = false //allow sending again in next CH lobby
+            oldPlayerCount = 0L //reset cache values
+            oldLobbyAge = 0L //reset cache values
         }
     }
 
     private val config get() = SkyHanniMod.feature.mining.crystalHollowsLobbyAgeWarning
     private fun isEnabled() = config.enabled && isInCrystalHollows()
-    private fun isInCrystalHollows() = IslandType.CRYSTAL_HOLLOWS.isInIsland()
+    private fun isInCrystalHollows() = THE_CRYSTAL_HOLLOWS.isInIsland()
 }

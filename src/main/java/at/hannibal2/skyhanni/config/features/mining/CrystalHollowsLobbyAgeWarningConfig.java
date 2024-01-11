@@ -27,13 +27,13 @@ public class CrystalHollowsLobbyAgeWarningConfig {
 
     @Expose
     @ConfigOption(name = "Minimum Players", desc = "")
-    public int minPlayers = 4;
+    public int minPlayers = 4; //hidden config option that gets added to config.json in case hypixel changes these particular values and a hotfix isn't immediately possible -ery
 
     @Expose
     @ConfigOption(name = "Min Lobby Age Threshold (in MC Days)", desc = "")
-    public int minLobbyAgeThreshold = 18;
+    public int minLobbyAgeThreshold = 18; //hidden config option that gets added to config.json in case hypixel changes these particular values and a hotfix isn't immediately possible -ery
 
     @Expose
     @ConfigOption(name = "Max Lobby Age Threshold (in MC Days)", desc = "")
-    public int maxLobbyAgeThreshold = 25;
+    public int maxLobbyAgeThreshold = 25; //hidden config option that gets added to config.json in case hypixel changes these particular values and a hotfix isn't immediately possible -ery
 }
