@@ -23,11 +23,11 @@ class ShiftClickNPCSell {
 
     private var inInventory = false
 
-    fun enabled() = LorenzUtils.inSkyBlock && config
+    fun isEnabled() = LorenzUtils.inSkyBlock && config
 
     @SubscribeEvent
     fun onOpen(event: InventoryFullyOpenedEvent) {
-        if (!enabled()) return
+        if (!isEnabled()) return
         inInventory = lastLoreLineOfSellPattern.matches(event.inventoryItems[sellSlot]?.getLore()?.lastOrNull() ?: "")
     }
 
@@ -38,7 +38,7 @@ class ShiftClickNPCSell {
 
     @SubscribeEvent
     fun onSlotClick(event: GuiContainerEvent.SlotClickEvent) {
-        if (!enabled()) return
+        if (!isEnabled()) return
         if (!inInventory) return
 
         val slot = event.slot ?: return
