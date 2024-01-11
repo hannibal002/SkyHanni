@@ -139,6 +139,12 @@ class FarmingFortuneDisplay {
         if (upgradeFortune == null) {
             updatedDisplay.addAsSingletonList("§cOpen §e/cropupgrades§c for more exact data!")
         }
+
+        val uniqueVisitors = GardenAPI.storage?.uniqueVisitors?.toDouble() ?: 0.0
+        if (uniqueVisitors == 0.0) {
+            updatedDisplay.addAsSingletonList("§cOpen §e/visitormilestones§c for more exact data!")
+        }
+
         if (accessoryFortune == null) {
             updatedDisplay.addAsSingletonList("§cOpen Accessory Bag for more exact data!")
             if (CropAccessoryData.isLoadingAccessories) {
