@@ -658,5 +658,5 @@ object LorenzUtils {
     }
 
     // Let garbage collector handle the removal of entries in this list
-    inline fun <reified T> weakReferenceList() = Collections.newSetFromMap(WeakHashMap<T, Boolean>())
+    inline fun <reified T> weakReferenceList(): MutableSet<T> = Collections.newSetFromMap(WeakHashMap<T, Boolean>())
 }
