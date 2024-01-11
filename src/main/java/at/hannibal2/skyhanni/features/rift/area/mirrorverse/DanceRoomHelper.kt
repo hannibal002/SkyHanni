@@ -14,7 +14,6 @@ import at.hannibal2.skyhanni.features.rift.RiftAPI
 import at.hannibal2.skyhanni.utils.LocationUtils.isPlayerInside
 import at.hannibal2.skyhanni.utils.RenderUtils.renderStrings
 import at.hannibal2.skyhanni.utils.StringUtils.firstLetterUppercase
-import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
@@ -168,8 +167,8 @@ object DanceRoomHelper {
         instructions = event.getConstant<DanceRoomInstructionsJson>("DanceRoomInstructions").instructions
     }
 
-    fun start(interval: Long): Job {
-        return SkyHanniMod.coroutineScope.launch {
+    fun start(interval: Long) {
+        SkyHanniMod.coroutineScope.launch {
             while (isActive && found) {
                 index++
                 startCountdown(0, 500)
