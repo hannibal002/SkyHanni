@@ -19,6 +19,11 @@ public class MiningConfig {
     public KingTalismanConfig kingTalisman = new KingTalismanConfig();
 
     @Expose
+    @ConfigOption(name = "Crystal Hollows Lobby Age Warning", desc = "Sends warnings when a Crystal Hollows lobby is about to close.")
+    @Accordion
+    public CrystalHollowsLobbyAgeWarningConfig crystalHollowsLobbyAgeWarning = new CrystalHollowsLobbyAgeWarningConfig();
+
+    @Expose
     @ConfigOption(name = "Highlight Commission Mobs", desc = "Highlight Mobs that are part of active commissions.")
     @ConfigEditorBoolean
     @FeatureToggle
