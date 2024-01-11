@@ -32,7 +32,7 @@ class CrystalHollowsLobbyAgeWarning {
     }
 
     private fun processPlayerCount() {
-        if (!isOnCrystalHollows()) return
+        if (!isInCrystalHollows()) return
         for (line in TabListData.getTabList()) {
             playerCountTabListPattern.matchMatcher(line) {
                 val playerCount = group("playerCount").formatNumber()
@@ -47,7 +47,7 @@ class CrystalHollowsLobbyAgeWarning {
     }
 
     private fun processLobbyAge() {
-        if (!isOnCrystalHollows()) return
+        if (!isInCrystalHollows()) return
         val lobbyAge = getLobbyAgeInMinecraftDays()
         if (oldLobbyAge == lobbyAge) return
         oldLobbyAge = lobbyAge
@@ -82,6 +82,6 @@ class CrystalHollowsLobbyAgeWarning {
     }
 
     private val config get() = SkyHanniMod.feature.mining.crystalHollowsLobbyAgeWarning
-    private fun isEnabled() = config.enabled && isOnCrystalHollows()
-    private fun isOnCrystalHollows() = IslandType.CRYSTAL_HOLLOWS.isInIsland()
+    private fun isEnabled() = config.enabled && isInCrystalHollows()
+    private fun isInCrystalHollows() = IslandType.CRYSTAL_HOLLOWS.isInIsland()
 }
