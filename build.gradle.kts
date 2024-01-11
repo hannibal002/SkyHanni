@@ -108,6 +108,7 @@ dependencies {
     shadowModImpl(libs.moulconfig)
     shadowImpl(libs.libautoupdate)
     shadowImpl("org.jetbrains.kotlin:kotlin-reflect:1.9.0")
+    implementation(libs.hotswapagentforge)
 
 //    testImplementation(kotlin("test"))
     testImplementation("com.github.NotEnoughUpdates:NotEnoughUpdates:v2.1.1-pre4:all") {
