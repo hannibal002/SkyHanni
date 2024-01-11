@@ -659,4 +659,7 @@ object LorenzUtils {
 
     // Let garbage collector handle the removal of entries in this list
     fun <T> weakReferenceList(): MutableSet<T> = Collections.newSetFromMap(WeakHashMap<T, Boolean>())
+
+
+    fun <T> MutableCollection<T>.filterToMutable(predicate: (T) -> Boolean) = filterTo(mutableListOf(), predicate)
 }

@@ -4,6 +4,7 @@ import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.events.SkipTabListLineEvent
 import at.hannibal2.skyhanni.mixins.transformers.AccessorGuiPlayerTabOverlay
 import at.hannibal2.skyhanni.utils.LorenzUtils
+import at.hannibal2.skyhanni.utils.LorenzUtils.filterToMutable
 import at.hannibal2.skyhanni.utils.StringUtils.matches
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraft.client.Minecraft
@@ -94,12 +95,12 @@ object TabListRenderer {
         }
 
         var middleX = x
-        var lastTitle = null as TabLine?
-        var lastSubTitle = null as TabLine?
-        for (column in columns) {
+        var lastTitle: TabLine? = null
+        var lastSubTitle: TabLine? = null
+        for (originalColumn in columns) {
             var middleY = if (config.hideAdverts) headerY else headerY + padding + 2
 
-            val filteredColumn = column.lines.filterTo(mutableListOf()) { tabLine ->
+            val column = originalColumn.lines.filterToMutable { tabLine ->
                 if (tabLine.type == TabStringType.TITLE) {
                     lastSubTitle = null
                     lastTitle = tabLine
@@ -113,12 +114,12 @@ object TabListRenderer {
             Gui.drawRect(
                 middleX - padding + 1,
                 middleY - padding + 1,
-                middleX + filteredColumn.getMaxWidth() + padding - 2,
-                middleY + filteredColumn.size() * lineHeight + padding - 2,
+                middleX + column.getMaxWidth() + padding - 2,
+                middleY + column.size() * lineHeight + padding - 2,
                 0x20AAAAAA
             )
 
-            for (tabLine in filteredColumn.lines) {
+            for (tabLine in column.lines) {
                 val savedX = middleX
 
                 val hideIcons = config.advancedPlayerList.hidePlayerIcons && !AdvancedPlayerList.ignoreCustomTabList()
@@ -141,7 +142,7 @@ object TabListRenderer {
                 if (tabLine.type == TabStringType.TITLE) {
                     minecraft.fontRendererObj.drawStringWithShadow(
                         text,
-                        middleX + filteredColumn.getMaxWidth() / 2f - tabLine.getWidth() / 2f,
+                        middleX + column.getMaxWidth() / 2f - tabLine.getWidth() / 2f,
                         middleY.toFloat(),
                         0xFFFFFF
                     )
@@ -156,7 +157,7 @@ object TabListRenderer {
                 middleY += lineHeight
                 middleX = savedX
             }
-            middleX += filteredColumn.getMaxWidth() + columnSpacing
+            middleX += column.getMaxWidth() + columnSpacing
         }
 
         if (footer.isNotEmpty()) {
@@ -173,11 +174,11 @@ object TabListRenderer {
         }
     }
 
-    val fireSaleRegex by RepoPattern.pattern("tablist.firesaletitle", "^§b§lFire Sales: §r§f\\([0-9]+\\)$")
+    private val fireSalePattern by RepoPattern.pattern("tablist.firesaletitle", "§b§lFire Sales: §r§f\\([0-9]+\\)")
 
     @SubscribeEvent
     fun hideFireFromTheTabListBecauseWhoWantsThose(event: SkipTabListLineEvent) {
-        if (config.hideFiresales && event.lastSubTitle != null && fireSaleRegex.matches(event.lastSubTitle.text)) {
+        if (config.hideFiresales && event.lastSubTitle != null && fireSalePattern.matches(event.lastSubTitle.text)) {
             event.cancel()
         }
     }
