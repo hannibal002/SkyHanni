@@ -51,6 +51,7 @@ import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.TimeUtils
 import at.hannibal2.skyhanni.utils.getLorenzVec
 import at.hannibal2.skyhanni.utils.renderables.Renderable
+import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import com.google.gson.JsonArray
 import com.google.gson.JsonPrimitive
 import net.minecraft.client.Minecraft
@@ -69,10 +70,24 @@ private val config get() = VisitorAPI.config
 
 class GardenVisitorFeatures {
     private var display = emptyList<List<Any>>()
-    private val newVisitorArrivedMessage = ".* §r§ehas arrived on your §r§bGarden§r§e!".toPattern()
-    private val copperPattern = " §8\\+§c(?<amount>.*) Copper".toPattern()
-    private val gardenExperiencePattern = " §8\\+§2(?<amount>.*) §7Garden Experience".toPattern()
-    private val visitorChatMessagePattern = "§e\\[NPC] (§.)?(?<name>.*)§f: §r.*".toPattern()
+
+    private val patternGroup = RepoPattern.group("garden.visitor")
+    private val visitorArrivePattern by patternGroup.pattern(
+        "visitorarrive",
+        ".* §r§ehas arrived on your §r§bGarden§r§e!"
+    )
+    private val copperPattern by patternGroup.pattern(
+        "copper",
+        " §8\\+§c(?<amount>.*) Copper"
+    )
+    private val gardenExperiencePattern by patternGroup.pattern(
+        "gardenexperience",
+        " §8\\+§2(?<amount>.*) §7Garden Experience"
+    )
+    private val visitorChatMessagePattern by patternGroup.pattern(
+        "visitorchat",
+        "§e\\[NPC] (§.)?(?<name>.*)§f: §r.*"
+    )
 
     private val logger = LorenzLogger("garden/visitors")
     private var lastFullPrice = 0.0
@@ -450,7 +465,7 @@ class GardenVisitorFeatures {
 
     @SubscribeEvent
     fun onChatMessage(event: LorenzChatEvent) {
-        if (config.hypixelArrivedMessage && newVisitorArrivedMessage.matcher(event.message).matches()) {
+        if (config.hypixelArrivedMessage && visitorArrivePattern.matcher(event.message).matches()) {
             event.blockedReason = "new_visitor_arrived"
         }
 
