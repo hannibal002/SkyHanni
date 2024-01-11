@@ -149,7 +149,7 @@ enum class ScoreboardElements(
     SLAYER(
         ::getSlayerDisplayPair,
         ::getSlayerShowWhen,
-        "§cSlayer\n §7- §cVoidgloom Seraph III\n §7- §e12§7/§c120 §7Kills"
+        "Slayer Quest\n §7- §cVoidgloom Seraph III\n §7- §e12§7/§c120 §7Kills"
     ),
     EMPTY_LINE3(
         ::getEmptyLineDisplayPair,
@@ -471,7 +471,7 @@ private fun getObjectiveDisplayPair(): List<ScoreboardElement> {
 
 private fun getSlayerDisplayPair(): List<ScoreboardElement> {
     return listOf(
-        (if (SlayerAPI.hasActiveSlayerQuest()) "§cSlayer" else "<hidden>") to AlignmentEnum.LEFT
+        (if (SlayerAPI.hasActiveSlayerQuest()) "Slayer Quest" else "<hidden>") to AlignmentEnum.LEFT
     ) + (
         " §7- §e${SlayerAPI.latestSlayerCategory.trim()}" to AlignmentEnum.LEFT
         ) + (
