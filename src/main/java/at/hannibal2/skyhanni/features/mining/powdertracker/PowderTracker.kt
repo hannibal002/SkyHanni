@@ -17,6 +17,7 @@ import at.hannibal2.skyhanni.utils.LorenzUtils.isInIsland
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.NumberUtil.formatNumber
 import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
+import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import at.hannibal2.skyhanni.utils.tracker.SkyHanniTracker
 import at.hannibal2.skyhanni.utils.tracker.TrackerData
 import com.google.gson.JsonArray
@@ -29,11 +30,29 @@ import kotlin.concurrent.fixedRateTimer
 object PowderTracker {
 
     private val config get() = SkyHanniMod.feature.mining.powderTracker
-    private val picked = "§6You have successfully picked the lock on this chest!".toPattern()
-    private val uncovered = "§aYou uncovered a treasure chest!".toPattern()
-    private val powderEvent = ".*§r§b§l2X POWDER STARTED!.*".toPattern()
-    private val powderEnded = ".*§r§b§l2X POWDER ENDED!.*".toPattern()
-    private val powderBossBar = "§e§lPASSIVE EVENT §b§l2X POWDER §e§lRUNNING FOR §a§l(?<time>.*)§r".toPattern()
+
+    private val patternGroup = RepoPattern.group("mining.powder.tracker")
+    private val pickedPattern by patternGroup.pattern(
+        "picked",
+        "§6You have successfully picked the lock on this chest!"
+    )
+    private val uncoveredPattern by patternGroup.pattern(
+        "uncovered",
+        "§aYou uncovered a treasure chest!"
+    )
+    private val powderStartedPattern by patternGroup.pattern(
+        "powder.started",
+        ".*§r§b§l2X POWDER ENDED!.*"
+    )
+    private val powderEndedPattern by patternGroup.pattern(
+        "powder.ended",
+        ".*§r§b§l2X POWDER STARTED!.*"
+    )
+    private val powderBossBarPattern by patternGroup.pattern(
+        "powder.bossbar",
+        "§e§lPASSIVE EVENT §b§l2X POWDER §e§lRUNNING FOR §a§l(?<time>.*)§r"
+    )
+
     private var lastChestPicked = 0L
     private var isGrinding = false
     private val gemstoneInfo = ResourceInfo(0L, 0L, 0, 0.0, mutableListOf())
@@ -53,6 +72,8 @@ object PowderTracker {
     )
 
     init {
+        PowderChestReward.entries.forEach { it.chatPattern }
+
         fixedRateTimer(name = "skyhanni-powder-tracker", period = 1000) {
             if (!isEnabled()) return@fixedRateTimer
             calculateResourceHour(gemstoneInfo)
@@ -94,7 +115,7 @@ object PowderTracker {
         val msg = event.message
 
         if (config.greatExplorerMaxed) {
-            uncovered.matchMatcher(msg) {
+            uncoveredPattern.matchMatcher(msg) {
                 tracker.modify {
                     it.totalChestPicked += 1
                 }
@@ -103,7 +124,7 @@ object PowderTracker {
             }
         }
 
-        picked.matchMatcher(msg) {
+        pickedPattern.matchMatcher(msg) {
             tracker.modify {
                 it.totalChestPicked += 1
             }
@@ -111,11 +132,11 @@ object PowderTracker {
             lastChestPicked = System.currentTimeMillis()
         }
 
-        powderEvent.matchMatcher(msg) { doublePowder = true }
-        powderEnded.matchMatcher(msg) { doublePowder = false }
+        powderStartedPattern.matchMatcher(msg) { doublePowder = true }
+        powderEndedPattern.matchMatcher(msg) { doublePowder = false }
 
         for (reward in PowderChestReward.entries) {
-            reward.pattern.matchMatcher(msg) {
+            reward.chatPattern.matchMatcher(msg) {
                 tracker.modify {
                     val count = it.rewards[reward] ?: 0
                     var amount = group("amount").formatNumber()
@@ -132,8 +153,8 @@ object PowderTracker {
     fun onTick(event: LorenzTickEvent) {
         if (!isEnabled()) return
         if (event.repeatSeconds(1)) {
-            doublePowder = powderBossBar.matcher(BossStatus.bossName).find()
-            powderBossBar.matchMatcher(BossStatus.bossName) {
+            doublePowder = powderBossBarPattern.matcher(BossStatus.bossName).find()
+            powderBossBarPattern.matchMatcher(BossStatus.bossName) {
                 powderTimer = group("time")
                 doublePowder = powderTimer != "00:00"
 
