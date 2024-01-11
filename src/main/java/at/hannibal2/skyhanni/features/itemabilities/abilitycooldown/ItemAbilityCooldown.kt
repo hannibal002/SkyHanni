@@ -25,6 +25,7 @@ import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getAbilityScrolls
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getItemId
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getItemUuid
 import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
+import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraft.client.Minecraft
 import net.minecraft.item.ItemStack
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
@@ -33,11 +34,19 @@ import kotlin.math.max
 class ItemAbilityCooldown {
     private val config get() = SkyHanniMod.feature.itemAbilities
 
+    private val patternGroup = RepoPattern.group("item.abilities.cooldown")
+    private val youAlignedOthersPattern by patternGroup.pattern(
+        "alignedother",
+        "§eYou aligned §r§a.* §r§eother player(s)?!"
+    )
+    private val youBuffedYourselfPattern by patternGroup.pattern(
+        "buffedyourself",
+        "§aYou buffed yourself for §r§c\\+\\d+❁ Strength"
+    )
+
     private var lastAbility = ""
     private var items = mapOf<ItemStack, List<ItemText>>()
     private var abilityItems = mapOf<ItemStack, MutableList<ItemAbility>>()
-    private val youAlignedOthersPattern = "§eYou aligned §r§a.* §r§eother player(s)?!".toPattern()
-    private val youBuffedYourselfPattern = "§aYou buffed yourself for §r§c\\+\\d+❁ Strength".toPattern()
     private val WEIRD_TUBA = "WEIRD_TUBA".asInternalName()
     private val WEIRDER_TUBA = "WEIRDER_TUBA".asInternalName()
     private val VOODOO_DOLL_WILTED = "VOODOO_DOLL_WILTED".asInternalName()
