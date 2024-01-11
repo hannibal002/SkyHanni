@@ -170,7 +170,7 @@ class HideNotClickableItems {
         reverseColor = false
 
         return when {
-            hideNpcSell(chestName, stack) -> true
+            hideNpcSell(stack) -> true
             hideInStorage(chestName, stack) -> true
             hideSalvage(chestName, stack) -> true
             hidePlayerTrade(chestName, stack) -> true
@@ -373,7 +373,7 @@ class HideNotClickableItems {
         return result
     }
 
-    private fun hideNpcSell(chestName: String, stack: ItemStack): Boolean {
+    private fun hideNpcSell(stack: ItemStack): Boolean {
         if (!ShiftClickNPCSell.inInventory) return false
         if (VisitorAPI.inInventory) return false
         reverseColor = true
