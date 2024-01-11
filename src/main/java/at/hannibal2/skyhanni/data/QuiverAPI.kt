@@ -48,6 +48,7 @@ object QuiverAPI {
         "§aYou filled your quiver with §f(?<flintAmount>.*) §aextra arrows!"
     )
     private val clearedPattern by group.pattern("cleared", "§aCleared your quiver!")
+    private val arrowResetPattern by group.pattern("arrowreset", "§cYour favorite arrow has been reset!")
 
     @SubscribeEvent
     fun onChat(event: LorenzChatEvent) {
@@ -88,7 +89,14 @@ object QuiverAPI {
             currentAmount = 0
             arrowAmount.clear()
 
-            saveArrowAmount()
+            return saveArrowAmount()
+        }
+
+        arrowResetPattern.matchMatcher(message) {
+            currentArrow = getByNameOrNull("NONE".asInternalName()) ?: return
+            currentAmount = 0
+
+            return saveArrowAmount()
         }
     }
 
