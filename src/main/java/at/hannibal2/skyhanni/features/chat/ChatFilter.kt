@@ -281,8 +281,8 @@ class ChatFilter {
     // Powder Mining
     private val powderMiningPatterns = listOf(
         "§cYou need a stronger tool to mine (Amethyst|Ruby|Jade|Amber|Sapphire|Topaz) Gemstone Block§r§c.".toPattern(),
-        "§aYou received §r§f\\d* §r§f[❤❈☘⸕✎✧] §r§fRough (Ruby|Amethyst|Jade|Amber|Sapphire|Topaz) Gemstone§r§a\\.".toPattern(),
-        "§aYou received §r§f\\d §r§a[❤❈☘⸕✎✧] §r§aFlawed (Ruby|Amethyst|Jade|Amber|Sapphire|Topaz) Gemstone§r§a\\.".toPattern(),
+        "§aYou received §r§f\\d* §r§f[❤❈☘⸕✎✧] Rough (Ruby|Amethyst|Jade|Amber|Sapphire|Topaz) Gemstone§r§a\\.".toPattern(),
+        "§aYou received §r§f\\d §r§a[❤❈☘⸕✎✧] Flawed (Ruby|Amethyst|Jade|Amber|Sapphire|Topaz) Gemstone§r§a\\.".toPattern(),
 
         // Jungle
         "§aYou received §r§f\\d* §r§aSludge Juice§r§a\\.".toPattern(),

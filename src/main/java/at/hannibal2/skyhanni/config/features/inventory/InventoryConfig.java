@@ -92,6 +92,13 @@ public class InventoryConfig {
     public boolean highlightMissingSkyBlockLevelGuide = true;
 
     @Expose
+    @ConfigOption(name = "Power Stone Guide",
+        desc = "Highlight missing power stones, show their total bazaar price, and allows to open the bazaar when clicking on the items in the Power Stone Guide.")
+    @ConfigEditorBoolean
+    @FeatureToggle
+    public boolean powerStoneGuide = true;
+
+    @Expose
     @ConfigOption(name = "Highlight Auctions",
         desc = "Highlight own items that are sold in green and that are expired in red.")
     @ConfigEditorBoolean
