@@ -9,7 +9,7 @@ import io.github.moulberry.moulconfig.annotations.ConfigEditorKeybind;
 import io.github.moulberry.moulconfig.annotations.ConfigOption;
 import org.lwjgl.input.Keyboard;
 
-import java.util.Collections;
+import java.util.ArrayList;
 import java.util.List;
 
 public class ChatConfig {
@@ -38,11 +38,12 @@ public class ChatConfig {
     @Expose
     @ConfigOption(name = "Dungeon Filter", desc = "Hide specific message types in Dungeons.")
     @ConfigEditorDraggableList
-    public List<DungeonMessageTypes> dungeonFilteredMessageTypes = Collections.emptyList();
+    public List<DungeonMessageTypes> dungeonFilteredMessageTypes = new ArrayList<>();
+
 
     public enum DungeonMessageTypes {
         PREPARE("§bPreparation"),
-        START("§aClass Buffs §r/ §cMort Dialog"),
+        START("§aClass Buffs §r/ §cMort Dialogue"),
         AMBIENCE("§bAmbience"),
         PICKUP("§ePickup"),
         REMINDER("§cReminder"),
