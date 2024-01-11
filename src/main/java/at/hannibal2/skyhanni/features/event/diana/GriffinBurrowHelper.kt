@@ -257,7 +257,7 @@ object GriffinBurrowHelper {
 
         if (!isEnabled()) {
             if (!config.alwaysDiana) {
-                LorenzUtils.userError("Enable Always Diana in the config!")
+                LorenzUtils.clickableChat("§cEnable Always Diana in the config!", "sh always diana")
             } else {
                 LorenzUtils.userError("Have an Ancestral Spade in the inventory!")
             }
