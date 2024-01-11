@@ -66,4 +66,9 @@ abstract class LorenzEvent : Event() {
     }
 
     fun postWithoutCatch() = MinecraftForge.EVENT_BUS.post(this)
+
+    // TODO let walker use this function for all 101 other uses
+    fun cancel() {
+        isCanceled = true
+    }
 }
