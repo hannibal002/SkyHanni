@@ -54,8 +54,3 @@ class LesserOrbHider {
 
     fun isEnabled() = LorenzUtils.inSkyBlock && config.lesserOrbHider
 }
-
-
-
-
-
