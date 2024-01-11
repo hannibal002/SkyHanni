@@ -205,8 +205,8 @@ public class MiscConfig {
 
     @Expose
     @ConfigOption(
-            name = "Lesser Orb of Healing Hider",
-            desc = "Hides the Lesser Orb of Healing.")
+        name = "Lesser Orb of Healing Hider",
+        desc = "Hides the Lesser Orb of Healing.")
     @ConfigEditorBoolean
     @FeatureToggle
     public boolean lesserOrbHider = false;

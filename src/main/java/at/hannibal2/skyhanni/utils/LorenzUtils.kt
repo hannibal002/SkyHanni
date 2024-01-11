@@ -35,6 +35,7 @@ import java.text.SimpleDateFormat
 import java.util.Collections
 import java.util.Timer
 import java.util.TimerTask
+import java.util.WeakHashMap
 import java.util.regex.Matcher
 import kotlin.properties.ReadWriteProperty
 import kotlin.reflect.KMutableProperty1
@@ -523,8 +524,8 @@ object LorenzUtils {
 
         val tileSign = (this as AccessorGuiEditSign).tileSign
         return (tileSign.signText[1].unformattedText.removeColor() == "^^^^^^"
-            && tileSign.signText[2].unformattedText.removeColor() == "Set your"
-            && tileSign.signText[3].unformattedText.removeColor() == "speed cap!")
+                && tileSign.signText[2].unformattedText.removeColor() == "Set your"
+                && tileSign.signText[3].unformattedText.removeColor() == "speed cap!")
     }
 
     fun IslandType.isInIsland() = inSkyBlock && skyBlockIsland == this
@@ -655,4 +656,7 @@ object LorenzUtils {
     fun Matcher.groupOrNull(groupName: String): String? {
         return runCatching { this.group(groupName) }.getOrNull()
     }
+
+    // Let garbage collector handle the removal of entries in this list
+    inline fun <reified T> weakReferenceList() = Collections.newSetFromMap(WeakHashMap<T, Boolean>())
 }
