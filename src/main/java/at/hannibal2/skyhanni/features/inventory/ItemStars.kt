@@ -9,6 +9,7 @@ import at.hannibal2.skyhanni.features.inventory.ItemDisplayOverlayFeatures.isSel
 import at.hannibal2.skyhanni.utils.ItemUtils.name
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.StringUtils.matches
+import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraftforge.event.entity.player.ItemTooltipEvent
 import net.minecraftforge.fml.common.eventhandler.EventPriority
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
@@ -17,9 +18,13 @@ class ItemStars {
 
     private val config get() = SkyHanniMod.feature.inventory
 
+    private val starPattern by RepoPattern.pattern(
+        "inventory.itemstars.stars",
+        "(.*)§.✪(.*)"
+    )
+
     private val armorNames = mutableListOf<String>()
     private val tiers = mutableMapOf<String, Int>()
-    private val starFindPattern = "(.*)§.✪(.*)".toPattern()
     private val armorParts = listOf("Helmet", "Chestplate", "Leggings", "Boots")
 
     @SubscribeEvent(priority = EventPriority.LOW)
@@ -34,7 +39,7 @@ class ItemStars {
 
         if (stars > 0) {
             var name = itemName
-            while (starFindPattern.matches(name)) {
+            while (starPattern.matches(name)) {
                 name = name.replaceFirst("§.✪".toRegex(), "")
             }
             name = name.trim()
