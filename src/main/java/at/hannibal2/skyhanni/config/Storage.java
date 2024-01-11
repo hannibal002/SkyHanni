@@ -135,10 +135,10 @@ public class Storage {
 
         public static class ArrowsStorage {
             @Expose
-            public ArrowType currentArrow = null;
+            public String currentArrow = null;
 
             @Expose
-            public Map<ArrowType, Float> arrowAmount = new HashMap<>();
+            public Map<String, Float> arrowAmount = new HashMap<>();
         }
 
         @Expose

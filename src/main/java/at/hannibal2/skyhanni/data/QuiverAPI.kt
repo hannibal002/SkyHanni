@@ -33,7 +33,7 @@ object QuiverAPI {
     var currentArrow: ArrowType? = null
     var currentAmount: Int = 0
     var arrowAmount: MutableMap<ArrowType, Float> = mutableMapOf()
-    var arrows: List<ArrowType> = listOf()
+    private var arrows: List<ArrowType> = listOf()
 
     private val fakeBows = listOf("BOSS_SPIRIT_BOW".asInternalName())
 
@@ -96,6 +96,7 @@ object QuiverAPI {
             currentArrow = getByNameOrNull("NONE".asInternalName()) ?: return
             currentAmount = 0
 
+            saveArrowType()
             return saveArrowAmount()
         }
     }
@@ -107,8 +108,7 @@ object QuiverAPI {
 
         // clear to prevent duplicates
         currentAmount = 0
-        if (arrowAmount.isNotEmpty())
-            arrowAmount.clear()
+        arrowAmount.clear()
 
         val stacks = event.inventoryItems
         for (stack in stacks.values) {
@@ -116,10 +116,9 @@ object QuiverAPI {
             if (lore.isEmpty()) continue
 
             val arrow = stack.getInternalNameOrNull() ?: continue
-            val amount = stack.stackSize
 
             val arrowType = getByNameOrNull(arrow) ?: continue
-            val arrowAmount = amount + (this.arrowAmount[arrowType] ?: 0.0f)
+            val arrowAmount = stack.stackSize + (this.arrowAmount[arrowType] ?: 0.0f)
 
             this.arrowAmount[arrowType] = arrowAmount
         }
@@ -134,7 +133,7 @@ object QuiverAPI {
             InventoryUtils.getItemInHand()?.getInternalNameOrNull()
         )
 
-        // check if sound location is more than 1 block away from player
+        // check if sound location is more than configAmount block away from player
         val soundLocation = event.location
         if (soundLocation.distanceToPlayer() > SkyHanniMod.feature.dev.bowSoundDistance) return
 
@@ -146,7 +145,7 @@ object QuiverAPI {
             val infiniteQuiverLevel = InventoryUtils.getItemInHand()?.getEnchantments()?.get("infinite_quiver") ?: 0
 
             val amountToRemove = {
-                when (Minecraft.getMinecraft().thePlayer.isSneaking && infiniteQuiverLevel > 0) {
+                when (Minecraft.getMinecraft().thePlayer.isSneaking) {
                     true -> 1.0f
                     false -> {
                         when (infiniteQuiverLevel) {
@@ -193,29 +192,36 @@ object QuiverAPI {
     @SubscribeEvent
     fun onConfigLoad(event: ConfigLoadEvent) {
         val config = ProfileStorageData.profileSpecific ?: return
-        currentArrow = config.arrows.currentArrow ?: null
-        arrowAmount = config.arrows.arrowAmount ?: mutableMapOf()
+        currentArrow = getByNameOrNull(config.arrows.currentArrow)
+        arrowAmount = config.arrows.arrowAmount.map {
+            val arrow = getByNameOrNull(it.key) ?: return@map null
+            arrow to it.value
+        }.filterNotNull().toMap().toMutableMap()
         currentAmount = arrowAmount[currentArrow]?.toInt() ?: 0
     }
 
     @SubscribeEvent
     fun onProfileJoin(event: ProfileJoinEvent) {
         val config = ProfileStorageData.profileSpecific ?: return
-        currentArrow = config.arrows.currentArrow ?: null
-        arrowAmount = config.arrows.arrowAmount ?: mutableMapOf()
+        currentArrow = getByNameOrNull(config.arrows.currentArrow)
+        arrowAmount = config.arrows.arrowAmount.map {
+            val arrow = getByNameOrNull(it.key) ?: return@map null
+            arrow to it.value
+        }.filterNotNull().toMap().toMutableMap()
         currentAmount = arrowAmount[currentArrow]?.toInt() ?: 0
     }
 
     private fun saveArrowType() {
         val config = ProfileStorageData.profileSpecific ?: return
-        config.arrows.currentArrow = currentArrow
+        config.arrows.currentArrow = currentArrow.toString()
     }
 
     private fun saveArrowAmount() {
         val config = ProfileStorageData.profileSpecific ?: return
 
-        if (arrowAmount != null)
-            config.arrows.arrowAmount = arrowAmount
+        config.arrows.arrowAmount = arrowAmount.map {
+            it.key.toString() to it.value
+        }.toMap().toMutableMap()
 
         if (arrowAmount.isNotEmpty())
             currentAmount = arrowAmount[currentArrow]?.toInt() ?: 0
