@@ -19,6 +19,7 @@ import at.hannibal2.skyhanni.utils.LorenzUtils.addOrPut
 import at.hannibal2.skyhanni.utils.LorenzUtils.sortedDesc
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
+import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import at.hannibal2.skyhanni.utils.tracker.SkyHanniTracker
 import at.hannibal2.skyhanni.utils.tracker.TrackerData
 import com.google.gson.JsonObject
@@ -28,9 +29,14 @@ import kotlin.time.Duration.Companion.seconds
 
 object ArmorDropTracker {
 
-    private var hasArmor = false
-    private val armorPattern = "(FERMENTO|CROPIE|SQUASH|MELON)_(LEGGINGS|CHESTPLATE|BOOTS|HELMET)".toPattern()
     private val config get() = GardenAPI.config.farmingArmorDrop
+
+    private val armorPattern by RepoPattern.pattern(
+        "garden.armordrops.armor",
+        "(FERMENTO|CROPIE|SQUASH|MELON)_(LEGGINGS|CHESTPLATE|BOOTS|HELMET)"
+    )
+
+    private var hasArmor = false
 
     private val tracker = SkyHanniTracker("Armor Drop Tracker", { Data() }, { it.garden.armorDropTracker })
     { drawDisplay(it) }
