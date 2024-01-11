@@ -72,7 +72,6 @@ object CaptureFarmingGear {
         ".* §e(?<having>.*)§6/(?<total>.*)"
     )
 
-
     private val farmingSets = arrayListOf(
         "FERMENTO", "SQUASH", "CROPIE", "MELON", "FARM",
         "RANCHERS", "FARMER", "RABBIT"
