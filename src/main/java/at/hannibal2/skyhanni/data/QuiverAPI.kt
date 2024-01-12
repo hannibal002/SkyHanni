@@ -49,6 +49,10 @@ object QuiverAPI {
     )
     private val clearedPattern by group.pattern("cleared", "§aCleared your quiver!")
     private val arrowResetPattern by group.pattern("arrowreset", "§cYour favorite arrow has been reset!")
+    private val addedToQuiverPattern by group.pattern(
+        "addedtoquiver",
+        "(§.)*You've added (§.)*(?<type>.*) x(?<amount>.*) (§.)*to your quiver!"
+    )
 
     @SubscribeEvent
     fun onChat(event: LorenzChatEvent) {
@@ -81,6 +85,19 @@ object QuiverAPI {
             val newAmount = existingAmount + flintAmount
 
             arrowAmount[getByNameOrFlint("ARROW".asInternalName())] = newAmount
+
+            return saveArrowAmount()
+        }
+
+        addedToQuiverPattern.matchMatcher(message) {
+            val type = group("type")
+            val amount = group("amount").formatNumber().toFloat()
+
+            val filledUpType = getByNameOrNull(type) ?: return
+
+            val existingAmount = arrowAmount[filledUpType] ?: 0f
+            val newAmount = existingAmount + amount
+            arrowAmount[filledUpType] = newAmount
 
             return saveArrowAmount()
         }
