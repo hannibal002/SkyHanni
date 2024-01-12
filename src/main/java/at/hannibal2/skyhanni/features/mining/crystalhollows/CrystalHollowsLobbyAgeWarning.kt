@@ -51,7 +51,7 @@ class CrystalHollowsLobbyAgeWarning {
                 if (config.playerCountReminders) LorenzUtils.chat("§a$playerCount players are currently in this Crystal Hollows lobby.")
                 if (!lobbyIsPastAgeThreshold) return
                 if (playerCount in 1..minPlayers) LorenzUtils.chat("§cThere are $playerCount players remaining in this Crystal Hollows lobby. §4§lIt will shut down very soon.")
-                else LorenzUtils.chat("There are $playerCount players remaining in this Crystal Hollows lobby. §cIt will shut down when there are fewer than ${minPlayers} people left, or when this lobby reaches Day ${maxLobbyAgeMCDays}.")
+                else LorenzUtils.chat("There are $playerCount players remaining in this Crystal Hollows lobby. §cIt will shut down when there are fewer than $minPlayers people left, or when this lobby reaches Day ${maxLobbyAgeMCDays}.")
             }
         }
     }
@@ -64,7 +64,7 @@ class CrystalHollowsLobbyAgeWarning {
         if (config.lobbyAgeReminders && !lobbyIsPastAgeThreshold) LorenzUtils.chat("§aThis Crystal Hollows lobby is currently at Day $lobbyAge, ${StringUtils.optionalPlural(number = abs(minLobbyAgeMCDays - lobbyAge).toInt(),"day", plural = "days")} away from Day ${minLobbyAgeMCDays}.")
         if (lobbyAge in minLobbyAgeMCDays..< maxLobbyAgeMCDays && !lobbyIsPastAgeThreshold) {
             lobbyIsPastAgeThreshold = true
-            LorenzUtils.chat("This Crystal Hollows lobby has reached Day ${minLobbyAgeMCDays}. It no longer accepts new players, §cand will shut down on Day ${maxLobbyAgeMCDays} or when there are fewer than ${minPlayers} people left.")
+            LorenzUtils.chat("This Crystal Hollows lobby has reached Day ${minLobbyAgeMCDays}. It no longer accepts new players, §cand will shut down on Day $maxLobbyAgeMCDays or when there are fewer than $minPlayers people left.")
         } else if (lobbyAge >= maxLobbyAgeMCDays) LorenzUtils.chat("§cThis Crystal Hollows lobby has reached Day ${maxLobbyAgeMCDays}. §4§lIt will shut down very soon.")
     }
 
