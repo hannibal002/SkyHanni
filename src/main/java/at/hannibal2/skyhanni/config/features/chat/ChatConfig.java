@@ -41,7 +41,8 @@ public class ChatConfig {
     @Category(name = "Emojis", desc = "Settings for chat emojis.")
     @Accordion
     public EmojiConfig EmojiConfig = new EmojiConfig();
-  
+
+    @Expose
     @ConfigOption(name = "Dungeon Filter", desc = "Hide specific message types in Dungeons.")
     @ConfigEditorDraggableList
     public List<DungeonMessageTypes> dungeonFilteredMessageTypes = new ArrayList<>();
