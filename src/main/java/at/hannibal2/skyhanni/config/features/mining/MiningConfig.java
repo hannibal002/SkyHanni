@@ -19,7 +19,7 @@ public class MiningConfig {
     public KingTalismanConfig kingTalisman = new KingTalismanConfig();
 
     @Expose
-    @ConfigOption(name = "Crystal Hollows Lobby Age Warning", desc = "Sends warnings when a Crystal Hollows lobby is about to close.")
+    @ConfigOption(name = "Crystal Hollows Lobby Age Warning", desc = "")
     @Accordion
     public CrystalHollowsLobbyAgeWarningConfig crystalHollowsLobbyAgeWarning = new CrystalHollowsLobbyAgeWarningConfig();
 
