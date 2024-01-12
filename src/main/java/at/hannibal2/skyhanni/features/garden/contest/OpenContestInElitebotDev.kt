@@ -105,7 +105,7 @@ object OpenContestInElitebotDev {
                 val year = group("year").formatNumber()
                 val month = group("month").convertMonthNameToInt()
                 val day = group("date").formatNumber().toInt()
-                openYearMonthDay(year, month, day, group("sbTime"))
+                openContest(year, month, day, group("sbTime"))
             }
         } else if (jacobsFarmingContestSBCalendarFirstLoreLinePattern.matches(item.getLore().first())) {
             calendarDateChestNameItemNamePattern.matchMatcher(chestName) {
@@ -116,7 +116,7 @@ object OpenContestInElitebotDev {
                 dayBlankItemNamePattern.matchMatcher(itemName) {
                     val origDayString = group("day")
                     val day = origDayString.formatNumber().toInt()
-                    openYearMonthDay(year, month, day, "$origMonthString $origDayString, Year $origYearString")
+                    openContest(year = year, month = month, day = day, "$origMonthString $origDayString, Year $origYearString")
                 }
             }
         }
@@ -126,32 +126,6 @@ object OpenContestInElitebotDev {
         LorenzUtils.chat("§aOpening the upcoming contests page on EliteWebsite.")
         OSUtils.openBrowser(ELITEBOT_UPCOMING)
     }
-    private fun openYearOverview(year: Long) {
-        if (SkyBlockTime(year = year.toInt()).calendarDateSanityCheck()) {
-            LorenzUtils.chat("§aOpening the annual contest records page for §eYear $year §aon EliteWebsite.")
-            OSUtils.openBrowser("$ELITEBOT_CONTESTS/$year/$ELITEBOT_RECORDS_SUFFIX")
-        } else {
-            LorenzUtils.chat("There is no annual contest records page for §aYear $year §eon EliteWebsite.")
-        }
-    }
-    private fun openYearAndMonth(year: Long, month: Int, origMonthString: String) {
-        if (SkyBlockTime(year = year.toInt(), month = month).calendarDateSanityCheck()) {
-            LorenzUtils.chat("§aOpening §e$origMonthString's §acontest records page for §eYear $year §aon EliteWebsite.")
-            OSUtils.openBrowser("$ELITEBOT_CONTESTS/$year/$month")
-        } else {
-            LorenzUtils.chat("There is no contest records page for §a$origMonthString, Year $year §eon EliteWebsite.")
-        }
-    }
-    private fun openYearMonthDay(year: Long, month: Int, day: Int, origSBTime: String, notFromChest: Boolean = false) {
-        val fromChestConditionalString = if (notFromChest) "page for the farming contests closest to" else "farming contests page for"
-        if (SkyBlockTime(year = year.toInt(), month = month, day = day).calendarDateSanityCheck()) {
-            LorenzUtils.chat("§aOpening the $fromChestConditionalString $origSBTime on EliteWebsite.")
-            OSUtils.openBrowser("$ELITEBOT_CONTESTS/$year/$month/$day")
-        } else {
-            LorenzUtils.chat("There is no farming contests page for §a$origSBTime §eon EliteWebsite. Try again with a different farming contest date.")
-        }
-    }
-
     private fun sendUsageMessagesCalendarDate() {
         LorenzUtils.chat("§cUsage: /shopencontest §b[case-sensitive month name] §b[day] §cYear <year number>")
         LorenzUtils.chat("Parameters colored like §bthis §eare optional.")
@@ -185,12 +159,11 @@ object OpenContestInElitebotDev {
                     sendUsageMessagesCalendarDate()
                     return
                 } else if (dayString.isEmpty() && monthString.isEmpty() && yearString.isNotEmpty()) {
-                    openYearOverview(yearString.formatNumber())
-                    return
+                    openContest(year = yearString.formatNumber(), sbDate = "Year $yearString")
                 } else if (dayString.isEmpty() && monthString.isNotEmpty() && yearString.isNotEmpty()) {
-                    openYearAndMonth(yearString.formatNumber(), monthString.convertMonthNameToInt(), monthString)
+                    openContest(year = yearString.formatNumber(), month = monthString.convertMonthNameToInt(), sbDate = "$monthString, Year $yearString")
                 } else if (dayString.isNotEmpty() && monthString.isNotEmpty() && yearString.isNotEmpty()) {
-                    openYearMonthDay(yearString.formatNumber(), monthString.convertMonthNameToInt(), dayString.formatNumber().toInt(), calendarDateString, true)
+                    openContest(year = yearString.formatNumber(), month = monthString.convertMonthNameToInt(), day = dayString.formatNumber().toInt(), sbDate = calendarDateString, fromCommand = true)
                 } else {
                     LorenzUtils.chat("§cIf you're reading this inside Minecraft, something went wrong with parsing your calendar date string. Please copy your original input below and report this bug on the SkyHanni Discord server.")
                     LorenzUtils.chat(calendarDateString)
@@ -199,6 +172,21 @@ object OpenContestInElitebotDev {
         } else {
             LorenzUtils.chat("You entered $calendarDateString, which could not be read correctly.")
             sendUsageMessagesCalendarDate()
+        }
+    }
+
+    private fun openContest(year: Long, month: Int = -1, day: Int = -1, sbDate: String, fromCommand: Boolean = false) {
+        val year = year.toInt()
+        if (month == -1 && day == -1 && SkyBlockTime(year).passesCalendarDateSanityCheck()) {
+            LorenzUtils.chat("Opening the year-specfic contests page for $sbDate.")
+            OSUtils.openBrowser("$ELITEBOT_CONTESTS/$year/$ELITEBOT_RECORDS_SUFFIX")
+        } else if (day == -1 && SkyBlockTime(year, month).passesCalendarDateSanityCheck()) {
+            LorenzUtils.chat("Opening the contests page for $sbDate.")
+            OSUtils.openBrowser("$$ELITEBOT_CONTESTS/$year/$month")
+        } else if (SkyBlockTime(year, month, day).passesCalendarDateSanityCheck()) {
+            val onExactDate = if (fromCommand) "nearest to" else "for"
+            LorenzUtils.chat("Opening the contests page $onExactDate for $sbDate.")
+            OSUtils.openBrowser("$$ELITEBOT_CONTESTS/$year/$month/$day")
         }
     }
 
@@ -217,11 +205,6 @@ object OpenContestInElitebotDev {
             sendUsageMessagesNumbers(argsAsOneString)
             return
         }
-        val mapOfMatches: MutableMap<String, Int> = mutableMapOf(
-            "month" to 0,
-            "day" to 0,
-            "year" to 0,
-        )
         if (calendarDateNumberCommandPattern.matches(argsAsOneString)) {
             calendarDateNumberCommandPattern.matchMatcher(argsAsOneString) {
                 val timeUnitOne = group("one") ?: ""
@@ -232,25 +215,22 @@ object OpenContestInElitebotDev {
                     sendUsageMessagesNumbers(argsAsOneString)
                     return
                 }
-                val timeUnitsInts: MutableList<Int> = mutableListOf(0, 0, 0)
+                val timeUnitsInts: MutableList<Int> = mutableListOf<Int>(0, 0, 0)
                 for (timeUnit in timeUnitsStrings) {
                     val lastLetter = timeUnit.takeLast(1)
                     if (lastLetter == "y") {
-                        mapOfMatches["year"] = mapOfMatches.getOrDefault("year", 0) + 1
                         timeUnitsInts[0] = timeUnit.removeSuffix(lastLetter).toInt()
                     } else if (lastLetter == "m") {
-                        mapOfMatches["month"] = mapOfMatches.getOrDefault("month", 0) + 1
                         timeUnitsInts[1] = timeUnit.removeSuffix(lastLetter).toInt()
                     } else if (lastLetter == "d") {
-                        mapOfMatches["day"] = mapOfMatches.getOrDefault("day", 0) + 1
                         timeUnitsInts[2] = timeUnit.removeSuffix(lastLetter).toInt()
                     }
                 }
-                if (mapOfMatches.any { it.value != 1 }) {
+                if (timeUnitsInts.any { it == 0 }) {
                     sendUsageMessagesNumbers(argsAsOneString)
                     return
                 }
-                openYearMonthDay(year = timeUnitsInts[0].toLong(), month = timeUnitsInts[1], day = timeUnitsInts[2], "${timeUnitsInts[1].convertIntToMonthName()} ${timeUnitsInts[2]}, Year ${timeUnitsInts[0]}", true)
+                openContest(year = timeUnitsInts[0].toLong(), month = timeUnitsInts[1], day = timeUnitsInts[2], sbDate = "${timeUnitsInts[1].convertIntToMonthName()} ${timeUnitsInts[2]}, Year ${timeUnitsInts[0]}", fromCommand = true)
             }
         } else {
             sendUsageMessagesNumbers(argsAsOneString)
@@ -258,7 +238,7 @@ object OpenContestInElitebotDev {
         }
     }
 
-    private fun SkyBlockTime.calendarDateSanityCheck(): Boolean = this.asTimeMark() >= EARLIEST_CONTEST
+    private fun SkyBlockTime.passesCalendarDateSanityCheck(): Boolean = this.asTimeMark() >= EARLIEST_CONTEST
     private fun String.convertMonthNameToInt(): Int = SB_MONTH_NAME_INT_MAP.getOrElse(this) { LorenzUtils.chat("§c\"$this\" is not a valid month name. Defaulting to \"Early Spring\"."); 1 }
     private fun Int.convertIntToMonthName(): String = SB_MONTH_NAME_LIST[this - 1]
     private fun isEnabled() = config.enabled
