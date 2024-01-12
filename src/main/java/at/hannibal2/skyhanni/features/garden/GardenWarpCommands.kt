@@ -6,14 +6,17 @@ import at.hannibal2.skyhanni.features.misc.LockMouseLook
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.NEUItems
 import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
+import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraft.client.Minecraft
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
 class GardenWarpCommands {
     private val config get() = GardenAPI.config.gardenCommands
 
-    // TODO repo
-    private val tpPlotPattern = "/tp (?<plot>.*)".toPattern()
+    private val tpPlotPattern by RepoPattern.pattern(
+        "garden.warpcommand.tpplot",
+        "/tp (?<plot>.*)"
+    )
 
     @SubscribeEvent
     fun onMessageSendToServer(event: MessageSendToServerEvent) {
