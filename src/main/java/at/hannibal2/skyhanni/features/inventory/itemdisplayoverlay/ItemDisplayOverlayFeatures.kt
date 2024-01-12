@@ -467,7 +467,7 @@ object ItemDisplayOverlayFeatures : AbstractStackSize() {
     private fun isArmadillo(internalName: NEUInternalName): Boolean = ARMADILLO.isSelected() && internalName == prehistoricEggInternalName
     private fun getArmadilloTip(item: ItemStack): String {
         val lore = item.getLore()
-        if (lore.lastOrNull() == null) return ""
+        if (lore.isEmpty()) return ""
         val blocksWalked = item.getPrehistoricEggBlocksWalked() ?: return ""
         var rarity = ""
         for (line in lore) {
@@ -537,23 +537,14 @@ object ItemDisplayOverlayFeatures : AbstractStackSize() {
 
     private fun isMinionStorage(item: ItemStack): Boolean = STORAGE_TIER.isSelected() && storageChestInternalNamePattern.matches(item.getInternalName()) && storageChestItemNamePattern.matches(item.cleanName())
     private fun getMinionStorageTip(itemName: String): String {
-        val numSlots = when (itemName) {
-            ("Small Storage") -> "3"
-            ("Medium Storage") -> "9"
-            ("Large Storage") -> "15"
-            ("X-Large Storage") -> "21"
-            ("XX-Large Storage") -> "27"
+        return when (itemName) {
+            ("Small Storage") -> "§f3"
+            ("Medium Storage") -> "§a9"
+            ("Large Storage") -> "§915"
+            ("X-Large Storage") -> "§c21"
+            ("XX-Large Storage") -> "§c27"
             else -> ""
         }
-        val colorCode = when (itemName) {
-            ("Small Storage") -> "f"
-            ("Medium Storage") -> "a"
-            ("Large Storage") -> "9"
-            ("X-Large Storage") -> "c"
-            ("XX-Large Storage") -> "c"
-            else -> ""
-        }
-        return "§$colorCode$numSlots"
     }
 
     private fun isCompactorOrDeletorItem(internalName: NEUInternalName, itemName: String): Boolean = COMPACTOR_DELETOR.isSelected() && personalCompactorDeletorInternalNamePattern.matches(internalName) && personalCompactorDeletorItemNamePattern.matches(itemName)
@@ -579,20 +570,20 @@ object ItemDisplayOverlayFeatures : AbstractStackSize() {
     private fun getAbiphoneTip(internalName: NEUInternalName): String {
         return when (internalName.asString()) {
             "ABIPHONE_X_PLUS" -> "X"
-            "ABIPHONE_X_PLUS_SPECIAL_EDITION" -> "X§b§zSE"
+            "ABIPHONE_X_PLUS_SPECIAL_EDITION" -> "X§dSE"
             "ABIPHONE_XI_ULTRA" -> "11"
-            "ABIPHONE_XI_ULTRA_STYLE" -> "11§b§zS"
+            "ABIPHONE_XI_ULTRA_STYLE" -> "11§aS"
             "ABIPHONE_XII_MEGA" -> "12"
-            "ABIPHONE_XII_MEGA_COLOR" -> "12§b§zC"
+            "ABIPHONE_XII_MEGA_COLOR" -> "12§bC"
             "ABIPHONE_XIII_PRO" -> "13"
-            "ABIPHONE_XIII_PRO_GIGA" -> "13§b§zG"
+            "ABIPHONE_XIII_PRO_GIGA" -> "13§5G"
             "ABIPHONE_XIV_ENORMOUS" -> "14"
-            "ABIPHONE_XIV_ENORMOUS_BLACK" -> "§714"
-            "ABIPHONE_XIV_ENORMOUS_PURPLE" -> "§714"
-            "ABIPHONE_FLIP_DRAGON" -> "Fl§b§zD"
-            "ABIPHONE_FLIP_NUCLEUS" -> "Fl§b§zN"
-            "ABIPHONE_FLIP_VOLCANO" -> "Fl§b§zV"
-            "ABINGOPHONE" -> "Ⓑ"
+            "ABIPHONE_XIV_ENORMOUS_BLACK" -> "14§7B"
+            "ABIPHONE_XIV_ENORMOUS_PURPLE" -> "14§dP"
+            "ABIPHONE_FLIP_DRAGON" -> "Fl§dD"
+            "ABIPHONE_FLIP_NUCLEUS" -> "Fl§5N"
+            "ABIPHONE_FLIP_VOLCANO" -> "Fl§6V"
+            "ABINGOPHONE" -> "§cⒷ"
             else -> ""
         }
     }
