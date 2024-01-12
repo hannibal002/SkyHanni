@@ -142,6 +142,10 @@ object QuiverAPI {
             val arrowAmount = QuiverAPI.arrowAmount[arrowType] ?: return
             if (arrowAmount <= 0) return
 
+            if (InventoryUtils.getChestplate()
+                    ?.getInternalNameOrNull() == "SKELETON_MASTER_CHESTPLATE".asInternalName()
+            ) return
+
             val infiniteQuiverLevel = InventoryUtils.getItemInHand()?.getEnchantments()?.get("infinite_quiver") ?: 0
 
             val amountToRemove = {
