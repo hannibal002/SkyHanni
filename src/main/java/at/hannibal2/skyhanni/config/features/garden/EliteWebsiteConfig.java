@@ -10,7 +10,7 @@ import org.lwjgl.input.Keyboard;
 public class EliteWebsiteConfig {
 
     @Expose
-    @ConfigOption(name = "Enabled", desc = "Toggles this feature on/off.")
+    @ConfigOption(name = "Enabled", desc = "Enables opening past contests in §eelitebot.dev§7.")
     @ConfigEditorBoolean
     @FeatureToggle
     public boolean enabled = false;

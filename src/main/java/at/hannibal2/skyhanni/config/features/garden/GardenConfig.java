@@ -55,7 +55,7 @@ public class GardenConfig {
     public EliteFarmingWeightConfig eliteFarmingWeights = new EliteFarmingWeightConfig();
 
     @Expose
-    @ConfigOption(name = "EliteWebsite", desc = "")
+    @ConfigOption(name = "Elite Contest Database", desc = "")
     @Accordion
     public EliteWebsiteConfig eliteWebsite = new EliteWebsiteConfig();
 
