@@ -7,6 +7,7 @@ import at.hannibal2.skyhanni.utils.ItemUtils.cleanName
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.KeyboardManager.isKeyHeld
 import at.hannibal2.skyhanni.utils.LorenzUtils
+import at.hannibal2.skyhanni.utils.LorenzUtils.getSBMonthByName
 import at.hannibal2.skyhanni.utils.NumberUtil.formatNumber
 import at.hannibal2.skyhanni.utils.OSUtils
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
@@ -28,24 +29,6 @@ object OpenContestInElitebotDev {
     private const val ELITEBOT_CONTESTS: String = "$ELITEBOT_DOMAIN/contests"
     private const val ELITEBOT_UPCOMING: String = "$ELITEBOT_CONTESTS/upcoming"
     private const val ELITEBOT_RECORDS_SUFFIX: String = "records"
-
-    private val SB_MONTH_NAME_INT_MAP: Map<String, Int> = mapOf(
-        "Early Spring" to 1,
-        "Spring" to 2,
-        "Late Spring" to 3,
-        "Early Summer" to 4,
-        "Summer" to 5,
-        "Late Summer" to 6,
-        "Early Autumn" to 7,
-        "Autumn" to 8,
-        "Late Autumn" to 9,
-        "Early Fall" to 7,
-        "Fall" to 8,
-        "Late Fall" to 9,
-        "Early Winter" to 10,
-        "Winter" to 11,
-        "Late Winter" to 12,
-    )
 
     private val elitebotDevRepoGroup = RepoPattern.group("garden.contest.elitebot")
     private val calendarDatePattern by elitebotDevRepoGroup.pattern(
@@ -74,23 +57,27 @@ object OpenContestInElitebotDev {
         val item = event.slot?.stack ?: return
         val chestName = InventoryUtils.openInventoryName()
         val itemName = item.cleanName()
-        if ((itemName == ("Upcoming Contests")) && (chestName == ("Jacob's Farming Contests")) && (item.getLore().first() == ("§8Schedule"))) {
+        val firstLoreLine = item.getLore().first()
+        if (itemName == "Upcoming Contests" && chestName == "Jacob's Farming Contests" && firstLoreLine == "§8Schedule") {
             LorenzUtils.chat("§aOpening the upcoming contests page on EliteWebsite.")
             OSUtils.openBrowser(ELITEBOT_UPCOMING)
             return
-        } else if ((chestName == ("Your Contests")) && contestsPattern.matches(item.getLore().first())) {
-            calendarDatePattern.matchMatcher(itemName) {
-                openContest(group("year").formatNumber(), group("month").convertMonthNameToInt(), group("date").formatNumber().toInt(), group("sbTime"))
-            }
-        } else if (jacobsFarmingContestPattern.matches(item.getLore().first())) {
-            calendarDatePattern.matchMatcher(chestName) {
-                val origYearString = group("year")
-                val origMonthString = group("month")
+        }
+        val useItemName = chestName == "Your Contests" && contestsPattern.matches(firstLoreLine)
+        val useChestName = jacobsFarmingContestPattern.matches(firstLoreLine)
+        val theString = if (useItemName) itemName else if (useChestName) chestName else return
+        calendarDatePattern.matchMatcher(theString) {
+            val origYearString = group("year")
+            val origMonthString = group("month")
+            var origDayString = group("date") ?: ""
+            var sbDate = group("sbTime") ?: ""
+            if (useChestName) {
                 dayPattern.matchMatcher(itemName) {
-                    val origDayString = group("day")
-                    openContest(origYearString.formatNumber(), origMonthString.convertMonthNameToInt(), origDayString.formatNumber().toInt(), "$origMonthString $origDayString, Year $origYearString")
+                    origDayString = group("day")
+                    sbDate = "$origMonthString $origDayString, Year $origYearString"
                 }
             }
+            openContest(origYearString.formatNumber(), getSBMonthByName(origMonthString), origDayString.formatNumber().toInt(), sbDate)
         }
     }
 
@@ -103,6 +90,5 @@ object OpenContestInElitebotDev {
     }
 
     private fun SkyBlockTime.passesCalendarDateSanityCheck(): Boolean = this.asTimeMark() >= EARLIEST_CONTEST
-    private fun String.convertMonthNameToInt(): Int = SB_MONTH_NAME_INT_MAP.getOrElse(this) { LorenzUtils.chat("§c\"$this\" is not a valid month name. Defaulting to \"Early Spring\"."); 1 }
     private fun isEnabled() = config.enabled
 }
