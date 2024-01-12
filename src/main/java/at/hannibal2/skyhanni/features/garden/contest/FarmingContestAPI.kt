@@ -43,6 +43,10 @@ object FarmingContestAPI {
     private var startTime = SimpleTimeMark.farPast()
     var inInventory = false
 
+    init {
+        ContestBracket.entries.forEach { it.bracketPattern }
+    }
+
     @SubscribeEvent
     fun onTick(event: LorenzTickEvent) {
         if (event.repeatSeconds(1)) {
@@ -127,7 +131,7 @@ object FarmingContestAPI {
         val brackets = buildMap {
             for (bracket in ContestBracket.entries) {
                 val amount = lore.firstNotNullOfOrNull {
-                    bracket.pattern.matchMatcher(it) {
+                    bracket.bracketPattern.matchMatcher(it) {
                         group("amount").replace(",", "").toInt()
                     }
                 } ?: continue
