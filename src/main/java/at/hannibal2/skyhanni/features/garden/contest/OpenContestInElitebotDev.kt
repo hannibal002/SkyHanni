@@ -76,12 +76,14 @@ object OpenContestInElitebotDev {
                     sbDate = "$origMonthString $origDayString, Year $origYearString"
                 }
             }
-            openContest(origYearString.formatNumber(), LorenzUtils.getSBMonthByName(origMonthString), origDayString.formatNumber().toInt(), sbDate)
+            openContest(origYearString, origMonthString, origDayString, sbDate)
         }
     }
 
-    private fun openContest(yearLong: Long, month: Int, day: Int, sbDate: String) {
-        val year = yearLong.toInt()
+    private fun openContest(yString: String, mString: String, dString: String, sbDate: String) {
+        val year = yString.formatNumber().toInt()
+        val month = LorenzUtils.getSBMonthByName(mString)
+        val day = dString.formatNumber().toInt()
         if (SkyBlockTime(year, month, day).isValidContest()) {
             LorenzUtils.chat("Opening the contests page for $sbDate.")
             OSUtils.openBrowser("$ELITEBOT_CONTESTS/$year/$month/$day")
