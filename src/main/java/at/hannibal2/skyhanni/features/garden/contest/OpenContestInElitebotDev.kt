@@ -98,7 +98,7 @@ object OpenContestInElitebotDev {
         val year = yearLong.toInt()
         if (SkyBlockTime(year, month, day).passesCalendarDateSanityCheck()) {
             LorenzUtils.chat("Opening the contests page for $sbDate.")
-            OSUtils.openBrowser("$$ELITEBOT_CONTESTS/$year/$month/$day")
+            OSUtils.openBrowser("$ELITEBOT_CONTESTS/$year/$month/$day")
         }
     }
 
