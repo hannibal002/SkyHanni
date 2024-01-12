@@ -9,6 +9,7 @@ import at.hannibal2.skyhanni.events.LorenzTickEvent
 import at.hannibal2.skyhanni.events.LorenzWorldChangeEvent
 import at.hannibal2.skyhanni.events.MessageSendToServerEvent
 import at.hannibal2.skyhanni.features.commands.LimboCommands
+import at.hannibal2.skyhanni.utils.LocationUtils.isPlayerInside
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils.round
 import at.hannibal2.skyhanni.utils.RenderUtils.renderString
@@ -16,6 +17,7 @@ import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.TimeUtils.format
 import net.minecraft.client.Minecraft
 import net.minecraft.entity.player.EntityPlayer
+import net.minecraft.util.AxisAlignedBB
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.seconds
@@ -32,14 +34,7 @@ class LimboTimeTracker {
     private var userLuck: Double = 0.0
     private val userLuckMultiplier = 0.000810185
 
-
-    //bedwars limbo coords, maybe move this somewhere else
-    private val minX = -662.0
-    private val minY = 43.0
-    private val minZ = -76.0
-    private val maxX = -619.0
-    private val maxY = 86.0
-    private val maxZ = -27.0
+    private val bedwarsLobbyLimbo = AxisAlignedBB(-662.0, 43.0, -76.0, -619.0, 86.0, -27.0)
 
     @SubscribeEvent
     fun onChat(event: LorenzChatEvent) {
@@ -77,10 +72,7 @@ class LimboTimeTracker {
         val lobbyName: String? = HypixelData.locrawData?.get("lobbyname")?.asString
         val player: EntityPlayer? = Minecraft.getMinecraft().thePlayer
         if (lobbyName.toString().startsWith("bedwarslobby") && player != null) {
-            val playerX: Double = player.posX
-            val playerY: Double = player.posY
-            val playerZ: Double = player.posZ
-            if (playerX in minX..maxX && playerY in minY..maxY && playerZ in minZ..maxZ) {
+            if (bedwarsLobbyLimbo.isPlayerInside()) {
                 if (inFakeLimbo) return
                 limboJoinTime = SimpleTimeMark.now()
                 inLimbo = true
