@@ -2,8 +2,10 @@ package at.hannibal2.skyhanni.features.mining.crystalhollows
 
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.data.IslandType
+import at.hannibal2.skyhanni.data.jsonobjects.repo.CrystalHollowsLobbyAgeWarningJson
 import at.hannibal2.skyhanni.events.IslandChangeEvent
 import at.hannibal2.skyhanni.events.LorenzTickEvent
+import at.hannibal2.skyhanni.events.RepositoryReloadEvent
 import at.hannibal2.skyhanni.events.TabListUpdateEvent
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils.isInIsland
@@ -33,6 +35,9 @@ class CrystalHollowsLobbyAgeWarning {
     private var lobbyIsPastAgeThreshold: Boolean = false
     private var oldPlayerCount: Long = 0L
     private var oldLobbyAge: Long = 0L
+    private var minPlayers: Int = 4
+    private var minLobbyAge: Int = 18
+    private var maxLobbyAge: Int = 25
 
     private fun getLobbyAgeInMinecraftDays(): Long = (mc.theWorld.worldTime) / TICKS_PER_MC_DAY //world day changes at 6AM in skyblock time
 
@@ -45,8 +50,8 @@ class CrystalHollowsLobbyAgeWarning {
                 oldPlayerCount = playerCount
                 if (config.playerCountReminders) LorenzUtils.chat("§a$playerCount players are currently in this Crystal Hollows lobby.")
                 if (!lobbyIsPastAgeThreshold) return
-                if (playerCount in 1..config.minPlayers) LorenzUtils.chat("§cThere are $playerCount players remaining in this Crystal Hollows lobby. §4§lIt will shut down very soon.")
-                else LorenzUtils.chat("There are $playerCount players remaining in this Crystal Hollows lobby. §cIt will shut down when there are fewer than ${config.minPlayers} people left, or when this lobby reaches Day ${config.maxLobbyAgeThreshold}.")
+                if (playerCount in 1..minPlayers) LorenzUtils.chat("§cThere are $playerCount players remaining in this Crystal Hollows lobby. §4§lIt will shut down very soon.")
+                else LorenzUtils.chat("There are $playerCount players remaining in this Crystal Hollows lobby. §cIt will shut down when there are fewer than ${minPlayers} people left, or when this lobby reaches Day ${maxLobbyAge}.")
             }
         }
     }
@@ -56,11 +61,11 @@ class CrystalHollowsLobbyAgeWarning {
         val lobbyAge = getLobbyAgeInMinecraftDays()
         if (oldLobbyAge == lobbyAge) return
         oldLobbyAge = lobbyAge
-        if (config.lobbyAgeReminders && !lobbyIsPastAgeThreshold) LorenzUtils.chat("§aThis Crystal Hollows lobby is currently at Day $lobbyAge, ${StringUtils.optionalPlural(number = abs(config.minLobbyAgeThreshold - lobbyAge).toInt(),"day", plural = "days")} away from Day ${config.minLobbyAgeThreshold}.")
-        if (lobbyAge in config.minLobbyAgeThreshold..< config.maxLobbyAgeThreshold && !lobbyIsPastAgeThreshold) {
+        if (config.lobbyAgeReminders && !lobbyIsPastAgeThreshold) LorenzUtils.chat("§aThis Crystal Hollows lobby is currently at Day $lobbyAge, ${StringUtils.optionalPlural(number = abs(minLobbyAge - lobbyAge).toInt(),"day", plural = "days")} away from Day ${minLobbyAge}.")
+        if (lobbyAge in minLobbyAge..< maxLobbyAge && !lobbyIsPastAgeThreshold) {
             lobbyIsPastAgeThreshold = true
-            LorenzUtils.chat("This Crystal Hollows lobby has reached Day ${config.minLobbyAgeThreshold}. It no longer accepts new players, §cand will shut down on Day ${config.maxLobbyAgeThreshold} or when there are fewer than ${config.minPlayers} people left.")
-        } else if (lobbyAge >= config.maxLobbyAgeThreshold) LorenzUtils.chat("§cThis Crystal Hollows lobby has reached Day ${config.maxLobbyAgeThreshold}. §4§lIt will shut down very soon.")
+            LorenzUtils.chat("This Crystal Hollows lobby has reached Day ${minLobbyAge}. It no longer accepts new players, §cand will shut down on Day ${maxLobbyAge} or when there are fewer than ${minPlayers} people left.")
+        } else if (lobbyAge >= maxLobbyAge) LorenzUtils.chat("§cThis Crystal Hollows lobby has reached Day ${maxLobbyAge}. §4§lIt will shut down very soon.")
     }
 
     @SubscribeEvent
@@ -85,6 +90,14 @@ class CrystalHollowsLobbyAgeWarning {
             oldPlayerCount = 0L
             oldLobbyAge = 0L
         }
+    }
+    
+    @SubscribeEvent
+    fun onRepoReload(event: RepositoryReloadEvent) {
+        val thresholds = event.getConstant<CrystalHollowsLobbyAgeWarningJson>("lobby_thresholds").lobby_thresholds
+        minPlayers = thresholds.getOrDefault("min_players", 4)
+        minLobbyAge = thresholds.getOrDefault("min_lobby_age", 18)
+        maxLobbyAge = thresholds.getOrDefault("max_lobby_age", 25)
     }
 
     private fun isEnabled() = config.enabled && isInCrystalHollows()
