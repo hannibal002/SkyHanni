@@ -71,14 +71,15 @@ format like "- #821" to illustrate the dependency.
     - See [this commit](https://github.com/hannibal002/SkyHanni/commit/3d748cb79f3a1afa7f1a9b7d0561e5d7bb284a9b)
       as an example.
 - Try to avoid using kotlin's `!!` (catch if not null) feature.
-    - Replace it with `?:` (ff null return this).
-    - This will most likely not be possible to avoid when working with obects from java.
+    - Replace it with `?:` (if null return this).
+    - This will most likely not be possible to avoid when working with objects from java.
 - Don't forget to add `@FeatureToggle` to new standalone features (not options to that feature) in the config.
 - Do not use `e.printStackTrace()`, use `CopyErrorCommand.logError(e, "explanation for users")` instead.
 - Do not use `MinecraftForge.EVENT_BUS.post(event)`, use `event.postAndCatch()` instead.
 - Do not use `toRegex()` or `toPattern()`, use `RepoPattern` instead.
     - See [RepoPattern.kt](https://github.com/walkerselby/SkyHanni/blob/beta/src/main/java/at/hannibal2/skyhanni/utils/repopatterns/RepoPattern.kt)
-    for more information and usages.
+for more information and usages.
+    - The pattern variables are named in the scheme `variableNamePattern`
 - Please use Regex instead of String comparison when it is likely Hypixel will change the message in the future.
 
 ## Software Used in SkyHanni
@@ -116,8 +117,8 @@ For more information, see https://github.com/NotEnoughUpdates/MoulConfig
 SkyHanni utilizes the [Elite API](https://api.elitebot.dev/) (view the [public site here](https://elitebot.dev)) for
 some farming features.
 
-This includes features relating to Farming Weight, as well as syncing jacob contests amongst players for conviencience.
-All data sent is anonymonized and opt-in.
+This includes features relating to Farming Weight, as well as syncing jacob contests amongst players for convenience.
+All data sent is anonymized and opt-in.
 
 ### Mixin
 
@@ -128,7 +129,7 @@ It allows to easily modify methods in Minecraft itself, without conflicting with
 
 For more information, see https://github.com/SpongePowered/Mixin or [our existing mixins](https://github.com/hannibal002/SkyHanni/tree/beta/src/main/java/at/hannibal2/skyhanni/mixins/transformers).
 
-When creating new Mixins, try to keep the code inside of the mixin as small as possible, and calling a hook as soon as
+When creating new Mixins, try to keep the code inside the mixin as small as possible, and calling a hook as soon as
 possible.
 
 ### Repo
