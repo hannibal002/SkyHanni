@@ -6,9 +6,13 @@ import com.google.gson.annotations.Expose;
 import io.github.moulberry.moulconfig.annotations.Accordion;
 import io.github.moulberry.moulconfig.annotations.Category;
 import io.github.moulberry.moulconfig.annotations.ConfigEditorBoolean;
+import io.github.moulberry.moulconfig.annotations.ConfigEditorDraggableList;
 import io.github.moulberry.moulconfig.annotations.ConfigEditorKeybind;
 import io.github.moulberry.moulconfig.annotations.ConfigOption;
 import org.lwjgl.input.Keyboard;
+
+import java.util.ArrayList;
+import java.util.List;
 
 public class ChatConfig {
 
@@ -37,12 +41,37 @@ public class ChatConfig {
     @Category(name = "Emojis", desc = "Settings for chat emojis.")
     @Accordion
     public EmojiConfig EmojiConfig = new EmojiConfig();
+  
+    @ConfigOption(name = "Dungeon Filter", desc = "Hide specific message types in Dungeons.")
+    @ConfigEditorDraggableList
+    public List<DungeonMessageTypes> dungeonFilteredMessageTypes = new ArrayList<>();
 
-    @Expose
-    @ConfigOption(name = "Dungeon Filter", desc = "Hides pickup, reminder, buff, damage, ability, puzzle and end messages in Dungeons.")
-    @ConfigEditorBoolean
-    @FeatureToggle
-    public boolean dungeonMessages = true;
+
+    public enum DungeonMessageTypes {
+        PREPARE("§bPreparation"),
+        START("§aClass Buffs §r/ §cMort Dialogue"),
+        AMBIENCE("§bAmbience"),
+        PICKUP("§ePickup"),
+        REMINDER("§cReminder"),
+        BUFF("§dBlessings"),
+        NOT_POSSIBLE("§cNot possible"),
+        DAMAGE("§cDamage"),
+        ABILITY("§dAbilities"),
+        PUZZLE("§dPuzzle §r/ §cQuiz"),
+        END("§cEnd §a(End of run spam)"),
+        ;
+
+        private final String name;
+
+        DungeonMessageTypes(String name) {
+            this.name = name;
+        }
+
+        @Override
+        public String toString() {
+            return name;
+        }
+    }
 
     @Expose
     @ConfigOption(name = "Dungeon Boss Messages", desc = "Hide messages from the Watcher and bosses in the Dungeon.")

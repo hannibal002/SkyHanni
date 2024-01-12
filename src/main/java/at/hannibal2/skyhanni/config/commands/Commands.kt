@@ -16,6 +16,7 @@ import at.hannibal2.skyhanni.features.combat.ghostcounter.GhostUtil
 import at.hannibal2.skyhanni.features.commands.PartyCommands
 import at.hannibal2.skyhanni.features.event.diana.BurrowWarpHelper
 import at.hannibal2.skyhanni.features.event.diana.DianaProfitTracker
+import at.hannibal2.skyhanni.features.event.diana.GriffinBurrowHelper
 import at.hannibal2.skyhanni.features.event.diana.InquisitorWaypointShare
 import at.hannibal2.skyhanni.features.event.diana.MythologicalCreatureTracker
 import at.hannibal2.skyhanni.features.event.jerry.frozentreasure.FrozenTreasureTracker
@@ -308,6 +309,10 @@ object Commands {
             "shconfigsave",
             "Manually saving the config"
         ) { SkyHanniMod.configManager.saveConfig(ConfigFileType.FEATURES, "manual-command") }
+        registerCommand(
+            "shtestburrow",
+            "Sets a test burrow waypoint at your location"
+        ) { GriffinBurrowHelper.setTestBurrow(it) }
     }
 
     private fun developersCodingHelp() {
