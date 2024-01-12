@@ -104,13 +104,16 @@ class EmojiColorer {
     }
 
     private fun handleColor(subString: String): String {
-        var finalColors = "§${subString[1]}"
-        for (code in formattingCodes) {
-            if (subString.contains(code)) {
-                finalColors += code
+        if (subString.isEmpty()) return ""
+        else {
+            var finalColors = "§${subString[1]}"
+            for (code in formattingCodes) {
+                if (subString.contains(code)) {
+                    finalColors += code
+                }
             }
+            return finalColors
         }
-        return finalColors
     }
 
     private fun findFirstIndex(message: String, lastIndex: Int): Int {
