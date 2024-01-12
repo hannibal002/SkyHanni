@@ -503,7 +503,10 @@ private fun getQuiverDisplayPair(): List<ScoreboardElement> {
     }.map { it to AlignmentEnum.LEFT }
 }
 
-private fun getQuiverShowWhen() = !listOf(IslandType.THE_RIFT).contains(HypixelData.skyBlockIsland)
+private fun getQuiverShowWhen(): Boolean {
+    if (displayConfig.onlyShowQuiverLineWhenBowInInventory && !QuiverAPI.hasBowInInvetory()) return false
+    return !listOf(IslandType.THE_RIFT).contains(HypixelData.skyBlockIsland)
+}
 
 private fun getPowderDisplayPair(): List<ScoreboardElement> {
     val mithrilPowder =

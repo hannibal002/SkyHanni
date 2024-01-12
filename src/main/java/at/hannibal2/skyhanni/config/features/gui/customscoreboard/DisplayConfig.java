@@ -37,6 +37,12 @@ public class DisplayConfig {
     public boolean cacheScoreboardOnIslandSwitch = false;
 
     @Expose
+    @ConfigOption(name = "Only show Quiver line when Bow in inventory",
+        desc = "Will only show the Quiver line when a Bow is in the inventory.")
+    @ConfigEditorBoolean
+    public boolean onlyShowQuiverLineWhenBowInInventory = false;
+
+    @Expose
     @ConfigOption(name = "Number Format", desc = "")
     @ConfigEditorDropdown
     public NumberFormat numberFormat = NumberFormat.LONG;

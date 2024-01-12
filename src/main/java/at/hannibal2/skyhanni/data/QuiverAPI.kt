@@ -183,6 +183,10 @@ object QuiverAPI {
         }
     }
 
+    fun hasBowInInvetory(): Boolean {
+        return InventoryUtils.getItemsInOwnInventory().any { it.item is ItemBow }
+    }
+
     fun getByNameOrNull(name: String): ArrowType? {
         return arrows.firstOrNull { it.arrow == name }
     }
