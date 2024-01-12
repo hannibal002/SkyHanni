@@ -94,10 +94,10 @@ class CrystalHollowsLobbyAgeWarning {
     
     @SubscribeEvent
     fun onRepoReload(event: RepositoryReloadEvent) {
-        val thresholds = event.getConstant<CrystalHollowsLobbyAgeWarningJson>("lobby_thresholds").lobby_thresholds
-        minPlayers = thresholds.getOrDefault("min_players", 4)
-        minLobbyAge = thresholds.getOrDefault("min_lobby_age", 18)
-        maxLobbyAge = thresholds.getOrDefault("max_lobby_age", 25)
+        val data = event.getConstant<CrystalHollowsLobbyAgeWarningJson>("CrystalHollowsLobbyAgeWarning")
+        minPlayers = data.minPlayers
+        minLobbyAge = data.minLobbyAge
+        maxLobbyAge = data.maxLobbyAge
     }
 
     private fun isEnabled() = config.enabled && isInCrystalHollows()
