@@ -26,6 +26,7 @@ import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.TabListData
 import at.hannibal2.skyhanni.utils.TimeUtils.format
+import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import com.google.gson.Gson
 import io.github.moulberry.notenoughupdates.util.SkyBlockTime
 import kotlinx.coroutines.Dispatchers
@@ -52,9 +53,19 @@ object GardenNextJacobContest {
     var contests = mutableMapOf<SimpleTimeMark, FarmingContest>()
     private var inCalendar = false
 
-    private val patternDay = "§aDay (?<day>.*)".toPattern()
-    private val patternMonth = "(?<month>.*), Year (?<year>.*)".toPattern()
-    private val patternCrop = "§(e○|6☘) §7(?<crop>.*)".toPattern()
+    private val patternGroup = RepoPattern.group("garden.nextcontest")
+    private val dayPattern by patternGroup.pattern(
+        "day",
+        "§aDay (?<day>.*)"
+    )
+    private val monthPattern by patternGroup.pattern(
+        "month",
+        "(?<month>.*), Year (?<year>.*)"
+    )
+    private val cropPattern by patternGroup.pattern(
+        "crop",
+        "§(e○|6☘) §7(?<crop>.*)"
+    )
 
     private val closeToNewYear = "§7Close to new SB year!"
     private const val maxContestsPerYear = 124
@@ -138,7 +149,7 @@ object GardenNextJacobContest {
 
         inCalendar = true
 
-        patternMonth.matchMatcher(event.inventoryName) {
+        monthPattern.matchMatcher(event.inventoryName) {
             val month = LorenzUtils.getSBMonthByName(group("month"))
             val year = group("year").toInt()
 
@@ -173,13 +184,13 @@ object GardenNextJacobContest {
             if (!lore.any { it.contains("§6§eJacob's Farming Contest") }) continue
 
             val name = item.name ?: continue
-            val day = patternDay.matchMatcher(name) { group("day").toInt() } ?: continue
+            val day = dayPattern.matchMatcher(name) { group("day").toInt() } ?: continue
 
             val startTime = SkyBlockTime(year, month, day).asTimeMark()
 
             val crops = mutableListOf<CropType>()
             for (line in lore) {
-                patternCrop.matchMatcher(line) { crops.add(CropType.getByName(group("crop"))) }
+                cropPattern.matchMatcher(line) { crops.add(CropType.getByName(group("crop"))) }
             }
 
             contests[startTime] = FarmingContest(startTime + contestDuration, crops)
