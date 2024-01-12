@@ -68,7 +68,7 @@ class NonGodPotEffectDisplay {
         ;
     }
 
-    private val patternEffectsCount by RepoPattern.pattern(
+    private val effectsCountPattern by RepoPattern.pattern(
         "misc.nongodpot.effects",
         "§7You have §e(?<name>\\d+) §7non-god effects\\."
     )
@@ -237,7 +237,7 @@ class NonGodPotEffectDisplay {
                         }
                     }
                 }
-                patternEffectsCount.matchMatcher(line) {
+                effectsCountPattern.matchMatcher(line) {
                     val group = group("name")
                     effectsCount = group.toInt()
                 }

@@ -13,11 +13,11 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
 class TeleportPadCompactName {
     private val patternGroup = RepoPattern.group("misc.teleportpad")
-    private val patternName by patternGroup.pattern(
+    private val namePattern by patternGroup.pattern(
         "name",
         "§.✦ §aWarp To (?<name>.*)"
     )
-    private val patternNoName by patternGroup.pattern(
+    private val noNamePattern by patternGroup.pattern(
         "noname",
         "§.✦ §cNo Destination"
     )
@@ -31,11 +31,11 @@ class TeleportPadCompactName {
 
         val name = entity.name
 
-        patternNoName.matchMatcher(name) {
+        noNamePattern.matchMatcher(name) {
             event.isCanceled = true
         }
 
-        patternName.matchMatcher(name) {
+        namePattern.matchMatcher(name) {
             entity.customNameTag = group("name")
         }
     }
