@@ -70,8 +70,7 @@ class LimboTimeTracker {
             LorenzUtils.chat("§fKeep it up!")
         }
         val lobbyName: String? = HypixelData.locrawData?.get("lobbyname")?.asString
-        val player: EntityPlayer? = Minecraft.getMinecraft().thePlayer
-        if (lobbyName.toString().startsWith("bedwarslobby") && player != null) {
+        if (lobbyName.toString().startsWith("bedwarslobby")) {
             if (bedwarsLobbyLimbo.isPlayerInside()) {
                 if (inFakeLimbo) return
                 limboJoinTime = SimpleTimeMark.now()
