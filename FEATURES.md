@@ -30,6 +30,7 @@ Use `/sh` or `/skyhanni` to open the SkyHanni config in game.
     + Optional if left or right side of name.
     + Should not break with other mods.
 + Hide the repeating fire sale reminder chat messages. - hannibal2
++ Add tab list fire sale advertisement hider. - nea
 
 #### Chat Filter
 
@@ -132,6 +133,10 @@ Use `/sh` or `/skyhanni` to open the SkyHanni config in game.
     + This removes the need to shift-click to swap the equipment items, without the annoying "pick up animation".
 + Added Copy Underbid Price. - hannibal2
     + Copies the price of an item in the "Create BIN Auction" minus 1 coin into the clipboard for faster under-bidding.
++ Added Power Stone Guide features. - hannibal2
+    + Highlight missing power stones, show their total bazaar price, and allows to open the bazaar when clicking on the
+      items in the Power Stone Guide.
++ Option to make normal clicks to shift clicks in equipment inventory. - Thunderblade73
 
 </details>
 <details open><summary>
@@ -145,6 +150,7 @@ Use `/sh` or `/skyhanni` to open the SkyHanni config in game.
     + Supports dungeon mage cooldown reduction. - Cad
 + Hiding the flame particles when using the Fire Veil Wand ability.
 + Circle around the player when having the Fire Veil Wand ability active.
++ Lesser Orb of Healing Hider. - jani
 
 </details>
 <details open><summary>
