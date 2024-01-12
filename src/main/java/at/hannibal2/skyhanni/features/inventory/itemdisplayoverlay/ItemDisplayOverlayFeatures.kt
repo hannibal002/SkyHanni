@@ -67,35 +67,122 @@ object ItemDisplayOverlayFeatures : AbstractStackSize() {
     private val config get() = configItemStackSize
     private val itemDisplayOverlaySubgroup = itemStackSizeGroup.group("itemdisplayoverlay")
 
-    private val masterStarInternalNamePattern by itemDisplayOverlaySubgroup.pattern(("masterstar.internalname"), ("(?<tier>[A-Z])+_MASTER_STAR"))
-    private val petLevelItemNamePattern by itemDisplayOverlaySubgroup.pattern(("petlevel.itemname"), ("\\[Lvl (?<level>.*)] .*"))
-    private val shredderBonusDamageLoreLinePattern by itemDisplayOverlaySubgroup.pattern(("shredderbonusdamage.loreline"), ("(§.)?Bonus Damage \\([0-9]+ cap\\): (§.)?(?<dmgbonus>[0-9]+)"))
-    private val legacyBottleOfJerryIntelBonusLoreLinePattern by itemDisplayOverlaySubgroup.pattern(("legacybottleofjerryintelbonus.loreline"), ("(§.)?Intelligence Bonus: (§.)?(?<intelbonus>[0-9]+)"))
-    private val gardenVacuumLoreLinePattern by itemDisplayOverlaySubgroup.pattern(("gardenvacuum.loreline"), ("§7Vacuum Bag: §6(?<amount>[0-9,]+) Pests?"))
-    private val masterSkullInternalNamePattern by itemDisplayOverlaySubgroup.pattern(("masterskull.internalname"), ("MASTER_SKULL_TIER_(?<tier>\\d)"))
-    private val dungeonBossHeadInternalNamePattern by itemDisplayOverlaySubgroup.pattern(("dungeonbosshead.internalname"), ("(GOLD(EN)?|DIAMOND)_(?<dungeonBoss>[\\w]+)_HEAD"))
-    private val minionTierItemNamePattern by itemDisplayOverlaySubgroup.pattern(("miniontier.itemname"), ("([\\w]+ Minion [\\w]+).*(?<!Recipes)\$"))
-    private val enchantedItemSackItemNamePattern by itemDisplayOverlaySubgroup.pattern(("enchanteditemsack.itemname"), ("Enchanted .*"))
-    private val kuudraKeyItemNamePattern by itemDisplayOverlaySubgroup.pattern(("kuudrakey.itemname"), ("([\\w ]+)?Kuudra Key"))
-    private val kuudraKeyInternalNamePattern by itemDisplayOverlaySubgroup.pattern(("kuudrakey.internalname"), ("KUUDRA_(?<tier>[\\w]+)_KEY"))
-    private val larvaHookLoreLinePattern by itemDisplayOverlaySubgroup.pattern(("larvahook.loreline"), ("§7§7You may harvest §6(?<amount>.).*"))
-    private val armadilloRarityLoreLinePattern by itemDisplayOverlaySubgroup.pattern(("armadillorarity.loreline"), ("(§.)*(?<rarity>COMMON|UNCOMMON|RARE|EPIC|LEGENDARY)"))
-    private val beastmasterCrestInternalNamePattern by itemDisplayOverlaySubgroup.pattern(("beastmastercrest.internalname"), ("BEASTMASTER_CREST_[\\w]*"))
-    private val beastmasterCrestKillsProgressLoreLinePattern by itemDisplayOverlaySubgroup.pattern(("beastmastercrestkillsprogress.loreline"), ("(§.)*Your kills: (§.)*(?<progress>[\\w,]+)(§.)*\\/(?<total>[\\w,]+)"))
-    private val campfireTalismanTierInternalNamePattern by itemDisplayOverlaySubgroup.pattern(("campfiretalismantier.internalname"), ("CAMPFIRE_TALISMAN_(?<tier>[\\d]+)"))
-    private val isNotAuctionHouseChestNamePattern by itemDisplayOverlaySubgroup.pattern(("isnotauctionhouse.chestname"), ("^(?:(?!Auction).)*\$"))
-    private val internalizedSoulflowLoreLinePattern by itemDisplayOverlaySubgroup.pattern(("internalizedsoulflow.loreline"), ("(§.)*Internalized: (§.)*(?<leading>[0-9]+)(?<trailing>,[0-9]{0,3})⸎ Soulflow"))
-    private val storageChestInternalNamePattern by itemDisplayOverlaySubgroup.pattern(("storagechest.internalname"), (".*_ENCHANTED_CHEST"))
-    private val storageChestItemNamePattern by itemDisplayOverlaySubgroup.pattern(("storagechest.itemname"), (".* Storage"))
-    private val personalCompactorDeletorChestNamePattern by itemDisplayOverlaySubgroup.pattern(("personalcompactordeletor.chestname"), ("Personal (Compactor .*|Deletor .*)"))
-    private val personalCompactorDeletorEnabledItemNamePattern by itemDisplayOverlaySubgroup.pattern(("personalcompactordeletorenabled.itemname"), ("(§.)*(Compactor|Deletor) Currently O(?<toggle>FF|N)!"))
-    private val personalCompactorDeletorInternalNamePattern by itemDisplayOverlaySubgroup.pattern(("personalcompactordeletor.internalname"), ("PERSONAL_(COMPACTOR|DELETOR)_(?<thousands>[\\w]+)(000)"))
-    private val personalCompactorDeletorItemNamePattern by itemDisplayOverlaySubgroup.pattern(("personalcompactordeletor.itemname"), ("Personal (Compactor|Deletor) (?<thousands>[\\w]+)(000)"))
-    private val abiphoneInternalNamePattern by itemDisplayOverlaySubgroup.pattern(("abiphone.internalname"), ("ABI(?:NGO)?PHONE_?.*"))
-    private val doesNotIncludeDungeonStarsItemNamePattern by itemDisplayOverlaySubgroup.pattern(("doesnotincludedungeonstars.itemname"), ("^(?:(?!✪).)*\$"))
-    private val soulflowAccessoryInternalNamePattern by itemDisplayOverlaySubgroup.pattern(("soulflowaccessory.internalname"), ("SOULFLOW_.*"))
-    private val isTradingWithPlayerChestNamePattern by itemDisplayOverlaySubgroup.pattern(("isinplayertradingmenu.chestname"), ("(You([\\t ]){2,}(?<theirName>[a-zA-Z0-9_]{2,16}))"))
-    private val isInAHOrNPCShopLoreLinePattern by itemDisplayOverlaySubgroup.pattern(("isinahornpcshop.loreline"), ("(((§.)*Ends in: (§.)*(?<time>([\\d.,]+[ywdhms]+( )?)+))|Click to [tT]rade.)"))
+    private val masterStarInternalNamePattern by itemDisplayOverlaySubgroup.pattern(
+        "masterstar.internalname",
+        "(?<tier>[A-Z])+_MASTER_STAR"
+    )
+    private val petLevelItemNamePattern by itemDisplayOverlaySubgroup.pattern(
+        "petlevel.itemname",
+        "\\[Lvl (?<level>.*)] .*"
+    )
+    private val shredderBonusDamageLoreLinePattern by itemDisplayOverlaySubgroup.pattern(
+        "shredderbonusdamage.loreline",
+        "(§.)?Bonus Damage \\([0-9]+ cap\\): (§.)?(?<dmgbonus>[0-9]+)"
+    )
+    private val legacyBottleOfJerryIntelBonusLoreLinePattern by itemDisplayOverlaySubgroup.pattern(
+        "legacybottleofjerryintelbonus.loreline",
+        "(§.)?Intelligence Bonus: (§.)?(?<intelbonus>[0-9]+)"
+    )
+    private val gardenVacuumLoreLinePattern by itemDisplayOverlaySubgroup.pattern(
+        "gardenvacuum.loreline",
+        "§7Vacuum Bag: §6(?<amount>[0-9,]+) Pests?"
+    )
+    private val masterSkullInternalNamePattern by itemDisplayOverlaySubgroup.pattern(
+        "masterskull.internalname",
+        "MASTER_SKULL_TIER_(?<tier>\\d)"
+    )
+    private val dungeonBossHeadInternalNamePattern by itemDisplayOverlaySubgroup.pattern(
+        "dungeonbosshead.internalname",
+        "(GOLD(EN)?|DIAMOND)_(?<dungeonBoss>\\w+)_HEAD"
+    )
+    private val minionTierItemNamePattern by itemDisplayOverlaySubgroup.pattern(
+        "miniontier.itemname",
+        "(\\w+ Minion \\w+).*(?<!Recipes)\$"
+    )
+    private val enchantedItemSackItemNamePattern by itemDisplayOverlaySubgroup.pattern(
+        "enchanteditemsack.itemname",
+        "Enchanted .*"
+    )
+    private val kuudraKeyItemNamePattern by itemDisplayOverlaySubgroup.pattern(
+        "kuudrakey.itemname",
+        "([\\w ]+)?Kuudra Key"
+    )
+    private val kuudraKeyInternalNamePattern by itemDisplayOverlaySubgroup.pattern(
+        "kuudrakey.internalname",
+        "KUUDRA_(?<tier>\\w+)_KEY"
+    )
+    private val larvaHookLoreLinePattern by itemDisplayOverlaySubgroup.pattern(
+        "larvahook.loreline",
+        "§7§7You may harvest §6(?<amount>.).*"
+    )
+    private val armadilloRarityLoreLinePattern by itemDisplayOverlaySubgroup.pattern(
+        "armadillorarity.loreline",
+        "(§.)*(?<rarity>COMMON|UNCOMMON|RARE|EPIC|LEGENDARY)"
+    )
+    private val beastmasterCrestInternalNamePattern by itemDisplayOverlaySubgroup.pattern(
+        "beastmastercrest.internalname",
+        "BEASTMASTER_CREST_\\w*"
+    )
+    private val beastmasterCrestKillsProgressLoreLinePattern by itemDisplayOverlaySubgroup.pattern(
+        "beastmastercrestkillsprogress.loreline",
+        "(§.)*Your kills: (§.)*(?<progress>[\\w,]+)(§.)*/(?<total>[\\w,]+)"
+    )
+    private val campfireTalismanTierInternalNamePattern by itemDisplayOverlaySubgroup.pattern(
+        "campfiretalismantier.internalname",
+        "CAMPFIRE_TALISMAN_(?<tier>\\d+)"
+    )
+    private val isNotAuctionHouseChestNamePattern by itemDisplayOverlaySubgroup.pattern(
+        "isnotauctionhouse.chestname",
+        "^(?:(?!Auction).)*\$"
+    )
+    private val internalizedSoulflowLoreLinePattern by itemDisplayOverlaySubgroup.pattern(
+        "internalizedsoulflow.loreline",
+        "(§.)*Internalized: (§.)*(?<leading>[0-9]+)(?<trailing>,[0-9]{0,3})⸎ Soulflow"
+    )
+    private val storageChestInternalNamePattern by itemDisplayOverlaySubgroup.pattern(
+        "storagechest.internalname",
+        ".*_ENCHANTED_CHEST"
+    )
+    private val storageChestItemNamePattern by itemDisplayOverlaySubgroup.pattern(
+        "storagechest.itemname",
+        ".* Storage"
+    )
+    private val personalCompactorDeletorChestNamePattern by itemDisplayOverlaySubgroup.pattern(
+        "personalcompactordeletor.chestname",
+        "Personal (Compactor .*|Deletor .*)"
+    )
+    private val personalCompactorDeletorEnabledItemNamePattern by itemDisplayOverlaySubgroup.pattern(
+        "personalcompactordeletorenabled.itemname",
+        "(§.)*(Compactor|Deletor) Currently O(?<toggle>FF|N)!"
+    )
+    private val personalCompactorDeletorInternalNamePattern by itemDisplayOverlaySubgroup.pattern(
+        "personalcompactordeletor.internalname",
+        "PERSONAL_(COMPACTOR|DELETOR)_(?<thousands>\\w+)(000)"
+    )
+    private val personalCompactorDeletorItemNamePattern by itemDisplayOverlaySubgroup.pattern(
+        "personalcompactordeletor.itemname",
+        "Personal (Compactor|Deletor) (?<thousands>\\w+)(000)"
+    )
+    private val abiphoneInternalNamePattern by itemDisplayOverlaySubgroup.pattern(
+        "abiphone.internalname",
+        "ABI(?:NGO)?PHONE_?.*"
+    )
+    private val doesNotIncludeDungeonStarsItemNamePattern by itemDisplayOverlaySubgroup.pattern(
+        "doesnotincludedungeonstars.itemname",
+        "^(?:(?!✪).)*\$"
+    )
+    private val soulflowAccessoryInternalNamePattern by itemDisplayOverlaySubgroup.pattern(
+        "soulflowaccessory.internalname",
+        "SOULFLOW_.*"
+    )
+    private val isTradingWithPlayerChestNamePattern by itemDisplayOverlaySubgroup.pattern(
+        "isinplayertradingmenu.chestname",
+        "(You([\\t ]){2,}(?<theirName>[a-zA-Z0-9_]{2,16}))"
+    )
+    private val isInAHOrNPCShopLoreLinePattern by itemDisplayOverlaySubgroup.pattern(
+        "isinahornpcshop.loreline",
+        "(((§.)*Ends in: (§.)*(?<time>([\\d.,]+[ywdhms]+( )?)+))|Click to [tT]rade.)"
+    )
 
     private val newYearCakeInternalName = (("NEW_YEAR_CAKE").asInternalName())
     private val ranchersBootsInternalName = (("RANCHERS_BOOTS").asInternalName())
