@@ -3,6 +3,7 @@ package at.hannibal2.skyhanni.features.misc.items
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.events.RenderEntityOutlineEvent
+import at.hannibal2.skyhanni.features.garden.pests.SprayType
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalNameOrNull
 import at.hannibal2.skyhanni.utils.ItemUtils.getItemRarityOrNull
 import at.hannibal2.skyhanni.utils.ItemUtils.name
@@ -56,7 +57,9 @@ class GlowingDroppedItems {
             return null
         }
 
-        entityItem.getInternalNameOrNull() ?: return null
+        val internalName = entityItem.getInternalNameOrNull() ?: return null
+        val isSprayItem = LorenzUtils.enumValueOfOrNull<SprayType>(internalName.asString()) != null
+        if (isSprayItem) return null
         val rarity = entityItem.getItemRarityOrNull()
         return rarity?.color?.toColor()?.rgb
     }

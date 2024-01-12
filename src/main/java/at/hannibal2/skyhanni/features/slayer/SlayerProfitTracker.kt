@@ -43,7 +43,7 @@ object SlayerProfitTracker {
         var slayerSpawnCost: Long = 0
 
         @Expose
-        var slayerCompletedCount = 0
+        var slayerCompletedCount = 0L
 
         override fun getDescription(timesDropped: Long): List<String> {
             val percentage = timesDropped.toDouble() / slayerCompletedCount
@@ -168,14 +168,7 @@ object SlayerProfitTracker {
             )
         )
 
-        val profitFormat = profit.addSeparators()
-        val profitPrefix = if (profit < 0) "§c" else "§6"
-
-        val profitPerBoss = profit / itemLog.slayerCompletedCount
-        val profitPerBossFormat = NumberUtil.format(profitPerBoss)
-
-        val text = "§eTotal Profit: $profitPrefix$profitFormat coins"
-        addAsSingletonList(Renderable.hoverTips(text, listOf("§7Profit per boss: $profitPrefix$profitPerBossFormat")))
+        addAsSingletonList(tracker.addTotalProfit(profit, itemLog.slayerCompletedCount, "boss"))
 
         tracker.addPriceFromButton(this)
     }
