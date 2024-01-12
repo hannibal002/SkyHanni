@@ -6,6 +6,12 @@ import io.github.moulberry.moulconfig.annotations.ConfigOption;
 
 public class InformationFilteringConfig {
     @Expose
+    @ConfigOption(name = "Only show Quiver line when Bow in inventory",
+        desc = "Will only show the Quiver line when a Bow is in the inventory.")
+    @ConfigEditorBoolean
+    public boolean onlyShowQuiverLineWhenBowInInventory = false;
+
+    @Expose
     @ConfigOption(name = "Hide lines with no info", desc = "Hide lines that have no info to display, like hiding the party when not being in one.")
     @ConfigEditorBoolean
     public boolean hideEmptyLines = true;
