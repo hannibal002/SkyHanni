@@ -198,7 +198,7 @@ object QuiverAPI {
         val config = ProfileStorageData.profileSpecific ?: return
         currentArrow = getByNameOrNull(config.arrows.currentArrow)
         arrowAmount = config.arrows.arrowAmount.map {
-            val arrow = getByNameOrNull(it.key) ?: return@map null
+            val arrow = getByNameOrNull(it.key.asInternalName()) ?: return@map null
             arrow to it.value
         }.filterNotNull().toMap().toMutableMap()
         currentAmount = arrowAmount[currentArrow]?.toInt() ?: 0
@@ -209,7 +209,7 @@ object QuiverAPI {
         val config = ProfileStorageData.profileSpecific ?: return
         currentArrow = getByNameOrNull(config.arrows.currentArrow)
         arrowAmount = config.arrows.arrowAmount.map {
-            val arrow = getByNameOrNull(it.key) ?: return@map null
+            val arrow = getByNameOrNull(it.key.asInternalName()) ?: return@map null
             arrow to it.value
         }.filterNotNull().toMap().toMutableMap()
         currentAmount = arrowAmount[currentArrow]?.toInt() ?: 0
