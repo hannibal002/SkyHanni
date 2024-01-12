@@ -9,6 +9,8 @@ import at.hannibal2.skyhanni.utils.KeyboardManager.isKeyHeld
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.NumberUtil.formatNumber
 import at.hannibal2.skyhanni.utils.OSUtils
+import at.hannibal2.skyhanni.utils.SimpleTimeMark
+import at.hannibal2.skyhanni.utils.SimpleTimeMark.Companion.asTimeMark
 import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.StringUtils.matches
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
@@ -20,14 +22,12 @@ object OpenContestInElitebotDev {
 
     private val config get() = SkyHanniMod.feature.garden.eliteWebsite
 
-    private val EARLIEST_CONTEST_YEAR_KNOWN_TO_ELITEWEBSITE: Long = 100L
-    private val EARLIEST_CONTEST_MONTH_KNOWN_TO_ELITEWEBSITE: Int = 6
-    private val EARLIEST_CONTEST_DATE_KNOWN_TO_ELITEWEBSITE: Int = 18
+    private val EARLIEST_CONTEST: SimpleTimeMark = SkyBlockTime(year = 100, month = 6, day = 18).asTimeMark()
 
-    private val ELITEBOT_DOMAIN: String = "https://elitebot.dev"
-    private val ELITEBOT_CONTESTS: String = "$ELITEBOT_DOMAIN/contests"
-    private val ELITEBOT_UPCOMING: String = "$ELITEBOT_CONTESTS/upcoming"
-    private val ELITEBOT_RECORDS_SUFFIX: String = "records"
+    private const val ELITEBOT_DOMAIN: String = "https://elitebot.dev"
+    private const val ELITEBOT_CONTESTS: String = "$ELITEBOT_DOMAIN/contests"
+    private const val ELITEBOT_UPCOMING: String = "$ELITEBOT_CONTESTS/upcoming"
+    private const val ELITEBOT_RECORDS_SUFFIX: String = "records"
 
     private val SB_MONTH_NAME_INT_MAP: Map<String, Int> = mapOf(
         "Early Spring" to 1,
@@ -65,28 +65,28 @@ object OpenContestInElitebotDev {
     private val elitebotDevRepoGroup = RepoPattern.group("elitebotdev")
 
     private val calendarDateChestNameItemNamePattern by elitebotDevRepoGroup.pattern(
-        ("calendardate.chestnameitemname"),
-        ("(?<sbTime>(?<month>(?:Early |Late )?(?:Winter|Spring|Summer|Autumn|Fall))(?: (?<date>[\\d]+)(?:nd|rd|th|st))?, Year (?<year>[\\d,.]+))")
+        "calendardate.chestnameitemname",
+        "(?<sbTime>(?<month>(?:Early |Late )?(?:Winter|Spring|Summer|Autumn|Fall))(?: (?<date>[\\d]+)(?:nd|rd|th|st))?, Year (?<year>[\\d,.]+))"
     )
     private val blankContestsFirstLoreLinePattern by elitebotDevRepoGroup.pattern(
-        ("blankcontests.firstloreline"),
-        ("((?:§.)+(?<crop>[\\S ]+)+ Contests?)")
+        "blankcontests.firstloreline",
+        "((?:§.)+(?<crop>[\\S ]+)+ Contests?)"
     )
     private val dayBlankItemNamePattern by elitebotDevRepoGroup.pattern(
-        ("dayblank.itemname"),
-        ("Day (?<day>[\\d.,]+)")
+        "dayblank.itemname",
+        "Day (?<day>[\\d.,]+)"
     )
     private val jacobsFarmingContestSBCalendarFirstLoreLinePattern by elitebotDevRepoGroup.pattern(
-        ("jacobsfarmingcontestsbcalendar.firstloreline"),
-        ("(?:(?:§.)*(?:[\\S ]+)?(?:[\\d]+):(?:[\\d]+) [ap]m(?:-|[\\S ]+)(?:[\\d]+):(?:[\\d]+) [ap]m: (?:§.)*Jacob's Farming Contest(?:§.)*(?: \\((?:§.)*(?:[\\d]+[ywhm] )*(?:[\\d]+s)(?:§.)*\\)| \\((?:§.)*(?:[\\S ]+)(?:§.)*\\))?)")
+        "jacobsfarmingcontestsbcalendar.firstloreline",
+        "(?:(?:§.)*(?:[\\S ]+)?(?:\\d+):(?:\\d+) [ap]m(?:-|[\\S ]+)(?:\\d+):(?:\\d+) [ap]m: (?:§.)*Jacob's Farming Contest(?:§.)*(?: \\((?:§.)*(?:\\d+[ywhm] )*(?:\\d+s)(?:§.)*\\)| \\((?:§.)*(?:[\\S ]+)(?:§.)*\\))?)"
     )
     private val calendarDateStringCommandPattern by elitebotDevRepoGroup.pattern(
-        ("calendardatestring.command"),
-        ("(?<sbTime>(?<month>(?:Early |Late )?(?:Winter|Spring|Summer|Autumn|Fall))?(?: (?<date>[\\d]+)(?:nd|rd|th|st)?)?(?:,? )?Year (?<year>[\\d,.]+))")
+        "calendardatestring.command",
+        "(?<sbTime>(?<month>(?:Early |Late )?(?:Winter|Spring|Summer|Autumn|Fall))?(?: (?<date>\\d+)(?:nd|rd|th|st)?)?(?:,? )?Year (?<year>[\\d,.]+))"
     )
     private val calendarDateNumberCommandPattern by elitebotDevRepoGroup.pattern(
-        ("calendardatenumber.command"),
-        ("(?<one>[\\d]+[ymd]) (?<two>[\\d]+[ymd]) (?<three>[\\d]+[ymd])")
+        "calendardatenumber.command",
+        "(?<one>\\d+[ymd]) (?<two>\\d+[ymd]) (?<three>\\d+[ymd])"
     )
 
     @SubscribeEvent
@@ -127,7 +127,7 @@ object OpenContestInElitebotDev {
         OSUtils.openBrowser(ELITEBOT_UPCOMING)
     }
     private fun openYearOverview(year: Long) {
-        if (calendarDateSanityCheck(year)) {
+        if (SkyBlockTime(year = year.toInt()).calendarDateSanityCheck()) {
             LorenzUtils.chat("§aOpening the annual contest records page for §eYear $year §aon EliteWebsite.")
             OSUtils.openBrowser("$ELITEBOT_CONTESTS/$year/$ELITEBOT_RECORDS_SUFFIX")
         } else {
@@ -135,7 +135,7 @@ object OpenContestInElitebotDev {
         }
     }
     private fun openYearAndMonth(year: Long, month: Int, origMonthString: String) {
-        if (calendarDateSanityCheck(year, month)) {
+        if (SkyBlockTime(year = year.toInt(), month = month).calendarDateSanityCheck()) {
             LorenzUtils.chat("§aOpening §e$origMonthString's §acontest records page for §eYear $year §aon EliteWebsite.")
             OSUtils.openBrowser("$ELITEBOT_CONTESTS/$year/$month")
         } else {
@@ -144,7 +144,7 @@ object OpenContestInElitebotDev {
     }
     private fun openYearMonthDay(year: Long, month: Int, day: Int, origSBTime: String, notFromChest: Boolean = false) {
         val fromChestConditionalString = if (notFromChest) "page for the farming contests closest to" else "farming contests page for"
-        if (calendarDateSanityCheck(year, month, day)) {
+        if (SkyBlockTime(year = year.toInt(), month = month, day = day).calendarDateSanityCheck()) {
             LorenzUtils.chat("§aOpening the $fromChestConditionalString $origSBTime on EliteWebsite.")
             OSUtils.openBrowser("$ELITEBOT_CONTESTS/$year/$month/$day")
         } else {
@@ -258,19 +258,7 @@ object OpenContestInElitebotDev {
         }
     }
 
-    private fun calendarDateSanityCheck(year: Long, month: Int = 1, day: Int = EARLIEST_CONTEST_DATE_KNOWN_TO_ELITEWEBSITE, currentSBTime: SkyBlockTime = SkyBlockTime.now()): Boolean {
-        if (failsYearSanityCheck(year, currentSBTime.year)) return false
-        if (year == EARLIEST_CONTEST_YEAR_KNOWN_TO_ELITEWEBSITE && failsMonthSanityCheckEarliestContest(month)) return false
-        if (year == EARLIEST_CONTEST_YEAR_KNOWN_TO_ELITEWEBSITE && month == EARLIEST_CONTEST_MONTH_KNOWN_TO_ELITEWEBSITE && failsDaySanityCheckEarliestContest(day)) return false
-        if (year == currentSBTime.year.toLong() && failsMonthSanityCheck(month, currentSBTime.month)) return false
-        if (year == currentSBTime.year.toLong() && month == currentSBTime.month && failsDaySanityCheck(day, currentSBTime.day)) return false
-        return true
-    }
-    private fun failsYearSanityCheck(year: Long, currentSBTimeYear: Int): Boolean = year !in EARLIEST_CONTEST_YEAR_KNOWN_TO_ELITEWEBSITE..currentSBTimeYear
-    private fun failsMonthSanityCheck(month: Int, currentSBTimeMonth: Int): Boolean = month !in 1..currentSBTimeMonth
-    private fun failsDaySanityCheck(day: Int, currentSBTimeDay: Int) = day !in 1..currentSBTimeDay
-    private fun failsMonthSanityCheckEarliestContest(month: Int): Boolean = month !in EARLIEST_CONTEST_MONTH_KNOWN_TO_ELITEWEBSITE..12
-    private fun failsDaySanityCheckEarliestContest(day: Int): Boolean = day !in EARLIEST_CONTEST_DATE_KNOWN_TO_ELITEWEBSITE..30
+    private fun SkyBlockTime.calendarDateSanityCheck(): Boolean = this.asTimeMark() >= EARLIEST_CONTEST
     private fun String.convertMonthNameToInt(): Int = SB_MONTH_NAME_INT_MAP.getOrElse(this) { LorenzUtils.chat("§c\"$this\" is not a valid month name. Defaulting to \"Early Spring\"."); 1 }
     private fun Int.convertIntToMonthName(): String = SB_MONTH_NAME_LIST[this - 1]
     private fun isEnabled() = config.enabled
