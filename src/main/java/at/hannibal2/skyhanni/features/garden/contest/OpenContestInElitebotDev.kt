@@ -131,7 +131,7 @@ object OpenContestInElitebotDev {
         LorenzUtils.chat("Parameters colored like §bthis §eare optional.")
     }
 
-    private fun sendUsageMessagesNumbers(argsAsOneString: String = "") {
+    private fun sendUsageMessagesNumbers(argsAsOneString: String) {
         LorenzUtils.chat("§cUsage example: /shelitebotdevcontest <month number>m <day number>d <year number>y")
         LorenzUtils.chat("All parameters are required, but they can be entered in any order (as long as you include the correct suffix).")
         if (argsAsOneString == "") return
@@ -196,12 +196,8 @@ object OpenContestInElitebotDev {
             LorenzUtils.chat("You have disabled opening past farming contests on EliteWebsite. Visit your config to enable this.")
             return
         }
-        if (args.isEmpty()) {
-            sendUsageMessagesNumbers()
-            return
-        }
         val argsAsOneString = args.joinToString(" ")
-        if (args.size != 3) {
+        if (args.size != 3 || args.isEmpty()) {
             sendUsageMessagesNumbers(argsAsOneString)
             return
         }
