@@ -6,7 +6,7 @@ public class CrystalHollowsLobbyAgeWarningJson {
     @Expose
     public int minPlayers;
     @Expose
-    public int minLobbyAge;
+    public int minLobbyAgeMCDays;
     @Expose
-    public int maxLobbyAge;
+    public int maxLobbyAgeMCDays;
 }
