@@ -7,7 +7,6 @@ import at.hannibal2.skyhanni.utils.ItemUtils.cleanName
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.KeyboardManager.isKeyHeld
 import at.hannibal2.skyhanni.utils.LorenzUtils
-import at.hannibal2.skyhanni.utils.LorenzUtils.getSBMonthByName
 import at.hannibal2.skyhanni.utils.NumberUtil.formatNumber
 import at.hannibal2.skyhanni.utils.OSUtils
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
@@ -77,18 +76,18 @@ object OpenContestInElitebotDev {
                     sbDate = "$origMonthString $origDayString, Year $origYearString"
                 }
             }
-            openContest(origYearString.formatNumber(), getSBMonthByName(origMonthString), origDayString.formatNumber().toInt(), sbDate)
+            openContest(origYearString.formatNumber(), LorenzUtils.getSBMonthByName(origMonthString), origDayString.formatNumber().toInt(), sbDate)
         }
     }
 
     private fun openContest(yearLong: Long, month: Int, day: Int, sbDate: String) {
         val year = yearLong.toInt()
-        if (SkyBlockTime(year, month, day).passesCalendarDateSanityCheck()) {
+        if (SkyBlockTime(year, month, day).isValidContest()) {
             LorenzUtils.chat("Opening the contests page for $sbDate.")
             OSUtils.openBrowser("$ELITEBOT_CONTESTS/$year/$month/$day")
         }
     }
 
-    private fun SkyBlockTime.passesCalendarDateSanityCheck(): Boolean = this.asTimeMark() >= EARLIEST_CONTEST
+    private fun SkyBlockTime.isValidContest(): Boolean = this.asTimeMark() >= EARLIEST_CONTEST
     private fun isEnabled() = config.enabled
 }
