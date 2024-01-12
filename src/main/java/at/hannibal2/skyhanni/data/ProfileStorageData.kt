@@ -8,7 +8,6 @@ import at.hannibal2.skyhanni.events.HypixelJoinEvent
 import at.hannibal2.skyhanni.events.LorenzChatEvent
 import at.hannibal2.skyhanni.events.LorenzTickEvent
 import at.hannibal2.skyhanni.events.LorenzWorldChangeEvent
-import at.hannibal2.skyhanni.events.PreProfileSwitchEvent
 import at.hannibal2.skyhanni.events.ProfileJoinEvent
 import at.hannibal2.skyhanni.events.TabListUpdateEvent
 import at.hannibal2.skyhanni.utils.LorenzUtils
@@ -22,41 +21,8 @@ object ProfileStorageData {
     var loaded = false
     private var noTabListTime = -1L
 
-    private var nextProfile: String? = null
-
-    // TODO USE SH-REPO
-    private val profileSwitchPattern = "§7Switching to profile (?<name>.*)\\.\\.\\.".toPattern()
-
     private var sackPlayers: SackData.PlayerSpecific? = null
     var sackProfiles: SackData.ProfileSpecific? = null
-
-    @SubscribeEvent(priority = EventPriority.HIGHEST)
-    fun onChat(event: LorenzChatEvent) {
-        profileSwitchPattern.matchMatcher(event.message) {
-            nextProfile = group("name").lowercase()
-            loaded = false
-            PreProfileSwitchEvent().postAndCatch()
-        }
-    }
-
-    @SubscribeEvent(priority = EventPriority.HIGHEST)
-    fun onWorldChange(event: LorenzWorldChangeEvent) {
-        val profileName = nextProfile ?: return
-        nextProfile = null
-
-        val playerSpecific = playerSpecific
-        val sackPlayers = sackPlayers
-        if (playerSpecific == null) {
-            LorenzUtils.error("profileSpecific after profile swap can not be set: playerSpecific is null!")
-            return
-        }
-        if (sackPlayers == null) {
-            LorenzUtils.error("sackPlayers after profile swap can not be set: sackPlayers is null!")
-            return
-        }
-        loadProfileSpecific(playerSpecific, sackPlayers, profileName)
-        ConfigLoadEvent().postAndCatch()
-    }
 
     @SubscribeEvent(priority = EventPriority.HIGHEST)
     fun onProfileJoin(event: ProfileJoinEvent) {
@@ -67,34 +33,28 @@ object ProfileStorageData {
             return
         }
         if (sackPlayers == null) {
-            LorenzUtils.error("sackPlayers is null in sackPlayers!")
+            LorenzUtils.error("sackPlayers is null in ProfileJoinEvent!")
             return
         }
 
-        if (profileSpecific == null) {
-            val profileName = event.name
-            loadProfileSpecific(playerSpecific, sackPlayers, profileName)
-        }
+        val profileName = event.name
+        loadProfileSpecific(playerSpecific, sackPlayers, profileName)
+        ConfigLoadEvent().postAndCatch()
     }
 
     @SubscribeEvent
     fun onTabListUpdate(event: TabListUpdateEvent) {
-        if (profileSpecific != null) return
-        val playerSpecific = playerSpecific ?: return
-        val sackPlayers = sackPlayers ?: return
+        if (!LorenzUtils.inSkyBlock) return
+
         for (line in event.tabList) {
-            val pattern = "§e§lProfile: §r§a(?<name>.*)".toPattern()
+            val pattern = "§e§lProfile: §r§a.*".toPattern()
             pattern.matchMatcher(line) {
-                val profileName = group("name").lowercase()
-                loadProfileSpecific(playerSpecific, sackPlayers, profileName)
-                nextProfile = null
+                noTabListTime = -1L
                 return
             }
         }
 
-        if (LorenzUtils.inSkyBlock) {
-            noTabListTime = System.currentTimeMillis()
-        }
+        noTabListTime = System.currentTimeMillis()
     }
 
     @SubscribeEvent

@@ -8,6 +8,7 @@ import at.hannibal2.skyhanni.events.LorenzChatEvent
 import at.hannibal2.skyhanni.events.LorenzTickEvent
 import at.hannibal2.skyhanni.events.LorenzWorldChangeEvent
 import at.hannibal2.skyhanni.events.ProfileJoinEvent
+import at.hannibal2.skyhanni.events.TabListUpdateEvent
 import at.hannibal2.skyhanni.features.bingo.BingoAPI
 import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.LorenzLogger
@@ -28,6 +29,7 @@ import kotlin.concurrent.thread
 class HypixelData {
     private val group = RepoPattern.group("data.hypixeldata")
     private val tabListProfilePattern by group.pattern("tablistprofile", "§e§lProfile: §r§a(?<profile>.*)")
+    private val tabListProfilePatternRift by group.pattern("tablistprofilerift", "§d§lProfile: §r§a(?<profile>.*)")
     private val lobbyTypePattern by group.pattern("lobbytype", "(?<lobbyType>.*lobby)\\d+")
     private val islandNamePattern by group.pattern("islandname", "(?:§.)*(Area|Dungeon): (?:§.)*(?<island>.*)")
 
@@ -101,6 +103,7 @@ class HypixelData {
         val message = event.message.removeColor().lowercase()
         if (message.startsWith("your profile was changed to:")) {
             val newProfile = message.replace("your profile was changed to:", "").replace("(co-op)", "").trim()
+            if (profileName == newProfile) return
             profileName = newProfile
             ProfileJoinEvent(newProfile).postAndCatch()
         }
@@ -109,6 +112,27 @@ class HypixelData {
             if (profileName == newProfile) return
             profileName = newProfile
             ProfileJoinEvent(newProfile).postAndCatch()
+        }
+    }
+
+    @SubscribeEvent
+    fun onTabListUpdate(event: TabListUpdateEvent) {
+        for (line in event.tabList) {
+            tabListProfilePattern.matchMatcher(line) {
+                val newProfile = group("profile").lowercase()
+                if (profileName == newProfile) return
+                profileName = newProfile
+                ProfileJoinEvent(newProfile).postAndCatch()
+                return
+            }
+            tabListProfilePatternRift.matchMatcher(line) {
+                // Hypixel shows the profile name reversed while in the Rift
+                val newProfile = group("profile").lowercase().reversed()
+                if (profileName == newProfile) return
+                profileName = newProfile
+                ProfileJoinEvent(newProfile).postAndCatch()
+                return
+            }
         }
     }
 
