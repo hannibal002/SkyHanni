@@ -88,6 +88,6 @@ object OpenContestInElitebotDev {
         }
     }
 
-    private fun SkyBlockTime.isValidContest(): Boolean = this.asTimeMark() >= EARLIEST_CONTEST
+    private fun SkyBlockTime.isValidContest(): Boolean = this.asTimeMark() in EARLIEST_CONTEST..SkyBlockTime.now().asTimeMark()
     private fun isEnabled() = config.enabled
 }
