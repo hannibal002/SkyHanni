@@ -50,19 +50,19 @@ object OpenContestInElitebotDev {
     private val elitebotDevRepoGroup = RepoPattern.group("garden.contest.elitebot")
 
     private val calendarDatePattern by elitebotDevRepoGroup.pattern(
-        "calendardate.chestnameitemname",
+        "calendardate.chestanditem",
         "(?<sbTime>(?<month>(?:Early |Late )?(?:Winter|Spring|Summer|Autumn|Fall))(?: (?<date>\\d+)(?:nd|rd|th|st))?, Year (?<year>[\\d,.]+))"
     )
     private val contestsPattern by elitebotDevRepoGroup.pattern(
-        "blankcontests.firstloreline",
+        "contests.loreline",
         "((?:§.)+(?<crop>[\\S ]+)+ Contests?)"
     )
     private val dayPattern by elitebotDevRepoGroup.pattern(
-        "dayblank.itemname",
+        "day.item",
         "Day (?<day>[\\d.,]+)"
     )
     private val jacobsFarmingContestPattern by elitebotDevRepoGroup.pattern(
-        "jacobsfarmingcontestsbcalendar.firstloreline",
+        "farmingcontest.loreline",
         "(?:§.)*(?:[\\S ]+)?\\d+:\\d+ [ap]m(?:-|[\\S ]+)\\d+:\\d+ [ap]m: (?:§.)*Jacob's Farming Contest(?:§.)*(?: \\((?:§.)*(?:\\d+[ywhm] )*\\d+s(?:§.)*\\)| \\((?:§.)*[\\S ]+(?:§.)*\\))?"
     )
 
