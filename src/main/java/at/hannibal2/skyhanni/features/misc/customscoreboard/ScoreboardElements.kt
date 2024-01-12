@@ -504,7 +504,7 @@ private fun getQuiverDisplayPair(): List<ScoreboardElement> {
 }
 
 private fun getQuiverShowWhen(): Boolean {
-    if (informationFilteringConfig.onlyShowQuiverLineWhenBowInInventory && !QuiverAPI.hasBowInInvetory()) return false
+    if (informationFilteringConfig.hideIrrelevantLines && !QuiverAPI.hasBowInInvetory()) return false
     return !listOf(IslandType.THE_RIFT).contains(HypixelData.skyBlockIsland)
 }
 
