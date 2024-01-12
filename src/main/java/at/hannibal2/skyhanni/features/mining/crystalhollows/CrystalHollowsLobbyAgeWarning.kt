@@ -27,7 +27,7 @@ class CrystalHollowsLobbyAgeWarning {
     private val crystalHollowsLobbyRepoGroup = RepoPattern.group("chlobbyage")
     private val playerCountTabListPattern by crystalHollowsLobbyRepoGroup.pattern(
         "playercount.tablist",
-        " *(?:§.)*Players[\\S ]*[\\(\\[\\{](?<playerCount>[\\S ]+)[\\)\\]\\}]"
+        " *(?:§.)*Players[\\S ]*[({\\[](?<playerCount>[\\S ]+)[)}\\]]"
     )
 
     private var lobbyIsPastAgeThreshold: Boolean = false
