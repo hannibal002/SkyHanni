@@ -15,14 +15,38 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 class MenuItemDisplayOverlayAbiphone : AbstractMenuStackSize() {
     private val abiphoneSubgroup = itemStackSizeGroup.group("abiphone")
     
-    private val abiphoneContactsDirectoryChestNamePattern by abiphoneSubgroup.pattern(("abiphonecontactsdirectory.chestname"), ("(.*A.iphone.*|Contacts Directory)"))
-    private val yourContactsLoreLinePattern by abiphoneSubgroup.pattern(("yourcontacts.loreline"), ("(§.)?Your contacts: (§.)?(?<useful>[0-9]+)(§.)?\\/(§.)?(?<total>[0-9]+).*"))
-    private val isAContactItemNamePattern by abiphoneSubgroup.pattern(("isacontact.itemname"), (".*§f§.*"))
-    private val upgradedAllRelaysLoreLinePattern by abiphoneSubgroup.pattern(("upgradedallrelays.loreline"), ("(§.)?Upgraded Relays: (§.).*ALL!.*"))
-    private val upgradedPartialRelaysLoreLinePattern by abiphoneSubgroup.pattern(("upgradedpartialrelays.loreline"), ("(§.)?Upgraded Relays: (§.)?(?<useful>[0-9]+)(§.)?\\/(§.)?(?<total>[0-9]+).*"))
-    private val selectedRingtoneLoreLinePattern by abiphoneSubgroup.pattern(("selectedringtone.loreline"), ("(§.)*Selected Ringtone: (§.)*(?<ringtone>.+)"))
-    private val abiphoneMinigameStatsLoreLinePattern by abiphoneSubgroup.pattern(("abiphoneminigamestats.loreline"), ("(§.)*(?<type>.+): (§.)*(?<count>[\\w]+)"))
-    private val filterSortAbiphoneOnlyLoreLinePattern by abiphoneSubgroup.pattern(("filtersortabiphoneonly.loreline"), (".*(?<colorCode>§.)*▶.?(?<category>[\\w ]+).*"))
+    private val abiphoneContactsDirectoryChestNamePattern by abiphoneSubgroup.pattern(
+        "abiphonecontactsdirectory.chestname",
+        "(.*A.iphone.*|Contacts Directory)"
+    )
+    private val yourContactsLoreLinePattern by abiphoneSubgroup.pattern(
+        "yourcontacts.loreline",
+        "(§.)?Your contacts: (§.)?(?<useful>[0-9]+)(§.)?\\/(§.)?(?<total>[0-9]+).*"
+    )
+    private val isAContactItemNamePattern by abiphoneSubgroup.pattern(
+        "isacontact.itemname",
+        ".*§f§.*"
+    )
+    private val upgradedAllRelaysLoreLinePattern by abiphoneSubgroup.pattern(
+        "upgradedallrelays.loreline",
+        "(§.)?Upgraded Relays: (§.).*ALL!.*"
+    )
+    private val upgradedPartialRelaysLoreLinePattern by abiphoneSubgroup.pattern(
+        "upgradedpartialrelays.loreline",
+        "(§.)?Upgraded Relays: (§.)?(?<useful>[0-9]+)(§.)?\\/(§.)?(?<total>[0-9]+).*"
+    )
+    private val selectedRingtoneLoreLinePattern by abiphoneSubgroup.pattern(
+        "selectedringtone.loreline",
+        "(§.)*Selected Ringtone: (§.)*(?<ringtone>.+)"
+    )
+    private val abiphoneMinigameStatsLoreLinePattern by abiphoneSubgroup.pattern(
+        "abiphoneminigamestats.loreline",
+        "(§.)*(?<type>.+): (§.)*(?<count>[\\w]+)"
+    )
+    private val filterSortAbiphoneOnlyLoreLinePattern by abiphoneSubgroup.pattern(
+        "filtersortabiphoneonly.loreline",
+        ".*(?<colorCode>§.)*▶.?(?<category>[\\w ]+).*"
+    )
 
     @SubscribeEvent
     override fun onRenderItemTip(event: RenderItemTipEvent) {
