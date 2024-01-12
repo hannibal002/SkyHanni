@@ -99,5 +99,14 @@ public class NextJacobContestConfig {
     public List<CropType> warnFor = new ArrayList<>(CropType.getEntries());
 
     @Expose
+    @ConfigOption(name = "Limit Units", desc = "Limits the number of time units on the display. Leave at 0 to display all time units.")
+    @ConfigEditorSlider(
+        minValue = 0,
+        maxValue = 5,
+        minStep = 1
+    )
+    public int limitUnits = 0;
+
+    @Expose
     public Position pos = new Position(-200, 10, false, true);
 }

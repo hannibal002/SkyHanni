@@ -344,7 +344,7 @@ object GardenNextJacobContest {
         if (!activeContest) {
             warn(duration, nextContest.crops, boostedCrop)
         }
-        val format = duration.format()
+        val format = duration.format(maxUnits = if (config.limitUnits < 1) -1 else config.limitUnits)
         list.add("§7(§b$format§7)")
 
         return list
