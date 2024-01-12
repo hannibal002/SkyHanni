@@ -17,22 +17,6 @@ import net.minecraft.client.gui.inventory.GuiChest
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
 object OpenContestInElitebotDev {
-    /*
-    EARLIEST KNOWN CONTEST: https://elitebot.dev/contests/100/6/18
-    URL STRUCTURE: "https://elitebot.dev/contests/$year/$month/$day"
-    MONTHLY CONTEST RECORDS: "https://elitebot.dev/contests/$year/$month"
-    ANNUAL CONTEST RECORDS: "https://elitebot.dev/contests/$year/records"
-    UPCOMING CONTESTS: "https://elitebot.dev/contests/upcoming"
-    PARENT PATTERN (CHESTNAME AND ITEMDISPLAYNAME):
-    ("(?:(?<month>(?:Early |Late )?(?:Winter|Spring|Summer|Autumn|Fall))(?: (?<date>[\d]+)(?:nd|rd|th|st))?, Year (?<year>[\d,.]+))|(?:(?:Jacob's Farming |Your )Contests)") // https://regex101.com/r/BfQfdV/2 -ery
-    "YOUR CONTESTS" FIRST LORELINE PATTERN:
-    ("((?:§.)+(?<crop>[\S ]+)+ Contests?)") // https://regex101.com/r/7o9eU0/1 -ery
-    SB CALENDAR ("MONTH, YEAR") FIRST LORELINE PATTERN:
-    ("(?:(?:§.)*(?:[\S ]+)?(?:[\d]+):(?:[\d]+) [ap]m(?:-|[\S ]+)(?:[\d]+):(?:[\d]+) [ap]m: (?:§.)*Jacob's Farming Contest(?:§.)*(?: \((?:§.)*(?:[\d]+[ywhm] )*(?:[\d]+s)(?:§.)*\)| \((?:§.)*(?:[\S ]+)(?:§.)*\))?)") // https://regex101.com/r/1lvgAr/2 -ery
-    SB CALENDAR ("MONTH, YEAR") ITEMDISPLAYNAME PATTERN:
-    ("Day (?<day>[\d.,]+)") // https://regex101.com/r/0lS3yW/1 -ery
-    "JACOB'S FARMING CONTESTS" FIRST LORELINE == ("§8Schedule")
-     */
 
     private val config get() = SkyHanniMod.feature.garden.eliteWebsite
 
@@ -43,7 +27,7 @@ object OpenContestInElitebotDev {
     private val ELITEBOT_DOMAIN: String = "https://elitebot.dev"
     private val ELITEBOT_CONTESTS: String = "$ELITEBOT_DOMAIN/contests"
     private val ELITEBOT_UPCOMING: String = "$ELITEBOT_CONTESTS/upcoming"
-    private val ELITEBOT_RECORDS_SUFFIX: String = "records" //to be used together with ELITEBOT_CONTESTS and year number -ery
+    private val ELITEBOT_RECORDS_SUFFIX: String = "records"
 
     private val SB_MONTH_NAME_INT_MAP: Map<String, Int> = mapOf(
         "Early Spring" to 1,
@@ -80,31 +64,30 @@ object OpenContestInElitebotDev {
 
     private val elitebotDevRepoGroup = RepoPattern.group("elitebotdev")
 
-    // private val jacobsFarmingContestChestNamePattern by elitebotDevGroup.pattern(("jacobsfarmingcontest.chestname"), ("(?:(?:Jacob's Farming |Your )Contests)")) // https://regex101.com/r/6dhLMl/1 -ery
     private val calendarDateChestNameItemNamePattern by elitebotDevRepoGroup.pattern(
         ("calendardate.chestnameitemname"),
         ("(?<sbTime>(?<month>(?:Early |Late )?(?:Winter|Spring|Summer|Autumn|Fall))(?: (?<date>[\\d]+)(?:nd|rd|th|st))?, Year (?<year>[\\d,.]+))")
-    ) // https://regex101.com/r/5rZqFd/1 -ery
+    )
     private val blankContestsFirstLoreLinePattern by elitebotDevRepoGroup.pattern(
         ("blankcontests.firstloreline"),
         ("((?:§.)+(?<crop>[\\S ]+)+ Contests?)")
-    ) // https://regex101.com/r/7o9eU0/1 -ery
+    )
     private val dayBlankItemNamePattern by elitebotDevRepoGroup.pattern(
         ("dayblank.itemname"),
         ("Day (?<day>[\\d.,]+)")
-    ) // https://regex101.com/r/0lS3yW/1 -ery
+    )
     private val jacobsFarmingContestSBCalendarFirstLoreLinePattern by elitebotDevRepoGroup.pattern(
         ("jacobsfarmingcontestsbcalendar.firstloreline"),
         ("(?:(?:§.)*(?:[\\S ]+)?(?:[\\d]+):(?:[\\d]+) [ap]m(?:-|[\\S ]+)(?:[\\d]+):(?:[\\d]+) [ap]m: (?:§.)*Jacob's Farming Contest(?:§.)*(?: \\((?:§.)*(?:[\\d]+[ywhm] )*(?:[\\d]+s)(?:§.)*\\)| \\((?:§.)*(?:[\\S ]+)(?:§.)*\\))?)")
-    ) // https://regex101.com/r/1lvgAr/2 -ery
+    )
     private val calendarDateStringCommandPattern by elitebotDevRepoGroup.pattern(
         ("calendardatestring.command"),
         ("(?<sbTime>(?<month>(?:Early |Late )?(?:Winter|Spring|Summer|Autumn|Fall))?(?: (?<date>[\\d]+)(?:nd|rd|th|st)?)?(?:,? )?Year (?<year>[\\d,.]+))")
-    ) // https://regex101.com/r/41kYdf/1 -ery
+    )
     private val calendarDateNumberCommandPattern by elitebotDevRepoGroup.pattern(
         ("calendardatenumber.command"),
         ("(?<one>[\\d]+[ymd]) (?<two>[\\d]+[ymd]) (?<three>[\\d]+[ymd])")
-    ) // https://regex101.com/r/mIBM6r/1 -ery
+    )
 
     @SubscribeEvent
     fun onSlotClick(event: GuiContainerEvent.SlotClickEvent) {
@@ -249,7 +232,7 @@ object OpenContestInElitebotDev {
                     sendUsageMessagesNumbers(argsAsOneString)
                     return
                 }
-                val timeUnitsInts: MutableList<Int> = mutableListOf(0, 0, 0) //y, m, d
+                val timeUnitsInts: MutableList<Int> = mutableListOf(0, 0, 0)
                 for (timeUnit in timeUnitsStrings) {
                     val lastLetter = timeUnit.takeLast(1)
                     if (lastLetter == "y") {
