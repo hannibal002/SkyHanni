@@ -23,37 +23,126 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 class MenuItemDisplayOverlayPlayerTryhard : AbstractMenuStackSize() {
     private val playerTryhardSubgroup = itemStackSizeGroup.group("player.tryhard")
     
-    // private val genericPercentPattern = ".* (§.)?(?<percent>[0-9]+)(\\.[0-9]*)?(§.)?%".toPattern()
-    private val auctionHousePageLoreLinePattern by playerTryhardSubgroup.pattern(("auctionhousepage.loreline"), ("§7\\((?<pagenumber>[0-9]+).*"))
-    private val otherMenusPageLoreLinePattern by playerTryhardSubgroup.pattern(("othermenuspage.loreline"), ("§.Page (?<pagenumber>[0-9]+)"))
-    private val rngMeterLoreLinePattern by playerTryhardSubgroup.pattern(("rngmeter.loreline"), ("(§.)*Odds: (?<odds>(§.[\\w]){1}).*"))
-    private val generalPurposeNotBoosterCookieDurationLoreLinePattern by playerTryhardSubgroup.pattern(("generalpurposenotboostercookieduration.loreline"), ("(§.)?(([A-z ])+): (§.)?(?<fullDuration>(?<years>[0-9]+y)?[ ]?(?<days>[0-9]+d)?[ ]?(?<hours>[0-9]+h)?[ ]?(?<minutes>[0-9]+m)?[ ]?(?<seconds>[0-9]+s)?)"))
-    private val totalFameLoreLinePattern by playerTryhardSubgroup.pattern(("totalfame.loreline"), ("(§.)?Your total: (§.)?(?<total>(?<useful>[0-9]+)((,[0-9]+))+) Fame"))
-    private val bitsAvailableLoreLinePattern by playerTryhardSubgroup.pattern(("bitsavailable.loreline"), ("(§.)?Bits Available: (§.)?(?<total>(?<useful>[0-9]+)(?<useless>(,[0-9]+))*)(§.)?.*"))
-    private val magicalPowerLoreLinePattern by playerTryhardSubgroup.pattern(("magicalpower.loreline"), ("(§.)?Magical Power: (§.)?(?<total>(?<useful>[0-9]+)(,[0-9]+)*)"))
-    private val otherMagicalPowerLoreLinePattern by playerTryhardSubgroup.pattern(("othermagicalpower.loreline"), (".*(§.)?Total: (§.)?(?<total>(?<useful>[0-9]+)(,[0-9]+)*).*"))
-    private val tuningPointsLoreLinePattern by playerTryhardSubgroup.pattern(("tuningpoints.loreline"), ("(§.)?Tuning Points: (§.)?(?<total>(?<useful>[0-9]+)(,[0-9]+)*)"))
-    private val slotSourceLoreLinePattern by playerTryhardSubgroup.pattern(("slotsource.loreline"), ("(§.)(?<category>(?!Buying).*)?: (§.)?(\\+?)(?<slots>[0-9]+) (s|S)lots"))
-    private val auctionChestNamePattern by playerTryhardSubgroup.pattern(("auction.chestname"), ("Auction.*"))
-    private val isNotAuctionAbiphoneContactsDirectoryChestNamePattern by playerTryhardSubgroup.pattern(("isnotauctionabiphonecontactsdirectory.chestname"), ("^(?:(?!Auction|A.iphone|Contacts Directory).)*\$"))
-    private val generalPurposeSelectedFilterSortLoreLinePattern by playerTryhardSubgroup.pattern(("generalpurposeselectedfiltersort.loreline"), ("((?<colorCode>§.)*▶ (?<threeChars>[\\w ]{3}))([\\w ])+"))
-    private val rngMeterOddsChestNamePattern by playerTryhardSubgroup.pattern(("rngmeterodds.chestname"), (".* RNG Meter"))
-    private val communityShopEssenceShopChestNamePattern by playerTryhardSubgroup.pattern(("communityshopessenceshop.chestname"), ("(Community Shop|.* Essence Shop)"))
-    private val communityShopIsUpgradeLoreLinePattern by playerTryhardSubgroup.pattern(("communityshopisupgrade.loreline"), ("(.* to start!|.*Maxed out!|.*upgrad.*)"))
-    private val communityShopIsAlsoUpgradeLoreLinePattern by playerTryhardSubgroup.pattern(("communityshopisalsoupgrade.loreline"), (".* Upgrade"))
-    private val essenceShopIsPurchasableUpgradeLoreLinePattern by playerTryhardSubgroup.pattern(("essenceshopispurchasableupgrade.loreline"), ("(§.)*(.* unlock|UNLOCK).*"))
-    private val isNotRomanNumeralNotForMinecraftOrSkyblockPattern by playerTryhardSubgroup.pattern(("isnotromannumeral.notforminecraftorskyblock"), ("^(?:(?!I|V|X|L|C|D|M).)*\$"))
-    private val auctionBazaarCommunityShopIsValidForSelectedTabStackSizeChestNamePattern by playerTryhardSubgroup.pattern(("auctionbazaarcommunityshopisvalidforselectedtabstacksize.chestname"), ("(Auction.*|Bazaar.*|Community Shop)"))
-    private val currentlySelectedBrowsingViewingTabLoreLinePattern by playerTryhardSubgroup.pattern(("currentlyselectedbrowsingviewingtab.loreline"), ("§aCurrently .*"))
-    private val isAuctionOrBazaarChestNamePattern by playerTryhardSubgroup.pattern(("isauctionorbazaar.chestname"), ("(Auction.*|Bazaar.*)"))
-    private val fameRankLoreLinePattern by playerTryhardSubgroup.pattern(("famerank.loreline"), ("(§.)*Fame Rank: (§.)*(?<fameRank>[\\w ]+)"))
-    private val boosterCookieDurationLoreLinePattern by playerTryhardSubgroup.pattern(("boostercookieduration.loreline"), ("(§.)*Duration: (§.)*(?<fullDuration>(?<years>[0-9]+y)?[ ]?(?<days>[0-9]+d)?[ ]?(?<hours>[0-9]+h)?[ ]?(?<minutes>[0-9]+m)?[ ]?(?<seconds>[0-9]+s)?)"))
-    private val currentlyActiveEffectsLoreLinePattern by playerTryhardSubgroup.pattern(("currentlyactiveeffects.loreline"), ("(§.)*Currently Active: (§.)*(?<effects>[\\w]+)"))
-    private val accessoryBagUpgradesStatsTuningChestNamePattern by playerTryhardSubgroup.pattern(("accessorybagupgradesstatstuning.chestname"), ("(Accessory Bag Upgrades|Stats Tuning)"))
-    private val powerStoneLearnedStatusLoreLinePattern by playerTryhardSubgroup.pattern(("powerstonelearnedstatus.loreline"), ("(§.)*Learned: (?<colorCode>§.)*(?<status>[\\w ]+) (?<icon>.)"))
-    private val startingInLoreLinePattern by playerTryhardSubgroup.pattern(("startingin.loreline"), ("§7Starting in: .*"))
-    private val startsInLoreLinePattern by playerTryhardSubgroup.pattern(("startsin.loreline"), ("§7Starts in: .*"))
-    private val achievementPointsLoreLinePattern by playerTryhardSubgroup.pattern(("achievementpoints.loreline"), ("(§.)*Points: (§.)*([\\w,]+)(§.)*\\/(§.)*([\\w,]+) (§.)*\\((?<percent>[\\w]+)%(§.)*\\)"))
+    private val auctionHousePageLoreLinePattern by playerTryhardSubgroup.pattern(
+        "auctionhousepage.loreline",
+        "§7\\((?<pagenumber>[0-9]+).*"
+    )
+    private val otherMenusPageLoreLinePattern by playerTryhardSubgroup.pattern(
+        "othermenuspage.loreline",
+        "§.Page (?<pagenumber>[0-9]+)"
+    )
+    private val rngMeterLoreLinePattern by playerTryhardSubgroup.pattern(
+        "rngmeter.loreline",
+        "(§.)*Odds: (?<odds>(§.[\\w]){1}).*"
+    )
+    private val generalPurposeNotBoosterCookieDurationLoreLinePattern by playerTryhardSubgroup.pattern(
+        "generalpurposenotboostercookieduration.loreline",
+        "(§.)?(([A-z ])+): (§.)?(?<fullDuration>(?<years>[0-9]+y)?[ ]?(?<days>[0-9]+d)?[ ]?(?<hours>[0-9]+h)?[ ]?(?<minutes>[0-9]+m)?[ ]?(?<seconds>[0-9]+s)?)"
+    )
+    private val totalFameLoreLinePattern by playerTryhardSubgroup.pattern(
+        "totalfame.loreline",
+        "(§.)?Your total: (§.)?(?<total>(?<useful>[0-9]+)((,[0-9]+))+) Fame"
+    )
+    private val bitsAvailableLoreLinePattern by playerTryhardSubgroup.pattern(
+        "bitsavailable.loreline",
+        "(§.)?Bits Available: (§.)?(?<total>(?<useful>[0-9]+)(?<useless>(,[0-9]+))*)(§.)?.*"
+    )
+    private val magicalPowerLoreLinePattern by playerTryhardSubgroup.pattern(
+        "magicalpower.loreline",
+        "(§.)?Magical Power: (§.)?(?<total>(?<useful>[0-9]+)(,[0-9]+)*)"
+    )
+    private val otherMagicalPowerLoreLinePattern by playerTryhardSubgroup.pattern(
+        "othermagicalpower.loreline",
+        ".*(§.)?Total: (§.)?(?<total>(?<useful>[0-9]+)(,[0-9]+)*).*"
+    )
+    private val tuningPointsLoreLinePattern by playerTryhardSubgroup.pattern(
+        "tuningpoints.loreline",
+        "(§.)?Tuning Points: (§.)?(?<total>(?<useful>[0-9]+)(,[0-9]+)*)"
+    )
+    private val slotSourceLoreLinePattern by playerTryhardSubgroup.pattern(
+        "slotsource.loreline",
+        "(§.)(?<category>(?!Buying).*)?: (§.)?(\\+?)(?<slots>[0-9]+) (s|S)lots"
+    )
+    private val auctionChestNamePattern by playerTryhardSubgroup.pattern(
+        "auction.chestname",
+        "Auction.*"
+    )
+    private val isNotAuctionAbiphoneContactsDirectoryChestNamePattern by playerTryhardSubgroup.pattern(
+        "isnotauctionabiphonecontactsdirectory.chestname",
+        "^(?:(?!Auction|A.iphone|Contacts Directory).)*\$"
+    )
+    private val generalPurposeSelectedFilterSortLoreLinePattern by playerTryhardSubgroup.pattern(
+        "generalpurposeselectedfiltersort.loreline",
+        "((?<colorCode>§.)*▶ (?<threeChars>[\\w ]{3}))([\\w ])+"
+    )
+    private val rngMeterOddsChestNamePattern by playerTryhardSubgroup.pattern(
+        "rngmeterodds.chestname",
+        ".* RNG Meter"
+    )
+    private val communityShopEssenceShopChestNamePattern by playerTryhardSubgroup.pattern(
+        "communityshopessenceshop.chestname",
+        "(Community Shop|.* Essence Shop)"
+    )
+    private val communityShopIsUpgradeLoreLinePattern by playerTryhardSubgroup.pattern(
+        "communityshopisupgrade.loreline",
+        "(.* to start!|.*Maxed out!|.*upgrad.*)"
+    )
+    private val communityShopIsAlsoUpgradeLoreLinePattern by playerTryhardSubgroup.pattern(
+        "communityshopisalsoupgrade.loreline",
+        ".* Upgrade"
+    )
+    private val essenceShopIsPurchasableUpgradeLoreLinePattern by playerTryhardSubgroup.pattern(
+        "essenceshopispurchasableupgrade.loreline",
+        "(§.)*(.* unlock|UNLOCK).*"
+    )
+    private val isNotRomanNumeralNotForMinecraftOrSkyblockPattern by playerTryhardSubgroup.pattern(
+        "isnotromannumeral.notforminecraftorskyblock",
+        "^(?:(?!I|V|X|L|C|D|M).)*\$"
+    )
+    private val auctionBazaarCommunityShopIsValidForSelectedTabStackSizeChestNamePattern by playerTryhardSubgroup.pattern(
+        "auctionbazaarcommunityshopisvalidforselectedtabstacksize.chestname",
+        "(Auction.*|Bazaar.*|Community Shop)"
+    )
+    private val currentlySelectedBrowsingViewingTabLoreLinePattern by playerTryhardSubgroup.pattern(
+        "currentlyselectedbrowsingviewingtab.loreline",
+        "§aCurrently .*"
+    )
+    private val isAuctionOrBazaarChestNamePattern by playerTryhardSubgroup.pattern(
+        "isauctionorbazaar.chestname",
+        "(Auction.*|Bazaar.*)"
+    )
+    private val fameRankLoreLinePattern by playerTryhardSubgroup.pattern(
+        "famerank.loreline",
+        "(§.)*Fame Rank: (§.)*(?<fameRank>[\\w ]+)"
+    )
+    private val boosterCookieDurationLoreLinePattern by playerTryhardSubgroup.pattern(
+        "boostercookieduration.loreline",
+        "(§.)*Duration: (§.)*(?<fullDuration>(?<years>[0-9]+y)?[ ]?(?<days>[0-9]+d)?[ ]?(?<hours>[0-9]+h)?[ ]?(?<minutes>[0-9]+m)?[ ]?(?<seconds>[0-9]+s)?)"
+    )
+    private val currentlyActiveEffectsLoreLinePattern by playerTryhardSubgroup.pattern(
+        "currentlyactiveeffects.loreline",
+        "(§.)*Currently Active: (§.)*(?<effects>[\\w]+)"
+    )
+    private val accessoryBagUpgradesStatsTuningChestNamePattern by playerTryhardSubgroup.pattern(
+        "accessorybagupgradesstatstuning.chestname",
+        "(Accessory Bag Upgrades|Stats Tuning)"
+    )
+    private val powerStoneLearnedStatusLoreLinePattern by playerTryhardSubgroup.pattern(
+        "powerstonelearnedstatus.loreline",
+        "(§.)*Learned: (?<colorCode>§.)*(?<status>[\\w ]+) (?<icon>.)"
+    )
+    private val startingInLoreLinePattern by playerTryhardSubgroup.pattern(
+        "startingin.loreline",
+        "§7Starting in: .*"
+    )
+    private val startsInLoreLinePattern by playerTryhardSubgroup.pattern(
+        "startsin.loreline",
+        "§7Starts in: .*"
+    )
+    private val achievementPointsLoreLinePattern by playerTryhardSubgroup.pattern(
+        "achievementpoints.loreline",
+        "(§.)*Points: (§.)*([\\w,]+)(§.)*\\/(§.)*([\\w,]+) (§.)*\\((?<percent>[\\w]+)%(§.)*\\)"
+    )
 
     @SubscribeEvent
     override fun onRenderItemTip(event: RenderItemTipEvent) {
@@ -107,23 +196,14 @@ class MenuItemDisplayOverlayPlayerTryhard : AbstractMenuStackSize() {
             also {
                 val lore = item.getLore()
                 var canDisplayTier = false
-                // (("Community Shop")) || ((" Essence Shop"))
                 communityShopEssenceShopChestNamePattern.matchMatcher(chestName) {
                     if (lore.isNotEmpty()) {
                         communityShopIsUpgradeLoreLinePattern.matchMatcher(lore.last()) { canDisplayTier = true }
                         communityShopIsAlsoUpgradeLoreLinePattern.matchMatcher(lore.first()) { canDisplayTier = true }
                         essenceShopIsPurchasableUpgradeLoreLinePattern.matchMatcher(lore.last()) { canDisplayTier = true }
-                        /* ((lore.first().contains(" Upgrade")) ||
-                                (lore.last().contains(" to start!")) ||
-                                (lore.last().contains("Maxed out")) ||
-                                (lore.last().contains("upgrad")))) ||
-                        ((chestName.contains(" Essence Shop")) &&
-                                (lore.last().lowercase().contains("unlock")))) */
                             if (canDisplayTier) {
-                                // the .lowercase() here is to match both "click to unlock" and "unlocked" in one fell swoop
                                 val lastWord = itemName.split(" ").last()
                                 for (char in lastWord) {
-                                // if (!(("IVXLCDM").contains(char))) {
                                     isNotRomanNumeralNotForMinecraftOrSkyblockPattern.matchMatcher("$char") {
                                         return@also
                                     }
@@ -136,8 +216,6 @@ class MenuItemDisplayOverlayPlayerTryhard : AbstractMenuStackSize() {
         }
         
         if (stackSizeConfig.contains(StackSizeMenuConfig.PlayerTryhard.SELECTED_TAB)) {
-            // ("(Auction.*|Bazaar.*)")
-            // (("(Auction.*|Bazaar.*)")).toPattern()).matchMatcher(chestName) {
             val lore = item.getLore()
             auctionBazaarCommunityShopIsValidForSelectedTabStackSizeChestNamePattern.matchMatcher(chestName) {
                 if (itemName.isNotEmpty() && lore.isNotEmpty()) {
