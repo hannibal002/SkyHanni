@@ -130,5 +130,4 @@ public class InventoryConfig {
     @ConfigEditorBoolean
     @FeatureToggle
     public boolean shiftClickNPCSell = false;
-
 }
