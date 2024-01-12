@@ -48,7 +48,6 @@ object OpenContestInElitebotDev {
     )
 
     private val elitebotDevRepoGroup = RepoPattern.group("garden.contest.elitebot")
-
     private val calendarDatePattern by elitebotDevRepoGroup.pattern(
         "date.chestanditem",
         "(?<sbTime>(?<month>(?:Early |Late )?(?:Winter|Spring|Summer|Autumn|Fall))(?: (?<date>\\d+)(?:nd|rd|th|st))?, Year (?<year>[\\d,.]+))"
@@ -78,6 +77,7 @@ object OpenContestInElitebotDev {
         if ((itemName == ("Upcoming Contests")) && (chestName == ("Jacob's Farming Contests")) && (item.getLore().first() == ("§8Schedule"))) {
             LorenzUtils.chat("§aOpening the upcoming contests page on EliteWebsite.")
             OSUtils.openBrowser(ELITEBOT_UPCOMING)
+            return
         } else if ((chestName == ("Your Contests")) && contestsPattern.matches(item.getLore().first())) {
             calendarDatePattern.matchMatcher(itemName) {
                 openContest(group("year").formatNumber(), group("month").convertMonthNameToInt(), group("date").formatNumber().toInt(), group("sbTime"))
