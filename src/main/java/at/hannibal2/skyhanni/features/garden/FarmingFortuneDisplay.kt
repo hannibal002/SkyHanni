@@ -29,6 +29,7 @@ import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getFarmingForDummie
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getHoeCounter
 import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
+import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraft.item.ItemStack
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import kotlin.math.floor
@@ -36,9 +37,15 @@ import kotlin.math.log10
 import kotlin.time.Duration.Companion.seconds
 
 class FarmingFortuneDisplay {
-    private val tabFortuneUniversalPattern = " Farming Fortune: §r§6☘(?<fortune>\\d+)".toPattern()
-    private val tabFortuneCropPattern =
-        " (?<crop>Wheat|Carrot|Potato|Pumpkin|Sugar Cane|Melon|Cactus|Cocoa Beans|Mushroom|Nether Wart) Fortune: §r§6☘(?<fortune>\\d+)".toPattern()
+    private val patternGroup = RepoPattern.group("garden.fortunedisplay.tablist")
+    private val universalTabFortunePattern by patternGroup.pattern(
+        "universal",
+        " Farming Fortune: §r§6☘(?<fortune>\\d+)"
+    )
+    private val cropSpecificTabFortunePattern by patternGroup.pattern(
+        "cropspecific",
+        " (?<crop>Wheat|Carrot|Potato|Pumpkin|Sugar Cane|Melon|Cactus|Cocoa Beans|Mushroom|Nether Wart) Fortune: §r§6☘(?<fortune>\\d+)"
+    )
 
     private var display = emptyList<List<Any>>()
     private var accessoryProgressDisplay = ""
@@ -55,10 +62,10 @@ class FarmingFortuneDisplay {
     fun onTabListUpdate(event: TabListUpdateEvent) {
         if (!GardenAPI.inGarden()) return
         event.tabList.firstNotNullOfOrNull {
-            tabFortuneUniversalPattern.matchMatcher(it) {
+            universalTabFortunePattern.matchMatcher(it) {
                 tabFortuneUniversal = group("fortune").toDouble()
             }
-            tabFortuneCropPattern.matchMatcher(it) {
+            cropSpecificTabFortunePattern.matchMatcher(it) {
                 currentCrop = CropType.getByName(group("crop"))
                 tabFortuneCrop = group("fortune").toDouble()
             }
