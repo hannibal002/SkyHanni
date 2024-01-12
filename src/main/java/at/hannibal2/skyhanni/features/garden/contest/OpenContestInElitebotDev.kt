@@ -94,17 +94,10 @@ object OpenContestInElitebotDev {
         }
     }
 
-    private fun openContest(yearLong: Long, month: Int = -1, day: Int = -1, sbDate: String, fromCommand: Boolean = false) {
+    private fun openContest(yearLong: Long, month: Int, day: Int, sbDate: String) {
         val year = yearLong.toInt()
-        if (month == -1 && day == -1 && SkyBlockTime(year).passesCalendarDateSanityCheck()) {
-            LorenzUtils.chat("Opening the year-specfic contests page for $sbDate.")
-            OSUtils.openBrowser("$ELITEBOT_CONTESTS/$year/$ELITEBOT_RECORDS_SUFFIX")
-        } else if (day == -1 && SkyBlockTime(year, month).passesCalendarDateSanityCheck()) {
+        if (SkyBlockTime(year, month, day).passesCalendarDateSanityCheck()) {
             LorenzUtils.chat("Opening the contests page for $sbDate.")
-            OSUtils.openBrowser("$$ELITEBOT_CONTESTS/$year/$month")
-        } else if (SkyBlockTime(year, month, day).passesCalendarDateSanityCheck()) {
-            val onExactDate = if (fromCommand) "nearest to" else "for"
-            LorenzUtils.chat("Opening the contests page $onExactDate $sbDate.")
             OSUtils.openBrowser("$$ELITEBOT_CONTESTS/$year/$month/$day")
         }
     }
