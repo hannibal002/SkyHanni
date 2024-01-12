@@ -66,7 +66,7 @@ object OpenContestInElitebotDev {
 
     private val calendarDateChestNameItemNamePattern by elitebotDevRepoGroup.pattern(
         "calendardate.chestnameitemname",
-        "(?<sbTime>(?<month>(?:Early |Late )?(?:Winter|Spring|Summer|Autumn|Fall))(?: (?<date>[\\d]+)(?:nd|rd|th|st))?, Year (?<year>[\\d,.]+))"
+        "(?<sbTime>(?<month>(?:Early |Late )?(?:Winter|Spring|Summer|Autumn|Fall))(?: (?<date>\\d+)(?:nd|rd|th|st))?, Year (?<year>[\\d,.]+))"
     )
     private val blankContestsFirstLoreLinePattern by elitebotDevRepoGroup.pattern(
         "blankcontests.firstloreline",
@@ -78,7 +78,7 @@ object OpenContestInElitebotDev {
     )
     private val jacobsFarmingContestSBCalendarFirstLoreLinePattern by elitebotDevRepoGroup.pattern(
         "jacobsfarmingcontestsbcalendar.firstloreline",
-        "(?:(?:§.)*(?:[\\S ]+)?(?:\\d+):(?:\\d+) [ap]m(?:-|[\\S ]+)(?:\\d+):(?:\\d+) [ap]m: (?:§.)*Jacob's Farming Contest(?:§.)*(?: \\((?:§.)*(?:\\d+[ywhm] )*(?:\\d+s)(?:§.)*\\)| \\((?:§.)*(?:[\\S ]+)(?:§.)*\\))?)"
+        "(?:§.)*(?:[\\S ]+)?\\d+:\\d+ [ap]m(?:-|[\\S ]+)\\d+:\\d+ [ap]m: (?:§.)*Jacob's Farming Contest(?:§.)*(?: \\((?:§.)*(?:\\d+[ywhm] )*\\d+s(?:§.)*\\)| \\((?:§.)*[\\S ]+(?:§.)*\\))?"
     )
     private val calendarDateStringCommandPattern by elitebotDevRepoGroup.pattern(
         "calendardatestring.command",
