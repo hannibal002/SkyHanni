@@ -67,7 +67,6 @@ object ItemDisplayOverlayFeatures : AbstractStackSize() {
     private val config get() = configItemStackSize
     private val itemDisplayOverlaySubgroup = itemStackSizeGroup.group("itemdisplayoverlay")
 
-    // private val xOutOfYNoColorRequiredPattern = ((".*: (§.)?(?<useful>[0-9]+)(§.)?\\/(§.)?(?<total>[0-9]+).*").toPattern())
     private val masterStarInternalNamePattern by itemDisplayOverlaySubgroup.pattern(("masterstar.internalname"), ("(?<tier>[A-Z])+_MASTER_STAR"))
     private val petLevelItemNamePattern by itemDisplayOverlaySubgroup.pattern(("petlevel.itemname"), ("\\[Lvl (?<level>.*)] .*"))
     private val shredderBonusDamageLoreLinePattern by itemDisplayOverlaySubgroup.pattern(("shredderbonusdamage.loreline"), ("(§.)?Bonus Damage \\([0-9]+ cap\\): (§.)?(?<dmgbonus>[0-9]+)"))
@@ -95,8 +94,8 @@ object ItemDisplayOverlayFeatures : AbstractStackSize() {
     private val abiphoneInternalNamePattern by itemDisplayOverlaySubgroup.pattern(("abiphone.internalname"), ("ABI(?:NGO)?PHONE_?.*"))
     private val doesNotIncludeDungeonStarsItemNamePattern by itemDisplayOverlaySubgroup.pattern(("doesnotincludedungeonstars.itemname"), ("^(?:(?!✪).)*\$"))
     private val soulflowAccessoryInternalNamePattern by itemDisplayOverlaySubgroup.pattern(("soulflowaccessory.internalname"), ("SOULFLOW_.*"))
-    private val isTradingWithPlayerChestNamePattern by itemDisplayOverlaySubgroup.pattern(("isinplayertradingmenu.chestname"), ("(You([\\t ]){2,}(?<theirName>[a-zA-Z0-9_]{2,16}))")) // see https://regex101.com/r/UDCQwR/1 for reference. -ery
-    private val isInAHOrNPCShopLoreLinePattern by itemDisplayOverlaySubgroup.pattern(("isavacuuminsideauctionhouseornpcshop.loreline"), ("(((§.)*Ends in: (§.)*(?<time>([\\d.,]+[ywdhms]+( )?)+))|Click to [tT]rade.)")) // see https://regex101.com/r/hyJEEe/1 for reference. -ery
+    private val isTradingWithPlayerChestNamePattern by itemDisplayOverlaySubgroup.pattern(("isinplayertradingmenu.chestname"), ("(You([\\t ]){2,}(?<theirName>[a-zA-Z0-9_]{2,16}))"))
+    private val isInAHOrNPCShopLoreLinePattern by itemDisplayOverlaySubgroup.pattern(("isinahornpcshop.loreline"), ("(((§.)*Ends in: (§.)*(?<time>([\\d.,]+[ywdhms]+( )?)+))|Click to [tT]rade.)"))
 
     private val newYearCakeInternalName = (("NEW_YEAR_CAKE").asInternalName())
     private val ranchersBootsInternalName = (("RANCHERS_BOOTS").asInternalName())
