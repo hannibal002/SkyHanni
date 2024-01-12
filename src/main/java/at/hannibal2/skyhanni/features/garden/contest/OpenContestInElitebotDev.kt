@@ -47,7 +47,7 @@ object OpenContestInElitebotDev {
         "Late Winter" to 12,
     )
 
-    private val elitebotDevRepoGroup = RepoPattern.group("elitebotdev")
+    private val elitebotDevRepoGroup = RepoPattern.group("garden.contest.elitebot")
 
     private val calendarDatePattern by elitebotDevRepoGroup.pattern(
         "calendardate.chestnameitemname",
