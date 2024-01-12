@@ -40,8 +40,15 @@ class CaptureFarmingGear {
 
     private val cakePattern = "(?:Big )?Yum! You (?:gain|refresh) [+]5☘ Farming Fortune for 48 hours!".toPattern()
 
-    private val tierPattern by RepoPattern.pattern("garden.uniqueVisitors.tier", "§7Progress to Tier (?<nextTier>\\d+):.*")
-    private val tierProgressPattern by RepoPattern.pattern("garden.uniqueVisitors.tierProgress", ".* §e(?<having>.*)§6/(?<total>.*)")
+    private val patternGroup = RepoPattern.group("garden.fortuneguide.capture")
+    private val tierPattern by patternGroup.pattern(
+        "uniquevisitors.tier",
+        "§7Progress to Tier (?<nextTier>\\d+):.*"
+    )
+    private val tierProgressPattern by patternGroup.pattern(
+        "uniquevisitors.tierprogress",
+        ".* §e(?<having>.*)§6/(?<total>.*)"
+    )
 
     companion object {
         private val strengthPattern = " Strength: §r§c❁(?<strength>.*)".toPattern()
