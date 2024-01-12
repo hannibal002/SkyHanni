@@ -208,6 +208,7 @@ import at.hannibal2.skyhanni.features.inventory.QuickCraftFeatures
 import at.hannibal2.skyhanni.features.inventory.RngMeterInventory
 import at.hannibal2.skyhanni.features.inventory.SackDisplay
 import at.hannibal2.skyhanni.features.inventory.ShiftClickEquipment
+import at.hannibal2.skyhanni.features.inventory.ShiftClickNPCSell
 import at.hannibal2.skyhanni.features.inventory.SkyBlockLevelGuideHelper
 import at.hannibal2.skyhanni.features.inventory.StatsTuning
 import at.hannibal2.skyhanni.features.inventory.itemdisplayoverlay.ItemDisplayOverlayFeatures
@@ -236,6 +237,7 @@ import at.hannibal2.skyhanni.features.misc.FixNEUHeavyPearls
 import at.hannibal2.skyhanni.features.misc.HideArmor
 import at.hannibal2.skyhanni.features.misc.InGameDateDisplay
 import at.hannibal2.skyhanni.features.misc.JoinCrystalHollows
+import at.hannibal2.skyhanni.features.misc.LesserOrbHider
 import at.hannibal2.skyhanni.features.misc.LimboTimeTracker
 import at.hannibal2.skyhanni.features.misc.LockMouseLook
 import at.hannibal2.skyhanni.features.misc.MarkedPlayerManager
@@ -256,7 +258,6 @@ import at.hannibal2.skyhanni.features.misc.SkyBlockKickDuration
 import at.hannibal2.skyhanni.features.misc.SuperpairsClicksAlert
 import at.hannibal2.skyhanni.features.misc.TimeFeatures
 import at.hannibal2.skyhanni.features.misc.TpsCounter
-import at.hannibal2.skyhanni.features.misc.LesserOrbHider
 import at.hannibal2.skyhanni.features.misc.compacttablist.AdvancedPlayerList
 import at.hannibal2.skyhanni.features.misc.compacttablist.TabListReader
 import at.hannibal2.skyhanni.features.misc.compacttablist.TabListRenderer
@@ -367,7 +368,7 @@ import org.apache.logging.log4j.Logger
     clientSideOnly = true,
     useMetadata = true,
     guiFactory = "at.hannibal2.skyhanni.config.ConfigGuiForgeInterop",
-    version = "0.23.Beta.6",
+    version = "0.23.Beta.7",
 )
 class SkyHanniMod {
     @Mod.EventHandler
@@ -519,6 +520,7 @@ class SkyHanniMod {
         loadModule(SoopyGuessBurrow())
         loadModule(DianaProfitTracker)
         loadModule(MythologicalCreatureTracker)
+        loadModule(ShiftClickNPCSell)
         loadModule(HighlightJerries())
         loadModule(TheGreatSpook())
         loadModule(GriffinBurrowHelper)
