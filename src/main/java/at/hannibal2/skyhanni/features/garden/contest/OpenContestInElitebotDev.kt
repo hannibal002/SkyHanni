@@ -178,10 +178,7 @@ object OpenContestInElitebotDev {
         }
         if (calendarDateNumberCommandPattern.matches(argsAsOneString)) {
             calendarDateNumberCommandPattern.matchMatcher(argsAsOneString) {
-                val timeUnitOne = group("one") ?: ""
-                val timeUnitTwo = group("two") ?: ""
-                val timeUnitThree = group("three") ?: ""
-                val timeUnitsStrings: List<String> = listOf<String>(timeUnitOne, timeUnitTwo, timeUnitThree)
+                val timeUnitsStrings: List<String> = listOf<String>(group("one") ?: "", group("two") ?: "", group("three") ?: "")
                 if (timeUnitsStrings.any { it.isEmpty() }) {
                     sendUsageMessagesNumbers(argsAsOneString)
                     return
