@@ -65,14 +65,6 @@ object OpenContestInElitebotDev {
         "jacobsfarmingcontestsbcalendar.firstloreline",
         "(?:§.)*(?:[\\S ]+)?\\d+:\\d+ [ap]m(?:-|[\\S ]+)\\d+:\\d+ [ap]m: (?:§.)*Jacob's Farming Contest(?:§.)*(?: \\((?:§.)*(?:\\d+[ywhm] )*\\d+s(?:§.)*\\)| \\((?:§.)*[\\S ]+(?:§.)*\\))?"
     )
-    private val calendarDateStringCommandPattern by elitebotDevRepoGroup.pattern(
-        "calendardatestring.command",
-        "(?<sbTime>(?<month>(?:Early |Late )?(?:Winter|Spring|Summer|Autumn|Fall))?(?: (?<date>\\d+)(?:nd|rd|th|st)?)?(?:,? )?Year (?<year>[\\d,.]+))"
-    )
-    private val calendarDateNumberCommandPattern by elitebotDevRepoGroup.pattern(
-        "calendardatenumber.command",
-        "(?<one>\\d+[ymd]) (?<two>\\d+[ymd]) (?<three>\\d+[ymd])"
-    )
 
     @SubscribeEvent
     fun onSlotClick(event: GuiContainerEvent.SlotClickEvent) {
@@ -101,54 +93,6 @@ object OpenContestInElitebotDev {
             }
         }
     }
-    private fun sendUsageMessagesCalendarDate() {
-        LorenzUtils.chat("§cUsage: /shopencontest §b[case-sensitive month name] §b[day] §cYear <year number>")
-        LorenzUtils.chat("Parameters colored like §bthis §eare optional.")
-    }
-
-    private fun sendUsageMessagesNumbers(argsAsOneString: String) {
-        LorenzUtils.chat("§cUsage example: /shelitebotdevcontest <month number>m <day number>d <year number>y")
-        LorenzUtils.chat("All parameters are required, but they can be entered in any order (as long as you include the correct suffix).")
-        if (argsAsOneString == "") return
-        LorenzUtils.chat("You entered: $argsAsOneString")
-    }
-
-    fun openFromCommandString(args: Array<String>) {
-        if (!LorenzUtils.inSkyBlock) return
-        if (!isEnabled()) {
-            LorenzUtils.chat("You have disabled opening past farming contests on EliteWebsite. Visit your config to enable this.")
-            return
-        }
-        if (args.isEmpty()) {
-            sendUsageMessagesCalendarDate()
-            return
-        }
-        val calendarDateString = args.joinToString(" ")
-        if (calendarDateStringCommandPattern.matches(calendarDateString)) {
-            calendarDateStringCommandPattern.matchMatcher(calendarDateString) {
-                val sbTime = group("sbTime") ?: ""
-                val yearString = group("year") ?: ""
-                val monthString = group("month") ?: ""
-                val dayString = group("date") ?: ""
-                if (sbTime.isEmpty() || yearString.isEmpty() || !(calendarDateString.contains("Year"))) {
-                    sendUsageMessagesCalendarDate()
-                    return
-                } else if (dayString.isEmpty() && monthString.isEmpty() && yearString.isNotEmpty()) {
-                    openContest(yearString.formatNumber(), sbDate = "Year $yearString")
-                } else if (dayString.isEmpty() && monthString.isNotEmpty() && yearString.isNotEmpty()) {
-                    openContest(yearString.formatNumber(), monthString.convertMonthNameToInt(), sbDate = "$monthString, Year $yearString")
-                } else if (dayString.isNotEmpty() && monthString.isNotEmpty() && yearString.isNotEmpty()) {
-                    openContest(yearString.formatNumber(), monthString.convertMonthNameToInt(), dayString.formatNumber().toInt(), calendarDateString, true)
-                } else {
-                    LorenzUtils.chat("§cIf you're reading this inside Minecraft, something went wrong with parsing your calendar date string. Please copy your original input below and report this bug on the SkyHanni Discord server.")
-                    LorenzUtils.chat(calendarDateString)
-                }
-            }
-        } else {
-            LorenzUtils.chat("You entered $calendarDateString, which could not be read correctly.")
-            sendUsageMessagesCalendarDate()
-        }
-    }
 
     private fun openContest(yearLong: Long, month: Int = -1, day: Int = -1, sbDate: String, fromCommand: Boolean = false) {
         val year = yearLong.toInt()
@@ -162,43 +106,6 @@ object OpenContestInElitebotDev {
             val onExactDate = if (fromCommand) "nearest to" else "for"
             LorenzUtils.chat("Opening the contests page $onExactDate for $sbDate.")
             OSUtils.openBrowser("$$ELITEBOT_CONTESTS/$year/$month/$day")
-        }
-    }
-
-    fun openFromCommandNumbers(args: Array<String>) {
-        if (!LorenzUtils.inSkyBlock) return
-        if (!isEnabled()) {
-            LorenzUtils.chat("You have disabled opening past farming contests on EliteWebsite. Visit your config to enable this.")
-            return
-        }
-        val argsAsOneString = args.joinToString(" ")
-        if (args.size != 3 || args.isEmpty()) {
-            sendUsageMessagesNumbers(argsAsOneString)
-            return
-        }
-        if (calendarDateNumberCommandPattern.matches(argsAsOneString)) {
-            calendarDateNumberCommandPattern.matchMatcher(argsAsOneString) {
-                val timeUnitsStrings: List<String> = listOf<String>(group("one") ?: "", group("two") ?: "", group("three") ?: "")
-                if (timeUnitsStrings.any { it.isEmpty() }) {
-                    sendUsageMessagesNumbers(argsAsOneString)
-                    return
-                }
-                val timeUnitsInts: MutableList<Int> = mutableListOf<Int>(0, 0, 0)
-                for (timeUnit in timeUnitsStrings) {
-                    val lastLetter = timeUnit.takeLast(1)
-                    if (lastLetter == "y") timeUnitsInts[0] = timeUnit.removeSuffix(lastLetter).toInt()
-                    else if (lastLetter == "m") timeUnitsInts[1] = timeUnit.removeSuffix(lastLetter).toInt()
-                    else if (lastLetter == "d") timeUnitsInts[2] = timeUnit.removeSuffix(lastLetter).toInt()
-                }
-                if (timeUnitsInts.any { it == 0 }) {
-                    sendUsageMessagesNumbers(argsAsOneString)
-                    return
-                }
-                openContest(timeUnitsInts[0].toLong(), timeUnitsInts[1], timeUnitsInts[2], "${SkyBlockTime.monthName(timeUnitsInts[1])} ${timeUnitsInts[2]}, Year ${timeUnitsInts[0]}", true)
-            }
-        } else {
-            sendUsageMessagesNumbers(argsAsOneString)
-            return
         }
     }
 

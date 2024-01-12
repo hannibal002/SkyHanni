@@ -29,7 +29,6 @@ import at.hannibal2.skyhanni.features.garden.GardenCropTimeCommand
 import at.hannibal2.skyhanni.features.garden.GardenCropsInCommand
 import at.hannibal2.skyhanni.features.garden.GardenNextJacobContest
 import at.hannibal2.skyhanni.features.garden.composter.ComposterOverlay
-import at.hannibal2.skyhanni.features.garden.contest.OpenContestInElitebotDev
 import at.hannibal2.skyhanni.features.garden.farming.ArmorDropTracker
 import at.hannibal2.skyhanni.features.garden.farming.CropMoneyDisplay
 import at.hannibal2.skyhanni.features.garden.farming.CropSpeedMeter
@@ -230,14 +229,6 @@ object Commands {
             "shresetseacreaturetracker",
             "Resets the Sea Creature Tracker"
         ) { SeaCreatureTracker.resetCommand(it) }
-        registerCommand(
-            "shopencontest",
-            "Opens a past farming contest on elitebot.dev with the date in literal form (Example: Late Summer 18, Year 100)"
-        ) { OpenContestInElitebotDev.openFromCommandString(it) }
-        registerCommand(
-            "shelitebotdevcontest",
-            "Opens a past farming contest on elitebot.dev with the date in numerical form (Example: 6m 18d 100y)"
-        ) { OpenContestInElitebotDev.openFromCommandNumbers(it) }
     }
 
     private fun usersBugFix() {
