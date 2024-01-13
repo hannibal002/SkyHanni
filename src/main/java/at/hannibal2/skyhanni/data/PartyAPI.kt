@@ -62,6 +62,14 @@ object PartyAPI {
         "members.list",
         "Party (?:Leader|Moderators|Members): (?<names>.*)"
     )
+    private val kuudraFinderJoinPattern by patternGroup.pattern(
+        "kuudrafinder.join",
+        "§dParty Finder §f> (?<name>.*?) §ejoined the group! \\(§[a-fA-F0-9]+Combat Level \\d+§e\\)"
+    )
+    private val dungeonFinderJoinPattern by patternGroup.pattern(
+        "dungeonfinder.join",
+        "§dParty Finder §f> (?<name>.*?) §ejoined the dungeon group! \\(§[a-fA-F0-9].* Level \\d+§[a-fA-F0-9]\\)"
+    )
 
     val partyMembers = mutableListOf<String>()
 
@@ -87,20 +95,26 @@ object PartyAPI {
         val message = event.message.trimWhiteSpaceAndResets().removeResets()
 
         // new member joined
-
         youJoinedPartyPattern.matchMatcher(message) {
             val name = group("name").cleanPlayerName()
-            if (!partyMembers.contains(name)) partyMembers.add(name)
+            addPlayer(name)
         }
         othersJoinedPartyPattern.matchMatcher(message) {
             val name = group("name").cleanPlayerName()
-            if (!partyMembers.contains(name)) partyMembers.add(name)
+            addPlayer(name)
         }
         othersInThePartyPattern.matchMatcher(message) {
             for (name in group("names").split(", ")) {
-                val playerName = name.cleanPlayerName()
-                if (!partyMembers.contains(playerName)) partyMembers.add(playerName)
+                addPlayer(name.cleanPlayerName())
             }
+        }
+        kuudraFinderJoinPattern.matchMatcher(message) {
+            val name = group("name").cleanPlayerName()
+            addPlayer(name)
+        }
+        dungeonFinderJoinPattern.matchMatcher(message) {
+            val name = group("name").cleanPlayerName()
+            addPlayer(name)
         }
 
         // one member got removed
@@ -147,9 +161,14 @@ object PartyAPI {
         partyMemberListPattern.matchMatcher(message.removeColor()) {
             for (name in group("names").split(" ● ")) {
                 val playerName = name.replace(" ●", "").cleanPlayerName()
-                if (playerName == LorenzUtils.getPlayerName()) continue
-                if (!partyMembers.contains(playerName)) partyMembers.add(playerName)
+                addPlayer(playerName)
             }
         }
+    }
+
+    private fun addPlayer(playerName: String) {
+        if (partyMembers.contains(playerName)) return
+        if (playerName == LorenzUtils.getPlayerName()) return
+        partyMembers.add(playerName)
     }
 }
