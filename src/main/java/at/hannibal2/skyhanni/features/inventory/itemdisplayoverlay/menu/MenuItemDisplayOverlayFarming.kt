@@ -13,28 +13,28 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 class MenuItemDisplayOverlayFarming : AbstractMenuStackSize() {
     private val farmingSubgroup = itemStackSizeGroup.group("farming")
     
-    private val totallingCountResourceLoreLinePattern by farmingSubgroup.pattern(
-        "totallingcountresource.loreline",
+    private val totallingResourcePattern by farmingSubgroup.pattern(
+        "totalling.resource.loreline",
         ".*(§.)Totalling ((§.)+)(?<resourceCount>[\\w]+) (?<resourceType>[ \\w]+)(§.)\\..*"
     )
-    private val jacobFarmingContestMedalInventoryLoreLinePattern by farmingSubgroup.pattern(
-        "jacobfarmingcontestmedalinventory.loreline",
+    private val jacobMedalInventoryPattern by farmingSubgroup.pattern(
+        "jacob.medal.inventory.loreline",
         "(?<colorCode>§.)(?<bold>§l)+(?<medal>[\\w]+) (§.)*(m|M)edals: (§.)*(?<count>[\\w]+)"
     )
-    private val nextVisitorCountdownLoreLinePattern by farmingSubgroup.pattern(
-        "nextvisitorcountdown.loreline",
+    private val nextVisitorPattern by farmingSubgroup.pattern(
+        "next.visitor.loreline",
         "(§.)*Next Visitor: (§.)*(?<time>[\\w]+)(m|s).*"
     )
-    private val insertResourceFromLocationItemNamePattern by farmingSubgroup.pattern(
-        "insertresourcefromlocation.itemname",
+    private val insertFromPattern by farmingSubgroup.pattern(
+        "insert.from.itemname",
         "Insert (?<resource>[\\w]+) from (?<inventorySacks>[\\w]+)"
     )
-    private val visitorLogbookNPCRarityLoreLinePattern by farmingSubgroup.pattern(
-        "visitorlogbooknpcrarity.loreline",
+    private val visitorRarityPattern by farmingSubgroup.pattern(
+        "visitor.rarity.loreline",
         "§.§(L|l)(UNCOMMON|RARE|LEGENDARY|SPECIAL|MYTHIC)"
     )
-    private val visitorMilestonePercentProgressLoreLinePattern by farmingSubgroup.pattern(
-        "visitormilestonepercentprogress.loreline",
+    private val visitorMilestonePercentPattern by farmingSubgroup.pattern(
+        "visitor.milestone.percent.loreline",
         "(§.)*Progress to Tier (?<tier>[\\w]+):.* (§.)*(?<percent>[0-9]+)(\\.[0-9]*)?(§.)?%"
     )
 
@@ -55,7 +55,7 @@ class MenuItemDisplayOverlayFarming : AbstractMenuStackSize() {
         if (stackSizeConfig.contains(StackSizeMenuConfig.Farming.JACOBS_MEDALS) && ((chestName == "Jacob's Farming Contests") && itemName == ("Claim your rewards!"))) {
             var result = ""
             for (line in lore) {
-                jacobFarmingContestMedalInventoryLoreLinePattern.matchMatcher(line) {
+                jacobMedalInventoryPattern.matchMatcher(line) {
                     result = "$result${group("colorCode")}${group("count")}"
                 }
             }
@@ -64,7 +64,7 @@ class MenuItemDisplayOverlayFarming : AbstractMenuStackSize() {
 
         if (stackSizeConfig.contains(StackSizeMenuConfig.Farming.VISITORS_LOGBOOK_COUNTDOWN) && ((chestName == "Visitor's Logbook") && itemName == ("Logbook"))) {
             for (line in lore) {
-                nextVisitorCountdownLoreLinePattern.matchMatcher(line) {
+                nextVisitorPattern.matchMatcher(line) {
                     return group("time")
                 }
             }
@@ -72,7 +72,7 @@ class MenuItemDisplayOverlayFarming : AbstractMenuStackSize() {
 
         if (stackSizeConfig.contains(StackSizeMenuConfig.Farming.VISITOR_MILESTONES) && (chestName == "Visitor Milestones")) {
             for (line in lore) {
-                visitorMilestonePercentProgressLoreLinePattern.matchMatcher(line) {
+                visitorMilestonePercentPattern.matchMatcher(line) {
                     return group("percent").convertPercentToGreenCheckmark()
                 }
             }
@@ -80,7 +80,7 @@ class MenuItemDisplayOverlayFarming : AbstractMenuStackSize() {
 
         if (stackSizeConfig.contains(StackSizeMenuConfig.Farming.VISITOR_NPC_RARITIES) && (chestName == "Visitor's Logbook")) {
             for (line in lore) {
-                visitorLogbookNPCRarityLoreLinePattern.matchMatcher(line) {
+                visitorRarityPattern.matchMatcher(line) {
                     return line.take(5)
                 }
             }
@@ -88,9 +88,9 @@ class MenuItemDisplayOverlayFarming : AbstractMenuStackSize() {
 
         if (stackSizeConfig.contains(StackSizeMenuConfig.Farming.COMPOSTER_INSERT_ABBV)) {
             if (chestName == "Composter") {
-                insertResourceFromLocationItemNamePattern.matchMatcher(itemName) {
+                insertFromPattern.matchMatcher(itemName) {
                     for (line in lore) {
-                        totallingCountResourceLoreLinePattern.matchMatcher(line) {
+                        totallingResourcePattern.matchMatcher(line) {
                             return group("resourceCount")
                         }
                     }
