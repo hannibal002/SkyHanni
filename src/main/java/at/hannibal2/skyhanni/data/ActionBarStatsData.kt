@@ -30,10 +30,16 @@ enum class ActionBarStatsData(@Language("RegExp") rawPattern: String) { HEALTH(
     ),
     ;
 
-    internal val pattern by RepoPattern.pattern("actionbar.$name", rawPattern)
+    private val repoKey = name.replace("_", ".").lowercase()
+
+    internal val pattern by RepoPattern.pattern("actionbar.$repoKey", rawPattern)
     var value: String = ""
 
     companion object {
+
+        init {
+            entries.forEach { it.pattern }
+        }
 
         @SubscribeEvent
         fun onActionBar(event: LorenzActionBarEvent) {
