@@ -30,7 +30,7 @@ object ScoreboardPattern {
     val autoClosingPattern by multiUseSb.pattern("autoclosing", "(§.)*Auto-closing in: §c(\\d{1,2}:)?\\d{1,2}$")
     val startingInPattern by multiUseSb.pattern("startingin", "(§.)*Starting in: §.(\\d{1,2}:)?\\d{1,2}$")
     val timeElapsedPattern by multiUseSb.pattern("timeelapsed", "(§.)*Time Elapsed: (§.)*(?<time>(\\w+[ydhms] ?)+)$")
-    val instanceShutdownPattern by multiUseSb.pattern("instanceshutdown", "(§.)*Instance Shutdown: (§.)*(\\d{1,2}:)?\\d{1,2}$")
+    val instanceShutdownPattern by multiUseSb.pattern("instanceshutdown", "(§.)*Instance Shutdown: (§.)*(?<time>(\\w+[ydhms] ?)+)$")
     val timeLeftPattern by multiUseSb.pattern("timeleft", "(§.)*Time Left: (§.)*[\\w:,.]*$")
     // dungeon scoreboard
     private val dungeonSb = scoreboardGroup.group("dungeon")
@@ -43,7 +43,7 @@ object ScoreboardPattern {
     private val kuudraSb = scoreboardGroup.group("kuudra")
     val wavePattern by kuudraSb.pattern("wave", "^(§.)*Wave: (§.)*\\d+(§.)*( §.- §.\\d+:\\d+)?$")
     val tokensPattern by kuudraSb.pattern("tokens", "^(§.)*Tokens: §.[\\w,]+$")
-    val submergesPattern by kuudraSb.pattern("submerges", "^(§.)*Submerges In: (§.)*[\\w,]+$")
+    val submergesPattern by kuudraSb.pattern("submerges", "^(§.)*Submerges In: (§.)*[\\w,?:]+$")
     // farming
     private val farmingSb = scoreboardGroup.group("farming")
     val medalsPattern by farmingSb.pattern("medals", "§[6fc]§l(GOLD|SILVER|BRONZE) §fmedals: §[6fc]\\d+$")
