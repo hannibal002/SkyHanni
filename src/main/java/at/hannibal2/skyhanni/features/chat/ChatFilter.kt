@@ -26,7 +26,10 @@ class ChatFilter {
 
         // mystery box
         "§b✦ §r.* §r§7found a §r§e.* §r§bMystery Box§r§7!".toPattern(),
-        "§b✦ §r.* §r§7found (a|an) §r.* §r§7in a §r§a(Holiday )?Mystery Box§r§7!".toPattern()
+        "§b✦ §r.* §r§7found (a|an) §r.* §r§7in a §r§a(Holiday )?Mystery Box§r§7!".toPattern(),
+
+        // mystery dust
+        "§b✦ §r§7You earned §r§b\\d+ §r§7Mystery Dust!".toPattern(),
     )
 
     private val lobbyMessages = listOf(
