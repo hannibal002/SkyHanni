@@ -15,44 +15,44 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 class MenuItemDisplayOverlaySBLeveling : AbstractMenuStackSize() {
     private val sbLevelingSubgroup = itemStackSizeGroup.group("sbleveling")
     
-    private val guideTaskChestNamePattern by sbLevelingSubgroup.pattern(
-        "guidetask.chestname",
+    private val guideTaskChestPattern by sbLevelingSubgroup.pattern(
+        "guide.task.chestname",
         ".*(Guide |Task).*"
     )
-    private val progressPatternLoreLinePattern by sbLevelingSubgroup.pattern(
-        "progresspattern.loreline",
+    private val progressPattern by sbLevelingSubgroup.pattern(
+        "progress.loreline",
         ".*Progress.*: (§.)?(?<percent>[0-9]+)(\\.[0-9]*)?(§.)?%"
     )
-    private val checkmarkItemNamePattern by sbLevelingSubgroup.pattern(
+    private val checkmarkPattern by sbLevelingSubgroup.pattern(
         "checkmark.itemname",
         "✔.*"
     )
-    private val progressToCompleteCategoryPercentLoreLinePattern by sbLevelingSubgroup.pattern(
-        "progresstocompletecategorypercent.loreline",
+    private val categoryPercentPattern by sbLevelingSubgroup.pattern(
+        "category.percent.loreline",
         ".*(§.)?Progress to Complete Category: (§.)?(?<percent>[0-9]+)(\\.[0-9]*)?(§.)?%"
     )
-    private val rewardsSkyblockLevelingChestNamePattern by sbLevelingSubgroup.pattern(
-        "rewardsskyblockleveling.chestname",
+    private val rewardsSBLevelingChestPattern by sbLevelingSubgroup.pattern(
+        "rewards.skyblockleveling.chestname",
         ".*(rewards|skyblock leveling).*"
     )
-    private val progressToRewardsUnlockedPatternLoreLinePattern by sbLevelingSubgroup.pattern(
-        "progresstorewardsunlockedpattern.loreline",
+    private val progressRewardsPattern by sbLevelingSubgroup.pattern(
+        "progres.rewards.loreline",
         ".*(Progress to .*|Rewards Unlocked:) (§.)?(?<percent>[0-9]+)(\\.[0-9]*)?(§.)?%"
     )
-    private val greenItemNamePattern by sbLevelingSubgroup.pattern(
+    private val greenPattern by sbLevelingSubgroup.pattern(
         "green.itemname",
         "^§a(\\S*)\$"
     )
-    private val emblemsUnlockedLoreLinePattern by sbLevelingSubgroup.pattern(
+    private val emblemsUnlockedPattern by sbLevelingSubgroup.pattern(
         "emblemsunlocked.loreline",
         "(§.)?(?<emblems>\\d+) Unlocked"
     )
-    private val emblemPreviewItemNamePattern by sbLevelingSubgroup.pattern(
-        "emblempreview.itemname",
+    private val emblemPreviewPattern by sbLevelingSubgroup.pattern(
+        "emblem.preview.itemname",
         "(?<status>§.)+(?<emblemName>[\\S ]+) (?<theEmblem>(§.)+.+)"
     )
-    private val isAnEmblemLoreLinePattern by sbLevelingSubgroup.pattern(
-        "isAnEmblem.loreline",
+    private val emblemPattern by sbLevelingSubgroup.pattern(
+        "emblem.loreline",
         "((§.)§8(\\S[^:][\\S ]+)|§8Locked)"
     )
 
@@ -70,14 +70,14 @@ class MenuItemDisplayOverlaySBLeveling : AbstractMenuStackSize() {
 
         if (lore.isNotEmpty()) {
             if (stackSizeConfig.contains(StackSizeMenuConfig.SBLeveling.GUIDE_PROGRESS)) {
-                guideTaskChestNamePattern.matchMatcher(chestName) {
+                guideTaskChestPattern.matchMatcher(chestName) {
                     if (itemName.isNotEmpty()) {
                         for (line in lore) {
-                            progressPatternLoreLinePattern.matchMatcher(line) {
+                            progressPattern.matchMatcher(line) {
                                 return group("percent").convertPercentToGreenCheckmark()
                             }
                         }
-                        checkmarkItemNamePattern.matchMatcher(itemName) {
+                        checkmarkPattern.matchMatcher(itemName) {
                             return greenCheckmark
                         }
                     }
@@ -86,7 +86,7 @@ class MenuItemDisplayOverlaySBLeveling : AbstractMenuStackSize() {
 
             if (stackSizeConfig.contains(StackSizeMenuConfig.SBLeveling.WAYS_TO_LEVEL_UP_PROGRESS)) {
                 for (line in lore) {
-                    progressToCompleteCategoryPercentLoreLinePattern.matchMatcher(line) {
+                    categoryPercentPattern.matchMatcher(line) {
                         return group("percent").convertPercentToGreenCheckmark()
                     }
                 }
@@ -94,9 +94,9 @@ class MenuItemDisplayOverlaySBLeveling : AbstractMenuStackSize() {
 
             if (stackSizeConfig.contains(StackSizeMenuConfig.SBLeveling.SB_LEVELING_REWARDS)) {
                 if ((itemName.isNotEmpty())) {
-                    rewardsSkyblockLevelingChestNamePattern.matchMatcher(chestName.lowercase()) {
+                    rewardsSBLevelingChestPattern.matchMatcher(chestName.lowercase()) {
                         for (line in lore) {
-                            progressToRewardsUnlockedPatternLoreLinePattern.matchMatcher(line) {
+                            progressRewardsPattern.matchMatcher(line) {
                                 return group("percent").convertPercentToGreenCheckmark()
                             }
                         }
@@ -106,16 +106,16 @@ class MenuItemDisplayOverlaySBLeveling : AbstractMenuStackSize() {
 
             if (stackSizeConfig.contains(StackSizeMenuConfig.SBLeveling.EMBLEMS_UNLOCKED) && (chestName == ("Emblems"))) {
                 val nameWithColor = item.name ?: return ""
-                greenItemNamePattern.matchMatcher(nameWithColor) {
-                    emblemsUnlockedLoreLinePattern.matchMatcher(lore.first()) {
+                greenPattern.matchMatcher(nameWithColor) {
+                    emblemsUnlockedPattern.matchMatcher(lore.first()) {
                         return group("emblems")
                     }
                 }
             }
 
-            if (stackSizeConfig.contains(StackSizeMenuConfig.SBLeveling.EMBLEM_PREVIEW) && (chestName == ("Emblems")) && !(emblemsUnlockedLoreLinePattern.matches(lore.first())) && (isAnEmblemLoreLinePattern.matches(lore.first()))) {
+            if (stackSizeConfig.contains(StackSizeMenuConfig.SBLeveling.EMBLEM_PREVIEW) && (chestName == ("Emblems")) && !(emblemsUnlockedPattern.matches(lore.first())) && (emblemPattern.matches(lore.first()))) {
                 val nameWithColor = item.name ?: return ""
-                emblemPreviewItemNamePattern.matchMatcher(nameWithColor) {
+                emblemPreviewPattern.matchMatcher(nameWithColor) {
                     return group("theEmblem")
                 }
             }
