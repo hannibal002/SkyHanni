@@ -30,8 +30,8 @@ public class PetConfig {
     public boolean hideAutopet = false;
 
     @Expose
-    @ConfigOption(name = "Show Exp Share", desc = "Shows an §5⚘ §7by a pet when an exp share is equipped")
+    @ConfigOption(name = "Show Tier Boost", desc = "Shows an §c● §7by a pet when an tier boost core is equipped")
     @ConfigEditorBoolean
     @FeatureToggle
-    public boolean expShare = false;
+    public boolean tierBoost = false;
 }

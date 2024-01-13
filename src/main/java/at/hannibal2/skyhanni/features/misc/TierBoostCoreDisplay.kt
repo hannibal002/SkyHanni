@@ -7,18 +7,18 @@ import at.hannibal2.skyhanni.utils.RenderUtils.drawSlotText
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getPetItem
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
-class PetExpShareDisplay {
+class TierBoostCoreDisplay {
 
     @SubscribeEvent
     fun onRenderItemOverlayPost(event: GuiRenderItemEvent.RenderOverlayEvent.GuiRenderItemPost) {
         val stack = event.stack ?: return
         if (!LorenzUtils.inSkyBlock || stack.stackSize != 1) return
-        if (!SkyHanniMod.feature.misc.pets.expShare) return
+        if (!SkyHanniMod.feature.misc.pets.tierBoost) return
 
         val petItem = stack.getPetItem() ?: return
-        if (petItem != "PET_ITEM_EXP_SHARE") return
+        if (petItem != "PET_ITEM_TIER_BOOST") return
 
-        val stackTip = "§5⚘"
+        val stackTip = "§c●"
         val x = event.x + 17
         val y = event.y - 1
 
