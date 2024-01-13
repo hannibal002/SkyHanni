@@ -194,4 +194,10 @@ public class InventoryConfig {
     @FeatureToggle
     public boolean shiftClickNPCSell = false;
 
+    @Expose
+    @ConfigOption(name = "Shift Click Brewing", desc = "Makes normal clicks to shift clicks in Brewing Stand inventory.")
+    @ConfigEditorBoolean
+    @FeatureToggle
+    public boolean shiftClickBrewing = false;
+
 }
