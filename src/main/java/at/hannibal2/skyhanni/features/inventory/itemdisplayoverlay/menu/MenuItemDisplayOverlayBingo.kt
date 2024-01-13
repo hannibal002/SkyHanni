@@ -15,20 +15,20 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 class MenuItemDisplayOverlayBingo : AbstractMenuStackSize() {
     private val bingoSubgroup = itemStackSizeGroup.group("bingo")
 
-    private val secretBingoDiscoveryLoreLinePattern by bingoSubgroup.pattern(
-        "secretbingodiscovery.loreline",
+    private val secretBingoDiscoveryPattern by bingoSubgroup.pattern(
+        "secretbingo.discovery.loreline",
         "(§.)*You were the (§.)*(?<rank>[\\w]+)(?<ordinal>(st|nd|rd|th)) (§.)*to"
     )
-    private val rowColumnDiagonalItemNamePattern by bingoSubgroup.pattern(
-        "rowcolumndiagonal.itemname",
+    private val rowColumnDiagonalPattern by bingoSubgroup.pattern(
+        "row.column.diagonal.itemname",
         "(§.)*((Community )?Diagonal|Row #.|Column #.)"
     )
-    private val topBlankPercentContribLoreLinePattern by bingoSubgroup.pattern(
-        "topblankpercentcontrib.loreline",
+    private val topPercentPattern by bingoSubgroup.pattern(
+        "top.percent.loreline",
         "((  )?(§.)?)?Top (§.)*(?<toUse>[\\w]{0,2})(.(?<decimal>[\\w]+))?%"
     )
-    private val communityPersonalGoalLoreLinePattern by bingoSubgroup.pattern(
-        "communitypersonalgoal.loreline",
+    private val communityPersonalGoalPattern by bingoSubgroup.pattern(
+        "communitypersonal.goal.loreline",
         "(§.)*(?<goalType>Community|Personal) Goal"
     )
 
@@ -47,23 +47,23 @@ class MenuItemDisplayOverlayBingo : AbstractMenuStackSize() {
         if (lore.isNotEmpty() && itemName.isNotEmpty() && (chestName == "Bingo Card")) { // only for items in bingo card menu and have item lore at all
             if (stackSizeConfig.contains(StackSizeMenuConfig.Bingo.SECRET_BINGO_DISCOVERY) && (lore.lastOrNull() == "§aGOAL REACHED")) {
                 for (line in lore) {
-                    secretBingoDiscoveryLoreLinePattern.matchMatcher(line) {
+                    secretBingoDiscoveryPattern.matchMatcher(line) {
                         group("rank").formatNumber().let { if (it < 10000) return "§6${NumberUtil.format(it)}" }
                     }
                 }
             }
 
             if (stackSizeConfig.contains(StackSizeMenuConfig.Bingo.ROW_COLUMN_DIAGONAL_PROGRESS)) {
-                rowColumnDiagonalItemNamePattern.matchMatcher(itemName) {
+                rowColumnDiagonalPattern.matchMatcher(itemName) {
                     return if (lore.lastOrNull() == "§aBINGO!") greenCheckmark else if (lore.lastOrNull() == "§cINCOMPLETE") bigRedCross else ""
                 }
             }
 
             if (stackSizeConfig.contains(StackSizeMenuConfig.Bingo.TOP_BLANK_PERCENT_COMMUNITY_GOAL_CONTRIB)) {
-                communityPersonalGoalLoreLinePattern.matchMatcher(lore.first()) {
+                communityPersonalGoalPattern.matchMatcher(lore.first()) {
                     if (group("goalType") == "Community") {
                         for (line in lore) {
-                            topBlankPercentContribLoreLinePattern.matchMatcher(line) {
+                            topPercentPattern.matchMatcher(line) {
                                 return group("toUse")
                             }
                         }
