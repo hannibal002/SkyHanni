@@ -18,6 +18,12 @@ class ChatFilter {
         // player join
         "(?: §b>§c>§a>§r §r)?.* §6(?:joined|(?:spooked|slid) into) the lobby!(?:§r §a<§c<§b<)?".toPattern(),
 
+        // Hypixel SMP
+        "§2[\\s]*?§aYou can now create your own Hypixel SMP server![\\s]*?".toPattern(),
+
+        // Snow Particles in the Lobby
+        "[\\s]*?.*§bFor the best experience, click the text below to enable Snow[\\s]§.*§bParticles in this lobby![\\s]*?.*§3§lClick to enable Snow Particles[\\s]*?".toPattern(),
+
         // mystery box
         "§b✦ §r.* §r§7found a §r§e.* §r§bMystery Box§r§7!".toPattern(),
         "§b✦ §r.* §r§7found (a|an) §r.* §r§7in a §r§a(Holiday )?Mystery Box§r§7!".toPattern()
