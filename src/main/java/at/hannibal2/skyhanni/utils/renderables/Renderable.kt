@@ -5,6 +5,7 @@ import at.hannibal2.skyhanni.data.ToolTipData
 import at.hannibal2.skyhanni.utils.LorenzColor
 import at.hannibal2.skyhanni.utils.LorenzLogger
 import at.hannibal2.skyhanni.utils.NEUItems.renderOnScreen
+import at.hannibal2.skyhanni.utils.RenderUtils
 import io.github.moulberry.moulconfig.gui.GuiScreenElementWrapper
 import io.github.moulberry.notenoughupdates.util.Utils
 import net.minecraft.client.Minecraft
@@ -14,6 +15,7 @@ import net.minecraft.client.gui.inventory.GuiEditSign
 import net.minecraft.client.renderer.GlStateManager
 import net.minecraft.item.ItemStack
 import org.lwjgl.input.Mouse
+import java.awt.Color
 import java.util.Collections
 import kotlin.math.max
 
@@ -310,6 +312,24 @@ interface Renderable {
                         GlStateManager.popMatrix()
                     }
                 }
+            }
+        }
+
+        fun drawInsideRoundedRect(
+            input: Renderable,
+            color: Color,
+            padding: Int = 2,
+            radius: Int = 10,
+            smoothness: Int = 2,
+        ) = object : Renderable {
+            override val width = input.width + padding * 2
+            override val height = input.height + padding * 2
+
+            override fun render(posX: Int, posY: Int) {
+                RenderUtils.drawRoundRect(0, 0, width, height, color.rgb, radius, smoothness)
+                GlStateManager.translate(padding.toFloat(), padding.toFloat(), 0f)
+                input.render(posX + padding, posY + padding)
+                GlStateManager.translate(-padding.toFloat(), -padding.toFloat(), 0f)
             }
         }
     }
