@@ -149,7 +149,10 @@ enum class PowderChestReward(val displayName: String, pattern: String) {
     GOLD_ESSENCE("§6Gold Essence", "§aYou received §r§6[+](?<amount>.*) Gold Essence"),
     ;
 
-    val chatPattern by RepoPattern.pattern("mining.powder.tracker.reward." + this.patternName(), pattern)
+    val chatPattern by RepoPattern.pattern(
+        "mining.powder.tracker.reward." + this.patternName(),
+        pattern
+    )
 
     private fun patternName() = name.lowercase().replace("_", "")
 }
