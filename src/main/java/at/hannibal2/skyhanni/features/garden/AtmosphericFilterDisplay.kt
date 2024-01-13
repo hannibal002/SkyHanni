@@ -12,7 +12,7 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
 class AtmosphericFilterDisplay {
 
-    val config get() = SkyHanniMod.feature.garden.atmosphericFilterDisplay
+    private val config get() = SkyHanniMod.feature.garden.atmosphericFilterDisplay
 
     private val patternGroup = RepoPattern.group("garden.atmospheric.hud")
     private val seasonPattern by patternGroup.pattern(
