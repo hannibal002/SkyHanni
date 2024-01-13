@@ -14,68 +14,68 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 class MenuItemDisplayOverlayMining : AbstractMenuStackSize() {
     private val miningSubgroup = itemStackSizeGroup.group("mining")
     
-    private val hotmPerkLevelXOutOfYLoreLinePattern by miningSubgroup.pattern(
-        "hotmperklevelxoutofy.loreline",
+    private val hotmPerkLevelPattern by miningSubgroup.pattern(
+        "hotm.perklevel.loreline",
         "(§.).* (?<useful>[0-9]+)(§.)?(\\/(§.)?(?<total>[0-9]+))?.*"
     )
-    private val rightClickToEnableDisableLoreLinePattern by miningSubgroup.pattern(
-        "rightclicktoenabledisable.loreline",
+    private val rClickTogglePattern by miningSubgroup.pattern(
+        "rclick.toggle.loreline",
         "(§.)*Right.?click to (?<colorCode>§.)*disable(§.)*!"
     )
-    private val skyMallCurrentEffectLoreLinePattern by miningSubgroup.pattern(
-        "skymallcurrenteffect.loreline",
+    private val currentEffectPattern by miningSubgroup.pattern(
+        "skymall.currenteffect.loreline",
         ".*(§.)*Your Current Effect.*"
     )
-    private val theSkymallCurrentEffectInQuestionLoreLinePattern by miningSubgroup.pattern(
-        "theskymallcurrenteffectinquestion.loreline",
+    private val currentEffectActivePattern by miningSubgroup.pattern(
+        "skymall.currenteffect.loreline",
         "(§.)*.*■ (§.)*(?<thePerk>.+)"
     )
-    private val hotmPerkEnabledDisabledInProgressItemNamePattern by miningSubgroup.pattern(
-        "hotmperkenableddisabledinprogress.itemname",
+    private val hotmColorCodePattern by miningSubgroup.pattern(
+        "hotm.colorcode.itemname",
         "§(a|e|c).*"
     )
-    private val isNotHOTMPerkFirstCheckLoreLinePattern by miningSubgroup.pattern(
-        "isnothotmperkfirstcheck.loreline",
+    private val notHOTMPerkFirstPattern by miningSubgroup.pattern(
+        "hotm.notperk.checkone.loreline",
         "^((?!(§.)*Level ).)*\$"
     )
-    private val isNotHOTMPerkSecondCheckLoreLinePattern by miningSubgroup.pattern(
-        "isnothotmperksecondcheck.loreline",
+    private val notHOTMPerkSecondPattern by miningSubgroup.pattern(
+        "hotm.notperk.checktwo.loreline",
         "^((?!(§.)*(Right|Left).click to ).)*\$"
     )
-    private val lockedHOTMPerkLoreLinePattern by miningSubgroup.pattern(
-        "lockedhotmperk.loreline",
+    private val lockedHOTMPerkPattern by miningSubgroup.pattern(
+        "hotm.lockedperk.loreline",
         ".*(§.)*(Requires .*|.*(the )?Mountain!).*"
     )
-    private val isHOTMPerkMaxedItemNamePattern by miningSubgroup.pattern(
-        "ishotmperkmaxed.itemname",
+    private val maxedHOTMPerkPattern by miningSubgroup.pattern(
+        "hotm.maxedperk.itemname",
         "§a.*"
     )
-    private val isHOTMPerkDisabledLoreLinePattern by miningSubgroup.pattern(
-        "ishotmperkdisabled.loreline",
+    private val disabledHOTMPerkPattern by miningSubgroup.pattern(
+        "hotm.disabledperk.loreline",
         "(§.)*(.*)click to (§.)*(enable).*"
     )
-    private val isHOTMTierItemNamePattern by miningSubgroup.pattern(
-        "ishotmtier.itemname",
+    private val hotmTierPattern by miningSubgroup.pattern(
+        "hotm.tier.itemname",
         "Tier (?<tier>[\\w]+)"
     )
-    private val isHOTMTierUnlockedItemNamePattern by miningSubgroup.pattern(
-        "ishotmtierunlocked.itemname",
+    private val hotmTierUnlockedPattern by miningSubgroup.pattern(
+        "hotm.tierunlocked.itemname",
         "§aTier (?<tier>[\\w]+)"
     )
-    private val hotmLevelPercentProgressLoreLinePattern by miningSubgroup.pattern(
-        "hotmlevelpercentprogress.loreline",
+    private val hotmLevelPercentPattern by miningSubgroup.pattern(
+        "hotm.levelpercent.loreline",
         ".*Progress.*: (§.)?(?<percent>[0-9]+)(\\.[0-9]*)?(§.)?%"
     )
-    private val crystalsNotForCrystalNucleusLoreLinePattern by miningSubgroup.pattern(
-        "crystalsnotforcrystalnucleus.loreline",
+    private val nonNucleusCrystalsPattern by miningSubgroup.pattern(
+        "crystals.nonnucleus.loreline",
         ".*(Your Other Crystals|Jasper|Ruby).*"
     )
-    private val crystalNotPlacedLoreLinePattern by miningSubgroup.pattern(
-        "crystalnotplaced.loreline",
+    private val crystalNotPlacedPattern by miningSubgroup.pattern(
+        "crystal.notplaced.loreline",
         ".* §e✖ Not Placed"
     )
-    private val crystalNotFoundLoreLinePattern by miningSubgroup.pattern(
-        "crystalnotfound.loreline",
+    private val crystalNotFoundPattern by miningSubgroup.pattern(
+        "crystal.notfound.loreline",
         ".* §c✖ Not Found"
     )
 
@@ -91,14 +91,14 @@ class MenuItemDisplayOverlayMining : AbstractMenuStackSize() {
         
         if (stackSizeConfig.contains(StackSizeMenuConfig.Mining.CURRENT_SKYMALL_PERK) && (item.cleanName() == ("Sky Mall")) && (chestName == "Heart of the Mountain")) {
             val lore = item.getLore()
-            rightClickToEnableDisableLoreLinePattern.matchMatcher(lore.last()) {
+            rClickTogglePattern.matchMatcher(lore.last()) {
                 var currentEffectLineLocated = false
                 for (line in lore) {
-                    skyMallCurrentEffectLoreLinePattern.matchMatcher(line) {
+                    currentEffectPattern.matchMatcher(line) {
                         currentEffectLineLocated = true
                     }
                     if (currentEffectLineLocated) {
-                        theSkymallCurrentEffectInQuestionLoreLinePattern.matchMatcher(line) {
+                        currentEffectActivePattern.matchMatcher(line) {
                             return when (group("thePerk")) {
                                 "Gain §a+100 §6⸕ Mining Speed§7." -> return "§a+§6⸕"
                                 "Gain §a+50 §6☘ Mining Fortune§7." -> return "§a+§6☘"
@@ -116,43 +116,43 @@ class MenuItemDisplayOverlayMining : AbstractMenuStackSize() {
 
         if (stackSizeConfig.contains(StackSizeMenuConfig.Mining.HOTM_PERK_LEVELS) && (chestName == "Heart of the Mountain")) {
             val nameWithColor = item.name ?: return ""
-            hotmPerkEnabledDisabledInProgressItemNamePattern.matchMatcher(nameWithColor) {
+            hotmColorCodePattern.matchMatcher(nameWithColor) {
                 val lore = item.getLore()
                 if ((lore.firstOrNull() == null) || (lore.lastOrNull() == null)) return ""
-                isNotHOTMPerkFirstCheckLoreLinePattern.matchMatcher(lore.first()) {
-                    isNotHOTMPerkSecondCheckLoreLinePattern.matchMatcher(lore.last()) {
+                notHOTMPerkFirstPattern.matchMatcher(lore.first()) {
+                    notHOTMPerkSecondPattern.matchMatcher(lore.last()) {
                         return ""
                     }
                 }
-                lockedHOTMPerkLoreLinePattern.matchMatcher(lore.last()) { return "" }
-                hotmPerkLevelXOutOfYLoreLinePattern.matchMatcher(lore.first()) {
+                lockedHOTMPerkPattern.matchMatcher(lore.last()) { return "" }
+                hotmPerkLevelPattern.matchMatcher(lore.first()) {
                     var colorCode = ""
                     var level = group("useful")
                     if (group("total") == null) level = "✔"
-                    isHOTMPerkMaxedItemNamePattern.matchMatcher(nameWithColor) {
+                    maxedHOTMPerkPattern.matchMatcher(nameWithColor) {
                         colorCode = "§a"
                     }
                     for (line in lore) {
-                        isHOTMPerkDisabledLoreLinePattern.matchMatcher(line) {
+                        disabledHOTMPerkPattern.matchMatcher(line) {
                             colorCode = "§c"
                         }
                     }
                     return "$colorCode$level"
                 }
-                rightClickToEnableDisableLoreLinePattern.matchMatcher(lore.last()) {
+                rClickTogglePattern.matchMatcher(lore.last()) {
                     return "${group("colorCode")}!!" //for hotm perks that are one-click/instant unlock
                 }
             }
         }
         
         if (stackSizeConfig.contains(StackSizeMenuConfig.Mining.HOTM_OVERALL_TIERS) && chestName == ("Heart of the Mountain")) {
-            isHOTMTierItemNamePattern.matchMatcher(item.cleanName()) {
+            hotmTierPattern.matchMatcher(item.cleanName()) {
                 val nameWithColor = item.name ?: return ""
-                isHOTMTierUnlockedItemNamePattern.matchMatcher(nameWithColor) { return "" }
+                hotmTierUnlockedPattern.matchMatcher(nameWithColor) { return "" }
                 val lore = item.getLore()
                 if (lore.isNotEmpty()) {
                     for (line in lore) {
-                        hotmLevelPercentProgressLoreLinePattern.matchMatcher(line) {
+                        hotmLevelPercentPattern.matchMatcher(line) {
                             return group("percent").convertPercentToGreenCheckmark()
                         }
                     }
@@ -167,9 +167,9 @@ class MenuItemDisplayOverlayMining : AbstractMenuStackSize() {
             var crystalsNotPlaced = 0
             var crystalsNotFound = 0
             loop@ for (line in lore) {
-                crystalsNotForCrystalNucleusLoreLinePattern.matchMatcher(line) { break@loop }
-                crystalNotPlacedLoreLinePattern.matchMatcher(line) { crystalsNotPlaced++ }
-                crystalNotFoundLoreLinePattern.matchMatcher(line) { crystalsNotFound++ }
+                nonNucleusCrystalsPattern.matchMatcher(line) { break@loop }
+                crystalNotPlacedPattern.matchMatcher(line) { crystalsNotPlaced++ }
+                crystalNotFoundPattern.matchMatcher(line) { crystalsNotFound++ }
             }
             val crystalsPlaced = 5 - crystalsNotPlaced - crystalsNotFound
             return "§a${crystalsPlaced}§r§e${crystalsNotPlaced}§r§c${crystalsNotFound}"
