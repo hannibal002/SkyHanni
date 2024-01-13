@@ -13,40 +13,40 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 class MenuItemDisplayOverlayCombat : AbstractMenuStackSize() {
     private val combatSubgroup = itemStackSizeGroup.group("combat")
     
-    private val bestiaryChestNamePattern by combatSubgroup.pattern(
+    private val bestiaryChestPattern by combatSubgroup.pattern(
         "bestiary.chestname",
         "Bestiary.*"
     )
-    private val bestiaryMilestoneItemNamePattern by combatSubgroup.pattern(
-        "bestiarymilestone.itemname",
+    private val bestiaryMilestonePattern by combatSubgroup.pattern(
+        "bestiary.milestone.itemname",
         "Bestiary Milestone (?<milestone>[\\w]+)"
     )
-    private val familiesCompletedOverallProgressPercentLoreLinePattern by combatSubgroup.pattern(
-        "familiescompletedoverallprogresspercent.loreline",
+    private val familiesOverallPercentPattern by combatSubgroup.pattern(
+        "families.overall.percent.loreline",
         ".*(Families Completed|Overall Progress):.* (§.)?(?<percent>[0-9]+)(\\.[0-9]*)?(§.)?%.*"
     )
-    private val slayerLevelLoreLinePattern by combatSubgroup.pattern(
-        "slayerlevel.loreline",
+    private val slayerLevelPattern by combatSubgroup.pattern(
+        "slayer.level.one.loreline",
         "(§.)*(?<mobType>[\\w]+) Slayer: (§.)*LVL (?<level>[\\w]+)"
     )
-    private val slayerLevelOtherLoreLinePattern by combatSubgroup.pattern(
-        "slayerlevelother.loreline",
+    private val slayerLevelOtherPattern by combatSubgroup.pattern(
+        "slayer.level.two.loreline",
         "(§.)*Current LVL: (§.)*(?<level>[\\w]+)"
     )
-    private val combatWisdomBuffLoreLinePattern by combatSubgroup.pattern(
-        "combatwisdombuff.loreline",
+    private val combatWisdomBuffPattern by combatSubgroup.pattern(
+        "combatwisdom.buff.loreline",
         "(§.)*Total buff: (§.)*\\+(?<combatWise>[\\w]+). Combat Wisdom"
     )
-    private val rngMeterProgressPercentLoreLinePattern by combatSubgroup.pattern(
-        "rngmeterprogresspercent.loreline",
+    private val rngMeterPercentPattern by combatSubgroup.pattern(
+        "rngmeter.percent.loreline",
         ".*(§.)+Progress:.* (§.)?(?<percent>[0-9]+)(\\.[0-9]*)?(§.)?%.*"
     )
-    private val unlockedSlayerRecipesLoreLinePattern by combatSubgroup.pattern(
+    private val unlockedSlayerRecipesPattern by combatSubgroup.pattern(
         "unlockedslayerrecipes.loreline",
         ".*(§.)*Unlocked: (§.)*(?<recipes>[\\w]+) recipes.*"
     )
-    private val overallProgressToggleLoreLinePattern by combatSubgroup.pattern(
-        "overallprogresstoggle.loreline",
+    private val overallProgressTogglePattern by combatSubgroup.pattern(
+        "overallprogress.toggle.loreline",
         "(§.)*Overall Progress: (§.)*(?<status>[\\w]+)"
     )
 
@@ -62,26 +62,26 @@ class MenuItemDisplayOverlayCombat : AbstractMenuStackSize() {
         val chestName = InventoryUtils.openInventoryName()
 
         if (stackSizeConfig.contains(StackSizeMenuConfig.Combat.BESTIARY_LEVEL)) {
-            bestiaryChestNamePattern.matchMatcher(chestName) {
-                bestiaryMilestoneItemNamePattern.matchMatcher(itemName) {
+            bestiaryChestPattern.matchMatcher(chestName) {
+                bestiaryMilestonePattern.matchMatcher(itemName) {
                         return group("milestone")
                 }
             }
         }
 
         if (stackSizeConfig.contains(StackSizeMenuConfig.Combat.BESTIARY_OVERALL_FAMILY_PROGRESS)) {
-            bestiaryChestNamePattern.matchMatcher(chestName) {
+            bestiaryChestPattern.matchMatcher(chestName) {
                 val lore = item.getLore()
                 if (itemName == "Toggle Families Completed Display") {
                     for (line in lore) {
-                        overallProgressToggleLoreLinePattern.matchMatcher(line) {
+                        overallProgressTogglePattern.matchMatcher(line) {
                             if (group("status") != "SHOWN") return "§c‼‼‼"
                         }
                     }
                 }
                 if (itemName.isNotEmpty()) {
                     for (line in lore) {
-                        familiesCompletedOverallProgressPercentLoreLinePattern.matchMatcher(line) {
+                        familiesOverallPercentPattern.matchMatcher(line) {
                             return group("percent").convertPercentToGreenCheckmark()
                         }
                     }
@@ -94,7 +94,7 @@ class MenuItemDisplayOverlayCombat : AbstractMenuStackSize() {
             if (chestName == ("Slayer")) {
                 if (itemName.isNotEmpty() && lore.isNotEmpty()) {
                     for (line in lore) {
-                        slayerLevelLoreLinePattern.matchMatcher(line) {
+                        slayerLevelPattern.matchMatcher(line) {
                             return group("level")
                         }
                     }
@@ -102,7 +102,7 @@ class MenuItemDisplayOverlayCombat : AbstractMenuStackSize() {
             }
             if (itemName == ("Boss Leveling Rewards")) {
                 for (line in lore) {
-                    slayerLevelOtherLoreLinePattern.matchMatcher(line) {
+                    slayerLevelOtherPattern.matchMatcher(line) {
                         return group("level")
                     }
                 }
@@ -111,7 +111,7 @@ class MenuItemDisplayOverlayCombat : AbstractMenuStackSize() {
 
         if ((stackSizeConfig.contains(StackSizeMenuConfig.Combat.SLAYER_COMBAT_WISDOM_BUFF)) && (itemName == ("Global Combat Wisdom Buff"))) {
             for (line in item.getLore()) {
-                combatWisdomBuffLoreLinePattern.matchMatcher(line) {
+                combatWisdomBuffPattern.matchMatcher(line) {
                     return group("combatWise")
                 }
             }
@@ -119,7 +119,7 @@ class MenuItemDisplayOverlayCombat : AbstractMenuStackSize() {
 
         if (stackSizeConfig.contains(StackSizeMenuConfig.Combat.RNG_METER_PROGRESS) && itemName == ("RNG Meter")) {
             for (line in item.getLore()) {
-                rngMeterProgressPercentLoreLinePattern.matchMatcher(line) {
+                rngMeterPercentPattern.matchMatcher(line) {
                     return group("percent").convertPercentToGreenCheckmark()
                 }
             }
@@ -127,7 +127,7 @@ class MenuItemDisplayOverlayCombat : AbstractMenuStackSize() {
 
         if (stackSizeConfig.contains(StackSizeMenuConfig.Combat.UNLOCKED_SLAYER_RECIPES) && itemName == ("Slayer Recipes")) {
             for (line in item.getLore()) {
-                unlockedSlayerRecipesLoreLinePattern.matchMatcher(line) {
+                unlockedSlayerRecipesPattern.matchMatcher(line) {
                     return group("recipes")
                 }
             }
