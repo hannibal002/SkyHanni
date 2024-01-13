@@ -30,8 +30,7 @@ public class PetConfig {
     public boolean hideAutopet = false;
 
     @Expose
-    @ConfigOption(name = "Show Tier Boost", desc = "Shows an §c● §7by a pet when an tier boost core is equipped")
+    @ConfigOption(name = "Show Tier Boost", desc = "Shows an §c● §7by a pet when a tier boost core is equipped.")
     @ConfigEditorBoolean
-    @FeatureToggle
     public boolean tierBoost = false;
 }
