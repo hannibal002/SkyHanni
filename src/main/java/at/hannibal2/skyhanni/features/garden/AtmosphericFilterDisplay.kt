@@ -14,15 +14,28 @@ class AtmosphericFilterDisplay {
 
     private val config get() = SkyHanniMod.feature.garden.atmosphericFilterDisplay
 
-    private val atmosphericFilterDisplayGroup = RepoPattern.group("atmosphericfilter.hud")
-    private val seasonPattern by atmosphericFilterDisplayGroup.pattern(
+    private val patternGroup = RepoPattern.group("garden.atmospheric.hud")
+    private val seasonPattern by patternGroup.pattern(
         "season.skyblocktime",
-        "(?:(?:Early|Late)? )?(?<season>Spring|Summer|Autumn|Winter)"
+        "(?:Early |Late )?(?<season>Spring|Summer|Autumn|Winter)"
     )
 
     private val posLabel = "Atmospheric Filter Perk Display"
 
     private var display = ""
+
+    private enum class Seasons(
+        val season: String,
+        val colorCode: String,
+        val abbvPerk: String,
+        val perk: String,
+    ) {
+        SPRING("Spring", "d", "§6+25☘", "§7Gain §6+25☘ Farming Fortune§7."),
+        SUMMER("Summer", "6", "§3+20☯", "§7Gain §3+20☯ Farming Wisdom§7."),
+        AUTUMN("Autumn", "e", "§a15%+§4ൠ", "§4Pests §7spawn §a15% §7more often."),
+        WINTER("Winter", "9", "§a5%+§cC", "§7Visitors give §a5% §7more §cCopper."),
+        ;
+    }
 
     @SubscribeEvent
     fun onTick(event: LorenzTickEvent) {
@@ -46,23 +59,10 @@ class AtmosphericFilterDisplay {
         }
     }
 
-    private fun constructPerk(season: String): String {
-        val perk = when (season) {
-            "Spring" -> if (config.abbreviatePerk) "§6+25☘" else "§7Gain §6+25☘ Farming Fortune§7."
-            "Summer" -> if (config.abbreviatePerk) "§3+20☯" else "§7Gain §3+20☯ Farming Wisdom§7."
-            "Autumn" -> if (config.abbreviatePerk) "§a15%+§4ൠ" else "§4Pests §7spawn §a15% §7more often."
-            "Winter" -> if (config.abbreviatePerk) "§a5%+§cC" else "§7Visitors give §a5% §7more §cCopper."
-            else -> if (config.abbreviatePerk) "§c?" else "§c??"
-        }
-        if (config.onlyBuff) return perk
-        val colorCode = when (season) {
-            "Spring" -> "d"
-            "Summer" -> "6"
-            "Autumn" -> "e"
-            "Winter" -> "9"
-            else -> "c"
-        }
-        return "§$colorCode${if (config.abbreviateSeason) season.take(2) else season}§7: $perk"
+    private fun constructPerk(seasonString: String): String {
+        val season = Seasons.values().find {it.season == seasonString} ?: return ""
+        if (config.onlyBuff) return if (config.abbreviatePerk) season.abbvPerk else season.perk
+        return "§${season.colorCode}${if (config.abbreviateSeason) season.season.take(2) else season.season}§7: ${if (config.abbreviatePerk) season.abbvPerk else season.perk}"
     }
 
     private fun isEnabled(): Boolean = config.enabled
