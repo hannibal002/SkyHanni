@@ -20,228 +20,228 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 class MenuItemDisplayOverlayPlayerAdvanced : AbstractMenuStackSize() {
     private val playerAdvancedSubgroup = itemStackSizeGroup.group("player.advanced")
     
-    private val dojoTestOfGradeLoreLinePattern by playerAdvancedSubgroup.pattern(
-        "dojotestofgrade.loreline",
+    private val dojoGradePattern by playerAdvancedSubgroup.pattern(
+        "dojo.grade.loreline",
         ".*(§[7|6])Your Rank: (§.)(?<grade>[A-Z]).*"
     )
-    private val skyblockStatBreakdownItemNamePattern by playerAdvancedSubgroup.pattern(
-        "skyblockstatbreakdown.itemname",
+    private val statBreakdownPattern by playerAdvancedSubgroup.pattern(
+        "stat.breakdown.itemname",
         "§(?<color>[0-9a-f])(?<icon>.) (?<name>.*) §f(?<useless>.+)"
     )
-    private val enigmaSoulsLoreLinePattern by playerAdvancedSubgroup.pattern(
-        "enigmasouls.loreline",
+    private val enigmaSoulsPattern by playerAdvancedSubgroup.pattern(
+        "enigma.souls.loreline",
         "(§.)?Enigma Souls: (§.)?(?<useful>[0-9]+)(§.)?/(§.)?.*"
     )
-    private val bankBalanceLoreLinePattern by playerAdvancedSubgroup.pattern(
-        "bankbalance.loreline",
+    private val bankBalancePattern by playerAdvancedSubgroup.pattern(
+        "bank.balance.loreline",
         "(§.)?Current balance: (§.)?(?<total>(?<useful>[0-9]+)(,[0-9]+)*).*"
     )
-    private val amtToWithdrawLoreLinePattern by playerAdvancedSubgroup.pattern(
-        "amttowithdraw.loreline",
+    private val withdrawPattern by playerAdvancedSubgroup.pattern(
+        "bank.withdraw.loreline",
         "(§.)?Amount to withdraw: (§.)?(?<total>(?<useful>[0-9]+)(,[0-9]+)*).*"
     )
-    private val isNotBankAccountMenuChestNamePattern by playerAdvancedSubgroup.pattern(
-        "isnotbankaccountmenu.chestname",
+    private val notBankAccountChestPattern by playerAdvancedSubgroup.pattern(
+        "bank.notbankaccount.chestname",
         "^((?!Bank Account).)*\$"
     )
-    private val isBankBalanceStackTipPattern by playerAdvancedSubgroup.pattern(
-        "isbankbalance.stacktip",
+    private val balanceStackTipPattern by playerAdvancedSubgroup.pattern(
+        "bank.balance.stacktip",
         ".*Balance: .*"
     )
-    private val isDepositCoinsItemNamePattern by playerAdvancedSubgroup.pattern(
-        "isdepositcoins.itemname",
+    private val depositCoinsPattern by playerAdvancedSubgroup.pattern(
+        "bank.deposit.itemname",
         ".*Deposit Coins.*"
     )
-    private val mayorAatroxPerksForJerryPerkapocalypseLoreLinePattern by playerAdvancedSubgroup.pattern(
-        "mayoraatroxperksforjerryperkapocalypse.loreline",
+    private val aatroxPerksJerryPattern by playerAdvancedSubgroup.pattern(
+        "aatrox.perks.jerry.loreline",
         "(§.)(SLASHED Pricing|Slayer XP Buff|Pathfinder)"
     )
-    private val mayorColePerksForJerryPerkapocalypseLoreLinePattern by playerAdvancedSubgroup.pattern(
-        "mayorcoleperksforjerryperkapocalypse.loreline",
+    private val colePerksJerryPattern by playerAdvancedSubgroup.pattern(
+        "cole.perks.jerry.loreline",
         "(§.)(Prospection|Mining XP Buff|Mining Fiesta)"
     )
-    private val mayorDianaPerksForJerryPerkapocalypseLoreLinePattern by playerAdvancedSubgroup.pattern(
-        "mayordianaperksforjerryperkapocalypse.loreline",
+    private val dianaPerksJerryPattern by playerAdvancedSubgroup.pattern(
+        "diana.perks.jerry.loreline",
         "(§.)(Lucky\\!|Pet XP Buff|Mythological Ritual)"
     )
-    private val mayorFinneganPerksForJerryPerkapocalypseLoreLinePattern by playerAdvancedSubgroup.pattern(
-        "mayorfinneganperksforjerryperkapocalypse.loreline",
+    private val finneganPerksJerryPattern by playerAdvancedSubgroup.pattern(
+        "finnegan.perks.jerry.loreline",
         "(§.)(Farming Simulator|Pelt-pocalypse|GOATed)"
     )
-    private val mayorFoxyPerksForJerryPerkapocalypseLoreLinePattern by playerAdvancedSubgroup.pattern(
-        "mayorfoxyperksforjerryperkapocalypse.loreline",
+    private val foxyPerksJerryPattern by playerAdvancedSubgroup.pattern(
+        "foxy.perks.jerry.loreline",
         "(§.)(Sweet Tooth|Benevolence|Extra Event)"
     )
-    private val mayorMarinaPerksForJerryPerkapocalypseLoreLinePattern by playerAdvancedSubgroup.pattern(
-        "mayormarinaperksforjerryperkapocalypse.loreline",
+    private val marinaPerksJerryPattern by playerAdvancedSubgroup.pattern(
+        "marina.perks.jerry.loreline",
         "(§.)(Luck of the Sea 2.0|Fishing XP Buff|Fishing Festival)"
     )
-    private val mayorPaulPerksForJerryPerkapocalypseLoreLinePattern by playerAdvancedSubgroup.pattern(
-        "mayorpaulperksforjerryperkapocalypse.loreline",
+    private val paulPerksJerryPattern by playerAdvancedSubgroup.pattern(
+        "paul.perks.jerry.loreline",
         "(§.)(Marauder|EZPZ|Benediction)"
     )
-    private val mayorDiazPerksForJerryPerkapocalypseLoreLinePattern by playerAdvancedSubgroup.pattern(
-        "mayordiazperksforjerryperkapocalypse.loreline",
+    private val diazPerksJerryPattern by playerAdvancedSubgroup.pattern(
+        "diaz.perks.jerry.loreline",
         "(§.)(Barrier Street|Shopping Spree)"
     )
-    private val recipeBookUnlockedPercentLoreLinePattern by playerAdvancedSubgroup.pattern(
-        "recipebookunlockedpercent.loreline",
+    private val recipeBookUnlockedPattern by playerAdvancedSubgroup.pattern(
+        "recipebook.unlocked.percent.loreline",
         ".* Book Unlocked: (§.)?(?<percent>[0-9]+)(\\.[0-9]*)?(§.)?%"
     )
-    private val recipeBookOrRecipesChestNamePattern by playerAdvancedSubgroup.pattern(
-        "recipebookorrecipes.chestname",
+    private val recipesChestPattern by playerAdvancedSubgroup.pattern(
+        "recipebook.recipes.chestname",
         "(Recipe Book|.* Recipes)"
     )
-    private val recipesCategoryItemNamePattern by playerAdvancedSubgroup.pattern(
-        "recipescategory.itemname",
+    private val recipesCategoryPattern by playerAdvancedSubgroup.pattern(
+        "recipes.category.itemname",
         ".* Recipes"
     )
-    private val recipesUnlockedPercentProgressLoreLinePattern by playerAdvancedSubgroup.pattern(
-        "recipesunlockedpercentprogress.loreline",
+    private val recipesUnlockedPattern by playerAdvancedSubgroup.pattern(
+        "recipes.unlocked.percent.loreline",
         ".*Recipes Unlocked: (§.)?(?<percent>[0-9]+)(\\.[0-9]*)?(§.)?%"
     )
-    private val fairySoulsFoundLoreLinePattern by playerAdvancedSubgroup.pattern(
-        "fairysoulsfound.loreline",
+    private val fairySoulsFoundPattern by playerAdvancedSubgroup.pattern(
+        "fairysouls.found.loreline",
         ".*(§.)*. (§.)*Found: (§.)*(?<foundSouls>[\\w]+)(§.)*\\/(§.)*(?<maxSouls>[\\w]+).*"
     )
-    private val completedQuestsLoreLinePattern by playerAdvancedSubgroup.pattern(
-        "completedquests.loreline",
+    private val completedQuestsPattern by playerAdvancedSubgroup.pattern(
+        "quests.completed.loreline",
         "(§.)*Completed: (§.)*(?<completed>[\\w]+)"
     )
-    private val tradesUnlockedPercentLoreLinePattern by playerAdvancedSubgroup.pattern(
-        "tradesunlockedpercent.loreline",
+    private val tradesUnlockedPattern by playerAdvancedSubgroup.pattern(
+        "trades.unlocked.percent.loreline",
         ".*Trades Unlocked.* (§.)?(?<percent>[0-9]+)(\\.[0-9]*)?(§.)?%"
     )
-    private val wardrobeChestNamePattern by playerAdvancedSubgroup.pattern(
+    private val wardrobeChestPattern by playerAdvancedSubgroup.pattern(
         "wardrobe.chestname",
         "Wardrobe.*"
     )
-    private val wardrobeSlotNumberItemNamePattern by playerAdvancedSubgroup.pattern(
-        "wardrobeslotnumber.itemname",
+    private val wardrobeSlotNumberPattern by playerAdvancedSubgroup.pattern(
+        "wardrobe.slotnumber.itemname",
         "(§.)?Slot (?<slotNumber>[0-9]): .*"
     )
-    private val yourStatsBreakdownChestNamePattern by playerAdvancedSubgroup.pattern(
-        "yourstatsbreakdown.chestname",
+    private val statsBreakdownChestPattern by playerAdvancedSubgroup.pattern(
+        "stats.breakdown.chestname",
         "Your Stats Breakdown.*"
     )
-    private val playingOnCuteNameProfileNameLoreLinePattern by playerAdvancedSubgroup.pattern(
-        "playingoncutenameprofilename.loreline",
+    private val playingOnPattern by playerAdvancedSubgroup.pattern(
+        "playingon.loreline",
         ".*(§.)*Playing on: (§.)*(?<cuteName>[\\w]+).*"
     )
-    private val dojoRankTestOfBlankItemNamePattern by playerAdvancedSubgroup.pattern(
-        "dojoranktestofblank.itemname",
+    private val dojoRankTestOfBlankPattern by playerAdvancedSubgroup.pattern(
+        "dojo.ranktestofblank.itemname",
         "(Rank|Test of .*)"
     )
-    private val isBankMenuChestNamePattern by playerAdvancedSubgroup.pattern(
+    private val isBankMenuChestPattern by playerAdvancedSubgroup.pattern(
         "isbankmenu.chestname",
         ".*Bank.*"
     )
-    private val bankAccountChestNamePattern by playerAdvancedSubgroup.pattern(
+    private val bankAccountChestPattern by playerAdvancedSubgroup.pattern(
         "bankaccount.chestname",
         ".*Bank Account"
     )
-    private val isElectionMenuChestNamePattern by playerAdvancedSubgroup.pattern(
+    private val isElectionMenuChestPattern by playerAdvancedSubgroup.pattern(
         "iselectionmenu.chestname",
         "(Election|Election, Year .*)"
     )
-    private val isDictatorDanteItemNamePattern by playerAdvancedSubgroup.pattern(
+    private val isDictatorDantePattern by playerAdvancedSubgroup.pattern(
         "isdictatordante.itemname",
         ".*dante.*"
     )
-    private val calendarAndEventsOrMayorBlankChestNamePattern by playerAdvancedSubgroup.pattern(
+    private val calendarAndEventsOrMayorBlankChestPattern by playerAdvancedSubgroup.pattern(
         "calendarandeventsormayorblank.chestname",
         "(Calendar and Events|Mayor .*)"
     )
-    private val holyHeckJerryIsMayorItemNamePattern by playerAdvancedSubgroup.pattern(
+    private val holyHeckJerryIsMayorPattern by playerAdvancedSubgroup.pattern(
         "holyheckjerryismayor.itemname",
         "JERRY IS MAYOR.*"
     )
-    private val mayorBlankItemNamePattern by playerAdvancedSubgroup.pattern(
+    private val mayorBlankPattern by playerAdvancedSubgroup.pattern(
         "mayorblank.itemname",
         "Mayor .*"
     )
-    private val perkpocalypsePerksLoreLinePattern by playerAdvancedSubgroup.pattern(
+    private val perkpocalypsePerksPattern by playerAdvancedSubgroup.pattern(
         "perkpocalypseperks.loreline",
         "^(§.)Perkpocalypse Perks:\$"
     )
-    private val thesePerksAreAvailableToAllPlayersUntilNextElectionLoremIpsumLoreLinePattern by playerAdvancedSubgroup.pattern(
+    private val thesePerksAreAvailableToAllPlayersUntilNextElectionLoremIpsumPattern by playerAdvancedSubgroup.pattern(
         "theseperksareavailabletoallplayersuntilnextelectionloremipsum.loreline",
         "(§.)*(?<apparentlyINeedThis>[A-z]+ )?players until the closing of(?<apparentlyINeedThisToo> [A-z]+)?"
     )
-    private val isNotMayorJerryItemNamePattern by playerAdvancedSubgroup.pattern(
+    private val isNotMayorJerryPattern by playerAdvancedSubgroup.pattern(
         "isnotmayorjerry.itemname",
         ".*(?<! Jerry)\$"
     )
-    private val isBazaarChestNamePattern by playerAdvancedSubgroup.pattern(
-        "isbazaar.chestname",
-        "Bazaar.*"
+    private val bzChestPattern by playerAdvancedSubgroup.pattern(
+        "bz.chestname",
+        "Bz.*"
     )
-    private val thereIsStuffToClaimFromBazaarLoreLinePattern by playerAdvancedSubgroup.pattern(
-        "thereisstufftoclaimfrombazaar.loreline",
+    private val pickupFromBzPattern by playerAdvancedSubgroup.pattern(
+        "bz.pickup.loreline",
         ".*to claim!"
     )
-    private val pickUpItemsFromBazaarLoreLinePattern by playerAdvancedSubgroup.pattern(
-        "pickupitemsfrombazaar.loreline",
+    private val itemsFromBzPattern by playerAdvancedSubgroup.pattern(
+        "bz.pickup.items.loreline",
         ".*(§2|§a).*"
     )
-    private val pickUpCoinsFromBazaarLoreLinePattern by playerAdvancedSubgroup.pattern(
-        "pickupcoinsfrombazaar.loreline",
+    private val coinsFromBzPattern by playerAdvancedSubgroup.pattern(
+        "bz.pickup.coins.loreline",
         ".*(§6|§e).*"
     )
-    private val instasellIgnoredProductsCountLoreLinePattern by playerAdvancedSubgroup.pattern(
-        "instasellignoredproductscount.loreline",
+    private val instasellIgnoredPattern by playerAdvancedSubgroup.pattern(
+        "bz.instasell.loreline",
         "(§.)*Ignored: (§.)*(?<products>\\w+) Products"
     )
-    private val bazaarViewModeItemNamePattern by playerAdvancedSubgroup.pattern(
-        "bazaarviewmode.itemname",
+    private val bzViewModePattern by playerAdvancedSubgroup.pattern(
+        "bz.viewmode.itemname",
         ".* Mode"
     )
-    private val containsArrowChestNamePattern by playerAdvancedSubgroup.pattern(
-        "containsarrow.chestname",
+    private val hasArrowChestPattern by playerAdvancedSubgroup.pattern(
+        "bz.hasarrow.chestname",
         ".* ➜ .*"
     )
-    private val instasellIgnoreItemNamePattern by playerAdvancedSubgroup.pattern(
-        "instasellignore.itemname",
+    private val instasellIgnorePattern by playerAdvancedSubgroup.pattern(
+        "bz.instasell.itemname",
         "Instasell Ignore"
     )
-    private val instasellIgnoreStatusLoreLinePattern by playerAdvancedSubgroup.pattern(
-        "instasellignorestatus.loreline",
+    private val instasellStatusPattern by playerAdvancedSubgroup.pattern(
+        "bz.instasell.status.loreline",
         "(§.)*Bulk Instasell: (?<display>(§.)*.)[\\w]+!"
     )
-    private val totalBidsOnItemLoreLinePattern by playerAdvancedSubgroup.pattern(
-        "totalbidsonitem.loreline",
+    private val totalBidsPattern by playerAdvancedSubgroup.pattern(
+        "ah.totalbids.loreline",
         "(§.)*Total bids: (§.)*(?<bids>[\\S]+) .*"
     )
-    private val isAuctionHouseMainMenuChestNamePattern by playerAdvancedSubgroup.pattern(
-        "isauctionhousemainmenu.chestname",
+    private val ahMainMenuChestPattern by playerAdvancedSubgroup.pattern(
+        "ah.mainmenu.chestname",
         ".*Auction House"
     )
-    private val isOneBidAndTopBidLoreLinePattern by playerAdvancedSubgroup.pattern(
-        "isonebidandtopbid.loreline",
+    private val soleTopBidPattern by playerAdvancedSubgroup.pattern(
+        "ah.sole.topbid.loreline",
         ".*top bid .*"
     )
-    private val multipleBidsPendingLoreLinePattern by playerAdvancedSubgroup.pattern(
-        "multiplebidspending.loreline",
+    private val multipleBidsPattern by playerAdvancedSubgroup.pattern(
+        "ah.multiplebids.loreline",
         "(§.)?You placed (§.)?(?<bids>[0-9]+) bid(.{0,3}) (§.)?on pending"
     )
-    private val yourAuctionsHaveHowManyBidsLoreLinePattern by playerAdvancedSubgroup.pattern(
-        "yourauctionshavehowmanybids.loreline",
+    private val yourAuctionsBidsPattern by playerAdvancedSubgroup.pattern(
+        "ah.yourauctionshavehowmanybids.loreline",
         "(§.)*Your (§.)*auction(s?) (§.)*ha(ve|s) (§.)*(?<bidcount>[\\S]+) (§.)*bid(s?)"
     )
-    private val isBrowsingAuctionsChestNamePattern by playerAdvancedSubgroup.pattern(
-        "isbrowsingauctions.chestname",
+    private val browsingAuctionsChestPattern by playerAdvancedSubgroup.pattern(
+        "ah.browsingauctions.chestname",
         ".*Auctions(:| ).*"
     )
-    private val auctionHouseSpecificSelectedFilterLoreLinePattern by playerAdvancedSubgroup.pattern(
-        "auctionhousespecificselectedfilter.loreline",
+    private val specificSelectedFilterPattern by playerAdvancedSubgroup.pattern(
+        "ah.specificselectedfilter.loreline",
         "(§.)*▶ (?<text>[\\w ]+)"
     )
-    private val auctionHouseSpecificSelectedRarityFilterLoreLinePattern by playerAdvancedSubgroup.pattern(
-        "auctionhousespecificselectedrarityfilter.loreline",
+    private val selectedRarityFilterPattern by playerAdvancedSubgroup.pattern(
+        "ah.selectedrarityfilter.loreline",
         "((?<colorCode>§.)*▶ (?<singleChar>[\\w ]))([\\w ])+"
     )
-    private val bankAccountTierLoreLinePattern by playerAdvancedSubgroup.pattern(
-        "bankaccounttier.loreline",
+    private val bankAccountTierPattern by playerAdvancedSubgroup.pattern(
+        "bank.account.tier.loreline",
         "(§.)*Current account: (?<colorCode>§.)*(?<tier>(?<tierFirstLetter>[\\w])[\\w]+)"
     )
 
@@ -254,11 +254,11 @@ class MenuItemDisplayOverlayPlayerAdvanced : AbstractMenuStackSize() {
     */
     @SubscribeEvent
     fun onRenderItemTip(event: RenderInventoryItemTipEvent) {
-        isNotBankAccountMenuChestNamePattern.matchMatcher(event.inventoryName) {
+        notBankAccountChestPattern.matchMatcher(event.inventoryName) {
             return
         }
         event.stackTip = getStackTip(event.stack)
-        isBankBalanceStackTipPattern.matchMatcher(event.stackTip) {
+        balanceStackTipPattern.matchMatcher(event.stackTip) {
             event.offsetY = -23
             event.offsetX = 0
             event.alignLeft = false
@@ -267,7 +267,7 @@ class MenuItemDisplayOverlayPlayerAdvanced : AbstractMenuStackSize() {
 
     @SubscribeEvent
     override fun onRenderItemTip(event: RenderItemTipEvent) {
-        isDepositCoinsItemNamePattern.matchMatcher(event.stack.cleanName()) { return }
+        depositCoinsPattern.matchMatcher(event.stack.cleanName()) { return }
         /*
             so apparently i have to make a whole separate event for the bank balance display.
             also having everything in this class rely on RenderInventoryItemTipEvent would
@@ -291,13 +291,13 @@ class MenuItemDisplayOverlayPlayerAdvanced : AbstractMenuStackSize() {
         if (stackSizeConfig.contains(StackSizeMenuConfig.PlayerAdvanced.UNLOCKED_RECIPES)) {
             if (chestName.lowercase() == ("skyblock menu") && (itemName == "Recipe Book")) {
                 for (line in item.getLore()) {
-                    recipeBookUnlockedPercentLoreLinePattern.matchMatcher(line) { return group("percent").convertPercentToGreenCheckmark() }
+                    recipeBookUnlockedPattern.matchMatcher(line) { return group("percent").convertPercentToGreenCheckmark() }
                 }
             }
-            recipeBookOrRecipesChestNamePattern.matchMatcher(chestName) {
-                recipesCategoryItemNamePattern.matchMatcher(itemName) {
+            recipesChestPattern.matchMatcher(chestName) {
+                recipesCategoryPattern.matchMatcher(itemName) {
                     for (line in item.getLore()) {
-                        recipesUnlockedPercentProgressLoreLinePattern.matchMatcher(
+                        recipesUnlockedPattern.matchMatcher(
                             line
                         ) { return group("percent").convertPercentToGreenCheckmark() }
                     }
@@ -311,21 +311,21 @@ class MenuItemDisplayOverlayPlayerAdvanced : AbstractMenuStackSize() {
                 if (itemName == "Find all Fairy Souls") {
                     for (line in lore) {
                         val totalFairySouls = "242"
-                        fairySoulsFoundLoreLinePattern.matchMatcher(line) {
+                        fairySoulsFoundPattern.matchMatcher(line) {
                             return "§d${group("foundSouls").replace(totalFairySouls, "§a${totalFairySouls}")}"
                         }
                     }
                 }
                 if (itemName == "Completed Quests") {
                     for (line in lore) {
-                        completedQuestsLoreLinePattern.matchMatcher(line) { return group("completed") }
+                        completedQuestsPattern.matchMatcher(line) { return group("completed") }
                     }
                 }
             }
             if (chestName == "Rift Guide") {
                 if (itemName.isNotEmpty() && lore.isNotEmpty()) {
                     for (line in lore) {
-                        enigmaSoulsLoreLinePattern.matchMatcher(line) { return group("useful") }
+                        enigmaSoulsPattern.matchMatcher(line) { return group("useful") }
                     }
                 }
             }
@@ -334,21 +334,21 @@ class MenuItemDisplayOverlayPlayerAdvanced : AbstractMenuStackSize() {
         if (stackSizeConfig.contains(StackSizeMenuConfig.PlayerAdvanced.TRADES_UNLOCKED) && (itemName == "Trades")) {
             val lore = item.getLore()
             for (line in lore) {
-                tradesUnlockedPercentLoreLinePattern.matchMatcher(line) { return group("percent").convertPercentToGreenCheckmark() }
+                tradesUnlockedPattern.matchMatcher(line) { return group("percent").convertPercentToGreenCheckmark() }
             }
         }
         
         if (stackSizeConfig.contains(StackSizeMenuConfig.PlayerAdvanced.WARDROBE_SLOT)) {
-            wardrobeChestNamePattern.matchMatcher(chestName) {
-                wardrobeSlotNumberItemNamePattern.matchMatcher(itemName) { return group("slotNumber") }
+            wardrobeChestPattern.matchMatcher(chestName) {
+                wardrobeSlotNumberPattern.matchMatcher(itemName) { return group("slotNumber") }
             }
         }
         
         if (stackSizeConfig.contains(StackSizeMenuConfig.PlayerAdvanced.ABBV_STATS)) {
-            yourStatsBreakdownChestNamePattern.matchMatcher(chestName) {
+            statsBreakdownChestPattern.matchMatcher(chestName) {
                 val statName = item.name ?: return ""
                 if (statName.isNotEmpty()) {
-                    skyblockStatBreakdownItemNamePattern.matchMatcher(statName) {
+                    statBreakdownPattern.matchMatcher(statName) {
                         val name = group("name")
                         val color = group("color")
                         val icon = group("icon")
@@ -393,7 +393,7 @@ class MenuItemDisplayOverlayPlayerAdvanced : AbstractMenuStackSize() {
             if (itemName != "Profile Management") return ""
             val lore = item.getLore()
             for (line in lore) {
-                playingOnCuteNameProfileNameLoreLinePattern.matchMatcher(line) {
+                playingOnPattern.matchMatcher(line) {
                     return when (val profileName = group("cuteName")) {
                         "Apple" -> "Apl"
                         "Banana" -> "Bna"
@@ -424,19 +424,19 @@ class MenuItemDisplayOverlayPlayerAdvanced : AbstractMenuStackSize() {
         }
 
         if (stackSizeConfig.contains(StackSizeMenuConfig.PlayerAdvanced.DOJO_PROGRESS) && (chestName == ("Challenges"))) {
-            dojoRankTestOfBlankItemNamePattern.matchMatcher(itemName) {
+            dojoRankTestOfBlankPattern.matchMatcher(itemName) {
                 for (line in item.getLore()) {
-                    dojoTestOfGradeLoreLinePattern.matchMatcher(line) { return group("grade") }
+                    dojoGradePattern.matchMatcher(line) { return group("grade") }
                 }
             }
         }
 
         if (stackSizeConfig.contains(StackSizeMenuConfig.PlayerAdvanced.BANK_UTILS)) {
             val lore = item.getLore()
-            isBankMenuChestNamePattern.matchMatcher(chestName) {
+            isBankMenuChestPattern.matchMatcher(chestName) {
                 if (chestName == ("Bank Withdrawal") && itemName == ("Withdraw 20%")) {
                     for (line in lore) {
-                        amtToWithdrawLoreLinePattern.matchMatcher(line) {
+                        withdrawPattern.matchMatcher(line) {
                             return NumberUtil.format(group("total").formatNumber())
                         }
                     }
@@ -444,14 +444,14 @@ class MenuItemDisplayOverlayPlayerAdvanced : AbstractMenuStackSize() {
             }
             if ((itemName == "Bank Upgrades")) {
                 for (line in lore) {
-                    bankAccountTierLoreLinePattern.matchMatcher(line) {
+                    bankAccountTierPattern.matchMatcher(line) {
                         return "${group("colorCode")}${group("tierFirstLetter")}"
                     }
                 }
             }
-            bankAccountChestNamePattern.matchMatcher(chestName) {
-                isDepositCoinsItemNamePattern.matchMatcher(itemName) {
-                    bankBalanceLoreLinePattern.matchMatcher(lore.first()) {
+            bankAccountChestPattern.matchMatcher(chestName) {
+                depositCoinsPattern.matchMatcher(itemName) {
+                    bankBalancePattern.matchMatcher(lore.first()) {
                         val totalAsString = NumberUtil.format(group("total").formatNumber())
                         return "§6Balance: $totalAsString"
                     }
@@ -461,9 +461,9 @@ class MenuItemDisplayOverlayPlayerAdvanced : AbstractMenuStackSize() {
 
         if (stackSizeConfig.contains(StackSizeMenuConfig.PlayerAdvanced.MAYOR_PERKS)) {
             val lore = item.getLore()
-            isElectionMenuChestNamePattern.matchMatcher(chestName) {
+            isElectionMenuChestPattern.matchMatcher(chestName) {
                 if (item.item == Item.getItemFromBlock(Blocks.glass_pane) || item.item == Item.getItemFromBlock(Blocks.stained_glass_pane)) return ""
-                isDictatorDanteItemNamePattern.matchMatcher(itemName.lowercase()) { return bigRedCross }
+                isDictatorDantePattern.matchMatcher(itemName.lowercase()) { return bigRedCross }
                 val colorCode = item.name?.take(2)
                 val candidates = MayorElection.rawMayorData?.current?.candidates ?: return ""
                 for (candidate in candidates) {
@@ -472,20 +472,20 @@ class MenuItemDisplayOverlayPlayerAdvanced : AbstractMenuStackSize() {
                     }
                 }
             }
-            calendarAndEventsOrMayorBlankChestNamePattern.matchMatcher(chestName) {
+            calendarAndEventsOrMayorBlankChestPattern.matchMatcher(chestName) {
                 val nameWithColor = item.name ?: return ""
                 val colorCode = nameWithColor.take(2)
-                holyHeckJerryIsMayorItemNamePattern.matchMatcher(itemName) {
+                holyHeckJerryIsMayorPattern.matchMatcher(itemName) {
                     return grabPerkpocalypseMayor(lore)
                 }
-                mayorBlankItemNamePattern.matchMatcher(itemName) {
-                    isDictatorDanteItemNamePattern.matchMatcher(itemName.lowercase()) { return bigRedCross }
+                mayorBlankPattern.matchMatcher(itemName) {
+                    isDictatorDantePattern.matchMatcher(itemName.lowercase()) { return bigRedCross }
                     for (line in lore) {
-                        perkpocalypsePerksLoreLinePattern.matchMatcher(line) {
+                        perkpocalypsePerksPattern.matchMatcher(line) {
                             return grabPerkpocalypseMayor(lore)
                         }
-                        thesePerksAreAvailableToAllPlayersUntilNextElectionLoremIpsumLoreLinePattern.matchMatcher(line) {
-                            isNotMayorJerryItemNamePattern.matchMatcher(itemName) {
+                        thesePerksAreAvailableToAllPlayersUntilNextElectionLoremIpsumPattern.matchMatcher(line) {
+                            isNotMayorJerryPattern.matchMatcher(itemName) {
                                 /*
                                     var numPerks = 0
                                     for (line in lore) {
@@ -506,32 +506,32 @@ class MenuItemDisplayOverlayPlayerAdvanced : AbstractMenuStackSize() {
         if (stackSizeConfig.contains(StackSizeMenuConfig.PlayerAdvanced.AUCTION_BAZAAR_VARIOUS)) {
             if (itemName.isEmpty()) return ""
             val lore = item.getLore()
-            isBazaarChestNamePattern.matchMatcher(chestName) {
+            bzChestPattern.matchMatcher(chestName) {
                 if (itemName == "Manage Orders") {
                     var result = ""
                     for (line in lore) {
-                        thereIsStuffToClaimFromBazaarLoreLinePattern.matchMatcher(line) {
-                            pickUpItemsFromBazaarLoreLinePattern.matchMatcher(line) { result += "§2☺" }
-                            pickUpCoinsFromBazaarLoreLinePattern.matchMatcher(line) { result += "§6☺" }
+                        pickupFromBzPattern.matchMatcher(line) {
+                            itemsFromBzPattern.matchMatcher(line) { result += "§2☺" }
+                            coinsFromBzPattern.matchMatcher(line) { result += "§6☺" }
                         }
                     }
                     return result
                 }
                 if (itemName == "Instasell Ignore List") {
                     for (line in lore) {
-                        instasellIgnoredProductsCountLoreLinePattern.matchMatcher(line) {
+                        instasellIgnoredPattern.matchMatcher(line) {
                             return group("products")
                         }
                     }
                 }
-                bazaarViewModeItemNamePattern.matchMatcher(itemName) {
+                bzViewModePattern.matchMatcher(itemName) {
                     return itemName.take(3)
                 }
             }
-            containsArrowChestNamePattern.matchMatcher(chestName) {
-                instasellIgnoreItemNamePattern.matchMatcher(itemName) {
+            hasArrowChestPattern.matchMatcher(chestName) {
+                instasellIgnorePattern.matchMatcher(itemName) {
                     for (line in lore) {
-                        instasellIgnoreStatusLoreLinePattern.matchMatcher(line) {
+                        instasellStatusPattern.matchMatcher(line) {
                             return group("display")
                         }
                     }
@@ -539,33 +539,33 @@ class MenuItemDisplayOverlayPlayerAdvanced : AbstractMenuStackSize() {
             }
             if ((chestName == "Auction View")) {
                 if (itemName == "Bid History") {
-                    totalBidsOnItemLoreLinePattern.matchMatcher(lore.first()) {
+                    totalBidsPattern.matchMatcher(lore.first()) {
                         return group("bids")
                     }
                 }
             }
-            isAuctionHouseMainMenuChestNamePattern.matchMatcher(chestName) {
+            ahMainMenuChestPattern.matchMatcher(chestName) {
                 if (itemName != "View Bids" && itemName != "Manage Auctions") return ""
                 if ((itemName == "View Bids")) {
-                    isOneBidAndTopBidLoreLinePattern.matchMatcher(lore.first()) {
+                    soleTopBidPattern.matchMatcher(lore.first()) {
                         return "1"
                     }
-                    multipleBidsPendingLoreLinePattern.matchMatcher(lore.first()) {
+                    multipleBidsPattern.matchMatcher(lore.first()) {
                         return group("bids")
                     }
                 }
                 if ((itemName == "Manage Auctions")) {
                     for (line in lore) {
-                        yourAuctionsHaveHowManyBidsLoreLinePattern.matchMatcher(line) {
+                        yourAuctionsBidsPattern.matchMatcher(line) {
                             return group("bidcount")
                         }
                     }
                 }
             }
-            isBrowsingAuctionsChestNamePattern.matchMatcher(chestName) {
+            browsingAuctionsChestPattern.matchMatcher(chestName) {
                 if (itemName != "Item Tier" && itemName != "BIN Filter" && itemName != "Sort") return ""
                 for (line in lore) {
-                    auctionHouseSpecificSelectedFilterLoreLinePattern.matchMatcher(line) {
+                    specificSelectedFilterPattern.matchMatcher(line) {
                         val theText = group("text")
                         if (itemName == "Sort") {
                             return when (theText) {
@@ -579,7 +579,7 @@ class MenuItemDisplayOverlayPlayerAdvanced : AbstractMenuStackSize() {
                             }
                         }
                         if (itemName == "Item Tier") {
-                            auctionHouseSpecificSelectedRarityFilterLoreLinePattern.matchMatcher(line) {
+                            selectedRarityFilterPattern.matchMatcher(line) {
                                 return "${group("colorCode")}${group("singleChar")}"
                             }
                         }
@@ -601,14 +601,14 @@ class MenuItemDisplayOverlayPlayerAdvanced : AbstractMenuStackSize() {
 
     private fun grabPerkpocalypseMayor(lore: List<String>): String {
         for (line in lore) {
-            mayorAatroxPerksForJerryPerkapocalypseLoreLinePattern.matchMatcher(line) { return "§bAtx" }
-            mayorColePerksForJerryPerkapocalypseLoreLinePattern.matchMatcher(line) { return "§bCle" }
-            mayorDianaPerksForJerryPerkapocalypseLoreLinePattern.matchMatcher(line) { return "§bDna" }
-            mayorFinneganPerksForJerryPerkapocalypseLoreLinePattern.matchMatcher(line) { return "§bFng" }
-            mayorFoxyPerksForJerryPerkapocalypseLoreLinePattern.matchMatcher(line) { return "§bFxy" }
-            mayorMarinaPerksForJerryPerkapocalypseLoreLinePattern.matchMatcher(line) { return "§bMrn" }
-            mayorPaulPerksForJerryPerkapocalypseLoreLinePattern.matchMatcher(line) { return "§bPul" }
-            mayorDiazPerksForJerryPerkapocalypseLoreLinePattern.matchMatcher(line) { return bigRedCross }
+            aatroxPerksJerryPattern.matchMatcher(line) { return "§bAtx" }
+            colePerksJerryPattern.matchMatcher(line) { return "§bCle" }
+            dianaPerksJerryPattern.matchMatcher(line) { return "§bDna" }
+            finneganPerksJerryPattern.matchMatcher(line) { return "§bFng" }
+            foxyPerksJerryPattern.matchMatcher(line) { return "§bFxy" }
+            marinaPerksJerryPattern.matchMatcher(line) { return "§bMrn" }
+            paulPerksJerryPattern.matchMatcher(line) { return "§bPul" }
+            diazPerksJerryPattern.matchMatcher(line) { return bigRedCross }
         }
         return "§c?"
     }
