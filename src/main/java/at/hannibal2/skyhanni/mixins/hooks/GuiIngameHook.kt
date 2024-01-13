@@ -1,15 +1,13 @@
 package at.hannibal2.skyhanni.mixins.hooks
 
 import at.hannibal2.skyhanni.SkyHanniMod
+import at.hannibal2.skyhanni.data.PurseAPI
 import at.hannibal2.skyhanni.features.garden.GardenAPI
 import at.hannibal2.skyhanni.features.garden.GardenPlotAPI
 import at.hannibal2.skyhanni.features.garden.GardenPlotAPI.isBarn
 import at.hannibal2.skyhanni.features.garden.GardenPlotAPI.name
 import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
 import net.minecraft.client.gui.FontRenderer
-
-// TODO USE SH-REPO
-private val piggyPattern = "Piggy: (?<coins>.*)".toPattern()
 
 fun drawString(
     instance: FontRenderer,
@@ -26,7 +24,7 @@ private fun replaceString(text: String): String? {
         return null
     }
     if (SkyHanniMod.feature.misc.hidePiggyScoreboard) {
-        piggyPattern.matchMatcher(text) {
+        PurseAPI.piggyPattern.matchMatcher(text) {
             val coins = group("coins")
             return "Purse: $coins"
         }

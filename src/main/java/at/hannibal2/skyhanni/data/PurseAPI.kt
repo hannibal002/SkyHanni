@@ -11,10 +11,15 @@ import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraft.client.Minecraft
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
-class PurseAPI {
-    private val coinsPattern by RepoPattern.pattern(
-        "data.purse.coins",
+object PurseAPI {
+    private val patternGroup = RepoPattern.group("data.purse")
+    private val coinsPattern by patternGroup.pattern(
+        "coins",
         "(Piggy|Purse): §6(?<coins>[\\d,]+).*"
+    )
+    val piggyPattern by patternGroup.pattern(
+        "piggy",
+        "Piggy: (?<coins>.*)"
     )
 
     private var currentPurse = 0.0
