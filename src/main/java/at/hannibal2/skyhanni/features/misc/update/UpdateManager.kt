@@ -115,7 +115,7 @@ object UpdateManager {
         }.thenAcceptAsync({
             logger.log("Update download completed, setting exit hook")
             updateState = UpdateState.DOWNLOADED
-            potentialUpdate!!.executeUpdate()
+            potentialUpdate!!.executePreparedUpdate()
         }, MinecraftExecutor.OnThread)
     }
 

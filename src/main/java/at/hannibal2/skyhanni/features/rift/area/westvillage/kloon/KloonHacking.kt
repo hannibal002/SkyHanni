@@ -1,4 +1,4 @@
-package at.hannibal2.skyhanni.features.rift.area.westvillage
+package at.hannibal2.skyhanni.features.rift.area.westvillage.kloon
 
 import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.data.ProfileStorageData
@@ -44,7 +44,7 @@ class KloonHacking {
     }
 
     private fun checkHelmet() {
-        wearingHelmet = InventoryUtils.getArmor()[3]?.getInternalName()?.equals("RETRO_ENCABULATING_VISOR") ?: false
+        wearingHelmet = InventoryUtils.getHelmet()?.getInternalName()?.equals("RETRO_ENCABULATING_VISOR") ?: false
     }
 
     @SubscribeEvent

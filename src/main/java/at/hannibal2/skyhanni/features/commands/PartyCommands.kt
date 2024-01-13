@@ -30,7 +30,10 @@ object PartyCommands {
     }
 
     fun transfer(args: Array<String>) {
-        if (args.isEmpty()) LorenzUtils.sendCommandToServer("pt")
+        if (args.isEmpty()) {
+            LorenzUtils.sendCommandToServer("pt")
+            return
+        }
         if (!config.shortCommands) return
         if (PartyAPI.partyMembers.isEmpty()) return
         LorenzUtils.sendCommandToServer("party transfer ${args[0]}")

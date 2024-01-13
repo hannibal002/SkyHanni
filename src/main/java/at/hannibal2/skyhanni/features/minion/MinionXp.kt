@@ -1,6 +1,7 @@
 package at.hannibal2.skyhanni.features.minion
 
 import at.hannibal2.skyhanni.SkyHanniMod
+import at.hannibal2.skyhanni.data.MayorElection
 import at.hannibal2.skyhanni.data.jsonobjects.repo.MinionXPJson
 import at.hannibal2.skyhanni.events.IslandChangeEvent
 import at.hannibal2.skyhanni.events.LorenzToolTipEvent
@@ -110,8 +111,11 @@ class MinionXp {
             val name = item.name
             val xp = xpInfoMap[name] ?: return@forEach
 
-            // TODO add wisdom and Derpy to calculation and random extra Exp Events
-            val xpAmount = xp.amount * item.stackSize
+            // TODO add wisdom and temporary skill exp (Events) to calculation
+            val baseXp = xp.amount * item.stackSize
+            val xpAmount = if (MayorElection.isPerkActive("Derpy", "MOAR SKILLZ!!!")) {
+                baseXp * 1.5
+            } else baseXp
 
             xpItemMap[item] = collectMessage(xp.type, xpAmount)
             xpTotal.compute(xp.type) { _, currentAmount -> (currentAmount ?: 0.0) + xpAmount }
@@ -140,7 +144,7 @@ class MinionXp {
         )
 
         return positionsToCheck.any { position ->
-            val pos = minionPosition.add(position).toBlocPos()
+            val pos = minionPosition.add(position).toBlockPos()
             val block = Minecraft.getMinecraft().theWorld.getBlockState(pos).block
             block is BlockChest
         }

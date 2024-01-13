@@ -25,7 +25,7 @@ class BazaarDataHolder {
     private fun loadNpcPrices(): MutableMap<NEUInternalName, Double> {
         val list = mutableMapOf<NEUInternalName, Double>()
         try {
-            val itemsData = APIUtil.getJSONResponse("https://api.hypixel.net/resources/skyblock/items")
+            val itemsData = APIUtil.getJSONResponse("https://api.hypixel.net/v2/resources/skyblock/items")
             val motesPrice = mutableMapOf<NEUInternalName, Double>()
             for (element in itemsData["items"].asJsonArray) {
                 val jsonObject = element.asJsonObject

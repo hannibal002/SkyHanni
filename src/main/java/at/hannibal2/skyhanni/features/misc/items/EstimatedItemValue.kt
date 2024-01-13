@@ -135,8 +135,14 @@ object EstimatedItemValue {
             return
         }
 
-        if (InventoryUtils.openInventoryName().startsWith("Museum ")) {
+        val openInventoryName = InventoryUtils.openInventoryName()
+        if (openInventoryName.startsWith("Museum ")) {
             if (item.getLore().any { it.contains("Armor Set") }) {
+                return
+            }
+        }
+        if (openInventoryName == "Island Deliveries") {
+            if (item.getLore().any { it == "§eClick to collect!" }) {
                 return
             }
         }
@@ -178,6 +184,7 @@ object EstimatedItemValue {
         // Hides the rune item
         if (internalName.contains("_RUNE;")) return listOf()
         if (internalName.contains("UNIQUE_RUNE")) return listOf()
+        if (internalName.contains("WISP_POTION")) return listOf()
 
 
         if (internalName.getItemStackOrNull() == null) {

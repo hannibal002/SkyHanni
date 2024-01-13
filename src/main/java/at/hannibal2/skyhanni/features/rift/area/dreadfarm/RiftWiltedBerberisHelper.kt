@@ -99,7 +99,6 @@ class RiftWiltedBerberisHelper {
         }
     }
 
-
     @SubscribeEvent
     fun onRenderWorld(event: LorenzRenderWorldEvent) {
         if (!isEnabled()) return
