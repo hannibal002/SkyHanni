@@ -31,9 +31,7 @@ class AtmosphericFilterDisplay {
         if (!GardenAPI.inGarden() && !config.everywhere) return
         if (!event.repeatSeconds(1)) return
         seasonPattern.matchMatcher(SkyBlockTime.now().monthName) {
-            if (group("season").isNotEmpty()) {
-                display = constructPerk(group("season"))
-            }
+            display = constructPerk(group("season"))
         }
     }
 
