@@ -48,12 +48,15 @@ import net.minecraft.nbt.NBTTagCompound
 import net.minecraftforge.client.event.GuiScreenEvent
 import net.minecraftforge.common.MinecraftForge
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
+import scala.Boolean
 import java.io.File
 import kotlin.time.Duration.Companion.seconds
 
 class SkyHanniDebugsAndTests {
 
     companion object {
+
+        private val test: Boolean? = null
         private val config get() = SkyHanniMod.feature.dev
         private val debugConfig get() = config.debug
         var displayLine = ""
