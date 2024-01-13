@@ -26,14 +26,13 @@ class AtmosphericFilterDisplay {
 
     private enum class Seasons(
         val season: String,
-        val colorCode: String,
         val abbvPerk: String,
         val perk: String,
     ) {
-        SPRING("Spring", "d", "§6+25☘", "§7Gain §6+25☘ Farming Fortune§7."),
-        SUMMER("Summer", "6", "§3+20☯", "§7Gain §3+20☯ Farming Wisdom§7."),
-        AUTUMN("Autumn", "e", "§a15%+§4ൠ", "§4Pests §7spawn §a15% §7more often."),
-        WINTER("Winter", "9", "§a5%+§cC", "§7Visitors give §a5% §7more §cCopper."),
+        SPRING("§dSpring", "§6+25☘", "§7Gain §6+25☘ Farming Fortune§7."),
+        SUMMER("§6Summer", "§3+20☯", "§7Gain §3+20☯ Farming Wisdom§7."),
+        AUTUMN("§eAutumn", "§a15%+§4ൠ", "§4Pests §7spawn §a15% §7more often."),
+        WINTER("§9Winter", "§a5%+§cC", "§7Visitors give §a5% §7more §cCopper."),
         ;
     }
 
@@ -60,9 +59,9 @@ class AtmosphericFilterDisplay {
     }
 
     private fun constructPerk(seasonString: String): String {
-        val season = Seasons.entries.find {it.season == seasonString} ?: return ""
+        val season = Seasons.entries.find {it.season.endsWith(seasonString)} ?: return ""
         if (config.onlyBuff) return if (config.abbreviatePerk) season.abbvPerk else season.perk
-        return "§${season.colorCode}${if (config.abbreviateSeason) season.season.take(2) else season.season}§7: ${if (config.abbreviatePerk) season.abbvPerk else season.perk}"
+        return "${if (config.abbreviateSeason) season.season.take(4) else season.season}§7: ${if (config.abbreviatePerk) season.abbvPerk else season.perk}"
     }
 
     private fun isEnabled(): Boolean = config.enabled
