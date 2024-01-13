@@ -2,11 +2,11 @@ package at.hannibal2.skyhanni.features.itemabilities.abilitycooldown
 
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.data.ItemRenderBackground.Companion.background
-import at.hannibal2.skyhanni.events.BlockClickEvent
 import at.hannibal2.skyhanni.events.ItemClickEvent
 import at.hannibal2.skyhanni.events.LorenzActionBarEvent
 import at.hannibal2.skyhanni.events.LorenzChatEvent
 import at.hannibal2.skyhanni.events.LorenzTickEvent
+import at.hannibal2.skyhanni.events.LorenzWorldChangeEvent
 import at.hannibal2.skyhanni.events.PlaySoundEvent
 import at.hannibal2.skyhanni.events.RenderItemTipEvent
 import at.hannibal2.skyhanni.events.RenderObject
@@ -31,6 +31,8 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import kotlin.math.max
 
 class ItemAbilityCooldown {
+    private val config get() = SkyHanniMod.feature.itemAbilities
+
     private var lastAbility = ""
     private var items = mapOf<ItemStack, List<ItemText>>()
     private var abilityItems = mapOf<ItemStack, MutableList<ItemAbility>>()
@@ -157,11 +159,6 @@ class ItemAbilityCooldown {
     }
 
     @SubscribeEvent
-    fun onBlockClickSend(event: BlockClickEvent) {
-        handleItemClick(event.itemInHand)
-    }
-
-    @SubscribeEvent
     fun onItemClick(event: ItemClickEvent) {
         handleItemClick(event.itemInHand)
     }
@@ -170,6 +167,14 @@ class ItemAbilityCooldown {
         if (!LorenzUtils.inSkyBlock) return
         itemInHand?.getInternalName()?.run {
             ItemAbility.getByInternalName(this)?.setItemClick()
+        }
+    }
+
+    @SubscribeEvent
+    fun onIslandChange(event: LorenzWorldChangeEvent) {
+        for (ability in ItemAbility.entries) {
+            ability.lastActivation = 0L
+            ability.specialColor = null
         }
     }
 
@@ -215,9 +220,7 @@ class ItemAbilityCooldown {
         lastAbility = ""
     }
 
-    private fun isEnabled(): Boolean {
-        return LorenzUtils.inSkyBlock && SkyHanniMod.feature.itemAbilities.itemAbilityCooldown
-    }
+    private fun isEnabled(): Boolean = LorenzUtils.inSkyBlock && config.itemAbilityCooldown
 
     private fun click(ability: ItemAbility) {
         if (ability.actionBarDetection) {
@@ -242,11 +245,10 @@ class ItemAbilityCooldown {
 
     private fun createItemText(ability: ItemAbility): ItemText {
         val specialColor = ability.specialColor
+        val readyText = if (config.itemAbilityShowWhenReady) "R" else ""
         return if (ability.isOnCooldown()) {
-            val duration: Long =
-                ability.lastActivation + ability.getCooldown() - System.currentTimeMillis()
-            val color =
-                specialColor ?: if (duration < 600) LorenzColor.RED else LorenzColor.YELLOW
+            val duration: Long = ability.lastActivation + ability.getCooldown() - System.currentTimeMillis()
+            val color = specialColor ?: if (duration < 600) LorenzColor.RED else LorenzColor.YELLOW
             ItemText(color, ability.getDurationText(), true, ability.alternativePosition)
         } else {
             if (specialColor != null) {
@@ -254,7 +256,7 @@ class ItemAbilityCooldown {
                 tryHandleNextPhase(ability, specialColor)
                 return createItemText(ability)
             }
-            ItemText(LorenzColor.GREEN, "R", false, ability.alternativePosition)
+            ItemText(LorenzColor.GREEN, readyText, false, ability.alternativePosition)
         }
     }
 
@@ -289,10 +291,11 @@ class ItemAbilityCooldown {
             event.renderObjects.add(renderObject)
 
             // fix multiple problems when having multiple abilities
-            if (SkyHanniMod.feature.itemAbilities.itemAbilityCooldownBackground) {
+            if (config.itemAbilityCooldownBackground) {
                 var opacity = 130
                 if (color == LorenzColor.GREEN) {
                     opacity = 80
+                    if (!config.itemAbilityShowWhenReady) return
                 }
                 stack.background = color.addOpacity(opacity).rgb
             }

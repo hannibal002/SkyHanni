@@ -3,18 +3,18 @@ package at.hannibal2.skyhanni.features.garden.pests
 import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.LorenzChatEvent
 import at.hannibal2.skyhanni.events.LorenzRenderWorldEvent
+import at.hannibal2.skyhanni.features.garden.GardenAPI
 import at.hannibal2.skyhanni.features.garden.GardenPlotAPI
 import at.hannibal2.skyhanni.features.garden.GardenPlotAPI.renderPlot
 import at.hannibal2.skyhanni.features.garden.pests.PestAPI.getPests
 import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.InventoryUtils
-import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName
 import at.hannibal2.skyhanni.utils.LorenzColor
 import at.hannibal2.skyhanni.utils.LorenzUtils
-import at.hannibal2.skyhanni.utils.NEUInternalName.Companion.asInternalName
 import at.hannibal2.skyhanni.utils.RenderUtils.renderString
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
+import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import kotlin.time.Duration.Companion.seconds
 
@@ -24,14 +24,16 @@ class SprayFeatures {
     private var display: String? = null
     private var lastChangeTime = SimpleTimeMark.farPast()
 
-    // TODO repo
-    private val pattern = "§a§lSPRAYONATOR! §r§7Your selected material is now §r§a(?<spray>.*)§r§7!".toPattern()
+    private val changeMaterialPattern by RepoPattern.pattern(
+        "garden.spray.material",
+        "§a§lSPRAYONATOR! §r§7Your selected material is now §r§a(?<spray>.*)§r§7!"
+    )
 
     @SubscribeEvent
     fun onChat(event: LorenzChatEvent) {
         if (!config.pestWhenSelector) return
 
-        val type = pattern.matchMatcher(event.message) {
+        val type = changeMaterialPattern.matchMatcher(event.message) {
             val sprayName = group("spray")
             SprayType.getByName(sprayName) ?: run {
                 ErrorManager.logErrorStateWithData(
@@ -66,6 +68,7 @@ class SprayFeatures {
 
     @SubscribeEvent
     fun onWorldRender(event: LorenzRenderWorldEvent) {
+        if (!GardenAPI.inGarden()) return
         if (!config.drawPlotsBorderWhenInHands) return
         if (!InventoryUtils.itemInHandId.equals("SPRAYONATOR")) return
         val plot = GardenPlotAPI.getCurrentPlot() ?: return

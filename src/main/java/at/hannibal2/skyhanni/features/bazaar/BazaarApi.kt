@@ -16,6 +16,7 @@ import at.hannibal2.skyhanni.utils.NEUInternalName
 import at.hannibal2.skyhanni.utils.NEUItems
 import at.hannibal2.skyhanni.utils.OSUtils
 import at.hannibal2.skyhanni.utils.RenderUtils.highlight
+import at.hannibal2.skyhanni.utils.StringUtils.equalsIgnoreColor
 import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import net.minecraft.client.gui.inventory.GuiChest
@@ -39,7 +40,7 @@ class BazaarApi {
             holder.getData(this)
         } else null
 
-        fun isBazaarItem(stack: ItemStack) = stack.getInternalName().isBazaarItem()
+        fun isBazaarItem(stack: ItemStack): Boolean = stack.getInternalName().isBazaarItem()
 
         fun NEUInternalName.isBazaarItem() = NEUItems.manager.auctionManager.getBazaarInfo(asString()) != null
 
@@ -58,20 +59,20 @@ class BazaarApi {
     fun onInventoryOpen(event: InventoryFullyOpenedEvent) {
         inBazaarInventory = checkIfInBazaar(event)
         if (inBazaarInventory) {
-            val openedProduct = getOpenedProduct(event.inventoryItems) ?: return
+            val itemName = getOpenedProduct(event.inventoryItems) ?: return
+            val openedProduct = NEUItems.getInternalNameOrNull(itemName)
             currentlyOpenedProduct = openedProduct
             BazaarOpenedProductEvent(openedProduct, event).postAndCatch()
         }
     }
 
-    private fun getOpenedProduct(inventoryItems: Map<Int, ItemStack>): NEUInternalName? {
+    private fun getOpenedProduct(inventoryItems: Map<Int, ItemStack>): String? {
         val buyInstantly = inventoryItems[10] ?: return null
 
         if (buyInstantly.displayName != "§aBuy Instantly") return null
         val bazaarItem = inventoryItems[13] ?: return null
 
-        val itemName = bazaarItem.displayName
-        return NEUItems.getInternalNameOrNull(itemName)
+        return bazaarItem.displayName
     }
 
     @SubscribeEvent
@@ -119,14 +120,9 @@ class BazaarApi {
     }
 
     private fun checkIfInBazaar(event: InventoryFullyOpenedEvent): Boolean {
-        val returnItem = event.inventorySize - 5
-        for ((slot, item) in event.inventoryItems) {
-            if (slot == returnItem && item.name?.removeColor().let { it == "Go Back" }) {
-                val lore = item.getLore()
-                if (lore.getOrNull(0)?.removeColor().let { it == "To Bazaar" }) {
-                    return true
-                }
-            }
+        val items = event.inventorySize.let { listOf(it - 5, it - 6) }.mapNotNull { event.inventoryItems[it] }
+        if (items.any { it.name.equalsIgnoreColor("Go Back") && it.getLore().firstOrNull() == "§7To Bazaar" }) {
+            return true
         }
 
         if (event.inventoryName.startsWith("Bazaar ➜ ")) return true

@@ -281,8 +281,8 @@ class ChatFilter {
     // Powder Mining
     private val powderMiningPatterns = listOf(
         "§cYou need a stronger tool to mine (Amethyst|Ruby|Jade|Amber|Sapphire|Topaz) Gemstone Block§r§c.".toPattern(),
-        "§aYou received §r§f\\d* §r§f[❤❈☘⸕✎✧] §r§fRough (Ruby|Amethyst|Jade|Amber|Sapphire|Topaz) Gemstone§r§a\\.".toPattern(),
-        "§aYou received §r§f\\d §r§a[❤❈☘⸕✎✧] §r§aFlawed (Ruby|Amethyst|Jade|Amber|Sapphire|Topaz) Gemstone§r§a\\.".toPattern(),
+        "§aYou received §r§f\\d* §r§f[❤❈☘⸕✎✧] Rough (Ruby|Amethyst|Jade|Amber|Sapphire|Topaz) Gemstone§r§a\\.".toPattern(),
+        "§aYou received §r§f\\d §r§a[❤❈☘⸕✎✧] Flawed (Ruby|Amethyst|Jade|Amber|Sapphire|Topaz) Gemstone§r§a\\.".toPattern(),
 
         // Jungle
         "§aYou received §r§f\\d* §r§aSludge Juice§r§a\\.".toPattern(),
@@ -293,7 +293,7 @@ class ChatFilter {
     )
     private val fireSalePatterns = listOf(
         "§c♨ §eFire Sales for .* §eare starting soon!".toPattern(),
-        "§c {3}♨ .* Skin §e\\(.* §eleft\\)§c".toPattern(),
+        "§c\\s*♨ .* (?:Skin|Rune) §e(?:for a limited time )?\\(.* §eleft\\)(?:§c|!)".toPattern(),
         "§c♨ §eVisit the Community Shop in the next §c.* §eto grab yours! §a§l\\[WARP]".toPattern(),
         "§c♨ §eA Fire Sale for .* §eis starting soon!".toPattern(),
     )

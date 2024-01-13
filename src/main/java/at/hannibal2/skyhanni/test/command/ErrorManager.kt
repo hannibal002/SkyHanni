@@ -34,7 +34,7 @@ object ErrorManager {
         }
 
         val id = array[0]
-        val fullErrorMessage = KeyboardManager.isControlKeyDown()
+        val fullErrorMessage = KeyboardManager.isModifierKeyDown()
         val errorMessage = if (fullErrorMessage) {
             fullErrorMessages[id]
         } else {

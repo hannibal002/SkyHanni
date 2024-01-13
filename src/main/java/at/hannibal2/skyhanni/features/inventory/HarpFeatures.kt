@@ -41,23 +41,11 @@ object HarpFeatures {
     }
 
     private val buttonColors = listOf('d', 'e', 'a', '2', '5', '9', 'b')
-    private val inventoryTitleRegex by RepoPattern.pattern("harp.inventory", "^Harp.*")
-    private val menuTitleRegex by RepoPattern.pattern("harp.menu", "^Melody.*")
+    private val inventoryTitlePattern by RepoPattern.pattern("harp.inventory", "^Harp.*")
+    private val menuTitlePattern by RepoPattern.pattern("harp.menu", "^Melody.*")
 
-    private fun isHarpGui() = inventoryTitleRegex.matches(InventoryUtils.openInventoryName())
-    private fun isMenuGui() = menuTitleRegex.matches(InventoryUtils.openInventoryName())
-
-    fun getKey(index: Int) = when (index) {
-        0 -> config.harpKeybinds.key1
-        1 -> config.harpKeybinds.key2
-        2 -> config.harpKeybinds.key3
-        3 -> config.harpKeybinds.key4
-        4 -> config.harpKeybinds.key5
-        5 -> config.harpKeybinds.key6
-        6 -> config.harpKeybinds.key7
-
-        else -> null
-    }
+    private fun isHarpGui() = inventoryTitlePattern.matches(InventoryUtils.openInventoryName())
+    private fun isMenuGui() = menuTitlePattern.matches(InventoryUtils.openInventoryName())
 
 
     @SubscribeEvent
@@ -81,6 +69,18 @@ object HarpFeatures {
             lastClick = SimpleTimeMark.now()
             break
         }
+    }
+
+    fun getKey(index: Int) = when (index) {
+        0 -> config.harpKeybinds.key1
+        1 -> config.harpKeybinds.key2
+        2 -> config.harpKeybinds.key3
+        3 -> config.harpKeybinds.key4
+        4 -> config.harpKeybinds.key5
+        5 -> config.harpKeybinds.key6
+        6 -> config.harpKeybinds.key7
+
+        else -> null
     }
 
     private var openTime: SimpleTimeMark = SimpleTimeMark.farPast()

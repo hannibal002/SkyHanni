@@ -15,19 +15,24 @@ import at.hannibal2.skyhanni.features.combat.endernodetracker.EnderNodeTracker
 import at.hannibal2.skyhanni.features.combat.ghostcounter.GhostUtil
 import at.hannibal2.skyhanni.features.commands.PartyCommands
 import at.hannibal2.skyhanni.features.event.diana.BurrowWarpHelper
+import at.hannibal2.skyhanni.features.event.diana.DianaProfitTracker
+import at.hannibal2.skyhanni.features.event.diana.GriffinBurrowHelper
 import at.hannibal2.skyhanni.features.event.diana.InquisitorWaypointShare
+import at.hannibal2.skyhanni.features.event.diana.MythologicalCreatureTracker
 import at.hannibal2.skyhanni.features.event.jerry.frozentreasure.FrozenTreasureTracker
 import at.hannibal2.skyhanni.features.fame.AccountUpgradeReminder
 import at.hannibal2.skyhanni.features.fame.CityProjectFeatures
 import at.hannibal2.skyhanni.features.fishing.tracker.FishingProfitTracker
+import at.hannibal2.skyhanni.features.fishing.tracker.SeaCreatureTracker
 import at.hannibal2.skyhanni.features.garden.GardenAPI
 import at.hannibal2.skyhanni.features.garden.GardenCropTimeCommand
+import at.hannibal2.skyhanni.features.garden.GardenCropsInCommand
 import at.hannibal2.skyhanni.features.garden.GardenNextJacobContest
 import at.hannibal2.skyhanni.features.garden.composter.ComposterOverlay
 import at.hannibal2.skyhanni.features.garden.farming.ArmorDropTracker
 import at.hannibal2.skyhanni.features.garden.farming.CropMoneyDisplay
 import at.hannibal2.skyhanni.features.garden.farming.CropSpeedMeter
-import at.hannibal2.skyhanni.features.garden.farming.DicerDropTracker
+import at.hannibal2.skyhanni.features.garden.farming.DicerRngDropTracker
 import at.hannibal2.skyhanni.features.garden.farming.FarmingWeightDisplay
 import at.hannibal2.skyhanni.features.garden.farming.GardenStartLocation
 import at.hannibal2.skyhanni.features.garden.fortuneguide.CaptureFarmingGear
@@ -41,11 +46,13 @@ import at.hannibal2.skyhanni.features.misc.MarkedPlayerManager
 import at.hannibal2.skyhanni.features.misc.discordrpc.DiscordRPCManager
 import at.hannibal2.skyhanni.features.misc.massconfiguration.DefaultConfigFeatures
 import at.hannibal2.skyhanni.features.misc.visualwords.VisualWordGui
+import at.hannibal2.skyhanni.features.rift.area.westvillage.VerminTracker
 import at.hannibal2.skyhanni.features.slayer.SlayerProfitTracker
 import at.hannibal2.skyhanni.test.PacketTest
 import at.hannibal2.skyhanni.test.SkyHanniConfigSearchResetCommand
 import at.hannibal2.skyhanni.test.SkyHanniDebugsAndTests
 import at.hannibal2.skyhanni.test.TestBingo
+import at.hannibal2.skyhanni.test.WorldEdit
 import at.hannibal2.skyhanni.test.command.CopyItemCommand
 import at.hannibal2.skyhanni.test.command.CopyNearbyEntitiesCommand
 import at.hannibal2.skyhanni.test.command.CopyNearbyParticlesCommand
@@ -148,6 +155,10 @@ object Commands {
             "Calculates with your current crop per second speed how long you need to farm a crop to collect this amount of items"
         ) { GardenCropTimeCommand.onCommand(it) }
         registerCommand(
+            "shcropsin",
+            "Calculates with your current crop per second how many items you can collect in this amount of time"
+        ) { GardenCropsInCommand.onCommand(it) }
+        registerCommand(
             "shrpcstart",
             "Manually starts the Discord Rich Presence feature"
         ) { DiscordRPCManager.startCommand() }
@@ -169,14 +180,23 @@ object Commands {
         ) { clearFarmingItems() }
         registerCommand("shresetghostcounter", "Resets the ghost counter") { GhostUtil.reset() }
         registerCommand("shresetpowdertracker", "Resets the Powder Tracker") { PowderTracker.resetCommand(it) }
-        registerCommand("shresetdicertracker", "Resets the Dicer Drop Tracker") { DicerDropTracker.resetCommand(it) }
+        registerCommand("shresetdicertracker", "Resets the Dicer Drop Tracker") { DicerRngDropTracker.resetCommand(it) }
         registerCommand(
             "shresetendernodetracker",
             "Resets the Ender Node Tracker"
         ) { EnderNodeTracker.resetCommand(it) }
-        registerCommand("shresetarmordroptracker", "Resets the Armor Drop Tracker") { ArmorDropTracker.resetCommand(it) }
-        registerCommand("shresetfrozentreasuretracker", "Resets the Frozen Treasure Tracker") { FrozenTreasureTracker.resetCommand(it) }
-        registerCommand("shresetfishingtracker", "Resets the Frozen Treasure Tracker") { FishingProfitTracker.resetCommand(it) }
+        registerCommand(
+            "shresetarmordroptracker",
+            "Resets the Armor Drop Tracker"
+        ) { ArmorDropTracker.resetCommand(it) }
+        registerCommand(
+            "shresetfrozentreasuretracker",
+            "Resets the Frozen Treasure Tracker"
+        ) { FrozenTreasureTracker.resetCommand(it) }
+        registerCommand(
+            "shresetfishingtracker",
+            "Resets the Fishing Profit Tracker"
+        ) { FishingProfitTracker.resetCommand(it) }
         registerCommand("shbingotoggle", "Toggle the bingo card display mode") { BingoCardDisplay.toggleCommand() }
         registerCommand(
             "shfarmingprofile",
@@ -193,6 +213,22 @@ object Commands {
             "shmouselock",
             "Lock/Unlock the mouse so it will no longer rotate the player (for farming)"
         ) { LockMouseLook.toggleLock() }
+        registerCommand(
+            "shresetvermintracker",
+            "Resets the Vermin Tracker"
+        ) { VerminTracker.resetCommand(it) }
+        registerCommand(
+            "shresetdianaprofittracker",
+            "Resets the Diana Profit Tracker"
+        ) { DianaProfitTracker.resetCommand(it) }
+        registerCommand(
+            "shresetmythologicalcreatureracker",
+            "Resets the Mythological Creature Tracker"
+        ) { MythologicalCreatureTracker.resetCommand(it) }
+        registerCommand(
+            "shresetseacreaturetracker",
+            "Resets the Sea Creature Tracker"
+        ) { SeaCreatureTracker.resetCommand(it) }
     }
 
     private fun usersBugFix() {
@@ -216,7 +252,11 @@ object Commands {
         registerCommand(
             "shwhereami",
             "Print current island in chat"
-        ) { SkyHanniDebugsAndTests.whereami() }
+        ) { SkyHanniDebugsAndTests.whereAmI() }
+        registerCommand(
+            "shclearcontestdata",
+            "Resets Jacob's Contest Data"
+        ) { SkyHanniDebugsAndTests.clearContestData() }
         registerCommand(
             "shconfig",
             "Search or reset config elements §c(warning, dangerous!)"
@@ -260,15 +300,28 @@ object Commands {
         registerCommand("shtestinquisitor", "dev command") { InquisitorWaypointShare.test() }
         registerCommand("shshowcropmoneycalculation", "dev command") { CropMoneyDisplay.toggleShowCalculation() }
         registerCommand("shcropspeedmeter", "Debugs how many crops you collect over time") { CropSpeedMeter.toggle() }
+        registerCommand0(
+            "shworldedit",
+            "Select regions in the world",
+            { WorldEdit.command(it) },
+            { listOf("copy", "reset", "help", "left", "right") })
         registerCommand(
             "shconfigsave",
             "Manually saving the config"
         ) { SkyHanniMod.configManager.saveConfig(ConfigFileType.FEATURES, "manual-command") }
+        registerCommand(
+            "shtestburrow",
+            "Sets a test burrow waypoint at your location"
+        ) { GriffinBurrowHelper.setTestBurrow(it) }
     }
 
     private fun developersCodingHelp() {
         registerCommand("shrepopatterns", "See where regexes are loaded from") { RepoPatternGui.open() }
         registerCommand("shtest", "Unused test command.") { SkyHanniDebugsAndTests.testCommand(it) }
+        registerCommand(
+            "shfindnullconfig",
+            "Find config elements that are null and prints them into the console"
+        ) { SkyHanniDebugsAndTests.findNullConfig(it) }
         registerCommand("shdebugwaypoint", "Mark a waypoint on that location") { SkyHanniDebugsAndTests.waypoint(it) }
         registerCommand("shdebugtablist", "Set your clipboard as a fake tab list.") { TabListData.toggleDebugCommand() }
         registerCommand("shreloadlocalrepo", "Reloading the local repo data") { SkyHanniMod.repo.reloadLocalRepo() }
@@ -418,6 +471,9 @@ object Commands {
     }
 
     private fun registerCommand(name: String, description: String, function: (Array<String>) -> Unit) {
+        if (commands.any { it.name.equals(name, ignoreCase = true) }) {
+            error("The command '$name is already registered!'")
+        }
         ClientCommandHandler.instance.registerCommand(SimpleCommand(name, createCommand(function)))
         commands.add(CommandInfo(name, description, currentCategory))
     }

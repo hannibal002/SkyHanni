@@ -120,7 +120,9 @@ class JacobContestTimeNeeded {
         for (bracket in ContestBracket.entries) {
             val amount = averages[bracket]
             if (amount == null) {
-                brackets.add("${bracket.displayName} §cNo contest data found!")
+                sorted[crop] = Double.MAX_VALUE - 1
+                brackets.add("${bracket.displayName} §cBracket not revealed!")
+                showLine = "§9${crop.cropName} §cBracket not revealed!"
                 continue
             }
             val timeInMinutes = amount.toDouble() / speedForFormular / 60

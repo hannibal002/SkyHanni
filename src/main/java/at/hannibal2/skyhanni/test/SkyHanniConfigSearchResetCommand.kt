@@ -48,7 +48,7 @@ object SkyHanniConfigSearchResetCommand {
         if (term.startsWith("playerSpecific")) return "§cCannot reset playerSpecific! Use §e/shconfig set §cinstead."
         if (term.startsWith("profileSpecific")) return "§cCannot reset profileSpecific! Use §e/shconfig set §cinstead."
 
-        return try {
+        try {
             val (field, defaultObject, _) = getComplexField(term, Features())
             val (_, _, parent) = getComplexField(term, SkyHanniMod.feature)
             val affectedElements = findConfigElements({ it.startsWith("$term.") }, { true }).size
@@ -56,10 +56,10 @@ object SkyHanniConfigSearchResetCommand {
                 return "§cThis will change $affectedElements config elements! Use the command again to confirm."
             }
             field.set(parent, defaultObject)
-            "§eSuccessfully reset config element '$term'"
-        } catch (e: Exception) {
+            return "§eSuccessfully reset config element '$term'"
+        } catch (e: Throwable) {
             ErrorManager.logError(e, "Could not reset config element '$term'")
-            "§cCould not reset config element '$term'"
+            return "§cCould not reset config element '$term'"
         }
     }
 

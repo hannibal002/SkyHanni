@@ -60,9 +60,7 @@ class GardenOptimalSpeed {
     @SubscribeEvent
     fun onGardenToolChange(event: GardenToolChangeEvent) {
         cropInHand = event.crop
-        if (isEnabled()) {
-            optimalSpeed = cropInHand.let { it?.getOptimalSpeed() ?: -1 }
-        }
+        optimalSpeed = cropInHand.let { it?.getOptimalSpeed() ?: -1 }
     }
 
     private fun CropType.getOptimalSpeed() = when (this) {
@@ -80,7 +78,7 @@ class GardenOptimalSpeed {
 
     @SubscribeEvent
     fun onRenderOverlay(event: GuiRenderEvent.GuiOverlayRenderEvent) {
-        if (!isEnabled()) return
+        if (!GardenAPI.inGarden()) return
 
         if (optimalSpeed == -1) return
 
@@ -88,10 +86,10 @@ class GardenOptimalSpeed {
 
         val text = "Optimal Speed: §f$optimalSpeed"
         if (optimalSpeed != currentSpeed) {
-            config.pos.renderString("§c$text", posLabel = "Garden Optimal Speed")
+            if (config.showOnHUD) config.pos.renderString("§c$text", posLabel = "Garden Optimal Speed")
             warn()
         } else {
-            config.pos.renderString("§a$text", posLabel = "Garden Optimal Speed")
+            if (config.showOnHUD) config.pos.renderString("§a$text", posLabel = "Garden Optimal Speed")
         }
     }
 
@@ -109,7 +107,6 @@ class GardenOptimalSpeed {
     }
 
     private fun isRancherOverlayEnabled() = GardenAPI.inGarden() && config.signEnabled
-    private fun isEnabled() = GardenAPI.inGarden() && config.enabled
 
     @SubscribeEvent
     fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
@@ -128,5 +125,7 @@ class GardenOptimalSpeed {
         event.move(3, "garden.optimalSpeedCustom.sugarCane", "garden.optimalSpeeds.customSpeed.sugarCane")
         event.move(3, "garden.optimalSpeedCustom.cactus", "garden.optimalSpeeds.customSpeed.cactus")
         event.move(3, "garden.optimalSpeedCustom.mushroom", "garden.optimalSpeeds.customSpeed.mushroom")
+
+        event.move(14, "garden.optimalSpeeds.enabled", "garden.optimalSpeeds.showOnHUD")
     }
 }

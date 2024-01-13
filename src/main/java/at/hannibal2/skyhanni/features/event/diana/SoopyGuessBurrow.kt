@@ -1,10 +1,10 @@
 package at.hannibal2.skyhanni.features.event.diana
 
 import at.hannibal2.skyhanni.SkyHanniMod
+import at.hannibal2.skyhanni.events.BurrowGuessEvent
 import at.hannibal2.skyhanni.events.LorenzWorldChangeEvent
 import at.hannibal2.skyhanni.events.PlaySoundEvent
 import at.hannibal2.skyhanni.events.ReceiveParticleEvent
-import at.hannibal2.skyhanni.events.SoopyGuessBurrowEvent
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.LorenzVec
 import at.hannibal2.skyhanni.utils.toLorenzVec
@@ -243,7 +243,7 @@ class SoopyGuessBurrow {
                         } else {
                             LorenzVec(floor(p2.x), 255.0, floor(p2.z))
                         }
-                        SoopyGuessBurrowEvent(finalLocation).postAndCatch()
+                        BurrowGuessEvent(finalLocation).postAndCatch()
                     }
                 }
             }
@@ -279,5 +279,5 @@ class SoopyGuessBurrow {
         }
     }
 
-    private fun isEnabled() = DianaAPI.featuresEnabled() && SkyHanniMod.feature.event.diana.burrowsSoopyGuess
+    private fun isEnabled() = DianaAPI.isDoingDiana() && SkyHanniMod.feature.event.diana.burrowsSoopyGuess
 }
