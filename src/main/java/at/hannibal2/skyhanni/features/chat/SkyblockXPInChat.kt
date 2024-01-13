@@ -12,7 +12,7 @@ class SkyblockXPInChat {
 
     @SubscribeEvent
     fun onActionBarValueUpdate(event: ActionBarValueUpdate) {
-        if (event.updated != ActionBarStatsData.skyBlockXP) return
+        if (event.updated != ActionBarStatsData.SKYBLOCK_XP) return
         if (!config) return
         LorenzUtils.chat(event.updated.value)
     }

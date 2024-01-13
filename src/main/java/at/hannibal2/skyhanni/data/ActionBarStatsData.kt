@@ -8,33 +8,33 @@ import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import org.intellij.lang.annotations.Language
 
-enum class ActionBarStatsData(@Language("RegExp") rawPattern: String) {
-    Health(
-        // language=RegExp
-        "§[c6](?<health>[\\d,]+)/[\\d,]+❤.*"
-    ),
-    defense(
+enum class ActionBarStatsData(@Language("RegExp") rawPattern: String) { HEALTH(
+    // language=RegExp
+    "§[c6](?<health>[\\d,]+)/[\\d,]+❤.*"
+),
+    DEFENSE(
         // language=RegExp
         ".*§a(?<defense>[\\d,]+)§a❈.*"
     ),
-    mana(
+    MANA(
         // language=RegExp
         ".*§b(?<mana>[\\d,]+)/[\\d,]+✎.*"
     ),
-    riftTime(
+    RIFT_TIME(
         // language=RegExp
         "§[a7](?<riftTime>[\\dms ]+)ф.*"
     ),
-    skyBlockXP(
+    SKYBLOCK_XP(
         // language=RegExp
         ".*(§b\\+\\d+ SkyBlock XP §.\\([^()]+\\)§b \\(\\d+/\\d+\\)).*"
-    )
+    ),
     ;
 
     internal val pattern by RepoPattern.pattern("actionbar.$name", rawPattern)
     var value: String = ""
 
     companion object {
+
         @SubscribeEvent
         fun onActionBar(event: LorenzActionBarEvent) {
             if (!LorenzUtils.inSkyBlock) return

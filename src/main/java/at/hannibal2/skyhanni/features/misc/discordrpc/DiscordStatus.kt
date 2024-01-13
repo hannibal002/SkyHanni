@@ -167,11 +167,11 @@ enum class DiscordStatus(private val displayMessageSupplier: Supplier<String>?) 
 
     STATS({
         val statString = if (!RiftAPI.inRift()) {
-            "❤${ActionBarStatsData.Health.value} ❈${ActionBarStatsData.defense.value} ✎${ActionBarStatsData.mana.value}"
+            "❤${ActionBarStatsData.HEALTH.value} ❈${ActionBarStatsData.DEFENSE.value} ✎${ActionBarStatsData.MANA.value}"
         } else {
-            "${ActionBarStatsData.riftTime.value}ф ✎${ActionBarStatsData.mana.value}"
+            "${ActionBarStatsData.RIFT_TIME.value}ф ✎${ActionBarStatsData.MANA.value}"
         }
-        if (ActionBarStatsData.mana.value != "") {
+        if (ActionBarStatsData.MANA.value != "") {
             lastKnownDisplayStrings[STATS] = statString
         }
         lastKnownDisplayStrings[STATS] ?: ""
