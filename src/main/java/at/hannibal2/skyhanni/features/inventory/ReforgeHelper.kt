@@ -1,7 +1,7 @@
 package at.hannibal2.skyhanni.features.inventory
 
+import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.ReforgeAPI
-import at.hannibal2.skyhanni.config.core.config.Position
 import at.hannibal2.skyhanni.data.ItemRenderBackground.Companion.background
 import at.hannibal2.skyhanni.events.GuiContainerEvent
 import at.hannibal2.skyhanni.events.GuiRenderEvent
@@ -33,6 +33,8 @@ import java.util.concurrent.atomic.AtomicBoolean
 
 class ReforgeHelper {
 
+    val config get() = SkyHanniMod.feature.inventory.helper.reforge
+
     val reforgeMenu by RepoPattern.pattern("menu.reforge", "Reforge Item")
     val reforgeHexMenu by RepoPattern.pattern("menu.reforge.hex", "The Hex ➜ Reforges")
     val reforgeChatMessage by RepoPattern.pattern("chat.reforge.message", "§aYou reforged your .* §r§ainto a .*!|§aYou applied a .* §r§ato your .*!")
@@ -44,10 +46,7 @@ class ReforgeHelper {
     fun isReforgeMenu(chestName: String) = reforgeMenu.matches(chestName)
     fun isHexReforgeMenu(chestName: String) = reforgeHexMenu.matches(chestName)
 
-    val posList: Position = Position(-200, 85, true, true)
-    val posCurrent: Position = Position(280, 45, true, true)
-
-    fun isEnabled() = LorenzUtils.inSkyBlock && isInReforgeMenu
+    fun isEnabled() = LorenzUtils.inSkyBlock && config.enable && isInReforgeMenu
 
     var item: ItemStack? = null
     var inventory: Container? = null
@@ -72,6 +71,8 @@ class ReforgeHelper {
     val reforgeButton get() = if (isInHexReforgeMenu) 48 else 22
 
     val hexReforgeNextButton = 35
+
+    val exitButton = 40
 
     var waitForChat = AtomicBoolean(false)
     var waitDelay = false
@@ -179,6 +180,7 @@ class ReforgeHelper {
         currentReforge = null
         hoverdReforge = null
         sortAfter = null
+        item = null
         updateDisplay()
     }
 
@@ -198,7 +200,7 @@ class ReforgeHelper {
         val itemType = item.getItemCategoryOrNull()
         val itemRarity = item.getItemRarityOrNull() ?: return@buildList
 
-        val rawReforgeList = if (isInHexReforgeMenu) ReforgeAPI.reforgeList else ReforgeAPI.nonePowerStoneReforge
+        val rawReforgeList = if (!isInHexReforgeMenu && config.reforgeStonesOnlyHex) ReforgeAPI.nonePowerStoneReforge else ReforgeAPI.reforgeList
         val reforgeList = rawReforgeList.filter { it.isValid(itemType, internalName) }
 
         val statTypes = reforgeList.mapNotNull { it.stats[itemRarity]?.keys }.flatten().toSet()
@@ -215,17 +217,22 @@ class ReforgeHelper {
         val tips = run {
             val pre: List<Renderable>
             val stats: List<Renderable>
+            val removedEffect: List<Renderable>
+            val addEffectText: String
             if (currentReforge == reforge) {
                 pre = listOf(Renderable.string("§3Reforge is currently applied!"))
                 stats = (currentReforge?.stats?.get(itemRarity)?.print() ?: emptyList())
+                removedEffect = emptyList()
+                addEffectText = "§aEffect:"
             } else {
                 pre = listOf(Renderable.string("§6Reforge Stats"))
                 stats = (reforge.stats[itemRarity]?.print(currentReforge?.stats?.get(itemRarity)) ?: emptyList())
+                removedEffect = getReforgeEffect(currentReforge, itemRarity)?.let { listOf(Renderable.string("§cRemoves Effect:")) + it }
+                    ?: emptyList()
+                addEffectText = "§aAdds Effect:"
             }
 
-            val removedEffect = (getReforgeEffect(currentReforge, itemRarity)?.let { listOf(Renderable.string("§cRemoves Effect:")) + it }
-                ?: emptyList())
-            val addedEffect = (getReforgeEffect(reforge, itemRarity)?.let { listOf(Renderable.string("§aAdds Effect:")) + it }
+            val addedEffect = (getReforgeEffect(reforge, itemRarity)?.let { listOf(Renderable.string(addEffectText)) + it }
                 ?: emptyList())
 
             return@run pre + stats + removedEffect + addedEffect
@@ -284,10 +291,10 @@ class ReforgeHelper {
     @SubscribeEvent
     fun onRender(event: GuiRenderEvent.ChestGuiOverlayRenderEvent) {
         if (!isEnabled()) return
-        posCurrent.renderStrings(listOf(formattedReforgeToSearch, formattedCurrentReforge), posLabel = "Reforge Notify")
-        posList.renderRenderables(display, posLabel = "Reforge Overlay")
+        config.posCurrent.renderStrings(listOf(formattedReforgeToSearch, formattedCurrentReforge), posLabel = "Reforge Notify")
+        config.posList.renderRenderables(display, posLabel = "Reforge Overlay")
 
-        if (hoverdReforge != null) {
+        if (hoverdReforge != null && isInHexReforgeMenu) {
             if (hoverdReforge != currentReforge) {
                 colorReforgeStone(hoverColor, hoverdReforge?.rawReforgeStoneName ?: "Random Basic Reforge")
             } else {
@@ -298,15 +305,22 @@ class ReforgeHelper {
 
         if (reforgeToSearch == null) return
         if (reforgeToSearch != currentReforge) {
-            if (reforgeToSearch?.isReforgeStone == true) {
-                colorReforgeStone(selectedColor, reforgeToSearch?.rawReforgeStoneName)
-            } else {
-                inventory?.inventory?.get(reforgeButton)?.background = selectedColor
-            }
+            colorSelected()
         } else {
             inventory?.inventory?.get(reforgeItem)?.background = finishedColor
         }
     }
+
+    private fun colorSelected() = if (reforgeToSearch?.isReforgeStone == true) {
+        if (isInHexReforgeMenu) {
+            colorReforgeStone(selectedColor, reforgeToSearch?.rawReforgeStoneName)
+        } else {
+            inventory?.inventory?.get(exitButton)?.background = selectedColor
+        }
+    } else {
+        inventory?.inventory?.get(reforgeButton)?.background = selectedColor
+    }
+
 
     private fun colorReforgeStone(color: Int, reforgeStone: String?) {
         val itemStack = inventory?.inventory?.firstOrNull { it?.name?.removeColor() == reforgeStone }
