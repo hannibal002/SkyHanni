@@ -1,29 +1,54 @@
 package at.hannibal2.skyhanni.data
 
+import at.hannibal2.skyhanni.events.ActionBarValueUpdate
 import at.hannibal2.skyhanni.events.LorenzActionBarEvent
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
+import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
+import org.intellij.lang.annotations.Language
 
-object ActionBarStatsData {
-    // TODO USE SH-REPO
-    private val patterns = mapOf(
-        "health" to "§[c6](?<health>[\\d,]+)/[\\d,]+❤.*".toPattern(),
-        "defense" to ".*§a(?<defense>[\\d,]+)§a❈.*".toPattern(),
-        "mana" to ".*§b(?<mana>[\\d,]+)/[\\d,]+✎.*".toPattern(),
-        "riftTime" to "§[a7](?<riftTime>[\\dms ]+)ф.*".toPattern(),
+enum class ActionBarStatsData(@Language("RegExp") rawPattern: String) {
+    Health(
+        // language=RegExp
+        "§[c6](?<health>[\\d,]+)/[\\d,]+❤.*"
+    ),
+    defense(
+        // language=RegExp
+        ".*§a(?<defense>[\\d,]+)§a❈.*"
+    ),
+    mana(
+        // language=RegExp
+        ".*§b(?<mana>[\\d,]+)/[\\d,]+✎.*"
+    ),
+    riftTime(
+        // language=RegExp
+        "§[a7](?<riftTime>[\\dms ]+)ф.*"
+    ),
+    skyBlockXP(
+        // language=RegExp
+        ".*(§b\\+\\d+ SkyBlock XP §.\\([^()]+\\)§b \\(\\d+/\\d+\\)).*"
     )
+    ;
 
-    var groups = mutableMapOf("health" to "", "riftTime" to "", "defense" to "", "mana" to "")
+    internal val pattern by RepoPattern.pattern("actionbar.$name", rawPattern)
+    var value: String = ""
 
-    @SubscribeEvent
-    fun onActionBar(event: LorenzActionBarEvent) {
-        if (!LorenzUtils.inSkyBlock) return
+    companion object {
+        @SubscribeEvent
+        fun onActionBar(event: LorenzActionBarEvent) {
+            if (!LorenzUtils.inSkyBlock) return
 
-        for ((groupName, pattern) in patterns) {
-            pattern.matchMatcher(event.message) {
-                groups[groupName] = group(groupName)
-            }
+            entries.mapNotNull { value ->
+                value.pattern.matchMatcher(event.message) {
+                    val newValue = group(1)
+                    if (value.value != newValue) {
+                        value.value = newValue
+                        return@mapNotNull ActionBarValueUpdate(value)
+                    }
+                }
+                null
+            }.forEach { it.postAndCatch() }
         }
     }
 }

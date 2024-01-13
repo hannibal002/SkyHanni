@@ -166,13 +166,12 @@ enum class DiscordStatus(private val displayMessageSupplier: Supplier<String>?) 
     }),
 
     STATS({
-        val groups = ActionBarStatsData.groups
         val statString = if (!RiftAPI.inRift()) {
-            "❤${groups["health"]} ❈${groups["defense"]} ✎${groups["mana"]}"
+            "❤${ActionBarStatsData.Health.value} ❈${ActionBarStatsData.defense.value} ✎${ActionBarStatsData.mana.value}"
         } else {
-            "${groups["riftTime"]}ф ✎${groups["mana"]}"
+            "${ActionBarStatsData.riftTime.value}ф ✎${ActionBarStatsData.mana.value}"
         }
-        if (groups["mana"] != "") {
+        if (ActionBarStatsData.mana.value != "") {
             lastKnownDisplayStrings[STATS] = statString
         }
         lastKnownDisplayStrings[STATS] ?: ""
