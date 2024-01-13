@@ -18,6 +18,7 @@ import at.hannibal2.skyhanni.features.misc.customscoreboard.CustomScoreboardUtil
 import at.hannibal2.skyhanni.mixins.hooks.replaceString
 import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.LorenzUtils.inDungeons
+import at.hannibal2.skyhanni.utils.LorenzUtils.isInIsland
 import at.hannibal2.skyhanni.utils.LorenzUtils.nextAfter
 import at.hannibal2.skyhanni.utils.NEUInternalName.Companion.asInternalName
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
@@ -143,7 +144,7 @@ enum class ScoreboardElements(
     ),
     OBJECTIVE(
         ::getObjectiveDisplayPair,
-        { true },
+        ::getObjectiveShowWhen,
         "Objective:\n§eUpdate SkyHanni"
     ),
     SLAYER(
@@ -467,6 +468,11 @@ private fun getObjectiveDisplayPair(): List<ScoreboardElement> {
     }
 
     return objective.map { it to AlignmentEnum.LEFT }
+}
+
+private fun getObjectiveShowWhen(): Boolean {
+    if (IslandType.KUUDRA_ARENA.isInIsland()) return false
+    return ScoreboardData.sidebarLinesFormatted.any { ScoreboardPattern.objectivePattern.matches(it) }
 }
 
 private fun getSlayerDisplayPair(): List<ScoreboardElement> {
