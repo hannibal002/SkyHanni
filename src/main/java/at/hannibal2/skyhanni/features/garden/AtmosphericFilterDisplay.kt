@@ -60,7 +60,7 @@ class AtmosphericFilterDisplay {
     }
 
     private fun constructPerk(seasonString: String): String {
-        val season = Seasons.values().find {it.season == seasonString} ?: return ""
+        val season = Seasons.entries.find {it.season == seasonString} ?: return ""
         if (config.onlyBuff) return if (config.abbreviatePerk) season.abbvPerk else season.perk
         return "§${season.colorCode}${if (config.abbreviateSeason) season.season.take(2) else season.season}§7: ${if (config.abbreviatePerk) season.abbvPerk else season.perk}"
     }
