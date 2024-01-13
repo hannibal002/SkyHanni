@@ -102,9 +102,8 @@ interface Renderable {
             condition: () -> Boolean = { true },
         ) =
             object : Renderable {
-                override val width: Int
-                    get() = render.width
-                override val height = 10
+                override val width = render.width
+                override val height = render.height
 
                 private var wasDown = false
 
@@ -135,9 +134,8 @@ interface Renderable {
 
             val render = string(text)
             return object : Renderable {
-                override val width: Int
-                    get() = render.width
-                override val height = 11
+                override val width = render.width
+                override val height = render.height
 
                 val tipsRender = tips.mapNotNull { fromAny(it) }
 
@@ -258,7 +256,7 @@ interface Renderable {
 
         fun string(string: String) = object : Renderable {
             override val width: Int
-                get() = Minecraft.getMinecraft().fontRendererObj.getStringWidth(string)
+                get() = Minecraft.getMinecraft().fontRendererObj.getStringWidth(string) + 1
             override val height = 10
 
             override fun render(posX: Int, posY: Int) {
