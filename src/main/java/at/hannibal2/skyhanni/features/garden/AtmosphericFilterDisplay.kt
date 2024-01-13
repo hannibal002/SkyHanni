@@ -24,7 +24,6 @@ class AtmosphericFilterDisplay {
     private val posLabelOutsideGarden = "$posLabel (Outside Garden)"
 
     private var display = ""
-    private var currentSeason: Seasons? = null
 
     private enum class Seasons(
         val season: String,
@@ -49,10 +48,7 @@ class AtmosphericFilterDisplay {
         if (!GardenAPI.inGarden() && !config.everywhere) return
         if (!event.repeatSeconds(1)) return
         seasonPattern.matchMatcher(SkyBlockTime.now().monthName) {
-            val readValue = Seasons.entries.find { it.season.endsWith(group("season")) } ?: return
-            if (currentSeason == readValue) return
-            currentSeason = readValue
-            display = constructPerk(readValue)
+            display = constructPerk(Seasons.entries.find { it.season.endsWith(group("season")) } ?: return)
         }
     }
 
