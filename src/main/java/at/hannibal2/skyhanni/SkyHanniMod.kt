@@ -207,6 +207,7 @@ import at.hannibal2.skyhanni.features.inventory.HighlightBonzoMasks
 import at.hannibal2.skyhanni.features.inventory.ItemDisplayOverlayFeatures
 import at.hannibal2.skyhanni.features.inventory.ItemStars
 import at.hannibal2.skyhanni.features.inventory.QuickCraftFeatures
+import at.hannibal2.skyhanni.features.inventory.ReforgeHelper
 import at.hannibal2.skyhanni.features.inventory.RngMeterInventory
 import at.hannibal2.skyhanni.features.inventory.SackDisplay
 import at.hannibal2.skyhanni.features.inventory.ShiftClickEquipment
@@ -250,7 +251,6 @@ import at.hannibal2.skyhanni.features.misc.PetExpTooltip
 import at.hannibal2.skyhanni.features.misc.PlayerChatSymbols
 import at.hannibal2.skyhanni.features.misc.PocketSackInASackDisplay
 import at.hannibal2.skyhanni.features.misc.QuickModMenuSwitch
-import at.hannibal2.skyhanni.features.misc.ReforgeHelper
 import at.hannibal2.skyhanni.features.misc.RestorePieceOfWizardPortalLore
 import at.hannibal2.skyhanni.features.misc.ServerRestartTitle
 import at.hannibal2.skyhanni.features.misc.SkyBlockKickDuration

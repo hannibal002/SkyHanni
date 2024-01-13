@@ -1,4 +1,4 @@
-package at.hannibal2.skyhanni.features.misc
+package at.hannibal2.skyhanni.features.inventory
 
 import at.hannibal2.skyhanni.api.ReforgeAPI
 import at.hannibal2.skyhanni.config.core.config.Position
