@@ -9,7 +9,6 @@ import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.NumberUtil
 import at.hannibal2.skyhanni.utils.NumberUtil.formatNumber
 import at.hannibal2.skyhanni.utils.NumberUtil.romanToDecimalIfNecessary
-import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.TimeUtils.format
 import at.hannibal2.skyhanni.utils.TimeUtils.getDuration
@@ -23,124 +22,124 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 class MenuItemDisplayOverlayPlayerTryhard : AbstractMenuStackSize() {
     private val playerTryhardSubgroup = itemStackSizeGroup.group("player.tryhard")
     
-    private val auctionHousePageLoreLinePattern by playerTryhardSubgroup.pattern(
-        "auctionhousepage.loreline",
+    private val ahPagePattern by playerTryhardSubgroup.pattern(
+        "page.ah.loreline",
         "§7\\((?<pagenumber>[0-9]+).*"
     )
-    private val otherMenusPageLoreLinePattern by playerTryhardSubgroup.pattern(
-        "othermenuspage.loreline",
+    private val notAHPagePattern by playerTryhardSubgroup.pattern(
+        "page.notah.loreline",
         "§.Page (?<pagenumber>[0-9]+)"
     )
-    private val rngMeterLoreLinePattern by playerTryhardSubgroup.pattern(
-        "rngmeter.loreline",
+    private val rngMeterPattern by playerTryhardSubgroup.pattern(
+        "rng.meter.loreline",
         "(§.)*Odds: (?<odds>(§.[\\w]){1}).*"
     )
-    private val generalPurposeNotBoosterCookieDurationLoreLinePattern by playerTryhardSubgroup.pattern(
-        "generalpurposenotboostercookieduration.loreline",
+    private val genericDurationPattern by playerTryhardSubgroup.pattern(
+        "generic.duration.loreline",
         "(§.)?(([A-z ])+): (§.)?(?<fullDuration>(?<years>[0-9]+y)?[ ]?(?<days>[0-9]+d)?[ ]?(?<hours>[0-9]+h)?[ ]?(?<minutes>[0-9]+m)?[ ]?(?<seconds>[0-9]+s)?)"
     )
-    private val totalFameLoreLinePattern by playerTryhardSubgroup.pattern(
-        "totalfame.loreline",
-        "(§.)?Your total: (§.)?(?<total>(?<useful>[0-9]+)((,[0-9]+))+) Fame"
+    private val totalFamePattern by playerTryhardSubgroup.pattern(
+        "total.fame.loreline",
+        "(§.)?Your total: (§.)?(?<total>(?<useful>[0-9]+)(,[0-9]+)+) Fame"
     )
-    private val bitsAvailableLoreLinePattern by playerTryhardSubgroup.pattern(
-        "bitsavailable.loreline",
+    private val bitsAvailablePattern by playerTryhardSubgroup.pattern(
+        "bits.available.loreline",
         "(§.)?Bits Available: (§.)?(?<total>(?<useful>[0-9]+)(?<useless>(,[0-9]+))*)(§.)?.*"
     )
-    private val magicalPowerLoreLinePattern by playerTryhardSubgroup.pattern(
-        "magicalpower.loreline",
+    private val magicalPowerPattern by playerTryhardSubgroup.pattern(
+        "maxwell.magicalpower.loreline",
         "(§.)?Magical Power: (§.)?(?<total>(?<useful>[0-9]+)(,[0-9]+)*)"
     )
-    private val otherMagicalPowerLoreLinePattern by playerTryhardSubgroup.pattern(
-        "othermagicalpower.loreline",
+    private val otherMagicalPowerPattern by playerTryhardSubgroup.pattern(
+        "maxwell.othermagicalpower.loreline",
         ".*(§.)?Total: (§.)?(?<total>(?<useful>[0-9]+)(,[0-9]+)*).*"
     )
-    private val tuningPointsLoreLinePattern by playerTryhardSubgroup.pattern(
-        "tuningpoints.loreline",
+    private val tuningPointsPattern by playerTryhardSubgroup.pattern(
+        "maxwell.tuningpoints.loreline",
         "(§.)?Tuning Points: (§.)?(?<total>(?<useful>[0-9]+)(,[0-9]+)*)"
     )
-    private val slotSourceLoreLinePattern by playerTryhardSubgroup.pattern(
-        "slotsource.loreline",
+    private val slotSourcePattern by playerTryhardSubgroup.pattern(
+        "maxwell.slotsource.loreline",
         "(§.)(?<category>(?!Buying).*)?: (§.)?(\\+?)(?<slots>[0-9]+) (s|S)lots"
     )
-    private val auctionChestNamePattern by playerTryhardSubgroup.pattern(
-        "auction.chestname",
+    private val auctionChestPattern by playerTryhardSubgroup.pattern(
+        "ah.chestname",
         "Auction.*"
     )
-    private val isNotAuctionAbiphoneContactsDirectoryChestNamePattern by playerTryhardSubgroup.pattern(
-        "isnotauctionabiphonecontactsdirectory.chestname",
+    private val notAHAbiphoneChestPattern by playerTryhardSubgroup.pattern(
+        "not.ah.abiphone.chestname",
         "^(?:(?!Auction|A.iphone|Contacts Directory).)*\$"
     )
-    private val generalPurposeSelectedFilterSortLoreLinePattern by playerTryhardSubgroup.pattern(
-        "generalpurposeselectedfiltersort.loreline",
+    private val genericSelectedFilterSortPattern by playerTryhardSubgroup.pattern(
+        "generic.selectedfiltersort.loreline",
         "((?<colorCode>§.)*▶ (?<threeChars>[\\w ]{3}))([\\w ])+"
     )
-    private val rngMeterOddsChestNamePattern by playerTryhardSubgroup.pattern(
-        "rngmeterodds.chestname",
+    private val rngMeterChestPattern by playerTryhardSubgroup.pattern(
+        "rng.meter.chestname",
         ".* RNG Meter"
     )
-    private val communityShopEssenceShopChestNamePattern by playerTryhardSubgroup.pattern(
-        "communityshopessenceshop.chestname",
+    private val communityEssenceChestPattern by playerTryhardSubgroup.pattern(
+        "community.essence.chestname",
         "(Community Shop|.* Essence Shop)"
     )
-    private val communityShopIsUpgradeLoreLinePattern by playerTryhardSubgroup.pattern(
-        "communityshopisupgrade.loreline",
+    private val communityUpgradePattern by playerTryhardSubgroup.pattern(
+        "community.isupgrade.variantone.loreline",
         "(.* to start!|.*Maxed out!|.*upgrad.*)"
     )
-    private val communityShopIsAlsoUpgradeLoreLinePattern by playerTryhardSubgroup.pattern(
-        "communityshopisalsoupgrade.loreline",
+    private val communityUpgradeOtherPattern by playerTryhardSubgroup.pattern(
+        "community.isupgrade.varianttwo.loreline",
         ".* Upgrade"
     )
-    private val essenceShopIsPurchasableUpgradeLoreLinePattern by playerTryhardSubgroup.pattern(
+    private val essenceUpgradePattern by playerTryhardSubgroup.pattern(
         "essenceshopispurchasableupgrade.loreline",
         "(§.)*(.* unlock|UNLOCK).*"
     )
-    private val isNotRomanNumeralNotForMinecraftOrSkyblockPattern by playerTryhardSubgroup.pattern(
-        "isnotromannumeral.notforminecraftorskyblock",
+    private val notRomanNumeralPattern by playerTryhardSubgroup.pattern(
+        "notromannumeral",
         "^(?:(?!I|V|X|L|C|D|M).)*\$"
     )
-    private val auctionBazaarCommunityShopIsValidForSelectedTabStackSizeChestNamePattern by playerTryhardSubgroup.pattern(
-        "auctionbazaarcommunityshopisvalidforselectedtabstacksize.chestname",
+    private val ahBZCommunityChestPattern by playerTryhardSubgroup.pattern(
+        "ah.bz.community.chestname",
         "(Auction.*|Bazaar.*|Community Shop)"
     )
-    private val currentlySelectedBrowsingViewingTabLoreLinePattern by playerTryhardSubgroup.pattern(
-        "currentlyselectedbrowsingviewingtab.loreline",
+    private val currentTabPattern by playerTryhardSubgroup.pattern(
+        "current.tab.loreline",
         "§aCurrently .*"
     )
-    private val isAuctionOrBazaarChestNamePattern by playerTryhardSubgroup.pattern(
-        "isauctionorbazaar.chestname",
+    private val notAHBZChestPattern by playerTryhardSubgroup.pattern(
+        "not.ah.bz.chestname",
         "(Auction.*|Bazaar.*)"
     )
-    private val fameRankLoreLinePattern by playerTryhardSubgroup.pattern(
-        "famerank.loreline",
+    private val fameRankPattern by playerTryhardSubgroup.pattern(
+        "cookie.famerank.loreline",
         "(§.)*Fame Rank: (§.)*(?<fameRank>[\\w ]+)"
     )
-    private val boosterCookieDurationLoreLinePattern by playerTryhardSubgroup.pattern(
-        "boostercookieduration.loreline",
+    private val boosterCookieDurationPattern by playerTryhardSubgroup.pattern(
+        "cookie.boostercookieduration.loreline",
         "(§.)*Duration: (§.)*(?<fullDuration>(?<years>[0-9]+y)?[ ]?(?<days>[0-9]+d)?[ ]?(?<hours>[0-9]+h)?[ ]?(?<minutes>[0-9]+m)?[ ]?(?<seconds>[0-9]+s)?)"
     )
-    private val currentlyActiveEffectsLoreLinePattern by playerTryhardSubgroup.pattern(
-        "currentlyactiveeffects.loreline",
+    private val currentlyActiveEffectsPattern by playerTryhardSubgroup.pattern(
+        "cookie.currentlyactiveeffects.loreline",
         "(§.)*Currently Active: (§.)*(?<effects>[\\w]+)"
     )
-    private val accessoryBagUpgradesStatsTuningChestNamePattern by playerTryhardSubgroup.pattern(
-        "accessorybagupgradesstatstuning.chestname",
+    private val upgradesTuningChestPattern by playerTryhardSubgroup.pattern(
+        "maxwell.upgrades.tuning.chestname",
         "(Accessory Bag Upgrades|Stats Tuning)"
     )
-    private val powerStoneLearnedStatusLoreLinePattern by playerTryhardSubgroup.pattern(
-        "powerstonelearnedstatus.loreline",
+    private val powerStoneStatusPattern by playerTryhardSubgroup.pattern(
+        "maxwell.powerstone.status.loreline",
         "(§.)*Learned: (?<colorCode>§.)*(?<status>[\\w ]+) (?<icon>.)"
     )
-    private val startingInLoreLinePattern by playerTryhardSubgroup.pattern(
+    private val startingInPattern by playerTryhardSubgroup.pattern(
         "startingin.loreline",
         "§7Starting in: .*"
     )
-    private val startsInLoreLinePattern by playerTryhardSubgroup.pattern(
+    private val startsInPattern by playerTryhardSubgroup.pattern(
         "startsin.loreline",
         "§7Starts in: .*"
     )
-    private val achievementPointsLoreLinePattern by playerTryhardSubgroup.pattern(
-        "achievementpoints.loreline",
+    private val achievementPointsPattern by playerTryhardSubgroup.pattern(
+        "achievement.points.loreline",
         "(§.)*Points: (§.)*([\\w,]+)(§.)*\\/(§.)*([\\w,]+) (§.)*\\((?<percent>[\\w]+)%(§.)*\\)"
     )
 
@@ -159,8 +158,8 @@ class MenuItemDisplayOverlayPlayerTryhard : AbstractMenuStackSize() {
             val lore = item.getLore()
             if ((itemName == "Previous Page" || itemName == "Next Page")) {
                 val line = lore.first()
-                auctionChestNamePattern.matchMatcher(chestName) {
-                    auctionHousePageLoreLinePattern.matchMatcher(line) {
+                auctionChestPattern.matchMatcher(chestName) {
+                    ahPagePattern.matchMatcher(line) {
                         var pageNum = group("pagenumber").formatNumber()
                         if (itemName == "Previous Page") {
                             pageNum--
@@ -171,12 +170,12 @@ class MenuItemDisplayOverlayPlayerTryhard : AbstractMenuStackSize() {
                         else return "$pageNum"
                     }
                 }
-                return otherMenusPageLoreLinePattern.matchMatcher(line) { group("pagenumber") } ?: ""
+                return notAHPagePattern.matchMatcher(line) { group("pagenumber") } ?: ""
             }
-            isNotAuctionAbiphoneContactsDirectoryChestNamePattern.matchMatcher(chestName) {
-                if (((itemName == ("Sort") && (item.getItem() == Item.getItemFromBlock(Blocks.hopper)))) || ((itemName == ("Filter") && (item.getItem() is ItemEnderEye)))) {
+            notAHAbiphoneChestPattern.matchMatcher(chestName) {
+                if (((itemName == ("Sort") && (item.item == Item.getItemFromBlock(Blocks.hopper)))) || ((itemName == ("Filter") && (item.item is ItemEnderEye)))) {
                     for (line in lore) {
-                        generalPurposeSelectedFilterSortLoreLinePattern.matchMatcher(line) {
+                        genericSelectedFilterSortPattern.matchMatcher(line) {
                             return group("threeChars").trim() // trim() to remove spaces. removing the space from the regex causes some filter options to get skipped
                         }
                     }
@@ -185,9 +184,9 @@ class MenuItemDisplayOverlayPlayerTryhard : AbstractMenuStackSize() {
         }
 
         if (stackSizeConfig.contains(StackSizeMenuConfig.PlayerTryhard.RNG_METER_ODDS)) {
-            rngMeterOddsChestNamePattern.matchMatcher(chestName) {
+            rngMeterChestPattern.matchMatcher(chestName) {
                 for (line in item.getLore()) {
-                    rngMeterLoreLinePattern.matchMatcher(line) { return group("odds") }
+                    rngMeterPattern.matchMatcher(line) { return group("odds") }
                 }
             }
         }
@@ -196,15 +195,15 @@ class MenuItemDisplayOverlayPlayerTryhard : AbstractMenuStackSize() {
             also {
                 val lore = item.getLore()
                 var canDisplayTier = false
-                communityShopEssenceShopChestNamePattern.matchMatcher(chestName) {
+                communityEssenceChestPattern.matchMatcher(chestName) {
                     if (lore.isNotEmpty()) {
-                        communityShopIsUpgradeLoreLinePattern.matchMatcher(lore.last()) { canDisplayTier = true }
-                        communityShopIsAlsoUpgradeLoreLinePattern.matchMatcher(lore.first()) { canDisplayTier = true }
-                        essenceShopIsPurchasableUpgradeLoreLinePattern.matchMatcher(lore.last()) { canDisplayTier = true }
+                        communityUpgradePattern.matchMatcher(lore.last()) { canDisplayTier = true }
+                        communityUpgradeOtherPattern.matchMatcher(lore.first()) { canDisplayTier = true }
+                        essenceUpgradePattern.matchMatcher(lore.last()) { canDisplayTier = true }
                             if (canDisplayTier) {
                                 val lastWord = itemName.split(" ").last()
                                 for (char in lastWord) {
-                                    isNotRomanNumeralNotForMinecraftOrSkyblockPattern.matchMatcher("$char") {
+                                    notRomanNumeralPattern.matchMatcher("$char") {
                                         return@also
                                     }
                                 }
@@ -217,16 +216,16 @@ class MenuItemDisplayOverlayPlayerTryhard : AbstractMenuStackSize() {
         
         if (stackSizeConfig.contains(StackSizeMenuConfig.PlayerTryhard.SELECTED_TAB)) {
             val lore = item.getLore()
-            auctionBazaarCommunityShopIsValidForSelectedTabStackSizeChestNamePattern.matchMatcher(chestName) {
+            ahBZCommunityChestPattern.matchMatcher(chestName) {
                 if (itemName.isNotEmpty() && lore.isNotEmpty()) {
                     if (chestName == "Community Shop") {
-                        currentlySelectedBrowsingViewingTabLoreLinePattern.matchMatcher(lore.last()) {
+                        currentTabPattern.matchMatcher(lore.last()) {
                             return "§a⬇"
                         }
                     }
-                    isAuctionOrBazaarChestNamePattern.matchMatcher(chestName) {
+                    notAHBZChestPattern.matchMatcher(chestName) {
                         if (lore.first() == ("§8Category")) {
-                            currentlySelectedBrowsingViewingTabLoreLinePattern.matchMatcher(lore.last()) {
+                            currentTabPattern.matchMatcher(lore.last()) {
                                 return "§a➡"
                             }
                         }
@@ -239,21 +238,21 @@ class MenuItemDisplayOverlayPlayerTryhard : AbstractMenuStackSize() {
         if (stackSizeConfig.contains(StackSizeMenuConfig.PlayerTryhard.FAME_RANK_BITS)) {
             if ((chestName == "Booster Cookie" && itemName == "Fame Rank")) {
                 for (line in item.getLore()) {
-                    totalFameLoreLinePattern.matchMatcher(line) {
+                    totalFamePattern.matchMatcher(line) {
                         return NumberUtil.format(group("total").formatNumber())
                     }
                 }
             }
             if ((chestName == "Booster Cookie" && itemName == "Bits")) {
                 for (line in item.getLore()) {
-                    bitsAvailableLoreLinePattern.matchMatcher(line) {
+                    bitsAvailablePattern.matchMatcher(line) {
                         return NumberUtil.format(group("total").formatNumber())
                     }
                 }
             }
             if ((chestName == "Community Shop" && itemName == "Community Shop")) {
                 for (line in item.getLore()) {
-                    fameRankLoreLinePattern.matchMatcher(line) {
+                    fameRankPattern.matchMatcher(line) {
                         return when (group("fameRank")) {
                             "New Player" -> "NP"
                             "Settler" -> "Str"
@@ -281,7 +280,7 @@ class MenuItemDisplayOverlayPlayerTryhard : AbstractMenuStackSize() {
 
         if (stackSizeConfig.contains(StackSizeMenuConfig.PlayerTryhard.BOOSTER_COOKIE_DURATION) && (item.getLore().isNotEmpty() && ((itemName == ("Booster Cookie")) && ((chestName.lowercase() == "skyblock menu") || (chestName == "Booster Cookie"))))) {
             for (line in item.getLore()) {
-                boosterCookieDurationLoreLinePattern.matchMatcher(line) {
+                boosterCookieDurationPattern.matchMatcher(line) {
                     return getDuration(group("fullDuration")).format(maxUnits = 1)
                 }
             }
@@ -289,7 +288,7 @@ class MenuItemDisplayOverlayPlayerTryhard : AbstractMenuStackSize() {
 
         if (stackSizeConfig.contains(StackSizeMenuConfig.PlayerTryhard.ACTIVE_POTION_COUNT) && (chestName == ("Your Equipment and Stats") && itemName == ("Active Effects"))) {
             for (line in item.getLore()) {
-                currentlyActiveEffectsLoreLinePattern.matchMatcher(line) {
+                currentlyActiveEffectsPattern.matchMatcher(line) {
                     return group("effects")
                 }
             }
@@ -299,7 +298,7 @@ class MenuItemDisplayOverlayPlayerTryhard : AbstractMenuStackSize() {
             val lore = item.getLore()
             if (chestName == ("Your Bags") && itemName == ("Accessory Bag")) {
                 for (line in lore) {
-                    magicalPowerLoreLinePattern.matchMatcher(line) {
+                    magicalPowerPattern.matchMatcher(line) {
                         return NumberUtil.format(group("total").formatNumber())
                     }
                 }
@@ -307,16 +306,16 @@ class MenuItemDisplayOverlayPlayerTryhard : AbstractMenuStackSize() {
             if (chestName == ("Accessory Bag Upgrades") && itemName == ("Accessory Bag Upgrades")) {
                 var totalSlotsResult = 0
                 for (line in lore) {
-                    slotSourceLoreLinePattern.matchMatcher(line){
+                    slotSourcePattern.matchMatcher(line){
                         totalSlotsResult += group("slots").toInt()
                     }
                 }
                 return "$totalSlotsResult"
             }
-            accessoryBagUpgradesStatsTuningChestNamePattern.matchMatcher(chestName) {
+            upgradesTuningChestPattern.matchMatcher(chestName) {
                 if (itemName == ("Stats Tuning")) {
                     for (line in lore) {
-                        tuningPointsLoreLinePattern.matchMatcher(line) {
+                        tuningPointsPattern.matchMatcher(line) {
                             return NumberUtil.format(group("total").formatNumber())
                         }
                     }
@@ -324,14 +323,14 @@ class MenuItemDisplayOverlayPlayerTryhard : AbstractMenuStackSize() {
             }
             if (chestName == ("Power Stones Guide")) {
                 if (lore.isNotEmpty()) {
-                    powerStoneLearnedStatusLoreLinePattern.matchMatcher(lore.last()) {
+                    powerStoneStatusPattern.matchMatcher(lore.last()) {
                         return "${group("colorCode")}${group("icon")}"
                     }
                 }
             }
             if (chestName == ("Accessory Bag Thaumaturgy") && itemName == ("Accessories Breakdown")) {
                 for (line in lore) {
-                    otherMagicalPowerLoreLinePattern.matchMatcher(line) {
+                    otherMagicalPowerPattern.matchMatcher(line) {
                         return NumberUtil.format(group("total").formatNumber())
                     }
                 }
@@ -343,17 +342,17 @@ class MenuItemDisplayOverlayPlayerTryhard : AbstractMenuStackSize() {
             var theStringToUse = ""
             if (lore.isNotEmpty() && (chestName.lowercase() == ("skyblock menu") && itemName == ("Calendar and Events"))) {
                 for (line in lore) {
-                    startingInLoreLinePattern.matchMatcher(line) {
+                    startingInPattern.matchMatcher(line) {
                         theStringToUse = line
                     }
                 }
             }
             if (lore.isNotEmpty() && chestName == ("Calendar and Events") && !CalendarOverlay.isEnabled()) {
-                startsInLoreLinePattern.matchMatcher(lore.first()) {
+                startsInPattern.matchMatcher(lore.first()) {
                     theStringToUse = lore.first()
                 }
             }
-            generalPurposeNotBoosterCookieDurationLoreLinePattern.matchMatcher(theStringToUse) {
+            genericDurationPattern.matchMatcher(theStringToUse) {
                 return getDuration(group("fullDuration")).format(maxUnits = 1)
             }
         }
@@ -361,7 +360,7 @@ class MenuItemDisplayOverlayPlayerTryhard : AbstractMenuStackSize() {
         if (stackSizeConfig.contains(StackSizeMenuConfig.PlayerTryhard.SKYBLOCK_ACHIEVEMENT_POINTS) && (chestName == ("Your Equipment and Stats") && itemName.lowercase() == ("skyblock achievements"))) {
             // §7Points: §e1,995§7/§e2,835 §8(70%§8)
             for (line in item.getLore()) {
-                achievementPointsLoreLinePattern.matchMatcher(line) {
+                achievementPointsPattern.matchMatcher(line) {
                     return group("percent")
                 }
             }
