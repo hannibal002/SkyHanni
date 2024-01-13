@@ -2,8 +2,6 @@ package at.hannibal2.skyhanni.data.mob
 
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.config.features.dev.DebugMob.HowToShow
-import at.hannibal2.skyhanni.events.HypixelJoinEvent
-import at.hannibal2.skyhanni.events.IslandChangeEvent
 import at.hannibal2.skyhanni.events.LorenzRenderWorldEvent
 import at.hannibal2.skyhanni.utils.LocationUtils.getTopCenter
 import at.hannibal2.skyhanni.utils.LorenzColor
@@ -73,16 +71,5 @@ class MobDebug {
                 event.drawFilledBoundingBox_nea(it.boundingBox.expandBlock(), LorenzColor.GOLD.toColor(), 0.5f)
             }
         }
-    }
-
-    @SubscribeEvent
-    fun onJoin(event: HypixelJoinEvent) {
-        MobDevTracker.loadFromFile()
-    }
-
-    @SubscribeEvent
-    fun onExit(event: IslandChangeEvent) {
-        MobDevTracker.saveToFile()
-        // counter.reset()
     }
 }

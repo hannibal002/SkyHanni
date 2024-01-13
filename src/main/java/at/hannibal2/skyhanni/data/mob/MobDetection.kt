@@ -93,7 +93,7 @@ class MobDetection {
     }
 
     private fun retry(entity: EntityLivingBase) = entity.getRoughType()?.let { type ->
-        MobData.retries.add(MobData.RetryEntityInstancing(entity, 0, type)).also { MobDevTracker.data.startedRetries++ }
+        MobData.retries.add(MobData.RetryEntityInstancing(entity, 0, type))
     }
 
     private fun removeRetry(entity: EntityLivingBase) = MobData.retries.remove(MobData.RetryEntityInstancing(entity))
@@ -104,7 +104,6 @@ class MobDetection {
 
     /**@return a false means that it should try again (later)*/
     private fun entitySpawn(entity: EntityLivingBase, roughType: Mob.Type): Boolean {
-        MobDevTracker.data.spawn++
         when (roughType) {
             Mob.Type.Player -> MobEvent.Spawn.Player(MobFactories.player(entity)).postAndCatch()
 
@@ -194,7 +193,6 @@ class MobDetection {
     }
 
     private fun entityDeSpawn(entity: EntityLivingBase) {
-        MobDevTracker.data.deSpawn++
         MobData.entityToMob[entity]?.let {
             when (it.mobType) {
                 Mob.Type.Player -> MobEvent.DeSpawn.Player(it)
@@ -225,10 +223,8 @@ class MobDetection {
                     else -> MobData.DETECTION_RANGE
                 }
             ) {
-                MobDevTracker.data.outOfRangeRetries++
                 continue
             }
-            MobDevTracker.data.retries++
             if (retry.times > MAX_RETRIES) {
                 mobDetectionError(
                     "(`${retry.entity.name}`${retry.entity.entityId} missed (Found? ${MobData.entityToMob[retry.entity] != null}). Position: ${retry.entity.getLorenzVec()} Distance: ${
@@ -237,7 +233,6 @@ class MobDetection {
                         entity.getLorenzVec().subtract(LocationUtils.playerLocation())
                     }"
                 )
-                MobDevTracker.data.misses++
                 // Temporary Change
                 // iterator.remove()
                 retry.times = Int.MIN_VALUE

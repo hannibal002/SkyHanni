@@ -67,7 +67,6 @@ class MobData {
     fun onMobEventSpawn(event: MobEvent.Spawn) {
         entityToMob.putAll(event.mob.makeEntityToMobAssociation())
         currentMobs.add(event.mob)
-        MobDevTracker.addEntityName(event.mob)
     }
 
     @SubscribeEvent
