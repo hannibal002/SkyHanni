@@ -205,16 +205,6 @@ private fun getKuudraLines(): List<String> {
     getSbLines().firstOrNull { SbPattern.wavePattern.matches(it) }?.let { list.add(it) }
     getSbLines().firstOrNull { SbPattern.tokensPattern.matches(it) }?.let { list.add(it) }
     getSbLines().firstOrNull { SbPattern.submergesPattern.matches(it) }?.let { list.add(it) }
-    list += ""
-
-    if (getSbLines().any { ScoreboardPattern.thirdObjectiveLinePattern.matches(it) }) {
-        val objectiveLine = getSbLines().first { ScoreboardPattern.thirdObjectiveLinePattern.matches(it) }
-        list += objectiveLine
-        list += getSbLines().nextAfter(objectiveLine) ?: "§cNo Objective"
-        if (getSbLines().any { ScoreboardPattern.thirdObjectiveLinePattern.matches(it) }) {
-            list += getSbLines().nextAfter(objectiveLine, 2) ?: "§cNo Objective"
-        }
-    }
 
     return list
 }
