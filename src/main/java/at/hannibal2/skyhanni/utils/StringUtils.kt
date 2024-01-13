@@ -65,7 +65,7 @@ object StringUtils {
     /**
      * From https://stackoverflow.com/questions/10711494/get-values-in-treemap-whose-string-keys-start-with-a-pattern
      */
-    fun <T> subMapWithKeysThatAreSuffixes(prefix: String, map: NavigableMap<String?, T>): Map<String?, T>? {
+    fun <T> subMapOfStringsStartingWith(prefix: String, map: NavigableMap<String, T>): NavigableMap<String, T> {
         if ("" == prefix) return map
         val lastKey = nextLexicographicallyStringWithSameLength(prefix)
         return map.subMap(prefix, true, lastKey, false)
@@ -128,6 +128,12 @@ object StringUtils {
             }
         }
         return default
+    }
+
+    fun String.substringBeforeLastOrNull(needle: String): String? {
+        val index = this.lastIndexOf(needle)
+        if (index < 0) return null
+        return this.substring(0, index)
     }
 
     fun encodeBase64(input: String) = Base64.getEncoder().encodeToString(input.toByteArray())
