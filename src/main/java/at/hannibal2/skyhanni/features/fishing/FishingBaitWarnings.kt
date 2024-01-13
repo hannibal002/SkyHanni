@@ -85,5 +85,5 @@ class FishingBaitWarnings {
         LorenzUtils.chat("You do not use any fishing baits!")
     }
 
-    private fun isEnabled() = LorenzUtils.inSkyBlock && FishingAPI.hasFishingRodInHand()
+    private fun isEnabled() = LorenzUtils.inSkyBlock && FishingAPI.hasFishingRodInHand() && !LorenzUtils.inKuudraFight
 }

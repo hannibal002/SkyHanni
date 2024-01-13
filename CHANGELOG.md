@@ -18,6 +18,21 @@
 + Added Sea Creature Tracker. - hannibal2
     + Allows to only show single variants, e.g. water or lava or winter.
 
+#### Inventory Features
+
++ Added Power Stone Guide features. - hannibal2
+    + Highlight missing power stones, show their total bazaar price, and allows to open the bazaar when clicking on the
+      items in the Power Stone Guide.
++ Option to make normal clicks to shift clicks in equipment inventory. - Thunderblade73
+
+#### Item Features
+
++ Lesser Orb of Healing Hider. - jani
+
+#### Chat Features
+
++ Add tab list fire sale advertisement hider. - nea
+
 ### Changes
 
 #### Garden Changes
@@ -29,6 +44,9 @@
 + Don't count Bountiful as a max reforge fortune on tools. - alexia
 + /shcroptime now supports k, m and b numbers. - DylanBruner
 + Only show the Garden Vacuum Bag on your own vacuums. - alexia
++ Jacob Contest feature now has clickable calendar open command when Elite API is not ready yet. - alexia
++ Mark carrot/pumpkin fortune as completed when giving to Carrolyn after already done. - alexia
++ Added ability to get unique visitors served without Green Thumb. - alexia
 
 #### Rift Changes
 
@@ -41,6 +59,7 @@
 #### Fishing Changes
 
 + Odger highlight feature tells in description that it is only useful for users without abiphone. - hannibal2
++ Added toggle to count double hook catches as two catches in Sea Creature Tracker. - hannibal2
 
 #### Mining Changes
 
@@ -55,10 +74,12 @@
 + Removed flawless gemstones from sack display. - CalMWolfs
     + Hypixel removed them from sacks.
 + Show a warning in Bestiary Display when Overall Progress is not enabled. - HiZe
++ Added option to hide pet candy count on maxed out pets. - CalMWolfs
 
 #### Dungeon Changes
 
 + Changed the description of the Dungeon Chat Filter feature to be more descriptive. - Wambo
++ Added options to change exactly what part of the Dungeon Chat Filter should be used. - Wambo
 
 #### Chat Changes
 
@@ -80,10 +101,21 @@
   hannibal2
 + Auto-fixing plots marked as pests when killing all pests without SkyHanni earlier. - hannibal2
 + Fixed error message that nearest pests cannot get removed properly. - hannibal2
++ Fixed grammar in Jacob Contest chat messages. - alexia
++ Fixed rarity error for items thrown around when using Sprayanator. - hannibal2
+
+#### Combat Fixes
+
++ Fixed corrupted Kada Knight getting detected as Revenant Slayer mini boss. - hannibal2
++ Fixed Daily Kuudra part of Crimson Isle Reputation Helper not detecting completed runs. - hannibal2
++ Fixed wrong calculation when zero bosses killed in slayer profit trackers. - hannibal2
++ Hide No Fishing Bait warning during Kuudra fight. - hannibal2
 
 #### Mining Fixes
 
 + Fixed an error when showing all elements in Powder Tracker. - hannibal2
++ Fixed powder tracker detecting gemstone chat messages. - CalMWolfs
++ Fixed Mining Chat Filter not hiding gemstone messages. - CalMWolfs
 
 #### Rift Fixes
 
@@ -93,6 +125,7 @@
 
 + Fixed Reindrake mob, Frosty NPC and frosty the snow blaster shop counting as sea creatures in the barn fishing
   timer. - hannibal2
++ Fixed trophy fish chat message detection. - Empa
 
 #### Invenory Fixes
 
@@ -106,10 +139,19 @@
 + Fixed performance issues with Bingo Minion Craft Helper. - hannibal2
 + Fixed Bingo Minion Craft Helper not detecting crafted tier one minion. - hannibal2
 
+#### Chat Fixes
+
++ Fixed poisoned candy potion chat message not getting compacted. - alexia
+
+#### GUI Fixes
+
++ Fixed items in SkyHanni GUI elements rendering over minecraft menus. - Thunderblade73
+
 #### Misc Fixes
 
 + Maybe fixed Tia Relay Helper. - Thunderblade73
 + Fixed wording in trackers when the item is newly obtained. - hannibal2
++ Fixed titles not showing above other SkyHanni GUI elements all the time. - Thunderblade73
 
 ### Technical Changes
 
@@ -126,6 +168,12 @@
 + Moving minion craft helper fully over to neu internal names. - hannibal2
 + Added information about trackers to the Discord FAQ. - j10a1n15
 + Defined the way how dependent PRs should be written in contributing.md. - Thunderblade73
++ Added debug command /shtestburrow. - hannibal2
++ Using SkyHanniMod.coroutineScope instead of CoroutineScope(Dispatchers.Default). - CalMWolfs
++ Creating function addTotalProfit for item trackers. - hannibal2
++ Tell people how to name a pattern variable. - CalMWolfs
++ Typo fixes in contributing md. - CalMWolfs
++ Make Repo Pattern keys more consistent for Farming Gear. - CalMWolfs
 
 ## Version 0.22
 
