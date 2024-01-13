@@ -29,7 +29,7 @@ enum class ItemCategory {
     BAIT,
     AXE,
     DEPLOYABLE,
-    HATCCESSORY,
+    HATCESSORY,
     ARROW,
     WAND,
     LONGSWORD,
