@@ -42,6 +42,8 @@ object FrozenTreasureTracker {
     { formatDisplay(drawDisplay(it)) }
 
     init {
+        FrozenTreasure.entries.forEach { it.chatPattern }
+
         fixedRateTimer(name = "skyhanni-frozen-treasure-tracker", period = 1000) {
             if (!onJerryWorkshop()) return@fixedRateTimer
             calculateIcePerHour()
@@ -125,7 +127,7 @@ object FrozenTreasureTracker {
             if (config.hideMessages) event.blockedReason = "frozen treasure tracker"
         }
 
-        for (treasure in FrozenTreasure.entries.filter { it.pattern.matches(message) }) {
+        for (treasure in FrozenTreasure.entries.filter { it.chatPattern.matches(message) }) {
             tracker.modify {
                 it.treasuresMined += 1
                 it.treasureCount.addOrPut(treasure, 1)
