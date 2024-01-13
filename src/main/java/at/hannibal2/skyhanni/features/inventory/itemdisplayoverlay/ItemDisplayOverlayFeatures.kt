@@ -67,120 +67,120 @@ object ItemDisplayOverlayFeatures : AbstractStackSize() {
     private val config get() = configItemStackSize
     private val itemDisplayOverlaySubgroup = itemStackSizeGroup.group("itemdisplayoverlay")
 
-    private val masterStarInternalNamePattern by itemDisplayOverlaySubgroup.pattern(
-        "masterstar.internalname",
+    private val masterStarInternalPattern by itemDisplayOverlaySubgroup.pattern(
+        "master.star.internal",
         "(?<tier>[A-Z])+_MASTER_STAR"
     )
-    private val petLevelItemNamePattern by itemDisplayOverlaySubgroup.pattern(
-        "petlevel.itemname",
+    private val petLevelPattern by itemDisplayOverlaySubgroup.pattern(
+        "pet.level.item",
         "\\[Lvl (?<level>.*)] .*"
     )
-    private val shredderBonusDamageLoreLinePattern by itemDisplayOverlaySubgroup.pattern(
-        "shredderbonusdamage.loreline",
+    private val shredderDamagePattern by itemDisplayOverlaySubgroup.pattern(
+        "shredder.damage.loreline",
         "(§.)?Bonus Damage \\([0-9]+ cap\\): (§.)?(?<dmgbonus>[0-9]+)"
     )
-    private val legacyBottleOfJerryIntelBonusLoreLinePattern by itemDisplayOverlaySubgroup.pattern(
-        "legacybottleofjerryintelbonus.loreline",
+    private val legacyJerryIntelPattern by itemDisplayOverlaySubgroup.pattern(
+        "legacy.jerry.intel.loreline",
         "(§.)?Intelligence Bonus: (§.)?(?<intelbonus>[0-9]+)"
     )
-    private val gardenVacuumLoreLinePattern by itemDisplayOverlaySubgroup.pattern(
-        "gardenvacuum.loreline",
+    private val gardenVacuumPattern by itemDisplayOverlaySubgroup.pattern(
+        "garden.vacuum.loreline",
         "§7Vacuum Bag: §6(?<amount>[0-9,]+) Pests?"
     )
-    private val masterSkullInternalNamePattern by itemDisplayOverlaySubgroup.pattern(
-        "masterskull.internalname",
+    private val masterSkullInternalPattern by itemDisplayOverlaySubgroup.pattern(
+        "master.skull.internal",
         "MASTER_SKULL_TIER_(?<tier>\\d)"
     )
-    private val dungeonBossHeadInternalNamePattern by itemDisplayOverlaySubgroup.pattern(
-        "dungeonbosshead.internalname",
+    private val dungeonBossHeadInternalPattern by itemDisplayOverlaySubgroup.pattern(
+        "dungeon.boss.head.internal",
         "(GOLD(EN)?|DIAMOND)_(?<dungeonBoss>\\w+)_HEAD"
     )
-    private val minionTierItemNamePattern by itemDisplayOverlaySubgroup.pattern(
-        "miniontier.itemname",
+    private val minionTierPattern by itemDisplayOverlaySubgroup.pattern(
+        "minion.tier.item",
         "(\\w+ Minion \\w+).*(?<!Recipes)\$"
     )
-    private val enchantedItemSackItemNamePattern by itemDisplayOverlaySubgroup.pattern(
-        "enchanteditemsack.itemname",
+    private val enchantedItemSackPattern by itemDisplayOverlaySubgroup.pattern(
+        "enchanted.itemsack.item",
         "Enchanted .*"
     )
-    private val kuudraKeyItemNamePattern by itemDisplayOverlaySubgroup.pattern(
-        "kuudrakey.itemname",
+    private val kuudraKeyPattern by itemDisplayOverlaySubgroup.pattern(
+        "kuudrakey.item",
         "([\\w ]+)?Kuudra Key"
     )
-    private val kuudraKeyInternalNamePattern by itemDisplayOverlaySubgroup.pattern(
-        "kuudrakey.internalname",
+    private val kuudraKeyInternalPattern by itemDisplayOverlaySubgroup.pattern(
+        "kuudrakey.internal",
         "KUUDRA_(?<tier>\\w+)_KEY"
     )
-    private val larvaHookLoreLinePattern by itemDisplayOverlaySubgroup.pattern(
+    private val larvaHookPattern by itemDisplayOverlaySubgroup.pattern(
         "larvahook.loreline",
         "§7§7You may harvest §6(?<amount>.).*"
     )
-    private val armadilloRarityLoreLinePattern by itemDisplayOverlaySubgroup.pattern(
-        "armadillorarity.loreline",
+    private val armadilloRarityPattern by itemDisplayOverlaySubgroup.pattern(
+        "armadillo.rarity.loreline",
         "(§.)*(?<rarity>COMMON|UNCOMMON|RARE|EPIC|LEGENDARY)"
     )
-    private val beastmasterCrestInternalNamePattern by itemDisplayOverlaySubgroup.pattern(
-        "beastmastercrest.internalname",
+    private val beastmasterInternalPattern by itemDisplayOverlaySubgroup.pattern(
+        "beastmaster.internal",
         "BEASTMASTER_CREST_\\w*"
     )
-    private val beastmasterCrestKillsProgressLoreLinePattern by itemDisplayOverlaySubgroup.pattern(
-        "beastmastercrestkillsprogress.loreline",
+    private val beastmasterKillsPattern by itemDisplayOverlaySubgroup.pattern(
+        "beastmasterkills.loreline",
         "(§.)*Your kills: (§.)*(?<progress>[\\w,]+)(§.)*/(?<total>[\\w,]+)"
     )
-    private val campfireTalismanTierInternalNamePattern by itemDisplayOverlaySubgroup.pattern(
-        "campfiretalismantier.internalname",
+    private val campfireInternalPattern by itemDisplayOverlaySubgroup.pattern(
+        "campfire.internal",
         "CAMPFIRE_TALISMAN_(?<tier>\\d+)"
     )
-    private val isNotAuctionHouseChestNamePattern by itemDisplayOverlaySubgroup.pattern(
-        "isnotauctionhouse.chestname",
+    private val notAHChestPattern by itemDisplayOverlaySubgroup.pattern(
+        "not.ah.chest",
         "^(?:(?!Auction).)*\$"
     )
-    private val internalizedSoulflowLoreLinePattern by itemDisplayOverlaySubgroup.pattern(
-        "internalizedsoulflow.loreline",
+    private val internalizedSoulflowPattern by itemDisplayOverlaySubgroup.pattern(
+        "internalized.soulflow.loreline",
         "(§.)*Internalized: (§.)*(?<leading>[0-9]+)(?<trailing>,[0-9]{0,3})⸎ Soulflow"
     )
-    private val storageChestInternalNamePattern by itemDisplayOverlaySubgroup.pattern(
-        "storagechest.internalname",
+    private val storageChestInternalPattern by itemDisplayOverlaySubgroup.pattern(
+        "storage.chest.internal",
         ".*_ENCHANTED_CHEST"
     )
-    private val storageChestItemNamePattern by itemDisplayOverlaySubgroup.pattern(
-        "storagechest.itemname",
+    private val storageChestPattern by itemDisplayOverlaySubgroup.pattern(
+        "storagechest.item",
         ".* Storage"
     )
-    private val personalCompactorDeletorChestNamePattern by itemDisplayOverlaySubgroup.pattern(
-        "personalcompactordeletor.chestname",
+    private val personalComDelChestPattern by itemDisplayOverlaySubgroup.pattern(
+        "personal.comdel.chest",
         "Personal (Compactor .*|Deletor .*)"
     )
-    private val personalCompactorDeletorEnabledItemNamePattern by itemDisplayOverlaySubgroup.pattern(
-        "personalcompactordeletorenabled.itemname",
+    private val personalComDelEnabledPattern by itemDisplayOverlaySubgroup.pattern(
+        "personal.comdel.enabled.item",
         "(§.)*(Compactor|Deletor) Currently O(?<toggle>FF|N)!"
     )
-    private val personalCompactorDeletorInternalNamePattern by itemDisplayOverlaySubgroup.pattern(
-        "personalcompactordeletor.internalname",
+    private val personalComDelInternalPattern by itemDisplayOverlaySubgroup.pattern(
+        "personal.comdel.internal",
         "PERSONAL_(COMPACTOR|DELETOR)_(?<thousands>\\w+)(000)"
     )
-    private val personalCompactorDeletorItemNamePattern by itemDisplayOverlaySubgroup.pattern(
-        "personalcompactordeletor.itemname",
+    private val personalComDelPattern by itemDisplayOverlaySubgroup.pattern(
+        "personal.comdel.item",
         "Personal (Compactor|Deletor) (?<thousands>\\w+)(000)"
     )
-    private val abiphoneInternalNamePattern by itemDisplayOverlaySubgroup.pattern(
-        "abiphone.internalname",
+    private val abiphoneInternalPattern by itemDisplayOverlaySubgroup.pattern(
+        "abiphone.internal",
         "ABI(?:NGO)?PHONE_?.*"
     )
-    private val doesNotIncludeDungeonStarsItemNamePattern by itemDisplayOverlaySubgroup.pattern(
-        "doesnotincludedungeonstars.itemname",
+    private val noStarsPattern by itemDisplayOverlaySubgroup.pattern(
+        "nostars.item",
         "^(?:(?!✪).)*\$"
     )
-    private val soulflowAccessoryInternalNamePattern by itemDisplayOverlaySubgroup.pattern(
-        "soulflowaccessory.internalname",
+    private val soulflowInternalPattern by itemDisplayOverlaySubgroup.pattern(
+        "soulflow.internal",
         "SOULFLOW_.*"
     )
-    private val isTradingWithPlayerChestNamePattern by itemDisplayOverlaySubgroup.pattern(
-        "isinplayertradingmenu.chestname",
+    private val tradingWithPlayerChestPattern by itemDisplayOverlaySubgroup.pattern(
+        "trading.with.player.chest",
         "(You([\\t ]){2,}(?<theirName>[a-zA-Z0-9_]{2,16}))"
     )
-    private val isInAHOrNPCShopLoreLinePattern by itemDisplayOverlaySubgroup.pattern(
-        "isinahornpcshop.loreline",
+    private val inAHOrNPCShopPattern by itemDisplayOverlaySubgroup.pattern(
+        "inah.or.npcshop.loreline",
         "(((§.)*Ends in: (§.)*(?<time>([\\d.,]+[ywdhms]+( )?)+))|Click to [tT]rade.)"
     )
 
@@ -261,10 +261,10 @@ object ItemDisplayOverlayFeatures : AbstractStackSize() {
     }
 
     // <editor-fold desc="Stack Size Implementations">
-    private fun isMasterStar(internalName: NEUInternalName): Boolean = MASTER_STAR_TIER.isSelected() && masterStarInternalNamePattern.matches(internalName)
+    private fun isMasterStar(internalName: NEUInternalName): Boolean = MASTER_STAR_TIER.isSelected() && masterStarInternalPattern.matches(internalName)
     private fun getMasterStarTip(internalName: NEUInternalName): String {
         var tier = ""
-        masterStarInternalNamePattern.matchMatcher(internalName.asString()) { tier = group("tier") }
+        masterStarInternalPattern.matchMatcher(internalName.asString()) { tier = group("tier") }
         return when (tier) {
             "FIRST" -> "1"
             "SECOND" -> "2"
@@ -275,15 +275,15 @@ object ItemDisplayOverlayFeatures : AbstractStackSize() {
         }
     }
 
-    private fun isMasterSkull(internalName: NEUInternalName): Boolean = MASTER_SKULL_TIER.isSelected() && masterSkullInternalNamePattern.matches(internalName)
+    private fun isMasterSkull(internalName: NEUInternalName): Boolean = MASTER_SKULL_TIER.isSelected() && masterSkullInternalPattern.matches(internalName)
     private fun getMasterSkullTip(internalName: NEUInternalName): String {
-        masterSkullInternalNamePattern.matchMatcher(internalName.asString()) { return group("tier") }
+        masterSkullInternalPattern.matchMatcher(internalName.asString()) { return group("tier") }
         return ""
     }
 
-    private fun isDungeonHead(internalName: NEUInternalName): Boolean = DUNGEON_HEAD_FLOOR_NUMBER.isSelected() && dungeonBossHeadInternalNamePattern.matches(internalName)
+    private fun isDungeonHead(internalName: NEUInternalName): Boolean = DUNGEON_HEAD_FLOOR_NUMBER.isSelected() && dungeonBossHeadInternalPattern.matches(internalName)
     private fun getDungeonHeadTip(internalName: NEUInternalName): String {
-        dungeonBossHeadInternalNamePattern.matchMatcher(internalName.asString()) {
+        dungeonBossHeadInternalPattern.matchMatcher(internalName.asString()) {
             return when (group("dungeonBoss")) {
                 "BONZO" -> "1"
                 "SCARF" -> "2"
@@ -310,7 +310,7 @@ object ItemDisplayOverlayFeatures : AbstractStackSize() {
 
     private fun isPet(itemName: String, chestName: String): Boolean = PET_LEVEL.isSelected() && !chestName.endsWith("Sea Creature Guide") && ItemUtils.isPet(itemName)
     private fun getPetTip(itemName: String): String {
-        petLevelItemNamePattern.matchMatcher(itemName) {
+        petLevelPattern.matchMatcher(itemName) {
             val rawLevel = group("level")
             val level = rawLevel.toIntOrNull()
                 ?: throw IllegalStateException("pet level not found for item name '$itemName'")
@@ -321,7 +321,7 @@ object ItemDisplayOverlayFeatures : AbstractStackSize() {
         return ""
     }
 
-    private fun isMinionTier(itemName: String): Boolean = MINION_TIER.isSelected() && minionTierItemNamePattern.matches(itemName)
+    private fun isMinionTier(itemName: String): Boolean = MINION_TIER.isSelected() && minionTierPattern.matches(itemName)
     private fun getMinionTierTip(itemName: String, lore: List<String>): String {
         if (lore.any { (it == ("§7Place this minion and it will")) }) {
             return "${itemName.split(" ").last().romanToDecimal()}"
@@ -332,7 +332,7 @@ object ItemDisplayOverlayFeatures : AbstractStackSize() {
     private fun isSack(item: ItemStack): Boolean = config.displaySackName && ItemUtils.isSack(item)
     private fun getSackTip(itemName: String): String {
         var colorCode = ""
-        enchantedItemSackItemNamePattern.matchMatcher(itemName) { colorCode = "§5" }
+        enchantedItemSackPattern.matchMatcher(itemName) { colorCode = "§5" }
         return "$colorCode${grabSackName(itemName).substring(0, 2)}"
     }
     private fun grabSackName(name: String): String {
@@ -343,9 +343,9 @@ object ItemDisplayOverlayFeatures : AbstractStackSize() {
         return text
     }
 
-    private fun isKuudraKey(internalName: NEUInternalName, itemName: String): Boolean = KUUDRA_KEY.isSelected() && kuudraKeyInternalNamePattern.matches(internalName) && kuudraKeyItemNamePattern.matches(itemName)
+    private fun isKuudraKey(internalName: NEUInternalName, itemName: String): Boolean = KUUDRA_KEY.isSelected() && kuudraKeyInternalPattern.matches(internalName) && kuudraKeyPattern.matches(itemName)
     private fun getKuudraKeyTip(internalName: NEUInternalName): String {
-        kuudraKeyInternalNamePattern.matchMatcher(internalName.asString()) {
+        kuudraKeyInternalPattern.matchMatcher(internalName.asString()) {
             return when (group("tier")) {
                 "TIER" -> "§a1"
                 "HOT_TIER" -> "§22"
@@ -375,7 +375,7 @@ object ItemDisplayOverlayFeatures : AbstractStackSize() {
     private fun isLarvaHook(internalName: NEUInternalName): Boolean = LARVA_HOOK.isSelected() && internalName == larvaHookInternalName
     private fun getLarvaHookTip(lore: List<String>): String {
         for (line in lore) {
-            larvaHookLoreLinePattern.matchMatcher(line) {
+            larvaHookPattern.matchMatcher(line) {
                 val amount = group("amount").toInt()
                 return when {
                     amount > 4 -> "§a$amount"
@@ -398,10 +398,10 @@ object ItemDisplayOverlayFeatures : AbstractStackSize() {
         }
     }
 
-    private fun isVacuumGardenAndIsOwnVaccum(item: ItemStack, lore: List<String>, chestName: String): Boolean = VACUUM_GARDEN.isSelected() && item.getInternalNameOrNull() in PestAPI.vacuumVariants && lore.none { isInAHOrNPCShopLoreLinePattern.matches(it) } && !(isTradingWithPlayerChestNamePattern.matches(chestName))
+    private fun isVacuumGardenAndIsOwnVaccum(item: ItemStack, lore: List<String>, chestName: String): Boolean = VACUUM_GARDEN.isSelected() && item.getInternalNameOrNull() in PestAPI.vacuumVariants && lore.none { inAHOrNPCShopPattern.matches(it) } && !(tradingWithPlayerChestPattern.matches(chestName))
     private fun getVacuumGardenTip(lore: List<String>): String {
         for (line in lore) {
-            gardenVacuumLoreLinePattern.matchMatcher(line) {
+            gardenVacuumPattern.matchMatcher(line) {
                 val pests = group("amount").formatNumber()
                 return if (config.vacuumBagCap) {
                     if (pests > 39) "§640+" else "$pests"
@@ -426,7 +426,7 @@ object ItemDisplayOverlayFeatures : AbstractStackSize() {
     private fun isLegacyBottleOfJyrre(internalName: NEUInternalName): Boolean = BOTTLE_OF_JYRRE.isSelected() && internalName == legacyBottleOfJyrreInternalName
     private fun getLegacyBottleOfJyrreTip(lore: List<String>): String {
         for (line in lore) {
-            legacyBottleOfJerryIntelBonusLoreLinePattern.matchMatcher(line) { return "§2${group("intelbonus")}" } //2 is a darker shade of color code a
+            legacyJerryIntelPattern.matchMatcher(line) { return "§2${group("intelbonus")}" } //2 is a darker shade of color code a
         }
         return ""
     }
@@ -443,10 +443,10 @@ object ItemDisplayOverlayFeatures : AbstractStackSize() {
         return ""
     }
 
-    private fun isSoulflowItem(internalName: NEUInternalName): Boolean = SOULFLOW.isSelected() && soulflowAccessoryInternalNamePattern.matches(internalName)
+    private fun isSoulflowItem(internalName: NEUInternalName): Boolean = SOULFLOW.isSelected() && soulflowInternalPattern.matches(internalName)
     private fun getSoulflowTip(item: ItemStack, chestName: String): String {
-        isNotAuctionHouseChestNamePattern.matchMatcher(chestName) {
-            internalizedSoulflowLoreLinePattern.matchMatcher(item.getLore().first()) {
+        notAHChestPattern.matchMatcher(chestName) {
+            internalizedSoulflowPattern.matchMatcher(item.getLore().first()) {
                 return NumberUtil.format("${group("leading")}${group("trailing")}".formatNumber())
             }
         }
@@ -471,7 +471,7 @@ object ItemDisplayOverlayFeatures : AbstractStackSize() {
         val blocksWalked = item.getPrehistoricEggBlocksWalked() ?: return ""
         var rarity = ""
         for (line in lore) {
-            armadilloRarityLoreLinePattern.matchMatcher(line) { rarity = group("rarity") }
+            armadilloRarityPattern.matchMatcher(line) { rarity = group("rarity") }
         }
         val threshold = when (rarity) {
             "COMMMON" -> 4_000F
@@ -493,9 +493,9 @@ object ItemDisplayOverlayFeatures : AbstractStackSize() {
         return if (threshold != 1F) { "$colorCode${((blocksWalked.toFloat() / threshold) * 100).toInt()}" } else ""
     }
 
-    private fun isCampfireAccessory(internalName: NEUInternalName): Boolean = CAMPFIRE.isSelected() && campfireTalismanTierInternalNamePattern.matches(internalName)
+    private fun isCampfireAccessory(internalName: NEUInternalName): Boolean = CAMPFIRE.isSelected() && campfireInternalPattern.matches(internalName)
     private fun getCampfireTip(internalName: NEUInternalName): String {
-        campfireTalismanTierInternalNamePattern.matchMatcher(internalName.asString()) { return "${(group("tier").toInt() + 1)}" }
+        campfireInternalPattern.matchMatcher(internalName.asString()) { return "${(group("tier").toInt() + 1)}" }
         return ""
     }
 
@@ -504,7 +504,7 @@ object ItemDisplayOverlayFeatures : AbstractStackSize() {
         item.getFruitBowlNames().let { return "${it?.size}" }
     }
 
-    private fun isBeastmaster(internalName: NEUInternalName): Boolean = BEASTMASTER.isSelected() && beastmasterCrestInternalNamePattern.matches(internalName)
+    private fun isBeastmaster(internalName: NEUInternalName): Boolean = BEASTMASTER.isSelected() && beastmasterInternalPattern.matches(internalName)
     private fun getBeastmasterTip(lore: List<String>): String {
         for (line in lore) {
             //§7Your kills: §21,581§8/2,500
@@ -513,7 +513,7 @@ object ItemDisplayOverlayFeatures : AbstractStackSize() {
                 val denom = line.removeColor().replace("Your kills: ", "").replace(",", "").split("/").last()
                 return (((num.toFloat() / denom.toFloat()) * 100).toString().take(2))
             } */
-            beastmasterCrestKillsProgressLoreLinePattern.matchMatcher(line) {
+            beastmasterKillsPattern.matchMatcher(line) {
                 return "${((group("progress").formatNumber().toFloat() / group("total").formatNumber().toFloat()) * 100)}".take(2)
             }
         }
@@ -528,14 +528,14 @@ object ItemDisplayOverlayFeatures : AbstractStackSize() {
     private fun isShredder(internalName: NEUInternalName): Boolean = SHREDDER.isSelected() && internalName == shredderInternalName
     private fun getShredderTip(lore: List<String>): String {
         for (line in lore) {
-            shredderBonusDamageLoreLinePattern.matchMatcher(line) {
+            shredderDamagePattern.matchMatcher(line) {
                 return group("dmgbonus")
             }
         }
         return ""
     }
 
-    private fun isMinionStorage(item: ItemStack): Boolean = STORAGE_TIER.isSelected() && storageChestInternalNamePattern.matches(item.getInternalName()) && storageChestItemNamePattern.matches(item.cleanName())
+    private fun isMinionStorage(item: ItemStack): Boolean = STORAGE_TIER.isSelected() && storageChestInternalPattern.matches(item.getInternalName()) && storageChestPattern.matches(item.cleanName())
     private fun getMinionStorageTip(itemName: String): String {
         return when (itemName) {
             ("Small Storage") -> "§f3"
@@ -547,17 +547,17 @@ object ItemDisplayOverlayFeatures : AbstractStackSize() {
         }
     }
 
-    private fun isCompactorOrDeletorItem(internalName: NEUInternalName, itemName: String): Boolean = COMPACTOR_DELETOR.isSelected() && personalCompactorDeletorInternalNamePattern.matches(internalName) && personalCompactorDeletorItemNamePattern.matches(itemName)
+    private fun isCompactorOrDeletorItem(internalName: NEUInternalName, itemName: String): Boolean = COMPACTOR_DELETOR.isSelected() && personalComDelInternalPattern.matches(internalName) && personalComDelPattern.matches(itemName)
     private fun getCompactorOrDeletorItemTip(itemName: String): String {
-        personalCompactorDeletorItemNamePattern.matchMatcher(itemName) {
+        personalComDelPattern.matchMatcher(itemName) {
             return "${group("thousands")}K"
         }
         return ""
     }
 
-    private fun isCompactorOrDeletorChest(chestName: String, itemName: String): Boolean = COMPACTOR_DELETOR.isSelected() && personalCompactorDeletorChestNamePattern.matches(chestName) && personalCompactorDeletorEnabledItemNamePattern.matches(itemName)
+    private fun isCompactorOrDeletorChest(chestName: String, itemName: String): Boolean = COMPACTOR_DELETOR.isSelected() && personalComDelChestPattern.matches(chestName) && personalComDelEnabledPattern.matches(itemName)
     private fun getCompactorOrDeletorStatusTip(itemName: String): String {
-        personalCompactorDeletorEnabledItemNamePattern.matchMatcher(itemName) {
+        personalComDelEnabledPattern.matchMatcher(itemName) {
             return when (group("toggle")) {
                 "N" -> greenCheckmark
                 else -> bigRedCross
@@ -566,7 +566,7 @@ object ItemDisplayOverlayFeatures : AbstractStackSize() {
         return ""
     }
 
-    private fun isAbiphone(internalName: NEUInternalName): Boolean = ABIPHONE.isSelected() && abiphoneInternalNamePattern.matches(internalName)
+    private fun isAbiphone(internalName: NEUInternalName): Boolean = ABIPHONE.isSelected() && abiphoneInternalPattern.matches(internalName)
     private fun getAbiphoneTip(internalName: NEUInternalName): String {
         return when (internalName.asString()) {
             "ABIPHONE_X_PLUS" -> "X"
@@ -588,7 +588,7 @@ object ItemDisplayOverlayFeatures : AbstractStackSize() {
         }
     }
 
-    private fun isQualifiedForStacking(itemName: String): Boolean = STACKING_ENCHANTMENT.isSelected() && doesNotIncludeDungeonStarsItemNamePattern.matches(itemName)
+    private fun isQualifiedForStacking(itemName: String): Boolean = STACKING_ENCHANTMENT.isSelected() && noStarsPattern.matches(itemName)
     private fun getStackingEnchantmentTierTip(item: ItemStack): String {
         item.getEnchantments().let {
             for (enchant in tieredEnchants) {
