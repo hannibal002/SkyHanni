@@ -60,9 +60,15 @@ object FarmingFortuneDisplay {
         "armorability",
         "Tiered Bonus: .* [(](?<pieces>.*)/4[)]"
     )
-
-//     private val tooltipFortunePattern =
-//         "^§7Farming Fortune: §a\\+([\\d.]+)(?: §2\\(\\+\\d\\))?(?: §9\\(\\+(\\d+)\\))?$".toRegex()
+    private val lotusAbilityPattern by patternGroup.pattern(
+        "lotusability",
+        "§7Piece Bonus: §6+(?<bonus>.*)☘"
+    )
+    // todo make pattern work on Melon and Cropie armor
+    private val armorAbilityFortunePattern by patternGroup.pattern(
+        "armorabilityfortune",
+        "§7.*§7Grants §6(?<bonus>.*)☘.*"
+    )
 
     private var display = emptyList<List<Any>>()
     private var accessoryProgressDisplay = ""
@@ -260,9 +266,6 @@ object FarmingFortuneDisplay {
     } ?: 0.0
 
     fun getAbilityFortune(internalName: NEUInternalName, lore: List<String>): Double {
-        val lotusAbilityPattern = "§7Piece Bonus: §6+(?<bonus>.*)☘".toPattern()
-        // todo make it work on Melon and Cropie armor
-        val armorAbilityFortune = "§7.*§7Grants §6(?<bonus>.*)☘.*".toPattern()
         var pieces = 0
 
         lore.forEach { line ->
@@ -275,7 +278,7 @@ object FarmingFortuneDisplay {
                 pieces = group("pieces").toInt()
             }
 
-            armorAbilityFortune.matchMatcher(line) {
+            armorAbilityFortunePattern.matchMatcher(line) {
                 return if (pieces < 2) 0.0 else group("bonus").toDouble() / pieces
             }
         }
