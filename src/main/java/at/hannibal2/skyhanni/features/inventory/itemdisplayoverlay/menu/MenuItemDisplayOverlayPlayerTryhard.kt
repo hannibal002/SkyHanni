@@ -10,6 +10,7 @@ import at.hannibal2.skyhanni.utils.NumberUtil
 import at.hannibal2.skyhanni.utils.NumberUtil.formatNumber
 import at.hannibal2.skyhanni.utils.NumberUtil.romanToDecimalIfNecessary
 import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
+import at.hannibal2.skyhanni.utils.StringUtils.matches
 import at.hannibal2.skyhanni.utils.TimeUtils.format
 import at.hannibal2.skyhanni.utils.TimeUtils.getDuration
 import io.github.moulberry.notenoughupdates.miscgui.CalendarOverlay
@@ -120,7 +121,7 @@ class MenuItemDisplayOverlayPlayerTryhard : AbstractMenuStackSize() {
     )
     private val currentlyActiveEffectsPattern by playerTryhardSubgroup.pattern(
         "cookie.currentlyactiveeffects.loreline",
-        "(§.)*Currently Active: (§.)*(?<effects>[\\w]+)"
+        "(?:§.)*Currently Active: (?:§.)*(?<effects>[\\w]+)"
     )
     private val upgradesTuningChestPattern by playerTryhardSubgroup.pattern(
         "maxwell.upgrades.tuning.chestname",
@@ -140,7 +141,39 @@ class MenuItemDisplayOverlayPlayerTryhard : AbstractMenuStackSize() {
     )
     private val achievementPointsPattern by playerTryhardSubgroup.pattern(
         "achievement.points.loreline",
-        "(§.)*Points: (§.)*([\\w,]+)(§.)*\\/(§.)*([\\w,]+) (§.)*\\((?<percent>[\\w]+)%(§.)*\\)"
+        "(§.)*Points: (§.)*([\\w,]+)(§.)*/(§.)*([\\w,]+) (§.)*\\((?<percent>\\w+)%(§.)*\\)"
+    )
+    private val bookshelfPowerPattern by playerTryhardSubgroup.pattern(
+        "bookshelf.power.loreline",
+        "(?:§.)*Bookshelf Power: (?:§.)*(?<power>\\d+)"
+    )
+    private val contributionsPattern by playerTryhardSubgroup.pattern(
+        "project.contributions.variantone.loreline",
+        "(?:§.)*You contributed to (?:§.)*(?<contribs>[\\d,.]+)(?: (?:§.)*of(?: (§.)*those(?:(§.)* projects.)?)?)?"
+    )
+    private val contributionsOtherPattern by playerTryhardSubgroup.pattern(
+        "project.contributions.varianttwo.loreline",
+        "(?:§.)*You made (?:§.)*(?<contribs>[\\d,.]+)(?: (?:§.)*contributions(?: (?:§.)*to(?: (§.)*this(?:(§.)* project.)?)?)?)?"
+    )
+    private val contributionsOtherOtherPattern by playerTryhardSubgroup.pattern(
+        "project.contributions.variantthree.loreline",
+        "(?:§.)*You made: (?:§.)*(?<contribs>[\\d,.]+)(?: contributions)?"
+    )
+    private val previousProjectsChestPattern by playerTryhardSubgroup.pattern(
+        "project.previous.chestname",
+        "Previous(?: \\S+)? Projects"
+    )
+    private val cityProjectItemPattern by playerTryhardSubgroup.pattern(
+        "project.contributions.city.project.itemname",
+        "City [pP]roject: [\\S ]+"
+    )
+    private val deliveriesPattern by playerTryhardSubgroup.pattern(
+        "island.management.deliveries.loreline",
+        "(?:§.)*You have (?<deliveryCount>[\\d,.]+) deliver(?:y|ies) available to(?: (?:§.)*collect\\.)?"
+    )
+    private val deliveriesItemPattern by playerTryhardSubgroup.pattern(
+        "island.management.deliveries.itemname",
+        ".* Deliveries"
     )
 
     @SubscribeEvent
@@ -181,6 +214,22 @@ class MenuItemDisplayOverlayPlayerTryhard : AbstractMenuStackSize() {
                     }
                 }
             }
+            ahBZCommunityChestPattern.matchMatcher(chestName) {
+                if (itemName.isNotEmpty() && lore.isNotEmpty()) {
+                    if (chestName == "Community Shop") {
+                        currentTabPattern.matchMatcher(lore.last()) {
+                            return "§a⬇"
+                        }
+                    }
+                    notAHBZChestPattern.matchMatcher(chestName) {
+                        if (lore.first() == ("§8Category")) {
+                            currentTabPattern.matchMatcher(lore.last()) {
+                                return "§a➡"
+                            }
+                        }
+                    }
+                }
+            }
         }
 
         if (stackSizeConfig.contains(StackSizeMenuConfig.PlayerTryhard.RNG_METER_ODDS)) {
@@ -214,21 +263,11 @@ class MenuItemDisplayOverlayPlayerTryhard : AbstractMenuStackSize() {
             }
         }
         
-        if (stackSizeConfig.contains(StackSizeMenuConfig.PlayerTryhard.SELECTED_TAB)) {
-            val lore = item.getLore()
-            ahBZCommunityChestPattern.matchMatcher(chestName) {
-                if (itemName.isNotEmpty() && lore.isNotEmpty()) {
-                    if (chestName == "Community Shop") {
-                        currentTabPattern.matchMatcher(lore.last()) {
-                            return "§a⬇"
-                        }
-                    }
-                    notAHBZChestPattern.matchMatcher(chestName) {
-                        if (lore.first() == ("§8Category")) {
-                            currentTabPattern.matchMatcher(lore.last()) {
-                                return "§a➡"
-                            }
-                        }
+        if (stackSizeConfig.contains(StackSizeMenuConfig.PlayerTryhard.BOOKSHELF_POWER)) {
+            if (chestName == "Enchant Item" && itemName == "Bookshelf Power") {
+                for (line in item.getLore()) {
+                    bookshelfPowerPattern.matchMatcher(line) {
+                        return group("power")
                     }
                 }
             }
@@ -278,18 +317,55 @@ class MenuItemDisplayOverlayPlayerTryhard : AbstractMenuStackSize() {
             }
         }
 
-        if (stackSizeConfig.contains(StackSizeMenuConfig.PlayerTryhard.BOOSTER_COOKIE_DURATION) && (item.getLore().isNotEmpty() && ((itemName == ("Booster Cookie")) && ((chestName.lowercase() == "skyblock menu") || (chestName == "Booster Cookie"))))) {
-            for (line in item.getLore()) {
-                boosterCookieDurationPattern.matchMatcher(line) {
-                    return getDuration(group("fullDuration")).format(maxUnits = 1)
+        if (stackSizeConfig.contains(StackSizeMenuConfig.PlayerTryhard.BOOSTER_COOKIE_POTION_EFFECTS)) {
+            if (item.getLore().isNotEmpty() && (itemName == "Booster Cookie" && ((chestName.lowercase() == "skyblock menu") || (chestName == "Booster Cookie")))) {
+                for (line in item.getLore()) {
+                    boosterCookieDurationPattern.matchMatcher(line) {
+                        return getDuration(group("fullDuration")).format(maxUnits = 1)
+                    }
+                }
+            }
+            if (itemName == ("Active Effects")) {
+                for (line in item.getLore()) {
+                    currentlyActiveEffectsPattern.matchMatcher(line) {
+                        return group("effects")
+                    }
                 }
             }
         }
 
-        if (stackSizeConfig.contains(StackSizeMenuConfig.PlayerTryhard.ACTIVE_POTION_COUNT) && (chestName == ("Your Equipment and Stats") && itemName == ("Active Effects"))) {
-            for (line in item.getLore()) {
-                currentlyActiveEffectsPattern.matchMatcher(line) {
-                    return group("effects")
+        if (stackSizeConfig.contains(StackSizeMenuConfig.PlayerTryhard.DELIVERIES_PROJECTS)) {
+            val lore = item.getLore()
+            if (chestName == "Deliveries") {
+                deliveriesItemPattern.matchMatcher(itemName) {
+                    for (line in lore) {
+                        deliveriesPattern.matchMatcher(line) {
+                            return "${group("deliveryCount").formatNumber()}"
+                        }
+                    }
+                }
+            }
+            if (chestName == "Community Shop") {
+                if (itemName == "Previous Projects") {
+                    for (line in lore) {
+                        contributionsPattern.matchMatcher(line) {
+                            return "${group("contribs").formatNumber()}"
+                        }
+                    }
+                }
+                if (lore.first() == "§8City Project") {
+                    for (line in lore) {
+                        contributionsOtherOtherPattern.matchMatcher(line) {
+                            return "${group("contribs").formatNumber()}"
+                        }
+                    }
+                }
+            }
+            if (previousProjectsChestPattern.matches(chestName) && cityProjectItemPattern.matches(itemName)) {
+                for (line in lore) {
+                    contributionsOtherPattern.matchMatcher(line) {
+                        return "${group("contribs").formatNumber()}"
+                    }
                 }
             }
         }
