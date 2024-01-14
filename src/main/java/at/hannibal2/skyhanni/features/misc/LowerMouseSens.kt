@@ -1,7 +1,6 @@
 package at.hannibal2.skyhanni.features.misc
 
 import at.hannibal2.skyhanni.SkyHanniMod
-import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.LorenzTickEvent
 import at.hannibal2.skyhanni.events.LorenzWorldChangeEvent
@@ -19,10 +18,9 @@ object LowerMouseSens {
 
     @SubscribeEvent
     fun onTick(event: LorenzTickEvent) {
-        if (!LorenzUtils.inSkyBlock) return
+        if (!GardenAPI.inGarden()) return
         if (isManualToggle) return
         if (!config.enabled) return
-        if (LorenzUtils.skyBlockIsland != IslandType.GARDEN) return
         if (isHoldingTool() && !isToggled) {
             toggleSens()
             isToggled = true
