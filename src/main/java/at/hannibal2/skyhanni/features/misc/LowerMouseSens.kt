@@ -46,12 +46,8 @@ object LowerMouseSens {
     private fun toggleSens() {
         gameSettings = Minecraft.getMinecraft().gameSettings ?: return
         if (!isToggled) {
-            SkyHanniMod.feature.storage.savedMouseloweredSensitivity = gameSettings!!.mouseSensitivity
-            val newSens = ((SkyHanniMod.feature.storage.savedMouseloweredSensitivity+(1F / 3F))/config.divisorSens)-(1F / 3F)
-            gameSettings!!.mouseSensitivity = newSens
-        } else {
-            gameSettings!!.mouseSensitivity = SkyHanniMod.feature.storage.savedMouseloweredSensitivity
-        }
+            lowerSensitivity()
+        } else restoreSensitivity()
     }
 
     private fun isHoldingTool(): Boolean {
@@ -65,14 +61,18 @@ object LowerMouseSens {
         }
         gameSettings = Minecraft.getMinecraft().gameSettings ?: return
         isManualToggle = !isManualToggle
-        if (isManualToggle) {
-            SkyHanniMod.feature.storage.savedMouseloweredSensitivity = gameSettings!!.mouseSensitivity
-            val newSens = ((SkyHanniMod.feature.storage.savedMouseloweredSensitivity+(1F / 3F))/config.divisorSens)-(1F / 3F)
-            gameSettings!!.mouseSensitivity = newSens
-            LorenzUtils.chat("§bMouse sensitivity is now lowered. Type /shmouselower to restore your sensitivity.")
-        } else {
-            gameSettings!!.mouseSensitivity = SkyHanniMod.feature.storage.savedMouseloweredSensitivity
-            LorenzUtils.chat("§bMouse sensitivity is now restored.")
-        }
+        if (isManualToggle) { lowerSensitivity()
+        } else restoreSensitivity(true)
+    }
+
+    private fun lowerSensitivity(showMessage: Boolean = false) {
+        SkyHanniMod.feature.storage.savedMouseloweredSensitivity = gameSettings!!.mouseSensitivity
+        val newSens = ((SkyHanniMod.feature.storage.savedMouseloweredSensitivity+(1F / 3F))/config.divisorSens)-(1F / 3F)
+        gameSettings!!.mouseSensitivity = newSens
+        if (showMessage) LorenzUtils.chat("§bMouse sensitivity is now lowered. Type /shmouselower to restore your sensitivity.")
+    }
+    private fun restoreSensitivity(showMessage: Boolean = false) {
+        gameSettings!!.mouseSensitivity = SkyHanniMod.feature.storage.savedMouseloweredSensitivity
+        if (showMessage) LorenzUtils.chat("§bMouse sensitivity is now restored.")
     }
 }
