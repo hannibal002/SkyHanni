@@ -1,0 +1,6 @@
+# Ban some packages from importing some other packages.
+# Lines starting with # are ignored
+# Every other line needs to be in the format
+# <directory without src/main/java prefix> <illegal import>
+
+at/hannibal2/skyhanni/ scala.
