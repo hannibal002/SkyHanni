@@ -203,7 +203,9 @@ class MenuItemDisplayOverlayPlayerTryhard : AbstractMenuStackSize() {
                         else return "$pageNum"
                     }
                 }
-                return notAHPagePattern.matchMatcher(line) { group("pagenumber") } ?: ""
+                notAHPagePattern.matchMatcher(line) {
+                    return group("pagenumber")
+                }
             }
             notAHAbiphoneChestPattern.matchMatcher(chestName) {
                 if (((itemName == ("Sort") && (item.item == Item.getItemFromBlock(Blocks.hopper)))) || ((itemName == ("Filter") && (item.item is ItemEnderEye)))) {
