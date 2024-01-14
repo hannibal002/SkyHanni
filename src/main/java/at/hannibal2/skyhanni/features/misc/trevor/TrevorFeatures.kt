@@ -98,6 +98,9 @@ object TrevorFeatures {
     @SubscribeEvent
     fun onChat(event: LorenzChatEvent) {
         if (!onFarmingIsland()) return
+
+        val formattedMessage = event.message.removeColor()
+
         if (event.message == "§aReturn to the Trapper soon to get a new animal to hunt!") {
             TrevorSolver.resetLocation()
             if (config.trapperMobDiedMessage) {
@@ -116,30 +119,26 @@ object TrevorFeatures {
             TrevorSolver.mobLocation = CurrentMobArea.NONE
         }
 
-        var matcher = trapperPattern.matcher(event.message.removeColor())
-        if (matcher.matches()) {
+        trapperPattern.matchMatcher(formattedMessage) {
             timeUntilNextReady = if (GardenCropSpeed.finneganPerkActive()) 16 else 21
             currentStatus = TrapperStatus.ACTIVE
             currentLabel = "§cActive Quest"
             trapperReady = false
-            TrevorTracker.startQuest(matcher)
+            TrevorTracker.startQuest(this)
             updateTrapper()
             lastChatPromptTime = SimpleTimeMark.farPast()
         }
 
-        matcher = talbotPatternAbove.matcher(event.message.removeColor())
-        if (matcher.matches()) {
-            val height = matcher.group("height").toInt()
+        talbotPatternAbove.matchMatcher(formattedMessage) {
+            val height = group("height").toInt()
             TrevorSolver.findMobHeight(height, true)
         }
-
-        matcher = talbotPatternBelow.matcher(event.message.removeColor())
-        if (matcher.matches()) {
-            val height = matcher.group("height").toInt()
+        talbotPatternBelow.matchMatcher(formattedMessage) {
+            val height = group("height").toInt()
             TrevorSolver.findMobHeight(height, false)
         }
 
-        if (event.message.removeColor() == "[NPC] Trevor: You will have 10 minutes to find the mob from when you accept the task.") {
+        if (formattedMessage == "[NPC] Trevor: You will have 10 minutes to find the mob from when you accept the task.") {
             teleportBlock = SimpleTimeMark.now()
         }
 

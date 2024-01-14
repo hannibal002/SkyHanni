@@ -8,6 +8,7 @@ import at.hannibal2.skyhanni.utils.SimpleTimeMark.Companion.asTimeMark
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.cachedData
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getEnchantments
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.isRecombobulated
+import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.StringUtils.matches
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import com.google.gson.GsonBuilder
@@ -263,18 +264,17 @@ object ItemUtils {
             return itemAmountCache[input]!!
         }
 
-        var matcher = UtilsPatterns.amountFrontPattern.matcher(input)
-        if (matcher.matches()) {
-            val itemName = matcher.group("name")
+        UtilsPatterns.amountFrontPattern.matchMatcher(input) {
+            val itemName = group("name")
             if (!itemName.contains("§8x")) {
-                return makePair(input, itemName.trim(), matcher)
+                return makePair(input, itemName.trim(), this)
             }
         }
 
         var string = input.trim()
         val color = string.substring(0, 2)
         string = string.substring(2)
-        matcher = UtilsPatterns.amountBehindPattern.matcher(string)
+        val matcher = UtilsPatterns.amountBehindPattern.matcher(string)
         if (!matcher.matches()) {
             println("")
             println("input: '$input'")

@@ -10,6 +10,7 @@ import at.hannibal2.skyhanni.utils.LorenzUtils.addAsSingletonList
 import at.hannibal2.skyhanni.utils.LorenzUtils.editCopy
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.RenderUtils.renderStringsAndItems
+import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import java.util.regex.Matcher
@@ -81,16 +82,15 @@ object TrevorTracker {
         if (!TrevorFeatures.onFarmingIsland()) return
         val storage = ProfileStorageData.profileSpecific?.trapperData ?: return
 
-        var matcher = selfKillMobPattern.matcher(event.message)
-        if (matcher.matches()) {
-            val pelts = matcher.group("pelts").toInt()
+        selfKillMobPattern.matchMatcher(event.message) {
+            val pelts = group("pelts").toInt()
             storage.peltsGained += pelts
             storage.selfKillingAnimals += 1
             update()
         }
-        matcher = killMobPattern.matcher(event.message)
-        if (matcher.matches()) {
-            val pelts = matcher.group("pelts").toInt()
+
+        killMobPattern.matchMatcher(event.message) {
+            val pelts = group("pelts").toInt()
             storage.peltsGained += pelts
             storage.killedAnimals += 1
             update()
