@@ -15,7 +15,7 @@ object ShaderManager {
 
     /**
      * For any future shaders add the object instance in this enum and
-     * in the when expression
+     * in the when-expression
      */
     enum class Shaders(val shader: Shader) {
         CHROMA(ChromaShader.INSTANCE);

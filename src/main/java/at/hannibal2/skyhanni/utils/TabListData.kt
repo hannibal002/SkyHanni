@@ -7,7 +7,9 @@ import at.hannibal2.skyhanni.mixins.hooks.tabListGuard
 import at.hannibal2.skyhanni.mixins.transformers.AccessorGuiPlayerTabOverlay
 import at.hannibal2.skyhanni.utils.LorenzUtils.conditionalTransform
 import at.hannibal2.skyhanni.utils.LorenzUtils.transformIf
+import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
+import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import com.google.common.collect.ComparisonChain
 import com.google.common.collect.Ordering
 import kotlinx.coroutines.launch
@@ -19,10 +21,12 @@ import net.minecraftforge.fml.relauncher.Side
 import net.minecraftforge.fml.relauncher.SideOnly
 
 class TabListData {
+    private val islandNamePattern by RepoPattern.pattern("data.tablist.islandname", "(?:§.)*(Area|Dungeon): (?:§.)*(?<island>.*)")
 
     companion object {
         private var cache = emptyList<String>()
         private var debugCache: List<String>? = null
+        var fullyLoaded = false
 
         // TODO replace with TabListUpdateEvent
         fun getTabList() = debugCache ?: cache
@@ -102,5 +106,16 @@ class TabListData {
             cache = tabList
             TabListUpdateEvent(getTabList()).postAndCatch()
         }
+    }
+
+    @SubscribeEvent
+    fun onTabListUpdate(event: TabListUpdateEvent) {
+        for (line in event.tabList) {
+            islandNamePattern.matchMatcher(line) {
+                fullyLoaded = true
+                return
+            }
+        }
+        fullyLoaded = false
     }
 }

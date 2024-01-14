@@ -1,5 +1,7 @@
 package at.hannibal2.skyhanni.config;
 
+import at.hannibal2.skyhanni.data.ArrowType;
+import at.hannibal2.skyhanni.data.FameRank;
 import at.hannibal2.skyhanni.data.model.ComposterUpgrade;
 import at.hannibal2.skyhanni.features.bingo.card.goals.BingoGoal;
 import at.hannibal2.skyhanni.features.combat.endernodetracker.EnderNodeTracker;
@@ -28,8 +30,6 @@ import at.hannibal2.skyhanni.utils.LorenzVec;
 import at.hannibal2.skyhanni.utils.NEUInternalName;
 import at.hannibal2.skyhanni.utils.tracker.SkyHanniTracker;
 import com.google.gson.annotations.Expose;
-import net.minecraft.item.ItemStack;
-
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -37,6 +37,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
+import net.minecraft.item.ItemStack;
 
 public class Storage {
 
@@ -119,6 +120,42 @@ public class Storage {
         public String currentPet = "";
 
         @Expose
+        public MaxwellPowerStorage maxwell = new MaxwellPowerStorage();
+
+        public static class MaxwellPowerStorage {
+            @Expose
+            public String currentPower = null;
+
+            @Expose
+            public int magicalPower = -1;
+        }
+
+        @Expose
+        public ArrowsStorage arrows = new ArrowsStorage();
+
+        public static class ArrowsStorage {
+            @Expose
+            public String currentArrow = null;
+
+            @Expose
+            public Map<String, Float> arrowAmount = new HashMap<>();
+        }
+
+        @Expose
+        public BitsStorage bits = new BitsStorage();
+
+        public static class BitsStorage {
+            @Expose
+            public int bits = -1;
+
+            @Expose
+            public FameRank currentFameRank = null;
+
+            @Expose
+            public int bitsToClaim = -1;
+        }
+
+        @Expose
         public Map<LorenzVec, MinionConfig> minions = new HashMap<>();
 
         public static class MinionConfig {
@@ -132,9 +169,9 @@ public class Storage {
             @Override
             public String toString() {
                 return "MinionConfig{" +
-                        "displayName='" + displayName + '\'' +
-                        ", lastClicked=" + lastClicked +
-                        '}';
+                    "displayName='" + displayName + '\'' +
+                    ", lastClicked=" + lastClicked +
+                    '}';
             }
         }
 
@@ -389,11 +426,11 @@ public class Storage {
             @Override
             public String toString() {
                 return "SlayerRngMeterStorage{" +
-                        "currentMeter=" + currentMeter +
-                        ", gainPerBoss=" + gainPerBoss +
-                        ", goalNeeded=" + goalNeeded +
-                        ", itemGoal='" + itemGoal + '\'' +
-                        '}';
+                    "currentMeter=" + currentMeter +
+                    ", gainPerBoss=" + gainPerBoss +
+                    ", goalNeeded=" + goalNeeded +
+                    ", itemGoal='" + itemGoal + '\'' +
+                    '}';
             }
         }
 
