@@ -22,7 +22,7 @@ class MenuItemDisplayOverlayPlayerAdvanced : AbstractMenuStackSize() {
     
     private val dojoGradePattern by playerAdvancedSubgroup.pattern(
         "dojo.grade.loreline",
-        ".*(§[7|6])Your Rank: (§.)(?<grade>[A-Z]).*"
+         ".*(§[76])Your Rank: (§.)(?<grade>[A-Z]).*"
     )
     private val statBreakdownPattern by playerAdvancedSubgroup.pattern(
         "stat.breakdown.itemname",
