@@ -7,9 +7,11 @@ import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.LorenzKeyPressEvent
 import at.hannibal2.skyhanni.test.SkyHanniDebugsAndTests
 import at.hannibal2.skyhanni.utils.LorenzUtils
+import at.hannibal2.skyhanni.utils.LorenzUtils.getPropertiesWithType
 import at.hannibal2.skyhanni.utils.LorenzUtils.isRancherSign
 import at.hannibal2.skyhanni.utils.NEUItems
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
+import io.github.moulberry.notenoughupdates.itemeditor.GuiElementTextField
 import io.github.moulberry.notenoughupdates.profileviewer.GuiProfileViewer
 import net.minecraft.client.Minecraft
 import net.minecraft.client.gui.inventory.GuiChest
@@ -51,6 +53,7 @@ class GuiEditManager {
     }
 
     companion object {
+
         var currentPositions = mutableMapOf<String, Position>()
         private var latestPositions = mapOf<String, Position>()
         private var currentBorderSize = mutableMapOf<String, Pair<Int, Int>>()
@@ -77,8 +80,8 @@ class GuiEditManager {
                 lastHotkeyReminded = SimpleTimeMark.now()
                 LorenzUtils.chat(
                     "§eTo edit hidden GUI elements:\n" +
-                            " §7- §e1. Set a key in /sh edit.\n" +
-                            " §7- §e2. Click that key while the GUI element is visible."
+                        " §7- §e1. Set a key in /sh edit.\n" +
+                        " §7- §e2. Click that key while the GUI element is visible."
                 )
             }
         }
@@ -112,7 +115,8 @@ class GuiEditManager {
 
         fun Position.getAbsY() = getAbsY0(getDummySize(true).y)
 
-        fun GuiProfileViewer.anyTextBoxFocused() = this.playerNameTextField.focus || this.inventoryTextField.focus || this.killDeathSearchTextField.focus
+        fun GuiProfileViewer.anyTextBoxFocused() =
+            this.getPropertiesWithType<GuiElementTextField>().any{it.focus}
     }
 }
 
