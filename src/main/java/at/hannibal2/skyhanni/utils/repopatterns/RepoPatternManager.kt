@@ -104,13 +104,13 @@ object RepoPatternManager {
         }
     }
 
-    val keyShape = Pattern.compile("^(?:[a-z0-9A-Z]+\\.)*[a-z0-9A-Z]+$")
+    val keyShape = Pattern.compile("^(?:[a-z0-9]+\\.)*[a-z0-9]+$")
 
     /**
      * Verify that a key has a valid shape or throw otherwise.
      */
     fun verifyKeyShape(key: String) {
-        require(keyShape.matches(key))
+        require(keyShape.matches(key)) { "pattern key: \"$key\" failed shape requirements" }
     }
 
     /**
