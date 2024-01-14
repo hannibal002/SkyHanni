@@ -190,7 +190,6 @@ public class InventoryConfig {
     public boolean shiftClickForEquipment = false;
 
     @Expose
-
     @ConfigOption(name = "Dojo Rank Display", desc = "Display your rank, score and actual belt in the Challenges inventory.")
     @ConfigEditorBoolean
     @FeatureToggle
@@ -199,6 +198,7 @@ public class InventoryConfig {
     @Expose
     public Position dojoRankDisplayPosition = new Position(100, 80, false, true);
 
+    @Expose
     @ConfigOption(name = "Shift Click NPC sell", desc = "Makes normal clicks to shift clicks in npc inventory for selling.")
     @ConfigEditorBoolean
     @FeatureToggle

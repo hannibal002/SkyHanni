@@ -16,11 +16,9 @@ class DojoRankDisplay {
 
     private val config get() = SkyHanniMod.feature.inventory
     private var display = emptyList<String>()
-    private val testNameRegex = "(?<color>§\\w)Test of (?<name>.*)".toRegex()
-    private val testRankRegex = "(?:§\\w)+Your Rank: (?<rank>§\\w.) §8\\((?<score>\\d+)\\)".toPattern()
-    private val trucGroup = RepoPattern.group("dojorankdisplay")
-    private val trucOui = trucGroup.pattern("name", "")
-    private val trucLol = trucGroup.pattern("", "")
+    private val patternGroup = RepoPattern.group("inventory.dojo.rankdisplay")
+    private val testNamePattern by patternGroup.pattern("name", "(?<color>§\\w)Test of (?<name>.*)")
+    private val testRankPattern by patternGroup.pattern("rank", "(?:§\\w)+Your Rank: (?<rank>§\\w.) §8\\((?<score>\\d+)\\)")
 
     @SubscribeEvent
     fun onRenderOverlay(event: GuiRenderEvent.ChestGuiOverlayRenderEvent) {
@@ -37,16 +35,19 @@ class DojoRankDisplay {
         for (stack in event.inventoryItems.values) {
             for (line in stack.getLore()) {
                 val name = stack.displayName ?: return
-                testRankRegex.matchMatcher(line) {
-                    val testColor = testNameRegex.find(name)?.groupValues?.get(1)
-                    val testName = testNameRegex.find(name)?.groupValues?.get(2)
-                    val rank = group("rank")
-                    val score = when (val s = group("score").toInt()) {
-                        in 0 .. 999 -> "§c$s"
-                        else -> "§a$s"
+                testRankPattern.matchMatcher(line) {
+                    val matcher = testNamePattern.matcher(name)
+                    if (matcher.matches()) {
+                        val testColor = matcher.group("color")
+                        val testName = matcher.group("name")
+                        val rank = group("rank")
+                        val score = when (val s = group("score").toInt()) {
+                            in 0 .. 999 -> "§c$s"
+                            else -> "§a$s"
+                        }
+                        totalScore += group("score").toInt()
+                        newDisplay.add("$testColor$testName§6: $rank §7($score§7)")
                     }
-                    totalScore += group("score").toInt()
-                    newDisplay.add("$testColor$testName§6: $rank §7($score§7)")
                 }
             }
         }
