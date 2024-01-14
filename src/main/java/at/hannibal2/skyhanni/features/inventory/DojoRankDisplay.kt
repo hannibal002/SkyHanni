@@ -35,17 +35,16 @@ class DojoRankDisplay {
         for (stack in event.inventoryItems.values) {
             for (line in stack.getLore()) {
                 val name = stack.displayName ?: return
-                testRankPattern.matchMatcher(line) {
-                    val matcher = testNamePattern.matcher(name)
-                    if (matcher.matches()) {
-                        val testColor = matcher.group("color")
-                        val testName = matcher.group("name")
-                        val rank = group("rank")
-                        val score = when (val s = group("score").toInt()) {
+                testRankPattern.matchMatcher(line) rank@{
+                    testNamePattern.matchMatcher(name) name@{
+                        val testColor = this@name.group("color")
+                        val testName = this@name.group("name")
+                        val rank = this@rank.group("rank")
+                        val score = when (val s = this@rank.group("score").toInt()) {
                             in 0 .. 999 -> "§c$s"
                             else -> "§a$s"
                         }
-                        totalScore += group("score").toInt()
+                        totalScore += this@rank.group("score").toInt()
                         newDisplay.add("$testColor$testName§6: $rank §7($score§7)")
                     }
                 }
