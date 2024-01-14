@@ -34,7 +34,7 @@ public class PetConfig {
     public boolean hideAutopet = false;
 
     @Expose
-    @ConfigOption(name = "Show Pet Item", desc = "Shows an icon by a pet when equipped.")
+    @ConfigOption(name = "Show Pet Item", desc = "Specifies the pet items for which icons should be displayed next to pets.")
     @ConfigEditorDraggableList
     public List<PetItemsDisplay> petItemDisplay = new ArrayList<>(Arrays.asList(
         PetItemsDisplay.XP_SHARE,
