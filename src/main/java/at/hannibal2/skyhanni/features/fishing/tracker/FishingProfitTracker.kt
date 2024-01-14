@@ -112,14 +112,7 @@ object FishingProfitTracker {
             )
         )
 
-        val profitFormat = profit.addSeparators()
-        val profitPrefix = if (profit < 0) "§c" else "§6"
-
-        val profitPerCatch = profit / data.totalCatchAmount
-        val profitPerCatchFormat = NumberUtil.format(profitPerCatch)
-
-        val text = "§eTotal Profit: $profitPrefix$profitFormat coins"
-        addAsSingletonList(Renderable.hoverTips(text, listOf("§7Profit per catch: $profitPrefix$profitPerCatchFormat")))
+        addAsSingletonList(tracker.addTotalProfit(profit, data.totalCatchAmount, "catch"))
 
         tracker.addPriceFromButton(this)
     }

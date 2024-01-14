@@ -7,6 +7,7 @@ import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils.sorted
 import at.hannibal2.skyhanni.utils.NEUItems
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
+import at.hannibal2.skyhanni.utils.NumberUtil.formatNumber
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.TimeUtils
 
@@ -26,9 +27,14 @@ object GardenCropTimeCommand {
 
         val rawAmount = args[0]
         val amount = try {
-            rawAmount.toInt()
+            rawAmount.formatNumber()
         } catch (e: NumberFormatException) {
             LorenzUtils.userError("Not a valid number: '$rawAmount'")
+            return
+        }
+        val multipliers = CropMoneyDisplay.multipliers
+        if (multipliers.isEmpty()) {
+            LorenzUtils.userError("Data not loaded yet. Join the garden and display the money per hour display.")
             return
         }
 
@@ -36,7 +42,7 @@ object GardenCropTimeCommand {
         val searchName = rawSearchName.lowercase()
 
         val map = mutableMapOf<String, Long>()
-        for (entry in CropMoneyDisplay.multipliers) {
+        for (entry in multipliers) {
             val internalName = entry.key
             val itemName = internalName.getItemName()
             if (itemName.removeColor().lowercase().contains(searchName)) {
@@ -44,7 +50,7 @@ object GardenCropTimeCommand {
                 val baseName = baseId.getItemName()
                 val crop = CropType.getByName(baseName.removeColor())
 
-                val fullAmount = baseAmount.toLong() * amount.toLong()
+                val fullAmount = baseAmount.toLong() * amount
                 val text = if (baseAmount == 1) {
                     "§e${amount.addSeparators()}x $itemName"
                 } else {
@@ -63,7 +69,7 @@ object GardenCropTimeCommand {
         }
 
         if (map.isEmpty()) {
-            LorenzUtils.error("No crop item found for '$rawSearchName'.")
+            LorenzUtils.userError("No crop item found for '$rawSearchName'.")
             return
         }
 

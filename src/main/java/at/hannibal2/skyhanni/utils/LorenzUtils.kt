@@ -27,6 +27,7 @@ import net.minecraft.launchwrapper.Launch
 import net.minecraft.util.ChatComponentText
 import net.minecraftforge.fml.common.FMLCommonHandler
 import java.awt.Color
+import java.lang.reflect.Constructor
 import java.lang.reflect.Field
 import java.lang.reflect.Modifier
 import java.text.DecimalFormat
@@ -35,6 +36,7 @@ import java.text.SimpleDateFormat
 import java.util.Collections
 import java.util.Timer
 import java.util.TimerTask
+import java.util.WeakHashMap
 import java.util.regex.Matcher
 import kotlin.properties.ReadWriteProperty
 import kotlin.reflect.KMutableProperty1
@@ -62,13 +64,15 @@ object LorenzUtils {
 
     val skyBlockArea get() = if (inSkyBlock) HypixelData.skyBlockArea else "?"
 
-    val inKuudraFight get() = skyBlockIsland == IslandType.KUUDRA_ARENA
+    val inKuudraFight get() = IslandType.KUUDRA_ARENA.isInIsland()
 
     val noTradeMode get() = HypixelData.noTrade
 
-    val isStrandedProfile get() = HypixelData.stranded
+    val isStrandedProfile get() = inSkyBlock && HypixelData.stranded
 
     val isBingoProfile get() = inSkyBlock && (HypixelData.bingo || TestBingo.testBingo)
+
+    val isIronmanProfile get() = inSkyBlock && HypixelData.ironman
 
     val lastWorldSwitch get() = HypixelData.joinedWorld
 
@@ -521,11 +525,11 @@ object LorenzUtils {
 
         val tileSign = (this as AccessorGuiEditSign).tileSign
         return (tileSign.signText[1].unformattedText.removeColor() == "^^^^^^"
-            && tileSign.signText[2].unformattedText.removeColor() == "Set your"
-            && tileSign.signText[3].unformattedText.removeColor() == "speed cap!")
+                && tileSign.signText[2].unformattedText.removeColor() == "Set your"
+                && tileSign.signText[3].unformattedText.removeColor() == "speed cap!")
     }
 
-    fun IslandType.isInIsland() = inSkyBlock && (skyBlockIsland == this || this == IslandType.CATACOMBS && inDungeons)
+    fun IslandType.isInIsland() = inSkyBlock && skyBlockIsland == this
 
     fun <K> MutableMap<K, Int>.addOrPut(key: K, number: Int): Int {
         val currentValue = this[key] ?: 0
@@ -548,7 +552,7 @@ object LorenzUtils {
         return newValue
     }
 
-    fun <K, N : Number> MutableMap<K, N>.sumAllValues(): Double {
+    fun <K, N : Number> Map<K, N>.sumAllValues(): Double {
         if (values.isEmpty()) return 0.0
 
         return when (values.first()) {
@@ -574,6 +578,8 @@ object LorenzUtils {
     }
 
     fun Field.makeAccessible() = also { isAccessible = true }
+
+    fun <T> Constructor<T>.makeAccessible() = also { isAccessible = true }
 
     // Taken and modified from Skytils
     @JvmStatic
@@ -601,6 +607,8 @@ object LorenzUtils {
     val isDerpy get() = recalculateDerpy.getValue()
 
     fun Int.derpy() = if (isDerpy) this / 2 else this
+
+    fun Int.ignoreDerpy() = if (isDerpy) this * 2 else this
 
     fun runDelayed(duration: Duration, runnable: () -> Unit) {
         Timer().schedule(object : TimerTask() {
@@ -651,4 +659,10 @@ object LorenzUtils {
     fun Matcher.groupOrNull(groupName: String): String? {
         return runCatching { this.group(groupName) }.getOrNull()
     }
+
+    // Let garbage collector handle the removal of entries in this list
+    fun <T> weakReferenceList(): MutableSet<T> = Collections.newSetFromMap(WeakHashMap<T, Boolean>())
+
+
+    fun <T> MutableCollection<T>.filterToMutable(predicate: (T) -> Boolean) = filterTo(mutableListOf(), predicate)
 }

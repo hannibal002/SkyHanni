@@ -9,6 +9,7 @@ import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.RenderUtils.renderStrings
 import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
+import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
 class DojoRankDisplay {
@@ -17,6 +18,9 @@ class DojoRankDisplay {
     private var display = emptyList<String>()
     private val testNameRegex = "(?<color>§\\w)Test of (?<name>.*)".toRegex()
     private val testRankRegex = "(?:§\\w)+Your Rank: (?<rank>§\\w.) §8\\((?<score>\\d+)\\)".toPattern()
+    private val trucGroup = RepoPattern.group("dojorankdisplay")
+    private val trucOui = trucGroup.pattern("name", "")
+    private val trucLol = trucGroup.pattern("", "")
 
     @SubscribeEvent
     fun onRenderOverlay(event: GuiRenderEvent.ChestGuiOverlayRenderEvent) {

@@ -45,7 +45,6 @@ import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.TimeUtils
 import at.hannibal2.skyhanni.utils.renderables.Renderable
-import io.github.moulberry.notenoughupdates.NotEnoughUpdates
 import net.minecraftforge.fml.common.eventhandler.EventPriority
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import java.util.Collections
@@ -470,8 +469,8 @@ object ComposterOverlay {
     }
 
     private fun retrieveMaterials(internalName: NEUInternalName, itemName: String, itemsNeeded: Int) {
-        if (itemsNeeded == 0 || internalName.equals("BIOFUEL")) return
-        if (config.retrieveFrom == ComposterConfig.RetrieveFromEntry.BAZAAR && !LorenzUtils.noTradeMode) {
+        if (itemsNeeded == 0) return
+        if (config.retrieveFrom == ComposterConfig.RetrieveFromEntry.BAZAAR && !LorenzUtils.noTradeMode && !internalName.equals("BIOFUEL")) {
             BazaarApi.searchForBazaarItem(itemName, itemsNeeded)
             return
         }
@@ -486,9 +485,9 @@ object ComposterOverlay {
         val sackStatus = sackItem.getStatus()
 
         if (sackStatus == SackStatus.MISSING || sackStatus == SackStatus.OUTDATED) {
-            if (sackStatus == SackStatus.OUTDATED) LorenzUtils.sendCommandToServer("gfs ${internalName.asString()} ${itemsNeeded - having}")
+            LorenzUtils.sendCommandToServer("gfs ${internalName.asString()} ${itemsNeeded - having}")
             // TODO Add sack type repo data
-            val sackType = if (internalName.equals("VOLTA") || internalName.equals("OIL_BARREL")) "Mining"
+            val sackType = if (internalName.equals("VOLTA") || internalName.equals("OIL_BARREL") || internalName.equals("BIOFUEL")) "Mining §eor §9Dwarven"
             else "Enchanted Agronomy"
             LorenzUtils.clickableChat(
                 "Sacks could not be loaded. Click here and open your §9$sackType Sack §eto update the data!",
@@ -551,7 +550,7 @@ object ComposterOverlay {
 
     private fun updateOrganicMatterFactors(baseValues: Map<NEUInternalName, Double>): Map<NEUInternalName, Double> {
         val map = mutableMapOf<NEUInternalName, Double>()
-        for ((internalName, _) in NotEnoughUpdates.INSTANCE.manager.itemInformation) {
+        for ((internalName, _) in NEUItems.allNeuRepoItems()) {
             if (internalName == "POTION_AFFINITY_TALISMAN"
                 || internalName == "CROPIE_TALISMAN"
                 || internalName.endsWith("_BOOTS")

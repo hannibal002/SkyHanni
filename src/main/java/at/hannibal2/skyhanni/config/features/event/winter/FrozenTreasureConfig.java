@@ -61,7 +61,7 @@ public class FrozenTreasureConfig {
     ));
 
     public enum FrozenTreasureDisplayEntry implements HasLegacyId {
-        TITLE("§1§lFrozen Treasure Tracker", 0),
+        TITLE("§e§lFrozen Treasure Tracker", 0),
         TREASURES_MINED("§61,636 Treasures Mined", 1),
         TOTAL_ICE("§33.2m Total Ice", 2),
         ICE_PER_HOUR("§3342,192 Ice/hr", 3),
@@ -77,6 +77,8 @@ public class FrozenTreasureConfig {
         GLOWY_CHUM_BAIT("§b3 §aGlowy Chum Bait", 13),
         GLACIAL_FRAGMENT("§b36 §5Glacial Fragment", 14),
         GLACIAL_TALISMAN("§b6 §fGlacial Talisman", 15),
+        FROZEN_BAIT("§b20 §9Frozen Bait"),
+        EINARY_RED_HOODIE("§b1 §cEinary's Red Hoodie"),
         SPACER_2(" ", 16);
 
         private final String str;
