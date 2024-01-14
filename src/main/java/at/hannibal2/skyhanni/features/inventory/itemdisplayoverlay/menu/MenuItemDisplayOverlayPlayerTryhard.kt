@@ -349,14 +349,14 @@ class MenuItemDisplayOverlayPlayerTryhard : AbstractMenuStackSize() {
                 if (itemName == "Previous Projects") {
                     for (line in lore) {
                         contributionsPattern.matchMatcher(line) {
-                            return "${group("contribs").formatNumber()}"
+                            return NumberUtil.format(group("contribs").formatNumber())
                         }
                     }
                 }
                 if (lore.first() == "§8City Project") {
                     for (line in lore) {
                         contributionsOtherOtherPattern.matchMatcher(line) {
-                            return "${group("contribs").formatNumber()}"
+                            return NumberUtil.format(group("contribs").formatNumber())
                         }
                     }
                 }
@@ -364,7 +364,7 @@ class MenuItemDisplayOverlayPlayerTryhard : AbstractMenuStackSize() {
             if (previousProjectsChestPattern.matches(chestName) && cityProjectItemPattern.matches(itemName)) {
                 for (line in lore) {
                     contributionsOtherPattern.matchMatcher(line) {
-                        return "${group("contribs").formatNumber()}"
+                        return NumberUtil.format(group("contribs").formatNumber())
                     }
                 }
             }
