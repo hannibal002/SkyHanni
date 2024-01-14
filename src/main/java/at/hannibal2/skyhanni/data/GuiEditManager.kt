@@ -33,7 +33,7 @@ class GuiEditManager {
         if (isInGui()) return
 
         Minecraft.getMinecraft().currentScreen?.let {
-            if (it !is GuiInventory && it !is GuiChest && it !is GuiEditSign && it !is GuiProfileViewer) return
+            if (it !is GuiInventory && it !is GuiChest && it !is GuiEditSign && !(it is GuiProfileViewer && !it.anyTextBoxFocused())) return
             if (it is GuiEditSign && !it.isRancherSign()) return
         }
 
@@ -111,6 +111,8 @@ class GuiEditManager {
         fun Position.getAbsX() = getAbsX0(getDummySize(true).x)
 
         fun Position.getAbsY() = getAbsY0(getDummySize(true).y)
+
+        fun GuiProfileViewer.anyTextBoxFocused() = this.playerNameTextField.focus || this.inventoryTextField.focus || this.killDeathSearchTextField.focus
     }
 }
 
