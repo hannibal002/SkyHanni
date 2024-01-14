@@ -25,50 +25,52 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import net.minecraftforge.fml.common.network.FMLNetworkEvent
 import kotlin.concurrent.thread
 
-object HypixelData {
+class HypixelData {
     private val group = RepoPattern.group("data.hypixeldata")
     private val tabListProfilePattern by group.pattern("tablistprofile", "§e§lProfile: §r§a(?<profile>.*)")
     private val lobbyTypePattern by group.pattern("lobbytype", "(?<lobbyType>.*lobby)\\d+")
-    val islandNamePattern by group.pattern("islandname", "(?:§.)*(Area|Dungeon): (?:§.)*(?<island>.*)")
+    private val islandNamePattern by group.pattern("islandname", "(?:§.)*(Area|Dungeon): (?:§.)*(?<island>.*)")
 
     private var lastLocRaw = 0L
 
-    var hypixelLive = false
-    var hypixelAlpha = false
-    var inLobby = false
-    var inLimbo = false
-    var skyBlock = false
-    var skyBlockIsland = IslandType.UNKNOWN
+    companion object {
+        var hypixelLive = false
+        var hypixelAlpha = false
+        var inLobby = false
+        var inLimbo = false
+        var skyBlock = false
+        var skyBlockIsland = IslandType.UNKNOWN
 
-    //Ironman, Stranded and Bingo
-    var noTrade = false
+        //Ironman, Stranded and Bingo
+        var noTrade = false
 
-    var ironman = false
-    var stranded = false
-    var bingo = false
+        var ironman = false
+        var stranded = false
+        var bingo = false
 
-    var profileName = ""
-    var joinedWorld = 0L
+        var profileName = ""
+        var joinedWorld = 0L
 
-    var skyBlockArea = "?"
+        var skyBlockArea = "?"
 
-    // Data from locraw
-    var locrawData: JsonObject? = null
-    private var locraw: MutableMap<String, String> = mutableMapOf(
-        "server" to "",
-        "gametype" to "",
-        "lobbyname" to "",
-        "lobbytype" to "",
-        "mode" to "",
-        "map" to ""
-    )
+        // Data from locraw
+        var locrawData: JsonObject? = null
+        private var locraw: MutableMap<String, String> = mutableMapOf(
+            "server" to "",
+            "gametype" to "",
+            "lobbyname" to "",
+            "lobbytype" to "",
+            "mode" to "",
+            "map" to ""
+        )
 
-    val server get() = locraw["server"] ?: ""
-    val gameType get() = locraw["gametype"] ?: ""
-    val lobbyName get() = locraw["lobbyname"] ?: ""
-    val lobbyType get() = locraw["lobbytype"] ?: ""
-    val mode get() = locraw["mode"] ?: ""
-    val map get() = locraw["map"] ?: ""
+        val server get() = locraw["server"] ?: ""
+        val gameType get() = locraw["gametype"] ?: ""
+        val lobbyName get() = locraw["lobbyname"] ?: ""
+        val lobbyType get() = locraw["lobbytype"] ?: ""
+        val mode get() = locraw["mode"] ?: ""
+        val map get() = locraw["map"] ?: ""
+    }
 
     private var loggerIslandChange = LorenzLogger("debug/island_change")
 
