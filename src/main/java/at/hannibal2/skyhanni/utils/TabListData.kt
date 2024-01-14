@@ -1,7 +1,7 @@
 package at.hannibal2.skyhanni.utils
 
 import at.hannibal2.skyhanni.SkyHanniMod
-import at.hannibal2.skyhanni.data.ProfileStorageData
+import at.hannibal2.skyhanni.data.HypixelData
 import at.hannibal2.skyhanni.events.LorenzTickEvent
 import at.hannibal2.skyhanni.events.TabListUpdateEvent
 import at.hannibal2.skyhanni.mixins.hooks.tabListGuard
@@ -110,7 +110,7 @@ class TabListData {
     @SubscribeEvent
     fun onTabListUpdate(event: TabListUpdateEvent) {
         for (line in event.tabList) {
-            ProfileStorageData.profileTablistPattern.matchMatcher(line) {
+            HypixelData.islandNamePattern.matchMatcher(line) {
                 fullyLoaded = true
                 return
             }

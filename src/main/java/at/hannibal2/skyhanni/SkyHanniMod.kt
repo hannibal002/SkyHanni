@@ -382,7 +382,7 @@ class SkyHanniMod {
         // data
         loadModule(this)
         loadModule(ChatManager)
-        loadModule(HypixelData())
+        loadModule(HypixelData)
         loadModule(LocationFixData)
         loadModule(DungeonAPI())
         loadModule(ScoreboardData())
