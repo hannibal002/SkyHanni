@@ -1,8 +1,10 @@
 package at.hannibal2.skyhanni.utils
 
+import at.hannibal2.skyhanni.utils.LorenzUtils.enumJoinToPattern
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 
 object UtilsPatterns {
+
     private val patternGroup = RepoPattern.group("utils")
 
     /** Examples:
@@ -13,9 +15,18 @@ object UtilsPatterns {
     §5§lEPIC BOOTS
     §f§lCOMMON
      **/
-    val rarityLoreLinePattern by patternGroup.pattern("item.lore.rarity.line", "^(?:§.){2,3}(?:.§. (?:§.){4})?(?:SHINY )?(?<Rarity>${LorenzRarity.entries.joinToString(separator = "|") { it.rawName }}) ?(?:DUNGEON )?(?<ItemCategory>[^§]*)(?: (?:§.){3}.)?$")
+    val rarityLoreLinePattern by patternGroup.pattern(
+        "item.lore.rarity.line",
+        "^(?:§.){2,3}(?:.§. (?:§.){4})?(?:SHINY )?(?<Rarity>${enumJoinToPattern<LorenzRarity>()}) ?(?:DUNGEON )?(?<ItemCategory>[^§]*)(?: (?:§.){3}.)?$"
+    )
 
-    val abiPhonePattern by patternGroup.pattern("item.name.abiphone", ".{2}Abiphone .*")
+    val abiPhonePattern by patternGroup.pattern(
+        "item.name.abiphone",
+        ".{2}Abiphone .*"
+    )
 
-    val enchantedBookPattern by patternGroup.pattern("item.name.enchanted.book", ".{2}?Enchanted Book")
+    val enchantedBookPattern by patternGroup.pattern(
+        "item.name.enchanted.book",
+        ".{2}?Enchanted Book"
+    )
 }
