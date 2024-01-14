@@ -17,7 +17,7 @@ object UtilsPatterns {
      **/
     val rarityLoreLinePattern by patternGroup.pattern(
         "item.lore.rarity.line",
-        "^(?:§.){2,3}(?:.§. (?:§.){4})?(?:SHINY )?(?<Rarity>${enumJoinToPattern<LorenzRarity>()}) ?(?:DUNGEON )?(?<ItemCategory>[^§]*)(?: (?:§.){3}.)?$"
+        "^(?:§.){2,3}(?:.§. (?:§.){4})?(?:SHINY )?(?<rarity>${enumJoinToPattern<LorenzRarity>()}) ?(?:DUNGEON )?(?<itemCategory>[^§]*)(?: (?:§.){3}.)?$"
     )
 
     val abiPhonePattern by patternGroup.pattern(

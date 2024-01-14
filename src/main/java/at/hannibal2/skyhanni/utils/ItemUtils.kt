@@ -211,8 +211,8 @@ object ItemUtils {
         val cleanName = this.cleanName()
         for (line in this.getLore().reversed()) {
             UtilsPatterns.rarityLoreLinePattern.matchMatcher(line) {
-                val itemCategory = group("ItemCategory").replace(" ", "_")
-                val rarity = group("Rarity").replace(" ", "_")
+                val itemCategory = group("itemCategory").replace(" ", "_")
+                val rarity = group("rarity").replace(" ", "_")
 
                 val itemCategoryEnum = try {
                     if (itemCategory.isEmpty()) {
