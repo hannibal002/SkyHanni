@@ -340,7 +340,7 @@ class MenuItemDisplayOverlayPlayerTryhard : AbstractMenuStackSize() {
                 deliveriesItemPattern.matchMatcher(itemName) {
                     for (line in lore) {
                         deliveriesPattern.matchMatcher(line) {
-                            return "${group("deliveryCount").formatNumber()}"
+                            return NumberUtil.format(group("deliveryCount").formatNumber())
                         }
                     }
                 }
