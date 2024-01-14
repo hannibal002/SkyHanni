@@ -5,7 +5,11 @@ import at.hannibal2.skyhanni.config.core.config.Position;
 import com.google.gson.annotations.Expose;
 import io.github.moulberry.moulconfig.annotations.Accordion;
 import io.github.moulberry.moulconfig.annotations.ConfigEditorBoolean;
+import io.github.moulberry.moulconfig.annotations.ConfigEditorDraggableList;
 import io.github.moulberry.moulconfig.annotations.ConfigOption;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 
 public class PetConfig {
     @Expose
@@ -30,8 +34,30 @@ public class PetConfig {
     public boolean hideAutopet = false;
 
     @Expose
-    @ConfigOption(name = "Show Exp Share", desc = "Shows an §5⚘ §7by a pet when an exp share is equipped.")
-    @ConfigEditorBoolean
-    @FeatureToggle
-    public boolean expShare = false;
+    @ConfigOption(name = "Show Pet Item", desc = "Shows an icon by a pet when equipped.")
+    @ConfigEditorDraggableList
+    public List<PetItemsDisplay> petItemDisplay = new ArrayList<>(Arrays.asList(
+        PetItemsDisplay.XP_SHARE,
+        PetItemsDisplay.TIER_BOOST
+    ));
+
+    public enum PetItemsDisplay {
+        XP_SHARE("§5⚘", "Exp Share", "PET_ITEM_EXP_SHARE"),
+        TIER_BOOST("§c●", "Tier Boost", "PET_ITEM_TIER_BOOST"),
+        ;
+        private final String str;
+        public final String icon;
+        public final String item;
+
+        PetItemsDisplay(String icon, String name, String item) {
+            this.icon = icon;
+            this.item = item;
+            this.str = icon + " §ffor " + name;
+        }
+
+        @Override
+        public String toString() {
+            return str;
+        }
+    }
 }
