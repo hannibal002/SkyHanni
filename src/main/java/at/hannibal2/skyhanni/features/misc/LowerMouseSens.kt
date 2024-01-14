@@ -61,7 +61,7 @@ object LowerMouseSens {
         }
         gameSettings = Minecraft.getMinecraft().gameSettings ?: return
         isManualToggle = !isManualToggle
-        if (isManualToggle) { lowerSensitivity()
+        if (isManualToggle) { lowerSensitivity(true)
         } else restoreSensitivity(true)
     }
 
