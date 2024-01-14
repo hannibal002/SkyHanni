@@ -32,7 +32,7 @@ public class StackSizeMenuConfig {
         WARDROBE_SLOT("§bWardrobe Slot #"),
         ABBV_STATS("§bSkyblock Stat Names"),
         CUTE_NAME("§bSkyblock Profile Fruit Name"),
-        AUCTION_BAZAAR_VARIOUS("§bAuction House + Bazaar Utils"),
+        AUCTION_BAZAAR_VARIOUS("§bAuction House + Bazaar Navigation Utils"),
         DOJO_PROGRESS("§bDojo Progress"), // (Abbvs)
         BANK_UTILS("§bBank Utilities"), // (Abbvs)
         MAYOR_PERKS("§bMayor Perk Count"), // §b(For Mayor Jerry specifically, it'll show which mayor's perks are active.)
