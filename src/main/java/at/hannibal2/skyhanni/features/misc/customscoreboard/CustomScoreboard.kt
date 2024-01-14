@@ -14,6 +14,7 @@
 //  - more bg options (round, blurr, outline)
 //  - countdown events like fishing festival + fiesta when its not on tablist
 //  - CookieAPI https://discord.com/channels/997079228510117908/1162844830360146080/1195695210433351821
+//  - option to track certain skills
 //
 
 package at.hannibal2.skyhanni.features.misc.customscoreboard
