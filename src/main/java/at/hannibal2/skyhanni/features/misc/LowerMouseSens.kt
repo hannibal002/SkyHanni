@@ -42,7 +42,6 @@ object LowerMouseSens {
     fun onWorldChange(event: LorenzWorldChangeEvent) {
         if (!isToggled) return
         isToggled = false
-        LorenzUtils.chat("§bMouse sensitivity is now restored.")
         gameSettings!!.mouseSensitivity = SkyHanniMod.feature.storage.savedMouseloweredSensitivity
     }
 
