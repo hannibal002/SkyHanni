@@ -23,7 +23,7 @@ object BitsAPI {
 
     private val group = RepoPattern.group("data.bits")
     val bitsScoreboardPattern by group.pattern(
-        "scoreboard.bits",
+        "scoreboard",
         "^Bits: §b(?<amount>[\\d,]+\\.?\\d*) ?§?3?(?:\\((?<earned>[+-][,\\d]+)?\\)?)?\$"
     )
     private val bitsFromFameRankUpChatPattern by group.pattern(
