@@ -84,10 +84,15 @@
 #### Chat Changes
 
 + Hide new Fire Sale message format. - Thunderblade73
++ Added Hypixel Lobby chat messages "SMP" and "Snow Particles" to the Spam Filter. - walker
++ Added more messages to Hypixel Lobby spam hider.
+    + SMP and Snow Particles. - walker
+    + Earned mystery dust. - alexia
 
 #### Misc Changes
 
 + Tia Relay Helper: Suggest /togglemusic. - alexia
++ Added option to ignore Everything Chroma in the chat. - VixidDev
 
 ### Fixes
 
@@ -110,6 +115,7 @@
 + Fixed Daily Kuudra part of Crimson Isle Reputation Helper not detecting completed runs. - hannibal2
 + Fixed wrong calculation when zero bosses killed in slayer profit trackers. - hannibal2
 + Hide No Fishing Bait warning during Kuudra fight. - hannibal2
++ Fixed Dungeon and Kuudra party finder join message not detecting in party member tab complete. - CalMWolfs
 
 #### Mining Fixes
 
@@ -132,6 +138,7 @@
 + Fixed hide non-clickable items not working in some bazaar pages. - hannibal2
 + Fixed rogue sword ability taking into account mage cooldown reduction. - Empa
 + Reset item ability cooldowns on the world switch. - hannibal2
++ Fixed Crap Hat of Celebration not getting detected as accessory in Hide Not Clickable Items. - Empa
 
 #### Bingo Fixes
 
@@ -146,6 +153,12 @@
 #### GUI Fixes
 
 + Fixed items in SkyHanni GUI elements rendering over minecraft menus. - Thunderblade73
++ Fixed GUI Editor hotkey working while inside a NEU PV text box. - Thunderblade73
+
+#### Winter Fixes
+
++ Fixed Unique Gifting Opportunities working with Golden Gift. - CalMWolfs
++ Fixed Frozen Treasure Tracker showing wrong Compact Procs number. - CalMWolfs
 
 #### Misc Fixes
 
@@ -174,6 +187,10 @@
 + Tell people how to name a pattern variable. - CalMWolfs
 + Typo fixes in contributing md. - CalMWolfs
 + Make Repo Pattern keys more consistent for Farming Gear. - CalMWolfs
++ Added options to ban specific imports in some packages. - nea
++ Don't allow uppercase Repo Pattern keys and added a more descriptive error. - CalMWolfs
++ Moved party API chat messages to Repo Pattern. - CalMWolfs
++ Allowing nullable parameters for regex functions matches() and find(). - hannibal2
 
 ## Version 0.22
 
