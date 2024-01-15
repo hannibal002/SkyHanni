@@ -96,7 +96,7 @@ object MaxwellAPI {
 
     @SubscribeEvent
     fun onConfigLoad(event: ConfigLoadEvent) {
-        val config = ProfileStorageData.profileSpecific ?: return
+        config ?: return
         currentPower = config.maxwell.currentPower
         magicalPower = config.maxwell.magicalPower
     }
