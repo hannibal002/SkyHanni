@@ -31,7 +31,7 @@ object MaxwellAPI {
         "§7Selected Power: §a(?<power>.*)"
     )
     private val inventoryMPPattern by group.pattern(
-        "inventory.mp",
+        "inventory.magicpower",
         "§7Magical Power: §6(?<mp>[\\d,]+)"
     )
 
