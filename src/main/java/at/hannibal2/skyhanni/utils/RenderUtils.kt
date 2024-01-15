@@ -34,7 +34,7 @@ import kotlin.time.Duration
 import kotlin.time.DurationUnit
 
 object RenderUtils {
-
+    enum class HorizontalAlignment{LEFT, CENTER, RIGHT}
     private val beaconBeam = ResourceLocation("textures/entity/beacon_beam.png")
 
     infix fun Slot.highlight(color: LorenzColor) {
@@ -397,7 +397,7 @@ object RenderUtils {
     }
 
     // Aligns using the width of element to render
-    private fun Position.renderString0(string: String?, offsetX: Int = 0, offsetY: Int = 0, alignmentEnum: AlignmentEnum): Int {
+    private fun Position.renderString0(string: String?, offsetX: Int = 0, offsetY: Int = 0, alignmentEnum: HorizontalAlignment): Int {
         val display = "§f$string"
         GlStateManager.pushMatrix()
         transform()
@@ -409,9 +409,9 @@ object RenderUtils {
 
         val strLen: Int = renderer.getStringWidth(string)
         val x2 = when (alignmentEnum) {
-            AlignmentEnum.LEFT -> offsetX.toFloat()
-            AlignmentEnum.CENTER -> offsetX + width / 2f - strLen / 2f
-            AlignmentEnum.RIGHT -> offsetX + width - strLen.toFloat()
+            HorizontalAlignment.LEFT -> offsetX.toFloat()
+            HorizontalAlignment.CENTER -> offsetX + width / 2f - strLen / 2f
+            HorizontalAlignment.RIGHT -> offsetX + width - strLen.toFloat()
         }
         GL11.glTranslatef(x2, 0f, 0f)
         renderer.drawStringWithShadow(display, 0f, 0f, 0)
@@ -437,11 +437,7 @@ object RenderUtils {
         GuiEditManager.add(this, posLabel, longestX, offsetY)
     }
 
-    enum class AlignmentEnum {
-        LEFT, CENTER, RIGHT
-    }
-
-    fun Position.renderStringsAlignedWidth(list: List<Pair<String, AlignmentEnum>>, extraSpace: Int = 0, posLabel: String){
+    fun Position.renderStringsAlignedWidth(list: List<Pair<String, HorizontalAlignment>>, extraSpace: Int = 0, posLabel: String){
         if (list.isEmpty()) return
 
         var offsetY = 0

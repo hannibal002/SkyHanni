@@ -8,7 +8,7 @@ import at.hannibal2.skyhanni.mixins.transformers.AccessorGuiPlayerTabOverlay
 import at.hannibal2.skyhanni.utils.NumberUtil
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.NumberUtil.formatNumber
-import at.hannibal2.skyhanni.utils.RenderUtils.AlignmentEnum
+import at.hannibal2.skyhanni.utils.RenderUtils.HorizontalAlignment
 import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.StringUtils.removeResets
 import at.hannibal2.skyhanni.utils.StringUtils.trimWhiteSpaceAndResets
@@ -49,8 +49,8 @@ object CustomScoreboardUtils {
     }
 
     fun getTitleAndFooterAlignment() = when (config.displayConfig.titleAndFooter.centerTitleAndFooter) {
-        true -> AlignmentEnum.CENTER
-        false -> AlignmentEnum.LEFT
+        true -> HorizontalAlignment.CENTER
+        false -> HorizontalAlignment.LEFT
     }
 
     fun Int.formatNum(): String = when (numberFormat) {

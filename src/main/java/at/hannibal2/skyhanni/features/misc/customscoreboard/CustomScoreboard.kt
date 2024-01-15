@@ -23,14 +23,14 @@ import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.LorenzTickEvent
 import at.hannibal2.skyhanni.utils.LorenzUtils
-import at.hannibal2.skyhanni.utils.RenderUtils.AlignmentEnum
+import at.hannibal2.skyhanni.utils.RenderUtils.HorizontalAlignment
 import at.hannibal2.skyhanni.utils.RenderUtils.renderStringsAlignedWidth
 import at.hannibal2.skyhanni.utils.TabListData
 import net.minecraftforge.client.GuiIngameForge
 import net.minecraftforge.client.event.RenderGameOverlayEvent
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
-typealias ScoreboardElement = Pair<String, AlignmentEnum>
+typealias ScoreboardElement = Pair<String, HorizontalAlignment>
 
 class CustomScoreboard {
     private val config get() = SkyHanniMod.feature.gui.customScoreboard
@@ -66,10 +66,10 @@ class CustomScoreboard {
     }
 
     private fun createLines() = buildList<ScoreboardElement> {
-        val lineMap = HashMap<Int, List<Pair<String, AlignmentEnum>>>()
+        val lineMap = HashMap<Int, List<Pair<String, HorizontalAlignment>>>()
         for (element in ScoreboardElements.entries) {
             lineMap[element.ordinal] =
-                if (element.isVisible()) element.getPair() else listOf("<hidden>" to AlignmentEnum.LEFT)
+                if (element.isVisible()) element.getPair() else listOf("<hidden>" to HorizontalAlignment.LEFT)
         }
 
         return formatLines(lineMap)
@@ -86,7 +86,7 @@ class CustomScoreboard {
 
                 // Adds empty lines
                 if (it[0].first == "<empty>") {
-                    newList.add("" to AlignmentEnum.LEFT)
+                    newList.add("" to HorizontalAlignment.LEFT)
                     continue
                 }
 
