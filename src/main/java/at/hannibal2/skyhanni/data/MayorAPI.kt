@@ -28,28 +28,34 @@ object MayorAPI {
 
     /**
      * @param input: The name of the mayor
-     * @return: The neu color of the mayor + the name of the mayor; If no mayor was found, it will return "§cUnknown Mayor: §7$input"
+     * @return: The neu color of the mayor + the name of the mayor; If no mayor was found, it will return "§cUnknown Mayor: §7"
      */
     fun mayorNameToColorCode(input: String): String {
         return when (input) {
             // Normal Mayors
-            "Aatrox" -> "§3$input"
-            "Cole" -> "§e$input"
-            "Diana" -> "§2$input"
-            "Diaz" -> "§6$input"
-            "Finnegan" -> "§c$input"
-            "Foxy" -> "§d$input"
-            "Marina" -> "§b$input"
-            "Paul" -> "§c$input"
+            "Aatrox" -> "§3"
+            "Cole" -> "§e"
+            "Diana" -> "§2"
+            "Diaz" -> "§6"
+            "Finnegan" -> "§c"
+            "Foxy" -> "§d"
+            "Marina" -> "§b"
+            "Paul" -> "§c"
 
             // Special Mayors
-            "Scorpius" -> "§d$input"
-            "Jerry" -> "§d$input"
-            "Derpy" -> "§d$input"
-            "Dante" -> "§d$input"
-            else -> "§cUnknown Mayor: §7$input"
+            "Scorpius" -> "§d"
+            "Jerry" -> "§d"
+            "Derpy" -> "§d"
+            "Dante" -> "§d"
+            else -> "§cUnknown Mayor: §7"
         }
     }
+    
+    /**
+     * @param input: The name of the mayor
+     * @return: The neu color of the mayor + the name of the mayor; If no mayor was found, it will return "§cUnknown Mayor: §7"
+     */
+    fun mayorNameWithColorCode(input: String) = mayorNameToColorCode(input) + input
     @SubscribeEvent
     fun onTick(event: LorenzTickEvent) {
         if (!LorenzUtils.onHypixel) return
