@@ -10,7 +10,6 @@ import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils.isInIsland
 import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
-import at.hannibal2.skyhanni.utils.StringUtils.removeResets
 import at.hannibal2.skyhanni.utils.StringUtils.trimWhiteSpaceAndResets
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
@@ -37,7 +36,7 @@ object MaxwellAPI {
 
     @SubscribeEvent
     fun onChat(event: LorenzChatEvent) {
-        val message = event.message.trimWhiteSpaceAndResets().removeResets()
+        val message = event.message.trimWhiteSpaceAndResets()
 
         chatPowerpattern.matchMatcher(message) {
             val power = group("power")
@@ -97,8 +96,8 @@ object MaxwellAPI {
     @SubscribeEvent
     fun onConfigLoad(event: ConfigLoadEvent) {
         config ?: return
-        currentPower = config.maxwell.currentPower
-        magicalPower = config.maxwell.magicalPower
+        currentPower = config.maxwell.currentPower ?: null
+        magicalPower = config.maxwell.magicalPower ?: -1
     }
 
     @SubscribeEvent
