@@ -151,8 +151,8 @@ object QuiverAPI {
         )
 
         // check if sound location is more than configAmount block away from player
-        val soundLocation = event.location
-        if (soundLocation.distanceToPlayer() > SkyHanniMod.feature.dev.bowSoundDistance) return
+        val soundLocation = event.distanceToPlayer
+        if (soundLocation > SkyHanniMod.feature.dev.bowSoundDistance) return
 
         if (event.soundName == "random.bow" && holdingBow) {
             val arrowType = currentArrow ?: return
