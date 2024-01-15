@@ -59,7 +59,9 @@ object MaxwellAPI {
             currentPower = byNameOrNull(selectedPower.getLore().first()) ?: return
             savePower(currentPower)
 
-        } else if (event.inventoryName.contains("Your Bags")) {
+            return
+        } 
+        if (event.inventoryName.contains("Your Bags")) {
             val stacks = event.inventoryItems
 
             for (stack in stacks.values) {
