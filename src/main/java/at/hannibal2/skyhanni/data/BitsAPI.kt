@@ -27,7 +27,7 @@ object BitsAPI {
         "^Bits: §b(?<amount>[\\d,]+\\.?\\d*) ?§?3?(?:\\((?<earned>[+-][,\\d]+)?\\)?)?\$"
     )
     private val bitsFromFameRankUpChatPattern by group.pattern(
-        "chat.bitsfromfamerankup",
+        "chat.bits.famerankup",
         "§eYou gained §3(?<amount>.*) Bits Available §ecompounded from all your §epreviously eaten §6cookies§e! Click here to open §6cookie menu§e!"
     )
     private val bitsEarnedChatPattern by group.pattern("chat.earned", "§f\\s+§8\\+§b(?<amount>.*)\\s+Bits\n")
