@@ -1,13 +1,18 @@
 package at.hannibal2.skyhanni.features.fishing.tracker
 
 import at.hannibal2.skyhanni.SkyHanniMod
+import at.hannibal2.skyhanni.data.jsonobjects.repo.ItemsJson
 import at.hannibal2.skyhanni.events.ConfigLoadEvent
 import at.hannibal2.skyhanni.events.FishingBobberCastEvent
 import at.hannibal2.skyhanni.events.GuiRenderEvent
+import at.hannibal2.skyhanni.events.RepositoryReloadEvent
 import at.hannibal2.skyhanni.events.SeaCreatureFishEvent
 import at.hannibal2.skyhanni.features.fishing.FishingAPI
 import at.hannibal2.skyhanni.features.fishing.SeaCreatureManager
 import at.hannibal2.skyhanni.test.command.ErrorManager
+import at.hannibal2.skyhanni.utils.InventoryUtils
+import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName
+import at.hannibal2.skyhanni.utils.ItemUtils.name
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils.addAsSingletonList
 import at.hannibal2.skyhanni.utils.LorenzUtils.addButton
@@ -27,6 +32,7 @@ object SeaCreatureTracker {
 
     private val tracker = SkyHanniTracker("Sea Creature Tracker", { Data() }, { it.fishing.seaCreatureTracker })
     { drawDisplay(it) }
+    private val armorNames = mutableListOf<String>()
 
     class Data : TrackerData() {
         override fun reset() {
@@ -151,10 +157,25 @@ object SeaCreatureTracker {
         tracker.renderDisplay(config.position)
     }
 
+    @SubscribeEvent
+    fun onRepoReload(event: RepositoryReloadEvent) {
+        val data = event.getConstant<ItemsJson>("Items")
+        armorNames.clear()
+        armorNames.addAll(data.trophy_armors)
+    }
+
     fun resetCommand(args: Array<String>) {
         tracker.resetCommand(args, "shresetseacreaturetracker")
     }
 
     private fun isEnabled() = LorenzUtils.inSkyBlock &&
-        FishingAPI.lastActiveFishingTime.passedSince() < 10.minutes && config.enabled
+        FishingAPI.lastActiveFishingTime.passedSince() < 10.minutes && config.enabled && !isTrophyFishing()
+
+    private fun isTrophyFishing(): Boolean {
+        val boots = InventoryUtils.getBoots()?.getInternalName().toString().replace("internalName:", "")
+        val leggings = InventoryUtils.getLeggings()?.getInternalName().toString().replace("internalName:", "")
+        val chestplate = InventoryUtils.getChestplate()?.getInternalName().toString().replace("internalName:", "")
+        val helmet = InventoryUtils.getHelmet()?.getInternalName().toString().replace("internalName:", "")
+        return armorNames.contains(helmet) && armorNames.contains(chestplate) && armorNames.contains(leggings) && armorNames.contains(boots)
+    }
 }
