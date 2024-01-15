@@ -16,7 +16,7 @@ import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
 object MaxwellAPI {
-    val config = ProfileStorageData.profileSpecific
+    val config get()= ProfileStorageData.profileSpecific
     var currentPower: String? = null
     var magicalPower = -1
     var powers = mutableListOf<String>()
