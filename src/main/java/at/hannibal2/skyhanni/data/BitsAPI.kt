@@ -31,7 +31,7 @@ object BitsAPI {
         "§eYou gained §3(?<amount>.*) Bits Available §ecompounded from all your §epreviously eaten §6cookies§e! Click here to open §6cookie menu§e!"
     )
     private val bitsEarnedChatPattern by group.pattern("chat.earned", "§f\\s+§8\\+§b(?<amount>.*)\\s+Bits\n")
-    private val boosterCookieAte by group.pattern("chat.boostercookieate", "§eYou consumed a §6Booster Cookie§e! §d.*")
+    private val boosterCookieAte by group.pattern("chat.boostercookie.ate", "§eYou consumed a §6Booster Cookie§e! §d.*")
     private val bitsAvailableMenu by group.pattern(
         "gui.bitsavailablemenu",
         "§7Bits Available: §b(?<toClaim>[\\w,]+)(§3.+)?"
