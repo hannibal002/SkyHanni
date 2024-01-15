@@ -19,6 +19,11 @@ public class MiningConfig {
     public KingTalismanConfig kingTalisman = new KingTalismanConfig();
 
     @Expose
+    @ConfigOption(name = "Commissions Calculator", desc = "")
+    @Accordion
+    public CommissionsCalculatorConfig commissionsCalculator = new CommissionsCalculatorConfig();
+
+    @Expose
     @ConfigOption(name = "Highlight Commission Mobs", desc = "Highlight Mobs that are part of active commissions.")
     @ConfigEditorBoolean
     @FeatureToggle
