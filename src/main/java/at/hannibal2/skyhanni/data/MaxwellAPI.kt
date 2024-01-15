@@ -1,10 +1,8 @@
 package at.hannibal2.skyhanni.data
 
 import at.hannibal2.skyhanni.data.jsonobjects.repo.MaxwellPowersJson
-import at.hannibal2.skyhanni.events.ConfigLoadEvent
 import at.hannibal2.skyhanni.events.InventoryFullyOpenedEvent
 import at.hannibal2.skyhanni.events.LorenzChatEvent
-import at.hannibal2.skyhanni.events.ProfileJoinEvent
 import at.hannibal2.skyhanni.events.RepositoryReloadEvent
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.LorenzUtils
@@ -15,10 +13,19 @@ import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
 object MaxwellAPI {
-    val config get()= ProfileStorageData.profileSpecific
-    var currentPower: String? = null
-    var magicalPower = -1
-    var powers = mutableListOf<String>()
+    private val storage get() = ProfileStorageData.profileSpecific
+    var currentPower: String?
+        get() = storage?.maxwell?.currentPower
+        set(value) {
+            storage?.maxwell?.currentPower = value
+        }
+    var magicalPower: Int?
+        get() = storage?.maxwell?.magicalPower
+        set(value) {
+            storage?.maxwell?.magicalPower = value
+        }
+
+    private var powers = mutableListOf<String>()
 
     private val group = RepoPattern.group("data.maxwell")
     private val chatPowerpattern by group.pattern(
@@ -40,8 +47,8 @@ object MaxwellAPI {
 
         chatPowerpattern.matchMatcher(message) {
             val power = group("power")
-            currentPower = byNameOrNull(power) ?: return
-            savePower(currentPower)
+            currentPower = getPowerByNameOrNull(power) ?: return
+            return@matchMatcher
         }
     }
 
@@ -55,11 +62,10 @@ object MaxwellAPI {
                 stacks.values.find { it.getLore().isNotEmpty() && it.getLore().last() == "§aPower is selected!" }
                     ?: return
 
-            currentPower = byNameOrNull(selectedPower.getLore().first()) ?: return
-            savePower(currentPower)
-
+            currentPower = getPowerByNameOrNull(selectedPower.getLore().first()) ?: return
             return
-        } 
+        }
+
         if (event.inventoryName.contains("Your Bags")) {
             val stacks = event.inventoryItems
 
@@ -68,54 +74,28 @@ object MaxwellAPI {
                 for (line in lore) {
                     inventoryPowerPattern.matchMatcher(line) {
                         val power = group("power")
-                        currentPower = byNameOrNull(power) ?: return
-                        savePower(currentPower)
+                        currentPower = getPowerByNameOrNull(power) ?: return
+                        return@matchMatcher
                     }
                     inventoryMPPattern.matchMatcher(line) {
-                        // Mp is boosted in catacombs
+                        // MagicalPower is boosted in catacombs
                         if (IslandType.CATACOMBS.isInIsland()) return
 
                         val mp = group("mp")
                         magicalPower = mp.replace(",", "").toIntOrNull() ?: return
-                        saveMP(magicalPower)
+                        return@matchMatcher
                     }
                 }
             }
         }
     }
 
-    fun byNameOrNull(name: String) = powers.find { it == name }
+    private fun getPowerByNameOrNull(name: String) = powers.find { it == name }
 
-    // Handle storage
+    // Load powers from repo
     @SubscribeEvent
     fun onRepoLoad(event: RepositoryReloadEvent) {
         val data = event.getConstant<MaxwellPowersJson>("MaxwellPowers")
         powers = data.powers
-    }
-
-    @SubscribeEvent
-    fun onConfigLoad(event: ConfigLoadEvent) {
-        config ?: return
-        currentPower = config.maxwell.currentPower ?: null
-        magicalPower = config.maxwell.magicalPower ?: -1
-    }
-
-    @SubscribeEvent
-    fun onProfileJoin(event: ProfileJoinEvent) {
-        val config = ProfileStorageData.profileSpecific ?: return
-        currentPower = config.maxwell.currentPower ?: null
-        magicalPower = config.maxwell.magicalPower
-    }
-
-    private fun savePower(power: String?) {
-        if (power == null) return
-        val config = ProfileStorageData.profileSpecific ?: return
-        config.maxwell.currentPower = power
-    }
-
-    private fun saveMP(mp: Int?) {
-        if (mp == null) return
-        val config = ProfileStorageData.profileSpecific ?: return
-        config.maxwell.magicalPower = mp
     }
 }
