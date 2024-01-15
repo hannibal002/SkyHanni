@@ -172,10 +172,10 @@ object SeaCreatureTracker {
         FishingAPI.lastActiveFishingTime.passedSince() < 10.minutes && config.enabled && !isTrophyFishing()
 
     private fun isTrophyFishing(): Boolean {
-        val boots = InventoryUtils.getBoots()?.getInternalName().toString().replace("internalName:", "")
-        val leggings = InventoryUtils.getLeggings()?.getInternalName().toString().replace("internalName:", "")
-        val chestplate = InventoryUtils.getChestplate()?.getInternalName().toString().replace("internalName:", "")
-        val helmet = InventoryUtils.getHelmet()?.getInternalName().toString().replace("internalName:", "")
+        val boots = InventoryUtils.getBoots()?.getInternalName()?.asString()
+        val leggings = InventoryUtils.getLeggings()?.getInternalName()?.asString()
+        val chestplate = InventoryUtils.getChestplate()?.getInternalName()?.asString()
+        val helmet = InventoryUtils.getHelmet()?.getInternalName()?.asString()
         return armorNames.contains(helmet) && armorNames.contains(chestplate) && armorNames.contains(leggings) && armorNames.contains(boots)
     }
 }
