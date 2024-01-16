@@ -67,8 +67,8 @@ class CommissionsCalculator {
         Renderable.string("§cTo update these calculations, please open /hotm.")
     )
 
-    private var currentHOTMLevel: Int = 7
-    private var currentHOTMXP: Int = 150000
+    private var currentHOTMLevel: Int = 0
+    private var currentHOTMXP: Int = 0
 
     private enum class HOTMProgression(
         val tier: Int,
@@ -81,7 +81,6 @@ class CommissionsCalculator {
         FOUR(4, 60000, 400.0),
         FIVE(5, 100000, 400.0),
         SIX(6, 150000, 400.0),
-        SEVEN(7, 200000, 400.0),
         ;
     }
 
@@ -155,7 +154,7 @@ class CommissionsCalculator {
                             val completed = group("completed").groupToInt()
                             val required = group("required").groupToInt()
                             val commsToNextMilestone = abs(required - completed)
-                            if (completed < required || mc.thePlayer.name == "Erymanthus") {
+                            if (completed < required) {
                                 val remainingPlural = StringUtils.optionalPlural(commsToNextMilestone, "commission", "commissions")
                                 val hotmXPGain = (commsToNextMilestone * perComm).roundToInt()
                                 newList.add(
