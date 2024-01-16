@@ -119,7 +119,7 @@ object BitsAPI {
         }
 
         if (fameRankGuiNamePattern.matches(event.inventoryName)) {
-            val fameRankStack = stacks.values.firstOrNull { fameRankGuiStackPattern.matches(it.displayName) }
+            val fameRankStack = stacks.values.lastOrNull { fameRankGuiStackPattern.matches(it.displayName) }
             if (fameRankStack != null) {
                 for (line in fameRankStack.getLore()) {
                     fameRankCommunityShop.matchMatcher(line) {
