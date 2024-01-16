@@ -3,11 +3,9 @@ package at.hannibal2.skyhanni.data
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.data.jsonobjects.repo.ArrowTypeJson
 import at.hannibal2.skyhanni.data.jsonobjects.repo.ItemsJson
-import at.hannibal2.skyhanni.events.ConfigLoadEvent
 import at.hannibal2.skyhanni.events.InventoryFullyOpenedEvent
 import at.hannibal2.skyhanni.events.LorenzChatEvent
 import at.hannibal2.skyhanni.events.PlaySoundEvent
-import at.hannibal2.skyhanni.events.ProfileJoinEvent
 import at.hannibal2.skyhanni.events.RepositoryReloadEvent
 import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalNameOrNull
@@ -29,9 +27,32 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 private var infinityQuiverLevelMultiplier = 0.03f
 
 object QuiverAPI {
-    var currentArrow: ArrowType? = null
-    var currentAmount: Int = 0
-    var arrowAmount: MutableMap<ArrowType, Float> = mutableMapOf()
+    private val storage get() = ProfileStorageData.profileSpecific
+    var currentArrow: ArrowType?
+        get() = getArrowByNameOrNull(storage?.arrows?.currentArrow ?: "None")
+        set(value) {
+            storage?.arrows?.currentArrow = value?.toString() ?: return
+        }
+    var arrowAmount: MutableMap<ArrowType, Float>
+        get() = storage?.arrows?.arrowAmount?.map {
+            val arrow = getArrowByNameOrNull(it.key.asInternalName()) ?: return@map null
+            arrow to it.value
+        }?.filterNotNull()?.toMap()?.toMutableMap() ?: mutableMapOf()
+        set(value) {
+            storage?.arrows?.arrowAmount = value.map {
+                it.key.toString() to it.value
+            }.toMap().toMutableMap()
+        }
+    var currentAmount: Int
+        get() = arrowAmount[currentArrow]?.toInt() ?: 0
+        set(value) {
+            currentArrow?.let { arrow ->
+                arrowAmount.let { amount ->
+                    amount[arrow] = value.toFloat()
+                }
+            }
+        }
+
     private var arrows: List<ArrowType> = listOf()
 
     private val SKELETON_MASTER_CHESTPLATE = "SKELETON_MASTER_CHESTPLATE".asInternalName()
@@ -53,6 +74,7 @@ object QuiverAPI {
         "addedtoquiver",
         "(§.)*You've added (§.)*(?<type>.*) x(?<amount>.*) (§.)*to your quiver!"
     )
+
     // Bows that don't use the players arrows
     private val fakeBowsPattern by group.pattern("fakebows", "^BOSS_SPIRIT_BOW$")
     private val quiverInventoryNamePattern by group.pattern("quivername", "^Quiver$")
@@ -66,7 +88,7 @@ object QuiverAPI {
             currentArrow = getArrowByNameOrNull(arrow) ?: return
             currentAmount = arrowAmount[currentArrow]?.toInt() ?: 0
 
-            return saveArrowType()
+            return
         }
 
         fillUpJaxPattern.matchMatcher(message) {
@@ -79,7 +101,7 @@ object QuiverAPI {
             val newAmount = existingAmount + amount
             arrowAmount[filledUpType] = newAmount
 
-            return saveArrowAmount()
+            return
         }
 
         fillUpPattern.matchMatcher(message) {
@@ -89,7 +111,7 @@ object QuiverAPI {
 
             arrowAmount[getArrowByNameOrFlint("ARROW".asInternalName())] = newAmount
 
-            return saveArrowAmount()
+            return
         }
 
         addedToQuiverPattern.matchMatcher(message) {
@@ -102,22 +124,21 @@ object QuiverAPI {
             val newAmount = existingAmount + amount
             arrowAmount[filledUpType] = newAmount
 
-            return saveArrowAmount()
+            return
         }
 
         clearedPattern.matchMatcher(message) {
             currentAmount = 0
             arrowAmount.clear()
 
-            return saveArrowAmount()
+            return
         }
 
         arrowResetPattern.matchMatcher(message) {
             currentArrow = getArrowByNameOrNull("NONE".asInternalName()) ?: return
             currentAmount = 0
 
-            saveArrowType()
-            return saveArrowAmount()
+            return
         }
     }
 
@@ -142,8 +163,6 @@ object QuiverAPI {
 
             this.arrowAmount[arrowType] = arrowAmount
         }
-
-        saveArrowAmount()
     }
 
     @SubscribeEvent(priority = EventPriority.HIGHEST)
@@ -166,7 +185,7 @@ object QuiverAPI {
         if (arrowAmount <= 0) return
 
         if (InventoryUtils.getChestplate()
-                // The chestplate has the ability to not shoot arrows
+                // The chestplate has the ability to not use arrows
                 // https://hypixel-skyblock.fandom.com/wiki/Skeleton_Master_Armor
                 ?.getInternalNameOrNull() == SKELETON_MASTER_CHESTPLATE
         ) return
@@ -186,8 +205,6 @@ object QuiverAPI {
         }
 
         this.arrowAmount[arrowType] = (arrowAmount - amountToRemove()).coerceAtLeast(0.0f)
-
-        saveArrowAmount()
     }
 
     fun hasBowInInventory(): Boolean {
@@ -211,7 +228,7 @@ object QuiverAPI {
     }
 
 
-    // Handle Storage data
+    // Load arrows from repo
     @SubscribeEvent
     fun onRepoReload(event: RepositoryReloadEvent) {
         val itemData = event.getConstant<ItemsJson>("Items")
@@ -219,43 +236,5 @@ object QuiverAPI {
 
         val arrowData = event.getConstant<ArrowTypeJson>("ArrowTypes")
         arrows = arrowData.arrows.map { ArrowType(it.value.arrow, it.key) }
-    }
-
-    @SubscribeEvent
-    fun onConfigLoad(event: ConfigLoadEvent) {
-        val config = ProfileStorageData.profileSpecific ?: return
-        currentArrow = getArrowByNameOrNull(config.arrows.currentArrow)
-        arrowAmount = config.arrows.arrowAmount.map {
-            val arrow = getArrowByNameOrNull(it.key.asInternalName()) ?: return@map null
-            arrow to it.value
-        }.filterNotNull().toMap().toMutableMap()
-        currentAmount = arrowAmount[currentArrow]?.toInt() ?: 0
-    }
-
-    @SubscribeEvent
-    fun onProfileJoin(event: ProfileJoinEvent) {
-        val config = ProfileStorageData.profileSpecific ?: return
-        currentArrow = getArrowByNameOrNull(config.arrows.currentArrow)
-        arrowAmount = config.arrows.arrowAmount.map {
-            val arrow = getArrowByNameOrNull(it.key.asInternalName()) ?: return@map null
-            arrow to it.value
-        }.filterNotNull().toMap().toMutableMap()
-        currentAmount = arrowAmount[currentArrow]?.toInt() ?: 0
-    }
-
-    private fun saveArrowType() {
-        val config = ProfileStorageData.profileSpecific ?: return
-        config.arrows.currentArrow = currentArrow.toString()
-    }
-
-    private fun saveArrowAmount() {
-        val config = ProfileStorageData.profileSpecific ?: return
-
-        config.arrows.arrowAmount = arrowAmount.map {
-            it.key.toString() to it.value
-        }.toMap().toMutableMap()
-
-        if (arrowAmount.isNotEmpty())
-            currentAmount = arrowAmount[currentArrow]?.toInt() ?: 0
     }
 }
