@@ -17,15 +17,12 @@ import at.hannibal2.skyhanni.utils.StringUtils
 import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
-import net.minecraft.client.Minecraft
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import kotlin.math.abs
 import kotlin.math.ceil
 import kotlin.math.roundToInt
 
 class CommissionsCalculator {
-
-    private val mc = Minecraft.getMinecraft()
     private val config get() = SkyHanniMod.feature.mining.commissionsCalculator
 
     private val DWARVEN = IslandType.DWARVEN_MINES
@@ -145,7 +142,7 @@ class CommissionsCalculator {
                     }
                 }
             }
-            newList.add(Renderable.string(" §7- §f(At least $colorCode${hotmXP.addSeparators()} HOTM XP §fto be gained from claiming completed commissions)"),)
+            newList.add(Renderable.string(" §7- §f(At least $colorCode${hotmXP.addSeparators()} HOTM XP §fto be gained from claiming completed commissions)"))
         }
         if (chestName == "Commission Milestones") {
             for ((_, item) in items) {
