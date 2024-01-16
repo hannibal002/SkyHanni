@@ -32,27 +32,69 @@ object BitsAPI {
 
     private const val defaultcookiebits = 4800
 
-    private val group = RepoPattern.group("data.bits")
-    val bitsScoreboardPattern by group.pattern(
+    private val bitsDataGroup = RepoPattern.group("data.bits")
+
+    // Scoreboard patterns
+    val bitsScoreboardPattern by bitsDataGroup.pattern(
         "scoreboard",
         "^Bits: §b(?<amount>[\\d,]+\\.?\\d*) ?§?3?(?:\\((?<earned>[+-][,\\d]+)?\\)?)?\$"
     )
-    private val bitsFromFameRankUpChatPattern by group.pattern(
-        "chat.bits.famerankup",
+
+    // Chat patterns related to bits
+    private val bitsChatGroup = bitsDataGroup.group("chat")
+
+    val bitsFromFameRankUpChatPattern by bitsChatGroup.pattern(
+        "fame-rank_up",
         "§eYou gained §3(?<amount>.*) Bits Available §ecompounded from all your §epreviously eaten §6cookies§e! Click here to open §6cookie menu§e!"
     )
-    private val bitsEarnedChatPattern by group.pattern("chat.earned", "§f\\s+§8\\+§b(?<amount>.*)\\s+Bits\n")
-    private val boosterCookieAte by group.pattern("chat.boostercookie.ate", "§eYou consumed a §6Booster Cookie§e!.*")
-    private val bitsAvailableMenu by group.pattern(
-        "gui.bitsavailablemenu",
+
+    val bitsEarnedChatPattern by bitsChatGroup.pattern(
+        "earned",
+        "§f\\s+§8\\+§b(?<amount>.*)\\s+Bits\n"
+    )
+
+    val boosterCookieAte by bitsChatGroup.pattern(
+        "booster-cookie-ate",
+        "§eYou consumed a §6Booster Cookie§e!.*"
+    )
+
+    // GUI patterns
+    private val bitsGuiGroup = bitsDataGroup.group("gui")
+
+    val bitsAvailableMenuPattern by bitsGuiGroup.pattern(
+        "available-menu",
         "§7Bits Available: §b(?<toClaim>[\\w,]+)(§3.+)?"
     )
-    private val fameRankSbmenu by group.pattern("gui.sbmenu.famerank", "§7Your rank: §e(?<rank>.*)")
-    private val fameRankCommunityShop by group.pattern("gui.communityshop.famerank", "§7Fame Rank: §e(?<rank>.*)")
-    private val bitsGuiNamePattern by group.pattern("gui.mainmenuname", "^SkyBlock Menu$")
-    private val bitsGuiStackPattern by group.pattern("gui.mainmenustack", "^§6Booster Cookie$")
-    private val fameRankGuiNamePattern by group.pattern("gui.famerankmenuname", "^(Community Shop|Booster Cookie)$")
-    private val fameRankGuiStackPattern by group.pattern("gui.famerankmenustack", "^(§aCommunity Shop|§eFame Rank)$")
+
+    val fameRankSbMenuPattern by bitsGuiGroup.pattern(
+        "sb-menu-fame-rank",
+        "§7Your rank: §e(?<rank>.*)"
+    )
+
+    val fameRankCommunityShopPattern by bitsGuiGroup.pattern(
+        "community-shop-fame-rank",
+        "§7Fame Rank: §e(?<rank>.*)"
+    )
+
+    val bitsGuiNamePattern by bitsGuiGroup.pattern(
+        "main-menu-name",
+        "^SkyBlock Menu$"
+    )
+
+    val bitsGuiStackPattern by bitsGuiGroup.pattern(
+        "main-menu-stack",
+        "^§6Booster Cookie$"
+    )
+
+    val fameRankGuiNamePattern by bitsGuiGroup.pattern(
+        "fame-rank-menu-name",
+        "^(Community Shop|Booster Cookie)$"
+    )
+
+    val fameRankGuiStackPattern by bitsGuiGroup.pattern(
+        "fame-rank-menu-stack",
+        "^(§aCommunity Shop|§eFame Rank)$"
+    )
 
     @SubscribeEvent
     fun onScoreboardChange(event: ScoreboardChangeEvent) {
@@ -109,7 +151,7 @@ object BitsAPI {
             val cookieStack = stacks.values.lastOrNull { bitsGuiStackPattern.matches(it.displayName) }
             if (cookieStack != null) {
                 for (line in cookieStack.getLore()) {
-                    bitsAvailableMenu.matchMatcher(line) {
+                    bitsAvailableMenuPattern.matchMatcher(line) {
                         bitsToClaim = group("toClaim").formatNumber().toInt()
 
                         return
@@ -123,14 +165,14 @@ object BitsAPI {
             val fameRankStack = stacks.values.lastOrNull { fameRankGuiStackPattern.matches(it.displayName) }
             if (fameRankStack != null) {
                 for (line in fameRankStack.getLore()) {
-                    fameRankCommunityShop.matchMatcher(line) {
+                    fameRankCommunityShopPattern.matchMatcher(line) {
                         val rank = group("rank")
                         currentFameRank = FameRank.entries.firstOrNull { it.rank == rank } ?: FameRank.NEW_PLAYER
 
                         return
                     }
 
-                    fameRankSbmenu.matchMatcher(line) {
+                    fameRankSbMenuPattern.matchMatcher(line) {
                         val rank = group("rank")
                         currentFameRank = FameRank.entries.firstOrNull { it.rank == rank } ?: FameRank.NEW_PLAYER
 
