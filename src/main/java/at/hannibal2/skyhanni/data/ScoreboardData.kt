@@ -41,14 +41,17 @@ class ScoreboardData {
                 // get last color code in start
                 val lastColorIndex = start.lastIndexOf('§')
                 val lastColor = when {
-                    lastColorIndex != -1 && lastColorIndex + 1 < start.length -> start[lastColorIndex] + "" + start[lastColorIndex + 1]
+                    lastColorIndex != -1 && lastColorIndex + 1 < start.length && (start[lastColorIndex + 1] in '0'..'9' || start[lastColorIndex + 1] in 'a'..'f') -> start.substring(
+                        lastColorIndex,
+                        lastColorIndex + 1
+                    )
+
                     else -> ""
                 }
 
                 // remove first color code from end, when it is the same as the last color code in start
-                if (end.length >= 2 && lastColor.isNotEmpty() && end[0] == '§' && (end[1] in '0'..'9' || end[1] in 'a'..'f') && end[1] == lastColor[1]) {
-                    end = end.substring(2)
-                }
+                end = end.removePrefix(lastColor)
+
                 list.add(start + end)
             }
 

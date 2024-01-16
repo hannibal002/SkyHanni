@@ -17,7 +17,8 @@ import at.hannibal2.skyhanni.utils.NumberUtil.formatNumber
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getEnchantments
 import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.StringUtils.matches
-import at.hannibal2.skyhanni.utils.StringUtils.trimWhiteSpaceAndResets
+import at.hannibal2.skyhanni.utils.StringUtils.removeResets
+import at.hannibal2.skyhanni.utils.StringUtils.trimWhiteSpace
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraft.client.Minecraft
 import net.minecraft.item.ItemBow
@@ -81,7 +82,7 @@ object QuiverAPI {
 
     @SubscribeEvent
     fun onChat(event: LorenzChatEvent) {
-        val message = event.message.trimWhiteSpaceAndResets()
+        val message = event.message.trimWhiteSpace().removeResets()
 
         selectPattern.matchMatcher(message) {
             val arrow = group("arrow")
@@ -117,11 +118,13 @@ object QuiverAPI {
         addedToQuiverPattern.matchMatcher(message) {
             val type = group("type")
             val amount = group("amount").formatNumber().toFloat()
+
             val filledUpType = getArrowByNameOrNull(type) ?: return
 
             val existingAmount = arrowAmount[filledUpType] ?: 0f
             val newAmount = existingAmount + amount
             arrowAmount[filledUpType] = newAmount
+
             return
         }
 
@@ -163,8 +166,19 @@ object QuiverAPI {
         }
     }
 
+    /*
+     Modified method to remove arrows from SkyblockFeatures QuiverOverlay
+     Original method source:
+     https://github.com/MrFast-js/SkyblockFeatures/blob/ae4bf0b91ed0fb17114d9cdaccaa9aef9a6c8d01/src/main/java/mrfast/sbf/features/overlays/QuiverOverlay.java#L127
+
+     Changes made:
+     - Added "fake bows" check
+     - Added "infinite quiver" check
+     - Added "sneaking" check
+     - Added "bow sound distance" check
+     - Added "skeleton master chestplate" check
+    */
     @SubscribeEvent(priority = EventPriority.HIGHEST)
-    // Inspired by SkyblockFeatures - https://github.com/MrFast-js/SkyblockFeatures/
     fun onPlaySound(event: PlaySoundEvent) {
         if (!LorenzUtils.inSkyBlock) return
         if (event.soundName != "random.bow") return
@@ -208,7 +222,7 @@ object QuiverAPI {
     fun hasBowInInventory(): Boolean {
         return InventoryUtils.getItemsInOwnInventory().any { it.item is ItemBow }
     }
-    
+
     fun getArrowByNameOrNull(name: String): ArrowType? {
         return arrows.firstOrNull { it.arrow == name }
     }

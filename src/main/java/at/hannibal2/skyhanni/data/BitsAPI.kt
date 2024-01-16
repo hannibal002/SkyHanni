@@ -1,47 +1,108 @@
 package at.hannibal2.skyhanni.data
 
-import at.hannibal2.skyhanni.events.ConfigLoadEvent
+import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.events.InventoryFullyOpenedEvent
 import at.hannibal2.skyhanni.events.LorenzChatEvent
-import at.hannibal2.skyhanni.events.ProfileJoinEvent
 import at.hannibal2.skyhanni.events.ScoreboardChangeEvent
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.NumberUtil.formatNumber
 import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
-import at.hannibal2.skyhanni.utils.StringUtils.trimWhiteSpaceAndResets
+import at.hannibal2.skyhanni.utils.StringUtils.matches
+import at.hannibal2.skyhanni.utils.StringUtils.removeResets
+import at.hannibal2.skyhanni.utils.StringUtils.trimWhiteSpace
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
 object BitsAPI {
-    var bits = 0
-    var currentFameRank = FameRank.NEW_PLAYER
-    var bitsToClaim = 0
+    private val profileStorage = ProfileStorageData.profileSpecific?.bits
+    private val playerStorage = SkyHanniMod.feature.storage
+    var bits: Int
+        get() = profileStorage?.bits ?: 0
+        set(value) {
+            profileStorage?.bits = value
+        }
+    var currentFameRank: FameRank
+        get() = playerStorage?.currentFameRank ?: FameRank.NEW_PLAYER
+        set(value) {
+            playerStorage?.currentFameRank = value
+        }
+    var bitsToClaim: Int
+        get() = profileStorage?.bitsToClaim ?: 0
+        set(value) {
+            profileStorage?.bitsToClaim = value
+        }
 
     private const val defaultcookiebits = 4800
 
-    private val group = RepoPattern.group("data.bits")
-    val bitsScoreboardPattern by group.pattern(
+    private val bitsDataGroup = RepoPattern.group("data.bits")
+
+    // Scoreboard patterns
+    val bitsScoreboardPattern by bitsDataGroup.pattern(
         "scoreboard",
         "^Bits: §b(?<amount>[\\d,]+\\.?\\d*) ?§?3?(?:\\((?<earned>[+-][,\\d]+)?\\)?)?\$"
     )
-    private val bitsFromFameRankUpChatPattern by group.pattern(
-        "chat.bits.famerankup",
+
+    // Chat patterns related to bits
+    private val bitsChatGroup = bitsDataGroup.group("chat")
+
+    val bitsFromFameRankUpChatPattern by bitsChatGroup.pattern(
+        "fame-rank_up",
         "§eYou gained §3(?<amount>.*) Bits Available §ecompounded from all your §epreviously eaten §6cookies§e! Click here to open §6cookie menu§e!"
     )
-    private val bitsEarnedChatPattern by group.pattern("chat.earned", "§f\\s+§8\\+§b(?<amount>.*)\\s+Bits\n")
-    private val boosterCookieAte by group.pattern("chat.boostercookie.ate", "§eYou consumed a §6Booster Cookie§e! §d.*")
-    private val bitsAvailableMenu by group.pattern(
-        "gui.bitsavailablemenu",
+
+    val bitsEarnedChatPattern by bitsChatGroup.pattern(
+        "earned",
+        "§f\\s+§8\\+§b(?<amount>.*)\\s+Bits\n"
+    )
+
+    val boosterCookieAte by bitsChatGroup.pattern(
+        "booster-cookie-ate",
+        "§eYou consumed a §6Booster Cookie§e!.*"
+    )
+
+    // GUI patterns
+    private val bitsGuiGroup = bitsDataGroup.group("gui")
+
+    val bitsAvailableMenuPattern by bitsGuiGroup.pattern(
+        "available-menu",
         "§7Bits Available: §b(?<toClaim>[\\w,]+)(§3.+)?"
     )
-    private val fameRankSbmenu by group.pattern("gui.fameranksbmenu", "§7Your rank: §e(?<rank>.*)")
-    private val fameRankCommunityShop by group.pattern("gui.famerankcommunityshop", "§7Fame Rank: §e(?<rank>.*)")
+
+    val fameRankSbMenuPattern by bitsGuiGroup.pattern(
+        "sb-menu-fame-rank",
+        "§7Your rank: §e(?<rank>.*)"
+    )
+
+    val fameRankCommunityShopPattern by bitsGuiGroup.pattern(
+        "community-shop-fame-rank",
+        "§7Fame Rank: §e(?<rank>.*)"
+    )
+
+    val bitsGuiNamePattern by bitsGuiGroup.pattern(
+        "main-menu-name",
+        "^SkyBlock Menu$"
+    )
+
+    val bitsGuiStackPattern by bitsGuiGroup.pattern(
+        "main-menu-stack",
+        "^§6Booster Cookie$"
+    )
+
+    val fameRankGuiNamePattern by bitsGuiGroup.pattern(
+        "fame-rank-menu-name",
+        "^(Community Shop|Booster Cookie)$"
+    )
+
+    val fameRankGuiStackPattern by bitsGuiGroup.pattern(
+        "fame-rank-menu-stack",
+        "^(§aCommunity Shop|§eFame Rank)$"
+    )
 
     @SubscribeEvent
     fun onScoreboardChange(event: ScoreboardChangeEvent) {
         for (line in event.newList) {
-            val message = line.trimWhiteSpaceAndResets()
+            val message = line.trimWhiteSpace().removeResets()
 
             bitsScoreboardPattern.matchMatcher(message) {
                 val amount = group("amount").formatNumber().toInt()
@@ -49,20 +110,20 @@ object BitsAPI {
                 bits = amount
                 if (earned > 0) bitsToClaim -= earned
 
-                save()
+                return
             }
         }
     }
 
     @SubscribeEvent
     fun onChat(event: LorenzChatEvent) {
-        val message = event.message.trimWhiteSpaceAndResets()
+        val message = event.message.trimWhiteSpace().removeResets()
 
         bitsFromFameRankUpChatPattern.matchMatcher(message) {
             val amount = group("amount").formatNumber().toInt()
             bitsToClaim += amount
 
-            save()
+            return
         }
 
         bitsEarnedChatPattern.matchMatcher(message) {
@@ -73,74 +134,55 @@ object BitsAPI {
             bits += amount
             bitsToClaim -= amount
 
-            save()
+            return
         }
 
         boosterCookieAte.matchMatcher(message) {
             bitsToClaim += (defaultcookiebits * currentFameRank.bitsMultiplier).toInt()
 
-            save()
+            return
         }
     }
 
     @SubscribeEvent
     fun onInventoryFullyLoaded(event: InventoryFullyOpenedEvent) {
         if (!LorenzUtils.inSkyBlock) return
-        val allowedNames = listOf("SkyBlock Menu", "Booster Cookie", "Community Shop")
-        if (!allowedNames.contains(event.inventoryName)) return
 
         val stacks = event.inventoryItems
-        for (stack in stacks.values) {
-            val lore = stack.getLore()
-            if (lore.isEmpty()) continue
 
-            for (line in lore) {
-                bitsAvailableMenu.matchMatcher(line) {
-                    val toClaim = group("toClaim").formatNumber().toInt()
-                    bitsToClaim = toClaim
+        if (bitsGuiNamePattern.matches(event.inventoryName)) {
+            val cookieStack = stacks.values.lastOrNull { bitsGuiStackPattern.matches(it.displayName) }
+            if (cookieStack != null) {
+                for (line in cookieStack.getLore()) {
+                    bitsAvailableMenuPattern.matchMatcher(line) {
+                        bitsToClaim = group("toClaim").formatNumber().toInt()
 
-                    save()
+                        return
+                    }
                 }
+            }
+            return
+        }
 
-                fameRankSbmenu.matchMatcher(line) {
-                    val rank = group("rank")
-                    currentFameRank = FameRank.entries.firstOrNull { it.rank == rank } ?: FameRank.NEW_PLAYER
+        if (fameRankGuiNamePattern.matches(event.inventoryName)) {
+            val fameRankStack = stacks.values.lastOrNull { fameRankGuiStackPattern.matches(it.displayName) }
+            if (fameRankStack != null) {
+                line@for (line in fameRankStack.getLore()) {
+                    fameRankCommunityShopPattern.matchMatcher(line) {
+                        val rank = group("rank")
+                        currentFameRank = FameRank.entries.firstOrNull { it.rank == rank } ?: FameRank.NEW_PLAYER
 
-                    save()
-                }
+                        continue@line
+                    }
 
-                fameRankCommunityShop.matchMatcher(line) {
-                    val rank = group("rank")
-                    currentFameRank = FameRank.entries.firstOrNull { it.rank == rank } ?: FameRank.NEW_PLAYER
+                    fameRankSbMenuPattern.matchMatcher(line) {
+                        val rank = group("rank")
+                        currentFameRank = FameRank.entries.firstOrNull { it.rank == rank } ?: FameRank.NEW_PLAYER
 
-                    save()
+                        return
+                    }
                 }
             }
         }
-    }
-
-
-    // Handle Storage data
-    @SubscribeEvent
-    fun onConfigLoad(event: ConfigLoadEvent) {
-        val config = ProfileStorageData.profileSpecific ?: return
-        bits = config.bits.bits
-        currentFameRank = config.bits.currentFameRank
-        bitsToClaim = config.bits.bitsToClaim
-    }
-
-    @SubscribeEvent
-    fun onProfileJoin(event: ProfileJoinEvent) {
-        val config = ProfileStorageData.profileSpecific ?: return
-        config.bits.bits = bits
-        config.bits.currentFameRank = currentFameRank
-        config.bits.bitsToClaim = bitsToClaim
-    }
-
-    private fun save() {
-        val config = ProfileStorageData.profileSpecific ?: return
-        config.bits.bits = bits
-        config.bits.currentFameRank = currentFameRank
-        config.bits.bitsToClaim = bitsToClaim
     }
 }
