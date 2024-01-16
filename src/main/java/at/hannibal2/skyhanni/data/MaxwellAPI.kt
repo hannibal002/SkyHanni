@@ -17,12 +17,12 @@ object MaxwellAPI {
     var currentPower: String?
         get() = storage?.maxwell?.currentPower
         set(value) {
-            storage?.maxwell?.currentPower = value
+            storage?.maxwell?.currentPower = value ?: return
         }
     var magicalPower: Int?
         get() = storage?.maxwell?.magicalPower
         set(value) {
-            storage?.maxwell?.magicalPower = value
+            storage?.maxwell?.magicalPower = value ?: return
         }
 
     private var powers = mutableListOf<String>()
@@ -37,7 +37,7 @@ object MaxwellAPI {
         "§7Selected Power: §a(?<power>.*)"
     )
     private val inventoryMPPattern by group.pattern(
-        "inventory.magicpower",
+        "inventory.magicalpower",
         "§7Magical Power: §6(?<mp>[\\d,]+)"
     )
 
