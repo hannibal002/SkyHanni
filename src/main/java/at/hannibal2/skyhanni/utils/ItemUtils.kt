@@ -218,7 +218,7 @@ object ItemUtils {
             val itemCategoryEnum = getItemCategoryEnum(itemCategory, name, cleanName)
             val itemRarityEnum = LorenzRarity.getByName(rarity)
 
-            if(itemCategoryEnum == null){
+            if (itemCategoryEnum == null) {
                 ErrorManager.logErrorStateWithData(
                     "Could not read category for item $name",
                     "Failed to read category from item rarity via item lore",
@@ -229,7 +229,7 @@ object ItemUtils {
                     "lore" to getLore(),
                 )
             }
-            if(itemRarityEnum == null){
+            if (itemRarityEnum == null) {
                 ErrorManager.logErrorStateWithData(
                     "Could not read rarity for item $name",
                     "Failed to read rarity from item rarity via item lore",
