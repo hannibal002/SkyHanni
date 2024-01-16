@@ -183,7 +183,7 @@ object QuiverAPI {
         }
     }
 
-    fun hasBowInInvetory(): Boolean {
+    fun hasBowInInventory(): Boolean {
         return InventoryUtils.getItemsInOwnInventory().any { it.item is ItemBow }
     }
 
