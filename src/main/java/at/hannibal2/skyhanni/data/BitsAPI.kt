@@ -165,12 +165,12 @@ object BitsAPI {
         if (fameRankGuiNamePattern.matches(event.inventoryName)) {
             val fameRankStack = stacks.values.lastOrNull { fameRankGuiStackPattern.matches(it.displayName) }
             if (fameRankStack != null) {
-                for (line in fameRankStack.getLore()) {
+                line@for (line in fameRankStack.getLore()) {
                     fameRankCommunityShopPattern.matchMatcher(line) {
                         val rank = group("rank")
                         currentFameRank = FameRank.entries.firstOrNull { it.rank == rank } ?: FameRank.NEW_PLAYER
 
-                        return
+                        continue@line
                     }
 
                     fameRankSbMenuPattern.matchMatcher(line) {
