@@ -67,7 +67,7 @@ object BitsAPI {
 
         bitsEarnedChatPattern.matchMatcher(message) {
             // Only two locations where the bits line isn't shown, but you can still get bits
-            if (!listOf(IslandType.CATACOMBS, IslandType.THE_RIFT).contains(HypixelData.skyBlockIsland)) return
+            if (LorenzUtils.inAnyIsland(IslandType.CATACOMBS, IslandType.THE_RIFT)) return
 
             val amount = group("amount").formatNumber().toInt()
             bits += amount
