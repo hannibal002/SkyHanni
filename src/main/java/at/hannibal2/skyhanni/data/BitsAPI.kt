@@ -106,7 +106,7 @@ object BitsAPI {
         val stacks = event.inventoryItems
 
         if (bitsGuiNamePattern.matches(event.inventoryName)) {
-            val cookieStack = stacks.values.firstOrNull { bitsGuiStackPattern.matches(it.displayName) }
+            val cookieStack = stacks.values.lastOrNull { bitsGuiStackPattern.matches(it.displayName) }
             if (cookieStack != null) {
                 for (line in cookieStack.getLore()) {
                     bitsAvailableMenu.matchMatcher(line) {
