@@ -366,8 +366,8 @@ object ItemUtils {
         return getItemStack().nameWithEnchantment ?: error("Could not find item name for $this")
     }
 
-    fun getPetRarity(pet: ItemStack): LorenzRarity? {
-        val rarityId = pet.getInternalName().asString().last() - '0'
+    private fun getPetRarity(pet: ItemStack): LorenzRarity? {
+        val rarityId = pet.getInternalName().asString().split(";").last().toInt()
         val rarity = LorenzRarity.getById(rarityId)
         val name = pet.name
         if (rarity == null) {
