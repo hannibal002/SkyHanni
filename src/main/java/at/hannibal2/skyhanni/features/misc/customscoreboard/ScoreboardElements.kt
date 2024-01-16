@@ -541,7 +541,7 @@ private fun getEventsShowWhen() = ScoreboardEvents.getEvent().isNotEmpty()
 
 private fun getMayorDisplayPair(): List<ScoreboardElement> {
     return listOf(
-        (MayorAPI.currentMayor?.name?.let { MayorAPI.mayorNameToColorCode(it) }
+        (MayorAPI.currentMayor?.name?.let { MayorAPI.mayorNameWithColorCode(it) }
             ?: "<hidden>") +
             (if (config.mayorConfig.showTimeTillNextMayor) {
                 "§7 (§e${TimeUtils.formatDuration(MayorAPI.timeTillNextMayor, TimeUnit.DAY)}§7)"
