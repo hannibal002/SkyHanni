@@ -51,24 +51,5 @@ fun replaceString(text: String): String? {
         }
     }
 
-    if (SkyHanniMod.feature.misc.colorMonthNames) {
-        listOf(
-            "Early Spring" to "§d",
-            "Spring" to "§d",
-            "Late Spring" to "§d",
-            "Early Summer" to "§6",
-            "Summer" to "§6",
-            "Late Summer" to "§6",
-            "Early Autumn" to "§e",
-            "Autumn" to "§e",
-            "Late Autumn" to "§e",
-            "Early Winter" to "§9",
-            "Winter" to "§9",
-            "Late Winter" to "§9"
-        ).forEach {
-            if (text.trim().startsWith(it.first)) return it.second + text
-        }
-    }
-
     return text
 }

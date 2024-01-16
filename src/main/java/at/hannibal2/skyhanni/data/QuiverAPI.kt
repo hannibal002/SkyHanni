@@ -117,11 +117,13 @@ object QuiverAPI {
         addedToQuiverPattern.matchMatcher(message) {
             val type = group("type")
             val amount = group("amount").formatNumber().toFloat()
+
             val filledUpType = getArrowByNameOrNull(type) ?: return
 
             val existingAmount = arrowAmount[filledUpType] ?: 0f
             val newAmount = existingAmount + amount
             arrowAmount[filledUpType] = newAmount
+
             return
         }
 
@@ -208,7 +210,7 @@ object QuiverAPI {
     fun hasBowInInventory(): Boolean {
         return InventoryUtils.getItemsInOwnInventory().any { it.item is ItemBow }
     }
-    
+
     fun getArrowByNameOrNull(name: String): ArrowType? {
         return arrows.firstOrNull { it.arrow == name }
     }
