@@ -43,6 +43,11 @@ import kotlin.properties.ReadWriteProperty
 import kotlin.reflect.KMutableProperty1
 import kotlin.reflect.KProperty
 import kotlin.reflect.KProperty0
+import kotlin.reflect.KProperty1
+import kotlin.reflect.full.isSubtypeOf
+import kotlin.reflect.full.memberProperties
+import kotlin.reflect.full.starProjectedType
+import kotlin.reflect.jvm.isAccessible
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.seconds
 
@@ -507,6 +512,14 @@ object LorenzUtils {
                 child.set(rootObj, value)
             }
         }
+
+    inline fun <reified T : Any> Any.getPropertiesWithType() =
+        this::class.memberProperties
+            .filter { it.returnType.isSubtypeOf(T::class.starProjectedType) }
+            .map {
+                it.isAccessible = true
+                (it as KProperty1<Any, T>).get(this)
+            }
 
     fun List<String>.nextAfter(after: String, skip: Int = 1) = nextAfter({ it == after }, skip)
 
