@@ -22,6 +22,8 @@ object MayorAPI {
     var currentMayor: MayorJson.Candidate? = null
     var timeTillNextMayor = 0L
 
+    private const val LATE_SPRING = 3
+
     fun isPerkActive(mayor: String, perk: String) = currentMayor?.let { currentCandidate ->
         currentCandidate.name == mayor && currentCandidate.perks.any { it.name == perk }
     } ?: false
@@ -50,12 +52,13 @@ object MayorAPI {
             else -> "§cUnknown Mayor: §7"
         }
     }
-    
+
     /**
      * @param input: The name of the mayor
      * @return: The neu color of the mayor + the name of the mayor; If no mayor was found, it will return "§cUnknown Mayor: §7"
      */
     fun mayorNameWithColorCode(input: String) = mayorNameToColorCode(input) + input
+
     @SubscribeEvent
     fun onTick(event: LorenzTickEvent) {
         if (!LorenzUtils.onHypixel) return
@@ -66,17 +69,32 @@ object MayorAPI {
         }
     }
 
-    private fun getTimeTillNextMayor() {
+    private fun calculateNextMayorTime(): Long {
         var currentYear = SkyBlockTime.now().year
-        val month = 3 // Late Spring
-        // check if either the month is already over or the day is after 27th and third month
-        if (SkyBlockTime.now().month > month || (SkyBlockTime.now().day >= 27 && SkyBlockTime.now().month == month)) {
-            // if so, next mayor will be in the next year
+
+        // Check if either the month is already over or the day is after 27th in the third month
+        if (SkyBlockTime.now().month > LATE_SPRING || (SkyBlockTime.now().day >= 27 && SkyBlockTime.now().month == LATE_SPRING)) {
+            // If so, the next mayor will be in the next year
             currentYear++
         }
-        val nextMayorTime = SkyBlockTime(currentYear, month, day = 27).toMillis()
 
+        return SkyBlockTime(currentYear, LATE_SPRING, day = 27).toMillis()
+    }
+
+    private fun getTimeTillNextMayor() {
+        val nextMayorTime = calculateNextMayorTime()
         timeTillNextMayor = nextMayorTime - System.currentTimeMillis()
+    }
+
+    private fun checkCurrentMayor() {
+        val nextMayorTime = calculateNextMayorTime()
+
+        // Check if it is still the mayor from the old SkyBlock year
+        currentMayor = if (nextMayorTime > System.currentTimeMillis()) {
+            candidates[SkyBlockTime.now().year - 1]
+        } else {
+            candidates[SkyBlockTime.now().year]
+        }
     }
 
     private fun checkHypixelAPI() {
@@ -97,20 +115,6 @@ object MayorAPI {
         }
 
         checkCurrentMayor()
-    }
-
-    private fun checkCurrentMayor() {
-        var currentYear = SkyBlockTime.now().year
-
-        // The time in the current SkyBlock year when the election circle will restart
-        val month = 3 // Late Spring
-        val nextMayorTime = SkyBlockTime(currentYear, month, day = 27).toMillis()
-
-        // Is it still the mayor from old sb year?
-        if (nextMayorTime > System.currentTimeMillis()) {
-            currentYear--
-        }
-        currentMayor = candidates[currentYear]
     }
 
     private fun MayorJson.Election.getPairs() = year + 1 to candidates.bestCandidate()
