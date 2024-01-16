@@ -49,7 +49,7 @@ object MayorAPI {
             "Jerry" -> "§d"
             "Derpy" -> "§d"
             "Dante" -> "§d"
-            else -> "§cUnknown Mayor: §7"
+            else -> "§cUnknown: §7"
         }
     }
 
