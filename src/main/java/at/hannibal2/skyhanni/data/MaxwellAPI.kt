@@ -72,7 +72,7 @@ object MaxwellAPI {
                 stacks.values.find { it.getLore().isNotEmpty() && it.getLore().last() == "§aPower is selected!" }
                     ?: return
 
-            currentPower = getPowerByNameOrNull(selectedPower.getLore().first()) ?: return
+            currentPower = getPowerByNameOrNull(selectedPower.displayName) ?: return
             return
         }
 
