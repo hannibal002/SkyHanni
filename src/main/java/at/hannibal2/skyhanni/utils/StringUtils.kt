@@ -281,9 +281,9 @@ object StringUtils {
 
     fun String.convertToFormatted(): String = this.replace("&&", "§")
 
-    fun Pattern.matches(string: String) = matcher(string).matches()
+    fun Pattern.matches(string: String?) = string?.let { matcher(it).matches() } ?: false
 
-    fun Pattern.find(string: String) = matcher(string).find()
+    fun Pattern.find(string: String?) = string?.let { matcher(it).find() } ?: false
 
     fun String.allLettersFirstUppercase() = split("_").joinToString(" ") { it.firstLetterUppercase() }
 

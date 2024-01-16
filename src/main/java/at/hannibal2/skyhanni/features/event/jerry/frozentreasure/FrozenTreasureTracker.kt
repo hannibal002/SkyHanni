@@ -134,7 +134,7 @@ object FrozenTreasureTracker {
         addAsSingletonList("§6${formatNumber(data.treasuresMined)} Treasures Mined")
         addAsSingletonList("§3${formatNumber(estimatedIce)} Total Ice")
         addAsSingletonList("§3${formatNumber(icePerHour)} Ice/hr")
-        addAsSingletonList("§8${formatNumber(data.treasuresMined)} Compact Procs")
+        addAsSingletonList("§8${formatNumber(data.compactProcs)} Compact Procs")
         addAsSingletonList("")
 
         for (treasure in FrozenTreasure.entries) {
