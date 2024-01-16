@@ -24,5 +24,5 @@ public class CommissionsCalculatorConfig {
     public boolean allMilestones = false;
 
     @Expose
-    public Position position = new Position(140, 90, false, true);
+    public Position position = new Position(100, 90, false, true);
 }
