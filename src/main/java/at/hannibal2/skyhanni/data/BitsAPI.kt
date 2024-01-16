@@ -116,6 +116,7 @@ object BitsAPI {
                     }
                 }
             }
+            return
         }
 
         if (fameRankGuiNamePattern.matches(event.inventoryName)) {
