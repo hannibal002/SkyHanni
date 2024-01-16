@@ -167,7 +167,18 @@ object QuiverAPI {
     }
 
     @SubscribeEvent(priority = EventPriority.HIGHEST)
-    // Inspired by SkyblockFeatures - https://github.com/MrFast-js/SkyblockFeatures/
+        /*
+         Modified method to remove arrows from SkyblockFeatures QuiverOverlay
+         Original method source:
+         https://github.com/MrFast-js/SkyblockFeatures/blob/ae4bf0b91ed0fb17114d9cdaccaa9aef9a6c8d01/src/main/java/mrfast/sbf/features/overlays/QuiverOverlay.java#L127
+
+         Changes made:
+         - Added "fake bows" check
+         - Added "infinite quiver" check
+         - Added "sneaking" check
+         - Added "bow sound distance" check
+         - Added "skeleton master chestplate" check
+        */
     fun onPlaySound(event: PlaySoundEvent) {
         if (!LorenzUtils.inSkyBlock) return
         if (event.soundName != "random.bow") return
