@@ -78,13 +78,13 @@ object MaxwellAPI {
         if (yourBagsGuiPattern.matches(event.inventoryName)) {
             val stacks = event.inventoryItems
 
-            for (stack in stacks.values) {
+            stack@for (stack in stacks.values) {
                 val lore = stack.getLore()
                 for (line in lore) {
                     inventoryPowerPattern.matchMatcher(line) {
                         val power = group("power")
                         currentPower = getPowerByNameOrNull(power) ?: return
-                        return@matchMatcher
+                        continue@stack
                     }
                     inventoryMPPattern.matchMatcher(line) {
                         // MagicalPower is boosted in catacombs
@@ -92,7 +92,7 @@ object MaxwellAPI {
 
                         val mp = group("mp")
                         magicalPower = mp.replace(",", "").toIntOrNull() ?: return
-                        return@matchMatcher
+                        continue@stack
                     }
                 }
             }
