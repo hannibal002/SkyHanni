@@ -263,6 +263,8 @@ import at.hannibal2.skyhanni.features.misc.TpsCounter
 import at.hannibal2.skyhanni.features.misc.compacttablist.AdvancedPlayerList
 import at.hannibal2.skyhanni.features.misc.compacttablist.TabListReader
 import at.hannibal2.skyhanni.features.misc.compacttablist.TabListRenderer
+import at.hannibal2.skyhanni.features.misc.customscoreboard.CustomScoreboard
+import at.hannibal2.skyhanni.features.misc.customscoreboard.ScoreboardPattern
 import at.hannibal2.skyhanni.features.misc.discordrpc.DiscordRPCManager
 import at.hannibal2.skyhanni.features.misc.items.AuctionHouseCopyUnderbidPrice
 import at.hannibal2.skyhanni.features.misc.items.EstimatedItemValue
@@ -427,6 +429,7 @@ class SkyHanniMod {
         loadModule(GardenBestCropTime())
         loadModule(TrackerManager)
         loadModule(SkyBlockItemModifierUtils)
+        loadModule(ScoreboardPattern)
 
         // APIs
         loadModule(BazaarApi())
@@ -696,6 +699,7 @@ class SkyHanniMod {
         loadModule(DungeonFinderFeatures())
         loadModule(PabloHelper())
         loadModule(FishingBaitWarnings())
+        loadModule(CustomScoreboard())
         loadModule(RepoPatternManager)
         loadModule(PestSpawn())
         loadModule(PestSpawnTimer)
