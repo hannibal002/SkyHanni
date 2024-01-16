@@ -1,6 +1,5 @@
 package at.hannibal2.skyhanni.utils
 
-
 enum class ItemCategory {
     SWORD,
     FISHING_ROD,

@@ -206,56 +206,41 @@ object ItemUtils {
 
     fun ItemStack.getItemRarityOrCommon() = getItemRarityOrNull() ?: LorenzRarity.COMMON
 
-    private fun ItemStack.readItemCategoryAndRarity(logError: Boolean): Pair<LorenzRarity?, ItemCategory?> {
+    private fun ItemStack.readItemCategoryAndRarity(): Pair<LorenzRarity?, ItemCategory?> {
         val name = this.name ?: ""
         val cleanName = this.cleanName()
         for (line in this.getLore().reversed()) {
-            UtilsPatterns.rarityLoreLinePattern.matchMatcher(line) {
-                val itemCategory = group("itemCategory").replace(" ", "_")
-                val rarity = group("rarity").replace(" ", "_")
+            val (itemCategory, rarity) = UtilsPatterns.rarityLoreLinePattern.matchMatcher(line) {
+                group("itemCategory").replace(" ", "_") to
+                    group("rarity").replace(" ", "_")
+            } ?: continue
 
-                val itemCategoryEnum = try {
-                    if (itemCategory.isEmpty()) {
-                        when {
-                            UtilsPatterns.abiPhonePattern.matches(name) -> ItemCategory.ABIPHONE
-                            isPet(cleanName) -> ItemCategory.PET
-                            UtilsPatterns.enchantedBookPattern.matches(name) -> ItemCategory.ENCHANTED_BOOK
-                            else -> ItemCategory.NONE
-                        }
-                    } else {
-                        ItemCategory.valueOf(itemCategory)
-                    }
-                } catch (e: IllegalArgumentException) {
-                    if (logError) {
-                        ErrorManager.logErrorStateWithData(
-                            "Could not read category for item $name",
-                            "Failed to read category from item rarity via item lore",
-                            "internal name" to getInternalName(),
-                            "item name" to name,
-                            "inventory name" to InventoryUtils.openInventoryName(),
-                            "pattern result" to itemCategory,
-                            "lore" to getLore(),
-                        )
-                    }
-                    null
-                }
-                val itemRarityEnum = try {
-                    LorenzRarity.valueOf(rarity)
-                } catch (e: IllegalArgumentException) {
-                    if (logError) {
-                        ErrorManager.logErrorStateWithData(
-                            "Could not read rarity for item $name",
-                            "Failed to read rarity from item rarity via item lore",
-                            "internal name" to getInternalName(),
-                            "item name" to name,
-                            "inventory name" to InventoryUtils.openInventoryName(),
-                            "lore" to getLore(),
-                        )
-                    }
-                    null
-                }
-                return itemRarityEnum to itemCategoryEnum
+            val itemCategoryEnum = getItemCategoryEnum(itemCategory, name, cleanName)
+            val itemRarityEnum = LorenzRarity.getByName(rarity)
+
+            if(itemCategoryEnum == null){
+                ErrorManager.logErrorStateWithData(
+                    "Could not read category for item $name",
+                    "Failed to read category from item rarity via item lore",
+                    "internal name" to getInternalName(),
+                    "item name" to name,
+                    "inventory name" to InventoryUtils.openInventoryName(),
+                    "pattern result" to itemCategory,
+                    "lore" to getLore(),
+                )
             }
+            if(itemRarityEnum == null){
+                ErrorManager.logErrorStateWithData(
+                    "Could not read rarity for item $name",
+                    "Failed to read rarity from item rarity via item lore",
+                    "internal name" to getInternalName(),
+                    "item name" to name,
+                    "inventory name" to InventoryUtils.openInventoryName(),
+                    "lore" to getLore(),
+                )
+            }
+
+            return itemRarityEnum to itemCategoryEnum
         }
         if (isPet(cleanName)) {
             return getPetRarity(this) to ItemCategory.PET
@@ -263,7 +248,17 @@ object ItemUtils {
         return null to null
     }
 
-    fun ItemStack.updateCategoryAndRarity(logError: Boolean = true) {
+    private fun getItemCategoryEnum(itemCategory: String, name: String, cleanName: String = name.removeColor()) =
+        if (itemCategory.isEmpty()) when {
+            UtilsPatterns.abiPhonePattern.matches(name) -> ItemCategory.ABIPHONE
+            isPet(cleanName) -> ItemCategory.PET
+            UtilsPatterns.enchantedBookPattern.matches(name) -> ItemCategory.ENCHANTED_BOOK
+            else -> ItemCategory.NONE
+        } else {
+            LorenzUtils.enumValueOfOrNull<ItemCategory>(itemCategory)
+        }
+
+    private fun ItemStack.updateCategoryAndRarity() {
         val data = cachedData
         data.itemRarityLastCheck = SimpleTimeMark.now().toMillis()
         val internalName = getInternalName()
@@ -272,23 +267,23 @@ object ItemUtils {
             data.itemCategory = null
             return
         }
-        val pair = this.readItemCategoryAndRarity(logError)
+        val pair = this.readItemCategoryAndRarity()
         data.itemRarity = pair.first
         data.itemCategory = pair.second
     }
 
-    fun ItemStack.getItemCategoryOrNull(logError: Boolean = true): ItemCategory? {
+    fun ItemStack.getItemCategoryOrNull(): ItemCategory? {
         val data = cachedData
         if (itemRarityLastCheck(data)) {
-            this.updateCategoryAndRarity(logError)
+            this.updateCategoryAndRarity()
         }
         return data.itemCategory
     }
 
-    fun ItemStack.getItemRarityOrNull(logError: Boolean = true): LorenzRarity? {
+    fun ItemStack.getItemRarityOrNull(): LorenzRarity? {
         val data = cachedData
         if (itemRarityLastCheck(data)) {
-            this.updateCategoryAndRarity(logError)
+            this.updateCategoryAndRarity()
         }
         return data.itemRarity
     }
