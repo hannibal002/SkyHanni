@@ -9,7 +9,7 @@ import at.hannibal2.skyhanni.data.MayorAPI
 import at.hannibal2.skyhanni.data.PartyAPI
 import at.hannibal2.skyhanni.data.PurseAPI
 import at.hannibal2.skyhanni.data.QuiverAPI
-import at.hannibal2.skyhanni.data.QuiverAPI.getByNameOrNull
+import at.hannibal2.skyhanni.data.QuiverAPI.getArrowByNameOrNull
 import at.hannibal2.skyhanni.data.ScoreboardData
 import at.hannibal2.skyhanni.data.SlayerAPI
 import at.hannibal2.skyhanni.features.misc.customscoreboard.CustomScoreboardUtils.formatNum
@@ -497,7 +497,7 @@ private fun getSlayerShowWhen() = listOf(
 private fun getQuiverDisplayPair(): List<ScoreboardElement> {
     if (QuiverAPI.currentArrow == null)
         return listOf("§cChange your Arrow once" to HorizontalAlignment.LEFT)
-    if (QuiverAPI.currentArrow == getByNameOrNull("NONE".asInternalName()))
+    if (QuiverAPI.currentArrow == getArrowByNameOrNull("NONE".asInternalName()))
         return listOf("No Arrows selected" to HorizontalAlignment.LEFT)
 
     return when (displayConfig.displayNumbersFirst) {
