@@ -14,20 +14,21 @@ import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
 object BitsAPI {
+    private val storage = ProfileStorageData.profileSpecific?.bits
     var bits: Int
-        get() = ProfileStorageData.profileSpecific?.bits?.bits ?: 0
+        get() = storage?.bits ?: 0
         set(value) {
-            ProfileStorageData.profileSpecific?.bits?.bits = value
+            storage?.bits = value
         }
     var currentFameRank: FameRank
-        get() = ProfileStorageData.profileSpecific?.bits?.currentFameRank ?: FameRank.NEW_PLAYER
+        get() = storage?.currentFameRank ?: FameRank.NEW_PLAYER
         set(value) {
-            ProfileStorageData.profileSpecific?.bits?.currentFameRank = value
+            storage?.currentFameRank = value
         }
     var bitsToClaim: Int
-        get() = ProfileStorageData.profileSpecific?.bits?.bitsToClaim ?: 0
+        get() = storage?.bitsToClaim ?: 0
         set(value) {
-            ProfileStorageData.profileSpecific?.bits?.bitsToClaim = value
+            storage?.bitsToClaim = value
         }
 
     private const val defaultcookiebits = 4800
