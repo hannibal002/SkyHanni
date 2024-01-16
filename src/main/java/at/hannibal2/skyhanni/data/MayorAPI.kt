@@ -30,7 +30,7 @@ object MayorAPI {
 
     /**
      * @param input: The name of the mayor
-     * @return: The neu color of the mayor; If no mayor was found, it will return "§cUnknown Mayor: §7"
+     * @return: The neu color of the mayor; If no mayor was found, it will return "§cUnknown: §7"
      */
     fun mayorNameToColorCode(input: String): String {
         return when (input) {
@@ -55,7 +55,7 @@ object MayorAPI {
 
     /**
      * @param input: The name of the mayor
-     * @return: The neu color of the mayor + the name of the mayor; If no mayor was found, it will return "§cUnknown Mayor: §7"
+     * @return: The neu color of the mayor + the name of the mayor; If no mayor was found, it will return "§cUnknown: §7[input]"
      */
     fun mayorNameWithColorCode(input: String) = mayorNameToColorCode(input) + input
 
