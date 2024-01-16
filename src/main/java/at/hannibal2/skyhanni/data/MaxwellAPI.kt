@@ -8,6 +8,7 @@ import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils.isInIsland
 import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
+import at.hannibal2.skyhanni.utils.StringUtils.matches
 import at.hannibal2.skyhanni.utils.StringUtils.trimWhiteSpaceAndResets
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
@@ -40,6 +41,14 @@ object MaxwellAPI {
         "inventory.magicalpower",
         "§7Magical Power: §6(?<mp>[\\d,]+)"
     )
+    private val thaumatorgyrGuiPattern by group.pattern(
+        "gui.thaumatorgyr",
+        "Accessory Bag Thaumaturgyr"
+    )
+    private val yourBagsGuiPattern by group.pattern(
+        "gui.yourbags",
+        "Your Bags"
+    )
 
     @SubscribeEvent
     fun onChat(event: LorenzChatEvent) {
@@ -56,7 +65,7 @@ object MaxwellAPI {
     fun onInventoryFullyLoaded(event: InventoryFullyOpenedEvent) {
         if (!LorenzUtils.inSkyBlock) return
 
-        if (event.inventoryName.contains("Accessory Bag Thaumaturgyr")) {
+        if (thaumatorgyrGuiPattern.matches(event.inventoryName)) {
             val stacks = event.inventoryItems
             val selectedPower =
                 stacks.values.find { it.getLore().isNotEmpty() && it.getLore().last() == "§aPower is selected!" }
@@ -66,7 +75,7 @@ object MaxwellAPI {
             return
         }
 
-        if (event.inventoryName.contains("Your Bags")) {
+        if (yourBagsGuiPattern.matches(event.inventoryName)) {
             val stacks = event.inventoryItems
 
             for (stack in stacks.values) {
