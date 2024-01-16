@@ -48,7 +48,7 @@ object BitsAPI {
         "§7Bits Available: §b(?<toClaim>[\\w,]+)(§3.+)?"
     )
     private val fameRankSbmenu by group.pattern("gui.sbmenu.famerank", "§7Your rank: §e(?<rank>.*)")
-    private val fameRankCommunityShop by group.pattern("gui.famerankcommunityshop", "§7Fame Rank: §e(?<rank>.*)")
+    private val fameRankCommunityShop by group.pattern("gui.communityshop.famerank", "§7Fame Rank: §e(?<rank>.*)")
     private val bitsGuiNamePattern by group.pattern("gui.mainmenuname", "^SkyBlock Menu$")
     private val bitsGuiStackPattern by group.pattern("gui.mainmenustack", "^§6Booster Cookie$")
     private val fameRankGuiNamePattern by group.pattern("gui.famerankmenuname", "^(Community Shop|Booster Cookie)$")
