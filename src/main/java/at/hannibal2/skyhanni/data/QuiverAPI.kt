@@ -55,6 +55,7 @@ object QuiverAPI {
     )
     // Bows that don't use the players arrows
     private val fakeBowsPattern by group.pattern("fakebows", "^BOSS_SPIRIT_BOW$")
+    private val quiverInventoryNamePattern by group.pattern("quivername", "^Quiver$")
 
     @SubscribeEvent
     fun onChat(event: LorenzChatEvent) {
@@ -123,7 +124,7 @@ object QuiverAPI {
     @SubscribeEvent
     fun onInventoryFullyLoaded(event: InventoryFullyOpenedEvent) {
         if (!LorenzUtils.inSkyBlock) return
-        if (event.inventoryName != "Quiver") return
+        if (!quiverInventoryNamePattern.matches(event.inventoryName)) return
 
         // clear to prevent duplicates
         currentAmount = 0
