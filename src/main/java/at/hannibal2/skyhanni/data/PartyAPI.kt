@@ -92,7 +92,7 @@ object PartyAPI {
 
     @SubscribeEvent
     fun onChat(event: LorenzChatEvent) {
-        val message = event.message.trimWhiteSpaceAndResets().removeResets()
+        val message = event.message.trimWhiteSpaceAndResets()
 
         // new member joined
         youJoinedPartyPattern.matchMatcher(message) {

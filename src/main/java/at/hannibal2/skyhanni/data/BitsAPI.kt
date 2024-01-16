@@ -9,7 +9,6 @@ import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.NumberUtil.formatNumber
 import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
-import at.hannibal2.skyhanni.utils.StringUtils.removeResets
 import at.hannibal2.skyhanni.utils.StringUtils.trimWhiteSpaceAndResets
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
@@ -23,15 +22,15 @@ object BitsAPI {
 
     private val group = RepoPattern.group("data.bits")
     val bitsScoreboardPattern by group.pattern(
-        "scoreboard.bits",
-        "^Bits: §b(?<amount>(,?\\d{1,3})*)(.\\d+)?( ?(§?3?(\\((?<earned>[+-](,?\\d)*)?\\))?)?)?$"
+        "scoreboard",
+        "^Bits: §b(?<amount>[\\d,]+\\.?\\d*) ?§?3?(?:\\((?<earned>[+-][,\\d]+)?\\)?)?\$"
     )
     private val bitsFromFameRankUpChatPattern by group.pattern(
-        "chat.bitsfromfamerankup",
+        "chat.bits.famerankup",
         "§eYou gained §3(?<amount>.*) Bits Available §ecompounded from all your §epreviously eaten §6cookies§e! Click here to open §6cookie menu§e!"
     )
     private val bitsEarnedChatPattern by group.pattern("chat.earned", "§f\\s+§8\\+§b(?<amount>.*)\\s+Bits\n")
-    private val boosterCookieAte by group.pattern("chat.boostercookieate", "§eYou consumed a §6Booster Cookie§e! §d.*")
+    private val boosterCookieAte by group.pattern("chat.boostercookie.ate", "§eYou consumed a §6Booster Cookie§e! §d.*")
     private val bitsAvailableMenu by group.pattern(
         "gui.bitsavailablemenu",
         "§7Bits Available: §b(?<toClaim>[\\w,]+)(§3.+)?"
@@ -42,7 +41,7 @@ object BitsAPI {
     @SubscribeEvent
     fun onScoreboardChange(event: ScoreboardChangeEvent) {
         for (line in event.newList) {
-            val message = line.trimWhiteSpaceAndResets().removeResets()
+            val message = line.trimWhiteSpaceAndResets()
 
             bitsScoreboardPattern.matchMatcher(message) {
                 val amount = group("amount").formatNumber().toInt()
@@ -57,7 +56,7 @@ object BitsAPI {
 
     @SubscribeEvent
     fun onChat(event: LorenzChatEvent) {
-        val message = event.message.trimWhiteSpaceAndResets().removeResets()
+        val message = event.message.trimWhiteSpaceAndResets()
 
         bitsFromFameRankUpChatPattern.matchMatcher(message) {
             val amount = group("amount").formatNumber().toInt()
@@ -68,7 +67,7 @@ object BitsAPI {
 
         bitsEarnedChatPattern.matchMatcher(message) {
             // Only two locations where the bits line isn't shown, but you can still get bits
-            if (!listOf(IslandType.CATACOMBS, IslandType.THE_RIFT).contains(HypixelData.skyBlockIsland)) return
+            if (LorenzUtils.inAnyIsland(IslandType.CATACOMBS, IslandType.THE_RIFT)) return
 
             val amount = group("amount").formatNumber().toInt()
             bits += amount
