@@ -373,14 +373,14 @@ object LorenzUtils {
     private val sendQueue: Queue<String> = LinkedList()
 
     @SubscribeEvent
-    fun sendQueuedChatMessages(ignored: LorenzTickEvent) {
-        val thePlayer = Minecraft.getMinecraft().thePlayer
-        if (thePlayer == null) {
+    fun sendQueuedChatMessages(event: LorenzTickEvent) {
+        val player = Minecraft.getMinecraft().thePlayer
+        if (player == null) {
             sendQueue.clear()
             return
         }
         if (lastMessageSent.passedSince() > 300.milliseconds) {
-            thePlayer.sendChatMessage(sendQueue.poll() ?: return)
+            player.sendChatMessage(sendQueue.poll() ?: return)
             lastMessageSent = SimpleTimeMark.now()
         }
     }

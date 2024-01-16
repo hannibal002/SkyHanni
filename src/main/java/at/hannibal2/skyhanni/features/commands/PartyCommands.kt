@@ -54,7 +54,8 @@ object PartyCommands {
         if (!config.partyKickReason) {
             return
         }
-        if (!event.message.startsWith("/party kick ") && !event.message.startsWith("/p kick ")) {
+        if (!event.message.startsWith("/party kick ", ignoreCase = true)
+            && !event.message.startsWith("/p kick ", ignoreCase = true)) {
             return
         }
         val args = event.message.split(" ")
