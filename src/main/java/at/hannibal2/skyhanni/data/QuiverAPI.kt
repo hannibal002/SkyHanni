@@ -34,6 +34,7 @@ object QuiverAPI {
     private var arrows: List<ArrowType> = listOf()
 
     private val fakeBows = listOf("BOSS_SPIRIT_BOW".asInternalName())
+    private val SKELETON_MASTER_CHESTPLATE = "SKELETON_MASTER_CHESTPLATE".asInternalName()
 
     private val group = RepoPattern.group("data.quiver.chat")
     private val selectPattern by group.pattern("select", "§aYou set your selected arrow type to §f(?<arrow>.*)§a!")
@@ -158,7 +159,9 @@ object QuiverAPI {
             if (arrowAmount <= 0) return
 
             if (InventoryUtils.getChestplate()
-                    ?.getInternalNameOrNull() == "SKELETON_MASTER_CHESTPLATE".asInternalName()
+                // The chestplate has the ability to not shoot arrows
+                // https://hypixel-skyblock.fandom.com/wiki/Skeleton_Master_Armor
+                    ?.getInternalNameOrNull() == SKELETON_MASTER_CHESTPLATE
             ) return
 
             val infiniteQuiverLevel = InventoryUtils.getItemInHand()?.getEnchantments()?.get("infinite_quiver") ?: 0
@@ -181,7 +184,7 @@ object QuiverAPI {
         }
     }
 
-    fun hasBowInInvetory(): Boolean {
+    fun hasBowInInventory(): Boolean {
         return InventoryUtils.getItemsInOwnInventory().any { it.item is ItemBow }
     }
 
