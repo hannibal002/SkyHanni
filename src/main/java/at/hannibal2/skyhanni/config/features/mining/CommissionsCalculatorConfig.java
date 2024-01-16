@@ -19,5 +19,10 @@ public class CommissionsCalculatorConfig {
     public boolean completedOnly = false;
 
     @Expose
+    @ConfigOption(name = "Progress for All Milestones", desc = "Calculates remaining commissions for all incomplete Commission Milestones.")
+    @ConfigEditorBoolean
+    public boolean allMilestones = false;
+
+    @Expose
     public Position position = new Position(140, 90, false, true);
 }

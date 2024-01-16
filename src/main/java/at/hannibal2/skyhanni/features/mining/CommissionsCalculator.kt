@@ -154,12 +154,22 @@ class CommissionsCalculator {
                         mileProgressPattern.matchMatcher(line) {
                             val completed = group("completed").groupToInt()
                             val required = group("required").groupToInt()
-                            val remaining = abs(required - completed)
+                            val commsToNextMilestone = abs(required - completed)
                             if (completed < required || mc.thePlayer.name == "Erymanthus") {
-                                val remainingPlural = StringUtils.optionalPlural(remaining, "commission", "commissions")
-                                val hotmXPGain = (remaining * perComm).roundToInt()
+                                val remainingPlural = StringUtils.optionalPlural(commsToNextMilestone, "commission", "commissions")
+                                val hotmXPGain = (commsToNextMilestone * perComm).roundToInt()
                                 newList.add(
                                     Renderable.string(" §7- $colorCode$remainingPlural §fleft to complete §6Milestone $milestone §f($colorCode+${hotmXPGain.addSeparators()} HOTM XP§f)"),
+                                )
+                            }
+                            if (!config.allMilestones) {
+                                val lastElement = newList.takeLast(1).first()
+                                newList.clear()
+                                newList.addAll(
+                                    listOf<Renderable>(
+                                        Renderable.string("$colorCode$firstLine"),
+                                        lastElement,
+                                    )
                                 )
                             }
                         }
