@@ -10,6 +10,7 @@ object UtilsPatterns {
     /** Examples:
     §d§l§ka§r §d§l§d§lMYTHIC ACCESSORY §d§l§ka
     §d§l§ka§r §d§l§d§lSHINY MYTHIC DUNGEON CHESTPLATE §d§l§ka
+    §c§l§ka§r §c§l§c§lVERY SPECIAL HATCESSORY §c§l§ka
     §6§lSHINY LEGENDARY DUNGEON BOOTS
     §6§lLEGENDARY DUNGEON BOOTS
     §5§lEPIC BOOTS
@@ -17,7 +18,7 @@ object UtilsPatterns {
      **/
     val rarityLoreLinePattern by patternGroup.pattern(
         "item.lore.rarity.line",
-        "^(?:§.){2,3}(?:.§. (?:§.){4})?(?:SHINY )?(?<rarity>${enumJoinToPattern<LorenzRarity>()}) ?(?:DUNGEON )?(?<itemCategory>[^§]*)(?: (?:§.){3}.)?$"
+        "^(?:§.){2,3}(?:.§. (?:§.){4})?(?:SHINY )?(?<rarity>${enumJoinToPattern<LorenzRarity> { it.name.replace("_", " ") }}) ?(?:DUNGEON )?(?<itemCategory>[^§]*)(?: (?:§.){3}.)?$"
     )
 
     val abiPhonePattern by patternGroup.pattern(
