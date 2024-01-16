@@ -8,7 +8,8 @@ import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.NumberUtil.formatNumber
 import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.StringUtils.matches
-import at.hannibal2.skyhanni.utils.StringUtils.trimWhiteSpaceAndResets
+import at.hannibal2.skyhanni.utils.StringUtils.removeResets
+import at.hannibal2.skyhanni.utils.StringUtils.trimWhiteSpace
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
@@ -56,7 +57,7 @@ object BitsAPI {
     @SubscribeEvent
     fun onScoreboardChange(event: ScoreboardChangeEvent) {
         for (line in event.newList) {
-            val message = line.trimWhiteSpaceAndResets()
+            val message = line.trimWhiteSpace().removeResets()
 
             bitsScoreboardPattern.matchMatcher(message) {
                 val amount = group("amount").formatNumber().toInt()
@@ -71,7 +72,7 @@ object BitsAPI {
 
     @SubscribeEvent
     fun onChat(event: LorenzChatEvent) {
-        val message = event.message.trimWhiteSpaceAndResets()
+        val message = event.message.trimWhiteSpace().removeResets()
 
         bitsFromFameRankUpChatPattern.matchMatcher(message) {
             val amount = group("amount").formatNumber().toInt()

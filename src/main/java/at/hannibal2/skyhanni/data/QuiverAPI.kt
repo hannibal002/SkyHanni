@@ -17,7 +17,8 @@ import at.hannibal2.skyhanni.utils.NumberUtil.formatNumber
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getEnchantments
 import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.StringUtils.matches
-import at.hannibal2.skyhanni.utils.StringUtils.trimWhiteSpaceAndResets
+import at.hannibal2.skyhanni.utils.StringUtils.removeResets
+import at.hannibal2.skyhanni.utils.StringUtils.trimWhiteSpace
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraft.client.Minecraft
 import net.minecraft.item.ItemBow
@@ -81,7 +82,7 @@ object QuiverAPI {
 
     @SubscribeEvent
     fun onChat(event: LorenzChatEvent) {
-        val message = event.message.trimWhiteSpaceAndResets()
+        val message = event.message.trimWhiteSpace().removeResets()
 
         selectPattern.matchMatcher(message) {
             val arrow = group("arrow")
