@@ -1,5 +1,6 @@
 package at.hannibal2.skyhanni.data
 
+import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.events.InventoryFullyOpenedEvent
 import at.hannibal2.skyhanni.events.LorenzChatEvent
 import at.hannibal2.skyhanni.events.ScoreboardChangeEvent
@@ -14,21 +15,22 @@ import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
 object BitsAPI {
-    private val storage = ProfileStorageData.profileSpecific?.bits
+    private val profileStorage = ProfileStorageData.profileSpecific?.bits
+    private val playerStorage = SkyHanniMod.feature.storage
     var bits: Int
-        get() = storage?.bits ?: 0
+        get() = profileStorage?.bits ?: 0
         set(value) {
-            storage?.bits = value
+            profileStorage?.bits = value
         }
     var currentFameRank: FameRank
-        get() = storage?.currentFameRank ?: FameRank.NEW_PLAYER
+        get() = playerStorage?.currentFameRank ?: FameRank.NEW_PLAYER
         set(value) {
-            storage?.currentFameRank = value
+            playerStorage?.currentFameRank = value
         }
     var bitsToClaim: Int
-        get() = storage?.bitsToClaim ?: 0
+        get() = profileStorage?.bitsToClaim ?: 0
         set(value) {
-            storage?.bitsToClaim = value
+            profileStorage?.bitsToClaim = value
         }
 
     private const val defaultcookiebits = 4800

@@ -1,6 +1,5 @@
 package at.hannibal2.skyhanni.config;
 
-import at.hannibal2.skyhanni.data.ArrowType;
 import at.hannibal2.skyhanni.data.FameRank;
 import at.hannibal2.skyhanni.data.model.ComposterUpgrade;
 import at.hannibal2.skyhanni.features.bingo.card.goals.BingoGoal;
@@ -30,6 +29,8 @@ import at.hannibal2.skyhanni.utils.LorenzVec;
 import at.hannibal2.skyhanni.utils.NEUInternalName;
 import at.hannibal2.skyhanni.utils.tracker.SkyHanniTracker;
 import com.google.gson.annotations.Expose;
+import net.minecraft.item.ItemStack;
+
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -37,7 +38,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
-import net.minecraft.item.ItemStack;
 
 public class Storage {
 
@@ -65,6 +65,9 @@ public class Storage {
 
     @Expose
     public Map<UUID, PlayerSpecific> players = new HashMap<>();
+
+    @Expose
+    public FameRank currentFameRank = null;
 
     public static class PlayerSpecific {
 
@@ -147,9 +150,6 @@ public class Storage {
         public static class BitsStorage {
             @Expose
             public int bits = -1;
-
-            @Expose
-            public FameRank currentFameRank = null;
 
             @Expose
             public int bitsToClaim = -1;
