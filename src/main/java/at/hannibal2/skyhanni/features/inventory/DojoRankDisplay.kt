@@ -5,8 +5,10 @@ import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.InventoryCloseEvent
 import at.hannibal2.skyhanni.events.InventoryFullyOpenedEvent
+import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.LorenzUtils
+import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.RenderUtils.renderStrings
 import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
@@ -26,15 +28,12 @@ class DojoRankDisplay {
         config.dojoRankDisplayPosition.renderStrings(display, posLabel = "Dojo Rank Display")
     }
 
-    @SubscribeEvent
-    fun onInventoryOpen(event: InventoryFullyOpenedEvent) {
-        if (!isEnabled()) return
-        if (event.inventoryName != "Challenges") return
-        val newDisplay = mutableListOf<String>()
+    private fun drawDisplay() = buildList {
         var totalScore = 0
-        for (stack in event.inventoryItems.values) {
+        for (slot in InventoryUtils.getItemsInOpenChest()) {
+            val stack = slot.stack ?: continue
             for (line in stack.getLore()) {
-                val name = stack.displayName ?: return
+                val name = stack.displayName ?: continue
                 testRankPattern.matchMatcher(line) rank@{
                     testNamePattern.matchMatcher(name) name@{
                         val testColor = this@name.group("color")
@@ -45,7 +44,7 @@ class DojoRankDisplay {
                             else -> "§a$s"
                         }
                         totalScore += this@rank.group("score").toInt()
-                        newDisplay.add("$testColor$testName§6: $rank §7($score§7)")
+                        add("$testColor$testName§6: $rank §7($score§7)")
                     }
                 }
             }
@@ -58,9 +57,16 @@ class DojoRankDisplay {
             in 6000 .. 6999 -> "§6Brown Belt"
             else -> "§8Black Belt"
         }
-        newDisplay.add("")
-        newDisplay.add("§7Total Score: §6$totalScore §7(§8$belt§7)")
-        display = newDisplay
+        add("")
+        add("§7Total Score: §6${totalScore.addSeparators()} §7(§8$belt§7)")
+    }
+
+    @SubscribeEvent
+    fun onInventoryOpen(event: InventoryFullyOpenedEvent) {
+        if (!isEnabled()) return
+        if (event.inventoryName != "Challenges") return
+        val newDisplay = mutableListOf<String>()
+        display = drawDisplay()
     }
 
     @SubscribeEvent
