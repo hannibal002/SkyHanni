@@ -42,12 +42,19 @@ import kotlin.properties.ReadWriteProperty
 import kotlin.reflect.KMutableProperty1
 import kotlin.reflect.KProperty
 import kotlin.reflect.KProperty0
+import kotlin.reflect.KProperty1
+import kotlin.reflect.full.isSubtypeOf
+import kotlin.reflect.full.memberProperties
+import kotlin.reflect.full.starProjectedType
+import kotlin.reflect.jvm.isAccessible
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.seconds
 
 object LorenzUtils {
 
-    val onHypixel get() = (HypixelData.hypixelLive || HypixelData.hypixelAlpha) && Minecraft.getMinecraft().thePlayer != null
+    val connectedToHypixel get() = HypixelData.hypixelLive || HypixelData.hypixelAlpha
+
+    val onHypixel get() = connectedToHypixel && Minecraft.getMinecraft().thePlayer != null
 
     val isOnAlphaServer get() = onHypixel && HypixelData.hypixelAlpha
 
@@ -501,6 +508,14 @@ object LorenzUtils {
             }
         }
 
+    inline fun <reified T : Any> Any.getPropertiesWithType() =
+        this::class.memberProperties
+            .filter { it.returnType.isSubtypeOf(T::class.starProjectedType) }
+            .map {
+                it.isAccessible = true
+                (it as KProperty1<Any, T>).get(this)
+            }
+
     fun List<String>.nextAfter(after: String, skip: Int = 1) = nextAfter({ it == after }, skip)
 
     fun List<String>.nextAfter(after: (String) -> Boolean, skip: Int = 1): String? {
@@ -626,8 +641,8 @@ object LorenzUtils {
     fun <T> T.conditionalTransform(condition: Boolean, ifTrue: T.() -> Any, ifFalse: T.() -> Any) =
         if (condition) ifTrue(this) else ifFalse(this)
 
-    fun sendTitle(text: String, duration: Duration, height: Double = 1.8) {
-        TitleManager.sendTitle(text, duration, height)
+    fun sendTitle(text: String, duration: Duration, height: Double = 1.8, fontSize: Float = 4f) {
+        TitleManager.sendTitle(text, duration, height, fontSize)
     }
 
     @Deprecated("Dont use this approach at all. check with regex or equals instead.", ReplaceWith("Regex or equals"))

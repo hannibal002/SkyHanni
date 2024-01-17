@@ -232,6 +232,7 @@ import at.hannibal2.skyhanni.features.misc.CurrentPetDisplay
 import at.hannibal2.skyhanni.features.misc.CustomTextBox
 import at.hannibal2.skyhanni.features.misc.ExpOrbsOnGroundHider
 import at.hannibal2.skyhanni.features.misc.FandomWikiFromMenus
+import at.hannibal2.skyhanni.features.misc.FixGhostEntities
 import at.hannibal2.skyhanni.features.misc.FixNEUHeavyPearls
 import at.hannibal2.skyhanni.features.misc.HideArmor
 import at.hannibal2.skyhanni.features.misc.InGameDateDisplay
@@ -248,6 +249,7 @@ import at.hannibal2.skyhanni.features.misc.PartyMemberOutlines
 import at.hannibal2.skyhanni.features.misc.PatcherSendCoordinates
 import at.hannibal2.skyhanni.features.misc.PetCandyUsedDisplay
 import at.hannibal2.skyhanni.features.misc.PetExpTooltip
+import at.hannibal2.skyhanni.features.misc.PetItemDisplay
 import at.hannibal2.skyhanni.features.misc.PlayerChatSymbols
 import at.hannibal2.skyhanni.features.misc.PocketSackInASackDisplay
 import at.hannibal2.skyhanni.features.misc.QuickModMenuSwitch
@@ -367,9 +369,10 @@ import org.apache.logging.log4j.Logger
     clientSideOnly = true,
     useMetadata = true,
     guiFactory = "at.hannibal2.skyhanni.config.ConfigGuiForgeInterop",
-    version = "0.23.Beta.7",
+    version = "0.23.Beta.8",
 )
 class SkyHanniMod {
+
     @Mod.EventHandler
     fun preInit(event: FMLPreInitializationEvent?) {
         checkIfNeuIsLoaded()
@@ -578,6 +581,7 @@ class SkyHanniMod {
         loadModule(MinionCollectLogic())
         loadModule(BetterSignEditing())
         loadModule(PatcherSendCoordinates())
+        loadModule(PetItemDisplay())
         loadModule(EstimatedItemValue)
         loadModule(EstimatedWardrobePrice())
         loadModule(ComposterInventoryNumbers())
@@ -707,6 +711,7 @@ class SkyHanniMod {
 
         // test stuff
         loadModule(SkyHanniDebugsAndTests())
+        loadModule(FixGhostEntities)
         loadModule(CopyNearbyParticlesCommand)
         loadModule(ButtonOnPause())
         loadModule(PacketTest())
@@ -757,6 +762,7 @@ class SkyHanniMod {
     }
 
     companion object {
+
         const val MODID = "skyhanni"
 
         @JvmStatic
