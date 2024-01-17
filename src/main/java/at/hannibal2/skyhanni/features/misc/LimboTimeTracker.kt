@@ -15,7 +15,9 @@ import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils.round
 import at.hannibal2.skyhanni.utils.RenderUtils.renderString
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
+import at.hannibal2.skyhanni.utils.StringUtils.matches
 import at.hannibal2.skyhanni.utils.TimeUtils.format
+import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraft.util.AxisAlignedBB
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import kotlin.time.Duration
@@ -35,6 +37,8 @@ class LimboTimeTracker {
 
     private lateinit var modifiedArray: MutableList<String>
     private var setMinutes = false
+    private val minutesRegex by RepoPattern.pattern("limbo.tooltip.minutes", "§5§o§a\\d+(\\.\\d+)? minutes.+\$")
+    private val hoursRegex by RepoPattern.pattern("limbo.tooltip.hours", "§5§o§b\\d+(\\.\\d+)? hours.+\$")
 
     private val bedwarsLobbyLimbo = AxisAlignedBB(-662.0, 43.0, -76.0, -619.0, 86.0, -27.0)
 
@@ -102,8 +106,8 @@ class LimboTimeTracker {
         if (event.slot.slotIndex != 4) return
 
         val lore = event.toolTip
-        val hoursArray = lore.filter { it.matches("§5§o§b\\d+(\\.\\d+)? hours.+\$".toRegex()) }.toMutableList()
-        val minutesArray = lore.filter { it.matches("§5§o§a\\d+(\\.\\d+)? minutes.+\$".toRegex()) }.toMutableList() //move to repo pattern
+        val hoursArray = lore.filter { hoursRegex.matches(it) }.toMutableList()
+        val minutesArray = lore.filter { minutesRegex.matches(it) }.toMutableList()
 
         addLimbo(hoursArray, minutesArray)
         remakeArray(event.toolTip, minutesArray, hoursArray)
