@@ -23,7 +23,7 @@ object TestCopyChestData {
         if (!LorenzUtils.inSkyBlock) return
         if (!config.copyPlayerInventory.isKeyHeld() && !config.copyEntireChest.isKeyHeld() && !config.copyChestName.isKeyHeld()) return
         if (event.gui !is GuiContainer) return
-        if (config.copyEntireChest.isKeyHeld()) {
+        if (config.copyEntireChest.isKeyHeld() && event.gui is GuiChest) {
             copySlotsData(chest = (event.gui as GuiChest).inventorySlots.inventorySlots)
             return
         } else if (config.copyPlayerInventory.isKeyHeld()) {
