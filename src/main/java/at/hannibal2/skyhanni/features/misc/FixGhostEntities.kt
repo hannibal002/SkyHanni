@@ -34,15 +34,11 @@ object FixGhostEntities {
             if (packet.entityID in recentlyRemovedEntities) {
                 event.cancel()
             }
-        }
-
-        if (packet is S0FPacketSpawnMob) {
+        } else if (packet is S0FPacketSpawnMob) {
             if (packet.entityID in recentlyRemovedEntities) {
                 event.cancel()
             }
-        }
-
-        if (packet is S13PacketDestroyEntities) {
+        } else if (packet is S13PacketDestroyEntities) {
             for (entityID in packet.entityIDs) {
                 recentlyRemovedEntities.add(entityID)
                 if (recentlyRemovedEntities.size == 10) {
