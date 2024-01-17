@@ -23,6 +23,10 @@ object RemoveBuggedHypixelEntities {
 
     private var lastCheckTime = SimpleTimeMark.farPast()
 
+    private var foundEntities = mutableListOf<Int>()
+    private var lastFoundTime = mapOf<Int, SimpleTimeMark>()
+    private var destroyedEntities = mutableListOf<Int>()
+
     @SubscribeEvent
     fun onTick(event: LorenzTickEvent) {
         if (!LorenzUtils.inSkyBlock) return
@@ -53,10 +57,6 @@ object RemoveBuggedHypixelEntities {
         destroyedEntities.clear()
     }
 
-    private var foundEntities = mutableListOf<Int>()
-    private var lastFoundTime = mapOf<Int, SimpleTimeMark>()
-    private var destroyedEntities = mutableListOf<Int>()
-
     @SubscribeEvent
     fun onReceiveCurrentShield(event: PacketEvent.ReceiveEvent) {
         val packet = event.packet
@@ -86,13 +86,9 @@ object RemoveBuggedHypixelEntities {
             val name = field.name
             if (name.equalsIgnoreColor("entityId")) {
                 val id = field.makeAccessible().get(packet) as Int
-                addEntityId(id)
+                foundEntities.add(id)
             }
         }
-    }
-
-    private fun addEntityId(entityId: Int) {
-        foundEntities.add(entityId)
     }
 
     private fun checkNearby() {
@@ -106,12 +102,11 @@ object RemoveBuggedHypixelEntities {
 
         collectFound()
 
-        val list = EntityUtils.getEntitiesNextToPlayer<Entity>(5.0)
+        val list = EntityUtils.getEntitiesNextToPlayer<Entity>(5.0).filter { it !=  Minecraft.getMinecraft().thePlayer}
 
         val neverUpdatedTime = (-1).seconds
         val result = mutableListOf<String>()
         for (entity in list) {
-            if (entity == Minecraft.getMinecraft().thePlayer) continue
             val entityId = entity.entityId
             val lastUpdateTime = lastFoundTime[entityId]?.passedSince() ?: neverUpdatedTime
             val ticksExisted = entity.ticksExisted
