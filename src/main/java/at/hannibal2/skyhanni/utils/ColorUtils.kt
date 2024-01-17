@@ -11,9 +11,9 @@ object ColorUtils {
 
     fun getAlpha(colour: Int) = colour shr 24 and 0xFF
 
-    fun blend(start: Color, end: Color, percent: Double) = Color(
-        (start.getRed() * (1 - percent) + end.getRed() * percent).toInt(),
-        (start.getGreen() * (1 - percent) + end.getGreen() * percent).toInt(),
-        (start.getBlue() * (1 - percent) + end.getBlue() * percent).toInt()
+    fun blendRGB(start: Color, end: Color, percent: Double) = Color(
+        (start.red * (1 - percent) + end.red * percent).toInt(),
+        (start.green * (1 - percent) + end.green * percent).toInt(),
+        (start.blue * (1 - percent) + end.blue * percent).toInt()
     )
 }

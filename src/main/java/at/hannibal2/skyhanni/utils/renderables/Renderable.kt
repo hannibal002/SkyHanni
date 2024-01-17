@@ -314,7 +314,7 @@ interface Renderable {
             override val verticalAlign = verticalAlign
 
             val progress = (1.0 + percent * (width - 2.0)).toInt()
-            val color = ColorUtils.blend(startColor, endColor, percent)
+            val color = ColorUtils.blendRGB(startColor, endColor, percent)
 
             override fun render(posX: Int, posY: Int) {
                 Gui.drawRect(0, 0, width, height, 0xFF43464B.toInt())
