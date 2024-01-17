@@ -6,8 +6,6 @@ import at.hannibal2.skyhanni.events.LorenzChatEvent
 import at.hannibal2.skyhanni.utils.SoundUtils
 import at.hannibal2.skyhanni.utils.SoundUtils.playSound
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
@@ -19,14 +17,15 @@ object QuiverNotification {
         if (!SkyHanniMod.configManager.features.inventory.quiverAlert) return
         val message = event.message.removeColor()
         if (message.startsWith("You only have") && message.endsWith("arrows left in your Quiver!")) {
-            val number = message.split(" ")[3]
+            //TODO Use Repo Pattern
+            val number = -1
             TitleManager.sendTitle("§c$number arrows left!", 3.seconds, 3.6, 7.0)
             sound()
         }
     }
 
     fun sound() {
-        CoroutineScope(Dispatchers.Default).launch {
+        SkyHanniMod.coroutineScope.launch {
             repeat(30) {
                 delay(100)
                 SoundUtils.createSound("note.pling", 1f, 1f).playSound()
