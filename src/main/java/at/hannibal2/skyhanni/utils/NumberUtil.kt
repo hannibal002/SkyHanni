@@ -176,7 +176,7 @@ object NumberUtil {
     }
 
     fun percentageColor(have: Long, max: Long): LorenzColor {
-        val percentage = have.percentOf(max)
+        val percentage = have.fractionOf(max)
         return when {
             percentage > 0.9 -> LorenzColor.DARK_GREEN
             percentage > 0.75 -> LorenzColor.GREEN
@@ -207,7 +207,8 @@ object NumberUtil {
     private val Int.bilion get() = this * 1_000_000_000.0
     val Double.milion get() = (this * 1_000_000.0).toLong()
 
-    fun Number.percentOf(maxValue: Number) = maxValue.toDouble().takeIf { it != 0.0 }?.let { max ->
+    /** @return clamped to [0.0, 1.0]**/
+    fun Number.fractionOf(maxValue: Number) = maxValue.toDouble().takeIf { it != 0.0 }?.let { max ->
         this.toDouble() / max
     }?.coerceIn(0.0, 1.0) ?: 1.0
 }
