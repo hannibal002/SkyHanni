@@ -98,11 +98,10 @@ object RemoveBuggedHypixelEntities {
         if (lastCheckTime.passedSince() < 500.milliseconds) return
 
         lastCheckTime = SimpleTimeMark.now()
-
         collectFound()
 
-        val entities =
-            EntityUtils.getEntitiesNextToPlayer<Entity>(5.0).filter { it != Minecraft.getMinecraft().thePlayer }
+        val entities = EntityUtils.getEntitiesNextToPlayer<Entity>(5.0)
+                .filter { it != Minecraft.getMinecraft().thePlayer }
 
         filterInvalidEntities(entities)
         debug(entities)
@@ -130,6 +129,21 @@ object RemoveBuggedHypixelEntities {
     }
 
     private fun debug(list: Sequence<Entity>) {
+        val result = calculateEntities(list)
+
+        if (result.isEmpty()) {
+            println("check (nothing)")
+            return
+        }
+
+        println(" ")
+        println("check:")
+        for (s in result) {
+            println(" $s")
+        }
+    }
+
+    private fun calculateEntities(list: Sequence<Entity>): MutableList<String> {
         val result = mutableListOf<String>()
         for (entity in list) {
             val entityId = entity.entityId
@@ -146,25 +160,15 @@ object RemoveBuggedHypixelEntities {
 
             val name = entity.name
             val text = "'$name' | " +
-                lastUpdateTime + " | " +
-                "$ticksExisted ticks | " +
-                "npc:$npc | " +
-                "inLoadedEntityList:$inLoadedEntityList | " +
-                "inEntityList:$inEntityList | " +
-                "inDestroyedEntities:$inDestroyedEntities"
+                    lastUpdateTime + " | " +
+                    "$ticksExisted ticks | " +
+                    "npc:$npc | " +
+                    "inLoadedEntityList:$inLoadedEntityList | " +
+                    "inEntityList:$inEntityList | " +
+                    "inDestroyedEntities:$inDestroyedEntities"
             result.add(text)
         }
-
-        if (result.isEmpty()) {
-            println("check (nothing)")
-            return
-        }
-
-        println(" ")
-        println("check:")
-        for (s in result) {
-            println(" $s")
-        }
+        return result
     }
 
     private fun removeInvalidEntity(entityId: Int, reason: String) {
