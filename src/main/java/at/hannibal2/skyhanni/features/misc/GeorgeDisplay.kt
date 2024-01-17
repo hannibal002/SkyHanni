@@ -67,7 +67,7 @@ class GeorgeDisplay {
                 ))
             }
         }
-        updateList.add(Renderable.string(" §7- §dTotal cost §7(§fLowest BIN§7): §6${totalCost.addSeparators()} coins"))
+        updateList.addAll(listOf<Renderable>(Renderable.string(" §7- §dTotal cost §7(§6Lowest BIN§7): §6${totalCost.addSeparators()} coins"), Renderable.string("§c§lDisclaimer:§r§c Some pets are not available on the Auction House.")))
         updateList.update()
     }
 
