@@ -6,11 +6,17 @@ import io.github.moulberry.moulconfig.annotations.ConfigEditorBoolean;
 import io.github.moulberry.moulconfig.annotations.ConfigOption;
 
 public class GeorgeConfig {
+
     @Expose
-    @ConfigOption(name = "Enabled", desc = "Show the currently lowest prices of the pets you need to increase your Taming level cap.")
+    @ConfigOption(name = "Enabled", desc = "Show the currently lowest prices of the pets you need to buy to increase your Taming level cap.")
     @ConfigEditorBoolean
     public boolean enabled = false;
 
     @Expose
-    public Position pos = new Position(100, 90, false, true);
+    @ConfigOption(name = "Other Rarities", desc = "Searches for other rarities besides the ones specified by George.")
+    @ConfigEditorBoolean
+    public boolean otherRarities = false;
+
+    @Expose
+    public Position position = new Position(100, 90, false, true);
 }

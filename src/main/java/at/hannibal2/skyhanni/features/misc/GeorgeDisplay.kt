@@ -23,64 +23,101 @@ class GeorgeDisplay {
     private val ROW_OFFSET: Int = 9 * 4
     private val INDEX_OFFSET: Int = 6 - 1
 
+    private val SEPARATOR: String = ";"
+
     private val patternGroup = RepoPattern.group("george.tamingcap")
     private val neededPetPattern by patternGroup.pattern(
         "needed.pet.loreline",
-        " +(?<fullThing>(?<tierColorCodes>§.)*(?<tier>(?:[uU][nN])?[cC][oO][mM][mM][oO][nN]|[rR][aA][rR][eE]|[eE][pP][iI][cC]|[lL][eE][gG][eE][nN][dD][aA][rR][yY]|[mM][yY][tT][hH][iI][cC]|[dD][iI][vV][iI][nN][eE]|(?:[vV][eE][rR][yY] )?[sS][pP][eE][cC][iI][aA][lL]|[uU][lL][tT][iI][mM][aA][tT][eE]|[sS][uU][pP][rR][eE][mM][eE]|[aA][dD][mM][iI][nN]) (?<pet>[\\S ]+))"
+        "(?i) +(?<fullThing>(?<tierColorCodes>§.)*(?<tier>(?:un)?common|rare|epic|legendary|mythic|divine|(?:very )?special|ultimate|supreme|admin) (?<pet>[\\S ]+))"
     )
+
+    private val notAHOrCraft: List<String> = listOf<String>("ENDERMAN", "BLACK_CAT", "SLUG", "SPIRIT", "GIRAFFE", "JELLYFISH", "BAL", "BABY_YETI", "RIFT_FERRET", "WISP")
 
     private val display = mutableListOf<Renderable>()
 
+    private enum class RarityToTier(
+        val rarityInternal: String,
+        val tier: Int,
+        val rarityDisplay: String,
+    ) {
+        COMMON("COMMON", 0, "§fCommon"),
+        UNCOMMON("UNCOMMON", 1, "§aUncommon"),
+        RARE("RARE", 2, "§9Rare"),
+        EPIC("EPIC", 3, "§5Epic"),
+        LEGENDARY("LEGENDARY", 4, "§6Legendary"),
+        MYTHIC("MYTHIC", 5, "§dMythic"),
+    }
+
     @SubscribeEvent
     fun onInventoryOpen(event: InventoryOpenEvent) {
-        if (!LorenzUtils.inSkyBlock) return
         if (!isEnabled()) return
         if (event.inventoryName != "Offer Pets") return
         val stack = event.inventoryItems[ROW_OFFSET + INDEX_OFFSET] ?: return
         if (stack.cleanName() != "+1 Taming Level Cap") return
-        val updateList: MutableList<Renderable> = mutableListOf<Renderable>(Renderable.string("§d§lTaming 60 Cost:"))
-        var totalCost: Double = 0.0
-        loop@ for (line in stack.getLore()) {
-            neededPetPattern.matchMatcher(line) {
-                val origTierString = group("tier")
-                val tier = when (origTierString.uppercase()) {
-                    "COMMON" -> "0"
-                    "UNCOMMON" -> "1"
-                    "RARE" -> "2"
-                    "EPIC" -> "3"
-                    "LEGENDARY" -> "4"
-                    "MYTHIC" -> "5"
-                    else -> ""
-                }
-                val origPetString = group("pet") ?: ""
-                val pet = origPetString.uppercase().replace(" ", "_").removePrefix("FROST_")
-                val petPrice = "$pet;$tier".asInternalName().getPriceOrNull() ?: continue@loop
-                totalCost += petPrice
-                updateList.add(Renderable.clickAndHover(
-                    text = " §7- ${group("fullThing")}§7: §6${petPrice.addSeparators()} coins",
-                    tips = listOf("§aClick to run §e/ahsearch [Lvl 1] $origPetString §ato find this pet on the Auction House.", "§aNotes: §eMake sure to set the rarity filter to ${group("tierColorCodes")}$origTierString §eon your own! §cBooster Cookie required!"),
-                    onClick = {
-                        LorenzUtils.sendCommandToServer("ahsearch [Lvl 1] $origPetString")
-                    }
-                ))
-            }
-        }
-        updateList.addAll(listOf<Renderable>(Renderable.string("§dTotal cost §7(§6Lowest BIN§7): §6${totalCost.addSeparators()} coins"), Renderable.string("§c§lDisclaimer:§r§c Some pets are not available on the Auction House.")))
-        updateList.update()
+        display.clear()
+        display.addAll(listBuilding(stack.getLore()))
     }
 
-    private fun List<Renderable>.update() {
-        display.clear()
-        display.addAll(this)
+    private fun listBuilding(lore: List<String>): MutableList<Renderable> {
+        val updateList: MutableList<Renderable> = mutableListOf<Renderable>(Renderable.string("§d§lTaming 60 Cost: §r§d(${if (config.otherRarities) "cheapest" else "exact"} rarity)"))
+        var totalCost: Double = 0.0
+        for (line in lore) {
+            neededPetPattern.matchMatcher(line) {
+                val origTierString = group("tier") ?: ""
+                val tier = RarityToTier.entries.find { it.rarityInternal == origTierString.uppercase() }?.tier ?: -1
+                val origPetString = group("pet") ?: ""
+                val pet = origPetString.uppercase().replace(" ", "_").removePrefix("FROST_")
+                val petPrices: MutableList<Double> = mutableListOf<Double>()
+                val petPriceOne = "$pet;$tier".asInternalName().getPriceOrNull() ?: -1.0
+                petPrices.add(petPriceOne)
+                if (config.otherRarities || petPriceOne == -1.0) {
+                    val lowerTier = "$pet$SEPARATOR${tier - 1}".asInternalName().getPriceOrNull() ?: Double.MAX_VALUE
+                    petPrices.add(lowerTier)
+                    if (tier != 5) {
+                        val higherTier = "$pet$SEPARATOR${tier + 1}".asInternalName().getPriceOrNull() ?: Double.MAX_VALUE
+                        petPrices.add(higherTier)
+                    }
+                }
+                val petPrice = petPrices.min()
+                val tierUsed = when (petPrices.indexOf(petPrice)) {
+                    1 -> tier - 1
+                    2 -> tier + 1
+                    else -> tier
+                }
+                val displayPetString = if (tierUsed == tier) group("fullThing") else {
+                    "${RarityToTier.entries.find { it.tier == tierUsed }?.rarityDisplay} $origPetString"
+                }
+                if (petPrice != -1.0) {
+                    totalCost += petPrice
+                    updateList.add(Renderable.clickAndHover(
+                        text = " §7- $displayPetString§7: §6${petPrice.addSeparators()} coins",
+                        tips = listOf(
+                            "§aClick to run §e/ahs ] $origPetString §ato find it on the Auction House.",
+                            "§aNotes: §eSet the rarity filter yourself. §cBooster Cookie required!"
+                        ),
+                        onClick = { LorenzUtils.sendCommandToServer("ahs ] $origPetString") }
+                    ))
+                } else {
+                    val command: String = if (pet !in notAHOrCraft) "viewrecipe" else "wiki"
+                    val whatCommandDoes: String = if (pet !in notAHOrCraft) "its crafting recipe" else "how to obtain it"
+                    updateList.add(Renderable.clickAndHover(
+                        text = " §7- $displayPetString§7: §eNot on AH; ${if (pet !in notAHOrCraft) "try crafting it" else "find its Wiki article here"}.",
+                        tips = listOf("§4Click to run §e$command $pet §4to view $whatCommandDoes."),
+                        onClick = { LorenzUtils.sendCommandToServer("$command $pet") }
+                    ))
+                }
+            }
+        }
+        updateList.addAll(listOf<Renderable>(Renderable.string("§dTotal cost §7(§6Lowest BIN§7${if (config.otherRarities) " before Kat" else ""}): §6${totalCost.addSeparators()} coins"), Renderable.string("§c§lDisclaimer:§r§c Some pets are unavailable on the Auction House.")))
+        return updateList
     }
 
     @SubscribeEvent
     fun onRenderOverlay(event: GuiRenderEvent.ChestGuiOverlayRenderEvent) {
-        if (!LorenzUtils.inSkyBlock) return
         if (!isEnabled()) return
         if (InventoryUtils.openInventoryName() != "Offer Pets") return
-        config.pos.renderRenderables(display, posLabel = "Taming 60 Progress")
+        config.position.renderRenderables(display, posLabel = "George Display")
     }
 
-    private fun isEnabled() = config.enabled
+    private fun isEnabled() = config.enabled && LorenzUtils.inSkyBlock
 }
