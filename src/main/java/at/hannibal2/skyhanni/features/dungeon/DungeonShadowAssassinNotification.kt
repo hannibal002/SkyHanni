@@ -16,8 +16,7 @@ class DungeonShadowAssassinNotification {
         if (!LorenzUtils.inSkyBlock || !LorenzUtils.inDungeons) return
         if (!SkyHanniMod.feature.dungeon.shadowAssassinJumpNotifier) return
         //F7 and maybe newer, currently not released, floors have shadow assassins, so they are allowed to be listed here
-        val disable = if (DungeonAPI.dungeonFloor == null) true else DungeonAPI.dungeonFloor!!.contains("7")
-        if (DungeonAPI.inBossRoom && disable) return
+        if (DungeonAPI.dungeonFloor?.contains("7") == true && DungeonAPI.inBossRoom) return
         if (event.packet !is S44PacketWorldBorder) return
         val packet: S44PacketWorldBorder = event.packet
         //Did not find another way to read the packet :/
