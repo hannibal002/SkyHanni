@@ -21,6 +21,8 @@ import kotlin.time.Duration.Companion.seconds
 
 object RemoveBuggedHypixelEntities {
 
+    private val neverUpdatedTime = (-1).seconds
+
     private var lastCheckTime = SimpleTimeMark.farPast()
 
     private var foundEntities = mutableListOf<Int>()
@@ -91,14 +93,9 @@ object RemoveBuggedHypixelEntities {
         }
     }
 
-    val neverUpdatedTime = (-1).seconds
-
     private fun checkNearby() {
         if (!Minecraft.getMinecraft().thePlayer.isSneaking()) return
-
-        if (lastCheckTime.passedSince() < 500.milliseconds) {
-            return
-        }
+        if (lastCheckTime.passedSince() < 500.milliseconds) return
 
         lastCheckTime = SimpleTimeMark.now()
 
@@ -148,8 +145,13 @@ object RemoveBuggedHypixelEntities {
             val inEntityList = entity in entityList
 
             val name = entity.name
-            val text = "'" + name + "' | " + lastUpdateTime + " | $ticksExisted ticks | npc:$npc |" +
-                " inLoadedEntityList:$inLoadedEntityList | inEntityList:$inEntityList | inDestroyedEntities:$inDestroyedEntities"
+            val text = "'$name' | " +
+                lastUpdateTime + " | " +
+                "$ticksExisted ticks | " +
+                "npc:$npc | " +
+                "inLoadedEntityList:$inLoadedEntityList | " +
+                "inEntityList:$inEntityList | " +
+                "inDestroyedEntities:$inDestroyedEntities"
             result.add(text)
         }
 
