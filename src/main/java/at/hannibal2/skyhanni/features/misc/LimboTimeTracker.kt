@@ -6,6 +6,7 @@ import at.hannibal2.skyhanni.events.ConfigLoadEvent
 import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.LorenzChatEvent
 import at.hannibal2.skyhanni.events.LorenzTickEvent
+import at.hannibal2.skyhanni.events.LorenzToolTipEvent
 import at.hannibal2.skyhanni.events.LorenzWorldChangeEvent
 import at.hannibal2.skyhanni.events.MessageSendToServerEvent
 import at.hannibal2.skyhanni.features.commands.LimboCommands
@@ -92,6 +93,50 @@ class LimboTimeTracker {
     }
 
     @SubscribeEvent
+    fun onHoverItem(event: LorenzToolTipEvent) {
+        if (!LorenzUtils.inSkyBlock) return
+        if (!event.slot.inventory.displayName.unformattedText.startsWith("Detailed /playtime")) return
+        if (event.slot.slotIndex != 4) return
+        val playtime: Duration = config.limboPlaytime.seconds
+        val lore = event.toolTip
+        val firstLine = event.toolTip.first()
+        val totalPlaytime = event.toolTip.last()
+        var modifiedArray: List<String>
+        var setMinutes = false
+        val hoursArray = lore.filter { it.matches("§5§o§b\\d+(\\.\\d+)? hours.+\$".toRegex()) }.toMutableList()
+        val minutesArray = lore.filter { it.matches("§5§o§a\\d+(\\.\\d+)? minutes.+\$".toRegex()) }.toMutableList() //move to repo pattern
+        if (config.limboPlaytime >= 3600) {
+            val hours = playtime.inWholeHours
+            val minutes = (playtime.inWholeMinutes-(hours*60).toFloat()/6).toInt()
+            modifiedArray = hoursArray
+            if (minutes == 0) modifiedArray.add("§b$hours hours §7on Limbo")
+            else modifiedArray.add("§b$hours.${(minutes.toFloat()/6).toInt()} hours §7on Limbo")
+            modifiedArray = modifiedArray.sortedByDescending {
+                it.substringAfter("§b").substringBefore(" hours").toDoubleOrNull()
+            }
+        }
+        else {
+            val minutes = playtime.inWholeMinutes
+            modifiedArray = minutesArray
+            modifiedArray.add("§a$minutes minutes §7on Limbo")
+            modifiedArray = modifiedArray.sortedByDescending {
+                it.substringAfter("§a").substringBefore(" minutes").toDoubleOrNull()
+            }
+            setMinutes = true
+        }
+        event.toolTip.clear()
+        event.toolTip.add(firstLine)
+        if (!setMinutes) {
+            event.toolTip.addAll(modifiedArray)
+            event.toolTip.addAll(minutesArray)
+        } else {
+            event.toolTip.addAll(hoursArray)
+            event.toolTip.addAll(modifiedArray)
+        }
+        event.toolTip.add(totalPlaytime)
+    }
+
+    @SubscribeEvent
     fun onRenderOverlay(event: GuiRenderEvent.GuiOverlayRenderEvent) {
         if (!isEnabled()) return
         if (!inLimbo) return
@@ -131,35 +176,3 @@ class LimboTimeTracker {
 
     fun isEnabled() = config.showTimeInLimbo
 }
-/* TODO: add playtime to this
-chest name: 'Detailed /playtime'
-index: 4
-internalName:NONE
-display name: '§aPlaytime Breakdown'
-minecraft id: 'minecraft:clock'
-lore:
- '§b866.3 hours §7on Private Island'
- '§b530.1 hours §7on Garden'
- '§b490.9 hours §7on Dungeon'
- '§b391.5 hours §7on Crystal Hollows'
- '§b358.8 hours §7on Dwarven Mines'
- '§b352 hours §7on Hub'
- '§b228.9 hours §7on Dungeon Hub'
- '§b206.8 hours §7on The End'
- '§b105.4 hours §7on Crimson Isle'
- '§b72.2 hours §7on Spider's Den'
- '§b50.3 hours §7on Jerry's Workshop'
- '§b49 hours §7on The Park'
- '§b32.9 hours §7on The Farming Islands'
- '§b30 hours §7on The Rift'
- '§b11.2 hours §7on Deep Caverns'
- '§b2.3 hours §7on Gold Mine'
- '§b2.3 hours §7on Kuudra'
- '§b1.3 hours §7on Mushroom Desert'
- '§a59 minutes §7on Dark Auction'
- '§7Totalling §b3,783.22 hours §7on this profile!'
-
-getTagCompound
-  display:
-    Name: "§aPlaytime Breakdown"
- */
