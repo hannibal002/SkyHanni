@@ -27,27 +27,21 @@ class MaxPurseItems {
     private var instantBuyPrice = -1f
 
     private fun getPrices() {
-        items@ for (item in Minecraft.getMinecraft().thePlayer.openContainer.inventory) {
+        for (item in Minecraft.getMinecraft().thePlayer.openContainer.inventory) {
             createOrderPattern.matchMatcher(item?.displayName ?: continue) {
-                if (matches()) {
-                    lore@ for (info in item.getLore()) {
-                        orderPattern.matchMatcher(info) {
-                            if (!matches()) continue@lore
-                            buyOrderPrice = group("coins").replace(",", "").toFloat()
-                            // If we get to this point, we have the instant price because instant is earlier in the list of items
-                            // So we can return
-                            return
-                        }
+                for (info in item.getLore()) {
+                    orderPattern.matchMatcher(info) {
+                        buyOrderPrice = group("coins").replace(",", "").toFloat()
+                        // If we get to this point, we have the instant price because instant is earlier in the list of items
+                        // So we can return
+                        return
                     }
                 }
             }
             createInstantPattern.matchMatcher(item.displayName ?: continue) {
-                if (matches()) {
-                    lore@ for (info in item.getLore()) {
-                        instantPattern.matchMatcher(info) {
-                            if (!matches()) continue@lore
-                            instantBuyPrice = group("coins").replace(",", "").toFloat()
-                        }
+                for (info in item.getLore()) {
+                    instantPattern.matchMatcher(info) {
+                        instantBuyPrice = group("coins").replace(",", "").toFloat()
                     }
                 }
             }
