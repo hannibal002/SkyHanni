@@ -183,7 +183,7 @@ public class InventoryConfig {
     public boolean shiftClickForEquipment = false;
 
     @Expose
-    @ConfigOption(name = "Quiver Empty Alert", desc = "Notifies you when your Quiver runs out of arrows.")
+    @ConfigOption(name = "Low Quiver Alert", desc = "Notifies you when your Quiver runs out of arrows.")
     @ConfigEditorBoolean
     @FeatureToggle
     public boolean quiverAlert = false;
