@@ -33,6 +33,9 @@ class LimboTimeTracker {
     private var userLuck: Double = 0.0
     private val userLuckMultiplier = 0.000810185
 
+    private lateinit var modifiedArray: MutableList<String>
+    private var setMinutes = false
+
     private val bedwarsLobbyLimbo = AxisAlignedBB(-662.0, 43.0, -76.0, -619.0, 86.0, -27.0)
 
     @SubscribeEvent
@@ -97,43 +100,51 @@ class LimboTimeTracker {
         if (!LorenzUtils.inSkyBlock) return
         if (!event.slot.inventory.displayName.unformattedText.startsWith("Detailed /playtime")) return
         if (event.slot.slotIndex != 4) return
-        val playtime: Duration = config.limboPlaytime.seconds
+
         val lore = event.toolTip
-        val firstLine = event.toolTip.first()
-        val totalPlaytime = event.toolTip.last()
-        var modifiedArray: List<String>
-        var setMinutes = false
         val hoursArray = lore.filter { it.matches("§5§o§b\\d+(\\.\\d+)? hours.+\$".toRegex()) }.toMutableList()
         val minutesArray = lore.filter { it.matches("§5§o§a\\d+(\\.\\d+)? minutes.+\$".toRegex()) }.toMutableList() //move to repo pattern
+
+        addLimbo(hoursArray, minutesArray)
+        remakeArray(event.toolTip, minutesArray, hoursArray)
+    }
+
+    private fun addLimbo(hoursArray: MutableList<String>, minutesArray: MutableList<String>) {
         if (config.limboPlaytime >= 3600) {
-            val hours = playtime.inWholeHours
-            val minutes = (playtime.inWholeMinutes-(hours*60).toFloat()/6).toInt()
+            val hours = config.limboPlaytime.seconds.inWholeHours
+            val minutes = (config.limboPlaytime.seconds.inWholeMinutes-(hours*60).toFloat()/6).toInt()
             modifiedArray = hoursArray
             if (minutes == 0) modifiedArray.add("§b$hours hours §7on Limbo")
             else modifiedArray.add("§b$hours.${(minutes.toFloat()/6).toInt()} hours §7on Limbo")
             modifiedArray = modifiedArray.sortedByDescending {
                 it.substringAfter("§b").substringBefore(" hours").toDoubleOrNull()
-            }
+            }.toMutableList()
+            setMinutes = false
         }
         else {
-            val minutes = playtime.inWholeMinutes
+            val minutes = config.limboPlaytime.seconds.inWholeMinutes
             modifiedArray = minutesArray
             modifiedArray.add("§a$minutes minutes §7on Limbo")
             modifiedArray = modifiedArray.sortedByDescending {
                 it.substringAfter("§a").substringBefore(" minutes").toDoubleOrNull()
-            }
+            }.toMutableList()
             setMinutes = true
         }
-        event.toolTip.clear()
-        event.toolTip.add(firstLine)
+    }
+
+    private fun remakeArray(toolTip: MutableList<String>, minutesArray: MutableList<String>, hoursArray: MutableList<String>) {
+        val firstLine = toolTip.first()
+        val totalPlaytime = toolTip.last()
+        toolTip.clear()
+        toolTip.add(firstLine)
         if (!setMinutes) {
-            event.toolTip.addAll(modifiedArray)
-            event.toolTip.addAll(minutesArray)
+            toolTip.addAll(modifiedArray)
+            toolTip.addAll(minutesArray)
         } else {
-            event.toolTip.addAll(hoursArray)
-            event.toolTip.addAll(modifiedArray)
+            toolTip.addAll(hoursArray)
+            toolTip.addAll(modifiedArray)
         }
-        event.toolTip.add(totalPlaytime)
+        toolTip.add(totalPlaytime)
     }
 
     @SubscribeEvent
