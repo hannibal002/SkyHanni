@@ -91,6 +91,8 @@ object RemoveBuggedHypixelEntities {
         }
     }
 
+    val neverUpdatedTime = (-1).seconds
+
     private fun checkNearby() {
         if (!Minecraft.getMinecraft().thePlayer.isSneaking()) return
 
@@ -102,9 +104,31 @@ object RemoveBuggedHypixelEntities {
 
         collectFound()
 
-        val list = EntityUtils.getEntitiesNextToPlayer<Entity>(5.0).filter { it !=  Minecraft.getMinecraft().thePlayer}
+        val entities = EntityUtils.getEntitiesNextToPlayer<Entity>(5.0).filter { it != Minecraft.getMinecraft().thePlayer }
 
-        val neverUpdatedTime = (-1).seconds
+        for (entity in entities) {
+            val entityId = entity.entityId
+            val lastUpdateTime = lastFoundTime[entityId]?.passedSince() ?: neverUpdatedTime
+            val ticksExisted = entity.ticksExisted
+
+            val name = entity.name
+            if (name == "§c☣ §fBleeds: §8-") {
+                if (ticksExisted > 20 * 4) {
+                    removeInvalidEntity(entityId, "Minotaur ability name")
+                }
+            }
+
+            if (lastUpdateTime == neverUpdatedTime) {
+                if (ticksExisted > 20) {
+                    removeInvalidEntity(entityId, "Mob never updated")
+                }
+            }
+        }
+
+        debug(entities)
+    }
+
+    private fun debug(list: Sequence<Entity>) {
         val result = mutableListOf<String>()
         for (entity in list) {
             val entityId = entity.entityId
@@ -121,20 +145,8 @@ object RemoveBuggedHypixelEntities {
 
             val name = entity.name
             val text = "'" + name + "' | " + lastUpdateTime + " | $ticksExisted ticks | npc:$npc |" +
-                " inLoadedEntityList:$inLoadedEntityList | inEntityList:$inEntityList | inDestroyedEntities:$inDestroyedEntities"
-
-            if (name == "§c☣ §fBleeds: §8-") {
-                if (ticksExisted > 20 * 4) {
-                    removeInvalidEntity(entityId, "Minotaur ability name")
-                }
-            }
-
+                    " inLoadedEntityList:$inLoadedEntityList | inEntityList:$inEntityList | inDestroyedEntities:$inDestroyedEntities"
             result.add(text)
-            if (lastUpdateTime == neverUpdatedTime) {
-                if (ticksExisted > 20) {
-                    removeInvalidEntity(entityId, "Mob never updated")
-                }
-            }
         }
 
         if (result.isEmpty()) {
