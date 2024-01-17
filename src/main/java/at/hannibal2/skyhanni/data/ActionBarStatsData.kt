@@ -50,10 +50,9 @@ enum class ActionBarStatsData(@Language("RegExp") rawPattern: String) { HEALTH(
                     val newValue = group(1)
                     if (value.value != newValue) {
                         value.value = newValue
-                        return@mapNotNull ActionBarValueUpdate(value)
-                    }
+                        ActionBarValueUpdate(value)
+                    } else null
                 }
-                null
             }.forEach { it.postAndCatch() }
         }
     }
