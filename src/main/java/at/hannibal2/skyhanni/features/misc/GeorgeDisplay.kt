@@ -104,7 +104,8 @@ class GeorgeDisplay {
                 }
             }
         }
-        updateList.addAll(listOf<Renderable>(Renderable.string("§dTotal cost §7(§6Lowest BIN§7${if (config.otherRarities) " before Kat" else ""}): §6${totalCost.addSeparators()} coins"), Renderable.string("§c§lDisclaimer:§r§c Some pets are unavailable on the Auction House.")))
+        updateList.add(Renderable.string("§dTotal cost §7(§6Lowest BIN§7): §6${totalCost.addSeparators()} coins"))
+        if (config.otherRarities) updateList.add(Renderable.string("§c§lDisclaimer:§r§c Total does not include costs to upgrade via Kat."))
         return updateList
     }
 
