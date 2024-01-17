@@ -47,7 +47,7 @@ object BitsAPI {
     private val bitsChatGroup = bitsDataGroup.group("chat")
 
     val bitsFromFameRankUpChatPattern by bitsChatGroup.pattern(
-        "fame-rank_up",
+        "famerankup",
         "§eYou gained §3(?<amount>.*) Bits Available §ecompounded from all your §epreviously eaten §6cookies§e! Click here to open §6cookie menu§e!"
     )
 
@@ -57,7 +57,7 @@ object BitsAPI {
     )
 
     val boosterCookieAte by bitsChatGroup.pattern(
-        "booster-cookie-ate",
+        "boostercookieate",
         "§eYou consumed a §6Booster Cookie§e!.*"
     )
 
@@ -65,37 +65,37 @@ object BitsAPI {
     private val bitsGuiGroup = bitsDataGroup.group("gui")
 
     val bitsAvailableMenuPattern by bitsGuiGroup.pattern(
-        "available-menu",
+        "availablemenu",
         "§7Bits Available: §b(?<toClaim>[\\w,]+)(§3.+)?"
     )
 
     val fameRankSbMenuPattern by bitsGuiGroup.pattern(
-        "sb-menu-fame-rank",
+        "sbmenufamerank",
         "§7Your rank: §e(?<rank>.*)"
     )
 
     val fameRankCommunityShopPattern by bitsGuiGroup.pattern(
-        "community-shop-fame-rank",
+        "communityshopfamerank",
         "§7Fame Rank: §e(?<rank>.*)"
     )
 
     val bitsGuiNamePattern by bitsGuiGroup.pattern(
-        "main-menu-name",
+        "mainmenuname",
         "^SkyBlock Menu$"
     )
 
     val bitsGuiStackPattern by bitsGuiGroup.pattern(
-        "main-menu-stack",
+        "mainmenustack",
         "^§6Booster Cookie$"
     )
 
     val fameRankGuiNamePattern by bitsGuiGroup.pattern(
-        "fame-rank-menu-name",
+        "famerankmenuname",
         "^(Community Shop|Booster Cookie)$"
     )
 
     val fameRankGuiStackPattern by bitsGuiGroup.pattern(
-        "fame-rank-menu-stack",
+        "famerankmenustack",
         "^(§aCommunity Shop|§eFame Rank)$"
     )
 
