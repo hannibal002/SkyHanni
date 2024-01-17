@@ -250,9 +250,9 @@ object MobFilter {
             }
 
             IslandType.HUB -> when {
-                baseEntity is EntityOcelot && armorStand?.isDefaultValue() == false && armorStand.name.startsWith("§8[§7Lv155§8] §cAzrael§r") -> MobUtils.getArmorStand(baseEntity, 2).makeMobResult { MobFactories.basic(baseEntity, it) }
-                baseEntity is EntityOcelot && nextEntity is EntityOcelot -> MobUtils.getArmorStand(baseEntity, 2).makeMobResult { MobFactories.basic(baseEntity, it) }
-                baseEntity is EntityOtherPlayerMP && (baseEntity.name == "Minos Champion" || baseEntity.name == "Minos Inquisitor") && armorStand != null -> MobUtils.getArmorStand(baseEntity, 2).makeMobResult { MobFactories.basic(baseEntity, it, listOf(armorStand)) }
+                baseEntity is EntityOcelot && armorStand?.isDefaultValue() == false && armorStand.name.startsWith("§8[§7Lv155§8] §cAzrael§r") -> MobUtils.getArmorStand(baseEntity, 1).makeMobResult { MobFactories.basic(baseEntity, it) }
+                baseEntity is EntityOcelot && (nextEntity is EntityOcelot || nextEntity == null) -> MobUtils.getArmorStand(baseEntity, 3).makeMobResult { MobFactories.basic(baseEntity, it) }
+                baseEntity is EntityOtherPlayerMP && (baseEntity.name == "Minos Champion" || baseEntity.name == "Minos Inquisitor" || baseEntity.name == "Minotaur ") && armorStand != null -> MobUtils.getArmorStand(baseEntity, 2).makeMobResult { MobFactories.basic(baseEntity, it, listOf(armorStand)) }
                 baseEntity is EntityZombie && armorStand?.isDefaultValue() == true && MobUtils.getNextEntity(baseEntity, 4)?.name?.startsWith("§e") == true -> petCareHandler(baseEntity)
                 baseEntity is EntityZombie && armorStand != null && !armorStand.isDefaultValue() -> null // Impossible Rat
                 baseEntity is EntityZombie -> ratHandler(baseEntity, nextEntity) // Possible Rat
