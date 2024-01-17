@@ -23,26 +23,15 @@ public class SulphurSkitterBoxConfig {
     @ConfigEditorDropdown()
     public BoxType boxType = BoxType.WIREFRAME;
 
-    public enum BoxType implements HasLegacyId {
+    public enum BoxType {
         FULL("Full"),
         WIREFRAME("Wireframe")
+
         ;
-
         private final String str;
-        private final int legacyId;
-
-        BoxType(String str, int legacyId) {
-            this.str = str;
-            this.legacyId = legacyId;
-        }
 
         BoxType(String str) {
-            this(str, -1);
-        }
-
-        @Override
-        public int getLegacyId() {
-            return legacyId;
+            this.str = str;
         }
 
         @Override
