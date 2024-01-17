@@ -3,6 +3,7 @@ package at.hannibal2.skyhanni.test
 import at.hannibal2.skyhanni.events.LorenzTickEvent
 import at.hannibal2.skyhanni.events.LorenzWorldChangeEvent
 import at.hannibal2.skyhanni.events.PacketEvent
+import at.hannibal2.skyhanni.mixins.transformers.AccessorWorldClient
 import at.hannibal2.skyhanni.utils.EntityUtils
 import at.hannibal2.skyhanni.utils.EntityUtils.isNPC
 import at.hannibal2.skyhanni.utils.LorenzUtils
@@ -10,7 +11,6 @@ import at.hannibal2.skyhanni.utils.LorenzUtils.makeAccessible
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.StringUtils.equalsIgnoreColor
 import net.minecraft.client.Minecraft
-import net.minecraft.client.multiplayer.WorldClient
 import net.minecraft.entity.Entity
 import net.minecraft.network.Packet
 import net.minecraft.network.play.server.S13PacketDestroyEntities
@@ -153,9 +153,8 @@ object RemoveBuggedHypixelEntities {
             val worldClient = Minecraft.getMinecraft().theWorld
             val inLoadedEntityList = entity in worldClient.loadedEntityList
             val inDestroyedEntities = entityId in destroyedEntities
-            val client = worldClient as WorldClient
-            val entityList: Set<Entity> =
-                client.javaClass.getDeclaredField("entityList").makeAccessible().get(client) as Set<Entity>
+            val client = worldClient as AccessorWorldClient
+            val entityList: Set<Entity> = client.getEntityList_skyhanni()
             val inEntityList = entity in entityList
 
             val name = entity.name
