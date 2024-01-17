@@ -31,8 +31,6 @@ class GeorgeDisplay {
         "(?i) +(?<fullThing>(?<tierColorCodes>§.)*(?<tier>(?:un)?common|rare|epic|legendary|mythic|divine|(?:very )?special|ultimate|supreme|admin) (?<pet>[\\S ]+))"
     )
 
-    private val notAHOrCraft: List<String> = listOf<String>("ENDERMAN", "BLACK_CAT", "SLUG", "SPIRIT", "GIRAFFE", "JELLYFISH", "BAL", "BABY_YETI", "RIFT_FERRET", "WISP")
-
     private val display = mutableListOf<Renderable>()
 
     private enum class RarityToTier(
@@ -98,12 +96,10 @@ class GeorgeDisplay {
                         onClick = { LorenzUtils.sendCommandToServer("ahs ] $origPetString") }
                     ))
                 } else {
-                    val command: String = if (pet !in notAHOrCraft) "viewrecipe" else "wiki"
-                    val whatCommandDoes: String = if (pet !in notAHOrCraft) "its crafting recipe" else "how to obtain it"
                     updateList.add(Renderable.clickAndHover(
-                        text = " §7- $displayPetString§7: §eNot on AH; ${if (pet !in notAHOrCraft) "try crafting it" else "find its Wiki article here"}.",
-                        tips = listOf("§4Click to run §e$command $pet §4to view $whatCommandDoes."),
-                        onClick = { LorenzUtils.sendCommandToServer("$command $pet") }
+                        text = " §7- $displayPetString§7: §eNot on AH; view its Wiki article here.",
+                        tips = listOf("§4Click to run §ewiki $pet §4to view how to obtain it."),
+                        onClick = { LorenzUtils.sendCommandToServer("wiki $pet") }
                     ))
                 }
             }
