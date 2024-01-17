@@ -53,7 +53,9 @@ import kotlin.time.Duration.Companion.seconds
 
 object LorenzUtils {
 
-    val onHypixel get() = (HypixelData.hypixelLive || HypixelData.hypixelAlpha) && Minecraft.getMinecraft().thePlayer != null
+    val connectedToHypixel get() = HypixelData.hypixelLive || HypixelData.hypixelAlpha
+
+    val onHypixel get() = connectedToHypixel && Minecraft.getMinecraft().thePlayer != null
 
     val isOnAlphaServer get() = onHypixel && HypixelData.hypixelAlpha
 
