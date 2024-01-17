@@ -40,6 +40,19 @@ class MobDetection {
 
     private var shouldClear: AtomicBoolean = AtomicBoolean(false)
 
+    init {
+        MobFilter.bossMobNameFilter
+        MobFilter.mobNameFilter
+        MobFilter.dojoFilter
+        MobFilter.minionMobPrefix
+        MobFilter.summonFilter
+        MobFilter.dungeonNameFilter
+        MobFilter.petCareNamePattern
+        MobFilter.slayerNameFilter
+        MobFilter.summonOwnerPattern
+        MobFilter.wokeSleepingGolemPattern
+    }
+
     private fun mobDetectionReset() {
         MobData.currentMobs.map {
             when (it.mobType) {

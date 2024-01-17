@@ -29,7 +29,10 @@ object MobFactories {
 
     fun basic(baseEntity: EntityLivingBase, armorStand: EntityArmorStand, extraEntityList: List<EntityLivingBase>? = null): Mob? =
         MobFilter.mobNameFilter.findMatcher(armorStand.cleanName()) {
-            Mob(baseEntity = baseEntity, mobType = Mob.Type.Basic, armorStand = armorStand, name = this.group(4).removeCorruptedSuffix(this.group(3).isNotEmpty()), additionalEntities = extraEntityList, levelOrTier = this.group(2).takeIf { it.isNotEmpty() }
+            Mob(
+                baseEntity = baseEntity, mobType = Mob.Type.Basic, armorStand = armorStand, name = this.group(4).removeCorruptedSuffix(
+                this.group(3)?.isNotEmpty() ?: false
+            ), additionalEntities = extraEntityList, levelOrTier = this.group(2)?.takeIf { it.isNotEmpty() }
                 ?.toInt() ?: -1)
         }
 
