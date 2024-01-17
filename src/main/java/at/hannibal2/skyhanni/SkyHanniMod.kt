@@ -331,6 +331,7 @@ import at.hannibal2.skyhanni.test.HighlightMissingRepoItems
 import at.hannibal2.skyhanni.test.HotSwapDetection
 import at.hannibal2.skyhanni.test.PacketTest
 import at.hannibal2.skyhanni.test.ParkourWaypointSaver
+import at.hannibal2.skyhanni.test.RemoveBuggedHypixelEntities
 import at.hannibal2.skyhanni.test.ShowItemUuid
 import at.hannibal2.skyhanni.test.SkyHanniDebugsAndTests
 import at.hannibal2.skyhanni.test.TestBingo
@@ -710,6 +711,7 @@ class SkyHanniMod {
 
         // test stuff
         loadModule(SkyHanniDebugsAndTests())
+        loadModule(RemoveBuggedHypixelEntities)
         loadModule(CopyNearbyParticlesCommand)
         loadModule(ButtonOnPause())
         loadModule(PacketTest())

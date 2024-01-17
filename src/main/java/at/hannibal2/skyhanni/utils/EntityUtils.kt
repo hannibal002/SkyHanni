@@ -139,7 +139,7 @@ object EntityUtils {
         return inventory.any { it != null && it.getSkullTexture() == skin }
     }
 
-    fun EntityPlayer.isNPC() = uniqueID == null || uniqueID.version() != 4
+    fun Entity.isNPC() = this is EntityPlayer && (uniqueID == null || uniqueID.version() != 4)
 
     fun EntityLivingBase.hasPotionEffect(potion: Potion) = getActivePotionEffect(potion) != null
 
@@ -150,9 +150,13 @@ object EntityUtils {
 
     inline fun <reified R : Entity> getEntities(): Sequence<R> = getAllEntities().filterIsInstance<R>()
 
-    fun getAllEntities(): Sequence<Entity> = Minecraft.getMinecraft()?.theWorld?.loadedEntityList?.let {
-        if (Minecraft.getMinecraft().isCallingFromMinecraftThread) it else it.toMutableList()
-    }?.asSequence()?.filterNotNull() ?: emptySequence()
+    fun getAllEntities(): Sequence<Entity> {
+        val result = Minecraft.getMinecraft()?.theWorld?.loadedEntityList?.let {
+            if (Minecraft.getMinecraft().isCallingFromMinecraftThread) it else it.toMutableList()
+        }?.asSequence()?.filterNotNull() ?: emptySequence()
+
+        return result
+    }
 
     fun Entity.canBeSeen(radius: Double = 150.0) = getLorenzVec().add(y = 0.5).canBeSeen(radius)
 
