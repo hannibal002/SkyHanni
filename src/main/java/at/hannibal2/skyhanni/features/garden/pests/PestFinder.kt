@@ -31,6 +31,7 @@ import at.hannibal2.skyhanni.utils.StringUtils
 import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 import net.minecraft.client.Minecraft
+import net.minecraftforge.fml.common.eventhandler.EventPriority
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import kotlin.time.Duration.Companion.seconds
 
@@ -140,11 +141,29 @@ class PestFinder {
             }
         }
 
-        if (newPests == PestAPI.scoreboardPests) return
+        if (newPests != PestAPI.scoreboardPests) {
+            removePests(PestAPI.scoreboardPests - newPests)
+            PestAPI.scoreboardPests = newPests
+            update()
+        }
 
-        removePests(PestAPI.scoreboardPests - newPests)
-        PestAPI.scoreboardPests = newPests
-        update()
+        resetAllPests(newPests)
+    }
+
+    // Auto fixing plots marked as pests when killing all pests without SkyHanni earlier.
+    private fun resetAllPests(newPests: Int) {
+        if (newPests != 0) return
+
+        var fixed = false
+        for (plot in GardenPlotAPI.plots) {
+            if (plot.pests > 0) {
+                fixed = true
+                plot.pests = 0
+            }
+        }
+        if (fixed) {
+            LorenzUtils.debug("Auto fixed all plots with pests.")
+        }
     }
 
     private fun removePests(removedPests: Int) {
@@ -178,7 +197,8 @@ class PestFinder {
 
     private fun getPlotsWithPests() = GardenPlotAPI.plots.filter { it.pests > 0 }
 
-    @SubscribeEvent
+    // priority to low so that this happens after other renderPlot calls.
+    @SubscribeEvent(priority = EventPriority.LOW)
     fun onRenderWorld(event: LorenzRenderWorldEvent) {
         if (!isEnabled()) return
         if (!config.showPlotInWorld) return

@@ -21,6 +21,7 @@ class HighlightInquisitors {
 
         if (entity is EntityPlayer && entity.name == "Minos Inquisitor") {
             RenderLivingEntityHelper.setEntityColor(entity, LorenzColor.AQUA.toColor().withAlpha(127)) { config.highlightInquisitors }
+            RenderLivingEntityHelper.setNoHurtTime(entity) { config.highlightInquisitors }
         }
     }
 }

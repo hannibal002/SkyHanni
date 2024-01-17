@@ -38,6 +38,12 @@ object StringUtils {
 
     private val formattingChars by lazy { "kmolnr".toCharArray() + "kmolnr".uppercase().toCharArray() }
 
+    /**
+     * Removes color and optionally formatting codes from the given string, leaving plain text.
+     *
+     * @param keepFormatting Boolean indicating whether to retain non-color formatting codes (default: false).
+     * @return A string with color codes removed (and optionally formatting codes if specified).
+     */
     fun String.removeColor(keepFormatting: Boolean = false): String {
         val builder = StringBuilder(this.length)
 
@@ -275,7 +281,11 @@ object StringUtils {
 
     fun String.convertToFormatted(): String = this.replace("&&", "§")
 
-    fun Pattern.matches(string: String) = matcher(string).matches()
+    fun Pattern.matches(string: String?) = string?.let { matcher(it).matches() } ?: false
 
-    fun Pattern.find(string: String) = matcher(string).find()
+    fun Pattern.find(string: String?) = string?.let { matcher(it).find() } ?: false
+
+    fun String.allLettersFirstUppercase() = split("_").joinToString(" ") { it.firstLetterUppercase() }
+
+    fun String?.equalsIgnoreColor(string: String?) = this?.let { it.removeColor() == string?.removeColor() } ?: false
 }

@@ -71,7 +71,8 @@ class TiaRelayHelper {
         val name = sounds.values.first().name
         for (sound in sounds.toMutableMap()) {
             if (sound.value.name != name) {
-                LorenzUtils.error("Tia Relay Helper error: Too much background noise! Please try again.")
+                LorenzUtils.error("Tia Relay Helper error: Too much background noise! Try turning off the music and then try again.")
+                LorenzUtils.clickableChat("Click here to run /togglemusic", "togglemusic")
                 sounds.clear()
                 return
             }

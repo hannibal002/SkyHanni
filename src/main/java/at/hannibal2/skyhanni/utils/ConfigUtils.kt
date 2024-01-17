@@ -40,12 +40,7 @@ object ConfigUtils {
     private fun <T> getEnumConstantFromLegacyId(
         legacyId: Int,
         enumClass: Class<T>
-    ): T? where T : Enum<T>, T : HasLegacyId {
-        for (enumConstant in enumClass.getEnumConstants()) {
-            if (enumConstant.legacyId == legacyId) return enumConstant
-        }
-        return null
-    }
+    ): T? where T : Enum<T>, T : HasLegacyId = enumClass.getEnumConstants().firstOrNull { it.legacyId == legacyId }
 
     /**
      * Migrates an Int to an Enum Constant.
