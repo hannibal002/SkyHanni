@@ -104,8 +104,14 @@ object RemoveBuggedHypixelEntities {
 
         collectFound()
 
-        val entities = EntityUtils.getEntitiesNextToPlayer<Entity>(5.0).filter { it != Minecraft.getMinecraft().thePlayer }
+        val entities =
+            EntityUtils.getEntitiesNextToPlayer<Entity>(5.0).filter { it != Minecraft.getMinecraft().thePlayer }
 
+        filterInvalidEntities(entities)
+        debug(entities)
+    }
+
+    private fun filterInvalidEntities(entities: Sequence<Entity>) {
         for (entity in entities) {
             val entityId = entity.entityId
             val lastUpdateTime = lastFoundTime[entityId]?.passedSince() ?: neverUpdatedTime
@@ -124,8 +130,6 @@ object RemoveBuggedHypixelEntities {
                 }
             }
         }
-
-        debug(entities)
     }
 
     private fun debug(list: Sequence<Entity>) {
@@ -145,7 +149,7 @@ object RemoveBuggedHypixelEntities {
 
             val name = entity.name
             val text = "'" + name + "' | " + lastUpdateTime + " | $ticksExisted ticks | npc:$npc |" +
-                    " inLoadedEntityList:$inLoadedEntityList | inEntityList:$inEntityList | inDestroyedEntities:$inDestroyedEntities"
+                " inLoadedEntityList:$inLoadedEntityList | inEntityList:$inEntityList | inDestroyedEntities:$inDestroyedEntities"
             result.add(text)
         }
 
