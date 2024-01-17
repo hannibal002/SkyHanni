@@ -646,8 +646,8 @@ object LorenzUtils {
     fun <T> T.conditionalTransform(condition: Boolean, ifTrue: T.() -> Any, ifFalse: T.() -> Any) =
         if (condition) ifTrue(this) else ifFalse(this)
 
-    fun sendTitle(text: String, duration: Duration, height: Double = 1.8) {
-        TitleManager.sendTitle(text, duration, height)
+    fun sendTitle(text: String, duration: Duration, height: Double = 1.8, fontSize: Float = 4f) {
+        TitleManager.sendTitle(text, duration, height, fontSize)
     }
 
     @Deprecated("Dont use this approach at all. check with regex or equals instead.", ReplaceWith("Regex or equals"))
