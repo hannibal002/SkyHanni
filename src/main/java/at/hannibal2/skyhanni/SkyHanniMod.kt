@@ -334,6 +334,7 @@ import at.hannibal2.skyhanni.test.ShowItemUuid
 import at.hannibal2.skyhanni.test.SkyHanniDebugsAndTests
 import at.hannibal2.skyhanni.test.TestBingo
 import at.hannibal2.skyhanni.test.TestCopyBestiaryValues
+import at.hannibal2.skyhanni.test.TestCopyChestData
 import at.hannibal2.skyhanni.test.TestCopyRngMeterValues
 import at.hannibal2.skyhanni.test.TestExportTools
 import at.hannibal2.skyhanni.test.TestShowSlotNumber
@@ -387,6 +388,7 @@ class SkyHanniMod {
         loadModule(EntityData())
         loadModule(EntityMovementData())
         loadModule(TestExportTools)
+        loadModule(TestCopyChestData)
         loadModule(ItemClickData())
 //        loadModule(Year300RaffleEvent)
         loadModule(MinecraftData)
