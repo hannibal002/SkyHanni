@@ -4,7 +4,7 @@ import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.events.GuiContainerEvent
 import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils
-import net.minecraft.client.Minecraft
+import at.hannibal2.skyhanni.utils.LorenzUtils.makeShiftClick
 import net.minecraft.client.gui.inventory.GuiChest
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
@@ -22,13 +22,6 @@ class ShiftClickBrewing {
         val chestName = InventoryUtils.openInventoryName()
         if (!chestName.startsWith("Brewing Stand")) return
 
-        event.isCanceled = true
-        Minecraft.getMinecraft().playerController.windowClick(
-            event.container.windowId,
-            event.slot.slotNumber,
-            event.clickedButton,
-            1,
-            Minecraft.getMinecraft().thePlayer
-        )
+        event.makeShiftClick()
     }
 }

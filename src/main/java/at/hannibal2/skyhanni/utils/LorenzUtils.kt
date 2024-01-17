@@ -5,6 +5,7 @@ import at.hannibal2.skyhanni.data.HypixelData
 import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.data.MayorElection
 import at.hannibal2.skyhanni.data.TitleManager
+import at.hannibal2.skyhanni.events.GuiContainerEvent
 import at.hannibal2.skyhanni.features.dungeon.DungeonAPI
 import at.hannibal2.skyhanni.mixins.transformers.AccessorGuiEditSign
 import at.hannibal2.skyhanni.test.TestBingo
@@ -598,6 +599,13 @@ object LorenzUtils {
         javaClass.getDeclaredField("modifiers").makeAccessible().set(this, modifiers and (Modifier.FINAL.inv()))
         return this
     }
+
+    fun GuiContainerEvent.SlotClickEvent.makeShiftClick() =
+        slot?.slotNumber?.let { slotNumber ->
+            Minecraft.getMinecraft().playerController.windowClick(
+                container.windowId, slotNumber, 0, 1, Minecraft.getMinecraft().thePlayer
+            )?.also { isCanceled = true }
+        }
 
     fun <T> List<T>.indexOfFirst(vararg args: T) = args.map { indexOf(it) }.firstOrNull { it != -1 }
 
