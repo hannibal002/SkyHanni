@@ -11,7 +11,7 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
 /**
  * This feature fixes ghost entities sent by hypixel that are not properly deleted in the correct order.
- * E.g. Diana or Dingeon mobs or nametags.
+ * This included Diana, Dungeon and Crimson Isle mobs and nametags.
  */
 object FixGhostEntities {
 
