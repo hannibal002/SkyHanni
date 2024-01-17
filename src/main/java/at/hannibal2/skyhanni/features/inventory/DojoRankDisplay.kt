@@ -5,13 +5,15 @@ import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.InventoryCloseEvent
 import at.hannibal2.skyhanni.events.InventoryFullyOpenedEvent
-import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.LorenzUtils
+import at.hannibal2.skyhanni.utils.LorenzUtils.indexOfFirst
+import at.hannibal2.skyhanni.utils.LorenzUtils.isInIsland
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.RenderUtils.renderStrings
 import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
+import net.minecraft.item.ItemStack
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
 class DojoRankDisplay {
@@ -28,45 +30,50 @@ class DojoRankDisplay {
         config.dojoRankDisplayPosition.renderStrings(display, posLabel = "Dojo Rank Display")
     }
 
-    private fun drawDisplay() = buildList {
+    private fun drawDisplay(items: Map<Int, ItemStack>) = buildList {
         var totalScore = 0
-        for (slot in InventoryUtils.getItemsInOpenChest()) {
-            val stack = slot.stack ?: continue
-            for (line in stack.getLore()) {
-                val name = stack.displayName ?: continue
-                testRankPattern.matchMatcher(line) rank@{
-                    testNamePattern.matchMatcher(name) name@{
-                        val testColor = this@name.group("color")
-                        val testName = this@name.group("name")
-                        val rank = this@rank.group("rank")
-                        val score = when (val s = this@rank.group("score").toInt()) {
-                            in 0 .. 999 -> "§c$s"
-                            else -> "§a$s"
-                        }
-                        totalScore += this@rank.group("score").toInt()
-                        add("$testColor$testName§6: $rank §7($score§7)")
+        for ((_, stack) in items) {
+            val name = stack.displayName ?: continue
+            testNamePattern.matchMatcher(name) {
+                val testColor = group("color")
+                val testName = group("name")
+                for (line in stack.getLore()) {
+                    testRankPattern.matchMatcher(line) {
+                        val rank = group("rank")
+                        val score = group("score").toInt()
+                        val color = if (score in 0 .. 99) "§c" else "§a"
+                        totalScore += group("score").toInt()
+                        add("$testColor$testName§f: $rank §7($color${score.addSeparators()}§7)")
                     }
                 }
             }
         }
-        val belt = when (totalScore) {
-            in 0 .. 999 -> "§fWhite Belt"
-            in 1000 .. 1999 -> "§cYellow Belt"
-            in 2000 .. 3999 -> "§aGreen Belt"
-            in 4000 .. 5999 -> "§9Blue Belt"
-            in 6000 .. 6999 -> "§6Brown Belt"
-            else -> "§8Black Belt"
-        }
-        add("")
-        add("§7Total Score: §6${totalScore.addSeparators()} §7(§8$belt§7)")
+
+        // TODO: use repo
+        val beltPoints = listOf(
+            "§fWhite Belt" to 0,
+            "§eYellow Belt" to 1000,
+            "§aGreen Belt" to 2000,
+            "§9Blue Belt" to 4000,
+            "§6Brown Belt" to 6000,
+            "§8Black Belt" to 7000
+        )
+        val currentBelt = beltPoints.lastOrNull { totalScore >= it.second } ?: beltPoints.first()
+        val currentIndex = beltPoints.indexOf(currentBelt)
+        val nextBelt = beltPoints.getOrNull(currentIndex + 1) ?: beltPoints.first()
+        val pointsNeededForNextBelt = 0.coerceAtLeast(nextBelt.second.minus(totalScore))
+
+        add("§7Total Score: §6${totalScore.addSeparators()} §7(§8${currentBelt.first}§7)")
+
+        if (pointsNeededForNextBelt != 0)
+            add("§7Points needed for ${nextBelt.first}§f: §6${pointsNeededForNextBelt.addSeparators()}")
     }
 
     @SubscribeEvent
     fun onInventoryOpen(event: InventoryFullyOpenedEvent) {
         if (!isEnabled()) return
         if (event.inventoryName != "Challenges") return
-        val newDisplay = mutableListOf<String>()
-        display = drawDisplay()
+        display = drawDisplay(event.inventoryItems)
     }
 
     @SubscribeEvent
@@ -75,6 +82,5 @@ class DojoRankDisplay {
     }
 
     private fun isEnabled() =
-        config.showDojoRankDisplay && LorenzUtils.skyBlockIsland == IslandType.CRIMSON_ISLE && LorenzUtils.skyBlockArea == "Dojo"
-
+        IslandType.CRIMSON_ISLE.isInIsland() && LorenzUtils.skyBlockArea == "Dojo" && config.showDojoRankDisplay
 }
