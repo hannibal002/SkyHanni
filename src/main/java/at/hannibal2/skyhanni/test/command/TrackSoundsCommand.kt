@@ -25,11 +25,7 @@ object TrackSoundsCommand {
         }
         enable.set(false)
         sounds.clear()
-        val duration = if (args.size == 1) {
-            args[0].toInt().seconds
-        } else {
-            5.0.seconds
-        }
+        val duration = args.firstOrNull()?.toInt()?.seconds ?: 5.0.seconds
         LorenzUtils.chat("Now started tracking sounds for ${duration.inWholeSeconds} Seconds")
         cutOfTime = SimpleTimeMark.future(duration)
         DelayedRun.runDelayed(duration + 0.1.seconds) {
