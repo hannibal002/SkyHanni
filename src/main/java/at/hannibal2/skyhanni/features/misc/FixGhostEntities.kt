@@ -33,14 +33,12 @@ object FixGhostEntities {
         if (packet is S0CPacketSpawnPlayer) {
             if (packet.entityID in recentlyRemovedEntities) {
                 event.cancel()
-                LorenzUtils.debug("Removed bugged hypixel mob id Player")
             }
         }
 
         if (packet is S0FPacketSpawnMob) {
             if (packet.entityID in recentlyRemovedEntities) {
                 event.cancel()
-                LorenzUtils.debug("Removed bugged hypixel mob id Mob")
             }
         }
 
