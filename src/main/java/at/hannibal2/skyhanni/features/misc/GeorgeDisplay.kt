@@ -98,7 +98,7 @@ class GeorgeDisplay {
                 } else {
                     updateList.add(Renderable.clickAndHover(
                         text = " §7- $displayPetString§7: §eNot on AH; view its Wiki article here.",
-                        tips = listOf("§4Click to run §ewiki $pet §4to view how to obtain it."),
+                        tips = listOf("§4Click to run §e/wiki $pet §4to view how to obtain it."),
                         onClick = { LorenzUtils.sendCommandToServer("wiki $pet") }
                     ))
                 }
