@@ -53,6 +53,7 @@ object MaxwellAPI {
 
     @SubscribeEvent
     fun onChat(event: LorenzChatEvent) {
+        if (!isEnabled()) return
         val message = event.message.trimWhiteSpace().removeResets()
 
         chatPowerpattern.matchMatcher(message) {
@@ -64,7 +65,7 @@ object MaxwellAPI {
 
     @SubscribeEvent
     fun onInventoryFullyLoaded(event: InventoryFullyOpenedEvent) {
-        if (!LorenzUtils.inSkyBlock) return
+        if (!isEnabled()) return
 
         if (thaumatorgyrGuiPattern.matches(event.inventoryName)) {
             val stacks = event.inventoryItems
@@ -101,6 +102,8 @@ object MaxwellAPI {
     }
 
     private fun getPowerByNameOrNull(name: String) = powers.find { it == name }
+
+    fun isEnabled() = LorenzUtils.inSkyBlock && storage != null
 
     // Load powers from repo
     @SubscribeEvent

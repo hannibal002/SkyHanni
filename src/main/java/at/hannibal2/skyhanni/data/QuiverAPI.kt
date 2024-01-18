@@ -82,6 +82,7 @@ object QuiverAPI {
 
     @SubscribeEvent
     fun onChat(event: LorenzChatEvent) {
+        if (!isEnabled()) return
         val message = event.message.trimWhiteSpace().removeResets()
 
         selectPattern.matchMatcher(message) {
@@ -145,7 +146,7 @@ object QuiverAPI {
 
     @SubscribeEvent
     fun onInventoryFullyLoaded(event: InventoryFullyOpenedEvent) {
-        if (!LorenzUtils.inSkyBlock) return
+        if (!isEnabled()) return
         if (!quiverInventoryNamePattern.matches(event.inventoryName)) return
 
         // clear to prevent duplicates
@@ -180,7 +181,7 @@ object QuiverAPI {
     */
     @SubscribeEvent(priority = EventPriority.HIGHEST)
     fun onPlaySound(event: PlaySoundEvent) {
-        if (!LorenzUtils.inSkyBlock) return
+        if (!isEnabled()) return
         if (event.soundName != "random.bow") return
 
         val holdingBow = InventoryUtils.getItemInHand()?.item is ItemBow
@@ -238,6 +239,8 @@ object QuiverAPI {
     fun getArrowByNameOrFlint(internalName: NEUInternalName): ArrowType {
         return getArrowByNameOrNull(internalName) ?: getArrowByNameOrNull("ARROW".asInternalName())!!
     }
+
+    fun isEnabled() = LorenzUtils.inSkyBlock && storage != null
 
 
     // Load arrows from repo
