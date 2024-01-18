@@ -1,4 +1,3 @@
-@file:Suppress("SENSELESS_COMPARISON") // intellij does a little trolling and assumes all ItemStacks will never be null. this suppresses such warnings.
 package at.hannibal2.skyhanni.test
 
 import at.hannibal2.skyhanni.SkyHanniMod
@@ -18,16 +17,18 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 object TestCopyChestData {
     private val config get() = SkyHanniMod.feature.dev.debug
     private val mc = Minecraft.getMinecraft()
+    private const val HOTBAR_SIZE = 9
+    private const val INVENTORY_SIZE = 27
+    private const val DEBUG_SUFFIX: String = "data copied into the clipboard! §lMake sure to save it into a .txt file; these tend to get quite long."
     @SubscribeEvent
     fun onKeybind(event: GuiScreenEvent.KeyboardInputEvent.Post) {
-        if (!LorenzUtils.inSkyBlock) return
         if (!config.copyPlayerInventory.isKeyHeld() && !config.copyEntireChest.isKeyHeld() && !config.copyChestName.isKeyHeld()) return
         if (event.gui !is GuiContainer) return
         if (config.copyEntireChest.isKeyHeld() && event.gui is GuiChest) {
-            copySlotsData(chest = (event.gui as GuiChest).inventorySlots.inventorySlots)
+            copyChestData(chest = (event.gui as GuiChest).inventorySlots.inventorySlots)
             return
         } else if (config.copyPlayerInventory.isKeyHeld()) {
-            copySlotsData(inventory = if (config.includeArmor) mc.thePlayer.inventory.mainInventory + mc.thePlayer.inventory.armorInventory else mc.thePlayer.inventory.mainInventory)
+            copyInventoryData(inventory = if (config.includeArmor) mc.thePlayer.inventory.mainInventory + mc.thePlayer.inventory.armorInventory else mc.thePlayer.inventory.mainInventory)
             return
         } else if (InventoryUtils.openInventoryName().isNotEmpty()) {
             OSUtils.copyToClipboard(InventoryUtils.openInventoryName())
@@ -35,40 +36,40 @@ object TestCopyChestData {
             return
         }
     }
-    private fun copySlotsData(chest: List<Slot> = emptyList(), inventory: Array<ItemStack> = emptyArray()) {
-        val copyList = mutableListOf<String>("relevant config:", "includeNullSlots: ${config.includeNullSlots}", "includeUnnamedItems: ${config.includeUnnamedItems}", "includeArmor: ${config.includeArmor}", "")
-        val inventoryType: String = if (chest.isNotEmpty()) "Chest" else if (inventory.isNotEmpty()) "Inventory" else "Unknown"
-        if (chest.isNotEmpty()) {
-            copyList.addAll(listOf<String>("chest name: '${InventoryUtils.openInventoryName()}'", ""))
-            for (slot in chest) {
-                val stack = slot.stack
-                if (stack == null) {
-                    if (config.includeNullSlots) copyList.addAll(listOf("(there is nothing inside slot ${slot.slotIndex}; it is null)", "", ""))
-                    continue
-                }
-                if (stack in mc.thePlayer.inventory.mainInventory) break
-                if ((stack.displayName.isNotEmpty() && stack.displayName.isNotBlank()) || config.includeUnnamedItems) {
-                    copyList.add("slot index: '${slot.slotIndex}'")
-                    copyList.addAll(stack.getStackInfo())
-                }
+    private fun copyInventoryData(inventory: Array<ItemStack?>) {
+        val copyList = mutableListOf<String>("relevant config:", "includeNullSlots: ${config.includeNullSlots}", "includeUnnamedItems: ${config.includeUnnamedItems}", "includeArmor: ${config.includeArmor}", "", "your inventory is below.", "", "your hotbar:", "")
+        for ((i, stack) in inventory.withIndex()) {
+            if (i == HOTBAR_SIZE) copyList.addAll(listOf("note: hotbar ends here", "the rest of your inventory:", "", ""))
+            if (i == HOTBAR_SIZE + INVENTORY_SIZE && config.includeArmor) copyList.addAll(listOf("note: the rest of your inventory data ends here", "your armor:", "", ""))
+            if (stack == null) {
+                if (config.includeNullSlots) copyList.addAll(listOf("(there is nothing inside slot $i; it is null)", "", ""))
+                continue
             }
-        } else if (inventory.isNotEmpty()) {
-            copyList.addAll(listOf<String>("your inventory is below.", "", "your hotbar:", ""))
-            for ((i, stack) in inventory.withIndex()) {
-                if (i - 1 == 8 && stack != null) copyList.addAll(listOf("note: hotbar ends here", "the rest of your inventory:", "", ""))
-                if (i - 1 == 35 && config.includeArmor && stack != null) copyList.addAll(listOf("note: the rest of your inventory data ends here", "your armor:", "", ""))
-                if (stack == null) {
-                    if (config.includeNullSlots) copyList.addAll(listOf("(there is nothing inside slot $i; it is null)", "", ""))
-                    continue
-                }
-                if ((stack.displayName.isNotEmpty() && stack.displayName.isNotBlank()) || config.includeUnnamedItems) {
-                    copyList.add("slot index: '$i'")
-                    copyList.addAll(stack.getStackInfo())
-                }
+            if ((stack.displayName.isNotEmpty() && stack.displayName.isNotBlank()) || config.includeUnnamedItems) {
+                copyList.add("slot index: '$i'")
+                copyList.addAll(stack.getStackInfo())
             }
         }
         OSUtils.copyToClipboard(copyList.joinToString("\n"))
-        LorenzUtils.chat("$inventoryType data copied into the clipboard! §lMake sure to save it into a .txt file; these tend to get quite long.")
+        LorenzUtils.chat("Inventory $DEBUG_SUFFIX")
+    }
+    private fun copyChestData(chest: List<Slot>) {
+        val copyList = mutableListOf<String>("relevant config:", "includeNullSlots: ${config.includeNullSlots}", "includeUnnamedItems: ${config.includeUnnamedItems}", "includeArmor: ${config.includeArmor}", "", "chest name: '${InventoryUtils.openInventoryName()}'", "")
+        copyList.addAll(listOf<String>())
+        for (slot in chest) {
+            val stack = slot.stack
+            if (stack == null) {
+                if (config.includeNullSlots) copyList.addAll(listOf("(there is nothing inside slot ${slot.slotIndex}; it is null)", "", ""))
+                continue
+            }
+            if (stack in mc.thePlayer.inventory.mainInventory) break
+            if ((stack.displayName.isNotEmpty() && stack.displayName.isNotBlank()) || config.includeUnnamedItems) {
+                copyList.add("slot index: '${slot.slotIndex}'")
+                copyList.addAll(stack.getStackInfo())
+            }
+        }
+        OSUtils.copyToClipboard(copyList.joinToString("\n"))
+        LorenzUtils.chat("Chest $DEBUG_SUFFIX")
     }
     private fun ItemStack.getStackInfo(): List<String> {
         val returnList = mutableListOf<String>()
