@@ -16,7 +16,7 @@ import at.hannibal2.skyhanni.utils.NEUInternalName
 import net.minecraft.item.ItemStack
 
 object VisitorAPI {
-    private var visitors = mapOf<String, Visitor>()
+    var visitors = mapOf<String, Visitor>()
     var inInventory = false
     val config get() = GardenAPI.config.visitors
     private val logger = LorenzLogger("garden/visitors/api")
