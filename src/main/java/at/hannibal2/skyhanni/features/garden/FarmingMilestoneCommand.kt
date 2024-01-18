@@ -52,24 +52,16 @@ object FarmingMilestoneCommand {
     }
 
     fun onComplete(strings: Array<String>): List<String> {
-        return if (strings.size <= 1)
-            return CommandBase.getListOfStringsMatchingLastWord(
+        return if (strings.size <= 1) {
+            CommandBase.getListOfStringsMatchingLastWord(
                 strings,
                 CropType.entries.map { it.simpleName }
             )
+        }
         else listOf()
     }
 
-    private fun getValidNumber(entry: String?): Int? {
-        entry ?: return null
-        val result = try {
-            entry.toInt()
-        } catch (_: Exception) {
-            return null
-        }
-
-        return result.coerceIn(0, 46)
-    }
+    private fun getValidNumber(entry: String?) = entry?.toIntOrNull()?.coerceIn(0, 46)
 
     private fun Long.formatOutput(needsTime: Boolean, crop: CropType): String {
         if (!needsTime) return "${this.addSeparators()} §a${crop.cropName}"
