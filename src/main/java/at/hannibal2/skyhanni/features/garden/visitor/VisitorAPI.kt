@@ -16,7 +16,7 @@ import at.hannibal2.skyhanni.utils.NEUInternalName
 import net.minecraft.item.ItemStack
 
 object VisitorAPI {
-    private var visitors = mapOf<String, Visitor>()
+    var visitors = mapOf<String, Visitor>()
     var inInventory = false
     val config get() = GardenAPI.config.visitors
     private val logger = LorenzLogger("garden/visitors/api")
@@ -108,7 +108,7 @@ object VisitorAPI {
         var nameTagEntityId: Int = -1,
         var status: VisitorStatus,
         var inSacks: Boolean = false,
-        val items: MutableMap<NEUInternalName, Int> = mutableMapOf(),
+        val shoppingList: MutableMap<NEUInternalName, Int> = mutableMapOf(),
         var offer: VisitorOffer? = null,
     ) {
         var lore: List<String> = emptyList()
