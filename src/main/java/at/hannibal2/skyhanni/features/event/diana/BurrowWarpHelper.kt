@@ -70,16 +70,16 @@ class BurrowWarpHelper {
         event.title("Diana Burrow Nearest Warp")
 
         if (!DianaAPI.isDoingDiana()) {
-            event.ignore("not doing diana")
+            event.addIrrelevant("not doing diana")
             return
         }
         if (!config.burrowNearestWarp) {
-            event.ignore("disabled in config")
+            event.addIrrelevant("disabled in config")
             return
         }
         val target = GriffinBurrowHelper.targetLocation
         if (target == null) {
-            event.ignore("targetLocation is null")
+            event.addIrrelevant("targetLocation is null")
             return
         }
 

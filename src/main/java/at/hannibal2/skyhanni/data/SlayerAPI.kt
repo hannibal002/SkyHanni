@@ -75,7 +75,7 @@ object SlayerAPI {
         event.title("Slayer")
 
         if (!hasActiveSlayerQuest()) {
-            event.ignore("no active slayer quest")
+            event.addIrrelevant("no active slayer quest")
             return
         }
 

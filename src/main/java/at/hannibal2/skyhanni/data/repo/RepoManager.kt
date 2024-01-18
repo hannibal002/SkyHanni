@@ -179,7 +179,7 @@ class RepoManager(private val configLocation: File) {
         event.title("Repo Status")
 
         if (unsuccessfulConstants.isEmpty() && successfulConstants.isNotEmpty()) {
-            event.ignore("Repo working fine")
+            event.addIrrelevant("Repo working fine")
             return
         }
 
