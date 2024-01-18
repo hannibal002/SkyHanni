@@ -262,8 +262,8 @@ object Commands {
             "Search or reset config elements §c(warning, dangerous!)"
         ) { SkyHanniConfigSearchResetCommand.command(it) }
         registerCommand(
-            "shdebugdata",
-            "Prints debug data in the clipboard"
+            "shdebug",
+            "Copies SkyHanni debug data in the clipboard."
         ) { SkyHanniDebugsAndTests.debugData(it) }
         registerCommand(
             "shversion",
@@ -322,8 +322,8 @@ object Commands {
             "shfindnullconfig",
             "Find config elements that are null and prints them into the console"
         ) { SkyHanniDebugsAndTests.findNullConfig(it) }
-        registerCommand("shdebugwaypoint", "Mark a waypoint on that location") { SkyHanniDebugsAndTests.waypoint(it) }
-        registerCommand("shdebugtablist", "Set your clipboard as a fake tab list.") { TabListData.toggleDebugCommand() }
+        registerCommand("shtestwaypoint", "Set a waypoint on that location") { SkyHanniDebugsAndTests.waypoint(it) }
+        registerCommand("shtesttablist", "Set your clipboard as a fake tab list.") { TabListData.toggleDebugCommand() }
         registerCommand("shreloadlocalrepo", "Reloading the local repo data") { SkyHanniMod.repo.reloadLocalRepo() }
         registerCommand("shchathistory", "Show the unfiltered chat history") { ChatManager.openChatFilterGUI() }
         registerCommand(
