@@ -28,8 +28,9 @@ class VolcanoExplosivityDisplay {
     fun onTick(event: TabListUpdateEvent) {
         if (!isEnabled()) return
         val tabList = event.tabList
-        if (tabList.none { headerPattern.matches(it) }) return
-        statusPattern.matchMatcher(tabList[tabList.indexOfFirst { headerPattern.matches(it) } + 1]) {
+        val headerIndex = tabList.indexOfFirst { headerPattern.matches(it) }
+        if (headerIndex < 0 || headerIndex + 1 !in tabList.indices) return
+        statusPattern.matchMatcher(tabList[headerIndex + 1]) {
             display = "§bVolcano Explosivity§7: ${group("status")}"
         }
     }
