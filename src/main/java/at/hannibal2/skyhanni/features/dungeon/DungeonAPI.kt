@@ -226,22 +226,20 @@ class DungeonAPI {
         event.title("Dungeon")
 
         if (!LorenzUtils.inDungeons) {
-            event.exit("not in dungeons")
+            event.ignore("not in dungeons")
             return
         }
 
-        event.addData(
-            buildList {
-                add("dungeonFloor: $dungeonFloor")
-                add("started: $started")
-                add("getRoomID: ${getRoomID()}")
-                add("inBossRoom: $inBossRoom")
-                add("")
-                add("playerClass: $playerClass")
-                add("isUniqueClass: $isUniqueClass")
-                add("playerClassLevel: $playerClassLevel")
-            }
-        )
+        event.addData {
+            add("dungeonFloor: $dungeonFloor")
+            add("started: $started")
+            add("getRoomID: ${getRoomID()}")
+            add("inBossRoom: $inBossRoom")
+            add("")
+            add("playerClass: $playerClass")
+            add("isUniqueClass: $isUniqueClass")
+            add("playerClassLevel: $playerClassLevel")
+        }
     }
 
     enum class DungeonFloor(private val bossName: String) {
