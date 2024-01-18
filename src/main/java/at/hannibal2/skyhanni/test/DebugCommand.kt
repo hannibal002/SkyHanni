@@ -25,9 +25,9 @@ object DebugCommand {
         list.add(
             if (search != null) {
                 if (search.equalsIgnoreColor("all")) {
-                    "search for everything."
-                } else "search: '$search'"
-            } else "search not specified, showing only interesting stuff"
+                    "search for everything:"
+                } else "search '$search':"
+            } else "search is not specified, show only interesting stuff:"
         )
 
         val event = DebugDataCollectEvent(list, search)
@@ -58,20 +58,21 @@ object DebugCommand {
         event.title("Profile Type")
         if (!LorenzUtils.inSkyBlock) {
             event.ignore("Not on SkyBlcok")
+            return
+        }
+
+        val classic = !LorenzUtils.noTradeMode
+        if (classic) {
+            event.ignore("on classic")
         } else {
-            val classic = !LorenzUtils.noTradeMode
-            if (classic) {
-                event.ignore("on classic")
-            } else {
-                if (HypixelData.ironman) {
-                    event.addData("on ironman")
-                }
-                if (HypixelData.stranded) {
-                    event.addData("on stranded")
-                }
-                if (HypixelData.bingo) {
-                    event.addData("on bingo")
-                }
+            if (HypixelData.ironman) {
+                event.addData("on ironman")
+            }
+            if (HypixelData.stranded) {
+                event.addData("on stranded")
+            }
+            if (HypixelData.bingo) {
+                event.addData("on bingo")
             }
         }
     }
@@ -80,12 +81,13 @@ object DebugCommand {
         event.title("Profile Name")
         if (!LorenzUtils.inSkyBlock) {
             event.ignore("Not on SkyBlcok")
+            return
+        }
+
+        if (HypixelData.profileName != "") {
+            event.ignore("profileName: '${HypixelData.profileName}'")
         } else {
-            if (HypixelData.profileName != "") {
-                event.ignore("profileName: '${HypixelData.profileName}'")
-            } else {
-                event.addData("profile name is empty!")
-            }
+            event.addData("profile name is empty!")
         }
     }
 
@@ -93,20 +95,20 @@ object DebugCommand {
         event.title("SkyBlock Status")
         if (!LorenzUtils.onHypixel) {
             event.addData("not on Hypixel")
-        } else {
-            if (!LorenzUtils.inSkyBlock) {
-                event.addData("not on SkyBlock, but on Hypixel")
-            } else {
-                if (LorenzUtils.skyBlockIsland == IslandType.UNKNOWN) {
-                    event.addData("Unknown SkyBlock island!")
-                } else {
-                    event.ignore {
-                        add("on Hypixel SkyBlock")
-                        add("skyBlockIsland: ${LorenzUtils.skyBlockIsland}")
-                        add("skyBlockArea: '${LorenzUtils.skyBlockArea}'")
-                    }
-                }
-            }
+            return
+        }
+        if (!LorenzUtils.inSkyBlock) {
+            event.addData("not on SkyBlock, but on Hypixel")
+            return
+        }
+        if (LorenzUtils.skyBlockIsland == IslandType.UNKNOWN) {
+            event.addData("Unknown SkyBlock island!")
+            return
+        }
+        event.ignore {
+            add("on Hypixel SkyBlock")
+            add("skyBlockIsland: ${LorenzUtils.skyBlockIsland}")
+            add("skyBlockArea: '${LorenzUtils.skyBlockArea}'")
         }
     }
 
