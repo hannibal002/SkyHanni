@@ -621,11 +621,11 @@ class GardenVisitorFeatures {
         }
 
         event.addData {
-            val visitors = VisitorAPI.visitors
+            val visitors = VisitorAPI.getVisitors()
 
             add("visitors: ${visitors.size}")
 
-            for (visitor in visitors.values) {
+            for (visitor in visitors) {
                 add(" ")
                 add("visitorName: '${visitor.visitorName}'")
                 add("status: '${visitor.status}'")
