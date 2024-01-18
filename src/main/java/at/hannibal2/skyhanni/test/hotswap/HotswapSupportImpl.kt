@@ -19,10 +19,9 @@ class HotswapSupportImpl : HotswapSupportHandle {
 
     @SubscribeEvent
     fun onHotswapClass(event: ClassDefinitionEvent.Redefinition) {
-        val instance = SkyHanniMod.modules.find { it.javaClass.name == event.fullyQualifiedName }
-        if (instance == null) return
+        val instance = SkyHanniMod.modules.find { it.javaClass.name == event.fullyQualifiedName } ?: return
         val primaryConstructor = runCatching { instance.javaClass.getDeclaredConstructor() }.getOrNull()
-        Minecraft.getMinecraft().addScheduledTask(Runnable {
+        Minecraft.getMinecraft().addScheduledTask {
             LorenzUtils.chat("Refreshing event subscriptions for module $instance!")
             MinecraftForge.EVENT_BUS.unregister(instance)
             if (primaryConstructor == null) {
@@ -43,7 +42,7 @@ class HotswapSupportImpl : HotswapSupportHandle {
                 SkyHanniMod.modules.add(newInstance)
                 MinecraftForge.EVENT_BUS.register(newInstance)
             }
-        })
+        }
     }
 
     @SubscribeEvent
