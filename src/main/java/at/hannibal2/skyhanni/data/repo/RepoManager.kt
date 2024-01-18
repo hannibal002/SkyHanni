@@ -184,13 +184,16 @@ class RepoManager(private val configLocation: File) {
         }
 
         event.addData {
-            if (successfulConstants.isNotEmpty()) add("Successful Constants (${successfulConstants.size}):")
-            for (constant in successfulConstants) {
-                add("   - $constant")
-            }
+            add("Successful Constants (${successfulConstants.size}):")
+
             add("Unsuccessful Constants (${unsuccessfulConstants.size}):")
-            for (constant in unsuccessfulConstants) {
+
+            for ((i, constant) in unsuccessfulConstants.withIndex()) {
                 add("   - $constant")
+                if (i == 5) {
+                    add("...")
+                    break
+                }
             }
         }
     }
@@ -214,7 +217,10 @@ class RepoManager(private val configLocation: File) {
             LorenzUtils.chat("Repo working fine!", prefixColor = "§a")
             return
         }
-        if (successfulConstants.isNotEmpty()) LorenzUtils.chat("Successful Constants §7(${successfulConstants.size}):", prefixColor = "§a")
+        if (successfulConstants.isNotEmpty()) LorenzUtils.chat(
+            "Successful Constants §7(${successfulConstants.size}):",
+            prefixColor = "§a"
+        )
         for (constant in successfulConstants) {
             LorenzUtils.chat("   §a- §7$constant")
         }
