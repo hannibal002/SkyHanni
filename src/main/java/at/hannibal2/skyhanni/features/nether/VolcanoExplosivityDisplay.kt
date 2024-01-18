@@ -3,8 +3,7 @@ package at.hannibal2.skyhanni.features.nether
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.events.GuiRenderEvent
-import at.hannibal2.skyhanni.events.LorenzTickEvent
-import at.hannibal2.skyhanni.utils.LorenzUtils
+import at.hannibal2.skyhanni.events.TabListUpdateEvent
 import at.hannibal2.skyhanni.utils.LorenzUtils.isInIsland
 import at.hannibal2.skyhanni.utils.RenderUtils.renderString
 import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
@@ -27,21 +26,20 @@ class VolcanoExplosivityDisplay {
     private var display = ""
 
     @SubscribeEvent
-    fun onTick(event: LorenzTickEvent) {
+    fun onTick(event: TabListUpdateEvent) {
         if (!isEnabled()) return
-        if (!event.repeatSeconds(1)) return
-        val tabList = TabListData.getTabList()
+        val tabList = event.tabList
         if (tabList.none { headerPattern.matches(it) }) return
-        val index = tabList.indexOfFirst { headerPattern.matches(it) }
-        statusPattern.matchMatcher(tabList[index + 1]) {
+        statusPattern.matchMatcher(tabList[tabList.indexOfFirst { headerPattern.matches(it) } + 1]) {
             display = "§bVolcano Explosivity§7: ${group("status")}"
         }
     }
+
     @SubscribeEvent
     fun onRenderOverlay(event: GuiRenderEvent.GuiOverlayRenderEvent) {
         if (!isEnabled()) return
         config.positionVolcano.renderString(display, posLabel = "Volcano Explosivity")
     }
 
-    private fun isEnabled() = LorenzUtils.inSkyBlock && IslandType.CRIMSON_ISLE.isInIsland() && config.volcanoExplosivity
+    private fun isEnabled() = IslandType.CRIMSON_ISLE.isInIsland() && config.volcanoExplosivity
 }
