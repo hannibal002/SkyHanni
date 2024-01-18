@@ -42,7 +42,6 @@ class CrystalHollowsLobbyAgeWarning {
     private fun getLobbyAgeInMinecraftDays(): Long = (mc.theWorld.worldTime) / TICKS_PER_MC_DAY //world day changes at 6AM in skyblock time
 
     private fun processPlayerCount() {
-        if (!isInCrystalHollows()) return
         for (line in TabListData.getTabList()) {
             playerCountTabListPattern.matchMatcher(line) {
                 val playerCount = group("playerCount").formatNumber()
@@ -57,7 +56,6 @@ class CrystalHollowsLobbyAgeWarning {
     }
 
     private fun processLobbyAge() {
-        if (!isInCrystalHollows()) return
         val lobbyAge = getLobbyAgeInMinecraftDays()
         if (oldLobbyAge == lobbyAge) return
         oldLobbyAge = lobbyAge
@@ -70,7 +68,6 @@ class CrystalHollowsLobbyAgeWarning {
 
     @SubscribeEvent
     fun onTick(event: LorenzTickEvent) {
-        if (!LorenzUtils.inSkyBlock) return
         if (!isEnabled()) return
         if (!event.repeatSeconds(1)) return
         processLobbyAge()
@@ -78,7 +75,6 @@ class CrystalHollowsLobbyAgeWarning {
 
     @SubscribeEvent
     fun onTabListUpdate(event: TabListUpdateEvent) {
-        if (!LorenzUtils.inSkyBlock) return
         if (!isEnabled()) return
         processPlayerCount()
     }
@@ -101,5 +97,4 @@ class CrystalHollowsLobbyAgeWarning {
     }
 
     private fun isEnabled() = THE_CRYSTAL_HOLLOWS.isInIsland() && config.enabled
-    private fun isInCrystalHollows() = THE_CRYSTAL_HOLLOWS.isInIsland()
 }
