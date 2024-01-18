@@ -25,6 +25,12 @@ public class CommandsConfig {
     @FeatureToggle
     public boolean shortCommands = true;
 
+    @ConfigOption(name = "Party Kick Reason", desc = "Kick people while sending a reason when using §e/pk lrg89 Dupe Archer§7 or §e/party kick nea89o Low Cata Level§7.")
+    @Expose
+    @ConfigEditorBoolean
+    @FeatureToggle
+    public boolean partyKickReason = true;
+
     @Expose
     @ConfigOption(name = "Replace Warp Is", desc = "Adds §e/warp is §7alongside §e/is§7. Idk why. Ask §cKaeso")
     @ConfigEditorBoolean
