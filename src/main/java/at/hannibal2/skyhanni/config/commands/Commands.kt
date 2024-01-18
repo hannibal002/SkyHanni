@@ -48,6 +48,7 @@ import at.hannibal2.skyhanni.features.misc.massconfiguration.DefaultConfigFeatur
 import at.hannibal2.skyhanni.features.misc.visualwords.VisualWordGui
 import at.hannibal2.skyhanni.features.rift.area.westvillage.VerminTracker
 import at.hannibal2.skyhanni.features.slayer.SlayerProfitTracker
+import at.hannibal2.skyhanni.test.DebugCommand
 import at.hannibal2.skyhanni.test.PacketTest
 import at.hannibal2.skyhanni.test.SkyHanniConfigSearchResetCommand
 import at.hannibal2.skyhanni.test.SkyHanniDebugsAndTests
@@ -264,7 +265,7 @@ object Commands {
         registerCommand(
             "shdebug",
             "Copies SkyHanni debug data in the clipboard."
-        ) { SkyHanniDebugsAndTests.debugData(it) }
+        ) { DebugCommand.command(it) }
         registerCommand(
             "shversion",
             "Prints the SkyHanni version in the chat"
