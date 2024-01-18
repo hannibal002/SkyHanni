@@ -40,6 +40,7 @@ enum class ItemCategory {
     ITEM,
     PET_ITEM,
     ENCHANTED_BOOK,
+    POTION,
     RIFT_TIMECHARM,
     COSMETIC,
     MEMENTO,

@@ -255,6 +255,7 @@ object ItemUtils {
             UtilsPatterns.abiPhonePattern.matches(name) -> ItemCategory.ABIPHONE
             isPet(cleanName) -> ItemCategory.PET
             UtilsPatterns.enchantedBookPattern.matches(name) -> ItemCategory.ENCHANTED_BOOK
+            UtilsPatterns.potionPattern.matches(name) -> ItemCategory.POTION
             else -> ItemCategory.NONE
         } else {
             LorenzUtils.enumValueOfOrNull<ItemCategory>(itemCategory)

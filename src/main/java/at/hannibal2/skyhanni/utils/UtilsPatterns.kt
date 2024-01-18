@@ -30,4 +30,9 @@ object UtilsPatterns {
         "item.name.enchanted.book",
         ".{2}?Enchanted Book"
     )
+
+    val potionPattern by patternGroup.pattern(
+        "item.name.potion",
+        ".*Potion"
+    )
 }
