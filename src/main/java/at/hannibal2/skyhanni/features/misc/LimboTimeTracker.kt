@@ -23,7 +23,6 @@ import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import io.github.moulberry.notenoughupdates.events.ReplaceItemEvent
 import io.github.moulberry.notenoughupdates.util.Utils
 import net.minecraft.client.player.inventory.ContainerLocalMenu
-import net.minecraft.item.ItemStack
 import net.minecraft.util.AxisAlignedBB
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import kotlin.time.Duration
@@ -43,7 +42,6 @@ class LimboTimeTracker {
 
     private lateinit var modifiedArray: MutableList<String>
     private var setMinutes = false
-    private var canReplace = true
     private val minutesRegex by RepoPattern.pattern("limbo.tooltip.minutes", "§5§o§a\\d+(\\.\\d+)? minutes.+\$")
     private val hoursRegex by RepoPattern.pattern("limbo.tooltip.hours", "§5§o§b\\d+(\\.\\d+)? hours.+\$")
 
@@ -113,18 +111,13 @@ class LimboTimeTracker {
     fun replaceItem(event: ReplaceItemEvent) {
         if (event.inventory !is ContainerLocalMenu) return
         if (event.inventory.displayName.unformattedText != "Detailed /playtime") return
-        val index = event.slotNumber
-//         if (index != 33) return
-        if (index == 0) canReplace = true
-        if (!canReplace) return
-        if (!isValidIndex(index)) return
-        if (event.original != null) return
+        if (event.slotNumber != 43) return
         val limboItem by lazy {
             val neuItem = NEUItems.getItemStack("ENDER_PEARL")
-            Utils.createItemStack(neuItem.item, "§aLimbo", "§7Playtime: §a${config.limboPlaytime.seconds.inWholeMinutes} minutes", "§aOr: §b$hoursString hours")
+            if (wholeMinutes >= 60) Utils.createItemStack(neuItem.item, "§aLimbo", "§7Playtime: §a${config.limboPlaytime.seconds.inWholeMinutes} minutes", "§7Or: §b$hoursString hours")
+            else Utils.createItemStack(neuItem.item, "§aLimbo", "§7Playtime: §a${config.limboPlaytime.seconds.inWholeMinutes} minutes")
         }
         event.replaceWith(limboItem)
-        canReplace = false
     }
 
     private fun isValidIndex(index: Int): Boolean {
@@ -151,7 +144,7 @@ class LimboTimeTracker {
         val playtime = config.limboPlaytime.seconds
         val wholeHours = playtime.inWholeHours
         wholeMinutes = playtime.inWholeMinutes
-        if (config.limboPlaytime%3600 == 0) {
+        if ((wholeMinutes%60).toInt() == 0) {
             hoursString = "$wholeHours"
         } else {
             val minutes:Float = ((wholeMinutes - wholeHours * 60).toFloat() / 60)
@@ -160,7 +153,7 @@ class LimboTimeTracker {
     }
 
     private fun addLimbo(hoursArray: MutableList<String>, minutesArray: MutableList<String>) {
-        if (config.limboPlaytime >= 3600) {
+        if (wholeMinutes >= 60) {
             val hours = config.limboPlaytime.seconds.inWholeHours
             val minutes = (config.limboPlaytime.seconds.inWholeMinutes-(hours*60).toFloat()/6).toInt()
             modifiedArray = hoursArray
