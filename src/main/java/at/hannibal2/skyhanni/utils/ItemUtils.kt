@@ -209,27 +209,32 @@ object ItemUtils {
     private fun ItemStack.readItemCategoryAndRarity(): Pair<LorenzRarity?, ItemCategory?> {
         val name = this.name ?: ""
         val cleanName = this.cleanName()
+
+        if (isPet(cleanName)) {
+            return getPetRarity(this) to ItemCategory.PET
+        }
+
         for (line in this.getLore().reversed()) {
-            val (itemCategory, rarity) = UtilsPatterns.rarityLoreLinePattern.matchMatcher(line) {
+            val (category, rarity) = UtilsPatterns.rarityLoreLinePattern.matchMatcher(line) {
                 group("itemCategory").replace(" ", "_") to
                     group("rarity").replace(" ", "_")
             } ?: continue
 
-            val itemCategoryEnum = getItemCategoryEnum(itemCategory, name, cleanName)
-            val itemRarityEnum = LorenzRarity.getByName(rarity)
+            val itemCategory = getItemCategory(category, name, cleanName)
+            val itemRarity = LorenzRarity.getByName(rarity)
 
-            if (itemCategoryEnum == null) {
+            if (itemCategory == null) {
                 ErrorManager.logErrorStateWithData(
                     "Could not read category for item $name",
                     "Failed to read category from item rarity via item lore",
                     "internal name" to getInternalName(),
                     "item name" to name,
                     "inventory name" to InventoryUtils.openInventoryName(),
-                    "pattern result" to itemCategory,
+                    "pattern result" to category,
                     "lore" to getLore(),
                 )
             }
-            if (itemRarityEnum == null) {
+            if (itemRarity == null) {
                 ErrorManager.logErrorStateWithData(
                     "Could not read rarity for item $name",
                     "Failed to read rarity from item rarity via item lore",
@@ -240,15 +245,12 @@ object ItemUtils {
                 )
             }
 
-            return itemRarityEnum to itemCategoryEnum
-        }
-        if (isPet(cleanName)) {
-            return getPetRarity(this) to ItemCategory.PET
+            return itemRarity to itemCategory
         }
         return null to null
     }
 
-    private fun getItemCategoryEnum(itemCategory: String, name: String, cleanName: String = name.removeColor()) =
+    private fun getItemCategory(itemCategory: String, name: String, cleanName: String = name.removeColor()) =
         if (itemCategory.isEmpty()) when {
             UtilsPatterns.abiPhonePattern.matches(name) -> ItemCategory.ABIPHONE
             isPet(cleanName) -> ItemCategory.PET
