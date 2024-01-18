@@ -7,8 +7,6 @@ import at.hannibal2.skyhanni.utils.SoundUtils
 import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
-import kotlinx.coroutines.delay
-import kotlinx.coroutines.launch
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import kotlin.time.Duration.Companion.seconds
 
@@ -20,17 +18,7 @@ object QuiverNotification {
         val message = event.message.removeColor()
         pattern.matchMatcher(message) {
             TitleManager.sendTitle("§c${group("arrowsLeft")} arrows left!", 3.seconds, 3.6, 7.0)
-            sound()
-        }
-    }
-
-    fun sound() {
-        SoundUtils
-        SkyHanniMod.coroutineScope.launch {
-            repeat(30) {
-                delay(100)
-                SoundUtils.playPlingSound()
-            }
+            SoundUtils.repeatSound(100, 30, SoundUtils.plingSound)
         }
     }
 }
