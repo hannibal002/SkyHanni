@@ -174,7 +174,10 @@ object TabListRenderer {
         }
     }
 
-    private val fireSalePattern by RepoPattern.pattern("tablist.firesaletitle", "§b§lFire Sales: §r§f\\([0-9]+\\)")
+    private val fireSalePattern by RepoPattern.pattern(
+        "tablist.firesaletitle",
+        "§b§lFire Sales: §r§f\\([0-9]+\\)"
+    )
 
     @SubscribeEvent
     fun hideFireFromTheTabListBecauseWhoWantsThose(event: SkipTabListLineEvent) {
