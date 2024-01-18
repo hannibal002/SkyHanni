@@ -32,60 +32,29 @@ object DebugCommand {
 
         val event = DebugDataCollectEvent(list, search)
 
-        event.title("Player")
-        event.ignore {
-            add("name: '${LorenzUtils.getPlayerName()}'")
-            add("uuid: '${LorenzUtils.getPlayerUuid()}'")
+        // calling default debug stuff
+        player(event)
+        repoAutoUpdate(event)
+        globalRender(event)
+        skyblockStatus(event)
+        profileName(event)
+        profileType(event)
+
+        event.postAndCatch()
+
+        if (event.empty) {
+            list.add("")
+            list.add("Nothing interesting to show right now!")
+            list.add("Looking for something specific? /shdebug <search>")
+            list.add("Wanna see everything? /shdebug all")
         }
 
-        event.title("Repo Auto Update")
-        if (SkyHanniMod.feature.dev.repoAutoUpdate) {
-            event.ignore("normal enabled")
-        } else {
-            event.addData("The repo does not auto update because auto update is disabled!")
-        }
+        list.add("```")
+        OSUtils.copyToClipboard(list.joinToString("\n"))
+        LorenzUtils.chat("§eCopied SkyHanni debug data in the clipboard.")
+    }
 
-        event.title("Global Render")
-        if (SkyHanniDebugsAndTests.globalRender) {
-            event.ignore("normal enabled")
-        } else {
-            event.addData {
-                add("Global renderer is disabled!")
-                add("No renderable elements from SkyHanni will show up anywhere!")
-            }
-        }
-
-        event.title("SkyBlock Status")
-        if (!LorenzUtils.onHypixel) {
-            event.addData("not on Hypixel")
-        } else {
-            if (!LorenzUtils.inSkyBlock) {
-                event.addData("not on SkyBlock, but on Hypixel")
-            } else {
-                if (LorenzUtils.skyBlockIsland == IslandType.UNKNOWN) {
-                    event.addData("Unknown SkyBlock island!")
-                } else {
-                    event.ignore {
-                        add("on Hypixel SkyBlock")
-                        add("skyBlockIsland: ${LorenzUtils.skyBlockIsland}")
-                        add("skyBlockArea: '${LorenzUtils.skyBlockArea}'")
-                    }
-                }
-            }
-        }
-
-        event.title("Profile Name")
-        if (!LorenzUtils.inSkyBlock) {
-            event.ignore("Not on SkyBlcok")
-        } else {
-            if (HypixelData.profileName != "") {
-                event.ignore("profileName: '${HypixelData.profileName}'")
-            } else {
-                event.addData("profile name is empty!")
-            }
-        }
-
-
+    private fun profileType(event: DebugDataCollectEvent) {
         event.title("Profile Type")
         if (!LorenzUtils.inSkyBlock) {
             event.ignore("Not on SkyBlcok")
@@ -105,18 +74,68 @@ object DebugCommand {
                 }
             }
         }
+    }
 
-        event.postAndCatch()
-
-        if (event.empty) {
-            list.add("")
-            list.add("Nothing interesting to show right now!")
-            list.add("Looking for something specific? /shdebug <search>")
-            list.add("Wanna see everything? /shdebug all")
+    private fun profileName(event: DebugDataCollectEvent) {
+        event.title("Profile Name")
+        if (!LorenzUtils.inSkyBlock) {
+            event.ignore("Not on SkyBlcok")
+        } else {
+            if (HypixelData.profileName != "") {
+                event.ignore("profileName: '${HypixelData.profileName}'")
+            } else {
+                event.addData("profile name is empty!")
+            }
         }
+    }
 
-        list.add("```")
-        OSUtils.copyToClipboard(list.joinToString("\n"))
-        LorenzUtils.chat("§eCopied SkyHanni debug data in the clipboard.")
+    private fun skyblockStatus(event: DebugDataCollectEvent) {
+        event.title("SkyBlock Status")
+        if (!LorenzUtils.onHypixel) {
+            event.addData("not on Hypixel")
+        } else {
+            if (!LorenzUtils.inSkyBlock) {
+                event.addData("not on SkyBlock, but on Hypixel")
+            } else {
+                if (LorenzUtils.skyBlockIsland == IslandType.UNKNOWN) {
+                    event.addData("Unknown SkyBlock island!")
+                } else {
+                    event.ignore {
+                        add("on Hypixel SkyBlock")
+                        add("skyBlockIsland: ${LorenzUtils.skyBlockIsland}")
+                        add("skyBlockArea: '${LorenzUtils.skyBlockArea}'")
+                    }
+                }
+            }
+        }
+    }
+
+    private fun globalRender(event: DebugDataCollectEvent) {
+        event.title("Global Render")
+        if (SkyHanniDebugsAndTests.globalRender) {
+            event.ignore("normal enabled")
+        } else {
+            event.addData {
+                add("Global renderer is disabled!")
+                add("No renderable elements from SkyHanni will show up anywhere!")
+            }
+        }
+    }
+
+    private fun repoAutoUpdate(event: DebugDataCollectEvent) {
+        event.title("Repo Auto Update")
+        if (SkyHanniMod.feature.dev.repoAutoUpdate) {
+            event.ignore("normal enabled")
+        } else {
+            event.addData("The repo does not auto update because auto update is disabled!")
+        }
+    }
+
+    private fun player(event: DebugDataCollectEvent) {
+        event.title("Player")
+        event.ignore {
+            add("name: '${LorenzUtils.getPlayerName()}'")
+            add("uuid: '${LorenzUtils.getPlayerUuid()}'")
+        }
     }
 }
