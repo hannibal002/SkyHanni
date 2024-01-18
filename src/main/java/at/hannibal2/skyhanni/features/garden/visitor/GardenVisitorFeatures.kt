@@ -616,7 +616,7 @@ class GardenVisitorFeatures {
         event.title("Garden Visitor Stats")
 
         if (!GardenAPI.inGarden()) {
-            event.ignore("not in garden")
+            event.addIrrelevant("not in garden")
             return
         }
 

@@ -6,7 +6,7 @@ class DebugDataCollectEvent(private val list: MutableList<String>, private val s
 
     var empty = true
     private var currentTitle = ""
-    private var ignore = false
+    private var irrelevant = false
 
     fun title(title: String) {
         if (currentTitle != "") error("Title already set: '$currentTitle'")
@@ -14,40 +14,28 @@ class DebugDataCollectEvent(private val list: MutableList<String>, private val s
         currentTitle = title
     }
 
-    fun ignore(block: MutableList<String>.() -> Unit) {
-        val list = mutableListOf<String>()
-        block(list)
-        ignore(list)
-    }
+    fun addIrrelevant(builder: MutableList<String>.() -> Unit) = addIrrelevant(buildList(builder))
 
-    fun ignore(text: String) {
-        ignore(listOf(text))
-    }
+    fun addIrrelevant(text: String) = addIrrelevant(listOf(text))
 
-    private fun ignore(text: List<String>) {
-        ignore = true
+    private fun addIrrelevant(text: List<String>) {
+        irrelevant = true
         addData(text)
     }
 
-    fun addData(block: MutableList<String>.() -> Unit) {
-        val list = mutableListOf<String>()
-        block(list)
-        addData(list)
-    }
+    fun addData(builder: MutableList<String>.() -> Unit) = addData(buildList(builder))
 
-    fun addData(text: String) {
-        addData(listOf(text))
-    }
+    fun addData(text: String) = addData(listOf(text))
 
     fun addData(text: List<String>) {
         if (currentTitle == "") error("Title not set")
         writeData(text)
         currentTitle = ""
-        ignore = false
+        irrelevant = false
     }
 
     private fun writeData(text: List<String>) {
-        if (ignore && search == null) return
+        if (irrelevant && search == null) return
         search?.let {
             if (!search.equalsIgnoreColor("all")) {
                 if (!currentTitle.contains(search, ignoreCase = true)) {

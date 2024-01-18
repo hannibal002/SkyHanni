@@ -57,13 +57,13 @@ object DebugCommand {
     private fun profileType(event: DebugDataCollectEvent) {
         event.title("Profile Type")
         if (!LorenzUtils.inSkyBlock) {
-            event.ignore("Not on SkyBlcok")
+            event.addIrrelevant("Not on SkyBlcok")
             return
         }
 
         val classic = !LorenzUtils.noTradeMode
         if (classic) {
-            event.ignore("on classic")
+            event.addIrrelevant("on classic")
         } else {
             if (HypixelData.ironman) {
                 event.addData("on ironman")
@@ -80,12 +80,12 @@ object DebugCommand {
     private fun profileName(event: DebugDataCollectEvent) {
         event.title("Profile Name")
         if (!LorenzUtils.inSkyBlock) {
-            event.ignore("Not on SkyBlcok")
+            event.addIrrelevant("Not on SkyBlcok")
             return
         }
 
         if (HypixelData.profileName != "") {
-            event.ignore("profileName: '${HypixelData.profileName}'")
+            event.addIrrelevant("profileName: '${HypixelData.profileName}'")
         } else {
             event.addData("profile name is empty!")
         }
@@ -105,7 +105,7 @@ object DebugCommand {
             event.addData("Unknown SkyBlock island!")
             return
         }
-        event.ignore {
+        event.addIrrelevant {
             add("on Hypixel SkyBlock")
             add("skyBlockIsland: ${LorenzUtils.skyBlockIsland}")
             add("skyBlockArea: '${LorenzUtils.skyBlockArea}'")
@@ -115,7 +115,7 @@ object DebugCommand {
     private fun globalRender(event: DebugDataCollectEvent) {
         event.title("Global Render")
         if (SkyHanniDebugsAndTests.globalRender) {
-            event.ignore("normal enabled")
+            event.addIrrelevant("normal enabled")
         } else {
             event.addData {
                 add("Global renderer is disabled!")
@@ -127,7 +127,7 @@ object DebugCommand {
     private fun repoAutoUpdate(event: DebugDataCollectEvent) {
         event.title("Repo Auto Update")
         if (SkyHanniMod.feature.dev.repoAutoUpdate) {
-            event.ignore("normal enabled")
+            event.addIrrelevant("normal enabled")
         } else {
             event.addData("The repo does not auto update because auto update is disabled!")
         }
@@ -135,7 +135,7 @@ object DebugCommand {
 
     private fun player(event: DebugDataCollectEvent) {
         event.title("Player")
-        event.ignore {
+        event.addIrrelevant {
             add("name: '${LorenzUtils.getPlayerName()}'")
             add("uuid: '${LorenzUtils.getPlayerUuid()}'")
         }

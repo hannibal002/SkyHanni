@@ -226,7 +226,7 @@ class DungeonAPI {
         event.title("Dungeon")
 
         if (!LorenzUtils.inDungeons) {
-            event.ignore("not in dungeons")
+            event.addIrrelevant("not in dungeons")
             return
         }
 
