@@ -5,7 +5,6 @@ import at.hannibal2.skyhanni.config.features.garden.visitor.VisitorConfig.Highli
 import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.data.SackAPI
 import at.hannibal2.skyhanni.data.SackStatus
-import at.hannibal2.skyhanni.events.BurrowGuessEvent
 import at.hannibal2.skyhanni.events.DebugDataCollectEvent
 import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.LorenzChatEvent
@@ -604,11 +603,6 @@ class GardenVisitorFeatures {
                 entity.customNameTag = GardenVisitorColorNames.getColoredName(entity.name)
             }
         }
-    }
-
-    @SubscribeEvent
-    fun onBurrowGuess(event: BurrowGuessEvent) {
-        LorenzUtils.chat("gues the burrow!!")
     }
 
     @SubscribeEvent
