@@ -23,6 +23,7 @@ import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import io.github.moulberry.notenoughupdates.events.ReplaceItemEvent
 import io.github.moulberry.notenoughupdates.util.Utils
 import net.minecraft.client.player.inventory.ContainerLocalMenu
+import net.minecraft.item.ItemStack
 import net.minecraft.util.AxisAlignedBB
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import kotlin.time.Duration
@@ -42,6 +43,7 @@ class LimboTimeTracker {
 
     private lateinit var modifiedArray: MutableList<String>
     private var setMinutes = false
+    private var canReplace = true
     private val minutesRegex by RepoPattern.pattern("limbo.tooltip.minutes", "§5§o§a\\d+(\\.\\d+)? minutes.+\$")
     private val hoursRegex by RepoPattern.pattern("limbo.tooltip.hours", "§5§o§b\\d+(\\.\\d+)? hours.+\$")
 
@@ -111,12 +113,22 @@ class LimboTimeTracker {
     fun replaceItem(event: ReplaceItemEvent) {
         if (event.inventory !is ContainerLocalMenu) return
         if (event.inventory.displayName.unformattedText != "Detailed /playtime") return
-        if (event.slotNumber != 43) return
+        val index = event.slotNumber
+//         if (index != 33) return
+        if (index == 0) canReplace = true
+        if (!canReplace) return
+        if (!isValidIndex(index)) return
+        if (event.original != null) return
         val limboItem by lazy {
             val neuItem = NEUItems.getItemStack("ENDER_PEARL")
             Utils.createItemStack(neuItem.item, "§aLimbo", "§7Playtime: §a${config.limboPlaytime.seconds.inWholeMinutes} minutes", "§aOr: §b$hoursString hours")
         }
         event.replaceWith(limboItem)
+        canReplace = false
+    }
+
+    private fun isValidIndex(index: Int): Boolean {
+        return !(index % 9 == 0 || index + 1 % 9 == 0 || index !in 10..43)
     }
 
     @SubscribeEvent
