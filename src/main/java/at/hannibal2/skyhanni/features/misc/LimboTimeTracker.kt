@@ -4,6 +4,7 @@ import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.data.HypixelData
 import at.hannibal2.skyhanni.events.ConfigLoadEvent
 import at.hannibal2.skyhanni.events.GuiRenderEvent
+import at.hannibal2.skyhanni.events.InventoryOpenEvent
 import at.hannibal2.skyhanni.events.LorenzChatEvent
 import at.hannibal2.skyhanni.events.LorenzTickEvent
 import at.hannibal2.skyhanni.events.LorenzToolTipEvent
@@ -13,11 +14,15 @@ import at.hannibal2.skyhanni.features.commands.LimboCommands
 import at.hannibal2.skyhanni.utils.LocationUtils.isPlayerInside
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils.round
+import at.hannibal2.skyhanni.utils.NEUItems
 import at.hannibal2.skyhanni.utils.RenderUtils.renderString
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.StringUtils.matches
 import at.hannibal2.skyhanni.utils.TimeUtils.format
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
+import io.github.moulberry.notenoughupdates.events.ReplaceItemEvent
+import io.github.moulberry.notenoughupdates.util.Utils
+import net.minecraft.client.player.inventory.ContainerLocalMenu
 import net.minecraft.util.AxisAlignedBB
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import kotlin.time.Duration
@@ -39,6 +44,9 @@ class LimboTimeTracker {
     private var setMinutes = false
     private val minutesRegex by RepoPattern.pattern("limbo.tooltip.minutes", "§5§o§a\\d+(\\.\\d+)? minutes.+\$")
     private val hoursRegex by RepoPattern.pattern("limbo.tooltip.hours", "§5§o§b\\d+(\\.\\d+)? hours.+\$")
+
+    private var wholeMinutes: Long = 0
+    private var hoursString: String = ""
 
     private val bedwarsLobbyLimbo = AxisAlignedBB(-662.0, 43.0, -76.0, -619.0, 86.0, -27.0)
 
@@ -100,6 +108,18 @@ class LimboTimeTracker {
     }
 
     @SubscribeEvent
+    fun replaceItem(event: ReplaceItemEvent) {
+        if (event.inventory !is ContainerLocalMenu) return
+        if (event.inventory.displayName.unformattedText != "Detailed /playtime") return
+        if (event.slotNumber != 43) return
+        val limboItem by lazy {
+            val neuItem = NEUItems.getItemStack("ENDER_PEARL")
+            Utils.createItemStack(neuItem.item, "§aLimbo", "§7Playtime: §a${config.limboPlaytime.seconds.inWholeMinutes} minutes", "§aOr: §b$hoursString hours")
+        }
+        event.replaceWith(limboItem)
+    }
+
+    @SubscribeEvent
     fun onHoverItem(event: LorenzToolTipEvent) {
         if (!LorenzUtils.inSkyBlock) return
         if (!event.slot.inventory.displayName.unformattedText.startsWith("Detailed /playtime")) return
@@ -113,13 +133,27 @@ class LimboTimeTracker {
         remakeArray(event.toolTip, minutesArray, hoursArray)
     }
 
+    @SubscribeEvent
+    fun onRenderGUI(event: InventoryOpenEvent) {
+        if (event.inventoryName != "Detailed /playtime") return
+        val playtime = config.limboPlaytime.seconds
+        val wholeHours = playtime.inWholeHours
+        wholeMinutes = playtime.inWholeMinutes
+        if (config.limboPlaytime%3600 == 0) {
+            hoursString = "$wholeHours"
+        } else {
+            val minutes:Float = ((wholeMinutes - wholeHours * 60).toFloat() / 60)
+            hoursString = "${wholeHours+minutes.round(1)}"
+        }
+    }
+
     private fun addLimbo(hoursArray: MutableList<String>, minutesArray: MutableList<String>) {
         if (config.limboPlaytime >= 3600) {
             val hours = config.limboPlaytime.seconds.inWholeHours
             val minutes = (config.limboPlaytime.seconds.inWholeMinutes-(hours*60).toFloat()/6).toInt()
             modifiedArray = hoursArray
             if (minutes == 0) modifiedArray.add("§b$hours hours §7on Limbo")
-            else modifiedArray.add("§b$hours.${(minutes.toFloat()/6).toInt()} hours §7on Limbo")
+            else modifiedArray.add("§b$hoursString hours §7on Limbo")
             modifiedArray = modifiedArray.sortedByDescending {
                 it.substringAfter("§b").substringBefore(" hours").toDoubleOrNull()
             }.toMutableList()
