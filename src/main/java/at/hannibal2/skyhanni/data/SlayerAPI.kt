@@ -75,18 +75,16 @@ object SlayerAPI {
         event.title("Slayer")
 
         if (!hasActiveSlayerQuest()) {
-            event.exit("no active slayer quest")
+            event.ignore("no active slayer quest")
             return
         }
 
-        event.addData(
-            buildList {
-                add("activeSlayer: ${getActiveSlayer()}")
-                add("isInCorrectArea: $isInCorrectArea")
-                add("isInAnyArea: $isInAnyArea")
-                add("latestSlayerProgress: $latestSlayerProgress")
-            }
-        )
+        event.addData {
+            add("activeSlayer: ${getActiveSlayer()}")
+            add("isInCorrectArea: $isInCorrectArea")
+            add("isInAnyArea: $isInAnyArea")
+            add("latestSlayerProgress: $latestSlayerProgress")
+        }
     }
 
     @SubscribeEvent
