@@ -2,11 +2,13 @@ package at.hannibal2.skyhanni.data.repo
 
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.config.ConfigManager
+import at.hannibal2.skyhanni.events.DebugDataCollectEvent
 import at.hannibal2.skyhanni.events.RepositoryReloadEvent
 import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import com.google.gson.JsonObject
 import net.minecraft.client.Minecraft
+import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import org.apache.commons.io.FileUtils
 import java.io.BufferedReader
 import java.io.BufferedWriter
@@ -170,6 +172,27 @@ class RepoManager(private val configLocation: File) {
             }
         }
         return comp
+    }
+
+    @SubscribeEvent
+    fun onDebugDataCollect(event: DebugDataCollectEvent) {
+        event.title("Repo Status")
+
+        if (unsuccessfulConstants.isEmpty() && successfulConstants.isNotEmpty()) {
+            event.ignore("Repo working fine")
+            return
+        }
+
+        event.addData {
+            if (successfulConstants.isNotEmpty()) add("Successful Constants (${successfulConstants.size}):")
+            for (constant in successfulConstants) {
+                add("   - $constant")
+            }
+            add("Unsuccessful Constants (${unsuccessfulConstants.size}):")
+            for (constant in unsuccessfulConstants) {
+                add("   - $constant")
+            }
+        }
     }
 
     fun displayRepoStatus(joinEvent: Boolean) {

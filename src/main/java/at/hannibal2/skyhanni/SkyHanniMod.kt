@@ -740,6 +740,7 @@ class SkyHanniMod {
             configManager.saveConfig(ConfigFileType.FEATURES, "shutdown-hook")
         })
         repo = RepoManager(ConfigManager.configDirectory)
+        loadModule(repo)
         try {
             repo.loadRepoInformation()
         } catch (e: Exception) {
