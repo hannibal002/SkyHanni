@@ -12,12 +12,12 @@ object FarmingMilestoneCommand {
 
     fun onCommand(crop: String?, current: String?, target: String?, needsTime: Boolean) {
         if (crop == null) {
-            LorenzUtils.chat("No crop type entered")
+            LorenzUtils.userError("No crop type entered")
             return
         }
 
         val enteredCrop = CropType.entries.firstOrNull { it.simpleName == crop.lowercase() } ?: run {
-            LorenzUtils.chat("Invalid crop type entered")
+            LorenzUtils.userError("Invalid crop type entered")
             return
         }
 
@@ -29,7 +29,7 @@ object FarmingMilestoneCommand {
             val currentCropMilestone = GardenCropMilestones.getTierForCropCount(currentProgress, enteredCrop) + 1
             val output = (GardenCropMilestones.getCropsForTier(currentCropMilestone, enteredCrop) - currentProgress).formatOutput(needsTime, enteredCrop)
 
-            LorenzUtils.chat("§7$output needed for you to reach the next milestone")
+            LorenzUtils.chat("§7$output needed to reach the next milestone")
             return
         }
 
@@ -40,7 +40,7 @@ object FarmingMilestoneCommand {
             return
         }
         if (currentMilestone >= targetMilestone) {
-            LorenzUtils.chat("Entered milestone is greater than target milestone")
+            LorenzUtils.userError("Entered milestone is greater than or the same as target milestone")
             return
         }
 
@@ -52,27 +52,23 @@ object FarmingMilestoneCommand {
     }
 
     fun onComplete(strings: Array<String>): List<String> {
-        if (strings.size <= 1)
+        return if (strings.size <= 1)
             return CommandBase.getListOfStringsMatchingLastWord(
                 strings,
                 CropType.entries.map { it.simpleName }
             )
-        return listOf()
+        else listOf()
     }
 
     private fun getValidNumber(entry: String?): Int? {
-        if (entry == null) return null
-        var result = try {
+        entry ?: return null
+        val result = try {
             entry.toInt()
         } catch (_: Exception) {
-            null
+            return null
         }
-        if (result == null) return null
 
-        if (result < 0) result = 0
-        if (result > 46) result = 46
-
-        return result
+        return result.coerceIn(0, 46)
     }
 
     private fun Long.formatOutput(needsTime: Boolean, crop: CropType): String {
