@@ -26,8 +26,8 @@ class CrystalHollowsLobbyAgeWarning {
 
     private val TICKS_PER_MC_DAY: Long = 24000L
 
-    private val crystalHollowsLobbyRepoGroup = RepoPattern.group("chlobbyage")
-    private val playerCountTabListPattern by crystalHollowsLobbyRepoGroup.pattern(
+    private val patternGroup = RepoPattern.group("mining.crystalhollows.lobbyage")
+    private val playerCountTabListPattern by patternGroup.pattern(
         "playercount.tablist",
         " *(?:§.)*Players[\\S ]*[({\\[](?<playerCount>[\\S ]+)[)}\\]]"
     )
