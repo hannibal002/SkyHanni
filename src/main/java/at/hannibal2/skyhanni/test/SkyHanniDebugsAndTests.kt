@@ -7,8 +7,6 @@ import at.hannibal2.skyhanni.config.ConfigManager
 import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.config.core.config.Position
 import at.hannibal2.skyhanni.data.HypixelData
-import at.hannibal2.skyhanni.data.IslandType
-import at.hannibal2.skyhanni.events.DebugDataCollectEvent
 import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.LorenzChatEvent
 import at.hannibal2.skyhanni.events.LorenzRenderWorldEvent
@@ -41,7 +39,6 @@ import at.hannibal2.skyhanni.utils.RenderUtils.renderString
 import at.hannibal2.skyhanni.utils.RenderUtils.renderStringsAndItems
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.SoundUtils
-import at.hannibal2.skyhanni.utils.StringUtils.equalsIgnoreColor
 import kotlinx.coroutines.launch
 import net.minecraft.client.Minecraft
 import net.minecraft.client.gui.inventory.GuiContainer
@@ -342,116 +339,6 @@ class SkyHanniDebugsAndTests {
             val name = "SkyHanni ${SkyHanniMod.version}"
             LorenzUtils.chat("§eYou are using $name")
             OSUtils.copyToClipboard(name)
-        }
-
-        fun debugData(args: Array<String>) {
-            if (args.size == 2 && args[0] == "profileName") {
-                HypixelData.profileName = args[1].lowercase()
-                LorenzUtils.chat("§eManually set profileName to '${HypixelData.profileName}'")
-                return
-            }
-            val list = mutableListOf<String>()
-            list.add("```")
-            list.add("= Debug Information for SkyHanni ${SkyHanniMod.version} =")
-            list.add("")
-
-            val search = args.getOrNull(0)
-            list.add(
-                if (search != null) {
-                    if (search.equalsIgnoreColor("all")) {
-                        "search for everything."
-                    } else "search: '$search'"
-                } else "search not specified, showing only interesting stuff"
-            )
-
-            val event = DebugDataCollectEvent(list, search)
-
-            event.title("Player")
-            event.ignore {
-                add("name: '${LorenzUtils.getPlayerName()}'")
-                add("uuid: '${LorenzUtils.getPlayerUuid()}'")
-            }
-
-            event.title("Repo Auto Update")
-            if (config.repoAutoUpdate) {
-                event.ignore("normally enabled")
-            } else {
-                event.addData("The repo does not auto update because auto update is disabled!")
-            }
-
-            event.title("Global Render")
-            if (globalRender) {
-                event.ignore("normally enabled")
-            } else {
-                event.addData {
-                    add("Global renderer is disabled!")
-                    add("No renderable elements from SkyHanni will show up anywhere!")
-                }
-            }
-
-            event.title("SkyBlock Status")
-            if (!LorenzUtils.onHypixel) {
-                event.addData("not on Hypixel")
-            } else {
-                if (!LorenzUtils.inSkyBlock) {
-                    event.addData("not on SkyBlock, but on Hypixel")
-                } else {
-                    if (LorenzUtils.skyBlockIsland == IslandType.UNKNOWN) {
-                        event.addData("Unknown SkyBlock island!")
-                    } else {
-                        event.ignore {
-                            add("on Hypixel SkyBlock")
-                            add("skyBlockIsland: ${LorenzUtils.skyBlockIsland}")
-                            add("skyBlockArea: '${LorenzUtils.skyBlockArea}'")
-                        }
-                    }
-                }
-            }
-
-            event.title("Profile Name")
-            if (!LorenzUtils.inSkyBlock) {
-                event.ignore("Not on SkyBlcok")
-            } else {
-                if (HypixelData.profileName != "") {
-                    event.ignore("profileName: '${HypixelData.profileName}'")
-                } else {
-                    event.addData("profile name is empty!")
-                }
-            }
-
-
-            event.title("Profile Type")
-            if (!LorenzUtils.inSkyBlock) {
-                event.ignore("Not on SkyBlcok")
-            } else {
-                val classic = !LorenzUtils.noTradeMode
-                if (classic) {
-                    event.ignore("on classic")
-                } else {
-                    if (HypixelData.ironman) {
-                        event.addData("on ironman")
-                    }
-                    if (HypixelData.stranded) {
-                        event.addData("on stranded")
-                    }
-                    if (HypixelData.bingo) {
-                        event.addData("on bingo")
-                    }
-                }
-            }
-
-            event.postAndCatch()
-
-            if (event.empty) {
-                list.add("")
-                list.add("Nothing interesting to show right now!")
-                list.add("Looking for something specific? /shdebug <search>")
-                list.add("Wanna see everything? /shdebug all")
-            }
-
-            list.add("```")
-            OSUtils.copyToClipboard(list.joinToString("\n"))
-            LorenzUtils.chat("§eCopied SkyHanni debug data in the clipboard.")
         }
 
         fun copyItemInternalName() {
