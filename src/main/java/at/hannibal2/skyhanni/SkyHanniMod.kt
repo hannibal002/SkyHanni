@@ -341,6 +341,7 @@ import at.hannibal2.skyhanni.test.TestExportTools
 import at.hannibal2.skyhanni.test.TestShowSlotNumber
 import at.hannibal2.skyhanni.test.WorldEdit
 import at.hannibal2.skyhanni.test.command.CopyNearbyParticlesCommand
+import at.hannibal2.skyhanni.test.hotswap.HotswapSupport
 import at.hannibal2.skyhanni.utils.EntityOutlineRenderer
 import at.hannibal2.skyhanni.utils.KeyboardManager
 import at.hannibal2.skyhanni.utils.LorenzUtils
@@ -377,6 +378,8 @@ class SkyHanniMod {
     @Mod.EventHandler
     fun preInit(event: FMLPreInitializationEvent?) {
         checkIfNeuIsLoaded()
+
+        HotswapSupport.load()
 
         // data
         loadModule(this)
