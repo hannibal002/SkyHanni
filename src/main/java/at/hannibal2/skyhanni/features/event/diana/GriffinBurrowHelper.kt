@@ -36,7 +36,7 @@ import kotlin.time.Duration.Companion.seconds
 object GriffinBurrowHelper {
     private val config get() = SkyHanniMod.feature.event.diana
 
-    private var targetLocation: LorenzVec? = null
+    var targetLocation: LorenzVec? = null
     private var guessLocation: LorenzVec? = null
     private var particleBurrows = mapOf<LorenzVec, BurrowType>()
 
