@@ -100,6 +100,6 @@ class CrystalHollowsLobbyAgeWarning {
         maxLobbyAgeMCDays = data.maxLobbyAgeMCDays
     }
 
-    private fun isEnabled() = config.enabled
+    private fun isEnabled() = THE_CRYSTAL_HOLLOWS.isInIsland() && config.enabled
     private fun isInCrystalHollows() = THE_CRYSTAL_HOLLOWS.isInIsland()
 }
