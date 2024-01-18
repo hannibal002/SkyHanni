@@ -8,6 +8,7 @@ import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.config.core.config.Position
 import at.hannibal2.skyhanni.data.HypixelData
 import at.hannibal2.skyhanni.data.SlayerAPI
+import at.hannibal2.skyhanni.events.DebugDataCollectEvent
 import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.LorenzChatEvent
 import at.hannibal2.skyhanni.events.LorenzRenderWorldEvent
@@ -400,8 +401,10 @@ class SkyHanniDebugsAndTests {
                     builder.append(" isInCorrectArea: ${SlayerAPI.isInCorrectArea}\n")
                     builder.append(" isInAnyArea: ${SlayerAPI.isInAnyArea}\n")
                 }
-
             }
+
+            DebugDataCollectEvent(builder).postAndCatch()
+
             builder.append("```")
             OSUtils.copyToClipboard(builder.toString())
             LorenzUtils.chat("§eCopied SkyHanni debug data to clipboard.")
