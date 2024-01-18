@@ -1,6 +1,7 @@
 package at.hannibal2.skyhanni.features.event.diana
 
 import at.hannibal2.skyhanni.SkyHanniMod
+import at.hannibal2.skyhanni.data.TitleManager
 import at.hannibal2.skyhanni.events.LorenzChatEvent
 import at.hannibal2.skyhanni.events.LorenzKeyPressEvent
 import at.hannibal2.skyhanni.events.LorenzWorldChangeEvent
@@ -31,6 +32,10 @@ class BurrowWarpHelper {
                 lastWarpTime = SimpleTimeMark.now()
                 LorenzUtils.sendCommandToServer("warp " + currentWarp?.name)
                 lastWarp = currentWarp
+                GriffinBurrowHelper.lastTitleSentTime = SimpleTimeMark.now() + 2.seconds
+                TitleManager.optionalResetTitle {
+                    it.startsWith("§bWarp to ")
+                }
             }
         }
     }
@@ -88,7 +93,7 @@ class BurrowWarpHelper {
 
     enum class WarpPoint(
         val displayName: String,
-        private val location: LorenzVec,
+        val location: LorenzVec,
         private val extraBlocks: Int,
         val ignored: () -> Boolean = { false },
         var unlocked: Boolean = true,
