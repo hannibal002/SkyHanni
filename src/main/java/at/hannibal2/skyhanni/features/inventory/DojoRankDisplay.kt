@@ -7,7 +7,6 @@ import at.hannibal2.skyhanni.events.InventoryCloseEvent
 import at.hannibal2.skyhanni.events.InventoryFullyOpenedEvent
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.LorenzUtils
-import at.hannibal2.skyhanni.utils.LorenzUtils.indexOfFirst
 import at.hannibal2.skyhanni.utils.LorenzUtils.isInIsland
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.RenderUtils.renderStrings
@@ -42,7 +41,7 @@ class DojoRankDisplay {
                         val rank = group("rank")
                         val score = group("score").toInt()
                         val color = if (score in 0 .. 99) "§c" else "§a"
-                        totalScore += group("score").toInt()
+                        totalScore += score
                         add("$testColor$testName§f: $rank §7($color${score.addSeparators()}§7)")
                     }
                 }
