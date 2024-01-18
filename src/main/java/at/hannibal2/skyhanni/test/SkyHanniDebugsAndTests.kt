@@ -7,7 +7,6 @@ import at.hannibal2.skyhanni.config.ConfigManager
 import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.config.core.config.Position
 import at.hannibal2.skyhanni.data.HypixelData
-import at.hannibal2.skyhanni.data.SlayerAPI
 import at.hannibal2.skyhanni.events.DebugDataCollectEvent
 import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.LorenzChatEvent
@@ -15,7 +14,6 @@ import at.hannibal2.skyhanni.events.LorenzRenderWorldEvent
 import at.hannibal2.skyhanni.events.LorenzToolTipEvent
 import at.hannibal2.skyhanni.events.PlaySoundEvent
 import at.hannibal2.skyhanni.events.ReceiveParticleEvent
-import at.hannibal2.skyhanni.features.dungeon.DungeonAPI
 import at.hannibal2.skyhanni.features.garden.GardenNextJacobContest
 import at.hannibal2.skyhanni.features.garden.visitor.GardenVisitorColorNames
 import at.hannibal2.skyhanni.test.GriffinUtils.drawWaypointFilled
@@ -42,6 +40,7 @@ import at.hannibal2.skyhanni.utils.RenderUtils.renderString
 import at.hannibal2.skyhanni.utils.RenderUtils.renderStringsAndItems
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.SoundUtils
+import at.hannibal2.skyhanni.utils.StringUtils.equalsIgnoreColor
 import kotlinx.coroutines.launch
 import net.minecraft.client.Minecraft
 import net.minecraft.client.gui.inventory.GuiContainer
@@ -381,29 +380,20 @@ class SkyHanniDebugsAndTests {
                 builder.append("ironman: ${HypixelData.ironman}\n")
                 builder.append("stranded: ${HypixelData.stranded}\n")
                 builder.append("bingo: ${HypixelData.bingo}\n")
-
-                if (LorenzUtils.inDungeons) {
-                    builder.append("\n")
-                    builder.append("In dungeon!\n")
-                    builder.append(" dungeonFloor: ${DungeonAPI.dungeonFloor}\n")
-                    builder.append(" started: ${DungeonAPI.started}\n")
-                    builder.append(" getRoomID: ${DungeonAPI.getRoomID()}\n")
-                    builder.append(" inBossRoom: ${DungeonAPI.inBossRoom}\n")
-                    builder.append(" ")
-                    builder.append(" playerClass: ${DungeonAPI.playerClass}\n")
-                    builder.append(" isUniqueClass: ${DungeonAPI.isUniqueClass}\n")
-                    builder.append(" playerClassLevel: ${DungeonAPI.playerClassLevel}\n")
-                }
-                if (SlayerAPI.hasActiveSlayerQuest()) {
-                    builder.append("\n")
-                    builder.append("Doing slayer!\n")
-                    builder.append(" activeSlayer: ${SlayerAPI.getActiveSlayer()}\n")
-                    builder.append(" isInCorrectArea: ${SlayerAPI.isInCorrectArea}\n")
-                    builder.append(" isInAnyArea: ${SlayerAPI.isInAnyArea}\n")
-                }
             }
 
-            DebugDataCollectEvent(builder).postAndCatch()
+            val search = args.getOrNull(0)
+            builder.append("\n")
+            if (search != null) {
+                if (search.equalsIgnoreColor("all")) {
+                    builder.append("search for everything.\n")
+                } else {
+                    builder.append("search: '$search'\n")
+                }
+            } else {
+                builder.append("search not set.\n")
+            }
+            DebugDataCollectEvent(builder, search).postAndCatch()
 
             builder.append("```")
             OSUtils.copyToClipboard(builder.toString())
