@@ -101,6 +101,7 @@ object BitsAPI {
 
     @SubscribeEvent
     fun onScoreboardChange(event: ScoreboardChangeEvent) {
+        if (!isEnabled()) return
         for (line in event.newList) {
             val message = line.trimWhiteSpace().removeResets()
 
@@ -117,6 +118,7 @@ object BitsAPI {
 
     @SubscribeEvent
     fun onChat(event: LorenzChatEvent) {
+        if (!isEnabled()) return
         val message = event.message.trimWhiteSpace().removeResets()
 
         bitsFromFameRankUpChatPattern.matchMatcher(message) {
@@ -146,7 +148,7 @@ object BitsAPI {
 
     @SubscribeEvent
     fun onInventoryFullyLoaded(event: InventoryFullyOpenedEvent) {
-        if (!LorenzUtils.inSkyBlock) return
+        if (!isEnabled()) return
 
         val stacks = event.inventoryItems
 
@@ -185,4 +187,6 @@ object BitsAPI {
             }
         }
     }
+
+    fun isEnabled() = LorenzUtils.inSkyBlock && profileStorage != null
 }
