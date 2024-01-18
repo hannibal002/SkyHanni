@@ -39,6 +39,7 @@ class VolcanoExplosivityDisplay {
     }
     @SubscribeEvent
     fun onRenderOverlay(event: GuiRenderEvent.GuiOverlayRenderEvent) {
+        if (!isEnabled()) return
         config.positionVolcano.renderString(display, posLabel = "Volcano Explosivity")
     }
 
