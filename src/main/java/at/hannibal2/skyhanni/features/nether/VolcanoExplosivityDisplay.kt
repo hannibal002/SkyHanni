@@ -34,7 +34,7 @@ class VolcanoExplosivityDisplay {
         if (tabList.none { headerPattern.matches(it) }) return
         val index = tabList.indexOfFirst { headerPattern.matches(it) }
         statusPattern.matchMatcher(tabList[index + 1]) {
-            display = "§bVolcano Explosivity: ${group("status")}"
+            display = "§bVolcano Explosivity§7: ${group("status")}"
         }
     }
     @SubscribeEvent
