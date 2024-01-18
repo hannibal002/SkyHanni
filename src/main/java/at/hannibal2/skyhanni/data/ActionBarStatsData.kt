@@ -35,6 +35,7 @@ enum class ActionBarStatsData(@Language("RegExp") rawPattern: String) {
 
     internal val pattern by RepoPattern.pattern("actionbar.$repoKey", rawPattern)
     var value: String = ""
+        private set
 
     companion object {
 
