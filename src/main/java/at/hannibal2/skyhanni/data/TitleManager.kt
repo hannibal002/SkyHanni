@@ -8,6 +8,7 @@ import io.github.moulberry.moulconfig.internal.TextRenderUtils
 import net.minecraft.client.Minecraft
 import net.minecraft.client.gui.ScaledResolution
 import net.minecraft.client.renderer.GlStateManager
+import net.minecraftforge.fml.common.eventhandler.EventPriority
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.seconds
@@ -18,9 +19,9 @@ class TitleManager {
         private var display = ""
         private var endTime = SimpleTimeMark.farPast()
         private var heightModifier = 1.8
-        private var fontSizeModifier = 4.0
+        private var fontSizeModifier = 4f
 
-        fun sendTitle(text: String, duration: Duration, height: Double = 1.8, fontSize: Double = 4.0) {
+        fun sendTitle(text: String, duration: Duration, height: Double, fontSize: Float) {
             display = "§f$text"
             endTime = SimpleTimeMark.now() + duration
             heightModifier = height
@@ -35,7 +36,7 @@ class TitleManager {
 
             val duration = args[0].toInt().seconds
             val height = args[1].toDouble()
-            val fontSize = args[2].toDouble()
+            val fontSize = args[2].toFloat()
             val title = "§6" + args.drop(3).joinToString(" ").replace("&", "§")
 
             sendTitle(title, duration, height, fontSize)
@@ -47,7 +48,7 @@ class TitleManager {
         endTime = SimpleTimeMark.farPast()
     }
 
-    @SubscribeEvent
+    @SubscribeEvent(priority = EventPriority.LOWEST)
     fun onRenderOverlay(event: GuiRenderEvent.GuiOverlayRenderEvent) {
         if (endTime.isInPast()) return
 

@@ -81,19 +81,7 @@ object DianaProfitTracker {
             )
         )
 
-        val profitFormat = profit.addSeparators()
-        val profitPrefix = if (profit < 0) "§c" else "§6"
-
-        val profitPerBurrow = profit / data.burrowsDug
-        val profitPerBurrowFormat = NumberUtil.format(profitPerBurrow)
-
-        val text = "§eTotal Profit: $profitPrefix$profitFormat coins"
-        addAsSingletonList(
-            Renderable.hoverTips(
-                text,
-                listOf("§7Profit per burrow: $profitPrefix$profitPerBurrowFormat")
-            )
-        )
+        addAsSingletonList(tracker.addTotalProfit(profit, data.burrowsDug, "burrow"))
 
         tracker.addPriceFromButton(this)
     }

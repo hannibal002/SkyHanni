@@ -21,8 +21,10 @@ import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.RenderUtils.highlight
 import at.hannibal2.skyhanni.utils.RenderUtils.renderStringsAndItems
 import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
+import at.hannibal2.skyhanni.utils.StringUtils.matches
 import at.hannibal2.skyhanni.utils.TimeUtils
 import at.hannibal2.skyhanni.utils.renderables.Renderable
+import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraft.client.Minecraft
 import net.minecraft.client.gui.inventory.GuiChest
 import net.minecraft.client.gui.inventory.GuiEditSign
@@ -35,8 +37,15 @@ class CityProjectFeatures {
     private var inInventory = false
     private var lastReminderSend = 0L
 
-    // TODO USE SH-REPO
-    private val contributeAgainPattern = "§7Contribute again: §e(?<time>.*)".toPattern()
+    private val patternGroup = RepoPattern.group("fame.projects")
+    private val contributeAgainPattern by patternGroup.pattern(
+        "contribute",
+        "§7Contribute again: §e(?<time>.*)"
+    )
+    private val completedPattern by patternGroup.pattern(
+        "completed",
+        "§aProject is (?:being built|released)!"
+    )
 
     companion object {
         private val config get() = SkyHanniMod.feature.event.cityProject
@@ -104,7 +113,8 @@ class CityProjectFeatures {
                 val itemName = item.name ?: continue
 
                 val lore = item.getLore()
-                if (lore.lastOrNull() == "§aProject is being built!") continue
+                val completed = lore.lastOrNull()?.let { completedPattern.matches(it) } ?: false
+                if (completed) continue
                 for (line in lore) {
                     contributeAgainPattern.matchMatcher(line) {
                         val rawTime = group("time")
@@ -163,7 +173,8 @@ class CityProjectFeatures {
     private fun fetchMaterials(item: ItemStack, materials: MutableMap<String, Int>) {
         var next = false
         val lore = item.getLore()
-        if (lore.lastOrNull() == "§aProject is being built!") return
+        val completed = lore.lastOrNull()?.let { completedPattern.matches(it) } ?: false
+        if (completed) return
         for (line in lore) {
             if (line == "§7Cost") {
                 next = true
