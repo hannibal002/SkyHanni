@@ -344,6 +344,7 @@ import at.hannibal2.skyhanni.test.WorldEdit
 import at.hannibal2.skyhanni.test.command.CopyNearbyParticlesCommand
 import at.hannibal2.skyhanni.utils.EntityOutlineRenderer
 import at.hannibal2.skyhanni.utils.KeyboardManager
+import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.MinecraftConsoleFilter.Companion.initLogging
 import at.hannibal2.skyhanni.utils.NEUVersionCheck.checkIfNeuIsLoaded
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils
@@ -446,6 +447,7 @@ class SkyHanniMod {
         loadModule(SackAPI)
         loadModule(BingoAPI)
         loadModule(FishingAPI)
+        loadModule(LorenzUtils)
 
         // features
         loadModule(BazaarOrderHelper())
