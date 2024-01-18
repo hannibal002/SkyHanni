@@ -407,7 +407,7 @@ class SkyHanniDebugsAndTests {
 
             builder.append("```")
             OSUtils.copyToClipboard(builder.toString())
-            LorenzUtils.chat("§eCopied SkyHanni debug data to clipboard.")
+            LorenzUtils.chat("§eCopied SkyHanni debug data in the clipboard.")
         }
 
         fun copyItemInternalName() {
