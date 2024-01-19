@@ -40,7 +40,7 @@ object FixGhostEntities {
             }
         } else if (packet is S13PacketDestroyEntities) {
             for (entityID in packet.entityIDs) {
-                recentlyRemovedEntities.add(entityID)
+                recentlyRemovedEntities.addLast(entityID)
                 if (recentlyRemovedEntities.size == 10) {
                     recentlyRemovedEntities.removeFirst()
                 }
