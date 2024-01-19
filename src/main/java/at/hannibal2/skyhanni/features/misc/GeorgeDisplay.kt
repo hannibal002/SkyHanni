@@ -20,9 +20,6 @@ class GeorgeDisplay {
 
     private val config get() = SkyHanniMod.feature.misc.pets.george
 
-    private val ROW_OFFSET: Int = 9 * 4
-    private val INDEX_OFFSET: Int = 6 - 1
-
     private val SEPARATOR: String = ";"
 
     private val patternGroup = RepoPattern.group("george.tamingcap")
@@ -50,7 +47,7 @@ class GeorgeDisplay {
     fun onInventoryOpen(event: InventoryOpenEvent) {
         if (!isEnabled()) return
         if (event.inventoryName != "Offer Pets") return
-        val stack = event.inventoryItems[ROW_OFFSET + INDEX_OFFSET] ?: return
+        val stack = event.inventoryItems[41] ?: return
         if (stack.cleanName() != "+1 Taming Level Cap") return
         display.clear()
         display.addAll(listBuilding(stack.getLore()))
