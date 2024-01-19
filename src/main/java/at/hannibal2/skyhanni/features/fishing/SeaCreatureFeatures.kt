@@ -2,7 +2,6 @@ package at.hannibal2.skyhanni.features.fishing
 
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
-import at.hannibal2.skyhanni.data.TitleManager
 import at.hannibal2.skyhanni.events.EntityMaxHealthUpdateEvent
 import at.hannibal2.skyhanni.events.LorenzWorldChangeEvent
 import at.hannibal2.skyhanni.events.RenderEntityOutlineEvent
@@ -59,7 +58,7 @@ class SeaCreatureFeatures {
 
             if (config.alertOtherCatches && lastRareCatch.passedSince() > 1.seconds) {
                 val creature = SeaCreatureManager.allFishingMobs[creatureType.nametag]
-                TitleManager.sendTitle("${creature?.rarity?.chatColorCode ?: "§6"}RARE SEA CREATURE!", 1.5.seconds, 3.6, 7.0)
+                LorenzUtils.sendTitle("${creature?.rarity?.chatColorCode ?: "§6"}RARE SEA CREATURE!", 1.5.seconds, 3.6, 7f)
                 if (config.playSound) SoundUtils.playBeepSound()
             }
         }
@@ -71,7 +70,7 @@ class SeaCreatureFeatures {
         if (!config.alertOwnCatches) return
 
         if (event.seaCreature.rare) {
-            TitleManager.sendTitle("${event.seaCreature.rarity.chatColorCode}RARE CATCH!", 3.seconds, 2.8, 7.0)
+            LorenzUtils.sendTitle("${event.seaCreature.rarity.chatColorCode}RARE CATCH!", 3.seconds, 2.8, 7f)
             if (config.playSound) SoundUtils.playBeepSound()
             lastRareCatch = SimpleTimeMark.now()
         }
