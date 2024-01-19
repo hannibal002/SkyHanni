@@ -57,11 +57,10 @@ class CommissionsCalculator {
     private val display: MutableList<Renderable> = mutableListOf<Renderable>()
     private val firstLine: String = "§lCommissions Calculator:"
     private val fatDisclaimer: List<Renderable> = listOf<Renderable>(
-        Renderable.string("§c§lDisclaimer: §r§cThis calculator does not include"),
-        Renderable.string("§cother sources of HOTM XP, including the 900 HOTM XP"),
-        Renderable.string("§cDaily Bonus, HOTM XP from completing the Crystal"),
-        Renderable.string("§cNucleus and Mining Events, or boosts from Bingo pets."),
-        Renderable.clickAndHover("§cTo update these calculations, open the §e/hotm §ctree.",
+        Renderable.string("§c§lDisclaimer: §r§cThis calculator only accounts for"),
+        Renderable.string("§cthe standard HOTM XP gain from claiming commissions"),
+        Renderable.string("§cbefore any modifiers/boosts or other sources."),
+        Renderable.clickAndHover("§eTo update these calculations, click here to open /hotm.",
             listOf("Click to run §e/hotm"), onClick = { LorenzUtils.sendCommandToServer("hotm") }
         ),
     )
