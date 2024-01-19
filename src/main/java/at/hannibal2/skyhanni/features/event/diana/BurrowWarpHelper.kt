@@ -2,11 +2,13 @@ package at.hannibal2.skyhanni.features.event.diana
 
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.data.TitleManager
+import at.hannibal2.skyhanni.events.DebugDataCollectEvent
 import at.hannibal2.skyhanni.events.LorenzChatEvent
 import at.hannibal2.skyhanni.events.LorenzKeyPressEvent
 import at.hannibal2.skyhanni.events.LorenzWorldChangeEvent
 import at.hannibal2.skyhanni.utils.LocationUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils
+import at.hannibal2.skyhanni.utils.LorenzUtils.round
 import at.hannibal2.skyhanni.utils.LorenzUtils.sorted
 import at.hannibal2.skyhanni.utils.LorenzVec
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
@@ -63,22 +65,49 @@ class BurrowWarpHelper {
         currentWarp = null
     }
 
+    @SubscribeEvent
+    fun onDebugDataCollect(event: DebugDataCollectEvent) {
+        event.title("Diana Burrow Nearest Warp")
+
+        if (!DianaAPI.isDoingDiana()) {
+            event.addIrrelevant("not doing diana")
+            return
+        }
+        if (!config.burrowNearestWarp) {
+            event.addIrrelevant("disabled in config")
+            return
+        }
+        val target = GriffinBurrowHelper.targetLocation
+        if (target == null) {
+            event.addIrrelevant("targetLocation is null")
+            return
+        }
+
+        val list = mutableListOf<String>()
+        shouldUseWarps(target, list)
+        event.addData(list)
+    }
+
     companion object {
         private val config get() = SkyHanniMod.feature.event.diana
         var currentWarp: WarpPoint? = null
 
-        fun shouldUseWarps(target: LorenzVec) {
+        fun shouldUseWarps(target: LorenzVec, debug: MutableList<String>? = null) {
+            debug?.add("target: ${target.printWithAccuracy(1)}")
             val playerLocation = LocationUtils.playerLocation()
+            debug?.add("playerLocation: ${playerLocation.printWithAccuracy(1)}")
             val warpPoint = getNearestWarpPoint(target)
+            debug?.add("warpPoint: ${warpPoint.displayName}")
 
             val playerDistance = playerLocation.distance(target)
+            debug?.add("playerDistance: ${playerDistance.round(1)}")
             val warpDistance = warpPoint.distance(target)
+            debug?.add("warpDistance: ${warpDistance.round(1)}")
             val difference = playerDistance - warpDistance
-            currentWarp = if (difference > 10) {
-                warpPoint
-            } else {
-                null
-            }
+            debug?.add("difference: ${difference.round(1)}")
+            val setWarpPoint = difference > 10
+            debug?.add("setWarpPoint: $setWarpPoint")
+            currentWarp = if (setWarpPoint) warpPoint else null
         }
 
         private fun getNearestWarpPoint(location: LorenzVec) =

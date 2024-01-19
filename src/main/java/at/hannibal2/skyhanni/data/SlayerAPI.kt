@@ -1,5 +1,6 @@
 package at.hannibal2.skyhanni.data
 
+import at.hannibal2.skyhanni.events.DebugDataCollectEvent
 import at.hannibal2.skyhanni.events.LorenzChatEvent
 import at.hannibal2.skyhanni.events.LorenzTickEvent
 import at.hannibal2.skyhanni.events.SlayerChangeEvent
@@ -62,11 +63,28 @@ object SlayerAPI {
         return result
     }
 
-    fun getNameWithEnchantmentFor(internalName: NEUInternalName): String {
+    private fun getNameWithEnchantmentFor(internalName: NEUInternalName): String {
         if (internalName.asString() == "WISP_POTION") {
             return "§fWisp's Ice-Flavored Water"
         }
         return internalName.getItemStack().nameWithEnchantment ?: error("Could not find name for $internalName")
+    }
+
+    @SubscribeEvent
+    fun onDebugDataCollect(event: DebugDataCollectEvent) {
+        event.title("Slayer")
+
+        if (!hasActiveSlayerQuest()) {
+            event.addIrrelevant("no active slayer quest")
+            return
+        }
+
+        event.addData {
+            add("activeSlayer: ${getActiveSlayer()}")
+            add("isInCorrectArea: $isInCorrectArea")
+            add("isInAnyArea: $isInAnyArea")
+            add("latestSlayerProgress: $latestSlayerProgress")
+        }
     }
 
     @SubscribeEvent
