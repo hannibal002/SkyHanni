@@ -84,7 +84,6 @@ class CommissionsCalculator {
 
     @SubscribeEvent
     fun onInventoryOpen(event: InventoryOpenEvent) {
-        if (!inMiningIsland()) return
         if (!isEnabled()) return
         val chestName = event.inventoryName
         if (chestName.isNotValidChestName()) return
@@ -190,14 +189,12 @@ class CommissionsCalculator {
 
     @SubscribeEvent
     fun onRenderOverlay(event: GuiRenderEvent.ChestGuiOverlayRenderEvent) {
-        if (!inMiningIsland()) return
         if (!isEnabled()) return
         if (InventoryUtils.openInventoryName().isNotValidChestName()) return
         config.position.renderRenderables(display, posLabel = "Commissions Calculator")
     }
 
-    private fun isEnabled() = config.enabled
-    private fun inMiningIsland(): Boolean = DWARVEN.isInIsland() || CRYSTAL.isInIsland()
+    private fun isEnabled() = config.enabled && (DWARVEN.isInIsland() || CRYSTAL.isInIsland())
     private fun String.isNotValidChestName(): Boolean = this != "Commission Milestones" && this != "Commissions" && this != "Heart of the Mountain"
     private fun String.groupToInt(): Int = this.formatNumber().toInt()
 }
