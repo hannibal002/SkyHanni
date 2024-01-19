@@ -462,6 +462,8 @@ public class Storage {
             // TODO renmae
             public MythologicalCreatureTracker.Data mythologicalMobTracker = new MythologicalCreatureTracker.Data();
 
+            @Expose
+            public List<LorenzVec> foundBurrowLocations = new ArrayList<>();
         }
     }
 }
