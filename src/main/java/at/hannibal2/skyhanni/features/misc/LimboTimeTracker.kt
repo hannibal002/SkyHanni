@@ -15,6 +15,7 @@ import at.hannibal2.skyhanni.utils.LocationUtils.isPlayerInside
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils.round
 import at.hannibal2.skyhanni.utils.NEUItems
+import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.RenderUtils.renderString
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.StringUtils.matches
@@ -114,8 +115,8 @@ class LimboTimeTracker {
         if (event.slotNumber != 43) return
         val limboItem by lazy {
             val neuItem = NEUItems.getItemStack("ENDER_PEARL")
-            if (wholeMinutes >= 60) Utils.createItemStack(neuItem.item, "§aLimbo", "§7Playtime: §a${config.limboPlaytime.seconds.inWholeMinutes} minutes", "§7Or: §b$hoursString hours")
-            else Utils.createItemStack(neuItem.item, "§aLimbo", "§7Playtime: §a${config.limboPlaytime.seconds.inWholeMinutes} minutes")
+            if (wholeMinutes >= 60) Utils.createItemStack(neuItem.item, "§aLimbo", "§7Playtime: §a${wholeMinutes.addSeparators()} minutes", "§7Or: §b$hoursString hours")
+            else Utils.createItemStack(neuItem.item, "§aLimbo", "§7Playtime: §a$wholeMinutes minutes")
         }
         event.replaceWith(limboItem)
     }
@@ -148,7 +149,7 @@ class LimboTimeTracker {
             hoursString = "$wholeHours"
         } else {
             val minutes:Float = ((wholeMinutes - wholeHours * 60).toFloat() / 60)
-            hoursString = "${wholeHours+minutes.round(1)}"
+            hoursString = wholeHours.addSeparators()+minutes.round(1).toString().replace("0", "")
         }
     }
 
