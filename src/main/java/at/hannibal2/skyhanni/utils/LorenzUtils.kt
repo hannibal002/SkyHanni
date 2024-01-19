@@ -5,6 +5,7 @@ import at.hannibal2.skyhanni.data.HypixelData
 import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.data.MayorAPI
 import at.hannibal2.skyhanni.data.TitleManager
+import at.hannibal2.skyhanni.events.LorenzTickEvent
 import at.hannibal2.skyhanni.features.dungeon.DungeonAPI
 import at.hannibal2.skyhanni.mixins.transformers.AccessorGuiEditSign
 import at.hannibal2.skyhanni.test.TestBingo
@@ -26,6 +27,7 @@ import net.minecraft.event.HoverEvent
 import net.minecraft.launchwrapper.Launch
 import net.minecraft.util.ChatComponentText
 import net.minecraftforge.fml.common.FMLCommonHandler
+import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import java.awt.Color
 import java.lang.reflect.Constructor
 import java.lang.reflect.Field
@@ -34,6 +36,8 @@ import java.text.DecimalFormat
 import java.text.NumberFormat
 import java.text.SimpleDateFormat
 import java.util.Collections
+import java.util.LinkedList
+import java.util.Queue
 import java.util.Timer
 import java.util.TimerTask
 import java.util.WeakHashMap
@@ -42,12 +46,20 @@ import kotlin.properties.ReadWriteProperty
 import kotlin.reflect.KMutableProperty1
 import kotlin.reflect.KProperty
 import kotlin.reflect.KProperty0
+import kotlin.reflect.KProperty1
+import kotlin.reflect.full.isSubtypeOf
+import kotlin.reflect.full.memberProperties
+import kotlin.reflect.full.starProjectedType
+import kotlin.reflect.jvm.isAccessible
 import kotlin.time.Duration
+import kotlin.time.Duration.Companion.milliseconds
 import kotlin.time.Duration.Companion.seconds
 
 object LorenzUtils {
 
-    val onHypixel get() = (HypixelData.hypixelLive || HypixelData.hypixelAlpha) && Minecraft.getMinecraft().thePlayer != null
+    val connectedToHypixel get() = HypixelData.hypixelLive || HypixelData.hypixelAlpha
+
+    val onHypixel get() = connectedToHypixel && Minecraft.getMinecraft().thePlayer != null
 
     val isOnAlphaServer get() = onHypixel && HypixelData.hypixelAlpha
 
@@ -364,18 +376,28 @@ object LorenzUtils {
         return this
     }
 
-    private var lastMessageSent = 0L
+    private var lastMessageSent = SimpleTimeMark.farPast()
+    private val sendQueue: Queue<String> = LinkedList()
+
+    @SubscribeEvent
+    fun sendQueuedChatMessages(event: LorenzTickEvent) {
+        val player = Minecraft.getMinecraft().thePlayer
+        if (player == null) {
+            sendQueue.clear()
+            return
+        }
+        if (lastMessageSent.passedSince() > 300.milliseconds) {
+            player.sendChatMessage(sendQueue.poll() ?: return)
+            lastMessageSent = SimpleTimeMark.now()
+        }
+    }
 
     fun sendCommandToServer(command: String) {
         sendMessageToServer("/$command")
     }
 
     fun sendMessageToServer(message: String) {
-        if (System.currentTimeMillis() > lastMessageSent + 1_000) {
-            lastMessageSent = System.currentTimeMillis()
-            val thePlayer = Minecraft.getMinecraft().thePlayer
-            thePlayer.sendChatMessage(message)
-        }
+        sendQueue.add(message)
     }
 
     // MoulConfig is in Java, I don't want to downgrade this logic
@@ -500,6 +522,14 @@ object LorenzUtils {
                 child.set(rootObj, value)
             }
         }
+
+    inline fun <reified T : Any> Any.getPropertiesWithType() =
+        this::class.memberProperties
+            .filter { it.returnType.isSubtypeOf(T::class.starProjectedType) }
+            .map {
+                it.isAccessible = true
+                (it as KProperty1<Any, T>).get(this)
+            }
 
     fun List<String>.nextAfter(after: String, skip: Int = 1) = nextAfter({ it == after }, skip)
 
@@ -650,8 +680,8 @@ object LorenzUtils {
     fun <T> T.conditionalTransform(condition: Boolean, ifTrue: T.() -> Any, ifFalse: T.() -> Any) =
         if (condition) ifTrue(this) else ifFalse(this)
 
-    fun sendTitle(text: String, duration: Duration, height: Double = 1.8) {
-        TitleManager.sendTitle(text, duration, height)
+    fun sendTitle(text: String, duration: Duration, height: Double = 1.8, fontSize: Float = 4f) {
+        TitleManager.sendTitle(text, duration, height, fontSize)
     }
 
     @Deprecated("Dont use this approach at all. check with regex or equals instead.", ReplaceWith("Regex or equals"))

@@ -229,4 +229,11 @@ public class MiscConfig {
 
     @Expose
     public int limboTimePB = 0;
+
+    @Expose
+    @ConfigOption(name = "Fix Ghost Entities", desc = "Removes ghost entities caused by a Hypixel bug. " +
+            "This included Diana, Dungeon and Crimson Isle mobs and nametags.")
+    @ConfigEditorBoolean
+    @FeatureToggle
+    public boolean fixGhostEntities = true;
 }
