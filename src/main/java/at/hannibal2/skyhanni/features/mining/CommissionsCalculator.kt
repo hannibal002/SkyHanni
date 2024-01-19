@@ -31,11 +31,11 @@ class CommissionsCalculator {
     private val patternGroup = RepoPattern.group("commissions.calculator")
     private val hotmXPPattern by patternGroup.pattern(
         "hotm.xp.loreline",
-        "(?:(?:§.)*-)? ?(?:§.)*(?<xp>[\\d,.]+) (?:§.)*[hH][oO][tT][mM] (?:§.)*[eE][xX][pP](?:(?:§.)* (?:§.)*\\((?:§.)*[dD][aA][iI][lL][yY] ?[bB][oO][nN][uU][sS](?:§.)*\\)(?:§.)*)?"
+        "(?i)(?:(?:§.)*-)? ?(?:§.)*(?<xp>[\\d,.]+) (?:§.)*HOTM (?:§.)*EXP(?:(?:§.)* (?:§.)*\\((?:§.)*DAILY ?BONUS(?:§.)*\\)(?:§.)*)?"
     )
     private val commissionItemPattern by patternGroup.pattern(
         "commission.itemname",
-        "(?:§.)*Commission #(?<commission>\\d+)(?: (?:§.)*[nN][eE][wW])?"
+        "(?i)(?:§.)*Commission #(?<commission>\\d+)(?: \\(?(?:§.)*\\(?(?:§.)*NEW(?:§.)*\\)?(?:§.)*)?"
     )
     private val tierItemPattern by patternGroup.pattern(
         "hotm.tier.itemname",
