@@ -43,7 +43,7 @@ public class PetConfig {
     ));
 
     @Expose
-    @ConfigOption(name = "Pet Item Scale", desc = "The scale at which the Pet Item will be displayed")
+    @ConfigOption(name = "Pet Item Scale", desc = "The scale at which the Pet Item will be displayed.")
     @ConfigEditorSlider(minValue = 0.7f, maxValue = 1.5f, minStep = 0.05f)
     public float petItemDisplayScale = 0.9f;
 
