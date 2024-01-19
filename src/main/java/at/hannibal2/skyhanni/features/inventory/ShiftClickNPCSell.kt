@@ -29,7 +29,7 @@ object ShiftClickNPCSell {
     @SubscribeEvent
     fun onOpen(event: InventoryFullyOpenedEvent) {
         if (!LorenzUtils.inSkyBlock) return
-        inInventory = lastLoreLineOfSellPattern.matches(event.inventoryItems[sellSlot]?.getLore()?.lastOrNull() ?: "")
+        inInventory = lastLoreLineOfSellPattern.matches(event.inventoryItems[sellSlot]?.getLore()?.lastOrNull())
     }
 
     @SubscribeEvent

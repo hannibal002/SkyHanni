@@ -5,6 +5,7 @@ import at.hannibal2.skyhanni.config.features.garden.visitor.VisitorConfig.Highli
 import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.data.SackAPI
 import at.hannibal2.skyhanni.data.SackStatus
+import at.hannibal2.skyhanni.events.DebugDataCollectEvent
 import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.LorenzChatEvent
 import at.hannibal2.skyhanni.events.LorenzTickEvent
@@ -600,6 +601,37 @@ class GardenVisitorFeatures {
         for (visitor in VisitorAPI.getVisitors()) {
             if (visitor.nameTagEntityId == entityId) {
                 entity.customNameTag = GardenVisitorColorNames.getColoredName(entity.name)
+            }
+        }
+    }
+
+    @SubscribeEvent
+    fun onDebugDataCollect(event: DebugDataCollectEvent) {
+        event.title("Garden Visitor Stats")
+
+        if (!GardenAPI.inGarden()) {
+            event.addIrrelevant("not in garden")
+            return
+        }
+
+        event.addData {
+            val visitors = VisitorAPI.getVisitors()
+
+            add("visitors: ${visitors.size}")
+
+            for (visitor in visitors) {
+                add(" ")
+                add("visitorName: '${visitor.visitorName}'")
+                add("status: '${visitor.status}'")
+                if (visitor.inSacks) {
+                    add("inSacks!")
+                }
+                if (visitor.shoppingList.isNotEmpty()) {
+                    add("shoppingList: '${visitor.shoppingList}'")
+                }
+                visitor.offer?.offerItem?.getInternalName()?.let {
+                    add("offer: '${it}'")
+                }
             }
         }
     }
