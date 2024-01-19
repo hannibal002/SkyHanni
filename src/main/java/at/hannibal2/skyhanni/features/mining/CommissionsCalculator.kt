@@ -85,7 +85,6 @@ class CommissionsCalculator {
 
     @SubscribeEvent
     fun onInventoryOpen(event: InventoryOpenEvent) {
-        if (!LorenzUtils.inSkyBlock) return
         if (!inMiningIsland()) return
         if (!isEnabled()) return
         val chestName = event.inventoryName
