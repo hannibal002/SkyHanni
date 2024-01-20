@@ -460,7 +460,7 @@ class GardenVisitorFeatures {
         }
 
         partialAcceptedPattern.matchMatcher(event.message) {
-            LorenzUtils.chat("Talk to the visitor again to update the number of items needed!")
+            if (config.shoppingList.display) LorenzUtils.chat("Talk to the visitor again to update the number of items needed!")
         }
     }
 
