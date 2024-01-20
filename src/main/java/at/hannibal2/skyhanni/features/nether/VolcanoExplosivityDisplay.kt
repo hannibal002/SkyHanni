@@ -28,7 +28,6 @@ class VolcanoExplosivityDisplay {
     @SubscribeEvent
     fun onTick(event: TabListUpdateEvent) {
         if (!isEnabled()) return
-        val tabList = event.tabList
         val text = event.tabList.nextAfter({ headerPattern.matches(it) }) ?: return
         statusPattern.matchMatcher(text) {
             display = "§bVolcano Explosivity§7: ${group("status")}"
