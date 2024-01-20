@@ -10,8 +10,10 @@ import at.hannibal2.skyhanni.events.LorenzWorldChangeEvent
 import at.hannibal2.skyhanni.events.PacketEvent
 import at.hannibal2.skyhanni.features.event.diana.DianaAPI.isDianaSpade
 import at.hannibal2.skyhanni.utils.BlockUtils.getBlockAt
+import at.hannibal2.skyhanni.utils.DelayedRun
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.LorenzVec
+import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.TimeLimitedSet
 import at.hannibal2.skyhanni.utils.toLorenzVec
 import net.minecraft.init.Blocks
@@ -19,6 +21,7 @@ import net.minecraft.network.play.server.S2APacketParticles
 import net.minecraftforge.fml.common.eventhandler.EventPriority
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import kotlin.time.Duration.Companion.minutes
+import kotlin.time.Duration.Companion.seconds
 
 class GriffinBurrowParticleFinder {
     private val config get() = SkyHanniMod.feature.event.diana
@@ -131,12 +134,16 @@ class GriffinBurrowParticleFinder {
         if (message.startsWith("§eYou dug out a Griffin Burrow!") ||
             message == "§eYou finished the Griffin burrow chain! §r§7(4/4)"
         ) {
+            BurrowAPI.lastBurrowRelatedChatMessage = SimpleTimeMark.now()
             val burrow = lastDugParticleBurrow
             if (burrow != null) {
                 if (!tryDig(burrow)) {
                     fakeBurrow = burrow
                 }
             }
+        }
+        if (message == "§cDefeat all the burrow defenders in order to dig it!") {
+            BurrowAPI.lastBurrowRelatedChatMessage = SimpleTimeMark.now()
         }
     }
 
@@ -167,9 +174,16 @@ class GriffinBurrowParticleFinder {
             return
         }
 
-
         if (burrows.containsKey(pos)) {
             lastDugParticleBurrow = pos
+
+            DelayedRun.runDelayed(1.seconds) {
+                if (BurrowAPI.lastBurrowRelatedChatMessage.passedSince() > 1.seconds) {
+                    burrows.remove(pos)
+                    LorenzUtils.error("Something unexected happened, deleted the burrow.")
+                }
+            }
+
         }
     }
 
