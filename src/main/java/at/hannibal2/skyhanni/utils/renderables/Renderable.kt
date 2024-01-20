@@ -290,8 +290,8 @@ interface Renderable {
 
             override fun render(posX: Int, posY: Int) {
                 GlStateManager.pushMatrix()
-                if (Minecraft.getMinecraft().currentScreen == null || Minecraft.getMinecraft().currentScreen is GuiChat)
-                    GlStateManager.translate(0F, 0F, -145F)
+                if (Minecraft.getMinecraft().currentScreen is GuiChat)
+                    GlStateManager.translate(0F, 0F, -3F)
                 any.renderOnScreen(0F, 0F, scaleMultiplier = scale) // TODO fix the misalignment from the renderable Bounding Box (positon, width, height) to the render
                 GlStateManager.popMatrix()
             }

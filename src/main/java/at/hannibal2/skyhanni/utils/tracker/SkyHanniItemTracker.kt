@@ -161,7 +161,7 @@ class SkyHanniItemTracker<Data : ItemTrackerData>(
         }
         add("")
         if (newDrop) {
-            add("§aYou caught this item recently.")
+            add("§aYou obtained this item recently.")
             add("")
         }
         add("§eClick to " + (if (hidden) "show" else "hide") + "!")
@@ -170,6 +170,20 @@ class SkyHanniItemTracker<Data : ItemTrackerData>(
             add("")
             add("§7${internalName}")
         }
+    }
+
+    fun addTotalProfit(profit: Double, totalAmount: Long, action: String): Renderable {
+        val profitFormat = profit.addSeparators()
+        val profitPrefix = if (profit < 0) "§c" else "§6"
+
+        val tips = if (totalAmount > 0) {
+            val profitPerCatch = profit / totalAmount
+            val profitPerCatchFormat = NumberUtil.format(profitPerCatch)
+            listOf("§7Profit per $action: $profitPrefix$profitPerCatchFormat")
+        } else emptyList()
+
+        val text = "§eTotal Profit: $profitPrefix$profitFormat coins"
+        return Renderable.hoverTips(text, tips)
     }
 
 }
