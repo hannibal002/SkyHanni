@@ -1,7 +1,8 @@
 package at.hannibal2.skyhanni.features.misc
 
 import at.hannibal2.skyhanni.SkyHanniMod
-import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName
+import at.hannibal2.skyhanni.utils.ItemCategory
+import at.hannibal2.skyhanni.utils.ItemUtils.getItemCategoryOrNull
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
@@ -14,9 +15,10 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
 class AbiphoneContactSlots {
     private val ALL_UPGRADES_TOTAL: Int = 40
-    private val abiphoneContactSlotsGroup = RepoPattern.group("abiphone.contact.slots")
-    private val isAbiphoneInternalNamePattern by abiphoneContactSlotsGroup.pattern(("isabiphone.internalname"), ("ABIPHONE_.*"))
-    private val maximumContactSlotsLoreLinePattern by abiphoneContactSlotsGroup.pattern(("maximumcontactslots.loreline"), (" ?§7Maximum Contacts: (?:§.)*(?<first>\\d+)(?: |§.)*(?:[(\\[]\\+?(?<second>\\d+)[)\\]])?(?: |§.)*(?:[(\\[]\\+?(?<third>\\d+)[)\\]])?(?: |§.)*(?:[(\\[]\\+?(?<fourth>\\d+)[)\\]])?(?: |§.)*(?:[(\\[]\\+?(?<fifth>\\d+)[)\\]])?")) // adapted from nea's https://regex101.com/r/aCVGHN/1 -ery
+    private val maximumContactSlotsLoreLinePattern by RepoPattern.pattern(
+        "abiphone.contact.slots/maximumcontactslots.loreline",
+        " ?§7Maximum Contacts: (?:§.)*(?<first>\\d+)(?: |§.)*(?:[(\\[]\\+?(?<second>\\d+)[)\\]])?(?: |§.)*(?:[(\\[]\\+?(?<third>\\d+)[)\\]])?(?: |§.)*(?:[(\\[]\\+?(?<fourth>\\d+)[)\\]])?(?: |§.)*(?:[(\\[]\\+?(?<fifth>\\d+)[)\\]])?"
+    )
 
     @SubscribeEvent
     fun onTooltip(event: ItemTooltipEvent) {
@@ -26,6 +28,7 @@ class AbiphoneContactSlots {
         if (itemStack.getItemCategoryOrNull() != ItemCategory.ABIPHONE) return
         val itemLore = itemStack.getLore()
         val trueIndex = itemLore.indexOfFirst { maximumContactSlotsLoreLinePattern.matches(it) }
+        if (trueIndex == -1 || trueIndex + 2 !in itemLore.indices) return
         maximumContactSlotsLoreLinePattern.matchMatcher(itemLore[trueIndex]) {
             val upgrades = listOf<String>(group("first") ?: "0", group("second") ?: "0", group("third") ?: "0", group("fourth") ?: "0", group("fifth") ?: "0")
             var total = 0
