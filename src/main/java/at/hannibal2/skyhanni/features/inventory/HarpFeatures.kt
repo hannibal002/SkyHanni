@@ -46,8 +46,8 @@ object HarpFeatures {
     }
 
     private val buttonColors = listOf('d', 'e', 'a', '2', '5', '9', 'b')
-    private val inventoryTitlePattern by RepoPattern.pattern("harp.inventory", "^Harp.*")
-    private val menuTitlePattern by RepoPattern.pattern("harp.menu", "^Melody.*")
+    private val inventoryTitlePattern by RepoPattern.pattern("harp.inventory", "Harp.*")
+    private val menuTitlePattern by RepoPattern.pattern("harp.menu", "Melody.*")
     private val songSelectedPattern by RepoPattern.pattern("harp.song.selected", "§aSong is selected!")
 
     private fun isHarpGui() = inventoryTitlePattern.matches(InventoryUtils.openInventoryName())
@@ -91,22 +91,22 @@ object HarpFeatures {
     private var openTime: SimpleTimeMark = SimpleTimeMark.farPast()
 
     @SubscribeEvent
-    fun onInventoryFullyOpenedEvent(event: InventoryFullyOpenedEvent) {
+    fun onInventoryOpen(event: InventoryFullyOpenedEvent) {
         if (!LorenzUtils.inSkyBlock) return
         if (!config.guiScale) return
         when {
             isMenuGui() -> {
-                setGUI()
+                setGUIScale()
                 openTime = SimpleTimeMark.now()
             }
 
             isHarpGui() -> {
-                setGUI()
+                setGUIScale()
             }
         }
     }
 
-    fun updateScale() {
+    private fun updateScale() {
         if (Minecraft.getMinecraft().currentScreen == null) {
             DelayedRun.runDelayed(100.milliseconds) {
                 updateScale()
@@ -125,19 +125,19 @@ object HarpFeatures {
     fun onInventoryCloseEvent(event: InventoryCloseEvent) {
         if (!LorenzUtils.inSkyBlock) return
         if (!config.guiScale) return
-        unSetGUI()
+        unSetGUIScale()
     }
 
     @SubscribeEvent
     fun onLeave(event: FMLNetworkEvent.ClientDisconnectionFromServerEvent) {
         if (!config.guiScale) return
-        unSetGUI()
+        unSetGUIScale()
     }
 
     private var guiSetting: Int = 0
     private var isGUIScaled = false
 
-    private fun setGUI() {
+    private fun setGUIScale() {
         val gameSettings = Minecraft.getMinecraft().gameSettings ?: return
         guiSetting = gameSettings.guiScale
         gameSettings.guiScale = 0
@@ -145,7 +145,7 @@ object HarpFeatures {
         updateScale()
     }
 
-    private fun unSetGUI() {
+    private fun unSetGUIScale() {
         if (!isGUIScaled) return
         Minecraft.getMinecraft().gameSettings.guiScale = guiSetting
         isGUIScaled = false
