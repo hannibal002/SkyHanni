@@ -251,7 +251,7 @@ object LorenzUtils {
 
     fun getSBMonthByName(month: String): Int {
         var monthNr = 0
-        for (i in 1..12) {
+        for (i in 1 .. 12) {
             val monthName = SkyBlockTime.monthName(i)
             if (month == monthName) {
                 monthNr = i
@@ -338,7 +338,7 @@ object LorenzUtils {
         hover: List<String>,
         command: String? = null,
         prefix: Boolean = true,
-        prefixColor: String = "§e"
+        prefixColor: String = "§e",
     ) {
         val msgPrefix = if (prefix) prefixColor + CHAT_PREFIX else ""
         val text = ChatComponentText(msgPrefix + message)
@@ -428,7 +428,7 @@ object LorenzUtils {
         prefix: String,
         getName: (T) -> String,
         isCurrent: (T) -> Boolean,
-        crossinline onChange: (T) -> Unit
+        crossinline onChange: (T) -> Unit,
     ) = buildList {
         add(prefix)
         for (entry in enumValues<T>()) {
@@ -637,6 +637,9 @@ object LorenzUtils {
     inline fun <reified T : Enum<T>> enumValueOf(name: String) =
         enumValueOfOrNull<T>(name)
             ?: kotlin.error("Unknown enum constant for ${enumValues<T>().first().name.javaClass.simpleName}: '$name'")
+
+    inline fun <reified T : Enum<T>> enumJoinToPattern(noinline transform: (T) -> CharSequence = { it.name }) =
+        enumValues<T>().joinToString("|", transform = transform)
 
     fun isInDevEnviromen() = Launch.blackboard["fml.deobfuscatedEnvironment"] as Boolean
 
