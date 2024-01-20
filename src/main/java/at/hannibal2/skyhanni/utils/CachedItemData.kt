@@ -21,6 +21,12 @@ data class CachedItemData(
 
     // null = not loaded
     var itemRarity: LorenzRarity? = null,
-    /** -1 = not loaded */ var auctionNumber: Int? = -1,
-    /** -1 = not loaded */ var editionNumber: Int? = -1,
+
+    var itemCategory: ItemCategory? = null,
+
+    // -1 = not loaded
+    var auctionNumber: Int? = -1,
+
+    // -1 = not loaded
+    var editionNumber: Int? = -1,
 )
