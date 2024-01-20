@@ -554,7 +554,7 @@ open class VisualWordGui : GuiScreen() {
 
     private fun saveChanges() {
         ModifyVisualWords.modifiedWords = modifiedWords
-        ModifyVisualWords.textCache.invalidateAll()
+        ModifyVisualWords.textCache.clear()
         SkyHanniMod.feature.storage.modifiedWords = modifiedWords
     }
 
