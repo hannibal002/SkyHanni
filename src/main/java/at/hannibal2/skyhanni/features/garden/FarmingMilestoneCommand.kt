@@ -27,14 +27,16 @@ object FarmingMilestoneCommand {
         if (currentMilestone == null) {
             val currentProgress = enteredCrop.getCounter()
             val currentCropMilestone = GardenCropMilestones.getTierForCropCount(currentProgress, enteredCrop) + 1
-            val output = (GardenCropMilestones.getCropsForTier(currentCropMilestone, enteredCrop) - currentProgress).formatOutput(needsTime, enteredCrop)
+            val cropsForTier = GardenCropMilestones.getCropsForTier(currentCropMilestone, enteredCrop)
+            val output = (cropsForTier - currentProgress).formatOutput(needsTime, enteredCrop)
 
             LorenzUtils.chat("§7$output needed to reach the next milestone")
             return
         }
 
         if (targetMilestone == null) {
-            val output = GardenCropMilestones.getCropsForTier(currentMilestone, enteredCrop).formatOutput(needsTime, enteredCrop)
+            val cropsForTier = GardenCropMilestones.getCropsForTier(currentMilestone, enteredCrop)
+            val output = cropsForTier.formatOutput(needsTime, enteredCrop)
 
             LorenzUtils.chat("§7$output needed for milestone §7$currentMilestone")
             return
@@ -57,8 +59,7 @@ object FarmingMilestoneCommand {
                 strings,
                 CropType.entries.map { it.simpleName }
             )
-        }
-        else listOf()
+        } else listOf()
     }
 
     private fun getValidNumber(entry: String?) = entry?.toIntOrNull()?.coerceIn(0, 46)
