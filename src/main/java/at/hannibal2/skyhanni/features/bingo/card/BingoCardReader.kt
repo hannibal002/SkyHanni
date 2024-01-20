@@ -63,9 +63,10 @@ class BingoCardReader {
 
             val done = lore.any { it.contains("GOAL REACHED") }
             val communtyGoalPercentage = readCommuntyGoalPercentage(lore)
-
             val hiddenGoalData = getHiddenGoalData(name, description, goalType)
             val visualDescription = hiddenGoalData.tipNote
+
+            val guide = BingoAPI.getData(name)?.guide?.map { "§7$it" } ?: listOf("§cNo guide yet!")
 
             val bingoGoal = BingoAPI.bingoGoals.getOrPut(slot) { BingoGoal() }
 
@@ -73,6 +74,7 @@ class BingoCardReader {
                 this.type = goalType
                 this.displayName = name
                 this.description = visualDescription
+                this.guide = guide
                 this.done = done
                 this.hiddenGoalData = hiddenGoalData
             }
@@ -130,7 +132,7 @@ class BingoCardReader {
             }
         }
 
-        val description = BingoAPI.getTip(name)?.getDescriptionLine()
+        val description = BingoAPI.getData(name)?.getDescriptionLine()
         val tipNote = description?.let {
             unknownTip = false
             it
@@ -153,5 +155,5 @@ class BingoCardReader {
         BingoCardUpdateEvent().postAndCatch()
     }
 
-    private fun BingoJson.BingoTip.getDescriptionLine() = "§7" + note.joinToString(" ")
+    private fun BingoJson.BingoData.getDescriptionLine() = "§7" + note.joinToString(" ")
 }
