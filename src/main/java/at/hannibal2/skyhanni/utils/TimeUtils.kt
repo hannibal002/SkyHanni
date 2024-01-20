@@ -2,6 +2,7 @@ package at.hannibal2.skyhanni.utils
 
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
+import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import io.github.moulberry.notenoughupdates.util.SkyBlockTime
 import java.time.LocalDate
 import java.time.ZoneId
@@ -14,6 +15,11 @@ import kotlin.time.toDuration
 object TimeUtils {
     private val pattern =
         "(?:(?<y>\\d+) ?y(?:\\w* ?)?)?(?:(?<d>\\d+) ?d(?:\\w* ?)?)?(?:(?<h>\\d+) ?h(?:\\w* ?)?)?(?:(?<m>\\d+) ?m(?:\\w* ?)?)?(?:(?<s>\\d+) ?s(?:\\w* ?)?)?".toPattern()
+
+    private val seasonPattern by RepoPattern.pattern(
+        "timeutils.season.skyblocktime",
+        "(?:Early |Late )?(?<season>Spring|Summer|Autumn|Winter)"
+    )
 
     fun Duration.format(
         biggestUnit: TimeUnit = TimeUnit.YEAR,
@@ -142,6 +148,13 @@ object TimeUtils {
     }
 
     fun getCurrentLocalDate(): LocalDate = LocalDate.now(ZoneId.of("UTC"))
+
+    fun getSeasonByName(input: String): String {
+        seasonPattern.matchMatcher(input) {
+            return group("season")
+        }
+        return ""
+    }
 }
 
 private const val FACTOR_SECONDS = 1000L
