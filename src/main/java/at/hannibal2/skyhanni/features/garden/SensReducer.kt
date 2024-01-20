@@ -1,11 +1,13 @@
 package at.hannibal2.skyhanni.features.garden
 
 import at.hannibal2.skyhanni.SkyHanniMod
+import at.hannibal2.skyhanni.events.ConfigLoadEvent
 import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.LorenzTickEvent
 import at.hannibal2.skyhanni.events.LorenzWorldChangeEvent
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.RenderUtils.renderString
+import kotlinx.coroutines.processNextEventInCurrentThread
 import net.minecraft.client.Minecraft
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
@@ -77,7 +79,6 @@ object SensReducer {
         val newSens =
             ((storage.savedMouseloweredSensitivity + (1F / 3F)) / config.divisorSens) - (1F / 3F)
         gameSettings?.mouseSensitivity = newSens
-        LorenzUtils.chat("Lowering sens!! on ${LorenzUtils.skyBlockIsland}")
         if (showMessage) LorenzUtils.chat("§bMouse sensitivity is now lowered. Type /shmouselower to restore your sensitivity.")
     }
 
