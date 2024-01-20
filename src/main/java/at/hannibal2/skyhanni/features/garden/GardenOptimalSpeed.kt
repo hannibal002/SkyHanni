@@ -3,6 +3,7 @@ package at.hannibal2.skyhanni.features.garden
 import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.events.GardenToolChangeEvent
 import at.hannibal2.skyhanni.events.GuiRenderEvent
+import at.hannibal2.skyhanni.events.LorenzTickEvent
 import at.hannibal2.skyhanni.events.TabListUpdateEvent
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils.isRancherSign
@@ -15,17 +16,35 @@ import net.minecraft.client.gui.inventory.GuiEditSign
 import net.minecraftforge.client.event.GuiOpenEvent
 import net.minecraftforge.client.event.GuiScreenEvent.DrawScreenEvent
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
+import kotlin.time.Duration.Companion.milliseconds
 import kotlin.time.Duration.Companion.seconds
 
 class GardenOptimalSpeed {
     private val config get() = GardenAPI.config.optimalSpeeds
     private val configCustomSpeed get() = config.customSpeed
-    private var currentSpeed = 100
+    private var sneakingTime = 0.seconds
+    private val sneaking get() = Minecraft.getMinecraft().thePlayer.isSneaking
+    private val sneakingPersistent get() = sneakingTime > 5.seconds
+    private var _currentSpeed = 100
+    private var currentSpeed: Int
+        get() = (_currentSpeed * (if (sneaking) 0.3 else 1.0)).toInt()
+        set(value) {
+            _currentSpeed = value
+        }
     private var optimalSpeed = -1
     private val currentSpeedPattern = " Speed: §r§f✦(?<speed>.*)".toPattern()
     private var lastWarnTime = 0L
     private var cropInHand: CropType? = null
     private var rancherOverlayList: List<List<Any?>> = emptyList()
+
+    @SubscribeEvent
+    fun onTick(event: LorenzTickEvent) {
+        if (sneaking) {
+            sneakingTime += 50.milliseconds
+        } else {
+            sneakingTime = 0.seconds
+        }
+    }
 
     @SubscribeEvent
     fun onTabListUpdate(event: TabListUpdateEvent) {
@@ -84,9 +103,14 @@ class GardenOptimalSpeed {
 
         if (GardenAPI.hideExtraGuis()) return
 
-        val text = "Optimal Speed: §f$optimalSpeed"
+        var text = "Optimal Speed: §f$optimalSpeed"
         if (optimalSpeed != currentSpeed) {
+            text += " (§eCurrent: §f$currentSpeed"
+            if (sneaking) text += " §7[Sneaking]"
+            text += "§f)"
+
             if (config.showOnHUD) config.pos.renderString("§c$text", posLabel = "Garden Optimal Speed")
+            if (sneaking && !sneakingPersistent) return
             warn()
         } else {
             if (config.showOnHUD) config.pos.renderString("§a$text", posLabel = "Garden Optimal Speed")
@@ -102,7 +126,11 @@ class GardenOptimalSpeed {
         lastWarnTime = System.currentTimeMillis()
         LorenzUtils.sendTitle("§cWrong speed!", 3.seconds)
         cropInHand?.let {
-            LorenzUtils.chat("Wrong speed for ${it.cropName}: §f$currentSpeed §e(§f$optimalSpeed §eis optimal)")
+            var text = "Wrong speed for ${it.cropName}: §f$currentSpeed"
+            if (sneaking) text += " §7[Sneaking]"
+            text += " §e(§f$optimalSpeed §eis optimal)"
+
+            LorenzUtils.chat(text)
         }
     }
 
