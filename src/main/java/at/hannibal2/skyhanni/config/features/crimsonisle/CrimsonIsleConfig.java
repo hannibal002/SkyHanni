@@ -35,8 +35,8 @@ public class CrimsonIsleConfig {
 
     @Expose
     @ConfigOption(name = "Dojo Rank Display", desc = "Display your rank, score, actual belt\n" +
-            "and points needed for the next belt in the Challenges inventory\n" +
-            "on the Crimson Isles.")
+        "and points needed for the next belt in the Challenges inventory\n" +
+        "on the Crimson Isles.")
     @ConfigEditorBoolean
     @FeatureToggle
     public boolean showDojoRankDisplay = false;
