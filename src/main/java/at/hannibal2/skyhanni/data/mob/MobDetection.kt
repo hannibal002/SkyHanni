@@ -13,7 +13,7 @@ import at.hannibal2.skyhanni.utils.EntityUtils
 import at.hannibal2.skyhanni.utils.LocationUtils
 import at.hannibal2.skyhanni.utils.LorenzDebug
 import at.hannibal2.skyhanni.utils.LorenzUtils
-import at.hannibal2.skyhanni.utils.LorenzUtils.forEachPolling
+import at.hannibal2.skyhanni.utils.LorenzUtils.drainForEach
 import at.hannibal2.skyhanni.utils.getLorenzVec
 import net.minecraft.entity.EntityLivingBase
 import net.minecraft.entity.item.EntityArmorStand
@@ -150,19 +150,19 @@ class MobDetection {
     private val creeperFromPacket = ConcurrentLinkedQueue<Int>()
 
     private fun handleMobsFromPacket() {
-        batFromPacket.forEachPolling { id ->
-            val entity = EntityUtils.getEntityByID(id) as? EntityBat ?: return@forEachPolling
-            if (MobData.entityToMob[entity] != null) return@forEachPolling
+        batFromPacket.drainForEach { id ->
+            val entity = EntityUtils.getEntityByID(id) as? EntityBat ?: return@drainForEach
+            if (MobData.entityToMob[entity] != null) return@drainForEach
             MobData.retries.remove(MobData.RetryEntityInstancing(entity))
             MobEvent.Spawn.Projectile(MobFactories.projectile(entity, "Spirit Scepter Bat")).postAndCatch() // Needs different handling because 6 is default health of Bat
         }
-        villagerFromPacket.forEachPolling { id ->
-            val entity = EntityUtils.getEntityByID(id) as? EntityVillager ?: return@forEachPolling
+        villagerFromPacket.drainForEach { id ->
+            val entity = EntityUtils.getEntityByID(id) as? EntityVillager ?: return@drainForEach
             val mob = MobData.entityToMob[entity]
             if (mob != null && mob.mobType == Mob.Type.DisplayNPC) {
                 MobEvent.DeSpawn.DisplayNPC(mob)
                 retry(entity)
-                return@forEachPolling
+                return@drainForEach
             }
             val retryInstance = MobData.RetryEntityInstancing(entity)
             MobData.retries.find { it == retryInstance }?.let {
@@ -172,10 +172,10 @@ class MobDetection {
                 }
             }
         }
-        creeperFromPacket.forEachPolling { id ->
-            val entity = EntityUtils.getEntityByID(id) as? EntityCreeper ?: return@forEachPolling
-            if (MobData.entityToMob[entity] != null) return@forEachPolling
-            if (!entity.powered) return@forEachPolling
+        creeperFromPacket.drainForEach { id ->
+            val entity = EntityUtils.getEntityByID(id) as? EntityCreeper ?: return@drainForEach
+            if (MobData.entityToMob[entity] != null) return@drainForEach
+            if (!entity.powered) return@drainForEach
             MobData.retries.remove(MobData.RetryEntityInstancing(entity))
             MobEvent.Spawn.Special(MobFactories.special(entity, "Creeper Veil")).postAndCatch() // Needs different handling because 6 is default health of Bat
         }

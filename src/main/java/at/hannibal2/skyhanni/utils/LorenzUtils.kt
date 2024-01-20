@@ -44,7 +44,6 @@ import java.util.TimerTask
 import java.util.WeakHashMap
 import java.util.concurrent.ConcurrentLinkedQueue
 import java.util.regex.Matcher
-import java.util.concurrent.ConcurrentLinkedQueue
 import kotlin.properties.ReadWriteProperty
 import kotlin.reflect.KMutableProperty1
 import kotlin.reflect.KProperty
@@ -718,16 +717,15 @@ object LorenzUtils {
             list.add(this.poll() ?: break)
     }
 
-    // Let garbage collector handle the removal of entries in this list
-    fun <T> weakReferenceList(): MutableSet<T> = Collections.newSetFromMap(WeakHashMap<T, Boolean>())
-
-    fun <T> MutableCollection<T>.filterToMutable(predicate: (T) -> Boolean) = filterTo(mutableListOf(), predicate)
-
-
-    inline fun <reified T> ConcurrentLinkedQueue<T>.forEachPolling(action: (T) -> Unit) {
+    inline fun <reified T> ConcurrentLinkedQueue<T>.drainForEach(action: (T) -> Unit) {
         while (true) {
             val value = this.poll() ?: break
             action(value)
         }
     }
+
+    // Let garbage collector handle the removal of entries in this list
+    fun <T> weakReferenceList(): MutableSet<T> = Collections.newSetFromMap(WeakHashMap<T, Boolean>())
+
+    fun <T> MutableCollection<T>.filterToMutable(predicate: (T) -> Boolean) = filterTo(mutableListOf(), predicate)
 }
