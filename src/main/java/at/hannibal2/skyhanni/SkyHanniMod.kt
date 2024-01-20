@@ -69,6 +69,7 @@ import at.hannibal2.skyhanni.features.chat.ChatFilter
 import at.hannibal2.skyhanni.features.chat.CompactBestiaryChatMessage
 import at.hannibal2.skyhanni.features.chat.CompactSplashPotionMessage
 import at.hannibal2.skyhanni.features.chat.PlayerDeathMessages
+import at.hannibal2.skyhanni.features.chat.SkyblockXPInChat
 import at.hannibal2.skyhanni.features.chat.Translator
 import at.hannibal2.skyhanni.features.chat.WatchdogHider
 import at.hannibal2.skyhanni.features.chat.playerchat.PlayerChatFilter
@@ -211,6 +212,7 @@ import at.hannibal2.skyhanni.features.inventory.PowerStoneGuideFeatures
 import at.hannibal2.skyhanni.features.inventory.QuickCraftFeatures
 import at.hannibal2.skyhanni.features.inventory.RngMeterInventory
 import at.hannibal2.skyhanni.features.inventory.SackDisplay
+import at.hannibal2.skyhanni.features.inventory.ShiftClickBrewing
 import at.hannibal2.skyhanni.features.inventory.ShiftClickEquipment
 import at.hannibal2.skyhanni.features.inventory.ShiftClickNPCSell
 import at.hannibal2.skyhanni.features.inventory.SkyBlockLevelGuideHelper
@@ -353,6 +355,7 @@ import at.hannibal2.skyhanni.utils.MinecraftConsoleFilter.Companion.initLogging
 import at.hannibal2.skyhanni.utils.NEUVersionCheck.checkIfNeuIsLoaded
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils
 import at.hannibal2.skyhanni.utils.TabListData
+import at.hannibal2.skyhanni.utils.UtilsPatterns
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPatternManager
 import kotlinx.coroutines.CoroutineName
 import kotlinx.coroutines.CoroutineScope
@@ -436,6 +439,7 @@ class SkyHanniMod {
         loadModule(TrackerManager)
         loadModule(SkyBlockItemModifierUtils)
         loadModule(ScoreboardPattern)
+        loadModule(UtilsPatterns)
 
         // APIs
         loadModule(BazaarApi())
@@ -484,6 +488,7 @@ class SkyHanniMod {
         loadModule(TrophyFishFillet())
         loadModule(TrophyFishMessages())
         loadModule(BazaarBestSellMethod())
+        loadModule(ShiftClickBrewing())
         loadModule(BazaarOpenPriceWebsite())
         loadModule(AuctionHouseCopyUnderbidPrice())
         loadModule(AnvilCombineHelper())
@@ -506,6 +511,7 @@ class SkyHanniMod {
         loadModule(ViewRecipeCommand)
         loadModule(PartyCommands)
         loadModule(SummoningMobManager())
+        loadModule(SkyblockXPInChat())
         loadModule(AreaMiniBossFeatures())
         loadModule(MobHighlight())
         loadModule(SpawnTimers())

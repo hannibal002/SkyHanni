@@ -30,6 +30,12 @@ public class ShoppingListConfig {
     public boolean inBazaarAlley = true;
 
     @Expose
+    @ConfigOption(name = "Farming Areas", desc = "Show the Visitor Shopping List while on the Farming Islands or inside the Farm in the Hub. " +
+        "This helps farming the correct amount, especially when in the early game.")
+    @ConfigEditorBoolean
+    public boolean inFarmingAreas = false;
+
+    @Expose
     @ConfigOption(name = "Show Price", desc = "Show the coin price in the shopping list.")
     @ConfigEditorBoolean
     public boolean showPrice = true;
