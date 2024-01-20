@@ -20,6 +20,8 @@ import at.hannibal2.skyhanni.utils.LorenzUtils.sumAllValues
 import at.hannibal2.skyhanni.utils.NEUInternalName
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.StringUtils.allLettersFirstUppercase
+import at.hannibal2.skyhanni.utils.StringUtils.matches
+import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import at.hannibal2.skyhanni.utils.tracker.SkyHanniTracker
 import at.hannibal2.skyhanni.utils.tracker.TrackerData
 import com.google.gson.annotations.Expose
@@ -32,7 +34,7 @@ object SeaCreatureTracker {
 
     private val tracker = SkyHanniTracker("Sea Creature Tracker", { Data() }, { it.fishing.seaCreatureTracker })
     { drawDisplay(it) }
-    private var trophyArmorNames = setOf<NEUInternalName>()
+    private val trophyArmorNames by RepoPattern.pattern("fishing.trophyfishing.armor", "(BRONZE|SILVER|GOLD|DIAMOND)_HUNTER_(HELMET|CHESTPLATE|LEGGINGS|BOOTS)")
 
     class Data : TrackerData() {
         override fun reset() {
@@ -157,12 +159,6 @@ object SeaCreatureTracker {
         tracker.renderDisplay(config.position)
     }
 
-    @SubscribeEvent
-    fun onRepoReload(event: RepositoryReloadEvent) {
-        val data = event.getConstant<ItemsJson>("Items")
-        trophyArmorNames = data.trophy_fishing_armors.toSet()
-    }
-
     fun resetCommand(args: Array<String>) {
         tracker.resetCommand(args, "shresetseacreaturetracker")
     }
@@ -171,6 +167,9 @@ object SeaCreatureTracker {
         FishingAPI.lastActiveFishingTime.passedSince() < 10.minutes && config.enabled && !isTrophyFishing()
 
     private fun isTrophyFishing(): Boolean {
-        return trophyArmorNames.containsAll(InventoryUtils.getArmor().map { it?.getInternalName() })
+        val armorInternalNames = InventoryUtils.getArmor().map { it?.getInternalName()?.asString() ?: return false }
+        return armorInternalNames.all { itemID ->
+            trophyArmorNames.matches(itemID)
+        }
     }
 }
