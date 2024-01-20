@@ -5,5 +5,8 @@
   "compatibilityLevel": "JAVA_8",
   "injectors": {
     "maxShiftBy": 2
-  }
+  },
+  "mixins": [
+    "AccessorWorldBoarderPacket"
+  ]
 }
