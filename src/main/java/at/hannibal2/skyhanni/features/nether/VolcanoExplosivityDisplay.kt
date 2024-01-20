@@ -5,6 +5,7 @@ import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.TabListUpdateEvent
 import at.hannibal2.skyhanni.utils.LorenzUtils.isInIsland
+import at.hannibal2.skyhanni.utils.LorenzUtils.nextAfter
 import at.hannibal2.skyhanni.utils.RenderUtils.renderString
 import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.StringUtils.matches
@@ -28,9 +29,8 @@ class VolcanoExplosivityDisplay {
     fun onTick(event: TabListUpdateEvent) {
         if (!isEnabled()) return
         val tabList = event.tabList
-        val headerIndex = tabList.indexOfFirst { headerPattern.matches(it) }
-        if (headerIndex < 0 || headerIndex + 1 !in tabList.indices) return
-        statusPattern.matchMatcher(tabList[headerIndex + 1]) {
+        val text = event.tabList.nextAfter({ headerPattern.matches(it) }) ?: return
+        statusPattern.matchMatcher(text) {
             display = "§bVolcano Explosivity§7: ${group("status")}"
         }
     }
