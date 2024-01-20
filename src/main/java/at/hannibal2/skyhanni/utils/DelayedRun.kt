@@ -12,6 +12,7 @@ object DelayedRun {
         futureTasks.add(Pair(run, SimpleTimeMark.now() + duration))
     }
 
+    /** Runs in the next full Tick so the delay is between 50ms to 100ms**/
     fun runNextTick(run: () -> Unit) {
         futureTasks.add(Pair(run, SimpleTimeMark.farPast()))
     }
