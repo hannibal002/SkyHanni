@@ -10,16 +10,18 @@ import at.hannibal2.skyhanni.events.PacketEvent
 import at.hannibal2.skyhanni.features.event.diana.DianaAPI.isDianaSpade
 import at.hannibal2.skyhanni.utils.BlockUtils.getBlockAt
 import at.hannibal2.skyhanni.utils.LorenzVec
+import at.hannibal2.skyhanni.utils.TimeLimitedSet
 import at.hannibal2.skyhanni.utils.toLorenzVec
 import net.minecraft.init.Blocks
 import net.minecraft.network.play.server.S2APacketParticles
 import net.minecraftforge.fml.common.eventhandler.EventPriority
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
+import kotlin.time.Duration.Companion.minutes
 
 class GriffinBurrowParticleFinder {
     private val config get() = SkyHanniMod.feature.event.diana
 
-    private val recentlyDugParticleBurrows = mutableListOf<LorenzVec>()
+    private val recentlyDugParticleBurrows = TimeLimitedSet<LorenzVec>(1.minutes)
     private val burrows = mutableMapOf<LorenzVec, Burrow>()
     private var lastDugParticleBurrow: LorenzVec? = null
 
