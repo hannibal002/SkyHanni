@@ -11,4 +11,6 @@ class TimeLimitedSet<T>(expireAfterWrite: Duration) {
     fun contains(element: T): Boolean = cache.containsKey(element)
 
     fun clear() = cache.clear()
+
+    fun toSet(): Set<T> = cache.keys().toSet()
 }

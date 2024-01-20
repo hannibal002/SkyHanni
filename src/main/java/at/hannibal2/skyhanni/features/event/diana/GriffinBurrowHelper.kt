@@ -7,6 +7,7 @@ import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.events.BurrowDetectEvent
 import at.hannibal2.skyhanni.events.BurrowDugEvent
 import at.hannibal2.skyhanni.events.BurrowGuessEvent
+import at.hannibal2.skyhanni.events.DebugDataCollectEvent
 import at.hannibal2.skyhanni.events.EntityMoveEvent
 import at.hannibal2.skyhanni.events.LorenzChatEvent
 import at.hannibal2.skyhanni.events.LorenzRenderWorldEvent
@@ -42,6 +43,25 @@ object GriffinBurrowHelper {
 
     private var lastGuessTime = 0L
     var lastTitleSentTime = SimpleTimeMark.farPast()
+
+    @SubscribeEvent
+    fun onDebugDataCollect(event: DebugDataCollectEvent) {
+        event.title("Griffin Burrow Helper")
+
+        if (!DianaAPI.isDoingDiana()) {
+            event.addIrrelevant("not doing diana")
+            return
+        }
+
+        event.addData {
+            add("targetLocation: ${targetLocation?.printWithAccuracy(1)}")
+            add("guessLocation: ${guessLocation?.printWithAccuracy(1)}")
+            add("particleBurrows: ${particleBurrows.size}")
+            for ((location, type) in particleBurrows) {
+                add(location.printWithAccuracy(1) + " " + type)
+            }
+        }
+    }
 
     @SubscribeEvent
     fun onTick(event: LorenzTickEvent) {
@@ -240,7 +260,6 @@ object GriffinBurrowHelper {
     private fun showWarpSuggestions() {
         if (!config.burrowNearestWarp) return
         val warp = BurrowWarpHelper.currentWarp ?: return
-
 
         val text = "§bWarp to " + warp.displayName
         val keybindSuffix = if (config.keyBindWarp != Keyboard.KEY_NONE) {
