@@ -7,20 +7,19 @@ import at.hannibal2.skyhanni.config.ConfigManager
 import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.config.core.config.Position
 import at.hannibal2.skyhanni.data.HypixelData
-import at.hannibal2.skyhanni.data.SlayerAPI
 import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.LorenzChatEvent
 import at.hannibal2.skyhanni.events.LorenzRenderWorldEvent
 import at.hannibal2.skyhanni.events.LorenzToolTipEvent
 import at.hannibal2.skyhanni.events.PlaySoundEvent
 import at.hannibal2.skyhanni.events.ReceiveParticleEvent
-import at.hannibal2.skyhanni.features.dungeon.DungeonAPI
 import at.hannibal2.skyhanni.features.garden.GardenNextJacobContest
 import at.hannibal2.skyhanni.features.garden.visitor.GardenVisitorColorNames
 import at.hannibal2.skyhanni.test.GriffinUtils.drawWaypointFilled
 import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalNameOrNull
+import at.hannibal2.skyhanni.utils.ItemUtils.getItemCategoryOrNull
 import at.hannibal2.skyhanni.utils.ItemUtils.getItemRarityOrNull
 import at.hannibal2.skyhanni.utils.ItemUtils.name
 import at.hannibal2.skyhanni.utils.KeyboardManager.isKeyHeld
@@ -343,70 +342,6 @@ class SkyHanniDebugsAndTests {
             OSUtils.copyToClipboard(name)
         }
 
-        fun debugData(args: Array<String>) {
-            if (args.size == 2 && args[0] == "profileName") {
-                HypixelData.profileName = args[1].lowercase()
-                LorenzUtils.chat("§eManually set profileName to '${HypixelData.profileName}'")
-                return
-            }
-            val builder = StringBuilder()
-            builder.append("```\n")
-            builder.append("= Debug Information = \n")
-            builder.append("\n")
-            builder.append("SkyHanni ${SkyHanniMod.version}\n")
-            builder.append("\n")
-            builder.append("player name: '${LorenzUtils.getPlayerName()}'\n")
-            builder.append("player uuid: '${LorenzUtils.getPlayerUuid()}'\n")
-            builder.append("repoAutoUpdate: ${config.repoAutoUpdate}\n")
-            if (!config.repoAutoUpdate) {
-                builder.append("REPO DOES NOT AUTO UPDATE\n")
-            }
-            builder.append("globalRender: ${globalRender}\n")
-            if (!globalRender) {
-                builder.append("GLOBAL RENDERER IS DISABLED\n")
-            }
-            builder.append("\n")
-
-            builder.append("onHypixel: ${LorenzUtils.onHypixel}\n")
-            val inSkyBlock = LorenzUtils.inSkyBlock
-            builder.append("inSkyBlock: $inSkyBlock\n")
-
-            if (inSkyBlock) {
-                builder.append("\n")
-                builder.append("skyBlockIsland: ${LorenzUtils.skyBlockIsland}\n")
-                builder.append("skyBlockArea: '${LorenzUtils.skyBlockArea}'\n")
-                builder.append("profileName: '${HypixelData.profileName}'\n")
-                builder.append("\n")
-                builder.append("ironman: ${HypixelData.ironman}\n")
-                builder.append("stranded: ${HypixelData.stranded}\n")
-                builder.append("bingo: ${HypixelData.bingo}\n")
-
-                if (LorenzUtils.inDungeons) {
-                    builder.append("\n")
-                    builder.append("In dungeon!\n")
-                    builder.append(" dungeonFloor: ${DungeonAPI.dungeonFloor}\n")
-                    builder.append(" started: ${DungeonAPI.started}\n")
-                    builder.append(" getRoomID: ${DungeonAPI.getRoomID()}\n")
-                    builder.append(" inBossRoom: ${DungeonAPI.inBossRoom}\n")
-                    builder.append(" ")
-                    builder.append(" playerClass: ${DungeonAPI.playerClass}\n")
-                    builder.append(" isUniqueClass: ${DungeonAPI.isUniqueClass}\n")
-                    builder.append(" playerClassLevel: ${DungeonAPI.playerClassLevel}\n")
-                }
-                if (SlayerAPI.hasActiveSlayerQuest()) {
-                    builder.append("\n")
-                    builder.append("Doing slayer!\n")
-                    builder.append(" activeSlayer: ${SlayerAPI.getActiveSlayer()}\n")
-                    builder.append(" isInCorrectArea: ${SlayerAPI.isInCorrectArea}\n")
-                    builder.append(" isInAnyArea: ${SlayerAPI.isInAnyArea}\n")
-                }
-
-            }
-            builder.append("```")
-            OSUtils.copyToClipboard(builder.toString())
-            LorenzUtils.chat("§eCopied SkyHanni debug data to clipboard.")
-        }
-
         fun copyItemInternalName() {
             val hand = InventoryUtils.getItemInHand()
             if (hand == null) {
@@ -464,8 +399,18 @@ class SkyHanniDebugsAndTests {
         if (!debugConfig.showItemRarity) return
         val itemStack = event.itemStack
 
-        val rarity = itemStack.getItemRarityOrNull(logError = false)
+        val rarity = itemStack.getItemRarityOrNull()
         event.toolTip.add("Item rarity: $rarity")
+    }
+
+    @SubscribeEvent
+    fun showItemCategory(event: LorenzToolTipEvent) {
+        if (!LorenzUtils.inSkyBlock) return
+        if (!debugConfig.showItemCategory) return
+        val itemStack = event.itemStack
+
+        val category = itemStack.getItemCategoryOrNull()?.name ?: "UNCLASSIFIED"
+        event.toolTip.add("Item category: $category")
     }
 
     @SubscribeEvent
@@ -512,7 +457,7 @@ class SkyHanniDebugsAndTests {
 //        val pitch = event.pitch
 //        val volume = event.volume
 
-        //background music
+        // background music
 //        if (soundName == "note.harp") {
 ////                if (distance < 2) {
 //
@@ -547,7 +492,7 @@ class SkyHanniDebugsAndTests {
 //            }
 //        }
 
-        //diana ancestral spade
+        // diana ancestral spade
 //        if (soundName == "note.harp") {
 //            val list = mutableListOf<Float>()
 //            list.add(0.52380955f)
@@ -622,7 +567,7 @@ class SkyHanniDebugsAndTests {
 //            }
 //        }
 
-        //use ancestral spade
+        // use ancestral spade
 //        if (soundName == "mob.zombie.infect") {
 //            if (pitch == 1.968254f) {
 //                if (volume == 0.3f) {
@@ -632,7 +577,7 @@ class SkyHanniDebugsAndTests {
 //            }
 //        }
 
-        //wither shield activated
+        // wither shield activated
 //        if (soundName == "mob.zombie.remedy") {
 //            if (pitch == 0.6984127f) {
 //                if (volume == 1f) {
@@ -641,7 +586,7 @@ class SkyHanniDebugsAndTests {
 //            }
 //        }
 
-        //wither shield cooldown over
+        // wither shield cooldown over
 //        if (soundName == "random.levelup") {
 //            if (pitch == 3f) {
 //                if (volume == 1f) {
@@ -650,21 +595,21 @@ class SkyHanniDebugsAndTests {
 //            }
 //        }
 
-        //teleport (hyp or aote)
+        // teleport (hyp or aote)
 //        if (soundName == "mob.endermen.portal") {
 //            if (pitch == 1f && volume == 1f) {
 //                return
 //            }
 //        }
 
-        //hyp wither impact
+        // hyp wither impact
 //        if (soundName == "random.explode") {
 //            if (pitch == 1f && volume == 1f) {
 //                return
 //            }
 //        }
 
-        //pick coins up
+        // pick coins up
 //        if (soundName == "random.orb") {
 //            if (pitch == 1.4920635f && volume == 1f) {
 //                return
