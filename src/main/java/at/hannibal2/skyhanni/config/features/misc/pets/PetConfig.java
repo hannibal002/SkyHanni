@@ -5,7 +5,12 @@ import at.hannibal2.skyhanni.config.core.config.Position;
 import com.google.gson.annotations.Expose;
 import io.github.moulberry.moulconfig.annotations.Accordion;
 import io.github.moulberry.moulconfig.annotations.ConfigEditorBoolean;
+import io.github.moulberry.moulconfig.annotations.ConfigEditorDraggableList;
+import io.github.moulberry.moulconfig.annotations.ConfigEditorSlider;
 import io.github.moulberry.moulconfig.annotations.ConfigOption;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 
 public class PetConfig {
     @Expose
@@ -28,4 +33,38 @@ public class PetConfig {
     @ConfigEditorBoolean
     @FeatureToggle
     public boolean hideAutopet = false;
+
+    @Expose
+    @ConfigOption(name = "Show Pet Item", desc = "Specifies the pet items for which icons should be displayed next to pets.")
+    @ConfigEditorDraggableList
+    public List<PetItemsDisplay> petItemDisplay = new ArrayList<>(Arrays.asList(
+        PetItemsDisplay.XP_SHARE,
+        PetItemsDisplay.TIER_BOOST
+    ));
+
+    @Expose
+    @ConfigOption(name = "Pet Item Scale", desc = "The scale at which the Pet Item will be displayed.")
+    @ConfigEditorSlider(minValue = 0.7f, maxValue = 1.5f, minStep = 0.05f)
+    public float petItemDisplayScale = 0.9f;
+
+
+    public enum PetItemsDisplay {
+        XP_SHARE("§5⚘", "Exp Share", "PET_ITEM_EXP_SHARE"),
+        TIER_BOOST("§c●", "Tier Boost", "PET_ITEM_TIER_BOOST"),
+        ;
+        private final String str;
+        public final String icon;
+        public final String item;
+
+        PetItemsDisplay(String icon, String name, String item) {
+            this.icon = icon;
+            this.item = item;
+            this.str = icon + " §ffor " + name;
+        }
+
+        @Override
+        public String toString() {
+            return str;
+        }
+    }
 }
