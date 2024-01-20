@@ -137,6 +137,7 @@ Use `/sh` or `/skyhanni` to open the SkyHanni config in game.
     + Highlight missing power stones, show their total bazaar price, and allows to open the bazaar when clicking on the
       items in the Power Stone Guide.
 + Option to make normal clicks to shift clicks in equipment inventory. - Thunderblade73
++ Show pet items XP Share and Tier Boost as small icons next to the pet in an inventory. - Thunderblade73
 
 </details>
 <details open><summary>
@@ -917,6 +918,11 @@ Use `/sh` or `/skyhanni` to open the SkyHanni config in game.
 + Added AFK time to Discord RPC. - NetheriteMiner
 + Added the option to change Hypixel Wiki to the fandom Wiki in more areas than just the /wiki command. - Erymanthus
     + E.g. inside the SkyBlock leveling guide.
++ Fixes Ghost Entities. - hannibal2 & nea & Thunderblade73
+    + Removes ghost entities caused by a Hypixel bug. This included Diana, Dungeon and Crimson Isle mobs and nametags.
++ Party Kick with reason. - nea
+    + Added support for the Hypixel command /p kick /pk to add a reason. The reason will be sent in party chat before
+      kicking the player.
 
 </details>
 <details open><summary>
