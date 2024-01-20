@@ -30,6 +30,7 @@ Use `/sh` or `/skyhanni` to open the SkyHanni config in game.
     + Optional if left or right side of name.
     + Should not break with other mods.
 + Hide the repeating fire sale reminder chat messages. - hannibal2
++ Add tab list fire sale advertisement hider. - nea
 
 #### Chat Filter
 
@@ -132,6 +133,11 @@ Use `/sh` or `/skyhanni` to open the SkyHanni config in game.
     + This removes the need to shift-click to swap the equipment items, without the annoying "pick up animation".
 + Added Copy Underbid Price. - hannibal2
     + Copies the price of an item in the "Create BIN Auction" minus 1 coin into the clipboard for faster under-bidding.
++ Added Power Stone Guide features. - hannibal2
+    + Highlight missing power stones, show their total bazaar price, and allows to open the bazaar when clicking on the
+      items in the Power Stone Guide.
++ Option to make normal clicks to shift clicks in equipment inventory. - Thunderblade73
++ Show pet items XP Share and Tier Boost as small icons next to the pet in an inventory. - Thunderblade73
 
 </details>
 <details open><summary>
@@ -145,6 +151,7 @@ Use `/sh` or `/skyhanni` to open the SkyHanni config in game.
     + Supports dungeon mage cooldown reduction. - Cad
 + Hiding the flame particles when using the Fire Veil Wand ability.
 + Circle around the player when having the Fire Veil Wand ability active.
++ Lesser Orb of Healing Hider. - jani
 
 </details>
 <details open><summary>
@@ -551,6 +558,7 @@ Use `/sh` or `/skyhanni` to open the SkyHanni config in game.
     + If you don't want to share anything, you can disable the chat message in the config with /sh copy milestone data.
 + Garden Vacuum Pests in Pest bag to item number as stack size. - hannibal2
     + Enable via /sh vacuum.
++ Show sack item amount to the visitor shopping list. - CalMWolfs
 
 ### Garden Pests
 
@@ -715,6 +723,8 @@ Use `/sh` or `/skyhanni` to open the SkyHanni config in game.
 + **/shcropspeedmeter** - Helps calculate the real farming fortune with the formula crops broken per block.
 + **/shcroptime <amount> <item>** Displays the estimated time it will take to gather the requested quantity of a
   particular item based on the current crop speed.
++ **/shcropsin <time> <item>**. - DylanBruner
+    + Shows the number of items you gain when farming in the garden for the given time.
 + `/pt <player>` as alias for `/party transfer <player>`
     + SkyBlock Command `/tp` to check the play time still works
 + **/shfarmingprofile [player name]**
@@ -908,6 +918,11 @@ Use `/sh` or `/skyhanni` to open the SkyHanni config in game.
 + Added AFK time to Discord RPC. - NetheriteMiner
 + Added the option to change Hypixel Wiki to the fandom Wiki in more areas than just the /wiki command. - Erymanthus
     + E.g. inside the SkyBlock leveling guide.
++ Fixes Ghost Entities. - hannibal2 & nea & Thunderblade73
+    + Removes ghost entities caused by a Hypixel bug. This included Diana, Dungeon and Crimson Isle mobs and nametags.
++ Party Kick with reason. - nea
+    + Added support for the Hypixel command /p kick /pk to add a reason. The reason will be sent in party chat before
+      kicking the player.
 
 </details>
 <details open><summary>
