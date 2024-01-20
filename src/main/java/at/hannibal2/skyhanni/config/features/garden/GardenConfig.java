@@ -106,7 +106,7 @@ public class GardenConfig {
     @Expose
     @ConfigOption(name = "Sensitivity Reducer", desc = "")
     @Accordion
-    public MouseSensConfig MouseSensConfig = new MouseSensConfig();
+    public SensReducerConfig sensReducerConfig = new SensReducerConfig();
 
     @Expose
     @ConfigOption(name = "Crop Start Location", desc = "")

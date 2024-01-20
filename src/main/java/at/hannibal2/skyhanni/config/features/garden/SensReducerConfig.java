@@ -6,16 +6,16 @@ import io.github.moulberry.moulconfig.annotations.ConfigEditorBoolean;
 import io.github.moulberry.moulconfig.annotations.ConfigEditorSlider;
 import io.github.moulberry.moulconfig.annotations.ConfigOption;
 
-public class MouseSensConfig {
+public class SensReducerConfig {
     @Expose
     @ConfigOption(
-        name = "Lower Mouse Sensitivity",
-        desc = "Lowers mouse sensitivity while a farming tool is held.")
+        name = "Enable",
+        desc = "Lowers mouse sensitivity while in the garden, and a farming tool is held.")
     @ConfigEditorBoolean
     public boolean enabled = false;
 
     @Expose
-    @ConfigOption(name = "Sensitivity Divisor", desc = "Changes how much the features lowers the sensitivity by.")
+    @ConfigOption(name = "Reducing factor", desc = "Changes by how much the sensitivity is lowered by.")
     @ConfigEditorSlider(minValue = 0, maxValue = 100, minStep = 1)
     public int divisorSens = 25;
 
@@ -27,5 +27,5 @@ public class MouseSensConfig {
     public boolean showLower = true;
 
     @Expose
-    public Position loweredMouseDisplay = new Position(400, 400, 0.8f);
+    public Position loweredSensPosition = new Position(400, 400, 0.8f);
 }
