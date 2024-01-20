@@ -42,7 +42,7 @@ object SensReducer {
     fun onRenderOverlay(event: GuiRenderEvent.GuiOverlayRenderEvent) {
         if (!(isToggled || isManualToggle)) return
         if (!config.showLower) return
-        config.loweredSensPosition.renderString("§eSensitivity Lowered", posLabel = "Sensitivity Lowered")
+        config.loweredSensPosition.renderString("§eSensitivity Lowered (by ${config.divisorSens})", posLabel = "Sensitivity Lowered")
     }
 
     @SubscribeEvent
@@ -79,7 +79,7 @@ object SensReducer {
         val newSens =
             ((storage.savedMouseloweredSensitivity + (1F / 3F)) / config.divisorSens) - (1F / 3F)
         gameSettings?.mouseSensitivity = newSens
-        if (showMessage) LorenzUtils.chat("§bMouse sensitivity is now lowered. Type /shmouselower to restore your sensitivity.")
+        if (showMessage) LorenzUtils.chat("§bMouse sensitivity is now lowered. Type /shsensreduce to restore your sensitivity.")
     }
 
     private fun restoreSensitivity(showMessage: Boolean = false) {

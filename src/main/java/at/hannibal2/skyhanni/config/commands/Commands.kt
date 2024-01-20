@@ -208,7 +208,7 @@ object Commands {
             "Lock/Unlock the mouse so it will no longer rotate the player (for farming)"
         ) { LockMouseLook.toggleLock() }
         registerCommand(
-            "shsensredicer",
+            "shsensreduce",
             "Lowers the mouse sensitivity for easier small adjustments (for farming)"
         ) { SensReducer.manualToggle() }
         registerCommand(
