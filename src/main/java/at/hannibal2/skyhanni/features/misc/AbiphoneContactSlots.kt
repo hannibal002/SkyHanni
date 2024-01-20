@@ -20,12 +20,11 @@ class AbiphoneContactSlots {
 
     @SubscribeEvent
     fun onTooltip(event: ItemTooltipEvent) {
-        if (!(LorenzUtils.inSkyBlock && SkyHanniMod.feature.misc.abiphoneContactsProgress)) return
+        if (!isEnabled()) return
         if (Minecraft.getMinecraft().currentScreen !is GuiInventory) return
         val itemStack = event.itemStack
         if (!(isAbiphoneInternalNamePattern.matches(itemStack.getInternalName().asString()))) return
         val itemLore = itemStack.getLore()
-        if (itemLore.none { maximumContactSlotsLoreLinePattern.matches(it) }) return
         val trueIndex = itemLore.indexOfFirst { maximumContactSlotsLoreLinePattern.matches(it) }
         maximumContactSlotsLoreLinePattern.matchMatcher(itemLore[trueIndex]) {
             val upgrades = listOf<String>(group("first") ?: "0", group("second") ?: "0", group("third") ?: "0", group("fourth") ?: "0", group("fifth") ?: "0")
@@ -41,4 +40,5 @@ class AbiphoneContactSlots {
             }
         }
     }
+    private fun isEnabled(): Boolean = LorenzUtils.inSkyBlock && SkyHanniMod.feature.misc.abiphoneContactsProgress
 }
