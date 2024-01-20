@@ -20,7 +20,7 @@ class VolcanoExplosivityDisplay {
     )
     private val statusPattern by patternGroup.pattern(
         "status.tablistline",
-        " *(?<status>(?:§.)*INACTIVE)"
+        " *(?<status>(?:§.)*\\S+)"
     )
     private var display = ""
 
