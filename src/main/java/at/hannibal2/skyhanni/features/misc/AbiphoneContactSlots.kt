@@ -23,7 +23,7 @@ class AbiphoneContactSlots {
         if (!isEnabled()) return
         if (Minecraft.getMinecraft().currentScreen !is GuiInventory) return
         val itemStack = event.itemStack
-        if (!(isAbiphoneInternalNamePattern.matches(itemStack.getInternalName().asString()))) return
+        if (itemStack.getItemCategoryOrNull() != ItemCategory.ABIPHONE) return
         val itemLore = itemStack.getLore()
         val trueIndex = itemLore.indexOfFirst { maximumContactSlotsLoreLinePattern.matches(it) }
         maximumContactSlotsLoreLinePattern.matchMatcher(itemLore[trueIndex]) {
