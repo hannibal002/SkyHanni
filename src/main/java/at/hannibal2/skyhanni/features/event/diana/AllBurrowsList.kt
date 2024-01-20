@@ -16,11 +16,12 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
 object AllBurrowsList {
     private var list = listOf<LorenzVec>()
+    private val storage get() = ProfileStorageData.profileSpecific?.diana
 
     @SubscribeEvent
     fun onBurrowDetect(event: BurrowDetectEvent) {
         if (!isEnabled()) return
-        val storage = ProfileStorageData.profileSpecific?.diana ?: return
+        val storage = storage ?: return
         storage.foundBurrowLocations.add(event.burrowLocation)
     }
 
@@ -28,7 +29,7 @@ object AllBurrowsList {
     fun onTick(event: LorenzTickEvent) {
         if (!isEnabled()) return
         if (!event.repeatSeconds(1)) return
-        val storage = ProfileStorageData.profileSpecific?.diana ?: return
+        val storage = storage ?: return
 
 //         val range = 10..30
 //         val range = 10..70
@@ -41,24 +42,18 @@ object AllBurrowsList {
     }
 
     fun copyToClipboard() {
-        val storage = ProfileStorageData.profileSpecific?.diana ?: return
-        val list = mutableListOf<String>()
-        for (abc in storage.foundBurrowLocations.toList()) {
-            val s = abc.printWithAccuracy(0, ":")
-            list.add(s)
-        }
-        val text = list.joinToString(";")
-        OSUtils.copyToClipboard(text)
+        val storage = storage ?: return
+        val list = storage.foundBurrowLocations.map { it.printWithAccuracy(0, ":") }
+        OSUtils.copyToClipboard(list.joinToString(";"))
         LorenzUtils.chat("Saved all ${list.size} burrow locations to clipboard.")
     }
 
     fun addFromClipboard() {
         SkyHanniMod.coroutineScope.launch {
             val text = OSUtils.readFromClipboard() ?: return@launch
+            val storage = storage ?: return@launch
 
-            val storage = ProfileStorageData.profileSpecific?.diana ?: return@launch
             val list = storage.foundBurrowLocations
-
             var new = 0
             var duplicate = 0
             for (raw in text.split(";")) {
@@ -80,8 +75,6 @@ object AllBurrowsList {
         if (!isEnabled()) return
 
         for (location in list) {
-//             event.drawColor(location, LorenzColor.LIGHT_PURPLE)
-//             event.drawColor(location, LorenzColor.DARK_GRAY)
             event.drawColor(location, LorenzColor.DARK_AQUA)
         }
     }
