@@ -7,10 +7,9 @@ import io.github.moulberry.moulconfig.annotations.ConfigEditorBoolean;
 import io.github.moulberry.moulconfig.annotations.ConfigEditorDraggableList;
 import io.github.moulberry.moulconfig.annotations.ConfigEditorKeybind;
 import io.github.moulberry.moulconfig.annotations.ConfigOption;
-import org.lwjgl.input.Keyboard;
-
 import java.util.ArrayList;
 import java.util.List;
+import org.lwjgl.input.Keyboard;
 
 public class ChatConfig {
 
@@ -118,4 +117,10 @@ public class ChatConfig {
     @ConfigEditorBoolean
     @FeatureToggle
     public boolean translator = false;
+
+    @Expose
+    @ConfigOption(name = "Skyblock XP Chat", desc = "Sends the Skyblock XP message into the chat.")
+    @ConfigEditorBoolean
+    @FeatureToggle
+    public boolean skyBlockXPInChat = true;
 }
