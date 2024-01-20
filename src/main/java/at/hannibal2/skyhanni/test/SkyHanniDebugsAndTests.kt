@@ -465,7 +465,7 @@ class SkyHanniDebugsAndTests {
         if (!debugConfig.showItemRarity) return
         val itemStack = event.itemStack
 
-        val rarity = itemStack.getItemRarityOrNull(logError = false)
+        val rarity = itemStack.getItemRarityOrNull()
         event.toolTip.add("Item rarity: $rarity")
     }
 
@@ -475,7 +475,7 @@ class SkyHanniDebugsAndTests {
         if (!debugConfig.showItemCategory) return
         val itemStack = event.itemStack
 
-        val category = itemStack.getItemCategoryOrNull(logError = true)?.name ?: "UNCLASSIFIED"
+        val category = itemStack.getItemCategoryOrNull()?.name ?: "UNCLASSIFIED"
         event.toolTip.add("Item category: $category")
     }
 

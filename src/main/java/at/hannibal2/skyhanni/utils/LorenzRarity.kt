@@ -2,9 +2,9 @@ package at.hannibal2.skyhanni.utils
 
 import at.hannibal2.skyhanni.test.command.ErrorManager
 
-
 // TODO: replace id with ordinal
 enum class LorenzRarity(val color: LorenzColor, val id: Int) {
+
     COMMON(LorenzColor.WHITE, 0),
     UNCOMMON(LorenzColor.GREEN, 1),
     RARE(LorenzColor.BLUE, 2),
@@ -48,8 +48,8 @@ enum class LorenzRarity(val color: LorenzColor, val id: Int) {
     fun isAtLeast(other: LorenzRarity): Boolean = this.ordinal >= other.ordinal
 
     companion object {
+
         fun getById(id: Int) = if (entries.size > id) entries[id] else null
         fun getByName(name: String) = entries.firstOrNull { it.name == name }
     }
-
 }
