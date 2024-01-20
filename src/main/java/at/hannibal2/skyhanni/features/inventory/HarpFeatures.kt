@@ -13,6 +13,7 @@ import at.hannibal2.skyhanni.utils.KeyboardManager
 import at.hannibal2.skyhanni.utils.KeyboardManager.isKeyHeld
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
+import at.hannibal2.skyhanni.utils.StringUtils.anyMatches
 import at.hannibal2.skyhanni.utils.StringUtils.matches
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraft.client.Minecraft
@@ -27,10 +28,14 @@ import kotlin.time.Duration.Companion.seconds
 
 // Delaying key presses by 300ms comes from NotEnoughUpdates
 object HarpFeatures {
+
     private val config get() = SkyHanniMod.feature.inventory.helper.harp
     private var lastClick = SimpleTimeMark.farPast()
 
+    private const val closeButtonSlot = 40
+
     private object KeyIterable : Iterable<Int> {
+
         override fun iterator() = object : Iterator<Int> {
             private var currentIndex = 0
 
@@ -43,10 +48,10 @@ object HarpFeatures {
     private val buttonColors = listOf('d', 'e', 'a', '2', '5', '9', 'b')
     private val inventoryTitlePattern by RepoPattern.pattern("harp.inventory", "^Harp.*")
     private val menuTitlePattern by RepoPattern.pattern("harp.menu", "^Melody.*")
+    private val songSelectedPattern by RepoPattern.pattern("harp.song.selected", "§aSong is selected!")
 
     private fun isHarpGui() = inventoryTitlePattern.matches(InventoryUtils.openInventoryName())
     private fun isMenuGui() = menuTitlePattern.matches(InventoryUtils.openInventoryName())
-
 
     @SubscribeEvent
     fun onGui(event: GuiScreenEvent) {
@@ -151,9 +156,11 @@ object HarpFeatures {
         if (!LorenzUtils.inSkyBlock) return
         if (!config.quickRestart) return
         if (!isMenuGui()) return
-        if (event.slot?.slotNumber != 40) return
+        if (event.slot?.slotNumber != closeButtonSlot) return
         if (openTime.passedSince() > 2.seconds) return
-        event.container.inventory.indexOfFirst { it.getLore().contains("§aSong is selected!") }.takeIf { it != -1 }?.let {
+        event.container.inventory.indexOfFirst {
+            songSelectedPattern.anyMatches(it.getLore())
+        }.takeIf { it != -1 }?.let {
             event.isCanceled = true
             Minecraft.getMinecraft().playerController.windowClick(
                 event.container.windowId,
@@ -164,7 +171,6 @@ object HarpFeatures {
             )
         }
     }
-
 
     @SubscribeEvent
     fun onRenderItemTip(event: RenderItemTipEvent) {
