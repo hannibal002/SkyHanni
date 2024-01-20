@@ -163,24 +163,23 @@ class GriffinBurrowParticleFinder {
         if (!isEnabled()) return
         if (!config.burrowsSoopyGuess) return
 
-        val pos = event.position
-        if (event.itemInHand?.isDianaSpade != true || pos.getBlockAt() !== Blocks.grass) return
+        val location = event.position
+        if (event.itemInHand?.isDianaSpade != true || location.getBlockAt() !== Blocks.grass) return
 
-        if (pos == fakeBurrow) {
+        if (location == fakeBurrow) {
             fakeBurrow = null
             // This exist to detect the unlucky timing when the user opens a burrow before it gets fully deteced
             LorenzUtils.chat("§dYou found a rare burrow bug. SkyHanni can auto fix it, though.")
-            tryDig(pos, ignoreFound = true)
+            tryDig(location, ignoreFound = true)
             return
         }
 
-        if (burrows.containsKey(pos)) {
-            lastDugParticleBurrow = pos
+        if (burrows.containsKey(location)) {
+            lastDugParticleBurrow = location
 
             DelayedRun.runDelayed(1.seconds) {
-                if (BurrowAPI.lastBurrowRelatedChatMessage.passedSince() > 1.seconds) {
-                    burrows.remove(pos)
-                    LorenzUtils.error("Something unexected happened, deleted the burrow.")
+                if (BurrowAPI.lastBurrowRelatedChatMessage.passedSince() > 2.seconds) {
+                    burrows.remove(location)
                 }
             }
 
