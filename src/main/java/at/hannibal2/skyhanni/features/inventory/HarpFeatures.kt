@@ -50,14 +50,14 @@ object HarpFeatures {
     private val menuTitlePattern by RepoPattern.pattern("harp.menu", "Melody.*")
     private val songSelectedPattern by RepoPattern.pattern("harp.song.selected", "§aSong is selected!")
 
-    private fun isHarpGui() = inventoryTitlePattern.matches(InventoryUtils.openInventoryName())
-    private fun isMenuGui() = menuTitlePattern.matches(InventoryUtils.openInventoryName())
+    private fun isHarpGui(chestName: String) = inventoryTitlePattern.matches(chestName)
+    private fun isMenuGui(chestName: String) = menuTitlePattern.matches(chestName)
 
     @SubscribeEvent
     fun onGui(event: GuiScreenEvent) {
         if (!LorenzUtils.inSkyBlock) return
         if (!config.keybinds) return
-        if (!isHarpGui()) return
+        if (!isHarpGui(InventoryUtils.openInventoryName())) return
         val chest = event.gui as? GuiChest ?: return
 
         for ((index, key) in KeyIterable.withIndex()) {
@@ -95,12 +95,12 @@ object HarpFeatures {
         if (!LorenzUtils.inSkyBlock) return
         if (!config.guiScale) return
         when {
-            isMenuGui() -> {
+            isMenuGui(event.inventoryName) -> {
                 setGUIScale()
                 openTime = SimpleTimeMark.now()
             }
 
-            isHarpGui() -> {
+            isHarpGui(event.inventoryName) -> {
                 setGUIScale()
             }
         }
@@ -108,7 +108,7 @@ object HarpFeatures {
 
     private fun updateScale() {
         if (Minecraft.getMinecraft().currentScreen == null) {
-            DelayedRun.runDelayed(100.milliseconds) {
+            DelayedRun.runNextTick() {
                 updateScale()
             }
             return
@@ -155,7 +155,7 @@ object HarpFeatures {
     fun onSlotClick(event: GuiContainerEvent.SlotClickEvent) {
         if (!LorenzUtils.inSkyBlock) return
         if (!config.quickRestart) return
-        if (!isMenuGui()) return
+        if (!isMenuGui(InventoryUtils.openInventoryName())) return
         if (event.slot?.slotNumber != closeButtonSlot) return
         if (openTime.passedSince() > 2.seconds) return
         event.container.inventory.indexOfFirst {
@@ -176,7 +176,7 @@ object HarpFeatures {
     fun onRenderItemTip(event: RenderItemTipEvent) {
         if (!LorenzUtils.inSkyBlock) return
         if (!config.showNumbers) return
-        if (!isHarpGui()) return
+        if (!isHarpGui(InventoryUtils.openInventoryName())) return
         if (Item.getIdFromItem(event.stack.item) != 159) return // Stained hardened clay item id = 159
 
         // Example: §9| §7Click! will select the 9
