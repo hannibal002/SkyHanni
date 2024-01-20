@@ -14,12 +14,12 @@ public class HelperConfig {
 
     public static class HarpConfig {
         @Expose
-        @ConfigOption(name = "GUI Scale", desc = "Automatically sets the GUI scale to \"AUTO\" when entering the Harp")
+        @ConfigOption(name = "GUI Scale", desc = "Automatically sets the GUI scale to \"AUTO\" when entering the Harp.")
         @ConfigEditorBoolean
         public boolean guiScale = false;
 
         @Expose
-        @ConfigOption(name = "Quick Restart", desc = "When pressing the close Button in the Harp Menu shortly after opening the Harp the selected song will be started")
+        @ConfigOption(name = "Quick Restart", desc = "Once you've launched the Harp, quickly hit the close button in the Harp Menu to initiate the selected song.")
         @ConfigEditorBoolean
         @FeatureToggle
         public boolean quickRestart = false;
