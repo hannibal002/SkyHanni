@@ -7,6 +7,7 @@ import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils.makeAccessible
 import at.hannibal2.skyhanni.utils.LorenzUtils.round
 import at.hannibal2.skyhanni.utils.LorenzVec
+import at.hannibal2.skyhanni.utils.NumberUtil.isInt
 import at.hannibal2.skyhanni.utils.getLorenzVec
 import at.hannibal2.skyhanni.utils.toLorenzVec
 import net.minecraft.client.Minecraft
@@ -34,15 +35,32 @@ import net.minecraft.network.play.server.S2APacketParticles
 import net.minecraftforge.fml.common.eventhandler.EventPriority
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
-class PacketTest {
-    companion object {
+object PacketTest {
 
-        private var enabled = true
+    private var enabled = true
 
-        fun toggle() {
-            enabled = !enabled
-            LorenzUtils.chat("Packet test: $enabled")
+    private val entityMap = mutableMapOf<Int, MutableList<Packet<*>>>()
+
+    fun command(args: Array<String>) {
+        if (args.size == 1 && args[0].isInt()) {
+            sendEntityPacketData(args[0].toInt())
+            return
         }
+
+        toggle()
+    }
+
+    private fun sendEntityPacketData(id: Int) {
+        LorenzUtils.chat("Packet Entity Data: $id")
+        entityMap[id]?.forEach {
+            it.print()
+        }
+        println("End of Data")
+    }
+
+    private fun toggle() {
+        enabled = !enabled
+        LorenzUtils.chat("Packet test: $enabled")
     }
 
     @SubscribeEvent
@@ -70,9 +88,21 @@ class PacketTest {
     fun onChatPacket(event: PacketEvent.ReceiveEvent) {
         if (!enabled) return
         val packet = event.packet
-        val packetName = packet.javaClass.simpleName
+        packet.print()
+        if (packet is S13PacketDestroyEntities) {
+            packet.entityIDs.forEach {
+                entityMap.getOrDefault(it, mutableListOf()).add(packet)
+            }
+        } else {
+            val id = packet.getEntityId() ?: return
+            entityMap.getOrDefault(id, mutableListOf()).add(packet)
+        }
+    }
 
-        packet is C00PacketKeepAlive
+    private fun Packet<*>.print() {
+        val packetName = javaClass.simpleName
+
+        this is C00PacketKeepAlive
 
         // Keep alive
         if (packetName == "S00PacketKeepAlive") return
@@ -99,13 +129,11 @@ class PacketTest {
 
         // Others
         if (packetName == "S29PacketSoundEffect") return
-//        if (packetName == "S2APacketParticles") return
+        //        if (packetName == "S2APacketParticles") return
 
         // Entity
-        if (packet is S13PacketDestroyEntities) {
-            println(" ")
-            println("Receive: $packetName")
-            println("IDs: ${packet.entityIDs.joinToString { "$it, " }}")
+        if (this is S13PacketDestroyEntities) {
+            println("Receive: $packetName with IDs: ${entityIDs.joinToString { "$it, " }}")
             return
         }
 
@@ -113,51 +141,49 @@ class PacketTest {
                 if (packetName == "S15PacketEntityRelMove") return
                 if (packetName == "S04PacketEntityEquipment") return */
 
-//        if (packetName == "S0EPacketSpawnObject") return
-//        if (packetName == "S0BPacketAnimation") return
-//        if (packetName == "S06PacketUpdateHealth") return
-//        if (packetName == "S17PacketEntityLookMove") return
-//        if (packetName == "S16PacketEntityLook") return
-//        if (packetName == "S19PacketEntityHeadLook") return
-//        if (packetName == "S1DPacketEntityEffect") return
-//        if (packetName == "S12PacketEntityVelocity") return
-//        if (packetName == "S19PacketEntityStatus") return
-//        if (packetName == "S1CPacketEntityMetadata") return
-//        if (packetName == "S20PacketEntityProperties") return
-//        if (packetName == "S1BPacketEntityAttach") return
+        //        if (packetName == "S0EPacketSpawnObject") return
+        //        if (packetName == "S0BPacketAnimation") return
+        //        if (packetName == "S06PacketUpdateHealth") return
+        //        if (packetName == "S17PacketEntityLookMove") return
+        //        if (packetName == "S16PacketEntityLook") return
+        //        if (packetName == "S19PacketEntityHeadLook") return
+        //        if (packetName == "S1DPacketEntityEffect") return
+        //        if (packetName == "S12PacketEntityVelocity") return
+        //        if (packetName == "S19PacketEntityStatus") return
+        //        if (packetName == "S1CPacketEntityMetadata") return
+        //        if (packetName == "S20PacketEntityProperties") return
+        //        if (packetName == "S1BPacketEntityAttach") return
 
-        println(" ")
-        println("Receive: $packetName")
-        val id = getEntityId(packet)
-        if (id != null) {
-            println("ID: $id")
-        }
+        buildString {
+            append("Receive: $packetName")
 
-
-        val entity = getEntity(packet, id)
-        val distance = getDistance(getLocation(packet, entity))
-
-        if (entity != null) {
-            if (entity == Minecraft.getMinecraft().thePlayer) {
-//                println("own: $distance $packetName")
-                return
-            } else {
-                println("other: $distance")
-            }
-        } else {
+            val id = getEntityId()
             if (id != null) {
-                return
+                append(" ID: $id")
             }
 
+            val entity = getEntity(this@print, id)
+            val distance = getDistance(getLocation(this@print, entity))
 
-//            if (packetName.contains("")) {
-//
-//            }
-            println("entity is null.")
+            if (entity != null) {
+                if (entity == Minecraft.getMinecraft().thePlayer) {
+                    //                println("own: $distance $packetName")
+                    return
+                } else {
+                    append(" other: $distance")
+                }
+            } else {
+                if (id != null) {
+                    return
+                }
+
+                //            if (packetName.contains("")) {
+                //
+                //            }
+                append(" entity is null.")
+            }
         }
-
-//        println("distance: $distance")
-
+        //        println("distance: $distance")
     }
 
     private fun getDistance(location: LorenzVec?): Double {
@@ -211,19 +237,19 @@ class PacketTest {
         return null
     }
 
-    private fun getEntityId(packet: Packet<*>) = when (packet) {
-        is S1CPacketEntityMetadata -> packet.entityId
-        is S20PacketEntityProperties -> packet.entityId
-        is S04PacketEntityEquipment -> packet.entityID
-        is S12PacketEntityVelocity -> packet.entityID
-        is S1BPacketEntityAttach -> packet.entityId
-        is S0BPacketAnimation -> packet.entityID
-        is S18PacketEntityTeleport -> packet.entityId
-        is S1DPacketEntityEffect -> packet.entityId
-        is S0CPacketSpawnPlayer -> packet.entityID
-        is S0FPacketSpawnMob -> packet.entityID
-        is S19PacketEntityHeadLook -> packet.javaClass.getDeclaredField("entityId").makeAccessible().get(packet) as Int
-        is S19PacketEntityStatus -> packet.javaClass.getDeclaredField("entityId").makeAccessible().get(packet) as Int
+    private fun Packet<*>.getEntityId() = when (this) {
+        is S1CPacketEntityMetadata -> entityId
+        is S20PacketEntityProperties -> entityId
+        is S04PacketEntityEquipment -> entityID
+        is S12PacketEntityVelocity -> entityID
+        is S1BPacketEntityAttach -> entityId
+        is S0BPacketAnimation -> entityID
+        is S18PacketEntityTeleport -> entityId
+        is S1DPacketEntityEffect -> entityId
+        is S0CPacketSpawnPlayer -> entityID
+        is S0FPacketSpawnMob -> entityID
+        is S19PacketEntityHeadLook -> javaClass.getDeclaredField("entityId").makeAccessible().get(this) as Int
+        is S19PacketEntityStatus -> javaClass.getDeclaredField("entityId").makeAccessible().get(this) as Int
         /* is S14PacketEntity.S15PacketEntityRelMove -> packet.javaClass.getDeclaredField("entityId").makeAccessible().get(packet) as Int
         is S14PacketEntity.S16PacketEntityLook -> packet.javaClass.getDeclaredField("entityId").makeAccessible().get(packet) as Int
         is S14PacketEntity.S17PacketEntityLookMove -> packet.javaClass.getDeclaredField("entityId").makeAccessible().get(packet) as Int */

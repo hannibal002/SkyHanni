@@ -729,7 +729,7 @@ class SkyHanniMod {
         loadModule(FixGhostEntities)
         loadModule(CopyNearbyParticlesCommand)
         loadModule(ButtonOnPause())
-        loadModule(PacketTest())
+        loadModule(PacketTest)
         loadModule(TestBingo)
         loadModule(TestCopyRngMeterValues)
         loadModule(TestCopyBestiaryValues)

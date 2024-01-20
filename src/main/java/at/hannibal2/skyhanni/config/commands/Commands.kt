@@ -363,7 +363,7 @@ object Commands {
             "shcopyparticles",
             "Copied information about the particles that spawn in the next 50ms to the clipboard"
         ) { CopyNearbyParticlesCommand.command(it) }
-        registerCommand("shtestpacket", "Logs incoming and outgoing packets to the console") { PacketTest.toggle() }
+        registerCommand("shtestpacket", "Logs incoming and outgoing packets to the console") { PacketTest.command(it) }
         registerCommand(
             "shtestmessage",
             "Sends a custom chat message client side in the chat"
