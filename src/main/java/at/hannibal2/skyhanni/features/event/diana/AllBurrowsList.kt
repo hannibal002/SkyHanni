@@ -1,5 +1,6 @@
 package at.hannibal2.skyhanni.features.event.diana
 
+import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.data.ProfileStorageData
 import at.hannibal2.skyhanni.events.BurrowDetectEvent
 import at.hannibal2.skyhanni.events.LorenzRenderWorldEvent
@@ -10,6 +11,7 @@ import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.LorenzVec
 import at.hannibal2.skyhanni.utils.OSUtils
 import at.hannibal2.skyhanni.utils.RenderUtils.drawColor
+import kotlinx.coroutines.launch
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
 object AllBurrowsList {
@@ -48,6 +50,29 @@ object AllBurrowsList {
         val text = list.joinToString(";")
         OSUtils.copyToClipboard(text)
         LorenzUtils.chat("Saved all ${list.size} burrow locations to clipboard.")
+    }
+
+    fun addFromClipboard() {
+        SkyHanniMod.coroutineScope.launch {
+            val text = OSUtils.readFromClipboard() ?: return@launch
+
+            val storage = ProfileStorageData.profileSpecific?.diana ?: return@launch
+            val list = storage.foundBurrowLocations
+
+            var new = 0
+            var duplicate = 0
+            for (raw in text.split(";")) {
+                val (x, y, z) = raw.split(":").map { it.toInt() }
+                val location = LorenzVec(x, y, z)
+                if (location !in list) {
+                    list.add(location)
+                    new++
+                } else {
+                    duplicate++
+                }
+            }
+            LorenzUtils.chat("Added $new new burrow locations, $duplicate are duplicate.")
+        }
     }
 
     @SubscribeEvent

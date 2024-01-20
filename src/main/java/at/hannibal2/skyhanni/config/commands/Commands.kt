@@ -390,6 +390,10 @@ object Commands {
             "shcopyfoundburrowlocations",
             "Copy all ever found burrow locations to clipboard"
         ) { AllBurrowsList.copyToClipboard() }
+        registerCommand(
+            "shaddfoundburrowlocationsfromclipboard",
+            "Add all ever found burrow locations from clipboard"
+        ) { AllBurrowsList.addFromClipboard() }
     }
 
     private fun internalCommands() {
