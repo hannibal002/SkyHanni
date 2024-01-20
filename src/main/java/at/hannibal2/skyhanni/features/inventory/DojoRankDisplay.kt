@@ -17,7 +17,7 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
 class DojoRankDisplay {
 
-    private val config get() = SkyHanniMod.feature.inventory
+    private val config get() = SkyHanniMod.feature.crimsonIsle
     private var display = emptyList<String>()
     private val patternGroup = RepoPattern.group("inventory.dojo.rankdisplay")
     private val testNamePattern by patternGroup.pattern("name", "(?<color>§\\w)Test of (?<name>.*)")
@@ -29,9 +29,9 @@ class DojoRankDisplay {
         config.dojoRankDisplayPosition.renderStrings(display, posLabel = "Dojo Rank Display")
     }
 
-    private fun drawDisplay(items: Map<Int, ItemStack>) = buildList {
+    private fun drawDisplay(items: Collection<ItemStack>) = buildList {
         var totalScore = 0
-        for ((_, stack) in items) {
+        for (stack in items) {
             val name = stack.displayName ?: continue
             testNamePattern.matchMatcher(name) {
                 val testColor = group("color")
@@ -72,7 +72,7 @@ class DojoRankDisplay {
     fun onInventoryOpen(event: InventoryFullyOpenedEvent) {
         if (!isEnabled()) return
         if (event.inventoryName != "Challenges") return
-        display = drawDisplay(event.inventoryItems)
+        display = drawDisplay(event.inventoryItems.values)
     }
 
     @SubscribeEvent

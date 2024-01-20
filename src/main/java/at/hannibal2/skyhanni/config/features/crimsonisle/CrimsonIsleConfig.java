@@ -1,6 +1,7 @@
 package at.hannibal2.skyhanni.config.features.crimsonisle;
 
 import at.hannibal2.skyhanni.config.FeatureToggle;
+import at.hannibal2.skyhanni.config.core.config.Position;
 import at.hannibal2.skyhanni.config.features.crimsonisle.ashfang.AshfangConfig;
 import com.google.gson.annotations.Expose;
 import io.github.moulberry.moulconfig.annotations.Accordion;
@@ -31,4 +32,15 @@ public class CrimsonIsleConfig {
     @ConfigEditorBoolean
     @FeatureToggle
     public boolean pabloHelper = false;
+
+    @Expose
+    @ConfigOption(name = "Dojo Rank Display", desc = "Display your rank, score, actual belt\n" +
+            "and points needed for the next belt in the Challenges inventory\n" +
+            "on the Crimson Isles.")
+    @ConfigEditorBoolean
+    @FeatureToggle
+    public boolean showDojoRankDisplay = false;
+
+    @Expose
+    public Position dojoRankDisplayPosition = new Position(-378, 206, false, true);
 }

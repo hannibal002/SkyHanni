@@ -2,22 +2,15 @@ package at.hannibal2.skyhanni.config.features.inventory;
 
 import at.hannibal2.skyhanni.config.FeatureToggle;
 import at.hannibal2.skyhanni.config.HasLegacyId;
-import at.hannibal2.skyhanni.config.core.config.Position;
 import at.hannibal2.skyhanni.config.features.inventory.helper.HelperConfig;
 import com.google.gson.annotations.Expose;
-import io.github.moulberry.moulconfig.annotations.Accordion;
-import io.github.moulberry.moulconfig.annotations.Category;
-import io.github.moulberry.moulconfig.annotations.ConfigEditorBoolean;
-import io.github.moulberry.moulconfig.annotations.ConfigEditorDraggableList;
-import io.github.moulberry.moulconfig.annotations.ConfigOption;
+import io.github.moulberry.moulconfig.annotations.*;
+
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-import static at.hannibal2.skyhanni.config.features.inventory.InventoryConfig.ItemNumberEntry.LARVA_HOOK;
-import static at.hannibal2.skyhanni.config.features.inventory.InventoryConfig.ItemNumberEntry.NEW_YEAR_CAKE;
-import static at.hannibal2.skyhanni.config.features.inventory.InventoryConfig.ItemNumberEntry.RANCHERS_BOOTS_SPEED;
-import static at.hannibal2.skyhanni.config.features.inventory.InventoryConfig.ItemNumberEntry.VACUUM_GARDEN;
+import static at.hannibal2.skyhanni.config.features.inventory.InventoryConfig.ItemNumberEntry.*;
 
 public class InventoryConfig {
 
@@ -58,15 +51,15 @@ public class InventoryConfig {
 
     @Expose
     @ConfigOption(
-        name = "Item Number",
-        desc = "Showing the item number as a stack size for these items."
+            name = "Item Number",
+            desc = "Showing the item number as a stack size for these items."
     )
     @ConfigEditorDraggableList()
     public List<ItemNumberEntry> itemNumberAsStackSize = new ArrayList<>(Arrays.asList(
-        NEW_YEAR_CAKE,
-        RANCHERS_BOOTS_SPEED,
-        LARVA_HOOK,
-        VACUUM_GARDEN
+            NEW_YEAR_CAKE,
+            RANCHERS_BOOTS_SPEED,
+            LARVA_HOOK,
+            VACUUM_GARDEN
     ));
 
     public enum ItemNumberEntry implements HasLegacyId {
@@ -121,9 +114,9 @@ public class InventoryConfig {
 
     @Expose
     @ConfigOption(
-        name = "Quick Craft Confirmation",
-        desc = "Require Ctrl+Click to craft items that aren't often quick crafted " +
-            "(e.g. armor, weapons, accessories). Sack items can be crafted normally."
+            name = "Quick Craft Confirmation",
+            desc = "Require Ctrl+Click to craft items that aren't often quick crafted " +
+                    "(e.g. armor, weapons, accessories). Sack items can be crafted normally."
     )
     @ConfigEditorBoolean
     @FeatureToggle
@@ -143,42 +136,42 @@ public class InventoryConfig {
 
     @Expose
     @ConfigOption(name = "Item Stars",
-        desc = "Show a compact star count in the item name for all items.")
+            desc = "Show a compact star count in the item name for all items.")
     @ConfigEditorBoolean
     @FeatureToggle
     public boolean itemStars = false;
 
     @Expose
     @ConfigOption(name = "Missing Tasks",
-        desc = "Highlight missing tasks in the SkyBlock Level Guide inventory.")
+            desc = "Highlight missing tasks in the SkyBlock Level Guide inventory.")
     @ConfigEditorBoolean
     @FeatureToggle
     public boolean highlightMissingSkyBlockLevelGuide = true;
 
     @Expose
     @ConfigOption(name = "Power Stone Guide",
-        desc = "Highlight missing power stones, show their total bazaar price, and allows to open the bazaar when clicking on the items in the Power Stone Guide.")
+            desc = "Highlight missing power stones, show their total bazaar price, and allows to open the bazaar when clicking on the items in the Power Stone Guide.")
     @ConfigEditorBoolean
     @FeatureToggle
     public boolean powerStoneGuide = true;
 
     @Expose
     @ConfigOption(name = "Highlight Auctions",
-        desc = "Highlight own items that are sold in green and that are expired in red.")
+            desc = "Highlight own items that are sold in green and that are expired in red.")
     @ConfigEditorBoolean
     @FeatureToggle
     public boolean highlightAuctions = true;
 
     @Expose
     @ConfigOption(name = "Highlight Underbid Auctions",
-        desc = "Highlight underbid own lowest BIN auctions that are outbid.")
+            desc = "Highlight underbid own lowest BIN auctions that are outbid.")
     @ConfigEditorBoolean
     @FeatureToggle
     public boolean highlightAuctionsUnderbid = false;
 
     @Expose
     @ConfigOption(name = "Copy Underbid Price",
-        desc = "Copies the price of an item in the \"Create BIN Auction\" minus 1 coin into the clipboard for faster under-bidding.")
+            desc = "Copies the price of an item in the \"Create BIN Auction\" minus 1 coin into the clipboard for faster under-bidding.")
     @ConfigEditorBoolean
     @FeatureToggle
     public boolean copyUnderbidPrice = false;
@@ -188,15 +181,6 @@ public class InventoryConfig {
     @ConfigEditorBoolean
     @FeatureToggle
     public boolean shiftClickForEquipment = false;
-
-    @Expose
-    @ConfigOption(name = "Dojo Rank Display", desc = "Display your rank, score and actual belt in the Challenges inventory.")
-    @ConfigEditorBoolean
-    @FeatureToggle
-    public boolean showDojoRankDisplay = false;
-
-    @Expose
-    public Position dojoRankDisplayPosition = new Position(100, 80, false, true);
 
     @Expose
     @ConfigOption(name = "Shift Click NPC sell", desc = "Makes normal clicks to shift clicks in npc inventory for selling.")
