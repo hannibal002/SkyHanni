@@ -349,6 +349,7 @@ import at.hannibal2.skyhanni.utils.MinecraftConsoleFilter.Companion.initLogging
 import at.hannibal2.skyhanni.utils.NEUVersionCheck.checkIfNeuIsLoaded
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils
 import at.hannibal2.skyhanni.utils.TabListData
+import at.hannibal2.skyhanni.utils.UtilsPatterns
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPatternManager
 import kotlinx.coroutines.CoroutineName
 import kotlinx.coroutines.CoroutineScope
@@ -432,6 +433,7 @@ class SkyHanniMod {
         loadModule(GardenBestCropTime())
         loadModule(TrackerManager)
         loadModule(SkyBlockItemModifierUtils)
+        loadModule(UtilsPatterns)
 
         // APIs
         loadModule(BazaarApi())
