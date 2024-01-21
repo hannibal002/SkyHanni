@@ -55,7 +55,7 @@ class CommissionsCalculator {
         "(?:§.)*Milestone (?<milestone>\\S+) Rewards"
     )
 
-    private var display: MutableList<Renderable> = mutableListOf()
+    private var display: List<Renderable> = listOf()
     private val firstLine: String = "§lCommissions Calculator:"
     private val fatDisclaimer: List<Renderable> = listOf(
         Renderable.string("§c§lDisclaimer: §r§cThis calculator only accounts for"),
@@ -212,9 +212,8 @@ class CommissionsCalculator {
     }
 
     private fun List<Renderable>.update() {
-        display.clear()
-        display.addAll(this)
-        if (currentHOTMLevel != 0) display.addAll(fatDisclaimer)
+        display = this
+        if (currentHOTMLevel != 0) display += fatDisclaimer
     }
 
     @SubscribeEvent
