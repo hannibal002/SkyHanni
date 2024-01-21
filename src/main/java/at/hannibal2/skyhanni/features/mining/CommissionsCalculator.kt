@@ -27,7 +27,6 @@ class CommissionsCalculator {
     private val config get() = SkyHanniMod.feature.mining.commissionsCalculator
 
     private val DWARVEN = IslandType.DWARVEN_MINES
-    private val CRYSTAL = IslandType.CRYSTAL_HOLLOWS
 
     private val patternGroup = RepoPattern.group("commissions.calculator")
     private val hotmXPPattern by patternGroup.pattern(
@@ -55,7 +54,6 @@ class CommissionsCalculator {
         "(?:§.)*Milestone (?<milestone>\\S+) Rewards"
     )
 
-    private var display: List<Renderable> = listOf()
     private val firstLine: String = "§lCommissions Calculator:"
     private val fatDisclaimer: List<Renderable> = listOf(
         Renderable.string("§c§lDisclaimer: §r§cThis calculator only accounts for"),
@@ -65,6 +63,8 @@ class CommissionsCalculator {
             listOf("Click to run §e/hotm"), onClick = { LorenzUtils.sendCommandToServer("hotm") }
         ),
     )
+
+    private var display: List<Renderable> = listOf()
 
     private var currentHOTMLevel: Int = 0
     private var currentHOTMXP: Int = 0
@@ -223,7 +223,7 @@ class CommissionsCalculator {
         config.position.renderRenderables(display, posLabel = "Commissions Calculator")
     }
 
-    private fun isEnabled() = config.enabled && (DWARVEN.isInIsland() || CRYSTAL.isInIsland())
+    private fun isEnabled() = config.enabled && (DWARVEN.isInIsland() || IslandType.CRYSTAL_HOLLOWS.isInIsland())
     private fun String.isNotValidChestName(): Boolean = this != "Commission Milestones" && this != "Commissions" && this != "Heart of the Mountain"
     private fun String.groupToInt(): Int = this.formatNumber().toInt()
 }
