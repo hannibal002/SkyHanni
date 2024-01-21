@@ -133,26 +133,6 @@ class CommissionsCalculator {
         newList.drawDisplay()
     }
 
-    private fun calculateWithMilestones(
-        items: Map<Int, ItemStack>,
-        perComm: Double,
-        newList: MutableList<Renderable>,
-        colorCode: String
-    ) {
-        for ((_, item) in items) {
-            milestoneRewardsItemPattern.matchMatcher(item.cleanName()) {
-                val milestone = group("milestone").romanToDecimalIfNecessary()
-                for (line in item.getLore()) {
-                    mileProgressPattern.matchMatcher(line) {
-                        val completed = group("completed").groupToInt()
-                        val required = group("required").groupToInt()
-                        remainingMilestones(required, completed, perComm, newList, colorCode, milestone)
-                    }
-                }
-            }
-        }
-    }
-
     private fun calculateWithCommissions(
         items: Map<Int, ItemStack>,
         hotmXP: Long
@@ -179,6 +159,26 @@ class CommissionsCalculator {
                 for (line in item.getLore()) {
                     tierProgressPattern.matchMatcher(line) {
                         currentHOTMXP = group("obtained").groupToInt()
+                    }
+                }
+            }
+        }
+    }
+
+    private fun calculateWithMilestones(
+        items: Map<Int, ItemStack>,
+        perComm: Double,
+        newList: MutableList<Renderable>,
+        colorCode: String
+    ) {
+        for ((_, item) in items) {
+            milestoneRewardsItemPattern.matchMatcher(item.cleanName()) {
+                val milestone = group("milestone").romanToDecimalIfNecessary()
+                for (line in item.getLore()) {
+                    mileProgressPattern.matchMatcher(line) {
+                        val completed = group("completed").groupToInt()
+                        val required = group("required").groupToInt()
+                        remainingMilestones(required, completed, perComm, newList, colorCode, milestone)
                     }
                 }
             }
