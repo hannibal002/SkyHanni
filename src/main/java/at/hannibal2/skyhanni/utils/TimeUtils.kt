@@ -16,11 +16,6 @@ object TimeUtils {
     private val pattern =
         "(?:(?<y>\\d+) ?y(?:\\w* ?)?)?(?:(?<d>\\d+) ?d(?:\\w* ?)?)?(?:(?<h>\\d+) ?h(?:\\w* ?)?)?(?:(?<m>\\d+) ?m(?:\\w* ?)?)?(?:(?<s>\\d+) ?s(?:\\w* ?)?)?".toPattern()
 
-    private val seasonPattern by RepoPattern.pattern(
-        "timeutils.season.skyblocktime",
-        "(?:Early |Late )?(?<season>Spring|Summer|Autumn|Winter)"
-    )
-
     fun Duration.format(
         biggestUnit: TimeUnit = TimeUnit.YEAR,
         showMilliSeconds: Boolean = false,
@@ -148,13 +143,6 @@ object TimeUtils {
     }
 
     fun getCurrentLocalDate(): LocalDate = LocalDate.now(ZoneId.of("UTC"))
-
-    fun getSeasonByName(input: String): String {
-        seasonPattern.matchMatcher(input) {
-            return group("season")
-        }
-        return ""
-    }
 }
 
 private const val FACTOR_SECONDS = 1000L

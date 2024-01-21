@@ -38,6 +38,6 @@ public class AtmosphericFilterDisplayConfig {
     @Expose
     public Position position = new Position(10, 10, true, true);
     @Expose
-    public Position posOutside = new Position(20, 20, true, true);
+    public Position positionOutside = new Position(20, 20, true, true);
 
 }
