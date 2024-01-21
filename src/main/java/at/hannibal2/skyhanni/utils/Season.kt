@@ -2,6 +2,7 @@ package at.hannibal2.skyhanni.utils
 
 import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.UtilsPatterns.seasonPattern
+import io.github.moulberry.notenoughupdates.util.SkyBlockTime
 
 enum class Season(
     val season: String,
@@ -20,12 +21,9 @@ enum class Season(
 
     companion object {
 
-        fun getSeasonByName(input: String): Season? {
-            seasonPattern.matchMatcher(input) {
-                return entries.find { it.season.endsWith(group("season")) }
-            }
-            return null
-        }
+        fun getCurrentSeason(month: String = SkyBlockTime.now().monthName): Season? = getSeasonByName(month)
+
+        private fun getSeasonByName(name: String): Season? = seasonPattern.matchMatcher(name) { entries.find { it.season.endsWith(group("season")) } }
     }
 
 }

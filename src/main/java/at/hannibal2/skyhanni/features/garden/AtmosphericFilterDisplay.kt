@@ -20,7 +20,7 @@ class AtmosphericFilterDisplay {
         if (!isEnabled()) return
         if (!GardenAPI.inGarden() && !config.everywhere) return
         if (!event.repeatSeconds(1)) return
-        display = constructPerk(Season.getSeasonByName(SkyBlockTime.now().monthName) ?: return)
+        display = drawDisplay(Season.getCurrentSeason() ?: return)
     }
 
     @SubscribeEvent
@@ -33,7 +33,7 @@ class AtmosphericFilterDisplay {
         }
     }
 
-    private fun constructPerk(season: Season): String = buildString {
+    private fun drawDisplay(season: Season): String = buildString {
         if (!config.onlyBuff) {
             append(season.getSeason(config.abbreviateSeason))
             append("§7: ")
