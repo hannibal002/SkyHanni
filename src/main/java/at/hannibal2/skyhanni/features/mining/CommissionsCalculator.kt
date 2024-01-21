@@ -95,7 +95,7 @@ class CommissionsCalculator {
                 Renderable.clickAndHover("§cOpen the §e/hotm §ctree.",
                     listOf("Click to run §e/hotm"), onClick = { LorenzUtils.sendCommandToServer("hotm") }
                 ),
-            ).update()
+            ).drawDisplay()
             return
         }
         val hotmInfo = HOTMTier.entries.find { it.tier == currentHOTMLevel } ?: return
@@ -113,7 +113,7 @@ class CommissionsCalculator {
                     Renderable.string(" §7- §fCurrent HOTM XP: $colorCode${currentHOTMXP.addSeparators()}"),
                 )
             )
-            newList.update()
+            newList.drawDisplay()
             return
         }
         if (chestName == "Commissions") {
@@ -130,7 +130,7 @@ class CommissionsCalculator {
                 Renderable.string(" §7- §f(to reach $colorCode${toNextTier.addSeparators()} HOTM XP §ffrom $colorCode${currentHOTMXP.addSeparators()} HOTM XP§f)"),
             )
         )
-        newList.update()
+        newList.drawDisplay()
     }
 
     private fun calculateWithMilestones(
@@ -211,9 +211,9 @@ class CommissionsCalculator {
         }
     }
 
-    private fun List<Renderable>.update() {
+    private fun List<Renderable>.drawDisplay() {
         display = this
-        if (currentHOTMLevel != 0) display += fatDisclaimer
+        if (currentHOTMLevel != 0) display = this + fatDisclaimer
     }
 
     @SubscribeEvent
