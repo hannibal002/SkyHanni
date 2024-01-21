@@ -35,4 +35,8 @@ object UtilsPatterns {
         "item.name.potion",
         ".*Potion"
     )
+    val petLevelPattern by patternGroup.pattern(
+        "item.petlevel",
+        "(?:§f§f)?§7\\[Lvl (?<level>\\d+)] .*"
+    )
 }
