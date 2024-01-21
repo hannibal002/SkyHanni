@@ -13,7 +13,6 @@ import at.hannibal2.skyhanni.utils.NEUInternalName.Companion.asInternalName
 import at.hannibal2.skyhanni.utils.NEUItems.getPriceOrNull
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderables
-import at.hannibal2.skyhanni.utils.StringUtils.allLettersFirstUppercase
 import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
@@ -50,8 +49,8 @@ class GeorgeDisplay {
         var totalCost = 0.0
         for (line in lore) {
             neededPetPattern.matchMatcher(line) {
-                val origTierString = group("tier") ?: ""
-                val origPetString = group("pet") ?: ""
+                val origTierString = group("tier")
+                val origPetString = group("pet")
                 val pet = origPetString.uppercase().replace(" ", "_").removePrefix("FROST_")
                 val originalTier = LorenzRarity.entries.find { it.name == origTierString.uppercase() }!!.id
                 val petPriceOne = "$pet$SEPARATOR$originalTier".getPetPrice()
@@ -61,11 +60,7 @@ class GeorgeDisplay {
                     if (originalTier != 5) petPrices.add("$pet$SEPARATOR${originalTier + 1}".getPetPrice(otherRarity = true))
                 }
                 val petPrice = petPrices.min()
-                val cheapestTier = when (petPrices.indexOf(petPrice)) {
-                    1 -> originalTier - 1
-                    2 -> originalTier + 1
-                    else -> originalTier
-                }
+                val cheapestTier = petPrices.cheapestTierIndex(petPrice, originalTier)
                 val displayPetString =
                     if (cheapestTier == originalTier) group("fullThing")
                     else "${LorenzRarity.entries.find { it.id == cheapestTier }!!.formattedName} $origPetString"
@@ -92,6 +87,13 @@ class GeorgeDisplay {
         if (config.otherRarities) updateList.add(Renderable.string("§c§lDisclaimer:§r§c Total does not include costs to upgrade via Kat."))
         return updateList
     }
+
+    private fun MutableList<Double>.cheapestTierIndex(petPrice: Double, originalTier: Int) =
+        when (this.indexOf(petPrice)) {
+            1 -> originalTier - 1
+            2 -> originalTier + 1
+            else -> originalTier
+        }
 
     @SubscribeEvent
     fun onRenderOverlay(event: GuiRenderEvent.ChestGuiOverlayRenderEvent) {
