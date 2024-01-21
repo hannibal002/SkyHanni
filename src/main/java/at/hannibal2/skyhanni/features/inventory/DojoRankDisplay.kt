@@ -33,6 +33,11 @@ class DojoRankDisplay {
     }
 
     private fun drawDisplay(items: Collection<ItemStack>) = buildList {
+        if (belts.isEmpty()) {
+            add("§cUnable to get Belts data, please run /shupdaterepo")
+            return@buildList
+        }
+
         var totalScore = 0
         for (stack in items) {
             val name = stack.displayName ?: continue
