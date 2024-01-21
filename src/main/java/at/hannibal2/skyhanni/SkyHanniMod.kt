@@ -483,7 +483,7 @@ class SkyHanniMod {
         loadModule(AuctionHouseCopyUnderbidPrice())
         loadModule(AnvilCombineHelper())
         loadModule(SeaCreatureMessageShortener())
-        loadModule(AshfangFreezeCooldown())
+        loadModule(AshfangFreezeCooldown)
         loadModule(AshfangNextResetCooldown())
         loadModule(SummoningSoulsName())
         loadModule(AshfangGravityOrbs())
