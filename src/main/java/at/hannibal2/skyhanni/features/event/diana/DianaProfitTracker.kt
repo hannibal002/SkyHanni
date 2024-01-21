@@ -12,6 +12,7 @@ import at.hannibal2.skyhanni.utils.NEUInternalName
 import at.hannibal2.skyhanni.utils.NumberUtil
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.NumberUtil.formatNumber
+import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.StringUtils.matches
 import at.hannibal2.skyhanni.utils.renderables.Renderable
@@ -104,12 +105,14 @@ object DianaProfitTracker {
     fun onChat(event: LorenzChatEvent) {
         val message = event.message
         if (chatDugOutPattern.matches(message)) {
+            BurrowAPI.lastBurrowRelatedChatMessage = SimpleTimeMark.now()
             tracker.modify {
                 it.burrowsDug++
             }
             tryHide(event)
         }
         chatDugOutCoinsPattern.matchMatcher(message) {
+            BurrowAPI.lastBurrowRelatedChatMessage = SimpleTimeMark.now()
             val coins = group("coins").formatNumber().toInt()
             tracker.addCoins(coins)
             tryHide(event)
@@ -118,6 +121,7 @@ object DianaProfitTracker {
         if (message == "§6§lRARE DROP! §r§eYou dug out a §r§9Griffin Feather§r§e!" ||
             message == "§eFollow the arrows to find the §r§6treasure§r§e!"
         ) {
+            BurrowAPI.lastBurrowRelatedChatMessage = SimpleTimeMark.now()
             tryHide(event)
         }
     }

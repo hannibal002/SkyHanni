@@ -24,6 +24,9 @@
     + Highlight missing power stones, show their total bazaar price, and allows to open the bazaar when clicking on the
       items in the Power Stone Guide.
 + Option to make normal clicks to shift clicks in equipment inventory. - Thunderblade73
++ Show pet items XP Share and Tier Boost as small icons next to the pet in an inventory. - Thunderblade73
++ Added Shift Click Brewing. - Thunderblade73
+    + Makes normal clicks to shift clicks in Brewing Stand inventory.
 
 #### Item Features
 
@@ -32,6 +35,23 @@
 #### Chat Features
 
 + Add tab list fire sale advertisement hider. - nea
++ Added SkyBlock XP Chat. - Thunderblade73
+    + Sends the SkyBlock XP message from the action bar into the chat.
+
+#### Command Features
+
++ Party Kick with reason. - nea
+    + Added support for the Hypixel command /p kick /pk to add a reason. The reason will be sent in party chat before
+      kicking the player.
++ Added /shcalccrop. - CalMWolfs
+    + Calculate how many crops need to be farmed between different crop milestones.
++ Added /shcalccroptime. - CalMWolfs
+    + Calculate how long you need to farm crops between different crop milestones.
+
+#### Misc Features
+
++ Fixes Ghost Entities. - hannibal2 & nea & Thunderblade73
+    + Removes ghost entities caused by a Hypixel bug. This included Diana, Dungeon and Crimson Isle mobs and nametags.
 
 ### Changes
 
@@ -47,6 +67,10 @@
 + Jacob Contest feature now has clickable calendar open command when Elite API is not ready yet. - alexia
 + Mark carrot/pumpkin fortune as completed when giving to Carrolyn after already done. - alexia
 + Added ability to get unique visitors served without Green Thumb. - alexia
++ Check if you are sneaking for optimal speed in the Garden and show current speed when wrong. - alexia
++ Added option to show visitor shopping list in Farming Islands - Erymanthus
+    + Show the Visitor Shopping List while on the Farming Islands or inside the Farm in the Hub.
+    + This helps to farm the correct amount, especially when in the early game.
 
 #### Rift Changes
 
@@ -75,11 +99,16 @@
     + Hypixel removed them from sacks.
 + Show a warning in Bestiary Display when Overall Progress is not enabled. - HiZe
 + Added option to hide pet candy count on maxed out pets. - CalMWolfs
++ Added option to change the size of the Pet Item Display Icon in inventories. - Thunderblade73
 
 #### Dungeon Changes
 
 + Changed the description of the Dungeon Chat Filter feature to be more descriptive. - Wambo
 + Added options to change exactly what part of the Dungeon Chat Filter should be used. - Wambo
+
+#### Diana Changes
+
++ Changed the Griffin Burrow Guess text to a centered title instead of an odd line that goes down. - hannibal2
 
 #### Chat Changes
 
@@ -88,6 +117,7 @@
 + Added more messages to Hypixel Lobby spam hider.
     + SMP and Snow Particles. - walker
     + Earned mystery dust. - alexia
++ Added the fire sale ended message to the Fire Sale Chat Hider. - hannibal2
 
 #### Misc Changes
 
@@ -108,6 +138,7 @@
 + Fixed error message that nearest pests cannot get removed properly. - hannibal2
 + Fixed grammar in Jacob Contest chat messages. - alexia
 + Fixed rarity error for items thrown around when using Sprayanator. - hannibal2
++ Added cooldown to Garden Warp Commands. - Empa
 
 #### Combat Fixes
 
@@ -116,12 +147,21 @@
 + Fixed wrong calculation when zero bosses killed in slayer profit trackers. - hannibal2
 + Hide No Fishing Bait warning during Kuudra fight. - hannibal2
 + Fixed Dungeon and Kuudra party finder join message not detecting in party member tab complete. - CalMWolfs
++ Fixed Fire Veil Wand circle shows on left-clicking. - hannibal2
+
+#### Diana Fixes
+
++ Fixed close griffin burrow detection with particles failing sometimes. - hannibal2
++ Fixed Diana mobs being invisible because of Fix Ghost Entities and four season pet skin. - hannibal2
++ Fixed a rare bug that leaves ghost burrows around. - hannibal2
 
 #### Mining Fixes
 
 + Fixed an error when showing all elements in Powder Tracker. - hannibal2
 + Fixed powder tracker detecting gemstone chat messages. - CalMWolfs
 + Fixed Mining Chat Filter not hiding gemstone messages. - CalMWolfs
++ Fixed names for the Crystal Hollows Mining Areas feature. - alexia
++ Fixed detection of gold and diamond essence gain chat message when powder mining. - CalMWolfs
 
 #### Rift Fixes
 
@@ -165,6 +205,7 @@
 + Maybe fixed Tia Relay Helper. - Thunderblade73
 + Fixed wording in trackers when the item is newly obtained. - hannibal2
 + Fixed titles not showing above other SkyHanni GUI elements all the time. - Thunderblade73
++ Fixed Daily City Project Reminder is still working on already-released projects. - alexia
 
 ### Technical Changes
 
@@ -191,6 +232,23 @@
 + Don't allow uppercase Repo Pattern keys and added a more descriptive error. - CalMWolfs
 + Moved party API chat messages to Repo Pattern. - CalMWolfs
 + Allowing nullable parameters for regex functions matches() and find(). - hannibal2
++ Cleanup calculate() in Estimated Item Value. - walker
++ Added DebugDataCollectEvent. - hannibal2
++ Added Diana Burrow Nearest Warp to /shdebugdata - hannibal2
++ Changed debug commands: - hannibal2
+    + /shdebugwaypoint -> /shtestwaypoint
+    + /shdebugtablist -> /shtesttablist
+    + /shdebugdata -> /shdebug
++ Moving dungeons and slayer related debug data into DebugDataCollectEvent. - hannibal2
+    + Allowing to hide/search for specific debug data with /shdebug <search> - hannibal2
++ Per default only active/relevant data is shown.
++ Added visitor status to /shdebug - hannibal2
++ Added hotswap detection and reloading all listeners on hotswap. - nea
++ Categorized every item using the rarity lore line. - Thunderblade73
++ Used better way of getting the item rarity. - Thunderblade73
++ Added function SlotClickEvent.makeShiftClick(). - Thunderblade73
++ Used a better bug fix for DelayedRun sync issues. - Thunderblade73
++ Creating and using TimeLimitedCache and TimeLimitedSet instead of guava cache. - hannibal2
 
 ## Version 0.22
 
