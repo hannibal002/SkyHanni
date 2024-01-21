@@ -14,7 +14,7 @@ plugins {
 }
 
 group = "at.hannibal2.skyhanni"
-version = "0.23.Beta.8"
+version = "0.23.Beta.10"
 
 val gitHash by lazy {
     val baos = ByteArrayOutputStream()
@@ -111,6 +111,7 @@ dependencies {
     shadowModImpl(libs.moulconfig)
     shadowImpl(libs.libautoupdate)
     shadowImpl("org.jetbrains.kotlin:kotlin-reflect:1.9.0")
+    implementation(libs.hotswapagentforge)
 
 //    testImplementation(kotlin("test"))
     testImplementation("com.github.NotEnoughUpdates:NotEnoughUpdates:v2.1.1-pre4:all") {

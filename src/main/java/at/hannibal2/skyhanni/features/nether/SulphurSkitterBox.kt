@@ -8,6 +8,7 @@ import at.hannibal2.skyhanni.events.LorenzRenderWorldEvent
 import at.hannibal2.skyhanni.events.LorenzTickEvent
 import at.hannibal2.skyhanni.events.LorenzWorldChangeEvent
 import at.hannibal2.skyhanni.events.RepositoryReloadEvent
+import at.hannibal2.skyhanni.features.fishing.FishingAPI
 import at.hannibal2.skyhanni.utils.BlockUtils.getBlockAt
 import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.LocationUtils
@@ -39,8 +40,9 @@ class SulphurSkitterBox {
             closestBlock = getClosestBlockToPlayer()
         }
         if (event.repeatSeconds(1)) {
-            val from = LocationUtils.playerLocation().add(-20, -20, -20).toBlockPos()
-            val to = LocationUtils.playerLocation().add(20, 20, 20).toBlockPos()
+            val location = LocationUtils.playerLocation()
+            val from = location.add(-20, -20, -20).toBlockPos()
+            val to = location.add(20, 20, 20).toBlockPos()
 
             spongeBlocks = BlockPos.getAllInBox(from, to).filter {
                 val b = it.toLorenzVec().getBlockAt()
@@ -49,7 +51,7 @@ class SulphurSkitterBox {
                 val pos1 = it.add(-radius, -radius, -radius)
                 val pos2 = it.add(radius, radius, radius)
                 BlockPos.getAllInBox(pos1, pos2).any { pos ->
-                    pos.toLorenzVec().getBlockAt() in listOf(Blocks.lava, Blocks.flowing_lava)
+                    pos.toLorenzVec().getBlockAt() in FishingAPI.lavaBlocks
                 }
             }
         }
@@ -67,7 +69,7 @@ class SulphurSkitterBox {
             if (it.toLorenzVec().distanceToPlayer() >= 50) return
             val pos1 = it.add(-radius, -radius, -radius)
             val pos2 = it.add(radius, radius, radius)
-            val axis = AxisAlignedBB(pos1, pos2)
+            val axis = AxisAlignedBB(pos1, pos2).expandBlock()
 
             drawBox(axis, event.partialTicks)
         }
@@ -81,18 +83,18 @@ class SulphurSkitterBox {
         val color = Color(SpecialColour.specialToChromaRGB(config.boxColor), true)
         when (config.boxType) {
             SulphurSkitterBoxConfig.BoxType.FULL -> {
-                RenderUtils.drawFilledBoundingBox_nea(axis.expandBlock(),
+                RenderUtils.drawFilledBoundingBox_nea(axis,
                     color,
                     partialTicks = partialTicks,
                     renderRelativeToCamera = false)
             }
 
             SulphurSkitterBoxConfig.BoxType.WIREFRAME -> {
-                RenderUtils.drawWireframeBoundingBox_nea(axis.expandBlock(), color, partialTicks)
+                RenderUtils.drawWireframeBoundingBox_nea(axis, color, partialTicks)
             }
 
             else -> {
-                RenderUtils.drawWireframeBoundingBox_nea(axis.expandBlock(), color, partialTicks)
+                RenderUtils.drawWireframeBoundingBox_nea(axis, color, partialTicks)
             }
         }
     }
@@ -101,6 +103,10 @@ class SulphurSkitterBox {
     fun onRepoReload(event: RepositoryReloadEvent) {
         val data = event.getConstant<ItemsJson>("Items")
         rods = data.lava_fishing_rods ?: emptyList()
+
+        if (rods.isEmpty()) {
+            error("§cConstants Items is missing data, please use /shupdaterepo")
+        }
     }
 
     fun isEnabled() =
