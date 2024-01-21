@@ -581,10 +581,15 @@ class GardenVisitorFeatures {
     }
 
     private fun showGui(): Boolean {
-        if (config.shoppingList.inBazaarAlley && IslandType.HUB.isInIsland() && LorenzUtils.skyBlockArea == "Bazaar Alley") {
-            return true
+        if (IslandType.HUB.isInIsland()) {
+            if (config.shoppingList.inBazaarAlley && LorenzUtils.skyBlockArea == "Bazaar Alley") {
+                return true
+            }
+            if (config.shoppingList.inFarmingAreas && LorenzUtils.skyBlockArea == "Farm") {
+                return true
+            }
         }
-
+        if (config.shoppingList.inFarmingAreas && IslandType.THE_FARMING_ISLANDS.isInIsland()) return true
         if (hideExtraGuis()) return false
         if (GardenAPI.inGarden()) {
             if (GardenAPI.onBarnPlot) return true

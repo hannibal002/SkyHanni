@@ -5,6 +5,7 @@ import at.hannibal2.skyhanni.data.HypixelData
 import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.data.MayorElection
 import at.hannibal2.skyhanni.data.TitleManager
+import at.hannibal2.skyhanni.events.GuiContainerEvent
 import at.hannibal2.skyhanni.events.LorenzTickEvent
 import at.hannibal2.skyhanni.features.dungeon.DungeonAPI
 import at.hannibal2.skyhanni.mixins.transformers.AccessorGuiEditSign
@@ -42,6 +43,7 @@ import java.util.Timer
 import java.util.TimerTask
 import java.util.WeakHashMap
 import java.util.regex.Matcher
+import java.util.concurrent.ConcurrentLinkedQueue
 import kotlin.properties.ReadWriteProperty
 import kotlin.reflect.KMutableProperty1
 import kotlin.reflect.KProperty
@@ -352,7 +354,7 @@ object LorenzUtils {
         hover: List<String>,
         command: String? = null,
         prefix: Boolean = true,
-        prefixColor: String = "§e"
+        prefixColor: String = "§e",
     ) {
         val msgPrefix = if (prefix) prefixColor + CHAT_PREFIX else ""
         val text = ChatComponentText(msgPrefix + message)
@@ -452,7 +454,7 @@ object LorenzUtils {
         prefix: String,
         getName: (T) -> String,
         isCurrent: (T) -> Boolean,
-        crossinline onChange: (T) -> Unit
+        crossinline onChange: (T) -> Unit,
     ) = buildList {
         add(prefix)
         for (entry in enumValues<T>()) {
@@ -555,8 +557,8 @@ object LorenzUtils {
 
         val tileSign = (this as AccessorGuiEditSign).tileSign
         return (tileSign.signText[1].unformattedText.removeColor() == "^^^^^^"
-                && tileSign.signText[2].unformattedText.removeColor() == "Set your"
-                && tileSign.signText[3].unformattedText.removeColor() == "speed cap!")
+            && tileSign.signText[2].unformattedText.removeColor() == "Set your"
+            && tileSign.signText[3].unformattedText.removeColor() == "speed cap!")
     }
 
     fun IslandType.isInIsland() = inSkyBlock && skyBlockIsland == this
@@ -629,6 +631,13 @@ object LorenzUtils {
         return this
     }
 
+    fun GuiContainerEvent.SlotClickEvent.makeShiftClick() =
+        slot?.slotNumber?.let { slotNumber ->
+            Minecraft.getMinecraft().playerController.windowClick(
+                container.windowId, slotNumber, 0, 1, Minecraft.getMinecraft().thePlayer
+            )?.also { isCanceled = true }
+        }
+
     fun <T> List<T>.indexOfFirst(vararg args: T) = args.map { indexOf(it) }.firstOrNull { it != -1 }
 
     private val recalculateDerpy =
@@ -672,6 +681,9 @@ object LorenzUtils {
         enumValueOfOrNull<T>(name)
             ?: kotlin.error("Unknown enum constant for ${enumValues<T>().first().name.javaClass.simpleName}: '$name'")
 
+    inline fun <reified T : Enum<T>> enumJoinToPattern(noinline transform: (T) -> CharSequence = { it.name }) =
+        enumValues<T>().joinToString("|", transform = transform)
+
     fun isInDevEnviromen() = Launch.blackboard["fml.deobfuscatedEnvironment"] as Boolean
 
     fun shutdownMinecraft(reason: String? = null) {
@@ -690,9 +702,14 @@ object LorenzUtils {
         return runCatching { this.group(groupName) }.getOrNull()
     }
 
+    fun <E> ConcurrentLinkedQueue<E>.drainTo(list: MutableCollection<E>) {
+        while (true)
+            list.add(this.poll() ?: break)
+    }
+    
     // Let garbage collector handle the removal of entries in this list
     fun <T> weakReferenceList(): MutableSet<T> = Collections.newSetFromMap(WeakHashMap<T, Boolean>())
 
-
     fun <T> MutableCollection<T>.filterToMutable(predicate: (T) -> Boolean) = filterTo(mutableListOf(), predicate)
+
 }

@@ -5,24 +5,26 @@ import at.hannibal2.skyhanni.events.GuiRenderItemEvent
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.RenderUtils.drawSlotText
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getPetItem
+import net.minecraft.client.Minecraft
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
 class PetItemDisplay {
 
-    private val configList get() = SkyHanniMod.feature.misc.pets.petItemDisplay
+    private val config get() = SkyHanniMod.feature.misc.pets
 
     @SubscribeEvent
     fun onRenderItemOverlayPost(event: GuiRenderItemEvent.RenderOverlayEvent.GuiRenderItemPost) {
         val stack = event.stack ?: return
         if (!LorenzUtils.inSkyBlock || stack.stackSize != 1) return
-        if (configList.isEmpty()) return
+        if (config.petItemDisplay.isEmpty()) return
 
         val petItem = stack.getPetItem() ?: return
-        val icon = configList.firstOrNull { it.item == petItem }?.icon ?: return
+        val icon = config.petItemDisplay.firstOrNull { it.item == petItem }?.icon ?: return
 
-        val x = event.x + 17
+        val width = (Minecraft.getMinecraft().fontRendererObj.getStringWidth(icon) * config.petItemDisplayScale).toInt()
+        val x = event.x + 22 - width
         val y = event.y - 1
 
-        event.drawSlotText(x, y, icon, .9f)
+        event.drawSlotText(x, y, icon, config.petItemDisplayScale)
     }
 }

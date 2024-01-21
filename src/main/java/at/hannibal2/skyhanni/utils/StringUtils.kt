@@ -282,6 +282,7 @@ object StringUtils {
     fun String.convertToFormatted(): String = this.replace("&&", "§")
 
     fun Pattern.matches(string: String?) = string?.let { matcher(it).matches() } ?: false
+    fun Pattern.anyMatches(list: List<String>?) = list?.any { this.matches(it) } ?: false
 
     fun Pattern.find(string: String?) = string?.let { matcher(it).find() } ?: false
 
