@@ -17,6 +17,7 @@ import at.hannibal2.skyhanni.utils.StringUtils
 import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
+import net.minecraft.item.ItemStack
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import kotlin.math.abs
 import kotlin.math.ceil
@@ -106,19 +107,10 @@ class CommissionsCalculator {
             Renderable.string("$colorCode$firstLine"),
         )
         if (chestName == "Heart of the Mountain") {
-            for ((_, item) in items) {
-                tierItemPattern.matchMatcher(item.cleanName()) {
-                    currentHOTMLevel = group("tier").groupToInt()
-                    for (line in item.getLore()) {
-                        tierProgressPattern.matchMatcher(line) {
-                            currentHOTMXP = group("obtained").groupToInt()
-                        }
-                    }
-                }
-            }
+            newList.add(Renderable.string(" §e(Remember to scroll up the HOTM tree!)"))
+            calculateWithHOTM(items)
             newList.addAll(
                 listOf(
-                    Renderable.string(" §e(Remember to scroll up the HOTM tree!)"),
                     Renderable.string(" §7- §fCurrent HOTM Level: $colorCode$currentHOTMLevel"),
                     Renderable.string(" §7- §fCurrent HOTM XP: $colorCode${currentHOTMXP.addSeparators()}"),
                 )
@@ -128,17 +120,7 @@ class CommissionsCalculator {
         }
         if (chestName == "Commissions") {
             var hotmXP: Long = 0
-            loop@for ((_, item) in items) {
-                commissionItemPattern.matchMatcher(item.cleanName()) {
-                    val lore = item.getLore()
-                    if (lore.none { it == "§a§lCOMPLETED" } && config.completedOnly) continue@loop
-                    for (line in lore) {
-                        hotmXPPattern.matchMatcher(line) {
-                            hotmXP += group("xp").formatNumber()
-                        }
-                    }
-                }
-            }
+            hotmXP = calculateWithCommissions(items, hotmXP)
             newList.add(Renderable.string(" §7- §f(At least $colorCode${hotmXP.addSeparators()} HOTM XP §fto be gained from claiming completed commissions)"))
         }
         if (chestName == "Commission Milestones") {
@@ -149,24 +131,7 @@ class CommissionsCalculator {
                         mileProgressPattern.matchMatcher(line) {
                             val completed = group("completed").groupToInt()
                             val required = group("required").groupToInt()
-                            val commsToNextMilestone = abs(required - completed)
-                            if (completed < required) {
-                                val remainingPlural = StringUtils.optionalPlural(commsToNextMilestone, "commission", "commissions")
-                                val hotmXPGain = (commsToNextMilestone * perComm).roundToInt()
-                                newList.add(
-                                    Renderable.string(" §7- $colorCode$remainingPlural §fleft to complete §6Milestone $milestone §f($colorCode+${hotmXPGain.addSeparators()} HOTM XP§f)"),
-                                )
-                            }
-                            if (!config.allMilestones) {
-                                val lastElement = newList.takeLast(1).first()
-                                newList.clear()
-                                newList.addAll(
-                                    listOf<Renderable>(
-                                        Renderable.string("$colorCode$firstLine"),
-                                        lastElement,
-                                    )
-                                )
-                            }
+                            remainingMilestones(required, completed, perComm, newList, colorCode, milestone)
                         }
                     }
                 }
@@ -180,7 +145,67 @@ class CommissionsCalculator {
         )
         newList.update()
     }
-    
+
+    private fun calculateWithCommissions(
+        items: Map<Int, ItemStack>,
+        hotmXP: Long
+    ): Long {
+        var hotmXP1 = hotmXP
+        loop@ for ((_, item) in items) {
+            commissionItemPattern.matchMatcher(item.cleanName()) {
+                val lore = item.getLore()
+                if (lore.none { it == "§a§lCOMPLETED" } && config.completedOnly) continue@loop
+                for (line in lore) {
+                    hotmXPPattern.matchMatcher(line) {
+                        hotmXP1 += group("xp").formatNumber()
+                    }
+                }
+            }
+        }
+        return hotmXP1
+    }
+
+    private fun calculateWithHOTM(items: Map<Int, ItemStack>) {
+        for ((_, item) in items) {
+            tierItemPattern.matchMatcher(item.cleanName()) {
+                currentHOTMLevel = group("tier").groupToInt()
+                for (line in item.getLore()) {
+                    tierProgressPattern.matchMatcher(line) {
+                        currentHOTMXP = group("obtained").groupToInt()
+                    }
+                }
+            }
+        }
+    }
+
+    private fun remainingMilestones(
+        required: Int,
+        completed: Int,
+        perComm: Double,
+        newList: MutableList<Renderable>,
+        colorCode: String,
+        milestone: Int
+    ) {
+        val commsToNextMilestone = abs(required - completed)
+        if (completed < required) {
+            val remainingPlural = StringUtils.optionalPlural(commsToNextMilestone, "commission", "commissions")
+            val hotmXPGain = (commsToNextMilestone * perComm).roundToInt()
+            newList.add(
+                Renderable.string(" §7- $colorCode$remainingPlural §fleft to complete §6Milestone $milestone §f($colorCode+${hotmXPGain.addSeparators()} HOTM XP§f)"),
+            )
+        }
+        if (!config.allMilestones) {
+            val lastElement = newList.takeLast(1).first()
+            newList.clear()
+            newList.addAll(
+                listOf<Renderable>(
+                    Renderable.string("$colorCode$firstLine"),
+                    lastElement,
+                )
+            )
+        }
+    }
+
     private fun List<Renderable>.update() {
         display.clear()
         display.addAll(this)
