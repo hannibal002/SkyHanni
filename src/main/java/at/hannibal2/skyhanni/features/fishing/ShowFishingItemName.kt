@@ -13,17 +13,15 @@ import at.hannibal2.skyhanni.utils.LorenzVec
 import at.hannibal2.skyhanni.utils.RenderUtils.drawString
 import at.hannibal2.skyhanni.utils.RenderUtils.exactLocation
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
-import com.google.common.cache.CacheBuilder
+import at.hannibal2.skyhanni.utils.TimeLimitedCache
 import net.minecraft.entity.item.EntityItem
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
-import java.util.concurrent.TimeUnit
+import kotlin.time.Duration.Companion.milliseconds
 
 class ShowFishingItemName {
     private val config get() = SkyHanniMod.feature.fishing.fishedItemName
     private var hasRodInHand = false
-    private var cache =
-        CacheBuilder.newBuilder().expireAfterWrite(750, TimeUnit.MILLISECONDS)
-            .build<EntityItem, Pair<LorenzVec, String>>()
+    private var cache = TimeLimitedCache<EntityItem, Pair<LorenzVec, String>>(750.milliseconds)
 
     // Taken from Skytils
     private val cheapCoins = setOf(
@@ -77,7 +75,7 @@ class ShowFishingItemName {
             }
         }
 
-        for ((location, text) in cache.asMap().values) {
+        for ((location, text) in cache.values()) {
             event.drawString(location, text)
         }
     }
