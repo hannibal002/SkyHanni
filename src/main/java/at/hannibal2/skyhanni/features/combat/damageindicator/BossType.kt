@@ -10,8 +10,6 @@ enum class BossType(
     val shortName: String = fullName,
     val showDeathTime: Boolean = false
 ) {
-    GENERIC_DUNGEON_BOSS("Generic Dungeon boss", Type.DUNGEON_ALL),//TODO split into different bosses
-
     //Nether Mini Bosses
     NETHER_BLADESOUL("§8Bladesoul", Type.NETHER_MINI_BOSSES),
     NETHER_MAGMA_BOSS("§4Magma Boss", Type.NETHER_MINI_BOSSES),
@@ -68,13 +66,26 @@ enum class BossType(
 
     HUB_HEADLESS_HORSEMAN("§6Headless Horseman", Type.HEADLESS_HORSEMAN),
 
-    DUNGEON_F1("", Type.DUNGEON_FLOOR_1),
-    DUNGEON_F2("", Type.DUNGEON_FLOOR_2),
-    DUNGEON_F3("", Type.DUNGEON_FLOOR_3),
+
+    DUNGEON_F1_BONZO_FIRST("§cFunny Bonzo", Type.DUNGEON_FLOOR_1),
+    DUNGEON_F1_BONZO_SECOND("§cSad Bonzo", Type.DUNGEON_FLOOR_1),
+
+    DUNGEON_F2_SUMMON("§eSummon", Type.DUNGEON_FLOOR_2),
+    DUNGEON_F2_SCARF("§cScarf", Type.DUNGEON_FLOOR_2),
+
+    DUNGEON_F3_GUARDIAN("§eGuardian", Type.DUNGEON_FLOOR_3),
+    DUNGEON_F3_PROFESSOR_1("§cProfessor 1/2", Type.DUNGEON_FLOOR_3),
+    DUNGEON_F3_PROFESSOR_2("§cProfessor 2/2", Type.DUNGEON_FLOOR_3),
+
     DUNGEON_F4_THORN("§cThorn", Type.DUNGEON_FLOOR_4),
+
     DUNGEON_F5("§dLivid", Type.DUNGEON_FLOOR_5),
-    DUNGEON_F("", Type.DUNGEON_FLOOR_6),
-    DUNGEON_75("", Type.DUNGEON_FLOOR_7),
+
+    DUNGEON_F6_GIANT("§eGiant", Type.DUNGEON_FLOOR_6),
+    DUNGEON_F6_SADAN("§cSadan", Type.DUNGEON_FLOOR_6),
+
+    // TODO implement
+    DUNGEON_7("", Type.DUNGEON_FLOOR_7),
 
     MINOS_INQUISITOR("§5Minos Inquisitor", Type.DIANA_MOBS),
     MINOS_CHAMPION("§2Minos Champion", Type.DIANA_MOBS),
