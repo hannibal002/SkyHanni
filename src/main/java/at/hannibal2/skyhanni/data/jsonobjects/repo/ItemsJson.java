@@ -12,7 +12,4 @@ public class ItemsJson {
 
     @Expose
     public Map<String, Integer> crimson_tiers;
-
-    @Expose
-    public List<NEUInternalName> trophy_fishing_armors;
 }
