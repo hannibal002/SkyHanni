@@ -298,7 +298,7 @@ class ChatFilter {
 
         // Useful, maybe in another chat
         "§aYou received §r§b\\+\\d{1,3} §r§a(Mithril|Gemstone) Powder.".toPattern(),
-        "§aYou received §r(§6|§b)\\+[1-2] (Diamond|Gold) Essence".toPattern(),
+        "§aYou received §r(§6|§b)\\+[1-2] (Diamond|Gold) Essence§r§a.".toPattern(),
     )
     private val fireSalePatterns = listOf(
         "§c♨ §eFire Sales for .* §eare starting soon!".toPattern(),

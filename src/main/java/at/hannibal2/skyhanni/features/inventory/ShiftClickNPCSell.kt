@@ -6,9 +6,9 @@ import at.hannibal2.skyhanni.events.InventoryCloseEvent
 import at.hannibal2.skyhanni.events.InventoryFullyOpenedEvent
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.LorenzUtils
+import at.hannibal2.skyhanni.utils.LorenzUtils.makeShiftClick
 import at.hannibal2.skyhanni.utils.StringUtils.matches
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
-import net.minecraft.client.Minecraft
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
 object ShiftClickNPCSell {
@@ -46,9 +46,6 @@ object ShiftClickNPCSell {
 
         if (slot.slotNumber == slot.slotIndex) return
 
-        event.isCanceled = true
-        Minecraft.getMinecraft().playerController.windowClick(
-            event.container.windowId, event.slot.slotNumber, event.clickedButton, 1, Minecraft.getMinecraft().thePlayer
-        )
+        event.makeShiftClick()
     }
 }

@@ -38,7 +38,12 @@ object RepoPatternManager {
     private var usedKeys = mutableMapOf<String, RepoPatternImpl>()
 
     private var wasPreinitialized = false
-    private val isInDevEnv = Launch.blackboard["fml.deobfuscatedEnvironment"] as Boolean
+    private val isInDevEnv = try {
+        Launch.blackboard["fml.deobfuscatedEnvironment"] as Boolean
+    } catch (_: Exception) {
+        true
+    }
+
     private val config get() = SkyHanniMod.feature.dev.repoPattern
 
     /**

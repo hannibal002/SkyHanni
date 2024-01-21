@@ -21,4 +21,6 @@ data class CachedItemData(
 
     // null = not loaded
     var itemRarity: LorenzRarity? = null,
+
+    var itemCategory: ItemCategory? = null,
 )
