@@ -718,4 +718,6 @@ object LorenzUtils {
 
     fun <T> MutableCollection<T>.filterToMutable(predicate: (T) -> Boolean) = filterTo(mutableListOf(), predicate)
 
+    val Long.ticks get() = (this * 50).milliseconds
+    val Int.ticks get() = (this * 50).milliseconds
 }
