@@ -98,9 +98,7 @@ class GeorgeDisplay {
         this[originalTier] = petInternalName(pet, originalTier).getPetPrice()
         if (config.otherRarities || this[originalTier] == -1.0) {
             this[originalTier - 1] = petInternalName(pet, originalTier - 1).getPetPrice(otherRarity = true)
-            if (originalTier != 5) {
-                this[originalTier + 1] = petInternalName(pet, originalTier + 1).getPetPrice(otherRarity = true)
-            }
+            if (originalTier != 5) this[originalTier + 1] = petInternalName(pet, originalTier + 1).getPetPrice(otherRarity = true)
         }
     }.minBy { it.value }
 
