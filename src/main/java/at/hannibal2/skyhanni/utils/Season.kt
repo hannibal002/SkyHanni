@@ -1,7 +1,7 @@
 package at.hannibal2.skyhanni.utils
 
 import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
-import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
+import at.hannibal2.skyhanni.utils.UtilsPatterns.seasonPattern
 
 enum class Season(
     val season: String,
@@ -19,11 +19,6 @@ enum class Season(
     fun getSeason(abbreviate: Boolean): String = if (abbreviate) season.take(4) else season
 
     companion object {
-
-        private val seasonPattern by RepoPattern.pattern(
-            "season.skyblocktime",
-            "(?:Early |Late )?(?<season>Spring|Summer|Autumn|Winter)"
-        )
 
         fun getSeasonByName(input: String): Season? {
             seasonPattern.matchMatcher(input) {
