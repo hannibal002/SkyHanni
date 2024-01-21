@@ -13,8 +13,11 @@ import kotlin.time.Duration.Companion.seconds
 class ServerRestartTitle {
     private val config get() = SkyHanniMod.feature.misc
 
-    companion object{
-        val restartingPattern by RepoPattern.pattern("features.misc.serverrestart", "§cServer closing(: (?<minutes>\\d+):(?<seconds>\\d+)| soon!)? ?§8.*")
+    companion object {
+        val restartingPattern by RepoPattern.pattern(
+            "features.misc.serverrestart",
+            "§cServer closing(: (?<minutes>\\d+):(?<seconds>\\d+)| soon!)? ?§8.*"
+        )
     }
 
     @SubscribeEvent
