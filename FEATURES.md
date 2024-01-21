@@ -31,6 +31,8 @@ Use `/sh` or `/skyhanni` to open the SkyHanni config in game.
     + Should not break with other mods.
 + Hide the repeating fire sale reminder chat messages. - hannibal2
 + Add tab list fire sale advertisement hider. - nea
++ Added SkyBlock XP Chat. - Thunderblade73
+    + Sends the SkyBlock XP message from the action bar into the chat.
 
 #### Chat Filter
 
@@ -138,6 +140,8 @@ Use `/sh` or `/skyhanni` to open the SkyHanni config in game.
       items in the Power Stone Guide.
 + Option to make normal clicks to shift clicks in equipment inventory. - Thunderblade73
 + Show pet items XP Share and Tier Boost as small icons next to the pet in an inventory. - Thunderblade73
++ Added Shift Click Brewing. - Thunderblade73
+    + Makes normal clicks to shift clicks in Brewing Stand inventory.
 
 </details>
 <details open><summary>
@@ -730,6 +734,10 @@ Use `/sh` or `/skyhanni` to open the SkyHanni config in game.
 + **/shfarmingprofile [player name]**
     + Opens the elitebot.dev website in your web browser to show your Farming Weight profile.
 + Tab Complete support to sacks command /gfs and /getfromsacks. - J10a1n15
++ Added /shcalccrop. - CalMWolfs
+    + Calculate how many crops need to be farmed between different crop milestones.
++ Added /shcalccroptime. - CalMWolfs
+    + Calculate how long you need to farm crops between different crop milestones.
 
 </details>
 <details open><summary>
