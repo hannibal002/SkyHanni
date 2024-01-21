@@ -99,6 +99,11 @@ public class MiscConfig {
     public PetCandyDisplayConfig petCandy = new PetCandyDisplayConfig();
 
     @Expose
+    @ConfigOption(name = "Skill Progress Display", desc = "")
+    @Accordion
+    public SkillProgressDisplayConfig skillProgressDisplayConfig = new SkillProgressDisplayConfig();
+
+    @Expose
     @ConfigOption(name = "Exp Bottles", desc = "Hides all the experience orbs lying on the ground.")
     @ConfigEditorBoolean
     @FeatureToggle
@@ -232,7 +237,7 @@ public class MiscConfig {
 
     @Expose
     @ConfigOption(name = "Fix Ghost Entities", desc = "Removes ghost entities caused by a Hypixel bug. " +
-            "This included Diana, Dungeon and Crimson Isle mobs and nametags.")
+        "This included Diana, Dungeon and Crimson Isle mobs and nametags.")
     @ConfigEditorBoolean
     @FeatureToggle
     public boolean fixGhostEntities = true;

@@ -49,11 +49,11 @@ object NumberUtil {
         if (value == Long.MIN_VALUE) return format(Long.MIN_VALUE + 1, preciseBillions)
         if (value < 0) return "-" + format(-value, preciseBillions)
 
-        if (value < 1000) return value.toString() //deal with small numbers
+        if (value < 1000) return value.toString() // deal with small numbers
 
         val (divideBy, suffix) = suffixes.floorEntry(value)
 
-        val truncated = value / (divideBy / 10) //the number part of the output times 10
+        val truncated = value / (divideBy / 10) // the number part of the output times 10
 
         val truncatedAt = if (suffix == "M") 1000 else if (suffix == "B") 1000000 else 100
 
@@ -176,7 +176,7 @@ object NumberUtil {
     }
 
     fun percentageColor(have: Long, max: Long): LorenzColor {
-        val percentage = have.toDouble() / max.toDouble()
+        val percentage = have.fractionOf(max)
         return when {
             percentage > 0.9 -> LorenzColor.DARK_GREEN
             percentage > 0.75 -> LorenzColor.GREEN
@@ -206,4 +206,9 @@ object NumberUtil {
     val Int.milion get() = this * 1_000_000.0
     private val Int.bilion get() = this * 1_000_000_000.0
     val Double.milion get() = (this * 1_000_000.0).toLong()
+
+    /** @return clamped to [0.0, 1.0]**/
+    fun Number.fractionOf(maxValue: Number) = maxValue.toDouble().takeIf { it != 0.0 }?.let { max ->
+        this.toDouble() / max
+    }?.coerceIn(0.0, 1.0) ?: 1.0
 }
