@@ -2,27 +2,40 @@ package at.hannibal2.skyhanni.features.inventory
 
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
+import at.hannibal2.skyhanni.events.GuiContainerEvent
+import at.hannibal2.skyhanni.events.InventoryCloseEvent
+import at.hannibal2.skyhanni.events.InventoryFullyOpenedEvent
 import at.hannibal2.skyhanni.events.RenderItemTipEvent
-import at.hannibal2.skyhanni.utils.InventoryUtils.openInventoryName
+import at.hannibal2.skyhanni.utils.DelayedRun
+import at.hannibal2.skyhanni.utils.InventoryUtils
+import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.KeyboardManager
 import at.hannibal2.skyhanni.utils.KeyboardManager.isKeyHeld
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
+import at.hannibal2.skyhanni.utils.StringUtils.anyMatches
 import at.hannibal2.skyhanni.utils.StringUtils.matches
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraft.client.Minecraft
+import net.minecraft.client.gui.ScaledResolution
 import net.minecraft.client.gui.inventory.GuiChest
 import net.minecraft.item.Item
 import net.minecraftforge.client.event.GuiScreenEvent
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
+import net.minecraftforge.fml.common.network.FMLNetworkEvent
 import kotlin.time.Duration.Companion.milliseconds
+import kotlin.time.Duration.Companion.seconds
 
 // Delaying key presses by 300ms comes from NotEnoughUpdates
 object HarpFeatures {
+
     private val config get() = SkyHanniMod.feature.inventory.helper.harp
     private var lastClick = SimpleTimeMark.farPast()
 
+    private const val closeButtonSlot = 40
+
     private object KeyIterable : Iterable<Int> {
+
         override fun iterator() = object : Iterator<Int> {
             private var currentIndex = 0
 
@@ -33,15 +46,18 @@ object HarpFeatures {
     }
 
     private val buttonColors = listOf('d', 'e', 'a', '2', '5', '9', 'b')
-    private val inventoryTitlePattern by RepoPattern.pattern("harp.inventory", "^Harp.*")
+    private val inventoryTitlePattern by RepoPattern.pattern("harp.inventory", "Harp.*")
+    private val menuTitlePattern by RepoPattern.pattern("harp.menu", "Melody.*")
+    private val songSelectedPattern by RepoPattern.pattern("harp.song.selected", "§aSong is selected!")
 
-    private fun isHarpGui() = inventoryTitlePattern.matches(openInventoryName())
+    private fun isHarpGui(chestName: String) = inventoryTitlePattern.matches(chestName)
+    private fun isMenuGui(chestName: String) = menuTitlePattern.matches(chestName)
 
     @SubscribeEvent
     fun onGui(event: GuiScreenEvent) {
         if (!LorenzUtils.inSkyBlock) return
         if (!config.keybinds) return
-        if (!isHarpGui()) return
+        if (!isHarpGui(InventoryUtils.openInventoryName())) return
         val chest = event.gui as? GuiChest ?: return
 
         for ((index, key) in KeyIterable.withIndex()) {
@@ -72,11 +88,95 @@ object HarpFeatures {
         else -> null
     }
 
+    private var openTime: SimpleTimeMark = SimpleTimeMark.farPast()
+
+    @SubscribeEvent
+    fun onInventoryOpen(event: InventoryFullyOpenedEvent) {
+        if (!LorenzUtils.inSkyBlock) return
+        if (!config.guiScale) return
+        when {
+            isMenuGui(event.inventoryName) -> {
+                setGUIScale()
+                openTime = SimpleTimeMark.now()
+            }
+
+            isHarpGui(event.inventoryName) -> {
+                setGUIScale()
+            }
+        }
+    }
+
+    private fun updateScale() {
+        if (Minecraft.getMinecraft().currentScreen == null) {
+            DelayedRun.runNextTick() {
+                updateScale()
+            }
+            return
+        }
+        // Copied from Minecraft Code to update the scale
+        val minecraft = Minecraft.getMinecraft()
+        val scaledresolution = ScaledResolution(minecraft)
+        val i = scaledresolution.scaledWidth
+        val j = scaledresolution.scaledHeight
+        minecraft.currentScreen.setWorldAndResolution(minecraft, i, j)
+    }
+
+    @SubscribeEvent
+    fun onInventoryCloseEvent(event: InventoryCloseEvent) {
+        if (!LorenzUtils.inSkyBlock) return
+        if (!config.guiScale) return
+        unSetGUIScale()
+    }
+
+    @SubscribeEvent
+    fun onLeave(event: FMLNetworkEvent.ClientDisconnectionFromServerEvent) {
+        if (!config.guiScale) return
+        unSetGUIScale()
+    }
+
+    private var guiSetting: Int = 0
+    private var isGUIScaled = false
+
+    private fun setGUIScale() {
+        val gameSettings = Minecraft.getMinecraft().gameSettings ?: return
+        guiSetting = gameSettings.guiScale
+        gameSettings.guiScale = 0
+        isGUIScaled = true
+        updateScale()
+    }
+
+    private fun unSetGUIScale() {
+        if (!isGUIScaled) return
+        Minecraft.getMinecraft().gameSettings.guiScale = guiSetting
+        isGUIScaled = false
+    }
+
+    @SubscribeEvent
+    fun onSlotClick(event: GuiContainerEvent.SlotClickEvent) {
+        if (!LorenzUtils.inSkyBlock) return
+        if (!config.quickRestart) return
+        if (!isMenuGui(InventoryUtils.openInventoryName())) return
+        if (event.slot?.slotNumber != closeButtonSlot) return
+        if (openTime.passedSince() > 2.seconds) return
+        event.container.inventory.indexOfFirst {
+            songSelectedPattern.anyMatches(it.getLore())
+        }.takeIf { it != -1 }?.let {
+            event.isCanceled = true
+            Minecraft.getMinecraft().playerController.windowClick(
+                event.container.windowId,
+                it,
+                event.clickedButton,
+                event.clickType,
+                Minecraft.getMinecraft().thePlayer
+            )
+        }
+    }
+
     @SubscribeEvent
     fun onRenderItemTip(event: RenderItemTipEvent) {
         if (!LorenzUtils.inSkyBlock) return
         if (!config.showNumbers) return
-        if (!isHarpGui()) return
+        if (!isHarpGui(InventoryUtils.openInventoryName())) return
         if (Item.getIdFromItem(event.stack.item) != 159) return // Stained hardened clay item id = 159
 
         // Example: §9| §7Click! will select the 9
@@ -84,7 +184,7 @@ object HarpFeatures {
         if (index == -1) return // this should never happen unless there's an update
 
         val keyCode = getKey(index) ?: return
-        event.stackTip = KeyboardManager.getKeyName(keyCode)
+        event.stackTip = KeyboardManager.getKeyName(keyCode).take(3)
     }
 
     @SubscribeEvent
