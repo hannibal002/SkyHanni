@@ -373,7 +373,7 @@ import org.apache.logging.log4j.Logger
     clientSideOnly = true,
     useMetadata = true,
     guiFactory = "at.hannibal2.skyhanni.config.ConfigGuiForgeInterop",
-    version = "0.23.Beta.10",
+    version = "0.23.Beta.11",
 )
 class SkyHanniMod {
 
@@ -483,7 +483,7 @@ class SkyHanniMod {
         loadModule(AuctionHouseCopyUnderbidPrice())
         loadModule(AnvilCombineHelper())
         loadModule(SeaCreatureMessageShortener())
-        loadModule(AshfangFreezeCooldown())
+        loadModule(AshfangFreezeCooldown)
         loadModule(AshfangNextResetCooldown())
         loadModule(SummoningSoulsName())
         loadModule(AshfangGravityOrbs())
