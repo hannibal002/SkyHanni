@@ -102,7 +102,11 @@ class GeorgeDisplay {
         return Pair(tierAndIndex.cheapestTierIndex(originalTier), tierAndIndex.value)
     }
 
-    private fun IndexedValue<Double>.cheapestTierIndex(originalTier: Int) = if (this.index == 1) originalTier - 1 else if (this.index == 2) originalTier + 1 else originalTier
+    private fun IndexedValue<Double>.cheapestTierIndex(originalTier: Int) = when (this.index) {
+        1 -> originalTier - 1
+        2 -> originalTier + 1
+        else -> originalTier
+    }
 
     @SubscribeEvent
     fun onRenderOverlay(event: GuiRenderEvent.ChestGuiOverlayRenderEvent) {
