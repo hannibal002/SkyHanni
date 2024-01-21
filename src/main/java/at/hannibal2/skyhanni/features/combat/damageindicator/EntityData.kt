@@ -1,6 +1,7 @@
 package at.hannibal2.skyhanni.features.combat.damageindicator
 
 import at.hannibal2.skyhanni.utils.LorenzVec
+import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.TimeUnit
 import at.hannibal2.skyhanni.utils.TimeUtils
 import net.minecraft.entity.EntityLivingBase
@@ -8,7 +9,7 @@ import net.minecraft.entity.EntityLivingBase
 class EntityData(
     val entity: EntityLivingBase,
     var ignoreBlocks: Boolean,
-    var delayedStart: Long,
+    var delayedStart: SimpleTimeMark?,
     val finalDungeonBoss: Boolean,
     val bossType: BossType,
     val damageCounter: DamageCounter = DamageCounter(),

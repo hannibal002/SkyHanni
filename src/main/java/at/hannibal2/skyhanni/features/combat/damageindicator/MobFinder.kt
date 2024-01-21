@@ -142,11 +142,11 @@ class MobFinder {
 
     private fun tryAddDungeonF1(entity: EntityLivingBase) = when {
         floor1bonzo1 && entity is EntityOtherPlayerMP && entity.name == "Bonzo " -> {
-            EntityResult(floor1bonzo1SpawnTime)
+            EntityResult(floor1bonzo1SpawnTime, bossType = BossType.DUNGEON_F1_BONZO_FIRST)
         }
 
         floor1bonzo2 && entity is EntityOtherPlayerMP && entity.name == "Bonzo " -> {
-            EntityResult(floor1bonzo2SpawnTime, finalDungeonBoss = true)
+            EntityResult(floor1bonzo2SpawnTime, bossType = BossType.DUNGEON_F1_BONZO_SECOND, finalDungeonBoss = true)
         }
 
         else -> null
@@ -156,19 +156,23 @@ class MobFinder {
         if (entity.name == "Summon " && entity is EntityOtherPlayerMP) {
             if (floor2summons1 && !floor2summonsDiedOnce.contains(entity)) {
                 if (entity.health.toInt() != 0) {
-                    return EntityResult(floor2summons1SpawnTime)
+                    return EntityResult(floor2summons1SpawnTime, bossType = BossType.DUNGEON_F2_SUMMON)
                 }
                 floor2summonsDiedOnce.add(entity)
             }
             if (floor2secondPhase) {
-                return EntityResult(floor2secondPhaseSpawnTime)
+                return EntityResult(floor2secondPhaseSpawnTime, bossType = BossType.DUNGEON_F2_SUMMON)
             }
         }
 
         if (floor2secondPhase && entity is EntityOtherPlayerMP) {
             //TODO only show scarf after (all/at least x) summons are dead?
             if (entity.name == "Scarf ") {
-                return EntityResult(floor2secondPhaseSpawnTime, finalDungeonBoss = true)
+                return EntityResult(
+                    floor2secondPhaseSpawnTime,
+                    finalDungeonBoss = true,
+                    bossType = BossType.DUNGEON_F2_SCARF
+                )
             }
         }
         return null
@@ -182,22 +186,27 @@ class MobFinder {
                 findGuardians()
             }
             if (guardians.contains(entity)) {
-                return EntityResult(floor3GuardianShieldSpawnTime, true)
+                return EntityResult(floor3GuardianShieldSpawnTime, true, bossType = BossType.DUNGEON_F3_GUARDIAN)
             }
         }
 
         if (floor3Professor && entity is EntityOtherPlayerMP && entity.name == "The Professor") {
             return EntityResult(
                 floor3ProfessorSpawnTime,
-                floor3ProfessorSpawnTime + 1_000 > System.currentTimeMillis()
+                floor3ProfessorSpawnTime + 1_000 > System.currentTimeMillis(),
+                bossType = BossType.DUNGEON_F3_PROFESSOR_1
             )
         }
         if (floor3ProfessorGuardianPrepare && entity is EntityOtherPlayerMP && entity.name == "The Professor") {
-            return EntityResult(floor3ProfessorGuardianPrepareSpawnTime, true)
+            return EntityResult(
+                floor3ProfessorGuardianPrepareSpawnTime,
+                true,
+                bossType = BossType.DUNGEON_F3_PROFESSOR_2
+            )
         }
 
         if (entity is EntityGuardian && floor3ProfessorGuardian && entity == floor3ProfessorGuardianEntity) {
-            return EntityResult(finalDungeonBoss = true)
+            return EntityResult(finalDungeonBoss = true, bossType = BossType.DUNGEON_F3_PROFESSOR_2)
         }
         return null
     }
@@ -230,12 +239,13 @@ class MobFinder {
             val extraDelay = checkExtraF6GiantsDelay(entity)
             return EntityResult(
                 floor6GiantsSpawnTime + extraDelay,
-                floor6GiantsSpawnTime + extraDelay + 1_000 > System.currentTimeMillis()
+                floor6GiantsSpawnTime + extraDelay + 1_000 > System.currentTimeMillis(),
+                bossType = BossType.DUNGEON_F6_GIANT
             )
         }
 
         if (floor6Sadan) {
-            return EntityResult(floor6SadanSpawnTime, finalDungeonBoss = true)
+            return EntityResult(floor6SadanSpawnTime, finalDungeonBoss = true, bossType = BossType.DUNGEON_F6_SADAN)
         }
         return null
     }
@@ -609,13 +619,17 @@ class MobFinder {
         guardians.clear()
 
         for (entity in EntityUtils.getEntities<EntityGuardian>()) {
-            //F3
+            // F3
             if (entity.hasMaxHealth(1_000_000, true) || entity.hasMaxHealth(1_200_000, true)) {
                 guardians.add(entity)
             }
 
-            //M3
+            // M3
             if (entity.hasMaxHealth(120_000_000, true) || entity.hasMaxHealth(240_000_000, true)) {
+                guardians.add(entity)
+            }
+            // M3 Reinforced Guardian
+            if (entity.hasMaxHealth(140_000_000, true) || entity.hasMaxHealth(280_000_000, true)) {
                 guardians.add(entity)
             }
         }
