@@ -20,15 +20,14 @@ class GeorgeDisplay {
 
     private val config get() = SkyHanniMod.feature.misc.pets.george
 
-    private val SEPARATOR: String = ";"
+    private val SEPARATOR = ";"
 
-    private val patternGroup = RepoPattern.group("george.tamingcap")
-    private val neededPetPattern by patternGroup.pattern(
-        "needed.pet.loreline",
+    private val neededPetPattern by RepoPattern.pattern(
+        "george.tamingcap.needed.pet.loreline",
         "(?i) +(?<fullThing>(?<tierColorCodes>§.)*(?<tier>(?:un)?common|rare|epic|legendary|mythic|divine|(?:very )?special|ultimate|supreme|admin) (?<pet>[\\S ]+))"
     )
 
-    private val display = mutableListOf<Renderable>()
+    private var display = listOf<Renderable>()
 
     private enum class RarityToTier(
         val rarityInternal: String,
@@ -49,13 +48,16 @@ class GeorgeDisplay {
         if (event.inventoryName != "Offer Pets") return
         val stack = event.inventoryItems[41] ?: return
         if (stack.cleanName() != "+1 Taming Level Cap") return
-        display.clear()
-        display.addAll(listBuilding(stack.getLore()))
+        display = listBuilding(stack.getLore())
     }
 
     private fun listBuilding(lore: List<String>): MutableList<Renderable> {
-        val updateList: MutableList<Renderable> = mutableListOf<Renderable>(Renderable.string("§d§lTaming 60 Cost: §r§d(${if (config.otherRarities) "cheapest" else "exact"} rarity)"))
-        var totalCost: Double = 0.0
+        val updateList: MutableList<Renderable> = mutableListOf(
+            Renderable.string("§d§lTaming 60 Cost: §r§d(${
+                if (config.otherRarities) "cheapest" else "exact"
+            } rarity)")
+        )
+        var totalCost = 0.0
         for (line in lore) {
             neededPetPattern.matchMatcher(line) {
                 val origTierString = group("tier") ?: ""
