@@ -188,5 +188,5 @@ object BitsAPI {
         }
     }
 
-    fun isEnabled() = LorenzUtils.inSkyBlock && profileStorage != null
+    fun isEnabled() = LorenzUtils.inSkyBlock && profileStorage != null && playerStorage != null
 }
