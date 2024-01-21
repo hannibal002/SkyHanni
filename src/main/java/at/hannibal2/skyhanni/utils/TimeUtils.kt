@@ -31,6 +31,7 @@ object TimeUtils {
         else -> default
     }
 
+    @Deprecated("off sets by one second", ReplaceWith("Duration.format()"))
     fun formatDuration(
         millis: Long,
         biggestUnit: TimeUnit = TimeUnit.YEAR,
