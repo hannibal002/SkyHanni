@@ -437,7 +437,6 @@ class SkyHanniMod {
         loadModule(BingoCardReader())
         loadModule(GardenBestCropTime())
         loadModule(TrackerManager)
-        loadModule(SkyBlockItemModifierUtils)
         loadModule(ScoreboardPattern)
         loadModule(UtilsPatterns)
 
