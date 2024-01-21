@@ -21,7 +21,7 @@ enum class Season(
 
     companion object {
 
-        fun getCurrentSeason(month: String = SkyBlockTime.now().monthName): Season? = getSeasonByName(month)
+        fun getCurrentSeason(): Season? = getSeasonByName(SkyBlockTime.now().monthName)
 
         private fun getSeasonByName(name: String): Season? = seasonPattern.matchMatcher(name) { entries.find { it.season.endsWith(group("season")) } }
     }
