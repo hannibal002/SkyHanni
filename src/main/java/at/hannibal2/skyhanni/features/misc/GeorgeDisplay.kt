@@ -6,11 +6,14 @@ import at.hannibal2.skyhanni.events.InventoryOpenEvent
 import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.cleanName
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
+import at.hannibal2.skyhanni.utils.LorenzRarity
 import at.hannibal2.skyhanni.utils.LorenzUtils
+import at.hannibal2.skyhanni.utils.LorenzUtils.enumJoinToPattern
 import at.hannibal2.skyhanni.utils.NEUInternalName.Companion.asInternalName
 import at.hannibal2.skyhanni.utils.NEUItems.getPriceOrNull
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderables
+import at.hannibal2.skyhanni.utils.StringUtils.allLettersFirstUppercase
 import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
@@ -24,23 +27,10 @@ class GeorgeDisplay {
 
     private val neededPetPattern by RepoPattern.pattern(
         "george.tamingcap.needed.pet.loreline",
-        "(?i) +(?<fullThing>(?<tierColorCodes>§.)*(?<tier>(?:un)?common|rare|epic|legendary|mythic|divine|(?:very )?special|ultimate|supreme|admin) (?<pet>[\\S ]+))"
+        "(?i) +(?<fullThing>(?<tierColorCodes>§.)*(?<tier>${enumJoinToPattern<LorenzRarity>{it.rawName.lowercase()}}) (?<pet>[\\S ]+))"
     )
 
     private var display = listOf<Renderable>()
-
-    private enum class RarityToTier(
-        val rarityInternal: String,
-        val tier: Int,
-        val rarityDisplay: String,
-    ) {
-        COMMON("COMMON", 0, "§fCommon"),
-        UNCOMMON("UNCOMMON", 1, "§aUncommon"),
-        RARE("RARE", 2, "§9Rare"),
-        EPIC("EPIC", 3, "§5Epic"),
-        LEGENDARY("LEGENDARY", 4, "§6Legendary"),
-        MYTHIC("MYTHIC", 5, "§dMythic"),
-    }
 
     @SubscribeEvent
     fun onInventoryOpen(event: InventoryOpenEvent) {
@@ -61,10 +51,10 @@ class GeorgeDisplay {
         for (line in lore) {
             neededPetPattern.matchMatcher(line) {
                 val origTierString = group("tier") ?: ""
-                val tier = RarityToTier.entries.find { it.rarityInternal == origTierString.uppercase() }?.tier ?: -1
+                val tier = LorenzRarity.entries.find { it.name == origTierString.uppercase() }!!.id
                 val origPetString = group("pet") ?: ""
                 val pet = origPetString.uppercase().replace(" ", "_").removePrefix("FROST_")
-                val petPrices: MutableList<Double> = mutableListOf<Double>()
+                val petPrices: MutableList<Double> = mutableListOf()
                 val petPriceOne = "$pet;$tier".asInternalName().getPriceOrNull() ?: -1.0
                 petPrices.add(petPriceOne)
                 if (config.otherRarities || petPriceOne == -1.0) {
@@ -82,7 +72,7 @@ class GeorgeDisplay {
                     else -> tier
                 }
                 val displayPetString = if (tierUsed == tier) group("fullThing") else {
-                    "${RarityToTier.entries.find { it.tier == tierUsed }?.rarityDisplay} $origPetString"
+                    "${LorenzRarity.entries.find { it.id == tierUsed }!!.formattedName} $origPetString"
                 }
                 if (petPrice != -1.0) {
                     totalCost += petPrice
