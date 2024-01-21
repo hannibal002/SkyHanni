@@ -53,10 +53,10 @@ private fun replaceString(text: String): String? {
 
     if (SkyHanniMod.feature.misc.colorMonthNames) {
         for (season in Season.entries) {
-		        if (text.trim().startsWith(season.prefix)) {
-			          return season.colorCode + text
-		        }
-		    }
+            if (text.trim().startsWith(season.prefix)) {
+                return season.colorCode + text
+            }
+        }
     }
 
     return text
