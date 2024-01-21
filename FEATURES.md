@@ -128,6 +128,10 @@ Use `/sh` or `/skyhanni` to open the SkyHanni config in game.
     + Shows a list of all items and their price when inside a chest on your private island.
 + In Melody's Harp, show buttons as stack size. - NetheriteMiner
     + Intended to be used with Harp Keybinds
++ Added Harp GUI Scale. - Thunderblade73
+    + Automatically sets the GUI scale to AUTO when entering the Harp.
++ Added Harp Quick Restart. - Thunderblade73
+    + Once you've launched the harp, quickly hit the close button in the harp menu to initiate the selected song.
 + **Quick Craft Confirmation**. - Cad
     + Require Ctrl+Click to craft items that aren't often quick crafted (e.g. armor, weapons, accessories).
     + Sack items can be crafted normally.
@@ -774,6 +778,11 @@ Use `/sh` or `/skyhanni` to open the SkyHanni config in game.
       needed from the sacks.
 + Crimson Isle **Pablo NPC Helper**. - NetheriteMiner
     + Similar to Quest Item Helper, shows a clickable message that grabs the flower needed from sacks.
++ Dojo Rank Display. - HiZe
+    + Display your rank, score, actual belt and points needed for the next belt in the Challenges inventory on the
+      Crimson Isles.
++ Added Volcano Explosivity in Crimson Isle. - Erymanthus
+    + Show a HUD of the current volcano explosivity level.
 + Red Scoreboard Numbers - Hides the red numbers in the scoreboard sidebar on the right side of the screen.
 + **Tia Relay Waypoint** - Show the next Relay waypoint for Tia The Fairy, where maintenance for the abiphone network
   needs to be done.
@@ -931,6 +940,7 @@ Use `/sh` or `/skyhanni` to open the SkyHanni config in game.
 + Party Kick with reason. - nea
     + Added support for the Hypixel command /p kick /pk to add a reason. The reason will be sent in party chat before
       kicking the player.
++ Color the month names on the scoreboard. - J10a1n15
 
 </details>
 <details open><summary>

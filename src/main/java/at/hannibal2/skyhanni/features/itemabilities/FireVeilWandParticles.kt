@@ -7,6 +7,7 @@ import at.hannibal2.skyhanni.data.ClickType
 import at.hannibal2.skyhanni.events.ItemClickEvent
 import at.hannibal2.skyhanni.events.LorenzRenderWorldEvent
 import at.hannibal2.skyhanni.events.ReceiveParticleEvent
+import at.hannibal2.skyhanni.features.nether.ashfang.AshfangFreezeCooldown
 import at.hannibal2.skyhanni.utils.ConfigUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName
 import at.hannibal2.skyhanni.utils.LorenzUtils
@@ -40,6 +41,8 @@ class FireVeilWandParticles {
         if (!LorenzUtils.inSkyBlock) return
         if (event.clickType != ClickType.RIGHT_CLICK) return
         val internalName = event.itemInHand?.getInternalName()
+
+        if (AshfangFreezeCooldown.iscurrentlyFrozen()) return
 
         if (internalName == item) {
             lastClick = SimpleTimeMark.now()
