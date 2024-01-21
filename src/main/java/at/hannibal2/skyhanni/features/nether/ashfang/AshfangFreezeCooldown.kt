@@ -8,17 +8,19 @@ import at.hannibal2.skyhanni.features.combat.damageindicator.BossType
 import at.hannibal2.skyhanni.features.combat.damageindicator.DamageIndicatorManager
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.RenderUtils.renderString
+import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
-import at.hannibal2.skyhanni.utils.TimeUtils
+import at.hannibal2.skyhanni.utils.TimeUtils.format
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
+import kotlin.time.Duration.Companion.seconds
 
-class AshfangFreezeCooldown {
+object AshfangFreezeCooldown {
     private val config get() = SkyHanniMod.feature.crimsonIsle.ashfang
 
     // TODO USE SH-REPO
     private val cryogenicBlastPattern = "§cAshfang Follower's Cryogenic Blast hit you for (.*) damage!".toPattern()
 
-    private var lastHit = 0L
+    private var lastHit = SimpleTimeMark.farPast()
 
     @SubscribeEvent
     fun onChatMessage(event: LorenzChatEvent) {
@@ -26,24 +28,31 @@ class AshfangFreezeCooldown {
 
         val message = event.message
         cryogenicBlastPattern.matchMatcher(message) {
-            lastHit = System.currentTimeMillis()
+            lastHit = SimpleTimeMark.now()
         }
     }
 
     @SubscribeEvent
     fun onRenderOverlay(event: GuiRenderEvent.GuiOverlayRenderEvent) {
         if (!isEnabled()) return
-        val duration = System.currentTimeMillis() - lastHit
-        val maxDuration = 3_000
 
-        val remainingLong = maxDuration - duration
-        if (remainingLong > 0) {
-            val format = TimeUtils.formatDuration(remainingLong, showMilliSeconds = true)
+        val passedSince = lastHit.passedSince()
+        val maxDuration = 3.seconds
+        val duration = maxDuration - passedSince
+        if (duration > 0.seconds) {
+            val format = duration.format(showMilliSeconds = true)
             config.freezeCooldownPos.renderString(
                 "§cAshfang Freeze: §a$format",
                 posLabel = "Ashfang Freeze Cooldown"
             )
         }
+    }
+
+    fun iscurrentlyFrozen(): Boolean {
+        val passedSince = lastHit.passedSince()
+        val maxDuration = 3.seconds
+        val duration = maxDuration - passedSince
+        return duration > 0.seconds
     }
 
     @SubscribeEvent
@@ -52,8 +61,6 @@ class AshfangFreezeCooldown {
         event.move(2, "ashfang.freezeCooldownPos", "crimsonIsle.ashfang.freezeCooldownPos")
     }
 
-    private fun isEnabled(): Boolean {
-        return LorenzUtils.inSkyBlock && config.freezeCooldown &&
-            DamageIndicatorManager.isBossSpawned(BossType.NETHER_ASHFANG)
-    }
+    private fun isEnabled() = LorenzUtils.inSkyBlock && config.freezeCooldown &&
+        DamageIndicatorManager.isBossSpawned(BossType.NETHER_ASHFANG)
 }
