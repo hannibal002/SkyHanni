@@ -4,15 +4,19 @@ import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.data.EntityMovementData
 import at.hannibal2.skyhanni.data.IslandType
+import at.hannibal2.skyhanni.events.BlockClickEvent
 import at.hannibal2.skyhanni.events.BurrowDetectEvent
 import at.hannibal2.skyhanni.events.BurrowDugEvent
 import at.hannibal2.skyhanni.events.BurrowGuessEvent
+import at.hannibal2.skyhanni.events.DebugDataCollectEvent
 import at.hannibal2.skyhanni.events.EntityMoveEvent
 import at.hannibal2.skyhanni.events.LorenzChatEvent
 import at.hannibal2.skyhanni.events.LorenzRenderWorldEvent
 import at.hannibal2.skyhanni.events.LorenzTickEvent
 import at.hannibal2.skyhanni.events.LorenzWorldChangeEvent
+import at.hannibal2.skyhanni.features.event.diana.DianaAPI.isDianaSpade
 import at.hannibal2.skyhanni.utils.BlockUtils.getBlockAt
+import at.hannibal2.skyhanni.utils.DelayedRun
 import at.hannibal2.skyhanni.utils.KeyboardManager
 import at.hannibal2.skyhanni.utils.LocationUtils
 import at.hannibal2.skyhanni.utils.LocationUtils.distanceToPlayer
@@ -42,6 +46,25 @@ object GriffinBurrowHelper {
 
     private var lastGuessTime = 0L
     var lastTitleSentTime = SimpleTimeMark.farPast()
+
+    @SubscribeEvent
+    fun onDebugDataCollect(event: DebugDataCollectEvent) {
+        event.title("Griffin Burrow Helper")
+
+        if (!DianaAPI.isDoingDiana()) {
+            event.addIrrelevant("not doing diana")
+            return
+        }
+
+        event.addData {
+            add("targetLocation: ${targetLocation?.printWithAccuracy(1)}")
+            add("guessLocation: ${guessLocation?.printWithAccuracy(1)}")
+            add("particleBurrows: ${particleBurrows.size}")
+            for ((location, type) in particleBurrows) {
+                add(location.printWithAccuracy(1) + " " + type)
+            }
+        }
+    }
 
     @SubscribeEvent
     fun onTick(event: LorenzTickEvent) {
@@ -237,10 +260,29 @@ object GriffinBurrowHelper {
         event.move(2, "diana", "event.diana")
     }
 
+    @SubscribeEvent
+    fun onBlockClick(event: BlockClickEvent) {
+        if (!isEnabled()) return
+
+        val location = event.position
+        if (event.itemInHand?.isDianaSpade != true || location.getBlockAt() !== Blocks.grass) return
+
+        if (particleBurrows.containsKey(location)) {
+            DelayedRun.runDelayed(1.seconds) {
+                if (BurrowAPI.lastBurrowRelatedChatMessage.passedSince() > 2.seconds) {
+                    if (particleBurrows.containsKey(location)) {
+                        LorenzUtils.error("Something unexected happened, deleted the burrow.")
+                        particleBurrows = particleBurrows.editCopy { keys.remove(location) }
+                    }
+                }
+            }
+
+        }
+    }
+
     private fun showWarpSuggestions() {
         if (!config.burrowNearestWarp) return
         val warp = BurrowWarpHelper.currentWarp ?: return
-
 
         val text = "§bWarp to " + warp.displayName
         val keybindSuffix = if (config.keyBindWarp != Keyboard.KEY_NONE) {

@@ -17,5 +17,7 @@ class TimeLimitedCache<K, V>(expireAfterWrite: Duration) {
 
     fun values(): MutableCollection<V> = cache.asMap().values
 
+    fun keys(): MutableSet<K> = cache.asMap().keys
+
     fun containsKey(key: K): Boolean = cache.getIfPresent(key) != null
 }
