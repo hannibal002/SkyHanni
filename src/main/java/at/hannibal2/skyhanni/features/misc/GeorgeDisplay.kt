@@ -45,7 +45,7 @@ class GeorgeDisplay {
     fun onInventoryOpen(event: InventoryOpenEvent) {
         if (!isEnabled()) return
         if (!offerPetsChestPattern.matches(event.inventoryName)) return
-        val stack = event.inventoryItems[41] ?: return //slot #41 = spawn egg with the tooltip
+        val stack = event.inventoryItems[41] ?: return //the slot #41 = spawn egg with the tooltip
         if (!increaseCapItemPattern.matches(stack.cleanName())) return
         display = drawDisplay(stack.getLore())
     }
