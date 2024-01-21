@@ -14,6 +14,7 @@ import at.hannibal2.skyhanni.utils.NEUItems.getPriceOrNull
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderables
 import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
+import at.hannibal2.skyhanni.utils.StringUtils.matches
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
@@ -24,9 +25,18 @@ class GeorgeDisplay {
 
     private val SEPARATOR = ";"
 
-    private val neededPetPattern by RepoPattern.pattern(
-        "george.tamingcap.needed.pet.loreline",
+    private val patternGroup = RepoPattern.group("george.tamingcap")
+    private val neededPetPattern by patternGroup.pattern(
+        "needed.pet.loreline",
         "(?i) +(?<fullThing>(?<tierColorCodes>§.)*(?<tier>${enumJoinToPattern<LorenzRarity>{it.rawName.lowercase()}}) (?<pet>[\\S ]+))"
+    )
+    private val offerPetsChestPattern by patternGroup.pattern(
+        "offerpets.chestname",
+        "Offer Pets"
+    )
+    private val increaseCapItemPattern by patternGroup.pattern(
+        "increasecap.itemname",
+        "\\+1 Taming Level Cap"
     )
 
     private var display = listOf<Renderable>()
@@ -34,13 +44,13 @@ class GeorgeDisplay {
     @SubscribeEvent
     fun onInventoryOpen(event: InventoryOpenEvent) {
         if (!isEnabled()) return
-        if (event.inventoryName != "Offer Pets") return
+        if (!offerPetsChestPattern.matches(event.inventoryName)) return
         val stack = event.inventoryItems[41] ?: return
-        if (stack.cleanName() != "+1 Taming Level Cap") return
-        display = listBuilding(stack.getLore())
+        if (!increaseCapItemPattern.matches(stack.cleanName())) return
+        display = drawDisplay(stack.getLore())
     }
 
-    private fun listBuilding(lore: List<String>): MutableList<Renderable> {
+    private fun drawDisplay(lore: List<String>) = buildList<Renderable> {
         val updateList: MutableList<Renderable> = mutableListOf(
             Renderable.string("§d§lTaming 60 Cost: §r§d(${
                 if (config.otherRarities) "cheapest" else "exact"
@@ -52,11 +62,11 @@ class GeorgeDisplay {
                 val origTierString = group("tier")
                 val origPetString = group("pet")
                 val pet = origPetString.uppercase().replace(" ", "_").removePrefix("FROST_")
-                val originalTier = LorenzRarity.entries.find { it.name == origTierString.uppercase() }!!.id
-                val (petPrice, cheapestTier) = findCheapestTier(pet, originalTier)
+                val originalTier = LorenzRarity.getByName(origTierString.uppercase().replace(" ", "_") )?.id ?: 0
+                val (cheapestTier, petPrice) = findCheapestTier(pet, originalTier)
                 val displayPetString =
                     if (cheapestTier == originalTier) group("fullThing")
-                    else "${LorenzRarity.entries.find { it.id == cheapestTier }!!.formattedName} $origPetString"
+                    else "${LorenzRarity.getById(cheapestTier )?.formattedName} $origPetString"
                 if (petPrice != -1.0) {
                     totalCost += petPrice
                     updateList.add(Renderable.clickAndHover(
@@ -78,27 +88,19 @@ class GeorgeDisplay {
         }
         updateList.add(Renderable.string("§dTotal cost §7(§6Lowest BIN§7): §6${totalCost.addSeparators()} coins"))
         if (config.otherRarities) updateList.add(Renderable.string("§c§lDisclaimer:§r§c Total does not include costs to upgrade via Kat."))
-        return updateList
+        return this
     }
 
-    private fun findCheapestTier(pet: String, originalTier: Int): Pair<Double, Int> {
-        val petPriceOne = "$pet$SEPARATOR$originalTier".getPetPrice()
-        val petPrices: MutableList<Double> = mutableListOf(petPriceOne)
+    private fun findCheapestTier(pet: String, originalTier: Int): IndexedValue<Double> {
+        val petPriceOne = petInternalName(pet, originalTier).getPetPrice()
+        val petPrices= mutableListOf(petPriceOne)
         if (config.otherRarities || petPriceOne == -1.0) {
-            petPrices.add("$pet$SEPARATOR${originalTier - 1}".getPetPrice(otherRarity = true))
-            if (originalTier != 5) petPrices.add("$pet$SEPARATOR${originalTier + 1}".getPetPrice(otherRarity = true))
+            petPrices.add(petInternalName(pet, originalTier - 1).getPetPrice(otherRarity = true))
+            if (originalTier != 5) petPrices.add(petInternalName(pet, originalTier + 1).getPetPrice(otherRarity = true))
         }
-        val petPrice = petPrices.min()
-        val cheapestTier = petPrices.cheapestTierIndex(petPrice, originalTier)
-        return Pair(petPrice, cheapestTier)
+        return petPrices.withIndex().minBy { it.value }
     }
 
-    private fun MutableList<Double>.cheapestTierIndex(petPrice: Double, originalTier: Int) =
-        when (this.indexOf(petPrice)) {
-            1 -> originalTier - 1
-            2 -> originalTier + 1
-            else -> originalTier
-        }
 
     @SubscribeEvent
     fun onRenderOverlay(event: GuiRenderEvent.ChestGuiOverlayRenderEvent) {
@@ -108,6 +110,6 @@ class GeorgeDisplay {
     }
 
     private fun String.getPetPrice(otherRarity: Boolean = false): Double = this.asInternalName().getPriceOrNull() ?: if (otherRarity) Double.MAX_VALUE else -1.0
-
+    private fun petInternalName(pet: String, originalTier: Int) = "$pet$SEPARATOR$originalTier"
     private fun isEnabled() = LorenzUtils.inSkyBlock && config.enabled
 }
