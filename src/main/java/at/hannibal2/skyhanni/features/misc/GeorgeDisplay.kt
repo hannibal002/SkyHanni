@@ -94,22 +94,15 @@ class GeorgeDisplay {
         if (config.otherRarities) this.add(Renderable.string("§c§lDisclaimer:§r§c Total does not include costs to upgrade via Kat."))
     }
 
-    private fun findCheapestTier(pet: String, originalTier: Int): Pair<Int, Double> {
-        val petPriceOne = petInternalName(pet, originalTier).getPetPrice()
-        val petPrices= mutableListOf(petPriceOne)
-        if (config.otherRarities || petPriceOne == -1.0) {
-            petPrices.add(petInternalName(pet, originalTier - 1).getPetPrice(otherRarity = true))
-            if (originalTier != 5) petPrices.add(petInternalName(pet, originalTier + 1).getPetPrice(otherRarity = true))
+    private fun findCheapestTier(pet: String, originalTier: Int) = buildMap<Int, Double> {
+        this[originalTier] = petInternalName(pet, originalTier).getPetPrice()
+        if (config.otherRarities || this[originalTier] == -1.0) {
+            this[originalTier - 1] = petInternalName(pet, originalTier - 1).getPetPrice(otherRarity = true)
+            if (originalTier != 5) {
+                this[originalTier + 1] = petInternalName(pet, originalTier + 1).getPetPrice(otherRarity = true)
+            }
         }
-        val tierAndIndex = petPrices.withIndex().minBy { it.value }
-        return Pair(tierAndIndex.cheapestTierIndex(originalTier), tierAndIndex.value)
-    }
-
-    private fun IndexedValue<Double>.cheapestTierIndex(originalTier: Int) = when (this.index) {
-        1 -> originalTier - 1
-        2 -> originalTier + 1
-        else -> originalTier
-    }
+    }.minBy { it.value }
 
     @SubscribeEvent
     fun onRenderOverlay(event: GuiRenderEvent.ChestGuiOverlayRenderEvent) {
