@@ -101,7 +101,6 @@ class GeorgeDisplay {
         return petPrices.withIndex().minBy { it.value }
     }
 
-
     @SubscribeEvent
     fun onRenderOverlay(event: GuiRenderEvent.ChestGuiOverlayRenderEvent) {
         if (!isEnabled()) return
