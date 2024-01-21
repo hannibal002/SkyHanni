@@ -50,7 +50,7 @@ class GeorgeDisplay {
         display = drawDisplay(stack.getLore())
     }
 
-    private fun drawDisplay(lore: List<String>) = buildList<Renderable> {
+    private fun drawDisplay(lore: List<String>): MutableList<Renderable> {
         val updateList: MutableList<Renderable> = mutableListOf(
             Renderable.string("§d§lTaming 60 Cost: §r§d(${
                 if (config.otherRarities) "cheapest" else "exact"
@@ -88,7 +88,7 @@ class GeorgeDisplay {
         }
         updateList.add(Renderable.string("§dTotal cost §7(§6Lowest BIN§7): §6${totalCost.addSeparators()} coins"))
         if (config.otherRarities) updateList.add(Renderable.string("§c§lDisclaimer:§r§c Total does not include costs to upgrade via Kat."))
-        return this
+        return updateList
     }
 
     private fun findCheapestTier(pet: String, originalTier: Int): IndexedValue<Double> {
