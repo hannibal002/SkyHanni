@@ -41,6 +41,7 @@ import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.TimeUtils.format
 import at.hannibal2.skyhanni.utils.getLorenzVec
+import com.google.gson.JsonArray
 import net.minecraft.client.Minecraft
 import net.minecraft.client.entity.EntityOtherPlayerMP
 import net.minecraft.client.renderer.GlStateManager
@@ -885,6 +886,17 @@ class DamageIndicatorManager {
         event.transform(15, "combat.damageIndicator.bossName") { element ->
             ConfigUtils.migrateIntToEnum(element, NameVisibility::class.java)
         }
+        event.transform(23, "combat.damageIndicator.bossesToShow") { element ->
+            val result = JsonArray()
+            for (bossType in element as JsonArray) {
+                if (bossType.asString == "DUNGEON_ALL") continue
+                result.add(bossType)
+            }
+
+            result
+        }
+
+
     }
 
     fun isEnabled() = LorenzUtils.inSkyBlock && config.enabled
