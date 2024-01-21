@@ -8,15 +8,20 @@
 
 + Added command /shcropsin <time> <item>. - DylanBruner
     + Shows the number of items you gain when farming in the garden for the given time.
-
-#### Fishing Features
-
 + Show sack item amount to the visitor shopping list. - CalMWolfs
 
 #### Fishing Features
 
 + Added Sea Creature Tracker. - hannibal2
     + Allows to only show single variants, e.g. water or lava or winter.
+
+#### Crimson Isle Features
+
++ Dojo Rank Display. - HiZe
+    + Display your rank, score, actual belt and points needed for the next belt in the Challenges inventory on the
+      Crimson Isles.
++ Added Volcano Explosivity in Crimson Isle. - Erymanthus
+    + Show a HUD of the current volcano explosivity level.
 
 #### Inventory Features
 
@@ -52,6 +57,11 @@
 
 + Fixes Ghost Entities. - hannibal2 & nea & Thunderblade73
     + Removes ghost entities caused by a Hypixel bug. This included Diana, Dungeon and Crimson Isle mobs and nametags.
++ Added Harp GUI Scale. - Thunderblade73
+    + Automatically sets the GUI scale to AUTO when entering the Harp.
++ Added Harp Quick Restart. - Thunderblade73
+    + Once you've launched the harp, quickly hit the close button in the harp menu to initiate the selected song.
++ Color the month names on the scoreboard. - J10a1n15
 
 ### Changes
 
@@ -123,6 +133,7 @@
 
 + Tia Relay Helper: Suggest /togglemusic. - alexia
 + Added option to ignore Everything Chroma in the chat. - VixidDev
++ Added Item Ability Cooldown support for Talbot's Theodolite (the Farming Island Trapper tracker thing). - Erymanthus
 
 ### Fixes
 
@@ -148,6 +159,10 @@
 + Hide No Fishing Bait warning during Kuudra fight. - hannibal2
 + Fixed Dungeon and Kuudra party finder join message not detecting in party member tab complete. - CalMWolfs
 + Fixed Fire Veil Wand circle shows on left-clicking. - hannibal2
++ Fixed Ashfang Freeze Cooldown being off by one second. Fixed Fire Veil line gets shown even while frozen. - hannibal2
++ Fixed all Damage Indicator boss timers in Dungeons being off by a second. - hannibal2
++ Gave Damage Indicator mobs correct names on floor 1, 2, 3 and 6. (Removed "Generic Dungeon Boss") - hannibal2
++ Fixed the M3 reinforced guardian not getting detected in the Damage Indicator. - hannibal2
 
 #### Diana Fixes
 
@@ -249,6 +264,7 @@
 + Added function SlotClickEvent.makeShiftClick(). - Thunderblade73
 + Used a better bug fix for DelayedRun sync issues. - Thunderblade73
 + Creating and using TimeLimitedCache and TimeLimitedSet instead of guava cache. - hannibal2
++ Bring back the deleted item modifier test and fix the issue causing it. - CalMWolfs
 
 ## Version 0.22
 

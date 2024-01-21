@@ -619,13 +619,17 @@ class MobFinder {
         guardians.clear()
 
         for (entity in EntityUtils.getEntities<EntityGuardian>()) {
-            //F3
+            // F3
             if (entity.hasMaxHealth(1_000_000, true) || entity.hasMaxHealth(1_200_000, true)) {
                 guardians.add(entity)
             }
 
-            //M3
+            // M3
             if (entity.hasMaxHealth(120_000_000, true) || entity.hasMaxHealth(240_000_000, true)) {
+                guardians.add(entity)
+            }
+            // M3 Reinforced Guardian
+            if (entity.hasMaxHealth(140_000_000, true) || entity.hasMaxHealth(280_000_000, true)) {
                 guardians.add(entity)
             }
         }
