@@ -42,6 +42,11 @@ public class DebugConfig {
     public boolean showItemRarity = false;
 
     @Expose
+    @ConfigOption(name = "Show Item Category", desc = "Show item categories in item lore.")
+    @ConfigEditorBoolean
+    public boolean showItemCategory = false;
+
+    @Expose
     @ConfigOption(name = "Copy Internal Name", desc = "Copies the internal name of an item on key press in the clipboard.")
     @ConfigEditorKeybind(defaultKey = Keyboard.KEY_NONE)
     public int copyInternalName = Keyboard.KEY_NONE;
