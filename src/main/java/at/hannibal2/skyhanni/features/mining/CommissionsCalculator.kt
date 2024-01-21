@@ -55,9 +55,9 @@ class CommissionsCalculator {
         "(?:§.)*Milestone (?<milestone>\\S+) Rewards"
     )
 
-    private val display: MutableList<Renderable> = mutableListOf<Renderable>()
+    private var display: MutableList<Renderable> = mutableListOf()
     private val firstLine: String = "§lCommissions Calculator:"
-    private val fatDisclaimer: List<Renderable> = listOf<Renderable>(
+    private val fatDisclaimer: List<Renderable> = listOf(
         Renderable.string("§c§lDisclaimer: §r§cThis calculator only accounts for"),
         Renderable.string("§cthe standard HOTM XP gain from claiming commissions"),
         Renderable.string("§cbefore any modifiers/boosts or other sources."),
@@ -69,7 +69,7 @@ class CommissionsCalculator {
     private var currentHOTMLevel: Int = 0
     private var currentHOTMXP: Int = 0
 
-    private enum class HOTMProgression(
+    private enum class HOTMTier(
         val tier: Int,
         val toNextTier: Int,
         val perComm: Double
@@ -98,14 +98,12 @@ class CommissionsCalculator {
             ).update()
             return
         }
-        val hotmInfo = HOTMProgression.entries.find { it.tier == currentHOTMLevel } ?: return
+        val hotmInfo = HOTMTier.entries.find { it.tier == currentHOTMLevel } ?: return
         val perComm = hotmInfo.perComm
         val toNextTier = hotmInfo.toNextTier
         val items = event.inventoryItems
         val commsToNextTier = ceil(abs(toNextTier - currentHOTMXP) / perComm).roundToInt()
-        val newList = mutableListOf<Renderable>(
-            Renderable.string("$colorCode$firstLine"),
-        )
+        val newList = mutableListOf(Renderable.string("$colorCode$firstLine"))
         if (chestName == "Heart of the Mountain") {
             newList.add(Renderable.string(" §e(Remember to scroll up the HOTM tree!)"))
             calculateWithHOTM(items)
@@ -124,18 +122,7 @@ class CommissionsCalculator {
             newList.add(Renderable.string(" §7- §f(At least $colorCode${hotmXP.addSeparators()} HOTM XP §fto be gained from claiming completed commissions)"))
         }
         if (chestName == "Commission Milestones") {
-            for ((_, item) in items) {
-                milestoneRewardsItemPattern.matchMatcher(item.cleanName()) {
-                    val milestone = group("milestone").romanToDecimalIfNecessary()
-                    for (line in item.getLore()) {
-                        mileProgressPattern.matchMatcher(line) {
-                            val completed = group("completed").groupToInt()
-                            val required = group("required").groupToInt()
-                            remainingMilestones(required, completed, perComm, newList, colorCode, milestone)
-                        }
-                    }
-                }
-            }
+            calculateWithMilestones(items, perComm, newList, colorCode)
         }
         newList.addAll(
             listOf(
@@ -144,6 +131,26 @@ class CommissionsCalculator {
             )
         )
         newList.update()
+    }
+
+    private fun calculateWithMilestones(
+        items: Map<Int, ItemStack>,
+        perComm: Double,
+        newList: MutableList<Renderable>,
+        colorCode: String
+    ) {
+        for ((_, item) in items) {
+            milestoneRewardsItemPattern.matchMatcher(item.cleanName()) {
+                val milestone = group("milestone").romanToDecimalIfNecessary()
+                for (line in item.getLore()) {
+                    mileProgressPattern.matchMatcher(line) {
+                        val completed = group("completed").groupToInt()
+                        val required = group("required").groupToInt()
+                        remainingMilestones(required, completed, perComm, newList, colorCode, milestone)
+                    }
+                }
+            }
+        }
     }
 
     private fun calculateWithCommissions(
@@ -188,17 +195,15 @@ class CommissionsCalculator {
     ) {
         val commsToNextMilestone = abs(required - completed)
         if (completed < required) {
-            val remainingPlural = StringUtils.optionalPlural(commsToNextMilestone, "commission", "commissions")
-            val hotmXPGain = (commsToNextMilestone * perComm).roundToInt()
             newList.add(
-                Renderable.string(" §7- $colorCode$remainingPlural §fleft to complete §6Milestone $milestone §f($colorCode+${hotmXPGain.addSeparators()} HOTM XP§f)"),
+                Renderable.string(" §7- $colorCode${StringUtils.optionalPlural(commsToNextMilestone, "commission", "commissions")} §fleft to complete §6Milestone $milestone §f($colorCode+${(commsToNextMilestone * perComm).roundToInt().addSeparators()} HOTM XP§f)"),
             )
         }
         if (!config.allMilestones) {
             val lastElement = newList.takeLast(1).first()
             newList.clear()
             newList.addAll(
-                listOf<Renderable>(
+                listOf(
                     Renderable.string("$colorCode$firstLine"),
                     lastElement,
                 )
