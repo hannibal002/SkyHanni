@@ -20,12 +20,12 @@ public class SulphurSkitterBoxConfig {
 
     @Expose
     @ConfigOption(name = "Box Type", desc = "Choose the look of the box.")
-    @ConfigEditorDropdown()
+    @ConfigEditorDropdown
     public BoxType boxType = BoxType.WIREFRAME;
 
     public enum BoxType {
         FULL("Full"),
-        WIREFRAME("Wireframe")
+        WIREFRAME("Wireframe"),
 
         ;
         private final String str;

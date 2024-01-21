@@ -8,6 +8,7 @@ import at.hannibal2.skyhanni.events.LorenzRenderWorldEvent
 import at.hannibal2.skyhanni.events.LorenzTickEvent
 import at.hannibal2.skyhanni.events.LorenzWorldChangeEvent
 import at.hannibal2.skyhanni.events.RepositoryReloadEvent
+import at.hannibal2.skyhanni.utils.BlockUtils.getBlockAt
 import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.LocationUtils
 import at.hannibal2.skyhanni.utils.LocationUtils.distanceToPlayer
@@ -17,7 +18,6 @@ import at.hannibal2.skyhanni.utils.RenderUtils
 import at.hannibal2.skyhanni.utils.RenderUtils.expandBlock
 import at.hannibal2.skyhanni.utils.SpecialColour
 import at.hannibal2.skyhanni.utils.toLorenzVec
-import net.minecraft.client.Minecraft
 import net.minecraft.init.Blocks
 import net.minecraft.util.AxisAlignedBB
 import net.minecraft.util.BlockPos
@@ -27,66 +27,72 @@ import java.awt.Color
 class SulphurSkitterBox {
 
     private val config get() = SkyHanniMod.feature.crimsonIsle.sulphurSkitterBoxConfig
-    private var rodsList = setOf<NEUInternalName>()
-    private var blocksList = setOf<BlockPos>()
+    private var rods = listOf<NEUInternalName>()
+    private var spongeBlocks = listOf<BlockPos>()
+    private var closestBlock: BlockPos? = null
     private val radius = 8
 
     @SubscribeEvent
     fun onTick(event: LorenzTickEvent) {
         if (!isEnabled()) return
-        if (!event.repeatSeconds(1)) return
-        if (InventoryUtils.itemInHandId !in rodsList && config.onlyWithRods) return
-        val from = LocationUtils.playerLocation().add(-20, -20, -20).toBlockPos()
-        val to = LocationUtils.playerLocation().add(20, 20, 20).toBlockPos()
-        blocksList = BlockPos.getAllInBox(from, to).filter {
-            val b = Minecraft.getMinecraft().theWorld.getBlockState(it).block
-            b == Blocks.sponge && it.toLorenzVec().distanceToPlayer() <= 15
-        }.filter {
-            val pos1 = it.add(-radius, -radius, -radius)
-            val pos2 = it.add(radius, radius, radius)
-            BlockPos.getAllInBox(pos1, pos2).any { p ->
-                Minecraft.getMinecraft().theWorld.getBlockState(p).block in listOf(Blocks.lava, Blocks.flowing_lava)
+        if (event.isMod(5)) {
+            closestBlock = getClosestBlockToPlayer()
+        }
+        if (event.repeatSeconds(1)) {
+            val from = LocationUtils.playerLocation().add(-20, -20, -20).toBlockPos()
+            val to = LocationUtils.playerLocation().add(20, 20, 20).toBlockPos()
+
+            spongeBlocks = BlockPos.getAllInBox(from, to).filter {
+                val b = it.toLorenzVec().getBlockAt()
+                b == Blocks.sponge && it.toLorenzVec().distanceToPlayer() <= 15
+            }.filter {
+                val pos1 = it.add(-radius, -radius, -radius)
+                val pos2 = it.add(radius, radius, radius)
+                BlockPos.getAllInBox(pos1, pos2).any { pos ->
+                    pos.toLorenzVec().getBlockAt() in listOf(Blocks.lava, Blocks.flowing_lava)
+                }
             }
-        }.toSet()
+        }
     }
 
     @SubscribeEvent
     fun onWorldChange(event: LorenzWorldChangeEvent) {
-        blocksList = emptySet()
+        spongeBlocks = emptyList()
     }
 
     @SubscribeEvent
     fun onRenderWorld(event: LorenzRenderWorldEvent) {
         if (!isEnabled()) return
-        if (InventoryUtils.itemInHandId !in rodsList && config.onlyWithRods) return
-        val block = getClosestBlockToPlayer(blocksList) ?: return
-        if (block.toLorenzVec().distanceToPlayer() >= 20) return
-        val pos1 = block.add(-radius, -radius, -radius)
-        val pos2 = block.add(radius, radius, radius)
-        val axis = AxisAlignedBB(pos1, pos2)
+        closestBlock?.let {
+            if (it.toLorenzVec().distanceToPlayer() >= 50) return
+            val pos1 = it.add(-radius, -radius, -radius)
+            val pos2 = it.add(radius, radius, radius)
+            val axis = AxisAlignedBB(pos1, pos2)
 
-        drawBox(axis, event.partialTicks)
+            drawBox(axis, event.partialTicks)
+        }
     }
 
-    private fun getClosestBlockToPlayer(list: Set<BlockPos>): BlockPos? {
-        return list.minByOrNull { it.toLorenzVec().distanceToPlayer() }
+    private fun getClosestBlockToPlayer(): BlockPos? {
+        return spongeBlocks.minByOrNull { it.toLorenzVec().distanceToPlayer() }
     }
 
     private fun drawBox(axis: AxisAlignedBB, partialTicks: Float) {
+        val color = Color(SpecialColour.specialToChromaRGB(config.boxColor), true)
         when (config.boxType) {
             SulphurSkitterBoxConfig.BoxType.FULL -> {
                 RenderUtils.drawFilledBoundingBox_nea(axis.expandBlock(),
-                    Color(SpecialColour.specialToChromaRGB(config.boxColor), true),
+                    color,
                     partialTicks = partialTicks,
                     renderRelativeToCamera = false)
             }
 
             SulphurSkitterBoxConfig.BoxType.WIREFRAME -> {
-                RenderUtils.drawWireframeBoundingBox_nea(axis.expandBlock(), Color(SpecialColour.specialToChromaRGB(config.boxColor), true), partialTicks)
+                RenderUtils.drawWireframeBoundingBox_nea(axis.expandBlock(), color, partialTicks)
             }
 
             else -> {
-                RenderUtils.drawWireframeBoundingBox_nea(axis.expandBlock(), Color(SpecialColour.specialToChromaRGB(config.boxColor), true), partialTicks)
+                RenderUtils.drawWireframeBoundingBox_nea(axis.expandBlock(), color, partialTicks)
             }
         }
     }
@@ -94,8 +100,9 @@ class SulphurSkitterBox {
     @SubscribeEvent
     fun onRepoReload(event: RepositoryReloadEvent) {
         val data = event.getConstant<ItemsJson>("Items")
-        rodsList = data.lava_fishing_rods
+        rods = data.lava_fishing_rods ?: emptyList()
     }
 
-    fun isEnabled() = IslandType.CRIMSON_ISLE.isInIsland() && config.enabled
+    fun isEnabled() =
+        IslandType.CRIMSON_ISLE.isInIsland() && config.enabled && (!config.onlyWithRods || InventoryUtils.itemInHandId in rods)
 }

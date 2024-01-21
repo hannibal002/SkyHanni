@@ -15,8 +15,8 @@ public class ItemsJson {
     public Map<String, Integer> crimson_tiers;
 
     @Expose
-    public Set<NEUInternalName> lava_fishing_rods;
+    public List<NEUInternalName> lava_fishing_rods;
 
     @Expose
-    public Set<NEUInternalName> water_fishing_rods;
+    public List<NEUInternalName> water_fishing_rods;
 }
