@@ -50,11 +50,13 @@ class GeorgeDisplay {
         display = drawDisplay(stack.getLore())
     }
 
-    private fun drawDisplay(lore: List<String>): MutableList<Renderable> {
-        val updateList: MutableList<Renderable> = mutableListOf(
-            Renderable.string("§d§lTaming 60 Cost: §r§d(${
-                if (config.otherRarities) "cheapest" else "exact"
-            } rarity)")
+    private fun drawDisplay(lore: List<String>) = buildList<Renderable> {
+        this.add(
+            Renderable.string(
+                "§d§lTaming 60 Cost: §r§d(${
+                    if (config.otherRarities) "cheapest" else "exact"
+                } rarity)"
+            )
         )
         var totalCost = 0.0
         for (line in lore) {
@@ -62,33 +64,34 @@ class GeorgeDisplay {
                 val origTierString = group("tier")
                 val origPetString = group("pet")
                 val pet = origPetString.uppercase().replace(" ", "_").removePrefix("FROST_")
-                val originalTier = LorenzRarity.getByName(origTierString.uppercase().replace(" ", "_") )?.id ?: 0
+                val originalTier = LorenzRarity.getByName(origTierString.uppercase().replace(" ", "_"))?.id ?: 0
                 val (cheapestTier, petPrice) = findCheapestTier(pet, originalTier)
                 val displayPetString =
                     if (cheapestTier == originalTier) group("fullThing")
                     else "${LorenzRarity.getById(cheapestTier)?.formattedName} $origPetString"
                 if (petPrice != -1.0) {
                     totalCost += petPrice
-                    updateList.add(Renderable.clickAndHover(
-                        text = " §7- $displayPetString§7: §6${petPrice.addSeparators()} coins",
-                        tips = listOf(
-                            "§aClick to run §e/ahs ] $origPetString §ato find it on the Auction House.",
-                            "§aNotes: §eSet the rarity filter yourself. §cBooster Cookie required!"
-                        ),
-                        onClick = { LorenzUtils.sendCommandToServer("ahs ] $origPetString") }
-                    ))
+                    this@buildList.add(
+                        Renderable.clickAndHover(
+                            text = " §7- $displayPetString§7: §6${petPrice.addSeparators()} coins",
+                            tips = listOf(
+                                "§aClick to run §e/ahs ] $origPetString §ato find it on the Auction House.",
+                                "§aNotes: §eSet the rarity filter yourself. §cBooster Cookie required!"
+                            ),
+                            onClick = { LorenzUtils.sendCommandToServer("ahs ] $origPetString") }
+                        ))
                 } else {
-                    updateList.add(Renderable.clickAndHover(
-                        text = " §7- $displayPetString§7: §eNot on AH; view its Wiki article here.",
-                        tips = listOf("§4Click to run §e/wiki $pet §4to view how to obtain it."),
-                        onClick = { LorenzUtils.sendCommandToServer("wiki $pet") }
-                    ))
+                    this@buildList.add(
+                        Renderable.clickAndHover(
+                            text = " §7- $displayPetString§7: §eNot on AH; view its Wiki article here.",
+                            tips = listOf("§4Click to run §e/wiki $pet §4to view how to obtain it."),
+                            onClick = { LorenzUtils.sendCommandToServer("wiki $pet") }
+                        ))
                 }
             }
         }
-        updateList.add(Renderable.string("§dTotal cost §7(§6Lowest BIN§7): §6${totalCost.addSeparators()} coins"))
-        if (config.otherRarities) updateList.add(Renderable.string("§c§lDisclaimer:§r§c Total does not include costs to upgrade via Kat."))
-        return updateList
+        this.add(Renderable.string("§dTotal cost §7(§6Lowest BIN§7): §6${totalCost.addSeparators()} coins"))
+        if (config.otherRarities) this.add(Renderable.string("§c§lDisclaimer:§r§c Total does not include costs to upgrade via Kat."))
     }
 
     private fun findCheapestTier(pet: String, originalTier: Int): Pair<Int, Double> {
