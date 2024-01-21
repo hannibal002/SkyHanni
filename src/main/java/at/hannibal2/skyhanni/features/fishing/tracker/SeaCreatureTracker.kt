@@ -169,9 +169,9 @@ object SeaCreatureTracker {
         FishingAPI.lastActiveFishingTime.passedSince() < 10.minutes && config.enabled && !isTrophyFishing
 
     private fun isWearingTrophyArmor(): Boolean {
-        val armorInternalNames = InventoryUtils.getArmor().map { it?.getInternalName()?.asString() ?: return false }
-        return armorInternalNames.all { itemID ->
-            trophyArmorNames.matches(itemID)
+        val armorInternalNames = InventoryUtils.getArmor()
+        return armorInternalNames.all { armorInternal ->
+            trophyArmorNames.matches(armorInternal?.getInternalName()?.asString().toString())
         }
     }
 
