@@ -53,14 +53,7 @@ class GeorgeDisplay {
                 val origPetString = group("pet")
                 val pet = origPetString.uppercase().replace(" ", "_").removePrefix("FROST_")
                 val originalTier = LorenzRarity.entries.find { it.name == origTierString.uppercase() }!!.id
-                val petPriceOne = "$pet$SEPARATOR$originalTier".getPetPrice()
-                val petPrices: MutableList<Double> = mutableListOf(petPriceOne)
-                if (config.otherRarities || petPriceOne == -1.0) {
-                    petPrices.add("$pet$SEPARATOR${originalTier - 1}".getPetPrice(otherRarity = true))
-                    if (originalTier != 5) petPrices.add("$pet$SEPARATOR${originalTier + 1}".getPetPrice(otherRarity = true))
-                }
-                val petPrice = petPrices.min()
-                val cheapestTier = petPrices.cheapestTierIndex(petPrice, originalTier)
+                val (petPrice, cheapestTier) = findCheapestTier(pet, originalTier)
                 val displayPetString =
                     if (cheapestTier == originalTier) group("fullThing")
                     else "${LorenzRarity.entries.find { it.id == cheapestTier }!!.formattedName} $origPetString"
@@ -86,6 +79,18 @@ class GeorgeDisplay {
         updateList.add(Renderable.string("§dTotal cost §7(§6Lowest BIN§7): §6${totalCost.addSeparators()} coins"))
         if (config.otherRarities) updateList.add(Renderable.string("§c§lDisclaimer:§r§c Total does not include costs to upgrade via Kat."))
         return updateList
+    }
+
+    private fun findCheapestTier(pet: String, originalTier: Int): Pair<Double, Int> {
+        val petPriceOne = "$pet$SEPARATOR$originalTier".getPetPrice()
+        val petPrices: MutableList<Double> = mutableListOf(petPriceOne)
+        if (config.otherRarities || petPriceOne == -1.0) {
+            petPrices.add("$pet$SEPARATOR${originalTier - 1}".getPetPrice(otherRarity = true))
+            if (originalTier != 5) petPrices.add("$pet$SEPARATOR${originalTier + 1}".getPetPrice(otherRarity = true))
+        }
+        val petPrice = petPrices.min()
+        val cheapestTier = petPrices.cheapestTierIndex(petPrice, originalTier)
+        return Pair(petPrice, cheapestTier)
     }
 
     private fun MutableList<Double>.cheapestTierIndex(petPrice: Double, originalTier: Int) =
