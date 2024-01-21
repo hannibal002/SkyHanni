@@ -51,29 +51,24 @@ class GeorgeDisplay {
         for (line in lore) {
             neededPetPattern.matchMatcher(line) {
                 val origTierString = group("tier") ?: ""
-                val tier = LorenzRarity.entries.find { it.name == origTierString.uppercase() }!!.id
                 val origPetString = group("pet") ?: ""
                 val pet = origPetString.uppercase().replace(" ", "_").removePrefix("FROST_")
-                val petPrices: MutableList<Double> = mutableListOf()
-                val petPriceOne = "$pet;$tier".asInternalName().getPriceOrNull() ?: -1.0
-                petPrices.add(petPriceOne)
+                val originalTier = LorenzRarity.entries.find { it.name == origTierString.uppercase() }!!.id
+                val petPriceOne = "$pet$SEPARATOR$originalTier".getPetPrice()
+                val petPrices: MutableList<Double> = mutableListOf(petPriceOne)
                 if (config.otherRarities || petPriceOne == -1.0) {
-                    val lowerTier = "$pet$SEPARATOR${tier - 1}".asInternalName().getPriceOrNull() ?: Double.MAX_VALUE
-                    petPrices.add(lowerTier)
-                    if (tier != 5) {
-                        val higherTier = "$pet$SEPARATOR${tier + 1}".asInternalName().getPriceOrNull() ?: Double.MAX_VALUE
-                        petPrices.add(higherTier)
-                    }
+                    petPrices.add("$pet$SEPARATOR${originalTier - 1}".getPetPrice(otherRarity = true))
+                    if (originalTier != 5) petPrices.add("$pet$SEPARATOR${originalTier + 1}".getPetPrice(otherRarity = true))
                 }
                 val petPrice = petPrices.min()
-                val tierUsed = when (petPrices.indexOf(petPrice)) {
-                    1 -> tier - 1
-                    2 -> tier + 1
-                    else -> tier
+                val cheapestTier = when (petPrices.indexOf(petPrice)) {
+                    1 -> originalTier - 1
+                    2 -> originalTier + 1
+                    else -> originalTier
                 }
-                val displayPetString = if (tierUsed == tier) group("fullThing") else {
-                    "${LorenzRarity.entries.find { it.id == tierUsed }!!.formattedName} $origPetString"
-                }
+                val displayPetString =
+                    if (cheapestTier == originalTier) group("fullThing")
+                    else "${LorenzRarity.entries.find { it.id == cheapestTier }!!.formattedName} $origPetString"
                 if (petPrice != -1.0) {
                     totalCost += petPrice
                     updateList.add(Renderable.clickAndHover(
@@ -104,6 +99,8 @@ class GeorgeDisplay {
         if (InventoryUtils.openInventoryName() != "Offer Pets") return
         config.position.renderRenderables(display, posLabel = "George Display")
     }
+
+    private fun String.getPetPrice(otherRarity: Boolean = false): Double = this.asInternalName().getPriceOrNull() ?: if (otherRarity) Double.MAX_VALUE else -1.0
 
     private fun isEnabled() = config.enabled && LorenzUtils.inSkyBlock
 }
