@@ -114,7 +114,7 @@ class GeorgeDisplay {
     @SubscribeEvent
     fun onRenderOverlay(event: GuiRenderEvent.ChestGuiOverlayRenderEvent) {
         if (!isEnabled()) return
-        if (InventoryUtils.openInventoryName() != "Offer Pets") return
+        if (!offerPetsChestPattern.matches(InventoryUtils.openInventoryName())) return
         config.position.renderRenderables(display, posLabel = "George Display")
     }
 
