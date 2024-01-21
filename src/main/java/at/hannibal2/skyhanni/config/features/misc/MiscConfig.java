@@ -113,6 +113,7 @@ public class MiscConfig {
     @FeatureToggle
     public boolean brewingStandOverlay = true;
 
+    // TODO move into scoreboard accordion
     @Expose
     @ConfigOption(name = "Red Scoreboard Numbers", desc = "Hide the red scoreboard numbers on the right side of the screen.")
     @ConfigEditorBoolean
@@ -126,7 +127,7 @@ public class MiscConfig {
     public boolean hidePiggyScoreboard = true;
 
     @Expose
-    @ConfigOption(name = "Color Month Names", desc = "Color the month names in the Scoreboard.\nAlso applies to the Custom Scoreboard")
+    @ConfigOption(name = "Color Month Names", desc = "Color the month names in the Scoreboard.\nAlso applies to the Custom Scoreboard.")
     @ConfigEditorBoolean
     @FeatureToggle
     public boolean colorMonthNames = false;

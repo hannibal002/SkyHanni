@@ -52,23 +52,27 @@ fun replaceString(text: String): String? {
     }
 
     if (SkyHanniMod.feature.misc.colorMonthNames) {
-        listOf(
-            "Early Spring" to "§d",
-            "Spring" to "§d",
-            "Late Spring" to "§d",
-            "Early Summer" to "§6",
-            "Summer" to "§6",
-            "Late Summer" to "§6",
-            "Early Autumn" to "§e",
-            "Autumn" to "§e",
-            "Late Autumn" to "§e",
-            "Early Winter" to "§9",
-            "Winter" to "§9",
-            "Late Winter" to "§9"
-        ).forEach {
-            if (text.trim().startsWith(it.first)) return it.second + text
+        for (season in Season.entries) {
+            if (text.trim().startsWith(season.prefix)) {
+                return season.colorCode + text
+            }
         }
     }
 
     return text
+}
+
+enum class Season(val prefix: String, val colorCode: String) {
+    EARLY_SPRING("Early Spring", "§d"),
+    SPRING("Spring", "§d"),
+    LATE_SPRING("Late Spring", "§d"),
+    EARLY_SUMMER("Early Summer", "§6"),
+    SUMMER("Summer", "§6"),
+    LATE_SUMMER("Late Summer", "§6"),
+    EARLY_AUTUMN("Early Autumn", "§e"),
+    AUTUMN("Autumn", "§e"),
+    LATE_AUTUMN("Late Autumn", "§e"),
+    EARLY_WINTER("Early Winter", "§9"),
+    WINTER("Winter", "§9"),
+    LATE_WINTER("Late Winter", "§9")
 }
