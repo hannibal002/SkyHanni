@@ -10,5 +10,5 @@ build
 gradle.properties
 .gradle
 
-#other
+# other
 .DS_STORE
