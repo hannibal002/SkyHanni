@@ -104,5 +104,5 @@ class GeorgeDisplay {
 
     private fun String.getPetPrice(otherRarity: Boolean = false): Double = this.asInternalName().getPriceOrNull() ?: if (otherRarity) Double.MAX_VALUE else -1.0
 
-    private fun isEnabled() = config.enabled && LorenzUtils.inSkyBlock
+    private fun isEnabled() = LorenzUtils.inSkyBlock && config.enabled
 }
