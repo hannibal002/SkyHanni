@@ -66,7 +66,7 @@ class GeorgeDisplay {
                 val (cheapestTier, petPrice) = findCheapestTier(pet, originalTier)
                 val displayPetString =
                     if (cheapestTier == originalTier) group("fullThing")
-                    else "${LorenzRarity.getById(cheapestTier )?.formattedName} $origPetString"
+                    else "${LorenzRarity.getById(cheapestTier)?.formattedName} $origPetString"
                 if (petPrice != -1.0) {
                     totalCost += petPrice
                     updateList.add(Renderable.clickAndHover(
@@ -91,15 +91,18 @@ class GeorgeDisplay {
         return updateList
     }
 
-    private fun findCheapestTier(pet: String, originalTier: Int): IndexedValue<Double> {
+    private fun findCheapestTier(pet: String, originalTier: Int): Pair<Int, Double> {
         val petPriceOne = petInternalName(pet, originalTier).getPetPrice()
         val petPrices= mutableListOf(petPriceOne)
         if (config.otherRarities || petPriceOne == -1.0) {
             petPrices.add(petInternalName(pet, originalTier - 1).getPetPrice(otherRarity = true))
             if (originalTier != 5) petPrices.add(petInternalName(pet, originalTier + 1).getPetPrice(otherRarity = true))
         }
-        return petPrices.withIndex().minBy { it.value }
+        val tierAndIndex = petPrices.withIndex().minBy { it.value }
+        return Pair(tierAndIndex.cheapestTierIndex(originalTier), tierAndIndex.value)
     }
+
+    private fun IndexedValue<Double>.cheapestTierIndex(originalTier: Int) = if (this.index == 1) originalTier - 1 else if (this.index == 2) originalTier + 1 else originalTier
 
     @SubscribeEvent
     fun onRenderOverlay(event: GuiRenderEvent.ChestGuiOverlayRenderEvent) {
