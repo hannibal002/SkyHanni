@@ -43,8 +43,8 @@ import java.util.Queue
 import java.util.Timer
 import java.util.TimerTask
 import java.util.WeakHashMap
-import java.util.regex.Matcher
 import java.util.concurrent.ConcurrentLinkedQueue
+import java.util.regex.Matcher
 import kotlin.properties.ReadWriteProperty
 import kotlin.reflect.KMutableProperty1
 import kotlin.reflect.KProperty
@@ -719,4 +719,6 @@ object LorenzUtils {
 
     fun <T> MutableCollection<T>.filterToMutable(predicate: (T) -> Boolean) = filterTo(mutableListOf(), predicate)
 
+    val Long.ticks get() = (this * 50).milliseconds
+    val Int.ticks get() = (this * 50).milliseconds
 }

@@ -31,14 +31,17 @@ import at.hannibal2.skyhanni.utils.LorenzUtils.baseMaxHealth
 import at.hannibal2.skyhanni.utils.LorenzUtils.editCopy
 import at.hannibal2.skyhanni.utils.LorenzUtils.put
 import at.hannibal2.skyhanni.utils.LorenzUtils.round
+import at.hannibal2.skyhanni.utils.LorenzUtils.ticks
 import at.hannibal2.skyhanni.utils.LorenzVec
 import at.hannibal2.skyhanni.utils.NumberUtil
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.RenderUtils.drawDynamicText
+import at.hannibal2.skyhanni.utils.SimpleTimeMark.Companion.asTimeMark
 import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
-import at.hannibal2.skyhanni.utils.TimeUtils
+import at.hannibal2.skyhanni.utils.TimeUtils.format
 import at.hannibal2.skyhanni.utils.getLorenzVec
+import com.google.gson.JsonArray
 import net.minecraft.client.Minecraft
 import net.minecraft.client.entity.EntityOtherPlayerMP
 import net.minecraft.client.renderer.GlStateManager
@@ -55,6 +58,8 @@ import net.minecraftforge.fml.common.eventhandler.EventPriority
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import java.util.UUID
 import kotlin.math.max
+import kotlin.time.Duration
+import kotlin.time.Duration.Companion.seconds
 
 class DamageIndicatorManager {
 
@@ -168,9 +173,11 @@ class DamageIndicatorManager {
 
             var healthText = data.healthText
             val delayedStart = data.delayedStart
-            if (delayedStart != -1L && delayedStart > System.currentTimeMillis()) {
-                val delay = delayedStart - System.currentTimeMillis()
-                healthText = formatDelay(delay)
+            delayedStart?.let {
+                if (!it.isInPast()) {
+                    val delay = it.timeUntil()
+                    healthText = formatDelay(delay)
+                }
             }
 
             val location = if (data.dead && data.deathLocation != null) {
@@ -297,14 +304,14 @@ class DamageIndicatorManager {
         damageCounter.oldDamages.removeIf { now > it.time + 5_000 }
     }
 
-    private fun formatDelay(delay: Long): String {
+    private fun formatDelay(delay: Duration): String {
         val color = when {
-            delay < 1_000 -> LorenzColor.DARK_PURPLE
-            delay < 3_000 -> LorenzColor.LIGHT_PURPLE
+            delay < 1.seconds -> LorenzColor.DARK_PURPLE
+            delay < 3.seconds -> LorenzColor.LIGHT_PURPLE
 
             else -> LorenzColor.WHITE
         }
-        val format = TimeUtils.formatDuration(delay, showMilliSeconds = true)
+        val format = delay.format(showMilliSeconds = true)
         return color.getChatColor() + format
     }
 
@@ -646,15 +653,16 @@ class DamageIndicatorManager {
 
         //Laser phase
         if (config.enderSlayer.laserPhaseTimer && entity.ridingEntity != null) {
-            val ticksAlive = entity.ridingEntity.ticksExisted.toLong()
             //TODO more tests, more exact values, better logic? idk make this working perfectly pls
-            //val remainingTicks = 8 * 20 - ticksAlive
-            val remainingTicks = (7.4 * 20).toLong() - ticksAlive
+            val totalTimeAlive = 7.4.seconds
 
+            val ticksAlive = entity.ridingEntity.ticksExisted.ticks
+            val remainingTime = totalTimeAlive - ticksAlive
+            val formatDelay = formatDelay(remainingTime)
             if (config.enderSlayer.showHealthDuringLaser) {
-                entityData.nameSuffix = " §f" + formatDelay(remainingTicks * 50)
+                entityData.nameSuffix = " §f$formatDelay"
             } else {
-                return formatDelay(remainingTicks * 50)
+                return formatDelay
             }
         }
 
@@ -789,7 +797,7 @@ class DamageIndicatorManager {
         val entityData = EntityData(
             entity,
             entityResult.ignoreBlocks,
-            entityResult.delayedStart,
+            entityResult.delayedStart?.asTimeMark(),
             entityResult.finalDungeonBoss,
             entityResult.bossType,
             foundTime = System.currentTimeMillis()
@@ -878,6 +886,17 @@ class DamageIndicatorManager {
         event.transform(15, "combat.damageIndicator.bossName") { element ->
             ConfigUtils.migrateIntToEnum(element, NameVisibility::class.java)
         }
+        event.transform(23, "combat.damageIndicator.bossesToShow") { element ->
+            val result = JsonArray()
+            for (bossType in element as JsonArray) {
+                if (bossType.asString == "DUNGEON_ALL") continue
+                result.add(bossType)
+            }
+
+            result
+        }
+
+
     }
 
     fun isEnabled() = LorenzUtils.inSkyBlock && config.enabled
