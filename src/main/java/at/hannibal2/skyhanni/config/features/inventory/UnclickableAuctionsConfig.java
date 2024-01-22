@@ -25,7 +25,8 @@ public class UnclickableAuctionsConfig {
     public int opacity = 180;
 
     @Expose
-    @ConfigOption(name = "Bypass With Key", desc = "Bypass unclickable auctions when holding a keybind of your choice.")
+    @ConfigOption(name = "Bypass With Key", desc = "Bypass unclickable auctions when holding a keybind of your choice." +
+        "\n§eBy setting this keybind to \"NONE\", you are disabling the bypass entirely.")
     @ConfigEditorKeybind(defaultKey = Keyboard.KEY_NONE)
     public int bypassKey = Keyboard.KEY_NONE;
 
