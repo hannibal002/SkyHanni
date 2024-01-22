@@ -1,0 +1,60 @@
+package at.hannibal2.skyhanni.config.features.garden;
+
+import at.hannibal2.skyhanni.config.FeatureToggle;
+import at.hannibal2.skyhanni.config.core.config.Position;
+import com.google.gson.annotations.Expose;
+import io.github.moulberry.moulconfig.annotations.ConfigEditorBoolean;
+import io.github.moulberry.moulconfig.annotations.ConfigEditorDraggableList;
+import io.github.moulberry.moulconfig.annotations.ConfigOption;
+
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+
+public class JacobContestStatsConfig {
+
+    @Expose
+    @ConfigOption(
+        name = "Contest Stats",
+        desc = "Show contest stats during a contest and after a contest in chat."
+    )
+    @ConfigEditorBoolean
+    @FeatureToggle
+    public boolean jacobContestSummary = true;
+
+    @Expose
+    @ConfigOption(name = "Contest Stats Text", desc = "Drag to change the order of the overlay."
+    )
+    @ConfigEditorDraggableList
+    public List<ContestStatsTextEntry> text = new ArrayList<>(Arrays.asList(
+        ContestStatsTextEntry.TITLE,
+        ContestStatsTextEntry.TIME,
+        ContestStatsTextEntry.BLOCKS_BROKEN,
+        ContestStatsTextEntry.BPS,
+        ContestStatsTextEntry.POSITION,
+        ContestStatsTextEntry.PREDICTED_SCORE
+    ));
+
+    public enum ContestStatsTextEntry {
+        TITLE("§e§lSugar Cane Contest Stats"),
+        TIME("§7Started §b3.1s §7into contest"),
+        BLOCKS_BROKEN("§7Blocks Broken: §e14,781"),
+        BPS("§7Blocks per Second: §c19.94"),
+        POSITION("§7Est. Position: §b2nd §7§7(Top §b0.1% §7◆ 675)"),
+        PREDICTED_SCORE("§7Predicted Score: §e915,430");
+
+        private final String str;
+
+        ContestStatsTextEntry(String str) {
+            this.str = str;
+        }
+
+        @Override
+        public String toString() {
+            return str;
+        }
+    }
+
+    @Expose
+    public Position pos = new Position(0, 240, false, true);
+}
