@@ -9,7 +9,9 @@ import io.github.moulberry.moulconfig.annotations.ConfigOption;
 public class CommissionsCalculatorConfig {
 
     @Expose
-    @ConfigOption(name = "Enabled", desc = "Calculates your commissions to the next HOTM Tier.\n§eDisclaimer: Does not account for HOTM XP gained from Daily Bonuses.")
+    @ConfigOption(name = "Enabled", desc = "Calculates your commissions to the next HOTM Tier." +
+        "\n§eDisclaimer: Only accounts for HOTM XP gained from commissions." +
+        "\n§cDisabled when HOTM 7 completion is detected via the HOTM menu.")
     @ConfigEditorBoolean
     public boolean enabled = false;
 

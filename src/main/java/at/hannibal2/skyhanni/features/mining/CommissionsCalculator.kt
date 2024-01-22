@@ -91,6 +91,7 @@ class CommissionsCalculator {
     @SubscribeEvent
     fun onInventoryOpen(event: InventoryOpenEvent) {
         if (!isEnabled()) return
+        if (currentHOTMTier.isMaxHOTMTier()) return
         val chestName = event.inventoryName
         if (chestName.isNotValidChestName()) return
         val colorCode = if (DWARVEN.isInIsland()) "§2" else "§5" //themed based on mining island
@@ -206,15 +207,10 @@ class CommissionsCalculator {
     }
 
     private fun remainingMilestones(required: Int, completed: Int, perComm: Double, listBeingModified: MutableList<Renderable>, colorCode: String, milestone: Int) {
-        val commsToNextMilestone = abs(required - completed)
+        val commsToNextMilestone = required - completed
         val singularOrPlural = StringUtils.optionalPlural(commsToNextMilestone, "commission", "commissions")
         val hotmXPGain = (commsToNextMilestone * perComm).roundToInt().addSeparators()
-        if (completed < required) listBeingModified.add(Renderable.string(" §7- $colorCode$singularOrPlural §fleft to complete §6Milestone $milestone §f($colorCode+$hotmXPGain HOTM XP§f)"))
-        if (!config.allMilestones) {
-            val lastElement = listBeingModified.takeLast(1).first()
-            listBeingModified.clear()
-            listBeingModified.addAll(listOf(Renderable.string("$colorCode$firstLine"), lastElement))
-        }
+        if (commsToNextMilestone > 0 && (completed < required || config.allMilestones)) listBeingModified.add(Renderable.string(" §7- $colorCode$singularOrPlural §fleft to complete §6Milestone $milestone §f($colorCode+$hotmXPGain HOTM XP§f)"))
     }
 
     private fun drawDisplay(list: List<Renderable>) {
@@ -228,6 +224,7 @@ class CommissionsCalculator {
     @SubscribeEvent
     fun onRenderOverlay(event: GuiRenderEvent.ChestGuiOverlayRenderEvent) {
         if (!isEnabled()) return
+        if (currentHOTMTier.isMaxHOTMTier()) return
         if (InventoryUtils.openInventoryName().isNotValidChestName()) return
         config.position.renderRenderables(display, posLabel = "Commissions Calculator")
     }
@@ -235,4 +232,5 @@ class CommissionsCalculator {
     private fun isEnabled() = (DWARVEN.isInIsland() || IslandType.CRYSTAL_HOLLOWS.isInIsland()) && config.enabled
     private fun String.isNotValidChestName(): Boolean = this != "Commission Milestones" && this != "Commissions" && this != "Heart of the Mountain"
     private fun String.groupToInt(): Int = this.formatNumber().toInt()
+    private fun Int.isMaxHOTMTier(): Boolean = this == HOTMTier.entries.last().tier + 1
 }
