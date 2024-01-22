@@ -10,7 +10,6 @@ import at.hannibal2.skyhanni.utils.NumberUtil
 import at.hannibal2.skyhanni.utils.NumberUtil.formatNumber
 import at.hannibal2.skyhanni.utils.NumberUtil.romanToDecimalIfNecessary
 import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
-import at.hannibal2.skyhanni.utils.StringUtils.matches
 import at.hannibal2.skyhanni.utils.TimeUtils.format
 import at.hannibal2.skyhanni.utils.TimeUtils.getDuration
 import io.github.moulberry.notenoughupdates.miscgui.CalendarOverlay
@@ -316,7 +315,7 @@ class MenuItemDisplayOverlayPlayerTryhard : AbstractMenuStackSize() {
             }
         }
 
-        if (stackSizeConfig.contains(StackSizeMenuConfig.PlayerTryhard.DELIVERIES_PROJECTS)) {
+        if (stackSizeConfig.contains(StackSizeMenuConfig.PlayerTryhard.DELIVERIES)) {
             val lore = item.getLore()
             if (chestName == "Deliveries") {
                 deliveriesItemPattern.matchMatcher(itemName) {
