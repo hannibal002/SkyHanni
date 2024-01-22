@@ -92,10 +92,9 @@ object SkyBlockItemModifierUtils {
     inline val ItemStack.cachedData get() = (this as ItemStackCachedData).skyhanni_cachedData
 
     fun ItemStack.getPetLevel(): Int {
-        UtilsPatterns.petLevelPattern.matchMatcher(this.displayName) {
-            return group("level").toInt()
-        }
-        return 0
+        return UtilsPatterns.petLevelPattern.matchMatcher(this.displayName) {
+            group("level").toInt()
+        } ?: 0
     }
 
     fun ItemStack.getMaxPetLevel() = if (this.getInternalName() == "GOLDEN_DRAGON;4".asInternalName()) 200 else 100
