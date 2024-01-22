@@ -44,7 +44,7 @@ class CommissionsCalculator {
     )
     private val maxTierItemPattern by patternGroup.pattern(
         "hotm.maxtier.coloreditemname",
-        "§aTier 7"
+        "§aTier (?<tier>\\d+)"
     )
     private val mileProgressPattern by patternGroup.pattern(
         "milestone.progress.loreline",
@@ -71,7 +71,7 @@ class CommissionsCalculator {
 
     private var display: List<Renderable> = listOf()
 
-    private var currentHOTMLevel: Int = 0
+    private var currentHOTMTier: Int = 0
     private var currentHOTMXP: Int = 0
 
     private enum class HOTMTier(
@@ -96,8 +96,12 @@ class CommissionsCalculator {
         val colorCode = if (DWARVEN.isInIsland()) "§2" else "§5" //themed based on mining island
         val items = event.inventoryItems
         val newList = mutableListOf(Renderable.string("$colorCode$firstLine"))
-        if (chestName == "Heart of the Mountain") hotmStatus(items, newList, colorCode)
-        if (currentHOTMLevel == 0) {
+        if (chestName == "Heart of the Mountain") {
+            hotmStatus(items, newList, colorCode)
+            drawDisplay(newList)
+            return
+        }
+        if (currentHOTMTier == 0) {
             drawDisplay(
                 listOf(
                     Renderable.string("$colorCode$firstLine"),
@@ -110,7 +114,7 @@ class CommissionsCalculator {
             )
             return
         }
-        val hotmInfo = HOTMTier.entries.find { it.tier == currentHOTMLevel } ?: return
+        val hotmInfo = HOTMTier.entries.find { it.tier == currentHOTMTier } ?: return
         val perComm = hotmInfo.xpPerComm
         val toNextTier = hotmInfo.xpToNextTier
         val commsToNextTier = ceil(abs(toNextTier - currentHOTMXP) / perComm).roundToInt()
@@ -153,13 +157,15 @@ class CommissionsCalculator {
         loop@for ((_, item) in items) {
             val itemName = item.name ?: ""
             maxTierItemPattern.matchMatcher(itemName) {
-                val lastHOTMTier = HOTMTier.entries.last()
-                currentHOTMLevel = lastHOTMTier.tier
+                val foundHOTMTier = group("tier").groupToInt()
+                if (foundHOTMTier < currentHOTMTier) break@loop
+                val lastHOTMTier = HOTMTier.entries[foundHOTMTier - 2]
+                currentHOTMTier = lastHOTMTier.tier + 1
                 currentHOTMXP = lastHOTMTier.xpToNextTier
                 break@loop
             }
             tierItemPattern.matchMatcher(itemName) {
-                currentHOTMLevel = group("tier").groupToInt()
+                currentHOTMTier = group("tier").groupToInt()
                 for (line in item.getLore()) {
                     tierProgressPattern.matchMatcher(line) {
                         currentHOTMXP = group("obtained").groupToInt()
@@ -169,7 +175,7 @@ class CommissionsCalculator {
         }
         listBeingModified.addAll(
             listOf(
-                Renderable.string(" §7- §fCurrent HOTM Level: $colorCode$currentHOTMLevel"),
+                Renderable.string(" §7- §fCurrent HOTM Tier: $colorCode$currentHOTMTier"),
                 Renderable.string(" §7- §fCurrent HOTM XP: $colorCode${currentHOTMXP.addSeparators()}"),
             )
         )
@@ -204,7 +210,7 @@ class CommissionsCalculator {
 
     private fun drawDisplay(list: List<Renderable>) {
         display = list
-        if (currentHOTMLevel != 0) {
+        if (currentHOTMTier != 0) {
             display += fatDisclaimer
             if (InventoryUtils.openInventoryName() != "Heart of the Mountain") display += disclaimerOpenHOTM
         }
