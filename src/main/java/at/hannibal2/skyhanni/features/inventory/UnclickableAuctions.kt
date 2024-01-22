@@ -6,9 +6,7 @@ import at.hannibal2.skyhanni.events.GuiContainerEvent
 import at.hannibal2.skyhanni.events.InventoryCloseEvent
 import at.hannibal2.skyhanni.events.InventoryOpenEvent
 import at.hannibal2.skyhanni.utils.InventoryUtils
-import at.hannibal2.skyhanni.utils.InventoryUtils.getInventoryName
 import at.hannibal2.skyhanni.utils.ItemUtils.cleanName
-import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.ItemUtils.isPet
 import at.hannibal2.skyhanni.utils.KeyboardManager.isKeyHeld
 import at.hannibal2.skyhanni.utils.LorenzColor
@@ -35,7 +33,7 @@ class UnclickableAuctions {
         "(?:\\S+ )?Auction View"
     )
 
-    private val auctionButtonNames = listOf<String>("Close", "Bid History", "Go Back")
+    private val auctionButtonNames = listOf<String>("Close", "Bid History", "Go Back") //"Close" for those who use /viewauction <auction ID>
 
     private var itemIsRecombOrBoosted = false
 
@@ -74,7 +72,7 @@ class UnclickableAuctions {
             itemIsRecombOrBoosted = false
             return
         }
-        val itemForAuction = event.inventoryItems[13] ?: return
+        val itemForAuction = event.inventoryItems[13] ?: return //slot 13 is where the auctioned item is
         if (itemForAuction.isTierBoostedPet() || itemForAuction.isRecombobulated()) itemIsRecombOrBoosted = true
     }
 
@@ -87,7 +85,7 @@ class UnclickableAuctions {
         if (!auctionViewChestPattern.matches(InventoryUtils.openInventoryName())) return
         if (!itemIsRecombOrBoosted) return
         val chest = event.gui.inventorySlots as ContainerChest
-        val slot = chest.inventorySlots[13] ?: return
+        val slot = chest.inventorySlots[13] ?: return //slot 13 is where the auctioned item is
         val color = LorenzColor.DARK_GRAY.addOpacity(config.opacity)
         slot.stack.background = color.rgb
     }
