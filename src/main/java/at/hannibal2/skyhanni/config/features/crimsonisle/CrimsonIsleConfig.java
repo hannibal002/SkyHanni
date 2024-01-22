@@ -20,6 +20,11 @@ public class CrimsonIsleConfig {
     @Expose
     public ReputationHelperConfig reputationHelper = new ReputationHelperConfig();
 
+    @ConfigOption(name = "Sulphur Skitter Box", desc = "")
+    @Accordion
+    @Expose
+    public SulphurSkitterBoxConfig sulphurSkitterBoxConfig = new SulphurSkitterBoxConfig();
+
     @Expose
     @ConfigOption(name = "Quest Item Helper", desc = "When you open the fetch item quest in the town board, " +
         "it shows a clickable chat message that will grab the items needed from the sacks.")
