@@ -129,7 +129,7 @@ class CommissionsCalculator {
         }
         listBeingModified.addAll(
             listOf(
-                Renderable.string(" §7- $colorCode${commsToNextTier.addSeparators()} §fmore commissions to ${colorCode}HOTM ${currentHOTMLevel + 1}"),
+                Renderable.string(" §7- $colorCode${commsToNextTier.addSeparators()} §fmore commissions to ${colorCode}HOTM ${currentHOTMTier + 1}"),
                 Renderable.string(" §7- §f(to reach $colorCode${toNextTier.addSeparators()} HOTM XP §ffrom $colorCode${currentHOTMXP.addSeparators()} HOTM XP§f)"),
             )
         )
@@ -200,7 +200,7 @@ class CommissionsCalculator {
         val commsToNextMilestone = abs(required - completed)
         val singularOrPlural = StringUtils.optionalPlural(commsToNextMilestone, "commission", "commissions")
         val hotmXPGain = (commsToNextMilestone * perComm).roundToInt().addSeparators()
-        if (completed < required) newList.add(Renderable.string(" §7- $colorCode$singularOrPlural §fleft to complete §6Milestone $milestone §f($colorCode+$hotmXPGain HOTM XP§f)"))
+        if (completed < required) listBeingModified.add(Renderable.string(" §7- $colorCode$singularOrPlural §fleft to complete §6Milestone $milestone §f($colorCode+$hotmXPGain HOTM XP§f)"))
         if (!config.allMilestones) {
             val lastElement = listBeingModified.takeLast(1).first()
             listBeingModified.clear()
