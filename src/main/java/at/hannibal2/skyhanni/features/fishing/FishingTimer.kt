@@ -16,7 +16,6 @@ import at.hannibal2.skyhanni.utils.SoundUtils
 import at.hannibal2.skyhanni.utils.StringUtils
 import at.hannibal2.skyhanni.utils.TimeUnit
 import at.hannibal2.skyhanni.utils.TimeUtils
-import at.hannibal2.skyhanni.utils.getLorenzVec
 import net.minecraft.client.Minecraft
 import net.minecraft.entity.item.EntityArmorStand
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
@@ -77,32 +76,7 @@ class FishingTimer {
         }
     }
 
-    private fun countMobs() = EntityUtils.getEntities<EntityArmorStand>().map { entity -> amount(entity) }.sum()
-
-    private fun amount(entity: EntityArmorStand): Int {
-        val name = entity.name
-        // a dragon, will always be fought
-        if (name == "Reindrake") return 0
-
-        // a npc shop
-        if (name == "§5Frosty the Snow Blaster") return 0
-
-        if (name == "Frosty") {
-            val npcLocation = LorenzVec(-1.5, 76.0, 92.5)
-            if (entity.getLorenzVec().distance(npcLocation) < 1) {
-                return 0
-            }
-        }
-
-        val isSummonedSoul = name.contains("'")
-        val hasFishingMobName = SeaCreatureManager.allFishingMobs.keys.any { name.contains(it) }
-        if (!hasFishingMobName || isSummonedSoul) return 0
-
-        if (name == "Sea Emperor" || name == "Rider of the Deep") {
-            return 2
-        }
-        return 1
-    }
+    private fun countMobs() = EntityUtils.getEntities<EntityArmorStand>().map { entity -> FishingAPI.seaCreatureCount(entity) }.sum()
 
     private fun isRightLocation(): Boolean {
         inHollows = false
@@ -131,6 +105,7 @@ class FishingTimer {
         if (!config.enabled) return
         if (!rightLocation) return
         if (currentCount == 0) return
+        if (!FishingAPI.isFishing()) return
 
         val duration = System.currentTimeMillis() - startTime
         val barnTimerAlertTime = config.alertTime * 1_000
