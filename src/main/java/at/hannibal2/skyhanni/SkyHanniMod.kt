@@ -146,6 +146,7 @@ import at.hannibal2.skyhanni.features.fishing.trophy.TrophyFishFillet
 import at.hannibal2.skyhanni.features.fishing.trophy.TrophyFishManager
 import at.hannibal2.skyhanni.features.fishing.trophy.TrophyFishMessages
 import at.hannibal2.skyhanni.features.garden.AnitaMedalProfit
+import at.hannibal2.skyhanni.features.garden.AtmosphericFilterDisplay
 import at.hannibal2.skyhanni.features.garden.FarmingFortuneDisplay
 import at.hannibal2.skyhanni.features.garden.GardenAPI
 import at.hannibal2.skyhanni.features.garden.GardenCropMilestoneFix
@@ -586,6 +587,7 @@ class SkyHanniMod {
         loadModule(GardenVisitorColorNames)
         loadModule(TeleportPadCompactName())
         loadModule(AnitaMedalProfit())
+        loadModule(AtmosphericFilterDisplay())
         loadModule(AnitaExtraFarmingFortune())
         loadModule(ComposterDisplay())
         loadModule(GardenComposterInventoryFeatures())
