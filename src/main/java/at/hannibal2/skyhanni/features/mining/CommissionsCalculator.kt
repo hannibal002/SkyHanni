@@ -149,8 +149,15 @@ class CommissionsCalculator {
 
     private fun hotmStatus(items: Map<Int, ItemStack>, newList: MutableList<Renderable>, colorCode: String) {
         newList.add(Renderable.string(" §e(Remember to scroll up the HOTM tree!)"))
-        for ((_, item) in items) {
-            tierItemPattern.matchMatcher(item.cleanName()) {
+        loop@for ((_, item) in items) {
+            val itemName = item.cleanName()
+            maxTierItemPattern.matchMatcher(itemName) {
+                val lastHOTMTier = HOTMTier.entries.last()
+                currentHOTMLevel = lastHOTMTier.tier
+                currentHOTMXP = lastHOTMTier.xpToNextTier
+                break@loop
+            }
+            tierItemPattern.matchMatcher(itemName) {
                 currentHOTMLevel = group("tier").groupToInt()
                 for (line in item.getLore()) {
                     tierProgressPattern.matchMatcher(line) {
