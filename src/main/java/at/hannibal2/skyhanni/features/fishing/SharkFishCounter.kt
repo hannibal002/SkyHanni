@@ -71,7 +71,7 @@ class SharkFishCounter {
         else -> "How???"
     }
 
-    private fun isWaterFishingRod() = FishingAPI.hasFishingRodInHand() && !FishingAPI.isLavaRod()
+    private fun isWaterFishingRod() = FishingAPI.isFishing() && !FishingAPI.isLavaRod()
 
     @SubscribeEvent
     fun onRenderOverlay(event: GuiRenderEvent.GuiOverlayRenderEvent) {
