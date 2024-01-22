@@ -112,24 +112,11 @@ class CommissionsCalculator {
     }
 
     private fun updateListFromChest(chestName: String, newList: MutableList<Renderable>, items: Map<Int, ItemStack>, colorCode: String, perComm: Double, commsToNextTier: Int, toNextTier: Int) {
-        if (chestName == "Heart of the Mountain") {
-            newList.add(Renderable.string(" §e(Remember to scroll up the HOTM tree!)"))
-            calculateWithHOTM(items)
-            newList.addAll(
-                listOf(
-                    Renderable.string(" §7- §fCurrent HOTM Level: $colorCode$currentHOTMLevel"),
-                    Renderable.string(" §7- §fCurrent HOTM XP: $colorCode${currentHOTMXP.addSeparators()}"),
-                )
-            )
-            drawDisplay(newList)
-            return
-        }
-        if (chestName == "Commissions") {
-            val hotmXPFromComms = calculateWithCommissions(items)
-            newList.add(Renderable.string(" §7- §f(At least $colorCode${hotmXPFromComms.addSeparators()} HOTM XP §fto be gained from claiming completed commissions)"))
-        }
-        if (chestName == "Commission Milestones") {
-            calculateWithMilestones(items, perComm, newList, colorCode)
+        when (chestName) {
+            "Heart of the Mountain" -> hotmStatus(items, newList, colorCode)
+            "Commissions" -> hotmFromComms(items, newList, colorCode)
+            "Commission Milestones" -> untilNextMilestone(items, perComm, newList, colorCode)
+            else -> return
         }
         newList.addAll(
             listOf(
@@ -140,12 +127,12 @@ class CommissionsCalculator {
         drawDisplay(newList)
     }
 
-    private fun calculateWithCommissions(items: Map<Int, ItemStack>): Long {
+    private fun hotmFromComms(items: Map<Int, ItemStack>, newList: MutableList<Renderable>, colorCode: String) {
         var hotmGain = 0L
-        loop@ for ((_, item) in items) {
+        for ((_, item) in items) {
+            val lore = item.getLore()
+            if (lore.none { it == "§a§lCOMPLETED" } && config.completedOnly) continue
             commissionItemPattern.matchMatcher(item.cleanName()) {
-                val lore = item.getLore()
-                if (lore.none { it == "§a§lCOMPLETED" } && config.completedOnly) continue@loop
                 for (line in lore) {
                     hotmXPPattern.matchMatcher(line) {
                         hotmGain += group("xp").formatNumber()
@@ -153,10 +140,11 @@ class CommissionsCalculator {
                 }
             }
         }
-        return hotmGain
+        newList.add(Renderable.string(" §7- §f(At least $colorCode${hotmGain.addSeparators()} HOTM XP §fto be gained from claiming completed commissions)"))
     }
 
-    private fun calculateWithHOTM(items: Map<Int, ItemStack>) {
+    private fun hotmStatus(items: Map<Int, ItemStack>, newList: MutableList<Renderable>, colorCode: String) {
+        newList.add(Renderable.string(" §e(Remember to scroll up the HOTM tree!)"))
         for ((_, item) in items) {
             tierItemPattern.matchMatcher(item.cleanName()) {
                 currentHOTMLevel = group("tier").groupToInt()
@@ -167,9 +155,15 @@ class CommissionsCalculator {
                 }
             }
         }
+        newList.addAll(
+            listOf(
+                Renderable.string(" §7- §fCurrent HOTM Level: $colorCode$currentHOTMLevel"),
+                Renderable.string(" §7- §fCurrent HOTM XP: $colorCode${currentHOTMXP.addSeparators()}"),
+            )
+        )
     }
 
-    private fun calculateWithMilestones(items: Map<Int, ItemStack>, perComm: Double, newList: MutableList<Renderable>, colorCode: String) {
+    private fun untilNextMilestone(items: Map<Int, ItemStack>, perComm: Double, newList: MutableList<Renderable>, colorCode: String) {
         for ((_, item) in items) {
             milestoneRewardsItemPattern.matchMatcher(item.cleanName()) {
                 val milestone = group("milestone").romanToDecimalIfNecessary()
