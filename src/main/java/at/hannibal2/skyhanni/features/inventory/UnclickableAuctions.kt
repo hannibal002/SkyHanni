@@ -51,7 +51,7 @@ class UnclickableAuctions {
         val (itemType, hideReason) = if (isPet(itemName)) Pair("pet", "tier-boosted") else Pair("item", "recombobulated")
         event.toolTip.clear()
         event.toolTip.addAll(listOf("§7${itemName.removeColor()}", "§cThe $itemType up for auction is hidden as it is $hideReason."))
-        if (config.bypassKey != Keyboard.KEY_NONE) event.toolTip.add("§8(To bypass this, please press ahd hold the ${Keyboard.getKeyName(config.bypassKey)} key.)")
+        if (config.bypassKey != Keyboard.KEY_NONE) event.toolTip.add("§7(To bypass this, please press ahd hold the ${Keyboard.getKeyName(config.bypassKey)} key.)")
     }
 
     @SubscribeEvent
