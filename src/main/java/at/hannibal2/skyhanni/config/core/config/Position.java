@@ -115,27 +115,23 @@ public class Position {
     public int getAbsX0(int objWidth) {
         int width = new ScaledResolution(Minecraft.getMinecraft()).getScaledWidth();
 
-        int ret = x;
-        if (x < 0) {
-            ret = width + x - objWidth;
-        }
-
-        if (ret < 0) ret = 0;
-        if (ret > width - objWidth) ret = width - objWidth;
-
-        return ret;
+        return calcAbs0(x, width, objWidth);
     }
 
     public int getAbsY0(int objHeight) {
         int height = new ScaledResolution(Minecraft.getMinecraft()).getScaledHeight();
 
-        int ret = y;
-        if (y < 0) {
-            ret = height + y - objHeight;
+        return calcAbs0(y, height, objHeight);
+    }
+
+    private int calcAbs0(int axis, int length, int objLength) {
+        int ret = axis;
+        if (axis < 0) {
+            ret = length + axis - objLength;
         }
 
         if (ret < 0) ret = 0;
-        if (ret > height - objHeight) ret = height - objHeight;
+        if (ret > length - objLength) ret = length - objLength;
 
         return ret;
     }

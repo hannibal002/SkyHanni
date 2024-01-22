@@ -1,10 +1,12 @@
 package at.hannibal2.skyhanni.features.event
 
 import at.hannibal2.skyhanni.SkyHanniMod
-import at.hannibal2.skyhanni.data.HypixelData
 import at.hannibal2.skyhanni.data.ProfileStorageData
+import at.hannibal2.skyhanni.data.WinterAPI
 import at.hannibal2.skyhanni.events.EntityCustomNameUpdateEvent
 import at.hannibal2.skyhanni.events.LorenzChatEvent
+import at.hannibal2.skyhanni.events.LorenzTickEvent
+import at.hannibal2.skyhanni.events.LorenzWorldChangeEvent
 import at.hannibal2.skyhanni.events.RenderMobColoredEvent
 import at.hannibal2.skyhanni.events.withAlpha
 import at.hannibal2.skyhanni.features.event.winter.UniqueGiftCounter
@@ -14,7 +16,9 @@ import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.LorenzColor
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
+import at.hannibal2.skyhanni.utils.StringUtils.matches
 import at.hannibal2.skyhanni.utils.getLorenzVec
+import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraft.client.entity.EntityPlayerSP
 import net.minecraft.entity.EntityLivingBase
 import net.minecraft.entity.item.EntityArmorStand
@@ -26,7 +30,17 @@ object UniqueGiftingOpportunitiesFeatures {
     private val playerList: MutableSet<String>?
         get() = ProfileStorageData.playerSpecific?.winter?.playersThatHaveBeenGifted
 
-    private val pattern = "§6\\+1 Unique Gift given! To ([^§]+)§r§6!".toPattern()
+    private val patternGroup = RepoPattern.group("event.winter.uniquegifts")
+    private val giftedPattern by patternGroup.pattern(
+        "gifted",
+        "§6\\+1 Unique Gift given! To ([^§]+)§r§6!"
+    )
+    private val giftNamePattern by patternGroup.pattern(
+        "giftname",
+        "(?:WHITE|RED|GREEN)_GIFT\$"
+    )
+
+    private var holdingGift = false
 
     private fun hasGiftedPlayer(player: EntityPlayer) = playerList?.contains(player.name) == true
 
@@ -36,9 +50,7 @@ object UniqueGiftingOpportunitiesFeatures {
 
     private val config get() = SkyHanniMod.feature.event.winter.giftingOpportunities
 
-    private fun isEnabled() = LorenzUtils.inSkyBlock && config.enabled &&
-        (InventoryUtils.itemInHandId.endsWith("_GIFT")
-            || !config.highlighWithGiftOnly)
+    private fun isEnabled() = holdingGift
 
     private val hasNotGiftedNametag = "§a§lꤥ"
     private val hasGiftedNametag = "§c§lꤥ"
@@ -70,21 +82,40 @@ object UniqueGiftingOpportunitiesFeatures {
         if (!isEnabled()) return
         val entity = event.entity
         if (entity is EntityPlayerSP) return
-        if (entity is EntityPlayer && !entity.isNPC() && !isIronman(entity) && !isBingo(entity) && !hasGiftedPlayer(entity))
+        if (entity is EntityPlayer && !entity.isNPC() && !isIronman(entity) && !isBingo(entity) &&
+            !hasGiftedPlayer(entity)
+        ) {
             event.color = LorenzColor.DARK_GREEN.toColor().withAlpha(127)
+        }
     }
 
     private fun isBingo(entity: EntityLivingBase) =
-        !HypixelData.bingo && entity.displayName.formattedText.endsWith("Ⓑ§r")
+        !LorenzUtils.isBingoProfile && entity.displayName.formattedText.endsWith("Ⓑ§r")
 
     private fun isIronman(entity: EntityLivingBase) =
         !LorenzUtils.noTradeMode && entity.displayName.formattedText.endsWith("♲§r")
 
     @SubscribeEvent
     fun onChat(event: LorenzChatEvent) {
-        pattern.matchMatcher(event.message) {
+        giftedPattern.matchMatcher(event.message) {
             addGiftedPlayer(group(1))
             UniqueGiftCounter.addUniqueGift()
         }
+    }
+
+    @SubscribeEvent
+    fun onTick(event: LorenzTickEvent) {
+        holdingGift = false
+
+        if (!LorenzUtils.inSkyBlock) return
+        if (!config.enabled) return
+        if (!WinterAPI.isDecember()) return
+
+        holdingGift = !config.highlighWithGiftOnly || giftNamePattern.matches(InventoryUtils.itemInHandId.asString())
+    }
+
+    @SubscribeEvent
+    fun onWorldChange(event: LorenzWorldChangeEvent) {
+        holdingGift = false
     }
 }

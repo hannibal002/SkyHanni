@@ -38,4 +38,10 @@ public class WinterConfig {
     @Expose
     public Position islandCloseTimePosition = new Position(10, 10, false, true);
 
+    @Expose
+    @ConfigOption(name = "New Year Cake Reminder", desc = "Reminds while the new year cake can be collected in the hub.")
+    @ConfigEditorBoolean
+    @FeatureToggle
+    public boolean newYearCakeReminder = true;
+
 }

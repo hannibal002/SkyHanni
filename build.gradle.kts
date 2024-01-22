@@ -1,3 +1,4 @@
+import org.apache.commons.lang3.SystemUtils
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 import java.io.ByteArrayOutputStream
 
@@ -9,10 +10,11 @@ plugins {
     id("com.github.johnrengelman.shadow") version "7.1.2"
     kotlin("jvm") version "1.9.0"
     id("com.bnorm.power.kotlin-power-assert") version "0.13.0"
+    id("moe.nea.shot") version "1.0.0"
 }
 
 group = "at.hannibal2.skyhanni"
-version = "0.22.Beta.10"
+version = "0.23.Beta.11"
 
 val gitHash by lazy {
     val baos = ByteArrayOutputStream()
@@ -67,6 +69,8 @@ val headlessLwjgl by configurations.creating {
     isVisible = false
 }
 
+val shot = shots.shot("minecraft", project.file("shots.txt"))
+
 dependencies {
     minecraft("com.mojang:minecraft:1.8.9")
     mappings("de.oceanlabs.mcp:mcp_stable:22-1.8.9")
@@ -107,6 +111,7 @@ dependencies {
     shadowModImpl(libs.moulconfig)
     shadowImpl(libs.libautoupdate)
     shadowImpl("org.jetbrains.kotlin:kotlin-reflect:1.9.0")
+    implementation(libs.hotswapagentforge)
 
 //    testImplementation(kotlin("test"))
     testImplementation("com.github.NotEnoughUpdates:NotEnoughUpdates:v2.1.1-pre4:all") {
@@ -115,6 +120,9 @@ dependencies {
     }
     testImplementation("org.junit.jupiter:junit-jupiter:5.10.0")
     testImplementation("io.mockk:mockk:1.12.5")
+}
+configurations.getByName("minecraftNamed").dependencies.forEach {
+    shot.applyTo(it as HasConfigurableAttributes<*>)
 }
 
 tasks.withType(Test::class) {
@@ -153,6 +161,11 @@ loom {
         defaultRefmapName.set("mixins.skyhanni.refmap.json")
     }
     runConfigs {
+        "client" {
+            if (SystemUtils.IS_OS_MAC_OSX) {
+                vmArgs.remove("-XstartOnFirstThread")
+            }
+        }
         "server" {
             isIdeConfigGenerated = false
         }

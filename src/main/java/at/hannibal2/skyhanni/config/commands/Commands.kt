@@ -15,19 +15,25 @@ import at.hannibal2.skyhanni.features.combat.endernodetracker.EnderNodeTracker
 import at.hannibal2.skyhanni.features.combat.ghostcounter.GhostUtil
 import at.hannibal2.skyhanni.features.commands.PartyCommands
 import at.hannibal2.skyhanni.features.event.diana.BurrowWarpHelper
+import at.hannibal2.skyhanni.features.event.diana.DianaProfitTracker
+import at.hannibal2.skyhanni.features.event.diana.GriffinBurrowHelper
 import at.hannibal2.skyhanni.features.event.diana.InquisitorWaypointShare
+import at.hannibal2.skyhanni.features.event.diana.MythologicalCreatureTracker
 import at.hannibal2.skyhanni.features.event.jerry.frozentreasure.FrozenTreasureTracker
 import at.hannibal2.skyhanni.features.fame.AccountUpgradeReminder
 import at.hannibal2.skyhanni.features.fame.CityProjectFeatures
 import at.hannibal2.skyhanni.features.fishing.tracker.FishingProfitTracker
+import at.hannibal2.skyhanni.features.fishing.tracker.SeaCreatureTracker
+import at.hannibal2.skyhanni.features.garden.FarmingMilestoneCommand
 import at.hannibal2.skyhanni.features.garden.GardenAPI
 import at.hannibal2.skyhanni.features.garden.GardenCropTimeCommand
+import at.hannibal2.skyhanni.features.garden.GardenCropsInCommand
 import at.hannibal2.skyhanni.features.garden.GardenNextJacobContest
 import at.hannibal2.skyhanni.features.garden.composter.ComposterOverlay
 import at.hannibal2.skyhanni.features.garden.farming.ArmorDropTracker
 import at.hannibal2.skyhanni.features.garden.farming.CropMoneyDisplay
 import at.hannibal2.skyhanni.features.garden.farming.CropSpeedMeter
-import at.hannibal2.skyhanni.features.garden.farming.DicerDropTracker
+import at.hannibal2.skyhanni.features.garden.farming.DicerRngDropTracker
 import at.hannibal2.skyhanni.features.garden.farming.FarmingWeightDisplay
 import at.hannibal2.skyhanni.features.garden.farming.GardenStartLocation
 import at.hannibal2.skyhanni.features.garden.fortuneguide.CaptureFarmingGear
@@ -41,7 +47,9 @@ import at.hannibal2.skyhanni.features.misc.MarkedPlayerManager
 import at.hannibal2.skyhanni.features.misc.discordrpc.DiscordRPCManager
 import at.hannibal2.skyhanni.features.misc.massconfiguration.DefaultConfigFeatures
 import at.hannibal2.skyhanni.features.misc.visualwords.VisualWordGui
+import at.hannibal2.skyhanni.features.rift.area.westvillage.VerminTracker
 import at.hannibal2.skyhanni.features.slayer.SlayerProfitTracker
+import at.hannibal2.skyhanni.test.DebugCommand
 import at.hannibal2.skyhanni.test.PacketTest
 import at.hannibal2.skyhanni.test.SkyHanniConfigSearchResetCommand
 import at.hannibal2.skyhanni.test.SkyHanniDebugsAndTests
@@ -149,6 +157,10 @@ object Commands {
             "Calculates with your current crop per second speed how long you need to farm a crop to collect this amount of items"
         ) { GardenCropTimeCommand.onCommand(it) }
         registerCommand(
+            "shcropsin",
+            "Calculates with your current crop per second how many items you can collect in this amount of time"
+        ) { GardenCropsInCommand.onCommand(it) }
+        registerCommand(
             "shrpcstart",
             "Manually starts the Discord Rich Presence feature"
         ) { DiscordRPCManager.startCommand() }
@@ -170,7 +182,7 @@ object Commands {
         ) { clearFarmingItems() }
         registerCommand("shresetghostcounter", "Resets the ghost counter") { GhostUtil.reset() }
         registerCommand("shresetpowdertracker", "Resets the Powder Tracker") { PowderTracker.resetCommand(it) }
-        registerCommand("shresetdicertracker", "Resets the Dicer Drop Tracker") { DicerDropTracker.resetCommand(it) }
+        registerCommand("shresetdicertracker", "Resets the Dicer Drop Tracker") { DicerRngDropTracker.resetCommand(it) }
         registerCommand(
             "shresetendernodetracker",
             "Resets the Ender Node Tracker"
@@ -185,7 +197,7 @@ object Commands {
         ) { FrozenTreasureTracker.resetCommand(it) }
         registerCommand(
             "shresetfishingtracker",
-            "Resets the Frozen Treasure Tracker"
+            "Resets the Fishing Profit Tracker"
         ) { FishingProfitTracker.resetCommand(it) }
         registerCommand("shbingotoggle", "Toggle the bingo card display mode") { BingoCardDisplay.toggleCommand() }
         registerCommand(
@@ -203,6 +215,28 @@ object Commands {
             "shmouselock",
             "Lock/Unlock the mouse so it will no longer rotate the player (for farming)"
         ) { LockMouseLook.toggleLock() }
+        registerCommand(
+            "shresetvermintracker",
+            "Resets the Vermin Tracker"
+        ) { VerminTracker.resetCommand(it) }
+        registerCommand(
+            "shresetdianaprofittracker",
+            "Resets the Diana Profit Tracker"
+        ) { DianaProfitTracker.resetCommand(it) }
+        registerCommand(
+            "shresetmythologicalcreatureracker",
+            "Resets the Mythological Creature Tracker"
+        ) { MythologicalCreatureTracker.resetCommand(it) }
+        registerCommand(
+            "shresetseacreaturetracker",
+            "Resets the Sea Creature Tracker"
+        ) { SeaCreatureTracker.resetCommand(it) }
+        registerCommand0("shcalccrop", "Calculate how many crops need to be farmed between different crop milestones.", {
+            FarmingMilestoneCommand.onCommand(it.getOrNull(0), it.getOrNull(1), it.getOrNull(2), false)
+        }, FarmingMilestoneCommand::onComplete)
+        registerCommand0("shcalccroptime", "Calculate how long you need to farm crops between different crop milestones.", {
+            FarmingMilestoneCommand.onCommand(it.getOrNull(0), it.getOrNull(1), it.getOrNull(2), true)
+        }, FarmingMilestoneCommand::onComplete)
     }
 
     private fun usersBugFix() {
@@ -236,9 +270,9 @@ object Commands {
             "Search or reset config elements §c(warning, dangerous!)"
         ) { SkyHanniConfigSearchResetCommand.command(it) }
         registerCommand(
-            "shdebugdata",
-            "Prints debug data in the clipboard"
-        ) { SkyHanniDebugsAndTests.debugData(it) }
+            "shdebug",
+            "Copies SkyHanni debug data in the clipboard."
+        ) { DebugCommand.command(it) }
         registerCommand(
             "shversion",
             "Prints the SkyHanni version in the chat"
@@ -283,13 +317,21 @@ object Commands {
             "shconfigsave",
             "Manually saving the config"
         ) { SkyHanniMod.configManager.saveConfig(ConfigFileType.FEATURES, "manual-command") }
+        registerCommand(
+            "shtestburrow",
+            "Sets a test burrow waypoint at your location"
+        ) { GriffinBurrowHelper.setTestBurrow(it) }
     }
 
     private fun developersCodingHelp() {
         registerCommand("shrepopatterns", "See where regexes are loaded from") { RepoPatternGui.open() }
         registerCommand("shtest", "Unused test command.") { SkyHanniDebugsAndTests.testCommand(it) }
-        registerCommand("shdebugwaypoint", "Mark a waypoint on that location") { SkyHanniDebugsAndTests.waypoint(it) }
-        registerCommand("shdebugtablist", "Set your clipboard as a fake tab list.") { TabListData.toggleDebugCommand() }
+        registerCommand(
+            "shfindnullconfig",
+            "Find config elements that are null and prints them into the console"
+        ) { SkyHanniDebugsAndTests.findNullConfig(it) }
+        registerCommand("shtestwaypoint", "Set a waypoint on that location") { SkyHanniDebugsAndTests.waypoint(it) }
+        registerCommand("shtesttablist", "Set your clipboard as a fake tab list.") { TabListData.toggleDebugCommand() }
         registerCommand("shreloadlocalrepo", "Reloading the local repo data") { SkyHanniMod.repo.reloadLocalRepo() }
         registerCommand("shchathistory", "Show the unfiltered chat history") { ChatManager.openChatFilterGUI() }
         registerCommand(

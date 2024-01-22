@@ -42,7 +42,10 @@ class BazaarBestSellMethod {
         display = updateDisplay(event.openedProduct)
     }
 
-    private fun updateDisplay(internalName: NEUInternalName): String {
+    private fun updateDisplay(internalName: NEUInternalName?): String {
+        if (internalName == null) {
+            return "§cUnknown Bazaar item!"
+        }
         try {
             var having = InventoryUtils.countItemsInLowerInventory { it.getInternalName() == internalName }
             lastClickedItem?.let {

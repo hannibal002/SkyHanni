@@ -26,6 +26,12 @@ public class PartyFinderConfig {
     public boolean markPaidCarries = true;
 
     @Expose
+    @ConfigOption(name = "Mark Perm/VC Parties", desc = "Highlight perm parties and parties that require a VC with a purple background to make them easier to find/skip.")
+    @ConfigEditorBoolean
+    @FeatureToggle
+    public boolean markNonPugs = true;
+
+    @Expose
     @ConfigOption(name = "Mark Low Levels", desc = "Highlight groups with players at or below the specified class level to make them easier to find/skip.")
     @ConfigEditorSlider(minValue = 0, maxValue = 50, minStep = 1)
     public int markBelowClassLevel = 0;

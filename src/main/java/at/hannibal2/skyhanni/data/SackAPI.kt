@@ -2,10 +2,12 @@ package at.hannibal2.skyhanni.data
 
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.config.ConfigFileType
+import at.hannibal2.skyhanni.config.features.inventory.SackDisplayConfig.PriceFrom
 import at.hannibal2.skyhanni.events.InventoryCloseEvent
 import at.hannibal2.skyhanni.events.InventoryFullyOpenedEvent
 import at.hannibal2.skyhanni.events.LorenzChatEvent
 import at.hannibal2.skyhanni.events.SackChangeEvent
+import at.hannibal2.skyhanni.events.SackDataUpdateEvent
 import at.hannibal2.skyhanni.features.fishing.FishingAPI
 import at.hannibal2.skyhanni.features.fishing.trophy.TrophyRarity
 import at.hannibal2.skyhanni.features.inventory.SackDisplay
@@ -89,9 +91,10 @@ object SackAPI {
     }
 
     private fun NEUInternalName.sackPrice(stored: String) = when (sackDisplayConfig.priceFrom) {
-        0 -> (getPrice(true) * stored.formatNumber()).toLong().let { if (it < 0) 0L else it }
+        PriceFrom.BAZAAR -> (getPrice(true) * stored.formatNumber()).toLong()
+            .let { if (it < 0) 0L else it }
 
-        1 -> try {
+        PriceFrom.NPC -> try {
             val npcPrice = getNpcPriceOrNull() ?: 0.0
             (npcPrice * stored.formatNumber()).toLong()
         } catch (e: Exception) {
@@ -136,12 +139,6 @@ object SackAPI {
                                 "Fine" -> {
                                     gem.fine = stored
                                     gem.finePrice = internalName.sackPrice(stored)
-                                    if (savingSacks) setSackItem(internalName, stored.formatNumber())
-                                }
-
-                                "Flawless" -> {
-                                    gem.flawless = stored
-                                    gem.flawlessPrice = internalName.sackPrice(stored)
                                     if (savingSacks) setSackItem(internalName, stored.formatNumber())
                                 }
                             }
@@ -298,6 +295,8 @@ object SackAPI {
     private fun saveSackData() {
         ProfileStorageData.sackProfiles?.sackContents = sackData
         SkyHanniMod.configManager.saveConfig(ConfigFileType.SACKS, "saving-data")
+
+        SackDataUpdateEvent().postAndCatch()
     }
 
     data class SackGemstone(
@@ -305,11 +304,9 @@ object SackAPI {
         var rough: String = "0",
         var flawed: String = "0",
         var fine: String = "0",
-        var flawless: String = "0",
         var roughPrice: Long = 0,
         var flawedPrice: Long = 0,
         var finePrice: Long = 0,
-        var flawlessPrice: Long = 0,
     )
 
     data class SackRune(

@@ -160,7 +160,7 @@ object EnderNodeTracker {
     @SubscribeEvent
     fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
         event.move(2, "misc.enderNodeTracker", "combat.enderNodeTracker")
-        event.move(11, "combat.enderNodeTracker.textFormat", "combat.enderNodeTracker.textFormat") { element ->
+        event.transform(11, "combat.enderNodeTracker.textFormat") { element ->
             ConfigUtils.migrateIntArrayListToEnumArrayList(element, EnderNodeDisplayEntry::class.java)
         }
     }

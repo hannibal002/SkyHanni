@@ -9,7 +9,6 @@ import io.github.moulberry.moulconfig.annotations.Category;
 import io.github.moulberry.moulconfig.annotations.ConfigEditorBoolean;
 import io.github.moulberry.moulconfig.annotations.ConfigEditorDraggableList;
 import io.github.moulberry.moulconfig.annotations.ConfigOption;
-
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -115,7 +114,7 @@ public class InventoryConfig {
     }
 
     @Expose
-    @ConfigOption(name = " Vacuum Bag Cap", desc = "Capping the Garden Vacuum Bag item number display to 40.")
+    @ConfigOption(name = " Vacuum Bag Cap", desc = "Cap the Garden Vacuum Bag item number display to 40.")
     @ConfigEditorBoolean
     public boolean vacuumBagCap = true;
 
@@ -156,6 +155,13 @@ public class InventoryConfig {
     public boolean highlightMissingSkyBlockLevelGuide = true;
 
     @Expose
+    @ConfigOption(name = "Power Stone Guide",
+        desc = "Highlight missing power stones, show their total bazaar price, and allows to open the bazaar when clicking on the items in the Power Stone Guide.")
+    @ConfigEditorBoolean
+    @FeatureToggle
+    public boolean powerStoneGuide = true;
+
+    @Expose
     @ConfigOption(name = "Highlight Auctions",
         desc = "Highlight own items that are sold in green and that are expired in red.")
     @ConfigEditorBoolean
@@ -163,9 +169,35 @@ public class InventoryConfig {
     public boolean highlightAuctions = true;
 
     @Expose
-    @ConfigOption(name = "Shift Click Equipment", desc = "Makes normal clicks to shift clicks in equipment inventory")
+    @ConfigOption(name = "Highlight Underbid Auctions",
+        desc = "Highlight underbid own lowest BIN auctions that are outbid.")
+    @ConfigEditorBoolean
+    @FeatureToggle
+    public boolean highlightAuctionsUnderbid = false;
+
+    @Expose
+    @ConfigOption(name = "Copy Underbid Price",
+        desc = "Copies the price of an item in the \"Create BIN Auction\" minus 1 coin into the clipboard for faster under-bidding.")
+    @ConfigEditorBoolean
+    @FeatureToggle
+    public boolean copyUnderbidPrice = false;
+
+    @Expose
+    @ConfigOption(name = "Shift Click Equipment", desc = "Makes normal clicks to shift clicks in equipment inventory.")
     @ConfigEditorBoolean
     @FeatureToggle
     public boolean shiftClickForEquipment = false;
+
+    @Expose
+    @ConfigOption(name = "Shift Click NPC sell", desc = "Makes normal clicks to shift clicks in npc inventory for selling.")
+    @ConfigEditorBoolean
+    @FeatureToggle
+    public boolean shiftClickNPCSell = false;
+
+    @Expose
+    @ConfigOption(name = "Shift Click Brewing", desc = "Makes normal clicks to shift clicks in Brewing Stand inventory.")
+    @ConfigEditorBoolean
+    @FeatureToggle
+    public boolean shiftClickBrewing = false;
 
 }

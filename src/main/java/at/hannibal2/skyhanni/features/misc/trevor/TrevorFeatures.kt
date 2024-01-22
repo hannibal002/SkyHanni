@@ -307,7 +307,7 @@ object TrevorFeatures {
 
     @SubscribeEvent
     fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
-        event.move(11, "misc.trevorTheTrapper.textFormat", "misc.trevorTheTrapper.textFormat") { element ->
+        event.transform(11, "misc.trevorTheTrapper.textFormat") { element ->
             ConfigUtils.migrateIntArrayListToEnumArrayList(element, TrackerEntry::class.java)
         }
     }
