@@ -20,6 +20,11 @@ public class CrimsonIsleConfig {
     @Expose
     public ReputationHelperConfig reputationHelper = new ReputationHelperConfig();
 
+    @ConfigOption(name = "Sulphur Skitter Box", desc = "")
+    @Accordion
+    @Expose
+    public SulphurSkitterBoxConfig sulphurSkitterBoxConfig = new SulphurSkitterBoxConfig();
+
     @Expose
     @ConfigOption(name = "Quest Item Helper", desc = "When you open the fetch item quest in the town board, " +
         "it shows a clickable chat message that will grab the items needed from the sacks.")
@@ -40,4 +45,15 @@ public class CrimsonIsleConfig {
 
     @Expose
     public Position positionVolcano = new Position(20, 20, false, true);
+
+    @Expose
+    @ConfigOption(name = "Dojo Rank Display", desc = "Display your rank, score, actual belt\n" +
+        "and points needed for the next belt in the Challenges inventory\n" +
+        "on the Crimson Isles.")
+    @ConfigEditorBoolean
+    @FeatureToggle
+    public boolean showDojoRankDisplay = false;
+
+    @Expose
+    public Position dojoRankDisplayPosition = new Position(-378, 206, false, true);
 }
