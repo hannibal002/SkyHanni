@@ -16,6 +16,11 @@ public class UnclickableAuctionsConfig {
     public boolean enabled = false;
 
     @Expose
+    @ConfigOption(name = "Skulls Only", desc = "Ignores auctions for items whose appearance in vanilla Minecraft isn't a skull.")
+    @ConfigEditorBoolean
+    public boolean skullsOnly = false;
+
+    @Expose
     @ConfigOption(name = "Opacity", desc = "Adjust the visibility of items being blurred out.")
     @ConfigEditorSlider(
         minValue = 0,

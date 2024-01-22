@@ -17,6 +17,7 @@ import at.hannibal2.skyhanni.utils.StringUtils.matches
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraft.client.gui.inventory.GuiChest
+import net.minecraft.init.Items
 import net.minecraft.inventory.ContainerChest
 import net.minecraft.item.ItemStack
 import net.minecraftforge.event.entity.player.ItemTooltipEvent
@@ -73,6 +74,7 @@ class UnclickableAuctions {
             return
         }
         val itemForAuction = event.inventoryItems[13] ?: return //slot 13 is where the auctioned item is
+        if (itemForAuction.item != Items.skull && config.skullsOnly) return
         if (itemForAuction.isTierBoostedPet() || itemForAuction.isRecombobulated()) itemIsRecombOrBoosted = true
     }
 
