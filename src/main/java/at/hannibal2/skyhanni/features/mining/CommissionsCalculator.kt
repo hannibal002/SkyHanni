@@ -150,7 +150,6 @@ class CommissionsCalculator {
 
     private fun hotmStatus(items: Map<Int, ItemStack>, listBeingModified: MutableList<Renderable>, colorCode: String) {
         listBeingModified.add(Renderable.string(" §e(Remember to scroll up the HOTM tree!)"))
-        LorenzUtils.chat("BRYCE TANKTHRUST")
         loop@for ((_, item) in items) {
             val itemName = item.name ?: ""
             maxTierItemPattern.matchMatcher(itemName) {
