@@ -102,16 +102,12 @@ class CommissionsCalculator {
             return
         }
         if (currentHOTMTier == 0) {
-            drawDisplay(
-                listOf(
-                    Renderable.string("$colorCode$firstLine"),
-                    Renderable.clickAndHover(
-                        "§cOpen the §e/hotm §ctree.",
-                        listOf("Click to run §e/hotm"),
-                        onClick = { LorenzUtils.sendCommandToServer("hotm") }
-                    )
-                )
-            )
+            newList.add(Renderable.clickAndHover(
+                "§cOpen the §e/hotm §ctree.",
+                listOf("Click to run §e/hotm"),
+                onClick = { LorenzUtils.sendCommandToServer("hotm") }
+            ))
+            drawDisplay(newList)
             return
         }
         val hotmInfo = HOTMTier.entries.find { it.tier == currentHOTMTier } ?: return
