@@ -81,7 +81,7 @@ class RiftWiltedBerberisHelper {
 
         fun invalidate() {
             reset()
-            LorenzUtils.chat("Current Berberis Sequence is invalid, falling back to using particles", prefixColor = "Â§c")
+            LorenzUtils.chat("Current Berberis Sequence is invalid, falling back to using particles", prefixColor = "§c")
             renderSequence = false
         }
 
@@ -152,7 +152,7 @@ class RiftWiltedBerberisHelper {
         val block = location.add(y = -1).getBlockAt().toString()
         val nearestCenter = mapBerberis.nearestFieldCenterOrNull(location)
 
-        if (config.respawnSequence && location.distanceToPlayer() < 40 && event.type == EnumParticleTypes.VILLAGER_HAPPY && block == "Block{minecraft:farmland}" && nearestCenter != null) {
+        if (config.respawnSequence && location.distanceToPlayer() < 40 && event.type == EnumParticleTypes.VILLAGER_HAPPY && nearestCenter != null) {
             val berberisSequence = mapBerberisSequence[nearestCenter] ?: WiltedBerberisSequence()
 
             with (berberisSequence) {
@@ -205,7 +205,11 @@ class RiftWiltedBerberisHelper {
 
             if (!moving && location.getBlockAt().toString() == "Block{minecraft:deadbush}" && nearestCenter != null) {
                 val berberisSequence = mapBerberisSequence[nearestCenter] ?: return
-                if (!berberisSequence.locationEqualsCurrent(location)) berberisSequence.invalidate()
+                if (!berberisSequence.sequenceValid || berberisSequence.away || !berberisSequence.renderSequence) return
+                if (!berberisSequence.locationEqualsCurrent(location)) {
+                    LorenzUtils.debug("${berberisSequence.listBerberisSequence[berberisSequence.currentPositionInSequence].roundLocationToBlock()}, ${location.roundLocationToBlock()}")
+                    berberisSequence.invalidate()
+                }
             }
         }
     }
@@ -231,7 +235,7 @@ class RiftWiltedBerberisHelper {
                     when (index) {
                         currentPositionInSequence -> {
                             event.drawFilledBoundingBox_nea(axisAlignedBB(location.roundLocationToBlock()), Color.GREEN, 0.7f)
-                            event.drawDynamicText(location.add(x = -0.5, y = 1.0, z = -0.5), "Â§aWilted Berberis", 1.5, ignoreBlocks = false)
+                            event.drawDynamicText(location.add(x = -0.5, y = 1.0, z = -0.5), "§aWilted Berberis", 1.5, ignoreBlocks = false)
                         }
                         currentPositionInSequence + 1 -> {
                             event.drawFilledBoundingBox_nea(axisAlignedBB(location.roundLocationToBlock()), Color.YELLOW, 0.7f)
@@ -253,7 +257,7 @@ class RiftWiltedBerberisHelper {
                     val location = currentParticles.fixLocation(berberis)
                     if (!moving) {
                         event.drawFilledBoundingBox_nea(axisAlignedBB(location), Color.YELLOW, 0.7f)
-                        event.drawDynamicText(location.add(y = 1), "Â§eWilted Berberis", 1.5, ignoreBlocks = false)
+                        event.drawDynamicText(location.add(y = 1), "§eWilted Berberis", 1.5, ignoreBlocks = false)
                     } else {
                         event.drawFilledBoundingBox_nea(axisAlignedBB(location), Color.WHITE, 0.5f)
                         previous?.fixLocation(berberis)?.let {
