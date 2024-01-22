@@ -41,6 +41,10 @@ class CommissionsCalculator {
         "hotm.tier.itemname",
         "§eTier (?<tier>\\d+)"
     )
+    private val maxTierItemPattern by patternGroup.pattern(
+        "hotm.tier.itemname",
+        "§aTier 7"
+    )
     private val mileProgressPattern by patternGroup.pattern(
         "milestone.progress.loreline",
         "(?:§.| )*(?<completed>[\\d,.]+)(?:§.)*/(?:§.)*(?<required>[\\d,.]+)"
@@ -71,8 +75,8 @@ class CommissionsCalculator {
 
     private enum class HOTMTier(
         val tier: Int,
-        val toNextTier: Int,
-        val perComm: Double
+        val xpToNextTier: Int,
+        val xpPerComm: Double
     ) {
         ONE(1, 3000, 100.0),
         TWO(2, 9000, 200.0),
@@ -103,8 +107,8 @@ class CommissionsCalculator {
             return
         }
         val hotmInfo = HOTMTier.entries.find { it.tier == currentHOTMLevel } ?: return
-        val perComm = hotmInfo.perComm
-        val toNextTier = hotmInfo.toNextTier
+        val perComm = hotmInfo.xpPerComm
+        val toNextTier = hotmInfo.xpToNextTier
         val items = event.inventoryItems
         val commsToNextTier = ceil(abs(toNextTier - currentHOTMXP) / perComm).roundToInt()
         val newList = mutableListOf(Renderable.string("$colorCode$firstLine"))
