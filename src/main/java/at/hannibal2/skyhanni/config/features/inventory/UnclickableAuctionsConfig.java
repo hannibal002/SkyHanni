@@ -16,10 +16,7 @@ public class UnclickableAuctionsConfig {
     public boolean enabled = false;
 
     @Expose
-    @ConfigOption(
-        name = "Opacity",
-        desc = "How strong should the items be grayed out?"
-    )
+    @ConfigOption(name = "Opacity", desc = "Adjust the visibility of items being blurred out.")
     @ConfigEditorSlider(
         minValue = 0,
         maxValue = 255,
@@ -28,7 +25,7 @@ public class UnclickableAuctionsConfig {
     public int opacity = 180;
 
     @Expose
-    @ConfigOption(name = "Bypass With Key", desc = "Adds the ability to bypass unclickable auctions when holding a keybind of your choice.")
+    @ConfigOption(name = "Bypass With Key", desc = "Bypass unclickable auctions when holding a keybind of your choice.")
     @ConfigEditorKeybind(defaultKey = Keyboard.KEY_NONE)
     public int bypassKey = Keyboard.KEY_NONE;
 
