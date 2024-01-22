@@ -211,10 +211,10 @@ class CommissionsCalculator {
         val singularOrPlural = StringUtils.optionalPlural(commsToNextMilestone, "commission", "commissions")
         val hotmXPGain = (commsToNextMilestone * perComm).roundToInt().addSeparators()
         if (commsToNextMilestone > 0) listBeingModified.add(Renderable.string(" §7- $colorCode$singularOrPlural §fleft to complete §6Milestone $milestone §f($colorCode+$hotmXPGain HOTM XP§f)"))
-        if (!config.allMilestones) {
-            val lastElement = listBeingModified.takeLast(1).first()
+        val lastElement = listBeingModified.takeLast(1).first()
+        if (!config.allMilestones && lastElement != Renderable.string("$colorCode$firstLine")) {
             listBeingModified.clear()
-            listBeingModified.addAll(listOf(Renderable.string("$colorCode$firstLine"), lastElement))
+            listBeingModified.add(lastElement)
         }
     }
 
