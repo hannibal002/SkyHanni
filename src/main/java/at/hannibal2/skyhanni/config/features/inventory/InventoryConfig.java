@@ -197,6 +197,8 @@ public class InventoryConfig {
 
     @Expose
     public Position purseItemsPos = new Position(30, 10, true, false);
+    
+    @Expose
     @ConfigOption(name = "Shift Click NPC sell", desc = "Makes normal clicks to shift clicks in npc inventory for selling.")
     @ConfigEditorBoolean
     @FeatureToggle
