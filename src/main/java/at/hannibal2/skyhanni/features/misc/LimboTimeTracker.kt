@@ -39,9 +39,9 @@ class LimboTimeTracker {
     private var inFakeLimbo = false
     private var shownPB = false
     private var oldPB: Duration = 0.seconds
-    private var userLuck: Double = 0.0
-    private val userLuckMultiplier = 0.000810185
-    private val fireMultiplier = 1.01
+    private var userLuck: Float = 0.0F
+    private val userLuckMultiplier = 0.000810185F
+    private val fireMultiplier = 1.01F
     private var onFire = false
 
     private lateinit var modifiedArray: MutableList<String>
@@ -227,6 +227,7 @@ class LimboTimeTracker {
             }
         } else LorenzUtils.chat("§fYou were in Limbo for §e$duration§f.")
         config.limboPlaytime += passedSince.toInt(DurationUnit.SECONDS)
+        if (userLuck > config.userLuck) config.userLuck = userLuck
         onFire = false
         shownPB = false
     }
