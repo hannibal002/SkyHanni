@@ -6,6 +6,7 @@ import at.hannibal2.skyhanni.utils.LorenzLogger
 import at.hannibal2.skyhanni.utils.NEUItems.renderOnScreen
 import at.hannibal2.skyhanni.utils.renderables.RenderableUtils.calculateTableXOffsets
 import at.hannibal2.skyhanni.utils.renderables.RenderableUtils.calculateTableYOffsets
+import at.hannibal2.skyhanni.utils.renderables.RenderableUtils.renderXYAligned
 import io.github.moulberry.moulconfig.gui.GuiScreenElementWrapper
 import io.github.moulberry.notenoughupdates.util.Utils
 import net.minecraft.client.Minecraft
@@ -322,7 +323,7 @@ interface Renderable {
                     row.forEachIndexed { index, renderable ->
                         GlStateManager.pushMatrix()
                         GlStateManager.translate(xOffsets[index].toFloat(), yOffsets[rowIndex].toFloat(), 0F)
-                        renderable?.render(posX + xOffsets[index], posY + yOffsets[rowIndex])
+                        renderable?.renderXYAligned(posX + xOffsets[index], posY + yOffsets[rowIndex], xOffsets[index + 1] - xOffsets[index], yOffsets[rowIndex + 1] - yOffsets[rowIndex])
                         GlStateManager.popMatrix()
                     }
                 }
