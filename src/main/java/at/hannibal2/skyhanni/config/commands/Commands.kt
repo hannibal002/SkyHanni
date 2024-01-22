@@ -55,6 +55,7 @@ import at.hannibal2.skyhanni.test.SkyHanniConfigSearchResetCommand
 import at.hannibal2.skyhanni.test.SkyHanniDebugsAndTests
 import at.hannibal2.skyhanni.test.TestBingo
 import at.hannibal2.skyhanni.test.WorldEdit
+import at.hannibal2.skyhanni.test.command.CopyBossbarCommand
 import at.hannibal2.skyhanni.test.command.CopyItemCommand
 import at.hannibal2.skyhanni.test.command.CopyNearbyEntitiesCommand
 import at.hannibal2.skyhanni.test.command.CopyNearbyParticlesCommand
@@ -355,6 +356,10 @@ object Commands {
             "shcopyscoreboard",
             "Copies the scoreboard data to the clipboard"
         ) { CopyScoreboardCommand.command(it) }
+        registerCommand(
+            "shcopybossbar",
+            "Copies the name of the bossbar to the clipboard, including formatting codes"
+        ) { CopyBossbarCommand.command(it) }
         registerCommand(
             "shcopyitem",
             "Copies information about the item in hand to the clipboard"
