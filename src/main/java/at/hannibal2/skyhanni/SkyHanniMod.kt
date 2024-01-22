@@ -214,6 +214,7 @@ import at.hannibal2.skyhanni.features.inventory.ShiftClickEquipment
 import at.hannibal2.skyhanni.features.inventory.ShiftClickNPCSell
 import at.hannibal2.skyhanni.features.inventory.SkyBlockLevelGuideHelper
 import at.hannibal2.skyhanni.features.inventory.StatsTuning
+import at.hannibal2.skyhanni.features.inventory.UnclickableAuctions
 import at.hannibal2.skyhanni.features.inventory.tiarelay.TiaRelayHelper
 import at.hannibal2.skyhanni.features.inventory.tiarelay.TiaRelayWaypoints
 import at.hannibal2.skyhanni.features.itemabilities.ChickenHeadTimer
@@ -460,6 +461,7 @@ class SkyHanniMod {
         loadModule(PlayerChatModifier())
         loadModule(DungeonChatFilter())
         loadModule(HideNotClickableItems())
+        loadModule(UnclickableAuctions())
         loadModule(ItemDisplayOverlayFeatures)
         loadModule(CurrentPetDisplay())
         loadModule(ExpOrbsOnGroundHider())

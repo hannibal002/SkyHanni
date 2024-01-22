@@ -26,6 +26,11 @@ public class InventoryConfig {
     public HideNotClickableConfig hideNotClickable = new HideNotClickableConfig();
 
     @Expose
+    @ConfigOption(name = "Unclickable Auctions", desc = "")
+    @Accordion
+    public UnclickableAuctionsConfig unclickableAuctions = new UnclickableAuctionsConfig();
+
+    @Expose
     @ConfigOption(name = "RNG Meter", desc = "")
     @Accordion
     public RngMeterConfig rngMeter = new RngMeterConfig();
