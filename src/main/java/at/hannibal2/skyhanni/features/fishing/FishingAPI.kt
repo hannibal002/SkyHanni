@@ -28,7 +28,7 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import kotlin.time.Duration.Companion.seconds
 
 object FishingAPI {
-    private val lavaBlocks = listOf(Blocks.lava, Blocks.flowing_lava)
+    val lavaBlocks = listOf(Blocks.lava, Blocks.flowing_lava)
     private val waterBlocks = listOf(Blocks.water, Blocks.flowing_water)
 
     var lastCastTime = SimpleTimeMark.farPast()
