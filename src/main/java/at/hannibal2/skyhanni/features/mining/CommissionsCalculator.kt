@@ -7,6 +7,7 @@ import at.hannibal2.skyhanni.events.InventoryOpenEvent
 import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.cleanName
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
+import at.hannibal2.skyhanni.utils.ItemUtils.name
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils.isInIsland
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
@@ -38,11 +39,11 @@ class CommissionsCalculator {
         "(?i)(?:§.)*Commission #(?<commission>\\d+)(?: \\(?(?:§.)*\\(?(?:§.)*NEW(?:§.)*\\)?(?:§.)*)?"
     )
     private val tierItemPattern by patternGroup.pattern(
-        "hotm.tier.itemname",
+        "hotm.tier.coloreditemname",
         "§eTier (?<tier>\\d+)"
     )
     private val maxTierItemPattern by patternGroup.pattern(
-        "hotm.tier.itemname",
+        "hotm.maxtier.coloreditemname",
         "§aTier 7"
     )
     private val mileProgressPattern by patternGroup.pattern(
@@ -63,9 +64,9 @@ class CommissionsCalculator {
         Renderable.string("§c§lDisclaimer: §r§cThis calculator only accounts for"),
         Renderable.string("§cthe standard HOTM XP gain from claiming commissions"),
         Renderable.string("§cbefore any modifiers/boosts or other sources."),
-        Renderable.clickAndHover("§eTo update these calculations, click here to open /hotm.",
-            listOf("Click to run §e/hotm"), onClick = { LorenzUtils.sendCommandToServer("hotm") }
-        ),
+    )
+    private val disclaimerOpenHOTM: Renderable = Renderable.clickAndHover("§eTo update these calculations, click here to open /hotm.",
+        listOf("Click to run §e/hotm"), onClick = { LorenzUtils.sendCommandToServer("hotm") }
     )
 
     private var display: List<Renderable> = listOf()
@@ -93,6 +94,9 @@ class CommissionsCalculator {
         val chestName = event.inventoryName
         if (chestName.isNotValidChestName()) return
         val colorCode = if (DWARVEN.isInIsland()) "§2" else "§5" //themed based on mining island
+        val items = event.inventoryItems
+        val newList = mutableListOf(Renderable.string("$colorCode$firstLine"))
+        if (chestName == "Heart of the Mountain") hotmStatus(items, newList, colorCode)
         if (currentHOTMLevel == 0) {
             drawDisplay(
                 listOf(
@@ -109,29 +113,26 @@ class CommissionsCalculator {
         val hotmInfo = HOTMTier.entries.find { it.tier == currentHOTMLevel } ?: return
         val perComm = hotmInfo.xpPerComm
         val toNextTier = hotmInfo.xpToNextTier
-        val items = event.inventoryItems
         val commsToNextTier = ceil(abs(toNextTier - currentHOTMXP) / perComm).roundToInt()
-        val newList = mutableListOf(Renderable.string("$colorCode$firstLine"))
         updateListFromChest(chestName, newList, items, colorCode, perComm, commsToNextTier, toNextTier)
     }
 
-    private fun updateListFromChest(chestName: String, newList: MutableList<Renderable>, items: Map<Int, ItemStack>, colorCode: String, perComm: Double, commsToNextTier: Int, toNextTier: Int) {
+    private fun updateListFromChest(chestName: String, listBeingModified: MutableList<Renderable>, items: Map<Int, ItemStack>, colorCode: String, perComm: Double, commsToNextTier: Int, toNextTier: Int) {
         when (chestName) {
-            "Heart of the Mountain" -> hotmStatus(items, newList, colorCode)
-            "Commissions" -> hotmFromComms(items, newList, colorCode)
-            "Commission Milestones" -> untilNextMilestone(items, perComm, newList, colorCode)
+            "Commissions" -> hotmFromComms(items, listBeingModified, colorCode)
+            "Commission Milestones" -> untilNextMilestone(items, perComm, listBeingModified, colorCode)
             else -> return
         }
-        newList.addAll(
+        listBeingModified.addAll(
             listOf(
                 Renderable.string(" §7- $colorCode${commsToNextTier.addSeparators()} §fmore commissions to ${colorCode}HOTM ${currentHOTMLevel + 1}"),
                 Renderable.string(" §7- §f(to reach $colorCode${toNextTier.addSeparators()} HOTM XP §ffrom $colorCode${currentHOTMXP.addSeparators()} HOTM XP§f)"),
             )
         )
-        drawDisplay(newList)
+        drawDisplay(listBeingModified)
     }
 
-    private fun hotmFromComms(items: Map<Int, ItemStack>, newList: MutableList<Renderable>, colorCode: String) {
+    private fun hotmFromComms(items: Map<Int, ItemStack>, listBeingModified: MutableList<Renderable>, colorCode: String) {
         var hotmGain = 0L
         for ((_, item) in items) {
             val lore = item.getLore()
@@ -144,13 +145,14 @@ class CommissionsCalculator {
                 }
             }
         }
-        newList.add(Renderable.string(" §7- §f(At least $colorCode${hotmGain.addSeparators()} HOTM XP §fto be gained from claiming completed commissions)"))
+        listBeingModified.add(Renderable.string(" §7- §f(At least $colorCode${hotmGain.addSeparators()} HOTM XP §fto be gained from claiming completed commissions)"))
     }
 
-    private fun hotmStatus(items: Map<Int, ItemStack>, newList: MutableList<Renderable>, colorCode: String) {
-        newList.add(Renderable.string(" §e(Remember to scroll up the HOTM tree!)"))
+    private fun hotmStatus(items: Map<Int, ItemStack>, listBeingModified: MutableList<Renderable>, colorCode: String) {
+        listBeingModified.add(Renderable.string(" §e(Remember to scroll up the HOTM tree!)"))
+        LorenzUtils.chat("BRYCE TANKTHRUST")
         loop@for ((_, item) in items) {
-            val itemName = item.cleanName()
+            val itemName = item.name ?: ""
             maxTierItemPattern.matchMatcher(itemName) {
                 val lastHOTMTier = HOTMTier.entries.last()
                 currentHOTMLevel = lastHOTMTier.tier
@@ -166,7 +168,7 @@ class CommissionsCalculator {
                 }
             }
         }
-        newList.addAll(
+        listBeingModified.addAll(
             listOf(
                 Renderable.string(" §7- §fCurrent HOTM Level: $colorCode$currentHOTMLevel"),
                 Renderable.string(" §7- §fCurrent HOTM XP: $colorCode${currentHOTMXP.addSeparators()}"),
@@ -174,7 +176,7 @@ class CommissionsCalculator {
         )
     }
 
-    private fun untilNextMilestone(items: Map<Int, ItemStack>, perComm: Double, newList: MutableList<Renderable>, colorCode: String) {
+    private fun untilNextMilestone(items: Map<Int, ItemStack>, perComm: Double, listBeingModified: MutableList<Renderable>, colorCode: String) {
         for ((_, item) in items) {
             milestoneRewardsItemPattern.matchMatcher(item.cleanName()) {
                 val milestone = group("milestone").romanToDecimalIfNecessary()
@@ -182,28 +184,31 @@ class CommissionsCalculator {
                     mileProgressPattern.matchMatcher(line) {
                         val completed = group("completed").groupToInt()
                         val required = group("required").groupToInt()
-                        remainingMilestones(required, completed, perComm, newList, colorCode, milestone)
+                        remainingMilestones(required, completed, perComm, listBeingModified, colorCode, milestone)
                     }
                 }
             }
         }
     }
 
-    private fun remainingMilestones(required: Int, completed: Int, perComm: Double, newList: MutableList<Renderable>, colorCode: String, milestone: Int) {
+    private fun remainingMilestones(required: Int, completed: Int, perComm: Double, listBeingModified: MutableList<Renderable>, colorCode: String, milestone: Int) {
         val commsToNextMilestone = abs(required - completed)
         val singularOrPlural = StringUtils.optionalPlural(commsToNextMilestone, "commission", "commissions")
         val hotmXPGain = (commsToNextMilestone * perComm).roundToInt().addSeparators()
         if (completed < required) newList.add(Renderable.string(" §7- $colorCode$singularOrPlural §fleft to complete §6Milestone $milestone §f($colorCode+$hotmXPGain HOTM XP§f)"))
         if (!config.allMilestones) {
-            val lastElement = newList.takeLast(1).first()
-            newList.clear()
-            newList.addAll(listOf(Renderable.string("$colorCode$firstLine"), lastElement))
+            val lastElement = listBeingModified.takeLast(1).first()
+            listBeingModified.clear()
+            listBeingModified.addAll(listOf(Renderable.string("$colorCode$firstLine"), lastElement))
         }
     }
 
     private fun drawDisplay(list: List<Renderable>) {
         display = list
-        if (currentHOTMLevel != 0) display = list + fatDisclaimer
+        if (currentHOTMLevel != 0) {
+            display += fatDisclaimer
+            if (InventoryUtils.openInventoryName() != "Heart of the Mountain") display += disclaimerOpenHOTM
+        }
     }
 
     @SubscribeEvent
@@ -213,7 +218,7 @@ class CommissionsCalculator {
         config.position.renderRenderables(display, posLabel = "Commissions Calculator")
     }
 
-    private fun isEnabled() = config.enabled && (DWARVEN.isInIsland() || IslandType.CRYSTAL_HOLLOWS.isInIsland())
+    private fun isEnabled() = (DWARVEN.isInIsland() || IslandType.CRYSTAL_HOLLOWS.isInIsland()) && config.enabled
     private fun String.isNotValidChestName(): Boolean = this != "Commission Milestones" && this != "Commissions" && this != "Heart of the Mountain"
     private fun String.groupToInt(): Int = this.formatNumber().toInt()
 }
