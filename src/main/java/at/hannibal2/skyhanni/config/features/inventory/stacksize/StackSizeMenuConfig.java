@@ -30,7 +30,7 @@ public class StackSizeMenuConfig {
         BOOKSHELF_POWER("§bBookshelf Power"), // (#)
         FAME_RANK_BITS("§bFame Rank, Fame Count, Bits Available"), // (Abbvs)
         BOOSTER_COOKIE_POTION_EFFECTS("§bBooster Cookie Duration + Active Potion Effects"), //§b[highest unit of time only: Xy ➡ Xd ➡ Xh ➡ etc...]
-        DELIVERIES_PROJECTS("§bJerry Deliveries, Project Contributions"), // (Includes)
+        DELIVERIES("§bJerry Deliveries"), // (#s)
         ACCESSORY_BAG_UTILS("§bAccessory Bag Utils"), // (Various)
         EVENT_COUNTDOWN_ABBV("§bEvents \"Start(ing) in\" Countdowns"), //§b[highest unit of time only: Xy ➡ Xd ➡ Xh ➡ etc...]
         SKYBLOCK_ACHIEVEMENT_POINTS("§bSkyBlock Achievements Points"), // (%)

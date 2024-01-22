@@ -147,26 +147,6 @@ class MenuItemDisplayOverlayPlayerTryhard : AbstractMenuStackSize() {
         "bookshelf.power.loreline",
         "(?:§.)*Bookshelf Power: (?:§.)*(?<power>\\d+)"
     )
-    private val contributionsPattern by playerTryhardSubgroup.pattern(
-        "project.contributions.variantone.loreline",
-        "(?:§.)*You contributed to (?:§.)*(?<contribs>[\\d,.]+)(?: (?:§.)*of(?: (§.)*those(?:(§.)* projects.)?)?)?"
-    )
-    private val contributionsOtherPattern by playerTryhardSubgroup.pattern(
-        "project.contributions.varianttwo.loreline",
-        "(?:§.)*You made (?:§.)*(?<contribs>[\\d,.]+)(?: (?:§.)*contributions(?: (?:§.)*to(?: (§.)*this(?:(§.)* project.)?)?)?)?"
-    )
-    private val contributionsOtherOtherPattern by playerTryhardSubgroup.pattern(
-        "project.contributions.variantthree.loreline",
-        "(?:§.)*You made: (?:§.)*(?<contribs>[\\d,.]+)(?: contributions)?"
-    )
-    private val previousProjectsChestPattern by playerTryhardSubgroup.pattern(
-        "project.previous.chestname",
-        "Previous(?: \\S+)? Projects"
-    )
-    private val cityProjectItemPattern by playerTryhardSubgroup.pattern(
-        "project.contributions.city.project.itemname",
-        "City [pP]roject: [\\S ]+"
-    )
     private val deliveriesPattern by playerTryhardSubgroup.pattern(
         "island.management.deliveries.loreline",
         "(?:§.)*You have (?<deliveryCount>[\\d,.]+) deliver(?:y|ies) available to(?: (?:§.)*collect\\.)?"
@@ -344,29 +324,6 @@ class MenuItemDisplayOverlayPlayerTryhard : AbstractMenuStackSize() {
                         deliveriesPattern.matchMatcher(line) {
                             return NumberUtil.format(group("deliveryCount").formatNumber())
                         }
-                    }
-                }
-            }
-            if (chestName == "Community Shop") {
-                if (itemName == "Previous Projects") {
-                    for (line in lore) {
-                        contributionsPattern.matchMatcher(line) {
-                            return NumberUtil.format(group("contribs").formatNumber())
-                        }
-                    }
-                }
-                if (lore.first() == "§8City Project") {
-                    for (line in lore) {
-                        contributionsOtherOtherPattern.matchMatcher(line) {
-                            return NumberUtil.format(group("contribs").formatNumber())
-                        }
-                    }
-                }
-            }
-            if (previousProjectsChestPattern.matches(chestName) && cityProjectItemPattern.matches(itemName)) {
-                for (line in lore) {
-                    contributionsOtherPattern.matchMatcher(line) {
-                        return NumberUtil.format(group("contribs").formatNumber())
                     }
                 }
             }
