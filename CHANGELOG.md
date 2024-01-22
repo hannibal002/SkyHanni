@@ -9,6 +9,9 @@
 + Added command /shcropsin <time> <item>. - DylanBruner
     + Shows the number of items you gain when farming in the garden for the given time.
 + Show sack item amount to the visitor shopping list. - CalMWolfs
++ Added Atmospheric Filter Display. - Erymanthus
+    + This display shows the currently active buff as a GUI element.
+    + For an optimal experience, please have the Atmospheric Filter accessory active.
 
 #### Fishing Features
 
@@ -17,11 +20,13 @@
 
 #### Crimson Isle Features
 
-+ Dojo Rank Display. - HiZe
-    + Display your rank, score, actual belt and points needed for the next belt in the Challenges inventory on the
-      Crimson Isles.
 + Added Volcano Explosivity in Crimson Isle. - Erymanthus
     + Show a HUD of the current volcano explosivity level.
++ Added Sulphur Skitter Box in Crimson Isle. - HiZe
+    + Renders a box around the closest sulphur block.
++ Added Dojo Rank Display. - HiZe
+    + Display your rank, score, actual belt and points needed for the next belt in the Challenges inventory on the
+      Crimson Isles.
 
 #### Inventory Features
 
@@ -94,6 +99,7 @@
 
 + Odger highlight feature tells in description that it is only useful for users without abiphone. - hannibal2
 + Added toggle to count double hook catches as two catches in Sea Creature Tracker. - hannibal2
++ Smarter check if the player is fishing for all fishing related displays. - hannibal2
 
 #### Mining Changes
 
@@ -163,6 +169,8 @@
 + Fixed all Damage Indicator boss timers in Dungeons being off by a second. - hannibal2
 + Gave Damage Indicator mobs correct names on floor 1, 2, 3 and 6. (Removed "Generic Dungeon Boss") - hannibal2
 + Fixed the M3 reinforced guardian not getting detected in the Damage Indicator. - hannibal2
++ Fixed kill time of slayer in Damage Indicator to be off by one second. - hannibal2
++ Fixed time until the next area mini boss spawns being off by one second. - hannibal2
 
 #### Diana Fixes
 
