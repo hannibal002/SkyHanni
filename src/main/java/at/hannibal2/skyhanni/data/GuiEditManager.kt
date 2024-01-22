@@ -7,9 +7,11 @@ import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.LorenzKeyPressEvent
 import at.hannibal2.skyhanni.test.SkyHanniDebugsAndTests
 import at.hannibal2.skyhanni.utils.LorenzUtils
+import at.hannibal2.skyhanni.utils.LorenzUtils.getPropertiesWithType
 import at.hannibal2.skyhanni.utils.LorenzUtils.isRancherSign
 import at.hannibal2.skyhanni.utils.NEUItems
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
+import io.github.moulberry.notenoughupdates.itemeditor.GuiElementTextField
 import io.github.moulberry.notenoughupdates.profileviewer.GuiProfileViewer
 import net.minecraft.client.Minecraft
 import net.minecraft.client.gui.inventory.GuiChest
@@ -33,7 +35,7 @@ class GuiEditManager {
         if (isInGui()) return
 
         Minecraft.getMinecraft().currentScreen?.let {
-            if (it !is GuiInventory && it !is GuiChest && it !is GuiEditSign && it !is GuiProfileViewer) return
+            if (it !is GuiInventory && it !is GuiChest && it !is GuiEditSign && !(it is GuiProfileViewer && !it.anyTextBoxFocused())) return
             if (it is GuiEditSign && !it.isRancherSign()) return
         }
 
@@ -51,9 +53,10 @@ class GuiEditManager {
     }
 
     companion object {
-        val currentPositions = mutableMapOf<String, Position>()
+
+        var currentPositions = mutableMapOf<String, Position>()
         private var latestPositions = mapOf<String, Position>()
-        private val currentBorderSize = mutableMapOf<String, Pair<Int, Int>>()
+        private var currentBorderSize = mutableMapOf<String, Pair<Int, Int>>()
 
         @JvmStatic
         fun add(position: Position, posLabel: String, x: Int, y: Int) {
@@ -111,6 +114,9 @@ class GuiEditManager {
         fun Position.getAbsX() = getAbsX0(getDummySize(true).x)
 
         fun Position.getAbsY() = getAbsY0(getDummySize(true).y)
+
+        fun GuiProfileViewer.anyTextBoxFocused() =
+            this.getPropertiesWithType<GuiElementTextField>().any{it.focus}
     }
 }
 
