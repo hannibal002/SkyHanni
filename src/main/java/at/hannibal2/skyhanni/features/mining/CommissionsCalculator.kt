@@ -90,12 +90,16 @@ class CommissionsCalculator {
         if (chestName.isNotValidChestName()) return
         val colorCode = if (DWARVEN.isInIsland()) "§2" else "§5" //themed based on mining island
         if (currentHOTMLevel == 0) {
-            listOf(
-                Renderable.string("$colorCode$firstLine"),
-                Renderable.clickAndHover("§cOpen the §e/hotm §ctree.",
-                    listOf("Click to run §e/hotm"), onClick = { LorenzUtils.sendCommandToServer("hotm") }
-                ),
-            ).drawDisplay()
+            drawDisplay(
+                listOf(
+                    Renderable.string("$colorCode$firstLine"),
+                    Renderable.clickAndHover(
+                        "§cOpen the §e/hotm §ctree.",
+                        listOf("Click to run §e/hotm"),
+                        onClick = { LorenzUtils.sendCommandToServer("hotm") }
+                    )
+                )
+            )
             return
         }
         val hotmInfo = HOTMTier.entries.find { it.tier == currentHOTMLevel } ?: return
@@ -104,6 +108,10 @@ class CommissionsCalculator {
         val items = event.inventoryItems
         val commsToNextTier = ceil(abs(toNextTier - currentHOTMXP) / perComm).roundToInt()
         val newList = mutableListOf(Renderable.string("$colorCode$firstLine"))
+        updateListFromChest(chestName, newList, items, colorCode, perComm, commsToNextTier, toNextTier)
+    }
+
+    private fun updateListFromChest(chestName: String, newList: MutableList<Renderable>, items: Map<Int, ItemStack>, colorCode: String, perComm: Double, commsToNextTier: Int, toNextTier: Int) {
         if (chestName == "Heart of the Mountain") {
             newList.add(Renderable.string(" §e(Remember to scroll up the HOTM tree!)"))
             calculateWithHOTM(items)
@@ -113,13 +121,12 @@ class CommissionsCalculator {
                     Renderable.string(" §7- §fCurrent HOTM XP: $colorCode${currentHOTMXP.addSeparators()}"),
                 )
             )
-            newList.drawDisplay()
+            drawDisplay(newList)
             return
         }
         if (chestName == "Commissions") {
-            var hotmXP: Long = 0
-            hotmXP = calculateWithCommissions(items, hotmXP)
-            newList.add(Renderable.string(" §7- §f(At least $colorCode${hotmXP.addSeparators()} HOTM XP §fto be gained from claiming completed commissions)"))
+            val hotmXPFromComms = calculateWithCommissions(items)
+            newList.add(Renderable.string(" §7- §f(At least $colorCode${hotmXPFromComms.addSeparators()} HOTM XP §fto be gained from claiming completed commissions)"))
         }
         if (chestName == "Commission Milestones") {
             calculateWithMilestones(items, perComm, newList, colorCode)
@@ -130,26 +137,23 @@ class CommissionsCalculator {
                 Renderable.string(" §7- §f(to reach $colorCode${toNextTier.addSeparators()} HOTM XP §ffrom $colorCode${currentHOTMXP.addSeparators()} HOTM XP§f)"),
             )
         )
-        newList.drawDisplay()
+        drawDisplay(newList)
     }
 
-    private fun calculateWithCommissions(
-        items: Map<Int, ItemStack>,
-        hotmXP: Long
-    ): Long {
-        var hotmXP1 = hotmXP
+    private fun calculateWithCommissions(items: Map<Int, ItemStack>): Long {
+        var hotmGain = 0L
         loop@ for ((_, item) in items) {
             commissionItemPattern.matchMatcher(item.cleanName()) {
                 val lore = item.getLore()
                 if (lore.none { it == "§a§lCOMPLETED" } && config.completedOnly) continue@loop
                 for (line in lore) {
                     hotmXPPattern.matchMatcher(line) {
-                        hotmXP1 += group("xp").formatNumber()
+                        hotmGain += group("xp").formatNumber()
                     }
                 }
             }
         }
-        return hotmXP1
+        return hotmGain
     }
 
     private fun calculateWithHOTM(items: Map<Int, ItemStack>) {
@@ -165,12 +169,7 @@ class CommissionsCalculator {
         }
     }
 
-    private fun calculateWithMilestones(
-        items: Map<Int, ItemStack>,
-        perComm: Double,
-        newList: MutableList<Renderable>,
-        colorCode: String
-    ) {
+    private fun calculateWithMilestones(items: Map<Int, ItemStack>, perComm: Double, newList: MutableList<Renderable>, colorCode: String) {
         for ((_, item) in items) {
             milestoneRewardsItemPattern.matchMatcher(item.cleanName()) {
                 val milestone = group("milestone").romanToDecimalIfNecessary()
@@ -185,35 +184,21 @@ class CommissionsCalculator {
         }
     }
 
-    private fun remainingMilestones(
-        required: Int,
-        completed: Int,
-        perComm: Double,
-        newList: MutableList<Renderable>,
-        colorCode: String,
-        milestone: Int
-    ) {
+    private fun remainingMilestones(required: Int, completed: Int, perComm: Double, newList: MutableList<Renderable>, colorCode: String, milestone: Int) {
         val commsToNextMilestone = abs(required - completed)
-        if (completed < required) {
-            newList.add(
-                Renderable.string(" §7- $colorCode${StringUtils.optionalPlural(commsToNextMilestone, "commission", "commissions")} §fleft to complete §6Milestone $milestone §f($colorCode+${(commsToNextMilestone * perComm).roundToInt().addSeparators()} HOTM XP§f)"),
-            )
-        }
+        val singularOrPlural = StringUtils.optionalPlural(commsToNextMilestone, "commission", "commissions")
+        val hotmXPGain = (commsToNextMilestone * perComm).roundToInt().addSeparators()
+        if (completed < required) newList.add(Renderable.string(" §7- $colorCode$singularOrPlural §fleft to complete §6Milestone $milestone §f($colorCode+$hotmXPGain HOTM XP§f)"))
         if (!config.allMilestones) {
             val lastElement = newList.takeLast(1).first()
             newList.clear()
-            newList.addAll(
-                listOf(
-                    Renderable.string("$colorCode$firstLine"),
-                    lastElement,
-                )
-            )
+            newList.addAll(listOf(Renderable.string("$colorCode$firstLine"), lastElement))
         }
     }
 
-    private fun List<Renderable>.drawDisplay() {
-        display = this
-        if (currentHOTMLevel != 0) display = this + fatDisclaimer
+    private fun drawDisplay(list: List<Renderable>) {
+        display = list
+        if (currentHOTMLevel != 0) display = list + fatDisclaimer
     }
 
     @SubscribeEvent
