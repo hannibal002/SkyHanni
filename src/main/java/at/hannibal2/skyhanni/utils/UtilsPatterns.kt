@@ -39,4 +39,9 @@ object UtilsPatterns {
         "item.petlevel",
         "(?:§f§f)?§7\\[Lvl (?<level>\\d+)] .*"
     )
+
+    val seasonPattern by RepoPattern.pattern(
+        "skyblocktime.season",
+        "(?:Early |Late )?(?<season>Spring|Summer|Autumn|Winter)"
+    )
 }
