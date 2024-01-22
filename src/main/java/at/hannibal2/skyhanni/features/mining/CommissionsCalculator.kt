@@ -115,10 +115,15 @@ class CommissionsCalculator {
             return
         }
         val hotmInfo = HOTMTier.entries.find { it.tier == currentHOTMTier } ?: return
+        val (perComm, toNextTier, commsToNextTier) = grabRelevantInfoFrom(hotmInfo)
+        updateListFromChest(chestName, newList, items, colorCode, perComm, commsToNextTier, toNextTier)
+    }
+
+    private fun grabRelevantInfoFrom(hotmInfo: HOTMTier): Triple<Double, Int, Int> {
         val perComm = hotmInfo.xpPerComm
         val toNextTier = hotmInfo.xpToNextTier
         val commsToNextTier = ceil(abs(toNextTier - currentHOTMXP) / perComm).roundToInt()
-        updateListFromChest(chestName, newList, items, colorCode, perComm, commsToNextTier, toNextTier)
+        return Triple(perComm, toNextTier, commsToNextTier)
     }
 
     private fun updateListFromChest(chestName: String, listBeingModified: MutableList<Renderable>, items: Map<Int, ItemStack>, colorCode: String, perComm: Double, commsToNextTier: Int, toNextTier: Int) {
@@ -127,13 +132,17 @@ class CommissionsCalculator {
             "Commission Milestones" -> untilNextMilestone(items, perComm, listBeingModified, colorCode)
             else -> return
         }
+        commissionsUntilNextTier(listBeingModified, colorCode, commsToNextTier, toNextTier)
+        drawDisplay(listBeingModified)
+    }
+
+    private fun commissionsUntilNextTier(listBeingModified: MutableList<Renderable>, colorCode: String, commsToNextTier: Int, toNextTier: Int) {
         listBeingModified.addAll(
             listOf(
                 Renderable.string(" §7- $colorCode${commsToNextTier.addSeparators()} §fmore commissions to ${colorCode}HOTM ${currentHOTMTier + 1}"),
                 Renderable.string(" §7- §f(to reach $colorCode${toNextTier.addSeparators()} HOTM XP §ffrom $colorCode${currentHOTMXP.addSeparators()} HOTM XP§f)"),
             )
         )
-        drawDisplay(listBeingModified)
     }
 
     private fun hotmFromComms(items: Map<Int, ItemStack>, listBeingModified: MutableList<Renderable>, colorCode: String) {
@@ -173,12 +182,16 @@ class CommissionsCalculator {
                 }
             }
         }
+        val hotmInfo = HOTMTier.entries.find { it.tier == currentHOTMTier } ?: return
+        val (perComm, toNextTier, commsToNextTier) = grabRelevantInfoFrom(hotmInfo)
         listBeingModified.addAll(
             listOf(
                 Renderable.string(" §7- §fCurrent HOTM Tier: $colorCode$currentHOTMTier"),
                 Renderable.string(" §7- §fCurrent HOTM XP: $colorCode${currentHOTMXP.addSeparators()}"),
+                Renderable.string(" §7- §fXP per Commission: $colorCode${perComm.addSeparators()}"),
             )
         )
+        commissionsUntilNextTier(listBeingModified, colorCode, commsToNextTier, toNextTier)
     }
 
     private fun untilNextMilestone(items: Map<Int, ItemStack>, perComm: Double, listBeingModified: MutableList<Renderable>, colorCode: String) {
