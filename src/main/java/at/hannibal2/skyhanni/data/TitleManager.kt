@@ -11,21 +11,30 @@ import net.minecraft.client.renderer.GlStateManager
 import net.minecraftforge.fml.common.eventhandler.EventPriority
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import kotlin.time.Duration
+import kotlin.time.Duration.Companion.milliseconds
 import kotlin.time.Duration.Companion.seconds
 
 class TitleManager {
 
     companion object {
+        private var originalText = ""
         private var display = ""
         private var endTime = SimpleTimeMark.farPast()
         private var heightModifier = 1.8
         private var fontSizeModifier = 4f
 
         fun sendTitle(text: String, duration: Duration, height: Double, fontSize: Float) {
+            originalText = text
             display = "§f$text"
             endTime = SimpleTimeMark.now() + duration
             heightModifier = height
             fontSizeModifier = fontSize
+        }
+
+        fun optionalResetTitle(condition: (String) -> Boolean) {
+            if (condition(originalText)) {
+                sendTitle("", 1.milliseconds, 1.8, 4f)
+            }
         }
 
         fun command(args: Array<String>) {

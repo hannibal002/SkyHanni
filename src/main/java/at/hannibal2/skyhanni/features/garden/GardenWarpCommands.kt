@@ -5,10 +5,12 @@ import at.hannibal2.skyhanni.events.MessageSendToServerEvent
 import at.hannibal2.skyhanni.features.misc.LockMouseLook
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.NEUItems
+import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraft.client.Minecraft
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
+import kotlin.time.Duration.Companion.seconds
 
 class GardenWarpCommands {
     private val config get() = GardenAPI.config.gardenCommands
@@ -17,6 +19,8 @@ class GardenWarpCommands {
         "garden.warpcommand.tpplot",
         "/tp (?<plot>.*)"
     )
+
+    private var lastWarpTime = SimpleTimeMark.farPast()
 
     @SubscribeEvent
     fun onMessageSendToServer(event: MessageSendToServerEvent) {
@@ -58,6 +62,8 @@ class GardenWarpCommands {
 
             else -> return
         }
+        if (lastWarpTime.passedSince() < 2.seconds) return
+        lastWarpTime = SimpleTimeMark.now()
         if (command == "tptoplot barn") {
             LockMouseLook.autoDisable()
         }

@@ -6,6 +6,7 @@ import com.google.gson.annotations.Expose;
 import io.github.moulberry.moulconfig.annotations.Accordion;
 import io.github.moulberry.moulconfig.annotations.ConfigEditorBoolean;
 import io.github.moulberry.moulconfig.annotations.ConfigEditorDraggableList;
+import io.github.moulberry.moulconfig.annotations.ConfigEditorSlider;
 import io.github.moulberry.moulconfig.annotations.ConfigOption;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -40,6 +41,12 @@ public class PetConfig {
         PetItemsDisplay.XP_SHARE,
         PetItemsDisplay.TIER_BOOST
     ));
+
+    @Expose
+    @ConfigOption(name = "Pet Item Scale", desc = "The scale at which the Pet Item will be displayed.")
+    @ConfigEditorSlider(minValue = 0.7f, maxValue = 1.5f, minStep = 0.05f)
+    public float petItemDisplayScale = 0.9f;
+
 
     public enum PetItemsDisplay {
         XP_SHARE("§5⚘", "Exp Share", "PET_ITEM_EXP_SHARE"),
