@@ -16,16 +16,14 @@ import at.hannibal2.skyhanni.utils.NEUItems.getNpcPriceOrNull
 import at.hannibal2.skyhanni.utils.NEUItems.getPrice
 import at.hannibal2.skyhanni.utils.NumberUtil
 import at.hannibal2.skyhanni.utils.RecalculatingValue
-import com.google.common.cache.CacheBuilder
+import at.hannibal2.skyhanni.utils.TimeLimitedCache
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
-import java.util.concurrent.TimeUnit
+import kotlin.time.Duration.Companion.minutes
 import kotlin.time.Duration.Companion.seconds
 
 object SlayerAPI {
 
-    private var nameCache =
-        CacheBuilder.newBuilder().expireAfterWrite(1, TimeUnit.MINUTES)
-            .build<Pair<NEUInternalName, Int>, Pair<String, Double>>()
+    private var nameCache = TimeLimitedCache<Pair<NEUInternalName, Int>, Pair<String, Double>>(1.minutes)
 
     var questStartTime = 0L
     var isInCorrectArea = false
@@ -43,7 +41,7 @@ object SlayerAPI {
 
     fun getItemNameAndPrice(internalName: NEUInternalName, amount: Int): Pair<String, Double> {
         val key = internalName to amount
-        nameCache.getIfPresent(key)?.let {
+        nameCache.getOrNull(key)?.let {
             return it
         }
 

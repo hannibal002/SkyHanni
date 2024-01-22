@@ -120,6 +120,11 @@ public class GardenConfig {
     public GardenCommandsConfig gardenCommands = new GardenCommandsConfig();
 
     @Expose
+    @ConfigOption(name = "Atmospheric Filter Display", desc = "")
+    @Accordion
+    public AtmosphericFilterDisplayConfig atmosphericFilterDisplay = new AtmosphericFilterDisplayConfig();
+
+    @Expose
     @ConfigOption(name = "Plot Price", desc = "Show the price of the plot in coins when inside the Configure Plots inventory.")
     @ConfigEditorBoolean
     @FeatureToggle

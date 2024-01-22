@@ -8,15 +8,20 @@
 
 + Added command /shcropsin <time> <item>. - DylanBruner
     + Shows the number of items you gain when farming in the garden for the given time.
-
-#### Fishing Features
-
 + Show sack item amount to the visitor shopping list. - CalMWolfs
 
 #### Fishing Features
 
 + Added Sea Creature Tracker. - hannibal2
     + Allows to only show single variants, e.g. water or lava or winter.
+
+#### Crimson Isle Features
+
++ Dojo Rank Display. - HiZe
+    + Display your rank, score, actual belt and points needed for the next belt in the Challenges inventory on the
+      Crimson Isles.
++ Added Volcano Explosivity in Crimson Isle. - Erymanthus
+    + Show a HUD of the current volcano explosivity level.
 
 #### Inventory Features
 
@@ -25,6 +30,8 @@
       items in the Power Stone Guide.
 + Option to make normal clicks to shift clicks in equipment inventory. - Thunderblade73
 + Show pet items XP Share and Tier Boost as small icons next to the pet in an inventory. - Thunderblade73
++ Added Shift Click Brewing. - Thunderblade73
+    + Makes normal clicks to shift clicks in Brewing Stand inventory.
 
 #### Item Features
 
@@ -33,17 +40,28 @@
 #### Chat Features
 
 + Add tab list fire sale advertisement hider. - nea
++ Added SkyBlock XP Chat. - Thunderblade73
+    + Sends the SkyBlock XP message from the action bar into the chat.
 
 #### Command Features
 
 + Party Kick with reason. - nea
     + Added support for the Hypixel command /p kick /pk to add a reason. The reason will be sent in party chat before
       kicking the player.
++ Added /shcalccrop. - CalMWolfs
+    + Calculate how many crops need to be farmed between different crop milestones.
++ Added /shcalccroptime. - CalMWolfs
+    + Calculate how long you need to farm crops between different crop milestones.
 
 #### Misc Features
 
 + Fixes Ghost Entities. - hannibal2 & nea & Thunderblade73
     + Removes ghost entities caused by a Hypixel bug. This included Diana, Dungeon and Crimson Isle mobs and nametags.
++ Added Harp GUI Scale. - Thunderblade73
+    + Automatically sets the GUI scale to AUTO when entering the Harp.
++ Added Harp Quick Restart. - Thunderblade73
+    + Once you've launched the harp, quickly hit the close button in the harp menu to initiate the selected song.
++ Color the month names on the scoreboard. - J10a1n15
 
 ### Changes
 
@@ -60,6 +78,9 @@
 + Mark carrot/pumpkin fortune as completed when giving to Carrolyn after already done. - alexia
 + Added ability to get unique visitors served without Green Thumb. - alexia
 + Check if you are sneaking for optimal speed in the Garden and show current speed when wrong. - alexia
++ Added option to show visitor shopping list in Farming Islands - Erymanthus
+    + Show the Visitor Shopping List while on the Farming Islands or inside the Farm in the Hub.
+    + This helps to farm the correct amount, especially when in the early game.
 
 #### Rift Changes
 
@@ -88,6 +109,7 @@
     + Hypixel removed them from sacks.
 + Show a warning in Bestiary Display when Overall Progress is not enabled. - HiZe
 + Added option to hide pet candy count on maxed out pets. - CalMWolfs
++ Added option to change the size of the Pet Item Display Icon in inventories. - Thunderblade73
 
 #### Dungeon Changes
 
@@ -111,6 +133,7 @@
 
 + Tia Relay Helper: Suggest /togglemusic. - alexia
 + Added option to ignore Everything Chroma in the chat. - VixidDev
++ Added Item Ability Cooldown support for Talbot's Theodolite (the Farming Island Trapper tracker thing). - Erymanthus
 
 ### Fixes
 
@@ -126,6 +149,7 @@
 + Fixed error message that nearest pests cannot get removed properly. - hannibal2
 + Fixed grammar in Jacob Contest chat messages. - alexia
 + Fixed rarity error for items thrown around when using Sprayanator. - hannibal2
++ Added cooldown to Garden Warp Commands. - Empa
 
 #### Combat Fixes
 
@@ -135,6 +159,16 @@
 + Hide No Fishing Bait warning during Kuudra fight. - hannibal2
 + Fixed Dungeon and Kuudra party finder join message not detecting in party member tab complete. - CalMWolfs
 + Fixed Fire Veil Wand circle shows on left-clicking. - hannibal2
++ Fixed Ashfang Freeze Cooldown being off by one second. Fixed Fire Veil line gets shown even while frozen. - hannibal2
++ Fixed all Damage Indicator boss timers in Dungeons being off by a second. - hannibal2
++ Gave Damage Indicator mobs correct names on floor 1, 2, 3 and 6. (Removed "Generic Dungeon Boss") - hannibal2
++ Fixed the M3 reinforced guardian not getting detected in the Damage Indicator. - hannibal2
+
+#### Diana Fixes
+
++ Fixed close griffin burrow detection with particles failing sometimes. - hannibal2
++ Fixed Diana mobs being invisible because of Fix Ghost Entities and four season pet skin. - hannibal2
++ Fixed a rare bug that leaves ghost burrows around. - hannibal2
 
 #### Mining Fixes
 
@@ -142,6 +176,7 @@
 + Fixed powder tracker detecting gemstone chat messages. - CalMWolfs
 + Fixed Mining Chat Filter not hiding gemstone messages. - CalMWolfs
 + Fixed names for the Crystal Hollows Mining Areas feature. - alexia
++ Fixed detection of gold and diamond essence gain chat message when powder mining. - CalMWolfs
 
 #### Rift Fixes
 
@@ -224,6 +259,12 @@
 + Per default only active/relevant data is shown.
 + Added visitor status to /shdebug - hannibal2
 + Added hotswap detection and reloading all listeners on hotswap. - nea
++ Categorized every item using the rarity lore line. - Thunderblade73
++ Used better way of getting the item rarity. - Thunderblade73
++ Added function SlotClickEvent.makeShiftClick(). - Thunderblade73
++ Used a better bug fix for DelayedRun sync issues. - Thunderblade73
++ Creating and using TimeLimitedCache and TimeLimitedSet instead of guava cache. - hannibal2
++ Bring back the deleted item modifier test and fix the issue causing it. - CalMWolfs
 
 ## Version 0.22
 

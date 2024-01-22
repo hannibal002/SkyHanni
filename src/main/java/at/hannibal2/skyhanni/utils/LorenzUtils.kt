@@ -42,6 +42,7 @@ import java.util.Queue
 import java.util.Timer
 import java.util.TimerTask
 import java.util.WeakHashMap
+import java.util.concurrent.ConcurrentLinkedQueue
 import java.util.regex.Matcher
 import kotlin.properties.ReadWriteProperty
 import kotlin.reflect.KMutableProperty1
@@ -725,8 +726,16 @@ object LorenzUtils {
         return runCatching { this.group(groupName) }.getOrNull()
     }
 
+    fun <E> ConcurrentLinkedQueue<E>.drainTo(list: MutableCollection<E>) {
+        while (true)
+            list.add(this.poll() ?: break)
+    }
+    
     // Let garbage collector handle the removal of entries in this list
     fun <T> weakReferenceList(): MutableSet<T> = Collections.newSetFromMap(WeakHashMap<T, Boolean>())
 
     fun <T> MutableCollection<T>.filterToMutable(predicate: (T) -> Boolean) = filterTo(mutableListOf(), predicate)
+
+    val Long.ticks get() = (this * 50).milliseconds
+    val Int.ticks get() = (this * 50).milliseconds
 }
