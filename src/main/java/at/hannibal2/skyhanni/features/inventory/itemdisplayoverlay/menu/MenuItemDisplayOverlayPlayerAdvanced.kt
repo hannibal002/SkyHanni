@@ -12,6 +12,7 @@ import at.hannibal2.skyhanni.utils.ItemUtils.name
 import at.hannibal2.skyhanni.utils.NumberUtil
 import at.hannibal2.skyhanni.utils.NumberUtil.formatNumber
 import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
+import at.hannibal2.skyhanni.utils.StringUtils.matches
 import net.minecraft.init.Blocks
 import net.minecraft.item.Item
 import net.minecraft.item.ItemStack
@@ -19,11 +20,7 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
 class MenuItemDisplayOverlayPlayerAdvanced : AbstractMenuStackSize() {
     private val playerAdvancedSubgroup = itemStackSizeGroup.group("player.advanced")
-    
-    private val dojoGradePattern by playerAdvancedSubgroup.pattern(
-        "dojo.grade.loreline",
-         ".*(§[76])Your Rank: (§.)(?<grade>[A-Z]).*"
-    )
+
     private val statBreakdownPattern by playerAdvancedSubgroup.pattern(
         "stat.breakdown.itemname",
         "§(?<color>[0-9a-f])(?<icon>.) (?<name>.*) §f(?<useless>.+)"
@@ -126,11 +123,7 @@ class MenuItemDisplayOverlayPlayerAdvanced : AbstractMenuStackSize() {
     )
     private val playingOnPattern by playerAdvancedSubgroup.pattern(
         "playingon.loreline",
-        ".*(§.)*Playing on: (§.)*(?<cuteName>[\\w]+).*"
-    )
-    private val dojoRankTestOfBlankPattern by playerAdvancedSubgroup.pattern(
-        "dojo.ranktestofblank.itemname",
-        "(Rank|Test of .*)"
+        ".*(§.)*Playing on: (§.)*(?<cuteName>\\w+).*"
     )
     private val isBankMenuChestPattern by playerAdvancedSubgroup.pattern(
         "isbankmenu.chestname",
@@ -243,6 +236,26 @@ class MenuItemDisplayOverlayPlayerAdvanced : AbstractMenuStackSize() {
     private val bankAccountTierPattern by playerAdvancedSubgroup.pattern(
         "bank.account.tier.loreline",
         "(§.)*Current account: (?<colorCode>§.)*(?<tier>(?<tierFirstLetter>[\\w])[\\w]+)"
+    )
+    private val contributionsPattern by playerAdvancedSubgroup.pattern(
+        "project.contributions.variantone.loreline",
+        "(?:§.)*You contributed to (?:§.)*(?<contribs>[\\d,.]+)(?: (?:§.)*of(?: (§.)*those(?:(§.)* projects.)?)?)?"
+    )
+    private val contributionsOtherPattern by playerAdvancedSubgroup.pattern(
+        "project.contributions.varianttwo.loreline",
+        "(?:§.)*You made (?:§.)*(?<contribs>[\\d,.]+)(?: (?:§.)*contributions(?: (?:§.)*to(?: (§.)*this(?:(§.)* project.)?)?)?)?"
+    )
+    private val contributionsOtherOtherPattern by playerAdvancedSubgroup.pattern(
+        "project.contributions.variantthree.loreline",
+        "(?:§.)*You made: (?:§.)*(?<contribs>[\\d,.]+)(?: contributions)?"
+    )
+    private val previousProjectsChestPattern by playerAdvancedSubgroup.pattern(
+        "project.previous.chestname",
+        "Previous(?: \\S+)? Projects"
+    )
+    private val cityProjectItemPattern by playerAdvancedSubgroup.pattern(
+        "project.contributions.city.project.itemname",
+        "City [pP]roject: [\\S ]+"
     )
 
     /*
@@ -423,10 +436,29 @@ class MenuItemDisplayOverlayPlayerAdvanced : AbstractMenuStackSize() {
             }
         }
 
-        if (stackSizeConfig.contains(StackSizeMenuConfig.PlayerAdvanced.DOJO_PROGRESS) && (chestName == ("Challenges"))) {
-            dojoRankTestOfBlankPattern.matchMatcher(itemName) {
-                for (line in item.getLore()) {
-                    dojoGradePattern.matchMatcher(line) { return group("grade") }
+        if (stackSizeConfig.contains(StackSizeMenuConfig.PlayerAdvanced.PROJECTS)) {
+            val lore = item.getLore()
+            if (chestName == "Community Shop") {
+                if (itemName == "Previous Projects") {
+                    for (line in lore) {
+                        contributionsPattern.matchMatcher(line) {
+                            return NumberUtil.format(group("contribs").formatNumber())
+                        }
+                    }
+                }
+                if (lore.first() == "§8City Project") {
+                    for (line in lore) {
+                        contributionsOtherOtherPattern.matchMatcher(line) {
+                            return NumberUtil.format(group("contribs").formatNumber())
+                        }
+                    }
+                }
+            }
+            if (previousProjectsChestPattern.matches(chestName) && cityProjectItemPattern.matches(itemName)) {
+                for (line in lore) {
+                    contributionsOtherPattern.matchMatcher(line) {
+                        return NumberUtil.format(group("contribs").formatNumber())
+                    }
                 }
             }
         }

@@ -20,7 +20,7 @@ public class StackSizeMenuConfig {
     public List<PlayerAdvanced> playerAdvanced = new ArrayList<>(Arrays.asList(
         PlayerAdvanced.UNLOCKED_RECIPES,
         PlayerAdvanced.AUCTION_BAZAAR_VARIOUS,
-        PlayerAdvanced.DOJO_PROGRESS,
+        PlayerAdvanced.PROJECTS,
         PlayerAdvanced.BANK_UTILS,
         PlayerAdvanced.MAYOR_PERKS
     ));
@@ -33,7 +33,7 @@ public class StackSizeMenuConfig {
         ABBV_STATS("§bSkyblock Stat Names"),
         CUTE_NAME("§bSkyblock Profile Fruit Name"),
         AUCTION_BAZAAR_VARIOUS("§bAuction House + Bazaar Navigation Utils"),
-        DOJO_PROGRESS("§bDojo Progress"), // (Abbvs)
+        PROJECTS("§bProject Contributions"), //
         BANK_UTILS("§bBank Utilities"), // (Abbvs)
         MAYOR_PERKS("§bMayor Perk Count"), // §b(For Mayor Jerry specifically, it'll show which mayor's perks are active.)
         ;
