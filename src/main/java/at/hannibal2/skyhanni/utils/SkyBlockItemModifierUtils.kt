@@ -17,9 +17,6 @@ import java.util.Locale
 object SkyBlockItemModifierUtils {
     private val drillPartTypes = listOf("drill_part_upgrade_module", "drill_part_engine", "drill_part_fuel_tank")
 
-    // TODO USE SH-REPO
-    private val petLevelPattern = "§7\\[Lvl (?<level>.*)\\] .*".toPattern()
-
     fun ItemStack.getHotPotatoCount() = getAttributeInt("hot_potato_count")
 
     fun ItemStack.getFarmingForDummiesCount() = getAttributeInt("farming_for_dummies_count")
@@ -63,6 +60,7 @@ object SkyBlockItemModifierUtils {
         return data.petCandies
     }
 
+    // TODO use NeuInternalName here
     fun ItemStack.getPetItem(): String? {
         val data = cachedData
         if (data.heldItem == "") {
@@ -94,11 +92,13 @@ object SkyBlockItemModifierUtils {
     inline val ItemStack.cachedData get() = (this as ItemStackCachedData).skyhanni_cachedData
 
     fun ItemStack.getPetLevel(): Int {
-        petLevelPattern.matchMatcher(this.displayName) {
+        UtilsPatterns.petLevelPattern.matchMatcher(this.displayName) {
             return group("level").toInt()
         }
         return 0
     }
+
+    fun ItemStack.getMaxPetLevel() = if (this.getInternalName() == "GOLDEN_DRAGON;4".asInternalName()) 200 else 100
 
     fun ItemStack.getDrillUpgrades() = getExtraAttributes()?.let {
         val list = mutableListOf<NEUInternalName>()

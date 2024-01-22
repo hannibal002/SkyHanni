@@ -11,7 +11,6 @@ import org.junit.jupiter.api.Test
 
 class ItemModifierTest {
 
-
     @Test
     fun testUpgradeLevelMasterStars() {
         val itemStack = TestExportTools.getTestData(TestExportTools.Item, "10starnecronhead")

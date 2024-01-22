@@ -30,6 +30,9 @@ Use `/sh` or `/skyhanni` to open the SkyHanni config in game.
     + Optional if left or right side of name.
     + Should not break with other mods.
 + Hide the repeating fire sale reminder chat messages. - hannibal2
++ Add tab list fire sale advertisement hider. - nea
++ Added SkyBlock XP Chat. - Thunderblade73
+    + Sends the SkyBlock XP message from the action bar into the chat.
 
 #### Chat Filter
 
@@ -125,6 +128,10 @@ Use `/sh` or `/skyhanni` to open the SkyHanni config in game.
     + Shows a list of all items and their price when inside a chest on your private island.
 + In Melody's Harp, show buttons as stack size. - NetheriteMiner
     + Intended to be used with Harp Keybinds
++ Added Harp GUI Scale. - Thunderblade73
+    + Automatically sets the GUI scale to AUTO when entering the Harp.
++ Added Harp Quick Restart. - Thunderblade73
+    + Once you've launched the harp, quickly hit the close button in the harp menu to initiate the selected song.
 + **Quick Craft Confirmation**. - Cad
     + Require Ctrl+Click to craft items that aren't often quick crafted (e.g. armor, weapons, accessories).
     + Sack items can be crafted normally.
@@ -132,6 +139,13 @@ Use `/sh` or `/skyhanni` to open the SkyHanni config in game.
     + This removes the need to shift-click to swap the equipment items, without the annoying "pick up animation".
 + Added Copy Underbid Price. - hannibal2
     + Copies the price of an item in the "Create BIN Auction" minus 1 coin into the clipboard for faster under-bidding.
++ Added Power Stone Guide features. - hannibal2
+    + Highlight missing power stones, show their total bazaar price, and allows to open the bazaar when clicking on the
+      items in the Power Stone Guide.
++ Option to make normal clicks to shift clicks in equipment inventory. - Thunderblade73
++ Show pet items XP Share and Tier Boost as small icons next to the pet in an inventory. - Thunderblade73
++ Added Shift Click Brewing. - Thunderblade73
+    + Makes normal clicks to shift clicks in Brewing Stand inventory.
 
 </details>
 <details open><summary>
@@ -145,6 +159,7 @@ Use `/sh` or `/skyhanni` to open the SkyHanni config in game.
     + Supports dungeon mage cooldown reduction. - Cad
 + Hiding the flame particles when using the Fire Veil Wand ability.
 + Circle around the player when having the Fire Veil Wand ability active.
++ Lesser Orb of Healing Hider. - jani
 
 </details>
 <details open><summary>
@@ -551,6 +566,7 @@ Use `/sh` or `/skyhanni` to open the SkyHanni config in game.
     + If you don't want to share anything, you can disable the chat message in the config with /sh copy milestone data.
 + Garden Vacuum Pests in Pest bag to item number as stack size. - hannibal2
     + Enable via /sh vacuum.
++ Show sack item amount to the visitor shopping list. - CalMWolfs
 
 ### Garden Pests
 
@@ -715,11 +731,17 @@ Use `/sh` or `/skyhanni` to open the SkyHanni config in game.
 + **/shcropspeedmeter** - Helps calculate the real farming fortune with the formula crops broken per block.
 + **/shcroptime <amount> <item>** Displays the estimated time it will take to gather the requested quantity of a
   particular item based on the current crop speed.
++ **/shcropsin <time> <item>**. - DylanBruner
+    + Shows the number of items you gain when farming in the garden for the given time.
 + `/pt <player>` as alias for `/party transfer <player>`
     + SkyBlock Command `/tp` to check the play time still works
 + **/shfarmingprofile [player name]**
     + Opens the elitebot.dev website in your web browser to show your Farming Weight profile.
 + Tab Complete support to sacks command /gfs and /getfromsacks. - J10a1n15
++ Added /shcalccrop. - CalMWolfs
+    + Calculate how many crops need to be farmed between different crop milestones.
++ Added /shcalccroptime. - CalMWolfs
+    + Calculate how long you need to farm crops between different crop milestones.
 
 </details>
 <details open><summary>
@@ -756,6 +778,11 @@ Use `/sh` or `/skyhanni` to open the SkyHanni config in game.
       needed from the sacks.
 + Crimson Isle **Pablo NPC Helper**. - NetheriteMiner
     + Similar to Quest Item Helper, shows a clickable message that grabs the flower needed from sacks.
++ Dojo Rank Display. - HiZe
+    + Display your rank, score, actual belt and points needed for the next belt in the Challenges inventory on the
+      Crimson Isles.
++ Added Volcano Explosivity in Crimson Isle. - Erymanthus
+    + Show a HUD of the current volcano explosivity level.
 + Red Scoreboard Numbers - Hides the red numbers in the scoreboard sidebar on the right side of the screen.
 + **Tia Relay Waypoint** - Show the next Relay waypoint for Tia The Fairy, where maintenance for the abiphone network
   needs to be done.
@@ -908,6 +935,12 @@ Use `/sh` or `/skyhanni` to open the SkyHanni config in game.
 + Added AFK time to Discord RPC. - NetheriteMiner
 + Added the option to change Hypixel Wiki to the fandom Wiki in more areas than just the /wiki command. - Erymanthus
     + E.g. inside the SkyBlock leveling guide.
++ Fixes Ghost Entities. - hannibal2 & nea & Thunderblade73
+    + Removes ghost entities caused by a Hypixel bug. This included Diana, Dungeon and Crimson Isle mobs and nametags.
++ Party Kick with reason. - nea
+    + Added support for the Hypixel command /p kick /pk to add a reason. The reason will be sent in party chat before
+      kicking the player.
++ Color the month names on the scoreboard. - J10a1n15
 
 </details>
 <details open><summary>

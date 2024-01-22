@@ -6,10 +6,12 @@ import at.hannibal2.skyhanni.events.ItemClickEvent
 import at.hannibal2.skyhanni.events.LorenzActionBarEvent
 import at.hannibal2.skyhanni.events.LorenzChatEvent
 import at.hannibal2.skyhanni.events.LorenzTickEvent
+import at.hannibal2.skyhanni.events.LorenzWorldChangeEvent
 import at.hannibal2.skyhanni.events.PlaySoundEvent
 import at.hannibal2.skyhanni.events.RenderItemTipEvent
 import at.hannibal2.skyhanni.events.RenderObject
 import at.hannibal2.skyhanni.features.itemabilities.abilitycooldown.ItemAbility.Companion.getMultiplier
+import at.hannibal2.skyhanni.features.nether.ashfang.AshfangFreezeCooldown
 import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.ItemUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.cleanName
@@ -159,6 +161,7 @@ class ItemAbilityCooldown {
 
     @SubscribeEvent
     fun onItemClick(event: ItemClickEvent) {
+        if (AshfangFreezeCooldown.iscurrentlyFrozen()) return
         handleItemClick(event.itemInHand)
     }
 
@@ -166,6 +169,14 @@ class ItemAbilityCooldown {
         if (!LorenzUtils.inSkyBlock) return
         itemInHand?.getInternalName()?.run {
             ItemAbility.getByInternalName(this)?.setItemClick()
+        }
+    }
+
+    @SubscribeEvent
+    fun onIslandChange(event: LorenzWorldChangeEvent) {
+        for (ability in ItemAbility.entries) {
+            ability.lastActivation = 0L
+            ability.specialColor = null
         }
     }
 
@@ -196,6 +207,7 @@ class ItemAbilityCooldown {
     }
 
     private fun handleOldAbilities(message: String) {
+        // TODO use regex
         if (message.contains(" (§6") && message.contains("§b) ")) {
             val name: String = message.between(" (§6", "§b) ")
             if (name == lastAbility) return
