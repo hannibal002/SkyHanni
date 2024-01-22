@@ -45,8 +45,8 @@ class SulphurSkitterBox {
             val to = location.add(20, 20, 20).toBlockPos()
 
             spongeBlocks = BlockPos.getAllInBox(from, to).filter {
-                val b = it.toLorenzVec().getBlockAt()
-                b == Blocks.sponge && it.toLorenzVec().distanceToPlayer() <= 15
+                val loc = it.toLorenzVec()
+                loc.getBlockAt() == Blocks.sponge && loc.distanceToPlayer() <= 15
             }.filter {
                 val pos1 = it.add(-radius, -radius, -radius)
                 val pos2 = it.add(radius, radius, radius)
