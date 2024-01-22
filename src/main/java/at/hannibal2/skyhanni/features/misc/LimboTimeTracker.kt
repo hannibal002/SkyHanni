@@ -23,6 +23,7 @@ import at.hannibal2.skyhanni.utils.TimeUtils.format
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import io.github.moulberry.notenoughupdates.events.ReplaceItemEvent
 import io.github.moulberry.notenoughupdates.util.Utils
+import net.minecraft.client.Minecraft
 import net.minecraft.client.player.inventory.ContainerLocalMenu
 import net.minecraft.util.AxisAlignedBB
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
@@ -40,6 +41,8 @@ class LimboTimeTracker {
     private var oldPB: Duration = 0.seconds
     private var userLuck: Double = 0.0
     private val userLuckMultiplier = 0.000810185
+    private val fireMultiplier = 1.01
+    private var onFire = false
 
     private lateinit var modifiedArray: MutableList<String>
     private var setMinutes = false
@@ -57,6 +60,7 @@ class LimboTimeTracker {
             limboJoinTime = SimpleTimeMark.now()
             inLimbo = true
             LimboCommands.enterLimbo(limboJoinTime)
+            onFire = Minecraft.getMinecraft().thePlayer.isBurning
         }
     }
 
@@ -195,12 +199,10 @@ class LimboTimeTracker {
     fun onRenderOverlay(event: GuiRenderEvent.GuiOverlayRenderEvent) {
         if (!isEnabled()) return
         if (!inLimbo) return
-
         if (LorenzUtils.inSkyBlock) {
             leaveLimbo()
             return
         }
-
         val duration = limboJoinTime.passedSince().format()
         config.showTimeInLimboPosition.renderString("§eIn limbo since §b$duration", posLabel = "Limbo Time Tracker")
     }
@@ -215,17 +217,17 @@ class LimboTimeTracker {
             oldPB = currentPB
             config.limboTimePB = passedSince.toInt(DurationUnit.SECONDS)
             userLuck = config.limboTimePB * userLuckMultiplier
-            if (passedSince.toInt(DurationUnit.SECONDS) == config.limboTimePB) { //need to come up with a good message for this
-                LorenzUtils.chat("§fYou were in Limbo for §e$duration§f! §d§lPERSONAL BEST§r§f!")
-                LorenzUtils.chat("§fYour previous Personal Best was §e$oldPB.")
+            LorenzUtils.chat("§fYou were in Limbo for §e$duration§f! §d§lPERSONAL BEST§r§f!")
+            LorenzUtils.chat("§fYour previous Personal Best was §e$oldPB.")
+            if (onFire) { //change the message slightly to indicate this
+                userLuck *= fireMultiplier
                 LorenzUtils.chat("§fYour §aPersonal Bests§f perk is now granting you §a+${userLuck.round(2)}✴ SkyHanni User Luck§f!")
             } else {
-                LorenzUtils.chat("§fYou were in Limbo for §e$duration§f! §d§lPERSONAL BEST§r§f!")
-                LorenzUtils.chat("§fYour previous Personal Best was §e$oldPB.")
                 LorenzUtils.chat("§fYour §aPersonal Bests§f perk is now granting you §a+${userLuck.round(2)}✴ SkyHanni User Luck§f!")
             }
         } else LorenzUtils.chat("§fYou were in Limbo for §e$duration§f.")
         config.limboPlaytime += passedSince.toInt(DurationUnit.SECONDS)
+        onFire = false
         shownPB = false
     }
 
