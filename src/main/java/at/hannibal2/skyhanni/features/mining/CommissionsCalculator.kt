@@ -18,7 +18,6 @@ import at.hannibal2.skyhanni.utils.StringUtils
 import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
-import net.minecraft.client.Minecraft
 import net.minecraft.item.ItemStack
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import kotlin.math.abs
@@ -86,7 +85,6 @@ class CommissionsCalculator {
         FOUR(4, 60000, 400.0),
         FIVE(5, 100000, 400.0),
         SIX(6, 150000, 400.0),
-        SEVEN(7, 200000, 400.0),
         ;
     }
 
@@ -152,6 +150,7 @@ class CommissionsCalculator {
 
     private fun hotmStatus(items: Map<Int, ItemStack>, listBeingModified: MutableList<Renderable>, colorCode: String) {
         listBeingModified.add(Renderable.string(" §e(Remember to scroll up the HOTM tree!)"))
+        LorenzUtils.chat("BRYCE TANKTHRUST")
         loop@for ((_, item) in items) {
             val itemName = item.name ?: ""
             maxTierItemPattern.matchMatcher(itemName) {
@@ -196,7 +195,7 @@ class CommissionsCalculator {
         val commsToNextMilestone = abs(required - completed)
         val singularOrPlural = StringUtils.optionalPlural(commsToNextMilestone, "commission", "commissions")
         val hotmXPGain = (commsToNextMilestone * perComm).roundToInt().addSeparators()
-        if (completed < required || Minecraft.getMinecraft().thePlayer.name == "Erymanthus") listBeingModified.add(Renderable.string(" §7- $colorCode$singularOrPlural §fleft to complete §6Milestone $milestone §f($colorCode+$hotmXPGain HOTM XP§f)"))
+        if (completed < required) newList.add(Renderable.string(" §7- $colorCode$singularOrPlural §fleft to complete §6Milestone $milestone §f($colorCode+$hotmXPGain HOTM XP§f)"))
         if (!config.allMilestones) {
             val lastElement = listBeingModified.takeLast(1).first()
             listBeingModified.clear()
