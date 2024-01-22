@@ -9,7 +9,7 @@ object CopyBossbarCommand {
     fun command(args: Array<String>) {
         val noFormattingCodes = args.size == 1 && args[0] == "true"
         val (bossbarName, status) = if (noFormattingCodes) Pair(BossStatus.bossName.removeColor(), "without") else Pair(BossStatus.bossName, "with")
-        if (bossbarName.isNullOrBlank() || bossbarName.isNullOrEmpty()) {
+        if (bossbarName.isBlank() || bossbarName.isEmpty()) {
             LorenzUtils.chat("Boss bar name failed to copy to clipboard. It appears to be blank/empty.")
         } else {
             OSUtils.copyToClipboard(bossbarName)
