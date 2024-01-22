@@ -210,7 +210,12 @@ class CommissionsCalculator {
         val commsToNextMilestone = required - completed
         val singularOrPlural = StringUtils.optionalPlural(commsToNextMilestone, "commission", "commissions")
         val hotmXPGain = (commsToNextMilestone * perComm).roundToInt().addSeparators()
-        if (commsToNextMilestone > 0 && (completed < required || config.allMilestones)) listBeingModified.add(Renderable.string(" §7- $colorCode$singularOrPlural §fleft to complete §6Milestone $milestone §f($colorCode+$hotmXPGain HOTM XP§f)"))
+        if (commsToNextMilestone > 0) listBeingModified.add(Renderable.string(" §7- $colorCode$singularOrPlural §fleft to complete §6Milestone $milestone §f($colorCode+$hotmXPGain HOTM XP§f)"))
+        if (!config.allMilestones) {
+            val lastElement = listBeingModified.takeLast(1).first()
+            listBeingModified.clear()
+            listBeingModified.addAll(listOf(Renderable.string("$colorCode$firstLine"), lastElement))
+        }
     }
 
     private fun drawDisplay(list: List<Renderable>) {
