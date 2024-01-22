@@ -31,7 +31,7 @@ Use `/sh` or `/skyhanni` to open the SkyHanni config in game.
     + Should not break with other mods.
 + Hide the repeating fire sale reminder chat messages. - hannibal2
 + Add tab list fire sale advertisement hider. - nea
-+ Added SkyBlock XP Chat. - Thunderblade73
++ SkyBlock XP Chat. - Thunderblade73
     + Sends the SkyBlock XP message from the action bar into the chat.
 
 #### Chat Filter
@@ -128,23 +128,23 @@ Use `/sh` or `/skyhanni` to open the SkyHanni config in game.
     + Shows a list of all items and their price when inside a chest on your private island.
 + In Melody's Harp, show buttons as stack size. - NetheriteMiner
     + Intended to be used with Harp Keybinds
-+ Added Harp GUI Scale. - Thunderblade73
++ Harp GUI Scale. - Thunderblade73
     + Automatically sets the GUI scale to AUTO when entering the Harp.
-+ Added Harp Quick Restart. - Thunderblade73
++ Harp Quick Restart. - Thunderblade73
     + Once you've launched the harp, quickly hit the close button in the harp menu to initiate the selected song.
 + **Quick Craft Confirmation**. - Cad
     + Require Ctrl+Click to craft items that aren't often quick crafted (e.g. armor, weapons, accessories).
     + Sack items can be crafted normally.
 + **Shift Click Equipment**. - Thunderblade73
     + This removes the need to shift-click to swap the equipment items, without the annoying "pick up animation".
-+ Added Copy Underbid Price. - hannibal2
++ Copy Underbid Price. - hannibal2
     + Copies the price of an item in the "Create BIN Auction" minus 1 coin into the clipboard for faster under-bidding.
-+ Added Power Stone Guide features. - hannibal2
++ Power Stone Guide features. - hannibal2
     + Highlight missing power stones, show their total bazaar price, and allows to open the bazaar when clicking on the
       items in the Power Stone Guide.
 + Option to make normal clicks to shift clicks in equipment inventory. - Thunderblade73
 + Show pet items XP Share and Tier Boost as small icons next to the pet in an inventory. - Thunderblade73
-+ Added Shift Click Brewing. - Thunderblade73
++ Shift Click Brewing. - Thunderblade73
     + Makes normal clicks to shift clicks in Brewing Stand inventory.
 
 </details>
@@ -265,7 +265,7 @@ Use `/sh` or `/skyhanni` to open the SkyHanni config in game.
 + **Fishing Bait Warnings.** - cimbraien
     + Option to warn when no bait is used.
     + Option to warn when used bait is changed.
-+ Added Sea Creature Tracker. - hannibal2
++ Sea Creature Tracker. - hannibal2
     + Allows to only show single variants, e.g. water or lava or winter.
 
 </details>
@@ -402,7 +402,7 @@ Use `/sh` or `/skyhanni` to open the SkyHanni config in game.
 + Bingo Goal Rank as stack size in Bingo Card. - Erymanthus
 + Option to only show tier 1 Minion Crafts in the Helper display when their items needed are fully collected. -
   hannibal2
-+ Added the option to click in the bingo card viewer on goals to mark them as highlighted. - hannibal2
++ Option to click in the bingo card viewer on goals to mark them as highlighted. - hannibal2
     + If at least one goal is highlighted, non-highlighted goals will be hidden.
 + Send a chat message with the change of community goal percentages after opening the bingo card inventory. - hannibal2
 
@@ -554,7 +554,7 @@ Use `/sh` or `/skyhanni` to open the SkyHanni config in game.
 + **Visual garden plot borders** - VixidDev
     + Press F3 + G to enable/disable the view.
 + /shmouselock command to lock mouse rotation for farming. - Cad
-+ Added Highlight Visitors in SkyBlock. - nea
++ Highlight Visitors in SkyBlock. - nea
     + Highlights Visitors outside the Garden.
 + Block Interacting with Visitors. - nea
     + Blocks you from interacting with / unlocking Visitors to allow for Dedication Cycling.
@@ -570,9 +570,9 @@ Use `/sh` or `/skyhanni` to open the SkyHanni config in game.
 
 ### Garden Pests
 
-+ Added Garden Vacuum Pests in Pest bag to item number as stack size. - hannibal2
++ Garden Vacuum Pests in Pest bag to item number as stack size. - hannibal2
     + Enable via /sh vacuum.
-+ Added Pests to Damage Indicator. - hannibal2
++ Pests in Damage Indicator. - hannibal2
     + Enable Damage Indicator and select Garden Pests.
 + Change how the pest spawn chat message should be formatted. - hannibal2
     + Unchanged, compact or hide the message entirely.
@@ -580,7 +580,7 @@ Use `/sh` or `/skyhanni` to open the SkyHanni config in game.
 + Show the time since the last pest spawned in your garden. - hannibal2
     + Option to only show the time while holding vacuum in the hand.
 + Show the pests that are attracted when changing the selected material of the Sprayanator. - hannibal2
-+ Added Garden only commands /home, /barn and /tp, and hotkeys. - hannibal2
++ Garden only commands /home, /barn and /tp, and hotkeys. - hannibal2
 + Showing a better plot name in the scoreboard. Updates faster and doesn't hide when pests are spawned. - hannibal2
 + Show a display with all known pest locations. - hannibal2
     + Click to warp to the plot.
@@ -588,9 +588,12 @@ Use `/sh` or `/skyhanni` to open the SkyHanni config in game.
 + Mark the plots with pests on them in the world. - hannibal2
 + Press the key to warp to the nearest plot with pests on it. - hannibal2
 + Draw plot borders when holding the Sprayonator. - HiZe
-+ Added Spray Display and Spray Expiration Notice. - appable
++ Spray Display and Spray Expiration Notice. - appable
     + Show the active spray and duration for your current plot.
     + Show a notification in chat when a spray runs out in any plot. Only active in the Garden.
++ Atmospheric Filter Display. - Erymanthus
+    + This display shows the currently active buff as a GUI element.
+    + For an optimal experience, please have the Atmospheric Filter accessory active.
 
 </details>
 <details open><summary>
@@ -700,7 +703,7 @@ Use `/sh` or `/skyhanni` to open the SkyHanni config in game.
 + Help with the 2023 Halloween visitor challenge (ephemeral dingsibumsi or something) - nea
     + New Visitor Ping: Pings you when you are less than 10 seconds away from getting a new visitor.
     + Accept Hotkey: Accept a visitor when you press this keybind while in the visitor GUI.
-+ Added support for showing the primal fear data from tab list as GUI elements. - Erymanthus
++ Support for showing the primal fear data from tab list as GUI elements. - Erymanthus
 + Play warning sound when the next Primal Fear can spawn. - thunderblade73
 + Unique Gifting Opportunities. - nea
     + Highlight players who you haven't given gifts to yet.
@@ -738,9 +741,9 @@ Use `/sh` or `/skyhanni` to open the SkyHanni config in game.
 + **/shfarmingprofile [player name]**
     + Opens the elitebot.dev website in your web browser to show your Farming Weight profile.
 + Tab Complete support to sacks command /gfs and /getfromsacks. - J10a1n15
-+ Added /shcalccrop. - CalMWolfs
++ /shcalccrop. - CalMWolfs
     + Calculate how many crops need to be farmed between different crop milestones.
-+ Added /shcalccroptime. - CalMWolfs
++ /shcalccroptime. - CalMWolfs
     + Calculate how long you need to farm crops between different crop milestones.
 
 </details>
@@ -781,8 +784,13 @@ Use `/sh` or `/skyhanni` to open the SkyHanni config in game.
 + Dojo Rank Display. - HiZe
     + Display your rank, score, actual belt and points needed for the next belt in the Challenges inventory on the
       Crimson Isles.
-+ Added Volcano Explosivity in Crimson Isle. - Erymanthus
++ Volcano Explosivity in Crimson Isle. - Erymanthus
     + Show a HUD of the current volcano explosivity level.
++ Sulphur Skitter Box in Crimson Isle. - HiZe
+    + Renders a box around the closest sulphur block.
++ Dojo Rank Display. - HiZe
+    + Display your rank, score, actual belt and points needed for the next belt in the Challenges inventory on the
+      Crimson Isles.
 + Red Scoreboard Numbers - Hides the red numbers in the scoreboard sidebar on the right side of the screen.
 + **Tia Relay Waypoint** - Show the next Relay waypoint for Tia The Fairy, where maintenance for the abiphone network
   needs to be done.
@@ -911,34 +919,34 @@ Use `/sh` or `/skyhanni` to open the SkyHanni config in game.
     + Marking party members with a bright outline to better find them in the world.
 + Porting SBA's **chroma** into SkyHanni with many more options and chroma everything. - VixidDev
     + Options to change speed, size, saturation and direction.
-+ Added Modify Visual Words (command /shwords). - CalMWolfs
++ Modify Visual Words (command /shwords). - CalMWolfs
     + Allows you to replace text on your screen with different text (like the SBE one, just less costly).
     + Supports all color codes, even chroma (use &&Z)
-+ Added In-Game Date display. - Erymanthus
++ In-Game Date display. - Erymanthus
     + Show the in-game date of SkyBlock (like in Apec, but with mild delays).
     + Includes the SkyBlock year.
-+ Added **Dungeon party finder** QOL improvements - Cad
++ **Dungeon party finder** QOL improvements - Cad
     + Floor stack size.
     + Mark Paid Carries red.
     + Mark Low-Class levels orange.
     + Mark groups you can't join dark red.
     + Mark groups without your current classes green.
-+ Added shortcuts for **Party commands** and smart **tab complete**. - CalMWolfs
++ Shortcuts for **Party commands** and smart **tab complete**. - CalMWolfs
     + /pw -> party warp
     + /pk -> party kick
     + /pt -> party transfer
     + /pp -> party promote
     + /pko -> party kickoffline
-+ Added working **Livid Finder** (should work 100% of the time). - hannibal2
++ Working **Livid Finder** (should work 100% of the time). - hannibal2
     + Option to hide other/wrong/fake Livids (try this out and see if you really want this, it can be counter-productive
       in some cases).
-+ Added AFK time to Discord RPC. - NetheriteMiner
-+ Added the option to change Hypixel Wiki to the fandom Wiki in more areas than just the /wiki command. - Erymanthus
++ AFK time to Discord RPC. - NetheriteMiner
++ Option to change Hypixel Wiki to the fandom Wiki in more areas than just the /wiki command. - Erymanthus
     + E.g. inside the SkyBlock leveling guide.
 + Fixes Ghost Entities. - hannibal2 & nea & Thunderblade73
     + Removes ghost entities caused by a Hypixel bug. This included Diana, Dungeon and Crimson Isle mobs and nametags.
 + Party Kick with reason. - nea
-    + Added support for the Hypixel command /p kick /pk to add a reason. The reason will be sent in party chat before
+    + Support for the Hypixel command /p kick /pk to add a reason. The reason will be sent in party chat before
       kicking the player.
 + Color the month names on the scoreboard. - J10a1n15
 
