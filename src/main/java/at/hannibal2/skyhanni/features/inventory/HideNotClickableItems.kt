@@ -301,7 +301,7 @@ class HideNotClickableItems {
         }
 
         reverseColor = true
-        if (stack.cleanName().endsWith(" Potion")) return false
+        if (stack.cleanName().endsWith(" Potion") || stack.cleanName() == "Water Bottle") return false
 
         hideReason = "This item is not a potion!"
         return true
