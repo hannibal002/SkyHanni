@@ -12,6 +12,7 @@ import at.hannibal2.skyhanni.mixins.transformers.AccessorGuiEditSign
 import at.hannibal2.skyhanni.test.TestBingo
 import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.NEUItems.getItemStackOrNull
+import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.StringUtils.capAtMinecraftLength
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.StringUtils.toDashlessUUID
@@ -35,7 +36,6 @@ import java.lang.reflect.Constructor
 import java.lang.reflect.Field
 import java.lang.reflect.Modifier
 import java.text.DecimalFormat
-import java.text.NumberFormat
 import java.text.SimpleDateFormat
 import java.util.Collections
 import java.util.LinkedList
@@ -228,14 +228,15 @@ object LorenzUtils {
     fun formatPercentage(percentage: Double, format: String?): String =
         DecimalFormat(format).format(percentage * 100).replace(',', '.') + "%"
 
-    fun formatInteger(i: Int): String = formatInteger(i.toLong())
+    @Deprecated("old code", ReplaceWith("addSeparator()"))
+    fun formatInteger(i: Int): String = i.addSeparators()
 
-    fun formatInteger(l: Long): String = NumberFormat.getIntegerInstance().format(l)
+    @Deprecated("old code", ReplaceWith("addSeparator()"))
+    fun formatInteger(l: Long): String = l.addSeparators()
 
+    @Deprecated("old code", ReplaceWith("round() and addSeparator()"))
     fun formatDouble(d: Double, round: Int = 1): String {
-        val numberInstance = NumberFormat.getNumberInstance()
-        numberInstance.maximumFractionDigits = round
-        return numberInstance.format(d.round(round))
+        return d.round(round).addSeparators()
     }
 
     fun consoleLog(text: String) {
@@ -713,7 +714,7 @@ object LorenzUtils {
         while (true)
             list.add(this.poll() ?: break)
     }
-    
+
     // Let garbage collector handle the removal of entries in this list
     fun <T> weakReferenceList(): MutableSet<T> = Collections.newSetFromMap(WeakHashMap<T, Boolean>())
 
