@@ -48,8 +48,10 @@ object SensReducer {
 
 
     private fun reloadSensitivity() {
-        restoreSensitivity()
-        lowerSensitivity()
+        if (isToggled) {
+            restoreSensitivity()
+            lowerSensitivity()
+        }
     }
 
     @SubscribeEvent
