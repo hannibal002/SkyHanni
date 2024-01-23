@@ -50,7 +50,7 @@ object SensReducer {
 
 
     private fun reloadSensitivity() {
-        if (isToggled) {
+        if (isToggled || isManualToggle) {
             restoreSensitivity()
             lowerSensitivity()
         }
