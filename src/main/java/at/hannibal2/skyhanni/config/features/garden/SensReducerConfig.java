@@ -18,7 +18,7 @@ public class SensReducerConfig {
     @Expose
     @ConfigOption(name = "Reducing factor", desc = "Changes by how much the sensitivity is lowered by.")
     @ConfigEditorSlider(minValue = 1, maxValue = 100, minStep = 1)
-    public Property<Integer> divisorSens = Property.of(25);
+    public Property<Float> divisorSens = Property.of(25.0F);
 
     @Expose
     @ConfigOption(
