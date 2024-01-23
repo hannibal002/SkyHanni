@@ -92,7 +92,7 @@ object SensReducer {
 
     private fun lowerSensitivity(showMessage: Boolean = false) {
         storage.savedMouseloweredSensitivity = gameSettings.mouseSensitivity
-        val divisor = config.divisorSens.get().toInt()
+        val divisor = config.divisorSens.get()
         LorenzUtils.debug("dividing by $divisor")
         val newSens =
             ((storage.savedMouseloweredSensitivity + (1F / 3F)) / divisor) - (1F / 3F)
