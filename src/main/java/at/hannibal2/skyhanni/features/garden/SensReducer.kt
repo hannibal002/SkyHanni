@@ -8,24 +8,29 @@ import at.hannibal2.skyhanni.events.LorenzWorldChangeEvent
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils.afterChange
 import at.hannibal2.skyhanni.utils.RenderUtils.renderString
+import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPatternManager
 import net.minecraft.client.Minecraft
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
+import scala.sys.process.ProcessBuilderImpl.Simple
+import kotlin.time.Duration.Companion.seconds
 
 object SensReducer {
     private val config get() = SkyHanniMod.feature.garden.sensReducerConfig
     private val storage get() = SkyHanniMod.feature.storage
     private var isToggled = false
     private var isManualToggle = false
+    private var lastCheckCooldown = SimpleTimeMark.farPast()
     private val gameSettings get() = Minecraft.getMinecraft().gameSettings
 
     @SubscribeEvent
     fun onTick(event: LorenzTickEvent) {
         if (!GardenAPI.inGarden()) {
-//             if (isToggled) {          //TODO look into a fix for onWorldChange
-//                 isToggled = false     //this is a temp unideal fix
-//                 restoreSensitivity()
-//             }
+            if (isToggled && lastCheckCooldown.passedSince() > 1.seconds) {
+                lastCheckCooldown = SimpleTimeMark.now()
+                isToggled = false
+                restoreSensitivity()
+            }
             return
         }
         if (isManualToggle) return
@@ -61,13 +66,6 @@ object SensReducer {
         config.loweredSensPosition.renderString("§eSensitivity Lowered", posLabel = "Sensitivity Lowered")
     }
 
-    @SubscribeEvent
-    fun onWorldChange(event: LorenzWorldChangeEvent) {
-        if (isManualToggle) return
-        if (!isToggled) return
-        isToggled = false
-        restoreSensitivity()
-    }
 
     private fun toggleSens() {
         if (!isToggled) {
