@@ -25,7 +25,6 @@ import at.hannibal2.skyhanni.utils.tracker.SkyHanniTracker
 import at.hannibal2.skyhanni.utils.tracker.TrackerData
 import com.google.gson.annotations.Expose
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
-import kotlin.time.Duration.Companion.minutes
 import kotlin.time.Duration.Companion.seconds
 
 object SeaCreatureTracker {
@@ -157,6 +156,7 @@ object SeaCreatureTracker {
     @SubscribeEvent
     fun onRenderOverlay(event: GuiRenderEvent) {
         if (!isEnabled()) return
+        if (!FishingAPI.isFishing()) return
 
         tracker.renderDisplay(config.position)
     }
@@ -165,8 +165,7 @@ object SeaCreatureTracker {
         tracker.resetCommand(args, "shresetseacreaturetracker")
     }
 
-    private fun isEnabled() = LorenzUtils.inSkyBlock &&
-        FishingAPI.lastActiveFishingTime.passedSince() < 10.minutes && config.enabled && !isTrophyFishing
+    private fun isEnabled() = LorenzUtils.inSkyBlock && config.enabled && !isTrophyFishing
 
     private fun isWearingTrophyArmor(): Boolean {
         val armorInternalNames = InventoryUtils.getArmor()
