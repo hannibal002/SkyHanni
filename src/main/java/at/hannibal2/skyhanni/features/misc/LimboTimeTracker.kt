@@ -125,10 +125,6 @@ class LimboTimeTracker {
         event.replaceWith(limboItem)
     }
 
-    private fun isValidIndex(index: Int): Boolean {
-        return !(index % 9 == 0 || index + 1 % 9 == 0 || index !in 10..43)
-    }
-
     @SubscribeEvent
     fun onHoverItem(event: LorenzToolTipEvent) {
         if (!LorenzUtils.inSkyBlock) return
@@ -227,9 +223,9 @@ class LimboTimeTracker {
             } else {
                 LorenzUtils.chat("§fYour §aPersonal Bests§f perk is now granting you §a+${userLuck.round(2)}✴ SkyHanni User Luck§f!")
             }
+            config.userLuck = userLuck
         }
         config.limboPlaytime += passedSince.toInt(DurationUnit.SECONDS)
-        if (userLuck > config.userLuck) config.userLuck = userLuck
         onFire = false
         shownPB = false
     }
