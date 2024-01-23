@@ -75,7 +75,10 @@ class GardenVisitorFeatures {
     private val copperPattern = " §8\\+§c(?<amount>.*) Copper".toPattern()
     private val gardenExperiencePattern = " §8\\+§2(?<amount>.*) §7Garden Experience".toPattern()
     private val visitorChatMessagePattern = "§e\\[NPC] (§.)?(?<name>.*)§f: §r.*".toPattern()
-    private val partialAcceptedPattern by RepoPattern.pattern("garden.visitor.partialaccepted", "§aYou gave some of the required items!")
+    private val partialAcceptedPattern by RepoPattern.pattern(
+        "garden.visitor.partialaccepted",
+        "§aYou gave some of the required items!"
+    )
 
     private val logger = LorenzLogger("garden/visitors")
     private var lastFullPrice = 0.0
@@ -460,8 +463,10 @@ class GardenVisitorFeatures {
             event.blockedReason = "garden_visitor_message"
         }
 
-        partialAcceptedPattern.matchMatcher(event.message) {
-            if (config.shoppingList.display) LorenzUtils.chat("Talk to the visitor again to update the number of items needed!")
+        if (config.shoppingList.display) {
+            partialAcceptedPattern.matchMatcher(event.message) {
+                LorenzUtils.chat("Talk to the visitor again to update the number of items needed!")
+            }
         }
     }
 
