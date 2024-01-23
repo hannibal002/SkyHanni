@@ -5,6 +5,7 @@ import com.google.gson.annotations.Expose;
 import io.github.moulberry.moulconfig.annotations.ConfigEditorBoolean;
 import io.github.moulberry.moulconfig.annotations.ConfigEditorSlider;
 import io.github.moulberry.moulconfig.annotations.ConfigOption;
+import io.github.moulberry.moulconfig.observer.Property;
 
 public class SensReducerConfig {
     @Expose
@@ -16,8 +17,8 @@ public class SensReducerConfig {
 
     @Expose
     @ConfigOption(name = "Reducing factor", desc = "Changes by how much the sensitivity is lowered by.")
-    @ConfigEditorSlider(minValue = 0, maxValue = 100, minStep = 1)
-    public int divisorSens = 25;
+    @ConfigEditorSlider(minValue = 1, maxValue = 100, minStep = 1)
+    public Property<Integer> divisorSens = Property.of(25);
 
     @Expose
     @ConfigOption(
