@@ -175,9 +175,7 @@ object FishingProfitTracker {
 
         val recentPickup = config.showWhenPickup && lastCatchTime.passedSince() < 3.seconds
         if (!recentPickup) {
-            if (!FishingAPI.hasFishingRodInHand()) return
-            // TODO remove hide moving chech, replace with last cast location + radius
-            if (FishingProfitPlayerMoving.isMoving && config.hideMoving) return
+            if (!FishingAPI.isFishing()) return
         }
 
         tracker.renderDisplay(config.position)
