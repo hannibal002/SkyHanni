@@ -52,6 +52,7 @@ import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.TimeUtils
 import at.hannibal2.skyhanni.utils.getLorenzVec
 import at.hannibal2.skyhanni.utils.renderables.Renderable
+import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import com.google.gson.JsonArray
 import com.google.gson.JsonPrimitive
 import net.minecraft.client.Minecraft
@@ -74,6 +75,10 @@ class GardenVisitorFeatures {
     private val copperPattern = " §8\\+§c(?<amount>.*) Copper".toPattern()
     private val gardenExperiencePattern = " §8\\+§2(?<amount>.*) §7Garden Experience".toPattern()
     private val visitorChatMessagePattern = "§e\\[NPC] (§.)?(?<name>.*)§f: §r.*".toPattern()
+    private val partialAcceptedPattern by RepoPattern.pattern(
+        "garden.visitor.partialaccepted",
+        "§aYou gave some of the required items!"
+    )
 
     private val logger = LorenzLogger("garden/visitors")
     private var lastFullPrice = 0.0
@@ -116,12 +121,11 @@ class GardenVisitorFeatures {
             if (alreadyReady) {
                 VisitorAPI.changeStatus(visitor, VisitorAPI.VisitorStatus.READY, "inSacks")
                 visitor.inSacks = true
-                update()
             } else {
                 VisitorAPI.changeStatus(visitor, VisitorAPI.VisitorStatus.WAITING, "firstContact")
             }
-            update()
         }
+        update()
     }
 
     private fun updateDisplay() {
@@ -457,6 +461,12 @@ class GardenVisitorFeatures {
 
         if (GardenAPI.inGarden() && config.hideChat && hideVisitorMessage(event.message)) {
             event.blockedReason = "garden_visitor_message"
+        }
+
+        if (config.shoppingList.display) {
+            partialAcceptedPattern.matchMatcher(event.message) {
+                LorenzUtils.chat("Talk to the visitor again to update the number of items needed!")
+            }
         }
     }
 
