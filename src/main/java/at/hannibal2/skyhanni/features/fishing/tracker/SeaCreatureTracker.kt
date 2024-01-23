@@ -34,7 +34,7 @@ object SeaCreatureTracker {
     private val tracker = SkyHanniTracker("Sea Creature Tracker", { Data() }, { it.fishing.seaCreatureTracker })
     { drawDisplay(it) }
     private val trophyArmorNames by RepoPattern.pattern("fishing.trophyfishing.armor", "(BRONZE|SILVER|GOLD|DIAMOND)_HUNTER_(HELMET|CHESTPLATE|LEGGINGS|BOOTS)")
-    private var trophyFishingCooldown = SimpleTimeMark.farPast()
+    private var lastArmorCheck = SimpleTimeMark.farPast()
     private var isTrophyFishing = false
 
     class Data : TrackerData() {
@@ -167,17 +167,14 @@ object SeaCreatureTracker {
 
     private fun isEnabled() = LorenzUtils.inSkyBlock && config.enabled && !isTrophyFishing
 
-    private fun isWearingTrophyArmor(): Boolean {
-        val armorInternalNames = InventoryUtils.getArmor()
-        return armorInternalNames.all { armorInternal ->
-            trophyArmorNames.matches(armorInternal?.getInternalName()?.asString().toString())
-        }
+    private fun isWearingTrophyArmor(): Boolean = InventoryUtils.getArmor().all {
+        trophyArmorNames.matches(it?.getInternalName()?.asString())
     }
 
     @SubscribeEvent
     fun onTick (event: LorenzTickEvent) {
-        if (trophyFishingCooldown.passedSince() < 3.seconds) return
-        trophyFishingCooldown = SimpleTimeMark.now()
+        if (lastArmorCheck.passedSince() < 3.seconds) return
+        lastArmorCheck = SimpleTimeMark.now()
         isTrophyFishing = isWearingTrophyArmor()
     }
 }
