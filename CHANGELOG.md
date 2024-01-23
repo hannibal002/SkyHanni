@@ -86,6 +86,8 @@
 + Added option to show visitor shopping list in Farming Islands - Erymanthus
     + Show the Visitor Shopping List while on the Farming Islands or inside the Farm in the Hub.
     + This helps to farm the correct amount, especially when in the early game.
++ Made blocks per second calculation more accurate immediately after starting to farm. - hannibal2
++ Warn to open visitor inventory again after partially serving Spaceman. - alexia
 
 #### Rift Changes
 
@@ -100,6 +102,7 @@
 + Odger highlight feature tells in description that it is only useful for users without abiphone. - hannibal2
 + Added toggle to count double hook catches as two catches in Sea Creature Tracker. - hannibal2
 + Smarter check if the player is fishing for all fishing related displays. - hannibal2
++ Hide Sea Creature Tracker when wearing full Trophy Hunter armor. - martimavocado
 
 #### Mining Changes
 
@@ -116,6 +119,7 @@
 + Show a warning in Bestiary Display when Overall Progress is not enabled. - HiZe
 + Added option to hide pet candy count on maxed out pets. - CalMWolfs
 + Added option to change the size of the Pet Item Display Icon in inventories. - Thunderblade73
++ Allow putting Water Bottles into Potion Bag. - alexia
 
 #### Dungeon Changes
 
@@ -229,6 +233,7 @@
 + Fixed wording in trackers when the item is newly obtained. - hannibal2
 + Fixed titles not showing above other SkyHanni GUI elements all the time. - Thunderblade73
 + Fixed Daily City Project Reminder is still working on already-released projects. - alexia
++ Fixed a typo in Odger Waypoint config. - Empa
 
 ### Technical Changes
 
@@ -273,6 +278,9 @@
 + Used a better bug fix for DelayedRun sync issues. - Thunderblade73
 + Creating and using TimeLimitedCache and TimeLimitedSet instead of guava cache. - hannibal2
 + Bring back the deleted item modifier test and fix the issue causing it. - CalMWolfs
++ Better error handling when an unknown crimson isle quest is detected. - hannibal2
++ Marked old number formatting code as deprecated. - hannibal2
++ Added the SkyHanni icon to the IntelliJ profile view. - Erymanthus
 
 ## Version 0.22
 
