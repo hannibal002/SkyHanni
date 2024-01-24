@@ -125,6 +125,8 @@
 
 + Changed the description of the Dungeon Chat Filter feature to be more descriptive. - Wambo
 + Added options to change exactly what part of the Dungeon Chat Filter should be used. - Wambo
++ Hide F3/M3 guardian Damage Indicators once the professor spawns. - hannibal2
++ Added exact names for the floor 6 giants in the Damage Indicator. - hannibal2
 
 #### Diana Changes
 
@@ -170,11 +172,17 @@
 + Fixed Dungeon and Kuudra party finder join message not detecting in party member tab complete. - CalMWolfs
 + Fixed Fire Veil Wand circle shows on left-clicking. - hannibal2
 + Fixed Ashfang Freeze Cooldown being off by one second. Fixed Fire Veil line gets shown even while frozen. - hannibal2
-+ Fixed all Damage Indicator boss timers in Dungeons being off by a second. - hannibal2
-+ Gave Damage Indicator mobs correct names on floor 1, 2, 3 and 6. (Removed "Generic Dungeon Boss") - hannibal2
-+ Fixed the M3 reinforced guardian not getting detected in the Damage Indicator. - hannibal2
-+ Fixed kill time of slayer in Damage Indicator to be off by one second. - hannibal2
 + Fixed time until the next area mini boss spawns being off by one second. - hannibal2
+
+#### Dungeon Fixes
+
++ Fixed the M3 reinforced guardian not getting detected in the Damage Indicator. - hannibal2
++ Gave Damage Indicator mobs correct names on floor 1, 2, 3 and 6. (Removed "Generic Dungeon Boss") - hannibal2
++ Fixed kill time of slayer in Damage Indicator to be off by one second. - hannibal2
++ Fixed all Damage Indicator boss timers in Dungeons being off by a second. - hannibal2
++ Fixed Bonzo phase 1 does not get detected properly for Damage Indicator. - hannibal2
++ Fixed Dungeon Clean End sometimes not deactivating when chest spawned. - hannibal2
++ Fixed F3/M3 guardian spawn timer in Damage Indicator. - hannibal2
 
 #### Diana Fixes
 
@@ -234,6 +242,7 @@
 + Fixed titles not showing above other SkyHanni GUI elements all the time. - Thunderblade73
 + Fixed Daily City Project Reminder is still working on already-released projects. - alexia
 + Fixed a typo in Odger Waypoint config. - Empa
++ Fixed NPC typos in config. - absterge
 
 ### Technical Changes
 
