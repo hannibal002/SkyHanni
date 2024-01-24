@@ -11,6 +11,7 @@ import at.hannibal2.skyhanni.events.PlaySoundEvent
 import at.hannibal2.skyhanni.events.ReceiveParticleEvent
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
+import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraft.client.Minecraft
 import net.minecraft.client.entity.EntityOtherPlayerMP
 import net.minecraft.entity.item.EntityArmorStand
@@ -20,7 +21,10 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 class DungeonCleanEnd {
 
     private val config get() = SkyHanniMod.feature.dungeon.cleanEnd
-    private val catacombsPattern = "([ ]*)§r§c(The|Master Mode) Catacombs §r§8- §r§eFloor (.*)".toPattern()
+    private val catacombsPattern by RepoPattern.pattern(
+        "dungeon.end.chests.spawned",
+        "(?:§f)?( *)§r§c(The|Master Mode) Catacombs §r§8- §r§eFloor (.*)"
+    )
 
     private var bossDone = false
     private var chestsSpawned = false
