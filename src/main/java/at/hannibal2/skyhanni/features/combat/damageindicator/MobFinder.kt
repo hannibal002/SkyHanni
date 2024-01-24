@@ -512,7 +512,7 @@ class MobFinder {
         if (!LorenzUtils.inDungeons) return
         when (message) {
             //F1
-            "§c[BOSS] Bonzo§r§f: Gratz for making it this far, but I’m basically unbeatable." -> {
+            "§c[BOSS] Bonzo§r§f: Gratz for making it this far, but I'm basically unbeatable." -> {
                 floor1bonzo1 = true
                 floor1bonzo1SpawnTime = System.currentTimeMillis() + 11_250
             }
