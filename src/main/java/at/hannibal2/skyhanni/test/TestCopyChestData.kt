@@ -45,7 +45,7 @@ object TestCopyChestData {
                 if (config.includeNullSlots) copyList.addAll(listOf("(there is nothing inside slot $i; it is null)", "", ""))
                 continue
             }
-            if ((stack.displayName.isNotEmpty() && stack.displayName.isNotBlank()) || config.includeUnnamedItems) {
+            if (stack.displayName.isNotBlank() || config.includeUnnamedItems) {
                 copyList.add("slot index: '$i'")
                 copyList.addAll(stack.getStackInfo())
             }
