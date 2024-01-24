@@ -552,7 +552,7 @@ class MobFinder {
             //F3
             "§c[BOSS] The Professor§r§f: I was burdened with terrible news recently..." -> {
                 floor3GuardianShield = true
-                floor3GuardianShieldSpawnTime = System.currentTimeMillis() + 16_400
+                floor3GuardianShieldSpawnTime = System.currentTimeMillis() + 15_400
             }
 
             "§c[BOSS] The Professor§r§f: Oh? You found my Guardians' one weakness?" -> {
