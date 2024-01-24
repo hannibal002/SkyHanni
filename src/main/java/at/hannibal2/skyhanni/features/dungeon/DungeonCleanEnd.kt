@@ -23,7 +23,7 @@ class DungeonCleanEnd {
     private val config get() = SkyHanniMod.feature.dungeon.cleanEnd
     private val catacombsPattern by RepoPattern.pattern(
         "dungeon.end.chests.spawned",
-        "(?:§f)?([ ]*)§r§c(The|Master Mode) Catacombs §r§8- §r§eFloor (.*)"
+        "(?:§f)?( *)§r§c(The|Master Mode) Catacombs §r§8- §r§eFloor (.*)"
     )
 
     private var bossDone = false
