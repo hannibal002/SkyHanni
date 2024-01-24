@@ -227,7 +227,7 @@ object SackDisplay {
 
     enum class PriceFrom(val displayName: String) {
         BAZAAR("Bazaar Price"),
-        NPC("Npc Price"),
+        NPC("NPC Price"),
         ;
     }
 
