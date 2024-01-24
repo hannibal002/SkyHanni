@@ -555,11 +555,9 @@ class MobFinder {
                 floor3GuardianShieldSpawnTime = System.currentTimeMillis() + 16_400
             }
 
-            "§c[BOSS] The Professor§r§f: Even if you took my barrier down, I can still fight." -> {
-                floor3GuardianShield = false
-            }
-
             "§c[BOSS] The Professor§r§f: Oh? You found my Guardians' one weakness?" -> {
+                floor3GuardianShield = false
+                DamageIndicatorManager.removeDamageIndicator(BossType.DUNGEON_F3_GUARDIAN)
                 floor3Professor = true
                 floor3ProfessorSpawnTime = System.currentTimeMillis() + 10_300
             }
