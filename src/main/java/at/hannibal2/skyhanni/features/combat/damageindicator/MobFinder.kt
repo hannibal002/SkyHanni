@@ -78,7 +78,7 @@ class MobFinder {
     //F6
     private var floor6Giants = false
     private var floor6GiantsSpawnTime = 0L
-    private var floor6GiantsSeparateDelay = mutableMapOf<UUID, Long>()
+    private var floor6GiantsSeparateDelay = mutableMapOf<UUID, Pair<Long, BossType>>()
     private var floor6Sadan = false
     private var floor6SadanSpawnTime = 0L
 
@@ -236,11 +236,11 @@ class MobFinder {
     private fun tryAddDungeonF6(entity: EntityLivingBase): EntityResult? {
         if (entity !is EntityGiantZombie || entity.isInvisible) return null
         if (floor6Giants && entity.posY > 68) {
-            val extraDelay = checkExtraF6GiantsDelay(entity)
+            val (extraDelay, bossType) = checkExtraF6GiantsDelay(entity)
             return EntityResult(
                 floor6GiantsSpawnTime + extraDelay,
                 floor6GiantsSpawnTime + extraDelay + 1_000 > System.currentTimeMillis(),
-                bossType = BossType.DUNGEON_F6_GIANT
+                bossType = bossType
             )
         }
 
@@ -469,7 +469,7 @@ class MobFinder {
         EntityResult(bossType = BossType.THUNDER)
     } else null
 
-    private fun checkExtraF6GiantsDelay(entity: EntityGiantZombie): Long {
+    private fun checkExtraF6GiantsDelay(entity: EntityGiantZombie): Pair<Long, BossType> {
         val uuid = entity.uniqueID
 
         if (floor6GiantsSeparateDelay.contains(uuid)) {
@@ -482,37 +482,42 @@ class MobFinder {
 
         var pos = 0
 
-        //first
+
+        val type: BossType
         if (loc.x > middle.x && loc.z > middle.z) {
+        //first
             pos = 2
-        }
-
+            type = BossType.DUNGEON_F6_GIANT_3
+        } else if (loc.x > middle.x && loc.z < middle.z) {
         //second
-        if (loc.x > middle.x && loc.z < middle.z) {
             pos = 3
-        }
-
+            type = BossType.DUNGEON_F6_GIANT_4
+        } else if (loc.x < middle.x && loc.z < middle.z) {
         //third
-        if (loc.x < middle.x && loc.z < middle.z) {
             pos = 0
+            type = BossType.DUNGEON_F6_GIANT_1
+        } else if (loc.x < middle.x && loc.z > middle.z) {
+        //fourth
+            pos = 1
+            type = BossType.DUNGEON_F6_GIANT_2
+        } else {
+            pos = 0
+            type = BossType.DUNGEON_F6_GIANT_1
         }
 
-        //fourth
-        if (loc.x < middle.x && loc.z > middle.z) {
-            pos = 1
-        }
 
         val extraDelay = 900L * pos
-        floor6GiantsSeparateDelay[uuid] = extraDelay
+        val pair = Pair(extraDelay, type)
+        floor6GiantsSeparateDelay[uuid] = pair
 
-        return extraDelay
+        return pair
     }
 
     fun handleChat(message: String) {
         if (!LorenzUtils.inDungeons) return
         when (message) {
             //F1
-            "§c[BOSS] Bonzo§r§f: Gratz for making it this far, but I’m basically unbeatable." -> {
+            "§c[BOSS] Bonzo§r§f: Gratz for making it this far, but I'm basically unbeatable." -> {
                 floor1bonzo1 = true
                 floor1bonzo1SpawnTime = System.currentTimeMillis() + 11_250
             }
@@ -552,14 +557,12 @@ class MobFinder {
             //F3
             "§c[BOSS] The Professor§r§f: I was burdened with terrible news recently..." -> {
                 floor3GuardianShield = true
-                floor3GuardianShieldSpawnTime = System.currentTimeMillis() + 16_400
-            }
-
-            "§c[BOSS] The Professor§r§f: Even if you took my barrier down, I can still fight." -> {
-                floor3GuardianShield = false
+                floor3GuardianShieldSpawnTime = System.currentTimeMillis() + 15_400
             }
 
             "§c[BOSS] The Professor§r§f: Oh? You found my Guardians' one weakness?" -> {
+                floor3GuardianShield = false
+                DamageIndicatorManager.removeDamageIndicator(BossType.DUNGEON_F3_GUARDIAN)
                 floor3Professor = true
                 floor3ProfessorSpawnTime = System.currentTimeMillis() + 10_300
             }

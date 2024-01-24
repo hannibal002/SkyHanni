@@ -103,6 +103,12 @@ class DamageIndicatorManager {
                 .map { it.entity.getLorenzVec() }
                 .minOfOrNull { it.distance(location) } ?: Double.MAX_VALUE
         }
+
+        fun removeDamageIndicator(type: BossType) {
+            data = data.editCopy {
+                values.removeIf {it.bossType == type}
+            }
+        }
     }
 
     @SubscribeEvent
@@ -896,7 +902,6 @@ class DamageIndicatorManager {
 
             result
         }
-
 
     }
 
