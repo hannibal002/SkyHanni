@@ -243,4 +243,10 @@ public class MiscConfig {
     @ConfigEditorBoolean
     @FeatureToggle
     public boolean fixGhostEntities = true;
+
+    @Expose
+    @ConfigOption(name = "Highlight Completed Perks", desc = "Highlight fully unlocked perks or profile upgrades.\n" +
+        "Applies to all Essence Shops and the Community Shop.")
+    @ConfigEditorBoolean
+    public boolean highlightCompletedPerks = false;
 }
