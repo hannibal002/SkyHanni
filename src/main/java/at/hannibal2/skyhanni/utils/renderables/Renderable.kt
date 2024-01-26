@@ -45,7 +45,7 @@ interface Renderable {
     companion object {
         val logger = LorenzLogger("debug/renderable")
         val list = mutableMapOf<Pair<Int, Int>, List<Int>>()
-        private val BAR_TEXTURE = ResourceLocation("skyhanni", "texturedBar.png")
+        private val BAR_TEXTURE = ResourceLocation("skyhanni", "textured_bar.png")
 
         var currentRenderPassMousePosition: Pair<Int, Int>? = null
             set
