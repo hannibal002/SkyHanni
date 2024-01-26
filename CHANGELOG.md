@@ -9,6 +9,9 @@
 + Added command /shcropsin <time> <item>. - DylanBruner
     + Shows the number of items you gain when farming in the garden for the given time.
 + Show sack item amount to the visitor shopping list. - CalMWolfs
++ Added Atmospheric Filter Display. - Erymanthus
+    + This display shows the currently active buff as a GUI element.
+    + For an optimal experience, please have the Atmospheric Filter accessory active.
 
 #### Fishing Features
 
@@ -17,11 +20,13 @@
 
 #### Crimson Isle Features
 
-+ Dojo Rank Display. - HiZe
-    + Display your rank, score, actual belt and points needed for the next belt in the Challenges inventory on the
-      Crimson Isles.
 + Added Volcano Explosivity in Crimson Isle. - Erymanthus
     + Show a HUD of the current volcano explosivity level.
++ Added Sulphur Skitter Box in Crimson Isle. - HiZe
+    + Renders a box around the closest sulphur block.
++ Added Dojo Rank Display. - HiZe
+    + Display your rank, score, actual belt and points needed for the next belt in the Challenges inventory on the
+      Crimson Isles.
 
 #### Inventory Features
 
@@ -81,6 +86,8 @@
 + Added option to show visitor shopping list in Farming Islands - Erymanthus
     + Show the Visitor Shopping List while on the Farming Islands or inside the Farm in the Hub.
     + This helps to farm the correct amount, especially when in the early game.
++ Made blocks per second calculation more accurate immediately after starting to farm. - hannibal2
++ Warn to open visitor inventory again after partially serving Spaceman. - alexia
 
 #### Rift Changes
 
@@ -94,6 +101,8 @@
 
 + Odger highlight feature tells in description that it is only useful for users without abiphone. - hannibal2
 + Added toggle to count double hook catches as two catches in Sea Creature Tracker. - hannibal2
++ Smarter check if the player is fishing for all fishing related displays. - hannibal2
++ Hide Sea Creature Tracker when wearing full Trophy Hunter armor. - martimavocado
 
 #### Mining Changes
 
@@ -110,11 +119,14 @@
 + Show a warning in Bestiary Display when Overall Progress is not enabled. - HiZe
 + Added option to hide pet candy count on maxed out pets. - CalMWolfs
 + Added option to change the size of the Pet Item Display Icon in inventories. - Thunderblade73
++ Allow putting Water Bottles into Potion Bag. - alexia
 
 #### Dungeon Changes
 
 + Changed the description of the Dungeon Chat Filter feature to be more descriptive. - Wambo
 + Added options to change exactly what part of the Dungeon Chat Filter should be used. - Wambo
++ Hide F3/M3 guardian Damage Indicators once the professor spawns. - hannibal2
++ Added exact names for the floor 6 giants in the Damage Indicator. - hannibal2
 
 #### Diana Changes
 
@@ -160,9 +172,17 @@
 + Fixed Dungeon and Kuudra party finder join message not detecting in party member tab complete. - CalMWolfs
 + Fixed Fire Veil Wand circle shows on left-clicking. - hannibal2
 + Fixed Ashfang Freeze Cooldown being off by one second. Fixed Fire Veil line gets shown even while frozen. - hannibal2
-+ Fixed all Damage Indicator boss timers in Dungeons being off by a second. - hannibal2
-+ Gave Damage Indicator mobs correct names on floor 1, 2, 3 and 6. (Removed "Generic Dungeon Boss") - hannibal2
++ Fixed time until the next area mini boss spawns being off by one second. - hannibal2
+
+#### Dungeon Fixes
+
 + Fixed the M3 reinforced guardian not getting detected in the Damage Indicator. - hannibal2
++ Gave Damage Indicator mobs correct names on floor 1, 2, 3 and 6. (Removed "Generic Dungeon Boss") - hannibal2
++ Fixed kill time of slayer in Damage Indicator to be off by one second. - hannibal2
++ Fixed all Damage Indicator boss timers in Dungeons being off by a second. - hannibal2
++ Fixed Bonzo phase 1 does not get detected properly for Damage Indicator. - hannibal2
++ Fixed Dungeon Clean End sometimes not deactivating when chest spawned. - hannibal2
++ Fixed F3/M3 guardian spawn timer in Damage Indicator. - hannibal2
 
 #### Diana Fixes
 
@@ -221,6 +241,8 @@
 + Fixed wording in trackers when the item is newly obtained. - hannibal2
 + Fixed titles not showing above other SkyHanni GUI elements all the time. - Thunderblade73
 + Fixed Daily City Project Reminder is still working on already-released projects. - alexia
++ Fixed a typo in Odger Waypoint config. - Empa
++ Fixed NPC typos in config. - absterge
 
 ### Technical Changes
 
@@ -265,6 +287,9 @@
 + Used a better bug fix for DelayedRun sync issues. - Thunderblade73
 + Creating and using TimeLimitedCache and TimeLimitedSet instead of guava cache. - hannibal2
 + Bring back the deleted item modifier test and fix the issue causing it. - CalMWolfs
++ Better error handling when an unknown crimson isle quest is detected. - hannibal2
++ Marked old number formatting code as deprecated. - hannibal2
++ Added the SkyHanni icon to the IntelliJ profile view. - Erymanthus
 
 ## Version 0.22
 

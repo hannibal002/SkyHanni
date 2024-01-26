@@ -81,7 +81,10 @@ enum class BossType(
 
     DUNGEON_F5("§dLivid", Type.DUNGEON_FLOOR_5),
 
-    DUNGEON_F6_GIANT("§eGiant", Type.DUNGEON_FLOOR_6),
+    DUNGEON_F6_GIANT_1("§eBoulder Tosser", Type.DUNGEON_FLOOR_6, "§eGiant 1"),
+    DUNGEON_F6_GIANT_2("§eSword Thrower", Type.DUNGEON_FLOOR_6, "§eGiant 2"),
+    DUNGEON_F6_GIANT_3("§eBigfoot Jumper", Type.DUNGEON_FLOOR_6, "§eGiant 3"),
+    DUNGEON_F6_GIANT_4("§eLazer Shooter", Type.DUNGEON_FLOOR_6, "§eGiant 4"),
     DUNGEON_F6_SADAN("§cSadan", Type.DUNGEON_FLOOR_6),
 
     // TODO implement
