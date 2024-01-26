@@ -4,8 +4,10 @@ import at.hannibal2.skyhanni.config.core.config.gui.GuiPositionEditor
 import at.hannibal2.skyhanni.data.ToolTipData
 import at.hannibal2.skyhanni.utils.ColorUtils
 import at.hannibal2.skyhanni.utils.LorenzColor
+import at.hannibal2.skyhanni.utils.LorenzDebug
 import at.hannibal2.skyhanni.utils.LorenzLogger
 import at.hannibal2.skyhanni.utils.NEUItems.renderOnScreen
+import at.hannibal2.skyhanni.utils.guide.GuideGUI
 import at.hannibal2.skyhanni.utils.renderables.RenderableUtils.calculateTableXOffsets
 import at.hannibal2.skyhanni.utils.renderables.RenderableUtils.calculateTableYOffsets
 import at.hannibal2.skyhanni.utils.renderables.RenderableUtils.renderXAligned
@@ -18,37 +20,35 @@ import net.minecraft.client.gui.GuiChat
 import net.minecraft.client.gui.inventory.GuiEditSign
 import net.minecraft.client.renderer.GlStateManager
 import net.minecraft.item.ItemStack
+import net.minecraftforge.client.event.MouseEvent
 import org.lwjgl.input.Mouse
 import java.awt.Color
 import java.util.Collections
 import kotlin.math.max
 
 interface Renderable {
+
     val width: Int
     val height: Int
 
     val horizontalAlign: HorizontalAlignment
     val verticalAlign: VerticalAlignment
     fun isHovered(posX: Int, posY: Int) = currentRenderPassMousePosition?.let { (x, y) ->
-        x in (posX..posX + width)
-            && y in (posY..posY + height) // TODO: adjust for variable height?
+        x in (posX .. posX + width)
+            && y in (posY .. posY + height)
     } ?: false
 
-    fun scrollInput(scrollOld: Int, posX: Int, posY: Int, button: Int?, minHeight: Int, maxHeight: Int, velocity: Double) =
-        if (isHovered(posX, posY)) {
-            var scroll = scrollOld
-            if (button != null && Mouse.isButtonDown(button)) {
-                scroll += (Mouse.getEventDY() * 0.5 * velocity).toInt()
-                // LorenzDebug.log(Mouse.getEventDY().toString())
-            }
-            scroll += (Mouse.getEventDWheel() * velocity * 0.02).toInt()
-
-            when {
-                scroll > maxHeight -> maxHeight
-                scroll < minHeight -> minHeight
-                else -> scroll
-            }
-        } else scrollOld
+    fun scrollInput(scrollOld: Float, posX: Int, posY: Int, button: Int?, minHeight: Int, maxHeight: Int, velocity: Double) =
+        if (maxHeight < minHeight) minHeight.toFloat() else
+            if (isHovered(posX, posY)) {
+                var scroll = scrollOld
+                if (button != null && Mouse.isButtonDown(button)) {
+                    scroll += (Mouse.getEventDY() * velocity * 1/20).toFloat()
+                    // LorenzDebug.log(Mouse.getEventDY().toString())
+                }
+                scroll += (Mouse.getEventDWheel() * velocity * 1 / (120 * 20)).toFloat()
+                scroll.coerceIn(minHeight.toFloat(), maxHeight.toFloat())
+            } else scrollOld
 
     /**
      * Pos x and pos y are relative to the mouse position.
@@ -57,6 +57,7 @@ interface Renderable {
     fun render(posX: Int, posY: Int)
 
     companion object {
+
         val logger = LorenzLogger("debug/renderable")
         val list = mutableMapOf<Pair<Int, Int>, List<Int>>()
 
@@ -75,7 +76,6 @@ interface Renderable {
 
         enum class HorizontalAlignment { Left, Center, Right }
         enum class VerticalAlignment { Top, Center, Bottom }
-
 
         fun fromAny(any: Any?, itemScale: Double = 1.0): Renderable? = when (any) {
             null -> placeholder(12)
@@ -200,17 +200,19 @@ interface Renderable {
         }
 
         private fun shouldAllowLink(debug: Boolean = false, bypassChecks: Boolean): Boolean {
-            val isGuiScreen = Minecraft.getMinecraft().currentScreen != null
+            val guiScreen = Minecraft.getMinecraft().currentScreen
+
+            val isGuiScreen = guiScreen != null
             if (bypassChecks) {
                 return isGuiScreen
             }
-            val isGuiPositionEditor = Minecraft.getMinecraft().currentScreen !is GuiPositionEditor
-            val isNotInSignAndOnSlot = if (Minecraft.getMinecraft().currentScreen !is GuiEditSign) {
+            val isGuiPositionEditor = guiScreen !is GuiPositionEditor
+            val isNotInSignAndOnSlot = if (guiScreen !is GuiEditSign && guiScreen !is GuideGUI<*>) {
                 ToolTipData.lastSlot == null
             } else true
-            val isConfigScreen = Minecraft.getMinecraft().currentScreen !is GuiScreenElementWrapper
+            val isConfigScreen = guiScreen !is GuiScreenElementWrapper
 
-            val openGui = Minecraft.getMinecraft().currentScreen?.javaClass?.name ?: "none"
+            val openGui = guiScreen?.javaClass?.name ?: "none"
             val isInNeuPv = openGui == "io.github.moulberry.notenoughupdates.profileviewer.GuiProfileViewer"
             val isInSkyTilsPv = openGui == "gg.skytils.skytilsmod.gui.profile.ProfileGui"
 
@@ -273,7 +275,6 @@ interface Renderable {
                         unhovered.render(posX, posY)
                         isHovered = false
                     }
-
                 }
             }
 
@@ -348,16 +349,17 @@ interface Renderable {
 
             private val virtualHeight = list.maxOf { it.height }
 
-            var scroll = 0
+            var scroll = 0f
+            val scrollInt get() = scroll.toInt()
 
-            private val end get() = scroll + height
+            private val end get() = scrollInt + height
 
             override fun render(posX: Int, posY: Int) {
                 scroll = scrollInput(scroll, posX, posY, button, 0, virtualHeight - height, velocity)
                 var renderY = 0
                 var virtualY = 0
                 list.forEach {
-                    if (virtualY in scroll..end) {
+                    if (virtualY in scrollInt .. end) {
                         it.renderXAligned(posX, posY + renderY, width)
                         GlStateManager.translate(0f, it.height.toFloat(), 0f)
                         renderY += it.height
@@ -366,7 +368,6 @@ interface Renderable {
                 }
                 GlStateManager.translate(0f, -renderY.toFloat(), 0f)
             }
-
         }
 
         fun scrollTable(
@@ -391,15 +392,15 @@ interface Renderable {
 
             private val virtualHeight = yOffsets.last() - yPadding
 
-            private val end get() = scroll + height - yPadding - 2 // TODO fix the -2 "fix"
+            private val end get() = scrollInt + height - yPadding - 2 // TODO fix the -2 "fix"
             private val minHeight = if (hasHeader) yOffsets[1] else 0
 
-            var scroll = minHeight
+            var scroll = minHeight.toFloat()
+
+            val scrollInt get() = scroll.toInt()
 
             override fun render(posX: Int, posY: Int) {
-                scroll = if (virtualHeight > height)
-                    scrollInput(scroll, posX, posY, button, minHeight, virtualHeight - height, velocity)
-                else minHeight
+                scroll = scrollInput(scroll, posX, posY, button, minHeight, virtualHeight - height, velocity)
                 var renderY = 0
                 if (hasHeader) {
                     content[0].forEachIndexed { index, renderable ->
@@ -411,7 +412,7 @@ interface Renderable {
                     GlStateManager.translate(0f, yShift.toFloat(), 0f)
                     renderY += yShift
                 }
-                val range = yOffsets.indexOfFirst { it >= scroll }..<(yOffsets.indexOfFirst { it >= end }.takeIf { it > 0 }
+                val range = yOffsets.indexOfFirst { it >= scrollInt } ..< (yOffsets.indexOfFirst { it >= end }.takeIf { it > 0 }
                     ?: (yOffsets.size - 1))
                 for (rowIndex in range) {
                     content[rowIndex].forEachIndexed { index, renderable ->
@@ -431,7 +432,6 @@ interface Renderable {
                 }
                 GlStateManager.translate(0f, -renderY.toFloat(), 0f)
             }
-
         }
 
         /**
@@ -486,7 +486,6 @@ interface Renderable {
                 Gui.drawRect(1, 1, width - 1, height - 1, color.darker().rgb)
                 Gui.drawRect(1, 1, progress, height - 1, color.rgb)
             }
-
         }
 
         fun wrappedString(
@@ -516,7 +515,6 @@ interface Renderable {
                 GlStateManager.scale(inverseScale, inverseScale, 1.0f)
             }
         }
-
 
         fun calculateStretchXPadding(content: List<List<Renderable?>>, xSpace: Int): Int {
             if (content.isEmpty()) return xSpace
@@ -581,6 +579,5 @@ interface Renderable {
                 GlStateManager.translate(0f, -yOffset.toFloat(), 0f)
             }
         }
-
     }
 }

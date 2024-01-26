@@ -17,7 +17,6 @@ abstract class GuideScrollPage(
         renderable = Renderable.scrollTable(
             content = content,
             height = sizeY - paddingY * 2,
-            velocity = 1.0,
             xPadding = Renderable.calculateStretchXPadding(content, sizeX - paddingX * 3),
             yPadding = 5,
             hasHeader = hasHeader,
