@@ -21,15 +21,14 @@ public class SkillProgressDisplayConfig {
     public Property<Boolean> showProgressBar = Property.of(false);
 
     @Expose
-    @ConfigOption(name = "Textured Bar", desc = "Use a textured progress bar\n§eCan be changed with a resource pack.")
+    @ConfigOption(name = "Textured Bar", desc = "Use a textured progress bar.\n§eCan be changed with a resource pack.")
     @ConfigEditorBoolean
     public Property<Boolean> useTexturedBar = Property.of(false);
 
     @Expose
-    @ConfigOption(name = "Chroma", desc = "Use the SBA like chroma effect on the bar.")
+    @ConfigOption(name = "Chroma", desc = "Use the SBA like chroma effect on the bar.\n§eIf enabled, ignore the Bar Color setting.")
     @ConfigEditorBoolean
     public Property<Boolean> useChroma = Property.of(false);
-
 
     @Expose
     @ConfigOption(name = "Always Show", desc = "Always show the skill progress.")
@@ -37,7 +36,7 @@ public class SkillProgressDisplayConfig {
     public Property<Boolean> alwaysShow = Property.of(false);
 
     @Expose
-    @ConfigOption(name = "Bar Color Start", desc = "Start color of the progress bar.")
+    @ConfigOption(name = "Bar Color", desc = "Color of the progress bar.")
     @ConfigEditorColour
     public String barStartColor = "0:255:255:0:0";
 
@@ -52,12 +51,12 @@ public class SkillProgressDisplayConfig {
     public Property<Boolean> usePercentage = Property.of(false);
 
     @Expose
-    @ConfigOption(name = "Use Icon", desc = "Display skill icon in the display.")
+    @ConfigOption(name = "Use Icon", desc = "Show the skill icon in the display.")
     @ConfigEditorBoolean
     public Property<Boolean> useIcon = Property.of(true);
 
     @Expose
-    @ConfigOption(name = "Use Skill Name", desc = "Display the skill name in the display.")
+    @ConfigOption(name = "Use Skill Name", desc = "Show the skill name in the display.")
     @ConfigEditorBoolean
     public Property<Boolean> useSkillName = Property.of(false);
 
@@ -67,13 +66,12 @@ public class SkillProgressDisplayConfig {
     public Property<Boolean> showLevel = Property.of(true);
 
     @Expose
-    @ConfigOption(name = "Show Overflow XP", desc = "Show overflow xp and level.\n§eOnly work when level 60.")
+    @ConfigOption(name = "Show Overflow XP", desc = "Show overflow XP and level.\n§eOnly work when level 60.")
     @ConfigEditorBoolean
     public Property<Boolean> showOverflow = Property.of(true);
 
-
     @Expose
-    public Position position = new Position(339, -100, true, true);
+    public Position position = new Position(339, -100, false, true);
 
     @Expose
     public Position barPosition = new Position(339, -110, false, true);

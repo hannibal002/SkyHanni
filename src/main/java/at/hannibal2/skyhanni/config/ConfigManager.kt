@@ -151,9 +151,9 @@ class ConfigManager {
                     while (reader.hasNext()) {
                         when (reader.nextName()) {
                             "level" -> skillInfo.level = reader.nextInt()
-                            "totalXp" -> skillInfo.totalXp = reader.nextDouble().toFloat()
-                            "currentXp" -> skillInfo.currentXp = reader.nextDouble().toFloat()
-                            "currentXpMax" -> skillInfo.currentXpMax = reader.nextDouble().toFloat()
+                            "totalXp" -> skillInfo.totalXp = reader.nextDouble().toLong()
+                            "currentXp" -> skillInfo.currentXp = reader.nextDouble().toLong()
+                            "currentXpMax" -> skillInfo.currentXpMax = reader.nextDouble().toLong()
                         }
                     }
                     reader.endObject()

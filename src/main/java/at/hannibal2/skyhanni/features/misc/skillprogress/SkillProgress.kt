@@ -30,7 +30,6 @@ import kotlin.time.Duration.Companion.seconds
 
 class SkillProgress {
 
-
     private val config get() = SkyHanniMod.feature.misc.skillProgressDisplayConfig
     private var skillExpPercentage = 0.0
     private var display = emptyList<List<Any>>()
@@ -48,7 +47,7 @@ class SkillProgress {
                 factor *= 182f
                 Renderable.texturedProgressBar(factor, Color(SpecialColour.specialToChromaRGB(config.barStartColor)), width = 182, height = 5, useChroma = config.useChroma.get())
             } else
-                Renderable.progressBar(skillExpPercentage, Color(SpecialColour.specialToChromaRGB(config.barStartColor)), Color(SpecialColour.specialToChromaRGB(config.barStartColor)), width = 125, useChroma = config.useChroma.get())
+                Renderable.progressBar(skillExpPercentage, Color(SpecialColour.specialToChromaRGB(config.barStartColor)), Color(SpecialColour.specialToChromaRGB(config.barStartColor)), width = 182)
 
             config.barPosition.renderRenderables(listOf(progress), posLabel = "Skill Progress Bar")
         }
@@ -59,7 +58,6 @@ class SkillProgress {
         display = emptyList()
         skillExpPercentage = 0.0
     }
-
 
     @SubscribeEvent
     fun onTick(event: LorenzTickEvent) {
@@ -92,24 +90,24 @@ class SkillProgress {
                 append("§b+${SkillAPI.gained} ")
 
                 if (config.useSkillName.get())
-                    append(activeSkill)
+                    append("${activeSkill.firstLetterUppercase()} ")
 
-                val percent = if (skill.currentXpMax.toLong() == 0L) 100F else 100F * skill.currentXp / skill.currentXpMax.toLong()
+                val percent = if (skill.currentXpMax == 0L) 100F else 100F * skill.currentXp / skill.currentXpMax
                 skillExpPercentage = (percent.toDouble() / 100)
 
                 if (config.usePercentage.get())
                     append("§7(§6${percent.roundToPrecision(2)}%§7)")
                 else {
-                    if (skill.currentXpMax == 0f)
-                        append("§7(§6${LorenzUtils.formatInteger(skill.currentXp.toLong())}§7)")
+                    if (skill.currentXpMax == 0L)
+                        append("§7(§6${skill.currentXp.addSeparators()}§7)")
                     else
-                        append("§7(§6${LorenzUtils.formatInteger(skill.currentXp.toLong())}§7/§6${LorenzUtils.formatInteger(skill.currentXpMax.toLong())}§7)")
+                        append("§7(§6${skill.currentXp.addSeparators()}§7/§6${skill.currentXpMax.addSeparators()}§7)")
                 }
 
                 if (config.showActionLeft.get() && percent != 100f) {
                     append(" - ")
                     if (SkillAPI.gained != "") {
-                        val actionLeft = (ceil(skill.currentXpMax - skill.currentXp) / SkillAPI.gained.formatNumber().toFloat()).toLong().addSeparators()
+                        val actionLeft = (ceil(skill.currentXpMax.toDouble() - skill.currentXp) / SkillAPI.gained.formatNumber()).toLong().addSeparators()
                         append("§6$actionLeft Left")
                     } else {
                         append("∞ Left")
@@ -130,9 +128,9 @@ class SkillProgress {
         config.showActionLeft.onToggle { update() }
         config.useIcon.onToggle { update() }
         config.useSkillName.onToggle { update() }
-        config.showOverflow.onToggle { update() }
         config.useTexturedBar.onToggle { update() }
         config.useChroma.onToggle { update() }
+        config.usePercentage.onToggle { update() }
         update()
     }
 

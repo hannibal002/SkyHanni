@@ -8,6 +8,8 @@ import at.hannibal2.skyhanni.utils.LorenzLogger
 import at.hannibal2.skyhanni.utils.NEUItems.renderOnScreen
 import at.hannibal2.skyhanni.utils.RenderUtils.HorizontalAlignment
 import at.hannibal2.skyhanni.utils.RenderUtils.VerticalAlignment
+import at.hannibal2.skyhanni.utils.renderables.RenderableUtils.renderXAligned
+import at.hannibal2.skyhanni.utils.shader.ShaderManager
 import io.github.moulberry.moulconfig.gui.GuiScreenElementWrapper
 import io.github.moulberry.notenoughupdates.util.Utils
 import net.minecraft.client.Minecraft
@@ -319,7 +321,7 @@ interface Renderable {
 
             override fun render(posX: Int, posY: Int) {
                 Minecraft.getMinecraft().renderEngine.bindTexture(BAR_TEXTURE)
-                Minecraft.getMinecraft().ingameGUI.drawTexturedModalRect(posX, posY, 0, 0, 182, 5)
+                Minecraft.getMinecraft().ingameGUI.drawTexturedModalRect(posX, posY, 0, 0, width, height)
                 Minecraft.getMinecraft().renderEngine.bindTexture(BAR_TEXTURE)
                 if (useChroma) {
                     ColorUtils.bindColor(Color.WHITE.rgb, 1f)
@@ -328,12 +330,11 @@ interface Renderable {
                 } else {
                     ColorUtils.bindColor(color.rgb, 1f)
                 }
-                Minecraft.getMinecraft().ingameGUI.drawTexturedModalRect(posX, posY, 0, 5, percent.toInt(), 5)
+                Minecraft.getMinecraft().ingameGUI.drawTexturedModalRect(posX, posY, 0, 5, percent.toInt(), height)
                 if (useChroma) {
                     ChromaShaderManager.end()
                     GlStateManager.shadeModel(GL11.GL_FLAT)
                 }
-                ColorUtils.bindColor(1.0f, 1.0f, 1.0f, 1.0f)
             }
         }
 
@@ -341,7 +342,6 @@ interface Renderable {
             percent: Double,
             startColor: Color = Color(255, 0, 0),
             endColor: Color = Color(0, 255, 0),
-            useChroma: Boolean = false,
             width: Int = 30,
             height: Int = 4,
             horizontalAlign: HorizontalAlignment = HorizontalAlignment.Left,
@@ -356,17 +356,10 @@ interface Renderable {
             val color = ColorUtils.blendRGB(startColor, endColor, percent)
 
             override fun render(posX: Int, posY: Int) {
-                if (useChroma){ //todo
-                    Gui.drawRect(0, 0, width, height, 0xFF43464B.toInt())
-                    Gui.drawRect(1, 1, width - 1, height - 1, 0)
-                    Gui.drawRect(1, 1, progress, height - 1, 0)
-                }else{
-                    Gui.drawRect(0, 0, width, height, 0xFF43464B.toInt())
-                    Gui.drawRect(1, 1, width - 1, height - 1, color.darker().rgb)
-                    Gui.drawRect(1, 1, progress, height - 1, color.rgb)
-                }
+                Gui.drawRect(0, 0, width, height, 0xFF43464B.toInt())
+                Gui.drawRect(1, 1, width - 1, height - 1, color.darker().rgb)
+                Gui.drawRect(1, 1, progress, height - 1, color.rgb)
             }
-
         }
     }
 }
