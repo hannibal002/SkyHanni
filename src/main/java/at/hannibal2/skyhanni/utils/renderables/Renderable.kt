@@ -4,7 +4,6 @@ import at.hannibal2.skyhanni.config.core.config.gui.GuiPositionEditor
 import at.hannibal2.skyhanni.data.ToolTipData
 import at.hannibal2.skyhanni.utils.ColorUtils
 import at.hannibal2.skyhanni.utils.LorenzColor
-import at.hannibal2.skyhanni.utils.LorenzDebug
 import at.hannibal2.skyhanni.utils.LorenzLogger
 import at.hannibal2.skyhanni.utils.NEUItems.renderOnScreen
 import at.hannibal2.skyhanni.utils.guide.GuideGUI
@@ -20,7 +19,6 @@ import net.minecraft.client.gui.GuiChat
 import net.minecraft.client.gui.inventory.GuiEditSign
 import net.minecraft.client.renderer.GlStateManager
 import net.minecraft.item.ItemStack
-import net.minecraftforge.client.event.MouseEvent
 import org.lwjgl.input.Mouse
 import java.awt.Color
 import java.util.Collections
@@ -37,18 +35,6 @@ interface Renderable {
         x in (posX .. posX + width)
             && y in (posY .. posY + height)
     } ?: false
-
-    fun scrollInput(scrollOld: Float, posX: Int, posY: Int, button: Int?, minHeight: Int, maxHeight: Int, velocity: Double) =
-        if (maxHeight < minHeight) minHeight.toFloat() else
-            if (isHovered(posX, posY)) {
-                var scroll = scrollOld
-                if (button != null && Mouse.isButtonDown(button)) {
-                    scroll += (Mouse.getEventDY() * velocity * 1/20).toFloat()
-                    // LorenzDebug.log(Mouse.getEventDY().toString())
-                }
-                scroll += (Mouse.getEventDWheel() * velocity * 1 / (120 * 20)).toFloat()
-                scroll.coerceIn(minHeight.toFloat(), maxHeight.toFloat())
-            } else scrollOld
 
     /**
      * Pos x and pos y are relative to the mouse position.
@@ -337,7 +323,7 @@ interface Renderable {
         fun scrollList(
             list: List<Renderable>,
             height: Int,
-            velocity: Double = 1.0,
+            velocity: Double = 2.5,
             button: Int? = null,
             horizontalAlign: HorizontalAlignment = HorizontalAlignment.Left,
             verticalAlign: VerticalAlignment = VerticalAlignment.Top,
@@ -349,13 +335,20 @@ interface Renderable {
 
             private val virtualHeight = list.maxOf { it.height }
 
-            var scroll = 0f
+            var scroll = 0.0
             val scrollInt get() = scroll.toInt()
 
             private val end get() = scrollInt + height
 
+            var mouseEventTime = 0L
+
             override fun render(posX: Int, posY: Int) {
-                scroll = scrollInput(scroll, posX, posY, button, 0, virtualHeight - height, velocity)
+                val mouseEvent = Mouse.getEventNanoseconds()
+                val mouseEventsValid = mouseEvent - mouseEventTime > 20L
+                mouseEventTime = mouseEvent
+
+                scroll = RenderableUtils.scrollInput(scroll, button, 0, virtualHeight - height, velocity, isHovered(posX, posY) && mouseEventsValid)
+
                 var renderY = 0
                 var virtualY = 0
                 list.forEach {
@@ -373,7 +366,7 @@ interface Renderable {
         fun scrollTable(
             content: List<List<Renderable?>>,
             height: Int,
-            velocity: Double = 1.0,
+            velocity: Double = 2.5,
             button: Int? = null,
             xPadding: Int = 1,
             yPadding: Int = 0,
@@ -392,15 +385,22 @@ interface Renderable {
 
             private val virtualHeight = yOffsets.last() - yPadding
 
-            private val end get() = scrollInt + height - yPadding - 2 // TODO fix the -2 "fix"
+            private val end get() = scrollInt + height - yPadding - 1// TODO fix the -1 "fix"
             private val minHeight = if (hasHeader) yOffsets[1] else 0
 
-            var scroll = minHeight.toFloat()
+            var scroll = minHeight.toDouble()
 
             val scrollInt get() = scroll.toInt()
 
+            var mouseEventTime = 0L
+
             override fun render(posX: Int, posY: Int) {
-                scroll = scrollInput(scroll, posX, posY, button, minHeight, virtualHeight - height, velocity)
+                val mouseEvent = Mouse.getEventNanoseconds()
+                val mouseEventsValid = mouseEvent - mouseEventTime > 20L
+                mouseEventTime = mouseEvent
+
+                scroll = RenderableUtils.scrollInput(scroll, button, minHeight, virtualHeight - height, velocity, isHovered(posX, posY) && mouseEventsValid)
+
                 var renderY = 0
                 if (hasHeader) {
                     content[0].forEachIndexed { index, renderable ->
@@ -413,16 +413,10 @@ interface Renderable {
                     renderY += yShift
                 }
                 val range = yOffsets.indexOfFirst { it >= scrollInt } ..< (yOffsets.indexOfFirst { it >= end }.takeIf { it > 0 }
-                    ?: (yOffsets.size - 1))
+                    ?: yOffsets.size) - 1
                 for (rowIndex in range) {
                     content[rowIndex].forEachIndexed { index, renderable ->
                         GlStateManager.translate(xOffsets[index].toFloat(), 0f, 0f)
-                        /* val buffer: FloatBuffer = ByteBuffer.allocateDirect(16 * java.lang.Float.BYTES)
-                            .order(ByteOrder.nativeOrder()).asFloatBuffer()
-                        GL11.glGetFloat(GL11.GL_MODELVIEW_MATRIX, buffer)
-                        buffer.flip()
-                        LorenzDebug.log(buffer[14].toString()) */
-
                         renderable?.renderXYAligned(posX + xOffsets[index], posY + renderY, xOffsets[index + 1] - xOffsets[index], yOffsets[rowIndex + 1] - yOffsets[rowIndex])
                         GlStateManager.translate(-xOffsets[index].toFloat(), 0f, 0f)
                     }

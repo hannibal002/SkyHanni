@@ -19,7 +19,7 @@ import net.minecraft.item.ItemStack
 import org.lwjgl.input.Mouse
 import java.io.IOException
 
-open class FFGuideGUI : GuideGUI<FFGuideGUI.FortuneGuidePage>(FortuneGuidePage.OVERVIEW) {
+class FFGuideGUI : GuideGUI<FFGuideGUI.FortuneGuidePage>(FortuneGuidePage.OVERVIEW) {
 
     override val sizeX = 360
     override val sizeY = 180
