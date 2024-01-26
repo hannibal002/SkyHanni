@@ -2,6 +2,7 @@ package at.hannibal2.skyhanni.utils.renderables
 
 import at.hannibal2.skyhanni.config.core.config.gui.GuiPositionEditor
 import at.hannibal2.skyhanni.data.ToolTipData
+import at.hannibal2.skyhanni.features.chroma.ChromaShaderManager
 import at.hannibal2.skyhanni.utils.ColorUtils
 import at.hannibal2.skyhanni.utils.LorenzLogger
 import at.hannibal2.skyhanni.utils.NEUItems.renderOnScreen
@@ -15,7 +16,9 @@ import net.minecraft.client.gui.GuiChat
 import net.minecraft.client.gui.inventory.GuiEditSign
 import net.minecraft.client.renderer.GlStateManager
 import net.minecraft.item.ItemStack
+import net.minecraft.util.ResourceLocation
 import org.lwjgl.input.Mouse
+import org.lwjgl.opengl.GL11
 import java.awt.Color
 import java.util.Collections
 import kotlin.math.max
@@ -40,6 +43,7 @@ interface Renderable {
     companion object {
         val logger = LorenzLogger("debug/renderable")
         val list = mutableMapOf<Pair<Int, Int>, List<Int>>()
+        private val BAR_TEXTURE = ResourceLocation("skyhanni", "texturedBar.png")
 
         var currentRenderPassMousePosition: Pair<Int, Int>? = null
             set
@@ -299,10 +303,45 @@ interface Renderable {
             }
         }
 
+        fun texturedProgressBar(
+            percent: Float,
+            color: Color = Color(0, 255, 0),
+            useChroma: Boolean = false,
+            width: Int = 30,
+            height: Int = 4,
+            horizontalAlign: HorizontalAlignment = HorizontalAlignment.Left,
+            verticalAlign: VerticalAlignment = VerticalAlignment.Top,
+        ) = object : Renderable {
+            override val width = width
+            override val height = height
+            override val horizontalAlign = horizontalAlign
+            override val verticalAlign = verticalAlign
+
+            override fun render(posX: Int, posY: Int) {
+                Minecraft.getMinecraft().renderEngine.bindTexture(BAR_TEXTURE)
+                Minecraft.getMinecraft().ingameGUI.drawTexturedModalRect(posX, posY, 0, 0, 182, 5)
+                Minecraft.getMinecraft().renderEngine.bindTexture(BAR_TEXTURE)
+                if (useChroma) {
+                    ColorUtils.bindColor(Color.WHITE.rgb, 1f)
+                    ChromaShaderManager.begin()
+                    GlStateManager.shadeModel(GL11.GL_SMOOTH)
+                } else {
+                    ColorUtils.bindColor(color.rgb, 1f)
+                }
+                Minecraft.getMinecraft().ingameGUI.drawTexturedModalRect(posX, posY, 0, 5, percent.toInt(), 5)
+                if (useChroma) {
+                    ChromaShaderManager.end()
+                    GlStateManager.shadeModel(GL11.GL_FLAT)
+                }
+                ColorUtils.bindColor(1.0f, 1.0f, 1.0f, 1.0f)
+            }
+        }
+
         fun progressBar(
             percent: Double,
             startColor: Color = Color(255, 0, 0),
             endColor: Color = Color(0, 255, 0),
+            useChroma: Boolean = false,
             width: Int = 30,
             height: Int = 4,
             horizontalAlign: HorizontalAlignment = HorizontalAlignment.Left,
@@ -317,9 +356,15 @@ interface Renderable {
             val color = ColorUtils.blendRGB(startColor, endColor, percent)
 
             override fun render(posX: Int, posY: Int) {
-                Gui.drawRect(0, 0, width, height, 0xFF43464B.toInt())
-                Gui.drawRect(1, 1, width - 1, height - 1, color.darker().rgb)
-                Gui.drawRect(1, 1, progress, height - 1, color.rgb)
+                if (useChroma){ //todo
+                    Gui.drawRect(0, 0, width, height, 0xFF43464B.toInt())
+                    Gui.drawRect(1, 1, width - 1, height - 1, 0)
+                    Gui.drawRect(1, 1, progress, height - 1, 0)
+                }else{
+                    Gui.drawRect(0, 0, width, height, 0xFF43464B.toInt())
+                    Gui.drawRect(1, 1, width - 1, height - 1, color.darker().rgb)
+                    Gui.drawRect(1, 1, progress, height - 1, color.rgb)
+                }
             }
 
         }

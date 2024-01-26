@@ -1,6 +1,7 @@
 package at.hannibal2.skyhanni.config
 
 import at.hannibal2.skyhanni.SkyHanniMod
+import at.hannibal2.skyhanni.api.SkillAPI
 import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.data.jsonobjects.local.FriendsJson
 import at.hannibal2.skyhanni.data.jsonobjects.local.JacobContestsJson
@@ -132,6 +133,31 @@ class ConfigManager {
 
                 override fun read(reader: JsonReader): SimpleTimeMark {
                     return reader.nextString().toLong().asTimeMark()
+                }
+            }.nullSafe())
+            .registerTypeAdapter(SkillAPI.SkillInfo::class.java, object : TypeAdapter<SkillAPI.SkillInfo>() {
+                override fun write(out: JsonWriter, value: SkillAPI.SkillInfo) {
+                    out.beginObject()
+                    out.name("level").value(value.level)
+                    out.name("totalXp").value(value.totalXp)
+                    out.name("currentXp").value(value.currentXp)
+                    out.name("currentXpMax").value(value.currentXpMax)
+                    out.endObject()
+                }
+
+                override fun read(reader: JsonReader): SkillAPI.SkillInfo {
+                    val skillInfo = SkillAPI.SkillInfo()
+                    reader.beginObject()
+                    while (reader.hasNext()) {
+                        when (reader.nextName()) {
+                            "level" -> skillInfo.level = reader.nextInt()
+                            "totalXp" -> skillInfo.totalXp = reader.nextDouble().toFloat()
+                            "currentXp" -> skillInfo.currentXp = reader.nextDouble().toFloat()
+                            "currentXpMax" -> skillInfo.currentXpMax = reader.nextDouble().toFloat()
+                        }
+                    }
+                    reader.endObject()
+                    return skillInfo
                 }
             }.nullSafe())
             .enableComplexMapKeySerialization()
