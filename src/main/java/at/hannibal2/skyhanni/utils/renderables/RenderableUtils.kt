@@ -3,6 +3,7 @@ package at.hannibal2.skyhanni.utils.renderables
 import at.hannibal2.skyhanni.utils.renderables.Renderable.Companion.HorizontalAlignment
 import at.hannibal2.skyhanni.utils.renderables.Renderable.Companion.VerticalAlignment
 import net.minecraft.client.renderer.GlStateManager
+import org.lwjgl.input.Mouse
 
 internal object RenderableUtils {
 
@@ -64,5 +65,17 @@ internal object RenderableUtils {
         this.render(posX, posY + yOffset)
         GlStateManager.translate(0f, -yOffset.toFloat(), 0f)
     }
+
+    fun scrollInput(scrollOld: Double, button: Int?, minHeight: Int, maxHeight: Int, velocity: Double, isValid: Boolean) =
+        if (maxHeight < minHeight) minHeight.toDouble() else
+            if (isValid) {
+                var scroll = scrollOld
+                if (button != null && Mouse.isButtonDown(button)) {
+                    scroll += (Mouse.getEventDY() * velocity )
+                }
+                val deltaWheel = Mouse.getEventDWheel()
+                scroll += (-deltaWheel.coerceIn(-1, 1) * 2.5 * velocity)
+                scroll.coerceIn(minHeight.toDouble(), maxHeight.toDouble())
+            } else scrollOld
 
 }
