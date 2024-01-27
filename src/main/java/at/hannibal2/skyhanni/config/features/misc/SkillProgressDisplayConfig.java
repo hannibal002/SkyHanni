@@ -71,8 +71,8 @@ public class SkillProgressDisplayConfig {
     public Property<Boolean> showOverflow = Property.of(true);
 
     @Expose
-    public Position position = new Position(339, -100, false, true);
+    public Position position = new Position(375, -130, false, true);
 
     @Expose
-    public Position barPosition = new Position(339, -110, false, true);
+    public Position barPosition = new Position(370, -112, false, true);
 }
