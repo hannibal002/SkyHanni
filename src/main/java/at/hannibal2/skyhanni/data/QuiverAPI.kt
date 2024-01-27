@@ -40,9 +40,9 @@ object QuiverAPI {
             arrow to it.value
         }?.filterNotNull()?.toMap()?.toMutableMap() ?: mutableMapOf()
         set(value) {
-            storage?.arrows?.arrowAmount = value.map {
-                it.key.toString() to it.value
-            }.toMap().toMutableMap()
+            storage?.arrows?.arrowAmount = value.mapKeys {
+                it.toString()
+            }.toMutableMap()
         }
     var currentAmount: Int
         get() = arrowAmount[currentArrow]?.toInt() ?: 0
