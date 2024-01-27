@@ -116,9 +116,7 @@ object QuiverAPI {
 
             val filledUpType = getArrowByNameOrNull(type) ?: return
 
-            val existingAmount = arrowAmount[filledUpType] ?: 0f
-            val newAmount = existingAmount + amount
-            arrowAmount[filledUpType] = newAmount
+            arrowAmount.merge(filledUpType,amount,Float::plus)
 
             return
         }
