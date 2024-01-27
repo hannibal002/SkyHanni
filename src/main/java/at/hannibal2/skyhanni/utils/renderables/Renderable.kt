@@ -303,8 +303,8 @@ interface Renderable {
             endColor: Color = Color(0, 255, 0),
             width: Int = 30,
             height: Int = 4,
-            horizontalAlign: HorizontalAlignment = HorizontalAlignment.Left,
-            verticalAlign: VerticalAlignment = VerticalAlignment.Top,
+            horizontalAlign: HorizontalAlignment = HorizontalAlignment.LEFT,
+            verticalAlign: VerticalAlignment = VerticalAlignment.TOP,
         ) = object : Renderable {
             override val width = width
             override val height = height
