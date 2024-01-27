@@ -13,7 +13,6 @@ public class SkillProgressDisplayConfig {
     @ConfigOption(name = "Enabled", desc = "Show the Skill Progress Display.")
     @ConfigEditorBoolean
     public Property<Boolean> enabled = Property.of(false);
-    ;
 
     @Expose
     @ConfigOption(name = "Progress Bar", desc = "yes progress bar are cool.")
@@ -71,8 +70,16 @@ public class SkillProgressDisplayConfig {
     public Property<Boolean> showOverflow = Property.of(true);
 
     @Expose
+    @ConfigOption(name = "All Skills Display", desc = "Show a display with all skills progress.")
+    @ConfigEditorBoolean
+    public Property<Boolean> allSkillProgress = Property.of(false);
+
+    @Expose
     public Position position = new Position(375, -130, false, true);
 
     @Expose
     public Position barPosition = new Position(370, -112, false, true);
+
+    @Expose
+    public Position allSkillPosition = new Position(20, 20, false, true);
 }

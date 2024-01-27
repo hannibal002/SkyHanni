@@ -18,6 +18,7 @@ import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.NumberUtil.formatNumber
 import at.hannibal2.skyhanni.utils.NumberUtil.roundToPrecision
 import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderables
+import at.hannibal2.skyhanni.utils.RenderUtils.renderStrings
 import at.hannibal2.skyhanni.utils.RenderUtils.renderStringsAndItems
 import at.hannibal2.skyhanni.utils.SpecialColour
 import at.hannibal2.skyhanni.utils.StringUtils.firstLetterUppercase
@@ -34,6 +35,7 @@ class SkillProgress {
     private val config get() = SkyHanniMod.feature.misc.skillProgressDisplayConfig
     private var skillExpPercentage = 0.0
     private var display = emptyList<List<Any>>()
+    private var allDisplay = emptyList<String>()
     private val defaultStack = Utils.createItemStack(Items.banner, "Default")
 
     @SubscribeEvent
@@ -52,6 +54,9 @@ class SkillProgress {
 
             config.barPosition.renderRenderables(listOf(progress), posLabel = "Skill Progress Bar")
         }
+        if (config.allSkillProgress.get()) {
+            config.allSkillPosition.renderStrings(allDisplay, posLabel = "All Skills Display")
+        }
     }
 
     @SubscribeEvent
@@ -68,6 +73,7 @@ class SkillProgress {
 
         if (event.repeatSeconds(1)) {
             update()
+            updateAllDisplay()
         }
     }
 
@@ -95,6 +101,28 @@ class SkillProgress {
 
     private fun update() {
         display = drawDisplay()
+    }
+
+    private fun updateAllDisplay() {
+        allDisplay = drawAllDisplay()
+    }
+
+    private fun drawAllDisplay(): List<String> {
+        val allDisplay = mutableListOf<String>()
+        val skillMap = skillMap ?: return allDisplay
+        for ((skillName, skillInfo) in skillMap) {
+            allDisplay.add(buildString {
+                append("§6${skillName.firstLetterUppercase()} ${skillInfo.level} ")
+                append("§7(")
+                append("§b${skillInfo.currentXp.addSeparators()}")
+                if (skillInfo.currentXpMax != 0L) {
+                    append("§6/")
+                    append("§b${skillInfo.currentXpMax.addSeparators()}")
+                    append("§7)")
+                }
+            })
+        }
+        return allDisplay
     }
 
     private fun drawDisplay(): List<List<Any>> {
