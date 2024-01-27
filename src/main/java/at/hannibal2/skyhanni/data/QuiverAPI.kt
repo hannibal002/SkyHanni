@@ -47,11 +47,8 @@ object QuiverAPI {
     var currentAmount: Int
         get() = arrowAmount[currentArrow]?.toInt() ?: 0
         set(value) {
-            currentArrow?.let { arrow ->
-                arrowAmount.let { amount ->
-                    amount[arrow] = value.toFloat()
-                }
-            }
+            arrowAmount[currentArrow ?: return] = value.toFloat()
+        }
         }
 
     private var arrows: List<ArrowType> = listOf()
