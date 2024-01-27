@@ -153,9 +153,8 @@ object QuiverAPI {
             val arrow = stack.getInternalNameOrNull() ?: continue
 
             val arrowType = getArrowByNameOrNull(arrow) ?: continue
-            val arrowAmount = stack.stackSize + this.arrowAmount.getOrDefault(arrowType, 0.0f)
 
-            this.arrowAmount[arrowType] = arrowAmount
+            this.arrowAmount.merge(arrowType,stack.stackSize.toFloat(),Float::plus)
         }
     }
 
