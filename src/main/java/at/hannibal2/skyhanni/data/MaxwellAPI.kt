@@ -59,7 +59,7 @@ object MaxwellAPI {
         chatPowerpattern.matchMatcher(message) {
             val power = group("power")
             currentPower = getPowerByNameOrNull(power) ?: return
-            return@matchMatcher
+            return
         }
     }
 
