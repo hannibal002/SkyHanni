@@ -35,10 +35,10 @@ object QuiverAPI {
             storage?.arrows?.currentArrow = value?.toString() ?: return
         }
     var arrowAmount: MutableMap<ArrowType, Float>
-        get() = storage?.arrows?.arrowAmount?.map {
-            val arrow = getArrowByNameOrNull(it.key.asInternalName()) ?: return@map null
+        get() = storage?.arrows?.arrowAmount?.mapNotNull {
+            val arrow = getArrowByNameOrNull(it.key.asInternalName()) ?: return@mapNotNull null
             arrow to it.value
-        }?.filterNotNull()?.toMap()?.toMutableMap() ?: mutableMapOf()
+        }?.toMap()?.toMutableMap() ?: mutableMapOf()
         set(value) {
             storage?.arrows?.arrowAmount = value.mapKeys {
                 it.toString()
