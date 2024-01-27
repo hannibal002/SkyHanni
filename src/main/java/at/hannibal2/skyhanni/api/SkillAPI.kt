@@ -4,6 +4,9 @@ import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.data.ProfileStorageData
 import at.hannibal2.skyhanni.events.ConfigLoadEvent
 import at.hannibal2.skyhanni.events.LorenzActionBarEvent
+import at.hannibal2.skyhanni.events.SkillOverflowLevelupEvent
+import at.hannibal2.skyhanni.utils.LorenzUtils
+import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.NumberUtil.formatNumber
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
@@ -53,10 +56,11 @@ object SkillAPI {
             if (matcher?.matches() == true) {
                 gained = matcher.group(1)
                 val skillS = matcher.group(2).lowercase()
+                val skillInfo = skillMap?.get(skillS) ?: SkillInfo()
                 when (matcher.pattern()) {
-                    SKILL_PATTERN -> handleSkillPattern(matcher, skillS)
-                    SKILL_PATTERN_PERCENT -> handleSkillPatternPercent(matcher, skillS)
-                    SKILL_PATTERN_MULTIPLIER -> handleSkillPatternMultiplier(matcher, skillS)
+                    SKILL_PATTERN -> handleSkillPattern(matcher, skillS, skillInfo)
+                    SKILL_PATTERN_PERCENT -> handleSkillPatternPercent(matcher, skillS, skillInfo)
+                    SKILL_PATTERN_MULTIPLIER -> handleSkillPatternMultiplier(matcher, skillS, skillInfo)
                 }
                 lastUpdate = SimpleTimeMark.now()
                 showDisplay = true
@@ -75,12 +79,14 @@ object SkillAPI {
         levelingMap = xpList.withIndex().associate { (index, xp) -> xp to index }
     }
 
-    private fun handleSkillPattern(matcher: Matcher, skillS: String) {
+    private fun handleSkillPattern(matcher: Matcher, skillS: String, skillInfo: SkillInfo) {
         val currentXp = matcher.group(3).formatNumber()
         val maxXp = matcher.group(4).formatNumber()
-        val skillInfo = SkillInfo()
         val level = getLevel(maxXp)
         val (levelOverflow, currentOverflow, currentMaxOverflow, totalOverflow) = getSkillInfo(level, currentXp, maxXp, maxXp)
+
+        if (skillInfo.level != 0 && levelOverflow == skillInfo.level + 1)
+            SkillOverflowLevelupEvent(skillS, skillInfo.level, levelOverflow).postAndCatch()
 
         skillInfo.apply {
             this.currentXp = currentOverflow
@@ -92,7 +98,7 @@ object SkillAPI {
         activeSkill = skillS
     }
 
-    private fun handleSkillPatternPercent(matcher: Matcher, skillS: String) {
+    private fun handleSkillPatternPercent(matcher: Matcher, skillS: String, skillInfo: SkillInfo?) {
         var tablistLevel = 0
         for (line in TabListData.getTabList()) {
             var levelMatcher = skillTabPattern.matcher(line)
@@ -126,10 +132,9 @@ object SkillAPI {
         activeSkill = skillS
     }
 
-    private fun handleSkillPatternMultiplier(matcher: Matcher, skillS: String) {
+    private fun handleSkillPatternMultiplier(matcher: Matcher, skillS: String, skillInfo: SkillInfo) {
         val currentXp = matcher.group(3).formatNumber()
         val maxXp = matcher.group(4).formatNumber()
-        val skillInfo = SkillInfo()
         val level = getLevel(maxXp)
         val levelingArray = levelArray(skillS)
         val levelXp = calculateLevelXp(levelingArray, level - 1).toLong() + currentXp
@@ -173,27 +178,22 @@ object SkillAPI {
         return Quad(level, xpCurrent, xpForCurr, total)
     }
 
-    fun calculateXpForLevel(targetLevel: Double): Long {
-        if (targetLevel < 60.0) return 0L
-        val integralPart = targetLevel.toInt()
-        val fractionalPart = targetLevel - integralPart
-        var level = 60
-        var totalXpNeeded = 0L
+    private fun xpRequiredForLevel(levelWithProgress: Double): Long {
+        val level = levelWithProgress.toInt()
         var slope = 600000L
-        var xpForNextLevel = 7000000L + slope
+        var xpForCurr = 7000000 + slope
+        var totalXpRequired = 0L
 
-        while (level < integralPart) {
-            totalXpNeeded += xpForNextLevel
-            xpForNextLevel += slope
-            level++
-            if (level % 10 == 0) slope *= 2
+        for (i in 61 .. level) {
+            totalXpRequired += xpForCurr
+            xpForCurr += slope
+            if (i % 10 == 0) slope *= 2
         }
 
-        if (fractionalPart > 0.0) {
-            totalXpNeeded += (xpForNextLevel * fractionalPart).toLong()
-        }
+        val fractionalProgress = levelWithProgress - level
+        totalXpRequired += (xpForCurr * fractionalProgress).toLong()
 
-        return totalXpNeeded
+        return totalXpRequired
     }
 
     private fun getLevel(neededXp: Long): Int {
@@ -223,6 +223,44 @@ object SkillAPI {
     private fun levelArray(skillType: String): JsonArray =
         if (skillType == "Runecrafting") Utils.getElement(Constants.LEVELING, "runecrafting_xp").asJsonArray
         else Utils.getElement(Constants.LEVELING, "leveling_xp").asJsonArray
+
+    fun onCommand(it: Array<String>) {
+        if (it.size != 2) {
+            commandHelp()
+            return
+        }
+
+        val second = it[1]
+        when (it.first()) {
+            "levelwithxp" -> {
+                val xp = second.toLong()
+                if (xp <= 111672425L) {
+                    val level = getLevel(xp)
+                    LorenzUtils.chat("With §b${xp.addSeparators()} §eXP you would be level §b$level")
+                } else {
+                    val (overflowLevel, current, needed, _) = calculateOverFlow(second.toLong())
+                    LorenzUtils.chat("With §b${xp.addSeparators()} §eXP you would be level §b$overflowLevel " +
+                        "§ewith progress (§b${current.addSeparators()}§e/§b${needed.addSeparators()}§e) XP")
+                }
+            }
+
+            "xpforlevel" -> {
+                val neededXP = xpRequiredForLevel(second.toDouble())
+                LorenzUtils.chat("You need §b${neededXP.addSeparators()} §eXP to be level §b${second.toDouble()}")
+            }
+
+            else -> {
+                commandHelp()
+            }
+        }
+    }
+
+    private fun commandHelp() {
+        LorenzUtils.chat("", false)
+        LorenzUtils.chat("/shskills levelwithxp <currentXP> - Get a level with the given current XP.")
+        LorenzUtils.chat("/shskills xpforlevel <desiredLevel> - Get how much XP you need for a desired level.")
+        LorenzUtils.chat("", false)
+    }
 
     data class SkillInfo(var level: Int = 0, var totalXp: Long = 0, var currentXp: Long = 0, var currentXpMax: Long = 0)
 

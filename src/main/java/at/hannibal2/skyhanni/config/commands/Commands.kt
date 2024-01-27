@@ -1,6 +1,7 @@
 package at.hannibal2.skyhanni.config.commands
 
 import at.hannibal2.skyhanni.SkyHanniMod
+import at.hannibal2.skyhanni.api.SkillAPI
 import at.hannibal2.skyhanni.config.ConfigFileType
 import at.hannibal2.skyhanni.config.ConfigGuiManager
 import at.hannibal2.skyhanni.data.ChatManager
@@ -237,6 +238,11 @@ object Commands {
         registerCommand0("shcalccroptime", "Calculate how long you need to farm crops between different crop milestones.", {
             FarmingMilestoneCommand.onCommand(it.getOrNull(0), it.getOrNull(1), it.getOrNull(2), true)
         }, FarmingMilestoneCommand::onComplete)
+        registerCommand0(
+            "shskills",
+            "Skills XP/Level related command",
+            { SkillAPI.onCommand(it) },
+            { listOf("levelwithxp", "xpforlevel") })
     }
 
     private fun usersBugFix() {

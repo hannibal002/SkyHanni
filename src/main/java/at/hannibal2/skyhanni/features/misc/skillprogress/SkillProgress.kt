@@ -11,6 +11,7 @@ import at.hannibal2.skyhanni.events.ConfigLoadEvent
 import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.LorenzTickEvent
 import at.hannibal2.skyhanni.events.PreProfileSwitchEvent
+import at.hannibal2.skyhanni.events.SkillOverflowLevelupEvent
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils.onToggle
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
@@ -69,6 +70,28 @@ class SkillProgress {
             update()
         }
     }
+
+    @SubscribeEvent
+    fun onLevelUp(event: SkillOverflowLevelupEvent) {
+        val skillName = event.skillName
+        val oldLevel = event.oldLevel
+        val newLevel = event.newLevel
+
+        val rewards = buildList {
+            add("  §r§7§8+§b1 Flexing Point\n")
+            if (newLevel % 5 == 0)
+                add("  §r§7§8+§d50 SkyHanni User Luck\n")
+        }
+
+        LorenzUtils.chat(
+            "§3§l▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬\n" +
+                "  §r§b§lSKILL LEVEL UP §3${skillName.firstLetterUppercase()} §8$oldLevel➜§3$newLevel\n" +
+                "\n" +
+                "  §r§a§lREWARDS\n" +
+                rewards.joinToString("") +
+                "  §3§l▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬")
+    }
+
 
     private fun update() {
         display = drawDisplay()
