@@ -8,8 +8,9 @@ import at.hannibal2.skyhanni.events.LorenzChatEvent
 import at.hannibal2.skyhanni.events.PlaySoundEvent
 import at.hannibal2.skyhanni.events.RepositoryReloadEvent
 import at.hannibal2.skyhanni.utils.InventoryUtils
+import at.hannibal2.skyhanni.utils.ItemCategory
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalNameOrNull
-import at.hannibal2.skyhanni.utils.ItemUtils.getLore
+import at.hannibal2.skyhanni.utils.ItemUtils.getItemCategoryOrNull
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.NEUInternalName
 import at.hannibal2.skyhanni.utils.NEUInternalName.Companion.asInternalName
@@ -145,7 +146,7 @@ object QuiverAPI {
 
         val stacks = event.inventoryItems
         for (stack in stacks.values) {
-            if(stack.getItemCategoryOrNull() != ItemCategory.ARROW) continue
+            if (stack.getItemCategoryOrNull() != ItemCategory.ARROW) continue
 
             val arrow = stack.getInternalNameOrNull() ?: continue
 
