@@ -26,9 +26,9 @@ import java.util.regex.Matcher
 
 object SkillAPI {
     private val patternGroup = RepoPattern.group("display.skilldisplay")
-    private val SKILL_PATTERN_PERCENT by patternGroup.pattern("skillpaternpercent", "\\+(\\d+(?:,\\d+)*(?:\\.\\d+)?) (.+) \\((\\d\\d?(?:\\.\\d\\d?)?)%\\)")
-    private val SKILL_PATTERN by patternGroup.pattern("skillpattern", "\\+(\\d+(?:,\\d+)*(?:\\.\\d+)?) (.+) \\((\\d+(?:,\\d+)*(?:\\.\\d+)?)/(\\d+(?:,\\d+)*(?:\\.\\d+)?)\\)")
-    private val SKILL_PATTERN_MULTIPLIER by patternGroup.pattern("skillpatternmultiplier", "\\+(\\d+(?:,\\d+)*(?:\\.\\d+)?) (.+) \\((\\d+(?:,\\d+)*(?:\\.\\d+)?)/(\\d+(?:.\\d+)*(?:k|m|b))\\)")
+    private val SKILL_PATTERN_PERCENT by patternGroup.pattern("skillpaternpercent", "\\+([\\d.,]+) (.+) \\(([\\d.]+)%\\)")
+    private val SKILL_PATTERN by patternGroup.pattern("skillpattern", "\\+([\\d.,]+) (.+) \\(([\\d.,]+)/([\\d.,]+)\\)")
+    private val SKILL_PATTERN_MULTIPLIER by patternGroup.pattern("skillpatternmultiplier", "\\+([\\d.,]+) (.+) \\(([\\d.,]+)/([\\d,.]+[kmb])\\)")
     private val skillTabPattern by patternGroup.pattern("skilltabpattern", "^§e§lSkills: §r§a(?<type>\\w+) (?<level>\\d+): §r§3(?<progress>.+)%\$")
     private val maxSkillTabPattern by patternGroup.pattern("maxskilltabpattern", "^§e§lSkills: §r§a(?<type>\\w+) (?<level>\\d+): §r§c§lMAX\$")
     private val SPACE_SPLITTER = Splitter.on("  ").omitEmptyStrings().trimResults()
@@ -153,15 +153,15 @@ object SkillAPI {
         return skillMap?.get(skillName)
     }
 
-    private fun getSkillInfo(currentLevel: Int, currentXp: Long, neededXp: Long, totalXp: Long): Quad<Int, Long, Long, Long> {
+    private fun getSkillInfo(currentLevel: Int, currentXp: Long, neededXp: Long, totalXp: Long): LorenzUtils.Quad<Int, Long, Long, Long> {
         val (level, overflowExp, xpForCurrentLevel, total) = calculateOverFlow(currentXp)
-        return if (currentLevel >= 60 && SkyHanniMod.feature.misc.skillProgressDisplayConfig.showOverflow.get()) Quad(level, overflowExp, xpForCurrentLevel, total) else Quad(currentLevel, currentXp, neededXp, totalXp)
+        return if (currentLevel >= 60 && SkyHanniMod.feature.misc.skillProgressDisplayConfig.showOverflow) LorenzUtils.Quad(level, overflowExp, xpForCurrentLevel, total) else LorenzUtils.Quad(currentLevel, currentXp, neededXp, totalXp)
     }
 
     /**
      * @author Soopyboo32
      */
-    private fun calculateOverFlow(currentXp: Long): Quad<Int, Long, Long, Long> {
+    private fun calculateOverFlow(currentXp: Long): LorenzUtils.Quad<Int, Long, Long, Long> {
         var xpCurrent = currentXp
         var slope = 600000L
         var xpForCurr = 7000000 + slope
@@ -175,7 +175,7 @@ object SkillAPI {
             if (level % 10 == 0) slope *= 2
         }
         total += xpCurrent
-        return Quad(level, xpCurrent, xpForCurr, total)
+        return LorenzUtils.Quad(level, xpCurrent, xpForCurr, total)
     }
 
     private fun xpRequiredForLevel(levelWithProgress: Double): Long {
@@ -263,13 +263,4 @@ object SkillAPI {
     }
 
     data class SkillInfo(var level: Int = 0, var totalXp: Long = 0, var currentXp: Long = 0, var currentXpMax: Long = 0)
-
-    data class Quad<out A, out B, out C, out D>(
-        val first: A,
-        val second: B,
-        val third: C,
-        val quad: D
-    ) : Serializable {
-        override fun toString(): String = "($first, $second, $third, $quad)"
-    }
 }

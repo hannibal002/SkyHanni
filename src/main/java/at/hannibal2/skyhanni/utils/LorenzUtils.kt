@@ -31,6 +31,7 @@ import net.minecraft.util.ChatComponentText
 import net.minecraftforge.fml.common.FMLCommonHandler
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import java.awt.Color
+import java.io.Serializable
 import java.lang.reflect.Constructor
 import java.lang.reflect.Field
 import java.lang.reflect.Modifier
@@ -715,4 +716,13 @@ object LorenzUtils {
 
     val Long.ticks get() = (this * 50).milliseconds
     val Int.ticks get() = (this * 50).milliseconds
+
+    data class Quad<out A, out B, out C, out D>(
+        val first: A,
+        val second: B,
+        val third: C,
+        val quad: D
+    ) : Serializable {
+        override fun toString(): String = "($first, $second, $third, $quad)"
+    }
 }

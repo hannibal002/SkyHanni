@@ -7,18 +7,15 @@ import at.hannibal2.skyhanni.api.SkillAPI.lastUpdate
 import at.hannibal2.skyhanni.api.SkillAPI.showDisplay
 import at.hannibal2.skyhanni.api.SkillAPI.skillMap
 import at.hannibal2.skyhanni.api.SkillAPI.stackMap
-import at.hannibal2.skyhanni.events.ConfigLoadEvent
 import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.LorenzTickEvent
 import at.hannibal2.skyhanni.events.PreProfileSwitchEvent
 import at.hannibal2.skyhanni.events.SkillOverflowLevelupEvent
 import at.hannibal2.skyhanni.utils.LorenzUtils
-import at.hannibal2.skyhanni.utils.LorenzUtils.onToggle
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.NumberUtil.formatNumber
 import at.hannibal2.skyhanni.utils.NumberUtil.roundToPrecision
 import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderables
-import at.hannibal2.skyhanni.utils.RenderUtils.renderStrings
 import at.hannibal2.skyhanni.utils.RenderUtils.renderStringsAndItems
 import at.hannibal2.skyhanni.utils.SpecialColour
 import at.hannibal2.skyhanni.utils.StringUtils.firstLetterUppercase
@@ -35,27 +32,27 @@ class SkillProgress {
     private val config get() = SkyHanniMod.feature.misc.skillProgressDisplayConfig
     private var skillExpPercentage = 0.0
     private var display = emptyList<List<Any>>()
-    private var allDisplay = emptyList<String>()
+    private var allDisplay = emptyList<Renderable>()
     private val defaultStack = Utils.createItemStack(Items.banner, "Default")
 
     @SubscribeEvent
     fun onRenderOverlay(event: GuiRenderEvent.GuiOverlayRenderEvent) {
         if (!isEnabled()) return
         if (!showDisplay) return
-        config.position.renderStringsAndItems(display, itemScale = 1.5, posLabel = "Skill Progress")
-        if (config.showProgressBar.get() && display.isNotEmpty()) {
-            val progress = if (config.useTexturedBar.get()) {
+        config.position.renderStringsAndItems(display, posLabel = "Skill Progress")
+        if (config.showProgressBar && display.isNotEmpty()) {
+            val progress = if (config.useTexturedBar) {
                 var factor = skillExpPercentage.toFloat()
                 if (factor > 1f) factor = 1f
                 factor *= 182f
-                Renderable.texturedProgressBar(factor, Color(SpecialColour.specialToChromaRGB(config.barStartColor)), width = 182, height = 5, useChroma = config.useChroma.get())
+                Renderable.texturedProgressBar(factor, Color(SpecialColour.specialToChromaRGB(config.barStartColor)), width = 182, height = 5, useChroma = config.useChroma)
             } else
                 Renderable.progressBar(skillExpPercentage, Color(SpecialColour.specialToChromaRGB(config.barStartColor)), Color(SpecialColour.specialToChromaRGB(config.barStartColor)), width = 182)
 
             config.barPosition.renderRenderables(listOf(progress), posLabel = "Skill Progress Bar")
         }
-        if (config.allSkillProgress.get()) {
-            config.allSkillPosition.renderStrings(allDisplay, posLabel = "All Skills Display")
+        if (config.allSkillProgress) {
+            config.allSkillPosition.renderRenderables(allDisplay, posLabel = "All Skills Display")
         }
     }
 
@@ -69,7 +66,7 @@ class SkillProgress {
     fun onTick(event: LorenzTickEvent) {
         if (!isEnabled()) return
 
-        if (lastUpdate.passedSince() > 3.seconds) showDisplay = config.alwaysShow.get()
+        if (lastUpdate.passedSince() > 3.seconds) showDisplay = config.alwaysShow
 
         if (event.repeatSeconds(1)) {
             update()
@@ -107,11 +104,10 @@ class SkillProgress {
         allDisplay = drawAllDisplay()
     }
 
-    private fun drawAllDisplay(): List<String> {
-        val allDisplay = mutableListOf<String>()
-        val skillMap = skillMap ?: return allDisplay
+    private fun drawAllDisplay() = buildList {
+        val skillMap = skillMap ?: return@buildList
         for ((skillName, skillInfo) in skillMap) {
-            allDisplay.add(buildString {
+            add(Renderable.string(buildString {
                 append("§6${skillName.firstLetterUppercase()} ${skillInfo.level} ")
                 append("§7(")
                 append("§b${skillInfo.currentXp.addSeparators()}")
@@ -120,33 +116,30 @@ class SkillProgress {
                     append("§b${skillInfo.currentXpMax.addSeparators()}")
                     append("§7)")
                 }
-            })
+            }))
         }
-        return allDisplay
     }
 
-    private fun drawDisplay(): List<List<Any>> {
-        val newDisplay = mutableListOf<List<Any>>()
-        val skillMap = skillMap ?: return newDisplay
-        val skill = skillMap[activeSkill] ?: return newDisplay
-
-        newDisplay.add(buildList {
-            if (config.showLevel.get())
+    private fun drawDisplay() = buildList {
+        val skillMap = skillMap ?: return@buildList
+        val skill = skillMap[activeSkill] ?: return@buildList
+        add(buildList {
+            if (config.showLevel)
                 add("§9[§d${skill.level}§9] ")
 
-            if (config.useIcon.get())
-                add(stackMap.getOrDefault(activeSkill.firstLetterUppercase(), defaultStack))
+            if (config.useIcon)
+                add(Renderable.itemStack(stackMap.getOrDefault(activeSkill.firstLetterUppercase(), defaultStack), 1.5))
 
             add(buildString {
                 append("§b+${SkillAPI.gained} ")
 
-                if (config.useSkillName.get())
+                if (config.useSkillName)
                     append("${activeSkill.firstLetterUppercase()} ")
 
                 val percent = if (skill.currentXpMax == 0L) 100F else 100F * skill.currentXp / skill.currentXpMax
                 skillExpPercentage = (percent.toDouble() / 100)
 
-                if (config.usePercentage.get())
+                if (config.usePercentage)
                     append("§7(§6${percent.roundToPrecision(2)}%§7)")
                 else {
                     if (skill.currentXpMax == 0L)
@@ -155,7 +148,7 @@ class SkillProgress {
                         append("§7(§6${skill.currentXp.addSeparators()}§7/§6${skill.currentXpMax.addSeparators()}§7)")
                 }
 
-                if (config.showActionLeft.get() && percent != 100f) {
+                if (config.showActionLeft && percent != 100f) {
                     append(" - ")
                     if (SkillAPI.gained != "") {
                         val actionLeft = (ceil(skill.currentXpMax.toDouble() - skill.currentXp) / SkillAPI.gained.formatNumber()).toLong().addSeparators()
@@ -166,24 +159,7 @@ class SkillProgress {
                 }
             })
         })
-        return newDisplay
     }
 
-    @SubscribeEvent
-    fun onConfigLoad(event: ConfigLoadEvent) {
-        config.enabled.onToggle { update() }
-        config.alwaysShow.onToggle { update() }
-        config.showProgressBar.onToggle { update() }
-        config.showOverflow.onToggle { update() }
-        config.showLevel.onToggle { update() }
-        config.showActionLeft.onToggle { update() }
-        config.useIcon.onToggle { update() }
-        config.useSkillName.onToggle { update() }
-        config.useTexturedBar.onToggle { update() }
-        config.useChroma.onToggle { update() }
-        config.usePercentage.onToggle { update() }
-        update()
-    }
-
-    private fun isEnabled() = LorenzUtils.inSkyBlock && config.enabled.get()
+    private fun isEnabled() = LorenzUtils.inSkyBlock && config.enabled
 }
