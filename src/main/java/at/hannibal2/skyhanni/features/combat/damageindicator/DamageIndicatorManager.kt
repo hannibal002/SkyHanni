@@ -36,6 +36,7 @@ import at.hannibal2.skyhanni.utils.LorenzVec
 import at.hannibal2.skyhanni.utils.NumberUtil
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.RenderUtils.drawDynamicText
+import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.SimpleTimeMark.Companion.asTimeMark
 import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
@@ -101,6 +102,12 @@ class DamageIndicatorManager {
             return data.values
                 .map { it.entity.getLorenzVec() }
                 .minOfOrNull { it.distance(location) } ?: Double.MAX_VALUE
+        }
+
+        fun removeDamageIndicator(type: BossType) {
+            data = data.editCopy {
+                values.removeIf {it.bossType == type}
+            }
         }
     }
 
@@ -800,7 +807,7 @@ class DamageIndicatorManager {
             entityResult.delayedStart?.asTimeMark(),
             entityResult.finalDungeonBoss,
             entityResult.bossType,
-            foundTime = System.currentTimeMillis()
+            foundTime = SimpleTimeMark.now()
         )
         DamageIndicatorDetectedEvent(entityData).postAndCatch()
         return entityData
@@ -895,7 +902,6 @@ class DamageIndicatorManager {
 
             result
         }
-
 
     }
 
