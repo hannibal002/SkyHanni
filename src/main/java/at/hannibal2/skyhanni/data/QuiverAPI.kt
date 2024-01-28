@@ -145,8 +145,7 @@ object QuiverAPI {
 
         val stacks = event.inventoryItems
         for (stack in stacks.values) {
-            val lore = stack.getLore()
-            if (lore.isEmpty()) continue
+            if(stack.getItemCategoryOrNull() != ItemCategory.ARROW) continue
 
             val arrow = stack.getInternalNameOrNull() ?: continue
 
