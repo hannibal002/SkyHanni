@@ -18,9 +18,13 @@ object MayorAPI {
     private var dispatcher = Dispatchers.IO
 
     var rawMayorData: MayorJson? = null
+        private set
     var candidates = mapOf<Int, MayorJson.Candidate>()
+        private set
     var currentMayor: MayorJson.Candidate? = null
+        private set
     var timeTillNextMayor = 0L
+        private set
 
     private const val LATE_SPRING = 3
 
