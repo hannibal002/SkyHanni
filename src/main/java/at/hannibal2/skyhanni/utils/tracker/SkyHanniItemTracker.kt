@@ -71,7 +71,7 @@ class SkyHanniItemTracker<Data : ItemTrackerData>(
     fun drawItems(
         data: Data,
         filter: (NEUInternalName) -> Boolean,
-        lists: MutableList<List<Any>>
+        lists: MutableList<List<Any>>,
     ): Double {
         var profit = 0.0
         val items = mutableMapOf<Renderable, Long>()
@@ -102,7 +102,7 @@ class SkyHanniItemTracker<Data : ItemTrackerData>(
 
             val lore = buildLore(data, itemProfit, hidden, newDrop, internalName)
 
-            val renderable = if (isInventoryOpen()) Renderable.clickAndHover(displayName, lore) {
+            val renderable = if (isInventoryOpen()) Renderable.clickAndHover(displayName, lore, onClick = {
                 if (System.currentTimeMillis() > lastClickDelay + 150) {
                     if (KeyboardManager.isModifierKeyDown()) {
                         data.items.remove(internalName)
@@ -116,7 +116,7 @@ class SkyHanniItemTracker<Data : ItemTrackerData>(
                     }
                     update()
                 }
-            } else Renderable.string(displayName)
+            }) else Renderable.string(displayName)
             if (isInventoryOpen() || !hidden) {
                 items[renderable] = price
             }
@@ -152,7 +152,7 @@ class SkyHanniItemTracker<Data : ItemTrackerData>(
         item: ItemTrackerData.TrackedItem,
         hidden: Boolean,
         newDrop: Boolean,
-        internalName: NEUInternalName
+        internalName: NEUInternalName,
     ) = buildList {
         if (internalName == SKYBLOCK_COIN) {
             addAll(data.getCoinDescription(item))

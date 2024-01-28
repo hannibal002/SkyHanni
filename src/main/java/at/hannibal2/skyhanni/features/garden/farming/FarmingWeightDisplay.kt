@@ -124,18 +124,18 @@ class FarmingWeightDisplay {
                     listOf("§eClick here to reload the data right now!"),
                     onClick = recalculate
                 ), Renderable.clickAndHover(
-                    "§cdata from Elite Farmers!",
-                    listOf("§eClick here to reload the data right now!"),
-                    onClick = recalculate
-                ), Renderable.clickAndHover(
-                    "§eRejoin the garden or",
-                    listOf("§eClick here to reload the data right now!"),
-                    onClick = recalculate
-                ), Renderable.clickAndHover(
-                    "§eclick here to fix it.",
-                    listOf("§eClick here to reload the data right now!"),
-                    onClick = recalculate
-                )
+                "§cdata from Elite Farmers!",
+                listOf("§eClick here to reload the data right now!"),
+                onClick = recalculate
+            ), Renderable.clickAndHover(
+                "§eRejoin the garden or",
+                listOf("§eClick here to reload the data right now!"),
+                onClick = recalculate
+            ), Renderable.clickAndHover(
+                "§eclick here to fix it.",
+                listOf("§eClick here to reload the data right now!"),
+                onClick = recalculate
+            )
             )
         }
 
@@ -178,12 +178,13 @@ class FarmingWeightDisplay {
             val leaderboard = getLeaderboard()
 
             val list = mutableListOf<Renderable>()
-            list.add(Renderable.clickAndHover(
-                "§6Farming Weight§7: $weight$leaderboard",
-                listOf("§eClick to open the Farming Profile of you.")
-            ) {
-                openWebsite(LorenzUtils.getPlayerName())
-            })
+            list.add(
+                Renderable.clickAndHover(
+                    "§6Farming Weight§7: $weight$leaderboard",
+                    listOf("§eClick to open the Farming Profile of you."), onClick = {
+                    openWebsite(LorenzUtils.getPlayerName())
+                })
+            )
 
             if (isEtaEnabled() && (weightPerSecond != -1.0 || config.overtakeETAAlways)) {
                 getETA()?.let {
@@ -306,10 +307,9 @@ class FarmingWeightDisplay {
             } else {
                 Renderable.clickAndHover(
                     text,
-                    listOf("§eClick to open the Farming Profile of §b$nextName.")
-                ) {
+                    listOf("§eClick to open the Farming Profile of §b$nextName."), onClick = {
                     openWebsite(nextName)
-                }
+                })
             }
         }
 
@@ -403,8 +403,8 @@ class FarmingWeightDisplay {
         private fun showLbChange(direction: String, oldPosition: Int) {
             farmingChatMessage(
                 "§7Since your last visit to the §aGarden§7, " +
-                        "you have $direction §7on the §dFarming Leaderboard§7. " +
-                        "§7(§e#${oldPosition.addSeparators()} §7-> §e#${leaderboardPosition.addSeparators()}§7)"
+                    "you have $direction §7on the §dFarming Leaderboard§7. " +
+                    "§7(§e#${oldPosition.addSeparators()} §7-> §e#${leaderboardPosition.addSeparators()}§7)"
             )
         }
 
@@ -481,8 +481,8 @@ class FarmingWeightDisplay {
             apiError = true
             LorenzUtils.error(
                 "Loading the farming weight data from elitebot.dev failed!\n"
-                        + "§eYou can re-enter the garden to try to fix the problem.\n" +
-                        "§cIf this message repeats, please report it on Discord!",
+                    + "§eYou can re-enter the garden to try to fix the problem.\n" +
+                    "§cIf this message repeats, please report it on Discord!",
             )
         }
 

@@ -1,5 +1,8 @@
 package at.hannibal2.skyhanni.utils
 
+import at.hannibal2.skyhanni.utils.LorenzUtils.round
+import at.hannibal2.skyhanni.utils.NumberUtil.percentOf
+import at.hannibal2.skyhanni.utils.renderables.Renderable
 import net.minecraft.client.Minecraft
 import net.minecraft.client.gui.FontRenderer
 import net.minecraft.client.gui.GuiScreen
@@ -9,7 +12,6 @@ import net.minecraft.item.ItemStack
 import org.lwjgl.opengl.GL11
 import java.awt.Color
 import java.text.DecimalFormat
-import kotlin.math.roundToInt
 
 /**
  * Some functions taken from NotEnoughUpdates
@@ -91,7 +93,7 @@ object GuiRenderUtils {
         mouseX: Int,
         mouseY: Int,
         screenHeight: Int,
-        fr: FontRenderer
+        fr: FontRenderer,
     ) {
         if (textLines.isNotEmpty()) {
             val borderColor = StringUtils.getColor(textLines[0], 0x505000FF)
@@ -187,7 +189,7 @@ object GuiRenderUtils {
         y: Int,
         mouseX: Int,
         mouseY: Int,
-        color: Int = 0xFF43464B.toInt()
+        color: Int = 0xFF43464B.toInt(),
     ) {
         GuiScreen.drawRect(x, y, x + 16, y + 16, color)
         if (item != null) {
@@ -206,7 +208,7 @@ object GuiRenderUtils {
         y: Float,
         mouseX: Float,
         mouseY: Float,
-        color: Int = 0xFF43464B.toInt()
+        color: Int = 0xFF43464B.toInt(),
     ) {
         renderItemAndTip(list, item, x.toInt(), y.toInt(), mouseX.toInt(), mouseY.toInt(), color)
     }
@@ -223,9 +225,27 @@ object GuiRenderUtils {
         mouseX: Int,
         mouseY: Int,
         output: MutableList<String>,
-        textScale: Float = .7f
+        textScale: Float = .7f,
     ) {
-        var currentVal = currentValue.toDouble()
+        val percent = currentValue.percentOf(maxValue)
+        GlStateManager.translate(xPos.toFloat(), yPos.toFloat(), 0f)
+        Renderable.hoverTips(
+            Renderable.verticalList(
+                listOf(
+                    Renderable.string(label, scale = 0.7),
+                    Renderable.leftRightBox(
+                        Renderable.string("§2${DecimalFormat("0.##").format(currentValue.toDouble())} / ${DecimalFormat("0.##").format(maxValue)}☘", scale = 0.7),
+                        Renderable.string("§2${(percent * 100).round(1)}%", scale = 0.7),
+                        width
+                    ),
+                    Renderable.progressBar(percent, width = width)
+                )
+            ),
+            listOf(Renderable.string(tooltip))
+        ).render(mouseX, mouseY)
+        GlStateManager.translate(-xPos.toFloat(), -yPos.toFloat(), 0f)
+
+        /* var currentVal = currentValue.toDouble()
         currentVal = if (currentVal < 0) 0.0 else currentVal
 
         var barProgress = currentVal / maxValue.toFloat()
@@ -269,7 +289,7 @@ object GuiRenderUtils {
             for (line in split) {
                 output.add(line)
             }
-        }
+        } */
     }
 
     private fun barColorGradient(double: Double): Int {

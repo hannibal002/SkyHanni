@@ -15,7 +15,7 @@ class OverviewPage : FFGuideGUI.FFGuidePage() {
     private var equipmentFF = mutableMapOf<FFTypes, Double>()
     private var armorFF = mutableMapOf<FFTypes, Double>()
 
-    override fun drawPage(mouseX: Int, mouseY: Int, partialTicks: Float) {
+    override fun drawPage(mouseX: Int, mouseY: Int) {
         val timeUntilCakes = TimeUtils.formatDuration(FFStats.cakeExpireTime - System.currentTimeMillis())
 
         GuiRenderUtils.drawFarmingBar(
