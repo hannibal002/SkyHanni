@@ -86,7 +86,6 @@ object QuiverAPI {
         selectPattern.matchMatcher(message) {
             val arrow = group("arrow")
             currentArrow = getArrowByNameOrNull(arrow) ?: return
-            currentAmount = arrowAmount[currentArrow]?.toInt() ?: 0
 
             return
         }
