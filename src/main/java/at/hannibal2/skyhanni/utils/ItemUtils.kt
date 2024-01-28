@@ -380,4 +380,6 @@ object ItemUtils {
         }
         return rarity
     }
+
+    fun NEUInternalName.isRune(): Boolean = contains("_RUNE;")
 }
