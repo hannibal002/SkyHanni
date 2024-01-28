@@ -59,7 +59,7 @@ object MaxwellAPI {
         chatPowerpattern.matchMatcher(message) {
             val power = group("power")
             currentPower = getPowerByNameOrNull(power) ?: return
-            return@matchMatcher
+            return
         }
     }
 
@@ -70,8 +70,10 @@ object MaxwellAPI {
         if (thaumatorgyrGuiPattern.matches(event.inventoryName)) {
             val stacks = event.inventoryItems
             val selectedPower =
-                stacks.values.find { it.getLore().isNotEmpty() && it.getLore().last() == "§aPower is selected!" }
-                    ?: return
+                stacks.values.find {
+                    val lore = it.getLore()
+                    lore.isNotEmpty() && lore.last() == "§aPower is selected!"
+                } ?: return
 
             currentPower = getPowerByNameOrNull(selectedPower.displayName) ?: return
             return

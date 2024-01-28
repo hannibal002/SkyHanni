@@ -15,8 +15,8 @@ import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
 object BitsAPI {
-    private val profileStorage = ProfileStorageData.profileSpecific?.bits
-    private val playerStorage = SkyHanniMod.feature.storage
+    private val profileStorage get() = ProfileStorageData.profileSpecific?.bits
+    private val playerStorage get() = SkyHanniMod.feature.storage
     var bits: Int
         get() = profileStorage?.bits ?: 0
         set(value) {
@@ -130,7 +130,9 @@ object BitsAPI {
 
         bitsEarnedChatPattern.matchMatcher(message) {
             // Only two locations where the bits line isn't shown, but you can still get bits
-            if (LorenzUtils.inAnyIsland(IslandType.CATACOMBS, IslandType.THE_RIFT)) return
+            if (!LorenzUtils.inAnyIsland(IslandType.CATACOMBS, IslandType.THE_RIFT)) return
+
+            // TODO: Remove bits to claim which you just get from being in those islands
 
             val amount = group("amount").formatNumber().toInt()
             bits += amount
@@ -188,5 +190,5 @@ object BitsAPI {
         }
     }
 
-    fun isEnabled() = LorenzUtils.inSkyBlock && profileStorage != null
+    fun isEnabled() = LorenzUtils.inSkyBlock && profileStorage != null && playerStorage != null
 }

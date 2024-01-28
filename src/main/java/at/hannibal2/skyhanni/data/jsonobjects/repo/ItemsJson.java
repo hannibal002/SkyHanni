@@ -16,7 +16,7 @@ public class ItemsJson {
 
     @Expose
     public Map<String, Float> enchant_multiplier;
-  
+
     @Expose
     public List<NEUInternalName> lava_fishing_rods;
 
