@@ -103,9 +103,8 @@ object QuiverAPI {
 
         fillUpPattern.matchMatcher(message) {
             val flintAmount = group("flintAmount").formatNumber().toFloat()
-            val existingAmount = arrowAmount[FLINT_ARROW_TYPE] ?: 0f
 
-            arrowAmount[FLINT_ARROW_TYPE] = existingAmount + flintAmount
+            arrowAmount.merge(FLINT_ARROW_TYPE, flintAmount, Float::plus)
 
             return
         }
