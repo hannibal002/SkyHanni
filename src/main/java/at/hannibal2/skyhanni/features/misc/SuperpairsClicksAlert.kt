@@ -29,6 +29,7 @@ class SuperpairsClicksAlert {
                 roundsNeeded = -1
                 break
             }
+            if (lore.any { it.contains("Enchanting level too low!") || it.contains("Not enough experience!") }) continue
             val match = lore.asReversed().firstNotNullOfOrNull { roundsNeededRegex.find(it.removeColor()) } ?: continue
             roundsNeeded = match.groups[1]!!.value.toInt()
             break
