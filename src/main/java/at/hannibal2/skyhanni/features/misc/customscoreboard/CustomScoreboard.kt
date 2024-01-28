@@ -45,7 +45,7 @@ class CustomScoreboard {
 
         RenderBackground().renderBackground()
 
-        if (!TabListData.fullyLoaded && config.displayConfig.cacheScoreboardOnIslandSwitch) {
+        if (!TabListData.fullyLoaded && config.displayConfig.cacheScoreboardOnIslandSwitch && cache.isNotEmpty()) {
             config.position.renderStringsAlignedWidth(cache, posLabel = "Custom Scoreboard")
         } else {
             config.position.renderStringsAlignedWidth(display, posLabel = "Custom Scoreboard")
