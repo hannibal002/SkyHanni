@@ -21,7 +21,6 @@ import io.github.moulberry.notenoughupdates.util.Utils
 import net.minecraft.init.Blocks
 import net.minecraft.init.Items
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
-import java.io.Serializable
 import java.util.regex.Matcher
 
 object SkillAPI {
