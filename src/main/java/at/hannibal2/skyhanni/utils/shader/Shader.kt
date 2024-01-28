@@ -45,47 +45,42 @@ abstract class Shader(val vertex: String, val fragment: String) {
             fragmentShaderID = -1
         }
         if (shaderProgram >= 0) {
-            OpenGlHelper.glDeleteProgram(shaderProgram);
+            OpenGlHelper.glDeleteProgram(shaderProgram)
         }
     }
 
     fun recompile() {
         deleteOldShaders()
         shaderProgram = ShaderLinkHelper.getStaticShaderLinkHelper().createProgram()
-        vertexShaderID = ShaderManager.loadShader(ShaderType.VERTEX, vertex)
+
+        vertexShaderID = ShaderManager.loadShader(ShaderType.VERTEX, vertex).also { if (it == -1) return }
         ShaderManager.attachShader(shaderProgram, vertexShaderID)
-        fragmentShaderID = ShaderManager.loadShader(ShaderType.FRAGMENT, fragment)
+
+        fragmentShaderID = ShaderManager.loadShader(ShaderType.FRAGMENT, fragment).also { if (it == -1) return }
         ShaderManager.attachShader(shaderProgram, fragmentShaderID)
-        run {
-            val vertexShaderID = ShaderManager.loadShader(ShaderType.VERTEX, vertex).also { if (it == -1) return@run }
-            ShaderManager.attachShader(shaderProgram, vertexShaderID)
 
-            val fragmentShaderID = ShaderManager.loadShader(ShaderType.FRAGMENT, fragment).also { if (it == -1) return@run }
-            ShaderManager.attachShader(shaderProgram, fragmentShaderID)
+        ShaderHelper.glLinkProgram(shaderProgram)
 
-            ShaderHelper.glLinkProgram(shaderProgram)
+        if (ShaderHelper.glGetProgrami(shaderProgram, ShaderHelper.GL_LINK_STATUS) == GL11.GL_FALSE) {
+            val errorMessage = "Failed to link vertex shader $vertex and fragment shader $fragment. Features that " +
+                    "utilise this shader will not work correctly, if at all"
+            val errorLog = StringUtils.trim(ShaderHelper.glGetShaderInfoLog(shaderProgram, 1024))
 
-            if (ShaderHelper.glGetProgrami(shaderProgram, ShaderHelper.GL_LINK_STATUS) == GL11.GL_FALSE) {
-                val errorMessage = "Failed to link vertex shader $vertex and fragment shader $fragment. Features that " +
-                        "utilise this shader will not work correctly, if at all."
-                val errorLog = StringUtils.trim(ShaderHelper.glGetShaderInfoLog(shaderProgram, 1024))
-
-                if (ShaderManager.inWorld()) {
-                    ErrorManager.logErrorWithData(
-                            OpenGLException("Shader linking error."),
-                            errorMessage,
-                            "Link Error:\n" to errorLog
-                    )
-                } else {
-                    LorenzUtils.consoleLog("$errorMessage $errorLog")
-                }
-
-                return@run
+            if (ShaderManager.inWorld()) {
+                ErrorManager.logErrorWithData(
+                        OpenGLException("Shader linking error."),
+                        errorMessage,
+                        "Link Error:\n" to errorLog
+                )
+            } else {
+                LorenzUtils.consoleLog("$errorMessage $errorLog")
             }
 
-            this.registerUniforms()
-            created = true
+            return
         }
+
+        this.registerUniforms()
+        created = true
     }
 
     abstract fun registerUniforms()
