@@ -43,7 +43,7 @@ object SensReducer {
 
     @SubscribeEvent
     fun onConfigInit(event: ConfigLoadEvent) {
-        config.divisorSens.afterChange {
+        config.reducingFactor.afterChange {
             reloadSensitivity()
         }
     }
@@ -59,8 +59,8 @@ object SensReducer {
     @SubscribeEvent
     fun onRenderOverlay(event: GuiRenderEvent.GuiOverlayRenderEvent) {
         if (!(isToggled || isManualToggle)) return
-        if (!config.showLower) return
-        config.loweredSensPosition.renderString("§eSensitivity Lowered", posLabel = "Sensitivity Lowered")
+        if (!config.showGUI) return
+        config.position.renderString("§eSensitivity Lowered", posLabel = "Sensitivity Lowered")
     }
 
 
@@ -87,7 +87,7 @@ object SensReducer {
 
     private fun lowerSensitivity(showMessage: Boolean = false) {
         storage.savedMouseloweredSensitivity = gameSettings.mouseSensitivity
-        val divisor = config.divisorSens.get()
+        val divisor = config.reducingFactor.get()
         LorenzUtils.debug("dividing by $divisor")
         val newSens =
             ((storage.savedMouseloweredSensitivity + (1F / 3F)) / divisor) - (1F / 3F)

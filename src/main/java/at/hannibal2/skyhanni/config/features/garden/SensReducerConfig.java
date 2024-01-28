@@ -10,7 +10,7 @@ import io.github.moulberry.moulconfig.observer.Property;
 public class SensReducerConfig {
     @Expose
     @ConfigOption(
-        name = "Enable",
+        name = "Auto Enable",
         desc = "Lowers mouse sensitivity while in the garden, and a farming tool is held.")
     @ConfigEditorBoolean
     public boolean enabled = false;
@@ -18,15 +18,15 @@ public class SensReducerConfig {
     @Expose
     @ConfigOption(name = "Reducing factor", desc = "Changes by how much the sensitivity is lowered by.")
     @ConfigEditorSlider(minValue = 1, maxValue = 100, minStep = 1)
-    public Property<Float> divisorSens = Property.of(25.0F);
+    public Property<Float> reducingFactor = Property.of(15.0F);
 
     @Expose
     @ConfigOption(
         name = "Show GUI",
         desc = "Shows the GUI element while the feature is enabled.")
     @ConfigEditorBoolean
-    public boolean showLower = true;
+    public boolean showGUI = true;
 
     @Expose
-    public Position loweredSensPosition = new Position(400, 400, 0.8f);
+    public Position position = new Position(400, 400, 0.8f);
 }
