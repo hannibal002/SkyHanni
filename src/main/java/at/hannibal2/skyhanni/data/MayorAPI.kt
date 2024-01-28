@@ -7,14 +7,18 @@ import at.hannibal2.skyhanni.events.LorenzTickEvent
 import at.hannibal2.skyhanni.utils.APIUtil
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils.put
+import at.hannibal2.skyhanni.utils.SimpleTimeMark
+import at.hannibal2.skyhanni.utils.SimpleTimeMark.Companion.asTimeMark
 import io.github.moulberry.notenoughupdates.util.SkyBlockTime
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
+import kotlin.time.Duration
+import kotlin.time.Duration.Companion.minutes
 
 object MayorAPI {
-    private var lastUpdate = 0L
+    private var lastUpdate = SimpleTimeMark.farPast()
     private var dispatcher = Dispatchers.IO
 
     var rawMayorData: MayorJson? = null
@@ -23,7 +27,7 @@ object MayorAPI {
         private set
     var currentMayor: MayorJson.Candidate? = null
         private set
-    var timeTillNextMayor = 0L
+    var timeTillNextMayor = Duration.ZERO
         private set
 
     private const val LATE_SPRING = 3
@@ -73,7 +77,7 @@ object MayorAPI {
         }
     }
 
-    private fun calculateNextMayorTime(): Long {
+    private fun calculateNextMayorTime(): SimpleTimeMark {
         var currentYear = SkyBlockTime.now().year
 
         // Check if either the month is already over or the day is after 27th in the third month
@@ -82,19 +86,19 @@ object MayorAPI {
             currentYear++
         }
 
-        return SkyBlockTime(currentYear, LATE_SPRING, day = 27).toMillis()
+        return SkyBlockTime(currentYear, LATE_SPRING, day = 27).asTimeMark()
     }
 
     private fun getTimeTillNextMayor() {
         val nextMayorTime = calculateNextMayorTime()
-        timeTillNextMayor = nextMayorTime - System.currentTimeMillis()
+        timeTillNextMayor = nextMayorTime - SimpleTimeMark.now()
     }
 
     private fun checkCurrentMayor() {
         val nextMayorTime = calculateNextMayorTime()
 
         // Check if it is still the mayor from the old SkyBlock year
-        currentMayor = if (nextMayorTime > System.currentTimeMillis()) {
+        currentMayor = if (nextMayorTime > System.currentTimeMillis().asTimeMark()) {
             candidates[SkyBlockTime.now().year - 1]
         } else {
             candidates[SkyBlockTime.now().year]
@@ -102,8 +106,8 @@ object MayorAPI {
     }
 
     private fun checkHypixelAPI() {
-        if (System.currentTimeMillis() > lastUpdate + 60_000 * 5) {
-            lastUpdate = System.currentTimeMillis()
+        if (SimpleTimeMark.now() > lastUpdate.plus(5.minutes)) {
+            lastUpdate = SimpleTimeMark.now()
             SkyHanniMod.coroutineScope.launch {
                 val url = "https://api.hypixel.net/v2/resources/skyblock/election"
                 val jsonObject = withContext(dispatcher) { APIUtil.getJSONResponse(url) }
