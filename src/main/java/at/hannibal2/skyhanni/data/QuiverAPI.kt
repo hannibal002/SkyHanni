@@ -49,7 +49,6 @@ object QuiverAPI {
         set(value) {
             arrowAmount[currentArrow ?: return] = value.toFloat()
         }
-        }
 
     private var arrows: List<ArrowType> = listOf()
 
@@ -116,7 +115,7 @@ object QuiverAPI {
 
             val filledUpType = getArrowByNameOrNull(type) ?: return
 
-            arrowAmount.merge(filledUpType,amount,Float::plus)
+            arrowAmount.merge(filledUpType, amount, Float::plus)
 
             return
         }
@@ -154,7 +153,7 @@ object QuiverAPI {
 
             val arrowType = getArrowByNameOrNull(arrow) ?: continue
 
-            this.arrowAmount.merge(arrowType,stack.stackSize.toFloat(),Float::plus)
+            this.arrowAmount.merge(arrowType, stack.stackSize.toFloat(), Float::plus)
         }
     }
 
