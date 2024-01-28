@@ -2,6 +2,9 @@ package at.hannibal2.skyhanni.utils.shader
 
 import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.LorenzUtils
+import net.minecraft.client.Minecraft
+import net.minecraft.client.renderer.OpenGlHelper
+import net.minecraft.client.resources.IReloadableResourceManager
 import java.util.function.Supplier
 import net.minecraft.client.shader.ShaderLinkHelper
 import org.apache.commons.lang3.StringUtils
@@ -15,14 +18,44 @@ import org.lwjgl.opengl.OpenGLException
  *
  * Credit: [Shader.java](https://github.com/BiscuitDevelopment/SkyblockAddons/blob/main/src/main/java/codes/biscuit/skyblockaddons/shader/Shader.java)
  */
-abstract class Shader(vertex: String, fragment: String) {
+abstract class Shader(val vertex: String, val fragment: String) {
 
-    var shaderProgram: Int = ShaderLinkHelper.getStaticShaderLinkHelper().createProgram()
+    var shaderProgram: Int = -1
+    private var vertexShaderID: Int = -1
+    private var fragmentShaderID: Int = -1
+
     private val uniforms: MutableList<Uniform<*>> = mutableListOf()
 
     var created = false
 
     init {
+        recompile()
+        (Minecraft.getMinecraft().resourceManager as IReloadableResourceManager).registerReloadListener {
+            recompile()
+        }
+    }
+
+    fun deleteOldShaders() {
+        if (vertexShaderID >= 0) {
+            OpenGlHelper.glDeleteShader(vertexShaderID)
+            vertexShaderID = -1
+        }
+        if (fragmentShaderID >= 0) {
+            OpenGlHelper.glDeleteShader(fragmentShaderID)
+            fragmentShaderID = -1
+        }
+        if (shaderProgram >= 0) {
+            OpenGlHelper.glDeleteProgram(shaderProgram);
+        }
+    }
+
+    fun recompile() {
+        deleteOldShaders()
+        shaderProgram = ShaderLinkHelper.getStaticShaderLinkHelper().createProgram()
+        vertexShaderID = ShaderManager.loadShader(ShaderType.VERTEX, vertex)
+        ShaderManager.attachShader(shaderProgram, vertexShaderID)
+        fragmentShaderID = ShaderManager.loadShader(ShaderType.FRAGMENT, fragment)
+        ShaderManager.attachShader(shaderProgram, fragmentShaderID)
         run {
             val vertexShaderID = ShaderManager.loadShader(ShaderType.VERTEX, vertex).also { if (it == -1) return@run }
             ShaderManager.attachShader(shaderProgram, vertexShaderID)
