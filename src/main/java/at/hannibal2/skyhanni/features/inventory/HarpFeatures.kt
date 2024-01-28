@@ -158,8 +158,8 @@ object HarpFeatures {
         if (!isMenuGui(InventoryUtils.openInventoryName())) return
         if (event.slot?.slotNumber != closeButtonSlot) return
         if (openTime.passedSince() > 2.seconds) return
-        event.container.inventory.indexOfFirst {
-            songSelectedPattern.anyMatches(it?.getLore() ?: return@indexOfFirst false)
+        event.container.inventory.filterNotNull().indexOfFirst {
+            songSelectedPattern.anyMatches(it.getLore())
         }.takeIf { it != -1 }?.let {
             event.isCanceled = true
             Minecraft.getMinecraft().playerController.windowClick(
