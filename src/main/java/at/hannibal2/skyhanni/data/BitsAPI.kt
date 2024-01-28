@@ -132,6 +132,8 @@ object BitsAPI {
             // Only two locations where the bits line isn't shown, but you can still get bits
             if (!LorenzUtils.inAnyIsland(IslandType.CATACOMBS, IslandType.THE_RIFT)) return
 
+            // TODO: Remove bits to claim which you just get from being in those islands
+
             val amount = group("amount").formatNumber().toInt()
             bits += amount
             bitsToClaim -= amount
