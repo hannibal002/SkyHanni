@@ -22,7 +22,7 @@ object ColorUtils {
         bindColor(r / 255f * colorMultiplier, g / 255f * colorMultiplier, b / 255f * colorMultiplier, a / 255f)
     }
 
-    fun bindColor(r: Float, g: Float, b: Float, a: Float) {
+    private fun bindColor(r: Float, g: Float, b: Float, a: Float) {
         GlStateManager.color(r, g, b, a)
     }
 
