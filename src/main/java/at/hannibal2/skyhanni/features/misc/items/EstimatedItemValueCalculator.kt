@@ -7,6 +7,7 @@ import at.hannibal2.skyhanni.utils.ItemUtils.getItemName
 import at.hannibal2.skyhanni.utils.ItemUtils.getItemNameOrNull
 import at.hannibal2.skyhanni.utils.ItemUtils.getItemRarityOrNull
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
+import at.hannibal2.skyhanni.utils.ItemUtils.isRune
 import at.hannibal2.skyhanni.utils.ItemUtils.name
 import at.hannibal2.skyhanni.utils.ItemUtils.nameWithEnchantment
 import at.hannibal2.skyhanni.utils.LorenzRarity
@@ -472,6 +473,7 @@ object EstimatedItemValueCalculator {
     }
 
     private fun addRune(stack: ItemStack, list: MutableList<String>): Double {
+        if (stack.getInternalName().isRune()) return 0.0
         val internalName = stack.getRune() ?: return 0.0
 
         val price = internalName.getPrice()
