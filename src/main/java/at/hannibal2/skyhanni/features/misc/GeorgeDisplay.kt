@@ -95,7 +95,7 @@ class GeorgeDisplay {
 
     private fun findCheapestTier(pet: String, originalTier: Int) = buildList<Pair<Int, Double>> {
         this.add(originalTier to petInternalName(pet, originalTier).getPetPrice())
-        if (config.otherRarities || this.first().second == -1.0) {
+        if (config.otherRarities) {
             this.add(originalTier - 1 to petInternalName(pet, originalTier - 1).getPetPrice(otherRarity = true))
             if (originalTier != 5) this.add(
                 originalTier + 1 to petInternalName(pet, originalTier + 1).getPetPrice(
