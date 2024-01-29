@@ -165,7 +165,7 @@ object SeaCreatureTracker {
         tracker.resetCommand(args, "shresetseacreaturetracker")
     }
 
-    private fun isEnabled() = LorenzUtils.inSkyBlock && config.enabled && !isTrophyFishing
+    private fun isEnabled() = LorenzUtils.inSkyBlock && config.enabled && !isTrophyFishing && !LorenzUtils.inKuudraFight
 
     private fun isWearingTrophyArmor(): Boolean = InventoryUtils.getArmor().all {
         trophyArmorNames.matches(it?.getInternalName()?.asString())
