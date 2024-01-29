@@ -8,7 +8,6 @@ import io.github.moulberry.moulconfig.gui.GuiScreenElementWrapper
 import io.github.moulberry.notenoughupdates.util.Utils
 import net.minecraft.client.Minecraft
 import net.minecraft.client.gui.Gui
-import net.minecraft.client.gui.GuiChat
 import net.minecraft.client.gui.inventory.GuiEditSign
 import net.minecraft.client.renderer.GlStateManager
 import net.minecraft.item.ItemStack
@@ -233,8 +232,6 @@ interface Renderable {
 
             override fun render(posX: Int, posY: Int) {
                 GlStateManager.pushMatrix()
-                if (Minecraft.getMinecraft().currentScreen is GuiChat)
-                    GlStateManager.translate(0F, 0F, -3F)
                 any.renderOnScreen(0F, 0F, scaleMultiplier = scale)
                 GlStateManager.popMatrix()
             }
