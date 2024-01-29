@@ -13,10 +13,12 @@ import at.hannibal2.skyhanni.utils.LorenzUtils.enumJoinToPattern
 import at.hannibal2.skyhanni.utils.NEUInternalName.Companion.asInternalName
 import at.hannibal2.skyhanni.utils.NEUItems.getPriceOrNull
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
+import at.hannibal2.skyhanni.utils.OSUtils
 import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderables
 import at.hannibal2.skyhanni.utils.StringUtils.convertToInternalNameString
 import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.StringUtils.matches
+import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
@@ -24,6 +26,7 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 class GeorgeDisplay {
 
     private val config get() = SkyHanniMod.feature.misc.pets.george
+    private val useFandomWiki get() = SkyHanniMod.feature.commands.fandomWiki.enabled
 
     private val SEPARATOR = ";"
 
@@ -81,11 +84,16 @@ class GeorgeDisplay {
                             onClick = { LorenzUtils.sendCommandToServer("ahs ] $origPetString") }
                         ))
                 } else {
+                    val typeOfWiki = if (useFandomWiki) "Fandom" else "Official Hypixel"
                     this@buildList.add(
                         Renderable.clickAndHover(
-                            text = " §7- $displayPetString§7: §eNot on AH; view its Wiki article here.",
-                            tips = listOf("§4Click to run §e/wiki $pet §4to view how to obtain it."),
-                            onClick = { LorenzUtils.sendCommandToServer("wiki $pet") }
+                            text = " §7- $displayPetString§7: §eNot on AH; view its $typeOfWiki article here.",
+                            tips = listOf("§eClick to open the $typeOfWiki Wiki article for the $displayPetString §eto view how to obtain it."),
+                            onClick = {
+                                val urlCompliantPet = displayPetString.removeColor().replace(" ", "%20")
+                                if (useFandomWiki) OSUtils.openBrowser("https://hypixel-skyblock.fandom.com/wiki/Special:Search?query=$urlCompliantPet&scope=internal")
+                                else OSUtils.openBrowser("https://wiki.hypixel.net/index.php?search=$urlCompliantPet")
+                            }
                         ))
                 }
             }
