@@ -75,7 +75,7 @@ object PartyCommands {
     }
 
     fun customTabComplete(command: String): List<String>? {
-        if (command == "pk" || command == "pt" || command == "pp" || command == "pd" && config.shortCommands) {
+        if (command == "pk" || command == "pt" || command == "pp" && config.shortCommands) {
             return PartyAPI.partyMembers
         }
 
