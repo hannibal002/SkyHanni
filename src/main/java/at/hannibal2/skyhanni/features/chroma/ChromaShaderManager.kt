@@ -13,19 +13,24 @@ object ChromaShaderManager {
 
     private var chromaEnabled = false
 
-    fun begin() {
+    /**
+     * Enables the type of chroma shader passed in
+     *
+     * @param chromaType A type of chroma shader from [ChromaType]
+     */
+    fun begin(chromaType: ChromaType) {
         disable()
-        enable()
+        enable(chromaType)
     }
 
     fun end() {
         disable()
     }
 
-    private fun enable() {
+    private fun enable(chromaType: ChromaType) {
         if (!chromaEnabled) {
             chromaEnabled = true
-            ShaderManager.enableShader("chroma")
+            ShaderManager.enableShader(chromaType.shaderName)
         }
     }
 
@@ -35,4 +40,15 @@ object ChromaShaderManager {
             ShaderManager.disableShader()
         }
     }
+}
+
+enum class ChromaType(val shaderName: String) {
+    /**
+     * See [StandardChromaShader]
+     */
+    STANDARD("standard_chroma"),
+    /**
+     * See [TexturedChromaShader]
+     */
+    TEXTURED("textured_chroma")
 }

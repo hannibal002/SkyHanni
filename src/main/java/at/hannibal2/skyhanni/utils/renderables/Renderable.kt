@@ -1,9 +1,12 @@
 package at.hannibal2.skyhanni.utils.renderables
 
 import at.hannibal2.skyhanni.config.core.config.gui.GuiPositionEditor
+import at.hannibal2.skyhanni.config.features.misc.SkillProgressDisplayConfig.ProgressBarConfig.TexturedBar.UsedTexture
 import at.hannibal2.skyhanni.data.ToolTipData
 import at.hannibal2.skyhanni.features.chroma.ChromaShaderManager
+import at.hannibal2.skyhanni.features.chroma.ChromaType
 import at.hannibal2.skyhanni.utils.ColorUtils
+import at.hannibal2.skyhanni.utils.ColorUtils.darker
 import at.hannibal2.skyhanni.utils.LorenzLogger
 import at.hannibal2.skyhanni.utils.NEUItems.renderOnScreen
 import at.hannibal2.skyhanni.utils.RenderUtils.HorizontalAlignment
@@ -18,7 +21,6 @@ import net.minecraft.client.renderer.GlStateManager
 import net.minecraft.item.ItemStack
 import net.minecraft.util.ResourceLocation
 import org.lwjgl.input.Mouse
-import org.lwjgl.opengl.GL11
 import java.awt.Color
 import java.util.Collections
 import kotlin.math.max
@@ -43,8 +45,6 @@ interface Renderable {
     companion object {
         val logger = LorenzLogger("debug/renderable")
         val list = mutableMapOf<Pair<Int, Int>, List<Int>>()
-        private val BAR_TEXTURE = ResourceLocation("skyhanni", "textured_bar.png")
-
         var currentRenderPassMousePosition: Pair<Int, Int>? = null
             set
 
@@ -305,6 +305,7 @@ interface Renderable {
             percent: Float,
             color: Color = Color(0, 255, 0),
             useChroma: Boolean = false,
+            texture: UsedTexture = UsedTexture.MATCH_PACK,
             width: Int = 30,
             height: Int = 4,
             horizontalAlign: HorizontalAlignment = HorizontalAlignment.LEFT,
@@ -316,20 +317,23 @@ interface Renderable {
             override val verticalAlign = verticalAlign
 
             override fun render(posX: Int, posY: Int) {
-                Minecraft.getMinecraft().renderEngine.bindTexture(BAR_TEXTURE)
-                Minecraft.getMinecraft().ingameGUI.drawTexturedModalRect(posX, posY, 0, 0, width, height)
-                Minecraft.getMinecraft().renderEngine.bindTexture(BAR_TEXTURE)
+
+                val (textureX, textureY) = if (texture == UsedTexture.MATCH_PACK) Pair(0, 64) else Pair(0, 0)
+
+                Minecraft.getMinecraft().renderEngine.bindTexture(ResourceLocation(texture.path))
+                Minecraft.getMinecraft().ingameGUI.drawTexturedModalRect(posX, posY, textureX, textureY, width, height)
+
+                Minecraft.getMinecraft().renderEngine.bindTexture(ResourceLocation(texture.path))
                 if (useChroma) {
-                    ColorUtils.bindColor(Color.WHITE.rgb, 1f)
-                    ChromaShaderManager.begin()
-                    GlStateManager.shadeModel(GL11.GL_SMOOTH)
+                    ChromaShaderManager.begin(ChromaType.TEXTURED)
+                    GlStateManager.color(Color.WHITE.red / 255f, Color.WHITE.green / 255f, Color.WHITE.blue / 255f, 1f)
                 } else {
-                    ColorUtils.bindColor(color.rgb, 1f)
+                    GlStateManager.color(color.red / 255f, color.green / 255f, color.blue / 255f, 1f)
                 }
-                Minecraft.getMinecraft().ingameGUI.drawTexturedModalRect(posX, posY, 0, 5, percent.toInt(), height)
+                Minecraft.getMinecraft().ingameGUI.drawTexturedModalRect(posX, posY, textureX, textureY + height, percent.toInt(), height)
+
                 if (useChroma) {
                     ChromaShaderManager.end()
-                    GlStateManager.shadeModel(GL11.GL_FLAT)
                 }
             }
         }
@@ -338,6 +342,7 @@ interface Renderable {
             percent: Double,
             startColor: Color = Color(255, 0, 0),
             endColor: Color = Color(0, 255, 0),
+            useChroma: Boolean = false,
             width: Int = 30,
             height: Int = 4,
             horizontalAlign: HorizontalAlignment = HorizontalAlignment.LEFT,
@@ -349,12 +354,22 @@ interface Renderable {
             override val verticalAlign = verticalAlign
 
             val progress = (1.0 + percent * (width - 2.0)).toInt()
-            val color = ColorUtils.blendRGB(startColor, endColor, percent)
+            var color = ColorUtils.blendRGB(startColor, endColor, percent)
 
             override fun render(posX: Int, posY: Int) {
                 Gui.drawRect(0, 0, width, height, 0xFF43464B.toInt())
-                Gui.drawRect(1, 1, width - 1, height - 1, color.darker().rgb)
+
+                if (useChroma) {
+                    ChromaShaderManager.begin(ChromaType.STANDARD)
+                }
+
+                val factor = if (useChroma) 0.2 else 0.7
+                Gui.drawRect(1, 1, width - 1, height - 1, color.darker(factor).rgb)
                 Gui.drawRect(1, 1, progress, height - 1, color.rgb)
+
+                if (useChroma) {
+                    ChromaShaderManager.end()
+                }
             }
         }
     }

@@ -4,22 +4,27 @@ import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.SkillAPI
 import at.hannibal2.skyhanni.api.SkillAPI.activeSkill
 import at.hannibal2.skyhanni.api.SkillAPI.lastUpdate
+import at.hannibal2.skyhanni.api.SkillAPI.oldSkillInfoMap
 import at.hannibal2.skyhanni.api.SkillAPI.showDisplay
 import at.hannibal2.skyhanni.api.SkillAPI.skillMap
+import at.hannibal2.skyhanni.api.SkillAPI.skillXPInfoMap
 import at.hannibal2.skyhanni.api.SkillAPI.stackMap
 import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.LorenzTickEvent
 import at.hannibal2.skyhanni.events.PreProfileSwitchEvent
 import at.hannibal2.skyhanni.events.SkillOverflowLevelupEvent
 import at.hannibal2.skyhanni.utils.LorenzUtils
+import at.hannibal2.skyhanni.utils.NumberUtil
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.NumberUtil.formatNumber
 import at.hannibal2.skyhanni.utils.NumberUtil.roundToPrecision
 import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderables
 import at.hannibal2.skyhanni.utils.RenderUtils.renderStringsAndItems
+import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.SpecialColour
 import at.hannibal2.skyhanni.utils.StringUtils.firstLetterUppercase
 import at.hannibal2.skyhanni.utils.renderables.Renderable
+import io.github.moulberry.notenoughupdates.core.util.lerp.LerpUtils
 import io.github.moulberry.notenoughupdates.util.Utils
 import net.minecraft.init.Items
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
@@ -33,32 +38,50 @@ class SkillProgress {
     private var skillExpPercentage = 0.0
     private var display = emptyList<List<Any>>()
     private var allDisplay = emptyList<Renderable>()
+    private var etaDisplay = emptyList<Renderable>()
     private val defaultStack = Utils.createItemStack(Items.banner, "Default")
 
     @SubscribeEvent
     fun onRenderOverlay(event: GuiRenderEvent.GuiOverlayRenderEvent) {
         if (!isEnabled()) return
-        if (!showDisplay) return
-        config.position.renderStringsAndItems(display, posLabel = "Skill Progress")
-        if (config.showProgressBar && display.isNotEmpty()) {
-            val progress = if (config.useTexturedBar) {
-                var factor = skillExpPercentage.toFloat()
-                if (factor > 1f) factor = 1f
-                factor *= 182f
-                Renderable.texturedProgressBar(factor, Color(SpecialColour.specialToChromaRGB(config.barStartColor)), width = 182, height = 5, useChroma = config.useChroma)
-            } else
-                Renderable.progressBar(skillExpPercentage, Color(SpecialColour.specialToChromaRGB(config.barStartColor)), Color(SpecialColour.specialToChromaRGB(config.barStartColor)), width = 182)
+        if (showDisplay) {
+            config.position.renderStringsAndItems(display, posLabel = "Skill Progress")
+            if (config.progressBarConfig.enabled && display.isNotEmpty()) {
+                val progress = if (config.progressBarConfig.useTexturedBar) {
+                    val factor = (skillExpPercentage.toFloat().coerceAtMost(1f)) * config.progressBarConfig.texturedBar.width.toFloat() // 182f
+                    Renderable.texturedProgressBar(factor,
+                        Color(SpecialColour.specialToChromaRGB(config.progressBarConfig.barStartColor)),
+                        texture = config.progressBarConfig.texturedBar.usedTexture.get(),
+                        width = config.progressBarConfig.texturedBar.width,
+                        height = config.progressBarConfig.texturedBar.height,
+                        useChroma = config.progressBarConfig.useChroma)
+                } else
+                    Renderable.progressBar(skillExpPercentage,
+                        Color(SpecialColour.specialToChromaRGB(config.progressBarConfig.barStartColor)),
+                        Color(SpecialColour.specialToChromaRGB(config.progressBarConfig.barStartColor)),
+                        width = config.progressBarConfig.regularBar.width,
+                        height = config.progressBarConfig.regularBar.height,
+                        useChroma = config.progressBarConfig.useChroma)
 
-            config.barPosition.renderRenderables(listOf(progress), posLabel = "Skill Progress Bar")
+                config.barPosition.renderRenderables(listOf(progress), posLabel = "Skill Progress Bar")
+            }
         }
-        if (config.allSkillProgress) {
+
+        if (config.showAllSkillProgress) {
             config.allSkillPosition.renderRenderables(allDisplay, posLabel = "All Skills Display")
         }
+
+        if (config.showEtaSkillProgress) {
+            config.etaPosition.renderRenderables(etaDisplay, posLabel = "Skill ETA")
+        }
+
     }
 
     @SubscribeEvent
     fun onProfileSwitch(event: PreProfileSwitchEvent) {
         display = emptyList()
+        allDisplay = emptyList()
+        etaDisplay = emptyList()
         skillExpPercentage = 0.0
     }
 
@@ -70,8 +93,15 @@ class SkillProgress {
 
         if (event.repeatSeconds(1)) {
             update()
-            updateAllDisplay()
         }
+
+        if (event.repeatSeconds(2)) {
+            updateSkillInfo(activeSkill)
+
+            val xpGain = skillXPInfoMap[activeSkill]?.xpGainHour ?: 0f
+            skillXPInfoMap[activeSkill]?.xpGainLast = xpGain
+        }
+
     }
 
     @SubscribeEvent
@@ -98,17 +128,23 @@ class SkillProgress {
 
     private fun update() {
         display = drawDisplay()
+        allDisplay = drawAllDisplay()
+        etaDisplay = drawETADisplay()
     }
 
-    private fun updateAllDisplay() {
-        allDisplay = drawAllDisplay()
-    }
 
     private fun drawAllDisplay() = buildList {
         val skillMap = skillMap ?: return@buildList
         for ((skillName, skillInfo) in skillMap) {
-            add(Renderable.string(buildString {
-                append("§6${skillName.firstLetterUppercase()} ${skillInfo.level} ")
+            val tips = buildList {
+                add("§6Level: §b${skillInfo.level}")
+                add("§6Current XP: §b${skillInfo.currentXp.addSeparators()}")
+                add("§6Needed XP: §b${skillInfo.currentXpMax.addSeparators()}")
+                add("§6Total XP: §b${skillInfo.totalXp.addSeparators()}")
+            }
+            val nameColor = if (skillName == activeSkill) "§e" else "§6"
+            add(Renderable.hoverTips(buildString {
+                append("$nameColor${skillName.firstLetterUppercase()} ${skillInfo.level} ")
                 append("§7(")
                 append("§b${skillInfo.currentXp.addSeparators()}")
                 if (skillInfo.currentXpMax != 0L) {
@@ -116,7 +152,26 @@ class SkillProgress {
                     append("§b${skillInfo.currentXpMax.addSeparators()}")
                     append("§7)")
                 }
-            }))
+            }, tips))
+        }
+    }
+
+    private fun drawETADisplay() = buildList {
+        val skillInfo = skillMap?.get(activeSkill) ?: return@buildList
+        val xpInfo = skillXPInfoMap[activeSkill] ?: return@buildList
+        val xpInfoLast = oldSkillInfoMap[activeSkill] ?: return@buildList
+        var remaining = skillInfo.currentXpMax - skillInfo.currentXp
+        if (skillInfo.currentXpMax == xpInfoLast.currentXpMax) {
+            remaining = NumberUtil.interpolate(remaining.toFloat(), (xpInfoLast.currentXpMax - xpInfoLast.currentXp).toFloat(), xpInfo.lastUpdate.toMillis()).toLong()
+        }
+
+        add(Renderable.string("§6Skill: §b${activeSkill.firstLetterUppercase()}"))
+        add(Renderable.string("§6Level: §b${skillInfo.level}"))
+        add(Renderable.string("§6XP/h: §b${xpInfo.xpGainHour.addSeparators()}"))
+
+        if (xpInfo.xpGainLast != 0f) {
+            val xpInterp = NumberUtil.interpolate(xpInfo.xpGainHour, xpInfo.xpGainLast, xpInfo.lastUpdate.toMillis())
+            add(Renderable.string("§6ETA: §b${Utils.prettyTime((remaining) * 1000 * 60 * 60 / xpInterp.toLong())}"))
         }
     }
 
@@ -159,6 +214,46 @@ class SkillProgress {
                 }
             })
         })
+    }
+
+    private fun updateSkillInfo(skill: String) {
+        if (skill.isEmpty()) return
+        val xpInfo = skillXPInfoMap.getOrPut(skill) { SkillAPI.SkillXPInfo() }
+        val skillInfo = skillMap?.get(skill) ?: return
+        oldSkillInfoMap[skill] = skillInfo
+
+        val totalXp = skillInfo.currentXp
+
+        if (xpInfo.lastTotalXp > 0) {
+            val delta = totalXp - xpInfo.lastTotalXp
+            if (delta > 0 && delta < 1000) {
+                xpInfo.xpGainQueue.add(0, delta)
+
+                calculateXPHour(xpInfo)
+            } else if (xpInfo.timer > 0) {
+                xpInfo.timer--
+                xpInfo.xpGainQueue.add(0, 0f)
+
+                calculateXPHour(xpInfo)
+            } else if (delta <= 0) {
+                xpInfo.isActive = false
+            }
+        }
+        xpInfo.lastTotalXp = totalXp.toFloat()
+        xpInfo.lastUpdate = SimpleTimeMark.now()
+    }
+
+    private fun calculateXPHour(xpInfo: SkillAPI.SkillXPInfo) {
+        while (xpInfo.xpGainQueue.size > 30) {
+            xpInfo.xpGainQueue.removeLast()
+        }
+
+        var totalGain = 0f
+        for (f in xpInfo.xpGainQueue) totalGain += f
+
+        xpInfo.xpGainHour = totalGain * (60 * 60) / xpInfo.xpGainQueue.size
+
+        xpInfo.isActive = true
     }
 
     private fun isEnabled() = LorenzUtils.inSkyBlock && config.enabled

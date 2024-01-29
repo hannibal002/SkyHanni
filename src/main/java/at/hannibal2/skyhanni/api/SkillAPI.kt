@@ -21,6 +21,7 @@ import io.github.moulberry.notenoughupdates.util.Utils
 import net.minecraft.init.Blocks
 import net.minecraft.init.Items
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
+import java.util.LinkedList
 import java.util.regex.Matcher
 
 object SkillAPI {
@@ -33,7 +34,37 @@ object SkillAPI {
     private val SPACE_SPLITTER = Splitter.on("  ").omitEmptyStrings().trimResults()
     private var lastActionBar: String? = null
     private var levelingMap = mapOf<Int, Int>()
+    var skillXPInfoMap = mutableMapOf(
+        "farming" to SkillXPInfo(),
+        "combat" to SkillXPInfo(),
+        "foraging" to SkillXPInfo(),
+        "alchemy" to SkillXPInfo(),
+        "mining" to SkillXPInfo(),
+        "enchanting" to SkillXPInfo(),
+        "fishing" to SkillXPInfo(),
+        "carpentry" to SkillXPInfo(),
+    )
+    var oldSkillInfoMap = mutableMapOf(
+        "farming" to SkillInfo(),
+        "combat" to SkillInfo(),
+        "foraging" to SkillInfo(),
+        "alchemy" to SkillInfo(),
+        "mining" to SkillInfo(),
+        "enchanting" to SkillInfo(),
+        "fishing" to SkillInfo(),
+        "carpentry" to SkillInfo(),
+    )
     val skillMap: MutableMap<String, SkillInfo>? get() = ProfileStorageData.profileSpecific?.skillMap
+    val stackMap = mapOf(
+        "Farming" to Utils.createItemStack(Items.golden_hoe, "Farming"),
+        "Combat" to Utils.createItemStack(Items.golden_sword, "Combat"),
+        "Foraging" to Utils.createItemStack(Items.golden_axe, "Foraging"),
+        "Alchemy" to Utils.createItemStack(Items.brewing_stand, "Alchemy"),
+        "Mining" to Utils.createItemStack(Items.golden_pickaxe, "Mining"),
+        "Enchanting" to Utils.createItemStack(Blocks.enchanting_table, "Enchanting"),
+        "Fishing" to Utils.createItemStack(Items.fishing_rod, "Fishing"),
+        "Carpentry" to Utils.createItemStack(Blocks.crafting_table, "Carpentry")
+    )
     var activeSkill = ""
     var gained = ""
     var showDisplay = false
@@ -199,17 +230,6 @@ object SkillAPI {
         return levelingMap.getOrDefault(neededXp.toInt(), 60)
     }
 
-    val stackMap = mapOf(
-        "Farming" to Utils.createItemStack(Items.golden_hoe, "Farming"),
-        "Combat" to Utils.createItemStack(Items.golden_sword, "Combat"),
-        "Foraging" to Utils.createItemStack(Items.golden_axe, "Foraging"),
-        "Alchemy" to Utils.createItemStack(Items.brewing_stand, "Alchemy"),
-        "Mining" to Utils.createItemStack(Items.golden_pickaxe, "Mining"),
-        "Enchanting" to Utils.createItemStack(Blocks.enchanting_table, "Enchanting"),
-        "Fishing" to Utils.createItemStack(Items.fishing_rod, "Fishing"),
-        "Carpentry" to Utils.createItemStack(Blocks.crafting_table, "Carpentry")
-    )
-
     private fun calculateLevelXp(levelingArray: JsonArray, level: Int): Double {
         var totalXp = 0.0
         for (i in 0 until level + 1) {
@@ -262,4 +282,13 @@ object SkillAPI {
     }
 
     data class SkillInfo(var level: Int = 0, var totalXp: Long = 0, var currentXp: Long = 0, var currentXpMax: Long = 0)
+    data class SkillXPInfo(
+        var lastTotalXp: Float = 0f,
+        var xpGainQueue: LinkedList<Float> = LinkedList(),
+        var xpGainHour: Float = 0f,
+        var xpGainLast: Float = 0f,
+        var timer: Int = 3,
+        var isActive: Boolean = false,
+        var lastUpdate: SimpleTimeMark = SimpleTimeMark.farPast(),
+    )
 }
