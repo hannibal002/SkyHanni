@@ -1,6 +1,7 @@
 package at.hannibal2.skyhanni.config.features.crimsonisle;
 
 import at.hannibal2.skyhanni.config.FeatureToggle;
+import at.hannibal2.skyhanni.config.core.config.Position;
 import at.hannibal2.skyhanni.config.features.crimsonisle.ashfang.AshfangConfig;
 import com.google.gson.annotations.Expose;
 import io.github.moulberry.moulconfig.annotations.Accordion;
@@ -19,6 +20,11 @@ public class CrimsonIsleConfig {
     @Expose
     public ReputationHelperConfig reputationHelper = new ReputationHelperConfig();
 
+    @ConfigOption(name = "Sulphur Skitter Box", desc = "")
+    @Accordion
+    @Expose
+    public SulphurSkitterBoxConfig sulphurSkitterBoxConfig = new SulphurSkitterBoxConfig();
+
     @Expose
     @ConfigOption(name = "Quest Item Helper", desc = "When you open the fetch item quest in the town board, " +
         "it shows a clickable chat message that will grab the items needed from the sacks.")
@@ -31,4 +37,23 @@ public class CrimsonIsleConfig {
     @ConfigEditorBoolean
     @FeatureToggle
     public boolean pabloHelper = false;
+
+    @Expose
+    @ConfigOption(name = "Volcano Explosivity", desc = "Shows a HUD of the current volcano explosivity level.")
+    @ConfigEditorBoolean
+    public boolean volcanoExplosivity = false;
+
+    @Expose
+    public Position positionVolcano = new Position(20, 20, false, true);
+
+    @Expose
+    @ConfigOption(name = "Dojo Rank Display", desc = "Display your rank, score, actual belt\n" +
+        "and points needed for the next belt in the Challenges inventory\n" +
+        "on the Crimson Isles.")
+    @ConfigEditorBoolean
+    @FeatureToggle
+    public boolean showDojoRankDisplay = false;
+
+    @Expose
+    public Position dojoRankDisplayPosition = new Position(-378, 206, false, true);
 }
