@@ -17,6 +17,12 @@ object PartyCommands {
         LorenzUtils.sendCommandToServer("party kickoffline")
     }
 
+    fun disband() {
+        if (!config.shortCommands) return
+        if (PartyAPI.partyMembers.isEmpty()) return
+        LorenzUtils.sendCommandToServer("party disband")
+    }
+
     fun warp() {
         if (!config.shortCommands) return
         if (PartyAPI.partyMembers.isEmpty()) return
@@ -69,7 +75,7 @@ object PartyCommands {
     }
 
     fun customTabComplete(command: String): List<String>? {
-        if (command == "pk" || command == "pt" || command == "pp" && config.shortCommands) {
+        if (command == "pk" || command == "pt" || command == "pp" || command == "pd" && config.shortCommands) {
             return PartyAPI.partyMembers
         }
 
