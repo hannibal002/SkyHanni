@@ -289,4 +289,6 @@ object StringUtils {
     fun String.allLettersFirstUppercase() = split("_").joinToString(" ") { it.firstLetterUppercase() }
 
     fun String?.equalsIgnoreColor(string: String?) = this?.let { it.removeColor() == string?.removeColor() } ?: false
+
+    fun String.convertToInternalNameString(): String = this.uppercase().replace(" ", "_")
 }

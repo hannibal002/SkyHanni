@@ -2,6 +2,7 @@ package at.hannibal2.skyhanni.features.misc
 
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.events.GuiRenderEvent
+import at.hannibal2.skyhanni.events.InventoryCloseEvent
 import at.hannibal2.skyhanni.events.InventoryOpenEvent
 import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.cleanName
@@ -13,6 +14,7 @@ import at.hannibal2.skyhanni.utils.NEUInternalName.Companion.asInternalName
 import at.hannibal2.skyhanni.utils.NEUItems.getPriceOrNull
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderables
+import at.hannibal2.skyhanni.utils.StringUtils.convertToInternalNameString
 import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.StringUtils.matches
 import at.hannibal2.skyhanni.utils.renderables.Renderable
@@ -59,16 +61,14 @@ class GeorgeDisplay {
             )
         )
         var totalCost = 0.0
-        for (line in lore) {
+        for (line in lore)
             neededPetPattern.matchMatcher(line) {
                 val origTierString = group("tier")
                 val origPetString = group("pet")
-                val pet = origPetString.uppercase().replace(" ", "_").removePrefix("FROST_")
+                val pet = origPetString.convertToInternalNameString().removePrefix("FROST_")
                 val originalTier = LorenzRarity.getByName(origTierString.uppercase().replace(" ", "_"))?.id ?: 0
                 val (cheapestTier, petPrice) = findCheapestTier(pet, originalTier)
-                val displayPetString =
-                    if (cheapestTier == originalTier) group("fullThing")
-                    else "${LorenzRarity.getById(cheapestTier)?.formattedName} $origPetString"
+                val displayPetString = "${LorenzRarity.getById(cheapestTier)?.formattedName} $origPetString"
                 if (petPrice != -1.0) {
                     totalCost += petPrice
                     this@buildList.add(
@@ -89,24 +89,33 @@ class GeorgeDisplay {
                         ))
                 }
             }
-        }
         this.add(Renderable.string("§dTotal cost §7(§6Lowest BIN§7): §6${totalCost.addSeparators()} coins"))
         if (config.otherRarities) this.add(Renderable.string("§c§lDisclaimer:§r§c Total does not include costs to upgrade via Kat."))
     }
 
-    private fun findCheapestTier(pet: String, originalTier: Int) = buildMap<Int, Double> {
-        this[originalTier] = petInternalName(pet, originalTier).getPetPrice()
-        if (config.otherRarities || this[originalTier] == -1.0) {
-            this[originalTier - 1] = petInternalName(pet, originalTier - 1).getPetPrice(otherRarity = true)
-            if (originalTier != 5) this[originalTier + 1] = petInternalName(pet, originalTier + 1).getPetPrice(otherRarity = true)
+    private fun findCheapestTier(pet: String, originalTier: Int) = buildList<Pair<Int, Double>> {
+        this.add(originalTier to petInternalName(pet, originalTier).getPetPrice())
+        if (config.otherRarities || this.first().second == -1.0) {
+            this.add(originalTier - 1 to petInternalName(pet, originalTier - 1).getPetPrice(otherRarity = true))
+            if (originalTier != 5) this.add(
+                originalTier + 1 to petInternalName(pet, originalTier + 1).getPetPrice(
+                    otherRarity = true
+                )
+            )
         }
-    }.minBy { it.value }
+    }.minBy { it.second }
 
     @SubscribeEvent
     fun onRenderOverlay(event: GuiRenderEvent.ChestGuiOverlayRenderEvent) {
         if (!isEnabled()) return
         if (!offerPetsChestPattern.matches(InventoryUtils.openInventoryName())) return
         config.position.renderRenderables(display, posLabel = "George Display")
+    }
+
+    @SubscribeEvent
+    fun onRenderOverlay(event: InventoryCloseEvent) {
+        if (!isEnabled() && !event.reopenSameName) return
+        display = emptyList()
     }
 
     private fun String.getPetPrice(otherRarity: Boolean = false): Double = this.asInternalName().getPriceOrNull() ?: if (otherRarity) Double.MAX_VALUE else -1.0
