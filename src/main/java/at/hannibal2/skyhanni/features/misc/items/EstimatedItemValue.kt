@@ -11,6 +11,7 @@ import at.hannibal2.skyhanni.events.RenderItemTooltipEvent
 import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalNameOrNull
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
+import at.hannibal2.skyhanni.utils.ItemUtils.isRune
 import at.hannibal2.skyhanni.utils.ItemUtils.name
 import at.hannibal2.skyhanni.utils.KeyboardManager.isKeyHeld
 import at.hannibal2.skyhanni.utils.LorenzUtils
@@ -54,7 +55,6 @@ object EstimatedItemValue {
                     object : TypeToken<HashMap<NEUInternalName, HashMap<String, List<String>>>>() {}.type
                 )
         else
-            LorenzUtils.error("Gemstone Slot Unlock Costs failed to load!")
     }
 
     @SubscribeEvent
@@ -182,7 +182,7 @@ object EstimatedItemValue {
         // Blocks the dungeon map
         if (internalName.startsWith("MAP-")) return listOf()
         // Hides the rune item
-        if (internalName.contains("_RUNE;")) return listOf()
+        if (internalName.isRune()) return listOf()
         if (internalName.contains("UNIQUE_RUNE")) return listOf()
         if (internalName.contains("WISP_POTION")) return listOf()
 
