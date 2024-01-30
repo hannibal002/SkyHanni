@@ -28,7 +28,7 @@ import at.hannibal2.skyhanni.data.ItemRenderBackground
 import at.hannibal2.skyhanni.data.ItemTipHelper
 import at.hannibal2.skyhanni.data.LocationFixData
 import at.hannibal2.skyhanni.data.MaxwellAPI
-import at.hannibal2.skyhanni.data.MayorAPI
+import at.hannibal2.skyhanni.data.MayorElection
 import at.hannibal2.skyhanni.data.MinecraftData
 import at.hannibal2.skyhanni.data.OtherInventoryData
 import at.hannibal2.skyhanni.data.OwnInventoryData
@@ -459,7 +459,7 @@ class SkyHanniMod {
         loadModule(MaxwellAPI)
         loadModule(QuiverAPI)
         loadModule(BitsAPI)
-        loadModule(MayorAPI)
+        loadModule(MayorElection)
         loadModule(FishingDetection)
         loadModule(LorenzUtils)
 

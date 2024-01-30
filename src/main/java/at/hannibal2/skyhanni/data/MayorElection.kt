@@ -17,7 +17,7 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.minutes
 
-object MayorAPI {
+object MayorElection {
     private var lastUpdate = SimpleTimeMark.farPast()
     private var dispatcher = Dispatchers.IO
 
