@@ -31,6 +31,20 @@ public class SensReducerConfig {
 
     @Expose
     @ConfigOption(
+        name = "Only in Ground",
+        desc = "")
+    @ConfigEditorBoolean
+    public boolean inGround = true;
+
+    @Expose
+    @ConfigOption(
+        name = "Only in Plots",
+        desc = "")
+    @ConfigEditorBoolean
+    public boolean inPlot = true;
+
+    @Expose
+    @ConfigOption(
         name = "use keybind instead",
         desc = "instead of checking for a farming tool use keybind")
     @ConfigEditorBoolean

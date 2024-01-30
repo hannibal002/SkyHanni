@@ -9,6 +9,7 @@ import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils.afterChange
 import at.hannibal2.skyhanni.utils.RenderUtils.renderString
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
+import com.sun.org.apache.xpath.internal.operations.Bool
 import net.minecraft.client.Minecraft
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import kotlin.time.Duration.Companion.seconds
@@ -19,7 +20,9 @@ object SensReducer {
     private var isToggled = false
     private var isManualToggle = false
     private var lastCheckCooldown = SimpleTimeMark.farPast()
-    private val gameSettings get() = Minecraft.getMinecraft().gameSettings
+
+    private val mc get() = Minecraft.getMinecraft()
+    private val gameSettings = mc.gameSettings
 
     @SubscribeEvent
     fun onTick(event: LorenzTickEvent) {
@@ -36,22 +39,17 @@ object SensReducer {
             if (isToggled) restoreSensitivity()
             return
         }
+        if (isToggled && config.inGround && !mc.thePlayer.onGround) {
+            restoreSensitivity()
+            isToggled = false
+            return
+        }
         if (config.useKeybind) {
-            if (config.keybind.isKeyHeld() && !isToggled) {
-                toggleSens()
-                isToggled = true
-            } else if (!config.keybind.isKeyHeld() && isToggled) {
-                toggleSens()
-                isToggled = false
-            }
+            if (config.keybind.isKeyHeld() && !isToggled)  toggle(true)
+            else if (!config.keybind.isKeyHeld() && isToggled) toggle(false)
         } else {
-            if (isHoldingTool() && !isToggled) {
-                toggleSens()
-                isToggled = true
-            } else if (!isHoldingTool() && isToggled) {
-                toggleSens()
-                isToggled = false
-            }
+            if (isHoldingTool() && !isToggled) toggle(true)
+            else if (!isHoldingTool() && isToggled) toggle(false)
         }
     }
 
@@ -61,7 +59,6 @@ object SensReducer {
             reloadSensitivity()
         }
     }
-
 
     private fun reloadSensitivity() {
         if (isToggled || isManualToggle) {
@@ -75,13 +72,6 @@ object SensReducer {
         if (!(isToggled || isManualToggle)) return
         if (!config.showGUI) return
         config.position.renderString("§eSensitivity Lowered", posLabel = "Sensitivity Lowered")
-    }
-
-
-    private fun toggleSens() {
-        if (!isToggled) {
-            lowerSensitivity()
-        } else restoreSensitivity()
     }
 
     private fun isHoldingTool(): Boolean {
@@ -112,5 +102,14 @@ object SensReducer {
     private fun restoreSensitivity(showMessage: Boolean = false) {
         gameSettings?.mouseSensitivity = SkyHanniMod.feature.storage.savedMouseloweredSensitivity
         if (showMessage) LorenzUtils.chat("§bMouse sensitivity is now restored.")
+    }
+
+    private fun toggle(on: Boolean) {
+        if (config.inPlot && GardenAPI.onBarnPlot) return
+        if (config.inGround && !Minecraft.getMinecraft().thePlayer.onGround) return
+        if (!isToggled) {
+            lowerSensitivity()
+        } else restoreSensitivity()
+        isToggled = on
     }
 }
