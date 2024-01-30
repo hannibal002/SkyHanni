@@ -113,7 +113,7 @@ class MinionXp {
 
             // TODO add wisdom and temporary skill exp (Events) to calculation
             val baseXp = xp.amount * item.stackSize
-            val xpAmount = if (Perks.MOAR_SKILLZ.isActive()) {
+            val xpAmount = if (Perks.MOAR_SKILLZ.isActive) {
                 baseXp * 1.5
             } else baseXp
 

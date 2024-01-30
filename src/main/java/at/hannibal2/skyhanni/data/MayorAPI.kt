@@ -2,7 +2,7 @@ package at.hannibal2.skyhanni.data
 
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.config.ConfigManager
-import at.hannibal2.skyhanni.data.Mayors.Companion.getMayorFromName
+import at.hannibal2.skyhanni.data.Mayors.Companion.setMayorWithActivePerks
 import at.hannibal2.skyhanni.data.jsonobjects.local.MayorJson
 import at.hannibal2.skyhanni.events.LorenzTickEvent
 import at.hannibal2.skyhanni.utils.APIUtil
@@ -82,7 +82,7 @@ object MayorAPI {
         } else {
             candidates[SkyBlockTime.now().year]
         })?.let {
-            getMayorFromName(it.name, it.perks)
+            setMayorWithActivePerks(it.name, it.perks)
         }
     }
 

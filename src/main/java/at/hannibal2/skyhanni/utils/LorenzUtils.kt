@@ -666,7 +666,7 @@ object LorenzUtils {
     fun <T> List<T>.indexOfFirst(vararg args: T) = args.map { indexOf(it) }.firstOrNull { it != -1 }
 
     private val recalculateDerpy =
-        RecalculatingValue(1.seconds) { Perks.DOUBLE_MOBS_HP.isActive() }
+        RecalculatingValue(1.seconds) { Perks.DOUBLE_MOBS_HP.isActive }
 
     val isDerpy get() = recalculateDerpy.getValue()
 

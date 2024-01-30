@@ -5,8 +5,7 @@ import at.hannibal2.skyhanni.data.jsonobjects.local.MayorJson
 enum class Mayors(
     val mayorName: String,
     val color: String,
-    private val perks: List<Perks>,
-    val activePerks: List<Perks> = listOf()
+    private val perks: List<Perks>
 ) {
     AATROX("Aatrox", "§3", listOf(Perks.SLASHED_PRICING, Perks.SLAYER_XP_BUFF, Perks.PATHFINDER)),
     COLE("Cole", "§e", listOf(Perks.PROSPECTION, Perks.MINING_XP_BUFF, Perks.MINING_FIESTA)),
@@ -30,8 +29,11 @@ enum class Mayors(
 
         fun setMayorWithActivePerks(name: String, perks: ArrayList<MayorJson.Perk>): Mayors {
             val mayor = getMayorFromName(name)
-            mayor.perks.forEach{ it.isActive = false}
-            perks.filter{mayor.perks.contains(it)}.forEach{ it.isActive = true}
+
+            mayor.perks.forEach { it.isActive = false }
+            perks.mapNotNull { perk -> Perks.entries.firstOrNull { it.perkName == perk.name } }
+                .filter { mayor.perks.contains(it) }.forEach { it.isActive = true }
+
             return mayor
         }
     }
