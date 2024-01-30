@@ -2,6 +2,7 @@ package at.hannibal2.skyhanni.features.minion
 
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.data.MayorAPI
+import at.hannibal2.skyhanni.data.Perks
 import at.hannibal2.skyhanni.data.jsonobjects.repo.MinionXPJson
 import at.hannibal2.skyhanni.events.IslandChangeEvent
 import at.hannibal2.skyhanni.events.LorenzToolTipEvent
@@ -113,7 +114,7 @@ class MinionXp {
 
             // TODO add wisdom and temporary skill exp (Events) to calculation
             val baseXp = xp.amount * item.stackSize
-            val xpAmount = if (MayorAPI.isPerkActive("Derpy", "MOAR SKILLZ!!!")) {
+            val xpAmount = if (MayorAPI.isPerkActive(Perks.MOAR_SKILLZ)) {
                 baseXp * 1.5
             } else baseXp
 
