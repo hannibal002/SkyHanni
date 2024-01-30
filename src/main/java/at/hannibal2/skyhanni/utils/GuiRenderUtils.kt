@@ -23,8 +23,6 @@ import kotlin.math.roundToInt
  */
 object GuiRenderUtils {
 
-    val VANILLA_BAR_TEXTURE = ResourceLocation("minecraft:textures/gui/icons.png")
-
     fun drawStringCentered(str: String?, fr: FontRenderer, x: Float, y: Float, shadow: Boolean, colour: Int) {
         val strLen = fr.getStringWidth(str)
         val x2 = x - strLen / 2f
