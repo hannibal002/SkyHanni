@@ -56,6 +56,7 @@ import kotlin.reflect.jvm.isAccessible
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.milliseconds
 import kotlin.time.Duration.Companion.seconds
+import kotlin.time.times
 
 object LorenzUtils {
 
@@ -268,7 +269,7 @@ object LorenzUtils {
 
     fun getSBMonthByName(month: String): Int {
         var monthNr = 0
-        for (i in 1..12) {
+        for (i in 1 .. 12) {
             val monthName = SkyBlockTime.monthName(i)
             if (month == monthName) {
                 monthNr = i
@@ -382,6 +383,10 @@ object LorenzUtils {
     private var lastMessageSent = SimpleTimeMark.farPast()
     private val sendQueue: Queue<String> = LinkedList()
 
+    private val commandSendDelay = 300.milliseconds
+
+    val timeWhenNewQueuedUpCommandExecutes = lastMessageSent + sendQueue.size * commandSendDelay
+
     @SubscribeEvent
     fun sendQueuedChatMessages(event: LorenzTickEvent) {
         val player = Minecraft.getMinecraft().thePlayer
@@ -389,7 +394,7 @@ object LorenzUtils {
             sendQueue.clear()
             return
         }
-        if (lastMessageSent.passedSince() > 300.milliseconds) {
+        if (lastMessageSent.passedSince() > commandSendDelay) {
             player.sendChatMessage(sendQueue.poll() ?: return)
             lastMessageSent = SimpleTimeMark.now()
         }
