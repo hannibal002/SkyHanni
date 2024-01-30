@@ -40,7 +40,7 @@ object UtilsPatterns {
         "(?:§f§f)?§7\\[Lvl (?<level>\\d+)] .*"
     )
 
-    val seasonPattern by RepoPattern.pattern(
+    val seasonPattern by patternGroup.pattern(
         "skyblocktime.season",
         "(?:Early |Late )?(?<season>Spring|Summer|Autumn|Winter)"
     )
