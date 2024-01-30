@@ -91,20 +91,20 @@ object MayorAPI {
     }
 
     private fun checkHypixelAPI() {
-        if (SimpleTimeMark.now() > lastUpdate.plus(5.minutes)) {
-            lastUpdate = SimpleTimeMark.now()
-            SkyHanniMod.coroutineScope.launch {
-                val url = "https://api.hypixel.net/v2/resources/skyblock/election"
-                val jsonObject = withContext(dispatcher) { APIUtil.getJSONResponse(url) }
-                rawMayorData = ConfigManager.gson.fromJson(jsonObject, MayorJson::class.java)
-                val data = rawMayorData ?: return@launch
-                val map = mutableMapOf<Int, MayorJson.Candidate>()
-                map put data.mayor.election.getPairs()
-                data.current?.let {
-                    map put data.current.getPairs()
-                }
-                candidates = map
+        if (lastUpdate.passedSince() < 20.minutes) return
+        lastUpdate = SimpleTimeMark.now()
+
+        SkyHanniMod.coroutineScope.launch {
+            val url = "https://api.hypixel.net/v2/resources/skyblock/election"
+            val jsonObject = withContext(dispatcher) { APIUtil.getJSONResponse(url) }
+            rawMayorData = ConfigManager.gson.fromJson(jsonObject, MayorJson::class.java)
+            val data = rawMayorData ?: return@launch
+            val map = mutableMapOf<Int, MayorJson.Candidate>()
+            map put data.mayor.election.getPairs()
+            data.current?.let {
+                map put data.current.getPairs()
             }
+            candidates = map
         }
 
         checkCurrentMayor()
