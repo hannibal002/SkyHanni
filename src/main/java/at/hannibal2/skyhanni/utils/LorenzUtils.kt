@@ -3,7 +3,7 @@ package at.hannibal2.skyhanni.utils
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.data.HypixelData
 import at.hannibal2.skyhanni.data.IslandType
-import at.hannibal2.skyhanni.data.MayorElection
+import at.hannibal2.skyhanni.data.MayorAPI
 import at.hannibal2.skyhanni.data.TitleManager
 import at.hannibal2.skyhanni.events.GuiContainerEvent
 import at.hannibal2.skyhanni.events.LorenzTickEvent
@@ -666,7 +666,7 @@ object LorenzUtils {
     fun <T> List<T>.indexOfFirst(vararg args: T) = args.map { indexOf(it) }.firstOrNull { it != -1 }
 
     private val recalculateDerpy =
-        RecalculatingValue(1.seconds) { MayorElection.isPerkActive("Derpy", "DOUBLE MOBS HP!!!") }
+        RecalculatingValue(1.seconds) { MayorAPI.isPerkActive("Derpy", "DOUBLE MOBS HP!!!") }
 
     val isDerpy get() = recalculateDerpy.getValue()
 
