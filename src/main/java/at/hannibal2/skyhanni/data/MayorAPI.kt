@@ -2,6 +2,7 @@ package at.hannibal2.skyhanni.data
 
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.config.ConfigManager
+import at.hannibal2.skyhanni.data.Mayors.Companion.getMayorFromName
 import at.hannibal2.skyhanni.data.jsonobjects.local.MayorJson
 import at.hannibal2.skyhanni.events.LorenzTickEvent
 import at.hannibal2.skyhanni.utils.APIUtil
@@ -21,44 +22,24 @@ object MayorAPI {
     private var lastUpdate = SimpleTimeMark.farPast()
     private var dispatcher = Dispatchers.IO
 
-    var rawMayorData: MayorJson? = null
-        private set
+    private var rawMayorData: MayorJson? = null
     var candidates = mapOf<Int, MayorJson.Candidate>()
         private set
-    var currentMayor: MayorJson.Candidate? = null
+    var currentMayor: Mayors? = null
         private set
     var timeTillNextMayor = Duration.ZERO
         private set
 
     private const val LATE_SPRING = 3
 
-    fun isPerkActive(mayor: String, perk: String) = currentMayor?.let { currentCandidate ->
-        currentCandidate.name == mayor && currentCandidate.perks.any { it.name == perk }
-    } ?: false
+    fun isPerkActive(mayor: Mayors, perk: Perks) = mayor.perk.contains(perk)
 
     /**
      * @param input: The name of the mayor
      * @return: The neu color of the mayor; If no mayor was found, it will return "§cUnknown: §7"
      */
     fun mayorNameToColorCode(input: String): String {
-        return when (input) {
-            // Normal Mayors
-            "Aatrox" -> "§3"
-            "Cole" -> "§e"
-            "Diana" -> "§2"
-            "Diaz" -> "§6"
-            "Finnegan" -> "§c"
-            "Foxy" -> "§d"
-            "Marina" -> "§b"
-            "Paul" -> "§c"
-
-            // Special Mayors
-            "Scorpius" -> "§d"
-            "Jerry" -> "§d"
-            "Derpy" -> "§d"
-            "Dante" -> "§d"
-            else -> "§cUnknown: §7"
-        }
+        return Mayors.getMayorFromName(input).color
     }
 
     /**
@@ -98,10 +79,14 @@ object MayorAPI {
         val nextMayorTime = calculateNextMayorTime()
 
         // Check if it is still the mayor from the old SkyBlock year
-        currentMayor = if (nextMayorTime > System.currentTimeMillis().asTimeMark()) {
+        currentMayor = (if (nextMayorTime > System.currentTimeMillis().asTimeMark()) {
             candidates[SkyBlockTime.now().year - 1]
         } else {
             candidates[SkyBlockTime.now().year]
+        })?.let {
+            getMayorFromName(
+                it.name
+            )
         }
     }
 
