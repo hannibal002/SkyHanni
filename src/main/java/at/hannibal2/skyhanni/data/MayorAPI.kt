@@ -32,7 +32,7 @@ object MayorAPI {
 
     private const val LATE_SPRING = 3
 
-    fun isPerkActive(mayor: Mayors, perk: Perks) = mayor.perk.contains(perk)
+    fun isPerkActive(perk: Perks) = currentMayor?.perk?.contains(perk) ?: false
 
     /**
      * @param input: The name of the mayor
