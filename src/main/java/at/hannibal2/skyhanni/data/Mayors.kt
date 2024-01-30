@@ -30,9 +30,8 @@ enum class Mayors(
 
         fun setMayorWithActivePerks(name: String, perks: ArrayList<MayorJson.Perk>): Mayors {
             val mayor = getMayorFromName(name)
-            perks.forEach {
-                mayor.perks.add(Perks.valueOf(it.name))
-            }
+            mayor.perks.forEach{ it.isActive = false}
+            perks.filter{mayor.perks.contains(it)}.forEach{ it.isActive = true}
             return mayor
         }
     }
