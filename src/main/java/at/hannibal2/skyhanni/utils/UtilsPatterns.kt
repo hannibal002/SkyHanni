@@ -61,4 +61,9 @@ object UtilsPatterns {
         "string.chatusername",
         "^(?:§\\w\\[§\\w\\d+§\\w] )?(?:(?:§\\w)+\\S )?(?<rankedName>(?:§\\w\\[\\w.+] )?(?:§\\w)?(?<username>\\w+))(?: (?:§\\w)?\\[.+?])?"
     )
+
+    val seasonPattern by patternGroup.pattern(
+        "skyblocktime.season",
+        "(?:Early |Late )?(?<season>Spring|Summer|Autumn|Winter)"
+    )
 }

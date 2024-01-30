@@ -89,6 +89,10 @@ class GardenVisitorFeatures {
         "visitorchat",
         "§e\\[NPC] (§.)?(?<name>.*)§f: §r.*"
     )
+    private val partialAcceptedPattern by patternGroup.pattern(
+        "partialaccepted",
+        "§aYou gave some of the required items!"
+    )
 
     private val logger = LorenzLogger("garden/visitors")
     private var lastFullPrice = 0.0
@@ -131,12 +135,11 @@ class GardenVisitorFeatures {
             if (alreadyReady) {
                 VisitorAPI.changeStatus(visitor, VisitorAPI.VisitorStatus.READY, "inSacks")
                 visitor.inSacks = true
-                update()
             } else {
                 VisitorAPI.changeStatus(visitor, VisitorAPI.VisitorStatus.WAITING, "firstContact")
             }
-            update()
         }
+        update()
     }
 
     private fun updateDisplay() {
@@ -472,6 +475,12 @@ class GardenVisitorFeatures {
 
         if (GardenAPI.inGarden() && config.hideChat && hideVisitorMessage(event.message)) {
             event.blockedReason = "garden_visitor_message"
+        }
+
+        if (config.shoppingList.display) {
+            partialAcceptedPattern.matchMatcher(event.message) {
+                LorenzUtils.chat("Talk to the visitor again to update the number of items needed!")
+            }
         }
     }
 

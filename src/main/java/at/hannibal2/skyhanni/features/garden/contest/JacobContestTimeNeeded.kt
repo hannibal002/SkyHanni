@@ -13,10 +13,14 @@ import at.hannibal2.skyhanni.utils.LorenzUtils.round
 import at.hannibal2.skyhanni.utils.LorenzUtils.sorted
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.RenderUtils.renderStringsAndItems
-import at.hannibal2.skyhanni.utils.TimeUtils
+import at.hannibal2.skyhanni.utils.TimeUtils.format
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 import net.minecraftforge.fml.common.eventhandler.EventPriority
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
+import kotlin.time.Duration
+import kotlin.time.Duration.Companion.milliseconds
+import kotlin.time.Duration.Companion.minutes
+import kotlin.time.Duration.Companion.seconds
 
 class JacobContestTimeNeeded {
     private val config get() = GardenAPI.config
@@ -31,7 +35,7 @@ class JacobContestTimeNeeded {
     }
 
     private fun update() {
-        val sorted = mutableMapOf<CropType, Double>()
+        val sorted = mutableMapOf<CropType, Duration>()
         val map = mutableMapOf<CropType, Renderable>()
         for (crop in CropType.entries) {
             testCrop(crop, sorted, map)
@@ -59,13 +63,13 @@ class JacobContestTimeNeeded {
 
     private fun testCrop(
         crop: CropType,
-        sorted: MutableMap<CropType, Double>,
+        sorted: MutableMap<CropType, Duration>,
         map: MutableMap<CropType, Renderable>
     ) {
 
         val bps = crop.getBps()
         if (bps == null) {
-            sorted[crop] = Double.MAX_VALUE
+            sorted[crop] = Duration.INFINITE
             map[crop] = Renderable.hoverTips(
                 "§9${crop.cropName} §cNo speed data!",
                 listOf("§cFarm ${crop.cropName} to show data!")
@@ -74,7 +78,7 @@ class JacobContestTimeNeeded {
         }
         val ff = crop.getLatestTrueFarmingFortune()
         if (ff == null) {
-            sorted[crop] = Double.MAX_VALUE
+            sorted[crop] = Duration.INFINITE
             map[crop] = Renderable.hoverTips(
                 "§9${crop.cropName} §cNo Farming Fortune data!",
                 listOf("§cHold a ${crop.cropName} specific", "§cfarming tool in hand to show data!")
@@ -84,7 +88,7 @@ class JacobContestTimeNeeded {
 
         val averages = FarmingContestAPI.calculateAverages(crop).second
         if (averages.isEmpty()) {
-            sorted[crop] = Double.MAX_VALUE - 2
+            sorted[crop] = Duration.INFINITE - 2.milliseconds
             map[crop] = Renderable.hoverTips(
                 "§9${crop.cropName} §cNo contest data!",
                 listOf(
@@ -104,7 +108,7 @@ class JacobContestTimeNeeded {
         speed: Int,
         crop: CropType,
         averages: Map<ContestBracket, Int>,
-        sorted: MutableMap<CropType, Double>,
+        sorted: MutableMap<CropType, Duration>,
         map: MutableMap<CropType, Renderable>
     ) {
         var lowBPSWarning = listOf<String>()
@@ -120,14 +124,14 @@ class JacobContestTimeNeeded {
         for (bracket in ContestBracket.entries) {
             val amount = averages[bracket]
             if (amount == null) {
-                sorted[crop] = Double.MAX_VALUE - 1
+                sorted[crop] = Duration.INFINITE - 1.milliseconds
                 brackets.add("${bracket.displayName} §cBracket not revealed!")
                 showLine = "§9${crop.cropName} §cBracket not revealed!"
                 continue
             }
-            val timeInMinutes = amount.toDouble() / speedForFormular / 60
-            val formatDuration = TimeUtils.formatDuration((timeInMinutes * 60 * 1000).toLong())
-            val color = if (timeInMinutes < 20) "§b" else "§c"
+            val timeInMinutes = (amount.toDouble() / speedForFormular).seconds
+            val formatDuration = timeInMinutes.format()
+            val color = if (timeInMinutes < 20.minutes) "§b" else "§c"
             var marking = ""
             var bracketText = "${bracket.displayName} $color$formatDuration"
             var blocksPerSecond = crop.getBps()
@@ -145,7 +149,7 @@ class JacobContestTimeNeeded {
                     marking += " "
                 }
             }
-            val line = if (timeInMinutes < 20) {
+            val line = if (timeInMinutes < 20.minutes) {
                 "§9${crop.cropName} §7in §b$formatDuration" + marking
             } else {
                 val cropFF = crop.getLatestTrueFarmingFortune() ?: 0.0
