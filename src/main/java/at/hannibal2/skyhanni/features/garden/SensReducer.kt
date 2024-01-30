@@ -4,6 +4,7 @@ import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.events.ConfigLoadEvent
 import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.LorenzTickEvent
+import at.hannibal2.skyhanni.utils.KeyboardManager.isKeyHeld
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils.afterChange
 import at.hannibal2.skyhanni.utils.RenderUtils.renderString
@@ -35,12 +36,22 @@ object SensReducer {
             if (isToggled) restoreSensitivity()
             return
         }
-        if (isHoldingTool() && !isToggled) {
-            toggleSens()
-            isToggled = true
-        } else if (!isHoldingTool() && isToggled) {
-            toggleSens()
-            isToggled = false
+        if (config.useKeybind) {
+            if (config.keybind.isKeyHeld() && !isToggled) {
+                toggleSens()
+                isToggled = true
+            } else if (!config.keybind.isKeyHeld() && isToggled) {
+                toggleSens()
+                isToggled = false
+            }
+        } else {
+            if (isHoldingTool() && !isToggled) {
+                toggleSens()
+                isToggled = true
+            } else if (!isHoldingTool() && isToggled) {
+                toggleSens()
+                isToggled = false
+            }
         }
     }
 
