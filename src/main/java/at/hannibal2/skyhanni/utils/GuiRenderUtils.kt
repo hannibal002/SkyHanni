@@ -1,20 +1,29 @@
 package at.hannibal2.skyhanni.utils
 
+import at.hannibal2.skyhanni.config.features.misc.SkillProgressDisplayConfig.ProgressBarConfig.TexturedBar.UsedTexture
+import at.hannibal2.skyhanni.features.chroma.ChromaShaderManager
+import at.hannibal2.skyhanni.features.chroma.ChromaType
+import io.github.moulberry.notenoughupdates.util.Utils
 import net.minecraft.client.Minecraft
 import net.minecraft.client.gui.FontRenderer
 import net.minecraft.client.gui.GuiScreen
 import net.minecraft.client.renderer.GlStateManager
 import net.minecraft.client.renderer.RenderHelper
 import net.minecraft.item.ItemStack
+import net.minecraft.util.ResourceLocation
 import org.lwjgl.opengl.GL11
 import java.awt.Color
 import java.text.DecimalFormat
+import kotlin.math.ceil
+import kotlin.math.min
 import kotlin.math.roundToInt
 
 /**
  * Some functions taken from NotEnoughUpdates
  */
 object GuiRenderUtils {
+
+    val VANILLA_BAR_TEXTURE = ResourceLocation("minecraft:textures/gui/icons.png")
 
     fun drawStringCentered(str: String?, fr: FontRenderer, x: Float, y: Float, shadow: Boolean, colour: Int) {
         val strLen = fr.getStringWidth(str)
@@ -293,5 +302,46 @@ object GuiRenderUtils {
     fun renderItemAndBackground(item: ItemStack, x: Int, y: Int, colour: Int) {
         renderItemStack(item, x, y)
         GuiScreen.drawRect(x, y, x + 16, y + 16, colour)
+    }
+
+    // Taken and edited from NEU
+    fun renderTexturedBar(x: Float, y: Float, xSize: Float, completed: Float, color: Color, useChroma: Boolean, texture: UsedTexture, height: Float) {
+        GlStateManager.pushMatrix()
+        GlStateManager.translate(x, y, 0f)
+        val w = xSize.toInt()
+        val w_2 = w / 2
+        val k = min(w.toDouble(), ceil((completed * w).toDouble())).toInt()
+        val vanilla = texture == UsedTexture.MATCH_PACK
+        val vMinEmpty = if (vanilla) 64 / 256f else 0f
+        val vMaxEmpty = if (vanilla) 69 / 256f else .5f
+        val vMinFilled = if (vanilla) 69 / 256f else .5f
+        val vMaxFilled = if (vanilla) 74 / 256f else 1f
+
+        if (useChroma) {
+            ChromaShaderManager.begin(ChromaType.TEXTURED)
+            GlStateManager.color(Color.LIGHT_GRAY.darker().red / 255f, Color.LIGHT_GRAY.darker().green / 255f, Color.LIGHT_GRAY.darker().blue / 255f, 1f)
+        } else {
+            GlStateManager.color(color.darker().red / 255f, color.darker().green / 255f, color.darker().blue / 255f, 1f)
+        }
+
+        Utils.drawTexturedRect(x, y, w_2.toFloat(), height, 0f, w_2 / xSize, vMinEmpty, vMaxEmpty, GL11.GL_NEAREST)
+        Utils.drawTexturedRect(x + w_2, y, w_2.toFloat(), height, 1 - w_2 / xSize, 1f, vMinEmpty, vMaxEmpty, GL11.GL_NEAREST)
+
+        if (useChroma) {
+            GlStateManager.color(Color.WHITE.red / 255f, Color.WHITE.green / 255f, Color.WHITE.blue / 255f, 1f)
+        } else {
+            GlStateManager.color(color.red / 255f, color.green / 255f, color.blue / 255f, 1f)
+        }
+
+        if (k > 0) {
+            Utils.drawTexturedRect(x, y, w_2.coerceAtMost(k).toFloat(), height, 0f, w_2.toDouble().coerceAtMost(k.toDouble() / xSize).toFloat(), vMinFilled, vMaxFilled, GL11.GL_NEAREST)
+            if (completed > 0.5f) {
+                Utils.drawTexturedRect(x + w_2, y, (k - w_2).toFloat(), height, 1 - w_2 / xSize, 1 + (k - w) / xSize, vMinFilled, vMaxFilled, GL11.GL_NEAREST)
+            }
+        }
+        if (useChroma) {
+            ChromaShaderManager.end()
+        }
+        GlStateManager.popMatrix()
     }
 }

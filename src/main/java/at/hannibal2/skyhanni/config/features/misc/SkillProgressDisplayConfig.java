@@ -88,15 +88,13 @@ public class SkillProgressDisplayConfig {
 
             @Expose
             @ConfigOption(name = "Width", desc = "Modify the width of the bar.\n" +
-                "§eDefault: 182\n" +
-                "§cOnly change this if using your own texture !")
+                "§eDefault: 182\n")
             @ConfigEditorSlider(minStep = 1, minValue = 16, maxValue = 1024)
             public int width = 182;
 
             @Expose
             @ConfigOption(name = "Height", desc = "Modify the height of the bar.\n" +
-                "§eDefault: 5\n" +
-                "§cOnly change this if using your own texture !")
+                "§eDefault: 5\n" )
             @ConfigEditorSlider(minStep = 1, minValue = 3, maxValue = 16)
             public int height = 5;
         }
