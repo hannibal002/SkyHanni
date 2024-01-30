@@ -4,7 +4,6 @@ import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.data.ClickType
 import at.hannibal2.skyhanni.data.GardenCropMilestones.getCounter
 import at.hannibal2.skyhanni.data.GardenCropMilestones.setCounter
-import at.hannibal2.skyhanni.data.MayorAPI
 import at.hannibal2.skyhanni.data.Perks
 import at.hannibal2.skyhanni.data.jsonobjects.repo.DicerDropsJson
 import at.hannibal2.skyhanni.data.jsonobjects.repo.DicerDropsJson.DicerType
@@ -173,7 +172,7 @@ object GardenCropSpeed {
 
     fun finneganPerkActive(): Boolean {
         val forcefullyEnabledAlwaysFinnegan = config.forcefullyEnabledAlwaysFinnegan
-        val perkActive = MayorAPI.isPerkActive(Perks.FARMING_SIMULATOR)
+        val perkActive = Perks.FARMING_SIMULATOR.isActive()
         return forcefullyEnabledAlwaysFinnegan || perkActive
     }
 

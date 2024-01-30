@@ -32,8 +32,6 @@ object MayorAPI {
 
     private const val LATE_SPRING = 3
 
-    fun isPerkActive(perk: Perks) = currentMayor?.perk?.contains(perk) ?: false
-
     /**
      * @param input: The name of the mayor
      * @return: The neu color of the mayor; If no mayor was found, it will return "§cUnknown: §7"
@@ -84,9 +82,7 @@ object MayorAPI {
         } else {
             candidates[SkyBlockTime.now().year]
         })?.let {
-            getMayorFromName(
-                it.name
-            )
+            getMayorFromName(it.name, it.perks)
         }
     }
 

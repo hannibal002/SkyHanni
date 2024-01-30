@@ -1,25 +1,35 @@
 package at.hannibal2.skyhanni.data
 
-enum class Mayors(val mayorName: String, val color: String, val perk: List<Perks>) {
-    AATROX("Aatrox", "§3", listOf(Perks.SLASHED_PRICING, Perks.SLAYER_XP_BUFF, Perks.PATHFINDER)),
-    COLE("Cole", "§e", listOf(Perks.PROSPECTION, Perks.MINING_XP_BUFF, Perks.MINING_FIESTA)),
-    DIANA("Diana", "§2", listOf(Perks.LUCKY, Perks.MYTHOLOGICAL_RITUAL, Perks.PET_XP_BUFF)),
-    DIAZ("Diaz", "§6", listOf(Perks.BARRIER_STREET, Perks.SHOPPING_SPREE)),
-    FINNEGAN("Finnegan", "§c", listOf(Perks.FARMING_SIMULATOR, Perks.PELT_POCALYPSE, Perks.GOATED)),
-    FOXY("Foxy", "§d", listOf(Perks.SWEET_TOOTH, Perks.BENEVOLENCE, Perks.EXTRA_EVENT)),
-    MARINA("Marina", "§b", listOf(Perks.FISHING_XP_BUFF, Perks.LUCK_OF_THE_SEA, Perks.FISHING_FESTIVAL)),
-    PAUL("Paul", "§c", listOf(Perks.MARAUDER, Perks.EZPZ, Perks.BENEDICTION)),
+import at.hannibal2.skyhanni.data.jsonobjects.local.MayorJson
 
-    SCORPIUS("Scorpius", "§d", listOf(Perks.BRIBE, Perks.DARKER_AUCTIONS)),
-    JERRY("Jerry", "§d", listOf(Perks.PERKPOCALYPSE, Perks.STATSPOCALYPSE, Perks.JERRYPOCALYPSE)),
-    DERPY("Derpy", "§d", listOf(Perks.TURBO_MINIONS, Perks.AH_CLOSED, Perks.DOUBLE_MOBS_HP, Perks.MOAR_SKILLZ)),
+enum class Mayors(val mayorName: String, val color: String, val perks: MutableList<Perks>) {
+    AATROX("Aatrox", "§3", mutableListOf()),
+    COLE("Cole", "§e", mutableListOf()),
+    DIANA("Diana", "§2", mutableListOf()),
+    DIAZ("Diaz", "§6", mutableListOf()),
+    FINNEGAN("Finnegan", "§c", mutableListOf()),
+    FOXY("Foxy", "§d", mutableListOf()),
+    MARINA("Marina", "§b", mutableListOf()),
+    PAUL("Paul", "§c", mutableListOf()),
 
-    UNKNOWN("Unknown", "§c", listOf()),
+    SCORPIUS("Scorpius", "§d", mutableListOf()),
+    JERRY("Jerry", "§d", mutableListOf()),
+    DERPY("Derpy", "§d", mutableListOf()),
+
+    UNKNOWN("Unknown", "§c", mutableListOf()),
     ;
 
 
     companion object {
         fun getMayorFromName(name: String) = entries.firstOrNull { it.mayorName == name } ?: UNKNOWN
+
+        fun getMayorFromName(name: String, perks: ArrayList<MayorJson.Perk>): Mayors {
+            val mayor = getMayorFromName(name)
+            perks.forEach {
+                mayor.perks.add(Perks.valueOf(it.name))
+            }
+            return mayor
+        }
     }
 }
 
@@ -79,4 +89,6 @@ enum class Perks(val perkName: String) {
     DOUBLE_MOBS_HP("DOUBLE MOBS HP!!!"),
     MOAR_SKILLZ("MOAR SKILLZ!!!"),
     ;
+
+    fun isActive() = MayorAPI.currentMayor?.perks?.contains(this) ?: false
 }
