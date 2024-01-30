@@ -364,7 +364,8 @@ interface Renderable {
                 }
 
                 val factor = if (useChroma) 0.2 else 0.7
-                Gui.drawRect(1, 1, width - 1, height - 1, color.darker(factor).rgb)
+                val bgColor = if (useChroma) Color.GRAY.darker() else color
+                Gui.drawRect(1, 1, width - 1, height - 1, bgColor.darker(factor).rgb)
                 Gui.drawRect(1, 1, progress, height - 1, color.rgb)
 
                 if (useChroma) {
