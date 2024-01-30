@@ -231,6 +231,7 @@ object Commands {
             "shresetseacreaturetracker",
             "Resets the Sea Creature Tracker"
         ) { SeaCreatureTracker.resetCommand(it) }
+        registerCommand("shgfs", "Get from Sack (queued)") { SkyHanniDebugsAndTests.testCommand(it) }
         registerCommand0("shcalccrop", "Calculate how many crops need to be farmed between different crop milestones.", {
             FarmingMilestoneCommand.onCommand(it.getOrNull(0), it.getOrNull(1), it.getOrNull(2), false)
         }, FarmingMilestoneCommand::onComplete)

@@ -18,6 +18,7 @@ import at.hannibal2.skyhanni.data.GardenComposterUpgradesData
 import at.hannibal2.skyhanni.data.GardenCropMilestones
 import at.hannibal2.skyhanni.data.GardenCropMilestonesCommunityFix
 import at.hannibal2.skyhanni.data.GardenCropUpgrades
+import at.hannibal2.skyhanni.data.GetFromSackData
 import at.hannibal2.skyhanni.data.GuiEditManager
 import at.hannibal2.skyhanni.data.GuildAPI
 import at.hannibal2.skyhanni.data.HypixelData
@@ -417,6 +418,7 @@ class SkyHanniMod {
         loadModule(ToolTipData())
         loadModule(HighlightVisitorsOutsideOfGarden())
         loadModule(GuiEditManager())
+        loadModule(GetFromSackData)
         loadModule(UpdateManager)
         loadModule(CropAccessoryData())
         loadModule(MayorElection())
