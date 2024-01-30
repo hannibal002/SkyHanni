@@ -31,7 +31,10 @@ object SensReducer {
             return
         }
         if (isManualToggle) return
-        if (!config.enabled) return
+        if (!config.enabled) {
+            if (isToggled) restoreSensitivity()
+            return
+        }
         if (isHoldingTool() && !isToggled) {
             toggleSens()
             isToggled = true
