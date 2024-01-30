@@ -26,14 +26,13 @@ import at.hannibal2.skyhanni.features.nether.reputationhelper.miniboss.CrimsonMi
 import at.hannibal2.skyhanni.test.GriffinUtils.drawWaypointFilled
 import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.InventoryUtils.getInventoryName
-import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.ItemUtils.name
 import at.hannibal2.skyhanni.utils.LorenzColor
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils.addAsSingletonList
 import at.hannibal2.skyhanni.utils.LorenzUtils.isInIsland
 import at.hannibal2.skyhanni.utils.LorenzVec
-import at.hannibal2.skyhanni.utils.NEUItems
+import at.hannibal2.skyhanni.utils.NEUItems.getItemStack
 import at.hannibal2.skyhanni.utils.RenderUtils.drawDynamicText
 import at.hannibal2.skyhanni.utils.RenderUtils.highlight
 import net.minecraft.client.gui.inventory.GuiChest
@@ -97,38 +96,6 @@ class DailyQuestHelper(val reputationHelper: CrimsonIsleReputationHelper) {
                 val itemName = stack.name ?: continue
 
                 if (itemName.contains(dojoQuest.dojoName)) {
-                    slot highlight LorenzColor.AQUA
-                }
-            }
-        }
-        if (chestName == "Sack of Sacks") {
-            val fetchQuest = getQuest<FetchQuest>() ?: return
-            if (fetchQuest.state != QuestState.ACCEPTED) return
-
-            val fetchItem = fetchQuest.itemName
-            for (slot in chest.inventorySlots) {
-                if (slot == null) continue
-                if (slot.slotNumber != slot.slotIndex) continue
-                val stack = slot.stack ?: continue
-                if (stack.name!!.contains("Enchanted")) continue
-
-                if (stack.getLore().any { it.contains(fetchItem) }) {
-                    slot highlight LorenzColor.AQUA
-                }
-            }
-        }
-        if (chestName.contains("Nether Sack")) {
-            val fetchQuest = getQuest<FetchQuest>() ?: return
-            if (fetchQuest.state != QuestState.ACCEPTED) return
-
-            val fetchItem = fetchQuest.itemName
-            for (slot in chest.inventorySlots) {
-                if (slot == null) continue
-                if (slot.slotNumber != slot.slotIndex) continue
-                val stack = slot.stack ?: continue
-                val itemName = stack.name ?: continue
-
-                if (itemName.contains(fetchItem)) {
                     slot highlight LorenzColor.AQUA
                 }
             }
@@ -268,32 +235,21 @@ class DailyQuestHelper(val reputationHelper: CrimsonIsleReputationHelper) {
         }
 
         val result = mutableListOf<Any>()
-        val internalItemName = quest.displayItem
+        val item = quest.displayItem.getItemStack()
 
         val displayName = if (category == QuestCategory.FETCH || category == QuestCategory.FISHING) {
-            if (internalItemName != null) {
-                val name = NEUItems.getItemStack(internalItemName).name
-                if (category == QuestCategory.FISHING) {
-                    name!!.split(" ").dropLast(1).joinToString(" ")
-                } else name
-
-            } else {
-                quest.displayName
-            }
+            val name = item.name
+            if (category == QuestCategory.FISHING) {
+                name!!.split(" ").dropLast(1).joinToString(" ")
+            } else name
         } else quest.displayName
 
         val categoryName = category.displayName
-        if (internalItemName == null) {
-            result.add("  $stateText$categoryName: §f$displayName$progressText$sacksText")
-        } else {
-            result.add("  $stateText$categoryName: ")
-            try {
-                result.add(NEUItems.getItemStack(internalItemName))
-            } catch (e: RuntimeException) {
-                e.printStackTrace()
-            }
-            result.add("§f$displayName$progressText$sacksText")
-        }
+
+        result.add("  $stateText$categoryName: ")
+        result.add(item)
+        result.add("§f$displayName$progressText$sacksText")
+
         return result
     }
 
