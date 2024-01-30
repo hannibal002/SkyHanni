@@ -2,28 +2,33 @@ package at.hannibal2.skyhanni.data
 
 import at.hannibal2.skyhanni.data.jsonobjects.local.MayorJson
 
-enum class Mayors(val mayorName: String, val color: String, val perks: MutableList<Perks>) {
-    AATROX("Aatrox", "§3", mutableListOf()),
-    COLE("Cole", "§e", mutableListOf()),
-    DIANA("Diana", "§2", mutableListOf()),
-    DIAZ("Diaz", "§6", mutableListOf()),
-    FINNEGAN("Finnegan", "§c", mutableListOf()),
-    FOXY("Foxy", "§d", mutableListOf()),
-    MARINA("Marina", "§b", mutableListOf()),
-    PAUL("Paul", "§c", mutableListOf()),
+enum class Mayors(
+    val mayorName: String,
+    val color: String,
+    private val perks: List<Perks>,
+    val activePerks: List<Perks> = listOf()
+) {
+    AATROX("Aatrox", "§3", listOf(Perks.SLASHED_PRICING, Perks.SLAYER_XP_BUFF, Perks.PATHFINDER)),
+    COLE("Cole", "§e", listOf(Perks.PROSPECTION, Perks.MINING_XP_BUFF, Perks.MINING_FIESTA)),
+    DIANA("Diana", "§2", listOf(Perks.LUCKY, Perks.MYTHOLOGICAL_RITUAL, Perks.PET_XP_BUFF)),
+    DIAZ("Diaz", "§6", listOf(Perks.BARRIER_STREET, Perks.SHOPPING_SPREE)),
+    FINNEGAN("Finnegan", "§c", listOf(Perks.FARMING_SIMULATOR, Perks.PELT_POCALYPSE, Perks.GOATED)),
+    FOXY("Foxy", "§d", listOf(Perks.SWEET_TOOTH, Perks.BENEVOLENCE, Perks.EXTRA_EVENT)),
+    MARINA("Marina", "§b", listOf(Perks.FISHING_XP_BUFF, Perks.LUCK_OF_THE_SEA, Perks.FISHING_FESTIVAL)),
+    PAUL("Paul", "§c", listOf(Perks.MARAUDER, Perks.EZPZ, Perks.BENEDICTION)),
 
-    SCORPIUS("Scorpius", "§d", mutableListOf()),
-    JERRY("Jerry", "§d", mutableListOf()),
-    DERPY("Derpy", "§d", mutableListOf()),
+    SCORPIUS("Scorpius", "§d", listOf(Perks.BRIBE, Perks.DARKER_AUCTIONS)),
+    JERRY("Jerry", "§d", listOf(Perks.PERKPOCALYPSE, Perks.STATSPOCALYPSE, Perks.JERRYPOCALYPSE)),
+    DERPY("Derpy", "§d", listOf(Perks.TURBO_MINIONS, Perks.AH_CLOSED, Perks.DOUBLE_MOBS_HP, Perks.MOAR_SKILLZ)),
 
-    UNKNOWN("Unknown", "§c", mutableListOf()),
+    UNKNOWN("Unknown", "§c", listOf()),
     ;
 
 
     companion object {
         fun getMayorFromName(name: String) = entries.firstOrNull { it.mayorName == name } ?: UNKNOWN
 
-        fun getMayorFromName(name: String, perks: ArrayList<MayorJson.Perk>): Mayors {
+        fun setMayorWithActivePerks(name: String, perks: ArrayList<MayorJson.Perk>): Mayors {
             val mayor = getMayorFromName(name)
             perks.forEach {
                 mayor.perks.add(Perks.valueOf(it.name))
@@ -90,5 +95,5 @@ enum class Perks(val perkName: String) {
     MOAR_SKILLZ("MOAR SKILLZ!!!"),
     ;
 
-    fun isActive() = MayorAPI.currentMayor?.perks?.contains(this) ?: false
+    var isActive = false
 }
