@@ -26,9 +26,12 @@ import at.hannibal2.skyhanni.utils.LorenzColor
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils.equalsOneOf
 import at.hannibal2.skyhanni.utils.MultiFilter
+import at.hannibal2.skyhanni.utils.NEUInternalName.Companion.asInternalName
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.isRiftExportable
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.isRiftTransferable
+import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
+import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraft.client.Minecraft
 import net.minecraft.client.gui.inventory.GuiChest
 import net.minecraft.inventory.ContainerChest
@@ -51,6 +54,13 @@ class HideNotClickableItems {
     private val itemsToSalvage = mutableListOf<String>()
     private val hidePlayerTradeFilter = MultiFilter()
     private val notAuctionableFilter = MultiFilter()
+
+    private val seedsPattern by RepoPattern.pattern(
+        "inventory.hidenotclickable.seeds",
+        "SEEDS|CARROT_ITEM|POTATO_ITEM|PUMPKIN_SEEDS|SUGAR_CANE|MELON_SEEDS|CACTUS|INK_SACK-3"
+    )
+
+    private val netherWart by lazy { "NETHER_STALK".asInternalName() }
 
     @SubscribeEvent
     fun onRepoReload(event: RepositoryReloadEvent) {
@@ -176,6 +186,9 @@ class HideNotClickableItems {
             hidePlayerTrade(chestName, stack) -> true
             hideBazaarOrAH(chestName, stack) -> true
             hideAccessoryBag(chestName, stack) -> true
+            hideBasketOfSeeds(chestName, stack) -> true
+            hideNetherWartPouch(chestName, stack) -> true
+            hideTrickOrTreatBag(chestName, stack) -> true
             hideSackOfSacks(chestName, stack) -> true
             hideFishingBag(chestName, stack) -> true
             hidePotionBag(chestName, stack) -> true
@@ -344,6 +357,50 @@ class HideNotClickableItems {
         if (stack.getLore().any { it.contains("ACCESSORY") || it.contains("HATCESSORY") }) return false
 
         hideReason = "This item is not an accessory!"
+        return true
+    }
+
+    private fun hideBasketOfSeeds(chestName: String, stack: ItemStack): Boolean {
+        if (!chestName.startsWith("Basket of Seeds")) return false
+
+        if (ItemUtils.isSkyBlockMenuItem(stack)) {
+            hideReason = "The SkyBlock Menu cannot be put into the basket of seeds!"
+            return true
+        }
+
+        seedsPattern.matchMatcher(stack.getInternalName().asString()) {
+            return false
+        }
+
+        hideReason = "This item is not a seed!"
+        return true
+    }
+
+    private fun hideNetherWartPouch(chestName: String, stack: ItemStack): Boolean {
+        if (!chestName.startsWith("Nether Wart Pouch")) return false
+
+        if (ItemUtils.isSkyBlockMenuItem(stack)) {
+            hideReason = "The SkyBlock Menu cannot be put into the nether wart pouch!"
+            return true
+        }
+
+        if (stack.getInternalName() == netherWart) return false
+
+        hideReason = "This item is not a nether wart!"
+        return true
+    }
+
+    private fun hideTrickOrTreatBag(chestName: String, stack: ItemStack): Boolean {
+        if (!chestName.startsWith("Trick or Treat Bag")) return false
+
+        if (ItemUtils.isSkyBlockMenuItem(stack)) {
+            hideReason = "The SkyBlock Menu cannot be put into the trick or treat bag!"
+            return true
+        }
+
+        if (stack.cleanName() == "Green Candy" || stack.cleanName() == "Purple Candy") return false
+
+        hideReason = "This item is not a spooky candy!"
         return true
     }
 
