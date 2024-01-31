@@ -41,7 +41,6 @@ class MinionXp {
     data class XpInfo(val type: XpType, val amount: Double)
 
     private data class MinionStorage(val position: LorenzVec, val xpList: EnumMap<XpType, Double>) {
-
         val timestamp: SimpleTimeMark = SimpleTimeMark.now()
     }
 
@@ -51,7 +50,6 @@ class MinionXp {
     // TODO use upper case names, created a function to get type by lowercase name
     // TODO maybe: rename to SkillType, move somewhere else
     enum class XpType {
-
         Farming,
         Mining,
         Combat,
@@ -99,12 +97,13 @@ class MinionXp {
         } else {
             true
         }
+
     }
 
     private fun handleItems(inventoryItems: Map<Int, ItemStack>, isMinion: Boolean): EnumMap<XpType, Double> {
         val xpTotal = EnumMap<XpType, Double>(XpType::class.java)
         inventoryItems.filter {
-            it.value.getLore().isNotEmpty() && (!isMinion || it.key in listOf(21 .. 26, 30 .. 35, 39 .. 44).flatten())
+            it.value.getLore().isNotEmpty() && (!isMinion || it.key in listOf(21..26, 30..35, 39..44).flatten())
         }.forEach { (_, itemStack) ->
             val item = toPrimitiveItemStack(itemStack)
             val name = item.name
