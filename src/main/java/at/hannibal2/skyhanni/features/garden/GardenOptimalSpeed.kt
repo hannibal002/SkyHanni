@@ -97,18 +97,19 @@ class GardenOptimalSpeed {
 
     private fun CropType.getOptimalSpeed() = getConfig().get().toInt()
 
-    private fun CropType.getConfig(): Property<Float> = when (this) {
-        CropType.WHEAT -> configCustomSpeed.wheat
-        CropType.CARROT -> configCustomSpeed.carrot
-        CropType.POTATO -> configCustomSpeed.potato
-        CropType.NETHER_WART -> configCustomSpeed.netherWart
-        CropType.PUMPKIN -> configCustomSpeed.pumpkin
-        CropType.MELON -> configCustomSpeed.melon
-        CropType.COCOA_BEANS -> configCustomSpeed.cocoaBeans
-        CropType.SUGAR_CANE -> configCustomSpeed.sugarCane
-        CropType.CACTUS -> configCustomSpeed.cactus
-        CropType.MUSHROOM -> configCustomSpeed.mushroom
-    }
+    private fun CropType.getConfig(): Property<Float> =
+        when (this) {
+            CropType.WHEAT -> configCustomSpeed.wheat
+            CropType.CARROT -> configCustomSpeed.carrot
+            CropType.POTATO -> configCustomSpeed.potato
+            CropType.NETHER_WART -> configCustomSpeed.netherWart
+            CropType.PUMPKIN -> configCustomSpeed.pumpkin
+            CropType.MELON -> configCustomSpeed.melon
+            CropType.COCOA_BEANS -> configCustomSpeed.cocoaBeans
+            CropType.SUGAR_CANE -> configCustomSpeed.sugarCane
+            CropType.CACTUS -> configCustomSpeed.cactus
+            CropType.MUSHROOM -> configCustomSpeed.mushroom
+        }
 
     @SubscribeEvent
     fun onRenderOverlay(event: GuiRenderEvent.GuiOverlayRenderEvent) {
