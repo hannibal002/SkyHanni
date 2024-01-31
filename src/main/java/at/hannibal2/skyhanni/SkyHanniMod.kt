@@ -9,6 +9,7 @@ import at.hannibal2.skyhanni.config.SackData
 import at.hannibal2.skyhanni.config.commands.Commands.init
 import at.hannibal2.skyhanni.data.ActionBarStatsData
 import at.hannibal2.skyhanni.data.BlockData
+import at.hannibal2.skyhanni.data.BossbarData
 import at.hannibal2.skyhanni.data.ChatManager
 import at.hannibal2.skyhanni.data.CropAccessoryData
 import at.hannibal2.skyhanni.data.EntityData
@@ -436,6 +437,7 @@ class SkyHanniMod {
         loadModule(GardenBestCropTime())
         loadModule(TrackerManager)
         loadModule(UtilsPatterns)
+        loadModule(BossbarData)
 
         // APIs
         loadModule(BazaarApi())
