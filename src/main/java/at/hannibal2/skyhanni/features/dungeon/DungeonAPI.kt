@@ -135,7 +135,7 @@ class DungeonAPI {
     }
 
     @SubscribeEvent
-    fun onChatMessage(event: LorenzChatEvent) {
+    fun onChat(event: LorenzChatEvent) {
         val floor = dungeonFloor
         if (floor != null) {
             if (event.message == "§e[NPC] §bMort§f: §rHere, I found this map when I first entered the dungeon.") {

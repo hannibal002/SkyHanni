@@ -118,7 +118,7 @@ class DamageIndicatorManager {
     }
 
     @SubscribeEvent(receiveCanceled = true)
-    fun onChatMessage(event: LorenzChatEvent) {
+    fun onChat(event: LorenzChatEvent) {
         mobFinder?.handleChat(event.message)
     }
 
