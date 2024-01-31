@@ -17,6 +17,12 @@ object PartyCommands {
         LorenzUtils.sendCommandToServer("party kickoffline")
     }
 
+    fun disband() {
+        if (!config.shortCommands) return
+        if (PartyAPI.partyMembers.isEmpty()) return
+        LorenzUtils.sendCommandToServer("party disband")
+    }
+
     fun warp() {
         if (!config.shortCommands) return
         if (PartyAPI.partyMembers.isEmpty()) return
