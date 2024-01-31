@@ -34,6 +34,9 @@ object SkillAPI {
     private val SPACE_SPLITTER = Splitter.on("  ").omitEmptyStrings().trimResults()
     private var lastActionBar: String? = null
     private var levelingMap = mapOf<Int, Int>()
+
+    //TODO: use repo ?
+    private val excludedSkills = listOf("foraging", "fishing", "alchemy", "carpentry")
     var skillXPInfoMap = mutableMapOf(
         "farming" to SkillXPInfo(),
         "combat" to SkillXPInfo(),
@@ -54,7 +57,6 @@ object SkillAPI {
         "fishing" to SkillInfo(),
         "carpentry" to SkillInfo(),
     )
-    val skillMap: MutableMap<String, SkillInfo>? get() = ProfileStorageData.profileSpecific?.skillMap
     val stackMap = mapOf(
         "Farming" to Utils.createItemStack(Items.golden_hoe, "Farming"),
         "Combat" to Utils.createItemStack(Items.golden_sword, "Combat"),
@@ -65,6 +67,7 @@ object SkillAPI {
         "Fishing" to Utils.createItemStack(Items.fishing_rod, "Fishing"),
         "Carpentry" to Utils.createItemStack(Blocks.crafting_table, "Carpentry")
     )
+    val skillMap: MutableMap<String, SkillInfo>? get() = ProfileStorageData.profileSpecific?.skillMap
     var activeSkill = ""
     var gained = ""
     var showDisplay = false
@@ -110,6 +113,7 @@ object SkillAPI {
     }
 
     private fun handleSkillPattern(matcher: Matcher, skillS: String, skillInfo: SkillInfo) {
+        activeSkill = skillS
         val currentXp = matcher.group(3).formatNumber()
         val maxXp = matcher.group(4).formatNumber()
         val level = getLevel(maxXp)
@@ -125,10 +129,10 @@ object SkillAPI {
             totalXp = totalOverflow
         }
         skillMap?.set(skillS, skillInfo)
-        activeSkill = skillS
     }
 
     private fun handleSkillPatternPercent(matcher: Matcher, skillS: String, skillInfo: SkillInfo?) {
+        activeSkill = skillS
         var tablistLevel = 0
         for (line in TabListData.getTabList()) {
             var levelMatcher = skillTabPattern.matcher(line)
@@ -148,7 +152,7 @@ object SkillAPI {
         val xpPercentage = xpPercentageS.toFloatOrNull() ?: return
         val levelingArray = levelArray(skillS)
         val levelXp = calculateLevelXp(levelingArray, existingLevel.level - 1)
-        val nextLevelDiff = levelingArray[tablistLevel].asDouble
+        val nextLevelDiff = levelingArray[tablistLevel]?.asDouble ?: 7_600_000.0
         val nextLevelProgress = nextLevelDiff * xpPercentage / 100
         val totalXp = levelXp + nextLevelProgress
         val (_, currentOverflow, currentMaxOverflow, totalOverflow) = getSkillInfo(tablistLevel, nextLevelProgress.toLong(), nextLevelDiff.toLong(), totalXp.toLong())
@@ -159,10 +163,10 @@ object SkillAPI {
             level = tablistLevel
         }
         skillMap?.set(skillS, existingLevel)
-        activeSkill = skillS
     }
 
     private fun handleSkillPatternMultiplier(matcher: Matcher, skillS: String, skillInfo: SkillInfo) {
+        activeSkill = skillS
         val currentXp = matcher.group(3).formatNumber()
         val maxXp = matcher.group(4).formatNumber()
         val level = getLevel(maxXp)
@@ -176,7 +180,6 @@ object SkillAPI {
             this.level = currentLevel
         }
         skillMap?.set(skillS, skillInfo)
-        activeSkill = skillS
     }
 
     private fun getSkillInfo(skillName: String): SkillInfo? {
@@ -184,8 +187,12 @@ object SkillAPI {
     }
 
     private fun getSkillInfo(currentLevel: Int, currentXp: Long, neededXp: Long, totalXp: Long): LorenzUtils.Quad<Int, Long, Long, Long> {
-        val (level, overflowExp, xpForCurrentLevel, total) = calculateOverFlow(currentXp)
-        return if (currentLevel >= 60 && SkyHanniMod.feature.misc.skillProgressDisplayConfig.showOverflow) LorenzUtils.Quad(level, overflowExp, xpForCurrentLevel, total) else LorenzUtils.Quad(currentLevel, currentXp, neededXp, totalXp)
+        return if (currentLevel == 50 && activeSkill in excludedSkills)
+            calculateOverFlow50(currentXp)
+        else if (currentLevel >= 60 && SkyHanniMod.feature.misc.skillProgressDisplayConfig.showOverflow)
+            calculateOverFlow(currentXp)
+        else
+            LorenzUtils.Quad(currentLevel, currentXp, neededXp, totalXp)
     }
 
     /**
@@ -196,6 +203,24 @@ object SkillAPI {
         var slope = 600000L
         var xpForCurr = 7000000 + slope
         var level = 60
+        var total = 0L
+        while (xpCurrent > xpForCurr) {
+            level++
+            xpCurrent -= xpForCurr
+            total += xpForCurr
+            xpForCurr += slope
+            if (level % 10 == 0) slope *= 2
+        }
+        total += xpCurrent
+        return LorenzUtils.Quad(level, xpCurrent, xpForCurr, total)
+    }
+
+
+    private fun calculateOverFlow50(currentXp: Long): LorenzUtils.Quad<Int, Long, Long, Long> {
+        var xpCurrent = currentXp
+        var slope = 300000L
+        var xpForCurr = 4000000 + slope
+        var level = 50
         var total = 0L
         while (xpCurrent > xpForCurr) {
             level++
@@ -227,7 +252,8 @@ object SkillAPI {
     }
 
     private fun getLevel(neededXp: Long): Int {
-        return levelingMap.getOrDefault(neededXp.toInt(), 60)
+        val defaultLevel = if (activeSkill in excludedSkills) 50 else 60
+        return levelingMap.getOrDefault(neededXp.toInt(), defaultLevel)
     }
 
     private fun calculateLevelXp(levelingArray: JsonArray, level: Int): Double {
