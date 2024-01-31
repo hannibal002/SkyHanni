@@ -7,7 +7,7 @@ import io.github.moulberry.moulconfig.annotations.ConfigOption;
 
 public class MobsConfig {
     @Expose
-    @ConfigOption(name = "Area Boss", desc = "Highlight Golden Ghoul, Old Wolf, Voidling Extremist and Millenia-Aged Blaze.")
+    @ConfigOption(name = "Area Boss Highlighter", desc = "Highlight Golden Ghoul, Old Wolf, Voidling Extremist and Millenia-Aged Blaze.")
     @ConfigEditorBoolean
     @FeatureToggle
     public boolean areaBossHighlight = true;
@@ -53,7 +53,7 @@ public class MobsConfig {
 
     @Expose
     @ConfigOption(
-        name = "Area Boss",
+        name = "Area Boss Timer",
         desc = "Show a timer when Golden Ghoul, Old Wolf, Voidling Extremist or Millenia-Aged Blaze respawns. " +
             "§cSometimes it takes 20-30 seconds to calibrate correctly."
     )
