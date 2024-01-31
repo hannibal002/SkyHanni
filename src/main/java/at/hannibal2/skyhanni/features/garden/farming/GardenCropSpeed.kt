@@ -42,7 +42,7 @@ object GardenCropSpeed {
         fixedRateTimer(name = "skyhanni-crop-milestone-speed", period = 1000L) {
             if (isEnabled()) {
                 if (GardenAPI.mushroomCowPet) {
-                    CropType.MUSHROOM.setCounter(CropType.MUSHROOM.getCounter() + blocksBroken)
+                    CropType.MUSHROOM.setCounter(CropType.MUSHROOM.getCounter() + blocksBroken * (lastBrokenCrop?.multiplier ?: 1))
                 }
                 checkSpeed()
                 update()
@@ -98,8 +98,10 @@ object GardenCropSpeed {
                     this.add(blocksBroken)
                 }
             }
-            averageBlocksPerSecond = if (blocksSpeedList.size > 1) {
-                blocksSpeedList.dropLast(1).average()
+            averageBlocksPerSecond = if (blocksSpeedList.size > 5) {
+                blocksSpeedList.drop(3).average()
+            } else if (blocksSpeedList.size > 1) {
+                blocksSpeedList.drop(1).average()
             } else 0.0
             GardenAPI.getCurrentlyFarmedCrop()?.let {
                 val heldTool = InventoryUtils.getItemInHand()

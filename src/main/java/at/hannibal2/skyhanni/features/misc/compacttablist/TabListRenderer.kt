@@ -1,8 +1,12 @@
 package at.hannibal2.skyhanni.features.misc.compacttablist
 
 import at.hannibal2.skyhanni.SkyHanniMod
+import at.hannibal2.skyhanni.events.SkipTabListLineEvent
 import at.hannibal2.skyhanni.mixins.transformers.AccessorGuiPlayerTabOverlay
 import at.hannibal2.skyhanni.utils.LorenzUtils
+import at.hannibal2.skyhanni.utils.LorenzUtils.filterToMutable
+import at.hannibal2.skyhanni.utils.StringUtils.matches
+import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraft.client.Minecraft
 import net.minecraft.client.gui.Gui
 import net.minecraft.client.gui.ScaledResolution
@@ -91,8 +95,21 @@ object TabListRenderer {
         }
 
         var middleX = x
-        for (column in columns) {
+        var lastTitle: TabLine? = null
+        var lastSubTitle: TabLine? = null
+        for (originalColumn in columns) {
             var middleY = if (config.hideAdverts) headerY else headerY + padding + 2
+
+            val column = originalColumn.lines.filterToMutable { tabLine ->
+                if (tabLine.type == TabStringType.TITLE) {
+                    lastSubTitle = null
+                    lastTitle = tabLine
+                }
+                if (tabLine.type == TabStringType.SUB_TITLE) {
+                    lastSubTitle = tabLine
+                }
+                !SkipTabListLineEvent(tabLine, lastSubTitle, lastTitle).postAndCatch()
+            }.let(::RenderColumn)
 
             Gui.drawRect(
                 middleX - padding + 1,
@@ -156,4 +173,14 @@ object TabListRenderer {
             }
         }
     }
+
+    private val fireSalePattern by RepoPattern.pattern("tablist.firesaletitle", "§b§lFire Sales: §r§f\\([0-9]+\\)")
+
+    @SubscribeEvent
+    fun hideFireFromTheTabListBecauseWhoWantsThose(event: SkipTabListLineEvent) {
+        if (config.hideFiresales && event.lastSubTitle != null && fireSalePattern.matches(event.lastSubTitle.text)) {
+            event.cancel()
+        }
+    }
+
 }

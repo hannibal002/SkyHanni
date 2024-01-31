@@ -7,6 +7,7 @@ import at.hannibal2.skyhanni.utils.ItemUtils.getItemName
 import at.hannibal2.skyhanni.utils.ItemUtils.getItemNameOrNull
 import at.hannibal2.skyhanni.utils.ItemUtils.getItemRarityOrNull
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
+import at.hannibal2.skyhanni.utils.ItemUtils.isRune
 import at.hannibal2.skyhanni.utils.ItemUtils.name
 import at.hannibal2.skyhanni.utils.ItemUtils.nameWithEnchantment
 import at.hannibal2.skyhanni.utils.LorenzRarity
@@ -46,7 +47,7 @@ import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.hasEtherwarp
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.hasJalapenoBook
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.hasWoodSingularity
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.isRecombobulated
-import at.hannibal2.skyhanni.utils.StringUtils.firstLetterUppercase
+import at.hannibal2.skyhanni.utils.StringUtils.allLettersFirstUppercase
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import com.google.gson.JsonObject
 import io.github.moulberry.notenoughupdates.recipes.Ingredient
@@ -56,48 +57,47 @@ import java.util.Locale
 
 object EstimatedItemValueCalculator {
     private val config get() = SkyHanniMod.feature.misc.estimatedItemValues
-
-    fun calculate(stack: ItemStack, list: MutableList<String>): Pair<Double, Double> {
-        var totalPrice = 0.0
-        val basePrice = addBaseItem(stack, list)
-        totalPrice += basePrice
-
-        totalPrice += addAttributeCost(stack, list)
-
-        totalPrice += addReforgeStone(stack, list)
+    private val additionalCostFunctions = listOf(
+        ::addAttributeCost,
+        ::addReforgeStone,
 
         // once
-        totalPrice += addRecomb(stack, list)
-        totalPrice += addArtOfWar(stack, list)
-        totalPrice += addArtOfPeace(stack, list)
-        totalPrice += addEtherwarp(stack, list)
-        totalPrice += addPowerScrolls(stack, list)
-        totalPrice += addWoodSingularity(stack, list)
-        totalPrice += addJalapenoBook(stack, list)
-        totalPrice += addStatsBook(stack, list)
-        totalPrice += addEnrichment(stack, list)
+        ::addRecomb,
+        ::addArtOfWar,
+        ::addArtOfPeace,
+        ::addEtherwarp,
+        ::addPowerScrolls,
+        ::addWoodSingularity,
+        ::addJalapenoBook,
+        ::addStatsBook,
+        ::addEnrichment,
 
         // counted
-        totalPrice += addMasterStars(stack, list)
-        totalPrice += addHotPotatoBooks(stack, list)
-        totalPrice += addFarmingForDummies(stack, list)
-        totalPrice += addSilex(stack, list)
-        totalPrice += addTransmissionTuners(stack, list)
-        totalPrice += addManaDisintegrators(stack, list)
-        totalPrice += addPolarvoidBook(stack, list)
-        totalPrice += addBookwormBook(stack, list)
+        ::addMasterStars,
+        ::addHotPotatoBooks,
+        ::addFarmingForDummies,
+        ::addSilex,
+        ::addTransmissionTuners,
+        ::addManaDisintegrators,
+        ::addPolarvoidBook,
+        ::addBookwormBook,
 
         // cosmetic
-        totalPrice += addHelmetSkin(stack, list)
-        totalPrice += addArmorDye(stack, list)
-        totalPrice += addRune(stack, list)
+        ::addHelmetSkin,
+        ::addArmorDye,
+        ::addRune,
 
         // dynamic
-        totalPrice += addAbilityScrolls(stack, list)
-        totalPrice += addDrillUpgrades(stack, list)
-        totalPrice += addGemstoneSlotUnlockCost(stack, list)
-        totalPrice += addGemstones(stack, list)
-        totalPrice += addEnchantments(stack, list)
+        ::addAbilityScrolls,
+        ::addDrillUpgrades,
+        ::addGemstoneSlotUnlockCost,
+        ::addGemstones,
+        ::addEnchantments
+    )
+
+    fun calculate(stack: ItemStack, list: MutableList<String>): Pair<Double, Double> {
+        val basePrice = addBaseItem(stack, list)
+        val totalPrice = additionalCostFunctions.fold(basePrice) { total, function -> total + function(stack, list) }
         return Pair(totalPrice, basePrice)
     }
 
@@ -122,7 +122,7 @@ object EstimatedItemValueCalculator {
             if (price != null) {
                 list.add(
                     "§7Attribute §9${
-                        attributes[0].first.fixMending().split("_").joinToString(" ") { it.firstLetterUppercase() }
+                        attributes[0].first.fixMending().allLettersFirstUppercase()
                     } ${attributes[0].second}§7: (§6${NumberUtil.format(price)}§7)"
                 )
                 return price
@@ -148,7 +148,7 @@ object EstimatedItemValueCalculator {
             val displayName = attr.first.fixMending()
             list.add(
                 "  §9${
-                    displayName.split("_").joinToString(" ") { it.firstLetterUppercase() }
+                    displayName.allLettersFirstUppercase()
                 } ${attr.second}§7: §6${if (price != null) NumberUtil.format(price) else "Unknown"}"
             )
         }
@@ -473,6 +473,7 @@ object EstimatedItemValueCalculator {
     }
 
     private fun addRune(stack: ItemStack, list: MutableList<String>): Double {
+        if (stack.getInternalName().isRune()) return 0.0
         val internalName = stack.getRune() ?: return 0.0
 
         val price = internalName.getPrice()
