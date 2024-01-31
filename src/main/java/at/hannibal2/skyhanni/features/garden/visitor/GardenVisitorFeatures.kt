@@ -489,7 +489,7 @@ class GardenVisitorFeatures {
             val visitorName = visitor.visitorName
             val entity = visitor.getEntity()
             if (entity == null) {
-                findNametag(visitorName.removeColor())?.let {
+                NPCVisitorFix.findNametag(visitorName.removeColor())?.let {
                     findEntity(it, visitor)
                 }
             }
@@ -525,33 +525,6 @@ class GardenVisitorFeatures {
             visitor.entityId = entity.entityId
             visitor.nameTagEntityId = nameTag.entityId
         }
-    }
-
-    private fun findNametag(visitorName: String): EntityArmorStand? {
-        val foundVisitorNameTags = mutableListOf<EntityArmorStand>()
-        for (entity in EntityUtils.getEntities<EntityArmorStand>()) {
-            if (entity.name.removeColor() == visitorName) {
-                foundVisitorNameTags.add(entity)
-            }
-        }
-
-        if (visitorName in listOf("Jacob", "Anita")) {
-            // Only detect jacob/anita npc if the "wrong" npc got found as well
-            if (foundVisitorNameTags.size != 2) return null
-
-            for (tag in foundVisitorNameTags.toMutableList()) {
-                for (entity in EntityUtils.getEntities<EntityArmorStand>()) {
-                    if (entity in foundVisitorNameTags) continue
-                    val distance = entity.getLorenzVec().distance(tag.getLorenzVec())
-                    if (distance < 1.5 && entity.name == "§bSam") {
-                        foundVisitorNameTags.remove(tag)
-                    }
-                }
-            }
-        }
-
-        if (foundVisitorNameTags.size != 1) return null
-        return foundVisitorNameTags[0]
     }
 
     private fun hasItemsInInventory(visitor: VisitorAPI.Visitor): Boolean {
