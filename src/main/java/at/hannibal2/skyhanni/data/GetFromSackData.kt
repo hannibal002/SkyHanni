@@ -21,7 +21,7 @@ import kotlin.time.Duration.Companion.seconds
 
 object GetFromSackData {
 
-    private val minimumDelay = 1.6.seconds
+    private val minimumDelay = 1.7.seconds
 
     private val queue: Queue<PrimitiveItemStack> = LinkedList()
     private val inventoryMap = mutableMapOf<Int, List<PrimitiveItemStack>>()
