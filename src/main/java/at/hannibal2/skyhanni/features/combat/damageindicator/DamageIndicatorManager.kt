@@ -106,7 +106,7 @@ class DamageIndicatorManager {
 
         fun removeDamageIndicator(type: BossType) {
             data = data.editCopy {
-                values.removeIf {it.bossType == type}
+                values.removeIf { it.bossType == type }
             }
         }
     }
@@ -642,6 +642,7 @@ class DamageIndicatorManager {
         }
 
         //Hit phase
+        var hitPhaseText: String? = null
         val armorStandHits = entity.getNameTagWith(3, " Hit")
         if (armorStandHits != null) {
             val maxHits = when (entityData.bossType) {
@@ -655,7 +656,7 @@ class DamageIndicatorManager {
                 group("hits").toInt()
             } ?: error("No hits number found in ender slayer name '${armorStandHits.name}'")
 
-            return NumberUtil.percentageColor(hits.toLong(), maxHits.toLong()).getChatColor() + "$hits Hits"
+            hitPhaseText = NumberUtil.percentageColor(hits.toLong(), maxHits.toLong()).getChatColor() + "$hits Hits"
         }
 
         //Laser phase
@@ -665,11 +666,14 @@ class DamageIndicatorManager {
             val ticksAlive = entity.ridingEntity.ticksExisted.ticks
             val remainingTime = totalTimeAlive - ticksAlive
             val formatDelay = formatDelay(remainingTime)
-            if (config.enderSlayer.showHealthDuringLaser) {
+            if (config.enderSlayer.showHealthDuringLaser || hitPhaseText != null) {
                 entityData.nameSuffix = " §f$formatDelay"
             } else {
                 return formatDelay
             }
+        }
+        hitPhaseText?.let {
+            return it
         }
 
         return result
