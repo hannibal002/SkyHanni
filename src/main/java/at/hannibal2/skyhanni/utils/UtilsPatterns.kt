@@ -30,6 +30,10 @@ object UtilsPatterns {
         "item.name.enchanted.book",
         ".{2}?Enchanted Book"
     )
+    val enchantmentNamePattern by patternGroup.pattern(
+        "item.neuitems.enchantmentname",
+        "^(?<format>(?:§.)+)(?<name>[^§]+) (?<level>[IVXL]+)$"
+    )
 
     val potionPattern by patternGroup.pattern(
         "item.name.potion",

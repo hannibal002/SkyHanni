@@ -350,6 +350,7 @@ import at.hannibal2.skyhanni.utils.EntityOutlineRenderer
 import at.hannibal2.skyhanni.utils.KeyboardManager
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.MinecraftConsoleFilter.Companion.initLogging
+import at.hannibal2.skyhanni.utils.NEUItems
 import at.hannibal2.skyhanni.utils.NEUVersionCheck.checkIfNeuIsLoaded
 import at.hannibal2.skyhanni.utils.TabListData
 import at.hannibal2.skyhanni.utils.UtilsPatterns
@@ -455,6 +456,7 @@ class SkyHanniMod {
         loadModule(FishingAPI)
         loadModule(FishingDetection)
         loadModule(LorenzUtils)
+        loadModule(NEUItems)
 
         // features
         loadModule(BazaarOrderHelper())
