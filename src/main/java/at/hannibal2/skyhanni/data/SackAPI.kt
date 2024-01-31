@@ -294,7 +294,7 @@ object SackAPI {
             return sackData[item] ?: return SackItem(0, 0, SackStatus.MISSING)
         }
 
-        sackData = sackData.editCopy { this[item] = SackItem(0, 0, SackStatus.OUTDATED) }
+        sackData = sackData.editCopy { this[item] = SackItem(0, 0, SackStatus.MISSING) }
         return sackData[item] ?: return SackItem(0, 0, SackStatus.MISSING)
     }
 
