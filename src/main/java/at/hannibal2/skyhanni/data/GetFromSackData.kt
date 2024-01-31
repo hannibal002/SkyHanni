@@ -42,8 +42,8 @@ object GetFromSackData {
         if (!LorenzUtils.inSkyBlock) return
         if (queue.isNotEmpty() && lastTimeOfCommand.passedSince() >= minimumDelay) {
             val item = queue.poll()
-            lastTimeOfCommand = LorenzUtils.timeWhenNewQueuedUpCommandExecutes
             LorenzUtils.sendCommandToServer("gfs ${item.name.asString()} ${item.amount}")
+            lastTimeOfCommand = SimpleTimeMark.now()
         }
     }
 
