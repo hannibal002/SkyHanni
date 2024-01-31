@@ -199,6 +199,7 @@ import at.hannibal2.skyhanni.features.garden.visitor.GardenVisitorDropStatistics
 import at.hannibal2.skyhanni.features.garden.visitor.GardenVisitorFeatures
 import at.hannibal2.skyhanni.features.garden.visitor.GardenVisitorTimer
 import at.hannibal2.skyhanni.features.garden.visitor.HighlightVisitorsOutsideOfGarden
+import at.hannibal2.skyhanni.features.garden.visitor.NPCVisitorFix
 import at.hannibal2.skyhanni.features.garden.visitor.VisitorListener
 import at.hannibal2.skyhanni.features.inventory.AuctionsHighlighter
 import at.hannibal2.skyhanni.features.inventory.ChestValue
@@ -568,6 +569,7 @@ class SkyHanniMod {
         loadModule(MiscFeatures())
         loadModule(SkyMartCopperPrice())
         loadModule(GardenVisitorFeatures())
+        loadModule(NPCVisitorFix)
         loadModule(GardenInventoryNumbers())
         loadModule(GardenVisitorTimer())
         loadModule(MinionXp())
