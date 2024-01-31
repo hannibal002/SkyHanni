@@ -48,5 +48,20 @@ public class EstimatedItemValueConfig {
     public boolean armor = true;
 
     @Expose
+    @ConfigOption(name = "Ignore Helmet Skins", desc = "Ignore helmet Skins from the total value.")
+    @ConfigEditorBoolean
+    public boolean ignoreHelmetSkins = false;
+
+    @Expose
+    @ConfigOption(name = "Ignore Armor Dyes", desc = "Ignore Armor Dyes from the total value.")
+    @ConfigEditorBoolean
+    public boolean ignoreArmorDyes = false;
+
+    @Expose
+    @ConfigOption(name = "Ignore Runes", desc = "Ignore Runes from the total value.")
+    @ConfigEditorBoolean
+    public boolean ignoreRunes = false;
+
+    @Expose
     public Position itemPriceDataPos = new Position(140, 90, false, true);
 }
