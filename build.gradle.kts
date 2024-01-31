@@ -165,6 +165,7 @@ loom {
             if (SystemUtils.IS_OS_MAC_OSX) {
                 vmArgs.remove("-XstartOnFirstThread")
             }
+            vmArgs.add("-Xmx4G")
         }
         "server" {
             isIdeConfigGenerated = false
