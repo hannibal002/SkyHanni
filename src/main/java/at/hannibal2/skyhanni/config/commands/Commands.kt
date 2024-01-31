@@ -5,6 +5,7 @@ import at.hannibal2.skyhanni.config.ConfigFileType
 import at.hannibal2.skyhanni.config.ConfigGuiManager
 import at.hannibal2.skyhanni.data.ChatManager
 import at.hannibal2.skyhanni.data.GardenCropMilestonesCommunityFix
+import at.hannibal2.skyhanni.data.GetFromSackData
 import at.hannibal2.skyhanni.data.GuiEditManager
 import at.hannibal2.skyhanni.data.PartyAPI
 import at.hannibal2.skyhanni.data.TitleManager
@@ -231,7 +232,6 @@ object Commands {
             "shresetseacreaturetracker",
             "Resets the Sea Creature Tracker"
         ) { SeaCreatureTracker.resetCommand(it) }
-        registerCommand("shgfs", "Get from Sack (queued)") { SkyHanniDebugsAndTests.testCommand(it) }
         registerCommand0("shcalccrop", "Calculate how many crops need to be farmed between different crop milestones.", {
             FarmingMilestoneCommand.onCommand(it.getOrNull(0), it.getOrNull(1), it.getOrNull(2), false)
         }, FarmingMilestoneCommand::onComplete)
@@ -414,6 +414,9 @@ object Commands {
         registerCommand("pk", "Kick a specific party member") { PartyCommands.kick(it) }
         registerCommand("pt", "Transfer the party to another party member") { PartyCommands.transfer(it) }
         registerCommand("pp", "Promote a specific party member") { PartyCommands.promote(it) }
+
+        registerCommand("gfs", "Get from Sack (queued)") { GetFromSackData.commandHandler(it) }
+        registerCommand("getFromSacks", "Get from Sack (queued)") { GetFromSackData.commandHandler(it) }
     }
 
     private fun commandHelp(args: Array<String>) {
