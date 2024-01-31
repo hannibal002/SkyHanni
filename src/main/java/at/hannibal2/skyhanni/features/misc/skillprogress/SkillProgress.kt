@@ -24,7 +24,6 @@ import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.SpecialColour
 import at.hannibal2.skyhanni.utils.StringUtils.firstLetterUppercase
 import at.hannibal2.skyhanni.utils.renderables.Renderable
-import io.github.moulberry.notenoughupdates.core.util.lerp.LerpUtils
 import io.github.moulberry.notenoughupdates.util.Utils
 import net.minecraft.init.Items
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
@@ -48,7 +47,8 @@ class SkillProgress {
             config.position.renderStringsAndItems(display, posLabel = "Skill Progress")
             if (config.progressBarConfig.enabled && display.isNotEmpty()) {
                 val progress = if (config.progressBarConfig.useTexturedBar) {
-                    val factor = (skillExpPercentage.toFloat().coerceAtMost(1f)) * config.progressBarConfig.texturedBar.width.toFloat() // 182f
+                    val width = config.progressBarConfig.texturedBar.width.toFloat()
+                    val factor = (skillExpPercentage.toFloat().coerceAtMost(1f)) * width
                     Renderable.texturedProgressBar(factor,
                         Color(SpecialColour.specialToChromaRGB(config.progressBarConfig.barStartColor)),
                         texture = config.progressBarConfig.texturedBar.usedTexture.get(),
@@ -150,8 +150,8 @@ class SkillProgress {
                 if (skillInfo.currentXpMax != 0L) {
                     append("§6/")
                     append("§b${skillInfo.currentXpMax.addSeparators()}")
-                    append("§7)")
                 }
+                append("§7)")
             }, tips))
         }
     }
