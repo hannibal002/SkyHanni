@@ -301,7 +301,7 @@ object GuiRenderUtils {
         GuiScreen.drawRect(x, y, x + 16, y + 16, colour)
     }
 
-    // Taken and edited from NEU
+    // Taken and edited from NEU <- it's broken
     fun renderTexturedBar(x: Float, y: Float, xSize: Float, completed: Float, color: Color, useChroma: Boolean, texture: UsedTexture, height: Float) {
         GlStateManager.pushMatrix()
         GlStateManager.translate(x, y, 0f)
@@ -330,7 +330,7 @@ object GuiRenderUtils {
             GlStateManager.color(color.red / 255f, color.green / 255f, color.blue / 255f, 1f)
         }
 
-        if (k > 0) {
+         if (k > 0) {
             Utils.drawTexturedRect(x, y, w_2.coerceAtMost(k).toFloat(), height, 0f, w_2.toDouble().coerceAtMost(k.toDouble() / xSize).toFloat(), vMinFilled, vMaxFilled, GL11.GL_NEAREST)
             if (completed > 0.5f) {
                 Utils.drawTexturedRect(x + w_2, y, (k - w_2).toFloat(), height, 1 - w_2 / xSize, 1 + (k - w) / xSize, vMinFilled, vMaxFilled, GL11.GL_NEAREST)

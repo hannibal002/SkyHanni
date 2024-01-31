@@ -48,12 +48,10 @@ class SkillProgress {
             if (config.progressBarConfig.enabled && display.isNotEmpty()) {
                 val progress = if (config.progressBarConfig.useTexturedBar) {
                     val width = config.progressBarConfig.texturedBar.width.toFloat()
-                    val factor = (skillExpPercentage.toFloat().coerceAtMost(1f)) * width
+                    val factor = (skillExpPercentage.toFloat().coerceAtMost(1f)) * 182
                     Renderable.texturedProgressBar(factor,
                         Color(SpecialColour.specialToChromaRGB(config.progressBarConfig.barStartColor)),
                         texture = config.progressBarConfig.texturedBar.usedTexture.get(),
-                        width = config.progressBarConfig.texturedBar.width,
-                        height = config.progressBarConfig.texturedBar.height,
                         useChroma = config.progressBarConfig.useChroma)
                 } else
                     Renderable.progressBar(skillExpPercentage,

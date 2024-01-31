@@ -307,7 +307,7 @@ interface Renderable {
             color: Color = Color(0, 255, 0),
             useChroma: Boolean = false,
             texture: UsedTexture = UsedTexture.MATCH_PACK,
-            width: Int = 184,
+            width: Int = 182,
             height: Int = 5,
             horizontalAlign: HorizontalAlignment = HorizontalAlignment.LEFT,
             verticalAlign: VerticalAlignment = VerticalAlignment.TOP,
@@ -318,8 +318,23 @@ interface Renderable {
             override val verticalAlign = verticalAlign
 
             override fun render(posX: Int, posY: Int) {
+                val (textureX, textureY) = if (texture == UsedTexture.MATCH_PACK) Pair(0, 64) else Pair(0, 0)
+
                 Minecraft.getMinecraft().renderEngine.bindTexture(ResourceLocation(texture.path))
-                renderTexturedBar(posX.toFloat(), posY.toFloat(), width.toFloat(), percent / width, color, useChroma, texture, height.toFloat())
+                Minecraft.getMinecraft().ingameGUI.drawTexturedModalRect(posX, posY, textureX, textureY, width, height)
+
+                Minecraft.getMinecraft().renderEngine.bindTexture(ResourceLocation(texture.path))
+                if (useChroma) {
+                    ChromaShaderManager.begin(ChromaType.TEXTURED)
+                    GlStateManager.color(Color.WHITE.red / 255f, Color.WHITE.green / 255f, Color.WHITE.blue / 255f, 1f)
+                } else {
+                    GlStateManager.color(color.red / 255f, color.green / 255f, color.blue / 255f, 1f)
+                }
+                Minecraft.getMinecraft().ingameGUI.drawTexturedModalRect(posX, posY, textureX, textureY + height, percent.toInt(), height)
+
+                if (useChroma) {
+                    ChromaShaderManager.end()
+                }
             }
         }
 
