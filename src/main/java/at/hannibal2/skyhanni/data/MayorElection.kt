@@ -7,14 +7,16 @@ import at.hannibal2.skyhanni.events.LorenzTickEvent
 import at.hannibal2.skyhanni.utils.APIUtil
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils.put
+import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import io.github.moulberry.notenoughupdates.util.SkyBlockTime
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
+import kotlin.time.Duration.Companion.minutes
 
 class MayorElection {
-    private var lastUpdate = 0L
+    private var lastUpdate = SimpleTimeMark.farPast()
     private var dispatcher = Dispatchers.IO
 
     companion object {
@@ -37,20 +39,20 @@ class MayorElection {
     }
 
     private fun check() {
-        if (System.currentTimeMillis() > lastUpdate + 60_000 * 5) {
-            lastUpdate = System.currentTimeMillis()
-            SkyHanniMod.coroutineScope.launch {
-                val url = "https://api.hypixel.net/v2/resources/skyblock/election"
-                val jsonObject = withContext(dispatcher) { APIUtil.getJSONResponse(url) }
-                rawMayorData = ConfigManager.gson.fromJson(jsonObject, MayorJson::class.java)
-                val data = rawMayorData ?: return@launch
-                val map = mutableMapOf<Int, MayorJson.Candidate>()
-                map put data.mayor.election.getPairs()
-                data.current?.let {
-                    map put data.current.getPairs()
-                }
-                candidates = map
+        if (lastUpdate.passedSince() < 20.minutes) return
+        lastUpdate = SimpleTimeMark.now()
+
+        SkyHanniMod.coroutineScope.launch {
+            val url = "https://api.hypixel.net/v2/resources/skyblock/election"
+            val jsonObject = withContext(dispatcher) { APIUtil.getJSONResponse(url) }
+            rawMayorData = ConfigManager.gson.fromJson(jsonObject, MayorJson::class.java)
+            val data = rawMayorData ?: return@launch
+            val map = mutableMapOf<Int, MayorJson.Candidate>()
+            map put data.mayor.election.getPairs()
+            data.current?.let {
+                map put data.current.getPairs()
             }
+            candidates = map
         }
 
         checkCurrentMayor()

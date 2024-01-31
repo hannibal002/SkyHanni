@@ -55,11 +55,6 @@ class DungeonHighlightClickedBlocks {
             else -> return
         }
 
-        // Water room
-        if (DungeonAPI.getRoomID() == "-60,-60") {
-            return
-        }
-
         if (type == ClickedBlockType.WITHER_ESSENCE) {
             val text = BlockUtils.getTextureFromSkull(position.toBlockPos())
             if (text != "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQ" +
@@ -70,8 +65,8 @@ class DungeonHighlightClickedBlocks {
             }
         }
 
-        // TODO hide in water room
-//        if (nearWaterRoom() && type == ClickedBlockType.LEVER) return
+        val inWaterRoom = DungeonAPI.getRoomID() == "-60,-60"
+        if (inWaterRoom && type == ClickedBlockType.LEVER) return
 
         val color = getNextColor()
         val displayText = color.getChatColor() + "Clicked " + type.display

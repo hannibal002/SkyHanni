@@ -75,15 +75,12 @@ class DailyMiniBossHelper(private val reputationHelper: CrimsonIsleReputationHel
                 val result = if (miniBoss.doneToday) "§aDone" else "§bTodo"
                 val displayName = miniBoss.displayName
                 val displayItem = miniBoss.displayItem
-                if (displayItem == null) {
-                    display.addAsSingletonList("  $displayName: $result")
-                } else {
-                    val lineList = mutableListOf<Any>()
-                    lineList.add(" ")
-                    lineList.add(getItemStack(displayItem))
-                    lineList.add("§5$displayName§7: $result")
-                    display.add(lineList)
-                }
+
+                val lineList = mutableListOf<Any>()
+                lineList.add(" ")
+                lineList.add(displayItem.getItemStack())
+                lineList.add("§5$displayName§7: $result")
+                display.add(lineList)
             }
         }
     }
