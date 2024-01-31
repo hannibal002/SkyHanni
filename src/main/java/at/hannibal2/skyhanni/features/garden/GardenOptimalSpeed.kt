@@ -1,6 +1,7 @@
 package at.hannibal2.skyhanni.features.garden
 
 import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
+import at.hannibal2.skyhanni.events.ConfigLoadEvent
 import at.hannibal2.skyhanni.events.GardenToolChangeEvent
 import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.LorenzTickEvent
@@ -11,6 +12,7 @@ import at.hannibal2.skyhanni.utils.RenderUtils.renderString
 import at.hannibal2.skyhanni.utils.RenderUtils.renderStringsAndItems
 import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.renderables.Renderable
+import io.github.moulberry.moulconfig.observer.Property
 import net.minecraft.client.Minecraft
 import net.minecraft.client.gui.inventory.GuiEditSign
 import net.minecraftforge.client.event.GuiOpenEvent
@@ -79,10 +81,23 @@ class GardenOptimalSpeed {
     @SubscribeEvent
     fun onGardenToolChange(event: GardenToolChangeEvent) {
         cropInHand = event.crop
-        optimalSpeed = cropInHand.let { it?.getOptimalSpeed() ?: -1 }
+        optimalSpeed = cropInHand?.getOptimalSpeed() ?: -1
     }
 
-    private fun CropType.getOptimalSpeed() = when (this) {
+    @SubscribeEvent
+    fun onConfigLoad(event: ConfigLoadEvent) {
+        for (value in CropType.entries) {
+            LorenzUtils.onToggle(value.getConfig()) {
+                if (value == cropInHand) {
+                    optimalSpeed = value.getOptimalSpeed()
+                }
+            }
+        }
+    }
+
+    private fun CropType.getOptimalSpeed() = getConfig().get().toInt()
+
+    private fun CropType.getConfig(): Property<Float> = when (this) {
         CropType.WHEAT -> configCustomSpeed.wheat
         CropType.CARROT -> configCustomSpeed.carrot
         CropType.POTATO -> configCustomSpeed.potato
