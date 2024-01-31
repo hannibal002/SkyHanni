@@ -38,15 +38,15 @@ public class SensReducerConfig {
 
     @Expose
     @ConfigOption(
-        name = "Only in Plots",
+        name = "Disable in Barn",
         desc = "")
     @ConfigEditorBoolean
     public boolean inPlot = true;
 
     @Expose
     @ConfigOption(
-        name = "use keybind instead",
-        desc = "instead of checking for a farming tool use keybind")
+        name = "keybind test",
+        desc = "instead of checking for a farming tool use a keybind")
     @ConfigEditorBoolean
     public boolean useKeybind = true;
 
