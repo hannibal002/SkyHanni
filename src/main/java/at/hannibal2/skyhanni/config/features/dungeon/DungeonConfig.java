@@ -86,6 +86,12 @@ public class DungeonConfig {
     @Accordion
     public LividFinderConfig lividFinder = new LividFinderConfig();
 
+
+    @Expose
+    @ConfigOption(name = "Terracotta Phase", desc = "")
+    @Accordion
+    public TerracottaPhaseConfig terracottaPhase = new TerracottaPhaseConfig();
+
     @Expose
     @ConfigOption(name = "Moving Skeleton Skulls", desc = "Highlight Skeleton Skulls when combining into an " +
         "orange Skeletor (not useful when combined with feature Hide Skeleton Skull).")
