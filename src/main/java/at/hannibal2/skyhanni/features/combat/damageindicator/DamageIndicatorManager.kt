@@ -660,8 +660,7 @@ class DamageIndicatorManager {
 
         //Laser phase
         if (config.enderSlayer.laserPhaseTimer && entity.ridingEntity != null) {
-            //TODO more tests, more exact values, better logic? idk make this working perfectly pls
-            val totalTimeAlive = 7.4.seconds
+            val totalTimeAlive = 8.2.seconds
 
             val ticksAlive = entity.ridingEntity.ticksExisted.ticks
             val remainingTime = totalTimeAlive - ticksAlive
