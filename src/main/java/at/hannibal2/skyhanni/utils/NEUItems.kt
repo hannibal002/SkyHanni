@@ -1,6 +1,8 @@
 package at.hannibal2.skyhanni.utils
 
 import at.hannibal2.skyhanni.config.ConfigManager
+import at.hannibal2.skyhanni.data.jsonobjects.repo.MultiFilterJson
+import at.hannibal2.skyhanni.events.RepositoryReloadEvent
 import at.hannibal2.skyhanni.features.bazaar.BazaarDataHolder
 import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.ItemBlink.checkBlinkItem
@@ -29,6 +31,7 @@ import net.minecraft.init.Blocks
 import net.minecraft.init.Items
 import net.minecraft.item.ItemStack
 import net.minecraft.nbt.NBTTagCompound
+import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import org.lwjgl.opengl.GL11
 import java.util.regex.Pattern
 
@@ -41,6 +44,7 @@ object NEUItems {
     private val enchantmentNamePattern = Pattern.compile("^(?<format>(?:§.)+)(?<name>[^§]+) (?<level>[IVXL]+)$")
     var allItemsCache = mapOf<String, NEUInternalName>() // item name -> internal name
     var allInternalNames = mutableListOf<NEUInternalName>()
+    val ignoreItemsFilter = MultiFilter()
 
     private val fallbackItem by lazy {
         Utils.createItemStack(
@@ -48,6 +52,12 @@ object NEUItems {
             "§cMissing Repo Item",
             "§cYour NEU repo seems to be out of date"
         )
+    }
+
+    @SubscribeEvent
+    fun onRepoReload(event: RepositoryReloadEvent) {
+        val ignoredItems = event.getConstant<MultiFilterJson>("IgnoredItems")
+        ignoreItemsFilter.load(ignoredItems)
     }
 
     // TODO remove
@@ -190,7 +200,8 @@ object NEUItems {
 
     fun NEUInternalName.getItemStack(): ItemStack =
         getItemStackOrNull() ?: run {
-            if (getPriceOrNull() == null) return@run fallbackItem
+            getPriceOrNull() ?: return@run fallbackItem
+            if (ignoreItemsFilter.match(this.asString())) return@run fallbackItem
             ErrorManager.logError(
                 IllegalStateException("Something went wrong!"),
                 "Encountered an error getting the item for §7$this§c. " +
