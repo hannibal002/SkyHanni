@@ -33,7 +33,6 @@ import net.minecraft.item.ItemStack
 import net.minecraft.nbt.NBTTagCompound
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import org.lwjgl.opengl.GL11
-import java.util.regex.Pattern
 
 object NEUItems {
     val manager: NEUManager get() = NotEnoughUpdates.INSTANCE.manager
@@ -41,7 +40,7 @@ object NEUItems {
     private val multiplierCache = mutableMapOf<NEUInternalName, Pair<NEUInternalName, Int>>()
     private val recipesCache = mutableMapOf<NEUInternalName, Set<NeuRecipe>>()
     private val ingredientsCache = mutableMapOf<NeuRecipe, Set<Ingredient>>()
-    private val enchantmentNamePattern = Pattern.compile("^(?<format>(?:§.)+)(?<name>[^§]+) (?<level>[IVXL]+)$")
+
     var allItemsCache = mapOf<String, NEUInternalName>() // item name -> internal name
     var allInternalNames = mutableListOf<NEUInternalName>()
     val ignoreItemsFilter = MultiFilter()
@@ -359,7 +358,7 @@ object NEUItems {
 
     // Taken and edited from NEU
     private fun resolveEnchantmentByName(enchantmentName: String) =
-        enchantmentNamePattern.matchMatcher(enchantmentName) {
+        UtilsPatterns.enchantmentNamePattern.matchMatcher(enchantmentName) {
             val name = group("name").trim { it <= ' ' }
             val ultimate = group("format").lowercase().contains("§l")
             ((if (ultimate && name != "Ultimate Wise") "ULTIMATE_" else "")
