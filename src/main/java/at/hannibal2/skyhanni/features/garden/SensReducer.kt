@@ -9,7 +9,6 @@ import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils.afterChange
 import at.hannibal2.skyhanni.utils.RenderUtils.renderString
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
-import com.sun.org.apache.xpath.internal.operations.Bool
 import net.minecraft.client.Minecraft
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import kotlin.time.Duration.Companion.seconds
@@ -40,6 +39,11 @@ object SensReducer {
             return
         }
         if (isToggled && config.inGround && !mc.thePlayer.onGround) {
+            restoreSensitivity()
+            isToggled = false
+            return
+        }
+        if (isToggled && config.inPlot && GardenAPI.onBarnPlot) {
             restoreSensitivity()
             isToggled = false
             return
