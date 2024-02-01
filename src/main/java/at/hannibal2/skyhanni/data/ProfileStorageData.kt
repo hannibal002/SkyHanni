@@ -47,7 +47,7 @@ object ProfileStorageData {
         if (!LorenzUtils.inSkyBlock) return
 
         for (line in event.tabList) {
-            val pattern = "§e§lProfile: §r§a.*".toPattern()
+            val pattern = "§[ed]§lProfile: §r§a.*".toPattern()
             pattern.matchMatcher(line) {
                 noTabListTime = -1L
                 return
