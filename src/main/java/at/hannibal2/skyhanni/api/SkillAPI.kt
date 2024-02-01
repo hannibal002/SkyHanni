@@ -4,6 +4,7 @@ import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.data.ProfileStorageData
 import at.hannibal2.skyhanni.events.ConfigLoadEvent
 import at.hannibal2.skyhanni.events.LorenzActionBarEvent
+import at.hannibal2.skyhanni.events.SkillDisplayUpdateEvent
 import at.hannibal2.skyhanni.events.SkillOverflowLevelupEvent
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
@@ -37,26 +38,8 @@ object SkillAPI {
 
     //TODO: use repo ?
     private val excludedSkills = listOf("foraging", "fishing", "alchemy", "carpentry")
-    var skillXPInfoMap = mutableMapOf(
-        "farming" to SkillXPInfo(),
-        "combat" to SkillXPInfo(),
-        "foraging" to SkillXPInfo(),
-        "alchemy" to SkillXPInfo(),
-        "mining" to SkillXPInfo(),
-        "enchanting" to SkillXPInfo(),
-        "fishing" to SkillXPInfo(),
-        "carpentry" to SkillXPInfo(),
-    )
-    var oldSkillInfoMap = mutableMapOf(
-        "farming" to SkillInfo(),
-        "combat" to SkillInfo(),
-        "foraging" to SkillInfo(),
-        "alchemy" to SkillInfo(),
-        "mining" to SkillInfo(),
-        "enchanting" to SkillInfo(),
-        "fishing" to SkillInfo(),
-        "carpentry" to SkillInfo(),
-    )
+    var skillXPInfoMap = mutableMapOf<String, SkillXPInfo>()
+    var oldSkillInfoMap = mutableMapOf<String?, SkillInfo?>()
     val stackMap = mapOf(
         "Farming" to Utils.createItemStack(Items.golden_hoe, "Farming"),
         "Combat" to Utils.createItemStack(Items.golden_sword, "Combat"),
@@ -69,7 +52,6 @@ object SkillAPI {
     )
     val skillMap: MutableMap<String, SkillInfo>? get() = ProfileStorageData.profileSpecific?.skillMap
     var activeSkill = ""
-    var gained = ""
     var showDisplay = false
     var lastUpdate = SimpleTimeMark.farPast()
 
@@ -87,16 +69,17 @@ object SkillAPI {
                 ?.matcher(component)
 
             if (matcher?.matches() == true) {
-                gained = matcher.group(1)
                 val skillS = matcher.group(2).lowercase()
                 val skillInfo = skillMap?.get(skillS) ?: SkillInfo()
+                activeSkill = skillS
                 when (matcher.pattern()) {
                     SKILL_PATTERN -> handleSkillPattern(matcher, skillS, skillInfo)
                     SKILL_PATTERN_PERCENT -> handleSkillPatternPercent(matcher, skillS, skillInfo)
                     SKILL_PATTERN_MULTIPLIER -> handleSkillPatternMultiplier(matcher, skillS, skillInfo)
                 }
-                lastUpdate = SimpleTimeMark.now()
                 showDisplay = true
+                lastUpdate = SimpleTimeMark.now()
+                SkillDisplayUpdateEvent().postAndCatch()
                 return
             }
         }
@@ -113,7 +96,6 @@ object SkillAPI {
     }
 
     private fun handleSkillPattern(matcher: Matcher, skillS: String, skillInfo: SkillInfo) {
-        activeSkill = skillS
         val currentXp = matcher.group(3).formatNumber()
         val maxXp = matcher.group(4).formatNumber()
         val level = getLevel(maxXp)
@@ -127,12 +109,12 @@ object SkillAPI {
             currentXpMax = currentMaxOverflow
             this.level = levelOverflow
             totalXp = totalOverflow
+            lastGain = matcher.group(1)
         }
         skillMap?.set(skillS, skillInfo)
     }
 
     private fun handleSkillPatternPercent(matcher: Matcher, skillS: String, skillInfo: SkillInfo?) {
-        activeSkill = skillS
         var tablistLevel = 0
         for (line in TabListData.getTabList()) {
             var levelMatcher = skillTabPattern.matcher(line)
@@ -161,12 +143,12 @@ object SkillAPI {
             currentXp = currentOverflow
             currentXpMax = currentMaxOverflow
             level = tablistLevel
+            lastGain = matcher.group(1)
         }
         skillMap?.set(skillS, existingLevel)
     }
 
     private fun handleSkillPatternMultiplier(matcher: Matcher, skillS: String, skillInfo: SkillInfo) {
-        activeSkill = skillS
         val currentXp = matcher.group(3).formatNumber()
         val maxXp = matcher.group(4).formatNumber()
         val level = getLevel(maxXp)
@@ -178,6 +160,7 @@ object SkillAPI {
             currentXpMax = currentMaxOverflow
             totalXp = totalOverflow
             this.level = currentLevel
+            lastGain = matcher.group(1)
         }
         skillMap?.set(skillS, skillInfo)
     }
@@ -214,7 +197,6 @@ object SkillAPI {
         total += xpCurrent
         return LorenzUtils.Quad(level, xpCurrent, xpForCurr, total)
     }
-
 
     private fun calculateOverFlow50(currentXp: Long): LorenzUtils.Quad<Int, Long, Long, Long> {
         var xpCurrent = currentXp
@@ -307,7 +289,7 @@ object SkillAPI {
         LorenzUtils.chat("", false)
     }
 
-    data class SkillInfo(var level: Int = 0, var totalXp: Long = 0, var currentXp: Long = 0, var currentXpMax: Long = 0)
+    data class SkillInfo(var level: Int = 0, var totalXp: Long = 0, var currentXp: Long = 0, var currentXpMax: Long = 0, var lastGain: String = "")
     data class SkillXPInfo(
         var lastTotalXp: Float = 0f,
         var xpGainQueue: LinkedList<Float> = LinkedList(),

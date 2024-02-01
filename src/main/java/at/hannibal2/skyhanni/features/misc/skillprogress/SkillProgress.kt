@@ -12,11 +12,12 @@ import at.hannibal2.skyhanni.api.SkillAPI.stackMap
 import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.LorenzTickEvent
 import at.hannibal2.skyhanni.events.PreProfileSwitchEvent
+import at.hannibal2.skyhanni.events.SkillDisplayUpdateEvent
 import at.hannibal2.skyhanni.events.SkillOverflowLevelupEvent
 import at.hannibal2.skyhanni.utils.LorenzUtils
-import at.hannibal2.skyhanni.utils.NumberUtil
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.NumberUtil.formatNumber
+import at.hannibal2.skyhanni.utils.NumberUtil.interpolate
 import at.hannibal2.skyhanni.utils.NumberUtil.roundToPrecision
 import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderables
 import at.hannibal2.skyhanni.utils.RenderUtils.renderStringsAndItems
@@ -47,7 +48,6 @@ class SkillProgress {
             config.position.renderStringsAndItems(display, posLabel = "Skill Progress")
             if (config.progressBarConfig.enabled && display.isNotEmpty()) {
                 val progress = if (config.progressBarConfig.useTexturedBar) {
-                    val width = config.progressBarConfig.texturedBar.width.toFloat()
                     val factor = (skillExpPercentage.toFloat().coerceAtMost(1f)) * 182
                     Renderable.texturedProgressBar(factor,
                         Color(SpecialColour.specialToChromaRGB(config.progressBarConfig.barStartColor)),
@@ -86,7 +86,6 @@ class SkillProgress {
     @SubscribeEvent
     fun onTick(event: LorenzTickEvent) {
         if (!isEnabled()) return
-
         if (lastUpdate.passedSince() > 3.seconds) showDisplay = config.alwaysShow
 
         if (event.repeatSeconds(1)) {
@@ -95,11 +94,12 @@ class SkillProgress {
 
         if (event.repeatSeconds(2)) {
             updateSkillInfo(activeSkill)
-
-            val xpGain = skillXPInfoMap[activeSkill]?.xpGainHour ?: 0f
-            skillXPInfoMap[activeSkill]?.xpGainLast = xpGain
         }
+    }
 
+    @SubscribeEvent
+    fun onSkillDisplayUpdate(event: SkillDisplayUpdateEvent) {
+        updateDisplay()
     }
 
     @SubscribeEvent
@@ -124,8 +124,11 @@ class SkillProgress {
     }
 
 
-    private fun update() {
+    private fun updateDisplay() {
         display = drawDisplay()
+    }
+
+    private fun update() {
         allDisplay = drawAllDisplay()
         etaDisplay = drawETADisplay()
     }
@@ -159,8 +162,9 @@ class SkillProgress {
         val xpInfo = skillXPInfoMap[activeSkill] ?: return@buildList
         val xpInfoLast = oldSkillInfoMap[activeSkill] ?: return@buildList
         var remaining = skillInfo.currentXpMax - skillInfo.currentXp
+        oldSkillInfoMap[activeSkill] = skillInfo
         if (skillInfo.currentXpMax == xpInfoLast.currentXpMax) {
-            remaining = NumberUtil.interpolate(remaining.toFloat(), (xpInfoLast.currentXpMax - xpInfoLast.currentXp).toFloat(), xpInfo.lastUpdate.toMillis()).toLong()
+            remaining = interpolate(remaining.toFloat(), (xpInfoLast.currentXpMax - xpInfoLast.currentXp).toFloat(), xpInfo.lastUpdate.toMillis()).toLong()
         }
 
         add(Renderable.string("§6Skill: §b${activeSkill.firstLetterUppercase()}"))
@@ -168,7 +172,7 @@ class SkillProgress {
         add(Renderable.string("§6XP/h: §b${xpInfo.xpGainHour.addSeparators()}"))
 
         if (xpInfo.xpGainLast != 0f) {
-            val xpInterp = NumberUtil.interpolate(xpInfo.xpGainHour, xpInfo.xpGainLast, xpInfo.lastUpdate.toMillis())
+            val xpInterp = interpolate(xpInfo.xpGainHour, xpInfo.xpGainLast, xpInfo.lastUpdate.toMillis())
             add(Renderable.string("§6ETA: §b${Utils.prettyTime((remaining) * 1000 * 60 * 60 / xpInterp.toLong())}"))
         }
     }
@@ -184,7 +188,7 @@ class SkillProgress {
                 add(Renderable.itemStack(stackMap.getOrDefault(activeSkill.firstLetterUppercase(), defaultStack), 1.5))
 
             add(buildString {
-                append("§b+${SkillAPI.gained} ")
+                append("§b+${skill.lastGain} ")
 
                 if (config.useSkillName)
                     append("${activeSkill.firstLetterUppercase()} ")
@@ -203,8 +207,8 @@ class SkillProgress {
 
                 if (config.showActionLeft && percent != 100f) {
                     append(" - ")
-                    if (SkillAPI.gained != "") {
-                        val actionLeft = (ceil(skill.currentXpMax.toDouble() - skill.currentXp) / SkillAPI.gained.formatNumber()).toLong().addSeparators()
+                    if (skill.lastGain != "") {
+                        val actionLeft = (ceil(skill.currentXpMax.toDouble() - skill.currentXp) / skill.lastGain.formatNumber()).toLong().addSeparators()
                         append("§6$actionLeft Left")
                     } else {
                         append("∞ Left")

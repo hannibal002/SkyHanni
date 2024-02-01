@@ -142,6 +142,7 @@ class ConfigManager {
                     out.name("totalXp").value(value.totalXp)
                     out.name("currentXp").value(value.currentXp)
                     out.name("currentXpMax").value(value.currentXpMax)
+                    out.name("lastGain").value(value.lastGain)
                     out.endObject()
                 }
 
@@ -154,6 +155,7 @@ class ConfigManager {
                             "totalXp" -> skillInfo.totalXp = reader.nextDouble().toLong()
                             "currentXp" -> skillInfo.currentXp = reader.nextDouble().toLong()
                             "currentXpMax" -> skillInfo.currentXpMax = reader.nextDouble().toLong()
+                            "lastGain" -> skillInfo.lastGain = reader.nextString()
                         }
                     }
                     reader.endObject()
