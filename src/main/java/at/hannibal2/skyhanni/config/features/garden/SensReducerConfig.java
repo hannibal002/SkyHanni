@@ -34,7 +34,7 @@ public class SensReducerConfig {
         name = "Only in Ground",
         desc = "")
     @ConfigEditorBoolean
-    public boolean inGround = true;
+    public boolean onGround = true;
 
     @Expose
     @ConfigOption(

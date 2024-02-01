@@ -3,6 +3,7 @@ package at.hannibal2.skyhanni.features.garden
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.events.ConfigLoadEvent
 import at.hannibal2.skyhanni.events.GuiRenderEvent
+import at.hannibal2.skyhanni.events.HypixelJoinEvent
 import at.hannibal2.skyhanni.events.LorenzTickEvent
 import at.hannibal2.skyhanni.utils.KeyboardManager.isKeyHeld
 import at.hannibal2.skyhanni.utils.LorenzUtils
@@ -11,9 +12,10 @@ import at.hannibal2.skyhanni.utils.RenderUtils.renderString
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import net.minecraft.client.Minecraft
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
+import kotlin.math.abs
 import kotlin.time.Duration.Companion.seconds
 
-object SensReducer {
+object SensitivityReducer {
     private val config get() = SkyHanniMod.feature.garden.sensReducerConfig
     private val storage get() = SkyHanniMod.feature.storage
     private var isToggled = false
@@ -38,7 +40,7 @@ object SensReducer {
             if (isToggled) restoreSensitivity()
             return
         }
-        if (isToggled && config.inGround && !mc.thePlayer.onGround) {
+        if (isToggled && config.onGround && !mc.thePlayer.onGround) {
             restoreSensitivity()
             isToggled = false
             return
@@ -97,6 +99,7 @@ object SensReducer {
         storage.savedMouseloweredSensitivity = gameSettings.mouseSensitivity
         val divisor = config.reducingFactor.get()
         LorenzUtils.debug("dividing by $divisor")
+        storage.savedMouseloweredSensitivity = gameSettings.mouseSensitivity
         val newSens =
             ((storage.savedMouseloweredSensitivity + (1F / 3F)) / divisor) - (1F / 3F)
         gameSettings?.mouseSensitivity = newSens
@@ -108,12 +111,31 @@ object SensReducer {
         if (showMessage) LorenzUtils.chat("§bMouse sensitivity is now restored.")
     }
 
-    private fun toggle(on: Boolean) {
+    private fun toggle(state: Boolean) {
         if (config.inPlot && GardenAPI.onBarnPlot) return
-        if (config.inGround && !Minecraft.getMinecraft().thePlayer.onGround) return
+        if (config.onGround && !Minecraft.getMinecraft().thePlayer.onGround) return
         if (!isToggled) {
             lowerSensitivity()
         } else restoreSensitivity()
-        isToggled = on
+        isToggled = state
+    }
+
+    @SubscribeEvent
+    fun onLogin(event: HypixelJoinEvent) {
+        val divisor = config.reducingFactor.get()
+        val expectedLoweredSensitivity = ((divisor * (gameSettings.mouseSensitivity + 1F / 3F)) - 1F / 3F)
+        println("expected = $expectedLoweredSensitivity")
+        if (abs(storage.savedMouseloweredSensitivity - expectedLoweredSensitivity) <= 0.0001) {
+            LorenzUtils.debug("Fixing incorrectly lowered sensitivity")
+            isToggled = false
+            isManualToggle = false
+            restoreSensitivity()
+        }
+    }
+
+    fun printSensitivities() {
+        LorenzUtils.chat("Current Sensitivity: ${gameSettings.mouseSensitivity}")
+        LorenzUtils.chat("Stored Sensitivity: ${storage.savedMouseloweredSensitivity}")
+        LorenzUtils.chat("Current Divisor: ${config.reducingFactor}")
     }
 }

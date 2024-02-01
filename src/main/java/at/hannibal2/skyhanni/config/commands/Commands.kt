@@ -29,6 +29,7 @@ import at.hannibal2.skyhanni.features.garden.GardenAPI
 import at.hannibal2.skyhanni.features.garden.GardenCropTimeCommand
 import at.hannibal2.skyhanni.features.garden.GardenCropsInCommand
 import at.hannibal2.skyhanni.features.garden.GardenNextJacobContest
+import at.hannibal2.skyhanni.features.garden.SensitivityReducer
 import at.hannibal2.skyhanni.features.garden.composter.ComposterOverlay
 import at.hannibal2.skyhanni.features.garden.farming.ArmorDropTracker
 import at.hannibal2.skyhanni.features.garden.farming.CropMoneyDisplay
@@ -43,7 +44,6 @@ import at.hannibal2.skyhanni.features.mining.powdertracker.PowderTracker
 import at.hannibal2.skyhanni.features.minion.MinionFeatures
 import at.hannibal2.skyhanni.features.misc.CollectionTracker
 import at.hannibal2.skyhanni.features.misc.LockMouseLook
-import at.hannibal2.skyhanni.features.garden.SensReducer
 import at.hannibal2.skyhanni.features.misc.MarkedPlayerManager
 import at.hannibal2.skyhanni.features.misc.discordrpc.DiscordRPCManager
 import at.hannibal2.skyhanni.features.misc.massconfiguration.DefaultConfigFeatures
@@ -219,7 +219,7 @@ object Commands {
         registerCommand(
             "shsensreduce",
             "Lowers the mouse sensitivity for easier small adjustments (for farming)"
-        ) { SensReducer.manualToggle() }
+        ) { SensitivityReducer.manualToggle() }
         registerCommand(
             "shresetvermintracker",
             "Resets the Vermin Tracker"
@@ -397,6 +397,10 @@ object Commands {
             "readcropmilestonefromclipboard",
             "Read crop milestone from clipboard. This helps fixing wrong crop milestone data"
         ) { GardenCropMilestonesCommunityFix.readDataFromClipboard() }
+        registerCommand(
+            "shprintsensitivities",
+            "Prints the current and stored sentivitities from the Lowered Sensitivity feature."
+        ) { SensitivityReducer.printSensitivities() }
     }
 
     private fun internalCommands() {
