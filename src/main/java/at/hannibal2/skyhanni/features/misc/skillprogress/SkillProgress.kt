@@ -94,6 +94,9 @@ class SkillProgress {
 
         if (event.repeatSeconds(2)) {
             updateSkillInfo(activeSkill)
+
+            val skill = skillXPInfoMap[activeSkill] ?: SkillAPI.SkillXPInfo()
+            skillXPInfoMap[activeSkill]?.xpGainLast = skill.xpGainHour
         }
     }
 
