@@ -28,7 +28,7 @@ public class SkillProgressDisplayConfig {
     public static class ProgressBarConfig {
 
         @Expose
-        @ConfigOption(name = "Progress Bar", desc = "yes progress bar are cool.")
+        @ConfigOption(name = "Enabled", desc = "Enable/Disable the progress bar.")
         @ConfigEditorBoolean
         public boolean enabled = false;
 
@@ -43,7 +43,7 @@ public class SkillProgressDisplayConfig {
         public boolean useChroma = false;
 
         @Expose
-        @ConfigOption(name = "Bar Color", desc = "Color of the progress bar.")
+        @ConfigOption(name = "Bar Color", desc = "Color of the progress bar.\n§eIgnored if Chroma is enabled")
         @ConfigEditorColour
         public String barStartColor = "0:255:255:0:0";
 
@@ -108,12 +108,12 @@ public class SkillProgressDisplayConfig {
 
         public static class RegularBar {
             @Expose
-            @ConfigOption(name = "Width of the bar", desc = "Modify the width of the bar.")
+            @ConfigOption(name = "Width", desc = "Modify the width of the bar.")
             @ConfigEditorSlider(minStep = 1, minValue = 100, maxValue = 1000)
             public int width = 182;
 
             @Expose
-            @ConfigOption(name = "Height of the bar", desc = "Modify the height of the bar.")
+            @ConfigOption(name = "Height", desc = "Modify the height of the bar.")
             @ConfigEditorSlider(minStep = 1, minValue = 3, maxValue = 15)
             public int height = 6;
         }
