@@ -135,9 +135,7 @@ class MiningEventTracker {
         }
     }
 
-    private fun isEnabled() = IslandType.DWARVEN_MINES.isInIsland() || IslandType.CRYSTAL_HOLLOWS.isInIsland()
-        //todo switch over on release
-        && config.sendData
+    private fun isEnabled() = (IslandType.DWARVEN_MINES.isInIsland() || IslandType.CRYSTAL_HOLLOWS.isInIsland()) && config.sendData
 //         && config.enabled
 
 
