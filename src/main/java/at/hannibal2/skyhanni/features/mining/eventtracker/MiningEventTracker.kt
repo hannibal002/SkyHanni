@@ -139,6 +139,7 @@ class MiningEventTracker {
 
     private fun sendData(json: String) {
         val response = APIUtil.postJSON("https://api.soopy.dev/skyblock/chevents/set", json)
+        if (!response.success) return
         val success = response.data.getBoolean("success")
         if (!success) {
 //             if (!config.enabled) return
