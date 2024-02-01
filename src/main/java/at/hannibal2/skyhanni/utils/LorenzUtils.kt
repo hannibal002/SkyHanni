@@ -4,15 +4,18 @@ import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.data.HypixelData
 import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.data.MayorElection
+import at.hannibal2.skyhanni.data.ScoreboardData
 import at.hannibal2.skyhanni.data.TitleManager
 import at.hannibal2.skyhanni.events.GuiContainerEvent
 import at.hannibal2.skyhanni.events.LorenzTickEvent
+import at.hannibal2.skyhanni.events.LorenzWorldChangeEvent
 import at.hannibal2.skyhanni.features.dungeon.DungeonAPI
 import at.hannibal2.skyhanni.mixins.transformers.AccessorGuiEditSign
 import at.hannibal2.skyhanni.test.TestBingo
 import at.hannibal2.skyhanni.utils.NEUItems.getItemStackOrNull
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.StringUtils.capAtMinecraftLength
+import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.StringUtils.toDashlessUUID
 import at.hannibal2.skyhanni.utils.renderables.Renderable
@@ -89,6 +92,9 @@ object LorenzUtils {
     val isIronmanProfile get() = inSkyBlock && HypixelData.ironman
 
     val lastWorldSwitch get() = HypixelData.joinedWorld
+
+    private var serverId: String? = null
+
 
     // TODO log based on chat category (error, warning, debug, user error, normal)
     private val log = LorenzLogger("chat/mod_sent")
@@ -252,6 +258,29 @@ object LorenzUtils {
             "F" -> 0
             else -> 0
         }
+    }
+
+    @SubscribeEvent
+    fun onWorldChange(event: LorenzWorldChangeEvent) {
+        serverId = null
+    }
+
+    fun getServerId(): String? {
+        if (!inSkyBlock) return null
+        if (serverId == null) {
+            ScoreboardData.sidebarLinesFormatted.forEach { UtilsPatterns.serverIdScoreboardPattern.matchMatcher(it) {
+                val serverType = if (group("servertype") == "M") "mega" else "mini"
+                serverId = "$serverType${group("serverid")}"
+                return serverId
+            } }
+        }
+        if (serverId == null) {
+            TabListData.getTabList().forEach { UtilsPatterns.serverIdTablistPattern.matchMatcher(it) {
+                serverId = group("serverid")
+                return serverId
+            } }
+        }
+        return serverId
     }
 
     fun <K, V : Comparable<V>> List<Pair<K, V>>.sorted(): List<Pair<K, V>> {

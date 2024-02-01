@@ -7,21 +7,21 @@ import net.minecraft.entity.boss.BossStatus
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
 object BossbarData {
-    private var bossbar = ""
+    private var bossbar: String? = null
     private var previousServerBossbar = ""
 
-    fun getBossbar() = bossbar
-
+    fun getBossbar() = bossbar ?: ""
 
     @SubscribeEvent
     fun onWorldChange(event: LorenzWorldChangeEvent) {
-        previousServerBossbar = bossbar
-        bossbar = ""
+        val oldBossbar = bossbar ?: return
+        previousServerBossbar = oldBossbar
+        bossbar = null
     }
 
     @SubscribeEvent
     fun onTick(event: LorenzTickEvent) {
-        val bossbarLine = BossStatus.bossName
+        val bossbarLine = BossStatus.bossName ?: return
         if (bossbarLine.isBlank() || bossbarLine.isEmpty()) return
         if (bossbarLine == bossbar) return
         if (bossbarLine == previousServerBossbar) return

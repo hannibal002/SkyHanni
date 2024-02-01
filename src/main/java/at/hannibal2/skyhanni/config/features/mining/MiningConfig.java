@@ -8,6 +8,10 @@ import io.github.moulberry.moulconfig.annotations.ConfigOption;
 
 public class MiningConfig {
 
+//     @Expose
+//     @Category(name = "Mining Event Tracker", desc = "Settings for the Mining Event Tracker")
+//     public MiningEventConfig miningEvent = new MiningEventConfig();
+
     @Expose
     @ConfigOption(name = "Powder Tracker", desc = "")
     @Accordion
