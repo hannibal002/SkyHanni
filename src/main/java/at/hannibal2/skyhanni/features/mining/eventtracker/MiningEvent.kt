@@ -11,8 +11,7 @@ enum class MiningEvent(val eventName: String, val defaultLength: Duration, priva
     GOBLIN_RAID("GOBLIN RAID", 5.minutes, 'c'),
     BETTER_TOGETHER("BETTER TOGETHER", 18.minutes, 'd'),
     RAFFLE("RAFFLE", 160.seconds, '6'),
-    MITHRIL_GOURMAND("MITHRIL GOURMAND", 10.minutes, 'c'),
-    UNKNOWN("???", 0.minutes, '4'),
+    MITHRIL_GOURMAND("MITHRIL GOURMAND", 10.minutes, 'b'),
     ;
 
     override fun toString(): String {
@@ -20,8 +19,8 @@ enum class MiningEvent(val eventName: String, val defaultLength: Duration, priva
     }
 
     companion object {
-        fun fromBossbarName(bossbarName: String): MiningEvent {
-            return MiningEvent.entries.find { it.eventName == bossbarName.removeColor() } ?: UNKNOWN
+        fun fromBossbarName(bossbarName: String): MiningEvent? {
+            return MiningEvent.entries.find { it.eventName == bossbarName.removeColor() }
         }
     }
 }

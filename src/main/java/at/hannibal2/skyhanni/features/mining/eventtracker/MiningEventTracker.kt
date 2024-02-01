@@ -2,6 +2,7 @@ package at.hannibal2.skyhanni.features.mining.eventtracker
 
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.config.ConfigManager
+import at.hannibal2.skyhanni.data.BossbarData
 import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.data.ScoreboardData
 import at.hannibal2.skyhanni.events.BossbarUpdateEvent
@@ -16,13 +17,14 @@ import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.TabListData
 import at.hannibal2.skyhanni.utils.TimeUtils
 import at.hannibal2.skyhanni.utils.getBoolean
+import at.hannibal2.skyhanni.utils.getStringOrValue
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import kotlinx.coroutines.launch
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import kotlin.time.Duration.Companion.seconds
 
 class MiningEventTracker {
-//     private val config get() = SkyHanniMod.feature.mining.miningEvent
+    private val config get() = SkyHanniMod.feature.mining.miningEvent
 
     private val patternGroup = RepoPattern.group("mining.eventtracker")
     private val bossbarPassivePattern by patternGroup.pattern(
@@ -46,7 +48,7 @@ class MiningEventTracker {
     private var lastWorldSwitch = SimpleTimeMark.farPast()
     private var eventEndTime = SimpleTimeMark.farPast()
 
-    private var lastSentEvent = MiningEvent.UNKNOWN
+    private var lastSentEvent: MiningEvent? = null
 
     @SubscribeEvent
     fun onWorldChange(event: LorenzWorldChangeEvent) {
@@ -54,7 +56,7 @@ class MiningEventTracker {
         lastWorldSwitch = SimpleTimeMark.farPast()
         eventEndTime = SimpleTimeMark.farPast()
 
-        lastSentEvent = MiningEvent.UNKNOWN
+        lastSentEvent = null
     }
 
     @SubscribeEvent
@@ -81,22 +83,21 @@ class MiningEventTracker {
             sendData(group("event"), null)
         }
         eventEndedPattern.matchMatcher(event.message) {
-            lastSentEvent = MiningEvent.UNKNOWN
+            lastSentEvent = null
         }
     }
 
     private fun sendData(eventName: String, time: String?) {
         val eventType = MiningEvent.fromBossbarName(eventName)
         if (lastSentEvent == eventType) return
-        if (eventType == MiningEvent.UNKNOWN) {
-//             if (!config.enabled) return
-//             ErrorManager.logErrorWithData(
-//                 Exception("UnknownMiningEvent"), "Unknown mining event detected from string $eventName",
-//                 "eventName" to eventName,
-//                 "bossbar" to BossbarData.getBossbar(),
-//                 "serverType" to LorenzUtils.skyBlockIsland,
-//                 "fromChat" to (time == null)
-//             )
+        if (eventType == null) {
+            ErrorManager.logErrorWithData(
+                Exception("UnknownMiningEvent"), "Unknown mining event detected from string $eventName",
+                "eventName" to eventName,
+                "bossbar" to BossbarData.getBossbar(),
+                "serverType" to LorenzUtils.skyBlockIsland,
+                "fromChat" to (time == null)
+            )
             return
         }
         lastSentEvent = eventType
@@ -135,6 +136,9 @@ class MiningEventTracker {
     }
 
     private fun isEnabled() = IslandType.DWARVEN_MINES.isInIsland() || IslandType.CRYSTAL_HOLLOWS.isInIsland()
+        //todo switch over on release
+        && config.sendData
+//         && config.enabled
 
 
     private fun sendData(json: String) {
@@ -142,13 +146,12 @@ class MiningEventTracker {
         if (!response.success) return
         val success = response.data.getBoolean("success")
         if (!success) {
-//             if (!config.enabled) return
-//             val cause = response.data.getStringOrValue("cause", "unknown")
-//             ErrorManager.logErrorWithData(
-//                 Exception("PostFailure"), "Sending mining event data was unsuccessful",
-//                 "cause" to cause,
-//                 "sentData" to json
-//             )
+            val cause = response.data.getStringOrValue("cause", "unknown")
+            ErrorManager.logErrorWithData(
+                Exception("PostFailure"), "Sending mining event data was unsuccessful",
+                "cause" to cause,
+                "sentData" to json
+            )
         }
     }
 }
