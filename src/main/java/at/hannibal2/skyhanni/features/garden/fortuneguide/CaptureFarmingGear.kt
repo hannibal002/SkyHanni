@@ -17,7 +17,6 @@ import at.hannibal2.skyhanni.utils.NumberUtil.romanToDecimal
 import at.hannibal2.skyhanni.utils.NumberUtil.romanToDecimalIfNecessary
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getEnchantments
 import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
-import at.hannibal2.skyhanni.utils.StringUtils.matches
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.TabListData
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
@@ -50,7 +49,7 @@ class CaptureFarmingGear {
         "uniquevisitors.tierprogress",
         ".* §e(?<having>.*)§6/(?<total>.*)"
     )
-    private val petsRegex by RepoPattern.pattern("garden.fortuneguide.petsmenu", "Pets(?: \\(\\d+/\\d+\\) )?")
+    private val petMenuPattern by patternGroup.pattern("garden.fortuneguide.petsmenu", "Pets(?: \\(\\d+/\\d+\\) )?")
 
     companion object {
         private val strengthPattern = " Strength: §r§c❁(?<strength>.*)".toPattern()
@@ -129,7 +128,10 @@ class CaptureFarmingGear {
         val farmingItems = farmingItems ?: return
         val outdatedItems = outdatedItems ?: return
         val items = event.inventoryItems
-        if (petsRegex.matches(event.inventoryName)) pets(farmingItems, items, outdatedItems)
+        petMenuPattern.matchMatcher(event.inventoryName) {
+            pets(farmingItems, items, outdatedItems)
+            return
+        }
         when (event.inventoryName) {
             "Your Equipment and Stats" -> equipmentAndStats(items, farmingItems, outdatedItems)
             "Your Skills" -> skills(items, storage)
