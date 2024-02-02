@@ -454,7 +454,7 @@ class GardenVisitorFeatures {
     }
 
     @SubscribeEvent
-    fun onChatMessage(event: LorenzChatEvent) {
+    fun onChat(event: LorenzChatEvent) {
         if (config.hypixelArrivedMessage && newVisitorArrivedMessage.matcher(event.message).matches()) {
             event.blockedReason = "new_visitor_arrived"
         }
