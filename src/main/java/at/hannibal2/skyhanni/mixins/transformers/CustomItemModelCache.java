@@ -1,3 +1,7 @@
+// Taken with Permission from
+// <https://git.nea.moe/nea/neuhax/src/branch/master/src/main/java/moe/nea/sky/mixin/patches/PatchCustomItemModelCache.java>
+// under the LGPL 3.0 License
+
 package at.hannibal2.skyhanni.mixins.transformers;
 
 import at.hannibal2.skyhanni.features.misc.CacheResult;
@@ -13,7 +17,6 @@ import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 import org.spongepowered.asm.mixin.injection.callback.LocalCapture;
 
-//todo license
 @Pseudo
 @Mixin(value = CustomItems.class, remap = false)
 public class CustomItemModelCache {

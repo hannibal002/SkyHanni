@@ -71,12 +71,27 @@ val headlessLwjgl by configurations.creating {
 
 val shot = shots.shot("minecraft", project.file("shots.txt"))
 
+val downloadOptifine by tasks.creating() {
+    val outputFile = layout.buildDirectory.file("download/optifine.jar")
+    outputs.file(outputFile)
+    doLast {
+        outputFile.get().asFile.parentFile.mkdirs()
+        uri("https://optifine.net/download?f=preview_OptiFine_1.8.9_HD_U_M6_pre2.jar")
+            .toURL()
+            .openStream().use { input ->
+                outputFile.get().asFile.outputStream().use { output ->
+                    input.copyTo(output)
+                }
+            }
+    }
+}
+
 dependencies {
     minecraft("com.mojang:minecraft:1.8.9")
     mappings("de.oceanlabs.mcp:mcp_stable:22-1.8.9")
     forge("net.minecraftforge:forge:1.8.9-11.15.1.2318-1.8.9")
 
-    compileOnly(fileTree("deps"))
+    compileOnly(project.files(downloadOptifine))
 
     // Discord RPC client
     shadowImpl("com.github.NetheriteMiner:DiscordIPC:3106be5") {

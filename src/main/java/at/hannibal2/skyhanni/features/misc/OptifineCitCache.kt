@@ -1,3 +1,7 @@
+// Taken with Permission from
+// <https://git.nea.moe/nea/neuhax/src/branch/master/src/main/kotlin/moe/nea/sky/features/fopt/OptifineCustomItemCacheKey.kt>
+// under the LGPL 3.0 License
+
 package at.hannibal2.skyhanni.features.misc
 
 import at.hannibal2.skyhanni.SkyHanniMod
@@ -10,7 +14,6 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import net.minecraftforge.fml.common.gameevent.TickEvent
 import net.optifine.CustomItemProperties
 
-//todo license
 object OptifineCitCache {
     private val config get() = SkyHanniMod.feature.misc.optifineCitCache
 
@@ -41,8 +44,6 @@ object OptifineCitCache {
             }
         }
     }
-
-
 
     @JvmStatic
     fun retrieveCacheHit(itemstack: ItemStack, type: Int): CacheResult? {
