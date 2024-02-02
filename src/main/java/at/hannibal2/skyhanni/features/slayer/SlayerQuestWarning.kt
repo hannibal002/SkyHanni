@@ -28,7 +28,7 @@ class SlayerQuestWarning {
     //TODO add check if player has clicked on an item, before mobs around you gets damage
 
     @SubscribeEvent
-    fun onChatMessage(event: LorenzChatEvent) {
+    fun onChat(event: LorenzChatEvent) {
         if (!(LorenzUtils.inSkyBlock)) return
 
         val message = event.message

@@ -255,7 +255,7 @@ class MinionFeatures {
     }
 
     @SubscribeEvent
-    fun onChatMessage(event: LorenzChatEvent) {
+    fun onChat(event: LorenzChatEvent) {
         if (!enable()) return
 
         val message = event.message
