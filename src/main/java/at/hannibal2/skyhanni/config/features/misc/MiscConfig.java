@@ -99,7 +99,7 @@ public class MiscConfig {
     public PetCandyDisplayConfig petCandy = new PetCandyDisplayConfig();
 
     @Expose
-    @ConfigOption(name = "Optifine CIT Cache", desc = "Caches optifine CIT data to increase performance when using it.")
+    @ConfigOption(name = "OptiFine CIT Cache", desc = "Caches OptiFine CIT data to increase performance when using it.")
     @ConfigEditorBoolean
     @FeatureToggle
     public boolean optifineCitCache = true;
