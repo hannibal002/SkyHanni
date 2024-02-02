@@ -24,7 +24,7 @@ class CompactSplashPotionMessage {
     )
 
     @SubscribeEvent
-    fun onChatMessage(event: LorenzChatEvent) {
+    fun onChat(event: LorenzChatEvent) {
         if (!isEnabled()) return
         if (!event.message.isPotionMessage()) return
         event.blockedReason = "compact_potion_effect"

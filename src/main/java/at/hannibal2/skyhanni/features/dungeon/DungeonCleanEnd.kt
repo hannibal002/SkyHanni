@@ -31,7 +31,7 @@ class DungeonCleanEnd {
     private var lastBossId: Int = -1
 
     @SubscribeEvent
-    fun onChatMessage(event: LorenzChatEvent) {
+    fun onChat(event: LorenzChatEvent) {
         if (!LorenzUtils.inDungeons) return
         if (!config.enabled) return
 
