@@ -25,7 +25,7 @@ class CurrentPetDisplay {
     private val chatPetRulePattern = "§cAutopet §eequipped your §7\\[Lvl .*] (?<pet>.*)! §a§lVIEW RULE".toPattern()
 
     @SubscribeEvent
-    fun onChatMessage(event: LorenzChatEvent) {
+    fun onChat(event: LorenzChatEvent) {
         findPetInChat(event.message)?.let {
             PetAPI.currentPet = it
             if (config.hideAutopet) {
