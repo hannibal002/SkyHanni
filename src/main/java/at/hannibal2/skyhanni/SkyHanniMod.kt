@@ -725,7 +725,7 @@ class SkyHanniMod {
         loadModule(SulphurSkitterBox())
         loadModule(HighlightInquisitors())
         loadModule(VerminTracker)
-        loadModule(SkillProgress())
+        loadModule(SkillProgress)
 
 
         init()

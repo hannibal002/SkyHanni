@@ -12,7 +12,6 @@ import at.hannibal2.skyhanni.api.SkillAPI.stackMap
 import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.LorenzTickEvent
 import at.hannibal2.skyhanni.events.PreProfileSwitchEvent
-import at.hannibal2.skyhanni.events.SkillDisplayUpdateEvent
 import at.hannibal2.skyhanni.events.SkillOverflowLevelupEvent
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
@@ -32,7 +31,7 @@ import java.awt.Color
 import kotlin.math.ceil
 import kotlin.time.Duration.Companion.seconds
 
-class SkillProgress {
+object SkillProgress {
 
     private val config get() = SkyHanniMod.feature.misc.skillProgressDisplayConfig
     private var skillExpPercentage = 0.0
@@ -101,11 +100,6 @@ class SkillProgress {
     }
 
     @SubscribeEvent
-    fun onSkillDisplayUpdate(event: SkillDisplayUpdateEvent) {
-        updateDisplay()
-    }
-
-    @SubscribeEvent
     fun onLevelUp(event: SkillOverflowLevelupEvent) {
         val skillName = event.skillName
         val oldLevel = event.oldLevel
@@ -127,7 +121,7 @@ class SkillProgress {
     }
 
 
-    private fun updateDisplay() {
+    fun updateDisplay() {
         display = drawDisplay()
     }
 

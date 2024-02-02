@@ -4,8 +4,8 @@ import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.data.ProfileStorageData
 import at.hannibal2.skyhanni.events.ConfigLoadEvent
 import at.hannibal2.skyhanni.events.LorenzActionBarEvent
-import at.hannibal2.skyhanni.events.SkillDisplayUpdateEvent
 import at.hannibal2.skyhanni.events.SkillOverflowLevelupEvent
+import at.hannibal2.skyhanni.features.misc.skillprogress.SkillProgress
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.NumberUtil.formatNumber
@@ -79,7 +79,7 @@ object SkillAPI {
                 }
                 showDisplay = true
                 lastUpdate = SimpleTimeMark.now()
-                SkillDisplayUpdateEvent().postAndCatch()
+                SkillProgress.updateDisplay()
                 return
             }
         }
