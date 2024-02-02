@@ -29,7 +29,7 @@ class DungeonHighlightClickedBlocks {
     }
 
     @SubscribeEvent
-    fun onChatMessage(event: LorenzChatEvent) {
+    fun onChat(event: LorenzChatEvent) {
         if (!SkyHanniMod.feature.dungeon.highlightClickedBlocks) return
         if (!LorenzUtils.inDungeons) return
 
