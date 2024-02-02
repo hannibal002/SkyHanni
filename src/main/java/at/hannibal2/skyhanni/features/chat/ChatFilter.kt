@@ -364,7 +364,7 @@ class ChatFilter {
     /// </editor-fold>
 
     @SubscribeEvent
-    fun onChatMessage(event: LorenzChatEvent) {
+    fun onChat(event: LorenzChatEvent) {
         val blockReason = block(event.message)
         if (blockReason == "") return
 
