@@ -44,6 +44,7 @@ import at.hannibal2.skyhanni.features.minion.MinionFeatures
 import at.hannibal2.skyhanni.features.misc.CollectionTracker
 import at.hannibal2.skyhanni.features.misc.LockMouseLook
 import at.hannibal2.skyhanni.features.misc.MarkedPlayerManager
+import at.hannibal2.skyhanni.features.misc.OptifineCitCache
 import at.hannibal2.skyhanni.features.misc.discordrpc.DiscordRPCManager
 import at.hannibal2.skyhanni.features.misc.massconfiguration.DefaultConfigFeatures
 import at.hannibal2.skyhanni.features.misc.visualwords.VisualWordGui
@@ -295,8 +296,12 @@ object Commands {
         ) { SkyHanniMod.repo.displayRepoStatus(false) }
         registerCommand(
             "shkingfix",
-            "Reseting the local King Talisman Helper offset."
+            "Resetting the local King Talisman Helper offset."
         ) { KingTalismanHelper.kingFix() }
+        registerCommand(
+            "shoptifinecache",
+            "Show stats about the optifine item cache"
+        ) { OptifineCitCache.onCommand(it) }
     }
 
     private fun developersDebugFeatures() {

@@ -99,6 +99,12 @@ public class MiscConfig {
     public PetCandyDisplayConfig petCandy = new PetCandyDisplayConfig();
 
     @Expose
+    @ConfigOption(name = "Optifine CIT Cache", desc = "Caches optifine CIT data to increase performance when using it.")
+    @ConfigEditorBoolean
+    @FeatureToggle
+    public boolean optifineCitCache = true;
+
+    @Expose
     @ConfigOption(name = "Exp Bottles", desc = "Hides all the experience orbs lying on the ground.")
     @ConfigEditorBoolean
     @FeatureToggle

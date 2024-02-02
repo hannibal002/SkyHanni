@@ -71,7 +71,7 @@ object MinecraftData {
     fun onTick(event: TickEvent.ClientTickEvent) {
         Minecraft.getMinecraft().thePlayer ?: return
         totalTicks++
-        LorenzTickEvent(totalTicks).postAndCatch()
+        LorenzTickEvent(totalTicks, event.phase).postAndCatch()
     }
 
     @SubscribeEvent

@@ -250,6 +250,7 @@ import at.hannibal2.skyhanni.features.misc.MarkedPlayerManager
 import at.hannibal2.skyhanni.features.misc.MiscFeatures
 import at.hannibal2.skyhanni.features.misc.MovementSpeedDisplay
 import at.hannibal2.skyhanni.features.misc.NonGodPotEffectDisplay
+import at.hannibal2.skyhanni.features.misc.OptifineCitCache
 import at.hannibal2.skyhanni.features.misc.ParticleHider
 import at.hannibal2.skyhanni.features.misc.PartyMemberOutlines
 import at.hannibal2.skyhanni.features.misc.PatcherSendCoordinates
@@ -718,6 +719,7 @@ class SkyHanniMod {
         loadModule(PestFinder())
         loadModule(SprayFeatures())
         loadModule(DojoRankDisplay())
+        loadModule(OptifineCitCache)
         loadModule(SprayDisplay())
         loadModule(HighlightPlaceableNpcs())
         loadModule(PresentWaypoints())

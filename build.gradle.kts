@@ -76,6 +76,8 @@ dependencies {
     mappings("de.oceanlabs.mcp:mcp_stable:22-1.8.9")
     forge("net.minecraftforge:forge:1.8.9-11.15.1.2318-1.8.9")
 
+    compileOnly(fileTree("deps"))
+
     // Discord RPC client
     shadowImpl("com.github.NetheriteMiner:DiscordIPC:3106be5") {
         exclude(module = "log4j")

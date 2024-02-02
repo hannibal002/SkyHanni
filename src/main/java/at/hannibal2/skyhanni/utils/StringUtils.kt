@@ -146,6 +146,10 @@ object StringUtils {
         }
     }
 
+    fun Int.trailingS(): String {
+        return if (this == 1) "" else "s"
+    }
+
     fun String.removeWordsAtEnd(i: Int) = split(" ").dropLast(i).joinToString(" ")
 
     fun String.splitLines(width: Int): String {
