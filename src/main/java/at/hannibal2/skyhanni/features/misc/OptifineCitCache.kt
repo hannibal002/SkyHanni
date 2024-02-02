@@ -8,7 +8,7 @@ import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.events.LorenzTickEvent
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.NumberUtil.isInt
-import at.hannibal2.skyhanni.utils.StringUtils.trailingS
+import at.hannibal2.skyhanni.utils.StringUtils
 import net.minecraft.item.ItemStack
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import net.minecraftforge.fml.common.gameevent.TickEvent
@@ -40,7 +40,7 @@ object OptifineCitCache {
         histogram.forEachIndexed { index, stats ->
             val ago = histogram.size - index
             if (ago <= amount) {
-                LorenzUtils.chat("§b${ago}§e tick${ago.trailingS()} ago: §a${stats.cacheHits}§e-§c${stats.cacheMisses}§e-§b${stats.cacheCount}")
+                LorenzUtils.chat("§b${ago}§e ${StringUtils.pluralize(ago, "tick")} ago: §a${stats.cacheHits}§e-§c${stats.cacheMisses}§e-§b${stats.cacheCount}")
             }
         }
     }

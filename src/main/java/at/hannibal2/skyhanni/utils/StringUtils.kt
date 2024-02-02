@@ -146,8 +146,11 @@ object StringUtils {
         }
     }
 
-    fun Int.trailingS(): String {
-        return if (this == 1) "" else "s"
+    fun pluralize(number: Int, singular: String, plural: String? = null, withNumber: Boolean = false): String {
+        val pluralForm = plural ?: "${singular}s"
+        var str = if (number == 1) singular else pluralForm
+        if (withNumber) str = "${number.addSeparators()} $str"
+        return str
     }
 
     fun String.removeWordsAtEnd(i: Int) = split(" ").dropLast(i).joinToString(" ")
