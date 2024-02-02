@@ -36,7 +36,7 @@ object OptifineCitCache {
             amount = args[0].toInt()
         }
 
-        LorenzUtils.chat("Optifine Cache Size:")
+        LorenzUtils.chat("OptiFine Cache Size:")
         histogram.forEachIndexed { index, stats ->
             val ago = histogram.size - index
             if (ago <= amount) {
