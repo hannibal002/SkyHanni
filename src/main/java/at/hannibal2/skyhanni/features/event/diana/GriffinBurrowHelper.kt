@@ -43,8 +43,6 @@ object GriffinBurrowHelper {
     var targetLocation: LorenzVec? = null
     private var guessLocation: LorenzVec? = null
     private var particleBurrows = mapOf<LorenzVec, BurrowType>()
-
-    private var lastGuessTime = 0L
     var lastTitleSentTime = SimpleTimeMark.farPast()
 
     @SubscribeEvent
@@ -96,7 +94,6 @@ object GriffinBurrowHelper {
     @SubscribeEvent
     fun onBurrowGuess(event: BurrowGuessEvent) {
         EntityMovementData.addToTrack(Minecraft.getMinecraft().thePlayer)
-        lastGuessTime = System.currentTimeMillis()
 
         guessLocation = event.guessLocation
         update()
@@ -134,21 +131,28 @@ object GriffinBurrowHelper {
     }
 
     @SubscribeEvent
-    fun onChatMessage(event: LorenzChatEvent) {
+    fun onChat(event: LorenzChatEvent) {
         if (!isEnabled()) return
         if (event.message.startsWith("§c ☠ §r§7You were killed by §r")) {
             particleBurrows = particleBurrows.editCopy { keys.removeIf { this[it] == BurrowType.MOB } }
         }
+
+        // talking to Diana NPC
         if (event.message == "§6Poof! §r§eYou have cleared your griffin burrows!") {
-            guessLocation = null
-            particleBurrows = emptyMap()
+            resetAllData()
         }
+    }
+
+    private fun resetAllData() {
+        guessLocation = null
+        targetLocation = null
+        particleBurrows = emptyMap()
+        update()
     }
 
     @SubscribeEvent
     fun onWorldChange(event: LorenzWorldChangeEvent) {
-        guessLocation = null
-        particleBurrows = emptyMap()
+        resetAllData()
     }
 
     private fun findBlock(point: LorenzVec): LorenzVec {
@@ -319,8 +323,7 @@ object GriffinBurrowHelper {
 
         val type: BurrowType = when (strings[0].lowercase()) {
             "reset" -> {
-                particleBurrows = emptyMap()
-                update()
+                resetAllData()
                 LorenzUtils.chat("Manually reset all burrow waypoints.")
                 return
             }

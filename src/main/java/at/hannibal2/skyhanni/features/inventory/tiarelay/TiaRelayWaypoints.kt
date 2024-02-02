@@ -22,7 +22,7 @@ class TiaRelayWaypoints {
     }
 
     @SubscribeEvent
-    fun onChatMessage(event: LorenzChatEvent) {
+    fun onChat(event: LorenzChatEvent) {
         if (!LorenzUtils.inSkyBlock) return
         if (!config.nextWaypoint) return
 
