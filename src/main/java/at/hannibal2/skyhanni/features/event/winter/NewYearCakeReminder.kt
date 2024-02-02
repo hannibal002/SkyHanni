@@ -26,7 +26,7 @@ class NewYearCakeReminder {
     private var lastReminderSend = SimpleTimeMark.farPast()
 
     @SubscribeEvent
-    fun onChatMessage(event: LorenzChatEvent) {
+    fun onChat(event: LorenzChatEvent) {
         if (event.message == "§aYou claimed a §r§cNew Year Cake§r§a!") {
             makedClaimed()
         }
