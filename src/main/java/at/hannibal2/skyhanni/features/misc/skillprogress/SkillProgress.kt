@@ -106,18 +106,18 @@ object SkillProgress {
         val newLevel = event.newLevel
 
         val rewards = buildList {
-            add("  §r§7§8+§b1 Flexing Point\n")
+            add("  §r§7§8+§b1 Flexing Point")
             if (newLevel % 5 == 0)
-                add("  §r§7§8+§d50 SkyHanni User Luck\n")
+                add("  §r§7§8+§d50 SkyHanni User Luck")
         }
 
-        LorenzUtils.chat(
-            "§3§l▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬\n" +
-                "  §r§b§lSKILL LEVEL UP §3${skillName.firstLetterUppercase()} §8$oldLevel➜§3$newLevel\n" +
-                "\n" +
-                "  §r§a§lREWARDS\n" +
-                rewards.joinToString("") +
-                "  §3§l▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬")
+        LorenzUtils.chat("§3§l▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬", false)
+        LorenzUtils.chat("  §r§b§lSKILL LEVEL UP §3${skillName.firstLetterUppercase()} §8$oldLevel➜§3$newLevel", false)
+        LorenzUtils.chat("", false)
+        LorenzUtils.chat("  §r§a§lREWARDS", false)
+        for (reward in rewards)
+            LorenzUtils.chat(reward, false)
+        LorenzUtils.chat("  §3§l▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬", false)
     }
 
 
