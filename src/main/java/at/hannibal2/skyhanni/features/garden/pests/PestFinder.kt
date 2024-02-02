@@ -97,7 +97,7 @@ class PestFinder {
         for (plot in getPlotsWithPests()) {
             val pests = plot.pests
             val plotName = plot.name
-            val pestsName = StringUtils.optionalPlural(pests, "pest", "pests")
+            val pestsName = StringUtils.pluralize(pests, "pest", withNumber = true)
             val renderable = Renderable.clickAndHover(
                 "§c$pestsName §7in §b$plotName",
                 listOf(
@@ -212,7 +212,7 @@ class PestFinder {
             }
             event.renderPlot(plot, LorenzColor.GOLD.toColor(), LorenzColor.RED.toColor())
 
-            val pestsName = StringUtils.optionalPlural(plot.pests, "pest", "pests")
+            val pestsName = StringUtils.pluralize(plot.pests, "pest", withNumber = true)
             val plotName = plot.name
             val middle = plot.middle
             val location = playerLocation.copy(x = middle.x, z = middle.z)
