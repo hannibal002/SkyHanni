@@ -64,14 +64,14 @@ val devenvMod: Configuration by configurations.creating {
     isVisible = false
 }
 
-val headlessLwjgl by configurations.creating {
+val headlessLwjgl: Configuration by configurations.creating {
     isTransitive = false
     isVisible = false
 }
 
 val shot = shots.shot("minecraft", project.file("shots.txt"))
 
-val downloadOptifine by tasks.creating() {
+val downloadOptifine: Task by tasks.creating {
     val outputFile = layout.buildDirectory.file("download/optifine.jar")
     outputs.file(outputFile)
     doLast {
