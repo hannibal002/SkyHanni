@@ -49,7 +49,10 @@ class CaptureFarmingGear {
         "uniquevisitors.tierprogress",
         ".* §e(?<having>.*)§6/(?<total>.*)"
     )
-    private val petMenuPattern by patternGroup.pattern("garden.fortuneguide.petsmenu", "Pets(?: \\(\\d+/\\d+\\) )?")
+    private val petMenuPattern by patternGroup.pattern(
+        "petsmenu", 
+        "Pets(?: \\(\\d+/\\d+\\) )?"
+    )
 
     companion object {
         private val strengthPattern = " Strength: §r§c❁(?<strength>.*)".toPattern()
