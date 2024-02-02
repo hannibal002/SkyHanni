@@ -434,7 +434,7 @@ class SkyHanniDebugsAndTests {
     }
 
     @SubscribeEvent
-    fun onChatMessage(event: LorenzChatEvent) {
+    fun onChat(event: LorenzChatEvent) {
 
     }
 
