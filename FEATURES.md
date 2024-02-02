@@ -79,6 +79,7 @@ Use `/sh` or `/skyhanni` to open the SkyHanni config in game.
     + Color class levels in the tab list. (Also hide rank colors and emblems because who needs that in dungeons anyway?)
 + Soulweaver Skull Hider in the Dungeon Object Hider. - nea
     + Hide the annoying soulweaver skulls that float around you if you have the soulweaver gloves equipped.
++ Hide particles and damage splashes during the terracotta phase in dungeons F6 and M6. - hannibal2
 
 </details>
 <details open><summary>
