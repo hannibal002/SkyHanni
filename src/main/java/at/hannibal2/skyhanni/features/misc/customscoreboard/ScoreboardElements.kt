@@ -548,7 +548,8 @@ private fun getMayorDisplayPair(): List<ScoreboardElement> {
                 ""
             }) to HorizontalAlignment.LEFT
     ) + (if (config.mayorConfig.showMayorPerks) {
-        MayorAPI.currentMayor?.perks?.map { " §7- §e${it.name}" to HorizontalAlignment.LEFT } ?: emptyList()
+        //MayorAPI.currentMayor?.perks?.map { " §7- §e${it.name}" to HorizontalAlignment.LEFT } ?: emptyList()
+        emptyList() // todo: fix this
     } else {
         emptyList()
     })
