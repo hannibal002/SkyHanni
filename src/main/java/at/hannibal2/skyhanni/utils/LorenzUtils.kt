@@ -26,7 +26,6 @@ import net.minecraft.entity.SharedMonsterAttributes
 import net.minecraft.launchwrapper.Launch
 import net.minecraft.util.ChatComponentText
 import net.minecraftforge.fml.common.FMLCommonHandler
-import java.awt.Color
 import java.text.DecimalFormat
 import java.text.SimpleDateFormat
 import java.util.Timer
@@ -271,9 +270,6 @@ object LorenzUtils {
     }
 
     fun IslandType.isInIsland() = inSkyBlock && skyBlockIsland == this
-
-    /** transfer string colors from the config to java.awt.Color */
-    fun String.toChromaColor() = Color(SpecialColour.specialToChromaRGB(this), true)
 
     fun GuiContainerEvent.SlotClickEvent.makeShiftClick() =
         slot?.slotNumber?.let { slotNumber ->
