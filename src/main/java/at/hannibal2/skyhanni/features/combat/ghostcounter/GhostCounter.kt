@@ -24,6 +24,8 @@ import at.hannibal2.skyhanni.features.combat.ghostcounter.GhostUtil.formatText
 import at.hannibal2.skyhanni.features.combat.ghostcounter.GhostUtil.isUsingCTGhostCounter
 import at.hannibal2.skyhanni.features.combat.ghostcounter.GhostUtil.preFormat
 import at.hannibal2.skyhanni.features.combat.ghostcounter.GhostUtil.prettyTime
+import at.hannibal2.skyhanni.utils.ChatUtils.chat
+import at.hannibal2.skyhanni.utils.ChatUtils.clickableChat
 import at.hannibal2.skyhanni.utils.CombatUtils._isKilling
 import at.hannibal2.skyhanni.utils.CombatUtils.calculateETA
 import at.hannibal2.skyhanni.utils.CombatUtils.calculateXP
@@ -37,10 +39,8 @@ import at.hannibal2.skyhanni.utils.CombatUtils.xpGainHour
 import at.hannibal2.skyhanni.utils.CombatUtils.xpGainHourLast
 import at.hannibal2.skyhanni.utils.ConfigUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
+import at.hannibal2.skyhanni.utils.LanguageUtils.addAsSingletonList
 import at.hannibal2.skyhanni.utils.LorenzUtils
-import at.hannibal2.skyhanni.utils.LorenzUtils.addAsSingletonList
-import at.hannibal2.skyhanni.utils.LorenzUtils.chat
-import at.hannibal2.skyhanni.utils.LorenzUtils.clickableChat
 import at.hannibal2.skyhanni.utils.LorenzUtils.isInIsland
 import at.hannibal2.skyhanni.utils.NEUInternalName.Companion.asInternalName
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
@@ -161,7 +161,7 @@ object GhostCounter {
         val bestiary = if (config.showMax) {
             when (nextLevel) {
                 26 -> bestiaryFormatting.maxed.replace("%currentKill%", currentKill.addSeparators())
-                in 1..25 -> {
+                in 1 .. 25 -> {
                     val sum = bestiaryData.filterKeys { it <= nextLevel - 1 }.values.sum()
 
                     val cKill = sum + currentKill
@@ -174,7 +174,7 @@ object GhostCounter {
         } else {
             when (nextLevel) {
                 26 -> bestiaryFormatting.maxed
-                in 1..25 -> bestiaryFormatting.progress
+                in 1 .. 25 -> bestiaryFormatting.progress
                 else -> bestiaryFormatting.openMenu
             }
         }
@@ -280,7 +280,7 @@ object GhostCounter {
                     val res = current.formatNumber().toString()
                     gain = (res.toLong() - lastXp.toLong()).toDouble().roundToInt()
                     num = (gain.toDouble() / gained)
-                    if (gained in 150.0..450.0 && lastXp != "0" && num >= 0) {
+                    if (gained in 150.0 .. 450.0 && lastXp != "0" && num >= 0) {
                         KILLS.add(num)
                         KILLS.add(num, true)
                         Option.GHOSTSINCESORROW.add(num)
@@ -424,7 +424,7 @@ object GhostCounter {
             Option.KILLCOMBO.set(0.0)
             update()
         }
-        //replace with BestiaryLevelUpEvent ?
+        // replace with BestiaryLevelUpEvent ?
         bestiaryPattern.matchMatcher(event.message) {
             val currentLevel = group("nextLevel").toInt()
             when (val nextLevel = if (currentLevel >= 25) 26 else currentLevel + 1) {

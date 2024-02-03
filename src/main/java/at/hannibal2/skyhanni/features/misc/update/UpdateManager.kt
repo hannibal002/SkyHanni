@@ -4,9 +4,9 @@ import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.config.features.About
 import at.hannibal2.skyhanni.events.ConfigLoadEvent
 import at.hannibal2.skyhanni.events.LorenzTickEvent
+import at.hannibal2.skyhanni.utils.ChatUtils
+import at.hannibal2.skyhanni.utils.LanguageUtils.onToggle
 import at.hannibal2.skyhanni.utils.LorenzLogger
-import at.hannibal2.skyhanni.utils.LorenzUtils
-import at.hannibal2.skyhanni.utils.LorenzUtils.onToggle
 import io.github.moulberry.moulconfig.processor.MoulConfigProcessor
 import io.github.moulberry.notenoughupdates.util.MinecraftExecutor
 import moe.nea.libautoupdate.CurrentVersion
@@ -95,9 +95,9 @@ object UpdateManager {
                 potentialUpdate = it
                 if (it.isUpdateAvailable) {
                     updateState = UpdateState.AVAILABLE
-                    LorenzUtils.clickableChat(
+                    ChatUtils.clickableChat(
                         "§aSkyHanni found a new update: ${it.update.versionName}. " +
-                                "Check §b/sh download update §afor more info.",
+                            "Check §b/sh download update §afor more info.",
                         "sh"
                     )
                 }

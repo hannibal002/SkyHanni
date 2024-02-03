@@ -6,8 +6,9 @@ import at.hannibal2.skyhanni.config.core.config.gui.GuiPositionEditor
 import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.LorenzKeyPressEvent
 import at.hannibal2.skyhanni.test.SkyHanniDebugsAndTests
+import at.hannibal2.skyhanni.utils.ChatUtils
+import at.hannibal2.skyhanni.utils.LanguageUtils.getPropertiesWithType
 import at.hannibal2.skyhanni.utils.LorenzUtils
-import at.hannibal2.skyhanni.utils.LorenzUtils.getPropertiesWithType
 import at.hannibal2.skyhanni.utils.LorenzUtils.isRancherSign
 import at.hannibal2.skyhanni.utils.NEUItems
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
@@ -78,7 +79,7 @@ class GuiEditManager {
             SkyHanniMod.screenToOpen = GuiPositionEditor(latestPositions.values.toList(), 2)
             if (hotkeyReminder && lastHotkeyReminded.passedSince() > 30.minutes) {
                 lastHotkeyReminded = SimpleTimeMark.now()
-                LorenzUtils.chat(
+                ChatUtils.chat(
                     "§eTo edit hidden GUI elements:\n" +
                         " §7- §e1. Set a key in /sh edit.\n" +
                         " §7- §e2. Click that key while the GUI element is visible."
@@ -116,7 +117,7 @@ class GuiEditManager {
         fun Position.getAbsY() = getAbsY0(getDummySize(true).y)
 
         fun GuiProfileViewer.anyTextBoxFocused() =
-            this.getPropertiesWithType<GuiElementTextField>().any{it.focus}
+            this.getPropertiesWithType<GuiElementTextField>().any { it.focus }
     }
 }
 

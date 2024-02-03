@@ -326,6 +326,10 @@ object LorenzUtils {
         FMLCommonHandler.instance().handleExit(-1)
     }
 
+    fun sendCommandToServer(command: String) {
+        ChatUtils.sendMessageToServer("/$command")
+    }
+
     /**
      * Get the group, otherwise, return null
      * @param groupName The group name in the pattern

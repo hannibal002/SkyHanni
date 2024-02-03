@@ -12,8 +12,10 @@ import at.hannibal2.skyhanni.events.PacketEvent
 import at.hannibal2.skyhanni.events.PreProfileSwitchEvent
 import at.hannibal2.skyhanni.features.rift.RiftAPI
 import at.hannibal2.skyhanni.test.command.ErrorManager
+import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.ItemUtils.name
+import at.hannibal2.skyhanni.utils.LanguageUtils.sorted
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils.sorted
 import at.hannibal2.skyhanni.utils.RenderUtils.renderStrings
@@ -31,6 +33,7 @@ import kotlin.time.Duration.Companion.minutes
 import kotlin.time.Duration.Companion.seconds
 
 class NonGodPotEffectDisplay {
+
     private val config get() = SkyHanniMod.feature.misc.potionEffect
     private var checkFooter = false
     private val effectDuration = mutableMapOf<NonGodPotEffect, Timer>()
@@ -40,8 +43,9 @@ class NonGodPotEffectDisplay {
     enum class NonGodPotEffect(
         val tabListName: String,
         val isMixin: Boolean = false,
-        val inventoryItemName: String = tabListName
+        val inventoryItemName: String = tabListName,
     ) {
+
         SMOLDERING("§aSmoldering Polarization I"),
         GLOWY("§2Mushed Glowy Tonic I"),
         WISP("§bWisp's Ice-Flavored Water I"),
@@ -131,7 +135,7 @@ class NonGodPotEffectDisplay {
 
     private fun update() {
         if (effectDuration.values.removeIf { it.ended }) {
-            //to fetch the real amount of active pots
+            // to fetch the real amount of active pots
             totalEffectsCount = 0
             checkFooter = true
         }
@@ -230,7 +234,7 @@ class NonGodPotEffectDisplay {
                             effectDuration[effect] = Timer(duration.milliseconds)
                             update()
                         } catch (e: IndexOutOfBoundsException) {
-                            LorenzUtils.debug("Error while reading non god pot effects from tab list! line: '$line'")
+                            ChatUtils.debug("Error while reading non god pot effects from tab list! line: '$line'")
                         }
                     }
                 }

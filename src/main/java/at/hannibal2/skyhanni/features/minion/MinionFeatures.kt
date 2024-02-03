@@ -17,14 +17,15 @@ import at.hannibal2.skyhanni.events.MinionOpenEvent
 import at.hannibal2.skyhanni.events.MinionStorageOpenEvent
 import at.hannibal2.skyhanni.test.GriffinUtils.drawWaypointFilled
 import at.hannibal2.skyhanni.utils.BlockUtils.getBlockStateAt
+import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.cleanName
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.ItemUtils.name
+import at.hannibal2.skyhanni.utils.LanguageUtils.editCopy
 import at.hannibal2.skyhanni.utils.LocationUtils
 import at.hannibal2.skyhanni.utils.LocationUtils.canBeSeen
 import at.hannibal2.skyhanni.utils.LorenzUtils
-import at.hannibal2.skyhanni.utils.LorenzUtils.editCopy
 import at.hannibal2.skyhanni.utils.LorenzUtils.formatInteger
 import at.hannibal2.skyhanni.utils.LorenzUtils.isInIsland
 import at.hannibal2.skyhanni.utils.LorenzVec
@@ -55,6 +56,7 @@ import org.lwjgl.input.Mouse
 import java.awt.Color
 
 class MinionFeatures {
+
     private val config get() = SkyHanniMod.feature.minions
     private var lastClickedEntity: LorenzVec? = null
     private var newMinion: LorenzVec? = null
@@ -370,7 +372,7 @@ class MinionFeatures {
 
         fun clearMinionData() {
             minions = mutableMapOf()
-            LorenzUtils.chat("Manually reset all private island minion location data!")
+            ChatUtils.chat("Manually reset all private island minion location data!")
         }
     }
 

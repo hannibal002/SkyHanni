@@ -25,9 +25,11 @@ import net.minecraft.item.ItemStack
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
 class BazaarApi {
+
     private var loadedNpcPriceData = false
 
     companion object {
+
         val holder = BazaarDataHolder()
         var inBazaarInventory = false
         private var currentSearchedItem = ""
@@ -99,7 +101,7 @@ class BazaarApi {
             if (slot == null) continue
             val stack = slot.stack ?: continue
 
-            if (chest.inventorySlots.indexOf(slot) !in 9..44) {
+            if (chest.inventorySlots.indexOf(slot) !in 9 .. 44) {
                 continue
             }
 

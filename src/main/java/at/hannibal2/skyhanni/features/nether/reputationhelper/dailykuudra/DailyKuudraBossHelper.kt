@@ -8,6 +8,8 @@ import at.hannibal2.skyhanni.events.LorenzChatEvent
 import at.hannibal2.skyhanni.events.LorenzRenderWorldEvent
 import at.hannibal2.skyhanni.features.nether.reputationhelper.CrimsonIsleReputationHelper
 import at.hannibal2.skyhanni.test.GriffinUtils.drawWaypointFilled
+import at.hannibal2.skyhanni.utils.ChatUtils
+import at.hannibal2.skyhanni.utils.LanguageUtils.addAsSingletonList
 import at.hannibal2.skyhanni.utils.LorenzColor
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils.addAsSingletonList
@@ -17,6 +19,7 @@ import at.hannibal2.skyhanni.utils.RenderUtils.drawDynamicText
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
 class DailyKuudraBossHelper(private val reputationHelper: CrimsonIsleReputationHelper) {
+
     val kuudraTiers = mutableListOf<KuudraTier>()
 
     private var kuudraLocation: LorenzVec? = null
@@ -55,7 +58,7 @@ class DailyKuudraBossHelper(private val reputationHelper: CrimsonIsleReputationH
     }
 
     private fun finished(kuudraTier: KuudraTier) {
-        LorenzUtils.debug("Detected kuudra tier done: $kuudraTier")
+        ChatUtils.debug("Detected kuudra tier done: $kuudraTier")
         reputationHelper.questHelper.finishKuudra(kuudraTier)
         kuudraTier.doneToday = true
         updateAllKuudraDone()

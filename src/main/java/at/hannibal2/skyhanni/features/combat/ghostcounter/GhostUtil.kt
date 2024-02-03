@@ -3,7 +3,7 @@ package at.hannibal2.skyhanni.features.combat.ghostcounter
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.config.ConfigManager
 import at.hannibal2.skyhanni.data.ProfileStorageData
-import at.hannibal2.skyhanni.utils.LorenzUtils
+import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.NumberUtil
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.NumberUtil.roundToPrecision
@@ -65,7 +65,7 @@ object GhostUtil {
         val c = ProfileStorageData.profileSpecific?.ghostCounter ?: return
         if (isUsingCTGhostCounter()) {
             if (c.ctDataImported) {
-                LorenzUtils.userError("You already imported GhostCounterV3 data!")
+                ChatUtils.userError("You already imported GhostCounterV3 data!")
                 return
             }
             val json = ConfigManager.gson.fromJson(
@@ -83,9 +83,9 @@ object GhostUtil {
                 ?: json["TotalMF"].asDouble
             GhostData.Option.TOTALDROPS.add(json["TotalDrops"].asDouble)
             c.ctDataImported = true
-            LorenzUtils.chat("§aImported data successfully!")
+            ChatUtils.chat("§aImported data successfully!")
         } else
-            LorenzUtils.error("GhostCounterV3 ChatTriggers module not found!")
+            ChatUtils.error("GhostCounterV3 ChatTriggers module not found!")
     }
 
     fun String.formatText(option: GhostData.Option) = formatText(option.getInt(), option.getInt(true))

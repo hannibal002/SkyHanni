@@ -4,8 +4,8 @@ import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.SkyHanniMod.Companion.coroutineScope
 import at.hannibal2.skyhanni.events.LorenzChatEvent
 import at.hannibal2.skyhanni.utils.APIUtil
-import at.hannibal2.skyhanni.utils.LorenzUtils
-import at.hannibal2.skyhanni.utils.LorenzUtils.transformIf
+import at.hannibal2.skyhanni.utils.ChatUtils
+import at.hannibal2.skyhanni.utils.LanguageUtils.transformIf
 import at.hannibal2.skyhanni.utils.OSUtils
 import at.hannibal2.skyhanni.utils.StringUtils.getPlayerNameFromChatMessage
 import com.google.gson.JsonArray
@@ -20,6 +20,7 @@ import java.net.URLDecoder
 import java.net.URLEncoder
 
 class Translator {
+
     private val messageContentRegex = Regex(".*: (.*)")
 
     // Logic for listening for a user click on a chat message is from NotEnoughUpdates
@@ -54,8 +55,8 @@ class Translator {
         return style
     }
 
-
     companion object {
+
         private val config get() = SkyHanniMod.feature.chat
 
         /*
@@ -125,7 +126,7 @@ class Translator {
             val firstSentence = (layer2?.get(0) as? JsonArray)?.get(0).toString()
             var messageToSend = firstSentence.substring(0, firstSentence.length - 1)
             if (layer2 != null) {
-                for (sentenceIndex in 1..<layer2.size()) {
+                for (sentenceIndex in 1 ..< layer2.size()) {
                     val sentence = (layer2.get(sentenceIndex) as JsonArray).get(0).toString()
                     val sentenceWithoutQuotes = sentence.substring(1, sentence.length - 1)
                     messageToSend = "$messageToSend$sentenceWithoutQuotes"
@@ -144,26 +145,26 @@ class Translator {
 
             coroutineScope.launch {
                 val translation = getTranslationToEnglish(message)
-                if (translation == "Unable to translate!") LorenzUtils.userError("Unable to translate message :( (is it in English?)")
-                else LorenzUtils.chat("Found translation: §f$translation")
+                if (translation == "Unable to translate!") ChatUtils.userError("Unable to translate message :( (is it in English?)")
+                else ChatUtils.chat("Found translation: §f$translation")
             }
         }
 
         fun fromEnglish(args: Array<String>) {
             if (!isEnabled()) return
             if (args.size < 2 || args[0].length != 2) { // args[0] is the language code
-                LorenzUtils.userError("Usage: /shcopytranslation <two letter language code (at the end of a translation)> <message>")
+                ChatUtils.userError("Usage: /shcopytranslation <two letter language code (at the end of a translation)> <message>")
                 return
             }
             val language = args[0]
             var message = ""
-            for (i in 1..<args.size) {
+            for (i in 1 ..< args.size) {
                 message = "$message${args[i]} "
             }
 
             coroutineScope.launch {
                 val translation = getTranslationFromEnglish(message, language)
-                LorenzUtils.chat("Copied translation to clipboard: $translation")
+                ChatUtils.chat("Copied translation to clipboard: $translation")
                 OSUtils.copyToClipboard(translation)
             }
         }

@@ -4,11 +4,11 @@ import at.hannibal2.skyhanni.data.ProfileStorageData
 import at.hannibal2.skyhanni.events.InventoryOpenEvent
 import at.hannibal2.skyhanni.events.LorenzChatEvent
 import at.hannibal2.skyhanni.events.garden.visitor.VisitorOpenEvent
+import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.DelayedRun
 import at.hannibal2.skyhanni.utils.EntityUtils
 import at.hannibal2.skyhanni.utils.LocationUtils.distanceTo
 import at.hannibal2.skyhanni.utils.LocationUtils.distanceToPlayer
-import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
@@ -23,6 +23,7 @@ import kotlin.time.Duration.Companion.seconds
  * Fixing the visitor detection problem with Anita and Jacob, as those two are on the garden twice when visiting.
  */
 object NPCVisitorFix {
+
     private val storage get() = ProfileStorageData.profileSpecific?.garden
     private val staticVisitors = listOf("Jacob", "Anita")
     private val barnSkinChangePattern by RepoPattern.pattern("garden.barn.skin.change", "§aChanging Barn skin to §r.*")
@@ -49,7 +50,7 @@ object NPCVisitorFix {
         }
 
         storage.npcVisitorLocations[name] = location
-        LorenzUtils.chat("Saved $name NPC location. Real $name visitors are now getting detected correctly.")
+        ChatUtils.chat("Saved $name NPC location. Real $name visitors are now getting detected correctly.")
     }
 
     private var lastVisitorOpen = SimpleTimeMark.farPast()

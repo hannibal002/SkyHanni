@@ -6,6 +6,8 @@ import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.ItemAddEvent
 import at.hannibal2.skyhanni.events.LorenzChatEvent
 import at.hannibal2.skyhanni.events.RepositoryReloadEvent
+import at.hannibal2.skyhanni.utils.ChatUtils
+import at.hannibal2.skyhanni.utils.LanguageUtils.addAsSingletonList
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils.addAsSingletonList
 import at.hannibal2.skyhanni.utils.NEUInternalName
@@ -23,6 +25,7 @@ import com.google.gson.annotations.Expose
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
 object DianaProfitTracker {
+
     private val config get() = SkyHanniMod.feature.event.diana.dianaProfitTracker
     private var allowedDrops = listOf<NEUInternalName>()
 
@@ -41,6 +44,7 @@ object DianaProfitTracker {
         { it.diana.dianaProfitTracker }) { drawDisplay(it) }
 
     class Data : ItemTrackerData() {
+
         override fun resetItems() {
             burrowsDug = 0
         }
@@ -94,7 +98,7 @@ object DianaProfitTracker {
         val internalName = event.internalName
 
         if (!isAllowedItem(internalName)) {
-            LorenzUtils.debug("Ignored non-diana item pickup: '$internalName'")
+            ChatUtils.debug("Ignored non-diana item pickup: '$internalName'")
             return
         }
 

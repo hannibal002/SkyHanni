@@ -7,10 +7,9 @@ import at.hannibal2.skyhanni.events.MessageSendToServerEvent
 import at.hannibal2.skyhanni.events.PacketEvent
 import at.hannibal2.skyhanni.features.chat.ChatFilterGui
 import at.hannibal2.skyhanni.utils.IdentityCharacteristics
+import at.hannibal2.skyhanni.utils.LanguageUtils.makeAccessible
 import at.hannibal2.skyhanni.utils.LorenzLogger
 import at.hannibal2.skyhanni.utils.LorenzUtils
-import at.hannibal2.skyhanni.utils.LorenzUtils.chat
-import at.hannibal2.skyhanni.utils.LorenzUtils.makeAccessible
 import net.minecraft.client.Minecraft
 import net.minecraft.client.gui.ChatLine
 import net.minecraft.client.gui.GuiNewChat
@@ -51,6 +50,7 @@ object ChatManager {
         val renderedString = "$format$name"
 
         companion object {
+
             val maxLength by lazy {
                 entries.maxOf { Minecraft.getMinecraft().fontRendererObj.getStringWidth(it.renderedString) }
             }
@@ -61,7 +61,7 @@ object ChatManager {
         val message: IChatComponent,
         var actionKind: ActionKind,
         var actionReason: String?,
-        val modified: IChatComponent?
+        val modified: IChatComponent?,
     )
 
     @SubscribeEvent(priority = EventPriority.LOW, receiveCanceled = true)
@@ -74,7 +74,6 @@ object ChatManager {
             val actionBarEvent = LorenzActionBarEvent(message)
             actionBarEvent.postAndCatch()
         }
-
     }
 
     @SubscribeEvent

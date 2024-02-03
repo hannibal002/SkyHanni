@@ -12,8 +12,9 @@ import at.hannibal2.skyhanni.events.PurseChangeEvent
 import at.hannibal2.skyhanni.events.RepositoryReloadEvent
 import at.hannibal2.skyhanni.events.SlayerChangeEvent
 import at.hannibal2.skyhanni.events.SlayerQuestCompleteEvent
+import at.hannibal2.skyhanni.utils.ChatUtils
+import at.hannibal2.skyhanni.utils.LanguageUtils.addAsSingletonList
 import at.hannibal2.skyhanni.utils.LorenzUtils
-import at.hannibal2.skyhanni.utils.LorenzUtils.addAsSingletonList
 import at.hannibal2.skyhanni.utils.NEUInternalName
 import at.hannibal2.skyhanni.utils.NumberUtil
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
@@ -27,6 +28,7 @@ import com.google.gson.annotations.Expose
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
 object SlayerProfitTracker {
+
     private val config get() = SkyHanniMod.feature.slayer.itemProfitTracker
 
     private var itemLogCategory = ""
@@ -34,6 +36,7 @@ object SlayerProfitTracker {
     private val trackers = mutableMapOf<String, SkyHanniItemTracker<Data>>()
 
     class Data : ItemTrackerData() {
+
         override fun resetItems() {
             slayerSpawnCost = 0
             slayerCompletedCount = 0
@@ -131,7 +134,7 @@ object SlayerProfitTracker {
         val amount = event.amount
 
         if (!isAllowedItem(internalName)) {
-            LorenzUtils.debug("Ignored non-slayer item pickup: '$internalName' '$itemLogCategory'")
+            ChatUtils.debug("Ignored non-slayer item pickup: '$internalName' '$itemLogCategory'")
             return
         }
 
@@ -212,14 +215,13 @@ object SlayerProfitTracker {
 
             old
         }
-
     }
 
     fun isEnabled() = LorenzUtils.inSkyBlock && config.enabled
 
     fun clearProfitCommand(args: Array<String>) {
         if (itemLogCategory == "") {
-            LorenzUtils.userError(
+            ChatUtils.userError(
                 "No current slayer data found! " +
                     "§eGo to a slayer area and start the specific slayer type you want to reset the data of.",
             )

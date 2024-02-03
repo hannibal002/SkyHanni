@@ -62,6 +62,7 @@ import at.hannibal2.skyhanni.test.command.CopyScoreboardCommand
 import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.test.command.TestChatCommand
 import at.hannibal2.skyhanni.utils.APIUtil
+import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.SoundUtils
 import at.hannibal2.skyhanni.utils.TabListData
@@ -455,7 +456,7 @@ object Commands {
     @JvmStatic
     fun openFortuneGuide() {
         if (!LorenzUtils.inSkyBlock) {
-            LorenzUtils.userError("Join SkyBlock to open the fortune guide!")
+            ChatUtils.userError("Join SkyBlock to open the fortune guide!")
         } else {
             CaptureFarmingGear.captureFarmingGear()
             SkyHanniMod.screenToOpen = FFGuideGUI()
@@ -465,7 +466,7 @@ object Commands {
     @JvmStatic
     fun openVisualWords() {
         if (!LorenzUtils.onHypixel) {
-            LorenzUtils.userError("You need to join Hypixel to use this feature!")
+            ChatUtils.userError("You need to join Hypixel to use this feature!")
         } else {
             if (VisualWordGui.sbeConfigPath.exists()) VisualWordGui.drawImport = true
             SkyHanniMod.screenToOpen = VisualWordGui()
@@ -474,7 +475,7 @@ object Commands {
 
     private fun clearFarmingItems() {
         val storage = GardenAPI.storage?.fortune ?: return
-        LorenzUtils.chat("clearing farming items")
+        ChatUtils.chat("clearing farming items")
         storage.farmingItems.clear()
         storage.outdatedItems.clear()
     }

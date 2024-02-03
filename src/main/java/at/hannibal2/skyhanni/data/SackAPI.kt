@@ -14,8 +14,8 @@ import at.hannibal2.skyhanni.features.inventory.SackDisplay
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.ItemUtils.name
+import at.hannibal2.skyhanni.utils.LanguageUtils.editCopy
 import at.hannibal2.skyhanni.utils.LorenzUtils
-import at.hannibal2.skyhanni.utils.LorenzUtils.editCopy
 import at.hannibal2.skyhanni.utils.NEUInternalName
 import at.hannibal2.skyhanni.utils.NEUInternalName.Companion.asInternalName
 import at.hannibal2.skyhanni.utils.NEUItems.getNpcPriceOrNull
@@ -30,6 +30,7 @@ import net.minecraft.item.ItemStack
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
 object SackAPI {
+
     private val sackDisplayConfig get() = SkyHanniMod.feature.inventory.sackDisplay
     private val chatConfig get() = SkyHanniMod.feature.chat
     private var lastOpenedInventory = ""
@@ -337,11 +338,11 @@ object SackAPI {
 data class SackItem(
     @Expose val amount: Long,
     @Expose val lastChange: Int,
-    @Expose private val status: SackStatus?
+    @Expose private val status: SackStatus?,
 ) {
+
     fun getStatus() = status ?: SackStatus.MISSING
 }
-
 
 private val gemstoneMap = mapOf(
     "Jade Gemstones" to "ROUGH_JADE_GEM".asInternalName(),
@@ -356,6 +357,7 @@ private val gemstoneMap = mapOf(
 
 // ideally should be correct but using alright should also be fine unless they sold their whole sacks
 enum class SackStatus {
+
     MISSING,
     CORRECT,
     ALRIGHT,

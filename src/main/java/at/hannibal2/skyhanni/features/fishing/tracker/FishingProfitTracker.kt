@@ -7,7 +7,9 @@ import at.hannibal2.skyhanni.events.ItemAddEvent
 import at.hannibal2.skyhanni.events.LorenzChatEvent
 import at.hannibal2.skyhanni.events.LorenzWorldChangeEvent
 import at.hannibal2.skyhanni.features.fishing.FishingAPI
+import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.DelayedRun
+import at.hannibal2.skyhanni.utils.LanguageUtils.addAsSingletonList
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils.addAsSingletonList
 import at.hannibal2.skyhanni.utils.LorenzUtils.addButton
@@ -31,6 +33,7 @@ import kotlin.time.Duration.Companion.seconds
 typealias CategoryName = String
 
 object FishingProfitTracker {
+
     val config get() = SkyHanniMod.feature.fishing.fishingProfitTracker
 
     private val coinsChatPattern = ".* CATCH! §r§bYou found §r§6(?<coins>.*) Coins§r§b\\.".toPattern()
@@ -42,6 +45,7 @@ object FishingProfitTracker {
         { it.fishing.fishingProfitTracker }) { drawDisplay(it) }
 
     class Data : ItemTrackerData() {
+
         override fun resetItems() {
             totalCatchAmount = 0
         }
@@ -190,7 +194,7 @@ object FishingProfitTracker {
         if (FishingAPI.lastActiveFishingTime.passedSince() > 10.minutes) return
 
         if (!isAllowedItem(internalName)) {
-            LorenzUtils.debug("Ignored non-fishing item pickup: $internalName'")
+            ChatUtils.debug("Ignored non-fishing item pickup: $internalName'")
             return
         }
 

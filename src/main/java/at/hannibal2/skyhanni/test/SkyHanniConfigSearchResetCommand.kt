@@ -6,8 +6,8 @@ import at.hannibal2.skyhanni.config.Features
 import at.hannibal2.skyhanni.config.core.config.Position
 import at.hannibal2.skyhanni.data.ProfileStorageData
 import at.hannibal2.skyhanni.test.command.ErrorManager
-import at.hannibal2.skyhanni.utils.LorenzUtils
-import at.hannibal2.skyhanni.utils.LorenzUtils.makeAccessible
+import at.hannibal2.skyhanni.utils.ChatUtils
+import at.hannibal2.skyhanni.utils.LanguageUtils.makeAccessible
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.OSUtils
 import com.google.gson.JsonElement
@@ -23,7 +23,7 @@ object SkyHanniConfigSearchResetCommand {
 
     fun command(args: Array<String>) {
         SkyHanniMod.coroutineScope.launch {
-            LorenzUtils.chat(runCommand(args), false)
+            ChatUtils.chat(runCommand(args), false)
         }
         lastCommand = args
     }

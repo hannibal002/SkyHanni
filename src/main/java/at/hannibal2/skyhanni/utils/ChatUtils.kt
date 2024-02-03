@@ -170,10 +170,6 @@ object ChatUtils {
         }
     }
 
-    fun sendCommandToServer(command: String) {
-        sendMessageToServer("/$command")
-    }
-
     fun sendMessageToServer(message: String) {
         sendQueue.add(message)
     }

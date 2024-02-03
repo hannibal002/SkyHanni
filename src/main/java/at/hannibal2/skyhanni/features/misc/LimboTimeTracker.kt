@@ -5,6 +5,7 @@ import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.LorenzChatEvent
 import at.hannibal2.skyhanni.events.LorenzTickEvent
 import at.hannibal2.skyhanni.events.LorenzWorldChangeEvent
+import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils.round
 import at.hannibal2.skyhanni.utils.RenderUtils.renderString
@@ -16,6 +17,7 @@ import kotlin.time.Duration.Companion.seconds
 import kotlin.time.DurationUnit
 
 class LimboTimeTracker {
+
     private val config get() = SkyHanniMod.feature.misc
 
     private var limboJoinTime = SimpleTimeMark.farPast()
@@ -36,8 +38,8 @@ class LimboTimeTracker {
         if (inLimbo && !shownPB && limboJoinTime.passedSince() >= config.limboTimePB.seconds && config.limboTimePB != 0) {
             shownPB = true
             oldPB = config.limboTimePB.seconds
-            LorenzUtils.chat("§d§lPERSONAL BEST§f! You've surpassed your previous record of §e$oldPB§f!")
-            LorenzUtils.chat("§fKeep it up!")
+            ChatUtils.chat("§d§lPERSONAL BEST§f! You've surpassed your previous record of §e$oldPB§f!")
+            ChatUtils.chat("§fKeep it up!")
         }
     }
 
@@ -71,11 +73,11 @@ class LimboTimeTracker {
         if (passedSince > currentPB) {
             oldPB = currentPB
             config.limboTimePB = passedSince.toInt(DurationUnit.SECONDS)
-            LorenzUtils.chat("§fYou were AFK in Limbo for §e$duration§f! §d§lPERSONAL BEST§r§f!")
-            LorenzUtils.chat("§fYour previous Personal Best was §e$oldPB.")
+            ChatUtils.chat("§fYou were AFK in Limbo for §e$duration§f! §d§lPERSONAL BEST§r§f!")
+            ChatUtils.chat("§fYour previous Personal Best was §e$oldPB.")
             val userLuck = config.limboTimePB * userLuckMultiplier
-            LorenzUtils.chat("§fYour §aPersonal Bests§f perk is now granting you §a+${userLuck.round(2)}✴ SkyHanni User Luck§f!")
-        } else LorenzUtils.chat("§fYou were AFK in Limbo for §e$duration§f.")
+            ChatUtils.chat("§fYour §aPersonal Bests§f perk is now granting you §a+${userLuck.round(2)}✴ SkyHanni User Luck§f!")
+        } else ChatUtils.chat("§fYou were AFK in Limbo for §e$duration§f.")
         shownPB = false
     }
 

@@ -9,12 +9,13 @@ import at.hannibal2.skyhanni.events.InventoryCloseEvent
 import at.hannibal2.skyhanni.events.InventoryFullyOpenedEvent
 import at.hannibal2.skyhanni.events.LorenzTickEvent
 import at.hannibal2.skyhanni.features.bazaar.BazaarApi
+import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.ItemUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.ItemUtils.name
+import at.hannibal2.skyhanni.utils.LanguageUtils.addAsSingletonList
 import at.hannibal2.skyhanni.utils.LorenzColor
 import at.hannibal2.skyhanni.utils.LorenzUtils
-import at.hannibal2.skyhanni.utils.LorenzUtils.addAsSingletonList
 import at.hannibal2.skyhanni.utils.NEUItems
 import at.hannibal2.skyhanni.utils.NumberUtil
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
@@ -33,6 +34,7 @@ import net.minecraft.item.ItemStack
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
 class CityProjectFeatures {
+
     private var display = emptyList<List<Any>>()
     private var inInventory = false
     private var lastReminderSend = 0L
@@ -48,10 +50,11 @@ class CityProjectFeatures {
     )
 
     companion object {
+
         private val config get() = SkyHanniMod.feature.event.cityProject
         fun disable() {
             config.dailyReminder = false
-            LorenzUtils.chat("Disabled city project reminder messages!")
+            ChatUtils.chat("Disabled city project reminder messages!")
         }
     }
 
@@ -76,7 +79,7 @@ class CityProjectFeatures {
         if (lastReminderSend + 30_000 > System.currentTimeMillis()) return
         lastReminderSend = System.currentTimeMillis()
 
-        LorenzUtils.clickableChat(
+        ChatUtils.clickableChat(
             "Daily City Project Reminder! (Click here to disable this reminder)",
             "shstopcityprojectreminder"
         )

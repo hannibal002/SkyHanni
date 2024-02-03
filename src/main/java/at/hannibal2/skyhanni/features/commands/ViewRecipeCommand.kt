@@ -2,11 +2,12 @@ package at.hannibal2.skyhanni.features.commands
 
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.events.MessageSendToServerEvent
-import at.hannibal2.skyhanni.utils.LorenzUtils
+import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.NEUItems
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
 object ViewRecipeCommand {
+
     private val config get() = SkyHanniMod.feature.commands
 
     @SubscribeEvent
@@ -16,7 +17,7 @@ object ViewRecipeCommand {
         if (message == message.uppercase()) return
         if (message.startsWith("/viewrecipe ", ignoreCase = true)) {
             event.isCanceled = true
-            LorenzUtils.sendMessageToServer(message.uppercase())
+            ChatUtils.sendCommandToServer(message.uppercase())
         }
     }
 

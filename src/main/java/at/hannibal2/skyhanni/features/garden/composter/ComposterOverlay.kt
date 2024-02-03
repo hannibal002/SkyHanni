@@ -19,16 +19,17 @@ import at.hannibal2.skyhanni.features.bazaar.BazaarApi
 import at.hannibal2.skyhanni.features.garden.GardenAPI
 import at.hannibal2.skyhanni.features.garden.composter.ComposterAPI.getLevel
 import at.hannibal2.skyhanni.features.misc.items.EstimatedItemValue
+import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.ConfigUtils
 import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName
 import at.hannibal2.skyhanni.utils.ItemUtils.name
 import at.hannibal2.skyhanni.utils.KeyboardManager
+import at.hannibal2.skyhanni.utils.LanguageUtils.addAsSingletonList
+import at.hannibal2.skyhanni.utils.LanguageUtils.sortedDesc
 import at.hannibal2.skyhanni.utils.LorenzUtils
-import at.hannibal2.skyhanni.utils.LorenzUtils.addAsSingletonList
 import at.hannibal2.skyhanni.utils.LorenzUtils.addSelector
 import at.hannibal2.skyhanni.utils.LorenzUtils.round
-import at.hannibal2.skyhanni.utils.LorenzUtils.sortedDesc
 import at.hannibal2.skyhanni.utils.NEUInternalName
 import at.hannibal2.skyhanni.utils.NEUInternalName.Companion.NONE
 import at.hannibal2.skyhanni.utils.NEUInternalName.Companion.asInternalName
@@ -55,6 +56,7 @@ import kotlin.time.Duration.Companion.milliseconds
 import kotlin.time.DurationUnit
 
 object ComposterOverlay {
+
     private var organicMatterFactors: Map<NEUInternalName, Double> = emptyMap()
     private var fuelFactors: Map<NEUInternalName, Double> = emptyMap()
     private var organicMatter: Map<NEUInternalName, Double> = emptyMap()
@@ -94,11 +96,11 @@ object ComposterOverlay {
 
     fun onCommand(args: Array<String>) {
         if (args.size != 1) {
-            LorenzUtils.userError("Usage: /shtestcomposter <offset>")
+            ChatUtils.userError("Usage: /shtestcomposter <offset>")
             return
         }
         testOffset = args[0].toInt()
-        LorenzUtils.chat("Composter test offset set to $testOffset.")
+        ChatUtils.chat("Composter test offset set to $testOffset.")
     }
 
     @SubscribeEvent
@@ -388,7 +390,7 @@ object ComposterOverlay {
         }
 
         val testOffset = if (testOffset_ > map.size) {
-            LorenzUtils.error("Invalid Composter Overlay Offset! $testOffset cannot be greater than ${map.size}!")
+            ChatUtils.error("Invalid Composter Overlay Offset! $testOffset cannot be greater than ${map.size}!")
             ComposterOverlay.testOffset = 0
             0
         } else testOffset_
@@ -410,7 +412,7 @@ object ComposterOverlay {
         factors: Map<NEUInternalName, Double>,
         missing: Double,
         onClick: (NEUInternalName) -> Unit,
-        bigList: MutableList<List<Any>>
+        bigList: MutableList<List<Any>>,
     ): NEUInternalName? {
         var i = 0
         var first: NEUInternalName? = null
@@ -453,7 +455,7 @@ object ComposterOverlay {
         itemName: String,
         list: MutableList<Any>,
         itemsNeeded: Double,
-        onClick: (NEUInternalName) -> Unit
+        onClick: (NEUInternalName) -> Unit,
     ) {
         val format = NumberUtil.format(totalPrice)
         val selected = if (internalName == currentOrganicMatterItem || internalName == currentFuelItem) "§n" else ""
@@ -476,7 +478,7 @@ object ComposterOverlay {
         }
         val having = InventoryUtils.countItemsInLowerInventory { it.getInternalName() == internalName }
         if (having >= itemsNeeded) {
-            LorenzUtils.chat("$itemName §8x${itemsNeeded} §ealready found in inventory!")
+            ChatUtils.chat("$itemName §8x${itemsNeeded} §ealready found in inventory!")
             return
         }
 
@@ -489,7 +491,7 @@ object ComposterOverlay {
             // TODO Add sack type repo data
             val sackType = if (internalName.equals("VOLTA") || internalName.equals("OIL_BARREL") || internalName.equals("BIOFUEL")) "Mining §eor §9Dwarven"
             else "Enchanted Agronomy"
-            LorenzUtils.clickableChat(
+            ChatUtils.clickableChat(
                 "Sacks could not be loaded. Click here and open your §9$sackType Sack §eto update the data!",
                 "sax"
             )
@@ -497,9 +499,9 @@ object ComposterOverlay {
         } else if (amountInSacks == 0L) {
             SoundUtils.playErrorSound()
             if (LorenzUtils.noTradeMode) {
-                LorenzUtils.chat("No $itemName §efound in sacks.")
+                ChatUtils.chat("No $itemName §efound in sacks.")
             } else {
-                LorenzUtils.chat("No $itemName §efound in sacks. Opening Bazaar.")
+                ChatUtils.chat("No $itemName §efound in sacks. Opening Bazaar.")
                 BazaarApi.searchForBazaarItem(itemName, itemsNeeded)
             }
             return
@@ -508,9 +510,9 @@ object ComposterOverlay {
         LorenzUtils.sendCommandToServer("gfs ${internalName.asString()} ${itemsNeeded - having}")
         if (amountInSacks <= itemsNeeded - having) {
             if (LorenzUtils.noTradeMode) {
-                LorenzUtils.chat("You're out of $itemName §ein your sacks!")
+                ChatUtils.chat("You're out of $itemName §ein your sacks!")
             } else {
-                LorenzUtils.clickableChat(
+                ChatUtils.clickableChat(
                     "You're out of $itemName §ein your sacks! Click here to buy more on the Bazaar!",
                     "bz ${itemName.removeColor()}"
                 )
@@ -544,7 +546,7 @@ object ComposterOverlay {
             organicMatterFactors = updateOrganicMatterFactors(organicMatter)
         } catch (e: Exception) {
             e.printStackTrace()
-            LorenzUtils.error("error in RepositoryReloadEvent")
+            ChatUtils.error("error in RepositoryReloadEvent")
         }
     }
 

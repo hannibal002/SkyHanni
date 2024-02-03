@@ -10,6 +10,7 @@ import at.hannibal2.skyhanni.events.LorenzWorldChangeEvent
 import at.hannibal2.skyhanni.events.ProfileJoinEvent
 import at.hannibal2.skyhanni.features.bingo.BingoAPI
 import at.hannibal2.skyhanni.test.command.ErrorManager
+import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.LorenzLogger
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
@@ -26,6 +27,7 @@ import net.minecraftforge.fml.common.network.FMLNetworkEvent
 import kotlin.concurrent.thread
 
 class HypixelData {
+
     private val group = RepoPattern.group("data.hypixeldata")
     private val tabListProfilePattern by group.pattern("tablistprofile", "§e§lProfile: §r§a(?<profile>.*)")
     private val lobbyTypePattern by group.pattern("lobbytype", "(?<lobbyType>.*lobby)\\d+")
@@ -34,6 +36,7 @@ class HypixelData {
     private var lastLocRaw = 0L
 
     companion object {
+
         var hypixelLive = false
         var hypixelAlpha = false
         var inLobby = false
@@ -41,7 +44,7 @@ class HypixelData {
         var skyBlock = false
         var skyBlockIsland = IslandType.UNKNOWN
 
-        //Ironman, Stranded and Bingo
+        // Ironman, Stranded and Bingo
         var noTrade = false
 
         var ironman = false
@@ -223,7 +226,7 @@ class HypixelData {
         if (skyBlockIsland != islandType) {
             IslandChangeEvent(islandType, skyBlockIsland).postAndCatch()
             if (islandType == IslandType.UNKNOWN) {
-                LorenzUtils.debug("Unknown island detected: '$newIsland'")
+                ChatUtils.debug("Unknown island detected: '$newIsland'")
                 loggerIslandChange.log("Unknown: '$newIsland'")
             } else {
                 loggerIslandChange.log(islandType.name)

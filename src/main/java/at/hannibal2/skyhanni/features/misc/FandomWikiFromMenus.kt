@@ -3,6 +3,7 @@ package at.hannibal2.skyhanni.features.misc
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.features.commands.WikiManager
+import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
@@ -42,7 +43,7 @@ class FandomWikiFromMenus {
         val inWikiInventory = // TODO better name for this inventory
             event.slotId == 11 && itemClickedName.contains("Wiki Command") && chestName.contains("Wiki")
         if ((itemInHandName == "") || inWikiInventory) {
-            LorenzUtils.clickableChat("Click here to visit the Hypixel Skyblock Fandom Wiki!", "wiki")
+            ChatUtils.clickableChat("Click here to visit the Hypixel Skyblock Fandom Wiki!", "wiki")
             return
         }
 
@@ -64,12 +65,12 @@ class FandomWikiFromMenus {
         }
 
         if (!config.skipWikiChat) {
-            LorenzUtils.clickableChat(
+            ChatUtils.clickableChat(
                 "Click here to search for $wikiDisplayName §eon the Hypixel Skyblock Fandom Wiki!",
                 "wiki $wikiInternalName"
             )
         } else {
-            LorenzUtils.chat("Searching the Fandom Wiki for §a$wikiDisplayName")
+            ChatUtils.chat("Searching the Fandom Wiki for §a$wikiDisplayName")
             val wikiUrlCustom = "${WikiManager.urlSearchPrefix}$wikiInternalName&scope=internal"
             OSUtils.openBrowser(wikiUrlCustom.replace(' ', '+'))
         }

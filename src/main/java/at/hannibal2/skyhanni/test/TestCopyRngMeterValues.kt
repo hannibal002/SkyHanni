@@ -4,9 +4,9 @@ import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.config.ConfigManager
 import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.events.InventoryFullyOpenedEvent
+import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
-import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.NEUInternalName
 import at.hannibal2.skyhanni.utils.NumberUtil.formatNumber
 import at.hannibal2.skyhanni.utils.OSUtils
@@ -35,7 +35,7 @@ object TestCopyRngMeterValues {
         if (map.isEmpty()) return
 
         OSUtils.copyToClipboard(ConfigManager.gson.toJson(map))
-        LorenzUtils.debug("${map.size} items saved to clipboard.")
+        ChatUtils.debug("${map.size} items saved to clipboard.")
     }
 
     @SubscribeEvent

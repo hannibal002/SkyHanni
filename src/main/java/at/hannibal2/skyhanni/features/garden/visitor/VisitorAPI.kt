@@ -7,7 +7,9 @@ import at.hannibal2.skyhanni.events.garden.visitor.VisitorRefusedEvent
 import at.hannibal2.skyhanni.events.withAlpha
 import at.hannibal2.skyhanni.features.garden.GardenAPI
 import at.hannibal2.skyhanni.test.command.ErrorManager
+import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.EntityUtils
+import at.hannibal2.skyhanni.utils.LanguageUtils.editCopy
 import at.hannibal2.skyhanni.utils.LorenzColor
 import at.hannibal2.skyhanni.utils.LorenzLogger
 import at.hannibal2.skyhanni.utils.LorenzUtils
@@ -16,6 +18,7 @@ import at.hannibal2.skyhanni.utils.NEUInternalName
 import net.minecraft.item.ItemStack
 
 object VisitorAPI {
+
     private var visitors = mapOf<String, Visitor>()
     var inInventory = false
     val config get() = GardenAPI.config.visitors
@@ -54,7 +57,7 @@ object VisitorAPI {
         if (visitor == null) {
             // workaround if the tab list has not yet updated when opening the visitor
             addVisitor(name)
-            LorenzUtils.debug("Found visitor from npc that is not in tab list. Adding it still.")
+            ChatUtils.debug("Found visitor from npc that is not in tab list. Adding it still.")
             visitor = visitors[name]
         }
 
@@ -99,7 +102,7 @@ object VisitorAPI {
     }
 
     class VisitorOffer(
-        val offerItem: ItemStack
+        val offerItem: ItemStack,
     )
 
     class Visitor(
@@ -111,6 +114,7 @@ object VisitorAPI {
         val shoppingList: MutableMap<NEUInternalName, Int> = mutableMapOf(),
         var offer: VisitorOffer? = null,
     ) {
+
         var lore: List<String> = emptyList()
         var allRewards = listOf<NEUInternalName>()
         var lastLore = listOf<String>()
@@ -160,7 +164,7 @@ object VisitorAPI {
                 continue
             }
 
-            //hide own player name
+            // hide own player name
             if (name.contains(LorenzUtils.getPlayerName())) {
                 logger.log("Ignore wrong own name: '$name'")
                 continue

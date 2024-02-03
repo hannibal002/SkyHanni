@@ -6,13 +6,14 @@ import at.hannibal2.skyhanni.events.InventoryCloseEvent
 import at.hannibal2.skyhanni.events.InventoryFullyOpenedEvent
 import at.hannibal2.skyhanni.features.garden.visitor.VisitorAPI
 import at.hannibal2.skyhanni.test.command.ErrorManager
+import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.ItemUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.ItemUtils.nameWithEnchantment
+import at.hannibal2.skyhanni.utils.LanguageUtils.addAsSingletonList
 import at.hannibal2.skyhanni.utils.LorenzUtils
-import at.hannibal2.skyhanni.utils.LorenzUtils.addAsSingletonList
 import at.hannibal2.skyhanni.utils.NEUInternalName
 import at.hannibal2.skyhanni.utils.NEUInternalName.Companion.asInternalName
 import at.hannibal2.skyhanni.utils.NEUItems
@@ -23,10 +24,12 @@ import net.minecraft.item.ItemStack
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
 class AnitaMedalProfit {
+
     private val config get() = GardenAPI.config.anitaShop
     private var display = emptyList<List<Any>>()
 
     companion object {
+
         var inInventory = false
     }
 
@@ -104,7 +107,7 @@ class AnitaMedalProfit {
         for (rawItemName in requiredItems) {
             val pair = ItemUtils.readItemAmount(rawItemName)
             if (pair == null) {
-                LorenzUtils.error("Could not read item '$rawItemName'")
+                ChatUtils.error("Could not read item '$rawItemName'")
                 continue
             }
 

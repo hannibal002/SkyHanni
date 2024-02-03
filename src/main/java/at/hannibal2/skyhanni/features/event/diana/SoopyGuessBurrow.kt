@@ -5,7 +5,7 @@ import at.hannibal2.skyhanni.events.BurrowGuessEvent
 import at.hannibal2.skyhanni.events.LorenzWorldChangeEvent
 import at.hannibal2.skyhanni.events.PlaySoundEvent
 import at.hannibal2.skyhanni.events.ReceiveParticleEvent
-import at.hannibal2.skyhanni.utils.LorenzUtils
+import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.LorenzVec
 import at.hannibal2.skyhanni.utils.toLorenzVec
 import net.minecraft.util.EnumParticleTypes
@@ -109,7 +109,7 @@ class SoopyGuessBurrow {
         distance2 = (Math.E / slope) - firstParticlePoint?.distance(pos)!!
 
         if (distance2!! > 1000) {
-            LorenzUtils.debug("Soopy distance2 is $distance2")
+            ChatUtils.debug("Soopy distance2 is $distance2")
             distance2 = null
             guessPoint = null
 
@@ -174,10 +174,10 @@ class SoopyGuessBurrow {
 
                     val (a, b, c) = solveEquationThing(
                         LorenzVec(slopeThing.size - 5, slopeThing.size - 3, slopeThing.size - 1), LorenzVec(
-                            slopeThing[slopeThing.size - 5],
-                            slopeThing[slopeThing.size - 3],
-                            slopeThing[slopeThing.size - 1]
-                        )
+                        slopeThing[slopeThing.size - 5],
+                        slopeThing[slopeThing.size - 3],
+                        slopeThing[slopeThing.size - 1]
+                    )
                     )
 
                     val pr1 = mutableListOf<LorenzVec>()
@@ -204,7 +204,7 @@ class SoopyGuessBurrow {
 
                         val dencity = 5
 
-                        for (o in 0..dencity) {
+                        for (o in 0 .. dencity) {
                             lastPos[0] += xOff / dencity
                             lastPos[2] += zOff / dencity
 
@@ -227,7 +227,7 @@ class SoopyGuessBurrow {
                         i++
                     }
 
-                    //Why does this happen?
+                    // Why does this happen?
                     if (pr1.isEmpty()) return
 
                     val p1 = pr1.last()

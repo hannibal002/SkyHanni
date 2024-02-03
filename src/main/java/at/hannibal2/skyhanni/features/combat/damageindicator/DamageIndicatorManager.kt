@@ -18,18 +18,18 @@ import at.hannibal2.skyhanni.features.dungeon.DungeonAPI
 import at.hannibal2.skyhanni.features.slayer.blaze.HellionShield
 import at.hannibal2.skyhanni.features.slayer.blaze.setHellionShield
 import at.hannibal2.skyhanni.test.command.ErrorManager
+import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.ConfigUtils
 import at.hannibal2.skyhanni.utils.EntityUtils
 import at.hannibal2.skyhanni.utils.EntityUtils.canBeSeen
 import at.hannibal2.skyhanni.utils.EntityUtils.getNameTagWith
 import at.hannibal2.skyhanni.utils.EntityUtils.hasNameTagWith
+import at.hannibal2.skyhanni.utils.LanguageUtils.editCopy
 import at.hannibal2.skyhanni.utils.LocationUtils
 import at.hannibal2.skyhanni.utils.LocationUtils.distanceToPlayer
 import at.hannibal2.skyhanni.utils.LorenzColor
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils.baseMaxHealth
-import at.hannibal2.skyhanni.utils.LorenzUtils.editCopy
-import at.hannibal2.skyhanni.utils.LorenzUtils.put
 import at.hannibal2.skyhanni.utils.LorenzUtils.round
 import at.hannibal2.skyhanni.utils.LorenzVec
 import at.hannibal2.skyhanni.utils.NumberUtil
@@ -399,7 +399,7 @@ class DamageIndicatorManager {
                 val thorn = checkThorn(health, maxHealth)
                 if (thorn == null) {
                     val floor = DungeonAPI.dungeonFloor
-                    LorenzUtils.error("problems with thorn detection! ($floor, $health/$maxHealth)")
+                    ChatUtils.error("problems with thorn detection! ($floor, $health/$maxHealth)")
                 }
                 return thorn
             }
@@ -562,7 +562,7 @@ class DamageIndicatorManager {
                     calcHealth = 0
                     break
                 } else {
-                    LorenzUtils.error("unknown magma boss health sidebar format!")
+                    ChatUtils.error("unknown magma boss health sidebar format!")
                     break
                 }
 
@@ -776,7 +776,7 @@ class DamageIndicatorManager {
                 }
             }
         } else {
-            LorenzUtils.error("Invalid/impossible thorn floor!")
+            ChatUtils.error("Invalid/impossible thorn floor!")
             return null
         }
         val color = NumberUtil.percentageColor(health.toLong(), maxHealth.toLong())

@@ -55,12 +55,12 @@ object GardenPlotAPI {
         var sprayType: SprayType?,
 
         @Expose
-        var sprayHasNotified: Boolean
+        var sprayHasNotified: Boolean,
     )
 
     data class SprayData(
         val expiry: SimpleTimeMark,
-        val type: SprayType
+        val type: SprayType,
     )
 
     private fun Plot.getData() = GardenAPI.storage?.plotData?.getOrPut(id) { PlotData(id, "$id", 0, null, null, false) }
@@ -172,7 +172,7 @@ object GardenPlotAPI {
         plot: Plot,
         lineColor: Color,
         cornerColor: Color,
-        showBuildLimit: Boolean = false
+        showBuildLimit: Boolean = false,
     ) {
 
         // These don't refer to Minecraft chunks but rather garden plots, but I use
@@ -188,8 +188,8 @@ object GardenPlotAPI {
         val maxHeight = 66 + 36
 
         // Render 4 vertical corners
-        for (i in 0..plotSize step plotSize) {
-            for (j in 0..plotSize step plotSize) {
+        for (i in 0 .. plotSize step plotSize) {
+            for (j in 0 .. plotSize step plotSize) {
                 val start = LorenzVec(chunkMinX + i, minHeight, chunkMinZ + j)
                 val end = LorenzVec(chunkMinX + i, maxHeight, chunkMinZ + j)
                 tryDraw3DLine(start, end, cornerColor, 2, true)
@@ -197,7 +197,7 @@ object GardenPlotAPI {
         }
 
         // Render vertical on X-Axis
-        for (x in 4..<plotSize step 4) {
+        for (x in 4 ..< plotSize step 4) {
             val start = LorenzVec(chunkMinX + x, minHeight, chunkMinZ)
             val end = LorenzVec(chunkMinX + x, maxHeight, chunkMinZ)
             // Front lines
@@ -207,7 +207,7 @@ object GardenPlotAPI {
         }
 
         // Render vertical on Z-Axis
-        for (z in 4..<plotSize step 4) {
+        for (z in 4 ..< plotSize step 4) {
             val start = LorenzVec(chunkMinX, minHeight, chunkMinZ + z)
             val end = LorenzVec(chunkMinX, maxHeight, chunkMinZ + z)
             // Left lines
@@ -219,9 +219,9 @@ object GardenPlotAPI {
         // Render horizontal
         val buildLimit = minHeight + 11
         val ints = if (showBuildLimit) {
-            (minHeight..maxHeight step 4) + buildLimit
+            (minHeight .. maxHeight step 4) + buildLimit
         } else {
-            minHeight..maxHeight step 4
+            minHeight .. maxHeight step 4
         }
         for (y in ints) {
             val start = LorenzVec(chunkMinX, y, chunkMinZ)
@@ -244,7 +244,7 @@ object GardenPlotAPI {
         p2: LorenzVec,
         color: Color,
         lineWidth: Int,
-        depth: Boolean
+        depth: Boolean,
     ) {
         if (isOutOfBorders(p1)) return
         if (isOutOfBorders(p2)) return
@@ -259,5 +259,4 @@ object GardenPlotAPI {
 
         else -> false
     }
-
 }
