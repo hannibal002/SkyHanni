@@ -48,7 +48,8 @@ object SkillAPI {
         "Mining" to Utils.createItemStack(Items.golden_pickaxe, "Mining"),
         "Enchanting" to Utils.createItemStack(Blocks.enchanting_table, "Enchanting"),
         "Fishing" to Utils.createItemStack(Items.fishing_rod, "Fishing"),
-        "Carpentry" to Utils.createItemStack(Blocks.crafting_table, "Carpentry")
+        "Carpentry" to Utils.createItemStack(Blocks.crafting_table, "Carpentry"),
+        "Social" to Utils.createItemStack(Items.emerald, "Social")
     )
     val skillMap: MutableMap<String, SkillInfo>? get() = ProfileStorageData.profileSpecific?.skillMap
     var activeSkill = ""
@@ -58,7 +59,7 @@ object SkillAPI {
     @SubscribeEvent
     fun onActionBar(event: LorenzActionBarEvent) {
         val actionBar = event.message.removeColor()
-        println("bar: $actionBar")
+
         if (lastActionBar != null && lastActionBar == actionBar) return
         lastActionBar = actionBar
         val components = SPACE_SPLITTER.splitToList(actionBar)
@@ -172,7 +173,7 @@ object SkillAPI {
     private fun getSkillInfo(currentLevel: Int, currentXp: Long, neededXp: Long, totalXp: Long): LorenzUtils.Quad<Int, Long, Long, Long> {
         return if (currentLevel == 50 && activeSkill in excludedSkills)
             calculateOverFlow50(currentXp)
-        else if (currentLevel >= 60 && SkyHanniMod.feature.misc.skillProgressDisplayConfig.showOverflow.get())
+        else if (currentLevel >= 60 && SkyHanniMod.feature.misc.skillProgressConfig.showOverflow.get())
             calculateOverFlow(currentXp)
         else
             LorenzUtils.Quad(currentLevel, currentXp, neededXp, totalXp)
@@ -248,8 +249,11 @@ object SkillAPI {
     }
 
     private fun levelArray(skillType: String): JsonArray =
-        if (skillType == "Runecrafting") Utils.getElement(Constants.LEVELING, "runecrafting_xp").asJsonArray
-        else Utils.getElement(Constants.LEVELING, "leveling_xp").asJsonArray
+        when (skillType) {
+            "runecrafting" -> Utils.getElement(Constants.LEVELING, "runecrafting_xp").asJsonArray
+            "social" -> Utils.getElement(Constants.LEVELING, "social").asJsonArray
+            else -> Utils.getElement(Constants.LEVELING, "leveling_xp").asJsonArray
+        }
 
     fun onCommand(it: Array<String>) {
         if (it.size != 2) {

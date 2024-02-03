@@ -1,6 +1,6 @@
 package at.hannibal2.skyhanni.utils
 
-import at.hannibal2.skyhanni.config.features.misc.SkillProgressDisplayConfig.ProgressBarConfig.TexturedBar.UsedTexture
+import at.hannibal2.skyhanni.config.features.misc.skillprogress.SkillProgressConfig.ProgressBarConfig.TexturedBar.UsedTexture
 import at.hannibal2.skyhanni.features.chroma.ChromaShaderManager
 import at.hannibal2.skyhanni.features.chroma.ChromaType
 import io.github.moulberry.notenoughupdates.util.Utils

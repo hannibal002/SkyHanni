@@ -1,4 +1,4 @@
-package at.hannibal2.skyhanni.config.features.misc;
+package at.hannibal2.skyhanni.config.features.misc.skillprogress;
 
 import at.hannibal2.skyhanni.SkyHanniMod;
 import at.hannibal2.skyhanni.config.FeatureToggle;
@@ -12,7 +12,7 @@ import io.github.moulberry.moulconfig.annotations.ConfigEditorSlider;
 import io.github.moulberry.moulconfig.annotations.ConfigOption;
 import io.github.moulberry.moulconfig.observer.Property;
 
-public class SkillProgressDisplayConfig {
+public class SkillProgressConfig {
 
     @Expose
     @ConfigOption(name = "Enabled", desc = "Show the Skill Progress Display.")

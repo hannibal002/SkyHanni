@@ -34,7 +34,7 @@ import kotlin.time.Duration.Companion.seconds
 
 object SkillProgress {
 
-    private val config get() = SkyHanniMod.feature.misc.skillProgressDisplayConfig
+    private val config get() = SkyHanniMod.feature.misc.skillProgressConfig
     private var skillExpPercentage = 0.0
     private var display = emptyList<List<Any>>()
     private var allDisplay = emptyList<Renderable>()

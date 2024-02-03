@@ -5,6 +5,7 @@ import at.hannibal2.skyhanni.config.core.config.Position;
 import at.hannibal2.skyhanni.config.features.misc.compacttablist.CompactTabListConfig;
 import at.hannibal2.skyhanni.config.features.misc.cosmetic.CosmeticConfig;
 import at.hannibal2.skyhanni.config.features.misc.pets.PetConfig;
+import at.hannibal2.skyhanni.config.features.misc.skillprogress.SkillProgressConfig;
 import com.google.gson.annotations.Expose;
 import io.github.moulberry.moulconfig.annotations.Accordion;
 import io.github.moulberry.moulconfig.annotations.Category;
@@ -99,9 +100,9 @@ public class MiscConfig {
     public PetCandyDisplayConfig petCandy = new PetCandyDisplayConfig();
 
     @Expose
-    @ConfigOption(name = "Skill Progress Display", desc = "")
+    @ConfigOption(name = "Skill Progress", desc = "")
     @Accordion
-    public SkillProgressDisplayConfig skillProgressDisplayConfig = new SkillProgressDisplayConfig();
+    public SkillProgressConfig skillProgressConfig = new SkillProgressConfig();
 
     @Expose
     @ConfigOption(name = "Exp Bottles", desc = "Hides all the experience orbs lying on the ground.")
