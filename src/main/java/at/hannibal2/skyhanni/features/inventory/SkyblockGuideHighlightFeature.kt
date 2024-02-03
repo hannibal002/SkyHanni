@@ -5,6 +5,7 @@ import at.hannibal2.skyhanni.events.GuiContainerEvent
 import at.hannibal2.skyhanni.events.InventoryCloseEvent
 import at.hannibal2.skyhanni.events.InventoryFullyOpenedEvent
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
+import at.hannibal2.skyhanni.utils.ItemUtils.name
 import at.hannibal2.skyhanni.utils.LorenzColor
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.RenderUtils.highlight
@@ -17,7 +18,7 @@ import org.intellij.lang.annotations.Language
 val group = RepoPattern.group("skyblockguide.highlight")
 
 private const val keyPrefixInventory = "inventory"
-private const val keyPrefixLoreCondition = "condition.lore"
+private const val keyPrefixCondition = "condition"
 
 class SkyblockGuideHighlightFeature private constructor(
     private val config: () -> Boolean,
@@ -37,7 +38,7 @@ class SkyblockGuideHighlightFeature private constructor(
         @Language("RegExp")
         loreCondition: String,
         onSlotClicked: (GuiContainerEvent.SlotClickEvent) -> Unit = {},
-    ) : this(config, group.pattern("$key.$keyPrefixInventory", inventory), group.pattern("$key.$keyPrefixLoreCondition", loreCondition), onSlotClicked)
+    ) : this(config, group.pattern("$key.$keyPrefixInventory", inventory), group.pattern("$key.$keyPrefixCondition", loreCondition), onSlotClicked)
 
     private constructor(
         config: () -> Boolean,
@@ -55,8 +56,6 @@ class SkyblockGuideHighlightFeature private constructor(
     companion object {
 
         private val skyblockGuideConfig get() = SkyHanniMod.feature.inventory.skyblockGuideConfig
-
-        fun load(skyHanniMod: SkyHanniMod) = skyHanniMod.loadModule(this)
 
         private val objectList = mutableListOf<SkyblockGuideHighlightFeature>()
 
@@ -103,16 +102,17 @@ class SkyblockGuideHighlightFeature private constructor(
 
             for ((slot, item) in event.inventoryItems) {
                 if (slot == 4) continue // Overview Item
-                val lore = item.getLore()
-                if (!current.conditionPattern.anyMatches(lore)) continue
+                val loreAndName = listOf(item.name ?: "") + item.getLore()
+                if (!current.conditionPattern.anyMatches(loreAndName)) continue
                 missing.add(slot)
             }
         }
 
-        private val taskOnlyCompleteOncePattern = group.pattern("$keyPrefixLoreCondition.once", "§7§eThis task can only be completed once!")
-        private val xPattern = group.pattern("$keyPrefixLoreCondition.x", "§c ?✖.*")
+        private val taskOnlyCompleteOncePattern = group.pattern("$keyPrefixCondition.once", "§7§eThis task can only be completed once!")
+        private val xPattern = group.pattern("$keyPrefixCondition.x", "§c ?✖.*")
 
         init {
+            SkyblockGuideHighlightFeature({ SkyHanniMod.feature.inventory.highlightMissingSkyBlockLevelGuide }, "level.guide", ".*Guide ➜.*", xPattern)
             SkyblockGuideHighlightFeature({ skyblockGuideConfig.abiphoneGuide }, "abiphone", "Miscellaneous ➜ Abiphone Contac", taskOnlyCompleteOncePattern)
             SkyblockGuideHighlightFeature({ skyblockGuideConfig.bankGuide }, "bank", "Core ➜ Bank Upgrades", taskOnlyCompleteOncePattern)
             SkyblockGuideHighlightFeature({ skyblockGuideConfig.travelGuide }, "travel", "Core ➜ Fast Travels Unlocked", taskOnlyCompleteOncePattern)

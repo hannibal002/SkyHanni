@@ -216,7 +216,6 @@ import at.hannibal2.skyhanni.features.inventory.SackDisplay
 import at.hannibal2.skyhanni.features.inventory.ShiftClickBrewing
 import at.hannibal2.skyhanni.features.inventory.ShiftClickEquipment
 import at.hannibal2.skyhanni.features.inventory.ShiftClickNPCSell
-import at.hannibal2.skyhanni.features.inventory.SkyBlockLevelGuideHelper
 import at.hannibal2.skyhanni.features.inventory.SkyblockGuideHighlightFeature
 import at.hannibal2.skyhanni.features.inventory.StatsTuning
 import at.hannibal2.skyhanni.features.inventory.tiarelay.TiaRelayHelper
@@ -555,9 +554,8 @@ class SkyHanniMod {
         loadModule(LesserOrbHider())
         loadModule(FishingHookDisplay())
         loadModule(CrimsonIsleReputationHelper(this))
-        SkyblockGuideHighlightFeature.load(this)
+        loadModule(SkyblockGuideHighlightFeature)
         loadModule(SharkFishCounter())
-        loadModule(SkyBlockLevelGuideHelper())
         loadModule(PowerStoneGuideFeatures())
         loadModule(OdgerWaypoint())
         loadModule(TiaRelayHelper())

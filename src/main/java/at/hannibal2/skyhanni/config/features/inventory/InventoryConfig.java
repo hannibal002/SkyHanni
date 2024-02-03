@@ -154,6 +154,7 @@ public class InventoryConfig {
     @Expose
     @ConfigOption(name = "Missing Tasks",
         desc = "Highlight missing tasks in the SkyBlock Level Guide inventory.")
+    // TODO move( , "inventory.highlightMissingSkyBlockLevelGuide", "inventory.skyblockGuideConfig.highlightMissingSkyBlockLevelGuide")
     @ConfigEditorBoolean
     @FeatureToggle
     public boolean highlightMissingSkyBlockLevelGuide = true;
