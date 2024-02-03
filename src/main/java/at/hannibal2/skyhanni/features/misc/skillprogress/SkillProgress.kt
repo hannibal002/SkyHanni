@@ -133,13 +133,11 @@ object SkillProgress {
             config.useIcon,
             config.usePercentage,
             config.useSkillName,
-            config.showOverflow
+            config.showOverflow,
+            config.showAllSkillProgress,
+            config.showEtaSkillProgress
         ) {
             updateDisplay()
-        }
-
-        LorenzUtils.onToggle(config.showAllSkillProgress, config.showEtaSkillProgress) {
-            update()
         }
     }
 

@@ -28,7 +28,7 @@ import java.util.regex.Matcher
 object SkillAPI {
     private val patternGroup = RepoPattern.group("display.skilldisplay")
     private val SKILL_PATTERN_PERCENT by patternGroup.pattern("skillpaternpercent", "\\+([\\d.,]+) (.+) \\(([\\d.]+)%\\)")
-    private val SKILL_PATTERN by patternGroup.pattern("skillpattern", "\\+([\\d.,]+) (.+) \\(([\\d.,]+)/([\\d.,]+)\\)")
+    private val SKILL_PATTERN by patternGroup.pattern("skillpattern", "\\+([\\d.,]+) (\\w+) \\(([\\d.,]+)/([\\d.,]+)\\)")
     private val SKILL_PATTERN_MULTIPLIER by patternGroup.pattern("skillpatternmultiplier", "\\+([\\d.,]+) (.+) \\(([\\d.,]+)/([\\d,.]+[kmb])\\)")
     private val skillTabPattern by patternGroup.pattern("skilltabpattern", "^§e§lSkills: §r§a(?<type>\\w+) (?<level>\\d+): §r§3(?<progress>.+)%\$")
     private val maxSkillTabPattern by patternGroup.pattern("maxskilltabpattern", "^§e§lSkills: §r§a(?<type>\\w+) (?<level>\\d+): §r§c§lMAX\$")
@@ -58,7 +58,7 @@ object SkillAPI {
     @SubscribeEvent
     fun onActionBar(event: LorenzActionBarEvent) {
         val actionBar = event.message.removeColor()
-
+        println("bar: $actionBar")
         if (lastActionBar != null && lastActionBar == actionBar) return
         lastActionBar = actionBar
         val components = SPACE_SPLITTER.splitToList(actionBar)
