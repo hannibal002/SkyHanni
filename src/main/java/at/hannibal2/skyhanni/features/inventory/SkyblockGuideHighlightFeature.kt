@@ -16,68 +16,37 @@ import org.intellij.lang.annotations.Language
 
 val group = RepoPattern.group("skyblockguide.highlight")
 
+private const val keyPrefixInventory = "inventory"
+private const val keyPrefixLoreCondition = "condition.lore"
+
 class SkyblockGuideHighlightFeature private constructor(
-    key: String,
     private val config: () -> Boolean,
-    @Language("RegExp")
-    inventory: String,
-    @Language("RegExp")
-    loreCondition: String,
+    inventory: RepoPattern,
+    loreCondition: RepoPattern,
     private val onSlotClicked: (GuiContainerEvent.SlotClickEvent) -> Unit = {},
 ) {
 
-    private val inventoryName by group.pattern("$key.inventory", inventory)
-    private val condition by group.pattern("$key.condition.lore", loreCondition)
+    private val inventoryPattern by inventory
+    private val conditionPattern by loreCondition
 
-    private var missing = mutableSetOf<Int>()
-    private var inInventory = false
+    private constructor(
+        config: () -> Boolean,
+        key: String,
+        @Language("RegExp")
+        inventory: String,
+        @Language("RegExp")
+        loreCondition: String,
+        onSlotClicked: (GuiContainerEvent.SlotClickEvent) -> Unit = {},
+    ) : this(config, group.pattern("$key.$keyPrefixInventory", inventory), group.pattern("$key.$keyPrefixLoreCondition", loreCondition), onSlotClicked)
 
-    @SubscribeEvent
-    fun onInventoryOpen(event: InventoryFullyOpenedEvent) {
-        if (!isEnabled()) return
-        if (!inventoryName.matches(event.inventoryName)) return
-
-        inInventory = true
-
-        missing.clear()
-
-        for ((slot, item) in event.inventoryItems) {
-            if (slot == 4) continue // Overview Item
-            val lore = item.getLore()
-            if (!condition.anyMatches(lore)) continue
-            missing.add(slot)
-        }
-    }
-
-    @SubscribeEvent
-    fun onInventoryClose(event: InventoryCloseEvent) {
-        inInventory = false
-    }
-
-    @SubscribeEvent
-    fun onInventoryClose(event: GuiContainerEvent.CloseWindowEvent) {
-        inInventory = false
-    }
-
-    @SubscribeEvent
-    fun onBackgroundDrawn(event: GuiContainerEvent.BackgroundDrawnEvent) {
-        if (!isEnabled()) return
-        if (!inInventory) return
-
-        event.gui.inventorySlots.inventorySlots
-            .filter { missing.contains(it.slotNumber) }
-            .forEach { it highlight LorenzColor.RED }
-    }
-
-    @SubscribeEvent
-    fun onSlotClick(event: GuiContainerEvent.SlotClickEvent) {
-        if (!isEnabled()) return
-        if (!inInventory) return
-        if (!missing.contains(event.slotId)) return
-        onSlotClicked.invoke(event)
-    }
-
-    fun isEnabled() = LorenzUtils.inSkyBlock && config.invoke()
+    private constructor(
+        config: () -> Boolean,
+        key: String,
+        @Language("RegExp")
+        inventory: String,
+        loreCondition: RepoPattern,
+        onSlotClicked: (GuiContainerEvent.SlotClickEvent) -> Unit = {},
+    ) : this(config, group.pattern("$key.$keyPrefixInventory", inventory), loreCondition, onSlotClicked)
 
     init {
         objectList.add(this)
@@ -87,27 +56,79 @@ class SkyblockGuideHighlightFeature private constructor(
 
         private val skyblockGuideConfig get() = SkyHanniMod.feature.inventory.skyblockGuideConfig
 
-        fun load(skyHanniMod: SkyHanniMod) = objectList.forEach { skyHanniMod.loadModule(it) }
+        fun load(skyHanniMod: SkyHanniMod) = skyHanniMod.loadModule(this)
 
         private val objectList = mutableListOf<SkyblockGuideHighlightFeature>()
 
+        private var activeObject: SkyblockGuideHighlightFeature? = null
+        private var missing = mutableSetOf<Int>()
+
+        fun isEnabled() = LorenzUtils.inSkyBlock
+        fun close() {
+            activeObject = null
+        }
+
+        @SubscribeEvent
+        fun onInventoryClose(event: InventoryCloseEvent) = close()
+
+        @SubscribeEvent
+        fun onInventoryClose(event: GuiContainerEvent.CloseWindowEvent) = close()
+
+        @SubscribeEvent
+        fun onSlotClick(event: GuiContainerEvent.SlotClickEvent) {
+            if (!isEnabled()) return
+            val current = activeObject ?: return
+            if (!missing.contains(event.slotId)) return
+            current.onSlotClicked.invoke(event)
+        }
+
+        @SubscribeEvent
+        fun onBackgroundDrawn(event: GuiContainerEvent.BackgroundDrawnEvent) {
+            if (!isEnabled()) return
+            val current = activeObject ?: return
+
+            event.gui.inventorySlots.inventorySlots
+                .filter { missing.contains(it.slotNumber) }
+                .forEach { it highlight LorenzColor.RED }
+        }
+
+        @SubscribeEvent
+        fun onInventoryOpen(event: InventoryFullyOpenedEvent) {
+            if (!isEnabled()) return
+            val current = objectList.firstOrNull { it.config.invoke() && it.inventoryPattern.matches(event.inventoryName) }
+                ?: return
+
+            missing.clear()
+            activeObject = current
+
+            for ((slot, item) in event.inventoryItems) {
+                if (slot == 4) continue // Overview Item
+                val lore = item.getLore()
+                if (!current.conditionPattern.anyMatches(lore)) continue
+                missing.add(slot)
+            }
+        }
+
+        private val taskOnlyCompleteOncePattern = group.pattern("$keyPrefixLoreCondition.once", "§7§eThis task can only be completed once!")
+        private val xPattern = group.pattern("$keyPrefixLoreCondition.x", "§c ?✖.*")
+
         init {
-            SkyblockGuideHighlightFeature("abiphone", { skyblockGuideConfig.abiphoneGuide }, "Miscellaneous ➜ Abiphone Contac", "§7§eThis task can only be completed once!")
-            SkyblockGuideHighlightFeature("bank", { skyblockGuideConfig.bankGuide }, "Core ➜ Bank Upgrades", "§7§eThis task can only be completed once!")
-            SkyblockGuideHighlightFeature("travel", { skyblockGuideConfig.travelGuide }, "Core ➜ Fast Travels Unlocked", "§7§eThis task can only be completed once!")
-            SkyblockGuideHighlightFeature("spooky", { skyblockGuideConfig.spookyGuide }, "Event ➜ Spooky Festival", "§7§eThis task can only be completed once!")
-            SkyblockGuideHighlightFeature("kuudra", { skyblockGuideConfig.kuudraGuide }, "Slaying ➜ Defeat Kuudra", "§7§eThis task can only be completed once!")
-            SkyblockGuideHighlightFeature("belt", { skyblockGuideConfig.beltGuide }, "Miscellaneous ➜ The Dojo", "§7§eThis task can only be completed once!")
-            SkyblockGuideHighlightFeature("jacob", { skyblockGuideConfig.jacobGuide }, "Event ➜ Jacob's Farming Contest", "§7§eThis task can only be completed once!")
-            SkyblockGuideHighlightFeature("dragon", { skyblockGuideConfig.dragonGuide }, "Slaying ➜ Slay Dragons", "§7§eThis task can only be completed once!")
-            SkyblockGuideHighlightFeature("story", { skyblockGuideConfig.storyGuide }, "Story ➜ Complete Objectives", "§7§eThis task can only be completed once!")
-            SkyblockGuideHighlightFeature("mining.rock", { skyblockGuideConfig.rockPetGuide }, "Mining ➜ Rock Milestones", "§7§eThis task can only be completed once!")
-            SkyblockGuideHighlightFeature("fishing.dolphin", { skyblockGuideConfig.dolphinGuide }, "Fishing ➜ Dolphin Milestones", "§7§eThis task can only be completed once!")
-            SkyblockGuideHighlightFeature("essence", { skyblockGuideConfig.essenceGuide }, "Essence Shop ➜.*", "§c ?✖.*")
-            SkyblockGuideHighlightFeature("minion", { skyblockGuideConfig.minionGuide }, "Crafted Minions", "§c✖.*")
-            SkyblockGuideHighlightFeature("slayer.defeat", { skyblockGuideConfig.slayerDefeatGuide }, "Slaying ➜ Defeat Slayers", "§c ✖.*")
-            SkyblockGuideHighlightFeature("harp", { skyblockGuideConfig.harpGuide }, "Miscellaneous ➜ Harp Songs", "§c ✖.*")
-            SkyblockGuideHighlightFeature("consumable", { skyblockGuideConfig.consumableGuide }, "Miscellaneous ➜ Consumable Items", "§7§eThis task can be completed \\d+ times!")
+            SkyblockGuideHighlightFeature({ skyblockGuideConfig.abiphoneGuide }, "abiphone", "Miscellaneous ➜ Abiphone Contac", taskOnlyCompleteOncePattern)
+            SkyblockGuideHighlightFeature({ skyblockGuideConfig.bankGuide }, "bank", "Core ➜ Bank Upgrades", taskOnlyCompleteOncePattern)
+            SkyblockGuideHighlightFeature({ skyblockGuideConfig.travelGuide }, "travel", "Core ➜ Fast Travels Unlocked", taskOnlyCompleteOncePattern)
+            SkyblockGuideHighlightFeature({ skyblockGuideConfig.spookyGuide }, "spooky", "Event ➜ Spooky Festival", taskOnlyCompleteOncePattern)
+            SkyblockGuideHighlightFeature({ skyblockGuideConfig.kuudraGuide }, "kuudra", "Slaying ➜ Defeat Kuudra", taskOnlyCompleteOncePattern)
+            SkyblockGuideHighlightFeature({ skyblockGuideConfig.beltGuide }, "belt", "Miscellaneous ➜ The Dojo", taskOnlyCompleteOncePattern)
+            SkyblockGuideHighlightFeature({ skyblockGuideConfig.jacobGuide }, "jacob", "Event ➜ Jacob's Farming Contest", taskOnlyCompleteOncePattern)
+            SkyblockGuideHighlightFeature({ skyblockGuideConfig.dragonGuide }, "dragon", "Slaying ➜ Slay Dragons", taskOnlyCompleteOncePattern)
+            SkyblockGuideHighlightFeature({ skyblockGuideConfig.storyGuide }, "story", "Story ➜ Complete Objectives", taskOnlyCompleteOncePattern)
+            SkyblockGuideHighlightFeature({ skyblockGuideConfig.rockPetGuide }, "mining.rock", "Mining ➜ Rock Milestones", taskOnlyCompleteOncePattern)
+            SkyblockGuideHighlightFeature({ skyblockGuideConfig.dolphinGuide }, "fishing.dolphin", "Fishing ➜ Dolphin Milestones", taskOnlyCompleteOncePattern)
+            SkyblockGuideHighlightFeature({ skyblockGuideConfig.essenceGuide }, "essence", "Essence Shop ➜.*", xPattern)
+            SkyblockGuideHighlightFeature({ skyblockGuideConfig.minionGuide }, "minion", "Crafted Minions", xPattern)
+            SkyblockGuideHighlightFeature({ skyblockGuideConfig.slayerDefeatGuide }, "slayer.defeat", "Slaying ➜ Defeat Slayers", xPattern)
+            SkyblockGuideHighlightFeature({ skyblockGuideConfig.harpGuide }, "harp", "Miscellaneous ➜ Harp Songs", xPattern)
+            SkyblockGuideHighlightFeature({ skyblockGuideConfig.consumableGuide }, "consumable", "Miscellaneous ➜ Consumable Items", "§7§eThis task can be completed \\d+ times!")
         }
     }
 }
