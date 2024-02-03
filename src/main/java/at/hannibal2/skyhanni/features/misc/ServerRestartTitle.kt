@@ -6,19 +6,14 @@ import at.hannibal2.skyhanni.events.LorenzTickEvent
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.TimeUtils
-import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import kotlin.time.Duration.Companion.seconds
 
 class ServerRestartTitle {
     private val config get() = SkyHanniMod.feature.misc
 
-    companion object {
-        val restartingPattern by RepoPattern.pattern(
-            "features.misc.serverrestart",
-            "§cServer closing(: (?<minutes>\\d+):(?<seconds>\\d+)| soon!)? ?§8.*"
-        )
-    }
+    // TODO USE SH-REPO
+    private val pattern = "§cServer closing: (?<minutes>\\d+):(?<seconds>\\d+) §8.*".toPattern()
 
     @SubscribeEvent
     fun onTick(event: LorenzTickEvent) {
@@ -28,7 +23,7 @@ class ServerRestartTitle {
         if (!event.repeatSeconds(1)) return
 
         for (line in ScoreboardData.sidebarLinesFormatted) {
-            restartingPattern.matchMatcher(line) {
+            pattern.matchMatcher(line) {
                 val minutes = group("minutes").toInt()
                 val seconds = group("seconds").toInt()
                 val totalSeconds = minutes * 60 + seconds
