@@ -7,6 +7,7 @@ import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.LorenzTickEvent
 import at.hannibal2.skyhanni.events.TabListUpdateEvent
 import at.hannibal2.skyhanni.utils.ChatUtils
+import at.hannibal2.skyhanni.utils.LanguageUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils.isRancherSign
 import at.hannibal2.skyhanni.utils.RenderUtils.renderString
@@ -89,7 +90,7 @@ class GardenOptimalSpeed {
     @SubscribeEvent
     fun onConfigLoad(event: ConfigLoadEvent) {
         for (value in CropType.entries) {
-            LorenzUtils.onToggle(value.getConfig()) {
+            LanguageUtils.onToggle(value.getConfig()) {
                 if (value == cropInHand) {
                     optimalSpeed = value.getOptimalSpeed()
                 }

@@ -16,9 +16,9 @@ import at.hannibal2.skyhanni.features.garden.GardenAPI.addCropIcon
 import at.hannibal2.skyhanni.features.garden.pests.PestAPI
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
+import at.hannibal2.skyhanni.utils.LanguageUtils.addAsSingletonList
+import at.hannibal2.skyhanni.utils.LanguageUtils.nextAfter
 import at.hannibal2.skyhanni.utils.LorenzUtils
-import at.hannibal2.skyhanni.utils.LorenzUtils.addAsSingletonList
-import at.hannibal2.skyhanni.utils.LorenzUtils.nextAfter
 import at.hannibal2.skyhanni.utils.NEUInternalName
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.RenderUtils.renderString
@@ -36,6 +36,7 @@ import kotlin.math.log10
 import kotlin.time.Duration.Companion.seconds
 
 class FarmingFortuneDisplay {
+
     private val tabFortuneUniversalPattern = " Farming Fortune: §r§6☘(?<fortune>\\d+)".toPattern()
     private val tabFortuneCropPattern =
         " (?<crop>Wheat|Carrot|Potato|Pumpkin|Sugar Cane|Melon|Cactus|Cocoa Beans|Mushroom|Nether Wart) Fortune: §r§6☘(?<fortune>\\d+)".toPattern()
@@ -161,7 +162,7 @@ class FarmingFortuneDisplay {
     private fun isEnabled(): Boolean = GardenAPI.inGarden() && config.display
 
     private fun getPestFFReduction(): Int = when (PestAPI.scoreboardPests) {
-        in 0..3 -> 0
+        in 0 .. 3 -> 0
         4 -> 5
         5 -> 15
         6 -> 30
@@ -170,6 +171,7 @@ class FarmingFortuneDisplay {
     }
 
     companion object {
+
         private val config get() = GardenAPI.config.farmingFortunes
         private val latestFF: MutableMap<CropType, Double>? get() = GardenAPI.storage?.latestTrueFarmingFortune
 

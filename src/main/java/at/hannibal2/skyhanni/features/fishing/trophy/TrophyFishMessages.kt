@@ -7,9 +7,9 @@ import at.hannibal2.skyhanni.events.LorenzChatEvent
 import at.hannibal2.skyhanni.features.fishing.trophy.TrophyFishManager.fishes
 import at.hannibal2.skyhanni.features.fishing.trophy.TrophyFishManager.getTooltip
 import at.hannibal2.skyhanni.utils.ConfigUtils
+import at.hannibal2.skyhanni.utils.LanguageUtils.addOrPut
+import at.hannibal2.skyhanni.utils.LanguageUtils.sumAllValues
 import at.hannibal2.skyhanni.utils.LorenzUtils
-import at.hannibal2.skyhanni.utils.LorenzUtils.addOrPut
-import at.hannibal2.skyhanni.utils.LorenzUtils.sumAllValues
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.NumberUtil.ordinal
 import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
@@ -18,6 +18,7 @@ import net.minecraft.util.ChatComponentText
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
 class TrophyFishMessages {
+
     private val trophyFishPattern =
         "§6§lTROPHY FISH! §r§bYou caught an? §r(?<displayName>§[0-9a-f](?:§k)?[\\w -]+) §r(?<displayRarity>§[0-9a-f]§l\\w+)§r§b\\.".toPattern()
     private val config get() = SkyHanniMod.feature.fishing.trophyFishing.chatMessages
@@ -51,12 +52,15 @@ class TrophyFishMessages {
         var edited = original
 
         if (config.enabled) {
-            edited = ChatComponentText("§6§lTROPHY FISH! " + when (config.design) {
-                DesignFormat.STYLE_1 -> if (amount == 1) "§c§lFIRST §r$displayRarity $displayName"
-                     else "§7$amount. §r$displayRarity $displayName"
-                DesignFormat.STYLE_2 -> "§bYou caught a $displayName $displayRarity§b. §7(${amount.addSeparators()})"
-                else -> "§bYou caught your ${amount.addSeparators()}${amount.ordinal()} $displayRarity $displayName§b."
-            })
+            edited = ChatComponentText(
+                "§6§lTROPHY FISH! " + when (config.design) {
+                    DesignFormat.STYLE_1 -> if (amount == 1) "§c§lFIRST §r$displayRarity $displayName"
+                    else "§7$amount. §r$displayRarity $displayName"
+
+                    DesignFormat.STYLE_2 -> "§bYou caught a $displayName $displayRarity§b. §7(${amount.addSeparators()})"
+                    else -> "§bYou caught your ${amount.addSeparators()}${amount.ordinal()} $displayRarity $displayName§b."
+                }
+            )
         }
 
         if (config.totalAmount) {
@@ -79,7 +83,7 @@ class TrophyFishMessages {
 
     private fun shouldBlockTrophyFish(rarity: TrophyRarity, amount: Int) =
         config.bronzeHider && rarity == TrophyRarity.BRONZE && amount != 1
-                || config.silverHider && rarity == TrophyRarity.SILVER && amount != 1
+            || config.silverHider && rarity == TrophyRarity.SILVER && amount != 1
 
     @SubscribeEvent
     fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {

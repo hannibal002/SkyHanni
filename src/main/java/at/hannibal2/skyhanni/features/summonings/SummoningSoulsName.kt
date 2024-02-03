@@ -7,8 +7,8 @@ import at.hannibal2.skyhanni.events.LorenzWorldChangeEvent
 import at.hannibal2.skyhanni.utils.EntityUtils
 import at.hannibal2.skyhanni.utils.EntityUtils.getNameTagWith
 import at.hannibal2.skyhanni.utils.EntityUtils.hasSkullTexture
+import at.hannibal2.skyhanni.utils.LanguageUtils.sorted
 import at.hannibal2.skyhanni.utils.LorenzUtils
-import at.hannibal2.skyhanni.utils.LorenzUtils.sorted
 import at.hannibal2.skyhanni.utils.LorenzVec
 import at.hannibal2.skyhanni.utils.RenderUtils.drawString
 import at.hannibal2.skyhanni.utils.getLorenzVec
@@ -34,7 +34,7 @@ class SummoningSoulsName {
     fun onTick(event: LorenzTickEvent) {
         if (!isEnabled()) return
 
-        //TODO use packets instead of this
+        // TODO use packets instead of this
         check()
     }
 
@@ -68,7 +68,7 @@ class SummoningSoulsName {
 
         val entityList = EntityUtils.getEntities<EntityArmorStand>()
         souls.keys.removeIf { it !in entityList }
-        //TODO fix overhead!
+        // TODO fix overhead!
 //        mobs.keys.removeIf { it !in world.loadedEntityList }
     }
 

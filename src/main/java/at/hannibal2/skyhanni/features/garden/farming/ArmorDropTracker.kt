@@ -14,9 +14,9 @@ import at.hannibal2.skyhanni.features.garden.CropType
 import at.hannibal2.skyhanni.features.garden.GardenAPI
 import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName
-import at.hannibal2.skyhanni.utils.LorenzUtils.addAsSingletonList
-import at.hannibal2.skyhanni.utils.LorenzUtils.addOrPut
-import at.hannibal2.skyhanni.utils.LorenzUtils.sortedDesc
+import at.hannibal2.skyhanni.utils.LanguageUtils.addAsSingletonList
+import at.hannibal2.skyhanni.utils.LanguageUtils.addOrPut
+import at.hannibal2.skyhanni.utils.LanguageUtils.sortedDesc
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.tracker.SkyHanniTracker
@@ -36,6 +36,7 @@ object ArmorDropTracker {
     { drawDisplay(it) }
 
     class Data : TrackerData() {
+
         override fun reset() {
             drops.clear()
         }

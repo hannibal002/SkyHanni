@@ -11,8 +11,8 @@ import at.hannibal2.skyhanni.events.LorenzChatEvent
 import at.hannibal2.skyhanni.events.LorenzTickEvent
 import at.hannibal2.skyhanni.events.LorenzWorldChangeEvent
 import at.hannibal2.skyhanni.utils.ConfigUtils
-import at.hannibal2.skyhanni.utils.LorenzUtils.addAsSingletonList
-import at.hannibal2.skyhanni.utils.LorenzUtils.afterChange
+import at.hannibal2.skyhanni.utils.LanguageUtils.addAsSingletonList
+import at.hannibal2.skyhanni.utils.LanguageUtils.afterChange
 import at.hannibal2.skyhanni.utils.LorenzUtils.isInIsland
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.NumberUtil.formatNumber
@@ -88,6 +88,7 @@ object PowderTracker {
     { formatDisplay(drawDisplay(it)) }
 
     class Data : TrackerData() {
+
         override fun reset() {
             rewards.clear()
             totalChestPicked = 0
@@ -299,7 +300,7 @@ object PowderTracker {
     private fun MutableList<List<Any>>.addPerHour(
         map: MutableMap<PowderChestReward, Long>,
         reward: PowderChestReward,
-        info: ResourceInfo
+        info: ResourceInfo,
     ) {
         val mithrilCount = map.getOrDefault(reward, 0).addSeparators()
         val mithrilPerHour = format(info.perHour)
@@ -364,7 +365,7 @@ object PowderTracker {
         var lastEstimated: Long,
         var stoppedChecks: Int,
         var perHour: Double,
-        val perMin: MutableList<Long>
+        val perMin: MutableList<Long>,
     )
 
     private fun isEnabled() = IslandType.CRYSTAL_HOLLOWS.isInIsland() && config.enabled

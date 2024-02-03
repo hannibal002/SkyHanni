@@ -13,7 +13,6 @@ import at.hannibal2.skyhanni.utils.LanguageUtils.editCopy
 import at.hannibal2.skyhanni.utils.LorenzColor
 import at.hannibal2.skyhanni.utils.LorenzLogger
 import at.hannibal2.skyhanni.utils.LorenzUtils
-import at.hannibal2.skyhanni.utils.LorenzUtils.editCopy
 import at.hannibal2.skyhanni.utils.NEUInternalName
 import net.minecraft.item.ItemStack
 

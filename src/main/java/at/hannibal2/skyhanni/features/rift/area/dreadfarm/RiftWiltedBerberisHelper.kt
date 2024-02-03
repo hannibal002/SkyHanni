@@ -7,9 +7,9 @@ import at.hannibal2.skyhanni.features.rift.RiftAPI
 import at.hannibal2.skyhanni.utils.BlockUtils.getBlockAt
 import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName
+import at.hannibal2.skyhanni.utils.LanguageUtils.editCopy
 import at.hannibal2.skyhanni.utils.LocationUtils
 import at.hannibal2.skyhanni.utils.LocationUtils.distanceToPlayer
-import at.hannibal2.skyhanni.utils.LorenzUtils.editCopy
 import at.hannibal2.skyhanni.utils.LorenzVec
 import at.hannibal2.skyhanni.utils.RenderUtils.draw3DLine
 import at.hannibal2.skyhanni.utils.RenderUtils.drawDynamicText
@@ -22,12 +22,14 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import java.awt.Color
 
 class RiftWiltedBerberisHelper {
+
     private val config get() = RiftAPI.config.area.dreadfarm.wiltedBerberis
     private var isOnFarmland = false
     private var hasFarmingToolInHand = false
     private var list = listOf<WiltedBerberis>()
 
     class WiltedBerberis(var currentParticles: LorenzVec) {
+
         var previous: LorenzVec? = null
         var moving = true
         var y = 0.0
@@ -137,5 +139,4 @@ class RiftWiltedBerberisHelper {
     }
 
     private fun isEnabled() = RiftAPI.inRift() && RiftAPI.inDreadfarm() && config.enabled
-
 }

@@ -9,8 +9,8 @@ import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.ItemUtils.isRune
 import at.hannibal2.skyhanni.utils.ItemUtils.name
 import at.hannibal2.skyhanni.utils.ItemUtils.nameWithEnchantment
+import at.hannibal2.skyhanni.utils.LanguageUtils.sortedDesc
 import at.hannibal2.skyhanni.utils.LorenzRarity
-import at.hannibal2.skyhanni.utils.LorenzUtils.sortedDesc
 import at.hannibal2.skyhanni.utils.NEUInternalName
 import at.hannibal2.skyhanni.utils.NEUInternalName.Companion.asInternalName
 import at.hannibal2.skyhanni.utils.NEUItems
@@ -55,6 +55,7 @@ import net.minecraft.item.ItemStack
 import java.util.Locale
 
 object EstimatedItemValueCalculator {
+
     private val config get() = SkyHanniMod.feature.misc.estimatedItemValues
     private val additionalCostFunctions = listOf(
         ::addAttributeCost,
@@ -157,7 +158,7 @@ object EstimatedItemValueCalculator {
     private fun String.fixMending() = if (this == "MENDING") "VITALITY" else this
 
     private fun getPriceOrCompositePriceForAttribute(attributeName: String, level: Int): Double? {
-        return (1..10).mapNotNull { lowerLevel ->
+        return (1 .. 10).mapNotNull { lowerLevel ->
             "$attributeName;$lowerLevel".asInternalName().getPriceOrNull()
                 ?.let { it / (1 shl lowerLevel) * (1 shl level).toDouble() }
         }.minOrNull()
@@ -190,7 +191,7 @@ object EstimatedItemValueCalculator {
     private fun getReforgeStoneApplyCost(
         stack: ItemStack,
         reforgeCosts: JsonObject,
-        reforgeStone: NEUInternalName
+        reforgeStone: NEUInternalName,
     ): Int? {
         var itemRarity = stack.getItemRarityOrNull() ?: return null
 
@@ -448,7 +449,7 @@ object EstimatedItemValueCalculator {
         internalName: NEUInternalName,
         list: MutableList<String>,
         label: String,
-        shouldIgnorePrice: Boolean
+        shouldIgnorePrice: Boolean,
     ): Double {
         val price = internalName.getPrice()
         val name = internalName.getNameOrRepoError()
@@ -571,7 +572,6 @@ object EstimatedItemValueCalculator {
                     5 -> multiplier = 16
                 }
                 level = 1
-
             }
             if (internalName.startsWith("ENCHANTED_BOOK_BUNDLE_")) {
                 multiplier = 5

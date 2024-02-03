@@ -7,7 +7,7 @@ import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.ItemUtils.getSkullOwner
 import at.hannibal2.skyhanni.utils.ItemUtils.getSkullTexture
 import at.hannibal2.skyhanni.utils.ItemUtils.name
-import at.hannibal2.skyhanni.utils.LorenzUtils.nextAfter
+import at.hannibal2.skyhanni.utils.LanguageUtils.nextAfter
 import at.hannibal2.skyhanni.utils.NumberUtil.formatNumber
 import at.hannibal2.skyhanni.utils.OSUtils
 import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
@@ -21,6 +21,7 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 object TestCopyBestiaryValues {
 
     class BestiarityObject {
+
         @Expose
         var name: String = ""
 
@@ -81,7 +82,7 @@ object TestCopyBestiaryValues {
         obj.cap = rawCap.toInt()
 
         val mobs = mutableListOf<String>()
-        for (i in 10..43) {
+        for (i in 10 .. 43) {
             val stack = inventoryItems[i] ?: continue
             val stackName = stack.name ?: continue
             pattern.matchMatcher(stackName.removeColor()) {

@@ -11,11 +11,12 @@ import at.hannibal2.skyhanni.features.fishing.SeaCreatureManager
 import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName
+import at.hannibal2.skyhanni.utils.LanguageUtils
+import at.hannibal2.skyhanni.utils.LanguageUtils.addAsSingletonList
+import at.hannibal2.skyhanni.utils.LanguageUtils.addOrPut
+import at.hannibal2.skyhanni.utils.LanguageUtils.sumAllValues
 import at.hannibal2.skyhanni.utils.LorenzUtils
-import at.hannibal2.skyhanni.utils.LorenzUtils.addAsSingletonList
 import at.hannibal2.skyhanni.utils.LorenzUtils.addButton
-import at.hannibal2.skyhanni.utils.LorenzUtils.addOrPut
-import at.hannibal2.skyhanni.utils.LorenzUtils.sumAllValues
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.StringUtils.allLettersFirstUppercase
@@ -38,6 +39,7 @@ object SeaCreatureTracker {
     private var isTrophyFishing = false
 
     class Data : TrackerData() {
+
         override fun reset() {
             amount.clear()
         }
@@ -143,7 +145,7 @@ object SeaCreatureTracker {
 
     @SubscribeEvent
     fun onConfigLoad(event: ConfigLoadEvent) {
-        LorenzUtils.onToggle(config.showPercentage) {
+        LanguageUtils.onToggle(config.showPercentage) {
             tracker.update()
         }
     }
@@ -172,7 +174,7 @@ object SeaCreatureTracker {
     }
 
     @SubscribeEvent
-    fun onTick (event: LorenzTickEvent) {
+    fun onTick(event: LorenzTickEvent) {
         if (lastArmorCheck.passedSince() < 3.seconds) return
         lastArmorCheck = SimpleTimeMark.now()
         isTrophyFishing = isWearingTrophyArmor()

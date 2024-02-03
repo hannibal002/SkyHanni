@@ -1,6 +1,6 @@
 package at.hannibal2.skyhanni.test
 
-import at.hannibal2.skyhanni.utils.LorenzUtils.makeAccessible
+import at.hannibal2.skyhanni.utils.LanguageUtils.makeAccessible
 import net.minecraft.block.Block
 import net.minecraft.block.BlockFire
 import net.minecraft.init.Bootstrap
@@ -13,6 +13,7 @@ import java.util.concurrent.locks.ReentrantLock
 
 class BootstrapHook : BeforeAllCallback, Extension {
     companion object {
+
         private val LOCK: Lock = ReentrantLock()
         private var bootstrapped = false
     }

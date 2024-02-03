@@ -5,10 +5,10 @@ import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.events.LorenzRenderWorldEvent
 import at.hannibal2.skyhanni.events.LorenzTickEvent
 import at.hannibal2.skyhanni.events.LorenzWorldChangeEvent
+import at.hannibal2.skyhanni.utils.ColorUtils.toChromaColor
+import at.hannibal2.skyhanni.utils.LanguageUtils.editCopy
 import at.hannibal2.skyhanni.utils.LocationUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils
-import at.hannibal2.skyhanni.utils.LorenzUtils.editCopy
-import at.hannibal2.skyhanni.utils.LorenzUtils.toChromaColor
 import at.hannibal2.skyhanni.utils.LorenzVec
 import at.hannibal2.skyhanni.utils.RenderUtils.draw3DLine
 import at.hannibal2.skyhanni.utils.RenderUtils.exactLocation
@@ -20,6 +20,7 @@ import kotlin.time.Duration.Companion.milliseconds
 import kotlin.time.Duration.Companion.seconds
 
 class CosmeticFollowingLine {
+
     private val config get() = SkyHanniMod.feature.misc.cosmetic.followingLine
 
     private var locations = mapOf<LorenzVec, LocationSpot>()
@@ -49,7 +50,7 @@ class CosmeticFollowingLine {
     private fun renderFar(
         event: LorenzRenderWorldEvent,
         firstPerson: Boolean,
-        color: Color
+        color: Color,
     ) {
         val last7 = locations.keys.toList().takeLast(7)
         val last2 = locations.keys.toList().takeLast(2)

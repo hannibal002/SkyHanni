@@ -6,7 +6,7 @@ import at.hannibal2.skyhanni.features.rift.RiftAPI
 import at.hannibal2.skyhanni.mixins.hooks.RenderLivingEntityHelper
 import at.hannibal2.skyhanni.utils.EntityUtils.getEntities
 import at.hannibal2.skyhanni.utils.ItemUtils.getSkullTexture
-import at.hannibal2.skyhanni.utils.LorenzUtils.editCopy
+import at.hannibal2.skyhanni.utils.LanguageUtils.editCopy
 import at.hannibal2.skyhanni.utils.RenderUtils
 import at.hannibal2.skyhanni.utils.RenderUtils.drawDynamicText
 import at.hannibal2.skyhanni.utils.RenderUtils.exactLocation
@@ -55,11 +55,11 @@ class VoltHighlighter {
             if (config.voltMoodMeter)
                 RenderLivingEntityHelper.setEntityColor(
                     entity, when (state) {
-                        VoltState.FRIENDLY -> 0x8000FF00.toInt()
-                        VoltState.DOING_LIGHTNING -> 0x800000FF.toInt()
-                        VoltState.HOSTILE -> 0x80FF0000.toInt()
-                        else -> 0
-                    }
+                    VoltState.FRIENDLY -> 0x8000FF00.toInt()
+                    VoltState.DOING_LIGHTNING -> 0x800000FF.toInt()
+                    VoltState.HOSTILE -> 0x80FF0000.toInt()
+                    else -> 0
+                }
                 ) { config.voltMoodMeter }
             if (state == VoltState.DOING_LIGHTNING && config.voltRange) {
                 RenderUtils.drawCylinderInWorld(
@@ -108,7 +108,6 @@ class VoltHighlighter {
 
             else -> VoltState.NO_VOLT
         }
-
     }
 
     private fun getVoltState(entity: Entity): VoltState {
