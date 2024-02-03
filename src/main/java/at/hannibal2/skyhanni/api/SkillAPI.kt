@@ -172,7 +172,7 @@ object SkillAPI {
     private fun getSkillInfo(currentLevel: Int, currentXp: Long, neededXp: Long, totalXp: Long): LorenzUtils.Quad<Int, Long, Long, Long> {
         return if (currentLevel == 50 && activeSkill in excludedSkills)
             calculateOverFlow50(currentXp)
-        else if (currentLevel >= 60 && SkyHanniMod.feature.misc.skillProgressDisplayConfig.showOverflow)
+        else if (currentLevel >= 60 && SkyHanniMod.feature.misc.skillProgressDisplayConfig.showOverflow.get())
             calculateOverFlow(currentXp)
         else
             LorenzUtils.Quad(currentLevel, currentXp, neededXp, totalXp)

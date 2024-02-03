@@ -9,6 +9,7 @@ import at.hannibal2.skyhanni.api.SkillAPI.showDisplay
 import at.hannibal2.skyhanni.api.SkillAPI.skillMap
 import at.hannibal2.skyhanni.api.SkillAPI.skillXPInfoMap
 import at.hannibal2.skyhanni.api.SkillAPI.stackMap
+import at.hannibal2.skyhanni.events.ConfigLoadEvent
 import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.LorenzTickEvent
 import at.hannibal2.skyhanni.events.PreProfileSwitchEvent
@@ -45,30 +46,30 @@ object SkillProgress {
         if (!isEnabled()) return
         if (showDisplay) {
             config.position.renderStringsAndItems(display, posLabel = "Skill Progress")
-            if (config.progressBarConfig.enabled && display.isNotEmpty()) {
-                val progress = if (config.progressBarConfig.useTexturedBar) {
+            if (config.progressBarConfig.enabled.get() && display.isNotEmpty()) {
+                val progress = if (config.progressBarConfig.useTexturedBar.get()) {
                     val factor = (skillExpPercentage.toFloat().coerceAtMost(1f)) * 182
                     Renderable.texturedProgressBar(factor,
                         Color(SpecialColour.specialToChromaRGB(config.progressBarConfig.barStartColor)),
                         texture = config.progressBarConfig.texturedBar.usedTexture.get(),
-                        useChroma = config.progressBarConfig.useChroma)
+                        useChroma = config.progressBarConfig.useChroma.get())
                 } else
                     Renderable.progressBar(skillExpPercentage,
                         Color(SpecialColour.specialToChromaRGB(config.progressBarConfig.barStartColor)),
                         Color(SpecialColour.specialToChromaRGB(config.progressBarConfig.barStartColor)),
                         width = config.progressBarConfig.regularBar.width,
                         height = config.progressBarConfig.regularBar.height,
-                        useChroma = config.progressBarConfig.useChroma)
+                        useChroma = config.progressBarConfig.useChroma.get())
 
                 config.barPosition.renderRenderables(listOf(progress), posLabel = "Skill Progress Bar")
             }
         }
 
-        if (config.showAllSkillProgress) {
+        if (config.showAllSkillProgress.get()) {
             config.allSkillPosition.renderRenderables(allDisplay, posLabel = "All Skills Display")
         }
 
-        if (config.showEtaSkillProgress) {
+        if (config.showEtaSkillProgress.get()) {
             config.etaPosition.renderRenderables(etaDisplay, posLabel = "Skill ETA")
         }
 
@@ -85,7 +86,7 @@ object SkillProgress {
     @SubscribeEvent
     fun onTick(event: LorenzTickEvent) {
         if (!isEnabled()) return
-        if (lastUpdate.passedSince() > 3.seconds) showDisplay = config.alwaysShow
+        if (lastUpdate.passedSince() > 3.seconds) showDisplay = config.alwaysShow.get()
 
         if (event.repeatSeconds(1)) {
             update()
@@ -118,6 +119,28 @@ object SkillProgress {
         for (reward in rewards)
             LorenzUtils.chat(reward, false)
         LorenzUtils.chat("  §3§l▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬", false)
+    }
+
+    @SubscribeEvent
+    fun onConfigLoad(event: ConfigLoadEvent) {
+        LorenzUtils.onToggle(
+            config.enabled,
+            config.progressBarConfig.enabled,
+            config.progressBarConfig.useChroma,
+            config.progressBarConfig.useTexturedBar,
+            config.alwaysShow,
+            config.showActionLeft,
+            config.useIcon,
+            config.usePercentage,
+            config.useSkillName,
+            config.showOverflow
+        ) {
+            updateDisplay()
+        }
+
+        LorenzUtils.onToggle(config.showAllSkillProgress, config.showEtaSkillProgress) {
+            update()
+        }
     }
 
 
@@ -178,22 +201,22 @@ object SkillProgress {
         val skillMap = skillMap ?: return@buildList
         val skill = skillMap[activeSkill] ?: return@buildList
         add(buildList {
-            if (config.showLevel)
+            if (config.showLevel.get())
                 add("§9[§d${skill.level}§9] ")
 
-            if (config.useIcon)
+            if (config.useIcon.get())
                 add(Renderable.itemStack(stackMap.getOrDefault(activeSkill.firstLetterUppercase(), defaultStack), 1.5))
 
             add(buildString {
                 append("§b+${skill.lastGain} ")
 
-                if (config.useSkillName)
+                if (config.useSkillName.get())
                     append("${activeSkill.firstLetterUppercase()} ")
 
                 val percent = if (skill.currentXpMax == 0L) 100F else 100F * skill.currentXp / skill.currentXpMax
                 skillExpPercentage = (percent.toDouble() / 100)
 
-                if (config.usePercentage)
+                if (config.usePercentage.get())
                     append("§7(§6${percent.roundToPrecision(2)}%§7)")
                 else {
                     if (skill.currentXpMax == 0L)
@@ -202,7 +225,7 @@ object SkillProgress {
                         append("§7(§6${skill.currentXp.addSeparators()}§7/§6${skill.currentXpMax.addSeparators()}§7)")
                 }
 
-                if (config.showActionLeft && percent != 100f) {
+                if (config.showActionLeft.get() && percent != 100f) {
                     append(" - ")
                     if (skill.lastGain != "") {
                         val actionLeft = (ceil(skill.currentXpMax.toDouble() - skill.currentXp) / skill.lastGain.formatNumber()).toLong().addSeparators()
@@ -255,5 +278,5 @@ object SkillProgress {
         xpInfo.isActive = true
     }
 
-    private fun isEnabled() = LorenzUtils.inSkyBlock && config.enabled
+    private fun isEnabled() = LorenzUtils.inSkyBlock && config.enabled.get()
 }

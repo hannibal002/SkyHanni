@@ -18,7 +18,7 @@ public class SkillProgressDisplayConfig {
     @ConfigOption(name = "Enabled", desc = "Show the Skill Progress Display.")
     @ConfigEditorBoolean
     @FeatureToggle
-    public boolean enabled = false;
+    public Property<Boolean> enabled = Property.of(false);
 
     @Expose
     @ConfigOption(name = "Progress Bar Config", desc = "")
@@ -30,17 +30,17 @@ public class SkillProgressDisplayConfig {
         @Expose
         @ConfigOption(name = "Enabled", desc = "Enable/Disable the progress bar.")
         @ConfigEditorBoolean
-        public boolean enabled = false;
+        public Property<Boolean> enabled = Property.of(false);
 
         @Expose
         @ConfigOption(name = "Textured Bar", desc = "Use a textured progress bar.\n§eCan be changed with a resource pack.")
         @ConfigEditorBoolean
-        public boolean useTexturedBar = false;
+        public Property<Boolean> useTexturedBar = Property.of(false);
 
         @Expose
         @ConfigOption(name = "Chroma", desc = "Use the SBA like chroma effect on the bar.\n§eIf enabled, ignore the Bar Color setting.")
         @ConfigEditorBoolean
-        public boolean useChroma = false;
+        public Property<Boolean> useChroma = Property.of(false);
 
         @Expose
         @ConfigOption(name = "Bar Color", desc = "Color of the progress bar.\n§eIgnored if Chroma is enabled")
@@ -122,48 +122,48 @@ public class SkillProgressDisplayConfig {
     @Expose
     @ConfigOption(name = "Always Show", desc = "Always show the skill progress.")
     @ConfigEditorBoolean
-    public boolean alwaysShow = false;
+    public Property<Boolean> alwaysShow = Property.of(false);;
 
     @Expose
     @ConfigOption(name = "Show action left", desc = "Show action left until you reach the next level.")
     @ConfigEditorBoolean
-    public boolean showActionLeft = false;
+    public Property<Boolean> showActionLeft = Property.of(false);;
 
     @Expose
     @ConfigOption(name = "Use percentage", desc = "Use percentage instead of XP.")
     @ConfigEditorBoolean
-    public boolean usePercentage = false;
+    public Property<Boolean> usePercentage = Property.of(false);
 
     @Expose
     @ConfigOption(name = "Use Icon", desc = "Show the skill icon in the display.")
     @ConfigEditorBoolean
-    public boolean useIcon = true;
+    public Property<Boolean> useIcon = Property.of(true);
 
     @Expose
     @ConfigOption(name = "Use Skill Name", desc = "Show the skill name in the display.")
     @ConfigEditorBoolean
-    public boolean useSkillName = false;
+    public Property<Boolean> useSkillName = Property.of(false);
 
     @Expose
     @ConfigOption(name = "Show Level", desc = "Show your current level in the display.")
     @ConfigEditorBoolean
-    public boolean showLevel = true;
+    public Property<Boolean> showLevel = Property.of(true);
 
     @Expose
     @ConfigOption(name = "Show Overflow XP", desc = "Show overflow XP and level.\n§eOnly work when level 60.")
     @ConfigEditorBoolean
-    public boolean showOverflow = false;
+    public Property<Boolean> showOverflow = Property.of(false);
 
     @Expose
     @ConfigOption(name = "All Skills Display", desc = "Show a display with all skills progress.")
     @ConfigEditorBoolean
-    public boolean showAllSkillProgress = false;
+    public Property<Boolean> showAllSkillProgress = Property.of(false);
 
     @Expose
     @ConfigOption(name = "Skill ETA Display", desc = "Show a display of your current active skill\n" +
         "with the XP/hour rate and ETA to the next level.")
     @ConfigEditorBoolean
-    public boolean showEtaSkillProgress = false;
+    public Property<Boolean> showEtaSkillProgress = Property.of(false);
 
     @Expose
     public Position position = new Position(348, -105, false, true);
