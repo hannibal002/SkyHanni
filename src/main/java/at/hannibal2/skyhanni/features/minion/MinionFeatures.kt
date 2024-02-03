@@ -133,7 +133,7 @@ class MinionFeatures {
         if (!minionTitlePattern.find(event.inventoryName)) return
 
         event.inventoryItems[48]?.let {
-            if (minionCollectItemPattern.matches(it.name ?: "")) {
+            if (minionCollectItemPattern.matches(it.name)) {
                 MinionOpenEvent(event.inventoryName, event.inventoryItems).postAndCatch()
                 return
             }
@@ -255,7 +255,7 @@ class MinionFeatures {
     }
 
     @SubscribeEvent
-    fun onChatMessage(event: LorenzChatEvent) {
+    fun onChat(event: LorenzChatEvent) {
         if (!enable()) return
 
         val message = event.message

@@ -243,8 +243,6 @@ interface Renderable {
 
             override fun render(posX: Int, posY: Int) {
                 GlStateManager.pushMatrix()
-                if (Minecraft.getMinecraft().currentScreen == null || Minecraft.getMinecraft().currentScreen is GuiChat)
-                    GlStateManager.translate(0F, 0F, -145F)
                 any.renderOnScreen(0F, 0F, scaleMultiplier = scale)
                 GlStateManager.popMatrix()
             }
@@ -264,9 +262,9 @@ interface Renderable {
             }
         }
 
-        fun placeholder(width: Int, height: Int = 10) = object : Renderable {
-            override val width = width
-            override val height = height
+        fun placeholder(width: Int) = object : Renderable {
+            override val width: Int = width
+            override val height = 10
 
             override fun render(posX: Int, posY: Int) {
             }

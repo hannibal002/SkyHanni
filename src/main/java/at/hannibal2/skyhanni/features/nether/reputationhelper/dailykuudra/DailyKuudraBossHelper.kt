@@ -3,6 +3,7 @@ package at.hannibal2.skyhanni.features.nether.reputationhelper.dailykuudra
 import at.hannibal2.skyhanni.config.Storage
 import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.data.ScoreboardData
+import at.hannibal2.skyhanni.data.jsonobjects.repo.CrimsonIsleReputationJson.ReputationQuest
 import at.hannibal2.skyhanni.events.LorenzChatEvent
 import at.hannibal2.skyhanni.events.LorenzRenderWorldEvent
 import at.hannibal2.skyhanni.features.nether.reputationhelper.CrimsonIsleReputationHelper
@@ -11,9 +12,8 @@ import at.hannibal2.skyhanni.utils.LorenzColor
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils.addAsSingletonList
 import at.hannibal2.skyhanni.utils.LorenzVec
-import at.hannibal2.skyhanni.utils.NEUItems
+import at.hannibal2.skyhanni.utils.NEUItems.getItemStack
 import at.hannibal2.skyhanni.utils.RenderUtils.drawDynamicText
-import at.hannibal2.skyhanni.data.jsonobjects.repo.CrimsonIsleReputationJson.ReputationQuest
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
 class DailyKuudraBossHelper(private val reputationHelper: CrimsonIsleReputationHelper) {
@@ -38,8 +38,7 @@ class DailyKuudraBossHelper(private val reputationHelper: CrimsonIsleReputationH
 
     @SubscribeEvent
     fun onChat(event: LorenzChatEvent) {
-        if (!LorenzUtils.inSkyBlock) return
-        if (LorenzUtils.skyBlockIsland != IslandType.KUUDRA_ARENA) return
+        if (!LorenzUtils.inKuudraFight) return
         if (!reputationHelper.config.enabled) return
 
         val message = event.message
@@ -72,15 +71,11 @@ class DailyKuudraBossHelper(private val reputationHelper: CrimsonIsleReputationH
                 val result = if (tier.doneToday) "§aDone" else "§bTodo"
                 val displayName = tier.getDisplayName()
                 val displayItem = tier.displayItem
-                if (displayItem == null) {
-                    display.addAsSingletonList("  $displayName: $result")
-                } else {
-                    val lineList = mutableListOf<Any>()
-                    lineList.add(" ")
-                    lineList.add(NEUItems.getItemStack(displayItem))
-                    lineList.add("$displayName: $result")
-                    display.add(lineList)
-                }
+                val lineList = mutableListOf<Any>()
+                lineList.add(" ")
+                lineList.add(displayItem.getItemStack())
+                lineList.add("$displayName: $result")
+                display.add(lineList)
             }
         }
     }

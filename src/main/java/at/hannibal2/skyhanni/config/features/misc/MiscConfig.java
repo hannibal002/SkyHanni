@@ -20,7 +20,7 @@ public class MiscConfig {
     @ConfigOption(name = "Hide Armor", desc = "")
     @Accordion
     @Expose
-    // TOOD maybe we can migrate this already
+    // TODO maybe we can migrate this already
     public HideArmorConfig hideArmor2 = new HideArmorConfig();
 
     @Expose
@@ -94,6 +94,11 @@ public class MiscConfig {
     public TrackerConfig tracker = new TrackerConfig();
 
     @Expose
+    @ConfigOption(name = "Pet Candy Display", desc = "")
+    @Accordion
+    public PetCandyDisplayConfig petCandy = new PetCandyDisplayConfig();
+
+    @Expose
     @ConfigOption(name = "Exp Bottles", desc = "Hides all the experience orbs lying on the ground.")
     @ConfigEditorBoolean
     @FeatureToggle
@@ -108,6 +113,7 @@ public class MiscConfig {
     @FeatureToggle
     public boolean brewingStandOverlay = true;
 
+    // TODO move into scoreboard accordion
     @Expose
     @ConfigOption(name = "Red Scoreboard Numbers", desc = "Hide the red scoreboard numbers on the right side of the screen.")
     @ConfigEditorBoolean
@@ -119,6 +125,12 @@ public class MiscConfig {
     @ConfigEditorBoolean
     @FeatureToggle
     public boolean hidePiggyScoreboard = true;
+
+    @Expose
+    @ConfigOption(name = "Color Month Names", desc = "Color the month names in the Scoreboard.")
+    @ConfigEditorBoolean
+    @FeatureToggle
+    public boolean colorMonthNames = false;
 
     @Expose
     @ConfigOption(name = "Explosions Hider", desc = "Hide explosions.")
@@ -152,12 +164,6 @@ public class MiscConfig {
 
     @Expose
     public Position playerMovementSpeedPos = new Position(394, 124, false, true);
-
-    @Expose
-    @ConfigOption(name = "Pet Candy Used", desc = "Show the number of Pet Candy used on a pet.")
-    @ConfigEditorBoolean
-    @FeatureToggle
-    public boolean petCandyUsed = true;
 
     @Expose
     @ConfigOption(name = "Server Restart Title", desc = "Show a title with seconds remaining until the server restarts after a Game Update or Scheduled Restart.")
@@ -206,6 +212,14 @@ public class MiscConfig {
 
     @Expose
     @ConfigOption(
+        name = "Lesser Orb of Healing Hider",
+        desc = "Hides the Lesser Orb of Healing.")
+    @ConfigEditorBoolean
+    @FeatureToggle
+    public boolean lesserOrbHider = false;
+
+    @Expose
+    @ConfigOption(
         name = "Lock Mouse Message",
         desc = "Show a message in chat when toggling the /shmouselock.")
     @ConfigEditorBoolean
@@ -222,4 +236,11 @@ public class MiscConfig {
 
     @Expose
     public int limboTimePB = 0;
+
+    @Expose
+    @ConfigOption(name = "Fix Ghost Entities", desc = "Removes ghost entities caused by a Hypixel bug. " +
+            "This included Diana, Dungeon and Crimson Isle mobs and nametags.")
+    @ConfigEditorBoolean
+    @FeatureToggle
+    public boolean fixGhostEntities = true;
 }

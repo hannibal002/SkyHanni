@@ -36,7 +36,7 @@ class SlayerMiniBossFeatures {
         val maxHealth = event.maxHealth
         for (bossType in SlayerMiniBossType.entries) {
             if (!bossType.health.any { entity.hasMaxHealth(it, true, maxHealth) }) continue
-            if (!bossType.clazz.isInstance(entity)) continue
+            if (bossType.clazz != entity.javaClass) continue
 
             miniBosses = miniBosses.editCopy { add(entity) }
             RenderLivingEntityHelper.setEntityColor(entity, LorenzColor.AQUA.toColor().withAlpha(127))

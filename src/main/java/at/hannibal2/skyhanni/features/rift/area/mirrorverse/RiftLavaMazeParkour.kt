@@ -1,5 +1,6 @@
 package at.hannibal2.skyhanni.features.rift.area.mirrorverse
 
+import at.hannibal2.skyhanni.data.jsonobjects.repo.ParkourJson
 import at.hannibal2.skyhanni.events.CheckRenderEntityEvent
 import at.hannibal2.skyhanni.events.ConfigLoadEvent
 import at.hannibal2.skyhanni.events.LorenzChatEvent
@@ -9,7 +10,6 @@ import at.hannibal2.skyhanni.features.rift.RiftAPI
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils.toChromaColor
 import at.hannibal2.skyhanni.utils.ParkourHelper
-import at.hannibal2.skyhanni.data.jsonobjects.repo.ParkourJson
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
 class RiftLavaMazeParkour {
@@ -41,7 +41,7 @@ class RiftLavaMazeParkour {
     }
 
     @SubscribeEvent
-    fun onChatMessage(event: LorenzChatEvent) {
+    fun onChat(event: LorenzChatEvent) {
         if (!isEnabled()) return
 
         if (event.message == "§c§lEEK! THE LAVA OOFED YOU!") {
