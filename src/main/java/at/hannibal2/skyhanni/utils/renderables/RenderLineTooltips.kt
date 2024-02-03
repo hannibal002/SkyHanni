@@ -2,6 +2,7 @@ package at.hannibal2.skyhanni.utils.renderables
 
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.LorenzColor
+import at.hannibal2.skyhanni.utils.renderables.RenderableUtils.renderXAligned
 import io.github.moulberry.notenoughupdates.util.Utils
 import net.minecraft.client.Minecraft
 import net.minecraft.client.gui.ScaledResolution
@@ -125,11 +126,10 @@ object RenderLineTooltips {
             GlStateManager.translate(x.toFloat(), tooltipY.toFloat(), 0f)
             var yTranslateSum = 0
             for (line in tips) {
-                // TODO
-                line?.render(x, tooltipY)
-                val y = line?.height ?: 0
-                GlStateManager.translate(0f, y.toFloat(), 0f)
-                yTranslateSum += y
+                line?.renderXAligned(x, tooltipY, tooltipTextWidth)
+                val yShift = line?.height ?: 0
+                GlStateManager.translate(0f, yShift.toFloat(), 0f)
+                yTranslateSum += yShift
             }
             GlStateManager.translate(-x.toFloat(), -tooltipY.toFloat() + yTranslateSum.toFloat(), 0f)
             GlStateManager.enableLighting()
