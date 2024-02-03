@@ -1,6 +1,7 @@
 package at.hannibal2.skyhanni.features.rift.area.stillgorechateau
 
 import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
+import at.hannibal2.skyhanni.data.jsonobjects.repo.RiftEffigiesJson
 import at.hannibal2.skyhanni.events.LorenzRenderWorldEvent
 import at.hannibal2.skyhanni.events.LorenzTickEvent
 import at.hannibal2.skyhanni.events.LorenzWorldChangeEvent
@@ -19,7 +20,7 @@ import at.hannibal2.skyhanni.utils.RenderUtils.drawDynamicText
 import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.TimeUtils
 import at.hannibal2.skyhanni.utils.getLorenzVec
-import at.hannibal2.skyhanni.data.jsonobjects.repo.RiftEffigiesJson
+import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraft.entity.item.EntityArmorStand
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
@@ -35,8 +36,11 @@ class RiftBloodEffigies {
         5 to -1L,
     )
 
-    // TODO USE SH-REPO
-    private val effigiesTimerPattern = "§eRespawn §c(?<time>.*) §7\\(or click!\\)".toPattern()
+    companion object {
+        private val group = RepoPattern.group("features.rift.area.stillgorechateau.bloodeffigies")
+        val effigiesTimerPattern by group.pattern("effigiestimer", "§eRespawn §c(?<time>.*) §7\\(or click!\\)")
+        val heartsPattern by group.pattern("hearts","Effigies: (?<hearts>((§[7c])?⧯)*)")
+    }
 
     @SubscribeEvent
     fun onWorldChange(event: LorenzWorldChangeEvent) {
@@ -64,7 +68,7 @@ class RiftBloodEffigies {
         if (!isEnabled()) return
 
         val line = event.newList.firstOrNull { it.startsWith("Effigies:") } ?: return
-        val hearts = "Effigies: (?<hearts>.*)".toPattern().matchMatcher(line) {
+        val hearts = effigiesTimerPattern.matchMatcher(line) {
             group("hearts")
         } ?: return
 
