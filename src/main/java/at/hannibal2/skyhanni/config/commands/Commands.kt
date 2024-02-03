@@ -55,6 +55,7 @@ import at.hannibal2.skyhanni.test.SkyHanniConfigSearchResetCommand
 import at.hannibal2.skyhanni.test.SkyHanniDebugsAndTests
 import at.hannibal2.skyhanni.test.TestBingo
 import at.hannibal2.skyhanni.test.WorldEdit
+import at.hannibal2.skyhanni.test.command.CopyActionBarCommand
 import at.hannibal2.skyhanni.test.command.CopyItemCommand
 import at.hannibal2.skyhanni.test.command.CopyNearbyEntitiesCommand
 import at.hannibal2.skyhanni.test.command.CopyNearbyParticlesCommand
@@ -350,7 +351,14 @@ object Commands {
             "shcopyentities",
             "Copies entities in the specified radius around the player to the clipboard"
         ) { CopyNearbyEntitiesCommand.command(it) }
-        registerCommand("shcopytablist", "Copies the tab list data to the clipboard") { TabListData.copyCommand(it) }
+        registerCommand(
+            "shcopytablist",
+            "Copies the tab list data to the clipboard"
+        ) { TabListData.copyCommand(it) }
+        registerCommand(
+            "shcopyactionbar",
+            "Copies the action bar to the clipboard, including formatting codes"
+        ) { CopyActionBarCommand.command(it) }
         registerCommand(
             "shcopyscoreboard",
             "Copies the scoreboard data to the clipboard"

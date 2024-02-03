@@ -6,10 +6,10 @@ import at.hannibal2.skyhanni.config.features.combat.ghostcounter.GhostCounterCon
 import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.data.ProfileStorageData
 import at.hannibal2.skyhanni.data.SkillExperience
+import at.hannibal2.skyhanni.events.ActionBarUpdateEvent
 import at.hannibal2.skyhanni.events.ConfigLoadEvent
 import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.InventoryFullyOpenedEvent
-import at.hannibal2.skyhanni.events.LorenzActionBarEvent
 import at.hannibal2.skyhanni.events.LorenzChatEvent
 import at.hannibal2.skyhanni.events.LorenzTickEvent
 import at.hannibal2.skyhanni.events.PurseChangeCause
@@ -312,12 +312,12 @@ object GhostCounter {
     }
 
     @SubscribeEvent
-    fun onActionBar(event: LorenzActionBarEvent) {
+    fun onActionBarUpdate(event: ActionBarUpdateEvent) {
         if (!isEnabled()) return
         if (!inMist) return
-        combatSectionPattern.matchMatcher(event.message) {
+        combatSectionPattern.matchMatcher(event.actionBar) {
             if (group("skillName").lowercase() != "combat") return
-            parseCombatSection(event.message)
+            parseCombatSection(event.actionBar)
         }
     }
 
