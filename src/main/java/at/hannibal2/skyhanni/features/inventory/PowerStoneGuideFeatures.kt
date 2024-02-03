@@ -45,6 +45,11 @@ class PowerStoneGuideFeatures {
     }
 
     @SubscribeEvent
+    fun onInventoryClose(event: GuiContainerEvent.CloseWindowEvent) {
+        inInventory = false
+    }
+
+    @SubscribeEvent
     fun onBackgroundDrawn(event: GuiContainerEvent.BackgroundDrawnEvent) {
         if (!isEnabled()) return
         if (!inInventory) return

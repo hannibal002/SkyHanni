@@ -134,7 +134,7 @@ object GriffinBurrowHelper {
     }
 
     @SubscribeEvent
-    fun onChatMessage(event: LorenzChatEvent) {
+    fun onChat(event: LorenzChatEvent) {
         if (!isEnabled()) return
         if (event.message.startsWith("§c ☠ §r§7You were killed by §r")) {
             particleBurrows = particleBurrows.editCopy { keys.removeIf { this[it] == BurrowType.MOB } }

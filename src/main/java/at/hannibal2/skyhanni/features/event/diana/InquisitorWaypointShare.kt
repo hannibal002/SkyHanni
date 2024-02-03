@@ -79,7 +79,7 @@ object InquisitorWaypointShare {
     }
 
     @SubscribeEvent
-    fun onChatMessage(event: LorenzChatEvent) {
+    fun onChat(event: LorenzChatEvent) {
         if (!isEnabled()) return
         val message = event.message
         if (message.contains("§eYou dug out")) {

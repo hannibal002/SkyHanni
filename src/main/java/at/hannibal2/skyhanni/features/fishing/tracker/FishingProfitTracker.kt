@@ -211,5 +211,5 @@ object FishingProfitTracker {
         tracker.resetCommand(args, "shresetfishingtracker")
     }
 
-    fun isEnabled() = LorenzUtils.inSkyBlock && config.enabled
+    fun isEnabled() = LorenzUtils.inSkyBlock && config.enabled && !LorenzUtils.inKuudraFight
 }

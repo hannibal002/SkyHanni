@@ -103,6 +103,7 @@
 + Added toggle to count double hook catches as two catches in Sea Creature Tracker. - hannibal2
 + Smarter check if the player is fishing for all fishing related displays. - hannibal2
 + Hide Sea Creature Tracker when wearing full Trophy Hunter armor. - martimavocado
++ Disabled Fishing Profit/SC Tracker in Kuudra. - CalMWolfs
 
 #### Mining Changes
 
@@ -120,6 +121,8 @@
 + Added option to hide pet candy count on maxed out pets. - CalMWolfs
 + Added option to change the size of the Pet Item Display Icon in inventories. - Thunderblade73
 + Allow putting Water Bottles into Potion Bag. - alexia
++ Skip unavailable experiments for number of clicks in Super Pair Clicks Alert in the experimentation table. - alexia
++ Hide non-clickable items in Basket of Seeds, Nether Wart Pouch & Trick or Treat Bag. - alexia
 
 #### Dungeon Changes
 
@@ -214,6 +217,8 @@
 + Fixed rogue sword ability taking into account mage cooldown reduction. - Empa
 + Reset item ability cooldowns on the world switch. - hannibal2
 + Fixed Crap Hat of Celebration not getting detected as accessory in Hide Not Clickable Items. - Empa
++ Fixed rune price calculation in Chest Value. - hannibal2
++ Fixed Power Stone Guide Highlight shows in other inventories when exiting via command. - hannibal2
 
 #### Bingo Fixes
 
@@ -229,6 +234,7 @@
 
 + Fixed items in SkyHanni GUI elements rendering over minecraft menus. - Thunderblade73
 + Fixed GUI Editor hotkey working while inside a NEU PV text box. - Thunderblade73
++ Fixed render overlapping problem with chat, SkyHanni GUIs and title. - Thunderblade73
 
 #### Winter Fixes
 
@@ -243,6 +249,7 @@
 + Fixed Daily City Project Reminder is still working on already-released projects. - alexia
 + Fixed a typo in Odger Waypoint config. - Empa
 + Fixed NPC typos in config. - absterge
++ Fixed rare error in Harp Features. - Thunderblade73
 
 ### Technical Changes
 
