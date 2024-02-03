@@ -268,7 +268,7 @@ object LorenzUtils {
 
     fun getSBMonthByName(month: String): Int {
         var monthNr = 0
-        for (i in 1..12) {
+        for (i in 1 .. 12) {
             val monthName = SkyBlockTime.monthName(i)
             if (month == monthName) {
                 monthNr = i
@@ -712,7 +712,4 @@ object LorenzUtils {
     fun <T> weakReferenceList(): MutableSet<T> = Collections.newSetFromMap(WeakHashMap<T, Boolean>())
 
     fun <T> MutableCollection<T>.filterToMutable(predicate: (T) -> Boolean) = filterTo(mutableListOf(), predicate)
-
-    val Long.ticks get() = (this * 50).milliseconds
-    val Int.ticks get() = (this * 50).milliseconds
 }
