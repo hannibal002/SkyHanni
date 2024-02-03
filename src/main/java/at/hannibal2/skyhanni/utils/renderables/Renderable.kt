@@ -9,7 +9,6 @@ import io.github.moulberry.moulconfig.gui.GuiScreenElementWrapper
 import io.github.moulberry.notenoughupdates.util.Utils
 import net.minecraft.client.Minecraft
 import net.minecraft.client.gui.Gui
-import net.minecraft.client.gui.GuiChat
 import net.minecraft.client.gui.inventory.GuiEditSign
 import net.minecraft.client.renderer.GlStateManager
 import net.minecraft.item.ItemStack
@@ -18,11 +17,12 @@ import java.util.Collections
 import kotlin.math.max
 
 interface Renderable {
+
     val width: Int
     val height: Int
     fun isHovered(posX: Int, posY: Int) = currentRenderPassMousePosition?.let { (x, y) ->
-        x in (posX..posX + width)
-            && y in (posY..posY + height) // TODO: adjust for variable height?
+        x in (posX .. posX + width)
+            && y in (posY .. posY + height) // TODO: adjust for variable height?
     } ?: false
 
     /**
@@ -32,6 +32,7 @@ interface Renderable {
     fun render(posX: Int, posY: Int)
 
     companion object {
+
         val logger = LorenzLogger("debug/renderable")
         val list = mutableMapOf<Pair<Int, Int>, List<Int>>()
 
@@ -135,7 +136,7 @@ interface Renderable {
             return object : Renderable {
                 override val width: Int
                     get() = render.width
-                override val height = 11
+                override val height = 10
 
                 val tipsRender = tips.mapNotNull { fromAny(it) }
 
