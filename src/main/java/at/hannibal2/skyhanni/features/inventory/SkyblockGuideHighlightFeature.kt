@@ -4,6 +4,8 @@ import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.events.GuiContainerEvent
 import at.hannibal2.skyhanni.events.InventoryCloseEvent
 import at.hannibal2.skyhanni.events.InventoryFullyOpenedEvent
+import at.hannibal2.skyhanni.events.LorenzToolTipEvent
+import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.ItemUtils.name
 import at.hannibal2.skyhanni.utils.LorenzColor
@@ -25,6 +27,7 @@ class SkyblockGuideHighlightFeature private constructor(
     inventory: RepoPattern,
     loreCondition: RepoPattern,
     private val onSlotClicked: (GuiContainerEvent.SlotClickEvent) -> Unit = {},
+    private val onTooltip: (LorenzToolTipEvent) -> Unit = {},
 ) {
 
     private val inventoryPattern by inventory
@@ -38,7 +41,8 @@ class SkyblockGuideHighlightFeature private constructor(
         @Language("RegExp")
         loreCondition: String,
         onSlotClicked: (GuiContainerEvent.SlotClickEvent) -> Unit = {},
-    ) : this(config, group.pattern("$key.$keyPrefixInventory", inventory), group.pattern("$key.$keyPrefixCondition", loreCondition), onSlotClicked)
+        onTooltip: (LorenzToolTipEvent) -> Unit = {},
+    ) : this(config, group.pattern("$key.$keyPrefixInventory", inventory), group.pattern("$key.$keyPrefixCondition", loreCondition), onSlotClicked, onTooltip)
 
     private constructor(
         config: () -> Boolean,
@@ -47,7 +51,8 @@ class SkyblockGuideHighlightFeature private constructor(
         inventory: String,
         loreCondition: RepoPattern,
         onSlotClicked: (GuiContainerEvent.SlotClickEvent) -> Unit = {},
-    ) : this(config, group.pattern("$key.$keyPrefixInventory", inventory), loreCondition, onSlotClicked)
+        onTooltip: (LorenzToolTipEvent) -> Unit = {},
+    ) : this(config, group.pattern("$key.$keyPrefixInventory", inventory), loreCondition, onSlotClicked, onTooltip)
 
     init {
         objectList.add(this)
@@ -92,6 +97,14 @@ class SkyblockGuideHighlightFeature private constructor(
         }
 
         @SubscribeEvent
+        fun onTooltip(event: LorenzToolTipEvent) {
+            if (!isEnabled()) return
+            val current = activeObject ?: return
+            if (!missing.contains(event.slot.slotNumber)) return
+            current.onTooltip.invoke(event)
+        }
+
+        @SubscribeEvent
         fun onInventoryOpen(event: InventoryFullyOpenedEvent) {
             if (!isEnabled()) return
             val current = objectList.firstOrNull { it.config.invoke() && it.inventoryPattern.matches(event.inventoryName) }
@@ -111,11 +124,23 @@ class SkyblockGuideHighlightFeature private constructor(
         private val taskOnlyCompleteOncePattern = group.pattern("$keyPrefixCondition.once", "§7§eThis task can only be completed once!")
         private val xPattern = group.pattern("$keyPrefixCondition.x", "§c ?✖.*")
 
+        private val openWikiOnClick: (GuiContainerEvent.SlotClickEvent) -> Unit = { event ->
+            val internalName = event.item?.getInternalName()
+            if (internalName != null) {
+                LorenzUtils.sendCommandToServer("wiki ${internalName.asString()}")
+            }
+        }
+
+        private val openWikiTooltip: (LorenzToolTipEvent) -> Unit = { event ->
+            event.toolTip.add("")
+            event.toolTip.add("§7§eClick to view on the SkyBlock Wiki!")
+        }
+
         init {
             SkyblockGuideHighlightFeature({ SkyHanniMod.feature.inventory.highlightMissingSkyBlockLevelGuide }, "level.guide", ".*Guide ➜.*", xPattern)
             SkyblockGuideHighlightFeature({ skyblockGuideConfig.abiphoneGuide }, "abiphone", "Miscellaneous ➜ Abiphone Contac", taskOnlyCompleteOncePattern)
             SkyblockGuideHighlightFeature({ skyblockGuideConfig.bankGuide }, "bank", "Core ➜ Bank Upgrades", taskOnlyCompleteOncePattern)
-            SkyblockGuideHighlightFeature({ skyblockGuideConfig.travelGuide }, "travel", "Core ➜ Fast Travels Unlocked", taskOnlyCompleteOncePattern)
+            SkyblockGuideHighlightFeature({ skyblockGuideConfig.travelGuide }, "travel", "Core ➜ Fast Travels Unlocked", taskOnlyCompleteOncePattern, { LorenzUtils.sendCommandToServer("wiki MUSEUM_TRAVEL_SCROLL") }, openWikiTooltip) // The items do not have proper internal names and using the fact that all travel scrolls lead to the same wiki page
             SkyblockGuideHighlightFeature({ skyblockGuideConfig.spookyGuide }, "spooky", "Event ➜ Spooky Festival", taskOnlyCompleteOncePattern)
             SkyblockGuideHighlightFeature({ skyblockGuideConfig.kuudraGuide }, "kuudra", "Slaying ➜ Defeat Kuudra", taskOnlyCompleteOncePattern)
             SkyblockGuideHighlightFeature({ skyblockGuideConfig.beltGuide }, "belt", "Miscellaneous ➜ The Dojo", taskOnlyCompleteOncePattern)
@@ -128,7 +153,7 @@ class SkyblockGuideHighlightFeature private constructor(
             SkyblockGuideHighlightFeature({ skyblockGuideConfig.minionGuide }, "minion", "Crafted Minions", xPattern)
             SkyblockGuideHighlightFeature({ skyblockGuideConfig.slayerDefeatGuide }, "slayer.defeat", "Slaying ➜ Defeat Slayers", xPattern)
             SkyblockGuideHighlightFeature({ skyblockGuideConfig.harpGuide }, "harp", "Miscellaneous ➜ Harp Songs", xPattern)
-            SkyblockGuideHighlightFeature({ skyblockGuideConfig.consumableGuide }, "consumable", "Miscellaneous ➜ Consumable Items", "§7§eThis task can be completed \\d+ times!")
+            SkyblockGuideHighlightFeature({ skyblockGuideConfig.consumableGuide }, "consumable", "Miscellaneous ➜ Consumable Items", "§7§eThis task can be completed \\d+ times!", openWikiOnClick, openWikiTooltip)
         }
     }
 }
