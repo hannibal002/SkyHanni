@@ -30,7 +30,7 @@ class RepoManager(private val configLocation: File) {
     private var latestRepoCommit: String? = null
     private val repoLocation: File = File(configLocation, "repo")
     private var error = false
-    private var lastUpdate = SimpleTimeMark.farPast()
+    private var lastRepoUpdate = SimpleTimeMark.farPast()
 
     companion object {
         val successfulConstants = mutableListOf<String>()
@@ -85,8 +85,7 @@ class RepoManager(private val configLocation: File) {
                 val file = File(configLocation, "repo")
                 if (file.exists() && currentCommitJSON != null && currentCommitJSON["sha"].asString == latestRepoCommit
                 ) {
-                    if (unsuccessfulConstants.isEmpty() || (command && lastUpdate.passedSince() < 1.minutes)) {
-
+                    if (unsuccessfulConstants.isEmpty() && lastRepoUpdate.passedSince() < 1.minutes) {
                         if (command) {
                             LorenzUtils.chat("§7The repo is already up to date!")
                             atomicShouldManuallyReload.set(false)
@@ -94,7 +93,7 @@ class RepoManager(private val configLocation: File) {
                         return@supplyAsync false
                     }
                 }
-                lastUpdate = SimpleTimeMark.now()
+                lastRepoUpdate = SimpleTimeMark.now()
                 RepoUtils.recursiveDelete(repoLocation)
                 repoLocation.mkdirs()
                 val itemsZip = File(repoLocation, "sh-repo-main.zip")
