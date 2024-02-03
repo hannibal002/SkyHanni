@@ -2,7 +2,6 @@ package at.hannibal2.skyhanni.data.jsonobjects.repo;
 
 import at.hannibal2.skyhanni.features.fishing.trophy.TrophyRarity;
 import com.google.gson.annotations.Expose;
-
 import java.util.Map;
 
 public class TrophyFishJson {

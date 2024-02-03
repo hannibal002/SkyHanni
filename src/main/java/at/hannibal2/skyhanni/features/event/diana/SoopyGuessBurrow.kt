@@ -204,7 +204,7 @@ class SoopyGuessBurrow {
 
                         val dencity = 5
 
-                        for (o in 0 .. dencity) {
+                        for (o in 0..dencity) {
                             lastPos[0] += xOff / dencity
                             lastPos[2] += zOff / dencity
 

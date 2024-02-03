@@ -101,7 +101,7 @@ class BazaarApi {
             if (slot == null) continue
             val stack = slot.stack ?: continue
 
-            if (chest.inventorySlots.indexOf(slot) !in 9 .. 44) {
+            if (chest.inventorySlots.indexOf(slot) !in 9..44) {
                 continue
             }
 

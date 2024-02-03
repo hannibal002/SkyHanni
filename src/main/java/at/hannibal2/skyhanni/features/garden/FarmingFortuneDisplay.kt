@@ -162,7 +162,7 @@ class FarmingFortuneDisplay {
     private fun isEnabled(): Boolean = GardenAPI.inGarden() && config.display
 
     private fun getPestFFReduction(): Int = when (PestAPI.scoreboardPests) {
-        in 0 .. 3 -> 0
+        in 0..3 -> 0
         4 -> 5
         5 -> 15
         6 -> 30

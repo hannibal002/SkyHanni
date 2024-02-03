@@ -23,6 +23,7 @@ enum class VisitorReward(private val rawInternalName: String, val displayName: S
 //     val displayName by lazy { itemStack.nameWithEnchantment ?: internalName.asString() }
 
     companion object {
+
         fun getByInternalName(internalName: NEUInternalName) = entries.firstOrNull { it.internalName == internalName }
     }
 

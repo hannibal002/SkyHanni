@@ -9,7 +9,6 @@ import io.github.moulberry.moulconfig.annotations.ConfigEditorDropdown;
 import io.github.moulberry.moulconfig.annotations.ConfigEditorText;
 import io.github.moulberry.moulconfig.annotations.ConfigOption;
 import io.github.moulberry.moulconfig.observer.Property;
-
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;

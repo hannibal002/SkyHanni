@@ -101,7 +101,7 @@ object GardenPlotIcon {
             return
         }
         if (editMode != 0) {
-            if (event.slotId in 54 .. 89) {
+            if (event.slotId in 54..89) {
                 event.isCanceled = true
                 copyStack = event.slot.stack ?: return
                 // TODO different format, not bold or show not in chat at all.

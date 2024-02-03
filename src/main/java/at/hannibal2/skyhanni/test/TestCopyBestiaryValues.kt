@@ -82,7 +82,7 @@ object TestCopyBestiaryValues {
         obj.cap = rawCap.toInt()
 
         val mobs = mutableListOf<String>()
-        for (i in 10 .. 43) {
+        for (i in 10..43) {
             val stack = inventoryItems[i] ?: continue
             val stackName = stack.name ?: continue
             pattern.matchMatcher(stackName.removeColor()) {

@@ -136,7 +136,7 @@ object SkyBlockItemModifierUtils {
         for (attributes in it.keySet) {
             if (attributes == "ability_scroll") {
                 val tagList = it.getTagList(attributes, 8)
-                for (i in 0 .. 3) {
+                for (i in 0..3) {
                     val text = tagList.get(i).toString()
                     if (text == "END") break
                     list.add(text.replace("\"", "").asInternalName())

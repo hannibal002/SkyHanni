@@ -14,6 +14,7 @@ import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
 class GardenInventoryNumbers {
+
     private val config get() = GardenAPI.config.number
 
     private var patternUpgradeTier = "§7Current Tier: §[ea](?<tier>.*)§7/§a.*".toPattern()
@@ -59,5 +60,4 @@ class GardenInventoryNumbers {
         event.move(3, "garden.numberCropUpgrades", "garden.number.cropUpgrades")
         event.move(3, "garden.numberComposterUpgrades", "garden.number.composterUpgrades")
     }
-
 }

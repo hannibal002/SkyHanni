@@ -48,7 +48,7 @@ class DojoRankDisplay {
                     testRankPattern.matchMatcher(line) {
                         val rank = group("rank")
                         val score = group("score").toInt()
-                        val color = if (score in 0 .. 99) "§c" else "§a"
+                        val color = if (score in 0..99) "§c" else "§a"
                         totalScore += score
                         add("$testColor$testName§f: $rank §7($color${score.addSeparators()}§7)")
                     }

@@ -16,6 +16,7 @@ import net.minecraftforge.fml.common.eventhandler.EventPriority
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
 class StatsTuning {
+
     private val config get() = SkyHanniMod.feature.inventory.statsTuning
     private val patternStatPoints = "§7Stat has: §e(?<amount>\\d+) points?".toPattern()
 
@@ -28,7 +29,6 @@ class StatsTuning {
         if (config.templateStats && inventoryName == "Stats Tuning") if (templateStats(stack, event)) return
         if (config.selectedStats && inventoryName == "Accessory Bag Thaumaturgy" && selectedStats(stack, event)) return
         if (config.points && inventoryName == "Stats Tuning") points(stack, event)
-
     }
 
     private fun templateStats(stack: ItemStack, event: RenderInventoryItemTipEvent): Boolean {

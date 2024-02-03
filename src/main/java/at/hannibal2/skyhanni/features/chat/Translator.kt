@@ -126,7 +126,7 @@ class Translator {
             val firstSentence = (layer2?.get(0) as? JsonArray)?.get(0).toString()
             var messageToSend = firstSentence.substring(0, firstSentence.length - 1)
             if (layer2 != null) {
-                for (sentenceIndex in 1 ..< layer2.size()) {
+                for (sentenceIndex in 1..<layer2.size()) {
                     val sentence = (layer2.get(sentenceIndex) as JsonArray).get(0).toString()
                     val sentenceWithoutQuotes = sentence.substring(1, sentence.length - 1)
                     messageToSend = "$messageToSend$sentenceWithoutQuotes"
@@ -158,7 +158,7 @@ class Translator {
             }
             val language = args[0]
             var message = ""
-            for (i in 1 ..< args.size) {
+            for (i in 1..<args.size) {
                 message = "$message${args[i]} "
             }
 

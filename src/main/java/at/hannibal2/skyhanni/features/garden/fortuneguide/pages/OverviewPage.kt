@@ -12,6 +12,7 @@ import at.hannibal2.skyhanni.utils.GuiRenderUtils
 import at.hannibal2.skyhanni.utils.TimeUtils
 
 class OverviewPage : FFGuideGUI.FFGuidePage() {
+
     private var equipmentFF = mutableMapOf<FFTypes, Double>()
     private var armorFF = mutableMapOf<FFTypes, Double>()
 

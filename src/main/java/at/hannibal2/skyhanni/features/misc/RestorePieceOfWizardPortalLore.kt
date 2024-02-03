@@ -23,5 +23,4 @@ class RestorePieceOfWizardPortalLore {
             event.toolTip.add(5, "§7Earned by: $recipient")
         }
     }
-
 }
