@@ -32,7 +32,7 @@ class CompactBingoChat {
     )
 
     @SubscribeEvent
-    fun onChatMessage(event: LorenzChatEvent) {
+    fun onChat(event: LorenzChatEvent) {
         if (!config.enabled) return
         if (!LorenzUtils.isBingoProfile && !config.outsideBingo) return
 

@@ -40,7 +40,7 @@ class BlazeSlayerDaggerHelper {
     private var lastNearest: HellionShield? = null
 
     @SubscribeEvent
-    fun onChatMessage(event: LorenzChatEvent) {
+    fun onChat(event: LorenzChatEvent) {
         if (!LorenzUtils.inSkyBlock) return
         if (!config.hideDaggerWarning) return
 

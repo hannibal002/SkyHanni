@@ -41,7 +41,7 @@ class CurrentPetDisplay {
     )
 
     @SubscribeEvent
-    fun onChatMessage(event: LorenzChatEvent) {
+    fun onChat(event: LorenzChatEvent) {
         findPetInChat(event.message)?.let {
             PetAPI.currentPet = it
             if (config.hideAutopet) {

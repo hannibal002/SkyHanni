@@ -28,7 +28,7 @@ class GardenCropMilestoneFix {
     private val tabListCropProgress = mutableMapOf<CropType, Long>()
 
     @SubscribeEvent
-    fun onChatMessage(event: LorenzChatEvent) {
+    fun onChat(event: LorenzChatEvent) {
         levelUpPattern.matchMatcher(event.message) {
             val cropName = group("crop")
             val crop = CropType.getByNameOrNull(cropName) ?: return

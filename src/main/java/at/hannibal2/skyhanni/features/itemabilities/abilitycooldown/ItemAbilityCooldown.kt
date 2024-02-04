@@ -317,7 +317,7 @@ class ItemAbilityCooldown {
     private fun ItemStack.getIdentifier() = getItemUuid() ?: getItemId()
 
     @SubscribeEvent
-    fun onChatMessage(event: LorenzChatEvent) {
+    fun onChat(event: LorenzChatEvent) {
         if (!isEnabled()) return
 
         val message = event.message

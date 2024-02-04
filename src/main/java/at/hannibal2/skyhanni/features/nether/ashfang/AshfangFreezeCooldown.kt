@@ -26,7 +26,7 @@ object AshfangFreezeCooldown {
     private var lastHit = SimpleTimeMark.farPast()
 
     @SubscribeEvent
-    fun onChatMessage(event: LorenzChatEvent) {
+    fun onChat(event: LorenzChatEvent) {
         if (!isEnabled()) return
 
         val message = event.message

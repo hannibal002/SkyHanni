@@ -190,7 +190,7 @@ class DungeonChatFilter {
     /// </editor-fold>
 
     @SubscribeEvent
-    fun onChatMessage(event: LorenzChatEvent) {
+    fun onChat(event: LorenzChatEvent) {
         if (!LorenzUtils.onHypixel || config.dungeonFilteredMessageTypes.isEmpty()) return
 
         // Workaround since the potion message gets always sent at that moment when SkyBlock is set as false
