@@ -4,7 +4,6 @@ import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName
 import at.hannibal2.skyhanni.utils.ItemUtils.getItemName
-import at.hannibal2.skyhanni.utils.ItemUtils.getItemNameOrNull
 import at.hannibal2.skyhanni.utils.ItemUtils.getItemRarityOrNull
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.ItemUtils.isRune
@@ -437,28 +436,30 @@ object EstimatedItemValueCalculator {
 
     private fun addHelmetSkin(stack: ItemStack, list: MutableList<String>): Double {
         val internalName = stack.getHelmetSkin() ?: return 0.0
-
-        val price = internalName.getPrice()
-        val name = internalName.getNameOrRepoError()
-        val displayname = name ?: "§c${internalName.asString()}"
-        list.add("§7Skin: $displayname §7(§6" + NumberUtil.format(price) + "§7)")
-        if (name == null) {
-            list.add("   §8(Not yet in NEU Repo)")
-        }
-        return price
+        return addCosmetic(internalName, list, "Skin", config.ignoreHelmetSkins)
     }
 
     private fun addArmorDye(stack: ItemStack, list: MutableList<String>): Double {
         val internalName = stack.getArmorDye() ?: return 0.0
+        return addCosmetic(internalName, list, "Dye", config.ignoreArmorDyes)
+    }
 
+    private fun addCosmetic(
+        internalName: NEUInternalName,
+        list: MutableList<String>,
+        label: String,
+        shouldIgnorePrice: Boolean
+    ): Double {
         val price = internalName.getPrice()
         val name = internalName.getNameOrRepoError()
         val displayname = name ?: "§c${internalName.asString()}"
-        list.add("§7Dye: $displayname §7(§6" + NumberUtil.format(price) + "§7)")
+        val color = if (shouldIgnorePrice) "§7" else "§6"
+        list.add("§7$label: $displayname §7($color" + NumberUtil.format(price) + "§7)")
         if (name == null) {
             list.add("   §8(Not yet in NEU Repo)")
         }
-        return price
+
+        return if (shouldIgnorePrice) 0.0 else price
     }
 
     private fun addEnrichment(stack: ItemStack, list: MutableList<String>): Double {
@@ -476,14 +477,7 @@ object EstimatedItemValueCalculator {
         if (stack.getInternalName().isRune()) return 0.0
         val internalName = stack.getRune() ?: return 0.0
 
-        val price = internalName.getPrice()
-        val name = internalName.getItemNameOrNull()
-        val displayname = name ?: "§c${internalName.asString()}"
-        list.add("§7Rune: $displayname §7(§6" + NumberUtil.format(price) + "§7)")
-        if (name == null) {
-            list.add("   §8(Not yet in NEU Repo)")
-        }
-        return price
+        return addCosmetic(internalName, list, "Rune", config.ignoreRunes)
     }
 
     private fun NEUInternalName.getNameOrRepoError(): String? {
