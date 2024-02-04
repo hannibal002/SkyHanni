@@ -150,9 +150,10 @@ public class SkillProgressConfig {
     public Property<Boolean> showLevel = Property.of(true);
 
     @Expose
-    @ConfigOption(name = "Show Overflow XP", desc = "Show overflow XP and level.\n§eOnly work when level 60.")
-    @ConfigEditorBoolean
-    public Property<Boolean> showOverflow = Property.of(false);
+    @ConfigOption(name = "Overflow Config", desc = "")
+    @Accordion
+    public SkillOverflowConfig overflowConfig = new SkillOverflowConfig();
+
 
     @Expose
     @ConfigOption(name = "All Skills Display", desc = "Show a display with all skills progress.")

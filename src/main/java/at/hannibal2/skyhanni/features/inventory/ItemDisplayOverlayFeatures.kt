@@ -151,9 +151,10 @@ object ItemDisplayOverlayFeatures {
                 val skillName = split.first().lowercase()
                 val text = split.last()
                 if (split.size < 2) return "0"
-                val skillInfo = SkillAPI.skillMap?.get(skillName) ?: return "" + text.romanToDecimalIfNecessary()
-                return "" + skillInfo.level
-              //  return "" + text.romanToDecimalIfNecessary()
+                val level = "" + text.romanToDecimalIfNecessary()
+                val skillInfo = SkillAPI.skillMap?.get(skillName) ?: return level
+                return if (SkyHanniMod.feature.misc.skillProgressConfig.overflowConfig.enableInSkillMenuAsStackSize)
+                    "" + skillInfo.overflowLevel else level
             }
         }
 
@@ -198,9 +199,9 @@ object ItemDisplayOverlayFeatures {
             item.name?.let {
                 dungeonPotionPattern.matchMatcher(it.removeColor()) {
                     return when (val level = group("level").romanToDecimal()) {
-                        in 1..2 -> "§f$level"
-                        in 3..4 -> "§a$level"
-                        in 5..6 -> "§9$level"
+                        in 1 .. 2 -> "§f$level"
+                        in 3 .. 4 -> "§a$level"
+                        in 5 .. 6 -> "§9$level"
                         else -> "§5$level"
                     }
                 }

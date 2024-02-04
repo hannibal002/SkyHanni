@@ -273,6 +273,7 @@ import at.hannibal2.skyhanni.features.misc.items.EstimatedItemValue
 import at.hannibal2.skyhanni.features.misc.items.EstimatedWardrobePrice
 import at.hannibal2.skyhanni.features.misc.items.GlowingDroppedItems
 import at.hannibal2.skyhanni.features.misc.massconfiguration.DefaultConfigFeatures
+import at.hannibal2.skyhanni.features.misc.skillprogress.SkillOverflowTooltip
 import at.hannibal2.skyhanni.features.misc.skillprogress.SkillProgress
 import at.hannibal2.skyhanni.features.misc.teleportpad.TeleportPadCompactName
 import at.hannibal2.skyhanni.features.misc.teleportpad.TeleportPadInventoryNumber
@@ -726,6 +727,7 @@ class SkyHanniMod {
         loadModule(HighlightInquisitors())
         loadModule(VerminTracker)
         loadModule(SkillProgress)
+        loadModule(SkillOverflowTooltip())
 
 
         init()

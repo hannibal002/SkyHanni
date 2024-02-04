@@ -2,7 +2,6 @@ package at.hannibal2.skyhanni.features.misc.skillprogress
 
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.SkillAPI
-import at.hannibal2.skyhanni.api.SkillAPI.activeSkill
 import at.hannibal2.skyhanni.api.SkillAPI.lastUpdate
 import at.hannibal2.skyhanni.api.SkillAPI.oldSkillInfoMap
 import at.hannibal2.skyhanni.api.SkillAPI.showDisplay
@@ -14,6 +13,7 @@ import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.LorenzTickEvent
 import at.hannibal2.skyhanni.events.PreProfileSwitchEvent
 import at.hannibal2.skyhanni.events.SkillOverflowLevelupEvent
+import at.hannibal2.skyhanni.features.misc.skillprogress.SkillUtil.activeSkill
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.NumberUtil.formatNumber
@@ -133,11 +133,13 @@ object SkillProgress {
             config.useIcon,
             config.usePercentage,
             config.useSkillName,
-            config.showOverflow,
+            config.overflowConfig.enableInDisplay,
+            config.overflowConfig.enableInProgressBar,
             config.showAllSkillProgress,
             config.showEtaSkillProgress
         ) {
             updateDisplay()
+            update()
         }
     }
 
@@ -155,20 +157,26 @@ object SkillProgress {
     private fun drawAllDisplay() = buildList {
         val skillMap = skillMap ?: return@buildList
         for ((skillName, skillInfo) in skillMap) {
+            val (level, currentXp, currentXpMax, totalXp) =
+                if (config.overflowConfig.enableInAllDisplay.get())
+                    LorenzUtils.Quad(skillInfo.overflowLevel, skillInfo.overflowCurrentXp, skillInfo.overflowCurrentXpMax, skillInfo.overflowTotalXp)
+                else
+                    LorenzUtils.Quad(skillInfo.level, skillInfo.currentXp, skillInfo.currentXpMax, skillInfo.totalXp)
+
             val tips = buildList {
-                add("§6Level: §b${skillInfo.level}")
-                add("§6Current XP: §b${skillInfo.currentXp.addSeparators()}")
-                add("§6Needed XP: §b${skillInfo.currentXpMax.addSeparators()}")
-                add("§6Total XP: §b${skillInfo.totalXp.addSeparators()}")
+                add("§6Level: §b${level}")
+                add("§6Current XP: §b${currentXp.addSeparators()}")
+                add("§6Needed XP: §b${currentXpMax.addSeparators()}")
+                add("§6Total XP: §b${totalXp.addSeparators()}")
             }
             val nameColor = if (skillName == activeSkill) "§e" else "§6"
             add(Renderable.hoverTips(buildString {
-                append("$nameColor${skillName.firstLetterUppercase()} ${skillInfo.level} ")
+                append("$nameColor${skillName.firstLetterUppercase()} $level ")
                 append("§7(")
-                append("§b${skillInfo.currentXp.addSeparators()}")
-                if (skillInfo.currentXpMax != 0L) {
+                append("§b${currentXp.addSeparators()}")
+                if (currentXpMax != 0L) {
                     append("§6/")
-                    append("§b${skillInfo.currentXpMax.addSeparators()}")
+                    append("§b${currentXpMax.addSeparators()}")
                 }
                 append("§7)")
             }, tips))
@@ -198,9 +206,15 @@ object SkillProgress {
     private fun drawDisplay() = buildList {
         val skillMap = skillMap ?: return@buildList
         val skill = skillMap[activeSkill] ?: return@buildList
+
+        val (level, currentXp, currentXpMax, total) = if (config.overflowConfig.enableInDisplay.get())
+            LorenzUtils.Quad(skill.overflowLevel, skill.overflowCurrentXp, skill.overflowCurrentXpMax, skill.overflowTotalXp)
+        else
+            LorenzUtils.Quad(skill.level, skill.currentXp, skill.currentXpMax, skill.totalXp)
+
         add(buildList {
             if (config.showLevel.get())
-                add("§9[§d${skill.level}§9] ")
+                add("§9[§d$level§9] ")
 
             if (config.useIcon.get())
                 add(Renderable.itemStack(stackMap.getOrDefault(activeSkill.firstLetterUppercase(), defaultStack), 1.5))
@@ -211,22 +225,29 @@ object SkillProgress {
                 if (config.useSkillName.get())
                     append("${activeSkill.firstLetterUppercase()} ")
 
-                val percent = if (skill.currentXpMax == 0L) 100F else 100F * skill.currentXp / skill.currentXpMax
-                skillExpPercentage = (percent.toDouble() / 100)
+                val (barCurrent, barMax) = if (config.overflowConfig.enableInProgressBar.get())
+                    Pair(skill.overflowCurrentXp, skill.overflowCurrentXpMax)
+                else
+                    Pair(skill.currentXp, skill.currentXpMax)
+
+                val barPercent = if (barMax == 0L) 100F else 100F * barCurrent / barMax
+                skillExpPercentage = (barPercent.toDouble() / 100)
+
+                val percent = if (currentXpMax == 0L) 100F else 100F * currentXp / currentXpMax
 
                 if (config.usePercentage.get())
                     append("§7(§6${percent.roundToPrecision(2)}%§7)")
                 else {
-                    if (skill.currentXpMax == 0L)
-                        append("§7(§6${skill.currentXp.addSeparators()}§7)")
+                    if (currentXpMax == 0L)
+                        append("§7(§6${currentXp.addSeparators()}§7)")
                     else
-                        append("§7(§6${skill.currentXp.addSeparators()}§7/§6${skill.currentXpMax.addSeparators()}§7)")
+                        append("§7(§6${currentXp.addSeparators()}§7/§6${currentXpMax.addSeparators()}§7)")
                 }
 
                 if (config.showActionLeft.get() && percent != 100f) {
                     append(" - ")
                     if (skill.lastGain != "") {
-                        val actionLeft = (ceil(skill.currentXpMax.toDouble() - skill.currentXp) / skill.lastGain.formatNumber()).toLong().addSeparators()
+                        val actionLeft = (ceil(currentXpMax.toDouble() - currentXp) / skill.lastGain.formatNumber()).toLong().addSeparators()
                         append("§6$actionLeft Left")
                     } else {
                         append("∞ Left")

@@ -242,7 +242,7 @@ object Commands {
             "shskills",
             "Skills XP/Level related command",
             { SkillAPI.onCommand(it) },
-            { listOf("levelwithxp", "xpforlevel") })
+            { listOf("levelwithxp", "xpforlevel", "copytoclipboard") })
     }
 
     private fun usersBugFix() {

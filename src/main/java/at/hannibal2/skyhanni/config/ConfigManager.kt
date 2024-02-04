@@ -142,6 +142,10 @@ class ConfigManager {
                     out.name("totalXp").value(value.totalXp)
                     out.name("currentXp").value(value.currentXp)
                     out.name("currentXpMax").value(value.currentXpMax)
+                    out.name("overflowLevel").value(value.overflowLevel)
+                    out.name("overflowTotalXp").value(value.overflowTotalXp)
+                    out.name("overflowCurrentXp").value(value.overflowCurrentXp)
+                    out.name("overflowCurrentXpMax").value(value.overflowCurrentXpMax)
                     out.name("lastGain").value(value.lastGain)
                     out.endObject()
                 }
@@ -155,6 +159,10 @@ class ConfigManager {
                             "totalXp" -> skillInfo.totalXp = reader.nextDouble().toLong()
                             "currentXp" -> skillInfo.currentXp = reader.nextDouble().toLong()
                             "currentXpMax" -> skillInfo.currentXpMax = reader.nextDouble().toLong()
+                            "overflowLevel" ->skillInfo.overflowLevel =  reader.nextInt()
+                            "overflowTotalXp" ->skillInfo.overflowTotalXp = reader.nextDouble().toLong()
+                            "overflowCurrentXp" -> skillInfo.overflowCurrentXp = reader.nextDouble().toLong()
+                            "overflowCurrentXpMax" -> skillInfo.overflowCurrentXpMax = reader.nextDouble().toLong()
                             "lastGain" -> skillInfo.lastGain = reader.nextString()
                         }
                     }
