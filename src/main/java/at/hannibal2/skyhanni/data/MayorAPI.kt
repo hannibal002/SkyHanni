@@ -31,6 +31,7 @@ object MayorAPI {
         private set
 
     private const val LATE_SPRING = 3
+    private const val LATE_SPRING_DAY = 27
 
     /**
      * @param input: The name of the mayor
@@ -57,15 +58,15 @@ object MayorAPI {
     }
 
     private fun calculateNextMayorTime(): SimpleTimeMark {
-        var currentYear = SkyBlockTime.now().year
+        var mayorYear = SkyBlockTime.now().year
 
         // Check if either the month is already over or the day is after 27th in the third month
-        if (SkyBlockTime.now().month > LATE_SPRING || (SkyBlockTime.now().day >= 27 && SkyBlockTime.now().month == LATE_SPRING)) {
+        if (SkyBlockTime.now().month > LATE_SPRING || (SkyBlockTime.now().day >= LATE_SPRING_DAY && SkyBlockTime.now().month == LATE_SPRING)) {
             // If so, the next mayor will be in the next year
-            currentYear++
+            mayorYear++
         }
 
-        return SkyBlockTime(currentYear, LATE_SPRING, day = 27).asTimeMark()
+        return SkyBlockTime(mayorYear, LATE_SPRING, day = LATE_SPRING_DAY).asTimeMark()
     }
 
     private fun getTimeTillNextMayor() {
@@ -75,6 +76,7 @@ object MayorAPI {
 
     private fun checkCurrentMayor() {
         val nextMayorTime = calculateNextMayorTime()
+        LorenzUtils.chat("Checking...")
 
         // Check if it is still the mayor from the old SkyBlock year
         currentMayor = (if (nextMayorTime > System.currentTimeMillis().asTimeMark()) {
@@ -83,7 +85,7 @@ object MayorAPI {
             candidates[SkyBlockTime.now().year]
         })?.let {
             setMayorWithActivePerks(it.name, it.perks)
-        }
+        } ?: Mayors.UNKNOWN
     }
 
     private fun checkHypixelAPI() {

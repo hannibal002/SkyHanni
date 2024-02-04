@@ -389,7 +389,9 @@ private fun getVisitShowWhen() =
     ScoreboardData.sidebarLinesFormatted.any { ScoreboardPattern.visitingPattern.matches(it) }
 
 private fun getDateDisplayPair() =
-    listOf(SkyBlockTime.now().formatted(yearElement = false, hoursAndMinutesElement = false) to HorizontalAlignment.LEFT)
+    listOf(
+        SkyBlockTime.now().formatted(yearElement = false, hoursAndMinutesElement = false) to HorizontalAlignment.LEFT
+    )
 
 
 private fun getTimeDisplayPair(): List<ScoreboardElement> {
@@ -532,7 +534,8 @@ private fun getPowderShowWhen() =
 
 private fun getEventsDisplayPair(): List<ScoreboardElement> {
     if (ScoreboardEvents.getEvent().isEmpty()) return listOf("<hidden>" to HorizontalAlignment.LEFT)
-    if (ScoreboardEvents.getEvent().flatMap { it.getLines() }.isEmpty()) return listOf("<hidden>" to HorizontalAlignment.LEFT)
+    if (ScoreboardEvents.getEvent().flatMap { it.getLines() }
+            .isEmpty()) return listOf("<hidden>" to HorizontalAlignment.LEFT)
     return ScoreboardEvents.getEvent().flatMap { it.getLines().map { i -> i to HorizontalAlignment.LEFT } }
 }
 
@@ -540,7 +543,7 @@ private fun getEventsShowWhen() = ScoreboardEvents.getEvent().isNotEmpty()
 
 private fun getMayorDisplayPair(): List<ScoreboardElement> {
     return listOf(
-        (MayorAPI.currentMayor?.name?.let { MayorAPI.mayorNameWithColorCode(it) }
+        (MayorAPI.currentMayor?.mayorName?.let { MayorAPI.mayorNameWithColorCode(it) }
             ?: "<hidden>") +
             (if (config.mayorConfig.showTimeTillNextMayor) {
                 "§7 (§e${MayorAPI.timeTillNextMayor.format()}§7)"
@@ -548,7 +551,7 @@ private fun getMayorDisplayPair(): List<ScoreboardElement> {
                 ""
             }) to HorizontalAlignment.LEFT
     ) + (if (config.mayorConfig.showMayorPerks) {
-        MayorAPI.currentMayor?.activePerks?.map { " §7- §e${it.name}" to HorizontalAlignment.LEFT } ?: emptyList()
+        MayorAPI.currentMayor?.activePerks?.map { " §7- §e${it.perkName}" to HorizontalAlignment.LEFT } ?: emptyList()
     } else {
         emptyList()
     })
