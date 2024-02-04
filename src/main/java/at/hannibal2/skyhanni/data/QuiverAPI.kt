@@ -31,19 +31,19 @@ private var infinityQuiverLevelMultiplier = 0.03f
 object QuiverAPI {
     private val storage get() = ProfileStorageData.profileSpecific
     var currentArrow: ArrowType?
-        get() = getArrowByNameOrNull(storage?.arrows?.currentArrow ?: "None")
+        get() = getArrowByNameOrNull(storage?.arrows?.currentArrow?.asInternalName() ?: "NONE".asInternalName())
         set(value) {
             storage?.arrows?.currentArrow = value?.toString() ?: return
         }
+    // im 99.9% sure the set() does not work, yay
     var arrowAmount: MutableMap<ArrowType, Float>
-        get() = storage?.arrows?.arrowAmount?.mapNotNull {
-            val arrow = getArrowByNameOrNull(it.key.asInternalName()) ?: return@mapNotNull null
-            arrow to it.value
-        }?.toMap()?.toMutableMap() ?: mutableMapOf()
+        get() = storage?.arrows?.arrowAmount?.mapKeys { (internalName, _) ->
+            getArrowByNameOrNull(internalName)
+                ?: throw NoSuchElementException("ArrowType not found for internal name: $internalName")
+        }?.toMutableMap() ?: mutableMapOf()
         set(value) {
-            storage?.arrows?.arrowAmount = value.mapKeys {
-                it.toString()
-            }.toMutableMap()
+            storage?.arrows?.arrowAmount =
+                value.mapKeys { (arrow, _) -> arrow.internalName }.mapValues { (_, amount) -> amount }
         }
     var currentAmount: Int
         get() = arrowAmount[currentArrow]?.toInt() ?: 0
@@ -87,6 +87,7 @@ object QuiverAPI {
         selectPattern.matchMatcher(message) {
             val arrow = group("arrow")
             currentArrow = getArrowByNameOrNull(arrow) ?: return
+            LorenzUtils.chat("Selected arrow type: $currentArrow")
 
             return
         }
@@ -96,6 +97,7 @@ object QuiverAPI {
             val amount = group("amount").formatNumber().toFloat()
 
             val filledUpType = getArrowByNameOrNull(type) ?: return
+            LorenzUtils.chat("Filled up quiver with $amount of $filledUpType")
 
             arrowAmount.merge(filledUpType, amount, Float::plus)
             return
@@ -105,7 +107,7 @@ object QuiverAPI {
             val flintAmount = group("flintAmount").formatNumber().toFloat()
 
             arrowAmount.merge(FLINT_ARROW_TYPE, flintAmount, Float::plus)
-
+            LorenzUtils.chat("Filled up quiver with $flintAmount flint arrows")
             return
         }
 
@@ -114,6 +116,7 @@ object QuiverAPI {
             val amount = group("amount").formatNumber().toFloat()
 
             val filledUpType = getArrowByNameOrNull(type) ?: return
+            LorenzUtils.chat("Added $amount of $filledUpType to quiver")
 
             arrowAmount.merge(filledUpType, amount, Float::plus)
 
@@ -148,11 +151,13 @@ object QuiverAPI {
         for (stack in stacks.values) {
             if (stack.getItemCategoryOrNull() != ItemCategory.ARROW) continue
 
+            LorenzUtils.chat("Found arrow: ${stack.getInternalNameOrNull()}")
+
             val arrow = stack.getInternalNameOrNull() ?: continue
 
             val arrowType = getArrowByNameOrNull(arrow) ?: continue
 
-            this.arrowAmount.merge(arrowType, stack.stackSize.toFloat(), Float::plus)
+            arrowAmount.merge(arrowType, stack.stackSize.toFloat(), Float::plus)
         }
     }
 
@@ -183,8 +188,8 @@ object QuiverAPI {
         if (soundLocation > SkyHanniMod.feature.dev.bowSoundDistance) return
 
         val arrowType = currentArrow ?: return
-        val arrowAmount = QuiverAPI.arrowAmount[arrowType] ?: return
-        if (arrowAmount <= 0) return
+        val amount = arrowAmount[arrowType] ?: return
+        if (amount <= 0) return
 
         if (InventoryUtils.getChestplate()
                 // The chestplate has the ability to not use arrows
@@ -206,7 +211,7 @@ object QuiverAPI {
             }
         }
 
-        this.arrowAmount[arrowType] = (arrowAmount - amountToRemove()).coerceAtLeast(0.0f)
+        arrowAmount[arrowType] = amount - amountToRemove()
     }
 
     fun hasBowInInventory(): Boolean {
