@@ -25,7 +25,11 @@ import kotlin.time.Duration.Companion.seconds
 object NPCVisitorFix {
     private val storage get() = ProfileStorageData.profileSpecific?.garden
     private val staticVisitors = listOf("Jacob", "Anita")
-    private val barnSkinChangePattern by RepoPattern.pattern("garden.barn.skin.change", "§aChanging Barn skin to §r.*")
+
+    private val barnSkinChangePattern by RepoPattern.pattern(
+        "garden.barn.skin.change",
+        "§aChanging Barn skin to §r.*"
+    )
 
     @SubscribeEvent
     fun onInventoryOpen(event: InventoryOpenEvent) {
