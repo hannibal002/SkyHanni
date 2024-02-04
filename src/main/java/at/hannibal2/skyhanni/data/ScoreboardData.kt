@@ -43,7 +43,7 @@ class ScoreboardData {
                 val lastColor = when {
                     lastColorIndex != -1 && lastColorIndex + 1 < start.length && (start[lastColorIndex + 1] in '0'..'9' || start[lastColorIndex + 1] in 'a'..'f') -> start.substring(
                         lastColorIndex,
-                        lastColorIndex + 1
+                        lastColorIndex + 2
                     )
 
                     else -> ""
