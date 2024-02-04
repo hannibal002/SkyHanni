@@ -1,9 +1,9 @@
 package at.hannibal2.skyhanni.api
 
 import at.hannibal2.skyhanni.data.ProfileStorageData
+import at.hannibal2.skyhanni.events.ActionBarUpdateEvent
 import at.hannibal2.skyhanni.events.ConfigLoadEvent
 import at.hannibal2.skyhanni.events.InventoryFullyOpenedEvent
-import at.hannibal2.skyhanni.events.LorenzActionBarEvent
 import at.hannibal2.skyhanni.events.SkillOverflowLevelupEvent
 import at.hannibal2.skyhanni.features.misc.skillprogress.SkillProgress
 import at.hannibal2.skyhanni.features.misc.skillprogress.SkillUtil.activeSkill
@@ -64,8 +64,8 @@ object SkillAPI {
     var lastUpdate = SimpleTimeMark.farPast()
 
     @SubscribeEvent
-    fun onActionBar(event: LorenzActionBarEvent) {
-        val actionBar = event.message.removeColor()
+    fun onActionBar(event: ActionBarUpdateEvent) {
+        val actionBar = event.actionBar.removeColor()
 
         if (lastActionBar != null && lastActionBar == actionBar) return
         lastActionBar = actionBar

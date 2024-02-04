@@ -1,7 +1,7 @@
 package at.hannibal2.skyhanni.data
 
+import at.hannibal2.skyhanni.events.ActionBarUpdateEvent
 import at.hannibal2.skyhanni.events.InventoryFullyOpenedEvent
-import at.hannibal2.skyhanni.events.LorenzActionBarEvent
 import at.hannibal2.skyhanni.events.ProfileJoinEvent
 import at.hannibal2.skyhanni.events.SkillExpGainEvent
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
@@ -25,10 +25,10 @@ class SkillExperience {
     }
 
     @SubscribeEvent
-    fun onActionBar(event: LorenzActionBarEvent) {
+    fun onActionBarUpdate(event: ActionBarUpdateEvent) {
         if (!LorenzUtils.inSkyBlock) return
 
-        actionBarPattern.matchMatcher(event.message) {
+        actionBarPattern.matchMatcher(event.actionBar) {
             val skill = group("skill").lowercase()
             val overflow = group("overflow").formatNumber()
             val neededForNextLevel = group("needed").formatNumber()
@@ -38,7 +38,7 @@ class SkillExperience {
             skillExp[skill] = totalExp
             SkillExpGainEvent(skill).postAndCatch()
         }
-        actionBarLowLevelPattern.matchMatcher(event.message) {
+        actionBarLowLevelPattern.matchMatcher(event.actionBar) {
             val skill = group("skill").lowercase()
             SkillExpGainEvent(skill).postAndCatch()
         }
