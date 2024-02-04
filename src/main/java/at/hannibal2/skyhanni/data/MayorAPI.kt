@@ -76,7 +76,6 @@ object MayorAPI {
 
     private fun checkCurrentMayor() {
         val nextMayorTime = calculateNextMayorTime()
-        LorenzUtils.chat("Checking...")
 
         // Check if it is still the mayor from the old SkyBlock year
         currentMayor = (if (nextMayorTime > System.currentTimeMillis().asTimeMark()) {
