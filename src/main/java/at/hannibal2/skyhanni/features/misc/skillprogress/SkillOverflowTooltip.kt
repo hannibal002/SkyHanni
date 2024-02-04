@@ -10,6 +10,7 @@ import at.hannibal2.skyhanni.utils.ItemUtils.name
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.NumberUtil.roundToPrecision
+import at.hannibal2.skyhanni.utils.NumberUtil.toRoman
 import at.hannibal2.skyhanni.utils.StringUtils
 import at.hannibal2.skyhanni.utils.StringUtils.firstLetterUppercase
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
@@ -25,7 +26,11 @@ class SkillOverflowTooltip {
         val stack = event.itemStack
         if (inventoryName == "Your Skills" && stack.getLore().any { it.contains("Click to view!") }) {
             val iterator = event.toolTip.listIterator()
-            val skillName = stack.cleanName().split(" ").first().lowercase()
+            val split = stack.cleanName().split(" ")
+            val skillName = split.first().lowercase()
+            val useRoman = split.last().toIntOrNull() == null
+
+            if (skillName == "runecrafting" || skillName == "dungeoneering") return
             val skillInfo = SkillAPI.skillMap?.get(skillName) ?: return
             for (line in iterator) {
                 val maxReached = "§7§8Max Skill level reached!"
@@ -33,7 +38,8 @@ class SkillOverflowTooltip {
                     val progress = (skillInfo.overflowCurrentXp.toDouble() / skillInfo.overflowCurrentXpMax) * 100
                     val percent = "§e${progress.roundToPrecision(1)}%"
                     iterator.set("§7Progress to Level ${skillInfo.overflowLevel + 1}: $percent")
-                    event.itemStack.name = "§a${skillName.firstLetterUppercase()} ${skillInfo.overflowLevel}"
+                    val level = if (useRoman) skillInfo.overflowLevel.toRoman() else skillInfo.overflowLevel
+                    event.itemStack.name = "§a${skillName.firstLetterUppercase()} $level"
                     continue
                 }
 

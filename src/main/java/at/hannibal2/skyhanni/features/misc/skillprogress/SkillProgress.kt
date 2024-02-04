@@ -102,6 +102,8 @@ object SkillProgress {
 
     @SubscribeEvent
     fun onLevelUp(event: SkillOverflowLevelupEvent) {
+        if (!isEnabled()) return
+        if (!config.overflowConfig.enableInChat) return
         val skillName = event.skillName
         val oldLevel = event.oldLevel
         val newLevel = event.newLevel
@@ -118,7 +120,7 @@ object SkillProgress {
         LorenzUtils.chat("  §r§a§lREWARDS", false)
         for (reward in rewards)
             LorenzUtils.chat(reward, false)
-        LorenzUtils.chat("  §3§l▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬", false)
+        LorenzUtils.chat("§3§l▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬", false)
     }
 
     @SubscribeEvent
@@ -135,6 +137,7 @@ object SkillProgress {
             config.useSkillName,
             config.overflowConfig.enableInDisplay,
             config.overflowConfig.enableInProgressBar,
+            config.overflowConfig.enableInEtaDisplay,
             config.showAllSkillProgress,
             config.showEtaSkillProgress
         ) {
@@ -187,14 +190,16 @@ object SkillProgress {
         val skillInfo = skillMap?.get(activeSkill) ?: return@buildList
         val xpInfo = skillXPInfoMap[activeSkill] ?: return@buildList
         val xpInfoLast = oldSkillInfoMap[activeSkill] ?: return@buildList
-        var remaining = skillInfo.currentXpMax - skillInfo.currentXp
+        var remaining = skillInfo.overflowCurrentXpMax - skillInfo.overflowCurrentXp
         oldSkillInfoMap[activeSkill] = skillInfo
-        if (skillInfo.currentXpMax == xpInfoLast.currentXpMax) {
+        if (skillInfo.overflowCurrentXpMax == xpInfoLast.overflowCurrentXpMax) {
             remaining = interpolate(remaining.toFloat(), (xpInfoLast.currentXpMax - xpInfoLast.currentXp).toFloat(), xpInfo.lastUpdate.toMillis()).toLong()
         }
 
+        val level = if (config.overflowConfig.enableInEtaDisplay.get()) skillInfo.overflowLevel else skillInfo.level
+
         add(Renderable.string("§6Skill: §b${activeSkill.firstLetterUppercase()}"))
-        add(Renderable.string("§6Level: §b${skillInfo.level}"))
+        add(Renderable.string("§6Level: §b$level"))
         add(Renderable.string("§6XP/h: §b${xpInfo.xpGainHour.addSeparators()}"))
 
         if (xpInfo.xpGainLast != 0f) {

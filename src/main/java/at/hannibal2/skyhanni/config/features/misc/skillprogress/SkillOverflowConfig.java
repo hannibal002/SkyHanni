@@ -18,6 +18,11 @@ public class SkillOverflowConfig {
     public Property<Boolean> enableInAllDisplay = Property.of(false);
 
     @Expose
+    @ConfigOption(name = "ETA Display", desc = "Enable the overflow calculation in the ETA skill display.")
+    @ConfigEditorBoolean
+    public Property<Boolean> enableInEtaDisplay = Property.of(false);
+
+    @Expose
     @ConfigOption(name = "Progress Bar", desc = "Enable the overflow calculation in the progress bar of the display.")
     @ConfigEditorBoolean
     public Property<Boolean> enableInProgressBar = Property.of(false);
@@ -31,6 +36,11 @@ public class SkillOverflowConfig {
     @ConfigOption(name = "Skill Menu Tooltips", desc = "Enable the overflow calculation in the tooltip of.")
     @ConfigEditorBoolean
     public boolean enableInSkillMenuTooltip = false;
+
+    @Expose
+    @ConfigOption(name = "Chat", desc = "Enable the overflow level up message when you gain an overflow level.")
+    @ConfigEditorBoolean
+    public boolean enableInChat = false;
 
 
 }

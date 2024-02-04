@@ -66,9 +66,6 @@ object SkillAPI {
     @SubscribeEvent
     fun onActionBar(event: ActionBarUpdateEvent) {
         val actionBar = event.actionBar.removeColor()
-
-        if (lastActionBar != null && lastActionBar == actionBar) return
-        lastActionBar = actionBar
         val components = SPACE_SPLITTER.splitToList(actionBar)
 
         for (component in components) {
@@ -169,8 +166,8 @@ object SkillAPI {
         val level = getLevel(maxXp)
         val (levelOverflow, currentOverflow, currentMaxOverflow, totalOverflow) = getSkillInfo(level, currentXp, maxXp, maxXp)
 
-        if (skillInfo.level != 0 && levelOverflow == skillInfo.level + 1)
-            SkillOverflowLevelupEvent(skillS, skillInfo.level, levelOverflow).postAndCatch()
+        if (skillInfo.overflowLevel != 0 && levelOverflow == skillInfo.overflowLevel + 1)
+            SkillOverflowLevelupEvent(skillS, skillInfo.overflowLevel, levelOverflow).postAndCatch()
 
         skillInfo.apply {
             this.level = level
