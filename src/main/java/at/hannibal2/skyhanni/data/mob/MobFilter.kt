@@ -63,7 +63,7 @@ object MobFilter {
     val dungeonNameFilter by repoGroup.pattern("filter.dungeon", "^(?:(✯)\\s)?(?:(${DungeonAttribute.toRegexLine})\\s)?(?:\\[[\\w\\d]+\\]\\s)?(.+)\\s[^\\s]+$")
     val summonFilter by repoGroup.pattern("filter.summon", "^(\\w+)'s (.*) \\d+.*")
     val dojoFilter by repoGroup.pattern("filter.dojo", "^(?:(\\d+) pts|(\\w+))$")
-    val jerryPattern by repoGroup.pattern("jerry", "(?:\\[\\w+(?<level>\\d+)\\] )? (?<owner>\\w+)'s (?<name>\\w+ Jerry)")
+    val jerryPattern by repoGroup.pattern("jerry", "(?:\\[\\w+(?<level>\\d+)\\] )?(?<owner>\\w+)'s (?<name>\\w+ Jerry) \\d+ Hits")
 
     val petCareNamePattern by repoGroup.pattern("pattern.petcare", "^\\[\\w+ (\\d+)\\] (.*)")
     val wokeSleepingGolemPattern by repoGroup.pattern("pattern.dungeon.woke.golem", "(?:§c§lWoke|§5§lSleeping) Golem§r")
@@ -182,7 +182,7 @@ object MobFilter {
 
         if (armorStand == null) return null
         armorStandOnlyMobs(baseEntity, armorStand)?.also { return it }
-        jerryPattern.matchMatcher(armorStand.name) {
+        jerryPattern.matchMatcher(armorStand.cleanName()) {
             val level = this.group("level")?.toInt() ?: -1
             val owner = this.group("owner") ?: return@matchMatcher
             val name = this.group("name") ?: return@matchMatcher
