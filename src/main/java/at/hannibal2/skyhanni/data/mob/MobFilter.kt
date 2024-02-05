@@ -57,17 +57,17 @@ object MobFilter {
 
     private val repoGroup = RepoPattern.group("mob.detection")
 
-    val mobNameFilter by repoGroup.pattern("filter.basic", "(\\[\\w+([0-9]+)\\] )?(.Corrupted )?(.*) [\\d❤]+")
+    val mobNameFilter by repoGroup.pattern("filter.basic", "(\\[\\w+(\\d+)\\] )?(.Corrupted )?(.*) [\\d❤]+")
     val slayerNameFilter by repoGroup.pattern("filter.slayer", "^. (.*) ([IV]+) \\d+.*")
     val bossMobNameFilter by repoGroup.pattern("filter.boss", "^. (\\[(.*)\\] )?(.*) ([\\d\\/Mk.,❤]+|█+) .$")
     val dungeonNameFilter by repoGroup.pattern("filter.dungeon", "^(?:(✯)\\s)?(?:(${DungeonAttribute.toRegexLine})\\s)?(?:\\[[\\w\\d]+\\]\\s)?(.+)\\s[^\\s]+$")
     val summonFilter by repoGroup.pattern("filter.summon", "^(\\w+)'s (.*) \\d+.*")
     val dojoFilter by repoGroup.pattern("filter.dojo", "^(?:(\\d+) pts|(\\w+))$")
+    val jerryPattern by repoGroup.pattern("jerry", "(?:\\[\\w+(?<level>\\d+)\\] )? (?<owner>\\w+)'s (?<name>\\w+ Jerry)")
 
     val petCareNamePattern by repoGroup.pattern("pattern.petcare", "^\\[\\w+ (\\d+)\\] (.*)")
     val wokeSleepingGolemPattern by repoGroup.pattern("pattern.dungeon.woke.golem", "(?:§c§lWoke|§5§lSleeping) Golem§r")
     val summonOwnerPattern by repoGroup.pattern("pattern.summon.owner", ".*Spawned by: (.*).*")
-
 
     private val RatSkull = "ewogICJ0aW1lc3RhbXAiIDogMTYxODQxOTcwMTc1MywKICAicHJvZmlsZUlkIiA6ICI3MzgyZGRmYmU0ODU0NTVjODI1ZjkwMGY4OGZkMzJmOCIsCiAgInByb2ZpbGVOYW1lIiA6ICJCdUlJZXQiLAogICJzaWduYXR1cmVSZXF1aXJlZCIgOiB0cnVlLAogICJ0ZXh0dXJlcyIgOiB7CiAgICAiU0tJTiIgOiB7CiAgICAgICJ1cmwiIDogImh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvYThhYmI0NzFkYjBhYjc4NzAzMDExOTc5ZGM4YjQwNzk4YTk0MWYzYTRkZWMzZWM2MWNiZWVjMmFmOGNmZmU4IiwKICAgICAgIm1ldGFkYXRhIiA6IHsKICAgICAgICAibW9kZWwiIDogInNsaW0iCiAgICAgIH0KICAgIH0KICB9Cn0="
     private val HellwispTentacleSkull = "ewogICJ0aW1lc3RhbXAiIDogMTY0OTM4MzAyMTQxNiwKICAicHJvZmlsZUlkIiA6ICIzYjgwOTg1YWU4ODY0ZWZlYjA3ODg2MmZkOTRhMTVkOSIsCiAgInByb2ZpbGVOYW1lIiA6ICJLaWVyYW5fVmF4aWxpYW4iLAogICJzaWduYXR1cmVSZXF1aXJlZCIgOiB0cnVlLAogICJ0ZXh0dXJlcyIgOiB7CiAgICAiU0tJTiIgOiB7CiAgICAgICJ1cmwiIDogImh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvZDI3MDQ2Mzg0OTM2MzhiODVjMzhkZDYzZmZkYmUyMjJmZTUzY2ZkNmE1MDk3NzI4NzU2MTE5MzdhZTViNWUyMiIsCiAgICAgICJtZXRhZGF0YSIgOiB7CiAgICAgICAgIm1vZGVsIiA6ICJzbGltIgogICAgICB9CiAgICB9CiAgfQp9"
@@ -81,6 +81,7 @@ object MobFilter {
         Flaming, Stormy, Speedy, Fortified, Healthy, Healing, Boomer, Golden, Stealth;
 
         companion object {
+
             val toRegexLine = DungeonAttribute.entries.joinToString("|") { it.name }
         }
     }
@@ -125,7 +126,6 @@ object MobFilter {
             true
         } ?: false
 
-
     /** baseEntity must have passed the .isSkyBlockMob() function */
     internal fun createSkyblockEntity(baseEntity: EntityLivingBase): MobResult {
         val nextEntity = MobUtils.getNextEntity(baseEntity, 1) as? EntityLivingBase
@@ -148,7 +148,6 @@ object MobFilter {
 
         // If Late Stack add all entities
         caughtSkyblockMob?.apply { internalAddEntity(extraEntityList.dropLast(1)) }?.also { return MobResult.illegal }
-
 
         val armorStand = extraEntityList.lastOrNull() as? EntityArmorStand ?: return MobResult.notYetFound
 
@@ -176,7 +175,6 @@ object MobFilter {
         else -> null
     }
 
-
     private fun exceptions(baseEntity: EntityLivingBase, nextEntity: EntityLivingBase?): MobResult? {
         noArmorStandMobs(baseEntity)?.also { return it }
         val armorStand = nextEntity as? EntityArmorStand
@@ -184,6 +182,12 @@ object MobFilter {
 
         if (armorStand == null) return null
         armorStandOnlyMobs(baseEntity, armorStand)?.also { return it }
+        jerryPattern.matchMatcher(armorStand.name) {
+            val level = this.group("level")?.toInt() ?: -1
+            val owner = this.group("owner") ?: return@matchMatcher
+            val name = this.group("name") ?: return@matchMatcher
+            return MobResult.found(Mob(baseEntity, Mob.Type.Basic, armorStand, name = name, ownerName = owner, levelOrTier = level))
+        }
         return when {
             baseEntity is EntityPig && armorStand.name.endsWith("'s Pig") -> MobResult.illegal // Pig Pet
 
@@ -287,7 +291,6 @@ object MobFilter {
         } ?: MobResult.somethingWentWrong
     }
 
-
     private fun stackedMobsException(baseEntity: EntityLivingBase, extraEntityList: List<EntityLivingBase>): MobResult? =
         if (DungeonAPI.inDungeon()) {
             when {
@@ -301,7 +304,6 @@ object MobFilter {
 
             else -> null
         }
-
 
     private fun armorStandOnlyMobs(baseEntity: EntityLivingBase, armorStand: EntityArmorStand): MobResult? {
         if (baseEntity !is EntityZombie) return null
@@ -334,6 +336,7 @@ object MobFilter {
     private fun createBat(baseEntity: EntityLivingBase): Mob? = when (baseEntity.baseMaxHealth.derpy()) {
         5_000_000 -> MobFactories.basic(baseEntity, "Cinderbat")
         75_000 -> MobFactories.basic(baseEntity, "Thorn Bat")
+        600 -> if ()
         100 -> MobFactories.basic(
             baseEntity, if (DungeonAPI.inDungeon()) "Dungeon Secret Bat" else if (IslandType.PRIVATE_ISLAND.isInIsland()) "Private Island Bat" else "Mega Bat"
         )
