@@ -19,7 +19,7 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
 class TrophyFishMessages {
     private val trophyFishPattern =
-        "§6§lTROPHY FISH! §r§bYou caught an? §r(?<displayName>§[0-9a-f](?:§k)?[\\w -]+)§r§r§r §r§l§r(?<displayRarity>§[0-9a-f]§l\\w+)§r§b\\.".toPattern()
+        "§6§lTROPHY FISH! §r§bYou caught an? §r(?<displayName>§[0-9a-f](?:§k)?[\\w -]+) §r(?<displayRarity>§[0-9a-f]§l\\w+)§r§b\\.".toPattern()
     private val config get() = SkyHanniMod.feature.fishing.trophyFishing.chatMessages
 
     @SubscribeEvent

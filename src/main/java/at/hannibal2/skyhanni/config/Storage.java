@@ -106,7 +106,7 @@ public class Storage {
         public static class BingoSession {
 
             @Expose
-            public List<String> tierOneMinionsDone = new ArrayList<>();
+            public List<NEUInternalName> tierOneMinionsDone = new ArrayList<>();
 
             @Expose
             public Map<Integer, BingoGoal> goals = new HashMap<>();
@@ -314,6 +314,9 @@ public class Storage {
                 @Expose
                 public int lastFarmingWeightLeaderboard = -1;
             }
+
+            @Expose
+            public Map<String, LorenzVec> npcVisitorLocations = new HashMap<>();
         }
 
         @Expose
