@@ -4,6 +4,7 @@ import at.hannibal2.skyhanni.data.ProfileStorageData
 import at.hannibal2.skyhanni.events.InventoryOpenEvent
 import at.hannibal2.skyhanni.events.LorenzChatEvent
 import at.hannibal2.skyhanni.events.garden.visitor.VisitorOpenEvent
+import at.hannibal2.skyhanni.features.garden.GardenAPI
 import at.hannibal2.skyhanni.utils.DelayedRun
 import at.hannibal2.skyhanni.utils.EntityUtils
 import at.hannibal2.skyhanni.utils.LocationUtils.distanceTo
@@ -29,6 +30,7 @@ object NPCVisitorFix {
 
     @SubscribeEvent
     fun onInventoryOpen(event: InventoryOpenEvent) {
+        if (!GardenAPI.inGarden()) return
         val name = staticVisitors.firstOrNull { event.inventoryName.contains(it) } ?: return
         val nearest = findNametags(name).firstOrNull { it.distanceToPlayer() < 3 } ?: return
         DelayedRun.runDelayed(200.milliseconds) {
