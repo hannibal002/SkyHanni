@@ -546,6 +546,8 @@ object EstimatedItemValueCalculator {
         val map = mutableMapOf<String, Double>()
 
         val tieredEnchants = listOf("compact", "cultivating", "champion", "expertise", "hecatomb")
+        val onlyTierOnePrices =
+            listOf("ultimate_chimera", "ultimate_fatal_tempo", "smoldering", "ultimate_flash", "divine_gift")
 
         val internalName = stack.getInternalName()
         for ((rawName, rawLevel) in enchantments) {
@@ -562,7 +564,7 @@ object EstimatedItemValueCalculator {
 
             var level = rawLevel
             var multiplier = 1
-            if (rawName == "ultimate_chimera" || rawName == "ultimate_fatal_tempo" || rawName == "smoldering") {
+            if (rawName in onlyTierOnePrices) {
 
                 when (rawLevel) {
                     2 -> multiplier = 2
