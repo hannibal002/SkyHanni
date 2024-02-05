@@ -3,8 +3,11 @@ package at.hannibal2.skyhanni.features.minion
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.config.Storage
+import at.hannibal2.skyhanni.data.ClickType
 import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.data.ProfileStorageData
+import at.hannibal2.skyhanni.events.BlockClickEvent
+import at.hannibal2.skyhanni.events.EntityClickEvent
 import at.hannibal2.skyhanni.events.InventoryCloseEvent
 import at.hannibal2.skyhanni.events.InventoryFullyOpenedEvent
 import at.hannibal2.skyhanni.events.InventoryUpdatedEvent
@@ -50,11 +53,10 @@ import net.minecraftforge.client.event.RenderLivingEvent
 import net.minecraftforge.event.entity.player.PlayerInteractEvent
 import net.minecraftforge.fml.common.eventhandler.EventPriority
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
-import net.minecraftforge.fml.common.gameevent.InputEvent
-import org.lwjgl.input.Mouse
 import java.awt.Color
 
 class MinionFeatures {
+
     private val config get() = SkyHanniMod.feature.minions
     private var lastClickedEntity: LorenzVec? = null
     private var newMinion: LorenzVec? = null
@@ -86,21 +88,19 @@ class MinionFeatures {
     }
 
     @SubscribeEvent
-    fun onClick(event: InputEvent.MouseInputEvent) {
+    fun onEntityClick(event: EntityClickEvent) {
         if (!enableWithHub()) return
+        if (event.clickType != ClickType.RIGHT_CLICK) return
 
-        if (!Mouse.getEventButtonState()) return
-        if (Mouse.getEventButton() != 1) return
+        lastClickedEntity = event.clickedEntity?.getLorenzVec() ?: return
+    }
 
-        val minecraft = Minecraft.getMinecraft()
-        val entity = minecraft.pointedEntity
-        if (entity != null) {
-            lastClickedEntity = entity.getLorenzVec()
-            return
-        }
-        minecraft.thePlayer.rayTrace(16.0, 1.0f)?.let {
-            lastStorage = it.blockPos.toLorenzVec()
-        }
+    @SubscribeEvent
+    fun onBlockClick(event: BlockClickEvent) {
+        if (!enableWithHub()) return
+        if (event.clickType != ClickType.RIGHT_CLICK) return
+
+        lastStorage = event.position
     }
 
     @SubscribeEvent
