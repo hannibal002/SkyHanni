@@ -37,8 +37,12 @@ class SkillOverflowTooltip {
                 if (line.contains(maxReached)) {
                     val progress = (skillInfo.overflowCurrentXp.toDouble() / skillInfo.overflowCurrentXpMax) * 100
                     val percent = "§e${progress.roundToPrecision(1)}%"
-                    iterator.set("§7Progress to Level ${skillInfo.overflowLevel + 1}: $percent")
-                    val level = if (useRoman) skillInfo.overflowLevel.toRoman() else skillInfo.overflowLevel
+                    val currentLevel = skillInfo.overflowLevel
+
+                    val level = if (useRoman) currentLevel.toRoman() else currentLevel
+                    val nextLevel = if (useRoman) (currentLevel + 1).toRoman() else currentLevel + 1
+                    iterator.set("§7Progress to Level $nextLevel: $percent")
+
                     event.itemStack.name = "§a${skillName.firstLetterUppercase()} $level"
                     continue
                 }
