@@ -6,22 +6,32 @@ import at.hannibal2.skyhanni.events.LorenzToolTipEvent
 import at.hannibal2.skyhanni.features.bingo.BingoAPI
 import at.hannibal2.skyhanni.features.bingo.BingoAPI.getData
 import at.hannibal2.skyhanni.features.bingo.card.goals.GoalType
+import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.LorenzColor
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.RenderUtils.highlight
+import at.hannibal2.skyhanni.utils.StringUtils.matches
+import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraft.client.Minecraft
 import net.minecraft.client.gui.inventory.GuiContainer
 import net.minecraft.inventory.ContainerChest
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
 class BingoCardTips {
+
+    private val repoGroup = RepoPattern.group("bingo.card.tips")
+
     private val config get() = SkyHanniMod.feature.event.bingo.bingoCard
+
+    private val inventoryPattern by repoGroup.pattern("card", "Bingo Card")
+    private val rewardPattern by repoGroup.pattern("reward", "§.§.§7Reward")
+    private val contributionRewardsPattern by repoGroup.pattern("reward.contribution", "§.§.§7Contribution Rewards.*")
 
     @SubscribeEvent
     fun onItemTooltipLow(event: LorenzToolTipEvent) {
         if (!isEnabled()) return
-        if (InventoryUtils.openInventoryName() != "Bingo Card") return
+        if (!inventoryPattern.matches(InventoryUtils.openInventoryName())) return
 
         val gui = Minecraft.getMinecraft().currentScreen as? GuiContainer ?: return
         val slot = gui.slotUnderMouse
@@ -35,10 +45,15 @@ class BingoCardTips {
         toolTip[0] = toolTip[0] + " §7(" + difficulty.displayName + "§7)"
 
         var index = if (!communityGoal) {
-            toolTip.indexOf("§5§o§7Reward")
+            toolTip.indexOfFirst { rewardPattern.matches(it) }
         } else {
-            toolTip.indexOfFirst { it.startsWith("§5§o§7Contribution Rewards") }
+            toolTip.indexOfFirst { contributionRewardsPattern.matches(it) }
         } - 1
+
+        if (index == -2) {
+            ErrorManager.logErrorWithData(IndexOutOfBoundsException(), "BingoCardTips reward line not found", "goal" to goal, "tip" to toolTip)
+            return
+        }
 
         toolTip.add(index++, "")
         toolTip.add(index++, "§eGuide:")
@@ -53,7 +68,7 @@ class BingoCardTips {
     @SubscribeEvent
     fun onBackgroundDrawn(event: GuiContainerEvent.BackgroundDrawnEvent) {
         if (!isEnabled()) return
-        if (InventoryUtils.openInventoryName() != "Bingo Card") return
+        if (!inventoryPattern.matches(InventoryUtils.openInventoryName())) return
 
         val guiChest = event.gui
         val chest = guiChest.inventorySlots as ContainerChest
