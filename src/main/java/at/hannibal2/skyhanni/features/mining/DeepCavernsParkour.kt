@@ -100,6 +100,13 @@ class DeepCavernsParkour {
     private fun start() {
         show = true
         parkourHelper?.reset()
+        if (parkourHelper == null) {
+            LorenzUtils.clickableChat(
+                "DeepCavernsParkour missing in SkyHanni Repo! Try /shupdaterepo to fix it!",
+                "shupdaterepo",
+                prefixColor = "§c"
+            )
+        }
     }
 
     @SubscribeEvent
