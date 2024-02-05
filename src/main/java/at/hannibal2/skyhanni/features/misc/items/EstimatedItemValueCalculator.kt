@@ -569,7 +569,7 @@ object EstimatedItemValueCalculator {
 
             var level = rawLevel
             var multiplier = 1
-            if (onlyTierOnePrices.contains(rawName)) {
+            if (rawName in onlyTierOnePrices) {
 
                 when (rawLevel) {
                     2 -> multiplier = 2
