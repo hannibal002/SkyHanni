@@ -31,6 +31,7 @@ import at.hannibal2.skyhanni.data.MinecraftData
 import at.hannibal2.skyhanni.data.OtherInventoryData
 import at.hannibal2.skyhanni.data.OwnInventoryData
 import at.hannibal2.skyhanni.data.PartyAPI
+import at.hannibal2.skyhanni.data.PetAPI
 import at.hannibal2.skyhanni.data.ProfileStorageData
 import at.hannibal2.skyhanni.data.PurseAPI
 import at.hannibal2.skyhanni.data.RenderData
@@ -441,6 +442,7 @@ class SkyHanniMod {
         loadModule(GardenBestCropTime())
         loadModule(TrackerManager)
         loadModule(UtilsPatterns)
+        loadModule(PetAPI)
 
         // APIs
         loadModule(BazaarApi())
