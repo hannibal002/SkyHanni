@@ -2,8 +2,8 @@ package at.hannibal2.skyhanni.test.command
 
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.events.GuiRenderEvent
+import at.hannibal2.skyhanni.events.LorenzTickEvent
 import at.hannibal2.skyhanni.events.PlaySoundEvent
-import at.hannibal2.skyhanni.utils.DelayedRun
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.OSUtils
 import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderables
@@ -26,8 +26,16 @@ object TrackSoundsCommand {
     private val position get() = SkyHanniMod.feature.dev.debug.trackSoundLog
 
     fun command(args: Array<String>) {
+        if (args.firstOrNull() == "end") {
+            if (!isRecording) {
+                LorenzUtils.userError("Nothing to end")
+            } else {
+                cutOfTime = SimpleTimeMark.now()
+            }
+            return
+        }
         if (isRecording) {
-            LorenzUtils.chat("Still tracking sounds, wait for the other tracking to complete before starting a new one")
+            LorenzUtils.userError("Still tracking sounds, wait for the other tracking to complete before starting a new one or type in \"end\" to end it prematurely")
             return
         }
         isRecording = true
@@ -36,15 +44,19 @@ object TrackSoundsCommand {
         LorenzUtils.chat("Now started tracking sounds for ${duration.inWholeSeconds} Seconds")
         startTime = SimpleTimeMark.now()
         cutOfTime = SimpleTimeMark.future(duration)
+    }
+
+    @SubscribeEvent
+    fun onTick(event: LorenzTickEvent) {
+        if (!isRecording) return
         // The function must run after cutOfTime has passed to ensure thread safety
-        DelayedRun.runDelayed(duration + 0.1.seconds) {
-            val string = sounds.reversed().joinToString("\n") { "Time: ${it.first.inWholeMilliseconds}  ${it.second}" }
-            val counter = sounds.size
-            OSUtils.copyToClipboard(string)
-            LorenzUtils.chat("$counter sounds copied into the clipboard!")
-            sounds.clear()
-            isRecording = false
-        }
+        if (cutOfTime.passedSince() <= 0.1.seconds) return
+        val string = sounds.reversed().joinToString("\n") { "Time: ${it.first.inWholeMilliseconds}  ${it.second}" }
+        val counter = sounds.size
+        OSUtils.copyToClipboard(string)
+        LorenzUtils.chat("$counter sounds copied into the clipboard!")
+        sounds.clear()
+        isRecording = false
     }
 
     @SubscribeEvent
