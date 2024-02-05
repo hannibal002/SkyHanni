@@ -34,7 +34,7 @@ public class SensitivityReducerConfig {
     }
 
     @Expose
-    @ConfigOption(name = "Keybind", desc = "Reduces the mouse sensitivity, only if \"Holding Keybind\" is selected above.")
+    @ConfigOption(name = "Keybind", desc = "When selected above, press this key to reduce the mouse sensitivity.")
     @ConfigEditorKeybind(defaultKey = Keyboard.KEY_N)
     public int keybind = Keyboard.KEY_N;
 

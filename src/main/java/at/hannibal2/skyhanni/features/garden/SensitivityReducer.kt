@@ -3,6 +3,7 @@ package at.hannibal2.skyhanni.features.garden
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.config.features.garden.SensitivityReducerConfig
 import at.hannibal2.skyhanni.events.ConfigLoadEvent
+import at.hannibal2.skyhanni.events.DebugDataCollectEvent
 import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.HypixelJoinEvent
 import at.hannibal2.skyhanni.events.LorenzTickEvent
@@ -143,5 +144,14 @@ object SensitivityReducer {
         LorenzUtils.chat("Current Sensitivity: ${gameSettings.mouseSensitivity}")
         LorenzUtils.chat("Stored Sensitivity: ${storage.savedMouseloweredSensitivity}")
         LorenzUtils.chat("Current Divisor: ${config.reducingFactor}")
+    }
+    @SubscribeEvent
+    fun onDebugDataCollect(event: DebugDataCollectEvent) {
+        event.title("Garden Reduced Sensitivity")
+        event.addData {
+            add("Current Sensitivity: ${gameSettings.mouseSensitivity}")
+            add("Stored Sensitivity: ${storage.savedMouseloweredSensitivity}")
+            add("Current Divisor: ${config.reducingFactor}")
+        }
     }
 }
