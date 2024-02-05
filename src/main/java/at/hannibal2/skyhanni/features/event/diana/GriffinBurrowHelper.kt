@@ -190,7 +190,8 @@ object GriffinBurrowHelper {
                 event.drawColor(location, LorenzColor.LIGHT_PURPLE)
                 val distance = location.distance(playerLocation)
                 if (distance > 10) {
-                    val formattedDistance = LorenzUtils.formatInteger(distance.toInt())
+                    distance.toInt()
+                    val formattedDistance = addSeparators()
                     event.drawDynamicText(location.add(y = 1), "§d§lInquisitor §e${formattedDistance}m", 1.7)
                 } else {
                     event.drawDynamicText(location.add(y = 1), "§d§lInquisitor", 1.7)
@@ -252,7 +253,8 @@ object GriffinBurrowHelper {
                 val color = if (currentWarp == null) "§f" else "§b"
                 event.drawDynamicText(guessLocation.add(y = 1), "${color}Guess", 1.5)
                 if (distance > 5) {
-                    val formattedDistance = LorenzUtils.formatInteger(distance.toInt())
+                    distance.toInt()
+                    val formattedDistance = addSeparators()
                     event.drawDynamicText(guessLocation.add(y = 1), "§e${formattedDistance}m", 1.7, yOff = 10f)
                 }
             }
@@ -275,7 +277,7 @@ object GriffinBurrowHelper {
             DelayedRun.runDelayed(1.seconds) {
                 if (BurrowAPI.lastBurrowRelatedChatMessage.passedSince() > 2.seconds) {
                     if (particleBurrows.containsKey(location)) {
-                        LorenzUtils.error("Something unexected happened, deleted the burrow.")
+                        // workaround
                         particleBurrows = particleBurrows.editCopy { keys.remove(location) }
                     }
                 }

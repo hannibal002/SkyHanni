@@ -19,6 +19,11 @@ public class MiningConfig {
     public KingTalismanConfig kingTalisman = new KingTalismanConfig();
 
     @Expose
+    @ConfigOption(name = "Deep Caverns Parkour", desc = "")
+    @Accordion
+    public DeepCavernsParkourConfig deepCavernsParkour = new DeepCavernsParkourConfig();
+
+    @Expose
     @ConfigOption(name = "Commissions Calculator", desc = "")
     @Accordion
     public CommissionsCalculatorConfig commissionsCalculator = new CommissionsCalculatorConfig();
