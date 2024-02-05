@@ -49,6 +49,10 @@ class CaptureFarmingGear {
         "uniquevisitors.tierprogress",
         ".* §e(?<having>.*)§6/(?<total>.*)"
     )
+    private val petMenuPattern by patternGroup.pattern(
+        "petsmenu", 
+        "Pets(?: \\(\\d+/\\d+\\) )?"
+    )
 
     companion object {
         private val strengthPattern = " Strength: §r§c❁(?<strength>.*)".toPattern()
@@ -127,9 +131,12 @@ class CaptureFarmingGear {
         val farmingItems = farmingItems ?: return
         val outdatedItems = outdatedItems ?: return
         val items = event.inventoryItems
+        petMenuPattern.matchMatcher(event.inventoryName) {
+            pets(farmingItems, items, outdatedItems)
+            return
+        }
         when (event.inventoryName) {
             "Your Equipment and Stats" -> equipmentAndStats(items, farmingItems, outdatedItems)
-            "Pets" -> pets(farmingItems, items, outdatedItems)
             "Your Skills" -> skills(items, storage)
             "Community Shop" -> communityShop(items)
             "Configure Plots" -> configurePlots(items, storage)
