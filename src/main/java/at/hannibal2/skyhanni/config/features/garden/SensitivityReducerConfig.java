@@ -9,7 +9,7 @@ import io.github.moulberry.moulconfig.annotations.ConfigOption;
 import io.github.moulberry.moulconfig.observer.Property;
 import org.lwjgl.input.Keyboard;
 
-public class SensReducerConfig {
+public class SensitivityReducerConfig {
     @Expose
     @ConfigOption(
         name = "Auto Enable",

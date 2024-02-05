@@ -16,7 +16,7 @@ import kotlin.math.abs
 import kotlin.time.Duration.Companion.seconds
 
 object SensitivityReducer {
-    private val config get() = SkyHanniMod.feature.garden.sensReducerConfig
+    private val config get() = SkyHanniMod.feature.garden.sensitivityReducerConfig
     private val storage get() = SkyHanniMod.feature.storage
     private var isToggled = false
     private var isManualToggle = false
