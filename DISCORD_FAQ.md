@@ -28,8 +28,10 @@ _Frequently Asked Questions_
 > Use [Patcher](<https://sk1er.club/mods/patcher>) to have 1.12 hit boxes in 1.8.9.
 
 > **9: Why does my Item Tracker feature not track this item?**
-> Check if the item goes directly into your sacks. If it does, enable the sack pickup chat message from Hypixel.
-> You can use SkyHanni's own setting to still hide the message from chat.
+> 1. Check if the item goes directly into your sacks. 
+> 2. If it does, enable the sack pickup chat message from Hypixel:
+> 3. Go to `hypixel settings --> personal -> chat feedback` and enable `sack notifications`
+> 4. If you want the [Sacks] messages to be hidden, do `/sh sacks hider` and enable that
 
 > **10: How do I remove SkyHanni GUI elements?**
 > 1. Type `/sh gui`
@@ -38,10 +40,17 @@ _Frequently Asked Questions_
 > 4. Search for that element with /sh name
 > 5. Disable this feature
   
-> **11: How do I reset a tracker?**
-> To reset a tracker, use the in-game command /shcommands <tracker type>.
-> Execute the obtained command to reset the tracker
+> **11: How do I reset a SkyHanni tracker?**
+> 1. Do you want to **view only the current session**? 
+> 2. Open the inventory (Press E) and hover over the display. 
+> 3. Then click on [session].
+> 1. Do you want to **remove one specific item** from the tracker?
+> 2. Open the inventory (Press E) and hover over the display.
+> 3. Then shift-click on an item in the list to remove it.
+> 1. Do you want to reset the total stats of a tracker?
+> 2. To reset a tracker, use the in-game command /shcommands <tracker type>.
+> 3. Execute the obtained command to reset the tracker.
 
 
-*This FAQ was last updated on January 7th, 2024.
+*This FAQ was last updated on February 5th, 2024.
 If you believe there's something that should be added to this list, please tell us, so we can add it.*
