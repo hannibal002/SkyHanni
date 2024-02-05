@@ -134,10 +134,10 @@ class KingTalismanHelper {
                 val current = king == currentKing
 
                 val missingTimeFormat = if (current) {
-                    val time = Duration.format()
+                    val time = TimeUtils.formatDuration(timeUntil - 1000 * 60 * 20 * (kingCircles.size - 1))
                     "§7(§b$time remaining§7)"
                 } else {
-                    val time = Duration.format()
+                    val time = TimeUtils.formatDuration(timeUntil, maxUnits = 2)
                     "§7(§bin $time§7)"
                 }
 
@@ -158,7 +158,7 @@ class KingTalismanHelper {
         val storage = storage ?: error("profileSpecific is null")
         val kingsTalkedTo = storage.kingsTalkedTo
         val (nextKing, until) = getKingTimes().filter { it.key !in kingsTalkedTo }.sorted().firstNotNullOf { it }
-        val time = Duration.format()
+        val time = TimeUtils.formatDuration(until, maxUnits = 2)
 
         return "§cNext missing king: §7$nextKing §7(§bin $time§7)"
     }
