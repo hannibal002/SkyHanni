@@ -1,6 +1,7 @@
 package at.hannibal2.skyhanni.features.garden
 
 import at.hannibal2.skyhanni.SkyHanniMod
+import at.hannibal2.skyhanni.config.features.garden.SensitivityReducerConfig
 import at.hannibal2.skyhanni.events.ConfigLoadEvent
 import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.HypixelJoinEvent
@@ -36,7 +37,7 @@ object SensitivityReducer {
             return
         }
         if (isManualToggle) return
-        if (!config.enabled) {
+        if (config.mode != SensitivityReducerConfig.Mode.OFF) {
             if (isToggled) restoreSensitivity()
             return
         }
@@ -50,12 +51,17 @@ object SensitivityReducer {
             isToggled = false
             return
         }
-        if (config.useKeybind) {
-            if (config.keybind.isKeyHeld() && !isToggled)  toggle(true)
-            else if (!config.keybind.isKeyHeld() && isToggled) toggle(false)
-        } else {
-            if (isHoldingTool() && !isToggled) toggle(true)
-            else if (!isHoldingTool() && isToggled) toggle(false)
+        when (config.mode) {
+            SensitivityReducerConfig.Mode.TOOL -> {
+                if (isHoldingTool() && !isToggled) toggle(true)
+                else if (!isHoldingTool() && isToggled) toggle(false)
+            }
+            SensitivityReducerConfig.Mode.KEYBIND -> {
+                if (config.keybind.isKeyHeld() && !isToggled)  toggle(true)
+                else if (!config.keybind.isKeyHeld() && isToggled) toggle(false)
+            }
+            SensitivityReducerConfig.Mode.OFF -> return
+            else -> return
         }
     }
 
