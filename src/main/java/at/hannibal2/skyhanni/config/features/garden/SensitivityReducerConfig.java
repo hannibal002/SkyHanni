@@ -45,13 +45,13 @@ public class SensitivityReducerConfig {
 
     @Expose
     @ConfigOption(
-        name = "keybind test",
-        desc = "instead of checking for a farming tool use a keybind")
+        name = "Use Keybind",
+        desc = "Use a keybind instead of holding a farming tool.")
     @ConfigEditorBoolean
     public boolean useKeybind = true;
 
     @Expose
-    @ConfigOption(name = "keybind", desc = "")
+    @ConfigOption(name = "Keybind", desc = "")
     @ConfigEditorKeybind(defaultKey = Keyboard.KEY_N)
     public int keybind = Keyboard.KEY_N;
 
