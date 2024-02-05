@@ -20,13 +20,21 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
 class BingoCardTips {
 
-    private val repoGroup = RepoPattern.group("bingo.card.tips")
-
     private val config get() = SkyHanniMod.feature.event.bingo.bingoCard
 
-    private val inventoryPattern by repoGroup.pattern("card", "Bingo Card")
-    private val rewardPattern by repoGroup.pattern("reward", "§.§.§7Reward")
-    private val contributionRewardsPattern by repoGroup.pattern("reward.contribution", "§.§.§7Contribution Rewards.*")
+    private val patternGroup = RepoPattern.group("bingo.card.tips")
+    private val inventoryPattern by patternGroup.pattern(
+        "card", 
+        "Bingo Card"
+    )
+    private val rewardPattern by patternGroup.pattern(
+        "reward", 
+        "§.§.§7Reward"
+    )
+    private val contributionRewardsPattern by patternGroup.pattern(
+        "reward.contribution", 
+        "§.§.§7Contribution Rewards.*"
+    )
 
     @SubscribeEvent
     fun onItemTooltipLow(event: LorenzToolTipEvent) {
