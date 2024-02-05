@@ -4,11 +4,11 @@ import at.hannibal2.skyhanni.config.core.config.gui.GuiPositionEditor
 import at.hannibal2.skyhanni.data.ToolTipData
 import at.hannibal2.skyhanni.utils.LorenzLogger
 import at.hannibal2.skyhanni.utils.NEUItems.renderOnScreen
+import at.hannibal2.skyhanni.utils.RenderUtils.HorizontalAlignment
+import at.hannibal2.skyhanni.utils.RenderUtils.VerticalAlignment
 import at.hannibal2.skyhanni.utils.renderables.RenderableUtils.calculateTableXOffsets
 import at.hannibal2.skyhanni.utils.renderables.RenderableUtils.calculateTableYOffsets
 import at.hannibal2.skyhanni.utils.renderables.RenderableUtils.renderXYAligned
-import at.hannibal2.skyhanni.utils.RenderUtils.HorizontalAlignment
-import at.hannibal2.skyhanni.utils.RenderUtils.VerticalAlignment
 import io.github.moulberry.moulconfig.gui.GuiScreenElementWrapper
 import io.github.moulberry.notenoughupdates.util.Utils
 import net.minecraft.client.Minecraft
@@ -21,6 +21,7 @@ import java.util.Collections
 import kotlin.math.max
 
 interface Renderable {
+
     val width: Int
     val height: Int
 
@@ -38,6 +39,7 @@ interface Renderable {
     fun render(posX: Int, posY: Int)
 
     companion object {
+
         val logger = LorenzLogger("debug/renderable")
         val list = mutableMapOf<Pair<Int, Int>, List<Int>>()
 
@@ -53,10 +55,6 @@ interface Renderable {
                 currentRenderPassMousePosition = last
             }
         }
-
-        enum class HorizontalAlignment { Left, Center, Right }
-        enum class VerticalAlignment { Top, Center, Bottom }
-
 
         fun fromAny(any: Any?, itemScale: Double = 1.0): Renderable? = when (any) {
             null -> placeholder(12)
@@ -245,7 +243,6 @@ interface Renderable {
                         unhovered.render(posX, posY)
                         isHovered = false
                     }
-
                 }
             }
 
@@ -306,8 +303,8 @@ interface Renderable {
             content: List<List<Renderable?>>,
             xPadding: Int = 1,
             yPadding: Int = 0,
-            horizontalAlign: HorizontalAlignment = HorizontalAlignment.Left,
-            verticalAlign: VerticalAlignment = VerticalAlignment.Top,
+            horizontalAlign: HorizontalAlignment = HorizontalAlignment.LEFT,
+            verticalAlign: VerticalAlignment = VerticalAlignment.TOP,
         ) = object : Renderable {
             val xOffsets: List<Int> = calculateTableXOffsets(content, xPadding)
             val yOffsets: List<Int> = calculateTableYOffsets(content, yPadding)
