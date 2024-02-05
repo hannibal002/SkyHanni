@@ -25,6 +25,7 @@ import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils.editCopy
 import at.hannibal2.skyhanni.utils.LorenzUtils.isInIsland
 import at.hannibal2.skyhanni.utils.LorenzVec
+import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.RenderUtils.draw3DLine
 import at.hannibal2.skyhanni.utils.RenderUtils.drawColor
 import at.hannibal2.skyhanni.utils.RenderUtils.drawDynamicText
@@ -190,8 +191,7 @@ object GriffinBurrowHelper {
                 event.drawColor(location, LorenzColor.LIGHT_PURPLE)
                 val distance = location.distance(playerLocation)
                 if (distance > 10) {
-                    distance.toInt()
-                    val formattedDistance = addSeparators()
+                    val formattedDistance = distance.toInt().addSeparators()
                     event.drawDynamicText(location.add(y = 1), "§d§lInquisitor §e${formattedDistance}m", 1.7)
                 } else {
                     event.drawDynamicText(location.add(y = 1), "§d§lInquisitor", 1.7)
@@ -253,8 +253,7 @@ object GriffinBurrowHelper {
                 val color = if (currentWarp == null) "§f" else "§b"
                 event.drawDynamicText(guessLocation.add(y = 1), "${color}Guess", 1.5)
                 if (distance > 5) {
-                    distance.toInt()
-                    val formattedDistance = addSeparators()
+                    val formattedDistance = distance.toInt().addSeparators()
                     event.drawDynamicText(guessLocation.add(y = 1), "§e${formattedDistance}m", 1.7, yOff = 10f)
                 }
             }
