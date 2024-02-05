@@ -7,11 +7,12 @@ import at.hannibal2.skyhanni.utils.NEUItems.renderOnScreen
 import at.hannibal2.skyhanni.utils.renderables.RenderableUtils.calculateTableXOffsets
 import at.hannibal2.skyhanni.utils.renderables.RenderableUtils.calculateTableYOffsets
 import at.hannibal2.skyhanni.utils.renderables.RenderableUtils.renderXYAligned
+import at.hannibal2.skyhanni.utils.RenderUtils.HorizontalAlignment
+import at.hannibal2.skyhanni.utils.RenderUtils.VerticalAlignment
 import io.github.moulberry.moulconfig.gui.GuiScreenElementWrapper
 import io.github.moulberry.notenoughupdates.util.Utils
 import net.minecraft.client.Minecraft
 import net.minecraft.client.gui.Gui
-import net.minecraft.client.gui.GuiChat
 import net.minecraft.client.gui.inventory.GuiEditSign
 import net.minecraft.client.renderer.GlStateManager
 import net.minecraft.item.ItemStack
@@ -251,8 +252,8 @@ interface Renderable {
         fun itemStack(
             any: ItemStack,
             scale: Double = 1.0,
-            horizontalAlign: HorizontalAlignment = HorizontalAlignment.Left,
-            verticalAlign: VerticalAlignment = VerticalAlignment.Top,
+            horizontalAlign: HorizontalAlignment = HorizontalAlignment.LEFT,
+            verticalAlign: VerticalAlignment = VerticalAlignment.TOP,
         ) = object : Renderable {
             override val width: Int
                 get() = 12
@@ -262,8 +263,6 @@ interface Renderable {
 
             override fun render(posX: Int, posY: Int) {
                 GlStateManager.pushMatrix()
-                if (Minecraft.getMinecraft().currentScreen == null || Minecraft.getMinecraft().currentScreen is GuiChat)
-                    GlStateManager.translate(0F, 0F, -145F)
                 any.renderOnScreen(0F, 0F, scaleMultiplier = scale)
                 GlStateManager.popMatrix()
             }
@@ -275,8 +274,8 @@ interface Renderable {
 
         fun string(
             text: String,
-            horizontalAlign: HorizontalAlignment = HorizontalAlignment.Left,
-            verticalAlign: VerticalAlignment = VerticalAlignment.Top,
+            horizontalAlign: HorizontalAlignment = HorizontalAlignment.LEFT,
+            verticalAlign: VerticalAlignment = VerticalAlignment.TOP,
         ) = object : Renderable {
 
             override val width: Int
@@ -293,8 +292,8 @@ interface Renderable {
         fun placeholder(width: Int, height: Int = 10) = object : Renderable {
             override val width = width
             override val height = height
-            override val horizontalAlign = HorizontalAlignment.Left
-            override val verticalAlign = VerticalAlignment.Top
+            override val horizontalAlign = HorizontalAlignment.LEFT
+            override val verticalAlign = VerticalAlignment.TOP
 
             override fun render(posX: Int, posY: Int) {
             }

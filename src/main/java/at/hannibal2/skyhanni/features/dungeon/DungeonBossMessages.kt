@@ -44,7 +44,7 @@ class DungeonBossMessages {
     )
 
     @SubscribeEvent
-    fun onChatMessage(event: LorenzChatEvent) {
+    fun onChat(event: LorenzChatEvent) {
         if (!LorenzUtils.inDungeons) return
         if (!isBoss(event.message)) return
 

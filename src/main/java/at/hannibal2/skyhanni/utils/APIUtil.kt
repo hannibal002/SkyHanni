@@ -71,9 +71,11 @@ object APIUtil {
                             e.printStackTrace()
 
                         } else {
-                            ErrorManager.logError(
-                                Error("$apiName error for url: '$urlString'", e),
-                                "Failed to load data from $apiName"
+                            ErrorManager.logErrorWithData(
+                                e, "$apiName error for url: '$urlString'",
+                                "apiName" to apiName,
+                                "urlString" to urlString,
+                                "returnedData" to retSrc
                             )
                         }
                     }
@@ -83,9 +85,10 @@ object APIUtil {
             if (silentError) {
                 throw throwable
             } else {
-                ErrorManager.logError(
-                    Error("$apiName error for url: '$urlString'", throwable),
-                    "Failed to load data from $apiName"
+                ErrorManager.logErrorWithData(
+                    throwable, "$apiName error for url: '$urlString'",
+                    "apiName" to apiName,
+                    "urlString" to urlString,
                 )
             }
         } finally {
