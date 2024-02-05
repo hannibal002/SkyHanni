@@ -1,4 +1,5 @@
-.idea/
+.idea/*
+!.idea/icon.svg
 .vscode/
 run/
 build/
@@ -9,5 +10,5 @@ build
 gradle.properties
 .gradle
 
-#other
+# other
 .DS_STORE

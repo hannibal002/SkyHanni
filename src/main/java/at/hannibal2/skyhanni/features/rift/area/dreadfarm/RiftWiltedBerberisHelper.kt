@@ -16,6 +16,7 @@ import at.hannibal2.skyhanni.utils.RenderUtils.drawDynamicText
 import at.hannibal2.skyhanni.utils.RenderUtils.drawFilledBoundingBox_nea
 import at.hannibal2.skyhanni.utils.RenderUtils.expandBlock
 import net.minecraft.client.Minecraft
+import net.minecraft.init.Blocks
 import net.minecraft.util.EnumParticleTypes
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import java.awt.Color
@@ -43,9 +44,9 @@ class RiftWiltedBerberisHelper {
         hasFarmingToolInHand = InventoryUtils.getItemInHand()?.getInternalName() == RiftAPI.farmingTool
 
         if (Minecraft.getMinecraft().thePlayer.onGround) {
-            val block = LocationUtils.playerLocation().add(y = -1).getBlockAt().toString()
+            val block = LocationUtils.playerLocation().add(y = -1).getBlockAt()
             val currentY = LocationUtils.playerLocation().y
-            isOnFarmland = block == "Block{minecraft:farmland}" && (currentY % 1 == 0.0)
+            isOnFarmland = block == Blocks.farmland && (currentY % 1 == 0.0)
         }
     }
 
