@@ -30,6 +30,7 @@ import com.google.gson.GsonBuilder
 import com.google.gson.reflect.TypeToken
 import io.github.moulberry.notenoughupdates.util.Constants
 import io.github.moulberry.notenoughupdates.util.Utils
+import io.github.moulberry.notenoughupdates.util.XPInformation
 import net.minecraft.init.Blocks
 import net.minecraft.init.Items
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
@@ -44,7 +45,6 @@ object SkillAPI {
     private val skillTabPattern by patternGroup.pattern("skilltabpattern", "^§e§lSkills: §r§a(?<type>\\w+) (?<level>\\d+): §r§3(?<progress>.+)%\$")
     private val maxSkillTabPattern by patternGroup.pattern("maxskilltabpattern", "^§e§lSkills: §r§a(?<type>\\w+) (?<level>\\d+): §r§c§lMAX\$")
     private val SPACE_SPLITTER = Splitter.on("  ").omitEmptyStrings().trimResults()
-    private var lastActionBar: String? = null
 
     var skillXPInfoMap = mutableMapOf<String, SkillXPInfo>()
     var oldSkillInfoMap = mutableMapOf<String?, SkillInfo?>()
@@ -56,8 +56,7 @@ object SkillAPI {
         "Mining" to Utils.createItemStack(Items.golden_pickaxe, "Mining"),
         "Enchanting" to Utils.createItemStack(Blocks.enchanting_table, "Enchanting"),
         "Fishing" to Utils.createItemStack(Items.fishing_rod, "Fishing"),
-        "Carpentry" to Utils.createItemStack(Blocks.crafting_table, "Carpentry"),
-        "Social" to Utils.createItemStack(Items.emerald, "Social")
+        "Carpentry" to Utils.createItemStack(Blocks.crafting_table, "Carpentry")
     )
     val skillMap: MutableMap<String, SkillInfo>? get() = ProfileStorageData.profileSpecific?.skillMap
     var showDisplay = false
@@ -111,7 +110,7 @@ object SkillAPI {
                 val cleanName = stack.cleanName()
                 val split = cleanName.split(" ")
                 val skillName = split.first().lowercase()
-                if (skillName == "dungeoneering") continue
+                if (skillName == "dungeoneering" || skillName == "social" || skillName == "runecrafting") continue
                 val skillLevel = split.last().romanToDecimalIfNecessary()
                 val skillInfo = skillMap?.getOrPut(skillName) { SkillInfo() }
 
@@ -122,9 +121,9 @@ object SkillAPI {
                     val progress = cleanLine.substring(cleanLine.lastIndexOf(' ') + 1)
                     if (previousLine == "§7§8Max Skill level reached!") {
                         var totalXp = progress.formatNumber()
-                        if (skillLevel == 60) totalXp = 0L.coerceAtLeast(totalXp - 7_000_000)
+                        val minus = if (skillLevel == 50) 4_000_000 else if (skillLevel == 60) 7_000_000 else 0
+                        totalXp -= minus
                         val (overflowLevel, overflowCurrent, overflowNeeded, overflowTotal) = getSkillInfo(skillLevel, totalXp, 0L, totalXp)
-
                         skillInfo?.apply {
                             this.overflowLevel = overflowLevel
                             this.overflowCurrentXp = overflowCurrent
@@ -164,8 +163,8 @@ object SkillAPI {
         val currentXp = matcher.group(3).formatNumber()
         val maxXp = matcher.group(4).formatNumber()
         val level = getLevel(maxXp)
-        val (levelOverflow, currentOverflow, currentMaxOverflow, totalOverflow) = getSkillInfo(level, currentXp, maxXp, maxXp)
 
+        val (levelOverflow, currentOverflow, currentMaxOverflow, totalOverflow) = getSkillInfo(level, currentXp, maxXp, currentXp)
         if (skillInfo.overflowLevel != 0 && levelOverflow == skillInfo.overflowLevel + 1)
             SkillOverflowLevelupEvent(skillS, skillInfo.overflowLevel, levelOverflow).postAndCatch()
 
@@ -173,7 +172,7 @@ object SkillAPI {
             this.level = level
             this.currentXp = currentXp
             this.currentXpMax = maxXp
-            this.totalXp = maxXp
+            this.totalXp = currentXp
 
             this.overflowLevel = levelOverflow
             this.overflowCurrentXp = currentOverflow
@@ -238,10 +237,10 @@ object SkillAPI {
             this.overflowTotalXp = totalOverflow
             this.overflowLevel = currentLevel
 
-            this.currentXp = currentOverflow
-            this.currentXpMax = currentMaxOverflow
-            this.totalXp = totalOverflow
-            this.level = currentLevel
+            this.currentXp = currentXp
+            this.currentXpMax = maxXp
+            this.totalXp = levelXp
+            this.level = level
 
             this.lastGain = matcher.group(1)
         }

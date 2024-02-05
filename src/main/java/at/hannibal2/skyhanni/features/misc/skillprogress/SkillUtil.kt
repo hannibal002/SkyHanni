@@ -45,12 +45,29 @@ object SkillUtil {
         return LorenzUtils.Quad(level, xpCurrent, xpForCurr, total)
     }
 
+    /**
+     * Calculate overflow starting at level 50
+     */
     private fun calculateOverFlow50(currentXp: Long): LorenzUtils.Quad<Int, Long, Long, Long> {
-        var xpCurrent = currentXp - 4_000_000
-        var slope = 300000L
-        var xpForCurr = 4000000 + slope
+        var xpCurrent = currentXp
         var level = 50
         var total = 0L
+        var slope = 300000L
+        var xpForCurr = 4000000 + slope
+
+        while (level < 60 && xpCurrent > xpForCurr) {
+            level++
+            xpCurrent -= xpForCurr
+            total += xpForCurr
+            xpForCurr += slope
+            if (level % 10 == 0) slope *= 2
+        }
+
+        if (level >= 60) {
+            slope = 600000L
+            xpForCurr = 7000000 + slope
+        }
+
         while (xpCurrent > xpForCurr) {
             level++
             xpCurrent -= xpForCurr
@@ -59,6 +76,7 @@ object SkillUtil {
             if (level % 10 == 0) slope *= 2
         }
         total += xpCurrent
+
         return LorenzUtils.Quad(level, xpCurrent, xpForCurr, total)
     }
 
