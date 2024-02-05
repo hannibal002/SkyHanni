@@ -30,9 +30,22 @@ object UtilsPatterns {
         "item.name.enchanted.book",
         ".{2}?Enchanted Book"
     )
+    val enchantmentNamePattern by patternGroup.pattern(
+        "item.neuitems.enchantmentname",
+        "^(?<format>(?:§.)+)(?<name>[^§]+) (?<level>[IVXL]+)$"
+    )
 
     val potionPattern by patternGroup.pattern(
         "item.name.potion",
         ".*Potion"
+    )
+    val petLevelPattern by patternGroup.pattern(
+        "item.petlevel",
+        "(?:§f§f)?§7\\[Lvl (?<level>\\d+)] .*"
+    )
+
+    val seasonPattern by patternGroup.pattern(
+        "skyblocktime.season",
+        "(?:Early |Late )?(?<season>Spring|Summer|Autumn|Winter)"
     )
 }

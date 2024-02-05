@@ -31,7 +31,7 @@ class PlayerDeathMessages {
     }
 
     @SubscribeEvent
-    fun onChatMessage(event: LorenzChatEvent) {
+    fun onChat(event: LorenzChatEvent) {
         if (!LorenzUtils.inSkyBlock) return
 
         val message = event.message
