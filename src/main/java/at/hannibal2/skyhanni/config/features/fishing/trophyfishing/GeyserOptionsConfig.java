@@ -21,7 +21,7 @@ public class GeyserOptionsConfig {
     @Expose
     @ConfigOption(
         name = "Draw Geyser Box",
-        desc = "Draws a box around the effective area of the geyser")
+        desc = "Draws a box around the effective area of the geyser.")
     @ConfigEditorBoolean
     @FeatureToggle
     public boolean drawGeyserBoundingBox = true;
