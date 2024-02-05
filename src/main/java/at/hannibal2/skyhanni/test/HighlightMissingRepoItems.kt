@@ -3,14 +3,11 @@ package at.hannibal2.skyhanni.test
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.events.GuiContainerEvent
-import at.hannibal2.skyhanni.events.RepositoryReloadEvent
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalNameOrNull
 import at.hannibal2.skyhanni.utils.LorenzColor
 import at.hannibal2.skyhanni.utils.LorenzUtils
-import at.hannibal2.skyhanni.utils.MultiFilter
 import at.hannibal2.skyhanni.utils.NEUItems
 import at.hannibal2.skyhanni.utils.RenderUtils.highlight
-import at.hannibal2.skyhanni.data.jsonobjects.repo.MultiFilterJson
 import net.minecraft.client.Minecraft
 import net.minecraft.client.gui.inventory.GuiChest
 import net.minecraft.client.gui.inventory.GuiInventory
@@ -19,7 +16,6 @@ import net.minecraftforge.fml.common.eventhandler.EventPriority
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
 class HighlightMissingRepoItems {
-    private val ignoreItems = MultiFilter()
 
     @SubscribeEvent(priority = EventPriority.LOWEST)
     fun onBackgroundDrawn(event: GuiContainerEvent.BackgroundDrawnEvent) {
@@ -41,7 +37,7 @@ class HighlightMissingRepoItems {
         for (slot in slots) {
             val internalName = slot.stack?.getInternalNameOrNull() ?: continue
             if (NEUItems.allInternalNames.contains(internalName)) continue
-            if (ignoreItems.match(internalName.asString())) continue
+            if (NEUItems.ignoreItemsFilter.match(internalName.asString())) continue
 
             slot highlight LorenzColor.RED
         }
@@ -50,12 +46,6 @@ class HighlightMissingRepoItems {
     @SubscribeEvent
     fun onNeuRepoReload(event: io.github.moulberry.notenoughupdates.events.RepositoryReloadEvent) {
         NEUItems.allItemsCache = NEUItems.readAllNeuItems()
-    }
-
-    @SubscribeEvent
-    fun onRepoReload(event: RepositoryReloadEvent) {
-        val ignoredItems = event.getConstant<MultiFilterJson>("IgnoredItems")
-        ignoreItems.load(ignoredItems)
     }
 
     @SubscribeEvent

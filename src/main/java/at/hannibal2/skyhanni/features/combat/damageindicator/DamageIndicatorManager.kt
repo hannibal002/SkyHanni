@@ -103,6 +103,12 @@ class DamageIndicatorManager {
                 .map { it.entity.getLorenzVec() }
                 .minOfOrNull { it.distance(location) } ?: Double.MAX_VALUE
         }
+
+        fun removeDamageIndicator(type: BossType) {
+            data = data.editCopy {
+                values.removeIf { it.bossType == type }
+            }
+        }
     }
 
     @SubscribeEvent
@@ -112,7 +118,7 @@ class DamageIndicatorManager {
     }
 
     @SubscribeEvent(receiveCanceled = true)
-    fun onChatMessage(event: LorenzChatEvent) {
+    fun onChat(event: LorenzChatEvent) {
         mobFinder?.handleChat(event.message)
     }
 
@@ -636,6 +642,7 @@ class DamageIndicatorManager {
         }
 
         //Hit phase
+        var hitPhaseText: String? = null
         val armorStandHits = entity.getNameTagWith(3, " Hit")
         if (armorStandHits != null) {
             val maxHits = when (entityData.bossType) {
@@ -649,22 +656,24 @@ class DamageIndicatorManager {
                 group("hits").toInt()
             } ?: error("No hits number found in ender slayer name '${armorStandHits.name}'")
 
-            return NumberUtil.percentageColor(hits.toLong(), maxHits.toLong()).getChatColor() + "$hits Hits"
+            hitPhaseText = NumberUtil.percentageColor(hits.toLong(), maxHits.toLong()).getChatColor() + "$hits Hits"
         }
 
         //Laser phase
         if (config.enderSlayer.laserPhaseTimer && entity.ridingEntity != null) {
-            //TODO more tests, more exact values, better logic? idk make this working perfectly pls
-            val totalTimeAlive = 7.4.seconds
+            val totalTimeAlive = 8.2.seconds
 
             val ticksAlive = entity.ridingEntity.ticksExisted.ticks
             val remainingTime = totalTimeAlive - ticksAlive
             val formatDelay = formatDelay(remainingTime)
-            if (config.enderSlayer.showHealthDuringLaser) {
+            if (config.enderSlayer.showHealthDuringLaser || hitPhaseText != null) {
                 entityData.nameSuffix = " §f$formatDelay"
             } else {
                 return formatDelay
             }
+        }
+        hitPhaseText?.let {
+            return it
         }
 
         return result
@@ -896,7 +905,6 @@ class DamageIndicatorManager {
 
             result
         }
-
 
     }
 

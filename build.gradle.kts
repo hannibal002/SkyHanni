@@ -14,7 +14,7 @@ plugins {
 }
 
 group = "at.hannibal2.skyhanni"
-version = "0.23.Beta.11"
+version = "0.23.Beta.16"
 
 val gitHash by lazy {
     val baos = ByteArrayOutputStream()
@@ -165,6 +165,7 @@ loom {
             if (SystemUtils.IS_OS_MAC_OSX) {
                 vmArgs.remove("-XstartOnFirstThread")
             }
+            vmArgs.add("-Xmx4G")
         }
         "server" {
             isIdeConfigGenerated = false
