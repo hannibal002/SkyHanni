@@ -8,8 +8,8 @@ import at.hannibal2.skyhanni.data.GuiEditManager.Companion.getDummySize
 import at.hannibal2.skyhanni.events.GuiRenderItemEvent
 import at.hannibal2.skyhanni.events.LorenzRenderWorldEvent
 import at.hannibal2.skyhanni.test.command.ErrorManager
-import at.hannibal2.skyhanni.utils.LorenzUtils.addAsSingletonList
 import at.hannibal2.skyhanni.utils.renderables.Renderable
+import at.hannibal2.skyhanni.utils.renderables.RenderableUtils.renderXAligned
 import io.github.moulberry.moulconfig.internal.TextRenderUtils
 import io.github.moulberry.notenoughupdates.util.Utils
 import net.minecraft.client.Minecraft
@@ -34,9 +34,10 @@ import kotlin.time.Duration
 import kotlin.time.DurationUnit
 
 object RenderUtils {
-    
-    enum class HorizontalAlignment{LEFT, CENTER, RIGHT}
-    
+
+    enum class HorizontalAlignment { LEFT, CENTER, RIGHT }
+    enum class VerticalAlignment { TOP, CENTER, BOTTOM }
+
     private val beaconBeam = ResourceLocation("textures/entity/beacon_beam.png")
 
     infix fun Slot.highlight(color: LorenzColor) {
@@ -457,15 +458,24 @@ object RenderUtils {
     fun Position.renderRenderables(
         renderables: List<Renderable>,
         extraSpace: Int = 0,
-        itemScale: Double = 1.0,
         posLabel: String,
     ) {
         if (renderables.isEmpty()) return
-        val list = mutableListOf<List<Any>>()
+        var longestY = 0
+        val longestX = renderables.maxOf { it.width }
         for (line in renderables) {
-            list.addAsSingletonList(line)
+            GlStateManager.pushMatrix()
+            val (x, y) = transform()
+            GlStateManager.translate(0f, longestY.toFloat(), 0F)
+            Renderable.withMousePosition(x, y) {
+                line.renderXAligned(0, longestY, longestX)
+            }
+
+            longestY += line.height + extraSpace + 2
+
+            GlStateManager.popMatrix()
         }
-        renderStringsAndItems(list, extraSpace, itemScale, posLabel)
+        GuiEditManager.add(this, posLabel, longestX, longestY)
     }
 
     /**
