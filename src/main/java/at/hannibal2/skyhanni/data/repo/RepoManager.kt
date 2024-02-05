@@ -6,6 +6,7 @@ import at.hannibal2.skyhanni.events.DebugDataCollectEvent
 import at.hannibal2.skyhanni.events.RepositoryReloadEvent
 import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.ChatUtils
+import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import com.google.gson.JsonObject
 import net.minecraft.client.Minecraft
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
@@ -22,6 +23,7 @@ import java.net.URL
 import java.nio.charset.StandardCharsets
 import java.util.concurrent.CompletableFuture
 import java.util.concurrent.atomic.AtomicBoolean
+import kotlin.time.Duration.Companion.minutes
 
 class RepoManager(private val configLocation: File) {
 
@@ -29,6 +31,7 @@ class RepoManager(private val configLocation: File) {
     private var latestRepoCommit: String? = null
     private val repoLocation: File = File(configLocation, "repo")
     private var error = false
+    private var lastRepoUpdate = SimpleTimeMark.farPast()
 
     companion object {
 
@@ -84,8 +87,7 @@ class RepoManager(private val configLocation: File) {
                 val file = File(configLocation, "repo")
                 if (file.exists() && currentCommitJSON != null && currentCommitJSON["sha"].asString == latestRepoCommit
                 ) {
-                    if (unsuccessfulConstants.isEmpty()) {
-
+                    if (unsuccessfulConstants.isEmpty() && lastRepoUpdate.passedSince() < 1.minutes) {
                         if (command) {
                             ChatUtils.chat("§7The repo is already up to date!")
                             atomicShouldManuallyReload.set(false)
@@ -93,6 +95,7 @@ class RepoManager(private val configLocation: File) {
                         return@supplyAsync false
                     }
                 }
+                lastRepoUpdate = SimpleTimeMark.now()
                 RepoUtils.recursiveDelete(repoLocation)
                 repoLocation.mkdirs()
                 val itemsZip = File(repoLocation, "sh-repo-main.zip")
@@ -216,19 +219,20 @@ class RepoManager(private val configLocation: File) {
             return
         }
         if (unsuccessfulConstants.isEmpty() && successfulConstants.isNotEmpty()) {
-            ChatUtils.chat("Repo working fine!", prefixColor = "§a")
+            ChatUtils.chat("Repo working fine! Commit hash: $latestRepoCommit", prefixColor = "§a")
             return
         }
-        if (successfulConstants.isNotEmpty()) ChatUtils.chat(
+        ChatUtils.chat("Repo has errors! Commit has: ${latestRepoCommit ?: "null"}", prefixColor = "§c")
+        if (successfulConstants.isNotEmpty()) LorenzUtils.chat(
             "Successful Constants §7(${successfulConstants.size}):",
             prefixColor = "§a"
         )
         for (constant in successfulConstants) {
-            ChatUtils.chat("   §a- §7$constant")
+            ChatUtils.chat("   §a- §7$constant", false)
         }
         ChatUtils.chat("Unsuccessful Constants §7(${unsuccessfulConstants.size}):")
         for (constant in unsuccessfulConstants) {
-            ChatUtils.chat("   §e- §7$constant")
+            ChatUtils.chat("   §e- §7$constant", false)
         }
     }
 
