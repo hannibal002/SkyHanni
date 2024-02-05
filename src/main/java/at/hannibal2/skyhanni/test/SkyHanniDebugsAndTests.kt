@@ -420,7 +420,7 @@ class SkyHanniDebugsAndTests {
         val internalName = event.itemStack.getInternalNameOrNull() ?: return
 
         val npcPrice = internalName.getNpcPriceOrNull() ?: return
-        event.toolTip.add("§7Npc price: §6${npcPrice.addSeparators()}")
+        event.toolTip.add("§7NPC price: §6${npcPrice.addSeparators()}")
     }
 
     @SubscribeEvent
@@ -434,7 +434,7 @@ class SkyHanniDebugsAndTests {
     }
 
     @SubscribeEvent
-    fun onChatMessage(event: LorenzChatEvent) {
+    fun onChat(event: LorenzChatEvent) {
 
     }
 

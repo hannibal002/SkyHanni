@@ -413,6 +413,7 @@ object Commands {
         registerCommand("pk", "Kick a specific party member") { PartyCommands.kick(it) }
         registerCommand("pt", "Transfer the party to another party member") { PartyCommands.transfer(it) }
         registerCommand("pp", "Promote a specific party member") { PartyCommands.promote(it) }
+        registerCommand("pd", "Disbands the party") { PartyCommands.disband() }
     }
 
     private fun commandHelp(args: Array<String>) {

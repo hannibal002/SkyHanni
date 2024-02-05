@@ -175,9 +175,7 @@ object FishingProfitTracker {
 
         val recentPickup = config.showWhenPickup && lastCatchTime.passedSince() < 3.seconds
         if (!recentPickup) {
-            if (!FishingAPI.hasFishingRodInHand()) return
-            // TODO remove hide moving chech, replace with last cast location + radius
-            if (FishingProfitPlayerMoving.isMoving && config.hideMoving) return
+            if (!FishingAPI.isFishing()) return
         }
 
         tracker.renderDisplay(config.position)
@@ -213,5 +211,5 @@ object FishingProfitTracker {
         tracker.resetCommand(args, "shresetfishingtracker")
     }
 
-    fun isEnabled() = LorenzUtils.inSkyBlock && config.enabled
+    fun isEnabled() = LorenzUtils.inSkyBlock && config.enabled && !LorenzUtils.inKuudraFight
 }
