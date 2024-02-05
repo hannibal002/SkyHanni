@@ -164,7 +164,7 @@ object MobFilter {
                 ?: MobFactories.dojo(baseEntity, armorStand))
 
     private fun noArmorStandMobs(baseEntity: EntityLivingBase): MobResult? = when {
-        baseEntity is EntityBat -> createBat(baseEntity)?.let { MobResult.found(it) } ?: MobResult.notYetFound
+        baseEntity is EntityBat -> createBat(baseEntity)
 
         baseEntity.isFarmMob() -> createFarmMobs(baseEntity)?.let { MobResult.found(it) }
         baseEntity is EntityDragon -> MobResult.found(MobFactories.basic(baseEntity, baseEntity.cleanName()))
@@ -333,18 +333,20 @@ object MobFilter {
         else -> null
     }
 
-    private fun createBat(baseEntity: EntityLivingBase): Mob? = when (baseEntity.baseMaxHealth.derpy()) {
-        5_000_000 -> MobFactories.basic(baseEntity, "Cinderbat")
-        75_000 -> MobFactories.basic(baseEntity, "Thorn Bat")
-        600 -> if ()
-        100 -> MobFactories.basic(
-            baseEntity, if (DungeonAPI.inDungeon()) "Dungeon Secret Bat" else if (IslandType.PRIVATE_ISLAND.isInIsland()) "Private Island Bat" else "Mega Bat"
+    private fun createBat(baseEntity: EntityLivingBase): MobResult? = when (baseEntity.baseMaxHealth.derpy()) {
+        5_000_000 -> MobResult.found(MobFactories.basic(baseEntity, "Cinderbat"))
+        75_000 -> MobResult.found(MobFactories.basic(baseEntity, "Thorn Bat"))
+        600 -> if (IslandType.GARDEN.isInIsland()) null else MobResult.notYetFound
+        100 -> MobResult.found(
+            MobFactories.basic(
+                baseEntity, if (DungeonAPI.inDungeon()) "Dungeon Secret Bat" else if (IslandType.PRIVATE_ISLAND.isInIsland()) "Private Island Bat" else "Mega Bat"
+            )
         )
 
-        20 -> MobFactories.projectile(baseEntity, "Vampire Mask Bat")
+        20 -> MobResult.found(MobFactories.projectile(baseEntity, "Vampire Mask Bat"))
         // 6 -> MobFactories.projectile(baseEntity, "Spirit Scepter Bat") // moved to Packet Event because 6 is default Health of Bats
-        5 -> MobFactories.special(baseEntity, "Bat Pinata")
-        else -> null
+        5 -> MobResult.found(MobFactories.special(baseEntity, "Bat Pinata"))
+        else -> MobResult.notYetFound
     }
 
     private fun ratHandler(baseEntity: EntityZombie, nextEntity: EntityLivingBase?): MobResult? =
