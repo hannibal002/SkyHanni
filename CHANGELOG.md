@@ -18,6 +18,11 @@
 + Added Sea Creature Tracker. - hannibal2
     + Allows to only show single variants, e.g. water or lava or winter.
 
+#### Mining Features
+
++ Added Deep Caverns Parkour. - hannibal2
+    + Shows a parkour to the bottom of Deep Caverns and to Rhys.
+
 #### Dungeon Features
 
 + Hide particles and damage splashes during the terracotta phase in dungeons F6 and M6. - hannibal2
@@ -140,6 +145,7 @@
 #### Diana Changes
 
 + Changed the Griffin Burrow Guess text to a centered title instead of an odd line that goes down. - hannibal2
++ Removed unnecessary error messages in Diana Burrow detection. - hannibal2
 
 #### Chat Changes
 
@@ -181,6 +187,8 @@
 + Fixed rarity error for items thrown around when using Sprayanator. - hannibal2
 + Added cooldown to Garden Warp Commands. - Empa
 + Fixed the detection of Anita and Jacob visitors. - hannibal2
++ Fixed the pets menu detection for /ff. - martimavocado
++ Fixed Anita and Jacob workaround working outside of garden. - CalMWolfs
 
 #### Combat Fixes
 
@@ -220,6 +228,7 @@
 + Fixed Mining Chat Filter not hiding gemstone messages. - CalMWolfs
 + Fixed names for the Crystal Hollows Mining Areas feature. - alexia
 + Fixed detection of gold and diamond essence gain chat message when powder mining. - CalMWolfs
++ Fixed powder mining start/end detection in Powder Tracker. - CalMWolfs
 
 #### Rift Fixes
 
@@ -240,6 +249,8 @@
 + Fixed rune price calculation in Chest Value. - hannibal2
 + Fixed Power Stone Guide Highlight shows in other inventories when exiting via command. - hannibal2
 + Added options to hide Helmet Skins, Armor Dyes or Runes from Estimated Item Value Calculation. - hannibal2
++ Fixed Divine Gift and Flash enchants showing the wrong/no price in EstimatedItemValue. - jani
++ Fixed showing the Piece of Wizard Portal earned duplicate. - Thunderblade73
 
 #### Bingo Fixes
 
@@ -275,6 +286,7 @@
 + Fixed NPC typos in config. - absterge
 + Fixed rare error in Harp Features. - Thunderblade73
 + Fixed some getItemStack errors. - CalMWolfs
++ Fixed Minion XP calculation not working when having different mouse settings. - Thunderblade73
 
 ### Technical Changes
 
@@ -326,6 +338,12 @@
 + Using NEUInternalName in the Reputation Helper Quest. - CalMWolfs
 + Limit RAM to 4 GB in the developement enviroment. - CalMWolfs
     + This is just the default and can be changed if needed.
++ Made /shupdaterepo better. - CalMWolfs
++ Added alignment support to Renderable. - Thunderblade73
++ Added support for dynamic Y size in Renderables. - Thunderblade73
++ Added outgoing chat log to /shchathistory. - nea
++ Added sending mining events to Soopy's API to test for new Mining Event feature. - CalMWolfs
++ Added /shcopybossbar to copy bossbar - Erymanthus
 
 ## Version 0.22
 
