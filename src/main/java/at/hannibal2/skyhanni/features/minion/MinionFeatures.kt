@@ -28,6 +28,7 @@ import at.hannibal2.skyhanni.utils.LocationUtils
 import at.hannibal2.skyhanni.utils.LocationUtils.canBeSeen
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils.editCopy
+import at.hannibal2.skyhanni.utils.LorenzUtils.formatInteger
 import at.hannibal2.skyhanni.utils.LorenzUtils.isInIsland
 import at.hannibal2.skyhanni.utils.LorenzVec
 import at.hannibal2.skyhanni.utils.NumberUtil.romanToDecimal
@@ -239,8 +240,7 @@ class MinionFeatures {
 
         val coinsPerDay = (coins / (duration.toDouble())) * 1000 * 60 * 60 * 24
 
-        coinsPerDay.toInt()
-        val format = addSeparators()
+        val format = formatInteger(coinsPerDay.toInt())
         val hopperName = stack.name
         return "§7Coins/day with $hopperName§7: §6$format coins"
     }
@@ -313,7 +313,7 @@ class MinionFeatures {
 
             if (config.emptiedTime.display && lastEmptied != 0L) {
                 val duration = System.currentTimeMillis() - lastEmptied
-                val format = Duration.format() + " ago"
+                val format = TimeUtils.formatDuration(duration, longName = true) + " ago"
                 val text = "§eHopper Emptied: $format"
                 event.drawString(location.add(y = 1.15), text, true)
             }
