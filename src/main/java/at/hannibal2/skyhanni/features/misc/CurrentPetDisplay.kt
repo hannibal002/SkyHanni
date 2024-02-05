@@ -18,7 +18,6 @@ class CurrentPetDisplay {
     private val config get() = SkyHanniMod.feature.misc.pets
 
     // TODO USE SH-REPO
-    private val inventoryNamePattern = "Pets( \\(\\d+/\\d+\\) )?".toPattern()
     private val inventorySelectedPetPattern = "§7§7Selected pet: (?<pet>.*)".toPattern()
     private val chatSpawnPattern = "§aYou summoned your §r(?<pet>.*)§r§a!".toPattern()
     private val chatDespawnPattern = "§aYou despawned your §r.*§r§a!".toPattern()
@@ -50,7 +49,7 @@ class CurrentPetDisplay {
 
     @SubscribeEvent
     fun onInventoryOpen(event: InventoryFullyOpenedEvent) {
-        if (!inventoryNamePattern.matches(event.inventoryName)) return
+        if (!PetAPI.isPetMenu(event.inventoryName)) return
 
         val lore = event.inventoryItems[4]?.getLore() ?: return
         for (line in lore) {
