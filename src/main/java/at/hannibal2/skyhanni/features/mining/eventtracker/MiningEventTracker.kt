@@ -3,6 +3,7 @@ package at.hannibal2.skyhanni.features.mining.eventtracker
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.config.ConfigManager
 import at.hannibal2.skyhanni.data.BossbarData
+import at.hannibal2.skyhanni.data.HypixelData
 import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.data.ScoreboardData
 import at.hannibal2.skyhanni.events.BossbarUpdateEvent
@@ -109,7 +110,7 @@ class MiningEventTracker {
         }
         eventEndTime = SimpleTimeMark.now() + timeRemaining
 
-        val serverId = LorenzUtils.getServerId()
+        val serverId = HypixelData.getCurrentServerId()
         if (serverId == null) {
             ErrorManager.logErrorWithData(
                 Exception("NoServerId"), "Could not find server id",
