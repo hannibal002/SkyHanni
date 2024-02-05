@@ -7,13 +7,14 @@ import at.hannibal2.skyhanni.features.garden.GardenAPI
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils.round
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
-import at.hannibal2.skyhanni.utils.TimeUtils
+import at.hannibal2.skyhanni.utils.SimpleTimeMark
+import at.hannibal2.skyhanni.utils.TimeUtils.format
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
 class JacobContestStatsSummary {
     private val config get() = GardenAPI.config
     private var blocksBroken = 0
-    private var startTime = 0L
+    private var startTime = SimpleTimeMark.farPast()
 
     @SubscribeEvent
     fun onBlockClick(event: CropClickEvent) {
@@ -32,16 +33,15 @@ class JacobContestStatsSummary {
         when (event.phase) {
             FarmingContestPhase.START -> {
                 LorenzUtils.chat("Started tracking your Jacob Contest Blocks Per Second!")
-                startTime = System.currentTimeMillis()
+                startTime = SimpleTimeMark.now()
             }
 
             FarmingContestPhase.STOP -> {
-                val duration = System.currentTimeMillis() - startTime
-                val durationInSeconds = duration.toDouble() / 1000
-                val blocksPerSecond = (blocksBroken.toDouble() / durationInSeconds).round(2)
+                val duration = startTime.passedSince()
+                val blocksPerSecond = (blocksBroken.toDouble() / duration.inWholeSeconds).round(2)
                 val cropName = event.crop.cropName
                 LorenzUtils.chat("Stats for $cropName Contest:")
-                val time = TimeUtils.formatDuration(duration - 999)
+                val time = duration.format()
                 LorenzUtils.chat("§7Blocks Broken in total: §e${blocksBroken.addSeparators()}")
                 val color = getBlocksPerSecondColor(blocksPerSecond)
                 LorenzUtils.chat("§7Average Blocks Per Second: $color$blocksPerSecond")
@@ -50,7 +50,7 @@ class JacobContestStatsSummary {
 
             FarmingContestPhase.CHANGE -> {
                 LorenzUtils.chat("You changed the crop during the contest, resetting the Blocks Per Second calculation..")
-                startTime = System.currentTimeMillis()
+                startTime = SimpleTimeMark.now()
             }
         }
         blocksBroken = 0

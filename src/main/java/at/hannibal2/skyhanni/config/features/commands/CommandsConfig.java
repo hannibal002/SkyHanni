@@ -19,11 +19,17 @@ public class CommandsConfig {
     public FandomWikiCommandConfig fandomWiki = new FandomWikiCommandConfig();
 
     @ConfigOption(name = "Party Commands", desc = "Shortens party commands and allows tab-completing for them. " +
-        "\n§eCommands: /pt /pp /pko /pk §7SkyBlock command §e/pt §7to check the play time still works.")
+        "\n§eCommands: /pt /pp /pko /pk /pd §7SkyBlock command §e/pt §7to check the play time still works.")
     @Expose
     @ConfigEditorBoolean
     @FeatureToggle
     public boolean shortCommands = true;
+
+    @ConfigOption(name = "Party Kick Reason", desc = "Kick people while sending a reason when using §e/pk lrg89 Dupe Archer§7 or §e/party kick nea89o Low Cata Level§7.")
+    @Expose
+    @ConfigEditorBoolean
+    @FeatureToggle
+    public boolean partyKickReason = true;
 
     @Expose
     @ConfigOption(name = "Replace Warp Is", desc = "Adds §e/warp is §7alongside §e/is§7. Idk why. Ask §cKaeso")

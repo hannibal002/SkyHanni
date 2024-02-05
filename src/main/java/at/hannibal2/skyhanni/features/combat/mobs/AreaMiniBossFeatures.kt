@@ -14,19 +14,21 @@ import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils.ignoreDerpy
 import at.hannibal2.skyhanni.utils.LorenzVec
 import at.hannibal2.skyhanni.utils.RenderUtils.drawDynamicText
-import at.hannibal2.skyhanni.utils.TimeUtils
+import at.hannibal2.skyhanni.utils.SimpleTimeMark
+import at.hannibal2.skyhanni.utils.TimeUtils.format
 import net.minecraft.entity.EntityLiving
 import net.minecraft.entity.monster.EntityBlaze
 import net.minecraft.entity.monster.EntityEnderman
 import net.minecraft.entity.monster.EntityZombie
 import net.minecraft.entity.passive.EntityWolf
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
+import kotlin.time.Duration.Companion.seconds
 
 class AreaMiniBossFeatures {
     private val config get() = SkyHanniMod.feature.combat.mobs
-    private var lastTime = 0L
+    private var lastSpawnTime = SimpleTimeMark.farPast()
     private var miniBossType: AreaMiniBossType? = null
-    private var respawnCooldown = 11_000L
+    private var respawnCooldown = 11.seconds
 
     @SubscribeEvent
     fun onEntityHealthUpdate(event: EntityMaxHealthUpdateEvent) {
@@ -40,12 +42,12 @@ class AreaMiniBossFeatures {
             if (!entity.hasMaxHealth(bossType.health, false, maxHealth)) continue
 
             miniBossType = bossType
-            val time = System.currentTimeMillis()
-            val diff = time - lastTime
-            if (diff in 5_000..20_000) {
+            val time = SimpleTimeMark.now()
+            val diff = time - lastSpawnTime
+            if (diff in 5.seconds..20.seconds) {
                 respawnCooldown = diff
             }
-            lastTime = time
+            lastSpawnTime = time
 
             if (config.areaBossHighlight) {
                 val color = bossType.color.toColor().withAlpha(bossType.colorOpacity)
@@ -72,9 +74,11 @@ class AreaMiniBossFeatures {
     }
 
     private fun AreaMiniBossType.getTime(): String {
-        val duration = System.currentTimeMillis() - lastTime
-        val estimatedTime = respawnCooldown - duration % respawnCooldown
-        val format = TimeUtils.formatDuration(estimatedTime, showMilliSeconds = true)
+        val spawnedSince = lastSpawnTime.passedSince()
+        if (respawnCooldown <= spawnedSince) return "§c?"
+
+        val estimatedTime = respawnCooldown - spawnedSince
+        val format = estimatedTime.format(showMilliSeconds = true)
         return color.getChatColor() + format
     }
 

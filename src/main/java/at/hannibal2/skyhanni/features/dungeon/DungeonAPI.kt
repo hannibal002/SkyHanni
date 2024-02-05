@@ -2,6 +2,7 @@ package at.hannibal2.skyhanni.features.dungeon
 
 import at.hannibal2.skyhanni.data.ProfileStorageData
 import at.hannibal2.skyhanni.data.ScoreboardData
+import at.hannibal2.skyhanni.events.DebugDataCollectEvent
 import at.hannibal2.skyhanni.events.DungeonBossRoomEnterEvent
 import at.hannibal2.skyhanni.events.DungeonEnterEvent
 import at.hannibal2.skyhanni.events.DungeonStartEvent
@@ -134,15 +135,22 @@ class DungeonAPI {
     }
 
     @SubscribeEvent
-    fun onChatMessage(event: LorenzChatEvent) {
-        val floor = dungeonFloor
-        if (floor != null) {
-            if (event.message == "§e[NPC] §bMort§f: §rHere, I found this map when I first entered the dungeon.") {
-                started = true
-                DungeonStartEvent(floor).postAndCatch()
-            }
-            if (event.message.removeColor().matches(uniqueClassBonus)) {
-                isUniqueClass = true
+    fun onChat(event: LorenzChatEvent) {
+        val floor = dungeonFloor ?: return
+        if (event.message == "§e[NPC] §bMort§f: §rHere, I found this map when I first entered the dungeon.") {
+            started = true
+            DungeonStartEvent(floor).postAndCatch()
+        }
+        if (event.message.removeColor().matches(uniqueClassBonus)) {
+            isUniqueClass = true
+        }
+
+        if (!LorenzUtils.inSkyBlock) return
+        killPattern.matchMatcher(event.message.removeColor()) {
+            val bossCollections = bossStorage ?: return
+            val boss = DungeonFloor.byBossName(group("boss"))
+            if (matches() && boss != null && boss !in bossCollections) {
+                bossCollections.addOrPut(boss, 1)
             }
         }
     }
@@ -209,14 +217,23 @@ class DungeonAPI {
     }
 
     @SubscribeEvent
-    fun onChat(event: LorenzChatEvent) {
-        if (!LorenzUtils.inDungeons) return
-        killPattern.matchMatcher(event.message.removeColor()) {
-            val bossCollections = bossStorage ?: return
-            val boss = DungeonFloor.byBossName(group("boss"))
-            if (matches() && boss != null && boss !in bossCollections) {
-                bossCollections.addOrPut(boss, 1)
-            }
+    fun onDebugDataCollect(event: DebugDataCollectEvent) {
+        event.title("Dungeon")
+
+        if (!LorenzUtils.inDungeons) {
+            event.addIrrelevant("not in dungeons")
+            return
+        }
+
+        event.addData {
+            add("dungeonFloor: $dungeonFloor")
+            add("started: $started")
+            add("getRoomID: ${getRoomID()}")
+            add("inBossRoom: $inBossRoom")
+            add("")
+            add("playerClass: $playerClass")
+            add("isUniqueClass: $isUniqueClass")
+            add("playerClassLevel: $playerClassLevel")
         }
     }
 
