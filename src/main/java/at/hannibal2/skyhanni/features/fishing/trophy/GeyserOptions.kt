@@ -24,11 +24,10 @@ class GeyserOptions {
     fun onPacket(event: ReceiveParticleEvent) {
         if (!shouldProcessParticles()) return
 
-        if (event.type == EnumParticleTypes.CLOUD) {
-            geyser = event.location
-        }
+        if (event.type != EnumParticleTypes.CLOUD) return
+        geyser = event.location
 
-        if (isHideParticlesEnabled() && geyser != null && bobber != null && event.type == EnumParticleTypes.CLOUD) {
+        if (isHideParticlesEnabled() && geyser != null && bobber != null) {
             hideGeyserParticles(event)
         }
     }
