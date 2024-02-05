@@ -1,34 +1,30 @@
 package at.hannibal2.skyhanni.utils
 
-import at.hannibal2.skyhanni.utils.LorenzUtils.editCopy
+import at.hannibal2.skyhanni.utils.LorenzUtils.drainTo
+import java.util.concurrent.ConcurrentLinkedQueue
 import kotlin.time.Duration
 
-// TODO find better sync bug fix than creating a new map for each use
 object DelayedRun {
-    var map = mapOf<() -> Any, SimpleTimeMark>()
+    private val tasks = mutableListOf<Pair<() -> Any, SimpleTimeMark>>()
+    private val futureTasks = ConcurrentLinkedQueue<Pair<() -> Any, SimpleTimeMark>>()
 
     fun runDelayed(duration: Duration, run: () -> Unit) {
-        map = map.editCopy {
-            this[run] = SimpleTimeMark.now() + duration
-        }
+        futureTasks.add(Pair(run, SimpleTimeMark.now() + duration))
     }
 
+    /** Runs in the next full Tick so the delay is between 50ms to 100ms**/
     fun runNextTick(run: () -> Unit) {
-        map = map.editCopy {
-            this[run] = SimpleTimeMark.now()
-        }
+        futureTasks.add(Pair(run, SimpleTimeMark.farPast()))
     }
 
     fun checkRuns() {
-        if (map.isEmpty()) return
-        map = map.editCopy {
-            entries.removeIf { (runnable, time) ->
-                val inPast = time.isInPast()
-                if (inPast) {
-                    runnable()
-                }
-                inPast
+        tasks.removeIf { (runnable, time) ->
+            val inPast = time.isInPast()
+            if (inPast) {
+                runnable()
             }
+            inPast
         }
+        futureTasks.drainTo(tasks)
     }
 }

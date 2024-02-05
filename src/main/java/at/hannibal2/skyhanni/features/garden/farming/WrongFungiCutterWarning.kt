@@ -18,7 +18,7 @@ class WrongFungiCutterWarning {
     private var lastPlaySoundTime = 0L
 
     @SubscribeEvent
-    fun onChatMessage(event: LorenzChatEvent) {
+    fun onChat(event: LorenzChatEvent) {
         val message = event.message
         if (message == "§eFungi Cutter Mode: §r§cRed Mushrooms") {
             mode = FungiMode.RED
