@@ -337,4 +337,30 @@ object LorenzUtils {
     fun Matcher.groupOrNull(groupName: String): String? {
         return runCatching { this.group(groupName) }.getOrNull()
     }
+
+    @Deprecated("moved", ReplaceWith("ChatUtils.debug"))
+    fun debug(message: String) = ChatUtils.debug(message)
+
+    @Deprecated("moved", ReplaceWith("ChatUtils.userError"))
+    fun userError(message: String) = ChatUtils.userError(message)
+
+    @Deprecated("moved", ReplaceWith("ChatUtils.chat"))
+    fun chat(message: String, prefix: Boolean = true, prefixColor: String = "§e") =
+        ChatUtils.chat(message, prefix, prefixColor)
+
+    @Deprecated("moved", ReplaceWith("ChatUtils.clickableChat"))
+    fun clickableChat(message: String, command: String, prefix: Boolean = true, prefixColor: String = "§e") =
+        ChatUtils.clickableChat(message, command, prefix, prefixColor)
+
+    @Deprecated("moved", ReplaceWith("ChatUtils.hoverableChat"))
+    fun hoverableChat(
+        message: String,
+        hover: List<String>,
+        command: String? = null,
+        prefix: Boolean = true,
+        prefixColor: String = "§e",
+    ) = ChatUtils.hoverableChat(message, hover, command, prefix, prefixColor)
+
+    @Deprecated("moved", ReplaceWith("ChatUtils.sendMessageToServer"))
+    fun sendMessageToServer(message: String) = ChatUtils.sendMessageToServer(message)
 }
