@@ -52,7 +52,9 @@ class SkillOverflowTooltip {
                     val progress = (skillInfo.overflowCurrentXp.toDouble() / skillInfo.overflowCurrentXpMax)
                     val progressBar = StringUtils.progressBar(progress)
                     iterator.set("$progressBar §e${skillInfo.overflowCurrentXp.addSeparators()}§6/§e${skillInfo.overflowCurrentXpMax.addSeparators()}")
-                    return
+                    iterator.add("")
+                    iterator.add("§b§lTOTAL XP:")
+                    iterator.add("§7▸ ${skillInfo.overflowTotalXp.addSeparators()}")
                 }
             }
         }

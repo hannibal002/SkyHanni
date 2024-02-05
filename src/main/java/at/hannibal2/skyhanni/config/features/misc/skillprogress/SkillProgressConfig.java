@@ -7,10 +7,25 @@ import com.google.gson.annotations.Expose;
 import io.github.moulberry.moulconfig.annotations.Accordion;
 import io.github.moulberry.moulconfig.annotations.ConfigEditorBoolean;
 import io.github.moulberry.moulconfig.annotations.ConfigEditorColour;
+import io.github.moulberry.moulconfig.annotations.ConfigEditorDraggableList;
 import io.github.moulberry.moulconfig.annotations.ConfigEditorDropdown;
 import io.github.moulberry.moulconfig.annotations.ConfigEditorSlider;
 import io.github.moulberry.moulconfig.annotations.ConfigOption;
 import io.github.moulberry.moulconfig.observer.Property;
+
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+
+import static at.hannibal2.skyhanni.config.features.misc.skillprogress.SkillProgressConfig.AllSkillEntry.ALCHEMY;
+import static at.hannibal2.skyhanni.config.features.misc.skillprogress.SkillProgressConfig.AllSkillEntry.CARPENTRY;
+import static at.hannibal2.skyhanni.config.features.misc.skillprogress.SkillProgressConfig.AllSkillEntry.COMBAT;
+import static at.hannibal2.skyhanni.config.features.misc.skillprogress.SkillProgressConfig.AllSkillEntry.ENCHANTING;
+import static at.hannibal2.skyhanni.config.features.misc.skillprogress.SkillProgressConfig.AllSkillEntry.FARMING;
+import static at.hannibal2.skyhanni.config.features.misc.skillprogress.SkillProgressConfig.AllSkillEntry.FISHING;
+import static at.hannibal2.skyhanni.config.features.misc.skillprogress.SkillProgressConfig.AllSkillEntry.FORAGING;
+import static at.hannibal2.skyhanni.config.features.misc.skillprogress.SkillProgressConfig.AllSkillEntry.MINING;
+import static at.hannibal2.skyhanni.config.features.misc.skillprogress.SkillProgressConfig.AllSkillEntry.TAMING;
 
 public class SkillProgressConfig {
 
@@ -88,15 +103,15 @@ public class SkillProgressConfig {
 
             @Expose
             @ConfigOption(name = "Width", desc = "Modify the width of the bar.\n" +
-                "§eDefault: 182\n"+
-                "§c!!Do not work for now!!" )
+                "§eDefault: 182\n" +
+                "§c!!Do not work for now!!")
             @ConfigEditorSlider(minStep = 1, minValue = 16, maxValue = 1024)
             public int width = 182;
 
             @Expose
             @ConfigOption(name = "Height", desc = "Modify the height of the bar.\n" +
                 "§eDefault: 5\n" +
-                "§c!!Do not work for now!!" )
+                "§c!!Do not work for now!!")
             @ConfigEditorSlider(minStep = 1, minValue = 3, maxValue = 16)
             public int height = 5;
         }
@@ -122,12 +137,12 @@ public class SkillProgressConfig {
     @Expose
     @ConfigOption(name = "Always Show", desc = "Always show the skill progress.")
     @ConfigEditorBoolean
-    public Property<Boolean> alwaysShow = Property.of(false);;
+    public Property<Boolean> alwaysShow = Property.of(false);
 
     @Expose
     @ConfigOption(name = "Show action left", desc = "Show action left until you reach the next level.")
     @ConfigEditorBoolean
-    public Property<Boolean> showActionLeft = Property.of(false);;
+    public Property<Boolean> showActionLeft = Property.of(false);
 
     @Expose
     @ConfigOption(name = "Use percentage", desc = "Use percentage instead of XP.")
@@ -159,6 +174,46 @@ public class SkillProgressConfig {
     @ConfigOption(name = "All Skills Display", desc = "Show a display with all skills progress.")
     @ConfigEditorBoolean
     public Property<Boolean> showAllSkillProgress = Property.of(false);
+
+    @Expose
+    @ConfigOption(name = "All Skill Text", desc = "Choose skills you want to see in the display.")
+    @ConfigEditorDraggableList
+    public List<AllSkillEntry> allskillEntryList = new ArrayList<>(Arrays.asList(
+        ALCHEMY,
+        CARPENTRY,
+        COMBAT,
+        ENCHANTING,
+        FARMING,
+        FISHING,
+        FORAGING,
+        MINING,
+        TAMING
+    ));
+
+    public enum AllSkillEntry {
+        ALCHEMY("§bAlchemy"),
+        CARPENTRY("§bCarpentry"),
+        COMBAT("§bCombat"),
+        ENCHANTING("§bEnchanting"),
+        FARMING("§bFarming"),
+        FISHING("§bFishing"),
+        FORAGING("§bForaging"),
+        MINING("§bMining"),
+        TAMING("§bTaming"),
+
+        ;
+
+        private final String str;
+
+        AllSkillEntry(String str) {
+            this.str = str;
+        }
+
+        @Override
+        public String toString() {
+            return str;
+        }
+    }
 
     @Expose
     @ConfigOption(name = "Skill ETA Display", desc = "Show a display of your current active skill\n" +

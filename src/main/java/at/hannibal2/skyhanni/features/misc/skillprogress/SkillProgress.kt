@@ -15,6 +15,7 @@ import at.hannibal2.skyhanni.events.PreProfileSwitchEvent
 import at.hannibal2.skyhanni.events.SkillOverflowLevelupEvent
 import at.hannibal2.skyhanni.features.misc.skillprogress.SkillUtil.activeSkill
 import at.hannibal2.skyhanni.utils.LorenzUtils
+import at.hannibal2.skyhanni.utils.LorenzUtils.addAsSingletonList
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.NumberUtil.formatNumber
 import at.hannibal2.skyhanni.utils.NumberUtil.interpolate
@@ -37,7 +38,7 @@ object SkillProgress {
     private val config get() = SkyHanniMod.feature.misc.skillProgressConfig
     private var skillExpPercentage = 0.0
     private var display = emptyList<List<Any>>()
-    private var allDisplay = emptyList<Renderable>()
+    private var allDisplay = emptyList<List<Any>>()
     private var etaDisplay = emptyList<Renderable>()
     private val defaultStack = Utils.createItemStack(Items.banner, "Default")
 
@@ -66,7 +67,7 @@ object SkillProgress {
         }
 
         if (config.showAllSkillProgress.get()) {
-            config.allSkillPosition.renderRenderables(allDisplay, posLabel = "All Skills Display")
+            config.allSkillPosition.renderStringsAndItems(allDisplay, posLabel = "All Skills Display")
         }
 
         if (config.showEtaSkillProgress.get()) {
@@ -152,14 +153,25 @@ object SkillProgress {
     }
 
     private fun update() {
-        allDisplay = drawAllDisplay()
+        allDisplay = formatAllDisplay(drawAllDisplay())
         etaDisplay = drawETADisplay()
+    }
+
+    private fun formatAllDisplay(map: List<List<Any>>): List<List<Any>> {
+        val newList = mutableListOf<List<Any>>()
+        for (index in config.allskillEntryList) {
+            newList.add(map[index.ordinal])
+        }
+        return newList
     }
 
 
     private fun drawAllDisplay() = buildList {
         val skillMap = skillMap ?: return@buildList
-        for ((skillName, skillInfo) in skillMap) {
+        val sortedMap = skillMap.toList().sortedBy { (name,_) ->
+            if (name.length >= 2) name.substring(0, 2) else name
+        }.toMap()
+        for ((skillName, skillInfo) in sortedMap) {
             val (level, currentXp, currentXpMax, totalXp) =
                 if (config.overflowConfig.enableInAllDisplay.get())
                     LorenzUtils.Quad(skillInfo.overflowLevel, skillInfo.overflowCurrentXp, skillInfo.overflowCurrentXpMax, skillInfo.overflowTotalXp)
@@ -173,7 +185,7 @@ object SkillProgress {
                 add("§6Total XP: §b${totalXp.addSeparators()}")
             }
             val nameColor = if (skillName == activeSkill) "§e" else "§6"
-            add(Renderable.hoverTips(buildString {
+            addAsSingletonList(Renderable.hoverTips(buildString {
                 append("$nameColor${skillName.firstLetterUppercase()} $level ")
                 append("§7(")
                 append("§b${currentXp.addSeparators()}")
