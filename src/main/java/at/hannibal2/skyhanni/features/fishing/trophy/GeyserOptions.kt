@@ -17,6 +17,8 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import java.awt.Color
 
 class GeyserOptions {
+    private val config get() = SkyHanniMod.feature.fishing.trophyFishing.geyserOptions
+
     private var bobber: EntityFishHook? = null
     private var geyser: LorenzVec? = null
 
