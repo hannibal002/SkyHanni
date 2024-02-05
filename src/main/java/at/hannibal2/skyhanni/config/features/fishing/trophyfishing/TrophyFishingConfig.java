@@ -23,7 +23,7 @@ public class TrophyFishingConfig {
     @ConfigOption(
         name = "Odger Waypoint",
         desc = "Show the Odger waypoint when Trophy Fishes are in the inventory and no lava rod in hand. " +
-            "§cOnly useful for users without abiohone contact."
+            "§cOnly useful for users without abiphone contact."
     )
     @ConfigEditorBoolean
     @FeatureToggle

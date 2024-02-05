@@ -47,7 +47,7 @@ class SummoningMobManager {
     private val seraphRecallPattern = "§cThe Seraph recalled your (\\d) summoned allies!".toPattern()
 
     @SubscribeEvent
-    fun onChatMessage(event: LorenzChatEvent) {
+    fun onChat(event: LorenzChatEvent) {
         if (!LorenzUtils.inSkyBlock) return
 
         val message = event.message

@@ -37,6 +37,9 @@ import kotlin.time.DurationUnit
 
 object RenderUtils {
 
+    enum class HorizontalAlignment { LEFT, CENTER, RIGHT }
+    enum class VerticalAlignment { TOP, CENTER, BOTTOM }
+
     private val beaconBeam = ResourceLocation("textures/entity/beacon_beam.png")
 
     infix fun Slot.highlight(color: LorenzColor) {

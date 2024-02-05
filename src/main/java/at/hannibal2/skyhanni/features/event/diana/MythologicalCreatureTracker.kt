@@ -9,6 +9,7 @@ import at.hannibal2.skyhanni.utils.LorenzUtils.addAsSingletonList
 import at.hannibal2.skyhanni.utils.LorenzUtils.addOrPut
 import at.hannibal2.skyhanni.utils.LorenzUtils.sumAllValues
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
+import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.StringUtils.matches
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import at.hannibal2.skyhanni.utils.tracker.SkyHanniTracker
@@ -58,6 +59,7 @@ object MythologicalCreatureTracker {
     fun onChat(event: LorenzChatEvent) {
         MythologicalCreatureType.entries.forEach { creatureType ->
             if (creatureType.pattern.matches(event.message)) {
+                BurrowAPI.lastBurrowRelatedChatMessage = SimpleTimeMark.now()
                 tracker.modify { it.count.addOrPut(creatureType, 1) }
 
                 if (config.hideChat) {

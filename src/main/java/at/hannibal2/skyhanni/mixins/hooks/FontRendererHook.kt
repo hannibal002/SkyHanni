@@ -4,6 +4,7 @@ import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.features.chroma.ChromaFontRenderer
 import at.hannibal2.skyhanni.mixins.transformers.AccessorFontRenderer
 import at.hannibal2.skyhanni.utils.LorenzUtils
+import at.hannibal2.skyhanni.utils.shader.ShaderManager
 import net.minecraft.client.Minecraft
 import net.minecraft.client.renderer.GlStateManager
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo
@@ -23,6 +24,8 @@ object FontRendererHook {
 
     private var currentDrawState: ChromaFontRenderer? = null
     private var previewChroma = false
+
+    var cameFromChat = false
 
     /**
      * Setups the [ChromaFontRenderer][at.hannibal2.skyhanni.features.chroma.ChromaFontRenderer] for rendering text
@@ -61,6 +64,10 @@ object FontRendererHook {
     fun beginChromaRendering(text: String, shadow: Boolean) {
         if (!LorenzUtils.inSkyBlock) return
         if (!SkyHanniMod.feature.chroma.enabled) return
+        if (SkyHanniMod.feature.chroma.allChroma && SkyHanniMod.feature.chroma.ignoreChat && cameFromChat) {
+            endChromaFont()
+            return
+        }
 
         if (text == "§fPlease star the mod on GitHub!") {
             previewChroma = true
