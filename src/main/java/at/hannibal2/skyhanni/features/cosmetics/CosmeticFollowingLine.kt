@@ -54,15 +54,15 @@ class CosmeticFollowingLine {
         val last7 = locations.keys.toList().takeLast(7)
         val last2 = locations.keys.toList().takeLast(2)
 
-        for ((a, b) in locations.keys.zipWithNext()) {
+        locations.keys.zipWithNext { a, b ->
             val locationSpot = locations[b]!!
             if (firstPerson && !locationSpot.onGround && b in last7) {
                 // Do not render the line in the face, keep more distance while the line is in the air
-                continue
+                return
             }
             if (b in last2 && locationSpot.time.passedSince() < 400.milliseconds) {
                 // Do not render the line directly next to the player, prevent laggy design
-                continue
+                return
             }
             event.draw3DLine(a, b, color, locationSpot.getWidth(), !config.behindBlocks)
         }
@@ -81,7 +81,8 @@ class CosmeticFollowingLine {
     private fun renderClose(event: LorenzRenderWorldEvent, firstPerson: Boolean, color: Color) {
         if (firstPerson && latestLocations.any { !it.value.onGround }) return
 
-        for ((a, b) in latestLocations.keys.zipWithNext()) {
+
+        latestLocations.keys.zipWithNext { a, b ->
             val locationSpot = latestLocations[b]!!
             event.draw3DLine(a, b, color, locationSpot.getWidth(), !config.behindBlocks)
         }
