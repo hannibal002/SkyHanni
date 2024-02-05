@@ -1,4 +1,4 @@
-package at.hannibal2.skyhanni.features.event.jerry
+package at.hannibal2.skyhanni.features.event.diana
 
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.events.withAlpha

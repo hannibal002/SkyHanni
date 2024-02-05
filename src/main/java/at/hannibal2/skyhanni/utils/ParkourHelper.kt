@@ -21,6 +21,8 @@ class ParkourHelper(
     private val shortCuts: List<ShortCut>,
     val platformSize: Double = 1.0,
     val detectionRange: Double = 1.0,
+    val depth: Boolean = true,
+    val onEndReach: () -> Unit = {},
 ) {
 
     private var current = -1
@@ -78,6 +80,9 @@ class ParkourHelper(
             }
 
             val inProgressVec = getInProgressPair().toSingletonListOrEmpty()
+            if (locations.size == current + 1) {
+                onEndReach()
+            }
             for ((prev, next) in locations.asSequence().withIndex().zipWithNext().drop(current)
                 .take(lookAhead - 1) + inProgressVec) {
                 event.draw3DLine_nea(
@@ -99,7 +104,7 @@ class ParkourHelper(
 
                     val aabb = axisAlignedBB(locations[shortCut.to])
                     event.drawFilledBoundingBox_nea(aabb, Color.RED, 1f)
-                    if (outline) event.outlineTopFace(aabb, 2, Color.BLACK, true)
+                    if (outline) event.outlineTopFace(aabb, 2, Color.BLACK, depth)
                 }
             }
 
@@ -113,7 +118,7 @@ class ParkourHelper(
                 } else {
                     val aabb = axisAlignedBB(location)
                     event.drawFilledBoundingBox_nea(aabb, colorForIndex(index), 1f)
-                    if (outline) event.outlineTopFace(aabb, 2, Color.BLACK, true)
+                    if (outline) event.outlineTopFace(aabb, 2, Color.BLACK, depth)
                 }
                 if (SkyHanniMod.feature.dev.waypoint.showPlatformNumber && !isMovingPlatform) {
                     event.drawString(location.offsetCenter().add(y = 1), "§a§l$index", seeThroughBlocks = true)

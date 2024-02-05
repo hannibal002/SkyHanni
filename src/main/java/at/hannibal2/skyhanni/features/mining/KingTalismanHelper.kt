@@ -25,6 +25,7 @@ import java.util.Collections
 class KingTalismanHelper {
 
     private val config get() = SkyHanniMod.feature.mining.kingTalisman
+    private val storage get() = ProfileStorageData.profileSpecific?.mining
 
     companion object {
 
@@ -66,14 +67,14 @@ class KingTalismanHelper {
     fun onTick(event: LorenzTickEvent) {
         if (!event.isMod(20)) return
         if (!isEnabled()) return
-        val profileSpecific = ProfileStorageData.profileSpecific ?: return
+        val storage = storage ?: return
 
         val nearby = isNearby()
         if (nearby && getCurrentOffset() == null) {
             checkOffset()
         }
 
-        val kingsTalkedTo = profileSpecific.mining.kingsTalkedTo
+        val kingsTalkedTo = storage.kingsTalkedTo
         if (getCurrentOffset() == null) {
             val allKings = kingsTalkedTo.size == kingCircles.size
             display = if (allKings) emptyList() else listOf("§cVisit the king to sync up.")
@@ -106,10 +107,10 @@ class KingTalismanHelper {
         if (!isEnabled()) return
         if (getCurrentOffset() == null) return
         if (!isNearby()) return
-        val profileSpecific = ProfileStorageData.profileSpecific ?: return
+        val storage = storage ?: return
 
         val currentKing = getCurrentKing()
-        val kingsTalkedTo = profileSpecific.mining.kingsTalkedTo
+        val kingsTalkedTo = storage.kingsTalkedTo
         if (currentKing !in kingsTalkedTo) {
             ChatUtils.debug("Found new king!")
             kingsTalkedTo.add(currentKing)
@@ -157,8 +158,8 @@ class KingTalismanHelper {
     }
 
     private fun nextMissingText(): String {
-        val profileSpecific = ProfileStorageData.profileSpecific ?: error("profileSpecific is null")
-        val kingsTalkedTo = profileSpecific.mining.kingsTalkedTo
+        val storage = storage ?: error("profileSpecific is null")
+        val kingsTalkedTo = storage.kingsTalkedTo
         val (nextKing, until) = getKingTimes().filter { it.key !in kingsTalkedTo }.sorted().firstNotNullOf { it }
         val time = TimeUtils.formatDuration(until, maxUnits = 2)
 

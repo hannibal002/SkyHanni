@@ -42,11 +42,11 @@ object PowderTracker {
     )
     private val powderStartedPattern by patternGroup.pattern(
         "powder.started",
-        ".*§r§b§l2X POWDER ENDED!.*"
+        ".*§r§b§l2X POWDER STARTED!.*"
     )
     private val powderEndedPattern by patternGroup.pattern(
         "powder.ended",
-        ".*§r§b§l2X POWDER STARTED!.*"
+        ".*§r§b§l2X POWDER ENDED!.*"
     )
     private val powderBossBarPattern by patternGroup.pattern(
         "powder.bossbar",

@@ -277,7 +277,7 @@ object GriffinBurrowHelper {
             DelayedRun.runDelayed(1.seconds) {
                 if (BurrowAPI.lastBurrowRelatedChatMessage.passedSince() > 2.seconds) {
                     if (particleBurrows.containsKey(location)) {
-                        ChatUtils.error("Something unexected happened, deleted the burrow.")
+                        // workaround
                         particleBurrows = particleBurrows.editCopy { keys.remove(location) }
                     }
                 }
