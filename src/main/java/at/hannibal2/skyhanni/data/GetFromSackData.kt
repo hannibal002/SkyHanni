@@ -1,5 +1,6 @@
 package at.hannibal2.skyhanni.data
 
+import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.GetFromSackAPI
 import at.hannibal2.skyhanni.data.jsonobjects.repo.SacksJson
 import at.hannibal2.skyhanni.events.GuiContainerEvent
@@ -20,6 +21,8 @@ import java.util.Queue
 import kotlin.time.Duration.Companion.seconds
 
 object GetFromSackData {
+
+    private val config get() = SkyHanniMod.feature.inventory
 
     private val minimumDelay = 1.7.seconds
 
@@ -73,6 +76,11 @@ object GetFromSackData {
     }
 
     fun commandHandler(args: Array<String>) {
+        if (!config.queuedGFS) {
+            LorenzUtils.sendCommandToServer("gfs ${args.joinToString(" ")}")
+            return
+        }
+
         if (args.size != 2) {
             LorenzUtils.chat("§cMissing arguments! Usage: /getfromsacks <name/id> <amount>", prefix = false)
             return
@@ -81,7 +89,7 @@ object GetFromSackData {
         val item = args[0].asInternalName()
 
         if (!sackList.contains(item)) {
-            LorenzUtils.chat("§cCouldn't find an item with this name or identifier!", prefix = false)
+            LorenzUtils.chat("§cCouldn't find an item with this name or identifier!", prefix = true)
             return
         }
 
@@ -92,7 +100,27 @@ object GetFromSackData {
             return
         }
 
-        GetFromSackAPI.get(item.makePrimitiveStack(amountString.toInt()))
+        val amount = amountString.toInt()
+
+        if (config.bazaarGFS && !LorenzUtils.noTradeMode) {
+            val sackInfo = SackAPI.fetchSackItem(item)
+            if (sackInfo.getStatus() != SackStatus.CORRECT && sackInfo.getStatus() != SackStatus.ALRIGHT) {
+                LorenzUtils.clickableChat("§fUnsure if items are available in Sack, §eCLICK§f to open bazaar", "bz ${item.asString()}")
+                GetFromSackAPI.get(item.makePrimitiveStack(amount))
+                return
+            }
+            val sackAmount = sackInfo.amount.toInt()
+            if (sackAmount < amount) {
+                val diff = amount - sackAmount
+                if (sackAmount > 0) {
+                    GetFromSackAPI.get(item.makePrimitiveStack(sackAmount))
+                }
+                LorenzUtils.clickableChat("§eCLICK HERE §fto get the remaining §ex${diff} §ffrom bazaar", "bz ${item.asString()}")
+                return
+            }
+        }
+
+        GetFromSackAPI.get(item.makePrimitiveStack(amount))
     }
 
     @SubscribeEvent

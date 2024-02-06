@@ -9,7 +9,6 @@ import io.github.moulberry.moulconfig.annotations.Category;
 import io.github.moulberry.moulconfig.annotations.ConfigEditorBoolean;
 import io.github.moulberry.moulconfig.annotations.ConfigEditorDraggableList;
 import io.github.moulberry.moulconfig.annotations.ConfigOption;
-
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -200,5 +199,16 @@ public class InventoryConfig {
     @ConfigEditorBoolean
     @FeatureToggle
     public boolean shiftClickBrewing = false;
+
+    @Expose
+    @ConfigOption(name = "Queued GfS", desc = "If /gfs or /getfromsacks is used it ques up the commands so all items are guarantied to receive the items")
+    @ConfigEditorBoolean
+    @FeatureToggle
+    public boolean queuedGFS = true;
+
+    @Expose
+    @ConfigOption(name = "Bazaar GfS", desc = "If you don't have enough items in sack get a prompt to buy them from bazaar.§e Queued GfS needs to be turned on!")
+    @ConfigEditorBoolean
+    public boolean bazaarGFS = true;
 
 }
