@@ -8,7 +8,6 @@ import io.github.moulberry.moulconfig.annotations.ConfigEditorBoolean;
 import io.github.moulberry.moulconfig.annotations.ConfigEditorDraggableList;
 import io.github.moulberry.moulconfig.annotations.ConfigOption;
 import io.github.moulberry.moulconfig.observer.Property;
-
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -40,6 +39,14 @@ public class EnderNodeConfig {
     @ConfigEditorBoolean
     @FeatureToggle
     public boolean enabled = false;
+
+    @Expose
+    @ConfigOption(
+        name = "Only Holding Tool",
+        desc = "Only shows the tracker if holding a pickaxe, drill or gauntlet"
+    )
+    @ConfigEditorBoolean
+    public boolean onlyPickaxe = false;
 
     @Expose
     @ConfigOption(
