@@ -148,10 +148,16 @@ object SensitivityReducer {
     @SubscribeEvent
     fun onDebugDataCollect(event: DebugDataCollectEvent) {
         event.title("Garden Reduced Sensitivity")
+
+        if (!GardenAPI.inGarden()) {
+            event.addIrrelevant("not in garden")
+            return
+        }
+
         event.addData {
             add("Current Sensitivity: ${gameSettings.mouseSensitivity}")
             add("Stored Sensitivity: ${storage.savedMouseloweredSensitivity}")
-            add("Current Divisor: ${config.reducingFactor}")
+            add("Current Divisor: ${config.reducingFactor.get()}")
         }
     }
 }
