@@ -4,6 +4,7 @@ import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.events.FishingBobberCastEvent
 import at.hannibal2.skyhanni.events.LorenzRenderWorldEvent
+import at.hannibal2.skyhanni.events.LorenzWorldChangeEvent
 import at.hannibal2.skyhanni.events.ReceiveParticleEvent
 import at.hannibal2.skyhanni.utils.LocationUtils.distanceTo
 import at.hannibal2.skyhanni.utils.LorenzUtils.isInIsland
@@ -39,6 +40,13 @@ class GeyserFishing {
         if (isHideParticlesEnabled() && bobber != null) {
             hideGeyserParticles(event)
         }
+    }
+
+    @SubscribeEvent
+    fun onWorldChange(event: LorenzWorldChangeEvent) {
+        bobber = null
+        geyser = null
+        geyserBox = null
     }
 
     @SubscribeEvent
