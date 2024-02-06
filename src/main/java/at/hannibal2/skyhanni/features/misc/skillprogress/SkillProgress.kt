@@ -41,6 +41,7 @@ object SkillProgress {
     private var allDisplay = emptyList<List<Any>>()
     private var etaDisplay = emptyList<Renderable>()
     private val defaultStack = Utils.createItemStack(Items.banner, "Default")
+    private var lastGainUpdate = SimpleTimeMark.farPast()
 
     @SubscribeEvent
     fun onRenderOverlay(event: GuiRenderEvent.GuiOverlayRenderEvent) {
@@ -89,15 +90,14 @@ object SkillProgress {
         if (!isEnabled()) return
         if (lastUpdate.passedSince() > 3.seconds) showDisplay = config.alwaysShow.get()
 
-        if (event.repeatSeconds(1)) {
-            update()
+        if (event.repeatSeconds(1)){
+            allDisplay = formatAllDisplay(drawAllDisplay())
+            etaDisplay = drawETADisplay()
         }
 
         if (event.repeatSeconds(2)) {
+            update()
             updateSkillInfo(activeSkill)
-
-            val skill = skillXPInfoMap[activeSkill] ?: SkillAPI.SkillXPInfo()
-            skillXPInfoMap[activeSkill]?.xpGainLast = skill.xpGainHour
         }
     }
 
@@ -147,14 +147,15 @@ object SkillProgress {
         }
     }
 
-
     fun updateDisplay() {
         display = drawDisplay()
     }
 
     private fun update() {
-        allDisplay = formatAllDisplay(drawAllDisplay())
-        etaDisplay = drawETADisplay()
+        lastGainUpdate = SimpleTimeMark.now()
+        skillXPInfoMap.forEach{
+            it.value.xpGainLast = it.value.xpGainHour
+        }
     }
 
     private fun formatAllDisplay(map: List<List<Any>>): List<List<Any>> {
@@ -201,21 +202,29 @@ object SkillProgress {
     private fun drawETADisplay() = buildList {
         val skillInfo = skillMap?.get(activeSkill) ?: return@buildList
         val xpInfo = skillXPInfoMap[activeSkill] ?: return@buildList
-        val xpInfoLast = oldSkillInfoMap[activeSkill] ?: return@buildList
-        var remaining = skillInfo.overflowCurrentXpMax - skillInfo.overflowCurrentXp
+        val skillInfoLast = oldSkillInfoMap[activeSkill] ?: return@buildList
         oldSkillInfoMap[activeSkill] = skillInfo
-        if (skillInfo.overflowCurrentXpMax == xpInfoLast.overflowCurrentXpMax) {
-            remaining = interpolate(remaining.toFloat(), (xpInfoLast.currentXpMax - xpInfoLast.currentXp).toFloat(), xpInfo.lastUpdate.toMillis()).toLong()
-        }
-
         val level = if (config.overflowConfig.enableInEtaDisplay.get()) skillInfo.overflowLevel else skillInfo.level
 
         add(Renderable.string("§6Skill: §b${activeSkill.firstLetterUppercase()}"))
         add(Renderable.string("§6Level: §b$level"))
-        add(Renderable.string("§6XP/h: §b${xpInfo.xpGainHour.addSeparators()}"))
 
-        if (xpInfo.xpGainLast != 0f) {
-            val xpInterp = interpolate(xpInfo.xpGainHour, xpInfo.xpGainLast, xpInfo.lastUpdate.toMillis())
+        var xpInterp = xpInfo.xpGainHour
+        if (xpInfo.xpGainLast == xpInfo.xpGainHour && xpInfo.xpGainHour <= 0){
+            add(Renderable.string("§6XP/h: §cN/A"))
+        }else{
+            xpInterp = interpolate(xpInfo.xpGainHour, xpInfo.xpGainLast, lastGainUpdate.toMillis())
+            add(Renderable.string("§6XP/h: §b${xpInterp.addSeparators()}"))
+        }
+
+        var remaining = skillInfo.overflowCurrentXpMax - skillInfo.overflowCurrentXp
+        if (skillInfo.overflowCurrentXpMax == skillInfoLast.overflowCurrentXpMax) {
+            remaining = interpolate(remaining.toFloat(), (skillInfoLast.overflowCurrentXpMax - skillInfoLast.overflowCurrentXp).toFloat(), lastGainUpdate.toMillis()).toLong()
+        }
+
+        if (xpInfo.xpGainHour < 1000) {
+            add(Renderable.string("§6ETA: §cN/A"))
+        }else{
             add(Renderable.string("§6ETA: §b${Utils.prettyTime((remaining) * 1000 * 60 * 60 / xpInterp.toLong())}"))
         }
     }
@@ -275,7 +284,6 @@ object SkillProgress {
     }
 
     private fun updateSkillInfo(skill: String) {
-        if (skill.isEmpty()) return
         val xpInfo = skillXPInfoMap.getOrPut(skill) { SkillAPI.SkillXPInfo() }
         val skillInfo = skillMap?.get(skill) ?: return
         oldSkillInfoMap[skill] = skillInfo
@@ -298,7 +306,6 @@ object SkillProgress {
             }
         }
         xpInfo.lastTotalXp = totalXp.toFloat()
-        xpInfo.lastUpdate = SimpleTimeMark.now()
     }
 
     private fun calculateXPHour(xpInfo: SkillAPI.SkillXPInfo) {
