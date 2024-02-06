@@ -37,7 +37,7 @@ class GeyserFishing {
             potentialGeyser.x + 2, 118.0 - 0.09, potentialGeyser.z + 2
         )
 
-        if (isHideParticlesEnabled() && bobber != null) {
+        if (config.hideParticles && bobber != null) {
             hideGeyserParticles(event)
         }
     }
@@ -56,7 +56,7 @@ class GeyserFishing {
 
     @SubscribeEvent
     fun onRenderWorld(event: LorenzRenderWorldEvent) {
-        if (!shouldDrawBoundingBox()) return
+        if (!config.drawBox) return
         val geyser = geyser ?: return
         val geyserBox = AxisAlignedBB(
             geyser.x - 1, 118.0 - 0.1, geyser.z - 1,
@@ -77,6 +77,4 @@ class GeyserFishing {
     }
 
     private fun shouldProcessParticles() = IslandType.CRIMSON_ISLE.isInIsland() && (config.hideParticles || config.drawBox)
-    private fun shouldDrawBoundingBox() = config.drawBox;
-    private fun isHideParticlesEnabled() = config.hideParticles
 }
