@@ -4,7 +4,6 @@ import at.hannibal2.skyhanni.config.FeatureToggle;
 import com.google.gson.annotations.Expose;
 import io.github.moulberry.moulconfig.annotations.Accordion;
 import io.github.moulberry.moulconfig.annotations.ConfigEditorBoolean;
-import io.github.moulberry.moulconfig.annotations.ConfigEditorColour;
 import io.github.moulberry.moulconfig.annotations.ConfigOption;
 
 public class TrophyFishingConfig {
@@ -15,9 +14,9 @@ public class TrophyFishingConfig {
     public ChatMessagesConfig chatMessages = new ChatMessagesConfig();
 
     @Expose
-    @ConfigOption(name = "Geyser", desc = "")
+    @ConfigOption(name = "Geyser Fishing", desc = "")
     @Accordion
-    public GeyserOptionsConfig geyserOptions = new GeyserOptionsConfig();
+    public GeyserFishingConfig geyserOptions = new GeyserFishingConfig();
 
     @Expose
     @ConfigOption(name = "Fillet Tooltip", desc = "Show fillet value of Trophy Fish in tooltip.")
