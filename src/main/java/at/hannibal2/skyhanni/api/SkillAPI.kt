@@ -30,9 +30,6 @@ import com.google.gson.GsonBuilder
 import com.google.gson.reflect.TypeToken
 import io.github.moulberry.notenoughupdates.util.Constants
 import io.github.moulberry.notenoughupdates.util.Utils
-import io.github.moulberry.notenoughupdates.util.XPInformation
-import net.minecraft.init.Blocks
-import net.minecraft.init.Items
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import java.util.LinkedList
 import java.util.regex.Matcher
@@ -48,16 +45,6 @@ object SkillAPI {
 
     var skillXPInfoMap = mutableMapOf<String, SkillXPInfo>()
     var oldSkillInfoMap = mutableMapOf<String?, SkillInfo?>()
-    val stackMap = mapOf(
-        "Farming" to Utils.createItemStack(Items.golden_hoe, "Farming"),
-        "Combat" to Utils.createItemStack(Items.golden_sword, "Combat"),
-        "Foraging" to Utils.createItemStack(Items.golden_axe, "Foraging"),
-        "Alchemy" to Utils.createItemStack(Items.brewing_stand, "Alchemy"),
-        "Mining" to Utils.createItemStack(Items.golden_pickaxe, "Mining"),
-        "Enchanting" to Utils.createItemStack(Blocks.enchanting_table, "Enchanting"),
-        "Fishing" to Utils.createItemStack(Items.fishing_rod, "Fishing"),
-        "Carpentry" to Utils.createItemStack(Blocks.crafting_table, "Carpentry")
-    )
     val skillMap: MutableMap<String, SkillInfo>? get() = ProfileStorageData.profileSpecific?.skillMap
     var showDisplay = false
     var lastUpdate = SimpleTimeMark.farPast()

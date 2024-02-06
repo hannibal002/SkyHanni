@@ -7,7 +7,6 @@ import at.hannibal2.skyhanni.api.SkillAPI.oldSkillInfoMap
 import at.hannibal2.skyhanni.api.SkillAPI.showDisplay
 import at.hannibal2.skyhanni.api.SkillAPI.skillMap
 import at.hannibal2.skyhanni.api.SkillAPI.skillXPInfoMap
-import at.hannibal2.skyhanni.api.SkillAPI.stackMap
 import at.hannibal2.skyhanni.events.ConfigLoadEvent
 import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.LorenzTickEvent
@@ -244,8 +243,10 @@ object SkillProgress {
             if (config.showLevel.get())
                 add("§9[§d$level§9] ")
 
-            if (config.useIcon.get())
-                add(Renderable.itemStack(stackMap.getOrDefault(activeSkill.firstLetterUppercase(), defaultStack), 1.5))
+            if (config.useIcon.get()) {
+                val item = LorenzUtils.enumValueOfOrNull<SkillType>(activeSkill.uppercase())?.item ?: defaultStack
+                add(Renderable.itemStack(item, 1.5))
+            }
 
             add(buildString {
                 append("§b+${skill.lastGain} ")
