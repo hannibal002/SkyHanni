@@ -90,7 +90,7 @@ object SkillProgress {
         if (!isEnabled()) return
         if (lastUpdate.passedSince() > 3.seconds) showDisplay = config.alwaysShow.get()
 
-        if (event.repeatSeconds(1)){
+        if (event.repeatSeconds(1)) {
             allDisplay = formatAllDisplay(drawAllDisplay())
             etaDisplay = drawETADisplay()
         }
@@ -153,13 +153,15 @@ object SkillProgress {
 
     private fun update() {
         lastGainUpdate = SimpleTimeMark.now()
-        skillXPInfoMap.forEach{
+        skillXPInfoMap.forEach {
             it.value.xpGainLast = it.value.xpGainHour
         }
     }
 
     private fun formatAllDisplay(map: List<List<Any>>): List<List<Any>> {
         val newList = mutableListOf<List<Any>>()
+        if (map.isEmpty()) return newList
+
         for (index in config.allskillEntryList) {
             newList.add(map[index.ordinal])
         }
@@ -169,7 +171,7 @@ object SkillProgress {
 
     private fun drawAllDisplay() = buildList {
         val skillMap = skillMap ?: return@buildList
-        val sortedMap = skillMap.toList().sortedBy { (name,_) ->
+        val sortedMap = skillMap.toList().sortedBy { (name, _) ->
             if (name.length >= 2) name.substring(0, 2) else name
         }.toMap()
         for ((skillName, skillInfo) in sortedMap) {
@@ -210,9 +212,9 @@ object SkillProgress {
         add(Renderable.string("§6Level: §b$level"))
 
         var xpInterp = xpInfo.xpGainHour
-        if (xpInfo.xpGainLast == xpInfo.xpGainHour && xpInfo.xpGainHour <= 0){
+        if (xpInfo.xpGainLast == xpInfo.xpGainHour && xpInfo.xpGainHour <= 0) {
             add(Renderable.string("§6XP/h: §cN/A"))
-        }else{
+        } else {
             xpInterp = interpolate(xpInfo.xpGainHour, xpInfo.xpGainLast, lastGainUpdate.toMillis())
             add(Renderable.string("§6XP/h: §b${xpInterp.addSeparators()}"))
         }
@@ -224,7 +226,7 @@ object SkillProgress {
 
         if (xpInfo.xpGainHour < 1000) {
             add(Renderable.string("§6ETA: §cN/A"))
-        }else{
+        } else {
             add(Renderable.string("§6ETA: §b${Utils.prettyTime((remaining) * 1000 * 60 * 60 / xpInterp.toLong())}"))
         }
     }
