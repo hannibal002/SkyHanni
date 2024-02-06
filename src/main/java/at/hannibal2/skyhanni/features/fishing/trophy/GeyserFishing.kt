@@ -6,7 +6,6 @@ import at.hannibal2.skyhanni.events.FishingBobberCastEvent
 import at.hannibal2.skyhanni.events.LorenzRenderWorldEvent
 import at.hannibal2.skyhanni.events.ReceiveParticleEvent
 import at.hannibal2.skyhanni.utils.LocationUtils.distanceTo
-import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils.isInIsland
 import at.hannibal2.skyhanni.utils.LorenzVec
 import at.hannibal2.skyhanni.utils.RenderUtils.drawFilledBoundingBox_nea
@@ -18,20 +17,26 @@ import net.minecraftforge.fml.common.eventhandler.EventPriority
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import java.awt.Color
 
-class GeyserOptions {
+class GeyserFishing {
     private val config get() = SkyHanniMod.feature.fishing.trophyFishing.geyserOptions
 
     private var bobber: EntityFishHook? = null
     private var geyser: LorenzVec? = null
+    private var geyserBox: AxisAlignedBB? = null
 
     @SubscribeEvent(priority = EventPriority.LOW, receiveCanceled = true)
-    fun onPacket(event: ReceiveParticleEvent) {
-        if (!shouldProcessParticles()) return
+    fun onReceiveParticle(event: ReceiveParticleEvent) {
+        if (!shouldProcessParticles() || event.type != EnumParticleTypes.CLOUD) return
 
-        if (event.type != EnumParticleTypes.CLOUD) return
         geyser = event.location
+        val potentialGeyser = geyser ?: return
 
-        if (isHideParticlesEnabled() && geyser != null && bobber != null) {
+        geyserBox = AxisAlignedBB(
+            potentialGeyser.x - 1, 118.0 - 0.1, potentialGeyser.z - 1,
+            potentialGeyser.x + 1, 118.0 - 0.09, potentialGeyser.z + 1
+        )
+
+        if (isHideParticlesEnabled() && bobber != null) {
             hideGeyserParticles(event)
         }
     }
@@ -43,30 +48,27 @@ class GeyserOptions {
 
     @SubscribeEvent
     fun onRenderWorld(event: LorenzRenderWorldEvent) {
-        if (shouldDrawBoundingBox()) {
-            val newGeyser = geyser ?: return
-            val geyserBox = AxisAlignedBB(
-                newGeyser.x - 1, 118.0 - 0.1, newGeyser.z - 1,
-                newGeyser.x + 1, 118.0 - 0.09, newGeyser.z + 1
-            )
-            val special = SkyHanniMod.feature.fishing.trophyFishing.geyserOptions.geyserBoxColor
-            val color = Color(SpecialColour.specialToChromaRGB(special), true)
-            event.drawFilledBoundingBox_nea(geyserBox, color)
-        }
+        if (!shouldDrawBoundingBox()) return
+        val geyser = geyser ?: return
+        val geyserBox = AxisAlignedBB(
+            geyser.x - 1, 118.0 - 0.1, geyser.z - 1,
+            geyser.x + 1, 118.0 - 0.09, geyser.z + 1
+        )
+        val special = config.boxColor
+        val color = Color(SpecialColour.specialToChromaRGB(special), true)
+        event.drawFilledBoundingBox_nea(geyserBox, color)
     }
 
     private fun hideGeyserParticles(event: ReceiveParticleEvent) {
-        val newBobber = bobber ?: return
-        val newGeyser = geyser ?: return
+        val bobber = bobber ?: return
+        val geyser = geyser ?: return
 
-        if (newBobber.distanceTo(event.location) < 3 && newBobber.distanceTo(newGeyser) < 3) {
+        if (bobber.distanceTo(event.location) < 3 && bobber.distanceTo(geyser) < 3) {
             event.isCanceled = true
         }
     }
 
-    private fun shouldProcessParticles() = IslandType.CRIMSON_ISLE.isInIsland() && (isHideParticlesEnabled() || shouldDrawBoundingBox())
-
-    private fun shouldDrawBoundingBox() = config.drawGeyserBoundingBox
-
-    private fun isHideParticlesEnabled() = config.hideGeyserParticles
+    private fun shouldProcessParticles() = IslandType.CRIMSON_ISLE.isInIsland() && (config.hideParticles || config.drawBox)
+    private fun shouldDrawBoundingBox() = config.drawBox;
+    private fun isHideParticlesEnabled() = config.hideParticles
 }
