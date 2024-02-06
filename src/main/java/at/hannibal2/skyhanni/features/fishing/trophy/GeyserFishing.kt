@@ -56,7 +56,7 @@ class GeyserFishing {
 
     @SubscribeEvent
     fun onRenderWorld(event: LorenzRenderWorldEvent) {
-        if (!config.drawBox) return
+        if (!config.drawBox || !IslandType.CRIMSON_ISLE.isInIsland()) return
         val geyserBox = geyserBox ?: return
         val color = Color(SpecialColour.specialToChromaRGB(config.boxColor), true)
         event.drawFilledBoundingBox_nea(geyserBox, color)
