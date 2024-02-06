@@ -315,6 +315,9 @@ public class Storage {
                 @Expose
                 public int lastFarmingWeightLeaderboard = -1;
             }
+
+            @Expose
+            public Map<String, LorenzVec> npcVisitorLocations = new HashMap<>();
         }
 
         @Expose

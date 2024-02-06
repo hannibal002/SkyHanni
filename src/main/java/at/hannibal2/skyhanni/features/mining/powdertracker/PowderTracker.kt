@@ -3,6 +3,7 @@ package at.hannibal2.skyhanni.features.mining.powdertracker
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.config.features.mining.PowderTrackerConfig.PowderDisplayEntry
+import at.hannibal2.skyhanni.data.BossbarData
 import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.events.ConfigLoadEvent
 import at.hannibal2.skyhanni.events.GuiRenderEvent
@@ -23,7 +24,6 @@ import at.hannibal2.skyhanni.utils.tracker.TrackerData
 import com.google.gson.JsonArray
 import com.google.gson.JsonNull
 import com.google.gson.annotations.Expose
-import net.minecraft.entity.boss.BossStatus
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import kotlin.concurrent.fixedRateTimer
 
@@ -42,11 +42,11 @@ object PowderTracker {
     )
     private val powderStartedPattern by patternGroup.pattern(
         "powder.started",
-        ".*§r§b§l2X POWDER ENDED!.*"
+        ".*§r§b§l2X POWDER STARTED!.*"
     )
     private val powderEndedPattern by patternGroup.pattern(
         "powder.ended",
-        ".*§r§b§l2X POWDER STARTED!.*"
+        ".*§r§b§l2X POWDER ENDED!.*"
     )
     private val powderBossBarPattern by patternGroup.pattern(
         "powder.bossbar",
@@ -153,8 +153,8 @@ object PowderTracker {
     fun onTick(event: LorenzTickEvent) {
         if (!isEnabled()) return
         if (event.repeatSeconds(1)) {
-            doublePowder = powderBossBarPattern.matcher(BossStatus.bossName).find()
-            powderBossBarPattern.matchMatcher(BossStatus.bossName) {
+            doublePowder = powderBossBarPattern.matcher(BossbarData.getBossbar()).find()
+            powderBossBarPattern.matchMatcher(BossbarData.getBossbar()) {
                 powderTimer = group("time")
                 doublePowder = powderTimer != "00:00"
 

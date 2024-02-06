@@ -12,7 +12,7 @@ import at.hannibal2.skyhanni.utils.LorenzColor
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils.addAsSingletonList
 import at.hannibal2.skyhanni.utils.LorenzVec
-import at.hannibal2.skyhanni.utils.NEUItems
+import at.hannibal2.skyhanni.utils.NEUItems.getItemStack
 import at.hannibal2.skyhanni.utils.RenderUtils.drawDynamicText
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
@@ -71,15 +71,11 @@ class DailyKuudraBossHelper(private val reputationHelper: CrimsonIsleReputationH
                 val result = if (tier.doneToday) "§aDone" else "§bTodo"
                 val displayName = tier.getDisplayName()
                 val displayItem = tier.displayItem
-                if (displayItem == null) {
-                    display.addAsSingletonList("  $displayName: $result")
-                } else {
-                    val lineList = mutableListOf<Any>()
-                    lineList.add(" ")
-                    lineList.add(NEUItems.getItemStack(displayItem))
-                    lineList.add("$displayName: $result")
-                    display.add(lineList)
-                }
+                val lineList = mutableListOf<Any>()
+                lineList.add(" ")
+                lineList.add(displayItem.getItemStack())
+                lineList.add("$displayName: $result")
+                display.add(lineList)
             }
         }
     }

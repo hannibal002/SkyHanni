@@ -18,6 +18,15 @@
 + Added Sea Creature Tracker. - hannibal2
     + Allows to only show single variants, e.g. water or lava or winter.
 
+#### Mining Features
+
++ Added Deep Caverns Parkour. - hannibal2
+    + Shows a parkour to the bottom of Deep Caverns and to Rhys.
+
+#### Dungeon Features
+
++ Hide particles and damage splashes during the terracotta phase in dungeons F6 and M6. - hannibal2
+
 #### Crimson Isle Features
 
 + Added Volcano Explosivity in Crimson Isle. - Erymanthus
@@ -88,6 +97,7 @@
     + This helps to farm the correct amount, especially when in the early game.
 + Made blocks per second calculation more accurate immediately after starting to farm. - hannibal2
 + Warn to open visitor inventory again after partially serving Spaceman. - alexia
++ Updating the Garden Optimal Speed Display and Warning immediately when changing the setting. - hannibal2
 
 #### Rift Changes
 
@@ -103,6 +113,7 @@
 + Added toggle to count double hook catches as two catches in Sea Creature Tracker. - hannibal2
 + Smarter check if the player is fishing for all fishing related displays. - hannibal2
 + Hide Sea Creature Tracker when wearing full Trophy Hunter armor. - martimavocado
++ Disabled Fishing Profit/SC Tracker in Kuudra. - CalMWolfs
 
 #### Mining Changes
 
@@ -120,6 +131,8 @@
 + Added option to hide pet candy count on maxed out pets. - CalMWolfs
 + Added option to change the size of the Pet Item Display Icon in inventories. - Thunderblade73
 + Allow putting Water Bottles into Potion Bag. - alexia
++ Skip unavailable experiments for number of clicks in Super Pair Clicks Alert in the experimentation table. - alexia
++ Hide non-clickable items in Basket of Seeds, Nether Wart Pouch & Trick or Treat Bag. - alexia
 
 #### Dungeon Changes
 
@@ -127,10 +140,12 @@
 + Added options to change exactly what part of the Dungeon Chat Filter should be used. - Wambo
 + Hide F3/M3 guardian Damage Indicators once the professor spawns. - hannibal2
 + Added exact names for the floor 6 giants in the Damage Indicator. - hannibal2
++ Show the laser phase timer even during the hit phase after a successful damage phase skip. - hannibal2
 
 #### Diana Changes
 
 + Changed the Griffin Burrow Guess text to a centered title instead of an odd line that goes down. - hannibal2
++ Removed unnecessary error messages in Diana Burrow detection. - hannibal2
 
 #### Chat Changes
 
@@ -141,11 +156,20 @@
     + Earned mystery dust. - alexia
 + Added the fire sale ended message to the Fire Sale Chat Hider. - hannibal2
 
+#### Command Changes
+
++ Added /pd short command for party disband. - Empa
+
+#### Config Changes
+
++ Using a better title for Area Boss features. - hannibal2
+
 #### Misc Changes
 
 + Tia Relay Helper: Suggest /togglemusic. - alexia
 + Added option to ignore Everything Chroma in the chat. - VixidDev
 + Added Item Ability Cooldown support for Talbot's Theodolite (the Farming Island Trapper tracker thing). - Erymanthus
++ Fewer election API updates, fewer election API errors. - CalMWolfs
 
 ### Fixes
 
@@ -162,6 +186,9 @@
 + Fixed grammar in Jacob Contest chat messages. - alexia
 + Fixed rarity error for items thrown around when using Sprayanator. - hannibal2
 + Added cooldown to Garden Warp Commands. - Empa
++ Fixed the detection of Anita and Jacob visitors. - hannibal2
++ Fixed the pets menu detection for /ff. - martimavocado
++ Fixed Anita and Jacob workaround working outside of garden. - CalMWolfs
 
 #### Combat Fixes
 
@@ -173,6 +200,8 @@
 + Fixed Fire Veil Wand circle shows on left-clicking. - hannibal2
 + Fixed Ashfang Freeze Cooldown being off by one second. Fixed Fire Veil line gets shown even while frozen. - hannibal2
 + Fixed time until the next area mini boss spawns being off by one second. - hannibal2
++ Fixed Reputation Helper in Crimson Isle showing incorrect sack amount. - CalMWolfs
++ Fixed the ender slayer laser phase timer being inaccurate in the Damage Indicator. - hannibal2
 
 #### Dungeon Fixes
 
@@ -183,12 +212,14 @@
 + Fixed Bonzo phase 1 does not get detected properly for Damage Indicator. - hannibal2
 + Fixed Dungeon Clean End sometimes not deactivating when chest spawned. - hannibal2
 + Fixed F3/M3 guardian spawn timer in Damage Indicator. - hannibal2
++ Fixed Highlight Clicked Chest in water puzzle room not showing. - hannibal2
 
 #### Diana Fixes
 
 + Fixed close griffin burrow detection with particles failing sometimes. - hannibal2
 + Fixed Diana mobs being invisible because of Fix Ghost Entities and four season pet skin. - hannibal2
 + Fixed a rare bug that leaves ghost burrows around. - hannibal2
++ Properly deleting Diana target markers when manually clearing griffin burrows by talking to Diana NPC. - hannibal2
 
 #### Mining Fixes
 
@@ -197,6 +228,7 @@
 + Fixed Mining Chat Filter not hiding gemstone messages. - CalMWolfs
 + Fixed names for the Crystal Hollows Mining Areas feature. - alexia
 + Fixed detection of gold and diamond essence gain chat message when powder mining. - CalMWolfs
++ Fixed powder mining start/end detection in Powder Tracker. - CalMWolfs
 
 #### Rift Fixes
 
@@ -214,6 +246,11 @@
 + Fixed rogue sword ability taking into account mage cooldown reduction. - Empa
 + Reset item ability cooldowns on the world switch. - hannibal2
 + Fixed Crap Hat of Celebration not getting detected as accessory in Hide Not Clickable Items. - Empa
++ Fixed rune price calculation in Chest Value. - hannibal2
++ Fixed Power Stone Guide Highlight shows in other inventories when exiting via command. - hannibal2
++ Added options to hide Helmet Skins, Armor Dyes or Runes from Estimated Item Value Calculation. - hannibal2
++ Fixed Divine Gift and Flash enchants showing the wrong/no price in EstimatedItemValue. - jani
++ Fixed showing the Piece of Wizard Portal earned duplicate. - Thunderblade73
 
 #### Bingo Fixes
 
@@ -224,11 +261,15 @@
 #### Chat Fixes
 
 + Fixed poisoned candy potion chat message not getting compacted. - alexia
++ Fixed the fire sale chat message hider again. - CalMWolfs
 
 #### GUI Fixes
 
 + Fixed items in SkyHanni GUI elements rendering over minecraft menus. - Thunderblade73
 + Fixed GUI Editor hotkey working while inside a NEU PV text box. - Thunderblade73
++ Fixed render overlapping problem with chat, SkyHanni GUIs and title. - Thunderblade73
++ Fixed GUI positions moving into the bottom-right corner when leaving the GUI position editor while pressing the mouse
+  button on next reopen. - hannibal2
 
 #### Winter Fixes
 
@@ -243,6 +284,9 @@
 + Fixed Daily City Project Reminder is still working on already-released projects. - alexia
 + Fixed a typo in Odger Waypoint config. - Empa
 + Fixed NPC typos in config. - absterge
++ Fixed rare error in Harp Features. - Thunderblade73
++ Fixed some getItemStack errors. - CalMWolfs
++ Fixed Minion XP calculation not working when having different mouse settings. - Thunderblade73
 
 ### Technical Changes
 
@@ -290,6 +334,16 @@
 + Better error handling when an unknown crimson isle quest is detected. - hannibal2
 + Marked old number formatting code as deprecated. - hannibal2
 + Added the SkyHanni icon to the IntelliJ profile view. - Erymanthus
++ Fixed key name in utils patterns. - CalMWolfs
++ Using NEUInternalName in the Reputation Helper Quest. - CalMWolfs
++ Limit RAM to 4 GB in the developement enviroment. - CalMWolfs
+    + This is just the default and can be changed if needed.
++ Made /shupdaterepo better. - CalMWolfs
++ Added alignment support to Renderable. - Thunderblade73
++ Added support for dynamic Y size in Renderables. - Thunderblade73
++ Added outgoing chat log to /shchathistory. - nea
++ Added sending mining events to Soopy's API to test for new Mining Event feature. - CalMWolfs
++ Added /shcopybossbar to copy bossbar - Erymanthus
 
 ## Version 0.22
 
