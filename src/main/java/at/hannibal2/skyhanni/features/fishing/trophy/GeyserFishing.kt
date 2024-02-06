@@ -33,8 +33,8 @@ class GeyserFishing {
         val potentialGeyser = geyser ?: return
 
         geyserBox = AxisAlignedBB(
-            potentialGeyser.x - 1, 118.0 - 0.1, potentialGeyser.z - 1,
-            potentialGeyser.x + 1, 118.0 - 0.09, potentialGeyser.z + 1
+            potentialGeyser.x - 2, 118.0 - 0.1, potentialGeyser.z - 2,
+            potentialGeyser.x + 2, 118.0 - 0.09, potentialGeyser.z + 2
         )
 
         if (isHideParticlesEnabled() && bobber != null) {
