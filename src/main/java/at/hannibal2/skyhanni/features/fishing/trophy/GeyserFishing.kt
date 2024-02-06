@@ -58,8 +58,7 @@ class GeyserFishing {
     fun onRenderWorld(event: LorenzRenderWorldEvent) {
         if (!config.drawBox) return
         val geyserBox = geyserBox ?: return
-        val special = config.boxColor
-        val color = Color(SpecialColour.specialToChromaRGB(special), true)
+        val color = Color(SpecialColour.specialToChromaRGB(config.boxColor), true)
         event.drawFilledBoundingBox_nea(geyserBox, color)
     }
 
