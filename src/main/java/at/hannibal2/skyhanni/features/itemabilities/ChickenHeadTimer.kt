@@ -34,7 +34,7 @@ class ChickenHeadTimer {
     }
 
     @SubscribeEvent
-    fun onChatMessage(event: LorenzChatEvent) {
+    fun onChat(event: LorenzChatEvent) {
         if (!isEnabled()) return
         if (!hasChickenHead) return
         if (event.message == "§aYou laid an egg!") {

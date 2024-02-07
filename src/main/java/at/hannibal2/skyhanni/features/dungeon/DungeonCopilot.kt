@@ -32,7 +32,7 @@ class DungeonCopilot {
     private var searchForKey = false
 
     @SubscribeEvent
-    fun onChatMessage(event: LorenzChatEvent) {
+    fun onChat(event: LorenzChatEvent) {
         if (!isEnabled()) return
 
         copilot(event.message)?.let {

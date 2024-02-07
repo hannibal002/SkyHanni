@@ -42,6 +42,9 @@ class GuiPositionEditor(private val positions: List<Position>, private val borde
     override fun onGuiClosed() {
         super.onGuiClosed()
         clickedPos = -1
+        for (position in positions) {
+            position.clicked = false
+        }
         OtherInventoryData.close()
     }
 
