@@ -297,12 +297,13 @@ interface Renderable {
 
         fun horizontalContainer(
             content: List<Renderable>,
+            spacing: Int = 0,
             horizontalAlign: HorizontalAlignment = HorizontalAlignment.LEFT,
             verticalAlign: VerticalAlignment = VerticalAlignment.TOP,
         ) = object : Renderable {
             val renderables = content
 
-            override val width = renderables.sumOf { it.width }
+            override val width = renderables.sumOf { it.width } + spacing * (renderables.size - 1)
             override val height = renderables.maxOf { it.height }
             override val horizontalAlign = horizontalAlign
             override val verticalAlign = verticalAlign
@@ -311,10 +312,10 @@ interface Renderable {
                 var xOffset = 0
                 renderables.forEach {
                     it.renderYAligned(xOffset, 0, height)
-                    xOffset += it.width
+                    xOffset += it.width + spacing
                     GlStateManager.translate(it.width.toFloat(), 0f, 0f)
                 }
-                GlStateManager.translate(-width.toFloat(), 0f, 0f)
+                GlStateManager.translate(-width.toFloat() - spacing.toFloat(), 0f, 0f)
             }
         }
 
