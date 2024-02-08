@@ -3,6 +3,7 @@ package at.hannibal2.skyhanni.config.features.misc.skillprogress;
 import at.hannibal2.skyhanni.SkyHanniMod;
 import at.hannibal2.skyhanni.config.FeatureToggle;
 import at.hannibal2.skyhanni.config.core.config.Position;
+import at.hannibal2.skyhanni.utils.RenderUtils;
 import com.google.gson.annotations.Expose;
 import io.github.moulberry.moulconfig.annotations.Accordion;
 import io.github.moulberry.moulconfig.annotations.ConfigEditorBoolean;
@@ -36,12 +37,42 @@ public class SkillProgressConfig {
     public Property<Boolean> enabled = Property.of(false);
 
     @Expose
+    @ConfigOption(name = "Text Alignment", desc = "")
+    @ConfigEditorDropdown
+    public Property<TextAlignment> textAlignmentProperty = Property.of(TextAlignment.NONE);
+
+    public enum TextAlignment {
+        NONE("None", null),
+        CENTERED("Centered", RenderUtils.HorizontalAlignment.CENTER),
+        LEFT("Left", RenderUtils.HorizontalAlignment.LEFT),
+        RIGHT("Right", RenderUtils.HorizontalAlignment.RIGHT),
+        ;
+
+        private final String str;
+        private final RenderUtils.HorizontalAlignment alignment;
+
+        TextAlignment(String str, RenderUtils.HorizontalAlignment alignment) {
+            this.str = str;
+            this.alignment = alignment;
+        }
+
+        public RenderUtils.HorizontalAlignment getAlignment() {
+            return alignment;
+        }
+
+        @Override
+        public String toString() {
+            return str;
+        }
+    }
+
+    @Expose
     @ConfigOption(name = "Hide In Action Bar", desc = "Hide the skill progress in the Hypixel action bar.")
     @ConfigEditorBoolean
     public boolean hideInActionBar = false;
 
     @Expose
-    @ConfigOption(name = "Progress Bar Config", desc = "")
+    @ConfigOption(name = "Progress Bar Config", desc = "Align the display text with the progress bar.")
     @Accordion
     public ProgressBarConfig progressBarConfig = new ProgressBarConfig();
 

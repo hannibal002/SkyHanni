@@ -7,6 +7,8 @@ import at.hannibal2.skyhanni.features.chroma.ChromaShaderManager
 import at.hannibal2.skyhanni.features.chroma.ChromaType
 import at.hannibal2.skyhanni.utils.ColorUtils
 import at.hannibal2.skyhanni.utils.ColorUtils.darker
+import at.hannibal2.skyhanni.utils.renderables.RenderableUtils.renderXAligned
+import at.hannibal2.skyhanni.utils.renderables.RenderableUtils.renderYAligned
 import at.hannibal2.skyhanni.utils.LorenzLogger
 import at.hannibal2.skyhanni.utils.NEUItems.renderOnScreen
 import at.hannibal2.skyhanni.utils.RenderUtils.HorizontalAlignment
@@ -366,6 +368,47 @@ interface Renderable {
                 if (useChroma) {
                     ChromaShaderManager.end()
                 }
+            }
+        }
+
+        fun horizontalContainer(
+            content: List<Renderable>,
+            horizontalAlign: HorizontalAlignment = HorizontalAlignment.LEFT,
+            verticalAlign: VerticalAlignment = VerticalAlignment.TOP,
+        ) = object : Renderable {
+            val renderables = content
+
+            override val width = renderables.sumOf { it.width }
+            override val height = renderables.maxOf { it.height }
+            override val horizontalAlign = horizontalAlign
+            override val verticalAlign = verticalAlign
+
+            override fun render(posX: Int, posY: Int) {
+                var xOffset = 0
+                renderables.forEach {
+                    it.renderYAligned(xOffset, 0, height)
+                    xOffset += it.width
+                    GlStateManager.translate(it.width.toFloat(), 0f, 0f)
+                }
+                GlStateManager.translate(-width.toFloat(), 0f, 0f)
+            }
+        }
+
+        fun fixedSizeLine(
+            content: Renderable,
+            width: Int,
+            horizontalAlign: HorizontalAlignment = HorizontalAlignment.LEFT,
+            verticalAlign: VerticalAlignment = VerticalAlignment.TOP,
+        ) = object : Renderable {
+            val render = content
+
+            override val width = width
+            override val height = render.height
+            override val horizontalAlign = horizontalAlign
+            override val verticalAlign = verticalAlign
+
+            override fun render(posX: Int, posY: Int) {
+                render.renderXAligned(0, 0, width)
             }
         }
     }

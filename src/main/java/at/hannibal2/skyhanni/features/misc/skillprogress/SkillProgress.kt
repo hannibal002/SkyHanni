@@ -7,6 +7,7 @@ import at.hannibal2.skyhanni.api.SkillAPI.oldSkillInfoMap
 import at.hannibal2.skyhanni.api.SkillAPI.showDisplay
 import at.hannibal2.skyhanni.api.SkillAPI.skillMap
 import at.hannibal2.skyhanni.api.SkillAPI.skillXPInfoMap
+import at.hannibal2.skyhanni.config.features.misc.skillprogress.SkillProgressConfig
 import at.hannibal2.skyhanni.events.ConfigLoadEvent
 import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.LorenzTickEvent
@@ -24,6 +25,7 @@ import at.hannibal2.skyhanni.utils.RenderUtils.renderStringsAndItems
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.SpecialColour
 import at.hannibal2.skyhanni.utils.renderables.Renderable
+import at.hannibal2.skyhanni.utils.renderables.Renderable.Companion.horizontalContainer
 import io.github.moulberry.notenoughupdates.util.Utils
 import net.minecraft.util.ChatComponentText
 import net.minecraftforge.client.event.ClientChatReceivedEvent
@@ -37,31 +39,53 @@ object SkillProgress {
 
     private val config get() = SkyHanniMod.feature.misc.skillProgressConfig
     private var skillExpPercentage = 0.0
-    private var display = emptyList<List<Any>>()
+    private var display = emptyList<Renderable>()
     private var allDisplay = emptyList<List<Any>>()
     private var etaDisplay = emptyList<Renderable>()
     private var lastGainUpdate = SimpleTimeMark.farPast()
+    private var maxWidth = 0
     var hideInActionBar = mutableListOf<String>()
 
     @SubscribeEvent
     fun onRenderOverlay(event: GuiRenderEvent.GuiOverlayRenderEvent) {
         if (!isEnabled()) return
+        if (display.isEmpty()) return
+
         if (showDisplay) {
-            config.position.renderStringsAndItems(display, posLabel = "Skill Progress")
-            if (config.progressBarConfig.enabled.get() && display.isNotEmpty()) {
+            when (val textAlignment = config.textAlignmentProperty.get()) {
+                SkillProgressConfig.TextAlignment.NONE -> {
+                    config.position.renderStringsAndItems(listOf(display), posLabel = "Skill Progress")
+                }
+
+                SkillProgressConfig.TextAlignment.CENTERED,
+                SkillProgressConfig.TextAlignment.LEFT,
+                SkillProgressConfig.TextAlignment.RIGHT -> {
+                    config.position.renderRenderables(
+                        listOf(Renderable.fixedSizeLine(horizontalContainer(display, textAlignment.alignment), maxWidth)),
+                        posLabel = "Skill Progress")
+                }
+
+                else -> {}
+            }
+
+            if (config.progressBarConfig.enabled.get()) {
                 val progress = if (config.progressBarConfig.useTexturedBar.get()) {
                     val factor = (skillExpPercentage.toFloat().coerceAtMost(1f)) * 182
+                    maxWidth = 182
                     Renderable.texturedProgressBar(factor,
                         Color(SpecialColour.specialToChromaRGB(config.progressBarConfig.barStartColor)),
                         texture = config.progressBarConfig.texturedBar.usedTexture.get(),
                         useChroma = config.progressBarConfig.useChroma.get())
-                } else
+
+                } else {
+                    maxWidth = config.progressBarConfig.regularBar.width
                     Renderable.progressBar(skillExpPercentage,
                         Color(SpecialColour.specialToChromaRGB(config.progressBarConfig.barStartColor)),
                         Color(SpecialColour.specialToChromaRGB(config.progressBarConfig.barStartColor)),
-                        width = config.progressBarConfig.regularBar.width,
+                        width = maxWidth,
                         height = config.progressBarConfig.regularBar.height,
                         useChroma = config.progressBarConfig.useChroma.get())
+                }
 
                 config.barPosition.renderRenderables(listOf(progress), posLabel = "Skill Progress Bar")
             }
@@ -260,50 +284,50 @@ object SkillProgress {
         else
             LorenzUtils.Quad(skill.level, skill.currentXp, skill.currentXpMax, skill.totalXp)
 
-        add(buildList {
-            if (config.showLevel.get())
-                add("§9[§d$level§9] ")
 
-            if (config.useIcon.get()) {
-                add(Renderable.itemStack(activeSkill.item, 1.5))
+        if (config.showLevel.get())
+            add(Renderable.fromAny("§9[§d$level§9] ") as Renderable)
+
+        if (config.useIcon.get()) {
+            add(Renderable.fromAny(activeSkill.item, 1.5) as Renderable)
+        }
+
+        add(Renderable.fromAny(buildString {
+            append("§b+${skill.lastGain} ")
+
+            if (config.useSkillName.get())
+                append("${activeSkill.displayName} ")
+
+            val (barCurrent, barMax) = if (config.overflowConfig.enableInProgressBar.get())
+                Pair(skill.overflowCurrentXp, skill.overflowCurrentXpMax)
+            else
+                Pair(skill.currentXp, skill.currentXpMax)
+
+            val barPercent = if (barMax == 0L) 100F else 100F * barCurrent / barMax
+            skillExpPercentage = (barPercent.toDouble() / 100)
+
+            val percent = if (currentXpMax == 0L) 100F else 100F * currentXp / currentXpMax
+
+            if (config.usePercentage.get())
+                append("§7(§6${percent.roundToPrecision(2)}%§7)")
+            else {
+                if (currentXpMax == 0L)
+                    append("§7(§6${currentXp.addSeparators()}§7)")
+                else
+                    append("§7(§6${currentXp.addSeparators()}§7/§6${currentXpMax.addSeparators()}§7)")
             }
 
-            add(buildString {
-                append("§b+${skill.lastGain} ")
-
-                if (config.useSkillName.get())
-                    append("${activeSkill.displayName} ")
-
-                val (barCurrent, barMax) = if (config.overflowConfig.enableInProgressBar.get())
-                    Pair(skill.overflowCurrentXp, skill.overflowCurrentXpMax)
-                else
-                    Pair(skill.currentXp, skill.currentXpMax)
-
-                val barPercent = if (barMax == 0L) 100F else 100F * barCurrent / barMax
-                skillExpPercentage = (barPercent.toDouble() / 100)
-
-                val percent = if (currentXpMax == 0L) 100F else 100F * currentXp / currentXpMax
-
-                if (config.usePercentage.get())
-                    append("§7(§6${percent.roundToPrecision(2)}%§7)")
-                else {
-                    if (currentXpMax == 0L)
-                        append("§7(§6${currentXp.addSeparators()}§7)")
-                    else
-                        append("§7(§6${currentXp.addSeparators()}§7/§6${currentXpMax.addSeparators()}§7)")
+            if (config.showActionLeft.get() && percent != 100f) {
+                append(" - ")
+                if (skill.lastGain != "") {
+                    val actionLeft = (ceil(currentXpMax.toDouble() - currentXp) / skill.lastGain.formatNumber()).toLong().addSeparators()
+                    append("§6$actionLeft Left")
+                } else {
+                    append("∞ Left")
                 }
+            }
+        }) as Renderable)
 
-                if (config.showActionLeft.get() && percent != 100f) {
-                    append(" - ")
-                    if (skill.lastGain != "") {
-                        val actionLeft = (ceil(currentXpMax.toDouble() - currentXp) / skill.lastGain.formatNumber()).toLong().addSeparators()
-                        append("§6$actionLeft Left")
-                    } else {
-                        append("∞ Left")
-                    }
-                }
-            })
-        })
     }
 
     private fun updateSkillInfo(skill: SkillType) {
