@@ -17,10 +17,10 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import java.net.URLEncoder
 
 object WikiManager {
-    private const val OFFICIALURLPREFIX = "https://wiki.hypixel.net/"
-    private const val OFFICIALSEARCHPREFIX = "index.php?search="
-    private const val FANDOMURLPREFIX = "https://hypixel-skyblock.fandom.com/wiki/"
-    private const val FANDOMSEARCHPREFIX = "Special:Search?query="
+    private const val OFFICIAL_URL_PREFIX = "https://wiki.hypixel.net/"
+    private const val OFFICIAL_SEARCH_PREFIX = "index.php?search="
+    private const val FANDOM_URL_PREFIX = "https://hypixel-skyblock.fandom.com/wiki/"
+    private const val FANDOM_SEARCH_PREFIX = "Special:Search?query="
 
     private val config get() = SkyHanniMod.feature.commands.betterWiki
 
@@ -41,7 +41,7 @@ object WikiManager {
             sendWikiMessage()
             return
         }
-        if (message.startsWith("/wiki ")){
+        if (message.startsWith("/wiki ")) {
             val search = event.message.drop("/wiki ".length)
             sendWikiMessage(search)
             return
@@ -104,8 +104,8 @@ object WikiManager {
         search: String = "", displaySearch: String = search,
         autoOpen: Boolean = config.autoOpenWiki, useFandom: Boolean = config.useFandom
     ) {
-        val wiki = if(useFandom) "SkyBlock Fandom Wiki" else "Official SkyBlock Wiki"
-        val urlPrefix = if (useFandom) FANDOMURLPREFIX else OFFICIALURLPREFIX
+        val wiki = if (useFandom) "SkyBlock Fandom Wiki" else "Official SkyBlock Wiki"
+        val urlPrefix = if (useFandom) FANDOM_URL_PREFIX else OFFICIAL_URL_PREFIX
         if (search == "") {
             LorenzUtils.clickableLinkChat(
                 "§7Click §e§lHERE §7to visit the §6$wiki§7!", urlPrefix, "§7The $wiki!"
@@ -113,7 +113,7 @@ object WikiManager {
             return
         }
 
-        val urlSearchPrefix = if (useFandom) "$urlPrefix$FANDOMSEARCHPREFIX" else "$urlPrefix$OFFICIALSEARCHPREFIX"
+        val urlSearchPrefix = if (useFandom) "$urlPrefix$FANDOM_SEARCH_PREFIX" else "$urlPrefix$OFFICIAL_SEARCH_PREFIX"
         val searchUrl = "$urlSearchPrefix${URLEncoder.encode(search, "UTF-8")}&scope=internal"
 
         LorenzUtils.clickableLinkChat(
