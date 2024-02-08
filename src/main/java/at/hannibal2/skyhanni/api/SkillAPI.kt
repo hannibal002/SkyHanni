@@ -100,7 +100,7 @@ object SkillAPI {
                 val split = cleanName.split(" ")
                 val skillName = split.first()
                 val skill = SkillType.getByNameFirstUppercase(skillName) ?: continue
-                val skillLevel = split.last().romanToDecimalIfNecessary()
+                val skillLevel = if (split.size > 1) split.last().romanToDecimalIfNecessary() else 0
                 val skillInfo = skillMap?.getOrPut(skill) { SkillInfo() }
 
                 for ((lineIndex, line) in lore.withIndex()) {

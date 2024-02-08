@@ -170,30 +170,38 @@ object SkillProgress {
         val sortedMap = SkillType.entries.filter { it.displayName.isNotEmpty() }.sortedBy { it.displayName.take(2) }
 
         for (skill in sortedMap) {
-            val skillInfo = skillMap[skill] ?: SkillAPI.SkillInfo()
+            val skillInfo = skillMap[skill] ?: SkillAPI.SkillInfo(level = -1, overflowLevel = -1)
             val (level, currentXp, currentXpMax, totalXp) =
                 if (config.overflowConfig.enableInAllDisplay.get())
                     LorenzUtils.Quad(skillInfo.overflowLevel, skillInfo.overflowCurrentXp, skillInfo.overflowCurrentXpMax, skillInfo.overflowTotalXp)
                 else
                     LorenzUtils.Quad(skillInfo.level, skillInfo.currentXp, skillInfo.currentXpMax, skillInfo.totalXp)
 
-            val tips = buildList {
-                add("§6Level: §b${level}")
-                add("§6Current XP: §b${currentXp.addSeparators()}")
-                add("§6Needed XP: §b${currentXpMax.addSeparators()}")
-                add("§6Total XP: §b${totalXp.addSeparators()}")
-            }
-            val nameColor = if (skill == activeSkill) "§e" else "§6"
-            addAsSingletonList(Renderable.hoverTips(buildString {
-                append("$nameColor${skill.displayName} $level ")
-                append("§7(")
-                append("§b${currentXp.addSeparators()}")
-                if (currentXpMax != 0L) {
-                    append("§6/")
-                    append("§b${currentXpMax.addSeparators()}")
+            if (level == -1) {
+                addAsSingletonList(Renderable.clickAndHover(
+                    "§cOpen your skills menu !",
+                    listOf("§eClick here to execute §6/skills"),
+                    onClick = { LorenzUtils.sendCommandToServer("skills") }
+                ))
+            } else {
+                val tips = buildList {
+                    add("§6Level: §b${level}")
+                    add("§6Current XP: §b${currentXp.addSeparators()}")
+                    add("§6Needed XP: §b${currentXpMax.addSeparators()}")
+                    add("§6Total XP: §b${totalXp.addSeparators()}")
                 }
-                append("§7)")
-            }, tips))
+                val nameColor = if (skill == activeSkill) "§e" else "§6"
+                addAsSingletonList(Renderable.hoverTips(buildString {
+                    append("$nameColor${skill.displayName} $level ")
+                    append("§7(")
+                    append("§b${currentXp.addSeparators()}")
+                    if (currentXpMax != 0L) {
+                        append("§6/")
+                        append("§b${currentXpMax.addSeparators()}")
+                    }
+                    append("§7)")
+                }, tips))
+            }
         }
     }
 
