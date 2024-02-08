@@ -54,7 +54,7 @@ object SkillAPI {
     fun onActionBar(event: ActionBarUpdateEvent) {
         val actionBar = event.actionBar.removeColor()
         val components = SPACE_SPLITTER.splitToList(actionBar)
-
+        SkillProgress.hideInActionBar.clear()
         for (component in components) {
             val matcher = listOf(SKILL_PATTERN, SKILL_PATTERN_PERCENT, SKILL_PATTERN_MULTIPLIER)
                 .firstOrNull { it.matcher(component).matches() }
@@ -73,6 +73,7 @@ object SkillAPI {
                 showDisplay = true
                 lastUpdate = SimpleTimeMark.now()
                 SkillProgress.updateDisplay()
+                SkillProgress.hideInActionBar.add(component)
                 return
             }
         }

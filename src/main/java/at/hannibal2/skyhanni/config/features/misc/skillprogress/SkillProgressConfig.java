@@ -36,6 +36,11 @@ public class SkillProgressConfig {
     public Property<Boolean> enabled = Property.of(false);
 
     @Expose
+    @ConfigOption(name = "Hide In Action Bar", desc = "Hide the skill progress in the Hypixel action bar.")
+    @ConfigEditorBoolean
+    public boolean hideInActionBar = false;
+
+    @Expose
     @ConfigOption(name = "Progress Bar Config", desc = "")
     @Accordion
     public ProgressBarConfig progressBarConfig = new ProgressBarConfig();

@@ -25,7 +25,9 @@ import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.SpecialColour
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 import io.github.moulberry.notenoughupdates.util.Utils
-import net.minecraft.init.Items
+import net.minecraft.util.ChatComponentText
+import net.minecraftforge.client.event.ClientChatReceivedEvent
+import net.minecraftforge.fml.common.eventhandler.EventPriority
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import java.awt.Color
 import kotlin.math.ceil
@@ -38,8 +40,8 @@ object SkillProgress {
     private var display = emptyList<List<Any>>()
     private var allDisplay = emptyList<List<Any>>()
     private var etaDisplay = emptyList<Renderable>()
-    private val defaultStack = Utils.createItemStack(Items.banner, "Default")
     private var lastGainUpdate = SimpleTimeMark.farPast()
+    var hideInActionBar = mutableListOf<String>()
 
     @SubscribeEvent
     fun onRenderOverlay(event: GuiRenderEvent.GuiOverlayRenderEvent) {
@@ -143,6 +145,20 @@ object SkillProgress {
             updateDisplay()
             update()
         }
+    }
+
+    @SubscribeEvent(priority = EventPriority.LOW)
+    fun onActionBar(event: ClientChatReceivedEvent) {
+        if (!config.hideInActionBar) return
+        if (event.type.toInt() != 2) return
+        if (event.isCanceled) return
+        val it = hideInActionBar.iterator()
+        var msg = event.message.unformattedText
+        while (it.hasNext()) {
+            msg = msg.replace(Regex("\\s*" + Regex.escape(it.next())), "")
+        }
+        msg = msg.trim()
+        event.message = ChatComponentText(msg)
     }
 
     fun updateDisplay() {
