@@ -101,7 +101,9 @@ object UnknownLinesHandler {
             SbPattern.winterCubeDmgPattern,
             SbPattern.riftDimensionPattern,
             RiftBloodEffigies.heartsPattern,
-            SbPattern.wtfAreThoseLinesPattern
+            SbPattern.wtfAreThoseLinesPattern,
+            SbPattern.timeLeftPattern,
+            SbPattern.daCurrentItemPattern,
         )
 
         unknownLines = unknownLines.filterNot { line ->
