@@ -19,7 +19,7 @@ import kotlin.time.Duration
 import kotlin.time.Duration.Companion.minutes
 
 object MayorAPI {
-    private var lastUpdate = SimpleTimeMark.farPast()
+    var lastUpdate = SimpleTimeMark.farPast()
     private var dispatcher = Dispatchers.IO
 
     private var rawMayorData: MayorJson? = null
@@ -78,13 +78,9 @@ object MayorAPI {
         val nextMayorTime = calculateNextMayorTime()
 
         // Check if it is still the mayor from the old SkyBlock year
-        currentMayor = (if (nextMayorTime > System.currentTimeMillis().asTimeMark()) {
-            candidates[SkyBlockTime.now().year - 1]
-        } else {
-            candidates[SkyBlockTime.now().year]
-        })?.let {
+        currentMayor = candidates[nextMayorTime.toSkyBlockTime().year - 1]?.let {
             setMayorWithActivePerks(it.name, it.perks)
-        } ?: Mayors.UNKNOWN
+        }
     }
 
     private fun checkHypixelAPI() {
