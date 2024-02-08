@@ -24,8 +24,8 @@ object RenderLineTooltips {
         mouseY: Int = Utils.getMouseY(),
     ) {
         if (tips.isNotEmpty()) {
-            val x = mouseX + 12 - posX
-            val y = mouseY - 10 - posY
+            val x = mouseX - posX + 12
+            val y = mouseY - posY - if (tips.size > 1) 10 else 2
             val color: Char = borderColor?.chatColorCode ?: stack?.getLore()?.lastOrNull()?.take(4)?.get(1)
             ?: 'f'
             val colourInt = Minecraft.getMinecraft().fontRendererObj.getColorCode(color)
