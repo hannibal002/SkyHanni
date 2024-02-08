@@ -380,16 +380,15 @@ object LorenzUtils {
     fun clickableLinkChat(
         message: String,
         url: String,
+        hover: String = "§eOpen $url",
         autoOpen: Boolean = false,
-        hover: String = "",
         prefix: Boolean = true,
         prefixColor: String = "§e"
     ) {
         val msgPrefix = if (prefix) prefixColor + CHAT_PREFIX else ""
         val text = ChatComponentText(msgPrefix + message)
         text.chatStyle.chatClickEvent = ClickEvent(ClickEvent.Action.OPEN_URL, url)
-        text.chatStyle.chatHoverEvent =  HoverEvent(HoverEvent.Action.SHOW_TEXT,
-            ChatComponentText(if (hover == "") "§eOpen $url" else "§e$hover"))
+        text.chatStyle.chatHoverEvent =  HoverEvent(HoverEvent.Action.SHOW_TEXT, ChatComponentText("$prefixColor$hover"))
         Minecraft.getMinecraft().thePlayer.addChatMessage(text)
         if (autoOpen) OSUtils.openBrowser(url)
     }

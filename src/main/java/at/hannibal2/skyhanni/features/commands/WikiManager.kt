@@ -14,8 +14,13 @@ import net.minecraft.client.gui.inventory.GuiContainer
 import net.minecraft.item.ItemStack
 import net.minecraftforge.client.event.GuiScreenEvent
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
+import java.net.URLEncoder
 
-class WikiManager {
+object WikiManager {
+    private const val OFFICIALURLPREFIX = "https://wiki.hypixel.net/"
+    private const val OFFICIALSEARCHPREFIX = "index.php?search="
+    private const val FANDOMURLPREFIX = "https://hypixel-skyblock.fandom.com/wiki/"
+    private const val FANDOMSEARCHPREFIX = "Special:Search?query="
 
     private val config get() = SkyHanniMod.feature.commands.betterWiki
 
@@ -28,27 +33,26 @@ class WikiManager {
     fun onMessageSendToServer(event: MessageSendToServerEvent) {
         if (!LorenzUtils.inSkyBlock) return
         if (!isEnabled()) return
-
-        val urlPrefix = if (config.useFandom) "https://hypixel-skyblock.fandom.com/wiki/" else "https://wiki.hypixel.net/"
-        val urlSearchPrefix = if (config.useFandom) "${urlPrefix}Special:Search?query=" else "${urlPrefix}index.php?search="
-
         val message = event.message.lowercase()
         if (!(message.startsWith("/wiki"))) return
+
         event.isCanceled = true
         if (message == "/wiki") {
-            LorenzUtils.clickableLinkChat("Click to open the wiki!", urlPrefix, config.autoOpenWiki, "Open the wiki!")
-        } else if (message.startsWith("/wiki ") || message == ("/wikithis")) { //conditional to see if we need Special:Search page
-            if (message == ("/wikithis")) {
-                val itemInHand = InventoryUtils.getItemInHand() ?: return
-                wikiTheItem(itemInHand, config.autoOpenWiki)
-            } else {
-                val search = event.message.split("/wiki ").last()
-                val wikiUrlCustom = "$urlSearchPrefix$search"
-                LorenzUtils.clickableLinkChat(
-                    "Click to search for §a${search}§e on the wiki!",
-                    wikiUrlCustom.replace(' ', '+'), config.autoOpenWiki, "Search for §a$search§e on the wiki!"
-                )
+            sendWikiMessage()
+            return
+        }
+        if (message.startsWith("/wiki ")){
+            val search = event.message.drop("/wiki ".length)
+            sendWikiMessage(search)
+            return
+        }
+        if (message == ("/wikithis")) {
+            val itemInHand = InventoryUtils.getItemInHand() ?: run {
+                LorenzUtils.chat("§cYou must be holding an item to use this command!")
+                return
             }
+            wikiTheItem(itemInHand, config.autoOpenWiki)
+            return
         }
     }
 
@@ -63,17 +67,60 @@ class WikiManager {
         wikiTheItem(stack, config.menuOpenWiki)
     }
 
-    private fun wikiTheItem(item: ItemStack, autoOpen: Boolean) {
-        val urlPrefix = if (config.useFandom) "https://hypixel-skyblock.fandom.com/wiki/" else "https://wiki.hypixel.net/"
-        val urlSearchPrefix = if (config.useFandom) "${urlPrefix}Special:Search?query=" else "${urlPrefix}index.php?search="
-
-        val itemDisplayName = (item.nameWithEnchantment ?: return).replace("§a✔ ", "").replace("§c✖ ", "")
+    private fun wikiTheItem(item: ItemStack, autoOpen: Boolean, useFandom: Boolean = config.useFandom) {
+        val itemDisplayName =
+            (item.nameWithEnchantment ?: return).replace("§a✔ ", "").replace("§c✖ ", "")
         val internalName = item.getInternalName().asString()
-        val wikiUrlSearch = if (internalName != "NONE") "$urlSearchPrefix$internalName"
-        else "$urlSearchPrefix${itemDisplayName.removeColor()}"
+        val wikiUrlSearch = if (internalName != "NONE") internalName else itemDisplayName.removeColor()
+
+        sendWikiMessage(wikiUrlSearch, itemDisplayName, autoOpen, useFandom)
+    }
+
+    fun otherWikiCommands(args: Array<String>, useFandom: Boolean, wikithis: Boolean = false) {
+        if (wikithis && !LorenzUtils.inSkyBlock) {
+            LorenzUtils.chat("§cYou must be in SkyBlock to do this!")
+            return
+        }
+
+        var search = ""
+        for (arg in args) search = "$search${arg}"
+
+        if (wikithis) {
+            val itemInHand = InventoryUtils.getItemInHand() ?: run {
+                LorenzUtils.chat("§cYou must be holding an item to use this command!")
+                return
+            }
+            wikiTheItem(itemInHand, false, useFandom = useFandom)
+            return
+        }
+        if (search == "") {
+            sendWikiMessage(useFandom = useFandom)
+            return
+        }
+        sendWikiMessage(search, useFandom = useFandom)
+    }
+
+    fun sendWikiMessage(
+        search: String = "", displaySearch: String = search,
+        autoOpen: Boolean = config.autoOpenWiki, useFandom: Boolean = config.useFandom
+    ) {
+        val wiki = if(useFandom) "SkyBlock Fandom Wiki" else "Official SkyBlock Wiki"
+        val urlPrefix = if (useFandom) FANDOMURLPREFIX else OFFICIALURLPREFIX
+        if (search == "") {
+            LorenzUtils.clickableLinkChat(
+                "§7Click §e§lHERE §7to visit the §6$wiki§7!", urlPrefix, "§7The $wiki!"
+            )
+            return
+        }
+
+        val urlSearchPrefix = if (useFandom) "$urlPrefix$FANDOMSEARCHPREFIX" else "$urlPrefix$OFFICIALSEARCHPREFIX"
+        val searchUrl = "$urlSearchPrefix${URLEncoder.encode(search, "UTF-8")}&scope=internal"
+
         LorenzUtils.clickableLinkChat(
-            "Click to search for §a$itemDisplayName§e on the wiki!",
-            wikiUrlSearch.replace(' ', '+'), autoOpen, "Search for §a$itemDisplayName§e on the wiki!"
+            "§7Click §e§lHERE §7to find §a$displaySearch §7on the §6$wiki§7!",
+            searchUrl,
+            "§7View §a$displaySearch §7on the §6$wiki§7!",
+            autoOpen
         )
     }
 

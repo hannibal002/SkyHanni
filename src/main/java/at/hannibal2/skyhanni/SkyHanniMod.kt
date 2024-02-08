@@ -491,7 +491,7 @@ class SkyHanniMod {
         loadModule(MinionFeatures())
         loadModule(TimeFeatures())
         loadModule(RngMeterInventory())
-        loadModule(WikiManager())
+        loadModule(WikiManager)
         loadModule(SendCoordinatedCommand())
         loadModule(WarpIsCommand())
         loadModule(ViewRecipeCommand)

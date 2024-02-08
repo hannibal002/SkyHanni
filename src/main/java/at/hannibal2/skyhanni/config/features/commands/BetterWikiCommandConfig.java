@@ -16,6 +16,12 @@ public class BetterWikiCommandConfig {
     public boolean enabled = false;
 
     @Expose
+    @ConfigOption(name = "SkyBlock Guide", desc = "Use SkyHanni's method in the SkyBlock Guide.") // TODO Make this method not suck
+    @ConfigEditorBoolean
+    @FeatureToggle
+    public boolean sbGuide = false;
+
+    @Expose
     @ConfigOption(name = "Use Fandom Wiki", desc = "Use Fandom Wiki (§ehypixel-skyblock.fandom.com§7) instead of the Hypixel wiki (§ewiki.hypixel.net§7) in most wiki-related chat messages.")
     @ConfigEditorBoolean
     @FeatureToggle

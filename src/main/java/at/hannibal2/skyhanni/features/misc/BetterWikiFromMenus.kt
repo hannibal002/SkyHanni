@@ -2,6 +2,7 @@ package at.hannibal2.skyhanni.features.misc
 
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
+import at.hannibal2.skyhanni.features.commands.WikiManager
 import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
@@ -26,9 +27,6 @@ class BetterWikiFromMenus {
         if (!LorenzUtils.inSkyBlock) return
         if (!isEnabled()) return
 
-        val urlSearchPrefix = if (config.useFandom) "https://hypixel-skyblock.fandom.com/wiki/Special:Search?query="
-        else "https://wiki.hypixel.net/index.php?search="
-
         val chestName = InventoryUtils.openInventoryName()
 
         if (chestName.isEmpty()) return
@@ -38,49 +36,31 @@ class BetterWikiFromMenus {
         val itemInHand = InventoryUtils.getItemInHand() ?: return
         val itemInHandName = itemInHand.nameWithEnchantment ?: return
 
+        println("${event.slotId} ${event.slot} $itemClickedStack $chestName")
         val wikiDisplayName: String
-        val wikiInternalName: String
 
-        val inWikiInventory = // TODO better name for this inventory
-            event.slotId == 11 && itemClickedName.contains("Wiki Command") && chestName.contains("Wiki")
-        if ((itemInHandName == "") || inWikiInventory) {
-            LorenzUtils.clickableLinkChat(
-                "Click here to visit the Hypixel Skyblock Fandom Wiki!",
-                "https://hypixel-skyblock.fandom.com/wiki"
-            )
-            return
+        val isWiki = event.slotId == 11 && itemClickedName.contains("Wiki Command")
+        val isWikithis = event.slotId == 15 && itemClickedName.contains("Wikithis Command")
+        val inBiblioInventory = chestName == "SkyBlock Wiki" && (isWiki || isWikithis)
+        val inSBGuideInventory = (itemClickedStack.getLore().let { it.any { line -> line == "§7§eClick to view on the SkyBlock Wiki!" } })
+
+        if (inBiblioInventory) {
+            if (isWiki) {
+                WikiManager.sendWikiMessage(useFandom = true)
+                return
+            }
+            if (isWikithis) {
+                val internalName = itemInHand.getInternalName().asString()
+                WikiManager.sendWikiMessage(internalName, itemInHandName, false, true)
+                return
+            }
         }
 
-        val inOtherWikiInventory = // TODO better name for this inventory
-            event.slotId == 15 && itemClickedName.contains("Wikithis Command") && chestName.contains("Wiki")
-        if (inOtherWikiInventory) {
-            wikiDisplayName = itemInHandName
-            val internalName = itemInHand.getInternalName().asString()
-            wikiInternalName = internalName
-        } else {
-            //.lowercase() to match "Wiki!" and ".*wiki.*" lore lines in one fell swoop
-            val inThirdWikiInventory = // TODO better name for this inventory
-                (itemClickedStack.getLore()
-                    .let { it.any { line -> line == "§7§eClick to view on the SkyBlock Wiki!" } })
-            if (inThirdWikiInventory) {
-                wikiDisplayName = itemClickedName.removeColor().replace("✔ ", "").replace("✖ ", "")
-                wikiInternalName = wikiDisplayName
-            } else return
+        if (inSBGuideInventory && config.sbGuide) {
+            val wikiSearch = itemClickedName.removeColor().replace("✔ ", "").replace("✖ ", "")
+            WikiManager.sendWikiMessage(wikiSearch, autoOpen = config.menuOpenWiki)
+            event.isCanceled = true
         }
-
-        if (!config.menuOpenWiki) {
-            LorenzUtils.clickableChat(
-                "Click here to search for $wikiDisplayName §eon the Hypixel Skyblock Fandom Wiki!",
-                "wiki $wikiInternalName"
-            )
-        } else {
-            val wikiUrlCustom = "${urlSearchPrefix}$wikiInternalName&scope=internal"
-            LorenzUtils.clickableLinkChat(
-                "Click to search the wiki for §a$wikiDisplayName§e!",
-                wikiUrlCustom.replace(' ', '+'), config.menuOpenWiki, "Search §a$wikiDisplayName§e on the wiki!"
-            )
-        }
-        event.isCanceled = true
     }
 
     private fun isEnabled() = config.enabled
