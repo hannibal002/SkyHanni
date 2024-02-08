@@ -33,11 +33,6 @@ class BetterWikiFromMenus {
 
         val itemClickedStack = event.slot.stack ?: return
         val itemClickedName = itemClickedStack.displayName
-        val itemInHand = InventoryUtils.getItemInHand() ?: return
-        val itemInHandName = itemInHand.nameWithEnchantment ?: return
-
-        println("${event.slotId} ${event.slot} $itemClickedStack $chestName")
-        val wikiDisplayName: String
 
         val isWiki = event.slotId == 11 && itemClickedName.contains("Wiki Command")
         val isWikithis = event.slotId == 15 && itemClickedName.contains("Wikithis Command")
@@ -49,9 +44,9 @@ class BetterWikiFromMenus {
                 WikiManager.sendWikiMessage(useFandom = true)
                 return
             }
+
             if (isWikithis) {
-                val internalName = itemInHand.getInternalName().asString()
-                WikiManager.sendWikiMessage(internalName, itemInHandName, false, true)
+                WikiManager.otherWikiCommands(arrayOf(""), true, true)
                 return
             }
         }

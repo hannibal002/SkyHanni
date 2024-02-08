@@ -73,7 +73,7 @@ object WikiManager {
         val internalName = item.getInternalName().asString()
         val wikiUrlSearch = if (internalName != "NONE") internalName else itemDisplayName.removeColor()
 
-        sendWikiMessage(wikiUrlSearch, itemDisplayName, autoOpen, useFandom)
+        sendWikiMessage(wikiUrlSearch, itemDisplayName.removeColor(), autoOpen, useFandom)
     }
 
     fun otherWikiCommands(args: Array<String>, useFandom: Boolean, wikithis: Boolean = false) {
