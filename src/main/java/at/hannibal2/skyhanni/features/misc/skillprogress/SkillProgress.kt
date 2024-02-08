@@ -23,7 +23,6 @@ import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderables
 import at.hannibal2.skyhanni.utils.RenderUtils.renderStringsAndItems
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.SpecialColour
-import at.hannibal2.skyhanni.utils.StringUtils.firstLetterUppercase
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 import io.github.moulberry.notenoughupdates.util.Utils
 import net.minecraft.init.Items
@@ -104,7 +103,7 @@ object SkillProgress {
     fun onLevelUp(event: SkillOverflowLevelupEvent) {
         if (!isEnabled()) return
         if (!config.overflowConfig.enableInChat) return
-        val skillName = event.skillName
+        val skillName = event.skill.displayName
         val oldLevel = event.oldLevel
         val newLevel = event.newLevel
 
@@ -115,7 +114,7 @@ object SkillProgress {
         }
 
         LorenzUtils.chat("§3§l▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬", false)
-        LorenzUtils.chat("  §r§b§lSKILL LEVEL UP §3${skillName.firstLetterUppercase()} §8$oldLevel➜§3$newLevel", false)
+        LorenzUtils.chat("  §r§b§lSKILL LEVEL UP §3$skillName §8$oldLevel➜§3$newLevel", false)
         LorenzUtils.chat("", false)
         LorenzUtils.chat("  §r§a§lREWARDS", false)
         for (reward in rewards)
@@ -160,20 +159,18 @@ object SkillProgress {
     private fun formatAllDisplay(map: List<List<Any>>): List<List<Any>> {
         val newList = mutableListOf<List<Any>>()
         if (map.isEmpty()) return newList
-
         for (index in config.allskillEntryList) {
             newList.add(map[index.ordinal])
         }
         return newList
     }
 
-
     private fun drawAllDisplay() = buildList {
         val skillMap = skillMap ?: return@buildList
-        val sortedMap = skillMap.toList().sortedBy { (name, _) ->
-            if (name.length >= 2) name.substring(0, 2) else name
-        }.toMap()
-        for ((skillName, skillInfo) in sortedMap) {
+        val sortedMap = SkillType.entries.filter { it.displayName.isNotEmpty() }.sortedBy { it.displayName.take(2) }
+
+        for (skill in sortedMap) {
+            val skillInfo = skillMap[skill] ?: SkillAPI.SkillInfo()
             val (level, currentXp, currentXpMax, totalXp) =
                 if (config.overflowConfig.enableInAllDisplay.get())
                     LorenzUtils.Quad(skillInfo.overflowLevel, skillInfo.overflowCurrentXp, skillInfo.overflowCurrentXpMax, skillInfo.overflowTotalXp)
@@ -186,9 +183,9 @@ object SkillProgress {
                 add("§6Needed XP: §b${currentXpMax.addSeparators()}")
                 add("§6Total XP: §b${totalXp.addSeparators()}")
             }
-            val nameColor = if (skillName == activeSkill) "§e" else "§6"
+            val nameColor = if (skill == activeSkill) "§e" else "§6"
             addAsSingletonList(Renderable.hoverTips(buildString {
-                append("$nameColor${skillName.firstLetterUppercase()} $level ")
+                append("$nameColor${skill.displayName} $level ")
                 append("§7(")
                 append("§b${currentXp.addSeparators()}")
                 if (currentXpMax != 0L) {
@@ -207,7 +204,7 @@ object SkillProgress {
         oldSkillInfoMap[activeSkill] = skillInfo
         val level = if (config.overflowConfig.enableInEtaDisplay.get()) skillInfo.overflowLevel else skillInfo.level
 
-        add(Renderable.string("§6Skill: §b${activeSkill.firstLetterUppercase()}"))
+        add(Renderable.string("§6Skill: §b${activeSkill.displayName}"))
         add(Renderable.string("§6Level: §b$level"))
 
         var xpInterp = xpInfo.xpGainHour
@@ -244,15 +241,14 @@ object SkillProgress {
                 add("§9[§d$level§9] ")
 
             if (config.useIcon.get()) {
-                val item = LorenzUtils.enumValueOfOrNull<SkillType>(activeSkill.uppercase())?.item ?: defaultStack
-                add(Renderable.itemStack(item, 1.5))
+                add(Renderable.itemStack(activeSkill.item, 1.5))
             }
 
             add(buildString {
                 append("§b+${skill.lastGain} ")
 
                 if (config.useSkillName.get())
-                    append("${activeSkill.firstLetterUppercase()} ")
+                    append("${activeSkill.displayName} ")
 
                 val (barCurrent, barMax) = if (config.overflowConfig.enableInProgressBar.get())
                     Pair(skill.overflowCurrentXp, skill.overflowCurrentXpMax)
@@ -286,7 +282,7 @@ object SkillProgress {
         })
     }
 
-    private fun updateSkillInfo(skill: String) {
+    private fun updateSkillInfo(skill: SkillType) {
         val xpInfo = skillXPInfoMap.getOrPut(skill) { SkillAPI.SkillXPInfo() }
         val skillInfo = skillMap?.get(skill) ?: return
         oldSkillInfoMap[skill] = skillInfo

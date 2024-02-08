@@ -9,11 +9,16 @@ import io.github.moulberry.notenoughupdates.util.Utils
 object SkillUtil {
 
     var levelingMap = mapOf<Int, Int>()
-    var activeSkill = ""
-    private val excludedSkills = listOf("foraging", "fishing", "alchemy", "carpentry")
+    var activeSkill: SkillType = SkillType.NONE
+    private val excludedSkills = listOf(
+        SkillType.FORAGING,
+        SkillType.FISHING,
+        SkillType.ALCHEMY,
+        SkillType.CARPENTRY
+    )
 
-    fun getSkillInfo(skillName: String): SkillAPI.SkillInfo? {
-        return SkillAPI.skillMap?.get(skillName)
+    fun getSkillInfo(skill: SkillType): SkillAPI.SkillInfo? {
+        return SkillAPI.skillMap?.get(skill)
     }
 
     fun getSkillInfo(currentLevel: Int, currentXp: Long, neededXp: Long, totalXp: Long): LorenzUtils.Quad<Int, Long, Long, Long> {
@@ -112,10 +117,7 @@ object SkillUtil {
         return totalXp
     }
 
-    fun levelArray(skillType: String): JsonArray =
-        when (skillType) {
-            "runecrafting" -> Utils.getElement(Constants.LEVELING, "runecrafting_xp").asJsonArray
-            "social" -> Utils.getElement(Constants.LEVELING, "social").asJsonArray
-            else -> Utils.getElement(Constants.LEVELING, "leveling_xp").asJsonArray
-        }
+    fun levelArray(): JsonArray =
+        Utils.getElement(Constants.LEVELING, "leveling_xp").asJsonArray
+
 }
