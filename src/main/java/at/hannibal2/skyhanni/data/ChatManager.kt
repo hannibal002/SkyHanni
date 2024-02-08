@@ -9,8 +9,9 @@ import at.hannibal2.skyhanni.features.chat.ChatFilterGui
 import at.hannibal2.skyhanni.utils.IdentityCharacteristics
 import at.hannibal2.skyhanni.utils.LorenzLogger
 import at.hannibal2.skyhanni.utils.LorenzUtils
-import at.hannibal2.skyhanni.utils.LorenzUtils.chat
 import at.hannibal2.skyhanni.utils.LorenzUtils.makeAccessible
+import at.hannibal2.skyhanni.utils.getClassInstance
+import at.hannibal2.skyhanni.utils.getModContainer
 import net.minecraft.client.Minecraft
 import net.minecraft.client.gui.ChatLine
 import net.minecraft.client.gui.GuiNewChat
@@ -64,7 +65,8 @@ object ChatManager {
         val message: IChatComponent,
         var actionKind: ActionKind,
         var actionReason: String?,
-        val modified: IChatComponent?
+        val modified: IChatComponent?,
+        val reasonExtraInfo: List<String> = listOf(),
     )
 
     @SubscribeEvent(priority = EventPriority.LOW, receiveCanceled = true)
@@ -86,12 +88,21 @@ object ChatManager {
 
         val message = packet.message
         val component = ChatComponentText(message)
-        messageHistory[IdentityCharacteristics(component)] =
-            MessageFilteringResult(component, ActionKind.OUTGOING, null, null)
+        val originatingModCall = event.findOriginatingModCall()
+        val originatingModContainer = originatingModCall?.getClassInstance()?.getModContainer()
+        val result = MessageFilteringResult(
+            component, ActionKind.OUTGOING, null, null,
+            reasonExtraInfo = listOf(
+                "§7Message created by §a${originatingModCall?.toString() ?: "§cprobably minecraft"}",
+                "§7Mod id: §a${originatingModContainer?.modId}",
+                "§7Mod name: §a${originatingModContainer?.name}"
+            )
+        )
+
+        messageHistory[IdentityCharacteristics(component)] = result
         if (MessageSendToServerEvent(message).postAndCatch()) {
             event.isCanceled = true
-            messageHistory[IdentityCharacteristics(component)] =
-                MessageFilteringResult(component, ActionKind.OUTGOING_BLOCKED, null, null)
+            messageHistory[IdentityCharacteristics(component)] = result.copy(actionKind = ActionKind.OUTGOING_BLOCKED)
         }
     }
 
