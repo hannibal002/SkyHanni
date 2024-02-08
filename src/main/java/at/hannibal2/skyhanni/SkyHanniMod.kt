@@ -10,6 +10,7 @@ import at.hannibal2.skyhanni.config.commands.Commands.init
 import at.hannibal2.skyhanni.data.ActionBarStatsData
 import at.hannibal2.skyhanni.data.BitsAPI
 import at.hannibal2.skyhanni.data.BlockData
+import at.hannibal2.skyhanni.data.BossbarData
 import at.hannibal2.skyhanni.data.ChatManager
 import at.hannibal2.skyhanni.data.CropAccessoryData
 import at.hannibal2.skyhanni.data.EntityData
@@ -231,6 +232,7 @@ import at.hannibal2.skyhanni.features.mining.DeepCavernsParkour
 import at.hannibal2.skyhanni.features.mining.HighlightMiningCommissionMobs
 import at.hannibal2.skyhanni.features.mining.KingTalismanHelper
 import at.hannibal2.skyhanni.features.mining.crystalhollows.CrystalHollowsNamesInCore
+import at.hannibal2.skyhanni.features.mining.eventtracker.MiningEventTracker
 import at.hannibal2.skyhanni.features.mining.powdertracker.PowderTracker
 import at.hannibal2.skyhanni.features.minion.MinionCollectLogic
 import at.hannibal2.skyhanni.features.minion.MinionFeatures
@@ -385,7 +387,7 @@ import org.apache.logging.log4j.Logger
     clientSideOnly = true,
     useMetadata = true,
     guiFactory = "at.hannibal2.skyhanni.config.ConfigGuiForgeInterop",
-    version = "0.23.Beta.16",
+    version = "0.23.Beta.17",
 )
 class SkyHanniMod {
 
@@ -448,6 +450,7 @@ class SkyHanniMod {
         loadModule(ScoreboardPattern)
         loadModule(UtilsPatterns)
         loadModule(PetAPI)
+        loadModule(BossbarData)
 
         // APIs
         loadModule(BazaarApi())
@@ -735,6 +738,7 @@ class SkyHanniMod {
         loadModule(SprayDisplay())
         loadModule(HighlightPlaceableNpcs())
         loadModule(PresentWaypoints())
+        loadModule(MiningEventTracker())
         loadModule(JyrreTimer())
         loadModule(NewYearCakeReminder())
         loadModule(SulphurSkitterBox())
