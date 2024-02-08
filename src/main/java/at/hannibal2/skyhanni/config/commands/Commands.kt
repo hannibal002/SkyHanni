@@ -25,6 +25,7 @@ import at.hannibal2.skyhanni.features.fame.AccountUpgradeReminder
 import at.hannibal2.skyhanni.features.fame.CityProjectFeatures
 import at.hannibal2.skyhanni.features.fishing.tracker.FishingProfitTracker
 import at.hannibal2.skyhanni.features.fishing.tracker.SeaCreatureTracker
+import at.hannibal2.skyhanni.features.garden.FarmingMilestoneCommand
 import at.hannibal2.skyhanni.features.garden.GardenAPI
 import at.hannibal2.skyhanni.features.garden.GardenCropTimeCommand
 import at.hannibal2.skyhanni.features.garden.GardenCropsInCommand
@@ -55,6 +56,7 @@ import at.hannibal2.skyhanni.test.SkyHanniConfigSearchResetCommand
 import at.hannibal2.skyhanni.test.SkyHanniDebugsAndTests
 import at.hannibal2.skyhanni.test.TestBingo
 import at.hannibal2.skyhanni.test.WorldEdit
+import at.hannibal2.skyhanni.test.command.CopyBossbarCommand
 import at.hannibal2.skyhanni.test.command.CopyItemCommand
 import at.hannibal2.skyhanni.test.command.CopyNearbyEntitiesCommand
 import at.hannibal2.skyhanni.test.command.CopyNearbyParticlesCommand
@@ -247,6 +249,12 @@ object Commands {
             "shofficialwikithis",
             "Searches the official wiki with SkyHanni's own method."
         ) {WikiManager.otherWikiCommands(it, false, true)}
+        registerCommand0("shcalccrop", "Calculate how many crops need to be farmed between different crop milestones.", {
+            FarmingMilestoneCommand.onCommand(it.getOrNull(0), it.getOrNull(1), it.getOrNull(2), false)
+        }, FarmingMilestoneCommand::onComplete)
+        registerCommand0("shcalccroptime", "Calculate how long you need to farm crops between different crop milestones.", {
+            FarmingMilestoneCommand.onCommand(it.getOrNull(0), it.getOrNull(1), it.getOrNull(2), true)
+        }, FarmingMilestoneCommand::onComplete)
     }
 
     private fun usersBugFix() {
@@ -366,6 +374,10 @@ object Commands {
             "Copies the scoreboard data to the clipboard"
         ) { CopyScoreboardCommand.command(it) }
         registerCommand(
+            "shcopybossbar",
+            "Copies the name of the bossbar to the clipboard, including formatting codes"
+        ) { CopyBossbarCommand.command(it) }
+        registerCommand(
             "shcopyitem",
             "Copies information about the item in hand to the clipboard"
         ) { CopyItemCommand.command() }
@@ -423,6 +435,7 @@ object Commands {
         registerCommand("pk", "Kick a specific party member") { PartyCommands.kick(it) }
         registerCommand("pt", "Transfer the party to another party member") { PartyCommands.transfer(it) }
         registerCommand("pp", "Promote a specific party member") { PartyCommands.promote(it) }
+        registerCommand("pd", "Disbands the party") { PartyCommands.disband() }
     }
 
     private fun commandHelp(args: Array<String>) {
