@@ -37,10 +37,8 @@ object QuiverAPI {
         }
     // im 99.9% sure the set() does not work, yay
     var arrowAmount: MutableMap<ArrowType, Float>
-        get() = storage?.arrows?.arrowAmount?.mapKeys { (internalName, _) ->
-            getArrowByNameOrNull(internalName)
-                ?: throw NoSuchElementException("ArrowType not found for internal name: $internalName")
-        }?.toMutableMap() ?: mutableMapOf()
+        get() = storage?.arrows?.arrowAmount?.mapKeys { (arrow, _) -> getArrowByNameOrNull(arrow) ?: NONE_ARROW_TYPE }
+            ?.mapValues { (_, amount) -> amount }?.toMutableMap() ?: mutableMapOf()
         set(value) {
             storage?.arrows?.arrowAmount =
                 value.mapKeys { (arrow, _) -> arrow.internalName }.mapValues { (_, amount) -> amount }
