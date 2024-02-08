@@ -273,8 +273,8 @@ interface Renderable {
             verticalAlign: VerticalAlignment = VerticalAlignment.TOP,
         ) = object : Renderable {
 
-            override val width = (Minecraft.getMinecraft().fontRendererObj.getStringWidth(text) * scale).toInt() + 1
-            override val height = (10.0 * scale).toInt() + 1
+            override val width = (Minecraft.getMinecraft().fontRendererObj.getStringWidth(text) * scale).toInt()
+            override val height = (10.0 * scale).toInt()
             override val horizontalAlign = horizontalAlign
             override val verticalAlign = verticalAlign
 
@@ -283,7 +283,7 @@ interface Renderable {
             override fun render(posX: Int, posY: Int) {
                 val fontRenderer = Minecraft.getMinecraft().fontRendererObj
                 GlStateManager.scale(scale, scale, 1.0)
-                fontRenderer.drawStringWithShadow("§f$text", inverseScale, inverseScale, 0)
+                fontRenderer.drawStringWithShadow("§f$text", 0f, 0f, 0)
                 GlStateManager.scale(inverseScale, inverseScale, 1.0f)
             }
         }
@@ -320,7 +320,7 @@ interface Renderable {
                 fontRenderer.drawString("§f", 0, 0, 0)
                 GlStateManager.scale(scale, scale, 1.0)
                 list.forEachIndexed { index, text ->
-                    fontRenderer.drawStringWithShadow(text, inverseScale, inverseScale + index * 10.0f, 0)
+                    fontRenderer.drawStringWithShadow(text, 0f, index * 10.0f, 0)
                 }
                 GlStateManager.scale(inverseScale, inverseScale, 1.0f)
             }
