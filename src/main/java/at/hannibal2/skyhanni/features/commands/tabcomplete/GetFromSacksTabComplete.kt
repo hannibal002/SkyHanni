@@ -31,7 +31,7 @@ object GetFromSacksTabComplete {
         if (realName.asString() == rawName) return
         if (realName !in GetFromSackAPI.sackList) return
         event.isCanceled = true
-        LorenzUtils.sendMessageToServer(message.replace(rawName, realName.asString()))
+        LorenzUtils.sendCommandToServer(message.replace(rawName, realName.asString()))
     }
 
     fun isEnabled() = LorenzUtils.inSkyBlock && config.gfsSack

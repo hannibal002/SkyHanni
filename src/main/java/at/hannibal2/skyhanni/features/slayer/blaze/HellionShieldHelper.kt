@@ -12,6 +12,7 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 class HellionShieldHelper {
 
     companion object {
+
         val hellionShieldMobs = mutableMapOf<EntityLiving, HellionShield>()
     }
 

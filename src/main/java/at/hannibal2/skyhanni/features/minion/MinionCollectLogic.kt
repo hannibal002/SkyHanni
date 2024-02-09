@@ -10,6 +10,7 @@ import at.hannibal2.skyhanni.utils.NEUItems
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
 class MinionCollectLogic {
+
     private var oldMap = mapOf<NEUInternalName, Int>()
 
     @SubscribeEvent

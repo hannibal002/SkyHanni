@@ -2,6 +2,7 @@ package at.hannibal2.skyhanni.features.misc.items
 
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.events.InventoryUpdatedEvent
+import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.NEUInternalName
@@ -11,6 +12,7 @@ import at.hannibal2.skyhanni.utils.OSUtils
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
 class AuctionHouseCopyUnderbidPrice {
+
     private val config get() = SkyHanniMod.feature.inventory
 
     @SubscribeEvent
@@ -30,7 +32,7 @@ class AuctionHouseCopyUnderbidPrice {
         }
         val newPrice = price * item.stackSize - 1
         OSUtils.copyToClipboard("$newPrice")
-        LorenzUtils.chat("Set §e${newPrice.addSeparators()} §eto clipboard. (Copy Underbid Price)")
+        ChatUtils.chat("Set §e${newPrice.addSeparators()} §eto clipboard. (Copy Underbid Price)")
     }
 
     fun isEnabled() = LorenzUtils.inSkyBlock && config.copyUnderbidPrice

@@ -21,6 +21,7 @@ import kotlin.time.Duration.Companion.minutes
 import kotlin.time.Duration.Companion.seconds
 
 object Year300RaffleEvent {
+
     private val config get() = SkyHanniMod.feature.event.century
     val displayItem by lazy { NEUItems.getItemStackOrNull("EPOCH_CAKE_ORANGE") ?: ItemStack(Items.clock) }
 
