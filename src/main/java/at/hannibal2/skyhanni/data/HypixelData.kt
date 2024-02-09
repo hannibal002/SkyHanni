@@ -32,7 +32,10 @@ class HypixelData {
         "tablistprofile",
         "§e§lProfile: §r§a(?<profile>.*)"
     )
-    private val tabListProfilePatternRift by patternGroup.pattern("tablistprofilerift", "§d§lProfile: §r§a(?<profile>.*)")
+    private val tabListProfilePatternRift by patternGroup.pattern(
+        "tablistprofilerift",
+        "§d§lProfile: §r§a(?<profile>.*)"
+    )
     private val lobbyTypePattern by patternGroup.pattern(
         "lobbytype",
         "(?<lobbyType>.*lobby)\\d+"
