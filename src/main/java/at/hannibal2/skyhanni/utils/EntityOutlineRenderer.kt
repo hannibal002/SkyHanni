@@ -32,6 +32,7 @@ import java.lang.reflect.Method
  *
  */
 object EntityOutlineRenderer {
+
     private val entityRenderCache: CachedInfo = CachedInfo(null, null, null)
     private var stopLookingForOptifine = false
     private var isMissingMixin = false
@@ -77,9 +78,7 @@ object EntityOutlineRenderer {
      *
      * @param camera       the current camera
      * @param partialTicks the progress to the next tick
-     * @param x            the camera x position
-     * @param y            the camera y position
-     * @param z            the camera z position
+     * @param vector       the camera position as Vector
      */
     @JvmStatic
     fun renderEntityOutlines(camera: ICamera, partialTicks: Float, vector: LorenzVec): Boolean {
@@ -284,9 +283,7 @@ object EntityOutlineRenderer {
      *
      * @param camera the current camera
      * @param entity the entity to render
-     * @param x      the camera x position
-     * @param y      the camera y position
-     * @param z      the camera z position
+     * @param vector the camera position as Vector
      * @return whether the entity should be rendered
      */
     private fun shouldRender(camera: ICamera, entity: Entity, vector: LorenzVec): Boolean =
@@ -404,6 +401,6 @@ object EntityOutlineRenderer {
     private class CachedInfo(
         var xrayCache: HashMap<Entity, Int>?,
         var noXrayCache: HashMap<Entity, Int>?,
-        var noOutlineCache: HashSet<Entity>?
+        var noOutlineCache: HashSet<Entity>?,
     )
 }

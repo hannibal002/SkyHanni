@@ -1,19 +1,23 @@
 package at.hannibal2.skyhanni.features.rift.everywhere.motes
 
+import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
+import at.hannibal2.skyhanni.config.features.rift.motes.RiftInventoryValueConfig.NumberFormatEntry
 import at.hannibal2.skyhanni.events.GuiContainerEvent
 import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.InventoryCloseEvent
 import at.hannibal2.skyhanni.events.InventoryFullyOpenedEvent
 import at.hannibal2.skyhanni.events.LorenzChatEvent
 import at.hannibal2.skyhanni.events.LorenzTickEvent
+import at.hannibal2.skyhanni.events.LorenzToolTipEvent
 import at.hannibal2.skyhanni.features.rift.RiftAPI
 import at.hannibal2.skyhanni.features.rift.RiftAPI.motesNpcPrice
+import at.hannibal2.skyhanni.utils.ChatUtils.chat
+import at.hannibal2.skyhanni.utils.CollectionUtils.addAsSingletonList
+import at.hannibal2.skyhanni.utils.ConfigUtils
 import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName
 import at.hannibal2.skyhanni.utils.LorenzColor
-import at.hannibal2.skyhanni.utils.LorenzUtils.addAsSingletonList
 import at.hannibal2.skyhanni.utils.LorenzUtils.addSelector
-import at.hannibal2.skyhanni.utils.LorenzUtils.chat
 import at.hannibal2.skyhanni.utils.NEUInternalName
 import at.hannibal2.skyhanni.utils.NEUItems.getItemStack
 import at.hannibal2.skyhanni.utils.NumberUtil
@@ -22,11 +26,11 @@ import at.hannibal2.skyhanni.utils.RenderUtils.highlight
 import at.hannibal2.skyhanni.utils.RenderUtils.renderStringsAndItems
 import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.renderables.Renderable
-import net.minecraftforge.event.entity.player.ItemTooltipEvent
 import net.minecraftforge.fml.common.eventhandler.EventPriority
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
 class ShowMotesNpcSellPrice {
+
     private val config get() = RiftAPI.config.motes
 
     // TODO USE SH-REPO
@@ -71,10 +75,10 @@ class ShowMotesNpcSellPrice {
     }
 
     @SubscribeEvent
-    fun onItemTooltipLow(event: ItemTooltipEvent) {
+    fun onItemTooltipLow(event: LorenzToolTipEvent) {
         if (!isShowPriceEnabled()) return
 
-        val itemStack = event.itemStack ?: return
+        val itemStack = event.itemStack
 
         val baseMotes = itemStack.motesNpcPrice() ?: return
         val burgerStacks = config.burgerStacks
@@ -163,14 +167,14 @@ class ShowMotesNpcSellPrice {
         }
         val total = itemMap.values.fold(0.0) { acc, pair -> acc + pair.second }.formatPrice()
         newDisplay.addAsSingletonList("§7Total price: §b$total")
-        val name = FormatType.entries[config.inventoryValue.formatType].type
+        val name = FormatType.entries[config.inventoryValue.formatType.ordinal].type // todo avoid ordinal
         newDisplay.addAsSingletonList("§7Price format: §c$name")
         newDisplay.addSelector<FormatType>(
             " ",
             getName = { type -> type.type },
-            isCurrent = { it.ordinal == config.inventoryValue.formatType },
+            isCurrent = { it.ordinal == config.inventoryValue.formatType.ordinal }, // todo avoid ordinal
             onChange = {
-                config.inventoryValue.formatType = it.ordinal
+                config.inventoryValue.formatType = NumberFormatEntry.entries[it.ordinal] // todo avoid ordinal
                 update()
             }
         )
@@ -183,12 +187,19 @@ class ShowMotesNpcSellPrice {
     }
 
     private fun Double.formatPrice(): String = when (config.inventoryValue.formatType) {
-        0 -> NumberUtil.format(this)
-        1 -> this.addSeparators()
+        NumberFormatEntry.SHORT -> NumberUtil.format(this)
+        NumberFormatEntry.LONG -> this.addSeparators()
         else -> "0"
     }
 
     private fun isShowPriceEnabled() = RiftAPI.inRift() && config.showPrice
 
     private fun isInventoryValueEnabled() = RiftAPI.inRift() && config.inventoryValue.enabled
+
+    @SubscribeEvent
+    fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
+        event.transform(15, "rift.motes.inventoryValue.formatType") { element ->
+            ConfigUtils.migrateIntToEnum(element, NumberFormatEntry::class.java)
+        }
+    }
 }

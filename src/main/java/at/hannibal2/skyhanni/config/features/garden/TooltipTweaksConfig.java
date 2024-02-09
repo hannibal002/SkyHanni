@@ -1,6 +1,7 @@
 package at.hannibal2.skyhanni.config.features.garden;
 
 import at.hannibal2.skyhanni.config.FeatureToggle;
+import at.hannibal2.skyhanni.config.HasLegacyId;
 import com.google.gson.annotations.Expose;
 import io.github.moulberry.moulconfig.annotations.ConfigEditorBoolean;
 import io.github.moulberry.moulconfig.annotations.ConfigEditorDropdown;
@@ -33,8 +34,36 @@ public class TooltipTweaksConfig {
             "§fShow: §7Crop-specific Fortune indicated as §6[+196]\n" +
             "§fReplace: §7Edits the total Fortune to include crop-specific Fortune."
     )
-    @ConfigEditorDropdown(values = {"Default", "Show", "Replace"})
-    public int cropTooltipFortune = 1;
+    @ConfigEditorDropdown()
+    public CropTooltipFortuneEntry cropTooltipFortune = CropTooltipFortuneEntry.SHOW;
+
+    public enum CropTooltipFortuneEntry implements HasLegacyId {
+        DEFAULT("Default", 0),
+        SHOW("Show", 1),
+        REPLACE("Replace", 2);
+        private final String str;
+        private final int legacyId;
+
+        CropTooltipFortuneEntry(String str, int legacyId) {
+            this.str = str;
+            this.legacyId = legacyId;
+        }
+
+        // Constructor if new enum elements are added post-migration
+        CropTooltipFortuneEntry(String str) {
+            this(str, -1);
+        }
+
+        @Override
+        public int getLegacyId() {
+            return legacyId;
+        }
+
+        @Override
+        public String toString() {
+            return str;
+        }
+    }
 
     @Expose
     @ConfigOption(

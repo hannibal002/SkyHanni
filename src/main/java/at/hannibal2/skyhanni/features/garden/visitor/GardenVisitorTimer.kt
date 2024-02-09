@@ -28,6 +28,7 @@ import kotlin.time.DurationUnit
 import kotlin.time.toDuration
 
 class GardenVisitorTimer {
+
     private val config get() = GardenAPI.config.visitors.timer
     private val pattern = "§b§lVisitors: §r§f\\((?<time>.*)\\)".toPattern()
     private var display = ""
@@ -38,7 +39,7 @@ class GardenVisitorTimer {
     private var lastTimerValue = ""
     private var lastTimerUpdate = SimpleTimeMark.farPast()
 
-    //TODO nea?
+    // TODO nea?
 //    private val visitorInterval by dynamic(GardenAPI::config, Storage.ProfileSpecific.GardenStorage::visitorInterval)
     private var visitorInterval: Duration?
         get() = GardenAPI.storage?.visitorInterval?.toDuration(DurationUnit.MILLISECONDS)
@@ -49,6 +50,7 @@ class GardenVisitorTimer {
         }
 
     companion object {
+
         var lastVisitors: Int = -1
     }
 
@@ -129,9 +131,11 @@ class GardenVisitorTimer {
             if (isSixthVisitorEnabled() && millis.isNegative()) {
                 visitorsAmount++
                 if (!sixthVisitorReady) {
-                    LorenzUtils.sendTitle("§a6th Visitor Ready", 5.seconds)
                     sixthVisitorReady = true
-                    if (isSixthVisitorWarningEnabled()) SoundUtils.playBeepSound()
+                    if (isSixthVisitorWarningEnabled()) {
+                        LorenzUtils.sendTitle("§a6th Visitor Ready", 5.seconds)
+                        SoundUtils.playBeepSound()
+                    }
                 }
             }
         }
@@ -160,15 +164,14 @@ class GardenVisitorTimer {
         }
 
         val extraSpeed = if (diff in 2.seconds..10.seconds) {
-            val factor = diff.inWholeSeconds.toDouble()
-            val duration = millis / factor
+            val duration = millis / 3
             "§7/§$formatColor" + duration.format()
         } else ""
         if (config.newVisitorPing && millis < 10.seconds) {
             SoundUtils.playBeepSound()
         }
 
-        val formatDuration = TimeUtils.formatDuration(millis)
+        val formatDuration = millis.format()
         val next = if (queueFull && (!isSixthVisitorEnabled() || millis.isNegative())) "§cQueue Full!" else {
             "Next in §$formatColor$formatDuration$extraSpeed"
         }

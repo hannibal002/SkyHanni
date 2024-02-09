@@ -11,12 +11,12 @@ import at.hannibal2.skyhanni.events.IslandChangeEvent
 import at.hannibal2.skyhanni.events.LorenzChatEvent
 import at.hannibal2.skyhanni.events.OwnInventoryItemUpdateEvent
 import at.hannibal2.skyhanni.events.SackChangeEvent
+import at.hannibal2.skyhanni.utils.CollectionUtils.addAsSingletonList
+import at.hannibal2.skyhanni.utils.CollectionUtils.addOrPut
+import at.hannibal2.skyhanni.utils.ConditionalUtils.afterChange
 import at.hannibal2.skyhanni.utils.ConfigUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalNameOrNull
 import at.hannibal2.skyhanni.utils.LorenzUtils
-import at.hannibal2.skyhanni.utils.LorenzUtils.addAsSingletonList
-import at.hannibal2.skyhanni.utils.LorenzUtils.addOrPut
-import at.hannibal2.skyhanni.utils.LorenzUtils.afterChange
 import at.hannibal2.skyhanni.utils.NEUItems.getNpcPriceOrNull
 import at.hannibal2.skyhanni.utils.NEUItems.getPriceOrNull
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
@@ -28,6 +28,7 @@ import net.minecraft.client.Minecraft
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
 object EnderNodeTracker {
+
     private val config get() = SkyHanniMod.feature.combat.enderNodeTracker
 
     private var miteGelInInventory = 0
@@ -160,7 +161,7 @@ object EnderNodeTracker {
     @SubscribeEvent
     fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
         event.move(2, "misc.enderNodeTracker", "combat.enderNodeTracker")
-        event.move(11, "combat.enderNodeTracker.textFormat", "combat.enderNodeTracker.textFormat") { element ->
+        event.transform(11, "combat.enderNodeTracker.textFormat") { element ->
             ConfigUtils.migrateIntArrayListToEnumArrayList(element, EnderNodeDisplayEntry::class.java)
         }
     }
@@ -191,7 +192,8 @@ object EnderNodeTracker {
         EnderNode.END_LEGGINGS,
         EnderNode.END_BOOTS,
         EnderNode.ENDER_NECKLACE,
-        EnderNode.ENDER_GAUNTLET -> true
+        EnderNode.ENDER_GAUNTLET,
+        -> true
 
         else -> false
     }

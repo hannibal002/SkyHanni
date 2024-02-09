@@ -5,28 +5,31 @@ import at.hannibal2.skyhanni.events.LorenzTickEvent
 import at.hannibal2.skyhanni.events.ReceiveParticleEvent
 import at.hannibal2.skyhanni.features.rift.RiftAPI
 import at.hannibal2.skyhanni.utils.BlockUtils.getBlockAt
+import at.hannibal2.skyhanni.utils.CollectionUtils.editCopy
 import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName
 import at.hannibal2.skyhanni.utils.LocationUtils
 import at.hannibal2.skyhanni.utils.LocationUtils.distanceToPlayer
-import at.hannibal2.skyhanni.utils.LorenzUtils.editCopy
 import at.hannibal2.skyhanni.utils.LorenzVec
 import at.hannibal2.skyhanni.utils.RenderUtils.draw3DLine
 import at.hannibal2.skyhanni.utils.RenderUtils.drawDynamicText
 import at.hannibal2.skyhanni.utils.RenderUtils.drawFilledBoundingBox_nea
 import at.hannibal2.skyhanni.utils.RenderUtils.expandBlock
 import net.minecraft.client.Minecraft
+import net.minecraft.init.Blocks
 import net.minecraft.util.EnumParticleTypes
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import java.awt.Color
 
 class RiftWiltedBerberisHelper {
+
     private val config get() = RiftAPI.config.area.dreadfarm.wiltedBerberis
     private var isOnFarmland = false
     private var hasFarmingToolInHand = false
     private var list = listOf<WiltedBerberis>()
 
     class WiltedBerberis(var currentParticles: LorenzVec) {
+
         var previous: LorenzVec? = null
         var moving = true
         var y = 0.0
@@ -43,9 +46,9 @@ class RiftWiltedBerberisHelper {
         hasFarmingToolInHand = InventoryUtils.getItemInHand()?.getInternalName() == RiftAPI.farmingTool
 
         if (Minecraft.getMinecraft().thePlayer.onGround) {
-            val block = LocationUtils.playerLocation().add(y = -1).getBlockAt().toString()
+            val block = LocationUtils.playerLocation().add(y = -1).getBlockAt()
             val currentY = LocationUtils.playerLocation().y
-            isOnFarmland = block == "Block{minecraft:farmland}" && (currentY % 1 == 0.0)
+            isOnFarmland = block == Blocks.farmland && (currentY % 1 == 0.0)
         }
     }
 
@@ -99,7 +102,6 @@ class RiftWiltedBerberisHelper {
         }
     }
 
-
     @SubscribeEvent
     fun onRenderWorld(event: LorenzRenderWorldEvent) {
         if (!isEnabled()) return
@@ -137,5 +139,4 @@ class RiftWiltedBerberisHelper {
     }
 
     private fun isEnabled() = RiftAPI.inRift() && RiftAPI.inDreadfarm() && config.enabled
-
 }

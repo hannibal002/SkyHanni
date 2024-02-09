@@ -4,16 +4,24 @@ import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.data.FriendAPI
 import at.hannibal2.skyhanni.data.PartyAPI
+import at.hannibal2.skyhanni.events.MessageSendToServerEvent
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
 object PartyCommands {
+
     private val config get() = SkyHanniMod.feature.commands
 
     fun kickOffline() {
         if (!config.shortCommands) return
         if (PartyAPI.partyMembers.isEmpty()) return
         LorenzUtils.sendCommandToServer("party kickoffline")
+    }
+
+    fun disband() {
+        if (!config.shortCommands) return
+        if (PartyAPI.partyMembers.isEmpty()) return
+        LorenzUtils.sendCommandToServer("party disband")
     }
 
     fun warp() {
@@ -26,11 +34,16 @@ object PartyCommands {
         if (!config.shortCommands) return
         if (PartyAPI.partyMembers.isEmpty()) return
         if (args.isEmpty()) return
+        if (args.size > 1 && config.partyKickReason)
+            LorenzUtils.sendCommandToServer("pc Kicking ${args[0]}: ${args.drop(1).joinToString(" ").trim()}")
         LorenzUtils.sendCommandToServer("party kick ${args[0]}")
     }
 
     fun transfer(args: Array<String>) {
-        if (args.isEmpty()) LorenzUtils.sendCommandToServer("pt")
+        if (args.isEmpty()) {
+            LorenzUtils.sendCommandToServer("pt")
+            return
+        }
         if (!config.shortCommands) return
         if (PartyAPI.partyMembers.isEmpty()) return
         LorenzUtils.sendCommandToServer("party transfer ${args[0]}")
@@ -41,6 +54,26 @@ object PartyCommands {
         if (PartyAPI.partyMembers.isEmpty()) return
         if (args.isEmpty()) return
         LorenzUtils.sendCommandToServer("party promote ${args[0]}")
+    }
+
+    @SubscribeEvent
+    fun onSendCommand(event: MessageSendToServerEvent) {
+        if (!config.partyKickReason) {
+            return
+        }
+        if (!event.message.startsWith("/party kick ", ignoreCase = true)
+            && !event.message.startsWith("/p kick ", ignoreCase = true)
+        ) {
+            return
+        }
+        val args = event.message.split(" ")
+        if (args.size < 3) return
+        val kickedPlayer = args[2]
+        val kickReason = args.drop(3).joinToString(" ").trim()
+        if (kickReason.isEmpty()) return
+        event.cancel()
+        LorenzUtils.sendCommandToServer("pc Kicking $kickedPlayer: $kickReason")
+        LorenzUtils.sendCommandToServer("p kick $kickedPlayer")
     }
 
     fun customTabComplete(command: String): List<String>? {

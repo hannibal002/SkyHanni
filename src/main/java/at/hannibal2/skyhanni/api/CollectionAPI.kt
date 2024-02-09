@@ -4,10 +4,10 @@ import at.hannibal2.skyhanni.events.CollectionUpdateEvent
 import at.hannibal2.skyhanni.events.InventoryFullyOpenedEvent
 import at.hannibal2.skyhanni.events.ItemAddEvent
 import at.hannibal2.skyhanni.events.ProfileJoinEvent
+import at.hannibal2.skyhanni.utils.ChatUtils
+import at.hannibal2.skyhanni.utils.CollectionUtils.addOrPut
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.ItemUtils.name
-import at.hannibal2.skyhanni.utils.LorenzUtils
-import at.hannibal2.skyhanni.utils.LorenzUtils.addOrPut
 import at.hannibal2.skyhanni.utils.NEUInternalName
 import at.hannibal2.skyhanni.utils.NEUItems
 import at.hannibal2.skyhanni.utils.NEUItems.getItemStackOrNull
@@ -17,8 +17,9 @@ import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
 class CollectionAPI {
+
     // TODO USE SH-REPO
-    private val counterPattern = "(?:.*) §e(?<amount>.*)§6\\/(?:.*)".toPattern()
+    private val counterPattern = ".* §e(?<amount>.*)§6/.*".toPattern()
     private val singleCounterPattern = "§7Total Collected: §e(?<amount>.*)".toPattern()
 
     @SubscribeEvent
@@ -76,13 +77,14 @@ class CollectionAPI {
 
         // TODO add support for replenish (higher collection than actual items in inv)
         if (internalName.getItemStackOrNull() == null) {
-            LorenzUtils.debug("CollectionAPI.addFromInventory: item is null for '$internalName'")
+            ChatUtils.debug("CollectionAPI.addFromInventory: item is null for '$internalName'")
             return
         }
         collectionValue.addOrPut(internalName, event.amount.toLong())
     }
 
     companion object {
+
         // TODO USE SH-REPO
         val collectionValue = mutableMapOf<NEUInternalName, Long>()
         private val collectionTier0Pattern = "§7Progress to .* I: .*".toPattern()

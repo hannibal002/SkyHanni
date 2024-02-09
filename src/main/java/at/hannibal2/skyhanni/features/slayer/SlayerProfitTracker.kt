@@ -4,6 +4,7 @@ import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.config.Storage
 import at.hannibal2.skyhanni.data.SlayerAPI
+import at.hannibal2.skyhanni.data.jsonobjects.repo.SlayerProfitTrackerItemsJson
 import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.ItemAddEvent
 import at.hannibal2.skyhanni.events.PurseChangeCause
@@ -11,14 +12,13 @@ import at.hannibal2.skyhanni.events.PurseChangeEvent
 import at.hannibal2.skyhanni.events.RepositoryReloadEvent
 import at.hannibal2.skyhanni.events.SlayerChangeEvent
 import at.hannibal2.skyhanni.events.SlayerQuestCompleteEvent
-import at.hannibal2.skyhanni.utils.LorenzLogger
+import at.hannibal2.skyhanni.utils.ChatUtils
+import at.hannibal2.skyhanni.utils.CollectionUtils.addAsSingletonList
 import at.hannibal2.skyhanni.utils.LorenzUtils
-import at.hannibal2.skyhanni.utils.LorenzUtils.addAsSingletonList
 import at.hannibal2.skyhanni.utils.NEUInternalName
 import at.hannibal2.skyhanni.utils.NumberUtil
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
-import at.hannibal2.skyhanni.data.jsonobjects.repo.SlayerProfitTrackerItemsJson
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 import at.hannibal2.skyhanni.utils.tracker.ItemTrackerData
 import at.hannibal2.skyhanni.utils.tracker.SkyHanniItemTracker
@@ -26,17 +26,17 @@ import com.google.gson.JsonObject
 import com.google.gson.JsonPrimitive
 import com.google.gson.annotations.Expose
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
-import kotlin.time.Duration.Companion.seconds
 
 object SlayerProfitTracker {
+
     private val config get() = SkyHanniMod.feature.slayer.itemProfitTracker
 
     private var itemLogCategory = ""
     private var baseSlayerType = ""
-    private val logger = LorenzLogger("slayer/profit_tracker")
     private val trackers = mutableMapOf<String, SkyHanniItemTracker<Data>>()
 
     class Data : ItemTrackerData() {
+
         override fun resetItems() {
             slayerSpawnCost = 0
             slayerCompletedCount = 0
@@ -46,7 +46,7 @@ object SlayerProfitTracker {
         var slayerSpawnCost: Long = 0
 
         @Expose
-        var slayerCompletedCount = 0
+        var slayerCompletedCount = 0L
 
         override fun getDescription(timesDropped: Long): List<String> {
             val percentage = timesDropped.toDouble() / slayerCompletedCount
@@ -64,7 +64,7 @@ object SlayerProfitTracker {
             val mobKillCoinsFormat = NumberUtil.format(item.totalAmount)
             return listOf(
                 "§7Killing mobs gives you coins (more with scavenger).",
-                "§7You got §6$mobKillCoinsFormat coins §7way."
+                "§7You got §6$mobKillCoinsFormat coins §7that way."
             )
         }
     }
@@ -89,11 +89,9 @@ object SlayerProfitTracker {
         if (!isEnabled()) return
         val coins = event.coins
         if (event.reason == PurseChangeCause.GAIN_MOB_KILL && SlayerAPI.isInCorrectArea) {
-            logger.log("Coins gained for killing mobs: ${coins.addSeparators()}")
-            addMobKillCoins(coins.toInt())
+            getTracker()?.addCoins(coins.toInt())
         }
         if (event.reason == PurseChangeCause.LOSE_SLAYER_QUEST_STARTED) {
-            logger.log("Coins paid for starting slayer quest: ${coins.addSeparators()}")
             addSlayerCosts(coins.toInt())
         }
     }
@@ -104,14 +102,6 @@ object SlayerProfitTracker {
         itemLogCategory = newSlayer.removeColor()
         baseSlayerType = itemLogCategory.substringBeforeLast(" ")
         getTracker()?.update()
-    }
-
-    private fun addMobKillCoins(coins: Int) {
-        getTracker()?.addCoins(coins)
-    }
-
-    private fun addItemPickup(internalName: NEUInternalName, stackSize: Int) {
-        getTracker()?.addItem(internalName, stackSize)
     }
 
     private fun getTracker(): SkyHanniItemTracker<Data>? {
@@ -144,19 +134,11 @@ object SlayerProfitTracker {
         val amount = event.amount
 
         if (!isAllowedItem(internalName)) {
-            LorenzUtils.debug("Ignored non-slayer item pickup: '$internalName' '$itemLogCategory'")
+            ChatUtils.debug("Ignored non-slayer item pickup: '$internalName' '$itemLogCategory'")
             return
         }
 
-        val (itemName, price) = SlayerAPI.getItemNameAndPrice(internalName, amount)
-        addItemPickup(internalName, amount)
-        logger.log("Coins gained for picking up an item ($itemName) ${price.addSeparators()}")
-        if (config.priceInChat && price > config.minimumPrice) {
-            LorenzUtils.chat("§a+Slayer Drop§7: §r$itemName")
-        }
-        if (config.titleWarning && price > config.minimumPriceWarning) {
-            LorenzUtils.sendTitle("§a+ $itemName", 5.seconds)
-        }
+        getTracker()?.addItem(internalName, amount)
     }
 
     private fun isAllowedItem(internalName: NEUInternalName): Boolean {
@@ -189,14 +171,7 @@ object SlayerProfitTracker {
             )
         )
 
-        val profitFormat = NumberUtil.format(profit)
-        val profitPrefix = if (profit < 0) "§c" else "§6"
-
-        val profitPerBoss = profit / itemLog.slayerCompletedCount
-        val profitPerBossFormat = NumberUtil.format(profitPerBoss)
-
-        val text = "§eTotal Profit: $profitPrefix$profitFormat coins"
-        addAsSingletonList(Renderable.hoverTips(text, listOf("§7Profit per boss: $profitPrefix$profitPerBossFormat")))
+        addAsSingletonList(tracker.addTotalProfit(profit, itemLog.slayerCompletedCount, "boss"))
 
         tracker.addPriceFromButton(this)
     }
@@ -222,7 +197,7 @@ object SlayerProfitTracker {
 
     @SubscribeEvent
     fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
-        event.move(10, "#profile.slayerProfitData", "#profile.slayerProfitData") { old ->
+        event.transform(10, "#profile.slayerProfitData") { old ->
             for (data in old.asJsonObject.entrySet().map { it.value.asJsonObject }) {
                 val items = data.get("items").asJsonObject
                 for (item in items.entrySet().map { it.value.asJsonObject }) {
@@ -240,14 +215,13 @@ object SlayerProfitTracker {
 
             old
         }
-
     }
 
     fun isEnabled() = LorenzUtils.inSkyBlock && config.enabled
 
     fun clearProfitCommand(args: Array<String>) {
         if (itemLogCategory == "") {
-            LorenzUtils.userError(
+            ChatUtils.userError(
                 "No current slayer data found! " +
                     "§eGo to a slayer area and start the specific slayer type you want to reset the data of.",
             )

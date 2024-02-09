@@ -6,14 +6,15 @@ import at.hannibal2.skyhanni.data.ProfileStorageData
 import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.LorenzChatEvent
 import at.hannibal2.skyhanni.events.LorenzWorldChangeEvent
-import at.hannibal2.skyhanni.utils.LorenzUtils.addAsSingletonList
-import at.hannibal2.skyhanni.utils.LorenzUtils.editCopy
+import at.hannibal2.skyhanni.utils.CollectionUtils.addAsSingletonList
+import at.hannibal2.skyhanni.utils.CollectionUtils.editCopy
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.RenderUtils.renderStringsAndItems
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import java.util.regex.Matcher
 
 object TrevorTracker {
+
     private val config get() = SkyHanniMod.feature.misc.trevorTheTrapper
 
     // TODO USE SH-REPO
@@ -59,7 +60,6 @@ object TrevorTracker {
         peltsPerSecond.clear()
         peltsPerHour = 0
         stoppedChecks = 0
-        saveAndUpdate()
     }
 
     private fun formatDisplay(map: List<List<Any>>): List<List<Any>> {
@@ -81,14 +81,14 @@ object TrevorTracker {
             val pelts = matcher.group("pelts").toInt()
             storage.peltsGained += pelts
             storage.selfKillingAnimals += 1
-            saveAndUpdate()
+            update()
         }
         matcher = killMobPattern.matcher(event.message)
         if (matcher.matches()) {
             val pelts = matcher.group("pelts").toInt()
             storage.peltsGained += pelts
             storage.killedAnimals += 1
-            saveAndUpdate()
+            update()
         }
     }
 
@@ -99,10 +99,10 @@ object TrevorTracker {
         val foundRarity = TrapperMobRarity.entries.firstOrNull { it.formattedName == rarity } ?: return
         val old = storage.animalRarities[foundRarity] ?: 0
         storage.animalRarities = storage.animalRarities.editCopy { this[foundRarity] = old + 1 }
-        saveAndUpdate()
+        update()
     }
 
-    fun saveAndUpdate() {
+    fun update() {
         val storage = ProfileStorageData.profileSpecific?.trapperData ?: return
         display = formatDisplay(drawTrapperDisplay(storage))
     }

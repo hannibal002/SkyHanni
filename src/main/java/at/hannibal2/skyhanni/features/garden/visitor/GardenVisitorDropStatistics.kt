@@ -11,11 +11,11 @@ import at.hannibal2.skyhanni.events.PreProfileSwitchEvent
 import at.hannibal2.skyhanni.events.garden.visitor.VisitorAcceptEvent
 import at.hannibal2.skyhanni.features.garden.GardenAPI
 import at.hannibal2.skyhanni.test.command.ErrorManager
+import at.hannibal2.skyhanni.utils.CollectionUtils.addAsSingletonList
+import at.hannibal2.skyhanni.utils.CollectionUtils.addOrPut
+import at.hannibal2.skyhanni.utils.CollectionUtils.editCopy
 import at.hannibal2.skyhanni.utils.ConfigUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils
-import at.hannibal2.skyhanni.utils.LorenzUtils.addAsSingletonList
-import at.hannibal2.skyhanni.utils.LorenzUtils.addOrPut
-import at.hannibal2.skyhanni.utils.LorenzUtils.editCopy
 import at.hannibal2.skyhanni.utils.NumberUtil
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.NumberUtil.formatNumber
@@ -25,6 +25,7 @@ import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
 object GardenVisitorDropStatistics {
+
     private val config get() = GardenAPI.config.visitors.dropsStatistics
     private var display = emptyList<List<Any>>()
 
@@ -47,7 +48,7 @@ object GardenVisitorDropStatistics {
     private fun formatDisplay(map: List<List<Any>>): List<List<Any>> {
         val newList = mutableListOf<List<Any>>()
         for (index in config.textFormat) {
-            // TODO, change functionality to use enum rather than ordinals
+            // We need to use the ordinal here, can't change this.
             newList.add(map[index.ordinal])
         }
         return newList
@@ -127,12 +128,12 @@ object GardenVisitorDropStatistics {
         saveAndUpdate()
     }
 
+    /**
+     * Do not change the order of the elements getting added to the list. See DropsStatisticsTextEntry for the order.
+     */
     private fun drawDisplay(storage: Storage.ProfileSpecific.GardenStorage.VisitorDrops) = buildList<List<Any>> {
-        //0
         addAsSingletonList("§e§lVisitor Statistics")
-        //1
         addAsSingletonList(format(totalVisitors, "Total", "§e", ""))
-        //2
         val visitorRarities = storage.visitorRarities
         fixRaritiesSize(visitorRarities)
         if (visitorRarities.isNotEmpty()) {
@@ -150,20 +151,19 @@ object GardenVisitorDropStatistics {
                 "Error rendering visitor drop statistics"
             )
         }
-        //3
         addAsSingletonList(format(acceptedVisitors, "Accepted", "§2", ""))
-        //4
         addAsSingletonList(format(deniedVisitors, "Denied", "§c", ""))
-        //5
         addAsSingletonList("")
-        //6
         addAsSingletonList(format(storage.copper, "Copper", "§c", ""))
-        //7
         addAsSingletonList(format(storage.farmingExp, "Farming EXP", "§3", "§7"))
-        //8
         addAsSingletonList(format(coinsSpent, "Coins Spent", "§6", ""))
 
-        //9 – 16
+        addAsSingletonList("")
+        addAsSingletonList(format(storage.gardenExp, "Garden EXP", "§2", "§7"))
+        addAsSingletonList(format(storage.bits, "Bits", "§b", "§b"))
+        addAsSingletonList(format(storage.mithrilPowder, "Mithril Powder", "§2", "§2"))
+        addAsSingletonList(format(storage.gemstonePowder, "Gemstone Powder", "§d", "§d"))
+
         for (reward in VisitorReward.entries) {
             val count = rewardsCount[reward] ?: 0
             if (config.displayIcons) {// Icons
@@ -175,16 +175,6 @@ object GardenVisitorDropStatistics {
                 addAsSingletonList(format(count, reward.displayName, "§b"))
             }
         }
-        //17
-        addAsSingletonList("")
-        //18
-        addAsSingletonList(format(storage.gardenExp, "Garden EXP", "§2", "§7"))
-        //19
-        addAsSingletonList(format(storage.bits, "Bits", "§b", "§b"))
-        //20
-        addAsSingletonList(format(storage.mithrilPowder, "Mithril Powder", "§2", "§2"))
-        //21
-        addAsSingletonList(format(storage.gemstonePowder, "Gemstone Powder", "§d", "§d"))
     }
 
     // Adding the mythic rarity between legendary and special, if missing
@@ -258,7 +248,7 @@ object GardenVisitorDropStatistics {
         event.move(3, "${originalPrefix}onlyOnBarn", "${newPrefix}onlyOnBarn")
         event.move(3, "${originalPrefix}visitorDropPos", "${newPrefix}pos")
 
-        event.move(11, "${newPrefix}textFormat", "${newPrefix}textFormat") { element ->
+        event.transform(11, "${newPrefix}textFormat") { element ->
             ConfigUtils.migrateIntArrayListToEnumArrayList(element, DropsStatisticsTextEntry::class.java)
         }
     }

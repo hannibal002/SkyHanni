@@ -1,5 +1,6 @@
 package at.hannibal2.skyhanni.features.garden.visitor
 
+import at.hannibal2.skyhanni.config.features.garden.visitor.VisitorConfig
 import at.hannibal2.skyhanni.events.CheckRenderEntityEvent
 import at.hannibal2.skyhanni.events.InventoryCloseEvent
 import at.hannibal2.skyhanni.events.InventoryFullyOpenedEvent
@@ -14,6 +15,7 @@ import at.hannibal2.skyhanni.features.garden.GardenAPI
 import at.hannibal2.skyhanni.features.garden.visitor.VisitorAPI.VisitorStatus
 import at.hannibal2.skyhanni.features.garden.visitor.VisitorAPI.config
 import at.hannibal2.skyhanni.mixins.transformers.gui.AccessorGuiContainer
+import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.ItemUtils.name
 import at.hannibal2.skyhanni.utils.KeyboardManager.isKeyHeld
@@ -36,10 +38,12 @@ import org.lwjgl.input.Keyboard
 private val config get() = VisitorAPI.config
 
 class VisitorListener {
+
     private var lastClickedNpc = 0
     private val logger = LorenzLogger("garden/visitors/listener")
 
     companion object {
+
         private val VISITOR_INFO_ITEM_SLOT = 13
         private val VISITOR_ACCEPT_ITEM_SLOT = 29
         private val VISITOR_REFUSE_ITEM_SLOT = 33
@@ -137,13 +141,13 @@ class VisitorListener {
             visitor.hasReward()?.let {
                 if (config.rewardWarning.preventRefusing) {
                     if (config.rewardWarning.bypassKey.isKeyHeld()) {
-                        LorenzUtils.chat("§cBypassed blocking refusal of visitor ${visitor.visitorName} §7(${it.displayName}§7)")
+                        ChatUtils.chat("§cBypassed blocking refusal of visitor ${visitor.visitorName} §7(${it.displayName}§7)")
                         return
                     }
                     event.isCanceled = true
-                    LorenzUtils.chat("§cBlocked refusing visitor ${visitor.visitorName} §7(${it.displayName}§7)")
+                    ChatUtils.chat("§cBlocked refusing visitor ${visitor.visitorName} §7(${it.displayName}§7)")
                     if (config.rewardWarning.bypassKey == Keyboard.KEY_NONE) {
-                        LorenzUtils.clickableChat(
+                        ChatUtils.clickableChat(
                             "§eIf you want to deny this visitor, set a keybind in §e/sh bypass",
                             "sh bypass",
                             false
@@ -177,7 +181,7 @@ class VisitorListener {
     fun onCheckRender(event: CheckRenderEntityEvent<*>) {
         if (!GardenAPI.inGarden()) return
         if (!GardenAPI.onBarnPlot) return
-        if (config.highlightStatus != 1 && config.highlightStatus != 2) return
+        if (config.highlightStatus != VisitorConfig.HighlightMode.NAME && config.highlightStatus != VisitorConfig.HighlightMode.BOTH) return
 
         val entity = event.entity
         if (entity is EntityArmorStand && entity.name == "§e§lCLICK") {
@@ -189,7 +193,7 @@ class VisitorListener {
     fun onRenderWorld(event: LorenzRenderWorldEvent) {
         if (!GardenAPI.inGarden()) return
         if (!GardenAPI.onBarnPlot) return
-        if (config.highlightStatus != 1 && config.highlightStatus != 2) return
+        if (config.highlightStatus != VisitorConfig.HighlightMode.NAME && config.highlightStatus != VisitorConfig.HighlightMode.BOTH) return
 
         for (visitor in VisitorAPI.getVisitors()) {
             visitor.getNameTagEntity()?.let {

@@ -29,7 +29,7 @@ class DungeonHighlightClickedBlocks {
     }
 
     @SubscribeEvent
-    fun onChatMessage(event: LorenzChatEvent) {
+    fun onChat(event: LorenzChatEvent) {
         if (!SkyHanniMod.feature.dungeon.highlightClickedBlocks) return
         if (!LorenzUtils.inDungeons) return
 
@@ -55,13 +55,8 @@ class DungeonHighlightClickedBlocks {
             else -> return
         }
 
-        // Water room
-        if (DungeonAPI.getRoomID() == "-60,-60") {
-            return
-        }
-
         if (type == ClickedBlockType.WITHER_ESSENCE) {
-            val text = BlockUtils.getTextureFromSkull(position.toBlocPos())
+            val text = BlockUtils.getTextureFromSkull(position.toBlockPos())
             if (text != "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQ" +
                 "ubmV0L3RleHR1cmUvYzRkYjRhZGZhOWJmNDhmZjVkNDE3M" +
                 "DdhZTM0ZWE3OGJkMjM3MTY1OWZjZDhjZDg5MzQ3NDlhZjRjY2U5YiJ9fX0="
@@ -70,8 +65,8 @@ class DungeonHighlightClickedBlocks {
             }
         }
 
-        // TODO hide in water room
-//        if (nearWaterRoom() && type == ClickedBlockType.LEVER) return
+        val inWaterRoom = DungeonAPI.getRoomID() == "-60,-60"
+        if (inWaterRoom && type == ClickedBlockType.LEVER) return
 
         val color = getNextColor()
         val displayText = color.getChatColor() + "Clicked " + type.display

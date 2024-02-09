@@ -6,8 +6,10 @@ import at.hannibal2.skyhanni.utils.NEUItems.getItemStack
 import at.hannibal2.skyhanni.utils.NumberUtil.formatNumber
 import at.hannibal2.skyhanni.utils.SimpleTimeMark.Companion.asTimeMark
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.cachedData
+import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getEnchantments
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.isRecombobulated
-import at.hannibal2.skyhanni.utils.StringUtils.matchRegex
+import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
+import at.hannibal2.skyhanni.utils.StringUtils.matches
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import com.google.gson.GsonBuilder
 import com.google.gson.JsonObject
@@ -23,6 +25,20 @@ import java.util.regex.Matcher
 import kotlin.time.Duration.Companion.seconds
 
 object ItemUtils {
+
+    // TODO USE SH-REPO
+    private val patternInFront = "(?: *§8(\\+§\\w)?(?<amount>[\\d.km,]+)(x )?)?(?<name>.*)".toPattern()
+    private val patternBehind = "(?<name>(?:['\\w-]+ ?)+)(?:§8x(?<amount>[\\d,]+))?".toPattern()
+    private val petLevelPattern = "\\[Lvl (.*)] (.*)".toPattern()
+
+    private val ignoredPetStrings = listOf(
+        "Archer",
+        "Berserk",
+        "Mage",
+        "Tank",
+        "Healer",
+        "➡",
+    )
 
     fun ItemStack.cleanName() = this.displayName.removeColor()
 
@@ -50,14 +66,7 @@ object ItemUtils {
 
     fun isRecombobulated(stack: ItemStack) = stack.isRecombobulated()
 
-    fun isPet(name: String): Boolean = name.matchRegex("\\[Lvl (.*)] (.*)") && !listOf(
-        "Archer",
-        "Berserk",
-        "Mage",
-        "Tank",
-        "Healer",
-        "➡",
-    ).any { name.contains(it) }
+    fun isPet(name: String): Boolean = petLevelPattern.matches(name) && !ignoredPetStrings.any { name.contains(it) }
 
     fun maxPetLevel(name: String) = if (name.contains("Golden Dragon")) 200 else 100
 
@@ -65,7 +74,7 @@ object ItemUtils {
         val list: LinkedList<ItemStack> = LinkedList()
         val player = Minecraft.getMinecraft().thePlayer
         if (player == null) {
-            LorenzUtils.error("getItemsInInventoryWithSlots: player is null!")
+            ChatUtils.error("getItemsInInventoryWithSlots: player is null!")
             return list
         }
         for (slot in player.openContainer.inventorySlots) {
@@ -84,7 +93,7 @@ object ItemUtils {
         val map: LinkedHashMap<ItemStack, Int> = LinkedHashMap()
         val player = Minecraft.getMinecraft().thePlayer
         if (player == null) {
-            LorenzUtils.error("getItemsInInventoryWithSlots: player is null!")
+            ChatUtils.error("getItemsInInventoryWithSlots: player is null!")
             return map
         }
         for (slot in player.openContainer.inventorySlots) {
@@ -116,10 +125,6 @@ object ItemUtils {
         return false
     }
 
-    // TODO remove
-    @Deprecated("Use NEUInternalName rather than String", ReplaceWith("getInternalName()"))
-    fun ItemStack.getInternalName_old() = getInternalName().asString()
-
     fun ItemStack.getInternalName() = getInternalNameOrNull() ?: NEUInternalName.NONE
 
     fun ItemStack.getInternalNameOrNull() = getRawInternalName()?.asInternalName()
@@ -133,7 +138,11 @@ object ItemUtils {
 
     fun ItemStack.isVanilla() = NEUItems.isVanillaItem(this)
 
+    // Checks for the enchantment glint as part of the minecraft enchantments
     fun ItemStack.isEnchanted() = isItemEnchanted
+
+    // Checks for hypixel enchantments in the attributes
+    fun ItemStack.hasEnchantments() = getEnchantments()?.isNotEmpty() ?: false
 
     fun ItemStack.getSkullTexture(): String? {
         if (item != Items.skull) return null
@@ -197,42 +206,95 @@ object ItemUtils {
 
     fun ItemStack.getItemRarityOrCommon() = getItemRarityOrNull() ?: LorenzRarity.COMMON
 
-    fun ItemStack.getItemRarityOrNull(logError: Boolean = true): LorenzRarity? {
-        val data = cachedData
-        if (data.itemRarityLastCheck.asTimeMark().passedSince() < 1.seconds) {
-            return data.itemRarity
-        }
-        data.itemRarityLastCheck = SimpleTimeMark.now().toMillis()
+    private fun ItemStack.readItemCategoryAndRarity(): Pair<LorenzRarity?, ItemCategory?> {
+        val name = this.name ?: ""
+        val cleanName = this.cleanName()
 
+        if (isPet(cleanName)) {
+            return getPetRarity(this) to ItemCategory.PET
+        }
+
+        for (line in this.getLore().reversed()) {
+            val (category, rarity) = UtilsPatterns.rarityLoreLinePattern.matchMatcher(line) {
+                group("itemCategory").replace(" ", "_") to
+                    group("rarity").replace(" ", "_")
+            } ?: continue
+
+            val itemCategory = getItemCategory(category, name, cleanName)
+            val itemRarity = LorenzRarity.getByName(rarity)
+
+            if (itemCategory == null) {
+                ErrorManager.logErrorStateWithData(
+                    "Could not read category for item $name",
+                    "Failed to read category from item rarity via item lore",
+                    "internal name" to getInternalName(),
+                    "item name" to name,
+                    "inventory name" to InventoryUtils.openInventoryName(),
+                    "pattern result" to category,
+                    "lore" to getLore(),
+                )
+            }
+            if (itemRarity == null) {
+                ErrorManager.logErrorStateWithData(
+                    "Could not read rarity for item $name",
+                    "Failed to read rarity from item rarity via item lore",
+                    "internal name" to getInternalName(),
+                    "item name" to name,
+                    "inventory name" to InventoryUtils.openInventoryName(),
+                    "lore" to getLore(),
+                )
+            }
+
+            return itemRarity to itemCategory
+        }
+        return null to null
+    }
+
+    private fun getItemCategory(itemCategory: String, name: String, cleanName: String = name.removeColor()) =
+        if (itemCategory.isEmpty()) when {
+            UtilsPatterns.abiPhonePattern.matches(name) -> ItemCategory.ABIPHONE
+            isPet(cleanName) -> ItemCategory.PET
+            UtilsPatterns.enchantedBookPattern.matches(name) -> ItemCategory.ENCHANTED_BOOK
+            UtilsPatterns.potionPattern.matches(name) -> ItemCategory.POTION
+            else -> ItemCategory.NONE
+        } else {
+            LorenzUtils.enumValueOfOrNull<ItemCategory>(itemCategory)
+        }
+
+    private fun ItemStack.updateCategoryAndRarity() {
+        val data = cachedData
+        data.itemRarityLastCheck = SimpleTimeMark.now().toMillis()
         val internalName = getInternalName()
         if (internalName == NEUInternalName.NONE) {
             data.itemRarity = null
-            return null
+            data.itemCategory = null
+            return
         }
-
-
-        if (isPet(cleanName())) {
-            val petRarity = getPetRarity(this)
-            data.itemRarity = petRarity
-            return petRarity
-        }
-
-        val rarity = LorenzRarity.readItemRarity(this)
-        data.itemRarity = rarity
-        if (rarity == null && logError) {
-            ErrorManager.logErrorStateWithData(
-                "Could not read rarity for item $name",
-                "Failed to read rarity from item rarity via item lore",
-                "internal name" to internalName,
-                "item name" to name,
-                "inventory name" to InventoryUtils.openInventoryName(),
-                "lore" to getLore(),
-            )
-        }
-        return rarity
+        val pair = this.readItemCategoryAndRarity()
+        data.itemRarity = pair.first
+        data.itemCategory = pair.second
     }
 
-    //extra method for shorter name and kotlin nullability logic
+    fun ItemStack.getItemCategoryOrNull(): ItemCategory? {
+        val data = cachedData
+        if (itemRarityLastCheck(data)) {
+            this.updateCategoryAndRarity()
+        }
+        return data.itemCategory
+    }
+
+    fun ItemStack.getItemRarityOrNull(): LorenzRarity? {
+        val data = cachedData
+        if (itemRarityLastCheck(data)) {
+            this.updateCategoryAndRarity()
+        }
+        return data.itemRarity
+    }
+
+    private fun itemRarityLastCheck(data: CachedItemData) =
+        data.itemRarityLastCheck.asTimeMark().passedSince() > 10.seconds
+
+    // extra method for shorter name and kotlin nullability logic
     var ItemStack.name: String?
         get() = this.displayName
         set(value) {
@@ -247,10 +309,6 @@ object ItemUtils {
         }
 
     fun isSkyBlockMenuItem(stack: ItemStack?): Boolean = stack?.getInternalName()?.equals("SKYBLOCK_MENU") ?: false
-
-    // TODO USE SH-REPO
-    private val patternInFront = "(?: *§8(\\+§[\\d\\w])?(?<amount>[\\d\\.km,]+)(x )?)?(?<name>.*)".toPattern()
-    private val patternBehind = "(?<name>(?:['\\w-]+ ?)+)(?:§8x(?<amount>[\\d,]+))?".toPattern()
 
     private val itemAmountCache = mutableMapOf<String, Pair<String, Int>>()
 
@@ -322,4 +380,6 @@ object ItemUtils {
         }
         return rarity
     }
+
+    fun NEUInternalName.isRune(): Boolean = contains("_RUNE;")
 }

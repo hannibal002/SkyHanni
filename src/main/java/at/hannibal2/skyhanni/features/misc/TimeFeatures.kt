@@ -3,6 +3,7 @@ package at.hannibal2.skyhanni.features.misc
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.data.IslandType
+import at.hannibal2.skyhanni.data.WinterAPI
 import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils.isInIsland
@@ -17,6 +18,7 @@ import kotlin.time.Duration.Companion.days
 import kotlin.time.Duration.Companion.seconds
 
 class TimeFeatures {
+
     private val config get() = SkyHanniMod.feature.gui
     private val winterConfig get() = SkyHanniMod.feature.event.winter
 
@@ -38,6 +40,7 @@ class TimeFeatures {
         }
 
         if (winterConfig.islandCloseTime && IslandType.WINTER.isInIsland()) {
+            if (WinterAPI.isDecember()) return
             val timeTillNextYear = startOfNextYear.getValue().timeUntil()
             val alreadyInNextYear = timeTillNextYear > 5.days
             val text = if (alreadyInNextYear) {

@@ -26,7 +26,8 @@ public class OwnBossConfig {
     public boolean steakAlert = true;
 
     @Expose
-    @ConfigOption(name = "Twinclaws Title", desc = "Send a title when Twinclaws is about to happen.\nWork on others highlighted people boss.")
+    @ConfigOption(name = "Twinclaws Title", desc = "Send a title when Twinclaws is about to happen.\n" +
+        "Works on others highlighted people boss.")
     @ConfigEditorBoolean
     @FeatureToggle
     public boolean twinClawsTitle = true;

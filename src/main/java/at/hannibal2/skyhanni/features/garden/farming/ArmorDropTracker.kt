@@ -1,20 +1,22 @@
 package at.hannibal2.skyhanni.features.garden.farming
 
 import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
+import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.data.jsonobjects.repo.ArmorDropsJson
 import at.hannibal2.skyhanni.data.jsonobjects.repo.ArmorDropsJson.DropInfo
 import at.hannibal2.skyhanni.events.GuiRenderEvent
+import at.hannibal2.skyhanni.events.IslandChangeEvent
 import at.hannibal2.skyhanni.events.LorenzChatEvent
 import at.hannibal2.skyhanni.events.LorenzTickEvent
 import at.hannibal2.skyhanni.events.PreProfileSwitchEvent
 import at.hannibal2.skyhanni.events.RepositoryReloadEvent
 import at.hannibal2.skyhanni.features.garden.CropType
 import at.hannibal2.skyhanni.features.garden.GardenAPI
+import at.hannibal2.skyhanni.utils.CollectionUtils.addAsSingletonList
+import at.hannibal2.skyhanni.utils.CollectionUtils.addOrPut
+import at.hannibal2.skyhanni.utils.CollectionUtils.sortedDesc
 import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName
-import at.hannibal2.skyhanni.utils.LorenzUtils.addAsSingletonList
-import at.hannibal2.skyhanni.utils.LorenzUtils.addOrPut
-import at.hannibal2.skyhanni.utils.LorenzUtils.sortedDesc
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.tracker.SkyHanniTracker
@@ -34,6 +36,7 @@ object ArmorDropTracker {
     { drawDisplay(it) }
 
     class Data : TrackerData() {
+
         override fun reset() {
             drops.clear()
         }
@@ -86,6 +89,13 @@ object ArmorDropTracker {
         if (!hasArmor) return
 
         tracker.renderDisplay(config.pos)
+    }
+
+    @SubscribeEvent
+    fun onIslandChange(event: IslandChangeEvent) {
+        if (event.newIsland == IslandType.GARDEN) {
+            tracker.firstUpdate()
+        }
     }
 
     @SubscribeEvent

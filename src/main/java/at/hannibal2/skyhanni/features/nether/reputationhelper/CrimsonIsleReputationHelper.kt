@@ -2,8 +2,10 @@ package at.hannibal2.skyhanni.features.nether.reputationhelper
 
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
+import at.hannibal2.skyhanni.config.features.crimsonisle.ReputationHelperConfig.ShowLocationEntry
 import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.data.ProfileStorageData
+import at.hannibal2.skyhanni.data.jsonobjects.repo.CrimsonIsleReputationJson
 import at.hannibal2.skyhanni.events.ConfigLoadEvent
 import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.LorenzTickEvent
@@ -12,18 +14,19 @@ import at.hannibal2.skyhanni.features.nether.reputationhelper.dailykuudra.DailyK
 import at.hannibal2.skyhanni.features.nether.reputationhelper.dailyquest.DailyQuestHelper
 import at.hannibal2.skyhanni.features.nether.reputationhelper.dailyquest.QuestLoader
 import at.hannibal2.skyhanni.features.nether.reputationhelper.miniboss.DailyMiniBossHelper
+import at.hannibal2.skyhanni.utils.ChatUtils
+import at.hannibal2.skyhanni.utils.CollectionUtils.addAsSingletonList
+import at.hannibal2.skyhanni.utils.ConfigUtils
 import at.hannibal2.skyhanni.utils.KeyboardManager.isKeyHeld
-import at.hannibal2.skyhanni.utils.LorenzUtils
-import at.hannibal2.skyhanni.utils.LorenzUtils.addAsSingletonList
 import at.hannibal2.skyhanni.utils.LorenzUtils.isInIsland
 import at.hannibal2.skyhanni.utils.LorenzVec
 import at.hannibal2.skyhanni.utils.RenderUtils.renderStringsAndItems
 import at.hannibal2.skyhanni.utils.TabListData
-import at.hannibal2.skyhanni.data.jsonobjects.repo.CrimsonIsleReputationJson
 import net.minecraftforge.fml.common.eventhandler.EventPriority
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
 class CrimsonIsleReputationHelper(skyHanniMod: SkyHanniMod) {
+
     val config get() = SkyHanniMod.feature.crimsonIsle.reputationHelper
 
     val questHelper = DailyQuestHelper(this)
@@ -95,7 +98,7 @@ class CrimsonIsleReputationHelper(skyHanniMod: SkyHanniMod) {
     private fun updateRender() {
         val newList = mutableListOf<List<Any>>()
 
-        //TODO test
+        // TODO test
         if (factionType == FactionType.NONE) return
 
         newList.addAsSingletonList("Reputation Helper:")
@@ -130,6 +133,10 @@ class CrimsonIsleReputationHelper(skyHanniMod: SkyHanniMod) {
         event.move(2, "misc.reputationHelperHotkey", "crimsonIsle.reputationHelper.hotkey")
         event.move(2, "misc.crimsonIsleReputationHelperPos", "crimsonIsle.reputationHelper.position")
         event.move(2, "misc.crimsonIsleReputationShowLocation", "crimsonIsle.reputationHelper.showLocation")
+
+        event.transform(15, "crimsonIsle.reputationHelper.showLocation") { element ->
+            ConfigUtils.migrateIntToEnum(element, ShowLocationEntry::class.java)
+        }
     }
 
     fun update() {
@@ -143,7 +150,7 @@ class CrimsonIsleReputationHelper(skyHanniMod: SkyHanniMod) {
     }
 
     fun reset() {
-        LorenzUtils.chat("Reset Reputation Helper.")
+        ChatUtils.chat("Reset Reputation Helper.")
 
         questHelper.reset()
         miniBossHelper.reset()
@@ -158,8 +165,8 @@ class CrimsonIsleReputationHelper(skyHanniMod: SkyHanniMod) {
     }
 
     fun showLocations() = when (config.showLocation) {
-        0 -> true
-        1 -> config.hotkey.isKeyHeld()
+        ShowLocationEntry.ALWAYS -> true
+        ShowLocationEntry.ONLY_HOTKEY -> config.hotkey.isKeyHeld()
         else -> false
     }
 }

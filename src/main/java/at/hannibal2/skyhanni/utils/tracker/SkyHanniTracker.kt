@@ -3,11 +3,14 @@ package at.hannibal2.skyhanni.utils.tracker
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.config.Storage
 import at.hannibal2.skyhanni.config.core.config.Position
+import at.hannibal2.skyhanni.config.features.misc.TrackerConfig.PriceFromEntry
 import at.hannibal2.skyhanni.data.ProfileStorageData
+import at.hannibal2.skyhanni.data.TrackerManager
 import at.hannibal2.skyhanni.features.bazaar.BazaarApi.Companion.getBazaarData
 import at.hannibal2.skyhanni.features.misc.items.EstimatedItemValue
+import at.hannibal2.skyhanni.utils.ChatUtils
+import at.hannibal2.skyhanni.utils.CollectionUtils.addAsSingletonList
 import at.hannibal2.skyhanni.utils.LorenzUtils
-import at.hannibal2.skyhanni.utils.LorenzUtils.addAsSingletonList
 import at.hannibal2.skyhanni.utils.NEUInternalName
 import at.hannibal2.skyhanni.utils.NEUItems.getNpcPriceOrNull
 import at.hannibal2.skyhanni.utils.NEUItems.getPriceOrNull
@@ -19,11 +22,12 @@ import net.minecraft.client.gui.inventory.GuiInventory
 import kotlin.time.Duration.Companion.seconds
 
 open class SkyHanniTracker<Data : TrackerData>(
-    private val name: String,
+    val name: String,
     private val createNewSession: () -> Data,
     private val getStorage: (Storage.ProfileSpecific) -> Data,
     private val drawDisplay: (Data) -> List<List<Any>>,
 ) {
+
     private var inventoryOpen = false
     private var displayMode: DisplayMode? = null
     private val currentSessions = mutableMapOf<Storage.ProfileSpecific, Data>()
@@ -32,12 +36,13 @@ open class SkyHanniTracker<Data : TrackerData>(
     private var dirty = false
 
     companion object {
+
         val config get() = SkyHanniMod.feature.misc.tracker
         private val storedTrackers get() = SkyHanniMod.feature.storage.trackerDisplayModes
 
         fun getPricePer(name: NEUInternalName) = when (config.priceFrom) {
-            0 -> name.getBazaarData()?.sellPrice ?: name.getPriceOrNull() ?: 0.0
-            1 -> name.getBazaarData()?.buyPrice ?: name.getPriceOrNull() ?: 0.0
+            PriceFromEntry.INSTANT_SELL -> name.getBazaarData()?.sellPrice ?: name.getPriceOrNull() ?: 0.0
+            PriceFromEntry.SELL_OFFER -> name.getBazaarData()?.buyPrice ?: name.getPriceOrNull() ?: 0.0
 
             else -> name.getNpcPriceOrNull() ?: 0.0
         }
@@ -51,7 +56,7 @@ open class SkyHanniTracker<Data : TrackerData>(
             return
         }
 
-        LorenzUtils.clickableChat(
+        ChatUtils.clickableChat(
             "Are you sure you want to reset your total $name? Click here to confirm.",
             "$command confirm"
         )
@@ -64,6 +69,16 @@ open class SkyHanniTracker<Data : TrackerData>(
         }
     }
 
+    fun modify(mode: DisplayMode, modifyFunction: (Data) -> Unit) {
+        val storage = ProfileStorageData.profileSpecific ?: return
+        val data: Data = when (mode) {
+            DisplayMode.TOTAL -> storage.getTotal()
+            DisplayMode.SESSION -> storage.getCurrentSession()
+        }
+        modifyFunction(data)
+        update()
+    }
+
     fun renderDisplay(position: Position) {
         if (config.hideInEstimatedItemValue && EstimatedItemValue.isCurrentlyShowing()) return
 
@@ -73,7 +88,7 @@ open class SkyHanniTracker<Data : TrackerData>(
             update()
         }
 
-        if (dirty) {
+        if (dirty || TrackerManager.dirty) {
             display = getSharedTracker()?.let {
                 buildFinalDisplay(drawDisplay(it.get(getDisplayMode())))
             } ?: emptyList()
@@ -123,13 +138,17 @@ open class SkyHanniTracker<Data : TrackerData>(
     )
 
     protected fun getSharedTracker() = ProfileStorageData.profileSpecific?.let {
-        SharedTracker(getStorage(it), currentSessions.getOrPut(it) { createNewSession() })
+        SharedTracker(it.getTotal(), it.getCurrentSession())
     }
+
+    private fun Storage.ProfileSpecific.getCurrentSession() = currentSessions.getOrPut(this) { createNewSession() }
+
+    private fun Storage.ProfileSpecific.getTotal(): Data = getStorage(this)
 
     private fun reset(displayMode: DisplayMode, message: String) {
         getSharedTracker()?.let {
             it.get(displayMode).reset()
-            LorenzUtils.chat(message)
+            ChatUtils.chat(message)
             update()
         }
     }
@@ -147,6 +166,7 @@ open class SkyHanniTracker<Data : TrackerData>(
     }
 
     class SharedTracker<Data : TrackerData>(private val total: Data, private val currentSession: Data) {
+
         fun modify(modifyFunction: (Data) -> Unit) {
             modifyFunction(total)
             modifyFunction(currentSession)

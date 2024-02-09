@@ -1,30 +1,29 @@
 package at.hannibal2.skyhanni.data
 
+import at.hannibal2.skyhanni.events.DebugDataCollectEvent
 import at.hannibal2.skyhanni.events.LorenzChatEvent
 import at.hannibal2.skyhanni.events.LorenzTickEvent
 import at.hannibal2.skyhanni.events.SlayerChangeEvent
 import at.hannibal2.skyhanni.events.SlayerProgressChangeEvent
 import at.hannibal2.skyhanni.events.SlayerQuestCompleteEvent
 import at.hannibal2.skyhanni.features.slayer.SlayerType
+import at.hannibal2.skyhanni.utils.CollectionUtils.nextAfter
 import at.hannibal2.skyhanni.utils.ItemUtils.nameWithEnchantment
 import at.hannibal2.skyhanni.utils.LorenzUtils
-import at.hannibal2.skyhanni.utils.LorenzUtils.nextAfter
 import at.hannibal2.skyhanni.utils.NEUInternalName
 import at.hannibal2.skyhanni.utils.NEUItems.getItemStack
 import at.hannibal2.skyhanni.utils.NEUItems.getNpcPriceOrNull
 import at.hannibal2.skyhanni.utils.NEUItems.getPrice
 import at.hannibal2.skyhanni.utils.NumberUtil
 import at.hannibal2.skyhanni.utils.RecalculatingValue
-import com.google.common.cache.CacheBuilder
+import at.hannibal2.skyhanni.utils.TimeLimitedCache
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
-import java.util.concurrent.TimeUnit
+import kotlin.time.Duration.Companion.minutes
 import kotlin.time.Duration.Companion.seconds
 
 object SlayerAPI {
 
-    private var nameCache =
-        CacheBuilder.newBuilder().expireAfterWrite(1, TimeUnit.MINUTES)
-            .build<Pair<NEUInternalName, Int>, Pair<String, Double>>()
+    private var nameCache = TimeLimitedCache<Pair<NEUInternalName, Int>, Pair<String, Double>>(1.minutes)
 
     var questStartTime = 0L
     var isInCorrectArea = false
@@ -42,7 +41,7 @@ object SlayerAPI {
 
     fun getItemNameAndPrice(internalName: NEUInternalName, amount: Int): Pair<String, Double> {
         val key = internalName to amount
-        nameCache.getIfPresent(key)?.let {
+        nameCache.getOrNull(key)?.let {
             return it
         }
 
@@ -62,11 +61,28 @@ object SlayerAPI {
         return result
     }
 
-    fun getNameWithEnchantmentFor(internalName: NEUInternalName): String {
+    private fun getNameWithEnchantmentFor(internalName: NEUInternalName): String {
         if (internalName.asString() == "WISP_POTION") {
             return "§fWisp's Ice-Flavored Water"
         }
         return internalName.getItemStack().nameWithEnchantment ?: error("Could not find name for $internalName")
+    }
+
+    @SubscribeEvent
+    fun onDebugDataCollect(event: DebugDataCollectEvent) {
+        event.title("Slayer")
+
+        if (!hasActiveSlayerQuest()) {
+            event.addIrrelevant("no active slayer quest")
+            return
+        }
+
+        event.addData {
+            add("activeSlayer: ${getActiveSlayer()}")
+            add("isInCorrectArea: $isInCorrectArea")
+            add("isInAnyArea: $isInAnyArea")
+            add("latestSlayerProgress: $latestSlayerProgress")
+        }
     }
 
     @SubscribeEvent

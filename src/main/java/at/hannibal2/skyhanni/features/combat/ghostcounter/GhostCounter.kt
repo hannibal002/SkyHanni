@@ -24,6 +24,9 @@ import at.hannibal2.skyhanni.features.combat.ghostcounter.GhostUtil.formatText
 import at.hannibal2.skyhanni.features.combat.ghostcounter.GhostUtil.isUsingCTGhostCounter
 import at.hannibal2.skyhanni.features.combat.ghostcounter.GhostUtil.preFormat
 import at.hannibal2.skyhanni.features.combat.ghostcounter.GhostUtil.prettyTime
+import at.hannibal2.skyhanni.utils.ChatUtils.chat
+import at.hannibal2.skyhanni.utils.ChatUtils.clickableChat
+import at.hannibal2.skyhanni.utils.CollectionUtils.addAsSingletonList
 import at.hannibal2.skyhanni.utils.CombatUtils._isKilling
 import at.hannibal2.skyhanni.utils.CombatUtils.calculateETA
 import at.hannibal2.skyhanni.utils.CombatUtils.calculateXP
@@ -38,9 +41,6 @@ import at.hannibal2.skyhanni.utils.CombatUtils.xpGainHourLast
 import at.hannibal2.skyhanni.utils.ConfigUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.LorenzUtils
-import at.hannibal2.skyhanni.utils.LorenzUtils.addAsSingletonList
-import at.hannibal2.skyhanni.utils.LorenzUtils.chat
-import at.hannibal2.skyhanni.utils.LorenzUtils.clickableChat
 import at.hannibal2.skyhanni.utils.LorenzUtils.isInIsland
 import at.hannibal2.skyhanni.utils.NEUInternalName.Companion.asInternalName
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
@@ -131,7 +131,10 @@ object GhostCounter {
         }
         val avgMagicFind = when (Option.TOTALDROPS.get()) {
             0.0 -> "0"
-            else -> "${((((storage?.totalMF!! / Option.TOTALDROPS.get()) + Math.ulp(1.0)) * 100) / 100).roundToPrecision(2)}"
+            else -> {
+                val mf = (((storage?.totalMF!! / Option.TOTALDROPS.get()) + Math.ulp(1.0)) * 100) / 100
+                mf.roundToPrecision(2).toString()
+            }
         }
 
         val xpHourFormatting = textFormatting.xpHourFormatting
@@ -424,7 +427,7 @@ object GhostCounter {
             Option.KILLCOMBO.set(0.0)
             update()
         }
-        //replace with BestiaryLevelUpEvent ?
+        // replace with BestiaryLevelUpEvent ?
         bestiaryPattern.matchMatcher(event.message) {
             val currentLevel = group("nextLevel").toInt()
             when (val nextLevel = if (currentLevel >= 25) 26 else currentLevel + 1) {
@@ -491,7 +494,7 @@ object GhostCounter {
     @SubscribeEvent
     fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
         event.move(2, "ghostCounter", "combat.ghostCounter")
-        event.move(11, "combat.ghostCounter.ghostDisplayText", "combat.ghostCounter.ghostDisplayText") { element ->
+        event.transform(11, "combat.ghostCounter.ghostDisplayText") { element ->
             ConfigUtils.migrateIntArrayListToEnumArrayList(element, GhostDisplayEntry::class.java)
         }
     }

@@ -1,12 +1,18 @@
 package at.hannibal2.skyhanni.config.features.garden;
 
 import at.hannibal2.skyhanni.config.FeatureToggle;
+import at.hannibal2.skyhanni.config.HasLegacyId;
 import at.hannibal2.skyhanni.config.core.config.Position;
+import at.hannibal2.skyhanni.features.garden.CropType;
 import com.google.gson.annotations.Expose;
 import io.github.moulberry.moulconfig.annotations.ConfigEditorBoolean;
+import io.github.moulberry.moulconfig.annotations.ConfigEditorDraggableList;
 import io.github.moulberry.moulconfig.annotations.ConfigEditorDropdown;
 import io.github.moulberry.moulconfig.annotations.ConfigEditorSlider;
 import io.github.moulberry.moulconfig.annotations.ConfigOption;
+
+import java.util.ArrayList;
+import java.util.List;
 
 public class NextJacobContestConfig {
     @Expose
@@ -32,8 +38,38 @@ public class NextJacobContestConfig {
 
     @Expose
     @ConfigOption(name = "Share Contests", desc = "Share the list of upcoming Contests to elitebot.dev for everyone else to then fetch automatically.")
-    @ConfigEditorDropdown(values = {"Ask When Needed", "Share Automatically", "Disabled"})
-    public int shareAutomatically = 0;
+    @ConfigEditorDropdown()
+    public ShareContestsEntry shareAutomatically = ShareContestsEntry.ASK;
+
+    public enum ShareContestsEntry implements HasLegacyId {
+        ASK("Ask When Needed", 0),
+        AUTO("Share Automatically", 1),
+        DISABLED("Disabled", 2),
+        ;
+
+        private final String str;
+        private final int legacyId;
+
+        ShareContestsEntry(String str, int legacyId) {
+            this.str = str;
+            this.legacyId = legacyId;
+        }
+
+        // Constructor if new enum elements are added post-migration
+        ShareContestsEntry(String str) {
+            this(str, -1);
+        }
+
+        @Override
+        public int getLegacyId() {
+            return legacyId;
+        }
+
+        @Override
+        public String toString() {
+            return str;
+        }
+    }
 
     @Expose
     @ConfigOption(name = "Warning", desc = "Show a warning shortly before a new Jacob's Contest starts.")
@@ -53,6 +89,14 @@ public class NextJacobContestConfig {
     @ConfigOption(name = "Popup Warning", desc = "Opens a popup when the warning time is reached and Minecraft is not in focus.")
     @ConfigEditorBoolean
     public boolean warnPopup = false;
+
+    @Expose
+    @ConfigOption(
+        name = "Warn For",
+        desc = "Only warn for these crops."
+    )
+    @ConfigEditorDraggableList
+    public List<CropType> warnFor = new ArrayList<>(CropType.getEntries());
 
     @Expose
     public Position pos = new Position(-200, 10, false, true);

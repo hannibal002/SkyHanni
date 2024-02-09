@@ -13,6 +13,7 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable
 import java.util.IdentityHashMap
 
 object GardenCustomKeybinds {
+
     private val config get() = GardenAPI.config.keyBind
     private val mcSettings get() = Minecraft.getMinecraft().gameSettings
 

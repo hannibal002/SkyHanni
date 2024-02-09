@@ -1,6 +1,7 @@
 package at.hannibal2.skyhanni.config.features.slayer.blaze;
 
 import at.hannibal2.skyhanni.config.FeatureToggle;
+import at.hannibal2.skyhanni.config.HasLegacyId;
 import at.hannibal2.skyhanni.config.core.config.Position;
 import com.google.gson.annotations.Expose;
 import io.github.moulberry.moulconfig.annotations.ConfigEditorBoolean;
@@ -28,8 +29,36 @@ public class BlazeHellionConfig {
 
     @Expose
     @ConfigOption(name = "First Dagger", desc = "Select the first, left sided dagger for the display.")
-    @ConfigEditorDropdown(values = {"Spirit/Crystal", "Ashen/Auric"})
-    public int firstDagger = 0;
+    @ConfigEditorDropdown()
+    public FirstDaggerEntry firstDagger = FirstDaggerEntry.SPIRIT_OR_CRYSTAL;
+
+    public enum FirstDaggerEntry implements HasLegacyId {
+        SPIRIT_OR_CRYSTAL("Spirit/Crystal", 0),
+        ASHEN_OR_AURIC("Ashen/Auric", 1),
+        ;
+        private final String str;
+        private final int legacyId;
+
+        FirstDaggerEntry(String str, int legacyId) {
+            this.str = str;
+            this.legacyId = legacyId;
+        }
+
+        // Constructor if new enum elements are added post-migration
+        FirstDaggerEntry(String str) {
+            this(str, -1);
+        }
+
+        @Override
+        public int getLegacyId() {
+            return legacyId;
+        }
+
+        @Override
+        public String toString() {
+            return str;
+        }
+    }
 
     @Expose
     @ConfigOption(name = "Hide Chat", desc = "Remove the wrong Blaze Slayer dagger messages from chat.")

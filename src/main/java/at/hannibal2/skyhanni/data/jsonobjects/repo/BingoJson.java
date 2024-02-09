@@ -7,13 +7,19 @@ import java.util.Map;
 
 public class BingoJson {
     @Expose
-    public Map<String, BingoTip> bingo_tips;
+    public Map<String, BingoData> bingo_tips;
 
-    public static class BingoTip {
+    public static class BingoData {
         @Expose
         public String difficulty;
 
         @Expose
         public List<String> note;
+
+        @Expose
+        public List<String> guide;
+
+        @Expose
+        public String found;
     }
 }

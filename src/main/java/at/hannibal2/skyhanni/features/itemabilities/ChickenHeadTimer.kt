@@ -14,6 +14,7 @@ import at.hannibal2.skyhanni.utils.TimeUtils
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
 class ChickenHeadTimer {
+
     private var hasChickenHead = false
     private var lastTime = 0L
     private val config get() = SkyHanniMod.feature.itemAbilities.chickenHead
@@ -23,7 +24,7 @@ class ChickenHeadTimer {
         if (!isEnabled()) return
         if (!event.isMod(5)) return
 
-        val itemStack = InventoryUtils.getArmor()[3]
+        val itemStack = InventoryUtils.getHelmet()
         val name = itemStack?.name ?: ""
         hasChickenHead = name.contains("Chicken Head")
     }
@@ -34,7 +35,7 @@ class ChickenHeadTimer {
     }
 
     @SubscribeEvent
-    fun onChatMessage(event: LorenzChatEvent) {
+    fun onChat(event: LorenzChatEvent) {
         if (!isEnabled()) return
         if (!hasChickenHead) return
         if (event.message == "§aYou laid an egg!") {

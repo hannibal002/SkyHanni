@@ -16,7 +16,7 @@ object RenderLineTooltips {
     fun drawHoveringText(
         posX: Int, posY: Int, tips: List<String?>, stack: ItemStack? = null,
         mouseX: Int = Utils.getMouseX(),
-        mouseY: Int = Utils.getMouseY()
+        mouseY: Int = Utils.getMouseY(),
     ) {
         if (tips.isNotEmpty()) {
             var textLines = tips
@@ -55,7 +55,7 @@ object RenderLineTooltips {
             }
             if (needsWrap) {
                 var wrappedTooltipWidth = 0
-                val wrappedTextLines: MutableList<String?> = ArrayList()
+                val wrappedTextLines = mutableListOf<String>()
                 for (i in textLines.indices) {
                     val textLine = textLines[i]
                     val wrappedLine = font.listFormattedStringToWidth(textLine, tooltipTextWidth)
@@ -198,7 +198,7 @@ object RenderLineTooltips {
         right: Int,
         bottom: Int,
         startColor: Int,
-        endColor: Int
+        endColor: Int,
     ) {
         val startAlpha = (startColor shr 24 and 255).toFloat() / 255.0f
         val startRed = (startColor shr 16 and 255).toFloat() / 255.0f

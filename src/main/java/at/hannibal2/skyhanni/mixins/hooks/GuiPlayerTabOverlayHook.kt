@@ -10,11 +10,11 @@ var tabListGuard by object : ThreadLocal<Boolean>() {
     }
 }
 
-private operator fun <T> ThreadLocal<T>.setValue(t: Any?, property: KProperty<*>, any: T) {
+operator fun <T> ThreadLocal<T>.setValue(t: Any?, property: KProperty<*>, any: T) {
     this.set(any)
 }
 
-private operator fun <T> ThreadLocal<T>.getValue(t: Any?, property: KProperty<*>): T {
+operator fun <T> ThreadLocal<T>.getValue(t: Any?, property: KProperty<*>): T {
     return get()
 }
 

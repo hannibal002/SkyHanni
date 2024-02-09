@@ -1,12 +1,16 @@
 package at.hannibal2.skyhanni.features.event.diana
 
 import at.hannibal2.skyhanni.SkyHanniMod
+import at.hannibal2.skyhanni.data.TitleManager
+import at.hannibal2.skyhanni.events.DebugDataCollectEvent
 import at.hannibal2.skyhanni.events.LorenzChatEvent
 import at.hannibal2.skyhanni.events.LorenzKeyPressEvent
 import at.hannibal2.skyhanni.events.LorenzWorldChangeEvent
+import at.hannibal2.skyhanni.utils.ChatUtils
+import at.hannibal2.skyhanni.utils.CollectionUtils.sorted
 import at.hannibal2.skyhanni.utils.LocationUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils
-import at.hannibal2.skyhanni.utils.LorenzUtils.sorted
+import at.hannibal2.skyhanni.utils.LorenzUtils.round
 import at.hannibal2.skyhanni.utils.LorenzVec
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import net.minecraft.client.Minecraft
@@ -20,7 +24,7 @@ class BurrowWarpHelper {
 
     @SubscribeEvent
     fun onKeyClick(event: LorenzKeyPressEvent) {
-        if (!DianaAPI.featuresEnabled()) return
+        if (!DianaAPI.isDoingDiana()) return
         if (!config.burrowNearestWarp) return
 
         if (event.keyCode != config.keyBindWarp) return
@@ -31,6 +35,10 @@ class BurrowWarpHelper {
                 lastWarpTime = SimpleTimeMark.now()
                 LorenzUtils.sendCommandToServer("warp " + currentWarp?.name)
                 lastWarp = currentWarp
+                GriffinBurrowHelper.lastTitleSentTime = SimpleTimeMark.now() + 2.seconds
+                TitleManager.optionalResetTitle {
+                    it.startsWith("§bWarp to ")
+                }
             }
         }
     }
@@ -43,8 +51,8 @@ class BurrowWarpHelper {
             if (lastWarpTime.passedSince() < 1.seconds) {
                 lastWarp?.let {
                     it.unlocked = false
-                    LorenzUtils.chat("Detected not having access to warp point §b${it.displayName}§e!")
-                    LorenzUtils.chat("Use §c/shresetburrowwarps §eonce you have activated this travel scroll.")
+                    ChatUtils.chat("Detected not having access to warp point §b${it.displayName}§e!")
+                    ChatUtils.chat("Use §c/shresetburrowwarps §eonce you have activated this travel scroll.")
                     lastWarp = null
                     currentWarp = null
                 }
@@ -58,22 +66,50 @@ class BurrowWarpHelper {
         currentWarp = null
     }
 
+    @SubscribeEvent
+    fun onDebugDataCollect(event: DebugDataCollectEvent) {
+        event.title("Diana Burrow Nearest Warp")
+
+        if (!DianaAPI.isDoingDiana()) {
+            event.addIrrelevant("not doing diana")
+            return
+        }
+        if (!config.burrowNearestWarp) {
+            event.addIrrelevant("disabled in config")
+            return
+        }
+        val target = GriffinBurrowHelper.targetLocation
+        if (target == null) {
+            event.addIrrelevant("targetLocation is null")
+            return
+        }
+
+        val list = mutableListOf<String>()
+        shouldUseWarps(target, list)
+        event.addData(list)
+    }
+
     companion object {
+
         private val config get() = SkyHanniMod.feature.event.diana
         var currentWarp: WarpPoint? = null
 
-        fun shouldUseWarps(target: LorenzVec) {
+        fun shouldUseWarps(target: LorenzVec, debug: MutableList<String>? = null) {
+            debug?.add("target: ${target.printWithAccuracy(1)}")
             val playerLocation = LocationUtils.playerLocation()
+            debug?.add("playerLocation: ${playerLocation.printWithAccuracy(1)}")
             val warpPoint = getNearestWarpPoint(target)
+            debug?.add("warpPoint: ${warpPoint.displayName}")
 
             val playerDistance = playerLocation.distance(target)
+            debug?.add("playerDistance: ${playerDistance.round(1)}")
             val warpDistance = warpPoint.distance(target)
+            debug?.add("warpDistance: ${warpDistance.round(1)}")
             val difference = playerDistance - warpDistance
-            currentWarp = if (difference > 10) {
-                warpPoint
-            } else {
-                null
-            }
+            debug?.add("difference: ${difference.round(1)}")
+            val setWarpPoint = difference > 10
+            debug?.add("setWarpPoint: $setWarpPoint")
+            currentWarp = if (setWarpPoint) warpPoint else null
         }
 
         private fun getNearestWarpPoint(location: LorenzVec) =
@@ -82,17 +118,18 @@ class BurrowWarpHelper {
 
         fun resetDisabledWarps() {
             WarpPoint.entries.forEach { it.unlocked = true }
-            LorenzUtils.chat("Reset disabled burrow warps.")
+            ChatUtils.chat("Reset disabled burrow warps.")
         }
     }
 
     enum class WarpPoint(
         val displayName: String,
-        private val location: LorenzVec,
+        val location: LorenzVec,
         private val extraBlocks: Int,
         val ignored: () -> Boolean = { false },
         var unlocked: Boolean = true,
     ) {
+
         HUB("Hub", LorenzVec(-3, 70, -70), 2),
         CASTLE("Castle", LorenzVec(-250, 130, 45), 10),
         CRYPT("Crypt", LorenzVec(-190, 74, -88), 15, { config.ignoredWarps.crypt }),

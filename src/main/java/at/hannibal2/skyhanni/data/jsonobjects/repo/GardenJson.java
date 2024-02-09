@@ -3,6 +3,7 @@ package at.hannibal2.skyhanni.data.jsonobjects.repo;
 import at.hannibal2.skyhanni.features.garden.CropType;
 import at.hannibal2.skyhanni.utils.LorenzRarity;
 import at.hannibal2.skyhanni.utils.LorenzVec;
+import at.hannibal2.skyhanni.utils.NEUInternalName;
 import com.google.gson.annotations.Expose;
 import org.jetbrains.annotations.Nullable;
 
@@ -23,10 +24,10 @@ public class GardenJson {
     public Map<String, GardenVisitor> visitors;
 
     @Expose
-    public Map<String, Double> organic_matter;
+    public Map<NEUInternalName, Double> organic_matter;
 
     @Expose
-    public Map<String, Double> fuel;
+    public Map<NEUInternalName, Double> fuel;
 
     public static class GardenVisitor {
         @Expose
