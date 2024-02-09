@@ -13,8 +13,9 @@ class ReceiveParticleEvent(
     val speed: Float,
     val offset: LorenzVec,
     val longDistance: Boolean,
-    val particleArgs: IntArray
+    val particleArgs: IntArray,
 ) :
     LorenzEvent() {
+
     val distanceToPlayer by lazy { location.distanceToPlayer() }
 }

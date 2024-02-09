@@ -9,6 +9,7 @@ import at.hannibal2.skyhanni.events.LorenzWorldChangeEvent
 import at.hannibal2.skyhanni.events.RenderMobColoredEvent
 import at.hannibal2.skyhanni.events.ResetEntityHurtEvent
 import at.hannibal2.skyhanni.events.withAlpha
+import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.EntityUtils
 import at.hannibal2.skyhanni.utils.LocationUtils
 import at.hannibal2.skyhanni.utils.LorenzColor
@@ -26,8 +27,8 @@ import net.minecraftforge.fml.common.eventhandler.EventPriority
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
 class SummoningMobManager {
-    private val config get() = SkyHanniMod.feature.combat.summonings
 
+    private val config get() = SkyHanniMod.feature.combat.summonings
 
     private val summoningMobs = mutableMapOf<EntityLiving, SummoningMob>()
     private val summoningMobNametags = mutableListOf<EntityArmorStand>()
@@ -124,7 +125,7 @@ class SummoningMobManager {
             val name = summoningMob.name
             if (currentHealth == 0) {
                 summoningMobs.remove(entityLiving)
-                LorenzUtils.chat("Your Summoning Mob just §cdied!")
+                ChatUtils.chat("Your Summoning Mob just §cdied!")
                 continue
             }
 

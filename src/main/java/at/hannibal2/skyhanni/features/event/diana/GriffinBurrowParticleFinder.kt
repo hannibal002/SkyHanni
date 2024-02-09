@@ -23,6 +23,7 @@ import kotlin.time.Duration.Companion.minutes
 import kotlin.time.Duration.Companion.seconds
 
 class GriffinBurrowParticleFinder {
+
     private val config get() = SkyHanniMod.feature.event.diana
 
     private val recentlyDugParticleBurrows = TimeLimitedSet<LorenzVec>(1.minutes)
@@ -180,7 +181,6 @@ class GriffinBurrowParticleFinder {
                     burrows.remove(location)
                 }
             }
-
         }
     }
 
