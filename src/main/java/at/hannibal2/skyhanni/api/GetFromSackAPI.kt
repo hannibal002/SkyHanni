@@ -8,6 +8,7 @@ import at.hannibal2.skyhanni.events.GuiContainerEvent
 import at.hannibal2.skyhanni.events.InventoryCloseEvent
 import at.hannibal2.skyhanni.events.LorenzTickEvent
 import at.hannibal2.skyhanni.events.LorenzToolTipEvent
+import at.hannibal2.skyhanni.events.MessageSendToServerEvent
 import at.hannibal2.skyhanni.events.RepositoryReloadEvent
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.NEUInternalName
@@ -30,8 +31,10 @@ object GetFromSackAPI {
 
     fun getFromSack(items: List<PrimitiveItemStack>) = addToQueue(items)
 
-    fun getFromChatMessageSackItems(item: PrimitiveItemStack, text: String = "Click here to grab §9x${item.amount} ${item.name.asString()}§e from sacks!") =
-        LorenzUtils.clickableChat(text, "${commands.first()} ${item.name.asString()} ${item.amount}")
+    fun getFromChatMessageSackItems(
+        item: PrimitiveItemStack,
+        text: String = "Click here to grab §9x${item.amount} ${item.name.asString()}§e from sacks!"
+    ) = LorenzUtils.clickableChat(text, "${commands.first()} ${item.name.asString()} ${item.amount}")
 
     fun getFromSlotSackItems(items: List<PrimitiveItemStack>, slotIndex: Int) = addToInventory(items, slotIndex)
 
@@ -71,7 +74,7 @@ object GetFromSackAPI {
     @SubscribeEvent
     fun onSlotClicked(event: GuiContainerEvent.SlotClickEvent) {
         if (!LorenzUtils.inSkyBlock) return
-        if (event.clickedButton != 1) return // right click
+        if (event.clickedButton != 1) return // filter none right clicks
         addToQueue(inventoryMap[event.slotId] ?: return)
         inventoryMap.remove(event.slotId)
         event.isCanceled = true
@@ -88,7 +91,18 @@ object GetFromSackAPI {
         }
     }
 
-    fun commandHandler(args: Array<String>) {
+    @SubscribeEvent
+    fun onMessageToServer(event: MessageSendToServerEvent) {
+        if (!config.queuedGFS) return
+        val message = event.message.split(" ")
+        if (message.firstOrNull()
+                ?.let { commands.contains(it) } != true // null or false == return
+        ) return
+        event.isCanceled = true
+        commandHandler(message.drop(1))
+    }
+
+    fun commandHandler(args: List<String>) {
         if (!config.queuedGFS) {
             LorenzUtils.sendCommandToServer("gfs ${args.joinToString(" ")}")
             return
@@ -118,7 +132,9 @@ object GetFromSackAPI {
         if (config.bazaarGFS && !LorenzUtils.noTradeMode) {
             val sackInfo = SackAPI.fetchSackItem(item)
             if (sackInfo.getStatus() != SackStatus.CORRECT && sackInfo.getStatus() != SackStatus.ALRIGHT) {
-                LorenzUtils.clickableChat("Unsure if items are available in Sack, §kCLICK §r§eto open bazaar", "bz ${item.asString()}")
+                LorenzUtils.clickableChat(
+                    "Unsure if items are available in Sack, §kCLICK §r§eto open bazaar", "bz ${item.asString()}"
+                )
                 getFromSack(item.makePrimitiveStack(amount))
                 return
             }
@@ -128,7 +144,9 @@ object GetFromSackAPI {
                 if (sackAmount > 0) {
                     getFromSack(item.makePrimitiveStack(sackAmount))
                 }
-                LorenzUtils.clickableChat("§kCLICK HERE §r§eto get the remaining §9x${diff} §ffrom bazaar", "bz ${item.asString()}")
+                LorenzUtils.clickableChat(
+                    "§kCLICK HERE §r§eto get the remaining §ax${diff} §ffrom bazaar", "bz ${item.asString()}"
+                )
                 return
             }
         }

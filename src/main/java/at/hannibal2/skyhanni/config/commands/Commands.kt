@@ -1,7 +1,6 @@
 package at.hannibal2.skyhanni.config.commands
 
 import at.hannibal2.skyhanni.SkyHanniMod
-import at.hannibal2.skyhanni.api.GetFromSackAPI
 import at.hannibal2.skyhanni.config.ConfigFileType
 import at.hannibal2.skyhanni.config.ConfigGuiManager
 import at.hannibal2.skyhanni.data.ChatManager
@@ -232,12 +231,22 @@ object Commands {
             "shresetseacreaturetracker",
             "Resets the Sea Creature Tracker"
         ) { SeaCreatureTracker.resetCommand(it) }
-        registerCommand0("shcalccrop", "Calculate how many crops need to be farmed between different crop milestones.", {
-            FarmingMilestoneCommand.onCommand(it.getOrNull(0), it.getOrNull(1), it.getOrNull(2), false)
-        }, FarmingMilestoneCommand::onComplete)
-        registerCommand0("shcalccroptime", "Calculate how long you need to farm crops between different crop milestones.", {
-            FarmingMilestoneCommand.onCommand(it.getOrNull(0), it.getOrNull(1), it.getOrNull(2), true)
-        }, FarmingMilestoneCommand::onComplete)
+        registerCommand0(
+            "shcalccrop",
+            "Calculate how many crops need to be farmed between different crop milestones.",
+            {
+                FarmingMilestoneCommand.onCommand(it.getOrNull(0), it.getOrNull(1), it.getOrNull(2), false)
+            },
+            FarmingMilestoneCommand::onComplete
+        )
+        registerCommand0(
+            "shcalccroptime",
+            "Calculate how long you need to farm crops between different crop milestones.",
+            {
+                FarmingMilestoneCommand.onCommand(it.getOrNull(0), it.getOrNull(1), it.getOrNull(2), true)
+            },
+            FarmingMilestoneCommand::onComplete
+        )
     }
 
     private fun usersBugFix() {
@@ -415,9 +424,6 @@ object Commands {
         registerCommand("pt", "Transfer the party to another party member") { PartyCommands.transfer(it) }
         registerCommand("pp", "Promote a specific party member") { PartyCommands.promote(it) }
         registerCommand("pd", "Disbands the party") { PartyCommands.disband() }
-
-        registerCommand("gfs", "Get from Sack (queued)") { GetFromSackAPI.commandHandler(it) }
-        registerCommand("getFromSacks", "Get from Sack (queued)") { GetFromSackAPI.commandHandler(it) }
     }
 
     private fun commandHelp(args: Array<String>) {
