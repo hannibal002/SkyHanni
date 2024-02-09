@@ -13,7 +13,7 @@ class SeaCreatureManager {
     private var doubleHook = false
 
     @SubscribeEvent
-    fun onChatMessage(event: LorenzChatEvent) {
+    fun onChat(event: LorenzChatEvent) {
         if (!LorenzUtils.inSkyBlock) return
         if (doubleHookMessages.contains(event.message)) {
             if (SkyHanniMod.feature.fishing.compactDoubleHook) {
@@ -62,6 +62,7 @@ class SeaCreatureManager {
     }
 
     companion object {
+
         private val seaCreatureMap = mutableMapOf<String, SeaCreature>()
         var allFishingMobs = mapOf<String, SeaCreature>()
         var allVariants = mapOf<String, List<String>>()

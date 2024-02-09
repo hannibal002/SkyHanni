@@ -5,6 +5,7 @@ import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.InventoryFullyOpenedEvent
 import at.hannibal2.skyhanni.events.LorenzChatEvent
 import at.hannibal2.skyhanni.events.ProfileJoinEvent
+import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.ItemUtils.name
 import at.hannibal2.skyhanni.utils.LorenzUtils
@@ -18,12 +19,22 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import kotlin.time.Duration.Companion.milliseconds
 
 class GardenLevelDisplay {
+
     private val config get() = GardenAPI.config.gardenLevels
-    private val expToNextLevelPattern by RepoPattern.pattern("garden.level.inventory.nextxp", ".* §e(?<nextLevelExp>.*)§6/.*")
+    private val expToNextLevelPattern by RepoPattern.pattern(
+        "garden.level.inventory.nextxp",
+        ".* §e(?<nextLevelExp>.*)§6/.*"
+    )
     private val overflowPattern by RepoPattern.pattern("garden.level.inventory.overflow", ".*§r §6(?<overflow>.*)")
-    private val currentLevelPattern by RepoPattern.pattern("garden.level.inventory.currentlevel", "Garden Level (?<currentLevel>.*)")
+    private val currentLevelPattern by RepoPattern.pattern(
+        "garden.level.inventory.currentlevel",
+        "Garden Level (?<currentLevel>.*)"
+    )
     private var display = ""
-    private val visitorRewardPattern by RepoPattern.pattern("garden.level.chat.increase", " {4}§r§8\\+§r§2(?<exp>.*) §r§7Garden Experience")
+    private val visitorRewardPattern by RepoPattern.pattern(
+        "garden.level.chat.increase",
+        " {4}§r§8\\+§r§2(?<exp>.*) §r§7Garden Experience"
+    )
 
     @SubscribeEvent
     fun onProfileJoin(event: ProfileJoinEvent) {
@@ -31,7 +42,7 @@ class GardenLevelDisplay {
     }
 
     @SubscribeEvent(receiveCanceled = true)
-    fun onChatMessage(event: LorenzChatEvent) {
+    fun onChat(event: LorenzChatEvent) {
         if (!GardenAPI.inGarden()) return
 
         visitorRewardPattern.matchMatcher(event.message) {
@@ -46,7 +57,7 @@ class GardenLevelDisplay {
         val newLevel = GardenAPI.getGardenLevel()
         if (newLevel == oldLevel + 1 && newLevel > 15) {
             LorenzUtils.runDelayed(50.milliseconds) {
-                LorenzUtils.clickableChat(
+                ChatUtils.clickableChat(
                     " \n§b§lGARDEN LEVEL UP §8$oldLevel ➜ §b$newLevel\n" +
                         " §8+§aRespect from Elite Farmers and SkyHanni members :)\n ",
                     "/gardenlevels",

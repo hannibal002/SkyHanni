@@ -6,13 +6,15 @@ import at.hannibal2.skyhanni.events.GuiContainerEvent
 import at.hannibal2.skyhanni.events.LorenzTickEvent
 import at.hannibal2.skyhanni.events.PlaySoundEvent
 import at.hannibal2.skyhanni.events.RenderInventoryItemTipEvent
+import at.hannibal2.skyhanni.utils.ChatUtils
+import at.hannibal2.skyhanni.utils.CollectionUtils.sorted
 import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.LorenzUtils
-import at.hannibal2.skyhanni.utils.LorenzUtils.sorted
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
 class TiaRelayHelper {
+
     private val config get() = SkyHanniMod.feature.inventory.helper.tiaRelay
     private var inInventory = false
 
@@ -71,8 +73,8 @@ class TiaRelayHelper {
         val name = sounds.values.first().name
         for (sound in sounds.toMutableMap()) {
             if (sound.value.name != name) {
-                LorenzUtils.error("Tia Relay Helper error: Too much background noise! Try turning off the music and then try again.")
-                LorenzUtils.clickableChat("Click here to run /togglemusic", "togglemusic")
+                ChatUtils.error("Tia Relay Helper error: Too much background noise! Try turning off the music and then try again.")
+                ChatUtils.clickableChat("Click here to run /togglemusic", "togglemusic")
                 sounds.clear()
                 return
             }

@@ -15,7 +15,6 @@ import java.util.List;
 
 import static at.hannibal2.skyhanni.config.features.combat.damageindicator.DamageIndicatorConfig.BossCategory.ARACHNE;
 import static at.hannibal2.skyhanni.config.features.combat.damageindicator.DamageIndicatorConfig.BossCategory.DIANA_MOBS;
-import static at.hannibal2.skyhanni.config.features.combat.damageindicator.DamageIndicatorConfig.BossCategory.DUNGEON_ALL;
 import static at.hannibal2.skyhanni.config.features.combat.damageindicator.DamageIndicatorConfig.BossCategory.GARDEN_PESTS;
 import static at.hannibal2.skyhanni.config.features.combat.damageindicator.DamageIndicatorConfig.BossCategory.INFERNO_DEMONLORD;
 import static at.hannibal2.skyhanni.config.features.combat.damageindicator.DamageIndicatorConfig.BossCategory.NETHER_MINI_BOSSES;
@@ -87,7 +86,6 @@ public class DamageIndicatorConfig {
     @ConfigEditorDraggableList()
     //TODO only show currently working and tested features
     public List<BossCategory> bossesToShow = new ArrayList<>(Arrays.asList(
-        DUNGEON_ALL,
         NETHER_MINI_BOSSES,
         VANQUISHER,
         REVENANT_HORROR,
@@ -106,7 +104,6 @@ public class DamageIndicatorConfig {
     ));
 
     public enum BossCategory implements HasLegacyId {
-        DUNGEON_ALL("§bDungeon All", 0),
         NETHER_MINI_BOSSES("§bNether Mini Bosses", 1),
         VANQUISHER("§bVanquisher", 2),
         ENDERSTONE_PROTECTOR("§bEndstone Protector (not tested)", 3),
@@ -157,6 +154,7 @@ public class DamageIndicatorConfig {
             return str;
         }
     }
+
     @Expose
     @ConfigOption(name = "Hide Damage Splash", desc = "Hiding damage splashes near the damage indicator.")
     @ConfigEditorBoolean

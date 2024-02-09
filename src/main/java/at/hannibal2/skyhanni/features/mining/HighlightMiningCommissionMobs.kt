@@ -21,6 +21,7 @@ import net.minecraft.entity.monster.EntitySlime
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
 class HighlightMiningCommissionMobs {
+
     private val config get() = SkyHanniMod.feature.mining
     private var active = listOf<MobType>()
 

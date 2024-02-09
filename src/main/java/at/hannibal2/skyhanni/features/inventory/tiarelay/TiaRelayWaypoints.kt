@@ -12,6 +12,7 @@ import at.hannibal2.skyhanni.utils.RenderUtils.drawDynamicText
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
 class TiaRelayWaypoints {
+
     private val config get() = SkyHanniMod.feature.inventory.helper.tiaRelay
     private var waypoint: LorenzVec? = null
     private var waypointName: String? = null
@@ -22,7 +23,7 @@ class TiaRelayWaypoints {
     }
 
     @SubscribeEvent
-    fun onChatMessage(event: LorenzChatEvent) {
+    fun onChat(event: LorenzChatEvent) {
         if (!LorenzUtils.inSkyBlock) return
         if (!config.nextWaypoint) return
 

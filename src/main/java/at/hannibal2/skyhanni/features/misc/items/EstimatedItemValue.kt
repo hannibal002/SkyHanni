@@ -8,14 +8,16 @@ import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.InventoryCloseEvent
 import at.hannibal2.skyhanni.events.LorenzToolTipEvent
 import at.hannibal2.skyhanni.events.RenderItemTooltipEvent
+import at.hannibal2.skyhanni.utils.ChatUtils
+import at.hannibal2.skyhanni.utils.CollectionUtils.addAsSingletonList
+import at.hannibal2.skyhanni.utils.ConditionalUtils.onToggle
 import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalNameOrNull
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
+import at.hannibal2.skyhanni.utils.ItemUtils.isRune
 import at.hannibal2.skyhanni.utils.ItemUtils.name
 import at.hannibal2.skyhanni.utils.KeyboardManager.isKeyHeld
 import at.hannibal2.skyhanni.utils.LorenzUtils
-import at.hannibal2.skyhanni.utils.LorenzUtils.addAsSingletonList
-import at.hannibal2.skyhanni.utils.LorenzUtils.onToggle
 import at.hannibal2.skyhanni.utils.NEUInternalName
 import at.hannibal2.skyhanni.utils.NEUItems.getItemStackOrNull
 import at.hannibal2.skyhanni.utils.NEUItems.manager
@@ -33,6 +35,7 @@ import java.io.File
 import kotlin.math.roundToLong
 
 object EstimatedItemValue {
+
     private val config get() = SkyHanniMod.feature.misc.estimatedItemValues
     private var display = emptyList<List<Any>>()
     private val cache = mutableMapOf<ItemStack, List<List<Any>>>()
@@ -54,7 +57,7 @@ object EstimatedItemValue {
                     object : TypeToken<HashMap<NEUInternalName, HashMap<String, List<String>>>>() {}.type
                 )
         else
-            LorenzUtils.error("Gemstone Slot Unlock Costs failed to load!")
+            ChatUtils.error("Gemstone Slot Unlock Costs failed to load!")
     }
 
     @SubscribeEvent
@@ -150,7 +153,7 @@ object EstimatedItemValue {
         val newDisplay = try {
             draw(item)
         } catch (e: Exception) {
-            LorenzUtils.debug("Estimated Item Value error: ${e.message}")
+            ChatUtils.debug("Estimated Item Value error: ${e.message}")
             e.printStackTrace()
             listOf()
         }
@@ -182,13 +185,13 @@ object EstimatedItemValue {
         // Blocks the dungeon map
         if (internalName.startsWith("MAP-")) return listOf()
         // Hides the rune item
-        if (internalName.contains("_RUNE;")) return listOf()
+        if (internalName.isRune()) return listOf()
         if (internalName.contains("UNIQUE_RUNE")) return listOf()
         if (internalName.contains("WISP_POTION")) return listOf()
 
 
         if (internalName.getItemStackOrNull() == null) {
-            LorenzUtils.debug("Estimated Item Value is null for: '$internalName'")
+            ChatUtils.debug("Estimated Item Value is null for: '$internalName'")
             return listOf()
         }
 

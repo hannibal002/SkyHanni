@@ -9,13 +9,13 @@ import at.hannibal2.skyhanni.events.SeaCreatureFishEvent
 import at.hannibal2.skyhanni.events.withAlpha
 import at.hannibal2.skyhanni.features.combat.damageindicator.DamageIndicatorManager
 import at.hannibal2.skyhanni.mixins.hooks.RenderLivingEntityHelper
+import at.hannibal2.skyhanni.utils.CollectionUtils.editCopy
 import at.hannibal2.skyhanni.utils.EntityUtils.hasMaxHealth
 import at.hannibal2.skyhanni.utils.EntityUtils.hasNameTagWith
 import at.hannibal2.skyhanni.utils.LocationUtils.distanceToPlayer
 import at.hannibal2.skyhanni.utils.LorenzColor
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils.baseMaxHealth
-import at.hannibal2.skyhanni.utils.LorenzUtils.editCopy
 import at.hannibal2.skyhanni.utils.LorenzUtils.ignoreDerpy
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.SoundUtils
@@ -31,6 +31,7 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import kotlin.time.Duration.Companion.seconds
 
 class SeaCreatureFeatures {
+
     private val config get() = SkyHanniMod.feature.fishing.rareCatches
     private var rareSeaCreatures = listOf<EntityLivingBase>()
     private var lastRareCatch = SimpleTimeMark.farPast()
@@ -58,7 +59,8 @@ class SeaCreatureFeatures {
 
             if (config.alertOtherCatches && lastRareCatch.passedSince() > 1.seconds) {
                 val creature = SeaCreatureManager.allFishingMobs[creatureType.nametag]
-                LorenzUtils.sendTitle("${creature?.rarity?.chatColorCode ?: "§6"}RARE SEA CREATURE!", 1.5.seconds, 3.6, 7f)
+                val text = "${creature?.rarity?.chatColorCode ?: "§6"}RARE SEA CREATURE!"
+                LorenzUtils.sendTitle(text, 1.5.seconds, 3.6, 7f)
                 if (config.playSound) SoundUtils.playBeepSound()
             }
         }
@@ -104,8 +106,9 @@ class SeaCreatureFeatures {
     enum class RareSeaCreatureType(
         val clazz: Class<out EntityLivingBase>,
         val nametag: String,
-        vararg val health: Int
+        vararg val health: Int,
     ) {
+
         WATER_HYDRA(EntityZombie::class.java, "Water Hydra", 500_000),
         SEA_EMPEROR(EntityGuardian::class.java, "Sea Emperor", 750_000, 800_000),
         SEA_EMPEROR_RIDER(EntitySkeleton::class.java, "Sea Emperor", 750_000, 800_000),
