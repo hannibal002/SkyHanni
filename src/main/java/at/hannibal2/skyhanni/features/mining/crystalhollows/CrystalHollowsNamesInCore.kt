@@ -12,6 +12,7 @@ import at.hannibal2.skyhanni.utils.RenderUtils.drawDynamicText
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
 class CrystalHollowsNamesInCore {
+
     private val config get() = SkyHanniMod.feature.mining
     private val coreLocations = mapOf(
         LorenzVec(550, 116, 550) to "§8Precursor Remnants",

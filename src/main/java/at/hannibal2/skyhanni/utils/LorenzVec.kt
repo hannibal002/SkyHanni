@@ -144,6 +144,7 @@ data class LorenzVec(
     }
 
     companion object {
+
         fun getFromYawPitch(yaw: Double, pitch: Double): LorenzVec {
             val yaw: Double = (yaw + 90) * Math.PI / 180
             val pitch: Double = (pitch + 90) * Math.PI / 180
