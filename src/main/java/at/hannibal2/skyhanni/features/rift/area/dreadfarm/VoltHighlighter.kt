@@ -55,11 +55,11 @@ class VoltHighlighter {
             if (config.voltMoodMeter)
                 RenderLivingEntityHelper.setEntityColor(
                     entity, when (state) {
-                    VoltState.FRIENDLY -> 0x8000FF00.toInt()
-                    VoltState.DOING_LIGHTNING -> 0x800000FF.toInt()
-                    VoltState.HOSTILE -> 0x80FF0000.toInt()
-                    else -> 0
-                }
+                        VoltState.FRIENDLY -> 0x8000FF00.toInt()
+                        VoltState.DOING_LIGHTNING -> 0x800000FF.toInt()
+                        VoltState.HOSTILE -> 0x80FF0000.toInt()
+                        else -> 0
+                    }
                 ) { config.voltMoodMeter }
             if (state == VoltState.DOING_LIGHTNING && config.voltRange) {
                 RenderUtils.drawCylinderInWorld(

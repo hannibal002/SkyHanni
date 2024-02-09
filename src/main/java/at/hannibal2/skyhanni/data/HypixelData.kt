@@ -98,16 +98,20 @@ class HypixelData {
             if (!LorenzUtils.inSkyBlock) return null
             if (serverId != null) return serverId
 
-            ScoreboardData.sidebarLinesFormatted.forEach { serverIdScoreboardPattern.matchMatcher(it) {
-                val serverType = if (group("servertype") == "M") "mega" else "mini"
-                serverId = "$serverType${group("serverid")}"
-                return serverId
-            } }
+            ScoreboardData.sidebarLinesFormatted.forEach {
+                serverIdScoreboardPattern.matchMatcher(it) {
+                    val serverType = if (group("servertype") == "M") "mega" else "mini"
+                    serverId = "$serverType${group("serverid")}"
+                    return serverId
+                }
+            }
 
-            TabListData.getTabList().forEach { serverIdTablistPattern.matchMatcher(it) {
-                serverId = group("serverid")
-                return serverId
-            } }
+            TabListData.getTabList().forEach {
+                serverIdTablistPattern.matchMatcher(it) {
+                    serverId = group("serverid")
+                    return serverId
+                }
+            }
 
             return serverId
         }

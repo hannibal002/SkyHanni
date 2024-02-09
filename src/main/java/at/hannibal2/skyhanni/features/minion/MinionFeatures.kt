@@ -66,7 +66,10 @@ class MinionFeatures {
 
     private var lastInventoryClosed = 0L
     private var coinsPerDay = ""
-    private val minionUpgradePattern by RepoPattern.pattern("minion.chat.upgrade", "§aYou have upgraded your Minion to Tier (?<tier>.*)")
+    private val minionUpgradePattern by RepoPattern.pattern(
+        "minion.chat.upgrade",
+        "§aYou have upgraded your Minion to Tier (?<tier>.*)"
+    )
     private val minionCoinPattern by RepoPattern.pattern("minion.chat.coin", "§aYou received §r§6(.*) coins§r§a!")
     private val minionTitlePattern by RepoPattern.pattern("minion.title", "Minion [^➜]")
     private val minionCollectItemPattern by RepoPattern.pattern("minion.item.collect", "^§aCollect All$")

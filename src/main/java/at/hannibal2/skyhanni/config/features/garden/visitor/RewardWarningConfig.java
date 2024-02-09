@@ -7,10 +7,11 @@ import io.github.moulberry.moulconfig.annotations.ConfigEditorBoolean;
 import io.github.moulberry.moulconfig.annotations.ConfigEditorDraggableList;
 import io.github.moulberry.moulconfig.annotations.ConfigEditorKeybind;
 import io.github.moulberry.moulconfig.annotations.ConfigOption;
+import org.lwjgl.input.Keyboard;
+
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-import org.lwjgl.input.Keyboard;
 
 public class RewardWarningConfig {
 

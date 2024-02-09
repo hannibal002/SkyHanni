@@ -65,7 +65,10 @@ object DiscordRPCManager : IPCListener {
 
                 try {
                     client?.connect()
-                    if (fromCommand) ChatUtils.chat("Successfully started Rich Presence!", prefixColor = "§a") // confirm that /shrpcstart worked
+                    if (fromCommand) ChatUtils.chat(
+                        "Successfully started Rich Presence!",
+                        prefixColor = "§a"
+                    ) // confirm that /shrpcstart worked
                 } catch (ex: Exception) {
                     consoleLog("Warn: Failed to connect to RPC!")
                     consoleLog(ex.toString())

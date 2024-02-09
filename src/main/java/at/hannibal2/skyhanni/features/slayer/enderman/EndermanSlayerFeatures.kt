@@ -221,7 +221,11 @@ class EndermanSlayerFeatures {
 
     @SubscribeEvent
     fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
-        event.move(3, "slayer.endermanBeaconConfig.highlightBeacon", "slayer.endermen.endermanBeaconConfig.highlightBeacon")
+        event.move(
+            3,
+            "slayer.endermanBeaconConfig.highlightBeacon",
+            "slayer.endermen.endermanBeaconConfig.highlightBeacon"
+        )
         event.move(3, "slayer.endermanBeaconConfig.beaconColor", "slayer.endermen.endermanBeaconConfig.beaconColor")
         event.move(3, "slayer.endermanBeaconConfig.showWarning", "slayer.endermen.endermanBeaconConfig.showWarning")
         event.move(3, "slayer.endermanBeaconConfig.showLine", "slayer.endermen.endermanBeaconConfig.showLine")

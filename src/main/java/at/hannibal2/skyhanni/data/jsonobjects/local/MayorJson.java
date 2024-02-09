@@ -1,6 +1,7 @@
 package at.hannibal2.skyhanni.data.jsonobjects.local;
 
 import com.google.gson.annotations.Expose;
+
 import java.util.ArrayList;
 
 public class MayorJson {

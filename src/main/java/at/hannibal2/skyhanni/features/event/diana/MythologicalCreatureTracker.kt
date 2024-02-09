@@ -35,8 +35,9 @@ object MythologicalCreatureTracker {
 
     private val config get() = SkyHanniMod.feature.event.diana.mythologicalMobtracker
 
-    private val tracker = SkyHanniTracker("Mythological Creature Tracker", { Data() }, { it.diana.mythologicalMobTracker })
-    { drawDisplay(it) }
+    private val tracker =
+        SkyHanniTracker("Mythological Creature Tracker", { Data() }, { it.diana.mythologicalMobTracker })
+        { drawDisplay(it) }
 
     class Data : TrackerData() {
 

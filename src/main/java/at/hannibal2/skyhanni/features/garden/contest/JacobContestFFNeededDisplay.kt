@@ -96,7 +96,8 @@ class JacobContestFFNeededDisplay {
         if (blocksPerSecond == null || trueFF == null) {
             add(listOf("§cMissing data from above!"))
         } else {
-            val predictedScore = ((100.0 + trueFF) * blocksPerSecond * crop.baseDrops * 20 * 60 / 100).toInt().addSeparators()
+            val predictedScore =
+                ((100.0 + trueFF) * blocksPerSecond * crop.baseDrops * 20 * 60 / 100).toInt().addSeparators()
             add(listOf("§6Predicted ", crop.icon, "§6crops: $predictedScore"))
         }
     }

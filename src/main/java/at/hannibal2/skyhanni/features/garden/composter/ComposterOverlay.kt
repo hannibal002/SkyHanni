@@ -472,7 +472,9 @@ object ComposterOverlay {
 
     private fun retrieveMaterials(internalName: NEUInternalName, itemName: String, itemsNeeded: Int) {
         if (itemsNeeded == 0) return
-        if (config.retrieveFrom == ComposterConfig.RetrieveFromEntry.BAZAAR && !LorenzUtils.noTradeMode && !internalName.equals("BIOFUEL")) {
+        if (config.retrieveFrom == ComposterConfig.RetrieveFromEntry.BAZAAR &&
+            !LorenzUtils.noTradeMode && !internalName.equals("BIOFUEL")
+        ) {
             BazaarApi.searchForBazaarItem(itemName, itemsNeeded)
             return
         }
@@ -489,8 +491,10 @@ object ComposterOverlay {
         if (sackStatus == SackStatus.MISSING || sackStatus == SackStatus.OUTDATED) {
             LorenzUtils.sendCommandToServer("gfs ${internalName.asString()} ${itemsNeeded - having}")
             // TODO Add sack type repo data
-            val sackType = if (internalName.equals("VOLTA") || internalName.equals("OIL_BARREL") || internalName.equals("BIOFUEL")) "Mining §eor §9Dwarven"
-            else "Enchanted Agronomy"
+
+            val isDwarvenMineable =
+                internalName.let { it.equals("VOLTA") || it.equals("OIL_BARREL") || it.equals("BIOFUEL") }
+            val sackType = if (isDwarvenMineable) "Mining §eor §9Dwarven" else "Enchanted Agronomy"
             ChatUtils.clickableChat(
                 "Sacks could not be loaded. Click here and open your §9$sackType Sack §eto update the data!",
                 "sax"

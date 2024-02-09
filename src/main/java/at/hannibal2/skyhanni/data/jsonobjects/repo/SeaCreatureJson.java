@@ -3,6 +3,7 @@ package at.hannibal2.skyhanni.data.jsonobjects.repo;
 import at.hannibal2.skyhanni.utils.LorenzRarity;
 import com.google.gson.annotations.Expose;
 import com.google.gson.reflect.TypeToken;
+
 import java.lang.reflect.Type;
 import java.util.Map;
 

@@ -27,8 +27,10 @@ class SpawnTimers {
 
     private val arachneAltarLocation = LorenzVec(-283f, 51f, -179f)
     private var arachneSpawnTime = SimpleTimeMark.farPast()
-    private val arachneFragmentMessage = "^☄ [a-z0-9_]{2,22} placed an arachne's calling! something is awakening! \\(4/4\\)\$".toPattern()
-    private val arachneCrystalMessage = "^☄ [a-z0-9_]{2,22} placed an arachne crystal! something is awakening!$".toPattern()
+    private val arachneFragmentMessage =
+        "^☄ [a-z0-9_]{2,22} placed an arachne's calling! something is awakening! \\(4/4\\)\$".toPattern()
+    private val arachneCrystalMessage =
+        "^☄ [a-z0-9_]{2,22} placed an arachne crystal! something is awakening!$".toPattern()
     private var saveNextTickParticles = false
     private var particleCounter = 0
     private var tickTime: Long = 0

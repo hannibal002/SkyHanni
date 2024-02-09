@@ -126,18 +126,18 @@ class FarmingWeightDisplay {
                     listOf("§eClick here to reload the data right now!"),
                     onClick = recalculate
                 ), Renderable.clickAndHover(
-                "§cdata from Elite Farmers!",
-                listOf("§eClick here to reload the data right now!"),
-                onClick = recalculate
-            ), Renderable.clickAndHover(
-                "§eRejoin the garden or",
-                listOf("§eClick here to reload the data right now!"),
-                onClick = recalculate
-            ), Renderable.clickAndHover(
-                "§eclick here to fix it.",
-                listOf("§eClick here to reload the data right now!"),
-                onClick = recalculate
-            )
+                    "§cdata from Elite Farmers!",
+                    listOf("§eClick here to reload the data right now!"),
+                    onClick = recalculate
+                ), Renderable.clickAndHover(
+                    "§eRejoin the garden or",
+                    listOf("§eClick here to reload the data right now!"),
+                    onClick = recalculate
+                ), Renderable.clickAndHover(
+                    "§eclick here to fix it.",
+                    listOf("§eClick here to reload the data right now!"),
+                    onClick = recalculate
+                )
             )
         }
 

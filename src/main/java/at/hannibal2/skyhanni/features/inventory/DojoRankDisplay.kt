@@ -23,7 +23,10 @@ class DojoRankDisplay {
     private var display = emptyList<String>()
     private val patternGroup = RepoPattern.group("inventory.dojo.rankdisplay")
     private val testNamePattern by patternGroup.pattern("name", "(?<color>§\\w)Test of (?<name>.*)")
-    private val testRankPattern by patternGroup.pattern("rank", "(?:§\\w)+Your Rank: (?<rank>§\\w.) §8\\((?<score>\\d+)\\)")
+    private val testRankPattern by patternGroup.pattern(
+        "rank",
+        "(?:§\\w)+Your Rank: (?<rank>§\\w.) §8\\((?<score>\\d+)\\)"
+    )
     private var belts = mapOf<String, Int>()
 
     @SubscribeEvent

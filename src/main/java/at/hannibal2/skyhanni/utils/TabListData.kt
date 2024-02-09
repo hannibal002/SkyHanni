@@ -54,8 +54,10 @@ class TabListData {
                 if (tabListLine != "") resultList.add("'$tabListLine'")
             }
             val tabList = Minecraft.getMinecraft().ingameGUI.tabList as AccessorGuiPlayerTabOverlay
-            val tabHeader = tabList.header_skyhanni.conditionalTransform(noColor, { unformattedText }, { formattedText })
-            val tabFooter = tabList.footer_skyhanni.conditionalTransform(noColor, { unformattedText }, { formattedText })
+            val tabHeader =
+                tabList.header_skyhanni.conditionalTransform(noColor, { unformattedText }, { formattedText })
+            val tabFooter =
+                tabList.footer_skyhanni.conditionalTransform(noColor, { unformattedText }, { formattedText })
             val string = "Header:\n\n$tabHeader\n\nBody:\n\n${resultList.joinToString("\n")}\n\nFooter:\n\n$tabFooter"
             OSUtils.copyToClipboard(string)
             ChatUtils.chat("Tab list copied into the clipboard!")

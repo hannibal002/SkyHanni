@@ -27,9 +27,10 @@ import com.google.gson.annotations.Expose;
 import io.github.moulberry.moulconfig.Config;
 import io.github.moulberry.moulconfig.Social;
 import io.github.moulberry.moulconfig.annotations.Category;
+import net.minecraft.util.ResourceLocation;
+
 import java.util.Arrays;
 import java.util.List;
-import net.minecraft.util.ResourceLocation;
 
 
 public class Features extends Config {

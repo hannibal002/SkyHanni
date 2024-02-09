@@ -216,7 +216,8 @@ class OverviewPage : FFGuideGUI.FFGuidePage() {
         val maxEquipmentReforgeFortune = 15.0
         val maxGreenThumbFortune = GardenAPI.totalAmountVisitorsExisting.toDouble() / 4
 
-        val maxFortunePerPiece = maxEquipmentBaseFortune + maxEquipmentAbilityFortune + maxEquipmentReforgeFortune + maxGreenThumbFortune
+        val maxFortunePerPiece =
+            maxEquipmentBaseFortune + maxEquipmentAbilityFortune + maxEquipmentReforgeFortune + maxGreenThumbFortune
 
         line = if (currentEquipment == 0) "§7§2Total fortune from all your equipment\n§2Select a piece for more info"
         else "§7§2Total fortune from your\n${equipmentItem.getItem().displayName}"

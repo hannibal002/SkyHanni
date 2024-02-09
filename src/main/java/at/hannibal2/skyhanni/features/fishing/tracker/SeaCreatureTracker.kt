@@ -34,7 +34,10 @@ object SeaCreatureTracker {
 
     private val tracker = SkyHanniTracker("Sea Creature Tracker", { Data() }, { it.fishing.seaCreatureTracker })
     { drawDisplay(it) }
-    private val trophyArmorNames by RepoPattern.pattern("fishing.trophyfishing.armor", "(BRONZE|SILVER|GOLD|DIAMOND)_HUNTER_(HELMET|CHESTPLATE|LEGGINGS|BOOTS)")
+    private val trophyArmorNames by RepoPattern.pattern(
+        "fishing.trophyfishing.armor",
+        "(BRONZE|SILVER|GOLD|DIAMOND)_HUNTER_(HELMET|CHESTPLATE|LEGGINGS|BOOTS)"
+    )
     private var lastArmorCheck = SimpleTimeMark.farPast()
     private var isTrophyFishing = false
 

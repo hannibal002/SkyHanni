@@ -59,7 +59,8 @@ class SeaCreatureFeatures {
 
             if (config.alertOtherCatches && lastRareCatch.passedSince() > 1.seconds) {
                 val creature = SeaCreatureManager.allFishingMobs[creatureType.nametag]
-                LorenzUtils.sendTitle("${creature?.rarity?.chatColorCode ?: "§6"}RARE SEA CREATURE!", 1.5.seconds, 3.6, 7f)
+                val text = "${creature?.rarity?.chatColorCode ?: "§6"}RARE SEA CREATURE!"
+                LorenzUtils.sendTitle(text, 1.5.seconds, 3.6, 7f)
                 if (config.playSound) SoundUtils.playBeepSound()
             }
         }
