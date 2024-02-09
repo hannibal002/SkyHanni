@@ -121,7 +121,6 @@ public class VisitorConfig {
     @FeatureToggle
     public boolean highlightVisitors = false;
 
-
     @Expose
     @ConfigOption(
         name = "Block Interacting with Visitors",

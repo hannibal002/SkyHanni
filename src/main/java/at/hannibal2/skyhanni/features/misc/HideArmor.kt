@@ -17,6 +17,7 @@ import net.minecraftforge.client.event.RenderLivingEvent
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
 class HideArmor {
+
     private val config get() = SkyHanniMod.feature.misc.hideArmor2
     private var armor = mapOf<Int, ItemStack>()
 

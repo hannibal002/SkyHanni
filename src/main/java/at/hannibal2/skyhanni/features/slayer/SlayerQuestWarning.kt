@@ -7,6 +7,7 @@ import at.hannibal2.skyhanni.events.EntityHealthUpdateEvent
 import at.hannibal2.skyhanni.events.LorenzChatEvent
 import at.hannibal2.skyhanni.events.LorenzTickEvent
 import at.hannibal2.skyhanni.events.LorenzWorldChangeEvent
+import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.LocationUtils.distanceToPlayer
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
@@ -17,6 +18,7 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import kotlin.time.Duration.Companion.seconds
 
 class SlayerQuestWarning {
+
     private val config get() = SkyHanniMod.feature.slayer
     private val talkToMaddoxPattern = " {3}§r§5§l» §r§7Talk to Maddox to claim your (.+) Slayer XP!".toPattern()
     private var needSlayerQuest = false
@@ -25,15 +27,15 @@ class SlayerQuestWarning {
     private var dirtySidebar = false
     private var hasAutoSlayer = false
 
-    //TODO add check if player has clicked on an item, before mobs around you gets damage
+    // TODO add check if player has clicked on an item, before mobs around you gets damage
 
     @SubscribeEvent
-    fun onChatMessage(event: LorenzChatEvent) {
+    fun onChat(event: LorenzChatEvent) {
         if (!(LorenzUtils.inSkyBlock)) return
 
         val message = event.message
 
-        //died
+        // died
         if (message == "  §r§c§lSLAYER QUEST FAILED!") {
             needNewQuest("The old slayer quest has failed!")
         }
@@ -43,7 +45,7 @@ class SlayerQuestWarning {
             dirtySidebar = true
         }
 
-        //no auto slayer
+        // no auto slayer
         talkToMaddoxPattern.matchMatcher(message) {
             needNewQuest("You have no Auto-Slayer active!")
         }
@@ -55,7 +57,7 @@ class SlayerQuestWarning {
             needSlayerQuest = false
         }
 
-        //TODO auto slayer disabled bc of no more money in bank or purse
+        // TODO auto slayer disabled bc of no more money in bank or purse
     }
 
     private fun needNewQuest(reason: String) {
@@ -132,7 +134,7 @@ class SlayerQuestWarning {
         if (lastWarning + 10_000 > System.currentTimeMillis()) return
 
         lastWarning = System.currentTimeMillis()
-        LorenzUtils.chat(chatMessage)
+        ChatUtils.chat(chatMessage)
 
         if (config.questWarningTitle) {
             LorenzUtils.sendTitle("§e$titleMessage", 2.seconds)
@@ -168,5 +170,4 @@ class SlayerQuestWarning {
 
         return slayerType.clazz.isInstance(entity)
     }
-
 }

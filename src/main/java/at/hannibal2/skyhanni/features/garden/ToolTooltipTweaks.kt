@@ -20,6 +20,7 @@ import java.text.DecimalFormat
 import kotlin.math.roundToInt
 
 class ToolTooltipTweaks {
+
     private val config get() = GardenAPI.config.tooltipTweak
     private val tooltipFortunePattern =
         "^§5§o§7Farming Fortune: §a\\+([\\d.]+)(?: §2\\(\\+\\d\\))?(?: §9\\(\\+(\\d+)\\))?$".toRegex()
@@ -74,7 +75,6 @@ class ToolTooltipTweaks {
                 val greenThumbFortune = FarmingFortuneDisplay.greenThumbFortune
 
                 val totalFortune = displayedFortune + hiddenFortune
-
 
                 val ffdString = if (ffdFortune != 0) " §2(+${ffdFortune.formatStat()})" else ""
                 val reforgeString = if (reforgeFortune != 0.0) " §9(+${reforgeFortune.formatStat()})" else ""

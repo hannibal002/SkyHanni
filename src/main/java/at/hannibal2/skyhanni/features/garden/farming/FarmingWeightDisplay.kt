@@ -14,6 +14,7 @@ import at.hannibal2.skyhanni.features.garden.CropType
 import at.hannibal2.skyhanni.features.garden.GardenAPI
 import at.hannibal2.skyhanni.features.garden.farming.GardenCropSpeed.getSpeed
 import at.hannibal2.skyhanni.utils.APIUtil
+import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.OSUtils
@@ -92,6 +93,7 @@ class FarmingWeightDisplay {
     }
 
     companion object {
+
         private val config get() = GardenAPI.config.eliteFarmingWeights
         private val localCounter = mutableMapOf<CropType, Long>()
         private var dispatcher = Dispatchers.IO
@@ -226,8 +228,8 @@ class FarmingWeightDisplay {
             // Check that the provided string is valid
             val parsed = value.toIntOrNull() ?: 0
             if (parsed < 1 || parsed > goal) {
-                LorenzUtils.error("Invalid Farming Weight Overtake Goal!")
-                LorenzUtils.chat(
+                ChatUtils.error("Invalid Farming Weight Overtake Goal!")
+                ChatUtils.chat(
                     "§eEdit the Overtake Goal config value with a valid number [1-10000] to use this feature!",
                     false
                 )
@@ -327,7 +329,7 @@ class FarmingWeightDisplay {
         }
 
         private fun farmingChatMessage(message: String) {
-            LorenzUtils.hoverableChat(
+            ChatUtils.hoverableChat(
                 message,
                 listOf(
                     "§eClick to open your Farming Weight",
@@ -402,8 +404,8 @@ class FarmingWeightDisplay {
         private fun showLbChange(direction: String, oldPosition: Int) {
             farmingChatMessage(
                 "§7Since your last visit to the §aGarden§7, " +
-                        "you have $direction §7on the §dFarming Leaderboard§7. " +
-                        "§7(§e#${oldPosition.addSeparators()} §7-> §e#${leaderboardPosition.addSeparators()}§7)"
+                    "you have $direction §7on the §dFarming Leaderboard§7. " +
+                    "§7(§e#${oldPosition.addSeparators()} §7-> §e#${leaderboardPosition.addSeparators()}§7)"
             )
         }
 
@@ -478,10 +480,10 @@ class FarmingWeightDisplay {
 
         private fun error() {
             apiError = true
-            LorenzUtils.error(
+            ChatUtils.error(
                 "Loading the farming weight data from elitebot.dev failed!\n"
-                        + "§eYou can re-enter the garden to try to fix the problem.\n" +
-                        "§cIf this message repeats, please report it on Discord!",
+                    + "§eYou can re-enter the garden to try to fix the problem.\n" +
+                    "§cIf this message repeats, please report it on Discord!",
             )
         }
 
@@ -529,7 +531,7 @@ class FarmingWeightDisplay {
             lastName = name
 
             OSUtils.openBrowser("https://elitebot.dev/@$name/")
-            LorenzUtils.chat("Opening Farming Profile of player §b$name")
+            ChatUtils.chat("Opening Farming Profile of player §b$name")
         }
 
         private val factorPerCrop = mutableMapOf<CropType, Double>()

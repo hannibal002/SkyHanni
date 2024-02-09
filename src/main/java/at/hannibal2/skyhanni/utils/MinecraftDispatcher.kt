@@ -5,6 +5,7 @@ import net.minecraft.client.Minecraft
 import kotlin.coroutines.CoroutineContext
 
 object MinecraftDispatcher : MainCoroutineDispatcher() {
+
     override val immediate: MainCoroutineDispatcher
         get() = this
 

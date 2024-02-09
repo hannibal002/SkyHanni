@@ -6,10 +6,10 @@ import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.events.LorenzRenderWorldEvent
 import at.hannibal2.skyhanni.events.LorenzTickEvent
 import at.hannibal2.skyhanni.events.LorenzWorldChangeEvent
+import at.hannibal2.skyhanni.utils.CollectionUtils.editCopy
+import at.hannibal2.skyhanni.utils.ColorUtils.toChromaColor
 import at.hannibal2.skyhanni.utils.LocationUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils
-import at.hannibal2.skyhanni.utils.LorenzUtils.editCopy
-import at.hannibal2.skyhanni.utils.LorenzUtils.toChromaColor
 import at.hannibal2.skyhanni.utils.LorenzVec
 import at.hannibal2.skyhanni.utils.RenderUtils.draw3DLine
 import at.hannibal2.skyhanni.utils.RenderUtils.exactLocation
@@ -21,6 +21,7 @@ import kotlin.time.Duration.Companion.milliseconds
 import kotlin.time.Duration.Companion.seconds
 
 class CosmeticFollowingLine {
+
     private val config get() = SkyHanniMod.feature.misc.cosmetic.followingLine
 
     private var locations = mapOf<LorenzVec, LocationSpot>()
@@ -49,20 +50,20 @@ class CosmeticFollowingLine {
     private fun renderFar(
         event: LorenzRenderWorldEvent,
         firstPerson: Boolean,
-        color: Color
+        color: Color,
     ) {
         val last7 = locations.keys.toList().takeLast(7)
         val last2 = locations.keys.toList().takeLast(2)
 
-        for ((a, b) in locations.keys.zipWithNext()) {
+        locations.keys.zipWithNext { a, b ->
             val locationSpot = locations[b]!!
             if (firstPerson && !locationSpot.onGround && b in last7) {
                 // Do not render the line in the face, keep more distance while the line is in the air
-                continue
+                return
             }
             if (b in last2 && locationSpot.time.passedSince() < 400.milliseconds) {
                 // Do not render the line directly next to the player, prevent laggy design
-                continue
+                return
             }
             event.draw3DLine(a, b, color, locationSpot.getWidth(), !config.behindBlocks)
         }
@@ -81,7 +82,8 @@ class CosmeticFollowingLine {
     private fun renderClose(event: LorenzRenderWorldEvent, firstPerson: Boolean, color: Color) {
         if (firstPerson && latestLocations.any { !it.value.onGround }) return
 
-        for ((a, b) in latestLocations.keys.zipWithNext()) {
+
+        latestLocations.keys.zipWithNext { a, b ->
             val locationSpot = latestLocations[b]!!
             event.draw3DLine(a, b, color, locationSpot.getWidth(), !config.behindBlocks)
         }

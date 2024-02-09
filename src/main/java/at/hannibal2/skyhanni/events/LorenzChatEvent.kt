@@ -6,5 +6,5 @@ class LorenzChatEvent(
     var message: String,
     var chatComponent: IChatComponent,
     var blockedReason: String = "",
-    var chatLineId: Int = 0
+    var chatLineId: Int = 0,
 ) : LorenzEvent()

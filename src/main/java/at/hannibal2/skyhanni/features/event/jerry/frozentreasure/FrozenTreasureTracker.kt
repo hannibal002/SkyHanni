@@ -9,9 +9,9 @@ import at.hannibal2.skyhanni.data.ScoreboardData
 import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.LorenzChatEvent
 import at.hannibal2.skyhanni.events.LorenzWorldChangeEvent
+import at.hannibal2.skyhanni.utils.CollectionUtils.addAsSingletonList
+import at.hannibal2.skyhanni.utils.CollectionUtils.addOrPut
 import at.hannibal2.skyhanni.utils.ConfigUtils
-import at.hannibal2.skyhanni.utils.LorenzUtils.addAsSingletonList
-import at.hannibal2.skyhanni.utils.LorenzUtils.addOrPut
 import at.hannibal2.skyhanni.utils.LorenzUtils.isInIsland
 import at.hannibal2.skyhanni.utils.NumberUtil
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
@@ -25,6 +25,7 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import kotlin.concurrent.fixedRateTimer
 
 object FrozenTreasureTracker {
+
     private val config get() = SkyHanniMod.feature.event.winter.frozenTreasureTracker
     private var estimatedIce = 0L
     private var lastEstimatedIce = 0L
@@ -134,7 +135,7 @@ object FrozenTreasureTracker {
         addAsSingletonList("§6${formatNumber(data.treasuresMined)} Treasures Mined")
         addAsSingletonList("§3${formatNumber(estimatedIce)} Total Ice")
         addAsSingletonList("§3${formatNumber(icePerHour)} Ice/hr")
-        addAsSingletonList("§8${formatNumber(data.treasuresMined)} Compact Procs")
+        addAsSingletonList("§8${formatNumber(data.compactProcs)} Compact Procs")
         addAsSingletonList("")
 
         for (treasure in FrozenTreasure.entries) {

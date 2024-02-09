@@ -31,7 +31,7 @@ public class MiscConfig {
     @ConfigOption(name = "Hide Armor", desc = "")
     @Accordion
     @Expose
-    // TOOD maybe we can migrate this already
+    // TODO maybe we can migrate this already
     public HideArmorConfig hideArmor2 = new HideArmorConfig();
 
     @Expose
@@ -129,6 +129,7 @@ public class MiscConfig {
     @FeatureToggle
     public boolean brewingStandOverlay = true;
 
+    // TODO move into scoreboard accordion
     @Expose
     @ConfigOption(name = "Red Scoreboard Numbers", desc = "Hide the red scoreboard numbers on the right side of the screen.")
     @ConfigEditorBoolean
@@ -140,6 +141,12 @@ public class MiscConfig {
     @ConfigEditorBoolean
     @FeatureToggle
     public boolean hidePiggyScoreboard = true;
+
+    @Expose
+    @ConfigOption(name = "Color Month Names", desc = "Color the month names in the Scoreboard.")
+    @ConfigEditorBoolean
+    @FeatureToggle
+    public boolean colorMonthNames = false;
 
     @Expose
     @ConfigOption(name = "Explosions Hider", desc = "Hide explosions.")
@@ -227,6 +234,14 @@ public class MiscConfig {
 
     @Expose
     @ConfigOption(
+        name = "Lesser Orb of Healing Hider",
+        desc = "Hides the Lesser Orb of Healing.")
+    @ConfigEditorBoolean
+    @FeatureToggle
+    public boolean lesserOrbHider = false;
+
+    @Expose
+    @ConfigOption(
         name = "Lock Mouse Message",
         desc = "Show a message in chat when toggling the /shmouselock.")
     @ConfigEditorBoolean
@@ -243,4 +258,11 @@ public class MiscConfig {
 
     @Expose
     public int limboTimePB = 0;
+
+    @Expose
+    @ConfigOption(name = "Fix Ghost Entities", desc = "Removes ghost entities caused by a Hypixel bug. " +
+        "This included Diana, Dungeon and Crimson Isle mobs and nametags.")
+    @ConfigEditorBoolean
+    @FeatureToggle
+    public boolean fixGhostEntities = true;
 }

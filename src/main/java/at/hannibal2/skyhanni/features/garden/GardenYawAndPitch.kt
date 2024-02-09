@@ -13,6 +13,7 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import kotlin.time.Duration.Companion.seconds
 
 class GardenYawAndPitch {
+
     private val config get() = GardenAPI.config.yawPitchDisplay
     private var lastChange = SimpleTimeMark.farPast()
     private var lastYaw = 0f

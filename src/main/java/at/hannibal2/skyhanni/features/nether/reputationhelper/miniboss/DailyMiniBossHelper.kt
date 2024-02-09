@@ -10,10 +10,10 @@ import at.hannibal2.skyhanni.features.nether.reputationhelper.CrimsonIsleReputat
 import at.hannibal2.skyhanni.features.nether.reputationhelper.dailyquest.quest.MiniBossQuest
 import at.hannibal2.skyhanni.features.nether.reputationhelper.dailyquest.quest.QuestState
 import at.hannibal2.skyhanni.test.GriffinUtils.drawWaypointFilled
+import at.hannibal2.skyhanni.utils.CollectionUtils.addAsSingletonList
 import at.hannibal2.skyhanni.utils.LocationUtils
 import at.hannibal2.skyhanni.utils.LorenzColor
 import at.hannibal2.skyhanni.utils.LorenzUtils
-import at.hannibal2.skyhanni.utils.LorenzUtils.addAsSingletonList
 import at.hannibal2.skyhanni.utils.LorenzUtils.isInIsland
 import at.hannibal2.skyhanni.utils.NEUItems.getItemStack
 import at.hannibal2.skyhanni.utils.RenderUtils.drawDynamicText
@@ -75,15 +75,12 @@ class DailyMiniBossHelper(private val reputationHelper: CrimsonIsleReputationHel
                 val result = if (miniBoss.doneToday) "§aDone" else "§bTodo"
                 val displayName = miniBoss.displayName
                 val displayItem = miniBoss.displayItem
-                if (displayItem == null) {
-                    display.addAsSingletonList("  $displayName: $result")
-                } else {
-                    val lineList = mutableListOf<Any>()
-                    lineList.add(" ")
-                    lineList.add(getItemStack(displayItem))
-                    lineList.add("§5$displayName§7: $result")
-                    display.add(lineList)
-                }
+
+                val lineList = mutableListOf<Any>()
+                lineList.add(" ")
+                lineList.add(displayItem.getItemStack())
+                lineList.add("§5$displayName§7: $result")
+                display.add(lineList)
             }
         }
     }
