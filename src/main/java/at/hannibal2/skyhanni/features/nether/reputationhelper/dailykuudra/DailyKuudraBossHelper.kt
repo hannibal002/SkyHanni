@@ -73,6 +73,7 @@ class DailyKuudraBossHelper(private val reputationHelper: CrimsonIsleReputationH
         display.addAsSingletonList("§7Daily Kuudra (§e$done§8/§e5 killed§7)")
         if (done < 5) {
             for (tier in kuudraTiers) {
+                if (config.hideComplete.get() && tier.doneToday) continue
                 val result = if (tier.doneToday) "§aDone" else "§bTodo"
                 val displayName = tier.getDisplayName()
                 val displayItem = tier.displayItem
@@ -80,7 +81,7 @@ class DailyKuudraBossHelper(private val reputationHelper: CrimsonIsleReputationH
                 lineList.add(" ")
                 lineList.add(displayItem.getItemStack())
                 lineList.add("$displayName: $result")
-                if (!(config.hideComplete.get() && tier.doneToday)) display.add(lineList)
+                display.add(lineList)
             }
         }
     }

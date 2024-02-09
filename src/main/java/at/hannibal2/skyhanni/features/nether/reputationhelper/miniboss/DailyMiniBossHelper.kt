@@ -74,6 +74,7 @@ class DailyMiniBossHelper(private val reputationHelper: CrimsonIsleReputationHel
         display.addAsSingletonList("§7Daily Bosses (§e$done§8/§e5 killed§7)")
         if (done != 5) {
             for (miniBoss in miniBosses) {
+                if (config.hideComplete.get() && miniBoss.doneToday) continue
                 val result = if (miniBoss.doneToday) "§aDone" else "§bTodo"
                 val displayName = miniBoss.displayName
                 val displayItem = miniBoss.displayItem
@@ -82,7 +83,7 @@ class DailyMiniBossHelper(private val reputationHelper: CrimsonIsleReputationHel
                 lineList.add(" ")
                 lineList.add(displayItem.getItemStack())
                 lineList.add("§5$displayName§7: $result")
-                if (!(config.hideComplete.get() && miniBoss.doneToday)) display.add(lineList)
+                display.add(lineList)
             }
         }
     }
