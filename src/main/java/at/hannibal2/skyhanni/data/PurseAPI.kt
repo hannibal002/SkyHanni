@@ -11,6 +11,7 @@ import net.minecraft.client.Minecraft
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
 class PurseAPI {
+
     // TODO USE SH-REPO
     private val pattern = "(Piggy|Purse): §6(?<coins>[\\d,]*).*".toPattern()
     private var currentPurse = 0.0

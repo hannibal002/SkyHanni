@@ -4,8 +4,9 @@ import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.TabListUpdateEvent
 import at.hannibal2.skyhanni.features.garden.GardenAPI
+import at.hannibal2.skyhanni.utils.ChatUtils
+import at.hannibal2.skyhanni.utils.CollectionUtils.addAsSingletonList
 import at.hannibal2.skyhanni.utils.LorenzUtils
-import at.hannibal2.skyhanni.utils.LorenzUtils.addAsSingletonList
 import at.hannibal2.skyhanni.utils.NEUItems
 import at.hannibal2.skyhanni.utils.RenderUtils.renderStringsAndItems
 import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
@@ -17,6 +18,7 @@ import kotlin.time.Duration
 import kotlin.time.Duration.Companion.seconds
 
 class ComposterDisplay {
+
     private val config get() = GardenAPI.config.composters
     private val storage get() = GardenAPI.storage
     private var display = emptyList<List<Any>>()
@@ -120,7 +122,7 @@ class ComposterDisplay {
             if (config.notifyLow.title) {
                 LorenzUtils.sendTitle("§cYour Organic Matter is low", 4.seconds)
             }
-            LorenzUtils.chat("§cYour Organic Matter is low!")
+            ChatUtils.chat("§cYour Organic Matter is low!")
             storage.informedAboutLowMatter = System.currentTimeMillis() + 60_000 * 5
         }
 
@@ -130,7 +132,7 @@ class ComposterDisplay {
             if (config.notifyLow.title) {
                 LorenzUtils.sendTitle("§cYour Fuel is low", 4.seconds)
             }
-            LorenzUtils.chat("§cYour Fuel is low!")
+            ChatUtils.chat("§cYour Fuel is low!")
             storage.informedAboutLowFuel = System.currentTimeMillis() + 60_000 * 5
         }
     }
@@ -177,7 +179,7 @@ class ComposterDisplay {
 
         if (System.currentTimeMillis() < storage.lastComposterEmptyWarningTime + 1000 * 60 * 2) return
         storage.lastComposterEmptyWarningTime = System.currentTimeMillis()
-        LorenzUtils.chat(warningMessage)
+        ChatUtils.chat(warningMessage)
         LorenzUtils.sendTitle("§eComposter Warning!", 3.seconds)
     }
 

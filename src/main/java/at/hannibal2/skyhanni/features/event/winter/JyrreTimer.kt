@@ -19,6 +19,7 @@ import kotlin.time.Duration.Companion.minutes
 import kotlin.time.Duration.Companion.seconds
 
 class JyrreTimer {
+
     private val config get() = SkyHanniMod.feature.event.winter.jyrreTimer
     private val drankBottlePattern by RepoPattern.pattern(
         "event.winter.drank.jyrre",

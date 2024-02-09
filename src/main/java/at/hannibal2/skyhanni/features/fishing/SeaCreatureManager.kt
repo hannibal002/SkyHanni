@@ -62,6 +62,7 @@ class SeaCreatureManager {
     }
 
     companion object {
+
         private val seaCreatureMap = mutableMapOf<String, SeaCreature>()
         var allFishingMobs = mapOf<String, SeaCreature>()
         var allVariants = mapOf<String, List<String>>()

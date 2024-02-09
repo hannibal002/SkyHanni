@@ -3,6 +3,7 @@ package at.hannibal2.skyhanni.features.garden.farming
 import at.hannibal2.skyhanni.events.GuiContainerEvent
 import at.hannibal2.skyhanni.events.OwnInventoryItemUpdateEvent
 import at.hannibal2.skyhanni.features.garden.GardenAPI
+import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.ItemBlink
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName
 import at.hannibal2.skyhanni.utils.ItemUtils.name
@@ -13,6 +14,7 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import kotlin.time.Duration.Companion.seconds
 
 class WildStrawberryDyeNotification {
+
     private var lastCloseTime = 0L
 
     val item by lazy { "DYE_WILD_STRAWBERRY".asInternalName() }
@@ -37,7 +39,7 @@ class WildStrawberryDyeNotification {
         if (internalName == item) {
             val name = itemStack.name!!
             LorenzUtils.sendTitle(name, 5.seconds)
-            LorenzUtils.chat("You found a $name§e!")
+            ChatUtils.chat("You found a $name§e!")
             SoundUtils.playBeepSound()
             ItemBlink.setBlink(itemStack, 5_000)
         }

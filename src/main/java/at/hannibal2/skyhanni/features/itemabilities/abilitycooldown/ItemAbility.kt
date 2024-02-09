@@ -18,7 +18,7 @@ enum class ItemAbility(
     val actionBarDetection: Boolean = true,
     private val ignoreMageCooldownReduction: Boolean = false,
 ) {
-    //TODO add into repo
+    // TODO add into repo
 
     HYPERION(5, "SCYLLA", "VALKYRIE", "ASTRAEA", ignoreMageCooldownReduction = true),
     GYROKINETIC_WAND_LEFT(30, "GYROKINETIC_WAND", alternativePosition = true),
@@ -115,6 +115,7 @@ enum class ItemAbility(
     }
 
     companion object {
+
         fun getByInternalName(internalName: NEUInternalName): ItemAbility? {
             return entries.firstOrNull { it.newVariant && internalName in it.internalNames }
         }
@@ -141,5 +142,4 @@ enum class ItemAbility(
             return abilityCooldownMultiplier
         }
     }
-
 }
