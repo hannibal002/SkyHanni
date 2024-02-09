@@ -48,14 +48,17 @@ object SensitivityReducer {
                 if (isToggled) toggle(false)
                 return
             }
+
             SensitivityReducerConfig.Mode.TOOL -> {
                 if (isHoldingTool() && !isToggled) toggle(true)
                 else if (isToggled && !isHoldingTool()) toggle(false)
             }
+
             SensitivityReducerConfig.Mode.KEYBIND -> {
                 if (config.keybind.isKeyHeld() && !isToggled) toggle(true)
                 else if (isToggled && !config.keybind.isKeyHeld()) toggle(false)
             }
+
             else -> return
         }
     }

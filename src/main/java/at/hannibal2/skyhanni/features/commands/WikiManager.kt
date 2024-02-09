@@ -79,7 +79,7 @@ object WikiManager {
 
     fun otherWikiCommands(args: Array<String>, useFandom: Boolean, wikithis: Boolean = false) {
         if (wikithis && !LorenzUtils.inSkyBlock) {
-            LorenzUtils.chat("§cYou must be in SkyBlock to do this!")
+            ChatUtils.chat("§cYou must be in SkyBlock to do this!")
             return
         }
 
@@ -88,7 +88,7 @@ object WikiManager {
 
         if (wikithis) {
             val itemInHand = InventoryUtils.getItemInHand() ?: run {
-                LorenzUtils.chat("§cYou must be holding an item to use this command!")
+                ChatUtils.chat("§cYou must be holding an item to use this command!")
                 return
             }
             wikiTheItem(itemInHand, false, useFandom = useFandom)
