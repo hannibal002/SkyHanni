@@ -6,6 +6,7 @@ import at.hannibal2.skyhanni.config.features.garden.pests.PestSpawnConfig.ChatMe
 import at.hannibal2.skyhanni.events.LorenzChatEvent
 import at.hannibal2.skyhanni.events.garden.pests.PestSpawnEvent
 import at.hannibal2.skyhanni.features.garden.GardenAPI
+import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.ConfigUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.StringUtils
@@ -14,6 +15,7 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import kotlin.time.Duration.Companion.seconds
 
 class PestSpawn {
+
     private val config get() = PestAPI.config.pestSpawn
 
     private val patternOnePest = "§6§l.*! §7A §6Pest §7has appeared in §aPlot §7- §b(?<plot>.*)§7!".toPattern()
@@ -55,7 +57,7 @@ class PestSpawn {
         }
 
         if (config.chatMessageFormat == PestSpawnConfig.ChatMessageFormatEntry.COMPACT) {
-            LorenzUtils.clickableChat(message, "tptoplot $plotName")
+            ChatUtils.clickableChat(message, "tptoplot $plotName")
         }
     }
 

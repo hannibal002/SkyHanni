@@ -7,6 +7,7 @@ import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
 object GardenVisitorColorNames {
+
     private var visitorColours = mutableMapOf<String, String>() // name -> color code
     var visitorItems = mutableMapOf<String, List<String>>()
 

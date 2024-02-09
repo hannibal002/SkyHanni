@@ -8,6 +8,7 @@ import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
 class ArachneChatMessageHider {
+
     private val config get() = SkyHanniMod.feature.chat
     private var hideArachneDeadMessage = false
 
