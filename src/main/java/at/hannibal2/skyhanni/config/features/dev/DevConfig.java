@@ -30,9 +30,19 @@ public class DevConfig {
     public DebugConfig debug = new DebugConfig();
 
     @Expose
+    @ConfigOption(name = "Repo Pattern", desc = "")
+    @Accordion
+    public RepoPatternConfig repoPattern = new RepoPatternConfig();
+
+    @Expose
     @ConfigOption(name = "Slot Number", desc = "Show slot number in inventory while pressing this key.")
     @ConfigEditorKeybind(defaultKey = Keyboard.KEY_NONE)
     public int showSlotNumberKey = Keyboard.KEY_NONE;
+
+    @Expose
+    @ConfigOption(name = "World Edit", desc = "Use wood axe or command /shworldedit to render a box, similar like the WorldEdit plugin.")
+    @ConfigEditorBoolean
+    public boolean worldEdit = false;
 
     @ConfigOption(name = "Parkour Waypoints", desc = "")
     @Accordion

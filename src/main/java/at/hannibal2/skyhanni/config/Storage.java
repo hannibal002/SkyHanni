@@ -1,23 +1,28 @@
 package at.hannibal2.skyhanni.config;
 
 import at.hannibal2.skyhanni.data.model.ComposterUpgrade;
+import at.hannibal2.skyhanni.features.bingo.card.goals.BingoGoal;
 import at.hannibal2.skyhanni.features.combat.endernodetracker.EnderNodeTracker;
 import at.hannibal2.skyhanni.features.combat.ghostcounter.GhostData;
 import at.hannibal2.skyhanni.features.dungeon.DungeonAPI;
+import at.hannibal2.skyhanni.features.event.diana.DianaProfitTracker;
+import at.hannibal2.skyhanni.features.event.diana.MythologicalCreatureTracker;
 import at.hannibal2.skyhanni.features.event.jerry.frozentreasure.FrozenTreasureTracker;
 import at.hannibal2.skyhanni.features.fishing.tracker.FishingProfitTracker;
+import at.hannibal2.skyhanni.features.fishing.tracker.SeaCreatureTracker;
 import at.hannibal2.skyhanni.features.fishing.trophy.TrophyRarity;
 import at.hannibal2.skyhanni.features.garden.CropAccessory;
 import at.hannibal2.skyhanni.features.garden.CropType;
 import at.hannibal2.skyhanni.features.garden.GardenPlotAPI;
 import at.hannibal2.skyhanni.features.garden.farming.ArmorDropTracker;
-import at.hannibal2.skyhanni.features.garden.farming.DicerDropTracker;
+import at.hannibal2.skyhanni.features.garden.farming.DicerRngDropTracker;
 import at.hannibal2.skyhanni.features.garden.fortuneguide.FarmingItems;
 import at.hannibal2.skyhanni.features.garden.visitor.VisitorReward;
 import at.hannibal2.skyhanni.features.mining.powdertracker.PowderTracker;
 import at.hannibal2.skyhanni.features.misc.trevor.TrevorTracker;
 import at.hannibal2.skyhanni.features.misc.visualwords.VisualWord;
-import at.hannibal2.skyhanni.features.rift.area.westvillage.KloonTerminal;
+import at.hannibal2.skyhanni.features.rift.area.westvillage.VerminTracker;
+import at.hannibal2.skyhanni.features.rift.area.westvillage.kloon.KloonTerminal;
 import at.hannibal2.skyhanni.features.slayer.SlayerProfitTracker;
 import at.hannibal2.skyhanni.utils.LorenzVec;
 import at.hannibal2.skyhanni.utils.NEUInternalName;
@@ -39,7 +44,10 @@ public class Storage {
     public boolean hasPlayedBefore = false;
 
     @Expose
-    public Float savedMouseSensitivity = .5f;
+    public Float savedMouselockedSensitivity = .5f;
+
+    @Expose
+    public Float savedMouseloweredSensitivity = .5f;
 
     @Deprecated
     @Expose
@@ -90,8 +98,22 @@ public class Storage {
 
             @Expose
             public int amountGifted = 0;
+
+            @Expose
+            public int cakeCollectedYear = 0;
         }
 
+        @Expose
+        public Map<Long, BingoSession> bingoSessions = new HashMap<>();
+
+        public static class BingoSession {
+
+            @Expose
+            public List<NEUInternalName> tierOneMinionsDone = new ArrayList<>();
+
+            @Expose
+            public Map<Integer, BingoGoal> goals = new HashMap<>();
+        }
     }
 
     public static class ProfileSpecific {
@@ -164,7 +186,7 @@ public class Storage {
             public CropAccessory savedCropAccessory = null;
 
             @Expose
-            public DicerDropTracker.Data dicerDropTracker = new DicerDropTracker.Data();
+            public DicerRngDropTracker.Data dicerDropTracker = new DicerRngDropTracker.Data();
 
             @Expose
             public long informedAboutLowMatter = 0;
@@ -188,10 +210,10 @@ public class Storage {
             public Map<CropType, Boolean> toolWithBountiful = new HashMap<>();
 
             @Expose
-            public String composterCurrentOrganicMatterItem = "";
+            public NEUInternalName composterCurrentOrganicMatterItem = NEUInternalName.Companion.getNONE();
 
             @Expose
-            public String composterCurrentFuelItem = "";
+            public NEUInternalName composterCurrentFuelItem = NEUInternalName.Companion.getNONE();
 
             @Expose
             public int uniqueVisitors = 0;
@@ -295,6 +317,9 @@ public class Storage {
                 @Expose
                 public int lastFarmingWeightLeaderboard = -1;
             }
+
+            @Expose
+            public Map<String, LorenzVec> npcVisitorLocations = new HashMap<>();
         }
 
         @Expose
@@ -341,6 +366,9 @@ public class Storage {
 
             @Expose
             public List<KloonTerminal> completedKloonTerminals = new ArrayList<>();
+
+            @Expose
+            public VerminTracker.Data verminTracker = new VerminTracker.Data();
 
         }
 
@@ -421,6 +449,24 @@ public class Storage {
 
             @Expose
             public FishingProfitTracker.Data fishingProfitTracker = new FishingProfitTracker.Data();
+
+            @Expose
+            public SeaCreatureTracker.Data seaCreatureTracker = new SeaCreatureTracker.Data();
+
+        }
+
+        @Expose
+        public DianaStorage diana = new DianaStorage();
+
+        public static class DianaStorage {
+
+            @Expose
+            // TODO rename to 'profitTracker'
+            public DianaProfitTracker.Data dianaProfitTracker = new DianaProfitTracker.Data();
+
+            @Expose
+            // TODO renmae
+            public MythologicalCreatureTracker.Data mythologicalMobTracker = new MythologicalCreatureTracker.Data();
 
         }
     }

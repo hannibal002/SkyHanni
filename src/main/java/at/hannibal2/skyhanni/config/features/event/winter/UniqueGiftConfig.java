@@ -9,7 +9,7 @@ import io.github.moulberry.moulconfig.annotations.ConfigOption;
 public class UniqueGiftConfig {
     @Expose
     @ConfigOption(name = "Enabled", desc = "Show in a display how many unique players you have given gifts to in the winter 2023 event." +
-        "Open §e/opengenerowmenu §7to sync up!")
+        " Open §e/opengenerowmenu §7to sync up!")
     @ConfigEditorBoolean
     @FeatureToggle
     public boolean enabled = true;

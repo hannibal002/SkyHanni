@@ -35,6 +35,7 @@ import org.lwjgl.input.Mouse
 import java.io.IOException
 
 class GuiPositionEditor(private val positions: List<Position>, private val border: Int) : GuiScreen() {
+
     private var grabbedX = 0
     private var grabbedY = 0
     private var clickedPos = -1
@@ -42,6 +43,9 @@ class GuiPositionEditor(private val positions: List<Position>, private val borde
     override fun onGuiClosed() {
         super.onGuiClosed()
         clickedPos = -1
+        for (position in positions) {
+            position.clicked = false
+        }
         OtherInventoryData.close()
     }
 

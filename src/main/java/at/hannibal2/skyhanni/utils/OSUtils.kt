@@ -17,7 +17,7 @@ object OSUtils {
             }
         } else {
             copyToClipboard(url)
-            LorenzUtils.error("Web browser is not supported! Copied url to clipboard.")
+            ChatUtils.error("Web browser is not supported! Copied url to clipboard.")
         }
     }
 

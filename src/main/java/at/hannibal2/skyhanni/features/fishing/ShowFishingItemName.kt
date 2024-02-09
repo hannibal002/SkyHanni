@@ -13,17 +13,16 @@ import at.hannibal2.skyhanni.utils.LorenzVec
 import at.hannibal2.skyhanni.utils.RenderUtils.drawString
 import at.hannibal2.skyhanni.utils.RenderUtils.exactLocation
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
-import com.google.common.cache.CacheBuilder
+import at.hannibal2.skyhanni.utils.TimeLimitedCache
 import net.minecraft.entity.item.EntityItem
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
-import java.util.concurrent.TimeUnit
+import kotlin.time.Duration.Companion.milliseconds
 
 class ShowFishingItemName {
+
     private val config get() = SkyHanniMod.feature.fishing.fishedItemName
     private var hasRodInHand = false
-    private var cache =
-        CacheBuilder.newBuilder().expireAfterWrite(750, TimeUnit.MILLISECONDS)
-            .build<EntityItem, Pair<LorenzVec, String>>()
+    private var cache = TimeLimitedCache<EntityItem, Pair<LorenzVec, String>>(750.milliseconds)
 
     // Taken from Skytils
     private val cheapCoins = setOf(
@@ -47,7 +46,7 @@ class ShowFishingItemName {
         if (!isEnabled()) return
         if (hasRodInHand) {
             for (entityItem in EntityUtils.getEntities<EntityItem>()) {
-                val location = event.exactLocation(entityItem).add(0.0, 0.8, 0.0)
+                val location = event.exactLocation(entityItem).add(y = 0.8)
                 if (location.distance(LocationUtils.playerLocation()) > 15) continue
                 val itemStack = entityItem.entityItem
                 var name = itemStack.name ?: continue
@@ -77,11 +76,10 @@ class ShowFishingItemName {
             }
         }
 
-        for ((location, text) in cache.asMap().values) {
+        for ((location, text) in cache.values()) {
             event.drawString(location, text)
         }
     }
 
     fun isEnabled() = LorenzUtils.inSkyBlock && config.enabled
-
 }

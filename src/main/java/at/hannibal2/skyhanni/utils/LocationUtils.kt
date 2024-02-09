@@ -24,7 +24,7 @@ object LocationUtils {
     fun playerEyeLocation(): LorenzVec {
         val player = Minecraft.getMinecraft().thePlayer
         val vec = player.getLorenzVec()
-        return vec.add(0.0, 0.0 + player.getEyeHeight(), 0.0)
+        return vec.add(y = player.getEyeHeight().toDouble())
     }
 
     fun AxisAlignedBB.isInside(vec: LorenzVec) = isVecInside(vec.toVec3())

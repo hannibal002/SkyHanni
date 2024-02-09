@@ -7,8 +7,8 @@ import at.hannibal2.skyhanni.events.LorenzWorldChangeEvent
 import at.hannibal2.skyhanni.events.RenderMobColoredEvent
 import at.hannibal2.skyhanni.events.ResetEntityHurtEvent
 import at.hannibal2.skyhanni.events.withAlpha
+import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.EntityUtils
-import at.hannibal2.skyhanni.utils.LorenzColor
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import net.minecraft.client.Minecraft
 import net.minecraft.client.entity.EntityOtherPlayerMP
@@ -19,12 +19,13 @@ class MarkedPlayerManager {
     private val config get() = SkyHanniMod.feature.markedPlayers
 
     companion object {
+
         val playerNamesToMark = mutableListOf<String>()
         private val markedPlayers = mutableMapOf<String, EntityOtherPlayerMP>()
 
         fun command(args: Array<String>) {
             if (args.size != 1) {
-                LorenzUtils.userError("Usage: /shmarkplayer <name>")
+                ChatUtils.userError("Usage: /shmarkplayer <name>")
                 return
             }
 
@@ -33,18 +34,18 @@ class MarkedPlayerManager {
 
 
             if (name == LorenzUtils.getPlayerName().lowercase()) {
-                LorenzUtils.userError("You can't add or remove yourself this way! Go to the settings and toggle 'Mark your own name'.")
+                ChatUtils.userError("You can't add or remove yourself this way! Go to the settings and toggle 'Mark your own name'.")
                 return
             }
 
             if (name !in playerNamesToMark) {
                 playerNamesToMark.add(name)
                 findPlayers()
-                LorenzUtils.chat("§aMarked §eplayer §b$displayName§e!")
+                ChatUtils.chat("§aMarked §eplayer §b$displayName§e!")
             } else {
                 playerNamesToMark.remove(name)
                 markedPlayers.remove(name)
-                LorenzUtils.chat("§cUnmarked §eplayer §b$displayName§e!")
+                ChatUtils.chat("§cUnmarked §eplayer §b$displayName§e!")
             }
         }
 
@@ -60,9 +61,7 @@ class MarkedPlayerManager {
         }
 
         fun isMarkedPlayer(player: String): Boolean = player.lowercase() in playerNamesToMark
-
     }
-
 
     @SubscribeEvent
     fun onConfigLoad(event: ConfigLoadEvent) {
@@ -93,7 +92,7 @@ class MarkedPlayerManager {
 
         val entity = event.entity
         if (entity in markedPlayers.values) {
-            event.color = LorenzColor.YELLOW.toColor().withAlpha(127)
+            event.color = config.entityColor.toColor().withAlpha(127)
         }
     }
 

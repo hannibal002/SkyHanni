@@ -5,10 +5,10 @@ import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.events.LorenzRenderWorldEvent
 import at.hannibal2.skyhanni.events.LorenzTickEvent
 import at.hannibal2.skyhanni.events.LorenzWorldChangeEvent
+import at.hannibal2.skyhanni.utils.CollectionUtils.editCopy
+import at.hannibal2.skyhanni.utils.ColorUtils.toChromaColor
 import at.hannibal2.skyhanni.utils.LocationUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils
-import at.hannibal2.skyhanni.utils.LorenzUtils.editCopy
-import at.hannibal2.skyhanni.utils.LorenzUtils.toChromaColor
 import at.hannibal2.skyhanni.utils.LorenzVec
 import at.hannibal2.skyhanni.utils.RenderUtils.draw3DLine
 import at.hannibal2.skyhanni.utils.RenderUtils.exactLocation
@@ -20,6 +20,7 @@ import kotlin.time.Duration.Companion.milliseconds
 import kotlin.time.Duration.Companion.seconds
 
 class CosmeticFollowingLine {
+
     private val config get() = SkyHanniMod.feature.misc.cosmetic.followingLine
 
     private var locations = mapOf<LorenzVec, LocationSpot>()
@@ -49,27 +50,27 @@ class CosmeticFollowingLine {
     private fun renderFar(
         event: LorenzRenderWorldEvent,
         firstPerson: Boolean,
-        color: Color
+        color: Color,
     ) {
         val last7 = locations.keys.toList().takeLast(7)
         val last2 = locations.keys.toList().takeLast(2)
 
-        for ((a, b) in locations.keys.zipWithNext()) {
+        locations.keys.zipWithNext { a, b ->
             val locationSpot = locations[b]!!
             if (firstPerson && !locationSpot.onGround && b in last7) {
                 // Do not render the line in the face, keep more distance while the line is in the air
-                continue
+                return
             }
             if (b in last2 && locationSpot.time.passedSince() < 400.milliseconds) {
                 // Do not render the line directly next to the player, prevent laggy design
-                continue
+                return
             }
             event.draw3DLine(a, b, color, locationSpot.getWidth(), !config.behindBlocks)
         }
     }
 
     private fun updateClose(event: LorenzRenderWorldEvent) {
-        val playerLocation = event.exactLocation(Minecraft.getMinecraft().thePlayer).add(0.0, 0.3, 0.0)
+        val playerLocation = event.exactLocation(Minecraft.getMinecraft().thePlayer).add(y = 0.3)
 
         latestLocations = latestLocations.editCopy {
             val locationSpot = LocationSpot(SimpleTimeMark.now(), Minecraft.getMinecraft().thePlayer.onGround)
@@ -81,7 +82,8 @@ class CosmeticFollowingLine {
     private fun renderClose(event: LorenzRenderWorldEvent, firstPerson: Boolean, color: Color) {
         if (firstPerson && latestLocations.any { !it.value.onGround }) return
 
-        for ((a, b) in latestLocations.keys.zipWithNext()) {
+
+        latestLocations.keys.zipWithNext { a, b ->
             val locationSpot = latestLocations[b]!!
             event.draw3DLine(a, b, color, locationSpot.getWidth(), !config.behindBlocks)
         }
@@ -110,7 +112,7 @@ class CosmeticFollowingLine {
         }
 
         if (event.isMod(2)) {
-            val playerLocation = LocationUtils.playerLocation().add(0.0, 0.3, 0.0)
+            val playerLocation = LocationUtils.playerLocation().add(y = 0.3)
 
             locations.keys.lastOrNull()?.let {
                 if (it.distance(playerLocation) < 0.1) return

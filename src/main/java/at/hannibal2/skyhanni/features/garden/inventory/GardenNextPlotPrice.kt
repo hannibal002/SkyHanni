@@ -1,19 +1,19 @@
 package at.hannibal2.skyhanni.features.garden.inventory
 
+import at.hannibal2.skyhanni.events.LorenzToolTipEvent
 import at.hannibal2.skyhanni.features.garden.GardenAPI
+import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.ItemUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.name
-import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.NEUItems
 import at.hannibal2.skyhanni.utils.NumberUtil
-import net.minecraftforge.event.entity.player.ItemTooltipEvent
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
 class GardenNextPlotPrice {
 
     @SubscribeEvent
-    fun onTooltip(event: ItemTooltipEvent) {
+    fun onTooltip(event: LorenzToolTipEvent) {
         if (!GardenAPI.inGarden()) return
         if (!GardenAPI.config.plotPrice) return
 
@@ -25,9 +25,8 @@ class GardenNextPlotPrice {
         var next = false
         val list = event.toolTip
         var i = -1
-        for (l in list) {
+        for (line in event.toolTipRemovedPrefix()) {
             i++
-            val line = l.substring(4)
             if (line.contains("Cost")) {
                 next = true
                 continue
@@ -42,7 +41,7 @@ class GardenNextPlotPrice {
                     val format = NumberUtil.format(price)
                     list[i] = list[i] + " §7(§6$format§7)"
                 } ?: {
-                    LorenzUtils.error("Could not read item '$line'")
+                    ChatUtils.error("Could not read item '$line'")
                 }
                 break
             }

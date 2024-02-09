@@ -9,8 +9,10 @@ import at.hannibal2.skyhanni.events.LorenzChatEvent
 import at.hannibal2.skyhanni.events.LorenzWorldChangeEvent
 import at.hannibal2.skyhanni.events.PlaySoundEvent
 import at.hannibal2.skyhanni.events.ReceiveParticleEvent
+import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils
-import at.hannibal2.skyhanni.utils.StringUtils.matchRegex
+import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
+import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraft.client.Minecraft
 import net.minecraft.client.entity.EntityOtherPlayerMP
 import net.minecraft.entity.item.EntityArmorStand
@@ -20,19 +22,23 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 class DungeonCleanEnd {
 
     private val config get() = SkyHanniMod.feature.dungeon.cleanEnd
+    private val catacombsPattern by RepoPattern.pattern(
+        "dungeon.end.chests.spawned",
+        "(?:§f)?( *)§r§c(The|Master Mode) Catacombs §r§8- §r§eFloor (.*)"
+    )
 
     private var bossDone = false
     private var chestsSpawned = false
     private var lastBossId: Int = -1
 
     @SubscribeEvent
-    fun onChatMessage(event: LorenzChatEvent) {
+    fun onChat(event: LorenzChatEvent) {
         if (!LorenzUtils.inDungeons) return
         if (!config.enabled) return
 
         val message = event.message
 
-        if (message.matchRegex("([ ]*)§r§c(The|Master Mode) Catacombs §r§8- §r§eFloor (.*)")) {
+        catacombsPattern.matchMatcher(message) {
             chestsSpawned = true
         }
     }
@@ -73,7 +79,7 @@ class DungeonCleanEnd {
 
         if (event.health <= 0.5) {
             val dungeonFloor = DungeonAPI.dungeonFloor
-            LorenzUtils.chat("§eFloor $dungeonFloor done!", false)
+            ChatUtils.chat("§eFloor $dungeonFloor done!", false)
             bossDone = true
         }
     }
@@ -121,5 +127,4 @@ class DungeonCleanEnd {
         event.move(3, "dungeon.cleanEndToggle", "dungeon.cleanEnd.enabled")
         event.move(3, "dungeon.cleanEndF3IgnoreGuardians", "dungeon.cleanEnd.F3IgnoreGuardians")
     }
-
 }

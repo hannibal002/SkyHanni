@@ -7,5 +7,5 @@ data class FortuneUpgrade(
     val itemQuantity: Int,
     val fortuneIncrease: Double,
     var cost: Int? = null,
-    var costPerFF: Int? = null // also the same as time to repay
+    var costPerFF: Int? = null, // also the same as time to repay
 )

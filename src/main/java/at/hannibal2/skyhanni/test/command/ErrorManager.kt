@@ -1,24 +1,24 @@
 package at.hannibal2.skyhanni.test.command
 
 import at.hannibal2.skyhanni.SkyHanniMod
+import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.KeyboardManager
-import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.OSUtils
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
-import com.google.common.cache.CacheBuilder
+import at.hannibal2.skyhanni.utils.TimeLimitedSet
 import net.minecraft.client.Minecraft
 import java.util.UUID
-import java.util.concurrent.TimeUnit
+import kotlin.time.Duration.Companion.minutes
 
 object ErrorManager {
+
     // random id -> error message
     private val errorMessages = mutableMapOf<String, String>()
     private val fullErrorMessages = mutableMapOf<String, String>()
-    private var cache =
-        CacheBuilder.newBuilder().expireAfterWrite(10, TimeUnit.MINUTES).build<Pair<String, Int>, Unit>()
+    private var cache = TimeLimitedSet<Pair<String, Int>>(10.minutes)
 
     fun resetCache() {
-        cache.asMap().clear()
+        cache.clear()
     }
 
     fun skyHanniError(message: String): Nothing {
@@ -29,19 +29,19 @@ object ErrorManager {
 
     fun command(array: Array<String>) {
         if (array.size != 1) {
-            LorenzUtils.userError("Use /shcopyerror <error id>")
+            ChatUtils.userError("Use /shcopyerror <error id>")
             return
         }
 
         val id = array[0]
-        val fullErrorMessage = KeyboardManager.isControlKeyDown()
+        val fullErrorMessage = KeyboardManager.isModifierKeyDown()
         val errorMessage = if (fullErrorMessage) {
             fullErrorMessages[id]
         } else {
             errorMessages[id]
         }
         val name = if (fullErrorMessage) "Full error" else "Error"
-        LorenzUtils.chat(errorMessage?.let {
+        ChatUtils.chat(errorMessage?.let {
             OSUtils.copyToClipboard(it)
             "$name copied into the clipboard, please report it on the SkyHanni discord!"
         } ?: "Error id not found!")
@@ -69,7 +69,7 @@ object ErrorManager {
         throwable: Throwable,
         message: String,
         ignoreErrorCache: Boolean,
-        vararg extraData: Pair<String, Any?>
+        vararg extraData: Pair<String, Any?>,
     ) {
         val error = Error(message, throwable)
         error.printStackTrace()
@@ -77,10 +77,10 @@ object ErrorManager {
 
         if (!ignoreErrorCache) {
             val pair = if (throwable.stackTrace.isNotEmpty()) {
-                throwable.stackTrace[0].let { it.fileName to it.lineNumber }
+                throwable.stackTrace[0].let { it.fileName!! to it.lineNumber }
             } else message to 0
-            if (cache.getIfPresent(pair) != null) return
-            cache.put(pair, Unit)
+            if (cache.contains(pair)) return
+            cache.add(pair)
         }
 
         val fullStackTrace = throwable.getCustomStackTrace(true).joinToString("\n")
@@ -94,7 +94,7 @@ object ErrorManager {
         fullErrorMessages[randomId] =
             "```\nSkyHanni ${SkyHanniMod.version}: $rawMessage\n(full stack trace)\n \n$fullStackTrace\n$extraDataString```"
 
-        LorenzUtils.clickableChat(
+        ChatUtils.clickableChat(
             "§c[SkyHanni-${SkyHanniMod.version}]: $message§c. Click here to copy the error into the clipboard.",
             "shcopyerror $randomId",
             false

@@ -18,6 +18,7 @@ import net.minecraftforge.fml.common.eventhandler.EventPriority
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
 class QuickCraftFeatures {
+
     private val config get() = SkyHanniMod.feature.inventory
     private val quickCraftSlots = listOf(16, 25, 34)
     private var quickCraftableItems = emptyList<String>()
@@ -32,14 +33,19 @@ class QuickCraftFeatures {
         if (!isEnabled() || !quickCraftSlots.contains(event.slot.slotNumber)) return
 
         if (needsQuickCraftConfirmation(event.itemStack)) {
-            event.toolTip.replaceAll { it.replace("Click to craft!", "§cCtrl+Click to craft!") }
+            event.toolTip.replaceAll {
+                it.replace(
+                    "Click to craft!",
+                    "§c${KeyboardManager.getModifierKeyName()} + Click to craft!"
+                )
+            }
         }
     }
 
     @SubscribeEvent
     fun onBackgroundDrawn(event: GuiContainerEvent.BackgroundDrawnEvent) {
         if (!isEnabled()) return
-        if (KeyboardManager.isControlKeyDown()) return
+        if (KeyboardManager.isModifierKeyDown()) return
         if (event.gui !is GuiChest) return
         val chest = event.gui.inventorySlots as ContainerChest
 
@@ -62,7 +68,7 @@ class QuickCraftFeatures {
 
         val clickedItem = event.slot?.stack ?: return
 
-        if (!KeyboardManager.isControlKeyDown() && needsQuickCraftConfirmation(clickedItem)) {
+        if (!KeyboardManager.isModifierKeyDown() && needsQuickCraftConfirmation(clickedItem)) {
             event.isCanceled = true
         }
     }
@@ -73,5 +79,4 @@ class QuickCraftFeatures {
 
     fun isEnabled() =
         LorenzUtils.inSkyBlock && config.quickCraftingConfirmation && InventoryUtils.openInventoryName() == "Craft Item"
-
 }

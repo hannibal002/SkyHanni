@@ -18,6 +18,7 @@ import net.minecraftforge.fml.common.eventhandler.EventPriority
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
 class BazaarBestSellMethod {
+
     private var display = ""
 
     // Working with the last clicked item manually because
@@ -42,7 +43,10 @@ class BazaarBestSellMethod {
         display = updateDisplay(event.openedProduct)
     }
 
-    private fun updateDisplay(internalName: NEUInternalName): String {
+    private fun updateDisplay(internalName: NEUInternalName?): String {
+        if (internalName == null) {
+            return "§cUnknown Bazaar item!"
+        }
         try {
             var having = InventoryUtils.countItemsInLowerInventory { it.getInternalName() == internalName }
             lastClickedItem?.let {

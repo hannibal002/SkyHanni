@@ -4,6 +4,7 @@ import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.events.GuiContainerEvent
 import at.hannibal2.skyhanni.events.InventoryFullyOpenedEvent
+import at.hannibal2.skyhanni.events.LorenzToolTipEvent
 import at.hannibal2.skyhanni.events.RenderItemTipEvent
 import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.InventoryUtils.getInventoryName
@@ -17,14 +18,15 @@ import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import net.minecraft.client.gui.inventory.GuiChest
 import net.minecraft.inventory.ContainerChest
-import net.minecraftforge.event.entity.player.ItemTooltipEvent
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
 class DungeonFinderFeatures {
+
     private val config get() = SkyHanniMod.feature.dungeon.partyFinder
 
     private val pricePattern = "([0-9]{2,3}K|[0-9]{1,3}M|[0-9]+\\.[0-9]M|[0-9] ?mil)".toRegex(RegexOption.IGNORE_CASE)
     private val carryPattern = "(carry|cary|carries|caries|comp|to cata [0-9]{2})".toRegex(RegexOption.IGNORE_CASE)
+    private val nonPugPattern = "(perm|vc|discord)".toRegex(RegexOption.IGNORE_CASE)
     private val memberPattern = "^ §.*?§.: §.([A-Z]+)§. \\(§.([0-9]+)§.\\)".toRegex(RegexOption.IGNORE_CASE)
     private val ineligiblePattern =
         "^§c(Requires .*$|You don't meet the requirement!|Complete previous floor first!$)".toRegex()
@@ -91,7 +93,7 @@ class DungeonFinderFeatures {
 
     @SubscribeEvent
     fun onBackgroundDrawn(event: GuiContainerEvent.BackgroundDrawnEvent) {
-        if (!LorenzUtils.inSkyBlock || LorenzUtils.skyBlockArea != "Dungeon Hub") return
+        if (!LorenzUtils.inSkyBlock) return
         if (event.gui !is GuiChest) return
 
         val chest = event.gui.inventorySlots as ContainerChest
@@ -120,6 +122,15 @@ class DungeonFinderFeatures {
                 }
             }
 
+            if (config.markNonPugs) {
+                val note = slot.stack.getLore().filter { notePattern.containsMatchIn(it) }.joinToString(" ")
+
+                if (nonPugPattern.containsMatchIn(note)) {
+                    slot highlight LorenzColor.LIGHT_PURPLE
+                    continue
+                }
+            }
+
             val members = slot.stack.getLore().filter { memberPattern.matches(it) }
             val memberLevels = members.map { memberPattern.matchEntire(it)?.groupValues?.get(2)?.toInt() ?: 0 }
             val memberClasses = members.map { memberPattern.matchEntire(it)?.groupValues?.get(1) ?: "" }
@@ -136,11 +147,10 @@ class DungeonFinderFeatures {
     }
 
     @SubscribeEvent
-    fun onItemTooltip(event: ItemTooltipEvent) {
+    fun onItemTooltip(event: LorenzToolTipEvent) {
         if (!LorenzUtils.inSkyBlock) return
         if (!config.coloredClassLevel) return
 
-        if (event.toolTip == null) return
         val chestName = InventoryUtils.openInventoryName()
         if (chestName != "Party Finder") return
 
@@ -161,7 +171,6 @@ class DungeonFinderFeatures {
     fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
         event.move(2, "dungeon.partyFinderColoredClassLevel", "dungeon.partyFinder.coloredClassLevel")
     }
-
 }
 
 fun getColor(level: Int): String {

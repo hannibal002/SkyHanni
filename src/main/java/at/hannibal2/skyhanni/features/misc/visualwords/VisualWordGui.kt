@@ -4,7 +4,7 @@ import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.config.ConfigManager
 import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.*
-import at.hannibal2.skyhanni.utils.LorenzUtils.chat
+import at.hannibal2.skyhanni.utils.ChatUtils.chat
 import at.hannibal2.skyhanni.utils.StringUtils.convertToFormatted
 import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
 import com.google.gson.JsonObject
@@ -22,6 +22,7 @@ import java.io.FileReader
 import java.io.IOException
 
 open class VisualWordGui : GuiScreen() {
+
     private var guiLeft = 0
     private var guiTop = 0
     private var screenHeight = 0
@@ -54,6 +55,7 @@ open class VisualWordGui : GuiScreen() {
     private val shouldDrawImport get() = drawImport && !SkyHanniMod.feature.storage.visualWordsImported
 
     companion object {
+
         fun isInGui() = Minecraft.getMinecraft().currentScreen is VisualWordGui
         var sbeConfigPath = File("." + File.separator + "config" + File.separator + "SkyblockExtras.cfg")
         var drawImport = false
@@ -75,7 +77,6 @@ open class VisualWordGui : GuiScreen() {
                     "RmNTlkYjg5MGM4MDA0MTU2YjcyN2M3N2NhNjk1YzQzOTlkOGUwZGE1Y2U5MjI3Y2Y4MzZiYjhlMiJ9fX0="
             )
         }
-
     }
 
     override fun drawScreen(unusedX: Int, unusedY: Int, partialTicks: Float) {
@@ -459,7 +460,7 @@ open class VisualWordGui : GuiScreen() {
         super.keyTyped(typedChar, keyCode)
         if (!currentlyEditing) {
             if (keyCode == Keyboard.KEY_DOWN || keyCode == Keyboard.KEY_S) {
-                if (KeyboardManager.isControlKeyDown()) {
+                if (KeyboardManager.isModifierKeyDown()) {
                     pageScroll = -(SkyHanniMod.feature.storage.modifiedWords.size * 30 - 100)
                 } else {
                     pageScroll -= 30
@@ -467,7 +468,7 @@ open class VisualWordGui : GuiScreen() {
                 scrollScreen()
             }
             if (keyCode == Keyboard.KEY_UP || keyCode == Keyboard.KEY_W) {
-                if (KeyboardManager.isControlKeyDown()) {
+                if (KeyboardManager.isModifierKeyDown()) {
                     pageScroll = 0
                 } else {
                     pageScroll += 30
@@ -481,7 +482,7 @@ open class VisualWordGui : GuiScreen() {
 
         if (keyCode == Keyboard.KEY_BACK) {
             if (currentText.isNotEmpty()) {
-                currentText = if (KeyboardManager.isControlKeyDown()) {
+                currentText = if (KeyboardManager.isModifierKeyDown()) {
                     ""
                 } else if (KeyboardManager.isShiftKeyDown()) {
                     val lastSpaceIndex = currentText.lastIndexOf(' ')
@@ -554,7 +555,7 @@ open class VisualWordGui : GuiScreen() {
 
     private fun saveChanges() {
         ModifyVisualWords.modifiedWords = modifiedWords
-        ModifyVisualWords.textCache.invalidateAll()
+        ModifyVisualWords.textCache.clear()
         SkyHanniMod.feature.storage.modifiedWords = modifiedWords
     }
 

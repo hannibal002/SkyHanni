@@ -20,6 +20,7 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import java.awt.Color
 
 class AshfangBlazingSouls {
+
     private val config get() = SkyHanniMod.feature.crimsonIsle.ashfang.blazingSouls
 
     private val texture =
@@ -47,8 +48,8 @@ class AshfangBlazingSouls {
             val orbLocation = orb.getLorenzVec()
             event.drawWaypointFilled(orbLocation.add(-0.5, 1.25, -0.5), color, extraSize = -0.15)
             if (orbLocation.distance(playerLocation) < 10) {
-                //TODO find way to dynamically change color
-                event.drawString(orbLocation.add(0.0, 2.5, 0.0), "§bBlazing Soul")
+                // TODO find way to dynamically change color
+                event.drawString(orbLocation.add(y = 2.5), "§bBlazing Soul")
             }
         }
     }

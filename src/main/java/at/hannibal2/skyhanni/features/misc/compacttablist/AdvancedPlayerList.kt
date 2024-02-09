@@ -1,26 +1,31 @@
 package at.hannibal2.skyhanni.features.misc.compacttablist
 
 import at.hannibal2.skyhanni.SkyHanniMod
-import at.hannibal2.skyhanni.data.BingoAPI
+import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
+import at.hannibal2.skyhanni.config.features.misc.compacttablist.AdvancedPlayerListConfig.PlayerSortEntry
 import at.hannibal2.skyhanni.data.FriendAPI
 import at.hannibal2.skyhanni.data.GuildAPI
 import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.data.PartyAPI
+import at.hannibal2.skyhanni.data.jsonobjects.repo.ContributorListJson
 import at.hannibal2.skyhanni.events.RepositoryReloadEvent
+import at.hannibal2.skyhanni.features.bingo.BingoAPI
 import at.hannibal2.skyhanni.features.misc.MarkedPlayerManager
 import at.hannibal2.skyhanni.test.SkyHanniDebugsAndTests
-import at.hannibal2.skyhanni.utils.KeyboardManager
+import at.hannibal2.skyhanni.utils.ChatUtils
+import at.hannibal2.skyhanni.utils.ConfigUtils
+import at.hannibal2.skyhanni.utils.KeyboardManager.isKeyHeld
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils.isInIsland
 import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
-import at.hannibal2.skyhanni.data.jsonobjects.repo.ContributorListJson
-import com.google.common.cache.CacheBuilder
+import at.hannibal2.skyhanni.utils.TimeLimitedCache
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
-import java.util.concurrent.TimeUnit
 import kotlin.random.Random
+import kotlin.time.Duration.Companion.minutes
 
 object AdvancedPlayerList {
+
     private val config get() = SkyHanniMod.feature.misc.compactTabList.advancedPlayerList
 
     // TODO USE SH-REPO
@@ -94,10 +99,9 @@ object AdvancedPlayerList {
                     } else {
                         playerData.nameSuffix = ""
                     }
-
                 } catch (e: NumberFormatException) {
                     val message = "Special user (youtube or admin?): '$line'"
-                    LorenzUtils.debug(message)
+                    ChatUtils.debug(message)
                     println(message)
                 }
             }
@@ -107,21 +111,26 @@ object AdvancedPlayerList {
 
         val sorted = when (config.playerSortOrder) {
 
-            // Rank (Default)
-            1 -> prepare.sortedBy { -(it.value.sbLevel) }
+            // SB Level
+            PlayerSortEntry.SB_LEVEL -> prepare.sortedBy { -(it.value.sbLevel) }
 
             // Name (Abc)
-            2 -> prepare.sortedBy { it.value.name.lowercase().replace("_", "") }
+            PlayerSortEntry.NAME -> prepare.sortedBy {
+                it.value.name.lowercase().replace("_", "")
+            }
 
             // Ironman/Bingo
-            3 -> prepare.sortedBy { -if (it.value.ironman) 10 else it.value.bingoLevel ?: -1 }
+            PlayerSortEntry.PROFILE_TYPE -> prepare.sortedBy {
+                -if (it.value.ironman) 10 else it.value.bingoLevel ?: -1
+            }
 
             // Party/Friends/Guild First
-            4 -> prepare.sortedBy { -socialScore(it.value.name) }
+            PlayerSortEntry.SOCIAL_STATUS -> prepare.sortedBy { -socialScore(it.value.name) }
 
             // Random
-            5 -> prepare.sortedBy { getRandomOrder(it.value.name) }
+            PlayerSortEntry.RANDOM -> prepare.sortedBy { getRandomOrder(it.value.name) }
 
+            // Rank (Default)
             else -> prepare
         }
 
@@ -140,7 +149,7 @@ object AdvancedPlayerList {
     }
 
     fun ignoreCustomTabList(): Boolean {
-        val denyKeyPressed = SkyHanniMod.feature.dev.debug.enabled && KeyboardManager.isControlKeyDown()
+        val denyKeyPressed = SkyHanniMod.feature.dev.debug.bypassAdvancedPlayerTabList.isKeyHeld()
         return denyKeyPressed || !SkyHanniDebugsAndTests.globalRender
     }
 
@@ -180,11 +189,10 @@ object AdvancedPlayerList {
         return "$level $playerName ${suffix.trim()}"
     }
 
-    private var randomOrderCache =
-        CacheBuilder.newBuilder().expireAfterWrite(20, TimeUnit.MINUTES).build<String, Int>()
+    private var randomOrderCache = TimeLimitedCache<String, Int>(20.minutes)
 
     private fun getRandomOrder(name: String): Int {
-        val saved = randomOrderCache.getIfPresent(name)
+        val saved = randomOrderCache.getOrNull(name)
         if (saved != null) {
             return saved
         }
@@ -206,7 +214,7 @@ object AdvancedPlayerList {
     private fun getSocialScoreIcon(score: Int) = when (score) {
 //        10 -> "§c§lME"
         10 -> ""
-        8 -> "§e§lMARKED"
+        8 -> "${SkyHanniMod.feature.markedPlayers.chatColor.getChatColor()}§lMARKED"
         5 -> "§9§lP"
         4 -> "§d§lF"
         3 -> "§2§lG"
@@ -224,6 +232,7 @@ object AdvancedPlayerList {
     }
 
     class PlayerData(val sbLevel: Int) {
+
         var name: String = "?"
         var coloredName: String = "?"
         var nameSuffix: String = "?"
@@ -237,5 +246,12 @@ object AdvancedPlayerList {
         BARBARIAN(" §c⚒"),
         MAGE(" §5ቾ"),
         NONE("")
+    }
+
+    @SubscribeEvent
+    fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
+        event.transform(15, "misc.compactTabList.advancedPlayerList.playerSortOrder") { element ->
+            ConfigUtils.migrateIntToEnum(element, PlayerSortEntry::class.java)
+        }
     }
 }

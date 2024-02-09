@@ -3,34 +3,56 @@ package at.hannibal2.skyhanni.features.mining.powdertracker
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.config.features.mining.PowderTrackerConfig.PowderDisplayEntry
+import at.hannibal2.skyhanni.data.BossbarData
 import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.events.ConfigLoadEvent
 import at.hannibal2.skyhanni.events.GuiRenderEvent
+import at.hannibal2.skyhanni.events.IslandChangeEvent
 import at.hannibal2.skyhanni.events.LorenzChatEvent
 import at.hannibal2.skyhanni.events.LorenzTickEvent
 import at.hannibal2.skyhanni.events.LorenzWorldChangeEvent
+import at.hannibal2.skyhanni.utils.CollectionUtils.addAsSingletonList
+import at.hannibal2.skyhanni.utils.ConditionalUtils.afterChange
 import at.hannibal2.skyhanni.utils.ConfigUtils
-import at.hannibal2.skyhanni.utils.LorenzUtils.addAsSingletonList
-import at.hannibal2.skyhanni.utils.LorenzUtils.afterChange
 import at.hannibal2.skyhanni.utils.LorenzUtils.isInIsland
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.NumberUtil.formatNumber
 import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
+import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import at.hannibal2.skyhanni.utils.tracker.SkyHanniTracker
 import at.hannibal2.skyhanni.utils.tracker.TrackerData
+import com.google.gson.JsonArray
+import com.google.gson.JsonNull
 import com.google.gson.annotations.Expose
-import net.minecraft.entity.boss.BossStatus
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import kotlin.concurrent.fixedRateTimer
 
 object PowderTracker {
 
     private val config get() = SkyHanniMod.feature.mining.powderTracker
-    private val picked = "§6You have successfully picked the lock on this chest!".toPattern()
-    private val uncovered = "§aYou uncovered a treasure chest!".toPattern()
-    private val powderEvent = ".*§r§b§l2X POWDER STARTED!.*".toPattern()
-    private val powderEnded = ".*§r§b§l2X POWDER ENDED!.*".toPattern()
-    private val powderBossBar = "§e§lPASSIVE EVENT §b§l2X POWDER §e§lRUNNING FOR §a§l(?<time>.*)§r".toPattern()
+
+    private val patternGroup = RepoPattern.group("mining.powder.tracker")
+    private val pickedPattern by patternGroup.pattern(
+        "picked",
+        "§6You have successfully picked the lock on this chest!"
+    )
+    private val uncoveredPattern by patternGroup.pattern(
+        "uncovered",
+        "§aYou uncovered a treasure chest!"
+    )
+    private val powderStartedPattern by patternGroup.pattern(
+        "powder.started",
+        ".*§r§b§l2X POWDER STARTED!.*"
+    )
+    private val powderEndedPattern by patternGroup.pattern(
+        "powder.ended",
+        ".*§r§b§l2X POWDER ENDED!.*"
+    )
+    private val powderBossBarPattern by patternGroup.pattern(
+        "powder.bossbar",
+        "§e§lPASSIVE EVENT §b§l2X POWDER §e§lRUNNING FOR §a§l(?<time>.*)§r"
+    )
+
     private var lastChestPicked = 0L
     private var isGrinding = false
     private val gemstoneInfo = ResourceInfo(0L, 0L, 0, 0.0, mutableListOf())
@@ -50,6 +72,8 @@ object PowderTracker {
     )
 
     init {
+        PowderChestReward.entries.forEach { it.chatPattern }
+
         fixedRateTimer(name = "skyhanni-powder-tracker", period = 1000) {
             if (!isEnabled()) return@fixedRateTimer
             calculateResourceHour(gemstoneInfo)
@@ -64,6 +88,7 @@ object PowderTracker {
     { formatDisplay(drawDisplay(it)) }
 
     class Data : TrackerData() {
+
         override fun reset() {
             rewards.clear()
             totalChestPicked = 0
@@ -91,7 +116,7 @@ object PowderTracker {
         val msg = event.message
 
         if (config.greatExplorerMaxed) {
-            uncovered.matchMatcher(msg) {
+            uncoveredPattern.matchMatcher(msg) {
                 tracker.modify {
                     it.totalChestPicked += 1
                 }
@@ -100,7 +125,7 @@ object PowderTracker {
             }
         }
 
-        picked.matchMatcher(msg) {
+        pickedPattern.matchMatcher(msg) {
             tracker.modify {
                 it.totalChestPicked += 1
             }
@@ -108,11 +133,11 @@ object PowderTracker {
             lastChestPicked = System.currentTimeMillis()
         }
 
-        powderEvent.matchMatcher(msg) { doublePowder = true }
-        powderEnded.matchMatcher(msg) { doublePowder = false }
+        powderStartedPattern.matchMatcher(msg) { doublePowder = true }
+        powderEndedPattern.matchMatcher(msg) { doublePowder = false }
 
         for (reward in PowderChestReward.entries) {
-            reward.pattern.matchMatcher(msg) {
+            reward.chatPattern.matchMatcher(msg) {
                 tracker.modify {
                     val count = it.rewards[reward] ?: 0
                     var amount = group("amount").formatNumber()
@@ -129,8 +154,8 @@ object PowderTracker {
     fun onTick(event: LorenzTickEvent) {
         if (!isEnabled()) return
         if (event.repeatSeconds(1)) {
-            doublePowder = powderBossBar.matcher(BossStatus.bossName).find()
-            powderBossBar.matchMatcher(BossStatus.bossName) {
+            doublePowder = powderBossBarPattern.matcher(BossbarData.getBossbar()).find()
+            powderBossBarPattern.matchMatcher(BossbarData.getBossbar()) {
                 powderTimer = group("time")
                 doublePowder = powderTimer != "00:00"
 
@@ -174,17 +199,35 @@ object PowderTracker {
     @SubscribeEvent
     fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
         event.move(2, "misc.powderTrackerConfig", "mining.powderTracker")
-
-        event.move(8, "#profile.powderTracker", "#profile.powderTracker") { old ->
-            old.asJsonObject.get("0")
-        }
-        event.move(11, "mining.powderTracker.textFormat", "mining.powderTracker.textFormat") { element ->
+        event.transform(8, "#profile.powderTracker") { old -> old.asJsonObject.get("0") }
+        event.transform(11, "mining.powderTracker.textFormat") { element ->
             ConfigUtils.migrateIntArrayListToEnumArrayList(element, PowderDisplayEntry::class.java)
+        }
+
+        event.transform(20, "mining.powderTracker.textFormat") { element ->
+            val newList = JsonArray()
+            for (entry in element.asJsonArray) {
+                if (entry is JsonNull) continue
+                if (entry.asString.let { it != "TITLE" && it != "DISPLAY_MODE" }) {
+                    newList.add(entry)
+                }
+            }
+            newList
         }
     }
 
-    private fun formatDisplay(map: List<List<Any>>) = buildList {
+    @SubscribeEvent
+    fun onIslandChange(event: IslandChangeEvent) {
+        if (event.newIsland == IslandType.CRYSTAL_HOLLOWS) {
+            tracker.firstUpdate()
+        }
+    }
+
+    private fun formatDisplay(map: List<List<Any>>) = buildList<List<Any>> {
         if (map.isEmpty()) return@buildList
+
+        addAsSingletonList("§b§lPowder Tracker")
+
         for (index in config.textFormat.get()) {
             // TODO, change functionality to use enum rather than ordinals
             add(map[index.ordinal])
@@ -197,12 +240,6 @@ object PowderTracker {
         calculate(data, diamondEssenceInfo, PowderChestReward.DIAMOND_ESSENCE)
         calculate(data, goldEssenceInfo, PowderChestReward.GOLD_ESSENCE)
         calculateChest(data)
-
-        addAsSingletonList("§b§lPowder Tracker")
-
-        if (!tracker.isInventoryOpen()) {
-            addAsSingletonList("")
-        }
 
         val chestPerHour = format(chestInfo.perHour)
         addAsSingletonList("§d${data.totalChestPicked.addSeparators()} Total Chests Picked §7($chestPerHour/h)")
@@ -263,7 +300,7 @@ object PowderTracker {
     private fun MutableList<List<Any>>.addPerHour(
         map: MutableMap<PowderChestReward, Long>,
         reward: PowderChestReward,
-        info: ResourceInfo
+        info: ResourceInfo,
     ) {
         val mithrilCount = map.getOrDefault(reward, 0).addSeparators()
         val mithrilPerHour = format(info.perHour)
@@ -328,7 +365,7 @@ object PowderTracker {
         var lastEstimated: Long,
         var stoppedChecks: Int,
         var perHour: Double,
-        val perMin: MutableList<Long>
+        val perMin: MutableList<Long>,
     )
 
     private fun isEnabled() = IslandType.CRYSTAL_HOLLOWS.isInIsland() && config.enabled
