@@ -9,14 +9,14 @@ import at.hannibal2.skyhanni.features.chat.ChatFilterGui
 import at.hannibal2.skyhanni.utils.IdentityCharacteristics
 import at.hannibal2.skyhanni.utils.LorenzLogger
 import at.hannibal2.skyhanni.utils.LorenzUtils
-import at.hannibal2.skyhanni.utils.LorenzUtils.chat
-import at.hannibal2.skyhanni.utils.LorenzUtils.makeAccessible
+import at.hannibal2.skyhanni.utils.ReflectionUtils.makeAccessible
 import net.minecraft.client.Minecraft
 import net.minecraft.client.gui.ChatLine
 import net.minecraft.client.gui.GuiNewChat
 import net.minecraft.event.HoverEvent
 import net.minecraft.network.play.client.C01PacketChatMessage
 import net.minecraft.network.play.server.S02PacketChat
+import net.minecraft.util.ChatComponentText
 import net.minecraft.util.EnumChatFormatting
 import net.minecraft.util.IChatComponent
 import net.minecraftforge.client.event.ClientChatReceivedEvent
@@ -46,11 +46,14 @@ object ChatManager {
         RETRACTED(EnumChatFormatting.DARK_PURPLE.toString() + EnumChatFormatting.BOLD),
         MODIFIED(EnumChatFormatting.YELLOW.toString() + EnumChatFormatting.BOLD),
         ALLOWED(EnumChatFormatting.GREEN),
+        OUTGOING(EnumChatFormatting.BLUE),
+        OUTGOING_BLOCKED(EnumChatFormatting.BLUE.toString() + EnumChatFormatting.BOLD),
         ;
 
         val renderedString = "$format$name"
 
         companion object {
+
             val maxLength by lazy {
                 entries.maxOf { Minecraft.getMinecraft().fontRendererObj.getStringWidth(it.renderedString) }
             }
@@ -61,7 +64,7 @@ object ChatManager {
         val message: IChatComponent,
         var actionKind: ActionKind,
         var actionReason: String?,
-        val modified: IChatComponent?
+        val modified: IChatComponent?,
     )
 
     @SubscribeEvent(priority = EventPriority.LOW, receiveCanceled = true)
@@ -74,7 +77,6 @@ object ChatManager {
             val actionBarEvent = LorenzActionBarEvent(message)
             actionBarEvent.postAndCatch()
         }
-
     }
 
     @SubscribeEvent
@@ -82,7 +84,14 @@ object ChatManager {
         val packet = event.packet as? C01PacketChatMessage ?: return
 
         val message = packet.message
-        event.isCanceled = MessageSendToServerEvent(message).postAndCatch()
+        val component = ChatComponentText(message)
+        messageHistory[IdentityCharacteristics(component)] =
+            MessageFilteringResult(component, ActionKind.OUTGOING, null, null)
+        if (MessageSendToServerEvent(message).postAndCatch()) {
+            event.isCanceled = true
+            messageHistory[IdentityCharacteristics(component)] =
+                MessageFilteringResult(component, ActionKind.OUTGOING_BLOCKED, null, null)
+        }
     }
 
     @SubscribeEvent(receiveCanceled = true)

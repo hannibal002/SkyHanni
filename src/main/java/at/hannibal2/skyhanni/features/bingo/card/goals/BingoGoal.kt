@@ -3,6 +3,7 @@ package at.hannibal2.skyhanni.features.bingo.card.goals
 import com.google.gson.annotations.Expose
 
 class BingoGoal {
+
     @Expose
     lateinit var type: GoalType
 

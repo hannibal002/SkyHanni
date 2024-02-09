@@ -1,16 +1,20 @@
 package at.hannibal2.skyhanni.features.garden
 
 import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
+import at.hannibal2.skyhanni.events.ConfigLoadEvent
 import at.hannibal2.skyhanni.events.GardenToolChangeEvent
 import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.LorenzTickEvent
 import at.hannibal2.skyhanni.events.TabListUpdateEvent
+import at.hannibal2.skyhanni.utils.ChatUtils
+import at.hannibal2.skyhanni.utils.ConditionalUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils.isRancherSign
 import at.hannibal2.skyhanni.utils.RenderUtils.renderString
 import at.hannibal2.skyhanni.utils.RenderUtils.renderStringsAndItems
 import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.renderables.Renderable
+import io.github.moulberry.moulconfig.observer.Property
 import net.minecraft.client.Minecraft
 import net.minecraft.client.gui.inventory.GuiEditSign
 import net.minecraftforge.client.event.GuiOpenEvent
@@ -20,6 +24,7 @@ import kotlin.time.Duration.Companion.milliseconds
 import kotlin.time.Duration.Companion.seconds
 
 class GardenOptimalSpeed {
+
     private val config get() = GardenAPI.config.optimalSpeeds
     private val configCustomSpeed get() = config.customSpeed
     private var sneakingTime = 0.seconds
@@ -79,20 +84,35 @@ class GardenOptimalSpeed {
     @SubscribeEvent
     fun onGardenToolChange(event: GardenToolChangeEvent) {
         cropInHand = event.crop
-        optimalSpeed = cropInHand.let { it?.getOptimalSpeed() ?: -1 }
+        optimalSpeed = cropInHand?.getOptimalSpeed() ?: -1
     }
 
-    private fun CropType.getOptimalSpeed() = when (this) {
-        CropType.WHEAT -> configCustomSpeed.wheat
-        CropType.CARROT -> configCustomSpeed.carrot
-        CropType.POTATO -> configCustomSpeed.potato
-        CropType.NETHER_WART -> configCustomSpeed.netherWart
-        CropType.PUMPKIN -> configCustomSpeed.pumpkin
-        CropType.MELON -> configCustomSpeed.melon
-        CropType.COCOA_BEANS -> configCustomSpeed.cocoaBeans
-        CropType.SUGAR_CANE -> configCustomSpeed.sugarCane
-        CropType.CACTUS -> configCustomSpeed.cactus
-        CropType.MUSHROOM -> configCustomSpeed.mushroom
+    @SubscribeEvent
+    fun onConfigLoad(event: ConfigLoadEvent) {
+        for (value in CropType.entries) {
+            ConditionalUtils.onToggle(value.getConfig()) {
+                if (value == cropInHand) {
+                    optimalSpeed = value.getOptimalSpeed()
+                }
+            }
+        }
+    }
+
+    private fun CropType.getOptimalSpeed() = getConfig().get().toInt()
+
+    private fun CropType.getConfig(): Property<Float> = with(configCustomSpeed) {
+        when (this@getConfig) {
+            CropType.WHEAT -> wheat
+            CropType.CARROT -> carrot
+            CropType.POTATO -> potato
+            CropType.NETHER_WART -> netherWart
+            CropType.PUMPKIN -> pumpkin
+            CropType.MELON -> melon
+            CropType.COCOA_BEANS -> cocoaBeans
+            CropType.SUGAR_CANE -> sugarCane
+            CropType.CACTUS -> cactus
+            CropType.MUSHROOM -> mushroom
+        }
     }
 
     @SubscribeEvent
@@ -130,7 +150,7 @@ class GardenOptimalSpeed {
             if (sneaking) text += " §7[Sneaking]"
             text += " §e(§f$optimalSpeed §eis optimal)"
 
-            LorenzUtils.chat(text)
+            ChatUtils.chat(text)
         }
     }
 

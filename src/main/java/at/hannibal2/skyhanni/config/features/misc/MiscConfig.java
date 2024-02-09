@@ -245,7 +245,7 @@ public class MiscConfig {
   
     @Expose
     @ConfigOption(name = "Fix Ghost Entities", desc = "Removes ghost entities caused by a Hypixel bug. " +
-            "This included Diana, Dungeon and Crimson Isle mobs and nametags.")
+        "This included Diana, Dungeon and Crimson Isle mobs and nametags.")
     @ConfigEditorBoolean
     @FeatureToggle
     public boolean fixGhostEntities = true;

@@ -9,12 +9,19 @@ import at.hannibal2.skyhanni.utils.LorenzUtils
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
 object PartyCommands {
+
     private val config get() = SkyHanniMod.feature.commands
 
     fun kickOffline() {
         if (!config.shortCommands) return
         if (PartyAPI.partyMembers.isEmpty()) return
         LorenzUtils.sendCommandToServer("party kickoffline")
+    }
+
+    fun disband() {
+        if (!config.shortCommands) return
+        if (PartyAPI.partyMembers.isEmpty()) return
+        LorenzUtils.sendCommandToServer("party disband")
     }
 
     fun warp() {
@@ -59,7 +66,8 @@ object PartyCommands {
             return
         }
         if (!event.message.startsWith("/party kick ", ignoreCase = true)
-            && !event.message.startsWith("/p kick ", ignoreCase = true)) {
+            && !event.message.startsWith("/p kick ", ignoreCase = true)
+        ) {
             return
         }
         val args = event.message.split(" ")

@@ -9,6 +9,7 @@ import at.hannibal2.skyhanni.events.LorenzChatEvent
 import at.hannibal2.skyhanni.events.LorenzTickEvent
 import at.hannibal2.skyhanni.events.LorenzToolTipEvent
 import at.hannibal2.skyhanni.events.LorenzWorldChangeEvent
+import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.events.MessageSendToServerEvent
 import at.hannibal2.skyhanni.features.commands.LimboCommands
 import at.hannibal2.skyhanni.utils.LocationUtils.isPlayerInside
@@ -85,8 +86,8 @@ class LimboTimeTracker {
         if (inLimbo && !shownPB && limboJoinTime.passedSince() >= config.limboTimePB.seconds && config.limboTimePB != 0) {
             shownPB = true
             oldPB = config.limboTimePB.seconds
-            LorenzUtils.chat("§d§lPERSONAL BEST§f! You've surpassed your previous record of §e$oldPB§f!")
-            LorenzUtils.chat("§fKeep it up!")
+            ChatUtils.chat("§d§lPERSONAL BEST§f! You've surpassed your previous record of §e$oldPB§f!")
+            ChatUtils.chat("§fKeep it up!")
         }
         val lobbyName: String? = HypixelData.locrawData?.get("lobbyname")?.asString
         if (lobbyName.toString().startsWith("bedwarslobby")) {
@@ -214,14 +215,14 @@ class LimboTimeTracker {
             config.limboTimePB = passedSince.toInt(DurationUnit.SECONDS)
             userLuck = (config.limboTimePB * userLuckMultiplier).round(2)
             if (onFire) userLuck *= fireMultiplier
-            LorenzUtils.chat("§fYou were in Limbo for §e$duration§f! §d§lPERSONAL BEST§r§f!")
-            LorenzUtils.chat("§fYour previous Personal Best was §e$oldPB.")
-        } else LorenzUtils.chat("§fYou were in Limbo for §e$duration§f.")
+            ChatUtils.chat("§fYou were in Limbo for §e$duration§f! §d§lPERSONAL BEST§r§f!")
+            ChatUtils.chat("§fYour previous Personal Best was §e$oldPB.")
+        } else ChatUtils.chat("§fYou were in Limbo for §e$duration§f.")
         if (userLuck > config.userLuck) {
             if (onFire) {
-                LorenzUtils.chat("§fYour §aPersonal Bests§f perk is now granting you §a+${userLuck.round(2)}§c✴ §aSkyHanni User Luck§f! ")
+                ChatUtils.chat("§fYour §aPersonal Bests§f perk is now granting you §a+${userLuck.round(2)}§c✴ §aSkyHanni User Luck§f! ")
             } else {
-                LorenzUtils.chat("§fYour §aPersonal Bests§f perk is now granting you §a+${userLuck.round(2)}✴ SkyHanni User Luck§f!")
+                ChatUtils.chat("§fYour §aPersonal Bests§f perk is now granting you §a+${userLuck.round(2)}✴ SkyHanni User Luck§f!")
             }
             config.userLuck = userLuck
         }
