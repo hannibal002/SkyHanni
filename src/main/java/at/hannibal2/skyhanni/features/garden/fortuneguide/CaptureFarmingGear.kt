@@ -17,7 +17,6 @@ import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.NumberUtil.romanToDecimal
 import at.hannibal2.skyhanni.utils.NumberUtil.romanToDecimalIfNecessary
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getEnchantments
-import at.hannibal2.skyhanni.utils.StringUtils.isRoman
 import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.TabListData
@@ -151,9 +150,7 @@ class CaptureFarmingGear {
             var tierProgress = -1
             for (line in item.getLore()) {
                 tierPattern.matchMatcher(line) {
-                    val nextTier = group("nextTier")
-                    tier = if (nextTier.isRoman()) nextTier.romanToDecimal()
-                    else nextTier.toInt()
+                    tier = group("nextTier").romanToDecimalIfNecessary()
                 }
                 tierProgressPattern.matchMatcher(line) {
                     tierProgress = group("having").toInt()
