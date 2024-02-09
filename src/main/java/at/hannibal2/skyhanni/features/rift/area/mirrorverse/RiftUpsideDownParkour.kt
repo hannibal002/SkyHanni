@@ -7,8 +7,8 @@ import at.hannibal2.skyhanni.events.LorenzChatEvent
 import at.hannibal2.skyhanni.events.LorenzRenderWorldEvent
 import at.hannibal2.skyhanni.events.RepositoryReloadEvent
 import at.hannibal2.skyhanni.features.rift.RiftAPI
+import at.hannibal2.skyhanni.utils.CollectionUtils
 import at.hannibal2.skyhanni.utils.ColorUtils.toChromaColor
-import at.hannibal2.skyhanni.utils.LanguageUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.ParkourHelper
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
@@ -53,7 +53,7 @@ class RiftUpsideDownParkour {
 
     @SubscribeEvent
     fun onConfigLoad(event: ConfigLoadEvent) {
-        LanguageUtils.onToggle(config.rainbowColor, config.monochromeColor, config.lookAhead) {
+        CollectionUtils.onToggle(config.rainbowColor, config.monochromeColor, config.lookAhead) {
             updateConfig()
         }
     }

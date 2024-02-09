@@ -2,7 +2,7 @@ package at.hannibal2.skyhanni.test.command
 
 import at.hannibal2.skyhanni.data.ScoreboardData
 import at.hannibal2.skyhanni.utils.ChatUtils
-import at.hannibal2.skyhanni.utils.LanguageUtils.transformIf
+import at.hannibal2.skyhanni.utils.CollectionUtils.transformIf
 import at.hannibal2.skyhanni.utils.OSUtils
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 

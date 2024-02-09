@@ -6,9 +6,9 @@ import at.hannibal2.skyhanni.config.features.fishing.trophyfishing.ChatMessagesC
 import at.hannibal2.skyhanni.events.LorenzChatEvent
 import at.hannibal2.skyhanni.features.fishing.trophy.TrophyFishManager.fishes
 import at.hannibal2.skyhanni.features.fishing.trophy.TrophyFishManager.getTooltip
+import at.hannibal2.skyhanni.utils.CollectionUtils.addOrPut
+import at.hannibal2.skyhanni.utils.CollectionUtils.sumAllValues
 import at.hannibal2.skyhanni.utils.ConfigUtils
-import at.hannibal2.skyhanni.utils.LanguageUtils.addOrPut
-import at.hannibal2.skyhanni.utils.LanguageUtils.sumAllValues
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.NumberUtil.ordinal

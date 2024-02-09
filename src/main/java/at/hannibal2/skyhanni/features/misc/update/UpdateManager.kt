@@ -5,7 +5,7 @@ import at.hannibal2.skyhanni.config.features.About
 import at.hannibal2.skyhanni.events.ConfigLoadEvent
 import at.hannibal2.skyhanni.events.LorenzTickEvent
 import at.hannibal2.skyhanni.utils.ChatUtils
-import at.hannibal2.skyhanni.utils.LanguageUtils.onToggle
+import at.hannibal2.skyhanni.utils.CollectionUtils.onToggle
 import at.hannibal2.skyhanni.utils.LorenzLogger
 import io.github.moulberry.moulconfig.processor.MoulConfigProcessor
 import io.github.moulberry.notenoughupdates.util.MinecraftExecutor

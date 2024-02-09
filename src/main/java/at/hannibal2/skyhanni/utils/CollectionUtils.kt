@@ -18,7 +18,7 @@ import kotlin.reflect.full.memberProperties
 import kotlin.reflect.full.starProjectedType
 import kotlin.reflect.jvm.isAccessible
 
-object LanguageUtils {
+object CollectionUtils {
 
     fun <E> ConcurrentLinkedQueue<E>.drainTo(list: MutableCollection<E>) {
         while (true)

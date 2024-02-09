@@ -2,8 +2,8 @@ package at.hannibal2.skyhanni.test.hotswap
 
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.utils.ChatUtils
-import at.hannibal2.skyhanni.utils.LanguageUtils.makeAccessible
-import at.hannibal2.skyhanni.utils.LanguageUtils.removeFinal
+import at.hannibal2.skyhanni.utils.CollectionUtils.makeAccessible
+import at.hannibal2.skyhanni.utils.CollectionUtils.removeFinal
 import moe.nea.hotswapagentforge.forge.ClassDefinitionEvent
 import moe.nea.hotswapagentforge.forge.HotswapEvent
 import moe.nea.hotswapagentforge.forge.HotswapFinishedEvent

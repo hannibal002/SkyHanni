@@ -5,8 +5,8 @@ import at.hannibal2.skyhanni.events.LorenzTickEvent
 import at.hannibal2.skyhanni.events.TabListUpdateEvent
 import at.hannibal2.skyhanni.mixins.hooks.tabListGuard
 import at.hannibal2.skyhanni.mixins.transformers.AccessorGuiPlayerTabOverlay
-import at.hannibal2.skyhanni.utils.LanguageUtils.conditionalTransform
-import at.hannibal2.skyhanni.utils.LanguageUtils.transformIf
+import at.hannibal2.skyhanni.utils.CollectionUtils.conditionalTransform
+import at.hannibal2.skyhanni.utils.CollectionUtils.transformIf
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import com.google.common.collect.ComparisonChain
 import com.google.common.collect.Ordering
