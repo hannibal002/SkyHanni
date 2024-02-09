@@ -1,6 +1,6 @@
 package at.hannibal2.skyhanni.test
 
-import at.hannibal2.skyhanni.utils.CollectionUtils.makeAccessible
+import at.hannibal2.skyhanni.utils.ReflectionUtils.makeAccessible
 import net.minecraft.block.Block
 import net.minecraft.block.BlockFire
 import net.minecraft.init.Bootstrap

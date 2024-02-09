@@ -7,7 +7,7 @@ import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.LorenzTickEvent
 import at.hannibal2.skyhanni.events.TabListUpdateEvent
 import at.hannibal2.skyhanni.utils.ChatUtils
-import at.hannibal2.skyhanni.utils.CollectionUtils
+import at.hannibal2.skyhanni.utils.ConditionalUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils.isRancherSign
 import at.hannibal2.skyhanni.utils.RenderUtils.renderString
@@ -90,7 +90,7 @@ class GardenOptimalSpeed {
     @SubscribeEvent
     fun onConfigLoad(event: ConfigLoadEvent) {
         for (value in CropType.entries) {
-            CollectionUtils.onToggle(value.getConfig()) {
+            ConditionalUtils.onToggle(value.getConfig()) {
                 if (value == cropInHand) {
                     optimalSpeed = value.getOptimalSpeed()
                 }

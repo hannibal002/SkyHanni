@@ -1,22 +1,8 @@
 package at.hannibal2.skyhanni.utils
 
-import io.github.moulberry.moulconfig.observer.Observer
-import io.github.moulberry.moulconfig.observer.Property
-import java.lang.reflect.Constructor
-import java.lang.reflect.Field
-import java.lang.reflect.Modifier
 import java.util.Collections
 import java.util.WeakHashMap
 import java.util.concurrent.ConcurrentLinkedQueue
-import kotlin.properties.ReadWriteProperty
-import kotlin.reflect.KMutableProperty1
-import kotlin.reflect.KProperty
-import kotlin.reflect.KProperty0
-import kotlin.reflect.KProperty1
-import kotlin.reflect.full.isSubtypeOf
-import kotlin.reflect.full.memberProperties
-import kotlin.reflect.full.starProjectedType
-import kotlin.reflect.jvm.isAccessible
 
 object CollectionUtils {
 
@@ -30,58 +16,7 @@ object CollectionUtils {
 
     fun <T> MutableCollection<T>.filterToMutable(predicate: (T) -> Boolean) = filterTo(mutableListOf(), predicate)
 
-    fun <T> T.transformIf(condition: T.() -> Boolean, transofmration: T.() -> T) =
-        if (condition()) transofmration(this) else this
-
-    fun <T> T.conditionalTransform(condition: Boolean, ifTrue: T.() -> Any, ifFalse: T.() -> Any) =
-        if (condition) ifTrue(this) else ifFalse(this)
-
     fun <T> List<T>.indexOfFirst(vararg args: T) = args.map { indexOf(it) }.firstOrNull { it != -1 }
-
-    // TODO nea?
-//    fun <T> dynamic(block: () -> KMutableProperty0<T>?): ReadWriteProperty<Any?, T?> {
-//        return object : ReadWriteProperty<Any?, T?> {
-//            override fun getValue(thisRef: Any?, property: KProperty<*>): T? {
-//                return block()?.get()
-//            }
-//
-//            override fun setValue(thisRef: Any?, property: KProperty<*>, value: T?) {
-//                if (value != null)
-//                    block()?.set(value)
-//            }
-//        }
-//    }
-
-    fun <T, R> dynamic(root: KProperty0<R?>, child: KMutableProperty1<R, T>) =
-        object : ReadWriteProperty<Any?, T?> {
-            override fun getValue(thisRef: Any?, property: KProperty<*>): T? {
-                val rootObj = root.get() ?: return null
-                return child.get(rootObj)
-            }
-
-            override fun setValue(thisRef: Any?, property: KProperty<*>, value: T?) {
-                if (value == null) return
-                val rootObj = root.get() ?: return
-                child.set(rootObj, value)
-            }
-        }
-
-    inline fun <reified T : Any> Any.getPropertiesWithType() =
-        this::class.memberProperties
-            .filter { it.returnType.isSubtypeOf(T::class.starProjectedType) }
-            .map {
-                it.isAccessible = true
-                (it as KProperty1<Any, T>).get(this)
-            }
-
-    fun Field.makeAccessible() = also { isAccessible = true }
-
-    fun <T> Constructor<T>.makeAccessible() = also { isAccessible = true }
-
-    fun Field.removeFinal(): Field {
-        javaClass.getDeclaredField("modifiers").makeAccessible().set(this, modifiers and (Modifier.FINAL.inv()))
-        return this
-    }
 
     infix fun <K, V> MutableMap<K, V>.put(pairs: Pair<K, V>) {
         this[pairs.first] = pairs.second
@@ -144,25 +79,6 @@ object CollectionUtils {
             }
         }
         return null
-    }
-
-    // MoulConfig is in Java, I don't want to downgrade this logic
-    fun <T> onChange(vararg properties: Property<out T>, observer: Observer<T>) {
-        for (property in properties) {
-            property.whenChanged { a, b -> observer.observeChange(a, b) }
-        }
-    }
-
-    fun <T> onToggle(vararg properties: Property<out T>, observer: Runnable) {
-        onChange(*properties) { _, _ -> observer.run() }
-    }
-
-    fun <T> Property<out T>.onToggle(observer: Runnable) {
-        whenChanged { _, _ -> observer.run() }
-    }
-
-    fun <T> Property<out T>.afterChange(observer: T.() -> Unit) {
-        whenChanged { _, new -> observer(new) }
     }
 
     fun <K, V> Map<K, V>.editCopy(function: MutableMap<K, V>.() -> Unit) =
