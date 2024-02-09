@@ -17,9 +17,9 @@ import at.hannibal2.skyhanni.features.misc.customscoreboard.CustomScoreboardUtil
 import at.hannibal2.skyhanni.features.misc.customscoreboard.CustomScoreboardUtils.getTitleAndFooterAlignment
 import at.hannibal2.skyhanni.mixins.hooks.replaceString
 import at.hannibal2.skyhanni.test.command.ErrorManager
+import at.hannibal2.skyhanni.utils.CollectionUtils.nextAfter
+import at.hannibal2.skyhanni.utils.LorenzUtils.inAnyIsland
 import at.hannibal2.skyhanni.utils.LorenzUtils.inDungeons
-import at.hannibal2.skyhanni.utils.LorenzUtils.isInIsland
-import at.hannibal2.skyhanni.utils.LorenzUtils.nextAfter
 import at.hannibal2.skyhanni.utils.NEUInternalName.Companion.asInternalName
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.RenderUtils.HorizontalAlignment
@@ -239,7 +239,7 @@ private fun getPurseDisplayPair(): List<ScoreboardElement> {
     }.map { it to HorizontalAlignment.LEFT }
 }
 
-private fun getPurseShowWhen() = !listOf(IslandType.THE_RIFT).contains(HypixelData.skyBlockIsland)
+private fun getPurseShowWhen() = !inAnyIsland(IslandType.THE_RIFT)
 
 private fun getMotesDisplayPair(): List<ScoreboardElement> {
     val motes = getGroupFromPattern(ScoreboardData.sidebarLinesFormatted, ScoreboardPattern.motesPattern, "motes")
@@ -252,7 +252,7 @@ private fun getMotesDisplayPair(): List<ScoreboardElement> {
     }.map { it to HorizontalAlignment.LEFT }
 }
 
-private fun getMotesShowWhen() = listOf(IslandType.THE_RIFT).contains(HypixelData.skyBlockIsland)
+private fun getMotesShowWhen() = inAnyIsland(IslandType.THE_RIFT)
 
 private fun getBankDisplayPair(): List<ScoreboardElement> {
     val bank = getGroupFromPattern(TabListData.getTabList(), ScoreboardPattern.bankPattern, "bank")
@@ -264,7 +264,7 @@ private fun getBankDisplayPair(): List<ScoreboardElement> {
     }.map { it to HorizontalAlignment.LEFT }
 }
 
-private fun getBankShowWhen() = !listOf(IslandType.THE_RIFT).contains(HypixelData.skyBlockIsland)
+private fun getBankShowWhen() = !inAnyIsland(IslandType.THE_RIFT)
 
 private fun getBitsDisplayPair(): List<ScoreboardElement> {
     val bits = if (BitsAPI.bits == -1) {
@@ -306,7 +306,7 @@ private fun getBitsDisplayPair(): List<ScoreboardElement> {
 private fun getBitsShowWhen(): Boolean {
     if (HypixelData.bingo) return false
 
-    return !listOf(IslandType.CATACOMBS).contains(HypixelData.skyBlockIsland)
+    return !inAnyIsland(IslandType.CATACOMBS)
 }
 
 private fun getCopperDisplayPair(): List<ScoreboardElement> {
@@ -320,7 +320,7 @@ private fun getCopperDisplayPair(): List<ScoreboardElement> {
     }.map { it to HorizontalAlignment.LEFT }
 }
 
-private fun getCopperShowWhen() = listOf(IslandType.GARDEN).contains(HypixelData.skyBlockIsland)
+private fun getCopperShowWhen() = inAnyIsland(IslandType.GARDEN)
 
 private fun getGemsDisplayPair(): List<ScoreboardElement> {
     val gems = getGroupFromPattern(TabListData.getTabList(), ScoreboardPattern.gemsPattern, "gems")
@@ -332,7 +332,7 @@ private fun getGemsDisplayPair(): List<ScoreboardElement> {
     }.map { it to HorizontalAlignment.LEFT }
 }
 
-private fun getGemsShowWhen() = !listOf(IslandType.THE_RIFT, IslandType.CATACOMBS).contains(HypixelData.skyBlockIsland)
+private fun getGemsShowWhen() = !inAnyIsland(IslandType.THE_RIFT, IslandType.CATACOMBS)
 
 private fun getHeatDisplayPair(): List<ScoreboardElement> {
     val heat = getGroupFromPattern(ScoreboardData.sidebarLinesFormatted, ScoreboardPattern.heatPattern, "heat")
@@ -344,7 +344,7 @@ private fun getHeatDisplayPair(): List<ScoreboardElement> {
     }.map { it to HorizontalAlignment.LEFT }
 }
 
-private fun getHeatShowWhen() = listOf(IslandType.CRYSTAL_HOLLOWS).contains(HypixelData.skyBlockIsland)
+private fun getHeatShowWhen() = inAnyIsland(IslandType.CRYSTAL_HOLLOWS)
     && ScoreboardData.sidebarLinesFormatted.any { ScoreboardPattern.heatPattern.matches(it) }
 
 private fun getNorthStarsDisplayPair(): List<ScoreboardElement> {
@@ -430,7 +430,7 @@ private fun getPowerDisplayPair() = when (MaxwellAPI.currentPower) {
         }
 }
 
-private fun getPowerShowWhen() = !listOf(IslandType.THE_RIFT).contains(HypixelData.skyBlockIsland)
+private fun getPowerShowWhen() = !inAnyIsland(IslandType.THE_RIFT)
 
 private fun getCookieDisplayPair(): List<ScoreboardElement> {
     val timeLine = CustomScoreboardUtils.getTablistFooter().split("\n")
@@ -472,7 +472,7 @@ private fun getObjectiveDisplayPair(): List<ScoreboardElement> {
 }
 
 private fun getObjectiveShowWhen(): Boolean {
-    if (IslandType.KUUDRA_ARENA.isInIsland()) return false
+    if (inAnyIsland(IslandType.KUUDRA_ARENA)) return false
     return ScoreboardData.sidebarLinesFormatted.any { ScoreboardPattern.objectivePattern.matches(it) }
 }
 
@@ -486,14 +486,14 @@ private fun getSlayerDisplayPair(): List<ScoreboardElement> {
         )
 }
 
-private fun getSlayerShowWhen() = listOf(
+private fun getSlayerShowWhen() = inAnyIsland(
     IslandType.HUB,
     IslandType.SPIDER_DEN,
     IslandType.THE_PARK,
     IslandType.THE_END,
     IslandType.CRIMSON_ISLE,
     IslandType.THE_RIFT
-).contains(HypixelData.skyBlockIsland)
+)
 
 private fun getQuiverDisplayPair(): List<ScoreboardElement> {
     if (QuiverAPI.currentArrow == null)
@@ -512,7 +512,7 @@ private fun getQuiverDisplayPair(): List<ScoreboardElement> {
 
 private fun getQuiverShowWhen(): Boolean {
     if (informationFilteringConfig.hideIrrelevantLines && !QuiverAPI.hasBowInInventory()) return false
-    return !listOf(IslandType.THE_RIFT).contains(HypixelData.skyBlockIsland)
+    return !inAnyIsland(IslandType.THE_RIFT)
 }
 
 private fun getPowderDisplayPair(): List<ScoreboardElement> {
@@ -558,7 +558,7 @@ private fun getMayorDisplayPair(): List<ScoreboardElement> {
 }
 
 private fun getMayorShowWhen() =
-    !listOf(IslandType.THE_RIFT).contains(HypixelData.skyBlockIsland) && MayorAPI.currentMayor != null
+    !inAnyIsland(IslandType.THE_RIFT) && MayorAPI.currentMayor != null
 
 private fun getPartyDisplayPair() =
     if (PartyAPI.partyMembers.isEmpty() && informationFilteringConfig.hideEmptyLines) {
@@ -579,11 +579,11 @@ private fun getPartyShowWhen() = when (inDungeons) {
     true -> false // Hidden bc the scoreboard lines already exist
     false -> when (config.partyConfig.showPartyEverywhere) {
         true -> true
-        false -> listOf(
+        false -> inAnyIsland(
             IslandType.DUNGEON_HUB,
             IslandType.KUUDRA_ARENA,
             IslandType.CRIMSON_ISLE
-        ).contains(HypixelData.skyBlockIsland)
+        )
     }
 }
 
