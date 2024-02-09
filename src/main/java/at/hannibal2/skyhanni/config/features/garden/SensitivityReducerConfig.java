@@ -62,7 +62,8 @@ public class SensitivityReducerConfig {
         name = "Disable in Barn",
         desc = "Disable reduced sensitivity in barn plot.")
     @ConfigEditorBoolean
-    public boolean inPlot = true;
+    public boolean onlyPlot = true;
+
     @Expose
     public Position position = new Position(400, 400, 0.8f);
 }

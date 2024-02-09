@@ -38,30 +38,29 @@ object SensitivityReducer {
             return
         }
         if (isManualToggle) return
-        if (config.mode != SensitivityReducerConfig.Mode.OFF) {
-            if (isToggled) restoreSensitivity()
-            return
-        }
         if (isToggled && config.onGround && !mc.thePlayer.onGround) {
             restoreSensitivity()
             isToggled = false
             return
         }
-        if (isToggled && config.inPlot && GardenAPI.onBarnPlot) {
+        if (isToggled && config.onlyPlot && GardenAPI.onBarnPlot) {
             restoreSensitivity()
             isToggled = false
             return
         }
         when (config.mode) {
+            SensitivityReducerConfig.Mode.OFF -> {
+                if (isToggled) toggle(false)
+                return
+            }
             SensitivityReducerConfig.Mode.TOOL -> {
                 if (isHoldingTool() && !isToggled) toggle(true)
-                else if (!isHoldingTool() && isToggled) toggle(false)
+                else if (isToggled && !isHoldingTool()) toggle(false)
             }
             SensitivityReducerConfig.Mode.KEYBIND -> {
-                if (config.keybind.isKeyHeld() && !isToggled)  toggle(true)
-                else if (!config.keybind.isKeyHeld() && isToggled) toggle(false)
+                if (config.keybind.isKeyHeld() && !isToggled) toggle(true)
+                else if (isToggled && !config.keybind.isKeyHeld()) toggle(false)
             }
-            SensitivityReducerConfig.Mode.OFF -> return
             else -> return
         }
     }
@@ -119,8 +118,8 @@ object SensitivityReducer {
     }
 
     private fun toggle(state: Boolean) {
-        if (config.inPlot && GardenAPI.onBarnPlot) return
-        if (config.onGround && !Minecraft.getMinecraft().thePlayer.onGround) return
+        if (config.onlyPlot && GardenAPI.onBarnPlot) return
+        if (config.onGround && !mc.thePlayer.onGround) return
         if (!isToggled) {
             lowerSensitivity()
         } else restoreSensitivity()
@@ -156,9 +155,15 @@ object SensitivityReducer {
         event.addData {
             add("Current Sensitivity: ${gameSettings.mouseSensitivity}")
             add("Stored Sensitivity: ${storage.savedMouseloweredSensitivity}")
+            add("onGround: ${mc.thePlayer.onGround}")
+            add("onBarn: ${GardenAPI.onBarnPlot}")
+            add("enabled: ${isToggled || isManualToggle}")
+            add("--- config ---")
+            add("mode: ${config.mode.name}")
             add("Current Divisor: ${config.reducingFactor.get()}")
-            add("Mode: ${config.mode}")
             add("Keybind: ${config.keybind}")
+            add("onlyGround: ${config.onGround}")
+            add("onlyPlot: ${config.onlyPlot}")
         }
     }
 }
