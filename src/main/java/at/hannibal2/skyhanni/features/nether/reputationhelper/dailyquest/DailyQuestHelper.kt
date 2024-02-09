@@ -263,7 +263,6 @@ class DailyQuestHelper(val reputationHelper: CrimsonIsleReputationHelper) {
         result.add("  $stateText$categoryName: ")
         result.add(item)
         result.add("§f$displayName$progressText$sacksText")
-        if (state.contains("Collected") && config.hideComplete) return mutableListOf<Any>()
         return result
     }
 
