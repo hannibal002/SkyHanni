@@ -124,7 +124,8 @@ class MinecraftConsoleFilter(private val loggerConfigName: String) : Filter {
                 val first = cause.stackTrace[0]
                 val firstName = first.toString()
                 if (firstName == "net.minecraft.scoreboard.Scoreboard.removeTeam(Scoreboard.java:229)" ||
-                    firstName == "net.minecraft.scoreboard.Scoreboard.removeTeam(Scoreboard.java:262)"
+                    firstName == "net.minecraft.scoreboard.Scoreboard.removeTeam(Scoreboard.java:262)" ||
+                    firstName == "net.minecraft.scoreboard.Scoreboard.removeTeam(Scoreboard.java:240)"
                 ) {
                     filterConsole("NullPointerException at Scoreboard.removeTeam")
                     return Filter.Result.DENY
@@ -134,7 +135,8 @@ class MinecraftConsoleFilter(private val loggerConfigName: String) : Filter {
                     return Filter.Result.DENY
                 }
                 if (firstName == "net.minecraft.scoreboard.Scoreboard.removeObjective(Scoreboard.java:179)" ||
-                    firstName == "net.minecraft.scoreboard.Scoreboard.removeObjective(Scoreboard.java:198)"
+                    firstName == "net.minecraft.scoreboard.Scoreboard.removeObjective(Scoreboard.java:198)" ||
+                    firstName == "net.minecraft.scoreboard.Scoreboard.removeObjective(Scoreboard.java:186)"
                 ) {
                     filterConsole("IllegalArgumentException at Scoreboard.removeObjective")
                     return Filter.Result.DENY
