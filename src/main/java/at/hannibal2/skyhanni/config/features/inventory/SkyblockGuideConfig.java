@@ -44,14 +44,14 @@ public class SkyblockGuideConfig {
 
     @Expose
     @ConfigOption(name = "Story Highlight",
-        desc = "Highlights not completed story lines, missing fast travel scrolls and not 100% completed harp songs")
+        desc = "Highlights uncompleted story lines, missing fast travel scrolls and not 100% completed harp songs")
     @ConfigEditorBoolean
     @FeatureToggle
     public boolean storyGuide = true;
 
     @Expose
-    @ConfigOption(name = "One time Completion Highlights",
-        desc = "Highlights these things: " + "\nwhich dragons weren't defeated" + "\nmissing kuudra defeats" + "\nmissing spooky ranks" + "\nmissing bank upgrades" + "\nnot obtained dojo Belts" + "\nmissing rock rarities" + "\nmissing dolphin rarities")
+    @ConfigOption(name = "One Time Completion Highlights",
+        desc = "Highlights missing kuudra defeats, dungeon floors completions, spooky ranks, bank upgrades, rock/dolphin rarities, undefeated dragons, unobtained dojo belts")
     @ConfigEditorBoolean
     @FeatureToggle
     public boolean oneTimeCompletion = true;

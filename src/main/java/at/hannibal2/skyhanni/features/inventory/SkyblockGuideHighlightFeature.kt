@@ -225,6 +225,18 @@ class SkyblockGuideHighlightFeature private constructor(
                 openWikiOnClick,
                 openWikiTooltip
             )
+            SkyblockGuideHighlightFeature(
+                { skyblockGuideConfig.oneTimeCompletion },
+                "dungeon.floor",
+                "Complete Dungeons ➜.*",
+                "§7§eThis task can only be completed once!|§7§7You have not unlocked the content"
+            )
+            SkyblockGuideHighlightFeature(
+                { skyblockGuideConfig.oneTimeCompletion },
+                "dungeon.layers",
+                "Dungeon ➜ Complete Dungeons",
+                xPattern
+            )
         }
     }
 }
