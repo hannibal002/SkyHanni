@@ -1,6 +1,7 @@
 package at.hannibal2.skyhanni.features.garden.fortuneguide
 
 import at.hannibal2.skyhanni.config.Storage
+import at.hannibal2.skyhanni.data.PetAPI
 import at.hannibal2.skyhanni.data.ProfileStorageData
 import at.hannibal2.skyhanni.events.GardenToolChangeEvent
 import at.hannibal2.skyhanni.events.InventoryFullyOpenedEvent
@@ -127,9 +128,12 @@ class CaptureFarmingGear {
         val farmingItems = farmingItems ?: return
         val outdatedItems = outdatedItems ?: return
         val items = event.inventoryItems
+        if (PetAPI.isPetMenu(event.inventoryName)) {
+            pets(farmingItems, items, outdatedItems)
+            return
+        }
         when (event.inventoryName) {
             "Your Equipment and Stats" -> equipmentAndStats(items, farmingItems, outdatedItems)
-            "Pets" -> pets(farmingItems, items, outdatedItems)
             "Your Skills" -> skills(items, storage)
             "Community Shop" -> communityShop(items)
             "Configure Plots" -> configurePlots(items, storage)

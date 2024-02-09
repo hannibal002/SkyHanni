@@ -14,6 +14,7 @@ import at.hannibal2.skyhanni.features.chat.Translator
 import at.hannibal2.skyhanni.features.combat.endernodetracker.EnderNodeTracker
 import at.hannibal2.skyhanni.features.combat.ghostcounter.GhostUtil
 import at.hannibal2.skyhanni.features.commands.PartyCommands
+import at.hannibal2.skyhanni.features.commands.WikiManager
 import at.hannibal2.skyhanni.features.event.diana.BurrowWarpHelper
 import at.hannibal2.skyhanni.features.event.diana.DianaProfitTracker
 import at.hannibal2.skyhanni.features.event.diana.GriffinBurrowHelper
@@ -29,6 +30,7 @@ import at.hannibal2.skyhanni.features.garden.GardenAPI
 import at.hannibal2.skyhanni.features.garden.GardenCropTimeCommand
 import at.hannibal2.skyhanni.features.garden.GardenCropsInCommand
 import at.hannibal2.skyhanni.features.garden.GardenNextJacobContest
+import at.hannibal2.skyhanni.features.garden.SensitivityReducer
 import at.hannibal2.skyhanni.features.garden.composter.ComposterOverlay
 import at.hannibal2.skyhanni.features.garden.farming.ArmorDropTracker
 import at.hannibal2.skyhanni.features.garden.farming.CropMoneyDisplay
@@ -55,6 +57,7 @@ import at.hannibal2.skyhanni.test.SkyHanniConfigSearchResetCommand
 import at.hannibal2.skyhanni.test.SkyHanniDebugsAndTests
 import at.hannibal2.skyhanni.test.TestBingo
 import at.hannibal2.skyhanni.test.WorldEdit
+import at.hannibal2.skyhanni.test.command.CopyBossbarCommand
 import at.hannibal2.skyhanni.test.command.CopyItemCommand
 import at.hannibal2.skyhanni.test.command.CopyNearbyEntitiesCommand
 import at.hannibal2.skyhanni.test.command.CopyNearbyParticlesCommand
@@ -216,6 +219,10 @@ object Commands {
             "Lock/Unlock the mouse so it will no longer rotate the player (for farming)"
         ) { LockMouseLook.toggleLock() }
         registerCommand(
+            "shsensreduce",
+            "Lowers the mouse sensitivity for easier small adjustments (for farming)"
+        ) { SensitivityReducer.manualToggle() }
+        registerCommand(
             "shresetvermintracker",
             "Resets the Vermin Tracker"
         ) { VerminTracker.resetCommand(it) }
@@ -231,22 +238,28 @@ object Commands {
             "shresetseacreaturetracker",
             "Resets the Sea Creature Tracker"
         ) { SeaCreatureTracker.resetCommand(it) }
-        registerCommand0(
-            "shcalccrop",
-            "Calculate how many crops need to be farmed between different crop milestones.",
-            {
-                FarmingMilestoneCommand.onCommand(it.getOrNull(0), it.getOrNull(1), it.getOrNull(2), false)
-            },
-            FarmingMilestoneCommand::onComplete
-        )
-        registerCommand0(
-            "shcalccroptime",
-            "Calculate how long you need to farm crops between different crop milestones.",
-            {
-                FarmingMilestoneCommand.onCommand(it.getOrNull(0), it.getOrNull(1), it.getOrNull(2), true)
-            },
-            FarmingMilestoneCommand::onComplete
-        )
+        registerCommand(
+            "shfandomwiki",
+            "Searches the fandom wiki with SkyHanni's own method."
+        ) {WikiManager.otherWikiCommands(it, true)}
+        registerCommand(
+            "shfandomwikithis",
+            "Searches the fandom wiki with SkyHanni's own method."
+        ) {WikiManager.otherWikiCommands(it, true, true)}
+        registerCommand(
+            "shofficialwiki",
+            "Searches the official wiki with SkyHanni's own method."
+        ) {WikiManager.otherWikiCommands(it, false)}
+        registerCommand(
+            "shofficialwikithis",
+            "Searches the official wiki with SkyHanni's own method."
+        ) {WikiManager.otherWikiCommands(it, false, true)}
+        registerCommand0("shcalccrop", "Calculate how many crops need to be farmed between different crop milestones.", {
+            FarmingMilestoneCommand.onCommand(it.getOrNull(0), it.getOrNull(1), it.getOrNull(2), false)
+        }, FarmingMilestoneCommand::onComplete)
+        registerCommand0("shcalccroptime", "Calculate how long you need to farm crops between different crop milestones.", {
+            FarmingMilestoneCommand.onCommand(it.getOrNull(0), it.getOrNull(1), it.getOrNull(2), true)
+        }, FarmingMilestoneCommand::onComplete)
     }
 
     private fun usersBugFix() {
@@ -365,6 +378,10 @@ object Commands {
             "shcopyscoreboard",
             "Copies the scoreboard data to the clipboard"
         ) { CopyScoreboardCommand.command(it) }
+        registerCommand(
+            "shcopybossbar",
+            "Copies the name of the bossbar to the clipboard, including formatting codes"
+        ) { CopyBossbarCommand.command(it) }
         registerCommand(
             "shcopyitem",
             "Copies information about the item in hand to the clipboard"
