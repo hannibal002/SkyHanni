@@ -65,7 +65,7 @@ object ChatUtils {
      */
     @Deprecated(
         "Do not send the user a non clickable non stacktrace containing error message.",
-        ReplaceWith("ErrorManager")
+        ReplaceWith("ErrorManager.logErrorStateWithData")
     )
     fun error(message: String) {
         println("error: '$message'")

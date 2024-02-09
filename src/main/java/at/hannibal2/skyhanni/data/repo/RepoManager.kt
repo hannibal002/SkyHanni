@@ -6,6 +6,7 @@ import at.hannibal2.skyhanni.events.DebugDataCollectEvent
 import at.hannibal2.skyhanni.events.RepositoryReloadEvent
 import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.ChatUtils
+import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import com.google.gson.JsonObject
 import net.minecraft.client.Minecraft
@@ -223,6 +224,7 @@ class RepoManager(private val configLocation: File) {
             return
         }
         ChatUtils.chat("Repo has errors! Commit has: ${latestRepoCommit ?: "null"}", prefixColor = "§c")
+//         if (successfulConstants.isNotEmpty()) ChatUtils.chat(
         if (successfulConstants.isNotEmpty()) LorenzUtils.chat(
             "Successful Constants §7(${successfulConstants.size}):",
             prefixColor = "§a"

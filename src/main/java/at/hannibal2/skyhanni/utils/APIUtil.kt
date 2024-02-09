@@ -138,15 +138,21 @@ object APIUtil {
         return parser.parse(retSrc) as JsonObject
     }
 
-    fun postJSONIsSuccessful(urlString: String, body: String, silentError: Boolean = false): Boolean {
-        val response = postJSON(urlString, body, silentError)
+    fun postJSONIsSuccessful(url: String, body: String, silentError: Boolean = false): Boolean {
+        val response = postJSON(url, body, silentError)
 
         if (response.success) {
             return true
         }
 
         println(response.message)
-        LorenzUtils.error(response.message ?: "An error occurred during the API request")
+        ErrorManager.logErrorStateWithData(
+            "An error occurred during the API request",
+            "unsuccessful API response",
+            "url" to url,
+            "body" to body,
+            "response" to response,
+        )
 
         return false
     }
