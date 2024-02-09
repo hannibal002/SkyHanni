@@ -26,20 +26,40 @@ import net.minecraftforge.fml.common.network.FMLNetworkEvent
 import kotlin.concurrent.thread
 
 class HypixelData {
-    private val group = RepoPattern.group("data.hypixeldata")
-    private val tabListProfilePattern by group.pattern("tablistprofile", "§e§lProfile: §r§a(?<profile>.*)")
-    private val lobbyTypePattern by group.pattern("lobbytype", "(?<lobbyType>.*lobby)\\d+")
-    private val islandNamePattern by group.pattern("islandname", "(?:§.)*(Area|Dungeon): (?:§.)*(?<island>.*)")
+    private val patternGroup = RepoPattern.group("data.hypixeldata")
+    private val tabListProfilePattern by patternGroup.pattern(
+        "tablistprofile",
+        "§e§lProfile: §r§a(?<profile>.*)"
+    )
+    private val lobbyTypePattern by patternGroup.pattern(
+        "lobbytype",
+        "(?<lobbyType>.*lobby)\\d+"
+    )
+    private val islandNamePattern by patternGroup.pattern(
+        "islandname",
+        "(?:§.)*(Area|Dungeon): (?:§.)*(?<island>.*)"
+    )
 
     private var lastLocRaw = 0L
 
     companion object {
+        private val patternGroup = RepoPattern.group("data.hypixeldata")
+        private val serverIdScoreboardPattern by patternGroup.pattern(
+            "serverid.scoreboard",
+            "§7\\d+/\\d+/\\d+ §8(?<servertype>[mM])(?<serverid>\\S+)"
+        )
+        private val serverIdTablistPattern by patternGroup.pattern(
+            "serverid.tablist",
+            " Server: §r§8(?<serverid>\\S+)"
+        )
+
         var hypixelLive = false
         var hypixelAlpha = false
         var inLobby = false
         var inLimbo = false
         var skyBlock = false
         var skyBlockIsland = IslandType.UNKNOWN
+        var serverId: String? = null
 
         //Ironman, Stranded and Bingo
         var noTrade = false
@@ -70,6 +90,24 @@ class HypixelData {
         val lobbyType get() = locraw["lobbytype"] ?: ""
         val mode get() = locraw["mode"] ?: ""
         val map get() = locraw["map"] ?: ""
+
+        fun getCurrentServerId(): String? {
+            if (!LorenzUtils.inSkyBlock) return null
+            if (serverId != null) return serverId
+
+            ScoreboardData.sidebarLinesFormatted.forEach { serverIdScoreboardPattern.matchMatcher(it) {
+                val serverType = if (group("servertype") == "M") "mega" else "mini"
+                serverId = "$serverType${group("serverid")}"
+                return serverId
+            } }
+
+            TabListData.getTabList().forEach { serverIdTablistPattern.matchMatcher(it) {
+                serverId = group("serverid")
+                return serverId
+            } }
+
+            return serverId
+        }
     }
 
     private var loggerIslandChange = LorenzLogger("debug/island_change")
@@ -82,6 +120,7 @@ class HypixelData {
         inLobby = false
         locraw.forEach { locraw[it.key] = "" }
         joinedWorld = System.currentTimeMillis()
+        serverId = null
     }
 
     @SubscribeEvent
