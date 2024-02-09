@@ -66,7 +66,8 @@ object ChatManager {
         var actionKind: ActionKind,
         var actionReason: String?,
         val modified: IChatComponent?,
-        val reasonExtraInfo: List<String> = listOf(),
+        val hoverInfo: List<String> = listOf(),
+        val hoverExtraInfo: List<String> = listOf(),
     )
 
     @SubscribeEvent(priority = EventPriority.LOW, receiveCanceled = true)
@@ -90,13 +91,29 @@ object ChatManager {
         val component = ChatComponentText(message)
         val originatingModCall = event.findOriginatingModCall()
         val originatingModContainer = originatingModCall?.getClassInstance()?.getModContainer()
+        val hoverInfo = listOf(
+            "§7Message created by §a${originatingModCall?.toString() ?: "§cprobably minecraft"}",
+            "§7Mod id: §a${originatingModContainer?.modId}",
+            "§7Mod name: §a${originatingModContainer?.name}"
+        )
+        /*
+
+        return s + "." + methodName + "(" +
+             (isNativeMethod() ? "Native Method)" :
+              (fileName != null && lineNumber >= 0 ?
+               fileName + ":" + lineNumber + ")" :
+                (fileName != null ?  ""+fileName+")" : "Unknown Source)")));
+
+         */
+        val stackTrace =
+            Thread.currentThread().stackTrace.map {
+                "§7  §2${it.className}§7.§a${it.methodName}§7" +
+                    if (it.fileName == null) "" else "(§b${it.fileName}§7:§3${it.lineNumber}§7)"
+            }
         val result = MessageFilteringResult(
             component, ActionKind.OUTGOING, null, null,
-            reasonExtraInfo = listOf(
-                "§7Message created by §a${originatingModCall?.toString() ?: "§cprobably minecraft"}",
-                "§7Mod id: §a${originatingModContainer?.modId}",
-                "§7Mod name: §a${originatingModContainer?.name}"
-            )
+            hoverInfo = hoverInfo,
+            hoverExtraInfo = hoverInfo + listOf("") + stackTrace
         )
 
         messageHistory[IdentityCharacteristics(component)] = result

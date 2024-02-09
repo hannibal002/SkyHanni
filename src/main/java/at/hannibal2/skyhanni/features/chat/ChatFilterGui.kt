@@ -61,8 +61,10 @@ class ChatFilterGui(private val history: List<ChatManager.MessageFilteringResult
                 )
             }
             val isHovered = mouseX in 0..w && mouseY in 0..(size * 10)
-            if (isHovered && msg.reasonExtraInfo.isNotEmpty())
-                queuedTooltip = msg.reasonExtraInfo
+            if (isHovered && msg.hoverInfo.isNotEmpty())
+                queuedTooltip = msg.hoverInfo
+            if (isHovered && KeyboardManager.isShiftKeyDown() && msg.hoverExtraInfo.isNotEmpty())
+                queuedTooltip = msg.hoverExtraInfo
             if (isHovered && (isMouseButtonDown && !wasMouseButtonDown)) {
                 if (KeyboardManager.isShiftKeyDown()) {
                     OSUtils.copyToClipboard(IChatComponent.Serializer.componentToJson(msg.message))
@@ -79,7 +81,7 @@ class ChatFilterGui(private val history: List<ChatManager.MessageFilteringResult
         wasMouseButtonDown = isMouseButtonDown
         GlStateManager.popMatrix()
         if (queuedTooltip != null) {
-            Utils.drawHoveringText(queuedTooltip, originalMouseX, originalMouseY, width, height, 400, mc.fontRendererObj)
+            Utils.drawHoveringText(queuedTooltip, originalMouseX, originalMouseY, width, height, -1, mc.fontRendererObj)
         }
         GlStateManager.color(1f, 1f, 1f, 1f)
     }
