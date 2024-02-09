@@ -1,5 +1,6 @@
 package at.hannibal2.skyhanni.features.nether.reputationhelper.miniboss
 
+import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.config.Storage
 import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.data.jsonobjects.repo.CrimsonIsleReputationJson.ReputationQuest
@@ -23,6 +24,7 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 class DailyMiniBossHelper(private val reputationHelper: CrimsonIsleReputationHelper) {
 
     val miniBosses = mutableListOf<CrimsonMiniBoss>()
+    private val config get() = SkyHanniMod.feature.crimsonIsle.reputationHelper
 
     @SubscribeEvent
     fun onChat(event: LorenzChatEvent) {
@@ -80,7 +82,7 @@ class DailyMiniBossHelper(private val reputationHelper: CrimsonIsleReputationHel
                 lineList.add(" ")
                 lineList.add(displayItem.getItemStack())
                 lineList.add("§5$displayName§7: $result")
-                display.add(lineList)
+                if (!(config.hideComplete && result == "§aDone")) display.add(lineList)
             }
         }
     }

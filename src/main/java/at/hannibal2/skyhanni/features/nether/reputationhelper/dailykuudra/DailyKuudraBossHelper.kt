@@ -1,5 +1,6 @@
 package at.hannibal2.skyhanni.features.nether.reputationhelper.dailykuudra
 
+import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.config.Storage
 import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.data.ScoreboardData
@@ -21,6 +22,8 @@ class DailyKuudraBossHelper(private val reputationHelper: CrimsonIsleReputationH
 
     private var kuudraLocation: LorenzVec? = null
     private var allKuudraDone = true
+
+    private val config get() = SkyHanniMod.feature.crimsonIsle.reputationHelper
 
     @SubscribeEvent
     fun onRenderWorld(event: LorenzRenderWorldEvent) {
@@ -75,7 +78,7 @@ class DailyKuudraBossHelper(private val reputationHelper: CrimsonIsleReputationH
                 lineList.add(" ")
                 lineList.add(displayItem.getItemStack())
                 lineList.add("$displayName: $result")
-                display.add(lineList)
+                if (!(config.hideComplete && result == "§aDone")) display.add(lineList)
             }
         }
     }

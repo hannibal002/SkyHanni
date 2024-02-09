@@ -24,6 +24,11 @@ public class ReputationHelperConfig {
     public boolean useHotkey = false;
 
     @Expose
+    @ConfigOption(name = "Hide Completed", desc = "Hides tasks after they've been completed.")
+    @ConfigEditorBoolean
+    public boolean hideComplete = true;
+
+    @Expose
     @ConfigOption(name = "Hotkey", desc = "Press this hotkey to show the Reputation Helper.")
     @ConfigEditorKeybind(defaultKey = Keyboard.KEY_NONE)
     public int hotkey = Keyboard.KEY_NONE;

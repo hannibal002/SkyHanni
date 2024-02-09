@@ -21,9 +21,11 @@ import at.hannibal2.skyhanni.utils.LorenzUtils.addAsSingletonList
 import at.hannibal2.skyhanni.utils.LorenzUtils.isInIsland
 import at.hannibal2.skyhanni.utils.LorenzVec
 import at.hannibal2.skyhanni.utils.RenderUtils.renderStringsAndItems
+import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.TabListData
 import net.minecraftforge.fml.common.eventhandler.EventPriority
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
+import kotlin.time.Duration.Companion.seconds
 
 class CrimsonIsleReputationHelper(skyHanniMod: SkyHanniMod) {
     val config get() = SkyHanniMod.feature.crimsonIsle.reputationHelper
@@ -33,6 +35,8 @@ class CrimsonIsleReputationHelper(skyHanniMod: SkyHanniMod) {
     val kuudraBossHelper = DailyKuudraBossHelper(this)
 
     var factionType = FactionType.NONE
+
+    private var lastUpdate = SimpleTimeMark.farPast()
 
     private var display = emptyList<List<Any>>()
     private var dirty = true
@@ -73,6 +77,10 @@ class CrimsonIsleReputationHelper(skyHanniMod: SkyHanniMod) {
         if (!config.enabled) return
         if (!dirty && display.isEmpty()) {
             dirty = true
+        }
+        if (!dirty && lastUpdate.passedSince() > 3.seconds) {
+            dirty = true
+            lastUpdate = SimpleTimeMark.now()
         }
         if (dirty) {
             dirty = false
