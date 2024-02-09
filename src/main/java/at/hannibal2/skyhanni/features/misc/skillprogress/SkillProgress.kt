@@ -332,13 +332,13 @@ object SkillProgress {
 
 
         if (config.showLevel.get())
-            add(Renderable.fromAny("§9[§d$level§9] ") as Renderable)
+            add(Renderable.string("§9[§d$level§9] "))
 
         if (config.useIcon.get()) {
-            add(Renderable.fromAny(activeSkill.item, 1.5) as Renderable)
+            add(Renderable.itemStack(activeSkill.item, 1.5))
         }
 
-        add(Renderable.fromAny(buildString {
+        add(Renderable.string(buildString {
             append("§b+${skill.lastGain} ")
 
             if (config.useSkillName.get())
@@ -372,8 +372,7 @@ object SkillProgress {
                     append("∞ Left")
                 }
             }
-        }) as Renderable)
-
+        }))
     }
 
     private fun updateSkillInfo(skill: SkillType) {
