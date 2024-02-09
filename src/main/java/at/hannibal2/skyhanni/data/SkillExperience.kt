@@ -14,6 +14,7 @@ import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
 class SkillExperience {
+
     // TODO USE SH-REPO
     private val actionBarPattern = ".*§3\\+.* (?<skill>.*) \\((?<overflow>.*)/(?<needed>.*)\\).*".toPattern()
     private val inventoryPattern = ".* §e(?<number>.*)§6/.*".toPattern()
@@ -79,6 +80,7 @@ class SkillExperience {
     }
 
     companion object {
+
         private val skillExp = mutableMapOf<String, Long>()
 
         private fun getLevelForExpExactly(experience: Long): Int {
@@ -109,7 +111,7 @@ class SkillExperience {
             return 0
         }
 
-        //TODO create additional event
+        // TODO create additional event
         fun getExpForSkill(skillName: String) = skillExp[skillName.lowercase()] ?: 0
 
         private val levelingExp = listOf(

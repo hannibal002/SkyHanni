@@ -12,6 +12,7 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import kotlin.concurrent.fixedRateTimer
 
 class DungeonMilestonesDisplay {
+
     private val config get() = SkyHanniMod.feature.dungeon
 
     companion object {

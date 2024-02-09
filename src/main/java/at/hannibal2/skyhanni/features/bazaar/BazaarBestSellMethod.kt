@@ -18,6 +18,7 @@ import net.minecraftforge.fml.common.eventhandler.EventPriority
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
 class BazaarBestSellMethod {
+
     private var display = ""
 
     // Working with the last clicked item manually because

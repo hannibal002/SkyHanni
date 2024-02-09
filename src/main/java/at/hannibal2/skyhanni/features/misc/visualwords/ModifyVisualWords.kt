@@ -7,6 +7,7 @@ import at.hannibal2.skyhanni.utils.TimeLimitedCache
 import kotlin.time.Duration.Companion.minutes
 
 object ModifyVisualWords {
+
     private val config get() = SkyHanniMod.feature.gui.modifyWords
     var textCache = TimeLimitedCache<String, String>(5.minutes)
 

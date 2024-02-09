@@ -9,7 +9,7 @@ import at.hannibal2.skyhanni.features.chat.ChatFilterGui
 import at.hannibal2.skyhanni.utils.IdentityCharacteristics
 import at.hannibal2.skyhanni.utils.LorenzLogger
 import at.hannibal2.skyhanni.utils.LorenzUtils
-import at.hannibal2.skyhanni.utils.LorenzUtils.makeAccessible
+import at.hannibal2.skyhanni.utils.ReflectionUtils.makeAccessible
 import at.hannibal2.skyhanni.utils.getClassInstance
 import at.hannibal2.skyhanni.utils.getModContainer
 import net.minecraft.client.Minecraft
@@ -55,6 +55,7 @@ object ChatManager {
         val renderedString = "$format$name"
 
         companion object {
+
             val maxLength by lazy {
                 entries.maxOf { Minecraft.getMinecraft().fontRendererObj.getStringWidth(it.renderedString) }
             }
@@ -80,7 +81,6 @@ object ChatManager {
             val actionBarEvent = LorenzActionBarEvent(message)
             actionBarEvent.postAndCatch()
         }
-
     }
 
     @SubscribeEvent

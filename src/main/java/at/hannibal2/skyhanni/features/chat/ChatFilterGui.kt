@@ -1,6 +1,7 @@
 package at.hannibal2.skyhanni.features.chat
 
 import at.hannibal2.skyhanni.data.ChatManager
+import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.KeyboardManager
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.OSUtils
@@ -16,6 +17,7 @@ import net.minecraft.util.IChatComponent
 import org.lwjgl.input.Mouse
 
 class ChatFilterGui(private val history: List<ChatManager.MessageFilteringResult>) : GuiScreen() {
+
     private var scroll = -1.0
     private val w = 500
     private var wasMouseButtonDown = false
@@ -68,11 +70,11 @@ class ChatFilterGui(private val history: List<ChatManager.MessageFilteringResult
             if (isHovered && (isMouseButtonDown && !wasMouseButtonDown)) {
                 if (KeyboardManager.isShiftKeyDown()) {
                     OSUtils.copyToClipboard(IChatComponent.Serializer.componentToJson(msg.message))
-                    LorenzUtils.chat("Copied structured chat line to clipboard", false)
+                    ChatUtils.chat("Copied structured chat line to clipboard", false)
                 } else {
                     val message = LorenzUtils.stripVanillaMessage(msg.message.formattedText)
                     OSUtils.copyToClipboard(message)
-                    LorenzUtils.chat("Copied chat line to clipboard", false)
+                    ChatUtils.chat("Copied chat line to clipboard", false)
                 }
             }
             mouseY -= size * 10
@@ -122,10 +124,8 @@ class ChatFilterGui(private val history: List<ChatManager.MessageFilteringResult
         return modifiedSplitText.size
     }
 
-
     override fun handleMouseInput() {
         super.handleMouseInput()
         setScroll(scroll - Mouse.getEventDWheel())
     }
-
 }

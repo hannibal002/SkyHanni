@@ -25,6 +25,7 @@ class EntityData(
     var firstDeath: Boolean = false, // TODO this defines if hp is very low, replace dead with this later
     var deathLocation: LorenzVec? = null,
 ) {
+
     val timeToKill by lazy {
         "§e" + foundTime.passedSince().format(TimeUnit.SECOND, showMilliSeconds = true)
     }

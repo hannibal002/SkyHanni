@@ -6,6 +6,7 @@ class RenderItemTipEvent(
     val stack: ItemStack,
     var renderObjects: MutableList<RenderObject>,
 ) : LorenzEvent() {
+
     var stackTip = ""
         set(value) {
             renderObjects.add(RenderObject(value, 0, 0))
