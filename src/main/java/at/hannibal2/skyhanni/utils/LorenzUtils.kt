@@ -391,7 +391,7 @@ object LorenzUtils {
         val msgPrefix = if (prefix) prefixColor + CHAT_PREFIX else ""
         val text = ChatComponentText(msgPrefix + message)
         text.chatStyle.chatClickEvent = ClickEvent(ClickEvent.Action.OPEN_URL, url)
-        text.chatStyle.chatHoverEvent =  HoverEvent(HoverEvent.Action.SHOW_TEXT, ChatComponentText("$prefixColor$hover"))
+        text.chatStyle.chatHoverEvent = HoverEvent(HoverEvent.Action.SHOW_TEXT, ChatComponentText("$prefixColor$hover"))
         Minecraft.getMinecraft().thePlayer.addChatMessage(text)
         if (autoOpen) OSUtils.openBrowser(url)
     }
@@ -663,8 +663,9 @@ object LorenzUtils {
         slot?.slotNumber?.let { slotNumber ->
             Minecraft.getMinecraft().playerController.windowClick(
                 container.windowId, slotNumber, 0, 1, Minecraft.getMinecraft().thePlayer
-            )?.also { isCanceled = true }
-        }
+            )
+            true
+        }?.also { isCanceled = true }
 
     fun <T> List<T>.indexOfFirst(vararg args: T) = args.map { indexOf(it) }.firstOrNull { it != -1 }
 
