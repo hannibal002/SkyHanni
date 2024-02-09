@@ -37,7 +37,7 @@ public class SkillProgressConfig {
     public Property<Boolean> enabled = Property.of(false);
 
     @Expose
-    @ConfigOption(name = "Text Alignment", desc = "")
+    @ConfigOption(name = "Text Alignment", desc = "Align the display text with the progress bar.")
     @ConfigEditorDropdown
     public Property<TextAlignment> textAlignmentProperty = Property.of(TextAlignment.NONE);
 
@@ -72,7 +72,7 @@ public class SkillProgressConfig {
     public boolean hideInActionBar = false;
 
     @Expose
-    @ConfigOption(name = "Progress Bar Config", desc = "Align the display text with the progress bar.")
+    @ConfigOption(name = "Progress Bar Config", desc = "")
     @Accordion
     public ProgressBarConfig progressBarConfig = new ProgressBarConfig();
 
@@ -176,7 +176,7 @@ public class SkillProgressConfig {
     public Property<Boolean> alwaysShow = Property.of(false);
 
     @Expose
-    @ConfigOption(name = "Show action left", desc = "Show action left until you reach the next level.")
+    @ConfigOption(name = "Show Action left", desc = "Show action left until you reach the next level.")
     @ConfigEditorBoolean
     public Property<Boolean> showActionLeft = Property.of(false);
 
