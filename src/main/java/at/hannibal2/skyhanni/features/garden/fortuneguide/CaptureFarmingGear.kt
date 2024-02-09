@@ -17,6 +17,7 @@ import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.NumberUtil.romanToDecimal
 import at.hannibal2.skyhanni.utils.NumberUtil.romanToDecimalIfNecessary
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getEnchantments
+import at.hannibal2.skyhanni.utils.StringUtils.isRoman
 import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.TabListData
@@ -44,7 +45,7 @@ class CaptureFarmingGear {
     private val patternGroup = RepoPattern.group("garden.fortuneguide.capture")
     private val tierPattern by patternGroup.pattern(
         "uniquevisitors.tier",
-        "§7Progress to Tier (?<nextTier>\\d+):.*"
+        "§7Progress to Tier (?<nextTier>\\d+|I{1,3}|IV|V|VI{1,3}|IX|X):.*"
     )
     private val tierProgressPattern by patternGroup.pattern(
         "uniquevisitors.tierprogress",
@@ -150,7 +151,9 @@ class CaptureFarmingGear {
             var tierProgress = -1
             for (line in item.getLore()) {
                 tierPattern.matchMatcher(line) {
-                    tier = group("nextTier").toInt() - 1
+                    val nextTier = group("nextTier")
+                    tier = if (nextTier.isRoman()) nextTier.romanToDecimal()
+                    else nextTier.toInt()
                 }
                 tierProgressPattern.matchMatcher(line) {
                     tierProgress = group("having").toInt()
