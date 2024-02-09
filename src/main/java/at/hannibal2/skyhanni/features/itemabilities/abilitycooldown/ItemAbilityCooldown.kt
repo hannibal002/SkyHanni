@@ -6,10 +6,13 @@ import at.hannibal2.skyhanni.events.ItemClickEvent
 import at.hannibal2.skyhanni.events.LorenzActionBarEvent
 import at.hannibal2.skyhanni.events.LorenzChatEvent
 import at.hannibal2.skyhanni.events.LorenzTickEvent
+import at.hannibal2.skyhanni.events.LorenzWorldChangeEvent
 import at.hannibal2.skyhanni.events.PlaySoundEvent
 import at.hannibal2.skyhanni.events.RenderItemTipEvent
 import at.hannibal2.skyhanni.events.RenderObject
 import at.hannibal2.skyhanni.features.itemabilities.abilitycooldown.ItemAbility.Companion.getMultiplier
+import at.hannibal2.skyhanni.features.nether.ashfang.AshfangFreezeCooldown
+import at.hannibal2.skyhanni.utils.CollectionUtils.equalsOneOf
 import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.ItemUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.cleanName
@@ -17,7 +20,6 @@ import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName
 import at.hannibal2.skyhanni.utils.LorenzColor
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils.between
-import at.hannibal2.skyhanni.utils.LorenzUtils.equalsOneOf
 import at.hannibal2.skyhanni.utils.LorenzUtils.round
 import at.hannibal2.skyhanni.utils.NEUInternalName.Companion.asInternalName
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getAbilityScrolls
@@ -30,6 +32,7 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import kotlin.math.max
 
 class ItemAbilityCooldown {
+
     private val config get() = SkyHanniMod.feature.itemAbilities
 
     private var lastAbility = ""
@@ -61,11 +64,11 @@ class ItemAbilityCooldown {
             }
             // Gyrokinetic Wand & Shadow Fury
             event.soundName == "mob.endermen.portal" -> {
-                //Gryokinetic Wand
+                // Gryokinetic Wand
                 if (event.pitch == 0.61904764f && event.volume == 1f) {
                     ItemAbility.GYROKINETIC_WAND_LEFT.sound()
                 }
-                //Shadow Fury
+                // Shadow Fury
                 if (event.pitch == 1f && event.volume == 1f) {
                     val internalName = InventoryUtils.getItemInHand()?.getInternalName() ?: return
                     if (!internalName.equalsOneOf(
@@ -159,6 +162,7 @@ class ItemAbilityCooldown {
 
     @SubscribeEvent
     fun onItemClick(event: ItemClickEvent) {
+        if (AshfangFreezeCooldown.iscurrentlyFrozen()) return
         handleItemClick(event.itemInHand)
     }
 
@@ -166,6 +170,14 @@ class ItemAbilityCooldown {
         if (!LorenzUtils.inSkyBlock) return
         itemInHand?.getInternalName()?.run {
             ItemAbility.getByInternalName(this)?.setItemClick()
+        }
+    }
+
+    @SubscribeEvent
+    fun onIslandChange(event: LorenzWorldChangeEvent) {
+        for (ability in ItemAbility.entries) {
+            ability.lastActivation = 0L
+            ability.specialColor = null
         }
     }
 
@@ -196,6 +208,7 @@ class ItemAbilityCooldown {
     }
 
     private fun handleOldAbilities(message: String) {
+        // TODO use regex
         if (message.contains(" (§6") && message.contains("§b) ")) {
             val name: String = message.between(" (§6", "§b) ")
             if (name == lastAbility) return
@@ -296,7 +309,7 @@ class ItemAbilityCooldown {
     private fun ItemStack.getIdentifier() = getItemUuid() ?: getItemId()
 
     @SubscribeEvent
-    fun onChatMessage(event: LorenzChatEvent) {
+    fun onChat(event: LorenzChatEvent) {
         if (!isEnabled()) return
 
         val message = event.message

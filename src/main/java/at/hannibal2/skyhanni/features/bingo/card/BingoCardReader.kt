@@ -10,6 +10,7 @@ import at.hannibal2.skyhanni.features.bingo.BingoAPI
 import at.hannibal2.skyhanni.features.bingo.card.goals.BingoGoal
 import at.hannibal2.skyhanni.features.bingo.card.goals.GoalType
 import at.hannibal2.skyhanni.features.bingo.card.goals.HiddenGoalData
+import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.ItemUtils.name
 import at.hannibal2.skyhanni.utils.LorenzUtils
@@ -22,6 +23,7 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import kotlin.time.Duration
 
 class BingoCardReader {
+
     private val config get() = SkyHanniMod.feature.event.bingo.bingoCard
 
     private val percentagePattern by RepoPattern.pattern("bingo.card.percentage", " {2}§8Top §.(?<percentage>.*)%")
@@ -63,9 +65,10 @@ class BingoCardReader {
 
             val done = lore.any { it.contains("GOAL REACHED") }
             val communtyGoalPercentage = readCommuntyGoalPercentage(lore)
-
             val hiddenGoalData = getHiddenGoalData(name, description, goalType)
             val visualDescription = hiddenGoalData.tipNote
+
+            val guide = BingoAPI.getData(name)?.guide?.map { "§7$it" } ?: listOf("§cNo guide yet!")
 
             val bingoGoal = BingoAPI.bingoGoals.getOrPut(slot) { BingoGoal() }
 
@@ -73,6 +76,7 @@ class BingoCardReader {
                 this.type = goalType
                 this.displayName = name
                 this.description = visualDescription
+                this.guide = guide
                 this.done = done
                 this.hiddenGoalData = hiddenGoalData
             }
@@ -95,7 +99,7 @@ class BingoCardReader {
         val oldFormat = BingoAPI.getCommunityPercentageColor(old)
         val newFormat = BingoAPI.getCommunityPercentageColor(new)
         val color = if (new > old) "§c" else "§a"
-        LorenzUtils.chat("$color${bingoGoal.displayName}: $oldFormat §b->" + " $newFormat")
+        ChatUtils.chat("$color${bingoGoal.displayName}: $oldFormat §b->" + " $newFormat")
     }
 
     private fun readCommuntyGoalPercentage(lore: List<String>): Double? {
@@ -130,7 +134,7 @@ class BingoCardReader {
             }
         }
 
-        val description = BingoAPI.getTip(name)?.getDescriptionLine()
+        val description = BingoAPI.getData(name)?.getDescriptionLine()
         val tipNote = description?.let {
             unknownTip = false
             it
@@ -153,5 +157,5 @@ class BingoCardReader {
         BingoCardUpdateEvent().postAndCatch()
     }
 
-    private fun BingoJson.BingoTip.getDescriptionLine() = "§7" + note.joinToString(" ")
+    private fun BingoJson.BingoData.getDescriptionLine() = "§7" + note.joinToString(" ")
 }

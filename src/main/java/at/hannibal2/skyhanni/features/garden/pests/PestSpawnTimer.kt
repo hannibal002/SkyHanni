@@ -9,6 +9,7 @@ import at.hannibal2.skyhanni.utils.TimeUtils.format
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
 object PestSpawnTimer {
+
     private val config get() = PestAPI.config.pestTimer
 
     var lastSpawnTime = SimpleTimeMark.farPast()

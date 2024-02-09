@@ -4,7 +4,7 @@ import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.events.GuiContainerEvent
 import at.hannibal2.skyhanni.events.LorenzToolTipEvent
 import at.hannibal2.skyhanni.features.bingo.BingoAPI
-import at.hannibal2.skyhanni.features.bingo.BingoAPI.getTip
+import at.hannibal2.skyhanni.features.bingo.BingoAPI.getData
 import at.hannibal2.skyhanni.features.bingo.card.goals.GoalType
 import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.LorenzColor
@@ -16,6 +16,7 @@ import net.minecraft.inventory.ContainerChest
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
 class BingoCardTips {
+
     private val config get() = SkyHanniMod.feature.event.bingo.bingoCard
 
     @SubscribeEvent
@@ -28,7 +29,7 @@ class BingoCardTips {
         val goal = BingoAPI.bingoGoals[slot.slotNumber] ?: return
 
         val toolTip = event.toolTip
-        val bingoTip = goal.getTip() ?: return
+        val bingoTip = goal.getData() ?: return
         val communityGoal = goal.type == GoalType.COMMUNITY
 
         val difficulty = Difficulty.valueOf(bingoTip.difficulty.uppercase())
@@ -42,7 +43,7 @@ class BingoCardTips {
 
         toolTip.add(index++, "")
         toolTip.add(index++, "§eGuide:")
-        for (line in bingoTip.note) {
+        for (line in bingoTip.guide) {
             toolTip.add(index++, " $line")
         }
         bingoTip.found?.let {
@@ -63,7 +64,7 @@ class BingoCardTips {
             val goal = BingoAPI.bingoGoals[slot.slotNumber] ?: continue
             if (config.hideDoneDifficulty && goal.done) continue
 
-            val color = goal.getTip()?.let {
+            val color = goal.getData()?.let {
                 val difficulty = Difficulty.valueOf(it.difficulty.uppercase())
                 difficulty.color
             } ?: LorenzColor.GRAY

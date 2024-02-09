@@ -10,11 +10,13 @@ import at.hannibal2.skyhanni.events.LorenzWorldChangeEvent
 import at.hannibal2.skyhanni.events.ProfileJoinEvent
 import at.hannibal2.skyhanni.features.bingo.BingoAPI
 import at.hannibal2.skyhanni.test.command.ErrorManager
+import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.LorenzLogger
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.TabListData
+import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import com.google.gson.JsonObject
 import io.github.moulberry.notenoughupdates.NotEnoughUpdates
 import net.minecraft.client.Minecraft
@@ -25,21 +27,44 @@ import net.minecraftforge.fml.common.network.FMLNetworkEvent
 import kotlin.concurrent.thread
 
 class HypixelData {
-    // TODO USE SH-REPO
-    private val tabListProfilePattern = "§e§lProfile: §r§a(?<profile>.*)".toPattern()
-    private val lobbyTypePattern = "(?<lobbyType>.*lobby)\\d+".toPattern()
+
+    private val patternGroup = RepoPattern.group("data.hypixeldata")
+    private val tabListProfilePattern by patternGroup.pattern(
+        "tablistprofile",
+        "§e§lProfile: §r§a(?<profile>.*)"
+    )
+    private val lobbyTypePattern by patternGroup.pattern(
+        "lobbytype",
+        "(?<lobbyType>.*lobby)\\d+"
+    )
+    private val islandNamePattern by patternGroup.pattern(
+        "islandname",
+        "(?:§.)*(Area|Dungeon): (?:§.)*(?<island>.*)"
+    )
 
     private var lastLocRaw = 0L
 
     companion object {
+
+        private val patternGroup = RepoPattern.group("data.hypixeldata")
+        private val serverIdScoreboardPattern by patternGroup.pattern(
+            "serverid.scoreboard",
+            "§7\\d+/\\d+/\\d+ §8(?<servertype>[mM])(?<serverid>\\S+)"
+        )
+        private val serverIdTablistPattern by patternGroup.pattern(
+            "serverid.tablist",
+            " Server: §r§8(?<serverid>\\S+)"
+        )
+
         var hypixelLive = false
         var hypixelAlpha = false
         var inLobby = false
         var inLimbo = false
         var skyBlock = false
         var skyBlockIsland = IslandType.UNKNOWN
+        var serverId: String? = null
 
-        //Ironman, Stranded and Bingo
+        // Ironman, Stranded and Bingo
         var noTrade = false
 
         var ironman = false
@@ -68,6 +93,28 @@ class HypixelData {
         val lobbyType get() = locraw["lobbytype"] ?: ""
         val mode get() = locraw["mode"] ?: ""
         val map get() = locraw["map"] ?: ""
+
+        fun getCurrentServerId(): String? {
+            if (!LorenzUtils.inSkyBlock) return null
+            if (serverId != null) return serverId
+
+            ScoreboardData.sidebarLinesFormatted.forEach {
+                serverIdScoreboardPattern.matchMatcher(it) {
+                    val serverType = if (group("servertype") == "M") "mega" else "mini"
+                    serverId = "$serverType${group("serverid")}"
+                    return serverId
+                }
+            }
+
+            TabListData.getTabList().forEach {
+                serverIdTablistPattern.matchMatcher(it) {
+                    serverId = group("serverid")
+                    return serverId
+                }
+            }
+
+            return serverId
+        }
     }
 
     private var loggerIslandChange = LorenzLogger("debug/island_change")
@@ -80,6 +127,7 @@ class HypixelData {
         inLobby = false
         locraw.forEach { locraw[it.key] = "" }
         joinedWorld = System.currentTimeMillis()
+        serverId = null
     }
 
     @SubscribeEvent
@@ -93,7 +141,7 @@ class HypixelData {
     }
 
     @SubscribeEvent
-    fun onChatMessage(event: LorenzChatEvent) {
+    fun onChat(event: LorenzChatEvent) {
         if (!LorenzUtils.onHypixel) return
 
         val message = event.message.removeColor().lowercase()
@@ -188,7 +236,7 @@ class HypixelData {
         bingo = false
 
         for (line in ScoreboardData.sidebarLinesFormatted) {
-            if (BingoAPI.getRank(line) != null) {
+            if (BingoAPI.getRankFromScoreboard(line) != null) {
                 bingo = true
             }
             when (line) {
@@ -209,8 +257,8 @@ class HypixelData {
         var newIsland = ""
         var guesting = false
         for (line in TabListData.getTabList()) {
-            if (line.startsWith("§b§lArea: ")) {
-                newIsland = line.split(": ")[1].removeColor()
+            islandNamePattern.matchMatcher(line) {
+                newIsland = group("island").removeColor()
             }
             if (line == " Status: §r§9Guest") {
                 guesting = true
@@ -221,7 +269,7 @@ class HypixelData {
         if (skyBlockIsland != islandType) {
             IslandChangeEvent(islandType, skyBlockIsland).postAndCatch()
             if (islandType == IslandType.UNKNOWN) {
-                LorenzUtils.debug("Unknown island detected: '$newIsland'")
+                ChatUtils.debug("Unknown island detected: '$newIsland'")
                 loggerIslandChange.log("Unknown: '$newIsland'")
             } else {
                 loggerIslandChange.log(islandType.name)

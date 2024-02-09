@@ -46,6 +46,7 @@ import net.minecraft.item.ItemStack
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
 object ItemDisplayOverlayFeatures {
+
     // TODO USE SH-REPO
     private val config get() = SkyHanniMod.feature.inventory
 
@@ -55,7 +56,8 @@ object ItemDisplayOverlayFeatures {
     private val gardenVacuumPatterm = "§7Vacuum Bag: §6(?<amount>\\d*) Pests?".toPattern()
     private val harvestPattern = "§7§7You may harvest §6(?<amount>.).*".toPattern()
     private val dungeonPotionPattern = "Dungeon (?<level>.*) Potion".toPattern()
-    private val bingoGoalRankPattern = "(§.)*You were the (§.)*(?<rank>[\\w]+)(?<ordinal>(st|nd|rd|th)) (§.)*to".toPattern()
+    private val bingoGoalRankPattern =
+        "(§.)*You were the (§.)*(?<rank>[\\w]+)(?<ordinal>(st|nd|rd|th)) (§.)*to".toPattern()
 
     private val bottleOfJyrre = "NEW_BOTTLE_OF_JYRRE".asInternalName()
 
@@ -202,7 +204,7 @@ object ItemDisplayOverlayFeatures {
             }
         }
 
-        if (VACUUM_GARDEN.isSelected() && item.getInternalNameOrNull() in PestAPI.vacuumVariants) {
+        if (VACUUM_GARDEN.isSelected() && item.getInternalNameOrNull() in PestAPI.vacuumVariants && isOwnVacuum(lore)) {
             for (line in lore) {
                 gardenVacuumPatterm.matchMatcher(line) {
                     val pests = group("amount").formatNumber()
@@ -244,6 +246,9 @@ object ItemDisplayOverlayFeatures {
 
         return ""
     }
+
+    private fun isOwnVacuum(lore: List<String>) =
+        lore.none { it.contains("Click to trade!") || it.contains("Starting bid:") || it.contains("Buy it now:") }
 
     var done = false
 

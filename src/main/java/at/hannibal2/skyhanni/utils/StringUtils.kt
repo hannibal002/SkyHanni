@@ -16,6 +16,7 @@ import java.util.regex.Matcher
 import java.util.regex.Pattern
 
 object StringUtils {
+
     // TODO USE SH-REPO
     private val playerChatPattern = "(?<important>.*?)(?:§[f7r])*: .*".toPattern()
     private val chatUsernamePattern =
@@ -281,9 +282,10 @@ object StringUtils {
 
     fun String.convertToFormatted(): String = this.replace("&&", "§")
 
-    fun Pattern.matches(string: String) = matcher(string).matches()
+    fun Pattern.matches(string: String?) = string?.let { matcher(it).matches() } ?: false
+    fun Pattern.anyMatches(list: List<String>?) = list?.any { this.matches(it) } ?: false
 
-    fun Pattern.find(string: String) = matcher(string).find()
+    fun Pattern.find(string: String?) = string?.let { matcher(it).find() } ?: false
 
     fun String.allLettersFirstUppercase() = split("_").joinToString(" ") { it.firstLetterUppercase() }
 

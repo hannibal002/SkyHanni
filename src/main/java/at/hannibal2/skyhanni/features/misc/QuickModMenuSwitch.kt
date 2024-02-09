@@ -2,13 +2,14 @@ package at.hannibal2.skyhanni.features.misc
 
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
+import at.hannibal2.skyhanni.data.jsonobjects.repo.ModGuiSwitcherJson
 import at.hannibal2.skyhanni.events.LorenzTickEvent
 import at.hannibal2.skyhanni.events.RepositoryReloadEvent
 import at.hannibal2.skyhanni.test.command.ErrorManager
+import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils
-import at.hannibal2.skyhanni.utils.LorenzUtils.makeAccessible
+import at.hannibal2.skyhanni.utils.ReflectionUtils.makeAccessible
 import at.hannibal2.skyhanni.utils.RenderUtils.renderStringsAndItems
-import at.hannibal2.skyhanni.data.jsonobjects.repo.ModGuiSwitcherJson
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 import net.minecraft.client.Minecraft
 import net.minecraft.client.renderer.GlStateManager
@@ -17,6 +18,7 @@ import net.minecraftforge.client.event.GuiScreenEvent
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
 object QuickModMenuSwitch {
+
     private val config get() = SkyHanniMod.feature.misc.quickModMenuSwitch
     private var display = emptyList<List<Any>>()
     private var latestGuiPath = ""
@@ -64,7 +66,7 @@ object QuickModMenuSwitch {
             latestGuiPath = openGui
 
             if (SkyHanniMod.feature.dev.debug.modMenuLog) {
-                LorenzUtils.debug("Open GUI: $latestGuiPath")
+                ChatUtils.debug("Open GUI: $latestGuiPath")
             }
         }
         val mods = mods ?: return
@@ -152,7 +154,7 @@ object QuickModMenuSwitch {
                         } catch (_: Exception) {
                         }
                     }
-                    LorenzUtils.error("Error trying to open the gui for mod " + mod.name + "!")
+                    ChatUtils.error("Error trying to open the gui for mod " + mod.name + "!")
                 }
 
                 "hytil" -> {
@@ -168,7 +170,7 @@ object QuickModMenuSwitch {
                         } catch (_: Exception) {
                         }
                     }
-                    LorenzUtils.chat("Error trying to open the gui for mod " + mod.name + "!")
+                    ChatUtils.chat("Error trying to open the gui for mod " + mod.name + "!")
                 }
 
                 else -> {

@@ -17,6 +17,7 @@ import at.hannibal2.skyhanni.features.garden.GardenAPI
 import at.hannibal2.skyhanni.features.garden.visitor.VisitorAPI.VisitorStatus
 import at.hannibal2.skyhanni.features.garden.visitor.VisitorAPI.config
 import at.hannibal2.skyhanni.mixins.transformers.gui.AccessorGuiContainer
+import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.ItemUtils.name
 import at.hannibal2.skyhanni.utils.KeyboardManager.isKeyHeld
@@ -40,10 +41,12 @@ import org.lwjgl.input.Keyboard
 private val config get() = VisitorAPI.config
 
 class VisitorListener {
+
     private var lastClickedNpc = 0
     private val logger = LorenzLogger("garden/visitors/listener")
 
     companion object {
+
         private val VISITOR_INFO_ITEM_SLOT = 13
         private val VISITOR_ACCEPT_ITEM_SLOT = 29
         private val VISITOR_REFUSE_ITEM_SLOT = 33

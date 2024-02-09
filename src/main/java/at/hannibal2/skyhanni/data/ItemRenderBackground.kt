@@ -38,7 +38,6 @@ class ItemRenderBackground {
             }
     }
 
-
     @SubscribeEvent
     fun renderOverlayLol(event: RenderRealOverlayEvent) {
         val stack = event.stack
