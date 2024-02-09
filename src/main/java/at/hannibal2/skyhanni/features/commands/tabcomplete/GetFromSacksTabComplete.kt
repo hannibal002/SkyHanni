@@ -1,7 +1,7 @@
 package at.hannibal2.skyhanni.features.commands.tabcomplete
 
 import at.hannibal2.skyhanni.SkyHanniMod
-import at.hannibal2.skyhanni.data.GetFromSackData
+import at.hannibal2.skyhanni.api.GetFromSackAPI
 import at.hannibal2.skyhanni.events.MessageSendToServerEvent
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.NEUInternalName.Companion.asInternalName
@@ -16,7 +16,7 @@ object GetFromSacksTabComplete {
         if (!isEnabled()) return null
         if (command !in commands) return null
 
-        return GetFromSackData.sackList.map { it.asString() }
+        return GetFromSackAPI.sackList.map { it.asString() }
     }
 
     @SubscribeEvent
@@ -29,7 +29,7 @@ object GetFromSacksTabComplete {
         val rawName = message.split(" ")[1]
         val realName = rawName.asInternalName()
         if (realName.asString() == rawName) return
-        if (realName !in GetFromSackData.sackList) return
+        if (realName !in GetFromSackAPI.sackList) return
         event.isCanceled = true
         LorenzUtils.sendMessageToServer(message.replace(rawName, realName.asString()))
     }

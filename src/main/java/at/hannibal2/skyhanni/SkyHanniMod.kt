@@ -2,6 +2,7 @@ package at.hannibal2.skyhanni
 
 import at.hannibal2.skyhanni.api.CollectionAPI
 import at.hannibal2.skyhanni.api.DataWatcherAPI
+import at.hannibal2.skyhanni.api.GetFromSackAPI
 import at.hannibal2.skyhanni.config.ConfigFileType
 import at.hannibal2.skyhanni.config.ConfigManager
 import at.hannibal2.skyhanni.config.Features
@@ -18,7 +19,6 @@ import at.hannibal2.skyhanni.data.GardenComposterUpgradesData
 import at.hannibal2.skyhanni.data.GardenCropMilestones
 import at.hannibal2.skyhanni.data.GardenCropMilestonesCommunityFix
 import at.hannibal2.skyhanni.data.GardenCropUpgrades
-import at.hannibal2.skyhanni.data.GetFromSackData
 import at.hannibal2.skyhanni.data.GuiEditManager
 import at.hannibal2.skyhanni.data.GuildAPI
 import at.hannibal2.skyhanni.data.HypixelData
@@ -420,7 +420,7 @@ class SkyHanniMod {
         loadModule(ToolTipData())
         loadModule(HighlightVisitorsOutsideOfGarden())
         loadModule(GuiEditManager())
-        loadModule(GetFromSackData)
+        loadModule(GetFromSackAPI)
         loadModule(UpdateManager)
         loadModule(CropAccessoryData())
         loadModule(MayorElection())
