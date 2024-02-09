@@ -37,12 +37,12 @@ import java.util.regex.Matcher
 
 object SkillAPI {
     private val patternGroup = RepoPattern.group("display.skilldisplay")
-    private val SKILL_PATTERN_PERCENT by patternGroup.pattern("skillpaternpercent", "\\+([\\d.,]+) (.+) \\(([\\d.]+)%\\)")
-    private val SKILL_PATTERN by patternGroup.pattern("skillpattern", "\\+([\\d.,]+) (\\w+) \\(([\\d.,]+)/([\\d.,]+)\\)")
-    private val SKILL_PATTERN_MULTIPLIER by patternGroup.pattern("skillpatternmultiplier", "\\+([\\d.,]+) (.+) \\(([\\d.,]+)/([\\d,.]+[kmb])\\)")
+    val SKILL_PATTERN_PERCENT by patternGroup.pattern("skillpaternpercent", "\\+([\\d.,]+) (.+) \\(([\\d.]+)%\\)")
+    val SKILL_PATTERN by patternGroup.pattern("skillpattern", "\\+([\\d.,]+) (\\w+) \\(([\\d.,]+)/([\\d.,]+)\\)")
+    val SKILL_PATTERN_MULTIPLIER by patternGroup.pattern("skillpatternmultiplier", "\\+([\\d.,]+) (.+) \\(([\\d.,]+)/([\\d,.]+[kmb])\\)")
     private val skillTabPattern by patternGroup.pattern("skilltabpattern", "^§e§lSkills: §r§a(?<type>\\w+) (?<level>\\d+): §r§3(?<progress>.+)%\$")
     private val maxSkillTabPattern by patternGroup.pattern("maxskilltabpattern", "^§e§lSkills: §r§a(?<type>\\w+) (?<level>\\d+): §r§c§lMAX\$")
-    private val SPACE_SPLITTER = Splitter.on("  ").omitEmptyStrings().trimResults()
+    val SPACE_SPLITTER = Splitter.on("  ").omitEmptyStrings().trimResults()
 
     var skillXPInfoMap = mutableMapOf<SkillType, SkillXPInfo>()
     var oldSkillInfoMap = mutableMapOf<SkillType?, SkillInfo?>()
@@ -149,7 +149,7 @@ object SkillAPI {
         }
     }
 
-    private fun handleSkillPattern(matcher: Matcher, skill: SkillType, skillInfo: SkillInfo) {
+    fun handleSkillPattern(matcher: Matcher, skill: SkillType, skillInfo: SkillInfo) {
         val currentXp = matcher.group(3).formatNumber()
         val maxXp = matcher.group(4).formatNumber()
         val level = getLevel(maxXp)
@@ -174,7 +174,7 @@ object SkillAPI {
         skillMap?.set(skill, skillInfo)
     }
 
-    private fun handleSkillPatternPercent(matcher: Matcher, skill: SkillType, skillInfo: SkillInfo?) {
+    fun handleSkillPatternPercent(matcher: Matcher, skill: SkillType, skillInfo: SkillInfo?) {
         var tablistLevel = 0
         for (line in TabListData.getTabList()) {
             var levelMatcher = skillTabPattern.matcher(line)
@@ -214,7 +214,7 @@ object SkillAPI {
         skillMap?.set(skill, existingLevel)
     }
 
-    private fun handleSkillPatternMultiplier(matcher: Matcher, skillS: SkillType, skillInfo: SkillInfo) {
+    fun handleSkillPatternMultiplier(matcher: Matcher, skillS: SkillType, skillInfo: SkillInfo) {
         val currentXp = matcher.group(3).formatNumber()
         val maxXp = matcher.group(4).formatNumber()
         val level = getLevel(maxXp)

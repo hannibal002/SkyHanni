@@ -16,6 +16,7 @@ import at.hannibal2.skyhanni.events.SkillOverflowLevelupEvent
 import at.hannibal2.skyhanni.features.misc.skillprogress.SkillUtil.activeSkill
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils.addAsSingletonList
+import at.hannibal2.skyhanni.utils.LorenzUtils.chat
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.NumberUtil.formatNumber
 import at.hannibal2.skyhanni.utils.NumberUtil.interpolate
@@ -23,6 +24,8 @@ import at.hannibal2.skyhanni.utils.NumberUtil.roundToPrecision
 import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderables
 import at.hannibal2.skyhanni.utils.RenderUtils.renderStringsAndItems
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
+import at.hannibal2.skyhanni.utils.SoundUtils
+import at.hannibal2.skyhanni.utils.SoundUtils.playSound
 import at.hannibal2.skyhanni.utils.SpecialColour
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 import at.hannibal2.skyhanni.utils.renderables.Renderable.Companion.horizontalContainer
@@ -139,13 +142,14 @@ object SkillProgress {
                 add("  §r§7§8+§d50 SkyHanni User Luck")
         }
 
-        LorenzUtils.chat("§3§l▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬", false)
-        LorenzUtils.chat("  §r§b§lSKILL LEVEL UP §3$skillName §8$oldLevel➜§3$newLevel", false)
-        LorenzUtils.chat("", false)
-        LorenzUtils.chat("  §r§a§lREWARDS", false)
+        chat("§3§l▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬", false)
+        chat("  §r§b§lSKILL LEVEL UP §3$skillName §8$oldLevel➜§3$newLevel", false)
+        chat("", false)
+        chat("  §r§a§lREWARDS", false)
         for (reward in rewards)
-            LorenzUtils.chat(reward, false)
-        LorenzUtils.chat("§3§l▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬", false)
+            chat(reward, false)
+        chat("§3§l▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬", false)
+        SoundUtils.createSound("random.levelup", 1f, 1f).playSound()
     }
 
     @SubscribeEvent
@@ -171,8 +175,10 @@ object SkillProgress {
         }
     }
 
+
     @SubscribeEvent(priority = EventPriority.LOW)
     fun onActionBar(event: ClientChatReceivedEvent) {
+        if (enabled) return //TODO:  remove before release
         if (!config.hideInActionBar) return
         if (event.type.toInt() != 2) return
         if (event.isCanceled) return
@@ -183,6 +189,46 @@ object SkillProgress {
         }
         msg = msg.trim()
         event.message = ChatComponentText(msg)
+    }
+
+    /**
+     * TODO: Remove before release
+     */
+    var start = 0L
+    var enabled = false
+    var add = 0L
+
+    @SubscribeEvent(priority = EventPriority.HIGHEST)
+    fun onActionBar2(event: ClientChatReceivedEvent) {
+        if (!enabled) return
+        if (event.type.toInt() != 2) return
+        if (event.isCanceled) return
+        event.message = ChatComponentText("+$add Farming ($start/0)")
+        start += add
+    }
+
+    /**
+     * TODO: Remove before release
+     */
+    fun setAction(args: Array<String>) {
+        if (args.isEmpty()) return
+        if (args.size == 1) {
+            when (args[0]) {
+                "toggle" -> {
+                    enabled = !enabled
+                    chat(if (enabled) "§aEnabled" else "§cDisabled")
+                }
+            }
+        }
+        if (args.size == 2) {
+            when (args[0]) {
+                "add" -> {
+                    val toAdd = args[1].toLongOrNull() ?: error("Cannot parse ${args[1]} as Long")
+                    add += toAdd
+                    chat("To add: ${toAdd.addSeparators()}")
+                }
+            }
+        }
     }
 
     fun updateDisplay() {
