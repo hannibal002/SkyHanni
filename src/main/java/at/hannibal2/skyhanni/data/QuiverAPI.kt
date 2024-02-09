@@ -7,6 +7,7 @@ import at.hannibal2.skyhanni.events.InventoryFullyOpenedEvent
 import at.hannibal2.skyhanni.events.LorenzChatEvent
 import at.hannibal2.skyhanni.events.PlaySoundEvent
 import at.hannibal2.skyhanni.events.RepositoryReloadEvent
+import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.ItemCategory
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalNameOrNull
@@ -85,7 +86,7 @@ object QuiverAPI {
         selectPattern.matchMatcher(message) {
             val arrow = group("arrow")
             currentArrow = getArrowByNameOrNull(arrow) ?: return
-            LorenzUtils.chat("Selected arrow type: $currentArrow")
+            ChatUtils.chat("Selected arrow type: $currentArrow")
 
             return
         }
@@ -95,7 +96,7 @@ object QuiverAPI {
             val amount = group("amount").formatNumber().toFloat()
 
             val filledUpType = getArrowByNameOrNull(type) ?: return
-            LorenzUtils.chat("Filled up quiver with $amount of $filledUpType")
+            ChatUtils.chat("Filled up quiver with $amount of $filledUpType")
 
             arrowAmount.merge(filledUpType, amount, Float::plus)
             return
@@ -105,7 +106,7 @@ object QuiverAPI {
             val flintAmount = group("flintAmount").formatNumber().toFloat()
 
             arrowAmount.merge(FLINT_ARROW_TYPE, flintAmount, Float::plus)
-            LorenzUtils.chat("Filled up quiver with $flintAmount flint arrows")
+            ChatUtils.chat("Filled up quiver with $flintAmount flint arrows")
             return
         }
 
@@ -114,7 +115,7 @@ object QuiverAPI {
             val amount = group("amount").formatNumber().toFloat()
 
             val filledUpType = getArrowByNameOrNull(type) ?: return
-            LorenzUtils.chat("Added $amount of $filledUpType to quiver")
+            ChatUtils.chat("Added $amount of $filledUpType to quiver")
 
             arrowAmount.merge(filledUpType, amount, Float::plus)
 
@@ -149,7 +150,7 @@ object QuiverAPI {
         for (stack in stacks.values) {
             if (stack.getItemCategoryOrNull() != ItemCategory.ARROW) continue
 
-            LorenzUtils.chat("Found arrow: ${stack.getInternalNameOrNull()}")
+            ChatUtils.chat("Found arrow: ${stack.getInternalNameOrNull()}")
 
             val arrow = stack.getInternalNameOrNull() ?: continue
 

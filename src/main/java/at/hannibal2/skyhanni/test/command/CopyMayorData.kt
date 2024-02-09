@@ -1,7 +1,7 @@
 package at.hannibal2.skyhanni.test.command
 
 import at.hannibal2.skyhanni.data.MayorAPI
-import at.hannibal2.skyhanni.utils.LorenzUtils
+import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.OSUtils
 
 object CopyMayorData {
@@ -19,6 +19,6 @@ object CopyMayorData {
 
 
         OSUtils.copyToClipboard(string.toString())
-        LorenzUtils.chat("Mayor data copied into your clipboard!")
+        ChatUtils.chat("Mayor data copied into your clipboard!")
     }
 }
