@@ -36,10 +36,8 @@ class SkyblockGuideHighlightFeature private constructor(
     private constructor(
         config: () -> Boolean,
         key: String,
-        @Language("RegExp")
-        inventory: String,
-        @Language("RegExp")
-        loreCondition: String,
+        @Language("RegExp") inventory: String,
+        @Language("RegExp") loreCondition: String,
         onSlotClicked: (GuiContainerEvent.SlotClickEvent) -> Unit = {},
         onTooltip: (LorenzToolTipEvent) -> Unit = {},
     ) : this(
@@ -53,8 +51,7 @@ class SkyblockGuideHighlightFeature private constructor(
     private constructor(
         config: () -> Boolean,
         key: String,
-        @Language("RegExp")
-        inventory: String,
+        @Language("RegExp") inventory: String,
         loreCondition: RepoPattern,
         onSlotClicked: (GuiContainerEvent.SlotClickEvent) -> Unit = {},
         onTooltip: (LorenzToolTipEvent) -> Unit = {},
@@ -97,8 +94,7 @@ class SkyblockGuideHighlightFeature private constructor(
             if (!isEnabled()) return
             if (activeObject == null) return
 
-            event.gui.inventorySlots.inventorySlots
-                .filter { missing.contains(it.slotNumber) }
+            event.gui.inventorySlots.inventorySlots.filter { missing.contains(it.slotNumber) }
                 .forEach { it highlight LorenzColor.RED }
         }
 
@@ -158,33 +154,30 @@ class SkyblockGuideHighlightFeature private constructor(
                 taskOnlyCompleteOncePattern
             )
             SkyblockGuideHighlightFeature(
-                { skyblockGuideConfig.bankGuide },
-                "bank",
-                "Core ➜ Bank Upgrades",
-                taskOnlyCompleteOncePattern
+                { skyblockGuideConfig.oneTimeCompletion }, "bank", "Core ➜ Bank Upgrades", taskOnlyCompleteOncePattern
             )
             SkyblockGuideHighlightFeature(
-                { skyblockGuideConfig.travelGuide },
+                { skyblockGuideConfig.storyGuide },
                 "travel",
                 "Core ➜ Fast Travels Unlocked",
                 taskOnlyCompleteOncePattern,
-                { LorenzUtils.sendCommandToServer("wiki MUSEUM_TRAVEL_SCROLL") },
+                { LorenzUtils.sendCommandToServer("wiki MUSEUM_TRAVEL_SCROLL") }, // The items do not have proper internal names and using the fact that all travel scrolls lead to the same wiki page
                 openWikiTooltip
-            ) // The items do not have proper internal names and using the fact that all travel scrolls lead to the same wiki page
+            )
             SkyblockGuideHighlightFeature(
-                { skyblockGuideConfig.spookyGuide },
+                { skyblockGuideConfig.oneTimeCompletion },
                 "spooky",
                 "Event ➜ Spooky Festival",
                 taskOnlyCompleteOncePattern
             )
             SkyblockGuideHighlightFeature(
-                { skyblockGuideConfig.kuudraGuide },
+                { skyblockGuideConfig.oneTimeCompletion },
                 "kuudra",
                 "Slaying ➜ Defeat Kuudra",
                 taskOnlyCompleteOncePattern
             )
             SkyblockGuideHighlightFeature(
-                { skyblockGuideConfig.beltGuide },
+                { skyblockGuideConfig.oneTimeCompletion },
                 "belt",
                 "Miscellaneous ➜ The Dojo",
                 taskOnlyCompleteOncePattern
@@ -196,25 +189,22 @@ class SkyblockGuideHighlightFeature private constructor(
                 taskOnlyCompleteOncePattern
             )
             SkyblockGuideHighlightFeature(
-                { skyblockGuideConfig.dragonGuide },
+                { skyblockGuideConfig.oneTimeCompletion },
                 "dragon",
                 "Slaying ➜ Slay Dragons",
                 taskOnlyCompleteOncePattern
             )
             SkyblockGuideHighlightFeature(
-                { skyblockGuideConfig.storyGuide },
-                "story",
-                "Story ➜ Complete Objectives",
-                taskOnlyCompleteOncePattern
+                { skyblockGuideConfig.storyGuide }, "story", "Story ➜ Complete Objectives", taskOnlyCompleteOncePattern
             )
             SkyblockGuideHighlightFeature(
-                { skyblockGuideConfig.rockPetGuide },
+                { skyblockGuideConfig.oneTimeCompletion },
                 "mining.rock",
                 "Mining ➜ Rock Milestones",
                 taskOnlyCompleteOncePattern
             )
             SkyblockGuideHighlightFeature(
-                { skyblockGuideConfig.dolphinGuide },
+                { skyblockGuideConfig.oneTimeCompletion },
                 "fishing.dolphin",
                 "Fishing ➜ Dolphin Milestones",
                 taskOnlyCompleteOncePattern
@@ -222,16 +212,10 @@ class SkyblockGuideHighlightFeature private constructor(
             SkyblockGuideHighlightFeature({ skyblockGuideConfig.essenceGuide }, "essence", "Essence Shop ➜.*", xPattern)
             SkyblockGuideHighlightFeature({ skyblockGuideConfig.minionGuide }, "minion", "Crafted Minions", xPattern)
             SkyblockGuideHighlightFeature(
-                { skyblockGuideConfig.slayerDefeatGuide },
-                "slayer.defeat",
-                "Slaying ➜ Defeat Slayers",
-                xPattern
+                { skyblockGuideConfig.oneTimeCompletion }, "slayer.defeat", "Slaying ➜ Defeat Slayers", xPattern
             )
             SkyblockGuideHighlightFeature(
-                { skyblockGuideConfig.harpGuide },
-                "harp",
-                "Miscellaneous ➜ Harp Songs",
-                xPattern
+                { skyblockGuideConfig.storyGuide }, "harp", "Miscellaneous ➜ Harp Songs", xPattern
             )
             SkyblockGuideHighlightFeature(
                 { skyblockGuideConfig.consumableGuide },
