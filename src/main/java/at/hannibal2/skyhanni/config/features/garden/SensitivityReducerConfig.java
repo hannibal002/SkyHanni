@@ -55,14 +55,14 @@ public class SensitivityReducerConfig {
         name = "Only in Ground",
         desc = "Lower sensitivity when standing on the ground.")
     @ConfigEditorBoolean
-    public boolean onGround = true;
+    public Property<Boolean> onGround = Property.of(false);
 
     @Expose
     @ConfigOption(
         name = "Disable in Barn",
         desc = "Disable reduced sensitivity in barn plot.")
     @ConfigEditorBoolean
-    public boolean onlyPlot = true;
+    public Property<Boolean> onlyPlot = Property.of(true);
 
     @Expose
     public Position position = new Position(400, 400, 0.8f);

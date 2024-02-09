@@ -38,12 +38,7 @@ object SensitivityReducer {
             return
         }
         if (isManualToggle) return
-        if (isToggled && config.onGround && !mc.thePlayer.onGround) {
-            restoreSensitivity()
-            isToggled = false
-            return
-        }
-        if (isToggled && config.onlyPlot && GardenAPI.onBarnPlot) {
+        if (isToggled && config.onGround.get() && !mc.thePlayer.onGround) {
             restoreSensitivity()
             isToggled = false
             return
@@ -69,6 +64,18 @@ object SensitivityReducer {
     fun onConfigInit(event: ConfigLoadEvent) {
         config.reducingFactor.afterChange {
             reloadSensitivity()
+        }
+        config.onlyPlot.afterChange {
+            if (isToggled && config.onlyPlot.get() && GardenAPI.onBarnPlot) {
+                restoreSensitivity()
+                isToggled = false
+            }
+        }
+        config.onGround.afterChange {
+            if (isToggled && config.onGround.get() && mc.thePlayer.onGround) {
+                restoreSensitivity()
+                isToggled = false
+            }
         }
     }
 
@@ -118,8 +125,8 @@ object SensitivityReducer {
     }
 
     private fun toggle(state: Boolean) {
-        if (config.onlyPlot && GardenAPI.onBarnPlot) return
-        if (config.onGround && !mc.thePlayer.onGround) return
+        if (config.onlyPlot.get() && GardenAPI.onBarnPlot) return
+        if (config.onGround.get() && !mc.thePlayer.onGround) return
         if (!isToggled) {
             lowerSensitivity()
         } else restoreSensitivity()
