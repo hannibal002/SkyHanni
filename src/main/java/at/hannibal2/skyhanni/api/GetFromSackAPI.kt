@@ -24,6 +24,7 @@ import java.util.Queue
 import kotlin.time.Duration.Companion.seconds
 
 object GetFromSackAPI {
+    private val config get() = SkyHanniMod.feature.inventory.gfs
 
     private val commands = arrayOf("gfs", "getfromsacks")
 
@@ -36,11 +37,9 @@ object GetFromSackAPI {
         text: String = "Click here to grab §9x${item.amount} ${item.name.asString()}§e from sacks!"
     ) = LorenzUtils.clickableChat(text, "${commands.first()} ${item.name.asString()} ${item.amount}")
 
-    fun getFromSlotSackItems(items: List<PrimitiveItemStack>, slotIndex: Int) = addToInventory(items, slotIndex)
+    fun getFromSlotClickedSackItems(items: List<PrimitiveItemStack>, slotIndex: Int) = addToInventory(items, slotIndex)
 
-    fun Slot.getFromSack(items: List<PrimitiveItemStack>) = getFromSlotSackItems(items, slotIndex)
-
-    private val config get() = SkyHanniMod.feature.inventory
+    fun Slot.getFromSackWhenClicked(items: List<PrimitiveItemStack>) = getFromSlotClickedSackItems(items, slotIndex)
 
     private val minimumDelay = 1.7.seconds
 
