@@ -29,6 +29,7 @@ import at.hannibal2.skyhanni.features.garden.GardenAPI
 import at.hannibal2.skyhanni.features.garden.GardenCropTimeCommand
 import at.hannibal2.skyhanni.features.garden.GardenCropsInCommand
 import at.hannibal2.skyhanni.features.garden.GardenNextJacobContest
+import at.hannibal2.skyhanni.features.garden.SensitivityReducer
 import at.hannibal2.skyhanni.features.garden.composter.ComposterOverlay
 import at.hannibal2.skyhanni.features.garden.farming.ArmorDropTracker
 import at.hannibal2.skyhanni.features.garden.farming.CropMoneyDisplay
@@ -217,6 +218,10 @@ object Commands {
             "shmouselock",
             "Lock/Unlock the mouse so it will no longer rotate the player (for farming)"
         ) { LockMouseLook.toggleLock() }
+        registerCommand(
+            "shsensreduce",
+            "Lowers the mouse sensitivity for easier small adjustments (for farming)"
+        ) { SensitivityReducer.manualToggle() }
         registerCommand(
             "shresetvermintracker",
             "Resets the Vermin Tracker"
