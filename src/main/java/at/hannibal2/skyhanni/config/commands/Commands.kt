@@ -24,6 +24,7 @@ import at.hannibal2.skyhanni.features.fame.AccountUpgradeReminder
 import at.hannibal2.skyhanni.features.fame.CityProjectFeatures
 import at.hannibal2.skyhanni.features.fishing.tracker.FishingProfitTracker
 import at.hannibal2.skyhanni.features.fishing.tracker.SeaCreatureTracker
+import at.hannibal2.skyhanni.features.garden.FarmingMilestoneCommand
 import at.hannibal2.skyhanni.features.garden.GardenAPI
 import at.hannibal2.skyhanni.features.garden.GardenCropTimeCommand
 import at.hannibal2.skyhanni.features.garden.GardenCropsInCommand
@@ -48,11 +49,13 @@ import at.hannibal2.skyhanni.features.misc.massconfiguration.DefaultConfigFeatur
 import at.hannibal2.skyhanni.features.misc.visualwords.VisualWordGui
 import at.hannibal2.skyhanni.features.rift.area.westvillage.VerminTracker
 import at.hannibal2.skyhanni.features.slayer.SlayerProfitTracker
+import at.hannibal2.skyhanni.test.DebugCommand
 import at.hannibal2.skyhanni.test.PacketTest
 import at.hannibal2.skyhanni.test.SkyHanniConfigSearchResetCommand
 import at.hannibal2.skyhanni.test.SkyHanniDebugsAndTests
 import at.hannibal2.skyhanni.test.TestBingo
 import at.hannibal2.skyhanni.test.WorldEdit
+import at.hannibal2.skyhanni.test.command.CopyBossbarCommand
 import at.hannibal2.skyhanni.test.command.CopyItemCommand
 import at.hannibal2.skyhanni.test.command.CopyNearbyEntitiesCommand
 import at.hannibal2.skyhanni.test.command.CopyNearbyParticlesCommand
@@ -229,6 +232,12 @@ object Commands {
             "shresetseacreaturetracker",
             "Resets the Sea Creature Tracker"
         ) { SeaCreatureTracker.resetCommand(it) }
+        registerCommand0("shcalccrop", "Calculate how many crops need to be farmed between different crop milestones.", {
+            FarmingMilestoneCommand.onCommand(it.getOrNull(0), it.getOrNull(1), it.getOrNull(2), false)
+        }, FarmingMilestoneCommand::onComplete)
+        registerCommand0("shcalccroptime", "Calculate how long you need to farm crops between different crop milestones.", {
+            FarmingMilestoneCommand.onCommand(it.getOrNull(0), it.getOrNull(1), it.getOrNull(2), true)
+        }, FarmingMilestoneCommand::onComplete)
     }
 
     private fun usersBugFix() {
@@ -262,9 +271,9 @@ object Commands {
             "Search or reset config elements §c(warning, dangerous!)"
         ) { SkyHanniConfigSearchResetCommand.command(it) }
         registerCommand(
-            "shdebugdata",
-            "Prints debug data in the clipboard"
-        ) { SkyHanniDebugsAndTests.debugData(it) }
+            "shdebug",
+            "Copies SkyHanni debug data in the clipboard."
+        ) { DebugCommand.command(it) }
         registerCommand(
             "shversion",
             "Prints the SkyHanni version in the chat"
@@ -322,8 +331,8 @@ object Commands {
             "shfindnullconfig",
             "Find config elements that are null and prints them into the console"
         ) { SkyHanniDebugsAndTests.findNullConfig(it) }
-        registerCommand("shdebugwaypoint", "Mark a waypoint on that location") { SkyHanniDebugsAndTests.waypoint(it) }
-        registerCommand("shdebugtablist", "Set your clipboard as a fake tab list.") { TabListData.toggleDebugCommand() }
+        registerCommand("shtestwaypoint", "Set a waypoint on that location") { SkyHanniDebugsAndTests.waypoint(it) }
+        registerCommand("shtesttablist", "Set your clipboard as a fake tab list.") { TabListData.toggleDebugCommand() }
         registerCommand("shreloadlocalrepo", "Reloading the local repo data") { SkyHanniMod.repo.reloadLocalRepo() }
         registerCommand("shchathistory", "Show the unfiltered chat history") { ChatManager.openChatFilterGUI() }
         registerCommand(
@@ -347,6 +356,10 @@ object Commands {
             "shcopyscoreboard",
             "Copies the scoreboard data to the clipboard"
         ) { CopyScoreboardCommand.command(it) }
+        registerCommand(
+            "shcopybossbar",
+            "Copies the name of the bossbar to the clipboard, including formatting codes"
+        ) { CopyBossbarCommand.command(it) }
         registerCommand(
             "shcopyitem",
             "Copies information about the item in hand to the clipboard"
@@ -405,6 +418,7 @@ object Commands {
         registerCommand("pk", "Kick a specific party member") { PartyCommands.kick(it) }
         registerCommand("pt", "Transfer the party to another party member") { PartyCommands.transfer(it) }
         registerCommand("pp", "Promote a specific party member") { PartyCommands.promote(it) }
+        registerCommand("pd", "Disbands the party") { PartyCommands.disband() }
     }
 
     private fun commandHelp(args: Array<String>) {

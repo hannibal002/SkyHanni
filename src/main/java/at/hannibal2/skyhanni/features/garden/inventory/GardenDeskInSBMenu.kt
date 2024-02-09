@@ -4,7 +4,8 @@ import at.hannibal2.skyhanni.events.InventoryCloseEvent
 import at.hannibal2.skyhanni.events.InventoryFullyOpenedEvent
 import at.hannibal2.skyhanni.features.garden.GardenAPI
 import at.hannibal2.skyhanni.utils.LorenzUtils
-import at.hannibal2.skyhanni.utils.NEUItems
+import at.hannibal2.skyhanni.utils.NEUInternalName.Companion.asInternalName
+import at.hannibal2.skyhanni.utils.NEUItems.getItemStack
 import io.github.moulberry.notenoughupdates.events.ReplaceItemEvent
 import io.github.moulberry.notenoughupdates.events.SlotClickEvent
 import io.github.moulberry.notenoughupdates.util.Utils
@@ -18,8 +19,15 @@ class GardenDeskInSBMenu {
     private var showItem = false
 
     private val item by lazy {
-        val neuItem = NEUItems.getItemStack("DOUBLE_PLANT")
-        Utils.createItemStack(neuItem.item, "§bDesk", "§7Click here to", "§7run §e/desk")
+        val neuItem = "DOUBLE_PLANT".asInternalName().getItemStack()
+        Utils.createItemStack(
+            neuItem.item,
+            "§bOpen Desk",
+            "§8(From SkyHanni)",
+            "",
+            "§7Click here to",
+            "§7run §e/desk"
+        )
     }
 
     @SubscribeEvent

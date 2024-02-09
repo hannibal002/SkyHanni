@@ -5,6 +5,7 @@ import at.hannibal2.skyhanni.config.features.garden.visitor.VisitorConfig.Highli
 import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.data.SackAPI
 import at.hannibal2.skyhanni.data.SackStatus
+import at.hannibal2.skyhanni.events.DebugDataCollectEvent
 import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.LorenzChatEvent
 import at.hannibal2.skyhanni.events.LorenzTickEvent
@@ -51,6 +52,7 @@ import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.TimeUtils
 import at.hannibal2.skyhanni.utils.getLorenzVec
 import at.hannibal2.skyhanni.utils.renderables.Renderable
+import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import com.google.gson.JsonArray
 import com.google.gson.JsonPrimitive
 import net.minecraft.client.Minecraft
@@ -73,6 +75,10 @@ class GardenVisitorFeatures {
     private val copperPattern = " §8\\+§c(?<amount>.*) Copper".toPattern()
     private val gardenExperiencePattern = " §8\\+§2(?<amount>.*) §7Garden Experience".toPattern()
     private val visitorChatMessagePattern = "§e\\[NPC] (§.)?(?<name>.*)§f: §r.*".toPattern()
+    private val partialAcceptedPattern by RepoPattern.pattern(
+        "garden.visitor.partialaccepted",
+        "§aYou gave some of the required items!"
+    )
 
     private val logger = LorenzLogger("garden/visitors")
     private var lastFullPrice = 0.0
@@ -115,12 +121,11 @@ class GardenVisitorFeatures {
             if (alreadyReady) {
                 VisitorAPI.changeStatus(visitor, VisitorAPI.VisitorStatus.READY, "inSacks")
                 visitor.inSacks = true
-                update()
             } else {
                 VisitorAPI.changeStatus(visitor, VisitorAPI.VisitorStatus.WAITING, "firstContact")
             }
-            update()
         }
+        update()
     }
 
     private fun updateDisplay() {
@@ -449,13 +454,19 @@ class GardenVisitorFeatures {
     }
 
     @SubscribeEvent
-    fun onChatMessage(event: LorenzChatEvent) {
+    fun onChat(event: LorenzChatEvent) {
         if (config.hypixelArrivedMessage && newVisitorArrivedMessage.matcher(event.message).matches()) {
             event.blockedReason = "new_visitor_arrived"
         }
 
         if (GardenAPI.inGarden() && config.hideChat && hideVisitorMessage(event.message)) {
             event.blockedReason = "garden_visitor_message"
+        }
+
+        if (config.shoppingList.display) {
+            partialAcceptedPattern.matchMatcher(event.message) {
+                LorenzUtils.chat("Talk to the visitor again to update the number of items needed!")
+            }
         }
     }
 
@@ -478,7 +489,7 @@ class GardenVisitorFeatures {
             val visitorName = visitor.visitorName
             val entity = visitor.getEntity()
             if (entity == null) {
-                findNametag(visitorName.removeColor())?.let {
+                NPCVisitorFix.findNametag(visitorName.removeColor())?.let {
                     findEntity(it, visitor)
                 }
             }
@@ -514,33 +525,6 @@ class GardenVisitorFeatures {
             visitor.entityId = entity.entityId
             visitor.nameTagEntityId = nameTag.entityId
         }
-    }
-
-    private fun findNametag(visitorName: String): EntityArmorStand? {
-        val foundVisitorNameTags = mutableListOf<EntityArmorStand>()
-        for (entity in EntityUtils.getEntities<EntityArmorStand>()) {
-            if (entity.name.removeColor() == visitorName) {
-                foundVisitorNameTags.add(entity)
-            }
-        }
-
-        if (visitorName in listOf("Jacob", "Anita")) {
-            // Only detect jacob/anita npc if the "wrong" npc got found as well
-            if (foundVisitorNameTags.size != 2) return null
-
-            for (tag in foundVisitorNameTags.toMutableList()) {
-                for (entity in EntityUtils.getEntities<EntityArmorStand>()) {
-                    if (entity in foundVisitorNameTags) continue
-                    val distance = entity.getLorenzVec().distance(tag.getLorenzVec())
-                    if (distance < 1.5 && entity.name == "§bSam") {
-                        foundVisitorNameTags.remove(tag)
-                    }
-                }
-            }
-        }
-
-        if (foundVisitorNameTags.size != 1) return null
-        return foundVisitorNameTags[0]
     }
 
     private fun hasItemsInInventory(visitor: VisitorAPI.Visitor): Boolean {
@@ -580,10 +564,15 @@ class GardenVisitorFeatures {
     }
 
     private fun showGui(): Boolean {
-        if (config.shoppingList.inBazaarAlley && IslandType.HUB.isInIsland() && LorenzUtils.skyBlockArea == "Bazaar Alley") {
-            return true
+        if (IslandType.HUB.isInIsland()) {
+            if (config.shoppingList.inBazaarAlley && LorenzUtils.skyBlockArea == "Bazaar Alley") {
+                return true
+            }
+            if (config.shoppingList.inFarmingAreas && LorenzUtils.skyBlockArea == "Farm") {
+                return true
+            }
         }
-
+        if (config.shoppingList.inFarmingAreas && IslandType.THE_FARMING_ISLANDS.isInIsland()) return true
         if (hideExtraGuis()) return false
         if (GardenAPI.inGarden()) {
             if (GardenAPI.onBarnPlot) return true
@@ -600,6 +589,37 @@ class GardenVisitorFeatures {
         for (visitor in VisitorAPI.getVisitors()) {
             if (visitor.nameTagEntityId == entityId) {
                 entity.customNameTag = GardenVisitorColorNames.getColoredName(entity.name)
+            }
+        }
+    }
+
+    @SubscribeEvent
+    fun onDebugDataCollect(event: DebugDataCollectEvent) {
+        event.title("Garden Visitor Stats")
+
+        if (!GardenAPI.inGarden()) {
+            event.addIrrelevant("not in garden")
+            return
+        }
+
+        event.addData {
+            val visitors = VisitorAPI.getVisitors()
+
+            add("visitors: ${visitors.size}")
+
+            for (visitor in visitors) {
+                add(" ")
+                add("visitorName: '${visitor.visitorName}'")
+                add("status: '${visitor.status}'")
+                if (visitor.inSacks) {
+                    add("inSacks!")
+                }
+                if (visitor.shoppingList.isNotEmpty()) {
+                    add("shoppingList: '${visitor.shoppingList}'")
+                }
+                visitor.offer?.offerItem?.getInternalName()?.let {
+                    add("offer: '${it}'")
+                }
             }
         }
     }

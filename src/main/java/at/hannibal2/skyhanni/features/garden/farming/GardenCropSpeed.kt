@@ -98,8 +98,10 @@ object GardenCropSpeed {
                     this.add(blocksBroken)
                 }
             }
-            averageBlocksPerSecond = if (blocksSpeedList.size > 1) {
-                blocksSpeedList.dropLast(1).average()
+            averageBlocksPerSecond = if (blocksSpeedList.size > 5) {
+                blocksSpeedList.drop(3).average()
+            } else if (blocksSpeedList.size > 1) {
+                blocksSpeedList.drop(1).average()
             } else 0.0
             GardenAPI.getCurrentlyFarmedCrop()?.let {
                 val heldTool = InventoryUtils.getItemInHand()

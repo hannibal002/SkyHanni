@@ -79,7 +79,7 @@ class NonGodPotEffectDisplay {
 
     // todo : cleanup and add support for poison candy I, and add support for splash / other formats
     @SubscribeEvent
-    fun onChatMessage(event: LorenzChatEvent) {
+    fun onChat(event: LorenzChatEvent) {
         if (event.message == "§aYou cleared all of your active effects!") {
             effectDuration.clear()
             update()
