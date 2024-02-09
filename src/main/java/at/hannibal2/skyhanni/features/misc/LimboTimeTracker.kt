@@ -9,9 +9,9 @@ import at.hannibal2.skyhanni.events.LorenzChatEvent
 import at.hannibal2.skyhanni.events.LorenzTickEvent
 import at.hannibal2.skyhanni.events.LorenzToolTipEvent
 import at.hannibal2.skyhanni.events.LorenzWorldChangeEvent
-import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.events.MessageSendToServerEvent
 import at.hannibal2.skyhanni.features.commands.LimboCommands
+import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.LocationUtils.isPlayerInside
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils.round
@@ -69,7 +69,7 @@ class LimboTimeTracker {
     fun onConfigLoad(event: ConfigLoadEvent) {
         if (config.limboPlaytime < config.limboTimePB) {
             config.limboPlaytime = config.limboTimePB
-            LorenzUtils.debug("Setting limboPlaytime = limboTimePB, since limboPlaytime was lower.")
+            ChatUtils.debug("Setting limboPlaytime = limboTimePB, since limboPlaytime was lower.")
         }
     }
 
