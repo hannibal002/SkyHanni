@@ -1,8 +1,8 @@
 package at.hannibal2.skyhanni.test.command
 
 import at.hannibal2.skyhanni.SkyHanniMod
+import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.KeyboardManager
-import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.OSUtils
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.TimeLimitedSet
@@ -11,6 +11,7 @@ import java.util.UUID
 import kotlin.time.Duration.Companion.minutes
 
 object ErrorManager {
+
     // random id -> error message
     private val errorMessages = mutableMapOf<String, String>()
     private val fullErrorMessages = mutableMapOf<String, String>()
@@ -28,7 +29,7 @@ object ErrorManager {
 
     fun command(array: Array<String>) {
         if (array.size != 1) {
-            LorenzUtils.userError("Use /shcopyerror <error id>")
+            ChatUtils.userError("Use /shcopyerror <error id>")
             return
         }
 
@@ -40,7 +41,7 @@ object ErrorManager {
             errorMessages[id]
         }
         val name = if (fullErrorMessage) "Full error" else "Error"
-        LorenzUtils.chat(errorMessage?.let {
+        ChatUtils.chat(errorMessage?.let {
             OSUtils.copyToClipboard(it)
             "$name copied into the clipboard, please report it on the SkyHanni discord!"
         } ?: "Error id not found!")
@@ -68,7 +69,7 @@ object ErrorManager {
         throwable: Throwable,
         message: String,
         ignoreErrorCache: Boolean,
-        vararg extraData: Pair<String, Any?>
+        vararg extraData: Pair<String, Any?>,
     ) {
         val error = Error(message, throwable)
         error.printStackTrace()
@@ -93,7 +94,7 @@ object ErrorManager {
         fullErrorMessages[randomId] =
             "```\nSkyHanni ${SkyHanniMod.version}: $rawMessage\n(full stack trace)\n \n$fullStackTrace\n$extraDataString```"
 
-        LorenzUtils.clickableChat(
+        ChatUtils.clickableChat(
             "§c[SkyHanni-${SkyHanniMod.version}]: $message§c. Click here to copy the error into the clipboard.",
             "shcopyerror $randomId",
             false

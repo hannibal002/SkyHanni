@@ -16,6 +16,7 @@ import java.util.regex.Matcher
 import java.util.regex.Pattern
 
 object StringUtils {
+
     // TODO USE SH-REPO
     private val playerChatPattern = "(?<important>.*?)(?:§[f7r])*: .*".toPattern()
     private val chatUsernamePattern =

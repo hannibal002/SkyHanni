@@ -9,5 +9,5 @@ class CrimsonMiniBoss(
     val displayItem: NEUInternalName,
     val location: LorenzVec?,
     val pattern: Pattern,
-    var doneToday: Boolean = false
+    var doneToday: Boolean = false,
 )

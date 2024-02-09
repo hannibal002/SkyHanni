@@ -9,7 +9,7 @@ class DojoQuest(
     location: LorenzVec?,
     displayItem: NEUInternalName,
     dojoRankGoal: String,
-    state: QuestState
+    state: QuestState,
 ) :
     Quest(
         displayItem,

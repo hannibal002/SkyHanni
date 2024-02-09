@@ -46,6 +46,7 @@ typealias TrackerDisplayMode = SkyHanniTracker.DefaultDisplayMode
 
 class ConfigManager {
     companion object {
+
         val gson = GsonBuilder().setPrettyPrinting()
             .excludeFieldsWithoutExposeAnnotation()
             .serializeSpecialFloatingPointValues()

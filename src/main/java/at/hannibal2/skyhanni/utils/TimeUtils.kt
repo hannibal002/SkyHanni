@@ -7,12 +7,14 @@ import io.github.moulberry.notenoughupdates.util.SkyBlockTime
 import java.time.LocalDate
 import java.time.ZoneId
 import kotlin.time.Duration
+import kotlin.time.Duration.Companion.milliseconds
 import kotlin.time.Duration.Companion.minutes
 import kotlin.time.Duration.Companion.seconds
 import kotlin.time.DurationUnit
 import kotlin.time.toDuration
 
 object TimeUtils {
+
     private val pattern =
         "(?:(?<y>\\d+) ?y(?:\\w* ?)?)?(?:(?<d>\\d+) ?d(?:\\w* ?)?)?(?:(?<h>\\d+) ?h(?:\\w* ?)?)?(?:(?<m>\\d+) ?m(?:\\w* ?)?)?(?:(?<s>\\d+) ?s(?:\\w* ?)?)?".toPattern()
 
@@ -20,7 +22,7 @@ object TimeUtils {
         biggestUnit: TimeUnit = TimeUnit.YEAR,
         showMilliSeconds: Boolean = false,
         longName: Boolean = false,
-        maxUnits: Int = -1
+        maxUnits: Int = -1,
     ): String = formatDuration(
         inWholeMilliseconds - 999, biggestUnit, showMilliSeconds, longName, maxUnits
     )
@@ -38,7 +40,7 @@ object TimeUtils {
         biggestUnit: TimeUnit = TimeUnit.YEAR,
         showMilliSeconds: Boolean = false,
         longName: Boolean = false,
-        maxUnits: Int = -1
+        maxUnits: Int = -1,
     ): String {
         // TODO: if this weird offset gets removed, also remove that subtraction from formatDuration(kotlin.time.Duration)
         var milliseconds = millis + 999
@@ -158,6 +160,9 @@ object TimeUtils {
     }
 
     fun getCurrentLocalDate(): LocalDate = LocalDate.now(ZoneId.of("UTC"))
+
+    val Long.ticks get() = (this * 50).milliseconds
+    val Int.ticks get() = (this * 50).milliseconds
 }
 
 private const val FACTOR_SECONDS = 1000L

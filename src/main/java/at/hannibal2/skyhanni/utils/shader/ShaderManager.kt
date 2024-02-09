@@ -18,9 +18,11 @@ object ShaderManager {
      * in the when-expression
      */
     enum class Shaders(val shader: Shader) {
+
         CHROMA(ChromaShader.INSTANCE);
 
         companion object {
+
             fun getShaderInstance(shaderName: String): Shader? = when (shaderName) {
                 "chroma" -> CHROMA.shader
                 else -> {

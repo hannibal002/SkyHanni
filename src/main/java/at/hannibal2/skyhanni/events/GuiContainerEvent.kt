@@ -12,7 +12,7 @@ abstract class GuiContainerEvent(open val gui: GuiContainer, open val container:
         override val container: Container,
         val mouseX: Int,
         val mouseY: Int,
-        val partialTicks: Float
+        val partialTicks: Float,
     ) : GuiContainerEvent(gui, container)
 
     @Cancelable
@@ -21,18 +21,19 @@ abstract class GuiContainerEvent(open val gui: GuiContainer, open val container:
 
     abstract class DrawSlotEvent(gui: GuiContainer, container: Container, open val slot: Slot) :
         GuiContainerEvent(gui, container) {
+
         @Cancelable
         data class GuiContainerDrawSlotPre(
             override val gui: GuiContainer,
             override val container: Container,
-            override val slot: Slot
+            override val slot: Slot,
         ) :
             DrawSlotEvent(gui, container, slot)
 
         data class GuiContainerDrawSlotPost(
             override val gui: GuiContainer,
             override val container: Container,
-            override val slot: Slot
+            override val slot: Slot,
         ) :
             DrawSlotEvent(gui, container, slot)
     }
@@ -42,7 +43,7 @@ abstract class GuiContainerEvent(open val gui: GuiContainer, open val container:
         override val container: Container,
         val mouseX: Int,
         val mouseY: Int,
-        val partialTicks: Float
+        val partialTicks: Float,
     ) : GuiContainerEvent(gui, container)
 
     @Cancelable
@@ -52,6 +53,6 @@ abstract class GuiContainerEvent(open val gui: GuiContainer, open val container:
         val slot: Slot?,
         val slotId: Int,
         val clickedButton: Int,
-        val clickType: Int
+        val clickType: Int,
     ) : GuiContainerEvent(gui, container)
 }

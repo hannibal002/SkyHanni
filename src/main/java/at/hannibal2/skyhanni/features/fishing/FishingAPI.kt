@@ -28,6 +28,7 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import kotlin.time.Duration.Companion.seconds
 
 object FishingAPI {
+
     val lavaBlocks = listOf(Blocks.lava, Blocks.flowing_lava)
     private val waterBlocks = listOf(Blocks.water, Blocks.flowing_water)
 
@@ -121,5 +122,4 @@ object FishingAPI {
         }
         return 1
     }
-
 }

@@ -14,11 +14,12 @@ class Uniform<T>(
     shader: Shader,
     private val uniformType: UniformType<T>,
     val name: String,
-    private val uniformValuesSupplier: Supplier<T>
+    private val uniformValuesSupplier: Supplier<T>,
 ) {
 
     class UniformType<T> {
         companion object {
+
             val FLOAT: UniformType<Float> = UniformType()
             val VEC3: UniformType<FloatArray> = UniformType()
             val BOOL: UniformType<Boolean> = UniformType()
