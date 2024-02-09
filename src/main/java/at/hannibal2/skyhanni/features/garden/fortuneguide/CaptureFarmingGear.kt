@@ -150,7 +150,7 @@ class CaptureFarmingGear {
             var tierProgress = -1
             for (line in item.getLore()) {
                 tierPattern.matchMatcher(line) {
-                    tier = group("nextTier").romanToDecimalIfNecessary()
+                    tier = group("nextTier").romanToDecimalIfNecessary() - 1
                 }
                 tierProgressPattern.matchMatcher(line) {
                     tierProgress = group("having").toInt()
