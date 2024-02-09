@@ -78,7 +78,7 @@ class DailyKuudraBossHelper(private val reputationHelper: CrimsonIsleReputationH
                 lineList.add(" ")
                 lineList.add(displayItem.getItemStack())
                 lineList.add("$displayName: $result")
-                if (!(config.hideComplete && result == "§aDone")) display.add(lineList)
+                if (!(config.hideComplete.get() && tier.doneToday)) display.add(lineList)
             }
         }
     }

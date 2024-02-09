@@ -201,8 +201,7 @@ class DailyQuestHelper(val reputationHelper: CrimsonIsleReputationHelper) {
         display.addAsSingletonList("")
         display.addAsSingletonList("§7Daily Quests (§e$done§8/§e5 collected§7)")
         if (done != 5) {
-            val filteredQuests: List<Quest> = if (config.hideComplete) quests.filter { it.state != QuestState.COLLECTED }
-            else quests
+            val filteredQuests = quests.filter { !config.hideComplete.get() || it.state != QuestState.COLLECTED }
             filteredQuests.mapTo(display) { renderQuest(it) }
         }
     }

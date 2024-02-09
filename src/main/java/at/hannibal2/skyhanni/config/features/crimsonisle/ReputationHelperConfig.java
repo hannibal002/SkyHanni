@@ -8,6 +8,7 @@ import io.github.moulberry.moulconfig.annotations.ConfigEditorBoolean;
 import io.github.moulberry.moulconfig.annotations.ConfigEditorDropdown;
 import io.github.moulberry.moulconfig.annotations.ConfigEditorKeybind;
 import io.github.moulberry.moulconfig.annotations.ConfigOption;
+import io.github.moulberry.moulconfig.observer.Property;
 import org.lwjgl.input.Keyboard;
 
 public class ReputationHelperConfig {
@@ -26,7 +27,7 @@ public class ReputationHelperConfig {
     @Expose
     @ConfigOption(name = "Hide Completed", desc = "Hides tasks after they've been completed.")
     @ConfigEditorBoolean
-    public boolean hideComplete = true;
+    public Property<Boolean> hideComplete = Property.of(true);
 
     @Expose
     @ConfigOption(name = "Hotkey", desc = "Press this hotkey to show the Reputation Helper.")

@@ -82,7 +82,7 @@ class DailyMiniBossHelper(private val reputationHelper: CrimsonIsleReputationHel
                 lineList.add(" ")
                 lineList.add(displayItem.getItemStack())
                 lineList.add("§5$displayName§7: $result")
-                if (!(config.hideComplete && result == "§aDone")) display.add(lineList)
+                if (!(config.hideComplete.get() && miniBoss.doneToday)) display.add(lineList)
             }
         }
     }
