@@ -131,7 +131,6 @@ object SensitivityReducer {
     fun onLogin(event: HypixelJoinEvent) {
         val divisor = config.reducingFactor.get()
         val expectedLoweredSensitivity = ((divisor * (gameSettings.mouseSensitivity + 1F / 3F)) - 1F / 3F)
-        println("expected = $expectedLoweredSensitivity")
         if (abs(storage.savedMouseloweredSensitivity - expectedLoweredSensitivity) <= 0.0001) {
             LorenzUtils.debug("Fixing incorrectly lowered sensitivity")
             isToggled = false
@@ -140,17 +139,17 @@ object SensitivityReducer {
         }
     }
 
-    fun printSensitivities() {
-        LorenzUtils.chat("Current Sensitivity: ${gameSettings.mouseSensitivity}")
-        LorenzUtils.chat("Stored Sensitivity: ${storage.savedMouseloweredSensitivity}")
-        LorenzUtils.chat("Current Divisor: ${config.reducingFactor}")
-    }
     @SubscribeEvent
     fun onDebugDataCollect(event: DebugDataCollectEvent) {
-        event.title("Garden Reduced Sensitivity")
+        event.title("Garden Sensitivity Reducer")
 
         if (!GardenAPI.inGarden()) {
             event.addIrrelevant("not in garden")
+            return
+        }
+
+        if (config.mode == SensitivityReducerConfig.Mode.OFF) {
+            event.addIrrelevant("disabled in config")
             return
         }
 
@@ -158,6 +157,8 @@ object SensitivityReducer {
             add("Current Sensitivity: ${gameSettings.mouseSensitivity}")
             add("Stored Sensitivity: ${storage.savedMouseloweredSensitivity}")
             add("Current Divisor: ${config.reducingFactor.get()}")
+            add("Mode: ${config.mode}")
+            add("Keybind: ${config.keybind}")
         }
     }
 }

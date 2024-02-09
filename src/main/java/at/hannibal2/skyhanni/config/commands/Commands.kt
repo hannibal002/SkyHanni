@@ -402,10 +402,6 @@ object Commands {
             "readcropmilestonefromclipboard",
             "Read crop milestone from clipboard. This helps fixing wrong crop milestone data"
         ) { GardenCropMilestonesCommunityFix.readDataFromClipboard() }
-        registerCommand(
-            "shprintsensitivities",
-            "Prints the current and stored sentivitities from the Lowered Sensitivity feature."
-        ) { SensitivityReducer.printSensitivities() }
     }
 
     private fun internalCommands() {
