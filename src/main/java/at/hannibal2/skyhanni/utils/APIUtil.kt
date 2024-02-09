@@ -22,8 +22,8 @@ import java.io.FileInputStream
 import java.io.InputStreamReader
 import java.nio.charset.StandardCharsets
 
-
 object APIUtil {
+
     private val parser = JsonParser()
     private var showApiErrors = false
 
@@ -49,7 +49,7 @@ object APIUtil {
     fun getJSONResponseAsElement(
         urlString: String,
         silentError: Boolean = false,
-        apiName: String = "Hypixel API"
+        apiName: String = "Hypixel API",
     ): JsonElement {
         val client = builder.build()
         try {
@@ -63,16 +63,15 @@ object APIUtil {
                         if (e.message?.contains("Use JsonReader.setLenient(true)") == true) {
                             println("MalformedJsonException: Use JsonReader.setLenient(true)")
                             println(" - getJSONResponse: '$urlString'")
-                            LorenzUtils.debug("MalformedJsonException: Use JsonReader.setLenient(true)")
+                            ChatUtils.debug("MalformedJsonException: Use JsonReader.setLenient(true)")
                         } else if (retSrc.contains("<center><h1>502 Bad Gateway</h1></center>")) {
                             if (showApiErrors && apiName == "Hypixel API") {
-                                LorenzUtils.clickableChat(
+                                ChatUtils.clickableChat(
                                     "Problems with detecting the Hypixel API. §eClick here to hide this message for now.",
                                     "shtogglehypixelapierrors"
                                 )
                             }
                             e.printStackTrace()
-
                         } else {
                             ErrorManager.logErrorWithData(
                                 e, "$apiName error for url: '$urlString'",
@@ -118,7 +117,7 @@ object APIUtil {
 
                 val message = "POST request to '$urlString' returned status ${status.statusCode}"
                 println(message)
-                LorenzUtils.error("SkyHanni ran into an error. Status: ${status.statusCode}")
+                ChatUtils.error("SkyHanni ran into an error. Status: ${status.statusCode}")
                 return ApiResponse(false, message, JsonObject())
             }
         } catch (throwable: Throwable) {
@@ -126,7 +125,7 @@ object APIUtil {
                 throw throwable
             } else {
                 throwable.printStackTrace()
-                LorenzUtils.error("SkyHanni ran into an ${throwable::class.simpleName ?: "error"} whilst sending a resource. See logs for more details.")
+                ChatUtils.error("SkyHanni ran into an ${throwable::class.simpleName ?: "error"} whilst sending a resource. See logs for more details.")
             }
             return ApiResponse(false, throwable.message, JsonObject())
         } finally {
@@ -139,15 +138,21 @@ object APIUtil {
         return parser.parse(retSrc) as JsonObject
     }
 
-    fun postJSONIsSuccessful(urlString: String, body: String, silentError: Boolean = false): Boolean {
-        val response = postJSON(urlString, body, silentError)
+    fun postJSONIsSuccessful(url: String, body: String, silentError: Boolean = false): Boolean {
+        val response = postJSON(url, body, silentError)
 
         if (response.success) {
             return true
         }
 
         println(response.message)
-        LorenzUtils.error(response.message ?: "An error occurred during the API request")
+        ErrorManager.logErrorStateWithData(
+            "An error occurred during the API request",
+            "unsuccessful API response",
+            "url" to url,
+            "body" to body,
+            "response" to response,
+        )
 
         return false
     }
@@ -158,6 +163,6 @@ object APIUtil {
 
     fun toggleApiErrorMessages() {
         showApiErrors = !showApiErrors
-        LorenzUtils.chat("Hypixel API error messages " + if (showApiErrors) "§chidden" else "§ashown")
+        ChatUtils.chat("Hypixel API error messages " + if (showApiErrors) "§chidden" else "§ashown")
     }
 }

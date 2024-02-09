@@ -5,6 +5,6 @@ import at.hannibal2.skyhanni.data.SkillExperience
 class SkillLevelStep(
     val skillName: String,
     private val skillLevelNeeded: Int,
-    skillExpNeeded: Long = SkillExperience.getExpForLevel(skillLevelNeeded)
+    skillExpNeeded: Long = SkillExperience.getExpForLevel(skillLevelNeeded),
 ) :
     ProgressionStep("$skillName $skillLevelNeeded", skillExpNeeded)
