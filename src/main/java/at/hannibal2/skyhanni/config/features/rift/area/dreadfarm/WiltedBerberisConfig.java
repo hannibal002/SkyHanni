@@ -22,6 +22,10 @@ public class WiltedBerberisConfig {
     @ConfigOption(name = "Hide Particles", desc = "Hide the Wilted Berberis particles.")
     @ConfigEditorBoolean
     // TODO fix typo
-    public boolean hideparticles = false;
+    public boolean hideParticles = false;
 
+    @Expose
+    @ConfigOption(name = "Respawn sequence", desc = "Use the respawn sequence to find the Wilted Berberis.")
+    @ConfigEditorBoolean
+    public boolean respawnSequence = true;
 }
