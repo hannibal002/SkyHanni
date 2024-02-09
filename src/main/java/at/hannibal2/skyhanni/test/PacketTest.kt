@@ -1,9 +1,9 @@
 package at.hannibal2.skyhanni.test
 
 import at.hannibal2.skyhanni.events.PacketEvent
+import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.EntityUtils
 import at.hannibal2.skyhanni.utils.LocationUtils.distanceToPlayer
-import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils.round
 import at.hannibal2.skyhanni.utils.LorenzVec
 import at.hannibal2.skyhanni.utils.getLorenzVec
@@ -33,11 +33,12 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
 class PacketTest {
     companion object {
+
         private var enabled = false
 
         fun toggle() {
             enabled = !enabled
-            LorenzUtils.chat("Packet test: $enabled")
+            ChatUtils.chat("Packet test: $enabled")
         }
     }
 
@@ -67,7 +68,6 @@ class PacketTest {
         if (!enabled) return
         val packet = event.packet
         val packetName = packet.javaClass.simpleName
-
 
         // Keep alive
         if (packetName == "S00PacketKeepAlive") return
@@ -116,7 +116,6 @@ class PacketTest {
 //        if (packetName == "S20PacketEntityProperties") return
 //        if (packetName == "S1BPacketEntityAttach") return
 
-
         val id = getEntityId(packet)
         val entity = getEntity(packet, id)
         val distance = getDistance(getLocation(packet, entity))
@@ -133,7 +132,6 @@ class PacketTest {
             if (id != null) {
                 return
             }
-
 
 //            if (packetName.contains("")) {
 //

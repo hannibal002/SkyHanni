@@ -7,12 +7,12 @@ import at.hannibal2.skyhanni.events.IslandChangeEvent
 import at.hannibal2.skyhanni.events.LorenzChatEvent
 import at.hannibal2.skyhanni.events.LorenzTickEvent
 import at.hannibal2.skyhanni.features.rift.RiftAPI
+import at.hannibal2.skyhanni.utils.CollectionUtils.addAsSingletonList
+import at.hannibal2.skyhanni.utils.CollectionUtils.addOrPut
 import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.LorenzUtils
-import at.hannibal2.skyhanni.utils.LorenzUtils.addAsSingletonList
-import at.hannibal2.skyhanni.utils.LorenzUtils.addOrPut
 import at.hannibal2.skyhanni.utils.NEUInternalName.Companion.asInternalName
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
@@ -41,6 +41,7 @@ object VerminTracker {
     { drawDisplay(it) }
 
     class Data : TrackerData() {
+
         override fun reset() {
             count.clear()
         }
@@ -65,7 +66,7 @@ object VerminTracker {
 
     private fun checkVacuum() {
         hasVacuum = InventoryUtils.getItemsInOwnInventory()
-            .any { it.getInternalName() == TURBOMAX_VACUUM}
+            .any { it.getInternalName() == TURBOMAX_VACUUM }
     }
 
     @SubscribeEvent
@@ -145,7 +146,8 @@ object VerminTracker {
     fun onRenderOverlay(event: GuiRenderEvent) {
         if (!isEnabled()) return
         if (!config.showOutsideWestVillage &&
-            !LorenzUtils.skyBlockArea.let { it == "Infested House" || it == "West Village" }) return
+            !LorenzUtils.skyBlockArea.let { it == "Infested House" || it == "West Village" }
+        ) return
         if (!config.showWithoutVacuum && !hasVacuum) return
 
         tracker.renderDisplay(config.position)

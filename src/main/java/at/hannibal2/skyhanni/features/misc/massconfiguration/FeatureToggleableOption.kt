@@ -5,5 +5,5 @@ data class FeatureToggleableOption(
     val isTrueEnabled: Boolean, val category: Category,
     val setter: (Boolean) -> Unit,
     val path: String,
-    var toggleOverride: ResetSuggestionState? = null
+    var toggleOverride: ResetSuggestionState? = null,
 )

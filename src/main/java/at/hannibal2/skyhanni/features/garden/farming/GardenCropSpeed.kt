@@ -13,13 +13,14 @@ import at.hannibal2.skyhanni.events.PreProfileSwitchEvent
 import at.hannibal2.skyhanni.events.RepositoryReloadEvent
 import at.hannibal2.skyhanni.features.garden.CropType
 import at.hannibal2.skyhanni.features.garden.GardenAPI
+import at.hannibal2.skyhanni.utils.CollectionUtils.editCopy
 import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName
-import at.hannibal2.skyhanni.utils.LorenzUtils.editCopy
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import kotlin.concurrent.fixedRateTimer
 
 object GardenCropSpeed {
+
     private val config get() = GardenAPI.config
     private val cropsPerSecond: MutableMap<CropType, Int>? get() = GardenAPI.storage?.cropsPerSecond
     private val latestBlocksPerSecond: MutableMap<CropType, Double>? get() = GardenAPI.storage?.latestBlocksPerSecond
@@ -42,7 +43,9 @@ object GardenCropSpeed {
         fixedRateTimer(name = "skyhanni-crop-milestone-speed", period = 1000L) {
             if (isEnabled()) {
                 if (GardenAPI.mushroomCowPet) {
-                    CropType.MUSHROOM.setCounter(CropType.MUSHROOM.getCounter() + blocksBroken * (lastBrokenCrop?.multiplier ?: 1))
+                    CropType.MUSHROOM.setCounter(
+                        CropType.MUSHROOM.getCounter() + blocksBroken * (lastBrokenCrop?.multiplier ?: 1)
+                    )
                 }
                 checkSpeed()
                 update()

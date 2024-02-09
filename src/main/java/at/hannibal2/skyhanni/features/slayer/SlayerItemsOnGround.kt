@@ -18,6 +18,7 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import kotlin.time.Duration.Companion.seconds
 
 class SlayerItemsOnGround {
+
     private val config get() = SkyHanniMod.feature.slayer.itemsOnGround
 
     private var itemsOnGround = TimeLimitedCache<EntityItem, Pair<LorenzVec, String>>(2.seconds)

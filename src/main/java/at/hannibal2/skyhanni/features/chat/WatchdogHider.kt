@@ -47,6 +47,7 @@ class WatchdogHider {
     }
 
     companion object {
+
         private const val watchdogStartLine = "§f"
         private const val watchdogAnnouncementLine = "§4[WATCHDOG ANNOUNCEMENT]"
         private const val watchdogEndLine = "§c"

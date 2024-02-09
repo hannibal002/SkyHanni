@@ -61,6 +61,5 @@ class RngMeterInventory {
         event.move(3, "inventory.rngMeterFloorName", "inventory.rngMeter.floorName")
         event.move(3, "inventory.rngMeterNoDrop", "inventory.rngMeter.noDrop")
         event.move(3, "inventory.rngMeterSelectedDrop", "inventory.rngMeter.selectedDrop")
-
     }
 }
