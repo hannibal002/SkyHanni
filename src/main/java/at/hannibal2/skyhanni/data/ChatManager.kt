@@ -16,6 +16,7 @@ import net.minecraft.client.gui.GuiNewChat
 import net.minecraft.event.HoverEvent
 import net.minecraft.network.play.client.C01PacketChatMessage
 import net.minecraft.network.play.server.S02PacketChat
+import net.minecraft.util.ChatComponentText
 import net.minecraft.util.EnumChatFormatting
 import net.minecraft.util.IChatComponent
 import net.minecraftforge.client.event.ClientChatReceivedEvent
@@ -45,6 +46,8 @@ object ChatManager {
         RETRACTED(EnumChatFormatting.DARK_PURPLE.toString() + EnumChatFormatting.BOLD),
         MODIFIED(EnumChatFormatting.YELLOW.toString() + EnumChatFormatting.BOLD),
         ALLOWED(EnumChatFormatting.GREEN),
+        OUTGOING(EnumChatFormatting.BLUE),
+        OUTGOING_BLOCKED(EnumChatFormatting.BLUE.toString() + EnumChatFormatting.BOLD),
         ;
 
         val renderedString = "$format$name"
@@ -81,7 +84,14 @@ object ChatManager {
         val packet = event.packet as? C01PacketChatMessage ?: return
 
         val message = packet.message
-        event.isCanceled = MessageSendToServerEvent(message).postAndCatch()
+        val component = ChatComponentText(message)
+        messageHistory[IdentityCharacteristics(component)] =
+            MessageFilteringResult(component, ActionKind.OUTGOING, null, null)
+        if (MessageSendToServerEvent(message).postAndCatch()) {
+            event.isCanceled = true
+            messageHistory[IdentityCharacteristics(component)] =
+                MessageFilteringResult(component, ActionKind.OUTGOING_BLOCKED, null, null)
+        }
     }
 
     @SubscribeEvent(receiveCanceled = true)

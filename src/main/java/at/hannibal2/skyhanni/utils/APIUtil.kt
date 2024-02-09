@@ -6,6 +6,7 @@ import com.google.gson.JsonElement
 import com.google.gson.JsonObject
 import com.google.gson.JsonParser
 import com.google.gson.JsonSyntaxException
+import org.apache.http.HttpEntity
 import org.apache.http.client.config.RequestConfig
 import org.apache.http.client.methods.HttpGet
 import org.apache.http.client.methods.HttpPost
@@ -25,6 +26,8 @@ object APIUtil {
 
     private val parser = JsonParser()
     private var showApiErrors = false
+
+    data class ApiResponse(val success: Boolean, val message: String?, val data: JsonObject)
 
     private val builder: HttpClientBuilder =
         HttpClients.custom().setUserAgent("SkyHanni/${SkyHanniMod.version}")
@@ -96,23 +99,26 @@ object APIUtil {
         return JsonObject()
     }
 
-    fun postJSONIsSuccessful(urlString: String, body: String, silentError: Boolean = false): Boolean {
+    fun postJSON(urlString: String, body: String, silentError: Boolean = false): ApiResponse {
         val client = builder.build()
+
         try {
             val method = HttpPost(urlString)
             method.entity = StringEntity(body, ContentType.APPLICATION_JSON)
 
             client.execute(method).use { response ->
                 val status = response.statusLine
+                val entity = response.entity
 
-                if (status.statusCode >= 200 || status.statusCode < 300) {
-                    return true
+                if (status.statusCode in 200..299) {
+                    val data = readResponse(entity)
+                    return ApiResponse(true, "Request successful", data)
                 }
 
-                println("POST request to '$urlString' returned status ${status.statusCode}")
-                ChatUtils.error("SkyHanni ran into an error whilst sending data. Status: ${status.statusCode}")
-
-                return false
+                val message = "POST request to '$urlString' returned status ${status.statusCode}"
+                println(message)
+                ChatUtils.error("SkyHanni ran into an error. Status: ${status.statusCode}")
+                return ApiResponse(false, message, JsonObject())
             }
         } catch (throwable: Throwable) {
             if (silentError) {
@@ -121,9 +127,26 @@ object APIUtil {
                 throwable.printStackTrace()
                 ChatUtils.error("SkyHanni ran into an ${throwable::class.simpleName ?: "error"} whilst sending a resource. See logs for more details.")
             }
+            return ApiResponse(false, throwable.message, JsonObject())
         } finally {
             client.close()
         }
+    }
+
+    private fun readResponse(entity: HttpEntity): JsonObject {
+        val retSrc = EntityUtils.toString(entity)
+        return parser.parse(retSrc) as JsonObject
+    }
+
+    fun postJSONIsSuccessful(urlString: String, body: String, silentError: Boolean = false): Boolean {
+        val response = postJSON(urlString, body, silentError)
+
+        if (response.success) {
+            return true
+        }
+
+        println(response.message)
+        LorenzUtils.error(response.message ?: "An error occurred during the API request")
 
         return false
     }
