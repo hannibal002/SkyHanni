@@ -26,7 +26,7 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 class GeorgeDisplay {
 
     private val config get() = SkyHanniMod.feature.misc.pets.george
-    private val useFandomWiki get() = SkyHanniMod.feature.commands.fandomWiki.enabled
+    private val useFandomWiki get() = SkyHanniMod.feature.commands.betterWiki.useFandom
 
     private val SEPARATOR = ";"
 
