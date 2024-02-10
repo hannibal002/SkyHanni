@@ -8,11 +8,7 @@ import at.hannibal2.skyhanni.features.chat.ChatFilterGui
 import at.hannibal2.skyhanni.utils.IdentityCharacteristics
 import at.hannibal2.skyhanni.utils.LorenzLogger
 import at.hannibal2.skyhanni.utils.LorenzUtils
-<<<<<<< HEAD
-import at.hannibal2.skyhanni.utils.LorenzUtils.makeAccessible
-=======
 import at.hannibal2.skyhanni.utils.ReflectionUtils.makeAccessible
->>>>>>> 1af3c89a8daf1eac3921c8b26a49e379f0d18f08
 import net.minecraft.client.Minecraft
 import net.minecraft.client.gui.ChatLine
 import net.minecraft.client.gui.GuiNewChat
@@ -68,21 +64,6 @@ object ChatManager {
         val modified: IChatComponent?,
     )
 
-<<<<<<< HEAD
-=======
-    @SubscribeEvent(priority = EventPriority.LOW, receiveCanceled = true)
-    fun onActionBarPacket(event: PacketEvent.ReceiveEvent) {
-        val packet = event.packet as? S02PacketChat ?: return
-
-        val messageComponent = packet.chatComponent
-        val message = LorenzUtils.stripVanillaMessage(messageComponent.formattedText)
-        if (packet.type.toInt() == 2) {
-            val actionBarEvent = LorenzActionBarEvent(message)
-            actionBarEvent.postAndCatch()
-        }
-    }
-
->>>>>>> 1af3c89a8daf1eac3921c8b26a49e379f0d18f08
     @SubscribeEvent
     fun onSendMessageToServerPacket(event: PacketEvent.SendEvent) {
         val packet = event.packet as? C01PacketChatMessage ?: return

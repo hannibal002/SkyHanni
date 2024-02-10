@@ -40,12 +40,7 @@ class MinionXp {
 
     data class XpInfo(val type: SkillType, val amount: Double)
 
-<<<<<<< HEAD
     private data class MinionStorage(val position: LorenzVec, val xpList: EnumMap<SkillType, Double>) {
-=======
-    private data class MinionStorage(val position: LorenzVec, val xpList: EnumMap<XpType, Double>) {
-
->>>>>>> 1af3c89a8daf1eac3921c8b26a49e379f0d18f08
         val timestamp: SimpleTimeMark = SimpleTimeMark.now()
     }
 
@@ -54,22 +49,7 @@ class MinionXp {
 
     private fun toPrimitiveItemStack(itemStack: ItemStack) =
         PrimitiveItemStack(itemStack.getInternalName(), itemStack.stackSize)
-
-<<<<<<< HEAD
-=======
-    // TODO use upper case names, created a function to get type by lowercase name
-    // TODO maybe: rename to SkillType, move somewhere else
-    enum class XpType {
-
-        Farming,
-        Mining,
-        Combat,
-        Foraging,
-        Fishing,
-        Alchemy
-    }
-
->>>>>>> 1af3c89a8daf1eac3921c8b26a49e379f0d18f08
+    
     @SubscribeEvent
     fun onMinionOpen(event: MinionOpenEvent) {
         if (!config.xpDisplay) return

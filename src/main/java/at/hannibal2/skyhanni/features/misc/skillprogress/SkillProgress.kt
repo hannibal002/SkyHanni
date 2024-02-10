@@ -15,7 +15,8 @@ import at.hannibal2.skyhanni.events.PreProfileSwitchEvent
 import at.hannibal2.skyhanni.events.SkillOverflowLevelupEvent
 import at.hannibal2.skyhanni.features.misc.skillprogress.SkillUtil.activeSkill
 import at.hannibal2.skyhanni.utils.LorenzUtils
-import at.hannibal2.skyhanni.utils.LorenzUtils.addAsSingletonList
+import at.hannibal2.skyhanni.utils.CollectionUtils.addAsSingletonList
+import at.hannibal2.skyhanni.utils.ConditionalUtils.onToggle
 import at.hannibal2.skyhanni.utils.LorenzUtils.chat
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.NumberUtil.formatNumber
@@ -154,7 +155,7 @@ object SkillProgress {
 
     @SubscribeEvent
     fun onConfigLoad(event: ConfigLoadEvent) {
-        LorenzUtils.onToggle(
+        onToggle(
             config.enabled,
             config.progressBarConfig.enabled,
             config.progressBarConfig.useChroma,
