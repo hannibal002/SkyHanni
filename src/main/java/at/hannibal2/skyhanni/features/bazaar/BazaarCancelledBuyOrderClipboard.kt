@@ -3,6 +3,7 @@ package at.hannibal2.skyhanni.features.bazaar
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.events.LorenzChatEvent
 import at.hannibal2.skyhanni.events.LorenzToolTipEvent
+import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.ItemUtils.name
 import at.hannibal2.skyhanni.utils.LorenzUtils
@@ -42,7 +43,7 @@ class BazaarCancelledBuyOrderClipboard {
         patternCancelledMessage.matchMatcher(event.message) {
             event.blockedReason = "bazaar cancelled buy order clipbaord"
             val coins = group("coins")
-            LorenzUtils.chat("Bazaar buy order cancelled. $latestAmount saved to clipboard. ($coins coins)")
+            ChatUtils.chat("Bazaar buy order cancelled. $latestAmount saved to clipboard. ($coins coins)")
 
             latestAmount?.let { OSUtils.copyToClipboard(it.replace(",", "")) }
             latestAmount = null

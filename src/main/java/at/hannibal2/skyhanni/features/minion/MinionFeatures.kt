@@ -20,6 +20,8 @@ import at.hannibal2.skyhanni.events.MinionOpenEvent
 import at.hannibal2.skyhanni.events.MinionStorageOpenEvent
 import at.hannibal2.skyhanni.test.GriffinUtils.drawWaypointFilled
 import at.hannibal2.skyhanni.utils.BlockUtils.getBlockStateAt
+import at.hannibal2.skyhanni.utils.ChatUtils
+import at.hannibal2.skyhanni.utils.CollectionUtils.editCopy
 import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.cleanName
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
@@ -28,6 +30,7 @@ import at.hannibal2.skyhanni.utils.LocationUtils
 import at.hannibal2.skyhanni.utils.LocationUtils.canBeSeen
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils.editCopy
+import at.hannibal2.skyhanni.utils.LorenzUtils.formatInteger
 import at.hannibal2.skyhanni.utils.LorenzUtils.isInIsland
 import at.hannibal2.skyhanni.utils.LorenzVec
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
@@ -65,7 +68,10 @@ class MinionFeatures {
 
     private var lastInventoryClosed = 0L
     private var coinsPerDay = ""
-    private val minionUpgradePattern by RepoPattern.pattern("minion.chat.upgrade", "§aYou have upgraded your Minion to Tier (?<tier>.*)")
+    private val minionUpgradePattern by RepoPattern.pattern(
+        "minion.chat.upgrade",
+        "§aYou have upgraded your Minion to Tier (?<tier>.*)"
+    )
     private val minionCoinPattern by RepoPattern.pattern("minion.chat.coin", "§aYou received §r§6(.*) coins§r§a!")
     private val minionTitlePattern by RepoPattern.pattern("minion.title", "Minion [^➜]")
     private val minionCollectItemPattern by RepoPattern.pattern("minion.item.collect", "^§aCollect All$")
@@ -370,7 +376,7 @@ class MinionFeatures {
 
         fun clearMinionData() {
             minions = mutableMapOf()
-            LorenzUtils.chat("Manually reset all private island minion location data!")
+            ChatUtils.chat("Manually reset all private island minion location data!")
         }
     }
 

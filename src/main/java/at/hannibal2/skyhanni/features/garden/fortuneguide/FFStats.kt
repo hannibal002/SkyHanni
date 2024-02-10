@@ -15,6 +15,7 @@ import net.minecraft.item.ItemStack
 import kotlin.math.floor
 
 object FFStats {
+
     private val mathCrops =
         listOf(CropType.WHEAT, CropType.CARROT, CropType.POTATO, CropType.SUGAR_CANE, CropType.NETHER_WART)
     private val dicerCrops = listOf(CropType.PUMPKIN, CropType.MELON)
