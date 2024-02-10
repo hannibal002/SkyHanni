@@ -153,7 +153,6 @@ object CaptureFarmingGear {
         }
         when (event.inventoryName) {
             "Your Equipment and Stats" -> equipmentAndStats(items, farmingItems, outdatedItems)
-            "Pets" -> pets(farmingItems, items, outdatedItems)
             "Your Skills" -> skills(items, storage)
             "Community Shop" -> communityShop(items)
             "Configure Plots" -> configurePlots(items, storage)
