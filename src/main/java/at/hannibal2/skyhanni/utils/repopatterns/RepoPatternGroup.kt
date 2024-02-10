@@ -6,6 +6,7 @@ import org.intellij.lang.annotations.Language
  * A utility class for allowing easier definitions of [RepoPattern]s with a common prefix.
  */
 class RepoPatternGroup internal constructor(val prefix: String) {
+
     init {
         RepoPatternManager.verifyKeyShape(prefix)
     }

@@ -15,10 +15,12 @@ import java.util.logging.Logger
 import kotlin.time.Duration.Companion.days
 
 class LorenzLogger(filePath: String) {
+
     private val format = SimpleDateFormat("HH:mm:ss")
     private val fileName = "$PREFIX_PATH$filePath.log"
 
     companion object {
+
         private var LOG_DIRECTORY = File("config/skyhanni/logs")
         private var PREFIX_PATH: String
         var hasDone = false

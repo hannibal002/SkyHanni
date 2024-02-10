@@ -5,9 +5,9 @@ import at.hannibal2.skyhanni.data.ClickType
 import at.hannibal2.skyhanni.events.BlockClickEvent
 import at.hannibal2.skyhanni.events.LorenzWorldChangeEvent
 import at.hannibal2.skyhanni.events.withAlpha
+import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.ClipboardUtils
 import at.hannibal2.skyhanni.utils.LocationUtils
-import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.RenderUtils
 import at.hannibal2.skyhanni.utils.RenderUtils.expandBlock
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getItemId
@@ -18,6 +18,7 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import java.awt.Color
 
 object WorldEdit {
+
     private var leftPos = null as BlockPos?
     private var rightPos = null as BlockPos?
 
@@ -97,37 +98,37 @@ object WorldEdit {
 
     fun command(it: Array<String>) {
         if (!isEnabled()) {
-            LorenzUtils.userError("World Edit is disabled in the config. Enable it if you want to use it.")
+            ChatUtils.userError("World Edit is disabled in the config. Enable it if you want to use it.")
             return
         }
         when (it.firstOrNull()) {
             null, "help" -> {
-                LorenzUtils.chat("Use a wood axe and left/right click to select a region in the world. Then use /shworldedit copy or /shworldedit reset.")
+                ChatUtils.chat("Use a wood axe and left/right click to select a region in the world. Then use /shworldedit copy or /shworldedit reset.")
             }
 
             "copy" -> {
                 copyToClipboard()
-                LorenzUtils.chat("Copied text to clipboard.")
+                ChatUtils.chat("Copied text to clipboard.")
             }
 
             "reset" -> {
                 leftPos = null
                 rightPos = null
-                LorenzUtils.chat("Reset selected region")
+                ChatUtils.chat("Reset selected region")
             }
 
             "left", "pos1" -> {
                 leftPos = LocationUtils.playerLocation().toBlockPos()
-                LorenzUtils.chat("Set left pos.")
+                ChatUtils.chat("Set left pos.")
             }
 
             "right", "pos2" -> {
                 leftPos = LocationUtils.playerLocation().toBlockPos()
-                LorenzUtils.chat("Set right pos.")
+                ChatUtils.chat("Set right pos.")
             }
 
             else -> {
-                LorenzUtils.chat("Unknown subcommand")
+                ChatUtils.chat("Unknown subcommand")
             }
         }
     }

@@ -14,6 +14,7 @@ import at.hannibal2.skyhanni.utils.TimeUtils
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
 class ChickenHeadTimer {
+
     private var hasChickenHead = false
     private var lastTime = 0L
     private val config get() = SkyHanniMod.feature.itemAbilities.chickenHead

@@ -2,9 +2,9 @@ package at.hannibal2.skyhanni.features.garden
 
 import at.hannibal2.skyhanni.features.garden.farming.CropMoneyDisplay
 import at.hannibal2.skyhanni.features.garden.farming.GardenCropSpeed.getSpeed
+import at.hannibal2.skyhanni.utils.ChatUtils
+import at.hannibal2.skyhanni.utils.CollectionUtils.sorted
 import at.hannibal2.skyhanni.utils.ItemUtils.getItemName
-import at.hannibal2.skyhanni.utils.LorenzUtils
-import at.hannibal2.skyhanni.utils.LorenzUtils.sorted
 import at.hannibal2.skyhanni.utils.NEUItems
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.NumberUtil.formatNumber
@@ -12,16 +12,17 @@ import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.TimeUtils
 
 object GardenCropTimeCommand {
+
     private val config get() = GardenAPI.config.moneyPerHours
 
     fun onCommand(args: Array<String>) {
         if (!config.display) {
-            LorenzUtils.userError("shcroptime requires 'Show money per Hour' feature to be enabled to work!")
+            ChatUtils.userError("shcroptime requires 'Show money per Hour' feature to be enabled to work!")
             return
         }
 
         if (args.size < 2) {
-            LorenzUtils.userError("Usage: /shcroptime <amount> <item>")
+            ChatUtils.userError("Usage: /shcroptime <amount> <item>")
             return
         }
 
@@ -29,12 +30,12 @@ object GardenCropTimeCommand {
         val amount = try {
             rawAmount.formatNumber()
         } catch (e: NumberFormatException) {
-            LorenzUtils.userError("Not a valid number: '$rawAmount'")
+            ChatUtils.userError("Not a valid number: '$rawAmount'")
             return
         }
         val multipliers = CropMoneyDisplay.multipliers
         if (multipliers.isEmpty()) {
-            LorenzUtils.userError("Data not loaded yet. Join the garden and display the money per hour display.")
+            ChatUtils.userError("Data not loaded yet. Join the garden and display the money per hour display.")
             return
         }
 
@@ -69,10 +70,10 @@ object GardenCropTimeCommand {
         }
 
         if (map.isEmpty()) {
-            LorenzUtils.userError("No crop item found for '$rawSearchName'.")
+            ChatUtils.userError("No crop item found for '$rawSearchName'.")
             return
         }
 
-        LorenzUtils.chat("Crop Speed for ${map.size} items:\n" + map.sorted().keys.joinToString("\n"))
+        ChatUtils.chat("Crop Speed for ${map.size} items:\n" + map.sorted().keys.joinToString("\n"))
     }
 }

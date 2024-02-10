@@ -28,6 +28,7 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import kotlin.time.Duration.Companion.seconds
 
 class MinionCraftHelper {
+
     private val config get() = SkyHanniMod.feature.event.bingo
 
     // TODO USE SH-REPO
@@ -296,5 +297,4 @@ class MinionCraftHelper {
         }
         data.add("tierOneMinionsDone", newList)
     }
-
 }

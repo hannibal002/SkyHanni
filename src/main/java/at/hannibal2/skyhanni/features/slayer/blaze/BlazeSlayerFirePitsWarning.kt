@@ -13,9 +13,11 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import kotlin.time.Duration.Companion.seconds
 
 class BlazeSlayerFirePitsWarning {
+
     private val config get() = SkyHanniMod.feature.slayer.blazes
 
     companion object {
+
         private var lastFirePitsWarning = 0L
 
         fun fireFirePits() {
