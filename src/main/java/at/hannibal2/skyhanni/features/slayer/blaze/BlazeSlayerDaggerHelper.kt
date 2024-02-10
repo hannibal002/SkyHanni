@@ -23,6 +23,7 @@ import net.minecraft.item.ItemStack
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
 class BlazeSlayerDaggerHelper {
+
     private val config get() = SkyHanniMod.feature.slayer.blazes.hellion
     private val attunementPattern = "§cStrike using the §r(.+) §r§cattunement on your dagger!".toPattern()
 
@@ -35,7 +36,7 @@ class BlazeSlayerDaggerHelper {
     private var lastNearest: HellionShield? = null
 
     @SubscribeEvent
-    fun onChatMessage(event: LorenzChatEvent) {
+    fun onChat(event: LorenzChatEvent) {
         if (!LorenzUtils.inSkyBlock) return
         if (!config.hideDaggerWarning) return
 
@@ -201,7 +202,6 @@ class BlazeSlayerDaggerHelper {
         val dagger = getDaggerFromStack(itemInHand)
         dagger?.shields?.forEach { shield -> shield.active = !shield.active }
         clientSideClicked = true
-
     }
 
     enum class Dagger(val daggerNames: List<String>, vararg val shields: HellionShield, var updated: Boolean = false) {
@@ -256,7 +256,6 @@ class BlazeSlayerDaggerHelper {
             ConfigUtils.migrateIntToEnum(element, FirstDaggerEntry::class.java)
         }
     }
-
 }
 
 private fun HellionShield.other(): HellionShield {

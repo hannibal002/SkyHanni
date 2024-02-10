@@ -10,6 +10,7 @@ import kotlin.time.Duration
 import kotlin.time.Duration.Companion.minutes
 
 object ComposterAPI {
+
     var tabListData = mapOf<ComposterDisplay.DataType, String>()
     val composterUpgrades: MutableMap<ComposterUpgrade, Int>? get() = GardenAPI.storage?.composterUpgrades
 
@@ -36,14 +37,14 @@ object ComposterAPI {
             getFuel(), fractionRemaining, fuelRequiredPer(null), timePerCompost
         )
 
-        return nextCompostTime +  minOf(remainingTimeByOrganicMatter, remainingTimeByFuel)
+        return nextCompostTime + minOf(remainingTimeByOrganicMatter, remainingTimeByFuel)
     }
 
     private fun getDurationUntilEndOfResource(
         amount: Long,
         fractionOfCompostRemaining: Double,
         requiredPer: Double,
-        timePerCompost: Duration
+        timePerCompost: Duration,
     ): Duration {
         val resourceConsumedByNextCompost = fractionOfCompostRemaining * requiredPer
         val resourceRemainingAfterNextCompostFinishes = amount - resourceConsumedByNextCompost

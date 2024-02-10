@@ -55,12 +55,12 @@ object GardenPlotAPI {
         var sprayType: SprayType?,
 
         @Expose
-        var sprayHasNotified: Boolean
+        var sprayHasNotified: Boolean,
     )
 
     data class SprayData(
         val expiry: SimpleTimeMark,
-        val type: SprayType
+        val type: SprayType,
     )
 
     private fun Plot.getData() = GardenAPI.storage?.plotData?.getOrPut(id) { PlotData(id, "$id", 0, null, null, false) }
@@ -172,7 +172,7 @@ object GardenPlotAPI {
         plot: Plot,
         lineColor: Color,
         cornerColor: Color,
-        showBuildLimit: Boolean = false
+        showBuildLimit: Boolean = false,
     ) {
 
         // These don't refer to Minecraft chunks but rather garden plots, but I use
@@ -244,7 +244,7 @@ object GardenPlotAPI {
         p2: LorenzVec,
         color: Color,
         lineWidth: Int,
-        depth: Boolean
+        depth: Boolean,
     ) {
         if (isOutOfBorders(p1)) return
         if (isOutOfBorders(p2)) return
@@ -259,5 +259,4 @@ object GardenPlotAPI {
 
         else -> false
     }
-
 }

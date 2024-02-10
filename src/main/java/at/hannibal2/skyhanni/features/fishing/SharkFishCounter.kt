@@ -5,12 +5,14 @@ import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.LorenzChatEvent
 import at.hannibal2.skyhanni.events.LorenzTickEvent
 import at.hannibal2.skyhanni.events.SeaCreatureFishEvent
+import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.RenderUtils.renderString
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
 class SharkFishCounter {
+
     private var counter = mutableListOf(0, 0, 0, 0)
     private var display = ""
     private var hasWaterRodInHand = false
@@ -45,7 +47,7 @@ class SharkFishCounter {
     }
 
     @SubscribeEvent
-    fun onChatMessage(event: LorenzChatEvent) {
+    fun onChat(event: LorenzChatEvent) {
         if (event.message != "§b§lFISHING FESTIVAL §r§eThe festival has concluded! Time to dry off and repair your rods!") return
         val count = counter.sum()
         if (count == 0) return
@@ -56,7 +58,7 @@ class SharkFishCounter {
         val g = counter[3] // Great White
         val total = count.addSeparators()
         val funnyComment = funnyComment(count)
-        LorenzUtils.chat("You caught $total §f(§a$n §9$b §5$t §6$g§f) §esharks during this fishing contest. $funnyComment")
+        ChatUtils.chat("You caught $total §f(§a$n §9$b §5$t §6$g§f) §esharks during this fishing contest. $funnyComment")
         counter = mutableListOf(0, 0, 0, 0)
         display = ""
     }
@@ -71,7 +73,7 @@ class SharkFishCounter {
         else -> "How???"
     }
 
-    private fun isWaterFishingRod() = FishingAPI.hasFishingRodInHand() && !FishingAPI.isLavaRod()
+    private fun isWaterFishingRod() = FishingAPI.isFishing() && !FishingAPI.isLavaRod()
 
     @SubscribeEvent
     fun onRenderOverlay(event: GuiRenderEvent.GuiOverlayRenderEvent) {

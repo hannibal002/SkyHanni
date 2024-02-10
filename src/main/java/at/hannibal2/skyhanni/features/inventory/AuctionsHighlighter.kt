@@ -19,10 +19,14 @@ import net.minecraft.inventory.ContainerChest
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
 class AuctionsHighlighter {
+
     private val config get() = SkyHanniMod.feature.inventory
     private val bidderPattern by RepoPattern.pattern("actions.highlight.bidder", "§7(?:Bidder|Buyer): (?<player>.*)")
     private val endedPattern by RepoPattern.pattern("auctions.highlight.ended", "§7Status: §a(?:Sold|Ended)!")
-    private val buyItNowPattern by RepoPattern.pattern("auctions.highlight.buyitnow", "§7Buy it now: §6(?<coins>.*) coins")
+    private val buyItNowPattern by RepoPattern.pattern(
+        "auctions.highlight.buyitnow",
+        "§7Buy it now: §6(?<coins>.*) coins"
+    )
 
     @SubscribeEvent
     fun onBackgroundDrawn(event: GuiContainerEvent.BackgroundDrawnEvent) {

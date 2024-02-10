@@ -5,6 +5,7 @@ import net.minecraft.client.renderer.GlStateManager
 import net.minecraft.entity.EntityLivingBase
 
 class RendererLivingEntityHook {
+
     fun setOutlineColor(red: Float, green: Float, blue: Float, alpha: Float, entity: EntityLivingBase) {
         val color = EntityOutlineRenderer.getCustomOutlineColor(entity)
 
