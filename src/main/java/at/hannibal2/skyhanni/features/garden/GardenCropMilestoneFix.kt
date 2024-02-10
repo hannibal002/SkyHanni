@@ -7,7 +7,7 @@ import at.hannibal2.skyhanni.data.ProfileStorageData
 import at.hannibal2.skyhanni.events.LorenzChatEvent
 import at.hannibal2.skyhanni.events.TabListUpdateEvent
 import at.hannibal2.skyhanni.features.garden.farming.GardenCropMilestoneDisplay
-import at.hannibal2.skyhanni.utils.LorenzUtils
+import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.NumberUtil.romanToDecimalIfNecessary
 import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
@@ -59,7 +59,7 @@ class GardenCropMilestoneFix {
 
         val crop = CropType.getByNameOrNull(cropName)
         if (crop == null) {
-            LorenzUtils.debug("GardenCropMilestoneFix: crop is null: '$cropName'")
+            ChatUtils.debug("GardenCropMilestoneFix: crop is null: '$cropName'")
             return
         }
 
@@ -89,11 +89,11 @@ class GardenCropMilestoneFix {
             crop.setCounter(tabListValue)
             GardenCropMilestoneDisplay.update()
             if (!loadedCrops.contains(crop)) {
-                LorenzUtils.chat("Loaded ${crop.cropName} milestone data from $source!")
+                ChatUtils.chat("Loaded ${crop.cropName} milestone data from $source!")
                 loadedCrops.add(crop)
             }
         } else if (diff >= minDiff) {
-            LorenzUtils.debug("Fixed wrong ${crop.cropName} milestone data from $source: ${diff.addSeparators()}")
+            ChatUtils.debug("Fixed wrong ${crop.cropName} milestone data from $source: ${diff.addSeparators()}")
             crop.setCounter(tabListValue)
             GardenCropMilestoneDisplay.update()
         }

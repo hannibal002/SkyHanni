@@ -16,6 +16,7 @@ import io.github.moulberry.notenoughupdates.util.SkyBlockTime
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
 class InGameDateDisplay {
+
     private val config get() = SkyHanniMod.feature.gui.inGameDate
 
     private val monthAndDatePattern by RepoPattern.pattern(
@@ -45,7 +46,7 @@ class InGameDateDisplay {
         val date = SkyBlockTime.now()
         var theBaseString: String
         if (config.useScoreboard) {
-            val list = ScoreboardData.sidebarLinesFormatted //we need this to grab the moon/sun symbol
+            val list = ScoreboardData.sidebarLinesFormatted // we need this to grab the moon/sun symbol
             val year = "Year ${date.year}"
             var monthAndDate = (list.find { monthAndDatePattern.matches(it) } ?: "??").trim()
             if (monthAndDate.last().isDigit()) {

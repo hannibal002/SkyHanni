@@ -4,10 +4,11 @@ import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.events.ConfigLoadEvent
 import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.LorenzChatEvent
+import at.hannibal2.skyhanni.utils.CollectionUtils.addAsSingletonList
+import at.hannibal2.skyhanni.utils.CollectionUtils.addOrPut
+import at.hannibal2.skyhanni.utils.CollectionUtils.sumAllValues
+import at.hannibal2.skyhanni.utils.ConditionalUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils
-import at.hannibal2.skyhanni.utils.LorenzUtils.addAsSingletonList
-import at.hannibal2.skyhanni.utils.LorenzUtils.addOrPut
-import at.hannibal2.skyhanni.utils.LorenzUtils.sumAllValues
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.StringUtils.matches
@@ -52,6 +53,7 @@ object MythologicalCreatureTracker {
     { drawDisplay(it) }
 
     class Data : TrackerData() {
+
         override fun reset() {
             count.clear()
         }
@@ -100,7 +102,7 @@ object MythologicalCreatureTracker {
 
     @SubscribeEvent
     fun onConfigLoad(event: ConfigLoadEvent) {
-        LorenzUtils.onToggle(config.showPercentage) {
+        ConditionalUtils.onToggle(config.showPercentage) {
             tracker.update()
         }
     }

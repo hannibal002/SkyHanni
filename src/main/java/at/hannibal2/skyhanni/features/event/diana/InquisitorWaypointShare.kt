@@ -8,11 +8,12 @@ import at.hannibal2.skyhanni.events.LorenzKeyPressEvent
 import at.hannibal2.skyhanni.events.LorenzTickEvent
 import at.hannibal2.skyhanni.events.LorenzWorldChangeEvent
 import at.hannibal2.skyhanni.events.PacketEvent
+import at.hannibal2.skyhanni.utils.ChatUtils
+import at.hannibal2.skyhanni.utils.CollectionUtils.editCopy
 import at.hannibal2.skyhanni.utils.EntityUtils
 import at.hannibal2.skyhanni.utils.KeyboardManager
 import at.hannibal2.skyhanni.utils.LorenzLogger
 import at.hannibal2.skyhanni.utils.LorenzUtils
-import at.hannibal2.skyhanni.utils.LorenzUtils.editCopy
 import at.hannibal2.skyhanni.utils.LorenzVec
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.SoundUtils
@@ -29,6 +30,7 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import kotlin.time.Duration.Companion.seconds
 
 object InquisitorWaypointShare {
+
     private val config get() = SkyHanniMod.feature.event.diana.inquisitorSharing
 
     private val patternGroup = RepoPattern.group("diana.waypoints")
@@ -57,14 +59,14 @@ object InquisitorWaypointShare {
         val fromPlayer: String,
         val displayName: String,
         val location: LorenzVec,
-        val spawnTime: SimpleTimeMark
+        val spawnTime: SimpleTimeMark,
     )
 
     private var test = false
 
     fun test() {
         test = !test
-        LorenzUtils.chat("Inquisitor Test " + if (test) "Enabled" else "Disabled")
+        ChatUtils.chat("Inquisitor Test " + if (test) "Enabled" else "Disabled")
     }
 
     @SubscribeEvent
@@ -156,7 +158,7 @@ object InquisitorWaypointShare {
             val keyName = KeyboardManager.getKeyName(config.keyBindShare)
             val message =
                 "§l§bYou found a Inquisitor! Press §l§chere §l§bor §c$keyName to share the location!"
-            LorenzUtils.clickableChat(message, "shshareinquis")
+            ChatUtils.clickableChat(message, "shshareinquis")
         }
     }
 
@@ -200,18 +202,18 @@ object InquisitorWaypointShare {
         lastShareTime = System.currentTimeMillis()
 
         if (inquisitor == -1) {
-            LorenzUtils.error("No Inquisitor Found!")
+            ChatUtils.error("No Inquisitor Found!")
             return
         }
 
         val inquisitor = EntityUtils.getEntityByID(inquisitor)
         if (inquisitor == null) {
-            LorenzUtils.chat("§cInquisitor out of range!")
+            ChatUtils.chat("§cInquisitor out of range!")
             return
         }
 
         if (inquisitor.isDead) {
-            LorenzUtils.chat("§cInquisitor is dead")
+            ChatUtils.chat("§cInquisitor is dead")
             return
         }
         val location = inquisitor.getLorenzVec()
@@ -241,7 +243,7 @@ object InquisitorWaypointShare {
             val name = rawName.cleanPlayerName()
             val displayName = rawName.cleanPlayerName(displayName = true)
             if (!waypoints.containsKey(name)) {
-                LorenzUtils.chat("$displayName §l§efound an inquisitor at §l§c$x $y $z!")
+                ChatUtils.chat("$displayName §l§efound an inquisitor at §l§c$x $y $z!")
                 if (name != LorenzUtils.getPlayerName()) {
                     LorenzUtils.sendTitle("§dINQUISITOR §efrom §b$displayName", 5.seconds)
                     SoundUtils.playBeepSound()
@@ -266,7 +268,7 @@ object InquisitorWaypointShare {
     fun maybeRemove(inquis: SharedInquisitor) {
         if (inquisitorsNearby.isEmpty()) {
             waypoints = waypoints.editCopy { remove(inquis.fromPlayer) }
-            LorenzUtils.chat("Inquisitor from ${inquis.displayName} not found, deleting.")
+            ChatUtils.chat("Inquisitor from ${inquis.displayName} not found, deleting.")
         }
     }
 }

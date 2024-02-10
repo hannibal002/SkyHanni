@@ -2,6 +2,7 @@ package at.hannibal2.skyhanni.features.bazaar
 
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.events.GuiContainerEvent
+import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.InventoryUtils.getInventoryName
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.ItemUtils.name
@@ -31,6 +32,7 @@ class BazaarOrderHelper {
     )
 
     companion object {
+
         fun isBazaarOrderInventory(inventoryName: String): Boolean = when (inventoryName) {
             "Your Bazaar Orders" -> true
             "Co-op Bazaar Orders" -> true
@@ -67,7 +69,7 @@ class BazaarOrderHelper {
     private fun highlightItem(itemName: String, slot: Slot, buyOrSell: Pair<Boolean, Boolean>) {
         val data = BazaarApi.getBazaarDataByName(itemName)
         if (data == null) {
-            LorenzUtils.debug("Bazaar data is null for bazaarItemName '$itemName'")
+            ChatUtils.debug("Bazaar data is null for bazaarItemName '$itemName'")
             return
         }
 

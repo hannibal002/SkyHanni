@@ -4,11 +4,12 @@ import at.hannibal2.skyhanni.events.ConfigLoadEvent
 import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.LorenzTickEvent
 import at.hannibal2.skyhanni.features.rift.RiftAPI
+import at.hannibal2.skyhanni.utils.CollectionUtils.addAsSingletonList
+import at.hannibal2.skyhanni.utils.ConditionalUtils
 import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.LorenzUtils
-import at.hannibal2.skyhanni.utils.LorenzUtils.addAsSingletonList
 import at.hannibal2.skyhanni.utils.NumberUtil.roundToPrecision
 import at.hannibal2.skyhanni.utils.RenderUtils.renderStringsAndItems
 import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
@@ -17,6 +18,7 @@ import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
 object CruxTalismanDisplay {
+
     private val config get() = RiftAPI.config.cruxTalisman
 
     private val progressPattern by RepoPattern.pattern(
@@ -83,7 +85,6 @@ object CruxTalismanDisplay {
         }
     }
 
-
     @SubscribeEvent
     fun onTick(event: LorenzTickEvent) {
         if (!isEnabled()) return
@@ -122,7 +123,7 @@ object CruxTalismanDisplay {
 
     @SubscribeEvent
     fun onConfigLoad(event: ConfigLoadEvent) {
-        LorenzUtils.onToggle(config.showBonuses) { update() }
+        ConditionalUtils.onToggle(config.showBonuses) { update() }
     }
 
     data class Crux(val name: String, val tier: String, val progress: String, val maxed: Boolean)

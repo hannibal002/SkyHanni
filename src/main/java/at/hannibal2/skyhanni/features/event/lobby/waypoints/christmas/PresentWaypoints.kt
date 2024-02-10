@@ -11,6 +11,7 @@ import at.hannibal2.skyhanni.events.RepositoryReloadEvent
 import at.hannibal2.skyhanni.features.event.lobby.waypoints.EventWaypoint
 import at.hannibal2.skyhanni.features.event.lobby.waypoints.loadEventWaypoints
 import at.hannibal2.skyhanni.test.GriffinUtils.drawWaypointFilled
+import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.LocationUtils.distanceSqToPlayer
 import at.hannibal2.skyhanni.utils.LorenzColor
 import at.hannibal2.skyhanni.utils.LorenzUtils
@@ -21,6 +22,7 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
 // todo: create abstract class for this and BasketWaypoints
 class PresentWaypoints {
+
     private val config get() = SkyHanniMod.feature.event.lobbyWaypoints.christmasPresent
     private var presentLocations = mapOf<String, MutableSet<EventWaypoint>>()
     private var presentEntranceLocations = mapOf<String, MutableSet<EventWaypoint>>()
@@ -77,7 +79,7 @@ class PresentWaypoints {
 
     private fun handleAllPresentsFound() {
         // If all presents are found, disable the feature
-        LorenzUtils.chat("Congratulations! As all presents are found, we are disabling the Christmas Present Waypoints feature.")
+        ChatUtils.chat("Congratulations! As all presents are found, we are disabling the Christmas Present Waypoints feature.")
         config.allWaypoints = false
         config.allEntranceWaypoints = false
     }
@@ -100,7 +102,7 @@ class PresentWaypoints {
     }
 
     private fun LorenzRenderWorldEvent.drawWaypoints(
-        waypoints: Set<EventWaypoint>, shouldDraw: Boolean, color: LorenzColor, prefix: String
+        waypoints: Set<EventWaypoint>, shouldDraw: Boolean, color: LorenzColor, prefix: String,
     ) {
         if (!shouldDraw) return
         waypoints.forEach { waypoint ->

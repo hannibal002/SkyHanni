@@ -595,6 +595,12 @@ Use `/sh` or `/skyhanni` to open the SkyHanni config in game.
 + Atmospheric Filter Display. - Erymanthus
     + This display shows the currently active buff as a GUI element.
     + For an optimal experience, please have the Atmospheric Filter accessory active.
++ Sensitivity Reducer. - martimavocado
+    + Lowers mouse sensitivity while in the garden.
+    + Either when pressing a keybind or holding a farming tool in hand.
+    + Changes by how much the sensitivity is lowered by.
+    + Show a GUI element while the feature is enabled.
+    + Option to only allow this feature while on ground and/or on barn plot.
 
 </details>
 <details open><summary>
@@ -688,6 +694,8 @@ Use `/sh` or `/skyhanni` to open the SkyHanni config in game.
     + Fully customizable: change what items or stats to show.
     + Has support for the maxed Great Explorer perk.
     + Option to hide while not grinding powder.
++ Added Deep Caverns Parkour. - hannibal2
+    + Shows a parkour to the bottom of Deep Caverns and to Rhys.
 
 </details>
 <details open><summary>

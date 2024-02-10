@@ -18,6 +18,7 @@ import java.time.OffsetDateTime
 import java.time.ZoneOffset
 
 object BingoAPI {
+
     private var ranks = mapOf<String, Int>()
     private var data: Map<String, BingoJson.BingoData> = emptyMap()
 

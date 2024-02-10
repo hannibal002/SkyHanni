@@ -29,6 +29,7 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import kotlin.time.Duration.Companion.seconds
 
 class MinionCraftHelper {
+
     private val config get() = SkyHanniMod.feature.event.bingo
 
     private val minionNamePattern by RepoPattern.pattern(
@@ -300,5 +301,4 @@ class MinionCraftHelper {
         }
         data.add("tierOneMinionsDone", newList)
     }
-
 }

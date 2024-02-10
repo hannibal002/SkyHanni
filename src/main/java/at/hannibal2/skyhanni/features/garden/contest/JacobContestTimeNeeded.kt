@@ -6,11 +6,11 @@ import at.hannibal2.skyhanni.features.garden.CropType
 import at.hannibal2.skyhanni.features.garden.FarmingFortuneDisplay.getLatestTrueFarmingFortune
 import at.hannibal2.skyhanni.features.garden.GardenAPI
 import at.hannibal2.skyhanni.features.garden.farming.GardenCropSpeed.getLatestBlocksPerSecond
+import at.hannibal2.skyhanni.utils.CollectionUtils.addAsSingletonList
+import at.hannibal2.skyhanni.utils.CollectionUtils.sorted
 import at.hannibal2.skyhanni.utils.LorenzUtils
-import at.hannibal2.skyhanni.utils.LorenzUtils.addAsSingletonList
 import at.hannibal2.skyhanni.utils.LorenzUtils.addSelector
 import at.hannibal2.skyhanni.utils.LorenzUtils.round
-import at.hannibal2.skyhanni.utils.LorenzUtils.sorted
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.RenderUtils.renderStringsAndItems
 import at.hannibal2.skyhanni.utils.TimeUtils.format
@@ -23,6 +23,7 @@ import kotlin.time.Duration.Companion.minutes
 import kotlin.time.Duration.Companion.seconds
 
 class JacobContestTimeNeeded {
+
     private val config get() = GardenAPI.config
     private var display = emptyList<List<Any>>()
     private var currentBracket = ContestBracket.GOLD
@@ -64,7 +65,7 @@ class JacobContestTimeNeeded {
     private fun testCrop(
         crop: CropType,
         sorted: MutableMap<CropType, Duration>,
-        map: MutableMap<CropType, Renderable>
+        map: MutableMap<CropType, Renderable>,
     ) {
 
         val bps = crop.getBps()
@@ -109,7 +110,7 @@ class JacobContestTimeNeeded {
         crop: CropType,
         averages: Map<ContestBracket, Int>,
         sorted: MutableMap<CropType, Duration>,
-        map: MutableMap<CropType, Renderable>
+        map: MutableMap<CropType, Renderable>,
     ) {
         var lowBPSWarning = listOf<String>()
         val rawSpeed = speed.toDouble()
@@ -136,7 +137,7 @@ class JacobContestTimeNeeded {
             var bracketText = "${bracket.displayName} $color$formatDuration"
             var blocksPerSecond = crop.getBps()
             if (blocksPerSecond == null) {
-                marking += "§0§l !" //hoping this never shows
+                marking += "§0§l !" // hoping this never shows
                 blocksPerSecond = 19.9
                 lowBPSWarning = listOf("§cYour Blocks/second is too low,", "§cshowing 19.9 Blocks/second instead!")
             } else {

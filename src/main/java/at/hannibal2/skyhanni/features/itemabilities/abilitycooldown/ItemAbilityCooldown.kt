@@ -12,6 +12,7 @@ import at.hannibal2.skyhanni.events.RenderItemTipEvent
 import at.hannibal2.skyhanni.events.RenderObject
 import at.hannibal2.skyhanni.features.itemabilities.abilitycooldown.ItemAbility.Companion.getMultiplier
 import at.hannibal2.skyhanni.features.nether.ashfang.AshfangFreezeCooldown
+import at.hannibal2.skyhanni.utils.CollectionUtils.equalsOneOf
 import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.ItemUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.cleanName
@@ -19,7 +20,6 @@ import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName
 import at.hannibal2.skyhanni.utils.LorenzColor
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils.between
-import at.hannibal2.skyhanni.utils.LorenzUtils.equalsOneOf
 import at.hannibal2.skyhanni.utils.LorenzUtils.round
 import at.hannibal2.skyhanni.utils.NEUInternalName.Companion.asInternalName
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getAbilityScrolls
@@ -33,6 +33,7 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import kotlin.math.max
 
 class ItemAbilityCooldown {
+
     private val config get() = SkyHanniMod.feature.itemAbilities
 
     private val patternGroup = RepoPattern.group("item.abilities.cooldown")
@@ -72,11 +73,11 @@ class ItemAbilityCooldown {
             }
             // Gyrokinetic Wand & Shadow Fury
             event.soundName == "mob.endermen.portal" -> {
-                //Gryokinetic Wand
+                // Gryokinetic Wand
                 if (event.pitch == 0.61904764f && event.volume == 1f) {
                     ItemAbility.GYROKINETIC_WAND_LEFT.sound()
                 }
-                //Shadow Fury
+                // Shadow Fury
                 if (event.pitch == 1f && event.volume == 1f) {
                     val internalName = InventoryUtils.getItemInHand()?.getInternalName() ?: return
                     if (!internalName.equalsOneOf(

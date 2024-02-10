@@ -10,5 +10,5 @@ abstract class ProgressQuest(
     displayName: String,
     state: QuestState,
     val needAmount: Int,
-    var haveAmount: Int = 0
+    var haveAmount: Int = 0,
 ) : Quest(displayItem, location, questCategory, displayName, state)

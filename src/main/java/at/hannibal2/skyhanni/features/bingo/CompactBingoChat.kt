@@ -2,6 +2,7 @@ package at.hannibal2.skyhanni.features.bingo
 
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.events.LorenzChatEvent
+import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
@@ -9,13 +10,14 @@ import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
 class CompactBingoChat {
+
     private val config get() = SkyHanniMod.feature.event.bingo.compactChat
 
     private var inSkillLevelUp = false
     private var inSkyBlockLevelUp = false
     private var inCollectionLevelUp = false
     private var collectionLevelUpLastLine: String? = null
-    private var newArea = 0//0 = nothing, 1 = after first message, 2 = after second message
+    private var newArea = 0 // 0 = nothing, 1 = after first message, 2 = after second message
 
     private val patternGroup = RepoPattern.group("bingo.compactchat")
     private val healthPattern by patternGroup.pattern(
@@ -104,7 +106,7 @@ class CompactBingoChat {
             if (message.contains("Trade") || message.contains("Recipe")) {
                 val text = message.removeColor().replace(" ", "")
                 if (text == "Trade" || text == "Recipe") {
-                    collectionLevelUpLastLine?.let { LorenzUtils.chat(it, false) }
+                    collectionLevelUpLastLine?.let { ChatUtils.chat(it, false) }
                 }
             } else {
                 collectionLevelUpLastLine = message

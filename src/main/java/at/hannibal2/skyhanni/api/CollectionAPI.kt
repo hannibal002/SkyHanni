@@ -4,10 +4,10 @@ import at.hannibal2.skyhanni.events.CollectionUpdateEvent
 import at.hannibal2.skyhanni.events.InventoryFullyOpenedEvent
 import at.hannibal2.skyhanni.events.ItemAddEvent
 import at.hannibal2.skyhanni.events.ProfileJoinEvent
+import at.hannibal2.skyhanni.utils.ChatUtils
+import at.hannibal2.skyhanni.utils.CollectionUtils.addOrPut
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.ItemUtils.name
-import at.hannibal2.skyhanni.utils.LorenzUtils
-import at.hannibal2.skyhanni.utils.LorenzUtils.addOrPut
 import at.hannibal2.skyhanni.utils.NEUInternalName
 import at.hannibal2.skyhanni.utils.NEUItems
 import at.hannibal2.skyhanni.utils.NEUItems.getItemStackOrNull
@@ -31,6 +31,8 @@ object CollectionAPI {
         "tierzero",
         "§7Progress to .* I: .*"
     )
+
+    val collectionValue = mutableMapOf<NEUInternalName, Long>()
 
     @SubscribeEvent
     fun onProfileJoin(event: ProfileJoinEvent) {
@@ -87,15 +89,12 @@ object CollectionAPI {
 
         // TODO add support for replenish (higher collection than actual items in inv)
         if (internalName.getItemStackOrNull() == null) {
-            LorenzUtils.debug("CollectionAPI.addFromInventory: item is null for '$internalName'")
+            ChatUtils.debug("CollectionAPI.addFromInventory: item is null for '$internalName'")
             return
         }
         collectionValue.addOrPut(internalName, event.amount.toLong())
     }
 
     fun isCollectionTier0(lore: List<String>) = lore.any { collectionTier0Pattern.matches(it) }
-
-    val collectionValue = mutableMapOf<NEUInternalName, Long>()
-
     fun getCollectionCounter(internalName: NEUInternalName): Long? = collectionValue[internalName]
 }

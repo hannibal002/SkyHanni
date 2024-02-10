@@ -4,6 +4,7 @@ import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.events.LorenzChatEvent
 import at.hannibal2.skyhanni.events.LorenzTickEvent
 import at.hannibal2.skyhanni.features.misc.MarkedPlayerManager
+import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.EntityUtils
 import at.hannibal2.skyhanni.utils.LocationUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils
@@ -46,7 +47,7 @@ class PlayerDeathMessages {
                 val reason = group("reason").removeColor()
 
                 val color = SkyHanniMod.feature.markedPlayers.chatColor.getChatColor()
-                LorenzUtils.chat(" §c☠ $color$name §7$reason", false)
+                ChatUtils.chat(" §c☠ $color$name §7$reason", false)
                 event.blockedReason = "marked_player_death"
                 return
             }

@@ -11,7 +11,6 @@ import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.NEUItems
 import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
-import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import com.google.gson.JsonElement
 import net.minecraft.item.ItemStack
 import net.minecraft.nbt.CompressedStreamTools
@@ -21,11 +20,9 @@ import java.io.ByteArrayInputStream
 import java.util.Base64
 
 class CropAccessoryData {
-    private val accessoryBagNamePattern by RepoPattern.pattern(
-        "data.accessory.bagname",
-        "Accessory Bag \\((?<current>\\d)/(?<total>\\d)\\)"
-    )
 
+    // TODO USE SH-REPO
+    private val accessoryBagNamePattern = "Accessory Bag \\((?<current>\\d)/(?<total>\\d)\\)".toPattern()
     private var loadedAccessoryThisProfile = false
     private var ticks = 0
     private var accessoryInBag: CropAccessory? = null
@@ -93,12 +90,12 @@ class CropAccessoryData {
         }
     }
 
-
     private fun bestCropAccessory(items: Iterable<ItemStack>) =
         items.mapNotNull { item -> CropAccessory.getByName(item.getInternalName()) }
             .maxOrNull() ?: CropAccessory.NONE
 
     companion object {
+
         var accessoryBagPageCount = 0
             private set
 

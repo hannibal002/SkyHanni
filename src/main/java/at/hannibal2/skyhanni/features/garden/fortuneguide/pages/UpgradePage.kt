@@ -12,6 +12,7 @@ import net.minecraft.util.MathHelper
 import java.text.DecimalFormat
 
 class UpgradePage : FFGuideGUI.FFGuidePage() {
+
     private var pageScroll = 0
     private var scrollVelocity = 0.0
     private val maxNoInputFrames = 100

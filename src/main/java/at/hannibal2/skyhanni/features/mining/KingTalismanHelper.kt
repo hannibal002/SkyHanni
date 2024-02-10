@@ -6,12 +6,13 @@ import at.hannibal2.skyhanni.data.ProfileStorageData
 import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.InventoryFullyOpenedEvent
 import at.hannibal2.skyhanni.events.LorenzTickEvent
+import at.hannibal2.skyhanni.utils.ChatUtils
+import at.hannibal2.skyhanni.utils.CollectionUtils.sorted
+import at.hannibal2.skyhanni.utils.CollectionUtils.sortedDesc
 import at.hannibal2.skyhanni.utils.EntityUtils
 import at.hannibal2.skyhanni.utils.LocationUtils.distanceToPlayer
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils.isInIsland
-import at.hannibal2.skyhanni.utils.LorenzUtils.sorted
-import at.hannibal2.skyhanni.utils.LorenzUtils.sortedDesc
 import at.hannibal2.skyhanni.utils.LorenzVec
 import at.hannibal2.skyhanni.utils.RenderUtils.renderStrings
 import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
@@ -23,7 +24,9 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import java.util.Collections
 
 class KingTalismanHelper {
+
     private val config get() = SkyHanniMod.feature.mining.kingTalisman
+    private val storage get() = ProfileStorageData.profileSpecific?.mining
 
     private val kingPattern by RepoPattern.pattern(
         "mining.kingtalisman.king",
@@ -31,6 +34,7 @@ class KingTalismanHelper {
     )
 
     companion object {
+
         private var currentOffset: Int? = null
         private var skyblockYear = 0
 
@@ -43,7 +47,7 @@ class KingTalismanHelper {
 
         fun kingFix() {
             currentOffset = null
-            LorenzUtils.chat("Reset internal offset of King Talisman Helper.")
+            ChatUtils.chat("Reset internal offset of King Talisman Helper.")
         }
     }
 
@@ -69,14 +73,14 @@ class KingTalismanHelper {
     fun onTick(event: LorenzTickEvent) {
         if (!event.isMod(20)) return
         if (!isEnabled()) return
-        val profileSpecific = ProfileStorageData.profileSpecific ?: return
+        val storage = storage ?: return
 
         val nearby = isNearby()
         if (nearby && getCurrentOffset() == null) {
             checkOffset()
         }
 
-        val kingsTalkedTo = profileSpecific.mining.kingsTalkedTo
+        val kingsTalkedTo = storage.kingsTalkedTo
         if (getCurrentOffset() == null) {
             val allKings = kingsTalkedTo.size == kingCircles.size
             display = if (allKings) emptyList() else listOf("§cVisit the king to sync up.")
@@ -109,12 +113,12 @@ class KingTalismanHelper {
         if (!isEnabled()) return
         if (getCurrentOffset() == null) return
         if (!isNearby()) return
-        val profileSpecific = ProfileStorageData.profileSpecific ?: return
+        val storage = storage ?: return
 
         val currentKing = getCurrentKing()
-        val kingsTalkedTo = profileSpecific.mining.kingsTalkedTo
+        val kingsTalkedTo = storage.kingsTalkedTo
         if (currentKing !in kingsTalkedTo) {
-            LorenzUtils.debug("Found new king!")
+            ChatUtils.debug("Found new king!")
             kingsTalkedTo.add(currentKing)
             update(kingsTalkedTo)
             display = allKingsDisplay
@@ -160,8 +164,8 @@ class KingTalismanHelper {
     }
 
     private fun nextMissingText(): String {
-        val profileSpecific = ProfileStorageData.profileSpecific ?: error("profileSpecific is null")
-        val kingsTalkedTo = profileSpecific.mining.kingsTalkedTo
+        val storage = storage ?: error("profileSpecific is null")
+        val kingsTalkedTo = storage.kingsTalkedTo
         val (nextKing, until) = getKingTimes().filter { it.key !in kingsTalkedTo }.sorted().firstNotNullOf { it }
         val time = TimeUtils.formatDuration(until, maxUnits = 2)
 

@@ -33,7 +33,6 @@ class ItemStars {
         val stack = event.itemStack ?: return
         if (stack.stackSize != 1) return
 
-
         val itemName = stack.name ?: return
         val stars = getStars(itemName)
 

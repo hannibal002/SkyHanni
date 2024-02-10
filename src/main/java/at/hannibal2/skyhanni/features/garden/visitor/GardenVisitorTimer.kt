@@ -29,6 +29,7 @@ import kotlin.time.DurationUnit
 import kotlin.time.toDuration
 
 class GardenVisitorTimer {
+
     private val config get() = GardenAPI.config.visitors.timer
 
     private val timePattern by RepoPattern.pattern(
@@ -44,7 +45,7 @@ class GardenVisitorTimer {
     private var lastTimerValue = ""
     private var lastTimerUpdate = SimpleTimeMark.farPast()
 
-    //TODO nea?
+    // TODO nea?
 //    private val visitorInterval by dynamic(GardenAPI::config, Storage.ProfileSpecific.GardenStorage::visitorInterval)
     private var visitorInterval: Duration?
         get() = GardenAPI.storage?.visitorInterval?.toDuration(DurationUnit.MILLISECONDS)
@@ -55,6 +56,7 @@ class GardenVisitorTimer {
         }
 
     companion object {
+
         var lastVisitors: Int = -1
     }
 

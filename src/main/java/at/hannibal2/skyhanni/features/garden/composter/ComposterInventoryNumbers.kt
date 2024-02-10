@@ -55,7 +55,6 @@ class ComposterInventoryNumbers {
                     val havingFormat = NumberUtil.format(having)
                     val total = group("total").removeColor()
 
-
                     val color = if (slotNumber == 46) {
                         // Organic Matter
                         event.offsetY = -95

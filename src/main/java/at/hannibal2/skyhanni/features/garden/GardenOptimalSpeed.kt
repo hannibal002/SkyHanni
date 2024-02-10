@@ -6,6 +6,8 @@ import at.hannibal2.skyhanni.events.GardenToolChangeEvent
 import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.LorenzTickEvent
 import at.hannibal2.skyhanni.events.TabListUpdateEvent
+import at.hannibal2.skyhanni.utils.ChatUtils
+import at.hannibal2.skyhanni.utils.ConditionalUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils.isRancherSign
 import at.hannibal2.skyhanni.utils.RenderUtils.renderString
@@ -23,6 +25,7 @@ import kotlin.time.Duration.Companion.milliseconds
 import kotlin.time.Duration.Companion.seconds
 
 class GardenOptimalSpeed {
+
     private val config get() = GardenAPI.config.optimalSpeeds
 
     private val currentSpeedPattern by RepoPattern.pattern(
@@ -93,7 +96,7 @@ class GardenOptimalSpeed {
     @SubscribeEvent
     fun onConfigLoad(event: ConfigLoadEvent) {
         for (value in CropType.entries) {
-            LorenzUtils.onToggle(value.getConfig()) {
+            ConditionalUtils.onToggle(value.getConfig()) {
                 if (value == cropInHand) {
                     optimalSpeed = value.getOptimalSpeed()
                 }
@@ -153,7 +156,7 @@ class GardenOptimalSpeed {
             if (sneaking) text += " §7[Sneaking]"
             text += " §e(§f$optimalSpeed §eis optimal)"
 
-            LorenzUtils.chat(text)
+            ChatUtils.chat(text)
         }
     }
 

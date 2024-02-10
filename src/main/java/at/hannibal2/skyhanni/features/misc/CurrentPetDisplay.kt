@@ -16,13 +16,10 @@ import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
 class CurrentPetDisplay {
+
     private val config get() = SkyHanniMod.feature.misc.pets
 
     private val patternGroup = RepoPattern.group("misc.currentpet")
-    private val inventoryNamePattern by patternGroup.pattern(
-        "inventory.name",
-        "Pets( \\(\\d+/\\d+\\) )?"
-    )
     private val inventorySelectedPetPattern by patternGroup.pattern(
         "inventory.selected",
         "§7§7Selected pet: (?<pet>.*)"
@@ -66,7 +63,7 @@ class CurrentPetDisplay {
 
     @SubscribeEvent
     fun onInventoryOpen(event: InventoryFullyOpenedEvent) {
-        if (!inventoryNamePattern.matches(event.inventoryName)) return
+        if (!PetAPI.isPetMenu(event.inventoryName)) return
 
         val lore = event.inventoryItems[4]?.getLore() ?: return
         for (line in lore) {

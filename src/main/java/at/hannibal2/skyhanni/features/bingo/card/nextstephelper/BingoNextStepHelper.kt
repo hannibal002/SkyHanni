@@ -17,16 +17,18 @@ import at.hannibal2.skyhanni.features.bingo.card.nextstephelper.steps.ObtainCrys
 import at.hannibal2.skyhanni.features.bingo.card.nextstephelper.steps.PartialProgressItemsStep
 import at.hannibal2.skyhanni.features.bingo.card.nextstephelper.steps.ProgressionStep
 import at.hannibal2.skyhanni.features.bingo.card.nextstephelper.steps.SkillLevelStep
+import at.hannibal2.skyhanni.utils.ChatUtils
+import at.hannibal2.skyhanni.utils.CollectionUtils.editCopy
 import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.name
 import at.hannibal2.skyhanni.utils.LorenzUtils
-import at.hannibal2.skyhanni.utils.LorenzUtils.editCopy
 import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
 class BingoNextStepHelper {
+
     private val config get() = SkyHanniMod.feature.event.bingo.bingoCard
     private var dirty = true
 
@@ -58,6 +60,7 @@ class BingoNextStepHelper {
     private val rhysTaskName = "30x Enchanted Minerals (Redstone, Lapis Lazuli, Coal) (for Rhys)"
 
     companion object {
+
         private val finalSteps = mutableListOf<NextStep>()
         private var currentSteps = emptyList<NextStep>()
         var currentHelp = emptyList<String>()
@@ -169,7 +172,7 @@ class BingoNextStepHelper {
                 currentStep.amountHavingHidden -= 10
             }
         }
-        //TODO add thys message
+        // TODO add thys message
 //        if (event.message == "thys message") {
 //            thys.done()
 //        }
@@ -219,7 +222,7 @@ class BingoNextStepHelper {
         done = true
         updateResult()
         if (!silent && config.stepHelper) {
-            LorenzUtils.chat("A bingo goal step is done! ($displayName)")
+            ChatUtils.chat("A bingo goal step is done! ($displayName)")
         }
     }
 

@@ -13,6 +13,7 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
 // heavily inspired by SBA code
 object TabListReader {
+
     private val config get() = SkyHanniMod.feature.misc.compactTabList
 
     private val patternGroup = RepoPattern.group("misc.compacttablist")

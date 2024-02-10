@@ -23,6 +23,7 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import kotlin.time.Duration.Companion.seconds
 
 class SpawnTimers {
+
     private val config get() = SkyHanniMod.feature.combat.mobs
 
     private val patternGroup = RepoPattern.group("combat.mobs.spawntime.arachne")
@@ -85,7 +86,7 @@ class SpawnTimers {
         if (particleCounter == 0 && tickTime == 0L) tickTime = System.currentTimeMillis()
 
         if (System.currentTimeMillis() > tickTime + 60) {
-            arachneSpawnTime = if (particleCounter <= 20)  {
+            arachneSpawnTime = if (particleCounter <= 20) {
                 SimpleTimeMark.now() + 21.seconds
             } else {
                 SimpleTimeMark.now() + 37.seconds
@@ -104,5 +105,6 @@ class SpawnTimers {
         }
     }
 
-    fun isEnabled() = IslandType.SPIDER_DEN.isInIsland() && LorenzUtils.skyBlockArea == "Arachne's Sanctuary" && config.showArachneSpawnTimer
+    fun isEnabled() =
+        IslandType.SPIDER_DEN.isInIsland() && LorenzUtils.skyBlockArea == "Arachne's Sanctuary" && config.showArachneSpawnTimer
 }

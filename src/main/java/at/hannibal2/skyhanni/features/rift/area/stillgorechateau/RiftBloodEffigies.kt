@@ -9,12 +9,12 @@ import at.hannibal2.skyhanni.events.RepositoryReloadEvent
 import at.hannibal2.skyhanni.events.ScoreboardRawChangeEvent
 import at.hannibal2.skyhanni.features.rift.RiftAPI
 import at.hannibal2.skyhanni.test.GriffinUtils.drawWaypointFilled
+import at.hannibal2.skyhanni.utils.ChatUtils
+import at.hannibal2.skyhanni.utils.CollectionUtils.editCopy
 import at.hannibal2.skyhanni.utils.EntityUtils
 import at.hannibal2.skyhanni.utils.LocationUtils
 import at.hannibal2.skyhanni.utils.LocationUtils.distanceToPlayer
 import at.hannibal2.skyhanni.utils.LorenzColor
-import at.hannibal2.skyhanni.utils.LorenzUtils
-import at.hannibal2.skyhanni.utils.LorenzUtils.editCopy
 import at.hannibal2.skyhanni.utils.LorenzVec
 import at.hannibal2.skyhanni.utils.RenderUtils.drawDynamicText
 import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
@@ -25,17 +25,8 @@ import net.minecraft.entity.item.EntityArmorStand
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
 class RiftBloodEffigies {
-    private val config get() = RiftAPI.config.area.stillgoreChateau.bloodEffigies
 
-    private var locations: List<LorenzVec> = emptyList()
-    private var effigiesTimes = mapOf(
-        0 to -1L,
-        1 to -1L,
-        2 to -1L,
-        3 to -1L,
-        4 to -1L,
-        5 to -1L,
-    )
+    private val config get() = RiftAPI.config.area.stillgoreChateau.bloodEffigies
 
     private val patternGroup = RepoPattern.group("rift.area.stillgore.effegies")
     private val effigiesTimerPattern by patternGroup.pattern(
@@ -45,6 +36,16 @@ class RiftBloodEffigies {
     private val effegieHeartPattern by patternGroup.pattern(
         "heart",
         "Effigies: (?<hearts>.*)"
+    )
+
+    private var locations: List<LorenzVec> = emptyList()
+    private var effigiesTimes = mapOf(
+        0 to -1L,
+        1 to -1L,
+        2 to -1L,
+        3 to -1L,
+        4 to -1L,
+        5 to -1L,
     )
 
     @SubscribeEvent
@@ -84,12 +85,12 @@ class RiftBloodEffigies {
             if (diff < 0L) {
                 if (s == "7") {
                     if (time != 0L) {
-                        LorenzUtils.chat("Effigy #${index + 1} respawned!")
+                        ChatUtils.chat("Effigy #${index + 1} respawned!")
                         effigiesTimes = effigiesTimes.editCopy { this[index] = 0L }
                     }
                 } else {
                     if (time != -1L) {
-                        LorenzUtils.chat("Effigy #${index + 1} is broken!")
+                        ChatUtils.chat("Effigy #${index + 1} is broken!")
                         val endTime = System.currentTimeMillis() + 1_000 * 60 * 20
                         effigiesTimes = effigiesTimes.editCopy { this[index] = endTime }
                     }

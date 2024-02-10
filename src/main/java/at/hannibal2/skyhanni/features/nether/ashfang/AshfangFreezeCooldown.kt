@@ -16,6 +16,7 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import kotlin.time.Duration.Companion.seconds
 
 object AshfangFreezeCooldown {
+
     private val config get() = SkyHanniMod.feature.crimsonIsle.ashfang
 
     private val cryogenicBlastPattern by RepoPattern.pattern(

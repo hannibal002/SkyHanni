@@ -6,10 +6,10 @@ import at.hannibal2.skyhanni.config.features.fishing.trophyfishing.ChatMessagesC
 import at.hannibal2.skyhanni.events.LorenzChatEvent
 import at.hannibal2.skyhanni.features.fishing.trophy.TrophyFishManager.fishes
 import at.hannibal2.skyhanni.features.fishing.trophy.TrophyFishManager.getTooltip
+import at.hannibal2.skyhanni.utils.CollectionUtils.addOrPut
+import at.hannibal2.skyhanni.utils.CollectionUtils.sumAllValues
 import at.hannibal2.skyhanni.utils.ConfigUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils
-import at.hannibal2.skyhanni.utils.LorenzUtils.addOrPut
-import at.hannibal2.skyhanni.utils.LorenzUtils.sumAllValues
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.NumberUtil.ordinal
 import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
@@ -55,12 +55,15 @@ class TrophyFishMessages {
         var edited = original
 
         if (config.enabled) {
-            edited = ChatComponentText("§6§lTROPHY FISH! " + when (config.design) {
-                DesignFormat.STYLE_1 -> if (amount == 1) "§c§lFIRST §r$displayRarity $displayName"
-                     else "§7$amount. §r$displayRarity $displayName"
-                DesignFormat.STYLE_2 -> "§bYou caught a $displayName $displayRarity§b. §7(${amount.addSeparators()})"
-                else -> "§bYou caught your ${amount.addSeparators()}${amount.ordinal()} $displayRarity $displayName§b."
-            })
+            edited = ChatComponentText(
+                "§6§lTROPHY FISH! " + when (config.design) {
+                    DesignFormat.STYLE_1 -> if (amount == 1) "§c§lFIRST §r$displayRarity $displayName"
+                    else "§7$amount. §r$displayRarity $displayName"
+
+                    DesignFormat.STYLE_2 -> "§bYou caught a $displayName $displayRarity§b. §7(${amount.addSeparators()})"
+                    else -> "§bYou caught your ${amount.addSeparators()}${amount.ordinal()} $displayRarity $displayName§b."
+                }
+            )
         }
 
         if (config.totalAmount) {
@@ -83,7 +86,7 @@ class TrophyFishMessages {
 
     private fun shouldBlockTrophyFish(rarity: TrophyRarity, amount: Int) =
         config.bronzeHider && rarity == TrophyRarity.BRONZE && amount != 1
-                || config.silverHider && rarity == TrophyRarity.SILVER && amount != 1
+            || config.silverHider && rarity == TrophyRarity.SILVER && amount != 1
 
     @SubscribeEvent
     fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {

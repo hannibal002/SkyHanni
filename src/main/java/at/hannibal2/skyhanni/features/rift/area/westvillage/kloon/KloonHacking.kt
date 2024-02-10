@@ -25,6 +25,7 @@ import net.minecraftforge.fml.common.eventhandler.EventPriority
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
 class KloonHacking {
+
     private val config get() = RiftAPI.config.area.westVillage.hacking
 
     private val colourPattern by RepoPattern.pattern(

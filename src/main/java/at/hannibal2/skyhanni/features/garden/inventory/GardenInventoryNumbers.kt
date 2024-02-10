@@ -15,6 +15,7 @@ import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
 class GardenInventoryNumbers {
+
     private val config get() = GardenAPI.config.number
 
     private val upgradeTierPattern by RepoPattern.pattern(
@@ -63,5 +64,4 @@ class GardenInventoryNumbers {
         event.move(3, "garden.numberCropUpgrades", "garden.number.cropUpgrades")
         event.move(3, "garden.numberComposterUpgrades", "garden.number.composterUpgrades")
     }
-
 }

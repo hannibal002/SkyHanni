@@ -89,6 +89,7 @@ class SkillExperience {
     }
 
     companion object {
+
         private val skillExp = mutableMapOf<String, Long>()
 
         private fun getLevelForExpExactly(experience: Long): Int {
@@ -119,7 +120,7 @@ class SkillExperience {
             return 0
         }
 
-        //TODO create additional event
+        // TODO create additional event
         fun getExpForSkill(skillName: String) = skillExp[skillName.lowercase()] ?: 0
 
         private val levelingExp = listOf(

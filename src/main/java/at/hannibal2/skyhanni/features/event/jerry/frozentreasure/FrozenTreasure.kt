@@ -9,6 +9,7 @@ enum class FrozenTreasure(
     val defaultAmount: Int,
     val iceMultiplier: Int = 0,
 ) {
+
     WHITE_GIFT("WHITE_GIFT", "§fWhite Gift", 1),
     GREEN_GIFT("GREEN_GIFT", "§aGreen Gift", 1),
     RED_GIFT("RED_GIFT", "§9§cRed Gift", 1),

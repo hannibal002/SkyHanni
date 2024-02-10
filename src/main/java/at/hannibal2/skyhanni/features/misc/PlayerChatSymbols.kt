@@ -20,6 +20,7 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
 // code inspired by SBA but heavily modified to be more functional and actually work
 class PlayerChatSymbols {
+
     private val config get() = SkyHanniMod.feature.chat.chatSymbols
     private val nameSymbols = mutableMapOf<String, String>()
 

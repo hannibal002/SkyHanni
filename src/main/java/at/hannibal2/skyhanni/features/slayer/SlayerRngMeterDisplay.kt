@@ -9,6 +9,7 @@ import at.hannibal2.skyhanni.events.InventoryFullyOpenedEvent
 import at.hannibal2.skyhanni.events.LorenzChatEvent
 import at.hannibal2.skyhanni.events.LorenzTickEvent
 import at.hannibal2.skyhanni.events.SlayerChangeEvent
+import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.ItemUtils.nameWithEnchantment
@@ -26,6 +27,7 @@ import kotlin.math.ceil
 import kotlin.time.Duration.Companion.seconds
 
 class SlayerRngMeterDisplay {
+
     private val config get() = SkyHanniMod.feature.slayer.rngMeterDisplay
 
     private val patternGroup = RepoPattern.group("slayer.rngmeter")
@@ -83,7 +85,7 @@ class SlayerRngMeterDisplay {
             val item = storage.itemGoal
             val hasItemSelected = item != "" && item != "?"
             if (!hasItemSelected && config.warnEmpty) {
-                LorenzUtils.userError("No Slayer RNG Meter Item selected!")
+                ChatUtils.userError("No Slayer RNG Meter Item selected!")
                 LorenzUtils.sendTitle("§cNo RNG Meter Item!", 3.seconds)
             }
             var blockChat = config.hideChat && hasItemSelected
@@ -99,7 +101,7 @@ class SlayerRngMeterDisplay {
                 var rawPercentage = old.toDouble() / storage.goalNeeded
                 if (rawPercentage > 1) rawPercentage = 1.0
                 val percentage = LorenzUtils.formatPercentage(rawPercentage)
-                LorenzUtils.chat("§dRNG Meter §7dropped at §e$percentage §7XP ($from/${to}§7)")
+                ChatUtils.chat("§dRNG Meter §7dropped at §e$percentage §7XP ($from/${to}§7)")
                 lastItemDroppedTime = System.currentTimeMillis()
             }
             if (blockChat) {

@@ -11,6 +11,7 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import kotlin.time.Duration.Companion.seconds
 
 class ServerRestartTitle {
+
     private val config get() = SkyHanniMod.feature.misc
 
     private val restartPattern by RepoPattern.pattern(

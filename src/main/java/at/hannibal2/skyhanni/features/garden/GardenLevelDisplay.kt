@@ -5,6 +5,7 @@ import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.InventoryFullyOpenedEvent
 import at.hannibal2.skyhanni.events.LorenzChatEvent
 import at.hannibal2.skyhanni.events.ProfileJoinEvent
+import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.ItemUtils.name
 import at.hannibal2.skyhanni.utils.LorenzUtils
@@ -18,6 +19,7 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import kotlin.time.Duration.Companion.milliseconds
 
 class GardenLevelDisplay {
+
     private val config get() = GardenAPI.config.gardenLevels
 
     private val patternGroup = RepoPattern.group("garden.level")
@@ -61,7 +63,7 @@ class GardenLevelDisplay {
         val newLevel = GardenAPI.getGardenLevel()
         if (newLevel == oldLevel + 1 && newLevel > 15) {
             LorenzUtils.runDelayed(50.milliseconds) {
-                LorenzUtils.clickableChat(
+                ChatUtils.clickableChat(
                     " \n§b§lGARDEN LEVEL UP §8$oldLevel ➜ §b$newLevel\n" +
                         " §8+§aRespect from Elite Farmers and SkyHanni members :)\n ",
                     "/gardenlevels",
