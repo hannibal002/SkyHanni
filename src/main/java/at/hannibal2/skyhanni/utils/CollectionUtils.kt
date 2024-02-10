@@ -51,6 +51,9 @@ object CollectionUtils {
     fun <K> MutableMap<K, Double>.addOrPut(key: K, number: Double): Double =
         this.merge(key, number, Double::plus)!! // Never returns null since "plus" can't return null
 
+    fun <K> MutableMap<K, Float>.addOrPut(key: K, number: Float): Float =
+        this.merge(key, number, Float::plus)!! // Never returns null since "plus" can't return null
+
     fun <K, N : Number> Map<K, N>.sumAllValues(): Double {
         if (values.isEmpty()) return 0.0
 

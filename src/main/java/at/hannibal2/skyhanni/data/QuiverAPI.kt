@@ -8,6 +8,7 @@ import at.hannibal2.skyhanni.events.LorenzChatEvent
 import at.hannibal2.skyhanni.events.PlaySoundEvent
 import at.hannibal2.skyhanni.events.RepositoryReloadEvent
 import at.hannibal2.skyhanni.utils.ChatUtils
+import at.hannibal2.skyhanni.utils.CollectionUtils.addOrPut
 import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.ItemCategory
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalNameOrNull
@@ -36,13 +37,15 @@ object QuiverAPI {
         set(value) {
             storage?.arrows?.currentArrow = value?.toString() ?: return
         }
-    // im 99.9% sure the set() does not work, yay
     var arrowAmount: MutableMap<ArrowType, Float>
-        get() = storage?.arrows?.arrowAmount?.mapKeys { (arrow, _) -> getArrowByNameOrNull(arrow) ?: NONE_ARROW_TYPE }
-            ?.mapValues { (_, amount) -> amount }?.toMutableMap() ?: mutableMapOf()
+        get() = storage?.arrows?.arrowAmount?.mapNotNull {
+            val arrow = getArrowByNameOrNull(it.key.asInternalName()) ?: return@mapNotNull null
+            arrow to it.value
+        }?.toMap()?.toMutableMap() ?: mutableMapOf()
         set(value) {
-            storage?.arrows?.arrowAmount =
-                value.mapKeys { (arrow, _) -> arrow.internalName }.mapValues { (_, amount) -> amount }
+            storage?.arrows?.arrowAmount = value.mapKeys {
+                it.toString()
+            }.toMutableMap()
         }
     var currentAmount: Int
         get() = arrowAmount[currentArrow]?.toInt() ?: 0
@@ -98,14 +101,14 @@ object QuiverAPI {
             val filledUpType = getArrowByNameOrNull(type) ?: return
             ChatUtils.chat("Filled up quiver with $amount of $filledUpType")
 
-            arrowAmount.merge(filledUpType, amount, Float::plus)
+            arrowAmount.addOrPut(filledUpType, amount)
             return
         }
 
         fillUpPattern.matchMatcher(message) {
             val flintAmount = group("flintAmount").formatNumber().toFloat()
 
-            arrowAmount.merge(FLINT_ARROW_TYPE, flintAmount, Float::plus)
+            arrowAmount.addOrPut(FLINT_ARROW_TYPE, flintAmount)
             ChatUtils.chat("Filled up quiver with $flintAmount flint arrows")
             return
         }
@@ -117,7 +120,7 @@ object QuiverAPI {
             val filledUpType = getArrowByNameOrNull(type) ?: return
             ChatUtils.chat("Added $amount of $filledUpType to quiver")
 
-            arrowAmount.merge(filledUpType, amount, Float::plus)
+            arrowAmount.addOrPut(filledUpType, amount)
 
             return
         }
@@ -156,7 +159,7 @@ object QuiverAPI {
 
             val arrowType = getArrowByNameOrNull(arrow) ?: continue
 
-            arrowAmount.merge(arrowType, stack.stackSize.toFloat(), Float::plus)
+            arrowAmount.addOrPut(arrowType, stack.stackSize.toFloat())
         }
     }
 
