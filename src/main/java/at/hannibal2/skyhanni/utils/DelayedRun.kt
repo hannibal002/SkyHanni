@@ -1,10 +1,11 @@
 package at.hannibal2.skyhanni.utils
 
-import at.hannibal2.skyhanni.utils.LorenzUtils.drainTo
+import at.hannibal2.skyhanni.utils.CollectionUtils.drainTo
 import java.util.concurrent.ConcurrentLinkedQueue
 import kotlin.time.Duration
 
 object DelayedRun {
+
     private val tasks = mutableListOf<Pair<() -> Any, SimpleTimeMark>>()
     private val futureTasks = ConcurrentLinkedQueue<Pair<() -> Any, SimpleTimeMark>>()
 

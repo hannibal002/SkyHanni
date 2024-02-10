@@ -14,9 +14,10 @@ import kotlin.math.min
 class DefaultConfigOptionGui(
     private val orderedOptions: Map<Category, List<FeatureToggleableOption>>,
     old: String,
-    new: String
+    new: String,
 ) :
     GuiScreen() {
+
     val title = if (old == "null") {
         if (new == "null")
             "§5SkyHanni Default Options"
@@ -181,7 +182,6 @@ class DefaultConfigOptionGui(
         if (hoveringTextToDraw != null) {
             Utils.drawHoveringText(hoveringTextToDraw, mouseX, mouseY, width, height, 100, mc.fontRendererObj)
         }
-
     }
 
     private fun scroll(s: Int) {

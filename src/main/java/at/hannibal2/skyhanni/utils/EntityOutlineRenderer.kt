@@ -32,6 +32,7 @@ import java.lang.reflect.Method
  *
  */
 object EntityOutlineRenderer {
+
     private val entityRenderCache: CachedInfo = CachedInfo(null, null, null)
     private var stopLookingForOptifine = false
     private var isMissingMixin = false
@@ -400,6 +401,6 @@ object EntityOutlineRenderer {
     private class CachedInfo(
         var xrayCache: HashMap<Entity, Int>?,
         var noXrayCache: HashMap<Entity, Int>?,
-        var noOutlineCache: HashSet<Entity>?
+        var noOutlineCache: HashSet<Entity>?,
     )
 }

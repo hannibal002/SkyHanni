@@ -15,6 +15,7 @@ import at.hannibal2.skyhanni.utils.StringUtils.matches
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
 class CurrentPetDisplay {
+
     private val config get() = SkyHanniMod.feature.misc.pets
 
     // TODO USE SH-REPO

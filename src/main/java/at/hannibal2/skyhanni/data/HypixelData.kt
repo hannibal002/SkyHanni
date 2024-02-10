@@ -10,6 +10,7 @@ import at.hannibal2.skyhanni.events.LorenzWorldChangeEvent
 import at.hannibal2.skyhanni.events.ProfileJoinEvent
 import at.hannibal2.skyhanni.features.bingo.BingoAPI
 import at.hannibal2.skyhanni.test.command.ErrorManager
+import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.LorenzLogger
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
@@ -26,6 +27,7 @@ import net.minecraftforge.fml.common.network.FMLNetworkEvent
 import kotlin.concurrent.thread
 
 class HypixelData {
+
     private val patternGroup = RepoPattern.group("data.hypixeldata")
     private val tabListProfilePattern by patternGroup.pattern(
         "tablistprofile",
@@ -43,6 +45,7 @@ class HypixelData {
     private var lastLocRaw = 0L
 
     companion object {
+
         private val patternGroup = RepoPattern.group("data.hypixeldata")
         private val serverIdScoreboardPattern by patternGroup.pattern(
             "serverid.scoreboard",
@@ -61,7 +64,7 @@ class HypixelData {
         var skyBlockIsland = IslandType.UNKNOWN
         var serverId: String? = null
 
-        //Ironman, Stranded and Bingo
+        // Ironman, Stranded and Bingo
         var noTrade = false
 
         var ironman = false
@@ -95,16 +98,20 @@ class HypixelData {
             if (!LorenzUtils.inSkyBlock) return null
             if (serverId != null) return serverId
 
-            ScoreboardData.sidebarLinesFormatted.forEach { serverIdScoreboardPattern.matchMatcher(it) {
-                val serverType = if (group("servertype") == "M") "mega" else "mini"
-                serverId = "$serverType${group("serverid")}"
-                return serverId
-            } }
+            ScoreboardData.sidebarLinesFormatted.forEach {
+                serverIdScoreboardPattern.matchMatcher(it) {
+                    val serverType = if (group("servertype") == "M") "mega" else "mini"
+                    serverId = "$serverType${group("serverid")}"
+                    return serverId
+                }
+            }
 
-            TabListData.getTabList().forEach { serverIdTablistPattern.matchMatcher(it) {
-                serverId = group("serverid")
-                return serverId
-            } }
+            TabListData.getTabList().forEach {
+                serverIdTablistPattern.matchMatcher(it) {
+                    serverId = group("serverid")
+                    return serverId
+                }
+            }
 
             return serverId
         }
@@ -262,7 +269,7 @@ class HypixelData {
         if (skyBlockIsland != islandType) {
             IslandChangeEvent(islandType, skyBlockIsland).postAndCatch()
             if (islandType == IslandType.UNKNOWN) {
-                LorenzUtils.debug("Unknown island detected: '$newIsland'")
+                ChatUtils.debug("Unknown island detected: '$newIsland'")
                 loggerIslandChange.log("Unknown: '$newIsland'")
             } else {
                 loggerIslandChange.log(islandType.name)

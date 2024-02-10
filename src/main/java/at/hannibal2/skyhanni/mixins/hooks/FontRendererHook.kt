@@ -4,7 +4,6 @@ import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.features.chroma.ChromaFontRenderer
 import at.hannibal2.skyhanni.mixins.transformers.AccessorFontRenderer
 import at.hannibal2.skyhanni.utils.LorenzUtils
-import at.hannibal2.skyhanni.utils.shader.ShaderManager
 import net.minecraft.client.Minecraft
 import net.minecraft.client.renderer.GlStateManager
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo
@@ -17,6 +16,7 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo
  * Credit: [FontRendererHook.java](https://github.com/BiscuitDevelopment/SkyblockAddons/blob/main/src/main/java/codes/biscuit/skyblockaddons/asm/hooks/FontRendererHook.java)
  */
 object FontRendererHook {
+
     private var CHROMA_COLOR: Int = -0x1
     private val DRAW_CHROMA = ChromaFontRenderer(CHROMA_COLOR)
     private var CHROMA_COLOR_SHADOW: Int = -0xAAAAAB
@@ -156,7 +156,7 @@ object FontRendererHook {
         ci: CallbackInfo,
         i: Int,
         c0: Char,
-        i1: Int
+        i1: Int,
     ): Boolean {
         if (!LorenzUtils.inSkyBlock) return false
         if (!SkyHanniMod.feature.chroma.enabled) return false
