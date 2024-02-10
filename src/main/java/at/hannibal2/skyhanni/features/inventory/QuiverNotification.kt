@@ -17,7 +17,7 @@ object QuiverNotification {
         if (!SkyHanniMod.configManager.features.inventory.quiverAlert) return
         val message = event.message.removeColor()
         quiverChatPattern.matchMatcher(message) {
-            TitleManager.sendTitle("§c${group("arrowsLeft")} arrows left!", 3.seconds, 3.6, 7.0)
+            TitleManager.sendTitle("§c${group("arrowsLeft")} arrows left!", 3.seconds, 3.6, 7f)
             SoundUtils.repeatSound(100, 30, SoundUtils.plingSound)
         }
     }
