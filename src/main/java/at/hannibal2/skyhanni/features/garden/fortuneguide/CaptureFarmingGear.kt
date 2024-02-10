@@ -9,6 +9,7 @@ import at.hannibal2.skyhanni.events.LorenzChatEvent
 import at.hannibal2.skyhanni.features.garden.FarmingFortuneDisplay
 import at.hannibal2.skyhanni.features.garden.GardenAPI
 import at.hannibal2.skyhanni.features.garden.GardenAPI.getCropType
+import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName
 import at.hannibal2.skyhanni.utils.ItemUtils.getItemRarityOrNull
@@ -27,6 +28,7 @@ import kotlin.math.round
 import kotlin.time.Duration.Companion.days
 
 class CaptureFarmingGear {
+
     private val farmingItems get() = GardenAPI.storage?.fortune?.farmingItems
     private val outdatedItems get() = GardenAPI.storage?.fortune?.outdatedItems
 
@@ -44,7 +46,7 @@ class CaptureFarmingGear {
     private val patternGroup = RepoPattern.group("garden.fortuneguide.capture")
     private val tierPattern by patternGroup.pattern(
         "uniquevisitors.tier",
-        "§7Progress to Tier (?<nextTier>\\d+):.*"
+        "§7Progress to Tier (?<nextTier>\\w+):.*"
     )
     private val tierProgressPattern by patternGroup.pattern(
         "uniquevisitors.tierprogress",
@@ -52,6 +54,7 @@ class CaptureFarmingGear {
     )
 
     companion object {
+
         private val strengthPattern = " Strength: §r§c❁(?<strength>.*)".toPattern()
         private val farmingSets = arrayListOf(
             "FERMENTO", "SQUASH", "CROPIE", "MELON", "FARM",
@@ -66,8 +69,8 @@ class CaptureFarmingGear {
             val currentCrop = itemStack.getCropType()
 
             if (currentCrop == null) {
-                //todo better fall back items
-                //todo Daedalus axe
+                // todo better fall back items
+                // todo Daedalus axe
             } else {
                 for (item in FarmingItems.entries) {
                     if (item.name == currentCrop.name) {
@@ -96,13 +99,13 @@ class CaptureFarmingGear {
         fun reverseCarrotFortune() {
             val storage = GardenAPI.storage?.fortune ?: return
             storage.carrotFortune = !storage.carrotFortune
-            LorenzUtils.chat("Toggled exportable carrot fortune to: ${storage.carrotFortune}")
+            ChatUtils.chat("Toggled exportable carrot fortune to: ${storage.carrotFortune}")
         }
 
         fun reversePumpkinFortune() {
             val storage = GardenAPI.storage?.fortune ?: return
             storage.pumpkinFortune = !storage.pumpkinFortune
-            LorenzUtils.chat("Toggled expired pumpkin fortune to: ${storage.pumpkinFortune}")
+            ChatUtils.chat("Toggled expired pumpkin fortune to: ${storage.pumpkinFortune}")
         }
 
         private fun getUniqueVisitorsForTier(tier: Int): Int {
@@ -150,7 +153,7 @@ class CaptureFarmingGear {
             var tierProgress = -1
             for (line in item.getLore()) {
                 tierPattern.matchMatcher(line) {
-                    tier = group("nextTier").toInt() - 1
+                    tier = group("nextTier").romanToDecimalIfNecessary() - 1
                 }
                 tierProgressPattern.matchMatcher(line) {
                     tierProgress = group("having").toInt()
@@ -164,7 +167,7 @@ class CaptureFarmingGear {
 
     private fun anita(
         items: Map<Int, ItemStack>,
-        storage: Storage.ProfileSpecific.GardenStorage.Fortune
+        storage: Storage.ProfileSpecific.GardenStorage.Fortune,
     ) {
         var level = -1
         for ((_, item) in items) {
@@ -186,7 +189,7 @@ class CaptureFarmingGear {
 
     private fun configurePlots(
         items: Map<Int, ItemStack>,
-        storage: Storage.ProfileSpecific.GardenStorage.Fortune
+        storage: Storage.ProfileSpecific.GardenStorage.Fortune,
     ) {
         var plotsUnlocked = 24
         for (slot in items) {
@@ -213,7 +216,7 @@ class CaptureFarmingGear {
 
     private fun skills(
         items: Map<Int, ItemStack>,
-        storage: Storage.ProfileSpecific.GardenStorage.Fortune
+        storage: Storage.ProfileSpecific.GardenStorage.Fortune,
     ) {
         for ((_, item) in items) {
             if (item.displayName.contains("Farming ")) {
@@ -225,7 +228,7 @@ class CaptureFarmingGear {
     private fun pets(
         farmingItems: MutableMap<FarmingItems, ItemStack>,
         items: Map<Int, ItemStack>,
-        outdatedItems: MutableMap<FarmingItems, Boolean>
+        outdatedItems: MutableMap<FarmingItems, Boolean>,
     ) {
         // If they've 2 of same pet, one will be overwritten
         // optimize
@@ -275,7 +278,7 @@ class CaptureFarmingGear {
     private fun equipmentAndStats(
         items: Map<Int, ItemStack>,
         farmingItems: MutableMap<FarmingItems, ItemStack>,
-        outdatedItems: MutableMap<FarmingItems, Boolean>
+        outdatedItems: MutableMap<FarmingItems, Boolean>,
     ) {
         for ((_, slot) in items) {
             val split = slot.getInternalName().asString().split("_")
@@ -337,11 +340,11 @@ class CaptureFarmingGear {
         }
         if (msg == "[NPC] Carrolyn: Thank you for the carrots.") {
             storage.carrotFortune = true
-            LorenzUtils.chat("§aYou have already given Carrolyn enough Exportable Carrots.")
+            ChatUtils.chat("§aYou have already given Carrolyn enough Exportable Carrots.")
         }
         if (msg == "[NPC] Carrolyn: Thank you for the pumpkins.") {
             storage.pumpkinFortune = true
-            LorenzUtils.chat("§aYou have already given Carrolyn enough Expired Pumpkins.")
+            ChatUtils.chat("§aYou have already given Carrolyn enough Expired Pumpkins.")
         }
     }
 }

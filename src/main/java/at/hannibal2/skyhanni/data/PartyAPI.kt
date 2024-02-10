@@ -1,6 +1,7 @@
 package at.hannibal2.skyhanni.data
 
 import at.hannibal2.skyhanni.events.LorenzChatEvent
+import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.OSUtils
 import at.hannibal2.skyhanni.utils.StringUtils.cleanPlayerName
@@ -13,6 +14,7 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import kotlin.random.Random
 
 object PartyAPI {
+
     private val patternGroup = RepoPattern.group("data.party")
     private val youJoinedPartyPattern by patternGroup.pattern(
         "you.joined",
@@ -76,17 +78,17 @@ object PartyAPI {
     fun listMembers() {
         val size = partyMembers.size
         if (size == 0) {
-            LorenzUtils.chat("No tracked party members!")
+            ChatUtils.chat("No tracked party members!")
             return
         }
-        LorenzUtils.chat("Tracked party members §7($size) §f:", prefixColor = "§a")
+        ChatUtils.chat("Tracked party members §7($size) §f:", prefixColor = "§a")
         for (member in partyMembers) {
-            LorenzUtils.chat(" §a- §7$member", false)
+            ChatUtils.chat(" §a- §7$member", false)
         }
 
         if (Random.nextDouble() < 0.1) {
             OSUtils.openBrowser("https://www.youtube.com/watch?v=iANP7ib7CPA")
-            LorenzUtils.hoverableChat("§7Are You Ready To Party?", listOf("§b~Spongebob"), prefix = false)
+            ChatUtils.hoverableChat("§7Are You Ready To Party?", listOf("§b~Spongebob"), prefix = false)
         }
     }
 

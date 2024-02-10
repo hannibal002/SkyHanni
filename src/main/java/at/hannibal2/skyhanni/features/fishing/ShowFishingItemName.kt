@@ -19,6 +19,7 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import kotlin.time.Duration.Companion.milliseconds
 
 class ShowFishingItemName {
+
     private val config get() = SkyHanniMod.feature.fishing.fishedItemName
     private var hasRodInHand = false
     private var cache = TimeLimitedCache<EntityItem, Pair<LorenzVec, String>>(750.milliseconds)
@@ -81,5 +82,4 @@ class ShowFishingItemName {
     }
 
     fun isEnabled() = LorenzUtils.inSkyBlock && config.enabled
-
 }

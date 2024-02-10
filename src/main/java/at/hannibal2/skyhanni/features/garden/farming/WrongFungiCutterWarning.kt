@@ -14,6 +14,7 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import kotlin.time.Duration.Companion.seconds
 
 class WrongFungiCutterWarning {
+
     private var mode = FungiMode.UNKNOWN
     private var lastPlaySoundTime = 0L
 
@@ -74,6 +75,7 @@ class WrongFungiCutterWarning {
         ;
 
         companion object {
+
             fun getOrNull(mode: String) =
                 entries.firstOrNull { it.name == mode } ?: error("Unknown fungi mode: '$mode'")
         }

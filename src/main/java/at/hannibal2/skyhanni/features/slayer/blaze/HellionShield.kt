@@ -9,6 +9,7 @@ enum class HellionShield(
     val chatColor: String = color.getChatColor(),
     var active: Boolean = false,
 ) {
+
     AURIC("§e§lAURIC", "Auric", LorenzColor.YELLOW),
     ASHEN("§8§lASHEN", "Ashen", LorenzColor.DARK_GRAY),
     SPIRIT("§f§lSPIRIT", "Spirit", LorenzColor.WHITE),

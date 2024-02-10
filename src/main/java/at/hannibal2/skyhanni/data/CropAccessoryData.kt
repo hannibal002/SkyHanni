@@ -20,6 +20,7 @@ import java.io.ByteArrayInputStream
 import java.util.Base64
 
 class CropAccessoryData {
+
     // TODO USE SH-REPO
     private val accessoryBagNamePattern = "Accessory Bag \\((?<current>\\d)/(?<total>\\d)\\)".toPattern()
     private var loadedAccessoryThisProfile = false
@@ -89,12 +90,12 @@ class CropAccessoryData {
         }
     }
 
-
     private fun bestCropAccessory(items: Iterable<ItemStack>) =
         items.mapNotNull { item -> CropAccessory.getByName(item.getInternalName()) }
             .maxOrNull() ?: CropAccessory.NONE
 
     companion object {
+
         var accessoryBagPageCount = 0
             private set
 
