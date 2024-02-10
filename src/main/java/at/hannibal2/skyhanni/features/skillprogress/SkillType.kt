@@ -1,4 +1,4 @@
-package at.hannibal2.skyhanni.features.misc.skillprogress
+package at.hannibal2.skyhanni.features.skillprogress
 
 import at.hannibal2.skyhanni.utils.StringUtils.firstLetterUppercase
 import io.github.moulberry.notenoughupdates.util.Utils

@@ -1,4 +1,4 @@
-package at.hannibal2.skyhanni.features.misc.skillprogress
+package at.hannibal2.skyhanni.features.skillprogress
 
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.SkillAPI
@@ -13,11 +13,11 @@ import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.LorenzTickEvent
 import at.hannibal2.skyhanni.events.PreProfileSwitchEvent
 import at.hannibal2.skyhanni.events.SkillOverflowLevelupEvent
-import at.hannibal2.skyhanni.features.misc.skillprogress.SkillUtil.activeSkill
-import at.hannibal2.skyhanni.utils.LorenzUtils
+import at.hannibal2.skyhanni.features.skillprogress.SkillUtil.activeSkill
+import at.hannibal2.skyhanni.utils.ChatUtils.chat
 import at.hannibal2.skyhanni.utils.CollectionUtils.addAsSingletonList
 import at.hannibal2.skyhanni.utils.ConditionalUtils.onToggle
-import at.hannibal2.skyhanni.utils.LorenzUtils.chat
+import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.NumberUtil.formatNumber
 import at.hannibal2.skyhanni.utils.NumberUtil.interpolate
@@ -28,15 +28,22 @@ import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.SoundUtils
 import at.hannibal2.skyhanni.utils.SoundUtils.playSound
 import at.hannibal2.skyhanni.utils.SpecialColour
+import at.hannibal2.skyhanni.utils.TimeUnit
+import at.hannibal2.skyhanni.utils.TimeUtils
+import at.hannibal2.skyhanni.utils.TimeUtils.format
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 import at.hannibal2.skyhanni.utils.renderables.Renderable.Companion.horizontalContainer
 import io.github.moulberry.notenoughupdates.util.Utils
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.runBlocking
 import net.minecraft.util.ChatComponentText
 import net.minecraftforge.client.event.ClientChatReceivedEvent
 import net.minecraftforge.fml.common.eventhandler.EventPriority
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import java.awt.Color
 import kotlin.math.ceil
+import kotlin.time.Duration
 import kotlin.time.Duration.Companion.seconds
 
 object SkillProgress {
@@ -44,7 +51,7 @@ object SkillProgress {
     private val config get() = SkyHanniMod.feature.skillProgress
     private val barConfig get() = config.skillProgressBarConfig
     private val allSkillConfig get() = config.allSkillDisplayConfig
-    private val etaConfig get() = config.skillETADisplayConfig
+    val etaConfig get() = config.skillETADisplayConfig
 
     private var skillExpPercentage = 0.0
     private var display = emptyList<Renderable>()
@@ -303,34 +310,43 @@ object SkillProgress {
         oldSkillInfoMap[activeSkill] = skillInfo
         val level = if (config.overflowConfig.enableInEtaDisplay.get()) skillInfo.overflowLevel else skillInfo.level
 
-        add(Renderable.string("§6Skill: §b${activeSkill.displayName}"))
-        add(Renderable.string("§6Level: §b$level"))
+        add(Renderable.string("§6Skill: §b${activeSkill.displayName} $level"))
 
         var xpInterp = xpInfo.xpGainHour
         if (xpInfo.xpGainLast == xpInfo.xpGainHour && xpInfo.xpGainHour <= 0) {
             add(Renderable.string("§6XP/h: §cN/A"))
         } else {
             xpInterp = interpolate(xpInfo.xpGainHour, xpInfo.xpGainLast, lastGainUpdate.toMillis())
-            add(Renderable.string("§6XP/h: §b${xpInterp.addSeparators()}"))
+            add(Renderable.string("§6XP/h: §b${xpInterp.addSeparators()} " +
+                if (xpInfo.isActive) "" else "§c(PAUSED"))
         }
 
         var remaining = skillInfo.overflowCurrentXpMax - skillInfo.overflowCurrentXp
         if (skillInfo.overflowCurrentXpMax == skillInfoLast.overflowCurrentXpMax) {
             remaining = interpolate(remaining.toFloat(), (skillInfoLast.overflowCurrentXpMax - skillInfoLast.overflowCurrentXp).toFloat(), lastGainUpdate.toMillis()).toLong()
         }
-
         if (xpInfo.xpGainHour < 1000) {
             add(Renderable.string("§6ETA: §cN/A"))
         } else {
-            add(Renderable.string("§6ETA: §b${Utils.prettyTime((remaining) * 1000 * 60 * 60 / xpInterp.toLong())}"))
+            add(Renderable.string("§6ETA: §b${Utils.prettyTime((remaining) * 1000 * 60 * 60 / xpInterp.toLong())} " +
+                if (xpInfo.isActive) "" else "§c(PAUSED)"))
         }
+
+        val session = xpInfo.timeActive.seconds.format(TimeUnit.HOUR)
+        add(Renderable.clickAndHover("§6Session: §b$session ${if (xpInfo.sessionTimerActive) "" else "§c(PAUSED)"}",
+            listOf("§eClick to reset!")){
+            xpInfo.sessionTimerActive = false
+            xpInfo.shouldStartTimer = true
+            xpInfo.timeActive = 0L
+            chat("Timer for §b${activeSkill.displayName} §ehas been reset!")
+        })
     }
 
     private fun drawDisplay() = buildList {
         val skillMap = skillMap ?: return@buildList
         val skill = skillMap[activeSkill] ?: return@buildList
 
-        val (level, currentXp, currentXpMax, total) = if (config.overflowConfig.enableInDisplay.get())
+        val (level, currentXp, currentXpMax, _) = if (config.overflowConfig.enableInDisplay.get())
             LorenzUtils.Quad(skill.overflowLevel, skill.overflowCurrentXp, skill.overflowCurrentXpMax, skill.overflowTotalXp)
         else
             LorenzUtils.Quad(skill.level, skill.currentXp, skill.currentXpMax, skill.totalXp)

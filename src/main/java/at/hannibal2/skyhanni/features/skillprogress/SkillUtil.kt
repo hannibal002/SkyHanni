@@ -1,4 +1,4 @@
-package at.hannibal2.skyhanni.features.misc.skillprogress
+package at.hannibal2.skyhanni.features.skillprogress
 
 import at.hannibal2.skyhanni.api.SkillAPI
 import at.hannibal2.skyhanni.utils.LorenzUtils

@@ -5,16 +5,16 @@ import at.hannibal2.skyhanni.events.ActionBarUpdateEvent
 import at.hannibal2.skyhanni.events.ConfigLoadEvent
 import at.hannibal2.skyhanni.events.InventoryFullyOpenedEvent
 import at.hannibal2.skyhanni.events.SkillOverflowLevelupEvent
-import at.hannibal2.skyhanni.features.misc.skillprogress.SkillProgress
-import at.hannibal2.skyhanni.features.misc.skillprogress.SkillType
-import at.hannibal2.skyhanni.features.misc.skillprogress.SkillUtil.activeSkill
-import at.hannibal2.skyhanni.features.misc.skillprogress.SkillUtil.calculateLevelXp
-import at.hannibal2.skyhanni.features.misc.skillprogress.SkillUtil.calculateOverFlow
-import at.hannibal2.skyhanni.features.misc.skillprogress.SkillUtil.getLevel
-import at.hannibal2.skyhanni.features.misc.skillprogress.SkillUtil.getSkillInfo
-import at.hannibal2.skyhanni.features.misc.skillprogress.SkillUtil.levelArray
-import at.hannibal2.skyhanni.features.misc.skillprogress.SkillUtil.levelingMap
-import at.hannibal2.skyhanni.features.misc.skillprogress.SkillUtil.xpRequiredForLevel
+import at.hannibal2.skyhanni.features.skillprogress.SkillProgress
+import at.hannibal2.skyhanni.features.skillprogress.SkillType
+import at.hannibal2.skyhanni.features.skillprogress.SkillUtil.activeSkill
+import at.hannibal2.skyhanni.features.skillprogress.SkillUtil.calculateLevelXp
+import at.hannibal2.skyhanni.features.skillprogress.SkillUtil.calculateOverFlow
+import at.hannibal2.skyhanni.features.skillprogress.SkillUtil.getLevel
+import at.hannibal2.skyhanni.features.skillprogress.SkillUtil.getSkillInfo
+import at.hannibal2.skyhanni.features.skillprogress.SkillUtil.levelArray
+import at.hannibal2.skyhanni.features.skillprogress.SkillUtil.levelingMap
+import at.hannibal2.skyhanni.features.skillprogress.SkillUtil.xpRequiredForLevel
 import at.hannibal2.skyhanni.utils.ItemUtils.cleanName
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.LorenzUtils
@@ -34,6 +34,8 @@ import io.github.moulberry.notenoughupdates.util.Utils
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import java.util.LinkedList
 import java.util.regex.Matcher
+import kotlin.concurrent.fixedRateTimer
+import kotlin.time.Duration.Companion.seconds
 
 object SkillAPI {
     private val patternGroup = RepoPattern.group("display.skilldisplay")
@@ -64,6 +66,7 @@ object SkillAPI {
                 val skillName = matcher.group(2)
                 val skill = SkillType.getByNameFirstUppercase(skillName) ?: return
                 val skillInfo = skillMap?.get(skill) ?: SkillInfo()
+                val skillXp = skillXPInfoMap[skill] ?: SkillXPInfo()
                 activeSkill = skill
                 when (matcher.pattern()) {
                     SKILL_PATTERN -> handleSkillPattern(matcher, skill, skillInfo)
@@ -72,6 +75,13 @@ object SkillAPI {
                 }
                 showDisplay = true
                 lastUpdate = SimpleTimeMark.now()
+                skillXp.lastUpdate = SimpleTimeMark.now()
+                skillXp.sessionTimerActive = true
+
+                if (skillXp.shouldStartTimer) {
+                    runTimer(skillName, skillXp)
+                    skillXp.shouldStartTimer = false
+                }
                 SkillProgress.updateDisplay()
                 SkillProgress.hideInActionBar.add(component)
                 return
@@ -149,7 +159,27 @@ object SkillAPI {
         }
     }
 
-    fun handleSkillPattern(matcher: Matcher, skill: SkillType, skillInfo: SkillInfo) {
+    private fun runTimer(skillName: String, info: SkillXPInfo) {
+        fixedRateTimer(name = "skyhanni-skillprogress-timer-$skillName", initialDelay = 1_000L, period = 1_000L) {
+            if (info.shouldStartTimer) cancel()
+            val time = when (activeSkill) {
+                SkillType.FARMING -> SkillProgress.etaConfig.farmingPauseTime
+                SkillType.MINING -> SkillProgress.etaConfig.miningPauseTime
+                SkillType.COMBAT -> SkillProgress.etaConfig.combatPauseTime
+                SkillType.FORAGING -> SkillProgress.etaConfig.foragingPauseTime
+                SkillType.FISHING -> SkillProgress.etaConfig.fishingPauseTime
+                else -> 0
+            }
+            if (info.lastUpdate.passedSince() > time.seconds) {
+                info.sessionTimerActive = false
+            }
+            if (info.sessionTimerActive) {
+                info.timeActive++
+            }
+        }
+    }
+
+    private fun handleSkillPattern(matcher: Matcher, skill: SkillType, skillInfo: SkillInfo) {
         val currentXp = matcher.group(3).formatNumber()
         val maxXp = matcher.group(4).formatNumber()
         val level = getLevel(maxXp)
@@ -174,7 +204,7 @@ object SkillAPI {
         skillMap?.set(skill, skillInfo)
     }
 
-    fun handleSkillPatternPercent(matcher: Matcher, skill: SkillType, skillInfo: SkillInfo?) {
+    private fun handleSkillPatternPercent(matcher: Matcher, skill: SkillType, skillInfo: SkillInfo?) {
         var tablistLevel = 0
         for (line in TabListData.getTabList()) {
             var levelMatcher = skillTabPattern.matcher(line)
@@ -214,7 +244,7 @@ object SkillAPI {
         skillMap?.set(skill, existingLevel)
     }
 
-    fun handleSkillPatternMultiplier(matcher: Matcher, skillS: SkillType, skillInfo: SkillInfo) {
+    private fun handleSkillPatternMultiplier(matcher: Matcher, skillS: SkillType, skillInfo: SkillInfo) {
         val currentXp = matcher.group(3).formatNumber()
         val maxXp = matcher.group(4).formatNumber()
         val level = getLevel(maxXp)
@@ -323,7 +353,10 @@ object SkillAPI {
         var xpGainHour: Float = 0f,
         var xpGainLast: Float = 0f,
         var timer: Int = 3,
+        var sessionTimerActive: Boolean = false,
         var isActive: Boolean = false,
         var lastUpdate: SimpleTimeMark = SimpleTimeMark.farPast(),
+        var timeActive: Long = 0L,
+        var shouldStartTimer: Boolean = true
     )
 }
