@@ -76,7 +76,7 @@ class SkyHanniItemTracker<Data : ItemTrackerData>(
         lists: MutableList<List<Any>>,
     ): Double {
         var profit = 0.0
-        val items = mutableMapOf<Pair<NEUInternalName, ItemTrackerData.TrackedItem>, Long>()
+        val items = mutableMapOf<NEUInternalName, Long>()
         for ((internalName, itemProfit) in data.items) {
             if (!filter(internalName)) continue
 
@@ -87,7 +87,7 @@ class SkyHanniItemTracker<Data : ItemTrackerData>(
             val hidden = itemProfit.hidden
 
             if (isInventoryOpen() || !hidden) {
-                items[internalName to itemProfit] = price
+                items[internalName] = price
             }
             if (!hidden || !config.excludeHiddenItemsInPrice) {
                 profit += price
@@ -96,13 +96,11 @@ class SkyHanniItemTracker<Data : ItemTrackerData>(
 
         val limitList = config.hideCheapItems
         var pos = 0
-        var hiddenItems = 0
-        var hiddenItemTexts = emptyList<String>()
-        for ((item, price) in items.sortedDesc()) {
-            val (internalName, itemProfit) = item
+        val hiddenItemTexts = mutableListOf<String>()
+        for ((internalName, price) in items.sortedDesc()) {
+            val itemProfit = data.items[internalName] ?: error("Item not found for $internalName")
 
             val amount = itemProfit.totalAmount
-
             val displayAmount = if (internalName == SKYBLOCK_COIN) itemProfit.timesGained else amount
 
             val cleanName = if (internalName == SKYBLOCK_COIN) {
@@ -125,8 +123,7 @@ class SkyHanniItemTracker<Data : ItemTrackerData>(
             if (limitList.enabled.get()) {
                 if (pos > limitList.alwaysShowBest.get()) {
                     if (price < limitList.minPrice.get() * 1000) {
-                        hiddenItems++
-                        hiddenItemTexts = hiddenItemTexts + displayName
+                        hiddenItemTexts += displayName
                         continue
                     }
                 }
@@ -151,8 +148,8 @@ class SkyHanniItemTracker<Data : ItemTrackerData>(
 
             lists.addAsSingletonList(renderable)
         }
-        if (hiddenItems > 0) {
-            lists.addAsSingletonList(Renderable.hoverTips(" §7$hiddenItems cheap items are hidden.", hiddenItemTexts))
+        if (hiddenItemTexts.size > 0) {
+            lists.addAsSingletonList(Renderable.hoverTips(" §7${hiddenItemTexts.size} cheap items are hidden.", hiddenItemTexts))
         }
 
         return profit
