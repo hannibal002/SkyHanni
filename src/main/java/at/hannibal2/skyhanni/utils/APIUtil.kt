@@ -6,6 +6,7 @@ import com.google.gson.JsonElement
 import com.google.gson.JsonObject
 import com.google.gson.JsonParser
 import com.google.gson.JsonSyntaxException
+import org.apache.http.HttpEntity
 import org.apache.http.client.config.RequestConfig
 import org.apache.http.client.methods.HttpGet
 import org.apache.http.client.methods.HttpPost
@@ -21,10 +22,12 @@ import java.io.FileInputStream
 import java.io.InputStreamReader
 import java.nio.charset.StandardCharsets
 
-
 object APIUtil {
+
     private val parser = JsonParser()
     private var showApiErrors = false
+
+    data class ApiResponse(val success: Boolean, val message: String?, val data: JsonObject)
 
     private val builder: HttpClientBuilder =
         HttpClients.custom().setUserAgent("SkyHanni/${SkyHanniMod.version}")
@@ -46,7 +49,7 @@ object APIUtil {
     fun getJSONResponseAsElement(
         urlString: String,
         silentError: Boolean = false,
-        apiName: String = "Hypixel API"
+        apiName: String = "Hypixel API",
     ): JsonElement {
         val client = builder.build()
         try {
@@ -60,20 +63,21 @@ object APIUtil {
                         if (e.message?.contains("Use JsonReader.setLenient(true)") == true) {
                             println("MalformedJsonException: Use JsonReader.setLenient(true)")
                             println(" - getJSONResponse: '$urlString'")
-                            LorenzUtils.debug("MalformedJsonException: Use JsonReader.setLenient(true)")
+                            ChatUtils.debug("MalformedJsonException: Use JsonReader.setLenient(true)")
                         } else if (retSrc.contains("<center><h1>502 Bad Gateway</h1></center>")) {
                             if (showApiErrors && apiName == "Hypixel API") {
-                                LorenzUtils.clickableChat(
+                                ChatUtils.clickableChat(
                                     "Problems with detecting the Hypixel API. §eClick here to hide this message for now.",
                                     "shtogglehypixelapierrors"
                                 )
                             }
                             e.printStackTrace()
-
                         } else {
-                            ErrorManager.logError(
-                                Error("$apiName error for url: '$urlString'", e),
-                                "Failed to load data from $apiName"
+                            ErrorManager.logErrorWithData(
+                                e, "$apiName error for url: '$urlString'",
+                                "apiName" to apiName,
+                                "urlString" to urlString,
+                                "returnedData" to retSrc
                             )
                         }
                     }
@@ -83,9 +87,10 @@ object APIUtil {
             if (silentError) {
                 throw throwable
             } else {
-                ErrorManager.logError(
-                    Error("$apiName error for url: '$urlString'", throwable),
-                    "Failed to load data from $apiName"
+                ErrorManager.logErrorWithData(
+                    throwable, "$apiName error for url: '$urlString'",
+                    "apiName" to apiName,
+                    "urlString" to urlString,
                 )
             }
         } finally {
@@ -94,34 +99,60 @@ object APIUtil {
         return JsonObject()
     }
 
-    fun postJSONIsSuccessful(urlString: String, body: String, silentError: Boolean = false): Boolean {
+    fun postJSON(urlString: String, body: String, silentError: Boolean = false): ApiResponse {
         val client = builder.build()
+
         try {
             val method = HttpPost(urlString)
             method.entity = StringEntity(body, ContentType.APPLICATION_JSON)
 
             client.execute(method).use { response ->
                 val status = response.statusLine
+                val entity = response.entity
 
-                if (status.statusCode >= 200 || status.statusCode < 300) {
-                    return true
+                if (status.statusCode in 200..299) {
+                    val data = readResponse(entity)
+                    return ApiResponse(true, "Request successful", data)
                 }
 
-                println("POST request to '$urlString' returned status ${status.statusCode}")
-                LorenzUtils.error("SkyHanni ran into an error whilst sending data. Status: ${status.statusCode}")
-
-                return false
+                val message = "POST request to '$urlString' returned status ${status.statusCode}"
+                println(message)
+                ChatUtils.error("SkyHanni ran into an error. Status: ${status.statusCode}")
+                return ApiResponse(false, message, JsonObject())
             }
         } catch (throwable: Throwable) {
             if (silentError) {
                 throw throwable
             } else {
                 throwable.printStackTrace()
-                LorenzUtils.error("SkyHanni ran into an ${throwable::class.simpleName ?: "error"} whilst sending a resource. See logs for more details.")
+                ChatUtils.error("SkyHanni ran into an ${throwable::class.simpleName ?: "error"} whilst sending a resource. See logs for more details.")
             }
+            return ApiResponse(false, throwable.message, JsonObject())
         } finally {
             client.close()
         }
+    }
+
+    private fun readResponse(entity: HttpEntity): JsonObject {
+        val retSrc = EntityUtils.toString(entity)
+        return parser.parse(retSrc) as JsonObject
+    }
+
+    fun postJSONIsSuccessful(url: String, body: String, silentError: Boolean = false): Boolean {
+        val response = postJSON(url, body, silentError)
+
+        if (response.success) {
+            return true
+        }
+
+        println(response.message)
+        ErrorManager.logErrorStateWithData(
+            "An error occurred during the API request",
+            "unsuccessful API response",
+            "url" to url,
+            "body" to body,
+            "response" to response,
+        )
 
         return false
     }
@@ -132,6 +163,6 @@ object APIUtil {
 
     fun toggleApiErrorMessages() {
         showApiErrors = !showApiErrors
-        LorenzUtils.chat("Hypixel API error messages " + if (showApiErrors) "§chidden" else "§ashown")
+        ChatUtils.chat("Hypixel API error messages " + if (showApiErrors) "§chidden" else "§ashown")
     }
 }

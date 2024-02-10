@@ -156,6 +156,13 @@ public class InventoryConfig {
     public boolean highlightMissingSkyBlockLevelGuide = true;
 
     @Expose
+    @ConfigOption(name = "Power Stone Guide",
+        desc = "Highlight missing power stones, show their total bazaar price, and allows to open the bazaar when clicking on the items in the Power Stone Guide.")
+    @ConfigEditorBoolean
+    @FeatureToggle
+    public boolean powerStoneGuide = true;
+
+    @Expose
     @ConfigOption(name = "Highlight Auctions",
         desc = "Highlight own items that are sold in green and that are expired in red.")
     @ConfigEditorBoolean
@@ -177,14 +184,27 @@ public class InventoryConfig {
     public boolean copyUnderbidPrice = false;
 
     @Expose
-    @ConfigOption(name = "Shift Click Equipment", desc = "Makes normal clicks to shift clicks in equipment inventory")
+    @ConfigOption(name = "Shift Click Equipment", desc = "Makes normal clicks to shift clicks in equipment inventory.")
     @ConfigEditorBoolean
     @FeatureToggle
     public boolean shiftClickForEquipment = false;
+
+    @Expose
+    @ConfigOption(name = "Shift Click NPC sell", desc = "Makes normal clicks to shift clicks in npc inventory for selling.")
+    @ConfigEditorBoolean
+    @FeatureToggle
+    public boolean shiftClickNPCSell = false;
+
+    @Expose
+    @ConfigOption(name = "Shift Click Brewing", desc = "Makes normal clicks to shift clicks in Brewing Stand inventory.")
+    @ConfigEditorBoolean
+    @FeatureToggle
+    public boolean shiftClickBrewing = false;
 
     @Expose
     @ConfigOption(name = "Low Quiver Alert", desc = "Notifies you when your Quiver runs out of arrows.")
     @ConfigEditorBoolean
     @FeatureToggle
     public boolean quiverAlert = false;
+
 }

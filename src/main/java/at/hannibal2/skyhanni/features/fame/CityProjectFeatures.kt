@@ -9,20 +9,23 @@ import at.hannibal2.skyhanni.events.InventoryCloseEvent
 import at.hannibal2.skyhanni.events.InventoryFullyOpenedEvent
 import at.hannibal2.skyhanni.events.LorenzTickEvent
 import at.hannibal2.skyhanni.features.bazaar.BazaarApi
+import at.hannibal2.skyhanni.utils.ChatUtils
+import at.hannibal2.skyhanni.utils.CollectionUtils.addAsSingletonList
 import at.hannibal2.skyhanni.utils.ItemUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.ItemUtils.name
 import at.hannibal2.skyhanni.utils.LorenzColor
 import at.hannibal2.skyhanni.utils.LorenzUtils
-import at.hannibal2.skyhanni.utils.LorenzUtils.addAsSingletonList
 import at.hannibal2.skyhanni.utils.NEUItems
 import at.hannibal2.skyhanni.utils.NumberUtil
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.RenderUtils.highlight
 import at.hannibal2.skyhanni.utils.RenderUtils.renderStringsAndItems
 import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
+import at.hannibal2.skyhanni.utils.StringUtils.matches
 import at.hannibal2.skyhanni.utils.TimeUtils
 import at.hannibal2.skyhanni.utils.renderables.Renderable
+import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraft.client.Minecraft
 import net.minecraft.client.gui.inventory.GuiChest
 import net.minecraft.client.gui.inventory.GuiEditSign
@@ -31,18 +34,27 @@ import net.minecraft.item.ItemStack
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
 class CityProjectFeatures {
+
     private var display = emptyList<List<Any>>()
     private var inInventory = false
     private var lastReminderSend = 0L
 
-    // TODO USE SH-REPO
-    private val contributeAgainPattern = "§7Contribute again: §e(?<time>.*)".toPattern()
+    private val patternGroup = RepoPattern.group("fame.projects")
+    private val contributeAgainPattern by patternGroup.pattern(
+        "contribute",
+        "§7Contribute again: §e(?<time>.*)"
+    )
+    private val completedPattern by patternGroup.pattern(
+        "completed",
+        "§aProject is (?:being built|released)!"
+    )
 
     companion object {
+
         private val config get() = SkyHanniMod.feature.event.cityProject
         fun disable() {
             config.dailyReminder = false
-            LorenzUtils.chat("Disabled city project reminder messages!")
+            ChatUtils.chat("Disabled city project reminder messages!")
         }
     }
 
@@ -67,7 +79,7 @@ class CityProjectFeatures {
         if (lastReminderSend + 30_000 > System.currentTimeMillis()) return
         lastReminderSend = System.currentTimeMillis()
 
-        LorenzUtils.clickableChat(
+        ChatUtils.clickableChat(
             "Daily City Project Reminder! (Click here to disable this reminder)",
             "shstopcityprojectreminder"
         )
@@ -104,7 +116,8 @@ class CityProjectFeatures {
                 val itemName = item.name ?: continue
 
                 val lore = item.getLore()
-                if (lore.lastOrNull() == "§aProject is being built!") continue
+                val completed = lore.lastOrNull()?.let { completedPattern.matches(it) } ?: false
+                if (completed) continue
                 for (line in lore) {
                     contributeAgainPattern.matchMatcher(line) {
                         val rawTime = group("time")
@@ -163,7 +176,8 @@ class CityProjectFeatures {
     private fun fetchMaterials(item: ItemStack, materials: MutableMap<String, Int>) {
         var next = false
         val lore = item.getLore()
-        if (lore.lastOrNull() == "§aProject is being built!") return
+        val completed = lore.lastOrNull()?.let { completedPattern.matches(it) } ?: false
+        if (completed) return
         for (line in lore) {
             if (line == "§7Cost") {
                 next = true

@@ -10,6 +10,7 @@ import net.minecraft.client.audio.SoundCategory
 import net.minecraft.util.ResourceLocation
 
 object SoundUtils {
+
     private val beepSound by lazy { createSound("random.orb", 1f) }
     private val clickSound by lazy { createSound("gui.button.press", 1f) }
     private val errorSound by lazy { createSound("mob.endermen.portal", 0f) }
@@ -66,7 +67,7 @@ object SoundUtils {
 
     fun command(args: Array<String>) {
         if (args.isEmpty()) {
-            LorenzUtils.userError("Specify a sound effect to test")
+            ChatUtils.userError("Specify a sound effect to test")
             return
         }
 
