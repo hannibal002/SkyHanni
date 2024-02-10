@@ -89,7 +89,7 @@ object MaxwellAPI {
         if (yourBagsGuiPattern.matches(event.inventoryName)) {
             val stacks = event.inventoryItems
 
-            stack@for (stack in stacks.values) {
+            for (stack in stacks.values) {
                 val lore = stack.getLore()
                 line@for (line in lore) {
                     inventoryMPPattern.matchMatcher(line) {
@@ -104,7 +104,7 @@ object MaxwellAPI {
                     inventoryPowerPattern.matchMatcher(line) {
                         val power = group("power")
                         currentPower = getPowerByNameOrNull(power) ?: return
-                        return
+                        continue@line
                     }
                 }
             }
