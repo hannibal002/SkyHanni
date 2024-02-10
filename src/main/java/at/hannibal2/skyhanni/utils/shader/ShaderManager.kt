@@ -22,11 +22,13 @@ object ShaderManager {
      * in the when expression
      */
     enum class Shaders(val shader: Shader) {
+
         STANDARD_CHROMA(StandardChromaShader.INSTANCE),
         TEXTURED_CHROMA(TexturedChromaShader.INSTANCE),
         ROUNDED_RECTANGLE(RoundedRectangleShader.INSTANCE);
 
         companion object {
+
             fun getShaderInstance(shaderName: String): Shader? = when (shaderName) {
                 "standard_chroma" -> STANDARD_CHROMA.shader
                 "textured_chroma" -> TEXTURED_CHROMA.shader

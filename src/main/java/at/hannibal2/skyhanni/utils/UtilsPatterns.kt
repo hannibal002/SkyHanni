@@ -18,7 +18,9 @@ object UtilsPatterns {
      **/
     val rarityLoreLinePattern by patternGroup.pattern(
         "item.lore.rarity.line",
-        "^(?:§.){2,3}(?:.§. (?:§.){4})?(?:SHINY )?(?<rarity>${enumJoinToPattern<LorenzRarity> { it.name.replace("_", " ") }}) ?(?:DUNGEON )?(?<itemCategory>[^§]*)(?: (?:§.){3}.)?$"
+        "^(?:§.){2,3}(?:.§. (?:§.){4})?(?:SHINY )?(?<rarity>" +
+            enumJoinToPattern<LorenzRarity> { it.name.replace("_", " ") } +
+            ") ?(?:DUNGEON )?(?<itemCategory>[^§]*)(?: (?:§.){3}.)?$"
     )
 
     val abiPhonePattern by patternGroup.pattern(
@@ -30,6 +32,10 @@ object UtilsPatterns {
         "item.name.enchanted.book",
         ".{2}?Enchanted Book"
     )
+    val enchantmentNamePattern by patternGroup.pattern(
+        "item.neuitems.enchantmentname",
+        "^(?<format>(?:§.)+)(?<name>[^§]+) (?<level>[IVXL]+)$"
+    )
 
     val potionPattern by patternGroup.pattern(
         "item.name.potion",
@@ -40,7 +46,7 @@ object UtilsPatterns {
         "(?:§f§f)?§7\\[Lvl (?<level>\\d+)] .*"
     )
 
-    val seasonPattern by RepoPattern.pattern(
+    val seasonPattern by patternGroup.pattern(
         "skyblocktime.season",
         "(?:Early |Late )?(?<season>Spring|Summer|Autumn|Winter)"
     )

@@ -11,6 +11,7 @@ import net.minecraft.util.EnumChatFormatting.RED
 import org.lwjgl.input.Mouse
 
 class GuiOptionEditorUpdateCheck(option: ProcessedOption) : GuiOptionEditor(option) {
+
     val button = GuiElementButton("", -1) { }
 
     override fun render(x: Int, y: Int, width: Int) {

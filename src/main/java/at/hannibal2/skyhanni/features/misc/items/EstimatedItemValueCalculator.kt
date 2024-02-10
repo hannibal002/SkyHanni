@@ -2,16 +2,15 @@ package at.hannibal2.skyhanni.features.misc.items
 
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.test.command.ErrorManager
+import at.hannibal2.skyhanni.utils.CollectionUtils.sortedDesc
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName
 import at.hannibal2.skyhanni.utils.ItemUtils.getItemName
-import at.hannibal2.skyhanni.utils.ItemUtils.getItemNameOrNull
 import at.hannibal2.skyhanni.utils.ItemUtils.getItemRarityOrNull
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.ItemUtils.isRune
 import at.hannibal2.skyhanni.utils.ItemUtils.name
 import at.hannibal2.skyhanni.utils.ItemUtils.nameWithEnchantment
 import at.hannibal2.skyhanni.utils.LorenzRarity
-import at.hannibal2.skyhanni.utils.LorenzUtils.sortedDesc
 import at.hannibal2.skyhanni.utils.NEUInternalName
 import at.hannibal2.skyhanni.utils.NEUInternalName.Companion.asInternalName
 import at.hannibal2.skyhanni.utils.NEUItems
@@ -56,6 +55,7 @@ import net.minecraft.item.ItemStack
 import java.util.Locale
 
 object EstimatedItemValueCalculator {
+
     private val config get() = SkyHanniMod.feature.misc.estimatedItemValues
     private val additionalCostFunctions = listOf(
         ::addAttributeCost,
@@ -191,7 +191,7 @@ object EstimatedItemValueCalculator {
     private fun getReforgeStoneApplyCost(
         stack: ItemStack,
         reforgeCosts: JsonObject,
-        reforgeStone: NEUInternalName
+        reforgeStone: NEUInternalName,
     ): Int? {
         var itemRarity = stack.getItemRarityOrNull() ?: return null
 
@@ -437,28 +437,30 @@ object EstimatedItemValueCalculator {
 
     private fun addHelmetSkin(stack: ItemStack, list: MutableList<String>): Double {
         val internalName = stack.getHelmetSkin() ?: return 0.0
-
-        val price = internalName.getPrice()
-        val name = internalName.getNameOrRepoError()
-        val displayname = name ?: "§c${internalName.asString()}"
-        list.add("§7Skin: $displayname §7(§6" + NumberUtil.format(price) + "§7)")
-        if (name == null) {
-            list.add("   §8(Not yet in NEU Repo)")
-        }
-        return price
+        return addCosmetic(internalName, list, "Skin", config.ignoreHelmetSkins)
     }
 
     private fun addArmorDye(stack: ItemStack, list: MutableList<String>): Double {
         val internalName = stack.getArmorDye() ?: return 0.0
+        return addCosmetic(internalName, list, "Dye", config.ignoreArmorDyes)
+    }
 
+    private fun addCosmetic(
+        internalName: NEUInternalName,
+        list: MutableList<String>,
+        label: String,
+        shouldIgnorePrice: Boolean,
+    ): Double {
         val price = internalName.getPrice()
         val name = internalName.getNameOrRepoError()
         val displayname = name ?: "§c${internalName.asString()}"
-        list.add("§7Dye: $displayname §7(§6" + NumberUtil.format(price) + "§7)")
+        val color = if (shouldIgnorePrice) "§7" else "§6"
+        list.add("§7$label: $displayname §7($color" + NumberUtil.format(price) + "§7)")
         if (name == null) {
             list.add("   §8(Not yet in NEU Repo)")
         }
-        return price
+
+        return if (shouldIgnorePrice) 0.0 else price
     }
 
     private fun addEnrichment(stack: ItemStack, list: MutableList<String>): Double {
@@ -476,14 +478,7 @@ object EstimatedItemValueCalculator {
         if (stack.getInternalName().isRune()) return 0.0
         val internalName = stack.getRune() ?: return 0.0
 
-        val price = internalName.getPrice()
-        val name = internalName.getItemNameOrNull()
-        val displayname = name ?: "§c${internalName.asString()}"
-        list.add("§7Rune: $displayname §7(§6" + NumberUtil.format(price) + "§7)")
-        if (name == null) {
-            list.add("   §8(Not yet in NEU Repo)")
-        }
-        return price
+        return addCosmetic(internalName, list, "Rune", config.ignoreRunes)
     }
 
     private fun NEUInternalName.getNameOrRepoError(): String? {
@@ -552,6 +547,8 @@ object EstimatedItemValueCalculator {
         val map = mutableMapOf<String, Double>()
 
         val tieredEnchants = listOf("compact", "cultivating", "champion", "expertise", "hecatomb")
+        val onlyTierOnePrices =
+            listOf("ultimate_chimera", "ultimate_fatal_tempo", "smoldering", "ultimate_flash", "divine_gift")
 
         val internalName = stack.getInternalName()
         for ((rawName, rawLevel) in enchantments) {
@@ -568,7 +565,7 @@ object EstimatedItemValueCalculator {
 
             var level = rawLevel
             var multiplier = 1
-            if (rawName == "ultimate_chimera" || rawName == "ultimate_fatal_tempo" || rawName == "smoldering") {
+            if (rawName in onlyTierOnePrices) {
 
                 when (rawLevel) {
                     2 -> multiplier = 2
@@ -577,7 +574,6 @@ object EstimatedItemValueCalculator {
                     5 -> multiplier = 16
                 }
                 level = 1
-
             }
             if (internalName.startsWith("ENCHANTED_BOOK_BUNDLE_")) {
                 multiplier = 5

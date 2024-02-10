@@ -14,6 +14,7 @@ import at.hannibal2.skyhanni.features.chat.Translator
 import at.hannibal2.skyhanni.features.combat.endernodetracker.EnderNodeTracker
 import at.hannibal2.skyhanni.features.combat.ghostcounter.GhostUtil
 import at.hannibal2.skyhanni.features.commands.PartyCommands
+import at.hannibal2.skyhanni.features.commands.WikiManager
 import at.hannibal2.skyhanni.features.event.diana.BurrowWarpHelper
 import at.hannibal2.skyhanni.features.event.diana.DianaProfitTracker
 import at.hannibal2.skyhanni.features.event.diana.GriffinBurrowHelper
@@ -29,6 +30,7 @@ import at.hannibal2.skyhanni.features.garden.GardenAPI
 import at.hannibal2.skyhanni.features.garden.GardenCropTimeCommand
 import at.hannibal2.skyhanni.features.garden.GardenCropsInCommand
 import at.hannibal2.skyhanni.features.garden.GardenNextJacobContest
+import at.hannibal2.skyhanni.features.garden.SensitivityReducer
 import at.hannibal2.skyhanni.features.garden.composter.ComposterOverlay
 import at.hannibal2.skyhanni.features.garden.farming.ArmorDropTracker
 import at.hannibal2.skyhanni.features.garden.farming.CropMoneyDisplay
@@ -55,6 +57,7 @@ import at.hannibal2.skyhanni.test.SkyHanniConfigSearchResetCommand
 import at.hannibal2.skyhanni.test.SkyHanniDebugsAndTests
 import at.hannibal2.skyhanni.test.TestBingo
 import at.hannibal2.skyhanni.test.WorldEdit
+import at.hannibal2.skyhanni.test.command.CopyBossbarCommand
 import at.hannibal2.skyhanni.test.command.CopyItemCommand
 import at.hannibal2.skyhanni.test.command.CopyNearbyEntitiesCommand
 import at.hannibal2.skyhanni.test.command.CopyNearbyParticlesCommand
@@ -62,6 +65,7 @@ import at.hannibal2.skyhanni.test.command.CopyScoreboardCommand
 import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.test.command.TestChatCommand
 import at.hannibal2.skyhanni.utils.APIUtil
+import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.SoundUtils
 import at.hannibal2.skyhanni.utils.TabListData
@@ -216,6 +220,10 @@ object Commands {
             "Lock/Unlock the mouse so it will no longer rotate the player (for farming)"
         ) { LockMouseLook.toggleLock() }
         registerCommand(
+            "shsensreduce",
+            "Lowers the mouse sensitivity for easier small adjustments (for farming)"
+        ) { SensitivityReducer.manualToggle() }
+        registerCommand(
             "shresetvermintracker",
             "Resets the Vermin Tracker"
         ) { VerminTracker.resetCommand(it) }
@@ -231,6 +239,22 @@ object Commands {
             "shresetseacreaturetracker",
             "Resets the Sea Creature Tracker"
         ) { SeaCreatureTracker.resetCommand(it) }
+        registerCommand(
+            "shfandomwiki",
+            "Searches the fandom wiki with SkyHanni's own method."
+        ) {WikiManager.otherWikiCommands(it, true)}
+        registerCommand(
+            "shfandomwikithis",
+            "Searches the fandom wiki with SkyHanni's own method."
+        ) {WikiManager.otherWikiCommands(it, true, true)}
+        registerCommand(
+            "shofficialwiki",
+            "Searches the official wiki with SkyHanni's own method."
+        ) {WikiManager.otherWikiCommands(it, false)}
+        registerCommand(
+            "shofficialwikithis",
+            "Searches the official wiki with SkyHanni's own method."
+        ) {WikiManager.otherWikiCommands(it, false, true)}
         registerCommand0("shcalccrop", "Calculate how many crops need to be farmed between different crop milestones.", {
             FarmingMilestoneCommand.onCommand(it.getOrNull(0), it.getOrNull(1), it.getOrNull(2), false)
         }, FarmingMilestoneCommand::onComplete)
@@ -356,6 +380,10 @@ object Commands {
             "Copies the scoreboard data to the clipboard"
         ) { CopyScoreboardCommand.command(it) }
         registerCommand(
+            "shcopybossbar",
+            "Copies the name of the bossbar to the clipboard, including formatting codes"
+        ) { CopyBossbarCommand.command(it) }
+        registerCommand(
             "shcopyitem",
             "Copies information about the item in hand to the clipboard"
         ) { CopyItemCommand.command() }
@@ -413,6 +441,7 @@ object Commands {
         registerCommand("pk", "Kick a specific party member") { PartyCommands.kick(it) }
         registerCommand("pt", "Transfer the party to another party member") { PartyCommands.transfer(it) }
         registerCommand("pp", "Promote a specific party member") { PartyCommands.promote(it) }
+        registerCommand("pd", "Disbands the party") { PartyCommands.disband() }
     }
 
     private fun commandHelp(args: Array<String>) {
@@ -454,7 +483,7 @@ object Commands {
     @JvmStatic
     fun openFortuneGuide() {
         if (!LorenzUtils.inSkyBlock) {
-            LorenzUtils.userError("Join SkyBlock to open the fortune guide!")
+            ChatUtils.userError("Join SkyBlock to open the fortune guide!")
         } else {
             CaptureFarmingGear.captureFarmingGear()
             SkyHanniMod.screenToOpen = FFGuideGUI()
@@ -464,7 +493,7 @@ object Commands {
     @JvmStatic
     fun openVisualWords() {
         if (!LorenzUtils.onHypixel) {
-            LorenzUtils.userError("You need to join Hypixel to use this feature!")
+            ChatUtils.userError("You need to join Hypixel to use this feature!")
         } else {
             if (VisualWordGui.sbeConfigPath.exists()) VisualWordGui.drawImport = true
             SkyHanniMod.screenToOpen = VisualWordGui()
@@ -473,7 +502,7 @@ object Commands {
 
     private fun clearFarmingItems() {
         val storage = GardenAPI.storage?.fortune ?: return
-        LorenzUtils.chat("clearing farming items")
+        ChatUtils.chat("clearing farming items")
         storage.farmingItems.clear()
         storage.outdatedItems.clear()
     }

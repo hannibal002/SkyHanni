@@ -6,6 +6,7 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
 class CommandsSendToServerLogger {
     companion object {
+
         fun logCommandsToServer(command: String) {
             if (SkyHanniMod.feature.dev.debug.commandLogs) {
                 Exception("command send to server: '$command'").printStackTrace()

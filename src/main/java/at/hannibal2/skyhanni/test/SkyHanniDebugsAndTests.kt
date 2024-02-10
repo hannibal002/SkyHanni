@@ -16,6 +16,7 @@ import at.hannibal2.skyhanni.events.ReceiveParticleEvent
 import at.hannibal2.skyhanni.features.garden.GardenNextJacobContest
 import at.hannibal2.skyhanni.features.garden.visitor.GardenVisitorColorNames
 import at.hannibal2.skyhanni.test.GriffinUtils.drawWaypointFilled
+import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalNameOrNull
@@ -28,13 +29,13 @@ import at.hannibal2.skyhanni.utils.LorenzColor
 import at.hannibal2.skyhanni.utils.LorenzDebug
 import at.hannibal2.skyhanni.utils.LorenzLogger
 import at.hannibal2.skyhanni.utils.LorenzUtils
-import at.hannibal2.skyhanni.utils.LorenzUtils.makeAccessible
 import at.hannibal2.skyhanni.utils.LorenzVec
 import at.hannibal2.skyhanni.utils.NEUInternalName
 import at.hannibal2.skyhanni.utils.NEUItems
 import at.hannibal2.skyhanni.utils.NEUItems.getNpcPriceOrNull
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.OSUtils
+import at.hannibal2.skyhanni.utils.ReflectionUtils.makeAccessible
 import at.hannibal2.skyhanni.utils.RenderUtils.drawDynamicText
 import at.hannibal2.skyhanni.utils.RenderUtils.renderString
 import at.hannibal2.skyhanni.utils.RenderUtils.renderStringsAndItems
@@ -53,6 +54,7 @@ import kotlin.time.Duration.Companion.seconds
 class SkyHanniDebugsAndTests {
 
     companion object {
+
         private val config get() = SkyHanniMod.feature.dev
         private val debugConfig get() = config.debug
         var displayLine = ""
@@ -93,14 +95,14 @@ class SkyHanniDebugsAndTests {
 
             if (args.isEmpty()) {
                 testLocation = null
-                LorenzUtils.chat("reset test waypoint")
+                ChatUtils.chat("reset test waypoint")
             }
 
             val x = args[0].toDouble()
             val y = args[1].toDouble()
             val z = args[2].toDouble()
             testLocation = LorenzVec(x, y, z)
-            LorenzUtils.chat("set test waypoint")
+            ChatUtils.chat("set test waypoint")
         }
 
         fun testCommand(args: Array<String>) {
@@ -184,7 +186,7 @@ class SkyHanniDebugsAndTests {
                 return
             }
 
-            LorenzUtils.clickableChat(
+            ChatUtils.clickableChat(
                 "§cTHIS WILL RESET YOUR SkyHanni CONFIG! Click here to procceed.",
                 "shconfigmanagerreset confirm",
                 false
@@ -209,7 +211,7 @@ class SkyHanniDebugsAndTests {
 
                 // resetting the MoulConfigProcessor in use
                 ConfigGuiManager.editor = null
-                LorenzUtils.chat("Reset the config manager!")
+                ChatUtils.chat("Reset the config manager!")
             }.start()
         }
 
@@ -239,7 +241,7 @@ class SkyHanniDebugsAndTests {
                         val internalName = NEUItems.getRawInternalName(itemName)
                         list.add(NEUItems.getItemStack(internalName))
                     } catch (e: Error) {
-                        LorenzUtils.debug("itemName '$itemName' is invalid for visitor '$name'")
+                        ChatUtils.debug("itemName '$itemName' is invalid for visitor '$name'")
                         errors++
                     }
                 }
@@ -251,9 +253,9 @@ class SkyHanniDebugsAndTests {
             bigList.add(list)
             displayList = bigList
             if (errors == 0) {
-                LorenzUtils.debug("Test garden visitor renderer: no errors")
+                ChatUtils.debug("Test garden visitor renderer: no errors")
             } else {
-                LorenzUtils.debug("Test garden visitor renderer: $errors errors")
+                ChatUtils.debug("Test garden visitor renderer: $errors errors")
             }
         }
 
@@ -282,7 +284,7 @@ class SkyHanniDebugsAndTests {
                     println("Skipped registering listener $simpleName")
                 }
             }
-            LorenzUtils.chat("reloaded ${modules.size} listener classes.")
+            ChatUtils.chat("reloaded ${modules.size} listener classes.")
         }
 
         fun stopListeners() {
@@ -293,22 +295,22 @@ class SkyHanniDebugsAndTests {
                 MinecraftForge.EVENT_BUS.unregister(original)
                 println("Unregistered listener $simpleName")
             }
-            LorenzUtils.chat("stopped ${modules.size} listener classes.")
+            ChatUtils.chat("stopped ${modules.size} listener classes.")
         }
 
         fun whereAmI() {
             if (LorenzUtils.inSkyBlock) {
-                LorenzUtils.chat("§eYou are currently in ${LorenzUtils.skyBlockIsland}.")
+                ChatUtils.chat("§eYou are currently in ${LorenzUtils.skyBlockIsland}.")
                 return
             }
-            LorenzUtils.chat("§eYou are not in Skyblock.")
+            ChatUtils.chat("§eYou are not in Skyblock.")
         }
 
         private var lastManualContestDataUpdate = SimpleTimeMark.farPast()
 
         fun clearContestData() {
             if (lastManualContestDataUpdate.passedSince() < 30.seconds) {
-                LorenzUtils.userError("§cYou already cleared Jacob's Contest data recently!")
+                ChatUtils.userError("§cYou already cleared Jacob's Contest data recently!")
                 return
             }
             lastManualContestDataUpdate = SimpleTimeMark.now()
@@ -338,34 +340,34 @@ class SkyHanniDebugsAndTests {
 
         fun debugVersion() {
             val name = "SkyHanni ${SkyHanniMod.version}"
-            LorenzUtils.chat("§eYou are using $name")
+            ChatUtils.chat("§eYou are using $name")
             OSUtils.copyToClipboard(name)
         }
 
         fun copyItemInternalName() {
             val hand = InventoryUtils.getItemInHand()
             if (hand == null) {
-                LorenzUtils.userError("No item in hand!")
+                ChatUtils.userError("No item in hand!")
                 return
             }
 
             val internalName = hand.getInternalNameOrNull()
             if (internalName == null) {
-                LorenzUtils.error("§cInternal name is null for item ${hand.name}")
+                ChatUtils.error("§cInternal name is null for item ${hand.name}")
                 return
             }
 
             val rawInternalName = internalName.asString()
             OSUtils.copyToClipboard(rawInternalName)
-            LorenzUtils.chat("§eCopied internal name §7$rawInternalName §eto the clipboard!")
+            ChatUtils.chat("§eCopied internal name §7$rawInternalName §eto the clipboard!")
         }
 
         fun toggleRender() {
             globalRender = !globalRender
             if (globalRender) {
-                LorenzUtils.chat("§aEnabled global renderer!")
+                ChatUtils.chat("§aEnabled global renderer!")
             } else {
-                LorenzUtils.chat("§cDisabled global renderer! Run this command again to show SkyHanni rendering again.")
+                ChatUtils.chat("§cDisabled global renderer! Run this command again to show SkyHanni rendering again.")
             }
         }
     }
@@ -379,7 +381,7 @@ class SkyHanniDebugsAndTests {
         val internalName = stack.getInternalNameOrNull() ?: return
         val rawInternalName = internalName.asString()
         OSUtils.copyToClipboard(rawInternalName)
-        LorenzUtils.chat("§eCopied internal name §7$rawInternalName §eto the clipboard!")
+        ChatUtils.chat("§eCopied internal name §7$rawInternalName §eto the clipboard!")
     }
 
     @SubscribeEvent
@@ -390,7 +392,6 @@ class SkyHanniDebugsAndTests {
         val internalName = itemStack.getInternalName()
         if ((internalName == NEUInternalName.NONE) && !debugConfig.showEmptyNames) return
         event.toolTip.add("Internal Name: '${internalName.asString()}'")
-
     }
 
     @SubscribeEvent
@@ -425,7 +426,7 @@ class SkyHanniDebugsAndTests {
 
     @SubscribeEvent
     fun onRenderLocation(event: GuiRenderEvent.GuiOverlayRenderEvent) {
-        if (LorenzUtils.inSkyBlock && Minecraft.getMinecraft().gameSettings.showDebugInfo) {
+        if (LorenzUtils.inSkyBlock && Minecraft.getMinecraft().gameSettings.showDebugInfo && debugConfig.currentAreaDebug) {
             config.debugLocationPos.renderString(
                 "Current Area: ${HypixelData.skyBlockArea}",
                 posLabel = "SkyBlock Area (Debug)"
@@ -434,8 +435,7 @@ class SkyHanniDebugsAndTests {
     }
 
     @SubscribeEvent
-    fun onChatMessage(event: LorenzChatEvent) {
-
+    fun onChat(event: LorenzChatEvent) {
     }
 
     @SubscribeEvent
@@ -571,7 +571,7 @@ class SkyHanniDebugsAndTests {
 //        if (soundName == "mob.zombie.infect") {
 //            if (pitch == 1.968254f) {
 //                if (volume == 0.3f) {
-//                    LorenzUtils.chat("used ancestral spade!")
+//                    ChatUtils.chat("used ancestral spade!")
 //                    return
 //                }
 //            }
@@ -662,6 +662,5 @@ class SkyHanniDebugsAndTests {
         event.move(3, "dev.showItemRarity", "dev.debug.showItemRarity")
         event.move(3, "dev.copyInternalName", "dev.debug.copyInternalName")
         event.move(3, "dev.showNpcPrice", "dev.debug.showNpcPrice")
-
     }
 }
