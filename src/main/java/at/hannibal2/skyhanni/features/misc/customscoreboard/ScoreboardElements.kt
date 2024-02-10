@@ -1,6 +1,7 @@
 package at.hannibal2.skyhanni.features.misc.customscoreboard
 
 import at.hannibal2.skyhanni.SkyHanniMod
+import at.hannibal2.skyhanni.config.features.gui.customscoreboard.DisplayConfig.ArrowAmountDisplay
 import at.hannibal2.skyhanni.data.BitsAPI
 import at.hannibal2.skyhanni.data.HypixelData
 import at.hannibal2.skyhanni.data.IslandType
@@ -9,6 +10,7 @@ import at.hannibal2.skyhanni.data.MayorAPI
 import at.hannibal2.skyhanni.data.PartyAPI
 import at.hannibal2.skyhanni.data.PurseAPI
 import at.hannibal2.skyhanni.data.QuiverAPI
+import at.hannibal2.skyhanni.data.QuiverAPI.asArrowPercentage
 import at.hannibal2.skyhanni.data.QuiverAPI.getArrowByNameOrNull
 import at.hannibal2.skyhanni.data.ScoreboardData
 import at.hannibal2.skyhanni.data.SlayerAPI
@@ -22,6 +24,7 @@ import at.hannibal2.skyhanni.utils.LorenzUtils.inAnyIsland
 import at.hannibal2.skyhanni.utils.LorenzUtils.inDungeons
 import at.hannibal2.skyhanni.utils.NEUInternalName.Companion.asInternalName
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
+import at.hannibal2.skyhanni.utils.NumberUtil.percentageColor
 import at.hannibal2.skyhanni.utils.RenderUtils.HorizontalAlignment
 import at.hannibal2.skyhanni.utils.StringUtils.firstLetterUppercase
 import at.hannibal2.skyhanni.utils.StringUtils.matches
@@ -501,11 +504,21 @@ private fun getQuiverDisplayPair(): List<ScoreboardElement> {
     if (QuiverAPI.currentArrow == getArrowByNameOrNull("NONE".asInternalName()))
         return listOf("No Arrows selected" to HorizontalAlignment.LEFT)
 
+    val amountString = (if (displayConfig.colorArrowAmount) {
+        percentageColor(QuiverAPI.currentAmount.toLong(), QuiverAPI.MAX_ARROW_AMOUNT.toLong()).getChatColor()
+    } else {
+        ""
+    }) + when (displayConfig.arrowAmountDisplay) {
+        ArrowAmountDisplay.NUMBER -> QuiverAPI.currentAmount.addSeparators()
+        ArrowAmountDisplay.PERCENTAGE -> "${QuiverAPI.currentAmount.asArrowPercentage()}%"
+        else -> QuiverAPI.currentAmount.addSeparators()
+    }
+
     return when (displayConfig.displayNumbersFirst) {
-        true -> listOf("${QuiverAPI.currentAmount.addSeparators()} ${QuiverAPI.currentArrow?.arrow} ")
+        true -> listOf("$amountString ${QuiverAPI.currentArrow?.arrow}s")
         false -> listOf(
             "§f${QuiverAPI.currentArrow?.arrow?.replace(" Arrow", "")}: " +
-                "${QuiverAPI.currentAmount.addSeparators()} Arrows"
+                "$amountString Arrows"
         )
     }.map { it to HorizontalAlignment.LEFT }
 }

@@ -58,6 +58,33 @@ public class DisplayConfig {
     }
 
     @Expose
+    @ConfigOption(name = "Arrow Amount Display", desc = "Determines how the arrow amount is displayed.")
+    @ConfigEditorDropdown
+    public ArrowAmountDisplay arrowAmountDisplay = ArrowAmountDisplay.NUMBER;
+
+    public enum ArrowAmountDisplay {
+        NUMBER("Number"),
+        PERCENTAGE("Percentage"),
+        ;
+
+        private final String str;
+
+        ArrowAmountDisplay(String str) {
+            this.str = str;
+        }
+
+        @Override
+        public String toString() {
+            return str;
+        }
+    }
+
+    @Expose
+    @ConfigOption(name = "Color Arrow Amount", desc = "Color the arrow amount based on the percentage.")
+    @ConfigEditorBoolean
+    public boolean colorArrowAmount = false;
+
+    @Expose
     @ConfigOption(name = "Alignment Options", desc = "")
     @Accordion
     public AlignmentConfig alignment = new AlignmentConfig();

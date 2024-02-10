@@ -13,6 +13,7 @@ import at.hannibal2.skyhanni.utils.ItemCategory
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalNameOrNull
 import at.hannibal2.skyhanni.utils.ItemUtils.getItemCategoryOrNull
 import at.hannibal2.skyhanni.utils.LorenzUtils
+import at.hannibal2.skyhanni.utils.LorenzUtils.round
 import at.hannibal2.skyhanni.utils.NEUInternalName
 import at.hannibal2.skyhanni.utils.NEUInternalName.Companion.asInternalName
 import at.hannibal2.skyhanni.utils.NumberUtil.formatNumber
@@ -49,6 +50,7 @@ object QuiverAPI {
 
     private var arrows: List<ArrowType> = listOf()
 
+    const val MAX_ARROW_AMOUNT = 2880
     private val SKELETON_MASTER_CHESTPLATE = "SKELETON_MASTER_CHESTPLATE".asInternalName()
     private val NONE_ARROW_TYPE =
         getArrowByNameOrNull("NONE".asInternalName()) ?: ArrowType("None", "NONE".asInternalName())
@@ -202,6 +204,8 @@ object QuiverAPI {
 
         arrowAmount[arrowType] = amount - amountToRemove()
     }
+
+    fun Int.asArrowPercentage() = ((this.toFloat() / MAX_ARROW_AMOUNT) * 100).round(1)
 
     fun hasBowInInventory(): Boolean {
         return InventoryUtils.getItemsInOwnInventory().any { it.item is ItemBow }
