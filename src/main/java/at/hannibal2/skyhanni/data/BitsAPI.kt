@@ -124,17 +124,20 @@ object BitsAPI {
     fun onIslandSwitch(event: IslandChangeEvent) {
         if (!isEnabled()) return
 
-        timeSinceLastSwitch = SimpleTimeMark.now()
+        val oldIsland = event.oldIsland
+        val wasInRiftOrCatacombs = oldIsland == IslandType.THE_RIFT || oldIsland == IslandType.CATACOMBS
 
-        if (event.oldIsland == IslandType.THE_RIFT || event.oldIsland == IslandType.CATACOMBS) {
+        if (wasInRiftOrCatacombs) {
             val minutesPassed = timeSinceLastSwitch.elapsedMinutes()
 
-            ChatUtils.debug("You were in the rift or catacombs for $minutesPassed minutes")
+            ChatUtils.debug("You spent $minutesPassed minutes in the rift or catacombs.")
 
             val bitsToClaim = ((minutesPassed / 30) * (defaultcookiebits * currentFameRank.bitsMultiplier)).toInt()
 
             this.bitsToClaim -= bitsToClaim
         }
+
+        timeSinceLastSwitch = SimpleTimeMark.now()
     }
 
     @SubscribeEvent
