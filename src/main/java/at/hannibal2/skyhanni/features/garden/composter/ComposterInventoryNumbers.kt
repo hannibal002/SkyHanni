@@ -11,6 +11,7 @@ import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
 class ComposterInventoryNumbers {
+
     private val valuePattern = ".* §e(?<having>.*)§6/(?<total>.*)".toPattern()
     private val compostsPattern = "§7§7Compost Available: §a(?<amount>.*)".toPattern()
 
@@ -45,7 +46,6 @@ class ComposterInventoryNumbers {
                     val having = group("having").removeColor().replace(",", "").toDouble().toInt()
                     val havingFormat = NumberUtil.format(having)
                     val total = group("total").removeColor()
-
 
                     val color = if (slotNumber == 46) {
                         // Organic Matter

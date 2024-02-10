@@ -21,10 +21,12 @@ object ShaderManager {
      * in the when expression
      */
     enum class Shaders(val shader: Shader) {
+
         CHROMA(ChromaShader.INSTANCE),
         ROUNDED_RECTANGLE(RoundedRectangleShader.INSTANCE);
 
         companion object {
+
             fun getShaderInstance(shaderName: String): Shader? = when (shaderName) {
                 "chroma" -> CHROMA.shader
                 "rounded_rect" -> ROUNDED_RECTANGLE.shader

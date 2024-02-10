@@ -13,9 +13,11 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import kotlin.concurrent.fixedRateTimer
 
 class TpsCounter {
+
     private val config get() = SkyHanniMod.feature.gui
 
     companion object {
+
         private const val minDataAmount = 5
         private const val waitAfterWorldSwitch = 6
     }

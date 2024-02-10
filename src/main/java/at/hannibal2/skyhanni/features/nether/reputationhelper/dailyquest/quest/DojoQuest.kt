@@ -2,13 +2,14 @@ package at.hannibal2.skyhanni.features.nether.reputationhelper.dailyquest.quest
 
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.LorenzVec
+import at.hannibal2.skyhanni.utils.NEUInternalName
 
 class DojoQuest(
     val dojoName: String,
     location: LorenzVec?,
-    displayItem: String?,
+    displayItem: NEUInternalName,
     dojoRankGoal: String,
-    state: QuestState
+    state: QuestState,
 ) :
     Quest(
         displayItem,

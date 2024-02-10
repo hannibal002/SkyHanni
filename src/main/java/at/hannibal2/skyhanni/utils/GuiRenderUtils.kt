@@ -91,7 +91,7 @@ object GuiRenderUtils {
         mouseX: Int,
         mouseY: Int,
         screenHeight: Int,
-        fr: FontRenderer
+        fr: FontRenderer,
     ) {
         if (textLines.isNotEmpty()) {
             val borderColor = StringUtils.getColor(textLines[0], 0x505000FF)
@@ -187,7 +187,7 @@ object GuiRenderUtils {
         y: Int,
         mouseX: Int,
         mouseY: Int,
-        color: Int = 0xFF43464B.toInt()
+        color: Int = 0xFF43464B.toInt(),
     ) {
         GuiScreen.drawRect(x, y, x + 16, y + 16, color)
         if (item != null) {
@@ -206,7 +206,7 @@ object GuiRenderUtils {
         y: Float,
         mouseX: Float,
         mouseY: Float,
-        color: Int = 0xFF43464B.toInt()
+        color: Int = 0xFF43464B.toInt(),
     ) {
         renderItemAndTip(list, item, x.toInt(), y.toInt(), mouseX.toInt(), mouseY.toInt(), color)
     }
@@ -223,7 +223,7 @@ object GuiRenderUtils {
         mouseX: Int,
         mouseY: Int,
         output: MutableList<String>,
-        textScale: Float = .7f
+        textScale: Float = .7f,
     ) {
         var currentVal = currentValue.toDouble()
         currentVal = if (currentVal < 0) 0.0 else currentVal
