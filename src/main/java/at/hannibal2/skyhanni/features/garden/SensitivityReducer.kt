@@ -172,8 +172,8 @@ object SensitivityReducer {
             add("mode: ${config.mode.name}")
             add("Current Divisor: ${config.reducingFactor.get()}")
             add("Keybind: ${config.keybind}")
-            add("onlyGround: ${config.onGround}")
-            add("onlyPlot: ${config.onlyPlot}")
+            add("onlyGround: ${config.onGround.get()}")
+            add("onlyPlot: ${config.onlyPlot.get()}")
         }
     }
 }
