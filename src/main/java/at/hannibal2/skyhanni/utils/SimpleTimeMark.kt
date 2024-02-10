@@ -35,6 +35,8 @@ value class SimpleTimeMark(private val millis: Long) : Comparable<SimpleTimeMark
 
     fun toSkyBlockTime() = SkyBlockTime.fromInstant(Instant.ofEpochMilli(millis))
 
+    fun elapsedMinutes() = passedSince().inWholeMinutes
+
     companion object {
 
         fun now() = SimpleTimeMark(System.currentTimeMillis())

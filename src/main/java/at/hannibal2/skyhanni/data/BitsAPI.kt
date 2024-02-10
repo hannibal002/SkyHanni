@@ -2,11 +2,14 @@ package at.hannibal2.skyhanni.data
 
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.events.InventoryFullyOpenedEvent
+import at.hannibal2.skyhanni.events.IslandChangeEvent
 import at.hannibal2.skyhanni.events.LorenzChatEvent
 import at.hannibal2.skyhanni.events.ScoreboardChangeEvent
+import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.NumberUtil.formatNumber
+import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.StringUtils.matches
 import at.hannibal2.skyhanni.utils.StringUtils.removeResets
@@ -36,6 +39,7 @@ object BitsAPI {
     private const val defaultcookiebits = 4800
 
     private val bitsDataGroup = RepoPattern.group("data.bits")
+    private var timeSinceLastSwitch: SimpleTimeMark = SimpleTimeMark.farPast()
 
     // Scoreboard patterns
     val bitsScoreboardPattern by bitsDataGroup.pattern(
@@ -117,6 +121,23 @@ object BitsAPI {
     }
 
     @SubscribeEvent
+    fun onIslandSwitch(event: IslandChangeEvent) {
+        if (!isEnabled()) return
+
+        timeSinceLastSwitch = SimpleTimeMark.now()
+
+        if (event.oldIsland == IslandType.THE_RIFT || event.oldIsland == IslandType.CATACOMBS) {
+            val minutesPassed = timeSinceLastSwitch.elapsedMinutes()
+
+            ChatUtils.debug("You were in the rift or catacombs for $minutesPassed minutes")
+
+            val bitsToClaim = ((minutesPassed / 30) * (defaultcookiebits * currentFameRank.bitsMultiplier)).toInt()
+
+            this.bitsToClaim -= bitsToClaim
+        }
+    }
+
+    @SubscribeEvent
     fun onChat(event: LorenzChatEvent) {
         if (!isEnabled()) return
         val message = event.message.trimWhiteSpace().removeResets()
@@ -131,8 +152,6 @@ object BitsAPI {
         bitsEarnedChatPattern.matchMatcher(message) {
             // Only two locations where the bits line isn't shown, but you can still get bits
             if (!LorenzUtils.inAnyIsland(IslandType.CATACOMBS, IslandType.THE_RIFT)) return
-
-            // TODO: Remove bits to claim which you just get from being in those islands
 
             val amount = group("amount").formatNumber().toInt()
             bits += amount
