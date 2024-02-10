@@ -21,6 +21,7 @@ import net.minecraft.inventory.ContainerChest
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
 class DungeonFinderFeatures {
+
     private val config get() = SkyHanniMod.feature.dungeon.partyFinder
 
     private val pricePattern = "([0-9]{2,3}K|[0-9]{1,3}M|[0-9]+\\.[0-9]M|[0-9] ?mil)".toRegex(RegexOption.IGNORE_CASE)
@@ -170,7 +171,6 @@ class DungeonFinderFeatures {
     fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
         event.move(2, "dungeon.partyFinderColoredClassLevel", "dungeon.partyFinder.coloredClassLevel")
     }
-
 }
 
 fun getColor(level: Int): String {

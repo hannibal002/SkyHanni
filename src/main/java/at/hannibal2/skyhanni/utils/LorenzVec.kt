@@ -174,6 +174,7 @@ data class LorenzVec(
     fun rotateYZ(theta: Double) = LorenzVec(x, y * cos(theta) - z * sin(theta), y * sin(theta) + z * cos(theta))
 
     companion object {
+
         fun getFromYawPitch(yaw: Double, pitch: Double): LorenzVec {
             val yaw: Double = (yaw + 90) * Math.PI / 180
             val pitch: Double = (pitch + 90) * Math.PI / 180

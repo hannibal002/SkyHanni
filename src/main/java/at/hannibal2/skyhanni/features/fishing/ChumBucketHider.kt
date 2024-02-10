@@ -4,15 +4,16 @@ import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.events.CheckRenderEntityEvent
 import at.hannibal2.skyhanni.events.ConfigLoadEvent
 import at.hannibal2.skyhanni.events.LorenzWorldChangeEvent
+import at.hannibal2.skyhanni.utils.ConditionalUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.name
 import at.hannibal2.skyhanni.utils.LorenzUtils
-import at.hannibal2.skyhanni.utils.LorenzUtils.onToggle
 import at.hannibal2.skyhanni.utils.getLorenzVec
 import net.minecraft.entity.Entity
 import net.minecraft.entity.item.EntityArmorStand
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
 class ChumBucketHider {
+
     private val config get() = SkyHanniMod.feature.fishing.chumBucketHider
     private val titleEntity = mutableListOf<Entity>()
     private val hiddenEntities = mutableListOf<Entity>()
@@ -73,7 +74,7 @@ class ChumBucketHider {
 
     @SubscribeEvent
     fun onConfigLoad(event: ConfigLoadEvent) {
-        onToggle(config.enabled, config.hideBucket, config.hideOwn) { reset() }
+        ConditionalUtils.onToggle(config.enabled, config.hideBucket, config.hideOwn) { reset() }
     }
 
     private fun reset() {

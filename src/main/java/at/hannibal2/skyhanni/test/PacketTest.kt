@@ -1,13 +1,14 @@
 package at.hannibal2.skyhanni.test
 
 import at.hannibal2.skyhanni.events.PacketEvent
+import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.EntityUtils
 import at.hannibal2.skyhanni.utils.LocationUtils.distanceToPlayer
 import at.hannibal2.skyhanni.utils.LorenzUtils
-import at.hannibal2.skyhanni.utils.LorenzUtils.makeAccessible
 import at.hannibal2.skyhanni.utils.LorenzUtils.round
 import at.hannibal2.skyhanni.utils.LorenzVec
 import at.hannibal2.skyhanni.utils.NumberUtil.isInt
+import at.hannibal2.skyhanni.utils.ReflectionUtils.makeAccessible
 import at.hannibal2.skyhanni.utils.getLorenzVec
 import at.hannibal2.skyhanni.utils.toLorenzVec
 import net.minecraft.client.Minecraft
@@ -37,7 +38,7 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
 object PacketTest {
 
-    private var enabled = true
+    private var enabled = false
 
     private val entityMap = mutableMapOf<Int, MutableList<Packet<*>>>()
 
@@ -60,7 +61,7 @@ object PacketTest {
 
     private fun toggle() {
         enabled = !enabled
-        LorenzUtils.chat("Packet test: $enabled")
+        ChatUtils.chat("Packet test: $enabled")
     }
 
     @SubscribeEvent

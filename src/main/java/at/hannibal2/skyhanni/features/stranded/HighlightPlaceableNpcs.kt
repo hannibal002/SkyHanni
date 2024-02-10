@@ -14,6 +14,7 @@ import net.minecraftforge.fml.common.eventhandler.EventPriority
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
 class HighlightPlaceableNpcs {
+
     private val config get() = SkyHanniMod.feature.stranded
     private val locationPattern = "§7Location: §f\\[§e\\d+§f, §e\\d+§f, §e\\d+§f]".toPattern()
 

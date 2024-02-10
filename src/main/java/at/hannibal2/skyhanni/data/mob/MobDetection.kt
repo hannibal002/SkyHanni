@@ -9,11 +9,11 @@ import at.hannibal2.skyhanni.events.EntityHealthUpdateEvent
 import at.hannibal2.skyhanni.events.LorenzTickEvent
 import at.hannibal2.skyhanni.events.MobEvent
 import at.hannibal2.skyhanni.events.PacketEvent
+import at.hannibal2.skyhanni.utils.CollectionUtils.drainForEach
 import at.hannibal2.skyhanni.utils.EntityUtils
 import at.hannibal2.skyhanni.utils.LocationUtils
 import at.hannibal2.skyhanni.utils.LorenzDebug
 import at.hannibal2.skyhanni.utils.LorenzUtils
-import at.hannibal2.skyhanni.utils.LorenzUtils.drainForEach
 import at.hannibal2.skyhanni.utils.getLorenzVec
 import net.minecraft.entity.EntityLivingBase
 import net.minecraft.entity.item.EntityArmorStand
@@ -84,7 +84,8 @@ class MobDetection {
         MobData.previousEntityLiving.clear()
         MobData.previousEntityLiving.addAll(MobData.currentEntityLiving)
         MobData.currentEntityLiving.clear()
-        MobData.currentEntityLiving.addAll(EntityUtils.getEntities<EntityLivingBase>().filter { it !is EntityArmorStand })
+        MobData.currentEntityLiving.addAll(
+            EntityUtils.getEntities<EntityLivingBase>().filter { it !is EntityArmorStand })
 
         if (forceReset) {
             MobData.currentEntityLiving.clear()
@@ -111,7 +112,6 @@ class MobDetection {
 
     private fun removeRetry(entity: EntityLivingBase) = MobData.retries.remove(MobData.RetryEntityInstancing(entity))
 
-
     /** @return always true */
     private fun mobDetectionError(string: String) = LorenzDebug.log(MOB_DETECTION_LOG_PREFIX + string).let { true }
 
@@ -131,7 +131,9 @@ class MobDetection {
                 when (mobResult.mob.mobType) {
                     Mob.Type.Summon -> MobEvent.Spawn.Summon(mobResult.mob).postAndCatch()
 
-                    Mob.Type.Basic, Mob.Type.Dungeon, Mob.Type.Boss, Mob.Type.Slayer -> MobEvent.Spawn.SkyblockMob(mobResult.mob).postAndCatch()
+                    Mob.Type.Basic, Mob.Type.Dungeon, Mob.Type.Boss, Mob.Type.Slayer -> MobEvent.Spawn.SkyblockMob(
+                        mobResult.mob
+                    ).postAndCatch()
 
                     Mob.Type.Special -> MobEvent.Spawn.Special(mobResult.mob).postAndCatch()
                     Mob.Type.Projectile -> MobEvent.Spawn.Projectile(mobResult.mob).postAndCatch()
@@ -154,7 +156,8 @@ class MobDetection {
             val entity = EntityUtils.getEntityByID(id) as? EntityBat ?: return@drainForEach
             if (MobData.entityToMob[entity] != null) return@drainForEach
             MobData.retries.remove(MobData.RetryEntityInstancing(entity))
-            MobEvent.Spawn.Projectile(MobFactories.projectile(entity, "Spirit Scepter Bat")).postAndCatch() // Needs different handling because 6 is default health of Bat
+            MobEvent.Spawn.Projectile(MobFactories.projectile(entity, "Spirit Scepter Bat"))
+                .postAndCatch() // Needs different handling because 6 is default health of Bat
         }
         villagerFromPacket.drainForEach { id ->
             val entity = EntityUtils.getEntityByID(id) as? EntityVillager ?: return@drainForEach
@@ -177,7 +180,8 @@ class MobDetection {
             if (MobData.entityToMob[entity] != null) return@drainForEach
             if (!entity.powered) return@drainForEach
             MobData.retries.remove(MobData.RetryEntityInstancing(entity))
-            MobEvent.Spawn.Special(MobFactories.special(entity, "Creeper Veil")).postAndCatch() // Needs different handling because 6 is default health of Bat
+            MobEvent.Spawn.Special(MobFactories.special(entity, "Creeper Veil"))
+                .postAndCatch() // Needs different handling because 6 is default health of Bat
         }
     }
 
@@ -197,7 +201,6 @@ class MobDetection {
             }
         }
     }
-
 
     private fun islandException(): Boolean = when (LorenzUtils.skyBlockIsland) {
         IslandType.GARDEN_GUEST -> true
@@ -273,7 +276,6 @@ class MobDetection {
         }
     }
 
-
     private fun handleEntityUpdate(entityID: Int): Boolean {
         val entity = EntityUtils.getEntityByID(entityID) as? EntityLivingBase ?: return false
         MobData.retries.firstOrNull { it.hashCode() == entity.hashCode() }?.apply { this.entity = entity }
@@ -285,7 +287,6 @@ class MobDetection {
         MobData.entityToMob[entity]?.internalUpdateOfEntity(entity)
         return true
     }
-
 
     @SubscribeEvent
     fun onEntitySpawnPacket(event: PacketEvent.ReceiveEvent) {

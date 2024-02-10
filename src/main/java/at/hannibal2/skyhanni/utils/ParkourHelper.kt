@@ -4,8 +4,8 @@ import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.data.jsonobjects.repo.ParkourJson.ShortCut
 import at.hannibal2.skyhanni.events.LorenzRenderWorldEvent
 import at.hannibal2.skyhanni.test.command.ErrorManager
+import at.hannibal2.skyhanni.utils.CollectionUtils.toSingletonListOrEmpty
 import at.hannibal2.skyhanni.utils.LocationUtils.distanceToPlayer
-import at.hannibal2.skyhanni.utils.LorenzUtils.toSingletonListOrEmpty
 import at.hannibal2.skyhanni.utils.RenderUtils.draw3DLine_nea
 import at.hannibal2.skyhanni.utils.RenderUtils.drawDynamicText
 import at.hannibal2.skyhanni.utils.RenderUtils.drawFilledBoundingBox_nea
@@ -22,8 +22,9 @@ class ParkourHelper(
     val platformSize: Double = 1.0,
     val detectionRange: Double = 1.0,
     val depth: Boolean = true,
-    val onEndReach: () -> Unit = {}
+    val onEndReach: () -> Unit = {},
 ) {
+
     private var current = -1
     private var visible = false
 
@@ -105,7 +106,6 @@ class ParkourHelper(
                     event.drawFilledBoundingBox_nea(aabb, Color.RED, 1f)
                     if (outline) event.outlineTopFace(aabb, 2, Color.BLACK, depth)
                 }
-
             }
 
             for ((index, location) in locations.asSequence().withIndex().drop(current)

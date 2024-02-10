@@ -3,13 +3,13 @@ package at.hannibal2.skyhanni.data.mob
 import at.hannibal2.skyhanni.data.mob.Mob.Type
 import at.hannibal2.skyhanni.data.mob.MobFilter.summonOwnerPattern
 import at.hannibal2.skyhanni.events.MobEvent
+import at.hannibal2.skyhanni.utils.CollectionUtils.toSingletonListOrEmpty
 import at.hannibal2.skyhanni.utils.EntityUtils.canBeSeen
 import at.hannibal2.skyhanni.utils.EntityUtils.cleanName
 import at.hannibal2.skyhanni.utils.EntityUtils.isCorrupted
 import at.hannibal2.skyhanni.utils.EntityUtils.isRunic
 import at.hannibal2.skyhanni.utils.LocationUtils.distanceToPlayer
 import at.hannibal2.skyhanni.utils.LocationUtils.union
-import at.hannibal2.skyhanni.utils.LorenzUtils.toSingletonListOrEmpty
 import at.hannibal2.skyhanni.utils.MobUtils
 import at.hannibal2.skyhanni.utils.RenderUtils.expandBlock
 import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
@@ -129,7 +129,6 @@ class Mob(
         if (extraEntities?.isNotEmpty() == true) relativeBoundingBox = makeRelativeBoundingBox()
     }
 
-
     private fun makeRelativeBoundingBox() =
         (baseEntity.entityBoundingBox.union(extraEntities?.filter { it !is EntityArmorStand }
             ?.mapNotNull { it.entityBoundingBox }))?.offset(-baseEntity.posX, -baseEntity.posY, -baseEntity.posZ)
@@ -164,6 +163,5 @@ class Mob(
 
     fun makeEntityToMobAssociation() =
         (baseEntity.toSingletonListOrEmpty() + (extraEntities ?: emptyList())).associateWith { this }
-
 
 }

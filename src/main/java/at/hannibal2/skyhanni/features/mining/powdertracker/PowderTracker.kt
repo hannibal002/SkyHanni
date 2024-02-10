@@ -3,6 +3,7 @@ package at.hannibal2.skyhanni.features.mining.powdertracker
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.config.features.mining.PowderTrackerConfig.PowderDisplayEntry
+import at.hannibal2.skyhanni.data.BossbarData
 import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.events.ConfigLoadEvent
 import at.hannibal2.skyhanni.events.GuiRenderEvent
@@ -10,9 +11,9 @@ import at.hannibal2.skyhanni.events.IslandChangeEvent
 import at.hannibal2.skyhanni.events.LorenzChatEvent
 import at.hannibal2.skyhanni.events.LorenzTickEvent
 import at.hannibal2.skyhanni.events.LorenzWorldChangeEvent
+import at.hannibal2.skyhanni.utils.CollectionUtils.addAsSingletonList
+import at.hannibal2.skyhanni.utils.ConditionalUtils.afterChange
 import at.hannibal2.skyhanni.utils.ConfigUtils
-import at.hannibal2.skyhanni.utils.LorenzUtils.addAsSingletonList
-import at.hannibal2.skyhanni.utils.LorenzUtils.afterChange
 import at.hannibal2.skyhanni.utils.LorenzUtils.isInIsland
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.NumberUtil.formatNumber
@@ -23,7 +24,6 @@ import at.hannibal2.skyhanni.utils.tracker.TrackerData
 import com.google.gson.JsonArray
 import com.google.gson.JsonNull
 import com.google.gson.annotations.Expose
-import net.minecraft.entity.boss.BossStatus
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import kotlin.concurrent.fixedRateTimer
 
@@ -88,6 +88,7 @@ object PowderTracker {
     { formatDisplay(drawDisplay(it)) }
 
     class Data : TrackerData() {
+
         override fun reset() {
             rewards.clear()
             totalChestPicked = 0
@@ -153,8 +154,8 @@ object PowderTracker {
     fun onTick(event: LorenzTickEvent) {
         if (!isEnabled()) return
         if (event.repeatSeconds(1)) {
-            doublePowder = powderBossBarPattern.matcher(BossStatus.bossName).find()
-            powderBossBarPattern.matchMatcher(BossStatus.bossName) {
+            doublePowder = powderBossBarPattern.matcher(BossbarData.getBossbar()).find()
+            powderBossBarPattern.matchMatcher(BossbarData.getBossbar()) {
                 powderTimer = group("time")
                 doublePowder = powderTimer != "00:00"
 
@@ -299,7 +300,7 @@ object PowderTracker {
     private fun MutableList<List<Any>>.addPerHour(
         map: MutableMap<PowderChestReward, Long>,
         reward: PowderChestReward,
-        info: ResourceInfo
+        info: ResourceInfo,
     ) {
         val mithrilCount = map.getOrDefault(reward, 0).addSeparators()
         val mithrilPerHour = format(info.perHour)
@@ -364,7 +365,7 @@ object PowderTracker {
         var lastEstimated: Long,
         var stoppedChecks: Int,
         var perHour: Double,
-        val perMin: MutableList<Long>
+        val perMin: MutableList<Long>,
     )
 
     private fun isEnabled() = IslandType.CRYSTAL_HOLLOWS.isInIsland() && config.enabled

@@ -1,5 +1,6 @@
 package at.hannibal2.skyhanni.test.command
 
+import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.data.mob.MobData
 import at.hannibal2.skyhanni.data.mob.MobFilter.isDisplayNPC
 import at.hannibal2.skyhanni.data.mob.MobFilter.isRealPlayer
@@ -168,9 +169,9 @@ object CopyNearbyEntitiesCommand {
         if (counter != 0) {
             val string = resultList.joinToString("\n")
             OSUtils.copyToClipboard(string)
-            LorenzUtils.chat("$counter entities copied into the clipboard!")
+            ChatUtils.chat("$counter entities copied into the clipboard!")
         } else {
-            LorenzUtils.chat("No entities found in a search radius of $searchRadius!")
+            ChatUtils.chat("No entities found in a search radius of $searchRadius!")
         }
     }
 

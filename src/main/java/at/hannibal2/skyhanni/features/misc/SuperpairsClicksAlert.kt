@@ -3,13 +3,14 @@ package at.hannibal2.skyhanni.features.misc
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.events.InventoryOpenEvent
 import at.hannibal2.skyhanni.events.InventoryUpdatedEvent
+import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
-import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.SoundUtils
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
 class SuperpairsClicksAlert {
+
     private val config get() = SkyHanniMod.feature.misc
 
     private var roundsNeeded = -1
@@ -54,7 +55,7 @@ class SuperpairsClicksAlert {
                 .any { it.value.stackSize > roundsNeeded })
         ) {
             SoundUtils.playBeepSound()
-            LorenzUtils.chat("You have reached the maximum possible clicks!")
+            ChatUtils.chat("You have reached the maximum possible clicks!")
             roundsNeeded = -1
         }
     }
