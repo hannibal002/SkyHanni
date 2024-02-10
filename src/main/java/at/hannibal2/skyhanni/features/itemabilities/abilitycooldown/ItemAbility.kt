@@ -7,23 +7,29 @@ import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils.isInIsland
 import at.hannibal2.skyhanni.utils.NEUInternalName
 import at.hannibal2.skyhanni.utils.NEUInternalName.Companion.asInternalName
+import at.hannibal2.skyhanni.utils.SimpleTimeMark
+import at.hannibal2.skyhanni.utils.TimeUtils.format
 import kotlin.math.floor
+import kotlin.time.Duration
+import kotlin.time.Duration.Companion.seconds
 
 enum class ItemAbility(
+    @Deprecated("just dont use it", ReplaceWith("cooldown"))
     private val cooldownInSeconds: Int,
     val manaCost: Int,
     vararg alternateInternalNames: String,
 
-    var lastActivation: Long = 0L,
+    var lastActivation: SimpleTimeMark = SimpleTimeMark.farPast(),
     var specialColor: LorenzColor? = null,
-    var lastItemClick: Long = 0L,
+    var lastItemClick: SimpleTimeMark = SimpleTimeMark.farPast(),
 
     val alternativePosition: Boolean = false,
     val ignoreMageCooldownReduction: Boolean = false,
     val remainingMana: (Int) -> Int = { it - manaCost },
     val riftManaCost: Int = manaCost,
     val remainingManaRift: (Int) -> Int = { it - riftManaCost },
-    val allowRecastAfterSeconds: Int = cooldownInSeconds,
+    private val cooldown: Duration = cooldownInSeconds.seconds,
+    val allowRecastAfter: Duration = cooldown,
     val isAllowed: (Unit) -> Boolean = { true },
 ) {
 
@@ -53,17 +59,17 @@ enum class ItemAbility(
     STARLIGHT_WAND(2, 120),
     VOODOO_DOLL(5, 200),
     WEIRD_TUBA(20, 150, riftManaCost = 60),
-    WEIRDER_TUBA(30, 120, riftManaCost = 60, allowRecastAfterSeconds = 20),
-    FIRE_FREEZE_STAFF(10, 500, allowRecastAfterSeconds = 0),
+    WEIRDER_TUBA(30, 120, riftManaCost = 60, allowRecastAfter = 20.seconds),
+    FIRE_FREEZE_STAFF(10, 500, allowRecastAfter = 0.seconds),
     SWORD_OF_BAD_HEALTH(5, 0),
     WITHER_CLOAK(10, 0),
     HOLY_ICE(4, 20),
     VOODOO_DOLL_WILTED(3, 180),
-    FIRE_FURY_STAFF(20, 1000, allowRecastAfterSeconds = 0),
+    FIRE_FURY_STAFF(20, 1000, allowRecastAfter = 0.seconds),
     SHADOW_FURY(15, 0, "STARRED_SHADOW_FURY"),
     ENDER_BOW(30, 50),
     LIVID_DAGGER(5, 150),
-    FIRE_VEIL_WAND(5, 300, allowRecastAfterSeconds = 0),
+    FIRE_VEIL_WAND(5, 300, allowRecastAfter = 0.seconds),
     INK_WAND(30, 60),
     ROGUE_SWORD(30, 50, ignoreMageCooldownReduction = true),
     TALBOTS_THEODOLITE(10, 98),
@@ -95,39 +101,30 @@ enum class ItemAbility(
         this.internalNames = internalNames
     }
 
-    fun activate(color: LorenzColor? = null, customCooldown: Int = (cooldownInSeconds * 1000)) {
+    fun activate(color: LorenzColor? = null, customCooldown: Duration = (cooldown)) {
         specialColor = color
-        lastActivation = System.currentTimeMillis() - ((cooldownInSeconds * 1000) - customCooldown)
+        lastActivation = SimpleTimeMark.now() - (cooldown - customCooldown)
     }
 
-    fun isOnCooldown(): Boolean = lastActivation + getCooldown() > System.currentTimeMillis()
+    fun isOnCooldown(): Boolean = getDuration().isPositive()
 
-    fun getCooldown(): Long {
+    fun getCooldown(): Duration {
         // Some items aren't really a cooldown but an effect over time, so don't apply cooldown multipliers
         if (this == WAND_OF_ATONEMENT || this == RAGNAROCK_AXE) {
-            return 1000L * cooldownInSeconds
+            return cooldown
         }
 
-        return (1000L * cooldownInSeconds * getMultiplier()).toLong()
+        return cooldown * getMultiplier()
     }
 
-    fun getDurationText(): String {
-        var duration: Long = lastActivation + getCooldown() - System.currentTimeMillis()
-        return if (duration < 1600) {
-            duration /= 100
-            var d = duration.toDouble()
-            d /= 10.0
-            LorenzUtils.formatDouble(d)
-        } else {
-            duration /= 1000
-            duration++
-            LorenzUtils.formatInteger(duration)
-        }
-    }
+    fun getDurationText(): String = getDuration().format(showMilliSeconds = getDuration() < 1.6.seconds).dropLast(1)
+
+    fun getDuration() = getCooldown() - lastActivation.passedSince()
 
     fun setItemClick() {
-        lastItemClick = System.currentTimeMillis()
-        lastActivation = System.currentTimeMillis()
+        if (lastItemClick.passedSince() < allowRecastAfter) return
+        lastItemClick = SimpleTimeMark.now()
+        lastActivation = SimpleTimeMark.now()
     }
 
     companion object {

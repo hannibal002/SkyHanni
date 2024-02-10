@@ -16,13 +16,15 @@ import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName
 import at.hannibal2.skyhanni.utils.LorenzColor
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.NEUInternalName.Companion.asInternalName
+import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getItemId
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getItemUuid
 import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
 import net.minecraft.client.Minecraft
 import net.minecraft.item.ItemStack
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
-import kotlin.math.max
+import kotlin.time.Duration.Companion.milliseconds
+import kotlin.time.Duration.Companion.seconds
 
 class ItemAbilityCooldown {
 
@@ -169,8 +171,8 @@ class ItemAbilityCooldown {
     @SubscribeEvent
     fun onIslandChange(event: LorenzWorldChangeEvent) {
         for (ability in ItemAbility.entries) {
-            ability.lastActivation = 0L
-            ability.lastItemClick = 0L
+            ability.lastActivation = SimpleTimeMark.farPast()
+            ability.lastItemClick = SimpleTimeMark.farPast()
             ability.specialColor = null
         }
     }
@@ -185,18 +187,18 @@ class ItemAbilityCooldown {
         when {
             message.contains("§lCASTING IN ") -> {
                 if (!ItemAbility.RAGNAROCK_AXE.isOnCooldown()) {
-                    ItemAbility.RAGNAROCK_AXE.activate(LorenzColor.WHITE, 3_000)
+                    ItemAbility.RAGNAROCK_AXE.activate(LorenzColor.WHITE, 3.seconds)
                 }
             }
 
             message.contains("§lCASTING") -> {
                 if (ItemAbility.RAGNAROCK_AXE.specialColor != LorenzColor.DARK_PURPLE) {
-                    ItemAbility.RAGNAROCK_AXE.activate(LorenzColor.DARK_PURPLE, 10_000)
+                    ItemAbility.RAGNAROCK_AXE.activate(LorenzColor.DARK_PURPLE, 10.seconds)
                 }
             }
 
             message.contains("§c§lCANCELLED") -> {
-                ItemAbility.RAGNAROCK_AXE.activate(null, 17_000)
+                ItemAbility.RAGNAROCK_AXE.activate(null, 17.seconds)
             }
         }
     }
@@ -245,8 +247,7 @@ class ItemAbilityCooldown {
         val specialColor = ability.specialColor
         val readyText = if (config.itemAbilityShowWhenReady) "R" else ""
         return if (ability.isOnCooldown()) {
-            val duration: Long = ability.lastActivation + ability.getCooldown() - System.currentTimeMillis()
-            val color = specialColor ?: if (duration < 600) LorenzColor.RED else LorenzColor.YELLOW
+            val color = specialColor ?: if (ability.getDuration() < 600.milliseconds) LorenzColor.RED else LorenzColor.YELLOW
             ItemText(color, ability.getDurationText(), true, ability.alternativePosition)
         } else {
             if (specialColor != null) {
@@ -260,10 +261,11 @@ class ItemAbilityCooldown {
 
     private fun tryHandleNextPhase(ability: ItemAbility, specialColor: LorenzColor) {
         if (ability == ItemAbility.GYROKINETIC_WAND_RIGHT && specialColor == LorenzColor.BLUE) {
-            ability.activate(null, 4_000)
+            ability.activate(null, 4.seconds)
         }
         if (ability == ItemAbility.RAGNAROCK_AXE && specialColor == LorenzColor.DARK_PURPLE) {
-            ability.activate(null, max((20_000 * ability.getMultiplier()) - 13_000, 0.0).toInt())
+            val duration = (20.seconds * ability.getMultiplier()) - 13.seconds
+            ability.activate(null, if (duration < 0.seconds) { 0.seconds } else duration)
         }
     }
 
@@ -316,17 +318,17 @@ class ItemAbilityCooldown {
             ItemAbility.WITHER_CLOAK.activate()
         }
         if (message == "§dCreeper Veil §r§cDe-activated!") {
-            ItemAbility.WITHER_CLOAK.activate(null, 5000)
+            ItemAbility.WITHER_CLOAK.activate(null, 5.seconds)
         }
 
         youAlignedOthersPattern.matchMatcher(message) {
-            ItemAbility.GYROKINETIC_WAND_RIGHT.activate(LorenzColor.BLUE, 6_000)
+            ItemAbility.GYROKINETIC_WAND_RIGHT.activate(LorenzColor.BLUE, 6.seconds)
         }
         if (message == "§eYou §r§aaligned §r§eyourself!") {
-            ItemAbility.GYROKINETIC_WAND_RIGHT.activate(LorenzColor.BLUE, 6_000)
+            ItemAbility.GYROKINETIC_WAND_RIGHT.activate(LorenzColor.BLUE, 6.seconds)
         }
         if (message == "§cRagnarock was cancelled due to being hit!") {
-            ItemAbility.RAGNAROCK_AXE.activate(null, 17_000)
+            ItemAbility.RAGNAROCK_AXE.activate(null, 17.seconds)
         }
         youBuffedYourselfPattern.matchMatcher(message) {
             ItemAbility.SWORD_OF_BAD_HEALTH.activate()
