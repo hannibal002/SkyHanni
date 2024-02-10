@@ -11,7 +11,6 @@ import at.hannibal2.skyhanni.utils.EntityUtils.isRunic
 import at.hannibal2.skyhanni.utils.LocationUtils.distanceToPlayer
 import at.hannibal2.skyhanni.utils.LocationUtils.union
 import at.hannibal2.skyhanni.utils.MobUtils
-import at.hannibal2.skyhanni.utils.RenderUtils.expandBlock
 import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
 import net.minecraft.entity.EntityLivingBase
 import net.minecraft.entity.item.EntityArmorStand
@@ -67,8 +66,11 @@ class Mob(
 
     val owner: MobUtils.OwnerShip?
 
-    val hologram1 by lazy { MobUtils.getArmorStand(armorStand ?: baseEntity, 1) }
-    val hologram2 by lazy { MobUtils.getArmorStand(armorStand ?: baseEntity, 2) }
+    val hologram1Delegate = lazy { MobUtils.getArmorStand(armorStand ?: baseEntity, 1) }
+    val hologram2Delegate = lazy { MobUtils.getArmorStand(armorStand ?: baseEntity, 2) }
+
+    val hologram1 by hologram1Delegate
+    val hologram2 by hologram2Delegate
 
     val extraEntities: List<EntityLivingBase>? get() = extraEntitiesList
 
@@ -108,8 +110,8 @@ class Mob(
     private var extraEntitiesList = additionalEntities?.toMutableList()
     private var relativeBoundingBox: AxisAlignedBB?
     val boundingBox: AxisAlignedBB
-        get() = (relativeBoundingBox?.offset(baseEntity.posX, baseEntity.posY, baseEntity.posZ)
-            ?: baseEntity.entityBoundingBox).expandBlock()
+        get() = relativeBoundingBox?.offset(baseEntity.posX, baseEntity.posY, baseEntity.posZ)
+            ?: baseEntity.entityBoundingBox
 
     init {
         removeExtraEntitiesFromChecking()
@@ -162,6 +164,7 @@ class Mob(
     }
 
     fun makeEntityToMobAssociation() =
-        (baseEntity.toSingletonListOrEmpty() + (extraEntities ?: emptyList())).associateWith { this }
+        (baseEntity.toSingletonListOrEmpty() + armorStand.toSingletonListOrEmpty() + (extraEntities
+            ?: emptyList())).associateWith { this }
 
 }

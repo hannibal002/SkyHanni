@@ -215,5 +215,3 @@ fun S2APacketParticles.toLorenzVec() = LorenzVec(xCoordinate, yCoordinate, zCoor
 fun Array<Double>.toLorenzVec(): LorenzVec {
     return LorenzVec(this[0], this[1], this[2])
 }
-
-fun vectorFromPoints(start: LorenzVec, end: LorenzVec) = end.subtract(start)
