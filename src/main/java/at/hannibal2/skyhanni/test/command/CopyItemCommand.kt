@@ -40,7 +40,7 @@ object CopyItemCommand {
 
         val string = resultList.joinToString("\n")
         OSUtils.copyToClipboard(string)
-        LorenzUtils.chat("Item info copied into the clipboard!")
+        ChatUtils.chat("Item info copied into the clipboard!")
     }
 
     fun grabItemData(itemStack: ItemStack): List<String> {
