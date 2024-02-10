@@ -4,13 +4,11 @@ import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.mixins.transformers.AccessorChatComponentText
 import at.hannibal2.skyhanni.utils.GuiRenderUtils.darkenColor
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
-import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraft.client.Minecraft
 import net.minecraft.client.gui.GuiUtilRenderComponents
 import net.minecraft.util.ChatComponentText
 import net.minecraft.util.IChatComponent
 import java.util.Base64
-import java.util.NavigableMap
 import java.util.UUID
 import java.util.function.Predicate
 import java.util.regex.Matcher
@@ -58,23 +56,6 @@ object StringUtils {
         }
 
         return builder.toString()
-    }
-
-    /**
-     * From https://stackoverflow.com/questions/10711494/get-values-in-treemap-whose-string-keys-start-with-a-pattern
-     */
-    fun <T> subMapWithKeysThatAreSuffixes(prefix: String, map: NavigableMap<String?, T>): Map<String?, T>? {
-        if ("" == prefix) return map
-        val lastKey = nextLexicographicallyStringWithSameLength(prefix)
-        return map.subMap(prefix, true, lastKey, false)
-    }
-
-    fun nextLexicographicallyStringWithSameLength(input: String): String {
-        val lastCharPosition = input.length - 1
-        val inputWithoutLastChar = input.substring(0, lastCharPosition)
-        val lastChar = input[lastCharPosition]
-        val incrementedLastChar = (lastChar.code + 1).toChar()
-        return inputWithoutLastChar + incrementedLastChar
     }
 
     fun UUID.toDashlessUUID(): String {
@@ -290,6 +271,6 @@ object StringUtils {
     fun String?.equalsIgnoreColor(string: String?) = this?.let { it.removeColor() == string?.removeColor() } ?: false
 
     fun String.isRoman(): Boolean {
-        return isRomanPattern.matches(this)
+        return UtilsPatterns.isRomanPattern.matches(this)
     }
 }
