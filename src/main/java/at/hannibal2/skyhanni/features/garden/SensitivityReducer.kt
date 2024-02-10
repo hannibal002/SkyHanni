@@ -107,7 +107,7 @@ object SensitivityReducer {
 
     fun manualToggle() {
         if (isToggled) {
-            ChatUtils.chat("This command is disabled while holding a farming tool.")
+            ChatUtils.chat("This command is disabled while the Sensitivity is lowered.")
             return
         }
         isManualToggle = !isManualToggle
