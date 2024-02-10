@@ -1,5 +1,6 @@
 package at.hannibal2.skyhanni.test.command
 
+import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.EntityUtils
 import at.hannibal2.skyhanni.utils.EntityUtils.getBlockInHand
 import at.hannibal2.skyhanni.utils.EntityUtils.getSkinTexture
@@ -8,7 +9,6 @@ import at.hannibal2.skyhanni.utils.ItemUtils.getSkullTexture
 import at.hannibal2.skyhanni.utils.ItemUtils.isEnchanted
 import at.hannibal2.skyhanni.utils.ItemUtils.name
 import at.hannibal2.skyhanni.utils.LocationUtils
-import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils.baseMaxHealth
 import at.hannibal2.skyhanni.utils.OSUtils
 import at.hannibal2.skyhanni.utils.toLorenzVec
@@ -45,7 +45,7 @@ object CopyNearbyEntitiesCommand {
                 resultList.add("name: '" + entity.name + "'")
                 resultList.add("displayName: '${displayName.formattedText}'")
                 resultList.add("entityId: ${entity.entityId}")
-                resultList.add("uuid version: ${entity.uniqueID.version()} ${if(entity.uniqueID.version() != 4) "NPC " else ""}(${entity.uniqueID})")
+                resultList.add("uuid version: ${entity.uniqueID.version()} ${if (entity.uniqueID.version() != 4) "NPC " else ""}(${entity.uniqueID})")
                 resultList.add("location data:")
                 resultList.add("-  vec: $vec")
                 resultList.add("-  distance: $distance")
@@ -147,9 +147,9 @@ object CopyNearbyEntitiesCommand {
         if (counter != 0) {
             val string = resultList.joinToString("\n")
             OSUtils.copyToClipboard(string)
-            LorenzUtils.chat("$counter entities copied into the clipboard!")
+            ChatUtils.chat("$counter entities copied into the clipboard!")
         } else {
-            LorenzUtils.chat("No entities found in a search radius of $searchRadius!")
+            ChatUtils.chat("No entities found in a search radius of $searchRadius!")
         }
     }
 

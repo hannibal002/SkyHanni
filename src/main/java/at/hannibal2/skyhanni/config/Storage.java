@@ -44,7 +44,10 @@ public class Storage {
     public boolean hasPlayedBefore = false;
 
     @Expose
-    public Float savedMouseSensitivity = .5f;
+    public Float savedMouselockedSensitivity = .5f;
+
+    @Expose
+    public Float savedMouseloweredSensitivity = .5f;
 
     @Deprecated
     @Expose
@@ -132,9 +135,9 @@ public class Storage {
             @Override
             public String toString() {
                 return "MinionConfig{" +
-                        "displayName='" + displayName + '\'' +
-                        ", lastClicked=" + lastClicked +
-                        '}';
+                    "displayName='" + displayName + '\'' +
+                    ", lastClicked=" + lastClicked +
+                    '}';
             }
         }
 
@@ -314,6 +317,9 @@ public class Storage {
                 @Expose
                 public int lastFarmingWeightLeaderboard = -1;
             }
+
+            @Expose
+            public Map<String, LorenzVec> npcVisitorLocations = new HashMap<>();
         }
 
         @Expose
@@ -389,11 +395,11 @@ public class Storage {
             @Override
             public String toString() {
                 return "SlayerRngMeterStorage{" +
-                        "currentMeter=" + currentMeter +
-                        ", gainPerBoss=" + gainPerBoss +
-                        ", goalNeeded=" + goalNeeded +
-                        ", itemGoal='" + itemGoal + '\'' +
-                        '}';
+                    "currentMeter=" + currentMeter +
+                    ", gainPerBoss=" + gainPerBoss +
+                    ", goalNeeded=" + goalNeeded +
+                    ", itemGoal='" + itemGoal + '\'' +
+                    '}';
             }
         }
 

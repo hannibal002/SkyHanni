@@ -2,6 +2,7 @@ package at.hannibal2.skyhanni.features.chat
 
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.events.LorenzChatEvent
+import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils.groupOrNull
 import at.hannibal2.skyhanni.utils.StringUtils.cleanPlayerName
@@ -9,6 +10,7 @@ import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
 class CompactSplashPotionMessage {
+
     private val config get() = SkyHanniMod.feature.chat.compactPotionMessages
 
     private val potionEffectPatternList = listOf(
@@ -24,7 +26,7 @@ class CompactSplashPotionMessage {
     )
 
     @SubscribeEvent
-    fun onChatMessage(event: LorenzChatEvent) {
+    fun onChat(event: LorenzChatEvent) {
         if (!isEnabled()) return
         if (!event.message.isPotionMessage()) return
         event.blockedReason = "compact_potion_effect"
@@ -32,14 +34,14 @@ class CompactSplashPotionMessage {
 
     private fun sendMessage(message: String) {
         if (config.clickableChatMessage) {
-            LorenzUtils.hoverableChat(
+            ChatUtils.hoverableChat(
                 message,
                 listOf("§eClick to view your potion effects."),
                 "/effects",
                 prefix = false
             )
         } else {
-            LorenzUtils.chat(message, prefix = false)
+            ChatUtils.chat(message, prefix = false)
         }
     }
 

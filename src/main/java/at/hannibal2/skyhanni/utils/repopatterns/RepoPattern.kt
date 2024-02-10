@@ -42,6 +42,7 @@ import kotlin.reflect.KProperty
  * of slightly more options.
  */
 interface RepoPattern : ReadOnlyProperty<Any?, Pattern> {
+
     /**
      * Check whether [value] has been loaded remotely or from the fallback value at [defaultPattern]. In case this is
      * accessed off-thread there are no guarantees for the correctness of this value in relation to any specific call
@@ -78,8 +79,8 @@ interface RepoPattern : ReadOnlyProperty<Any?, Pattern> {
         return value
     }
 
-
     companion object {
+
         /**
          * Obtain a reference to a [Pattern] backed by either a local regex, or a remote regex.
          * Check the documentation of [RepoPattern] for more information.

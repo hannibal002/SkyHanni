@@ -11,6 +11,7 @@ enum class TrophyRarity(val formatCode: String) {
     val formattedString get() = "$formatCode${name.firstLetterUppercase()}"
 
     companion object {
+
         fun getByName(rawName: String) = entries.firstOrNull { rawName.uppercase().endsWith(it.name) }
     }
 }

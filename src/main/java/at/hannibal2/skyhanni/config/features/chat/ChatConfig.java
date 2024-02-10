@@ -118,4 +118,10 @@ public class ChatConfig {
     @ConfigEditorBoolean
     @FeatureToggle
     public boolean translator = false;
+
+    @Expose
+    @ConfigOption(name = "Skyblock XP Chat", desc = "Sends the Skyblock XP message into the chat.")
+    @ConfigEditorBoolean
+    @FeatureToggle
+    public boolean skyBlockXPInChat = true;
 }
