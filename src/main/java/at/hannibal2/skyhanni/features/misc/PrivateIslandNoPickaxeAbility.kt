@@ -6,7 +6,6 @@ import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.events.WorldClickEvent
 import at.hannibal2.skyhanni.utils.ItemCategory
 import at.hannibal2.skyhanni.utils.ItemUtils.getItemCategoryOrNull
-import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils.isInIsland
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
@@ -16,7 +15,7 @@ class PrivateIslandNoPickaxeAbility {
 
     @SubscribeEvent
     fun onClick(event: WorldClickEvent) {
-        if (!LorenzUtils.inSkyBlock || !IslandType.PRIVATE_ISLAND.isInIsland()) return
+        if (!IslandType.PRIVATE_ISLAND.isInIsland()) return
         if (!config.privateIslandNoPickaxeAbility) return
         if (event.clickType != ClickType.RIGHT_CLICK) return
 
