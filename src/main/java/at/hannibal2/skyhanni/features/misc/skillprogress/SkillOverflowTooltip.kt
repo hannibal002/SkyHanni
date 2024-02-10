@@ -16,7 +16,7 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
 class SkillOverflowTooltip {
 
-    private val config get() = SkyHanniMod.feature.misc.skillProgressConfig.overflowConfig
+    private val config get() = SkyHanniMod.feature.skillProgress.overflowConfig
 
     @SubscribeEvent
     fun onTooltip(event: LorenzToolTipEvent) {

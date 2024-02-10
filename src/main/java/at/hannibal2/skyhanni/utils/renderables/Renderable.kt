@@ -1,7 +1,7 @@
 package at.hannibal2.skyhanni.utils.renderables
 
 import at.hannibal2.skyhanni.config.core.config.gui.GuiPositionEditor
-import at.hannibal2.skyhanni.config.features.misc.skillprogress.SkillProgressConfig.ProgressBarConfig.TexturedBar.UsedTexture
+import at.hannibal2.skyhanni.config.features.skillprogress.SkillProgressBarConfig
 import at.hannibal2.skyhanni.data.ToolTipData
 import at.hannibal2.skyhanni.features.chroma.ChromaShaderManager
 import at.hannibal2.skyhanni.features.chroma.ChromaType
@@ -305,7 +305,7 @@ interface Renderable {
             percent: Float,
             color: Color = Color(0, 255, 0),
             useChroma: Boolean = false,
-            texture: UsedTexture = UsedTexture.MATCH_PACK,
+            texture: SkillProgressBarConfig.TexturedBar.UsedTexture = SkillProgressBarConfig.TexturedBar.UsedTexture.MATCH_PACK,
             width: Int = 182,
             height: Int = 5,
             horizontalAlign: HorizontalAlignment = HorizontalAlignment.LEFT,
@@ -317,7 +317,7 @@ interface Renderable {
             override val verticalAlign = verticalAlign
 
             override fun render(posX: Int, posY: Int) {
-                val (textureX, textureY) = if (texture == UsedTexture.MATCH_PACK) Pair(0, 64) else Pair(0, 0)
+                val (textureX, textureY) = if (texture == SkillProgressBarConfig.TexturedBar.UsedTexture.MATCH_PACK) Pair(0, 64) else Pair(0, 0)
 
                 Minecraft.getMinecraft().renderEngine.bindTexture(ResourceLocation(texture.path))
                 Minecraft.getMinecraft().ingameGUI.drawTexturedModalRect(posX, posY, textureX, textureY, width, height)

@@ -21,12 +21,15 @@ import at.hannibal2.skyhanni.config.features.mining.MiningConfig;
 import at.hannibal2.skyhanni.config.features.minion.MinionsConfig;
 import at.hannibal2.skyhanni.config.features.misc.MiscConfig;
 import at.hannibal2.skyhanni.config.features.rift.RiftConfig;
+import at.hannibal2.skyhanni.config.features.skillprogress.SkillProgressConfig;
 import at.hannibal2.skyhanni.config.features.slayer.SlayerConfig;
 import at.hannibal2.skyhanni.config.features.stranded.StrandedConfig;
 import com.google.gson.annotations.Expose;
 import io.github.moulberry.moulconfig.Config;
 import io.github.moulberry.moulconfig.Social;
+import io.github.moulberry.moulconfig.annotations.Accordion;
 import io.github.moulberry.moulconfig.annotations.Category;
+import io.github.moulberry.moulconfig.annotations.ConfigOption;
 import net.minecraft.util.ResourceLocation;
 
 import java.util.Arrays;
@@ -91,6 +94,10 @@ public class Features extends Config {
     @Expose
     @Category(name = "Combat", desc = "Everything combat and PvE related.")
     public CombatConfig combat = new CombatConfig();
+
+    @Expose
+    @Category(name = "Skill Progress", desc = "Skill Progress related config options.")
+    public SkillProgressConfig skillProgress = new SkillProgressConfig();
 
     @Expose
     @Category(name = "Commands", desc = "Enable or disable commands.")

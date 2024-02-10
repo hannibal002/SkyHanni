@@ -7,7 +7,7 @@ import at.hannibal2.skyhanni.api.SkillAPI.oldSkillInfoMap
 import at.hannibal2.skyhanni.api.SkillAPI.showDisplay
 import at.hannibal2.skyhanni.api.SkillAPI.skillMap
 import at.hannibal2.skyhanni.api.SkillAPI.skillXPInfoMap
-import at.hannibal2.skyhanni.config.features.misc.skillprogress.SkillProgressConfig
+import at.hannibal2.skyhanni.config.features.skillprogress.SkillProgressConfig
 import at.hannibal2.skyhanni.events.ConfigLoadEvent
 import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.LorenzTickEvent
@@ -41,7 +41,11 @@ import kotlin.time.Duration.Companion.seconds
 
 object SkillProgress {
 
-    private val config get() = SkyHanniMod.feature.misc.skillProgressConfig
+    private val config get() = SkyHanniMod.feature.skillProgress
+    private val barConfig get() = config.skillProgressBarConfig
+    private val allSkillConfig get() = config.allSkillDisplayConfig
+    private val etaConfig get() = config.skillETADisplayConfig
+
     private var skillExpPercentage = 0.0
     private var display = emptyList<Renderable>()
     private var allDisplay = emptyList<List<Any>>()
@@ -72,34 +76,34 @@ object SkillProgress {
                 else -> {}
             }
 
-            if (config.progressBarConfig.enabled.get()) {
-                val progress = if (config.progressBarConfig.useTexturedBar.get()) {
+            if (barConfig.enabled.get()) {
+                val progress = if (barConfig.useTexturedBar.get()) {
                     val factor = (skillExpPercentage.toFloat().coerceAtMost(1f)) * 182
                     maxWidth = 182
                     Renderable.texturedProgressBar(factor,
-                        Color(SpecialColour.specialToChromaRGB(config.progressBarConfig.barStartColor)),
-                        texture = config.progressBarConfig.texturedBar.usedTexture.get(),
-                        useChroma = config.progressBarConfig.useChroma.get())
+                        Color(SpecialColour.specialToChromaRGB(barConfig.barStartColor)),
+                        texture = barConfig.texturedBar.usedTexture.get(),
+                        useChroma = barConfig.useChroma.get())
 
                 } else {
-                    maxWidth = config.progressBarConfig.regularBar.width
+                    maxWidth = barConfig.regularBar.width
                     Renderable.progressBar(skillExpPercentage,
-                        Color(SpecialColour.specialToChromaRGB(config.progressBarConfig.barStartColor)),
-                        Color(SpecialColour.specialToChromaRGB(config.progressBarConfig.barStartColor)),
+                        Color(SpecialColour.specialToChromaRGB(barConfig.barStartColor)),
+                        Color(SpecialColour.specialToChromaRGB(barConfig.barStartColor)),
                         width = maxWidth,
-                        height = config.progressBarConfig.regularBar.height,
-                        useChroma = config.progressBarConfig.useChroma.get())
+                        height = barConfig.regularBar.height,
+                        useChroma = barConfig.useChroma.get())
                 }
 
                 config.barPosition.renderRenderables(listOf(progress), posLabel = "Skill Progress Bar")
             }
         }
 
-        if (config.showAllSkillProgress.get()) {
+        if (allSkillConfig.enabled.get()) {
             config.allSkillPosition.renderStringsAndItems(allDisplay, posLabel = "All Skills Display")
         }
 
-        if (config.showEtaSkillProgress.get()) {
+        if (etaConfig.enabled.get()) {
             config.etaPosition.renderRenderables(etaDisplay, posLabel = "Skill ETA")
         }
 
@@ -157,9 +161,6 @@ object SkillProgress {
     fun onConfigLoad(event: ConfigLoadEvent) {
         onToggle(
             config.enabled,
-            config.progressBarConfig.enabled,
-            config.progressBarConfig.useChroma,
-            config.progressBarConfig.useTexturedBar,
             config.alwaysShow,
             config.showActionLeft,
             config.useIcon,
@@ -168,8 +169,11 @@ object SkillProgress {
             config.overflowConfig.enableInDisplay,
             config.overflowConfig.enableInProgressBar,
             config.overflowConfig.enableInEtaDisplay,
-            config.showAllSkillProgress,
-            config.showEtaSkillProgress
+            barConfig.enabled,
+            barConfig.useChroma,
+            barConfig.useTexturedBar,
+            allSkillConfig.enabled,
+            etaConfig.enabled
         ) {
             updateDisplay()
             update()
@@ -246,7 +250,7 @@ object SkillProgress {
     private fun formatAllDisplay(map: List<List<Any>>): List<List<Any>> {
         val newList = mutableListOf<List<Any>>()
         if (map.isEmpty()) return newList
-        for (index in config.allskillEntryList) {
+        for (index in allSkillConfig.skillEntryList) {
             newList.add(map[index.ordinal])
         }
         return newList

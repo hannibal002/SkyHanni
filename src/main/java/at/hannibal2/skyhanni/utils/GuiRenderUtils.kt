@@ -1,6 +1,6 @@
 package at.hannibal2.skyhanni.utils
 
-import at.hannibal2.skyhanni.config.features.misc.skillprogress.SkillProgressConfig.ProgressBarConfig.TexturedBar.UsedTexture
+import at.hannibal2.skyhanni.config.features.skillprogress.SkillProgressBarConfig
 import at.hannibal2.skyhanni.features.chroma.ChromaShaderManager
 import at.hannibal2.skyhanni.features.chroma.ChromaType
 import io.github.moulberry.notenoughupdates.util.Utils
@@ -302,13 +302,13 @@ object GuiRenderUtils {
     }
 
     // Taken and edited from NEU <- it's broken
-    fun renderTexturedBar(x: Float, y: Float, xSize: Float, completed: Float, color: Color, useChroma: Boolean, texture: UsedTexture, height: Float) {
+    fun renderTexturedBar(x: Float, y: Float, xSize: Float, completed: Float, color: Color, useChroma: Boolean, texture: SkillProgressBarConfig.TexturedBar.UsedTexture, height: Float) {
         GlStateManager.pushMatrix()
         GlStateManager.translate(x, y, 0f)
         val w = xSize.toInt()
         val w_2 = w / 2
         val k = min(w.toDouble(), ceil((completed * w).toDouble())).toInt()
-        val vanilla = texture == UsedTexture.MATCH_PACK
+        val vanilla = texture == SkillProgressBarConfig.TexturedBar.UsedTexture.MATCH_PACK
         val vMinEmpty = if (vanilla) 64 / 256f else 0f
         val vMaxEmpty = if (vanilla) 69 / 256f else .5f
         val vMinFilled = if (vanilla) 69 / 256f else .5f

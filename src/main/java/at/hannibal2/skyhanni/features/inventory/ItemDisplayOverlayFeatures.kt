@@ -157,7 +157,7 @@ object ItemDisplayOverlayFeatures {
                 val level = "" + text.romanToDecimalIfNecessary()
                 val skill = SkillType.getByNameFirstUppercase(skillName)
                 val skillInfo = SkillAPI.skillMap?.get(skill) ?: return level
-                return if (SkyHanniMod.feature.misc.skillProgressConfig.overflowConfig.enableInSkillMenuAsStackSize)
+                return if (SkyHanniMod.feature.skillProgress.overflowConfig.enableInSkillMenuAsStackSize)
                     "" + skillInfo.overflowLevel else level
             }
         }
