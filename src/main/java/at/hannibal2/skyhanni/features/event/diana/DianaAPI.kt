@@ -16,7 +16,7 @@ object DianaAPI {
 
     fun hasSpadeInHand() = InventoryUtils.itemInHandId == spade
 
-    private fun isRitualActive() = MayorElection.isPerkActive("Diana", "Mythological Ritual") ||
+    fun isRitualActive() = MayorElection.isPerkActive("Diana", "Mythological Ritual") ||
         MayorElection.isPerkActive("Jerry", "Perkpocalypse") || SkyHanniMod.feature.event.diana.alwaysDiana
 
     fun hasGriffinPet() = PetAPI.isCurrentPet("Griffin")
