@@ -9,6 +9,7 @@ import kotlin.math.pow
 import kotlin.math.roundToInt
 
 object NumberUtil {
+
     @JvmField
     val nf: NumberFormat = NumberFormat.getInstance(Locale.US)
     private val suffixes = TreeMap<Long, String>().apply {

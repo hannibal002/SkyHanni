@@ -11,17 +11,19 @@ import at.hannibal2.skyhanni.features.garden.GardenAPI
 import at.hannibal2.skyhanni.features.garden.GardenAPI.addCropIcon
 import at.hannibal2.skyhanni.features.garden.GardenNextJacobContest
 import at.hannibal2.skyhanni.features.garden.farming.GardenCropSpeed.getSpeed
+import at.hannibal2.skyhanni.utils.CollectionUtils.addAsSingletonList
+import at.hannibal2.skyhanni.utils.CollectionUtils.sorted
 import at.hannibal2.skyhanni.utils.ConfigUtils
-import at.hannibal2.skyhanni.utils.LorenzUtils.addAsSingletonList
-import at.hannibal2.skyhanni.utils.LorenzUtils.sorted
 import at.hannibal2.skyhanni.utils.TimeUnit
 import at.hannibal2.skyhanni.utils.TimeUtils
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
 class GardenBestCropTime {
+
     var display = emptyList<List<Any>>()
 
     companion object {
+
         private val config get() = GardenAPI.config.cropMilestones
         val timeTillNextCrop = mutableMapOf<CropType, Long>()
 
@@ -115,7 +117,6 @@ class GardenBestCropTime {
             val contestFormat = if (GardenNextJacobContest.isNextCrop(crop)) "§n" else ""
             val currentTier = GardenCropMilestones.getTierForCropCount(crop.getCounter(), crop)
             val nextTier = if (config.bestShowMaxedNeeded.get()) 46 else currentTier + 1
-
 
             val cropName = if (!config.next.bestCompact) crop.cropName + " " else ""
             val tier = if (!config.next.bestCompact) "$currentTier➜$nextTier§r " else ""

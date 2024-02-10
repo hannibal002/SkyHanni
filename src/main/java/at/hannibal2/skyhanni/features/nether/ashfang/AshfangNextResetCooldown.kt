@@ -16,6 +16,7 @@ import net.minecraft.entity.item.EntityArmorStand
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
 class AshfangNextResetCooldown {
+
     private val config get() = SkyHanniMod.feature.crimsonIsle.ashfang
     private var spawnTime = 1L
 

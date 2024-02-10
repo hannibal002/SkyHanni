@@ -8,6 +8,7 @@ import com.google.gson.JsonObject
 import com.google.gson.JsonPrimitive
 
 object ConfigUpdaterMigrator {
+
     val logger = LorenzLogger("ConfigMigration")
     const val CONFIG_VERSION = 23
     fun JsonElement.at(chain: List<String>, init: Boolean): JsonElement? {
@@ -28,6 +29,7 @@ object ConfigUpdaterMigrator {
         var movesPerformed: Int,
         val dynamicPrefix: Map<String, List<String>>,
     ) : LorenzEvent() {
+
         init {
             dynamicPrefix.entries.filter { it.value.isEmpty() }.forEach {
                 logger.log("Dynamic prefix ${it.key} does not resolve to anything.")

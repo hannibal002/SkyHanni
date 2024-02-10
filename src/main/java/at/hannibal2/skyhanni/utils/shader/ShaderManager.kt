@@ -27,6 +27,7 @@ object ShaderManager {
         ROUNDED_RECTANGLE(RoundedRectangleShader.INSTANCE);
 
         companion object {
+
             fun getShaderInstance(shaderName: String): Shader? = when (shaderName) {
                 "standard_chroma" -> STANDARD_CHROMA.shader
                 "textured_chroma" -> TEXTURED_CHROMA.shader

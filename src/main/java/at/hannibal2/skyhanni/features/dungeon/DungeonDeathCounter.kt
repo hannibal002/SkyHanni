@@ -5,6 +5,7 @@ import at.hannibal2.skyhanni.events.DungeonStartEvent
 import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.LorenzChatEvent
 import at.hannibal2.skyhanni.events.LorenzWorldChangeEvent
+import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.RenderUtils.renderString
 import at.hannibal2.skyhanni.utils.StringUtils.matches
@@ -55,7 +56,7 @@ class DungeonDeathCounter {
 
         if (isDeathMessage(event.message)) {
             deaths++
-            LorenzUtils.chat("§c§l$deaths. DEATH!", false)
+            ChatUtils.chat("§c§l$deaths. DEATH!", false)
             update()
         }
     }

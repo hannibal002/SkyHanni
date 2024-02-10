@@ -15,6 +15,7 @@ import at.hannibal2.skyhanni.utils.TimeUtils
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
 class RiftAgaricusCap {
+
     private val config get() = RiftAPI.config.area.dreadfarm
     private var startTime = 0L
     private var location: LorenzVec? = null

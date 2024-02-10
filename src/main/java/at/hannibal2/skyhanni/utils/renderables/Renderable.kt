@@ -27,6 +27,7 @@ import java.util.Collections
 import kotlin.math.max
 
 interface Renderable {
+
     val width: Int
     val height: Int
 
@@ -44,6 +45,7 @@ interface Renderable {
     fun render(posX: Int, posY: Int)
 
     companion object {
+
         val logger = LorenzLogger("debug/renderable")
         val list = mutableMapOf<Pair<Int, Int>, List<Int>>()
         var currentRenderPassMousePosition: Pair<Int, Int>? = null
