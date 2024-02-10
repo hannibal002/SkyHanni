@@ -27,6 +27,7 @@ import net.minecraftforge.fml.common.network.FMLNetworkEvent
 import kotlin.concurrent.thread
 
 class HypixelData {
+
     private val patternGroup = RepoPattern.group("data.hypixeldata")
     private val tabListProfilePattern by patternGroup.pattern(
         "tablistprofile",
