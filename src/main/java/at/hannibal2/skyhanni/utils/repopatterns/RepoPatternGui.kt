@@ -12,7 +12,9 @@ import io.github.moulberry.moulconfig.xml.XMLUniverse
  * Gui for analyzing [RepoPattern]s
  */
 class RepoPatternGui private constructor() {
+
     companion object {
+
         /**
          * Open the [RepoPatternGui]
          */
@@ -34,10 +36,10 @@ class RepoPatternGui private constructor() {
         .map { RepoPatternInfo(it) }
     private var searchCache = ObservableList(mutableListOf<RepoPatternInfo>())
 
-
     class RepoPatternInfo(
-        repoPatternImpl: RepoPatternImpl
+        repoPatternImpl: RepoPatternImpl,
     ) {
+
         @field:Bind
         val key: String = repoPatternImpl.key
 

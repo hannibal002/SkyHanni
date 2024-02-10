@@ -15,6 +15,7 @@ import net.minecraft.client.Minecraft
  */
 
 object ChromaShader : Shader("chroma", "chroma") {
+
     val config get() = SkyHanniMod.feature.chroma
     val INSTANCE: ChromaShader
         get() = this

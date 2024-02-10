@@ -7,6 +7,7 @@ import net.minecraft.item.ItemStack
 import net.minecraftforge.fml.common.eventhandler.Cancelable
 
 @Cancelable
-class BlockClickEvent(clickType: ClickType, val position: LorenzVec, itemInHand: ItemStack?) : WorldClickEvent(itemInHand, clickType) {
+class BlockClickEvent(val clickType: ClickType, val position: LorenzVec, val itemInHand: ItemStack?) : LorenzEvent() {
+
     val getBlockState by lazy { position.getBlockStateAt() }
 }

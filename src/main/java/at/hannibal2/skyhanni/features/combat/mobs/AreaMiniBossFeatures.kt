@@ -25,6 +25,7 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import kotlin.time.Duration.Companion.seconds
 
 class AreaMiniBossFeatures {
+
     private val config get() = SkyHanniMod.feature.combat.mobs
     private var lastSpawnTime = SimpleTimeMark.farPast()
     private var miniBossType: AreaMiniBossType? = null
@@ -92,8 +93,9 @@ class AreaMiniBossFeatures {
         val health: Int,
         val color: LorenzColor,
         val colorOpacity: Int,
-        vararg val spawnLocations: LorenzVec
+        vararg val spawnLocations: LorenzVec,
     ) {
+
         GOLDEN_GHOUL(
             EntityZombie::class.java, 45_000, LorenzColor.YELLOW, 127,
             LorenzVec(-99.7, 39.0, -86.4),
