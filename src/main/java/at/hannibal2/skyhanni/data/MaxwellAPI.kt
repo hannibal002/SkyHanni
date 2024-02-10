@@ -91,10 +91,10 @@ object MaxwellAPI {
 
             for (stack in stacks.values) {
                 val lore = stack.getLore()
-                line@for (line in lore) {
+                line@ for (line in lore) {
                     inventoryMPPattern.matchMatcher(line) {
                         // MagicalPower is boosted in catacombs
-                        if (IslandType.CATACOMBS.isInIsland()) return
+                        if (IslandType.CATACOMBS.isInIsland()) continue@line
 
                         val mp = group("mp")
                         magicalPower = mp.formatNumber().toInt()
@@ -103,7 +103,7 @@ object MaxwellAPI {
 
                     inventoryPowerPattern.matchMatcher(line) {
                         val power = group("power")
-                        currentPower = getPowerByNameOrNull(power) ?: return
+                        currentPower = getPowerByNameOrNull(power) ?: continue@line
                         continue@line
                     }
                 }
