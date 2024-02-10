@@ -61,6 +61,11 @@ object SensitivityReducer {
 
             else -> return
         }
+        if (isToggled && lastCheckCooldown.passedSince() > 1.seconds) {
+            if (GardenAPI.onBarnPlot && config.onlyPlot.get()) restoreSensitivity()
+            if (!mc.thePlayer.onGround && config.onGround.get()) restoreSensitivity()
+            lastCheckCooldown = SimpleTimeMark.now()
+        }
     }
 
     @SubscribeEvent
