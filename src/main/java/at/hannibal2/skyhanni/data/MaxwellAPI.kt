@@ -52,6 +52,10 @@ object MaxwellAPI {
         "gui.yourbags",
         "Your Bags"
     )
+    private val powerSelectedPattern by group.pattern(
+        "gui.selectedpower",
+        "§aPower is selected!"
+    )
 
     @SubscribeEvent
     fun onChat(event: LorenzChatEvent) {
@@ -74,7 +78,7 @@ object MaxwellAPI {
             val selectedPowerStack =
                 stacks.values.find {
                     val lore = it.getLore()
-                    lore.isNotEmpty() && lore.last() == "§aPower is selected!"
+                    lore.isNotEmpty() && powerSelectedPattern.matches(lore.last())
                 } ?: return
             val displayName = selectedPowerStack.displayName.removeColor()
 
