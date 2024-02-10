@@ -29,21 +29,16 @@ import at.hannibal2.skyhanni.utils.SoundUtils
 import at.hannibal2.skyhanni.utils.SoundUtils.playSound
 import at.hannibal2.skyhanni.utils.SpecialColour
 import at.hannibal2.skyhanni.utils.TimeUnit
-import at.hannibal2.skyhanni.utils.TimeUtils
 import at.hannibal2.skyhanni.utils.TimeUtils.format
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 import at.hannibal2.skyhanni.utils.renderables.Renderable.Companion.horizontalContainer
 import io.github.moulberry.notenoughupdates.util.Utils
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
-import kotlinx.coroutines.runBlocking
 import net.minecraft.util.ChatComponentText
 import net.minecraftforge.client.event.ClientChatReceivedEvent
 import net.minecraftforge.fml.common.eventhandler.EventPriority
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import java.awt.Color
 import kotlin.math.ceil
-import kotlin.time.Duration
 import kotlin.time.Duration.Companion.seconds
 
 object SkillProgress {
@@ -334,7 +329,7 @@ object SkillProgress {
 
         val session = xpInfo.timeActive.seconds.format(TimeUnit.HOUR)
         add(Renderable.clickAndHover("§6Session: §b$session ${if (xpInfo.sessionTimerActive) "" else "§c(PAUSED)"}",
-            listOf("§eClick to reset!")){
+            listOf("§eClick to reset!")) {
             xpInfo.sessionTimerActive = false
             xpInfo.shouldStartTimer = true
             xpInfo.timeActive = 0L
