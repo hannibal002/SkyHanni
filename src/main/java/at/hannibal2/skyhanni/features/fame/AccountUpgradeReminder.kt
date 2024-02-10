@@ -7,6 +7,7 @@ import at.hannibal2.skyhanni.events.InventoryCloseEvent
 import at.hannibal2.skyhanni.events.InventoryFullyOpenedEvent
 import at.hannibal2.skyhanni.events.LorenzChatEvent
 import at.hannibal2.skyhanni.events.LorenzTickEvent
+import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
@@ -17,6 +18,7 @@ import kotlin.time.Duration.Companion.days
 import kotlin.time.Duration.Companion.seconds
 
 class AccountUpgradeReminder {
+
     private var inInventory = false
     private var duration: Duration? = null
     private var lastReminderSend = SimpleTimeMark.farPast()
@@ -29,7 +31,6 @@ class AccountUpgradeReminder {
                 ProfileStorageData.playerSpecific?.nextAccountUpgradeCompletionTime = it.toMillis()
             }
         }
-
 
     @SubscribeEvent
     fun onTick(event: LorenzTickEvent) {
@@ -53,7 +54,7 @@ class AccountUpgradeReminder {
         if (lastReminderSend.passedSince() < 30.seconds) return
         lastReminderSend = SimpleTimeMark.now()
 
-        LorenzUtils.clickableChat(
+        ChatUtils.clickableChat(
             "The §a$upgrade §eupgrade has completed! §c(Click to disable these reminders)",
             "shstopaccountupgradereminder"
         )
@@ -107,6 +108,7 @@ class AccountUpgradeReminder {
     }
 
     companion object {
+
         private val durationRegex = "§8Duration: (\\d{1,3})d".toRegex()
         private val startedRegex = "§eYou started the §r§a(.+) §r§eupgrade!".toRegex()
         private val claimedRegex = "§eYou claimed the §r§a.+ §r§eupgrade!".toRegex()

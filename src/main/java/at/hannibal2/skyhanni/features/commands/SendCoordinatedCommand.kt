@@ -12,11 +12,11 @@ class SendCoordinatedCommand {
         val message = event.message
         if (message == "/sendcoords") {
             event.isCanceled = true
-            LorenzUtils.sendMessageToServer(getCoordinates())
+            LorenzUtils.sendCommandToServer(getCoordinates())
         } else if (message.startsWith("/sendcoords ")) {
             event.isCanceled = true
             val description = message.split(" ").drop(1).joinToString(" ")
-            LorenzUtils.sendMessageToServer("${getCoordinates()} $description")
+            LorenzUtils.sendCommandToServer("${getCoordinates()} $description")
         }
     }
 
@@ -27,5 +27,4 @@ class SendCoordinatedCommand {
         val z = location.z.toInt()
         return "x: $x, y: $y, z: $z"
     }
-
 }

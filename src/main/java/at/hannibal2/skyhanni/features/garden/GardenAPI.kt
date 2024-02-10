@@ -24,13 +24,13 @@ import at.hannibal2.skyhanni.features.garden.fortuneguide.FarmingItems
 import at.hannibal2.skyhanni.features.garden.inventory.SkyMartCopperPrice
 import at.hannibal2.skyhanni.features.garden.visitor.VisitorAPI
 import at.hannibal2.skyhanni.utils.BlockUtils.isBabyCrop
+import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.DelayedRun
 import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName
 import at.hannibal2.skyhanni.utils.ItemUtils.getItemRarityOrNull
 import at.hannibal2.skyhanni.utils.LocationUtils.isPlayerInside
 import at.hannibal2.skyhanni.utils.LorenzRarity
-import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils.isInIsland
 import at.hannibal2.skyhanni.utils.LorenzVec
 import at.hannibal2.skyhanni.utils.NEUInternalName
@@ -45,6 +45,7 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import kotlin.time.Duration.Companion.seconds
 
 object GardenAPI {
+
     var toolInHand: String? = null
     var itemInHand: ItemStack? = null
     var cropInHand: CropType? = null
@@ -159,7 +160,7 @@ object GardenAPI {
         storage?.cropsPerSecond?.clear()
         GardenBestCropTime.reset()
         updateGardenTool()
-        LorenzUtils.chat("Manually reset all crop speed data!")
+        ChatUtils.chat("Manually reset all crop speed data!")
     }
 
     @SubscribeEvent

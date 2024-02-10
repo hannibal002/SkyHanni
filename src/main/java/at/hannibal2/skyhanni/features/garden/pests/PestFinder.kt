@@ -17,10 +17,10 @@ import at.hannibal2.skyhanni.features.garden.GardenPlotAPI.pests
 import at.hannibal2.skyhanni.features.garden.GardenPlotAPI.renderPlot
 import at.hannibal2.skyhanni.features.garden.GardenPlotAPI.sendTeleportTo
 import at.hannibal2.skyhanni.test.GriffinUtils.drawWaypointFilled
+import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.LocationUtils.distanceSqToPlayer
 import at.hannibal2.skyhanni.utils.LorenzColor
-import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.NEUItems
 import at.hannibal2.skyhanni.utils.NumberUtil.formatNumber
 import at.hannibal2.skyhanni.utils.RenderUtils.drawDynamicText
@@ -51,7 +51,7 @@ class PestFinder {
         PestSpawnTimer.lastSpawnTime = SimpleTimeMark.now()
         val plot = GardenPlotAPI.getPlotByName(event.plotName)
         if (plot == null) {
-            LorenzUtils.userError("Open Desk to load plot names and pest locations!")
+            ChatUtils.userError("Open Desk to load plot names and pest locations!")
             return
         }
         plot.pests += event.amountPests
@@ -75,7 +75,6 @@ class PestFinder {
             }
         }
         update()
-
     }
 
     private fun update() {
@@ -162,7 +161,7 @@ class PestFinder {
             }
         }
         if (fixed) {
-            LorenzUtils.debug("Auto fixed all plots with pests.")
+            ChatUtils.debug("Auto fixed all plots with pests.")
         }
     }
 
@@ -178,7 +177,7 @@ class PestFinder {
 
     private fun removeNearestPest() {
         val plot = getNearestInfectedPest() ?: run {
-            LorenzUtils.error("Can not remove nearest pest: No infected plots detected.")
+            ChatUtils.error("Can not remove nearest pest: No infected plots detected.")
             return
         }
         plot.pests--
@@ -218,7 +217,6 @@ class PestFinder {
             val location = playerLocation.copy(x = middle.x, z = middle.z)
             event.drawWaypointFilled(location, LorenzColor.RED.toColor())
             event.drawDynamicText(location, "§c$pestsName §7in §b$plotName", 1.5)
-
         }
     }
 
@@ -235,12 +233,12 @@ class PestFinder {
         lastKeyPress = SimpleTimeMark.now()
 
         val plot = getNearestInfectedPest() ?: run {
-            LorenzUtils.userError("No infected plots detected to warp to!")
+            ChatUtils.userError("No infected plots detected to warp to!")
             return
         }
 
         if (plot.isPlayerInside()) {
-            LorenzUtils.userError("You stand already on the infected plot!")
+            ChatUtils.userError("You stand already on the infected plot!")
             return
         }
 

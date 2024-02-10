@@ -6,6 +6,7 @@ import net.minecraft.command.ICommandSender
 import net.minecraft.util.BlockPos
 
 class SimpleCommand : CommandBase {
+
     private val commandName: String
     private val runnable: ProcessCommandRunnable
     private var tabRunnable: TabCompleteRunnable? = null
@@ -22,10 +23,12 @@ class SimpleCommand : CommandBase {
     }
 
     abstract class ProcessCommandRunnable {
+
         abstract fun processCommand(sender: ICommandSender?, args: Array<String>?)
     }
 
     interface TabCompleteRunnable {
+
         fun tabComplete(sender: ICommandSender?, args: Array<String>?, pos: BlockPos?): List<String>
     }
 

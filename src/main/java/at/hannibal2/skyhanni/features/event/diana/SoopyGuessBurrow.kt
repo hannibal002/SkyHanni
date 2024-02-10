@@ -5,7 +5,7 @@ import at.hannibal2.skyhanni.events.BurrowGuessEvent
 import at.hannibal2.skyhanni.events.LorenzWorldChangeEvent
 import at.hannibal2.skyhanni.events.PlaySoundEvent
 import at.hannibal2.skyhanni.events.ReceiveParticleEvent
-import at.hannibal2.skyhanni.utils.LorenzUtils
+import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.LorenzVec
 import at.hannibal2.skyhanni.utils.toLorenzVec
 import net.minecraft.util.EnumParticleTypes
@@ -109,7 +109,7 @@ class SoopyGuessBurrow {
         distance2 = (Math.E / slope) - firstParticlePoint?.distance(pos)!!
 
         if (distance2!! > 1000) {
-            LorenzUtils.debug("Soopy distance2 is $distance2")
+            ChatUtils.debug("Soopy distance2 is $distance2")
             distance2 = null
             guessPoint = null
 
@@ -227,7 +227,7 @@ class SoopyGuessBurrow {
                         i++
                     }
 
-                    //Why does this happen?
+                    // Why does this happen?
                     if (pr1.isEmpty()) return
 
                     val p1 = pr1.last()
