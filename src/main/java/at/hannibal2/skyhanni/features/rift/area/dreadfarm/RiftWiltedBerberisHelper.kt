@@ -133,8 +133,8 @@ class RiftWiltedBerberisHelper {
             .minByOrNull { it.currentParticles.distanceSq(location) }
     }
 
-    private fun MutableMap<LorenzVec, Int>.nearestFieldCenterOrNull(location: LorenzVec): LorenzVec? {
-        return keys.minByOrNull { it.distanceSq(location) }
+    private fun nearestFieldCenterOrNull(location: LorenzVec): LorenzVec? {
+        return mapBerberis.keys.minByOrNull { it.distanceSq(location) }
     }
 
     private fun MutableMap<LorenzVec, WiltedBerberisSequence>.nearestBerberisSequenceOrNull(location: LorenzVec, filter: Boolean = true): Pair<LorenzVec, WiltedBerberisSequence>? {
@@ -147,12 +147,13 @@ class RiftWiltedBerberisHelper {
         if (!isEnabled()) return
         if (!hasFarmingToolInHand) return
 
+        // ########################################################
         val location = event.location
         val berberis = nearestBerberisParticle(location)
         val block = location.add(y = -1).getBlockAt().toString()
-        val nearestCenter = mapBerberis.nearestFieldCenterOrNull(location)
+        val nearestCenter = nearestFieldCenterOrNull(location)
 
-        if (config.respawnSequence && location.distanceToPlayer() < 40 && event.type == EnumParticleTypes.VILLAGER_HAPPY && nearestCenter != null) {
+        if (config.respawnSequence && location.distanceToPlayer() < 40 && event.type == EnumParticleTypes.VILLAGER_HAPPY && block == "Block{minecraft:farmland}" && nearestCenter != null) {
             val berberisSequence = mapBerberisSequence[nearestCenter] ?: WiltedBerberisSequence()
 
             with (berberisSequence) {
@@ -167,6 +168,7 @@ class RiftWiltedBerberisHelper {
 
             mapBerberisSequence[nearestCenter] = berberisSequence
         }
+        // ########################################################
 
         if (event.type != EnumParticleTypes.FIREWORKS_SPARK) {
             if (config.hideParticles && berberis != null) {
@@ -183,6 +185,7 @@ class RiftWiltedBerberisHelper {
             listBerberisParticle = listBerberisParticle.editCopy { add(WiltedBerberisParticle(location)) }
             return
         }
+
 
         with(berberis) {
             val isMoving = currentParticles != location
