@@ -14,6 +14,7 @@ import at.hannibal2.skyhanni.utils.LorenzVec
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
 class LivingCaveLivingMetalHelper {
+
     private val config get() = RiftAPI.config.area.livingCave.livingCaveLivingMetalConfig
     private var lastClicked: LorenzVec? = null
     private var pair: Pair<LorenzVec, LorenzVec>? = null

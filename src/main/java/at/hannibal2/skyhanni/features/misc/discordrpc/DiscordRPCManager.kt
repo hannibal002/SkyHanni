@@ -15,9 +15,10 @@ import at.hannibal2.skyhanni.events.LorenzTickEvent
 import at.hannibal2.skyhanni.events.LorenzWorldChangeEvent
 import at.hannibal2.skyhanni.events.RepositoryReloadEvent
 import at.hannibal2.skyhanni.test.command.ErrorManager
+import at.hannibal2.skyhanni.utils.ChatUtils
+import at.hannibal2.skyhanni.utils.ConditionalUtils
 import at.hannibal2.skyhanni.utils.ConfigUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils
-import at.hannibal2.skyhanni.utils.LorenzUtils.onToggle
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import com.google.gson.JsonObject
 import com.jagrosh.discordipc.IPCClient
@@ -33,6 +34,7 @@ import java.util.concurrent.ScheduledExecutorService
 import java.util.concurrent.TimeUnit
 
 object DiscordRPCManager : IPCListener {
+
     private const val applicationID = 1093298182735282176L
     private const val updatePeriod = 4200L
 
@@ -67,13 +69,18 @@ object DiscordRPCManager : IPCListener {
 
                 try {
                     client?.connect()
-                    if (fromCommand) LorenzUtils.chat("Successfully started Rich Presence!", prefixColor = "§a") // confirm that /shrpcstart worked
+                    if (fromCommand) ChatUtils.chat(
+                        "Successfully started Rich Presence!",
+                        prefixColor = "§a"
+                    ) // confirm that /shrpcstart worked
                 } catch (ex: Exception) {
                     consoleLog("Warn: Failed to connect to RPC!")
                     consoleLog(ex.toString())
-                    LorenzUtils.clickableChat("Discord Rich Presence was unable to start! " +
+                    ChatUtils.clickableChat(
+                        "Discord Rich Presence was unable to start! " +
                             "This usually happens when you join SkyBlock when Discord is not started. " +
-                            "Please run /shrpcstart to retry once you have launched Discord.", "shrpcstart")
+                            "Please run /shrpcstart to retry once you have launched Discord.", "shrpcstart"
+                    )
                 }
             } catch (ex: Throwable) {
                 consoleLog("Warn: Discord RPC has thrown an unexpected error while trying to start...")
@@ -96,9 +103,11 @@ object DiscordRPCManager : IPCListener {
 
     @SubscribeEvent
     fun onConfigLoad(event: ConfigLoadEvent) {
-        onToggle(config.firstLine,
+        ConditionalUtils.onToggle(
+            config.firstLine,
             config.secondLine,
-            config.customText) {
+            config.customText
+        ) {
             if (isActive()) {
                 updatePresence()
             }
@@ -198,16 +207,16 @@ object DiscordRPCManager : IPCListener {
 
     fun startCommand() {
         if (!config.enabled.get()) {
-            LorenzUtils.userError("Discord Rich Presence is disabled. Enable it in the config §e/sh discord")
+            ChatUtils.userError("Discord Rich Presence is disabled. Enable it in the config §e/sh discord")
             return
         }
 
         if (isActive()) {
-            LorenzUtils.userError("Discord Rich Presence is already active!")
+            ChatUtils.userError("Discord Rich Presence is already active!")
             return
         }
 
-        LorenzUtils.chat("Attempting to start Discord Rich Presence...")
+        ChatUtils.chat("Attempting to start Discord Rich Presence...")
         try {
             start(true)
         } catch (e: Exception) {

@@ -5,5 +5,5 @@ import at.hannibal2.skyhanni.data.SackAPI
 class SackChangeEvent(
     val sackChanges: List<SackAPI.SackChange>,
     val otherItemsAdded: Boolean,
-    val otherItemsRemoved: Boolean
+    val otherItemsRemoved: Boolean,
 ) : LorenzEvent()

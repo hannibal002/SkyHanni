@@ -14,7 +14,7 @@ class WarpIsCommand {
 
         if (event.message.lowercase() == "/warp is") {
             event.isCanceled = true
-            LorenzUtils.sendMessageToServer("/is")
+            LorenzUtils.sendCommandToServer("/is")
         }
     }
 }

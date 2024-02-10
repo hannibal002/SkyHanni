@@ -9,14 +9,15 @@ abstract class GuiRenderItemEvent : LorenzEvent() {
         open val stack: ItemStack?,
         open val x: Int,
         open val y: Int,
-        open val text: String?
+        open val text: String?,
     ) : GuiRenderItemEvent() {
+
         data class GuiRenderItemPost(
             override val fontRenderer: FontRenderer,
             override val stack: ItemStack?,
             override val x: Int,
             override val y: Int,
-            override val text: String?
+            override val text: String?,
         ) :
             RenderOverlayEvent(fontRenderer, stack, x, y, text)
     }

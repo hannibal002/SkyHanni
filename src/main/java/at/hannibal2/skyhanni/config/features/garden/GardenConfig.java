@@ -105,6 +105,11 @@ public class GardenConfig {
     public YawPitchDisplayConfig yawPitchDisplay = new YawPitchDisplayConfig();
 
     @Expose
+    @ConfigOption(name = "Sensitivity Reducer", desc = "")
+    @Accordion
+    public SensitivityReducerConfig sensitivityReducerConfig = new SensitivityReducerConfig();
+
+    @Expose
     @ConfigOption(name = "Crop Start Location", desc = "")
     @Accordion
     public CropStartLocationConfig cropStartLocation = new CropStartLocationConfig();
@@ -118,6 +123,11 @@ public class GardenConfig {
     @ConfigOption(name = "Garden Commands", desc = "")
     @Accordion
     public GardenCommandsConfig gardenCommands = new GardenCommandsConfig();
+
+    @Expose
+    @ConfigOption(name = "Atmospheric Filter Display", desc = "")
+    @Accordion
+    public AtmosphericFilterDisplayConfig atmosphericFilterDisplay = new AtmosphericFilterDisplayConfig();
 
     @Expose
     @ConfigOption(name = "Plot Price", desc = "Show the price of the plot in coins when inside the Configure Plots inventory.")

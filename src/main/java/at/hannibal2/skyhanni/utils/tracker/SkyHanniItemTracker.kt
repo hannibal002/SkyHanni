@@ -5,12 +5,13 @@ import at.hannibal2.skyhanni.config.Storage
 import at.hannibal2.skyhanni.config.features.misc.TrackerConfig.PriceFromEntry
 import at.hannibal2.skyhanni.data.SlayerAPI
 import at.hannibal2.skyhanni.test.PriceSource
+import at.hannibal2.skyhanni.utils.ChatUtils
+import at.hannibal2.skyhanni.utils.CollectionUtils.addAsSingletonList
+import at.hannibal2.skyhanni.utils.CollectionUtils.sortedDesc
 import at.hannibal2.skyhanni.utils.ItemUtils.getNameWithEnchantment
 import at.hannibal2.skyhanni.utils.KeyboardManager
 import at.hannibal2.skyhanni.utils.LorenzUtils
-import at.hannibal2.skyhanni.utils.LorenzUtils.addAsSingletonList
 import at.hannibal2.skyhanni.utils.LorenzUtils.addSelector
-import at.hannibal2.skyhanni.utils.LorenzUtils.sortedDesc
 import at.hannibal2.skyhanni.utils.NEUInternalName
 import at.hannibal2.skyhanni.utils.NEUInternalName.Companion.asInternalName
 import at.hannibal2.skyhanni.utils.NumberUtil
@@ -27,6 +28,7 @@ class SkyHanniItemTracker<Data : ItemTrackerData>(
 ) : SkyHanniTracker<Data>(name, createNewSession, getStorage, drawDisplay) {
 
     companion object {
+
         val SKYBLOCK_COIN by lazy { "SKYBLOCK_COIN".asInternalName() }
     }
 
@@ -47,7 +49,7 @@ class SkyHanniItemTracker<Data : ItemTrackerData>(
 
         val (itemName, price) = SlayerAPI.getItemNameAndPrice(internalName, amount)
         if (config.warnings.chat && price >= config.warnings.minimumChat) {
-            LorenzUtils.chat("§a+Tracker Drop§7: §r$itemName")
+            ChatUtils.chat("§a+Tracker Drop§7: §r$itemName")
         }
         if (config.warnings.title && price >= config.warnings.minimumTitle) {
             LorenzUtils.sendTitle("§a+ $itemName", 5.seconds)
@@ -71,7 +73,7 @@ class SkyHanniItemTracker<Data : ItemTrackerData>(
     fun drawItems(
         data: Data,
         filter: (NEUInternalName) -> Boolean,
-        lists: MutableList<List<Any>>
+        lists: MutableList<List<Any>>,
     ): Double {
         var profit = 0.0
         val items = mutableMapOf<Renderable, Long>()
@@ -106,7 +108,7 @@ class SkyHanniItemTracker<Data : ItemTrackerData>(
                 if (System.currentTimeMillis() > lastClickDelay + 150) {
                     if (KeyboardManager.isModifierKeyDown()) {
                         data.items.remove(internalName)
-                        LorenzUtils.chat("Removed $cleanName §efrom $name.")
+                        ChatUtils.chat("Removed $cleanName §efrom $name.")
                         lastClickDelay = System.currentTimeMillis() + 500
                     } else {
                         modify {
@@ -152,7 +154,7 @@ class SkyHanniItemTracker<Data : ItemTrackerData>(
         item: ItemTrackerData.TrackedItem,
         hidden: Boolean,
         newDrop: Boolean,
-        internalName: NEUInternalName
+        internalName: NEUInternalName,
     ) = buildList {
         if (internalName == SKYBLOCK_COIN) {
             addAll(data.getCoinDescription(item))
@@ -161,7 +163,7 @@ class SkyHanniItemTracker<Data : ItemTrackerData>(
         }
         add("")
         if (newDrop) {
-            add("§aYou caught this item recently.")
+            add("§aYou obtained this item recently.")
             add("")
         }
         add("§eClick to " + (if (hidden) "show" else "hide") + "!")
@@ -172,4 +174,17 @@ class SkyHanniItemTracker<Data : ItemTrackerData>(
         }
     }
 
+    fun addTotalProfit(profit: Double, totalAmount: Long, action: String): Renderable {
+        val profitFormat = profit.addSeparators()
+        val profitPrefix = if (profit < 0) "§c" else "§6"
+
+        val tips = if (totalAmount > 0) {
+            val profitPerCatch = profit / totalAmount
+            val profitPerCatchFormat = NumberUtil.format(profitPerCatch)
+            listOf("§7Profit per $action: $profitPrefix$profitPerCatchFormat")
+        } else emptyList()
+
+        val text = "§eTotal Profit: $profitPrefix$profitFormat coins"
+        return Renderable.hoverTips(text, tips)
+    }
 }

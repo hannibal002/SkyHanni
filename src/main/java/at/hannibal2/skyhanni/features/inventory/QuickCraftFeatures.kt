@@ -18,6 +18,7 @@ import net.minecraftforge.fml.common.eventhandler.EventPriority
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
 class QuickCraftFeatures {
+
     private val config get() = SkyHanniMod.feature.inventory
     private val quickCraftSlots = listOf(16, 25, 34)
     private var quickCraftableItems = emptyList<String>()
@@ -78,5 +79,4 @@ class QuickCraftFeatures {
 
     fun isEnabled() =
         LorenzUtils.inSkyBlock && config.quickCraftingConfirmation && InventoryUtils.openInventoryName() == "Craft Item"
-
 }
