@@ -10,6 +10,7 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import java.util.regex.Pattern
 
 class ChatFilter {
+
     private val config get() = SkyHanniMod.feature.chat.filterType
 
     /// <editor-fold desc="Regex Patterns & Messages">
@@ -97,13 +98,13 @@ class ChatFilter {
         "§7Putting item in escrow...",
         "§7Putting coins in escrow...",
 
-        //Auction House
+        // Auction House
         "§7Setting up the auction...",
         "§7Processing purchase...",
         "§7Processing bid...",
         "§7Claiming BIN auction...",
 
-        //Bazaar
+        // Bazaar
         "§6[Bazaar] §r§7Submitting sell offer...",
         "§6[Bazaar] §r§7Submitting buy order...",
         "§6[Bazaar] §r§7Executing instant sell...",
@@ -112,18 +113,18 @@ class ChatFilter {
         "§6[Bazaar] §r§7Claiming order...",
         "§6[Bazaar] §r§7Putting goods in escrow...",
 
-        //Bank
+        // Bank
         "§8Depositing coins...",
         "§8Withdrawing coins..."
     )
 
     // Slayer
     private val slayerPatterns = listOf(
-        //start
+        // start
         " {2}§r§5§lSLAYER QUEST STARTED!".toPattern(),
         " {3}§5§l» §7Slay §c(.*) Combat XP §7worth of (.*)§7.".toPattern(),
 
-        //end
+        // end
         " {2}§r§a§lSLAYER QUEST COMPLETE!".toPattern(),
         " {3}§r§e(.*)Slayer LVL 9 §r§5- §r§a§lLVL MAXED OUT!".toPattern(),
         " {3}§r§5§l» §r§7Talk to Maddox to claim your (.*) Slayer XP!".toPattern()
@@ -137,7 +138,7 @@ class ChatFilter {
 
     // Slayer Drop
     private val slayerDropPatterns = listOf(
-        //Zombie
+        // Zombie
         "§b§lRARE DROP! §r§7\\(§r§f§r§9Revenant Viscera§r§7\\) (.*)".toPattern(),
         "§b§lRARE DROP! §r§7\\(§r§f§r§7(.*)x §r§f§r§9Foul Flesh§r§7\\) (.*)".toPattern(),
         "§b§lRARE DROP! §r§7\\(§r§f§r§9Foul Flesh§r§7\\) (.*)".toPattern(),
@@ -147,7 +148,7 @@ class ChatFilter {
         "§5§lVERY RARE DROP! {2}§r§7\\(§r§f§r§9Undead Catalyst§r§7\\) (.*)".toPattern(),
         "§5§lVERY RARE DROP! {2}§r§7\\(§r§f§r§2◆ Pestilence Rune I§r§7\\) §r§b(.*)".toPattern(),
 
-        //Tarantula
+        // Tarantula
         "§6§lRARE DROP! §r§9Arachne's Keeper Fragment (.+)".toPattern(),
         "§6§lRARE DROP! §r§5Travel Scroll to Spider's Den Top of Nest (.+)".toPattern(),
         "§9§lVERY RARE DROP! {2}§r§7\\(§r§f§r§a◆ Bite Rune I§r§7\\) (.+)".toPattern(),
@@ -155,7 +156,7 @@ class ChatFilter {
         "§b§lRARE DROP! §r§7\\(§r§f§r§aToxic Arrow Poison§r§7\\) (.+)".toPattern(),
         "§5§lVERY RARE DROP! {2}§r§7\\(§r§9Bane of Arthropods VI§r§7\\) (.+)".toPattern(),
 
-        //Enderman
+        // Enderman
         "§b§lRARE DROP! §r§7\\(§r§f§r§7(.*)x §r§f§r§aTwilight Arrow Poison§r§7\\) (.*)".toPattern(),
         "§5§lVERY RARE DROP! {2}§r§7\\(§r§fMana Steal I§r§7\\) (.*)".toPattern(),
         "§5§lVERY RARE DROP! {2}§r§7\\(§r§f§r§5Sinful Dice§r§7\\) (.*)".toPattern(),
@@ -167,7 +168,7 @@ class ChatFilter {
         "§5§lVERY RARE DROP! {2}§r§7\\(§r§f§r§5◆ End Rune I§r§7\\) (.*)".toPattern(),
         "§5§lVERY RARE DROP! {2}§r§7\\(§r§f§r§6Hazmat Enderman§r§7\\) .*".toPattern(),
 
-        //Blaze
+        // Blaze
         "§9§lVERY RARE DROP! {2}§r§7\\(§r§f§r§fWisp's Ice-Flavored Water I Splash Potion§r§7\\) (.*)".toPattern(),
         "§b§lRARE DROP! §r§7\\(§r§f§r§5Bundle of Magma Arrows§r§7\\) (.*)".toPattern(),
         "§9§lVERY RARE DROP! {2}§r§7\\(§r§f§r§7\\d+x §r§f§r§9(Glowstone|Blaze Rod|Magma Cream|Nether Wart) Distillate§r§7\\) (.*)".toPattern()
@@ -298,13 +299,14 @@ class ChatFilter {
 
         // Useful, maybe in another chat
         "§aYou received §r§b\\+\\d{1,3} §r§a(Mithril|Gemstone) Powder.".toPattern(),
-        "§aYou received §r(§6|§b)\\+[1-2] (Diamond|Gold) Essence".toPattern(),
+        "§aYou received §r(§6|§b)\\+[1-2] (Diamond|Gold) Essence§r§a.".toPattern(),
     )
     private val fireSalePatterns = listOf(
         "§c♨ §eFire Sales for .* §eare starting soon!".toPattern(),
-        "§c\\s*♨ .* (?:Skin|Rune) §e(?:for a limited time )?\\(.* §eleft\\)(?:§c|!)".toPattern(),
+        "§c\\s*♨ .* (?:Skin|Rune|Dye) §e(?:for a limited time )?\\(.* §eleft\\)(?:§c|!)".toPattern(),
         "§c♨ §eVisit the Community Shop in the next §c.* §eto grab yours! §a§l\\[WARP]".toPattern(),
         "§c♨ §eA Fire Sale for .* §eis starting soon!".toPattern(),
+        "§c♨ §r§eFire Sale for .* §r§eended!".toPattern(),
     )
     private val powderMiningMessages = listOf(
         "§aYou uncovered a treasure chest!",
@@ -363,7 +365,7 @@ class ChatFilter {
     /// </editor-fold>
 
     @SubscribeEvent
-    fun onChatMessage(event: LorenzChatEvent) {
+    fun onChat(event: LorenzChatEvent) {
         val blockReason = block(event.message)
         if (blockReason == "") return
 

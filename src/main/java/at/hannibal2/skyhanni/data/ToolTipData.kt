@@ -36,6 +36,7 @@ class ToolTipData {
     }
 
     companion object {
+
         var lastSlot: Slot? = null
     }
 }

@@ -25,9 +25,11 @@ import net.minecraft.item.ItemStack
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
 class BazaarApi {
+
     private var loadedNpcPriceData = false
 
     companion object {
+
         val holder = BazaarDataHolder()
         var inBazaarInventory = false
         private var currentSearchedItem = ""

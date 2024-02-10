@@ -10,6 +10,7 @@ import io.github.moulberry.moulconfig.annotations.Category;
 import io.github.moulberry.moulconfig.annotations.ConfigEditorBoolean;
 import io.github.moulberry.moulconfig.annotations.ConfigEditorDraggableList;
 import io.github.moulberry.moulconfig.annotations.ConfigOption;
+
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -203,5 +204,11 @@ public class InventoryConfig {
     @ConfigEditorBoolean
     @FeatureToggle
     public boolean shiftClickNPCSell = false;
+
+    @Expose
+    @ConfigOption(name = "Shift Click Brewing", desc = "Makes normal clicks to shift clicks in Brewing Stand inventory.")
+    @ConfigEditorBoolean
+    @FeatureToggle
+    public boolean shiftClickBrewing = false;
 
 }

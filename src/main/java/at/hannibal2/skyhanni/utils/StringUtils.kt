@@ -4,6 +4,7 @@ import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.mixins.transformers.AccessorChatComponentText
 import at.hannibal2.skyhanni.utils.GuiRenderUtils.darkenColor
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
+import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraft.client.Minecraft
 import net.minecraft.client.gui.GuiUtilRenderComponents
 import net.minecraft.util.ChatComponentText
@@ -16,6 +17,7 @@ import java.util.regex.Matcher
 import java.util.regex.Pattern
 
 object StringUtils {
+
     // TODO USE SH-REPO
     private val playerChatPattern = "(?<important>.*?)(?:§[f7r])*: .*".toPattern()
     private val chatUsernamePattern =
@@ -23,6 +25,10 @@ object StringUtils {
     private val whiteSpaceResetPattern = "^(?:\\s|§r)*|(?:\\s|§r)*$".toPattern()
     private val whiteSpacePattern = "^\\s*|\\s*$".toPattern()
     private val resetPattern = "(?i)§R".toPattern()
+    private val isRomanPattern by RepoPattern.pattern(
+        "utils.string.isroman",
+        "^M{0,3}(CM|CD|D?C{0,3})(XC|XL|L?X{0,3})(IX|IV|V?I{0,3})"
+    )
 
     fun String.trimWhiteSpaceAndResets(): String = whiteSpaceResetPattern.matcher(this).replaceAll("")
     fun String.trimWhiteSpace(): String = whiteSpacePattern.matcher(this).replaceAll("")
@@ -282,10 +288,15 @@ object StringUtils {
     fun String.convertToFormatted(): String = this.replace("&&", "§")
 
     fun Pattern.matches(string: String?) = string?.let { matcher(it).matches() } ?: false
+    fun Pattern.anyMatches(list: List<String>?) = list?.any { this.matches(it) } ?: false
 
     fun Pattern.find(string: String?) = string?.let { matcher(it).find() } ?: false
 
     fun String.allLettersFirstUppercase() = split("_").joinToString(" ") { it.firstLetterUppercase() }
 
     fun String?.equalsIgnoreColor(string: String?) = this?.let { it.removeColor() == string?.removeColor() } ?: false
+
+    fun String.isRoman(): Boolean {
+        return isRomanPattern.matches(this)
+    }
 }
