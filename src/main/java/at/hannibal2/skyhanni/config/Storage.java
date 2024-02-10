@@ -144,7 +144,7 @@ public class Storage {
             public String currentArrow = null;
 
             @Expose
-            public Map<String, Float> arrowAmount = new HashMap<>();
+            public Map<NEUInternalName, Float> arrowAmount = new HashMap<>();
         }
 
         @Expose

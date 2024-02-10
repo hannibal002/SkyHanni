@@ -1,7 +1,9 @@
 package at.hannibal2.skyhanni.data
 
-data class ArrowType(val arrow: String, val internalName: String) {
-    override fun toString() = internalName
+import at.hannibal2.skyhanni.utils.NEUInternalName
+
+data class ArrowType(val arrow: String, val internalName: NEUInternalName) {
+    override fun toString() = internalName.asString()
 
     override fun hashCode(): Int {
         var result = arrow.hashCode()
