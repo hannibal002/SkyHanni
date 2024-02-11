@@ -344,6 +344,7 @@ class ItemAbilityCooldown {
 
         val list = mutableListOf<ItemAbility>()
         for (ability in ItemAbility.entries) {
+            if (!ability.canCastAbility()) continue
             if (ability.internalNames.contains(internalName)) {
                 list.add(ability)
             }

@@ -131,7 +131,7 @@ enum class ItemAbility(
 
     fun setItemClick(clickType: ClickType) {
         if (lastItemClick.passedSince() < allowRecastAfter) return
-        if (!isAllowed()) return
+        if (!canCastAbility()) return
 
         // only allow left clicks on alternative position, only right clicks on others
         if (alternativePosition != (clickType == ClickType.LEFT_CLICK)) return
@@ -167,6 +167,10 @@ enum class ItemAbility(
         }
 
         private fun allAbilitiesBlocked(): Boolean {
+            if (LorenzUtils.skyBlockArea == "Matriarch's Lair") {
+                return true
+            }
+
             return false
         }
     }
