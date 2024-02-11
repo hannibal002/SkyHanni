@@ -8,7 +8,6 @@ import at.hannibal2.skyhanni.events.LorenzTickEvent
 import at.hannibal2.skyhanni.events.LorenzWorldChangeEvent
 import at.hannibal2.skyhanni.events.RenderItemTipEvent
 import at.hannibal2.skyhanni.events.RenderObject
-import at.hannibal2.skyhanni.utils.ItemUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName
 import at.hannibal2.skyhanni.utils.LorenzColor
 import at.hannibal2.skyhanni.utils.LorenzUtils
@@ -225,18 +224,6 @@ class ItemAbilityCooldown {
     fun onTick(event: LorenzTickEvent) {
         if (!isEnabled()) return
 
-        checkItems()
-    }
-
-    private fun checkItems() {
-        for (itemStack in ItemUtils.getItemsInInventory(true)) {
-            val activeAbilities = itemStack.getActiveAbilities()
-            if (activeAbilities.isNotEmpty()) {
-                val data = itemStack.cachedData
-                data.itemAbilities = activeAbilities
-            }
-        }
-
         for (activeAbility in activeAbilities.values) {
             activeAbility.text = createItemText(activeAbility)
         }
@@ -278,9 +265,17 @@ class ItemAbilityCooldown {
         if (!isEnabled()) return
 
         val stack = event.stack
-        val guiOpen = Minecraft.getMinecraft().currentScreen != null
+        val cachedData = stack.cachedData
 
-        for (ability in stack.cachedData.itemAbilities) {
+        val itemAbilities = cachedData.itemAbilities ?: run {
+            val itemAbilities = stack.getActiveAbilities()
+            cachedData.itemAbilities = itemAbilities
+            itemAbilities
+        }
+
+        val guiOpen = Minecraft.getMinecraft().currentScreen != null
+        for (ability in itemAbilities) {
+            if (!ability.isAllowed()) continue
             val itemText = ability.text ?: continue
             if (guiOpen && !itemText.onCooldown) continue
             val color = itemText.color

@@ -43,7 +43,7 @@ class ActiveAbility(
 
     fun onClick(clickType: ClickType) {
         if (lastItemClick.passedSince() < type.allowRecastAfter) return
-        if (!canCastAbility()) return
+        if (!isAllowed()) return
 
         // only allow left clicks on alternative position, only right clicks on others
         if (type.alternativePosition != (clickType == ClickType.LEFT_CLICK)) return
@@ -85,5 +85,5 @@ class ActiveAbility(
         return false
     }
 
-    private fun canCastAbility(): Boolean = type.isAllowed() && !allAbilitiesBlocked()
+    fun isAllowed(): Boolean = type.isAllowed() && !allAbilitiesBlocked()
 }

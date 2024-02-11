@@ -26,5 +26,5 @@ data class CachedItemData(
 
     var itemCategory: ItemCategory? = null,
 
-    var itemAbilities: List<ActiveAbility> = listOf()
+    var itemAbilities: List<ActiveAbility>? = null
 )
