@@ -17,6 +17,10 @@ public class MiscConfig {
     @Category(name = "Pets", desc = "Pets Settings")
     public PetConfig pets = new PetConfig();
 
+    @Expose
+    @Category(name = "Player Stats Displays", desc = "Show Player Stats")
+    public PlayerStatsDisplayConfig playerStatsDisplay = new PlayerStatsDisplayConfig();
+
     @ConfigOption(name = "Hide Armor", desc = "")
     @Accordion
     @Expose

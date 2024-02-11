@@ -8,6 +8,7 @@ import at.hannibal2.skyhanni.utils.LorenzColor
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.TimeUtils.format
+import net.minecraft.item.ItemStack
 import kotlin.math.floor
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.seconds
@@ -41,18 +42,25 @@ class ActiveAbility(
 
     fun getDuration() = getCooldown() - lastActivation.passedSince()
 
-    fun onClick(clickType: ClickType) {
-        if (lastItemClick.passedSince() < type.allowRecastAfter) return
+    fun onClick(itemStack: ItemStack, clickType: ClickType) {
         if (!isAllowed()) return
 
         // only allow left clicks on alternative position, only right clicks on others
         if (type.alternativePosition != (clickType == ClickType.LEFT_CLICK)) return
 
-        startAbility()
+        startAbility(itemStack)
     }
 
-    private fun startAbility() {
-        if (ItemAbilityCastEvent(type).postAndCatch()) return
+    private fun startAbility(itemStack: ItemStack) {
+        val event = ItemAbilityCastEvent(type, itemStack)
+        if (lastItemClick.passedSince() < type.recastAfter) {
+            if (type.allowRecast) {
+                if (event.postAndCatch()) return
+            }
+            return
+        }
+
+        if (event.postAndCatch()) return
 
         lastItemClick = SimpleTimeMark.now()
         lastActivation = SimpleTimeMark.now()

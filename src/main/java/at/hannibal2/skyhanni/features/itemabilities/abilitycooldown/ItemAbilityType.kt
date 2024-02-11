@@ -16,15 +16,16 @@ enum class ItemAbilityType(
 
     val alternativePosition: Boolean = false,
     val ignoreMageCooldownReduction: Boolean = false,
-    val remainingMana: (Int) -> Int = { it - manaCost },
+    val allowRecast: Boolean = false,
+    val manaCostPercentage: Double = 0.0,
     val riftManaCost: Int = manaCost,
     val remainingManaRift: (Int) -> Int = { it - riftManaCost },
     val cooldown: Duration = cooldownInSeconds.seconds,
-    val allowRecastAfter: Duration = cooldown,
+    val recastAfter: Duration = cooldown,
     val isAllowed: () -> Boolean = { true },
 ) {
 
-    HYPERION(5, 300, "SCYLLA", "VALKYRIE", "ASTRAEA", ignoreMageCooldownReduction = true),
+    HYPERION(5, 300, "SCYLLA", "VALKYRIE", "ASTRAEA", ignoreMageCooldownReduction = true, allowRecast = true),
     GYROKINETIC_WAND_LEFT(30, 1200, "GYROKINETIC_WAND", alternativePosition = true, isAllowed = {
         LorenzUtils.skyBlockArea != "Village"
     }),
@@ -40,7 +41,7 @@ enum class ItemAbilityType(
     // todo support for mana disintegrator
     WAND_OF_ATONEMENT(7, 240, "WAND_OF_HEALING", "WAND_OF_MENDING", "WAND_OF_RESTORATION"),
     GOLEM_SWORD(3, 70),
-    END_STONE_SWORD(5, 0, remainingMana = { 0 }, isAllowed = {
+    END_STONE_SWORD(5, 0, manaCostPercentage = 1.0, isAllowed = {
         !LorenzUtils.inDungeons
     }),
 
@@ -53,13 +54,13 @@ enum class ItemAbilityType(
     STARLIGHT_WAND(2, 120),
     VOODOO_DOLL(5, 200),
     WEIRD_TUBA(20, 150, riftManaCost = 60),
-    WEIRDER_TUBA(30, 120, riftManaCost = 60, allowRecastAfter = 20.seconds),
-    FIRE_FREEZE_STAFF(10, 500, allowRecastAfter = 0.seconds),
+    WEIRDER_TUBA(30, 120, riftManaCost = 60, recastAfter = 20.seconds),
+    FIRE_FREEZE_STAFF(10, 500, recastAfter = 0.seconds),
     SWORD_OF_BAD_HEALTH(5, 0),
     WITHER_CLOAK(10, 0),
     HOLY_ICE(4, 20),
     VOODOO_DOLL_WILTED(3, 180),
-    FIRE_FURY_STAFF(20, 1000, allowRecastAfter = 0.seconds),
+    FIRE_FURY_STAFF(20, 1000, recastAfter = 0.seconds),
     SHADOW_FURY(15, 0, "STARRED_SHADOW_FURY"),
     ENDER_BOW(30, 50),
     LIVID_DAGGER(5, 150),
@@ -72,10 +73,10 @@ enum class ItemAbilityType(
         IslandType.HUB.isInIsland()
     }),
     MOODY_GRAPPLESHOT(1, 30),
-    FLOWER_OF_TRUTH(1, 0),
-    BOUQUET_OF_LIES(1, 0),
+    FLOWER_OF_TRUTH(1, 0, manaCostPercentage = 0.1),
+    BOUQUET_OF_LIES(1, 0, manaCostPercentage = 0.1),
     WAND_OF_VOLCANO(1, 0),
-    ASPECT_OF_THE_END(0, 50, isAllowed =  {
+    ASPECT_OF_THE_END(0, 50, isAllowed = {
         !DungeonAPI.isInF7Boss()
     }),
 

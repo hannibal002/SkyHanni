@@ -153,7 +153,7 @@ class ItemAbilityCooldown {
         val itemInHand = event.itemInHand ?: return
 
         for (ability in itemInHand.getActiveAbilities()) {
-            ability.onClick(event.clickType)
+            ability.onClick(itemInHand, event.clickType)
         }
     }
 

@@ -21,6 +21,10 @@ enum class ActionBarStatsData(@Language("RegExp") rawPattern: String) {
         // language=RegExp
         ".*§b(?<mana>[\\d,]+)/[\\d,]+✎.*"
     ),
+    MAX_MANA(
+        // language=RegExp
+        ".*§b[\\d,]+/(?<maxMana>[\\d,]+)✎.*"
+    ),
     RIFT_TIME(
         // language=RegExp
         "§[a7](?<riftTime>[\\dms ]+)ф.*"
@@ -46,16 +50,15 @@ enum class ActionBarStatsData(@Language("RegExp") rawPattern: String) {
         @SubscribeEvent
         fun onActionBar(event: LorenzActionBarEvent) {
             if (!LorenzUtils.inSkyBlock) return
-
-            entries.mapNotNull { data ->
+            for (data in entries) {
                 data.pattern.matchMatcher(event.message) {
                     val newValue = group(1)
                     if (data.value != newValue) {
                         data.value = newValue
-                        ActionBarValueUpdate(data)
-                    } else null
+                        ActionBarValueUpdate(data).postAndCatch()
+                    }
                 }
-            }.forEach { it.postAndCatch() }
+            }
         }
     }
 }
