@@ -39,7 +39,10 @@ enum class ItemAbilityType(
     RAGNAROCK_AXE(20, 500),
 
     // todo support for mana disintegrator
-    WAND_OF_ATONEMENT(7, 240, "WAND_OF_HEALING", "WAND_OF_MENDING", "WAND_OF_RESTORATION"),
+    WAND_OF_HEALING(7, 60, allowRecastAfter = 1.seconds),
+    WAND_OF_MENDING(7, 100, allowRecastAfter = 1.seconds),
+    WAND_OF_RESTORATION(7, 200, allowRecastAfter = 1.seconds),
+    WAND_OF_ATONEMENT(7, 240, allowRecastAfter = 1.seconds),
     GOLEM_SWORD(3, 70),
     END_STONE_SWORD(5, 0, remainingMana = { 0 }, isAllowed = {
         !LorenzUtils.inDungeons
