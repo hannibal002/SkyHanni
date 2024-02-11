@@ -3,7 +3,6 @@ package at.hannibal2.skyhanni.features.itemabilities.abilitycooldown
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.data.ItemRenderBackground.Companion.background
 import at.hannibal2.skyhanni.events.ItemClickEvent
-import at.hannibal2.skyhanni.events.LorenzActionBarEvent
 import at.hannibal2.skyhanni.events.LorenzTickEvent
 import at.hannibal2.skyhanni.events.LorenzWorldChangeEvent
 import at.hannibal2.skyhanni.events.RenderItemTipEvent
@@ -174,14 +173,14 @@ class ItemAbilityCooldown {
         activeAbilities.clear()
     }
 
-    @SubscribeEvent
-    fun onActionBar(event: LorenzActionBarEvent) {
-        if (!isEnabled()) return
-
-        val message = event.message
+//     @SubscribeEvent
+//     fun onActionBar(event: LorenzActionBarEvent) {
+//         if (!isEnabled()) return
+//
+//         val message = event.message
 //         handleOldAbilities(message)
-
-        when {
+//
+//         when {
 //             message.contains("§lCASTING IN ") -> {
 //                 if (!ItemAbilityType.RAGNAROCK_AXE.isOnCooldown()) {
 //                     ItemAbilityType.RAGNAROCK_AXE.activate(LorenzColor.WHITE, 3.seconds)
@@ -197,8 +196,8 @@ class ItemAbilityCooldown {
 //             message.contains("§c§lCANCELLED") -> {
 //                 ItemAbilityType.RAGNAROCK_AXE.activate(null, 17.seconds)
 //             }
-        }
-    }
+//         }
+//     }
 
 //     private fun handleOldAbilities(message: String) {
 //         // TODO use regex
