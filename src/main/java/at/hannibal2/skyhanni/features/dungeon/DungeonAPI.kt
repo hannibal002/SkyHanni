@@ -98,7 +98,7 @@ class DungeonAPI {
 
         fun getRoomID() = ScoreboardData.sidebarLines.firstOrNull()?.removeColor()?.split(" ")?.getOrNull(2)
 
-        fun isInF7Boss(): Boolean = LorenzUtils.inDungeons && getCurrentBoss() == DungeonFloor.F7 && inBossRoom
+        fun isInF7Boss(): Boolean = LorenzUtils.inDungeons && getCurrentBoss() == DungeonFloor.F7_NECRON && inBossRoom
     }
 
     @SubscribeEvent
@@ -242,14 +242,14 @@ class DungeonAPI {
     }
 
     enum class DungeonFloor(private val bossName: String) {
-        ENTRANCE("The Watcher"),
-        F1("Bonzo"),
-        F2("Scarf"),
-        F3("The Professor"),
-        F4("Thorn"),
-        F5("Livid"),
-        F6("Sadan"),
-        F7("Necron");
+        ENTRANCE_WATCHER("The Watcher"),
+        F1_BONZO("Bonzo"),
+        F2_SCARF("Scarf"),
+        F3_PROFESSOR("The Professor"),
+        F4_THORN("Thorn"),
+        F5_LIVID("Livid"),
+        F6_SADAN("Sadan"),
+        F7_NECRON("Necron");
 
         companion object {
 

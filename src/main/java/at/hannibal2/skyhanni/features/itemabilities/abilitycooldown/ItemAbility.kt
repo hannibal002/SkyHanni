@@ -4,6 +4,7 @@ import at.hannibal2.skyhanni.data.ClickType
 import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.events.item.ItemAbilityCastEvent
 import at.hannibal2.skyhanni.features.dungeon.DungeonAPI
+import at.hannibal2.skyhanni.features.nether.ashfang.AshfangFreezeCooldown
 import at.hannibal2.skyhanni.utils.LorenzColor
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils.isInIsland
@@ -167,9 +168,8 @@ enum class ItemAbility(
         }
 
         private fun allAbilitiesBlocked(): Boolean {
-            if (LorenzUtils.skyBlockArea == "Matriarch's Lair") {
-                return true
-            }
+            if (LorenzUtils.skyBlockArea == "Matriarch's Lair") return true
+            if (AshfangFreezeCooldown.iscurrentlyFrozen()) return true
 
             return false
         }
