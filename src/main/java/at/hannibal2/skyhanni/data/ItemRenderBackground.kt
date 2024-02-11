@@ -25,7 +25,6 @@ class ItemRenderBackground {
         var ItemStack.background: Int
             get() {
                 val data = getData()
-                data.time
                 if (System.currentTimeMillis() > data.time + 60) return -1
                 return data.color
             }
