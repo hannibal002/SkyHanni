@@ -1,5 +1,6 @@
 package at.hannibal2.skyhanni.utils
 
+import at.hannibal2.skyhanni.data.ItemRenderBackground
 import at.hannibal2.skyhanni.features.itemabilities.abilitycooldown.ActiveAbility
 
 data class CachedItemData(
@@ -26,5 +27,7 @@ data class CachedItemData(
 
     var itemCategory: ItemCategory? = null,
 
-    var itemAbilities: List<ActiveAbility>? = null
+    var itemAbilities: List<ActiveAbility>? = null,
+
+    var renderBackground: ItemRenderBackground.RenderBackgroundData = ItemRenderBackground.RenderBackgroundData(),
 )

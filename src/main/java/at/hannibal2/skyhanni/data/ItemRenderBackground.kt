@@ -2,6 +2,7 @@ package at.hannibal2.skyhanni.data
 
 import at.hannibal2.skyhanni.events.RenderRealOverlayEvent
 import at.hannibal2.skyhanni.utils.LorenzUtils
+import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.cachedData
 import net.minecraft.client.Minecraft
 import net.minecraft.client.gui.Gui
 import net.minecraft.client.renderer.GlStateManager
@@ -10,31 +11,40 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
 class ItemRenderBackground {
 
+    class RenderBackgroundData {
+        var color = -1
+        var time = 0L
+        var lineColor = -1
+        var borderTime = 0L
+    }
+
     companion object {
 
-        private val backgroundColor = mutableMapOf<ItemStack, Int>()
-        private val backgroundTime = mutableMapOf<ItemStack, Long>()
-        private val borderLineColor = mutableMapOf<ItemStack, Int>()
-        private val borderTime = mutableMapOf<ItemStack, Long>()
+        private fun ItemStack.getData() = cachedData.renderBackground
 
         var ItemStack.background: Int
             get() {
-                if (System.currentTimeMillis() > backgroundTime.getOrDefault(this, 0) + 60) return -1
-                return backgroundColor.getOrDefault(this, -1)
+                val data = getData()
+                data.time
+                if (System.currentTimeMillis() > data.time + 60) return -1
+                return data.color
             }
             set(value) {
-                backgroundColor[this] = value
-                backgroundTime[this] = System.currentTimeMillis()
+                val data = getData()
+                data.color = value
+                data.time = System.currentTimeMillis()
             }
 
         var ItemStack.borderLine: Int
             get() {
-                if (System.currentTimeMillis() > borderTime.getOrDefault(this, 0) + 60) return -1
-                return borderLineColor.getOrDefault(this, -1)
+                val data = getData()
+                if (System.currentTimeMillis() > data.lineColor + 60) return -1
+                return data.lineColor
             }
             set(value) {
-                borderLineColor[this] = value
-                borderTime[this] = System.currentTimeMillis()
+                val data = getData()
+                data.lineColor = value
+                data.borderTime = System.currentTimeMillis()
             }
     }
 
