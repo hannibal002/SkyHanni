@@ -1,15 +1,16 @@
 package at.hannibal2.skyhanni.features.itemabilities.abilitycooldown
 
 import at.hannibal2.skyhanni.SkyHanniMod
+import at.hannibal2.skyhanni.data.ClickType
 import at.hannibal2.skyhanni.data.ItemRenderBackground.Companion.background
 import at.hannibal2.skyhanni.events.ItemClickEvent
 import at.hannibal2.skyhanni.events.LorenzActionBarEvent
-import at.hannibal2.skyhanni.events.LorenzChatEvent
 import at.hannibal2.skyhanni.events.LorenzTickEvent
 import at.hannibal2.skyhanni.events.LorenzWorldChangeEvent
 import at.hannibal2.skyhanni.events.RenderItemTipEvent
 import at.hannibal2.skyhanni.events.RenderObject
 import at.hannibal2.skyhanni.features.itemabilities.abilitycooldown.ItemAbility.Companion.getMultiplier
+import at.hannibal2.skyhanni.features.itemabilities.abilitycooldown.ItemAbility.entries
 import at.hannibal2.skyhanni.features.nether.ashfang.AshfangFreezeCooldown
 import at.hannibal2.skyhanni.utils.ItemUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName
@@ -19,7 +20,6 @@ import at.hannibal2.skyhanni.utils.NEUInternalName.Companion.asInternalName
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getItemId
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getItemUuid
-import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
 import net.minecraft.client.Minecraft
 import net.minecraft.item.ItemStack
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
@@ -158,13 +158,17 @@ class ItemAbilityCooldown {
     @SubscribeEvent
     fun onItemClick(event: ItemClickEvent) {
         if (AshfangFreezeCooldown.iscurrentlyFrozen()) return
-        handleItemClick(event.itemInHand)
+        handleItemClick(event.itemInHand, event.clickType)
     }
 
-    private fun handleItemClick(itemInHand: ItemStack?) {
+    private fun handleItemClick(itemInHand: ItemStack?, clickType: ClickType) {
         if (!LorenzUtils.inSkyBlock) return
-        itemInHand?.getInternalName()?.run {
-            ItemAbility.getByInternalName(this)?.setItemClick()
+        val internalName = itemInHand?.getInternalName()
+
+        for (ability in entries) {
+            if (internalName in ability.internalNames) {
+                ability.setItemClick(clickType)
+            }
         }
     }
 
@@ -304,36 +308,36 @@ class ItemAbilityCooldown {
 
     private fun ItemStack.getIdentifier() = getItemUuid() ?: getItemId()
 
-    @SubscribeEvent
-    fun onChat(event: LorenzChatEvent) {
-        if (!isEnabled()) return
-
-        val message = event.message
-        if (message == "§dCreeper Veil §r§aActivated!") {
-            ItemAbility.WITHER_CLOAK.activate(LorenzColor.LIGHT_PURPLE)
-        }
-        if (message == "§dCreeper Veil §r§cDe-activated! §r§8(Expired)"
-            || message == "§cNot enough mana! §r§dCreeper Veil §r§cDe-activated!"
-        ) {
-            ItemAbility.WITHER_CLOAK.activate()
-        }
-        if (message == "§dCreeper Veil §r§cDe-activated!") {
-            ItemAbility.WITHER_CLOAK.activate(null, 5.seconds)
-        }
-
-        youAlignedOthersPattern.matchMatcher(message) {
-            ItemAbility.GYROKINETIC_WAND_RIGHT.activate(LorenzColor.BLUE, 6.seconds)
-        }
-        if (message == "§eYou §r§aaligned §r§eyourself!") {
-            ItemAbility.GYROKINETIC_WAND_RIGHT.activate(LorenzColor.BLUE, 6.seconds)
-        }
-        if (message == "§cRagnarock was cancelled due to being hit!") {
-            ItemAbility.RAGNAROCK_AXE.activate(null, 17.seconds)
-        }
-        youBuffedYourselfPattern.matchMatcher(message) {
-            ItemAbility.SWORD_OF_BAD_HEALTH.activate()
-        }
-    }
+//     @SubscribeEvent
+//     fun onChat(event: LorenzChatEvent) {
+//         if (!isEnabled()) return
+//
+//         val message = event.message
+//         if (message == "§dCreeper Veil §r§aActivated!") {
+//             ItemAbility.WITHER_CLOAK.activate(LorenzColor.LIGHT_PURPLE)
+//         }
+//         if (message == "§dCreeper Veil §r§cDe-activated! §r§8(Expired)"
+//             || message == "§cNot enough mana! §r§dCreeper Veil §r§cDe-activated!"
+//         ) {
+//             ItemAbility.WITHER_CLOAK.activate()
+//         }
+//         if (message == "§dCreeper Veil §r§cDe-activated!") {
+//             ItemAbility.WITHER_CLOAK.activate(null, 5.seconds)
+//         }
+//
+//         youAlignedOthersPattern.matchMatcher(message) {
+//             ItemAbility.GYROKINETIC_WAND_RIGHT.activate(LorenzColor.BLUE, 6.seconds)
+//         }
+//         if (message == "§eYou §r§aaligned §r§eyourself!") {
+//             ItemAbility.GYROKINETIC_WAND_RIGHT.activate(LorenzColor.BLUE, 6.seconds)
+//         }
+//         if (message == "§cRagnarock was cancelled due to being hit!") {
+//             ItemAbility.RAGNAROCK_AXE.activate(null, 17.seconds)
+//         }
+//         youBuffedYourselfPattern.matchMatcher(message) {
+//             ItemAbility.SWORD_OF_BAD_HEALTH.activate()
+//         }
+//     }
 
     private fun hasAbility(stack: ItemStack): MutableList<ItemAbility> {
         val internalName = stack.getInternalName()

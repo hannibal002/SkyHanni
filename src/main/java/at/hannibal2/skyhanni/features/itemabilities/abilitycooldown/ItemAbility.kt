@@ -1,6 +1,8 @@
 package at.hannibal2.skyhanni.features.itemabilities.abilitycooldown
 
+import at.hannibal2.skyhanni.data.ClickType
 import at.hannibal2.skyhanni.data.IslandType
+import at.hannibal2.skyhanni.events.item.ItemAbilityCastEvent
 import at.hannibal2.skyhanni.features.dungeon.DungeonAPI
 import at.hannibal2.skyhanni.utils.LorenzColor
 import at.hannibal2.skyhanni.utils.LorenzUtils
@@ -30,13 +32,16 @@ enum class ItemAbility(
     val remainingManaRift: (Int) -> Int = { it - riftManaCost },
     private val cooldown: Duration = cooldownInSeconds.seconds,
     val allowRecastAfter: Duration = cooldown,
-    val isAllowed: (Unit) -> Boolean = { true },
+    val isAllowed: () -> Boolean = { true },
 ) {
 
     HYPERION(5, 300, "SCYLLA", "VALKYRIE", "ASTRAEA", ignoreMageCooldownReduction = true),
-    GYROKINETIC_WAND_LEFT(30, 1200, "GYROKINETIC_WAND", alternativePosition = true),
+    GYROKINETIC_WAND_LEFT(30, 1200, "GYROKINETIC_WAND", alternativePosition = true, isAllowed = {
+        LorenzUtils.skyBlockArea != "Village"
+    }),
     GYROKINETIC_WAND_RIGHT(10, 220, "GYROKINETIC_WAND", isAllowed = {
-        LorenzUtils.inDungeons || LorenzUtils.inKuudraFight
+//         LorenzUtils.inDungeons || LorenzUtils.inKuudraFight
+        true
     }),
     GIANTS_SWORD(30, 100),
     ICE_SPRAY_WAND(5, 50),
@@ -69,7 +74,7 @@ enum class ItemAbility(
     SHADOW_FURY(15, 0, "STARRED_SHADOW_FURY"),
     ENDER_BOW(30, 50),
     LIVID_DAGGER(5, 150),
-    FIRE_VEIL_WAND(5, 300, allowRecastAfter = 0.seconds),
+    FIRE_VEIL_WAND(5, 300),
     INK_WAND(30, 60),
     ROGUE_SWORD(30, 50, ignoreMageCooldownReduction = true),
     TALBOTS_THEODOLITE(10, 98),
@@ -81,7 +86,10 @@ enum class ItemAbility(
     FLOWER_OF_TRUTH(1, 0),
     BOUQUET_OF_LIES(1, 0),
     WAND_OF_VOLCANO(1, 0),
-    ASPECT_OF_THE_END(0, 50),
+    ASPECT_OF_THE_END(0, 50, isAllowed =  {
+        !DungeonAPI.isInF7Boss()
+    }),
+
     ASPECT_OF_THE_VOID(0, 45),
     AURORA_STAFF(1, 0),
 
@@ -121,17 +129,20 @@ enum class ItemAbility(
 
     fun getDuration() = getCooldown() - lastActivation.passedSince()
 
-    fun setItemClick() {
+    fun setItemClick(clickType: ClickType) {
         if (lastItemClick.passedSince() < allowRecastAfter) return
+        if (!isAllowed()) return
+
+        // only allow left clicks on alternative position, only right clicks on others
+        if (alternativePosition != (clickType == ClickType.LEFT_CLICK)) return
+
+        if (ItemAbilityCastEvent(this).postAndCatch()) return
+
         lastItemClick = SimpleTimeMark.now()
         lastActivation = SimpleTimeMark.now()
     }
 
     companion object {
-
-        fun getByInternalName(internalName: NEUInternalName): ItemAbility? {
-            return entries.firstOrNull { internalName in it.internalNames }
-        }
 
         fun ItemAbility.getMultiplier(): Double {
             return getMageCooldownReduction() ?: 1.0
@@ -154,5 +165,12 @@ enum class ItemAbility(
 
             return abilityCooldownMultiplier
         }
+
+        private fun allAbilitiesBlocked(): Boolean {
+            return false
+        }
     }
+
+    fun canCastAbility(): Boolean = isAllowed() && !allAbilitiesBlocked()
+
 }

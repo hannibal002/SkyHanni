@@ -90,12 +90,15 @@ class DungeonAPI {
             return ""
         }
 
+        // TODO add cache
         fun getCurrentBoss(): DungeonFloor? {
             val floor = dungeonFloor ?: return null
             return DungeonFloor.valueOf(floor.replace("M", "F"))
         }
 
         fun getRoomID() = ScoreboardData.sidebarLines.firstOrNull()?.removeColor()?.split(" ")?.getOrNull(2)
+
+        fun isInF7Boss(): Boolean = LorenzUtils.inDungeons && getCurrentBoss() == DungeonFloor.F7 && inBossRoom
     }
 
     @SubscribeEvent
