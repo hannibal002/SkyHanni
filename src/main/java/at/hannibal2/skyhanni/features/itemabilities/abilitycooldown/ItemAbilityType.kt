@@ -1,37 +1,25 @@
 package at.hannibal2.skyhanni.features.itemabilities.abilitycooldown
 
-import at.hannibal2.skyhanni.data.ClickType
 import at.hannibal2.skyhanni.data.IslandType
-import at.hannibal2.skyhanni.events.item.ItemAbilityCastEvent
 import at.hannibal2.skyhanni.features.dungeon.DungeonAPI
-import at.hannibal2.skyhanni.features.nether.ashfang.AshfangFreezeCooldown
-import at.hannibal2.skyhanni.utils.LorenzColor
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils.isInIsland
 import at.hannibal2.skyhanni.utils.NEUInternalName
 import at.hannibal2.skyhanni.utils.NEUInternalName.Companion.asInternalName
-import at.hannibal2.skyhanni.utils.SimpleTimeMark
-import at.hannibal2.skyhanni.utils.TimeUtils.format
-import kotlin.math.floor
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.seconds
 
-enum class ItemAbility(
-    @Deprecated("just dont use it", ReplaceWith("cooldown"))
+enum class ItemAbilityType(
     private val cooldownInSeconds: Int,
     val manaCost: Int,
     vararg alternateInternalNames: String,
-
-    var lastActivation: SimpleTimeMark = SimpleTimeMark.farPast(),
-    var specialColor: LorenzColor? = null,
-    var lastItemClick: SimpleTimeMark = SimpleTimeMark.farPast(),
 
     val alternativePosition: Boolean = false,
     val ignoreMageCooldownReduction: Boolean = false,
     val remainingMana: (Int) -> Int = { it - manaCost },
     val riftManaCost: Int = manaCost,
     val remainingManaRift: (Int) -> Int = { it - riftManaCost },
-    private val cooldown: Duration = cooldownInSeconds.seconds,
+    val cooldown: Duration = cooldownInSeconds.seconds,
     val allowRecastAfter: Duration = cooldown,
     val isAllowed: () -> Boolean = { true },
 ) {
@@ -109,72 +97,4 @@ enum class ItemAbility(
         internalNames.add(name.asInternalName())
         this.internalNames = internalNames
     }
-
-    fun activate(color: LorenzColor? = null, customCooldown: Duration = (cooldown)) {
-        specialColor = color
-        lastActivation = SimpleTimeMark.now() - (cooldown - customCooldown)
-    }
-
-    fun isOnCooldown(): Boolean = getDuration().isPositive()
-
-    fun getCooldown(): Duration {
-        // Some items aren't really a cooldown but an effect over time, so don't apply cooldown multipliers
-        if (this == WAND_OF_ATONEMENT || this == RAGNAROCK_AXE) {
-            return cooldown
-        }
-
-        return cooldown * getMultiplier()
-    }
-
-    fun getDurationText(): String = getDuration().format(showMilliSeconds = getDuration() < 1.6.seconds).dropLast(1)
-
-    fun getDuration() = getCooldown() - lastActivation.passedSince()
-
-    fun setItemClick(clickType: ClickType) {
-        if (lastItemClick.passedSince() < allowRecastAfter) return
-        if (!canCastAbility()) return
-
-        // only allow left clicks on alternative position, only right clicks on others
-        if (alternativePosition != (clickType == ClickType.LEFT_CLICK)) return
-
-        if (ItemAbilityCastEvent(this).postAndCatch()) return
-
-        lastItemClick = SimpleTimeMark.now()
-        lastActivation = SimpleTimeMark.now()
-    }
-
-    companion object {
-
-        fun ItemAbility.getMultiplier(): Double {
-            return getMageCooldownReduction() ?: 1.0
-        }
-
-        private fun ItemAbility.getMageCooldownReduction(): Double? {
-            if (ignoreMageCooldownReduction) return null
-            if (!LorenzUtils.inDungeons) return null
-            if (DungeonAPI.playerClass != DungeonAPI.DungeonClass.MAGE) return null
-
-            var abilityCooldownMultiplier = 1.0
-            abilityCooldownMultiplier -= if (DungeonAPI.isUniqueClass) {
-                0.5 // 50% base reduction at level 0
-            } else {
-                0.25 // 25% base reduction at level 0
-            }
-
-            // 1% ability reduction every other level
-            abilityCooldownMultiplier -= 0.01 * floor(DungeonAPI.playerClassLevel / 2f)
-
-            return abilityCooldownMultiplier
-        }
-
-        private fun allAbilitiesBlocked(): Boolean {
-            if (LorenzUtils.skyBlockArea == "Matriarch's Lair") return true
-            if (AshfangFreezeCooldown.iscurrentlyFrozen()) return true
-
-            return false
-        }
-    }
-
-    fun canCastAbility(): Boolean = isAllowed() && !allAbilitiesBlocked()
-
 }

@@ -6,7 +6,7 @@ import at.hannibal2.skyhanni.config.features.itemability.FireVeilWandConfig.Disp
 import at.hannibal2.skyhanni.events.LorenzRenderWorldEvent
 import at.hannibal2.skyhanni.events.ReceiveParticleEvent
 import at.hannibal2.skyhanni.events.item.ItemAbilityCastEvent
-import at.hannibal2.skyhanni.features.itemabilities.abilitycooldown.ItemAbility
+import at.hannibal2.skyhanni.features.itemabilities.abilitycooldown.ItemAbilityType
 import at.hannibal2.skyhanni.utils.ColorUtils.toChromaColor
 import at.hannibal2.skyhanni.utils.ConfigUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils
@@ -35,7 +35,7 @@ class FireVeilWandParticles {
 
     @SubscribeEvent
     fun onItemAbilityCast(event: ItemAbilityCastEvent) {
-        if (event.itemAbility == ItemAbility.FIRE_VEIL_WAND) {
+        if (event.itemAbility == ItemAbilityType.FIRE_VEIL_WAND) {
             lastClick = SimpleTimeMark.now()
         }
     }

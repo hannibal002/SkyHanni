@@ -1,7 +1,6 @@
 package at.hannibal2.skyhanni.features.itemabilities.abilitycooldown
 
 import at.hannibal2.skyhanni.SkyHanniMod
-import at.hannibal2.skyhanni.data.ClickType
 import at.hannibal2.skyhanni.data.ItemRenderBackground.Companion.background
 import at.hannibal2.skyhanni.events.ItemClickEvent
 import at.hannibal2.skyhanni.events.LorenzActionBarEvent
@@ -9,14 +8,11 @@ import at.hannibal2.skyhanni.events.LorenzTickEvent
 import at.hannibal2.skyhanni.events.LorenzWorldChangeEvent
 import at.hannibal2.skyhanni.events.RenderItemTipEvent
 import at.hannibal2.skyhanni.events.RenderObject
-import at.hannibal2.skyhanni.features.itemabilities.abilitycooldown.ItemAbility.Companion.getMultiplier
-import at.hannibal2.skyhanni.features.itemabilities.abilitycooldown.ItemAbility.entries
 import at.hannibal2.skyhanni.utils.ItemUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName
 import at.hannibal2.skyhanni.utils.LorenzColor
 import at.hannibal2.skyhanni.utils.LorenzUtils
-import at.hannibal2.skyhanni.utils.NEUInternalName.Companion.asInternalName
-import at.hannibal2.skyhanni.utils.SimpleTimeMark
+import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.cachedData
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getItemId
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getItemUuid
 import net.minecraft.client.Minecraft
@@ -29,14 +25,12 @@ class ItemAbilityCooldown {
 
     private val config get() = SkyHanniMod.feature.itemAbilities
 
-//     private var lastAbility = ""
-    private var items = mapOf<ItemStack, List<ItemText>>()
-    private var abilityItems = mapOf<ItemStack, MutableList<ItemAbility>>()
+    private val activeAbilities = mutableMapOf<ItemAbilityType, ActiveAbility>()
     private val youAlignedOthersPattern = "§eYou aligned §r§a.* §r§eother player(s)?!".toPattern()
     private val youBuffedYourselfPattern = "§aYou buffed yourself for §r§c\\+\\d+❁ Strength".toPattern()
-    private val WEIRD_TUBA = "WEIRD_TUBA".asInternalName()
-    private val WEIRDER_TUBA = "WEIRDER_TUBA".asInternalName()
-    private val VOODOO_DOLL_WILTED = "VOODOO_DOLL_WILTED".asInternalName()
+//     private val WEIRD_TUBA = "WEIRD_TUBA".asInternalName()
+//     private val WEIRDER_TUBA = "WEIRDER_TUBA".asInternalName()
+//     private val VOODOO_DOLL_WILTED = "VOODOO_DOLL_WILTED".asInternalName()
 
 //     @SubscribeEvent
 //     fun onSoundEvent(event: PlaySoundEvent) {
@@ -156,27 +150,30 @@ class ItemAbilityCooldown {
 
     @SubscribeEvent
     fun onItemClick(event: ItemClickEvent) {
-        handleItemClick(event.itemInHand, event.clickType)
+        if (!LorenzUtils.inSkyBlock) return
+        val itemInHand = event.itemInHand ?: return
+
+        for (ability in itemInHand.getActiveAbilities()) {
+            ability.onClick(event.clickType)
+        }
     }
 
-    private fun handleItemClick(itemInHand: ItemStack?, clickType: ClickType) {
-        if (!LorenzUtils.inSkyBlock) return
-        val internalName = itemInHand?.getInternalName()
+    private fun ItemStack.getActiveAbilities(): List<ActiveAbility> {
+        val internalName = getInternalName()
 
-        for (ability in entries) {
+        val list = mutableListOf<ActiveAbility>()
+        for (ability in ItemAbilityType.entries) {
             if (internalName in ability.internalNames) {
-                ability.setItemClick(clickType)
+                list.add(activeAbilities.getOrPut(ability) { ActiveAbility(ability) })
             }
         }
+
+        return list
     }
 
     @SubscribeEvent
     fun onIslandChange(event: LorenzWorldChangeEvent) {
-        for (ability in ItemAbility.entries) {
-            ability.lastActivation = SimpleTimeMark.farPast()
-            ability.lastItemClick = SimpleTimeMark.farPast()
-            ability.specialColor = null
-        }
+        activeAbilities.clear()
     }
 
     @SubscribeEvent
@@ -187,21 +184,21 @@ class ItemAbilityCooldown {
 //         handleOldAbilities(message)
 
         when {
-            message.contains("§lCASTING IN ") -> {
-                if (!ItemAbility.RAGNAROCK_AXE.isOnCooldown()) {
-                    ItemAbility.RAGNAROCK_AXE.activate(LorenzColor.WHITE, 3.seconds)
-                }
-            }
-
-            message.contains("§lCASTING") -> {
-                if (ItemAbility.RAGNAROCK_AXE.specialColor != LorenzColor.DARK_PURPLE) {
-                    ItemAbility.RAGNAROCK_AXE.activate(LorenzColor.DARK_PURPLE, 10.seconds)
-                }
-            }
-
-            message.contains("§c§lCANCELLED") -> {
-                ItemAbility.RAGNAROCK_AXE.activate(null, 17.seconds)
-            }
+//             message.contains("§lCASTING IN ") -> {
+//                 if (!ItemAbilityType.RAGNAROCK_AXE.isOnCooldown()) {
+//                     ItemAbilityType.RAGNAROCK_AXE.activate(LorenzColor.WHITE, 3.seconds)
+//                 }
+//             }
+//
+//             message.contains("§lCASTING") -> {
+//                 if (ItemAbilityType.RAGNAROCK_AXE.specialColor != LorenzColor.DARK_PURPLE) {
+//                     ItemAbilityType.RAGNAROCK_AXE.activate(LorenzColor.DARK_PURPLE, 10.seconds)
+//                 }
+//             }
+//
+//             message.contains("§c§lCANCELLED") -> {
+//                 ItemAbilityType.RAGNAROCK_AXE.activate(null, 17.seconds)
+//             }
         }
     }
 
@@ -224,50 +221,55 @@ class ItemAbilityCooldown {
 
     private fun isEnabled(): Boolean = LorenzUtils.inSkyBlock && config.itemAbilityCooldown
 
-//     private fun click(ability: ItemAbility) {
-//         if (ability.actionBarDetection) {
-//             ability.activate()
-//         }
-//     }
-
     @SubscribeEvent
     fun onTick(event: LorenzTickEvent) {
         if (!isEnabled()) return
 
-        checkHotBar(event.isMod(10))
+        checkItems()
     }
 
-    private fun checkHotBar(recheckInventorySlots: Boolean = false) {
-        if (recheckInventorySlots || abilityItems.isEmpty()) {
-            abilityItems = ItemUtils.getItemsInInventory(true).associateWith { hasAbility(it) }
+    private fun checkItems() {
+        for (itemStack in ItemUtils.getItemsInInventory(true)) {
+            val activeAbilities = itemStack.getActiveAbilities()
+            if (activeAbilities.isNotEmpty()) {
+                val data = itemStack.cachedData
+                data.itemAbilities = activeAbilities
+            }
         }
 
-        items = abilityItems.mapValues { kp -> kp.value.map { createItemText(it) } }
+        for (activeAbility in activeAbilities.values) {
+            activeAbility.text = createItemText(activeAbility)
+        }
     }
 
-    private fun createItemText(ability: ItemAbility): ItemText {
+    private fun createItemText(ability: ActiveAbility): ItemText {
         val specialColor = ability.specialColor
         val readyText = if (config.itemAbilityShowWhenReady) "R" else ""
         return if (ability.isOnCooldown()) {
-            val color = specialColor ?: if (ability.getDuration() < 600.milliseconds) LorenzColor.RED else LorenzColor.YELLOW
-            ItemText(color, ability.getDurationText(), true, ability.alternativePosition)
+            val color =
+                specialColor ?: if (ability.getDuration() < 600.milliseconds) LorenzColor.RED else LorenzColor.YELLOW
+            ItemText(color, ability.getDurationText(), true, ability.type.alternativePosition)
         } else {
             if (specialColor != null) {
                 ability.specialColor = null
                 tryHandleNextPhase(ability, specialColor)
                 return createItemText(ability)
             }
-            ItemText(LorenzColor.GREEN, readyText, false, ability.alternativePosition)
+            ItemText(LorenzColor.GREEN, readyText, false, ability.type.alternativePosition)
         }
     }
 
-    private fun tryHandleNextPhase(ability: ItemAbility, specialColor: LorenzColor) {
-        if (ability == ItemAbility.GYROKINETIC_WAND_RIGHT && specialColor == LorenzColor.BLUE) {
+    private fun tryHandleNextPhase(ability: ActiveAbility, specialColor: LorenzColor) {
+        if (ability.type == ItemAbilityType.GYROKINETIC_WAND_RIGHT && specialColor == LorenzColor.BLUE) {
             ability.activate(null, 4.seconds)
         }
-        if (ability == ItemAbility.RAGNAROCK_AXE && specialColor == LorenzColor.DARK_PURPLE) {
+        if (ability.type == ItemAbilityType.RAGNAROCK_AXE && specialColor == LorenzColor.DARK_PURPLE) {
             val duration = (20.seconds * ability.getMultiplier()) - 13.seconds
-            ability.activate(null, if (duration < 0.seconds) { 0.seconds } else duration)
+            ability.activate(
+                null, if (duration < 0.seconds) {
+                    0.seconds
+                } else duration
+            )
         }
     }
 
@@ -276,13 +278,10 @@ class ItemAbilityCooldown {
         if (!isEnabled()) return
 
         val stack = event.stack
-
         val guiOpen = Minecraft.getMinecraft().currentScreen != null
-        val uuid = stack.getIdentifier() ?: return
-        val list = items.filter { (it.key.getIdentifier()) == uuid }
-            .firstNotNullOfOrNull { it.value } ?: return
 
-        for (itemText in list) {
+        for (ability in stack.cachedData.itemAbilities) {
+            val itemText = ability.text ?: continue
             if (guiOpen && !itemText.onCooldown) continue
             val color = itemText.color
             val renderObject = RenderObject(color.getChatColor() + itemText.text)
@@ -337,30 +336,10 @@ class ItemAbilityCooldown {
 //         }
 //     }
 
-    private fun hasAbility(stack: ItemStack): MutableList<ItemAbility> {
-        val internalName = stack.getInternalName()
-
-        val list = mutableListOf<ItemAbility>()
-        for (ability in ItemAbility.entries) {
-            if (!ability.canCastAbility()) continue
-            if (ability.internalNames.contains(internalName)) {
-                list.add(ability)
-            }
-        }
-        return list
-    }
-
 //     private fun ItemAbility.sound() {
 //         val ping = System.currentTimeMillis() - lastItemClick
 //         if (ping < 400) {
 //             activate()
 //         }
 //     }
-
-    class ItemText(
-        val color: LorenzColor,
-        val text: String,
-        val onCooldown: Boolean,
-        val alternativePosition: Boolean,
-    )
 }
