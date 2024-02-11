@@ -2,6 +2,7 @@ package at.hannibal2.skyhanni.features.itemabilities.abilitycooldown
 
 import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.features.dungeon.DungeonAPI
+import at.hannibal2.skyhanni.features.event.diana.DianaAPI
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils.isInIsland
 import at.hannibal2.skyhanni.utils.NEUInternalName
@@ -69,8 +70,7 @@ enum class ItemAbilityType(
     ROGUE_SWORD(30, 50, ignoreMageCooldownReduction = true),
     TALBOTS_THEODOLITE(10, 98),
     ANCESTRAL_SPADE(3, 98, isAllowed = {
-//         IslandType.HUB.isInIsland() && DianaAPI.isRitualActive()
-        IslandType.HUB.isInIsland()
+        IslandType.HUB.isInIsland() && DianaAPI.isRitualActive()
     }),
     MOODY_GRAPPLESHOT(1, 30),
     FLOWER_OF_TRUTH(1, 0, manaCostPercentage = 0.1),
@@ -85,6 +85,8 @@ enum class ItemAbilityType(
 
     // TODO incoming damage reduction for 10s
     ENRAGER(500, 20),
+
+    BONZO_STAFF(0, 90, "STARRED_BONZO_STAFF"),
     ;
 
     var newVariant = false

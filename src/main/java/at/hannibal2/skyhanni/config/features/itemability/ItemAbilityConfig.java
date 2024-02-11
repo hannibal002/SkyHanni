@@ -5,6 +5,7 @@ import com.google.gson.annotations.Expose;
 import io.github.moulberry.moulconfig.annotations.Accordion;
 import io.github.moulberry.moulconfig.annotations.ConfigEditorBoolean;
 import io.github.moulberry.moulconfig.annotations.ConfigOption;
+import io.github.moulberry.moulconfig.observer.Property;
 
 public class ItemAbilityConfig {
 
@@ -23,7 +24,7 @@ public class ItemAbilityConfig {
     @Expose
     @ConfigOption(name = "Show When Ready", desc = "Show the R and background (if enabled) when the ability is ready.")
     @ConfigEditorBoolean
-    public boolean itemAbilityShowWhenReady = true;
+    public Property<Boolean> itemAbilityShowWhenReady = Property.of(true);
 
     @Expose
     @ConfigOption(name = "Fire Veil", desc = "")

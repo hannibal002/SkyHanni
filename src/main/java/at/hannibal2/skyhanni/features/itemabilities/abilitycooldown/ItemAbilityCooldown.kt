@@ -2,12 +2,13 @@ package at.hannibal2.skyhanni.features.itemabilities.abilitycooldown
 
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.data.ItemRenderBackground.Companion.background
+import at.hannibal2.skyhanni.events.ConfigLoadEvent
 import at.hannibal2.skyhanni.events.ItemClickEvent
-import at.hannibal2.skyhanni.events.LorenzActionBarEvent
 import at.hannibal2.skyhanni.events.LorenzTickEvent
 import at.hannibal2.skyhanni.events.LorenzWorldChangeEvent
 import at.hannibal2.skyhanni.events.RenderItemTipEvent
 import at.hannibal2.skyhanni.events.RenderObject
+import at.hannibal2.skyhanni.utils.ConditionalUtils.afterChange
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName
 import at.hannibal2.skyhanni.utils.LorenzColor
 import at.hannibal2.skyhanni.utils.LorenzUtils
@@ -27,6 +28,9 @@ class ItemAbilityCooldown {
     private val activeAbilities = mutableMapOf<ItemAbilityType, ActiveAbility>()
     private val youAlignedOthersPattern = "§eYou aligned §r§a.* §r§eother player(s)?!".toPattern()
     private val youBuffedYourselfPattern = "§aYou buffed yourself for §r§c\\+\\d+❁ Strength".toPattern()
+
+    private var readyText = ""
+
 //     private val WEIRD_TUBA = "WEIRD_TUBA".asInternalName()
 //     private val WEIRDER_TUBA = "WEIRDER_TUBA".asInternalName()
 //     private val VOODOO_DOLL_WILTED = "VOODOO_DOLL_WILTED".asInternalName()
@@ -157,17 +161,16 @@ class ItemAbilityCooldown {
         }
     }
 
-    private fun ItemStack.getActiveAbilities(): List<ActiveAbility> {
+    private fun ItemStack.getActiveAbilities(): List<ActiveAbility> = cachedData.itemAbilities ?: run {
         val internalName = getInternalName()
-
-        val list = mutableListOf<ActiveAbility>()
+        val itemAbilities = mutableListOf<ActiveAbility>()
         for (ability in ItemAbilityType.entries) {
             if (internalName in ability.internalNames) {
-                list.add(activeAbilities.getOrPut(ability) { ActiveAbility(ability) })
+                itemAbilities.add(activeAbilities.getOrPut(ability) { ActiveAbility(ability) })
             }
         }
-
-        return list
+        cachedData.itemAbilities = itemAbilities
+        itemAbilities
     }
 
     @SubscribeEvent
@@ -175,14 +178,14 @@ class ItemAbilityCooldown {
         activeAbilities.clear()
     }
 
-    @SubscribeEvent
-    fun onActionBar(event: LorenzActionBarEvent) {
-        if (!isEnabled()) return
-
-        val message = event.message
+//     @SubscribeEvent
+//     fun onActionBar(event: LorenzActionBarEvent) {
+//         if (!isEnabled()) return
+//
+//         val message = event.message
 //         handleOldAbilities(message)
-
-        when {
+//
+//         when {
 //             message.contains("§lCASTING IN ") -> {
 //                 if (!ItemAbilityType.RAGNAROCK_AXE.isOnCooldown()) {
 //                     ItemAbilityType.RAGNAROCK_AXE.activate(LorenzColor.WHITE, 3.seconds)
@@ -198,8 +201,8 @@ class ItemAbilityCooldown {
 //             message.contains("§c§lCANCELLED") -> {
 //                 ItemAbilityType.RAGNAROCK_AXE.activate(null, 17.seconds)
 //             }
-        }
-    }
+//         }
+//     }
 
 //     private fun handleOldAbilities(message: String) {
 //         // TODO use regex
@@ -229,12 +232,20 @@ class ItemAbilityCooldown {
         }
     }
 
+    @SubscribeEvent
+    fun onConfigInit(event: ConfigLoadEvent) {
+        readyText = if (config.itemAbilityShowWhenReady.get()) "R" else ""
+        config.itemAbilityShowWhenReady.afterChange {
+            readyText = if (this) "R" else ""
+        }
+    }
+
     private fun createItemText(ability: ActiveAbility): ItemText {
         val specialColor = ability.specialColor
-        val readyText = if (config.itemAbilityShowWhenReady) "R" else ""
         return if (ability.isOnCooldown()) {
             val color =
-                specialColor ?: if (ability.getDuration() < 600.milliseconds) LorenzColor.RED else LorenzColor.YELLOW
+                specialColor
+                    ?: if (ability.getDuration() < 600.milliseconds) LorenzColor.RED else LorenzColor.YELLOW
             ItemText(color, ability.getDurationText(), true, ability.type.alternativePosition)
         } else {
             if (specialColor != null) {
@@ -265,13 +276,7 @@ class ItemAbilityCooldown {
         if (!isEnabled()) return
 
         val stack = event.stack
-        val cachedData = stack.cachedData
-
-        val itemAbilities = cachedData.itemAbilities ?: run {
-            val itemAbilities = stack.getActiveAbilities()
-            cachedData.itemAbilities = itemAbilities
-            itemAbilities
-        }
+        val itemAbilities = stack.getActiveAbilities()
 
         val guiOpen = Minecraft.getMinecraft().currentScreen != null
         for (ability in itemAbilities) {
@@ -291,7 +296,7 @@ class ItemAbilityCooldown {
                 var opacity = 130
                 if (color == LorenzColor.GREEN) {
                     opacity = 80
-                    if (!config.itemAbilityShowWhenReady) return
+                    if (!config.itemAbilityShowWhenReady.get()) return
                 }
                 stack.background = color.addOpacity(opacity).rgb
             }
