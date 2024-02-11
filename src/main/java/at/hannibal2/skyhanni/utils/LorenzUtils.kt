@@ -299,7 +299,8 @@ object LorenzUtils {
         slot?.slotNumber?.let { slotNumber ->
             Minecraft.getMinecraft().playerController.windowClick(
                 container.windowId, slotNumber, 0, 1, Minecraft.getMinecraft().thePlayer
-            )?.also { isCanceled = true }
+            )
+            isCanceled = true
         }
 
     private val recalculateDerpy =
