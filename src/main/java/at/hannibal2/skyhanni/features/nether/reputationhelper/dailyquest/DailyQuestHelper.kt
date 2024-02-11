@@ -1,5 +1,6 @@
 package at.hannibal2.skyhanni.features.nether.reputationhelper.dailyquest
 
+import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.config.Storage
 import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.data.SackAPI
@@ -51,6 +52,8 @@ class DailyQuestHelper(val reputationHelper: CrimsonIsleReputationHelper) {
     private val questLoader = QuestLoader(this)
     val quests = mutableListOf<Quest>()
     var greatSpook = false
+
+    private val config get() = SkyHanniMod.feature.crimsonIsle.reputationHelper
 
     @SubscribeEvent
     fun onInventoryOpen(event: InventoryFullyOpenedEvent) {
@@ -199,7 +202,8 @@ class DailyQuestHelper(val reputationHelper: CrimsonIsleReputationHelper) {
         display.addAsSingletonList("")
         display.addAsSingletonList("§7Daily Quests (§e$done§8/§e5 collected§7)")
         if (done != 5) {
-            quests.mapTo(display) { renderQuest(it) }
+            val filteredQuests = quests.filter { !config.hideComplete.get() || it.state != QuestState.COLLECTED }
+            filteredQuests.mapTo(display) { renderQuest(it) }
         }
     }
 
@@ -258,7 +262,6 @@ class DailyQuestHelper(val reputationHelper: CrimsonIsleReputationHelper) {
         result.add("  $stateText$categoryName: ")
         result.add(item)
         result.add("§f$displayName$progressText$sacksText")
-
         return result
     }
 

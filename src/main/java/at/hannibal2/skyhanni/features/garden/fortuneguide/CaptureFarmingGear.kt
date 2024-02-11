@@ -46,7 +46,7 @@ class CaptureFarmingGear {
     private val patternGroup = RepoPattern.group("garden.fortuneguide.capture")
     private val tierPattern by patternGroup.pattern(
         "uniquevisitors.tier",
-        "§7Progress to Tier (?<nextTier>\\d+):.*"
+        "§7Progress to Tier (?<nextTier>\\w+):.*"
     )
     private val tierProgressPattern by patternGroup.pattern(
         "uniquevisitors.tierprogress",
@@ -153,7 +153,7 @@ class CaptureFarmingGear {
             var tierProgress = -1
             for (line in item.getLore()) {
                 tierPattern.matchMatcher(line) {
-                    tier = group("nextTier").toInt() - 1
+                    tier = group("nextTier").romanToDecimalIfNecessary() - 1
                 }
                 tierProgressPattern.matchMatcher(line) {
                     tierProgress = group("having").toInt()
