@@ -157,17 +157,16 @@ class ItemAbilityCooldown {
         }
     }
 
-    private fun ItemStack.getActiveAbilities(): List<ActiveAbility> {
+    private fun ItemStack.getActiveAbilities(): List<ActiveAbility> = cachedData.itemAbilities ?: run {
         val internalName = getInternalName()
-
-        val list = mutableListOf<ActiveAbility>()
+        val itemAbilities = mutableListOf<ActiveAbility>()
         for (ability in ItemAbilityType.entries) {
             if (internalName in ability.internalNames) {
-                list.add(activeAbilities.getOrPut(ability) { ActiveAbility(ability) })
+                itemAbilities.add(activeAbilities.getOrPut(ability) { ActiveAbility(ability) })
             }
         }
-
-        return list
+        cachedData.itemAbilities = itemAbilities
+        itemAbilities
     }
 
     @SubscribeEvent
@@ -234,7 +233,8 @@ class ItemAbilityCooldown {
         val readyText = if (config.itemAbilityShowWhenReady) "R" else ""
         return if (ability.isOnCooldown()) {
             val color =
-                specialColor ?: if (ability.getDuration() < 600.milliseconds) LorenzColor.RED else LorenzColor.YELLOW
+                specialColor
+                    ?: if (ability.getDuration() < 600.milliseconds) LorenzColor.RED else LorenzColor.YELLOW
             ItemText(color, ability.getDurationText(), true, ability.type.alternativePosition)
         } else {
             if (specialColor != null) {
@@ -265,13 +265,7 @@ class ItemAbilityCooldown {
         if (!isEnabled()) return
 
         val stack = event.stack
-        val cachedData = stack.cachedData
-
-        val itemAbilities = cachedData.itemAbilities ?: run {
-            val itemAbilities = stack.getActiveAbilities()
-            cachedData.itemAbilities = itemAbilities
-            itemAbilities
-        }
+        val itemAbilities = stack.getActiveAbilities()
 
         val guiOpen = Minecraft.getMinecraft().currentScreen != null
         for (ability in itemAbilities) {
