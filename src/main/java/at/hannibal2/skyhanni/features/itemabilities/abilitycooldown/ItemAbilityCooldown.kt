@@ -2,11 +2,13 @@ package at.hannibal2.skyhanni.features.itemabilities.abilitycooldown
 
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.data.ItemRenderBackground.Companion.background
+import at.hannibal2.skyhanni.events.ConfigLoadEvent
 import at.hannibal2.skyhanni.events.ItemClickEvent
 import at.hannibal2.skyhanni.events.LorenzTickEvent
 import at.hannibal2.skyhanni.events.LorenzWorldChangeEvent
 import at.hannibal2.skyhanni.events.RenderItemTipEvent
 import at.hannibal2.skyhanni.events.RenderObject
+import at.hannibal2.skyhanni.utils.ConditionalUtils.afterChange
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName
 import at.hannibal2.skyhanni.utils.LorenzColor
 import at.hannibal2.skyhanni.utils.LorenzUtils
@@ -26,6 +28,9 @@ class ItemAbilityCooldown {
     private val activeAbilities = mutableMapOf<ItemAbilityType, ActiveAbility>()
     private val youAlignedOthersPattern = "§eYou aligned §r§a.* §r§eother player(s)?!".toPattern()
     private val youBuffedYourselfPattern = "§aYou buffed yourself for §r§c\\+\\d+❁ Strength".toPattern()
+
+    private var readyText = ""
+
 //     private val WEIRD_TUBA = "WEIRD_TUBA".asInternalName()
 //     private val WEIRDER_TUBA = "WEIRDER_TUBA".asInternalName()
 //     private val VOODOO_DOLL_WILTED = "VOODOO_DOLL_WILTED".asInternalName()
@@ -227,9 +232,16 @@ class ItemAbilityCooldown {
         }
     }
 
+    @SubscribeEvent
+    fun onConfigInit(event: ConfigLoadEvent) {
+        readyText = if (config.itemAbilityShowWhenReady.get()) "R" else ""
+        config.itemAbilityShowWhenReady.afterChange {
+            readyText = if (this) "R" else ""
+        }
+    }
+
     private fun createItemText(ability: ActiveAbility): ItemText {
         val specialColor = ability.specialColor
-        val readyText = if (config.itemAbilityShowWhenReady) "R" else ""
         return if (ability.isOnCooldown()) {
             val color =
                 specialColor
@@ -284,7 +296,7 @@ class ItemAbilityCooldown {
                 var opacity = 130
                 if (color == LorenzColor.GREEN) {
                     opacity = 80
-                    if (!config.itemAbilityShowWhenReady) return
+                    if (!config.itemAbilityShowWhenReady.get()) return
                 }
                 stack.background = color.addOpacity(opacity).rgb
             }
