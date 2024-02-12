@@ -52,10 +52,9 @@ object QuiverAPI {
 
     const val MAX_ARROW_AMOUNT = 2880
     private val SKELETON_MASTER_CHESTPLATE = "SKELETON_MASTER_CHESTPLATE".asInternalName()
-    private val NONE_ARROW_TYPE =
-        getArrowByNameOrNull("NONE".asInternalName()) ?: ArrowType("None", "NONE".asInternalName())
-    private val FLINT_ARROW_TYPE =
-        getArrowByNameOrNull("ARROW".asInternalName()) ?: ArrowType("Flint Arrow", "ARROW".asInternalName())
+
+    private var NONE_ARROW_TYPE: ArrowType? = null
+    private var FLINT_ARROW_TYPE: ArrowType? = null
 
     private val group = RepoPattern.group("data.quiver")
     private val chatGroup = group.group("chat")
@@ -102,7 +101,7 @@ object QuiverAPI {
         fillUpPattern.matchMatcher(message) {
             val flintAmount = group("flintAmount").formatNumber().toFloat()
 
-            arrowAmount.addOrPut(FLINT_ARROW_TYPE.internalName, flintAmount)
+            FLINT_ARROW_TYPE?.let { arrowAmount.addOrPut(it.internalName, flintAmount) }
             return
         }
 
@@ -219,14 +218,6 @@ object QuiverAPI {
         return arrows.firstOrNull { it.internalName == internalName }
     }
 
-    fun getArrowByNameOrFlint(name: String): ArrowType {
-        return getArrowByNameOrNull(name) ?: FLINT_ARROW_TYPE
-    }
-
-    fun getArrowByNameOrFlint(internalName: NEUInternalName): ArrowType {
-        return getArrowByNameOrNull(internalName) ?: FLINT_ARROW_TYPE
-    }
-
     private fun NEUInternalName.asArrowTypeOrNull() = getArrowByNameOrNull(this)
 
     fun isEnabled() = LorenzUtils.inSkyBlock && storage != null
@@ -240,5 +231,8 @@ object QuiverAPI {
 
         val arrowData = event.getConstant<ArrowTypeJson>("ArrowTypes")
         arrows = arrowData.arrows.map { ArrowType(it.value.arrow, it.key.asInternalName()) }
+
+        NONE_ARROW_TYPE = getArrowByNameOrNull("NONE".asInternalName())
+        FLINT_ARROW_TYPE = getArrowByNameOrNull("FLINT".asInternalName())
     }
 }
