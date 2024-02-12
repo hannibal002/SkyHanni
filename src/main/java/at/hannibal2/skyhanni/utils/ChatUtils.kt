@@ -11,6 +11,7 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import java.util.LinkedList
 import java.util.Queue
 import kotlin.time.Duration.Companion.milliseconds
+import kotlin.time.times
 
 object ChatUtils {
 
@@ -183,6 +184,10 @@ object ChatUtils {
 
     private var lastMessageSent = SimpleTimeMark.farPast()
     private val sendQueue: Queue<String> = LinkedList()
+    private val messageDelay = 300.milliseconds
+
+    fun getTimeWhenNewlyQueuedMessageGetsExecuted() =
+        (lastMessageSent + sendQueue.size * messageDelay).takeIf { !it.isInPast() } ?: SimpleTimeMark.now()
 
     @SubscribeEvent
     fun sendQueuedChatMessages(event: LorenzTickEvent) {
@@ -191,7 +196,7 @@ object ChatUtils {
             sendQueue.clear()
             return
         }
-        if (lastMessageSent.passedSince() > 300.milliseconds) {
+        if (lastMessageSent.passedSince() > messageDelay) {
             player.sendChatMessage(sendQueue.poll() ?: return)
             lastMessageSent = SimpleTimeMark.now()
         }

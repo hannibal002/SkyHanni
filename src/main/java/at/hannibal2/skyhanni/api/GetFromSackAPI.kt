@@ -42,7 +42,7 @@ object GetFromSackAPI {
 
     fun Slot.getFromSackWhenClicked(items: List<PrimitiveItemStack>) = getFromSlotClickedSackItems(items, slotIndex)
 
-    private val minimumDelay = 1.7.seconds
+    private val minimumDelay = 1.65.seconds
 
     private val queue: Deque<PrimitiveItemStack> = LinkedList()
     private val inventoryMap = mutableMapOf<Int, List<PrimitiveItemStack>>()
@@ -62,7 +62,7 @@ object GetFromSackAPI {
         if (queue.isNotEmpty() && lastTimeOfCommand.passedSince() >= minimumDelay) {
             val item = queue.poll()
             LorenzUtils.sendCommandToServer("gfs ${item.name.asString()} ${item.amount}")
-            lastTimeOfCommand = SimpleTimeMark.now()
+            lastTimeOfCommand = ChatUtils.getTimeWhenNewlyQueuedMessageGetsExecuted()
         }
     }
 
