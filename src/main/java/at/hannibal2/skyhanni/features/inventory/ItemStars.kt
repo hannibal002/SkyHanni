@@ -14,6 +14,7 @@ import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getUpgradeLevel
 import net.minecraftforge.event.entity.player.ItemTooltipEvent
 import net.minecraftforge.fml.common.eventhandler.EventPriority
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
+import kotlin.math.max
 
 class ItemStars {
 
@@ -44,7 +45,14 @@ class ItemStars {
 
         if (stars > 0) {
             val displayName = name.replace("§.[✪➊➋➌➍➎]".toRegex(), "").trim()
-            event.toolTip[0] = if (usesMasterStars())"$displayName ${"§c✪".repeat(stars - 5) + "§6✪".repeat(10 - stars)}" else "$displayName §c$stars✪"
+
+            if (usesMasterStars()) {
+                val masterStars = max(0, stars - 5)
+                val normalStars = 5 - masterStars
+                event.toolTip[0] = "$displayName ${"§c✪".repeat(masterStars) + "§6✪".repeat(normalStars)}"
+            } else {
+                event.toolTip[0] = "$displayName §c$stars✪"
+            }
         }
     }
 
