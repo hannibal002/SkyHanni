@@ -8,6 +8,7 @@ import io.github.moulberry.moulconfig.annotations.Accordion;
 import io.github.moulberry.moulconfig.annotations.Category;
 import io.github.moulberry.moulconfig.annotations.ConfigEditorBoolean;
 import io.github.moulberry.moulconfig.annotations.ConfigEditorDraggableList;
+import io.github.moulberry.moulconfig.annotations.ConfigEditorDropdown;
 import io.github.moulberry.moulconfig.annotations.ConfigOption;
 
 import java.util.ArrayList;
@@ -141,12 +142,41 @@ public class InventoryConfig {
     @FeatureToggle
     public boolean anvilCombineHelper = false;
 
+    // TODO merge to new feature
     @Expose
     @ConfigOption(name = "Item Stars",
         desc = "Show a compact star count in the item name for all items.")
     @ConfigEditorBoolean
     @FeatureToggle
     public boolean itemStars = false;
+
+    @Expose
+    @ConfigOption(name = "Starred Items",
+        desc = "Modifies how stars are displayed on items.")
+    @ConfigEditorDropdown
+    public StarType starType = StarType.ALLSTAR;
+
+    public enum StarType {
+        OFF("Off"),
+        ALLSTAR("All stars"),
+        CURRENTSTAR("Current stars"),
+        MASTERSTAR("Old Master Stars"),
+
+        ;
+        private final String str;
+
+        StarType(String s) {
+            this.str = s;
+        }
+
+        @Override
+        public String toString() {
+            return str;
+        }
+
+    }
+
+    // TODO option for stack tip number
 
     @Expose
     @ConfigOption(name = "Missing Tasks",
