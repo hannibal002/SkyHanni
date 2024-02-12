@@ -125,6 +125,13 @@ class AreaMiniBossFeatures {
             LorenzVec(-281.6, 82.0, -1010.7),
             LorenzVec(-342.8, 86.0, -1035.2),
         ),
+        SOUL_OF_THE_ALPHA(
+            EntityWolf::class.java, 31_150, LorenzColor.GOLD, 60,
+            LorenzVec(-381.5, 56.0, -94.5),
+            LorenzVec(-394.5, 63.0, -52.5),
+            LorenzVec(-386.5, 50.0, -2.5),
+            LorenzVec(-396.5, 58.0, 29.5),
+            )
         ;
     }
 }
