@@ -34,7 +34,7 @@ object GetFromSackAPI {
 
     fun getFromChatMessageSackItems(
         item: PrimitiveItemStack,
-        text: String = "Click here to grab §ax${item.amount} §9${item.name.asString()}§e from sacks!"
+        text: String = "§lCLICK HERE§r§e to grab §ax${item.amount} §9${item.name.asString()}§e from sacks!"
     ) =
         ChatUtils.clickableChat(text, "${commands.first()} ${item.name.asString()} ${item.amount}")
 
