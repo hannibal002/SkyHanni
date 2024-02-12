@@ -79,6 +79,7 @@ object MayorAPI {
 
         // Check if it is still the mayor from the old SkyBlock year
         currentMayor = candidates[nextMayorTime.toSkyBlockTime().year - 1]?.let {
+            // TODO: Once Jerry is active, add the sub mayor perks in here
             setMayorWithActivePerks(it.name, it.perks)
         }
     }
