@@ -46,7 +46,6 @@ class ScoreboardData {
                         lastColorIndex,
                         lastColorIndex + 2
                     )
-
                     else -> ""
                 }
 

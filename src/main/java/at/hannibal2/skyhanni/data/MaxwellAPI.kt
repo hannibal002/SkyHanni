@@ -7,8 +7,10 @@ import at.hannibal2.skyhanni.events.RepositoryReloadEvent
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils.isInIsland
+import at.hannibal2.skyhanni.utils.NumberUtil.formatNumber
 import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.StringUtils.matches
+import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.StringUtils.removeResets
 import at.hannibal2.skyhanni.utils.StringUtils.trimWhiteSpace
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
@@ -42,13 +44,17 @@ object MaxwellAPI {
         "inventory.magicalpower",
         "§7Magical Power: §6(?<mp>[\\d,]+)"
     )
-    private val thaumatorgyrGuiPattern by group.pattern(
-        "gui.thaumatorgyr",
-        "Accessory Bag Thaumaturgyr"
+    private val thaumaturgyGuiPattern by group.pattern(
+        "gui.thaumaturgy",
+        "Accessory Bag Thaumaturgy"
     )
     private val yourBagsGuiPattern by group.pattern(
         "gui.yourbags",
         "Your Bags"
+    )
+    private val powerSelectedPattern by group.pattern(
+        "gui.selectedpower",
+        "§aPower is selected!"
     )
 
     @SubscribeEvent
@@ -67,36 +73,38 @@ object MaxwellAPI {
     fun onInventoryFullyLoaded(event: InventoryFullyOpenedEvent) {
         if (!isEnabled()) return
 
-        if (thaumatorgyrGuiPattern.matches(event.inventoryName)) {
+        if (thaumaturgyGuiPattern.matches(event.inventoryName)) {
             val stacks = event.inventoryItems
-            val selectedPower =
+            val selectedPowerStack =
                 stacks.values.find {
                     val lore = it.getLore()
-                    lore.isNotEmpty() && lore.last() == "§aPower is selected!"
+                    lore.isNotEmpty() && powerSelectedPattern.matches(lore.last())
                 } ?: return
+            val displayName = selectedPowerStack.displayName.removeColor()
 
-            currentPower = getPowerByNameOrNull(selectedPower.displayName) ?: return
+            currentPower = getPowerByNameOrNull(displayName) ?: return
             return
         }
 
         if (yourBagsGuiPattern.matches(event.inventoryName)) {
             val stacks = event.inventoryItems
 
-            stack@for (stack in stacks.values) {
+            for (stack in stacks.values) {
                 val lore = stack.getLore()
-                for (line in lore) {
-                    inventoryPowerPattern.matchMatcher(line) {
-                        val power = group("power")
-                        currentPower = getPowerByNameOrNull(power) ?: return
-                        continue@stack
-                    }
+                line@ for (line in lore) {
                     inventoryMPPattern.matchMatcher(line) {
                         // MagicalPower is boosted in catacombs
-                        if (IslandType.CATACOMBS.isInIsland()) return
+                        if (IslandType.CATACOMBS.isInIsland()) continue@line
 
                         val mp = group("mp")
-                        magicalPower = mp.replace(",", "").toIntOrNull() ?: return
-                        continue@stack
+                        magicalPower = mp.formatNumber().toInt()
+                        continue@line
+                    }
+
+                    inventoryPowerPattern.matchMatcher(line) {
+                        val power = group("power")
+                        currentPower = getPowerByNameOrNull(power) ?: continue@line
+                        continue@line
                     }
                 }
             }

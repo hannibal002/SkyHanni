@@ -6,8 +6,8 @@ import at.hannibal2.skyhanni.data.Mayors.Companion.setMayorWithActivePerks
 import at.hannibal2.skyhanni.data.jsonobjects.local.MayorJson
 import at.hannibal2.skyhanni.events.LorenzTickEvent
 import at.hannibal2.skyhanni.utils.APIUtil
+import at.hannibal2.skyhanni.utils.CollectionUtils.put
 import at.hannibal2.skyhanni.utils.LorenzUtils
-import at.hannibal2.skyhanni.utils.LorenzUtils.put
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.SimpleTimeMark.Companion.asTimeMark
 import io.github.moulberry.notenoughupdates.util.SkyBlockTime
@@ -19,7 +19,7 @@ import kotlin.time.Duration
 import kotlin.time.Duration.Companion.minutes
 
 object MayorAPI {
-    private var lastUpdate = SimpleTimeMark.farPast()
+    var lastUpdate = SimpleTimeMark.farPast()
     private var dispatcher = Dispatchers.IO
 
     private var rawMayorData: MayorJson? = null
@@ -31,6 +31,7 @@ object MayorAPI {
         private set
 
     private const val LATE_SPRING = 3
+    private const val LATE_SPRING_DAY = 27
 
     /**
      * @param input: The name of the mayor
@@ -57,15 +58,15 @@ object MayorAPI {
     }
 
     private fun calculateNextMayorTime(): SimpleTimeMark {
-        var currentYear = SkyBlockTime.now().year
+        var mayorYear = SkyBlockTime.now().year
 
         // Check if either the month is already over or the day is after 27th in the third month
-        if (SkyBlockTime.now().month > LATE_SPRING || (SkyBlockTime.now().day >= 27 && SkyBlockTime.now().month == LATE_SPRING)) {
+        if (SkyBlockTime.now().month > LATE_SPRING || (SkyBlockTime.now().day >= LATE_SPRING_DAY && SkyBlockTime.now().month == LATE_SPRING)) {
             // If so, the next mayor will be in the next year
-            currentYear++
+            mayorYear++
         }
 
-        return SkyBlockTime(currentYear, LATE_SPRING, day = 27).asTimeMark()
+        return SkyBlockTime(mayorYear, LATE_SPRING, day = LATE_SPRING_DAY).asTimeMark()
     }
 
     private fun getTimeTillNextMayor() {
@@ -77,11 +78,8 @@ object MayorAPI {
         val nextMayorTime = calculateNextMayorTime()
 
         // Check if it is still the mayor from the old SkyBlock year
-        currentMayor = (if (nextMayorTime > System.currentTimeMillis().asTimeMark()) {
-            candidates[SkyBlockTime.now().year - 1]
-        } else {
-            candidates[SkyBlockTime.now().year]
-        })?.let {
+        currentMayor = candidates[nextMayorTime.toSkyBlockTime().year - 1]?.let {
+            // TODO: Once Jerry is active, add the sub mayor perks in here
             setMayorWithActivePerks(it.name, it.perks)
         }
     }

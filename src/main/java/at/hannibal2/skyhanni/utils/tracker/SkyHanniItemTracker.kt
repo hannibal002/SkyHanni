@@ -76,7 +76,7 @@ class SkyHanniItemTracker<Data : ItemTrackerData>(
         lists: MutableList<List<Any>>,
     ): Double {
         var profit = 0.0
-        val items = mutableMapOf<Renderable, Long>()
+        val items = mutableMapOf<NEUInternalName, Long>()
         for ((internalName, itemProfit) in data.items) {
             if (!filter(internalName)) continue
 
@@ -84,6 +84,23 @@ class SkyHanniItemTracker<Data : ItemTrackerData>(
             val pricePer =
                 if (internalName == SKYBLOCK_COIN) 1.0 else data.getCustomPricePer(internalName)
             val price = (pricePer * amount).toLong()
+            val hidden = itemProfit.hidden
+
+            if (isInventoryOpen() || !hidden) {
+                items[internalName] = price
+            }
+            if (!hidden || !config.excludeHiddenItemsInPrice) {
+                profit += price
+            }
+        }
+
+        val limitList = config.hideCheapItems
+        var pos = 0
+        val hiddenItemTexts = mutableListOf<String>()
+        for ((internalName, price) in items.sortedDesc()) {
+            val itemProfit = data.items[internalName] ?: error("Item not found for $internalName")
+
+            val amount = itemProfit.totalAmount
             val displayAmount = if (internalName == SKYBLOCK_COIN) itemProfit.timesGained else amount
 
             val cleanName = if (internalName == SKYBLOCK_COIN) {
@@ -102,8 +119,17 @@ class SkyHanniItemTracker<Data : ItemTrackerData>(
             } else cleanName
             displayName = " $numberColor${displayAmount.addSeparators()}x $displayName§7: §6$priceFormat"
 
-            val lore = buildLore(data, itemProfit, hidden, newDrop, internalName)
+            pos++
+            if (limitList.enabled.get()) {
+                if (pos > limitList.alwaysShowBest.get()) {
+                    if (price < limitList.minPrice.get() * 1000) {
+                        hiddenItemTexts += displayName
+                        continue
+                    }
+                }
+            }
 
+            val lore = buildLore(data, itemProfit, hidden, newDrop, internalName)
             val renderable = if (isInventoryOpen()) Renderable.clickAndHover(displayName, lore) {
                 if (System.currentTimeMillis() > lastClickDelay + 150) {
                     if (KeyboardManager.isModifierKeyDown()) {
@@ -119,31 +145,11 @@ class SkyHanniItemTracker<Data : ItemTrackerData>(
                     update()
                 }
             } else Renderable.string(displayName)
-            if (isInventoryOpen() || !hidden) {
-                items[renderable] = price
-            }
-            if (!hidden || !config.excludeHiddenItemsInPrice) {
-                profit += price
-            }
-        }
 
-        val limitList = config.hideCheapItems
-        var pos = 0
-        var hiddenItems = 0
-        for ((text, pricePer) in items.sortedDesc()) {
-            pos++
-            if (limitList.enabled.get()) {
-                if (pos > limitList.alwaysShowBest.get()) {
-                    if (pricePer < limitList.minPrice.get() * 1000) {
-                        hiddenItems++
-                        continue
-                    }
-                }
-            }
-            lists.addAsSingletonList(text)
+            lists.addAsSingletonList(renderable)
         }
-        if (hiddenItems > 0) {
-            lists.addAsSingletonList(" §7$hiddenItems cheap items are hidden.")
+        if (hiddenItemTexts.size > 0) {
+            lists.addAsSingletonList(Renderable.hoverTips(" §7${hiddenItemTexts.size} cheap items are hidden.", hiddenItemTexts))
         }
 
         return profit

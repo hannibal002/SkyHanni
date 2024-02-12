@@ -7,11 +7,13 @@ import at.hannibal2.skyhanni.events.InventoryFullyOpenedEvent
 import at.hannibal2.skyhanni.events.LorenzChatEvent
 import at.hannibal2.skyhanni.events.PlaySoundEvent
 import at.hannibal2.skyhanni.events.RepositoryReloadEvent
+import at.hannibal2.skyhanni.utils.CollectionUtils.addOrPut
 import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.ItemCategory
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalNameOrNull
 import at.hannibal2.skyhanni.utils.ItemUtils.getItemCategoryOrNull
 import at.hannibal2.skyhanni.utils.LorenzUtils
+import at.hannibal2.skyhanni.utils.LorenzUtils.round
 import at.hannibal2.skyhanni.utils.NEUInternalName
 import at.hannibal2.skyhanni.utils.NEUInternalName.Companion.asInternalName
 import at.hannibal2.skyhanni.utils.NumberUtil.formatNumber
@@ -31,38 +33,35 @@ private var infinityQuiverLevelMultiplier = 0.03f
 object QuiverAPI {
     private val storage get() = ProfileStorageData.profileSpecific
     var currentArrow: ArrowType?
-        get() = getArrowByNameOrNull(storage?.arrows?.currentArrow ?: "None")
+        get() = getArrowByNameOrNull(storage?.arrows?.currentArrow?.asInternalName() ?: "NONE".asInternalName())
         set(value) {
             storage?.arrows?.currentArrow = value?.toString() ?: return
         }
-    var arrowAmount: MutableMap<ArrowType, Float>
-        get() = storage?.arrows?.arrowAmount?.mapNotNull {
-            val arrow = getArrowByNameOrNull(it.key.asInternalName()) ?: return@mapNotNull null
-            arrow to it.value
-        }?.toMap()?.toMutableMap() ?: mutableMapOf()
+    var arrowAmount: MutableMap<NEUInternalName, Float>
+        get() = storage?.arrows?.arrowAmount ?: mutableMapOf()
         set(value) {
-            storage?.arrows?.arrowAmount = value.mapKeys {
-                it.toString()
-            }.toMutableMap()
+            storage?.arrows?.arrowAmount = value
         }
     var currentAmount: Int
-        get() = arrowAmount[currentArrow]?.toInt() ?: 0
+        get() = arrowAmount[currentArrow?.internalName]?.toInt() ?: 0
         set(value) {
-            arrowAmount[currentArrow ?: return] = value.toFloat()
+            arrowAmount[currentArrow?.internalName ?: return] = value.toFloat()
         }
 
     private var arrows: List<ArrowType> = listOf()
 
+    const val MAX_ARROW_AMOUNT = 2880
     private val SKELETON_MASTER_CHESTPLATE = "SKELETON_MASTER_CHESTPLATE".asInternalName()
-    private val NONE_ARROW_TYPE = getArrowByNameOrNull("NONE".asInternalName()) ?: ArrowType("None", "NONE")
-    private val FLINT_ARROW_TYPE = getArrowByNameOrNull("ARROW".asInternalName()) ?: ArrowType("Flint Arrow", "ARROW")
+
+    private var NONE_ARROW_TYPE: ArrowType? = null
+    private var FLINT_ARROW_TYPE: ArrowType? = null
 
     private val group = RepoPattern.group("data.quiver")
     private val chatGroup = group.group("chat")
     private val selectPattern by chatGroup.pattern("select", "§aYou set your selected arrow type to §f(?<arrow>.*)§a!")
     private val fillUpJaxPattern by chatGroup.pattern(
         "fillupjax",
-        "(§.)*Jax forged (§.)*(?<type>.*)(§.)* x(?<amount>.*)( (§.)*for (§.)*(?<coins>.*) Coins)?(§.)*!"
+        "(§.)*Jax forged (§.)*(?<type>.*?)(§.)* x(?<amount>[\\d,]+)( (§.)*for (§.)*(?<coins>[\\d,]+) Coins)?(§.)*!"
     )
     private val fillUpPattern by chatGroup.pattern(
         "fillup",
@@ -87,25 +86,22 @@ object QuiverAPI {
         selectPattern.matchMatcher(message) {
             val arrow = group("arrow")
             currentArrow = getArrowByNameOrNull(arrow) ?: return
-
             return
         }
 
         fillUpJaxPattern.matchMatcher(message) {
             val type = group("type")
             val amount = group("amount").formatNumber().toFloat()
-
             val filledUpType = getArrowByNameOrNull(type) ?: return
 
-            arrowAmount.merge(filledUpType, amount, Float::plus)
+            arrowAmount.addOrPut(filledUpType.internalName, amount)
             return
         }
 
         fillUpPattern.matchMatcher(message) {
             val flintAmount = group("flintAmount").formatNumber().toFloat()
 
-            arrowAmount.merge(FLINT_ARROW_TYPE, flintAmount, Float::plus)
-
+            FLINT_ARROW_TYPE?.let { arrowAmount.addOrPut(it.internalName, flintAmount) }
             return
         }
 
@@ -115,8 +111,7 @@ object QuiverAPI {
 
             val filledUpType = getArrowByNameOrNull(type) ?: return
 
-            arrowAmount.merge(filledUpType, amount, Float::plus)
-
+            arrowAmount.addOrPut(filledUpType.internalName, amount)
             return
         }
 
@@ -152,7 +147,7 @@ object QuiverAPI {
 
             val arrowType = getArrowByNameOrNull(arrow) ?: continue
 
-            this.arrowAmount.merge(arrowType, stack.stackSize.toFloat(), Float::plus)
+            arrowAmount.addOrPut(arrowType.internalName, stack.stackSize.toFloat())
         }
     }
 
@@ -182,9 +177,9 @@ object QuiverAPI {
         val soundLocation = event.distanceToPlayer
         if (soundLocation > SkyHanniMod.feature.dev.bowSoundDistance) return
 
-        val arrowType = currentArrow ?: return
-        val arrowAmount = QuiverAPI.arrowAmount[arrowType] ?: return
-        if (arrowAmount <= 0) return
+        val arrowType = currentArrow?.internalName ?: return
+        val amount = arrowAmount[arrowType] ?: return
+        if (amount <= 0) return
 
         if (InventoryUtils.getChestplate()
                 // The chestplate has the ability to not use arrows
@@ -206,8 +201,10 @@ object QuiverAPI {
             }
         }
 
-        this.arrowAmount[arrowType] = (arrowAmount - amountToRemove()).coerceAtLeast(0.0f)
+        arrowAmount[arrowType] = amount - amountToRemove()
     }
+
+    fun Int.asArrowPercentage() = ((this.toFloat() / MAX_ARROW_AMOUNT) * 100).round(1)
 
     fun hasBowInInventory(): Boolean {
         return InventoryUtils.getItemsInOwnInventory().any { it.item is ItemBow }
@@ -218,16 +215,10 @@ object QuiverAPI {
     }
 
     fun getArrowByNameOrNull(internalName: NEUInternalName): ArrowType? {
-        return arrows.firstOrNull { it.internalName == internalName.asString() }
+        return arrows.firstOrNull { it.internalName == internalName }
     }
 
-    fun getArrowByNameOrFlint(name: String): ArrowType {
-        return getArrowByNameOrNull(name) ?: FLINT_ARROW_TYPE
-    }
-
-    fun getArrowByNameOrFlint(internalName: NEUInternalName): ArrowType {
-        return getArrowByNameOrNull(internalName) ?: FLINT_ARROW_TYPE
-    }
+    private fun NEUInternalName.asArrowTypeOrNull() = getArrowByNameOrNull(this)
 
     fun isEnabled() = LorenzUtils.inSkyBlock && storage != null
 
@@ -239,6 +230,9 @@ object QuiverAPI {
         infinityQuiverLevelMultiplier = itemData.enchant_multiplier["infinite_quiver"] ?: 0.03f
 
         val arrowData = event.getConstant<ArrowTypeJson>("ArrowTypes")
-        arrows = arrowData.arrows.map { ArrowType(it.value.arrow, it.key) }
+        arrows = arrowData.arrows.map { ArrowType(it.value.arrow, it.key.asInternalName()) }
+
+        NONE_ARROW_TYPE = getArrowByNameOrNull("NONE".asInternalName())
+        FLINT_ARROW_TYPE = getArrowByNameOrNull("FLINT".asInternalName())
     }
 }

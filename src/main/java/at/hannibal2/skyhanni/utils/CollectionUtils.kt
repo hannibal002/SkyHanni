@@ -51,6 +51,9 @@ object CollectionUtils {
     fun <K> MutableMap<K, Double>.addOrPut(key: K, number: Double): Double =
         this.merge(key, number, Double::plus)!! // Never returns null since "plus" can't return null
 
+    fun <K> MutableMap<K, Float>.addOrPut(key: K, number: Float): Float =
+        this.merge(key, number, Float::plus)!! // Never returns null since "plus" can't return null
+
     fun <K, N : Number> Map<K, N>.sumAllValues(): Double {
         if (values.isEmpty()) return 0.0
 
@@ -79,6 +82,28 @@ object CollectionUtils {
             }
         }
         return null
+    }
+
+    fun List<String>.removeNextAfter(after: String, skip: Int = 1) = removeNextAfter({ it == after }, skip)
+
+    fun List<String>.removeNextAfter(after: (String) -> Boolean, skip: Int = 1): List<String> {
+        val newList = mutableListOf<String>()
+        var missing = -1
+        for (line in this) {
+            if (after(line)) {
+                missing = skip - 1
+                continue
+            }
+            if (missing == 0) {
+                missing--
+                continue
+            }
+            if (missing != -1) {
+                missing--
+            }
+            newList.add(line)
+        }
+        return newList
     }
 
     fun <K, V> Map<K, V>.editCopy(function: MutableMap<K, V>.() -> Unit) =
