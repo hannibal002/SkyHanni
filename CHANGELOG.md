@@ -12,6 +12,12 @@
 + Added Atmospheric Filter Display. - Erymanthus
     + This display shows the currently active buff as a GUI element.
     + For an optimal experience, please have the Atmospheric Filter accessory active.
++ Added Sensitivity Reducer. - martimavocado
+    + Lowers mouse sensitivity while in the garden.
+    + Either when pressing a keybind or holding a farming tool in hand.
+    + Changes by how much the sensitivity is lowered by.
+    + Show a GUI element while the feature is enabled.
+    + Option to only allow this feature while on ground and/or on barn plot.
 
 #### Fishing Features
 
@@ -123,6 +129,10 @@
 
 + Show the guide text when hovering over the missing bingo goal list. - hannibal2
 
+#### Crimson Isle Changes
+
++ Added option to hide tasks after they've been completed in Crimson Isle Reputation Helper. - martimavocado
+
 #### Inventory Changes
 
 + Removed flawless gemstones from sack display. - CalMWolfs
@@ -170,6 +180,10 @@
 + Added option to ignore Everything Chroma in the chat. - VixidDev
 + Added Item Ability Cooldown support for Talbot's Theodolite (the Farming Island Trapper tracker thing). - Erymanthus
 + Fewer election API updates, fewer election API errors. - CalMWolfs
++ SkyHanni's own /wiki command logic now works better in SkyBlock Level guide and allows changing weather to use
+  official Hypixel Wiki or the older Fandom Wiki. - Obsidian
++ Added option to hide the already existing F3 SkyBlock Area Debug Feature. - Obsidian
+    + This feature shows the current area in SkyBlock while f3 is open.
 
 ### Fixes
 
@@ -189,6 +203,7 @@
 + Fixed the detection of Anita and Jacob visitors. - hannibal2
 + Fixed the pets menu detection for /ff. - martimavocado
 + Fixed Anita and Jacob workaround working outside of garden. - CalMWolfs
++ Fixed opening visitor Milestones menu not loading visitor amount for /ff. - martimavocado
 
 #### Combat Fixes
 
@@ -344,6 +359,8 @@
 + Added outgoing chat log to /shchathistory. - nea
 + Added sending mining events to Soopy's API to test for new Mining Event feature. - CalMWolfs
 + Added /shcopybossbar to copy bossbar - Erymanthus
++ Splitting many utils functions from LorenzUtils up into other classes: ChatUtils, CollectionUtils, ConditionalUtils. - Thunderblade73
++ A ton of code cleanup, mainly on imports. - Thunderblade73 & hannibal2
 
 ## Version 0.22
 
