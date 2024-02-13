@@ -30,8 +30,8 @@ object MayorAPI {
     var timeTillNextMayor = Duration.ZERO
         private set
 
-    private const val LATE_SPRING = 3
-    private const val LATE_SPRING_DAY = 27
+    private const val ELECTION_END_MONTH = 3
+    private const val ELECTION_END_DAY = 27
 
     /**
      * @param input: The name of the mayor
@@ -61,12 +61,12 @@ object MayorAPI {
         var mayorYear = SkyBlockTime.now().year
 
         // Check if either the month is already over or the day is after 27th in the third month
-        if (SkyBlockTime.now().month > LATE_SPRING || (SkyBlockTime.now().day >= LATE_SPRING_DAY && SkyBlockTime.now().month == LATE_SPRING)) {
+        if (SkyBlockTime.now().month > ELECTION_END_MONTH || (SkyBlockTime.now().day >= ELECTION_END_DAY && SkyBlockTime.now().month == ELECTION_END_MONTH)) {
             // If so, the next mayor will be in the next year
             mayorYear++
         }
 
-        return SkyBlockTime(mayorYear, LATE_SPRING, day = LATE_SPRING_DAY).asTimeMark()
+        return SkyBlockTime(mayorYear, ELECTION_END_MONTH, day = ELECTION_END_DAY).asTimeMark()
     }
 
     private fun getTimeTillNextMayor() {
