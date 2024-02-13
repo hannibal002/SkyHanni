@@ -78,7 +78,7 @@ object MaxwellAPI {
             val selectedPowerStack =
                 stacks.values.find {
                     val lore = it.getLore()
-                    lore.isNotEmpty() && powerSelectedPattern.matches(lore.last())
+                    powerSelectedPattern.matches(lore.lastOrNull())
                 } ?: return
             val displayName = selectedPowerStack.displayName.removeColor()
 
