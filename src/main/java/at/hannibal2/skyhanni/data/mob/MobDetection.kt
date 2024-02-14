@@ -52,7 +52,7 @@ class MobDetection {
         Zee
      */
 
-    private val forceReset get() = SkyHanniMod.feature.dev.mobDebug.forceReset
+    private val forceReset get() = !SkyHanniMod.feature.dev.mobDebug.enable
 
     private var shouldClear: AtomicBoolean = AtomicBoolean(false)
 

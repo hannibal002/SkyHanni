@@ -9,9 +9,9 @@ import io.github.moulberry.moulconfig.annotations.ConfigOption;
 public class DebugMob {
 
     @Expose
-    @ConfigOption(name = "Force Reset", desc = "Resets all Mobs, turn off to enable Mob Detetcion again")
+    @ConfigOption(name = "Mob Detection Enable", desc = "Turn off and on again to reset all Mobs")
     @ConfigEditorBoolean
-    public boolean forceReset = false;
+    public boolean enable = true;
 
     @Expose
     @ConfigOption(name = "Mob Detection", desc = "Debug feature to check the Mob Detection")
@@ -70,7 +70,7 @@ public class DebugMob {
         public HowToShow special = HowToShow.OFF;
 
         @Expose
-        @ConfigOption(name = "Show Invisible", desc = "Shows the mob even though they are invisible (Not trough Blocks only if the have the invisibility effect). This is very dangerous so don't use unless you want to debug invisible mobs")
+        @ConfigOption(name = "Show Invisible", desc = "Shows the mob even though they are invisible (do to invisibility effect) if looked at directly.")
         @ConfigEditorBoolean
         public boolean showInvisible = false;
     }

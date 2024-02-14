@@ -15,7 +15,9 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
 class MobDebug {
 
-    private val mobDebugConfig get() = SkyHanniMod.feature.dev.mobDebug.mobDetection
+    private val config get() = SkyHanniMod.feature.dev.mobDebug.mobDetection
+
+    private var lastRayHit: Mob? = null
 
     private fun HowToShow.isHighlight() =
         this == HowToShow.ONLY_HIGHLIGHT || this == HowToShow.NAME_AND_HIGHLIGHT
@@ -23,7 +25,7 @@ class MobDebug {
     private fun HowToShow.isName() =
         this == HowToShow.ONLY_NAME || this == HowToShow.NAME_AND_HIGHLIGHT
 
-    private fun Mob.isNotInvisible() = mobDebugConfig.showInvisible || !this.isInvisible()
+    private fun Mob.isNotInvisible() = !this.isInvisible() || (config.showInvisible && this == lastRayHit)
 
     private fun MobData.MobSet.highlight(event: LorenzRenderWorldEvent, color: (Mob) -> (LorenzColor)) =
         this.filter { it.isNotInvisible() }.forEach {
@@ -39,35 +41,40 @@ class MobDebug {
 
     @SubscribeEvent
     fun onWorldRenderDebug(event: LorenzRenderWorldEvent) {
-        if (mobDebugConfig.skyblockMob.isHighlight()) {
+        if (config.showRayHit || config.showInvisible) {
+            lastRayHit = MobUtils.rayTraceForMob(Minecraft.getMinecraft().thePlayer, event.partialTicks)
+                ?.takeIf { it.canBeSeen() && it.isNotInvisible() }
+        }
+
+        if (config.skyblockMob.isHighlight()) {
             MobData.skyblockMobs.highlight(event) { if (it.mobType == Mob.Type.Boss) LorenzColor.DARK_GREEN else LorenzColor.GREEN }
         }
-        if (mobDebugConfig.displayNPC.isHighlight()) {
+        if (config.displayNPC.isHighlight()) {
             MobData.displayNPCs.highlight(event) { LorenzColor.RED }
         }
-        if (mobDebugConfig.realPlayerHighlight) {
+        if (config.realPlayerHighlight) {
             MobData.players.highlight(event) { if (it.baseEntity is EntityPlayerSP) LorenzColor.CHROMA else LorenzColor.BLUE }
         }
-        if (mobDebugConfig.summon.isHighlight()) {
+        if (config.summon.isHighlight()) {
             MobData.summoningMobs.highlight(event) { LorenzColor.YELLOW }
         }
-        if (mobDebugConfig.special.isHighlight()) {
+        if (config.special.isHighlight()) {
             MobData.special.highlight(event) { LorenzColor.AQUA }
         }
-        if (mobDebugConfig.skyblockMob.isName()) {
+        if (config.skyblockMob.isName()) {
             MobData.skyblockMobs.showName(event)
         }
-        if (mobDebugConfig.displayNPC.isName()) {
+        if (config.displayNPC.isName()) {
             MobData.displayNPCs.showName(event)
         }
-        if (mobDebugConfig.summon.isName()) {
+        if (config.summon.isName()) {
             MobData.summoningMobs.showName(event)
         }
-        if (mobDebugConfig.special.isName()) {
+        if (config.special.isName()) {
             MobData.special.showName(event)
         }
-        if (mobDebugConfig.showRayHit) {
-            MobUtils.rayTraceForMob(Minecraft.getMinecraft().thePlayer, event.partialTicks)?.let {
+        if (config.showRayHit) {
+            lastRayHit?.let {
                 event.drawFilledBoundingBox_nea(it.boundingBox.expandBlock(), LorenzColor.GOLD.toColor(), 0.5f)
             }
         }
