@@ -37,6 +37,7 @@ private const val MOB_DETECTION_LOG_PREFIX = "MobDetection: "
 class MobDetection {
 
     /* Unsupported "Mobs"
+        Nicked Players
         Odanate
         Silk Worm
         Fairy (in Dungeon)
