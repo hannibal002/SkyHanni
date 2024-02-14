@@ -96,10 +96,6 @@ public class Features extends Config {
     public CombatConfig combat = new CombatConfig();
 
     @Expose
-    @Category(name = "Skill Progress", desc = "Skill Progress related config options.")
-    public SkillProgressConfig skillProgress = new SkillProgressConfig();
-
-    @Expose
     @Category(name = "Commands", desc = "Enable or disable commands.")
     public CommandsConfig commands = new CommandsConfig();
 
@@ -143,6 +139,10 @@ public class Features extends Config {
     @Category(name = "Mining", desc = "Features that help you break blocks.")
     public MiningConfig mining = new MiningConfig();
 
+    @Expose
+    @Category(name = "Skill Progress", desc = "Skill Progress related config options.")
+    public SkillProgressConfig skillProgress = new SkillProgressConfig();
+    
     @Expose
     @Category(name = "Slayer", desc = "Slayer features.")
     public SlayerConfig slayer = new SlayerConfig();
