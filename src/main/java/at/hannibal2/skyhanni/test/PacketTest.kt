@@ -4,7 +4,6 @@ import at.hannibal2.skyhanni.events.PacketEvent
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.EntityUtils
 import at.hannibal2.skyhanni.utils.LocationUtils.distanceToPlayer
-import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils.round
 import at.hannibal2.skyhanni.utils.LorenzVec
 import at.hannibal2.skyhanni.utils.NumberUtil.isInt
@@ -38,6 +37,7 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 object PacketTest {
 
     private var enabled = false
+    private var full = false
 
     private val entityMap = mutableMapOf<Int, MutableList<Packet<*>>>()
 
@@ -46,12 +46,17 @@ object PacketTest {
             sendEntityPacketData(args[0].toInt())
             return
         }
+        if (args.size == 1 && (args[0] == "full" || args[0] == "all")) {
+            full = !full
+            ChatUtils.chat("Packet test full: $full")
+            return
+        }
 
         toggle()
     }
 
     private fun sendEntityPacketData(id: Int) {
-        LorenzUtils.chat("Packet Entity Data: $id")
+        ChatUtils.chat("Packet Entity Data: $id")
         entityMap[id]?.forEach {
             it.print()
         }
@@ -127,7 +132,7 @@ object PacketTest {
 
         // Others
         if (packetName == "S29PacketSoundEffect") return
-//        if (packetName == "S2APacketParticles") return
+        if (!full && packetName == "S2APacketParticles") return
 
         // Entity
         if (this is S13PacketDestroyEntities) {
@@ -135,21 +140,23 @@ object PacketTest {
             return
         }
 
-//         if (packetName == "S18PacketEntityTeleport") return
-//         if (packetName == "S15PacketEntityRelMove") return
-//         if (packetName == "S04PacketEntityEquipment") return
+        if (!full) {
+            if (packetName == "S18PacketEntityTeleport") return
+            if (packetName == "S15PacketEntityRelMove") return
+            if (packetName == "S04PacketEntityEquipment") return
+            if (packetName == "S17PacketEntityLookMove") return
+            if (packetName == "S19PacketEntityHeadLook") return
+            if (packetName == "S16PacketEntityLook") return
+            if (packetName == "S12PacketEntityVelocity") return
+            if (packetName == "S1CPacketEntityMetadata") return
+            if (packetName == "S20PacketEntityProperties") return
+            if (packetName == "S0BPacketAnimation") return
+        }
 
 //        if (packetName == "S0EPacketSpawnObject") return
-//        if (packetName == "S0BPacketAnimation") return
 //        if (packetName == "S06PacketUpdateHealth") return
-//        if (packetName == "S17PacketEntityLookMove") return
-//        if (packetName == "S16PacketEntityLook") return
-//        if (packetName == "S19PacketEntityHeadLook") return
 //        if (packetName == "S1DPacketEntityEffect") return
-//        if (packetName == "S12PacketEntityVelocity") return
 //        if (packetName == "S19PacketEntityStatus") return
-//        if (packetName == "S1CPacketEntityMetadata") return
-//        if (packetName == "S20PacketEntityProperties") return
 //        if (packetName == "S1BPacketEntityAttach") return
 
         buildString {
@@ -165,23 +172,18 @@ object PacketTest {
 
             if (entity != null) {
                 if (entity == Minecraft.getMinecraft().thePlayer) {
-                    //                println("own: $distance $packetName")
-                    return
+                    append(" own")
+                    return@buildString
                 } else {
-                    append(" other: $distance")
+                    append(" distance: $distance other")
                 }
             } else {
-                if (id != null) {
-                    return
+                if (id == null) {
+                    return@buildString
                 }
-
-                //            if (packetName.contains("")) {
-                //
-                //            }
                 append(" entity is null.")
             }
-        }
-        //        println("distance: $distance")
+        }.let { println(it) }
     }
 
     private fun getDistance(location: LorenzVec?): Double {
@@ -245,6 +247,7 @@ object PacketTest {
         is S1DPacketEntityEffect -> entityId
         is S0CPacketSpawnPlayer -> entityID
         is S0FPacketSpawnMob -> entityID
+        is S0EPacketSpawnObject -> entityID
         is S19PacketEntityHeadLook -> javaClass.getDeclaredField("entityId").makeAccessible().get(this) as Int
         is S19PacketEntityStatus -> javaClass.getDeclaredField("entityId").makeAccessible().get(this) as Int
         /* is S14PacketEntity.S15PacketEntityRelMove -> packet.javaClass.getDeclaredField("entityId").makeAccessible().get(packet) as Int
