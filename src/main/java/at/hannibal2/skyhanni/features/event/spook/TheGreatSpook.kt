@@ -10,7 +10,8 @@ import at.hannibal2.skyhanni.utils.TabListData
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
 class TheGreatSpook {
-// §r§cPrimal Fears§r§7: §r§6§lREADY!!
+
+    // §r§cPrimal Fears§r§7: §r§6§lREADY!!
     private val config get() = SkyHanniMod.feature.event.spook
     private var displayTimer = ""
     private var displayFearStat = ""
@@ -40,6 +41,7 @@ class TheGreatSpook {
     private fun checkTabList(matchString: String): String {
         return (TabListData.getTabList().find { it.contains(matchString) } ?: "").trim()
     }
+
     @SubscribeEvent
     fun onRenderOverlay(event: GuiRenderEvent.GuiOverlayRenderEvent) {
         if (isTimerEnabled()) config.positionTimer.renderString(displayTimer, posLabel = "Primal Fear Timer")

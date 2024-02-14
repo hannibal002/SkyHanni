@@ -11,6 +11,7 @@ import net.minecraftforge.fml.common.eventhandler.EventPriority
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
 class TerracottaPhase {
+
     private val config get() = SkyHanniMod.feature.dungeon.terracottaPhase
 
     private var inTerracottaPhase = false

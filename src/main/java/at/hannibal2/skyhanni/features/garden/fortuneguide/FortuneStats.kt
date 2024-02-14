@@ -9,7 +9,7 @@ enum class FortuneStats(val label: String, val tooltip: String) {
     CROP_TOTAL("§6Crop Farming Fortune", "§7§2Farming fortune for this crop"),
     ACCESSORY("§2Talisman Bonus", "§7§2Fortune from your talisman\n§2You get 10☘ per talisman tier"),
     CROP_UPGRADE("§2Crop Upgrade", "§7§2Fortune from Desk crop upgrades\n§2You get 5☘ per level"),
-    BASE_TOOL("§2Base tool fortune","§7§2Crop specific fortune from your tool"),
+    BASE_TOOL("§2Base tool fortune", "§7§2Crop specific fortune from your tool"),
     REFORGE("§2Tool reforge", "§7§2Fortune from reforging your tool"),
     FFD("§2Farming for Dummies", "§7§2Fortune for each applied book\n§2You get 1☘ per applied book"),
     COUNTER("§2Logarithmic Counter", "§7§2Fortune from increasing crop counter\n§2You get 16☘ per digit - 4"),

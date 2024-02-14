@@ -11,7 +11,6 @@ import at.hannibal2.skyhanni.events.PacketEvent
 import at.hannibal2.skyhanni.features.event.diana.DianaAPI.isDianaSpade
 import at.hannibal2.skyhanni.utils.BlockUtils.getBlockAt
 import at.hannibal2.skyhanni.utils.DelayedRun
-import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.LorenzVec
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.TimeLimitedSet
@@ -24,6 +23,7 @@ import kotlin.time.Duration.Companion.minutes
 import kotlin.time.Duration.Companion.seconds
 
 class GriffinBurrowParticleFinder {
+
     private val config get() = SkyHanniMod.feature.event.diana
 
     private val recentlyDugParticleBurrows = TimeLimitedSet<LorenzVec>(1.minutes)
@@ -169,7 +169,6 @@ class GriffinBurrowParticleFinder {
         if (location == fakeBurrow) {
             fakeBurrow = null
             // This exist to detect the unlucky timing when the user opens a burrow before it gets fully deteced
-            LorenzUtils.chat("§dYou found a rare burrow bug. SkyHanni can auto fix it, though.")
             tryDig(location, ignoreFound = true)
             return
         }
@@ -182,7 +181,6 @@ class GriffinBurrowParticleFinder {
                     burrows.remove(location)
                 }
             }
-
         }
     }
 

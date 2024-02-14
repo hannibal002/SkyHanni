@@ -13,6 +13,7 @@ import net.minecraft.network.play.server.S2FPacketSetSlot
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
 object OtherInventoryData {
+
     private var currentInventory: Inventory? = null
     private var acceptItems = false
     private var lateEvent: InventoryUpdatedEvent? = null
@@ -105,6 +106,6 @@ object OtherInventoryData {
         val title: String,
         val slotCount: Int,
         val items: MutableMap<Int, ItemStack> = mutableMapOf(),
-        var fullyOpenedOnce: Boolean = false
+        var fullyOpenedOnce: Boolean = false,
     )
 }

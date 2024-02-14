@@ -12,6 +12,7 @@ import net.minecraft.entity.projectile.EntityFireball
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
 class BlazeSlayerClearView {
+
     private var nearBlaze = false
 
     @SubscribeEvent
