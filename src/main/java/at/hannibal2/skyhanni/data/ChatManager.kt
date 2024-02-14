@@ -9,9 +9,9 @@ import at.hannibal2.skyhanni.features.chat.ChatFilterGui
 import at.hannibal2.skyhanni.utils.IdentityCharacteristics
 import at.hannibal2.skyhanni.utils.LorenzLogger
 import at.hannibal2.skyhanni.utils.LorenzUtils
+import at.hannibal2.skyhanni.utils.ReflectionUtils.getClassInstance
+import at.hannibal2.skyhanni.utils.ReflectionUtils.getModContainer
 import at.hannibal2.skyhanni.utils.ReflectionUtils.makeAccessible
-import at.hannibal2.skyhanni.utils.getClassInstance
-import at.hannibal2.skyhanni.utils.getModContainer
 import net.minecraft.client.Minecraft
 import net.minecraft.client.gui.ChatLine
 import net.minecraft.client.gui.GuiNewChat
@@ -96,15 +96,6 @@ object ChatManager {
             "§7Mod id: §a${originatingModContainer?.modId}",
             "§7Mod name: §a${originatingModContainer?.name}"
         )
-        /*
-
-        return s + "." + methodName + "(" +
-             (isNativeMethod() ? "Native Method)" :
-              (fileName != null && lineNumber >= 0 ?
-               fileName + ":" + lineNumber + ")" :
-                (fileName != null ?  ""+fileName+")" : "Unknown Source)")));
-
-         */
         val stackTrace =
             Thread.currentThread().stackTrace.map {
                 "§7  §2${it.className}§7.§a${it.methodName}§7" +
