@@ -112,6 +112,7 @@ object SensitivityReducer {
     private fun isHoldingTool(): Boolean {
         return GardenAPI.toolInHand != null
     }
+
     private fun isHoldingKey(): Boolean {
         return config.keybind.isKeyHeld() && mc.currentScreen == null
     }

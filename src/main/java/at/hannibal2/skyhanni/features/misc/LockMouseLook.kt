@@ -1,12 +1,10 @@
 package at.hannibal2.skyhanni.features.misc
 
 import at.hannibal2.skyhanni.SkyHanniMod
-import at.hannibal2.skyhanni.config.features.garden.SensitivityReducerConfig
 import at.hannibal2.skyhanni.events.DebugDataCollectEvent
 import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.LorenzChatEvent
 import at.hannibal2.skyhanni.events.LorenzWorldChangeEvent
-import at.hannibal2.skyhanni.features.garden.GardenAPI
 import at.hannibal2.skyhanni.features.garden.SensitivityReducer
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.RenderUtils.renderString
@@ -31,7 +29,7 @@ object LockMouseLook {
     }
 
     @SubscribeEvent
-    fun onChat (event: LorenzChatEvent) {
+    fun onChat(event: LorenzChatEvent) {
         if (!event.message.startsWith("§aTeleported you to §r§aPlot")) return
         if (lockedMouse) toggleLock()
     }
