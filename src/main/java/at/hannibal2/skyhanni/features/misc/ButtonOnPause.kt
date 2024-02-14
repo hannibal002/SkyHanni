@@ -10,6 +10,7 @@ import net.minecraftforge.client.event.GuiScreenEvent
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
 class ButtonOnPause {
+
     private val config get() = SkyHanniMod.feature.gui
     private val buttonId = System.nanoTime().toInt()
 

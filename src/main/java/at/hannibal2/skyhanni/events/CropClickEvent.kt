@@ -9,5 +9,5 @@ class CropClickEvent(
     val crop: CropType,
     val blockState: IBlockState,
     val clickType: ClickType,
-    val itemInHand: ItemStack?
+    val itemInHand: ItemStack?,
 ) : LorenzEvent()

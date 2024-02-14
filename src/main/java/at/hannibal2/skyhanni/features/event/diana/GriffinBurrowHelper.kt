@@ -16,13 +16,14 @@ import at.hannibal2.skyhanni.events.LorenzTickEvent
 import at.hannibal2.skyhanni.events.LorenzWorldChangeEvent
 import at.hannibal2.skyhanni.features.event.diana.DianaAPI.isDianaSpade
 import at.hannibal2.skyhanni.utils.BlockUtils.getBlockAt
+import at.hannibal2.skyhanni.utils.ChatUtils
+import at.hannibal2.skyhanni.utils.CollectionUtils.editCopy
 import at.hannibal2.skyhanni.utils.DelayedRun
 import at.hannibal2.skyhanni.utils.KeyboardManager
 import at.hannibal2.skyhanni.utils.LocationUtils
 import at.hannibal2.skyhanni.utils.LocationUtils.distanceToPlayer
 import at.hannibal2.skyhanni.utils.LorenzColor
 import at.hannibal2.skyhanni.utils.LorenzUtils
-import at.hannibal2.skyhanni.utils.LorenzUtils.editCopy
 import at.hannibal2.skyhanni.utils.LorenzUtils.isInIsland
 import at.hannibal2.skyhanni.utils.LorenzVec
 import at.hannibal2.skyhanni.utils.RenderUtils.draw3DLine
@@ -38,6 +39,7 @@ import org.lwjgl.input.Keyboard
 import kotlin.time.Duration.Companion.seconds
 
 object GriffinBurrowHelper {
+
     private val config get() = SkyHanniMod.feature.event.diana
 
     var targetLocation: LorenzVec? = null
@@ -280,7 +282,6 @@ object GriffinBurrowHelper {
                     }
                 }
             }
-
         }
     }
 
@@ -303,28 +304,28 @@ object GriffinBurrowHelper {
 
     fun setTestBurrow(strings: Array<String>) {
         if (!IslandType.HUB.isInIsland()) {
-            LorenzUtils.userError("You can only create test burrows on the hub island!")
+            ChatUtils.userError("You can only create test burrows on the hub island!")
             return
         }
 
         if (!isEnabled()) {
             if (!config.alwaysDiana) {
-                LorenzUtils.clickableChat("§cEnable Always Diana in the config!", "sh always diana")
+                ChatUtils.clickableChat("§cEnable Always Diana in the config!", "sh always diana")
             } else {
-                LorenzUtils.userError("Have an Ancestral Spade in the inventory!")
+                ChatUtils.userError("Have an Ancestral Spade in the inventory!")
             }
             return
         }
 
         if (strings.size != 1) {
-            LorenzUtils.userError("/shtestburrow <type>")
+            ChatUtils.userError("/shtestburrow <type>")
             return
         }
 
         val type: BurrowType = when (strings[0].lowercase()) {
             "reset" -> {
                 resetAllData()
-                LorenzUtils.chat("Manually reset all burrow waypoints.")
+                ChatUtils.chat("Manually reset all burrow waypoints.")
                 return
             }
 
@@ -332,7 +333,7 @@ object GriffinBurrowHelper {
             "2", "mob" -> BurrowType.MOB
             "3", "treasure" -> BurrowType.TREASURE
             else -> {
-                LorenzUtils.userError("Unknown burrow type! Try 1-3 instead.")
+                ChatUtils.userError("Unknown burrow type! Try 1-3 instead.")
                 return
             }
         }
