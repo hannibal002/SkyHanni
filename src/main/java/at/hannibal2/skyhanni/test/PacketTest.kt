@@ -6,13 +6,11 @@ import at.hannibal2.skyhanni.utils.LocationUtils.distanceToPlayer
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils.round
 import at.hannibal2.skyhanni.utils.LorenzVec
-import at.hannibal2.skyhanni.utils.ReflectionUtils.makeAccessible
 import at.hannibal2.skyhanni.utils.getLorenzVec
 import at.hannibal2.skyhanni.utils.toLorenzVec
 import net.minecraft.client.Minecraft
 import net.minecraft.entity.Entity
 import net.minecraft.network.Packet
-import net.minecraft.network.play.client.C00PacketKeepAlive
 import net.minecraft.network.play.client.C03PacketPlayer
 import net.minecraft.network.play.server.S04PacketEntityEquipment
 import net.minecraft.network.play.server.S0BPacketAnimation
@@ -20,7 +18,6 @@ import net.minecraft.network.play.server.S0CPacketSpawnPlayer
 import net.minecraft.network.play.server.S0EPacketSpawnObject
 import net.minecraft.network.play.server.S0FPacketSpawnMob
 import net.minecraft.network.play.server.S12PacketEntityVelocity
-import net.minecraft.network.play.server.S13PacketDestroyEntities
 import net.minecraft.network.play.server.S14PacketEntity
 import net.minecraft.network.play.server.S18PacketEntityTeleport
 import net.minecraft.network.play.server.S19PacketEntityHeadLook
@@ -36,8 +33,7 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
 class PacketTest {
     companion object {
-
-        private var enabled = true
+        private var enabled = false
 
         fun toggle() {
             enabled = !enabled
@@ -72,7 +68,6 @@ class PacketTest {
         val packet = event.packet
         val packetName = packet.javaClass.simpleName
 
-        packet is C00PacketKeepAlive
 
         // Keep alive
         if (packetName == "S00PacketKeepAlive") return
@@ -102,16 +97,11 @@ class PacketTest {
 //        if (packetName == "S2APacketParticles") return
 
         // Entity
-        if (packet is S13PacketDestroyEntities) {
-            println(" ")
-            println("Receive: $packetName")
-            println("IDs: ${packet.entityIDs.joinToString { "$it, " }}")
-            return
-        }
+        if (packetName == "S13PacketDestroyEntities") return
 
-        /*         if (packetName == "S18PacketEntityTeleport") return
-                if (packetName == "S15PacketEntityRelMove") return
-                if (packetName == "S04PacketEntityEquipment") return */
+        if (packetName == "S18PacketEntityTeleport") return
+        if (packetName == "S15PacketEntityRelMove") return
+        if (packetName == "S04PacketEntityEquipment") return
 
 //        if (packetName == "S0EPacketSpawnObject") return
 //        if (packetName == "S0BPacketAnimation") return
@@ -126,15 +116,11 @@ class PacketTest {
 //        if (packetName == "S20PacketEntityProperties") return
 //        if (packetName == "S1BPacketEntityAttach") return
 
-        println(" ")
-        println("Receive: $packetName")
-        val id = getEntityId(packet)
-        if (id != null) {
-            println("ID: $id")
-        }
 
+        val id = getEntityId(packet)
         val entity = getEntity(packet, id)
         val distance = getDistance(getLocation(packet, entity))
+        if (distance > 10) return
 
         if (entity != null) {
             if (entity == Minecraft.getMinecraft().thePlayer) {
@@ -155,7 +141,8 @@ class PacketTest {
         }
 
 //        println("distance: $distance")
-
+        println("Receive: $packetName")
+        println(" ")
     }
 
     private fun getDistance(location: LorenzVec?): Double {
@@ -179,7 +166,6 @@ class PacketTest {
         if (packet is S0FPacketSpawnMob) {
             return LorenzVec(packet.x, packet.y, packet.z)
         }
-
         if (packet is S28PacketEffect) {
             return packet.soundPos.toLorenzVec()
         }
@@ -218,13 +204,7 @@ class PacketTest {
         is S0BPacketAnimation -> packet.entityID
         is S18PacketEntityTeleport -> packet.entityId
         is S1DPacketEntityEffect -> packet.entityId
-        is S0CPacketSpawnPlayer -> packet.entityID
-        is S0FPacketSpawnMob -> packet.entityID
-        is S19PacketEntityHeadLook -> packet.javaClass.getDeclaredField("entityId").makeAccessible().get(packet) as Int
-        is S19PacketEntityStatus -> packet.javaClass.getDeclaredField("entityId").makeAccessible().get(packet) as Int
-        /* is S14PacketEntity.S15PacketEntityRelMove -> packet.javaClass.getDeclaredField("entityId").makeAccessible().get(packet) as Int
-        is S14PacketEntity.S16PacketEntityLook -> packet.javaClass.getDeclaredField("entityId").makeAccessible().get(packet) as Int
-        is S14PacketEntity.S17PacketEntityLookMove -> packet.javaClass.getDeclaredField("entityId").makeAccessible().get(packet) as Int */
+
         else -> null
     }
 }
