@@ -30,7 +30,7 @@ object MayorAPI {
     var timeTillNextMayor = Duration.ZERO
         private set
 
-    private const val ELECTION_END_MONTH = 3
+    private const val ELECTION_END_MONTH = 3 //Late Spring
     private const val ELECTION_END_DAY = 27
 
     /**
