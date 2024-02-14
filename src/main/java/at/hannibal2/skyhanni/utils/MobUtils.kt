@@ -31,7 +31,6 @@ object MobUtils {
 
     fun EntityArmorStand?.takeNonDefault() = this?.takeIf { !it.isDefaultValue() }
 
-
     class OwnerShip(val ownerName: String) {
         val ownerPlayer = MobData.players.firstOrNull { it.name == ownerName }
         override fun equals(other: Any?): Boolean {
@@ -45,33 +44,34 @@ object MobUtils {
         }
     }
 
-
-    fun rayTraceForSkyblockMob(entity: Entity, distance: Double, partialTicks: Float, offset: LorenzVec = LorenzVec()) =
-        rayTraceForSkyblockMob(entity, partialTicks, offset)?.takeIf {
+    fun rayTraceForMob(entity: Entity, distance: Double, partialTicks: Float, offset: LorenzVec = LorenzVec()) =
+        rayTraceForMob(entity, partialTicks, offset)?.takeIf {
             it.baseEntity.distanceTo(entity.getLorenzVec()) <= distance
         }
 
-    fun rayTraceForSkyblockMobs(entity: Entity, distance: Double, partialTicks: Float, offset: LorenzVec = LorenzVec()) =
-        rayTraceForSkyblockMobs(entity, partialTicks, offset)?.filter {
+    fun rayTraceForMobs(
+        entity: Entity,
+        distance: Double,
+        partialTicks: Float,
+        offset: LorenzVec = LorenzVec()
+    ) =
+        rayTraceForMobs(entity, partialTicks, offset)?.filter {
             it.baseEntity.distanceTo(entity.getLorenzVec()) <= distance
         }.takeIf { it?.isNotEmpty() ?: false }
 
-    fun rayTraceForSkyblockMob(entity: Entity, partialTicks: Float, offset: LorenzVec = LorenzVec()) =
-        rayTraceForSkyblockMobs(entity, partialTicks, offset)?.first()
+    fun rayTraceForMob(entity: Entity, partialTicks: Float, offset: LorenzVec = LorenzVec()) =
+        rayTraceForMobs(entity, partialTicks, offset)?.first()
 
-    fun rayTraceForSkyblockMobs(entity: Entity, partialTicks: Float, offset: LorenzVec = LorenzVec()): List<Mob>? {
+    fun rayTraceForMobs(entity: Entity, partialTicks: Float, offset: LorenzVec = LorenzVec()): List<Mob>? {
         val pos = entity.getPositionEyes(partialTicks).toLorenzVec().add(offset)
         val look = entity.getLook(partialTicks).toLorenzVec().normalize()
-        val possibleEntities = MobData.skyblockMobs.entityList.filter {
+        val possibleEntities = MobData.entityToMob.filterKeys {
             it !is EntityArmorStand && it.entityBoundingBox.rayIntersects(
                 pos, look
             )
-        }
+        }.values.distinct()
         if (possibleEntities.isEmpty()) return null
-        return possibleEntities.toList().sortedBy { it.distanceTo(pos) }.map {
-            MobData.entityToMob[it]
-                ?: throw IllegalStateException("Entity not found even though in entity is in mob Set")
-        }
+        return possibleEntities.sortedBy { it.baseEntity.distanceTo(pos) }.drop(1) // drop to remove player
     }
 
 }

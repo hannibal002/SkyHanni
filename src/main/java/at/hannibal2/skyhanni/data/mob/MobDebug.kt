@@ -67,7 +67,7 @@ class MobDebug {
             MobData.special.showName(event)
         }
         if (mobDebugConfig.showRayHit) {
-            MobUtils.rayTraceForSkyblockMob(Minecraft.getMinecraft().thePlayer, event.partialTicks)?.let {
+            MobUtils.rayTraceForMob(Minecraft.getMinecraft().thePlayer, event.partialTicks)?.let {
                 event.drawFilledBoundingBox_nea(it.boundingBox.expandBlock(), LorenzColor.GOLD.toColor(), 0.5f)
             }
         }
