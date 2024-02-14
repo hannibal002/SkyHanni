@@ -55,8 +55,8 @@ object SensitivityReducer {
             }
 
             SensitivityReducerConfig.Mode.KEYBIND -> {
-                if (config.keybind.isKeyHeld() && !isToggled) toggle(true)
-                else if (isToggled && !config.keybind.isKeyHeld()) toggle(false)
+                if (isHoldingKey() && !isToggled) toggle(true)
+                else if (isToggled && !isHoldingKey()) toggle(false)
             }
 
             else -> return
@@ -109,6 +109,9 @@ object SensitivityReducer {
 
     private fun isHoldingTool(): Boolean {
         return GardenAPI.toolInHand != null
+    }
+    private fun isHoldingKey(): Boolean {
+        return config.keybind.isKeyHeld() && mc.currentScreen == null
     }
 
     fun manualToggle() {
