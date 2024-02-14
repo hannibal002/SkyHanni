@@ -23,6 +23,7 @@ object SensitivityReducer {
     private var isToggled = false
     private var isManualToggle = false
     private var lastCheckCooldown = SimpleTimeMark.farPast()
+    private const val LOCKED = -1F / 3F
 
     private val mc get() = Minecraft.getMinecraft()
     private val gameSettings = mc.gameSettings
@@ -126,18 +127,17 @@ object SensitivityReducer {
     }
 
     private fun lowerSensitivity(showMessage: Boolean = false) {
-        storage.savedMouseloweredSensitivity = gameSettings.mouseSensitivity
         val divisor = config.reducingFactor.get()
         ChatUtils.debug("dividing by $divisor")
+
         storage.savedMouseloweredSensitivity = gameSettings.mouseSensitivity
-        val newSens =
-            ((storage.savedMouseloweredSensitivity + (1F / 3F)) / divisor) - (1F / 3F)
+        val newSens = doTheMath(storage.savedMouseloweredSensitivity)
         gameSettings?.mouseSensitivity = newSens
         if (showMessage) ChatUtils.chat("§bMouse sensitivity is now lowered. Type /shsensreduce to restore your sensitivity.")
     }
 
     private fun restoreSensitivity(showMessage: Boolean = false) {
-        gameSettings?.mouseSensitivity = SkyHanniMod.feature.storage.savedMouseloweredSensitivity
+        gameSettings?.mouseSensitivity = storage.savedMouseloweredSensitivity
         if (showMessage) ChatUtils.chat("§bMouse sensitivity is now restored.")
     }
 
@@ -150,10 +150,17 @@ object SensitivityReducer {
         isToggled = state
     }
 
+
+    private fun doTheMath(input: Float, reverse: Boolean = false): Float {
+        val divisor = config.reducingFactor.get()
+        return if (!reverse) ((input - LOCKED) / divisor) + LOCKED
+        else (divisor * (input - LOCKED)) + LOCKED
+    }
+
     @SubscribeEvent
     fun onLogin(event: HypixelJoinEvent) {
         val divisor = config.reducingFactor.get()
-        val expectedLoweredSensitivity = ((divisor * (gameSettings.mouseSensitivity + 1F / 3F)) - 1F / 3F)
+        val expectedLoweredSensitivity = doTheMath(gameSettings.mouseSensitivity, true)
         if (abs(storage.savedMouseloweredSensitivity - expectedLoweredSensitivity) <= 0.0001) {
             ChatUtils.debug("Fixing incorrectly lowered sensitivity")
             isToggled = false
