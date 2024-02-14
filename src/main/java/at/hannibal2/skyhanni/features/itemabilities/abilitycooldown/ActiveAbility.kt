@@ -21,7 +21,7 @@ class ActiveAbility(
     private var lastItemClick: SimpleTimeMark = SimpleTimeMark.farPast(),
 ) {
 
-    fun activate(color: LorenzColor? = null, customCooldown: Duration = (type.cooldown)) {
+    fun activate(color: LorenzColor? = null, customCooldown: Duration = type.cooldown) {
         specialColor = color
         lastActivation = SimpleTimeMark.now() - (type.cooldown - customCooldown)
     }
