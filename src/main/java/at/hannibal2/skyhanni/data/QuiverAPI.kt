@@ -33,7 +33,7 @@ private var infinityQuiverLevelMultiplier = 0.03f
 object QuiverAPI {
     private val storage get() = ProfileStorageData.profileSpecific
     var currentArrow: ArrowType?
-        get() = getArrowByNameOrNull(storage?.arrows?.currentArrow?.asInternalName() ?: "NONE".asInternalName())
+        get() =  storage?.arrows?.currentArrow?.asInternalName()?.let{ getArrowByNameOrNull(it) } ?: NONE_ARROW_TYPE
         set(value) {
             storage?.arrows?.currentArrow = value?.toString() ?: return
         }

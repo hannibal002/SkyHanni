@@ -6,7 +6,6 @@ enum class Mayors(
     val mayorName: String,
     val color: String,
     private val perks: List<Perks>,
-    val activePerks: MutableList<Perks> = mutableListOf()
 ) {
     AATROX("Aatrox", "§3", listOf(Perks.SLASHED_PRICING, Perks.SLAYER_XP_BUFF, Perks.PATHFINDER)),
     COLE("Cole", "§e", listOf(Perks.PROSPECTION, Perks.MINING_XP_BUFF, Perks.MINING_FIESTA)),
@@ -24,6 +23,7 @@ enum class Mayors(
     UNKNOWN("Unknown", "§c", listOf()),
     ;
 
+    val activePerks: MutableList<Perks> = mutableListOf()
 
     companion object {
         fun getMayorFromName(name: String) = entries.firstOrNull { it.mayorName == name } ?: UNKNOWN
