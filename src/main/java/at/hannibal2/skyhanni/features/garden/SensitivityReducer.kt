@@ -7,6 +7,7 @@ import at.hannibal2.skyhanni.events.DebugDataCollectEvent
 import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.HypixelJoinEvent
 import at.hannibal2.skyhanni.events.LorenzTickEvent
+import at.hannibal2.skyhanni.features.misc.LockMouseLook
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.ConditionalUtils.afterChange
 import at.hannibal2.skyhanni.utils.KeyboardManager.isKeyHeld
@@ -115,6 +116,10 @@ object SensitivityReducer {
         return config.keybind.isKeyHeld() && mc.currentScreen == null
     }
 
+    fun isEnabled(): Boolean {
+        return isToggled || isManualToggle
+    }
+
     fun manualToggle() {
         if (isToggled) {
             ChatUtils.chat("This command is disabled while the Sensitivity is lowered.")
@@ -137,7 +142,7 @@ object SensitivityReducer {
     }
 
     private fun restoreSensitivity(showMessage: Boolean = false) {
-        gameSettings?.mouseSensitivity = storage.savedMouseloweredSensitivity
+        if (!LockMouseLook.lockedMouse) gameSettings?.mouseSensitivity = storage.savedMouseloweredSensitivity
         if (showMessage) ChatUtils.chat("§bMouse sensitivity is now restored.")
     }
 
@@ -151,7 +156,7 @@ object SensitivityReducer {
     }
 
 
-    private fun doTheMath(input: Float, reverse: Boolean = false): Float {
+    fun doTheMath(input: Float, reverse: Boolean = false): Float {
         val divisor = config.reducingFactor.get()
         return if (!reverse) ((input - LOCKED) / divisor) + LOCKED
         else (divisor * (input - LOCKED)) + LOCKED
