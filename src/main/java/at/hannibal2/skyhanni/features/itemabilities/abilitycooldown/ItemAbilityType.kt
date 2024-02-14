@@ -78,7 +78,7 @@ enum class ItemAbilityType(
     FLOWER_OF_TRUTH(1, 0),
     BOUQUET_OF_LIES(1, 0),
     WAND_OF_VOLCANO(1, 0),
-    ASPECT_OF_THE_END(0, 50, isAllowed =  {
+    ASPECT_OF_THE_END(0, 50, isAllowed = {
         !DungeonAPI.isInF7Boss()
     }),
 
@@ -91,15 +91,6 @@ enum class ItemAbilityType(
     BONZO_STAFF(0, 90, "STARRED_BONZO_STAFF"),
     ;
 
-    var newVariant = false
-    val internalNames: List<NEUInternalName>
-
-    init {
-        val internalNames = mutableListOf<NEUInternalName>()
-        alternateInternalNames.forEach {
-            internalNames.add(it.asInternalName())
-        }
-        internalNames.add(name.asInternalName())
-        this.internalNames = internalNames
-    }
+    val internalNames: List<NEUInternalName> =
+        alternateInternalNames.mapTo(mutableListOf(name.asInternalName())) { it.asInternalName() }
 }
