@@ -36,6 +36,19 @@ private const val MOB_DETECTION_LOG_PREFIX = "MobDetection: "
 
 class MobDetection {
 
+    /* Unsupported "Mobs"
+        Odanate
+        Silk Worm
+        Fairy (in Dungeon)
+        Totem of Corruption
+        Worm
+        Scatha
+        Butterfly
+        Exe
+        Wai
+        Zee
+     */
+
     private val forceReset get() = SkyHanniMod.feature.dev.mobDebug.forceReset
 
     private var shouldClear: AtomicBoolean = AtomicBoolean(false)
