@@ -60,7 +60,7 @@ object MobUtils {
         }.takeIf { it?.isNotEmpty() ?: false }
 
     fun rayTraceForMob(entity: Entity, partialTicks: Float, offset: LorenzVec = LorenzVec()) =
-        rayTraceForMobs(entity, partialTicks, offset)?.first()
+        rayTraceForMobs(entity, partialTicks, offset)?.firstOrNull()
 
     fun rayTraceForMobs(entity: Entity, partialTicks: Float, offset: LorenzVec = LorenzVec()): List<Mob>? {
         val pos = entity.getPositionEyes(partialTicks).toLorenzVec().add(offset)
@@ -69,9 +69,9 @@ object MobUtils {
             it !is EntityArmorStand && it.entityBoundingBox.rayIntersects(
                 pos, look
             )
-        }.values.distinct()
+        }.values
         if (possibleEntities.isEmpty()) return null
-        return possibleEntities.sortedBy { it.baseEntity.distanceTo(pos) }.drop(1) // drop to remove player
+        return possibleEntities.distinct().sortedBy { it.baseEntity.distanceTo(pos) }.drop(1) // drop to remove player
     }
 
 }
