@@ -12,7 +12,7 @@ example 1
 
 Those websites might even claim their findings are powered by artifical intelligence. this is obviously wrong.
 
-Please dont trust websites that claim to know wether or not any mod can rat you or harm your computer.
+Please don't trust websites that claim to know whether or not any mod can rat you or harm your computer.
 
 To download a mod safely, search for `github <mod name>` on the web.
 
