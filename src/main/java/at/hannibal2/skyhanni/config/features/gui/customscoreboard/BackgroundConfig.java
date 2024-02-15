@@ -4,6 +4,7 @@ import com.google.gson.annotations.Expose;
 import io.github.moulberry.moulconfig.annotations.ConfigEditorBoolean;
 import io.github.moulberry.moulconfig.annotations.ConfigEditorColour;
 import io.github.moulberry.moulconfig.annotations.ConfigEditorInfoText;
+import io.github.moulberry.moulconfig.annotations.ConfigEditorSlider;
 import io.github.moulberry.moulconfig.annotations.ConfigOption;
 
 public class BackgroundConfig {
@@ -22,6 +23,30 @@ public class BackgroundConfig {
     )
     @ConfigEditorColour
     public String color = "0:102:0:0:0";
+
+    @Expose
+    @ConfigOption(
+        name = "Background Border Size",
+        desc = "The size of the border around the background."
+    )
+    @ConfigEditorSlider(
+        minValue = 0,
+        maxValue = 20,
+        minStep = 1
+    )
+    public int borderSize = 5;
+
+    @Expose
+    @ConfigOption(
+        name = "Rounded Corner Smoothness",
+        desc = "The smoothness of the rounded corners."
+    )
+    @ConfigEditorSlider(
+        minValue = 0,
+        maxValue = 30,
+        minStep = 1
+    )
+    public int roundedCornerSmoothness = 10;
 
     @Expose
     @ConfigOption(

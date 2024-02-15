@@ -6,10 +6,10 @@ import at.hannibal2.skyhanni.data.GuiEditManager
 import at.hannibal2.skyhanni.data.GuiEditManager.Companion.getAbsX
 import at.hannibal2.skyhanni.data.GuiEditManager.Companion.getAbsY
 import at.hannibal2.skyhanni.data.GuiEditManager.Companion.getDummySize
+import at.hannibal2.skyhanni.utils.RenderUtils
 import at.hannibal2.skyhanni.utils.SpecialColour
 import io.github.moulberry.notenoughupdates.util.Utils
 import net.minecraft.client.Minecraft
-import net.minecraft.client.gui.Gui
 import net.minecraft.client.gui.ScaledResolution
 import net.minecraft.client.renderer.GlStateManager
 import net.minecraft.util.ResourceLocation
@@ -17,6 +17,7 @@ import org.lwjgl.opengl.GL11
 
 class RenderBackground {
     private val config get() = SkyHanniMod.feature.gui.customScoreboard
+    private val backgroundConfig get() = config.backgroundConfig
 
     fun renderBackground() {
         val position = config.position
@@ -31,53 +32,54 @@ class RenderBackground {
         val scaledWidth = ScaledResolution(Minecraft.getMinecraft()).scaledWidth
         val scaledHeight = ScaledResolution(Minecraft.getMinecraft()).scaledHeight
 
-        position.set(
-            Position(
-                if (config.displayConfig.alignment.alignRight)
-                    scaledWidth - elementWidth - (border * 2)
-                else x,
-                if (config.displayConfig.alignment.alignCenterVertically)
-                    scaledHeight / 2 - elementHeight / 2
-                else y,
-                position.getScale(),
-                position.isCenter
+        // Update the position to the alignment options
+        if (
+            config.displayConfig.alignment.alignRight
+            || config.displayConfig.alignment.alignCenterVertically
+        ) {
+            position.set(
+                Position(
+                    if (config.displayConfig.alignment.alignRight)
+                        scaledWidth - elementWidth - (backgroundConfig.borderSize * 2)
+                    else x,
+                    if (config.displayConfig.alignment.alignCenterVertically)
+                        scaledHeight / 2 - elementHeight / 2
+                    else y,
+                    position.getScale(),
+                    position.isCenter
+                )
             )
-        )
+        }
 
         if (GuiEditManager.isInGui()) return
 
-        // Insert Rounded Rectangle Shader here (https://github.com/hannibal002/SkyHanni/pull/851)
-
-        val textureLocation = ResourceLocation("skyhanni", "scoreboard.png")
-
-        // Save the current color state
         GlStateManager.pushMatrix()
         GlStateManager.pushAttrib()
 
         GlStateManager.color(1f, 1f, 1f, 1f)
 
-        if (config.backgroundConfig.enabled && config.backgroundConfig.useCustomBackgroundImage) {
-            // Draw the default texture
+        if (backgroundConfig.enabled && backgroundConfig.useCustomBackgroundImage) {
+            val textureLocation = ResourceLocation("skyhanni", "scoreboard.png")
             Minecraft.getMinecraft().textureManager.bindTexture(textureLocation)
+
             Utils.drawTexturedRect(
-                (x - border).toFloat(),
-                (y - border).toFloat(),
-                (elementWidth + border * 3).toFloat(),
+                (x - backgroundConfig.borderSize).toFloat(),
+                (y - backgroundConfig.borderSize).toFloat(),
+                (elementWidth + backgroundConfig.borderSize * 3).toFloat(),
                 (elementHeight + border * 2).toFloat(),
                 GL11.GL_NEAREST
             )
-        } else if (config.backgroundConfig.enabled) {
-            // Draw a solid background with a specified color
-            Gui.drawRect(
-                x - border,
-                y - border,
-                x + elementWidth + border * 2,
-                y + elementHeight + border,
-                SpecialColour.specialToChromaRGB(config.backgroundConfig.color)
+        } else if (backgroundConfig.enabled) {
+            RenderUtils.drawRoundRect(
+                x - backgroundConfig.borderSize,
+                y - backgroundConfig.borderSize,
+                elementWidth + backgroundConfig.borderSize * 3,
+                elementHeight + backgroundConfig.borderSize * 2,
+                SpecialColour.specialToChromaRGB(backgroundConfig.color),
+                backgroundConfig.roundedCornerSmoothness
             )
         }
 
-        // Restore the original color state
         GlStateManager.popMatrix()
         GlStateManager.popAttrib()
     }
