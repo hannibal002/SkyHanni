@@ -3,6 +3,7 @@ package at.hannibal2.skyhanni.api
 import at.hannibal2.skyhanni.data.ProfileStorageData
 import at.hannibal2.skyhanni.events.ActionBarUpdateEvent
 import at.hannibal2.skyhanni.events.ConfigLoadEvent
+import at.hannibal2.skyhanni.events.DebugDataCollectEvent
 import at.hannibal2.skyhanni.events.InventoryFullyOpenedEvent
 import at.hannibal2.skyhanni.events.SkillOverflowLevelupEvent
 import at.hannibal2.skyhanni.features.skillprogress.SkillProgress
@@ -24,7 +25,6 @@ import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.NumberUtil.formatNumber
 import at.hannibal2.skyhanni.utils.NumberUtil.romanToDecimalIfNecessary
-import at.hannibal2.skyhanni.utils.OSUtils
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.TabListData
@@ -163,6 +163,30 @@ object SkillAPI {
         }
     }
 
+    @SubscribeEvent
+    fun onDebugDataCollect(event: DebugDataCollectEvent) {
+        event.title("Skills")
+        if (skillMap == null) {
+            event.addIrrelevant("SkillMap is empty")
+            return
+        }
+        event.addData {
+            skillMap?.let {
+                for ((skillName, skillInfo) in it) {
+                    add("-  Name: $skillName")
+                    add("-  Level: ${skillInfo.level}")
+                    add("-  CurrentXp: ${skillInfo.currentXp}")
+                    add("-  CurrentXpMax: ${skillInfo.currentXpMax}")
+                    add("-  TotalXp: ${skillInfo.totalXp}")
+                    add("-  OverflowLevel: ${skillInfo.overflowLevel}")
+                    add("-  OverflowCurrentXp: ${skillInfo.overflowCurrentXp}")
+                    add("-  OverflowCurrentXpMax: ${skillInfo.overflowCurrentXpMax}")
+                    add("-  OverflowTotalXp: ${skillInfo.overflowTotalXp}\n")
+                }
+            }
+        }
+    }
+
     private fun runTimer(skillName: String, info: SkillXPInfo) {
         fixedRateTimer(name = "skyhanni-skillprogress-timer-$skillName", initialDelay = 1_000L, period = 1_000L) {
             if (info.shouldStartTimer) cancel()
@@ -223,6 +247,7 @@ object SkillAPI {
                 }
             }
         }
+        tablistLevel = 51
         val existingLevel = getSkillInfo(skill) ?: SkillInfo()
         val xpPercentageS = matcher.group(3).replace(",", "")
         val xpPercentage = xpPercentageS.toFloatOrNull() ?: return
@@ -308,35 +333,7 @@ object SkillAPI {
         }
 
         if (it.size == 1) {
-            when (it.first()) {
-                "copytoclipboard" -> {
-                    skillMap?.let {
-                        val list = buildList {
-                            add("```md")
-                            for ((skillName, skillInfo) in it) {
-                                add("Skill: $skillName")
-                                add("-  Level: ${skillInfo.level}")
-                                add("-  CurrentXp: ${skillInfo.currentXp}")
-                                add("-  CurrentXpMax: ${skillInfo.currentXpMax}")
-                                add("-  TotalXp: ${skillInfo.totalXp}")
-                                add("-  OverflowLevel: ${skillInfo.overflowLevel}")
-                                add("-  OverflowCurrentXp: ${skillInfo.overflowCurrentXp}")
-                                add("-  OverflowCurrentXpMax: ${skillInfo.overflowCurrentXpMax}")
-                                add("-  OverflowTotalXp: ${skillInfo.overflowTotalXp}")
-                                add(" ")
-                            }
-                            add("```")
-                        }
-                        OSUtils.copyToClipboard(list.joinToString("\n"))
-                        ChatUtils.chat("Copied to clipboard!")
-                        return
-                    }
-                }
-
-                else -> {
-                    commandHelp()
-                }
-            }
+            commandHelp()
         }
     }
 

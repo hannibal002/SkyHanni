@@ -342,11 +342,11 @@ object SkillProgress {
 
             if (config.showActionLeft.get() && percent != 100f) {
                 append(" - ")
-                if (skill.lastGain != "") {
-                    val actionLeft = (ceil(currentXpMax.toDouble() - currentXp) / skill.lastGain.formatNumber()).toLong().addSeparators()
+                val actionLeft = (ceil(currentXpMax.toDouble() - currentXp) / skill.lastGain.formatNumber()).toLong().addSeparators()
+                if (skill.lastGain != "" && !actionLeft.contains("-")) {
                     append("§6$actionLeft Left")
                 } else {
-                    append("∞ Left")
+                    append("§6∞ Left")
                 }
             }
         }))
