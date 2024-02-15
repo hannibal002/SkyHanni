@@ -80,9 +80,7 @@ inline fun <reified U : T, T> Const<T>.tryCast(): Const<U>? = (unsafeMutable as?
  * mutable as long. The caller may never cast the returned instance to [MutableList].
  */
 fun <T> Const<List<T>>.liftList(): List<Const<T>> {
-    @Suppress("UNCHECKED_CAST")
-    // This cast is valid since List<T> and List<Const<T>> are always the same at runtime, guaranteed by `@JvmInline`
-    return unsafeMutable as List<Const<T>>
+    return unsafeMutable.map(Const.Companion::newUnchecked)
 }
 
 /**
@@ -90,8 +88,6 @@ fun <T> Const<List<T>>.liftList(): List<Const<T>> {
  * either constructed directly as a [List] or if it originally comes from a [MutableList], mutations operations on this
  * instance are never used.
  */
-fun <T> List<Const<T>>.unliftList(): Const<List<T>> {
-    @Suppress("UNCHECKED_CAST")
-    // This cast is valid since List<T> and List<Const<T>> are always the same at runtime, guaranteed by `@JvmInline`
-    return Const.newUnchecked(this as List<T>)
+fun <T> List<Const<T>>.liftConst(): Const<List<T>> {
+    return Const.newUnchecked(this.map { it.unsafeMutable })
 }
