@@ -4,7 +4,7 @@ Those websites are wrong.
 
 Those websites might claim to know the mod has malicious code.
 
-Looking closer at the parts in the code they claim are malicious, we notice that their detection algorhytmus has a lot of flaws:
+Looking closer at the parts in the code they claim are malicious, we notice that their detection algorithms has a lot of flaws:
 
 for example:
 
