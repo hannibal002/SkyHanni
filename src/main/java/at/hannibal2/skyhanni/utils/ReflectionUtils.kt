@@ -74,7 +74,7 @@ object ReflectionUtils {
 
     val Class<*>.shPackageName
         get() =
-            canonicalName.substringBeforeLast('.')
+            canonicalName?.substringBeforeLast('.')
 
     fun Class<*>.getModContainer(): ModContainer? {
         return packageLookup[shPackageName]
