@@ -46,6 +46,11 @@ object UtilsPatterns {
         "(?:§f§f)?§7\\[Lvl (?<level>\\d+)] .*"
     )
 
+    val sackPattern by patternGroup.pattern(
+        "item.sack",
+        ".*Sack"
+    )
+
     val seasonPattern by patternGroup.pattern(
         "skyblocktime.season",
         "(?:Early |Late )?(?<season>Spring|Summer|Autumn|Winter)"
