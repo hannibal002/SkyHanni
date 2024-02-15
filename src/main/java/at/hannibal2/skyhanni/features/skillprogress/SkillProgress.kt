@@ -312,7 +312,7 @@ object SkillProgress {
             add(Renderable.string("§6XP/h: §cN/A"))
         } else {
             xpInterp = interpolate(xpInfo.xpGainHour, xpInfo.xpGainLast, lastGainUpdate.toMillis())
-            add(Renderable.string("§6XP/h: §b${xpInterp.addSeparators()} " +
+            add(Renderable.string("§6XP/h: §b${xpInterp.toLong().addSeparators()} " +
                 if (xpInfo.isActive) "" else "§c(PAUSED"))
         }
 
