@@ -221,11 +221,15 @@ object SkillProgress {
 
         for (skill in sortedMap) {
             val skillInfo = skillMap[skill] ?: SkillAPI.SkillInfo(level = -1, overflowLevel = -1)
+
+            val lockedLevels = skillInfo.overflowCurrentXp > skillInfo.overflowCurrentXpMax
             val (level, currentXp, currentXpMax, totalXp) =
-                if (config.overflowConfig.enableInAllDisplay.get())
+                if (config.overflowConfig.enableInAllDisplay.get() && !lockedLevels)
                     LorenzUtils.Quad(skillInfo.overflowLevel, skillInfo.overflowCurrentXp, skillInfo.overflowCurrentXpMax, skillInfo.overflowTotalXp)
                 else
                     LorenzUtils.Quad(skillInfo.level, skillInfo.currentXp, skillInfo.currentXpMax, skillInfo.totalXp)
+
+
 
             if (level == -1) {
                 addAsSingletonList(Renderable.clickAndHover(
