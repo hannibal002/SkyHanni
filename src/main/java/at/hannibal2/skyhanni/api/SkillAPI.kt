@@ -10,11 +10,14 @@ import at.hannibal2.skyhanni.features.skillprogress.SkillType
 import at.hannibal2.skyhanni.features.skillprogress.SkillUtil.activeSkill
 import at.hannibal2.skyhanni.features.skillprogress.SkillUtil.calculateLevelXp
 import at.hannibal2.skyhanni.features.skillprogress.SkillUtil.calculateOverFlow
+import at.hannibal2.skyhanni.features.skillprogress.SkillUtil.exactLevelingMap
 import at.hannibal2.skyhanni.features.skillprogress.SkillUtil.getLevel
+import at.hannibal2.skyhanni.features.skillprogress.SkillUtil.getLevelExact
 import at.hannibal2.skyhanni.features.skillprogress.SkillUtil.getSkillInfo
 import at.hannibal2.skyhanni.features.skillprogress.SkillUtil.levelArray
 import at.hannibal2.skyhanni.features.skillprogress.SkillUtil.levelingMap
 import at.hannibal2.skyhanni.features.skillprogress.SkillUtil.xpRequiredForLevel
+import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.cleanName
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.LorenzUtils
@@ -96,7 +99,8 @@ object SkillAPI {
             Utils.getElement(Constants.LEVELING, "leveling_xp").asJsonArray.toString(),
             object : TypeToken<List<Int>>() {}.type
         )
-        levelingMap = xpList.withIndex().associate { (index, xp) -> xp to index }
+        levelingMap = xpList.withIndex().associate { (index, xp) -> index to xp }
+        exactLevelingMap = xpList.withIndex().associate { (index, xp) -> xp to index }
     }
 
     @SubscribeEvent
@@ -182,7 +186,7 @@ object SkillAPI {
     private fun handleSkillPattern(matcher: Matcher, skill: SkillType, skillInfo: SkillInfo) {
         val currentXp = matcher.group(3).formatNumber()
         val maxXp = matcher.group(4).formatNumber()
-        val level = getLevel(maxXp)
+        val level = getLevelExact(maxXp)
 
         val (levelOverflow, currentOverflow, currentMaxOverflow, totalOverflow) = getSkillInfo(level, currentXp, maxXp, currentXp)
         if (skillInfo.overflowLevel != 0 && levelOverflow == skillInfo.overflowLevel + 1)
@@ -247,7 +251,7 @@ object SkillAPI {
     private fun handleSkillPatternMultiplier(matcher: Matcher, skillS: SkillType, skillInfo: SkillInfo) {
         val currentXp = matcher.group(3).formatNumber()
         val maxXp = matcher.group(4).formatNumber()
-        val level = getLevel(maxXp)
+        val level = getLevelExact(maxXp)
         val levelingArray = levelArray()
         val levelXp = calculateLevelXp(levelingArray, level - 1).toLong() + currentXp
         val (currentLevel, currentOverflow, currentMaxOverflow, totalOverflow) = getSkillInfo(level, currentXp, maxXp, levelXp)
@@ -280,17 +284,25 @@ object SkillAPI {
                     val xp = second.toLong()
                     if (xp <= 111672425L) {
                         val level = getLevel(xp)
-                        LorenzUtils.chat("With §b${xp.addSeparators()} §eXP you would be level §b$level")
+                        ChatUtils.chat("With §b${xp.addSeparators()} §eXP you would be level §b$level")
                     } else {
                         val (overflowLevel, current, needed, _) = calculateOverFlow(second.toLong())
-                        LorenzUtils.chat("With §b${xp.addSeparators()} §eXP you would be level §b$overflowLevel " +
+                        ChatUtils.chat("With §b${xp.addSeparators()} §eXP you would be level §b$overflowLevel " +
                             "§ewith progress (§b${current.addSeparators()}§e/§b${needed.addSeparators()}§e) XP")
                     }
                 }
 
                 "xpforlevel" -> {
-                    val neededXP = xpRequiredForLevel(second.toDouble())
-                    LorenzUtils.chat("You need §b${neededXP.addSeparators()} §eXP to be level §b${second.toDouble()}")
+                    val level = second.toInt()
+                    if (level <= 60) {
+                        val neededXp = levelingMap.filter { it.key < level }.values.sum().toLong()
+                        ChatUtils.chat("You need §b${neededXp.addSeparators()} §eXP to be level §b${level.toDouble()}")
+                    } else {
+                        val base = levelingMap.values.sum().toLong()
+                        val neededXP = xpRequiredForLevel(level.toDouble()) + base
+                        ChatUtils.chat("You need §b${neededXP.addSeparators()} §eXP to be level §b${level.toDouble()}")
+                    }
+
                 }
             }
         }
@@ -316,7 +328,7 @@ object SkillAPI {
                             add("```")
                         }
                         OSUtils.copyToClipboard(list.joinToString("\n"))
-                        LorenzUtils.chat("Copied to clipboard!")
+                        ChatUtils.chat("Copied to clipboard!")
                         return
                     }
                 }

@@ -108,7 +108,6 @@ object SkillProgress {
         if (etaConfig.enabled.get()) {
             config.etaPosition.renderRenderables(etaDisplay, posLabel = "Skill ETA")
         }
-
     }
 
     @SubscribeEvent
@@ -182,10 +181,8 @@ object SkillProgress {
         }
     }
 
-
     @SubscribeEvent(priority = EventPriority.LOW)
     fun onActionBar(event: ClientChatReceivedEvent) {
-        if (enabled) return //TODO:  remove before release
         if (!config.hideInActionBar) return
         if (event.type.toInt() != 2) return
         if (event.isCanceled) return
@@ -196,46 +193,6 @@ object SkillProgress {
         }
         msg = msg.trim()
         event.message = ChatComponentText(msg)
-    }
-
-    /**
-     * TODO: Remove before release
-     */
-    var start = 0L
-    var enabled = false
-    var add = 0L
-
-    @SubscribeEvent(priority = EventPriority.HIGHEST)
-    fun onActionBar2(event: ClientChatReceivedEvent) {
-        if (!enabled) return
-        if (event.type.toInt() != 2) return
-        if (event.isCanceled) return
-        event.message = ChatComponentText("+$add Farming ($start/0)")
-        start += add
-    }
-
-    /**
-     * TODO: Remove before release
-     */
-    fun setAction(args: Array<String>) {
-        if (args.isEmpty()) return
-        if (args.size == 1) {
-            when (args[0]) {
-                "toggle" -> {
-                    enabled = !enabled
-                    chat(if (enabled) "§aEnabled" else "§cDisabled")
-                }
-            }
-        }
-        if (args.size == 2) {
-            when (args[0]) {
-                "add" -> {
-                    val toAdd = args[1].toLongOrNull() ?: error("Cannot parse ${args[1]} as Long")
-                    add += toAdd
-                    chat("To add: ${toAdd.addSeparators()}")
-                }
-            }
-        }
     }
 
     fun updateDisplay() {

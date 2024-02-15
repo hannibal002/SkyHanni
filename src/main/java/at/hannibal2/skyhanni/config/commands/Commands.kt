@@ -49,7 +49,6 @@ import at.hannibal2.skyhanni.features.misc.LockMouseLook
 import at.hannibal2.skyhanni.features.misc.MarkedPlayerManager
 import at.hannibal2.skyhanni.features.misc.discordrpc.DiscordRPCManager
 import at.hannibal2.skyhanni.features.misc.massconfiguration.DefaultConfigFeatures
-import at.hannibal2.skyhanni.features.skillprogress.SkillProgress
 import at.hannibal2.skyhanni.features.misc.visualwords.VisualWordGui
 import at.hannibal2.skyhanni.features.rift.area.westvillage.VerminTracker
 import at.hannibal2.skyhanni.features.slayer.SlayerProfitTracker
@@ -245,19 +244,19 @@ object Commands {
         registerCommand(
             "shfandomwiki",
             "Searches the fandom wiki with SkyHanni's own method."
-        ) {WikiManager.otherWikiCommands(it, true)}
+        ) { WikiManager.otherWikiCommands(it, true) }
         registerCommand(
             "shfandomwikithis",
             "Searches the fandom wiki with SkyHanni's own method."
-        ) {WikiManager.otherWikiCommands(it, true, true)}
+        ) { WikiManager.otherWikiCommands(it, true, true) }
         registerCommand(
             "shofficialwiki",
             "Searches the official wiki with SkyHanni's own method."
-        ) {WikiManager.otherWikiCommands(it, false)}
+        ) { WikiManager.otherWikiCommands(it, false) }
         registerCommand(
             "shofficialwikithis",
             "Searches the official wiki with SkyHanni's own method."
-        ) {WikiManager.otherWikiCommands(it, false, true)}
+        ) { WikiManager.otherWikiCommands(it, false, true) }
         registerCommand0("shcalccrop", "Calculate how many crops need to be farmed between different crop milestones.", {
             FarmingMilestoneCommand.onCommand(it.getOrNull(0), it.getOrNull(1), it.getOrNull(2), false)
         }, FarmingMilestoneCommand::onComplete)
@@ -353,7 +352,6 @@ object Commands {
             "shtestburrow",
             "Sets a test burrow waypoint at your location"
         ) { GriffinBurrowHelper.setTestBurrow(it) }
-        registerCommand("shdebugskillprogress", "dev command") { SkillProgress.setAction(it) }
     }
 
     private fun developersCodingHelp() {

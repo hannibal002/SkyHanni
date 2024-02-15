@@ -8,6 +8,7 @@ import io.github.moulberry.notenoughupdates.util.Utils
 
 object SkillUtil {
 
+    var exactLevelingMap = mapOf<Int, Int>()
     var levelingMap = mapOf<Int, Int>()
     var activeSkill: SkillType = SkillType.NONE
     private val excludedSkills = listOf(
@@ -103,9 +104,21 @@ object SkillUtil {
         return totalXpRequired
     }
 
-    fun getLevel(neededXp: Long): Int {
+    fun getLevelExact(neededXp: Long): Int {
         val defaultLevel = if (activeSkill in excludedSkills) 50 else 60
-        return levelingMap.getOrDefault(neededXp.toInt(), defaultLevel)
+        return exactLevelingMap.getOrDefault(neededXp.toInt(), defaultLevel)
+    }
+
+    fun getLevel(currentXp: Long): Int {
+        var level = 0
+        var remainingXp = currentXp
+        for ((i, v) in levelingMap) {
+            if (remainingXp >= v) {
+                remainingXp -= v
+                level++
+            }
+        }
+        return level
     }
 
     fun calculateLevelXp(levelingArray: JsonArray, level: Int): Double {
