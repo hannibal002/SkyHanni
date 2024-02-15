@@ -2,6 +2,7 @@ package at.hannibal2.skyhanni.features.misc
 
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.events.GuiRenderEvent
+import at.hannibal2.skyhanni.events.LorenzChatEvent
 import at.hannibal2.skyhanni.events.LorenzWorldChangeEvent
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.RenderUtils.renderString
@@ -22,6 +23,12 @@ object LockMouseLook {
             gameSettings.mouseSensitivity = SkyHanniMod.feature.storage.savedMouselockedSensitivity
             ChatUtils.chat("§bMouse rotation is now unlocked because you left it locked.")
         }
+    }
+
+    @SubscribeEvent
+    fun onChat (event: LorenzChatEvent) {
+        if (!event.message.startsWith("§aTeleported you to §r§aPlot")) return
+        if (lockedMouse) toggleLock()
     }
 
     fun toggleLock() {

@@ -958,6 +958,7 @@ Use `/sh` or `/skyhanni` to open the SkyHanni config in game.
     + Support for the Hypixel command /p kick /pk to add a reason. The reason will be sent in party chat before
       kicking the player.
 + Color the month names on the scoreboard. - J10a1n15
++ Blocks the mining ability when on a private island. - Thunderblade73
 
 </details>
 <details open><summary>
