@@ -16,11 +16,6 @@ public class SkillETADisplayConfig {
     public Property<Boolean> enabled = Property.of(false);
 
     @Expose
-    @ConfigOption(name = "Info", desc = "yes")
-    @ConfigEditorInfoText
-    public boolean info = false;
-
-    @Expose
     @ConfigOption(name = "Farming", desc = "After how much seconds the Farming session timer should pause.")
     @ConfigEditorSlider(minStep = 1, minValue = 3, maxValue = 60)
     public int farmingPauseTime = 3;
