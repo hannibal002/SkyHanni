@@ -100,8 +100,13 @@ public class DungeonConfig {
     public boolean highlightSkeletonSkull = true;
 
     @Expose
+    @ConfigOption(name = "Chests Config", desc = "")
+    @Accordion
+    public DungeonChestConfig chest = new DungeonChestConfig();
+
+    @Expose
     @ConfigOption(name = "Croesus Chest", desc = "Adds a visual highlight to the Croesus inventory that " +
-        "shows unopened chests.")
+        "shows unopened chests.") // TODO move to chest
     @ConfigEditorBoolean
     @FeatureToggle
     public boolean croesusUnopenedChestTracker = true;
