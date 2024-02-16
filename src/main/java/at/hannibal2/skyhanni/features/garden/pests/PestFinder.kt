@@ -30,6 +30,7 @@ import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.StringUtils
 import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.renderables.Renderable
+import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraft.client.Minecraft
 import net.minecraftforge.fml.common.eventhandler.EventPriority
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
@@ -39,8 +40,15 @@ class PestFinder {
 
     private val config get() = PestAPI.config.pestFinder
 
-    // TODO repo pattern
-    private val pestsInScoreboardPattern = " §7⏣ §[ac]The Garden §4§lൠ§7 x(?<pests>.*)".toPattern()
+    private val patternGroup = RepoPattern.group("garden.pests.finder")
+    private val pestsInScoreboardPattern by patternGroup.pattern(
+        "scoreboard",
+        " §7⏣ §[ac]The Garden §4§lൠ§7 x(?<pests>.*)"
+    )
+    private val pestInventoryPattern by patternGroup.pattern(
+        "inventory",
+        "§4§lൠ §cThis plot has §6(?<amount>\\d) Pests?§c!"
+    )
 
     private var display = emptyList<Renderable>()
     private var lastTimeVacuumHold = SimpleTimeMark.farPast()
@@ -62,8 +70,6 @@ class PestFinder {
     fun onInventoryOpen(event: InventoryFullyOpenedEvent) {
         if (!isEnabled()) return
         if (event.inventoryName != "Configure Plots") return
-
-        val pestInventoryPattern = "§4§lൠ §cThis plot has §6(?<amount>\\d) Pests?§c!".toPattern()
 
         for (plot in GardenPlotAPI.plots) {
             plot.pests = 0

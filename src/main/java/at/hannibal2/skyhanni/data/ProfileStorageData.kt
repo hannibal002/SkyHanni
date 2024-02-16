@@ -14,6 +14,7 @@ import at.hannibal2.skyhanni.events.TabListUpdateEvent
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
+import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraftforge.fml.common.eventhandler.EventPriority
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
@@ -26,8 +27,16 @@ object ProfileStorageData {
 
     private var nextProfile: String? = null
 
-    // TODO USE SH-REPO
-    private val profileSwitchPattern = "§7Switching to profile (?<name>.*)\\.\\.\\.".toPattern()
+    private val patternGroup = RepoPattern.group("data.profile")
+    private val profileSwitchPattern by patternGroup.pattern(
+        "switch",
+        "§7Switching to profile (?<name>.*)\\.\\.\\."
+    )
+    private val profileNamePattern by patternGroup.pattern(
+        "name",
+        "§e§lProfile: §r§a(?<name>.*)"
+    )
+
 
     private var sackPlayers: SackData.PlayerSpecific? = null
     var sackProfiles: SackData.ProfileSpecific? = null
@@ -85,8 +94,7 @@ object ProfileStorageData {
         val playerSpecific = playerSpecific ?: return
         val sackPlayers = sackPlayers ?: return
         for (line in event.tabList) {
-            val pattern = "§e§lProfile: §r§a(?<name>.*)".toPattern()
-            pattern.matchMatcher(line) {
+            profileNamePattern.matchMatcher(line) {
                 val profileName = group("name").lowercase()
                 loadProfileSpecific(playerSpecific, sackPlayers, profileName)
                 nextProfile = null
