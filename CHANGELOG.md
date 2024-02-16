@@ -28,6 +28,7 @@
 
 + Added Deep Caverns Parkour. - hannibal2
     + Shows a parkour to the bottom of Deep Caverns and to Rhys.
++ Blocks the mining ability when on a private island. - Thunderblade73
 
 #### Dungeon Features
 
@@ -104,6 +105,8 @@
 + Made blocks per second calculation more accurate immediately after starting to farm. - hannibal2
 + Warn to open visitor inventory again after partially serving Spaceman. - alexia
 + Updating the Garden Optimal Speed Display and Warning immediately when changing the setting. - hannibal2
++ Added auto mouse-unlocking on plot teleport in garden. - martimavocado
++ Improve items in sacks display in Visitor Shopping List wording and color. - alexia
 
 #### Rift Changes
 
@@ -174,6 +177,10 @@
 
 + Using a better title for Area Boss features. - hannibal2
 
+#### Slayer Changes
+
++ Adding Soul Of The Alpha support to the Area Mini Boss features respawn timer and highlight. - martimavocado
+
 #### Misc Changes
 
 + Tia Relay Helper: Suggest /togglemusic. - alexia
@@ -184,6 +191,7 @@
   official Hypixel Wiki or the older Fandom Wiki. - Obsidian
 + Added option to hide the already existing F3 SkyBlock Area Debug Feature. - Obsidian
     + This feature shows the current area in SkyBlock while f3 is open.
++ Hovering on cheap items in an Item Tracker now shows the hidden items. - Mikecraft1224
 
 ### Fixes
 
@@ -204,6 +212,7 @@
 + Fixed the pets menu detection for /ff. - martimavocado
 + Fixed Anita and Jacob workaround working outside of garden. - CalMWolfs
 + Fixed opening visitor Milestones menu not loading visitor amount for /ff. - martimavocado
++ Fixed Sensitivity Reducer still working when switching from the garden to the hub. - martimavocado
 
 #### Combat Fixes
 
@@ -266,6 +275,9 @@
 + Added options to hide Helmet Skins, Armor Dyes or Runes from Estimated Item Value Calculation. - hannibal2
 + Fixed Divine Gift and Flash enchants showing the wrong/no price in EstimatedItemValue. - jani
 + Fixed showing the Piece of Wizard Portal earned duplicate. - Thunderblade73
++ Fixed shift-click NPC sell not working for menus with different sizes and full inventories. - Thunderblade73
++ Fixed an error with the shift-click NPC sell feature. - Thunderblade73
++ Ignore Shift-Click NPC Sell when right-clicking a sack. - Thunderblade73
 
 #### Bingo Fixes
 
@@ -361,6 +373,8 @@
 + Added /shcopybossbar to copy bossbar - Erymanthus
 + Splitting many utils functions from LorenzUtils up into other classes: ChatUtils, CollectionUtils, ConditionalUtils. - Thunderblade73
 + A ton of code cleanup, mainly on imports. - Thunderblade73 & hannibal2
++ Added mod identification for outgoing mod calls and show this data in /shchathistory. - nea
++ Sensitivity Reducer changes: clearer error message, using ChatUtils and wrong values in debug data. - martimavocado
 
 ## Version 0.22
 
