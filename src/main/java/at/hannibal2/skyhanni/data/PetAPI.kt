@@ -19,7 +19,6 @@ object PetAPI {
         "(§f§f)?§7\\[Lvl 1➡(100|200)] (?<name>.*)"
     )
 
-``` To better match the format of patterns in the rest of the mod
     fun isPetMenu(inventoryTitle: String): Boolean = petMenuPattern.matches(inventoryTitle)
 
     // Contains color code + name and for older SkyHanni users maybe also the pet level
