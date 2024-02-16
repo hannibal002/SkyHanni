@@ -14,7 +14,7 @@ public class GetFromSackConfig {
     public boolean queuedGFS = true;
 
     @Expose
-    @ConfigOption(name = "Bazaar GfS", desc = "If you don't have enough items in sack get a prompt to buy them from bazaar. §eQueued GfS needs to be turned on!")
+    @ConfigOption(name = "Bazaar GfS", desc = "If you don't have enough items in sack get a prompt to buy them from bazaar.")
     @ConfigEditorBoolean
-    public boolean bazaarGFS = true;
+    public boolean bazaarGFS = false;
 }

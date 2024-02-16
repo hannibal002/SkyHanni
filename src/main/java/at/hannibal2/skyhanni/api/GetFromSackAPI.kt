@@ -1,13 +1,13 @@
 package at.hannibal2.skyhanni.api
 
 import at.hannibal2.skyhanni.SkyHanniMod
-import at.hannibal2.skyhanni.data.SackAPI
-import at.hannibal2.skyhanni.data.SackStatus
 import at.hannibal2.skyhanni.data.jsonobjects.repo.SacksJson
 import at.hannibal2.skyhanni.events.GuiContainerEvent
 import at.hannibal2.skyhanni.events.InventoryCloseEvent
+import at.hannibal2.skyhanni.events.LorenzChatEvent
 import at.hannibal2.skyhanni.events.LorenzTickEvent
 import at.hannibal2.skyhanni.events.LorenzToolTipEvent
+import at.hannibal2.skyhanni.events.MessageSendToServerEvent
 import at.hannibal2.skyhanni.events.RepositoryReloadEvent
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils
@@ -17,6 +17,9 @@ import at.hannibal2.skyhanni.utils.NumberUtil.isInt
 import at.hannibal2.skyhanni.utils.PrimitiveItemStack
 import at.hannibal2.skyhanni.utils.PrimitiveItemStack.Companion.makePrimitiveStack
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
+import at.hannibal2.skyhanni.utils.StringUtils.firstLetterUppercase
+import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
+import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraft.inventory.Slot
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import java.util.Deque
@@ -27,6 +30,15 @@ object GetFromSackAPI {
     private val config get() = SkyHanniMod.feature.inventory.gfs
 
     private val commands = arrayOf("gfs", "getfromsacks")
+
+    private val fromSacksChatPattern by RepoPattern.pattern(
+        "gfs.chat.from",
+        "§aMoved §r§e(?<amount>\\d+) (?<item>.+)§r§a from your Sacks to your inventory."
+    )
+    private val missingChatPattern by RepoPattern.pattern(
+        "gfs.chat.missing",
+        "§cYou have no (?<item>.+) in your Sacks!"
+    )
 
     fun getFromSack(item: NEUInternalName, amount: Int) = getFromSack(item.makePrimitiveStack(amount))
 
@@ -99,51 +111,80 @@ object GetFromSackAPI {
             return
         }
 
+        val (result, stack) = commandValidator(args.toList())
+
+        when (result) {
+            CommandResult.VALID -> getFromSack(stack ?: return)
+            CommandResult.WRONG_ARGUMENT -> ChatUtils.userError("Missing arguments! Usage: /getfromsacks <name/id> <amount>")
+            CommandResult.WRONG_IDENTIFIER -> ChatUtils.userError("Couldn't find an item with this name or identifier!")
+            CommandResult.WRONG_AMOUNT -> ChatUtils.userError("Invalid amount!")
+        }
+    }
+
+    private enum class CommandResult {
+        VALID,
+        WRONG_ARGUMENT,
+        WRONG_IDENTIFIER,
+        WRONG_AMOUNT
+    }
+
+    private fun commandValidator(args: List<String>): Pair<CommandResult, PrimitiveItemStack?> {
         if (args.size != 2) {
-            ChatUtils.userError("Missing arguments! Usage: /getfromsacks <name/id> <amount>")
-            return
+            return CommandResult.WRONG_ARGUMENT to null
         }
 
         val item = args[0].asInternalName()
 
         if (!sackList.contains(item)) {
-            ChatUtils.userError("Couldn't find an item with this name or identifier!")
-            return
+            return CommandResult.WRONG_IDENTIFIER to null
         }
 
         val amountString = args[1]
 
         if (!amountString.isInt()) {
-            ChatUtils.userError("Invalid amount!")
+            return CommandResult.WRONG_AMOUNT to null
+        }
+
+        return CommandResult.VALID to item.makePrimitiveStack(amountString.toInt())
+    }
+
+    private var lastItemStack: PrimitiveItemStack? = null
+
+    @SubscribeEvent
+    fun onMessageToServer(event: MessageSendToServerEvent) {
+        if (event.isCanceled) return
+        if (!LorenzUtils.inSkyBlock) return
+        if (!config.bazaarGFS || LorenzUtils.noTradeMode) return
+        val command = event.message.split(" ")
+        if (command.isEmpty()) return
+        if (command[0] != "/gfs") return
+        lastItemStack = commandValidator(command.drop(1)).second
+    }
+
+    @SubscribeEvent
+    fun onChat(event: LorenzChatEvent) {
+        if (!LorenzUtils.inSkyBlock) return
+        if (!config.bazaarGFS || LorenzUtils.noTradeMode) return
+        val stack = lastItemStack ?: return
+        val message = event.message
+        fromSacksChatPattern.matchMatcher(message) {
+            val diff = stack.amount - group("amount").toInt()
+            if (diff <= 0) return
+            bazaarMessage(stack.name.asString().firstLetterUppercase(), diff, true)
+            lastItemStack = null
             return
         }
-
-        val amount = amountString.toInt()
-
-        if (config.bazaarGFS && !LorenzUtils.noTradeMode) {
-            val sackInfo = SackAPI.fetchSackItem(item)
-            if (sackInfo.getStatus() != SackStatus.CORRECT && sackInfo.getStatus() != SackStatus.ALRIGHT) {
-                ChatUtils.clickableChat(
-                    "Unsure if items are available in Sack, §lCLICK §r§eto open bazaar", "bz ${item.asString()}"
-                )
-                getFromSack(item.makePrimitiveStack(amount))
-                return
-            }
-            val sackAmount = sackInfo.amount.toInt()
-            if (sackAmount < amount) {
-                val diff = amount - sackAmount
-                if (sackAmount > 0) {
-                    getFromSack(item.makePrimitiveStack(sackAmount))
-                }
-                ChatUtils.clickableChat(
-                    "§leCLICK HERE §r§eto get the remaining §ax${diff} §ffrom bazaar", "bz ${item.asString()}"
-                )
-                return
-            }
+        missingChatPattern.matchMatcher(message) {
+            bazaarMessage(stack.name.asString().firstLetterUppercase(), stack.amount)
+            lastItemStack = null
+            return
         }
-
-        getFromSack(item.makePrimitiveStack(amount))
     }
+
+    private fun bazaarMessage(item: String, amount: Int, isRemaining: Boolean = false) = ChatUtils.clickableChat(
+        "§lCLICK §r§eto get the ${if (isRemaining) "remaining " else ""}§ax${amount} §9$item §efrom bazaar",
+        "bz $item"
+    )
 
     @SubscribeEvent
     fun onRepoReload(event: RepositoryReloadEvent) {
