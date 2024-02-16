@@ -27,6 +27,8 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 class RiftBloodEffigies {
 
     private val config get() = RiftAPI.config.area.stillgoreChateau.bloodEffigies
+
+
     private var locations: List<LorenzVec> = emptyList()
     private var effigiesTimes = mapOf(
         0 to -1L,

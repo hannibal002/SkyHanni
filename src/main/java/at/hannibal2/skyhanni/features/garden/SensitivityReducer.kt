@@ -7,6 +7,7 @@ import at.hannibal2.skyhanni.events.DebugDataCollectEvent
 import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.HypixelJoinEvent
 import at.hannibal2.skyhanni.events.LorenzTickEvent
+import at.hannibal2.skyhanni.features.misc.LockMouseLook
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.ConditionalUtils.afterChange
 import at.hannibal2.skyhanni.utils.KeyboardManager.isKeyHeld
@@ -23,6 +24,7 @@ object SensitivityReducer {
     private var isToggled = false
     private var isManualToggle = false
     private var lastCheckCooldown = SimpleTimeMark.farPast()
+    private const val LOCKED = -1F / 3F
 
     private val mc get() = Minecraft.getMinecraft()
     private val gameSettings = mc.gameSettings
@@ -55,8 +57,8 @@ object SensitivityReducer {
             }
 
             SensitivityReducerConfig.Mode.KEYBIND -> {
-                if (config.keybind.isKeyHeld() && !isToggled) toggle(true)
-                else if (isToggled && !config.keybind.isKeyHeld()) toggle(false)
+                if (isHoldingKey() && !isToggled) toggle(true)
+                else if (isToggled && !isHoldingKey()) toggle(false)
             }
 
             else -> return
@@ -111,6 +113,14 @@ object SensitivityReducer {
         return GardenAPI.toolInHand != null
     }
 
+    private fun isHoldingKey(): Boolean {
+        return config.keybind.isKeyHeld() && mc.currentScreen == null
+    }
+
+    fun isEnabled(): Boolean {
+        return isToggled || isManualToggle
+    }
+
     fun manualToggle() {
         if (isToggled) {
             ChatUtils.chat("This command is disabled while the Sensitivity is lowered.")
@@ -123,18 +133,17 @@ object SensitivityReducer {
     }
 
     private fun lowerSensitivity(showMessage: Boolean = false) {
-        storage.savedMouseloweredSensitivity = gameSettings.mouseSensitivity
         val divisor = config.reducingFactor.get()
         ChatUtils.debug("dividing by $divisor")
+
         storage.savedMouseloweredSensitivity = gameSettings.mouseSensitivity
-        val newSens =
-            ((storage.savedMouseloweredSensitivity + (1F / 3F)) / divisor) - (1F / 3F)
+        val newSens = doTheMath(storage.savedMouseloweredSensitivity)
         gameSettings?.mouseSensitivity = newSens
         if (showMessage) ChatUtils.chat("§bMouse sensitivity is now lowered. Type /shsensreduce to restore your sensitivity.")
     }
 
     private fun restoreSensitivity(showMessage: Boolean = false) {
-        gameSettings?.mouseSensitivity = SkyHanniMod.feature.storage.savedMouseloweredSensitivity
+        if (!LockMouseLook.lockedMouse) gameSettings?.mouseSensitivity = storage.savedMouseloweredSensitivity
         if (showMessage) ChatUtils.chat("§bMouse sensitivity is now restored.")
     }
 
@@ -147,10 +156,17 @@ object SensitivityReducer {
         isToggled = state
     }
 
+
+    fun doTheMath(input: Float, reverse: Boolean = false): Float {
+        val divisor = config.reducingFactor.get()
+        return if (!reverse) ((input - LOCKED) / divisor) + LOCKED
+        else (divisor * (input - LOCKED)) + LOCKED
+    }
+
     @SubscribeEvent
     fun onLogin(event: HypixelJoinEvent) {
         val divisor = config.reducingFactor.get()
-        val expectedLoweredSensitivity = ((divisor * (gameSettings.mouseSensitivity + 1F / 3F)) - 1F / 3F)
+        val expectedLoweredSensitivity = doTheMath(gameSettings.mouseSensitivity, true)
         if (abs(storage.savedMouseloweredSensitivity - expectedLoweredSensitivity) <= 0.0001) {
             ChatUtils.debug("Fixing incorrectly lowered sensitivity")
             isToggled = false
