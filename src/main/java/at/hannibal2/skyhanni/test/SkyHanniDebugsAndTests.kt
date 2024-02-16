@@ -325,11 +325,11 @@ class SkyHanniDebugsAndTests {
             if (!logSounds) return
             if (event.soundName.isEmpty()) return
             if (event.volume == 0.0f && event.pitch == 0.0f) return
-            soundArray.add("${event.soundName} | ${event.volume} | ${event.pitch} | ${event.location.x}, ${event.location.y}, ${event.location.z}")
+            soundArray.add("§3${event.soundName} §e| §7${event.volume} §e| §8${event.pitch} §e| §2${event.location.x}§e, §2${event.location.y}§e, §2${event.location.z}")
         }
 
         private fun printSounds() {
-            ChatUtils.chat("Name | Volume | Pitch | Location")
+            ChatUtils.chat("§3Name §e| §7Volume §e| §8Pitch §e| §2Location§r")
             for (sound in soundArray) {
                 ChatUtils.chat(sound)
             }
