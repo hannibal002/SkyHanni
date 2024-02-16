@@ -12,6 +12,12 @@
 + Added Atmospheric Filter Display. - Erymanthus
     + This display shows the currently active buff as a GUI element.
     + For an optimal experience, please have the Atmospheric Filter accessory active.
++ Added Sensitivity Reducer. - martimavocado
+    + Lowers mouse sensitivity while in the garden.
+    + Either when pressing a keybind or holding a farming tool in hand.
+    + Changes by how much the sensitivity is lowered by.
+    + Show a GUI element while the feature is enabled.
+    + Option to only allow this feature while on ground and/or on barn plot.
 
 #### Fishing Features
 
@@ -22,6 +28,7 @@
 
 + Added Deep Caverns Parkour. - hannibal2
     + Shows a parkour to the bottom of Deep Caverns and to Rhys.
++ Blocks the mining ability when on a private island. - Thunderblade73
 
 #### Dungeon Features
 
@@ -98,6 +105,8 @@
 + Made blocks per second calculation more accurate immediately after starting to farm. - hannibal2
 + Warn to open visitor inventory again after partially serving Spaceman. - alexia
 + Updating the Garden Optimal Speed Display and Warning immediately when changing the setting. - hannibal2
++ Added auto mouse-unlocking on plot teleport in garden. - martimavocado
++ Improve items in sacks display in Visitor Shopping List wording and color. - alexia
 
 #### Rift Changes
 
@@ -122,6 +131,10 @@
 #### Bingo Changes
 
 + Show the guide text when hovering over the missing bingo goal list. - hannibal2
+
+#### Crimson Isle Changes
+
++ Added option to hide tasks after they've been completed in Crimson Isle Reputation Helper. - martimavocado
 
 #### Inventory Changes
 
@@ -164,12 +177,21 @@
 
 + Using a better title for Area Boss features. - hannibal2
 
+#### Slayer Changes
+
++ Adding Soul Of The Alpha support to the Area Mini Boss features respawn timer and highlight. - martimavocado
+
 #### Misc Changes
 
 + Tia Relay Helper: Suggest /togglemusic. - alexia
 + Added option to ignore Everything Chroma in the chat. - VixidDev
 + Added Item Ability Cooldown support for Talbot's Theodolite (the Farming Island Trapper tracker thing). - Erymanthus
 + Fewer election API updates, fewer election API errors. - CalMWolfs
++ SkyHanni's own /wiki command logic now works better in SkyBlock Level guide and allows changing weather to use
+  official Hypixel Wiki or the older Fandom Wiki. - Obsidian
++ Added option to hide the already existing F3 SkyBlock Area Debug Feature. - Obsidian
+    + This feature shows the current area in SkyBlock while f3 is open.
++ Hovering on cheap items in an Item Tracker now shows the hidden items. - Mikecraft1224
 
 ### Fixes
 
@@ -189,6 +211,8 @@
 + Fixed the detection of Anita and Jacob visitors. - hannibal2
 + Fixed the pets menu detection for /ff. - martimavocado
 + Fixed Anita and Jacob workaround working outside of garden. - CalMWolfs
++ Fixed opening visitor Milestones menu not loading visitor amount for /ff. - martimavocado
++ Fixed Sensitivity Reducer still working when switching from the garden to the hub. - martimavocado
 
 #### Combat Fixes
 
@@ -251,6 +275,9 @@
 + Added options to hide Helmet Skins, Armor Dyes or Runes from Estimated Item Value Calculation. - hannibal2
 + Fixed Divine Gift and Flash enchants showing the wrong/no price in EstimatedItemValue. - jani
 + Fixed showing the Piece of Wizard Portal earned duplicate. - Thunderblade73
++ Fixed shift-click NPC sell not working for menus with different sizes and full inventories. - Thunderblade73
++ Fixed an error with the shift-click NPC sell feature. - Thunderblade73
++ Ignore Shift-Click NPC Sell when right-clicking a sack. - Thunderblade73
 
 #### Bingo Fixes
 
@@ -344,6 +371,10 @@
 + Added outgoing chat log to /shchathistory. - nea
 + Added sending mining events to Soopy's API to test for new Mining Event feature. - CalMWolfs
 + Added /shcopybossbar to copy bossbar - Erymanthus
++ Splitting many utils functions from LorenzUtils up into other classes: ChatUtils, CollectionUtils, ConditionalUtils. - Thunderblade73
++ A ton of code cleanup, mainly on imports. - Thunderblade73 & hannibal2
++ Added mod identification for outgoing mod calls and show this data in /shchathistory. - nea
++ Sensitivity Reducer changes: clearer error message, using ChatUtils and wrong values in debug data. - martimavocado
 
 ## Version 0.22
 

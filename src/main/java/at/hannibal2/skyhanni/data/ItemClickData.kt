@@ -22,18 +22,18 @@ class ItemClickData {
         if (packet is C08PacketPlayerBlockPlacement) {
             if (packet.placedBlockDirection != 255) {
                 val position = packet.position.toLorenzVec()
-                BlockClickEvent(ClickType.RIGHT_CLICK, position, packet.stack).postAndCatch()
+                event.isCanceled = BlockClickEvent(ClickType.RIGHT_CLICK, position, packet.stack).postAndCatch()
             } else {
-                ItemClickEvent(InventoryUtils.getItemInHand(), ClickType.RIGHT_CLICK).postAndCatch()
+                event.isCanceled = ItemClickEvent(InventoryUtils.getItemInHand(), ClickType.RIGHT_CLICK).postAndCatch()
             }
         }
         if (packet is C07PacketPlayerDigging && packet.status == C07PacketPlayerDigging.Action.START_DESTROY_BLOCK) {
             val position = packet.position.toLorenzVec()
-            BlockClickEvent(ClickType.LEFT_CLICK, position, InventoryUtils.getItemInHand()).postAndCatch()
-            ItemClickEvent(InventoryUtils.getItemInHand(), ClickType.LEFT_CLICK).postAndCatch()
+            val blockClickCancelled = BlockClickEvent(ClickType.LEFT_CLICK, position, InventoryUtils.getItemInHand()).postAndCatch()
+            event.isCanceled = ItemClickEvent(InventoryUtils.getItemInHand(), ClickType.LEFT_CLICK).also { it.isCanceled = blockClickCancelled }.postAndCatch()
         }
         if (packet is C0APacketAnimation) {
-            ItemClickEvent(InventoryUtils.getItemInHand(), ClickType.LEFT_CLICK).postAndCatch()
+            event.isCanceled = ItemClickEvent(InventoryUtils.getItemInHand(), ClickType.LEFT_CLICK).postAndCatch()
         }
     }
 
@@ -56,6 +56,6 @@ class ItemClickData {
         if (minecraft.thePlayer == null) return
         if (clickedEntity == null) return
 
-        EntityClickEvent(clickType, clickedEntity).postAndCatch()
+        EntityClickEvent(clickType, clickedEntity, InventoryUtils.getItemInHand()).postAndCatch()
     }
 }
