@@ -54,8 +54,6 @@ object SkillProgress {
     private var etaDisplay = emptyList<Renderable>()
     private var lastGainUpdate = SimpleTimeMark.farPast()
     private var maxWidth = 0
-    private var incr = 0
-    private var oldTargetNeededXp = 0L
     var hideInActionBar = mutableListOf<String>()
 
     @SubscribeEvent
@@ -312,11 +310,6 @@ object SkillProgress {
             xpInfo.timeActive = 0L
             chat("Timer for §b${activeSkill.displayName} §ehas been reset!")
         })
-
-        incr++
-
-        if (incr % 20 == 0)
-            oldTargetNeededXp = targetNeededXp
     }
 
     private fun drawDisplay() = buildList {
