@@ -1,5 +1,7 @@
 package at.hannibal2.skyhanni.utils
 
+import net.minecraftforge.fml.common.Loader
+import net.minecraftforge.fml.common.ModContainer
 import java.lang.reflect.Constructor
 import java.lang.reflect.Field
 import java.lang.reflect.Modifier
@@ -59,4 +61,23 @@ object ReflectionUtils {
         javaClass.getDeclaredField("modifiers").makeAccessible().set(this, modifiers and (Modifier.FINAL.inv()))
         return this
     }
+
+    fun StackTraceElement.getClassInstance(): Class<*> {
+        return Class.forName(this.className)
+    }
+
+    private val packageLookup by lazy {
+        Loader.instance().modList
+            .flatMap { mod -> mod.ownedPackages.map { it to mod } }
+            .toMap()
+    }
+
+    val Class<*>.shPackageName
+        get() =
+            canonicalName?.substringBeforeLast('.')
+
+    fun Class<*>.getModContainer(): ModContainer? {
+        return packageLookup[shPackageName]
+    }
+
 }
