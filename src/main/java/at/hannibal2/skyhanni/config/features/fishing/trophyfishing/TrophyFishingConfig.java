@@ -14,6 +14,11 @@ public class TrophyFishingConfig {
     public ChatMessagesConfig chatMessages = new ChatMessagesConfig();
 
     @Expose
+    @ConfigOption(name = "Geyser Fishing", desc = "")
+    @Accordion
+    public GeyserFishingConfig geyserOptions = new GeyserFishingConfig();
+
+    @Expose
     @ConfigOption(name = "Fillet Tooltip", desc = "Show fillet value of Trophy Fish in tooltip.")
     @ConfigEditorBoolean
     @FeatureToggle
