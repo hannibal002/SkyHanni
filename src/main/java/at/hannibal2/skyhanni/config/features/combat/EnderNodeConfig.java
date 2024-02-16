@@ -43,7 +43,7 @@ public class EnderNodeConfig {
 
     @Expose
     @ConfigOption(
-        name = "Only Holding Tool",
+        name = "Only While Holding Tool",
         desc = "Only shows the tracker if holding a pickaxe, drill or gauntlet"
     )
     @ConfigEditorBoolean
