@@ -11,14 +11,18 @@ import at.hannibal2.skyhanni.utils.RenderUtils.renderString
 import at.hannibal2.skyhanni.utils.StringUtils.matches
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.TimeUtils.formatted
+import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import io.github.moulberry.notenoughupdates.util.SkyBlockTime
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
 class InGameDateDisplay {
 
     private val config get() = SkyHanniMod.feature.gui.inGameDate
-    private val monthAndDatePattern =
-        ".*((Early|Late) )?(Winter|Spring|Summer|Autumn) [0-9]{1,2}(nd|rd|th|st)?.*".toPattern()
+
+    private val monthAndDatePattern by RepoPattern.pattern(
+        "misc.ingametime.date",
+        ".*((Early|Late) )?(Winter|Spring|Summer|Autumn) [0-9]{1,2}(nd|rd|th|st)?.*"
+    )
     private var display = ""
 
     // sun, moon, spooky

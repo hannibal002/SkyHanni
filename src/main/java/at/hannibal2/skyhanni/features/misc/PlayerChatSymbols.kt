@@ -13,6 +13,7 @@ import at.hannibal2.skyhanni.utils.StringUtils.getPlayerNameAndRankFromChatMessa
 import at.hannibal2.skyhanni.utils.StringUtils.getPlayerNameFromChatMessage
 import at.hannibal2.skyhanni.utils.StringUtils.removeResets
 import at.hannibal2.skyhanni.utils.TabListData
+import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraft.util.ChatComponentText
 import net.minecraft.util.IChatComponent
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
@@ -22,8 +23,16 @@ class PlayerChatSymbols {
 
     private val config get() = SkyHanniMod.feature.chat.chatSymbols
     private val nameSymbols = mutableMapOf<String, String>()
-    private val symbolsPattern = "^(?<symbols>(?:(?:§\\w)+\\S)+) ".toPattern()
-    private val symbolPattern = "((?:§\\w)+\\S)".toPattern()
+
+    private val patternGroup = RepoPattern.group("misc.chatsymbols")
+    private val symbolsPattern by patternGroup.pattern(
+        "symbols",
+        "^(?<symbols>(?:(?:§\\w)+\\S)+) "
+    )
+    private val symbolPattern by patternGroup.pattern(
+        "symbol",
+        "((?:§\\w)+\\S)"
+    )
 
     @SubscribeEvent
     fun onChatReceived(event: LorenzChatEvent) {

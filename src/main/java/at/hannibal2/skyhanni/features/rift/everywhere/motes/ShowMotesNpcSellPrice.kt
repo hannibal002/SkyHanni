@@ -26,6 +26,7 @@ import at.hannibal2.skyhanni.utils.RenderUtils.highlight
 import at.hannibal2.skyhanni.utils.RenderUtils.renderStringsAndItems
 import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.renderables.Renderable
+import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraftforge.fml.common.eventhandler.EventPriority
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
@@ -33,8 +34,10 @@ class ShowMotesNpcSellPrice {
 
     private val config get() = RiftAPI.config.motes
 
-    // TODO USE SH-REPO
-    private val pattern = ".*(?:§\\w)+You have (?:§\\w)+(?<amount>\\d) Grubber Stacks.*".toPattern()
+    private val burgerPattern by RepoPattern.pattern(
+        "rift.everywhere.burger",
+        ".*(?:§\\w)+You have (?:§\\w)+(?<amount>\\d) Grubber Stacks.*"
+    )
 
     private var display = emptyList<List<Any>>()
     private val itemMap = mutableMapOf<NEUInternalName, Pair<MutableList<Int>, Double>>()
@@ -132,7 +135,7 @@ class ShowMotesNpcSellPrice {
     @SubscribeEvent
     fun onChat(event: LorenzChatEvent) {
         if (!RiftAPI.inRift()) return
-        pattern.matchMatcher(event.message) {
+        burgerPattern.matchMatcher(event.message) {
             config.burgerStacks = group("amount").toInt()
             chat("Set your McGrubber's burger stacks to ${group("amount")}.")
         }
