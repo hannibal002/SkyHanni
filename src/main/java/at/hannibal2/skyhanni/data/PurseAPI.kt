@@ -13,7 +13,7 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
 object PurseAPI {
     private val patternGroup = RepoPattern.group("data.purse")
-    val pursePattern by patternGroup.pattern(
+    val coinsPattern by patternGroup.pattern(
         "coins",
         "(§.)*(Piggy|Purse): §6(?<coins>[\\d,]*(\\.\\d)?)( ?(§.)*\\([+-](?<earned>[\\w,.]+)\\)?|.*)?$"
     )
@@ -34,7 +34,7 @@ object PurseAPI {
     @SubscribeEvent
     fun onTick(event: LorenzTickEvent) {
         for (line in ScoreboardData.sidebarLinesFormatted) {
-            val newPurse = pursePattern.matchMatcher(line) {
+            val newPurse = coinsPattern.matchMatcher(line) {
                 group("coins").formatNumber().toDouble()
             } ?: continue
             val diff = newPurse - currentPurse
