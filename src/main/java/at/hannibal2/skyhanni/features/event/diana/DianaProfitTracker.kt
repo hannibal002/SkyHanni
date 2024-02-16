@@ -28,12 +28,13 @@ object DianaProfitTracker {
     private val config get() = SkyHanniMod.feature.event.diana.dianaProfitTracker
     private var allowedDrops = listOf<NEUInternalName>()
 
-    private val chatDugOutPattern by RepoPattern.pattern(
-        "diana.chat.burrow.dug",
+    private val patternGroup = RepoPattern.group("diana.chat")
+    private val chatDugOutPattern by patternGroup.pattern(
+        "burrow.dug",
         "(§eYou dug out a Griffin Burrow!|§eYou finished the Griffin burrow chain!) .*"
     )
-    private val chatDugOutCoinsPattern by RepoPattern.pattern(
-        "diana.chat.coins",
+    private val chatDugOutCoinsPattern by patternGroup.pattern(
+        "coins",
         "§6§lWow! §r§eYou dug out §r§6(?<coins>.*) coins§r§e!"
     )
 

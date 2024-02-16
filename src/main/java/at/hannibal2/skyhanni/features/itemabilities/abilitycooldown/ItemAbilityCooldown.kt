@@ -16,6 +16,7 @@ import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.cachedData
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getItemId
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getItemUuid
 import net.minecraft.client.Minecraft
+import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraft.item.ItemStack
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import kotlin.time.Duration.Companion.milliseconds
@@ -25,9 +26,19 @@ class ItemAbilityCooldown {
 
     private val config get() = SkyHanniMod.feature.itemAbilities
 
+    private val patternGroup = RepoPattern.group("item.abilities.cooldown")
+    private val youAlignedOthersPattern by patternGroup.pattern(
+        "alignedother",
+        "§eYou aligned §r§a.* §r§eother player(s)?!"
+    )
+    private val youBuffedYourselfPattern by patternGroup.pattern(
+        "buffedyourself",
+        "§aYou buffed yourself for §r§c\\+\\d+❁ Strength"
+    )
+
+    private var lastAbility = ""
+
     private val activeAbilities = mutableMapOf<ItemAbilityType, ActiveAbility>()
-    private val youAlignedOthersPattern = "§eYou aligned §r§a.* §r§eother player(s)?!".toPattern()
-    private val youBuffedYourselfPattern = "§aYou buffed yourself for §r§c\\+\\d+❁ Strength".toPattern()
 
     private var readyText = ""
 
