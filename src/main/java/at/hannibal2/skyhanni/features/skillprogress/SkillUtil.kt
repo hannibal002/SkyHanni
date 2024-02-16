@@ -1,6 +1,10 @@
 package at.hannibal2.skyhanni.features.skillprogress
 
 import at.hannibal2.skyhanni.api.SkillAPI
+import at.hannibal2.skyhanni.api.SkillAPI.activeSkill
+import at.hannibal2.skyhanni.api.SkillAPI.exactLevelingMap
+import at.hannibal2.skyhanni.api.SkillAPI.excludedSkills
+import at.hannibal2.skyhanni.api.SkillAPI.levelingMap
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import com.google.gson.JsonArray
 import io.github.moulberry.notenoughupdates.util.Constants
@@ -8,18 +12,8 @@ import io.github.moulberry.notenoughupdates.util.Utils
 
 object SkillUtil {
 
-    var exactLevelingMap = mapOf<Int, Int>()
-    var levelingMap = mapOf<Int, Int>()
-    var activeSkill: SkillType = SkillType.NONE
-    private val excludedSkills = listOf(
-        SkillType.FORAGING,
-        SkillType.FISHING,
-        SkillType.ALCHEMY,
-        SkillType.CARPENTRY
-    )
-
     fun getSkillInfo(skill: SkillType): SkillAPI.SkillInfo? {
-        return SkillAPI.skillMap?.get(skill)
+        return SkillAPI.skillData?.get(skill)
     }
 
     fun getSkillInfo(currentLevel: Int, currentXp: Long, neededXp: Long, totalXp: Long): LorenzUtils.Quad<Int, Long, Long, Long> {

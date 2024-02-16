@@ -100,7 +100,7 @@ public class SkillProgressConfig {
     public SkillETADisplayConfig skillETADisplayConfig = new SkillETADisplayConfig();
 
     @Expose
-    public Position position = new Position(384, -105, false, true);
+    public Position displayPosition = new Position(384, -105, false, true);
 
     @Expose
     public Position barPosition = new Position(384, -87, false, true);

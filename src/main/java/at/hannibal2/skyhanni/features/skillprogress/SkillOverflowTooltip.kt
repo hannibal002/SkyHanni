@@ -29,7 +29,7 @@ class SkillOverflowTooltip {
             val skillName = split.first()
             val skill = SkillType.getByNameFirstUppercase(skillName) ?: return
             val useRoman = split.last().toIntOrNull() == null
-            val skillInfo = SkillAPI.skillMap?.get(skill) ?: return
+            val skillInfo = SkillAPI.skillData?.get(skill) ?: return
             var next = false
             for (line in iterator) {
                 val maxReached = "§7§8Max Skill level reached!"

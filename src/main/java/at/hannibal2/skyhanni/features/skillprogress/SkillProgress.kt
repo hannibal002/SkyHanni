@@ -2,10 +2,11 @@ package at.hannibal2.skyhanni.features.skillprogress
 
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.SkillAPI
+import at.hannibal2.skyhanni.api.SkillAPI.activeSkill
 import at.hannibal2.skyhanni.api.SkillAPI.lastUpdate
 import at.hannibal2.skyhanni.api.SkillAPI.oldSkillInfoMap
 import at.hannibal2.skyhanni.api.SkillAPI.showDisplay
-import at.hannibal2.skyhanni.api.SkillAPI.skillMap
+import at.hannibal2.skyhanni.api.SkillAPI.skillData
 import at.hannibal2.skyhanni.api.SkillAPI.skillXPInfoMap
 import at.hannibal2.skyhanni.config.features.skillprogress.SkillProgressConfig
 import at.hannibal2.skyhanni.events.ConfigLoadEvent
@@ -13,13 +14,11 @@ import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.LorenzTickEvent
 import at.hannibal2.skyhanni.events.PreProfileSwitchEvent
 import at.hannibal2.skyhanni.events.SkillOverflowLevelupEvent
-import at.hannibal2.skyhanni.features.skillprogress.SkillUtil.activeSkill
 import at.hannibal2.skyhanni.utils.ChatUtils.chat
 import at.hannibal2.skyhanni.utils.CollectionUtils.addAsSingletonList
 import at.hannibal2.skyhanni.utils.ConditionalUtils.onToggle
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
-import at.hannibal2.skyhanni.utils.NumberUtil.formatNumber
 import at.hannibal2.skyhanni.utils.NumberUtil.interpolate
 import at.hannibal2.skyhanni.utils.NumberUtil.roundToPrecision
 import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderables
@@ -54,7 +53,7 @@ object SkillProgress {
     private var etaDisplay = emptyList<Renderable>()
     private var lastGainUpdate = SimpleTimeMark.farPast()
     private var maxWidth = 0
-    var hideInActionBar = mutableListOf<String>()
+    var hideInActionBar = listOf<String>()
 
     @SubscribeEvent
     fun onRenderOverlay(event: GuiRenderEvent.GuiOverlayRenderEvent) {
@@ -62,42 +61,10 @@ object SkillProgress {
         if (display.isEmpty()) return
 
         if (showDisplay) {
-            when (val textAlignment = config.textAlignmentProperty.get()) {
-                SkillProgressConfig.TextAlignment.NONE -> {
-                    config.position.renderStringsAndItems(listOf(display), posLabel = "Skill Progress")
-                }
-
-                SkillProgressConfig.TextAlignment.CENTERED,
-                SkillProgressConfig.TextAlignment.LEFT,
-                SkillProgressConfig.TextAlignment.RIGHT -> {
-                    config.position.renderRenderables(
-                        listOf(Renderable.fixedSizeLine(horizontalContainer(display, textAlignment.alignment), maxWidth)),
-                        posLabel = "Skill Progress")
-                }
-
-                else -> {}
-            }
+            renderDisplay()
 
             if (barConfig.enabled.get()) {
-                val progress = if (barConfig.useTexturedBar.get()) {
-                    val factor = (skillExpPercentage.toFloat().coerceAtMost(1f)) * 182
-                    maxWidth = 182
-                    Renderable.texturedProgressBar(factor,
-                        Color(SpecialColour.specialToChromaRGB(barConfig.barStartColor)),
-                        texture = barConfig.texturedBar.usedTexture.get(),
-                        useChroma = barConfig.useChroma.get())
-
-                } else {
-                    maxWidth = barConfig.regularBar.width
-                    Renderable.progressBar(skillExpPercentage,
-                        Color(SpecialColour.specialToChromaRGB(barConfig.barStartColor)),
-                        Color(SpecialColour.specialToChromaRGB(barConfig.barStartColor)),
-                        width = maxWidth,
-                        height = barConfig.regularBar.height,
-                        useChroma = barConfig.useChroma.get())
-                }
-
-                config.barPosition.renderRenderables(listOf(progress), posLabel = "Skill Progress Bar")
+                renderBar()
             }
         }
 
@@ -108,6 +75,46 @@ object SkillProgress {
         if (etaConfig.enabled.get()) {
             config.etaPosition.renderRenderables(etaDisplay, posLabel = "Skill ETA")
         }
+    }
+
+    private fun renderDisplay() {
+        when (val textAlignment = config.textAlignmentProperty.get()) {
+            SkillProgressConfig.TextAlignment.NONE -> {
+                config.displayPosition.renderStringsAndItems(listOf(display), posLabel = "Skill Progress")
+            }
+
+            SkillProgressConfig.TextAlignment.CENTERED,
+            SkillProgressConfig.TextAlignment.LEFT,
+            SkillProgressConfig.TextAlignment.RIGHT -> {
+                config.displayPosition.renderRenderables(
+                    listOf(Renderable.fixedSizeLine(horizontalContainer(display, textAlignment.alignment), maxWidth)),
+                    posLabel = "Skill Progress")
+            }
+
+            else -> {}
+        }
+    }
+
+    private fun renderBar() {
+        val progress = if (barConfig.useTexturedBar.get()) {
+            val factor = (skillExpPercentage.toFloat().coerceAtMost(1f)) * 182
+            maxWidth = 182
+            Renderable.texturedProgressBar(factor,
+                Color(SpecialColour.specialToChromaRGB(barConfig.barStartColor)),
+                texture = barConfig.texturedBar.usedTexture.get(),
+                useChroma = barConfig.useChroma.get())
+
+        } else {
+            maxWidth = barConfig.regularBar.width
+            Renderable.progressBar(skillExpPercentage,
+                Color(SpecialColour.specialToChromaRGB(barConfig.barStartColor)),
+                Color(SpecialColour.specialToChromaRGB(barConfig.barStartColor)),
+                width = maxWidth,
+                height = barConfig.regularBar.height,
+                useChroma = barConfig.useChroma.get())
+        }
+
+        config.barPosition.renderRenderables(listOf(progress), posLabel = "Skill Progress Bar")
     }
 
     @SubscribeEvent
@@ -147,14 +154,16 @@ object SkillProgress {
             if (newLevel % 5 == 0)
                 add("  §r§7§8+§d50 SkyHanni User Luck")
         }
+        val messages = listOf(
+            "§3§l▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬",
+            "  §r§b§lSKILL LEVEL UP §3$skillName §8$oldLevel➜§3$newLevel",
+            "",
+            "  §r§a§lREWARDS",
+            rewards.joinToString("\n"),
+            "§3§l▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬"
+        )
 
-        chat("§3§l▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬", false)
-        chat("  §r§b§lSKILL LEVEL UP §3$skillName §8$oldLevel➜§3$newLevel", false)
-        chat("", false)
-        chat("  §r§a§lREWARDS", false)
-        for (reward in rewards)
-            chat(reward, false)
-        chat("§3§l▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬", false)
+        chat(messages.joinToString("\n"), false)
         SoundUtils.createSound("random.levelup", 1f, 1f).playSound()
     }
 
@@ -186,10 +195,9 @@ object SkillProgress {
         if (!config.hideInActionBar) return
         if (event.type.toInt() != 2) return
         if (event.isCanceled) return
-        val it = hideInActionBar.iterator()
         var msg = event.message.unformattedText
-        while (it.hasNext()) {
-            msg = msg.replace(Regex("\\s*" + Regex.escape(it.next())), "")
+        for (line in hideInActionBar) {
+            msg = msg.replace(Regex("\\s*" + Regex.escape(line)), "")
         }
         msg = msg.trim()
         event.message = ChatComponentText(msg)
@@ -216,7 +224,7 @@ object SkillProgress {
     }
 
     private fun drawAllDisplay() = buildList {
-        val skillMap = skillMap ?: return@buildList
+        val skillMap = skillData ?: return@buildList
         val sortedMap = SkillType.entries.filter { it.displayName.isNotEmpty() }.sortedBy { it.displayName.take(2) }
 
         for (skill in sortedMap) {
@@ -228,8 +236,6 @@ object SkillProgress {
                     LorenzUtils.Quad(skillInfo.overflowLevel, skillInfo.overflowCurrentXp, skillInfo.overflowCurrentXpMax, skillInfo.overflowTotalXp)
                 else
                     LorenzUtils.Quad(skillInfo.level, skillInfo.currentXp, skillInfo.currentXpMax, skillInfo.totalXp)
-
-
 
             if (level == -1) {
                 addAsSingletonList(Renderable.clickAndHover(
@@ -260,7 +266,7 @@ object SkillProgress {
     }
 
     private fun drawETADisplay() = buildList {
-        val skillInfo = skillMap?.get(activeSkill) ?: return@buildList
+        val skillInfo = skillData?.get(activeSkill) ?: return@buildList
         val xpInfo = skillXPInfoMap[activeSkill] ?: return@buildList
         val skillInfoLast = oldSkillInfoMap[activeSkill] ?: return@buildList
         oldSkillInfoMap[activeSkill] = skillInfo
@@ -272,6 +278,13 @@ object SkillProgress {
         val currentLevelNeededXp = SkillUtil.xpRequiredForLevel(level.toDouble()) + skillInfo.overflowCurrentXp
         val targetNeededXp = SkillUtil.xpRequiredForLevel(targetLevel)
         var remaining = if (useCustomGoal) targetNeededXp - currentLevelNeededXp else skillInfo.overflowCurrentXpMax - skillInfo.overflowCurrentXp
+
+        if (!useCustomGoal) {
+            if (skillInfo.overflowCurrentXpMax == skillInfoLast.overflowCurrentXpMax) {
+                remaining = interpolate(remaining.toFloat(), (skillInfoLast.overflowCurrentXpMax - skillInfoLast.overflowCurrentXp).toFloat(), lastGainUpdate.toMillis()).toLong()
+            }
+        }
+
         add(Renderable.string(buildString {
             append("§6Skill: §b${activeSkill.displayName} ")
             if (useCustomGoal && targetLevel != 0.0) append("§8$level➜§3${targetLevel.toInt()}") else append(level)
@@ -295,12 +308,6 @@ object SkillProgress {
                 if (xpInfo.isActive) "" else "§c(PAUSED"))
         }
 
-        if (!useCustomGoal) {
-            if (skillInfo.overflowCurrentXpMax == skillInfoLast.overflowCurrentXpMax) {
-                remaining = interpolate(remaining.toFloat(), (skillInfoLast.overflowCurrentXpMax - skillInfoLast.overflowCurrentXp).toFloat(), lastGainUpdate.toMillis()).toLong()
-            }
-        }
-
 
         val session = xpInfo.timeActive.seconds.format(TimeUnit.HOUR)
         add(Renderable.clickAndHover("§6Session: §b$session ${if (xpInfo.sessionTimerActive) "" else "§c(PAUSED)"}",
@@ -313,7 +320,7 @@ object SkillProgress {
     }
 
     private fun drawDisplay() = buildList {
-        val skillMap = skillMap ?: return@buildList
+        val skillMap = skillData ?: return@buildList
         val skill = skillMap[activeSkill] ?: return@buildList
 
         val (level, currentXp, currentXpMax, _) = if (config.overflowConfig.enableInDisplay.get())
@@ -356,7 +363,7 @@ object SkillProgress {
 
             if (config.showActionLeft.get() && percent != 100f) {
                 append(" - ")
-                val actionLeft = (ceil(currentXpMax.toDouble() - currentXp) / skill.lastGain.formatNumber()).toLong().addSeparators()
+                val actionLeft = (ceil(currentXpMax.toDouble() - currentXp) / skill.lastGain.toDouble()).toLong().addSeparators()
                 if (skill.lastGain != "" && !actionLeft.contains("-")) {
                     append("§6$actionLeft Left")
                 } else {
@@ -368,7 +375,7 @@ object SkillProgress {
 
     private fun updateSkillInfo(skill: SkillType) {
         val xpInfo = skillXPInfoMap.getOrPut(skill) { SkillAPI.SkillXPInfo() }
-        val skillInfo = skillMap?.get(skill) ?: return
+        val skillInfo = skillData?.get(skill) ?: return
         oldSkillInfoMap[skill] = skillInfo
 
         val totalXp = skillInfo.currentXp

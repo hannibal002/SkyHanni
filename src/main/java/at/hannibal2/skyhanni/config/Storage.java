@@ -473,7 +473,7 @@ public class Storage {
         }
 
         @Expose
-        public Map<SkillType, SkillAPI.SkillInfo> skillMap = new HashMap<>();
+        public Map<SkillType, SkillAPI.SkillInfo> skillData = new HashMap<>();
 
     }
 }

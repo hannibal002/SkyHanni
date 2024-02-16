@@ -136,41 +136,6 @@ class ConfigManager {
                     return reader.nextString().toLong().asTimeMark()
                 }
             }.nullSafe())
-            .registerTypeAdapter(SkillAPI.SkillInfo::class.java, object : TypeAdapter<SkillAPI.SkillInfo>() {
-                override fun write(out: JsonWriter, value: SkillAPI.SkillInfo) {
-                    out.beginObject()
-                    out.name("level").value(value.level)
-                    out.name("totalXp").value(value.totalXp)
-                    out.name("currentXp").value(value.currentXp)
-                    out.name("currentXpMax").value(value.currentXpMax)
-                    out.name("overflowLevel").value(value.overflowLevel)
-                    out.name("overflowTotalXp").value(value.overflowTotalXp)
-                    out.name("overflowCurrentXp").value(value.overflowCurrentXp)
-                    out.name("overflowCurrentXpMax").value(value.overflowCurrentXpMax)
-                    out.name("lastGain").value(value.lastGain)
-                    out.endObject()
-                }
-
-                override fun read(reader: JsonReader): SkillAPI.SkillInfo {
-                    val skillInfo = SkillAPI.SkillInfo()
-                    reader.beginObject()
-                    while (reader.hasNext()) {
-                        when (reader.nextName()) {
-                            "level" -> skillInfo.level = reader.nextInt()
-                            "totalXp" -> skillInfo.totalXp = reader.nextDouble().toLong()
-                            "currentXp" -> skillInfo.currentXp = reader.nextDouble().toLong()
-                            "currentXpMax" -> skillInfo.currentXpMax = reader.nextDouble().toLong()
-                            "overflowLevel" ->skillInfo.overflowLevel =  reader.nextInt()
-                            "overflowTotalXp" ->skillInfo.overflowTotalXp = reader.nextDouble().toLong()
-                            "overflowCurrentXp" -> skillInfo.overflowCurrentXp = reader.nextDouble().toLong()
-                            "overflowCurrentXpMax" -> skillInfo.overflowCurrentXpMax = reader.nextDouble().toLong()
-                            "lastGain" -> skillInfo.lastGain = reader.nextString()
-                        }
-                    }
-                    reader.endObject()
-                    return skillInfo
-                }
-            }.nullSafe())
             .enableComplexMapKeySerialization()
             .create()
 
