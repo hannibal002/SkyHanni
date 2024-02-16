@@ -20,7 +20,7 @@ object UnknownLinesHandler {
          * remove with pattern
         */
         val patternsToExclude = listOf(
-            PurseAPI.pursePattern,
+            PurseAPI.coinsPattern,
             SbPattern.motesPattern,
             BitsAPI.bitsScoreboardPattern,
             SbPattern.heatPattern,
