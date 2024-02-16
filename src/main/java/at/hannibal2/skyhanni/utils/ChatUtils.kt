@@ -2,6 +2,7 @@ package at.hannibal2.skyhanni.utils
 
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.events.LorenzTickEvent
+import at.hannibal2.skyhanni.events.MessageSendToServerEvent
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import net.minecraft.client.Minecraft
 import net.minecraft.event.ClickEvent
@@ -209,4 +210,10 @@ object ChatUtils {
     fun sendCommandToServer(command: String) {
         sendMessageToServer("/$command")
     }
+
+    fun MessageSendToServerEvent.isCommand(commandWithSlash: String) =
+        splitMessage.takeIf { it.isNotEmpty() }?.get(0) == commandWithSlash
+
+    fun MessageSendToServerEvent.isCommand(commandsWithSlash: Collection<String>) =
+        splitMessage.takeIf { it.isNotEmpty() }?.get(0) in commandsWithSlash
 }

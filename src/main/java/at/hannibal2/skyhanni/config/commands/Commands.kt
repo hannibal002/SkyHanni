@@ -1,7 +1,6 @@
 package at.hannibal2.skyhanni.config.commands
 
 import at.hannibal2.skyhanni.SkyHanniMod
-import at.hannibal2.skyhanni.api.GetFromSackAPI
 import at.hannibal2.skyhanni.config.ConfigFileType
 import at.hannibal2.skyhanni.config.ConfigGuiManager
 import at.hannibal2.skyhanni.data.ChatManager
@@ -436,9 +435,6 @@ object Commands {
         registerCommand("pt", "Transfer the party to another party member") { PartyCommands.transfer(it) }
         registerCommand("pp", "Promote a specific party member") { PartyCommands.promote(it) }
         registerCommand("pd", "Disbands the party") { PartyCommands.disband() }
-
-        registerCommand("gfs", "Get from Sack (queued)") { GetFromSackAPI.commandHandler(it) }
-        registerCommand("getFromSacks", "Get from Sack (queued)") { GetFromSackAPI.commandHandler(it) }
     }
 
     private fun commandHelp(args: Array<String>) {

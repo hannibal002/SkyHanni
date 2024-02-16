@@ -10,6 +10,7 @@ import at.hannibal2.skyhanni.events.LorenzToolTipEvent
 import at.hannibal2.skyhanni.events.MessageSendToServerEvent
 import at.hannibal2.skyhanni.events.RepositoryReloadEvent
 import at.hannibal2.skyhanni.utils.ChatUtils
+import at.hannibal2.skyhanni.utils.ChatUtils.isCommand
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.NEUInternalName
 import at.hannibal2.skyhanni.utils.NEUInternalName.Companion.asInternalName
@@ -30,6 +31,7 @@ object GetFromSackAPI {
     private val config get() = SkyHanniMod.feature.inventory.gfs
 
     private val commands = arrayOf("gfs", "getfromsacks")
+    private val commandsWithSlash = commands.map { "/$it" }
 
     private val fromSacksChatPattern by RepoPattern.pattern(
         "gfs.chat.from",
@@ -62,6 +64,8 @@ object GetFromSackAPI {
     private val inventoryMap = mutableMapOf<Int, List<PrimitiveItemStack>>()
 
     private var lastTimeOfCommand = SimpleTimeMark.farPast()
+
+    private var lastItemStack: PrimitiveItemStack? = null
 
     var sackList = emptyList<NEUInternalName>()
         private set
@@ -105,13 +109,20 @@ object GetFromSackAPI {
         }
     }
 
-    fun commandHandler(args: Array<String>) {
-        if (!config.queuedGFS) {
-            LorenzUtils.sendCommandToServer("gfs ${args.joinToString(" ")}")
-            return
-        }
+    @SubscribeEvent
+    fun onMessageToServer(event: MessageSendToServerEvent) {
+        if (!LorenzUtils.inSkyBlock) return
+        if (!config.queuedGFS && !config.bazaarGFS) return
+        if (!event.isCommand(commandsWithSlash)) return
+        queuedHandler(event)
+        bazaarHandler(event)
+    }
 
-        val (result, stack) = commandValidator(args.toList())
+    private fun queuedHandler(event: MessageSendToServerEvent) {
+        if (!config.queuedGFS) return
+        if (event.originatingModContainer?.modId == "skyhanni") return
+
+        val (result, stack) = commandValidator(event.splitMessage.drop(1))
 
         when (result) {
             CommandResult.VALID -> getFromSack(stack ?: return)
@@ -119,14 +130,19 @@ object GetFromSackAPI {
             CommandResult.WRONG_IDENTIFIER -> ChatUtils.userError("Couldn't find an item with this name or identifier!")
             CommandResult.WRONG_AMOUNT -> ChatUtils.userError("Invalid amount!")
         }
+        event.isCanceled = true
     }
 
-    private enum class CommandResult {
-        VALID,
-        WRONG_ARGUMENT,
-        WRONG_IDENTIFIER,
-        WRONG_AMOUNT
+    private fun bazaarHandler(event: MessageSendToServerEvent) {
+        if (event.isCanceled) return
+        if (!config.bazaarGFS || LorenzUtils.noTradeMode) return
+        lastItemStack = commandValidator(event.splitMessage.drop(1)).second
     }
+
+    private fun bazaarMessage(item: String, amount: Int, isRemaining: Boolean = false) = ChatUtils.clickableChat(
+        "§lCLICK §r§eto get the ${if (isRemaining) "remaining " else ""}§ax${amount} §9$item §efrom bazaar",
+        "bz $item"
+    )
 
     private fun commandValidator(args: List<String>): Pair<CommandResult, PrimitiveItemStack?> {
         if (args.size != 2) {
@@ -146,19 +162,6 @@ object GetFromSackAPI {
         }
 
         return CommandResult.VALID to item.makePrimitiveStack(amountString.toInt())
-    }
-
-    private var lastItemStack: PrimitiveItemStack? = null
-
-    @SubscribeEvent
-    fun onMessageToServer(event: MessageSendToServerEvent) {
-        if (event.isCanceled) return
-        if (!LorenzUtils.inSkyBlock) return
-        if (!config.bazaarGFS || LorenzUtils.noTradeMode) return
-        val command = event.message.split(" ")
-        if (command.isEmpty()) return
-        if (command[0] != "/gfs") return
-        lastItemStack = commandValidator(command.drop(1)).second
     }
 
     @SubscribeEvent
@@ -181,10 +184,12 @@ object GetFromSackAPI {
         }
     }
 
-    private fun bazaarMessage(item: String, amount: Int, isRemaining: Boolean = false) = ChatUtils.clickableChat(
-        "§lCLICK §r§eto get the ${if (isRemaining) "remaining " else ""}§ax${amount} §9$item §efrom bazaar",
-        "bz $item"
-    )
+    private enum class CommandResult {
+        VALID,
+        WRONG_ARGUMENT,
+        WRONG_IDENTIFIER,
+        WRONG_AMOUNT
+    }
 
     @SubscribeEvent
     fun onRepoReload(event: RepositoryReloadEvent) {
