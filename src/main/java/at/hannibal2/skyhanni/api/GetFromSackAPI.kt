@@ -28,6 +28,8 @@ object GetFromSackAPI {
 
     private val commands = arrayOf("gfs", "getfromsacks")
 
+    fun getFromSack(item: NEUInternalName, amount: Int) = getFromSack(item.makePrimitiveStack(amount))
+
     fun getFromSack(item: PrimitiveItemStack) = getFromSack(listOf(item))
 
     fun getFromSack(items: List<PrimitiveItemStack>) = addToQueue(items)
