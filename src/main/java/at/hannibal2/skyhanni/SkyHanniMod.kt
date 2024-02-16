@@ -144,6 +144,7 @@ import at.hannibal2.skyhanni.features.fishing.ThunderSparksHighlight
 import at.hannibal2.skyhanni.features.fishing.tracker.FishingProfitTracker
 import at.hannibal2.skyhanni.features.fishing.tracker.FishingTrackerCategoryManager
 import at.hannibal2.skyhanni.features.fishing.tracker.SeaCreatureTracker
+import at.hannibal2.skyhanni.features.fishing.trophy.GeyserFishing
 import at.hannibal2.skyhanni.features.fishing.trophy.OdgerWaypoint
 import at.hannibal2.skyhanni.features.fishing.trophy.TrophyFishFillet
 import at.hannibal2.skyhanni.features.fishing.trophy.TrophyFishManager
@@ -456,13 +457,13 @@ class SkyHanniMod {
         loadModule(GardenAPI)
         loadModule(GardenPlotAPI)
         loadModule(DataWatcherAPI())
-        loadModule(CollectionAPI())
+        loadModule(CollectionAPI)
         loadModule(FarmingContestAPI)
         loadModule(FriendAPI)
         loadModule(PartyAPI)
         loadModule(GuildAPI)
         loadModule(SlayerAPI)
-        loadModule(PurseAPI())
+        loadModule(PurseAPI)
         loadModule(RiftAPI)
         loadModule(SackAPI)
         loadModule(BingoAPI)
@@ -495,6 +496,7 @@ class SkyHanniMod {
         loadModule(TrophyFishManager)
         loadModule(TrophyFishFillet())
         loadModule(TrophyFishMessages())
+        loadModule(GeyserFishing())
         loadModule(BazaarBestSellMethod())
         loadModule(ShiftClickBrewing())
         loadModule(BazaarOpenPriceWebsite())
@@ -615,7 +617,7 @@ class SkyHanniMod {
         loadModule(EstimatedItemValue)
         loadModule(EstimatedWardrobePrice())
         loadModule(ComposterInventoryNumbers())
-        loadModule(FarmingFortuneDisplay())
+        loadModule(FarmingFortuneDisplay)
         loadModule(ToolTooltipTweaks())
         loadModule(CropSpeedMeter())
         loadModule(AshfangMinisNametagHider())
@@ -637,7 +639,7 @@ class SkyHanniMod {
         loadModule(TrevorTracker)
         loadModule(BingoCardTips())
         loadModule(GardenVisitorDropStatistics)
-        loadModule(CaptureFarmingGear())
+        loadModule(CaptureFarmingGear)
         loadModule(SackDisplay)
         loadModule(GardenStartLocation)
         loadModule(PetCandyUsedDisplay())

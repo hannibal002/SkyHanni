@@ -27,7 +27,10 @@ object BingoAPI {
     val communityGoals get() = bingoGoals.values.filter { it.type == GoalType.COMMUNITY }
     var lastBingoCardOpenTime = SimpleTimeMark.farPast()
 
-    private val detectionPattern by RepoPattern.pattern("bingo.detection.scoreboard", " §.Ⓑ §.Bingo")
+    private val detectionPattern by RepoPattern.pattern(
+        "bingo.detection.scoreboard",
+        " §.Ⓑ §.Bingo"
+    )
 
     @SubscribeEvent
     fun onRepoReload(event: RepositoryReloadEvent) {
