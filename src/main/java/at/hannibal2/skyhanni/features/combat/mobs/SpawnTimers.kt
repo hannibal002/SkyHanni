@@ -33,7 +33,7 @@ class SpawnTimers {
     )
     private val arachneCrystalPattern by patternGroup.pattern(
         "crystal",
-        "^☄ [a-z0-9_]{2,22} placed an arachne crystal! something is awakening!\$"
+        "^☄ [a-z0-9_]{2,22} placed an arachne crystal! something is awakening!$"
     )
 
     private val arachneAltarLocation = LorenzVec(-283f, 51f, -179f)

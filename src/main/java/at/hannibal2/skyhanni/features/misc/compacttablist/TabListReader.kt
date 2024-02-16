@@ -4,6 +4,7 @@ import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.events.LorenzTickEvent
 import at.hannibal2.skyhanni.mixins.transformers.AccessorGuiPlayerTabOverlay
 import at.hannibal2.skyhanni.utils.LorenzUtils
+import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.StringUtils.removeResets
 import at.hannibal2.skyhanni.utils.StringUtils.trimWhiteSpaceAndResets
 import at.hannibal2.skyhanni.utils.TabListData
@@ -44,10 +45,6 @@ object TabListReader {
     private val upgradesPattern by patternGroup.pattern(
         "upgrades",
         "(?<firstPart>§e[A-Za-z ]+)(?<secondPart> §f[\\w ]+)"
-    )
-    private val tabListSPattern by patternGroup.pattern(
-        "sformatting",
-        "(?i)§S"
     )
 
     var hypixelAdvertisingString = "HYPIXEL.NET"
@@ -110,7 +107,7 @@ object TabListReader {
 
         val column = TabColumn("§2§lOther")
 
-        var footer = tabListSPattern.matcher(tabList.footer_skyhanni.formattedText).replaceAll("")
+        var footer = tabList.footer_skyhanni.formattedText.removeColor()
 
         var matcher = godPotPattern.matcher(tabList.footer_skyhanni.unformattedText)
         if (matcher.find()) {

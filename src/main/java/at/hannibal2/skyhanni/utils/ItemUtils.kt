@@ -317,7 +317,7 @@ object ItemUtils {
             return itemAmountCache[input]!!
         }
 
-        UtilsPatterns.amountFrontPattern.matchMatcher(input) {
+        UtilsPatterns.readAmountBeforePattern.matchMatcher(input) {
             val itemName = group("name")
             if (!itemName.contains("§8x")) {
                 return makePair(input, itemName.trim(), this)
@@ -327,7 +327,7 @@ object ItemUtils {
         var string = input.trim()
         val color = string.substring(0, 2)
         string = string.substring(2)
-        val matcher = UtilsPatterns.amountBehindPattern.matcher(string)
+        val matcher = UtilsPatterns.readAmountAfterPattern.matcher(string)
         if (!matcher.matches()) {
             println("")
             println("input: '$input'")
