@@ -1,12 +1,24 @@
 package at.hannibal2.skyhanni.data
 
+import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.StringUtils.matches
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 
 object PetAPI {
-    private val petMenuPattern by RepoPattern.pattern(
-        "misc.pet.menu.title",
+    private val group = RepoPattern.group("misc.pet")
+    private val petMenuPattern by group.pattern(
+        "menu.title",
         "Pets(?: \\(\\d+/\\d+\\) )?"
+    )
+
+    private val petItemName by group.pattern(
+        "item.name",
+        "§.\\[Lvl (?<level>\\d)] (?<name>.*)"
+    )
+
+    private val neuRepoPetItemName by group.pattern(
+        "item.name.neu.format",
+        "§f§f§7\\[Lvl 1➡100] (?<name>.*)"
     )
 
     fun isPetMenu(inventoryTitle: String): Boolean = petMenuPattern.matches(inventoryTitle)
@@ -19,4 +31,15 @@ object PetAPI {
         }
 
     fun isCurrentPet(petName: String): Boolean = currentPet?.contains(petName) ?: false
+
+    fun getCleanName(nameWithLevel: String): String? {
+        petItemName.matchMatcher(nameWithLevel) {
+            return group("name")
+        }
+        neuRepoPetItemName.matchMatcher(nameWithLevel) {
+            return group("name")
+        }
+
+        return null
+    }
 }
