@@ -30,8 +30,8 @@ import kotlin.time.Duration.Companion.seconds
 object GetFromSackAPI {
     private val config get() = SkyHanniMod.feature.inventory.gfs
 
-    private val commands = arrayOf("gfs", "getfromsacks")
-    private val commandsWithSlash = commands.map { "/$it" }
+    val commands = arrayOf("gfs", "getfromsacks")
+    val commandsWithSlash = commands.map { "/$it" }
 
     private val fromSacksChatPattern by RepoPattern.pattern(
         "gfs.chat.from",
