@@ -27,6 +27,7 @@ import at.hannibal2.skyhanni.data.ItemClickData
 import at.hannibal2.skyhanni.data.ItemRenderBackground
 import at.hannibal2.skyhanni.data.ItemTipHelper
 import at.hannibal2.skyhanni.data.LocationFixData
+import at.hannibal2.skyhanni.data.ManaAPI
 import at.hannibal2.skyhanni.data.MayorElection
 import at.hannibal2.skyhanni.data.MinecraftData
 import at.hannibal2.skyhanni.data.OtherInventoryData
@@ -226,6 +227,7 @@ import at.hannibal2.skyhanni.features.inventory.tiarelay.TiaRelayHelper
 import at.hannibal2.skyhanni.features.inventory.tiarelay.TiaRelayWaypoints
 import at.hannibal2.skyhanni.features.itemabilities.ChickenHeadTimer
 import at.hannibal2.skyhanni.features.itemabilities.FireVeilWandParticles
+import at.hannibal2.skyhanni.features.itemabilities.ManaDisplay
 import at.hannibal2.skyhanni.features.itemabilities.abilitycooldown.ItemAbilityCooldown
 import at.hannibal2.skyhanni.features.mining.DeepCavernsParkour
 import at.hannibal2.skyhanni.features.mining.HighlightMiningCommissionMobs
@@ -449,6 +451,7 @@ class SkyHanniMod {
         loadModule(TrackerManager)
         loadModule(UtilsPatterns)
         loadModule(PetAPI)
+        loadModule(ManaAPI)
         loadModule(BossbarData)
         loadModule(ChatUtils)
 
@@ -742,6 +745,7 @@ class SkyHanniMod {
         loadModule(SulphurSkitterBox())
         loadModule(HighlightInquisitors())
         loadModule(VerminTracker)
+        loadModule(ManaDisplay)
 
         init()
 
