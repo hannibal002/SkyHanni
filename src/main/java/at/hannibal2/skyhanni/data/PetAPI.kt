@@ -18,7 +18,7 @@ object PetAPI {
 
     private val neuRepoPetItemName by group.pattern(
         "item.name.neu.format",
-        "(§f§f)?§7\\[Lvl 1➡100] (?<name>.*)"
+        "(§f§f)?§7\\[Lvl 1➡(100|200)] (?<name>.*)"
     )
 
     fun isPetMenu(inventoryTitle: String): Boolean = petMenuPattern.matches(inventoryTitle)
