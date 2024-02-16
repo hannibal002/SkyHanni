@@ -101,7 +101,13 @@ object SkillUtil {
         val fractionalProgress = levelWithProgress - level
         totalXpRequired += (xpForCurr * fractionalProgress).toLong()
 
-        return totalXpRequired
+        val xp = if (level <= 60) {
+            levelingMap.filter { it.key < level }.values.sum().toLong()
+        } else {
+            totalXpRequired + levelingMap.values.sum()
+        }
+
+        return xp
     }
 
     fun getLevelExact(neededXp: Long): Int {

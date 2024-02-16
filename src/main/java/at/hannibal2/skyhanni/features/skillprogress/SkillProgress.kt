@@ -54,6 +54,8 @@ object SkillProgress {
     private var etaDisplay = emptyList<Renderable>()
     private var lastGainUpdate = SimpleTimeMark.farPast()
     private var maxWidth = 0
+    private var incr = 0
+    private var oldTargetNeededXp = 0L
     var hideInActionBar = mutableListOf<String>()
 
     @SubscribeEvent
@@ -266,9 +268,27 @@ object SkillProgress {
         oldSkillInfoMap[activeSkill] = skillInfo
         val level = if (config.overflowConfig.enableInEtaDisplay.get()) skillInfo.overflowLevel else skillInfo.level
 
-        add(Renderable.string("§6Skill: §b${activeSkill.displayName} $level"))
+        val useCustomGoal = etaConfig.enableCustomGoal
+        var targetLevel = etaConfig.customGoalValue.toDoubleOrNull() ?: (level + 1).toDouble()
+        if (targetLevel.toInt() <= level || targetLevel > 400) targetLevel = (level + 1).toDouble()
+        val currentLevelNeededXp = SkillUtil.xpRequiredForLevel(level.toDouble()) + skillInfo.overflowCurrentXp
+        val targetNeededXp = SkillUtil.xpRequiredForLevel(targetLevel)
+        var remaining = if (useCustomGoal) targetNeededXp - currentLevelNeededXp else skillInfo.overflowCurrentXpMax - skillInfo.overflowCurrentXp
+        add(Renderable.string(buildString {
+            append("§6Skill: §b${activeSkill.displayName} ")
+            if (useCustomGoal && targetLevel != 0.0) append("§8$level➜§3${targetLevel.toInt()}") else append(level)
+        }))
+        if (useCustomGoal)
+            add(Renderable.string("§6Needed XP: §b${remaining.addSeparators()}"))
 
         var xpInterp = xpInfo.xpGainHour
+        if (xpInfo.xpGainHour < 1000) {
+            add(Renderable.string("§6in §cN/A"))
+        } else {
+            add(Renderable.string("§6in §b${Utils.prettyTime((remaining) * 1000 * 60 * 60 / xpInterp.toLong())} " +
+                if (xpInfo.isActive) "" else "§c(PAUSED)"))
+        }
+
         if (xpInfo.xpGainLast == xpInfo.xpGainHour && xpInfo.xpGainHour <= 0) {
             add(Renderable.string("§6XP/h: §cN/A"))
         } else {
@@ -277,16 +297,12 @@ object SkillProgress {
                 if (xpInfo.isActive) "" else "§c(PAUSED"))
         }
 
-        var remaining = skillInfo.overflowCurrentXpMax - skillInfo.overflowCurrentXp
-        if (skillInfo.overflowCurrentXpMax == skillInfoLast.overflowCurrentXpMax) {
-            remaining = interpolate(remaining.toFloat(), (skillInfoLast.overflowCurrentXpMax - skillInfoLast.overflowCurrentXp).toFloat(), lastGainUpdate.toMillis()).toLong()
+        if (!useCustomGoal) {
+            if (skillInfo.overflowCurrentXpMax == skillInfoLast.overflowCurrentXpMax) {
+                remaining = interpolate(remaining.toFloat(), (skillInfoLast.overflowCurrentXpMax - skillInfoLast.overflowCurrentXp).toFloat(), lastGainUpdate.toMillis()).toLong()
+            }
         }
-        if (xpInfo.xpGainHour < 1000) {
-            add(Renderable.string("§6ETA: §cN/A"))
-        } else {
-            add(Renderable.string("§6ETA: §b${Utils.prettyTime((remaining) * 1000 * 60 * 60 / xpInterp.toLong())} " +
-                if (xpInfo.isActive) "" else "§c(PAUSED)"))
-        }
+
 
         val session = xpInfo.timeActive.seconds.format(TimeUnit.HOUR)
         add(Renderable.clickAndHover("§6Session: §b$session ${if (xpInfo.sessionTimerActive) "" else "§c(PAUSED)"}",
@@ -296,6 +312,11 @@ object SkillProgress {
             xpInfo.timeActive = 0L
             chat("Timer for §b${activeSkill.displayName} §ehas been reset!")
         })
+
+        incr++
+
+        if (incr % 20 == 0)
+            oldTargetNeededXp = targetNeededXp
     }
 
     private fun drawDisplay() = buildList {
