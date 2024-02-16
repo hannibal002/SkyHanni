@@ -261,6 +261,10 @@ object Commands {
         registerCommand0("shcalccroptime", "Calculate how long you need to farm crops between different crop milestones.", {
             FarmingMilestoneCommand.onCommand(it.getOrNull(0), it.getOrNull(1), it.getOrNull(2), true)
         }, FarmingMilestoneCommand::onComplete)
+        registerCommand(
+            "shsoundlogger",
+            "Logs sounds played and displays them to you."
+        ) { SkyHanniDebugsAndTests.logSounds() }
     }
 
     private fun usersBugFix() {
