@@ -3,6 +3,7 @@ package at.hannibal2.skyhanni.features.commands.tabcomplete
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.GetFromSackAPI
 import at.hannibal2.skyhanni.events.MessageSendToServerEvent
+import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.NEUInternalName.Companion.asInternalName
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
@@ -31,7 +32,7 @@ object GetFromSacksTabComplete {
         if (realName.asString() == rawName) return
         if (realName !in GetFromSackAPI.sackList) return
         event.isCanceled = true
-        LorenzUtils.sendCommandToServer(message.replace(rawName, realName.asString()))
+        ChatUtils.sendMessageToServer(message.replace(rawName, realName.asString()))
     }
 
     fun isEnabled() = LorenzUtils.inSkyBlock && config.gfsSack
