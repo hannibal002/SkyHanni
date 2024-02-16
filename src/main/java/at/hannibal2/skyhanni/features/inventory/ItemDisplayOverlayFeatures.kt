@@ -128,7 +128,6 @@ object ItemDisplayOverlayFeatures {
                 if (level != ItemUtils.maxPetLevel(itemName)) {
                     return level.toString()
                 }
-
             }
         }
 
