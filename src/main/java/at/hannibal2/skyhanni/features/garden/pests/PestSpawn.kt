@@ -49,7 +49,7 @@ class PestSpawn {
 
     private fun pestSpawn(amount: Int, plotName: String) {
         PestSpawnEvent(amount, plotName).postAndCatch()
-        val pestName = StringUtils.canBePlural(amount, "Pest", "Pests")
+        val pestName = StringUtils.pluralize(amount, "Pest")
         val message = "§e$amount §a$pestName Spawned in §b$plotName§a!"
 
         if (config.showTitle) {
