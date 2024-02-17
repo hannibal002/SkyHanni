@@ -959,6 +959,10 @@ Use `/sh` or `/skyhanni` to open the SkyHanni config in game.
       kicking the player.
 + Color the month names on the scoreboard. - J10a1n15
 + Blocks the mining ability when on a private island. - Thunderblade73
++ Crimson Isle Volcano Geyser features. - MrFast
+    + Stops the white geyser smoke particles from rendering if your bobber is near the geyser.
+    + Draws a box around the effective area of the geyser.
+    + Change the color of the box around the geyser.
 
 </details>
 <details open><summary>
