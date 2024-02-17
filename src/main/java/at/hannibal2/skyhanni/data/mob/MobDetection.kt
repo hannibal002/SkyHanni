@@ -84,14 +84,14 @@ class MobDetection {
 
     @SubscribeEvent
     fun onTick(event: LorenzTickEvent) {
-        if (shouldClear.get()) {
+        if (shouldClear.get()) { // Needs to work outside skyblock since it needs clearing when leaving skyblock and joining limbo
             mobDetectionReset()
             shouldClear.set(false)
         }
         if (!LorenzUtils.inSkyBlock) return
         if (event.isMod(2)) return
 
-        makeEntityUpdate()
+        makeEntityReferenceUpdate()
 
         handleMobsFromPacket()
 
@@ -104,17 +104,18 @@ class MobDetection {
             EntityUtils.getEntities<EntityLivingBase>().filter { it !is EntityArmorStand })
 
         if (forceReset) {
-            MobData.currentEntityLiving.clear()
+            MobData.currentEntityLiving.clear() // Naturally removing the mobs using the despawn
         }
 
-        (MobData.currentEntityLiving - MobData.previousEntityLiving).forEach { retry(it) }
-        (MobData.previousEntityLiving - MobData.currentEntityLiving).forEach { entityDeSpawn(it) }
+        (MobData.currentEntityLiving - MobData.previousEntityLiving).forEach { addRetry(it) }  // Spawn
+        (MobData.previousEntityLiving - MobData.currentEntityLiving).forEach { entityDeSpawn(it) } // Despawn
 
         if (forceReset) {
-            mobDetectionReset()
+            mobDetectionReset() // Ensure that all mobs are cleared 100%
         }
     }
 
+    /** Splits the entity into player, displayNPC and other */
     private fun EntityLivingBase.getRoughType() = when {
         this is EntityPlayer && this.isRealPlayer() -> Mob.Type.Player
         this.isDisplayNPC() -> Mob.Type.DisplayNPC
@@ -122,7 +123,7 @@ class MobDetection {
         else -> null
     }
 
-    private fun retry(entity: EntityLivingBase) = entity.getRoughType()?.let { type ->
+    private fun addRetry(entity: EntityLivingBase) = entity.getRoughType()?.let { type ->
         MobData.retries.add(MobData.RetryEntityInstancing(entity, 0, type))
     }
 
@@ -167,6 +168,7 @@ class MobDetection {
     private val villagerFromPacket = ConcurrentLinkedQueue<Int>()
     private val creeperFromPacket = ConcurrentLinkedQueue<Int>()
 
+    /** Handles some mobs that have default health of the entity, specially using the [EntityHealthUpdateEvent] */
     private fun handleMobsFromPacket() {
         batFromPacket.drainForEach { id ->
             val entity = EntityUtils.getEntityByID(id) as? EntityBat ?: return@drainForEach
@@ -180,14 +182,14 @@ class MobDetection {
             val mob = MobData.entityToMob[entity]
             if (mob != null && mob.mobType == Mob.Type.DisplayNPC) {
                 MobEvent.DeSpawn.DisplayNPC(mob)
-                retry(entity)
+                addRetry(entity)
                 return@drainForEach
             }
             val retryInstance = MobData.RetryEntityInstancing(entity)
             MobData.retries.find { it == retryInstance }?.let {
                 if (it.roughType == Mob.Type.DisplayNPC) {
                     MobData.retries.remove(retryInstance)
-                    retry(entity)
+                    addRetry(entity)
                 }
             }
         }
@@ -279,9 +281,10 @@ class MobDetection {
     }
 
     private val entityUpdatePackets = LinkedBlockingQueue<Int>()
-    private val entitiesThatRequireUpdate = mutableSetOf<Int>()
+    private val entitiesThatRequireUpdate = mutableSetOf<Int>() // needs to be distinct, therefore not using a queue
 
-    private fun makeEntityUpdate() {
+    /** Refreshes the references of the entities in entitiesThatRequireUpdate */
+    private fun makeEntityReferenceUpdate() {
         entitiesThatRequireUpdate.iterator().let { iterator ->
             while (iterator.hasNext()) {
                 if (handleEntityUpdate(iterator.next())) iterator.remove()
