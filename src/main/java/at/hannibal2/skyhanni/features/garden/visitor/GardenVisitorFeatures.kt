@@ -73,12 +73,26 @@ private val config get() = VisitorAPI.config
 class GardenVisitorFeatures {
 
     private var display = emptyList<List<Any>>()
-    private val newVisitorArrivedMessage = ".* §r§ehas arrived on your §r§bGarden§r§e!".toPattern()
-    private val copperPattern = " §8\\+§c(?<amount>.*) Copper".toPattern()
-    private val gardenExperiencePattern = " §8\\+§2(?<amount>.*) §7Garden Experience".toPattern()
-    private val visitorChatMessagePattern = "§e\\[NPC] (§.)?(?<name>.*)§f: §r.*".toPattern()
-    private val partialAcceptedPattern by RepoPattern.pattern(
-        "garden.visitor.partialaccepted",
+
+    private val patternGroup = RepoPattern.group("garden.visitor")
+    private val visitorArrivePattern by patternGroup.pattern(
+        "visitorarrive",
+        ".* §r§ehas arrived on your §r§bGarden§r§e!"
+    )
+    private val copperPattern by patternGroup.pattern(
+        "copper",
+        " §8\\+§c(?<amount>.*) Copper"
+    )
+    private val gardenExperiencePattern by patternGroup.pattern(
+        "gardenexperience",
+        " §8\\+§2(?<amount>.*) §7Garden Experience"
+    )
+    private val visitorChatMessagePattern by patternGroup.pattern(
+        "visitorchat",
+        "§e\\[NPC] (§.)?(?<name>.*)§f: §r.*"
+    )
+    private val partialAcceptedPattern by patternGroup.pattern(
+        "partialaccepted",
         "§aYou gave some of the required items!"
     )
 
@@ -192,8 +206,8 @@ class GardenVisitorFeatures {
                     val itemStatus = sackItemData.getStatus()
                     val itemAmount = sackItemData.amount
                     if (itemStatus != SackStatus.OUTDATED) {
-                        val textColour = if (itemAmount > amount) "a" else "e"
-                        list.add(" §${textColour}x${sackItemData.amount.addSeparators()} §7in your sack")
+                        val textColour = if (itemAmount >= amount) "a" else "e"
+                        list.add(" (§${textColour}x${sackItemData.amount.addSeparators()} §7in sacks)")
                     }
                 }
 
@@ -456,8 +470,8 @@ class GardenVisitorFeatures {
     }
 
     @SubscribeEvent
-    fun onChat(event: LorenzChatEvent) {
-        if (config.hypixelArrivedMessage && newVisitorArrivedMessage.matcher(event.message).matches()) {
+    fun onChatMessage(event: LorenzChatEvent) {
+        if (config.hypixelArrivedMessage && visitorArrivePattern.matcher(event.message).matches()) {
             event.blockedReason = "new_visitor_arrived"
         }
 

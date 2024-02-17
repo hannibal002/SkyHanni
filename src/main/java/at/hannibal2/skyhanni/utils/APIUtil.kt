@@ -116,7 +116,6 @@ object APIUtil {
                 }
 
                 val message = "POST request to '$urlString' returned status ${status.statusCode}"
-                println(message)
                 ChatUtils.error("SkyHanni ran into an error. Status: ${status.statusCode}")
                 return ApiResponse(false, message, JsonObject())
             }
@@ -134,8 +133,10 @@ object APIUtil {
     }
 
     private fun readResponse(entity: HttpEntity): JsonObject {
-        val retSrc = EntityUtils.toString(entity)
-        return parser.parse(retSrc) as JsonObject
+        val retSrc = EntityUtils.toString(entity) ?: return JsonObject()
+        val parsed = parser.parse(retSrc)
+        if (parsed.isJsonNull) return JsonObject()
+        return parsed as JsonObject
     }
 
     fun postJSONIsSuccessful(url: String, body: String, silentError: Boolean = false): Boolean {
@@ -145,12 +146,12 @@ object APIUtil {
             return true
         }
 
-        println(response.message)
         ErrorManager.logErrorStateWithData(
             "An error occurred during the API request",
             "unsuccessful API response",
             "url" to url,
             "body" to body,
+            "message" to response.message,
             "response" to response,
         )
 

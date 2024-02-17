@@ -10,14 +10,17 @@ import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.RenderUtils.renderStrings
 import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.TimeUtils
+import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
 class RiftTimer {
 
     private val config get() = RiftAPI.config.timer
 
-    // TODO USE SH-REPO
-    val pattern = "§(?<color>[a7])(?<time>.*)ф Left.*".toPattern()
+    private val timePattern by RepoPattern.pattern(
+        "rift.everywhere.timer",
+        "§(?<color>[a7])(?<time>.*)ф Left.*"
+    )
 
     private var display = emptyList<String>()
     private var maxTime = 0L
@@ -38,7 +41,7 @@ class RiftTimer {
     fun onActionBarUpdate(event: ActionBarUpdateEvent) {
         if (!isEnabled()) return
         for (entry in event.actionBar.split("     ")) {
-            pattern.matchMatcher(entry) {
+            timePattern.matchMatcher(entry) {
                 val color = group("color")
                 val newTime = getTime(group("time"))
                 if (color == "7") {
