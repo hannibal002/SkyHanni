@@ -25,6 +25,8 @@ import net.minecraft.util.AxisAlignedBB
  * Avoid caching, as it may change without notice.
  * @property mobType The type of the Mob.
  * @property armorStand The armor stand entity associated with the Mob, if it has one.
+ *
+ * Avoid caching, as it may change without notice.
  * @property name The name of the Mob.
  * @property extraEntities Additional entities associated with the Mob.
  *
@@ -55,7 +57,7 @@ import net.minecraft.util.AxisAlignedBB
 class Mob(
     var baseEntity: EntityLivingBase,
     val mobType: Type,
-    val armorStand: EntityArmorStand? = null,
+    var armorStand: EntityArmorStand? = null,
     val name: String = "",
     additionalEntities: List<EntityLivingBase>? = null,
     ownerName: String? = null,
@@ -156,10 +158,13 @@ class Mob(
         MobData.entityToMob.putAll(entities.associateWith { this })
     }
 
-    internal fun internalUpdateOfEntity(entity: EntityLivingBase) {
-        if (entity == baseEntity) baseEntity = entity else {
+    internal fun internalUpdateOfEntity(entity: EntityLivingBase) = when (entity.entityId) {
+        baseEntity.entityId -> baseEntity = entity
+        armorStand?.entityId ?: Int.MIN_VALUE -> armorStand = entity as EntityArmorStand
+        else -> {
             extraEntitiesList?.remove(entity)
             extraEntitiesList?.add(entity)
+            Unit // To make return type of this branch Unit
         }
     }
 
