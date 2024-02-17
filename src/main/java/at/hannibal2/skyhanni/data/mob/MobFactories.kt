@@ -49,8 +49,8 @@ object MobFactories {
                 armorStand,
                 this.group(3),
                 extraEntityList,
-                hasStar = this.group(1).isNotEmpty(),
-                attribute = this.group(2).takeIf { it.isNotEmpty() }
+                hasStar = this.group(1)?.isNotEmpty() ?: false,
+                attribute = this.group(2)?.takeIf { it.isNotEmpty() }
                     ?.let { MobFilter.DungeonAttribute.valueOf(it) })
         }
 
