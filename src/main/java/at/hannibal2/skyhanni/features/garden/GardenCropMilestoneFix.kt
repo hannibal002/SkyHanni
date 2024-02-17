@@ -11,12 +11,19 @@ import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.NumberUtil.romanToDecimalIfNecessary
 import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
+import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
 class GardenCropMilestoneFix {
-
-    private val tabListPattern = " Milestone: §r§a(?<crop>.*) (?<tier>.*): §r§3(?<percentage>.*)%".toPattern()
-    private val levelUpPattern = " {2}§r§b§lGARDEN MILESTONE §3(?<crop>.*) §8.*➜§3(?<tier>.*)".toPattern()
+    private val patternGroup = RepoPattern.group("garden.cropmilestone.fix")
+    private val tabListPattern by patternGroup.pattern(
+        "tablist",
+        " Milestone: §r§a(?<crop>.*) (?<tier>.*): §r§3(?<percentage>.*)%"
+    )
+    private val levelUpPattern by patternGroup.pattern(
+        "levelup",
+        " {2}§r§b§lGARDEN MILESTONE §3(?<crop>.*) §8.*➜§3(?<tier>.*)"
+    )
 
     private val tabListCropProgress = mutableMapOf<CropType, Long>()
 

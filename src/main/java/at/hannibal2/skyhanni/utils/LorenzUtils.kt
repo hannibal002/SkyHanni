@@ -333,7 +333,10 @@ object LorenzUtils {
     }
 
     fun sendCommandToServer(command: String) {
-        ChatUtils.sendMessageToServer("/$command")
+        if (command.startsWith("/")) {
+            ChatUtils.debug("Sending wrong command to server? ($command)")
+        }
+        ChatUtils.sendCommandToServer(command)
     }
 
     /**
