@@ -28,7 +28,6 @@ class RiftBloodEffigies {
 
     private val config get() = RiftAPI.config.area.stillgoreChateau.bloodEffigies
 
-
     private var locations: List<LorenzVec> = emptyList()
     private var effigiesTimes = mapOf(
         0 to -1L,
@@ -42,7 +41,7 @@ class RiftBloodEffigies {
     companion object {
         private val group = RepoPattern.group("rift.area.stillgore.effegies")
         val effigiesTimerPattern by group.pattern("respawn", "§eRespawn §c(?<time>.*) §7\\(or click!\\)")
-        val heartsPattern by group.pattern("heart","Effigies: (?<hearts>((§[7c])?⧯)*)")
+        val effegieHeartPattern by group.pattern("heart","Effigies: (?<hearts>((§[7c])?⧯)*)")
     }
 
     @SubscribeEvent
@@ -71,7 +70,7 @@ class RiftBloodEffigies {
         if (!isEnabled()) return
 
         val line = event.newList.firstOrNull { it.startsWith("Effigies:") } ?: return
-        val hearts = effigiesTimerPattern.matchMatcher(line) {
+        val hearts = effegieHeartPattern.matchMatcher(line) {
             group("hearts")
         } ?: return
 

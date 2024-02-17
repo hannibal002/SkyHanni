@@ -43,6 +43,10 @@
 + Added Dojo Rank Display. - HiZe
     + Display your rank, score, actual belt and points needed for the next belt in the Challenges inventory on the
       Crimson Isles.
++ Crimson Isle Volcano Geyser features. - MrFast
+    + Stops the white geyser smoke particles from rendering if your bobber is near the geyser.
+    + Draws a box around the effective area of the geyser.
+    + Change the color of the box around the geyser.
 
 #### Inventory Features
 
@@ -123,6 +127,7 @@
 + Smarter check if the player is fishing for all fishing related displays. - hannibal2
 + Hide Sea Creature Tracker when wearing full Trophy Hunter armor. - martimavocado
 + Disabled Fishing Profit/SC Tracker in Kuudra. - CalMWolfs
++ Moved Sulphur Skitter Box from Crimson Isle to Fishing -> Trophy Fishing. - hannibal2
 
 #### Mining Changes
 
@@ -213,6 +218,8 @@
 + Fixed Anita and Jacob workaround working outside of garden. - CalMWolfs
 + Fixed opening visitor Milestones menu not loading visitor amount for /ff. - martimavocado
 + Fixed Sensitivity Reducer still working when switching from the garden to the hub. - martimavocado
++ Fixed a rare farming weight API error. - CalMWolfs
++ Fixed mouse rotation unlocks after doing /warp garden with Sensitivity Reducer on. - martimavocado
 
 #### Combat Fixes
 
@@ -314,6 +321,8 @@
 + Fixed rare error in Harp Features. - Thunderblade73
 + Fixed some getItemStack errors. - CalMWolfs
 + Fixed Minion XP calculation not working when having different mouse settings. - Thunderblade73
++ Fixed /gfs tab complete. - martimavocado
++ Fixed /warp is command replace. - hannibal2
 
 ### Technical Changes
 
@@ -375,6 +384,10 @@
 + A ton of code cleanup, mainly on imports. - Thunderblade73 & hannibal2
 + Added mod identification for outgoing mod calls and show this data in /shchathistory. - nea
 + Sensitivity Reducer changes: clearer error message, using ChatUtils and wrong values in debug data. - martimavocado
++ Bumped NEU to version 2.1.1 pre-5. - CalMWolfs
++ Fixed an NPE in ReflectionUtils.shPackageName. - Thunderblade73
++ Cleaned up string pluralization methods. - alexia
++ Moved many regex patterns in the repo and code cleanup. - CalMWolfs
 
 ## Version 0.22
 
