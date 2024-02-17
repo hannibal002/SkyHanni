@@ -286,31 +286,31 @@ object SkillProgress {
         }
 
         add(Renderable.string(buildString {
-            append("§6Skill: §b${activeSkill.displayName} ")
+            append("§6Skill: §7${activeSkill.displayName} ")
             if (useCustomGoal && targetLevel != 0.0) append("§8$level➜§3${targetLevel.toInt()}") else append(level)
         }))
         if (useCustomGoal)
-            add(Renderable.string("§6Needed XP: §b${remaining.addSeparators()}"))
+            add(Renderable.string("§7Needed XP: §e${remaining.addSeparators()}"))
 
         var xpInterp = xpInfo.xpGainHour
         if (xpInfo.xpGainHour < 1000) {
-            add(Renderable.string("§6in §cN/A"))
+            add(Renderable.string("§7In §cN/A"))
         } else {
-            add(Renderable.string("§6in §b${Utils.prettyTime((remaining) * 1000 * 60 * 60 / xpInterp.toLong())} " +
+            add(Renderable.string("§7In §b${Utils.prettyTime((remaining) * 1000 * 60 * 60 / xpInterp.toLong())} " +
                 if (xpInfo.isActive) "" else "§c(PAUSED)"))
         }
 
         if (xpInfo.xpGainLast == xpInfo.xpGainHour && xpInfo.xpGainHour <= 0) {
-            add(Renderable.string("§6XP/h: §cN/A"))
+            add(Renderable.string("§7XP/h: §cN/A"))
         } else {
             xpInterp = interpolate(xpInfo.xpGainHour, xpInfo.xpGainLast, lastGainUpdate.toMillis())
-            add(Renderable.string("§6XP/h: §b${xpInterp.toLong().addSeparators()} " +
-                if (xpInfo.isActive) "" else "§c(PAUSED"))
+            add(Renderable.string("§7XP/h: §e${xpInterp.toLong().addSeparators()} " +
+                if (xpInfo.isActive) "" else "§c(PAUSED)"))
         }
 
 
         val session = xpInfo.timeActive.seconds.format(TimeUnit.HOUR)
-        add(Renderable.clickAndHover("§6Session: §b$session ${if (xpInfo.sessionTimerActive) "" else "§c(PAUSED)"}",
+        add(Renderable.clickAndHover("§7Session: §e$session ${if (xpInfo.sessionTimerActive) "" else "§c(PAUSED)"}",
             listOf("§eClick to reset!")) {
             xpInfo.sessionTimerActive = false
             xpInfo.shouldStartTimer = true
