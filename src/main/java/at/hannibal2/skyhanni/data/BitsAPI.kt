@@ -2,14 +2,12 @@ package at.hannibal2.skyhanni.data
 
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.events.InventoryFullyOpenedEvent
-import at.hannibal2.skyhanni.events.IslandChangeEvent
 import at.hannibal2.skyhanni.events.LorenzChatEvent
 import at.hannibal2.skyhanni.events.ScoreboardChangeEvent
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.NumberUtil.formatNumber
-import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.StringUtils.matches
 import at.hannibal2.skyhanni.utils.StringUtils.removeResets
@@ -39,28 +37,22 @@ object BitsAPI {
     private const val defaultcookiebits = 4800
 
     private val bitsDataGroup = RepoPattern.group("data.bits")
-    private var timeSinceLastSwitch: SimpleTimeMark = SimpleTimeMark.farPast()
 
     // Scoreboard patterns
     val bitsScoreboardPattern by bitsDataGroup.pattern(
         "scoreboard",
-        "^Bits: §b(?<amount>[\\d,]+\\.?\\d*) ?§?3?(?:\\((?<earned>[+-][,\\d]+)?\\)?)?\$"
+        "^Bits: §b(?<amount>[\\d,.]+).*$"
     )
 
-    // Chat patterns related to bits
+    // Chat patterns
     private val bitsChatGroup = bitsDataGroup.group("chat")
 
-    val bitsFromFameRankUpChatPattern by bitsChatGroup.pattern(
+    private val bitsFromFameRankUpChatPattern by bitsChatGroup.pattern(
         "famerankup",
         "§eYou gained §3(?<amount>.*) Bits Available §ecompounded from all your §epreviously eaten §6cookies§e! Click here to open §6cookie menu§e!"
     )
 
-    val bitsEarnedChatPattern by bitsChatGroup.pattern(
-        "earned",
-        "§f\\s+§8\\+§b(?<amount>.*)\\s+Bits\n"
-    )
-
-    val boosterCookieAte by bitsChatGroup.pattern(
+    private val boosterCookieAte by bitsChatGroup.pattern(
         "boostercookieate",
         "§eYou consumed a §6Booster Cookie§e!.*"
     )
@@ -68,37 +60,37 @@ object BitsAPI {
     // GUI patterns
     private val bitsGuiGroup = bitsDataGroup.group("gui")
 
-    val bitsAvailableMenuPattern by bitsGuiGroup.pattern(
+    private val bitsAvailableMenuPattern by bitsGuiGroup.pattern(
         "availablemenu",
         "§7Bits Available: §b(?<toClaim>[\\w,]+)(§3.+)?"
     )
 
-    val fameRankSbMenuPattern by bitsGuiGroup.pattern(
+    private val fameRankSbMenuPattern by bitsGuiGroup.pattern(
         "sbmenufamerank",
         "§7Your rank: §e(?<rank>.*)"
     )
 
-    val fameRankCommunityShopPattern by bitsGuiGroup.pattern(
+    private val fameRankCommunityShopPattern by bitsGuiGroup.pattern(
         "communityshopfamerank",
         "§7Fame Rank: §e(?<rank>.*)"
     )
 
-    val bitsGuiNamePattern by bitsGuiGroup.pattern(
+    private val bitsGuiNamePattern by bitsGuiGroup.pattern(
         "mainmenuname",
         "^SkyBlock Menu$"
     )
 
-    val bitsGuiStackPattern by bitsGuiGroup.pattern(
+    private val bitsGuiStackPattern by bitsGuiGroup.pattern(
         "mainmenustack",
         "^§6Booster Cookie$"
     )
 
-    val fameRankGuiNamePattern by bitsGuiGroup.pattern(
+    private val fameRankGuiNamePattern by bitsGuiGroup.pattern(
         "famerankmenuname",
         "^(Community Shop|Booster Cookie)$"
     )
 
-    val fameRankGuiStackPattern by bitsGuiGroup.pattern(
+    private val fameRankGuiStackPattern by bitsGuiGroup.pattern(
         "famerankmenustack",
         "^(§aCommunity Shop|§eFame Rank)$"
     )
@@ -111,33 +103,16 @@ object BitsAPI {
 
             bitsScoreboardPattern.matchMatcher(message) {
                 val amount = group("amount").formatNumber().toInt()
-                val earned = group("earned")?.formatNumber()?.toInt() ?: 0
+
+                if (amount > bits) {
+                    bitsToClaim += amount - bits
+                    ChatUtils.debug("You have gained §3${amount - bits} Bits §eaccording to the scoreboard!")
+                }
                 bits = amount
-                if (earned > 0) bitsToClaim -= earned
 
                 return
             }
         }
-    }
-
-    @SubscribeEvent
-    fun onIslandSwitch(event: IslandChangeEvent) {
-        if (!isEnabled()) return
-
-        val oldIsland = event.oldIsland
-        val wasInRiftOrCatacombs = oldIsland == IslandType.THE_RIFT || oldIsland == IslandType.CATACOMBS
-
-        if (wasInRiftOrCatacombs) {
-            val minutesPassed = timeSinceLastSwitch.elapsedMinutes()
-
-            ChatUtils.debug("You spent $minutesPassed minutes in the rift or catacombs.")
-
-            val bitsToClaim = ((minutesPassed / 30) * (defaultcookiebits * currentFameRank.bitsMultiplier)).toInt()
-
-            this.bitsToClaim -= bitsToClaim
-        }
-
-        timeSinceLastSwitch = SimpleTimeMark.now()
     }
 
     @SubscribeEvent
@@ -148,17 +123,6 @@ object BitsAPI {
         bitsFromFameRankUpChatPattern.matchMatcher(message) {
             val amount = group("amount").formatNumber().toInt()
             bitsToClaim += amount
-
-            return
-        }
-
-        bitsEarnedChatPattern.matchMatcher(message) {
-            // Only two locations where the bits line isn't shown, but you can still get bits
-            if (!LorenzUtils.inAnyIsland(IslandType.CATACOMBS, IslandType.THE_RIFT)) return
-
-            val amount = group("amount").formatNumber().toInt()
-            bits += amount
-            bitsToClaim -= amount
 
             return
         }
@@ -193,7 +157,7 @@ object BitsAPI {
         if (fameRankGuiNamePattern.matches(event.inventoryName)) {
             val fameRankStack = stacks.values.lastOrNull { fameRankGuiStackPattern.matches(it.displayName) }
             if (fameRankStack != null) {
-                line@for (line in fameRankStack.getLore()) {
+                line@ for (line in fameRankStack.getLore()) {
                     fameRankCommunityShopPattern.matchMatcher(line) {
                         val rank = group("rank")
                         currentFameRank = FameRank.entries.firstOrNull { it.rank == rank } ?: FameRank.NEW_PLAYER
@@ -205,12 +169,12 @@ object BitsAPI {
                         val rank = group("rank")
                         currentFameRank = FameRank.entries.firstOrNull { it.rank == rank } ?: FameRank.NEW_PLAYER
 
-                        return
+                        continue@line
                     }
                 }
             }
         }
     }
 
-    fun isEnabled() = LorenzUtils.inSkyBlock && profileStorage != null && playerStorage != null
+    fun isEnabled() = LorenzUtils.inSkyBlock
 }
