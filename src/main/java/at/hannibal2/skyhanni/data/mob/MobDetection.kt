@@ -167,42 +167,49 @@ class MobDetection {
         return true
     }
 
-    private val batFromPacket = ConcurrentLinkedQueue<Int>()
-    private val villagerFromPacket = ConcurrentLinkedQueue<Int>()
-    private val creeperFromPacket = ConcurrentLinkedQueue<Int>()
+    private val entityFromPacket = ConcurrentLinkedQueue<Pair<EntityPacketType, Int>>()
+
+    /** For mobs that have default health of the entity */
+    private enum class EntityPacketType {
+        SPIRIT_BAT,
+        VILLAGER,
+        CREEPER_VAIL
+    }
 
     /** Handles some mobs that have default health of the entity, specially using the [EntityHealthUpdateEvent] */
-    private fun handleMobsFromPacket() {
-        batFromPacket.drainForEach { id ->
-            val entity = EntityUtils.getEntityByID(id) as? EntityBat ?: return@drainForEach
-            if (MobData.entityToMob[entity] != null) return@drainForEach
-            MobData.retries.remove(MobData.RetryEntityInstancing(entity))
-            MobEvent.Spawn.Projectile(MobFactories.projectile(entity, "Spirit Scepter Bat"))
-                .postAndCatch() // Needs different handling because 6 is default health of Bat
-        }
-        villagerFromPacket.drainForEach { id ->
-            val entity = EntityUtils.getEntityByID(id) as? EntityVillager ?: return@drainForEach
-            val mob = MobData.entityToMob[entity]
-            if (mob != null && mob.mobType == Mob.Type.DisplayNPC) {
-                MobEvent.DeSpawn.DisplayNPC(mob)
-                addRetry(entity)
-                return@drainForEach
+    private fun handleMobsFromPacket() = entityFromPacket.drainForEach { (type, id) ->
+        when (type) {
+            EntityPacketType.SPIRIT_BAT -> {
+                val entity = EntityUtils.getEntityByID(id) as? EntityBat ?: return@drainForEach
+                if (MobData.entityToMob[entity] != null) return@drainForEach
+                MobData.retries.remove(MobData.RetryEntityInstancing(entity))
+                MobEvent.Spawn.Projectile(MobFactories.projectile(entity, "Spirit Scepter Bat")).postAndCatch()
             }
-            val retryInstance = MobData.RetryEntityInstancing(entity)
-            MobData.retries.find { it == retryInstance }?.let {
-                if (it.roughType == Mob.Type.DisplayNPC) {
-                    MobData.retries.remove(retryInstance)
+
+            EntityPacketType.VILLAGER -> {
+                val entity = EntityUtils.getEntityByID(id) as? EntityVillager ?: return@drainForEach
+                val mob = MobData.entityToMob[entity]
+                if (mob != null && mob.mobType == Mob.Type.DisplayNPC) {
+                    MobEvent.DeSpawn.DisplayNPC(mob)
                     addRetry(entity)
+                    return@drainForEach
+                }
+                val retryInstance = MobData.RetryEntityInstancing(entity)
+                MobData.retries.find { it == retryInstance }?.let {
+                    if (it.roughType == Mob.Type.DisplayNPC) {
+                        MobData.retries.remove(retryInstance)
+                        addRetry(entity)
+                    }
                 }
             }
-        }
-        creeperFromPacket.drainForEach { id ->
-            val entity = EntityUtils.getEntityByID(id) as? EntityCreeper ?: return@drainForEach
-            if (MobData.entityToMob[entity] != null) return@drainForEach
-            if (!entity.powered) return@drainForEach
-            MobData.retries.remove(MobData.RetryEntityInstancing(entity))
-            MobEvent.Spawn.Special(MobFactories.special(entity, "Creeper Veil"))
-                .postAndCatch() // Needs different handling because 6 is default health of Bat
+
+            EntityPacketType.CREEPER_VAIL -> {
+                val entity = EntityUtils.getEntityByID(id) as? EntityCreeper ?: return@drainForEach
+                if (MobData.entityToMob[entity] != null) return@drainForEach
+                if (!entity.powered) return@drainForEach
+                MobData.retries.remove(MobData.RetryEntityInstancing(entity))
+                MobEvent.Spawn.Special(MobFactories.special(entity, "Creeper Veil")).postAndCatch()
+            }
         }
     }
 
@@ -210,15 +217,15 @@ class MobDetection {
     fun onEntityHealthUpdateEvent(event: EntityHealthUpdateEvent) {
         when {
             event.entity is EntityBat && event.health == 6 -> {
-                batFromPacket.add(event.entity.entityId)
+                entityFromPacket.add(EntityPacketType.SPIRIT_BAT to event.entity.entityId)
             }
 
             event.entity is EntityVillager && event.health != 20 -> {
-                villagerFromPacket.add(event.entity.entityId)
+                entityFromPacket.add(EntityPacketType.VILLAGER to event.entity.entityId)
             }
 
             event.entity is EntityCreeper && event.health == 20 -> {
-                creeperFromPacket.add(event.entity.entityId)
+                entityFromPacket.add(EntityPacketType.CREEPER_VAIL to event.entity.entityId)
             }
         }
     }
