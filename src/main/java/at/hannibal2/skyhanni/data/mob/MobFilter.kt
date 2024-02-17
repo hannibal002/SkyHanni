@@ -523,6 +523,6 @@ object MobFilter {
         }
             ?: if (nextEntity is EntityZombie) MobResult.notYetFound else null
 
-    private const val ratSearchStart = 3
+    private const val ratSearchStart = 1
     private const val ratSearchUpTo = 11
 }
