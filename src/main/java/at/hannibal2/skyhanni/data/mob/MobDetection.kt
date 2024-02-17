@@ -119,7 +119,7 @@ class MobDetection {
     private fun EntityLivingBase.getRoughType() = when {
         this is EntityPlayer && this.isRealPlayer() -> Mob.Type.Player
         this.isDisplayNPC() -> Mob.Type.DisplayNPC
-        this.isSkyBlockMob() -> Mob.Type.Basic
+        this.isSkyBlockMob() && !islandException() -> Mob.Type.Basic
         else -> null
     }
 
@@ -139,23 +139,26 @@ class MobDetection {
 
             Mob.Type.DisplayNPC -> return MobFilter.createDisplayNPC(entity)
             Mob.Type.Basic -> {
-                if (islandException()) return true
-                val mobResult = MobFilter.createSkyblockEntity(entity)
-                if (mobResult.result == MobData.Result.NotYetFound) return false
-                if (mobResult.result == MobData.Result.Illegal) return true
-                if (mobResult.result == MobData.Result.SomethingWentWrong) return mobDetectionError("Something Went Wrong!")
-                if (mobResult.mob == null) return mobDetectionError("Mob is null even though result is Found")
-                when (mobResult.mob.mobType) {
-                    Mob.Type.Summon -> MobEvent.Spawn.Summon(mobResult.mob).postAndCatch()
+                val (result, mob) = MobFilter.createSkyblockEntity(entity)
+                when (result) {
+                    MobData.Result.NotYetFound -> return false
+                    MobData.Result.Illegal -> return true // Remove entity from the spawning queue
+                    MobData.Result.SomethingWentWrong -> return mobDetectionError("Something Went Wrong!")
+                    MobData.Result.Found -> {
+                        if (mob == null) return mobDetectionError("Mob is null even though result is Found")
+                        when (mob.mobType) {
+                            Mob.Type.Summon -> MobEvent.Spawn.Summon(mob)
 
-                    Mob.Type.Basic, Mob.Type.Dungeon, Mob.Type.Boss, Mob.Type.Slayer -> MobEvent.Spawn.SkyblockMob(
-                        mobResult.mob
-                    ).postAndCatch()
+                            Mob.Type.Basic, Mob.Type.Dungeon, Mob.Type.Boss, Mob.Type.Slayer ->
+                                MobEvent.Spawn.SkyblockMob(mob)
 
-                    Mob.Type.Special -> MobEvent.Spawn.Special(mobResult.mob).postAndCatch()
-                    Mob.Type.Projectile -> MobEvent.Spawn.Projectile(mobResult.mob).postAndCatch()
-                    Mob.Type.DisplayNPC -> MobEvent.Spawn.DisplayNPC(mobResult.mob).postAndCatch()
-                    Mob.Type.Player -> return mobDetectionError("An Player Ended Here. How?")
+                            Mob.Type.Special -> MobEvent.Spawn.Special(mob)
+                            Mob.Type.Projectile -> MobEvent.Spawn.Projectile(mob)
+                            Mob.Type.DisplayNPC ->
+                                MobEvent.Spawn.DisplayNPC(mob) // Needed for some special cases
+                            Mob.Type.Player -> return mobDetectionError("An Player Ended Here. How?")
+                        }.postAndCatch()
+                    }
                 }
             }
 

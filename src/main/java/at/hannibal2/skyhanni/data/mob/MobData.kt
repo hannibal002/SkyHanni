@@ -6,7 +6,6 @@ import net.minecraft.entity.item.EntityArmorStand
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import java.util.TreeSet
 
-
 class MobData {
 
     class MobSet : HashSet<Mob>() {
@@ -41,6 +40,9 @@ class MobData {
     }
 
     internal class MobResult(val result: Result, val mob: Mob?) {
+        operator fun component1() = result
+        operator fun component2() = mob
+
         companion object {
             val illegal = MobResult(Result.Illegal, null)
             val notYetFound = MobResult(Result.NotYetFound, null)
@@ -54,7 +56,8 @@ class MobData {
         }
     }
 
-    internal class RetryEntityInstancing(var entity: EntityLivingBase, var times: Int, val roughType: Mob.Type) : Comparable<RetryEntityInstancing> {
+    internal class RetryEntityInstancing(var entity: EntityLivingBase, var times: Int, val roughType: Mob.Type) :
+        Comparable<RetryEntityInstancing> {
 
         constructor(entity: EntityLivingBase) : this(entity, 0, Mob.Type.Special) // Only use this for compare
 
