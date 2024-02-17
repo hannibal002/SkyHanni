@@ -42,8 +42,8 @@ class MobDebug {
     @SubscribeEvent
     fun onWorldRenderDebug(event: LorenzRenderWorldEvent) {
         if (config.showRayHit || config.showInvisible) {
-            lastRayHit = MobUtils.rayTraceForMob(Minecraft.getMinecraft().thePlayer, event.partialTicks)
-                ?.takeIf { it.canBeSeen() && it.isNotInvisible() }
+            lastRayHit = MobUtils.rayTraceForMobs(Minecraft.getMinecraft().thePlayer, event.partialTicks)
+                ?.firstOrNull { it.canBeSeen() && (config.showInvisible || it.isInvisible()) }
         }
 
         if (config.skyblockMob.isHighlight()) {
