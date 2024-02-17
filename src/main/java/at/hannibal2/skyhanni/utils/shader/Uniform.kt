@@ -21,7 +21,6 @@ class Uniform<T>(
         companion object {
 
             val FLOAT: UniformType<Float> = UniformType()
-            val VEC2: UniformType<FloatArray> = UniformType()
             val VEC3: UniformType<FloatArray> = UniformType()
             val BOOL: UniformType<Boolean> = UniformType()
         }
@@ -34,17 +33,12 @@ class Uniform<T>(
         val newUniformValue: T = uniformValuesSupplier.get()
         if (!Objects.deepEquals(previousUniformValue, newUniformValue)) {
             when (uniformType) {
-                UniformType.FLOAT -> {
-                    ShaderHelper.glUniform1f(uniformID, (newUniformValue as Float))
-                }
-                UniformType.VEC2 -> {
-                    val values = newUniformValue as FloatArray
-                    ShaderHelper.glUniform2f(uniformID, values[0], values[1])
-                }
+                UniformType.FLOAT -> ShaderHelper.glUniform1f(uniformID, (newUniformValue as Float))
                 UniformType.VEC3 -> {
                     val values = newUniformValue as FloatArray
                     ShaderHelper.glUniform3f(uniformID, values[0], values[1], values[2])
                 }
+
                 UniformType.BOOL -> ShaderHelper.glUniform1f(uniformID, if (newUniformValue as Boolean) 1f else 0f)
             }
             previousUniformValue = newUniformValue

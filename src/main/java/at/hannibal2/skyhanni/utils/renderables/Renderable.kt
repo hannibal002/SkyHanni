@@ -4,7 +4,6 @@ import at.hannibal2.skyhanni.config.core.config.gui.GuiPositionEditor
 import at.hannibal2.skyhanni.data.ToolTipData
 import at.hannibal2.skyhanni.utils.LorenzLogger
 import at.hannibal2.skyhanni.utils.NEUItems.renderOnScreen
-import at.hannibal2.skyhanni.utils.RenderUtils
 import at.hannibal2.skyhanni.utils.RenderUtils.HorizontalAlignment
 import at.hannibal2.skyhanni.utils.RenderUtils.VerticalAlignment
 import io.github.moulberry.moulconfig.gui.GuiScreenElementWrapper
@@ -15,7 +14,6 @@ import net.minecraft.client.gui.inventory.GuiEditSign
 import net.minecraft.client.renderer.GlStateManager
 import net.minecraft.item.ItemStack
 import org.lwjgl.input.Mouse
-import java.awt.Color
 import java.util.Collections
 import kotlin.math.max
 
@@ -242,6 +240,7 @@ interface Renderable {
                         unhovered.render(posX, posY)
                         isHovered = false
                     }
+
                 }
             }
 
@@ -292,28 +291,6 @@ interface Renderable {
             override val verticalAlign = VerticalAlignment.TOP
 
             override fun render(posX: Int, posY: Int) {
-            }
-        }
-
-        fun drawInsideRoundedRect(
-            input: Renderable,
-            color: Color,
-            padding: Int = 2,
-            radius: Int = 10,
-            smoothness: Int = 2,
-            horizontalAlign: HorizontalAlignment = HorizontalAlignment.LEFT,
-            verticalAlign: VerticalAlignment = VerticalAlignment.TOP,
-        ) = object : Renderable {
-            override val width = input.width + padding * 2
-            override val height = input.height + padding * 2
-            override val horizontalAlign = horizontalAlign
-            override val verticalAlign = verticalAlign
-
-            override fun render(posX: Int, posY: Int) {
-                RenderUtils.drawRoundRect(0, 0, width, height, color.rgb, radius, smoothness)
-                GlStateManager.translate(padding.toFloat(), padding.toFloat(), 0f)
-                input.render(posX + padding, posY + padding)
-                GlStateManager.translate(-padding.toFloat(), -padding.toFloat(), 0f)
             }
         }
     }
