@@ -106,6 +106,10 @@ object MobFilter {
     private val listOfClickArmorStand = setOf(
         "§e§lCLICK",
         "§6§lSEASONAL SKINS",
+        "§e§lGATE KEEPER",
+        "§e§lBLACKSMITH",
+        "§e§lSHOP",
+        "§e§lTREASURES"
     )
 
     fun Entity.isSkyBlockMob(): Boolean = when {
