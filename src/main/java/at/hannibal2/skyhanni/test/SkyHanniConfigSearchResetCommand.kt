@@ -6,7 +6,6 @@ import at.hannibal2.skyhanni.config.Features
 import at.hannibal2.skyhanni.config.core.config.Position
 import at.hannibal2.skyhanni.data.ProfileStorageData
 import at.hannibal2.skyhanni.test.command.ErrorManager
-import at.hannibal2.skyhanni.test.command.ErrorManager.logErrorWithData
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.OSUtils
@@ -60,7 +59,10 @@ object SkyHanniConfigSearchResetCommand {
             field.set(parent, defaultObject)
             return "§eSuccessfully reset config element '$term'"
         } catch (e: Throwable) {
-            ErrorManager.logError(e, "Could not reset config element '$term'")
+            ErrorManager.logErrorWithData(
+                e, "Could not reset config element '$term'",
+                "args" to args.toList(),
+            )
             return "§cCould not reset config element '$term'"
         }
     }
@@ -71,7 +73,10 @@ object SkyHanniConfigSearchResetCommand {
         return try {
             startSearch(args)
         } catch (e: Exception) {
-            ErrorManager.logError(e, "Error while trying to search config")
+            ErrorManager.logErrorWithData(
+                e, "Error while trying to search config",
+                "args" to args.toList()
+            )
             "§cError while trying to search config"
         }
     }
@@ -111,7 +116,10 @@ object SkyHanniConfigSearchResetCommand {
             shimmy.setJson(element)
             "§eChanged config element $term to $rawJson."
         } catch (e: Exception) {
-            ErrorManager.logError(e, "Could not change config element '$term' to '$rawJson'")
+            ErrorManager.logErrorWithData(
+                e, "Could not change config element '$term' to '$rawJson'",
+                "args" to args.toList()
+            )
             "§cCould not change config element '$term' to '$rawJson'"
         }
     }
@@ -135,8 +143,14 @@ object SkyHanniConfigSearchResetCommand {
             setCommand(arrayOf("set", path, newValue))
 
         } catch (e: Exception) {
-            logErrorWithData(e, "Error while trying to toggle config")
-            "§cError while trying to toggle config"
+            ErrorManager.logErrorWithData(
+                e, "Error while trying to toggle config element",
+                "args" to args.toList(),
+                "path" to path,
+                "value1" to rawJson1,
+                "value2" to rawJson2,
+            )
+            "§cError while trying to toggle config element"
         }
     }
 
