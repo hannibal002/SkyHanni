@@ -74,7 +74,10 @@ class Mob(
     val hologram1 by hologram1Delegate
     val hologram2 by hologram2Delegate
 
-    val extraEntities: List<EntityLivingBase>? get() = extraEntitiesList
+    private val extraEntitiesList = additionalEntities?.toMutableList() ?: mutableListOf()
+    private var relativeBoundingBox: AxisAlignedBB?
+
+    val extraEntities: List<EntityLivingBase> = extraEntitiesList
 
     enum class Type {
         DisplayNPC, Summon, Basic, Dungeon, Boss, Slayer, Player, Projectile, Special;
@@ -85,12 +88,6 @@ class Mob(
         }
     }
 
-    override fun hashCode(): Int {
-        return baseEntity.hashCode()
-    }
-
-    override fun toString(): String = "$name - ${baseEntity.entityId}"
-
     val isCorrupted get() = baseEntity.isCorrupted() // Can change
     val isRunic = baseEntity.isRunic() // Does not Change
 
@@ -100,24 +97,14 @@ class Mob(
 
     fun isInvisible() = if (baseEntity !is EntityZombie) baseEntity.isInvisible else false
 
-    override fun equals(other: Any?): Boolean {
-        if (this === other) return true
-        if (javaClass != other?.javaClass) return false
-
-        other as Mob
-
-        return baseEntity == other.baseEntity
-    }
-
-    private var extraEntitiesList = additionalEntities?.toMutableList()
-    private var relativeBoundingBox: AxisAlignedBB?
     val boundingBox: AxisAlignedBB
         get() = relativeBoundingBox?.offset(baseEntity.posX, baseEntity.posY, baseEntity.posZ)
             ?: baseEntity.entityBoundingBox
 
     init {
         removeExtraEntitiesFromChecking()
-        relativeBoundingBox = makeRelativeBoundingBox()
+        relativeBoundingBox =
+            if (extraEntities.isNotEmpty()) makeRelativeBoundingBox() else null // Inlined updateBoundingBox()
 
         owner = (ownerName ?: if (mobType == Type.Slayer) hologram2?.let {
             summonOwnerPattern.matchMatcher(it.cleanName()) { this.group(1) }
@@ -125,35 +112,42 @@ class Mob(
     }
 
     private fun removeExtraEntitiesFromChecking() =
-        extraEntities?.count { MobData.retries[it.entityId] != null }?.also {
+        extraEntities.count { MobData.retries[it.entityId] != null }.also {
             MobData.externRemoveOfRetryAmount += it
         }
 
     fun updateBoundingBox() {
-        if (extraEntities?.isNotEmpty() == true) relativeBoundingBox = makeRelativeBoundingBox()
+        relativeBoundingBox = if (extraEntities.isNotEmpty()) makeRelativeBoundingBox() else null
     }
 
     private fun makeRelativeBoundingBox() =
-        (baseEntity.entityBoundingBox.union(extraEntities?.filter { it !is EntityArmorStand }
-            ?.mapNotNull { it.entityBoundingBox }))?.offset(-baseEntity.posX, -baseEntity.posY, -baseEntity.posZ)
+        (baseEntity.entityBoundingBox.union(extraEntities.filter { it !is EntityArmorStand }
+            .mapNotNull { it.entityBoundingBox }))?.offset(-baseEntity.posX, -baseEntity.posY, -baseEntity.posZ)
+
+    fun fullEntityList() =
+        baseEntity.toSingletonListOrEmpty() +
+            armorStand.toSingletonListOrEmpty() +
+            extraEntities
+
+    fun makeEntityToMobAssociation() =
+        fullEntityList().associateWith { this }
 
     internal fun internalAddEntity(entity: EntityLivingBase) {
         if (baseEntity.entityId > entity.entityId) {
-            extraEntitiesList?.add(0, baseEntity) ?: run { extraEntitiesList = mutableListOf(baseEntity) }
+            extraEntitiesList.add(0, baseEntity)
             baseEntity = entity
         } else {
-            extraEntitiesList?.apply { add(this.lastIndex + 1, entity) }
-                ?: run { extraEntitiesList = mutableListOf(entity) }
+            extraEntitiesList.add(extraEntitiesList.lastIndex + 1, entity)
         }
-        relativeBoundingBox = makeRelativeBoundingBox()
+        updateBoundingBox()
         MobData.entityToMob[entity] = this
     }
 
     internal fun internalAddEntity(entities: Collection<EntityLivingBase>) {
         val list = entities.drop(1).toMutableList().apply { add(baseEntity) }
-        extraEntitiesList?.addAll(0, list) ?: run { extraEntitiesList = list }
+        extraEntitiesList.addAll(0, list)
         baseEntity = entities.first()
-        relativeBoundingBox = makeRelativeBoundingBox()
+        updateBoundingBox()
         removeExtraEntitiesFromChecking()
         MobData.entityToMob.putAll(entities.associateWith { this })
     }
@@ -162,18 +156,22 @@ class Mob(
         baseEntity.entityId -> baseEntity = entity
         armorStand?.entityId ?: Int.MIN_VALUE -> armorStand = entity as EntityArmorStand
         else -> {
-            extraEntitiesList?.remove(entity)
-            extraEntitiesList?.add(entity)
+            extraEntitiesList.remove(entity)
+            extraEntitiesList.add(entity)
             Unit // To make return type of this branch Unit
         }
     }
 
-    fun fullEntityList() =
-        baseEntity.toSingletonListOrEmpty() +
-            armorStand.toSingletonListOrEmpty() +
-            (extraEntities ?: emptyList())
+    override fun hashCode() = baseEntity.hashCode()
 
-    fun makeEntityToMobAssociation() =
-        fullEntityList().associateWith { this }
+    override fun toString(): String = "$name - ${baseEntity.entityId}"
 
+    override fun equals(other: Any?): Boolean {
+        if (this === other) return true
+        if (javaClass != other?.javaClass) return false
+
+        other as Mob
+
+        return baseEntity == other.baseEntity
+    }
 }

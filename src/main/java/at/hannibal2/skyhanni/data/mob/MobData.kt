@@ -9,7 +9,7 @@ import java.util.TreeMap
 class MobData {
 
     class MobSet : HashSet<Mob>() {
-        val entityList get() = this.flatMap { listOf(it.baseEntity) + (it.extraEntities ?: emptyList()) }
+        val entityList get() = this.flatMap { listOf(it.baseEntity) + (it.extraEntities) }
     }
 
     companion object {

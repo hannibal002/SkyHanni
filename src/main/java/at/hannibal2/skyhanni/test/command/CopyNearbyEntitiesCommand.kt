@@ -236,9 +236,9 @@ object CopyNearbyEntitiesCommand {
         add("Type: ${mob.mobType}")
         add("Base Entity: ${mob.baseEntity.asString()}")
         add("Armorstand: ${mob.armorStand?.asString()}")
-        if (mob.extraEntities?.isNotEmpty() == true) {
+        if (mob.extraEntities.isNotEmpty()) {
             add("Extra Entities")
-            addAll(mob.extraEntities!!.map { "  " + it.asString() }) // smart cast not working
+            addAll(mob.extraEntities.map { "  " + it.asString() })
         }
         if (mob.hologram1Delegate.isInitialized()) {
             add("Hologram1: ${mob.hologram1?.asString()}")
