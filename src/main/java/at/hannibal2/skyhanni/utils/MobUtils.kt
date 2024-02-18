@@ -6,6 +6,7 @@ import at.hannibal2.skyhanni.utils.EntityUtils.cleanName
 import at.hannibal2.skyhanni.utils.LocationUtils.distanceTo
 import at.hannibal2.skyhanni.utils.LocationUtils.rayIntersects
 import net.minecraft.entity.Entity
+import net.minecraft.entity.EntityLivingBase
 import net.minecraft.entity.item.EntityArmorStand
 import net.minecraft.entity.player.EntityPlayer
 
@@ -73,5 +74,7 @@ object MobUtils {
         if (possibleEntities.isEmpty()) return null
         return possibleEntities.distinct().sortedBy { it.baseEntity.distanceTo(pos) }.drop(1) // drop to remove player
     }
+
+    val EntityLivingBase.mob get() = MobData.entityToMob[this]
 
 }
