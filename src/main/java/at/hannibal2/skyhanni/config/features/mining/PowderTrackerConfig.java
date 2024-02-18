@@ -54,7 +54,7 @@ public class PowderTrackerConfig {
         name = "Text Format",
         desc = "Drag text to change the appearance of the overlay."
     )
-    @ConfigEditorDraggableList()
+    @ConfigEditorDraggableList
     public Property<List<PowderDisplayEntry>> textFormat = Property.of(new ArrayList<>(Arrays.asList(
         TOTAL_CHESTS,
         DOUBLE_POWDER,
