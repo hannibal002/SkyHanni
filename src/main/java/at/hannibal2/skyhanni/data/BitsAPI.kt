@@ -105,7 +105,7 @@ object BitsAPI {
                 val amount = group("amount").formatNumber().toInt()
 
                 if (amount > bits) {
-                    bitsToClaim += amount - bits
+                    bitsToClaim -= amount - bits
                     ChatUtils.debug("You have gained §3${amount - bits} Bits §eaccording to the scoreboard!")
                 }
                 bits = amount
