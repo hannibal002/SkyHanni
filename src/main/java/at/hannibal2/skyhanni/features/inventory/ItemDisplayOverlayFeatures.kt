@@ -25,10 +25,12 @@ import at.hannibal2.skyhanni.events.RenderItemTipEvent
 import at.hannibal2.skyhanni.features.garden.pests.PestAPI
 import at.hannibal2.skyhanni.utils.ConfigUtils
 import at.hannibal2.skyhanni.utils.InventoryUtils
+import at.hannibal2.skyhanni.utils.ItemCategory
 import at.hannibal2.skyhanni.utils.ItemUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.cleanName
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalNameOrNull
+import at.hannibal2.skyhanni.utils.ItemUtils.getItemCategoryOrNull
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.ItemUtils.name
 import at.hannibal2.skyhanni.utils.LorenzUtils.between
@@ -39,6 +41,7 @@ import at.hannibal2.skyhanni.utils.NumberUtil.romanToDecimal
 import at.hannibal2.skyhanni.utils.NumberUtil.romanToDecimalIfNecessary
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getBottleOfJyrreSeconds
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getEdition
+import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getPetLevel
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getRanchersSpeed
 import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
@@ -120,15 +123,10 @@ object ItemDisplayOverlayFeatures {
         }
 
         if (PET_LEVEL.isSelected()) {
-            val containerName = InventoryUtils.openInventoryName()
-            if (!containerName.endsWith("Sea Creature Guide") && ItemUtils.isPet(itemName)) {
-                petLevelPattern.matchMatcher(itemName) {
-                    val rawLevel = group("level")
-                    val level = rawLevel.toIntOrNull()
-                        ?: throw IllegalStateException("pet level not found for item name '$itemName'")
-                    if (level != ItemUtils.maxPetLevel(itemName)) {
-                        return "$level"
-                    }
+            if (item.getItemCategoryOrNull() == ItemCategory.PET) {
+                val level = item.getPetLevel()
+                if (level != ItemUtils.maxPetLevel(itemName)) {
+                    return level.toString()
                 }
             }
         }
