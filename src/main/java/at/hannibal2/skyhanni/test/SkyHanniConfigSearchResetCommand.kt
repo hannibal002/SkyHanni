@@ -6,6 +6,7 @@ import at.hannibal2.skyhanni.config.Features
 import at.hannibal2.skyhanni.config.core.config.Position
 import at.hannibal2.skyhanni.data.ProfileStorageData
 import at.hannibal2.skyhanni.test.command.ErrorManager
+import at.hannibal2.skyhanni.test.command.ErrorManager.logErrorWithData
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils.makeAccessible
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
@@ -116,30 +117,25 @@ object SkyHanniConfigSearchResetCommand {
     }
 
     private suspend fun toggleCommand(args: Array<String>): String {
-        if (args.size < 2 || args.size == 3) return "§c/shconfig toggle <config name> [value 1] [value 2]"
+        if (args.size == 1 || args.size == 3) return "§c/shconfig toggle <config name> [value 1] [value 2]"
 
         val path = args[1]
-        val rawJson1 = if (args.size > 2)
-            if (args[2] == "clipboard") OSUtils.readFromClipboard() ?: return "§cClipboard has no string!" else args[2]
-        else "true"
-        val rawJson2 = if (args.size > 2)
-            if (args[3] == "clipboard") OSUtils.readFromClipboard() ?: return "§cClipboard has no string!" else args[3]
-        else "false"
+        val rawJson1 = if (args.size > 2) args[2] else "true"
+        val rawJson2 = if (args.size > 2) args[3] else "false"
 
         return try {
             val (argsFilter) = createFilter(true) { path.lowercase() }
-            val (classFilter) = createFilter(false) {path.lowercase()}
+            val (classFilter) = createFilter(false) { path.lowercase() }
 
-            val currentValue = findConfigElements(argsFilter, classFilter,true).toString()
+            val currentValue = findConfigElements(argsFilter, classFilter, true).toString()
             val newValue = when (currentValue) {
-                 "[$rawJson1]" -> rawJson2
-                 "[$rawJson2]" -> rawJson1
+                "[$rawJson1]" -> rawJson2
                 else -> rawJson1
             }
             setCommand(arrayOf("set", path, newValue))
 
         } catch (e: Exception) {
-            ErrorManager.logError(e, "Error while trying to toggle config")
+            logErrorWithData(e, "Error while trying to toggle config")
             "§cError while trying to toggle config"
         }
     }
@@ -216,7 +212,7 @@ object SkyHanniConfigSearchResetCommand {
                         objectName.startsWith("at.hannibal2.skyhanni.config.Storage"))
                 ) {
                     "<category>"
-                } else if (onlyValue){
+                } else if (onlyValue) {
                     objectName
                 } else {
                     "$className = $objectName"
