@@ -10,7 +10,7 @@ class Timer(
     @Expose
     private var started: SimpleTimeMark = SimpleTimeMark.now(),
 
-    startPaused: Boolean = false
+    startPaused: Boolean = false,
 ) : Comparable<Timer> {
 
     @Expose
@@ -39,5 +39,4 @@ class Timer(
     }
 
     override fun compareTo(other: Timer): Int = remaining.compareTo(other.remaining)
-
 }

@@ -17,9 +17,9 @@ public class VisitorConfig {
     public TimerConfig timer = new TimerConfig();
 
     @Expose
-    @ConfigOption(name = "Visitor Items Needed", desc = "")
+    @ConfigOption(name = "Visitor Shopping List", desc = "")
     @Accordion
-    public NeedsConfig needs = new NeedsConfig();
+    public ShoppingListConfig shoppingList = new ShoppingListConfig();
 
     @Expose
     @ConfigOption(name = "Visitor Inventory", desc = "")
@@ -120,7 +120,6 @@ public class VisitorConfig {
     @ConfigEditorBoolean
     @FeatureToggle
     public boolean highlightVisitors = false;
-
 
     @Expose
     @ConfigOption(

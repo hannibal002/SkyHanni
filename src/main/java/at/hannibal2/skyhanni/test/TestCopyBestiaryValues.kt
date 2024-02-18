@@ -3,15 +3,16 @@ package at.hannibal2.skyhanni.test
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.events.InventoryUpdatedEvent
+import at.hannibal2.skyhanni.utils.CollectionUtils.nextAfter
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.ItemUtils.getSkullOwner
 import at.hannibal2.skyhanni.utils.ItemUtils.getSkullTexture
 import at.hannibal2.skyhanni.utils.ItemUtils.name
-import at.hannibal2.skyhanni.utils.LorenzUtils.nextAfter
 import at.hannibal2.skyhanni.utils.NumberUtil.formatNumber
 import at.hannibal2.skyhanni.utils.OSUtils
 import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
+import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import com.google.gson.GsonBuilder
 import com.google.gson.annotations.Expose
 import net.minecraft.item.ItemStack
@@ -21,6 +22,7 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 object TestCopyBestiaryValues {
 
     class BestiarityObject {
+
         @Expose
         var name: String = ""
 
@@ -40,7 +42,10 @@ object TestCopyBestiaryValues {
         var bracket: Int = 0
     }
 
-    val pattern = "\\[Lv(?<lvl>.*)] (?<text>.*)".toPattern()
+    private val bestiaryTypePattern by RepoPattern.pattern(
+        "test.bestiary.type",
+        "\\[Lv(?<lvl>.*)] (?<text>.*)"
+    )
 
     @SubscribeEvent(priority = EventPriority.LOW)
     fun onLateInventoryOpen(event: InventoryUpdatedEvent) {
@@ -84,7 +89,7 @@ object TestCopyBestiaryValues {
         for (i in 10..43) {
             val stack = inventoryItems[i] ?: continue
             val stackName = stack.name ?: continue
-            pattern.matchMatcher(stackName.removeColor()) {
+            bestiaryTypePattern.matchMatcher(stackName.removeColor()) {
                 val lvl = group("lvl").toInt()
                 var text = group("text").lowercase().replace(" ", "_")
 

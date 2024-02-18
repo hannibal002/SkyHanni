@@ -1,5 +1,6 @@
 package at.hannibal2.skyhanni.data.jsonobjects.repo;
 
+import at.hannibal2.skyhanni.utils.NEUInternalName;
 import com.google.gson.annotations.Expose;
 
 import java.util.List;
@@ -26,7 +27,7 @@ public class CrimsonIsleReputationJson {
 
     public static class ReputationQuest {
         @Expose
-        public String item;
+        public NEUInternalName item;
 
         @Expose
         public List<Double> location;

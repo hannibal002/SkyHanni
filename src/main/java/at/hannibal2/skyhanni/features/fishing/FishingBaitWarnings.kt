@@ -6,6 +6,7 @@ import at.hannibal2.skyhanni.events.LorenzRenderWorldEvent
 import at.hannibal2.skyhanni.events.LorenzTickEvent
 import at.hannibal2.skyhanni.features.fishing.FishingAPI.isBait
 import at.hannibal2.skyhanni.utils.BlockUtils.getBlockAt
+import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.EntityUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.name
 import at.hannibal2.skyhanni.utils.LorenzUtils
@@ -19,6 +20,7 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import kotlin.time.Duration.Companion.seconds
 
 class FishingBaitWarnings {
+
     private val config get() = SkyHanniMod.feature.fishing.fishingBaitWarnings
     private var bobber: EntityFishHook? = null
     private var lastBait: String? = null
@@ -76,14 +78,14 @@ class FishingBaitWarnings {
     private fun showBaitChangeWarning(before: String, after: String) {
         SoundUtils.playClickSound()
         LorenzUtils.sendTitle("§eBait changed!", 2.seconds)
-        LorenzUtils.chat("Fishing Bait changed: $before -> $after")
+        ChatUtils.chat("Fishing Bait changed: $before -> $after")
     }
 
     private fun showNoBaitWarning() {
         SoundUtils.playErrorSound()
         LorenzUtils.sendTitle("§cNo bait is used!", 2.seconds)
-        LorenzUtils.chat("You do not use any fishing baits!")
+        ChatUtils.chat("You do not use any fishing baits!")
     }
 
-    private fun isEnabled() = LorenzUtils.inSkyBlock && FishingAPI.hasFishingRodInHand()
+    private fun isEnabled() = LorenzUtils.inSkyBlock && FishingAPI.isFishing() && !LorenzUtils.inKuudraFight
 }

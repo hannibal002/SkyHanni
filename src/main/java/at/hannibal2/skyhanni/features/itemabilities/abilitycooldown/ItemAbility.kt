@@ -18,7 +18,7 @@ enum class ItemAbility(
     val actionBarDetection: Boolean = true,
     private val ignoreMageCooldownReduction: Boolean = false,
 ) {
-    //TODO add into repo
+    // TODO add into repo
 
     HYPERION(5, "SCYLLA", "VALKYRIE", "ASTRAEA", ignoreMageCooldownReduction = true),
     GYROKINETIC_WAND_LEFT(30, "GYROKINETIC_WAND", alternativePosition = true),
@@ -52,7 +52,8 @@ enum class ItemAbility(
     LIVID_DAGGER("Throw", 5, "Livid Dagger"),
     FIRE_VEIL("Fire Veil", 5, "Fire Veil Wand"),
     INK_WAND("Ink Bomb", 30, "Ink Wand"),
-    ROUGE_SWORD("Speed Boost", 30, "Rogue Sword"),
+    ROGUE_SWORD("Speed Boost", 30, "Rogue Sword", ignoreMageCooldownReduction = true),
+    TALBOTS_THEODOLITE("Track", 10, "Talbot's Theodolite"),
 
     // doesn't have a consistent sound
     ECHO("Echo", 3, "Ancestral Spade");
@@ -114,6 +115,7 @@ enum class ItemAbility(
     }
 
     companion object {
+
         fun getByInternalName(internalName: NEUInternalName): ItemAbility? {
             return entries.firstOrNull { it.newVariant && internalName in it.internalNames }
         }
@@ -140,5 +142,4 @@ enum class ItemAbility(
             return abilityCooldownMultiplier
         }
     }
-
 }

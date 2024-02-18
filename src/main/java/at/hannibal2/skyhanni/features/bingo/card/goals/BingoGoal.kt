@@ -3,6 +3,7 @@ package at.hannibal2.skyhanni.features.bingo.card.goals
 import com.google.gson.annotations.Expose
 
 class BingoGoal {
+
     @Expose
     lateinit var type: GoalType
 
@@ -11,6 +12,9 @@ class BingoGoal {
 
     @Expose
     var description = ""
+
+    @Expose
+    var guide = emptyList<String>()
 
     @Expose
     var done = false

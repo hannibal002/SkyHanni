@@ -17,7 +17,7 @@ object GriffinUtils {
         beacon: Boolean = false,
         extraSize: Double = 0.0,
         extraSizeTopY: Double = extraSize,
-        extraSizeBottomY: Double = extraSize
+        extraSizeBottomY: Double = extraSize,
     ) {
         val (viewerX, viewerY, viewerZ) = RenderUtils.getViewerPos(partialTicks)
         val x = location.x - viewerX

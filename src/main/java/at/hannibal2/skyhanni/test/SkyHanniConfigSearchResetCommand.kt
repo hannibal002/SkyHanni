@@ -7,10 +7,10 @@ import at.hannibal2.skyhanni.config.core.config.Position
 import at.hannibal2.skyhanni.data.ProfileStorageData
 import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.test.command.ErrorManager.logErrorWithData
-import at.hannibal2.skyhanni.utils.LorenzUtils
-import at.hannibal2.skyhanni.utils.LorenzUtils.makeAccessible
+import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.OSUtils
+import at.hannibal2.skyhanni.utils.ReflectionUtils.makeAccessible
 import com.google.gson.JsonElement
 import io.github.moulberry.notenoughupdates.util.Shimmy
 import kotlinx.coroutines.launch
@@ -24,7 +24,7 @@ object SkyHanniConfigSearchResetCommand {
 
     fun command(args: Array<String>) {
         SkyHanniMod.coroutineScope.launch {
-            LorenzUtils.chat(runCommand(args), false)
+            ChatUtils.chat(runCommand(args), false)
         }
         lastCommand = args
     }

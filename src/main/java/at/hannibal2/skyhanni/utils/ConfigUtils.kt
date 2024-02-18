@@ -39,7 +39,7 @@ object ConfigUtils {
      */
     private fun <T> getEnumConstantFromLegacyId(
         legacyId: Int,
-        enumClass: Class<T>
+        enumClass: Class<T>,
     ): T? where T : Enum<T>, T : HasLegacyId = enumClass.getEnumConstants().firstOrNull { it.legacyId == legacyId }
 
     /**

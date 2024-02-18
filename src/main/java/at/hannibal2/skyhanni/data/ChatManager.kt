@@ -9,13 +9,16 @@ import at.hannibal2.skyhanni.features.chat.ChatFilterGui
 import at.hannibal2.skyhanni.utils.IdentityCharacteristics
 import at.hannibal2.skyhanni.utils.LorenzLogger
 import at.hannibal2.skyhanni.utils.LorenzUtils
-import at.hannibal2.skyhanni.utils.LorenzUtils.makeAccessible
+import at.hannibal2.skyhanni.utils.ReflectionUtils.getClassInstance
+import at.hannibal2.skyhanni.utils.ReflectionUtils.getModContainer
+import at.hannibal2.skyhanni.utils.ReflectionUtils.makeAccessible
 import net.minecraft.client.Minecraft
 import net.minecraft.client.gui.ChatLine
 import net.minecraft.client.gui.GuiNewChat
 import net.minecraft.event.HoverEvent
 import net.minecraft.network.play.client.C01PacketChatMessage
 import net.minecraft.network.play.server.S02PacketChat
+import net.minecraft.util.ChatComponentText
 import net.minecraft.util.EnumChatFormatting
 import net.minecraft.util.IChatComponent
 import net.minecraftforge.client.event.ClientChatReceivedEvent
@@ -45,11 +48,14 @@ object ChatManager {
         RETRACTED(EnumChatFormatting.DARK_PURPLE.toString() + EnumChatFormatting.BOLD),
         MODIFIED(EnumChatFormatting.YELLOW.toString() + EnumChatFormatting.BOLD),
         ALLOWED(EnumChatFormatting.GREEN),
+        OUTGOING(EnumChatFormatting.BLUE),
+        OUTGOING_BLOCKED(EnumChatFormatting.BLUE.toString() + EnumChatFormatting.BOLD),
         ;
 
         val renderedString = "$format$name"
 
         companion object {
+
             val maxLength by lazy {
                 entries.maxOf { Minecraft.getMinecraft().fontRendererObj.getStringWidth(it.renderedString) }
             }
@@ -60,7 +66,9 @@ object ChatManager {
         val message: IChatComponent,
         var actionKind: ActionKind,
         var actionReason: String?,
-        val modified: IChatComponent?
+        val modified: IChatComponent?,
+        val hoverInfo: List<String> = listOf(),
+        val hoverExtraInfo: List<String> = listOf(),
     )
 
     @SubscribeEvent(priority = EventPriority.LOW, receiveCanceled = true)
@@ -73,7 +81,6 @@ object ChatManager {
             val actionBarEvent = LorenzActionBarEvent(message)
             actionBarEvent.postAndCatch()
         }
-
     }
 
     @SubscribeEvent
@@ -81,7 +88,30 @@ object ChatManager {
         val packet = event.packet as? C01PacketChatMessage ?: return
 
         val message = packet.message
-        event.isCanceled = MessageSendToServerEvent(message).postAndCatch()
+        val component = ChatComponentText(message)
+        val originatingModCall = event.findOriginatingModCall()
+        val originatingModContainer = originatingModCall?.getClassInstance()?.getModContainer()
+        val hoverInfo = listOf(
+            "§7Message created by §a${originatingModCall?.toString() ?: "§cprobably minecraft"}",
+            "§7Mod id: §a${originatingModContainer?.modId}",
+            "§7Mod name: §a${originatingModContainer?.name}"
+        )
+        val stackTrace =
+            Thread.currentThread().stackTrace.map {
+                "§7  §2${it.className}§7.§a${it.methodName}§7" +
+                    if (it.fileName == null) "" else "(§b${it.fileName}§7:§3${it.lineNumber}§7)"
+            }
+        val result = MessageFilteringResult(
+            component, ActionKind.OUTGOING, null, null,
+            hoverInfo = hoverInfo,
+            hoverExtraInfo = hoverInfo + listOf("") + stackTrace
+        )
+
+        messageHistory[IdentityCharacteristics(component)] = result
+        if (MessageSendToServerEvent(message).postAndCatch()) {
+            event.isCanceled = true
+            messageHistory[IdentityCharacteristics(component)] = result.copy(actionKind = ActionKind.OUTGOING_BLOCKED)
+        }
     }
 
     @SubscribeEvent(receiveCanceled = true)
@@ -120,6 +150,14 @@ object ChatManager {
             messageHistory[key] = MessageFilteringResult(original, ActionKind.MODIFIED, null, modified)
         } else {
             messageHistory[key] = MessageFilteringResult(original, ActionKind.ALLOWED, null, null)
+        }
+
+        // TODO: Handle this with ChatManager.retractMessage or some other way for logging and /shchathistory purposes?
+        if (chatEvent.chatLineId != 0) {
+            event.isCanceled = true
+            Minecraft.getMinecraft().ingameGUI.chatGUI.printChatMessageWithOptionalDeletion(
+                event.message, chatEvent.chatLineId
+            )
         }
     }
 

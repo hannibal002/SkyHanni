@@ -11,13 +11,23 @@ import at.hannibal2.skyhanni.utils.NumberUtil.formatNumber
 import at.hannibal2.skyhanni.utils.NumberUtil.romanToDecimal
 import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
+import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
 class SkillExperience {
-    // TODO USE SH-REPO
-    private val actionBarPattern = ".*§3\\+.* (?<skill>.*) \\((?<overflow>.*)/(?<needed>.*)\\).*".toPattern()
-    private val inventoryPattern = ".* §e(?<number>.*)§6/.*".toPattern()
-    private val actionBarLowLevelPattern = ".*§3+(?<add>.+) (?<skill>.*) \\((?<percentage>.*)%\\).*".toPattern()
+    private val patternGroup = RepoPattern.group("data.skill")
+    private val actionBarPattern by patternGroup.pattern(
+        "actionbar",
+        ".*§3\\+.* (?<skill>.*) \\((?<overflow>.*)/(?<needed>.*)\\).*"
+    )
+    private val inventoryPattern by patternGroup.pattern(
+        "inventory",
+        ".* §e(?<number>.*)§6/.*"
+    )
+    private val actionBarLowLevelPattern by patternGroup.pattern(
+        "actionbarlow",
+        ".*§3+(?<add>.+) (?<skill>.*) \\((?<percentage>.*)%\\).*"
+    )
 
     @SubscribeEvent
     fun onProfileJoin(event: ProfileJoinEvent) {
@@ -79,6 +89,7 @@ class SkillExperience {
     }
 
     companion object {
+
         private val skillExp = mutableMapOf<String, Long>()
 
         private fun getLevelForExpExactly(experience: Long): Int {
@@ -109,7 +120,7 @@ class SkillExperience {
             return 0
         }
 
-        //TODO create additional event
+        // TODO create additional event
         fun getExpForSkill(skillName: String) = skillExp[skillName.lowercase()] ?: 0
 
         private val levelingExp = listOf(

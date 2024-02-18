@@ -4,10 +4,12 @@ import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.data.jsonobjects.repo.SacksJson
 import at.hannibal2.skyhanni.events.MessageSendToServerEvent
 import at.hannibal2.skyhanni.events.RepositoryReloadEvent
+import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
 object GetFromSacksTabComplete {
+
     private val config get() = SkyHanniMod.feature.commands.tabComplete
     private var sackList = emptyList<String>()
     private val commands = arrayOf("gfs", "getfromsacks")
@@ -36,7 +38,7 @@ object GetFromSacksTabComplete {
         if (realName == rawName) return
         if (realName !in sackList) return
         event.isCanceled = true
-        LorenzUtils.sendMessageToServer(message.replace(rawName, realName))
+        ChatUtils.sendMessageToServer(message.replace(rawName, realName))
     }
 
     fun isEnabled() = LorenzUtils.inSkyBlock && config.gfsSack
