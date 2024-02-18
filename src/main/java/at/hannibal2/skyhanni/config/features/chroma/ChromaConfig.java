@@ -41,7 +41,7 @@ public class ChromaConfig {
 
     @Expose
     @ConfigOption(name = "Chroma Direction", desc = "Change the slant and direction of the chroma.")
-    @ConfigEditorDropdown()
+    @ConfigEditorDropdown
     public Direction chromaDirection = Direction.FORWARD_RIGHT;
 
     public enum Direction implements HasLegacyId {

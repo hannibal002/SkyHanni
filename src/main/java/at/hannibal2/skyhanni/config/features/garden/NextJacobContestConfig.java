@@ -38,7 +38,7 @@ public class NextJacobContestConfig {
 
     @Expose
     @ConfigOption(name = "Share Contests", desc = "Share the list of upcoming Contests to elitebot.dev for everyone else to then fetch automatically.")
-    @ConfigEditorDropdown()
+    @ConfigEditorDropdown
     public ShareContestsEntry shareAutomatically = ShareContestsEntry.ASK;
 
     public enum ShareContestsEntry implements HasLegacyId {
