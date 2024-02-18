@@ -129,4 +129,11 @@ object CollectionUtils {
             }
         }
     }
+
+    /** Updates a value if it is present in the set (equals), useful if the newValue is not reference equal with the value in the set */
+    inline fun <reified T> MutableSet<T>.refreshReference(newValue: T) = if (this.contains(newValue)) {
+        this.remove(newValue)
+        this.add(newValue)
+        true
+    } else false
 }

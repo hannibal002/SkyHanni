@@ -4,7 +4,7 @@ import at.hannibal2.skyhanni.events.MobEvent
 import net.minecraft.entity.EntityLivingBase
 import net.minecraft.entity.item.EntityArmorStand
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
-import java.util.TreeSet
+import java.util.TreeMap
 
 class MobData {
 
@@ -26,7 +26,7 @@ class MobData {
         internal val currentEntityLiving = mutableSetOf<EntityLivingBase>()
         internal val previousEntityLiving = mutableSetOf<EntityLivingBase>()
 
-        internal val retries = TreeSet<RetryEntityInstancing>()
+        internal val retries = TreeMap<Int, RetryEntityInstancing>()
 
         const val ENTITY_RENDER_RANGE_IN_BLOCKS = 80.0 // Entity DeRender after ~5 Chunks
         const val DETECTION_RANGE = 22.0
@@ -56,14 +56,14 @@ class MobData {
         }
     }
 
-    internal class RetryEntityInstancing(var entity: EntityLivingBase, var times: Int, val roughType: Mob.Type) :
-        Comparable<RetryEntityInstancing> {
-
-        constructor(entity: EntityLivingBase) : this(entity, 0, Mob.Type.Special) // Only use this for compare
-
-        override fun hashCode() = entity.hashCode()
-        override fun compareTo(other: RetryEntityInstancing) = this.hashCode() - other.hashCode()
-        override fun equals(other: Any?) = (other as? EntityLivingBase) == entity
+    class RetryEntityInstancing(
+        var entity: EntityLivingBase,
+        var times: Int,
+        val roughType: Mob.Type
+    ) {
+        override fun hashCode() = entity.entityId
+        override fun equals(other: Any?) = (other as? RetryEntityInstancing).hashCode() == this.hashCode()
+        fun toKeyValuePair() = entity.entityId to this
     }
 
     @SubscribeEvent
@@ -74,8 +74,7 @@ class MobData {
 
     @SubscribeEvent
     fun onMobEventDeSpawn(event: MobEvent.DeSpawn) {
-        entityToMob.remove(event.mob.baseEntity)
-        event.mob.extraEntities?.forEach { entityToMob.remove(it) }
+        event.mob.fullEntityList().forEach { entityToMob.remove(it) }
         currentMobs.remove(event.mob)
     }
 

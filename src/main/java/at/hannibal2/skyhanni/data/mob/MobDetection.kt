@@ -11,6 +11,8 @@ import at.hannibal2.skyhanni.events.LorenzTickEvent
 import at.hannibal2.skyhanni.events.MobEvent
 import at.hannibal2.skyhanni.events.PacketEvent
 import at.hannibal2.skyhanni.utils.CollectionUtils.drainForEach
+import at.hannibal2.skyhanni.utils.CollectionUtils.put
+import at.hannibal2.skyhanni.utils.CollectionUtils.refreshReference
 import at.hannibal2.skyhanni.utils.EntityUtils
 import at.hannibal2.skyhanni.utils.LocationUtils
 import at.hannibal2.skyhanni.utils.LorenzDebug
@@ -124,10 +126,13 @@ class MobDetection {
     }
 
     private fun addRetry(entity: EntityLivingBase) = entity.getRoughType()?.let { type ->
-        MobData.retries.add(MobData.RetryEntityInstancing(entity, 0, type))
+        val re = MobData.RetryEntityInstancing(entity, 0, type)
+        MobData.retries.put(re.toKeyValuePair())
     }
 
-    private fun removeRetry(entity: EntityLivingBase) = MobData.retries.remove(MobData.RetryEntityInstancing(entity))
+    private fun removeRetry(entity: EntityLivingBase) = MobData.retries.remove(entity.entityId)
+
+    private fun getRetry(entity: EntityLivingBase) = MobData.retries[entity.entityId]
 
     /** @return always true */
     private fun mobDetectionError(string: String) = LorenzDebug.log(MOB_DETECTION_LOG_PREFIX + string).let { true }
@@ -182,7 +187,7 @@ class MobDetection {
             EntityPacketType.SPIRIT_BAT -> {
                 val entity = EntityUtils.getEntityByID(id) as? EntityBat ?: return@drainForEach
                 if (MobData.entityToMob[entity] != null) return@drainForEach
-                MobData.retries.remove(MobData.RetryEntityInstancing(entity))
+                removeRetry(entity)
                 MobEvent.Spawn.Projectile(MobFactories.projectile(entity, "Spirit Scepter Bat")).postAndCatch()
             }
 
@@ -194,10 +199,9 @@ class MobDetection {
                     addRetry(entity)
                     return@drainForEach
                 }
-                val retryInstance = MobData.RetryEntityInstancing(entity)
-                MobData.retries.find { it == retryInstance }?.let {
+                getRetry(entity)?.let {
                     if (it.roughType == Mob.Type.DisplayNPC) {
-                        MobData.retries.remove(retryInstance)
+                        removeRetry(entity)
                         addRetry(entity)
                     }
                 }
@@ -207,7 +211,7 @@ class MobDetection {
                 val entity = EntityUtils.getEntityByID(id) as? EntityCreeper ?: return@drainForEach
                 if (MobData.entityToMob[entity] != null) return@drainForEach
                 if (!entity.powered) return@drainForEach
-                MobData.retries.remove(MobData.RetryEntityInstancing(entity))
+                removeRetry(entity)
                 MobEvent.Spawn.Special(MobFactories.special(entity, "Creeper Veil")).postAndCatch()
             }
         }
@@ -253,7 +257,7 @@ class MobDetection {
     private fun handleRetries() {
         val iterator = MobData.retries.iterator()
         while (iterator.hasNext()) {
-            val retry = iterator.next()
+            val (_, retry) = iterator.next()
             if (MobData.externRemoveOfRetryAmount > 0) {
                 iterator.remove()
                 MobData.externRemoveOfRetryAmount--
@@ -307,11 +311,9 @@ class MobDetection {
 
     private fun handleEntityUpdate(entityID: Int): Boolean {
         val entity = EntityUtils.getEntityByID(entityID) as? EntityLivingBase ?: return false
-        MobData.retries.firstOrNull { it.hashCode() == entity.hashCode() }?.apply { this.entity = entity }
-        if (MobData.currentEntityLiving.contains(entity)) {
-            MobData.currentEntityLiving.remove(entity)
-            MobData.currentEntityLiving.add(entity)
-        }
+        getRetry(entity)?.apply { this.entity = entity }
+        MobData.currentEntityLiving.refreshReference(entity)
+        MobData.previousEntityLiving.refreshReference(entity)
         // update map
         MobData.entityToMob[entity]?.internalUpdateOfEntity(entity)
         return true

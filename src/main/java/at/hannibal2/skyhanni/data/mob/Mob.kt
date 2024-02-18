@@ -125,7 +125,7 @@ class Mob(
     }
 
     private fun removeExtraEntitiesFromChecking() =
-        extraEntities?.count { MobData.retries.contains(MobData.RetryEntityInstancing(it)) }?.also {
+        extraEntities?.count { MobData.retries[it.entityId] != null }?.also {
             MobData.externRemoveOfRetryAmount += it
         }
 
@@ -168,8 +168,12 @@ class Mob(
         }
     }
 
+    fun fullEntityList() =
+        baseEntity.toSingletonListOrEmpty() +
+            armorStand.toSingletonListOrEmpty() +
+            (extraEntities ?: emptyList())
+
     fun makeEntityToMobAssociation() =
-        (baseEntity.toSingletonListOrEmpty() + armorStand.toSingletonListOrEmpty() + (extraEntities
-            ?: emptyList())).associateWith { this }
+        fullEntityList().associateWith { this }
 
 }
