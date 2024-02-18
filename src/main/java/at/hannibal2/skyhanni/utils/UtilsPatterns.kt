@@ -43,7 +43,7 @@ object UtilsPatterns {
     )
     val petLevelPattern by patternGroup.pattern(
         "item.petlevel",
-        "(?:§f§f)?§7\\[Lvl (?<level>\\d+)] .*"
+        "(?:§f§f)?(?:§7)?\\[Lvl (?<level>\\d+)] .*"
     )
     val readAmountBeforePattern by patternGroup.pattern(
         "item.amount.front",

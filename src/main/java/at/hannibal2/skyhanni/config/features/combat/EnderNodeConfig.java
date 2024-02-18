@@ -46,7 +46,7 @@ public class EnderNodeConfig {
         name = "Text Format",
         desc = "Drag text to change the appearance of the overlay."
     )
-    @ConfigEditorDraggableList()
+    @ConfigEditorDraggableList
     public Property<List<EnderNodeDisplayEntry>> textFormat = Property.of(new ArrayList<>(Arrays.asList(
         TITLE,
         NODES_MINED,
