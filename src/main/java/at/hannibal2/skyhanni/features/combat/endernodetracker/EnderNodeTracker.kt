@@ -183,9 +183,10 @@ object EnderNodeTracker {
         return newProfit
     }
 
-    private fun isEnabled() =
-        LorenzUtils.inSkyBlock && IslandType.THE_END.isInIsland() && config.enabled &&
-            (!config.onlyPickaxe || ItemCategory.miningTools.containsItem(InventoryUtils.getItemInHand()))
+    private fun isEnabled() = IslandType.THE_END.isInIsland() && config.enabled &&
+        (!config.onlyPickaxe || hasItemInHand())
+
+    private fun hasItemInHand() = ItemCategory.miningTools.containsItem(InventoryUtils.getItemInHand())
 
     private fun isEnderArmor(displayName: EnderNode) = when (displayName) {
         EnderNode.END_HELMET,
