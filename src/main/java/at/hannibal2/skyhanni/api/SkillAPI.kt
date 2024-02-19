@@ -115,7 +115,7 @@ object SkillAPI {
         for (stack in event.inventoryItems.values) {
             val lore = stack.getLore()
             if (inventoryName == "Your Skills" &&
-                lore.any { it.contains("Click to view!") }
+               lore.any { it.contains("Click to view!") || it.contains("Not unlocked!") }
             ) {
                 val cleanName = stack.cleanName()
                 val split = cleanName.split(" ")
