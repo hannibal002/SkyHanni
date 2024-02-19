@@ -38,8 +38,6 @@ enum class ActionBarStatsData(@Language("RegExp") rawPattern: String) {
         private set
 
     companion object {
-        var actionBar: String = ""
-            private set
 
         init {
             entries.forEach { it.pattern }
@@ -48,7 +46,6 @@ enum class ActionBarStatsData(@Language("RegExp") rawPattern: String) {
         @SubscribeEvent
         fun onActionBarUpdate(event: ActionBarUpdateEvent) {
             if (!LorenzUtils.inSkyBlock) return
-            actionBar = event.message
 
             entries.mapNotNull { data ->
                 data.pattern.matchMatcher(event.actionBar) {
