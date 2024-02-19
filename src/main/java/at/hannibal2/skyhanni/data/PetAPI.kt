@@ -19,6 +19,15 @@ object PetAPI {
         "(§f§f)?§7\\[Lvl 1➡(100|200)] (?<name>.*)"
     )
 
+    private val ignoredPetStrings = listOf(
+        "Archer",
+        "Berserk",
+        "Mage",
+        "Tank",
+        "Healer",
+        "➡",
+    )
+
     fun isPetMenu(inventoryTitle: String): Boolean = petMenuPattern.matches(inventoryTitle)
 
     // Contains color code + name and for older SkyHanni users maybe also the pet level
@@ -40,4 +49,10 @@ object PetAPI {
 
         return null
     }
+
+    fun getPetLevel(nameWithLevel: String): Int? = petItemName.matchMatcher(nameWithLevel) {
+         group("name").toInt()
+    }
+
+    fun hasPetName(name: String): Boolean = petItemName.matches(name) && !ignoredPetStrings.any { name.contains(it) }
 }
