@@ -18,6 +18,7 @@ import java.time.OffsetDateTime
 import java.time.ZoneOffset
 
 object BingoAPI {
+
     private var ranks = mapOf<String, Int>()
     private var data: Map<String, BingoJson.BingoData> = emptyMap()
 
@@ -26,7 +27,10 @@ object BingoAPI {
     val communityGoals get() = bingoGoals.values.filter { it.type == GoalType.COMMUNITY }
     var lastBingoCardOpenTime = SimpleTimeMark.farPast()
 
-    private val detectionPattern by RepoPattern.pattern("bingo.detection.scoreboard", " §.Ⓑ §.Bingo")
+    private val detectionPattern by RepoPattern.pattern(
+        "bingo.detection.scoreboard",
+        " §.Ⓑ §.Bingo"
+    )
 
     @SubscribeEvent
     fun onRepoReload(event: RepositoryReloadEvent) {

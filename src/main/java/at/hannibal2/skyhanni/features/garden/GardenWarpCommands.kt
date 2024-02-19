@@ -3,19 +3,25 @@ package at.hannibal2.skyhanni.features.garden
 import at.hannibal2.skyhanni.events.LorenzKeyPressEvent
 import at.hannibal2.skyhanni.events.MessageSendToServerEvent
 import at.hannibal2.skyhanni.features.misc.LockMouseLook
+import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.NEUItems
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
+import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraft.client.Minecraft
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import kotlin.time.Duration.Companion.seconds
 
 class GardenWarpCommands {
+
     private val config get() = GardenAPI.config.gardenCommands
 
-    // TODO repo
-    private val tpPlotPattern = "/tp (?<plot>.*)".toPattern()
+    private val tpPlotPattern by RepoPattern.pattern(
+        "garden.warpcommand.tpplot",
+        "/tp (?<plot>.*)"
+    )
+
     private var lastWarpTime = SimpleTimeMark.farPast()
 
     @SubscribeEvent
@@ -28,7 +34,7 @@ class GardenWarpCommands {
         if (message == "/home") {
             event.isCanceled = true
             LorenzUtils.sendCommandToServer("warp garden")
-            LorenzUtils.chat("§aTeleported you to the spawn location!", prefix = false)
+            ChatUtils.chat("§aTeleported you to the spawn location!", prefix = false)
         }
 
         if (message == "/barn") {

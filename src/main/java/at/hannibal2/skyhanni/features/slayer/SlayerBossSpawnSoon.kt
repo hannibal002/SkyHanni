@@ -8,13 +8,19 @@ import at.hannibal2.skyhanni.utils.NumberUtil.formatNumber
 import at.hannibal2.skyhanni.utils.SoundUtils
 import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
+import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import kotlin.time.Duration.Companion.seconds
 
 class SlayerBossSpawnSoon {
 
     private val config get() = SkyHanniMod.feature.slayer.slayerBossWarning
-    private val pattern = " \\(?(?<progress>[0-9.,k]+)/(?<total>[0-9.,k]+)\\)?.*".toPattern()
+
+    private val progressPattern by RepoPattern.pattern(
+        "slayer.bosswarning.progress",
+        " \\(?(?<progress>[0-9.,k]+)/(?<total>[0-9.,k]+)\\)?.*"
+    )
+
     private var lastCompletion = 0f
     private var warned = false
 
@@ -23,7 +29,7 @@ class SlayerBossSpawnSoon {
         if (!isEnabled()) return
         if (!SlayerAPI.isInCorrectArea) return
 
-        val completion = pattern.matchMatcher(event.newProgress.removeColor()) {
+        val completion = progressPattern.matchMatcher(event.newProgress.removeColor()) {
             group("progress").formatNumber().toFloat() / group("total").formatNumber().toFloat()
         } ?: return
 

@@ -11,13 +11,13 @@ import at.hannibal2.skyhanni.events.LorenzTickEvent
 import at.hannibal2.skyhanni.events.LorenzToolTipEvent
 import at.hannibal2.skyhanni.features.rift.RiftAPI
 import at.hannibal2.skyhanni.features.rift.RiftAPI.motesNpcPrice
+import at.hannibal2.skyhanni.utils.ChatUtils.chat
+import at.hannibal2.skyhanni.utils.CollectionUtils.addAsSingletonList
 import at.hannibal2.skyhanni.utils.ConfigUtils
 import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName
 import at.hannibal2.skyhanni.utils.LorenzColor
-import at.hannibal2.skyhanni.utils.LorenzUtils.addAsSingletonList
 import at.hannibal2.skyhanni.utils.LorenzUtils.addSelector
-import at.hannibal2.skyhanni.utils.LorenzUtils.chat
 import at.hannibal2.skyhanni.utils.NEUInternalName
 import at.hannibal2.skyhanni.utils.NEUItems.getItemStack
 import at.hannibal2.skyhanni.utils.NumberUtil
@@ -26,14 +26,18 @@ import at.hannibal2.skyhanni.utils.RenderUtils.highlight
 import at.hannibal2.skyhanni.utils.RenderUtils.renderStringsAndItems
 import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.renderables.Renderable
+import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraftforge.fml.common.eventhandler.EventPriority
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
 class ShowMotesNpcSellPrice {
+
     private val config get() = RiftAPI.config.motes
 
-    // TODO USE SH-REPO
-    private val pattern = ".*(?:§\\w)+You have (?:§\\w)+(?<amount>\\d) Grubber Stacks.*".toPattern()
+    private val burgerPattern by RepoPattern.pattern(
+        "rift.everywhere.burger",
+        ".*(?:§\\w)+You have (?:§\\w)+(?<amount>\\d) Grubber Stacks.*"
+    )
 
     private var display = emptyList<List<Any>>()
     private val itemMap = mutableMapOf<NEUInternalName, Pair<MutableList<Int>, Double>>()
@@ -131,7 +135,7 @@ class ShowMotesNpcSellPrice {
     @SubscribeEvent
     fun onChat(event: LorenzChatEvent) {
         if (!RiftAPI.inRift()) return
-        pattern.matchMatcher(event.message) {
+        burgerPattern.matchMatcher(event.message) {
             config.burgerStacks = group("amount").toInt()
             chat("Set your McGrubber's burger stacks to ${group("amount")}.")
         }

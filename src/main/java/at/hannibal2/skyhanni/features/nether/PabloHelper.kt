@@ -3,9 +3,9 @@ package at.hannibal2.skyhanni.features.nether
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.events.LorenzChatEvent
+import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.name
-import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils.isInIsland
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.StringUtils.matchMatchers
@@ -15,6 +15,7 @@ import kotlin.time.Duration.Companion.minutes
 
 // https://wiki.hypixel.net/Pablo
 class PabloHelper {
+
     private val config get() = SkyHanniMod.feature.crimsonIsle
 
     private val patterns = listOf(
@@ -33,7 +34,7 @@ class PabloHelper {
 
         if (InventoryUtils.countItemsInLowerInventory { it.name?.contains(itemName) == true } > 0) return
 
-        LorenzUtils.clickableChat("Click here to grab an $itemName from sacks!", "gfs $itemName 1")
+        ChatUtils.clickableChat("Click here to grab an $itemName from sacks!", "gfs $itemName 1")
         lastSentMessage = SimpleTimeMark.now()
     }
 

@@ -15,6 +15,7 @@ import net.minecraft.entity.EntityLivingBase
 import kotlin.time.Duration.Companion.seconds
 
 object TrevorSolver {
+
     private val animalHealths = intArrayOf(100, 200, 500, 1000, 2000, 5000, 10000, 30000)
 
     var currentMob: TrevorMobs? = null

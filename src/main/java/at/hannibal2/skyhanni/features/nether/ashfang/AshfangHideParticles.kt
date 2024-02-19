@@ -14,6 +14,7 @@ import net.minecraftforge.fml.common.eventhandler.EventPriority
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
 class AshfangHideParticles {
+
     private var nearAshfang = false
 
     @SubscribeEvent

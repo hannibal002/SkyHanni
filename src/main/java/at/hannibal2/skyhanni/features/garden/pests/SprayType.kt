@@ -9,6 +9,7 @@ enum class SprayType(val displayName: String) {
     ;
 
     companion object {
-        fun getByName(name: String) = entries.firstOrNull {it.displayName == name}
+
+        fun getByName(name: String) = entries.firstOrNull { it.displayName == name }
     }
 }

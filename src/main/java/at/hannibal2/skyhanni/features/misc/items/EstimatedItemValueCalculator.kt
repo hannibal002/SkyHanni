@@ -2,15 +2,16 @@ package at.hannibal2.skyhanni.features.misc.items
 
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.test.command.ErrorManager
+import at.hannibal2.skyhanni.utils.CollectionUtils.sortedDesc
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName
-import at.hannibal2.skyhanni.utils.ItemUtils.getItemName
 import at.hannibal2.skyhanni.utils.ItemUtils.getItemRarityOrNull
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.ItemUtils.isRune
+import at.hannibal2.skyhanni.utils.ItemUtils.itemName
+import at.hannibal2.skyhanni.utils.ItemUtils.itemNameWithoutColor
 import at.hannibal2.skyhanni.utils.ItemUtils.name
 import at.hannibal2.skyhanni.utils.ItemUtils.nameWithEnchantment
 import at.hannibal2.skyhanni.utils.LorenzRarity
-import at.hannibal2.skyhanni.utils.LorenzUtils.sortedDesc
 import at.hannibal2.skyhanni.utils.NEUInternalName
 import at.hannibal2.skyhanni.utils.NEUInternalName.Companion.asInternalName
 import at.hannibal2.skyhanni.utils.NEUItems
@@ -47,7 +48,6 @@ import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.hasJalapenoBook
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.hasWoodSingularity
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.isRecombobulated
 import at.hannibal2.skyhanni.utils.StringUtils.allLettersFirstUppercase
-import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import com.google.gson.JsonObject
 import io.github.moulberry.notenoughupdates.recipes.Ingredient
 import io.github.moulberry.notenoughupdates.util.Constants
@@ -55,6 +55,7 @@ import net.minecraft.item.ItemStack
 import java.util.Locale
 
 object EstimatedItemValueCalculator {
+
     private val config get() = SkyHanniMod.feature.misc.estimatedItemValues
     private val additionalCostFunctions = listOf(
         ::addAttributeCost,
@@ -172,7 +173,7 @@ object EstimatedItemValueCalculator {
             if (rawReforgeName == reforgeName.lowercase() || rawReforgeName == rawInternalName.lowercase()) {
                 val internalName = rawInternalName.asInternalName()
                 val reforgeStonePrice = internalName.getPrice()
-                val reforgeStoneName = internalName.getItemName()
+                val reforgeStoneName = internalName.itemName
 
                 val reforgeCosts = stoneJson.get("reforgeCosts").asJsonObject
                 val applyCost = getReforgeStoneApplyCost(stack, reforgeCosts, internalName) ?: return 0.0
@@ -190,7 +191,7 @@ object EstimatedItemValueCalculator {
     private fun getReforgeStoneApplyCost(
         stack: ItemStack,
         reforgeCosts: JsonObject,
-        reforgeStone: NEUInternalName
+        reforgeStone: NEUInternalName,
     ): Int? {
         var itemRarity = stack.getItemRarityOrNull() ?: return null
 
@@ -411,7 +412,7 @@ object EstimatedItemValueCalculator {
         var totalPrice = 0.0
         val map = mutableMapOf<String, Double>()
         for (internalName in drillUpgrades) {
-            val name = internalName.getItemName()
+            val name = internalName.itemName
             val price = internalName.getPriceOrNull() ?: continue
 
             totalPrice += price
@@ -429,7 +430,7 @@ object EstimatedItemValueCalculator {
         val internalName = stack.getPowerScroll() ?: return 0.0
 
         val price = internalName.getPrice()
-        val name = internalName.getItemName().removeColor()
+        val name = internalName.itemNameWithoutColor
         list.add("§7$name: §a§l✔ §7(§6" + NumberUtil.format(price) + "§7)")
         return price
     }
@@ -448,7 +449,7 @@ object EstimatedItemValueCalculator {
         internalName: NEUInternalName,
         list: MutableList<String>,
         label: String,
-        shouldIgnorePrice: Boolean
+        shouldIgnorePrice: Boolean,
     ): Double {
         val price = internalName.getPrice()
         val name = internalName.getNameOrRepoError()
@@ -468,7 +469,7 @@ object EstimatedItemValueCalculator {
         val internalName = "TALISMAN_ENRICHMENT_$enrichmentName".asInternalName()
 
         val price = internalName.getPrice()
-        val name = internalName.getItemName()
+        val name = internalName.itemName
         list.add("§7Enrichment: $name §7(§6" + NumberUtil.format(price) + "§7)")
         return price
     }
@@ -491,7 +492,7 @@ object EstimatedItemValueCalculator {
         var totalPrice = 0.0
         val map = mutableMapOf<String, Double>()
         for (internalName in abilityScrolls) {
-            val name = internalName.getItemName()
+            val name = internalName.itemName
             val price = internalName.getPriceOrNull() ?: continue
 
             totalPrice += price
@@ -512,7 +513,7 @@ object EstimatedItemValueCalculator {
             price = 0.0
         }
 
-        val name = internalName.getItemName()
+        val name = internalName.itemName
         if (internalName.startsWith("ENCHANTED_BOOK_BUNDLE_")) {
             list.add("§7Base item: $name")
             return 0.0
@@ -573,7 +574,6 @@ object EstimatedItemValueCalculator {
                     5 -> multiplier = 16
                 }
                 level = 1
-
             }
             if (internalName.startsWith("ENCHANTED_BOOK_BUNDLE_")) {
                 multiplier = 5
@@ -627,7 +627,7 @@ object EstimatedItemValueCalculator {
         val priceMap = mutableMapOf<String, Double>()
         for ((internalName, amount) in counterMap) {
 
-            val name = internalName.getItemName()
+            val name = internalName.itemName
             val price = internalName.getPrice() * amount
 
             totalPrice += price

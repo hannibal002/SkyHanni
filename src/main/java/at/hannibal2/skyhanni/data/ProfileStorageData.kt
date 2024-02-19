@@ -11,12 +11,15 @@ import at.hannibal2.skyhanni.events.LorenzWorldChangeEvent
 import at.hannibal2.skyhanni.events.PreProfileSwitchEvent
 import at.hannibal2.skyhanni.events.ProfileJoinEvent
 import at.hannibal2.skyhanni.events.TabListUpdateEvent
+import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
+import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraftforge.fml.common.eventhandler.EventPriority
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
 object ProfileStorageData {
+
     var playerSpecific: Storage.PlayerSpecific? = null
     var profileSpecific: Storage.ProfileSpecific? = null
     var loaded = false
@@ -24,8 +27,16 @@ object ProfileStorageData {
 
     private var nextProfile: String? = null
 
-    // TODO USE SH-REPO
-    private val profileSwitchPattern = "§7Switching to profile (?<name>.*)\\.\\.\\.".toPattern()
+    private val patternGroup = RepoPattern.group("data.profile")
+    private val profileSwitchPattern by patternGroup.pattern(
+        "switch",
+        "§7Switching to profile (?<name>.*)\\.\\.\\."
+    )
+    private val profileNamePattern by patternGroup.pattern(
+        "name",
+        "§e§lProfile: §r§a(?<name>.*)"
+    )
+
 
     private var sackPlayers: SackData.PlayerSpecific? = null
     var sackProfiles: SackData.ProfileSpecific? = null
@@ -47,11 +58,11 @@ object ProfileStorageData {
         val playerSpecific = playerSpecific
         val sackPlayers = sackPlayers
         if (playerSpecific == null) {
-            LorenzUtils.error("profileSpecific after profile swap can not be set: playerSpecific is null!")
+            ChatUtils.error("profileSpecific after profile swap can not be set: playerSpecific is null!")
             return
         }
         if (sackPlayers == null) {
-            LorenzUtils.error("sackPlayers after profile swap can not be set: sackPlayers is null!")
+            ChatUtils.error("sackPlayers after profile swap can not be set: sackPlayers is null!")
             return
         }
         loadProfileSpecific(playerSpecific, sackPlayers, profileName)
@@ -63,11 +74,11 @@ object ProfileStorageData {
         val playerSpecific = playerSpecific
         val sackPlayers = sackPlayers
         if (playerSpecific == null) {
-            LorenzUtils.error("playerSpecific is null in ProfileJoinEvent!")
+            ChatUtils.error("playerSpecific is null in ProfileJoinEvent!")
             return
         }
         if (sackPlayers == null) {
-            LorenzUtils.error("sackPlayers is null in sackPlayers!")
+            ChatUtils.error("sackPlayers is null in sackPlayers!")
             return
         }
 
@@ -83,8 +94,7 @@ object ProfileStorageData {
         val playerSpecific = playerSpecific ?: return
         val sackPlayers = sackPlayers ?: return
         for (line in event.tabList) {
-            val pattern = "§e§lProfile: §r§a(?<name>.*)".toPattern()
-            pattern.matchMatcher(line) {
+            profileNamePattern.matchMatcher(line) {
                 val profileName = group("name").lowercase()
                 loadProfileSpecific(playerSpecific, sackPlayers, profileName)
                 nextProfile = null
@@ -104,7 +114,7 @@ object ProfileStorageData {
 
         if (System.currentTimeMillis() > noTabListTime + 3_000) {
             noTabListTime = System.currentTimeMillis()
-            LorenzUtils.chat(
+            ChatUtils.chat(
                 "Extra Information from Tab list not found! " +
                     "Enable it: SkyBlock Menu ➜ Settings ➜ Personal ➜ User Interface ➜ Player List Info"
             )
@@ -114,7 +124,7 @@ object ProfileStorageData {
     private fun loadProfileSpecific(
         playerSpecific: Storage.PlayerSpecific,
         sackProfile: SackData.PlayerSpecific,
-        profileName: String
+        profileName: String,
     ) {
         noTabListTime = -1
         profileSpecific = playerSpecific.profiles.getOrPut(profileName) { Storage.ProfileSpecific() }
