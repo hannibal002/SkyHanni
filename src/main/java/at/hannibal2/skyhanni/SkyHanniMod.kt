@@ -218,6 +218,7 @@ import at.hannibal2.skyhanni.features.inventory.ItemDisplayOverlayFeatures
 import at.hannibal2.skyhanni.features.inventory.ItemStars
 import at.hannibal2.skyhanni.features.inventory.PowerStoneGuideFeatures
 import at.hannibal2.skyhanni.features.inventory.QuickCraftFeatures
+import at.hannibal2.skyhanni.features.inventory.QuiverNotification
 import at.hannibal2.skyhanni.features.inventory.RngMeterInventory
 import at.hannibal2.skyhanni.features.inventory.SackDisplay
 import at.hannibal2.skyhanni.features.inventory.ShiftClickBrewing
@@ -752,7 +753,7 @@ class SkyHanniMod {
         loadModule(VerminTracker)
         loadModule(SkillProgress)
         loadModule(SkillOverflowTooltip())
-
+        loadModule(QuiverNotification)
 
         init()
 
