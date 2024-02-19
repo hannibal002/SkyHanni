@@ -47,6 +47,11 @@ public class DebugConfig {
     public boolean showItemCategory = false;
 
     @Expose
+    @ConfigOption(name = "Show Item Name", desc = "Show the SkyHanni item name for an item.")
+    @ConfigEditorBoolean
+    public boolean showItemName = false;
+
+    @Expose
     @ConfigOption(name = "Copy Internal Name", desc = "Copies the internal name of an item on key press in the clipboard.")
     @ConfigEditorKeybind(defaultKey = Keyboard.KEY_NONE)
     public int copyInternalName = Keyboard.KEY_NONE;

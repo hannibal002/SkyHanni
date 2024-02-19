@@ -45,6 +45,7 @@ enum class ItemCategory {
     COSMETIC,
     MEMENTO,
     PORTAL,
+    SACK,
 
     NONE,
     ;

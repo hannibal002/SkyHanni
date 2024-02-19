@@ -1,8 +1,8 @@
 package at.hannibal2.skyhanni.features.rift.everywhere
 
+import at.hannibal2.skyhanni.events.ActionBarUpdateEvent
 import at.hannibal2.skyhanni.events.ConfigLoadEvent
 import at.hannibal2.skyhanni.events.GuiRenderEvent
-import at.hannibal2.skyhanni.events.LorenzActionBarEvent
 import at.hannibal2.skyhanni.events.LorenzWorldChangeEvent
 import at.hannibal2.skyhanni.features.rift.RiftAPI
 import at.hannibal2.skyhanni.utils.ConditionalUtils
@@ -10,14 +10,17 @@ import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.RenderUtils.renderStrings
 import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.TimeUtils
+import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
 class RiftTimer {
 
     private val config get() = RiftAPI.config.timer
 
-    // TODO USE SH-REPO
-    val pattern = "§(?<color>[a7])(?<time>.*)ф Left.*".toPattern()
+    private val timePattern by RepoPattern.pattern(
+        "rift.everywhere.timer",
+        "§(?<color>[a7])(?<time>.*)ф Left.*"
+    )
 
     private var display = emptyList<String>()
     private var maxTime = 0L
@@ -33,11 +36,12 @@ class RiftTimer {
         currentTime = 0
     }
 
+    //todo use ActionBarValueUpdateEvent
     @SubscribeEvent
-    fun onActionBar(event: LorenzActionBarEvent) {
+    fun onActionBarUpdate(event: ActionBarUpdateEvent) {
         if (!isEnabled()) return
-        for (entry in event.message.split("     ")) {
-            pattern.matchMatcher(entry) {
+        for (entry in event.actionBar.split("     ")) {
+            timePattern.matchMatcher(entry) {
                 val color = group("color")
                 val newTime = getTime(group("time"))
                 if (color == "7") {

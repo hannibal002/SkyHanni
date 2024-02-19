@@ -25,10 +25,12 @@ import at.hannibal2.skyhanni.events.RenderItemTipEvent
 import at.hannibal2.skyhanni.features.garden.pests.PestAPI
 import at.hannibal2.skyhanni.utils.ConfigUtils
 import at.hannibal2.skyhanni.utils.InventoryUtils
+import at.hannibal2.skyhanni.utils.ItemCategory
 import at.hannibal2.skyhanni.utils.ItemUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.cleanName
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalNameOrNull
+import at.hannibal2.skyhanni.utils.ItemUtils.getItemCategoryOrNull
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.ItemUtils.name
 import at.hannibal2.skyhanni.utils.LorenzUtils.between
@@ -39,25 +41,42 @@ import at.hannibal2.skyhanni.utils.NumberUtil.romanToDecimal
 import at.hannibal2.skyhanni.utils.NumberUtil.romanToDecimalIfNecessary
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getBottleOfJyrreSeconds
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getEdition
+import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getPetLevel
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getRanchersSpeed
 import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
+import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraft.item.ItemStack
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
 object ItemDisplayOverlayFeatures {
-
-    // TODO USE SH-REPO
     private val config get() = SkyHanniMod.feature.inventory
 
-    // TODO repo
-    private val petLevelPattern = "\\[Lvl (?<level>.*)] .*".toPattern()
-    private val masterSkullPattern = "(.*)Master Skull - Tier .".toPattern()
-    private val gardenVacuumPatterm = "§7Vacuum Bag: §6(?<amount>\\d*) Pests?".toPattern()
-    private val harvestPattern = "§7§7You may harvest §6(?<amount>.).*".toPattern()
-    private val dungeonPotionPattern = "Dungeon (?<level>.*) Potion".toPattern()
-    private val bingoGoalRankPattern =
-        "(§.)*You were the (§.)*(?<rank>[\\w]+)(?<ordinal>(st|nd|rd|th)) (§.)*to".toPattern()
+    private val patternGroup = RepoPattern.group("inventory.item.overlay")
+    private val petLevelPattern by patternGroup.pattern(
+        "pet.level",
+        "\\[Lvl (?<level>\\d+)] .*"
+    )
+    private val masterSkullPattern by patternGroup.pattern(
+        "masterskull",
+        "(.*)Master Skull - Tier ."
+    )
+    private val gardenVacuumPatterm by patternGroup.pattern(
+        "vacuum",
+        "§7Vacuum Bag: §6(?<amount>\\d*) Pests?"
+    )
+    private val harvestPattern by patternGroup.pattern(
+        "harvest",
+        "§7§7You may harvest §6(?<amount>.).*"
+    )
+    private val dungeonPotionPattern by patternGroup.pattern(
+        "dungeonpotion",
+        "Dungeon (?<level>.*) Potion"
+    )
+    private val bingoGoalRankPattern by patternGroup.pattern(
+        "bingogoalrank",
+        "(§.)*You were the (§.)*(?<rank>[\\w]+)(?<ordinal>(st|nd|rd|th)) (§.)*to"
+    )
 
     private val bottleOfJyrre = "NEW_BOTTLE_OF_JYRRE".asInternalName()
 
@@ -104,15 +123,10 @@ object ItemDisplayOverlayFeatures {
         }
 
         if (PET_LEVEL.isSelected()) {
-            val chestName = InventoryUtils.openInventoryName()
-            if (!chestName.endsWith("Sea Creature Guide") && ItemUtils.isPet(itemName)) {
-                petLevelPattern.matchMatcher(itemName) {
-                    val rawLevel = group("level")
-                    val level = rawLevel.toIntOrNull()
-                        ?: throw IllegalStateException("pet level not found for item name '$itemName'")
-                    if (level != ItemUtils.maxPetLevel(itemName)) {
-                        return "$level"
-                    }
+            if (item.getItemCategoryOrNull() == ItemCategory.PET) {
+                val level = item.getPetLevel()
+                if (level != ItemUtils.maxPetLevel(itemName)) {
+                    return level.toString()
                 }
             }
         }
