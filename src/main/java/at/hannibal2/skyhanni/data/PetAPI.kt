@@ -12,7 +12,7 @@ object PetAPI {
     )
     private val petItemName by patternGroup.pattern(
         "item.name",
-        "§.\\[Lvl (?<level>\\d+)] (?<name>.*)"
+        "(?:§.)*\\[Lvl (?<level>\\d+)] (?<name>.*)"
     )
     private val neuRepoPetItemName by patternGroup.pattern(
         "item.name.neu.format",
@@ -51,7 +51,7 @@ object PetAPI {
     }
 
     fun getPetLevel(nameWithLevel: String): Int? = petItemName.matchMatcher(nameWithLevel) {
-         group("name").toInt()
+         group("level").toInt()
     }
 
     fun hasPetName(name: String): Boolean = petItemName.matches(name) && !ignoredPetStrings.any { name.contains(it) }
