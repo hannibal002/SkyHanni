@@ -8,12 +8,11 @@ import at.hannibal2.skyhanni.test.PriceSource
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.CollectionUtils.addAsSingletonList
 import at.hannibal2.skyhanni.utils.CollectionUtils.sortedDesc
-import at.hannibal2.skyhanni.utils.ItemUtils.getNameWithEnchantment
+import at.hannibal2.skyhanni.utils.ItemUtils.itemName
 import at.hannibal2.skyhanni.utils.KeyboardManager
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils.addSelector
 import at.hannibal2.skyhanni.utils.NEUInternalName
-import at.hannibal2.skyhanni.utils.NEUInternalName.Companion.asInternalName
 import at.hannibal2.skyhanni.utils.NumberUtil
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
@@ -29,7 +28,7 @@ class SkyHanniItemTracker<Data : ItemTrackerData>(
 
     companion object {
 
-        val SKYBLOCK_COIN by lazy { "SKYBLOCK_COIN".asInternalName() }
+        val SKYBLOCK_COIN = NEUInternalName.SKYBLOCK_COIN
     }
 
     private var lastClickDelay = 0L
@@ -106,7 +105,7 @@ class SkyHanniItemTracker<Data : ItemTrackerData>(
             val cleanName = if (internalName == SKYBLOCK_COIN) {
                 data.getCoinName(itemProfit)
             } else {
-                internalName.getNameWithEnchantment()
+                internalName.itemName
             }
 
             val priceFormat = NumberUtil.format(price)
