@@ -93,7 +93,7 @@ object ChatManager {
         )
 
         messageHistory[IdentityCharacteristics(component)] = result
-        if (MessageSendToServerEvent(message).postAndCatch()) {
+        if (MessageSendToServerEvent(message, message.split(" "), originatingModContainer).postAndCatch()) {
             event.isCanceled = true
             messageHistory[IdentityCharacteristics(component)] = result.copy(actionKind = ActionKind.OUTGOING_BLOCKED)
         }

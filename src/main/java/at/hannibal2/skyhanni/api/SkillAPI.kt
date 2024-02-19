@@ -115,7 +115,7 @@ object SkillAPI {
         for (stack in event.inventoryItems.values) {
             val lore = stack.getLore()
             if (inventoryName == "Your Skills" &&
-               lore.any { it.contains("Click to view!") || it.contains("Not unlocked!") }
+                lore.any { it.contains("Click to view!") || it.contains("Not unlocked!") }
             ) {
                 val cleanName = stack.cleanName()
                 val split = cleanName.split(" ")
@@ -307,6 +307,11 @@ object SkillAPI {
             return
         }
 
+        if (it.size == 1) {
+            commandHelp()
+            return
+        }
+
         if (it.size == 2) {
             val second = it[1]
             when (it.first()) {
@@ -335,10 +340,6 @@ object SkillAPI {
 
                 }
             }
-        }
-
-        if (it.size == 1) {
-            commandHelp()
         }
     }
 
