@@ -57,11 +57,16 @@ public class InventoryConfig {
     public HelperConfig helper = new HelperConfig();
 
     @Expose
+    @ConfigOption(name = "Get From Sack", desc = "")
+    @Accordion
+    public GetFromSackConfig gfs = new GetFromSackConfig();
+
+    @Expose
     @ConfigOption(
         name = "Item Number",
         desc = "Showing the item number as a stack size for these items."
     )
-    @ConfigEditorDraggableList()
+    @ConfigEditorDraggableList
     public List<ItemNumberEntry> itemNumberAsStackSize = new ArrayList<>(Arrays.asList(
         NEW_YEAR_CAKE,
         RANCHERS_BOOTS_SPEED,
@@ -200,5 +205,11 @@ public class InventoryConfig {
     @ConfigEditorBoolean
     @FeatureToggle
     public boolean shiftClickBrewing = false;
+
+    @Expose
+    @ConfigOption(name = "Low Quiver Alert", desc = "Notifies you when your Quiver runs out of arrows.")
+    @ConfigEditorBoolean
+    @FeatureToggle
+    public boolean quiverAlert = false;
 
 }

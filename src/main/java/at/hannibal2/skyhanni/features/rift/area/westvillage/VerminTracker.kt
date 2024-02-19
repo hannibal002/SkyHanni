@@ -26,12 +26,28 @@ import java.util.regex.Pattern
 
 object VerminTracker {
 
-    private val group = RepoPattern.group("rift.area.westvillage.vermintracker")
-    private val silverfishPattern by group.pattern("silverfish", ".*§eYou vacuumed a §.*Silverfish.*")
-    private val spiderPattern by group.pattern("spider", ".*§eYou vacuumed a §.*Spider.*")
-    private val flyPattern by group.pattern("fly", ".*§eYou vacuumed a §.*Fly.*")
-    private val verminBinPattern by group.pattern("binline", "§fVermin Bin: §\\w(?<count>\\d+) (?<vermin>\\w+)")
-    private val verminBagPattern by group.pattern("bagline", "§fVacuum Bag: §\\w(?<count>\\d+) (?<vermin>\\w+)")
+    private val patternGroup = RepoPattern.group("rift.area.westvillage.vermintracker")
+    private val silverfishPattern by patternGroup.pattern(
+        "silverfish",
+        ".*§eYou vacuumed a §.*Silverfish.*"
+    )
+    private val spiderPattern by patternGroup.pattern(
+        "spider",
+        ".*§eYou vacuumed a §.*Spider.*"
+    )
+    private val flyPattern by patternGroup.pattern(
+        "fly",
+        ".*§eYou vacuumed a §.*Fly.*"
+    )
+    private val verminBinPattern by patternGroup.pattern(
+        "binline",
+        "§fVermin Bin: §\\w(?<count>\\d+) (?<vermin>\\w+)"
+    )
+    private val verminBagPattern by patternGroup.pattern(
+        "bagline",
+        "§fVacuum Bag: §\\w(?<count>\\d+) (?<vermin>\\w+)"
+    )
+
     private var hasVacuum = false
     private val TURBOMAX_VACUUM = "TURBOMAX_VACUUM".asInternalName()
 
