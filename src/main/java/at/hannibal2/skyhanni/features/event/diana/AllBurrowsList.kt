@@ -17,6 +17,7 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
 object AllBurrowsList {
     private var list = listOf<LorenzVec>()
+    private val config get() = SkyHanniMod.feature.event.diana.allBurrowsList
     private val storage get() = ProfileStorageData.profileSpecific?.diana
 
     @SubscribeEvent
@@ -71,11 +72,12 @@ object AllBurrowsList {
     @SubscribeEvent
     fun onRenderWorld(event: LorenzRenderWorldEvent) {
         if (!isEnabled()) return
+        if (!config.showAll) return
 
         for (location in list) {
             event.drawColor(location, LorenzColor.DARK_AQUA)
         }
     }
 
-    fun isEnabled() = DianaAPI.isDoingDiana()
+    fun isEnabled() = DianaAPI.isDoingDiana() && config.save
 }
