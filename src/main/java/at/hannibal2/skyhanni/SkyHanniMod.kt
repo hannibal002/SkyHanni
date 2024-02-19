@@ -7,6 +7,7 @@ import at.hannibal2.skyhanni.config.ConfigManager
 import at.hannibal2.skyhanni.config.Features
 import at.hannibal2.skyhanni.config.SackData
 import at.hannibal2.skyhanni.config.commands.Commands.init
+import at.hannibal2.skyhanni.data.ActionBarData
 import at.hannibal2.skyhanni.data.ActionBarStatsData
 import at.hannibal2.skyhanni.data.BlockData
 import at.hannibal2.skyhanni.data.BossbarData
@@ -446,6 +447,7 @@ class SkyHanniMod {
         loadModule(BingoCardReader())
         loadModule(DeepCavernsParkour())
         loadModule(GardenBestCropTime())
+        loadModule(ActionBarData)
         loadModule(TrackerManager)
         loadModule(UtilsPatterns)
         loadModule(PetAPI)
