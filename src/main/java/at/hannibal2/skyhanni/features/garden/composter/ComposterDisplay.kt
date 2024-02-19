@@ -117,7 +117,7 @@ class ComposterDisplay {
 
     private fun sendNotify() {
         if (!config.notifyLow.enabled) return
-        if (!ReminderUtils.isBusy()) return
+        if (ReminderUtils.isBusy()) return
 
         val storage = storage ?: return
 
@@ -177,7 +177,7 @@ class ComposterDisplay {
         if (!config.warnAlmostClose) return
         val storage = GardenAPI.storage ?: return
 
-        if (!ReminderUtils.isBusy()) return
+        if (ReminderUtils.isBusy()) return
 
         if (System.currentTimeMillis() < storage.lastComposterEmptyWarningTime + 1000 * 60 * 2) return
         storage.lastComposterEmptyWarningTime = System.currentTimeMillis()
