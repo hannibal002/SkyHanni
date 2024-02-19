@@ -57,6 +57,6 @@ enum class ItemCategory {
         fun Collection<ItemCategory>.containsItem(stack: ItemStack?) =
             stack?.getItemCategoryOrNull()?.let { this.contains(it) } ?: false
 
-        val miningTools = listOf(ItemCategory.PICKAXE, ItemCategory.DRILL, ItemCategory.GAUNTLET)
+        val miningTools = listOf(PICKAXE, DRILL, GAUNTLET)
     }
 }
