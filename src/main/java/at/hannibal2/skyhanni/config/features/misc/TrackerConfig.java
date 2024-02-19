@@ -20,7 +20,7 @@ public class TrackerConfig {
 
     @Expose
     @ConfigOption(name = "Show Price From", desc = "Show price from Bazaar or NPC.")
-    @ConfigEditorDropdown()
+    @ConfigEditorDropdown
     public PriceFromEntry priceFrom = PriceFromEntry.SELL_OFFER;
 
     public enum PriceFromEntry implements HasLegacyId {
