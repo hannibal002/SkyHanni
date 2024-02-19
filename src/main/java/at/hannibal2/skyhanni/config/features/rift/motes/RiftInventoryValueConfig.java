@@ -18,7 +18,7 @@ public class RiftInventoryValueConfig {
     @Expose
     @ConfigOption(name = "Number Format Type", desc = "Short: 1.2M\n" +
         "Long: 1,200,000")
-    @ConfigEditorDropdown()
+    @ConfigEditorDropdown
     public NumberFormatEntry formatType = NumberFormatEntry.SHORT;
 
     public enum NumberFormatEntry implements HasLegacyId {
