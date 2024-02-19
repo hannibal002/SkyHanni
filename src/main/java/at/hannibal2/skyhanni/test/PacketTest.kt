@@ -136,7 +136,7 @@ object PacketTest {
 
         // Entity
         if (this is S13PacketDestroyEntities) {
-            println("Receive: $packetName with IDs: ${entityIDs.joinToString { "$it, " }}")
+            println("Receive: $packetName with IDs: ${entityIDs.joinToString(", ")}")
             return
         }
 
