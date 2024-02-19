@@ -337,7 +337,6 @@ interface Renderable {
             }
         }
 
-
         fun progressBar(
             percent: Double,
             startColor: Color = Color(255, 0, 0),
