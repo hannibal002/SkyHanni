@@ -215,6 +215,11 @@ object NumberUtil {
         this.toDouble() / max
     }?.coerceIn(0.0, 1.0) ?: 1.0
 
+    /** @return clamped to [0.0, 1.0]**/
+    fun Number.fractionOf(maxValue: Number) = maxValue.toDouble().takeIf { it != 0.0 }?.let { max ->
+        this.toDouble() / max
+    }?.coerceIn(0.0, 1.0) ?: 1.0
+
     fun interpolate(now: Float, last: Float, lastUpdate: Long): Float {
         var interp = now
         if (last >= 0 && last != now) {

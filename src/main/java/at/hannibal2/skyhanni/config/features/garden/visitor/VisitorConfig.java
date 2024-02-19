@@ -45,7 +45,7 @@ public class VisitorConfig {
 
     @Expose
     @ConfigOption(name = "Highlight Status", desc = "Highlight the status for visitors with a text above or with color.")
-    @ConfigEditorDropdown()
+    @ConfigEditorDropdown
     public HighlightMode highlightStatus = HighlightMode.BOTH;
 
     public enum HighlightMode implements HasLegacyId {

@@ -61,7 +61,7 @@ public class InventoryConfig {
         name = "Item Number",
         desc = "Showing the item number as a stack size for these items."
     )
-    @ConfigEditorDraggableList()
+    @ConfigEditorDraggableList
     public List<ItemNumberEntry> itemNumberAsStackSize = new ArrayList<>(Arrays.asList(
         NEW_YEAR_CAKE,
         RANCHERS_BOOTS_SPEED,

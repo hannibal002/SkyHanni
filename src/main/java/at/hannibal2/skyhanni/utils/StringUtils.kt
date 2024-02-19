@@ -18,11 +18,13 @@ object StringUtils {
     private val whiteSpaceResetPattern = "^(?:\\s|§r)*|(?:\\s|§r)*$".toPattern()
     private val whiteSpacePattern = "^\\s*|\\s*$".toPattern()
     private val resetPattern = "(?i)§R".toPattern()
+    private val sFormattingPattern = "(?i)§S".toPattern()
     private val stringColourPattern = "§[0123456789abcdef].*".toPattern()
 
     fun String.trimWhiteSpaceAndResets(): String = whiteSpaceResetPattern.matcher(this).replaceAll("")
     fun String.trimWhiteSpace(): String = whiteSpacePattern.matcher(this).replaceAll("")
     fun String.removeResets(): String = resetPattern.matcher(this).replaceAll("")
+    fun String.removeSFormattingCode(): String = sFormattingPattern.matcher(this).replaceAll("")
 
     fun String.firstLetterUppercase(): String {
         if (isEmpty()) return this

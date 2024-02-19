@@ -301,6 +301,31 @@ interface Renderable {
             }
         }
 
+        fun progressBar(
+            percent: Double,
+            startColor: Color = Color(255, 0, 0),
+            endColor: Color = Color(0, 255, 0),
+            width: Int = 30,
+            height: Int = 4,
+            horizontalAlign: HorizontalAlignment = HorizontalAlignment.LEFT,
+            verticalAlign: VerticalAlignment = VerticalAlignment.TOP,
+        ) = object : Renderable {
+            override val width = width
+            override val height = height
+            override val horizontalAlign = horizontalAlign
+            override val verticalAlign = verticalAlign
+
+            val progress = (1.0 + percent * (width - 2.0)).toInt()
+            val color = ColorUtils.blendRGB(startColor, endColor, percent)
+
+            override fun render(posX: Int, posY: Int) {
+                Gui.drawRect(0, 0, width, height, 0xFF43464B.toInt())
+                Gui.drawRect(1, 1, width - 1, height - 1, color.darker().rgb)
+                Gui.drawRect(1, 1, progress, height - 1, color.rgb)
+            }
+
+        }
+
         fun texturedProgressBar(
             percent: Float,
             color: Color = Color(0, 255, 0),
