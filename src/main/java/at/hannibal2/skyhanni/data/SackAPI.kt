@@ -11,11 +11,11 @@ import at.hannibal2.skyhanni.events.SackDataUpdateEvent
 import at.hannibal2.skyhanni.features.fishing.FishingAPI
 import at.hannibal2.skyhanni.features.fishing.trophy.TrophyRarity
 import at.hannibal2.skyhanni.features.inventory.SackDisplay
+import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.CollectionUtils.editCopy
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.ItemUtils.name
-import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.NEUInternalName
 import at.hannibal2.skyhanni.utils.NEUInternalName.Companion.asInternalName
 import at.hannibal2.skyhanni.utils.NEUItems.getNpcPriceOrNull
@@ -299,7 +299,9 @@ object SackAPI {
         return sackData[item] ?: return SackItem(0, 0, SackStatus.MISSING)
     }
 
-    fun commandGetFromSacks(item: String, amount: Int) = LorenzUtils.sendCommandToServer("gfs $item $amount")
+    fun commandGetFromSacks(item: String, amount: Int) {
+        ChatUtils.sendCommandToServer("gfs $item $amount")
+    }
 
     private fun saveSackData() {
         ProfileStorageData.sackProfiles?.sackContents = sackData
