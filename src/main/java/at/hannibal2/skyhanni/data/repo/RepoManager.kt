@@ -82,7 +82,12 @@ class RepoManager(private val configLocation: File) {
                             latestRepoCommit = commits["sha"].asString
                         }
                 } catch (e: Exception) {
-                    e.printStackTrace()
+                    ErrorManager.logErrorWithData(
+                        e,
+                        "Error while loading data from repo",
+                        "command" to command,
+                        "currentCommitJSON" to currentCommitJSON,
+                    )
                 }
                 if (latestRepoCommit == null || latestRepoCommit!!.isEmpty()) return@supplyAsync false
                 val file = File(configLocation, "repo")
@@ -117,13 +122,12 @@ class RepoManager(private val configLocation: File) {
                         )
                     }
                 } catch (e: IOException) {
-                    Exception(
-                        "Failed to download SkyHanni Repo! Please report this issue on the discord!",
-                        e
-                    ).printStackTrace()
-                    if (command) {
-                        ChatUtils.error("An error occurred while trying to reload the repo! See logs for more info.")
-                    }
+                    ErrorManager.logErrorWithData(
+                        e,
+                        "Failed to download SkyHanni Repo",
+                        "url" to url,
+                        "command" to command,
+                    )
                     return@supplyAsync false
                 }
                 RepoUtils.unzipIgnoreFirstFolder(
@@ -139,7 +143,11 @@ class RepoManager(private val configLocation: File) {
                     }
                 }
             } catch (e: Exception) {
-                e.printStackTrace()
+                ErrorManager.logErrorWithData(
+                    e,
+                    "Failed to download SkyHanni Repo",
+                    "command" to command,
+                )
             }
             true
         }

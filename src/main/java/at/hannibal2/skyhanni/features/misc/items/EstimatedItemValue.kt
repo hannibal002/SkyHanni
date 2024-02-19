@@ -8,6 +8,7 @@ import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.InventoryCloseEvent
 import at.hannibal2.skyhanni.events.LorenzToolTipEvent
 import at.hannibal2.skyhanni.events.RenderItemTooltipEvent
+import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.CollectionUtils.addAsSingletonList
 import at.hannibal2.skyhanni.utils.ConditionalUtils.onToggle
@@ -153,8 +154,13 @@ object EstimatedItemValue {
         val newDisplay = try {
             draw(item)
         } catch (e: Exception) {
-            ChatUtils.debug("Estimated Item Value error: ${e.message}")
-            e.printStackTrace()
+            ErrorManager.logErrorWithData(
+                e, "Error calculating Estimated Item Value",
+                "openInventoryName" to openInventoryName,
+                "item name" to item.name,
+                "internal name" to item.getInternalNameOrNull(),
+                "lore" to item.getLore(),
+            )
             listOf()
         }
 

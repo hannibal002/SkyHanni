@@ -12,6 +12,7 @@ import at.hannibal2.skyhanni.events.PreProfileSwitchEvent
 import at.hannibal2.skyhanni.features.garden.CropType
 import at.hannibal2.skyhanni.features.garden.GardenAPI
 import at.hannibal2.skyhanni.features.garden.farming.GardenCropSpeed.getSpeed
+import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.APIUtil
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils
@@ -112,6 +113,10 @@ class FarmingWeightDisplay {
 
         private var nextPlayers = mutableListOf<UpcomingPlayer>()
         private val nextPlayer get() = nextPlayers.firstOrNull()
+
+        val tryAgainMessage = "Loading the farming weight data from elitebot.dev failed!\n" +
+            "§eYou can re-enter the garden to try to fix the problem.\n" +
+            "§cIf this message repeats, please report it on Discord!"
 
         private val recalculate by lazy {
             ({
@@ -433,8 +438,10 @@ class FarmingWeightDisplay {
 
             result["rank"].asInt
         } catch (e: Exception) {
-            error()
-            e.printStackTrace()
+            ErrorManager.logErrorWithData(
+                e, tryAgainMessage,
+            )
+            apiError = true
             -1
         }
 
@@ -469,23 +476,21 @@ class FarmingWeightDisplay {
                     return
                 }
 
-                println("localProfile: '$localProfile'")
-                println("url: '$url'")
-                println("result: '$result'")
+                ErrorManager.logErrorStateWithData(
+                    tryAgainMessage,
+                    "could not find correct profile",
+                    "localProfile" to localProfile,
+                    "url" to url,
+                    "result" to result,
+                )
             } catch (e: Exception) {
-                println("url: '$url'")
-                e.printStackTrace()
+                ErrorManager.logErrorWithData(
+                    e, tryAgainMessage,
+                    "localProfile" to localProfile,
+                    "url" to url,
+                )
             }
-            error()
-        }
-
-        private fun error() {
             apiError = true
-            ChatUtils.error(
-                "Loading the farming weight data from elitebot.dev failed!\n"
-                    + "§eYou can re-enter the garden to try to fix the problem.\n" +
-                    "§cIf this message repeats, please report it on Discord!",
-            )
         }
 
         private fun calculateCollectionWeight(): MutableMap<CropType, Double> {

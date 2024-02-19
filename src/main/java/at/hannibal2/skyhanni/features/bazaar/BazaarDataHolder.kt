@@ -2,6 +2,7 @@ package at.hannibal2.skyhanni.features.bazaar
 
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.features.rift.RiftAPI
+import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.APIUtil
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.name
@@ -42,8 +43,7 @@ class BazaarDataHolder {
             }
             RiftAPI.motesPrice = motesPrice
         } catch (e: Throwable) {
-            e.printStackTrace()
-            ChatUtils.error("Error while trying to read bazaar item list from api: " + e.message)
+            ErrorManager.logErrorWithData(e, "Error while trying to read bazaar item list from api")
         }
         return list
     }

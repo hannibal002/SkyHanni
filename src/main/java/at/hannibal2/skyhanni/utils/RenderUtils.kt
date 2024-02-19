@@ -13,7 +13,6 @@ import at.hannibal2.skyhanni.utils.renderables.RenderableUtils.renderXAligned
 import at.hannibal2.skyhanni.utils.shader.ShaderManager
 import io.github.moulberry.moulconfig.internal.TextRenderUtils
 import io.github.moulberry.notenoughupdates.util.Utils
-import java.awt.Color
 import net.minecraft.client.Minecraft
 import net.minecraft.client.gui.FontRenderer
 import net.minecraft.client.gui.Gui
@@ -29,6 +28,7 @@ import net.minecraft.util.AxisAlignedBB
 import net.minecraft.util.MathHelper
 import net.minecraft.util.ResourceLocation
 import org.lwjgl.opengl.GL11
+import java.awt.Color
 import kotlin.math.cos
 import kotlin.math.sin
 import kotlin.math.sqrt
@@ -462,15 +462,10 @@ object RenderUtils {
                 offsetY += 10 + extraSpace + 2
             }
         } catch (e: NullPointerException) {
-            println(" ")
-            for (innerList in list) {
-                println("new inner list:")
-                for (any in innerList) {
-                    println("any: '$any'")
-                }
-            }
-            e.printStackTrace()
-            ChatUtils.debug("NPE in renderStringsAndItems!")
+            ErrorManager.logErrorWithData(
+                e, "Failed to render an element",
+                "list" to list
+            )
         }
         GuiEditManager.add(this, posLabel, longestX, offsetY)
     }
