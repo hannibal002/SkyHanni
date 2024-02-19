@@ -48,6 +48,11 @@ public class InventoryConfig {
     public SackDisplayConfig sackDisplay = new SackDisplayConfig();
 
     @Expose
+    @ConfigOption(name = "Sack HUD", desc = "")
+    @Accordion
+    public SackHudConfig sackHud = new SackHudConfig();
+
+    @Expose
     @ConfigOption(name = "Chest Value", desc = "")
     @Accordion
     public ChestValueConfig chestValueConfig = new ChestValueConfig();

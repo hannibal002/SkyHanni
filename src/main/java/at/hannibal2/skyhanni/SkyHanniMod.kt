@@ -217,6 +217,7 @@ import at.hannibal2.skyhanni.features.inventory.PowerStoneGuideFeatures
 import at.hannibal2.skyhanni.features.inventory.QuickCraftFeatures
 import at.hannibal2.skyhanni.features.inventory.RngMeterInventory
 import at.hannibal2.skyhanni.features.inventory.SackDisplay
+import at.hannibal2.skyhanni.features.inventory.SackHud
 import at.hannibal2.skyhanni.features.inventory.ShiftClickBrewing
 import at.hannibal2.skyhanni.features.inventory.ShiftClickEquipment
 import at.hannibal2.skyhanni.features.inventory.ShiftClickNPCSell
@@ -473,6 +474,7 @@ class SkyHanniMod {
         loadModule(NEUItems)
 
         // features
+        loadModule(SackHud)
         loadModule(BazaarOrderHelper())
         loadModule(AuctionsHighlighter())
         loadModule(ChatFilter())

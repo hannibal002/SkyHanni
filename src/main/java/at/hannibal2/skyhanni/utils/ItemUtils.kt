@@ -49,6 +49,13 @@ object ItemUtils {
         return list
     }
 
+    fun ItemStack.getNBTName(): String? {
+        return this.tagCompound
+            ?.getCompoundTag("display")
+            ?.getString("Name")
+            ?.takeIf { it.isNotBlank() }
+    }
+
     // TODO change else janni is sad
     fun isCoopSoulBound(stack: ItemStack): Boolean =
         stack.getLore().any {
@@ -61,7 +68,8 @@ object ItemUtils {
 
     fun isRecombobulated(stack: ItemStack) = stack.isRecombobulated()
 
-    fun isPet(name: String): Boolean = UtilsPatterns.petLevelPattern.matches(name) && !ignoredPetStrings.any { name.contains(it) }
+    fun isPet(name: String): Boolean =
+        UtilsPatterns.petLevelPattern.matches(name) && !ignoredPetStrings.any { name.contains(it) }
 
     fun maxPetLevel(name: String) = if (name.contains("Golden Dragon")) 200 else 100
 

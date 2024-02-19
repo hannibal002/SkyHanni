@@ -288,6 +288,16 @@ object SackAPI {
         sackData = sackData.editCopy { this[item] = SackItem(amount, 0, SackStatus.CORRECT) }
     }
 
+    /**
+     * Get a list of all known items the sacks.
+     */
+    fun getAllKnownSackItems(): Set<NEUInternalName> {
+        return ProfileStorageData.sackProfiles?.sackContents?.keys ?: emptySet()
+    }
+
+    /**
+     * Get information about how many items are contained within the sacks for the given item type.
+     */
     fun fetchSackItem(item: NEUInternalName): SackItem {
         sackData = ProfileStorageData.sackProfiles?.sackContents ?: return SackItem(0, 0, SackStatus.MISSING)
 
@@ -299,7 +309,21 @@ object SackAPI {
         return sackData[item] ?: return SackItem(0, 0, SackStatus.MISSING)
     }
 
-    fun commandGetFromSacks(item: String, amount: Int) = LorenzUtils.sendCommandToServer("gfs $item $amount")
+    /**
+     * Send a request to hypixel to receive items from the sacks. Has a roughly 2 second cooldown.
+     * Note that our own internal command queueing sends faster than that cooldown, so additional measures need to be
+     * taken to slow down those requests.
+     */
+    fun commandGetFromSacks(
+        /**
+         * The [item id](NEUInternalName) or the name of the item you want to get.
+         */
+        item: String,
+        /**
+         * The amount of items you want to request
+         */
+        amount: Int
+    ) = LorenzUtils.sendCommandToServer("gfs $item $amount")
 
     private fun saveSackData() {
         ProfileStorageData.sackProfiles?.sackContents = sackData
