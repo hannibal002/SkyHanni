@@ -162,7 +162,7 @@ data class LorenzVec(
             return LorenzVec(x, z, y)
         }
 
-        // only for migration purposes
+        // Format: "x:y:z"
         fun decodeFromString(string: String): LorenzVec {
             val (x, y, z) = string.split(":").map { it.toDouble() }
             return LorenzVec(x, y, z)

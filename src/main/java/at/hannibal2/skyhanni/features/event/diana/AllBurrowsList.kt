@@ -5,6 +5,7 @@ import at.hannibal2.skyhanni.data.ProfileStorageData
 import at.hannibal2.skyhanni.events.BurrowDetectEvent
 import at.hannibal2.skyhanni.events.LorenzRenderWorldEvent
 import at.hannibal2.skyhanni.events.LorenzTickEvent
+import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.LocationUtils.distanceToPlayer
 import at.hannibal2.skyhanni.utils.LorenzColor
 import at.hannibal2.skyhanni.utils.LorenzUtils
@@ -31,8 +32,6 @@ object AllBurrowsList {
         if (!event.repeatSeconds(1)) return
         val storage = storage ?: return
 
-//         val range = 10..30
-//         val range = 10..70
         val range = 5..70
         list = storage.foundBurrowLocations.asSequence().map { it to it.distanceToPlayer() }
             .filter { it.second.toInt() in range }
@@ -57,8 +56,7 @@ object AllBurrowsList {
             var new = 0
             var duplicate = 0
             for (raw in text.split(";")) {
-                val (x, y, z) = raw.split(":").map { it.toInt() }
-                val location = LorenzVec(x, y, z)
+                val location = LorenzVec.decodeFromString(raw)
                 if (location !in list) {
                     list.add(location)
                     new++
@@ -66,7 +64,7 @@ object AllBurrowsList {
                     duplicate++
                 }
             }
-            LorenzUtils.chat("Added $new new burrow locations, $duplicate are duplicate.")
+            ChatUtils.chat("Added $new new burrow locations, $duplicate are duplicate.")
         }
     }
 
