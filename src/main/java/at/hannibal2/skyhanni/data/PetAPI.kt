@@ -12,7 +12,7 @@ object PetAPI {
     )
     private val petItemName by patternGroup.pattern(
         "item.name",
-        "§.\\[Lvl (?<level>\\d)] (?<name>.*)"
+        "§.\\[Lvl (?<level>\\d+)] (?<name>.*)"
     )
     private val neuRepoPetItemName by patternGroup.pattern(
         "item.name.neu.format",
