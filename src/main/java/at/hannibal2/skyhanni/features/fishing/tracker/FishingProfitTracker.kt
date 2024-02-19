@@ -180,11 +180,9 @@ object FishingProfitTracker {
         if (!isEnabled()) return
 
         val recentPickup = config.showWhenPickup && lastCatchTime.passedSince() < 3.seconds
-        if (!recentPickup) {
-            if (!FishingAPI.isFishing()) return
+        if (recentPickup || FishingAPI.isFishing()) {
+            tracker.renderDisplay(config.position)
         }
-
-        tracker.renderDisplay(config.position)
     }
 
     @SubscribeEvent
