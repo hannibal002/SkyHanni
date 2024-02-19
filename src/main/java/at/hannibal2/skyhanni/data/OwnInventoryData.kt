@@ -11,7 +11,7 @@ import at.hannibal2.skyhanni.utils.CollectionUtils.addOrPut
 import at.hannibal2.skyhanni.utils.DelayedRun
 import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalNameOrNull
-import at.hannibal2.skyhanni.utils.ItemUtils.getItemName
+import at.hannibal2.skyhanni.utils.ItemUtils.itemName
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.NEUInternalName
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
@@ -109,7 +109,7 @@ class OwnInventoryData {
     fun onChat(event: LorenzChatEvent) {
         sackToInventoryChatPattern.matchMatcher(event.message) {
             val name = group("name")
-            ignoreItem(500.milliseconds) { it.getItemName().contains(name) }
+            ignoreItem(500.milliseconds) { it.itemName.contains(name) }
         }
     }
 

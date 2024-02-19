@@ -22,6 +22,7 @@ import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalNameOrNull
 import at.hannibal2.skyhanni.utils.ItemUtils.getItemCategoryOrNull
 import at.hannibal2.skyhanni.utils.ItemUtils.getItemRarityOrNull
+import at.hannibal2.skyhanni.utils.ItemUtils.itemName
 import at.hannibal2.skyhanni.utils.ItemUtils.name
 import at.hannibal2.skyhanni.utils.KeyboardManager.isKeyHeld
 import at.hannibal2.skyhanni.utils.LocationUtils
@@ -415,13 +416,27 @@ class SkyHanniDebugsAndTests {
     }
 
     @SubscribeEvent
-    fun onSHowNpcPrice(event: LorenzToolTipEvent) {
+    fun onShowNpcPrice(event: LorenzToolTipEvent) {
         if (!LorenzUtils.inSkyBlock) return
         if (!debugConfig.showNpcPrice) return
         val internalName = event.itemStack.getInternalNameOrNull() ?: return
 
         val npcPrice = internalName.getNpcPriceOrNull() ?: return
         event.toolTip.add("§7NPC price: §6${npcPrice.addSeparators()}")
+    }
+
+    @SubscribeEvent
+    fun onShowItemName(event: LorenzToolTipEvent) {
+        if (!LorenzUtils.inSkyBlock) return
+        if (!debugConfig.showItemName) return
+        val itemStack = event.itemStack
+        val internalName = itemStack.getInternalName()
+        if (internalName == NEUInternalName.NONE) {
+            event.toolTip.add("Item name: no item.")
+            return
+        }
+        val name = internalName.itemName
+        event.toolTip.add("Item name: '$name'")
     }
 
     @SubscribeEvent

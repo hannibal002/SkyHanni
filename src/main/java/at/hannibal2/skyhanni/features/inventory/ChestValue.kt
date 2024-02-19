@@ -16,6 +16,7 @@ import at.hannibal2.skyhanni.utils.CollectionUtils.addAsSingletonList
 import at.hannibal2.skyhanni.utils.ConfigUtils
 import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalNameOrNull
+import at.hannibal2.skyhanni.utils.ItemUtils.itemName
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils.addButton
 import at.hannibal2.skyhanni.utils.LorenzUtils.isInIsland
@@ -129,12 +130,12 @@ class ChestValue {
             if (total < config.hideBelow) continue
             val textAmount = " §7x$amount:"
             val width = Minecraft.getMinecraft().fontRendererObj.getStringWidth(textAmount)
-            val name = "${stack.displayName.reduceStringLength((config.nameLength - width), ' ')} $textAmount"
+            val name = "${stack.itemName.reduceStringLength((config.nameLength - width), ' ')} $textAmount"
             val price = "§6${(total).formatPrice()}"
             val text = if (config.alignedDisplay)
                 "$name $price"
             else
-                "${stack.displayName} §7x$amount: §6${total.formatPrice()}"
+                "${stack.itemName} §7x$amount: §6${total.formatPrice()}"
             newDisplay.add(buildList {
                 val renderable = Renderable.hoverTips(
                     text,
