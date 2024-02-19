@@ -15,7 +15,7 @@ object PurseAPI {
     private val patternGroup = RepoPattern.group("data.purse")
     private val coinsPattern by patternGroup.pattern(
         "coins",
-        "(Piggy|Purse): §6(?<coins>[\\d,]+).*"
+        "(§.)*(Piggy|Purse): §6(?<coins>[\\d,.]+)( ?(§.)*\\([+-](?<earned>[\\d,.]+)\\)?|.*)?$"
     )
     val piggyPattern by patternGroup.pattern(
         "piggy",

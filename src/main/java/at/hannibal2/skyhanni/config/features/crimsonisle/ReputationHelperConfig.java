@@ -40,7 +40,7 @@ public class ReputationHelperConfig {
 
     @Expose
     @ConfigOption(name = "Show Locations", desc = "Crimson Isles waypoints for locations to get reputation.")
-    @ConfigEditorDropdown()
+    @ConfigEditorDropdown
     public ShowLocationEntry showLocation = ShowLocationEntry.ONLY_HOTKEY;
 
     public enum ShowLocationEntry implements HasLegacyId {
