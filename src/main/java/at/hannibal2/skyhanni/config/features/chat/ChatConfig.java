@@ -1,8 +1,10 @@
 package at.hannibal2.skyhanni.config.features.chat;
 
 import at.hannibal2.skyhanni.config.FeatureToggle;
+import at.hannibal2.skyhanni.config.features.chat.Emojis.EmojiConfig;
 import com.google.gson.annotations.Expose;
 import io.github.moulberry.moulconfig.annotations.Accordion;
+import io.github.moulberry.moulconfig.annotations.Category;
 import io.github.moulberry.moulconfig.annotations.ConfigEditorBoolean;
 import io.github.moulberry.moulconfig.annotations.ConfigEditorDraggableList;
 import io.github.moulberry.moulconfig.annotations.ConfigEditorKeybind;
@@ -34,6 +36,11 @@ public class ChatConfig {
     @ConfigOption(name = "Player Chat Symbols", desc = "")
     @Accordion
     public ChatSymbols chatSymbols = new ChatSymbols();
+
+    @Expose
+    @Category(name = "Emojis", desc = "Settings for chat emojis.")
+    @Accordion
+    public EmojiConfig EmojiConfig = new EmojiConfig();
 
     @Expose
     @ConfigOption(name = "Dungeon Filter", desc = "Hide specific message types in Dungeons.")
