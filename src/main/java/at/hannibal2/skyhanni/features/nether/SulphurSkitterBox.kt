@@ -1,6 +1,7 @@
 package at.hannibal2.skyhanni.features.nether
 
 import at.hannibal2.skyhanni.SkyHanniMod
+import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.config.features.crimsonisle.SulphurSkitterBoxConfig
 import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.data.jsonobjects.repo.ItemsJson
@@ -27,7 +28,7 @@ import java.awt.Color
 
 class SulphurSkitterBox {
 
-    private val config get() = SkyHanniMod.feature.crimsonIsle.sulphurSkitterBoxConfig
+    private val config get() = SkyHanniMod.feature.fishing.trophyFishing.sulphurSkitterBox
     private var rods = listOf<NEUInternalName>()
     private var spongeBlocks = listOf<BlockPos>()
     private var closestBlock: BlockPos? = null
@@ -113,4 +114,10 @@ class SulphurSkitterBox {
 
     fun isEnabled() =
         IslandType.CRIMSON_ISLE.isInIsland() && config.enabled && (!config.onlyWithRods || InventoryUtils.itemInHandId in rods)
+
+
+    @SubscribeEvent
+    fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
+        event.move(24, "crimsonIsle.sulphurSkitterBoxConfig", "fishing.trophyFishing.sulphurSkitterBox")
+    }
 }

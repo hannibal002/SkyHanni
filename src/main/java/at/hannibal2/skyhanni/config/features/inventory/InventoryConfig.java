@@ -57,11 +57,16 @@ public class InventoryConfig {
     public HelperConfig helper = new HelperConfig();
 
     @Expose
+    @ConfigOption(name = "Get From Sack", desc = "")
+    @Accordion
+    public GetFromSackConfig gfs = new GetFromSackConfig();
+
+    @Expose
     @ConfigOption(
         name = "Item Number",
         desc = "Showing the item number as a stack size for these items."
     )
-    @ConfigEditorDraggableList()
+    @ConfigEditorDraggableList
     public List<ItemNumberEntry> itemNumberAsStackSize = new ArrayList<>(Arrays.asList(
         NEW_YEAR_CAKE,
         RANCHERS_BOOTS_SPEED,

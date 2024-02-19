@@ -158,7 +158,7 @@ object NEUItems {
     fun NEUInternalName.getNpcPrice() = getNpcPriceOrNull() ?: -1.0
 
     fun NEUInternalName.getNpcPriceOrNull(): Double? {
-        if (equals("WISP_POTION")) {
+        if (this == NEUInternalName.WISP_POTION) {
             return 20_000.0
         }
         return BazaarDataHolder.getNpcPrice(this)
@@ -168,7 +168,7 @@ object NEUItems {
         manager.auctionManager.transformHypixelBazaarToNEUItemId(hypixelId).asInternalName()
 
     fun NEUInternalName.getPriceOrNull(useSellingPrice: Boolean = false): Double? {
-        if (equals("WISP_POTION")) {
+        if (this == NEUInternalName.WISP_POTION) {
             return 20_000.0
         }
         val result = manager.auctionManager.getBazaarOrBin(asString(), useSellingPrice)

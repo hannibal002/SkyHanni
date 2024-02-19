@@ -17,12 +17,17 @@ import at.hannibal2.skyhanni.utils.NEUItems.getPriceOrNull
 import at.hannibal2.skyhanni.utils.NumberUtil
 import at.hannibal2.skyhanni.utils.RenderUtils.renderStringsAndItems
 import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
+import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraft.item.ItemStack
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
 class SkyMartCopperPrice {
 
-    private val copperPattern = "§c(?<amount>.*) Copper".toPattern()
+    private val copperPattern by RepoPattern.pattern(
+        "garden.inventory.skymart.copper",
+        "§c(?<amount>.*) Copper"
+    )
+
     private var display = emptyList<List<Any>>()
     private val config get() = GardenAPI.config.skyMart
 

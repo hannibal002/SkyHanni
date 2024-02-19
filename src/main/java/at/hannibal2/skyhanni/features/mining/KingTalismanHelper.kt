@@ -17,6 +17,7 @@ import at.hannibal2.skyhanni.utils.LorenzVec
 import at.hannibal2.skyhanni.utils.RenderUtils.renderStrings
 import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.TimeUtils
+import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import io.github.moulberry.notenoughupdates.util.SkyBlockTime
 import net.minecraft.entity.item.EntityArmorStand
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
@@ -26,6 +27,11 @@ class KingTalismanHelper {
 
     private val config get() = SkyHanniMod.feature.mining.kingTalisman
     private val storage get() = ProfileStorageData.profileSpecific?.mining
+
+    private val kingPattern by RepoPattern.pattern(
+        "mining.kingtalisman.king",
+        "§6§lKing (?<name>.*)"
+    )
 
     companion object {
 
@@ -88,7 +94,7 @@ class KingTalismanHelper {
     private fun checkOffset() {
         val king = EntityUtils.getEntitiesNearby<EntityArmorStand>(LorenzVec(129.6, 196.0, 196.7), 2.0)
             .filter { it.name.startsWith("§6§lKing ") }.firstOrNull() ?: return
-        val foundKing = "§6§lKing (?<name>.*)".toPattern().matchMatcher(king.name) {
+        val foundKing = kingPattern.matchMatcher(king.name) {
             group("name")
         } ?: return
 
