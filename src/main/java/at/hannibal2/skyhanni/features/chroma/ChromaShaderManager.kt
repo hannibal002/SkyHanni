@@ -25,7 +25,7 @@ object ChromaShaderManager {
     private fun enable() {
         if (!chromaEnabled) {
             chromaEnabled = true
-            ShaderManager.enableShader("chroma")
+            ShaderManager.Shaders.CHROMA.enable()
         }
     }
 

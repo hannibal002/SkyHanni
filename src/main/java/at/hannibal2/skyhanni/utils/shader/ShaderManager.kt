@@ -4,12 +4,12 @@ import at.hannibal2.skyhanni.features.chroma.ChromaShader
 import at.hannibal2.skyhanni.features.misc.RoundedRectangleShader
 import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.LorenzUtils
-import java.io.BufferedReader
-import java.io.InputStreamReader
 import net.minecraft.client.Minecraft
 import net.minecraft.util.ResourceLocation
 import org.apache.commons.lang3.StringUtils
 import org.lwjgl.opengl.OpenGLException
+import java.io.BufferedReader
+import java.io.InputStreamReader
 
 /**
  * Object to handle shaders for SkyHanni
@@ -23,32 +23,17 @@ object ShaderManager {
     enum class Shaders(val shader: Shader) {
 
         CHROMA(ChromaShader.INSTANCE),
-        ROUNDED_RECTANGLE(RoundedRectangleShader.INSTANCE);
+        ROUNDED_RECTANGLE(RoundedRectangleShader.INSTANCE),
+        ;
 
-        companion object {
-
-            fun getShaderInstance(shaderName: String): Shader? = when (shaderName) {
-                "chroma" -> CHROMA.shader
-                "rounded_rect" -> ROUNDED_RECTANGLE.shader
-                else -> {
-                    null
-                }
-            }
+        fun enable() {
+            enableShader(shader)
         }
     }
 
-    private val shaders: MutableMap<String, Shader> = mutableMapOf()
     private var activeShader: Shader? = null
 
-    fun enableShader(shaderName: String) {
-        var shader = shaders[shaderName]
-
-        if (shader == null) {
-            shader = Shaders.getShaderInstance(shaderName)
-            if (shader == null) return
-            shaders[shaderName] = shader
-        }
-
+    fun enableShader(shader: Shader) {
         if (!shader.created) return
 
         activeShader = shader
