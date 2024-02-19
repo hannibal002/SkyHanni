@@ -147,6 +147,8 @@ Use `/sh` or `/skyhanni` to open the SkyHanni config in game.
 + Show pet items XP Share and Tier Boost as small icons next to the pet in an inventory. - Thunderblade73
 + Shift Click Brewing. - Thunderblade73
     + Makes normal clicks to shift clicks in Brewing Stand inventory.
++ Low Quiver Notification. - CarsCupcake
+    + This will notify you via title if your quiver is low on arrows according to chat message.
 
 </details>
 <details open><summary>
