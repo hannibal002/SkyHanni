@@ -337,6 +337,7 @@ interface Renderable {
             }
         }
 
+
         fun progressBar(
             percent: Double,
             startColor: Color = Color(255, 0, 0),
@@ -408,7 +409,6 @@ interface Renderable {
             override val height = render.height
             override val horizontalAlign = horizontalAlign
             override val verticalAlign = verticalAlign
-
             override fun render(posX: Int, posY: Int) {
                 render.renderXAligned(0, 0, width)
             }
