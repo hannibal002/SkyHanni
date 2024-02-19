@@ -958,6 +958,11 @@ Use `/sh` or `/skyhanni` to open the SkyHanni config in game.
     + Support for the Hypixel command /p kick /pk to add a reason. The reason will be sent in party chat before
       kicking the player.
 + Color the month names on the scoreboard. - J10a1n15
++ Blocks the mining ability when on a private island. - Thunderblade73
++ Crimson Isle Volcano Geyser features. - MrFast
+    + Stops the white geyser smoke particles from rendering if your bobber is near the geyser.
+    + Draws a box around the effective area of the geyser.
+    + Change the color of the box around the geyser.
 
 </details>
 <details open><summary>

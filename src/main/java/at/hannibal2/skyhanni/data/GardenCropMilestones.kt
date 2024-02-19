@@ -9,14 +9,20 @@ import at.hannibal2.skyhanni.features.garden.GardenAPI
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.NumberUtil.formatNumber
 import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
+import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraft.item.ItemStack
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
 object GardenCropMilestones {
-
-    // TODO USE SH-REPO
-    private val cropPattern = "§7Harvest §f(?<name>.*) §7on .*".toPattern()
-    val totalPattern = "§7Total: §a(?<name>.*)".toPattern()
+    private val patternGroup = RepoPattern.group("data.garden.milestone")
+    private val cropPattern by patternGroup.pattern(
+        "crop",
+        "§7Harvest §f(?<name>.*) §7on .*"
+    )
+    val totalPattern by patternGroup.pattern(
+        "total",
+        "§7Total: §a(?<name>.*)"
+    )
 
     fun getCropTypeByLore(itemStack: ItemStack): CropType? {
         for (line in itemStack.getLore()) {

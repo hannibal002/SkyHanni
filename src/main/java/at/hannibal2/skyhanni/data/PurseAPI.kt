@@ -7,13 +7,21 @@ import at.hannibal2.skyhanni.events.PurseChangeEvent
 import at.hannibal2.skyhanni.utils.NumberUtil.formatNumber
 import at.hannibal2.skyhanni.utils.NumberUtil.milion
 import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
+import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraft.client.Minecraft
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
-class PurseAPI {
+object PurseAPI {
+    private val patternGroup = RepoPattern.group("data.purse")
+    private val coinsPattern by patternGroup.pattern(
+        "coins",
+        "(§.)*(Piggy|Purse): §6(?<coins>[\\d,.]+)( ?(§.)*\\([+-](?<earned>[\\d,.]+)\\)?|.*)?$"
+    )
+    val piggyPattern by patternGroup.pattern(
+        "piggy",
+        "Piggy: (?<coins>.*)"
+    )
 
-    // TODO USE SH-REPO
-    private val pattern = "(Piggy|Purse): §6(?<coins>[\\d,]*).*".toPattern()
     private var currentPurse = 0.0
     private var inventoryCloseTime = 0L
 
@@ -26,7 +34,7 @@ class PurseAPI {
     fun onTick(event: LorenzTickEvent) {
 
         for (line in ScoreboardData.sidebarLinesFormatted) {
-            val newPurse = pattern.matchMatcher(line) {
+            val newPurse = coinsPattern.matchMatcher(line) {
                 group("coins").formatNumber().toDouble()
             } ?: continue
             val diff = newPurse - currentPurse
