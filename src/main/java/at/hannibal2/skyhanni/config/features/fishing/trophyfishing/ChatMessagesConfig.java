@@ -25,7 +25,7 @@ public class ChatMessagesConfig {
             "§fStyle 2: §bYou caught a §5Moldfin §6§lGOLD§b. §7(2)\n" +
             "§fStyle 3: §bYou caught your 2nd §6§lGOLD §5Moldfin§b."
     )
-    @ConfigEditorDropdown()
+    @ConfigEditorDropdown
     public DesignFormat design = DesignFormat.STYLE_1;
 
     public enum DesignFormat implements HasLegacyId {

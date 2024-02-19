@@ -33,7 +33,7 @@ public class MushroomPetPerkConfig {
         desc = "Drag text to change the appearance of the overlay.\n" +
             "Hold a farming tool to show the overlay."
     )
-    @ConfigEditorDraggableList()
+    @ConfigEditorDraggableList
     public List<MushroomTextEntry> text = new ArrayList<>(Arrays.asList(
         TITLE,
         MUSHROOM_TIER,

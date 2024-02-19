@@ -4,8 +4,8 @@ import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.events.LorenzTickEvent
 import at.hannibal2.skyhanni.mixins.transformers.AccessorGuiPlayerTabOverlay
 import at.hannibal2.skyhanni.utils.LorenzUtils
-import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.StringUtils.removeResets
+import at.hannibal2.skyhanni.utils.StringUtils.removeSFormattingCode
 import at.hannibal2.skyhanni.utils.StringUtils.trimWhiteSpaceAndResets
 import at.hannibal2.skyhanni.utils.TabListData
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
@@ -107,7 +107,7 @@ object TabListReader {
 
         val column = TabColumn("§2§lOther")
 
-        var footer = tabList.footer_skyhanni.formattedText.removeColor()
+        var footer = tabList.footer_skyhanni.formattedText.removeSFormattingCode()
 
         var matcher = godPotPattern.matcher(tabList.footer_skyhanni.unformattedText)
         if (matcher.find()) {
