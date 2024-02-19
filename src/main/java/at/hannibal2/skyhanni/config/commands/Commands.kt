@@ -373,7 +373,7 @@ object Commands {
             "shtracksounds",
             "Tracks the sounds for the specified duration (in seconds) and copies it to the clipboard"
         ) { TrackSoundsCommand.command(it) }
-        registerCommand("shcopytablist", "Copies the tab list data to the clipboard") { TabListData.copyCommand(it) }
+        registerCommand(
             "shcopytablist",
             "Copies the tab list data to the clipboard"
         ) { TabListData.copyCommand(it) }
