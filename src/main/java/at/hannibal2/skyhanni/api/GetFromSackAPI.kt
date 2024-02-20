@@ -178,7 +178,7 @@ object GetFromSackAPI {
             return
         }
         missingChatPattern.matchMatcher(message) {
-            bazaarMessage(stack.name.asString().firstLetterUppercase(), stack.amount)
+            bazaarMessage(stack.name.asString().allLettersFirstUppercase(), stack.amount)
             lastItemStack = null
             return
         }
