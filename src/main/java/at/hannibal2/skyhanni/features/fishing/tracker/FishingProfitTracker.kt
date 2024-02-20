@@ -221,6 +221,7 @@ object FishingProfitTracker {
     }
 
     private fun maybeAddItem(internalName: NEUInternalName, amount: Int) {
+        if (!FishingAPI.isFishing(checkRodInHand = false)) return
         if (!isAllowedItem(internalName)) {
             ChatUtils.debug("Ignored non-fishing item pickup: $internalName'")
             return

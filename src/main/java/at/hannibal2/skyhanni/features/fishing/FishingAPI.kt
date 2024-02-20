@@ -1,6 +1,7 @@
 package at.hannibal2.skyhanni.features.fishing
 
 import at.hannibal2.skyhanni.events.FishingBobberCastEvent
+import at.hannibal2.skyhanni.events.ItemInHandChangeEvent
 import at.hannibal2.skyhanni.features.fishing.trophy.TrophyFishManager
 import at.hannibal2.skyhanni.features.fishing.trophy.TrophyFishManager.getFilletValue
 import at.hannibal2.skyhanni.features.fishing.trophy.TrophyRarity
@@ -27,10 +28,11 @@ object FishingAPI {
     private val waterBlocks = listOf(Blocks.water, Blocks.flowing_water)
 
     var lastCastTime = SimpleTimeMark.farPast()
+    var holdingRod = false
 
     @SubscribeEvent
     fun onJoinWorld(event: EntityJoinWorldEvent) {
-        if (!LorenzUtils.inSkyBlock || !hasFishingRodInHand()) return
+        if (!LorenzUtils.inSkyBlock || !holdingRod) return
         val entity = event.entity ?: return
         if (entity !is EntityFishHook) return
         if (entity.angler != Minecraft.getMinecraft().thePlayer) return
@@ -39,13 +41,17 @@ object FishingAPI {
         FishingBobberCastEvent(entity).postAndCatch()
     }
 
-    fun hasFishingRodInHand() = InventoryUtils.itemInHandId.isFishingRod()
-
-    fun NEUInternalName.isFishingRod() = contains("ROD")
+    private fun NEUInternalName.isFishingRod() = contains("ROD")
 
     fun ItemStack.isBait(): Boolean {
         val name = name ?: return false
         return stackSize == 1 && (name.removeColor().startsWith("Obfuscated") || name.endsWith(" Bait"))
+    }
+
+    @SubscribeEvent
+    fun onItemInHandChange(event: ItemInHandChangeEvent) {
+        // TODO correct rod type per island water/lava
+        holdingRod = event.newItem.isFishingRod()
     }
 
     fun isLavaRod() = InventoryUtils.getItemInHand()?.getLore()?.any { it.contains("Lava Rod") } ?: false
@@ -62,7 +68,7 @@ object FishingAPI {
         return info?.getFilletValue(rarity) ?: 0
     }
 
-    fun isFishing() = FishingDetection.isFishing
+    fun isFishing(checkRodInHand: Boolean = true) = IsFishingDetection.isFishing || (checkRodInHand && holdingRod)
 
     fun seaCreatureCount(entity: EntityArmorStand): Int {
         val name = entity.name

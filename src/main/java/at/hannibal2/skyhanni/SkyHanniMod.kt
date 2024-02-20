@@ -134,9 +134,9 @@ import at.hannibal2.skyhanni.features.fame.CityProjectFeatures
 import at.hannibal2.skyhanni.features.fishing.ChumBucketHider
 import at.hannibal2.skyhanni.features.fishing.FishingAPI
 import at.hannibal2.skyhanni.features.fishing.FishingBaitWarnings
-import at.hannibal2.skyhanni.features.fishing.FishingDetection
 import at.hannibal2.skyhanni.features.fishing.FishingHookDisplay
 import at.hannibal2.skyhanni.features.fishing.FishingTimer
+import at.hannibal2.skyhanni.features.fishing.IsFishingDetection
 import at.hannibal2.skyhanni.features.fishing.SeaCreatureFeatures
 import at.hannibal2.skyhanni.features.fishing.SeaCreatureManager
 import at.hannibal2.skyhanni.features.fishing.SeaCreatureMessageShortener
@@ -472,7 +472,7 @@ class SkyHanniMod {
         loadModule(SackAPI)
         loadModule(BingoAPI)
         loadModule(FishingAPI)
-        loadModule(FishingDetection)
+        loadModule(IsFishingDetection)
         loadModule(LorenzUtils)
         loadModule(NEUItems)
 
