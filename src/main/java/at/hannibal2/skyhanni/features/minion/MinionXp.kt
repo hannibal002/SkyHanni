@@ -95,7 +95,7 @@ class MinionXp {
             it.value.getLore().isNotEmpty() && (!isMinion || it.key in listOf(21 .. 26, 30 .. 35, 39 .. 44).flatten())
         }.forEach { (_, itemStack) ->
             val item = toPrimitiveItemStack(itemStack)
-            val name = item.name
+            val name = item.internalName
             val xp = xpInfoMap[name] ?: return@forEach
 
             // TODO add wisdom and temporary skill exp (Events) to calculation

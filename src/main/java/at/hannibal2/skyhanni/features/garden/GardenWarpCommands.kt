@@ -4,7 +4,6 @@ import at.hannibal2.skyhanni.events.LorenzKeyPressEvent
 import at.hannibal2.skyhanni.events.MessageSendToServerEvent
 import at.hannibal2.skyhanni.features.misc.LockMouseLook
 import at.hannibal2.skyhanni.utils.ChatUtils
-import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.NEUItems
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
@@ -33,20 +32,20 @@ class GardenWarpCommands {
 
         if (message == "/home") {
             event.isCanceled = true
-            LorenzUtils.sendCommandToServer("warp garden")
+            ChatUtils.sendCommandToServer("warp garden")
             ChatUtils.chat("§aTeleported you to the spawn location!", prefix = false)
         }
 
         if (message == "/barn") {
             event.isCanceled = true
-            LorenzUtils.sendCommandToServer("tptoplot barn")
+            ChatUtils.sendCommandToServer("tptoplot barn")
             LockMouseLook.autoDisable()
         }
 
         tpPlotPattern.matchMatcher(event.message) {
             event.isCanceled = true
             val plotName = group("plot")
-            LorenzUtils.sendCommandToServer("tptoplot $plotName")
+            ChatUtils.sendCommandToServer("tptoplot $plotName")
             LockMouseLook.autoDisable()
         }
     }
@@ -69,6 +68,6 @@ class GardenWarpCommands {
         if (command == "tptoplot barn") {
             LockMouseLook.autoDisable()
         }
-        LorenzUtils.sendCommandToServer(command)
+        ChatUtils.sendCommandToServer(command)
     }
 }

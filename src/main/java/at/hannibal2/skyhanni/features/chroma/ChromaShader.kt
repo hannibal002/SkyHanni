@@ -16,7 +16,6 @@ import net.minecraft.client.Minecraft
 
 
 abstract class ChromaShader(vertex: String, fragment: String) : Shader(vertex, fragment) {
-
     val config get() = SkyHanniMod.feature.chroma
 
     override fun registerUniforms() {

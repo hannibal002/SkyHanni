@@ -22,6 +22,7 @@ object ShaderManager {
      * in the when expression
      */
     enum class Shaders(val shader: Shader) {
+
         STANDARD_CHROMA(StandardChromaShader.INSTANCE),
         TEXTURED_CHROMA(TexturedChromaShader.INSTANCE),
         ROUNDED_RECTANGLE(RoundedRectangleShader.INSTANCE);

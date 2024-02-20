@@ -57,6 +57,8 @@
 + Show pet items XP Share and Tier Boost as small icons next to the pet in an inventory. - Thunderblade73
 + Added Shift Click Brewing. - Thunderblade73
     + Makes normal clicks to shift clicks in Brewing Stand inventory.
++ Low Quiver Notification. - CarsCupcake
+    + This will notify you via title if your quiver is low on arrows according to chat message.
 
 #### Item Features
 
@@ -111,6 +113,8 @@
 + Updating the Garden Optimal Speed Display and Warning immediately when changing the setting. - hannibal2
 + Added auto mouse-unlocking on plot teleport in garden. - martimavocado
 + Improve items in sacks display in Visitor Shopping List wording and color. - alexia
++ Hide Garden Composter reminder while participating in a Farming Contest. - hannibal2
++ Improve Exportable Carrots/Expired Pumpkin tooltip in /ff. - alexia
 
 #### Rift Changes
 
@@ -220,6 +224,7 @@
 + Fixed Sensitivity Reducer still working when switching from the garden to the hub. - martimavocado
 + Fixed a rare farming weight API error. - CalMWolfs
 + Fixed mouse rotation unlocks after doing /warp garden with Sensitivity Reducer on. - martimavocado
++ Fixed wording of composter fuel warning. - alexia
 
 #### Combat Fixes
 
@@ -270,6 +275,8 @@
 + Fixed Reindrake mob, Frosty NPC and frosty the snow blaster shop counting as sea creatures in the barn fishing
   timer. - hannibal2
 + Fixed trophy fish chat message detection. - Empa
++ Fixed Sheep pet triggering Geyser Box and fixed particles being permanently hidden after throwing bobber at it once. - Empa
++ Fixed fishing profit tracker stops working when trophy fishing for 10 minutes. - hannibal2
 
 #### Invenory Fixes
 
@@ -285,6 +292,9 @@
 + Fixed shift-click NPC sell not working for menus with different sizes and full inventories. - Thunderblade73
 + Fixed an error with the shift-click NPC sell feature. - Thunderblade73
 + Ignore Shift-Click NPC Sell when right-clicking a sack. - Thunderblade73
++ Fixed pet level stack size - Thunderblade73
++ Fixed enchantment names and pet names in the chest value feature. - hannibal2
++ Fixed pet names in item profit trackers. - hannibal2
 
 #### Bingo Fixes
 
@@ -304,6 +314,7 @@
 + Fixed render overlapping problem with chat, SkyHanni GUIs and title. - Thunderblade73
 + Fixed GUI positions moving into the bottom-right corner when leaving the GUI position editor while pressing the mouse
   button on next reopen. - hannibal2
++ Fixed parts of Compact Tab List being uncoloured. - CalMWolfs
 
 #### Winter Fixes
 
@@ -388,6 +399,17 @@
 + Fixed an NPE in ReflectionUtils.shPackageName. - Thunderblade73
 + Cleaned up string pluralization methods. - alexia
 + Moved many regex patterns in the repo and code cleanup. - CalMWolfs
++ Improved purse pattern. - j10a1n15
++ Added cache to item stack → neu internal name. - hannibal2
++ Added cache to internal name → item name. - hannibal2
++ Added debug option to show SkyHanni item name in item lore. - hannibal2
++ Created ActionBarUpdateEvent and used it. - CalMWolfs
++ Added Rounded Rectangles Renderable. - VixidDev
++ Added progress Bar Renderable. - Thunderblade73
++ Added Horizontal Container Renderable. - Thunderblade73
++ Added GetFromSackAPI. - Thunderblade73
++ Improved Packet Test. - Thunderblade73
++ Increases the feature set of the packet test and improves usability.
 
 ## Version 0.22
 

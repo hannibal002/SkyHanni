@@ -23,6 +23,9 @@ object ChromaShaderManager {
         enable(chromaType)
     }
 
+    /**
+     * Disables the currently active chroma shader
+     */
     fun end() {
         disable()
     }

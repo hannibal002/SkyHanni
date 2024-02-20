@@ -9,10 +9,11 @@ import at.hannibal2.skyhanni.events.LorenzRenderWorldEvent
 import at.hannibal2.skyhanni.features.misc.RoundedRectangleShader
 import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.renderables.Renderable
-import at.hannibal2.skyhanni.utils.shader.ShaderManager
 import at.hannibal2.skyhanni.utils.renderables.RenderableUtils.renderXAligned
+import at.hannibal2.skyhanni.utils.shader.ShaderManager
 import io.github.moulberry.moulconfig.internal.TextRenderUtils
 import io.github.moulberry.notenoughupdates.util.Utils
+import java.awt.Color
 import net.minecraft.client.Minecraft
 import net.minecraft.client.gui.FontRenderer
 import net.minecraft.client.gui.Gui
@@ -28,7 +29,6 @@ import net.minecraft.util.AxisAlignedBB
 import net.minecraft.util.MathHelper
 import net.minecraft.util.ResourceLocation
 import org.lwjgl.opengl.GL11
-import java.awt.Color
 import kotlin.math.cos
 import kotlin.math.sin
 import kotlin.math.sqrt
