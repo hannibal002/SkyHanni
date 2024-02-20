@@ -193,7 +193,7 @@ object InquisitorWaypointShare {
             return
         }
         inquisitor = -1
-        LorenzUtils.sendCommandToServer("pc Inquisitor dead!")
+        ChatUtils.sendCommandToServer("pc Inquisitor dead!")
     }
 
     fun sendInquisitor() {
@@ -220,7 +220,7 @@ object InquisitorWaypointShare {
         val x = location.x.toInt()
         val y = location.y.toInt()
         val z = location.z.toInt()
-        LorenzUtils.sendCommandToServer("pc x: $x, y: $y, z: $z ")
+        ChatUtils.sendCommandToServer("pc x: $x, y: $y, z: $z ")
     }
 
     @SubscribeEvent(priority = EventPriority.LOW, receiveCanceled = true)
