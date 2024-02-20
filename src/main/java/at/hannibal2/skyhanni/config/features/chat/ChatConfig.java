@@ -2,11 +2,7 @@ package at.hannibal2.skyhanni.config.features.chat;
 
 import at.hannibal2.skyhanni.config.FeatureToggle;
 import com.google.gson.annotations.Expose;
-import io.github.moulberry.moulconfig.annotations.Accordion;
-import io.github.moulberry.moulconfig.annotations.ConfigEditorBoolean;
-import io.github.moulberry.moulconfig.annotations.ConfigEditorDraggableList;
-import io.github.moulberry.moulconfig.annotations.ConfigEditorKeybind;
-import io.github.moulberry.moulconfig.annotations.ConfigOption;
+import io.github.moulberry.moulconfig.annotations.*;
 import org.lwjgl.input.Keyboard;
 
 import java.util.ArrayList;
@@ -124,4 +120,16 @@ public class ChatConfig {
     @ConfigEditorBoolean
     @FeatureToggle
     public boolean skyBlockXPInChat = true;
+
+    @Expose
+    @ConfigOption(name = "Jacob's Event", desc = "Hides the fortune message from when a contest starts outside the Garden.")
+    @ConfigEditorBoolean
+    @FeatureToggle
+    public boolean hideJacob = true;
+
+    @Expose
+    @ConfigOption(name = "Sky Mall", desc = "Hides the Sky Mall message outside Mining Islands.")
+    @ConfigEditorBoolean
+    @FeatureToggle
+    public boolean hideSkyMall = true;
 }

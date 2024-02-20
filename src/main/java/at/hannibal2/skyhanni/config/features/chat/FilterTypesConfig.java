@@ -86,6 +86,14 @@ public class FilterTypesConfig {
     @FeatureToggle
     public boolean diana = false;
 
+    @Expose
+    @ConfigOption(name = "Daily", desc = "Hides Anita's artifact, SkyMall and Great Spook Tree unneeded messages.")
+    @ConfigEditorBoolean
+    @FeatureToggle
+    public boolean daily = true;
+
+    public boolean hideJacob = true;
+
     //TODO remove
     @Expose
     @ConfigOption(name = "Others", desc = "Hide other annoying messages.")
