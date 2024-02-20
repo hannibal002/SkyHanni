@@ -144,7 +144,6 @@ import at.hannibal2.skyhanni.features.fishing.SharkFishCounter
 import at.hannibal2.skyhanni.features.fishing.ShowFishingItemName
 import at.hannibal2.skyhanni.features.fishing.ThunderSparksHighlight
 import at.hannibal2.skyhanni.features.fishing.tracker.FishingProfitTracker
-import at.hannibal2.skyhanni.features.fishing.tracker.FishingTrackerCategoryManager
 import at.hannibal2.skyhanni.features.fishing.tracker.SeaCreatureTracker
 import at.hannibal2.skyhanni.features.fishing.trophy.GeyserFishing
 import at.hannibal2.skyhanni.features.fishing.trophy.OdgerWaypoint
@@ -658,7 +657,6 @@ class SkyHanniMod {
         loadModule(GetFromSacksTabComplete)
         loadModule(SlayerProfitTracker)
         loadModule(FishingProfitTracker)
-        loadModule(FishingTrackerCategoryManager)
         loadModule(SeaCreatureTracker)
         loadModule(SlayerItemsOnGround())
         loadModule(RestorePieceOfWizardPortalLore())

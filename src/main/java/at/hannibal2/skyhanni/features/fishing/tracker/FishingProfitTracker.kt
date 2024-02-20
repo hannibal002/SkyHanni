@@ -1,12 +1,15 @@
 package at.hannibal2.skyhanni.features.fishing.tracker
 
 import at.hannibal2.skyhanni.SkyHanniMod
+import at.hannibal2.skyhanni.data.jsonobjects.repo.FishingProfitItemsJson
 import at.hannibal2.skyhanni.events.FishingBobberCastEvent
 import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.ItemAddEvent
 import at.hannibal2.skyhanni.events.LorenzChatEvent
 import at.hannibal2.skyhanni.events.LorenzWorldChangeEvent
+import at.hannibal2.skyhanni.events.RepositoryReloadEvent
 import at.hannibal2.skyhanni.features.fishing.FishingAPI
+import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.CollectionUtils.addAsSingletonList
 import at.hannibal2.skyhanni.utils.DelayedRun
@@ -18,6 +21,7 @@ import at.hannibal2.skyhanni.utils.NumberUtil
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.NumberUtil.formatNumber
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
+import at.hannibal2.skyhanni.utils.StringUtils
 import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
@@ -91,6 +95,13 @@ object FishingProfitTracker {
     private val nameAll: CategoryName = "All"
     private var currentCategory: CategoryName = nameAll
 
+    private var itemCategories = mapOf<String, List<NEUInternalName>>()
+
+    @SubscribeEvent
+    fun onRepoReload(event: RepositoryReloadEvent) {
+        itemCategories = event.getConstant<FishingProfitItemsJson>("FishingProfitItems").categories
+    }
+
     private fun getCurrentCategories(data: Data): Map<CategoryName, Int> {
         val map = mutableMapOf<CategoryName, Int>()
         map[nameAll] = data.items.size
@@ -125,6 +136,7 @@ object FishingProfitTracker {
 
     private fun MutableList<List<Any>>.addCategories(data: Data): (NEUInternalName) -> Boolean {
         val amounts = getCurrentCategories(data)
+        checkMissingItems(data)
         val list = amounts.keys.toList()
         if (currentCategory !in list) {
             currentCategory = nameAll
@@ -149,6 +161,24 @@ object FishingProfitTracker {
             { it in items }
         }
         return filter
+    }
+
+    private fun checkMissingItems(data: Data) {
+        val missingItems = mutableListOf<NEUInternalName>()
+        for (internalName in data.items.keys) {
+            if (itemCategories.none { internalName in it.value }) {
+                missingItems.add(internalName)
+            }
+        }
+        if (missingItems.isNotEmpty()) {
+            val label = StringUtils.pluralize(missingItems.size, "item", withNumber = true)
+            ErrorManager.logErrorStateWithData(
+                "Loaded $label not in a fishing category",
+                "Found items missing in itemCategories",
+                "missingItems" to missingItems,
+                noStackTrace = true
+            )
+        }
     }
 
     @SubscribeEvent
@@ -199,8 +229,6 @@ object FishingProfitTracker {
         tracker.addItem(internalName, amount)
         addCatch()
     }
-
-    private val itemCategories get() = FishingTrackerCategoryManager.itemCategories
 
     private fun isAllowedItem(internalName: NEUInternalName) = itemCategories.any { internalName in it.value }
 
