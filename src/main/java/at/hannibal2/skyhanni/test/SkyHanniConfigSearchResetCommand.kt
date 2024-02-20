@@ -145,10 +145,7 @@ object SkyHanniConfigSearchResetCommand {
         } catch (e: Exception) {
             ErrorManager.logErrorWithData(
                 e, "Error while trying to toggle config element",
-                "args" to args.toList(),
-                "path" to path,
-                "value1" to rawJson1,
-                "value2" to rawJson2,
+                "args" to args.toList()
             )
             "§cError while trying to toggle config element"
         }
