@@ -258,9 +258,6 @@ class ChatFilter {
         "§6§lGOOD CATCH! §r§bYou found a §r§fLight Bait§r§b.",
         "§6§lGOOD CATCH! §r§bYou found a §r§aHot Bait§r§b.",
         "§6§lGOOD CATCH! §r§bYou found a §r§fSpooky Bait§r§b.",
-    )
-
-    private val dailyMessages = listOf(
         "§bNew day! §r§eYour §r§2Sky Mall §r§ebuff changed!",
         "§8§oYou can disable this messaging by toggling Sky Mall in your /hotm!",
         "§e[NPC] Jacob§f: §rMy contest has started!",
@@ -373,7 +370,6 @@ class ChatFilter {
         "money" to auctionHouseMessages,
         "useless_warning" to uselessWarningMessages,
         "annoying_spam" to annoyingSpamMessages,
-        "daily_spam" to dailyMessages,
         "powder_mining" to powderMiningMessages,
         "fire_sale" to fireSaleMessages,
     )
@@ -413,7 +409,6 @@ class ChatFilter {
         config.winterGift && message.isPresent("winter_gift") -> "winter_gift"
         config.powderMining && message.isPresent("powder_mining") -> "powder_mining"
         config.fireSale && message.isPresent("fire_sale") -> "fire_sale"
-        config.daily && message.isPresent("daily_spam") -> "daily_spam"
         generalConfig.hideJacob && !GardenAPI.inGarden() && anitaFortunePattern.matches(message) -> "jacob_event"
         generalConfig.hideSkyMall && LocationUtils.inMiningIsland() && skymallPerkPattern.matches(message) -> "skymall"
 
