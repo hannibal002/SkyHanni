@@ -11,6 +11,7 @@ import at.hannibal2.skyhanni.events.MessageSendToServerEvent
 import at.hannibal2.skyhanni.events.RepositoryReloadEvent
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.ChatUtils.isCommand
+import at.hannibal2.skyhanni.utils.ItemUtils.itemName
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.NEUInternalName
 import at.hannibal2.skyhanni.utils.NEUInternalName.Companion.asInternalName
@@ -18,7 +19,6 @@ import at.hannibal2.skyhanni.utils.NumberUtil.isInt
 import at.hannibal2.skyhanni.utils.PrimitiveItemStack
 import at.hannibal2.skyhanni.utils.PrimitiveItemStack.Companion.makePrimitiveStack
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
-import at.hannibal2.skyhanni.utils.StringUtils.allLettersFirstUppercase
 import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraft.inventory.Slot
@@ -173,12 +173,12 @@ object GetFromSackAPI {
         fromSacksChatPattern.matchMatcher(message) {
             val diff = stack.amount - group("amount").toInt()
             if (diff <= 0) return
-            bazaarMessage(stack.name.asString().allLettersFirstUppercase(), diff, true)
+            bazaarMessage(stack.name.itemName, diff, true)
             lastItemStack = null
             return
         }
         missingChatPattern.matchMatcher(message) {
-            bazaarMessage(stack.name.asString().allLettersFirstUppercase(), stack.amount)
+            bazaarMessage(stack.name.itemName, stack.amount)
             lastItemStack = null
             return
         }
