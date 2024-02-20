@@ -55,5 +55,5 @@ _Frequently Asked Questions_
 >  - Execute the obtained command to reset the tracker.
 
 
-*This FAQ was last updated on February 5th, 2024.
+*This FAQ was last updated on February 20th, 2024.
 If you believe there's something that should be added to this list, please tell us, so we can add it.*
