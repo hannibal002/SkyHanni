@@ -47,7 +47,7 @@ public class CropMilestonesConfig {
     @ConfigOption(
         name = "Time Format",
         desc = "Change the highest time unit to show (1h30m vs 90min)")
-    @ConfigEditorDropdown()
+    @ConfigEditorDropdown
     public Property<TimeFormatEntry> highestTimeFormat = Property.of(YEAR);
 
     public enum TimeFormatEntry implements HasLegacyId {
@@ -95,7 +95,7 @@ public class CropMilestonesConfig {
         desc = "Drag text to change the appearance of the overlay.\n" +
             "Hold a farming tool to show the overlay."
     )
-    @ConfigEditorDraggableList()
+    @ConfigEditorDraggableList
     public List<MilestoneTextEntry> text = new ArrayList<>(Arrays.asList(
         TITLE,
         MILESTONE_TIER,

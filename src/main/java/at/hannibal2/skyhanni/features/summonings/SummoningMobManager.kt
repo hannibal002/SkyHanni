@@ -19,6 +19,7 @@ import at.hannibal2.skyhanni.utils.NumberUtil
 import at.hannibal2.skyhanni.utils.RenderUtils.renderStrings
 import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.getLorenzVec
+import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraft.entity.EntityLiving
 import net.minecraft.entity.EntityLivingBase
 import net.minecraft.entity.item.EntityArmorStand
@@ -36,16 +37,23 @@ class SummoningMobManager {
     private var searchArmorStands = false
     private var searchMobs = false
 
-    // TODO repo
-    //§aYou have spawned your Tank Zombie §r§asoul! §r§d(249 Mana)
-    private val spawnPattern = "§aYou have spawned your (.+) §r§asoul! §r§d\\((\\d+) Mana\\)".toPattern()
-    private val despawnPattern = "§cYou have despawned your (monster|monsters)!".toPattern()
-
-    //§a§ohannibal2's Tank Zombie§r §a160k§c❤
-    private val healthPattern = "§a§o(.+)'s (.+)§r §[ae]([\\dkm]+)§c❤".toPattern()
-
-    //§cThe Seraph recalled your 3 summoned allies!
-    private val seraphRecallPattern = "§cThe Seraph recalled your (\\d) summoned allies!".toPattern()
+    private val patternGroup = RepoPattern.group("summoning.mobs")
+    private val spawnPattern by patternGroup.pattern( //§aYou have spawned your Tank Zombie §r§asoul! §r§d(249 Mana)
+        "spawn",
+        "§aYou have spawned your (.+) §r§asoul! §r§d\\((\\d+) Mana\\)"
+    )
+    private val despawnPattern by patternGroup.pattern(
+        "despawn",
+        "§cYou have despawned your (monster|monsters)!"
+    )
+    private val healthPattern by patternGroup.pattern( //§a§ohannibal2's Tank Zombie§r §a160k§c❤
+        "health",
+        "§a§o(.+)'s (.+)§r §[ae]([\\dkm]+)§c❤"
+    )
+    private val seraphRecallPattern by patternGroup.pattern( //§cThe Seraph recalled your 3 summoned allies!
+        "seraphrecall",
+        "§cThe Seraph recalled your (\\d) summoned allies!"
+    )
 
     @SubscribeEvent
     fun onChat(event: LorenzChatEvent) {

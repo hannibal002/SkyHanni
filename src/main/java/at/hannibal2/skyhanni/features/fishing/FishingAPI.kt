@@ -1,14 +1,9 @@
 package at.hannibal2.skyhanni.features.fishing
 
 import at.hannibal2.skyhanni.events.FishingBobberCastEvent
-import at.hannibal2.skyhanni.events.IslandChangeEvent
-import at.hannibal2.skyhanni.events.ItemInHandChangeEvent
-import at.hannibal2.skyhanni.events.SkillExpGainEvent
-import at.hannibal2.skyhanni.features.fishing.tracker.FishingProfitTracker
 import at.hannibal2.skyhanni.features.fishing.trophy.TrophyFishManager
 import at.hannibal2.skyhanni.features.fishing.trophy.TrophyFishManager.getFilletValue
 import at.hannibal2.skyhanni.features.fishing.trophy.TrophyRarity
-import at.hannibal2.skyhanni.utils.DelayedRun
 import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.ItemUtils.name
@@ -25,7 +20,6 @@ import net.minecraft.init.Blocks
 import net.minecraft.item.ItemStack
 import net.minecraftforge.event.entity.EntityJoinWorldEvent
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
-import kotlin.time.Duration.Companion.seconds
 
 object FishingAPI {
 
@@ -33,7 +27,6 @@ object FishingAPI {
     private val waterBlocks = listOf(Blocks.water, Blocks.flowing_water)
 
     var lastCastTime = SimpleTimeMark.farPast()
-    var lastActiveFishingTime = SimpleTimeMark.farPast()
 
     @SubscribeEvent
     fun onJoinWorld(event: EntityJoinWorldEvent) {
@@ -44,33 +37,6 @@ object FishingAPI {
 
         lastCastTime = SimpleTimeMark.now()
         FishingBobberCastEvent(entity).postAndCatch()
-    }
-
-    @SubscribeEvent
-    fun onItemInHandChange(event: ItemInHandChangeEvent) {
-        if (event.oldItem.isFishingRod()) {
-            lastActiveFishingTime = SimpleTimeMark.now()
-        }
-        if (event.newItem.isFishingRod()) {
-            DelayedRun.runDelayed(1.seconds) {
-                lastActiveFishingTime = SimpleTimeMark.now()
-            }
-        }
-    }
-
-    @SubscribeEvent
-    fun onSkillExpGain(event: SkillExpGainEvent) {
-        val skill = event.skill
-        if (FishingProfitTracker.isEnabled()) {
-            if (skill != "fishing") {
-                lastActiveFishingTime = SimpleTimeMark.farPast()
-            }
-        }
-    }
-
-    @SubscribeEvent
-    fun onIslandChange(event: IslandChangeEvent) {
-        lastActiveFishingTime = SimpleTimeMark.farPast()
     }
 
     fun hasFishingRodInHand() = InventoryUtils.itemInHandId.isFishingRod()

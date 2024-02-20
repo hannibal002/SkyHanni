@@ -20,13 +20,13 @@ import at.hannibal2.skyhanni.utils.NumberUtil.formatNumber
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.renderables.Renderable
+import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import at.hannibal2.skyhanni.utils.tracker.ItemTrackerData
 import at.hannibal2.skyhanni.utils.tracker.SkyHanniItemTracker
 import at.hannibal2.skyhanni.utils.tracker.SkyHanniTracker
 import com.google.gson.annotations.Expose
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import kotlin.time.Duration.Companion.milliseconds
-import kotlin.time.Duration.Companion.minutes
 import kotlin.time.Duration.Companion.seconds
 
 typealias CategoryName = String
@@ -35,7 +35,10 @@ object FishingProfitTracker {
 
     val config get() = SkyHanniMod.feature.fishing.fishingProfitTracker
 
-    private val coinsChatPattern = ".* CATCH! §r§bYou found §r§6(?<coins>.*) Coins§r§b\\.".toPattern()
+    private val coinsChatPattern by RepoPattern.pattern(
+        "fishing.tracker.chat.coins",
+        ".* CATCH! §r§bYou found §r§6(?<coins>.*) Coins§r§b\\."
+    )
 
     private var lastCatchTime = SimpleTimeMark.farPast()
     private val tracker = SkyHanniItemTracker(
@@ -177,11 +180,9 @@ object FishingProfitTracker {
         if (!isEnabled()) return
 
         val recentPickup = config.showWhenPickup && lastCatchTime.passedSince() < 3.seconds
-        if (!recentPickup) {
-            if (!FishingAPI.isFishing()) return
+        if (recentPickup || FishingAPI.isFishing()) {
+            tracker.renderDisplay(config.position)
         }
-
-        tracker.renderDisplay(config.position)
     }
 
     @SubscribeEvent
@@ -190,8 +191,6 @@ object FishingProfitTracker {
     }
 
     private fun maybeAddItem(internalName: NEUInternalName, amount: Int) {
-        if (FishingAPI.lastActiveFishingTime.passedSince() > 10.minutes) return
-
         if (!isAllowedItem(internalName)) {
             ChatUtils.debug("Ignored non-fishing item pickup: $internalName'")
             return

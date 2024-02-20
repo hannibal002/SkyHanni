@@ -14,6 +14,7 @@ import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.StringUtils.matches
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.TimeUtils.format
+import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import at.hannibal2.skyhanni.utils.toLorenzVec
 import net.minecraft.network.play.server.S2APacketParticles
 import net.minecraft.util.EnumParticleTypes
@@ -25,12 +26,18 @@ class SpawnTimers {
 
     private val config get() = SkyHanniMod.feature.combat.mobs
 
+    private val patternGroup = RepoPattern.group("combat.mobs.spawntime.arachne")
+    private val arachneFragmentPattern by patternGroup.pattern(
+        "fragment",
+        "^☄ [a-z0-9_]{2,22} placed an arachne's calling! something is awakening! \\(4/4\\)\$"
+    )
+    private val arachneCrystalPattern by patternGroup.pattern(
+        "crystal",
+        "^☄ [a-z0-9_]{2,22} placed an arachne crystal! something is awakening!$"
+    )
+
     private val arachneAltarLocation = LorenzVec(-283f, 51f, -179f)
     private var arachneSpawnTime = SimpleTimeMark.farPast()
-    private val arachneFragmentMessage =
-        "^☄ [a-z0-9_]{2,22} placed an arachne's calling! something is awakening! \\(4/4\\)\$".toPattern()
-    private val arachneCrystalMessage =
-        "^☄ [a-z0-9_]{2,22} placed an arachne crystal! something is awakening!$".toPattern()
     private var saveNextTickParticles = false
     private var particleCounter = 0
     private var tickTime: Long = 0
@@ -60,8 +67,8 @@ class SpawnTimers {
         if (!isEnabled()) return
         val message = event.message.removeColor().lowercase()
 
-        if (arachneFragmentMessage.matches(message) || arachneCrystalMessage.matches(message)) {
-            if (arachneCrystalMessage.matches(message)) {
+        if (arachneFragmentPattern.matches(message) || arachneCrystalPattern.matches(message)) {
+            if (arachneCrystalPattern.matches(message)) {
                 saveNextTickParticles = true
                 searchTime = System.currentTimeMillis()
                 particleCounter = 0
