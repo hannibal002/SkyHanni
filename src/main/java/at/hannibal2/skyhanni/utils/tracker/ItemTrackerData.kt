@@ -36,8 +36,6 @@ abstract class ItemTrackerData : TrackerData() {
     var items: MutableMap<NEUInternalName, TrackedItem> = HashMap()
 
     class TrackedItem {
-        @Expose
-        var internalName: NEUInternalName? = null
 
         @Expose
         var timesGained: Long = 0

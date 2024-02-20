@@ -7,8 +7,8 @@ import at.hannibal2.skyhanni.events.InventoryFullyOpenedEvent
 import at.hannibal2.skyhanni.events.LorenzTickEvent
 import at.hannibal2.skyhanni.events.LorenzWorldChangeEvent
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName
-import at.hannibal2.skyhanni.utils.ItemUtils.getItemName
 import at.hannibal2.skyhanni.utils.ItemUtils.hasEnchantments
+import at.hannibal2.skyhanni.utils.ItemUtils.itemName
 import at.hannibal2.skyhanni.utils.ItemUtils.name
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.NEUInternalName
@@ -21,6 +21,7 @@ import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import com.google.gson.JsonArray
 import com.google.gson.JsonObject
+import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import io.github.moulberry.notenoughupdates.recipes.CraftingRecipe
 import net.minecraft.client.Minecraft
 import net.minecraft.item.ItemStack
@@ -28,10 +29,14 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import kotlin.time.Duration.Companion.seconds
 
 class MinionCraftHelper {
+
     private val config get() = SkyHanniMod.feature.event.bingo
 
-    // TODO USE SH-REPO
-    private var minionNamePattern = "(?<name>.*) Minion (?<number>.*)".toPattern()
+    private val minionNamePattern by RepoPattern.pattern(
+        "bingo.minion.name",
+        "(?<name>.*) Minion (?<number>.*)"
+    )
+
     private var display = emptyList<String>()
     private var hasMinionInInventory = false
     private var hasItemsForMinion = false
@@ -205,7 +210,7 @@ class MinionCraftHelper {
                 val needAmount = need * multiplier
                 val have = otherItems.getOrDefault(itemId, 0)
                 val percentage = have.toDouble() / needAmount
-                val itemName = rawId.getItemName()
+                val itemName = rawId.itemName
                 val isTool = itemId.startsWith("WOOD_")
                 if (percentage >= 1) {
                     val color = if (isTool) "§7" else "§a"
@@ -296,5 +301,4 @@ class MinionCraftHelper {
         }
         data.add("tierOneMinionsDone", newList)
     }
-
 }

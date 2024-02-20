@@ -24,6 +24,7 @@ class MinecraftConsoleFilter(private val loggerConfigName: String) : Filter {
     private val patternBiomeIdBounds = "Biome ID is out of bounds: (\\d+), defaulting to 0 \\(Ocean\\)".toPattern()
 
     companion object {
+
         fun initLogging() {
             val ctx: LoggerContext = LogManager.getContext(false) as LoggerContext
 
@@ -56,7 +57,7 @@ class MinecraftConsoleFilter(private val loggerConfigName: String) : Filter {
             filterConsole("Unknown soundEvent (minecraft:)")
             return Filter.Result.DENY
         }
-        //TODO testing
+        // TODO testing
         if (filterConfig.filterParticleVillagerHappy && formattedMessage == "Could not spawn particle effect VILLAGER_HAPPY") {
             filterConsole("particle VILLAGER_HAPPY")
             return Filter.Result.DENY
@@ -83,7 +84,7 @@ class MinecraftConsoleFilter(private val loggerConfigName: String) : Filter {
             }
         }
 
-        //TODO find a way to load the filter earlier to filter these messages too
+        // TODO find a way to load the filter earlier to filter these messages too
 //        if (loggerName == "LaunchWrapper") {
 //            //The jar file C:\Users\Lorenz\AppData\Roaming\.minecraft\libraries\org\lwjgl\lwjgl\lwjgl\2.9.4-nightly-20150209\lwjgl-2.9.4-nightly-20150209.jar has a security seal for path org.lwjgl.opengl, but that path is defined and not secure
 //            if (formattedMessage.startsWith("The jar file ")) {
@@ -124,7 +125,8 @@ class MinecraftConsoleFilter(private val loggerConfigName: String) : Filter {
                 val first = cause.stackTrace[0]
                 val firstName = first.toString()
                 if (firstName == "net.minecraft.scoreboard.Scoreboard.removeTeam(Scoreboard.java:229)" ||
-                    firstName == "net.minecraft.scoreboard.Scoreboard.removeTeam(Scoreboard.java:262)"
+                    firstName == "net.minecraft.scoreboard.Scoreboard.removeTeam(Scoreboard.java:262)" ||
+                    firstName == "net.minecraft.scoreboard.Scoreboard.removeTeam(Scoreboard.java:240)"
                 ) {
                     filterConsole("NullPointerException at Scoreboard.removeTeam")
                     return Filter.Result.DENY
@@ -134,7 +136,8 @@ class MinecraftConsoleFilter(private val loggerConfigName: String) : Filter {
                     return Filter.Result.DENY
                 }
                 if (firstName == "net.minecraft.scoreboard.Scoreboard.removeObjective(Scoreboard.java:179)" ||
-                    firstName == "net.minecraft.scoreboard.Scoreboard.removeObjective(Scoreboard.java:198)"
+                    firstName == "net.minecraft.scoreboard.Scoreboard.removeObjective(Scoreboard.java:198)" ||
+                    firstName == "net.minecraft.scoreboard.Scoreboard.removeObjective(Scoreboard.java:186)"
                 ) {
                     filterConsole("IllegalArgumentException at Scoreboard.removeObjective")
                     return Filter.Result.DENY

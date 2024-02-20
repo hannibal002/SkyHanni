@@ -6,6 +6,8 @@ import at.hannibal2.skyhanni.events.GardenToolChangeEvent
 import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.LorenzTickEvent
 import at.hannibal2.skyhanni.events.TabListUpdateEvent
+import at.hannibal2.skyhanni.utils.ChatUtils
+import at.hannibal2.skyhanni.utils.ConditionalUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils.isRancherSign
 import at.hannibal2.skyhanni.utils.RenderUtils.renderString
@@ -13,6 +15,7 @@ import at.hannibal2.skyhanni.utils.RenderUtils.renderStringsAndItems
 import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 import io.github.moulberry.moulconfig.observer.Property
+import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraft.client.Minecraft
 import net.minecraft.client.gui.inventory.GuiEditSign
 import net.minecraftforge.client.event.GuiOpenEvent
@@ -22,7 +25,14 @@ import kotlin.time.Duration.Companion.milliseconds
 import kotlin.time.Duration.Companion.seconds
 
 class GardenOptimalSpeed {
+
     private val config get() = GardenAPI.config.optimalSpeeds
+
+    private val currentSpeedPattern by RepoPattern.pattern(
+        "garden.optimalspeed.currentspeed",
+        " Speed: §r§f✦(?<speed>.*)"
+    )
+
     private val configCustomSpeed get() = config.customSpeed
     private var sneakingTime = 0.seconds
     private val sneaking get() = Minecraft.getMinecraft().thePlayer.isSneaking
@@ -34,7 +44,6 @@ class GardenOptimalSpeed {
             _currentSpeed = value
         }
     private var optimalSpeed = -1
-    private val currentSpeedPattern = " Speed: §r§f✦(?<speed>.*)".toPattern()
     private var lastWarnTime = 0L
     private var cropInHand: CropType? = null
     private var rancherOverlayList: List<List<Any?>> = emptyList()
@@ -87,7 +96,7 @@ class GardenOptimalSpeed {
     @SubscribeEvent
     fun onConfigLoad(event: ConfigLoadEvent) {
         for (value in CropType.entries) {
-            LorenzUtils.onToggle(value.getConfig()) {
+            ConditionalUtils.onToggle(value.getConfig()) {
                 if (value == cropInHand) {
                     optimalSpeed = value.getOptimalSpeed()
                 }
@@ -147,7 +156,7 @@ class GardenOptimalSpeed {
             if (sneaking) text += " §7[Sneaking]"
             text += " §e(§f$optimalSpeed §eis optimal)"
 
-            LorenzUtils.chat(text)
+            ChatUtils.chat(text)
         }
     }
 

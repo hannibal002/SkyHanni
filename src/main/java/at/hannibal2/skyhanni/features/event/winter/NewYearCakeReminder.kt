@@ -7,6 +7,7 @@ import at.hannibal2.skyhanni.events.LorenzChatEvent
 import at.hannibal2.skyhanni.events.LorenzTickEvent
 import at.hannibal2.skyhanni.events.ScoreboardChangeEvent
 import at.hannibal2.skyhanni.features.fame.ReminderUtils
+import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.StringUtils.matches
@@ -16,6 +17,7 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import kotlin.time.Duration.Companion.seconds
 
 class NewYearCakeReminder {
+
     private val config get() = SkyHanniMod.feature.event.winter
     private val sidebarDetectionPattern by RepoPattern.pattern(
         "event.winter.newyearcake.reminder.sidebar",
@@ -72,7 +74,7 @@ class NewYearCakeReminder {
         if (lastReminderSend.passedSince() < 30.seconds) return
         lastReminderSend = SimpleTimeMark.now()
 
-        LorenzUtils.clickableChat(
+        ChatUtils.clickableChat(
             "Reminding you to grab the free New Year Cake. Click here to open the baker menu!",
             "openbaker"
         )

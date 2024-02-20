@@ -16,6 +16,7 @@ import kotlin.time.Duration.Companion.minutes
 import kotlin.time.Duration.Companion.seconds
 
 object FishingDetection {
+
     var isFishing = false
     private var holdingRod = false
     private var lastRodCastLocation: LorenzVec? = null
