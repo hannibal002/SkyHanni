@@ -18,7 +18,6 @@ import at.hannibal2.skyhanni.utils.NumberUtil.isInt
 import at.hannibal2.skyhanni.utils.PrimitiveItemStack
 import at.hannibal2.skyhanni.utils.PrimitiveItemStack.Companion.makePrimitiveStack
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
-import at.hannibal2.skyhanni.utils.StringUtils.firstLetterUppercase
 import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraft.inventory.Slot
@@ -50,9 +49,9 @@ object GetFromSackAPI {
 
     fun getFromChatMessageSackItems(
         item: PrimitiveItemStack,
-        text: String = "§lCLICK HERE§r§e to grab §ax${item.amount} §9${item.name.asString()}§e from sacks!"
+        text: String = "§lCLICK HERE§r§e to grab §ax${item.amount} §9${item.itemName}§e from sacks!"
     ) =
-        ChatUtils.clickableChat(text, "${commands.first()} ${item.name.asString()} ${item.amount}")
+        ChatUtils.clickableChat(text, "${commands.first()} ${item.internalName.asString()} ${item.amount}")
 
     fun getFromSlotClickedSackItems(items: List<PrimitiveItemStack>, slotIndex: Int) = addToInventory(items, slotIndex)
 
@@ -79,7 +78,7 @@ object GetFromSackAPI {
         if (!LorenzUtils.inSkyBlock) return
         if (queue.isNotEmpty() && lastTimeOfCommand.passedSince() >= minimumDelay) {
             val item = queue.poll()
-            ChatUtils.sendCommandToServer("gfs ${item.name.asString()} ${item.amount}")
+            ChatUtils.sendCommandToServer("gfs ${item.internalName.asString()} ${item.amount}")
             lastTimeOfCommand = ChatUtils.getTimeWhenNewlyQueuedMessageGetsExecuted()
         }
     }
@@ -105,7 +104,7 @@ object GetFromSackAPI {
         event.toolTip.let { tip ->
             tip.add("")
             tip.add("§ePress right click to get from sack:")
-            tip.addAll(list.map { "§ex" + it.amount.toString() + " " + it.name.asString() })
+            tip.addAll(list.map { "§ex" + it.amount.toString() + " " + it.internalName.asString() })
         }
     }
 
@@ -173,12 +172,12 @@ object GetFromSackAPI {
         fromSacksChatPattern.matchMatcher(message) {
             val diff = stack.amount - group("amount").toInt()
             if (diff <= 0) return
-            bazaarMessage(stack.name.asString().firstLetterUppercase(), diff, true)
+            bazaarMessage(stack.itemName, diff, true)
             lastItemStack = null
             return
         }
         missingChatPattern.matchMatcher(message) {
-            bazaarMessage(stack.name.asString().firstLetterUppercase(), stack.amount)
+            bazaarMessage(stack.itemName, stack.amount)
             lastItemStack = null
             return
         }

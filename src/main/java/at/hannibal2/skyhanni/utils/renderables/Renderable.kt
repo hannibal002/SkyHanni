@@ -7,6 +7,8 @@ import at.hannibal2.skyhanni.utils.LorenzLogger
 import at.hannibal2.skyhanni.utils.NEUItems.renderOnScreen
 import at.hannibal2.skyhanni.utils.RenderUtils.HorizontalAlignment
 import at.hannibal2.skyhanni.utils.RenderUtils.VerticalAlignment
+import at.hannibal2.skyhanni.utils.renderables.RenderableUtils.renderXAligned
+import at.hannibal2.skyhanni.utils.renderables.RenderableUtils.renderYAligned
 import io.github.moulberry.moulconfig.gui.GuiScreenElementWrapper
 import io.github.moulberry.notenoughupdates.util.Utils
 import net.minecraft.client.Minecraft
@@ -242,7 +244,6 @@ interface Renderable {
                         unhovered.render(posX, posY)
                         isHovered = false
                     }
-
                 }
             }
 
@@ -319,6 +320,48 @@ interface Renderable {
                 Gui.drawRect(1, 1, progress, height - 1, color.rgb)
             }
 
+        }
+
+        fun horizontalContainer(
+            content: List<Renderable>,
+            spacing: Int = 0,
+            horizontalAlign: HorizontalAlignment = HorizontalAlignment.LEFT,
+            verticalAlign: VerticalAlignment = VerticalAlignment.TOP,
+        ) = object : Renderable {
+            val renderables = content
+
+            override val width = renderables.sumOf { it.width } + spacing * (renderables.size - 1)
+            override val height = renderables.maxOf { it.height }
+            override val horizontalAlign = horizontalAlign
+            override val verticalAlign = verticalAlign
+
+            override fun render(posX: Int, posY: Int) {
+                var xOffset = 0
+                renderables.forEach {
+                    it.renderYAligned(xOffset, 0, height)
+                    xOffset += it.width + spacing
+                    GlStateManager.translate(it.width.toFloat(), 0f, 0f)
+                }
+                GlStateManager.translate(-width.toFloat() - spacing.toFloat(), 0f, 0f)
+            }
+        }
+
+        fun fixedSizeLine(
+            content: Renderable,
+            width: Int,
+            horizontalAlign: HorizontalAlignment = HorizontalAlignment.LEFT,
+            verticalAlign: VerticalAlignment = VerticalAlignment.TOP,
+        ) = object : Renderable {
+            val render = content
+
+            override val width = width
+            override val height = render.height
+            override val horizontalAlign = horizontalAlign
+            override val verticalAlign = verticalAlign
+
+            override fun render(posX: Int, posY: Int) {
+                render.renderXAligned(0, 0, width)
+            }
         }
     }
 }
