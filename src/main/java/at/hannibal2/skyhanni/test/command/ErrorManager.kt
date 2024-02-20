@@ -49,26 +49,38 @@ object ErrorManager {
 
     @Deprecated("Use data as well", ReplaceWith("logErrorStateWithData()"))
     fun logErrorState(userMessage: String, internalMessage: String) {
-        logError(IllegalStateException(internalMessage), userMessage, false)
+        logError(IllegalStateException(internalMessage), userMessage, ignoreErrorCache = false, noStackTrace = false)
     }
 
-    fun logErrorStateWithData(userMessage: String, internalMessage: String, vararg extraData: Pair<String, Any?>) {
-        logError(IllegalStateException(internalMessage), userMessage, false, *extraData)
+    fun logErrorStateWithData(
+        userMessage: String,
+        internalMessage: String,
+        vararg extraData: Pair<String, Any?>,
+        ignoreErrorCache: Boolean = false,
+        noStackTrace: Boolean = false,
+    ) {
+        logError(IllegalStateException(internalMessage), userMessage, ignoreErrorCache, noStackTrace, *extraData)
     }
 
     @Deprecated("Use data as well", ReplaceWith("logErrorWithData()"))
     fun logError(throwable: Throwable, message: String) {
-        logError(throwable, message, false)
+        logError(throwable, message, ignoreErrorCache = false, noStackTrace = false)
     }
 
-    fun logErrorWithData(throwable: Throwable, message: String, vararg extraData: Pair<String, Any?>) {
-        logError(throwable, message, false, *extraData)
+    fun logErrorWithData(
+        throwable: Throwable,
+        message: String,
+        vararg extraData: Pair<String, Any?>,
+        ignoreErrorCache: Boolean = false,
+    ) {
+        logError(throwable, message, ignoreErrorCache, noStackTrace = false, *extraData)
     }
 
-    fun logError(
+    private fun logError(
         throwable: Throwable,
         message: String,
         ignoreErrorCache: Boolean,
+        noStackTrace: Boolean,
         vararg extraData: Pair<String, Any?>,
     ) {
         val error = Error(message, throwable)
@@ -83,8 +95,16 @@ object ErrorManager {
             cache.add(pair)
         }
 
-        val fullStackTrace = throwable.getCustomStackTrace(true).joinToString("\n")
-        val stackTrace = throwable.getCustomStackTrace(false).joinToString("\n").removeSpam()
+        val fullStackTrace: String
+        val stackTrace: String
+
+        if (noStackTrace) {
+            fullStackTrace = "<no stack trace>"
+            stackTrace = "<no stack trace>"
+        } else {
+            fullStackTrace = throwable.getCustomStackTrace(true).joinToString("\n")
+            stackTrace = throwable.getCustomStackTrace(false).joinToString("\n").removeSpam()
+        }
         val randomId = UUID.randomUUID().toString()
 
         val extraDataString = buildExtraDataString(extraData)

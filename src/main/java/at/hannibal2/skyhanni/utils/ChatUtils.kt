@@ -208,6 +208,9 @@ object ChatUtils {
     }
 
     fun sendCommandToServer(command: String) {
+        if (command.startsWith("/")) {
+            debug("Sending wrong command to server? ($command)")
+        }
         sendMessageToServer("/$command")
     }
 
