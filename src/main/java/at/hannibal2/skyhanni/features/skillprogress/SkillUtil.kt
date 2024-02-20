@@ -13,7 +13,7 @@ import io.github.moulberry.notenoughupdates.util.Utils
 object SkillUtil {
 
     fun getSkillInfo(skill: SkillType): SkillAPI.SkillInfo? {
-        return SkillAPI.skillData?.get(skill)
+        return SkillAPI.storage?.skillData?.get(skill)
     }
 
     fun getSkillInfo(currentLevel: Int, currentXp: Long, neededXp: Long, totalXp: Long): LorenzUtils.Quad<Int, Long, Long, Long> {

@@ -49,7 +49,7 @@ object SkillAPI {
 
     var skillXPInfoMap = mutableMapOf<SkillType, SkillXPInfo>()
     var oldSkillInfoMap = mutableMapOf<SkillType?, SkillInfo?>()
-    val skillData: MutableMap<SkillType, SkillInfo>? get() = ProfileStorageData.profileSpecific?.skillData
+    val storage get() = ProfileStorageData.profileSpecific
     var exactLevelingMap = mapOf<Int, Int>()
     var levelingMap = mapOf<Int, Int>()
     var activeSkill: SkillType = SkillType.NONE
@@ -74,7 +74,7 @@ object SkillAPI {
             if (matcher?.matches() == true) {
                 val skillName = matcher.group("skillName")
                 val skill = SkillType.getByNameFirstUppercase(skillName) ?: return
-                val skillInfo = skillData?.get(skill) ?: SkillInfo()
+                val skillInfo = storage?.skillData?.get(skill) ?: SkillInfo()
                 val skillXp = skillXPInfoMap[skill] ?: SkillXPInfo()
                 activeSkill = skill
                 when (matcher.pattern()) {
@@ -122,7 +122,7 @@ object SkillAPI {
                 val skillName = split.first()
                 val skill = SkillType.getByNameFirstUppercase(skillName) ?: continue
                 val skillLevel = if (split.size > 1) split.last().romanToDecimalIfNecessary() else 0
-                val skillInfo = skillData?.getOrPut(skill) { SkillInfo() }
+                val skillInfo = storage?.skillData?.getOrPut(skill) { SkillInfo() }
 
                 for ((lineIndex, line) in lore.withIndex()) {
                     val cleanLine = line.removeColor()
@@ -172,12 +172,12 @@ object SkillAPI {
     @SubscribeEvent
     fun onDebugDataCollect(event: DebugDataCollectEvent) {
         event.title("Skills")
-        if (skillData == null) {
+        if (storage?.skillData == null) {
             event.addIrrelevant("SkillMap is empty")
             return
         }
         event.addData {
-            skillData?.let {
+            storage?.skillData?.let {
                 for ((skillName, skillInfo) in it) {
                     add("-  Name: $skillName")
                     add("-  Level: ${skillInfo.level}")
@@ -187,7 +187,8 @@ object SkillAPI {
                     add("-  OverflowLevel: ${skillInfo.overflowLevel}")
                     add("-  OverflowCurrentXp: ${skillInfo.overflowCurrentXp}")
                     add("-  OverflowCurrentXpMax: ${skillInfo.overflowCurrentXpMax}")
-                    add("-  OverflowTotalXp: ${skillInfo.overflowTotalXp}\n")
+                    add("-  OverflowTotalXp: ${skillInfo.overflowTotalXp}")
+                    add("-  CustomGoalLevel: ${skillInfo.customGoalLevel}\n")
                 }
             }
         }
@@ -235,7 +236,7 @@ object SkillAPI {
 
             this.lastGain = matcher.group("gained")
         }
-        skillData?.set(skill, skillInfo)
+        storage?.skillData?.set(skill, skillInfo)
     }
 
     private fun handleSkillPatternPercent(matcher: Matcher, skill: SkillType, skillInfo: SkillInfo?) {
@@ -244,12 +245,12 @@ object SkillAPI {
             var levelMatcher = skillTabPattern.matcher(line)
             if (levelMatcher.matches()) {
                 tablistLevel = levelMatcher.group("level").toInt()
-                if (levelMatcher.group("type").lowercase() != activeSkill?.lowercaseName) tablistLevel = 0
+                if (levelMatcher.group("type").lowercase() != activeSkill.lowercaseName) tablistLevel = 0
             } else {
                 levelMatcher = maxSkillTabPattern.matcher(line)
                 if (levelMatcher.matches()) {
                     tablistLevel = levelMatcher.group("level").toInt()
-                    if (levelMatcher.group("type").lowercase() != activeSkill?.lowercaseName) tablistLevel = 0
+                    if (levelMatcher.group("type").lowercase() != activeSkill.lowercaseName) tablistLevel = 0
                 }
             }
         }
@@ -275,7 +276,7 @@ object SkillAPI {
 
             this.lastGain = matcher.group("gained")
         }
-        skillData?.set(skill, existingLevel)
+        storage?.skillData?.set(skill, existingLevel)
     }
 
     private fun handleSkillPatternMultiplier(matcher: Matcher, skillS: SkillType, skillInfo: SkillInfo) {
@@ -298,7 +299,7 @@ object SkillAPI {
 
             this.lastGain = matcher.group("gained")
         }
-        skillData?.set(skillS, skillInfo)
+        storage?.skillData?.set(skillS, skillInfo)
     }
 
     fun onCommand(it: Array<String>) {
@@ -308,8 +309,14 @@ object SkillAPI {
         }
 
         if (it.size == 1) {
-            commandHelp()
-            return
+            when (it.first()) {
+                "skillgoal" -> {
+                    ChatUtils.chat("§bSkill Custom Goal Level")
+                    storage?.skillData?.filter { it.value.customGoalLevel != 0 }?.forEach { (skill, data) ->
+                        ChatUtils.chat("§e${skill.displayName}: §b${data.customGoalLevel}")
+                    }
+                }
+            }
         }
 
         if (it.size == 2) {
@@ -341,14 +348,45 @@ object SkillAPI {
                 }
             }
         }
+        if (it.size == 3) {
+            when (it.first()) {
+                "skillgoal" -> {
+                    val rawSkill = it[1].lowercase()
+                    val skillType = SkillType.getByNameLowercase(rawSkill)
+                    if (skillType == null) {
+                        ChatUtils.userError("$rawSkill is not a valid skill. Available skills: ${SkillType.entries.filter { it.displayName != "" }.joinToString(", ")}")
+                        return
+                    }
+
+                    val rawLevel = it[2]
+                    val targetLevel = rawLevel.toIntOrNull()
+                    if (targetLevel == null) {
+                        ChatUtils.userError("$rawLevel is not a valid number.")
+                        return
+                    }
+                    val skill = storage?.skillData?.get(skillType) ?: return
+
+                    if (targetLevel <= skill.overflowLevel && targetLevel != 0) {
+                        ChatUtils.userError("Custom goal level ($targetLevel) must be greater than your current level (${skill.overflowLevel}).")
+                        return
+                    }
+
+                    skill.apply {
+                        customGoalLevel = targetLevel
+                    }
+                    ChatUtils.chat("Custom goal level for §b${skillType.displayName} §eset to §b$targetLevel")
+                }
+            }
+        }
     }
 
     private fun commandHelp() {
-        LorenzUtils.chat("", false)
-        LorenzUtils.chat("/shskills levelwithxp <currentXP> - Get a level with the given current XP.")
-        LorenzUtils.chat("/shskills xpforlevel <desiredLevel> - Get how much XP you need for a desired level.")
-        LorenzUtils.chat("/shskills copytoclipboard - Copy your skills information into your clipboard.")
-        LorenzUtils.chat("", false)
+        ChatUtils.chat("", false)
+        ChatUtils.chat("/shskills levelwithxp <currentXP> - Get a level with the given current XP.")
+        ChatUtils.chat("/shskills xpforlevel <desiredLevel> - Get how much XP you need for a desired level.")
+        ChatUtils.chat("/shskills skillgoal - View your current goal")
+        ChatUtils.chat("/shskills skillgoal <skill> <level> - Define your goal for <skill>")
+        ChatUtils.chat("", false)
     }
 
     data class SkillInfo(
@@ -360,7 +398,8 @@ object SkillAPI {
         @Expose var overflowCurrentXp: Long = 0,
         @Expose var overflowTotalXp: Long = 0,
         @Expose var overflowCurrentXpMax: Long = 0,
-        @Expose var lastGain: String = "")
+        @Expose var lastGain: String = "",
+        @Expose var customGoalLevel: Int = 0)
 
     data class SkillXPInfo(
         var lastTotalXp: Float = 0f,

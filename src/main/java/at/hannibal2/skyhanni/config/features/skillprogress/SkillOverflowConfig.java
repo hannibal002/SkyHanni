@@ -33,7 +33,7 @@ public class SkillOverflowConfig {
     public boolean enableInSkillMenuAsStackSize = false;
 
     @Expose
-    @ConfigOption(name = "Skill Menu Tooltips", desc = "Enable the overflow calculation in the tooltip of.")
+    @ConfigOption(name = "Skill Menu Tooltips", desc = "Enable the overflow calculation in the tooltip of items in skills menu.")
     @ConfigEditorBoolean
     public boolean enableInSkillMenuTooltip = false;
 

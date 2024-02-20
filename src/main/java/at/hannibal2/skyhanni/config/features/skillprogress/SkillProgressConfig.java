@@ -92,6 +92,10 @@ public class SkillProgressConfig {
     public SkillOverflowConfig overflowConfig = new SkillOverflowConfig();
 
     @Expose
+    @Category(name = "Custom Goal", desc = "Define a custom goal for each skills.")
+    public CustomGoalConfig customGoalConfig = new CustomGoalConfig();
+
+    @Expose
     @Category(name = "All Skill Display", desc = "All Skill Display Config")
     public AllSkillDisplayConfig allSkillDisplayConfig = new AllSkillDisplayConfig();
 
