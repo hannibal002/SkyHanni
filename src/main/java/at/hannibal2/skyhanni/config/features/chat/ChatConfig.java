@@ -122,7 +122,7 @@ public class ChatConfig {
     public boolean skyBlockXPInChat = true;
 
     @Expose
-    @ConfigOption(name = "Jacob's Event", desc = "Hides the fortune message from when a contest starts outside the Garden.")
+    @ConfigOption(name = "Jacob's Event", desc = "Hide Anita Accessories' fortune bonus messages outside the Garden.")
     @ConfigEditorBoolean
     @FeatureToggle
     public boolean hideJacob = true;
