@@ -27,7 +27,6 @@ import at.hannibal2.skyhanni.utils.tracker.SkyHanniTracker
 import com.google.gson.annotations.Expose
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import kotlin.time.Duration.Companion.milliseconds
-import kotlin.time.Duration.Companion.minutes
 import kotlin.time.Duration.Companion.seconds
 
 typealias CategoryName = String
@@ -181,11 +180,9 @@ object FishingProfitTracker {
         if (!isEnabled()) return
 
         val recentPickup = config.showWhenPickup && lastCatchTime.passedSince() < 3.seconds
-        if (!recentPickup) {
-            if (!FishingAPI.isFishing()) return
+        if (recentPickup || FishingAPI.isFishing()) {
+            tracker.renderDisplay(config.position)
         }
-
-        tracker.renderDisplay(config.position)
     }
 
     @SubscribeEvent
@@ -194,8 +191,6 @@ object FishingProfitTracker {
     }
 
     private fun maybeAddItem(internalName: NEUInternalName, amount: Int) {
-        if (FishingAPI.lastActiveFishingTime.passedSince() > 10.minutes) return
-
         if (!isAllowedItem(internalName)) {
             ChatUtils.debug("Ignored non-fishing item pickup: $internalName'")
             return

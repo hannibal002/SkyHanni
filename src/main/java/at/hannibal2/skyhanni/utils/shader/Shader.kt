@@ -5,11 +5,11 @@ import at.hannibal2.skyhanni.utils.LorenzUtils
 import net.minecraft.client.Minecraft
 import net.minecraft.client.renderer.OpenGlHelper
 import net.minecraft.client.resources.IReloadableResourceManager
-import java.util.function.Supplier
 import net.minecraft.client.shader.ShaderLinkHelper
 import org.apache.commons.lang3.StringUtils
 import org.lwjgl.opengl.GL11
 import org.lwjgl.opengl.OpenGLException
+import java.util.function.Supplier
 
 /**
  * Superclass for shader objects to compile and attach vertex and fragment shaders to the shader program
@@ -46,17 +46,23 @@ abstract class Shader(val vertex: String, val fragment: String) {
         }
         if (shaderProgram >= 0) {
             OpenGlHelper.glDeleteProgram(shaderProgram)
+            shaderProgram = -1
         }
+        uniforms.clear()
+        created = false
     }
 
     fun recompile() {
         deleteOldShaders()
         shaderProgram = ShaderLinkHelper.getStaticShaderLinkHelper().createProgram()
+        if (shaderProgram < 0) return
 
-        vertexShaderID = ShaderManager.loadShader(ShaderType.VERTEX, vertex).also { if (it == -1) return }
+        vertexShaderID = ShaderManager.loadShader(ShaderType.VERTEX, vertex)
+        if (vertexShaderID < 0) return
         ShaderManager.attachShader(shaderProgram, vertexShaderID)
 
-        fragmentShaderID = ShaderManager.loadShader(ShaderType.FRAGMENT, fragment).also { if (it == -1) return }
+        fragmentShaderID = ShaderManager.loadShader(ShaderType.FRAGMENT, fragment)
+        if (fragmentShaderID < 0) return
         ShaderManager.attachShader(shaderProgram, fragmentShaderID)
 
         ShaderHelper.glLinkProgram(shaderProgram)
@@ -75,7 +81,6 @@ abstract class Shader(val vertex: String, val fragment: String) {
             } else {
                 LorenzUtils.consoleLog("$errorMessage $errorLog")
             }
-
             return
         }
 
