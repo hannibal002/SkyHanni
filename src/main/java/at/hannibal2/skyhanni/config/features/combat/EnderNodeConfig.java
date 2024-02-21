@@ -43,10 +43,18 @@ public class EnderNodeConfig {
 
     @Expose
     @ConfigOption(
+        name = "Only While Holding Tool",
+        desc = "Only shows the tracker if holding a pickaxe, drill or gauntlet in hand."
+    )
+    @ConfigEditorBoolean
+    public boolean onlyPickaxe = false;
+
+    @Expose
+    @ConfigOption(
         name = "Text Format",
         desc = "Drag text to change the appearance of the overlay."
     )
-    @ConfigEditorDraggableList()
+    @ConfigEditorDraggableList
     public Property<List<EnderNodeDisplayEntry>> textFormat = Property.of(new ArrayList<>(Arrays.asList(
         TITLE,
         NODES_MINED,

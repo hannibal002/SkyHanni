@@ -18,6 +18,7 @@ import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.StringUtils.matches
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
+import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import at.hannibal2.skyhanni.utils.tracker.SkyHanniTracker
 import at.hannibal2.skyhanni.utils.tracker.TrackerData
 import com.google.gson.annotations.Expose
@@ -27,16 +28,23 @@ import kotlin.concurrent.fixedRateTimer
 object FrozenTreasureTracker {
 
     private val config get() = SkyHanniMod.feature.event.winter.frozenTreasureTracker
+
+    private val compactPattern by RepoPattern.pattern(
+        "event.jerry.frozentreasure.compact",
+        "COMPACT! You found an Enchanted Ice!"
+    )
+
     private var estimatedIce = 0L
     private var lastEstimatedIce = 0L
     private var icePerSecond = mutableListOf<Long>()
     private var icePerHour = 0
     private var stoppedChecks = 0
-    private var compactPattern = "COMPACT! You found an Enchanted Ice!".toPattern()
     private val tracker = SkyHanniTracker("Frozen Treasure Tracker", { Data() }, { it.frozenTreasureTracker })
     { formatDisplay(drawDisplay(it)) }
 
     init {
+        FrozenTreasure.entries.forEach { it.chatPattern }
+
         fixedRateTimer(name = "skyhanni-frozen-treasure-tracker", period = 1000) {
             if (!onJerryWorkshop()) return@fixedRateTimer
             calculateIcePerHour()
@@ -120,7 +128,7 @@ object FrozenTreasureTracker {
             if (config.hideMessages) event.blockedReason = "frozen treasure tracker"
         }
 
-        for (treasure in FrozenTreasure.entries.filter { it.pattern.matches(message) }) {
+        for (treasure in FrozenTreasure.entries.filter { it.chatPattern.matches(message) }) {
             tracker.modify {
                 it.treasuresMined += 1
                 it.treasureCount.addOrPut(treasure, 1)

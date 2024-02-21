@@ -20,6 +20,7 @@ import at.hannibal2.skyhanni.utils.SoundUtils
 import at.hannibal2.skyhanni.utils.StringUtils.cleanPlayerName
 import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.getLorenzVec
+import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraft.client.Minecraft
 import net.minecraft.client.entity.EntityOtherPlayerMP
 import net.minecraft.network.play.server.S02PacketChat
@@ -32,10 +33,16 @@ object InquisitorWaypointShare {
 
     private val config get() = SkyHanniMod.feature.event.diana.inquisitorSharing
 
-    // TODO USE SH-REPO
-    private val partyPattern =
-        "§9Party §8> (?<playerName>.*)§f: §rx: (?<x>-?[0-9]{1,4}), y: (?<y>-?[0-9]{1,4}), z: (?<z>-?[0-9]{1,4})\\b".toPattern()
-    private val diedPattern = "§9Party §8> (?<playerName>.*)§f: §rInquisitor dead!".toPattern()
+    private val patternGroup = RepoPattern.group("diana.waypoints")
+    private val partyPattern by patternGroup.pattern(
+        "party",
+        "§9Party §8> (?<playerName>.*)§f: §rx: (?<x>-?[0-9]{1,4}), y: (?<y>-?[0-9]{1,4}), z: (?<z>-?[0-9]{1,4})\\b"
+    )
+    private val diedPattern by patternGroup.pattern(
+        "died",
+        "§9Party §8> (?<playerName>.*)§f: §rInquisitor dead!"
+    )
+
     private var time = 0L
     private var testTime = 0L
     private var lastInquisitorMessage = ""
@@ -186,7 +193,7 @@ object InquisitorWaypointShare {
             return
         }
         inquisitor = -1
-        LorenzUtils.sendCommandToServer("pc Inquisitor dead!")
+        ChatUtils.sendCommandToServer("pc Inquisitor dead!")
     }
 
     fun sendInquisitor() {
@@ -213,7 +220,7 @@ object InquisitorWaypointShare {
         val x = location.x.toInt()
         val y = location.y.toInt()
         val z = location.z.toInt()
-        LorenzUtils.sendCommandToServer("pc x: $x, y: $y, z: $z ")
+        ChatUtils.sendCommandToServer("pc x: $x, y: $y, z: $z ")
     }
 
     @SubscribeEvent(priority = EventPriority.LOW, receiveCanceled = true)

@@ -31,12 +31,12 @@ public class DiscordRPCConfig {
 
     @Expose
     @ConfigOption(name = "First Line", desc = "Decide what to show in the first line.")
-    @ConfigEditorDropdown()
+    @ConfigEditorDropdown
     public Property<LineEntry> firstLine = Property.of(NOTHING);
 
     @Expose
     @ConfigOption(name = "Second Line", desc = "Decide what to show in the second line.")
-    @ConfigEditorDropdown()
+    @ConfigEditorDropdown
     public Property<LineEntry> secondLine = Property.of(NOTHING);
 
     @Expose
@@ -46,7 +46,7 @@ public class DiscordRPCConfig {
 
     @Expose
     @ConfigOption(name = "Dynamic Priority", desc = "Disable certain dynamic statuses, or change the priority in case two are triggered at the same time (higher up means higher priority).")
-    @ConfigEditorDraggableList()
+    @ConfigEditorDraggableList
     public List<PriorityEntry> autoPriority = new ArrayList<>(Arrays.asList(
         CROP_MILESTONES,
         SLAYER,
@@ -89,7 +89,7 @@ public class DiscordRPCConfig {
 
     @Expose
     @ConfigOption(name = "Dynamic Fallback", desc = "What to show when none of your \"Dynamic Priority\" statuses are active.")
-    @ConfigEditorDropdown()
+    @ConfigEditorDropdown
     public Property<LineEntry> auto = Property.of(NOTHING);
 
     public enum LineEntry implements HasLegacyId {

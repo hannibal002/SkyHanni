@@ -15,7 +15,7 @@ object ShiftClickNPCSell {
 
     private val config get() = SkyHanniMod.feature.inventory.shiftClickNPCSell
 
-    private val sellSlot = 49
+    private val sellSlot = -4
     private val lastLoreLineOfSellPattern by RepoPattern.pattern(
         "inventory.npc.sell.lore",
         "§7them to this Shop!|§eClick to buyback!"
@@ -29,7 +29,10 @@ object ShiftClickNPCSell {
     @SubscribeEvent
     fun onOpen(event: InventoryFullyOpenedEvent) {
         if (!LorenzUtils.inSkyBlock) return
-        inInventory = lastLoreLineOfSellPattern.matches(event.inventoryItems[sellSlot]?.getLore()?.lastOrNull())
+        if (event.inventoryItems.isEmpty()) return
+        val item = event.inventoryItems[event.inventoryItems.keys.last() + sellSlot] ?: return
+
+        inInventory = lastLoreLineOfSellPattern.matches(item.getLore().lastOrNull())
     }
 
     @SubscribeEvent

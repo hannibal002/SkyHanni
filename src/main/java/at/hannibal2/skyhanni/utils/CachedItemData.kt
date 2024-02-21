@@ -17,10 +17,14 @@ data class CachedItemData(
     var riftExportable: Boolean? = null,
 
     // null = not loaded
-    var itemRarityLastCheck: Long = 0L, // Cant use SimpleTimeMark here
+    var itemRarityLastCheck: Long = 0L, // Can't use SimpleTimeMark here
 
     // null = not loaded
     var itemRarity: LorenzRarity? = null,
 
     var itemCategory: ItemCategory? = null,
+
+    var lastInternalName: NEUInternalName? = null,
+
+    var lastInternalNameFetchTime: Long = 0L, // Still can't use SimpleTimeMark here
 )

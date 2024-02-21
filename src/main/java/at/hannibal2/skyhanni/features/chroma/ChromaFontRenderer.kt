@@ -36,7 +36,7 @@ class ChromaFontRenderer(private val baseColor: Int) {
 
     fun newChromaEnv(): ChromaFontRenderer {
         if (ShaderHelper.areShadersSupported()) {
-            ChromaShaderManager.begin()
+            ChromaShaderManager.begin(ChromaType.TEXTURED)
             GlStateManager.shadeModel(GL11.GL_SMOOTH)
         }
         return this
