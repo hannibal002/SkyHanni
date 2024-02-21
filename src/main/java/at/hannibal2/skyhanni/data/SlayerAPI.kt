@@ -8,10 +8,9 @@ import at.hannibal2.skyhanni.events.SlayerProgressChangeEvent
 import at.hannibal2.skyhanni.events.SlayerQuestCompleteEvent
 import at.hannibal2.skyhanni.features.slayer.SlayerType
 import at.hannibal2.skyhanni.utils.CollectionUtils.nextAfter
-import at.hannibal2.skyhanni.utils.ItemUtils.nameWithEnchantment
+import at.hannibal2.skyhanni.utils.ItemUtils.itemName
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.NEUInternalName
-import at.hannibal2.skyhanni.utils.NEUItems.getItemStack
 import at.hannibal2.skyhanni.utils.NEUItems.getNpcPriceOrNull
 import at.hannibal2.skyhanni.utils.NEUItems.getPrice
 import at.hannibal2.skyhanni.utils.NumberUtil
@@ -46,7 +45,7 @@ object SlayerAPI {
         }
 
         val amountFormat = if (amount != 1) "§7${amount}x §r" else ""
-        val displayName = getNameWithEnchantmentFor(internalName)
+        val displayName = internalName.itemName
 
         val price = internalName.getPrice()
         val npcPrice = internalName.getNpcPriceOrNull() ?: 0.0
@@ -59,13 +58,6 @@ object SlayerAPI {
         val result = "$amountFormat$displayName$priceFormat" to totalPrice
         nameCache.put(key, result)
         return result
-    }
-
-    private fun getNameWithEnchantmentFor(internalName: NEUInternalName): String {
-        if (internalName.asString() == "WISP_POTION") {
-            return "§fWisp's Ice-Flavored Water"
-        }
-        return internalName.getItemStack().nameWithEnchantment ?: error("Could not find name for $internalName")
     }
 
     @SubscribeEvent

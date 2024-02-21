@@ -11,6 +11,7 @@ import at.hannibal2.skyhanni.mixins.transformers.AccessorGuiEditSign
 import at.hannibal2.skyhanni.test.TestBingo
 import at.hannibal2.skyhanni.utils.ChatUtils.lastButtonClicked
 import at.hannibal2.skyhanni.utils.CollectionUtils.sortedDesc
+import at.hannibal2.skyhanni.utils.ItemUtils.getItemCategoryOrNull
 import at.hannibal2.skyhanni.utils.NEUItems.getItemStackOrNull
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.StringUtils.capAtMinecraftLength
@@ -271,12 +272,15 @@ object LorenzUtils {
 
     fun IslandType.isInIsland() = inSkyBlock && skyBlockIsland == this
 
-    fun GuiContainerEvent.SlotClickEvent.makeShiftClick() =
+    fun GuiContainerEvent.SlotClickEvent.makeShiftClick() {
+        if (this.clickedButton == 1 && slot?.stack?.getItemCategoryOrNull() == ItemCategory.SACK) return
         slot?.slotNumber?.let { slotNumber ->
             Minecraft.getMinecraft().playerController.windowClick(
                 container.windowId, slotNumber, 0, 1, Minecraft.getMinecraft().thePlayer
-            )?.also { isCanceled = true }
+            )
+            isCanceled = true
         }
+    }
 
     private val recalculateDerpy =
         RecalculatingValue(1.seconds) { MayorElection.isPerkActive("Derpy", "DOUBLE MOBS HP!!!") }
@@ -326,8 +330,9 @@ object LorenzUtils {
         FMLCommonHandler.instance().handleExit(-1)
     }
 
+    @Deprecated("moved", ReplaceWith("ChatUtils.sendCommandToServer"))
     fun sendCommandToServer(command: String) {
-        ChatUtils.sendMessageToServer("/$command")
+        ChatUtils.sendCommandToServer(command)
     }
 
     /**

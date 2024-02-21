@@ -53,7 +53,7 @@ channel [#neu-updates](https://discord.com/channels/997079228510117908/112320109
 <details>
 <summary>5. Download SkyHanni</summary>
 
-SkyHanni has 2 update circles: [Full Release](https://github.com/hannibal002/SkyHanni/releases/latest)
+SkyHanni has two different update circles: [Full Release](https://github.com/hannibal002/SkyHanni/releases/latest)
 and [Beta](https://github.com/hannibal002/SkyHanni/releases).
 
 In general, it is recommended to use the **Full Release**.
@@ -130,4 +130,4 @@ settings.
 
 </details>
 
-<h1>And finally, don't forget to <i><b>never run a file that is sent to you in dms</b></i></h1>
+<h2>And finally, don't forget to <i><b>never run a file that is sent to you in dms</b></i></h2>

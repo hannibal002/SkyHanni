@@ -4,6 +4,7 @@ import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.config.enums.OutsideSbFeature
 import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.TabListUpdateEvent
+import at.hannibal2.skyhanni.features.fame.ReminderUtils
 import at.hannibal2.skyhanni.features.garden.GardenAPI
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.CollectionUtils.addAsSingletonList
@@ -117,6 +118,8 @@ class ComposterDisplay {
 
     private fun sendNotify() {
         if (!config.notifyLow.enabled) return
+        if (ReminderUtils.isBusy()) return
+
         val storage = storage ?: return
 
         if (ComposterAPI.getOrganicMatter() <= config.notifyLow.organicMatter && System.currentTimeMillis() >= storage.informedAboutLowMatter) {
@@ -177,8 +180,7 @@ class ComposterDisplay {
         if (!config.warnAlmostClose) return
         val storage = GardenAPI.storage ?: return
 
-        if (LorenzUtils.inDungeons) return
-        if (LorenzUtils.inKuudraFight) return
+        if (ReminderUtils.isBusy()) return
 
         if (System.currentTimeMillis() < storage.lastComposterEmptyWarningTime + 1000 * 60 * 2) return
         storage.lastComposterEmptyWarningTime = System.currentTimeMillis()

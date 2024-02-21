@@ -1,9 +1,7 @@
 package at.hannibal2.skyhanni.features.fishing
 
 import at.hannibal2.skyhanni.events.FishingBobberCastEvent
-import at.hannibal2.skyhanni.events.ItemInHandChangeEvent
 import at.hannibal2.skyhanni.events.LorenzTickEvent
-import at.hannibal2.skyhanni.features.fishing.FishingAPI.isFishingRod
 import at.hannibal2.skyhanni.utils.EntityUtils
 import at.hannibal2.skyhanni.utils.LocationUtils
 import at.hannibal2.skyhanni.utils.LocationUtils.distanceToPlayer
@@ -15,22 +13,15 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import kotlin.time.Duration.Companion.minutes
 import kotlin.time.Duration.Companion.seconds
 
-object FishingDetection {
+object IsFishingDetection {
 
     var isFishing = false
-    private var holdingRod = false
     private var lastRodCastLocation: LorenzVec? = null
     private var lastRodCastTime = SimpleTimeMark.farPast()
     private var lastInAreaTime = SimpleTimeMark.farPast()
 
     private var lastSeaCreatureKillArea: LorenzVec? = null
     private var lastSeaCreatureKillAreaTime = SimpleTimeMark.farPast()
-
-    @SubscribeEvent
-    fun onItemInHandChange(event: ItemInHandChangeEvent) {
-        // TODO correct rod type per island water/lava
-        holdingRod = event.newItem.isFishingRod()
-    }
 
     @SubscribeEvent
     fun onBobberThrow(event: FishingBobberCastEvent) {
@@ -59,8 +50,6 @@ object FishingDetection {
     }
 
     private fun testIsFishing(): Boolean {
-        if (holdingRod) return true
-
         if (inRodCastArea()) return true
 
         if (lastRodCastTime.passedSince() < 5.seconds) return true
