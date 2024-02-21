@@ -3,7 +3,6 @@ package at.hannibal2.skyhanni.config.features.misc;
 import at.hannibal2.skyhanni.config.FeatureToggle;
 import at.hannibal2.skyhanni.config.core.config.Position;
 import at.hannibal2.skyhanni.config.enums.OutsideSbFeature;
-import at.hannibal2.skyhanni.config.enums.OutsideSbFeature;
 import at.hannibal2.skyhanni.config.features.misc.compacttablist.CompactTabListConfig;
 import at.hannibal2.skyhanni.config.features.misc.cosmetic.CosmeticConfig;
 import at.hannibal2.skyhanni.config.features.misc.pets.PetConfig;
@@ -15,11 +14,6 @@ import io.github.moulberry.moulconfig.annotations.ConfigEditorDraggableList;
 import io.github.moulberry.moulconfig.annotations.ConfigOption;
 
 import java.util.ArrayList;
-import java.util.List;
-import io.github.moulberry.moulconfig.annotations.ConfigEditorDraggableList;
-
-import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
 public class MiscConfig {

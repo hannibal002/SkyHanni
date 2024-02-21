@@ -22,7 +22,7 @@ class GardenYawAndPitch {
     @SubscribeEvent
     fun onRenderOverlay(event: GuiRenderEvent.GuiOverlayRenderEvent) {
         if (!LorenzUtils.onHypixel) return
-        if(!((OutsideSbFeature.YAW_AND_PITCH.isSelected() && !LorenzUtils.inSkyBlock)  || (LorenzUtils.inSkyBlock && (GardenAPI.inGarden() || config.showOutsideGarden)))) return
+        if (!isEnabled()) return
         if (GardenAPI.hideExtraGuis()) return
         if (GardenAPI.toolInHand == null && !config.showWithoutTool) return
 
@@ -63,4 +63,9 @@ class GardenYawAndPitch {
     fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
         event.move(18, "garden.yawPitchDisplay.everywhere", "garden.yawPitchDisplay.showOutsideGarden")
     }
+
+    private fun isEnabled() = (
+            (OutsideSbFeature.YAW_AND_PITCH.isSelected() && !LorenzUtils.inSkyBlock) ||
+            (LorenzUtils.inSkyBlock && (GardenAPI.inGarden() || config.showOutsideGarden))
+            )
 }
