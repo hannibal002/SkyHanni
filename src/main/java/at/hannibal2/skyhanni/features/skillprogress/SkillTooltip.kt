@@ -31,7 +31,7 @@ class SkillTooltip {
             val skillName = split.first()
             val skill = SkillType.getByNameFirstUppercase(skillName) ?: return
             val useRoman = split.last().toIntOrNull() == null
-            val skillInfo = SkillAPI.storage?.skillData?.get(skill) ?: return
+            val skillInfo = SkillAPI.storage?.get(skill) ?: return
             val showCustomGoal = skillInfo.customGoalLevel != 0 && customGoalConfig.enableInSkillMenuTooltip
             var next = false
             for (line in iterator) {

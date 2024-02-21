@@ -12,7 +12,7 @@ public class CustomGoalConfig {
     public boolean enableIndDisplay = true;
 
     @Expose
-    @ConfigOption(name = "All Skill Display", desc = "Enable the custom goal in the all skill display")
+    @ConfigOption(name = "All Skill Display", desc = "Enable the custom goal in the all skill display.")
     @ConfigEditorBoolean
     public boolean enableInAllDisplay = false;
 
@@ -22,7 +22,7 @@ public class CustomGoalConfig {
     public boolean enableInETADisplay = false;
 
     @Expose
-    @ConfigOption(name = "Progress Bar", desc = "Enable the custom goal in the progress bar")
+    @ConfigOption(name = "Progress Bar", desc = "Enable the custom goal in the progress bar.")
     @ConfigEditorBoolean
     public boolean enableInProgressBar = true;
 

@@ -13,6 +13,7 @@ import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.LorenzTickEvent
 import at.hannibal2.skyhanni.events.PreProfileSwitchEvent
 import at.hannibal2.skyhanni.events.SkillOverflowLevelupEvent
+import at.hannibal2.skyhanni.features.skillprogress.SkillUtil.XP_NEEDED_FOR_60
 import at.hannibal2.skyhanni.utils.ChatUtils.chat
 import at.hannibal2.skyhanni.utils.CollectionUtils.addAsSingletonList
 import at.hannibal2.skyhanni.utils.ConditionalUtils.onToggle
@@ -148,7 +149,7 @@ object SkillProgress {
         val skillName = event.skill.displayName
         val oldLevel = event.oldLevel
         val newLevel = event.newLevel
-        val skill = SkillAPI.storage?.skillData?.get(event.skill) ?: return
+        val skill = SkillAPI.storage?.get(event.skill) ?: return
         val goalReached = newLevel == skill.customGoalLevel && customGoalConfig.enableInChat
 
         val rewards = buildList {
@@ -236,7 +237,7 @@ object SkillProgress {
     }
 
     private fun drawAllDisplay() = buildList {
-        val skillMap = SkillAPI.storage?.skillData ?: return@buildList
+        val skillMap = SkillAPI.storage ?: return@buildList
         val sortedMap = SkillType.entries.filter { it.displayName.isNotEmpty() }.sortedBy { it.displayName.take(2) }
 
         for (skill in sortedMap) {
@@ -290,7 +291,7 @@ object SkillProgress {
     }
 
     private fun drawETADisplay() = buildList {
-        val skillInfo = SkillAPI.storage?.skillData?.get(activeSkill) ?: return@buildList
+        val skillInfo = SkillAPI.storage?.get(activeSkill) ?: return@buildList
         val xpInfo = skillXPInfoMap[activeSkill] ?: return@buildList
         val skillInfoLast = oldSkillInfoMap[activeSkill] ?: return@buildList
         oldSkillInfoMap[activeSkill] = skillInfo
@@ -344,12 +345,12 @@ object SkillProgress {
     }
 
     private fun drawDisplay() = buildList {
-        val skillMap = SkillAPI.storage?.skillData ?: return@buildList
+        val skillMap = SkillAPI.storage ?: return@buildList
         val skill = skillMap[activeSkill] ?: return@buildList
         val useCustomGoalLevel = skill.customGoalLevel != 0 && skill.customGoalLevel > skill.overflowLevel
         val targetLevel = skill.customGoalLevel
         val xp = skill.totalXp
-        val currentLevel = if (xp <= 111672425L) {
+        val currentLevel = if (xp <= XP_NEEDED_FOR_60) {
             SkillUtil.getLevel(xp)
         } else {
             SkillUtil.calculateOverFlow(xp).first
@@ -418,7 +419,7 @@ object SkillProgress {
 
     private fun updateSkillInfo(skill: SkillType) {
         val xpInfo = skillXPInfoMap.getOrPut(skill) { SkillAPI.SkillXPInfo() }
-        val skillInfo = SkillAPI.storage?.skillData?.get(skill) ?: return
+        val skillInfo = SkillAPI.storage?.get(skill) ?: return
         oldSkillInfoMap[skill] = skillInfo
 
         val totalXp = skillInfo.currentXp

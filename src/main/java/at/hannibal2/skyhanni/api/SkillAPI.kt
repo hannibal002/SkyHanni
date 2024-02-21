@@ -8,6 +8,8 @@ import at.hannibal2.skyhanni.events.InventoryFullyOpenedEvent
 import at.hannibal2.skyhanni.events.SkillOverflowLevelupEvent
 import at.hannibal2.skyhanni.features.skillprogress.SkillProgress
 import at.hannibal2.skyhanni.features.skillprogress.SkillType
+import at.hannibal2.skyhanni.features.skillprogress.SkillUtil.SPACE_SPLITTER
+import at.hannibal2.skyhanni.features.skillprogress.SkillUtil.XP_NEEDED_FOR_60
 import at.hannibal2.skyhanni.features.skillprogress.SkillUtil.calculateLevelXp
 import at.hannibal2.skyhanni.features.skillprogress.SkillUtil.calculateOverFlow
 import at.hannibal2.skyhanni.features.skillprogress.SkillUtil.getLevel
@@ -25,7 +27,6 @@ import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.TabListData
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
-import com.google.common.base.Splitter
 import com.google.gson.GsonBuilder
 import com.google.gson.annotations.Expose
 import com.google.gson.reflect.TypeToken
@@ -39,17 +40,31 @@ import kotlin.concurrent.fixedRateTimer
 import kotlin.time.Duration.Companion.seconds
 
 object SkillAPI {
-    private val patternGroup = RepoPattern.group("display.skilldisplay")
-    private val skillPercentPattern by patternGroup.pattern("skillpaternpercent", "\\+(?<gained>[\\d.,]+) (?<skillName>.+) \\((?<progress>[\\d.]+)%\\)")
-    private val skillPattern by patternGroup.pattern("skillpattern", "\\+(?<gained>[\\d.,]+) (?<skillName>\\w+) \\((?<current>[\\d.,]+)/(?<needed>[\\d.,]+)\\)")
-    private val skillMultiplierPattern by patternGroup.pattern("skillpatternmultiplier", "\\+(?<gained>[\\d.,]+) (?<skillName>.+) \\((?<current>[\\d.,]+)/(?<needed>[\\d,.]+[kmb])\\)")
-    private val skillTabPattern by patternGroup.pattern("skilltabpattern", "^§e§lSkills: §r§a(?<type>\\w+) (?<level>\\d+): §r§3(?<progress>.+)%\$")
-    private val maxSkillTabPattern by patternGroup.pattern("maxskilltabpattern", "^§e§lSkills: §r§a(?<type>\\w+) (?<level>\\d+): §r§c§lMAX\$")
-    val SPACE_SPLITTER = Splitter.on("  ").omitEmptyStrings().trimResults()
+    private val patternGroup = RepoPattern.group("api.skills.skilldisplay")
+    private val skillPercentPattern by patternGroup.pattern(
+        "skillpaternpercent",
+        "\\+(?<gained>[\\d.,]+) (?<skillName>.+) \\((?<progress>[\\d.]+)%\\)"
+    )
+    private val skillPattern by patternGroup.pattern(
+        "skillpattern",
+        "\\+(?<gained>[\\d.,]+) (?<skillName>\\w+) \\((?<current>[\\d.,]+)/(?<needed>[\\d.,]+)\\)"
+    )
+    private val skillMultiplierPattern by patternGroup.pattern(
+        "skillpatternmultiplier",
+        "\\+(?<gained>[\\d.,]+) (?<skillName>.+) \\((?<current>[\\d.,]+)/(?<needed>[\\d,.]+[kmb])\\)"
+    )
+    private val skillTabPattern by patternGroup.pattern(
+        "skilltabpattern",
+        "^§e§lSkills: §r§a(?<type>\\w+) (?<level>\\d+): §r§3(?<progress>.+)%\$"
+    )
+    private val maxSkillTabPattern by patternGroup.pattern(
+        "maxskilltabpattern",
+        "^§e§lSkills: §r§a(?<type>\\w+) (?<level>\\d+): §r§c§lMAX\$"
+    )
 
     var skillXPInfoMap = mutableMapOf<SkillType, SkillXPInfo>()
     var oldSkillInfoMap = mutableMapOf<SkillType?, SkillInfo?>()
-    val storage get() = ProfileStorageData.profileSpecific
+    val storage get() = ProfileStorageData.profileSpecific?.skillData
     var exactLevelingMap = mapOf<Int, Int>()
     var levelingMap = mapOf<Int, Int>()
     var activeSkill: SkillType = SkillType.NONE
@@ -74,12 +89,12 @@ object SkillAPI {
             if (matcher?.matches() == true) {
                 val skillName = matcher.group("skillName")
                 val skill = SkillType.getByNameFirstUppercase(skillName) ?: return
-                val skillInfo = storage?.skillData?.get(skill) ?: SkillInfo()
+                val skillInfo = storage?.get(skill) ?: SkillInfo()
                 val skillXp = skillXPInfoMap[skill] ?: SkillXPInfo()
                 activeSkill = skill
                 when (matcher.pattern()) {
                     skillPattern -> handleSkillPattern(matcher, skill, skillInfo)
-                    skillPercentPattern -> handleSkillPatternPercent(matcher, skill, skillInfo)
+                    skillPercentPattern -> handleSkillPatternPercent(matcher, skill)
                     skillMultiplierPattern -> handleSkillPatternMultiplier(matcher, skill, skillInfo)
                 }
                 showDisplay = true
@@ -122,7 +137,7 @@ object SkillAPI {
                 val skillName = split.first()
                 val skill = SkillType.getByNameFirstUppercase(skillName) ?: continue
                 val skillLevel = if (split.size > 1) split.last().romanToDecimalIfNecessary() else 0
-                val skillInfo = storage?.skillData?.getOrPut(skill) { SkillInfo() }
+                val skillInfo = storage?.getOrPut(skill) { SkillInfo() }
 
                 for ((lineIndex, line) in lore.withIndex()) {
                     val cleanLine = line.removeColor()
@@ -172,12 +187,12 @@ object SkillAPI {
     @SubscribeEvent
     fun onDebugDataCollect(event: DebugDataCollectEvent) {
         event.title("Skills")
-        if (storage?.skillData == null) {
+        if (storage == null) {
             event.addIrrelevant("SkillMap is empty")
             return
         }
         event.addData {
-            storage?.skillData?.let {
+            storage?.let {
                 for ((skillName, skillInfo) in it) {
                     add("-  Name: $skillName")
                     add("-  Level: ${skillInfo.level}")
@@ -236,10 +251,10 @@ object SkillAPI {
 
             this.lastGain = matcher.group("gained")
         }
-        storage?.skillData?.set(skill, skillInfo)
+        storage?.set(skill, skillInfo)
     }
 
-    private fun handleSkillPatternPercent(matcher: Matcher, skill: SkillType, skillInfo: SkillInfo?) {
+    private fun handleSkillPatternPercent(matcher: Matcher, skill: SkillType) {
         var tablistLevel = 0
         for (line in TabListData.getTabList()) {
             var levelMatcher = skillTabPattern.matcher(line)
@@ -276,7 +291,7 @@ object SkillAPI {
 
             this.lastGain = matcher.group("gained")
         }
-        storage?.skillData?.set(skill, existingLevel)
+        storage?.set(skill, existingLevel)
     }
 
     private fun handleSkillPatternMultiplier(matcher: Matcher, skillS: SkillType, skillInfo: SkillInfo) {
@@ -299,7 +314,7 @@ object SkillAPI {
 
             this.lastGain = matcher.group("gained")
         }
-        storage?.skillData?.set(skillS, skillInfo)
+        storage?.set(skillS, skillInfo)
     }
 
     fun onCommand(it: Array<String>) {
@@ -312,7 +327,7 @@ object SkillAPI {
             when (it.first()) {
                 "skillgoal" -> {
                     ChatUtils.chat("§bSkill Custom Goal Level")
-                    storage?.skillData?.filter { it.value.customGoalLevel != 0 }?.forEach { (skill, data) ->
+                    storage?.filter { it.value.customGoalLevel != 0 }?.forEach { (skill, data) ->
                         ChatUtils.chat("§e${skill.displayName}: §b${data.customGoalLevel}")
                     }
                 }
@@ -324,7 +339,7 @@ object SkillAPI {
             when (it.first()) {
                 "levelwithxp" -> {
                     val xp = second.toLong()
-                    if (xp <= 111672425L) {
+                    if (xp <= XP_NEEDED_FOR_60) {
                         val level = getLevel(xp)
                         ChatUtils.chat("With §b${xp.addSeparators()} §eXP you would be level §b$level")
                     } else {
@@ -364,7 +379,7 @@ object SkillAPI {
                         ChatUtils.userError("$rawLevel is not a valid number.")
                         return
                     }
-                    val skill = storage?.skillData?.get(skillType) ?: return
+                    val skill = storage?.get(skillType) ?: return
 
                     if (targetLevel <= skill.overflowLevel && targetLevel != 0) {
                         ChatUtils.userError("Custom goal level ($targetLevel) must be greater than your current level (${skill.overflowLevel}).")

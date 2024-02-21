@@ -6,14 +6,18 @@ import at.hannibal2.skyhanni.api.SkillAPI.exactLevelingMap
 import at.hannibal2.skyhanni.api.SkillAPI.excludedSkills
 import at.hannibal2.skyhanni.api.SkillAPI.levelingMap
 import at.hannibal2.skyhanni.utils.LorenzUtils
+import com.google.common.base.Splitter
 import com.google.gson.JsonArray
 import io.github.moulberry.notenoughupdates.util.Constants
 import io.github.moulberry.notenoughupdates.util.Utils
 
 object SkillUtil {
 
+    val SPACE_SPLITTER = Splitter.on("  ").omitEmptyStrings().trimResults()
+    const val XP_NEEDED_FOR_60 = 111_672_425L
+
     fun getSkillInfo(skill: SkillType): SkillAPI.SkillInfo? {
-        return SkillAPI.storage?.skillData?.get(skill)
+        return SkillAPI.storage?.get(skill)
     }
 
     fun getSkillInfo(currentLevel: Int, currentXp: Long, neededXp: Long, totalXp: Long): LorenzUtils.Quad<Int, Long, Long, Long> {

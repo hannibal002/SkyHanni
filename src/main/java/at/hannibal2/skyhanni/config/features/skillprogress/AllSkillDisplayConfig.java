@@ -1,5 +1,6 @@
 package at.hannibal2.skyhanni.config.features.skillprogress;
 
+import at.hannibal2.skyhanni.config.FeatureToggle;
 import com.google.gson.annotations.Expose;
 import io.github.moulberry.moulconfig.annotations.ConfigEditorBoolean;
 import io.github.moulberry.moulconfig.annotations.ConfigEditorDraggableList;
@@ -25,6 +26,7 @@ public class AllSkillDisplayConfig {
     @Expose
     @ConfigOption(name = "Enabled", desc = "Show a display with all skills progress.")
     @ConfigEditorBoolean
+    @FeatureToggle
     public Property<Boolean> enabled = Property.of(false);
 
     @Expose

@@ -1,6 +1,7 @@
 package at.hannibal2.skyhanni.config.features.skillprogress;
 
 import at.hannibal2.skyhanni.SkyHanniMod;
+import at.hannibal2.skyhanni.config.FeatureToggle;
 import com.google.gson.annotations.Expose;
 import io.github.moulberry.moulconfig.annotations.Accordion;
 import io.github.moulberry.moulconfig.annotations.ConfigEditorBoolean;
@@ -15,6 +16,7 @@ public class SkillProgressBarConfig {
     @Expose
     @ConfigOption(name = "Enabled", desc = "Enable/Disable the progress bar.")
     @ConfigEditorBoolean
+    @FeatureToggle
     public Property<Boolean> enabled = Property.of(false);
 
     @Expose
@@ -28,7 +30,7 @@ public class SkillProgressBarConfig {
     public Property<Boolean> useChroma = Property.of(false);
 
     @Expose
-    @ConfigOption(name = "Bar Color", desc = "Color of the progress bar.\n§eIgnored if Chroma is enabled")
+    @ConfigOption(name = "Bar Color", desc = "Color of the progress bar.\n§eIgnored if Chroma is enabled.")
     @ConfigEditorColour
     public String barStartColor = "0:255:255:0:0";
 

@@ -84,11 +84,11 @@ public class SkillProgressConfig {
     public Property<Boolean> showLevel = Property.of(true);
 
     @Expose
-    @Category(name = "Progress Bar", desc = "Progress Bar Config")
+    @Category(name = "Progress Bar", desc = "Progress Bar Config.")
     public SkillProgressBarConfig skillProgressBarConfig = new SkillProgressBarConfig();
 
     @Expose
-    @Category(name = "OverFlow", desc = "Overflow Config")
+    @Category(name = "OverFlow", desc = "Overflow Config.")
     public SkillOverflowConfig overflowConfig = new SkillOverflowConfig();
 
     @Expose
@@ -96,11 +96,11 @@ public class SkillProgressConfig {
     public CustomGoalConfig customGoalConfig = new CustomGoalConfig();
 
     @Expose
-    @Category(name = "All Skill Display", desc = "All Skill Display Config")
+    @Category(name = "All Skill Display", desc = "All Skill Display Config.")
     public AllSkillDisplayConfig allSkillDisplayConfig = new AllSkillDisplayConfig();
 
     @Expose
-    @Category(name = "ETA Display", desc = "ETA Display Config")
+    @Category(name = "ETA Display", desc = "ETA Display Config.")
     public SkillETADisplayConfig skillETADisplayConfig = new SkillETADisplayConfig();
 
     @Expose

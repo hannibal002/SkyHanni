@@ -1,5 +1,6 @@
 package at.hannibal2.skyhanni.config.features.skillprogress;
 
+import at.hannibal2.skyhanni.config.FeatureToggle;
 import com.google.gson.annotations.Expose;
 import io.github.moulberry.moulconfig.annotations.ConfigEditorBoolean;
 import io.github.moulberry.moulconfig.annotations.ConfigEditorSlider;
@@ -13,17 +14,8 @@ public class SkillETADisplayConfig {
     @ConfigOption(name = "Enabled", desc = "Show a display of your current active skill\n" +
         "with the XP/hour rate, ETA to the next level and current session time.")
     @ConfigEditorBoolean
+    @FeatureToggle
     public Property<Boolean> enabled = Property.of(false);
-
-    @Expose
-    @ConfigOption(name = "Custom Goal", desc = "Choose a target level instead of showing progress to the next one.")
-    @ConfigEditorBoolean
-    public boolean enableCustomGoal = false;
-
-    @Expose
-    @ConfigOption(name = "Target Level", desc = "Desired target level.\n§eShould be §ahigher §ethan §ayour current level §eand §clower §ethan §c400.")
-    @ConfigEditorText
-    public String customGoalValue = "0";
 
     @Expose
     @ConfigOption(name = "Farming", desc = "After how much seconds the Farming session timer should pause.")

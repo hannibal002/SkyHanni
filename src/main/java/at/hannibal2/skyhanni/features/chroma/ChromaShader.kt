@@ -14,7 +14,6 @@ import net.minecraft.client.Minecraft
  * Credit: [ChromaShader.java](https://github.com/BiscuitDevelopment/SkyblockAddons/blob/main/src/main/java/codes/biscuit/skyblockaddons/shader/chroma/ChromaShader.java)
  */
 
-
 abstract class ChromaShader(vertex: String, fragment: String) : Shader(vertex, fragment) {
     val config get() = SkyHanniMod.feature.chroma
 
