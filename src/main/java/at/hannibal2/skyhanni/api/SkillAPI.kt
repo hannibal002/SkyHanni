@@ -18,7 +18,6 @@ import at.hannibal2.skyhanni.features.skillprogress.SkillUtil.xpRequiredForLevel
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.cleanName
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
-import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.NumberUtil.formatNumber
 import at.hannibal2.skyhanni.utils.NumberUtil.romanToDecimalIfNecessary
@@ -32,6 +31,7 @@ import com.google.gson.annotations.Expose
 import com.google.gson.reflect.TypeToken
 import io.github.moulberry.notenoughupdates.util.Constants
 import io.github.moulberry.notenoughupdates.util.Utils
+import net.minecraft.command.CommandBase
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import java.util.LinkedList
 import java.util.regex.Matcher
@@ -377,6 +377,19 @@ object SkillAPI {
                     ChatUtils.chat("Custom goal level for §b${skillType.displayName} §eset to §b$targetLevel")
                 }
             }
+        }
+    }
+
+    fun onComplete(strings: Array<String>): List<String> {
+        return when (strings.size) {
+            1 -> listOf("levelwithxp", "xpforlevel", "skillgoal")
+            2 -> if (strings[0].lowercase() == "skillgoal") CommandBase.getListOfStringsMatchingLastWord(
+                strings,
+                SkillType.entries.map { it.displayName })
+            else
+                listOf()
+
+            else -> listOf()
         }
     }
 

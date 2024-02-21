@@ -267,7 +267,7 @@ object Commands {
             "shskills",
             "Skills XP/Level related command",
             { SkillAPI.onCommand(it) },
-            { listOf("levelwithxp", "xpforlevel", "skillgoal") })
+            SkillAPI::onComplete)
         registerCommand0(
             "shcalccrop",
             "Calculate how many crops need to be farmed between different crop milestones.",
