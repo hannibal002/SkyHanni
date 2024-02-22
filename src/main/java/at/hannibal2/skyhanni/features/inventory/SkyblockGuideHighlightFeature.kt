@@ -17,7 +17,7 @@ import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import org.intellij.lang.annotations.Language
 
-val group = RepoPattern.group("skyblockguide.highlight")
+val patternGroup = RepoPattern.group("skyblockguide.highlight")
 
 private const val keyPrefixInventory = "inventory"
 private const val keyPrefixCondition = "condition"
@@ -42,8 +42,8 @@ class SkyblockGuideHighlightFeature private constructor(
         onTooltip: (LorenzToolTipEvent) -> Unit = {},
     ) : this(
         config,
-        group.pattern("$key.$keyPrefixInventory", inventory),
-        group.pattern("$key.$keyPrefixCondition", loreCondition),
+        patternGroup.pattern("$key.$keyPrefixInventory", inventory),
+        patternGroup.pattern("$key.$keyPrefixCondition", loreCondition),
         onSlotClicked,
         onTooltip
     )
@@ -55,7 +55,7 @@ class SkyblockGuideHighlightFeature private constructor(
         loreCondition: RepoPattern,
         onSlotClicked: (GuiContainerEvent.SlotClickEvent) -> Unit = {},
         onTooltip: (LorenzToolTipEvent) -> Unit = {},
-    ) : this(config, group.pattern("$key.$keyPrefixInventory", inventory), loreCondition, onSlotClicked, onTooltip)
+    ) : this(config, patternGroup.pattern("$key.$keyPrefixInventory", inventory), loreCondition, onSlotClicked, onTooltip)
 
     init {
         objectList.add(this)
@@ -125,12 +125,12 @@ class SkyblockGuideHighlightFeature private constructor(
         }
 
         private val taskOnlyCompleteOncePattern =
-            group.pattern("$keyPrefixCondition.once", "§7§eThis task can only be completed once!")
-        private val xPattern = group.pattern("$keyPrefixCondition.x", "§c ?✖.*")
+            patternGroup.pattern("$keyPrefixCondition.once", "§7§eThis task can only be completed once!")
+        private val xPattern = patternGroup.pattern("$keyPrefixCondition.x", "§c ?✖.*")
         private val totalProgressPattern =
-            group.pattern("$keyPrefixCondition.total", "§7Total Progress: §3\\d{1,2}(?:\\.\\d)?%")
+            patternGroup.pattern("$keyPrefixCondition.total", "§7Total Progress: §3\\d{1,2}(?:\\.\\d)?%")
         private val categoryProgressPattern =
-            group.pattern("$keyPrefixCondition.category", "§7Progress to Complete Category: §6\\d{1,2}(?:\\.\\d)?%")
+            patternGroup.pattern("$keyPrefixCondition.category", "§7Progress to Complete Category: §6\\d{1,2}(?:\\.\\d)?%")
 
         private val openWikiOnClick: (GuiContainerEvent.SlotClickEvent) -> Unit = { event ->
             val internalName = event.item?.getInternalName()
