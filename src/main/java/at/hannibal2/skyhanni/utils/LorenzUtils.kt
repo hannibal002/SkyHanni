@@ -330,10 +330,8 @@ object LorenzUtils {
         FMLCommonHandler.instance().handleExit(-1)
     }
 
+    @Deprecated("moved", ReplaceWith("ChatUtils.sendCommandToServer"))
     fun sendCommandToServer(command: String) {
-        if (command.startsWith("/")) {
-            ChatUtils.debug("Sending wrong command to server? ($command)")
-        }
         ChatUtils.sendCommandToServer(command)
     }
 

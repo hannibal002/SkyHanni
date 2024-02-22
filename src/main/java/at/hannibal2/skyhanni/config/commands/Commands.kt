@@ -14,6 +14,7 @@ import at.hannibal2.skyhanni.features.chat.Translator
 import at.hannibal2.skyhanni.features.combat.endernodetracker.EnderNodeTracker
 import at.hannibal2.skyhanni.features.combat.ghostcounter.GhostUtil
 import at.hannibal2.skyhanni.features.commands.PartyCommands
+import at.hannibal2.skyhanni.features.event.diana.AllBurrowsList
 import at.hannibal2.skyhanni.features.event.diana.BurrowWarpHelper
 import at.hannibal2.skyhanni.features.event.diana.DianaProfitTracker
 import at.hannibal2.skyhanni.features.event.diana.GriffinBurrowHelper
@@ -392,7 +393,7 @@ object Commands {
             "shcopyparticles",
             "Copied information about the particles that spawn in the next 50ms to the clipboard"
         ) { CopyNearbyParticlesCommand.command(it) }
-        registerCommand("shtestpacket", "Logs incoming and outgoing packets to the console") { PacketTest.toggle() }
+        registerCommand("shtestpacket", "Logs incoming and outgoing packets to the console") { PacketTest.command(it) }
         registerCommand(
             "shtestmessage",
             "Sends a custom chat message client side in the chat"
@@ -421,6 +422,14 @@ object Commands {
             "readcropmilestonefromclipboard",
             "Read crop milestone from clipboard. This helps fixing wrong crop milestone data"
         ) { GardenCropMilestonesCommunityFix.readDataFromClipboard() }
+        registerCommand(
+            "shcopyfoundburrowlocations",
+            "Copy all ever found burrow locations to clipboard"
+        ) { AllBurrowsList.copyToClipboard() }
+        registerCommand(
+            "shaddfoundburrowlocationsfromclipboard",
+            "Add all ever found burrow locations from clipboard"
+        ) { AllBurrowsList.addFromClipboard() }
     }
 
     private fun internalCommands() {

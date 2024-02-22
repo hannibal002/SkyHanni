@@ -1,10 +1,10 @@
-// Chroma Vertex Shader
+// Textured Chroma Vertex Shader
 // Credit: https://github.com/BiscuitDevelopment/SkyblockAddons/blob/main/src/main/resources/assets/skyblockaddons/shaders/program/chroma_screen_textured.vsh
 
-#version 120
+#version 130
 
-varying vec2 outTextureCoords;
-varying vec4 outColor;
+out vec2 outTextureCoords;
+out vec4 outColor;
 
 void main() {
     gl_Position = gl_ModelViewProjectionMatrix * gl_Vertex;

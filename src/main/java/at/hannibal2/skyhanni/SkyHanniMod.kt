@@ -112,6 +112,7 @@ import at.hannibal2.skyhanni.features.dungeon.DungeonTeammateOutlines
 import at.hannibal2.skyhanni.features.dungeon.HighlightDungeonDeathmite
 import at.hannibal2.skyhanni.features.dungeon.TerracottaPhase
 import at.hannibal2.skyhanni.features.event.UniqueGiftingOpportunitiesFeatures
+import at.hannibal2.skyhanni.features.event.diana.AllBurrowsList
 import at.hannibal2.skyhanni.features.event.diana.BurrowWarpHelper
 import at.hannibal2.skyhanni.features.event.diana.DianaProfitTracker
 import at.hannibal2.skyhanni.features.event.diana.GriffinBurrowHelper
@@ -134,9 +135,9 @@ import at.hannibal2.skyhanni.features.fame.CityProjectFeatures
 import at.hannibal2.skyhanni.features.fishing.ChumBucketHider
 import at.hannibal2.skyhanni.features.fishing.FishingAPI
 import at.hannibal2.skyhanni.features.fishing.FishingBaitWarnings
-import at.hannibal2.skyhanni.features.fishing.FishingDetection
 import at.hannibal2.skyhanni.features.fishing.FishingHookDisplay
 import at.hannibal2.skyhanni.features.fishing.FishingTimer
+import at.hannibal2.skyhanni.features.fishing.IsFishingDetection
 import at.hannibal2.skyhanni.features.fishing.SeaCreatureFeatures
 import at.hannibal2.skyhanni.features.fishing.SeaCreatureManager
 import at.hannibal2.skyhanni.features.fishing.SeaCreatureMessageShortener
@@ -144,7 +145,6 @@ import at.hannibal2.skyhanni.features.fishing.SharkFishCounter
 import at.hannibal2.skyhanni.features.fishing.ShowFishingItemName
 import at.hannibal2.skyhanni.features.fishing.ThunderSparksHighlight
 import at.hannibal2.skyhanni.features.fishing.tracker.FishingProfitTracker
-import at.hannibal2.skyhanni.features.fishing.tracker.FishingTrackerCategoryManager
 import at.hannibal2.skyhanni.features.fishing.tracker.SeaCreatureTracker
 import at.hannibal2.skyhanni.features.fishing.trophy.GeyserFishing
 import at.hannibal2.skyhanni.features.fishing.trophy.OdgerWaypoint
@@ -224,7 +224,7 @@ import at.hannibal2.skyhanni.features.inventory.SackDisplay
 import at.hannibal2.skyhanni.features.inventory.ShiftClickBrewing
 import at.hannibal2.skyhanni.features.inventory.ShiftClickEquipment
 import at.hannibal2.skyhanni.features.inventory.ShiftClickNPCSell
-import at.hannibal2.skyhanni.features.inventory.SkyBlockLevelGuideHelper
+import at.hannibal2.skyhanni.features.inventory.SkyblockGuideHighlightFeature
 import at.hannibal2.skyhanni.features.inventory.StatsTuning
 import at.hannibal2.skyhanni.features.inventory.tiarelay.TiaRelayHelper
 import at.hannibal2.skyhanni.features.inventory.tiarelay.TiaRelayWaypoints
@@ -390,7 +390,7 @@ import org.apache.logging.log4j.Logger
     clientSideOnly = true,
     useMetadata = true,
     guiFactory = "at.hannibal2.skyhanni.config.ConfigGuiForgeInterop",
-    version = "0.23.Beta.20",
+    version = "0.23.Beta.23",
 )
 class SkyHanniMod {
 
@@ -474,7 +474,7 @@ class SkyHanniMod {
         loadModule(SackAPI)
         loadModule(BingoAPI)
         loadModule(FishingAPI)
-        loadModule(FishingDetection)
+        loadModule(IsFishingDetection)
         loadModule(LorenzUtils)
         loadModule(NEUItems)
 
@@ -560,6 +560,7 @@ class SkyHanniMod {
         loadModule(HighlightJerries())
         loadModule(TheGreatSpook())
         loadModule(GriffinBurrowHelper)
+        loadModule(AllBurrowsList)
         loadModule(GriffinBurrowParticleFinder())
         loadModule(BurrowWarpHelper())
         loadModule(CollectionTracker())
@@ -573,8 +574,8 @@ class SkyHanniMod {
         loadModule(LesserOrbHider())
         loadModule(FishingHookDisplay())
         loadModule(CrimsonIsleReputationHelper(this))
+        loadModule(SkyblockGuideHighlightFeature)
         loadModule(SharkFishCounter())
-        loadModule(SkyBlockLevelGuideHelper())
         loadModule(PowerStoneGuideFeatures())
         loadModule(OdgerWaypoint())
         loadModule(TiaRelayHelper())
@@ -659,7 +660,6 @@ class SkyHanniMod {
         loadModule(GetFromSacksTabComplete)
         loadModule(SlayerProfitTracker)
         loadModule(FishingProfitTracker)
-        loadModule(FishingTrackerCategoryManager)
         loadModule(SeaCreatureTracker)
         loadModule(SlayerItemsOnGround())
         loadModule(RestorePieceOfWizardPortalLore())
@@ -758,7 +758,7 @@ class SkyHanniMod {
         loadModule(FixGhostEntities)
         loadModule(CopyNearbyParticlesCommand)
         loadModule(ButtonOnPause())
-        loadModule(PacketTest())
+        loadModule(PacketTest)
         loadModule(TestBingo)
         loadModule(TestCopyRngMeterValues)
         loadModule(TestCopyBestiaryValues)
