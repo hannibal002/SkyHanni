@@ -38,7 +38,6 @@ class BazaarDataHolder {
                 item.npcPrice?.let { list[neuItemId] = it }
                 item.motesPrice?.let { motesPrice[neuItemId] = it }
             }
-
             RiftAPI.motesPrice = motesPrice
         } catch (e: Throwable) {
             ErrorManager.logErrorWithData(
