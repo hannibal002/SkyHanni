@@ -12,7 +12,6 @@ import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraft.client.Minecraft
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
-import kotlin.math.floor
 
 class MaxPurseItems {
 
@@ -23,25 +22,28 @@ class MaxPurseItems {
     )
     private val createOrderPattern by RepoPattern.pattern("inventory.maxpurse.createorder", "§aCreate Buy Order")
     private val createInstantPattern by RepoPattern.pattern("inventory.maxpurse.createinstant", "§aBuy Instantly")
-    private var buyOrderPrice = -1f
-    private var instantBuyPrice = -1f
+    private var buyOrderPrice: Double? = null
+    private var instantBuyPrice: Double? = null
+    private val config get() = SkyHanniMod.feature.inventory
 
     private fun getPrices() {
         for (item in Minecraft.getMinecraft().thePlayer.openContainer.inventory) {
-            createOrderPattern.matchMatcher(item?.displayName ?: continue) {
+            val name = item?.displayName ?: continue
+            createOrderPattern.matchMatcher(name) {
                 for (info in item.getLore()) {
                     orderPattern.matchMatcher(info) {
-                        buyOrderPrice = group("coins").replace(",", "").toFloat()
+                        // +0.1 because I expect people to use the gold nugget option
+                        buyOrderPrice = group("coins").replace(",", "").toDouble() + 0.1
                         // If we get to this point, we have the instant price because instant is earlier in the list of items
                         // So we can return
                         return
                     }
                 }
             }
-            createInstantPattern.matchMatcher(item.displayName ?: continue) {
+            createInstantPattern.matchMatcher(name) {
                 for (info in item.getLore()) {
                     instantPattern.matchMatcher(info) {
-                        instantBuyPrice = group("coins").replace(",", "").toFloat()
+                        instantBuyPrice = group("coins").replace(",", "").toDouble()
                     }
                 }
             }
@@ -54,31 +56,34 @@ class MaxPurseItems {
         if (!BazaarApi.inBazaarInventory) return
         // I would use BazaarAPI for price info, but as soon as NEU's data goes out of date, it will be wrong
         if (BazaarApi.currentlyOpenedProduct == null) {
-            buyOrderPrice = -1f
-            instantBuyPrice = -1f
+            buyOrderPrice = null
+            instantBuyPrice = null
             return
         }
-        if (buyOrderPrice == -1f && instantBuyPrice == -1f) {
+        if (buyOrderPrice == null && instantBuyPrice == null) {
             getPrices()
         }
 
         val currentPurse = PurseAPI.getPurse()
+        val buyOrders = buyOrderPrice?.let {
+            (currentPurse / it).toInt()
+        } ?: 0
+        val buyInstant = instantBuyPrice?.let {
+            (currentPurse / it).toInt()
+        } ?: 0
 
-        var buyOrders = floor(currentPurse / buyOrderPrice).toInt()
-        if (buyOrders < 0) buyOrders = 0
-
-        var buyInstant = floor(currentPurse / instantBuyPrice).toInt()
-        if (buyInstant < 0) buyInstant = 0
-
-        SkyHanniMod.feature.inventory.purseItemsPos.renderStrings(
+        config.purseItemsPos.renderStrings(
             listOf(
-                "Buy order: ${buyOrders.addSeparators()}",
-                "Buy instantly: ${buyInstant.addSeparators()}"
+                "§dYou can buy order ${buyOrders.addSeparators()}x of this item with your purse (at top order +0.1)",
+                "§dYou can instantly buy ${buyInstant.addSeparators()}x of this item with your purse"
             ), posLabel = "Max Items With Purse"
         )
+        println(buyOrderPrice)
+        println(currentPurse)
+        println(buyOrders)
     }
 
     fun isEnabled(): Boolean {
-        return LorenzUtils.inSkyBlock && SkyHanniMod.feature.inventory.maxPurseItems
+        return LorenzUtils.inSkyBlock && config.maxPurseItems
     }
 }
