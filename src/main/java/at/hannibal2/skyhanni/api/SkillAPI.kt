@@ -42,23 +42,23 @@ import kotlin.time.Duration.Companion.seconds
 object SkillAPI {
     private val patternGroup = RepoPattern.group("api.skills.skilldisplay")
     private val skillPercentPattern by patternGroup.pattern(
-        "skillpaternpercent",
+        "skill.percent",
         "\\+(?<gained>[\\d.,]+) (?<skillName>.+) \\((?<progress>[\\d.]+)%\\)"
     )
     private val skillPattern by patternGroup.pattern(
-        "skillpattern",
+        "skill",
         "\\+(?<gained>[\\d.,]+) (?<skillName>\\w+) \\((?<current>[\\d.,]+)/(?<needed>[\\d.,]+)\\)"
     )
     private val skillMultiplierPattern by patternGroup.pattern(
-        "skillpatternmultiplier",
+        "skill.multiplier",
         "\\+(?<gained>[\\d.,]+) (?<skillName>.+) \\((?<current>[\\d.,]+)/(?<needed>[\\d,.]+[kmb])\\)"
     )
     private val skillTabPattern by patternGroup.pattern(
-        "skilltabpattern",
+        "skill.tab",
         "^§e§lSkills: §r§a(?<type>\\w+) (?<level>\\d+): §r§3(?<progress>.+)%\$"
     )
     private val maxSkillTabPattern by patternGroup.pattern(
-        "maxskilltabpattern",
+        "skill.tab.max",
         "^§e§lSkills: §r§a(?<type>\\w+) (?<level>\\d+): §r§c§lMAX\$"
     )
 
