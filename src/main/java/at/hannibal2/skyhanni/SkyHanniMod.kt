@@ -112,6 +112,7 @@ import at.hannibal2.skyhanni.features.dungeon.DungeonTeammateOutlines
 import at.hannibal2.skyhanni.features.dungeon.HighlightDungeonDeathmite
 import at.hannibal2.skyhanni.features.dungeon.TerracottaPhase
 import at.hannibal2.skyhanni.features.event.UniqueGiftingOpportunitiesFeatures
+import at.hannibal2.skyhanni.features.event.diana.AllBurrowsList
 import at.hannibal2.skyhanni.features.event.diana.BurrowWarpHelper
 import at.hannibal2.skyhanni.features.event.diana.DianaProfitTracker
 import at.hannibal2.skyhanni.features.event.diana.GriffinBurrowHelper
@@ -558,6 +559,7 @@ class SkyHanniMod {
         loadModule(HighlightJerries())
         loadModule(TheGreatSpook())
         loadModule(GriffinBurrowHelper)
+        loadModule(AllBurrowsList)
         loadModule(GriffinBurrowParticleFinder())
         loadModule(BurrowWarpHelper())
         loadModule(CollectionTracker())
