@@ -59,6 +59,9 @@
     + Makes normal clicks to shift clicks in Brewing Stand inventory.
 + Low Quiver Notification. - CarsCupcake
     + This will notify you via title if your quiver is low on arrows according to chat message.
++ Added not fully completed tasks in Way to gain SkyBlock XP menus. - Thunderblade73
+    + Works in the subcategories.
+    + It does not work with infinite tasks.
 
 #### Item Features
 
@@ -79,6 +82,13 @@
     + Calculate how many crops need to be farmed between different crop milestones.
 + Added /shcalccroptime. - CalMWolfs
     + Calculate how long you need to farm crops between different crop milestones.
+
+#### Diana Features
+
++ Saving every Diana Burrow Location and option to render them. - hannibal2
+    + Saves the burrow locations you find into a list in the local config file. (default enabled, option to opt out)
+    + Option to render all saved locations in the world. (default disabled)
+    + Commands to save the full list to the clipboard, and load a list from the clipboard (to share between users)
 
 #### Misc Features
 
@@ -169,6 +179,10 @@
 
 + Changed the Griffin Burrow Guess text to a centered title instead of an odd line that goes down. - hannibal2
 + Removed unnecessary error messages in Diana Burrow detection. - hannibal2
++ Fixed and improved the Inquisitor Waypoint Share feature. - hannibal2
+    + Now it correctly hides burrow waypoints when the "focus" mode is enabled.
+    + Shows a pink line to the shared location.
+    + Support for the nearest warp feature.
 
 #### Chat Changes
 
@@ -332,6 +346,8 @@
 #### Command Fixes
 
 + Fixed /gfs not working. - Thunderblade73
++ Fixed /sendcoords command not working. - CalMWolfs
++ Fixed open bazaar command sending color code as well. - Thunderblade73
 
 #### Misc Fixes
 
@@ -428,6 +444,8 @@
 + Deprecate LorenzUtils.sendCommandToServer. - hannibal2
 + Adds a chroma shader to be used on non-textured GUI elements. - VixidDev
 + Added /shdebug Garden Next Jacob Contest. - hannibal2
++ Make future NPC price fetch errors better debuggable. - CalMWolfs
++ Removed duplicate pet-level detection logic. - hannibal2
 
 ## Version 0.22
 
