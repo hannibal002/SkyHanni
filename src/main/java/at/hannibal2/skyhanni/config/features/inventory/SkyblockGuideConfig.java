@@ -8,6 +8,20 @@ import io.github.moulberry.moulconfig.annotations.ConfigOption;
 public class SkyblockGuideConfig {
 
     @Expose
+    @ConfigOption(name = "Menu Highlight",
+        desc = "Highlights the toplevel of not completed task in the skyblock guide.")
+    @ConfigEditorBoolean
+    @FeatureToggle
+    public boolean menuGuide = true;
+
+    @Expose
+    @ConfigOption(name = "Collection Highlight",
+        desc = "Highlights missing collections.")
+    @ConfigEditorBoolean
+    @FeatureToggle
+    public boolean collectionGuide = true;
+
+    @Expose
     @ConfigOption(name = "Abiphone Highlight",
         desc = "Highlights missing abiphone contacts.")
     @ConfigEditorBoolean

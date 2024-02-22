@@ -127,6 +127,10 @@ class SkyblockGuideHighlightFeature private constructor(
         private val taskOnlyCompleteOncePattern =
             group.pattern("$keyPrefixCondition.once", "§7§eThis task can only be completed once!")
         private val xPattern = group.pattern("$keyPrefixCondition.x", "§c ?✖.*")
+        private val totalProgressPattern =
+            group.pattern("$keyPrefixCondition.total", "§7Total Progress: §3\\d{1,2}(?:\\.\\d)?%")
+        private val categoryProgressPattern =
+            group.pattern("$keyPrefixCondition.category", "§7Progress to Complete Category: §6\\d{1,2}(?:\\.\\d)?%")
 
         private val openWikiOnClick: (GuiContainerEvent.SlotClickEvent) -> Unit = { event ->
             val internalName = event.item?.getInternalName()
@@ -172,12 +176,6 @@ class SkyblockGuideHighlightFeature private constructor(
             )
             SkyblockGuideHighlightFeature(
                 { skyblockGuideConfig.oneTimeCompletion },
-                "kuudra",
-                "Slaying ➜ Defeat Kuudra",
-                taskOnlyCompleteOncePattern
-            )
-            SkyblockGuideHighlightFeature(
-                { skyblockGuideConfig.oneTimeCompletion },
                 "belt",
                 "Miscellaneous ➜ The Dojo",
                 taskOnlyCompleteOncePattern
@@ -190,8 +188,8 @@ class SkyblockGuideHighlightFeature private constructor(
             )
             SkyblockGuideHighlightFeature(
                 { skyblockGuideConfig.oneTimeCompletion },
-                "dragon",
-                "Slaying ➜ Slay Dragons",
+                "slaying",
+                "Slaying ➜ .*",
                 taskOnlyCompleteOncePattern
             )
             SkyblockGuideHighlightFeature(
@@ -199,21 +197,18 @@ class SkyblockGuideHighlightFeature private constructor(
             )
             SkyblockGuideHighlightFeature(
                 { skyblockGuideConfig.oneTimeCompletion },
-                "mining.rock",
+                "pet.rock",
                 "Mining ➜ Rock Milestones",
                 taskOnlyCompleteOncePattern
             )
             SkyblockGuideHighlightFeature(
                 { skyblockGuideConfig.oneTimeCompletion },
-                "fishing.dolphin",
+                "pet.dolphin",
                 "Fishing ➜ Dolphin Milestones",
                 taskOnlyCompleteOncePattern
             )
             SkyblockGuideHighlightFeature({ skyblockGuideConfig.essenceGuide }, "essence", "Essence Shop ➜.*", xPattern)
             SkyblockGuideHighlightFeature({ skyblockGuideConfig.minionGuide }, "minion", "Crafted Minions", xPattern)
-            SkyblockGuideHighlightFeature(
-                { skyblockGuideConfig.oneTimeCompletion }, "slayer.defeat", "Slaying ➜ Defeat Slayers", xPattern
-            )
             SkyblockGuideHighlightFeature(
                 { skyblockGuideConfig.storyGuide }, "harp", "Miscellaneous ➜ Harp Songs", xPattern
             )
@@ -232,10 +227,19 @@ class SkyblockGuideHighlightFeature private constructor(
                 "§7§eThis task can only be completed once!|§7§7You have not unlocked the content"
             )
             SkyblockGuideHighlightFeature(
-                { skyblockGuideConfig.oneTimeCompletion },
-                "dungeon.layers",
-                "Dungeon ➜ Complete Dungeons",
-                xPattern
+                { skyblockGuideConfig.oneTimeCompletion }, "dungeon.layers", "Dungeon ➜ Complete Dungeons", xPattern
+            )
+            SkyblockGuideHighlightFeature(
+                { skyblockGuideConfig.menuGuide }, "tasks", "Tasks ➜ .*", totalProgressPattern
+            )
+            SkyblockGuideHighlightFeature(
+                { skyblockGuideConfig.menuGuide }, "tasks.skill", "Skill Related Tasks", categoryProgressPattern
+            )
+            SkyblockGuideHighlightFeature(
+                { skyblockGuideConfig.collectionGuide },
+                "collections",
+                "\\w+ Collections|Collections",
+                "§7Progress to .*|§7Find this item to add it to your|§7Kill this boss once to view collection|§7Collections Maxed Out: §e.*|§7Boss Collections Unlocked: §e.*"
             )
         }
     }
