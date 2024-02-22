@@ -64,6 +64,7 @@ import at.hannibal2.skyhanni.test.command.CopyNearbyParticlesCommand
 import at.hannibal2.skyhanni.test.command.CopyScoreboardCommand
 import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.test.command.TestChatCommand
+import at.hannibal2.skyhanni.test.command.TestNotificationCommand
 import at.hannibal2.skyhanni.utils.APIUtil
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils
@@ -421,6 +422,10 @@ object Commands {
             "readcropmilestonefromclipboard",
             "Read crop milestone from clipboard. This helps fixing wrong crop milestone data"
         ) { GardenCropMilestonesCommunityFix.readDataFromClipboard() }
+        registerCommand(
+            "shtestnotification",
+            "Tests if notifications work on your system"
+        ) { TestNotificationCommand.command() }
     }
 
     private fun internalCommands() {
