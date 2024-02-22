@@ -15,13 +15,22 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
 class MaxPurseItems {
 
-    private val orderPattern by RepoPattern.pattern("inventory.maxpurse.order", ".*§6(?<coins>[\\d.,]+) coins §7each.*")
+    private val orderPattern by RepoPattern.pattern(
+        "inventory.maxpurse.order",
+        ".*§6(?<coins>[\\d.,]+) coins §7each.*"
+    )
     private val instantPattern by RepoPattern.pattern(
         "inventory.maxpurse.instant",
         ".*Price per unit: §6(?<coins>[\\d.,]+) coins.*"
     )
-    private val createOrderPattern by RepoPattern.pattern("inventory.maxpurse.createorder", "§aCreate Buy Order")
-    private val createInstantPattern by RepoPattern.pattern("inventory.maxpurse.createinstant", "§aBuy Instantly")
+    private val createOrderPattern by RepoPattern.pattern(
+        "inventory.maxpurse.createorder",
+        "§aCreate Buy Order"
+    )
+    private val createInstantPattern by RepoPattern.pattern(
+        "inventory.maxpurse.createinstant",
+        "§aBuy Instantly"
+    )
     private var buyOrderPrice: Double? = null
     private var instantBuyPrice: Double? = null
     private val config get() = SkyHanniMod.feature.inventory
@@ -78,9 +87,6 @@ class MaxPurseItems {
                 "§dYou can instantly buy ${buyInstant.addSeparators()}x of this item with your purse"
             ), posLabel = "Max Items With Purse"
         )
-        println(buyOrderPrice)
-        println(currentPurse)
-        println(buyOrders)
     }
 
     fun isEnabled(): Boolean {
