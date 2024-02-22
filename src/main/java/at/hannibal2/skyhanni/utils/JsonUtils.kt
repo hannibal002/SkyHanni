@@ -37,3 +37,27 @@ fun JsonObject.getStringOrValue(key: String, alternative: String): String {
         alternative
     }
 }
+
+fun JsonObject.getStringOrNull(key: String): String? {
+    return if (has(key)) {
+        try {
+            get(key).asString
+        } catch (_: Exception) {
+            null
+        }
+    } else {
+        null
+    }
+}
+
+fun JsonObject.getDoubleOrNull(key: String): Double? {
+    return if (has(key)) {
+        try {
+            get(key).asDouble
+        } catch (_: Exception) {
+            null
+        }
+    } else {
+        null
+    }
+}
