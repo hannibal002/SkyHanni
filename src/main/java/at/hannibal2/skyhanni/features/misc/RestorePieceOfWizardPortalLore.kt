@@ -16,7 +16,10 @@ class RestorePieceOfWizardPortalLore {
 
     private val item by lazy { "WIZARD_PORTAL_MEMENTO".asInternalName() }
 
-    private val earnedPattern by RepoPattern.pattern("misc.restore.wizard.portal.earned", "§7Earned by:.*")
+    private val earnedPattern by RepoPattern.pattern(
+        "misc.restore.wizard.portal.earned",
+        "§7Earned by:.*"
+    )
 
     @SubscribeEvent
     fun onTooltip(event: LorenzToolTipEvent) {

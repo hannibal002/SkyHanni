@@ -33,12 +33,13 @@ object GetFromSackAPI {
     val commands = arrayOf("gfs", "getfromsacks")
     val commandsWithSlash = commands.map { "/$it" }
 
-    private val fromSacksChatPattern by RepoPattern.pattern(
-        "gfs.chat.from",
+    private val patternGroup = RepoPattern.group("gfs.chat")
+    private val fromSacksChatPattern by patternGroup.pattern(
+        "from",
         "§aMoved §r§e(?<amount>\\d+) (?<item>.+)§r§a from your Sacks to your inventory."
     )
-    private val missingChatPattern by RepoPattern.pattern(
-        "gfs.chat.missing",
+    private val missingChatPattern by patternGroup.pattern(
+        "missing",
         "§cYou have no (?<item>.+) in your Sacks!"
     )
 
