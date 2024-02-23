@@ -31,6 +31,9 @@ class ChatFilter {
 
         // mystery dust
         "§b✦ §r§7You earned §r§b\\d+ §r§7Mystery Dust!".toPattern(),
+
+        // pet consumables
+        "§b✦ §r§7You earned §r§a\\d+ §r§7Pet Consumables?!".toPattern(),
     )
 
     private val lobbyMessages = listOf(
