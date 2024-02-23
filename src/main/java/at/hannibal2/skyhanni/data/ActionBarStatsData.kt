@@ -1,7 +1,7 @@
 package at.hannibal2.skyhanni.data
 
-import at.hannibal2.skyhanni.events.ActionBarValueUpdate
-import at.hannibal2.skyhanni.events.LorenzActionBarEvent
+import at.hannibal2.skyhanni.events.ActionBarUpdateEvent
+import at.hannibal2.skyhanni.events.ActionBarValueUpdateEvent
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
@@ -44,15 +44,15 @@ enum class ActionBarStatsData(@Language("RegExp") rawPattern: String) {
         }
 
         @SubscribeEvent
-        fun onActionBar(event: LorenzActionBarEvent) {
+        fun onActionBarUpdate(event: ActionBarUpdateEvent) {
             if (!LorenzUtils.inSkyBlock) return
 
             entries.mapNotNull { data ->
-                data.pattern.matchMatcher(event.message) {
+                data.pattern.matchMatcher(event.actionBar) {
                     val newValue = group(1)
                     if (data.value != newValue) {
                         data.value = newValue
-                        ActionBarValueUpdate(data)
+                        ActionBarValueUpdateEvent(data)
                     } else null
                 }
             }.forEach { it.postAndCatch() }

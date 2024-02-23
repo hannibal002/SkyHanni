@@ -396,9 +396,9 @@ class FarmingWeightDisplay {
             if (diff == 0) return
 
             if (diff > 0) {
-                showLbChange("§cdropped ${StringUtils.optionalPlural(diff, "place", "places")}", oldPosition)
+                showLbChange("§cdropped ${StringUtils.pluralize(diff, "place", withNumber = true)}", oldPosition)
             } else {
-                showLbChange("§arisen ${StringUtils.optionalPlural(-diff, "place", "places")}", oldPosition)
+                showLbChange("§arisen ${StringUtils.pluralize(-diff, "place", withNumber = true)}", oldPosition)
             }
         }
 

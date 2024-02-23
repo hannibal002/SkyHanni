@@ -77,7 +77,7 @@ format like "- #821" to illustrate the dependency.
 - Do not use `e.printStackTrace()`, use `CopyErrorCommand.logError(e, "explanation for users")` instead.
 - Do not use `MinecraftForge.EVENT_BUS.post(event)`, use `event.postAndCatch()` instead.
 - Do not use `toRegex()` or `toPattern()`, use `RepoPattern` instead.
-    - See [RepoPattern.kt](https://github.com/walkerselby/SkyHanni/blob/beta/src/main/java/at/hannibal2/skyhanni/utils/repopatterns/RepoPattern.kt)
+    - See [RepoPattern.kt](https://github.com/hannibal002/SkyHanni/blob/beta/src/main/java/at/hannibal2/skyhanni/utils/repopatterns/RepoPattern.kt)
 for more information and usages.
     - The pattern variables are named in the scheme `variableNamePattern`
 - Please use Regex instead of String comparison when it is likely Hypixel will change the message in the future.

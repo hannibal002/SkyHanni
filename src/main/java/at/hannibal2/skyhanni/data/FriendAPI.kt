@@ -10,19 +10,37 @@ import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.StringUtils.cleanPlayerName
 import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
+import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraft.util.ChatStyle
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import java.util.UUID
 
 object FriendAPI {
-
-    // TODO USE SH-REPO
-    private val removedFriendPattern =
-        ".*\n§r§eYou removed §r(?<name>.*)§e from your friends list!§r§9§m\n.*".toPattern()
-    private val addedFriendPattern = "§aYou are now friends with (?<name>.*)".toPattern()
-    private val noBestFriendPattern = ".*\n§r(?<name>.*)§e is no longer a best friend!§r§9§m\n.*".toPattern()
-    private val bestFriendPattern = ".*\n(?<name>.*)§a is now a best friend!§r§9§m\n.*".toPattern()
-    private val readFriendListPattern = "/viewprofile (?<uuid>.*)".toPattern()
+    private val patternGroup = RepoPattern.group("data.friends")
+    private val removedFriendPattern by patternGroup.pattern(
+        "remove",
+        ".*\n§r§eYou removed §r(?<name>.*)§e from your friends list!§r§9§m\n.*"
+    )
+    private val addedFriendPattern by patternGroup.pattern(
+        "add",
+        "§aYou are now friends with (?<name>.*)"
+    )
+    private val noBestFriendPattern by patternGroup.pattern(
+        "removebest",
+        ".*\n§r(?<name>.*)§e is no longer a best friend!§r§9§m\n.*"
+    )
+    private val bestFriendPattern by patternGroup.pattern(
+        "addbest",
+        ".*\n(?<name>.*)§a is now a best friend!§r§9§m\n.*"
+    )
+    private val rawNamePattern by patternGroup.pattern(
+        "rawname",
+        "\\n§eClick to view §.(?<name>.*)§e's profile"
+    )
+    private val readFriendListPattern by patternGroup.pattern(
+        "readfriends",
+        "/viewprofile (?<uuid>.*)"
+    )
 
     private val tempFriends = mutableListOf<Friend>()
 
@@ -130,7 +148,6 @@ object FriendAPI {
     private fun readName(chatStyle: ChatStyle): String? {
         for (component in chatStyle.chatHoverEvent.value.siblings) {
             val rawName = component.unformattedText
-            val rawNamePattern = "\\n§eClick to view §.(?<name>.*)§e's profile".toPattern()
             rawNamePattern.matchMatcher(rawName) {
                 return group("name")
             }
