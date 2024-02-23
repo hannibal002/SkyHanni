@@ -14,6 +14,7 @@ import at.hannibal2.skyhanni.features.chat.Translator
 import at.hannibal2.skyhanni.features.combat.endernodetracker.EnderNodeTracker
 import at.hannibal2.skyhanni.features.combat.ghostcounter.GhostUtil
 import at.hannibal2.skyhanni.features.commands.PartyCommands
+import at.hannibal2.skyhanni.features.event.diana.AllBurrowsList
 import at.hannibal2.skyhanni.features.event.diana.BurrowWarpHelper
 import at.hannibal2.skyhanni.features.event.diana.DianaProfitTracker
 import at.hannibal2.skyhanni.features.event.diana.GriffinBurrowHelper
@@ -426,6 +427,14 @@ object Commands {
             "shcopymayordata",
             "Copies the mayor data to the clipboard"
         ) { CopyMayorData.command(it) }
+        registerCommand(
+            "shcopyfoundburrowlocations",
+            "Copy all ever found burrow locations to clipboard"
+        ) { AllBurrowsList.copyToClipboard() }
+        registerCommand(
+            "shaddfoundburrowlocationsfromclipboard",
+            "Add all ever found burrow locations from clipboard"
+        ) { AllBurrowsList.addFromClipboard() }
     }
 
     private fun internalCommands() {

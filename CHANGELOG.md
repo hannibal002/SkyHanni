@@ -59,6 +59,9 @@
     + Makes normal clicks to shift clicks in Brewing Stand inventory.
 + Low Quiver Notification. - CarsCupcake
     + This will notify you via title if your quiver is low on arrows according to chat message.
++ Added not fully completed tasks in Way to gain SkyBlock XP menus. - Thunderblade73
+    + Works in the subcategories.
+    + It does not work with infinite tasks.
 
 #### Item Features
 
@@ -79,6 +82,13 @@
     + Calculate how many crops need to be farmed between different crop milestones.
 + Added /shcalccroptime. - CalMWolfs
     + Calculate how long you need to farm crops between different crop milestones.
+
+#### Diana Features
+
++ Saving every Diana Burrow Location and option to render them. - hannibal2
+    + Saves the burrow locations you find into a list in the local config file. (default enabled, option to opt out)
+    + Option to render all saved locations in the world. (default disabled)
+    + Commands to save the full list to the clipboard, and load a list from the clipboard (to share between users)
 
 #### Misc Features
 
@@ -132,6 +142,7 @@
 + Hide Sea Creature Tracker when wearing full Trophy Hunter armor. - martimavocado
 + Disabled Fishing Profit/SC Tracker in Kuudra. - CalMWolfs
 + Moved Sulphur Skitter Box from Crimson Isle to Fishing -> Trophy Fishing. - hannibal2
++ Fishing Profit Tracker now has better categories. - hannibal2 & Empa
 
 #### Mining Changes
 
@@ -168,6 +179,10 @@
 
 + Changed the Griffin Burrow Guess text to a centered title instead of an odd line that goes down. - hannibal2
 + Removed unnecessary error messages in Diana Burrow detection. - hannibal2
++ Fixed and improved the Inquisitor Waypoint Share feature. - hannibal2
+    + Now it correctly hides burrow waypoints when the "focus" mode is enabled.
+    + Shows a pink line to the shared location.
+    + Support for the nearest warp feature.
 
 #### Chat Changes
 
@@ -201,6 +216,8 @@
 + Added option to hide the already existing F3 SkyBlock Area Debug Feature. - Obsidian
     + This feature shows the current area in SkyBlock while f3 is open.
 + Hovering on cheap items in an Item Tracker now shows the hidden items. - Mikecraft1224
++ Added shader reload capabilities for chroma resource packs. - nea
++ Added option to only show Ender Node tracker while holding a pickaxe. - Thunderblade73
 
 ### Fixes
 
@@ -265,6 +282,7 @@
 + Fixed names for the Crystal Hollows Mining Areas feature. - alexia
 + Fixed detection of gold and diamond essence gain chat message when powder mining. - CalMWolfs
 + Fixed powder mining start/end detection in Powder Tracker. - CalMWolfs
++ Fixed Ruby Gemstone detection in powder chest reward. - J10a1n15
 
 #### Rift Fixes
 
@@ -275,8 +293,12 @@
 + Fixed Reindrake mob, Frosty NPC and frosty the snow blaster shop counting as sea creatures in the barn fishing
   timer. - hannibal2
 + Fixed trophy fish chat message detection. - Empa
-+ Fixed Sheep pet triggering Geyser Box and fixed particles being permanently hidden after throwing bobber at it once. - Empa
++ Fixed Sheep pet triggering Geyser Box and fixed particles being permanently hidden after throwing bobber at it once. -
+  Empa
 + Fixed fishing profit tracker stops working when trophy fishing for 10 minutes. - hannibal2
++ Fixed adding drops to Fishing Profit Tracker while not actually fishing. - hannibal2
+    + This fixes red mushroom picking up with Mooshroom Cow pet while farming.
+    + This does not fix wrongfully adding drops while moving items in inventory.
 
 #### Invenory Fixes
 
@@ -321,6 +343,12 @@
 + Fixed Unique Gifting Opportunities working with Golden Gift. - CalMWolfs
 + Fixed Frozen Treasure Tracker showing wrong Compact Procs number. - CalMWolfs
 
+#### Command Fixes
+
++ Fixed /gfs not working. - Thunderblade73
++ Fixed /sendcoords command not working. - CalMWolfs
++ Fixed open bazaar command sending color code as well. - Thunderblade73
+
 #### Misc Fixes
 
 + Maybe fixed Tia Relay Helper. - Thunderblade73
@@ -334,6 +362,7 @@
 + Fixed Minion XP calculation not working when having different mouse settings. - Thunderblade73
 + Fixed /gfs tab complete. - martimavocado
 + Fixed /warp is command replace. - hannibal2
++ Fixed Queued Gfs description. - Thunderblade73
 
 ### Technical Changes
 
@@ -391,7 +420,8 @@
 + Added outgoing chat log to /shchathistory. - nea
 + Added sending mining events to Soopy's API to test for new Mining Event feature. - CalMWolfs
 + Added /shcopybossbar to copy bossbar - Erymanthus
-+ Splitting many utils functions from LorenzUtils up into other classes: ChatUtils, CollectionUtils, ConditionalUtils. - Thunderblade73
++ Splitting many utils functions from LorenzUtils up into other classes: ChatUtils, CollectionUtils, ConditionalUtils. -
+  Thunderblade73
 + A ton of code cleanup, mainly on imports. - Thunderblade73 & hannibal2
 + Added mod identification for outgoing mod calls and show this data in /shchathistory. - nea
 + Sensitivity Reducer changes: clearer error message, using ChatUtils and wrong values in debug data. - martimavocado
@@ -410,6 +440,12 @@
 + Added GetFromSackAPI. - Thunderblade73
 + Improved Packet Test. - Thunderblade73
 + Increases the feature set of the packet test and improves usability.
++ Fishing Tracker using SH Repo over NEU recipes. - hannibal2 & Empa
++ Deprecate LorenzUtils.sendCommandToServer. - hannibal2
++ Adds a chroma shader to be used on non-textured GUI elements. - VixidDev
++ Added /shdebug Garden Next Jacob Contest. - hannibal2
++ Make future NPC price fetch errors better debuggable. - CalMWolfs
++ Removed duplicate pet-level detection logic. - hannibal2
 
 ## Version 0.22
 

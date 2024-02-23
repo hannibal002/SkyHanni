@@ -67,6 +67,9 @@ public class Storage {
     public Map<String, SkyHanniTracker.DisplayMode> trackerDisplayModes = new HashMap<>();
 
     @Expose
+    public List<LorenzVec> foundDianaBurrowLocations = new ArrayList<>();
+
+    @Expose
     public Map<UUID, PlayerSpecific> players = new HashMap<>();
 
     @Expose
@@ -504,7 +507,6 @@ public class Storage {
             @Expose
             // TODO renmae
             public MythologicalCreatureTracker.Data mythologicalMobTracker = new MythologicalCreatureTracker.Data();
-
         }
     }
 }
