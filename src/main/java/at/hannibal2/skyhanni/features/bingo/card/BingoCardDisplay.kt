@@ -91,7 +91,7 @@ class BingoCardDisplay {
             newList.add(Renderable.clickAndHover("§cOpen the §e/bingo §ccard.",
                 listOf("Click to run §e/bingo"),
                 onClick = {
-                    LorenzUtils.sendCommandToServer("bingo")
+                    ChatUtils.sendCommandToServer("bingo")
                 }
             ))
         } else {

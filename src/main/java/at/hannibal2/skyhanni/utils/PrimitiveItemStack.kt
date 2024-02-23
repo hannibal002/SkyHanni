@@ -1,10 +1,13 @@
 package at.hannibal2.skyhanni.utils
 
+import at.hannibal2.skyhanni.utils.ItemUtils.itemName
 import at.hannibal2.skyhanni.utils.NEUItems.getItemStack
 
-data class PrimitiveItemStack(val name: NEUInternalName, val amount: Int) {
+data class PrimitiveItemStack(val internalName: NEUInternalName, val amount: Int) {
 
-    fun createItem() = name.getItemStack().apply { stackSize = amount }
+    fun createItem() = internalName.getItemStack().apply { stackSize = amount }
+
+    val itemName by lazy { internalName.itemName }
 
     companion object {
 
