@@ -44,7 +44,10 @@ public class Storage {
     public boolean hasPlayedBefore = false;
 
     @Expose
-    public Float savedMouseSensitivity = .5f;
+    public Float savedMouselockedSensitivity = .5f;
+
+    @Expose
+    public Float savedMouseloweredSensitivity = .5f;
 
     @Deprecated
     @Expose
@@ -61,6 +64,9 @@ public class Storage {
 
     @Expose
     public Map<String, SkyHanniTracker.DisplayMode> trackerDisplayModes = new HashMap<>();
+
+    @Expose
+    public List<LorenzVec> foundDianaBurrowLocations = new ArrayList<>();
 
     @Expose
     public Map<UUID, PlayerSpecific> players = new HashMap<>();
@@ -132,9 +138,9 @@ public class Storage {
             @Override
             public String toString() {
                 return "MinionConfig{" +
-                        "displayName='" + displayName + '\'' +
-                        ", lastClicked=" + lastClicked +
-                        '}';
+                    "displayName='" + displayName + '\'' +
+                    ", lastClicked=" + lastClicked +
+                    '}';
             }
         }
 
@@ -392,11 +398,11 @@ public class Storage {
             @Override
             public String toString() {
                 return "SlayerRngMeterStorage{" +
-                        "currentMeter=" + currentMeter +
-                        ", gainPerBoss=" + gainPerBoss +
-                        ", goalNeeded=" + goalNeeded +
-                        ", itemGoal='" + itemGoal + '\'' +
-                        '}';
+                    "currentMeter=" + currentMeter +
+                    ", gainPerBoss=" + gainPerBoss +
+                    ", goalNeeded=" + goalNeeded +
+                    ", itemGoal='" + itemGoal + '\'' +
+                    '}';
             }
         }
 
@@ -464,7 +470,6 @@ public class Storage {
             @Expose
             // TODO renmae
             public MythologicalCreatureTracker.Data mythologicalMobTracker = new MythologicalCreatureTracker.Data();
-
         }
     }
 }

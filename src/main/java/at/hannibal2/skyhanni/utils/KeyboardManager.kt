@@ -13,6 +13,7 @@ import org.lwjgl.input.Keyboard
 import org.lwjgl.input.Mouse
 
 object KeyboardManager {
+
     private var lastClickedMouseButton = -1
 
     // A mac-only key, represents Windows key on windows (but different key code)

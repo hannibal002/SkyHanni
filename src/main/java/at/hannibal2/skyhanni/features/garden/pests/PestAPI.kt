@@ -5,6 +5,7 @@ import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.NEUInternalName.Companion.asInternalName
 
 object PestAPI {
+
     val config get() = GardenAPI.config.pests
 
     var scoreboardPests = 0

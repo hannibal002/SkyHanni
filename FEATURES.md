@@ -147,6 +147,11 @@ Use `/sh` or `/skyhanni` to open the SkyHanni config in game.
 + Show pet items XP Share and Tier Boost as small icons next to the pet in an inventory. - Thunderblade73
 + Shift Click Brewing. - Thunderblade73
     + Makes normal clicks to shift clicks in Brewing Stand inventory.
++ Low Quiver Notification. - CarsCupcake
+    + This will notify you via title if your quiver is low on arrows according to chat message.
++ Added not fully completed tasks in Way to gain SkyBlock XP menus. - Thunderblade73
+    + Works in the subcategories.
+    + It does not work with infinite tasks.
 
 </details>
 <details open><summary>
@@ -595,6 +600,12 @@ Use `/sh` or `/skyhanni` to open the SkyHanni config in game.
 + Atmospheric Filter Display. - Erymanthus
     + This display shows the currently active buff as a GUI element.
     + For an optimal experience, please have the Atmospheric Filter accessory active.
++ Sensitivity Reducer. - martimavocado
+    + Lowers mouse sensitivity while in the garden.
+    + Either when pressing a keybind or holding a farming tool in hand.
+    + Changes by how much the sensitivity is lowered by.
+    + Show a GUI element while the feature is enabled.
+    + Option to only allow this feature while on ground and/or on barn plot.
 
 </details>
 <details open><summary>
@@ -688,6 +699,8 @@ Use `/sh` or `/skyhanni` to open the SkyHanni config in game.
     + Fully customizable: change what items or stats to show.
     + Has support for the maxed Great Explorer perk.
     + Option to hide while not grinding powder.
++ Added Deep Caverns Parkour. - hannibal2
+    + Shows a parkour to the bottom of Deep Caverns and to Rhys.
 
 </details>
 <details open><summary>
@@ -950,6 +963,11 @@ Use `/sh` or `/skyhanni` to open the SkyHanni config in game.
     + Support for the Hypixel command /p kick /pk to add a reason. The reason will be sent in party chat before
       kicking the player.
 + Color the month names on the scoreboard. - J10a1n15
++ Blocks the mining ability when on a private island. - Thunderblade73
++ Crimson Isle Volcano Geyser features. - MrFast
+    + Stops the white geyser smoke particles from rendering if your bobber is near the geyser.
+    + Draws a box around the effective area of the geyser.
+    + Change the color of the box around the geyser.
 
 </details>
 <details open><summary>

@@ -35,6 +35,7 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import org.lwjgl.opengl.GL11
 
 object NEUItems {
+
     val manager: NEUManager get() = NotEnoughUpdates.INSTANCE.manager
     private val itemNameCache = mutableMapOf<String, NEUInternalName>() // item name -> internal name
     private val multiplierCache = mutableMapOf<NEUInternalName, Pair<NEUInternalName, Int>>()
@@ -157,7 +158,7 @@ object NEUItems {
     fun NEUInternalName.getNpcPrice() = getNpcPriceOrNull() ?: -1.0
 
     fun NEUInternalName.getNpcPriceOrNull(): Double? {
-        if (equals("WISP_POTION")) {
+        if (this == NEUInternalName.WISP_POTION) {
             return 20_000.0
         }
         return BazaarDataHolder.getNpcPrice(this)
@@ -167,7 +168,7 @@ object NEUItems {
         manager.auctionManager.transformHypixelBazaarToNEUItemId(hypixelId).asInternalName()
 
     fun NEUInternalName.getPriceOrNull(useSellingPrice: Boolean = false): Double? {
-        if (equals("WISP_POTION")) {
+        if (this == NEUInternalName.WISP_POTION) {
             return 20_000.0
         }
         val result = manager.auctionManager.getBazaarOrBin(asString(), useSellingPrice)
@@ -212,7 +213,6 @@ object NEUItems {
 
     fun isVanillaItem(item: ItemStack): Boolean =
         manager.auctionManager.isVanillaItem(item.getInternalName().asString())
-
 
     fun ItemStack.renderOnScreen(x: Float, y: Float, scaleMultiplier: Double = 1.0) {
         val item = checkBlinkItem()
@@ -327,7 +327,6 @@ object NEUItems {
         val result = Pair(internalName, 1)
         multiplierCache[internalName] = result
         return result
-
     }
 
     @Deprecated("Do not use strings as id", ReplaceWith("getMultiplier with NEUInternalName"))

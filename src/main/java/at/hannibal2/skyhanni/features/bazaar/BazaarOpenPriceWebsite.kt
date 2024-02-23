@@ -14,6 +14,7 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import kotlin.time.Duration.Companion.seconds
 
 class BazaarOpenPriceWebsite {
+
     private val config get() = SkyHanniMod.feature.bazaar
     private var lastClick = SimpleTimeMark.farPast()
 

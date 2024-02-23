@@ -24,6 +24,11 @@ public class MiningConfig {
     public KingTalismanConfig kingTalisman = new KingTalismanConfig();
 
     @Expose
+    @ConfigOption(name = "Deep Caverns Parkour", desc = "")
+    @Accordion
+    public DeepCavernsParkourConfig deepCavernsParkour = new DeepCavernsParkourConfig();
+
+    @Expose
     @ConfigOption(name = "Highlight Commission Mobs", desc = "Highlight Mobs that are part of active commissions.")
     @ConfigEditorBoolean
     @FeatureToggle
@@ -34,4 +39,10 @@ public class MiningConfig {
     @ConfigEditorBoolean
     @FeatureToggle
     public boolean crystalHollowsNamesInCore = false;
+
+    @Expose
+    @ConfigOption(name = "Private Island Ability Block", desc = "Blocks the mining ability when on private island.")
+    @ConfigEditorBoolean
+    @FeatureToggle
+    public boolean privateIslandNoPickaxeAbility = false;
 }

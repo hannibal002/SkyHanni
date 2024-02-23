@@ -29,6 +29,7 @@ import net.minecraft.util.AxisAlignedBB
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
 object DungeonLividFinder {
+
     private val config get() = SkyHanniMod.feature.dungeon.lividFinder
     private val blockLocation = LorenzVec(6, 109, 43)
 

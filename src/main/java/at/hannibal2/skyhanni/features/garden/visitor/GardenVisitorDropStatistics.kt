@@ -11,20 +11,22 @@ import at.hannibal2.skyhanni.events.PreProfileSwitchEvent
 import at.hannibal2.skyhanni.events.garden.visitor.VisitorAcceptEvent
 import at.hannibal2.skyhanni.features.garden.GardenAPI
 import at.hannibal2.skyhanni.test.command.ErrorManager
+import at.hannibal2.skyhanni.utils.CollectionUtils.addAsSingletonList
+import at.hannibal2.skyhanni.utils.CollectionUtils.addOrPut
+import at.hannibal2.skyhanni.utils.CollectionUtils.editCopy
 import at.hannibal2.skyhanni.utils.ConfigUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils
-import at.hannibal2.skyhanni.utils.LorenzUtils.addAsSingletonList
-import at.hannibal2.skyhanni.utils.LorenzUtils.addOrPut
-import at.hannibal2.skyhanni.utils.LorenzUtils.editCopy
 import at.hannibal2.skyhanni.utils.NumberUtil
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.NumberUtil.formatNumber
 import at.hannibal2.skyhanni.utils.RenderUtils.renderStringsAndItems
 import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
+import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
 object GardenVisitorDropStatistics {
+
     private val config get() = GardenAPI.config.visitors.dropsStatistics
     private var display = emptyList<List<Any>>()
 
@@ -35,13 +37,36 @@ object GardenVisitorDropStatistics {
 
     var lastAccept = 0L
 
-    private val acceptPattern = "OFFER ACCEPTED with (?<visitor>.*) [(](?<rarity>.*)[)]".toPattern()
-    private val copperPattern = "[+](?<amount>.*) Copper".toPattern()
-    private val gardenExpPattern = "[+](?<amount>.*) Garden Experience".toPattern()
-    private val farmingExpPattern = "[+](?<amount>.*) Farming XP".toPattern()
-    private val bitsPattern = "[+](?<amount>.*) Bits".toPattern()
-    private val mithrilPowderPattern = "[+](?<amount>.*) Mithril Powder".toPattern()
-    private val gemstonePowderPattern = "[+](?<amount>.*) Gemstone Powder".toPattern()
+    private val patternGroup = RepoPattern.group("garden.visitor.droptracker")
+    private val acceptPattern by patternGroup.pattern(
+        "accept",
+        "OFFER ACCEPTED with (?<visitor>.*) [(](?<rarity>.*)[)]"
+    )
+    private val copperPattern by patternGroup.pattern(
+        "copper",
+        "[+](?<amount>.*) Copper"
+    )
+    private val gardenExpPattern by patternGroup.pattern(
+        "gardenexp",
+        "[+](?<amount>.*) Garden Experience"
+    )
+    private val farmingExpPattern by patternGroup.pattern(
+        "farmingexp",
+        "[+](?<amount>.*) Farming XP"
+    )
+    private val bitsPattern by patternGroup.pattern(
+        "bits",
+        "[+](?<amount>.*) Bits"
+    )
+    private val mithrilPowderPattern by patternGroup.pattern(
+        "powder.mithril",
+        "[+](?<amount>.*) Mithril Powder"
+    )
+    private val gemstonePowderPattern by patternGroup.pattern(
+        "powder.gemstone",
+        "[+](?<amount>.*) Gemstone Powder"
+    )
+
     private var rewardsCount = mapOf<VisitorReward, Int>()
 
     private fun formatDisplay(map: List<List<Any>>): List<List<Any>> {

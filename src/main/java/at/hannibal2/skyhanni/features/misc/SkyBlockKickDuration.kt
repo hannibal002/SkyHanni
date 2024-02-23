@@ -14,6 +14,7 @@ import kotlin.time.Duration.Companion.minutes
 import kotlin.time.Duration.Companion.seconds
 
 class SkyBlockKickDuration {
+
     private val config get() = SkyHanniMod.feature.misc.kickDuration
 
     private var kickMessage = false
