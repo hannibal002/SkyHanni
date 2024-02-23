@@ -15,7 +15,7 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
 class MaxPurseItems {
 
-    private val patternGroup by RepoPattern.group("inventory.maxpurse")
+    private val patternGroup = RepoPattern.group("inventory.maxpurse")
     private val orderPattern by patternGroup.pattern(
         "order",
         ".*§6(?<coins>[\\d.,]+) coins §7each.*"
