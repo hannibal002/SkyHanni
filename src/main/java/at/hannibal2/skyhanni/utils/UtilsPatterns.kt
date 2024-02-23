@@ -77,13 +77,4 @@ object UtilsPatterns {
         "skyblocktime.season",
         "(?:Early |Late )?(?<season>Spring|Summer|Autumn|Winter)"
     )
-
-    val serverIdScoreboardPattern by patternGroup.pattern(
-        "skyblock.serverid.scoreboard",
-        "§7\\d+/\\d+/\\d+ §8(?<servertype>[mM])(?<serverid>\\S+)"
-    )
-    val serverIdTablistPattern by patternGroup.pattern(
-        "skyblock.serverid.tablist",
-        " Server: §r§8(?<serverid>\\S+)"
-    )
 }
