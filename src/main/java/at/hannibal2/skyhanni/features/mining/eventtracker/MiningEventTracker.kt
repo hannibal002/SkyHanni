@@ -18,6 +18,7 @@ import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.TabListData
 import at.hannibal2.skyhanni.utils.TimeUtils
+import at.hannibal2.skyhanni.utils.fromJson
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import kotlinx.coroutines.launch
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
@@ -150,7 +151,7 @@ class MiningEventTracker {
         val response = APIUtil.postJSON("https://api.soopy.dev/skyblock/chevents/set", json)
         if (!response.success) return
 
-        val formattedResponse = ConfigManager.gson.fromJson(response.data, MiningEventDataReceive::class.java)
+        val formattedResponse = ConfigManager.gson.fromJson<MiningEventDataReceive>(response.data)
         if (!formattedResponse.success) {
             if (!config.enabled) return
             ErrorManager.logErrorWithData(
