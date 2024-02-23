@@ -113,6 +113,7 @@ import at.hannibal2.skyhanni.features.dungeon.DungeonTeammateOutlines
 import at.hannibal2.skyhanni.features.dungeon.HighlightDungeonDeathmite
 import at.hannibal2.skyhanni.features.dungeon.TerracottaPhase
 import at.hannibal2.skyhanni.features.event.UniqueGiftingOpportunitiesFeatures
+import at.hannibal2.skyhanni.features.event.diana.AllBurrowsList
 import at.hannibal2.skyhanni.features.event.diana.BurrowWarpHelper
 import at.hannibal2.skyhanni.features.event.diana.DianaProfitTracker
 import at.hannibal2.skyhanni.features.event.diana.GriffinBurrowHelper
@@ -223,7 +224,7 @@ import at.hannibal2.skyhanni.features.inventory.SackDisplay
 import at.hannibal2.skyhanni.features.inventory.ShiftClickBrewing
 import at.hannibal2.skyhanni.features.inventory.ShiftClickEquipment
 import at.hannibal2.skyhanni.features.inventory.ShiftClickNPCSell
-import at.hannibal2.skyhanni.features.inventory.SkyBlockLevelGuideHelper
+import at.hannibal2.skyhanni.features.inventory.SkyblockGuideHighlightFeature
 import at.hannibal2.skyhanni.features.inventory.StatsTuning
 import at.hannibal2.skyhanni.features.inventory.tiarelay.TiaRelayHelper
 import at.hannibal2.skyhanni.features.inventory.tiarelay.TiaRelayWaypoints
@@ -391,7 +392,7 @@ import org.apache.logging.log4j.Logger
     clientSideOnly = true,
     useMetadata = true,
     guiFactory = "at.hannibal2.skyhanni.config.ConfigGuiForgeInterop",
-    version = "0.23.Beta.22",
+    version = "0.23.Beta.23",
 )
 class SkyHanniMod {
 
@@ -562,6 +563,7 @@ class SkyHanniMod {
         loadModule(HighlightJerries())
         loadModule(TheGreatSpook())
         loadModule(GriffinBurrowHelper)
+        loadModule(AllBurrowsList)
         loadModule(GriffinBurrowParticleFinder())
         loadModule(BurrowWarpHelper())
         loadModule(CollectionTracker())
@@ -575,8 +577,8 @@ class SkyHanniMod {
         loadModule(LesserOrbHider())
         loadModule(FishingHookDisplay())
         loadModule(CrimsonIsleReputationHelper(this))
+        loadModule(SkyblockGuideHighlightFeature)
         loadModule(SharkFishCounter())
-        loadModule(SkyBlockLevelGuideHelper())
         loadModule(PowerStoneGuideFeatures())
         loadModule(OdgerWaypoint())
         loadModule(TiaRelayHelper())

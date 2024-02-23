@@ -55,10 +55,6 @@ object ItemDisplayOverlayFeatures {
     private val config get() = SkyHanniMod.feature.inventory
 
     private val patternGroup = RepoPattern.group("inventory.item.overlay")
-    private val petLevelPattern by patternGroup.pattern(
-        "pet.level",
-        "\\[Lvl (?<level>\\d+)] .*"
-    )
     private val masterSkullPattern by patternGroup.pattern(
         "masterskull",
         "(.*)Master Skull - Tier ."
