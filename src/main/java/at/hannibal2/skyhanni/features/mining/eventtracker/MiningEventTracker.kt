@@ -178,8 +178,7 @@ class MiningEventTracker {
 
             canRequestAt = SimpleTimeMark.now() + miningEventData.data.updateIn.milliseconds
 
-            // todo format display once data is in api
-
+            MiningEventDisplay.updateData(miningEventData.data)
         }
     }
 

@@ -1,21 +1,17 @@
 package at.hannibal2.skyhanni.config.features.mining;
 
 import at.hannibal2.skyhanni.config.FeatureToggle;
-import at.hannibal2.skyhanni.features.mining.eventtracker.MiningEvent;
+import at.hannibal2.skyhanni.config.core.config.Position;
 import com.google.gson.annotations.Expose;
 import io.github.moulberry.moulconfig.annotations.ConfigEditorBoolean;
-import io.github.moulberry.moulconfig.annotations.ConfigEditorDraggableList;
 import io.github.moulberry.moulconfig.annotations.ConfigEditorDropdown;
 import io.github.moulberry.moulconfig.annotations.ConfigOption;
-
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
 
 public class MiningEventConfig {
 
     @Expose
-    @ConfigOption(name = "Enabled", desc = "Show information about upcoming Dwarven Mines and Crystal Hollows mining events, also enables you sending data.")
+    @ConfigOption(name = "Enabled", desc = "Show information about upcoming Dwarven Mines and Crystal Hollows mining events, " +
+        "also enables you sending data. §eTakes up to a minutes to sync new events.")
     @ConfigEditorBoolean
     @FeatureToggle
     public boolean enabled = true;
@@ -29,17 +25,6 @@ public class MiningEventConfig {
     @ConfigOption(name = "What to Show", desc = "Choose which island's events are shown in the gui.")
     @ConfigEditorDropdown
     public ShowType showType = ShowType.BOTH;
-
-    @Expose
-    @ConfigOption(name = "Show Warnings For Events", desc = "Shows the warnings when select mining events are about to start.")
-    @ConfigEditorBoolean
-    @FeatureToggle
-    public boolean showWarnings = false;
-
-    @Expose
-    @ConfigOption(name = "Events to Warn for", desc = "Choose which mining events you get warned about.")
-    @ConfigEditorDraggableList
-    public List<MiningEvent> eventsToWarn = new ArrayList<>(Collections.singletonList(MiningEvent.DOUBLE_POWDER));
 
     public enum ShowType {
         BOTH("Both Mining Islands"),
@@ -58,4 +43,7 @@ public class MiningEventConfig {
             return str;
         }
     }
+
+    @Expose
+    public Position position = new Position(15, 70, false, true);
 }
