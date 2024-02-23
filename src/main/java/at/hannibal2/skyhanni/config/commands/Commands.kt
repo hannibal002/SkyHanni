@@ -43,6 +43,7 @@ import at.hannibal2.skyhanni.features.mining.KingTalismanHelper
 import at.hannibal2.skyhanni.features.mining.powdertracker.PowderTracker
 import at.hannibal2.skyhanni.features.minion.MinionFeatures
 import at.hannibal2.skyhanni.features.misc.CollectionTracker
+import at.hannibal2.skyhanni.features.misc.IslandLeaveJoinMsgs
 import at.hannibal2.skyhanni.features.misc.LockMouseLook
 import at.hannibal2.skyhanni.features.misc.MarkedPlayerManager
 import at.hannibal2.skyhanni.features.misc.discordrpc.DiscordRPCManager
@@ -315,6 +316,11 @@ object Commands {
             "shkingfix",
             "Reseting the local King Talisman Helper offset."
         ) { KingTalismanHelper.kingFix() }
+        registerCommand(
+            "shclearstoredplayers",
+            "Clears the stored players on the island."
+        ) { IslandLeaveJoinMsgs.clearPlayers() }
+
     }
 
     private fun developersDebugFeatures() {
