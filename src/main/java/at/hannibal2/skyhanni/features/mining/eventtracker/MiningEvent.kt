@@ -1,21 +1,29 @@
 package at.hannibal2.skyhanni.features.mining.eventtracker
 
+import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.minutes
 import kotlin.time.Duration.Companion.seconds
 
-enum class MiningEvent(val eventName: String, val defaultLength: Duration, private val colourCode: Char) {
-    GONE_WITH_THE_WIND("GONE WITH THE WIND", 18.minutes, '9'),
-    DOUBLE_POWDER("2X POWDER", 15.minutes, 'b'),
-    GOBLIN_RAID("GOBLIN RAID", 5.minutes, 'c'),
-    BETTER_TOGETHER("BETTER TOGETHER", 18.minutes, 'd'),
-    RAFFLE("RAFFLE", 160.seconds, '6'),
-    MITHRIL_GOURMAND("MITHRIL GOURMAND", 10.minutes, 'b'),
+enum class MiningEvent(
+    val eventName: String,
+    private val shortName: String,
+    val defaultLength: Duration,
+    private val colourCode: Char
+) {
+    GONE_WITH_THE_WIND("GONE WITH THE WIND", "Wind", 18.minutes, '9'),
+    DOUBLE_POWDER("2X POWDER", "2x", 15.minutes, 'b'),
+    GOBLIN_RAID("GOBLIN RAID", "Raid", 5.minutes, 'c'),
+    BETTER_TOGETHER("BETTER TOGETHER", "Better", 18.minutes, 'd'),
+    RAFFLE("RAFFLE", "Raffle", 160.seconds, '6'),
+    MITHRIL_GOURMAND("MITHRIL GOURMAND", "Gourmand", 10.minutes, 'b'),
     ;
 
+    private val config get() = SkyHanniMod.feature.mining.miningEvent
+
     override fun toString(): String {
-        return "§$colourCode$eventName"
+        return if (config.compressedFormat) "§$colourCode$shortName" else "§$colourCode$eventName"
     }
 
     companion object {

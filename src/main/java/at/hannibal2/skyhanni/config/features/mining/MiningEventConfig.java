@@ -26,6 +26,11 @@ public class MiningEventConfig {
     @ConfigEditorDropdown
     public ShowType showType = ShowType.BOTH;
 
+    @Expose
+    @ConfigOption(name = "Compressed Format", desc = "Compresses the event names so that they are shorter.")
+    @ConfigEditorBoolean
+    public boolean compressedFormat = false;
+
     public enum ShowType {
         BOTH("Both Mining Islands"),
         CRYSTAL("Crystal Hollows Only"),
