@@ -219,4 +219,9 @@ object ChatUtils {
 
     fun MessageSendToServerEvent.isCommand(commandsWithSlash: Collection<String>) =
         splitMessage.takeIf { it.isNotEmpty() }?.get(0) in commandsWithSlash
+
+    fun MessageSendToServerEvent.senderIsSkyhanni() = originatingModContainer?.modId == "skyhanni"
+
+    fun MessageSendToServerEvent.eventWithNewMessage(message: String) =
+        MessageSendToServerEvent(message, this.splitMessage, this.originatingModContainer)
 }

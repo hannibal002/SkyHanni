@@ -9,8 +9,10 @@ import at.hannibal2.skyhanni.events.LorenzTickEvent
 import at.hannibal2.skyhanni.events.LorenzToolTipEvent
 import at.hannibal2.skyhanni.events.MessageSendToServerEvent
 import at.hannibal2.skyhanni.events.RepositoryReloadEvent
+import at.hannibal2.skyhanni.features.commands.tabcomplete.GetFromSacksTabComplete
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.ChatUtils.isCommand
+import at.hannibal2.skyhanni.utils.ChatUtils.senderIsSkyhanni
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.NEUInternalName
 import at.hannibal2.skyhanni.utils.NEUInternalName.Companion.asInternalName
@@ -21,6 +23,7 @@ import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraft.inventory.Slot
+import net.minecraftforge.fml.common.eventhandler.EventPriority
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import java.util.Deque
 import java.util.LinkedList
@@ -66,7 +69,10 @@ object GetFromSackAPI {
 
     private var lastItemStack: PrimitiveItemStack? = null
 
-    var sackList = emptyList<NEUInternalName>()
+    var sackListInternalNames = emptySet<String>()
+        private set
+
+    var sackListNames = emptySet<String>()
         private set
 
     private fun addToQueue(items: List<PrimitiveItemStack>) = queue.addAll(items)
@@ -108,18 +114,27 @@ object GetFromSackAPI {
         }
     }
 
-    @SubscribeEvent
+    @SubscribeEvent(priority = EventPriority.LOW)
     fun onMessageToServer(event: MessageSendToServerEvent) {
         if (!LorenzUtils.inSkyBlock) return
         if (!config.queuedGFS && !config.bazaarGFS) return
         if (!event.isCommand(commandsWithSlash)) return
-        queuedHandler(event)
-        bazaarHandler(event)
+        val replacedEvent = GetFromSacksTabComplete.handleUnderlineReplace(event)
+        queuedHandler(replacedEvent)
+        bazaarHandler(replacedEvent)
+        if (replacedEvent.isCanceled) {
+            event.isCanceled
+            return
+        }
+        if (replacedEvent !== event) {
+            event.isCanceled
+            ChatUtils.sendMessageToServer(replacedEvent.message)
+        }
     }
 
     private fun queuedHandler(event: MessageSendToServerEvent) {
         if (!config.queuedGFS) return
-        if (event.originatingModContainer?.modId == "skyhanni") return
+        if (event.senderIsSkyhanni()) return
 
         val (result, stack) = commandValidator(event.splitMessage.drop(1))
 
@@ -144,23 +159,25 @@ object GetFromSackAPI {
     )
 
     private fun commandValidator(args: List<String>): Pair<CommandResult, PrimitiveItemStack?> {
-        if (args.size != 2) {
+        if (args.size <= 1) {
             return CommandResult.WRONG_ARGUMENT to null
         }
 
-        val item = args[0].asInternalName()
-
-        if (!sackList.contains(item)) {
-            return CommandResult.WRONG_IDENTIFIER to null
-        }
-
-        val amountString = args[1]
+        val amountString = args[args.lastIndex]
 
         if (!amountString.isInt()) {
             return CommandResult.WRONG_AMOUNT to null
         }
 
-        return CommandResult.VALID to item.makePrimitiveStack(amountString.toInt())
+        val itemString = args.dropLast(1).joinToString(" ").uppercase()
+
+        val item = when {
+            sackListInternalNames.contains(itemString) -> itemString.asInternalName()
+            sackListNames.contains(itemString) -> NEUInternalName.fromItemName(itemString)
+            else -> return CommandResult.WRONG_IDENTIFIER to null
+        }
+
+        return CommandResult.VALID to PrimitiveItemStack(item, amountString.toInt())
     }
 
     @SubscribeEvent
@@ -192,6 +209,8 @@ object GetFromSackAPI {
 
     @SubscribeEvent
     fun onRepoReload(event: RepositoryReloadEvent) {
-        sackList = event.getConstant<SacksJson>("Sacks").sackList.map { it.replace(" ", "_").asInternalName() }
+        sackListInternalNames = event.getConstant<SacksJson>("Sacks").sackItems.toSet()
+
+        sackListNames = event.getConstant<SacksJson>("Sacks").sackList.map { it.uppercase() }.toSet()
     }
 }
