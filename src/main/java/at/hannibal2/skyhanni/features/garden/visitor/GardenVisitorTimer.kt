@@ -4,7 +4,7 @@ import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.events.CropClickEvent
 import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.LorenzWorldChangeEvent
-import at.hannibal2.skyhanni.events.PreProfileSwitchEvent
+import at.hannibal2.skyhanni.events.ProfileJoinEvent
 import at.hannibal2.skyhanni.events.garden.visitor.VisitorArrivalEvent
 import at.hannibal2.skyhanni.features.garden.GardenAPI
 import at.hannibal2.skyhanni.test.command.ErrorManager
@@ -80,7 +80,7 @@ class GardenVisitorTimer {
     }
 
     @SubscribeEvent
-    fun onPreProfileSwitch(event: PreProfileSwitchEvent) {
+    fun onProfileJoin(event: ProfileJoinEvent) {
         display = ""
         lastMillis = 0.seconds
         sixthVisitorArrivalTime = SimpleTimeMark.farPast()
