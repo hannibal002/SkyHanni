@@ -13,6 +13,7 @@ import at.hannibal2.skyhanni.utils.NEUItems
 import at.hannibal2.skyhanni.utils.NEUItems.getItemStackOrNull
 import at.hannibal2.skyhanni.utils.NEUItems.getPrice
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
+import at.hannibal2.skyhanni.utils.fromJson
 import kotlinx.coroutines.launch
 import kotlin.concurrent.fixedRateTimer
 
@@ -30,7 +31,7 @@ class BazaarDataHolder {
         val list = mutableMapOf<NEUInternalName, Double>()
         val apiResponse = APIUtil.getJSONResponse("https://api.hypixel.net/v2/resources/skyblock/items")
         try {
-            val itemsData = ConfigManager.gson.fromJson(apiResponse, SkyblockItemsDataJson::class.java)
+            val itemsData = ConfigManager.gson.fromJson<SkyblockItemsDataJson>(apiResponse)
 
             val motesPrice = mutableMapOf<NEUInternalName, Double>()
             for (item in itemsData.items) {
