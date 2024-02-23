@@ -29,7 +29,8 @@ public class MiningEventConfig {
     public enum ShowType {
         BOTH("Both Mining Islands"),
         CRYSTAL("Crystal Hollows Only"),
-        DWARVEN("Dwarven Mines Only")
+        DWARVEN("Dwarven Mines Only"),
+        CURRENT("Current Island Only"),
         ;
 
         private final String str;

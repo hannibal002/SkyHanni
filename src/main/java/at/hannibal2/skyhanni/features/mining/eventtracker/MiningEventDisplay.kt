@@ -8,6 +8,7 @@ import at.hannibal2.skyhanni.events.LorenzTickEvent
 import at.hannibal2.skyhanni.features.fame.ReminderUtils
 import at.hannibal2.skyhanni.utils.LocationUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils
+import at.hannibal2.skyhanni.utils.LorenzUtils.isInIsland
 import at.hannibal2.skyhanni.utils.RenderUtils.renderStrings
 import at.hannibal2.skyhanni.utils.SimpleTimeMark.Companion.asTimeMark
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
@@ -33,8 +34,18 @@ object MiningEventDisplay {
     }
 
     private fun updateDisplay() {
-        val shouldShowDwarven = config.showType == MiningEventConfig.ShowType.BOTH || config.showType == MiningEventConfig.ShowType.DWARVEN
-        val shouldShowCrystal = config.showType == MiningEventConfig.ShowType.BOTH || config.showType == MiningEventConfig.ShowType.CRYSTAL
+        val shouldShowDwarven = when {
+            config.showType == MiningEventConfig.ShowType.BOTH -> true
+            config.showType == MiningEventConfig.ShowType.DWARVEN -> true
+            config.showType == MiningEventConfig.ShowType.CURRENT && IslandType.DWARVEN_MINES.isInIsland() -> true
+            else -> false
+        }
+        val shouldShowCrystal = when {
+            config.showType == MiningEventConfig.ShowType.BOTH -> true
+            config.showType == MiningEventConfig.ShowType.CRYSTAL -> true
+            config.showType == MiningEventConfig.ShowType.CURRENT && IslandType.CRYSTAL_HOLLOWS.isInIsland() -> true
+            else -> false
+        }
 
         display.clear()
         if (shouldShowDwarven) display.add("§aDwarven Mines: ${formUpcomingString(dwarvenEvents)}")
