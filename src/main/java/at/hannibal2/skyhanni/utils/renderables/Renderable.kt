@@ -301,98 +301,68 @@ interface Renderable {
             }
         }
 
-        fun texturedProgressBar(
-            percent: Float,
-            color: Color = Color(0, 255, 0),
-            useChroma: Boolean = false,
-            texture: SkillProgressBarConfig.TexturedBar.UsedTexture = SkillProgressBarConfig.TexturedBar.UsedTexture.MATCH_PACK,
-            width: Int = 182,
-            height: Int = 5,
-            horizontalAlign: HorizontalAlignment = HorizontalAlignment.LEFT,
-            verticalAlign: VerticalAlignment = VerticalAlignment.TOP,
-        ) = object : Renderable {
-            override val width = width
-            override val height = height
-            override val horizontalAlign = horizontalAlign
-            override val verticalAlign = verticalAlign
-
-            override fun render(posX: Int, posY: Int) {
-                val (textureX, textureY) = if (texture == SkillProgressBarConfig.TexturedBar.UsedTexture.MATCH_PACK) Pair(0, 64) else Pair(0, 0)
-
-                Minecraft.getMinecraft().renderEngine.bindTexture(ResourceLocation(texture.path))
-                Minecraft.getMinecraft().ingameGUI.drawTexturedModalRect(posX, posY, textureX, textureY, width, height)
-
-                Minecraft.getMinecraft().renderEngine.bindTexture(ResourceLocation(texture.path))
-                if (useChroma) {
-                    ChromaShaderManager.begin(ChromaType.TEXTURED)
-                    GlStateManager.color(Color.WHITE.red / 255f, Color.WHITE.green / 255f, Color.WHITE.blue / 255f, 1f)
-                } else {
-                    GlStateManager.color(color.red / 255f, color.green / 255f, color.blue / 255f, 1f)
-                }
-                Minecraft.getMinecraft().ingameGUI.drawTexturedModalRect(posX, posY, textureX, textureY + height, percent.toInt(), height)
-
-                if (useChroma) {
-                    ChromaShaderManager.end()
-                }
-            }
-        }
-
         fun progressBar(
             percent: Double,
             startColor: Color = Color(255, 0, 0),
             endColor: Color = Color(0, 255, 0),
             useChroma: Boolean = false,
-            width: Int = 30,
-            height: Int = 4,
+            texture: SkillProgressBarConfig.TexturedBar.UsedTexture? = null,
+            width: Int = 182,
+            height: Int = 5,
             horizontalAlign: HorizontalAlignment = HorizontalAlignment.LEFT,
-            verticalAlign: VerticalAlignment = VerticalAlignment.TOP,
+            verticalAlign: VerticalAlignment = VerticalAlignment.TOP
         ) = object : Renderable {
             override val width = width
             override val height = height
             override val horizontalAlign = horizontalAlign
             override val verticalAlign = verticalAlign
 
-            val progress = (1.0 + percent * (width - 2.0)).toInt()
-            var color = ColorUtils.blendRGB(startColor, endColor, percent)
-
-            override fun render(posX: Int, posY: Int) {
-                Gui.drawRect(0, 0, width, height, 0xFF43464B.toInt())
-
-                if (useChroma) {
-                    ChromaShaderManager.begin(ChromaType.STANDARD)
-                }
-
-                val factor = if (useChroma) 0.2 else 0.7
-                val bgColor = if (useChroma) Color.GRAY.darker() else color
-                Gui.drawRect(1, 1, width - 1, height - 1, bgColor.darker(factor).rgb)
-                Gui.drawRect(1, 1, progress, height - 1, color.rgb)
-
-                if (useChroma) {
-                    ChromaShaderManager.end()
-                }
+            private val progress = if (texture == null) {
+                (1.0 + percent * (width - 2.0)).toInt()
+            } else {
+                percent.toInt()
             }
-        }
 
-        fun horizontalContainer(
-            content: List<Renderable>,
-            horizontalAlign: HorizontalAlignment = HorizontalAlignment.LEFT,
-            verticalAlign: VerticalAlignment = VerticalAlignment.TOP,
-        ) = object : Renderable {
-            val renderables = content
-
-            override val width = renderables.sumOf { it.width }
-            override val height = renderables.maxOf { it.height }
-            override val horizontalAlign = horizontalAlign
-            override val verticalAlign = verticalAlign
+            private var color = if (texture == null) {
+                ColorUtils.blendRGB(startColor, endColor, percent)
+            } else {
+                startColor
+            }
 
             override fun render(posX: Int, posY: Int) {
-                var xOffset = 0
-                renderables.forEach {
-                    it.renderYAligned(xOffset, 0, height)
-                    xOffset += it.width
-                    GlStateManager.translate(it.width.toFloat(), 0f, 0f)
+                if (texture == null) {
+                    Gui.drawRect(0, 0, width, height, 0xFF43464B.toInt())
+
+                    if (useChroma) {
+                        ChromaShaderManager.begin(ChromaType.STANDARD)
+                    }
+
+                    val factor = if (useChroma) 0.2 else 0.7
+                    val bgColor = if (useChroma) Color.GRAY.darker() else color
+                    Gui.drawRect(1, 1, width - 1, height - 1, bgColor.darker(factor).rgb)
+                    Gui.drawRect(1, 1, progress, height - 1, color.rgb)
+
+                    if (useChroma) {
+                        ChromaShaderManager.end()
+                    }
+                } else {
+                    val (textureX, textureY) = if (texture == SkillProgressBarConfig.TexturedBar.UsedTexture.MATCH_PACK) Pair(0, 64) else Pair(0, 0)
+
+                    Minecraft.getMinecraft().renderEngine.bindTexture(ResourceLocation(texture.path))
+                    Minecraft.getMinecraft().ingameGUI.drawTexturedModalRect(posX, posY, textureX, textureY, width, height)
+
+                    if (useChroma) {
+                        ChromaShaderManager.begin(ChromaType.TEXTURED)
+                        GlStateManager.color(1f, 1f, 1f, 1f)
+                    } else {
+                        GlStateManager.color(color.red / 255f, color.green / 255f, color.blue / 255f, 1f)
+                    }
+                    Minecraft.getMinecraft().ingameGUI.drawTexturedModalRect(posX, posY, textureX, textureY + height, progress, height)
+
+                    if (useChroma) {
+                        ChromaShaderManager.end()
+                    }
                 }
-                GlStateManager.translate(-width.toFloat(), 0f, 0f)
             }
         }
 

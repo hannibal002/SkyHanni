@@ -9,7 +9,7 @@ public class CustomGoalConfig {
     @Expose
     @ConfigOption(name = "Display", desc = "Enable the custom goal in the progress display.")
     @ConfigEditorBoolean
-    public boolean enableIndDisplay = true;
+    public boolean enableInDisplay = true;
 
     @Expose
     @ConfigOption(name = "All Skill Display", desc = "Enable the custom goal in the all skill display.")

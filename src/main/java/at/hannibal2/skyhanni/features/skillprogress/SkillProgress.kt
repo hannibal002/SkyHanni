@@ -8,6 +8,7 @@ import at.hannibal2.skyhanni.api.SkillAPI.oldSkillInfoMap
 import at.hannibal2.skyhanni.api.SkillAPI.showDisplay
 import at.hannibal2.skyhanni.api.SkillAPI.skillXPInfoMap
 import at.hannibal2.skyhanni.config.features.skillprogress.SkillProgressConfig
+import at.hannibal2.skyhanni.events.ActionBarUpdateEvent
 import at.hannibal2.skyhanni.events.ConfigLoadEvent
 import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.LorenzTickEvent
@@ -21,6 +22,7 @@ import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.NumberUtil.interpolate
 import at.hannibal2.skyhanni.utils.NumberUtil.roundToPrecision
+import at.hannibal2.skyhanni.utils.Quad
 import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderables
 import at.hannibal2.skyhanni.utils.RenderUtils.renderStringsAndItems
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
@@ -32,8 +34,6 @@ import at.hannibal2.skyhanni.utils.TimeUtils.format
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 import at.hannibal2.skyhanni.utils.renderables.Renderable.Companion.horizontalContainer
 import io.github.moulberry.notenoughupdates.util.Utils
-import net.minecraft.util.ChatComponentText
-import net.minecraftforge.client.event.ClientChatReceivedEvent
 import net.minecraftforge.fml.common.eventhandler.EventPriority
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import java.awt.Color
@@ -88,7 +88,7 @@ object SkillProgress {
             SkillProgressConfig.TextAlignment.LEFT,
             SkillProgressConfig.TextAlignment.RIGHT -> {
                 config.displayPosition.renderRenderables(
-                    listOf(Renderable.fixedSizeLine(horizontalContainer(display, textAlignment.alignment), maxWidth)),
+                    listOf(Renderable.fixedSizeLine(horizontalContainer(display, horizontalAlign = textAlignment.alignment), maxWidth)),
                     posLabel = "Skill Progress")
             }
 
@@ -100,16 +100,18 @@ object SkillProgress {
         val progress = if (barConfig.useTexturedBar.get()) {
             val factor = (skillExpPercentage.toFloat().coerceAtMost(1f)) * 182
             maxWidth = 182
-            Renderable.texturedProgressBar(factor,
-                Color(SpecialColour.specialToChromaRGB(barConfig.barStartColor)),
+            Renderable.progressBar(
+                percent = factor.toDouble(),
+                startColor = Color(SpecialColour.specialToChromaRGB(barConfig.barStartColor)),
                 texture = barConfig.texturedBar.usedTexture.get(),
                 useChroma = barConfig.useChroma.get())
 
         } else {
             maxWidth = barConfig.regularBar.width
-            Renderable.progressBar(skillExpPercentage,
-                Color(SpecialColour.specialToChromaRGB(barConfig.barStartColor)),
-                Color(SpecialColour.specialToChromaRGB(barConfig.barStartColor)),
+            Renderable.progressBar(
+                percent = skillExpPercentage,
+                startColor = Color(SpecialColour.specialToChromaRGB(barConfig.barStartColor)),
+                endColor = Color(SpecialColour.specialToChromaRGB(barConfig.barStartColor)),
                 width = maxWidth,
                 height = barConfig.regularBar.height,
                 useChroma = barConfig.useChroma.get())
@@ -204,16 +206,16 @@ object SkillProgress {
     }
 
     @SubscribeEvent(priority = EventPriority.LOW)
-    fun onActionBar(event: ClientChatReceivedEvent) {
+    fun onActionBar(event: ActionBarUpdateEvent) {
         if (!config.hideInActionBar) return
-        if (event.type.toInt() != 2) return
         if (event.isCanceled) return
-        var msg = event.message.unformattedText
+        var msg = event.actionBar
         for (line in hideInActionBar) {
             msg = msg.replace(Regex("\\s*" + Regex.escape(line)), "")
         }
         msg = msg.trim()
-        event.message = ChatComponentText(msg)
+
+        event.changeActionBar(msg)
     }
 
     fun updateDisplay() {
@@ -256,11 +258,11 @@ object SkillProgress {
 
             val (level, currentXp, currentXpMax, totalXp) =
                 if (useCustomGoalLevel)
-                    LorenzUtils.Quad(skillInfo.overflowLevel, have, need, xp)
+                    Quad(skillInfo.overflowLevel, have, need, xp)
                 else if (config.overflowConfig.enableInAllDisplay.get() && !lockedLevels)
-                    LorenzUtils.Quad(skillInfo.overflowLevel, skillInfo.overflowCurrentXp, skillInfo.overflowCurrentXpMax, skillInfo.overflowTotalXp)
+                    Quad(skillInfo.overflowLevel, skillInfo.overflowCurrentXp, skillInfo.overflowCurrentXpMax, skillInfo.overflowTotalXp)
                 else
-                    LorenzUtils.Quad(skillInfo.level, skillInfo.currentXp, skillInfo.currentXpMax, skillInfo.totalXp)
+                    Quad(skillInfo.level, skillInfo.currentXp, skillInfo.currentXpMax, skillInfo.totalXp)
 
             if (level == -1) {
                 addAsSingletonList(Renderable.clickAndHover(
@@ -362,12 +364,12 @@ object SkillProgress {
 
 
         val (level, currentXp, currentXpMax, _) =
-            if (useCustomGoalLevel && customGoalConfig.enableIndDisplay)
-                LorenzUtils.Quad(currentLevel, have, need, xp)
+            if (useCustomGoalLevel && customGoalConfig.enableInDisplay)
+                Quad(currentLevel, have, need, xp)
             else if (config.overflowConfig.enableInDisplay.get())
-                LorenzUtils.Quad(skill.overflowLevel, skill.overflowCurrentXp, skill.overflowCurrentXpMax, skill.overflowTotalXp)
+                Quad(skill.overflowLevel, skill.overflowCurrentXp, skill.overflowCurrentXpMax, skill.overflowTotalXp)
             else
-                LorenzUtils.Quad(skill.level, skill.currentXp, skill.currentXpMax, skill.totalXp)
+                Quad(skill.level, skill.currentXp, skill.currentXpMax, skill.totalXp)
 
         if (config.showLevel.get())
             add(Renderable.string("§9[§d$level§9] "))

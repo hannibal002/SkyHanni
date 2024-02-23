@@ -29,7 +29,7 @@ class SkillTooltip {
             val iterator = event.toolTip.listIterator()
             val split = stack.cleanName().split(" ")
             val skillName = split.first()
-            val skill = SkillType.getByNameFirstUppercase(skillName) ?: return
+            val skill = SkillType.getByName(skillName)
             val useRoman = split.last().toIntOrNull() == null
             val skillInfo = SkillAPI.storage?.get(skill) ?: return
             val showCustomGoal = skillInfo.customGoalLevel != 0 && customGoalConfig.enableInSkillMenuTooltip

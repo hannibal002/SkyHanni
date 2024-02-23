@@ -27,9 +27,7 @@ import at.hannibal2.skyhanni.config.features.stranded.StrandedConfig;
 import com.google.gson.annotations.Expose;
 import io.github.moulberry.moulconfig.Config;
 import io.github.moulberry.moulconfig.Social;
-import io.github.moulberry.moulconfig.annotations.Accordion;
 import io.github.moulberry.moulconfig.annotations.Category;
-import io.github.moulberry.moulconfig.annotations.ConfigOption;
 import net.minecraft.util.ResourceLocation;
 
 import java.util.Arrays;
@@ -142,7 +140,7 @@ public class Features extends Config {
     @Expose
     @Category(name = "Skill Progress", desc = "Skill Progress related config options.")
     public SkillProgressConfig skillProgress = new SkillProgressConfig();
-    
+
     @Expose
     @Category(name = "Slayer", desc = "Slayer features.")
     public SlayerConfig slayer = new SlayerConfig();

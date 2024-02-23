@@ -5,7 +5,7 @@ import at.hannibal2.skyhanni.api.SkillAPI.activeSkill
 import at.hannibal2.skyhanni.api.SkillAPI.exactLevelingMap
 import at.hannibal2.skyhanni.api.SkillAPI.excludedSkills
 import at.hannibal2.skyhanni.api.SkillAPI.levelingMap
-import at.hannibal2.skyhanni.utils.LorenzUtils
+import at.hannibal2.skyhanni.utils.Quad
 import com.google.common.base.Splitter
 import com.google.gson.JsonArray
 import io.github.moulberry.notenoughupdates.util.Constants
@@ -20,19 +20,19 @@ object SkillUtil {
         return SkillAPI.storage?.get(skill)
     }
 
-    fun getSkillInfo(currentLevel: Int, currentXp: Long, neededXp: Long, totalXp: Long): LorenzUtils.Quad<Int, Long, Long, Long> {
+    fun getSkillInfo(currentLevel: Int, currentXp: Long, neededXp: Long, totalXp: Long): Quad<Int, Long, Long, Long> {
         return if (currentLevel == 50 && neededXp == 0L)
             calculateOverFlow50(currentXp)
         else if (currentLevel >= 60)
             calculateOverFlow(currentXp)
         else
-            LorenzUtils.Quad(currentLevel, currentXp, neededXp, totalXp)
+            Quad(currentLevel, currentXp, neededXp, totalXp)
     }
 
     /**
      * @author Soopyboo32
      */
-    fun calculateOverFlow(currentXp: Long): LorenzUtils.Quad<Int, Long, Long, Long> {
+    fun calculateOverFlow(currentXp: Long): Quad<Int, Long, Long, Long> {
         var xpCurrent = currentXp
         var slope = 600000L
         var xpForCurr = 7000000 + slope
@@ -46,13 +46,13 @@ object SkillUtil {
             if (level % 10 == 0) slope *= 2
         }
         total += xpCurrent
-        return LorenzUtils.Quad(level, xpCurrent, xpForCurr, total)
+        return Quad(level, xpCurrent, xpForCurr, total)
     }
 
     /**
      * Calculate overflow starting at level 50
      */
-    private fun calculateOverFlow50(currentXp: Long): LorenzUtils.Quad<Int, Long, Long, Long> {
+    private fun calculateOverFlow50(currentXp: Long): Quad<Int, Long, Long, Long> {
         var xpCurrent = currentXp
         var level = 50
         var total = 0L
@@ -81,7 +81,7 @@ object SkillUtil {
         }
         total += xpCurrent
 
-        return LorenzUtils.Quad(level, xpCurrent, xpForCurr, total)
+        return Quad(level, xpCurrent, xpForCurr, total)
     }
 
     fun xpRequiredForLevel(levelWithProgress: Double): Long {

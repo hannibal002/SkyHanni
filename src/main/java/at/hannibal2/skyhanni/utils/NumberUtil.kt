@@ -219,13 +219,10 @@ object NumberUtil {
         var interp = now
         if (last >= 0 && last != now) {
             var factor: Float = (SimpleTimeMark.now().toMillis() - lastUpdate) / 1000f
-            factor = clampZeroOne(factor)
+            factor = factor.coerceIn(0f, 1f)
             interp = last + (now - last) * factor
         }
         return interp
     }
 
-    private fun clampZeroOne(f: Float): Float {
-        return max(0f, min(1f, f))
-    }
 }

@@ -355,18 +355,6 @@ object LorenzUtils {
     fun chat(message: String, prefix: Boolean = true, prefixColor: String = "§e") =
         ChatUtils.chat(message, prefix, prefixColor)
 
-    val Long.ticks get() = (this * 50).milliseconds
-    val Int.ticks get() = (this * 50).milliseconds
-
-    data class Quad<out A, out B, out C, out D>(
-        val first: A,
-        val second: B,
-        val third: C,
-        val quad: D
-    ) : Serializable {
-        override fun toString(): String = "($first, $second, $third, $quad)"
-    }
-
     @Deprecated("moved", ReplaceWith("ChatUtils.clickableChat"))
     fun clickableChat(message: String, command: String, prefix: Boolean = true, prefixColor: String = "§e") =
         ChatUtils.clickableChat(message, command, prefix, prefixColor)
