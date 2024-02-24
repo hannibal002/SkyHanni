@@ -60,20 +60,13 @@ object NEUItems {
         ignoreItemsFilter.load(ignoredItems)
     }
 
-    // TODO remove
     @Deprecated("Use NEUInternalName rather than String", ReplaceWith("getInternalNameFromItemName()"))
-    fun getRawInternalName(itemName: String): String {
-        return getInternalNameFromItemName(itemName).asString()
-    }
+    fun getRawInternalName(itemName: String): String = NEUInternalName.fromItemName(itemName).asString()
 
-    fun getInternalNameFromItemName(itemName: String): NEUInternalName {
-        return getInternalNameOrNull(itemName) ?: throw Error("Internal name is null for '$itemName'")
-    }
-
-    fun getInternalNameOrNullIgnoreCase(itemName: String): NEUInternalName? {
+    private fun getInternalNameOrNullIgnoreCase(itemName: String): NEUInternalName? {
         val lowercase = itemName.removeColor().lowercase()
-        if (itemNameCache.containsKey(lowercase)) {
-            return itemNameCache[lowercase]!!
+        itemNameCache[lowercase]?.let {
+            return it
         }
 
         if (allItemsCache.isEmpty()) {
@@ -99,7 +92,11 @@ object NEUItems {
         return map
     }
 
-    fun getInternalNameOrNull(itemName: String): NEUInternalName? {
+    @Deprecated("moved", ReplaceWith("NEUInternalName.fromItemNameOrNull(itemName)"))
+    fun getInternalNameOrNull(itemName: String): NEUInternalName? = NEUInternalName.fromItemNameOrNull(itemName)
+
+    // internal function
+    fun getInternalNameOrNull0(itemName: String): NEUInternalName? {
         val lowercase = itemName.lowercase()
         if (itemNameCache.containsKey(lowercase)) {
             return itemNameCache[lowercase]!!
@@ -115,13 +112,16 @@ object NEUItems {
             itemNameCache[itemName] = enchantmentName
             return enchantmentName
         }
-        var rawInternalName = ItemResolutionQuery.findInternalNameByDisplayName(itemName, false) ?: return null
 
-        // This fixes a NEU bug with §9Hay Bale (cosmetic item)
-        // TODO remove workaround when this is fixed in neu
-        rawInternalName = if (rawInternalName == "HAY_BALE") "HAY_BLOCK" else rawInternalName
+        val internalName = ItemResolutionQuery.findInternalNameByDisplayName(itemName, true)?.let {
 
-        val internalName = rawInternalName.asInternalName()
+            // This fixes a NEU bug with §9Hay Bale (cosmetic item)
+            // TODO remove workaround when this is fixed in neu
+            val rawInternalName = if (it == "HAY_BALE") "HAY_BLOCK" else it
+            rawInternalName.asInternalName()
+        } ?: run {
+            getInternalNameOrNullIgnoreCase(itemName)
+        } ?: return null
 
         itemNameCache[lowercase] = internalName
         return internalName
@@ -184,6 +184,7 @@ object NEUItems {
         return getNpcPriceOrNull()
     }
 
+    @Deprecated("Use NEUInternalName", ReplaceWith("internalName.asInternalName().getPrice(useSellingPrice)"))
     fun getPrice(internalName: String, useSellingPrice: Boolean = false): Double =
         internalName.asInternalName().getPrice(useSellingPrice)
 

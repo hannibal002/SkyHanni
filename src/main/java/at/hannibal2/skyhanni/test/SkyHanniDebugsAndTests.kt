@@ -32,7 +32,9 @@ import at.hannibal2.skyhanni.utils.LorenzLogger
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.LorenzVec
 import at.hannibal2.skyhanni.utils.NEUInternalName
+import at.hannibal2.skyhanni.utils.NEUInternalName.Companion.asInternalName
 import at.hannibal2.skyhanni.utils.NEUItems
+import at.hannibal2.skyhanni.utils.NEUItems.getItemStackOrNull
 import at.hannibal2.skyhanni.utils.NEUItems.getNpcPriceOrNull
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.OSUtils
@@ -108,6 +110,25 @@ class SkyHanniDebugsAndTests {
 
         fun testCommand(args: Array<String>) {
             SoundUtils.playBeepSound()
+
+            val input = args.joinToString(" ")
+
+            println("")
+            println("input: '$input'")
+
+            NEUItems.getInternalNameOrNull(input)?.let {
+                println("item name -> internalName: '$it'")
+                println("  itemName: '${it.itemName}'")
+                return
+            }
+
+            input.asInternalName().getItemStackOrNull()?.let {
+                val itemName = it.itemName
+                println("internal name -> item name: $itemName")
+                return
+            }
+
+            println("nothing found!")
 
 //            val a = Thread { OSUtils.copyToClipboard("123") }
 //            val b = Thread { OSUtils.copyToClipboard("456") }
