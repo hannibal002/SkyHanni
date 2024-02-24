@@ -47,7 +47,7 @@ object ErrorManager {
         } ?: "Error id not found!")
     }
 
-    @Deprecated("Use data as well", ReplaceWith("logErrorStateWithData()"))
+    @Deprecated("Use data as well", ReplaceWith("logErrorStateWithData(userMessage, internalMessage)"))
     fun logErrorState(userMessage: String, internalMessage: String) {
         logError(IllegalStateException(internalMessage), userMessage, ignoreErrorCache = false, noStackTrace = false)
     }
