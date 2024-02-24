@@ -16,7 +16,6 @@ import at.hannibal2.skyhanni.events.ProfileJoinEvent
 import at.hannibal2.skyhanni.events.SkillOverflowLevelupEvent
 import at.hannibal2.skyhanni.features.skillprogress.SkillUtil.XP_NEEDED_FOR_60
 import at.hannibal2.skyhanni.utils.ChatUtils.chat
-import at.hannibal2.skyhanni.utils.CollectionUtils.addAsSingletonList
 import at.hannibal2.skyhanni.utils.ConditionalUtils.onToggle
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
@@ -50,7 +49,7 @@ object SkillProgress {
 
     private var skillExpPercentage = 0.0
     private var display = emptyList<Renderable>()
-    private var allDisplay = emptyList<List<Any>>()
+    private var allDisplay = emptyList<Renderable>()
     private var etaDisplay = emptyList<Renderable>()
     private var lastGainUpdate = SimpleTimeMark.farPast()
     private var maxWidth = 0
@@ -70,7 +69,7 @@ object SkillProgress {
         }
 
         if (allSkillConfig.enabled.get()) {
-            config.allSkillPosition.renderStringsAndItems(allDisplay, posLabel = "All Skills Display")
+            config.allSkillPosition.renderRenderables(allDisplay, posLabel = "All Skills Display")
         }
 
         if (etaConfig.enabled.get()) {
@@ -229,17 +228,19 @@ object SkillProgress {
         }
     }
 
-    private fun formatAllDisplay(map: List<List<Any>>): List<List<Any>> {
-        val newList = mutableListOf<List<Any>>()
+    private fun formatAllDisplay(map: Map<SkillType, Renderable>): List<Renderable> {
+        val newList = mutableListOf<Renderable>()
         if (map.isEmpty()) return newList
-        for (index in allSkillConfig.skillEntryList) {
-            newList.add(map[index.ordinal])
+        for (skillType in allSkillConfig.skillEntryList) {
+            map[skillType]?.let {
+                newList.add(it)
+            }
         }
         return newList
     }
 
-    private fun drawAllDisplay() = buildList {
-        val skillMap = SkillAPI.storage ?: return@buildList
+    private fun drawAllDisplay() = buildMap {
+        val skillMap = SkillAPI.storage ?: return@buildMap
         val sortedMap = SkillType.entries.filter { it.displayName.isNotEmpty() }.sortedBy { it.displayName.take(2) }
 
         for (skill in sortedMap) {
@@ -264,12 +265,12 @@ object SkillProgress {
                 else
                     Quad(skillInfo.level, skillInfo.currentXp, skillInfo.currentXpMax, skillInfo.totalXp)
 
-            if (level == -1) {
-                addAsSingletonList(Renderable.clickAndHover(
+            this[skill] =  if (level == -1) {
+                Renderable.clickAndHover(
                     "§cOpen your skills menu !",
                     listOf("§eClick here to execute §6/skills"),
                     onClick = { LorenzUtils.sendCommandToServer("skills") }
-                ))
+                )
             } else {
                 val tips = buildList {
                     add("§6Level: §b${level}")
@@ -278,7 +279,7 @@ object SkillProgress {
                     add("§6Total XP: §b${totalXp.addSeparators()}")
                 }
                 val nameColor = if (skill == activeSkill) "§e" else "§6"
-                addAsSingletonList(Renderable.hoverTips(buildString {
+                Renderable.hoverTips(buildString {
                     append("$nameColor${skill.displayName} $level ")
                     append("§7(")
                     append("§b${currentXp.addSeparators()}")
@@ -287,7 +288,7 @@ object SkillProgress {
                         append("§b${currentXpMax.addSeparators()}")
                     }
                     append("§7)")
-                }, tips))
+                }, tips)
             }
         }
     }

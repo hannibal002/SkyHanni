@@ -27,6 +27,8 @@ enum class SkillType(val displayName: String, icon: Item) {
     val lowercaseName = displayName.lowercase()
     val uppercaseName = displayName.uppercase()
 
+    override fun toString(): String = "§b$displayName"
+
     companion object {
         fun getByName(name: String) = getByNameOrNull(name) ?: error("Unknown Skill Type: '$name'")
 
