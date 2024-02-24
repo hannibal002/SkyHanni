@@ -8,8 +8,6 @@ import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.ItemBlink.checkBlinkItem
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName
 import at.hannibal2.skyhanni.utils.NEUInternalName.Companion.asInternalName
-import at.hannibal2.skyhanni.utils.NumberUtil.romanToDecimal
-import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import com.google.gson.JsonObject
 import com.google.gson.JsonPrimitive
@@ -37,19 +35,11 @@ import org.lwjgl.opengl.GL11
 object NEUItems {
 
     val manager: NEUManager get() = NotEnoughUpdates.INSTANCE.manager
-    private val itemNameCache = mutableMapOf<String, NEUInternalName>() // item name -> internal name
     private val multiplierCache = mutableMapOf<NEUInternalName, Pair<NEUInternalName, Int>>()
     private val recipesCache = mutableMapOf<NEUInternalName, Set<NeuRecipe>>()
     private val ingredientsCache = mutableMapOf<NeuRecipe, Set<Ingredient>>()
 
     var allItemsCache = mapOf<String, NEUInternalName>() // item name -> internal name
-    val allInternalNames: Collection<NEUInternalName>
-        get() {
-            if (allItemsCache.isEmpty()) {
-                allItemsCache = readAllNeuItems()
-            }
-            return allItemsCache.values
-        }
     val ignoreItemsFilter = MultiFilter()
 
     private val fallbackItem by lazy {
@@ -69,23 +59,6 @@ object NEUItems {
     @Deprecated("Use NEUInternalName rather than String", ReplaceWith("getInternalNameFromItemName()"))
     fun getRawInternalName(itemName: String): String = NEUInternalName.fromItemName(itemName).asString()
 
-    private fun getInternalNameOrNullIgnoreCase(itemName: String): NEUInternalName? {
-        val lowercase = itemName.removeColor().lowercase()
-        itemNameCache[lowercase]?.let {
-            return it
-        }
-
-        if (allItemsCache.isEmpty()) {
-            allItemsCache = readAllNeuItems()
-        }
-        allItemsCache[lowercase]?.let {
-            itemNameCache[lowercase] = it
-            return it
-        }
-
-        return null
-    }
-
     fun readAllNeuItems(): Map<String, NEUInternalName> {
         val map = mutableMapOf<String, NEUInternalName>()
         for (rawInternalName in allNeuRepoItems().keys) {
@@ -98,55 +71,6 @@ object NEUItems {
 
     @Deprecated("moved", ReplaceWith("NEUInternalName.fromItemNameOrNull(itemName)"))
     fun getInternalNameOrNull(itemName: String): NEUInternalName? = NEUInternalName.fromItemNameOrNull(itemName)
-
-    internal fun _getInternalNameOrNull(itemName: String): NEUInternalName? {
-        val lowercase = itemName.lowercase()
-        if (itemNameCache.containsKey(lowercase)) {
-            return itemNameCache[lowercase]!!
-        }
-
-        if (itemName == "§cmissing repo item") {
-            itemNameCache[lowercase] = NEUInternalName.MISSING_ITEM
-            return NEUInternalName.MISSING_ITEM
-        }
-
-        resolveEnchantmentByName(itemName)?.let {
-            val enchantmentName = fixEnchantmentName(it)
-            itemNameCache[itemName] = enchantmentName
-            return enchantmentName
-        }
-
-        val internalName = ItemResolutionQuery.findInternalNameByDisplayName(itemName, true)?.let {
-
-            // This fixes a NEU bug with §9Hay Bale (cosmetic item)
-            // TODO remove workaround when this is fixed in neu
-            val rawInternalName = if (it == "HAY_BALE") "HAY_BLOCK" else it
-            rawInternalName.asInternalName()
-        } ?: run {
-            getInternalNameOrNullIgnoreCase(itemName)
-        } ?: return null
-
-        itemNameCache[lowercase] = internalName
-        return internalName
-    }
-
-    // Workaround for duplex
-    private val duplexPattern = "ULTIMATE_DUPLEX;(?<tier>.*)".toPattern()
-
-    private fun fixEnchantmentName(originalName: String): NEUInternalName {
-        duplexPattern.matchMatcher(originalName) {
-            val tier = group("tier")
-            return "ULTIMATE_REITERATE;$tier".asInternalName()
-        }
-        // TODO USE SH-REPO
-        return originalName.asInternalName()
-    }
-
-    private fun turboCheck(text: String): String {
-        if (text == "Turbo-Cocoa") return "Turbo-Coco"
-        if (text == "Turbo-Cacti") return "Turbo-Cactus"
-        return text
-    }
 
     fun getInternalName(itemStack: ItemStack): String? = ItemResolutionQuery(manager)
         .withCurrentGuiContext()
@@ -358,16 +282,6 @@ object NEUItems {
 
         return false
     }
-
-    // Taken and edited from NEU
-    private fun resolveEnchantmentByName(enchantmentName: String) =
-        UtilsPatterns.enchantmentNamePattern.matchMatcher(enchantmentName) {
-            val name = group("name").trim { it <= ' ' }
-            val ultimate = group("format").lowercase().contains("§l")
-            ((if (ultimate && name != "Ultimate Wise") "ULTIMATE_" else "")
-                + turboCheck(name).replace(" ", "_").replace("-", "_").uppercase()
-                + ";" + group("level").romanToDecimal())
-        }
 
     // Uses NEU
     fun saveNBTData(item: ItemStack, removeLore: Boolean = true): String {
