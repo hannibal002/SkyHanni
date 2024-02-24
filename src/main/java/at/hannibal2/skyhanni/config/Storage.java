@@ -132,9 +132,9 @@ public class Storage {
             @Override
             public String toString() {
                 return "MinionConfig{" +
-                        "displayName='" + displayName + '\'' +
-                        ", lastClicked=" + lastClicked +
-                        '}';
+                    "displayName='" + displayName + '\'' +
+                    ", lastClicked=" + lastClicked +
+                    '}';
             }
         }
 
@@ -389,11 +389,11 @@ public class Storage {
             @Override
             public String toString() {
                 return "SlayerRngMeterStorage{" +
-                        "currentMeter=" + currentMeter +
-                        ", gainPerBoss=" + gainPerBoss +
-                        ", goalNeeded=" + goalNeeded +
-                        ", itemGoal='" + itemGoal + '\'' +
-                        '}';
+                    "currentMeter=" + currentMeter +
+                    ", gainPerBoss=" + gainPerBoss +
+                    ", goalNeeded=" + goalNeeded +
+                    ", itemGoal='" + itemGoal + '\'' +
+                    '}';
             }
         }
 
@@ -404,6 +404,9 @@ public class Storage {
 
             @Expose
             public List<String> kingsTalkedTo = new ArrayList<>();
+
+            @Expose
+            public Map<String, Integer> hotmTree = new HashMap<>();
         }
 
         @Expose
