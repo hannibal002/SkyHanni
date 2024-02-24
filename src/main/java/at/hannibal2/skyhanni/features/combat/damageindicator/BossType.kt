@@ -8,9 +8,10 @@ enum class BossType(
     val fullName: String,
     val bossTypeToggle: Type,
     val shortName: String = fullName,
-    val showDeathTime: Boolean = false
+    val showDeathTime: Boolean = false,
 ) {
-    //Nether Mini Bosses
+
+    // Nether Mini Bosses
     NETHER_BLADESOUL("§8Bladesoul", Type.NETHER_MINI_BOSSES),
     NETHER_MAGMA_BOSS("§4Magma Boss", Type.NETHER_MINI_BOSSES),
     NETHER_ASHFANG("§cAshfang", Type.NETHER_MINI_BOSSES),
@@ -20,7 +21,7 @@ enum class BossType(
     NETHER_VANQUISHER("§5Vanquisher", Type.VANQUISHER),
 
     END_ENDSTONE_PROTECTOR("§cEndstone Protector", Type.ENDERSTONE_PROTECTOR),
-    END_ENDER_DRAGON("Ender Dragon", Type.ENDER_DRAGON),//TODO fix totally
+    END_ENDER_DRAGON("Ender Dragon", Type.ENDER_DRAGON),// TODO fix totally
 
     SLAYER_ZOMBIE_1("§aRevenant Horror 1", Type.REVENANT_HORROR, "§aRev 1", showDeathTime = true),
     SLAYER_ZOMBIE_2("§eRevenant Horror 2", Type.REVENANT_HORROR, "§eRev 2", showDeathTime = true),
@@ -66,7 +67,6 @@ enum class BossType(
 
     HUB_HEADLESS_HORSEMAN("§6Headless Horseman", Type.HEADLESS_HORSEMAN),
 
-
     DUNGEON_F1_BONZO_FIRST("§cFunny Bonzo", Type.DUNGEON_FLOOR_1),
     DUNGEON_F1_BONZO_SECOND("§cSad Bonzo", Type.DUNGEON_FLOOR_1),
 
@@ -81,7 +81,10 @@ enum class BossType(
 
     DUNGEON_F5("§dLivid", Type.DUNGEON_FLOOR_5),
 
-    DUNGEON_F6_GIANT("§eGiant", Type.DUNGEON_FLOOR_6),
+    DUNGEON_F6_GIANT_1("§eBoulder Tosser", Type.DUNGEON_FLOOR_6, "§eGiant 1"),
+    DUNGEON_F6_GIANT_2("§eSword Thrower", Type.DUNGEON_FLOOR_6, "§eGiant 2"),
+    DUNGEON_F6_GIANT_3("§eBigfoot Jumper", Type.DUNGEON_FLOOR_6, "§eGiant 3"),
+    DUNGEON_F6_GIANT_4("§eLazer Shooter", Type.DUNGEON_FLOOR_6, "§eGiant 4"),
     DUNGEON_F6_SADAN("§cSadan", Type.DUNGEON_FLOOR_6),
 
     // TODO implement
@@ -103,7 +106,7 @@ enum class BossType(
     LEECH_SUPREME("§cLeech Supreme", Type.THE_RIFT_BOSSES),
     BACTE("§aBacte", Type.THE_RIFT_BOSSES),
 
-    WINTER_REINDRAKE("Reindrake", Type.REINDRAKE),//TODO fix totally
+    WINTER_REINDRAKE("Reindrake", Type.REINDRAKE),// TODO fix totally
 
     GARDEN_PEST_BEETLE("§cBeetle", Type.GARDEN_PESTS),
     GARDEN_PEST_CRICKET("§cCricket", Type.GARDEN_PESTS),
@@ -116,11 +119,10 @@ enum class BossType(
     GARDEN_PEST_SLUG("§cSlug", Type.GARDEN_PESTS),
     GARDEN_PEST_EARTHWORM("§cEarthworm", Type.GARDEN_PESTS),
 
-    //TODO arachne
+    // TODO arachne
 
-    //TODO corelone
-    //TODO bal
-
+    // TODO corelone
+    // TODO bal
 
     /**
      * TODO dungeon mini bosses
@@ -133,5 +135,5 @@ enum class BossType(
      *
      */
 
-    //TODO diana mythological creatures
+    // TODO diana mythological creatures
 }

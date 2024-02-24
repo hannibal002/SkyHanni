@@ -21,14 +21,7 @@ public class CrimsonIsleConfig {
     public ReputationHelperConfig reputationHelper = new ReputationHelperConfig();
 
     @Expose
-    @ConfigOption(name = "Quest Item Helper", desc = "When you open the fetch item quest in the town board, " +
-        "it shows a clickable chat message that will grab the items needed from the sacks.")
-    @ConfigEditorBoolean
-    @FeatureToggle
-    public boolean questItemHelper = false;
-
-    @Expose
-    @ConfigOption(name = "Pablo NPC Helper", desc = "Similar to Quest Item Helper, shows a clickable message that grabs the flower needed from sacks.")
+    @ConfigOption(name = "Pablo NPC Helper", desc = "Shows a clickable message that grabs the flower needed from your sacks.")
     @ConfigEditorBoolean
     @FeatureToggle
     public boolean pabloHelper = false;
@@ -40,4 +33,15 @@ public class CrimsonIsleConfig {
 
     @Expose
     public Position positionVolcano = new Position(20, 20, false, true);
+
+    @Expose
+    @ConfigOption(name = "Dojo Rank Display", desc = "Display your rank, score, actual belt\n" +
+        "and points needed for the next belt in the Challenges inventory\n" +
+        "on the Crimson Isles.")
+    @ConfigEditorBoolean
+    @FeatureToggle
+    public boolean showDojoRankDisplay = false;
+
+    @Expose
+    public Position dojoRankDisplayPosition = new Position(-378, 206, false, true);
 }

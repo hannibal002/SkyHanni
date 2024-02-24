@@ -1,39 +1,38 @@
 package at.hannibal2.skyhanni.features.fishing
 
 import at.hannibal2.skyhanni.events.FishingBobberCastEvent
-import at.hannibal2.skyhanni.events.IslandChangeEvent
 import at.hannibal2.skyhanni.events.ItemInHandChangeEvent
-import at.hannibal2.skyhanni.events.SkillExpGainEvent
-import at.hannibal2.skyhanni.features.fishing.tracker.FishingProfitTracker
 import at.hannibal2.skyhanni.features.fishing.trophy.TrophyFishManager
 import at.hannibal2.skyhanni.features.fishing.trophy.TrophyFishManager.getFilletValue
 import at.hannibal2.skyhanni.features.fishing.trophy.TrophyRarity
-import at.hannibal2.skyhanni.utils.DelayedRun
 import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.ItemUtils.name
 import at.hannibal2.skyhanni.utils.LorenzUtils
+import at.hannibal2.skyhanni.utils.LorenzVec
 import at.hannibal2.skyhanni.utils.NEUInternalName
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
+import at.hannibal2.skyhanni.utils.getLorenzVec
 import net.minecraft.client.Minecraft
+import net.minecraft.entity.item.EntityArmorStand
 import net.minecraft.entity.projectile.EntityFishHook
 import net.minecraft.init.Blocks
 import net.minecraft.item.ItemStack
 import net.minecraftforge.event.entity.EntityJoinWorldEvent
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
-import kotlin.time.Duration.Companion.seconds
 
 object FishingAPI {
-    private val lavaBlocks = listOf(Blocks.lava, Blocks.flowing_lava)
+
+    val lavaBlocks = listOf(Blocks.lava, Blocks.flowing_lava)
     private val waterBlocks = listOf(Blocks.water, Blocks.flowing_water)
 
     var lastCastTime = SimpleTimeMark.farPast()
-    var lastActiveFishingTime = SimpleTimeMark.farPast()
+    var holdingRod = false
 
     @SubscribeEvent
     fun onJoinWorld(event: EntityJoinWorldEvent) {
-        if (!LorenzUtils.inSkyBlock || !hasFishingRodInHand()) return
+        if (!LorenzUtils.inSkyBlock || !holdingRod) return
         val entity = event.entity ?: return
         if (entity !is EntityFishHook) return
         if (entity.angler != Minecraft.getMinecraft().thePlayer) return
@@ -42,40 +41,17 @@ object FishingAPI {
         FishingBobberCastEvent(entity).postAndCatch()
     }
 
-    @SubscribeEvent
-    fun onItemInHandChange(event: ItemInHandChangeEvent) {
-        if (event.oldItem.isFishingRod()) {
-            lastActiveFishingTime = SimpleTimeMark.now()
-        }
-        if (event.newItem.isFishingRod()) {
-            DelayedRun.runDelayed(1.seconds) {
-                lastActiveFishingTime = SimpleTimeMark.now()
-            }
-        }
-    }
-
-    @SubscribeEvent
-    fun onSkillExpGain(event: SkillExpGainEvent) {
-        val skill = event.skill
-        if (FishingProfitTracker.isEnabled()) {
-            if (skill != "fishing") {
-                lastActiveFishingTime = SimpleTimeMark.farPast()
-            }
-        }
-    }
-
-    @SubscribeEvent
-    fun onIslandChange(event: IslandChangeEvent) {
-        lastActiveFishingTime = SimpleTimeMark.farPast()
-    }
-
-    fun hasFishingRodInHand() = InventoryUtils.itemInHandId.isFishingRod()
-
-    fun NEUInternalName.isFishingRod() = contains("ROD")
+    private fun NEUInternalName.isFishingRod() = contains("ROD")
 
     fun ItemStack.isBait(): Boolean {
         val name = name ?: return false
         return stackSize == 1 && (name.removeColor().startsWith("Obfuscated") || name.endsWith(" Bait"))
+    }
+
+    @SubscribeEvent
+    fun onItemInHandChange(event: ItemInHandChangeEvent) {
+        // TODO correct rod type per island water/lava
+        holdingRod = event.newItem.isFishingRod()
     }
 
     fun isLavaRod() = InventoryUtils.getItemInHand()?.getLore()?.any { it.contains("Lava Rod") } ?: false
@@ -92,4 +68,30 @@ object FishingAPI {
         return info?.getFilletValue(rarity) ?: 0
     }
 
+    fun isFishing(checkRodInHand: Boolean = true) = IsFishingDetection.isFishing || (checkRodInHand && holdingRod)
+
+    fun seaCreatureCount(entity: EntityArmorStand): Int {
+        val name = entity.name
+        // a dragon, will always be fought
+        if (name == "Reindrake") return 0
+
+        // a npc shop
+        if (name == "§5Frosty the Snow Blaster") return 0
+
+        if (name == "Frosty") {
+            val npcLocation = LorenzVec(-1.5, 76.0, 92.5)
+            if (entity.getLorenzVec().distance(npcLocation) < 1) {
+                return 0
+            }
+        }
+
+        val isSummonedSoul = name.contains("'")
+        val hasFishingMobName = SeaCreatureManager.allFishingMobs.keys.any { name.contains(it) }
+        if (!hasFishingMobName || isSummonedSoul) return 0
+
+        if (name == "Sea Emperor" || name == "Rider of the Deep") {
+            return 2
+        }
+        return 1
+    }
 }

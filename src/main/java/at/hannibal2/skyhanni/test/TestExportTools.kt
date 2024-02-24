@@ -3,11 +3,11 @@ package at.hannibal2.skyhanni.test
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.test.command.CopyItemCommand.copyItemToClipboard
+import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.ItemStackTypeAdapterFactory
 import at.hannibal2.skyhanni.utils.KSerializable
 import at.hannibal2.skyhanni.utils.KeyboardManager.isKeyHeld
 import at.hannibal2.skyhanni.utils.KotlinTypeAdapterFactory
-import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.NBTTypeAdapter
 import at.hannibal2.skyhanni.utils.OSUtils
 import at.hannibal2.skyhanni.utils.fromJson
@@ -22,6 +22,7 @@ import java.io.InputStreamReader
 import java.io.Reader
 
 object TestExportTools {
+
     private val config get() = SkyHanniMod.feature.dev.debug
 
     val gson = GsonBuilder()
@@ -61,7 +62,7 @@ object TestExportTools {
         }
         val json = toJson(Item, stack)
         OSUtils.copyToClipboard(json)
-        LorenzUtils.chat("Compressed item info copied into the clipboard!")
+        ChatUtils.chat("Compressed item info copied into the clipboard!")
     }
 
     inline fun <reified T> getTestData(category: Key<T>, name: String): T {

@@ -46,9 +46,20 @@ object HarpFeatures {
     }
 
     private val buttonColors = listOf('d', 'e', 'a', '2', '5', '9', 'b')
-    private val inventoryTitlePattern by RepoPattern.pattern("harp.inventory", "Harp.*")
-    private val menuTitlePattern by RepoPattern.pattern("harp.menu", "Melody.*")
-    private val songSelectedPattern by RepoPattern.pattern("harp.song.selected", "§aSong is selected!")
+
+    private val patternGroup = RepoPattern.group("harp")
+    private val inventoryTitlePattern by patternGroup.pattern(
+        "inventory",
+        "Harp.*"
+    )
+    private val menuTitlePattern by patternGroup.pattern(
+        "menu",
+        "Melody.*"
+    )
+    private val songSelectedPattern by patternGroup.pattern(
+        "song.selected",
+        "§aSong is selected!"
+    )
 
     private fun isHarpGui(chestName: String) = inventoryTitlePattern.matches(chestName)
     private fun isMenuGui(chestName: String) = menuTitlePattern.matches(chestName)
@@ -158,7 +169,7 @@ object HarpFeatures {
         if (!isMenuGui(InventoryUtils.openInventoryName())) return
         if (event.slot?.slotNumber != closeButtonSlot) return
         if (openTime.passedSince() > 2.seconds) return
-        event.container.inventory.indexOfFirst {
+        event.container.inventory.filterNotNull().indexOfFirst {
             songSelectedPattern.anyMatches(it.getLore())
         }.takeIf { it != -1 }?.let {
             event.isCanceled = true

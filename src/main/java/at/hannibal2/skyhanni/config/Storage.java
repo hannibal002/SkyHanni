@@ -1,5 +1,6 @@
 package at.hannibal2.skyhanni.config;
 
+import at.hannibal2.skyhanni.api.SkillAPI;
 import at.hannibal2.skyhanni.data.model.ComposterUpgrade;
 import at.hannibal2.skyhanni.features.bingo.card.goals.BingoGoal;
 import at.hannibal2.skyhanni.features.combat.endernodetracker.EnderNodeTracker;
@@ -23,6 +24,7 @@ import at.hannibal2.skyhanni.features.misc.trevor.TrevorTracker;
 import at.hannibal2.skyhanni.features.misc.visualwords.VisualWord;
 import at.hannibal2.skyhanni.features.rift.area.westvillage.VerminTracker;
 import at.hannibal2.skyhanni.features.rift.area.westvillage.kloon.KloonTerminal;
+import at.hannibal2.skyhanni.features.skillprogress.SkillType;
 import at.hannibal2.skyhanni.features.slayer.SlayerProfitTracker;
 import at.hannibal2.skyhanni.utils.LorenzVec;
 import at.hannibal2.skyhanni.utils.NEUInternalName;
@@ -44,7 +46,10 @@ public class Storage {
     public boolean hasPlayedBefore = false;
 
     @Expose
-    public Float savedMouseSensitivity = .5f;
+    public Float savedMouselockedSensitivity = .5f;
+
+    @Expose
+    public Float savedMouseloweredSensitivity = .5f;
 
     @Deprecated
     @Expose
@@ -61,6 +66,9 @@ public class Storage {
 
     @Expose
     public Map<String, SkyHanniTracker.DisplayMode> trackerDisplayModes = new HashMap<>();
+
+    @Expose
+    public List<LorenzVec> foundDianaBurrowLocations = new ArrayList<>();
 
     @Expose
     public Map<UUID, PlayerSpecific> players = new HashMap<>();
@@ -132,9 +140,9 @@ public class Storage {
             @Override
             public String toString() {
                 return "MinionConfig{" +
-                        "displayName='" + displayName + '\'' +
-                        ", lastClicked=" + lastClicked +
-                        '}';
+                    "displayName='" + displayName + '\'' +
+                    ", lastClicked=" + lastClicked +
+                    '}';
             }
         }
 
@@ -314,6 +322,9 @@ public class Storage {
                 @Expose
                 public int lastFarmingWeightLeaderboard = -1;
             }
+
+            @Expose
+            public Map<String, LorenzVec> npcVisitorLocations = new HashMap<>();
         }
 
         @Expose
@@ -389,11 +400,11 @@ public class Storage {
             @Override
             public String toString() {
                 return "SlayerRngMeterStorage{" +
-                        "currentMeter=" + currentMeter +
-                        ", gainPerBoss=" + gainPerBoss +
-                        ", goalNeeded=" + goalNeeded +
-                        ", itemGoal='" + itemGoal + '\'' +
-                        '}';
+                    "currentMeter=" + currentMeter +
+                    ", gainPerBoss=" + gainPerBoss +
+                    ", goalNeeded=" + goalNeeded +
+                    ", itemGoal='" + itemGoal + '\'' +
+                    '}';
             }
         }
 
@@ -461,7 +472,9 @@ public class Storage {
             @Expose
             // TODO renmae
             public MythologicalCreatureTracker.Data mythologicalMobTracker = new MythologicalCreatureTracker.Data();
-
         }
+
+        @Expose
+        public Map<SkillType, SkillAPI.SkillInfo> skillData = new HashMap<>();
     }
 }

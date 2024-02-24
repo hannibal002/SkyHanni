@@ -14,7 +14,7 @@ plugins {
 }
 
 group = "at.hannibal2.skyhanni"
-version = "0.23.Beta.11"
+version = "0.23.Beta.24"
 
 val gitHash by lazy {
     val baos = ByteArrayOutputStream()
@@ -103,7 +103,7 @@ dependencies {
         exclude(module = "unspecified")
         isTransitive = false
     }
-    devenvMod("com.github.NotEnoughUpdates:NotEnoughUpdates:v2.1.1-pre4:all") {
+    devenvMod("com.github.NotEnoughUpdates:NotEnoughUpdates:v2.1.1-pre5:all") {
         exclude(module = "unspecified")
         isTransitive = false
     }
@@ -114,7 +114,7 @@ dependencies {
     implementation(libs.hotswapagentforge)
 
 //    testImplementation(kotlin("test"))
-    testImplementation("com.github.NotEnoughUpdates:NotEnoughUpdates:v2.1.1-pre4:all") {
+    testImplementation("com.github.NotEnoughUpdates:NotEnoughUpdates:v2.1.1-pre5:all") {
         exclude(module = "unspecified")
         isTransitive = false
     }
@@ -165,6 +165,7 @@ loom {
             if (SystemUtils.IS_OS_MAC_OSX) {
                 vmArgs.remove("-XstartOnFirstThread")
             }
+            vmArgs.add("-Xmx4G")
         }
         "server" {
             isIdeConfigGenerated = false

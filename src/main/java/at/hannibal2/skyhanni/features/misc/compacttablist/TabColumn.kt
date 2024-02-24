@@ -1,7 +1,7 @@
 package at.hannibal2.skyhanni.features.misc.compacttablist
 
-
 class TabColumn(val columnTitle: String) {
+
     val lines = mutableListOf<String>()
     val sections = mutableListOf<TabSection>()
 

@@ -13,6 +13,7 @@ import net.minecraftforge.event.entity.EntityJoinWorldEvent
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
 class FishingHookDisplay {
+
     private val config get() = SkyHanniMod.feature.fishing.fishingHookDisplay
     private var armorStand: EntityArmorStand? = null
     private val potentionArmorStands = mutableListOf<EntityArmorStand>()
@@ -85,5 +86,5 @@ class FishingHookDisplay {
         return pattern.matcher(name).matches()
     }
 
-    fun isEnabled() = LorenzUtils.inSkyBlock && config.enabled && FishingAPI.hasFishingRodInHand()
+    fun isEnabled() = LorenzUtils.inSkyBlock && config.enabled && FishingAPI.holdingRod
 }
