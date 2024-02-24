@@ -90,7 +90,7 @@ object GardenCropMilestones {
     }
 
     @SubscribeEvent
-    fun onCropMilestoneOverflowLevelUpEvent(event: CropMilestoneOverflowLevelUpEvent) {
+    fun onCropMilestoneOverflowLevelUp(event: CropMilestoneOverflowLevelUpEvent) {
         val crop = event.cropType
         val oldLevel = event.oldLevel
         val newLevel = event.newLevel

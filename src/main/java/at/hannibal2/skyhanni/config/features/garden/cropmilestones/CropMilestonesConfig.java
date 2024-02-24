@@ -43,11 +43,6 @@ public class CropMilestonesConfig {
     public static class Overflow {
 
         @Expose
-        @ConfigOption(name = "", desc = "Maybe i forgot something idk")
-        @ConfigEditorInfoText
-        public boolean unused = false;
-
-        @Expose
         @ConfigOption(name = "Display", desc = "Overflow in display.")
         @ConfigEditorBoolean
         public boolean display = false;

@@ -22,8 +22,8 @@ object FarmingMilestoneCommand {
             return
         }
 
-        val currentMilestone = getValidNumber(current)
-        val targetMilestone = getValidNumber(target)
+        val currentMilestone = current?.toIntOrNull()
+        val targetMilestone = target?.toIntOrNull()
 
         if (currentMilestone == null) {
             val currentProgress = enteredCrop.getCounter()
@@ -70,7 +70,7 @@ object FarmingMilestoneCommand {
             return
         }
 
-        val targetLevel = getValidNumber(target)
+        val targetLevel = target?.toIntOrNull()
         if (targetLevel == null) {
             ChatUtils.userError("$target is not a valid number.")
             return
@@ -93,8 +93,6 @@ object FarmingMilestoneCommand {
             )
         } else listOf()
     }
-
-    private fun getValidNumber(entry: String?) = entry?.toIntOrNull()
 
     private fun Long.formatOutput(needsTime: Boolean, crop: CropType): String {
         if (!needsTime) return "${this.addSeparators()} §a${crop.cropName}"
