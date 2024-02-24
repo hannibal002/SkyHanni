@@ -331,6 +331,9 @@ object SkillAPI {
             when (first) {
                 "skillgoal" -> {
                     ChatUtils.chat("§bSkill Custom Goal Level")
+                    if (storage?.isEmpty() == true) {
+                        ChatUtils.chat("§cYou haven't set any custom goal yet!")
+                    }
                     storage?.filter { it.value.customGoalLevel != 0 }?.forEach { (skill, data) ->
                         ChatUtils.chat("§e${skill.displayName}: §b${data.customGoalLevel}")
                     }
@@ -411,10 +414,10 @@ object SkillAPI {
 
     private fun commandHelp() {
         ChatUtils.chat("", false)
-        ChatUtils.chat("/shskills levelwithxp <currentXP> - Get a level with the given current XP.")
-        ChatUtils.chat("/shskills xpforlevel <desiredLevel> - Get how much XP you need for a desired level.")
-        ChatUtils.chat("/shskills skillgoal - View your current goal")
-        ChatUtils.chat("/shskills skillgoal <skill> <level> - Define your goal for <skill>")
+        ChatUtils.chat("§6/shskills levelwithxp <currentXP> - §bGet a level with the given current XP.", false)
+        ChatUtils.chat("§6/shskills xpforlevel <desiredLevel> - §bGet how much XP you need for a desired level.", false)
+        ChatUtils.chat("§6/shskills skillgoal - §bView your current goal", false)
+        ChatUtils.chat("§6/shskills skillgoal <skill> <level> - §bDefine your goal for <skill>", false)
         ChatUtils.chat("", false)
     }
 
@@ -428,7 +431,8 @@ object SkillAPI {
         @Expose var overflowTotalXp: Long = 0,
         @Expose var overflowCurrentXpMax: Long = 0,
         @Expose var lastGain: String = "",
-        @Expose var customGoalLevel: Int = 0)
+        @Expose var customGoalLevel: Int = 0,
+    )
 
     data class SkillXPInfo(
         var lastTotalXp: Float = 0f,
@@ -440,6 +444,6 @@ object SkillAPI {
         var isActive: Boolean = false,
         var lastUpdate: SimpleTimeMark = SimpleTimeMark.farPast(),
         var timeActive: Long = 0L,
-        var shouldStartTimer: Boolean = true
+        var shouldStartTimer: Boolean = true,
     )
 }

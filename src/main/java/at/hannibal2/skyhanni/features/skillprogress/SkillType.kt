@@ -8,14 +8,14 @@ import net.minecraft.item.Item
 import net.minecraft.item.ItemStack
 
 enum class SkillType(val displayName: String, icon: Item) {
-    ALCHEMY("Alchemy", Items.brewing_stand),
-    CARPENTRY("Carpentry", Blocks.crafting_table),
     COMBAT("Combat", Items.golden_sword),
-    ENCHANTING("Enchanting", Blocks.enchanting_table),
     FARMING("Farming", Items.golden_hoe),
     FISHING("Fishing", Items.fishing_rod),
-    FORAGING("Foraging", Items.golden_axe),
     MINING("Mining", Items.golden_pickaxe),
+    FORAGING("Foraging", Items.golden_axe),
+    ENCHANTING("Enchanting", Blocks.enchanting_table),
+    ALCHEMY("Alchemy", Items.brewing_stand),
+    CARPENTRY("Carpentry", Blocks.crafting_table),
     TAMING("Taming", Items.spawn_egg),
     ;
 

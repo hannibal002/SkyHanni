@@ -32,11 +32,11 @@ import at.hannibal2.skyhanni.utils.TimeUnit
 import at.hannibal2.skyhanni.utils.TimeUtils.format
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 import at.hannibal2.skyhanni.utils.renderables.Renderable.Companion.horizontalContainer
-import io.github.moulberry.notenoughupdates.util.Utils
 import net.minecraftforge.fml.common.eventhandler.EventPriority
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import java.awt.Color
 import kotlin.math.ceil
+import kotlin.time.Duration.Companion.milliseconds
 import kotlin.time.Duration.Companion.seconds
 
 object SkillProgress {
@@ -91,7 +91,8 @@ object SkillProgress {
 
             SkillProgressConfig.TextAlignment.CENTERED,
             SkillProgressConfig.TextAlignment.LEFT,
-            SkillProgressConfig.TextAlignment.RIGHT -> {
+            SkillProgressConfig.TextAlignment.RIGHT,
+            -> {
                 config.displayPosition.renderRenderables(
                     listOf(Renderable.fixedSizeLine(horizontalContainer(display, horizontalAlign = textAlignment.alignment), maxWidth)),
                     posLabel = "Skill Progress")
@@ -271,7 +272,7 @@ object SkillProgress {
                 else
                     Quad(skillInfo.level, skillInfo.currentXp, skillInfo.currentXpMax, skillInfo.totalXp)
 
-            this[skill] =  if (level == -1) {
+            this[skill] = if (level == -1) {
                 Renderable.clickAndHover(
                     "§cOpen your skills menu !",
                     listOf("§eClick here to execute §6/skills"),
@@ -284,7 +285,7 @@ object SkillProgress {
                     add("§6Needed XP: §b${currentXpMax.addSeparators()}")
                     add("§6Total XP: §b${totalXp.addSeparators()}")
                 }
-                val nameColor = if (skill == activeSkill) "§e" else "§6"
+                val nameColor = if (skill == activeSkill) "§2" else "§a"
                 Renderable.hoverTips(buildString {
                     append("$nameColor${skill.displayName} $level ")
                     append("§7(")
@@ -320,10 +321,8 @@ object SkillProgress {
             }
         }
 
-        add(Renderable.string(buildString {
-            append("§6Skill: §7${activeSkill.displayName} ")
-            if (useCustomGoalLevel && targetLevel != 0) append("§8$level➜§3${targetLevel}") else append(level)
-        }))
+        add(Renderable.string("§6Skill: §a${activeSkill.displayName} §8$level➜§3$targetLevel"))
+
         if (useCustomGoalLevel)
             add(Renderable.string("§7Needed XP: §e${remaining.addSeparators()}"))
 
@@ -331,7 +330,9 @@ object SkillProgress {
         if (xpInfo.xpGainHour < 1000) {
             add(Renderable.string("§7In §cN/A"))
         } else {
-            add(Renderable.string("§7In §b${Utils.prettyTime((remaining) * 1000 * 60 * 60 / xpInterp.toLong())} " +
+            val duration = ((remaining) * 1000 * 60 * 60 / xpInterp.toLong()).milliseconds
+            val format = duration.format(TimeUnit.DAY)
+            add(Renderable.string("§7In §b$format " +
                 if (xpInfo.isActive) "" else "§c(PAUSED)"))
         }
 

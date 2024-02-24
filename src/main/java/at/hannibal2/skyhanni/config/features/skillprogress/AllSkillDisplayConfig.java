@@ -24,14 +24,14 @@ public class AllSkillDisplayConfig {
     @ConfigOption(name = "Text", desc = "Choose what skills you want to see in the display.")
     @ConfigEditorDraggableList
     public List<SkillType> skillEntryList = new ArrayList<>(Arrays.asList(
-       SkillType.ALCHEMY,
-       SkillType.CARPENTRY,
-       SkillType.COMBAT,
-       SkillType.ENCHANTING,
-       SkillType.FARMING,
-       SkillType.FISHING,
-       SkillType.FORAGING,
-       SkillType.MINING,
-       SkillType.TAMING
+        SkillType.COMBAT,
+        SkillType.FARMING,
+        SkillType.FISHING,
+        SkillType.MINING,
+        SkillType.FORAGING,
+        SkillType.ENCHANTING,
+        SkillType.ALCHEMY,
+        SkillType.CARPENTRY,
+        SkillType.TAMING
     ));
 }

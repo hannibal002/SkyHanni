@@ -88,7 +88,7 @@ public class SkillProgressConfig {
     public SkillProgressBarConfig skillProgressBarConfig = new SkillProgressBarConfig();
 
     @Expose
-    @Category(name = "OverFlow", desc = "Overflow Config.")
+    @Category(name = "Overflow", desc = "Overflow Config.")
     public SkillOverflowConfig overflowConfig = new SkillOverflowConfig();
 
     @Expose
