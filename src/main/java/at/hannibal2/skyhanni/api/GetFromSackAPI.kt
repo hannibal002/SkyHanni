@@ -10,6 +10,7 @@ import at.hannibal2.skyhanni.events.LorenzToolTipEvent
 import at.hannibal2.skyhanni.events.MessageSendToServerEvent
 import at.hannibal2.skyhanni.events.RepositoryReloadEvent
 import at.hannibal2.skyhanni.features.commands.tabcomplete.GetFromSacksTabComplete
+import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.ChatUtils.isCommand
 import at.hannibal2.skyhanni.utils.ChatUtils.senderIsSkyhanni
@@ -26,7 +27,6 @@ import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraft.inventory.Slot
-import net.minecraftforge.fml.common.eventhandler.EventPriority
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import java.util.Deque
 import java.util.LinkedList
@@ -118,7 +118,7 @@ object GetFromSackAPI {
         }
     }
 
-    @SubscribeEvent(priority = EventPriority.LOW)
+    @SubscribeEvent
     fun onMessageToServer(event: MessageSendToServerEvent) {
         if (!LorenzUtils.inSkyBlock) return
         if (!config.queuedGFS && !config.bazaarGFS) return
@@ -127,11 +127,11 @@ object GetFromSackAPI {
         queuedHandler(replacedEvent)
         bazaarHandler(replacedEvent)
         if (replacedEvent.isCanceled) {
-            event.isCanceled
+            event.isCanceled = true
             return
         }
         if (replacedEvent !== event) {
-            event.isCanceled
+            event.isCanceled = true
             ChatUtils.sendMessageToServer(replacedEvent.message)
         }
     }
@@ -147,6 +147,7 @@ object GetFromSackAPI {
             CommandResult.WRONG_ARGUMENT -> ChatUtils.userError("Missing arguments! Usage: /getfromsacks <name/id> <amount>")
             CommandResult.WRONG_IDENTIFIER -> ChatUtils.userError("Couldn't find an item with this name or identifier!")
             CommandResult.WRONG_AMOUNT -> ChatUtils.userError("Invalid amount!")
+            CommandResult.INTERNAL_ERROR -> {}
         }
         event.isCanceled = true
     }
@@ -177,7 +178,15 @@ object GetFromSackAPI {
 
         val item = when {
             sackListInternalNames.contains(itemString) -> itemString.asInternalName()
-            sackListNames.contains(itemString) -> NEUInternalName.fromItemName(itemString)
+            sackListNames.contains(itemString) -> NEUInternalName.fromItemNameOrNull(itemString) ?: run {
+                ErrorManager.logErrorStateWithData(
+                    "Couldn't resolve item name",
+                    "Query failed",
+                    "itemName" to itemString
+                )
+                return CommandResult.INTERNAL_ERROR to null
+            }
+
             else -> return CommandResult.WRONG_IDENTIFIER to null
         }
 
@@ -208,7 +217,8 @@ object GetFromSackAPI {
         VALID,
         WRONG_ARGUMENT,
         WRONG_IDENTIFIER,
-        WRONG_AMOUNT
+        WRONG_AMOUNT,
+        INTERNAL_ERROR
     }
 
     @SubscribeEvent
