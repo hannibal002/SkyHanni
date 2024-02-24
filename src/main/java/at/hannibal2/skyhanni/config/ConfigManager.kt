@@ -67,8 +67,7 @@ class ConfigManager {
                 }
 
                 override fun read(reader: JsonReader): LorenzVec {
-                    val (x, y, z) = reader.nextString().split(":").map { it.toDouble() }
-                    return LorenzVec(x, y, z)
+                    return LorenzVec.decodeFromString(reader.nextString())
                 }
             }.nullSafe())
             .registerTypeAdapter(TrophyRarity::class.java, object : TypeAdapter<TrophyRarity>() {

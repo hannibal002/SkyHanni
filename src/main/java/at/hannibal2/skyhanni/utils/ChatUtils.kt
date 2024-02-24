@@ -67,7 +67,7 @@ object ChatUtils {
      */
     @Deprecated(
         "Do not send the user a non clickable non stacktrace containing error message.",
-        ReplaceWith("ErrorManager.logErrorStateWithData")
+        ReplaceWith("ErrorManager.logErrorStateWithData(message)")
     )
     fun error(message: String) {
         println("error: '$message'")
@@ -208,6 +208,9 @@ object ChatUtils {
     }
 
     fun sendCommandToServer(command: String) {
+        if (command.startsWith("/")) {
+            debug("Sending wrong command to server? ($command)")
+        }
         sendMessageToServer("/$command")
     }
 

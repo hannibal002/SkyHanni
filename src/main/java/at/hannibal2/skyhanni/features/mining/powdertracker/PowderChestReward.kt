@@ -13,7 +13,7 @@ enum class PowderChestReward(val displayName: String, pattern: String) {
     ),
     FLAWED_RUBY_GEMSTONE(
         "§aFlawed Sapphire Gemstone",
-        "§aYou received §r§f(?<amount>.*) §r§a❤ Flawed RubyGemstone§r§a."
+        "§aYou received §r§f(?<amount>.*) §r§a❤ Flawed Ruby Gemstone§r§a."
     ),
     FINE_RUBY_GEMSTONE(
         "§9Fine Ruby Gemstone",

@@ -3,11 +3,13 @@ package at.hannibal2.skyhanni.features.misc.items
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.config.ConfigManager
 import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
+import at.hannibal2.skyhanni.data.jsonobjects.repo.ItemsJson
 import at.hannibal2.skyhanni.events.ConfigLoadEvent
 import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.InventoryCloseEvent
 import at.hannibal2.skyhanni.events.LorenzToolTipEvent
 import at.hannibal2.skyhanni.events.RenderItemTooltipEvent
+import at.hannibal2.skyhanni.events.RepositoryReloadEvent
 import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.CollectionUtils.addAsSingletonList
@@ -16,6 +18,7 @@ import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalNameOrNull
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.ItemUtils.isRune
+import at.hannibal2.skyhanni.utils.ItemUtils.itemName
 import at.hannibal2.skyhanni.utils.ItemUtils.name
 import at.hannibal2.skyhanni.utils.KeyboardManager.isKeyHeld
 import at.hannibal2.skyhanni.utils.LorenzUtils
@@ -26,7 +29,6 @@ import at.hannibal2.skyhanni.utils.NumberUtil
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.RenderUtils.renderStringsAndItems
 import com.google.gson.reflect.TypeToken
-import io.github.moulberry.notenoughupdates.events.RepositoryReloadEvent
 import io.github.moulberry.notenoughupdates.profileviewer.GuiProfileViewer
 import net.minecraft.client.Minecraft
 import net.minecraft.init.Items
@@ -42,12 +44,13 @@ object EstimatedItemValue {
     private val cache = mutableMapOf<ItemStack, List<List<Any>>>()
     private var lastToolTipTime = 0L
     var gemstoneUnlockCosts = HashMap<NEUInternalName, HashMap<String, List<String>>>()
+    var bookBundleAmount = mapOf<String, Int>()
     private var currentlyShowing = false
 
     fun isCurrentlyShowing() = currentlyShowing && Minecraft.getMinecraft().currentScreen != null
 
     @SubscribeEvent
-    fun onRepoReload(event: RepositoryReloadEvent) {
+    fun onRepoReload(event: io.github.moulberry.notenoughupdates.events.RepositoryReloadEvent) {
         val data = manager.getJsonFromFile(File(manager.repoLocation, "constants/gemstonecosts.json"))
 
         if (data != null)
@@ -59,6 +62,12 @@ object EstimatedItemValue {
                 )
         else
             ChatUtils.error("Gemstone Slot Unlock Costs failed to load!")
+    }
+
+    @SubscribeEvent
+    fun onRepoReload(event: RepositoryReloadEvent) {
+        val data = event.getConstant<ItemsJson>("Items")
+        bookBundleAmount = data.book_bundle_amount ?: error("book_bundle_amount is missing")
     }
 
     @SubscribeEvent
@@ -132,9 +141,8 @@ object EstimatedItemValue {
     }
 
     private fun updateItem(item: ItemStack) {
-        val oldData = cache[item]
-        if (oldData != null) {
-            display = oldData
+        cache[item]?.let {
+            display = it
             lastToolTipTime = System.currentTimeMillis()
             return
         }
@@ -155,9 +163,10 @@ object EstimatedItemValue {
             draw(item)
         } catch (e: Exception) {
             ErrorManager.logErrorWithData(
-                e, "Error calculating Estimated Item Value",
+                e, "Error in Estimated Item Value renderer",
                 "openInventoryName" to openInventoryName,
-                "item name" to item.name,
+                "item" to item,
+                "item name" to item.itemName,
                 "internal name" to item.getInternalNameOrNull(),
                 "lore" to item.getLore(),
             )

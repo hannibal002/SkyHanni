@@ -490,7 +490,7 @@ object ComposterOverlay {
         val sackStatus = sackItem.getStatus()
 
         if (sackStatus == SackStatus.MISSING || sackStatus == SackStatus.OUTDATED) {
-            LorenzUtils.sendCommandToServer("gfs ${internalName.asString()} ${itemsNeeded - having}")
+            ChatUtils.sendCommandToServer("gfs ${internalName.asString()} ${itemsNeeded - having}")
             // TODO Add sack type repo data
 
             val isDwarvenMineable =
@@ -512,7 +512,7 @@ object ComposterOverlay {
             return
         }
 
-        LorenzUtils.sendCommandToServer("gfs ${internalName.asString()} ${itemsNeeded - having}")
+        ChatUtils.sendCommandToServer("gfs ${internalName.asString()} ${itemsNeeded - having}")
         if (amountInSacks <= itemsNeeded - having) {
             if (LorenzUtils.noTradeMode) {
                 ChatUtils.chat("You're out of $itemName §ein your sacks!")

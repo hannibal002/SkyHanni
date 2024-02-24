@@ -6,7 +6,7 @@ import at.hannibal2.skyhanni.config.features.garden.MoneyPerHourConfig.CustomFor
 import at.hannibal2.skyhanni.events.GardenToolChangeEvent
 import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.LorenzTickEvent
-import at.hannibal2.skyhanni.events.PreProfileSwitchEvent
+import at.hannibal2.skyhanni.events.ProfileJoinEvent
 import at.hannibal2.skyhanni.features.bazaar.BazaarApi.Companion.getBazaarData
 import at.hannibal2.skyhanni.features.bazaar.BazaarApi.Companion.isBazaarItem
 import at.hannibal2.skyhanni.features.bazaar.BazaarData
@@ -60,7 +60,7 @@ object CropMoneyDisplay {
     private val toolHasBountiful get() = GardenAPI.storage?.toolWithBountiful
 
     @SubscribeEvent
-    fun onPreProfileSwitch(event: PreProfileSwitchEvent) {
+    fun onProfileJoin(event: ProfileJoinEvent) {
         display = emptyList()
     }
 
