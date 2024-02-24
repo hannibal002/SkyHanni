@@ -15,8 +15,12 @@ import at.hannibal2.skyhanni.utils.CollectionUtils.addAsSingletonList
 import at.hannibal2.skyhanni.utils.CollectionUtils.addOrPut
 import at.hannibal2.skyhanni.utils.ConditionalUtils.afterChange
 import at.hannibal2.skyhanni.utils.ConfigUtils
+import at.hannibal2.skyhanni.utils.InventoryUtils
+import at.hannibal2.skyhanni.utils.ItemCategory
+import at.hannibal2.skyhanni.utils.ItemCategory.Companion.containsItem
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalNameOrNull
 import at.hannibal2.skyhanni.utils.LorenzUtils
+import at.hannibal2.skyhanni.utils.LorenzUtils.isInIsland
 import at.hannibal2.skyhanni.utils.NEUItems.getNpcPriceOrNull
 import at.hannibal2.skyhanni.utils.NEUItems.getPriceOrNull
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
@@ -62,9 +66,8 @@ object EnderNodeTracker {
 
     @SubscribeEvent
     fun onChat(event: LorenzChatEvent) {
-        if (!config.enabled) return
+        if (!isEnabled()) return
         if (!ProfileStorageData.loaded) return
-        if (!isInTheEnd()) return
 
         // don't call removeColor because we want to distinguish enderman pet rarity
         val message = event.message.trim()
@@ -102,8 +105,7 @@ object EnderNodeTracker {
 
     @SubscribeEvent
     fun onIslandChange(event: IslandChangeEvent) {
-        if (!config.enabled) return
-        if (event.newIsland != IslandType.THE_END) return
+        if (!isEnabled()) return
         miteGelInInventory = Minecraft.getMinecraft().thePlayer.inventory.mainInventory
             .filter { it?.getInternalNameOrNull() == EnderNode.MITE_GEL.internalName }
             .sumOf { it.stackSize }
@@ -111,9 +113,8 @@ object EnderNodeTracker {
 
     @SubscribeEvent
     fun onSackChange(event: SackChangeEvent) {
-        if (!config.enabled) return
+        if (!isEnabled()) return
         if (!ProfileStorageData.loaded) return
-        if (!isInTheEnd()) return
 
         val change = event.sackChanges
             .firstOrNull { it.internalName == EnderNode.MITE_GEL.internalName && it.delta > 0 }
@@ -126,8 +127,7 @@ object EnderNodeTracker {
 
     @SubscribeEvent
     fun onInventoryUpdate(event: OwnInventoryItemUpdateEvent) {
-        if (!config.enabled) return
-        if (!isInTheEnd()) return
+        if (!isEnabled()) return
         if (!ProfileStorageData.loaded) return
 
         val newMiteGelInInventory = Minecraft.getMinecraft().thePlayer.inventory.mainInventory
@@ -144,8 +144,7 @@ object EnderNodeTracker {
 
     @SubscribeEvent
     fun onRenderOverlay(event: GuiRenderEvent) {
-        if (!config.enabled) return
-        if (!isInTheEnd()) return
+        if (!isEnabled()) return
 
         tracker.renderDisplay(config.position)
     }
@@ -184,7 +183,10 @@ object EnderNodeTracker {
         return newProfit
     }
 
-    private fun isInTheEnd() = LorenzUtils.skyBlockArea == "The End"
+    private fun isEnabled() = IslandType.THE_END.isInIsland() && config.enabled &&
+        (!config.onlyPickaxe || hasItemInHand())
+
+    private fun hasItemInHand() = ItemCategory.miningTools.containsItem(InventoryUtils.getItemInHand())
 
     private fun isEnderArmor(displayName: EnderNode) = when (displayName) {
         EnderNode.END_HELMET,

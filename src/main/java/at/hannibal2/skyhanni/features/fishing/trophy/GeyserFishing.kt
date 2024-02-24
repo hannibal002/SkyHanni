@@ -4,9 +4,11 @@ import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.events.FishingBobberCastEvent
 import at.hannibal2.skyhanni.events.LorenzRenderWorldEvent
+import at.hannibal2.skyhanni.events.LorenzTickEvent
 import at.hannibal2.skyhanni.events.LorenzWorldChangeEvent
 import at.hannibal2.skyhanni.events.ReceiveParticleEvent
 import at.hannibal2.skyhanni.utils.LocationUtils.distanceTo
+import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils.isInIsland
 import at.hannibal2.skyhanni.utils.LorenzVec
 import at.hannibal2.skyhanni.utils.RenderUtils.drawFilledBoundingBox_nea
@@ -27,7 +29,8 @@ class GeyserFishing {
 
     @SubscribeEvent(priority = EventPriority.LOW, receiveCanceled = true)
     fun onReceiveParticle(event: ReceiveParticleEvent) {
-        if (!shouldProcessParticles() || event.type != EnumParticleTypes.CLOUD) return
+        if (!shouldProcessParticles()) return
+        if (event.type != EnumParticleTypes.CLOUD || event.count != 15 || event.speed != 0.05f || event.offset != LorenzVec(0.1f, 0.6f, 0.1f)) return
 
         geyser = event.location
         val potentialGeyser = geyser ?: return
@@ -55,6 +58,16 @@ class GeyserFishing {
     }
 
     @SubscribeEvent
+    fun onTick(event: LorenzTickEvent) {
+        if (!shouldProcessParticles()) return
+        val bobber = bobber ?: return
+        if (bobber.isDead) {
+            this.bobber = null
+            return
+        }
+    }
+
+    @SubscribeEvent
     fun onRenderWorld(event: LorenzRenderWorldEvent) {
         if (!config.drawBox || !IslandType.CRIMSON_ISLE.isInIsland()) return
         val geyserBox = geyserBox ?: return
@@ -71,5 +84,5 @@ class GeyserFishing {
         }
     }
 
-    private fun shouldProcessParticles() = IslandType.CRIMSON_ISLE.isInIsland() && (config.hideParticles || config.drawBox)
+    private fun shouldProcessParticles() = IslandType.CRIMSON_ISLE.isInIsland() && LorenzUtils.skyBlockArea == "Blazing Volcano" && (config.hideParticles || config.drawBox)
 }

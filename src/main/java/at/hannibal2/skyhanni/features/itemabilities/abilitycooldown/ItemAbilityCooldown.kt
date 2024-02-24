@@ -2,8 +2,10 @@ package at.hannibal2.skyhanni.features.itemabilities.abilitycooldown
 
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.data.ItemRenderBackground.Companion.background
+import at.hannibal2.skyhanni.events.ActionBarUpdateEvent
 import at.hannibal2.skyhanni.events.ConfigLoadEvent
 import at.hannibal2.skyhanni.events.ItemClickEvent
+import at.hannibal2.skyhanni.events.LorenzChatEvent
 import at.hannibal2.skyhanni.events.LorenzTickEvent
 import at.hannibal2.skyhanni.events.LorenzWorldChangeEvent
 import at.hannibal2.skyhanni.events.RenderItemTipEvent
@@ -190,30 +192,24 @@ class ItemAbilityCooldown {
     }
 
 //     @SubscribeEvent
-//     fun onActionBar(event: LorenzActionBarEvent) {
+//     fun onActionBarUpdate(event: ActionBarUpdateEvent) {
 //         if (!isEnabled()) return
 //
-//         val message = event.message
+//         val message: String = event.actionBar
 //         handleOldAbilities(message)
 //
 //         when {
 //             message.contains("§lCASTING IN ") -> {
-//                 if (!ItemAbilityType.RAGNAROCK_AXE.isOnCooldown()) {
-//                     ItemAbilityType.RAGNAROCK_AXE.activate(LorenzColor.WHITE, 3.seconds)
+//                 if (!ItemAbility.RAGNAROCK_AXE.isOnCooldown()) {
+//                     ItemAbility.RAGNAROCK_AXE.activate(LorenzColor.WHITE, 3_000)
 //                 }
 //             }
 //
 //             message.contains("§lCASTING") -> {
-//                 if (ItemAbilityType.RAGNAROCK_AXE.specialColor != LorenzColor.DARK_PURPLE) {
-//                     ItemAbilityType.RAGNAROCK_AXE.activate(LorenzColor.DARK_PURPLE, 10.seconds)
+//                 if (ItemAbility.RAGNAROCK_AXE.specialColor != LorenzColor.DARK_PURPLE) {
+//                     ItemAbility.RAGNAROCK_AXE.activate(LorenzColor.DARK_PURPLE, 10_000)
 //                 }
 //             }
-//
-//             message.contains("§c§lCANCELLED") -> {
-//                 ItemAbilityType.RAGNAROCK_AXE.activate(null, 17.seconds)
-//             }
-//         }
-//     }
 
 //     private fun handleOldAbilities(message: String) {
 //         // TODO use regex

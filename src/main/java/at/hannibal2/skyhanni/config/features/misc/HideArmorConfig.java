@@ -10,7 +10,7 @@ public class HideArmorConfig {
 
     @Expose
     @ConfigOption(name = "Mode", desc = "Hide the armor of players.")
-    @ConfigEditorDropdown()
+    @ConfigEditorDropdown
     public ModeEntry mode = ModeEntry.OFF;
 
     public enum ModeEntry implements HasLegacyId {
@@ -44,7 +44,7 @@ public class HideArmorConfig {
 
     @Expose
     @ConfigOption(name = "Only Helmet", desc = "Only hide the helmet.")
-    @ConfigEditorBoolean()
+    @ConfigEditorBoolean
     public Boolean onlyHelmet = false;
 
 }

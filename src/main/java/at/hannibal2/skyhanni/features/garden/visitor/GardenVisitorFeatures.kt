@@ -10,7 +10,7 @@ import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.LorenzChatEvent
 import at.hannibal2.skyhanni.events.LorenzTickEvent
 import at.hannibal2.skyhanni.events.OwnInventoryItemUpdateEvent
-import at.hannibal2.skyhanni.events.PreProfileSwitchEvent
+import at.hannibal2.skyhanni.events.ProfileJoinEvent
 import at.hannibal2.skyhanni.events.SackDataUpdateEvent
 import at.hannibal2.skyhanni.events.garden.visitor.VisitorAcceptEvent
 import at.hannibal2.skyhanni.events.garden.visitor.VisitorAcceptedEvent
@@ -33,9 +33,9 @@ import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.ItemBlink
 import at.hannibal2.skyhanni.utils.ItemUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName
-import at.hannibal2.skyhanni.utils.ItemUtils.getItemName
-import at.hannibal2.skyhanni.utils.ItemUtils.getItemNameOrNull
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
+import at.hannibal2.skyhanni.utils.ItemUtils.itemName
+import at.hannibal2.skyhanni.utils.ItemUtils.itemNameWithoutColor
 import at.hannibal2.skyhanni.utils.ItemUtils.name
 import at.hannibal2.skyhanni.utils.LorenzLogger
 import at.hannibal2.skyhanni.utils.LorenzUtils
@@ -100,7 +100,7 @@ class GardenVisitorFeatures {
     private var lastFullPrice = 0.0
 
     @SubscribeEvent
-    fun onPreProfileSwitch(event: PreProfileSwitchEvent) {
+    fun onProfileJoin(event: ProfileJoinEvent) {
         display = emptyList()
     }
 
@@ -179,7 +179,7 @@ class GardenVisitorFeatures {
             var totalPrice = 0.0
             addAsSingletonList("§7Visitor Shopping List:")
             for ((internalName, amount) in shoppingList) {
-                val name = internalName.getItemName()
+                val name = internalName.itemName
                 val itemStack = internalName.getItemStack()
 
                 val list = mutableListOf<Any>()
@@ -410,7 +410,7 @@ class GardenVisitorFeatures {
             if (!readingShoppingList) continue
             val multiplier = NEUItems.getMultiplier(internalName)
 
-            val rawName = multiplier.first.getItemNameOrNull()?.removeColor() ?: continue
+            val rawName = multiplier.first.itemNameWithoutColor
             val cropType = getByNameOrNull(rawName) ?: continue
 
             val cropAmount = multiplier.second.toLong() * amount

@@ -3,6 +3,8 @@ package at.hannibal2.skyhanni.utils
 import java.text.NumberFormat
 import java.util.Locale
 import java.util.TreeMap
+import kotlin.math.max
+import kotlin.math.min
 import kotlin.math.pow
 import kotlin.math.roundToInt
 
@@ -90,7 +92,7 @@ object NumberUtil {
 
     fun Number.ordinal(): String {
         val long = this.toLong()
-        if (long % 100 in 11..13) return "th"
+        if (long % 100 in 11 .. 13) return "th"
         return when (long % 10) {
             1L -> "st"
             2L -> "nd"
@@ -177,7 +179,7 @@ object NumberUtil {
     }
 
     fun percentageColor(have: Long, max: Long): LorenzColor {
-        val percentage = have.toDouble() / max.toDouble()
+        val percentage = have.fractionOf(max)
         return when {
             percentage > 0.9 -> LorenzColor.DARK_GREEN
             percentage > 0.75 -> LorenzColor.GREEN
@@ -187,7 +189,10 @@ object NumberUtil {
         }
     }
 
-    fun String.formatNumber(): Long {
+    // TODO create new function formatLong, and eventually deprecate this function.
+    fun String.formatNumber(): Long = formatDouble().toLong()
+
+    fun String.formatDouble(): Double {
         var text = lowercase().replace(",", "")
 
         val multiplier = if (text.endsWith("k")) {
@@ -201,10 +206,26 @@ object NumberUtil {
             1.bilion
         } else 1.0
         val d = text.toDouble()
-        return (d * multiplier).toLong()
+        return d * multiplier
     }
 
     val Int.milion get() = this * 1_000_000.0
     private val Int.bilion get() = this * 1_000_000_000.0
     val Double.milion get() = (this * 1_000_000.0).toLong()
+
+    /** @return clamped to [0.0, 1.0]**/
+    fun Number.fractionOf(maxValue: Number) = maxValue.toDouble().takeIf { it != 0.0 }?.let { max ->
+        this.toDouble() / max
+    }?.coerceIn(0.0, 1.0) ?: 1.0
+
+    fun interpolate(now: Float, last: Float, lastUpdate: Long): Float {
+        var interp = now
+        if (last >= 0 && last != now) {
+            var factor: Float = (SimpleTimeMark.now().toMillis() - lastUpdate) / 1000f
+            factor = factor.coerceIn(0f, 1f)
+            interp = last + (now - last) * factor
+        }
+        return interp
+    }
+
 }
