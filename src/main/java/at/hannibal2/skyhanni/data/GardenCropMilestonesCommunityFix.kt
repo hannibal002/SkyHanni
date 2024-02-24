@@ -91,10 +91,7 @@ object GardenCropMilestonesCommunityFix {
 //         debug("crop: $crop")
 //         debug("realTier: $realTier")
 
-        val guessNextMax = GardenCropMilestones.getCropsForTier(
-            realTier + 1,
-            crop
-        ) - GardenCropMilestones.getCropsForTier(realTier, crop)
+        val guessNextMax = GardenCropMilestones.getCropsForTier(realTier + 1, crop) - GardenCropMilestones.getCropsForTier(realTier, crop)
 //         debug("guessNextMax: ${guessNextMax.addSeparators()}")
         val nextMax = amountPattern.matchMatcher(next) {
             group("max").formatNumber()
@@ -163,13 +160,8 @@ object GardenCropMilestonesCommunityFix {
     }
 
     private fun tryFix(crop: CropType, tier: Int, amount: Int): Boolean {
-        val guessNextMax = GardenCropMilestones.getCropsForTier(tier + 1, crop) - GardenCropMilestones.getCropsForTier(
-            tier,
-            crop
-        )
-        if (guessNextMax.toInt() == amount) {
-            return false
-        }
+        val guessNextMax = GardenCropMilestones.getCropsForTier(tier + 1, crop) - GardenCropMilestones.getCropsForTier(tier, crop)
+        if (guessNextMax.toInt() == amount) return false
         GardenCropMilestones.cropMilestoneData = GardenCropMilestones.cropMilestoneData.editCopy {
             fix(crop, this, tier, amount)
         }

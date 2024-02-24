@@ -211,11 +211,11 @@ object GardenCropMilestones {
         return totalCrops
     }
 
-    fun CropType.progressToNextLevel(allowOverFlow: Boolean = false): Double {
+    fun CropType.progressToNextLevel(allowOverflow: Boolean = false): Double {
         val progress = getCounter()
-        val startTier = getTierForCropCount(progress, this, allowOverFlow)
-        val startCrops = getCropsForTier(startTier, this, allowOverFlow)
-        val end = getCropsForTier(startTier + 1, this, allowOverFlow)
+        val startTier = getTierForCropCount(progress, this, allowOverflow)
+        val startCrops = getCropsForTier(startTier, this, allowOverflow)
+        val end = getCropsForTier(startTier + 1, this, allowOverflow)
         return (progress - startCrops).toDouble() / (end - startCrops)
     }
 

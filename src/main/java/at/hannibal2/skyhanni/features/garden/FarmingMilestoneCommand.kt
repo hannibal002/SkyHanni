@@ -27,8 +27,8 @@ object FarmingMilestoneCommand {
 
         if (currentMilestone == null) {
             val currentProgress = enteredCrop.getCounter()
-            val currentCropMilestone = GardenCropMilestones.getTierForCropCount(currentProgress, enteredCrop, true) + 1
-            val cropsForTier = GardenCropMilestones.getCropsForTier(currentCropMilestone, enteredCrop, true)
+            val currentCropMilestone = GardenCropMilestones.getTierForCropCount(currentProgress, enteredCrop, allowOverflow = true) + 1
+            val cropsForTier = GardenCropMilestones.getCropsForTier(currentCropMilestone, enteredCrop, allowOverflow = true)
             val output = (cropsForTier - currentProgress).formatOutput(needsTime, enteredCrop)
 
             ChatUtils.chat("§7$output needed to reach the next milestone")
@@ -36,7 +36,7 @@ object FarmingMilestoneCommand {
         }
 
         if (targetMilestone == null) {
-            val cropsForTier = GardenCropMilestones.getCropsForTier(currentMilestone, enteredCrop, true)
+            val cropsForTier = GardenCropMilestones.getCropsForTier(currentMilestone, enteredCrop, allowOverflow = true)
             val output = cropsForTier.formatOutput(needsTime, enteredCrop)
 
             ChatUtils.chat("§7$output needed for milestone §7$currentMilestone")
@@ -48,8 +48,8 @@ object FarmingMilestoneCommand {
             return
         }
 
-        val currentAmount = GardenCropMilestones.getCropsForTier(currentMilestone, enteredCrop, true)
-        val targetAmount = GardenCropMilestones.getCropsForTier(targetMilestone, enteredCrop, true)
+        val currentAmount = GardenCropMilestones.getCropsForTier(currentMilestone, enteredCrop, allowOverflow = true)
+        val targetAmount = GardenCropMilestones.getCropsForTier(targetMilestone, enteredCrop, allowOverflow = true)
         println("current: $currentMilestone")
         println("target: $targetMilestone")
         val output = (targetAmount - currentAmount).formatOutput(needsTime, enteredCrop)
