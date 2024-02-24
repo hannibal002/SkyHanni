@@ -69,6 +69,8 @@ object SkillAPI {
     var exactLevelingMap = mapOf<Int, Int>()
     var levelingMap = mapOf<Int, Int>()
     var activeSkill: SkillType? = null
+
+    // TODO Use a map maxSkillLevel and move it into the repo
     val excludedSkills = listOf(
         SkillType.FORAGING,
         SkillType.FISHING,
