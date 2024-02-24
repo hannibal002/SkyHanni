@@ -77,4 +77,9 @@ object UtilsPatterns {
         "skyblocktime.season",
         "(?:Early |Late )?(?<season>Spring|Summer|Autumn|Winter)"
     )
+
+    val tabListProfilePattern by patternGroup.pattern(
+        "tablist.profile",
+        "§.§lProfile: §r§a(?<profile>.*)"
+    )
 }
