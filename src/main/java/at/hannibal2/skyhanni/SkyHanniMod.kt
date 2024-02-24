@@ -2,6 +2,7 @@ package at.hannibal2.skyhanni
 
 import at.hannibal2.skyhanni.api.CollectionAPI
 import at.hannibal2.skyhanni.api.DataWatcherAPI
+import at.hannibal2.skyhanni.api.SkillAPI
 import at.hannibal2.skyhanni.api.GetFromSackAPI
 import at.hannibal2.skyhanni.config.ConfigFileType
 import at.hannibal2.skyhanni.config.ConfigManager
@@ -284,6 +285,8 @@ import at.hannibal2.skyhanni.features.misc.items.EstimatedItemValue
 import at.hannibal2.skyhanni.features.misc.items.EstimatedWardrobePrice
 import at.hannibal2.skyhanni.features.misc.items.GlowingDroppedItems
 import at.hannibal2.skyhanni.features.misc.massconfiguration.DefaultConfigFeatures
+import at.hannibal2.skyhanni.features.skillprogress.SkillTooltip
+import at.hannibal2.skyhanni.features.skillprogress.SkillProgress
 import at.hannibal2.skyhanni.features.misc.teleportpad.TeleportPadCompactName
 import at.hannibal2.skyhanni.features.misc.teleportpad.TeleportPadInventoryNumber
 import at.hannibal2.skyhanni.features.misc.trevor.TrevorFeatures
@@ -473,6 +476,7 @@ class SkyHanniMod {
         loadModule(SackAPI)
         loadModule(BingoAPI)
         loadModule(FishingAPI)
+        loadModule(SkillAPI)
         loadModule(IsFishingDetection)
         loadModule(LorenzUtils)
         loadModule(NEUItems)
@@ -747,6 +751,8 @@ class SkyHanniMod {
         loadModule(SulphurSkitterBox())
         loadModule(HighlightInquisitors())
         loadModule(VerminTracker)
+        loadModule(SkillProgress)
+        loadModule(SkillTooltip())
         loadModule(QuiverNotification)
 
         init()
