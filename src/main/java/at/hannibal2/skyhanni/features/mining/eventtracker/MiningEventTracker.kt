@@ -4,7 +4,6 @@ import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.config.ConfigManager
 import at.hannibal2.skyhanni.data.BossbarData
 import at.hannibal2.skyhanni.data.HypixelData
-import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.data.ScoreboardData
 import at.hannibal2.skyhanni.events.BossbarUpdateEvent
 import at.hannibal2.skyhanni.events.LorenzChatEvent
@@ -12,8 +11,8 @@ import at.hannibal2.skyhanni.events.LorenzTickEvent
 import at.hannibal2.skyhanni.events.LorenzWorldChangeEvent
 import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.APIUtil
+import at.hannibal2.skyhanni.utils.LocationUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils
-import at.hannibal2.skyhanni.utils.LorenzUtils.isInIsland
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.TabListData
@@ -64,7 +63,7 @@ class MiningEventTracker {
 
     @SubscribeEvent
     fun onBossbarChange(event: BossbarUpdateEvent) {
-        if (!isEnabled()) return
+        if (!LocationUtils.inAdvancedMiningIsland()) return
         if (lastWorldSwitch.passedSince() < 2.seconds) return
         if (!eventEndTime.isInPast()) {
             return
@@ -80,7 +79,7 @@ class MiningEventTracker {
 
     @SubscribeEvent
     fun onChat(event: LorenzChatEvent) {
-        if (!isEnabled()) return
+        if (!LocationUtils.inAdvancedMiningIsland()) return
 
         eventStartedPattern.matchMatcher(event.message) {
             sendData(group("event"), null)
@@ -94,7 +93,7 @@ class MiningEventTracker {
     fun onTick(event: LorenzTickEvent) {
         if (!event.repeatSeconds(1)) return
         if (!config.enabled) return
-        if (!LorenzUtils.inSkyBlock || (!config.outsideMining && !isEnabled())) return
+        if (!LorenzUtils.inSkyBlock || (!config.outsideMining && !LocationUtils.inAdvancedMiningIsland())) return
         if (!canRequestAt.isInPast()) return
 
         fetchData()
@@ -182,6 +181,4 @@ class MiningEventTracker {
             MiningEventDisplay.updateData(miningEventData.data)
         }
     }
-
-    private fun isEnabled() = (IslandType.DWARVEN_MINES.isInIsland() || IslandType.CRYSTAL_HOLLOWS.isInIsland())
 }

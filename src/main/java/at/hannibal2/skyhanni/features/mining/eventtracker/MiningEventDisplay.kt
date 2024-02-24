@@ -34,28 +34,28 @@ object MiningEventDisplay {
     }
 
     private fun updateDisplay() {
-        val shouldShowDwarven = when {
-            config.showType == MiningEventConfig.ShowType.BOTH -> true
-            config.showType == MiningEventConfig.ShowType.DWARVEN -> true
-            config.showType == MiningEventConfig.ShowType.CURRENT && IslandType.DWARVEN_MINES.isInIsland() -> true
+        val shouldShowDwarven = when (config.showType) {
+            MiningEventConfig.ShowType.BOTH -> true
+            MiningEventConfig.ShowType.DWARVEN -> true
+            MiningEventConfig.ShowType.CURRENT -> IslandType.DWARVEN_MINES.isInIsland()
             else -> false
         }
-        val shouldShowCrystal = when {
-            config.showType == MiningEventConfig.ShowType.BOTH -> true
-            config.showType == MiningEventConfig.ShowType.CRYSTAL -> true
-            config.showType == MiningEventConfig.ShowType.CURRENT && IslandType.CRYSTAL_HOLLOWS.isInIsland() -> true
+        val shouldShowCrystal = when (config.showType) {
+            MiningEventConfig.ShowType.BOTH -> true
+            MiningEventConfig.ShowType.CRYSTAL -> true
+            MiningEventConfig.ShowType.CURRENT -> IslandType.CRYSTAL_HOLLOWS.isInIsland()
             else -> false
         }
 
         display.clear()
-        if (shouldShowDwarven) display.add("§aDwarven Mines: ${formUpcomingString(dwarvenEvents)}")
-        if (shouldShowCrystal) display.add("§aCrystal Hollows: ${formUpcomingString(crystalEvents)}")
+        if (shouldShowDwarven) display.add("§aDwarven Mines: ${dwarvenEvents.formatUpcomingEvents()}")
+        if (shouldShowCrystal) display.add("§aCrystal Hollows: ${crystalEvents.formatUpcomingEvents()}")
     }
 
-    private fun formUpcomingString(eventList: MutableList<RunningEvent>): String {
+    private fun MutableList<RunningEvent>.formatUpcomingEvents(): String {
         var output = ""
         var foundCount = 0
-        for (event in eventList) {
+        for (event in this) {
             val endsIn = event.endsAt.asTimeMark()
             if (endsIn.isInPast()) continue
 
@@ -86,9 +86,6 @@ object MiningEventDisplay {
         }
     }
 
-    private fun shouldDisplay(): Boolean {
-        if (!LorenzUtils.inSkyBlock || !config.enabled || ReminderUtils.isBusy()) return false
-        if (!config.outsideMining && !LocationUtils.inAdvancedMiningIsland()) return false
-        return true
-    }
+    private fun shouldDisplay() = LorenzUtils.inSkyBlock && config.enabled && !ReminderUtils.isBusy() &&
+        !(!config.outsideMining && !LocationUtils.inAdvancedMiningIsland())
 }
