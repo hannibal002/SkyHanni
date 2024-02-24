@@ -43,7 +43,13 @@ object NEUItems {
     private val ingredientsCache = mutableMapOf<NeuRecipe, Set<Ingredient>>()
 
     var allItemsCache = mapOf<String, NEUInternalName>() // item name -> internal name
-    var allInternalNames = mutableListOf<NEUInternalName>()
+    val allInternalNames: Collection<NEUInternalName>
+        get() {
+            if (allItemsCache.isEmpty()) {
+                allItemsCache = readAllNeuItems()
+            }
+            return allItemsCache.values
+        }
     val ignoreItemsFilter = MultiFilter()
 
     private val fallbackItem by lazy {
@@ -81,13 +87,11 @@ object NEUItems {
     }
 
     fun readAllNeuItems(): Map<String, NEUInternalName> {
-        allInternalNames.clear()
         val map = mutableMapOf<String, NEUInternalName>()
         for (rawInternalName in allNeuRepoItems().keys) {
             val name = manager.createItem(rawInternalName).displayName.removeColor().lowercase()
             val internalName = rawInternalName.asInternalName()
             map[name] = internalName
-            allInternalNames.add(internalName)
         }
         return map
     }
