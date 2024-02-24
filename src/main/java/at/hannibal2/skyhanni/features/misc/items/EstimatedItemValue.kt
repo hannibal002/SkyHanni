@@ -10,13 +10,16 @@ import at.hannibal2.skyhanni.events.InventoryCloseEvent
 import at.hannibal2.skyhanni.events.LorenzToolTipEvent
 import at.hannibal2.skyhanni.events.RenderItemTooltipEvent
 import at.hannibal2.skyhanni.events.RepositoryReloadEvent
+import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.CollectionUtils.addAsSingletonList
 import at.hannibal2.skyhanni.utils.ConditionalUtils.onToggle
 import at.hannibal2.skyhanni.utils.InventoryUtils
+import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalNameOrNull
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.ItemUtils.isRune
+import at.hannibal2.skyhanni.utils.ItemUtils.itemName
 import at.hannibal2.skyhanni.utils.ItemUtils.name
 import at.hannibal2.skyhanni.utils.KeyboardManager.isKeyHeld
 import at.hannibal2.skyhanni.utils.LorenzUtils
@@ -139,9 +142,8 @@ object EstimatedItemValue {
     }
 
     private fun updateItem(item: ItemStack) {
-        val oldData = cache[item]
-        if (oldData != null) {
-            display = oldData
+        cache[item]?.let {
+            display = it
             lastToolTipTime = System.currentTimeMillis()
             return
         }
@@ -161,8 +163,12 @@ object EstimatedItemValue {
         val newDisplay = try {
             draw(item)
         } catch (e: Exception) {
-            ChatUtils.debug("Estimated Item Value error: ${e.message}")
-            e.printStackTrace()
+            ErrorManager.logErrorWithData(
+                e, "Error in Estimated Item Value renderer",
+                "item" to item,
+                "itemName" to item.itemName,
+                "getInternalName" to item.getInternalName(),
+            )
             listOf()
         }
 
