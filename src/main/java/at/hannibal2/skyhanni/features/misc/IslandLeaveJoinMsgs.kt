@@ -48,7 +48,7 @@ object IslandLeaveJoinMsgs {
     fun onTabListUpdate(event: TabListUpdateEvent) {
         if (!config.enabled) return
         val onPrivateIslandGarden = IslandType.onPrivateWorld()
-        val guesting = IslandType.onPrivateWorld()
+        val guesting = IslandType.onPrivateWorld(guesting = true)
         if (!(onPrivateIslandGarden || (config.onPublicIslands && !guesting) || (config.guestLeaveJoinMsgs && guesting))) return
 
         val rawPlayersNew = mutableListOf<String>()
