@@ -201,11 +201,13 @@ object SkillAPI {
             return
         }
 
+        val skillType = activeSkill
+        if (skillType == null) {
+            event.addIrrelevant("activeSkill is null")
+            return
+        }
+
         event.addData {
-            val skillType = activeSkill
-            if (skillType == null) {
-                event.addIrrelevant("activeSkill is null")
-            }
             storage[skillType]?.let { skillInfo ->
                 addDebug(skillType, skillInfo)
             }
@@ -228,7 +230,7 @@ object SkillAPI {
         }
     }
 
-    private fun MutableList<String>.addDebug(skillType: SkillType?, skillInfo: SkillInfo) {
+    private fun MutableList<String>.addDebug(skillType: SkillType, skillInfo: SkillInfo) {
         add("Name: $skillType")
         add("-  Level: ${skillInfo.level}")
         add("-  CurrentXp: ${skillInfo.currentXp}")
