@@ -99,8 +99,7 @@ object NEUItems {
     @Deprecated("moved", ReplaceWith("NEUInternalName.fromItemNameOrNull(itemName)"))
     fun getInternalNameOrNull(itemName: String): NEUInternalName? = NEUInternalName.fromItemNameOrNull(itemName)
 
-    // internal function
-    fun getInternalNameOrNull0(itemName: String): NEUInternalName? {
+    internal fun _getInternalNameOrNull(itemName: String): NEUInternalName? {
         val lowercase = itemName.lowercase()
         if (itemNameCache.containsKey(lowercase)) {
             return itemNameCache[lowercase]!!
