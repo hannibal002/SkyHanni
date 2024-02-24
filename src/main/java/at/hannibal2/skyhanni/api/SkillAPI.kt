@@ -151,7 +151,12 @@ object SkillAPI {
                         var totalXp = progress.formatNumber()
                         val minus = if (skillLevel == 50) 4_000_000 else if (skillLevel == 60) 7_000_000 else 0
                         totalXp -= minus
-                        val (overflowLevel, overflowCurrent, overflowNeeded, overflowTotal) = getSkillInfo(skillLevel, totalXp, 0L, totalXp)
+                        val (overflowLevel, overflowCurrent, overflowNeeded, overflowTotal) = getSkillInfo(
+                            skillLevel,
+                            totalXp,
+                            0L,
+                            totalXp
+                        )
                         skillInfo?.apply {
                             this.overflowLevel = overflowLevel
                             this.overflowCurrentXp = overflowCurrent
@@ -237,7 +242,12 @@ object SkillAPI {
         val maxXp = matcher.group("needed").formatNumber()
         val level = getLevelExact(maxXp)
 
-        val (levelOverflow, currentOverflow, currentMaxOverflow, totalOverflow) = getSkillInfo(level, currentXp, maxXp, currentXp)
+        val (levelOverflow, currentOverflow, currentMaxOverflow, totalOverflow) = getSkillInfo(
+            level,
+            currentXp,
+            maxXp,
+            currentXp
+        )
         if (skillInfo.overflowLevel != 0 && levelOverflow == skillInfo.overflowLevel + 1)
             SkillOverflowLevelupEvent(skillType, skillInfo.overflowLevel, levelOverflow).postAndCatch()
 
@@ -280,7 +290,12 @@ object SkillAPI {
         val nextLevelDiff = levelingArray[tablistLevel]?.asDouble ?: 7_600_000.0
         val nextLevelProgress = nextLevelDiff * xpPercentage / 100
         val totalXp = levelXp + nextLevelProgress
-        val (_, currentOverflow, currentMaxOverflow, totalOverflow) = getSkillInfo(tablistLevel, nextLevelProgress.toLong(), nextLevelDiff.toLong(), totalXp.toLong())
+        val (_, currentOverflow, currentMaxOverflow, totalOverflow) = getSkillInfo(
+            tablistLevel,
+            nextLevelProgress.toLong(),
+            nextLevelDiff.toLong(),
+            totalXp.toLong()
+        )
         existingLevel.apply {
             this.totalXp = totalXp.toLong()
             this.currentXp = nextLevelProgress.toLong()
@@ -303,7 +318,12 @@ object SkillAPI {
         val level = getLevelExact(maxXp)
         val levelingArray = levelArray()
         val levelXp = calculateLevelXp(levelingArray, level - 1).toLong() + currentXp
-        val (currentLevel, currentOverflow, currentMaxOverflow, totalOverflow) = getSkillInfo(level, currentXp, maxXp, levelXp)
+        val (currentLevel, currentOverflow, currentMaxOverflow, totalOverflow) = getSkillInfo(
+            level,
+            currentXp,
+            maxXp,
+            levelXp
+        )
         skillInfo.apply {
             this.overflowCurrentXp = currentOverflow
             this.overflowCurrentXpMax = currentMaxOverflow
@@ -329,14 +349,16 @@ object SkillAPI {
         val first = it.first()
         if (it.size == 1) {
             when (first) {
-                "skillgoal" -> {
+                "goal" -> {
                     ChatUtils.chat("§bSkill Custom Goal Level")
-                    if (storage?.isEmpty() == true) {
-                        ChatUtils.chat("§cYou haven't set any custom goal yet!")
+                    val map = storage?.filter { it.value.customGoalLevel != 0 } ?: return
+                    if (map.isEmpty()) {
+                        ChatUtils.chat("§cYou haven't set any custom goals yet!")
                     }
-                    storage?.filter { it.value.customGoalLevel != 0 }?.forEach { (skill, data) ->
+                    map.forEach { (skill, data) ->
                         ChatUtils.chat("§e${skill.displayName}: §b${data.customGoalLevel}")
                     }
+                    return
                 }
             }
         }
@@ -351,9 +373,12 @@ object SkillAPI {
                         ChatUtils.chat("With §b${xp.addSeparators()} §eXP you would be level §b$level")
                     } else {
                         val (overflowLevel, current, needed, _) = calculateOverFlow(second.toLong())
-                        ChatUtils.chat("With §b${xp.addSeparators()} §eXP you would be level §b$overflowLevel " +
-                            "§ewith progress (§b${current.addSeparators()}§e/§b${needed.addSeparators()}§e) XP")
+                        ChatUtils.chat(
+                            "With §b${xp.addSeparators()} §eXP you would be level §b$overflowLevel " +
+                                "§ewith progress (§b${current.addSeparators()}§e/§b${needed.addSeparators()}§e) XP"
+                        )
                     }
+                    return
                 }
 
                 "xpforlevel" -> {
@@ -366,13 +391,25 @@ object SkillAPI {
                         val neededXP = xpRequiredForLevel(level.toDouble()) + base
                         ChatUtils.chat("You need §b${neededXP.addSeparators()} §eXP to be level §b${level.toDouble()}")
                     }
+                    return
+                }
 
+                "goal" -> {
+                    val rawSkill = it[1].lowercase()
+                    val skillType = SkillType.getByNameOrNull(rawSkill)
+                    if (skillType == null) {
+                        userError("Unknown Skill type: $rawSkill")
+                        return
+                    }
+                    val skill = storage?.get(skillType) ?: return
+                    skill.customGoalLevel = 0
+                    ChatUtils.chat("Custom goal level for §b${skillType.displayName} §ereset")
                 }
             }
         }
         if (it.size == 3) {
             when (first) {
-                "skillgoal" -> {
+                "goal" -> {
                     val rawSkill = it[1].lowercase()
                     val skillType = SkillType.getByNameOrNull(rawSkill)
                     if (skillType == null) {
@@ -387,22 +424,24 @@ object SkillAPI {
                     }
                     val skill = storage?.get(skillType) ?: return
 
-                    if (targetLevel <= skill.overflowLevel && targetLevel != 0) {
+                    if (targetLevel <= skill.overflowLevel) {
                         userError("Custom goal level ($targetLevel) must be greater than your current level (${skill.overflowLevel}).")
                         return
                     }
 
                     skill.customGoalLevel = targetLevel
                     ChatUtils.chat("Custom goal level for §b${skillType.displayName} §eset to §b$targetLevel")
+                    return
                 }
             }
         }
+        commandHelp()
     }
 
     fun onComplete(strings: Array<String>): List<String> {
         return when (strings.size) {
-            1 -> listOf("levelwithxp", "xpforlevel", "skillgoal")
-            2 -> if (strings[0].lowercase() == "skillgoal") CommandBase.getListOfStringsMatchingLastWord(
+            1 -> listOf("levelwithxp", "xpforlevel", "goal")
+            2 -> if (strings[0].lowercase() == "goal") CommandBase.getListOfStringsMatchingLastWord(
                 strings,
                 SkillType.entries.map { it.displayName })
             else
@@ -413,12 +452,15 @@ object SkillAPI {
     }
 
     private fun commandHelp() {
-        ChatUtils.chat("", false)
-        ChatUtils.chat("§6/shskills levelwithxp <currentXP> - §bGet a level with the given current XP.", false)
-        ChatUtils.chat("§6/shskills xpforlevel <desiredLevel> - §bGet how much XP you need for a desired level.", false)
-        ChatUtils.chat("§6/shskills skillgoal - §bView your current goal", false)
-        ChatUtils.chat("§6/shskills skillgoal <skill> <level> - §bDefine your goal for <skill>", false)
-        ChatUtils.chat("", false)
+        ChatUtils.chat(
+            listOf(
+                "§6/shskills levelwithxp <currentXP> - §bGet a level with the given current XP.",
+                "§6/shskills xpforlevel <desiredLevel> - §bGet how much XP you need for a desired level.",
+                "§6/shskills goal - §bView your current goal",
+                "§6/shskills goal <skill> <level> - §bDefine your goal for <skill>",
+                "",
+            ).joinToString("\n"), prefix = false
+        )
     }
 
     data class SkillInfo(
