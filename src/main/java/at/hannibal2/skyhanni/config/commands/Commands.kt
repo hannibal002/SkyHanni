@@ -378,7 +378,6 @@ object Commands {
             "shtestburrow",
             "Sets a test burrow waypoint at your location"
         ) { GriffinBurrowHelper.setTestBurrow(it) }
-        registerCommand("shsetcrop", "lol") { GardenCropMilestones.command(it) }
     }
 
     private fun developersCodingHelp() {

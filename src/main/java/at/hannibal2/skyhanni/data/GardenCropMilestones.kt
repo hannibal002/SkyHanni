@@ -89,46 +89,6 @@ object GardenCropMilestones {
         }
     }
 
-    /**
-     * Just for me testing
-     */
-    fun command(args: Array<String>) {
-        if (args.size == 1) {
-            val first = args[0]
-            when (first) {
-                "toggle" -> {
-                    enabled = !enabled
-                    chat(if (enabled) "§aEnabled" else "§cDisabled")
-                }
-
-                "togglemush" -> {
-                    menabled = !menabled
-                    chat(if (menabled) "§aEnabled" else "§cDisabled")
-                }
-
-                "reset" -> {
-                    menabled = false
-                    enabled = false
-                    add = 0L
-                    madd = 0L
-                }
-            }
-        }
-        if (args.size == 2) {
-            val first = args[0]
-            val second = args[1].toLong()
-            when (first) {
-                "add" -> {
-                    add = second
-                }
-
-                "addmush" -> {
-                    madd = second
-                }
-            }
-        }
-    }
-
     @SubscribeEvent
     fun onCropMilestoneOverflowLevelUpEvent(event: CropMilestoneOverflowLevelUpEvent) {
         val crop = event.cropType
