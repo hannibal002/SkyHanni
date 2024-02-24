@@ -77,8 +77,6 @@ object GetFromSackAPI {
     var sackListNames = emptySet<String>()
         private set
 
-    private var sackListNamesNeedsSet = false
-
     private fun addToQueue(items: List<PrimitiveItemStack>) = queue.addAll(items)
 
     private fun addToInventory(items: List<PrimitiveItemStack>, slotId: Int) = inventoryMap.put(slotId, items)
@@ -86,10 +84,6 @@ object GetFromSackAPI {
     @SubscribeEvent
     fun onTick(event: LorenzTickEvent) {
         if (!LorenzUtils.inSkyBlock) return
-        if (sackListNamesNeedsSet) {
-
-            sackListNamesNeedsSet = false
-        }
         if (queue.isNotEmpty() && lastTimeOfCommand.passedSince() >= minimumDelay) {
             val item = queue.poll()
             ChatUtils.sendCommandToServer("gfs ${item.internalName.asString()} ${item.amount}")
