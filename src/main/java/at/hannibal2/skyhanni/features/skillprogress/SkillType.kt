@@ -30,7 +30,7 @@ enum class SkillType(val displayName: String, icon: Item) {
     companion object {
         fun getByName(name: String) = getByNameOrNull(name) ?: error("Unknown Skill Type: '$name'")
 
-        private fun getByNameOrNull(name: String) =
+        fun getByNameOrNull(name: String) =
             entries.firstOrNull { it.displayName.lowercase() == name.lowercase() }
     }
 }

@@ -18,6 +18,7 @@ import at.hannibal2.skyhanni.features.skillprogress.SkillUtil.getSkillInfo
 import at.hannibal2.skyhanni.features.skillprogress.SkillUtil.levelArray
 import at.hannibal2.skyhanni.features.skillprogress.SkillUtil.xpRequiredForLevel
 import at.hannibal2.skyhanni.utils.ChatUtils
+import at.hannibal2.skyhanni.utils.ChatUtils.userError
 import at.hannibal2.skyhanni.utils.ItemUtils.cleanName
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
@@ -34,7 +35,7 @@ import io.github.moulberry.notenoughupdates.util.Constants
 import io.github.moulberry.notenoughupdates.util.Utils
 import net.minecraft.command.CommandBase
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
-import java.util.LinkedList
+import java.util.*
 import java.util.regex.Matcher
 import kotlin.concurrent.fixedRateTimer
 import kotlin.time.Duration.Companion.seconds
@@ -88,7 +89,7 @@ object SkillAPI {
 
             if (matcher?.matches() == true) {
                 val skillName = matcher.group("skillName")
-                val skillType = SkillType.getByName(skillName)
+                val skillType = SkillType.getByNameOrNull(skillName) ?: return
                 val skillInfo = storage?.get(skillType) ?: SkillInfo()
                 val skillXp = skillXPInfoMap[skillType] ?: SkillXPInfo()
                 activeSkill = skillType
@@ -135,7 +136,7 @@ object SkillAPI {
                 val cleanName = stack.cleanName()
                 val split = cleanName.split(" ")
                 val skillName = split.first()
-                val skill = SkillType.getByName(skillName)
+                val skill = SkillType.getByNameOrNull(skillName) ?: continue
                 val skillLevel = if (split.size > 1) split.last().romanToDecimalIfNecessary() else 0
                 val skillInfo = storage?.getOrPut(skill) { SkillInfo() }
 
@@ -368,17 +369,21 @@ object SkillAPI {
             when (first) {
                 "skillgoal" -> {
                     val rawSkill = it[1].lowercase()
-                    val skillType = SkillType.getByName(rawSkill)
+                    val skillType = SkillType.getByNameOrNull(rawSkill)
+                    if (skillType == null) {
+                        userError("Unknown Skill type: $rawSkill")
+                        return
+                    }
                     val rawLevel = it[2]
                     val targetLevel = rawLevel.toIntOrNull()
                     if (targetLevel == null) {
-                        ChatUtils.userError("$rawLevel is not a valid number.")
+                        userError("$rawLevel is not a valid number.")
                         return
                     }
                     val skill = storage?.get(skillType) ?: return
 
                     if (targetLevel <= skill.overflowLevel && targetLevel != 0) {
-                        ChatUtils.userError("Custom goal level ($targetLevel) must be greater than your current level (${skill.overflowLevel}).")
+                        userError("Custom goal level ($targetLevel) must be greater than your current level (${skill.overflowLevel}).")
                         return
                     }
 
