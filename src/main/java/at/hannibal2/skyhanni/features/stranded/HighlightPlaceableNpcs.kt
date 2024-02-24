@@ -10,13 +10,18 @@ import at.hannibal2.skyhanni.utils.LorenzColor
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.RenderUtils.highlight
 import at.hannibal2.skyhanni.utils.StringUtils.matches
+import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraftforge.fml.common.eventhandler.EventPriority
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
 class HighlightPlaceableNpcs {
 
     private val config get() = SkyHanniMod.feature.stranded
-    private val locationPattern = "§7Location: §f\\[§e\\d+§f, §e\\d+§f, §e\\d+§f]".toPattern()
+
+    private val locationPattern by RepoPattern.pattern(
+        "stranded.highlightplacement.location",
+        "§7Location: §f\\[§e\\d+§f, §e\\d+§f, §e\\d+§f]"
+    )
 
     private var inInventory = false
     private var highlightedItems = emptyList<Int>()

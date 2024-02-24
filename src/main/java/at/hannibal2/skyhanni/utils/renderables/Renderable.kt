@@ -1,7 +1,14 @@
 package at.hannibal2.skyhanni.utils.renderables
 
 import at.hannibal2.skyhanni.config.core.config.gui.GuiPositionEditor
+import at.hannibal2.skyhanni.config.features.skillprogress.SkillProgressBarConfig
 import at.hannibal2.skyhanni.data.ToolTipData
+import at.hannibal2.skyhanni.features.chroma.ChromaShaderManager
+import at.hannibal2.skyhanni.features.chroma.ChromaType
+import at.hannibal2.skyhanni.utils.ColorUtils
+import at.hannibal2.skyhanni.utils.ColorUtils.darker
+import at.hannibal2.skyhanni.utils.renderables.RenderableUtils.renderXAligned
+import at.hannibal2.skyhanni.utils.renderables.RenderableUtils.renderYAligned
 import at.hannibal2.skyhanni.utils.LorenzLogger
 import at.hannibal2.skyhanni.utils.NEUItems.renderOnScreen
 import at.hannibal2.skyhanni.utils.RenderUtils.HorizontalAlignment
@@ -13,7 +20,9 @@ import net.minecraft.client.gui.Gui
 import net.minecraft.client.gui.inventory.GuiEditSign
 import net.minecraft.client.renderer.GlStateManager
 import net.minecraft.item.ItemStack
+import net.minecraft.util.ResourceLocation
 import org.lwjgl.input.Mouse
+import java.awt.Color
 import java.util.Collections
 import kotlin.math.max
 
@@ -25,8 +34,8 @@ interface Renderable {
     val horizontalAlign: HorizontalAlignment
     val verticalAlign: VerticalAlignment
     fun isHovered(posX: Int, posY: Int) = currentRenderPassMousePosition?.let { (x, y) ->
-        x in (posX..posX + width)
-            && y in (posY..posY + height) // TODO: adjust for variable height?
+        x in (posX .. posX + width)
+            && y in (posY .. posY + height) // TODO: adjust for variable height?
     } ?: false
 
     /**
@@ -39,7 +48,6 @@ interface Renderable {
 
         val logger = LorenzLogger("debug/renderable")
         val list = mutableMapOf<Pair<Int, Int>, List<Int>>()
-
         var currentRenderPassMousePosition: Pair<Int, Int>? = null
             set
 
@@ -233,14 +241,13 @@ interface Renderable {
                 var isHovered = false
 
                 override fun render(posX: Int, posY: Int) {
-                    if (isHovered(posX, posY) && condition() && shouldAllowLink(true, bypassChecks)) {
+                    isHovered = if (isHovered(posX, posY) && condition() && shouldAllowLink(true, bypassChecks)) {
                         hovered.render(posX, posY)
-                        isHovered = true
+                        true
                     } else {
                         unhovered.render(posX, posY)
-                        isHovered = false
+                        false
                     }
-
                 }
             }
 
@@ -291,6 +298,112 @@ interface Renderable {
             override val verticalAlign = VerticalAlignment.TOP
 
             override fun render(posX: Int, posY: Int) {
+            }
+        }
+
+        fun progressBar(
+            percent: Double,
+            startColor: Color = Color(255, 0, 0),
+            endColor: Color = Color(0, 255, 0),
+            useChroma: Boolean = false,
+            texture: SkillProgressBarConfig.TexturedBar.UsedTexture? = null,
+            width: Int = 182,
+            height: Int = 5,
+            horizontalAlign: HorizontalAlignment = HorizontalAlignment.LEFT,
+            verticalAlign: VerticalAlignment = VerticalAlignment.TOP
+        ) = object : Renderable {
+            override val width = width
+            override val height = height
+            override val horizontalAlign = horizontalAlign
+            override val verticalAlign = verticalAlign
+
+            private val progress = if (texture == null) {
+                (1.0 + percent * (width - 2.0)).toInt()
+            } else {
+                percent.toInt()
+            }
+
+            private var color = if (texture == null) {
+                ColorUtils.blendRGB(startColor, endColor, percent)
+            } else {
+                startColor
+            }
+
+            override fun render(posX: Int, posY: Int) {
+                if (texture == null) {
+                    Gui.drawRect(0, 0, width, height, 0xFF43464B.toInt())
+
+                    if (useChroma) {
+                        ChromaShaderManager.begin(ChromaType.STANDARD)
+                    }
+
+                    val factor = 0.2
+                    val bgColor = if (useChroma) Color.GRAY.darker() else color
+                    Gui.drawRect(1, 1, width - 1, height - 1, bgColor.darker(factor).rgb)
+                    Gui.drawRect(1, 1, progress, height - 1, color.rgb)
+
+                    if (useChroma) {
+                        ChromaShaderManager.end()
+                    }
+                } else {
+                    val (textureX, textureY) = if (texture == SkillProgressBarConfig.TexturedBar.UsedTexture.MATCH_PACK) Pair(0, 64) else Pair(0, 0)
+
+                    Minecraft.getMinecraft().renderEngine.bindTexture(ResourceLocation(texture.path))
+                    Minecraft.getMinecraft().ingameGUI.drawTexturedModalRect(posX, posY, textureX, textureY, width, height)
+
+                    if (useChroma) {
+                        ChromaShaderManager.begin(ChromaType.TEXTURED)
+                        GlStateManager.color(1f, 1f, 1f, 1f)
+                    } else {
+                        GlStateManager.color(color.red / 255f, color.green / 255f, color.blue / 255f, 1f)
+                    }
+                    Minecraft.getMinecraft().ingameGUI.drawTexturedModalRect(posX, posY, textureX, textureY + height, progress, height)
+
+                    if (useChroma) {
+                        ChromaShaderManager.end()
+                    }
+                }
+            }
+        }
+
+        fun fixedSizeLine(
+            content: Renderable,
+            width: Int,
+            horizontalAlign: HorizontalAlignment = HorizontalAlignment.LEFT,
+            verticalAlign: VerticalAlignment = VerticalAlignment.TOP,
+        ) = object : Renderable {
+            val render = content
+
+            override val width = width
+            override val height = render.height
+            override val horizontalAlign = horizontalAlign
+            override val verticalAlign = verticalAlign
+            override fun render(posX: Int, posY: Int) {
+                render.renderXAligned(0, 0, width)
+            }
+        }
+
+        fun horizontalContainer(
+            content: List<Renderable>,
+            spacing: Int = 0,
+            horizontalAlign: HorizontalAlignment = HorizontalAlignment.LEFT,
+            verticalAlign: VerticalAlignment = VerticalAlignment.TOP,
+        ) = object : Renderable {
+            val renderables = content
+
+            override val width = renderables.sumOf { it.width } + spacing * (renderables.size - 1)
+            override val height = renderables.maxOf { it.height }
+            override val horizontalAlign = horizontalAlign
+            override val verticalAlign = verticalAlign
+
+            override fun render(posX: Int, posY: Int) {
+                var xOffset = 0
+                renderables.forEach {
+                    it.renderYAligned(xOffset, 0, height)
+                    xOffset += it.width + spacing
+                    GlStateManager.translate(it.width.toFloat(), 0f, 0f)
+                }
+                GlStateManager.translate(-width.toFloat() - spacing.toFloat(), 0f, 0f)
             }
         }
     }

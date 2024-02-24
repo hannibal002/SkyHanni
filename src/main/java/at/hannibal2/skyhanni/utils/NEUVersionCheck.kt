@@ -20,7 +20,7 @@ object NEUVersionCheck {
             neuWarning(
                 "NotEnoughUpdates is missing!\n" +
                     "SkyHanni requires the latest version of NotEnoughUpdates to work.\n" +
-                    "You currently need NEU version 2.1.1-Pre-4 or later.\n" +
+                    "You currently need NEU version 2.1.1-Pre-5 or later.\n" +
                     "NEU 2.1 is NOT the latest version.\n" +
                     "Use these links to download the latest version:"
             )
@@ -37,7 +37,7 @@ object NEUVersionCheck {
         }
         neuWarning(
             "NotEnoughUpdates is outdated!\n" +
-                "You currently need NEU version 2.1.1-Pre-4 or later.\n" +
+                "You currently need NEU version 2.1.1-Pre-5 or later.\n" +
                 "NEU 2.1 is NOT the latest version.\n" +
                 "Use these links to download the latest version:"
         )
@@ -49,7 +49,7 @@ object NEUVersionCheck {
             Pair("Join SkyHanni Discord", "https://discord.com/invite/skyhanni-997079228510117908"),
             Pair("Open SkyHanni GitHub", "https://github.com/hannibal002/SkyHanni"),
             Pair("Join NEU Discord", "https://discord.gg/moulberry"),
-            Pair("Download Pre-4", "https://github.com/NotEnoughUpdates/NotEnoughUpdates/releases/tag/v2.1.1-pre4"),
+            Pair("Download Pre-5", "https://github.com/NotEnoughUpdates/NotEnoughUpdates/releases/tag/v2.1.1-pre5"),
         )
         closeMinecraft()
     }

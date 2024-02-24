@@ -8,7 +8,7 @@ import at.hannibal2.skyhanni.events.GardenToolChangeEvent
 import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.LorenzTickEvent
 import at.hannibal2.skyhanni.events.LorenzWorldChangeEvent
-import at.hannibal2.skyhanni.events.PreProfileSwitchEvent
+import at.hannibal2.skyhanni.events.ProfileJoinEvent
 import at.hannibal2.skyhanni.features.garden.CropType
 import at.hannibal2.skyhanni.features.garden.GardenAPI
 import at.hannibal2.skyhanni.features.garden.farming.GardenCropSpeed.getSpeed
@@ -52,7 +52,7 @@ class FarmingWeightDisplay {
     }
 
     @SubscribeEvent
-    fun onPreProfileSwitch(event: PreProfileSwitchEvent) {
+    fun onProfileJoin(event: ProfileJoinEvent) {
         display = emptyList()
         profileId = ""
         weight = -2.0
@@ -396,9 +396,9 @@ class FarmingWeightDisplay {
             if (diff == 0) return
 
             if (diff > 0) {
-                showLbChange("§cdropped ${StringUtils.optionalPlural(diff, "place", "places")}", oldPosition)
+                showLbChange("§cdropped ${StringUtils.pluralize(diff, "place", withNumber = true)}", oldPosition)
             } else {
-                showLbChange("§arisen ${StringUtils.optionalPlural(-diff, "place", "places")}", oldPosition)
+                showLbChange("§arisen ${StringUtils.pluralize(-diff, "place", withNumber = true)}", oldPosition)
             }
         }
 

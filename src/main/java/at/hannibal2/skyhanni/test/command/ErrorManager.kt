@@ -17,13 +17,45 @@ object ErrorManager {
     private val fullErrorMessages = mutableMapOf<String, String>()
     private var cache = TimeLimitedSet<Pair<String, Int>>(10.minutes)
 
+    private val breakAfter = listOf(
+        "at at.hannibal2.skyhanni.config.commands.Commands\$createCommand",
+        "at net.minecraftforge.fml.common.eventhandler.EventBus.post",
+    )
+
+    private val replace = mapOf(
+        "at.hannibal2.skyhanni" to "SH",
+        "io.mouberry,notenoughupdates" to "NEU",
+        "net.minecraft." to "MC.",
+        "net.minecraftforge.fml." to "FML.",
+    )
+
+    private val ignored = listOf(
+        "at java.lang.Thread.run",
+        "at java.util.concurrent.",
+        "at java.lang.reflect.",
+        "at net.minecraft.network.",
+        "at net.minecraft.client.Minecraft.addScheduledTask(",
+        "at net.minecraftforge.fml.common.network.handshake.",
+        "at net.minecraftforge.fml.common.eventhandler.",
+        "at net.fabricmc.devlaunchinjector.",
+        "at io.netty.",
+        "at com.google.gson.internal.",
+        "at sun.reflect.",
+
+        "at at.hannibal2.skyhanni.config.commands.SimpleCommand.",
+        "at at.hannibal2.skyhanni.config.commands.Commands\$createCommand\$1.processCommand",
+        "at at.hannibal2.skyhanni.test.command.ErrorManager.logError",
+        "at at.hannibal2.skyhanni.events.LorenzEvent.postAndCatchAndBlock",
+        "at net.minecraft.launchwrapper.",
+    )
+
     fun resetCache() {
         cache.clear()
     }
 
     fun skyHanniError(message: String): Nothing {
         val exception = IllegalStateException(message)
-        logError(exception, message)
+        logErrorWithData(exception, message)
         throw exception
     }
 
@@ -47,28 +79,40 @@ object ErrorManager {
         } ?: "Error id not found!")
     }
 
-    @Deprecated("Use data as well", ReplaceWith("logErrorStateWithData()"))
+    @Deprecated("Use data as well", ReplaceWith("ErrorManager.logErrorStateWithData(userMessage, internalMessage)"))
     fun logErrorState(userMessage: String, internalMessage: String) {
-        logError(IllegalStateException(internalMessage), userMessage, false)
+        logError(IllegalStateException(internalMessage), userMessage, ignoreErrorCache = false, noStackTrace = false)
     }
 
-    fun logErrorStateWithData(userMessage: String, internalMessage: String, vararg extraData: Pair<String, Any?>) {
-        logError(IllegalStateException(internalMessage), userMessage, false, *extraData)
+    fun logErrorStateWithData(
+        userMessage: String,
+        internalMessage: String,
+        vararg extraData: Pair<String, Any?>,
+        ignoreErrorCache: Boolean = false,
+        noStackTrace: Boolean = false,
+    ) {
+        logError(IllegalStateException(internalMessage), userMessage, ignoreErrorCache, noStackTrace, *extraData)
     }
 
-    @Deprecated("Use data as well", ReplaceWith("logErrorWithData()"))
+    @Deprecated("Use data as well", ReplaceWith("ErrorManager.logErrorWithData(throwable, message)"))
     fun logError(throwable: Throwable, message: String) {
-        logError(throwable, message, false)
+        logError(throwable, message, ignoreErrorCache = false, noStackTrace = false)
     }
 
-    fun logErrorWithData(throwable: Throwable, message: String, vararg extraData: Pair<String, Any?>) {
-        logError(throwable, message, false, *extraData)
+    fun logErrorWithData(
+        throwable: Throwable,
+        message: String,
+        vararg extraData: Pair<String, Any?>,
+        ignoreErrorCache: Boolean = false,
+    ) {
+        logError(throwable, message, ignoreErrorCache, noStackTrace = false, *extraData)
     }
 
-    fun logError(
+    private fun logError(
         throwable: Throwable,
         message: String,
         ignoreErrorCache: Boolean,
+        noStackTrace: Boolean,
         vararg extraData: Pair<String, Any?>,
     ) {
         val error = Error(message, throwable)
@@ -83,8 +127,16 @@ object ErrorManager {
             cache.add(pair)
         }
 
-        val fullStackTrace = throwable.getCustomStackTrace(true).joinToString("\n")
-        val stackTrace = throwable.getCustomStackTrace(false).joinToString("\n").removeSpam()
+        val fullStackTrace: String
+        val stackTrace: String
+
+        if (noStackTrace) {
+            fullStackTrace = "<no stack trace>"
+            stackTrace = "<no stack trace>"
+        } else {
+            fullStackTrace = throwable.getCustomStackTrace(true).joinToString("\n")
+            stackTrace = throwable.getCustomStackTrace(false).joinToString("\n")
+        }
         val randomId = UUID.randomUUID().toString()
 
         val extraDataString = buildExtraDataString(extraData)
@@ -122,70 +174,39 @@ object ErrorManager {
         } else ""
         return extraDataString
     }
-}
 
-private fun Throwable.getCustomStackTrace(full: Boolean, parent: List<String> = emptyList()): List<String> = buildList {
-    add("Caused by " + javaClass.name + ": $message")
+    private fun Throwable.getCustomStackTrace(
+        fullStackTrace: Boolean,
+        parent: List<String> = emptyList()
+    ): List<String> = buildList {
+        add("Caused by ${this@getCustomStackTrace.javaClass.name}: $message")
 
-    val breakAfter = listOf(
-        "at net.minecraftforge.client.ClientCommandHandler.executeCommand(",
-    )
-    val replace = mapOf(
-        "io.mouberry,notenoughupdates" to "NEU",
-        "at.hannibal2.skyhanni" to "SH",
-        "net.minecraft." to "MC.",
-        "net.minecraftforge.fml." to "FML.",
-    )
-
-    for (traceElement in stackTrace) {
-        var text = "\tat $traceElement"
-        if (!full && text in parent) {
-            println("broke at: $text")
-            break
-        }
-        if (!full) {
-            for ((from, to) in replace) {
-                text = text.replace(from, to)
+        for (traceElement in stackTrace) {
+            val text = "\tat $traceElement"
+            if (!fullStackTrace && text in parent) {
+                println("broke at: $text")
+                break
             }
+            var visualText = text
+            if (!fullStackTrace) {
+                for ((from, to) in replace) {
+                    visualText = visualText.replace(from, to)
+                }
+            }
+            if (!fullStackTrace && breakAfter.any { text.contains(it) }) {
+                break
+            }
+            if (ignored.any { text.contains(it) }) continue
+            add(visualText)
         }
-        add(text)
-        if (!full && breakAfter.any { text.contains(it) }) {
-            println("breakAfter: $text")
-            break
+
+        if (this === cause) {
+            add("<Infinite recurring causes>")
+            return@buildList
+        }
+
+        cause?.let {
+            addAll(it.getCustomStackTrace(fullStackTrace, this))
         }
     }
-
-    if (this === cause) {
-        add("Infinite recurring causes")
-        return@buildList
-    }
-
-    cause?.let {
-        addAll(it.getCustomStackTrace(full, this))
-    }
-}
-
-private fun String.removeSpam(): String {
-    val ignored = listOf(
-        "at io.netty.",
-        "at net.minecraft.network.",
-        "at net.minecraftforge.fml.common.network.handshake.",
-        "at java.lang.Thread.run",
-        "at com.google.gson.internal.",
-        "at net.minecraftforge.fml.common.eventhandler.",
-        "at java.util.concurrent.",
-        "at sun.reflect.",
-        "at net.minecraft.client.Minecraft.addScheduledTask(",
-        "at java.lang.reflect.",
-        "at at.hannibal2.skyhanni.config.commands.Commands\$",
-        ".ErrorManager.logErrorState(ErrorManager.kt:51)",
-        "LorenzEvent.postWithoutCatch(LorenzEvent.kt:24)",
-        "LorenzEvent.postAndCatch(LorenzEvent.kt:15)",
-        "at net.minecraft.launchwrapper.",
-        "at net.fabricmc.devlaunchinjector.",
-        "at SH.events.LorenzEvent.postAndCatchAndBlock(LorenzEvent.kt:28)",
-        "at SH.events.LorenzEvent.postAndCatchAndBlock\$default(LorenzEvent.kt:18)",
-        "at SH.events.LorenzEvent.postAndCatch(LorenzEvent.kt:16)",
-    )
-    return split("\n").filter { line -> !ignored.any { line.contains(it) } }.joinToString("\n")
 }

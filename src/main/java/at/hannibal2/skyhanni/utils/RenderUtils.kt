@@ -13,6 +13,7 @@ import at.hannibal2.skyhanni.utils.renderables.RenderableUtils.renderXAligned
 import at.hannibal2.skyhanni.utils.shader.ShaderManager
 import io.github.moulberry.moulconfig.internal.TextRenderUtils
 import io.github.moulberry.notenoughupdates.util.Utils
+import java.awt.Color
 import net.minecraft.client.Minecraft
 import net.minecraft.client.gui.FontRenderer
 import net.minecraft.client.gui.Gui
@@ -28,7 +29,6 @@ import net.minecraft.util.AxisAlignedBB
 import net.minecraft.util.MathHelper
 import net.minecraft.util.ResourceLocation
 import org.lwjgl.opengl.GL11
-import java.awt.Color
 import kotlin.math.cos
 import kotlin.math.sin
 import kotlin.math.sqrt
@@ -549,7 +549,7 @@ object RenderUtils {
             val z: Double =
                 entity.lastTickPosZ + (entity.posZ - entity.lastTickPosZ) * partialTicks - renderManager.viewerPosZ
             val pix2 = Math.PI * 2.0
-            for (i in 0..90) {
+            for (i in 0 .. 90) {
                 color.bindColor()
                 worldRenderer.pos(x + rad * cos(i * pix2 / 45.0), y + il, z + rad * sin(i * pix2 / 45.0)).endVertex()
             }
@@ -1134,10 +1134,6 @@ object RenderUtils {
         GlStateManager.enableDepth()
     }
 
-    fun drawRoundRect(x: Int, y: Int, width: Int, height: Int, color: Color, radius: Int = 10, smoothness: Int = 1) {
-        drawRoundRect(x, y, width, height, color.rgb, radius, smoothness)
-    }
-
     /**
      * Method to draw a rounded rectangle.
      *
@@ -1165,7 +1161,7 @@ object RenderUtils {
         RoundedRectangleShader.centerPos = floatArrayOf(xIn + (widthIn / 2f), yIn + (heightIn / 2f))
 
         GlStateManager.pushMatrix()
-        ShaderManager.Shaders.ROUNDED_RECTANGLE.enable()
+        ShaderManager.enableShader("rounded_rect")
 
         Gui.drawRect(x, y, x + width, y + height, color)
 

@@ -1,6 +1,7 @@
 package at.hannibal2.skyhanni.features.misc.compacttablist
 
 import at.hannibal2.skyhanni.SkyHanniMod
+import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.SkipTabListLineEvent
 import at.hannibal2.skyhanni.mixins.transformers.AccessorGuiPlayerTabOverlay
 import at.hannibal2.skyhanni.utils.CollectionUtils.filterToMutable
@@ -31,6 +32,36 @@ object TabListRenderer {
         if (!config.enabled) return
         event.isCanceled = true
 
+        if (config.toggleTab) return
+
+        drawTabList()
+    }
+
+    private var isPressed = false
+    private var isTabToggled = false
+
+    @SubscribeEvent
+    fun onRenderOverlay(event: GuiRenderEvent.GuiOverlayRenderEvent) {
+        if (!LorenzUtils.inSkyBlock) return
+        if (!config.enabled) return
+        if (!config.toggleTab) return
+        if (Minecraft.getMinecraft().currentScreen != null) return
+
+        if (Minecraft.getMinecraft().gameSettings.keyBindPlayerList.isPressed) {
+            isPressed = true
+        } else {
+            if (isPressed) {
+                isPressed = false
+                isTabToggled = !isTabToggled
+            }
+        }
+
+        if (isTabToggled) {
+            drawTabList()
+        }
+    }
+
+    private fun drawTabList() {
         val columns = TabListReader.renderColumns
 
         if (columns.isEmpty()) return
@@ -175,7 +206,10 @@ object TabListRenderer {
         }
     }
 
-    private val fireSalePattern by RepoPattern.pattern("tablist.firesaletitle", "§b§lFire Sales: §r§f\\([0-9]+\\)")
+    private val fireSalePattern by RepoPattern.pattern(
+        "tablist.firesaletitle",
+        "§b§lFire Sales: §r§f\\([0-9]+\\)"
+    )
 
     @SubscribeEvent
     fun hideFireFromTheTabListBecauseWhoWantsThose(event: SkipTabListLineEvent) {

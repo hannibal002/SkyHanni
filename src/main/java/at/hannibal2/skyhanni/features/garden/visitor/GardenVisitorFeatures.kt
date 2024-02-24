@@ -10,7 +10,7 @@ import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.LorenzChatEvent
 import at.hannibal2.skyhanni.events.LorenzTickEvent
 import at.hannibal2.skyhanni.events.OwnInventoryItemUpdateEvent
-import at.hannibal2.skyhanni.events.PreProfileSwitchEvent
+import at.hannibal2.skyhanni.events.ProfileJoinEvent
 import at.hannibal2.skyhanni.events.SackDataUpdateEvent
 import at.hannibal2.skyhanni.events.garden.visitor.VisitorAcceptEvent
 import at.hannibal2.skyhanni.events.garden.visitor.VisitorAcceptedEvent
@@ -33,9 +33,9 @@ import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.ItemBlink
 import at.hannibal2.skyhanni.utils.ItemUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName
-import at.hannibal2.skyhanni.utils.ItemUtils.getItemName
-import at.hannibal2.skyhanni.utils.ItemUtils.getItemNameOrNull
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
+import at.hannibal2.skyhanni.utils.ItemUtils.itemName
+import at.hannibal2.skyhanni.utils.ItemUtils.itemNameWithoutColor
 import at.hannibal2.skyhanni.utils.ItemUtils.name
 import at.hannibal2.skyhanni.utils.LorenzLogger
 import at.hannibal2.skyhanni.utils.LorenzUtils
@@ -73,12 +73,26 @@ private val config get() = VisitorAPI.config
 class GardenVisitorFeatures {
 
     private var display = emptyList<List<Any>>()
-    private val newVisitorArrivedMessage = ".* §r§ehas arrived on your §r§bGarden§r§e!".toPattern()
-    private val copperPattern = " §8\\+§c(?<amount>.*) Copper".toPattern()
-    private val gardenExperiencePattern = " §8\\+§2(?<amount>.*) §7Garden Experience".toPattern()
-    private val visitorChatMessagePattern = "§e\\[NPC] (§.)?(?<name>.*)§f: §r.*".toPattern()
-    private val partialAcceptedPattern by RepoPattern.pattern(
-        "garden.visitor.partialaccepted",
+
+    private val patternGroup = RepoPattern.group("garden.visitor")
+    private val visitorArrivePattern by patternGroup.pattern(
+        "visitorarrive",
+        ".* §r§ehas arrived on your §r§bGarden§r§e!"
+    )
+    private val copperPattern by patternGroup.pattern(
+        "copper",
+        " §8\\+§c(?<amount>.*) Copper"
+    )
+    private val gardenExperiencePattern by patternGroup.pattern(
+        "gardenexperience",
+        " §8\\+§2(?<amount>.*) §7Garden Experience"
+    )
+    private val visitorChatMessagePattern by patternGroup.pattern(
+        "visitorchat",
+        "§e\\[NPC] (§.)?(?<name>.*)§f: §r.*"
+    )
+    private val partialAcceptedPattern by patternGroup.pattern(
+        "partialaccepted",
         "§aYou gave some of the required items!"
     )
 
@@ -86,7 +100,7 @@ class GardenVisitorFeatures {
     private var lastFullPrice = 0.0
 
     @SubscribeEvent
-    fun onPreProfileSwitch(event: PreProfileSwitchEvent) {
+    fun onProfileJoin(event: ProfileJoinEvent) {
         display = emptyList()
     }
 
@@ -165,7 +179,7 @@ class GardenVisitorFeatures {
             var totalPrice = 0.0
             addAsSingletonList("§7Visitor Shopping List:")
             for ((internalName, amount) in shoppingList) {
-                val name = internalName.getItemName()
+                val name = internalName.itemName
                 val itemStack = internalName.getItemStack()
 
                 val list = mutableListOf<Any>()
@@ -192,8 +206,8 @@ class GardenVisitorFeatures {
                     val itemStatus = sackItemData.getStatus()
                     val itemAmount = sackItemData.amount
                     if (itemStatus != SackStatus.OUTDATED) {
-                        val textColour = if (itemAmount > amount) "a" else "e"
-                        list.add(" §${textColour}x${sackItemData.amount.addSeparators()} §7in your sack")
+                        val textColour = if (itemAmount >= amount) "a" else "e"
+                        list.add(" (§${textColour}x${sackItemData.amount.addSeparators()} §7in sacks)")
                     }
                 }
 
@@ -396,7 +410,7 @@ class GardenVisitorFeatures {
             if (!readingShoppingList) continue
             val multiplier = NEUItems.getMultiplier(internalName)
 
-            val rawName = multiplier.first.getItemNameOrNull()?.removeColor() ?: continue
+            val rawName = multiplier.first.itemNameWithoutColor
             val cropType = getByNameOrNull(rawName) ?: continue
 
             val cropAmount = multiplier.second.toLong() * amount
@@ -456,8 +470,8 @@ class GardenVisitorFeatures {
     }
 
     @SubscribeEvent
-    fun onChat(event: LorenzChatEvent) {
-        if (config.hypixelArrivedMessage && newVisitorArrivedMessage.matcher(event.message).matches()) {
+    fun onChatMessage(event: LorenzChatEvent) {
+        if (config.hypixelArrivedMessage && visitorArrivePattern.matcher(event.message).matches()) {
             event.blockedReason = "new_visitor_arrived"
         }
 

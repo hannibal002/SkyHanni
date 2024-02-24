@@ -11,6 +11,7 @@ import at.hannibal2.skyhanni.mixins.transformers.AccessorGuiEditSign
 import at.hannibal2.skyhanni.test.TestBingo
 import at.hannibal2.skyhanni.utils.ChatUtils.lastButtonClicked
 import at.hannibal2.skyhanni.utils.CollectionUtils.sortedDesc
+import at.hannibal2.skyhanni.utils.ItemUtils.getItemCategoryOrNull
 import at.hannibal2.skyhanni.utils.NEUItems.getItemStackOrNull
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.StringUtils.capAtMinecraftLength
@@ -26,12 +27,14 @@ import net.minecraft.entity.SharedMonsterAttributes
 import net.minecraft.launchwrapper.Launch
 import net.minecraft.util.ChatComponentText
 import net.minecraftforge.fml.common.FMLCommonHandler
+import java.io.Serializable
 import java.text.DecimalFormat
 import java.text.SimpleDateFormat
 import java.util.Timer
 import java.util.TimerTask
 import java.util.regex.Matcher
 import kotlin.time.Duration
+import kotlin.time.Duration.Companion.milliseconds
 import kotlin.time.Duration.Companion.seconds
 
 object LorenzUtils {
@@ -112,13 +115,13 @@ object LorenzUtils {
     fun formatPercentage(percentage: Double, format: String?): String =
         DecimalFormat(format).format(percentage * 100).replace(',', '.') + "%"
 
-    @Deprecated("old code", ReplaceWith("addSeparators()"))
+    @Deprecated("old code", ReplaceWith("i.addSeparators()"))
     fun formatInteger(i: Int): String = i.addSeparators()
 
-    @Deprecated("old code", ReplaceWith("addSeparators()"))
+    @Deprecated("old code", ReplaceWith("l.addSeparators()"))
     fun formatInteger(l: Long): String = l.addSeparators()
 
-    @Deprecated("old code", ReplaceWith("round() and addSeparators()"))
+    @Deprecated("old code", ReplaceWith("d.round(round).addSeparators()"))
     fun formatDouble(d: Double, round: Int = 1): String {
         return d.round(round).addSeparators()
     }
@@ -141,7 +144,7 @@ object LorenzUtils {
 
     fun getSBMonthByName(month: String): Int {
         var monthNr = 0
-        for (i in 1..12) {
+        for (i in 1 .. 12) {
             val monthName = SkyBlockTime.monthName(i)
             if (month == monthName) {
                 monthNr = i
@@ -271,12 +274,15 @@ object LorenzUtils {
 
     fun IslandType.isInIsland() = inSkyBlock && skyBlockIsland == this
 
-    fun GuiContainerEvent.SlotClickEvent.makeShiftClick() =
+    fun GuiContainerEvent.SlotClickEvent.makeShiftClick() {
+        if (this.clickedButton == 1 && slot?.stack?.getItemCategoryOrNull() == ItemCategory.SACK) return
         slot?.slotNumber?.let { slotNumber ->
             Minecraft.getMinecraft().playerController.windowClick(
                 container.windowId, slotNumber, 0, 1, Minecraft.getMinecraft().thePlayer
-            )?.also { isCanceled = true }
+            )
+            isCanceled = true
         }
+    }
 
     private val recalculateDerpy =
         RecalculatingValue(1.seconds) { MayorElection.isPerkActive("Derpy", "DOUBLE MOBS HP!!!") }
@@ -326,8 +332,9 @@ object LorenzUtils {
         FMLCommonHandler.instance().handleExit(-1)
     }
 
+    @Deprecated("moved", ReplaceWith("ChatUtils.sendCommandToServer(command)"))
     fun sendCommandToServer(command: String) {
-        ChatUtils.sendMessageToServer("/$command")
+        ChatUtils.sendCommandToServer(command)
     }
 
     /**
@@ -338,21 +345,21 @@ object LorenzUtils {
         return runCatching { this.group(groupName) }.getOrNull()
     }
 
-    @Deprecated("moved", ReplaceWith("ChatUtils.debug"))
+    @Deprecated("moved", ReplaceWith("ChatUtils.debug(message)"))
     fun debug(message: String) = ChatUtils.debug(message)
 
-    @Deprecated("moved", ReplaceWith("ChatUtils.userError"))
+    @Deprecated("moved", ReplaceWith("ChatUtils.userError(message)"))
     fun userError(message: String) = ChatUtils.userError(message)
 
-    @Deprecated("moved", ReplaceWith("ChatUtils.chat"))
+    @Deprecated("moved", ReplaceWith("ChatUtils.chat(message, prefix, prefixColor)"))
     fun chat(message: String, prefix: Boolean = true, prefixColor: String = "§e") =
         ChatUtils.chat(message, prefix, prefixColor)
 
-    @Deprecated("moved", ReplaceWith("ChatUtils.clickableChat"))
+    @Deprecated("moved", ReplaceWith("ChatUtils.clickableChat(message, command, prefix, prefixColor)"))
     fun clickableChat(message: String, command: String, prefix: Boolean = true, prefixColor: String = "§e") =
         ChatUtils.clickableChat(message, command, prefix, prefixColor)
 
-    @Deprecated("moved", ReplaceWith("ChatUtils.hoverableChat"))
+    @Deprecated("moved", ReplaceWith("ChatUtils.hoverableChat(message, hover, command, prefix, prefixColor)"))
     fun hoverableChat(
         message: String,
         hover: List<String>,
@@ -361,6 +368,6 @@ object LorenzUtils {
         prefixColor: String = "§e",
     ) = ChatUtils.hoverableChat(message, hover, command, prefix, prefixColor)
 
-    @Deprecated("moved", ReplaceWith("ChatUtils.sendMessageToServer"))
+    @Deprecated("moved", ReplaceWith("ChatUtils.sendMessageToServer(message)"))
     fun sendMessageToServer(message: String) = ChatUtils.sendMessageToServer(message)
 }

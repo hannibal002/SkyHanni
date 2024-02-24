@@ -2,6 +2,7 @@ package at.hannibal2.skyhanni.utils
 
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.events.LorenzTickEvent
+import at.hannibal2.skyhanni.events.MessageSendToServerEvent
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import net.minecraft.client.Minecraft
 import net.minecraft.event.ClickEvent
@@ -11,6 +12,7 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import java.util.LinkedList
 import java.util.Queue
 import kotlin.time.Duration.Companion.milliseconds
+import kotlin.time.times
 
 object ChatUtils {
 
@@ -65,7 +67,7 @@ object ChatUtils {
      */
     @Deprecated(
         "Do not send the user a non clickable non stacktrace containing error message.",
-        ReplaceWith("ErrorManager.logErrorStateWithData")
+        ReplaceWith("ErrorManager.logErrorStateWithData(message)")
     )
     fun error(message: String) {
         println("error: '$message'")
@@ -183,6 +185,10 @@ object ChatUtils {
 
     private var lastMessageSent = SimpleTimeMark.farPast()
     private val sendQueue: Queue<String> = LinkedList()
+    private val messageDelay = 300.milliseconds
+
+    fun getTimeWhenNewlyQueuedMessageGetsExecuted() =
+        (lastMessageSent + sendQueue.size * messageDelay).takeIf { !it.isInPast() } ?: SimpleTimeMark.now()
 
     @SubscribeEvent
     fun sendQueuedChatMessages(event: LorenzTickEvent) {
@@ -191,7 +197,7 @@ object ChatUtils {
             sendQueue.clear()
             return
         }
-        if (lastMessageSent.passedSince() > 300.milliseconds) {
+        if (lastMessageSent.passedSince() > messageDelay) {
             player.sendChatMessage(sendQueue.poll() ?: return)
             lastMessageSent = SimpleTimeMark.now()
         }
@@ -200,4 +206,17 @@ object ChatUtils {
     fun sendMessageToServer(message: String) {
         sendQueue.add(message)
     }
+
+    fun sendCommandToServer(command: String) {
+        if (command.startsWith("/")) {
+            debug("Sending wrong command to server? ($command)")
+        }
+        sendMessageToServer("/$command")
+    }
+
+    fun MessageSendToServerEvent.isCommand(commandWithSlash: String) =
+        splitMessage.takeIf { it.isNotEmpty() }?.get(0) == commandWithSlash
+
+    fun MessageSendToServerEvent.isCommand(commandsWithSlash: Collection<String>) =
+        splitMessage.takeIf { it.isNotEmpty() }?.get(0) in commandsWithSlash
 }
