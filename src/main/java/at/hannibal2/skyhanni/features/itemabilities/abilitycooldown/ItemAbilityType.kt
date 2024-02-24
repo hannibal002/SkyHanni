@@ -65,7 +65,7 @@ enum class ItemAbilityType(
     VOODOO_DOLL_WILTED(3, 180),
     FIRE_FURY_STAFF(20, 1000, allowRecastAfter = 0.seconds),
     SHADOW_FURY(15, 0, "STARRED_SHADOW_FURY"),
-    ENDER_BOW(30, 50),
+    ENDER_BOW(5, 50),
     LIVID_DAGGER(5, 150),
     FIRE_VEIL_WAND(5, 300),
     INK_WAND(30, 60),
