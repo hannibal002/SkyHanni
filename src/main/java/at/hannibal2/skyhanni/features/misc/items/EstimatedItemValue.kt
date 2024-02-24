@@ -65,7 +65,7 @@ object EstimatedItemValue {
     @SubscribeEvent
     fun onRepoReload(event: RepositoryReloadEvent) {
         val data = event.getConstant<ItemsJson>("Items")
-        bookBundleAmount = data.book_bundle_amount!!
+        bookBundleAmount = data.book_bundle_amount ?: error("book_bundle_amount is missing")
     }
 
     @SubscribeEvent
