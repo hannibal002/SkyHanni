@@ -13,27 +13,3 @@ inline fun <reified T : Any> Gson.fromJson(jsonElement: JsonElement): T =
     this.fromJson(jsonElement, typeOf<T>().javaType)
 
 inline fun <reified T : Any> Gson.fromJson(reader: Reader): T = this.fromJson(reader, typeOf<T>().javaType)
-
-fun JsonObject.getStringOrNull(key: String): String? {
-    return if (has(key)) {
-        try {
-            get(key).asString
-        } catch (_: Exception) {
-            null
-        }
-    } else {
-        null
-    }
-}
-
-fun JsonObject.getDoubleOrNull(key: String): Double? {
-    return if (has(key)) {
-        try {
-            get(key).asDouble
-        } catch (_: Exception) {
-            null
-        }
-    } else {
-        null
-    }
-}
