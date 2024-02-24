@@ -68,12 +68,18 @@ object SkillProgress {
             }
         }
 
-        if (allSkillConfig.enabled.get()) {
-            config.allSkillPosition.renderRenderables(allDisplay, posLabel = "All Skills Display")
-        }
-
         if (etaConfig.enabled.get()) {
             config.etaPosition.renderRenderables(etaDisplay, posLabel = "Skill ETA")
+        }
+    }
+
+    @SubscribeEvent
+    fun onGuiRender(event: GuiRenderEvent) {
+        if (!isEnabled()) return
+        if (display.isEmpty()) return
+
+        if (allSkillConfig.enabled.get()) {
+            config.allSkillPosition.renderRenderables(allDisplay, posLabel = "All Skills Display")
         }
     }
 
