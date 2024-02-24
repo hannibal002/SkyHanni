@@ -193,28 +193,52 @@ object SkillAPI {
     }
 
     @SubscribeEvent
-    fun onDebugDataCollect(event: DebugDataCollectEvent) {
-        event.title("Skills")
+    fun onDebugDataCollectCurrent(event: DebugDataCollectEvent) {
+        event.title("Current Skill")
         val storage = storage
         if (storage == null) {
             event.addIrrelevant("SkillMap is empty")
             return
         }
-        event.addData {
-            for ((skillName, skillInfo) in storage) {
-                add("-  Name: $skillName")
-                add("-  Level: ${skillInfo.level}")
-                add("-  CurrentXp: ${skillInfo.currentXp}")
-                add("-  CurrentXpMax: ${skillInfo.currentXpMax}")
-                add("-  TotalXp: ${skillInfo.totalXp}")
-                add("-  OverflowLevel: ${skillInfo.overflowLevel}")
-                add("-  OverflowCurrentXp: ${skillInfo.overflowCurrentXp}")
-                add("-  OverflowCurrentXpMax: ${skillInfo.overflowCurrentXpMax}")
-                add("-  OverflowTotalXp: ${skillInfo.overflowTotalXp}")
-                add("-  CustomGoalLevel: ${skillInfo.customGoalLevel}\n")
-            }
 
+        event.addData {
+            val skillType = activeSkill
+            if (skillType == null) {
+                event.addIrrelevant("activeSkill is null")
+            }
+            storage[skillType]?.let { skillInfo ->
+                addDebug(skillType, skillInfo)
+            }
         }
+    }
+
+    @SubscribeEvent
+    fun onDebugDataCollectAll(event: DebugDataCollectEvent) {
+        event.title("All Skills")
+        val storage = storage
+        if (storage == null) {
+            event.addIrrelevant("SkillMap is empty")
+            return
+        }
+
+        event.addIrrelevant {
+            for ((skillType, skillInfo) in storage) {
+                addDebug(skillType, skillInfo)
+            }
+        }
+    }
+
+    private fun MutableList<String>.addDebug(skillType: SkillType?, skillInfo: SkillInfo) {
+        add("Name: $skillType")
+        add("-  Level: ${skillInfo.level}")
+        add("-  CurrentXp: ${skillInfo.currentXp}")
+        add("-  CurrentXpMax: ${skillInfo.currentXpMax}")
+        add("-  TotalXp: ${skillInfo.totalXp}")
+        add("-  OverflowLevel: ${skillInfo.overflowLevel}")
+        add("-  OverflowCurrentXp: ${skillInfo.overflowCurrentXp}")
+        add("-  OverflowCurrentXpMax: ${skillInfo.overflowCurrentXpMax}")
+        add("-  OverflowTotalXp: ${skillInfo.overflowTotalXp}")
+        add("-  CustomGoalLevel: ${skillInfo.customGoalLevel}\n")
     }
 
     private fun runTimer(skillName: String, info: SkillXPInfo) {
