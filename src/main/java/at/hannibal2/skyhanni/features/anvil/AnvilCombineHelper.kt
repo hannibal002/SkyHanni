@@ -3,6 +3,8 @@ package at.hannibal2.skyhanni.features.anvil
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.events.GuiContainerEvent
 import at.hannibal2.skyhanni.utils.InventoryUtils.getInventoryName
+import at.hannibal2.skyhanni.utils.InventoryUtils.getLowerItems
+import at.hannibal2.skyhanni.utils.InventoryUtils.getUpperItems
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.LorenzColor
 import at.hannibal2.skyhanni.utils.LorenzUtils
@@ -26,12 +28,7 @@ class AnvilCombineHelper {
 
         val matchLore = mutableListOf<String>()
 
-        for (slot in chest.inventorySlots) {
-            if (slot == null) continue
-
-            if (slot.slotNumber != slot.slotIndex) continue
-            if (slot.stack == null) continue
-
+        for ((slot, stack) in chest.getUpperItems()) {
             if (slot.slotNumber == 29) {
                 val lore = slot.stack.getLore()
                 matchLore.addAll(lore)
@@ -41,13 +38,7 @@ class AnvilCombineHelper {
 
         if (matchLore.isEmpty()) return
 
-        for (slot in chest.inventorySlots) {
-            if (slot == null) continue
-
-            if (slot.slotNumber == slot.slotIndex) continue
-            if (slot.stack == null) continue
-
-
+        for ((slot, stack) in chest.getLowerItems()) {
             if (matchLore == slot.stack.getLore()) {
                 slot highlight LorenzColor.GREEN
             }

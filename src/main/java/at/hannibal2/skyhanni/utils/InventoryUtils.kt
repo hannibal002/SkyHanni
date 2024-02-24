@@ -74,4 +74,26 @@ object InventoryUtils {
         val screen = Minecraft.getMinecraft().currentScreen as? GuiContainer ?: return false
         return screen.slotUnderMouse.inventory is InventoryPlayer && screen.slotUnderMouse.stack == itemStack
     }
+
+    fun ContainerChest.getUpperItems(): Map<Slot, ItemStack> = buildMap {
+        for ((slot, stack) in getAllItems()) {
+            if (slot.slotNumber != slot.slotIndex) continue
+            this[slot] = stack
+        }
+    }
+
+    fun ContainerChest.getLowerItems(): Map<Slot, ItemStack> = buildMap {
+        for ((slot, stack) in getAllItems()) {
+            if (slot.slotNumber == slot.slotIndex) continue
+            this[slot] = stack
+        }
+    }
+
+    fun ContainerChest.getAllItems(): Map<Slot, ItemStack> = buildMap {
+        for (slot in inventorySlots) {
+            if (slot == null) continue
+            val stack = slot.stack ?: continue
+            this[slot] = stack
+        }
+    }
 }

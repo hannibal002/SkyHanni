@@ -31,6 +31,7 @@ import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.CollectionUtils.addAsSingletonList
 import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.InventoryUtils.getInventoryName
+import at.hannibal2.skyhanni.utils.InventoryUtils.getUpperItems
 import at.hannibal2.skyhanni.utils.ItemUtils.name
 import at.hannibal2.skyhanni.utils.LorenzColor
 import at.hannibal2.skyhanni.utils.LorenzUtils
@@ -95,10 +96,7 @@ class DailyQuestHelper(val reputationHelper: CrimsonIsleReputationHelper) {
             val dojoQuest = getQuest<DojoQuest>() ?: return
             if (dojoQuest.state != QuestState.ACCEPTED) return
 
-            for (slot in chest.inventorySlots) {
-                if (slot == null) continue
-                if (slot.slotNumber != slot.slotIndex) continue
-                val stack = slot.stack ?: continue
+            for ((slot, stack) in chest.getUpperItems()) {
                 val itemName = stack.name ?: continue
 
                 if (itemName.contains(dojoQuest.dojoName)) {

@@ -8,6 +8,7 @@ import at.hannibal2.skyhanni.events.LorenzToolTipEvent
 import at.hannibal2.skyhanni.events.RenderItemTipEvent
 import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.InventoryUtils.getInventoryName
+import at.hannibal2.skyhanni.utils.InventoryUtils.getUpperItems
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.ItemUtils.name
 import at.hannibal2.skyhanni.utils.LorenzColor
@@ -100,11 +101,7 @@ class DungeonFinderFeatures {
         val inventoryName = chest.getInventoryName()
         if (inventoryName != "Party Finder") return
 
-        for (slot in chest.inventorySlots) {
-            if (slot == null) continue
-            if (slot.slotNumber != slot.slotIndex) continue
-            if (slot.stack == null) continue
-
+        for ((slot, stack) in chest.getUpperItems()) {
             val itemName = slot.stack.name ?: continue
             if (!itemName.endsWith(" Party")) continue
 

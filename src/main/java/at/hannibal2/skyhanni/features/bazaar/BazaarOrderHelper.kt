@@ -4,6 +4,7 @@ import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.events.GuiContainerEvent
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.InventoryUtils.getInventoryName
+import at.hannibal2.skyhanni.utils.InventoryUtils.getUpperItems
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.ItemUtils.name
 import at.hannibal2.skyhanni.utils.LorenzColor
@@ -51,12 +52,9 @@ class BazaarOrderHelper {
         val inventoryName = chest.getInventoryName()
         if (!isBazaarOrderInventory(inventoryName)) return
 
-        for (slot in chest.inventorySlots) {
-            if (slot == null) continue
-            if (slot.slotNumber != slot.slotIndex) continue
-            if (slot.stack == null) continue
+        for ((slot, stack) in chest.getUpperItems()) {
 
-            val itemName = slot.stack.name ?: continue
+            val itemName = stack.name ?: continue
             bazaarItemNamePattern.matchMatcher(itemName) {
                 val buyOrSell = group("type").let { (it == "BUY") to (it == "SELL") }
                 if (buyOrSell.let { !it.first && !it.second }) return
