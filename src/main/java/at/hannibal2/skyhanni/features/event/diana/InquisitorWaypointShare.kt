@@ -129,6 +129,7 @@ object InquisitorWaypointShare {
         logger.log("FOUND: $name")
 
         inquisitorsNearby = inquisitorsNearby.editCopy { add(entity) }
+        GriffinBurrowHelper.update()
 
         val diff = System.currentTimeMillis() - time
         time = System.currentTimeMillis()
@@ -251,6 +252,7 @@ object InquisitorWaypointShare {
             }
             val inquis = SharedInquisitor(name, displayName, location, SimpleTimeMark.now())
             waypoints = waypoints.editCopy { this[name] = inquis }
+            GriffinBurrowHelper.update()
 
             event.isCanceled = true
         }
@@ -259,6 +261,7 @@ object InquisitorWaypointShare {
             val name = rawName.cleanPlayerName()
             val displayName = rawName.cleanPlayerName(displayName = true)
             waypoints = waypoints.editCopy { remove(name) }
+            GriffinBurrowHelper.update()
             logger.log("Inquisitor died from '$displayName'")
         }
     }
@@ -268,6 +271,7 @@ object InquisitorWaypointShare {
     fun maybeRemove(inquis: SharedInquisitor) {
         if (inquisitorsNearby.isEmpty()) {
             waypoints = waypoints.editCopy { remove(inquis.fromPlayer) }
+            GriffinBurrowHelper.update()
             ChatUtils.chat("Inquisitor from ${inquis.displayName} not found, deleting.")
         }
     }

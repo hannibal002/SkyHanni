@@ -23,6 +23,7 @@ import at.hannibal2.skyhanni.utils.PrimitiveItemStack
 import at.hannibal2.skyhanni.utils.PrimitiveItemStack.Companion.makePrimitiveStack
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
+import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraft.inventory.Slot
 import net.minecraftforge.fml.common.eventhandler.EventPriority
@@ -37,12 +38,13 @@ object GetFromSackAPI {
     val commands = arrayOf("gfs", "getfromsacks")
     val commandsWithSlash = commands.map { "/$it" }
 
-    private val fromSacksChatPattern by RepoPattern.pattern(
-        "gfs.chat.from",
+    private val patternGroup = RepoPattern.group("gfs.chat")
+    private val fromSacksChatPattern by patternGroup.pattern(
+        "from",
         "§aMoved §r§e(?<amount>\\d+) (?<item>.+)§r§a from your Sacks to your inventory."
     )
-    private val missingChatPattern by RepoPattern.pattern(
-        "gfs.chat.missing",
+    private val missingChatPattern by patternGroup.pattern(
+        "missing",
         "§cYou have no (?<item>.+) in your Sacks!"
     )
 
@@ -157,7 +159,7 @@ object GetFromSackAPI {
 
     private fun bazaarMessage(item: String, amount: Int, isRemaining: Boolean = false) = ChatUtils.clickableChat(
         "§lCLICK §r§eto get the ${if (isRemaining) "remaining " else ""}§ax${amount} §9$item §efrom bazaar",
-        "bz $item"
+        "bz ${item.removeColor()}"
     )
 
     private fun commandValidator(args: List<String>): Pair<CommandResult, PrimitiveItemStack?> {

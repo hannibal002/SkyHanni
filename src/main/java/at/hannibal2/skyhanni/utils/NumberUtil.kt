@@ -187,7 +187,10 @@ object NumberUtil {
         }
     }
 
-    fun String.formatNumber(): Long {
+    // TODO create new function formatLong, and eventually deprecate this function.
+    fun String.formatNumber(): Long = formatDouble().toLong()
+
+    fun String.formatDouble(): Double {
         var text = lowercase().replace(",", "")
 
         val multiplier = if (text.endsWith("k")) {
@@ -201,7 +204,7 @@ object NumberUtil {
             1.bilion
         } else 1.0
         val d = text.toDouble()
-        return (d * multiplier).toLong()
+        return d * multiplier
     }
 
     val Int.milion get() = this * 1_000_000.0

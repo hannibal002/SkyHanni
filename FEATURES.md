@@ -149,6 +149,9 @@ Use `/sh` or `/skyhanni` to open the SkyHanni config in game.
     + Makes normal clicks to shift clicks in Brewing Stand inventory.
 + Low Quiver Notification. - CarsCupcake
     + This will notify you via title if your quiver is low on arrows according to chat message.
++ Added not fully completed tasks in Way to gain SkyBlock XP menus. - Thunderblade73
+    + Works in the subcategories.
+    + It does not work with infinite tasks.
 
 </details>
 <details open><summary>
