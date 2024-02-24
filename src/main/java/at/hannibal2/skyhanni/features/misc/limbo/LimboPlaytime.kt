@@ -66,7 +66,7 @@ class LimboPlaytime {
     @SubscribeEvent
     fun onRenderGUI(event: InventoryOpenEvent) {
         if (event.inventoryName != "Detailed /playtime") return
-        if (config.limboPlaytime == 0) return
+        if (config.limboPlaytime < 60) return
         val playtime = config.limboPlaytime.seconds
         val wholeHours = playtime.inWholeHours
         wholeMinutes = playtime.inWholeMinutes
