@@ -18,43 +18,47 @@ object IslandLeaveJoinMsgs {
     private val config get() = SkyHanniMod.feature.misc.leaveJoinMsgs
 
     private var players = mutableListOf<String>()
-    private var rawPlayersNew = mutableListOf<String>()
-    private var cleanPlayersNew = mutableListOf<String>()
 
     private var updatedSinceWorldSwitch = false
     private var onKnownIsland = false
 
-    private val rawPlayerPattern by RepoPattern.pattern(
-        "misc.islandleavejoinmsgs.rawplayers", "^§8\\[§\\w\\d+§8\\] (?<player>§\\w+).*$"
+    private val patternGroup = RepoPattern.group("misc.islandleavejoinmsgs")
+    private val rawPlayerPattern by patternGroup.pattern(
+        "rawplayers",
+        "^§8\\[§\\w\\d+§8\\] (?<player>§\\w+).*$"
     )
-    private val cleanPlayerPattern by RepoPattern.pattern(
-        "misc.islandleavejoinmsgs.cleanplayers", "^§8\\[§r§\\w\\d+§r§8\\] §r(?<player>§\\w+).*$"
+    private val cleanPlayerPattern by patternGroup.pattern(
+        "cleanplayers",
+        "^§8\\[§r§\\w\\d+§r§8\\] §r(?<player>§\\w+).*$"
     )
-    private val offlinePlayerPattern by RepoPattern.pattern(
-        "misc.islandleavejoinmsgs.offlineplayers", "^§[0-9a-f]\\w+(?: §r§7\\(Offline [0-9dh+]+§r§7\\))?\$"
+    private val offlinePlayerPattern by patternGroup.pattern(
+        "offlineplayers",
+        "^§[0-9a-f]\\w+(?: §r§7\\(Offline [0-9dh+]+§r§7\\))?\$"
     )
-    private val islandCategoryPattern by RepoPattern.pattern(
-        "misc.islandleavejoinmsgs.islandcategory", "^\\s+§r§b§lIsland$"
+    private val islandCategoryPattern by patternGroup.pattern(
+        "islandcategory",
+        "^\\s+§r§b§lIsland$"
     )
-    private val guestCategoryPattern by RepoPattern.pattern(
-        "misc.islandleavejoinmsgs.guestcategory", "^\\s+§r§5§lGuests §r§f\\(\\d+\\)$"
+    private val guestCategoryPattern by patternGroup.pattern(
+        "guestcategory",
+        "^\\s+§r§5§lGuests §r§f\\(\\d+\\)$"
     )
 
     @SubscribeEvent
     fun onTabListUpdate(event: TabListUpdateEvent) {
         if (!config.enabled) return
-        val onPrivateIslandGarden = onPrivateIsland()
-        val guesting = onPrivateIsland(true)
+        val onPrivateIslandGarden = IslandType.onPrivateWorld()
+        val guesting = IslandType.onPrivateWorld()
         if (!(onPrivateIslandGarden || (config.onPublicIslands && !guesting) || (config.guestLeaveJoinMsgs && guesting))) return
 
-        rawPlayersNew.clear()
-        cleanPlayersNew.clear()
+        val rawPlayersNew = mutableListOf<String>()
+        val cleanPlayersNew = mutableListOf<String>()
 
         var inIslandCategory = false
         val islandOwners = mutableListOf<String>()
 
-        val joinMessage = " §" + if (config.leaveJoinColor) { "a" } else { "e" } + "joined §ethe island."
-        val leaveMessage = " §" + if (config.leaveJoinColor) { "c" } else { "e" } + "left §ethe island."
+        val joinMessage = " §${if (config.leaveJoinColor) "a" else "e"}joined §ethe island."
+        val leaveMessage = " §${if (config.leaveJoinColor) "c" else "e"}left §ethe island."
 
         for (line in event.tabList) {
             if (guesting && !onKnownIsland) {
@@ -93,11 +97,11 @@ object IslandLeaveJoinMsgs {
             }
         }
 
+        if (players.isEmpty()) return
+
         if (players.size > 1) {
             updatedSinceWorldSwitch = true
         }
-
-        if (players.isEmpty()) return
 
         for ((index, player) in players.withIndex().reversed()) {
             if (!rawPlayersNew.contains(player) && !cleanPlayersNew.contains(player)) {
@@ -120,25 +124,13 @@ object IslandLeaveJoinMsgs {
 
     private fun shouldSendMsg(player: String): Boolean {
         val cleanPlayer = player.removeColor()
-        return (
-            LorenzUtils.getPlayerName() != cleanPlayer &&
-                if (config.onlyKnownPeople) isPlayerKnown(cleanPlayer) ||
-                    (config.alwaysOnYourIsland && onPrivateIsland()) ||
-                    (config.alwaysOnKnownIslands && onKnownIsland)
-                else true
-            )
-    }
 
-    private fun onPrivateIsland(guesting: Boolean = false) =
-        if (guesting) {
-            LorenzUtils.skyBlockIsland == IslandType.PRIVATE_ISLAND_GUEST || LorenzUtils.skyBlockIsland == IslandType.GARDEN_GUEST
-        } else LorenzUtils.skyBlockIsland == IslandType.PRIVATE_ISLAND || LorenzUtils.skyBlockIsland == IslandType.GARDEN
+        if (LorenzUtils.getPlayerName() == cleanPlayer) return false
+        if (!config.onlyKnownPeople) return true
+        return isPlayerKnown(cleanPlayer) || (config.alwaysOnYourIsland && IslandType.onPrivateWorld()) || (config.alwaysOnKnownIslands && onKnownIsland)
+    }
 
     private fun isPlayerKnown(player: String): Boolean {
-        return (
-            FriendAPI.getAllFriends().any { it.name.contains(player) } ||
-                GuildAPI.isInGuild(player) ||
-                PartyAPI.partyMembers.contains(player)
-            )
-    }
+        return (FriendAPI.isFriend(player) || GuildAPI.isInGuild(player) || PartyAPI.partyMembers.contains(player))
+    } // TODO options for only best friends and adding/removing known players
 }

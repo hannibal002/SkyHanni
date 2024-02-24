@@ -63,6 +63,8 @@ object FriendAPI {
         return list
     }
 
+    fun isFriend(player: String): Boolean = getAllFriends().any { it.name.contains(player) }
+
     fun saveConfig() {
         SkyHanniMod.configManager.saveConfig(ConfigFileType.FRIENDS, "Save file")
     }

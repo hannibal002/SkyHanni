@@ -316,11 +316,6 @@ object Commands {
             "shkingfix",
             "Reseting the local King Talisman Helper offset."
         ) { KingTalismanHelper.kingFix() }
-        registerCommand(
-            "shclearstoredplayers",
-            "Clears the stored players on the island."
-        ) { IslandLeaveJoinMsgs.clearPlayers() }
-
     }
 
     private fun developersDebugFeatures() {
@@ -345,6 +340,10 @@ object Commands {
             "shtestburrow",
             "Sets a test burrow waypoint at your location"
         ) { GriffinBurrowHelper.setTestBurrow(it) }
+        registerCommand(
+            "shclearstoredplayers",
+            "Clears the stored players on the island."
+        ) { IslandLeaveJoinMsgs.clearPlayers() }
     }
 
     private fun developersCodingHelp() {
