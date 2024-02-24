@@ -223,5 +223,5 @@ object ChatUtils {
     fun MessageSendToServerEvent.senderIsSkyhanni() = originatingModContainer?.modId == "skyhanni"
 
     fun MessageSendToServerEvent.eventWithNewMessage(message: String) =
-        MessageSendToServerEvent(message, this.splitMessage, this.originatingModContainer)
+        MessageSendToServerEvent(message, message.split(" "), this.originatingModContainer)
 }
