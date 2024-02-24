@@ -32,6 +32,7 @@ object GardenCropMilestones {
         "§7Total: §a(?<name>.*)"
     )
 
+    private val config get() = GardenAPI.config.cropMilestones
 
     fun getCropTypeByLore(itemStack: ItemStack): CropType? {
         for (line in itemStack.getLore()) {
