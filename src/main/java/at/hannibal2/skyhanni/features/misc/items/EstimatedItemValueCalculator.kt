@@ -540,15 +540,6 @@ object EstimatedItemValueCalculator {
         "ADVANCED_GARDENING_AXE".asInternalName(),
     )
 
-    private val bookBundleAmount = mapOf(
-        "vicious" to 5,
-        "big_brain" to 5,
-        "reflection" to 3,
-        "quantum" to 3,
-        "ultimate_the_one" to 1,
-        "rainbow" to 1,
-    )
-
     private fun addEnchantments(stack: ItemStack, list: MutableList<String>): Double {
         val enchantments = stack.getEnchantments() ?: return 0.0
 
@@ -585,7 +576,7 @@ object EstimatedItemValueCalculator {
                 level = 1
             }
             if (internalName.startsWith("ENCHANTED_BOOK_BUNDLE_")) {
-                multiplier = if (bookBundleAmount.contains(rawName)) bookBundleAmount[rawName]!! else 5
+                multiplier = EstimatedItemValue.bookBundleAmount.getOrDefault(rawName, 5)
             }
             if (rawName in tieredEnchants) level = 1
 

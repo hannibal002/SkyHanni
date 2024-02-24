@@ -18,4 +18,7 @@ public class ItemsJson {
 
     @Expose
     public List<NEUInternalName> water_fishing_rods;
+
+    @Expose
+    public Map<String, Integer> book_bundle_amount;
 }
