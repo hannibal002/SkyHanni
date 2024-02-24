@@ -18,8 +18,15 @@ import kotlin.time.Duration.Companion.seconds
 class LimboPlaytime {
     private lateinit var modifiedArray: MutableList<String>
     private var setMinutes = false
-    private val minutesRegex by RepoPattern.pattern("limbo.tooltip.minutes", "§5§o§a\\d+(\\.\\d+)? minutes.+\$")
-    private val hoursRegex by RepoPattern.pattern("limbo.tooltip.hours", "§5§o§b\\d+(\\.\\d+)? hours.+\$")
+    private val patternGroup = RepoPattern.group("misc.limbo.tooltip")
+    private val minutesPattern by patternGroup.pattern(
+        "minutes",
+        "§5§o§a\\d+(\\.\\d+)? minutes.+\$"
+    )
+    private val hoursPattern by patternGroup.pattern(
+        "hours",
+        "§5§o§b\\d+(\\.\\d+)? hours.+\$"
+    )
 
     private var wholeMinutes: Long = 0
     private var hoursString: String = ""
@@ -49,8 +56,8 @@ class LimboPlaytime {
         if (config.limboPlaytime == 0) return
 
         val lore = event.toolTip
-        val hoursArray = lore.filter { hoursRegex.matches(it) }.toMutableList()
-        val minutesArray = lore.filter { minutesRegex.matches(it) }.toMutableList()
+        val hoursArray = lore.filter { hoursPattern.matches(it) }.toMutableList()
+        val minutesArray = lore.filter { minutesPattern.matches(it) }.toMutableList()
 
         addLimbo(hoursArray, minutesArray)
         remakeArray(event.toolTip, minutesArray, hoursArray)
