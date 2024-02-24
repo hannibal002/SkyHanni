@@ -10,6 +10,8 @@ import at.hannibal2.skyhanni.utils.CollectionUtils.addAsSingletonList
 import at.hannibal2.skyhanni.utils.CollectionUtils.editCopy
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.RenderUtils.renderStringsAndItems
+import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
+import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import java.util.regex.Matcher
 
@@ -17,10 +19,15 @@ object TrevorTracker {
 
     private val config get() = SkyHanniMod.feature.misc.trevorTheTrapper
 
-    // TODO USE SH-REPO
-    private val selfKillMobPattern =
-        "§aYour mob died randomly, you are rewarded §r§5(?<pelts>.*) pelts§r§a.".toPattern()
-    private val killMobPattern = "§aKilling the animal rewarded you §r§5(?<pelts>.*) pelts§r§a.".toPattern()
+    private val patternGroup = RepoPattern.group("misc.trevor")
+    private val selfKillMobPattern by patternGroup.pattern(
+        "selfkill",
+        "§aYour mob died randomly, you are rewarded §r§5(?<pelts>.*) pelts§r§a."
+    )
+    private val killMobPattern by patternGroup.pattern(
+        "kill",
+        "§aKilling the animal rewarded you §r§5(?<pelts>.*) pelts§r§a."
+    )
 
     private var display = emptyList<List<Any>>()
 
@@ -76,16 +83,15 @@ object TrevorTracker {
         if (!TrevorFeatures.onFarmingIsland()) return
         val storage = ProfileStorageData.profileSpecific?.trapperData ?: return
 
-        var matcher = selfKillMobPattern.matcher(event.message)
-        if (matcher.matches()) {
-            val pelts = matcher.group("pelts").toInt()
+        selfKillMobPattern.matchMatcher(event.message) {
+            val pelts = group("pelts").toInt()
             storage.peltsGained += pelts
             storage.selfKillingAnimals += 1
             update()
         }
-        matcher = killMobPattern.matcher(event.message)
-        if (matcher.matches()) {
-            val pelts = matcher.group("pelts").toInt()
+
+        killMobPattern.matchMatcher(event.message) {
+            val pelts = group("pelts").toInt()
             storage.peltsGained += pelts
             storage.killedAnimals += 1
             update()
@@ -125,7 +131,7 @@ object TrevorTracker {
     @SubscribeEvent
     fun onRenderOverlay(event: GuiRenderEvent.GuiOverlayRenderEvent) {
         if (!shouldDisplay()) return
-        config.position.renderStringsAndItems(display, posLabel = "Frozen Treasure Tracker")
+        config.position.renderStringsAndItems(display, posLabel = "Trevor Tracker")
     }
 
     private fun shouldDisplay(): Boolean {

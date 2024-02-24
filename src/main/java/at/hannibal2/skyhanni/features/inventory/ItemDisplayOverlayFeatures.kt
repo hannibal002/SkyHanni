@@ -2,6 +2,7 @@ package at.hannibal2.skyhanni.features.inventory
 
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.CollectionAPI
+import at.hannibal2.skyhanni.api.SkillAPI
 import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.config.features.inventory.InventoryConfig.ItemNumberEntry
 import at.hannibal2.skyhanni.config.features.inventory.InventoryConfig.ItemNumberEntry.BINGO_GOAL_RANK
@@ -24,12 +25,15 @@ import at.hannibal2.skyhanni.data.PetAPI
 import at.hannibal2.skyhanni.events.RenderItemTipEvent
 import at.hannibal2.skyhanni.events.RenderObject
 import at.hannibal2.skyhanni.features.garden.pests.PestAPI
+import at.hannibal2.skyhanni.features.skillprogress.SkillType
 import at.hannibal2.skyhanni.utils.ConfigUtils
 import at.hannibal2.skyhanni.utils.InventoryUtils
+import at.hannibal2.skyhanni.utils.ItemCategory
 import at.hannibal2.skyhanni.utils.ItemUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.cleanName
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalNameOrNull
+import at.hannibal2.skyhanni.utils.ItemUtils.getItemCategoryOrNull
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.ItemUtils.name
 import at.hannibal2.skyhanni.utils.LorenzUtils.between
@@ -40,25 +44,38 @@ import at.hannibal2.skyhanni.utils.NumberUtil.romanToDecimal
 import at.hannibal2.skyhanni.utils.NumberUtil.romanToDecimalIfNecessary
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getBottleOfJyrreSeconds
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getEdition
+import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getPetLevel
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getRanchersSpeed
 import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
+import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraft.item.ItemStack
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
 object ItemDisplayOverlayFeatures {
-
-    // TODO USE SH-REPO
     private val config get() = SkyHanniMod.feature.inventory
 
-    // TODO repo
-    private val petLevelPattern = "\\[Lvl (?<level>.*)] .*".toPattern()
-    private val masterSkullPattern = "(.*)Master Skull - Tier .".toPattern()
-    private val gardenVacuumPatterm = "§7Vacuum Bag: §6(?<amount>\\d*) Pests?".toPattern()
-    private val harvestPattern = "§7§7You may harvest §6(?<amount>.).*".toPattern()
-    private val dungeonPotionPattern = "Dungeon (?<level>.*) Potion".toPattern()
-    private val bingoGoalRankPattern =
-        "(§.)*You were the (§.)*(?<rank>[\\w]+)(?<ordinal>(st|nd|rd|th)) (§.)*to".toPattern()
+    private val patternGroup = RepoPattern.group("inventory.item.overlay")
+    private val masterSkullPattern by patternGroup.pattern(
+        "masterskull",
+        "(.*)Master Skull - Tier ."
+    )
+    private val gardenVacuumPatterm by patternGroup.pattern(
+        "vacuum",
+        "§7Vacuum Bag: §6(?<amount>\\d*) Pests?"
+    )
+    private val harvestPattern by patternGroup.pattern(
+        "harvest",
+        "§7§7You may harvest §6(?<amount>.).*"
+    )
+    private val dungeonPotionPattern by patternGroup.pattern(
+        "dungeonpotion",
+        "Dungeon (?<level>.*) Potion"
+    )
+    private val bingoGoalRankPattern by patternGroup.pattern(
+        "bingogoalrank",
+        "(§.)*You were the (§.)*(?<rank>[\\w]+)(?<ordinal>(st|nd|rd|th)) (§.)*to"
+    )
 
     private val bottleOfJyrre = "NEW_BOTTLE_OF_JYRRE".asInternalName()
 
@@ -112,15 +129,10 @@ object ItemDisplayOverlayFeatures {
         }
 
         if (PET_LEVEL.isSelected()) {
-            val chestName = InventoryUtils.openInventoryName()
-            if (!chestName.endsWith("Sea Creature Guide") && ItemUtils.isPet(itemName)) {
-                petLevelPattern.matchMatcher(itemName) {
-                    val rawLevel = group("level")
-                    val level = rawLevel.toIntOrNull()
-                        ?: throw IllegalStateException("pet level not found for item name '$itemName'")
-                    if (level != ItemUtils.maxPetLevel(itemName)) {
-                        return "$level"
-                    }
+            if (item.getItemCategoryOrNull() == ItemCategory.PET) {
+                val level = item.getPetLevel()
+                if (level != ItemUtils.maxPetLevel(itemName)) {
+                    return level.toString()
                 }
             }
         }
@@ -156,9 +168,14 @@ object ItemDisplayOverlayFeatures {
             if (CollectionAPI.isCollectionTier0(lore)) return "0"
             val split = itemName.split(" ")
             if (!itemName.contains("Dungeon")) {
+                val skillName = split.first()
                 val text = split.last()
                 if (split.size < 2) return "0"
-                return "" + text.romanToDecimalIfNecessary()
+                val level = "" + text.romanToDecimalIfNecessary()
+                val skill = SkillType.getByNameOrNull(skillName) ?: return level
+                val skillInfo = SkillAPI.storage?.get(skill) ?: return level
+                return if (SkyHanniMod.feature.skillProgress.overflowConfig.enableInSkillMenuAsStackSize)
+                    "" + skillInfo.overflowLevel else level
             }
         }
 
@@ -203,9 +220,9 @@ object ItemDisplayOverlayFeatures {
             item.name?.let {
                 dungeonPotionPattern.matchMatcher(it.removeColor()) {
                     return when (val level = group("level").romanToDecimal()) {
-                        in 1..2 -> "§f$level"
-                        in 3..4 -> "§a$level"
-                        in 5..6 -> "§9$level"
+                        in 1 .. 2 -> "§f$level"
+                        in 3 .. 4 -> "§a$level"
+                        in 5 .. 6 -> "§9$level"
                         else -> "§5$level"
                     }
                 }

@@ -6,10 +6,10 @@ import at.hannibal2.skyhanni.config.features.combat.ghostcounter.GhostCounterCon
 import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.data.ProfileStorageData
 import at.hannibal2.skyhanni.data.SkillExperience
+import at.hannibal2.skyhanni.events.ActionBarUpdateEvent
 import at.hannibal2.skyhanni.events.ConfigLoadEvent
 import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.InventoryFullyOpenedEvent
-import at.hannibal2.skyhanni.events.LorenzActionBarEvent
 import at.hannibal2.skyhanni.events.LorenzChatEvent
 import at.hannibal2.skyhanni.events.LorenzTickEvent
 import at.hannibal2.skyhanni.events.PurseChangeCause
@@ -52,6 +52,7 @@ import at.hannibal2.skyhanni.utils.RenderUtils.renderStringsAndItems
 import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.renderables.Renderable
+import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import io.github.moulberry.notenoughupdates.util.Utils
 import io.github.moulberry.notenoughupdates.util.XPInformation
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
@@ -68,16 +69,33 @@ object GhostCounter {
     private var display = emptyList<List<Any>>()
     var ghostCounterV3File =
         File("." + File.separator + "config" + File.separator + "ChatTriggers" + File.separator + "modules" + File.separator + "GhostCounterV3" + File.separator + ".persistantData.json")
-    private val skillXPPattern = "[+](?<gained>[0-9,.]+) \\((?<current>[0-9,.]+)(?:/(?<total>[0-9,.]+))?\\)".toPattern()
-    private val combatSectionPattern =
-        ".*[+](?<gained>[0-9,.]+) (?<skillName>[A-Za-z]+) \\((?<progress>(?<current>[0-9.,]+)/(?<total>[0-9.,]+)|(?<percent>[0-9.]+)%)\\).*".toPattern()
-    private val killComboExpiredPattern =
-        "§cYour Kill Combo has expired! You reached a (?<combo>.*) Kill Combo!".toPattern()
-    private val ghostXPPattern =
-        "(?<current>\\d+(?:\\.\\d+)?(?:,\\d+)?[kK]?)/(?<total>\\d+(?:\\.\\d+)?(?:,\\d+)?[kKmM]?)".toPattern()
-    private val bestiaryPattern =
-        ".*(?:§\\d|§\\w)+BESTIARY (?:§\\d|§\\w)+Ghost (?:§\\d|§\\w)(?<previousLevel>\\d+)➜(?:§\\d|§\\w)(?<nextLevel>\\d+).*".toPattern() //   &3&lBESTIARY &b&lGhost &89➜&b10
-    private val skillLevelPattern = ".*§e§lSkills: §r§a(?<skillName>.*) (?<skillLevel>\\d+).*".toPattern()
+
+    private val patternGroup = RepoPattern.group("combat.ghostcounter")
+    private val skillXPPattern by patternGroup.pattern(
+        "skillxp",
+        "[+](?<gained>[0-9,.]+) \\((?<current>[0-9,.]+)(?:/(?<total>[0-9,.]+))?\\)"
+    )
+    private val combatSectionPattern by patternGroup.pattern(
+        "combatsection",
+        ".*[+](?<gained>[0-9,.]+) (?<skillName>[A-Za-z]+) \\((?<progress>(?<current>[0-9.,]+)/(?<total>[0-9.,]+)|(?<percent>[0-9.]+)%)\\).*"
+    )
+    private val killComboExpiredPattern by patternGroup.pattern(
+        "killcomboexpired",
+        "§cYour Kill Combo has expired! You reached a (?<combo>.*) Kill Combo!"
+    )
+    private val ghostXPPattern by patternGroup.pattern(
+        "ghostxp",
+        "(?<current>\\d+(?:\\.\\d+)?(?:,\\d+)?[kK]?)/(?<total>\\d+(?:\\.\\d+)?(?:,\\d+)?[kKmM]?)"
+    )
+    private val bestiaryPattern by patternGroup.pattern(
+        "bestiary",
+        ".*(?:§\\d|§\\w)+BESTIARY (?:§\\d|§\\w)+Ghost (?:§\\d|§\\w)(?<previousLevel>\\d+)➜(?:§\\d|§\\w)(?<nextLevel>\\d+).*"
+    )
+    private val skillLevelPattern by patternGroup.pattern(
+        "skilllevel",
+        ".*§e§lSkills: §r§a(?<skillName>.*) (?<skillLevel>\\d+).*"
+    )
+
     private val format = NumberFormat.getInstance()
     private var percent: Float = 0.0f
     private var totalSkillXp = 0
@@ -164,7 +182,7 @@ object GhostCounter {
         val bestiary = if (config.showMax) {
             when (nextLevel) {
                 26 -> bestiaryFormatting.maxed.replace("%currentKill%", currentKill.addSeparators())
-                in 1..25 -> {
+                in 1 .. 25 -> {
                     val sum = bestiaryData.filterKeys { it <= nextLevel - 1 }.values.sum()
 
                     val cKill = sum + currentKill
@@ -177,7 +195,7 @@ object GhostCounter {
         } else {
             when (nextLevel) {
                 26 -> bestiaryFormatting.maxed
-                in 1..25 -> bestiaryFormatting.progress
+                in 1 .. 25 -> bestiaryFormatting.progress
                 else -> bestiaryFormatting.openMenu
             }
         }
@@ -283,7 +301,7 @@ object GhostCounter {
                     val res = current.formatNumber().toString()
                     gain = (res.toLong() - lastXp.toLong()).toDouble().roundToInt()
                     num = (gain.toDouble() / gained)
-                    if (gained in 150.0..450.0 && lastXp != "0" && num >= 0) {
+                    if (gained in 150.0 .. 450.0 && lastXp != "0" && num >= 0) {
                         KILLS.add(num)
                         KILLS.add(num, true)
                         Option.GHOSTSINCESORROW.add(num)
@@ -315,12 +333,12 @@ object GhostCounter {
     }
 
     @SubscribeEvent
-    fun onActionBar(event: LorenzActionBarEvent) {
+    fun onActionBarUpdate(event: ActionBarUpdateEvent) {
         if (!isEnabled()) return
         if (!inMist) return
-        combatSectionPattern.matchMatcher(event.message) {
+        combatSectionPattern.matchMatcher(event.actionBar) {
             if (group("skillName").lowercase() != "combat") return
-            parseCombatSection(event.message)
+            parseCombatSection(event.actionBar)
         }
     }
 

@@ -28,7 +28,7 @@ public class NotifyLowConfig {
     public int organicMatter = 20_000;
 
     @Expose
-    @ConfigOption(name = "Min Fuel Cap", desc = "Warn when Fuel is below this value.")
+    @ConfigOption(name = "Min Fuel", desc = "Warn when Fuel is below this value.")
     @ConfigEditorSlider(
         minValue = 500,
         maxValue = 40_000,

@@ -1,12 +1,12 @@
 package at.hannibal2.skyhanni.utils
 
 import at.hannibal2.skyhanni.config.ConfigManager
+import at.hannibal2.skyhanni.data.PetAPI
 import at.hannibal2.skyhanni.mixins.hooks.ItemStackCachedData
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.ItemUtils.name
 import at.hannibal2.skyhanni.utils.NEUInternalName.Companion.asInternalName
-import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import com.google.gson.JsonObject
 import net.minecraft.item.Item
@@ -94,11 +94,7 @@ object SkyBlockItemModifierUtils {
     @Suppress("CAST_NEVER_SUCCEEDS")
     inline val ItemStack.cachedData get() = (this as ItemStackCachedData).skyhanni_cachedData
 
-    fun ItemStack.getPetLevel(): Int {
-        return UtilsPatterns.petLevelPattern.matchMatcher(this.displayName) {
-            group("level").toInt()
-        } ?: 0
-    }
+    fun ItemStack.getPetLevel(): Int = PetAPI.getPetLevel(displayName)?: 0
 
     fun ItemStack.getMaxPetLevel() = if (this.getInternalName() == "GOLDEN_DRAGON;4".asInternalName()) 200 else 100
 

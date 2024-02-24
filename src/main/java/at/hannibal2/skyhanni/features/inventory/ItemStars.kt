@@ -9,6 +9,8 @@ import at.hannibal2.skyhanni.events.RepositoryReloadEvent
 import at.hannibal2.skyhanni.features.inventory.ItemDisplayOverlayFeatures.isSelected
 import at.hannibal2.skyhanni.utils.ItemUtils.name
 import at.hannibal2.skyhanni.utils.LorenzUtils
+import at.hannibal2.skyhanni.utils.StringUtils.matches
+import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getDungeonStarCount
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getUpgradeLevel
 import net.minecraftforge.event.entity.player.ItemTooltipEvent
@@ -19,6 +21,11 @@ import kotlin.math.max
 class ItemStars {
 
     private val config get() = SkyHanniMod.feature.inventory
+
+    private val starPattern by RepoPattern.pattern(
+        "inventory.itemstars.stars",
+        "(.*)§.✪(.*)"
+    )
 
     private var armorNames = listOf<String>()
     private var tiers = mapOf<String, Int>()

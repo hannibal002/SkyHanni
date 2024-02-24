@@ -10,7 +10,6 @@ import io.github.moulberry.moulconfig.annotations.ConfigEditorBoolean;
 import io.github.moulberry.moulconfig.annotations.ConfigEditorDraggableList;
 import io.github.moulberry.moulconfig.annotations.ConfigEditorDropdown;
 import io.github.moulberry.moulconfig.annotations.ConfigOption;
-
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -54,15 +53,24 @@ public class InventoryConfig {
     public ChestValueConfig chestValueConfig = new ChestValueConfig();
 
     @Expose
+    @Category(name = "Skyblock Guide", desc = "")
+    public SkyblockGuideConfig skyblockGuideConfig = new SkyblockGuideConfig();
+
+    @Expose
     @Category(name = "Helpers", desc = "Settings for Helpers")
     public HelperConfig helper = new HelperConfig();
+
+    @Expose
+    @ConfigOption(name = "Get From Sack", desc = "")
+    @Accordion
+    public GetFromSackConfig gfs = new GetFromSackConfig();
 
     @Expose
     @ConfigOption(
         name = "Item Number",
         desc = "Showing the item number as a stack size for these items."
     )
-    @ConfigEditorDraggableList()
+    @ConfigEditorDraggableList
     public List<ItemNumberEntry> itemNumberAsStackSize = new ArrayList<>(Arrays.asList(
         NEW_YEAR_CAKE,
         RANCHERS_BOOTS_SPEED,
@@ -181,6 +189,7 @@ public class InventoryConfig {
     @Expose
     @ConfigOption(name = "Missing Tasks",
         desc = "Highlight missing tasks in the SkyBlock Level Guide inventory.")
+    // TODO move( , "inventory.highlightMissingSkyBlockLevelGuide", "inventory.skyblockGuideConfig.highlightMissingSkyBlockLevelGuide")
     @ConfigEditorBoolean
     @FeatureToggle
     public boolean highlightMissingSkyBlockLevelGuide = true;
@@ -188,6 +197,7 @@ public class InventoryConfig {
     @Expose
     @ConfigOption(name = "Power Stone Guide",
         desc = "Highlight missing power stones, show their total bazaar price, and allows to open the bazaar when clicking on the items in the Power Stone Guide.")
+    // TODO move( , "inventory.powerStoneGuide", "inventory.skyblockGuideConfig.powerStoneGuide")
     @ConfigEditorBoolean
     @FeatureToggle
     public boolean powerStoneGuide = true;
@@ -230,5 +240,11 @@ public class InventoryConfig {
     @ConfigEditorBoolean
     @FeatureToggle
     public boolean shiftClickBrewing = false;
+
+    @Expose
+    @ConfigOption(name = "Low Quiver Alert", desc = "Notifies you when your Quiver runs out of arrows.")
+    @ConfigEditorBoolean
+    @FeatureToggle
+    public boolean quiverAlert = false;
 
 }

@@ -46,6 +46,7 @@ object GriffinBurrowHelper {
     private var guessLocation: LorenzVec? = null
     private var particleBurrows = mapOf<LorenzVec, BurrowType>()
     var lastTitleSentTime = SimpleTimeMark.farPast()
+    private var shouldFocusOnInquis = false
 
     @SubscribeEvent
     fun onDebugDataCollect(event: DebugDataCollectEvent) {
@@ -74,16 +75,26 @@ object GriffinBurrowHelper {
         update()
     }
 
-    private fun update() {
+    fun update() {
         if (config.burrowsNearbyDetection) {
             checkRemoveGuess()
         }
 
-        val locations = particleBurrows.keys.toMutableList()
-        guessLocation?.let {
-            locations.add(findBlock(it))
+        val locations = mutableListOf<LorenzVec>()
+
+        if (config.inquisitorSharing.enabled) {
+            for (waypoint in InquisitorWaypointShare.waypoints) {
+                locations.add(waypoint.value.location)
+            }
         }
-        locations.addAll(InquisitorWaypointShare.waypoints.values.map { it.location })
+        shouldFocusOnInquis = config.inquisitorSharing.focusInquisitor && locations.isNotEmpty()
+        if (!shouldFocusOnInquis) {
+            locations.addAll(particleBurrows.keys.toMutableList())
+            guessLocation?.let {
+                locations.add(findBlock(it))
+            }
+            locations.addAll(InquisitorWaypointShare.waypoints.values.map { it.location })
+        }
         targetLocation = locations.minByOrNull { it.distanceToPlayer() }
 
         if (config.burrowNearestWarp) {
@@ -149,6 +160,9 @@ object GriffinBurrowHelper {
         guessLocation = null
         targetLocation = null
         particleBurrows = emptyMap()
+        GriffinBurrowParticleFinder.reset()
+
+        BurrowWarpHelper.currentWarp = null
         update()
     }
 
@@ -219,7 +233,7 @@ object GriffinBurrowHelper {
                 color = LorenzColor.AQUA
                 currentWarp.location
             } else {
-                color = LorenzColor.WHITE
+                color = if (shouldFocusOnInquis) LorenzColor.LIGHT_PURPLE else LorenzColor.WHITE
                 targetLocation?.add(0.5, 0.5, 0.5) ?: return
             }
 
@@ -325,7 +339,7 @@ object GriffinBurrowHelper {
         val type: BurrowType = when (strings[0].lowercase()) {
             "reset" -> {
                 resetAllData()
-                ChatUtils.chat("Manually reset all burrow waypoints.")
+                ChatUtils.chat("Manually reset all burrow data.")
                 return
             }
 

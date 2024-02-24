@@ -9,7 +9,7 @@ import at.hannibal2.skyhanni.events.LorenzChatEvent
 import at.hannibal2.skyhanni.events.LorenzTickEvent
 import at.hannibal2.skyhanni.events.LorenzWorldChangeEvent
 import at.hannibal2.skyhanni.events.PacketEvent
-import at.hannibal2.skyhanni.events.PreProfileSwitchEvent
+import at.hannibal2.skyhanni.events.ProfileJoinEvent
 import at.hannibal2.skyhanni.features.rift.RiftAPI
 import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.ChatUtils
@@ -23,6 +23,7 @@ import at.hannibal2.skyhanni.utils.TimeUnit
 import at.hannibal2.skyhanni.utils.TimeUtils
 import at.hannibal2.skyhanni.utils.TimeUtils.timerColor
 import at.hannibal2.skyhanni.utils.Timer
+import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraft.network.play.server.S47PacketPlayerListHeaderFooter
 import net.minecraftforge.fml.common.eventhandler.EventPriority
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
@@ -70,12 +71,14 @@ class NonGodPotEffectDisplay {
         ;
     }
 
-    // TODO USE SH-REPO
-    private var patternEffectsCount = "§7You have §e(?<name>\\d+) §7non-god effects\\.".toPattern()
+    private val effectsCountPattern by RepoPattern.pattern(
+        "misc.nongodpot.effects",
+        "§7You have §e(?<name>\\d+) §7non-god effects\\."
+    )
     private var totalEffectsCount = 0
 
     @SubscribeEvent
-    fun onPreProfileSwitch(event: PreProfileSwitchEvent) {
+    fun onProfileJoin(event: ProfileJoinEvent) {
         effectDuration.clear()
         display = emptyList()
     }
@@ -237,7 +240,7 @@ class NonGodPotEffectDisplay {
                         }
                     }
                 }
-                patternEffectsCount.matchMatcher(line) {
+                effectsCountPattern.matchMatcher(line) {
                     val group = group("name")
                     effectsCount = group.toInt()
                 }
