@@ -13,6 +13,8 @@ import at.hannibal2.skyhanni.features.commands.tabcomplete.GetFromSacksTabComple
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.ChatUtils.isCommand
 import at.hannibal2.skyhanni.utils.ChatUtils.senderIsSkyhanni
+import at.hannibal2.skyhanni.utils.DelayedRun
+import at.hannibal2.skyhanni.utils.ItemUtils.itemNameWithoutColor
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.NEUInternalName
 import at.hannibal2.skyhanni.utils.NEUInternalName.Companion.asInternalName
@@ -75,6 +77,8 @@ object GetFromSackAPI {
     var sackListNames = emptySet<String>()
         private set
 
+    private var sackListNamesNeedsSet = false
+
     private fun addToQueue(items: List<PrimitiveItemStack>) = queue.addAll(items)
 
     private fun addToInventory(items: List<PrimitiveItemStack>, slotId: Int) = inventoryMap.put(slotId, items)
@@ -82,6 +86,10 @@ object GetFromSackAPI {
     @SubscribeEvent
     fun onTick(event: LorenzTickEvent) {
         if (!LorenzUtils.inSkyBlock) return
+        if (sackListNamesNeedsSet) {
+
+            sackListNamesNeedsSet = false
+        }
         if (queue.isNotEmpty() && lastTimeOfCommand.passedSince() >= minimumDelay) {
             val item = queue.poll()
             ChatUtils.sendCommandToServer("gfs ${item.internalName.asString()} ${item.amount}")
@@ -211,6 +219,9 @@ object GetFromSackAPI {
     fun onRepoReload(event: RepositoryReloadEvent) {
         sackListInternalNames = event.getConstant<SacksJson>("Sacks").sackItems.toSet()
 
-        sackListNames = event.getConstant<SacksJson>("Sacks").sackList.map { it.uppercase() }.toSet()
+        DelayedRun.runNextTick {
+            sackListNames = sackListInternalNames.map { it.asInternalName().itemNameWithoutColor.uppercase() }.toSet()
+        }
+        //sackListNames = event.getConstant<SacksJson>("Sacks").sackList.map { it.uppercase() }.toSet()
     }
 }
