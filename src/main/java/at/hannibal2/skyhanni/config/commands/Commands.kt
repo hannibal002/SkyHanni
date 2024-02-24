@@ -345,6 +345,7 @@ object Commands {
     private fun developersCodingHelp() {
         registerCommand("shrepopatterns", "See where regexes are loaded from") { RepoPatternGui.open() }
         registerCommand("shtest", "Unused test command.") { SkyHanniDebugsAndTests.testCommand(it) }
+        registerCommand("shtestitem", "test item internal name resolving") { SkyHanniDebugsAndTests.testItemCommand(it) }
         registerCommand(
             "shfindnullconfig",
             "Find config elements that are null and prints them into the console"
