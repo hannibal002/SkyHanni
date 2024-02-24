@@ -12,8 +12,8 @@ import at.hannibal2.skyhanni.features.garden.GardenAPI.getCropType
 import at.hannibal2.skyhanni.features.garden.fortuneguide.FFGuideGUI.Companion.currentPet
 import at.hannibal2.skyhanni.features.garden.fortuneguide.FFGuideGUI.Companion.getItem
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName
-import at.hannibal2.skyhanni.utils.ItemUtils.getItemName
 import at.hannibal2.skyhanni.utils.ItemUtils.getItemRarityOrCommon
+import at.hannibal2.skyhanni.utils.ItemUtils.itemName
 import at.hannibal2.skyhanni.utils.NEUItems
 import at.hannibal2.skyhanni.utils.NumberUtil.addSuffix
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getEnchantments
@@ -84,7 +84,7 @@ object FortuneUpgrades {
             val nextTalisman = CropAccessory.entries[currentTalismanTier + 1]
             genericUpgrades.add(
                 FortuneUpgrade(
-                    "§7Upgrade your talisman to ${nextTalisman.internalName?.getItemName()}",
+                    "§7Upgrade your talisman to ${nextTalisman.internalName?.itemName}",
                     null, nextTalisman.upgradeCost?.first!!, nextTalisman.upgradeCost.second, 10.0
                 )
             )

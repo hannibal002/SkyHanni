@@ -16,6 +16,7 @@ import at.hannibal2.skyhanni.utils.LorenzVec
 import at.hannibal2.skyhanni.utils.NEUInternalName
 import at.hannibal2.skyhanni.utils.NEUInternalName.Companion.asInternalName
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
+import at.hannibal2.skyhanni.utils.PrimitiveItemStack
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import net.minecraft.block.BlockChest
 import net.minecraft.client.Minecraft
@@ -43,9 +44,6 @@ class MinionXp {
 
         val timestamp: SimpleTimeMark = SimpleTimeMark.now()
     }
-
-    // TODO move to some other spot. This can be used at other features as well
-    private data class PrimitiveItemStack(val name: NEUInternalName, val stackSize: Int)
 
     private fun toPrimitiveItemStack(itemStack: ItemStack) =
         PrimitiveItemStack(itemStack.getInternalName(), itemStack.stackSize)
@@ -109,11 +107,11 @@ class MinionXp {
             it.value.getLore().isNotEmpty() && (!isMinion || it.key in listOf(21..26, 30..35, 39..44).flatten())
         }.forEach { (_, itemStack) ->
             val item = toPrimitiveItemStack(itemStack)
-            val name = item.name
+            val name = item.internalName
             val xp = xpInfoMap[name] ?: return@forEach
 
             // TODO add wisdom and temporary skill exp (Events) to calculation
-            val baseXp = xp.amount * item.stackSize
+            val baseXp = xp.amount * item.amount
             val xpAmount = if (MayorElection.isPerkActive("Derpy", "MOAR SKILLZ!!!")) {
                 baseXp * 1.5
             } else baseXp
