@@ -35,7 +35,7 @@ import io.github.moulberry.notenoughupdates.util.Constants
 import io.github.moulberry.notenoughupdates.util.Utils
 import net.minecraft.command.CommandBase
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
-import java.util.*
+import java.util.LinkedList
 import java.util.regex.Matcher
 import kotlin.concurrent.fixedRateTimer
 import kotlin.time.Duration.Companion.seconds
@@ -68,7 +68,7 @@ object SkillAPI {
     val storage get() = ProfileStorageData.profileSpecific?.skillData
     var exactLevelingMap = mapOf<Int, Int>()
     var levelingMap = mapOf<Int, Int>()
-    var activeSkill: SkillType = SkillType.NONE
+    var activeSkill: SkillType? = null
     val excludedSkills = listOf(
         SkillType.FORAGING,
         SkillType.FISHING,
@@ -261,12 +261,12 @@ object SkillAPI {
             var levelMatcher = skillTabPattern.matcher(line)
             if (levelMatcher.matches()) {
                 tablistLevel = levelMatcher.group("level").toInt()
-                if (levelMatcher.group("type").lowercase() != activeSkill.lowercaseName) tablistLevel = 0
+                if (levelMatcher.group("type").lowercase() != activeSkill?.lowercaseName) tablistLevel = 0
             } else {
                 levelMatcher = maxSkillTabPattern.matcher(line)
                 if (levelMatcher.matches()) {
                     tablistLevel = levelMatcher.group("level").toInt()
-                    if (levelMatcher.group("type").lowercase() != activeSkill.lowercaseName) tablistLevel = 0
+                    if (levelMatcher.group("type").lowercase() != activeSkill?.lowercaseName) tablistLevel = 0
                 }
             }
         }

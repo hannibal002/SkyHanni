@@ -139,7 +139,7 @@ object SkillProgress {
 
         if (event.repeatSeconds(2)) {
             update()
-            updateSkillInfo(activeSkill)
+            updateSkillInfo()
         }
     }
 
@@ -294,6 +294,7 @@ object SkillProgress {
     }
 
     private fun drawETADisplay() = buildList {
+        val activeSkill = activeSkill ?: return@buildList
         val skillInfo = SkillAPI.storage?.get(activeSkill) ?: return@buildList
         val xpInfo = skillXPInfoMap[activeSkill] ?: return@buildList
         val skillInfoLast = oldSkillInfoMap[activeSkill] ?: return@buildList
@@ -348,6 +349,7 @@ object SkillProgress {
     }
 
     private fun drawDisplay() = buildList {
+        val activeSkill = activeSkill ?: return@buildList
         val skillMap = SkillAPI.storage ?: return@buildList
         val skill = skillMap[activeSkill] ?: return@buildList
         val useCustomGoalLevel = skill.customGoalLevel != 0 && skill.customGoalLevel > skill.overflowLevel
@@ -420,10 +422,11 @@ object SkillProgress {
         }))
     }
 
-    private fun updateSkillInfo(skill: SkillType) {
-        val xpInfo = skillXPInfoMap.getOrPut(skill) { SkillAPI.SkillXPInfo() }
-        val skillInfo = SkillAPI.storage?.get(skill) ?: return
-        oldSkillInfoMap[skill] = skillInfo
+    private fun updateSkillInfo() {
+        val activeSkill = activeSkill ?: return
+        val xpInfo = skillXPInfoMap.getOrPut(activeSkill) { SkillAPI.SkillXPInfo() }
+        val skillInfo = SkillAPI.storage?.get(activeSkill) ?: return
+        oldSkillInfoMap[activeSkill] = skillInfo
 
         val totalXp = skillInfo.currentXp
 

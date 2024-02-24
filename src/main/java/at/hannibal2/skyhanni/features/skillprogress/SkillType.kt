@@ -17,8 +17,6 @@ enum class SkillType(val displayName: String, icon: Item) {
     FORAGING("Foraging", Items.golden_axe),
     MINING("Mining", Items.golden_pickaxe),
     TAMING("Taming", Items.spawn_egg),
-
-    NONE("", Blocks.bedrock)
     ;
 
     constructor(displayName: String, block: Block) : this(displayName, Item.getItemFromBlock(block))
