@@ -6,24 +6,21 @@ import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import io.github.moulberry.notenoughupdates.util.ItemResolutionQuery
 
-class ItemNameResolver {
+object ItemNameResolver {
     private val itemNameCache = mutableMapOf<String, NEUInternalName>() // item name -> internal name
 
-    internal fun _getInternalNameOrNull(itemName: String): NEUInternalName? {
+    internal fun getInternalNameOrNull(itemName: String): NEUInternalName? {
         val lowercase = itemName.lowercase()
-        if (itemNameCache.containsKey(lowercase)) {
-            return itemNameCache[lowercase]!!
+        itemNameCache[lowercase]?.let {
+            return it
         }
 
         if (itemName == "§cmissing repo item") {
-            itemNameCache[lowercase] = NEUInternalName.MISSING_ITEM
-            return NEUInternalName.MISSING_ITEM
+                return itemNameCache.getOrPut(lowercase) { NEUInternalName.MISSING_ITEM }
         }
 
         resolveEnchantmentByName(itemName)?.let {
-            val enchantmentName = fixEnchantmentName(it)
-            itemNameCache[itemName] = enchantmentName
-            return enchantmentName
+            return itemNameCache.getOrPut(lowercase) { fixEnchantmentName(it) }
         }
 
         val internalName = ItemResolutionQuery.findInternalNameByDisplayName(itemName, true)?.let {
