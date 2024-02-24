@@ -16,7 +16,7 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import kotlin.time.Duration.Companion.seconds
 
 class LimboPlaytime {
-    private lateinit var modifiedArray: MutableList<String>
+    private lateinit var modifiedList: MutableList<String>
     private var setMinutes = false
     private val patternGroup = RepoPattern.group("misc.limbo.tooltip")
     private val minutesPattern by patternGroup.pattern(
@@ -56,11 +56,14 @@ class LimboPlaytime {
         if (config.limboPlaytime == 0) return
 
         val lore = event.toolTip
-        val hoursArray = lore.filter { hoursPattern.matches(it) }.toMutableList()
-        val minutesArray = lore.filter { minutesPattern.matches(it) }.toMutableList()
+        val hoursList = lore.filter { hoursPattern.matches(it) }.toMutableList()
+        val minutesList = lore.filter { minutesPattern.matches(it) }.toMutableList()
 
-        addLimbo(hoursArray, minutesArray)
-        remakeArray(event.toolTip, minutesArray, hoursArray)
+        addLimbo(hoursList, minutesList)
+        remakeList(event.toolTip, minutesList, hoursList)
+        event.toolTip.forEach{
+            println(it)
+        }
     }
 
     @SubscribeEvent
@@ -78,40 +81,40 @@ class LimboPlaytime {
         }
     }
 
-    private fun addLimbo(hoursArray: MutableList<String>, minutesArray: MutableList<String>) {
+    private fun addLimbo(hoursList: MutableList<String>, minutesList: MutableList<String>) {
         if (wholeMinutes >= 60) {
             val hours = config.limboPlaytime.seconds.inWholeHours
             val minutes = (config.limboPlaytime.seconds.inWholeMinutes-(hours*60).toFloat()/6).toInt()
-            modifiedArray = hoursArray
-            if (minutes == 0) modifiedArray.add("§b$hours hours §7on Limbo")
-            else modifiedArray.add("§b$hoursString hours §7on Limbo")
-            modifiedArray = modifiedArray.sortedByDescending {
+            modifiedList = hoursList
+            if (minutes == 0) modifiedList.add("§b$hours hours §7on Limbo")
+            else modifiedList.add("§b$hoursString hours §7on Limbo")
+            modifiedList = modifiedList.sortedByDescending {
                 it.substringAfter("§b").substringBefore(" hours").toDoubleOrNull()
             }.toMutableList()
             setMinutes = false
         }
         else {
             val minutes = config.limboPlaytime.seconds.inWholeMinutes
-            modifiedArray = minutesArray
-            modifiedArray.add("§a$minutes minutes §7on Limbo")
-            modifiedArray = modifiedArray.sortedByDescending {
+            modifiedList = minutesList
+            modifiedList.add("§a$minutes minutes §7on Limbo")
+            modifiedList = modifiedList.sortedByDescending {
                 it.substringAfter("§a").substringBefore(" minutes").toDoubleOrNull()
             }.toMutableList()
             setMinutes = true
         }
     }
 
-    private fun remakeArray(toolTip: MutableList<String>, minutesArray: MutableList<String>, hoursArray: MutableList<String>) {
+    private fun remakeList(toolTip: MutableList<String>, minutesList: MutableList<String>, hoursList: MutableList<String>) {
         val firstLine = toolTip.first()
         val totalPlaytime = toolTip.last()
         toolTip.clear()
         toolTip.add(firstLine)
         if (!setMinutes) {
-            toolTip.addAll(modifiedArray)
-            toolTip.addAll(minutesArray)
+            toolTip.addAll(modifiedList)
+            toolTip.addAll(minutesList)
         } else {
-            toolTip.addAll(hoursArray)
-            toolTip.addAll(modifiedArray)
+            toolTip.addAll(hoursList)
+            toolTip.addAll(modifiedList)
         }
         toolTip.add(totalPlaytime)
     }
