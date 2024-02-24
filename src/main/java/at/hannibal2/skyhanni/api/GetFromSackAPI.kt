@@ -165,7 +165,7 @@ object GetFromSackAPI {
             return CommandResult.WRONG_ARGUMENT to null
         }
 
-        val amountString = args[args.lastIndex]
+        val amountString = args.last()
 
         if (!amountString.isInt()) {
             return CommandResult.WRONG_AMOUNT to null
