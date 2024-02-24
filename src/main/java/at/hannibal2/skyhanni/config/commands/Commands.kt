@@ -5,6 +5,7 @@ import at.hannibal2.skyhanni.api.SkillAPI
 import at.hannibal2.skyhanni.config.ConfigFileType
 import at.hannibal2.skyhanni.config.ConfigGuiManager
 import at.hannibal2.skyhanni.data.ChatManager
+import at.hannibal2.skyhanni.data.GardenCropMilestones
 import at.hannibal2.skyhanni.data.GardenCropMilestonesCommunityFix
 import at.hannibal2.skyhanni.data.GuiEditManager
 import at.hannibal2.skyhanni.data.PartyAPI
@@ -285,6 +286,14 @@ object Commands {
             },
             FarmingMilestoneCommand::onComplete
         )
+        registerCommand0(
+            "shcropgoal",
+            "Define a custom milestone goal for a crop.",
+            {
+            FarmingMilestoneCommand.setGoal(it.getOrNull(0), it.getOrNull(1))
+            },
+            FarmingMilestoneCommand::onComplete
+        )
     }
 
     private fun usersBugFix() {
@@ -369,6 +378,7 @@ object Commands {
             "shtestburrow",
             "Sets a test burrow waypoint at your location"
         ) { GriffinBurrowHelper.setTestBurrow(it) }
+        registerCommand("shsetcrop", "lol") { GardenCropMilestones.command(it) }
     }
 
     private fun developersCodingHelp() {

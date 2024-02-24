@@ -105,7 +105,7 @@ object GardenCropMilestonesCommunityFix {
             wrongData.add("$crop:$realTier:${nextMax.addSeparators()}")
         }
 
-        val guessTotalMax = GardenCropMilestones.getCropsForTier(46, crop)
+        val guessTotalMax = GardenCropMilestones.getCropsForTier(46, crop) // no need to overflow here
 //         println("guessTotalMax: ${guessTotalMax.addSeparators()}")
         val totalMax = amountPattern.matchMatcher(total) {
             group("max").formatNumber()
