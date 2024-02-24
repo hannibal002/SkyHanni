@@ -2,8 +2,8 @@ package at.hannibal2.skyhanni
 
 import at.hannibal2.skyhanni.api.CollectionAPI
 import at.hannibal2.skyhanni.api.DataWatcherAPI
-import at.hannibal2.skyhanni.api.SkillAPI
 import at.hannibal2.skyhanni.api.GetFromSackAPI
+import at.hannibal2.skyhanni.api.SkillAPI
 import at.hannibal2.skyhanni.config.ConfigFileType
 import at.hannibal2.skyhanni.config.ConfigManager
 import at.hannibal2.skyhanni.config.Features
@@ -285,8 +285,6 @@ import at.hannibal2.skyhanni.features.misc.items.EstimatedItemValue
 import at.hannibal2.skyhanni.features.misc.items.EstimatedWardrobePrice
 import at.hannibal2.skyhanni.features.misc.items.GlowingDroppedItems
 import at.hannibal2.skyhanni.features.misc.massconfiguration.DefaultConfigFeatures
-import at.hannibal2.skyhanni.features.skillprogress.SkillTooltip
-import at.hannibal2.skyhanni.features.skillprogress.SkillProgress
 import at.hannibal2.skyhanni.features.misc.teleportpad.TeleportPadCompactName
 import at.hannibal2.skyhanni.features.misc.teleportpad.TeleportPadInventoryNumber
 import at.hannibal2.skyhanni.features.misc.trevor.TrevorFeatures
@@ -330,6 +328,8 @@ import at.hannibal2.skyhanni.features.rift.everywhere.RiftHorsezookaHider
 import at.hannibal2.skyhanni.features.rift.everywhere.RiftTimer
 import at.hannibal2.skyhanni.features.rift.everywhere.motes.RiftMotesOrb
 import at.hannibal2.skyhanni.features.rift.everywhere.motes.ShowMotesNpcSellPrice
+import at.hannibal2.skyhanni.features.skillprogress.SkillProgress
+import at.hannibal2.skyhanni.features.skillprogress.SkillTooltip
 import at.hannibal2.skyhanni.features.slayer.HideMobNames
 import at.hannibal2.skyhanni.features.slayer.SlayerBossSpawnSoon
 import at.hannibal2.skyhanni.features.slayer.SlayerItemsOnGround
@@ -564,7 +564,7 @@ class SkyHanniMod {
         loadModule(TheGreatSpook())
         loadModule(GriffinBurrowHelper)
         loadModule(AllBurrowsList)
-        loadModule(GriffinBurrowParticleFinder())
+        loadModule(GriffinBurrowParticleFinder)
         loadModule(BurrowWarpHelper())
         loadModule(CollectionTracker())
         loadModule(HighlightBonzoMasks())
