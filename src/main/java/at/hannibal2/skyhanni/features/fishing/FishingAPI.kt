@@ -71,7 +71,6 @@ object FishingAPI {
         waterRods = data.water_fishing_rods ?: error("§cwater_fishing_rods is missing from repo.")
     }
 
-
     fun isLavaRod() = InventoryUtils.getItemInHand()?.getLore()?.any { it.contains("Lava Rod") } ?: false
 
     fun getAllowedBlocks() = if (isLavaRod()) lavaBlocks else waterBlocks
