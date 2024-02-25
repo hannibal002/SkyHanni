@@ -1,16 +1,21 @@
 package at.hannibal2.skyhanni.api
 
 import at.hannibal2.skyhanni.SkyHanniMod
-import at.hannibal2.skyhanni.data.jsonobjects.repo.SacksJson
+import at.hannibal2.skyhanni.config.ConfigManager
+import at.hannibal2.skyhanni.data.jsonobjects.other.NeuSacksJson
 import at.hannibal2.skyhanni.events.GuiContainerEvent
 import at.hannibal2.skyhanni.events.InventoryCloseEvent
 import at.hannibal2.skyhanni.events.LorenzChatEvent
 import at.hannibal2.skyhanni.events.LorenzTickEvent
 import at.hannibal2.skyhanni.events.LorenzToolTipEvent
 import at.hannibal2.skyhanni.events.MessageSendToServerEvent
-import at.hannibal2.skyhanni.events.RepositoryReloadEvent
+import at.hannibal2.skyhanni.events.NeuRepositoryReloadEvent
+import at.hannibal2.skyhanni.features.commands.tabcomplete.GetFromSacksTabComplete
+import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.ChatUtils.isCommand
+import at.hannibal2.skyhanni.utils.ChatUtils.senderIsSkyhanni
+import at.hannibal2.skyhanni.utils.ItemUtils.itemNameWithoutColor
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.NEUInternalName
 import at.hannibal2.skyhanni.utils.NEUInternalName.Companion.asInternalName
@@ -20,7 +25,9 @@ import at.hannibal2.skyhanni.utils.PrimitiveItemStack.Companion.makePrimitiveSta
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
+import at.hannibal2.skyhanni.utils.fromJson
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
+import io.github.moulberry.notenoughupdates.util.Utils
 import net.minecraft.inventory.Slot
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import java.util.Deque
@@ -68,7 +75,10 @@ object GetFromSackAPI {
 
     private var lastItemStack: PrimitiveItemStack? = null
 
-    var sackList = emptyList<NEUInternalName>()
+    var sackListInternalNames = emptySet<String>()
+        private set
+
+    var sackListNames = emptySet<String>()
         private set
 
     private fun addToQueue(items: List<PrimitiveItemStack>) = queue.addAll(items)
@@ -80,7 +90,7 @@ object GetFromSackAPI {
         if (!LorenzUtils.inSkyBlock) return
         if (queue.isNotEmpty() && lastTimeOfCommand.passedSince() >= minimumDelay) {
             val item = queue.poll()
-            ChatUtils.sendCommandToServer("gfs ${item.internalName.asString()} ${item.amount}")
+            ChatUtils.sendCommandToServer("gfs ${item.internalName.asString().replace('-', ':')} ${item.amount}")
             lastTimeOfCommand = ChatUtils.getTimeWhenNewlyQueuedMessageGetsExecuted()
         }
     }
@@ -115,13 +125,22 @@ object GetFromSackAPI {
         if (!LorenzUtils.inSkyBlock) return
         if (!config.queuedGFS && !config.bazaarGFS) return
         if (!event.isCommand(commandsWithSlash)) return
-        queuedHandler(event)
-        bazaarHandler(event)
+        val replacedEvent = GetFromSacksTabComplete.handleUnderlineReplace(event)
+        queuedHandler(replacedEvent)
+        bazaarHandler(replacedEvent)
+        if (replacedEvent.isCanceled) {
+            event.isCanceled = true
+            return
+        }
+        if (replacedEvent !== event) {
+            event.isCanceled = true
+            ChatUtils.sendMessageToServer(replacedEvent.message)
+        }
     }
 
     private fun queuedHandler(event: MessageSendToServerEvent) {
         if (!config.queuedGFS) return
-        if (event.originatingModContainer?.modId == "skyhanni") return
+        if (event.senderIsSkyhanni()) return
 
         val (result, stack) = commandValidator(event.splitMessage.drop(1))
 
@@ -130,6 +149,7 @@ object GetFromSackAPI {
             CommandResult.WRONG_ARGUMENT -> ChatUtils.userError("Missing arguments! Usage: /getfromsacks <name/id> <amount>")
             CommandResult.WRONG_IDENTIFIER -> ChatUtils.userError("Couldn't find an item with this name or identifier!")
             CommandResult.WRONG_AMOUNT -> ChatUtils.userError("Invalid amount!")
+            CommandResult.INTERNAL_ERROR -> {}
         }
         event.isCanceled = true
     }
@@ -146,23 +166,33 @@ object GetFromSackAPI {
     )
 
     private fun commandValidator(args: List<String>): Pair<CommandResult, PrimitiveItemStack?> {
-        if (args.size != 2) {
+        if (args.size <= 1) {
             return CommandResult.WRONG_ARGUMENT to null
         }
 
-        val item = args[0].asInternalName()
-
-        if (!sackList.contains(item)) {
-            return CommandResult.WRONG_IDENTIFIER to null
-        }
-
-        val amountString = args[1]
+        val amountString = args.last()
 
         if (!amountString.isInt()) {
             return CommandResult.WRONG_AMOUNT to null
         }
 
-        return CommandResult.VALID to item.makePrimitiveStack(amountString.toInt())
+        val itemString = args.dropLast(1).joinToString(" ").uppercase().replace(':', '-')
+
+        val item = when {
+            sackListInternalNames.contains(itemString) -> itemString.asInternalName()
+            sackListNames.contains(itemString) -> NEUInternalName.fromItemNameOrNull(itemString) ?: run {
+                ErrorManager.logErrorStateWithData(
+                    "Couldn't resolve item name",
+                    "Query failed",
+                    "itemName" to itemString
+                )
+                return CommandResult.INTERNAL_ERROR to null
+            }
+
+            else -> return CommandResult.WRONG_IDENTIFIER to null
+        }
+
+        return CommandResult.VALID to PrimitiveItemStack(item, amountString.toInt())
     }
 
     @SubscribeEvent
@@ -189,11 +219,32 @@ object GetFromSackAPI {
         VALID,
         WRONG_ARGUMENT,
         WRONG_IDENTIFIER,
-        WRONG_AMOUNT
+        WRONG_AMOUNT,
+        INTERNAL_ERROR
     }
 
     @SubscribeEvent
-    fun onRepoReload(event: RepositoryReloadEvent) {
-        sackList = event.getConstant<SacksJson>("Sacks").sackList.map { it.replace(" ", "_").asInternalName() }
+    fun onNeuRepoReload(event: NeuRepositoryReloadEvent) {
+        val data = event.getConstant("sacks") ?: ErrorManager.skyHanniError("NEU sacks data is null.")
+        try {
+            val sacksData = ConfigManager.gson.fromJson<NeuSacksJson>(data).sacks
+            val uniqueSackItems = mutableSetOf<NEUInternalName>()
+
+            sacksData.values.forEach { sackInfo ->
+                sackInfo.contents.forEach { content ->
+                    uniqueSackItems.add(content)
+                }
+            }
+
+            sackListInternalNames = uniqueSackItems.map { it.asString() }.toSet()
+            sackListNames = uniqueSackItems.map { it.itemNameWithoutColor.uppercase() }.toSet()
+
+        } catch (e: Exception) {
+            ErrorManager.logErrorWithData(
+                e, "Error getting NEU sacks data, make sure your neu repo is updated.",
+                "sacksJson" to data
+            )
+            Utils.showOutdatedRepoNotification()
+        }
     }
 }
