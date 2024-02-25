@@ -7,6 +7,7 @@ import at.hannibal2.skyhanni.features.bazaar.BazaarApi
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
+import at.hannibal2.skyhanni.utils.NumberUtil.formatDouble
 import at.hannibal2.skyhanni.utils.RenderUtils.renderStrings
 import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
@@ -44,7 +45,7 @@ class MaxPurseItems {
                 for (info in item.getLore()) {
                     orderPattern.matchMatcher(info) {
                         // +0.1 because I expect people to use the gold nugget option
-                        buyOrderPrice = group("coins").replace(",", "").toDouble() + 0.1
+                        buyOrderPrice = group("coins").formatDouble()?.let { it + 0.1 } ?: 0.0
                         // If we get to this point, we have the instant price because instant is earlier in the list of items
                         // So we can return
                         return
@@ -54,7 +55,7 @@ class MaxPurseItems {
             createInstantPattern.matchMatcher(name) {
                 for (info in item.getLore()) {
                     instantPattern.matchMatcher(info) {
-                        instantBuyPrice = group("coins").replace(",", "").toDouble()
+                        instantBuyPrice = group("coins").formatDouble() ?: 0.0
                     }
                 }
             }
@@ -85,8 +86,9 @@ class MaxPurseItems {
 
         config.purseItemsPos.renderStrings(
             listOf(
-                "§dYou can buy order ${buyOrders.addSeparators()}x of this item with your purse (at top order +0.1)",
-                "§dYou can instantly buy ${buyInstant.addSeparators()}x of this item with your purse"
+                "§eWith your current purse, you can buy order",
+                "§e${buyOrders.addSeparators()}x of this item with your purse (at top order +0.1)",
+                "§eOr ${buyInstant.addSeparators()}x with instant buy at the bazaar"
             ), posLabel = "Max Items With Purse"
         )
     }

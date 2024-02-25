@@ -21,6 +21,7 @@ object PurseAPI {
         "piggy",
         "Piggy: (?<coins>.*)"
     )
+
     private var currentPurse = 0.0
     private var inventoryCloseTime = 0L
 
