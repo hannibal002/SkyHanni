@@ -282,6 +282,9 @@ enum class HotmData(
             it.activeLevel = 0
             it.enabled = false
             it.isUnlocked = false
+            availableGemstonePowder = gemstonePowder
+            availableMithrilPowder = mithrilPowder
+            availableTokens = tokens
         }
 
         private fun Slot.parse() {
@@ -379,6 +382,7 @@ enum class HotmData(
             if (!inInventory) return
             inInventory = false
             entries.forEach { it.slot = null }
+            heartItem = null
         }
 
         @SubscribeEvent
