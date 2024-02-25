@@ -53,7 +53,7 @@
 + Added Power Stone Guide features. - hannibal2
     + Highlight missing power stones, show their total bazaar price, and allows to open the bazaar when clicking on the
       items in the Power Stone Guide.
-+ Option to make normal clicks to shift clicks in equipment inventory. - Thunderblade73
++ Option to make normal clicks to shift clicks in npc sell inventory. - Thunderblade73
 + Show pet items XP Share and Tier Boost as small icons next to the pet in an inventory. - Thunderblade73
 + Added Shift Click Brewing. - Thunderblade73
     + Makes normal clicks to shift clicks in Brewing Stand inventory.
@@ -89,6 +89,13 @@
     + Saves the burrow locations you find into a list in the local config file. (default enabled, option to opt out)
     + Option to render all saved locations in the world. (default disabled)
     + Commands to save the full list to the clipboard, and load a list from the clipboard (to share between users)
+
+#### GUI Features
+
++ Added Skill Progress Display. - HiZe
+    + ETA Display, exp, actions or percentage to next level, custom level goals, all skill display, chroma progress bar,
+      and overflow levels for all those things.
+    + A ton of settings.
 
 #### Misc Features
 
@@ -166,6 +173,7 @@
 + Allow putting Water Bottles into Potion Bag. - alexia
 + Skip unavailable experiments for number of clicks in Super Pair Clicks Alert in the experimentation table. - alexia
 + Hide non-clickable items in Basket of Seeds, Nether Wart Pouch & Trick or Treat Bag. - alexia
++ Added support for blocking quick crafting for the new quick craft UI. - hannibal2
 
 #### Dungeon Changes
 
@@ -192,10 +200,14 @@
     + SMP and Snow Particles. - walker
     + Earned mystery dust. - alexia
 + Added the fire sale ended message to the Fire Sale Chat Hider. - hannibal2
++ Hide pet consumables chat messages on Hypixel main lobby. - alexia
++ Fire sale chat message hider now also hides the "and x more" part. - hannibal2
 
 #### Command Changes
 
 + Added /pd short command for party disband. - Empa
++ Added support for number abbreviations in /shskills. - hannibal2
+    + "/shskills levelwithxp 750m"
 
 #### Config Changes
 
@@ -204,6 +216,11 @@
 #### Slayer Changes
 
 + Adding Soul Of The Alpha support to the Area Mini Boss features respawn timer and highlight. - martimavocado
+
+#### GUI Changes
+
++ The Compact Tab List now has toggle tab support. - hannibal2
++ The tab list now toggles on key press, not key release. This should feel faster now. - hannibal2
 
 #### Misc Changes
 
@@ -242,6 +259,7 @@
 + Fixed a rare farming weight API error. - CalMWolfs
 + Fixed mouse rotation unlocks after doing /warp garden with Sensitivity Reducer on. - martimavocado
 + Fixed wording of composter fuel warning. - alexia
++ Fixed Garden plot menu icon edit mode copies stack size. - hannibal2
 
 #### Combat Fixes
 
@@ -273,6 +291,7 @@
 + Fixed Diana mobs being invisible because of Fix Ghost Entities and four season pet skin. - hannibal2
 + Fixed a rare bug that leaves ghost burrows around. - hannibal2
 + Properly deleting Diana target markers when manually clearing griffin burrows by talking to Diana NPC. - hannibal2
++ Properly resetting internal Diana data on clearing waypoints via NPC. - hannibal2
 
 #### Mining Fixes
 
@@ -309,7 +328,7 @@
 + Fixed rune price calculation in Chest Value. - hannibal2
 + Fixed Power Stone Guide Highlight shows in other inventories when exiting via command. - hannibal2
 + Added options to hide Helmet Skins, Armor Dyes or Runes from Estimated Item Value Calculation. - hannibal2
-+ Fixed Divine Gift and Flash enchants showing the wrong/no price in EstimatedItemValue. - jani
++ Fixed Divine Gift and Flash enchants showing the wrong/no price in Estimated Item Value. - jani
 + Fixed showing the Piece of Wizard Portal earned duplicate. - Thunderblade73
 + Fixed shift-click NPC sell not working for menus with different sizes and full inventories. - Thunderblade73
 + Fixed an error with the shift-click NPC sell feature. - Thunderblade73
@@ -317,6 +336,7 @@
 + Fixed pet level stack size - Thunderblade73
 + Fixed enchantment names and pet names in the chest value feature. - hannibal2
 + Fixed pet names in item profit trackers. - hannibal2
++ Fixed Book Bundle showing the wrong number of books in Estimated Item Value. - Empa
 
 #### Bingo Fixes
 
@@ -337,6 +357,8 @@
 + Fixed GUI positions moving into the bottom-right corner when leaving the GUI position editor while pressing the mouse
   button on next reopen. - hannibal2
 + Fixed parts of Compact Tab List being uncoloured. - CalMWolfs
++ Fixed Compact Tab List' Toggle Tab not working when using patcher. - hannibal2
++ Fixed Skill progress display size too small when not using the progress bar. - Thunderblade73
 
 #### Winter Fixes
 
@@ -348,6 +370,12 @@
 + Fixed /gfs not working. - Thunderblade73
 + Fixed /sendcoords command not working. - CalMWolfs
 + Fixed open bazaar command sending color code as well. - Thunderblade73
++ Fixed /gfs not working with spaces in item name. - Thunderblade73
++ Fixed multiple edge cases with /gfs. - Thunderblade73
+
+#### Config Fixes
+
++ Fixed rare profile detection bugs. - alexia
 
 #### Misc Fixes
 
@@ -363,6 +391,9 @@
 + Fixed /gfs tab complete. - martimavocado
 + Fixed /warp is command replace. - hannibal2
 + Fixed Queued Gfs description. - Thunderblade73
++ Fixed ender bow ability time (30s -> 5s). - hannibal2
++ Reputation Helper now shows Kuudra Runs for barbarian faction as well. - hannibal2
+    + Daily Kuudra reputation also works for barbarian faction, not only mage.
 
 ### Technical Changes
 
@@ -446,6 +477,21 @@
 + Added /shdebug Garden Next Jacob Contest. - hannibal2
 + Make future NPC price fetch errors better debuggable. - CalMWolfs
 + Removed duplicate pet-level detection logic. - hannibal2
++ Changed PreProfileSwitchEvent to ProfileJoinEvent. - alexia
++ Cleanup some repo pattern formatting. - CalMWolfs
++ Make Hypixel items API response a proper JSON object. - CalMWolfs
++ Created utils function String.formatDouble(): Double. - hannibal2
++ Fixed ReplaceWith auto-replace feature from IDEs for deprecated functions. - hannibal2
++ Fixed the BuildList name in part of the stack trace. - hannibal2
++ Cleanup error manager code. - hannibal2
++ Fixed /shdebug without parameter showing everything instead of only important data. - hannibal2
++ Fixed internal item name resolving problems. - hannibal2
++ Extracted item name resolving logic into own class. - hannibal2
++ Added debug command /shtestitem. - hannibal2
++ Made String.formatDouble() and formatLong()return nullable. - hannibal2
++ /gfs tab complete now uses NEU's Repo instead of SkyHanni Repo. - CalMWolfs
++ Creating NeuRepositoryReloadEvent as wrapper for less confusion. - CalMWolfs
++ Made ErrorManager compact stack trace even more compacter. - hannibal2
 
 ## Version 0.22
 
