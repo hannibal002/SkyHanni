@@ -90,7 +90,7 @@ object GetFromSackAPI {
         if (!LorenzUtils.inSkyBlock) return
         if (queue.isNotEmpty() && lastTimeOfCommand.passedSince() >= minimumDelay) {
             val item = queue.poll()
-            ChatUtils.sendCommandToServer("gfs ${item.internalName.asString()} ${item.amount}")
+            ChatUtils.sendCommandToServer("gfs ${item.internalName.asString().replace('-', ':')} ${item.amount}")
             lastTimeOfCommand = ChatUtils.getTimeWhenNewlyQueuedMessageGetsExecuted()
         }
     }
