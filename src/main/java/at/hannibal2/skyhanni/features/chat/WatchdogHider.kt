@@ -15,7 +15,7 @@ class WatchdogHider {
     private var startLineComponent: IChatComponent? = null
 
     @SubscribeEvent
-    fun onChatMessage(event: LorenzChatEvent) {
+    fun onChat(event: LorenzChatEvent) {
         if (!LorenzUtils.onHypixel || !SkyHanniMod.feature.chat.filterType.watchDog) return
 
         when (event.message) {
@@ -47,6 +47,7 @@ class WatchdogHider {
     }
 
     companion object {
+
         private const val watchdogStartLine = "§f"
         private const val watchdogAnnouncementLine = "§4[WATCHDOG ANNOUNCEMENT]"
         private const val watchdogEndLine = "§c"

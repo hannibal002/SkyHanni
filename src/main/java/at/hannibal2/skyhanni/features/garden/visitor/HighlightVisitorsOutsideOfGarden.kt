@@ -8,6 +8,7 @@ import at.hannibal2.skyhanni.events.RepositoryReloadEvent
 import at.hannibal2.skyhanni.events.withAlpha
 import at.hannibal2.skyhanni.features.garden.GardenAPI
 import at.hannibal2.skyhanni.mixins.hooks.RenderLivingEntityHelper
+import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.EntityUtils
 import at.hannibal2.skyhanni.utils.EntityUtils.getSkinTexture
 import at.hannibal2.skyhanni.utils.LorenzColor
@@ -25,6 +26,7 @@ import net.minecraft.network.play.client.C02PacketUseEntity
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
 class HighlightVisitorsOutsideOfGarden {
+
     private var visitorJson = mapOf<String?, List<GardenJson.GardenVisitor>>()
 
     private val config get() = GardenAPI.config.visitors
@@ -96,7 +98,7 @@ class HighlightVisitorsOutsideOfGarden {
         if (isVisitor(entity) || (entity is EntityArmorStand && isVisitorNearby(entity.getLorenzVec()))) {
             event.isCanceled = true
             if (packet.action == C02PacketUseEntity.Action.INTERACT) {
-                LorenzUtils.clickableChat(
+                ChatUtils.clickableChat(
                     "Blocked you from interacting with a visitor. Sneak to bypass or click here to change settings.",
                     "/sh block interacting with visitors"
                 )

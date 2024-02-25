@@ -17,7 +17,9 @@ import org.lwjgl.opengl.GLContext
  *  Credit: [ShaderHelper.java](https://github.com/BiscuitDevelopment/SkyblockAddons/blob/main/src/main/java/codes/biscuit/skyblockaddons/shader/ShaderHelper.java)
  */
 class ShaderHelper {
+
     companion object {
+
         private var SHADERS_SUPPORTED: Boolean
 
         private var USING_ARB_SHADERS: Boolean
@@ -133,6 +135,14 @@ class ShaderHelper {
 
         fun glUniform1f(location: Int, v0: Float) {
             if (USING_ARB_SHADERS) ARBShaderObjects.glUniform1fARB(location, v0) else GL20.glUniform1f(location, v0)
+        }
+
+        fun glUniform2f(location: Int, v0: Float, v1: Float) {
+            if (USING_ARB_SHADERS) ARBShaderObjects.glUniform2fARB(location, v0, v1) else GL20.glUniform2f(
+                location,
+                v0,
+                v1
+            )
         }
 
         fun glUniform3f(location: Int, v0: Float, v1: Float, v2: Float) {

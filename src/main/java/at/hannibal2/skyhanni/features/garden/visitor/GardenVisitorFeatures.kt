@@ -3,11 +3,15 @@ package at.hannibal2.skyhanni.features.garden.visitor
 import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.config.features.garden.visitor.VisitorConfig.HighlightMode
 import at.hannibal2.skyhanni.data.IslandType
+import at.hannibal2.skyhanni.data.SackAPI
+import at.hannibal2.skyhanni.data.SackStatus
+import at.hannibal2.skyhanni.events.DebugDataCollectEvent
 import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.LorenzChatEvent
 import at.hannibal2.skyhanni.events.LorenzTickEvent
 import at.hannibal2.skyhanni.events.OwnInventoryItemUpdateEvent
-import at.hannibal2.skyhanni.events.PreProfileSwitchEvent
+import at.hannibal2.skyhanni.events.ProfileJoinEvent
+import at.hannibal2.skyhanni.events.SackDataUpdateEvent
 import at.hannibal2.skyhanni.events.garden.visitor.VisitorAcceptEvent
 import at.hannibal2.skyhanni.events.garden.visitor.VisitorAcceptedEvent
 import at.hannibal2.skyhanni.events.garden.visitor.VisitorArrivalEvent
@@ -21,19 +25,20 @@ import at.hannibal2.skyhanni.features.garden.GardenAPI
 import at.hannibal2.skyhanni.features.garden.farming.GardenCropSpeed.getSpeed
 import at.hannibal2.skyhanni.mixins.hooks.RenderLivingEntityHelper
 import at.hannibal2.skyhanni.test.command.ErrorManager
+import at.hannibal2.skyhanni.utils.ChatUtils
+import at.hannibal2.skyhanni.utils.CollectionUtils.addAsSingletonList
 import at.hannibal2.skyhanni.utils.ConfigUtils
 import at.hannibal2.skyhanni.utils.EntityUtils
 import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.ItemBlink
 import at.hannibal2.skyhanni.utils.ItemUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName
-import at.hannibal2.skyhanni.utils.ItemUtils.getItemName
-import at.hannibal2.skyhanni.utils.ItemUtils.getItemNameOrNull
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
+import at.hannibal2.skyhanni.utils.ItemUtils.itemName
+import at.hannibal2.skyhanni.utils.ItemUtils.itemNameWithoutColor
 import at.hannibal2.skyhanni.utils.ItemUtils.name
 import at.hannibal2.skyhanni.utils.LorenzLogger
 import at.hannibal2.skyhanni.utils.LorenzUtils
-import at.hannibal2.skyhanni.utils.LorenzUtils.addAsSingletonList
 import at.hannibal2.skyhanni.utils.LorenzUtils.isInIsland
 import at.hannibal2.skyhanni.utils.NEUInternalName
 import at.hannibal2.skyhanni.utils.NEUItems
@@ -48,6 +53,7 @@ import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.TimeUtils
 import at.hannibal2.skyhanni.utils.getLorenzVec
 import at.hannibal2.skyhanni.utils.renderables.Renderable
+import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import com.google.gson.JsonArray
 import com.google.gson.JsonPrimitive
 import net.minecraft.client.Minecraft
@@ -65,17 +71,36 @@ import kotlin.time.Duration.Companion.seconds
 private val config get() = VisitorAPI.config
 
 class GardenVisitorFeatures {
+
     private var display = emptyList<List<Any>>()
-    private val newVisitorArrivedMessage = ".* §r§ehas arrived on your §r§bGarden§r§e!".toPattern()
-    private val copperPattern = " §8\\+§c(?<amount>.*) Copper".toPattern()
-    private val gardenExperiencePattern = " §8\\+§2(?<amount>.*) §7Garden Experience".toPattern()
-    private val visitorChatMessagePattern = "§e\\[NPC] (§.)?(?<name>.*)§f: §r.*".toPattern()
+
+    private val patternGroup = RepoPattern.group("garden.visitor")
+    private val visitorArrivePattern by patternGroup.pattern(
+        "visitorarrive",
+        ".* §r§ehas arrived on your §r§bGarden§r§e!"
+    )
+    private val copperPattern by patternGroup.pattern(
+        "copper",
+        " §8\\+§c(?<amount>.*) Copper"
+    )
+    private val gardenExperiencePattern by patternGroup.pattern(
+        "gardenexperience",
+        " §8\\+§2(?<amount>.*) §7Garden Experience"
+    )
+    private val visitorChatMessagePattern by patternGroup.pattern(
+        "visitorchat",
+        "§e\\[NPC] (§.)?(?<name>.*)§f: §r.*"
+    )
+    private val partialAcceptedPattern by patternGroup.pattern(
+        "partialaccepted",
+        "§aYou gave some of the required items!"
+    )
 
     private val logger = LorenzLogger("garden/visitors")
     private var lastFullPrice = 0.0
 
     @SubscribeEvent
-    fun onPreProfileSwitch(event: PreProfileSwitchEvent) {
+    fun onProfileJoin(event: ProfileJoinEvent) {
         display = emptyList()
     }
 
@@ -92,7 +117,7 @@ class GardenVisitorFeatures {
             val pair = ItemUtils.readItemAmount(line)
             if (pair == null) {
                 ErrorManager.logErrorStateWithData(
-                    "Could not read items required in Visitor Inventory", "ItemUtils.readItemAmount returns null",
+                    "Could not read Shopping List in Visitor Inventory", "ItemUtils.readItemAmount returns null",
                     "line" to line,
                     "offerItem" to offerItem,
                     "lore" to lore,
@@ -102,7 +127,7 @@ class GardenVisitorFeatures {
             }
             val (itemName, amount) = pair
             val internalName = NEUInternalName.fromItemName(itemName)
-            visitor.items[internalName] = amount
+            visitor.shoppingList[internalName] = amount
         }
 
         readToolTip(visitor, offerItem)
@@ -112,12 +137,11 @@ class GardenVisitorFeatures {
             if (alreadyReady) {
                 VisitorAPI.changeStatus(visitor, VisitorAPI.VisitorStatus.READY, "inSacks")
                 visitor.inSacks = true
-                update()
             } else {
                 VisitorAPI.changeStatus(visitor, VisitorAPI.VisitorStatus.WAITING, "firstContact")
             }
-            update()
         }
+        update()
     }
 
     private fun updateDisplay() {
@@ -125,37 +149,37 @@ class GardenVisitorFeatures {
     }
 
     private fun drawDisplay() = buildList {
-        if (!config.needs.display) return@buildList
-        val (requiredItems, newVisitors) = prepareDrawingData()
+        if (!config.shoppingList.display) return@buildList
+        val (shoppingList, newVisitors) = prepareDrawingData()
 
-        drawRequiredItems(requiredItems)
-        drawVisitors(newVisitors, requiredItems)
+        drawShoppingList(shoppingList)
+        drawVisitors(newVisitors, shoppingList)
     }
 
     private fun prepareDrawingData(): Pair<MutableMap<NEUInternalName, Int>, MutableList<String>> {
-        val requiredItems = mutableMapOf<NEUInternalName, Int>()
+        val globalShoppingList = mutableMapOf<NEUInternalName, Int>()
         val newVisitors = mutableListOf<String>()
         for ((visitorName, visitor) in VisitorAPI.getVisitorsMap()) {
             if (visitor.status == VisitorAPI.VisitorStatus.ACCEPTED || visitor.status == VisitorAPI.VisitorStatus.REFUSED) continue
 
-            val items = visitor.items
-            if (items.isEmpty()) {
+            val shoppingList = visitor.shoppingList
+            if (shoppingList.isEmpty()) {
                 newVisitors.add(visitorName)
             }
-            for ((internalName, amount) in items) {
-                val old = requiredItems.getOrDefault(internalName, 0)
-                requiredItems[internalName] = old + amount
+            for ((internalName, amount) in shoppingList) {
+                val old = globalShoppingList.getOrDefault(internalName, 0)
+                globalShoppingList[internalName] = old + amount
             }
         }
-        return requiredItems to newVisitors
+        return globalShoppingList to newVisitors
     }
 
-    private fun MutableList<List<Any>>.drawRequiredItems(requiredItems: MutableMap<NEUInternalName, Int>) {
-        if (requiredItems.isNotEmpty()) {
+    private fun MutableList<List<Any>>.drawShoppingList(shoppingList: MutableMap<NEUInternalName, Int>) {
+        if (shoppingList.isNotEmpty()) {
             var totalPrice = 0.0
-            addAsSingletonList("§7Visitor items needed:")
-            for ((internalName, amount) in requiredItems) {
-                val name = internalName.getItemName()
+            addAsSingletonList("§7Visitor Shopping List:")
+            for ((internalName, amount) in shoppingList) {
+                val name = internalName.itemName
                 val itemStack = internalName.getItemStack()
 
                 val list = mutableListOf<Any>()
@@ -170,28 +194,38 @@ class GardenVisitorFeatures {
                     }
                 }) { GardenAPI.inGarden() && !NEUItems.neuHasFocus() })
 
-                if (config.needs.showPrice) {
+                if (config.shoppingList.showPrice) {
                     val price = internalName.getPrice() * amount
                     totalPrice += price
                     val format = NumberUtil.format(price)
                     list.add(" §7(§6$format§7)")
                 }
 
+                if (config.shoppingList.showSackCount) {
+                    val sackItemData = SackAPI.fetchSackItem(internalName)
+                    val itemStatus = sackItemData.getStatus()
+                    val itemAmount = sackItemData.amount
+                    if (itemStatus != SackStatus.OUTDATED) {
+                        val textColour = if (itemAmount >= amount) "a" else "e"
+                        list.add(" (§${textColour}x${sackItemData.amount.addSeparators()} §7in sacks)")
+                    }
+                }
+
                 add(list)
             }
             if (totalPrice > 0) {
                 val format = NumberUtil.format(totalPrice)
-                this[0] = listOf("§7Visitor items needed: §7(§6$format§7)")
+                this[0] = listOf("§7Visitor Shopping List: §7(§6$format§7)")
             }
         }
     }
 
     private fun MutableList<List<Any>>.drawVisitors(
         newVisitors: MutableList<String>,
-        requiredItems: MutableMap<NEUInternalName, Int>
+        shoppingList: MutableMap<NEUInternalName, Int>,
     ) {
         if (newVisitors.isNotEmpty()) {
-            if (requiredItems.isNotEmpty()) {
+            if (shoppingList.isNotEmpty()) {
                 addAsSingletonList("")
             }
             val amount = newVisitors.size
@@ -203,12 +237,12 @@ class GardenVisitorFeatures {
                 val list = mutableListOf<Any>()
                 list.add(" §7- $displayName")
 
-                if (config.needs.itemPreview) {
+                if (config.shoppingList.itemPreview) {
                     val items = GardenVisitorColorNames.visitorItems[visitor.removeColor()]
                     if (items == null) {
                         val text = "Visitor '$visitor' has no items in repo!"
                         logger.log(text)
-                        LorenzUtils.debug(text)
+                        ChatUtils.debug(text)
                         list.add(" §7(§c?§7)")
                         continue
                     }
@@ -237,6 +271,11 @@ class GardenVisitorFeatures {
         if (GardenAPI.onBarnPlot) {
             update()
         }
+    }
+
+    @SubscribeEvent
+    fun onSackUpdate(event: SackDataUpdateEvent) {
+        update()
     }
 
     @SubscribeEvent
@@ -287,14 +326,14 @@ class GardenVisitorFeatures {
     private fun readToolTip(visitor: VisitorAPI.Visitor, itemStack: ItemStack?) {
         val stack = itemStack ?: error("Accept offer item not found for visitor ${visitor.visitorName}")
         var totalPrice = 0.0
-        var timeRequired = -1L
-        var readingItemsNeeded = true
+        var farmingTimeRequired = -1L
+        var readingShoppingList = true
         lastFullPrice = 0.0
         val foundRewards = mutableListOf<NEUInternalName>()
 
         for (formattedLine in stack.getLore()) {
             if (formattedLine.contains("Rewards")) {
-                readingItemsNeeded = false
+                readingShoppingList = false
             }
 
             val (itemName, amount) = ItemUtils.readItemAmount(formattedLine) ?: continue
@@ -304,7 +343,7 @@ class GardenVisitorFeatures {
             if (internalName.startsWith("SKYBLOCK_")) continue
             val price = internalName.getPrice() * amount
 
-            if (readingItemsNeeded) {
+            if (readingShoppingList) {
                 totalPrice += price
                 lastFullPrice += price
             } else {
@@ -322,13 +361,13 @@ class GardenVisitorFeatures {
             if (wasEmpty) {
                 visitor.hasReward()?.let { reward ->
                     if (config.rewardWarning.notifyInChat) {
-                        LorenzUtils.chat("Found Visitor Reward ${reward.displayName}§e!")
+                        ChatUtils.chat("Found Visitor Reward ${reward.displayName}§e!")
                     }
                 }
             }
         }
 
-        readingItemsNeeded = true
+        readingShoppingList = true
         val finalList = stack.getLore().toMutableList()
         var offset = 0
         for ((i, formattedLine) in finalList.toMutableList().withIndex()) {
@@ -344,17 +383,17 @@ class GardenVisitorFeatures {
             copperPattern.matchMatcher(formattedLine) {
                 val copper = group("amount").replace(",", "").toInt()
                 val pricePerCopper = NumberUtil.format((totalPrice / copper).toInt())
-                val timePerCopper = TimeUtils.formatDuration((timeRequired / copper) * 1000)
+                val timePerCopper = TimeUtils.formatDuration((farmingTimeRequired / copper) * 1000)
                 var copperLine = formattedLine
                 if (config.inventory.copperPrice) copperLine += " §7(§6$pricePerCopper §7per)"
                 if (config.inventory.copperTime) {
-                    copperLine += if (timeRequired != -1L) " §7(§b$timePerCopper §7per)" else " §7(§cno speed data!§7)"
+                    copperLine += if (farmingTimeRequired != -1L) " §7(§b$timePerCopper §7per)" else " §7(§cno speed data!§7)"
                 }
                 finalList.set(index, copperLine)
             }
 
             if (formattedLine.contains("Rewards")) {
-                readingItemsNeeded = false
+                readingShoppingList = false
             }
 
             val (itemName, amount) = ItemUtils.readItemAmount(formattedLine) ?: continue
@@ -368,18 +407,18 @@ class GardenVisitorFeatures {
                 val format = NumberUtil.format(price)
                 finalList[index] = "$formattedLine §7(§6$format§7)"
             }
-            if (!readingItemsNeeded) continue
+            if (!readingShoppingList) continue
             val multiplier = NEUItems.getMultiplier(internalName)
 
-            val rawName = multiplier.first.getItemNameOrNull()?.removeColor() ?: continue
+            val rawName = multiplier.first.itemNameWithoutColor
             val cropType = getByNameOrNull(rawName) ?: continue
 
             val cropAmount = multiplier.second.toLong() * amount
             val formattedAmount = LorenzUtils.formatInteger(cropAmount)
             val formattedName = "§e$formattedAmount§7x ${cropType.cropName} "
             val formattedSpeed = cropType.getSpeed()?.let { speed ->
-                timeRequired = cropAmount / speed
-                val duration = TimeUtils.formatDuration(timeRequired * 1000)
+                farmingTimeRequired = cropAmount / speed
+                val duration = TimeUtils.formatDuration(farmingTimeRequired * 1000)
                 "in §b$duration"
             } ?: "§cno speed data!"
             if (config.inventory.exactAmountAndTime) {
@@ -393,7 +432,7 @@ class GardenVisitorFeatures {
     @SubscribeEvent
     fun onTick(event: LorenzTickEvent) {
         if (!GardenAPI.inGarden()) return
-        if (!config.needs.display && config.highlightStatus == HighlightMode.DISABLED) return
+        if (!config.shoppingList.display && config.highlightStatus == HighlightMode.DISABLED) return
         if (!event.isMod(10)) return
 
         if (GardenAPI.onBarnPlot && config.highlightStatus != HighlightMode.DISABLED) {
@@ -415,7 +454,7 @@ class GardenVisitorFeatures {
         }
         if (config.notificationChat) {
             val displayName = GardenVisitorColorNames.getColoredName(name)
-            LorenzUtils.chat("$displayName §eis visiting your garden!")
+            ChatUtils.chat("$displayName §eis visiting your garden!")
         }
 
         if (System.currentTimeMillis() > LorenzUtils.lastWorldSwitch + 2_000) {
@@ -432,12 +471,18 @@ class GardenVisitorFeatures {
 
     @SubscribeEvent
     fun onChatMessage(event: LorenzChatEvent) {
-        if (config.hypixelArrivedMessage && newVisitorArrivedMessage.matcher(event.message).matches()) {
+        if (config.hypixelArrivedMessage && visitorArrivePattern.matcher(event.message).matches()) {
             event.blockedReason = "new_visitor_arrived"
         }
 
         if (GardenAPI.inGarden() && config.hideChat && hideVisitorMessage(event.message)) {
             event.blockedReason = "garden_visitor_message"
+        }
+
+        if (config.shoppingList.display) {
+            partialAcceptedPattern.matchMatcher(event.message) {
+                ChatUtils.chat("Talk to the visitor again to update the number of items needed!")
+            }
         }
     }
 
@@ -460,7 +505,7 @@ class GardenVisitorFeatures {
             val visitorName = visitor.visitorName
             val entity = visitor.getEntity()
             if (entity == null) {
-                findNametag(visitorName.removeColor())?.let {
+                NPCVisitorFix.findNametag(visitorName.removeColor())?.let {
                     findEntity(it, visitor)
                 }
             }
@@ -498,38 +543,11 @@ class GardenVisitorFeatures {
         }
     }
 
-    private fun findNametag(visitorName: String): EntityArmorStand? {
-        val foundVisitorNameTags = mutableListOf<EntityArmorStand>()
-        for (entity in EntityUtils.getEntities<EntityArmorStand>()) {
-            if (entity.name.removeColor() == visitorName) {
-                foundVisitorNameTags.add(entity)
-            }
-        }
-
-        if (visitorName in listOf("Jacob", "Anita")) {
-            // Only detect jacob/anita npc if the "wrong" npc got found as well
-            if (foundVisitorNameTags.size != 2) return null
-
-            for (tag in foundVisitorNameTags.toMutableList()) {
-                for (entity in EntityUtils.getEntities<EntityArmorStand>()) {
-                    if (entity in foundVisitorNameTags) continue
-                    val distance = entity.getLorenzVec().distance(tag.getLorenzVec())
-                    if (distance < 1.5 && entity.name == "§bSam") {
-                        foundVisitorNameTags.remove(tag)
-                    }
-                }
-            }
-        }
-
-        if (foundVisitorNameTags.size != 1) return null
-        return foundVisitorNameTags[0]
-    }
-
     private fun hasItemsInInventory(visitor: VisitorAPI.Visitor): Boolean {
         var ready = true
-        for ((internalName, need) in visitor.items) {
+        for ((internalName, required) in visitor.shoppingList) {
             val having = InventoryUtils.countItemsInLowerInventory { it.getInternalName() == internalName }
-            if (having < need) {
+            if (having < required) {
                 ready = false
             }
         }
@@ -539,14 +557,14 @@ class GardenVisitorFeatures {
     @SubscribeEvent
     fun onRenderInSigns(event: DrawScreenEvent.Post) {
         if (!GardenAPI.inGarden()) return
-        if (!config.needs.display) return
+        if (!config.shoppingList.display) return
         val gui = event.gui
         if (gui !is GuiEditSign) return
 
-        if (config.needs.onlyWhenClose && !GardenAPI.onBarnPlot) return
+        if (config.shoppingList.onlyWhenClose && !GardenAPI.onBarnPlot) return
 
         if (!hideExtraGuis()) {
-            config.needs.pos.renderStringsAndItems(display, posLabel = "Visitor Items Needed")
+            config.shoppingList.pos.renderStringsAndItems(display, posLabel = "Visitor Shopping List")
         }
     }
 
@@ -554,22 +572,27 @@ class GardenVisitorFeatures {
 
     @SubscribeEvent
     fun onRenderOverlay(event: GuiRenderEvent) {
-        if (!config.needs.display) return
+        if (!config.shoppingList.display) return
 
         if (showGui()) {
-            config.needs.pos.renderStringsAndItems(display, posLabel = "Visitor Items Needed")
+            config.shoppingList.pos.renderStringsAndItems(display, posLabel = "Visitor Shopping List")
         }
     }
 
     private fun showGui(): Boolean {
-        if (config.needs.inBazaarAlley && IslandType.HUB.isInIsland() && LorenzUtils.skyBlockArea == "Bazaar Alley") {
-            return true
+        if (IslandType.HUB.isInIsland()) {
+            if (config.shoppingList.inBazaarAlley && LorenzUtils.skyBlockArea == "Bazaar Alley") {
+                return true
+            }
+            if (config.shoppingList.inFarmingAreas && LorenzUtils.skyBlockArea == "Farm") {
+                return true
+            }
         }
-
+        if (config.shoppingList.inFarmingAreas && IslandType.THE_FARMING_ISLANDS.isInIsland()) return true
         if (hideExtraGuis()) return false
         if (GardenAPI.inGarden()) {
             if (GardenAPI.onBarnPlot) return true
-            if (!config.needs.onlyWhenClose) return true
+            if (!config.shoppingList.onlyWhenClose) return true
         }
         return false
     }
@@ -582,6 +605,37 @@ class GardenVisitorFeatures {
         for (visitor in VisitorAPI.getVisitors()) {
             if (visitor.nameTagEntityId == entityId) {
                 entity.customNameTag = GardenVisitorColorNames.getColoredName(entity.name)
+            }
+        }
+    }
+
+    @SubscribeEvent
+    fun onDebugDataCollect(event: DebugDataCollectEvent) {
+        event.title("Garden Visitor Stats")
+
+        if (!GardenAPI.inGarden()) {
+            event.addIrrelevant("not in garden")
+            return
+        }
+
+        event.addData {
+            val visitors = VisitorAPI.getVisitors()
+
+            add("visitors: ${visitors.size}")
+
+            for (visitor in visitors) {
+                add(" ")
+                add("visitorName: '${visitor.visitorName}'")
+                add("status: '${visitor.status}'")
+                if (visitor.inSacks) {
+                    add("inSacks!")
+                }
+                if (visitor.shoppingList.isNotEmpty()) {
+                    add("shoppingList: '${visitor.shoppingList}'")
+                }
+                visitor.offer?.offerItem?.getInternalName()?.let {
+                    add("offer: '${it}'")
+                }
             }
         }
     }
@@ -635,7 +689,8 @@ class GardenVisitorFeatures {
         event.transform(15, "garden.visitors.highlightStatus") { element ->
             ConfigUtils.migrateIntToEnum(element, HighlightMode::class.java)
         }
-    }
 
+        event.move(18, "garden.visitors.needs", "garden.visitors.shoppingList")
+    }
 }
 

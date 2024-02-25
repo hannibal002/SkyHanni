@@ -9,15 +9,13 @@ enum class TabStringType {
     PLAYER;
 
     companion object {
-        // TODO USE SH-REPO
-        private val usernamePattern = "^\\[(?<sblevel>\\d+)] (?:\\[\\w+] )?(?<username>\\w+)".toPattern()
 
         fun fromLine(line: String): TabStringType {
             val strippedLine: String = line.removeColor()
             if (strippedLine.startsWith(" ")) {
                 return TEXT
             }
-            return if (usernamePattern.matcher(strippedLine).find()) {
+            return if (TabListReader.usernamePattern.matcher(strippedLine).find()) {
                 PLAYER
             } else {
                 SUB_TITLE
@@ -25,7 +23,7 @@ enum class TabStringType {
         }
 
         fun usernameFromLine(input: String): String {
-            val usernameMatcher = usernamePattern.matcher(input.removeColor())
+            val usernameMatcher = TabListReader.usernamePattern.matcher(input.removeColor())
             return if (usernameMatcher.find()) usernameMatcher.group("username") else input
         }
     }

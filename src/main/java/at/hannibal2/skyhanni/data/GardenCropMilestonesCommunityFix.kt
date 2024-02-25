@@ -6,11 +6,12 @@ import at.hannibal2.skyhanni.data.jsonobjects.repo.GardenJson
 import at.hannibal2.skyhanni.events.RepositoryReloadEvent
 import at.hannibal2.skyhanni.features.garden.CropType
 import at.hannibal2.skyhanni.features.garden.GardenAPI
+import at.hannibal2.skyhanni.utils.ChatUtils
+import at.hannibal2.skyhanni.utils.CollectionUtils.editCopy
+import at.hannibal2.skyhanni.utils.CollectionUtils.nextAfter
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.ItemUtils.name
 import at.hannibal2.skyhanni.utils.LorenzUtils
-import at.hannibal2.skyhanni.utils.LorenzUtils.editCopy
-import at.hannibal2.skyhanni.utils.LorenzUtils.nextAfter
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.NumberUtil.formatNumber
 import at.hannibal2.skyhanni.utils.NumberUtil.romanToDecimalIfNecessary
@@ -18,12 +19,17 @@ import at.hannibal2.skyhanni.utils.OSUtils
 import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.StringUtils.matches
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
+import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import kotlinx.coroutines.launch
 import net.minecraft.item.ItemStack
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
 object GardenCropMilestonesCommunityFix {
-    private val pattern = ".*§e(?<having>.*)§6/§e(?<max>.*)".toPattern()
+    private val amountPattern by RepoPattern.pattern(
+        "data.garden.milestonefix.amount",
+        ".*§e(?<having>.*)§6/§e(?<max>.*)"
+    )
+
     private var showWrongData = false
     private var showWhenAllCorrect = false
 
@@ -55,7 +61,7 @@ object GardenCropMilestonesCommunityFix {
         }
 
         if (data.isNotEmpty()) {
-            LorenzUtils.chat(
+            ChatUtils.chat(
                 "Found §c${data.size} §ewrong crop milestone steps in the menu! " +
                     "Correct data got put into clipboard. " +
                     "Please share it on the §bSkyHanni Discord §ein the channel §b#share-data§e."
@@ -63,7 +69,7 @@ object GardenCropMilestonesCommunityFix {
             OSUtils.copyToClipboard("```${data.joinToString("\n")}```")
         } else {
             if (showWhenAllCorrect) {
-                LorenzUtils.chat("No wrong crop milestone steps found!")
+                ChatUtils.chat("No wrong crop milestone steps found!")
             }
         }
     }
@@ -71,7 +77,7 @@ object GardenCropMilestonesCommunityFix {
     private fun checkForWrongData(
         stack: ItemStack,
         crop: CropType,
-        wrongData: MutableList<String>
+        wrongData: MutableList<String>,
     ) {
         val name = stack.name ?: return
         val rawNumber = name.removeColor().replace(crop.cropName, "").trim()
@@ -90,7 +96,7 @@ object GardenCropMilestonesCommunityFix {
             crop
         ) - GardenCropMilestones.getCropsForTier(realTier, crop)
 //         debug("guessNextMax: ${guessNextMax.addSeparators()}")
-        val nextMax = pattern.matchMatcher(next) {
+        val nextMax = amountPattern.matchMatcher(next) {
             group("max").formatNumber()
         } ?: return
 //         debug("nextMax real: ${nextMax.addSeparators()}")
@@ -101,7 +107,7 @@ object GardenCropMilestonesCommunityFix {
 
         val guessTotalMax = GardenCropMilestones.getCropsForTier(46, crop)
 //         println("guessTotalMax: ${guessTotalMax.addSeparators()}")
-        val totalMax = pattern.matchMatcher(total) {
+        val totalMax = amountPattern.matchMatcher(total) {
             group("max").formatNumber()
         } ?: return
 //         println("totalMax real: ${totalMax.addSeparators()}")
@@ -151,7 +157,7 @@ object GardenCropMilestonesCommunityFix {
             }
         }
         totalFixedValues += fixed
-        LorenzUtils.chat("Fixed: $fixed/$alreadyCorrect, total fixes: $totalFixedValues")
+        ChatUtils.chat("Fixed: $fixed/$alreadyCorrect, total fixes: $totalFixedValues")
         val s = ConfigManager.gson.toJsonTree(GardenCropMilestones.cropMilestoneData).toString()
         OSUtils.copyToClipboard("\"crop_milestones\":$s,")
     }

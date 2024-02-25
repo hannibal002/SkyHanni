@@ -1,5 +1,6 @@
 package at.hannibal2.skyhanni.config;
 
+import at.hannibal2.skyhanni.api.SkillAPI;
 import at.hannibal2.skyhanni.data.jsonobjects.local.HotmTree;
 import at.hannibal2.skyhanni.data.model.ComposterUpgrade;
 import at.hannibal2.skyhanni.features.bingo.card.goals.BingoGoal;
@@ -24,6 +25,7 @@ import at.hannibal2.skyhanni.features.misc.trevor.TrevorTracker;
 import at.hannibal2.skyhanni.features.misc.visualwords.VisualWord;
 import at.hannibal2.skyhanni.features.rift.area.westvillage.VerminTracker;
 import at.hannibal2.skyhanni.features.rift.area.westvillage.kloon.KloonTerminal;
+import at.hannibal2.skyhanni.features.skillprogress.SkillType;
 import at.hannibal2.skyhanni.features.slayer.SlayerProfitTracker;
 import at.hannibal2.skyhanni.utils.LorenzVec;
 import at.hannibal2.skyhanni.utils.NEUInternalName;
@@ -45,7 +47,10 @@ public class Storage {
     public boolean hasPlayedBefore = false;
 
     @Expose
-    public Float savedMouseSensitivity = .5f;
+    public Float savedMouselockedSensitivity = .5f;
+
+    @Expose
+    public Float savedMouseloweredSensitivity = .5f;
 
     @Deprecated
     @Expose
@@ -62,6 +67,9 @@ public class Storage {
 
     @Expose
     public Map<String, SkyHanniTracker.DisplayMode> trackerDisplayModes = new HashMap<>();
+
+    @Expose
+    public List<LorenzVec> foundDianaBurrowLocations = new ArrayList<>();
 
     @Expose
     public Map<UUID, PlayerSpecific> players = new HashMap<>();
@@ -107,7 +115,7 @@ public class Storage {
         public static class BingoSession {
 
             @Expose
-            public List<String> tierOneMinionsDone = new ArrayList<>();
+            public List<NEUInternalName> tierOneMinionsDone = new ArrayList<>();
 
             @Expose
             public Map<Integer, BingoGoal> goals = new HashMap<>();
@@ -315,6 +323,9 @@ public class Storage {
                 @Expose
                 public int lastFarmingWeightLeaderboard = -1;
             }
+
+            @Expose
+            public Map<String, LorenzVec> npcVisitorLocations = new HashMap<>();
         }
 
         @Expose
@@ -482,7 +493,9 @@ public class Storage {
             @Expose
             // TODO renmae
             public MythologicalCreatureTracker.Data mythologicalMobTracker = new MythologicalCreatureTracker.Data();
-
         }
+
+        @Expose
+        public Map<SkillType, SkillAPI.SkillInfo> skillData = new HashMap<>();
     }
 }

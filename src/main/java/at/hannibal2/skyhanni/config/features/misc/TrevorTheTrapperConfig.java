@@ -52,7 +52,7 @@ public class TrevorTheTrapperConfig {
         name = "Text Format",
         desc = "Drag text to change the appearance of the overlay."
     )
-    @ConfigEditorDraggableList()
+    @ConfigEditorDraggableList
     public List<TrackerEntry> textFormat = new ArrayList<>(Arrays.asList(
         TITLE,
         QUESTS_STARTED,

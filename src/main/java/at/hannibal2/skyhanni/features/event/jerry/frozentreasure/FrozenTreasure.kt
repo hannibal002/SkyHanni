@@ -1,6 +1,7 @@
 package at.hannibal2.skyhanni.features.event.jerry.frozentreasure
 
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
+import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 
 enum class FrozenTreasure(
     val internalName: String,
@@ -8,6 +9,7 @@ enum class FrozenTreasure(
     val defaultAmount: Int,
     val iceMultiplier: Int = 0,
 ) {
+
     WHITE_GIFT("WHITE_GIFT", "§fWhite Gift", 1),
     GREEN_GIFT("GREEN_GIFT", "§aGreen Gift", 1),
     RED_GIFT("RED_GIFT", "§9§cRed Gift", 1),
@@ -22,5 +24,11 @@ enum class FrozenTreasure(
     EINARY_RED_HOODIE("FROZEN_BAIT", "§cEinary's Red Hoodie", 1),
     ;
 
-    val pattern by lazy { "FROZEN TREASURE! You found ${displayName.removeColor()}!".toPattern() }
+    val chatPattern by RepoPattern.pattern(
+        "event.jerry.frozentreasure.item." + this.patternName(),
+        patternText()
+    )
+
+    private fun patternName() = name.lowercase().replace("_", "")
+    private fun patternText() = "FROZEN TREASURE! You found ${displayName.removeColor()}!"
 }

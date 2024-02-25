@@ -10,6 +10,7 @@ import net.minecraft.entity.Entity
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
 class PartyMemberOutlines {
+
     private val config get() = SkyHanniMod.feature.misc.highlightPartyMembers
 
     @SubscribeEvent
