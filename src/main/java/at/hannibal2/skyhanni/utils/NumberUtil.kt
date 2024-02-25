@@ -189,11 +189,11 @@ object NumberUtil {
 
     // TODO create new function formatLong, and eventually deprecate this function.
     @Deprecated("renamed", ReplaceWith("this.formatLong()"))
-    fun String.formatNumber(): Long = formatLong()
+    fun String.formatNumber(): Long = formatLong() ?: error("formatNumber has a NumberFormatException with '$this'")
 
-    fun String.formatLong(): Long = formatDouble().toLong()
+    fun String.formatLong(): Long? = formatDouble()?.toLong()
 
-    fun String.formatDouble(): Double {
+    fun String.formatDouble(): Double? {
         var text = lowercase().replace(",", "")
 
         val multiplier = if (text.endsWith("k")) {
@@ -206,8 +206,9 @@ object NumberUtil {
             text = text.substring(0, text.length - 1)
             1.bilion
         } else 1.0
-        val d = text.toDouble()
-        return d * multiplier
+        return text.toDoubleOrNull()?.let {
+            it * multiplier
+        }
     }
 
     val Int.milion get() = this * 1_000_000.0

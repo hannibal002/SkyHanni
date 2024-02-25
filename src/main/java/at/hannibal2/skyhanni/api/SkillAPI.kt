@@ -394,6 +394,10 @@ object SkillAPI {
             when (first) {
                 "levelwithxp" -> {
                     val xp = second.formatLong()
+                    if (xp == null) {
+                        ChatUtils.userError("Not a valid number: '$second'")
+                        return
+                    }
                     if (xp <= XP_NEEDED_FOR_60) {
                         val level = getLevel(xp)
                         ChatUtils.chat("With §b${xp.addSeparators()} §eXP you would be level §b$level")
@@ -410,7 +414,7 @@ object SkillAPI {
                 "xpforlevel" -> {
                     val level = second.toIntOrNull()
                     if (level == null) {
-                        ChatUtils.userError("Not a number: '$second'")
+                        ChatUtils.userError("Not a valid number: '$second'")
                         return
                     }
                     if (level <= 60) {
