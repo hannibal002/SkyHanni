@@ -25,7 +25,7 @@ object GetFromSacksTabComplete {
 
         if (event.senderIsSkyhanni()) return event
 
-        if (event.splitMessage.isEmpty()) return event
+        if (event.splitMessage.size <= 2) return event
 
         val rawName = event.splitMessage[1]
         val realName = rawName.replace("_", " ")
