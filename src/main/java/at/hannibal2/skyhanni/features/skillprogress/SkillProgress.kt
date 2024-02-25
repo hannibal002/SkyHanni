@@ -115,8 +115,9 @@ object SkillProgress {
 
         } else {
             maxWidth = barConfig.regularBar.width
+            val factor = skillExpPercentage.coerceAtMost(1.0)
             Renderable.progressBar(
-                percent = skillExpPercentage,
+                percent = factor,
                 startColor = Color(SpecialColour.specialToChromaRGB(barConfig.barStartColor)),
                 endColor = Color(SpecialColour.specialToChromaRGB(barConfig.barStartColor)),
                 width = maxWidth,
@@ -312,13 +313,18 @@ object SkillProgress {
         val useCustomGoalLevel = skillInfo.customGoalLevel != 0 && skillInfo.customGoalLevel > skillInfo.overflowLevel && customGoalConfig.enableInETADisplay
         var targetLevel = if (useCustomGoalLevel) skillInfo.customGoalLevel else level + 1
         if (targetLevel <= level || targetLevel > 400) targetLevel = (level + 1)
-        val currentLevelNeededXp = SkillUtil.xpRequiredForLevel(level.toDouble()) + skillInfo.overflowCurrentXp
-        val targetNeededXp = SkillUtil.xpRequiredForLevel(targetLevel.toDouble())
-        var remaining = if (useCustomGoalLevel) targetNeededXp - currentLevelNeededXp else skillInfo.overflowCurrentXpMax - skillInfo.overflowCurrentXp
 
-        if (!useCustomGoalLevel) {
+        val need = skillInfo.overflowCurrentXpMax
+        val have = skillInfo.overflowCurrentXp
+
+        val currentLevelNeededXp = SkillUtil.xpRequiredForLevel(level.toDouble()) + have
+        val targetNeededXp = SkillUtil.xpRequiredForLevel(targetLevel.toDouble())
+
+        var remaining = if (useCustomGoalLevel) targetNeededXp - currentLevelNeededXp else need - have
+
+        if (!useCustomGoalLevel && have < need) {
             if (skillInfo.overflowCurrentXpMax == skillInfoLast.overflowCurrentXpMax) {
-                remaining = interpolate(remaining.toFloat(), (skillInfoLast.overflowCurrentXpMax - skillInfoLast.overflowCurrentXp).toFloat(), lastGainUpdate.toMillis()).toLong()
+                remaining = interpolate(remaining.toFloat(), (need - have).toFloat(), lastGainUpdate.toMillis()).toLong()
             }
         }
 
@@ -328,7 +334,10 @@ object SkillProgress {
             add(Renderable.string("§7Needed XP: §e${remaining.addSeparators()}"))
 
         var xpInterp = xpInfo.xpGainHour
-        if (xpInfo.xpGainHour < 1000) {
+
+        if (have > need){
+            add(Renderable.string("§7In §cIncrease level cap!"))
+        } else if (xpInfo.xpGainHour < 1000) {
             add(Renderable.string("§7In §cN/A"))
         } else {
             val duration = ((remaining) * 1000 * 60 * 60 / xpInterp.toLong()).milliseconds
