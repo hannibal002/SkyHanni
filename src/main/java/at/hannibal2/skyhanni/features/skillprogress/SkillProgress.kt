@@ -350,7 +350,7 @@ object SkillProgress {
         add(Renderable.clickAndHover("§7Session: §e$session ${if (xpInfo.sessionTimerActive) "" else "§c(PAUSED)"}",
             listOf("§eClick to reset!")) {
             xpInfo.sessionTimerActive = false
-            xpInfo.shouldStartTimer = true
+            activeSkill.timer = null
             xpInfo.timeActive = 0L
             chat("Timer for §b${activeSkill.displayName} §ehas been reset!")
         })
