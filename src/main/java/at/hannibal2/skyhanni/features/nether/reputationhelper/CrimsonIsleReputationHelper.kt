@@ -115,9 +115,7 @@ class CrimsonIsleReputationHelper(skyHanniMod: SkyHanniMod) {
         newList.addAsSingletonList("Reputation Helper:")
         questHelper.render(newList)
         miniBossHelper.render(newList)
-        if (factionType == FactionType.MAGE) {
-            kuudraBossHelper.render(newList)
-        }
+        kuudraBossHelper.render(newList)
 
         display = newList
     }
