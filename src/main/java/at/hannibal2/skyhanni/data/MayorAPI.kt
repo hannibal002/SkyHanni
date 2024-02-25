@@ -99,9 +99,8 @@ object MayorAPI {
                 map put data.current.getPairs()
             }
             candidates = map
+            checkCurrentMayor()
         }
-
-        checkCurrentMayor()
     }
 
     private fun MayorJson.Election.getPairs() = year + 1 to candidates.bestCandidate()
