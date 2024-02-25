@@ -176,7 +176,7 @@ object GetFromSackAPI {
             return CommandResult.WRONG_AMOUNT to null
         }
 
-        val itemString = args.dropLast(1).joinToString(" ").uppercase()
+        val itemString = args.dropLast(1).joinToString(" ").uppercase().replace(':', '-')
 
         val item = when {
             sackListInternalNames.contains(itemString) -> itemString.asInternalName()
