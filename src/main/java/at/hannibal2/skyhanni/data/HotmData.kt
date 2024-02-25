@@ -1,18 +1,14 @@
 package at.hannibal2.skyhanni.data
 
 import at.hannibal2.skyhanni.data.jsonobjects.local.HotmTree
-import at.hannibal2.skyhanni.events.GuiContainerEvent
 import at.hannibal2.skyhanni.events.InventoryCloseEvent
 import at.hannibal2.skyhanni.events.InventoryFullyOpenedEvent
 import at.hannibal2.skyhanni.events.LorenzChatEvent
-import at.hannibal2.skyhanni.events.RenderItemTipEvent
 import at.hannibal2.skyhanni.utils.DelayedRun
 import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.ItemUtils.name
-import at.hannibal2.skyhanni.utils.LorenzColor
 import at.hannibal2.skyhanni.utils.LorenzUtils
-import at.hannibal2.skyhanni.utils.RenderUtils.highlight
 import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.StringUtils.matches
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
@@ -276,6 +272,8 @@ enum class HotmData(
                 ProfileStorageData.profileSpecific?.mining?.availableTokens = value
             }
 
+        var heartItem: ItemStack? = null
+
         init {
             entries.forEach { it.guiNamePattern }
         }
@@ -335,6 +333,7 @@ enum class HotmData(
                 availableGemstonePowder = 0
                 availableMithrilPowder = 0
                 availableTokens = 0
+                heartItem = this
             }
 
             val lore = this.getLore()
@@ -397,26 +396,6 @@ enum class HotmData(
             if (!LorenzUtils.inSkyBlock) return
             if (!resetChatPattern.matches(event.message)) return
             resetTree()
-        }
-
-        // Feature
-
-        @SubscribeEvent
-        fun onRender(event: GuiContainerEvent.BackgroundDrawnEvent) {
-            entries.forEach { entry ->
-                val color = if (!entry.isUnlocked) LorenzColor.GRAY
-                else if (entry.enabled) LorenzColor.GREEN else LorenzColor.RED
-                entry.slot?.highlight(color)
-            }
-        }
-
-        @SubscribeEvent
-        fun onRenderTip(event: RenderItemTipEvent) {
-            entries.firstOrNull() {
-                event.stack == it.slot?.stack
-            }?.let {
-                event.stackTip = it.activeLevel.takeIf { it != 0 }?.toString() ?: ""
-            }
         }
 
     }
