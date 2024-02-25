@@ -7,7 +7,9 @@ import at.hannibal2.skyhanni.events.LorenzRenderWorldEvent
 import at.hannibal2.skyhanni.events.LorenzTickEvent
 import at.hannibal2.skyhanni.events.LorenzWorldChangeEvent
 import at.hannibal2.skyhanni.events.ReceiveParticleEvent
+import at.hannibal2.skyhanni.features.fishing.FishingAPI
 import at.hannibal2.skyhanni.utils.LocationUtils.distanceTo
+import at.hannibal2.skyhanni.utils.LocationUtils.distanceToPlayerIgnoreY
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils.isInIsland
 import at.hannibal2.skyhanni.utils.LorenzVec
@@ -69,7 +71,11 @@ class GeyserFishing {
 
     @SubscribeEvent
     fun onRenderWorld(event: LorenzRenderWorldEvent) {
-        if (!config.drawBox || !IslandType.CRIMSON_ISLE.isInIsland()) return
+        if (!config.drawBox) return
+        if (!IslandType.CRIMSON_ISLE.isInIsland()) return
+        if (config.onlyWithRod && !FishingAPI.holdingLavaRod) return
+        if (geyser?.distanceToPlayerIgnoreY()!! > 96) return
+
         val geyserBox = geyserBox ?: return
         val color = Color(SpecialColour.specialToChromaRGB(config.boxColor), true)
         event.drawFilledBoundingBox_nea(geyserBox, color)
