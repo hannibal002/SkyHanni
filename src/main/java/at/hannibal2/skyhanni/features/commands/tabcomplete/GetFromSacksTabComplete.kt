@@ -27,10 +27,10 @@ object GetFromSacksTabComplete {
 
         if (event.splitMessage.isEmpty()) return event
 
-        val rawName = event.splitMessage[1].uppercase()
+        val rawName = event.splitMessage[1]
         val realName = rawName.replace("_", " ")
         if (realName == rawName) return event
-        if (realName !in GetFromSackAPI.sackListNames) return event
+        if (realName.uppercase() !in GetFromSackAPI.sackListNames) return event
         return event.eventWithNewMessage(event.message.replace(rawName, realName))
     }
 
