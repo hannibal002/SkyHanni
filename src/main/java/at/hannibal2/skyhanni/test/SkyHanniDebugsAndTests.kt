@@ -1,13 +1,11 @@
 package at.hannibal2.skyhanni.test
 
 import at.hannibal2.skyhanni.SkyHanniMod
-import at.hannibal2.skyhanni.api.HotmAPI
 import at.hannibal2.skyhanni.config.ConfigFileType
 import at.hannibal2.skyhanni.config.ConfigGuiManager
 import at.hannibal2.skyhanni.config.ConfigManager
 import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.config.core.config.Position
-import at.hannibal2.skyhanni.data.HotmData
 import at.hannibal2.skyhanni.data.HypixelData
 import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.LorenzChatEvent
@@ -46,7 +44,6 @@ import at.hannibal2.skyhanni.utils.RenderUtils.renderString
 import at.hannibal2.skyhanni.utils.RenderUtils.renderStringsAndItems
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.SoundUtils
-import com.google.gson.Gson
 import kotlinx.coroutines.launch
 import net.minecraft.client.Minecraft
 import net.minecraft.client.gui.inventory.GuiContainer
@@ -113,12 +110,6 @@ class SkyHanniDebugsAndTests {
 
         fun testCommand(args: Array<String>) {
             SoundUtils.playBeepSound()
-            val gson = Gson()
-            LorenzDebug.log("Ability: " + HotmAPI.activeMiningAbility?.name)
-            LorenzDebug.log("Token: " + HotmData.availableTokens + " / " + HotmData.tokens)
-            LorenzDebug.log("Mithril: " + HotmAPI.Powder.currentMithril + " / " + HotmAPI.Powder.maxMithril)
-            LorenzDebug.log("Gemstone: " + HotmAPI.Powder.currentGemstone + " / " + HotmAPI.Powder.maxGemstone)
-            LorenzDebug.log("Tree: " + gson.toJson(HotmAPI.copyCurrentTree()))
 
 //            val a = Thread { OSUtils.copyToClipboard("123") }
 //            val b = Thread { OSUtils.copyToClipboard("456") }
