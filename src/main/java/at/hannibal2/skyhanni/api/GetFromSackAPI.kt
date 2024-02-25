@@ -9,8 +9,13 @@ import at.hannibal2.skyhanni.events.LorenzTickEvent
 import at.hannibal2.skyhanni.events.LorenzToolTipEvent
 import at.hannibal2.skyhanni.events.MessageSendToServerEvent
 import at.hannibal2.skyhanni.events.RepositoryReloadEvent
+import at.hannibal2.skyhanni.features.commands.tabcomplete.GetFromSacksTabComplete
+import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.ChatUtils.isCommand
+import at.hannibal2.skyhanni.utils.ChatUtils.senderIsSkyhanni
+import at.hannibal2.skyhanni.utils.DelayedRun
+import at.hannibal2.skyhanni.utils.ItemUtils.itemNameWithoutColor
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.NEUInternalName
 import at.hannibal2.skyhanni.utils.NEUInternalName.Companion.asInternalName
@@ -68,7 +73,10 @@ object GetFromSackAPI {
 
     private var lastItemStack: PrimitiveItemStack? = null
 
-    var sackList = emptyList<NEUInternalName>()
+    var sackListInternalNames = emptySet<String>()
+        private set
+
+    var sackListNames = emptySet<String>()
         private set
 
     private fun addToQueue(items: List<PrimitiveItemStack>) = queue.addAll(items)
@@ -115,13 +123,22 @@ object GetFromSackAPI {
         if (!LorenzUtils.inSkyBlock) return
         if (!config.queuedGFS && !config.bazaarGFS) return
         if (!event.isCommand(commandsWithSlash)) return
-        queuedHandler(event)
-        bazaarHandler(event)
+        val replacedEvent = GetFromSacksTabComplete.handleUnderlineReplace(event)
+        queuedHandler(replacedEvent)
+        bazaarHandler(replacedEvent)
+        if (replacedEvent.isCanceled) {
+            event.isCanceled = true
+            return
+        }
+        if (replacedEvent !== event) {
+            event.isCanceled = true
+            ChatUtils.sendMessageToServer(replacedEvent.message)
+        }
     }
 
     private fun queuedHandler(event: MessageSendToServerEvent) {
         if (!config.queuedGFS) return
-        if (event.originatingModContainer?.modId == "skyhanni") return
+        if (event.senderIsSkyhanni()) return
 
         val (result, stack) = commandValidator(event.splitMessage.drop(1))
 
@@ -130,6 +147,7 @@ object GetFromSackAPI {
             CommandResult.WRONG_ARGUMENT -> ChatUtils.userError("Missing arguments! Usage: /getfromsacks <name/id> <amount>")
             CommandResult.WRONG_IDENTIFIER -> ChatUtils.userError("Couldn't find an item with this name or identifier!")
             CommandResult.WRONG_AMOUNT -> ChatUtils.userError("Invalid amount!")
+            CommandResult.INTERNAL_ERROR -> {}
         }
         event.isCanceled = true
     }
@@ -146,23 +164,33 @@ object GetFromSackAPI {
     )
 
     private fun commandValidator(args: List<String>): Pair<CommandResult, PrimitiveItemStack?> {
-        if (args.size != 2) {
+        if (args.size <= 1) {
             return CommandResult.WRONG_ARGUMENT to null
         }
 
-        val item = args[0].asInternalName()
-
-        if (!sackList.contains(item)) {
-            return CommandResult.WRONG_IDENTIFIER to null
-        }
-
-        val amountString = args[1]
+        val amountString = args.last()
 
         if (!amountString.isInt()) {
             return CommandResult.WRONG_AMOUNT to null
         }
 
-        return CommandResult.VALID to item.makePrimitiveStack(amountString.toInt())
+        val itemString = args.dropLast(1).joinToString(" ").uppercase()
+
+        val item = when {
+            sackListInternalNames.contains(itemString) -> itemString.asInternalName()
+            sackListNames.contains(itemString) -> NEUInternalName.fromItemNameOrNull(itemString) ?: run {
+                ErrorManager.logErrorStateWithData(
+                    "Couldn't resolve item name",
+                    "Query failed",
+                    "itemName" to itemString
+                )
+                return CommandResult.INTERNAL_ERROR to null
+            }
+
+            else -> return CommandResult.WRONG_IDENTIFIER to null
+        }
+
+        return CommandResult.VALID to PrimitiveItemStack(item, amountString.toInt())
     }
 
     @SubscribeEvent
@@ -189,11 +217,17 @@ object GetFromSackAPI {
         VALID,
         WRONG_ARGUMENT,
         WRONG_IDENTIFIER,
-        WRONG_AMOUNT
+        WRONG_AMOUNT,
+        INTERNAL_ERROR
     }
 
     @SubscribeEvent
     fun onRepoReload(event: RepositoryReloadEvent) {
-        sackList = event.getConstant<SacksJson>("Sacks").sackList.map { it.replace(" ", "_").asInternalName() }
+        sackListInternalNames = event.getConstant<SacksJson>("Sacks").sackItems.toSet()
+
+        DelayedRun.runNextTick {
+            sackListNames = sackListInternalNames.map { it.asInternalName().itemNameWithoutColor.uppercase() }.toSet()
+        }
+        //sackListNames = event.getConstant<SacksJson>("Sacks").sackList.map { it.uppercase() }.toSet()
     }
 }

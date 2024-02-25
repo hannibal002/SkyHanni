@@ -4,11 +4,9 @@ import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.GetFromSackAPI
 import at.hannibal2.skyhanni.api.GetFromSackAPI.commands
 import at.hannibal2.skyhanni.events.MessageSendToServerEvent
-import at.hannibal2.skyhanni.utils.ChatUtils
-import at.hannibal2.skyhanni.utils.ChatUtils.isCommand
+import at.hannibal2.skyhanni.utils.ChatUtils.eventWithNewMessage
+import at.hannibal2.skyhanni.utils.ChatUtils.senderIsSkyhanni
 import at.hannibal2.skyhanni.utils.LorenzUtils
-import at.hannibal2.skyhanni.utils.NEUInternalName.Companion.asInternalName
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
 object GetFromSacksTabComplete {
 
@@ -18,21 +16,22 @@ object GetFromSacksTabComplete {
         if (!isEnabled()) return null
         if (command !in commands) return null
 
-        return GetFromSackAPI.sackList.map { it.asString() }
+        return GetFromSackAPI.sackListNames.map { it.replace(" ", "_") }
     }
 
-    @SubscribeEvent
-    fun onMessageSendToServer(event: MessageSendToServerEvent) {
-        if (!isEnabled()) return
+    //No subscribe since it needs to be called from the GetFromSackAPI
+    fun handleUnderlineReplace(event: MessageSendToServerEvent): MessageSendToServerEvent {
+        if (!isEnabled()) return event
 
-        if (!event.isCommand(GetFromSackAPI.commandsWithSlash)) return
+        if (event.senderIsSkyhanni()) return event
 
-        val rawName = event.splitMessage[1]
-        val realName = rawName.asInternalName()
-        if (realName.asString() == rawName) return
-        if (realName !in GetFromSackAPI.sackList) return
-        event.isCanceled = true
-        ChatUtils.sendMessageToServer(event.message.replace(rawName, realName.asString()))
+        if (event.splitMessage.isEmpty()) return event
+
+        val rawName = event.splitMessage[1].uppercase()
+        val realName = rawName.replace("_", " ")
+        if (realName == rawName) return event
+        if (realName !in GetFromSackAPI.sackListNames) return event
+        return event.eventWithNewMessage(event.message.replace(rawName, realName))
     }
 
     fun isEnabled() = LorenzUtils.inSkyBlock && config.gfsSack
