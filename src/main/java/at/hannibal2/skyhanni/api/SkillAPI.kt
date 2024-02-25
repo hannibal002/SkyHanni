@@ -244,6 +244,7 @@ object SkillAPI {
         add("-  CustomGoalLevel: ${skillInfo.customGoalLevel}\n")
     }
 
+    // TODO only use one statuc timer for the whole feature. this timer just ticks the currently active skill.
     private fun runTimer(skillType: SkillType, info: SkillXPInfo): Timer =
         fixedRateTimer(name = "skyhanni-skillprogress-timer-${skillType.displayName}", initialDelay = 1_000L, period = 1_000L) {
             if (skillType.timer != this) cancel()
