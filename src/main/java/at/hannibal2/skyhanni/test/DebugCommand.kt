@@ -3,6 +3,7 @@ package at.hannibal2.skyhanni.test
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.data.HypixelData
 import at.hannibal2.skyhanni.data.IslandType
+import at.hannibal2.skyhanni.data.MayorAPI
 import at.hannibal2.skyhanni.events.DebugDataCollectEvent
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils
@@ -40,6 +41,7 @@ object DebugCommand {
         skyblockStatus(event)
         profileName(event)
         profileType(event)
+        mayor(event)
 
         event.postAndCatch()
 
@@ -58,7 +60,7 @@ object DebugCommand {
     private fun profileType(event: DebugDataCollectEvent) {
         event.title("Profile Type")
         if (!LorenzUtils.inSkyBlock) {
-            event.addIrrelevant("Not on SkyBlcok")
+            event.addIrrelevant("Not on SkyBlock")
             return
         }
 
@@ -81,7 +83,7 @@ object DebugCommand {
     private fun profileName(event: DebugDataCollectEvent) {
         event.title("Profile Name")
         if (!LorenzUtils.inSkyBlock) {
-            event.addIrrelevant("Not on SkyBlcok")
+            event.addIrrelevant("Not on SkyBlock")
             return
         }
 
@@ -139,6 +141,16 @@ object DebugCommand {
         event.addIrrelevant {
             add("name: '${LorenzUtils.getPlayerName()}'")
             add("uuid: '${LorenzUtils.getPlayerUuid()}'")
+        }
+    }
+
+    private fun mayor(event: DebugDataCollectEvent) {
+        event.title("Mayor")
+        event.addIrrelevant {
+            add("Current Mayor: ${MayorAPI.currentMayor?.name ?: "Unknown"}")
+            add("Active Perks: ${MayorAPI.currentMayor?.activePerks}")
+            add("Last Update: ${MayorAPI.lastUpdate} (${MayorAPI.lastUpdate.passedSince()} ago)")
+            add("Time Till Next Mayor: ${MayorAPI.timeTillNextMayor}")
         }
     }
 }
