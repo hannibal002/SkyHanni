@@ -3,8 +3,6 @@ package at.hannibal2.skyhanni.utils
 import java.text.NumberFormat
 import java.util.Locale
 import java.util.TreeMap
-import kotlin.math.max
-import kotlin.math.min
 import kotlin.math.pow
 import kotlin.math.roundToInt
 
@@ -190,7 +188,10 @@ object NumberUtil {
     }
 
     // TODO create new function formatLong, and eventually deprecate this function.
-    fun String.formatNumber(): Long = formatDouble().toLong()
+    @Deprecated("renamed", ReplaceWith("this.formatLong()"))
+    fun String.formatNumber(): Long = formatLong()
+
+    fun String.formatLong(): Long = formatDouble().toLong()
 
     fun String.formatDouble(): Double {
         var text = lowercase().replace(",", "")
