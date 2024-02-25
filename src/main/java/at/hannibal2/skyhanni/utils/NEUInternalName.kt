@@ -1,6 +1,5 @@
 package at.hannibal2.skyhanni.utils
 
-
 class NEUInternalName private constructor(private val internalName: String) {
 
     companion object {

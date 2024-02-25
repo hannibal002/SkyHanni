@@ -111,25 +111,6 @@ class SkyHanniDebugsAndTests {
         fun testCommand(args: Array<String>) {
             SoundUtils.playBeepSound()
 
-            val input = args.joinToString(" ")
-
-            println("")
-            println("input: '$input'")
-
-            NEUItems.getInternalNameOrNull(input)?.let {
-                println("item name -> internalName: '$it'")
-                println("  itemName: '${it.itemName}'")
-                return
-            }
-
-            input.asInternalName().getItemStackOrNull()?.let {
-                val itemName = it.itemName
-                println("internal name -> item name: $itemName")
-                return
-            }
-
-            println("nothing found!")
-
 //            val a = Thread { OSUtils.copyToClipboard("123") }
 //            val b = Thread { OSUtils.copyToClipboard("456") }
 //            a.start()
