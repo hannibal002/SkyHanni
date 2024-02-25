@@ -616,7 +616,8 @@ private fun getExtraDisplayPair(): List<ScoreboardElement> {
             "CustomScoreboard detected ${unknownLines.size} unknown line${if (unknownLines.size > 1) "s" else ""}",
             "Unknown Lines" to unknownLines,
             "Island" to HypixelData.skyBlockIsland,
-            "Area" to HypixelData.skyBlockArea
+            "Area" to HypixelData.skyBlockArea,
+            noStackTrace = true
         )
         amountOfUnknownLines = unknownLines.size
     }
