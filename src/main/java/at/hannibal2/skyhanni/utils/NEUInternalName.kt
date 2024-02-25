@@ -18,7 +18,7 @@ class NEUInternalName private constructor(private val internalName: String) {
             return map.getOrPut(internalName) { NEUInternalName(internalName) }
         }
 
-        fun fromItemNameOrNull(itemName: String): NEUInternalName? = NEUItems.getInternalNameOrNull0(itemName)
+        fun fromItemNameOrNull(itemName: String): NEUInternalName? = ItemNameResolver.getInternalNameOrNull(itemName)
 
         fun fromItemName(itemName: String): NEUInternalName =
             fromItemNameOrNull(itemName) ?: throw Error("NEUInternalName is null for item name '$itemName'")

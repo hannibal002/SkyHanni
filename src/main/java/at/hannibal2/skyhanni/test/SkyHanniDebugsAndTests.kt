@@ -392,6 +392,36 @@ class SkyHanniDebugsAndTests {
                 ChatUtils.chat("§cDisabled global renderer! Run this command again to show SkyHanni rendering again.")
             }
         }
+
+        fun testItemCommand(args: Array<String>) {
+            if (args.isEmpty()) {
+                ChatUtils.userError("Usage: /shtestitem <item name or internal name>")
+                return
+            }
+
+            val input = args.joinToString(" ")
+            val result = buildList {
+                add("")
+                add("§bSkyHanni Test Item")
+                add("§einput: '§f$input§e'")
+
+                NEUInternalName.fromItemNameOrNull(input)?.let {
+                    add("§eitem name -> internalName: '§7${it.asString()}§e'")
+                    add("  §eitemName: '${it.itemName}§e'")
+                    return@buildList
+                }
+
+                input.asInternalName().getItemStackOrNull()?.let {
+                    val itemName = it.itemName
+                    add("§einternal name: §7${it.getInternalName().asString()}")
+                    add("§einternal name -> item name: '$itemName§e'")
+                    return@buildList
+                }
+
+                add("§cNothing found!")
+            }
+            ChatUtils.chat(result.joinToString("\n"), prefix = false)
+        }
     }
 
     @SubscribeEvent

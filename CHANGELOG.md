@@ -90,6 +90,13 @@
     + Option to render all saved locations in the world. (default disabled)
     + Commands to save the full list to the clipboard, and load a list from the clipboard (to share between users)
 
+#### GUI Features
+
++ Added Skill Progress Display. - HiZe
+    + ETA Display, exp, actions or percentage to next level, custom level goals, all skill display, chroma progress bar,
+      and overflow levels for all those things.
+    + A ton of settings.
+
 #### Misc Features
 
 + Fixes Ghost Entities. - hannibal2 & nea & Thunderblade73
@@ -192,6 +199,8 @@
     + SMP and Snow Particles. - walker
     + Earned mystery dust. - alexia
 + Added the fire sale ended message to the Fire Sale Chat Hider. - hannibal2
++ Hide pet consumables chat messages on Hypixel main lobby. - alexia
++ Fire sale chat message hider now also hides the "and x more" part. - hannibal2
 
 #### Command Changes
 
@@ -204,6 +213,10 @@
 #### Slayer Changes
 
 + Adding Soul Of The Alpha support to the Area Mini Boss features respawn timer and highlight. - martimavocado
+
+#### GUI Changes
+
++ The Compact Tab List now has toggle tab support. - hannibal2
 
 #### Misc Changes
 
@@ -242,6 +255,7 @@
 + Fixed a rare farming weight API error. - CalMWolfs
 + Fixed mouse rotation unlocks after doing /warp garden with Sensitivity Reducer on. - martimavocado
 + Fixed wording of composter fuel warning. - alexia
++ Fixed Garden plot menu icon edit mode copies stack size. - hannibal2
 
 #### Combat Fixes
 
@@ -273,6 +287,7 @@
 + Fixed Diana mobs being invisible because of Fix Ghost Entities and four season pet skin. - hannibal2
 + Fixed a rare bug that leaves ghost burrows around. - hannibal2
 + Properly deleting Diana target markers when manually clearing griffin burrows by talking to Diana NPC. - hannibal2
++ Properly resetting internal Diana data on clearing waypoints via NPC. - hannibal2
 
 #### Mining Fixes
 
@@ -309,7 +324,7 @@
 + Fixed rune price calculation in Chest Value. - hannibal2
 + Fixed Power Stone Guide Highlight shows in other inventories when exiting via command. - hannibal2
 + Added options to hide Helmet Skins, Armor Dyes or Runes from Estimated Item Value Calculation. - hannibal2
-+ Fixed Divine Gift and Flash enchants showing the wrong/no price in EstimatedItemValue. - jani
++ Fixed Divine Gift and Flash enchants showing the wrong/no price in Estimated Item Value. - jani
 + Fixed showing the Piece of Wizard Portal earned duplicate. - Thunderblade73
 + Fixed shift-click NPC sell not working for menus with different sizes and full inventories. - Thunderblade73
 + Fixed an error with the shift-click NPC sell feature. - Thunderblade73
@@ -317,6 +332,7 @@
 + Fixed pet level stack size - Thunderblade73
 + Fixed enchantment names and pet names in the chest value feature. - hannibal2
 + Fixed pet names in item profit trackers. - hannibal2
++ Fixed Book Bundle showing the wrong number of books in Estimated Item Value. - Empa
 
 #### Bingo Fixes
 
@@ -348,6 +364,10 @@
 + Fixed /gfs not working. - Thunderblade73
 + Fixed /sendcoords command not working. - CalMWolfs
 + Fixed open bazaar command sending color code as well. - Thunderblade73
+
+#### Config Fixes
+
++ Fixed rare profile detection bugs. - alexia
 
 #### Misc Fixes
 
@@ -446,6 +466,14 @@
 + Added /shdebug Garden Next Jacob Contest. - hannibal2
 + Make future NPC price fetch errors better debuggable. - CalMWolfs
 + Removed duplicate pet-level detection logic. - hannibal2
++ Changed PreProfileSwitchEvent to ProfileJoinEvent. - alexia
++ Cleanup some repo pattern formatting. - CalMWolfs
++ Make Hypixel items API response a proper JSON object. - CalMWolfs
++ Created utils function String.formatDouble(): Double. - hannibal2
++ Fixed ReplaceWith auto-replace feature  from IDEs for deprecated functions. - hannibal2
++ Fixed the BuildList name in part of the stack trace. - hannibal2
++ Cleanup error manager code. - hannibal2
++ Fixed /shdebug without parameter showing everything instead of only important data. - hannibal2
 
 ## Version 0.22
 

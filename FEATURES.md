@@ -968,6 +968,10 @@ Use `/sh` or `/skyhanni` to open the SkyHanni config in game.
     + Stops the white geyser smoke particles from rendering if your bobber is near the geyser.
     + Draws a box around the effective area of the geyser.
     + Change the color of the box around the geyser.
++ Added Skill Progress Display. - HiZe
+    + ETA Display, exp, actions or percentage to next level, custom level goals, all skill display, chroma progress bar,
+      and overflow levels for all those things.
+    + A ton of settings.
 
 </details>
 <details open><summary>
