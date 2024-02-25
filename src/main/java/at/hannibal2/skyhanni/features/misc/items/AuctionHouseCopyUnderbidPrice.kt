@@ -37,7 +37,8 @@ class AuctionHouseCopyUnderbidPrice {
 
     @SubscribeEvent
     fun onInventoryUpdated(event: InventoryUpdatedEvent) {
-        if (!isEnabled()) return
+        if (!LorenzUtils.inSkyBlock) return
+        if (!config.autoCopyUnderbidPrice) return
         if (!event.fullyOpenedOnce) return
         if (event.inventoryName != "Create BIN Auction") return
         val item = event.inventoryItems[13] ?: return
@@ -54,8 +55,6 @@ class AuctionHouseCopyUnderbidPrice {
         OSUtils.copyToClipboard("$newPrice")
         ChatUtils.chat("Copied ${newPrice.addSeparators()} to clipboard. (Copy Underbid Price)")
     }
-
-    fun isEnabled() = LorenzUtils.inSkyBlock && config.copyUnderbidPrice
 
     @SubscribeEvent
     fun onKeybind(event: GuiScreenEvent.KeyboardInputEvent.Post) {
@@ -79,7 +78,7 @@ class AuctionHouseCopyUnderbidPrice {
 
     @SubscribeEvent
     fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
-        event.move(24, "inventory.copyUnderbidPrice", "inventory.auctions.copyUnerbidPrice")
+        event.move(24, "inventory.copyUnderbidPrice", "inventory.auctions.autoCopyUnderbidPrice")
     }
 
 }
