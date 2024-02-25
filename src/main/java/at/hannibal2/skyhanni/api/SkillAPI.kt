@@ -36,6 +36,7 @@ import io.github.moulberry.notenoughupdates.util.Utils
 import net.minecraft.command.CommandBase
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import java.util.LinkedList
+import java.util.Timer
 import java.util.regex.Matcher
 import kotlin.concurrent.fixedRateTimer
 import kotlin.time.Duration.Companion.seconds
@@ -105,9 +106,9 @@ object SkillAPI {
                 skillXp.lastUpdate = SimpleTimeMark.now()
                 skillXp.sessionTimerActive = true
 
-                if (skillXp.shouldStartTimer) {
-                    runTimer(skillName, skillXp)
-                    skillXp.shouldStartTimer = false
+
+                if (skillType.timer == null) {
+                    skillType.timer = runTimer(skillType, skillXp)
                 }
                 SkillProgress.updateDisplay()
                 SkillProgress.hideInActionBar = listOf(component)
@@ -243,9 +244,9 @@ object SkillAPI {
         add("-  CustomGoalLevel: ${skillInfo.customGoalLevel}\n")
     }
 
-    private fun runTimer(skillName: String, info: SkillXPInfo) {
-        fixedRateTimer(name = "skyhanni-skillprogress-timer-$skillName", initialDelay = 1_000L, period = 1_000L) {
-            if (info.shouldStartTimer) cancel()
+    private fun runTimer(skillType: SkillType, info: SkillXPInfo): Timer =
+        fixedRateTimer(name = "skyhanni-skillprogress-timer-${skillType.displayName}", initialDelay = 1_000L, period = 1_000L) {
+            if (skillType.timer != this) cancel()
             val time = when (activeSkill) {
                 SkillType.FARMING -> SkillProgress.etaConfig.farmingPauseTime
                 SkillType.MINING -> SkillProgress.etaConfig.miningPauseTime
@@ -261,7 +262,6 @@ object SkillAPI {
                 info.timeActive++
             }
         }
-    }
 
     private fun handleSkillPattern(matcher: Matcher, skillType: SkillType, skillInfo: SkillInfo) {
         val currentXp = matcher.group("current").formatNumber()
@@ -520,6 +520,5 @@ object SkillAPI {
         var isActive: Boolean = false,
         var lastUpdate: SimpleTimeMark = SimpleTimeMark.farPast(),
         var timeActive: Long = 0L,
-        var shouldStartTimer: Boolean = true,
     )
 }
