@@ -160,6 +160,9 @@ object GriffinBurrowHelper {
         guessLocation = null
         targetLocation = null
         particleBurrows = emptyMap()
+        GriffinBurrowParticleFinder.reset()
+
+        BurrowWarpHelper.currentWarp = null
         update()
     }
 
@@ -336,7 +339,7 @@ object GriffinBurrowHelper {
         val type: BurrowType = when (strings[0].lowercase()) {
             "reset" -> {
                 resetAllData()
-                ChatUtils.chat("Manually reset all burrow waypoints.")
+                ChatUtils.chat("Manually reset all burrow data.")
                 return
             }
 
