@@ -235,6 +235,7 @@ object GetFromSackAPI {
                 }
             }
 
+            sackListInternalNames = uniqueSackItems.map { it.asString() }.toSet()
             sackListNames = uniqueSackItems.map { it.itemNameWithoutColor.uppercase() }.toSet()
 
         } catch (e: Exception) {
