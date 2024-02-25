@@ -450,6 +450,16 @@ object SkillProgress {
         if (xpInfo.lastTotalXp > 0) {
             val delta = totalXp - xpInfo.lastTotalXp
             if (delta > 0 && delta < 1000) {
+
+                xpInfo.timer = when (SkillAPI.activeSkill) {
+                    SkillType.FARMING -> etaConfig.farmingPauseTime
+                    SkillType.MINING -> etaConfig.miningPauseTime
+                    SkillType.COMBAT -> etaConfig.combatPauseTime
+                    SkillType.FORAGING -> etaConfig.foragingPauseTime
+                    SkillType.FISHING -> etaConfig.fishingPauseTime
+                    else -> 3
+                }
+
                 xpInfo.xpGainQueue.add(0, delta)
 
                 calculateXPHour(xpInfo)
