@@ -13,11 +13,14 @@ class NEUInternalName private constructor(private val internalName: String) {
         val SKYBLOCK_COIN = "SKYBLOCK_COIN".asInternalName()
 
         fun String.asInternalName(): NEUInternalName {
-            val internalName = uppercase()
+            val internalName = uppercase().replace(" ", "_")
             return map.getOrPut(internalName) { NEUInternalName(internalName) }
         }
 
-        fun fromItemName(itemName: String) = NEUItems.getInternalNameFromItemName(itemName)
+        fun fromItemNameOrNull(itemName: String): NEUInternalName? = ItemNameResolver.getInternalNameOrNull(itemName)
+
+        fun fromItemName(itemName: String): NEUInternalName =
+            fromItemNameOrNull(itemName) ?: throw Error("NEUInternalName is null for item name '$itemName'")
     }
 
     fun asString() = internalName
