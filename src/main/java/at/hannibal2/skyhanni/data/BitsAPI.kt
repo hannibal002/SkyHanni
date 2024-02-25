@@ -7,6 +7,7 @@ import at.hannibal2.skyhanni.events.ScoreboardChangeEvent
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.LorenzUtils
+import at.hannibal2.skyhanni.utils.NumberUtil.formatLong
 import at.hannibal2.skyhanni.utils.NumberUtil.formatNumber
 import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.StringUtils.matches
@@ -106,7 +107,7 @@ object BitsAPI {
 
                 if (amount > bits) {
                     bitsToClaim -= amount - bits
-                    ChatUtils.debug("You have gained §3${amount - bits} Bits §eaccording to the scoreboard!")
+                    ChatUtils.debug("You have gained §3${amount - bits} Bits §7according to the scoreboard!")
                 }
                 bits = amount
 
@@ -121,7 +122,7 @@ object BitsAPI {
         val message = event.message.trimWhiteSpace().removeResets()
 
         bitsFromFameRankUpChatPattern.matchMatcher(message) {
-            val amount = group("amount").formatNumber().toInt()
+            val amount = group("amount").formatLong()?.toInt() ?: return
             bitsToClaim += amount
 
             return
