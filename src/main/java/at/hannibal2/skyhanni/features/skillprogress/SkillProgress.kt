@@ -53,7 +53,7 @@ object SkillProgress {
     private var allDisplay = emptyList<Renderable>()
     private var etaDisplay = emptyList<Renderable>()
     private var lastGainUpdate = SimpleTimeMark.farPast()
-    private var maxWidth = 0
+    private var maxWidth = 182
     var hideInActionBar = listOf<String>()
 
     @SubscribeEvent
