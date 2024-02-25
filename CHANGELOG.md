@@ -53,7 +53,7 @@
 + Added Power Stone Guide features. - hannibal2
     + Highlight missing power stones, show their total bazaar price, and allows to open the bazaar when clicking on the
       items in the Power Stone Guide.
-+ Option to make normal clicks to shift clicks in equipment inventory. - Thunderblade73
++ Option to make normal clicks to shift clicks in npc sell inventory. - Thunderblade73
 + Show pet items XP Share and Tier Boost as small icons next to the pet in an inventory. - Thunderblade73
 + Added Shift Click Brewing. - Thunderblade73
     + Makes normal clicks to shift clicks in Brewing Stand inventory.
