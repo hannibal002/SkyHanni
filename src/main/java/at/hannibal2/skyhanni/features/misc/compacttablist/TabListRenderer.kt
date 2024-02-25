@@ -5,6 +5,7 @@ import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.SkipTabListLineEvent
 import at.hannibal2.skyhanni.mixins.transformers.AccessorGuiPlayerTabOverlay
 import at.hannibal2.skyhanni.utils.CollectionUtils.filterToMutable
+import at.hannibal2.skyhanni.utils.KeyboardManager.isActive
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.StringUtils.matches
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
@@ -47,13 +48,13 @@ object TabListRenderer {
         if (!config.toggleTab) return
         if (Minecraft.getMinecraft().currentScreen != null) return
 
-        if (Minecraft.getMinecraft().gameSettings.keyBindPlayerList.isPressed) {
-            isPressed = true
-        } else {
-            if (isPressed) {
-                isPressed = false
+        if (Minecraft.getMinecraft().gameSettings.keyBindPlayerList.isActive()) {
+            if (!isPressed) {
+                isPressed = true
                 isTabToggled = !isTabToggled
             }
+        } else {
+            isPressed = false
         }
 
         if (isTabToggled) {

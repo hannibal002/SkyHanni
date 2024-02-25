@@ -18,10 +18,10 @@ import at.hannibal2.skyhanni.features.skillprogress.SkillUtil.getSkillInfo
 import at.hannibal2.skyhanni.features.skillprogress.SkillUtil.levelArray
 import at.hannibal2.skyhanni.features.skillprogress.SkillUtil.xpRequiredForLevel
 import at.hannibal2.skyhanni.utils.ChatUtils
-import at.hannibal2.skyhanni.utils.ChatUtils.userError
 import at.hannibal2.skyhanni.utils.ItemUtils.cleanName
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
+import at.hannibal2.skyhanni.utils.NumberUtil.formatLong
 import at.hannibal2.skyhanni.utils.NumberUtil.formatNumber
 import at.hannibal2.skyhanni.utils.NumberUtil.romanToDecimalIfNecessary
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
@@ -36,6 +36,7 @@ import io.github.moulberry.notenoughupdates.util.Utils
 import net.minecraft.command.CommandBase
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import java.util.LinkedList
+import java.util.Timer
 import java.util.regex.Matcher
 import kotlin.concurrent.fixedRateTimer
 import kotlin.time.Duration.Companion.seconds
@@ -105,9 +106,9 @@ object SkillAPI {
                 skillXp.lastUpdate = SimpleTimeMark.now()
                 skillXp.sessionTimerActive = true
 
-                if (skillXp.shouldStartTimer) {
-                    runTimer(skillName, skillXp)
-                    skillXp.shouldStartTimer = false
+
+                if (skillType.timer == null) {
+                    skillType.timer = runTimer(skillType, skillXp)
                 }
                 SkillProgress.updateDisplay()
                 SkillProgress.hideInActionBar = listOf(component)
@@ -243,9 +244,10 @@ object SkillAPI {
         add("-  CustomGoalLevel: ${skillInfo.customGoalLevel}\n")
     }
 
-    private fun runTimer(skillName: String, info: SkillXPInfo) {
-        fixedRateTimer(name = "skyhanni-skillprogress-timer-$skillName", initialDelay = 1_000L, period = 1_000L) {
-            if (info.shouldStartTimer) cancel()
+    // TODO only use one statuc timer for the whole feature. this timer just ticks the currently active skill.
+    private fun runTimer(skillType: SkillType, info: SkillXPInfo): Timer =
+        fixedRateTimer(name = "skyhanni-skillprogress-timer-${skillType.displayName}", initialDelay = 1_000L, period = 1_000L) {
+            if (skillType.timer != this) cancel()
             val time = when (activeSkill) {
                 SkillType.FARMING -> SkillProgress.etaConfig.farmingPauseTime
                 SkillType.MINING -> SkillProgress.etaConfig.miningPauseTime
@@ -261,7 +263,6 @@ object SkillAPI {
                 info.timeActive++
             }
         }
-    }
 
     private fun handleSkillPattern(matcher: Matcher, skillType: SkillType, skillInfo: SkillInfo) {
         val currentXp = matcher.group("current").formatNumber()
@@ -393,12 +394,16 @@ object SkillAPI {
             val second = it[1]
             when (first) {
                 "levelwithxp" -> {
-                    val xp = second.toLong()
+                    val xp = second.formatLong()
+                    if (xp == null) {
+                        ChatUtils.userError("Not a valid number: '$second'")
+                        return
+                    }
                     if (xp <= XP_NEEDED_FOR_60) {
                         val level = getLevel(xp)
                         ChatUtils.chat("With §b${xp.addSeparators()} §eXP you would be level §b$level")
                     } else {
-                        val (overflowLevel, current, needed, _) = calculateOverFlow((second.toLong()) - XP_NEEDED_FOR_60)
+                        val (overflowLevel, current, needed, _) = calculateOverFlow((xp) - XP_NEEDED_FOR_60)
                         ChatUtils.chat(
                             "With §b${xp.addSeparators()} §eXP you would be level §b$overflowLevel " +
                                 "§ewith progress (§b${current.addSeparators()}§e/§b${needed.addSeparators()}§e) XP"
@@ -408,7 +413,11 @@ object SkillAPI {
                 }
 
                 "xpforlevel" -> {
-                    val level = second.toInt()
+                    val level = second.toIntOrNull()
+                    if (level == null) {
+                        ChatUtils.userError("Not a valid number: '$second'")
+                        return
+                    }
                     if (level <= 60) {
                         val neededXp = levelingMap.filter { it.key < level }.values.sum().toLong()
                         ChatUtils.chat("You need §b${neededXp.addSeparators()} §eXP to be level §b${level.toDouble()}")
@@ -424,7 +433,7 @@ object SkillAPI {
                     val rawSkill = it[1].lowercase()
                     val skillType = SkillType.getByNameOrNull(rawSkill)
                     if (skillType == null) {
-                        userError("Unknown Skill type: $rawSkill")
+                        ChatUtils.userError("Unknown Skill type: $rawSkill")
                         return
                     }
                     val skill = storage?.get(skillType) ?: return
@@ -439,19 +448,19 @@ object SkillAPI {
                     val rawSkill = it[1].lowercase()
                     val skillType = SkillType.getByNameOrNull(rawSkill)
                     if (skillType == null) {
-                        userError("Unknown Skill type: $rawSkill")
+                        ChatUtils.userError("Unknown Skill type: $rawSkill")
                         return
                     }
                     val rawLevel = it[2]
                     val targetLevel = rawLevel.toIntOrNull()
                     if (targetLevel == null) {
-                        userError("$rawLevel is not a valid number.")
+                        ChatUtils.userError("$rawLevel is not a valid number.")
                         return
                     }
                     val skill = storage?.get(skillType) ?: return
 
                     if (targetLevel <= skill.overflowLevel) {
-                        userError("Custom goal level ($targetLevel) must be greater than your current level (${skill.overflowLevel}).")
+                        ChatUtils.userError("Custom goal level ($targetLevel) must be greater than your current level (${skill.overflowLevel}).")
                         return
                     }
 
@@ -512,6 +521,5 @@ object SkillAPI {
         var isActive: Boolean = false,
         var lastUpdate: SimpleTimeMark = SimpleTimeMark.farPast(),
         var timeActive: Long = 0L,
-        var shouldStartTimer: Boolean = true,
     )
 }
