@@ -38,7 +38,8 @@ class HotmFeatures {
         HotmData.entries.firstOrNull() {
             event.stack == it.slot?.stack
         }?.let {
-            event.stackTip = it.activeLevel.takeIf { it != 0 }?.toString() ?: ""
+            event.stackTip = if (it.activeLevel == 0 || it.activeLevel == it.maxLevel) "" else
+                it.activeLevel.toString()
         }
     }
 
