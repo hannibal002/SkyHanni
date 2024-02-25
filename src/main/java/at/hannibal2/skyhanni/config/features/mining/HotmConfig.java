@@ -20,7 +20,7 @@ public class HotmConfig {
     public boolean levelStackSize = true;
 
     @Expose
-    @ConfigOption(name = "Token Stack", desc = "Shows the unused tokens on the heart")
+    @ConfigOption(name = "Token Stack", desc = "Shows unused tokens on the heart")
     @ConfigEditorBoolean
     @FeatureToggle
     public boolean tokenStackSize = true;

@@ -44,7 +44,7 @@ class HotmFeatures {
 
     private fun handleTokenStackSize(event: RenderItemTipEvent) {
         if (!config.tokenStackSize) return
-        if (event.stack != HotmData.heartItem) return
+        if (event.stack != HotmData.heartItem?.stack) return
         event.stackTip = HotmData.availableTokens.takeIf { it != 0 }?.let { "§b$it" } ?: ""
     }
 

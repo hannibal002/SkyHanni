@@ -13,7 +13,6 @@ import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.StringUtils.matches
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraft.inventory.Slot
-import net.minecraft.item.ItemStack
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import kotlin.math.ceil
 import kotlin.math.pow
@@ -272,7 +271,7 @@ enum class HotmData(
                 ProfileStorageData.profileSpecific?.mining?.availableTokens = value
             }
 
-        var heartItem: ItemStack? = null
+        var heartItem: Slot? = null
 
         init {
             entries.forEach { it.guiNamePattern }
@@ -290,7 +289,7 @@ enum class HotmData(
         private fun Slot.parse() {
             val item = this.stack ?: return
 
-            if (item.handlePowder()) return
+            if (this.handlePowder()) return
 
             val entry = entries.firstOrNull { it.guiNamePattern.matches(item.name) } ?: return
             entry.slot = this
@@ -322,10 +321,12 @@ enum class HotmData(
 
         }
 
-        private fun ItemStack.handlePowder(): Boolean {
+        private fun Slot.handlePowder(): Boolean {
+            val item = this.stack ?: return false
+
             val isHeartItem = when {
-                heartItemPattern.matches(this.name) -> true
-                resetItemPattern.matches(this.name) -> false
+                heartItemPattern.matches(item.name) -> true
+                resetItemPattern.matches(item.name) -> false
                 else -> return false
             }
 
@@ -339,7 +340,7 @@ enum class HotmData(
                 heartItem = this
             }
 
-            val lore = this.getLore()
+            val lore = item.getLore()
 
             val mithrilPattern = if (isHeartItem) heartMithrilPattern else resetMithrilPattern
             val gemstonePattern = if (isHeartItem) heartGemstonePattern else resetGemstonePattern
