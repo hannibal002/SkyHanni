@@ -428,6 +428,7 @@ public class Storage {
 
             @Expose
             public long gemstonePowder;
+
             @Expose
             public long availableGemstonePowder;
 
