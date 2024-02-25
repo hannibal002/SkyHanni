@@ -52,7 +52,7 @@ object EstimatedItemValue {
     @SubscribeEvent
     fun onNeuRepoReload(event: NeuRepositoryReloadEvent) {
         val data = event.getConstant("gemstonecosts") ?: run {
-            ErrorManager.skyHanniError("Gemstone Slot Unlock Costs failed to load!")
+            ErrorManager.skyHanniError("Gemstone Slot Unlock Costs failed to load from neu repo!")
         }
 
         gemstoneUnlockCosts = ConfigManager.gson.fromJson(data, object : TypeToken<HashMap<NEUInternalName, HashMap<String, List<String>>>>() {}.type)

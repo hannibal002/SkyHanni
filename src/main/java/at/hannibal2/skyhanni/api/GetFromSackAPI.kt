@@ -27,6 +27,7 @@ import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.fromJson
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
+import io.github.moulberry.notenoughupdates.util.Utils
 import net.minecraft.inventory.Slot
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import java.util.Deque
@@ -240,9 +241,10 @@ object GetFromSackAPI {
 
         } catch (e: Exception) {
             ErrorManager.logErrorWithData(
-                e, "Error getting NEU sacks data, make sure your neu is updated.",
+                e, "Error getting NEU sacks data, make sure your neu repo is updated.",
                 "sacksJson" to data
             )
+            Utils.showOutdatedRepoNotification()
         }
     }
 }
