@@ -49,12 +49,12 @@ object TabListRenderer {
         if (Minecraft.getMinecraft().currentScreen != null) return
 
         if (Minecraft.getMinecraft().gameSettings.keyBindPlayerList.isActive()) {
-            isPressed = true
-        } else {
-            if (isPressed) {
-                isPressed = false
+            if (!isPressed) {
+                isPressed = true
                 isTabToggled = !isTabToggled
             }
+        } else {
+            isPressed = false
         }
 
         if (isTabToggled) {
