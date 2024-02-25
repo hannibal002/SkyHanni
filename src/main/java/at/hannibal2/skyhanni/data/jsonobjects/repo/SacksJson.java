@@ -9,7 +9,4 @@ public class SacksJson {
     @Deprecated
     @Expose
     public List<String> sackList;
-
-    @Expose
-    public List<String> sackItems;
 }
