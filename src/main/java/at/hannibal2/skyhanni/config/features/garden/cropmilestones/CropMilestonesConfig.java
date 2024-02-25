@@ -127,7 +127,7 @@ public class CropMilestonesConfig {
         name = "Overflow Milestones",
         desc = "Show overflow crop milestones beyond 46.")
     @ConfigEditorBoolean
-    public Property<Boolean> overflowMilestones = Property.of(false);
+    public boolean overflowMilestones = false;
 
     @Expose
     @ConfigOption(
