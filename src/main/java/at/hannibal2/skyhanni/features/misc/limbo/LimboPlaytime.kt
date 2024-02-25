@@ -21,11 +21,11 @@ class LimboPlaytime {
     private val patternGroup = RepoPattern.group("misc.limbo.tooltip")
     private val minutesPattern by patternGroup.pattern(
         "minutes",
-        "§5§o§a\\d+(\\.\\d+)? minutes.+\$"
+        "§5§o§a([\\d.,]+) minutes.+\$"
     )
     private val hoursPattern by patternGroup.pattern(
         "hours",
-        "§5§o§b\\d+(\\.\\d+)? hours.+\$"
+        "§5§o§b([\\d.,]+) hours.+\$"
     )
 
     private var wholeMinutes: Long = 0
@@ -61,9 +61,6 @@ class LimboPlaytime {
 
         addLimbo(hoursList, minutesList)
         remakeList(event.toolTip, minutesList, hoursList)
-        event.toolTip.forEach{
-            println(it)
-        }
     }
 
     @SubscribeEvent
@@ -86,10 +83,13 @@ class LimboPlaytime {
             val hours = config.limboPlaytime.seconds.inWholeHours
             val minutes = (config.limboPlaytime.seconds.inWholeMinutes-(hours*60).toFloat()/6).toInt()
             modifiedList = hoursList
-            if (minutes == 0) modifiedList.add("§b$hours hours §7on Limbo")
-            else modifiedList.add("§b$hoursString hours §7on Limbo")
+            if (minutes == 0) modifiedList.add("§5§o§b$hours hours §7on Limbo")
+            else modifiedList.add("§5§o§b$hoursString hours §7on Limbo")
             modifiedList = modifiedList.sortedByDescending {
-                it.substringAfter("§b").substringBefore(" hours").toDoubleOrNull()
+                val matcher = hoursPattern.matcher(it)
+                if (matcher.find()) {
+                    matcher.group(1).replace(",", "").toDoubleOrNull() ?: 0.0
+                } else 0.0
             }.toMutableList()
             setMinutes = false
         }
