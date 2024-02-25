@@ -173,6 +173,7 @@
 + Allow putting Water Bottles into Potion Bag. - alexia
 + Skip unavailable experiments for number of clicks in Super Pair Clicks Alert in the experimentation table. - alexia
 + Hide non-clickable items in Basket of Seeds, Nether Wart Pouch & Trick or Treat Bag. - alexia
++ Added support for blocking quick crafting for the new quick craft UI. - hannibal2
 
 #### Dungeon Changes
 
@@ -205,6 +206,8 @@
 #### Command Changes
 
 + Added /pd short command for party disband. - Empa
++ Added support for number abbreviations in /shskills. - hannibal2
+    + "/shskills levelwithxp 750m"
 
 #### Config Changes
 
@@ -217,6 +220,7 @@
 #### GUI Changes
 
 + The Compact Tab List now has toggle tab support. - hannibal2
++ The tab list now toggles on key press, not key release. This should feel faster now. - hannibal2
 
 #### Misc Changes
 
@@ -353,6 +357,8 @@
 + Fixed GUI positions moving into the bottom-right corner when leaving the GUI position editor while pressing the mouse
   button on next reopen. - hannibal2
 + Fixed parts of Compact Tab List being uncoloured. - CalMWolfs
++ Fixed Compact Tab List' Toggle Tab not working when using patcher. - hannibal2
++ Fixed Skill progress display size too small when not using the progress bar. - Thunderblade73
 
 #### Winter Fixes
 
@@ -364,6 +370,8 @@
 + Fixed /gfs not working. - Thunderblade73
 + Fixed /sendcoords command not working. - CalMWolfs
 + Fixed open bazaar command sending color code as well. - Thunderblade73
++ Fixed /gfs not working with spaces in item name. - Thunderblade73
++ Fixed multiple edge cases with /gfs. - Thunderblade73
 
 #### Config Fixes
 
@@ -383,6 +391,9 @@
 + Fixed /gfs tab complete. - martimavocado
 + Fixed /warp is command replace. - hannibal2
 + Fixed Queued Gfs description. - Thunderblade73
++ Fixed ender bow ability time (30s -> 5s). - hannibal2
++ Reputation Helper now shows Kuudra Runs for barbarian faction as well. - hannibal2
+    + Daily Kuudra reputation also works for barbarian faction, not only mage.
 
 ### Technical Changes
 
@@ -470,10 +481,17 @@
 + Cleanup some repo pattern formatting. - CalMWolfs
 + Make Hypixel items API response a proper JSON object. - CalMWolfs
 + Created utils function String.formatDouble(): Double. - hannibal2
-+ Fixed ReplaceWith auto-replace feature  from IDEs for deprecated functions. - hannibal2
++ Fixed ReplaceWith auto-replace feature from IDEs for deprecated functions. - hannibal2
 + Fixed the BuildList name in part of the stack trace. - hannibal2
 + Cleanup error manager code. - hannibal2
 + Fixed /shdebug without parameter showing everything instead of only important data. - hannibal2
++ Fixed internal item name resolving problems. - hannibal2
++ Extracted item name resolving logic into own class. - hannibal2
++ Added debug command /shtestitem. - hannibal2
++ Made String.formatDouble() and formatLong()return nullable. - hannibal2
++ /gfs tab complete now uses NEU's Repo instead of SkyHanni Repo. - CalMWolfs
++ Creating NeuRepositoryReloadEvent as wrapper for less confusion. - CalMWolfs
++ Made ErrorManager compact stack trace even more compacter. - hannibal2
 
 ## Version 0.22
 
