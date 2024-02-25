@@ -7,8 +7,6 @@ import at.hannibal2.skyhanni.events.RepositoryReloadEvent
 import at.hannibal2.skyhanni.features.fishing.trophy.TrophyFishManager
 import at.hannibal2.skyhanni.features.fishing.trophy.TrophyFishManager.getFilletValue
 import at.hannibal2.skyhanni.features.fishing.trophy.TrophyRarity
-import at.hannibal2.skyhanni.utils.InventoryUtils
-import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.ItemUtils.name
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.LorenzVec
@@ -48,7 +46,11 @@ object FishingAPI {
         FishingBobberCastEvent(entity).postAndCatch()
     }
 
-    private fun NEUInternalName.isFishingRod() = contains("ROD")
+    fun NEUInternalName?.isFishingRod() = isLavaRod() || isWaterRod()
+
+    fun NEUInternalName?.isLavaRod() = this in lavaRods
+
+    fun NEUInternalName?.isWaterRod() = this in waterRods
 
     fun ItemStack.isBait(): Boolean {
         val name = name ?: return false
@@ -59,10 +61,9 @@ object FishingAPI {
     fun onItemInHandChange(event: ItemInHandChangeEvent) {
         // TODO correct rod type per island water/lava
         holdingRod = event.newItem.isFishingRod()
-        holdingLavaRod = event.newItem in lavaRods
-        holdingWaterRod = event.newItem in waterRods
+        holdingLavaRod = event.newItem.isLavaRod()
+        holdingWaterRod = event.newItem.isWaterRod()
     }
-
 
     @SubscribeEvent
     fun onRepoReload(event: RepositoryReloadEvent) {
@@ -71,10 +72,7 @@ object FishingAPI {
         waterRods = data.water_fishing_rods ?: error("§cwater_fishing_rods is missing from repo.")
     }
 
-
-    fun isLavaRod() = InventoryUtils.getItemInHand()?.getLore()?.any { it.contains("Lava Rod") } ?: false
-
-    fun getAllowedBlocks() = if (isLavaRod()) lavaBlocks else waterBlocks
+    fun getAllowedBlocks() = if (holdingLavaRod) lavaBlocks else waterBlocks
 
     fun getFilletPerTrophy(internalName: NEUInternalName): Int {
         val internal = internalName.asString()
