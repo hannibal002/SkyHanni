@@ -398,7 +398,7 @@ object SkillAPI {
                         val level = getLevel(xp)
                         ChatUtils.chat("With §b${xp.addSeparators()} §eXP you would be level §b$level")
                     } else {
-                        val (overflowLevel, current, needed, _) = calculateOverFlow(second.toLong())
+                        val (overflowLevel, current, needed, _) = calculateOverFlow((second.toLong())- XP_NEEDED_FOR_60)
                         ChatUtils.chat(
                             "With §b${xp.addSeparators()} §eXP you would be level §b$overflowLevel " +
                                 "§ewith progress (§b${current.addSeparators()}§e/§b${needed.addSeparators()}§e) XP"
