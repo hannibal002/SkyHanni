@@ -25,9 +25,9 @@ object GetFromSacksTabComplete {
 
         if (event.senderIsSkyhanni()) return event
 
-        if (event.splitMessage.size <= 2) return event
+        if (event.splitMessage.size < 3) return event
 
-        val rawName = event.splitMessage[1]
+        val rawName = event.splitMessage.drop(1).dropLast(1).joinToString(" ")
         val realName = rawName.replace("_", " ")
         if (realName == rawName) return event
         if (realName.uppercase() !in GetFromSackAPI.sackListNames) return event
