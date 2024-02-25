@@ -42,7 +42,7 @@ import kotlin.time.Duration.Companion.seconds
 
 object SkillProgress {
 
-    private val config get() = SkyHanniMod.feature.skillProgress
+    val config get() = SkyHanniMod.feature.skillProgress
     private val barConfig get() = config.skillProgressBarConfig
     private val allSkillConfig get() = config.allSkillDisplayConfig
     val etaConfig get() = config.skillETADisplayConfig
@@ -408,13 +408,15 @@ object SkillProgress {
 
             val percent = if (currentXpMax == 0L) 100F else 100F * currentXp / currentXpMax
 
+            val color = if (config.skillColorConfig.enabledDisplayColor) "§${SkillUtil.getColorForPercentage(barPercent.toInt())}" else "§6"
+
             if (config.usePercentage.get())
-                append("§7(§6${percent.roundToPrecision(2)}%§7)")
+                append("§7($color${percent.roundToPrecision(2)}%§7)")
             else {
                 if (currentXpMax == 0L)
                     append("§7(§6${currentXp.addSeparators()}§7)")
                 else
-                    append("§7(§6${currentXp.addSeparators()}§7/§6${currentXpMax.addSeparators()}§7)")
+                    append("§7($color${currentXp.addSeparators()}§7/$color${currentXpMax.addSeparators()}§7)")
             }
 
             if (config.showActionLeft.get() && percent != 100f) {

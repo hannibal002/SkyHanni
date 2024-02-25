@@ -137,4 +137,16 @@ object SkillUtil {
     fun levelArray(): JsonArray =
         Utils.getElement(Constants.LEVELING, "leveling_xp").asJsonArray
 
+    fun getColorForPercentage(percentage: Int): String {
+        val segments = SkillProgress.config.skillColorConfig.displayPercentageColorString.split(";")
+        val rules = segments.map { segment ->
+            val parts = segment.split(":")
+            val start = parts[0].toInt()
+            val end = parts[1].toInt()
+            val color = parts[2]
+            IntRange(start, end) to color
+        }
+        val rule = rules.firstOrNull { (range, _) -> percentage in range }
+        return rule?.second ?: "6"
+    }
 }
