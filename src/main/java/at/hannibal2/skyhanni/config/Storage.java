@@ -1,5 +1,6 @@
 package at.hannibal2.skyhanni.config;
 
+import at.hannibal2.skyhanni.data.jsonobjects.local.HotmTree;
 import at.hannibal2.skyhanni.data.model.ComposterUpgrade;
 import at.hannibal2.skyhanni.features.bingo.card.goals.BingoGoal;
 import at.hannibal2.skyhanni.features.combat.endernodetracker.EnderNodeTracker;
@@ -406,7 +407,24 @@ public class Storage {
             public List<String> kingsTalkedTo = new ArrayList<>();
 
             @Expose
-            public Map<String, Integer> hotmTree = new HashMap<>();
+            public HotmTree hotmTree = new HotmTree();
+
+            @Expose
+            public long mithrilPowder;
+
+            @Expose
+            public long availableMithrilPowder;
+
+            @Expose
+            public long gemstonePowder;
+            @Expose
+            public long availableGemstonePowder;
+
+            @Expose
+            public int tokens;
+
+            @Expose
+            public int availableTokens;
         }
 
         @Expose

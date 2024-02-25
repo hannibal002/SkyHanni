@@ -1,5 +1,6 @@
 package at.hannibal2.skyhanni.data
 
+import at.hannibal2.skyhanni.data.jsonobjects.local.HotmTree
 import at.hannibal2.skyhanni.events.GuiContainerEvent
 import at.hannibal2.skyhanni.events.InventoryCloseEvent
 import at.hannibal2.skyhanni.events.InventoryFullyOpenedEvent
@@ -16,6 +17,7 @@ import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.StringUtils.matches
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraft.inventory.Slot
+import net.minecraft.item.ItemStack
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import kotlin.math.ceil
 import kotlin.math.pow
@@ -132,22 +134,34 @@ enum class HotmData(
 
     PEAK_OF_THE_MOUNTAIN("Peak of the Mountain", 7, { null }, { 0.0 to null }), ;
 
-    var activeLevel: Int?
-        get() = ProfileStorageData.profileSpecific?.mining?.hotmTree?.get(this.name)
+    val guiNamePattern by repoGroup.pattern("perk.name.${name.lowercase().replace("_", "")}", "§.$guiName")
+
+    var activeLevel: Int
+        get() = storage?.perks?.get(this.name)?.level ?: 0
         private set(value) {
-            ProfileStorageData.profileSpecific?.mining?.hotmTree?.set(this.name, value)
+            storage?.perks?.computeIfAbsent(this.name) { HotmTree.HotmPerk() }?.level = value
         }
 
-    val guiNamePattern by repoGroup.pattern("perk.name.${name.lowercase().replace("_", "")}", "§.$guiName")
+    var enabled: Boolean
+        get() = storage?.perks?.get(this.name)?.enabled ?: false
+        private set(value) {
+            storage?.perks?.computeIfAbsent(this.name) { HotmTree.HotmPerk() }?.enabled = value
+        }
+
+    var isUnlocked: Boolean
+        get() = storage?.perks?.get(this.name)?.isUnlocked ?: false
+        private set(value) {
+            storage?.perks?.computeIfAbsent(this.name) { HotmTree.HotmPerk() }?.isUnlocked = value
+        }
 
     var slot: Slot? = null
         private set
 
-    var enabled = true // TODO use storage
-
-    var isUnlocked: Boolean? = null // TODO use storage
-
     companion object {
+
+        val storage get() = ProfileStorageData.profileSpecific?.mining?.hotmTree
+
+        val abilities = listOf(PICKOBULUS, MINING_SPEED_BOOST, VEIN_SEEKER, MANIAC_MINER)
 
         private val inventoryPattern by repoGroup.pattern("inventory", "Heart of the Mountain")
 
@@ -158,33 +172,106 @@ enum class HotmData(
         )
 
         private val enabledPattern by repoGroup.pattern("perk.enable", "§a§lENABLED|§7§a§lSELECTED")
-        private val disabledPattern by repoGroup.pattern("perk.disabled", "§c§lDISABLED|§7§eClick to select!")
+        private val disabledPattern by repoGroup.pattern(
+            "perk.disabled",
+            "§c§lDISABLED|§7§eClick to select!"
+        ) // unused for now since the assumption is whe enable not found it is disabled, but the value might be useful in the future or for debugging
 
         private val resetChatPattern by repoGroup.pattern(
             "reset.chat", "§aReset your §r§5Heart of the Mountain§r§a! Your Perks and Abilities have been reset."
         )
 
+        private val heartItemPattern by repoGroup.pattern("invetory.heart", "§5Heart of the Mountain")
+        private val resetItemPattern by repoGroup.pattern("invetory.reset", "§cReset Heart of the Mountain")
+
+        private val heartMithrilPattern by repoGroup.pattern(
+            "invetory.heart.mithril",
+            "§7Mithril Powder: §a§2(?<powder>[\\d,]+)"
+        )
+        private val heartGemstonePattern by repoGroup.pattern(
+            "invetory.heart.gemstone",
+            "§7Gemstone Powder: §a§d(?<powder>[\\d,]+)"
+        )
+
+        private val heartTokensPattern by repoGroup.pattern(
+            "invetory.heart.token",
+            "§7Token of the Mountain: §5(?<token>\\d+)"
+        )
+
+        private val resetMithrilPattern by repoGroup.pattern(
+            "invetory.reset.mithril",
+            "\\s+§8- §2(?<powder>[\\d,]+) Mithril Powder"
+        )
+        private val resetGemstonePattern by repoGroup.pattern(
+            "invetory.reset.gemstone",
+            "\\s+§8- §d(?<powder>[\\d,]+) Gemstone Powder"
+        )
+
+        private val resetTokensPattern by repoGroup.pattern(
+            "invetory.reset.token",
+            "\\s+§8- §5(?<token>\\d+) Token of the Mountain"
+        )
+
         var inInventory = false
+
+        var mithrilPowder: Long
+            get() = ProfileStorageData.profileSpecific?.mining?.mithrilPowder ?: 0L
+            private set(value) {
+                ProfileStorageData.profileSpecific?.mining?.mithrilPowder = value
+            }
+
+        var gemstonePowder: Long
+            get() = ProfileStorageData.profileSpecific?.mining?.gemstonePowder ?: 0L
+            private set(value) {
+                ProfileStorageData.profileSpecific?.mining?.gemstonePowder = value
+            }
+
+        var tokens: Int
+            get() = ProfileStorageData.profileSpecific?.mining?.tokens ?: 0
+            private set(value) {
+                ProfileStorageData.profileSpecific?.mining?.tokens = value
+            }
+
+        var availableMithrilPowder: Long
+            get() = ProfileStorageData.profileSpecific?.mining?.availableMithrilPowder ?: 0L
+            private set(value) {
+                ProfileStorageData.profileSpecific?.mining?.availableMithrilPowder = value
+            }
+
+        var availableGemstonePowder: Long
+            get() = ProfileStorageData.profileSpecific?.mining?.availableGemstonePowder ?: 0L
+            private set(value) {
+                ProfileStorageData.profileSpecific?.mining?.availableGemstonePowder = value
+            }
+
+        var availableTokens: Int
+            get() = ProfileStorageData.profileSpecific?.mining?.availableTokens ?: 0
+            private set(value) {
+                ProfileStorageData.profileSpecific?.mining?.availableTokens = value
+            }
 
         init {
             entries.forEach { it.guiNamePattern }
         }
 
         private fun resetTree() = entries.forEach {
-            it.activeLevel = null
-            it.enabled = true
+            it.activeLevel = 0
+            it.enabled = false
             it.isUnlocked = false
         }
 
         private fun Slot.parse() {
             val item = this.stack ?: return
+
+            if (item.handlePowder()) return
+
             val entry = entries.firstOrNull { it.guiNamePattern.matches(item.name) } ?: return
             entry.slot = this
 
             val lore = item.getLore().takeIf { it.isNotEmpty() } ?: return
 
             if (entry != PEAK_OF_THE_MOUNTAIN && notUnlockedPattern.matches(lore.last())) {
-                entry.activeLevel = null
+                entry.activeLevel = 0
                 entry.enabled = false
                 entry.isUnlocked = false
                 return
@@ -194,9 +281,9 @@ enum class HotmData(
 
             entry.activeLevel = levelPattern.matchMatcher(lore.first()) {
                 group("level").toInt()
-            }
+            } ?: 0
 
-            if ((entry.activeLevel ?: 0) > entry.maxLevel) {
+            if (entry.activeLevel > entry.maxLevel) {
                 throw IllegalStateException("Hotm Perk '${entry.name}' over max level")
             }
 
@@ -206,6 +293,61 @@ enum class HotmData(
             }
             entry.enabled = lore.any { enabledPattern.matches(it) }
 
+        }
+
+        private fun ItemStack.handlePowder(): Boolean {
+            val isHeartItem =
+                when {
+                    heartItemPattern.matches(this.name) -> true
+                    resetItemPattern.matches(this.name) -> false
+                    else -> return false
+                }
+
+            if (isHeartItem) { // Reset on the heart Item to remove duplication
+                mithrilPowder = 0
+                gemstonePowder = 0
+                tokens = 0
+                availableGemstonePowder = 0
+                availableMithrilPowder = 0
+                availableTokens = 0
+            }
+
+            val lore = this.getLore()
+
+            val mithrilPattern = if (isHeartItem) heartMithrilPattern else resetMithrilPattern
+            val gemstonePattern = if (isHeartItem) heartGemstonePattern else resetGemstonePattern
+            val tokenPattern = if (isHeartItem) heartTokensPattern else resetTokensPattern
+
+            lore@ for (line in lore) {
+
+                mithrilPattern.matchMatcher(line) {
+                    val powder = group("powder").replace(",", "").toLong()
+                    if (isHeartItem) {
+                        availableMithrilPowder = powder
+                    }
+                    mithrilPowder += powder
+                    continue@lore
+                }
+
+                gemstonePattern.matchMatcher(line) {
+                    val powder = group("powder").replace(",", "").toLong()
+                    if (isHeartItem) {
+                        availableGemstonePowder = powder
+                    }
+                    gemstonePowder += powder
+                    continue@lore
+                }
+
+                tokenPattern.matchMatcher(line) {
+                    val token = group("token").toInt()
+                    if (isHeartItem) {
+                        availableTokens = token
+                    }
+                    tokens += token
+                    continue@lore
+                }
+            }
+            return true
         }
 
         @SubscribeEvent
@@ -237,7 +379,7 @@ enum class HotmData(
         @SubscribeEvent
         fun onRender(event: GuiContainerEvent.BackgroundDrawnEvent) {
             entries.forEach { entry ->
-                val color = if (entry.isUnlocked != true) LorenzColor.GRAY
+                val color = if (!entry.isUnlocked) LorenzColor.GRAY
                 else if (entry.enabled) LorenzColor.GREEN else LorenzColor.RED
                 entry.slot?.highlight(color)
             }
@@ -248,7 +390,7 @@ enum class HotmData(
             entries.firstOrNull() {
                 event.stack == it.slot?.stack
             }?.let {
-                event.stackTip = it.activeLevel?.toString() ?: ""
+                event.stackTip = it.activeLevel.takeIf { it != 0 }?.toString() ?: ""
             }
         }
 
