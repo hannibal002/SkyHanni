@@ -272,7 +272,7 @@ object InquisitorWaypointShare {
         if (inquisitorsNearby.isEmpty()) {
             waypoints = waypoints.editCopy { remove(inquis.fromPlayer) }
             GriffinBurrowHelper.update()
-            ChatUtils.chat("Inquisitor from ${inquis.displayName} not found, deleting.")
+            ChatUtils.chat("Inquisitor from ${inquis.displayName} §enot found, deleting.")
         }
     }
 }
