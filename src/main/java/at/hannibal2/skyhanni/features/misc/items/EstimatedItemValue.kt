@@ -26,7 +26,6 @@ import at.hannibal2.skyhanni.utils.KeyboardManager.isKeyHeld
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.NEUInternalName
 import at.hannibal2.skyhanni.utils.NEUItems.getItemStackOrNull
-import at.hannibal2.skyhanni.utils.NEUItems.manager
 import at.hannibal2.skyhanni.utils.NumberUtil
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.RenderUtils.renderStringsAndItems
@@ -36,7 +35,6 @@ import net.minecraft.client.Minecraft
 import net.minecraft.init.Items
 import net.minecraft.item.ItemStack
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
-import java.io.File
 import kotlin.math.roundToLong
 
 object EstimatedItemValue {
@@ -53,7 +51,7 @@ object EstimatedItemValue {
 
     @SubscribeEvent
     fun onNeuRepoReload(event: NeuRepositoryReloadEvent) {
-        val data = manager.getJsonFromFile(File(manager.repoLocation, "constants/gemstonecosts.json"))
+        val data = event.getConstant("gemstonecosts")
 
         if (data != null)
         // item_internal_names -> gemstone_slots -> ingredients_array
