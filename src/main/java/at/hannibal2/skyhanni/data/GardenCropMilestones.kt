@@ -140,7 +140,7 @@ object GardenCropMilestones {
     }
 
     fun CropType.isMaxed(): Boolean {
-        if (config.overflowMilestones.get()) return false
+        if (config.overflowMilestones) return false
 
         // TODO change 1b
         val maxValue = cropMilestoneData[this]?.sum() ?: 1_000_000_000 // 1 bil for now
