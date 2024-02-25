@@ -104,4 +104,54 @@ public class SkillProgressBarConfig {
         @ConfigEditorSlider(minStep = 1, minValue = 3, maxValue = 15)
         public int height = 6;
     }
+
+    @Expose
+    @ConfigOption(name = "Color Per Skill", desc = "Change the bar color depending of the skill.")
+    @ConfigEditorBoolean
+    public boolean colorPerSkill = false;
+
+    @Expose
+    @ConfigOption(name = "Combat", desc = "Color for the combat bar.")
+    @ConfigEditorColour
+    public String combatBarColor = "0:245:255:0:59";
+
+    @Expose
+    @ConfigOption(name = "Farming", desc = "Color for the farming bar.")
+    @ConfigEditorColour
+    public String farmingBarColor = "0:245:85:255:85";
+
+    @Expose
+    @ConfigOption(name = "Fishing", desc = "Color for the fishing bar.")
+    @ConfigEditorColour
+    public String fishingBarColor = "0:245:0:64:255";
+
+    @Expose
+    @ConfigOption(name = "Mining", desc = "Color for the mining bar.")
+    @ConfigEditorColour
+    public String miningBarColor = "0:245:0:255:249";
+
+    @Expose
+    @ConfigOption(name = "Foraging", desc = "Color for the foraging bar.")
+    @ConfigEditorColour
+    public String foragingBarColor = "0:245:30:126:0";
+
+    @Expose
+    @ConfigOption(name = "Enchanting", desc = "Color for the enchanting bar.")
+    @ConfigEditorColour
+    public String enchantingBarColor = "0:255:255:248:0";
+
+    @Expose
+    @ConfigOption(name = "Alchemy", desc = "Color for the alchemy bar.")
+    @ConfigEditorColour
+    public String alchemyBarColor = "0:245:255:141:206";
+
+    @Expose
+    @ConfigOption(name = "Carpentry", desc = "Color for the carpentry bar.")
+    @ConfigEditorColour
+    public String carpentryBarColor = "0:245:255:250:242";
+
+    @Expose
+    @ConfigOption(name = "Taming", desc = "Color for the taming bar.")
+    @ConfigEditorColour
+    public String tamingBarColor = "0:245:255:0:171";
 }

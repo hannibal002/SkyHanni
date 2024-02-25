@@ -104,12 +104,16 @@ object SkillProgress {
     }
 
     private fun renderBar() {
+        val skill = activeSkill ?: return
+        val color = if (barConfig.colorPerSkill) SkillType.getBarColor(skill) else barConfig.barStartColor
+
         val progress = if (barConfig.useTexturedBar.get()) {
             val factor = (skillExpPercentage.toFloat().coerceAtMost(1f)) * 182
             maxWidth = 182
             Renderable.progressBar(
                 percent = factor.toDouble(),
-                startColor = Color(SpecialColour.specialToChromaRGB(barConfig.barStartColor)),
+                startColor = Color(SpecialColour.specialToChromaRGB(color)),
+                endColor = Color(SpecialColour.specialToChromaRGB(color)),
                 texture = barConfig.texturedBar.usedTexture.get(),
                 useChroma = barConfig.useChroma.get())
 
@@ -117,8 +121,8 @@ object SkillProgress {
             maxWidth = barConfig.regularBar.width
             Renderable.progressBar(
                 percent = skillExpPercentage,
-                startColor = Color(SpecialColour.specialToChromaRGB(barConfig.barStartColor)),
-                endColor = Color(SpecialColour.specialToChromaRGB(barConfig.barStartColor)),
+                startColor = Color(SpecialColour.specialToChromaRGB(color)),
+                endColor = Color(SpecialColour.specialToChromaRGB(color)),
                 width = maxWidth,
                 height = barConfig.regularBar.height,
                 useChroma = barConfig.useChroma.get())
