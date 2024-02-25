@@ -414,7 +414,7 @@ object SkillProgress {
                 append("§7($color${percent.roundToPrecision(2)}%§7)")
             else {
                 if (currentXpMax == 0L)
-                    append("§7(§6${currentXp.addSeparators()}§7)")
+                    append("§7($color${currentXp.addSeparators()}§7)")
                 else
                     append("§7($color${currentXp.addSeparators()}§7/$color${currentXpMax.addSeparators()}§7)")
             }
@@ -443,6 +443,7 @@ object SkillProgress {
         if (xpInfo.lastTotalXp > 0) {
             val delta = totalXp - xpInfo.lastTotalXp
             if (delta > 0 && delta < 1000) {
+
                 xpInfo.xpGainQueue.add(0, delta)
 
                 calculateXPHour(xpInfo)
