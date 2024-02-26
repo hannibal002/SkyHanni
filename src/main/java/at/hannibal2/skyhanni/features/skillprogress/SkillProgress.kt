@@ -95,8 +95,16 @@ object SkillProgress {
             SkillProgressConfig.TextAlignment.RIGHT,
             -> {
                 config.displayPosition.renderRenderables(
-                    listOf(Renderable.fixedSizeLine(horizontalContainer(display, horizontalAlign = textAlignment.alignment), maxWidth)),
-                    posLabel = "Skill Progress")
+                    listOf(
+                        Renderable.fixedSizeLine(
+                            horizontalContainer(
+                                display,
+                                horizontalAlign = textAlignment.alignment
+                            ), maxWidth
+                        )
+                    ),
+                    posLabel = "Skill Progress"
+                )
             }
 
             else -> {}
@@ -111,7 +119,8 @@ object SkillProgress {
                 percent = factor.toDouble(),
                 startColor = Color(SpecialColour.specialToChromaRGB(barConfig.barStartColor)),
                 texture = barConfig.texturedBar.usedTexture.get(),
-                useChroma = barConfig.useChroma.get())
+                useChroma = barConfig.useChroma.get()
+            )
 
         } else {
             maxWidth = barConfig.regularBar.width
@@ -122,7 +131,8 @@ object SkillProgress {
                 endColor = Color(SpecialColour.specialToChromaRGB(barConfig.barStartColor)),
                 width = maxWidth,
                 height = barConfig.regularBar.height,
-                useChroma = barConfig.useChroma.get())
+                useChroma = barConfig.useChroma.get()
+            )
         }
 
         config.barPosition.renderRenderables(listOf(progress), posLabel = "Skill Progress Bar")
@@ -255,22 +265,28 @@ object SkillProgress {
         for (skill in sortedMap) {
             val skillInfo = skillMap[skill] ?: SkillAPI.SkillInfo(level = -1, overflowLevel = -1)
             val lockedLevels = skillInfo.overflowCurrentXp > skillInfo.overflowCurrentXpMax
-            val useCustomGoalLevel = skillInfo.customGoalLevel != 0 && skillInfo.customGoalLevel > skillInfo.overflowLevel && customGoalConfig.enableInAllDisplay
+            val useCustomGoalLevel =
+                skillInfo.customGoalLevel != 0 && skillInfo.customGoalLevel > skillInfo.overflowLevel && customGoalConfig.enableInAllDisplay
             val targetLevel = skillInfo.customGoalLevel
             var xp = skillInfo.overflowTotalXp
-            if (targetLevel in 50 .. 60 && skillInfo.overflowLevel >= 50) xp += SkillUtil.xpRequiredForLevel(50.0)
+            if (targetLevel in 50..60 && skillInfo.overflowLevel >= 50) xp += SkillUtil.xpRequiredForLevel(50.0)
             else if (targetLevel > 60 && skillInfo.overflowLevel >= 60) xp += SkillUtil.xpRequiredForLevel(60.0)
 
             var have = skillInfo.overflowTotalXp
             val need = SkillUtil.xpRequiredForLevel(targetLevel.toDouble())
-            if (targetLevel in 51 .. 59) have += SkillUtil.xpRequiredForLevel(50.0)
+            if (targetLevel in 51..59) have += SkillUtil.xpRequiredForLevel(50.0)
             else if (targetLevel > 60) have += SkillUtil.xpRequiredForLevel(60.0)
 
             val (level, currentXp, currentXpMax, totalXp) =
                 if (useCustomGoalLevel)
                     Quad(skillInfo.overflowLevel, have, need, xp)
                 else if (config.overflowConfig.enableInAllDisplay.get() && !lockedLevels)
-                    Quad(skillInfo.overflowLevel, skillInfo.overflowCurrentXp, skillInfo.overflowCurrentXpMax, skillInfo.overflowTotalXp)
+                    Quad(
+                        skillInfo.overflowLevel,
+                        skillInfo.overflowCurrentXp,
+                        skillInfo.overflowCurrentXpMax,
+                        skillInfo.overflowTotalXp
+                    )
                 else
                     Quad(skillInfo.level, skillInfo.currentXp, skillInfo.currentXpMax, skillInfo.totalXp)
 
@@ -308,9 +324,11 @@ object SkillProgress {
         val xpInfo = skillXPInfoMap[activeSkill] ?: return@buildList
         val skillInfoLast = oldSkillInfoMap[activeSkill] ?: return@buildList
         oldSkillInfoMap[activeSkill] = skillInfo
-        val level = if (config.overflowConfig.enableInEtaDisplay.get() || config.customGoalConfig.enableInETADisplay) skillInfo.overflowLevel else skillInfo.level
+        val level =
+            if (config.overflowConfig.enableInEtaDisplay.get() || config.customGoalConfig.enableInETADisplay) skillInfo.overflowLevel else skillInfo.level
 
-        val useCustomGoalLevel = skillInfo.customGoalLevel != 0 && skillInfo.customGoalLevel > skillInfo.overflowLevel && customGoalConfig.enableInETADisplay
+        val useCustomGoalLevel =
+            skillInfo.customGoalLevel != 0 && skillInfo.customGoalLevel > skillInfo.overflowLevel && customGoalConfig.enableInETADisplay
         var targetLevel = if (useCustomGoalLevel) skillInfo.customGoalLevel else level + 1
         if (targetLevel <= level || targetLevel > 400) targetLevel = (level + 1)
 
@@ -324,7 +342,8 @@ object SkillProgress {
 
         if (!useCustomGoalLevel && have < need) {
             if (skillInfo.overflowCurrentXpMax == skillInfoLast.overflowCurrentXpMax) {
-                remaining = interpolate(remaining.toFloat(), (need - have).toFloat(), lastGainUpdate.toMillis()).toLong()
+                remaining =
+                    interpolate(remaining.toFloat(), (need - have).toFloat(), lastGainUpdate.toMillis()).toLong()
             }
         }
 
@@ -335,34 +354,43 @@ object SkillProgress {
 
         var xpInterp = xpInfo.xpGainHour
 
-        if (have > need){
+        if (have > need) {
             add(Renderable.string("§7In §cIncrease level cap!"))
         } else if (xpInfo.xpGainHour < 1000) {
             add(Renderable.string("§7In §cN/A"))
         } else {
             val duration = ((remaining) * 1000 * 60 * 60 / xpInterp.toLong()).milliseconds
             val format = duration.format(TimeUnit.DAY)
-            add(Renderable.string("§7In §b$format " +
-                if (xpInfo.isActive) "" else "§c(PAUSED)"))
+            add(
+                Renderable.string(
+                    "§7In §b$format " +
+                        if (xpInfo.isActive) "" else "§c(PAUSED)"
+                )
+            )
         }
 
         if (xpInfo.xpGainLast == xpInfo.xpGainHour && xpInfo.xpGainHour <= 0) {
             add(Renderable.string("§7XP/h: §cN/A"))
         } else {
             xpInterp = interpolate(xpInfo.xpGainHour, xpInfo.xpGainLast, lastGainUpdate.toMillis())
-            add(Renderable.string("§7XP/h: §e${xpInterp.toLong().addSeparators()} " +
-                if (xpInfo.isActive) "" else "§c(PAUSED)"))
+            add(
+                Renderable.string(
+                    "§7XP/h: §e${xpInterp.toLong().addSeparators()} " +
+                        if (xpInfo.isActive) "" else "§c(PAUSED)"
+                )
+            )
         }
 
-
         val session = xpInfo.timeActive.seconds.format(TimeUnit.HOUR)
-        add(Renderable.clickAndHover("§7Session: §e$session ${if (xpInfo.sessionTimerActive) "" else "§c(PAUSED)"}",
-            listOf("§eClick to reset!")) {
-            xpInfo.sessionTimerActive = false
-            activeSkill.timer = null
-            xpInfo.timeActive = 0L
-            chat("Timer for §b${activeSkill.displayName} §ehas been reset!")
-        })
+        add(
+            Renderable.clickAndHover("§7Session: §e$session ${if (xpInfo.sessionTimerActive) "" else "§c(PAUSED)"}",
+                listOf("§eClick to reset!"), onClick = {
+                    xpInfo.sessionTimerActive = false
+                    activeSkill.timer = null
+                    xpInfo.timeActive = 0L
+                    chat("Timer for §b${activeSkill.displayName} §ehas been reset!")
+                })
+        )
     }
 
     private fun drawDisplay() = buildList {
@@ -379,7 +407,7 @@ object SkillProgress {
         }
         var have = skill.overflowTotalXp
         val need = SkillUtil.xpRequiredForLevel(targetLevel.toDouble())
-        if (targetLevel in 51 .. 59) have += SkillUtil.xpRequiredForLevel(50.0)
+        if (targetLevel in 51..59) have += SkillUtil.xpRequiredForLevel(50.0)
         else if (targetLevel > 60) have += SkillUtil.xpRequiredForLevel(60.0)
 
 
