@@ -18,13 +18,19 @@ import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.RenderUtils.renderString
 import at.hannibal2.skyhanni.utils.StringUtils.matches
 import at.hannibal2.skyhanni.utils.getLorenzVec
+import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraft.client.Minecraft
 import net.minecraft.item.ItemStack
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
 class BlazeSlayerDaggerHelper {
+
     private val config get() = SkyHanniMod.feature.slayer.blazes.hellion
-    private val attunementPattern = "§cStrike using the §r(.+) §r§cattunement on your dagger!".toPattern()
+
+    private val attunementPattern by RepoPattern.pattern(
+        "slayer.blaze.dagger.attunement",
+        "§cStrike using the §r(.+) §r§cattunement on your dagger!"
+    )
 
     private var clientSideClicked = false
     private var textTop = ""
@@ -201,7 +207,6 @@ class BlazeSlayerDaggerHelper {
         val dagger = getDaggerFromStack(itemInHand)
         dagger?.shields?.forEach { shield -> shield.active = !shield.active }
         clientSideClicked = true
-
     }
 
     enum class Dagger(val daggerNames: List<String>, vararg val shields: HellionShield, var updated: Boolean = false) {
@@ -256,7 +261,6 @@ class BlazeSlayerDaggerHelper {
             ConfigUtils.migrateIntToEnum(element, FirstDaggerEntry::class.java)
         }
     }
-
 }
 
 private fun HellionShield.other(): HellionShield {

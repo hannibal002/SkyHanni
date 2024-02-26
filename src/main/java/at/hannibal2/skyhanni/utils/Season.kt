@@ -23,7 +23,7 @@ enum class Season(
 
         fun getCurrentSeason(): Season? = getSeasonByName(SkyBlockTime.now().monthName)
 
-        private fun getSeasonByName(name: String): Season? = seasonPattern.matchMatcher(name) { entries.find { it.season.endsWith(group("season")) } }
+        private fun getSeasonByName(name: String): Season? =
+            seasonPattern.matchMatcher(name) { entries.find { it.season.endsWith(group("season")) } }
     }
-
 }

@@ -17,7 +17,7 @@ public class BestiaryConfig {
 
     @Expose
     @ConfigOption(name = "Number format", desc = "Short: 1.1k\nLong: 1.100")
-    @ConfigEditorDropdown()
+    @ConfigEditorDropdown
     public NumberFormatEntry numberFormat = NumberFormatEntry.SHORT;
 
     public enum NumberFormatEntry implements HasLegacyId {
@@ -50,7 +50,7 @@ public class BestiaryConfig {
 
     @Expose
     @ConfigOption(name = "Display type", desc = "Choose what the display should show")
-    @ConfigEditorDropdown()
+    @ConfigEditorDropdown
     public DisplayTypeEntry displayType = DisplayTypeEntry.GLOBAL_MAX;
 
     public enum DisplayTypeEntry implements HasLegacyId {

@@ -14,18 +14,21 @@ import at.hannibal2.skyhanni.features.nether.reputationhelper.dailykuudra.DailyK
 import at.hannibal2.skyhanni.features.nether.reputationhelper.dailyquest.DailyQuestHelper
 import at.hannibal2.skyhanni.features.nether.reputationhelper.dailyquest.QuestLoader
 import at.hannibal2.skyhanni.features.nether.reputationhelper.miniboss.DailyMiniBossHelper
+import at.hannibal2.skyhanni.utils.ChatUtils
+import at.hannibal2.skyhanni.utils.CollectionUtils.addAsSingletonList
+import at.hannibal2.skyhanni.utils.ConditionalUtils.afterChange
 import at.hannibal2.skyhanni.utils.ConfigUtils
 import at.hannibal2.skyhanni.utils.KeyboardManager.isKeyHeld
-import at.hannibal2.skyhanni.utils.LorenzUtils
-import at.hannibal2.skyhanni.utils.LorenzUtils.addAsSingletonList
 import at.hannibal2.skyhanni.utils.LorenzUtils.isInIsland
 import at.hannibal2.skyhanni.utils.LorenzVec
 import at.hannibal2.skyhanni.utils.RenderUtils.renderStringsAndItems
+import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.TabListData
 import net.minecraftforge.fml.common.eventhandler.EventPriority
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
 class CrimsonIsleReputationHelper(skyHanniMod: SkyHanniMod) {
+
     val config get() = SkyHanniMod.feature.crimsonIsle.reputationHelper
 
     val questHelper = DailyQuestHelper(this)
@@ -33,6 +36,8 @@ class CrimsonIsleReputationHelper(skyHanniMod: SkyHanniMod) {
     val kuudraBossHelper = DailyKuudraBossHelper(this)
 
     var factionType = FactionType.NONE
+
+    private var lastUpdate = SimpleTimeMark.farPast()
 
     private var display = emptyList<List<Any>>()
     private var dirty = true
@@ -94,18 +99,23 @@ class CrimsonIsleReputationHelper(skyHanniMod: SkyHanniMod) {
         }
     }
 
+    @SubscribeEvent
+    fun onConfigInit(event: ConfigLoadEvent) {
+        config.hideComplete.afterChange {
+            updateRender()
+        }
+    }
+
     private fun updateRender() {
         val newList = mutableListOf<List<Any>>()
 
-        //TODO test
+        // TODO test
         if (factionType == FactionType.NONE) return
 
         newList.addAsSingletonList("Reputation Helper:")
         questHelper.render(newList)
         miniBossHelper.render(newList)
-        if (factionType == FactionType.MAGE) {
-            kuudraBossHelper.render(newList)
-        }
+        kuudraBossHelper.render(newList)
 
         display = newList
     }
@@ -149,7 +159,7 @@ class CrimsonIsleReputationHelper(skyHanniMod: SkyHanniMod) {
     }
 
     fun reset() {
-        LorenzUtils.chat("Reset Reputation Helper.")
+        ChatUtils.chat("Reset Reputation Helper.")
 
         questHelper.reset()
         miniBossHelper.reset()

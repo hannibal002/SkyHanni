@@ -4,6 +4,7 @@ import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.data.HypixelData
 import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.events.DebugDataCollectEvent
+import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.OSUtils
 import at.hannibal2.skyhanni.utils.StringUtils.equalsIgnoreColor
@@ -13,7 +14,7 @@ object DebugCommand {
     fun command(args: Array<String>) {
         if (args.size == 2 && args[0] == "profileName") {
             HypixelData.profileName = args[1].lowercase()
-            LorenzUtils.chat("§eManually set profileName to '${HypixelData.profileName}'")
+            ChatUtils.chat("§eManually set profileName to '${HypixelData.profileName}'")
             return
         }
         val list = mutableListOf<String>()
@@ -21,9 +22,9 @@ object DebugCommand {
         list.add("= Debug Information for SkyHanni ${SkyHanniMod.version} =")
         list.add("")
 
-        val search = args.getOrNull(0)
+        val search = args.joinToString(" ")
         list.add(
-            if (search != null) {
+            if (search.isNotEmpty()) {
                 if (search.equalsIgnoreColor("all")) {
                     "search for everything:"
                 } else "search '$search':"
@@ -51,7 +52,7 @@ object DebugCommand {
 
         list.add("```")
         OSUtils.copyToClipboard(list.joinToString("\n"))
-        LorenzUtils.chat("§eCopied SkyHanni debug data in the clipboard.")
+        ChatUtils.chat("§eCopied SkyHanni debug data in the clipboard.")
     }
 
     private fun profileType(event: DebugDataCollectEvent) {

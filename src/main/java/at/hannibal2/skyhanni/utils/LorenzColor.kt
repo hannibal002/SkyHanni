@@ -39,6 +39,7 @@ enum class LorenzColor(val chatColorCode: Char, private val color: Color, privat
     override fun toString(): String = coloredLabel
 
     companion object {
+
         fun EnumDyeColor.toLorenzColor() = when (this) {
             EnumDyeColor.WHITE -> WHITE
             EnumDyeColor.MAGENTA -> LIGHT_PURPLE
