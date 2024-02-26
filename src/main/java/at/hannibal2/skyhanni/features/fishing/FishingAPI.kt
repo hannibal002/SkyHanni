@@ -2,11 +2,15 @@ package at.hannibal2.skyhanni.features.fishing
 
 import at.hannibal2.skyhanni.data.jsonobjects.repo.ItemsJson
 import at.hannibal2.skyhanni.events.FishingBobberCastEvent
+import at.hannibal2.skyhanni.events.FishingBobberInWaterEvent
 import at.hannibal2.skyhanni.events.ItemInHandChangeEvent
+import at.hannibal2.skyhanni.events.LorenzTickEvent
+import at.hannibal2.skyhanni.events.LorenzWorldChangeEvent
 import at.hannibal2.skyhanni.events.RepositoryReloadEvent
 import at.hannibal2.skyhanni.features.fishing.trophy.TrophyFishManager
 import at.hannibal2.skyhanni.features.fishing.trophy.TrophyFishManager.getFilletValue
 import at.hannibal2.skyhanni.features.fishing.trophy.TrophyRarity
+import at.hannibal2.skyhanni.utils.BlockUtils.getBlockAt
 import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.ItemUtils.name
@@ -37,6 +41,9 @@ object FishingAPI {
     private var lavaRods = listOf<NEUInternalName>()
     private var waterRods = listOf<NEUInternalName>()
 
+    var bobber: EntityFishHook? = null
+    var bobberHasTouchedWater = false
+
     @SubscribeEvent
     fun onJoinWorld(event: EntityJoinWorldEvent) {
         if (!LorenzUtils.inSkyBlock || !holdingRod) return
@@ -45,7 +52,36 @@ object FishingAPI {
         if (entity.angler != Minecraft.getMinecraft().thePlayer) return
 
         lastCastTime = SimpleTimeMark.now()
+        bobber = entity
+        bobberHasTouchedWater = false
         FishingBobberCastEvent(entity).postAndCatch()
+    }
+
+    private fun resetBobber() {
+        bobber = null
+        bobberHasTouchedWater = false
+    }
+
+    @SubscribeEvent
+    fun onWorldChange(event: LorenzWorldChangeEvent) {
+        resetBobber()
+    }
+
+    @SubscribeEvent
+    fun onTick(event: LorenzTickEvent) {
+        if (!LorenzUtils.inSkyBlock) return
+        val bobber = bobber ?: return
+        if (bobber.isDead) {
+            resetBobber()
+        } else {
+            if (!bobberHasTouchedWater) {
+                val block = bobber.getLorenzVec().getBlockAt()
+                if (block in getAllowedBlocks()) {
+                    bobberHasTouchedWater = true
+                    FishingBobberInWaterEvent().postAndCatch()
+                }
+            }
+        }
     }
 
     private fun NEUInternalName.isFishingRod() = contains("ROD")
@@ -63,7 +99,6 @@ object FishingAPI {
         holdingWaterRod = event.newItem in waterRods
     }
 
-
     @SubscribeEvent
     fun onRepoReload(event: RepositoryReloadEvent) {
         val data = event.getConstant<ItemsJson>("Items")
@@ -73,7 +108,7 @@ object FishingAPI {
 
     fun isLavaRod() = InventoryUtils.getItemInHand()?.getLore()?.any { it.contains("Lava Rod") } ?: false
 
-    fun getAllowedBlocks() = if (isLavaRod()) lavaBlocks else waterBlocks
+    private fun getAllowedBlocks() = if (isLavaRod()) lavaBlocks else waterBlocks
 
     fun getFilletPerTrophy(internalName: NEUInternalName): Int {
         val internal = internalName.asString()
