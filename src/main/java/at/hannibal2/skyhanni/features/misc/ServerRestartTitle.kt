@@ -15,9 +15,14 @@ class ServerRestartTitle {
     private val config get() = SkyHanniMod.feature.misc
 
     companion object {
-        val restartingPattern by RepoPattern.pattern(
-            "features.misc.serverrestart",
-            "§cServer closing(: (?<minutes>\\d+):(?<seconds>\\d+)| soon!)? ?§8.*"
+        private val restartingGroup = RepoPattern.group("features.misc.serverrestart")
+        private val restartingPattern by restartingGroup.pattern(
+            "time",
+            "§cServer closing: (?<minutes>\\d+):(?<seconds>\\d+) ?§8.*"
+        )
+        val restartingGreedyPattern by restartingGroup.pattern(
+            "greedy",
+            "§cServer closing:.*"
         )
     }
 

@@ -168,11 +168,11 @@ private fun getVotingShowWhen(): Boolean {
 }
 
 private fun getServerCloseLines(): List<String> {
-    return listOf(getSbLines().first { ServerRestartTitle.restartingPattern.matches(it) }.split("§8")[0])
+    return listOf(getSbLines().first { ServerRestartTitle.restartingGreedyPattern.matches(it) }.split("§8")[0])
 }
 
 private fun getServerCloseShowWhen(): Boolean {
-    return getSbLines().any { ServerRestartTitle.restartingPattern.matches(it) }
+    return getSbLines().any { ServerRestartTitle.restartingGreedyPattern.matches(it) }
 }
 
 private fun getDungeonsLines(): List<String> {
