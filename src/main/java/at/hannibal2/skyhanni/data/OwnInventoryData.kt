@@ -7,17 +7,18 @@ import at.hannibal2.skyhanni.events.LorenzWorldChangeEvent
 import at.hannibal2.skyhanni.events.OwnInventoryItemUpdateEvent
 import at.hannibal2.skyhanni.events.PacketEvent
 import at.hannibal2.skyhanni.events.entity.ItemAddInInventoryEvent
+import at.hannibal2.skyhanni.utils.CollectionUtils.addOrPut
 import at.hannibal2.skyhanni.utils.DelayedRun
 import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalNameOrNull
-import at.hannibal2.skyhanni.utils.ItemUtils.getItemName
+import at.hannibal2.skyhanni.utils.ItemUtils.itemName
 import at.hannibal2.skyhanni.utils.LorenzUtils
-import at.hannibal2.skyhanni.utils.LorenzUtils.addOrPut
 import at.hannibal2.skyhanni.utils.NEUInternalName
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraft.client.Minecraft
+import net.minecraft.network.play.client.C0EPacketClickWindow
 import net.minecraft.network.play.server.S0DPacketCollectItem
 import net.minecraft.network.play.server.S2FPacketSetSlot
 import net.minecraftforge.fml.common.eventhandler.EventPriority
@@ -26,6 +27,7 @@ import kotlin.time.Duration
 import kotlin.time.Duration.Companion.milliseconds
 
 class OwnInventoryData {
+
     private var itemAmounts = mapOf<NEUInternalName, Int>()
     private var dirty = false
     private val sackToInventoryChatPattern by RepoPattern.pattern(
@@ -49,6 +51,16 @@ class OwnInventoryData {
                     OwnInventoryItemUpdateEvent(item).postAndCatch()
                 }
             }
+        }
+    }
+
+    @SubscribeEvent
+    fun onClickEntity(event: PacketEvent.SendEvent) {
+        if (!LorenzUtils.inSkyBlock) return
+        val packet = event.packet
+
+        if (packet is C0EPacketClickWindow) {
+            dirty = true
         }
     }
 
@@ -108,7 +120,7 @@ class OwnInventoryData {
     fun onChat(event: LorenzChatEvent) {
         sackToInventoryChatPattern.matchMatcher(event.message) {
             val name = group("name")
-            ignoreItem(500.milliseconds) { it.getItemName().contains(name) }
+            ignoreItem(500.milliseconds) { it.itemName.contains(name) }
         }
     }
 

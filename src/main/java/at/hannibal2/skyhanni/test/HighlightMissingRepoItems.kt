@@ -44,11 +44,6 @@ class HighlightMissingRepoItems {
     }
 
     @SubscribeEvent
-    fun onNeuRepoReload(event: io.github.moulberry.notenoughupdates.events.RepositoryReloadEvent) {
-        NEUItems.allItemsCache = NEUItems.readAllNeuItems()
-    }
-
-    @SubscribeEvent
     fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
         event.move(3, "dev.highlightMissingRepo", "dev.debug.highlightMissingRepo")
     }

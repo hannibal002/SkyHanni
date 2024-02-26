@@ -5,7 +5,6 @@ import com.google.gson.annotations.Expose;
 
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
 public class ItemsJson {
     @Expose
@@ -19,4 +18,7 @@ public class ItemsJson {
 
     @Expose
     public List<NEUInternalName> water_fishing_rods;
+
+    @Expose
+    public Map<String, Integer> book_bundle_amount;
 }

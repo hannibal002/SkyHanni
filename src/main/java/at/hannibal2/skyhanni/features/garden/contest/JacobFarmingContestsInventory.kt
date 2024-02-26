@@ -24,6 +24,7 @@ import java.text.SimpleDateFormat
 import java.util.Locale
 
 class JacobFarmingContestsInventory {
+
     private val realTime = mutableMapOf<Int, String>()
 
     private val formatDay = SimpleDateFormat("dd MMMM yyyy", Locale.US)

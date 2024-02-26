@@ -5,6 +5,7 @@ import at.hannibal2.skyhanni.utils.StringUtils.cleanPlayerName
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
 object GuildAPI {
+
     private var inGuildMessage = false
     private val list = mutableListOf<String>()
 

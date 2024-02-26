@@ -9,9 +9,11 @@ import at.hannibal2.skyhanni.events.InventoryFullyOpenedEvent
 import at.hannibal2.skyhanni.events.IslandChangeEvent
 import at.hannibal2.skyhanni.events.LorenzRenderWorldEvent
 import at.hannibal2.skyhanni.events.RepositoryReloadEvent
+import at.hannibal2.skyhanni.utils.ChatUtils
+import at.hannibal2.skyhanni.utils.ColorUtils.toChromaColor
+import at.hannibal2.skyhanni.utils.ConditionalUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils.isInIsland
-import at.hannibal2.skyhanni.utils.LorenzUtils.toChromaColor
 import at.hannibal2.skyhanni.utils.NEUInternalName.Companion.asInternalName
 import at.hannibal2.skyhanni.utils.NEUItems.getItemStack
 import at.hannibal2.skyhanni.utils.ParkourHelper
@@ -23,6 +25,7 @@ import net.minecraftforge.fml.common.eventhandler.EventPriority
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
 class DeepCavernsParkour {
+
     private val config get() = SkyHanniMod.feature.mining.deepCavernsParkour
 
     private var parkourHelper: ParkourHelper? = null
@@ -66,7 +69,7 @@ class DeepCavernsParkour {
 
     @SubscribeEvent
     fun onConfigLoad(event: ConfigLoadEvent) {
-        LorenzUtils.onToggle(config.rainbowColor, config.monochromeColor, config.lookAhead) {
+        ConditionalUtils.onToggle(config.rainbowColor, config.monochromeColor, config.lookAhead) {
             updateConfig()
         }
     }
@@ -91,7 +94,7 @@ class DeepCavernsParkour {
             if (it.displayName != "§aObsidian Sanctuary") {
                 if (!show) {
                     start()
-                    LorenzUtils.chat("Automatically enabling Deep Caverns Parkour, helping you find the way to the bottom of Deep Caverns and the path to Ryst.")
+                    ChatUtils.chat("Automatically enabling Deep Caverns Parkour, helping you find the way to the bottom of Deep Caverns and the path to Ryst.")
                 }
             }
         }
@@ -101,7 +104,7 @@ class DeepCavernsParkour {
         show = true
         parkourHelper?.reset()
         if (parkourHelper == null) {
-            LorenzUtils.clickableChat(
+            ChatUtils.clickableChat(
                 "DeepCavernsParkour missing in SkyHanni Repo! Try /shupdaterepo to fix it!",
                 "shupdaterepo",
                 prefixColor = "§c"
@@ -126,7 +129,7 @@ class DeepCavernsParkour {
     fun onStackClick(event: SlotClickEvent) {
         if (showStartIcon && event.slotId == 40) {
             event.isCanceled = true
-            LorenzUtils.chat("Manually enabled Deep Caverns Parkour.")
+            ChatUtils.chat("Manually enabled Deep Caverns Parkour.")
             start()
         }
     }

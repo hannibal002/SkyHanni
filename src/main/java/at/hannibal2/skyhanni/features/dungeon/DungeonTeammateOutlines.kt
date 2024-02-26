@@ -12,6 +12,7 @@ import net.minecraft.scoreboard.Team
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
 class DungeonTeammateOutlines {
+
     private val config get() = SkyHanniMod.feature.dungeon
 
     @SubscribeEvent
@@ -35,5 +36,4 @@ class DungeonTeammateOutlines {
             Minecraft.getMinecraft().fontRendererObj.getColorCode(colorFormat[1])
         else null
     }
-
 }

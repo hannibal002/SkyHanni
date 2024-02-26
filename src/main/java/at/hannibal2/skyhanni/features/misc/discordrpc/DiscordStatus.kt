@@ -385,7 +385,6 @@ enum class DiscordStatus(private val displayMessageSupplier: Supplier<String>?) 
         }
         return ""
     }
-
 }
 
 enum class AutoStatus(val placeholderText: String, val correspondingDiscordStatus: DiscordStatus) {

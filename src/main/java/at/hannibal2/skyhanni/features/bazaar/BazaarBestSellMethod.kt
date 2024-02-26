@@ -6,7 +6,7 @@ import at.hannibal2.skyhanni.events.InventoryCloseEvent
 import at.hannibal2.skyhanni.features.bazaar.BazaarApi.Companion.getBazaarData
 import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName
-import at.hannibal2.skyhanni.utils.ItemUtils.getNameWithEnchantment
+import at.hannibal2.skyhanni.utils.ItemUtils.itemName
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.NEUInternalName
 import at.hannibal2.skyhanni.utils.NumberUtil
@@ -18,6 +18,7 @@ import net.minecraftforge.fml.common.eventhandler.EventPriority
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
 class BazaarBestSellMethod {
+
     private var display = ""
 
     // Working with the last clicked item manually because
@@ -46,25 +47,20 @@ class BazaarBestSellMethod {
         if (internalName == null) {
             return "§cUnknown Bazaar item!"
         }
-        try {
-            var having = InventoryUtils.countItemsInLowerInventory { it.getInternalName() == internalName }
-            lastClickedItem?.let {
-                if (it.getInternalName() == internalName) {
-                    having += it.stackSize
-                }
+        var having = InventoryUtils.countItemsInLowerInventory { it.getInternalName() == internalName }
+        lastClickedItem?.let {
+            if (it.getInternalName() == internalName) {
+                having += it.stackSize
             }
-            if (having <= 0) return ""
-
-            val data = internalName.getBazaarData() ?: return ""
-            val totalDiff = (data.buyPrice - data.sellPrice) * having
-            val result = NumberUtil.format(totalDiff.toInt())
-
-            val name = internalName.getNameWithEnchantment()
-            return "$name§7 sell difference: §6$result coins"
-        } catch (e: Error) {
-            e.printStackTrace()
-            return ""
         }
+        if (having <= 0) return ""
+
+        val data = internalName.getBazaarData() ?: return ""
+        val totalDiff = (data.buyPrice - data.sellPrice) * having
+        val result = NumberUtil.format(totalDiff.toInt())
+
+        val name = internalName.itemName
+        return "$name§7 sell difference: §6$result coins"
     }
 
     @SubscribeEvent(priority = EventPriority.LOWEST)
