@@ -3,6 +3,7 @@ package at.hannibal2.skyhanni.features.misc
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.data.ScoreboardData
 import at.hannibal2.skyhanni.events.LorenzTickEvent
+import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.TimeUtils.format
@@ -29,12 +30,20 @@ class ServerRestartTitle {
 
         for (line in ScoreboardData.sidebarLinesFormatted) {
             restartPattern.matchMatcher(line) {
-                val minutes = group("minutes").toInt().minutes
-                val seconds = group("seconds").toInt().seconds
-                val totalTime = minutes + seconds
-                if (totalTime > 2.minutes && totalTime.inWholeSeconds % 30 != 0L) return
-                val time = totalTime.format()
-                LorenzUtils.sendTitle("§cServer Restart in §b$time", 2.seconds)
+                try {
+                    val minutes = group("minutes").toInt().minutes
+                    val seconds = group("seconds").toInt().seconds
+                    val totalTime = minutes + seconds
+                    if (totalTime > 2.minutes && totalTime.inWholeSeconds % 30 != 0L) return
+                    val time = totalTime.format()
+                    LorenzUtils.sendTitle("§cServer Restart in §b$time", 2.seconds)
+                } catch (e: Throwable) {
+                    ErrorManager.logErrorWithData(
+                        e, "Error reading server restart time from socreboard",
+                        "line" to line,
+                        "restartPattern" to restartPattern.pattern(),
+                    )
+                }
             }
         }
     }
