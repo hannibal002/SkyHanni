@@ -3,6 +3,7 @@ package at.hannibal2.skyhanni.events
 import net.minecraft.client.gui.inventory.GuiContainer
 import net.minecraft.inventory.Container
 import net.minecraft.inventory.Slot
+import net.minecraft.item.ItemStack
 import net.minecraftforge.fml.common.eventhandler.Cancelable
 
 abstract class GuiContainerEvent(open val gui: GuiContainer, open val container: Container) : LorenzEvent() {
@@ -50,6 +51,7 @@ abstract class GuiContainerEvent(open val gui: GuiContainer, open val container:
     data class SlotClickEvent(
         override val gui: GuiContainer,
         override val container: Container,
+        val item: ItemStack?,
         val slot: Slot?,
         val slotId: Int,
         val clickedButton: Int,

@@ -11,13 +11,17 @@ import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.ItemUtils.name
 import at.hannibal2.skyhanni.utils.NumberUtil.romanToDecimalIfNecessary
 import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
+import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
 class GardenInventoryNumbers {
 
     private val config get() = GardenAPI.config.number
 
-    private var patternUpgradeTier = "§7Current Tier: §[ea](?<tier>.*)§7/§a.*".toPattern()
+    private val upgradeTierPattern by RepoPattern.pattern(
+        "garden.inventory.numbers.upgradetier",
+        "§7Current Tier: §[ea](?<tier>.*)§7/§a.*"
+    )
 
     @SubscribeEvent
     fun onRenderItemTip(event: RenderItemTipEvent) {
@@ -36,7 +40,7 @@ class GardenInventoryNumbers {
             if (!config.cropUpgrades) return
 
             event.stack.getLore()
-                .map { patternUpgradeTier.matcher(it) }
+                .map { upgradeTierPattern.matcher(it) }
                 .filter { it.matches() }
                 .map { it.group("tier") }
                 .forEach { event.stackTip = "" + it }

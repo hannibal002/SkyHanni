@@ -14,9 +14,6 @@ import kotlin.time.toDuration
 
 object TimeUtils {
 
-    private val pattern =
-        "(?:(?<y>\\d+) ?y(?:\\w* ?)?)?(?:(?<d>\\d+) ?d(?:\\w* ?)?)?(?:(?<h>\\d+) ?h(?:\\w* ?)?)?(?:(?<m>\\d+) ?m(?:\\w* ?)?)?(?:(?<s>\\d+) ?s(?:\\w* ?)?)?".toPattern()
-
     fun Duration.format(
         biggestUnit: TimeUnit = TimeUnit.YEAR,
         showMilliSeconds: Boolean = false,
@@ -33,7 +30,7 @@ object TimeUtils {
         else -> default
     }
 
-    @Deprecated("off sets by one second", ReplaceWith("Duration.format()"))
+    @Deprecated("Has an offset of one second", ReplaceWith("use kotlin Duration"))
     fun formatDuration(
         millis: Long,
         biggestUnit: TimeUnit = TimeUnit.YEAR,
@@ -81,12 +78,12 @@ object TimeUtils {
         return builder.toString().trim()
     }
 
-    @Deprecated("Do no longer use long for time", ReplaceWith("getDuration()"))
+    @Deprecated("Do no longer use long for time", ReplaceWith("getDuration(string)"))
     fun getMillis(string: String) = getDuration(string).inWholeMilliseconds
 
     fun getDuration(string: String) = getMillis_(string.replace("m", "m ").replace("  ", " ").trim())
 
-    private fun getMillis_(string: String) = pattern.matchMatcher(string.lowercase().trim()) {
+    private fun getMillis_(string: String) = UtilsPatterns.timeAmountPattern.matchMatcher(string.lowercase().trim()) {
         val years = group("y")?.toLong() ?: 0L
         val days = group("d")?.toLong() ?: 0L
         val hours = group("h")?.toLong() ?: 0L

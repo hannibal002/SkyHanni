@@ -15,9 +15,12 @@ import org.lwjgl.opengl.OpenGLException
  *
  * Credit: [Shader.java](https://github.com/BiscuitDevelopment/SkyblockAddons/blob/main/src/main/java/codes/biscuit/skyblockaddons/shader/Shader.java)
  */
-abstract class Shader(vertex: String, fragment: String) {
+abstract class Shader(val vertex: String, val fragment: String) {
 
-    var shaderProgram: Int = ShaderLinkHelper.getStaticShaderLinkHelper().createProgram()
+    var shaderProgram: Int = -1
+    private var vertexShaderID: Int = -1
+    private var fragmentShaderID: Int = -1
+
     private val uniforms: MutableList<Uniform<*>> = mutableListOf()
 
     var created = false

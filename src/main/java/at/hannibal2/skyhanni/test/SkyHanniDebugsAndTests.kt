@@ -22,6 +22,7 @@ import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalNameOrNull
 import at.hannibal2.skyhanni.utils.ItemUtils.getItemCategoryOrNull
 import at.hannibal2.skyhanni.utils.ItemUtils.getItemRarityOrNull
+import at.hannibal2.skyhanni.utils.ItemUtils.itemName
 import at.hannibal2.skyhanni.utils.ItemUtils.name
 import at.hannibal2.skyhanni.utils.KeyboardManager.isKeyHeld
 import at.hannibal2.skyhanni.utils.LocationUtils
@@ -31,7 +32,9 @@ import at.hannibal2.skyhanni.utils.LorenzLogger
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.LorenzVec
 import at.hannibal2.skyhanni.utils.NEUInternalName
+import at.hannibal2.skyhanni.utils.NEUInternalName.Companion.asInternalName
 import at.hannibal2.skyhanni.utils.NEUItems
+import at.hannibal2.skyhanni.utils.NEUItems.getItemStackOrNull
 import at.hannibal2.skyhanni.utils.NEUItems.getNpcPriceOrNull
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.OSUtils
@@ -370,6 +373,36 @@ class SkyHanniDebugsAndTests {
                 ChatUtils.chat("§cDisabled global renderer! Run this command again to show SkyHanni rendering again.")
             }
         }
+
+        fun testItemCommand(args: Array<String>) {
+            if (args.isEmpty()) {
+                ChatUtils.userError("Usage: /shtestitem <item name or internal name>")
+                return
+            }
+
+            val input = args.joinToString(" ")
+            val result = buildList {
+                add("")
+                add("§bSkyHanni Test Item")
+                add("§einput: '§f$input§e'")
+
+                NEUInternalName.fromItemNameOrNull(input)?.let {
+                    add("§eitem name -> internalName: '§7${it.asString()}§e'")
+                    add("  §eitemName: '${it.itemName}§e'")
+                    return@buildList
+                }
+
+                input.asInternalName().getItemStackOrNull()?.let {
+                    val itemName = it.itemName
+                    add("§einternal name: §7${it.getInternalName().asString()}")
+                    add("§einternal name -> item name: '$itemName§e'")
+                    return@buildList
+                }
+
+                add("§cNothing found!")
+            }
+            ChatUtils.chat(result.joinToString("\n"), prefix = false)
+        }
     }
 
     @SubscribeEvent
@@ -415,13 +448,27 @@ class SkyHanniDebugsAndTests {
     }
 
     @SubscribeEvent
-    fun onSHowNpcPrice(event: LorenzToolTipEvent) {
+    fun onShowNpcPrice(event: LorenzToolTipEvent) {
         if (!LorenzUtils.inSkyBlock) return
         if (!debugConfig.showNpcPrice) return
         val internalName = event.itemStack.getInternalNameOrNull() ?: return
 
         val npcPrice = internalName.getNpcPriceOrNull() ?: return
         event.toolTip.add("§7NPC price: §6${npcPrice.addSeparators()}")
+    }
+
+    @SubscribeEvent
+    fun onShowItemName(event: LorenzToolTipEvent) {
+        if (!LorenzUtils.inSkyBlock) return
+        if (!debugConfig.showItemName) return
+        val itemStack = event.itemStack
+        val internalName = itemStack.getInternalName()
+        if (internalName == NEUInternalName.NONE) {
+            event.toolTip.add("Item name: no item.")
+            return
+        }
+        val name = internalName.itemName
+        event.toolTip.add("Item name: '$name'")
     }
 
     @SubscribeEvent

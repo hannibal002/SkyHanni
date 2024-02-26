@@ -549,7 +549,7 @@ object RenderUtils {
             val z: Double =
                 entity.lastTickPosZ + (entity.posZ - entity.lastTickPosZ) * partialTicks - renderManager.viewerPosZ
             val pix2 = Math.PI * 2.0
-            for (i in 0..90) {
+            for (i in 0 .. 90) {
                 color.bindColor()
                 worldRenderer.pos(x + rad * cos(i * pix2 / 45.0), y + il, z + rad * sin(i * pix2 / 45.0)).endVertex()
             }

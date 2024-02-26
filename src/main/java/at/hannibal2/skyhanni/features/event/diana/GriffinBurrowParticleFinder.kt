@@ -22,7 +22,7 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import kotlin.time.Duration.Companion.minutes
 import kotlin.time.Duration.Companion.seconds
 
-class GriffinBurrowParticleFinder {
+object GriffinBurrowParticleFinder {
 
     private val config get() = SkyHanniMod.feature.event.diana
 
@@ -122,6 +122,10 @@ class GriffinBurrowParticleFinder {
 
     @SubscribeEvent
     fun onWorldChange(event: LorenzWorldChangeEvent) {
+        reset()
+    }
+
+    fun reset() {
         burrows.clear()
         recentlyDugParticleBurrows.clear()
     }
