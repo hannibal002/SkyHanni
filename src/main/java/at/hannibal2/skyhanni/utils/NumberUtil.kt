@@ -189,9 +189,14 @@ object NumberUtil {
 
     // TODO create new function formatLong, and eventually deprecate this function.
     @Deprecated("renamed", ReplaceWith("this.formatLong()"))
-    fun String.formatNumber(): Long = formatLong() ?: error("formatNumber has a NumberFormatException with '$this'")
+    fun String.formatNumber(): Long = formatLong() ?: throw NumberFormatException("formatNumber has a NumberFormatException with '$this'")
 
     fun String.formatLong(): Long? = formatDouble()?.toLong()
+
+    fun String.formatLongOrUserError(): Long? = formatDouble()?.toLong() ?: run {
+        ChatUtils.userError("Not a valid number: '$this'")
+        return@run null
+    }
 
     fun String.formatDouble(): Double? {
         var text = lowercase().replace(",", "")
