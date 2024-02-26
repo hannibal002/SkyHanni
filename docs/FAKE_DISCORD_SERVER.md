@@ -28,6 +28,7 @@ You can try to get your account back by contacting microsoft support.
 You need to send them a ticket via your email, telling them what happened.
 Also provide them with exact information how and when you have bought your minecraft account.
 Good luck!
+This thread might help you as well: https://hypixel.net/threads/guide-how-to-handle-hacked-account-issues-with-microsoft-support.5429472/
 
 ### Someone else logged in into my account, but i can still access the account myself
 
