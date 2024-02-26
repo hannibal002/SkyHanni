@@ -1,7 +1,9 @@
 package at.hannibal2.skyhanni.features.fishing
 
+import at.hannibal2.skyhanni.data.jsonobjects.repo.ItemsJson
 import at.hannibal2.skyhanni.events.FishingBobberCastEvent
 import at.hannibal2.skyhanni.events.ItemInHandChangeEvent
+import at.hannibal2.skyhanni.events.RepositoryReloadEvent
 import at.hannibal2.skyhanni.features.fishing.trophy.TrophyFishManager
 import at.hannibal2.skyhanni.features.fishing.trophy.TrophyFishManager.getFilletValue
 import at.hannibal2.skyhanni.features.fishing.trophy.TrophyRarity
@@ -29,6 +31,11 @@ object FishingAPI {
 
     var lastCastTime = SimpleTimeMark.farPast()
     var holdingRod = false
+    var holdingLavaRod = false
+    var holdingWaterRod = false
+
+    private var lavaRods = listOf<NEUInternalName>()
+    private var waterRods = listOf<NEUInternalName>()
 
     @SubscribeEvent
     fun onJoinWorld(event: EntityJoinWorldEvent) {
@@ -52,6 +59,16 @@ object FishingAPI {
     fun onItemInHandChange(event: ItemInHandChangeEvent) {
         // TODO correct rod type per island water/lava
         holdingRod = event.newItem.isFishingRod()
+        holdingLavaRod = event.newItem in lavaRods
+        holdingWaterRod = event.newItem in waterRods
+    }
+
+
+    @SubscribeEvent
+    fun onRepoReload(event: RepositoryReloadEvent) {
+        val data = event.getConstant<ItemsJson>("Items")
+        lavaRods = data.lava_fishing_rods ?: error("§clava_fishing_rods is missing from repo.")
+        waterRods = data.water_fishing_rods ?: error("§cwater_fishing_rods is missing from repo.")
     }
 
     fun isLavaRod() = InventoryUtils.getItemInHand()?.getLore()?.any { it.contains("Lava Rod") } ?: false
