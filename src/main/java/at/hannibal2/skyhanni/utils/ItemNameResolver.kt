@@ -74,6 +74,7 @@ object ItemNameResolver {
         if (NEUItems.allItemsCache.isEmpty()) {
             NEUItems.allItemsCache = NEUItems.readAllNeuItems()
         }
+
         NEUItems.allItemsCache[lowercase]?.let {
             itemNameCache[lowercase] = it
             return it
