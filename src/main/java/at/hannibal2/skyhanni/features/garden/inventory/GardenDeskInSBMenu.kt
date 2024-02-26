@@ -3,7 +3,7 @@ package at.hannibal2.skyhanni.features.garden.inventory
 import at.hannibal2.skyhanni.events.InventoryCloseEvent
 import at.hannibal2.skyhanni.events.InventoryFullyOpenedEvent
 import at.hannibal2.skyhanni.features.garden.GardenAPI
-import at.hannibal2.skyhanni.utils.LorenzUtils
+import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.NEUInternalName.Companion.asInternalName
 import at.hannibal2.skyhanni.utils.NEUItems.getItemStack
 import io.github.moulberry.notenoughupdates.events.ReplaceItemEvent
@@ -51,7 +51,7 @@ class GardenDeskInSBMenu {
     fun onStackClick(event: SlotClickEvent) {
         if (showItem && event.slotId == 10) {
             event.isCanceled = true
-            LorenzUtils.sendCommandToServer("desk")
+            ChatUtils.sendCommandToServer("desk")
         }
     }
 }

@@ -19,6 +19,7 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import kotlin.time.Duration.Companion.seconds
 
 class SprayFeatures {
+
     private val config get() = PestAPI.config.spray
 
     private var display: String? = null
@@ -49,7 +50,6 @@ class SprayFeatures {
         display = "§a${type.displayName} §7(§6$pests§7)"
 
         lastChangeTime = SimpleTimeMark.now()
-
     }
 
     @SubscribeEvent

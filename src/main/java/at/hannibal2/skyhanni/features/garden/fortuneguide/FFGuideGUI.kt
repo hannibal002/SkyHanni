@@ -19,6 +19,7 @@ import java.io.IOException
 
 open class FFGuideGUI : GuiScreen() {
     companion object {
+
         val pages = mutableMapOf<FortuneGuidePage, FFGuidePage>()
 
         var guiLeft = 0
@@ -31,7 +32,7 @@ open class FFGuideGUI : GuiScreen() {
         var selectedPage = FortuneGuidePage.OVERVIEW
         var currentCrop: CropType? = null
 
-        //todo set this to what they have equip
+        // todo set this to what they have equip
         var currentPet = FarmingItems.ELEPHANT
         var currentArmor = 0
         var currentEquipment = 0
@@ -473,6 +474,7 @@ open class FFGuideGUI : GuiScreen() {
     }
 
     abstract class FFGuidePage {
+
         abstract fun drawPage(mouseX: Int, mouseY: Int, partialTicks: Float)
     }
 }

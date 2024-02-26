@@ -3,7 +3,7 @@ package at.hannibal2.skyhanni.features.garden
 import at.hannibal2.skyhanni.data.GardenCropMilestones
 import at.hannibal2.skyhanni.data.GardenCropMilestones.getCounter
 import at.hannibal2.skyhanni.features.garden.farming.GardenCropSpeed.getSpeed
-import at.hannibal2.skyhanni.utils.LorenzUtils
+import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.TimeUtils
 import net.minecraft.command.CommandBase
@@ -12,12 +12,12 @@ object FarmingMilestoneCommand {
 
     fun onCommand(crop: String?, current: String?, target: String?, needsTime: Boolean) {
         if (crop == null) {
-            LorenzUtils.userError("No crop type entered")
+            ChatUtils.userError("No crop type entered")
             return
         }
 
         val enteredCrop = CropType.entries.firstOrNull { it.simpleName == crop.lowercase() } ?: run {
-            LorenzUtils.userError("Invalid crop type entered")
+            ChatUtils.userError("Invalid crop type entered")
             return
         }
 
@@ -30,7 +30,7 @@ object FarmingMilestoneCommand {
             val cropsForTier = GardenCropMilestones.getCropsForTier(currentCropMilestone, enteredCrop)
             val output = (cropsForTier - currentProgress).formatOutput(needsTime, enteredCrop)
 
-            LorenzUtils.chat("§7$output needed to reach the next milestone")
+            ChatUtils.chat("§7$output needed to reach the next milestone")
             return
         }
 
@@ -38,11 +38,11 @@ object FarmingMilestoneCommand {
             val cropsForTier = GardenCropMilestones.getCropsForTier(currentMilestone, enteredCrop)
             val output = cropsForTier.formatOutput(needsTime, enteredCrop)
 
-            LorenzUtils.chat("§7$output needed for milestone §7$currentMilestone")
+            ChatUtils.chat("§7$output needed for milestone §7$currentMilestone")
             return
         }
         if (currentMilestone >= targetMilestone) {
-            LorenzUtils.userError("Entered milestone is greater than or the same as target milestone")
+            ChatUtils.userError("Entered milestone is greater than or the same as target milestone")
             return
         }
 
@@ -50,7 +50,7 @@ object FarmingMilestoneCommand {
         val targetAmount = GardenCropMilestones.getCropsForTier(targetMilestone, enteredCrop)
         val output = (targetAmount - currentAmount).formatOutput(needsTime, enteredCrop)
 
-        LorenzUtils.chat("§7$output needed for milestone §7$currentMilestone §a-> §7$targetMilestone")
+        ChatUtils.chat("§7$output needed for milestone §7$currentMilestone §a-> §7$targetMilestone")
     }
 
     fun onComplete(strings: Array<String>): List<String> {

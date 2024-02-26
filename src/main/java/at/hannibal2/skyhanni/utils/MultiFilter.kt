@@ -1,7 +1,7 @@
 package at.hannibal2.skyhanni.utils
 
-import at.hannibal2.skyhanni.utils.StringUtils.trimWhiteSpace
 import at.hannibal2.skyhanni.data.jsonobjects.repo.MultiFilterJson
+import at.hannibal2.skyhanni.utils.StringUtils.trimWhiteSpace
 
 class MultiFilter {
 

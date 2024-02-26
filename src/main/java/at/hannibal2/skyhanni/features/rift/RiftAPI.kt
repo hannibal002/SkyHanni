@@ -11,6 +11,7 @@ import at.hannibal2.skyhanni.utils.NEUInternalName.Companion.asInternalName
 import net.minecraft.item.ItemStack
 
 object RiftAPI {
+
     fun inRift() = IslandType.THE_RIFT.isInIsland()
 
     val config: RiftConfig get() = SkyHanniMod.feature.rift

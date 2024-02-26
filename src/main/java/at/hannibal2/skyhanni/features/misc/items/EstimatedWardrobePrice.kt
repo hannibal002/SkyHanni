@@ -13,6 +13,7 @@ import net.minecraft.item.ItemStack
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
 class EstimatedWardrobePrice {
+
     private val config get() = SkyHanniMod.feature.misc.estimatedItemValues
     var data = mutableMapOf<Int, MutableList<ItemStack>>()
 

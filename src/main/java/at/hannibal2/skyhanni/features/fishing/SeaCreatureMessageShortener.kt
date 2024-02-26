@@ -7,6 +7,7 @@ import net.minecraft.util.ChatComponentText
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
 class SeaCreatureMessageShortener {
+
     private val config get() = SkyHanniMod.feature.fishing
 
     @SubscribeEvent
