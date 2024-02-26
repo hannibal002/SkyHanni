@@ -12,6 +12,7 @@ import net.minecraftforge.fml.common.eventhandler.EventPriority
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
 class HighlightRiftGuide {
+
     private var inInventory = false
     private var highlightedItems = emptyList<Int>()
 

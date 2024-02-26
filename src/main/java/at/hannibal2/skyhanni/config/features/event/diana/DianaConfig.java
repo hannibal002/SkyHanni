@@ -74,4 +74,9 @@ public class DianaConfig {
     @Accordion
     // TODO renmae
     public MythologicalMobTrackerConfig mythologicalMobtracker = new MythologicalMobTrackerConfig();
+
+    @Expose
+    @ConfigOption(name = "All Burrows List", desc = "")
+    @Accordion
+    public AllBurrowsListConfig allBurrowsList = new AllBurrowsListConfig();
 }

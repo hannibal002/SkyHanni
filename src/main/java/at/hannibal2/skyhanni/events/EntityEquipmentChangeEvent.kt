@@ -6,8 +6,9 @@ import net.minecraft.item.ItemStack
 data class EntityEquipmentChangeEvent(
     val entity: Entity,
     val equipmentSlot: Int,
-    val newItemStack: ItemStack?
+    val newItemStack: ItemStack?,
 ) : LorenzEvent() {
+
     val isHead get() = equipmentSlot == EQUIPMENT_SLOT_HEAD
     val isChest get() = equipmentSlot == EQUIPMENT_SLOT_CHEST
     val isLeggings get() = equipmentSlot == EQUIPMENT_SLOT_LEGGINGS
@@ -15,6 +16,7 @@ data class EntityEquipmentChangeEvent(
     val isHand get() = equipmentSlot == EQUIPMENT_SLOT_HAND
 
     companion object {
+
         const val EQUIPMENT_SLOT_HEAD = 4
         const val EQUIPMENT_SLOT_CHEST = 3
         const val EQUIPMENT_SLOT_LEGGINGS = 2

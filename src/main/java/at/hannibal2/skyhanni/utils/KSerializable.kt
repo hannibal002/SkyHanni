@@ -24,11 +24,9 @@ import com.google.gson.internal.`$Gson$Types` as InternalGsonTypes
 @Target(AnnotationTarget.CLASS)
 annotation class KSerializable
 
-
 @Retention(AnnotationRetention.RUNTIME)
 @Target(AnnotationTarget.CLASS)
 annotation class ExtraData
-
 
 class KotlinTypeAdapterFactory : TypeAdapterFactory {
 
@@ -36,7 +34,7 @@ class KotlinTypeAdapterFactory : TypeAdapterFactory {
         val param: KParameter,
         val adapter: TypeAdapter<Any?>,
         val name: String,
-        val field: KProperty1<Any, Any?>
+        val field: KProperty1<Any, Any?>,
     )
 
     @OptIn(ExperimentalStdlibApi::class)

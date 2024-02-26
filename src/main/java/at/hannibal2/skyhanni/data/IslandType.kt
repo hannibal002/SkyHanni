@@ -17,7 +17,7 @@ enum class IslandType(val displayName: String, val modeName: String = "null") {
     CRYSTAL_HOLLOWS("Crystal Hollows"),
     THE_PARK("The Park", "floating_islands_1"),
     DEEP_CAVERNS("Deep Caverns", "deep_caverns"),
-    GOLD_MINES("Gold Mine", "gold_mine"),//TODO confirm
+    GOLD_MINES("Gold Mine", "gold_mine"),// TODO confirm
     GARDEN("Garden"),
     GARDEN_GUEST("Garden Guest"),
     SPIDER_DEN("Spider's Den"),
@@ -29,6 +29,7 @@ enum class IslandType(val displayName: String, val modeName: String = "null") {
     ;
 
     companion object {
+
         fun getByNameOrUnknown(name: String) = getByNameOrNull(name) ?: UNKNOWN
         fun getByName(name: String) = getByNameOrNull(name) ?: error("IslandType not found: '$name'")
 

@@ -11,6 +11,7 @@ enum class Relay(
     val island: IslandType,
     chatMessage: String,
 ) {
+
     RELAY_1(
         "1st Relay", LorenzVec(143.5, 108.0, 93.0), IslandType.HUB,
         "§e[NPC] §dTia the Fairy§f: §b✆ §f§r§fThe first relay is on a branch of the large tree on the north-east of the fairy pond."
@@ -48,6 +49,10 @@ enum class Relay(
         "§e[NPC] §dTia the Fairy§f: §b✆ §f§r§fThe next relay is on top of the Auction House."
     );
 
-    val chatPattern by RepoPattern.pattern("relay.chat." + relayName.takeWhile { it != ' ' }, chatMessage)
+    val chatPattern by RepoPattern.pattern(
+        "relay.chat." + relayName.takeWhile { it != ' ' },
+        chatMessage
+    )
+
     fun checkChatMessage(string: String) = chatPattern.matches(string)
 }

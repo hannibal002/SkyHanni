@@ -6,10 +6,11 @@ import at.hannibal2.skyhanni.events.DebugDataCollectEvent
 import at.hannibal2.skyhanni.events.LorenzChatEvent
 import at.hannibal2.skyhanni.events.LorenzKeyPressEvent
 import at.hannibal2.skyhanni.events.LorenzWorldChangeEvent
+import at.hannibal2.skyhanni.utils.ChatUtils
+import at.hannibal2.skyhanni.utils.CollectionUtils.sorted
 import at.hannibal2.skyhanni.utils.LocationUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils.round
-import at.hannibal2.skyhanni.utils.LorenzUtils.sorted
 import at.hannibal2.skyhanni.utils.LorenzVec
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import net.minecraft.client.Minecraft
@@ -32,7 +33,7 @@ class BurrowWarpHelper {
         currentWarp?.let {
             if (lastWarpTime.passedSince() > 5.seconds) {
                 lastWarpTime = SimpleTimeMark.now()
-                LorenzUtils.sendCommandToServer("warp " + currentWarp?.name)
+                ChatUtils.sendCommandToServer("warp " + currentWarp?.name)
                 lastWarp = currentWarp
                 GriffinBurrowHelper.lastTitleSentTime = SimpleTimeMark.now() + 2.seconds
                 TitleManager.optionalResetTitle {
@@ -50,8 +51,8 @@ class BurrowWarpHelper {
             if (lastWarpTime.passedSince() < 1.seconds) {
                 lastWarp?.let {
                     it.unlocked = false
-                    LorenzUtils.chat("Detected not having access to warp point §b${it.displayName}§e!")
-                    LorenzUtils.chat("Use §c/shresetburrowwarps §eonce you have activated this travel scroll.")
+                    ChatUtils.chat("Detected not having access to warp point §b${it.displayName}§e!")
+                    ChatUtils.chat("Use §c/shresetburrowwarps §eonce you have activated this travel scroll.")
                     lastWarp = null
                     currentWarp = null
                 }
@@ -89,6 +90,7 @@ class BurrowWarpHelper {
     }
 
     companion object {
+
         private val config get() = SkyHanniMod.feature.event.diana
         var currentWarp: WarpPoint? = null
 
@@ -116,7 +118,7 @@ class BurrowWarpHelper {
 
         fun resetDisabledWarps() {
             WarpPoint.entries.forEach { it.unlocked = true }
-            LorenzUtils.chat("Reset disabled burrow warps.")
+            ChatUtils.chat("Reset disabled burrow warps.")
         }
     }
 
@@ -127,6 +129,7 @@ class BurrowWarpHelper {
         val ignored: () -> Boolean = { false },
         var unlocked: Boolean = true,
     ) {
+
         HUB("Hub", LorenzVec(-3, 70, -70), 2),
         CASTLE("Castle", LorenzVec(-250, 130, 45), 10),
         CRYPT("Crypt", LorenzVec(-190, 74, -88), 15, { config.ignoredWarps.crypt }),

@@ -55,7 +55,7 @@ public class ChestValueConfig {
 
     @Expose
     @ConfigOption(name = "Sorting Type", desc = "Price sorting type.")
-    @ConfigEditorDropdown()
+    @ConfigEditorDropdown
     public SortingTypeEntry sortingType = SortingTypeEntry.DESCENDING;
 
     public enum SortingTypeEntry implements HasLegacyId {
@@ -88,7 +88,7 @@ public class ChestValueConfig {
 
     @Expose
     @ConfigOption(name = "Value formatting Type", desc = "Format of the price.")
-    @ConfigEditorDropdown()
+    @ConfigEditorDropdown
     public NumberFormatEntry formatType = NumberFormatEntry.SHORT;
 
     public enum NumberFormatEntry implements HasLegacyId {

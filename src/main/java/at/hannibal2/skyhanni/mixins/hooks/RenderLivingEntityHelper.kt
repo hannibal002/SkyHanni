@@ -19,6 +19,7 @@ class RenderLivingEntityHelper {
     }
 
     companion object {
+
         private val entityColorMap = mutableMapOf<EntityLivingBase, Int>()
         private val entityColorCondition = mutableMapOf<EntityLivingBase, () -> Boolean>()
 
@@ -49,7 +50,7 @@ class RenderLivingEntityHelper {
                 }
             }
 
-            //TODO remove event
+            // TODO remove event
             if (!SkyHanniDebugsAndTests.globalRender) return 0
             val event = RenderMobColoredEvent(entity, 0)
             event.postAndCatch()
@@ -65,7 +66,7 @@ class RenderLivingEntityHelper {
                 }
             }
 
-            //TODO remove event
+            // TODO remove event
             val event = ResetEntityHurtEvent(entity, false)
             event.postAndCatch()
             return if (event.shouldReset) 0 else entity.hurtTime
