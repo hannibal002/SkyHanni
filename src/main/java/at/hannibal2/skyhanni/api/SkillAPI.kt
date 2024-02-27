@@ -108,8 +108,8 @@ object SkillAPI {
 
 
                 if (skillType.timer == null) {
-                    skillType.timer = runTimer(skillType, skillXp)
                     skillXp.shouldStartTimer = false
+                    skillType.timer = runTimer(skillType, skillXp)
                 }
                 SkillProgress.updateDisplay()
                 SkillProgress.hideInActionBar = listOf(component)
