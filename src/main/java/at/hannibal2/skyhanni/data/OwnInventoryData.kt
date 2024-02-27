@@ -18,6 +18,7 @@ import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraft.client.Minecraft
+import net.minecraft.network.play.client.C0EPacketClickWindow
 import net.minecraft.network.play.server.S0DPacketCollectItem
 import net.minecraft.network.play.server.S2FPacketSetSlot
 import net.minecraftforge.fml.common.eventhandler.EventPriority
@@ -50,6 +51,16 @@ class OwnInventoryData {
                     OwnInventoryItemUpdateEvent(item).postAndCatch()
                 }
             }
+        }
+    }
+
+    @SubscribeEvent
+    fun onClickEntity(event: PacketEvent.SendEvent) {
+        if (!LorenzUtils.inSkyBlock) return
+        val packet = event.packet
+
+        if (packet is C0EPacketClickWindow) {
+            dirty = true
         }
     }
 
