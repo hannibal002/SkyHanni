@@ -6,19 +6,13 @@ import at.hannibal2.skyhanni.events.InventoryCloseEvent
 import at.hannibal2.skyhanni.events.InventoryFullyOpenedEvent
 import at.hannibal2.skyhanni.features.garden.visitor.VisitorAPI
 import at.hannibal2.skyhanni.test.command.ErrorManager
-import at.hannibal2.skyhanni.utils.ChatUtils
+import at.hannibal2.skyhanni.utils.*
 import at.hannibal2.skyhanni.utils.CollectionUtils.addAsSingletonList
-import at.hannibal2.skyhanni.utils.InventoryUtils
-import at.hannibal2.skyhanni.utils.ItemUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.ItemUtils.nameWithEnchantment
-import at.hannibal2.skyhanni.utils.LorenzUtils
-import at.hannibal2.skyhanni.utils.NEUInternalName
 import at.hannibal2.skyhanni.utils.NEUInternalName.Companion.asInternalName
-import at.hannibal2.skyhanni.utils.NEUItems
 import at.hannibal2.skyhanni.utils.NEUItems.getPrice
-import at.hannibal2.skyhanni.utils.NumberUtil
 import at.hannibal2.skyhanni.utils.RenderUtils.renderStringsAndItems
 import net.minecraft.item.ItemStack
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
@@ -39,6 +33,22 @@ class AnitaMedalProfit {
         BRONZE("§cBronze medal", 1),
         ;
     }
+
+    private val farmingToolIDs = arrayOf(
+        "MELON".asInternalName() to "MELON_DICER".asInternalName(),
+        "PUMPKIN".asInternalName() to "PUMPKIN_DICER".asInternalName(),
+        "CACTUS".asInternalName() to "CACTUS_KNIFE".asInternalName(),
+        "INK_SACK-3".asInternalName() to "COCO_CHOPPER".asInternalName(),
+        "HUGE_MUSHROOM_2".asInternalName() to "FUNGI_CUTTER".asInternalName()
+    )
+
+    private val farmingToolNames = arrayOf(
+        "§fMelon" to "§5Melon Dicer",
+        "§fPumpkin" to "§5Pumpkin Dicer",
+        "§fCactus" to "§5Cactus Knife",
+        "§fCocoa Beans" to "§5Cocoa Chopper",
+        "§fRed Mushroom Block" to "§5Fungi Cutter"
+    )
 
     private fun getMedal(name: String) = MedalType.entries.firstOrNull { it.displayName == name }
 
@@ -76,7 +86,7 @@ class AnitaMedalProfit {
     }
 
     private fun readItem(item: ItemStack, table: MutableMap<Pair<String, String>, Pair<Double, NEUInternalName>>) {
-        val itemName = item.nameWithEnchantment ?: return
+        var itemName = item.nameWithEnchantment ?: return
         if (itemName == " ") return
         if (itemName == "§cClose") return
         if (itemName == "§eUnique Gold Medals") return
@@ -87,7 +97,14 @@ class AnitaMedalProfit {
 
         val (name, amount) = ItemUtils.readItemAmount(itemName) ?: return
 
-        var internalName = NEUItems.getInternalNameOrNull(name)
+        var internalName: NEUInternalName? = null
+        for ((wrongName, correctName) in farmingToolIDs) {
+            if (wrongName == NEUItems.getInternalNameOrNull(name)) internalName = correctName
+        }
+        for ((wrongName, correctName) in farmingToolNames) {
+            if (itemName == wrongName) itemName = correctName
+        }
+
         if (internalName == null) {
             internalName = item.getInternalName()
         }
