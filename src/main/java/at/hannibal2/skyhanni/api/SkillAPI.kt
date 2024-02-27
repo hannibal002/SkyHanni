@@ -36,7 +36,6 @@ import io.github.moulberry.notenoughupdates.util.Utils
 import net.minecraft.command.CommandBase
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import java.util.LinkedList
-import java.util.Timer
 import java.util.regex.Matcher
 import kotlin.concurrent.fixedRateTimer
 import kotlin.time.Duration.Companion.seconds
@@ -81,6 +80,33 @@ object SkillAPI {
     var showDisplay = false
     var lastUpdate = SimpleTimeMark.farPast()
 
+    init {
+        fixedRateTimer(name = "skyhanni-skillprogress-timer", initialDelay = 1_000L, period = 1_000L) {
+            tickSkill()
+        }
+    }
+
+    private fun tickSkill() {
+        val activeSkill = activeSkill ?: return
+        val info = skillXPInfoMap[activeSkill] ?: return
+        if (!info.sessionTimerActive) return
+
+        val time = when (activeSkill) {
+            SkillType.FARMING -> SkillProgress.etaConfig.farmingPauseTime
+            SkillType.MINING -> SkillProgress.etaConfig.miningPauseTime
+            SkillType.COMBAT -> SkillProgress.etaConfig.combatPauseTime
+            SkillType.FORAGING -> SkillProgress.etaConfig.foragingPauseTime
+            SkillType.FISHING -> SkillProgress.etaConfig.fishingPauseTime
+            else -> 0
+        }
+        if (info.lastUpdate.passedSince() > time.seconds) {
+            info.sessionTimerActive = false
+        }
+        if (info.sessionTimerActive) {
+            info.timeActive++
+        }
+    }
+
     @SubscribeEvent
     fun onActionBar(event: ActionBarUpdateEvent) {
         val actionBar = event.actionBar.removeColor()
@@ -105,12 +131,6 @@ object SkillAPI {
                 lastUpdate = SimpleTimeMark.now()
                 skillXp.lastUpdate = SimpleTimeMark.now()
                 skillXp.sessionTimerActive = true
-
-
-                if (skillType.timer == null) {
-                    skillXp.shouldStartTimer = false
-                    skillType.timer = runTimer(skillType, skillXp)
-                }
                 SkillProgress.updateDisplay()
                 SkillProgress.hideInActionBar = listOf(component)
                 return
@@ -244,26 +264,6 @@ object SkillAPI {
         add("-  OverflowTotalXp: ${skillInfo.overflowTotalXp}")
         add("-  CustomGoalLevel: ${skillInfo.customGoalLevel}\n")
     }
-
-    // TODO only use one statuc timer for the whole feature. this timer just ticks the currently active skill.
-    private fun runTimer(skillType: SkillType, info: SkillXPInfo): Timer =
-        fixedRateTimer(name = "skyhanni-skillprogress-timer-${skillType.displayName}", initialDelay = 1_000L, period = 1_000L) {
-            if (info.shouldStartTimer) cancel()
-            val time = when (activeSkill) {
-                SkillType.FARMING -> SkillProgress.etaConfig.farmingPauseTime
-                SkillType.MINING -> SkillProgress.etaConfig.miningPauseTime
-                SkillType.COMBAT -> SkillProgress.etaConfig.combatPauseTime
-                SkillType.FORAGING -> SkillProgress.etaConfig.foragingPauseTime
-                SkillType.FISHING -> SkillProgress.etaConfig.fishingPauseTime
-                else -> 0
-            }
-            if (info.lastUpdate.passedSince() > time.seconds) {
-                info.sessionTimerActive = false
-            }
-            if (info.sessionTimerActive) {
-                info.timeActive++
-            }
-        }
 
     private fun handleSkillPattern(matcher: Matcher, skillType: SkillType, skillInfo: SkillInfo) {
         val currentXp = matcher.group("current").formatNumber()
@@ -486,7 +486,7 @@ object SkillAPI {
     private fun commandHelp() {
         ChatUtils.chat(
             listOf(
-                "§6/shskills levelwithxp <currentXP> - §bGet a level with the given current XP.",
+                "§6/shskills levelwithxp <xp> - §bGet a level with the given current XP.",
                 "§6/shskills xpforlevel <desiredLevel> - §bGet how much XP you need for a desired level.",
                 "§6/shskills goal - §bView your current goal",
                 "§6/shskills goal <skill> <level> - §bDefine your goal for <skill>",
