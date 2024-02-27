@@ -42,6 +42,7 @@ object TabListRenderer {
     private var isPressed = false
     private var isTabToggled = false
 
+    // compact scoreboard should render above other SkyHanni GUIs when toggle tab is in use.
     @SubscribeEvent(priority = EventPriority.LOW)
     fun onRenderOverlay(event: GuiRenderEvent.GuiOverlayRenderEvent) {
         if (!LorenzUtils.inSkyBlock) return
