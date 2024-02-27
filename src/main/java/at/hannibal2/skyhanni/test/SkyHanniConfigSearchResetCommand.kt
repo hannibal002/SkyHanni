@@ -58,7 +58,10 @@ object SkyHanniConfigSearchResetCommand {
             field.set(parent, defaultObject)
             return "§eSuccessfully reset config element '$term'"
         } catch (e: Throwable) {
-            ErrorManager.logError(e, "Could not reset config element '$term'")
+            ErrorManager.logErrorWithData(
+                e, "Could not reset config element",
+                "term" to term
+            )
             return "§cCould not reset config element '$term'"
         }
     }
@@ -69,7 +72,7 @@ object SkyHanniConfigSearchResetCommand {
         return try {
             startSearch(args)
         } catch (e: Exception) {
-            ErrorManager.logError(e, "Error while trying to search config")
+            ErrorManager.logErrorWithData(e, "Error while trying to search config")
             "§cError while trying to search config"
         }
     }
@@ -109,7 +112,11 @@ object SkyHanniConfigSearchResetCommand {
             shimmy.setJson(element)
             "§eChanged config element $term."
         } catch (e: Exception) {
-            ErrorManager.logError(e, "Could not change config element '$term' to '$rawJson'")
+            ErrorManager.logErrorWithData(
+                e, "Could not change config element",
+                "term" to term,
+                "rawJson" to rawJson
+                )
             "§cCould not change config element '$term' to '$rawJson'"
         }
     }

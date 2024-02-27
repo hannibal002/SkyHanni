@@ -587,8 +587,8 @@ open class VisualWordGui : GuiScreen() {
                 SkyHanniMod.feature.storage.visualWordsImported = true
                 drawImport = false
             }
-        } catch (t: Throwable) {
-            ErrorManager.logError(t, "Failed to load visual words from SBE")
+        } catch (e: Throwable) {
+            ErrorManager.logErrorWithData(e, "Failed to load visual words from SBE")
         }
     }
 

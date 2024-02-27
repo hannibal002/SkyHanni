@@ -13,11 +13,14 @@ object OSUtils {
             try {
                 Desktop.getDesktop().browse(URI(url))
             } catch (e: IOException) {
-                ErrorManager.logError(e, "Error opening website: $url")
+                ErrorManager.logErrorWithData(
+                    e, "Error while opening website.",
+                    "url" to url
+                )
             }
         } else {
             copyToClipboard(url)
-            ChatUtils.error("Web browser is not supported! Copied url to clipboard.")
+            ErrorManager.skyHanniError("Cannot open website, web browser is not supported! Copied url to clipboard.")
         }
     }
 

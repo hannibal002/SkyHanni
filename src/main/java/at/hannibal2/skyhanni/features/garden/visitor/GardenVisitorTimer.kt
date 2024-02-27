@@ -70,7 +70,7 @@ class GardenVisitorTimer {
             try {
                 updateVisitorDisplay()
             } catch (error: Throwable) {
-                ErrorManager.logError(error, "Encountered an error when updating visitor display")
+                ErrorManager.logErrorWithData(error, "Encountered an error when updating visitor display")
             }
             try {
                 GardenVisitorDropStatistics.saveAndUpdate()
