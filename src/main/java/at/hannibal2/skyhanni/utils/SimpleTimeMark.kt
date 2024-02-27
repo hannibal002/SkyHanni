@@ -40,6 +40,8 @@ value class SimpleTimeMark(private val millis: Long) : Comparable<SimpleTimeMark
         fun now() = SimpleTimeMark(System.currentTimeMillis())
         fun farPast() = SimpleTimeMark(0)
 
+        fun farFuture() = SimpleTimeMark(Long.MAX_VALUE)
+
         fun future(duration: Duration) = SimpleTimeMark.now().plus(duration)
 
         fun Long.asTimeMark() = SimpleTimeMark(this)

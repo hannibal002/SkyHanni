@@ -4,7 +4,8 @@ import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.LorenzTickEvent
 import at.hannibal2.skyhanni.events.PlaySoundEvent
-import at.hannibal2.skyhanni.utils.LorenzUtils
+import at.hannibal2.skyhanni.utils.ChatUtils
+import at.hannibal2.skyhanni.utils.NumberUtil.isInt
 import at.hannibal2.skyhanni.utils.OSUtils
 import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderables
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
@@ -28,22 +29,28 @@ object TrackSoundsCommand {
     fun command(args: Array<String>) {
         if (args.firstOrNull() == "end") {
             if (!isRecording) {
-                LorenzUtils.userError("Nothing to end")
+                ChatUtils.userError("Nothing to end")
             } else {
                 cutOfTime = SimpleTimeMark.now()
             }
             return
         }
         if (isRecording) {
-            LorenzUtils.userError("Still tracking sounds, wait for the other tracking to complete before starting a new one or type in \"end\" to end it prematurely")
+            ChatUtils.userError("Still tracking sounds, wait for the other tracking to complete before starting a new one or type in \"end\" to end it prematurely")
             return
         }
         isRecording = true
         sounds.clear()
-        val duration = args.firstOrNull()?.toInt()?.seconds ?: 5.0.seconds
-        LorenzUtils.chat("Now started tracking sounds for ${duration.inWholeSeconds} Seconds")
+        val duration: Duration?
+        if (args.firstOrNull()?.isInt() != true) {
+            duration = null
+            ChatUtils.chat("Now started tracking sounds until manually ended")
+        } else {
+            duration = args.firstOrNull()?.toInt()?.seconds
+            ChatUtils.chat("Now started tracking sounds for ${duration?.inWholeSeconds} Seconds")
+        }
         startTime = SimpleTimeMark.now()
-        cutOfTime = SimpleTimeMark.future(duration)
+        cutOfTime = duration?.let { SimpleTimeMark.future(it) } ?: SimpleTimeMark.farFuture()
     }
 
     @SubscribeEvent
@@ -54,7 +61,7 @@ object TrackSoundsCommand {
         val string = sounds.reversed().joinToString("\n") { "Time: ${it.first.inWholeMilliseconds}  ${it.second}" }
         val counter = sounds.size
         OSUtils.copyToClipboard(string)
-        LorenzUtils.chat("$counter sounds copied into the clipboard!")
+        ChatUtils.chat("$counter sounds copied into the clipboard!")
         sounds.clear()
         isRecording = false
     }
@@ -73,7 +80,7 @@ object TrackSoundsCommand {
         if (cutOfTime.isInPast()) return
         val list = sounds.takeWhile { startTime.passedSince() - it.first < 3.0.seconds }
             .take(10).reversed().map {
-                Renderable.string("§6" + it.second.soundName + " p:" + it.second.pitch + " v:" + it.second.volume)
+                Renderable.string("§3" + it.second.soundName + " §8p:" + it.second.pitch + " §7v:" + it.second.volume)
             }
         position.renderRenderables(list, posLabel = "Track sound log")
     }
