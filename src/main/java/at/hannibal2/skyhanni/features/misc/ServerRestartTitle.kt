@@ -36,7 +36,7 @@ class ServerRestartTitle {
         if (!event.repeatSeconds(1)) return
 
         for (line in ScoreboardData.sidebarLinesFormatted) {
-            restartPattern.matchMatcher(line) {
+            restartingPattern.matchMatcher(line) {
                 try {
                     val minutes = group("minutes").toInt().minutes
                     val seconds = group("seconds").toInt().seconds
@@ -48,7 +48,7 @@ class ServerRestartTitle {
                     ErrorManager.logErrorWithData(
                         e, "Error reading server restart time from scoreboard",
                         "line" to line,
-                        "restartPattern" to restartPattern.pattern(),
+                        "restartPattern" to restartingPattern.pattern(),
                     )
                 }
             }
