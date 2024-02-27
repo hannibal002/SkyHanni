@@ -2,8 +2,10 @@ package at.hannibal2.skyhanni.config.features.skillprogress;
 
 import com.google.gson.annotations.Expose;
 import io.github.moulberry.moulconfig.annotations.ConfigEditorBoolean;
+import io.github.moulberry.moulconfig.annotations.ConfigEditorKeybind;
 import io.github.moulberry.moulconfig.annotations.ConfigOption;
 import io.github.moulberry.moulconfig.observer.Property;
+import org.lwjgl.input.Keyboard;
 
 public class SkillOverflowConfig {
 
@@ -42,5 +44,13 @@ public class SkillOverflowConfig {
     @ConfigEditorBoolean
     public boolean enableInChat = false;
 
+    @Expose
+    @ConfigOption(name = "Skill Avg" , desc = "Enable the overflow calculation for the skill average in SkyBlock and Your Skills menu.")
+    @ConfigEditorBoolean
+    public boolean enableSkillAvg = false;
 
+    @Expose
+    @ConfigOption(name = "Avg Key", desc = "Press this key in the SkyBlock/Your Skills menu while hovering the Avg. item to show more info.")
+    @ConfigEditorKeybind(defaultKey = Keyboard.KEY_NONE)
+    public int showAvgInfoKey = Keyboard.KEY_NONE;
 }

@@ -377,7 +377,6 @@ object SkillProgress {
         if (targetLevel in 51 .. 59) have += SkillUtil.xpRequiredForLevel(50.0)
         else if (targetLevel > 60) have += SkillUtil.xpRequiredForLevel(60.0)
 
-
         val (level, currentXp, currentXpMax, _) =
             if (useCustomGoalLevel && customGoalConfig.enableInDisplay)
                 Quad(currentLevel, have, need, xp)
