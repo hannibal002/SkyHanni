@@ -485,7 +485,7 @@ object SkillAPI {
     private fun commandHelp() {
         ChatUtils.chat(
             listOf(
-                "§6/shskills levelwithxp <currentXP> - §bGet a level with the given current XP.",
+                "§6/shskills levelwithxp <xp> - §bGet a level with the given current XP.",
                 "§6/shskills xpforlevel <desiredLevel> - §bGet how much XP you need for a desired level.",
                 "§6/shskills goal - §bView your current goal",
                 "§6/shskills goal <skill> <level> - §bDefine your goal for <skill>",
