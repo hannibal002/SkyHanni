@@ -91,12 +91,13 @@ object MobFactories {
             )
         }
 
-    fun displayNPC(baseEntity: EntityLivingBase, armorStand: EntityArmorStand): Mob =
+    fun displayNPC(baseEntity: EntityLivingBase, armorStand: EntityArmorStand, clickArmorStand: EntityArmorStand): Mob =
         Mob(
             baseEntity = baseEntity,
             mobType = Mob.Type.DisplayNPC,
             armorStand = armorStand,
-            name = armorStand.cleanName()
+            name = armorStand.cleanName(),
+            additionalEntities = listOf(clickArmorStand)
         )
 
     fun player(baseEntity: EntityLivingBase): Mob = Mob(baseEntity, Mob.Type.Player, name = baseEntity.name)

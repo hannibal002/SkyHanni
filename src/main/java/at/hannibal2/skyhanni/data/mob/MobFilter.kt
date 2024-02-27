@@ -103,6 +103,12 @@ object MobFilter {
         "anrrtqytsl", // Weaponsmith
     )
 
+    private val displayNPCCompressedNamePattern by repoGroup.pattern("displaynpc.name", "[a-z0-9]{10}")
+
+    private fun displayNPCNameCheck(name: String) = name.startsWith('§')
+        || displayNPCCompressedNamePattern.matches(name)
+        || extraDisplayNPCByName.contains(name)
+
     private val listOfClickArmorStand = setOf(
         "§e§lCLICK",
         "§6§lSEASONAL SKINS",
@@ -123,23 +129,20 @@ object MobFilter {
 
     fun EntityPlayer.isRealPlayer() = uniqueID != null && uniqueID.version() == 4
 
-    fun EntityLivingBase.isDisplayNPC() = (this is EntityPlayer && isNPC() && when {
-        this.name.startsWith('§') -> true
-        this.name.any { it in '0'..'9' } -> true
-        extraDisplayNPCByName.contains(this.name) -> true
-        else -> false
-    }) || (this is EntityVillager && this.maxHealth == 20.0f) // Villager NPCs in the Village
+    fun EntityLivingBase.isDisplayNPC() = (this is EntityPlayer && isNPC() && displayNPCNameCheck(this.name))
+        || (this is EntityVillager && this.maxHealth == 20.0f) // Villager NPCs in the Village
         || (this is EntityWitch && this.entityId <= 500) // Alchemist NPC
         || (this is EntityCow && this.entityId <= 500) // Shania NPC (in Rift and Outside)
         || (this is EntitySnowman && this.entityId <= 500) // Sherry NPC (in Jerry Island)
 
-    internal fun createDisplayNPC(entity: EntityLivingBase): Boolean =
-        MobUtils.getArmorStandByRangeAll(entity, 1.5).firstOrNull { armorStand ->
+    internal fun createDisplayNPC(entity: EntityLivingBase): Boolean {
+        val clickArmorStand = MobUtils.getArmorStandByRangeAll(entity, 1.5).firstOrNull { armorStand ->
             listOfClickArmorStand.contains(armorStand.name)
-        }?.let { MobUtils.getArmorStand(it, -1) }?.let { armorStand ->
-            MobEvent.Spawn.DisplayNPC(MobFactories.displayNPC(entity, armorStand)).postAndCatch()
-            true
-        } ?: false
+        } ?: return false
+        val armorStand = MobUtils.getArmorStand(clickArmorStand, -1) ?: return false
+        MobEvent.Spawn.DisplayNPC(MobFactories.displayNPC(entity, armorStand, clickArmorStand)).postAndCatch()
+        return true
+    }
 
     /** baseEntity must have passed the .isSkyBlockMob() function */
     internal fun createSkyblockEntity(baseEntity: EntityLivingBase): MobResult {
