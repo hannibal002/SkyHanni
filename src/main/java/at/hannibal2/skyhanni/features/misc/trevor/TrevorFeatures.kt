@@ -58,6 +58,10 @@ object TrevorFeatures {
         "below",
         "The target is around (?<height>.*) blocks below, at a (?<angle>.*) degrees angle!"
     )
+    private val talbotPatternAt by patternGroup.pattern(
+        "at",
+        "You are at the exact height!",
+    )
     private val locationPattern by patternGroup.pattern(
         "zone",
         "Zone: (?<zone>.*)"
@@ -137,6 +141,11 @@ object TrevorFeatures {
         talbotPatternBelow.matchMatcher(formattedMessage) {
             val height = group("height").toInt()
             TrevorSolver.findMobHeight(height, false)
+        }
+        talbotPatternAt.matchMatcher(formattedMessage) {
+            val thePlayer = Minecraft.getMinecraft().thePlayer ?: return
+            val height = thePlayer.posY
+            TrevorSolver.averageHeight = height
         }
 
         if (formattedMessage == "[NPC] Trevor: You will have 10 minutes to find the mob from when you accept the task.") {

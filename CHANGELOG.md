@@ -150,6 +150,9 @@
 + Disabled Fishing Profit/SC Tracker in Kuudra. - CalMWolfs
 + Moved Sulphur Skitter Box from Crimson Isle to Fishing -> Trophy Fishing. - hannibal2
 + Fishing Profit Tracker now has better categories. - hannibal2 & Empa
++ No longer showing fishing trackers when holding a fishing rod in the hand. Only showing the trackers when truly
+  fishing. - hannibal2
++ Added option to only show the Geyser Box while holding a lava rod. - Obsidian
 
 #### Mining Changes
 
@@ -191,6 +194,7 @@
     + Now it correctly hides burrow waypoints when the "focus" mode is enabled.
     + Shows a pink line to the shared location.
     + Support for the nearest warp feature.
++ Changed the Diana Guess Waypoint word color to only be in blue when actually warping to the nearest warp. - hannibal2
 
 #### Chat Changes
 
@@ -235,6 +239,7 @@
 + Hovering on cheap items in an Item Tracker now shows the hidden items. - Mikecraft1224
 + Added shader reload capabilities for chroma resource packs. - nea
 + Added option to only show Ender Node tracker while holding a pickaxe. - Thunderblade73
++ Matched XP/h timer with the session timer in the skill ETA display. - HiZe
 
 ### Fixes
 
@@ -260,6 +265,7 @@
 + Fixed mouse rotation unlocks after doing /warp garden with Sensitivity Reducer on. - martimavocado
 + Fixed wording of composter fuel warning. - alexia
 + Fixed Garden plot menu icon edit mode copies stack size. - hannibal2
++ Fixed the wrong color code on the visitor shopping list sacks number line. - hannibal2
 
 #### Combat Fixes
 
@@ -292,6 +298,7 @@
 + Fixed a rare bug that leaves ghost burrows around. - hannibal2
 + Properly deleting Diana target markers when manually clearing griffin burrows by talking to Diana NPC. - hannibal2
 + Properly resetting internal Diana data on clearing waypoints via NPC. - hannibal2
++ Fixed the missing color code in the inquisitor deletion message. - jani
 
 #### Mining Fixes
 
@@ -318,6 +325,10 @@
 + Fixed adding drops to Fishing Profit Tracker while not actually fishing. - hannibal2
     + This fixes red mushroom picking up with Mooshroom Cow pet while farming.
     + This does not fix wrongfully adding drops while moving items in inventory.
++ Fixed fishing trackers appearing when rod swapping. - hannibal2
++ Fixed fishing bait change spam. - hannibal2
++ Fixed no bait warning appearing at the wrong moment or not appearing at all. - hannibal2
++ Fixed Crimson Isle Fishing Geyser Box showing even when very far away. - Obsidian
 
 #### Invenory Fixes
 
@@ -359,6 +370,8 @@
 + Fixed parts of Compact Tab List being uncoloured. - CalMWolfs
 + Fixed Compact Tab List' Toggle Tab not working when using patcher. - hannibal2
 + Fixed Skill progress display size too small when not using the progress bar. - Thunderblade73
++ Fixed the skill progress bar trying to get out of the screen. - HiZe
++ Fixed the negative time remaining in the skill ETA display. - HiZe
 
 #### Winter Fixes
 
@@ -372,6 +385,7 @@
 + Fixed open bazaar command sending color code as well. - Thunderblade73
 + Fixed /gfs not working with spaces in item name. - Thunderblade73
 + Fixed multiple edge cases with /gfs. - Thunderblade73
++ Fixed commands /shskill levelwithxp/xpforlevel. - HiZe
 
 #### Config Fixes
 
@@ -394,6 +408,9 @@
 + Fixed ender bow ability time (30s -> 5s). - hannibal2
 + Reputation Helper now shows Kuudra Runs for barbarian faction as well. - hannibal2
     + Daily Kuudra reputation also works for barbarian faction, not only mage.
++ Fixed item trackers duplicating items when taking items out of storage or chest. - hannibal2
++ Fixed current mayor is taking 20 minutes to get loaded. - Empa
+    + This fixes active Diana detection not working, making the workaround (/sh always diana) unnecessary.
 
 ### Technical Changes
 
@@ -492,6 +509,11 @@
 + /gfs tab complete now uses NEU's Repo instead of SkyHanni Repo. - CalMWolfs
 + Creating NeuRepositoryReloadEvent as wrapper for less confusion. - CalMWolfs
 + Made ErrorManager compact stack trace even more compacter. - hannibal2
++ Added holdingLavaRod and holdingWaterRod in FishingAPI. - Obsidian
++ Fixed HighlightMissingRepoItems. - CalMWolfs
++ Added String.formatLongOrUserError(). - hannibal2
++ Use duration for time in ServerRestartTitle. - hannibal2
++ Added error handling for ServerRestartTitle problems. - hannibal2
 
 ## Version 0.22
 
