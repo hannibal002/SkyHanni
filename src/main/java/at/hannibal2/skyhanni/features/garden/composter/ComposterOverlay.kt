@@ -13,6 +13,7 @@ import at.hannibal2.skyhanni.events.InventoryCloseEvent
 import at.hannibal2.skyhanni.events.InventoryFullyOpenedEvent
 import at.hannibal2.skyhanni.events.LorenzTickEvent
 import at.hannibal2.skyhanni.events.LorenzToolTipEvent
+import at.hannibal2.skyhanni.events.NeuRepositoryReloadEvent
 import at.hannibal2.skyhanni.events.RepositoryReloadEvent
 import at.hannibal2.skyhanni.events.TabListUpdateEvent
 import at.hannibal2.skyhanni.features.bazaar.BazaarApi
@@ -489,7 +490,7 @@ object ComposterOverlay {
         val sackStatus = sackItem.getStatus()
 
         if (sackStatus == SackStatus.MISSING || sackStatus == SackStatus.OUTDATED) {
-            LorenzUtils.sendCommandToServer("gfs ${internalName.asString()} ${itemsNeeded - having}")
+            ChatUtils.sendCommandToServer("gfs ${internalName.asString()} ${itemsNeeded - having}")
             // TODO Add sack type repo data
 
             val isDwarvenMineable =
@@ -511,7 +512,7 @@ object ComposterOverlay {
             return
         }
 
-        LorenzUtils.sendCommandToServer("gfs ${internalName.asString()} ${itemsNeeded - having}")
+        ChatUtils.sendCommandToServer("gfs ${internalName.asString()} ${itemsNeeded - having}")
         if (amountInSacks <= itemsNeeded - having) {
             if (LorenzUtils.noTradeMode) {
                 ChatUtils.chat("You're out of $itemName §ein your sacks!")
@@ -533,7 +534,7 @@ object ComposterOverlay {
     }
 
     @SubscribeEvent
-    fun onRepoReload(event: io.github.moulberry.notenoughupdates.events.RepositoryReloadEvent) {
+    fun onNeuRepoReload(event: NeuRepositoryReloadEvent) {
         updateOrganicMatterFactors()
     }
 

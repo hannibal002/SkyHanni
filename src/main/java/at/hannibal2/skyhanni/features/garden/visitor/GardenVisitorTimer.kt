@@ -4,7 +4,7 @@ import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.events.CropClickEvent
 import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.LorenzWorldChangeEvent
-import at.hannibal2.skyhanni.events.PreProfileSwitchEvent
+import at.hannibal2.skyhanni.events.ProfileJoinEvent
 import at.hannibal2.skyhanni.events.garden.visitor.VisitorArrivalEvent
 import at.hannibal2.skyhanni.features.garden.GardenAPI
 import at.hannibal2.skyhanni.test.command.ErrorManager
@@ -18,6 +18,7 @@ import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.TabListData
 import at.hannibal2.skyhanni.utils.TimeUtils
 import at.hannibal2.skyhanni.utils.TimeUtils.format
+import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import kotlin.concurrent.fixedRateTimer
 import kotlin.time.Duration
@@ -30,7 +31,12 @@ import kotlin.time.toDuration
 class GardenVisitorTimer {
 
     private val config get() = GardenAPI.config.visitors.timer
-    private val pattern = "§b§lVisitors: §r§f\\((?<time>.*)\\)".toPattern()
+
+    private val timePattern by RepoPattern.pattern(
+        "garden.visitor.timer.time",
+        "§b§lVisitors: §r§f\\((?<time>.*)\\)"
+    )
+
     private var display = ""
     private var lastMillis = 0.seconds
     private var sixthVisitorArrivalTime = SimpleTimeMark.farPast()
@@ -74,7 +80,7 @@ class GardenVisitorTimer {
     }
 
     @SubscribeEvent
-    fun onPreProfileSwitch(event: PreProfileSwitchEvent) {
+    fun onProfileJoin(event: ProfileJoinEvent) {
         display = ""
         lastMillis = 0.seconds
         sixthVisitorArrivalTime = SimpleTimeMark.farPast()
@@ -99,7 +105,7 @@ class GardenVisitorTimer {
                 return
             }
 
-            pattern.matchMatcher(line) {
+            timePattern.matchMatcher(line) {
                 val rawTime = group("time").removeColor()
                 if (lastTimerValue != rawTime) {
                     lastTimerUpdate = SimpleTimeMark.now()

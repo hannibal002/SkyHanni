@@ -16,6 +16,8 @@ object LocationUtils {
 
     fun LorenzVec.distanceToPlayer() = distance(playerLocation())
 
+    fun LorenzVec.distanceToPlayerIgnoreY() = distanceIgnoreY(playerLocation())
+
     fun LorenzVec.distanceSqToPlayer() = distanceSq(playerLocation())
 
     fun LorenzVec.distanceToPlayerSqIgnoreY() = distanceSqIgnoreY(playerLocation())

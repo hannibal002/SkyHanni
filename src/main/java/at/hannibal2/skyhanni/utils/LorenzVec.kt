@@ -92,11 +92,18 @@ data class LorenzVec(
     fun minOfEachElement(other: LorenzVec) = LorenzVec(min(x, other.x), min(y, other.y), min(z, other.z))
     fun maxOfEachElement(other: LorenzVec) = LorenzVec(max(x, other.x), max(y, other.y), max(z, other.z))
 
-    fun printWithAccuracy(accuracy: Int): String {
-        val x = (round(x * accuracy) / accuracy)
-        val y = (round(y * accuracy) / accuracy)
-        val z = (round(z * accuracy) / accuracy)
-        return LorenzVec(x, y, z).toCleanString()
+    fun printWithAccuracy(accuracy: Int, splitChar: String = " "): String {
+        return if (accuracy == 0) {
+            val x = round(x).toInt()
+            val y = round(y).toInt()
+            val z = round(z).toInt()
+            "$x$splitChar$y$splitChar$z"
+        } else {
+            val x = (round(x * accuracy) / accuracy)
+            val y = (round(y * accuracy) / accuracy)
+            val z = (round(z * accuracy) / accuracy)
+            "$x$splitChar$y$splitChar$z"
+        }
     }
 
     private fun toCleanString(): String {
@@ -185,7 +192,7 @@ data class LorenzVec(
             return LorenzVec(x, z, y)
         }
 
-        // only for migration purposes
+        // Format: "x:y:z"
         fun decodeFromString(string: String): LorenzVec {
             val (x, y, z) = string.split(":").map { it.toDouble() }
             return LorenzVec(x, y, z)

@@ -41,13 +41,45 @@ object UtilsPatterns {
         "item.name.potion",
         ".*Potion"
     )
-    val petLevelPattern by patternGroup.pattern(
-        "item.petlevel",
-        "(?:§f§f)?§7\\[Lvl (?<level>\\d+)] .*"
+    val readAmountBeforePattern by patternGroup.pattern(
+        "item.amount.front",
+        "(?: *§8(\\+§\\w)?(?<amount>[\\d.km,]+)(x )?)?(?<name>.*)"
+    )
+    val readAmountAfterPattern by patternGroup.pattern(
+        "item.amount.behind",
+        "(?<name>(?:['\\w-]+ ?)+)(?:§8x(?<amount>[\\d,]+))?"
+    )
+
+    val timeAmountPattern by patternGroup.pattern(
+        "time.amount",
+        "(?:(?<y>\\d+) ?y(?:\\w* ?)?)?(?:(?<d>\\d+) ?d(?:\\w* ?)?)?(?:(?<h>\\d+) ?h(?:\\w* ?)?)?(?:(?<m>\\d+) ?m(?:\\w* ?)?)?(?:(?<s>\\d+) ?s(?:\\w* ?)?)?"
+    )
+
+    val playerChatPattern by patternGroup.pattern(
+        "string.playerchat",
+        "(?<important>.*?)(?:§[f7r])*: .*"
+    )
+    val chatUsernamePattern by patternGroup.pattern(
+        "string.chatusername",
+        "^(?:§\\w\\[§\\w\\d+§\\w] )?(?:(?:§\\w)+\\S )?(?<rankedName>(?:§\\w\\[\\w.+] )?(?:§\\w)?(?<username>\\w+))(?: (?:§\\w)?\\[.+?])?"
+    )
+    val isRomanPattern by RepoPattern.pattern(
+        "string.isroman",
+        "^M{0,3}(CM|CD|D?C{0,3})(XC|XL|L?X{0,3})(IX|IV|V?I{0,3})"
+    )
+
+    val sackPattern by patternGroup.pattern(
+        "item.sack",
+        ".*Sack"
     )
 
     val seasonPattern by patternGroup.pattern(
         "skyblocktime.season",
         "(?:Early |Late )?(?<season>Spring|Summer|Autumn|Winter)"
+    )
+
+    val tabListProfilePattern by patternGroup.pattern(
+        "tablist.profile",
+        "§.§lProfile: §r§a(?<profile>.*)"
     )
 }

@@ -3,17 +3,21 @@ package at.hannibal2.skyhanni.data
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.config.SackData
 import at.hannibal2.skyhanni.config.Storage
+import at.hannibal2.skyhanni.data.HypixelData
 import at.hannibal2.skyhanni.events.ConfigLoadEvent
 import at.hannibal2.skyhanni.events.HypixelJoinEvent
 import at.hannibal2.skyhanni.events.LorenzChatEvent
 import at.hannibal2.skyhanni.events.LorenzTickEvent
 import at.hannibal2.skyhanni.events.LorenzWorldChangeEvent
-import at.hannibal2.skyhanni.events.PreProfileSwitchEvent
 import at.hannibal2.skyhanni.events.ProfileJoinEvent
 import at.hannibal2.skyhanni.events.TabListUpdateEvent
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils
+import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
+import at.hannibal2.skyhanni.utils.UtilsPatterns
+import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
+import kotlin.time.Duration.Companion.seconds
 import net.minecraftforge.fml.common.eventhandler.EventPriority
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
@@ -22,43 +26,18 @@ object ProfileStorageData {
     var playerSpecific: Storage.PlayerSpecific? = null
     var profileSpecific: Storage.ProfileSpecific? = null
     var loaded = false
-    private var noTabListTime = -1L
+    private var noTabListTime = SimpleTimeMark.farPast()
 
     private var nextProfile: String? = null
 
-    // TODO USE SH-REPO
-    private val profileSwitchPattern = "§7Switching to profile (?<name>.*)\\.\\.\\.".toPattern()
+    private val patternGroup = RepoPattern.group("data.profile")
+    private val profileSwitchPattern by patternGroup.pattern(
+        "switch",
+        "§7Switching to profile (?<name>.*)\\.\\.\\."
+    )
 
     private var sackPlayers: SackData.PlayerSpecific? = null
     var sackProfiles: SackData.ProfileSpecific? = null
-
-    @SubscribeEvent(priority = EventPriority.HIGHEST)
-    fun onChat(event: LorenzChatEvent) {
-        profileSwitchPattern.matchMatcher(event.message) {
-            nextProfile = group("name").lowercase()
-            loaded = false
-            PreProfileSwitchEvent().postAndCatch()
-        }
-    }
-
-    @SubscribeEvent(priority = EventPriority.HIGHEST)
-    fun onWorldChange(event: LorenzWorldChangeEvent) {
-        val profileName = nextProfile ?: return
-        nextProfile = null
-
-        val playerSpecific = playerSpecific
-        val sackPlayers = sackPlayers
-        if (playerSpecific == null) {
-            ChatUtils.error("profileSpecific after profile swap can not be set: playerSpecific is null!")
-            return
-        }
-        if (sackPlayers == null) {
-            ChatUtils.error("sackPlayers after profile swap can not be set: sackPlayers is null!")
-            return
-        }
-        loadProfileSpecific(playerSpecific, sackPlayers, profileName)
-        ConfigLoadEvent().postAndCatch()
-    }
 
     @SubscribeEvent(priority = EventPriority.HIGHEST)
     fun onProfileJoin(event: ProfileJoinEvent) {
@@ -69,43 +48,36 @@ object ProfileStorageData {
             return
         }
         if (sackPlayers == null) {
-            ChatUtils.error("sackPlayers is null in sackPlayers!")
+            ChatUtils.error("sackPlayers is null in ProfileJoinEvent!")
             return
         }
 
-        if (profileSpecific == null) {
-            val profileName = event.name
-            loadProfileSpecific(playerSpecific, sackPlayers, profileName)
-        }
+        val profileName = event.name
+        loadProfileSpecific(playerSpecific, sackPlayers, profileName)
+        ConfigLoadEvent().postAndCatch()
     }
 
     @SubscribeEvent
     fun onTabListUpdate(event: TabListUpdateEvent) {
-        if (profileSpecific != null) return
-        val playerSpecific = playerSpecific ?: return
-        val sackPlayers = sackPlayers ?: return
+        if (!LorenzUtils.inSkyBlock) return
+
         for (line in event.tabList) {
-            val pattern = "§e§lProfile: §r§a(?<name>.*)".toPattern()
-            pattern.matchMatcher(line) {
-                val profileName = group("name").lowercase()
-                loadProfileSpecific(playerSpecific, sackPlayers, profileName)
-                nextProfile = null
+            UtilsPatterns.tabListProfilePattern.matchMatcher(line) {
+                noTabListTime = SimpleTimeMark.farPast()
                 return
             }
         }
 
-        if (LorenzUtils.inSkyBlock) {
-            noTabListTime = System.currentTimeMillis()
-        }
+        noTabListTime = SimpleTimeMark.now()
     }
 
     @SubscribeEvent
     fun onTick(event: LorenzTickEvent) {
         if (!LorenzUtils.inSkyBlock) return
-        if (noTabListTime == -1L) return
+        if (noTabListTime == SimpleTimeMark.farPast()) return
 
-        if (System.currentTimeMillis() > noTabListTime + 3_000) {
-            noTabListTime = System.currentTimeMillis()
+        if (noTabListTime.passedSince() > 3.seconds) {
+            noTabListTime = SimpleTimeMark.now()
             ChatUtils.chat(
                 "Extra Information from Tab list not found! " +
                     "Enable it: SkyBlock Menu ➜ Settings ➜ Personal ➜ User Interface ➜ Player List Info"
@@ -118,7 +90,7 @@ object ProfileStorageData {
         sackProfile: SackData.PlayerSpecific,
         profileName: String,
     ) {
-        noTabListTime = -1
+        noTabListTime = SimpleTimeMark.farPast()
         profileSpecific = playerSpecific.profiles.getOrPut(profileName) { Storage.ProfileSpecific() }
         sackProfiles = sackProfile.profiles.getOrPut(profileName) { SackData.ProfileSpecific() }
         loaded = true

@@ -5,6 +5,7 @@ import at.hannibal2.skyhanni.config.ConfigFileType
 import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.config.features.garden.NextJacobContestConfig.ShareContestsEntry
 import at.hannibal2.skyhanni.events.ConfigLoadEvent
+import at.hannibal2.skyhanni.events.DebugDataCollectEvent
 import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.InventoryCloseEvent
 import at.hannibal2.skyhanni.events.InventoryFullyOpenedEvent
@@ -21,12 +22,12 @@ import at.hannibal2.skyhanni.utils.RenderUtils.renderSingleLineWithItems
 import at.hannibal2.skyhanni.utils.RenderUtils.renderStrings
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.SimpleTimeMark.Companion.asTimeMark
-import at.hannibal2.skyhanni.utils.SimpleTimeMark.Companion.now
 import at.hannibal2.skyhanni.utils.SoundUtils
 import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.TabListData
 import at.hannibal2.skyhanni.utils.TimeUtils.format
+import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import com.google.gson.Gson
 import io.github.moulberry.notenoughupdates.util.SkyBlockTime
 import kotlinx.coroutines.Dispatchers
@@ -43,6 +44,7 @@ import javax.swing.JOptionPane
 import javax.swing.UIManager
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.days
+import kotlin.time.Duration.Companion.hours
 import kotlin.time.Duration.Companion.minutes
 import kotlin.time.Duration.Companion.seconds
 
@@ -54,9 +56,19 @@ object GardenNextJacobContest {
     var contests = mutableMapOf<SimpleTimeMark, FarmingContest>()
     private var inCalendar = false
 
-    private val patternDay = "§aDay (?<day>.*)".toPattern()
-    private val patternMonth = "(?<month>.*), Year (?<year>.*)".toPattern()
-    private val patternCrop = "§(e○|6☘) §7(?<crop>.*)".toPattern()
+    private val patternGroup = RepoPattern.group("garden.nextcontest")
+    private val dayPattern by patternGroup.pattern(
+        "day",
+        "§aDay (?<day>.*)"
+    )
+    private val monthPattern by patternGroup.pattern(
+        "month",
+        "(?<month>.*), Year (?<year>.*)"
+    )
+    private val cropPattern by patternGroup.pattern(
+        "crop",
+        "§(e○|6☘) §7(?<crop>.*)"
+    )
 
     private val closeToNewYear = "§7Close to new SB year!"
     private const val maxContestsPerYear = 124
@@ -70,6 +82,45 @@ object GardenNextJacobContest {
     var isFetchingContests = false
     var fetchedFromElite = false
     private var isSendingContests = false
+
+    @SubscribeEvent
+    fun onDebugDataCollect(event: DebugDataCollectEvent) {
+        event.title("Garden Next Jacob Contest")
+
+        if (!GardenAPI.inGarden()) {
+            event.addIrrelevant("not in garden")
+            return
+        }
+
+        event.addData {
+            add("Current time: ${SimpleTimeMark.now()}")
+            add("")
+
+            val display = display.filterIsInstance<String>().joinToString("")
+            add("Display: '$display'")
+            add("")
+
+            add("Contests:")
+            for (contest in contests) {
+                val time = contest.key
+                val passedSince = time.passedSince()
+                val timeUntil = time.timeUntil()
+                val farmingContest = contest.value
+                val crops = farmingContest.crops
+                val recently = 0.seconds..2.hours
+                if (passedSince in recently || timeUntil in recently) {
+                    add(" Time: $time")
+                    if (passedSince.isPositive()) {
+                        add("  Passed since: $passedSince")
+                    }
+                    if (timeUntil.isPositive()) {
+                        add("  Time until: $timeUntil")
+                    }
+                    add("  Crops: $crops")
+                }
+            }
+        }
+    }
 
     @SubscribeEvent
     fun onTabListUpdate(event: TabListUpdateEvent) {
@@ -140,7 +191,7 @@ object GardenNextJacobContest {
 
         inCalendar = true
 
-        patternMonth.matchMatcher(event.inventoryName) {
+        monthPattern.matchMatcher(event.inventoryName) {
             val month = LorenzUtils.getSBMonthByName(group("month"))
             val year = group("year").toInt()
 
@@ -175,13 +226,13 @@ object GardenNextJacobContest {
             if (!lore.any { it.contains("§6§eJacob's Farming Contest") }) continue
 
             val name = item.name ?: continue
-            val day = patternDay.matchMatcher(name) { group("day").toInt() } ?: continue
+            val day = dayPattern.matchMatcher(name) { group("day").toInt() } ?: continue
 
             val startTime = SkyBlockTime(year, month, day).asTimeMark()
 
             val crops = mutableListOf<CropType>()
             for (line in lore) {
-                patternCrop.matchMatcher(line) { crops.add(CropType.getByName(group("crop"))) }
+                cropPattern.matchMatcher(line) { crops.add(CropType.getByName(group("crop"))) }
             }
 
             contests[startTime] = FarmingContest(startTime + contestDuration, crops)
@@ -374,7 +425,7 @@ object GardenNextJacobContest {
         // Check that it only gets called once for the current event
         if (lastWarningTime.passedSince() < config.warnTime.seconds) return
 
-        lastWarningTime = now()
+        lastWarningTime = SimpleTimeMark.now()
         val cropText = crops.joinToString("§7, ") { (if (it == boostedCrop) "§6" else "§a") + it.cropName }
         ChatUtils.chat("Next farming contest: $cropText")
         LorenzUtils.sendTitle("§eFarming Contest!", 5.seconds)
@@ -583,3 +634,4 @@ object GardenNextJacobContest {
         }
     }
 }
+
