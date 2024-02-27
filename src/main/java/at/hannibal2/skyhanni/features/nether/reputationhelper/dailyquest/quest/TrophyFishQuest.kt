@@ -8,6 +8,6 @@ class TrophyFishQuest(
     location: LorenzVec?,
     displayItem: NEUInternalName,
     state: QuestState,
-    needAmount: Int
+    needAmount: Int,
 ) :
     ProgressQuest(displayItem, location, QuestCategory.FISHING, fishName, state, needAmount)

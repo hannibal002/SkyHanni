@@ -224,7 +224,7 @@ class DungeonChatFilter {
         }
     }
 
-    private fun String.isFiltered(key: MessageTypes) : Boolean {
+    private fun String.isFiltered(key: MessageTypes): Boolean {
         return config.dungeonFilteredMessageTypes.contains(key) && this.isPresent(key)
     }
 

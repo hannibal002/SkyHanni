@@ -3,8 +3,10 @@ package at.hannibal2.skyhanni.data.repo
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.config.ConfigManager
 import at.hannibal2.skyhanni.events.DebugDataCollectEvent
+import at.hannibal2.skyhanni.events.NeuRepositoryReloadEvent
 import at.hannibal2.skyhanni.events.RepositoryReloadEvent
 import at.hannibal2.skyhanni.test.command.ErrorManager
+import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import com.google.gson.JsonObject
@@ -26,6 +28,7 @@ import java.util.concurrent.atomic.AtomicBoolean
 import kotlin.time.Duration.Companion.minutes
 
 class RepoManager(private val configLocation: File) {
+
     private val gson get() = ConfigManager.gson
     private var latestRepoCommit: String? = null
     private val repoLocation: File = File(configLocation, "repo")
@@ -33,6 +36,7 @@ class RepoManager(private val configLocation: File) {
     private var lastRepoUpdate = SimpleTimeMark.farPast()
 
     companion object {
+
         val successfulConstants = mutableListOf<String>()
         val unsuccessfulConstants = mutableListOf<String>()
 
@@ -55,7 +59,7 @@ class RepoManager(private val configLocation: File) {
         }
     }
 
-    private val atomicShouldManuallyReload = AtomicBoolean(false)//TODO remove the workaround
+    private val atomicShouldManuallyReload = AtomicBoolean(false)// TODO remove the workaround
 
     fun updateRepo() {
         atomicShouldManuallyReload.set(true)
@@ -87,7 +91,7 @@ class RepoManager(private val configLocation: File) {
                 ) {
                     if (unsuccessfulConstants.isEmpty() && lastRepoUpdate.passedSince() < 1.minutes) {
                         if (command) {
-                            LorenzUtils.chat("§7The repo is already up to date!")
+                            ChatUtils.chat("§7The repo is already up to date!")
                             atomicShouldManuallyReload.set(false)
                         }
                         return@supplyAsync false
@@ -119,7 +123,7 @@ class RepoManager(private val configLocation: File) {
                         e
                     ).printStackTrace()
                     if (command) {
-                        LorenzUtils.error("An error occurred while trying to reload the repo! See logs for more info.")
+                        ChatUtils.error("An error occurred while trying to reload the repo! See logs for more info.")
                     }
                     return@supplyAsync false
                 }
@@ -161,10 +165,10 @@ class RepoManager(private val configLocation: File) {
             }
             comp.complete(null)
             if (answerMessage.isNotEmpty() && !error) {
-                LorenzUtils.chat("§a$answerMessage")
+                ChatUtils.chat("§a$answerMessage")
             }
             if (error) {
-                LorenzUtils.clickableChat(
+                ChatUtils.clickableChat(
                     "Error with the repo detected, try /shupdaterepo to fix it!",
                     "shupdaterepo",
                     prefixColor = "§c"
@@ -204,33 +208,34 @@ class RepoManager(private val configLocation: File) {
     fun displayRepoStatus(joinEvent: Boolean) {
         if (joinEvent) {
             if (unsuccessfulConstants.isNotEmpty()) {
-                LorenzUtils.error(
+                ChatUtils.error(
                     "§7Repo Issue! Some features may not work. Please report this error on the Discord!\n"
                         + "§7Repo Auto Update Value: §c${SkyHanniMod.feature.dev.repoAutoUpdate}\n"
                         + "§7If you have Repo Auto Update turned off, please try turning that on.\n"
                         + "§cUnsuccessful Constants §7(${unsuccessfulConstants.size}):"
                 )
                 for (constant in unsuccessfulConstants) {
-                    LorenzUtils.chat("   §e- §7$constant")
+                    ChatUtils.chat("   §e- §7$constant")
                 }
             }
             return
         }
         if (unsuccessfulConstants.isEmpty() && successfulConstants.isNotEmpty()) {
-            LorenzUtils.chat("Repo working fine! Commit hash: $latestRepoCommit", prefixColor = "§a")
+            ChatUtils.chat("Repo working fine! Commit hash: $latestRepoCommit", prefixColor = "§a")
             return
         }
-        LorenzUtils.chat("Repo has errors! Commit has: ${latestRepoCommit ?: "null"}", prefixColor = "§c")
+        ChatUtils.chat("Repo has errors! Commit has: ${latestRepoCommit ?: "null"}", prefixColor = "§c")
+//         if (successfulConstants.isNotEmpty()) ChatUtils.chat(
         if (successfulConstants.isNotEmpty()) LorenzUtils.chat(
             "Successful Constants §7(${successfulConstants.size}):",
             prefixColor = "§a"
         )
         for (constant in successfulConstants) {
-            LorenzUtils.chat("   §a- §7$constant", false)
+            ChatUtils.chat("   §a- §7$constant", false)
         }
-        LorenzUtils.chat("Unsuccessful Constants §7(${unsuccessfulConstants.size}):")
+        ChatUtils.chat("Unsuccessful Constants §7(${unsuccessfulConstants.size}):")
         for (constant in unsuccessfulConstants) {
-            LorenzUtils.chat("   §e- §7$constant", false)
+            ChatUtils.chat("   §e- §7$constant", false)
         }
     }
 
@@ -274,5 +279,10 @@ class RepoManager(private val configLocation: File) {
                 StandardCharsets.UTF_8
             )
         ).use { writer -> writer.write(gson.toJson(json)) }
+    }
+
+    @SubscribeEvent
+    fun onNeuRepoReload(event: io.github.moulberry.notenoughupdates.events.RepositoryReloadEvent) {
+        NeuRepositoryReloadEvent().postAndCatch()
     }
 }

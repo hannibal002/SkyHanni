@@ -10,6 +10,7 @@ import at.hannibal2.skyhanni.features.bingo.BingoAPI
 import at.hannibal2.skyhanni.features.bingo.card.goals.BingoGoal
 import at.hannibal2.skyhanni.features.bingo.card.goals.GoalType
 import at.hannibal2.skyhanni.features.bingo.card.goals.HiddenGoalData
+import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.ItemUtils.name
 import at.hannibal2.skyhanni.utils.LorenzUtils
@@ -22,13 +23,21 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import kotlin.time.Duration
 
 class BingoCardReader {
+
     private val config get() = SkyHanniMod.feature.event.bingo.bingoCard
-
-    private val percentagePattern by RepoPattern.pattern("bingo.card.percentage", " {2}§8Top §.(?<percentage>.*)%")
-
-    // TODO USE SH-REPO
-    private val goalCompletePattern = "§6§lBINGO GOAL COMPLETE! §r§e(?<name>.*)".toPattern()
-    private val personalHiddenGoalPattern = ".*§7§eThe next hint will unlock in (?<time>.*)".toPattern()
+    private val patternGroup = RepoPattern.group("bingo.card")
+    private val percentagePattern by patternGroup.pattern(
+        "percentage",
+        " {2}§8Top §.(?<percentage>.*)%"
+    )
+    private val goalCompletePattern by patternGroup.pattern(
+        "goalcomplete",
+        "§6§lBINGO GOAL COMPLETE! §r§e(?<name>.*)"
+    )
+    private val personalHiddenGoalPattern by patternGroup.pattern(
+        "hiddengoal",
+        ".*§7§eThe next hint will unlock in (?<time>.*)"
+    )
 
     @SubscribeEvent
     fun onInventoryOpen(event: InventoryUpdatedEvent) {
@@ -97,7 +106,7 @@ class BingoCardReader {
         val oldFormat = BingoAPI.getCommunityPercentageColor(old)
         val newFormat = BingoAPI.getCommunityPercentageColor(new)
         val color = if (new > old) "§c" else "§a"
-        LorenzUtils.chat("$color${bingoGoal.displayName}: $oldFormat §b->" + " $newFormat")
+        ChatUtils.chat("$color${bingoGoal.displayName}: $oldFormat §b->" + " $newFormat")
     }
 
     private fun readCommuntyGoalPercentage(lore: List<String>): Double? {
