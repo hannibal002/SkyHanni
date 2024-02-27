@@ -147,7 +147,7 @@ enum class ScoreboardElements(
     OBJECTIVE(
         ::getObjectiveDisplayPair,
         ::getObjectiveShowWhen,
-        "Objective:\n§eUpdate SkyHanni"
+        "Objective:\n§eStar SkyHanni on Github"
     ),
     SLAYER(
         ::getSlayerDisplayPair,
