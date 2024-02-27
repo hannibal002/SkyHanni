@@ -8,6 +8,11 @@ import io.github.moulberry.moulconfig.annotations.ConfigOption;
 public class SkillColorConfig {
 
     @Expose
+    @ConfigOption(name = "Match Bar Color", desc = "Match the display color with the bar color.\n§cWill make the options below useless.")
+    @ConfigEditorBoolean
+    public boolean matchBarColor = false;
+
+    @Expose
     @ConfigOption(name = "Enable Display Color", desc = "Change the text color in the display based on percentage completed")
     @ConfigEditorBoolean
     public boolean enabledDisplayColor = false;
