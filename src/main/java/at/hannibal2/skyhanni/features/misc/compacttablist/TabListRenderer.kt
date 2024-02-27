@@ -5,6 +5,7 @@ import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.SkipTabListLineEvent
 import at.hannibal2.skyhanni.mixins.transformers.AccessorGuiPlayerTabOverlay
 import at.hannibal2.skyhanni.utils.CollectionUtils.filterToMutable
+import at.hannibal2.skyhanni.utils.KeyboardManager.isActive
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.StringUtils.matches
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
@@ -14,6 +15,7 @@ import net.minecraft.client.gui.ScaledResolution
 import net.minecraft.client.renderer.GlStateManager
 import net.minecraft.entity.player.EnumPlayerModelParts
 import net.minecraftforge.client.event.RenderGameOverlayEvent
+import net.minecraftforge.fml.common.eventhandler.EventPriority
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
 object TabListRenderer {
@@ -40,20 +42,21 @@ object TabListRenderer {
     private var isPressed = false
     private var isTabToggled = false
 
-    @SubscribeEvent
+    // compact scoreboard should render above other SkyHanni GUIs when toggle tab is in use.
+    @SubscribeEvent(priority = EventPriority.LOW)
     fun onRenderOverlay(event: GuiRenderEvent.GuiOverlayRenderEvent) {
         if (!LorenzUtils.inSkyBlock) return
         if (!config.enabled) return
         if (!config.toggleTab) return
         if (Minecraft.getMinecraft().currentScreen != null) return
 
-        if (Minecraft.getMinecraft().gameSettings.keyBindPlayerList.isPressed) {
-            isPressed = true
-        } else {
-            if (isPressed) {
-                isPressed = false
+        if (Minecraft.getMinecraft().gameSettings.keyBindPlayerList.isActive()) {
+            if (!isPressed) {
+                isPressed = true
                 isTabToggled = !isTabToggled
             }
+        } else {
+            isPressed = false
         }
 
         if (isTabToggled) {

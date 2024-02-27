@@ -28,4 +28,9 @@ public class GeyserFishingConfig {
     @ConfigOption(name = "Geyser Box Color", desc = "Color of the Geyser Box.")
     @ConfigEditorColour
     public String boxColor = "0:245:85:255:85";
+
+    @Expose
+    @ConfigOption(name = "Only With Rod", desc = "Only render the geyser box while holding a lava rod.")
+    @ConfigEditorBoolean
+    public boolean onlyWithRod = true;
 }

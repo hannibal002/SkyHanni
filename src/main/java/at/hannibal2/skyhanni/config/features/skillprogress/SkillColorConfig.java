@@ -4,13 +4,14 @@ import com.google.gson.annotations.Expose;
 import io.github.moulberry.moulconfig.annotations.ConfigEditorBoolean;
 import io.github.moulberry.moulconfig.annotations.ConfigEditorText;
 import io.github.moulberry.moulconfig.annotations.ConfigOption;
+import io.github.moulberry.moulconfig.observer.Property;
 
 public class SkillColorConfig {
 
     @Expose
     @ConfigOption(name = "Match Bar Color", desc = "Match the display color with the bar color.\n§cWill make the options below useless.")
     @ConfigEditorBoolean
-    public boolean matchBarColor = false;
+    public Property<Boolean> matchBarColor = Property.of(false);
 
     @Expose
     @ConfigOption(name = "Enable Display Color", desc = "Change the text color in the display based on percentage completed")

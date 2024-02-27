@@ -37,15 +37,15 @@ enum class SkillType(val displayName: String, icon: Item) {
         fun getBarColor(type: SkillType): String {
             val barConfig = SkyHanniMod.feature.skillProgress.skillProgressBarConfig
             return when (type) {
-                COMBAT -> barConfig.combatBarColor
-                FARMING -> barConfig.farmingBarColor
-                FISHING -> barConfig.fishingBarColor
-                FORAGING -> barConfig.foragingBarColor
-                ENCHANTING -> barConfig.enchantingBarColor
-                ALCHEMY -> barConfig.alchemyBarColor
-                CARPENTRY -> barConfig.carpentryBarColor
-                TAMING -> barConfig.tamingBarColor
-                else -> "0:245:85:255:85"
+                COMBAT -> barConfig.combatBarColor.get()
+                FARMING -> barConfig.farmingBarColor.get()
+                FISHING -> barConfig.fishingBarColor.get()
+                FORAGING -> barConfig.foragingBarColor.get()
+                ENCHANTING -> barConfig.enchantingBarColor.get()
+                ALCHEMY -> barConfig.alchemyBarColor.get()
+                CARPENTRY -> barConfig.carpentryBarColor.get()
+                TAMING -> barConfig.tamingBarColor.get()
+                MINING -> barConfig.miningBarColor.get()
             }
         }
     }
