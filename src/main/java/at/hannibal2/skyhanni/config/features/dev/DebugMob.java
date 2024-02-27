@@ -39,10 +39,14 @@ public class DebugMob {
     public static class MobDetection {
 
         @Expose
+        @ConfigOption(name = "Log Events", desc = "Logs the spawn and despawn event with full mob info")
+        @ConfigEditorBoolean
+        public boolean logEvents = false;
+
+        @Expose
         @ConfigOption(name = "Show RayHit", desc = "Highlights the mob that is currently in front of your view (only SkyblockMob)")
         @ConfigEditorBoolean
         public boolean showRayHit = false;
-
 
         @Expose
         @ConfigOption(name = "Player Highlight", desc = "Highlight each entity that is a real Player in blue. (Yourself is also include in the list but won't be highlighted for obvious reason)")

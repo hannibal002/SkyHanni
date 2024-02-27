@@ -2,7 +2,7 @@ package at.hannibal2.skyhanni.events
 
 import at.hannibal2.skyhanni.data.mob.Mob
 
-abstract class MobEvent(val mob: Mob) : LorenzEvent() {
+open class MobEvent(val mob: Mob) : LorenzEvent() {
     open class Spawn(mob: Mob) : MobEvent(mob) {
         class SkyblockMob(mob: Mob) : Spawn(mob)
         class Summon(mob: Mob) : Spawn(mob)

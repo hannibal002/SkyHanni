@@ -231,7 +231,7 @@ object CopyNearbyEntitiesCommand {
         }
     }
 
-    private fun getMobInfo(mob: Mob) = buildList<String> {
+    fun getMobInfo(mob: Mob) = buildList<String> {
         add("Name: ${mob.name}")
         add("Type: ${mob.mobType}")
         add("Base Entity: ${mob.baseEntity.asString()}")

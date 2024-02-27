@@ -3,8 +3,11 @@ package at.hannibal2.skyhanni.data.mob
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.config.features.dev.DebugMob.HowToShow
 import at.hannibal2.skyhanni.events.LorenzRenderWorldEvent
+import at.hannibal2.skyhanni.events.MobEvent
+import at.hannibal2.skyhanni.test.command.CopyNearbyEntitiesCommand.getMobInfo
 import at.hannibal2.skyhanni.utils.LocationUtils.getTopCenter
 import at.hannibal2.skyhanni.utils.LorenzColor
+import at.hannibal2.skyhanni.utils.LorenzDebug
 import at.hannibal2.skyhanni.utils.MobUtils
 import at.hannibal2.skyhanni.utils.RenderUtils.drawFilledBoundingBox_nea
 import at.hannibal2.skyhanni.utils.RenderUtils.drawString
@@ -78,5 +81,17 @@ class MobDebug {
                 event.drawFilledBoundingBox_nea(it.boundingBox.expandBlock(), LorenzColor.GOLD.toColor(), 0.5f)
             }
         }
+    }
+
+    @SubscribeEvent
+    fun onMobEvent(event: MobEvent) {
+        if (!config.logEvents) return
+        LorenzDebug.log(
+            "Mob ${if (event is MobEvent.Spawn) "Spawn" else "Despawn"}: ${
+                getMobInfo(event.mob).joinToString(
+                    ", "
+                )
+            }"
+        )
     }
 }
