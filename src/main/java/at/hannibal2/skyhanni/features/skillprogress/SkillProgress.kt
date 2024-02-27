@@ -360,6 +360,7 @@ object SkillProgress {
             listOf("§eClick to reset!")) {
             xpInfo.sessionTimerActive = false
             activeSkill.timer = null
+            xpInfo.shouldStartTimer = true
             xpInfo.timeActive = 0L
             chat("Timer for §b${activeSkill.displayName} §ehas been reset!")
         })

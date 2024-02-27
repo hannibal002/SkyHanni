@@ -109,6 +109,7 @@ object SkillAPI {
 
                 if (skillType.timer == null) {
                     skillType.timer = runTimer(skillType, skillXp)
+                    skillXp.shouldStartTimer = false
                 }
                 SkillProgress.updateDisplay()
                 SkillProgress.hideInActionBar = listOf(component)
@@ -247,7 +248,7 @@ object SkillAPI {
     // TODO only use one statuc timer for the whole feature. this timer just ticks the currently active skill.
     private fun runTimer(skillType: SkillType, info: SkillXPInfo): Timer =
         fixedRateTimer(name = "skyhanni-skillprogress-timer-${skillType.displayName}", initialDelay = 1_000L, period = 1_000L) {
-            if (skillType.timer != this) cancel()
+            if (info.shouldStartTimer) cancel()
             val time = when (activeSkill) {
                 SkillType.FARMING -> SkillProgress.etaConfig.farmingPauseTime
                 SkillType.MINING -> SkillProgress.etaConfig.miningPauseTime
@@ -517,5 +518,6 @@ object SkillAPI {
         var isActive: Boolean = false,
         var lastUpdate: SimpleTimeMark = SimpleTimeMark.farPast(),
         var timeActive: Long = 0L,
+        var shouldStartTimer: Boolean = true,
     )
 }
