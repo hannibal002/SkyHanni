@@ -3,35 +3,38 @@ package at.hannibal2.skyhanni.features.misc.items
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.config.ConfigManager
 import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
+import at.hannibal2.skyhanni.data.jsonobjects.repo.ItemsJson
 import at.hannibal2.skyhanni.events.ConfigLoadEvent
 import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.InventoryCloseEvent
 import at.hannibal2.skyhanni.events.LorenzToolTipEvent
+import at.hannibal2.skyhanni.events.NeuRepositoryReloadEvent
 import at.hannibal2.skyhanni.events.RenderItemTooltipEvent
+import at.hannibal2.skyhanni.events.RepositoryReloadEvent
+import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.CollectionUtils.addAsSingletonList
 import at.hannibal2.skyhanni.utils.ConditionalUtils.onToggle
 import at.hannibal2.skyhanni.utils.InventoryUtils
+import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalNameOrNull
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.ItemUtils.isRune
+import at.hannibal2.skyhanni.utils.ItemUtils.itemName
 import at.hannibal2.skyhanni.utils.ItemUtils.name
 import at.hannibal2.skyhanni.utils.KeyboardManager.isKeyHeld
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.NEUInternalName
 import at.hannibal2.skyhanni.utils.NEUItems.getItemStackOrNull
-import at.hannibal2.skyhanni.utils.NEUItems.manager
 import at.hannibal2.skyhanni.utils.NumberUtil
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.RenderUtils.renderStringsAndItems
 import com.google.gson.reflect.TypeToken
-import io.github.moulberry.notenoughupdates.events.RepositoryReloadEvent
 import io.github.moulberry.notenoughupdates.profileviewer.GuiProfileViewer
 import net.minecraft.client.Minecraft
 import net.minecraft.init.Items
 import net.minecraft.item.ItemStack
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
-import java.io.File
 import kotlin.math.roundToLong
 
 object EstimatedItemValue {
@@ -41,23 +44,24 @@ object EstimatedItemValue {
     private val cache = mutableMapOf<ItemStack, List<List<Any>>>()
     private var lastToolTipTime = 0L
     var gemstoneUnlockCosts = HashMap<NEUInternalName, HashMap<String, List<String>>>()
+    var bookBundleAmount = mapOf<String, Int>()
     private var currentlyShowing = false
 
     fun isCurrentlyShowing() = currentlyShowing && Minecraft.getMinecraft().currentScreen != null
 
     @SubscribeEvent
-    fun onRepoReload(event: RepositoryReloadEvent) {
-        val data = manager.getJsonFromFile(File(manager.repoLocation, "constants/gemstonecosts.json"))
+    fun onNeuRepoReload(event: NeuRepositoryReloadEvent) {
+        val data = event.getConstant("gemstonecosts") ?: run {
+            ErrorManager.skyHanniError("Gemstone Slot Unlock Costs failed to load from neu repo!")
+        }
 
-        if (data != null)
-        // item_internal_names -> gemstone_slots -> ingredients_array
-            gemstoneUnlockCosts =
-                ConfigManager.gson.fromJson(
-                    data,
-                    object : TypeToken<HashMap<NEUInternalName, HashMap<String, List<String>>>>() {}.type
-                )
-        else
-            ChatUtils.error("Gemstone Slot Unlock Costs failed to load!")
+        gemstoneUnlockCosts = ConfigManager.gson.fromJson(data, object : TypeToken<HashMap<NEUInternalName, HashMap<String, List<String>>>>() {}.type)
+    }
+
+    @SubscribeEvent
+    fun onRepoReload(event: RepositoryReloadEvent) {
+        val data = event.getConstant<ItemsJson>("Items")
+        bookBundleAmount = data.book_bundle_amount ?: error("book_bundle_amount is missing")
     }
 
     @SubscribeEvent
@@ -131,9 +135,8 @@ object EstimatedItemValue {
     }
 
     private fun updateItem(item: ItemStack) {
-        val oldData = cache[item]
-        if (oldData != null) {
-            display = oldData
+        cache[item]?.let {
+            display = it
             lastToolTipTime = System.currentTimeMillis()
             return
         }
@@ -153,8 +156,12 @@ object EstimatedItemValue {
         val newDisplay = try {
             draw(item)
         } catch (e: Exception) {
-            ChatUtils.debug("Estimated Item Value error: ${e.message}")
-            e.printStackTrace()
+            ErrorManager.logErrorWithData(
+                e, "Error in Estimated Item Value renderer",
+                "item" to item,
+                "itemName" to item.itemName,
+                "getInternalName" to item.getInternalName(),
+            )
             listOf()
         }
 

@@ -31,6 +31,9 @@ class ChatFilter {
 
         // mystery dust
         "§b✦ §r§7You earned §r§b\\d+ §r§7Mystery Dust!".toPattern(),
+
+        // pet consumables
+        "§b✦ §r§7You earned §r§a\\d+ §r§7Pet Consumables?!".toPattern(),
     )
 
     private val lobbyMessages = listOf(
@@ -307,6 +310,7 @@ class ChatFilter {
         "§c♨ §eVisit the Community Shop in the next §c.* §eto grab yours! §a§l\\[WARP]".toPattern(),
         "§c♨ §eA Fire Sale for .* §eis starting soon!".toPattern(),
         "§c♨ §r§eFire Sale for .* §r§eended!".toPattern(),
+        "§c {3}♨ §eAnd \\d+ more!".toPattern(),
     )
     private val powderMiningMessages = listOf(
         "§aYou uncovered a treasure chest!",

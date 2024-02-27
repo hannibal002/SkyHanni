@@ -2,7 +2,7 @@ package at.hannibal2.skyhanni.config.features.garden;
 
 import at.hannibal2.skyhanni.config.FeatureToggle;
 import at.hannibal2.skyhanni.features.garden.inventory.GardenPlotIcon;
-import at.hannibal2.skyhanni.utils.LorenzUtils;
+import at.hannibal2.skyhanni.utils.ChatUtils;
 import com.google.gson.annotations.Expose;
 import io.github.moulberry.moulconfig.annotations.ConfigEditorBoolean;
 import io.github.moulberry.moulconfig.annotations.ConfigEditorButton;
@@ -19,6 +19,6 @@ public class PlotIconConfig {
     @ConfigEditorButton(buttonText = "Reset")
     public Runnable hardReset = () -> {
         GardenPlotIcon.INSTANCE.setHardReset(true);
-        LorenzUtils.INSTANCE.sendCommandToServer("desk");
+        ChatUtils.INSTANCE.sendCommandToServer("desk");
     };
 }

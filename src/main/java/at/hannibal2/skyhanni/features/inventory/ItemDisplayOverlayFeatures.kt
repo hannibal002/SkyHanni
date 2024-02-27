@@ -2,6 +2,7 @@ package at.hannibal2.skyhanni.features.inventory
 
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.CollectionAPI
+import at.hannibal2.skyhanni.api.SkillAPI
 import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.config.features.inventory.InventoryConfig.ItemNumberEntry
 import at.hannibal2.skyhanni.config.features.inventory.InventoryConfig.ItemNumberEntry.BINGO_GOAL_RANK
@@ -23,6 +24,7 @@ import at.hannibal2.skyhanni.config.features.inventory.InventoryConfig.ItemNumbe
 import at.hannibal2.skyhanni.data.PetAPI
 import at.hannibal2.skyhanni.events.RenderItemTipEvent
 import at.hannibal2.skyhanni.features.garden.pests.PestAPI
+import at.hannibal2.skyhanni.features.skillprogress.SkillType
 import at.hannibal2.skyhanni.utils.ConfigUtils
 import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.ItemCategory
@@ -53,10 +55,6 @@ object ItemDisplayOverlayFeatures {
     private val config get() = SkyHanniMod.feature.inventory
 
     private val patternGroup = RepoPattern.group("inventory.item.overlay")
-    private val petLevelPattern by patternGroup.pattern(
-        "pet.level",
-        "\\[Lvl (?<level>\\d+)] .*"
-    )
     private val masterSkullPattern by patternGroup.pattern(
         "masterskull",
         "(.*)Master Skull - Tier ."
@@ -162,9 +160,14 @@ object ItemDisplayOverlayFeatures {
             if (CollectionAPI.isCollectionTier0(lore)) return "0"
             val split = itemName.split(" ")
             if (!itemName.contains("Dungeon")) {
+                val skillName = split.first()
                 val text = split.last()
                 if (split.size < 2) return "0"
-                return "" + text.romanToDecimalIfNecessary()
+                val level = "" + text.romanToDecimalIfNecessary()
+                val skill = SkillType.getByNameOrNull(skillName) ?: return level
+                val skillInfo = SkillAPI.storage?.get(skill) ?: return level
+                return if (SkyHanniMod.feature.skillProgress.overflowConfig.enableInSkillMenuAsStackSize)
+                    "" + skillInfo.overflowLevel else level
             }
         }
 
@@ -209,9 +212,9 @@ object ItemDisplayOverlayFeatures {
             item.name?.let {
                 dungeonPotionPattern.matchMatcher(it.removeColor()) {
                     return when (val level = group("level").romanToDecimal()) {
-                        in 1..2 -> "§f$level"
-                        in 3..4 -> "§a$level"
-                        in 5..6 -> "§9$level"
+                        in 1 .. 2 -> "§f$level"
+                        in 3 .. 4 -> "§a$level"
+                        in 5 .. 6 -> "§9$level"
                         else -> "§5$level"
                     }
                 }

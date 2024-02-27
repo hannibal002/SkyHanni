@@ -86,5 +86,5 @@ class FishingHookDisplay {
         return pattern.matcher(name).matches()
     }
 
-    fun isEnabled() = LorenzUtils.inSkyBlock && config.enabled && FishingAPI.hasFishingRodInHand()
+    fun isEnabled() = LorenzUtils.inSkyBlock && config.enabled && FishingAPI.holdingRod
 }

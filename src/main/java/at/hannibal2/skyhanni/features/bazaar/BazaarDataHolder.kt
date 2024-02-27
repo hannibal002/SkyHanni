@@ -1,7 +1,10 @@
 package at.hannibal2.skyhanni.features.bazaar
 
 import at.hannibal2.skyhanni.SkyHanniMod
+import at.hannibal2.skyhanni.config.ConfigManager
+import at.hannibal2.skyhanni.data.jsonobjects.other.SkyblockItemsDataJson
 import at.hannibal2.skyhanni.features.rift.RiftAPI
+import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.APIUtil
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.name
@@ -10,6 +13,7 @@ import at.hannibal2.skyhanni.utils.NEUItems
 import at.hannibal2.skyhanni.utils.NEUItems.getItemStackOrNull
 import at.hannibal2.skyhanni.utils.NEUItems.getPrice
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
+import at.hannibal2.skyhanni.utils.fromJson
 import kotlinx.coroutines.launch
 import kotlin.concurrent.fixedRateTimer
 
@@ -25,25 +29,22 @@ class BazaarDataHolder {
 
     private fun loadNpcPrices(): MutableMap<NEUInternalName, Double> {
         val list = mutableMapOf<NEUInternalName, Double>()
+        val apiResponse = APIUtil.getJSONResponse("https://api.hypixel.net/v2/resources/skyblock/items")
         try {
-            val itemsData = APIUtil.getJSONResponse("https://api.hypixel.net/v2/resources/skyblock/items")
+            val itemsData = ConfigManager.gson.fromJson<SkyblockItemsDataJson>(apiResponse)
+
             val motesPrice = mutableMapOf<NEUInternalName, Double>()
-            for (element in itemsData["items"].asJsonArray) {
-                val jsonObject = element.asJsonObject
-                val hypixelId = jsonObject["id"].asString
-                jsonObject["npc_sell_price"]?.let {
-                    val neuItemId = NEUItems.transHypixelNameToInternalName(hypixelId)
-                    list[neuItemId] = it.asDouble
-                }
-                jsonObject["motes_sell_price"]?.let {
-                    val neuItemId = NEUItems.transHypixelNameToInternalName(hypixelId)
-                    motesPrice[neuItemId] = it.asDouble
-                }
+            for (item in itemsData.items) {
+                val neuItemId = NEUItems.transHypixelNameToInternalName(item.id ?: continue)
+                item.npcPrice?.let { list[neuItemId] = it }
+                item.motesPrice?.let { motesPrice[neuItemId] = it }
             }
             RiftAPI.motesPrice = motesPrice
         } catch (e: Throwable) {
-            e.printStackTrace()
-            ChatUtils.error("Error while trying to read bazaar item list from api: " + e.message)
+            ErrorManager.logErrorWithData(
+                e, "Error getting npc sell prices",
+                "hypixelApiResponse" to apiResponse
+            )
         }
         return list
     }

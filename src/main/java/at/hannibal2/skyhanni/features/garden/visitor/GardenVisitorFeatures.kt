@@ -10,7 +10,7 @@ import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.LorenzChatEvent
 import at.hannibal2.skyhanni.events.LorenzTickEvent
 import at.hannibal2.skyhanni.events.OwnInventoryItemUpdateEvent
-import at.hannibal2.skyhanni.events.PreProfileSwitchEvent
+import at.hannibal2.skyhanni.events.ProfileJoinEvent
 import at.hannibal2.skyhanni.events.SackDataUpdateEvent
 import at.hannibal2.skyhanni.events.garden.visitor.VisitorAcceptEvent
 import at.hannibal2.skyhanni.events.garden.visitor.VisitorAcceptedEvent
@@ -100,7 +100,7 @@ class GardenVisitorFeatures {
     private var lastFullPrice = 0.0
 
     @SubscribeEvent
-    fun onPreProfileSwitch(event: PreProfileSwitchEvent) {
+    fun onProfileJoin(event: ProfileJoinEvent) {
         display = emptyList()
     }
 
@@ -207,7 +207,7 @@ class GardenVisitorFeatures {
                     val itemAmount = sackItemData.amount
                     if (itemStatus != SackStatus.OUTDATED) {
                         val textColour = if (itemAmount >= amount) "a" else "e"
-                        list.add(" (§${textColour}x${sackItemData.amount.addSeparators()} §7in sacks)")
+                        list.add(" §7(§${textColour}x${sackItemData.amount.addSeparators()} §7in sacks)")
                     }
                 }
 

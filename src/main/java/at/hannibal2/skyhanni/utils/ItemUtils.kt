@@ -29,15 +29,6 @@ object ItemUtils {
 
     private val itemNameCache = mutableMapOf<NEUInternalName, String>() // internal name -> item name
 
-    private val ignoredPetStrings = listOf(
-        "Archer",
-        "Berserk",
-        "Mage",
-        "Tank",
-        "Healer",
-        "➡",
-    )
-
     fun ItemStack.cleanName() = this.displayName.removeColor()
 
     fun isSack(stack: ItemStack) = stack.getInternalName().endsWith("_SACK") && stack.cleanName().endsWith(" Sack")
@@ -63,8 +54,6 @@ object ItemUtils {
         stack.getLore().any { it == "§8§l* §8Soulbound §8§l*" }
 
     fun isRecombobulated(stack: ItemStack) = stack.isRecombobulated()
-
-    fun isPet(name: String): Boolean = UtilsPatterns.petLevelPattern.matches(name) && !ignoredPetStrings.any { name.contains(it) }
 
     fun maxPetLevel(name: String) = if (name.contains("Golden Dragon")) 200 else 100
 
@@ -217,7 +206,7 @@ object ItemUtils {
         val name = this.name ?: ""
         val cleanName = this.cleanName()
 
-        if (isPet(cleanName)) {
+        if (PetAPI.hasPetName(cleanName)) {
             return getPetRarity(this) to ItemCategory.PET
         }
 
@@ -260,7 +249,7 @@ object ItemUtils {
     private fun getItemCategory(itemCategory: String, name: String, cleanName: String = name.removeColor()) =
         if (itemCategory.isEmpty()) when {
             UtilsPatterns.abiPhonePattern.matches(name) -> ItemCategory.ABIPHONE
-            isPet(cleanName) -> ItemCategory.PET
+            PetAPI.hasPetName(cleanName) -> ItemCategory.PET
             UtilsPatterns.enchantedBookPattern.matches(name) -> ItemCategory.ENCHANTED_BOOK
             UtilsPatterns.potionPattern.matches(name) -> ItemCategory.POTION
             UtilsPatterns.sackPattern.matches(name) -> ItemCategory.SACK

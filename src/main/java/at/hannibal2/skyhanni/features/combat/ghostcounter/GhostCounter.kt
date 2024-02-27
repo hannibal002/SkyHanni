@@ -182,7 +182,7 @@ object GhostCounter {
         val bestiary = if (config.showMax) {
             when (nextLevel) {
                 26 -> bestiaryFormatting.maxed.replace("%currentKill%", currentKill.addSeparators())
-                in 1..25 -> {
+                in 1 .. 25 -> {
                     val sum = bestiaryData.filterKeys { it <= nextLevel - 1 }.values.sum()
 
                     val cKill = sum + currentKill
@@ -195,7 +195,7 @@ object GhostCounter {
         } else {
             when (nextLevel) {
                 26 -> bestiaryFormatting.maxed
-                in 1..25 -> bestiaryFormatting.progress
+                in 1 .. 25 -> bestiaryFormatting.progress
                 else -> bestiaryFormatting.openMenu
             }
         }
@@ -301,7 +301,7 @@ object GhostCounter {
                     val res = current.formatNumber().toString()
                     gain = (res.toLong() - lastXp.toLong()).toDouble().roundToInt()
                     num = (gain.toDouble() / gained)
-                    if (gained in 150.0..450.0 && lastXp != "0" && num >= 0) {
+                    if (gained in 150.0 .. 450.0 && lastXp != "0" && num >= 0) {
                         KILLS.add(num)
                         KILLS.add(num, true)
                         Option.GHOSTSINCESORROW.add(num)

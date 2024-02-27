@@ -5,9 +5,9 @@ import at.hannibal2.skyhanni.events.LorenzChatEvent
 import at.hannibal2.skyhanni.events.LorenzRenderWorldEvent
 import at.hannibal2.skyhanni.features.garden.pests.SprayType
 import at.hannibal2.skyhanni.features.misc.LockMouseLook
+import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.name
 import at.hannibal2.skyhanni.utils.LocationUtils.isPlayerInside
-import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.LorenzVec
 import at.hannibal2.skyhanni.utils.RenderUtils.draw3DLine
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
@@ -109,7 +109,7 @@ object GardenPlotAPI {
     fun Plot.isPlayerInside() = box.isPlayerInside()
 
     fun Plot.sendTeleportTo() {
-        LorenzUtils.sendCommandToServer("tptoplot $name")
+        ChatUtils.sendCommandToServer("tptoplot $name")
         LockMouseLook.autoDisable()
     }
 

@@ -3,6 +3,7 @@ package at.hannibal2.skyhanni
 import at.hannibal2.skyhanni.api.CollectionAPI
 import at.hannibal2.skyhanni.api.DataWatcherAPI
 import at.hannibal2.skyhanni.api.GetFromSackAPI
+import at.hannibal2.skyhanni.api.SkillAPI
 import at.hannibal2.skyhanni.config.ConfigFileType
 import at.hannibal2.skyhanni.config.ConfigManager
 import at.hannibal2.skyhanni.config.Features
@@ -112,6 +113,7 @@ import at.hannibal2.skyhanni.features.dungeon.DungeonTeammateOutlines
 import at.hannibal2.skyhanni.features.dungeon.HighlightDungeonDeathmite
 import at.hannibal2.skyhanni.features.dungeon.TerracottaPhase
 import at.hannibal2.skyhanni.features.event.UniqueGiftingOpportunitiesFeatures
+import at.hannibal2.skyhanni.features.event.diana.AllBurrowsList
 import at.hannibal2.skyhanni.features.event.diana.BurrowWarpHelper
 import at.hannibal2.skyhanni.features.event.diana.DianaProfitTracker
 import at.hannibal2.skyhanni.features.event.diana.GriffinBurrowHelper
@@ -134,9 +136,9 @@ import at.hannibal2.skyhanni.features.fame.CityProjectFeatures
 import at.hannibal2.skyhanni.features.fishing.ChumBucketHider
 import at.hannibal2.skyhanni.features.fishing.FishingAPI
 import at.hannibal2.skyhanni.features.fishing.FishingBaitWarnings
-import at.hannibal2.skyhanni.features.fishing.FishingDetection
 import at.hannibal2.skyhanni.features.fishing.FishingHookDisplay
 import at.hannibal2.skyhanni.features.fishing.FishingTimer
+import at.hannibal2.skyhanni.features.fishing.IsFishingDetection
 import at.hannibal2.skyhanni.features.fishing.SeaCreatureFeatures
 import at.hannibal2.skyhanni.features.fishing.SeaCreatureManager
 import at.hannibal2.skyhanni.features.fishing.SeaCreatureMessageShortener
@@ -144,7 +146,6 @@ import at.hannibal2.skyhanni.features.fishing.SharkFishCounter
 import at.hannibal2.skyhanni.features.fishing.ShowFishingItemName
 import at.hannibal2.skyhanni.features.fishing.ThunderSparksHighlight
 import at.hannibal2.skyhanni.features.fishing.tracker.FishingProfitTracker
-import at.hannibal2.skyhanni.features.fishing.tracker.FishingTrackerCategoryManager
 import at.hannibal2.skyhanni.features.fishing.tracker.SeaCreatureTracker
 import at.hannibal2.skyhanni.features.fishing.trophy.GeyserFishing
 import at.hannibal2.skyhanni.features.fishing.trophy.OdgerWaypoint
@@ -223,7 +224,7 @@ import at.hannibal2.skyhanni.features.inventory.SackDisplay
 import at.hannibal2.skyhanni.features.inventory.ShiftClickBrewing
 import at.hannibal2.skyhanni.features.inventory.ShiftClickEquipment
 import at.hannibal2.skyhanni.features.inventory.ShiftClickNPCSell
-import at.hannibal2.skyhanni.features.inventory.SkyBlockLevelGuideHelper
+import at.hannibal2.skyhanni.features.inventory.SkyblockGuideHighlightFeature
 import at.hannibal2.skyhanni.features.inventory.StatsTuning
 import at.hannibal2.skyhanni.features.inventory.tiarelay.TiaRelayHelper
 import at.hannibal2.skyhanni.features.inventory.tiarelay.TiaRelayWaypoints
@@ -327,6 +328,8 @@ import at.hannibal2.skyhanni.features.rift.everywhere.RiftHorsezookaHider
 import at.hannibal2.skyhanni.features.rift.everywhere.RiftTimer
 import at.hannibal2.skyhanni.features.rift.everywhere.motes.RiftMotesOrb
 import at.hannibal2.skyhanni.features.rift.everywhere.motes.ShowMotesNpcSellPrice
+import at.hannibal2.skyhanni.features.skillprogress.SkillProgress
+import at.hannibal2.skyhanni.features.skillprogress.SkillTooltip
 import at.hannibal2.skyhanni.features.slayer.HideMobNames
 import at.hannibal2.skyhanni.features.slayer.SlayerBossSpawnSoon
 import at.hannibal2.skyhanni.features.slayer.SlayerItemsOnGround
@@ -390,7 +393,7 @@ import org.apache.logging.log4j.Logger
     clientSideOnly = true,
     useMetadata = true,
     guiFactory = "at.hannibal2.skyhanni.config.ConfigGuiForgeInterop",
-    version = "0.23.Beta.20",
+    version = "0.23.Beta.26",
 )
 class SkyHanniMod {
 
@@ -474,7 +477,8 @@ class SkyHanniMod {
         loadModule(SackAPI)
         loadModule(BingoAPI)
         loadModule(FishingAPI)
-        loadModule(FishingDetection)
+        loadModule(SkillAPI)
+        loadModule(IsFishingDetection)
         loadModule(LorenzUtils)
         loadModule(NEUItems)
 
@@ -560,7 +564,8 @@ class SkyHanniMod {
         loadModule(HighlightJerries())
         loadModule(TheGreatSpook())
         loadModule(GriffinBurrowHelper)
-        loadModule(GriffinBurrowParticleFinder())
+        loadModule(AllBurrowsList)
+        loadModule(GriffinBurrowParticleFinder)
         loadModule(BurrowWarpHelper())
         loadModule(CollectionTracker())
         loadModule(HighlightBonzoMasks())
@@ -573,8 +578,8 @@ class SkyHanniMod {
         loadModule(LesserOrbHider())
         loadModule(FishingHookDisplay())
         loadModule(CrimsonIsleReputationHelper(this))
+        loadModule(SkyblockGuideHighlightFeature)
         loadModule(SharkFishCounter())
-        loadModule(SkyBlockLevelGuideHelper())
         loadModule(PowerStoneGuideFeatures())
         loadModule(OdgerWaypoint())
         loadModule(TiaRelayHelper())
@@ -659,7 +664,6 @@ class SkyHanniMod {
         loadModule(GetFromSacksTabComplete)
         loadModule(SlayerProfitTracker)
         loadModule(FishingProfitTracker)
-        loadModule(FishingTrackerCategoryManager)
         loadModule(SeaCreatureTracker)
         loadModule(SlayerItemsOnGround())
         loadModule(RestorePieceOfWizardPortalLore())
@@ -748,6 +752,8 @@ class SkyHanniMod {
         loadModule(SulphurSkitterBox())
         loadModule(HighlightInquisitors())
         loadModule(VerminTracker)
+        loadModule(SkillProgress)
+        loadModule(SkillTooltip())
         loadModule(QuiverNotification)
 
         init()

@@ -16,6 +16,7 @@ import at.hannibal2.skyhanni.features.garden.farming.GardenCropSpeed
 import at.hannibal2.skyhanni.mixins.hooks.RenderLivingEntityHelper
 import at.hannibal2.skyhanni.test.GriffinUtils.drawWaypointFilled
 import at.hannibal2.skyhanni.test.command.ErrorManager
+import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.ConfigUtils
 import at.hannibal2.skyhanni.utils.EntityUtils
 import at.hannibal2.skyhanni.utils.LocationUtils.distanceToPlayer
@@ -56,6 +57,10 @@ object TrevorFeatures {
     private val talbotPatternBelow by patternGroup.pattern(
         "below",
         "The target is around (?<height>.*) blocks below, at a (?<angle>.*) degrees angle!"
+    )
+    private val talbotPatternAt by patternGroup.pattern(
+        "at",
+        "You are at the exact height!",
     )
     private val locationPattern by patternGroup.pattern(
         "zone",
@@ -136,6 +141,11 @@ object TrevorFeatures {
         talbotPatternBelow.matchMatcher(formattedMessage) {
             val height = group("height").toInt()
             TrevorSolver.findMobHeight(height, false)
+        }
+        talbotPatternAt.matchMatcher(formattedMessage) {
+            val thePlayer = Minecraft.getMinecraft().thePlayer ?: return
+            val height = thePlayer.posY
+            TrevorSolver.averageHeight = height
         }
 
         if (formattedMessage == "[NPC] Trevor: You will have 10 minutes to find the mob from when you accept the task.") {
@@ -268,7 +278,7 @@ object TrevorFeatures {
             val timeSince = lastChatPromptTime.passedSince()
             if (timeSince > 200.milliseconds && timeSince < 5.seconds) {
                 lastChatPromptTime = SimpleTimeMark.farPast()
-                LorenzUtils.sendCommandToServer(lastChatPrompt)
+                ChatUtils.sendCommandToServer(lastChatPrompt)
                 lastChatPrompt = ""
                 timeLastWarped = SimpleTimeMark.now()
                 return
@@ -276,7 +286,7 @@ object TrevorFeatures {
         }
 
         if (config.warpToTrapper && timeLastWarped.passedSince() > 3.seconds && teleportBlock.passedSince() > 5.seconds) {
-            LorenzUtils.sendCommandToServer("warp trapper")
+            ChatUtils.sendCommandToServer("warp trapper")
             timeLastWarped = SimpleTimeMark.now()
         }
     }
