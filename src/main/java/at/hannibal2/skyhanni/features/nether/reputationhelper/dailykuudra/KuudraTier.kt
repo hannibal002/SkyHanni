@@ -8,7 +8,8 @@ class KuudraTier(
     val displayItem: NEUInternalName,
     val location: LorenzVec?,
     val tierNumber: Int,
-    var doneToday: Boolean = false
+    var doneToday: Boolean = false,
 ) {
+
     fun getDisplayName() = "Tier $tierNumber ($name)"
 }

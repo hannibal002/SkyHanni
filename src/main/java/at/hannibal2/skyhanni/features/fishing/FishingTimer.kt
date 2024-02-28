@@ -22,6 +22,7 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import kotlin.time.Duration.Companion.seconds
 
 class FishingTimer {
+
     private val config get() = SkyHanniMod.feature.fishing.barnTimer
     private val barnLocation = LorenzVec(108, 89, -252)
 
@@ -76,7 +77,8 @@ class FishingTimer {
         }
     }
 
-    private fun countMobs() = EntityUtils.getEntities<EntityArmorStand>().map { entity -> FishingAPI.seaCreatureCount(entity) }.sum()
+    private fun countMobs() =
+        EntityUtils.getEntities<EntityArmorStand>().map { entity -> FishingAPI.seaCreatureCount(entity) }.sum()
 
     private fun isRightLocation(): Boolean {
         inHollows = false
@@ -111,7 +113,7 @@ class FishingTimer {
         val barnTimerAlertTime = config.alertTime * 1_000
         val color = if (duration > barnTimerAlertTime) "§c" else "§e"
         val timeFormat = TimeUtils.formatDuration(duration, biggestUnit = TimeUnit.MINUTE)
-        val name = StringUtils.canBePlural(currentCount, "sea creature", "sea creatures")
+        val name = StringUtils.pluralize(currentCount, "sea creature")
         val text = "$color$timeFormat §8(§e$currentCount §b$name§8)"
 
         config.pos.renderString(text, posLabel = "BarnTimer")

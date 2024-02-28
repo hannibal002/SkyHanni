@@ -9,12 +9,12 @@ import at.hannibal2.skyhanni.events.GuiContainerEvent
 import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.InventoryCloseEvent
 import at.hannibal2.skyhanni.events.InventoryFullyOpenedEvent
+import at.hannibal2.skyhanni.utils.CollectionUtils.addAsSingletonList
 import at.hannibal2.skyhanni.utils.ConfigUtils
 import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.LorenzColor
 import at.hannibal2.skyhanni.utils.LorenzUtils
-import at.hannibal2.skyhanni.utils.LorenzUtils.addAsSingletonList
 import at.hannibal2.skyhanni.utils.LorenzUtils.addButton
 import at.hannibal2.skyhanni.utils.NumberUtil
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
@@ -27,18 +27,28 @@ import at.hannibal2.skyhanni.utils.RenderUtils.renderStringsAndItems
 import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.renderables.Renderable
+import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraft.item.ItemStack
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
 object BestiaryData {
 
     private val config get() = SkyHanniMod.feature.combat.bestiary
+
+    private val patternGroup = RepoPattern.group("combat.bestiary.data")
+    private val progressPattern by patternGroup.pattern(
+        "progress",
+        "(?<current>[0-9kKmMbB,.]+)/(?<needed>[0-9kKmMbB,.]+\$)"
+    )
+    private val titlePattern by patternGroup.pattern(
+        "title",
+        "^(?:\\(\\d+/\\d+\\) )?(Bestiary|.+) ➜ (.+)\$"
+    )
+
     private var display = emptyList<List<Any>>()
     private val mobList = mutableListOf<BestiaryMob>()
     private val stackList = mutableMapOf<Int, ItemStack>()
     private val catList = mutableListOf<Category>()
-    private val progressPattern = "(?<current>[0-9kKmMbB,.]+)/(?<needed>[0-9kKmMbB,.]+$)".toPattern()
-    private val titlePattern = "^(?:\\(\\d+/\\d+\\) )?(Bestiary|.+) ➜ (.+)$".toPattern()
     private var inInventory = false
     private var isCategory = false
     private var overallProgressEnabled = false
@@ -168,7 +178,8 @@ object BestiaryData {
             for ((lineIndex, line) in stack.getLore().withIndex()) {
                 val loreLine = line.removeColor()
                 if (loreLine.startsWith("Kills: ")) {
-                    actualRealTotalKill = "([0-9,.]+)".toRegex().find(loreLine)?.groupValues?.get(1)?.formatNumber() ?: 0
+                    actualRealTotalKill = "([0-9,.]+)".toRegex().find(loreLine)?.groupValues?.get(1)?.formatNumber()
+                        ?: 0
                 }
                 if (!loreLine.startsWith("                    ")) continue
                 val previousLine = stack.getLore()[lineIndex - 1]
@@ -437,7 +448,7 @@ object BestiaryData {
         val name: String,
         val familiesFound: Long,
         val totalFamilies: Long,
-        val familiesCompleted: Long
+        val familiesCompleted: Long,
     )
 
     data class BestiaryMob(
@@ -447,7 +458,7 @@ object BestiaryData {
         var totalKills: Long,
         var killNeededForNextLevel: Long,
         var currentKillToNextLevel: Long,
-        var actualRealTotalKill: Long
+        var actualRealTotalKill: Long,
     ) {
 
         fun killNeededToMax(): Long {
@@ -482,5 +493,4 @@ object BestiaryData {
     }
 
     private fun isEnabled() = LorenzUtils.inSkyBlock && config.enabled
-
 }

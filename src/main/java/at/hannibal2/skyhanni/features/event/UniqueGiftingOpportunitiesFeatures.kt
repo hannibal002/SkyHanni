@@ -27,6 +27,7 @@ import net.minecraftforge.event.entity.EntityJoinWorldEvent
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
 object UniqueGiftingOpportunitiesFeatures {
+
     private val playerList: MutableSet<String>?
         get() = ProfileStorageData.playerSpecific?.winter?.playersThatHaveBeenGifted
 
@@ -62,7 +63,6 @@ object UniqueGiftingOpportunitiesFeatures {
         val matchedPlayer = EntityUtils.getEntitiesNearby<EntityPlayer>(entity.getLorenzVec(), 2.0)
             .singleOrNull { !it.isNPC() } ?: return
         addGiftedPlayer(matchedPlayer.name)
-
     }
 
     @SubscribeEvent

@@ -17,30 +17,50 @@ import at.hannibal2.skyhanni.features.bingo.card.nextstephelper.steps.ObtainCrys
 import at.hannibal2.skyhanni.features.bingo.card.nextstephelper.steps.PartialProgressItemsStep
 import at.hannibal2.skyhanni.features.bingo.card.nextstephelper.steps.ProgressionStep
 import at.hannibal2.skyhanni.features.bingo.card.nextstephelper.steps.SkillLevelStep
+import at.hannibal2.skyhanni.utils.ChatUtils
+import at.hannibal2.skyhanni.utils.CollectionUtils.editCopy
 import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.name
 import at.hannibal2.skyhanni.utils.LorenzUtils
-import at.hannibal2.skyhanni.utils.LorenzUtils.editCopy
 import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
+import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
 class BingoNextStepHelper {
+
     private val config get() = SkyHanniMod.feature.event.bingo.bingoCard
     private var dirty = true
 
-    // TODO USE SH-REPO
-    private val crystalObtainedPattern = " *§r§e(?<crystalName>Topaz|Sapphire|Jade|Amethyst|Amber) Crystal".toPattern()
+    private val patternGroup = RepoPattern.group("bingo.steps")
+    private val crystalObtainedPattern by patternGroup.pattern(
+        "crystal.obtained",
+        " *§r§e(?<crystalName>Topaz|Sapphire|Jade|Amethyst|Amber) Crystal"
+    )
+    private val collectionPattern by patternGroup.pattern(
+        "collection",
+        "Reach (?<amount>[0-9]+(?:,\\d+)*) (?<name>.*) Collection\\."
+    )
+    private val crystalPattern by patternGroup.pattern(
+        "crystal.obtain",
+        "Obtain a (?<name>\\w+) Crystal in the Crystal Hollows\\."
+    )
+    private val skillPattern by patternGroup.pattern(
+        "skill",
+        "Obtain level (?<level>.*) in the (?<skill>.*) Skill."
+    )
+    private val crystalFoundPattern by patternGroup.pattern(
+        "crystal.found",
+        " *§r§5§l✦ CRYSTAL FOUND §r§7\\(.§r§7/5§r§7\\)"
+    )
+
     private val itemIslandRequired = mutableMapOf<String, IslandVisitStep>()
     private val itemPreconditions = mutableMapOf<String, NextStep>()
     private val islands = mutableMapOf<IslandType, IslandVisitStep>()
-    private val collectionPattern = "Reach (?<amount>[0-9]+(?:,\\d+)*) (?<name>.*) Collection\\.".toPattern()
-    private val crystalPattern = "Obtain a (?<name>\\w+) Crystal in the Crystal Hollows\\.".toPattern()
-    private val skillPattern = "Obtain level (?<level>.*) in the (?<skill>.*) Skill.".toPattern()
-    private val crystalFoundPattern = " *§r§5§l✦ CRYSTAL FOUND §r§7\\(.§r§7/5§r§7\\)".toPattern()
     private val rhysTaskName = "30x Enchanted Minerals (Redstone, Lapis Lazuli, Coal) (for Rhys)"
 
     companion object {
+
         private val finalSteps = mutableListOf<NextStep>()
         private var currentSteps = emptyList<NextStep>()
         var currentHelp = emptyList<String>()
@@ -152,7 +172,7 @@ class BingoNextStepHelper {
                 currentStep.amountHavingHidden -= 10
             }
         }
-        //TODO add thys message
+        // TODO add thys message
 //        if (event.message == "thys message") {
 //            thys.done()
 //        }
@@ -202,7 +222,7 @@ class BingoNextStepHelper {
         done = true
         updateResult()
         if (!silent && config.stepHelper) {
-            LorenzUtils.chat("A bingo goal step is done! ($displayName)")
+            ChatUtils.chat("A bingo goal step is done! ($displayName)")
         }
     }
 

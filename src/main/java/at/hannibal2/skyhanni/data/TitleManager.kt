@@ -1,8 +1,8 @@
 package at.hannibal2.skyhanni.data
 
 import at.hannibal2.skyhanni.events.GuiRenderEvent
-import at.hannibal2.skyhanni.events.PreProfileSwitchEvent
-import at.hannibal2.skyhanni.utils.LorenzUtils
+import at.hannibal2.skyhanni.events.ProfileJoinEvent
+import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import io.github.moulberry.moulconfig.internal.TextRenderUtils
 import net.minecraft.client.Minecraft
@@ -16,6 +16,7 @@ import kotlin.time.Duration.Companion.seconds
 class TitleManager {
 
     companion object {
+
         private var originalText = ""
         private var display = ""
         private var endTime = SimpleTimeMark.farPast()
@@ -38,7 +39,7 @@ class TitleManager {
 
         fun command(args: Array<String>) {
             if (args.size < 4) {
-                LorenzUtils.userError("Usage: /shsendtitle <duration> <height> <fontSize> <text ..>")
+                ChatUtils.userError("Usage: /shsendtitle <duration> <height> <fontSize> <text ..>")
                 return
             }
 
@@ -52,7 +53,7 @@ class TitleManager {
     }
 
     @SubscribeEvent
-    fun onPreProfileSwitch(event: PreProfileSwitchEvent) {
+    fun onProfileJoin(event: ProfileJoinEvent) {
         endTime = SimpleTimeMark.farPast()
     }
 

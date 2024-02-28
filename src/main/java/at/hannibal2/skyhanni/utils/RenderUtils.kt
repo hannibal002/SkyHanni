@@ -9,6 +9,7 @@ import at.hannibal2.skyhanni.events.LorenzRenderWorldEvent
 import at.hannibal2.skyhanni.features.misc.RoundedRectangleShader
 import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.renderables.Renderable
+import at.hannibal2.skyhanni.utils.renderables.RenderableUtils.renderXAligned
 import at.hannibal2.skyhanni.utils.shader.ShaderManager
 import io.github.moulberry.moulconfig.internal.TextRenderUtils
 import io.github.moulberry.notenoughupdates.util.Utils
@@ -404,20 +405,17 @@ object RenderUtils {
     ) {
         if (renderables.isEmpty()) return
         var longestY = 0
-        var longestX = 0
+        val longestX = renderables.maxOf { it.width }
         for (line in renderables) {
             GlStateManager.pushMatrix()
             val (x, y) = transform()
             GlStateManager.translate(0f, longestY.toFloat(), 0F)
             Renderable.withMousePosition(x, y) {
-                line.render(0, longestY)
+                line.renderXAligned(0, longestY, longestX)
             }
 
             longestY += line.height + extraSpace + 2
 
-            if (line.width > longestX) {
-                longestX = line.width
-            }
             GlStateManager.popMatrix()
         }
         GuiEditManager.add(this, posLabel, longestX, longestY)
@@ -454,7 +452,7 @@ object RenderUtils {
                 }
             }
             e.printStackTrace()
-            LorenzUtils.debug("NPE in renderStringsAndItems!")
+            ChatUtils.debug("NPE in renderStringsAndItems!")
         }
         GuiEditManager.add(this, posLabel, longestX, offsetY)
     }
@@ -529,7 +527,7 @@ object RenderUtils {
             val y: Double = entity.lastTickPosY + (entity.posY - entity.lastTickPosY) * partialTicks - renderManager.viewerPosY
             val z: Double = entity.lastTickPosZ + (entity.posZ - entity.lastTickPosZ) * partialTicks - renderManager.viewerPosZ
             val pix2 = Math.PI * 2.0
-            for (i in 0..90) {
+            for (i in 0 .. 90) {
                 color.bindColor()
                 worldRenderer.pos(x + rad * cos(i * pix2 / 45.0), y + il, z + rad * sin(i * pix2 / 45.0)).endVertex()
             }

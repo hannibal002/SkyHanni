@@ -6,14 +6,13 @@ import io.github.moulberry.notenoughupdates.util.SkyBlockTime
 import java.time.LocalDate
 import java.time.ZoneId
 import kotlin.time.Duration
+import kotlin.time.Duration.Companion.milliseconds
 import kotlin.time.Duration.Companion.minutes
 import kotlin.time.Duration.Companion.seconds
 import kotlin.time.DurationUnit
 import kotlin.time.toDuration
 
 object TimeUtils {
-    private val pattern =
-        "(?:(?<y>\\d+) ?y(?:\\w* ?)?)?(?:(?<d>\\d+) ?d(?:\\w* ?)?)?(?:(?<h>\\d+) ?h(?:\\w* ?)?)?(?:(?<m>\\d+) ?m(?:\\w* ?)?)?(?:(?<s>\\d+) ?s(?:\\w* ?)?)?".toPattern()
 
     fun Duration.format(
         biggestUnit: TimeUnit = TimeUnit.YEAR,
@@ -31,7 +30,7 @@ object TimeUtils {
         else -> default
     }
 
-    @Deprecated("off sets by one second", ReplaceWith("Duration.format()"))
+    @Deprecated("Has an offset of one second", ReplaceWith("use kotlin Duration"))
     fun formatDuration(
         millis: Long,
         biggestUnit: TimeUnit = TimeUnit.YEAR,
@@ -79,12 +78,12 @@ object TimeUtils {
         return builder.toString().trim()
     }
 
-    @Deprecated("Do no longer use long for time", ReplaceWith("getDuration()"))
+    @Deprecated("Do no longer use long for time", ReplaceWith("getDuration(string)"))
     fun getMillis(string: String) = getDuration(string).inWholeMilliseconds
 
     fun getDuration(string: String) = getMillis_(string.replace("m", "m ").replace("  ", " ").trim())
 
-    private fun getMillis_(string: String) = pattern.matchMatcher(string.lowercase().trim()) {
+    private fun getMillis_(string: String) = UtilsPatterns.timeAmountPattern.matchMatcher(string.lowercase().trim()) {
         val years = group("y")?.toLong() ?: 0L
         val days = group("d")?.toLong() ?: 0L
         val hours = group("h")?.toLong() ?: 0L
@@ -144,7 +143,8 @@ object TimeUtils {
 
     fun getCurrentLocalDate(): LocalDate = LocalDate.now(ZoneId.of("UTC"))
 
-    inline val Int.tick get() = (this * 50 * 2).toDuration(DurationUnit.MILLISECONDS) // Remove the x2 when NeaTickEvent is implemented
+    val Long.ticks get() = (this * 50).milliseconds
+    val Int.ticks get() = (this * 50).milliseconds
 }
 
 private const val FACTOR_SECONDS = 1000L
