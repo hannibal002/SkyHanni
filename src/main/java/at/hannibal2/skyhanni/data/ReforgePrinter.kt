@@ -1,4 +1,5 @@
 package at.hannibal2.skyhanni.data
+/*
 
 import at.hannibal2.skyhanni.api.ReforgeAPI
 import at.hannibal2.skyhanni.utils.LorenzRarity
@@ -350,7 +351,8 @@ class ReforgePrinter {
             val extraProperty = r.extraPropertyText
             val customStat = r.customStat
             val stats = r.stats
-            /* val stats = EnumMap<StatType, Map<LorenzRarity, Double>>(StatType::class.java).apply {
+            */
+/* val stats = EnumMap<StatType, Map<LorenzRarity, Double>>(StatType::class.java).apply {
                 r.stats.forEach {
                     it.value.forEach { stat ->
                         val te = this.getOrDefault(stat.key, emptyMap()).toMutableMap()
@@ -358,7 +360,8 @@ class ReforgePrinter {
                         this[stat.key] = te
                     }
                 }
-            } */
+            } *//*
+
         }
     }
 
@@ -370,3 +373,4 @@ class ReforgePrinter {
         stream.close()
     }
 }
+*/

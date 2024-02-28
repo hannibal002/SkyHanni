@@ -2,8 +2,8 @@ package at.hannibal2.skyhanni
 
 import at.hannibal2.skyhanni.api.CollectionAPI
 import at.hannibal2.skyhanni.api.DataWatcherAPI
-import at.hannibal2.skyhanni.api.ReforgeAPI
 import at.hannibal2.skyhanni.api.GetFromSackAPI
+import at.hannibal2.skyhanni.api.ReforgeAPI
 import at.hannibal2.skyhanni.api.SkillAPI
 import at.hannibal2.skyhanni.config.ConfigFileType
 import at.hannibal2.skyhanni.config.ConfigManager
@@ -39,7 +39,6 @@ import at.hannibal2.skyhanni.data.PartyAPI
 import at.hannibal2.skyhanni.data.PetAPI
 import at.hannibal2.skyhanni.data.ProfileStorageData
 import at.hannibal2.skyhanni.data.PurseAPI
-import at.hannibal2.skyhanni.data.ReforgePrinter
 import at.hannibal2.skyhanni.data.RenderData
 import at.hannibal2.skyhanni.data.SackAPI
 import at.hannibal2.skyhanni.data.ScoreboardData
@@ -220,8 +219,8 @@ import at.hannibal2.skyhanni.features.inventory.ItemDisplayOverlayFeatures
 import at.hannibal2.skyhanni.features.inventory.ItemStars
 import at.hannibal2.skyhanni.features.inventory.PowerStoneGuideFeatures
 import at.hannibal2.skyhanni.features.inventory.QuickCraftFeatures
-import at.hannibal2.skyhanni.features.inventory.ReforgeHelper
 import at.hannibal2.skyhanni.features.inventory.QuiverNotification
+import at.hannibal2.skyhanni.features.inventory.ReforgeHelper
 import at.hannibal2.skyhanni.features.inventory.RngMeterInventory
 import at.hannibal2.skyhanni.features.inventory.SackDisplay
 import at.hannibal2.skyhanni.features.inventory.ShiftClickBrewing
@@ -464,7 +463,6 @@ class SkyHanniMod {
         loadModule(PetAPI)
         loadModule(BossbarData)
         loadModule(ChatUtils)
-        loadModule(ReforgePrinter())
 
         // APIs
         loadModule(BazaarApi())
