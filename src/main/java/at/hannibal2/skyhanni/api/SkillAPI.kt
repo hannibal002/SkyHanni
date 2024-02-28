@@ -1,5 +1,6 @@
 package at.hannibal2.skyhanni.api
 
+import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.data.ProfileStorageData
 import at.hannibal2.skyhanni.events.ActionBarUpdateEvent
 import at.hannibal2.skyhanni.events.ConfigLoadEvent
@@ -41,6 +42,15 @@ import kotlin.concurrent.fixedRateTimer
 import kotlin.time.Duration.Companion.seconds
 
 object SkillAPI {
+
+    val config get() = SkyHanniMod.feature.skillProgress
+    val barConfig get() = config.skillProgressBarConfig
+    val allSkillConfig get() = config.allSkillDisplayConfig
+    val etaConfig get() = config.skillETADisplayConfig
+    val customGoalConfig get() = config.customGoalConfig
+    val overflowConfig get() = config.overflowConfig
+    val skillColorConfig get() = config.skillColorConfig
+
     private val patternGroup = RepoPattern.group("api.skilldisplay")
     private val skillPercentPattern by patternGroup.pattern(
         "skill.percent",
@@ -92,11 +102,11 @@ object SkillAPI {
         if (!info.sessionTimerActive) return
 
         val time = when (activeSkill) {
-            SkillType.FARMING -> SkillProgress.etaConfig.farmingPauseTime
-            SkillType.MINING -> SkillProgress.etaConfig.miningPauseTime
-            SkillType.COMBAT -> SkillProgress.etaConfig.combatPauseTime
-            SkillType.FORAGING -> SkillProgress.etaConfig.foragingPauseTime
-            SkillType.FISHING -> SkillProgress.etaConfig.fishingPauseTime
+            SkillType.FARMING -> etaConfig.farmingPauseTime
+            SkillType.MINING -> etaConfig.miningPauseTime
+            SkillType.COMBAT -> etaConfig.combatPauseTime
+            SkillType.FORAGING -> etaConfig.foragingPauseTime
+            SkillType.FISHING -> etaConfig.fishingPauseTime
             else -> 0
         }
         if (info.lastUpdate.passedSince() > time.seconds) {

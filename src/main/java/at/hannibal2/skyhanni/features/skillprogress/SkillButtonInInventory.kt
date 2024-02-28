@@ -1,6 +1,7 @@
 package at.hannibal2.skyhanni.features.skillprogress
 
-import at.hannibal2.skyhanni.SkyHanniMod
+import at.hannibal2.skyhanni.api.SkillAPI.customGoalConfig
+import at.hannibal2.skyhanni.api.SkillAPI.overflowConfig
 import at.hannibal2.skyhanni.events.InventoryCloseEvent
 import at.hannibal2.skyhanni.events.InventoryFullyOpenedEvent
 import io.github.moulberry.notenoughupdates.events.ReplaceItemEvent
@@ -91,16 +92,16 @@ class SkillButtonInInventory {
     @SubscribeEvent
     fun replaceItem(event: ReplaceItemEvent) {
         if (event.inventory is ContainerLocalMenu && showItem) {
-            if (event.slotNumber == 50 && SkyHanniMod.feature.skillProgress.overflowConfig.tooltipButtonInSkillMenu) {
-                val itemToShow = if (SkyHanniMod.feature.skillProgress.overflowConfig.enableInSkillMenuTooltip) toggleTooltipEnabled else toggleTooltipDisabled
+            if (event.slotNumber == 50 && overflowConfig.tooltipButtonInSkillMenu) {
+                val itemToShow = if (overflowConfig.enableInSkillMenuTooltip) toggleTooltipEnabled else toggleTooltipDisabled
                 event.replaceWith(itemToShow)
             }
-            if (event.slotNumber == 51 && SkyHanniMod.feature.skillProgress.overflowConfig.stackSizeButtonInSkillMenu) {
-                val itemToShow = if (SkyHanniMod.feature.skillProgress.overflowConfig.enableInSkillMenuAsStackSize) toggleStackSizeEnabled else toggleStackSizeDisabled
+            if (event.slotNumber == 51 && overflowConfig.stackSizeButtonInSkillMenu) {
+                val itemToShow = if (overflowConfig.enableInSkillMenuAsStackSize) toggleStackSizeEnabled else toggleStackSizeDisabled
                 event.replaceWith(itemToShow)
             }
-            if (event.slotNumber == 52 && SkyHanniMod.feature.skillProgress.customGoalConfig.customGoalButtonInSkillMenu){
-                val itemToShow = if (SkyHanniMod.feature.skillProgress.customGoalConfig.enableInSkillMenuTooltip) toggleCustomGoalEnabled else toggleCustomGoalDisabled
+            if (event.slotNumber == 52 && customGoalConfig.customGoalButtonInSkillMenu) {
+                val itemToShow = if (customGoalConfig.enableInSkillMenuTooltip) toggleCustomGoalEnabled else toggleCustomGoalDisabled
                 event.replaceWith(itemToShow)
             }
         }
@@ -109,17 +110,17 @@ class SkillButtonInInventory {
     @SubscribeEvent(priority = EventPriority.HIGH)
     fun onStackClick(event: SlotClickEvent) {
         if (showItem) {
-            if (event.slotId == 50 && SkyHanniMod.feature.skillProgress.overflowConfig.tooltipButtonInSkillMenu) {
+            if (event.slotId == 50 && overflowConfig.tooltipButtonInSkillMenu) {
                 event.isCanceled = true
-                SkyHanniMod.feature.skillProgress.overflowConfig.enableInSkillMenuTooltip = !SkyHanniMod.feature.skillProgress.overflowConfig.enableInSkillMenuTooltip
+                overflowConfig.enableInSkillMenuTooltip = !overflowConfig.enableInSkillMenuTooltip
             }
-            if (event.slotId == 51 && SkyHanniMod.feature.skillProgress.overflowConfig.stackSizeButtonInSkillMenu) {
+            if (event.slotId == 51 && overflowConfig.stackSizeButtonInSkillMenu) {
                 event.isCanceled = true
-                SkyHanniMod.feature.skillProgress.overflowConfig.enableInSkillMenuAsStackSize = !SkyHanniMod.feature.skillProgress.overflowConfig.enableInSkillMenuAsStackSize
+                overflowConfig.enableInSkillMenuAsStackSize = !overflowConfig.enableInSkillMenuAsStackSize
             }
-            if (event.slotId == 52 && SkyHanniMod.feature.skillProgress.customGoalConfig.customGoalButtonInSkillMenu) {
+            if (event.slotId == 52 && customGoalConfig.customGoalButtonInSkillMenu) {
                 event.isCanceled = true
-                SkyHanniMod.feature.skillProgress.customGoalConfig.enableInSkillMenuTooltip = !SkyHanniMod.feature.skillProgress.customGoalConfig.enableInSkillMenuTooltip
+                customGoalConfig.enableInSkillMenuTooltip = !customGoalConfig.enableInSkillMenuTooltip
             }
         }
     }

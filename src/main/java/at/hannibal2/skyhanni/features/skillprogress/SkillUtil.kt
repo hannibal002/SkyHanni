@@ -5,6 +5,7 @@ import at.hannibal2.skyhanni.api.SkillAPI.activeSkill
 import at.hannibal2.skyhanni.api.SkillAPI.exactLevelingMap
 import at.hannibal2.skyhanni.api.SkillAPI.excludedSkills
 import at.hannibal2.skyhanni.api.SkillAPI.levelingMap
+import at.hannibal2.skyhanni.api.SkillAPI.skillColorConfig
 import at.hannibal2.skyhanni.utils.Quad
 import com.google.common.base.Splitter
 import com.google.gson.JsonArray
@@ -138,7 +139,7 @@ object SkillUtil {
         Utils.getElement(Constants.LEVELING, "leveling_xp").asJsonArray
 
     fun getColorForPercentage(percentage: Int): String {
-        val segments = SkillProgress.config.skillColorConfig.displayPercentageColorString.split(";")
+        val segments = skillColorConfig.displayPercentageColorString.split(";")
         val rules = segments.map { segment ->
             val parts = segment.split(":")
             val start = parts[0].toInt()

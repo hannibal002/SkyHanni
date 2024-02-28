@@ -1,8 +1,12 @@
 package at.hannibal2.skyhanni.features.skillprogress
 
-import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.SkillAPI
 import at.hannibal2.skyhanni.api.SkillAPI.activeSkill
+import at.hannibal2.skyhanni.api.SkillAPI.allSkillConfig
+import at.hannibal2.skyhanni.api.SkillAPI.barConfig
+import at.hannibal2.skyhanni.api.SkillAPI.config
+import at.hannibal2.skyhanni.api.SkillAPI.customGoalConfig
+import at.hannibal2.skyhanni.api.SkillAPI.etaConfig
 import at.hannibal2.skyhanni.api.SkillAPI.lastUpdate
 import at.hannibal2.skyhanni.api.SkillAPI.oldSkillInfoMap
 import at.hannibal2.skyhanni.api.SkillAPI.showDisplay
@@ -43,12 +47,6 @@ import kotlin.time.Duration.Companion.milliseconds
 import kotlin.time.Duration.Companion.seconds
 
 object SkillProgress {
-
-    val config get() = SkyHanniMod.feature.skillProgress
-    private val barConfig get() = config.skillProgressBarConfig
-    private val allSkillConfig get() = config.allSkillDisplayConfig
-    val etaConfig get() = config.skillETADisplayConfig
-    val customGoalConfig get() = config.customGoalConfig
 
     private var skillExpPercentage = 0.0
     private var display = emptyList<Renderable>()

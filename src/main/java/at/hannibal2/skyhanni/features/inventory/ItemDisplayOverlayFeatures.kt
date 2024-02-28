@@ -3,6 +3,7 @@ package at.hannibal2.skyhanni.features.inventory
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.CollectionAPI
 import at.hannibal2.skyhanni.api.SkillAPI
+import at.hannibal2.skyhanni.api.SkillAPI.overflowConfig
 import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.config.features.inventory.InventoryConfig.ItemNumberEntry
 import at.hannibal2.skyhanni.config.features.inventory.InventoryConfig.ItemNumberEntry.BINGO_GOAL_RANK
@@ -166,7 +167,7 @@ object ItemDisplayOverlayFeatures {
                 val level = "" + text.romanToDecimalIfNecessary()
                 val skill = SkillType.getByNameOrNull(skillName) ?: return level
                 val skillInfo = SkillAPI.storage?.get(skill) ?: return level
-                return if (SkyHanniMod.feature.skillProgress.overflowConfig.enableInSkillMenuAsStackSize)
+                return if (overflowConfig.enableInSkillMenuAsStackSize)
                     "" + skillInfo.overflowLevel else level
             }
         }
