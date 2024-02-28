@@ -212,6 +212,7 @@
 + Added /pd short command for party disband. - Empa
 + Added support for number abbreviations in /shskills. - hannibal2
     + "/shskills levelwithxp 750m"
++ Renamed currentXP to xp in /shskills description. - hannibal2
 
 #### Config Changes
 
@@ -240,6 +241,7 @@
 + Added shader reload capabilities for chroma resource packs. - nea
 + Added option to only show Ender Node tracker while holding a pickaxe. - Thunderblade73
 + Matched XP/h timer with the session timer in the skill ETA display. - HiZe
++ Talbot's Theodolite: Support exact height message. - alexia
 
 ### Fixes
 
@@ -266,6 +268,9 @@
 + Fixed wording of composter fuel warning. - alexia
 + Fixed Garden plot menu icon edit mode copies stack size. - hannibal2
 + Fixed the wrong color code on the visitor shopping list sacks number line. - hannibal2
++ Fixed Anita Medal Profit Display using wrong items. - hannibal2
++ Fixed Box of Seeds not working with /shcroptime. - alexia
++ Fixed Farming Weight Display sometimes not showing when joining the Garden. - CalMWolfs
 
 #### Combat Fixes
 
@@ -354,6 +359,7 @@
 + Fixed detecting bingo profile while visiting other players bingo island. - hannibal2
 + Fixed performance issues with Bingo Minion Craft Helper. - hannibal2
 + Fixed Bingo Minion Craft Helper not detecting crafted tier one minion. - hannibal2
++ Fixed rare error reading and rendering Bingo Card Tips in Bingo inventory. - Thunderblade73
 
 #### Chat Fixes
 
@@ -372,6 +378,8 @@
 + Fixed Skill progress display size too small when not using the progress bar. - Thunderblade73
 + Fixed the skill progress bar trying to get out of the screen. - HiZe
 + Fixed the negative time remaining in the skill ETA display. - HiZe
++ Fixed skill timer. - hannibal2
++ Fixed overflow level goal in skills tooltips. - HiZe
 
 #### Winter Fixes
 
