@@ -29,7 +29,6 @@ import at.hannibal2.skyhanni.utils.TimeUtils
 import at.hannibal2.skyhanni.utils.fromJson
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 import com.google.gson.reflect.TypeToken
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import kotlin.time.Duration.Companion.seconds
@@ -96,7 +95,6 @@ class FarmingWeightDisplay {
 
         private val config get() = GardenAPI.config.eliteFarmingWeights
         private val localCounter = mutableMapOf<CropType, Long>()
-        private var dispatcher = Dispatchers.IO
 
         private var display = emptyList<Renderable>()
         private var profileId = ""
