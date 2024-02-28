@@ -20,35 +20,31 @@ class LaneswitchNotification {
     private var lastPos = LorenzVec(0, 0, 0)
     private var lastLaneSwitch = SimpleTimeMark.farPast()
 
-    private fun coverable(from: LorenzVec, to: LorenzVec, speed: Double, time: Int): Boolean {
+    private fun switchPossibleInTime(from: LorenzVec, to: LorenzVec, speed: Double, time: Int): Boolean {
         return from.distance(to) <= speed * time
     }
 
-    companion object {
-        private val config get() = GardenAPI.config.laneswitch
-
-        @JvmStatic
-        fun playUserSound() {
-            SoundUtils.createSound(
-                config.notification.sound.notificationSound,
-                config.notification.sound.notificationPitch,
-                config.notification.sound.notificationVolume
-            ).playSound()
-        }
+    private fun playUserSound() {
+        SoundUtils.createSound(
+            config.notification.sound.notificationSound,
+            config.notification.sound.notificationPitch,
+            config.notification.sound.notificationVolume
+        ).playSound()
     }
+
 
     @SubscribeEvent
     fun onTick(event: LorenzTickEvent) {
         if (!config.enabled || !GardenAPI.inGarden()) return
         if (GardenCropSpeed.averageBlocksPerSecond <= 0.0 && config.notification.farmingOnly) return
 
-        val playerPosition = LocationUtils.playerLocation().round(2)
+        val playerPosition = LocationUtils.playerLocation()
         blocksPerSecond = playerPosition.distance(lastPos) * 20
         this.lastPos = playerPosition
 
         if (lastLaneSwitch.passedSince() >= config.notification.settings.notificationTimeout.seconds) {
             val farmEnd: List<LorenzVec> = when (config.farm.farmDirection) {
-                LaneswitchFarmConfig.FarmDirection.NORTH, LaneswitchFarmConfig.FarmDirection.SOUTH -> {
+                LaneswitchFarmConfig.FarmDirection.NORTH_SOUTH -> {
                     val xValue = (config.farm.plotAmount * 48).toDouble()
                     listOf(
                         LorenzVec(xValue, playerPosition.y, playerPosition.z),
@@ -56,17 +52,15 @@ class LaneswitchNotification {
                     )
                 }
 
-                LaneswitchFarmConfig.FarmDirection.EAST, LaneswitchFarmConfig.FarmDirection.WEST -> {
+                LaneswitchFarmConfig.FarmDirection.EAST_WEST -> {
                     val zValue = (config.farm.plotAmount * 48).toDouble()
                     listOf(
                         LorenzVec(playerPosition.x, playerPosition.y, zValue),
                         LorenzVec(playerPosition.x, playerPosition.y, -zValue)
                     )
                 }
-
-                else -> emptyList()
             }
-            if (coverable(playerPosition, farmEnd[0], blocksPerSecond, config.notification.settings.notificationThreshold) || playerPosition.distance(farmEnd[1]) <= blocksPerSecond * config.notification.settings.notificationThreshold) {
+            if (farmEnd.any { switchPossibleInTime (playerPosition, it, blocksPerSecond, config.notification.settings.notificationThreshold) }) {
                 sendTitle(config.notification.settings.notificationColor.getChatColor() + config.notification.settings.notificationText, config.notification.settings.notificationDuration.seconds)
                 playUserSound()
                 this.lastLaneSwitch = SimpleTimeMark.now()

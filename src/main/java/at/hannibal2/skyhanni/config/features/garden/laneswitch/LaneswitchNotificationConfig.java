@@ -23,7 +23,7 @@ public class LaneswitchNotificationConfig {
     public LaneswitchNotificationSettings settings = new LaneswitchNotificationSettings();
 
     @Expose
-    @ConfigOption(name = "Farming only", desc = "Show the notification only when Farming.")
+    @ConfigOption(name = "Farming only", desc = "Show the notification only when farming.")
     @ConfigEditorBoolean
     @FeatureToggle
     public boolean farmingOnly = false;

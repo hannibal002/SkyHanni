@@ -10,32 +10,32 @@ import io.github.moulberry.moulconfig.annotations.ConfigOption;
 public class LaneswitchNotificationSettings {
 
     @Expose
-    @ConfigOption(name = "Notification Text", desc = "The Text to be displayed as the Notification.")
+    @ConfigOption(name = "Notification Text", desc = "The text to be displayed as the notification.")
     @ConfigEditorText
     public String notificationText = "Lane Switch incoming.";
 
-    @ConfigOption(name = "Notification Text Color", desc = "Notification Text Color. §eIf Chroma is gray, enable Chroma in Chroma settings.")
+    @ConfigOption(name = "Notification Text Color", desc = "Notification text color. §eIf Chroma is gray, enable Chroma in Chroma settings.")
     @Expose
     @ConfigEditorDropdown
     public LorenzColor notificationColor = LorenzColor.YELLOW;
 
     @Expose
-    @ConfigOption(name = "Notification Duration", desc = "The time the Notification is displayed.")
+    @ConfigOption(name = "Notification Duration", desc = "The time the notification is displayed.")
     @ConfigEditorSlider(
         minValue = 1F,
-        maxValue = 5F,
+        maxValue = 10F,
         minStep = 0.5F
     )
     public double notificationDuration = 2.5;
 
     @Expose
-    @ConfigOption(name = "Notification Threshold", desc = "How early the notification will be displayed (Seconds before the Lane Switching Notification).")
+    @ConfigOption(name = "Notification Threshold", desc = "How early the notification will be displayed (Seconds before the Lane Switching notification).")
     @ConfigEditorSlider(
         minValue = 1,
-        maxValue = 15,
+        maxValue = 10,
         minStep = 1
     )
-    public int notificationThreshold = 10;
+    public int notificationThreshold = 5;
 
     @Expose
     @ConfigOption(name = "Notification Timeout", desc = "Minimum time to pass before the next Notification is displayed.")

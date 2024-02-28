@@ -8,7 +8,7 @@ import io.github.moulberry.moulconfig.annotations.ConfigOption;
 
 public class LaneswitchFarmConfig {
     @Expose
-    @ConfigOption(name = "Amount of Plots", desc = "The amount of plots the current Farm has.")
+    @ConfigOption(name = "Lane Length", desc = "The length (in plots) of each lane.")
     @ConfigEditorSlider(
         minValue = 1,
         maxValue = 5,
@@ -16,32 +16,18 @@ public class LaneswitchFarmConfig {
     )
     public int plotAmount = 1;
 
-    @ConfigOption(name = "Farm Direction", desc = "The Direction you face while you are farming.")
+    @ConfigOption(name = "Farm direction", desc = "The direction you are facing while farming.")
     @Expose
     @ConfigEditorDropdown
-    public FarmDirection farmDirection = FarmDirection.SOUTH;
+    public FarmDirection farmDirection = FarmDirection.NORTH_SOUTH;
 
-    public enum FarmDirection implements HasLegacyId {
-        NORTH("North", 0),
-        EAST("East", 1),
-        SOUTH("South", 2),
-        WEST("West", 3);
+    public enum FarmDirection{
+        NORTH_SOUTH("North-South"),
+        EAST_WEST("East-West");
         private final String str;
-        private final int legacyId;
 
-        FarmDirection(String str, int legacyId) {
-            this.str = str;
-            this.legacyId = legacyId;
-        }
-
-        // Constructor if new enum elements are added post-migration
         FarmDirection(String str) {
-            this(str, -1);
-        }
-
-        @Override
-        public int getLegacyId() {
-            return legacyId;
+            this.str = str;
         }
 
         @Override
