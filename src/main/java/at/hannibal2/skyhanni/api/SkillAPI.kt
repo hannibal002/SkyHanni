@@ -191,13 +191,6 @@ object SkillAPI {
                             totalXp
                         )
 
-                        val xpFor50 = xpRequiredForLevel(50.0)
-                        val xpFor60 = xpRequiredForLevel(60.0)
-                        var have = overflowTotal
-                        have += if (overflowLevel >= 60 && skill in excludedSkills || overflowLevel in 50 .. 59) xpFor50
-                        else if (overflowLevel >= 60 && skill !in excludedSkills) xpFor60
-                        else 0
-
                         skillInfo?.apply {
                             this.overflowLevel = overflowLevel
                             this.overflowCurrentXp = overflowCurrent
@@ -208,7 +201,6 @@ object SkillAPI {
                             this.level = skillLevel
                             this.currentXp = totalXp
                             this.currentXpMax = 0L
-                            this.globalXp = have
                         }
                     } else {
                         val splitProgress = progress.split("/")
@@ -216,15 +208,6 @@ object SkillAPI {
                         val neededXp = splitProgress.last().formatNumber()
                         val levelingArray = levelArray()
                         val levelXp = calculateLevelXp(levelingArray, skillLevel - 1).toLong()
-
-
-                        val xpFor50 = xpRequiredForLevel(50.0)
-                        val xpFor60 = xpRequiredForLevel(60.0)
-                        var have = levelXp + currentXp
-
-                        have += if (skillLevel >= 60 && skill in excludedSkills || skillLevel in 50 .. 59) xpFor50
-                        else if (skillLevel >= 60 && skill !in excludedSkills) xpFor60
-                        else 0
 
                         skillInfo?.apply {
                             this.currentXp = currentXp
@@ -236,7 +219,6 @@ object SkillAPI {
                             this.overflowLevel = skillLevel
                             this.overflowCurrentXpMax = neededXp
                             this.overflowTotalXp = levelXp + currentXp
-                            this.globalXp = have
                         }
                     }
                 }
@@ -292,7 +274,6 @@ object SkillAPI {
         add("-  OverflowCurrentXp: ${skillInfo.overflowCurrentXp}")
         add("-  OverflowCurrentXpMax: ${skillInfo.overflowCurrentXpMax}")
         add("-  OverflowTotalXp: ${skillInfo.overflowTotalXp}")
-        add("-  GlobalXp: ${skillInfo.globalXp}")
         add("-  CustomGoalLevel: ${skillInfo.customGoalLevel}\n")
     }
 
@@ -310,13 +291,6 @@ object SkillAPI {
         if (skillInfo.overflowLevel != 0 && levelOverflow == skillInfo.overflowLevel + 1)
             SkillOverflowLevelupEvent(skillType, skillInfo.overflowLevel, levelOverflow).postAndCatch()
 
-        val xpFor50 = xpRequiredForLevel(50.0)
-        val xpFor60 = xpRequiredForLevel(60.0)
-        var have = totalOverflow
-        have += if (levelOverflow >= 60 && skillType in excludedSkills || levelOverflow in 50 .. 59) xpFor50
-        else if (levelOverflow >= 60 && skillType !in excludedSkills) xpFor60
-        else 0
-
         skillInfo.apply {
             this.level = level
             this.currentXp = currentXp
@@ -327,7 +301,6 @@ object SkillAPI {
             this.overflowCurrentXp = currentOverflow
             this.overflowCurrentXpMax = currentMaxOverflow
             this.overflowTotalXp = totalOverflow
-            this.globalXp = have
 
             this.lastGain = matcher.group("gained")
         }
@@ -363,12 +336,6 @@ object SkillAPI {
             nextLevelDiff.toLong(),
             totalXp.toLong()
         )
-        val xpFor50 = xpRequiredForLevel(50.0)
-        val xpFor60 = xpRequiredForLevel(60.0)
-        var have = totalOverflow
-        have += if (levelOverflow >= 60 && skillType in excludedSkills || levelOverflow in 50 .. 59) xpFor50
-        else if (levelOverflow >= 60 && skillType !in excludedSkills) xpFor60
-        else 0
         existingLevel.apply {
             this.totalXp = totalXp.toLong()
             this.currentXp = nextLevelProgress.toLong()
@@ -379,7 +346,6 @@ object SkillAPI {
             this.overflowCurrentXp = currentOverflow
             this.overflowCurrentXpMax = currentMaxOverflow
             this.overflowLevel = tablistLevel
-            this.globalXp = have
 
             this.lastGain = matcher.group("gained")
         }
@@ -398,12 +364,6 @@ object SkillAPI {
             maxXp,
             levelXp
         )
-        val xpFor50 = xpRequiredForLevel(50.0)
-        val xpFor60 = xpRequiredForLevel(60.0)
-        var have = totalOverflow
-        have += if (currentLevel >= 60 && skillType in excludedSkills || currentLevel in 50 .. 59) xpFor50
-        else if (currentLevel >= 60 && skillType !in excludedSkills) xpFor60
-        else 0
         skillInfo.apply {
             this.overflowCurrentXp = currentOverflow
             this.overflowCurrentXpMax = currentMaxOverflow
@@ -414,7 +374,6 @@ object SkillAPI {
             this.currentXpMax = maxXp
             this.totalXp = levelXp
             this.level = level
-            this.globalXp = have
 
             this.lastGain = matcher.group("gained")
         }
@@ -559,7 +518,6 @@ object SkillAPI {
         @Expose var overflowCurrentXpMax: Long = 0,
         @Expose var lastGain: String = "",
         @Expose var customGoalLevel: Int = 0,
-        @Expose var globalXp: Long = 0,
     )
 
     data class SkillXPInfo(
