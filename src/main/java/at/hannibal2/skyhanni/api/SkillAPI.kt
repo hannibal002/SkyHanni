@@ -131,7 +131,6 @@ object SkillAPI {
                 lastUpdate = SimpleTimeMark.now()
                 skillXp.lastUpdate = SimpleTimeMark.now()
                 skillXp.sessionTimerActive = true
-
                 SkillProgress.updateDisplay()
                 SkillProgress.hideInActionBar = listOf(component)
                 return
