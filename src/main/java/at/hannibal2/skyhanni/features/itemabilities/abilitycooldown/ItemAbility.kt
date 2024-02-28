@@ -53,6 +53,7 @@ enum class ItemAbility(
     FIRE_VEIL("Fire Veil", 5, "Fire Veil Wand"),
     INK_WAND("Ink Bomb", 30, "Ink Wand"),
     ROGUE_SWORD("Speed Boost", 30, "Rogue Sword", ignoreMageCooldownReduction = true),
+    TALBOTS_THEODOLITE("Track", 10, "Talbot's Theodolite"),
 
     // doesn't have a consistent sound
     ECHO("Echo", 3, "Ancestral Spade");

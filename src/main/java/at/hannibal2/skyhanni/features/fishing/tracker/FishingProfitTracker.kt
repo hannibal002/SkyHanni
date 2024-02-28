@@ -112,14 +112,7 @@ object FishingProfitTracker {
             )
         )
 
-        val profitFormat = profit.addSeparators()
-        val profitPrefix = if (profit < 0) "§c" else "§6"
-
-        val profitPerCatch = profit / data.totalCatchAmount
-        val profitPerCatchFormat = NumberUtil.format(profitPerCatch)
-
-        val text = "§eTotal Profit: $profitPrefix$profitFormat coins"
-        addAsSingletonList(Renderable.hoverTips(text, listOf("§7Profit per catch: $profitPrefix$profitPerCatchFormat")))
+        addAsSingletonList(tracker.addTotalProfit(profit, data.totalCatchAmount, "catch"))
 
         tracker.addPriceFromButton(this)
     }
@@ -182,9 +175,7 @@ object FishingProfitTracker {
 
         val recentPickup = config.showWhenPickup && lastCatchTime.passedSince() < 3.seconds
         if (!recentPickup) {
-            if (!FishingAPI.hasFishingRodInHand()) return
-            // TODO remove hide moving chech, replace with last cast location + radius
-            if (FishingProfitPlayerMoving.isMoving && config.hideMoving) return
+            if (!FishingAPI.isFishing()) return
         }
 
         tracker.renderDisplay(config.position)
@@ -220,5 +211,5 @@ object FishingProfitTracker {
         tracker.resetCommand(args, "shresetfishingtracker")
     }
 
-    fun isEnabled() = LorenzUtils.inSkyBlock && config.enabled
+    fun isEnabled() = LorenzUtils.inSkyBlock && config.enabled && !LorenzUtils.inKuudraFight
 }

@@ -24,7 +24,9 @@ class RenderData {
         if (!SkyHanniDebugsAndTests.globalRender) return
         if (GuiEditManager.isInGui() || VisualWordGui.isInGui()) return
 
+        GlStateManager.translate(0f,0f,-3f)
         GuiRenderEvent.GuiOverlayRenderEvent().postAndCatch()
+        GlStateManager.translate(0f,0f,3f)
     }
 
     @SubscribeEvent
@@ -38,7 +40,9 @@ class RenderData {
         GlStateManager.enableDepth()
 
         if (GuiEditManager.isInGui()) {
+            GlStateManager.translate(0f,0f,-3f)
             GuiRenderEvent.GuiOverlayRenderEvent().postAndCatch()
+            GlStateManager.translate(0f,0f,3f)
         }
 
         GuiRenderEvent.ChestGuiOverlayRenderEvent().postAndCatch()
