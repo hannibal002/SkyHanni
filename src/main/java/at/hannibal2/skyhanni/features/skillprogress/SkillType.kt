@@ -1,6 +1,5 @@
 package at.hannibal2.skyhanni.features.skillprogress
 
-import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.SkillAPI.barConfig
 import io.github.moulberry.notenoughupdates.util.Utils
 import net.minecraft.block.Block

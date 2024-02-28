@@ -19,6 +19,7 @@ import at.hannibal2.skyhanni.features.skillprogress.SkillUtil.getSkillInfo
 import at.hannibal2.skyhanni.features.skillprogress.SkillUtil.levelArray
 import at.hannibal2.skyhanni.features.skillprogress.SkillUtil.xpRequiredForLevel
 import at.hannibal2.skyhanni.utils.ChatUtils
+import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.cleanName
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
@@ -35,6 +36,7 @@ import com.google.gson.reflect.TypeToken
 import io.github.moulberry.notenoughupdates.util.Constants
 import io.github.moulberry.notenoughupdates.util.Utils
 import net.minecraft.command.CommandBase
+import net.minecraft.item.ItemStack
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import java.util.LinkedList
 import java.util.regex.Matcher
@@ -430,12 +432,12 @@ object SkillAPI {
                     if (level <= 60) {
                         val neededXp = levelingMap.filter { it.key < level }.values.sum().toLong()
                         ChatUtils.chat("You need §b${neededXp.addSeparators()} §eXP to be level §b${level.toDouble()}")
+                        return
                     } else {
-                        val base = levelingMap.values.sum().toLong()
                         val neededXP = xpRequiredForLevel(level.toDouble())
                         ChatUtils.chat("You need §b${neededXP.addSeparators()} §eXP to be level §b${level.toDouble()}")
+                        return
                     }
-                    return
                 }
 
                 "goal" -> {
@@ -448,6 +450,26 @@ object SkillAPI {
                     val skill = storage?.get(skillType) ?: return
                     skill.customGoalLevel = 0
                     ChatUtils.chat("Custom goal level for §b${skillType.displayName} §ereset")
+                    return
+                }
+
+                "icon" -> {
+                    val rawSkill = it[1].lowercase()
+                    val skillType = SkillType.getByNameOrNull(rawSkill)
+                    if (skillType == null) {
+                        ChatUtils.userError("Unknown Skill type: $rawSkill")
+                        return
+                    }
+                    val skill = storage?.get(skillType) ?: return
+                    val stack = InventoryUtils.getItemInHand()
+                    if (stack == null) {
+                        ChatUtils.chat("Icon for ${skillType.displayName} has been reset.")
+                        skill.item = null
+                        return
+                    }
+                    skill.item = stack
+                    ChatUtils.chat("Changed item for skill ${skillType.displayName}")
+                    return
                 }
             }
         }
@@ -484,8 +506,8 @@ object SkillAPI {
 
     fun onComplete(strings: Array<String>): List<String> {
         return when (strings.size) {
-            1 -> listOf("levelwithxp", "xpforlevel", "goal")
-            2 -> if (strings[0].lowercase() == "goal") CommandBase.getListOfStringsMatchingLastWord(
+            1 -> listOf("levelwithxp", "xpforlevel", "goal", "icon")
+            2 -> if (strings[0].lowercase() == "goal" || strings[0].lowercase() == "icon") CommandBase.getListOfStringsMatchingLastWord(
                 strings,
                 SkillType.entries.map { it.displayName })
             else
@@ -502,6 +524,7 @@ object SkillAPI {
                 "§6/shskills xpforlevel <desiredLevel> - §bGet how much XP you need for a desired level.",
                 "§6/shskills goal - §bView your current goal",
                 "§6/shskills goal <skill> <level> - §bDefine your goal for <skill>",
+                "§6/shskills icon <skill> - §bChange the icon for <skill>",
                 "",
             ).joinToString("\n"), prefix = false
         )
@@ -518,6 +541,7 @@ object SkillAPI {
         @Expose var overflowCurrentXpMax: Long = 0,
         @Expose var lastGain: String = "",
         @Expose var customGoalLevel: Int = 0,
+        @Expose var item: ItemStack? = null,
     )
 
     data class SkillXPInfo(
