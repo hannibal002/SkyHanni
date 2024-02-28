@@ -4,9 +4,11 @@ import at.hannibal2.skyhanni.config.FeatureToggle;
 import at.hannibal2.skyhanni.config.core.config.Position;
 import at.hannibal2.skyhanni.config.features.garden.composter.ComposterConfig;
 import at.hannibal2.skyhanni.config.features.garden.cropmilestones.CropMilestonesConfig;
+import at.hannibal2.skyhanni.config.features.garden.laneswitch.LaneswitchConfig;
 import at.hannibal2.skyhanni.config.features.garden.optimalspeed.OptimalSpeedConfig;
 import at.hannibal2.skyhanni.config.features.garden.pests.PestsConfig;
 import at.hannibal2.skyhanni.config.features.garden.visitor.VisitorConfig;
+import at.hannibal2.skyhanni.config.features.garden.laneswitch.LaneswitchNotificationConfig;
 import com.google.gson.annotations.Expose;
 import io.github.moulberry.moulconfig.annotations.Accordion;
 import io.github.moulberry.moulconfig.annotations.Category;
@@ -15,6 +17,10 @@ import io.github.moulberry.moulconfig.annotations.ConfigEditorSlider;
 import io.github.moulberry.moulconfig.annotations.ConfigOption;
 
 public class GardenConfig {
+
+    @Expose
+    @Category(name = "Lane Switching", desc = "Settings for Lane Switches")
+    public LaneswitchConfig laneswitch = new LaneswitchConfig();
 
     @Expose
     @ConfigOption(name = "SkyMart", desc = "")
@@ -128,6 +134,7 @@ public class GardenConfig {
     @ConfigOption(name = "Atmospheric Filter Display", desc = "")
     @Accordion
     public AtmosphericFilterDisplayConfig atmosphericFilterDisplay = new AtmosphericFilterDisplayConfig();
+
 
     @Expose
     @ConfigOption(name = "Plot Price", desc = "Show the price of the plot in coins when inside the Configure Plots inventory.")

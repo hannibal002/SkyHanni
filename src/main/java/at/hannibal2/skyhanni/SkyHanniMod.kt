@@ -176,6 +176,7 @@ import at.hannibal2.skyhanni.features.garden.contest.JacobContestStatsSummary
 import at.hannibal2.skyhanni.features.garden.contest.JacobContestTimeNeeded
 import at.hannibal2.skyhanni.features.garden.contest.JacobFarmingContestsInventory
 import at.hannibal2.skyhanni.features.garden.farming.ArmorDropTracker
+import at.hannibal2.skyhanni.features.garden.farming.LaneswitchNotification
 import at.hannibal2.skyhanni.features.garden.farming.CropMoneyDisplay
 import at.hannibal2.skyhanni.features.garden.farming.CropSpeedMeter
 import at.hannibal2.skyhanni.features.garden.farming.DicerRngDropTracker
@@ -611,6 +612,7 @@ class SkyHanniMod {
         loadModule(GardenNextJacobContest)
         loadModule(WrongFungiCutterWarning())
         loadModule(ArmorDropTracker)
+        loadModule(LaneswitchNotification())
         loadModule(JoinCrystalHollows())
         loadModule(CrystalHollowsNamesInCore())
         loadModule(GardenVisitorColorNames)
