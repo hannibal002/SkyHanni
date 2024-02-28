@@ -518,6 +518,5 @@ object SkillAPI {
         var isActive: Boolean = false,
         var lastUpdate: SimpleTimeMark = SimpleTimeMark.farPast(),
         var timeActive: Long = 0L,
-        var shouldStartTimer: Boolean = true,
     )
 }
