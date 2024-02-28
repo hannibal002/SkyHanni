@@ -1,6 +1,7 @@
 package at.hannibal2.skyhanni.features.misc
 
 import at.hannibal2.skyhanni.SkyHanniMod
+import at.hannibal2.skyhanni.config.features.misc.LeaveJoinMsgsConfig.KnownPlayersDetails.IsFriendsKnown
 import at.hannibal2.skyhanni.data.FriendAPI
 import at.hannibal2.skyhanni.data.GuildAPI
 import at.hannibal2.skyhanni.data.IslandType
@@ -16,6 +17,7 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
 object IslandLeaveJoinMsgs {
     private val config get() = SkyHanniMod.feature.misc.leaveJoinMsgs
+    private val knownConfig get() = config.knownPlayersDetails
 
     private var players = mutableListOf<String>()
 
@@ -25,15 +27,15 @@ object IslandLeaveJoinMsgs {
     private val patternGroup = RepoPattern.group("misc.islandleavejoinmsgs")
     private val rawPlayerPattern by patternGroup.pattern(
         "rawplayers",
-        "^§8\\[§\\w\\d+§8\\] (?<player>§\\w+).*$"
+        "^§8\\[§[0-9a-f]\\d+§8\\] (?<player>§[0-9a-f]\\w+).*$"
     )
     private val cleanPlayerPattern by patternGroup.pattern(
         "cleanplayers",
-        "^§8\\[§r§\\w\\d+§r§8\\] §r(?<player>§\\w+).*$"
+        "^§8\\[§r§[0-9a-f]\\d+§r§8\\] §r(?<player>§[0-9a-f]\\w+).*$"
     )
     private val offlinePlayerPattern by patternGroup.pattern(
         "offlineplayers",
-        "^§[0-9a-f]\\w+(?: §r§7\\(Offline [0-9dh+]+§r§7\\))?\$"
+        "^(?<player>§[0-9a-f]\\w+)(?: §r§7\\(Offline [0-9dh+]+§r§7\\))?\$"
     )
     private val islandCategoryPattern by patternGroup.pattern(
         "islandcategory",
@@ -51,8 +53,7 @@ object IslandLeaveJoinMsgs {
         val guesting = IslandType.onPrivateWorld(guesting = true)
         if (!(onPrivateIslandGarden || (config.onPublicIslands && !guesting) || (config.guestLeaveJoinMsgs && guesting))) return
 
-        val rawPlayersNew = mutableListOf<String>()
-        val cleanPlayersNew = mutableListOf<String>()
+        val playersNew = mutableListOf<String>()
 
         var inIslandCategory = false
         val islandOwners = mutableListOf<String>()
@@ -61,12 +62,12 @@ object IslandLeaveJoinMsgs {
         val leaveMessage = " §${if (config.leaveJoinColor) "c" else "e"}left §ethe island."
 
         for (line in event.tabList) {
-            if (guesting && !onKnownIsland) {
+            if (guesting) {
                 islandCategoryPattern.matchMatcher(line) {
                     inIslandCategory = true
                 }
                 if (inIslandCategory) offlinePlayerPattern.matchMatcher(line) {
-                    islandOwners.add(line)
+                    islandOwners.add(group("player"))
                 }
                 guestCategoryPattern.matchMatcher(line) {
                     inIslandCategory = false
@@ -76,14 +77,15 @@ object IslandLeaveJoinMsgs {
                             return@matchMatcher
                         }
                     }
+                    onKnownIsland = false
                     return@matchMatcher
                 }
             }
 
             cleanPlayerPattern.matchMatcher(line) {
                 val player = group("player")
-                cleanPlayersNew.add(player)
-                if (guesting && inIslandCategory) {islandOwners.add(player)}
+                playersNew.add(player)
+                if (guesting && inIslandCategory) { islandOwners.add(player) }
                 if (players.contains(player)) {
                     return@matchMatcher
                 }
@@ -93,7 +95,8 @@ object IslandLeaveJoinMsgs {
                 }
             }
             rawPlayerPattern.matchMatcher(line) {
-                rawPlayersNew.add(group("player"))
+                val player = group("player")
+                if (!playersNew.contains(player)) playersNew.add(player)
             }
         }
 
@@ -104,7 +107,7 @@ object IslandLeaveJoinMsgs {
         }
 
         for ((index, player) in players.withIndex().reversed()) {
-            if (!rawPlayersNew.contains(player) && !cleanPlayersNew.contains(player)) {
+            if (!playersNew.contains(player)) {
                 if (shouldSendMsg(player)) ChatUtils.chat(player + leaveMessage)
                 players.removeAt(index)
             }
@@ -131,6 +134,12 @@ object IslandLeaveJoinMsgs {
     }
 
     private fun isPlayerKnown(player: String): Boolean {
-        return (FriendAPI.isFriend(player) || GuildAPI.isInGuild(player) || PartyAPI.partyMembers.contains(player))
-    } // TODO options for only best friends and adding/removing known players
+        val bestFriendsSelected = knownConfig.isFriendsKnown.equals(IsFriendsKnown.BEST_FRIENDS)
+        val noFriendsSelected = knownConfig.isFriendsKnown.equals(IsFriendsKnown.NO_FRIENDS)
+
+        if (FriendAPI.isFriend(player, bestFriendsSelected) && !noFriendsSelected) return true
+        if (GuildAPI.isInGuild(player) && knownConfig.isGuildKnown) return true
+        if (PartyAPI.partyMembers.contains(player) && knownConfig.isPartyKnown) return true
+        return MarkedPlayerManager.isMarkedPlayer(player) && knownConfig.isMarkedPlayersKnown
+    } 
 }

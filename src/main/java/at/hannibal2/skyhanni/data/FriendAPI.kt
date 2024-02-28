@@ -63,7 +63,8 @@ object FriendAPI {
         return list
     }
 
-    fun isFriend(player: String): Boolean = getAllFriends().any { it.name.contains(player) }
+    fun isFriend(player: String, onlyBest: Boolean = false): Boolean =
+        getAllFriends().any { it.name.contains(player) && if (onlyBest) { it.bestFriend } else true}
 
     fun saveConfig() {
         SkyHanniMod.configManager.saveConfig(ConfigFileType.FRIENDS, "Save file")

@@ -2,8 +2,11 @@ package at.hannibal2.skyhanni.config.features.misc;
 
 import at.hannibal2.skyhanni.config.FeatureToggle;
 import com.google.gson.annotations.Expose;
+import io.github.moulberry.moulconfig.annotations.Accordion;
 import io.github.moulberry.moulconfig.annotations.ConfigEditorBoolean;
+import io.github.moulberry.moulconfig.annotations.ConfigEditorDropdown;
 import io.github.moulberry.moulconfig.annotations.ConfigOption;
+import io.github.moulberry.moulconfig.observer.Property;
 
 public class LeaveJoinMsgsConfig {
 
@@ -39,9 +42,62 @@ public class LeaveJoinMsgsConfig {
     @Expose
     @ConfigOption(
         name = "Only Known Players",
-        desc = "Only send a message if you know the person (they're in your friends, guild, or party).")
+        desc = "Only send a message if you know the person (they're in your friends, guild, party, or marked).")
     @ConfigEditorBoolean
     public boolean onlyKnownPeople = true;
+
+    @Expose
+    @ConfigOption(name = "Known Players Customization", desc = "")
+    @Accordion
+    public KnownPlayersDetails knownPlayersDetails = new KnownPlayersDetails();
+
+    public static class KnownPlayersDetails {
+        @Expose
+        @ConfigOption(
+            name = "Friends",
+            desc = "Types of friends to include as known players.")
+        @ConfigEditorDropdown
+        public Property<IsFriendsKnown> isFriendsKnown = Property.of(IsFriendsKnown.ALL_FRIENDS);
+
+        public enum IsFriendsKnown {
+            ALL_FRIENDS("All"),
+            BEST_FRIENDS("Only best"),
+            NO_FRIENDS("None"),
+            ;
+
+            private final String str;
+
+            IsFriendsKnown(String str) {
+                this.str = str;
+            }
+
+            @Override
+            public String toString() {
+                return str;
+            }
+        }
+
+        @Expose
+        @ConfigOption(
+            name = "Guild",
+            desc = "Include guild members as known players.")
+        @ConfigEditorBoolean
+        public boolean isGuildKnown = true;
+
+        @Expose
+        @ConfigOption(
+            name = "Party",
+            desc = "Include party members as known players.")
+        @ConfigEditorBoolean
+        public boolean isPartyKnown = true;
+
+        @Expose
+        @ConfigOption(
+            name = "Marked Players",
+            desc = "Include marked players (§e/shmarkplayer§7) as known players.")
+        @ConfigEditorBoolean
+        public boolean isMarkedPlayersKnown = true;
+    }
 
     @Expose
     @ConfigOption(
@@ -53,7 +109,7 @@ public class LeaveJoinMsgsConfig {
     @Expose
     @ConfigOption(
         name = "Always on Known Islands",
-        desc = "Bypass the Only Known Players toggle while visiting known players' Private Island/Garden.")
+        desc = "Bypass the Only Known Players toggle while visiting known players' Private Island/Garden.\n§cMay be buggy with offline owners.")
     @ConfigEditorBoolean
     public boolean alwaysOnKnownIslands = false;
 }
