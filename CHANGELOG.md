@@ -62,6 +62,10 @@
 + Added not fully completed tasks in Way to gain SkyBlock XP menus. - Thunderblade73
     + Works in the subcategories.
     + It does not work with infinite tasks.
++ Added Harp GUI Scale. - Thunderblade73
+    + Automatically sets the GUI scale to AUTO when entering the Harp.
++ Added Harp Quick Restart. - Thunderblade73
+    + Once you've launched the harp, quickly hit the close button in the harp menu to initiate the selected song.
 
 #### Item Features
 
@@ -96,15 +100,6 @@
     + ETA Display, exp, actions or percentage to next level, custom level goals, all skill display, chroma progress bar,
       and overflow levels for all those things.
     + A ton of settings.
-
-#### Misc Features
-
-+ Fixes Ghost Entities. - hannibal2 & nea & Thunderblade73
-    + Removes ghost entities caused by a Hypixel bug. This included Diana, Dungeon and Crimson Isle mobs and nametags.
-+ Added Harp GUI Scale. - Thunderblade73
-    + Automatically sets the GUI scale to AUTO when entering the Harp.
-+ Added Harp Quick Restart. - Thunderblade73
-    + Once you've launched the harp, quickly hit the close button in the harp menu to initiate the selected song.
 + Color the month names on the scoreboard. - J10a1n15
 
 ### Changes
@@ -419,6 +414,8 @@
 + Fixed item trackers duplicating items when taking items out of storage or chest. - hannibal2
 + Fixed current mayor is taking 20 minutes to get loaded. - Empa
     + This fixes active Diana detection not working, making the workaround (/sh always diana) unnecessary.
++ Fixes Ghost Entities. - hannibal2 & nea & Thunderblade73
+    + Removes ghost entities caused by a Hypixel bug. This included Diana, Dungeon and Crimson Isle mobs and nametags.
 
 ### Technical Changes
 
