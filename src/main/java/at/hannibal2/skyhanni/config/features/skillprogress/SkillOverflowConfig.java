@@ -1,5 +1,6 @@
 package at.hannibal2.skyhanni.config.features.skillprogress;
 
+import at.hannibal2.skyhanni.config.FeatureToggle;
 import com.google.gson.annotations.Expose;
 import io.github.moulberry.moulconfig.annotations.ConfigEditorBoolean;
 import io.github.moulberry.moulconfig.annotations.ConfigEditorKeybind;
@@ -53,4 +54,16 @@ public class SkillOverflowConfig {
     @ConfigOption(name = "Avg Key", desc = "Press this key in the SkyBlock/Your Skills menu while hovering the Avg. item to show more info.")
     @ConfigEditorKeybind(defaultKey = Keyboard.KEY_NONE)
     public int showAvgInfoKey = Keyboard.KEY_NONE;
+
+    @Expose
+    @ConfigOption(name = "Tooltip Button", desc = "Show a button in the Skill menu to toggle overflow in tooltip.")
+    @ConfigEditorBoolean
+    @FeatureToggle
+    public boolean tooltipButtonInSkillMenu = false;
+
+    @Expose
+    @ConfigOption(name = "Stack Size Button", desc = "Show a button in the Skill menu to toggle skill level overflow as stack size.")
+    @ConfigEditorBoolean
+    @FeatureToggle
+    public boolean stackSizeButtonInSkillMenu = false;
 }

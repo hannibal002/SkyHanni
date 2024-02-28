@@ -8,7 +8,6 @@ import at.hannibal2.skyhanni.events.InventoryFullyOpenedEvent
 import at.hannibal2.skyhanni.events.SkillOverflowLevelupEvent
 import at.hannibal2.skyhanni.features.skillprogress.SkillProgress
 import at.hannibal2.skyhanni.features.skillprogress.SkillType
-import at.hannibal2.skyhanni.features.skillprogress.SkillUtil
 import at.hannibal2.skyhanni.features.skillprogress.SkillUtil.SPACE_SPLITTER
 import at.hannibal2.skyhanni.features.skillprogress.SkillUtil.XP_NEEDED_FOR_60
 import at.hannibal2.skyhanni.features.skillprogress.SkillUtil.calculateLevelXp
