@@ -7,8 +7,6 @@ import at.hannibal2.skyhanni.features.chroma.ChromaShaderManager
 import at.hannibal2.skyhanni.features.chroma.ChromaType
 import at.hannibal2.skyhanni.utils.ColorUtils
 import at.hannibal2.skyhanni.utils.ColorUtils.darker
-import at.hannibal2.skyhanni.utils.renderables.RenderableUtils.renderXAligned
-import at.hannibal2.skyhanni.utils.renderables.RenderableUtils.renderYAligned
 import at.hannibal2.skyhanni.utils.LorenzColor
 import at.hannibal2.skyhanni.utils.LorenzLogger
 import at.hannibal2.skyhanni.utils.NEUItems.renderOnScreen
@@ -17,8 +15,9 @@ import at.hannibal2.skyhanni.utils.RenderUtils.HorizontalAlignment
 import at.hannibal2.skyhanni.utils.RenderUtils.VerticalAlignment
 import at.hannibal2.skyhanni.utils.renderables.RenderableUtils.calculateTableXOffsets
 import at.hannibal2.skyhanni.utils.renderables.RenderableUtils.calculateTableYOffsets
+import at.hannibal2.skyhanni.utils.renderables.RenderableUtils.renderXAligned
 import at.hannibal2.skyhanni.utils.renderables.RenderableUtils.renderXYAligned
-import at.hannibal2.skyhanni.utils.RenderUtils
+import at.hannibal2.skyhanni.utils.renderables.RenderableUtils.renderYAligned
 import io.github.moulberry.moulconfig.gui.GuiScreenElementWrapper
 import io.github.moulberry.notenoughupdates.util.Utils
 import net.minecraft.client.Minecraft
@@ -40,8 +39,8 @@ interface Renderable {
     val horizontalAlign: HorizontalAlignment
     val verticalAlign: VerticalAlignment
     fun isHovered(posX: Int, posY: Int) = currentRenderPassMousePosition?.let { (x, y) ->
-        x in (posX .. posX + width)
-            && y in (posY .. posY + height) // TODO: adjust for variable height?
+        x in (posX..posX + width)
+            && y in (posY..posY + height) // TODO: adjust for variable height?
     } ?: false
 
     /**
@@ -108,7 +107,11 @@ interface Renderable {
             onClick: () -> Unit,
             onHover: () -> Unit = {},
         ): Renderable {
-            return clickable(hoverTips(text, tips, bypassChecks = bypassChecks, onHover = onHover), onClick, bypassChecks = bypassChecks)
+            return clickable(
+                hoverTips(text, tips, bypassChecks = bypassChecks, onHover = onHover),
+                onClick,
+                bypassChecks = bypassChecks
+            )
         }
 
         fun clickable(
@@ -339,7 +342,12 @@ interface Renderable {
                     row.forEachIndexed { index, renderable ->
                         GlStateManager.pushMatrix()
                         GlStateManager.translate(xOffsets[index].toFloat(), yOffsets[rowIndex].toFloat(), 0F)
-                        renderable?.renderXYAligned(posX + xOffsets[index], posY + yOffsets[rowIndex], xOffsets[index + 1] - xOffsets[index], yOffsets[rowIndex + 1] - yOffsets[rowIndex])
+                        renderable?.renderXYAligned(
+                            posX + xOffsets[index],
+                            posY + yOffsets[rowIndex],
+                            xOffsets[index + 1] - xOffsets[index],
+                            yOffsets[rowIndex + 1] - yOffsets[rowIndex]
+                        )
                         GlStateManager.popMatrix()
                     }
                 }
@@ -391,10 +399,20 @@ interface Renderable {
                         ChromaShaderManager.end()
                     }
                 } else {
-                    val (textureX, textureY) = if (texture == SkillProgressBarConfig.TexturedBar.UsedTexture.MATCH_PACK) Pair(0, 64) else Pair(0, 0)
+                    val (textureX, textureY) = if (texture == SkillProgressBarConfig.TexturedBar.UsedTexture.MATCH_PACK) Pair(
+                        0,
+                        64
+                    ) else Pair(0, 0)
 
                     Minecraft.getMinecraft().renderEngine.bindTexture(ResourceLocation(texture.path))
-                    Minecraft.getMinecraft().ingameGUI.drawTexturedModalRect(posX, posY, textureX, textureY, width, height)
+                    Minecraft.getMinecraft().ingameGUI.drawTexturedModalRect(
+                        posX,
+                        posY,
+                        textureX,
+                        textureY,
+                        width,
+                        height
+                    )
 
                     if (useChroma) {
                         ChromaShaderManager.begin(ChromaType.TEXTURED)
@@ -402,7 +420,14 @@ interface Renderable {
                     } else {
                         GlStateManager.color(color.red / 255f, color.green / 255f, color.blue / 255f, 1f)
                     }
-                    Minecraft.getMinecraft().ingameGUI.drawTexturedModalRect(posX, posY, textureX, textureY + height, progress, height)
+                    Minecraft.getMinecraft().ingameGUI.drawTexturedModalRect(
+                        posX,
+                        posY,
+                        textureX,
+                        textureY + height,
+                        progress,
+                        height
+                    )
 
                     if (useChroma) {
                         ChromaShaderManager.end()
