@@ -102,7 +102,7 @@ interface Renderable {
         }
 
         fun clickAndHover(
-            text: String,
+            text: Any,
             tips: List<Any>,
             bypassChecks: Boolean = false,
             onClick: () -> Unit,
@@ -141,7 +141,7 @@ interface Renderable {
             }
 
         fun hoverTips(
-            text: String,
+            text: Any,
             tips: List<Any>,
             indexes: List<Int> = listOf(),
             stack: ItemStack? = null,
@@ -151,7 +151,7 @@ interface Renderable {
             onHover: () -> Unit = {},
         ): Renderable {
 
-            val render = string(text)
+            val render = fromAny(text) ?: string("Error")
             return object : Renderable {
                 override val width = render.width
                 override val height = render.height
