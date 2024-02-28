@@ -335,7 +335,7 @@ object SkillProgress {
 
         var xpInterp = xpInfo.xpGainHour
 
-        if (have > need){
+        if (have > need) {
             add(Renderable.string("§7In §cIncrease level cap!"))
         } else if (xpInfo.xpGainHour < 1000) {
             add(Renderable.string("§7In §cN/A"))
