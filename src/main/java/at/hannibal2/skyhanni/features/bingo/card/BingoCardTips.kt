@@ -24,15 +24,15 @@ class BingoCardTips {
 
     private val patternGroup = RepoPattern.group("bingo.card.tips")
     private val inventoryPattern by patternGroup.pattern(
-        "card", 
+        "card",
         "Bingo Card"
     )
     private val rewardPattern by patternGroup.pattern(
-        "reward", 
+        "reward",
         "§.§.§7Reward"
     )
     private val contributionRewardsPattern by patternGroup.pattern(
-        "reward.contribution", 
+        "reward.contribution",
         "§.§.§7Contribution Rewards.*"
     )
 
@@ -59,7 +59,13 @@ class BingoCardTips {
         } - 1
 
         if (index == -2) {
-            ErrorManager.logErrorWithData(IndexOutOfBoundsException(), "BingoCardTips reward line not found", "goal" to goal, "tip" to toolTip)
+            ErrorManager.logErrorWithData(
+                IndexOutOfBoundsException(),
+                "BingoCardTips reward line not found",
+                "goal displayName" to goal.displayName,
+                "slot slotNumber" to slot.slotNumber,
+                "toolTip" to toolTip
+            )
             return
         }
 
