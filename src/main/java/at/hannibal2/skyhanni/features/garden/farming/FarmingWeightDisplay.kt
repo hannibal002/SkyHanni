@@ -5,7 +5,7 @@ import at.hannibal2.skyhanni.config.ConfigManager
 import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.data.HypixelData
 import at.hannibal2.skyhanni.data.ProfileStorageData
-import at.hannibal2.skyhanni.data.jsonobjects.other.EliteLeaderboardJson.Companion.toEliteLeaderboardJson
+import at.hannibal2.skyhanni.data.jsonobjects.other.EliteLeaderboardJson
 import at.hannibal2.skyhanni.data.jsonobjects.other.EliteWeightJson
 import at.hannibal2.skyhanni.data.jsonobjects.other.UpcomingLeaderboardPlayer
 import at.hannibal2.skyhanni.events.GardenToolChangeEvent
@@ -28,6 +28,7 @@ import at.hannibal2.skyhanni.utils.StringUtils
 import at.hannibal2.skyhanni.utils.TimeUtils
 import at.hannibal2.skyhanni.utils.fromJson
 import at.hannibal2.skyhanni.utils.renderables.Renderable
+import com.google.gson.JsonObject
 import com.google.gson.reflect.TypeToken
 import kotlinx.coroutines.launch
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
@@ -416,7 +417,7 @@ class FarmingWeightDisplay {
             val apiResponse = APIUtil.getJSONResponse(url)
 
             try {
-                val apiData = apiResponse.toEliteLeaderboardJson().data
+                val apiData = toEliteLeaderboardJson(apiResponse).data
 
                 if (isEtaEnabled()) {
                     nextPlayers.clear()
@@ -433,6 +434,12 @@ class FarmingWeightDisplay {
                 error()
             }
             return -1
+        }
+
+        private fun toEliteLeaderboardJson(obj: JsonObject): EliteLeaderboardJson {
+            val jsonObject = JsonObject()
+            jsonObject.add("data", obj)
+            return ConfigManager.gson.fromJson<EliteLeaderboardJson>(jsonObject)
         }
 
         private fun loadWeight(localProfile: String) {

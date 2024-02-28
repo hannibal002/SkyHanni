@@ -1,8 +1,5 @@
 package at.hannibal2.skyhanni.data.jsonobjects.other
 
-import at.hannibal2.skyhanni.config.ConfigManager
-import at.hannibal2.skyhanni.utils.fromJson
-import com.google.gson.JsonObject
 import com.google.gson.annotations.Expose
 import com.google.gson.annotations.SerializedName
 
@@ -19,15 +16,7 @@ data class WeightProfile(
 
 data class EliteLeaderboardJson(
     @Expose val data: EliteLeaderboard
-) {
-    companion object {
-        fun JsonObject.toEliteLeaderboardJson(): EliteLeaderboardJson {
-            val jsonObject = JsonObject()
-            jsonObject.add("data", this)
-            return ConfigManager.gson.fromJson<EliteLeaderboardJson>(jsonObject)
-        }
-    }
-}
+)
 
 data class EliteLeaderboard(
     @Expose val rank: Int,
