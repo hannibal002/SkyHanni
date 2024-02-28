@@ -6,7 +6,6 @@ import net.minecraft.init.Blocks
 import net.minecraft.init.Items
 import net.minecraft.item.Item
 import net.minecraft.item.ItemStack
-import java.util.Timer
 
 enum class SkillType(val displayName: String, icon: Item) {
     COMBAT("Combat", Items.golden_sword),
@@ -19,8 +18,6 @@ enum class SkillType(val displayName: String, icon: Item) {
     CARPENTRY("Carpentry", Blocks.crafting_table),
     TAMING("Taming", Items.spawn_egg),
     ;
-
-    var timer: Timer? = null
 
     constructor(displayName: String, block: Block) : this(displayName, Item.getItemFromBlock(block))
 
