@@ -468,7 +468,7 @@ class SkyHanniDebugsAndTests {
             return
         }
         val name = internalName.itemName
-        event.toolTip.add("Item name: '$name'")
+        event.toolTip.add("Item name: '$name§7'")
     }
 
     @SubscribeEvent

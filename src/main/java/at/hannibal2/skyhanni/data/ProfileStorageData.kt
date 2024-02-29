@@ -13,7 +13,6 @@ import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.UtilsPatterns
-import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraftforge.fml.common.eventhandler.EventPriority
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import kotlin.time.Duration.Companion.seconds
@@ -24,14 +23,6 @@ object ProfileStorageData {
     var profileSpecific: Storage.ProfileSpecific? = null
     var loaded = false
     private var noTabListTime = SimpleTimeMark.farPast()
-
-    private var nextProfile: String? = null
-
-    private val patternGroup = RepoPattern.group("data.profile")
-    private val profileSwitchPattern by patternGroup.pattern(
-        "switch",
-        "§7Switching to profile (?<name>.*)\\.\\.\\."
-    )
 
     private var sackPlayers: SackData.PlayerSpecific? = null
     var sackProfiles: SackData.ProfileSpecific? = null

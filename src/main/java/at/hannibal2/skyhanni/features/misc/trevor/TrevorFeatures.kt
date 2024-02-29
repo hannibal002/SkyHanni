@@ -19,6 +19,7 @@ import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.ConfigUtils
 import at.hannibal2.skyhanni.utils.EntityUtils
+import at.hannibal2.skyhanni.utils.LocationUtils
 import at.hannibal2.skyhanni.utils.LocationUtils.distanceToPlayer
 import at.hannibal2.skyhanni.utils.LorenzColor
 import at.hannibal2.skyhanni.utils.LorenzUtils
@@ -143,9 +144,7 @@ object TrevorFeatures {
             TrevorSolver.findMobHeight(height, false)
         }
         talbotPatternAt.matchMatcher(formattedMessage) {
-            val thePlayer = Minecraft.getMinecraft().thePlayer ?: return
-            val height = thePlayer.posY
-            TrevorSolver.averageHeight = height
+            TrevorSolver.averageHeight = LocationUtils.playerLocation().y
         }
 
         if (formattedMessage == "[NPC] Trevor: You will have 10 minutes to find the mob from when you accept the task.") {
