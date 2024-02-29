@@ -16,11 +16,6 @@ import io.github.moulberry.moulconfig.annotations.ConfigEditorSlider;
 import io.github.moulberry.moulconfig.annotations.ConfigOption;
 
 public class GardenConfig {
-
-    @Expose
-    @Category(name = "Lane Switching", desc = "Settings for Lane Switches")
-    public LaneSwitchConfig laneswitch = new LaneSwitchConfig();
-
     @Expose
     @ConfigOption(name = "SkyMart", desc = "")
     @Accordion
@@ -48,6 +43,11 @@ public class GardenConfig {
     @Expose
     @Category(name = "Optimal Speed", desc = "Optimal Speed Settings")
     public OptimalSpeedConfig optimalSpeeds = new OptimalSpeedConfig();
+
+    @Expose
+    @ConfigOption(name = "Lane Switching", desc = "")
+    @Accordion
+    public LaneSwitchConfig laneswitch = new LaneSwitchConfig();
 
     @Expose
     @ConfigOption(name = "Garden Level", desc = "")
