@@ -12,9 +12,11 @@ import at.hannibal2.skyhanni.utils.LorenzRarity
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.NEUInternalName
 import at.hannibal2.skyhanni.utils.NEUInternalName.Companion.asInternalName
+import at.hannibal2.skyhanni.utils.NEUItems
 import at.hannibal2.skyhanni.utils.StringUtils.allLettersFirstUppercase
 import at.hannibal2.skyhanni.utils.fromJson
 import io.github.moulberry.notenoughupdates.util.Utils
+import net.minecraft.item.Item
 import net.minecraft.item.ItemStack
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import java.util.EnumMap
@@ -27,7 +29,7 @@ object ReforgeAPI {
     val nonePowerStoneReforge by lazy { reforgeList.filterNot { it.isReforgeStone } }
 
     enum class ReforgeType {
-        SWORD, BOW, ARMOR, CHESTPLATE, HELMET, CLOAK, AXE, HOE, AXE_AND_HOE, PICKAXE, EQUIPMENT, ROD, SWORD_AND_ROD, SpecialItems, VACUUM
+        SWORD, BOW, ARMOR, CHESTPLATE, HELMET, CLOAK, AXE, HOE, AXE_AND_HOE, PICKAXE, EQUIPMENT, ROD, SWORD_AND_ROD, SPECIAL_ITEMS, VACUUM
     }
 
     class Reforge(
@@ -97,7 +99,7 @@ object ReforgeAPI {
                 ).contains(itemCategory)
 
                 ReforgeType.VACUUM -> itemCategory == ItemCategory.VACUUM
-                ReforgeType.SpecialItems -> specialItems?.contains(internalName) ?: false
+                ReforgeType.SPECIAL_ITEMS -> specialItems?.contains(internalName) ?: false
             }
 
         override fun equals(other: Any?): Boolean {
@@ -174,22 +176,26 @@ object ReforgeAPI {
         }
     }
 
-    private fun reforge(it: ReforgeStoneJson) = Reforge(
-        name = it.reforgeName,
-        type = LorenzUtils.enumValueOf<ReforgeType>(it.itemTypes.replace("/", "_AND_").uppercase()),
-        stats = it.reforgeStats?.map {
-            LorenzUtils.enumValueOf<LorenzRarity>(
-                it.key.replace(
-                    " ",
-                    "_"
-                )
-            ) to StatList.fromJson(it.value)
-        }
-            ?.toMap() ?: emptyMap(),
-        reforgeStone = it.internalName.asInternalName(),
-        extraProperty = it.getReforgeAbility()
-            .mapKeys { LorenzUtils.enumValueOf<LorenzRarity>(it.key.replace(" ", "_")) }
-    )
+    private fun reforge(it: ReforgeStoneJson): Reforge {
+        val type = it.getItemType() ?: throw IllegalStateException()
+        return Reforge(
+            name = it.reforgeName,
+            type = LorenzUtils.enumValueOf<ReforgeType>(type.first),
+            stats = it.reforgeStats?.map {
+                LorenzUtils.enumValueOf<LorenzRarity>(
+                    it.key.replace(
+                        " ",
+                        "_"
+                    )
+                ) to StatList.fromJson(it.value)
+            }
+                ?.toMap() ?: emptyMap(),
+            reforgeStone = it.internalName.asInternalName(),
+            specialItems = type.second.takeIf { it.isNotEmpty() },
+            extraProperty = it.getReforgeAbility()
+                .mapKeys { LorenzUtils.enumValueOf<LorenzRarity>(it.key.replace(" ", "_")) }
+        )
+    }
 
     enum class StatType(val icon: String) {
         DAMAGE("§c❁"),
@@ -282,6 +288,29 @@ object ReforgeAPI {
 
             is Map<*, *> -> any as? Map<String, String> ?: emptyMap()
             else -> emptyMap()
+        }
+    }
+
+    fun ReforgeStoneJson.getItemType(): Pair<String, List<NEUInternalName>>? {
+        val any = this.itemTypes ?: return null
+        return when (any) {
+            is String -> {
+                any.replace("/", "_AND_").uppercase() to emptyList()
+            }
+
+            is Map<*, *> -> {
+                val type = ReforgeType.SPECIAL_ITEMS.name
+                val map = any as? Map<String, List<String>> ?: return type to emptyList()
+                val internalNames = map["internalName"]?.map { it.asInternalName() } ?: emptyList()
+                val itemType =
+                    map["itemid"]?.map {
+                        NEUItems.getInternalNamesForItemId(Item.getByNameOrId(it))
+                    }?.flatten()
+                        ?: emptyList()
+                type to (internalNames + itemType)
+            }
+
+            else -> null
         }
     }
 }

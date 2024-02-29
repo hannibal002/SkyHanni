@@ -28,6 +28,7 @@ import net.minecraft.client.renderer.GlStateManager
 import net.minecraft.client.renderer.RenderHelper
 import net.minecraft.init.Blocks
 import net.minecraft.init.Items
+import net.minecraft.item.Item
 import net.minecraft.item.ItemStack
 import net.minecraft.nbt.NBTTagCompound
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
@@ -39,6 +40,7 @@ object NEUItems {
     private val multiplierCache = mutableMapOf<NEUInternalName, Pair<NEUInternalName, Int>>()
     private val recipesCache = mutableMapOf<NEUInternalName, Set<NeuRecipe>>()
     private val ingredientsCache = mutableMapOf<NeuRecipe, Set<Ingredient>>()
+    private val itemIdCache = mutableMapOf<Item, List<NEUInternalName>>()
 
     var allItemsCache = mapOf<String, NEUInternalName>() // item name -> internal name
     val allInternalNames = mutableListOf<NEUInternalName>()
@@ -205,6 +207,17 @@ object NEUItems {
     }
 
     fun allNeuRepoItems(): Map<String, JsonObject> = NotEnoughUpdates.INSTANCE.manager.itemInformation
+
+    fun getInternalNamesForItemId(item: Item): List<NEUInternalName> {
+        if (itemIdCache.contains(item)) {
+            return itemIdCache[item]!!
+        }
+        val result = allNeuRepoItems().filter {
+            Item.getByNameOrId(it.value.get("itemid").asString) == item
+        }.keys.map { it.asInternalName() }
+        itemIdCache[item] = result
+        return result
+    }
 
     fun getMultiplier(internalName: NEUInternalName, tryCount: Int = 0): Pair<NEUInternalName, Int> {
         if (multiplierCache.contains(internalName)) {

@@ -14,7 +14,7 @@ public class ReforgeStoneJson {
     public String reforgeName;
 
     @Expose
-    public String itemTypes;
+    public Object itemTypes;
 
     @Expose
     public List<String> requiredRarities;
