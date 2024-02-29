@@ -79,10 +79,10 @@ object StringUtils {
                 readIndex = nextFormattingSequence + 2
                 // Find the next § symbol after the formatting sequence
                 nextFormattingSequence = indexOf('§', startIndex = readIndex)
+
+                // If the next read would be out of bound, reset the readIndex to the very end of the string, resulting in a "" string to be appended
+                readIndex = readIndex.coerceAtMost(this.length)
             }
-            // If the next read would be out of bound, reset the readIndex to the very end of the string, resulting in a "" string to be appended
-            if (readIndex > this.length)
-                readIndex = this.length
         }
         // Finally, after the last formatting sequence was processed, copy over the last sequence of the string
         cleanedString.append(this, readIndex, this.length)
