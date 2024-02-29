@@ -431,7 +431,6 @@ class FarmingWeightDisplay {
                     "url" to url,
                     "apiResponse" to apiResponse
                 )
-                error()
             }
             return -1
         }
