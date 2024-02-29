@@ -265,7 +265,7 @@ object GriffinBurrowHelper {
                 val guessLocation = findBlock(it)
                 val distance = guessLocation.distance(playerLocation)
                 event.drawColor(guessLocation, LorenzColor.WHITE, distance > 10)
-                val color = if (currentWarp == null) "§f" else "§b"
+                val color = if (currentWarp != null && targetLocation == guessLocation) "§b" else "§f"
                 event.drawDynamicText(guessLocation.add(y = 1), "${color}Guess", 1.5)
                 if (distance > 5) {
                     val formattedDistance = LorenzUtils.formatInteger(distance.toInt())
