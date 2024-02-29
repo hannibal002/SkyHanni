@@ -12,4 +12,3 @@ gradle.properties
 
 # other
 .DS_STORE
-do-release.sh
