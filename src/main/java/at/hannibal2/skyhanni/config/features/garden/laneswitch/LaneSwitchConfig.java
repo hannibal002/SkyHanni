@@ -15,9 +15,10 @@ public class LaneSwitchConfig {
     public boolean enabled = false;
 
     @Expose
-    @ConfigOption(name = "Farm Layout", desc = "")
-    @Accordion
-    public LaneswitchFarmConfig farm = new LaneswitchFarmConfig();
+    @ConfigOption(name = "Farming only", desc = "Show the notification only when farming.")
+    @ConfigEditorBoolean
+    @FeatureToggle
+    public boolean farmingOnly = false;
 
     @Expose
     @ConfigOption(name = "Notifications", desc = "")

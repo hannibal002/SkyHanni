@@ -36,13 +36,4 @@ public class LaneswitchNotificationSettings {
         minStep = 1
     )
     public int notificationThreshold = 5;
-
-    @Expose
-    @ConfigOption(name = "Notification Timeout", desc = "Minimum time to pass before the next Notification is displayed.")
-    @ConfigEditorSlider(
-        minValue = 15,
-        maxValue = 90,
-        minStep = 1
-    )
-    public int notificationTimeout = 30;
 }

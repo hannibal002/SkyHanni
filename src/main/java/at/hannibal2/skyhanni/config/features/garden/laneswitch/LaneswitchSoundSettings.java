@@ -15,9 +15,4 @@ public class LaneswitchSoundSettings {
     @ConfigOption(name = "Notification Pitch", desc = "The pitch of the notification sound.")
     @ConfigEditorSlider(minValue = 0.5f, maxValue = 2.0f, minStep = 0.1f)
     public float notificationPitch = 1.0f;
-
-    @Expose
-    @ConfigOption(name = "Notification Volume", desc = "The volume of the notification sound.")
-    @ConfigEditorSlider(minValue = 1f, maxValue = 100f, minStep = 1f)
-    public float notificationVolume = 50f;
 }
