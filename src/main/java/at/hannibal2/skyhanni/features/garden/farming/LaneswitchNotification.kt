@@ -76,7 +76,7 @@ class LaneswitchNotification {
             blocksPerSecond = playerPos.distance(lastPos) * 20
             this.lastPos = playerPos
 
-            if (farmEnd.isNotEmpty() && lastLaneSwitch.passedSince() >= ((farmEnd[0].distance(farmEnd[1]) / blocksPerSecond) + 1).seconds && (blocksPerSecond - lastBlocksPerSecond).absoluteValue <= 20) {
+            if (farmEnd.isNotEmpty() && lastLaneSwitch.passedSince() >= ((farmEnd[0].distance(farmEnd[1]) / blocksPerSecond) - notificationSettings.notificationThreshold).seconds && (blocksPerSecond - lastBlocksPerSecond).absoluteValue <= 20) {
                 if (farmEnd.any {switchPossibleInTime(playerPos, it, blocksPerSecond, notificationSettings.notificationThreshold)}) {
                     sendTitle(
                         config.notification.settings.notificationColor.getChatColor() + notificationSettings.notificationText,
