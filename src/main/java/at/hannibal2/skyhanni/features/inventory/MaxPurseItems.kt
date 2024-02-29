@@ -15,6 +15,7 @@ import net.minecraft.client.Minecraft
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
 class MaxPurseItems {
+    private val config get() = SkyHanniMod.feature.bazaar
 
     private val patternGroup = RepoPattern.group("inventory.maxpurse")
     private val orderPattern by patternGroup.pattern(
@@ -36,7 +37,6 @@ class MaxPurseItems {
     
     private var buyOrderPrice: Double? = null
     private var instantBuyPrice: Double? = null
-    private val config get() = SkyHanniMod.feature.inventory
 
     private fun getPrices() {
         for (item in Minecraft.getMinecraft().thePlayer.openContainer.inventory) {
@@ -84,7 +84,7 @@ class MaxPurseItems {
             (currentPurse / it).toInt()
         } ?: 0
 
-        config.purseItemsPos.renderStrings(
+        config.maxPurseItemsPosition.renderStrings(
             listOf(
                 "§eWith your current purse, you can buy order",
                 "§e${buyOrders.addSeparators()}x of this item with your purse (at top order +0.1)",
