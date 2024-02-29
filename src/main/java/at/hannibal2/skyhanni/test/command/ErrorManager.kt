@@ -20,6 +20,7 @@ object ErrorManager {
     private val breakAfter = listOf(
         "at at.hannibal2.skyhanni.config.commands.Commands\$createCommand",
         "at net.minecraftforge.fml.common.eventhandler.EventBus.post",
+        "at at.hannibal2.skyhanni.mixins.hooks.NetHandlerPlayClientHookKt.onSendPacket",
     )
 
     private val replace = mapOf(
@@ -45,7 +46,7 @@ object ErrorManager {
         "at at.hannibal2.skyhanni.config.commands.SimpleCommand.",
         "at at.hannibal2.skyhanni.config.commands.Commands\$createCommand\$1.processCommand",
         "at at.hannibal2.skyhanni.test.command.ErrorManager.logError",
-        "at at.hannibal2.skyhanni.events.LorenzEvent.postAndCatchAndBlock",
+        "at at.hannibal2.skyhanni.events.LorenzEvent.postAndCatch",
         "at net.minecraft.launchwrapper.",
     )
 
@@ -179,7 +180,6 @@ object ErrorManager {
         for (traceElement in stackTrace) {
             val text = "\tat $traceElement"
             if (!fullStackTrace && text in parent) {
-                println("broke at: $text")
                 break
             }
             var visualText = text
@@ -189,6 +189,7 @@ object ErrorManager {
                 }
             }
             if (!fullStackTrace && breakAfter.any { text.contains(it) }) {
+                add(visualText)
                 break
             }
             if (ignored.any { text.contains(it) }) continue

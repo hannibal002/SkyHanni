@@ -47,6 +47,4 @@ public class SulphurSkitterBoxConfig {
     @ConfigOption(name = "Only With Rods", desc = "Render the box only when holding a lava fishing rod.")
     @ConfigEditorBoolean
     public boolean onlyWithRods = true;
-
-
 }

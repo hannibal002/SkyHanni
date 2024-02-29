@@ -3,6 +3,7 @@ package at.hannibal2.skyhanni.data.repo
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.config.ConfigManager
 import at.hannibal2.skyhanni.events.DebugDataCollectEvent
+import at.hannibal2.skyhanni.events.NeuRepositoryReloadEvent
 import at.hannibal2.skyhanni.events.RepositoryReloadEvent
 import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.ChatUtils
@@ -286,5 +287,10 @@ class RepoManager(private val configLocation: File) {
                 StandardCharsets.UTF_8
             )
         ).use { writer -> writer.write(gson.toJson(json)) }
+    }
+
+    @SubscribeEvent
+    fun onNeuRepoReload(event: io.github.moulberry.notenoughupdates.events.RepositoryReloadEvent) {
+        NeuRepositoryReloadEvent().postAndCatch()
     }
 }

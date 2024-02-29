@@ -12,6 +12,8 @@ import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.ItemUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
+import at.hannibal2.skyhanni.utils.ItemUtils.itemName
+import at.hannibal2.skyhanni.utils.ItemUtils.name
 import at.hannibal2.skyhanni.utils.ItemUtils.nameWithEnchantment
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.NEUInternalName
@@ -20,6 +22,7 @@ import at.hannibal2.skyhanni.utils.NEUItems
 import at.hannibal2.skyhanni.utils.NEUItems.getPrice
 import at.hannibal2.skyhanni.utils.NumberUtil
 import at.hannibal2.skyhanni.utils.RenderUtils.renderStringsAndItems
+import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import net.minecraft.item.ItemStack
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
@@ -76,7 +79,7 @@ class AnitaMedalProfit {
     }
 
     private fun readItem(item: ItemStack, table: MutableMap<Pair<String, String>, Pair<Double, NEUInternalName>>) {
-        val itemName = item.nameWithEnchantment ?: return
+        val itemName = getItemName(item) ?: return
         if (itemName == " ") return
         if (itemName == "§cClose") return
         if (itemName == "§eUnique Gold Medals") return
@@ -99,6 +102,14 @@ class AnitaMedalProfit {
         val format = NumberUtil.format(profit)
         val color = if (profit > 0) "§6" else "§c"
         table[Pair(itemName, "$color$format")] = Pair(profit, internalName)
+    }
+
+    private fun getItemName(item: ItemStack): String? {
+        val name = item.name ?: return null
+        val isEnchantedBook = name.removeColor() == "Enchanted Book"
+        return if (isEnchantedBook) {
+            item.itemName
+        } else name
     }
 
     private fun getFullCost(requiredItems: MutableList<String>): Double {
