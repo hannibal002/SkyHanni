@@ -146,7 +146,7 @@ loom {
     launchConfigs {
         "client" {
             property("mixin.debug", "true")
-            property("asmhelper.verbose", "true")
+            property("devauth.configDir", rootProject.file(".devauth").absolutePath)
             arg("--tweakClass", "org.spongepowered.asm.launch.MixinTweaker")
             arg("--tweakClass", "io.github.moulberry.moulconfig.tweaker.DevelopmentResourceTweaker")
             arg("--mods", devenvMod.resolve().joinToString(",") { it.relativeTo(file("run")).path })
