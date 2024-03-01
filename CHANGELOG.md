@@ -1,6 +1,6 @@
 # SkyHanni - Change Log
 
-## Version 0.23 (Unreleased)
+## Version 0.23
 
 ### New Features
 
@@ -53,7 +53,7 @@
 + Added Power Stone Guide features. - hannibal2
     + Highlight missing power stones, show their total bazaar price, and allows to open the bazaar when clicking on the
       items in the Power Stone Guide.
-+ Option to make normal clicks to shift clicks in equipment inventory. - Thunderblade73
++ Option to make normal clicks to shift clicks in npc sell inventory. - Thunderblade73
 + Show pet items XP Share and Tier Boost as small icons next to the pet in an inventory. - Thunderblade73
 + Added Shift Click Brewing. - Thunderblade73
     + Makes normal clicks to shift clicks in Brewing Stand inventory.
@@ -62,6 +62,10 @@
 + Added not fully completed tasks in Way to gain SkyBlock XP menus. - Thunderblade73
     + Works in the subcategories.
     + It does not work with infinite tasks.
++ Added Harp GUI Scale. - Thunderblade73
+    + Automatically sets the GUI scale to AUTO when entering the Harp.
++ Added Harp Quick Restart. - Thunderblade73
+    + Once you've launched the harp, quickly hit the close button in the harp menu to initiate the selected song.
 
 #### Item Features
 
@@ -96,15 +100,6 @@
     + ETA Display, exp, actions or percentage to next level, custom level goals, all skill display, chroma progress bar,
       and overflow levels for all those things.
     + A ton of settings.
-
-#### Misc Features
-
-+ Fixes Ghost Entities. - hannibal2 & nea & Thunderblade73
-    + Removes ghost entities caused by a Hypixel bug. This included Diana, Dungeon and Crimson Isle mobs and nametags.
-+ Added Harp GUI Scale. - Thunderblade73
-    + Automatically sets the GUI scale to AUTO when entering the Harp.
-+ Added Harp Quick Restart. - Thunderblade73
-    + Once you've launched the harp, quickly hit the close button in the harp menu to initiate the selected song.
 + Color the month names on the scoreboard. - J10a1n15
 
 ### Changes
@@ -150,6 +145,9 @@
 + Disabled Fishing Profit/SC Tracker in Kuudra. - CalMWolfs
 + Moved Sulphur Skitter Box from Crimson Isle to Fishing -> Trophy Fishing. - hannibal2
 + Fishing Profit Tracker now has better categories. - hannibal2 & Empa
++ No longer showing fishing trackers when holding a fishing rod in the hand. Only showing the trackers when truly
+  fishing. - hannibal2
++ Added option to only show the Geyser Box while holding a lava rod. - Obsidian
 
 #### Mining Changes
 
@@ -173,6 +171,7 @@
 + Allow putting Water Bottles into Potion Bag. - alexia
 + Skip unavailable experiments for number of clicks in Super Pair Clicks Alert in the experimentation table. - alexia
 + Hide non-clickable items in Basket of Seeds, Nether Wart Pouch & Trick or Treat Bag. - alexia
++ Added support for blocking quick crafting for the new quick craft UI. - hannibal2
 
 #### Dungeon Changes
 
@@ -190,6 +189,7 @@
     + Now it correctly hides burrow waypoints when the "focus" mode is enabled.
     + Shows a pink line to the shared location.
     + Support for the nearest warp feature.
++ Changed the Diana Guess Waypoint word color to only be in blue when actually warping to the nearest warp. - hannibal2
 
 #### Chat Changes
 
@@ -205,6 +205,9 @@
 #### Command Changes
 
 + Added /pd short command for party disband. - Empa
++ Added support for number abbreviations in /shskills. - hannibal2
+    + "/shskills levelwithxp 750m"
++ Renamed currentXP to xp in /shskills description. - hannibal2
 
 #### Config Changes
 
@@ -217,6 +220,7 @@
 #### GUI Changes
 
 + The Compact Tab List now has toggle tab support. - hannibal2
++ The tab list now toggles on key press, not key release. This should feel faster now. - hannibal2
 
 #### Misc Changes
 
@@ -231,6 +235,8 @@
 + Hovering on cheap items in an Item Tracker now shows the hidden items. - Mikecraft1224
 + Added shader reload capabilities for chroma resource packs. - nea
 + Added option to only show Ender Node tracker while holding a pickaxe. - Thunderblade73
++ Matched XP/h timer with the session timer in the skill ETA display. - HiZe
++ Talbot's Theodolite: Support exact height message. - alexia
 
 ### Fixes
 
@@ -256,6 +262,10 @@
 + Fixed mouse rotation unlocks after doing /warp garden with Sensitivity Reducer on. - martimavocado
 + Fixed wording of composter fuel warning. - alexia
 + Fixed Garden plot menu icon edit mode copies stack size. - hannibal2
++ Fixed the wrong color code on the visitor shopping list sacks number line. - hannibal2
++ Fixed Anita Medal Profit Display using wrong items. - hannibal2
++ Fixed Box of Seeds not working with /shcroptime. - alexia
++ Fixed Farming Weight Display sometimes not showing when joining the Garden. - CalMWolfs
 
 #### Combat Fixes
 
@@ -288,6 +298,7 @@
 + Fixed a rare bug that leaves ghost burrows around. - hannibal2
 + Properly deleting Diana target markers when manually clearing griffin burrows by talking to Diana NPC. - hannibal2
 + Properly resetting internal Diana data on clearing waypoints via NPC. - hannibal2
++ Fixed the missing color code in the inquisitor deletion message. - jani
 
 #### Mining Fixes
 
@@ -314,6 +325,10 @@
 + Fixed adding drops to Fishing Profit Tracker while not actually fishing. - hannibal2
     + This fixes red mushroom picking up with Mooshroom Cow pet while farming.
     + This does not fix wrongfully adding drops while moving items in inventory.
++ Fixed fishing trackers appearing when rod swapping. - hannibal2
++ Fixed fishing bait change spam. - hannibal2
++ Fixed no bait warning appearing at the wrong moment or not appearing at all. - hannibal2
++ Fixed Crimson Isle Fishing Geyser Box showing even when very far away. - Obsidian
 
 #### Invenory Fixes
 
@@ -339,6 +354,7 @@
 + Fixed detecting bingo profile while visiting other players bingo island. - hannibal2
 + Fixed performance issues with Bingo Minion Craft Helper. - hannibal2
 + Fixed Bingo Minion Craft Helper not detecting crafted tier one minion. - hannibal2
++ Fixed rare error reading and rendering Bingo Card Tips in Bingo inventory. - Thunderblade73
 
 #### Chat Fixes
 
@@ -353,6 +369,12 @@
 + Fixed GUI positions moving into the bottom-right corner when leaving the GUI position editor while pressing the mouse
   button on next reopen. - hannibal2
 + Fixed parts of Compact Tab List being uncoloured. - CalMWolfs
++ Fixed Compact Tab List' Toggle Tab not working when using patcher. - hannibal2
++ Fixed Skill progress display size too small when not using the progress bar. - Thunderblade73
++ Fixed the skill progress bar trying to get out of the screen. - HiZe
++ Fixed the negative time remaining in the skill ETA display. - HiZe
++ Fixed skill timer. - hannibal2
++ Fixed overflow level goal in skills tooltips. - HiZe
 
 #### Winter Fixes
 
@@ -364,6 +386,9 @@
 + Fixed /gfs not working. - Thunderblade73
 + Fixed /sendcoords command not working. - CalMWolfs
 + Fixed open bazaar command sending color code as well. - Thunderblade73
++ Fixed /gfs not working with spaces in item name. - Thunderblade73
++ Fixed multiple edge cases with /gfs. - Thunderblade73
++ Fixed commands /shskill levelwithxp/xpforlevel. - HiZe
 
 #### Config Fixes
 
@@ -383,6 +408,14 @@
 + Fixed /gfs tab complete. - martimavocado
 + Fixed /warp is command replace. - hannibal2
 + Fixed Queued Gfs description. - Thunderblade73
++ Fixed ender bow ability time (30s -> 5s). - hannibal2
++ Reputation Helper now shows Kuudra Runs for barbarian faction as well. - hannibal2
+    + Daily Kuudra reputation also works for barbarian faction, not only mage.
++ Fixed item trackers duplicating items when taking items out of storage or chest. - hannibal2
++ Fixed current mayor is taking 20 minutes to get loaded. - Empa
+    + This fixes active Diana detection not working, making the workaround (/sh always diana) unnecessary.
++ Fixes Ghost Entities. - hannibal2 & nea & Thunderblade73
+    + Removes ghost entities caused by a Hypixel bug. This included Diana, Dungeon and Crimson Isle mobs and nametags.
 
 ### Technical Changes
 
@@ -470,10 +503,22 @@
 + Cleanup some repo pattern formatting. - CalMWolfs
 + Make Hypixel items API response a proper JSON object. - CalMWolfs
 + Created utils function String.formatDouble(): Double. - hannibal2
-+ Fixed ReplaceWith auto-replace feature  from IDEs for deprecated functions. - hannibal2
++ Fixed ReplaceWith auto-replace feature from IDEs for deprecated functions. - hannibal2
 + Fixed the BuildList name in part of the stack trace. - hannibal2
 + Cleanup error manager code. - hannibal2
 + Fixed /shdebug without parameter showing everything instead of only important data. - hannibal2
++ Fixed internal item name resolving problems. - hannibal2
++ Extracted item name resolving logic into own class. - hannibal2
++ Added debug command /shtestitem. - hannibal2
++ Made String.formatDouble() and formatLong()return nullable. - hannibal2
++ /gfs tab complete now uses NEU's Repo instead of SkyHanni Repo. - CalMWolfs
++ Creating NeuRepositoryReloadEvent as wrapper for less confusion. - CalMWolfs
++ Made ErrorManager compact stack trace even more compacter. - hannibal2
++ Added holdingLavaRod and holdingWaterRod in FishingAPI. - Obsidian
++ Fixed HighlightMissingRepoItems. - CalMWolfs
++ Added String.formatLongOrUserError(). - hannibal2
++ Use duration for time in ServerRestartTitle. - hannibal2
++ Added error handling for ServerRestartTitle problems. - hannibal2
 
 ## Version 0.22
 

@@ -216,6 +216,7 @@ import at.hannibal2.skyhanni.features.inventory.HideNotClickableItems
 import at.hannibal2.skyhanni.features.inventory.HighlightBonzoMasks
 import at.hannibal2.skyhanni.features.inventory.ItemDisplayOverlayFeatures
 import at.hannibal2.skyhanni.features.inventory.ItemStars
+import at.hannibal2.skyhanni.features.inventory.MaxPurseItems
 import at.hannibal2.skyhanni.features.inventory.PowerStoneGuideFeatures
 import at.hannibal2.skyhanni.features.inventory.QuickCraftFeatures
 import at.hannibal2.skyhanni.features.inventory.QuiverNotification
@@ -392,7 +393,7 @@ import org.apache.logging.log4j.Logger
     clientSideOnly = true,
     useMetadata = true,
     guiFactory = "at.hannibal2.skyhanni.config.ConfigGuiForgeInterop",
-    version = "0.23.Beta.24",
+    version = "0.23",
 )
 class SkyHanniMod {
 
@@ -754,6 +755,7 @@ class SkyHanniMod {
         loadModule(SkillProgress)
         loadModule(SkillTooltip())
         loadModule(QuiverNotification)
+        loadModule(MaxPurseItems())
 
         init()
 

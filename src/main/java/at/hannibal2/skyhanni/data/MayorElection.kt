@@ -55,9 +55,8 @@ class MayorElection {
                 map put data.current.getPairs()
             }
             candidates = map
+            checkCurrentMayor()
         }
-
-        checkCurrentMayor()
     }
 
     private fun checkCurrentMayor() {
