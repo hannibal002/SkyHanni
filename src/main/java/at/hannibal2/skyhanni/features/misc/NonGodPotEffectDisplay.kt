@@ -9,7 +9,7 @@ import at.hannibal2.skyhanni.events.LorenzChatEvent
 import at.hannibal2.skyhanni.events.LorenzTickEvent
 import at.hannibal2.skyhanni.events.LorenzWorldChangeEvent
 import at.hannibal2.skyhanni.events.PacketEvent
-import at.hannibal2.skyhanni.events.PreProfileSwitchEvent
+import at.hannibal2.skyhanni.events.ProfileJoinEvent
 import at.hannibal2.skyhanni.features.rift.RiftAPI
 import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.ChatUtils
@@ -78,7 +78,7 @@ class NonGodPotEffectDisplay {
     private var totalEffectsCount = 0
 
     @SubscribeEvent
-    fun onPreProfileSwitch(event: PreProfileSwitchEvent) {
+    fun onProfileJoin(event: ProfileJoinEvent) {
         effectDuration.clear()
         display = emptyList()
     }
@@ -200,9 +200,9 @@ class NonGodPotEffectDisplay {
                         val duration = try {
                             TimeUtils.getMillis(line.split("§f")[1])
                         } catch (e: IndexOutOfBoundsException) {
-                            ErrorManager.logError(
-                                Exception("'§f' not found in line '$line'", e),
-                                "Error while reading Non God-Potion effects from tab list"
+                            ErrorManager.logErrorWithData(
+                                e, "Error while reading Non God-Potion effects from tab list",
+                                "line" to line
                             )
                             continue
                         }

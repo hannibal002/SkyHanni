@@ -40,7 +40,7 @@ class GuiContainerHook(guiAny: Any) {
     }
 
     fun onMouseClick(slot: Slot?, slotId: Int, clickedButton: Int, clickType: Int, ci: CallbackInfo) {
-        if (SlotClickEvent(gui, gui.inventorySlots, slot, slotId, clickedButton, clickType).postAndCatch()) ci.cancel()
+        if (SlotClickEvent(gui, gui.inventorySlots, gui.inventorySlots?.inventory?.takeIf { it.size > slotId && slotId >= 0 }?.get(slotId), slot, slotId, clickedButton, clickType).postAndCatch()) ci.cancel()
     }
 
     fun onDrawScreenAfter(

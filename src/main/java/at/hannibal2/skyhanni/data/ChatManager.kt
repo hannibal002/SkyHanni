@@ -1,7 +1,6 @@
 package at.hannibal2.skyhanni.data
 
 import at.hannibal2.skyhanni.SkyHanniMod
-import at.hannibal2.skyhanni.events.LorenzActionBarEvent
 import at.hannibal2.skyhanni.events.LorenzChatEvent
 import at.hannibal2.skyhanni.events.MessageSendToServerEvent
 import at.hannibal2.skyhanni.events.PacketEvent
@@ -17,12 +16,10 @@ import net.minecraft.client.gui.ChatLine
 import net.minecraft.client.gui.GuiNewChat
 import net.minecraft.event.HoverEvent
 import net.minecraft.network.play.client.C01PacketChatMessage
-import net.minecraft.network.play.server.S02PacketChat
 import net.minecraft.util.ChatComponentText
 import net.minecraft.util.EnumChatFormatting
 import net.minecraft.util.IChatComponent
 import net.minecraftforge.client.event.ClientChatReceivedEvent
-import net.minecraftforge.fml.common.eventhandler.EventPriority
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import net.minecraftforge.fml.relauncher.ReflectionHelper
 import java.lang.invoke.MethodHandles
@@ -71,18 +68,6 @@ object ChatManager {
         val hoverExtraInfo: List<String> = listOf(),
     )
 
-    @SubscribeEvent(priority = EventPriority.LOW, receiveCanceled = true)
-    fun onActionBarPacket(event: PacketEvent.ReceiveEvent) {
-        val packet = event.packet as? S02PacketChat ?: return
-
-        val messageComponent = packet.chatComponent
-        val message = LorenzUtils.stripVanillaMessage(messageComponent.formattedText)
-        if (packet.type.toInt() == 2) {
-            val actionBarEvent = LorenzActionBarEvent(message)
-            actionBarEvent.postAndCatch()
-        }
-    }
-
     @SubscribeEvent
     fun onSendMessageToServerPacket(event: PacketEvent.SendEvent) {
         val packet = event.packet as? C01PacketChatMessage ?: return
@@ -108,7 +93,13 @@ object ChatManager {
         )
 
         messageHistory[IdentityCharacteristics(component)] = result
-        if (MessageSendToServerEvent(message).postAndCatch()) {
+        val trimmedMessage = message.trimEnd()
+        if (MessageSendToServerEvent(
+                trimmedMessage,
+                trimmedMessage.split(" "),
+                originatingModContainer
+            ).postAndCatch()
+        ) {
             event.isCanceled = true
             messageHistory[IdentityCharacteristics(component)] = result.copy(actionKind = ActionKind.OUTGOING_BLOCKED)
         }

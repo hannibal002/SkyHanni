@@ -21,7 +21,7 @@ public class MarkedPlayerConfig {
 
     @Expose
     @ConfigOption(name = "Mark Own Name", desc = "Mark own player name.")
-    @ConfigEditorBoolean()
+    @ConfigEditorBoolean
     public Property<Boolean> markOwnName = Property.of(false);
 
     @ConfigOption(name = "Marked Chat Color", desc = "Marked Chat Color. §eIf Chroma is gray, enable Chroma in Chroma settings.")

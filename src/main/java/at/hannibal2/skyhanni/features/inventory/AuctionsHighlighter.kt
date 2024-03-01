@@ -1,6 +1,7 @@
 package at.hannibal2.skyhanni.features.inventory
 
 import at.hannibal2.skyhanni.SkyHanniMod
+import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.events.GuiContainerEvent
 import at.hannibal2.skyhanni.utils.InventoryUtils.getInventoryName
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalNameOrNull
@@ -20,7 +21,7 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
 class AuctionsHighlighter {
 
-    private val config get() = SkyHanniMod.feature.inventory
+    private val config get() = SkyHanniMod.feature.inventory.auctions
 
     private val patternGroup = RepoPattern.group("auctions.highlight")
     private val bidderPattern by patternGroup.pattern(
@@ -107,5 +108,11 @@ class AuctionsHighlighter {
                 }
             }
         }
+    }
+
+    @SubscribeEvent
+    fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
+        event.move(25, "inventory.highlightAuctions", "inventory.auctions.highlightAuctions")
+        event.move(25, "inventory.highlightAuctionsUnderbid", "inventory.auctions.highlightAuctionsUnderbid")
     }
 }

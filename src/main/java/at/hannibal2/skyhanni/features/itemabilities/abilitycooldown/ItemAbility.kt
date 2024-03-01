@@ -48,7 +48,7 @@ enum class ItemAbility(
     SHADOW_FURY(15, "STARRED_SHADOW_FURY"),
 
     // doesn't have a sound
-    ENDER_BOW("Ender Warp", 30, "Ender Bow"),
+    ENDER_BOW("Ender Warp", 5, "Ender Bow"),
     LIVID_DAGGER("Throw", 5, "Livid Dagger"),
     FIRE_VEIL("Fire Veil", 5, "Fire Veil Wand"),
     INK_WAND("Ink Bomb", 30, "Ink Wand"),
