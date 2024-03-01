@@ -4,11 +4,11 @@ import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.data.ClickType
 import at.hannibal2.skyhanni.events.EntityClickEvent
-import at.hannibal2.skyhanni.events.LorenzRenderLivingEvent
 import at.hannibal2.skyhanni.events.LorenzRenderWorldEvent
 import at.hannibal2.skyhanni.events.LorenzTickEvent
 import at.hannibal2.skyhanni.events.LorenzWorldChangeEvent
 import at.hannibal2.skyhanni.events.ReceiveParticleEvent
+import at.hannibal2.skyhanni.events.SkyHanniRenderEntityEvent
 import at.hannibal2.skyhanni.events.withAlpha
 import at.hannibal2.skyhanni.features.rift.RiftAPI
 import at.hannibal2.skyhanni.mixins.hooks.RenderLivingEntityHelper
@@ -259,7 +259,7 @@ object VampireSlayerFeatures {
     }
 
     @SubscribeEvent
-    fun pre(event: LorenzRenderLivingEvent.Pre<EntityOtherPlayerMP>) {
+    fun pre(event: SkyHanniRenderEntityEvent.Pre<EntityOtherPlayerMP>) {
         if (!isEnabled()) return
         if (!config.seeThrough) return
         if (entityList.contains(event.entity) && event.entity.canBeSeen()) {
@@ -268,7 +268,7 @@ object VampireSlayerFeatures {
     }
 
     @SubscribeEvent
-    fun pre(event: LorenzRenderLivingEvent.Post<EntityOtherPlayerMP>) {
+    fun post(event: SkyHanniRenderEntityEvent.Post<EntityOtherPlayerMP>) {
         if (!isEnabled()) return
         if (!config.seeThrough) return
         if (entityList.contains(event.entity) && event.entity.canBeSeen()) {

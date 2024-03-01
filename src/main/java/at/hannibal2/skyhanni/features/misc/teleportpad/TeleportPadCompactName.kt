@@ -2,7 +2,7 @@ package at.hannibal2.skyhanni.features.misc.teleportpad
 
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.data.IslandType
-import at.hannibal2.skyhanni.events.LorenzRenderLivingEvent
+import at.hannibal2.skyhanni.events.SkyHanniRenderEntityEvent
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
@@ -23,7 +23,7 @@ class TeleportPadCompactName {
     )
 
     @SubscribeEvent(priority = EventPriority.HIGH)
-    fun onRenderLivingB(event: LorenzRenderLivingEvent.Specials.Pre<EntityLivingBase>) {
+    fun onRenderLivingB(event: SkyHanniRenderEntityEvent.Specials.Pre<EntityLivingBase>) {
         if (!SkyHanniMod.feature.misc.teleportPad.compactName) return
         if (LorenzUtils.skyBlockIsland != IslandType.PRIVATE_ISLAND) return
         val entity = event.entity

@@ -2,7 +2,7 @@ package at.hannibal2.skyhanni.features.combat
 
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
-import at.hannibal2.skyhanni.events.LorenzRenderLivingEvent
+import at.hannibal2.skyhanni.events.SkyHanniRenderEntityEvent
 import at.hannibal2.skyhanni.features.combat.damageindicator.DamageIndicatorManager
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import net.minecraft.entity.EntityLivingBase
@@ -12,7 +12,7 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 class HideDamageSplash {
 
     @SubscribeEvent(priority = EventPriority.HIGH)
-    fun onRenderDamage(event: LorenzRenderLivingEvent.Specials.Pre<EntityLivingBase>) {
+    fun onRenderDamage(event: SkyHanniRenderEntityEvent.Specials.Pre<EntityLivingBase>) {
         if (!LorenzUtils.inSkyBlock) return
         if (!SkyHanniMod.feature.combat.hideDamageSplash) return
 

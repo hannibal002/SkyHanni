@@ -3,7 +3,7 @@ package at.hannibal2.skyhanni.features.misc
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.config.features.misc.HideArmorConfig.ModeEntry
-import at.hannibal2.skyhanni.events.LorenzRenderLivingEvent
+import at.hannibal2.skyhanni.events.SkyHanniRenderEntityEvent
 import at.hannibal2.skyhanni.utils.ConfigUtils
 import at.hannibal2.skyhanni.utils.EntityUtils.getArmorInventory
 import at.hannibal2.skyhanni.utils.EntityUtils.hasPotionEffect
@@ -38,7 +38,7 @@ class HideArmor {
     }
 
     @SubscribeEvent
-    fun onRenderLivingPre(event: LorenzRenderLivingEvent.Pre<EntityLivingBase>) {
+    fun onRenderLivingPre(event: SkyHanniRenderEntityEvent.Pre<EntityLivingBase>) {
         val entity = event.entity
         if (!shouldHideArmor(entity)) return
         val armorInventory = entity.getArmorInventory() ?: return
@@ -56,7 +56,7 @@ class HideArmor {
     }
 
     @SubscribeEvent
-    fun onRenderLivingPost(event: LorenzRenderLivingEvent.Post<EntityLivingBase>) {
+    fun onRenderLivingPost(event: SkyHanniRenderEntityEvent.Post<EntityLivingBase>) {
         val entity = event.entity
         if (!shouldHideArmor(entity)) return
         val armorInventory = entity.getArmorInventory() ?: return

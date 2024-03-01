@@ -1,6 +1,6 @@
 package at.hannibal2.skyhanni.utils
 
-import at.hannibal2.skyhanni.events.LorenzRenderLivingEvent
+import at.hannibal2.skyhanni.events.SkyHanniRenderEntityEvent
 import at.hannibal2.skyhanni.utils.ItemUtils.getSkullTexture
 import at.hannibal2.skyhanni.utils.LocationUtils.canBeSeen
 import at.hannibal2.skyhanni.utils.LocationUtils.distanceTo
@@ -163,26 +163,26 @@ object EntityUtils {
 
     @SubscribeEvent
     fun onEntityRender(event: RenderLivingEvent<*>) {
-        LorenzRenderLivingEvent(event.entity, event.renderer, event.x, event.y, event.z).postAndCatch()
+        SkyHanniRenderEntityEvent(event.entity, event.renderer, event.x, event.y, event.z).postAndCatch()
     }
 
     @SubscribeEvent
     fun onEntityRenderPre(event: RenderLivingEvent.Pre<*>) {
-        LorenzRenderLivingEvent.Pre(event.entity, event.renderer, event.x, event.y, event.z).postAndCatch()
+        SkyHanniRenderEntityEvent.Pre(event.entity, event.renderer, event.x, event.y, event.z).postAndCatch()
     }
 
     @SubscribeEvent
     fun onEntityRenderPost(event: RenderLivingEvent.Post<*>) {
-        LorenzRenderLivingEvent.Post(event.entity, event.renderer, event.x, event.y, event.z).postAndCatch()
+        SkyHanniRenderEntityEvent.Post(event.entity, event.renderer, event.x, event.y, event.z).postAndCatch()
     }
 
     @SubscribeEvent
     fun onEntityRenderSpecialsPre(event: RenderLivingEvent.Specials.Pre<*>) {
-        LorenzRenderLivingEvent.Specials.Pre(event.entity, event.renderer, event.x, event.y, event.z).postAndCatch()
+        SkyHanniRenderEntityEvent.Specials.Pre(event.entity, event.renderer, event.x, event.y, event.z).postAndCatch()
     }
 
     @SubscribeEvent
     fun onEntityRenderSpecialsPost(event: RenderLivingEvent.Specials.Post<*>) {
-        LorenzRenderLivingEvent.Specials.Post(event.entity, event.renderer, event.x, event.y, event.z).postAndCatch()
+        SkyHanniRenderEntityEvent.Specials.Post(event.entity, event.renderer, event.x, event.y, event.z).postAndCatch()
     }
 }

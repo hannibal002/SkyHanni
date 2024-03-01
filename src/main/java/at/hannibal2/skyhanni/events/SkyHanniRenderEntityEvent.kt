@@ -5,7 +5,7 @@ import net.minecraft.entity.EntityLivingBase
 import net.minecraftforge.fml.common.eventhandler.Cancelable
 
 @Cancelable
-open class LorenzRenderLivingEvent<T : EntityLivingBase>(
+open class SkyHanniRenderEntityEvent<T : EntityLivingBase>(
     val entity: T,
     val renderer: RendererLivingEntity<out T>,
     val x: Double,
@@ -18,7 +18,7 @@ open class LorenzRenderLivingEvent<T : EntityLivingBase>(
         x: Double,
         y: Double,
         z: Double
-    ) : LorenzRenderLivingEvent<T>(entity, renderer, x, y, z)
+    ) : SkyHanniRenderEntityEvent<T>(entity, renderer, x, y, z)
 
     class Post<T : EntityLivingBase>(
         entity: T,
@@ -26,7 +26,7 @@ open class LorenzRenderLivingEvent<T : EntityLivingBase>(
         x: Double,
         y: Double,
         z: Double
-    ) : LorenzRenderLivingEvent<T>(entity, renderer, x, y, z)
+    ) : SkyHanniRenderEntityEvent<T>(entity, renderer, x, y, z)
 
     open class Specials<T : EntityLivingBase>(
         entity: T,
@@ -34,7 +34,7 @@ open class LorenzRenderLivingEvent<T : EntityLivingBase>(
         x: Double,
         y: Double,
         z: Double
-    ) : LorenzRenderLivingEvent<T>(entity, renderer, x, y, z) {
+    ) : SkyHanniRenderEntityEvent<T>(entity, renderer, x, y, z) {
         class Pre<T : EntityLivingBase>(
             entity: T,
             renderer: RendererLivingEntity<out T>,
