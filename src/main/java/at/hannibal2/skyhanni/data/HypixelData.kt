@@ -8,6 +8,7 @@ import at.hannibal2.skyhanni.events.LorenzChatEvent
 import at.hannibal2.skyhanni.events.LorenzTickEvent
 import at.hannibal2.skyhanni.events.LorenzWorldChangeEvent
 import at.hannibal2.skyhanni.events.ProfileJoinEvent
+import at.hannibal2.skyhanni.events.ServerChatEvent
 import at.hannibal2.skyhanni.events.TabListUpdateEvent
 import at.hannibal2.skyhanni.features.bingo.BingoAPI
 import at.hannibal2.skyhanni.features.rift.RiftAPI
@@ -24,8 +25,6 @@ import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import com.google.gson.JsonObject
 import io.github.moulberry.notenoughupdates.NotEnoughUpdates
 import net.minecraft.client.Minecraft
-import net.minecraftforge.client.event.ClientChatReceivedEvent
-import net.minecraftforge.fml.common.eventhandler.EventPriority
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import net.minecraftforge.fml.common.network.FMLNetworkEvent
 import kotlin.concurrent.thread
@@ -317,9 +316,10 @@ class HypixelData {
     // This code is modified from NEU, and depends on NEU (or another mod) sending /locraw.
     private val jsonBracketPattern = "^\\{.+}".toPattern()
 
-    @SubscribeEvent(priority = EventPriority.LOW, receiveCanceled = true)
-    fun onChatMessage(event: ClientChatReceivedEvent) {
-        jsonBracketPattern.matchMatcher(event.message.unformattedText) {
+    //todo convert to proper json object
+    @SubscribeEvent
+    fun onServerChat(event: ServerChatEvent) {
+        jsonBracketPattern.matchMatcher(event.message.removeColor()) {
             try {
                 val obj: JsonObject = gson.fromJson(group(), JsonObject::class.java)
                 if (obj.has("server")) {

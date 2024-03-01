@@ -4,6 +4,7 @@ import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.events.LorenzChatEvent
 import at.hannibal2.skyhanni.events.MessageSendToServerEvent
 import at.hannibal2.skyhanni.events.PacketEvent
+import at.hannibal2.skyhanni.events.ServerChatEvent
 import at.hannibal2.skyhanni.features.chat.ChatFilterGui
 import at.hannibal2.skyhanni.utils.IdentityCharacteristics
 import at.hannibal2.skyhanni.utils.LorenzLogger
@@ -112,7 +113,10 @@ object ChatManager {
         val original = event.message
         val message = LorenzUtils.stripVanillaMessage(original.formattedText)
 
-        if (message.startsWith("§f{\"server\":\"")) return
+        if (message.startsWith("§f{\"server\":\"")) {
+            ServerChatEvent(message).postAndCatch()
+            return
+        }
         val key = IdentityCharacteristics(original)
         val chatEvent = LorenzChatEvent(message, original)
         if (!isSoopyMessage(event.message)) {
