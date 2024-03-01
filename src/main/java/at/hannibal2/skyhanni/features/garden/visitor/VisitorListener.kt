@@ -1,9 +1,7 @@
 package at.hannibal2.skyhanni.features.garden.visitor
 
 import at.hannibal2.skyhanni.config.features.garden.visitor.VisitorConfig
-import at.hannibal2.skyhanni.data.ItemRenderBackground.Companion.background
 import at.hannibal2.skyhanni.events.CheckRenderEntityEvent
-import at.hannibal2.skyhanni.events.GuiContainerEvent
 import at.hannibal2.skyhanni.events.InventoryCloseEvent
 import at.hannibal2.skyhanni.events.InventoryFullyOpenedEvent
 import at.hannibal2.skyhanni.events.LorenzRenderWorldEvent
@@ -14,19 +12,16 @@ import at.hannibal2.skyhanni.events.garden.visitor.VisitorOpenEvent
 import at.hannibal2.skyhanni.events.garden.visitor.VisitorRenderEvent
 import at.hannibal2.skyhanni.events.garden.visitor.VisitorToolTipEvent
 import at.hannibal2.skyhanni.features.garden.GardenAPI
-import at.hannibal2.skyhanni.features.garden.visitor.VisitorAPI.VisitorStatus
-import at.hannibal2.skyhanni.features.garden.visitor.VisitorAPI.config
+import at.hannibal2.skyhanni.features.garden.visitor.VisitorAPI.lastClickedNpc
 import at.hannibal2.skyhanni.mixins.transformers.gui.AccessorGuiContainer
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.ItemUtils.name
 import at.hannibal2.skyhanni.utils.KeyboardManager.isKeyHeld
 import at.hannibal2.skyhanni.utils.LocationUtils.distanceToPlayer
-import at.hannibal2.skyhanni.utils.LorenzColor
 import at.hannibal2.skyhanni.utils.LorenzLogger
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.RenderUtils.exactLocation
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
-import io.github.moulberry.notenoughupdates.events.SlotClickEvent
 import net.minecraft.client.Minecraft
 import net.minecraft.client.gui.inventory.GuiContainer
 import net.minecraft.entity.item.EntityArmorStand
@@ -35,20 +30,18 @@ import net.minecraftforge.client.event.GuiScreenEvent.KeyboardInputEvent
 import net.minecraftforge.event.entity.player.ItemTooltipEvent
 import net.minecraftforge.fml.common.eventhandler.EventPriority
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
-import org.lwjgl.input.Keyboard
 
 private val config get() = VisitorAPI.config
 
 class VisitorListener {
 
-    private var lastClickedNpc = 0
     private val logger = LorenzLogger("garden/visitors/listener")
 
     companion object {
 
-        private val VISITOR_INFO_ITEM_SLOT = 13
-        private val VISITOR_ACCEPT_ITEM_SLOT = 29
-        private val VISITOR_REFUSE_ITEM_SLOT = 33
+        private const val INFO_SLOT = 13
+        private const val ACCEPT_SLOT = 29
+        private const val REFUSE_SLOT = 33
     }
 
     @SubscribeEvent
@@ -92,11 +85,11 @@ class VisitorListener {
     @SubscribeEvent
     fun onInventoryOpen(event: InventoryFullyOpenedEvent) {
         if (!GardenAPI.inGarden()) return
-        val npcItem = event.inventoryItems[VISITOR_INFO_ITEM_SLOT] ?: return
+        val npcItem = event.inventoryItems[INFO_SLOT] ?: return
         val lore = npcItem.getLore()
         if (!VisitorAPI.isVisitorInfo(lore)) return
 
-        val offerItem = event.inventoryItems[VISITOR_ACCEPT_ITEM_SLOT] ?: return
+        val offerItem = event.inventoryItems[ACCEPT_SLOT] ?: return
         if (offerItem.name != "§aAccept Offer") return
 
         VisitorAPI.inInventory = true
@@ -130,92 +123,13 @@ class VisitorListener {
         inventory.handleMouseClick_skyhanni(slot, slot.slotIndex, 0, 0)
     }
 
-    @SubscribeEvent
-    fun onBackgroundDrawn(event: GuiContainerEvent.BackgroundDrawnEvent) {
-        if (!VisitorAPI.inInventory) return
-        if (!config.rewardWarning.preventRefusing && !config.rewardWarning.preventRefusingCopper && !config.rewardWarning.preventAcceptingCopper) return
-        if (config.rewardWarning.bypassKey.isKeyHeld()) return
-
-        val visitor = VisitorAPI.getVisitor(lastClickedNpc) ?: return
-        val refuseOfferStack = event.gui.inventorySlots.getSlot(33).stack ?: return
-        val acceptOfferStack = event.gui.inventorySlots.getSlot(29).stack ?: return
-
-        if (visitor.hasReward() != null && config.rewardWarning.preventRefusing)
-            refuseOfferStack.background = LorenzColor.DARK_GRAY.addOpacity(180).rgb
-        if (visitor.pricePerCopper <= config.rewardWarning.coinsPerCopperPrice && config.rewardWarning.preventRefusingCopper)
-            refuseOfferStack.background = LorenzColor.DARK_GRAY.addOpacity(180).rgb
-        if (visitor.pricePerCopper >= config.rewardWarning.coinsPerCopperPrice && config.rewardWarning.preventAcceptingCopper)
-            acceptOfferStack.background = LorenzColor.DARK_GRAY.addOpacity(180).rgb
-    }
-
-    @SubscribeEvent(priority = EventPriority.HIGH)
-    fun onStackClick(event: SlotClickEvent) {
-        if (!VisitorAPI.inInventory) return
-
-        val visitor = VisitorAPI.getVisitor(lastClickedNpc) ?: return
-
-        if (event.slotId == VISITOR_REFUSE_ITEM_SLOT) {
-            visitor.hasReward()?.let {
-                if (config.rewardWarning.preventRefusing && !config.rewardWarning.bypassKey.isKeyHeld()) {
-                    event.isCanceled = true
-                    return
-                }
-            }
-
-            if (visitor.pricePerCopper <= config.rewardWarning.coinsPerCopperPrice &&
-                config.rewardWarning.preventRefusingCopper && !config.rewardWarning.bypassKey.isKeyHeld()) {
-                event.isCanceled = true
-                return
-            }
-
-            if (event.slot.stack?.name != "§cRefuse Offer") return
-            VisitorAPI.changeStatus(visitor, VisitorStatus.REFUSED, "refused")
-            return
-        }
-        if (event.slotId == VISITOR_ACCEPT_ITEM_SLOT) {
-            if (visitor.pricePerCopper > config.rewardWarning.coinsPerCopperPrice && config.rewardWarning.preventAcceptingCopper &&
-                !config.rewardWarning.bypassKey.isKeyHeld()) {
-                event.isCanceled = true
-                return
-            }
-
-            if (event.slot.stack?.name != "§eClick to give!") return
-            VisitorAPI.changeStatus(visitor, VisitorStatus.ACCEPTED, "accepted")
-            return
-        }
-    }
 
     @SubscribeEvent(priority = EventPriority.HIGH)
     fun onTooltip(event: ItemTooltipEvent) {
         if (!GardenAPI.onBarnPlot) return
         if (!VisitorAPI.inInventory) return
         val visitor = VisitorAPI.getVisitor(lastClickedNpc) ?: return
-        val isRefuseSlot = event.itemStack.toString() == "1xtile.clayHardenedStained@14"
-        val isAcceptSlot = event.itemStack.toString() == "1xtile.clayHardenedStained@13"
-        VisitorToolTipEvent(visitor, event.itemStack, event.toolTip).postAndCatch()
-
-        if (config.rewardWarning.bypassKey.isKeyHeld()) return
-        if (((!(visitor.hasReward() != null && config.rewardWarning.preventRefusing) &&
-            !(visitor.pricePerCopper <= config.rewardWarning.coinsPerCopperPrice && config.rewardWarning.preventRefusingCopper)) || !isRefuseSlot) &&
-            (!(visitor.pricePerCopper >= config.rewardWarning.coinsPerCopperPrice && config.rewardWarning.preventAcceptingCopper) || !isAcceptSlot)) return
-
-        val blockReason = when {
-            visitor.hasReward() != null && config.rewardWarning.preventRefusing && isRefuseSlot -> "§aRare visitor reward found"
-            visitor.pricePerCopper <= config.rewardWarning.coinsPerCopperPrice && isRefuseSlot -> "§cCheap copper"
-            visitor.pricePerCopper >= config.rewardWarning.coinsPerCopperPrice && isAcceptSlot -> "§cExpensive copper"
-            else -> "Error"
-        }
-
-        val copiedTooltip = event.toolTip.toList()
-        event.toolTip.clear()
-
-        for (line in copiedTooltip) {
-            if (line.contains("§aAccept Offer")) event.toolTip.add("§7Accept Offer")
-                else if (!line.contains("minecraft:") && !line.contains("NBT:")) event.toolTip.add("§8" + line.removeColor())
-        }
-        event.toolTip.add("")
-        event.toolTip.add(blockReason)
-        event.toolTip.add("  §7(Bypass by holding ${Keyboard.getKeyName(config.rewardWarning.bypassKey)})")
+        VisitorToolTipEvent(visitor, event.itemStack, event.toolTip, event.showAdvancedItemTooltips).postAndCatch()
     }
 
     @SubscribeEvent

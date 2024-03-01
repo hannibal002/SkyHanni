@@ -20,6 +20,7 @@ object VisitorAPI {
 
     private var visitors = mapOf<String, Visitor>()
     var inInventory = false
+    var lastClickedNpc = 0
     val config get() = GardenAPI.config.visitors
     private val logger = LorenzLogger("garden/visitors/api")
 

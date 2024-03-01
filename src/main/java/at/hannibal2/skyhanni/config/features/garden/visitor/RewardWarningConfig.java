@@ -29,7 +29,7 @@ public class RewardWarningConfig {
     public boolean showOverName = true;
 
     @Expose
-    @ConfigOption(name = "Prevent Refusing", desc = "Prevent the refusal of a visitor with reward.")
+    @ConfigOption(name = "Block Refusing Reward", desc = "Prevent the refusal of a visitor with reward.")
     @ConfigEditorBoolean
     @FeatureToggle
     public boolean preventRefusing = true;
@@ -59,17 +59,34 @@ public class RewardWarningConfig {
     @Expose
     @ConfigOption(name = "Coins Per Copper", desc = "The price to use for the below options.\nRequires one of the below options to be on.")
     @ConfigEditorSlider(minValue = 1, maxValue = 50_000, minStep = 250)
-    public int coinsPerCopperPrice = 1;
+    public int coinsPerCopperPrice = 6_000;
 
     @Expose
-    @ConfigOption(name = "Prevent Refusing", desc = "Prevent refusing a visitor with a coins per copper lower than the set value.")
+    @ConfigOption(name = "Block Refusing Copper", desc = "Prevent refusing a visitor with a coins per copper lower than the set value.")
     @ConfigEditorBoolean
     @FeatureToggle
     public boolean preventRefusingCopper = false;
 
     @Expose
-    @ConfigOption(name = "Prevent Accepting", desc = "Prevent accepting a visitor with a coins per copper higher than the set value.")
+    @ConfigOption(name = "Block Accepting Copper", desc = "Prevent accepting a visitor with a coins per copper higher than the set value.")
     @ConfigEditorBoolean
     @FeatureToggle
     public boolean preventAcceptingCopper = false;
+
+    @Expose
+    @ConfigOption(
+        name = "Opacity",
+        desc = "How strong should the offer buttons be grayed out when blocked?"
+    )
+    @ConfigEditorSlider(
+        minValue = 0,
+        maxValue = 255,
+        minStep = 5
+    )
+    public int opacity = 180;
+
+    @Expose
+    @ConfigOption(name = "Outline", desc = "Adds a red/green line around the best offer button.")
+    @ConfigEditorBoolean
+    public boolean optionOutline = true;
 }

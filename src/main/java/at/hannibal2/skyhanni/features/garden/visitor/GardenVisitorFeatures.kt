@@ -312,6 +312,13 @@ class GardenVisitorFeatures {
     fun onVisitorTooltip(event: VisitorToolTipEvent) {
         if (event.itemStack.name != "§aAccept Offer") return
 
+
+        // stores the title, id, and nbt tags as vals because toolTip.clear() also clears event.toolTip
+        val title = event.toolTip[0]
+        val size = event.toolTip.size
+        val id = (event.toolTip[size - 2]) // 2nd to last
+        val nbtTags = (event.toolTip[size - 1]) // last
+
         val visitor = event.visitor
         val toolTip = event.toolTip
         toolTip.clear()
@@ -320,8 +327,12 @@ class GardenVisitorFeatures {
             readToolTip(visitor, event.itemStack)
         }
 
-        toolTip.add("§aAccept Offer")
+        toolTip.add(title) // reconstruct title
         toolTip.addAll(visitor.lastLore)
+        if (event.showAdvancedItemTooltips) { // reconstruct advanced tooltips
+            toolTip.add(id)
+            toolTip.add(nbtTags)
+        }
     }
 
     private fun readToolTip(visitor: VisitorAPI.Visitor, itemStack: ItemStack?) {
