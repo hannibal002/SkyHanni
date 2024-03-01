@@ -78,7 +78,6 @@ class AuctionHouseCopyUnderbidPrice {
 
     @SubscribeEvent
     fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
-        event.move(24, "inventory.copyUnderbidPrice", "inventory.auctions.autoCopyUnderbidPrice")
+        event.move(25, "inventory.copyUnderbidPrice", "inventory.auctions.autoCopyUnderbidPrice")
     }
-
 }

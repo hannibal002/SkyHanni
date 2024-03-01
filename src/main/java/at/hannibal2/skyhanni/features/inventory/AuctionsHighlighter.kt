@@ -67,7 +67,7 @@ class AuctionsHighlighter {
 
     @SubscribeEvent
     fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
-        event.move(24, "inventory.highlightAuctions", "inventory.auctions.highlightAuctions")
-        event.move(24, "inventory.highlightAuctionsUnderbid", "inventory.auctions.highlightAuctionsUnderbid")
+        event.move(25, "inventory.highlightAuctions", "inventory.auctions.highlightAuctions")
+        event.move(25, "inventory.highlightAuctionsUnderbid", "inventory.auctions.highlightAuctionsUnderbid")
     }
 }
