@@ -28,11 +28,11 @@ class AuctionHouseCopyUnderbidPrice {
     private val patternGroup = RepoPattern.group("auctions.underbid")
     private val auctionPricePattern by patternGroup.pattern(
         "price",
-        "^§7(?:Buy it now|Starting bid|Top bid): §6(?<coins>[0-9,]+) coins\$"
+        "§7(?:Buy it now|Starting bid|Top bid): §6(?<coins>[0-9,]+) coins"
     )
     private val allowedInventoriesPattern by patternGroup.pattern(
         "allowedinventories",
-        "^(?:Auctions Browser|Manage Auctions|Auctions: \".*\")$"
+        "(?:Auctions Browser|Manage Auctions|Auctions: \".*\"?)"
     )
 
     @SubscribeEvent
