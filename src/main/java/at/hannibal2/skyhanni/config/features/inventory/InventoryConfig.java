@@ -57,6 +57,10 @@ public class InventoryConfig {
     public SkyblockGuideConfig skyblockGuideConfig = new SkyblockGuideConfig();
 
     @Expose
+    @Category(name = "Bazaar", desc = "Bazaar settings.")
+    public BazaarConfig bazaar = new BazaarConfig();
+
+    @Expose
     @Category(name = "Helpers", desc = "Settings for Helpers")
     public HelperConfig helper = new HelperConfig();
 
