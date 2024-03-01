@@ -149,6 +149,14 @@ Use `/sh` or `/skyhanni` to open the SkyHanni config in game.
     + Makes normal clicks to shift clicks in Brewing Stand inventory.
 + Low Quiver Notification. - CarsCupcake
     + This will notify you via title if your quiver is low on arrows according to chat message.
++ Added not fully completed tasks in Way to gain SkyBlock XP menus. - Thunderblade73
+    + Works in the subcategories.
+    + It does not work with infinite tasks.
++ Max Items With Purse. - NetheriteMiner
+    + Calculates the maximum number of items that can be purchased from the Bazaar with the number of coins in your
+      purse.
++ Copy Underbid Keybind. - Obsidian
+    + Copies the price of the hovered item in Auction House minus 1 coin into the clipboard for easier under-bidding.
 
 </details>
 <details open><summary>
@@ -965,6 +973,10 @@ Use `/sh` or `/skyhanni` to open the SkyHanni config in game.
     + Stops the white geyser smoke particles from rendering if your bobber is near the geyser.
     + Draws a box around the effective area of the geyser.
     + Change the color of the box around the geyser.
++ Added Skill Progress Display. - HiZe
+    + ETA Display, exp, actions or percentage to next level, custom level goals, all skill display, chroma progress bar,
+      and overflow levels for all those things.
+    + A ton of settings.
 
 </details>
 <details open><summary>

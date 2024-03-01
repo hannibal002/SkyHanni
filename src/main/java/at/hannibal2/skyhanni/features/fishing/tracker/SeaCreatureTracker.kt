@@ -162,7 +162,7 @@ object SeaCreatureTracker {
     @SubscribeEvent
     fun onRenderOverlay(event: GuiRenderEvent) {
         if (!isEnabled()) return
-        if (!FishingAPI.isFishing()) return
+        if (!FishingAPI.isFishing(checkRodInHand = false)) return
 
         tracker.renderDisplay(config.position)
     }
