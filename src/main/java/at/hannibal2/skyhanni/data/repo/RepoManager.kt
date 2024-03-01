@@ -63,12 +63,12 @@ class RepoManager(private val configLocation: File) {
 
     fun updateRepo() {
         atomicShouldManuallyReload.set(true)
-        fetchRepository(true).thenRun { this.reloadRepository("Repo updated successful.") }
+        fetchRepository(true).thenRun { this.reloadRepository("Repo updated successfully.") }
     }
 
     fun reloadLocalRepo() {
         atomicShouldManuallyReload.set(true)
-        reloadRepository("Repo loaded from local files successful.")
+        reloadRepository("Repo loaded from local files successfully.")
     }
 
     private fun fetchRepository(command: Boolean): CompletableFuture<Boolean> {
