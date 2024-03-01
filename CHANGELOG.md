@@ -1,5 +1,48 @@
 # SkyHanni - Change Log
 
+## Version 0.24 (Unreleased)
+
+### New Features
+
+#### Inventory
+
++ Added Max Items With Purse. - NetheriteMiner
+    + Calculates the maximum number of items that can be purchased from the Bazaar with the number of coins in your
+      purse.
++ Added Copy Underbid Keybind. - Obsidian
+    + Copies the price of the hovered item in Auction House minus 1 coin into the clipboard for easier under-bidding.
+
+### Improvements
+
+### Bug Fixes
+
+#### Bingo
+
++ Fixed Bingo Card Tips using wrong slot sometimes. - Thunderblade73
+
+#### Mining
+
++ Fixed a small typo in the Deep Caverns Parkour message. - alexia
+
+### Technical Details
+
++ Auto-enable + configure DevAuth. - nea
++ Improve performance of removeColor. - nea
++ Removed wildcard imports in VisualWorldGui. - CalMWolfs
++ printStackTrace -> ErrorManager. - hannibal2
++ Added command /shconfig toggle <path> <value 1> <value 2>. - Obsidian
++ Removes usage of logError everywhere in the code and replaces it with logErrorWithData. - CalMWolfs
++ Removed ErrorManager.logErrorState(). - CalMWolfs
++ Creating number utils functions for string -> int, long, double, with either error throwing or wrong usage to user
+  message.
++ Removed RenderWorldLastEvent usage in WorldEdit feature. - hannibal2
++ Using GardenAPI.storage everywhere. - hannibal2
++ Added stacking enchants to the repo. - CalMWolfs
++ Moved bazaar config into inventory category. - hannibal2
++ Optimize IntelliJ icon. - nea
+
+### Removed Features
+
 ## Version 0.23
 
 ### New Features
