@@ -9,7 +9,6 @@ import org.lwjgl.input.Keyboard;
 
 public class AuctionHouseConfig {
 
-
     @Expose
     @ConfigOption(
         name = "Highlight Auctions",
@@ -44,4 +43,11 @@ public class AuctionHouseConfig {
     )
     @ConfigEditorKeybind(defaultKey = Keyboard.KEY_NONE)
     public int copyUnderbidKeybind = Keyboard.KEY_NONE;
+
+    @Expose
+    @ConfigOption(name = "Highlight Bids",
+        desc = "Highlight own bids that are won in green, outbid in gold, and expired in red.")
+    @ConfigEditorBoolean
+    @FeatureToggle
+    public boolean highlightBids = true;
 }
