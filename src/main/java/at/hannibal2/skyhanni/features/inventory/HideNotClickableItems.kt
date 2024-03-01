@@ -6,14 +6,15 @@ import at.hannibal2.skyhanni.data.ItemRenderBackground.Companion.background
 import at.hannibal2.skyhanni.data.ItemRenderBackground.Companion.borderLine
 import at.hannibal2.skyhanni.data.jsonobjects.repo.HideNotClickableItemsJson
 import at.hannibal2.skyhanni.data.jsonobjects.repo.HideNotClickableItemsJson.SalvageFilter
-import at.hannibal2.skyhanni.data.jsonobjects.repo.MultiFilterJson
 import at.hannibal2.skyhanni.events.GuiContainerEvent
 import at.hannibal2.skyhanni.events.RepositoryReloadEvent
-import at.hannibal2.skyhanni.features.bazaar.BazaarApi
 import at.hannibal2.skyhanni.features.garden.composter.ComposterOverlay
 import at.hannibal2.skyhanni.features.garden.visitor.VisitorAPI
+import at.hannibal2.skyhanni.features.inventory.bazaar.BazaarApi
 import at.hannibal2.skyhanni.features.rift.RiftAPI
 import at.hannibal2.skyhanni.features.rift.RiftAPI.motesNpcPrice
+import at.hannibal2.skyhanni.utils.ChatUtils
+import at.hannibal2.skyhanni.utils.CollectionUtils.equalsOneOf
 import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.InventoryUtils.getInventoryName
 import at.hannibal2.skyhanni.utils.ItemUtils
@@ -25,11 +26,13 @@ import at.hannibal2.skyhanni.utils.ItemUtils.isVanilla
 import at.hannibal2.skyhanni.utils.KeyboardManager
 import at.hannibal2.skyhanni.utils.LorenzColor
 import at.hannibal2.skyhanni.utils.LorenzUtils
-import at.hannibal2.skyhanni.utils.LorenzUtils.equalsOneOf
 import at.hannibal2.skyhanni.utils.MultiFilter
+import at.hannibal2.skyhanni.utils.NEUInternalName.Companion.asInternalName
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.isRiftExportable
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.isRiftTransferable
+import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
+import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraft.client.Minecraft
 import net.minecraft.client.gui.inventory.GuiChest
 import net.minecraft.inventory.ContainerChest
@@ -39,6 +42,7 @@ import net.minecraftforge.fml.common.eventhandler.EventPriority
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
 class HideNotClickableItems {
+
     private val config get() = SkyHanniMod.feature.inventory.hideNotClickable
 
     private var hideReason = ""
@@ -49,16 +53,19 @@ class HideNotClickableItems {
 
     private val hideNpcSellFilter = MultiFilter()
     private val hideInStorageFilter = MultiFilter()
-    private val tradeNpcFilter = MultiFilter()
     private val itemsToSalvage = mutableListOf<String>()
     private val hidePlayerTradeFilter = MultiFilter()
     private val notAuctionableFilter = MultiFilter()
 
+    private val seedsPattern by RepoPattern.pattern(
+        "inventory.hidenotclickable.seeds",
+        "SEEDS|CARROT_ITEM|POTATO_ITEM|PUMPKIN_SEEDS|SUGAR_CANE|MELON_SEEDS|CACTUS|INK_SACK-3"
+    )
+
+    private val netherWart by lazy { "NETHER_STALK".asInternalName() }
+
     @SubscribeEvent
     fun onRepoReload(event: RepositoryReloadEvent) {
-        val data = event.getConstant<MultiFilterJson>("TradeNpcs")
-        tradeNpcFilter.load(data)
-
         val hideNotClickable = event.getConstant<HideNotClickableItemsJson>("HideNotClickableItems")
         hideNpcSellFilter.load(hideNotClickable.hide_npc_sell)
         hideInStorageFilter.load(hideNotClickable.hide_in_storage)
@@ -127,7 +134,7 @@ class HideNotClickableItems {
             event.toolTip.add("")
             if (hideReason == "") {
                 event.toolTip.add("§4No hide reason!")
-                LorenzUtils.error("No hide reason for not clickable item!")
+                ChatUtils.error("No hide reason for not clickable item!")
             } else {
                 event.toolTip.add("§c$hideReason")
                 if (config.itemsBypass) {
@@ -175,12 +182,15 @@ class HideNotClickableItems {
         reverseColor = false
 
         return when {
-            hideNpcSell(chestName, stack) -> true
+            hideNpcSell(stack) -> true
             hideInStorage(chestName, stack) -> true
             hideSalvage(chestName, stack) -> true
             hidePlayerTrade(chestName, stack) -> true
             hideBazaarOrAH(chestName, stack) -> true
             hideAccessoryBag(chestName, stack) -> true
+            hideBasketOfSeeds(chestName, stack) -> true
+            hideNetherWartPouch(chestName, stack) -> true
+            hideTrickOrTreatBag(chestName, stack) -> true
             hideSackOfSacks(chestName, stack) -> true
             hideFishingBag(chestName, stack) -> true
             hidePotionBag(chestName, stack) -> true
@@ -260,7 +270,7 @@ class HideNotClickableItems {
             "BRACELET"
         )
         for (type in list) {
-            if (stack.getLore().any { it.contains("§l") && it.contains(type) }) {//todo use item api
+            if (stack.getLore().any { it.contains("§l") && it.contains(type) }) {// todo use item api
                 reverseColor = true
                 return false
             }
@@ -289,7 +299,7 @@ class HideNotClickableItems {
     private fun hidePrivateIslandChest(chestName: String, stack: ItemStack): Boolean {
         if (chestName != "Chest" && chestName != "Large Chest") return false
 
-        //TODO make check if player is on private island
+        // TODO make check if player is on private island
 
         if (!ItemUtils.isSoulBound(stack)) return false
 
@@ -306,7 +316,7 @@ class HideNotClickableItems {
         }
 
         reverseColor = true
-        if (stack.cleanName().endsWith(" Potion")) return false
+        if (stack.cleanName().endsWith(" Potion") || stack.cleanName() == "Water Bottle") return false
 
         hideReason = "This item is not a potion!"
         return true
@@ -346,9 +356,53 @@ class HideNotClickableItems {
         if (ItemUtils.isSkyBlockMenuItem(stack)) return false
 
         reverseColor = true
-        if (stack.getLore().any { it.contains("ACCESSORY") || it.contains("HATCCESSORY") }) return false
+        if (stack.getLore().any { it.contains("ACCESSORY") || it.contains("HATCESSORY") }) return false
 
         hideReason = "This item is not an accessory!"
+        return true
+    }
+
+    private fun hideBasketOfSeeds(chestName: String, stack: ItemStack): Boolean {
+        if (!chestName.startsWith("Basket of Seeds")) return false
+
+        if (ItemUtils.isSkyBlockMenuItem(stack)) {
+            hideReason = "The SkyBlock Menu cannot be put into the basket of seeds!"
+            return true
+        }
+
+        seedsPattern.matchMatcher(stack.getInternalName().asString()) {
+            return false
+        }
+
+        hideReason = "This item is not a seed!"
+        return true
+    }
+
+    private fun hideNetherWartPouch(chestName: String, stack: ItemStack): Boolean {
+        if (!chestName.startsWith("Nether Wart Pouch")) return false
+
+        if (ItemUtils.isSkyBlockMenuItem(stack)) {
+            hideReason = "The SkyBlock Menu cannot be put into the nether wart pouch!"
+            return true
+        }
+
+        if (stack.getInternalName() == netherWart) return false
+
+        hideReason = "This item is not a nether wart!"
+        return true
+    }
+
+    private fun hideTrickOrTreatBag(chestName: String, stack: ItemStack): Boolean {
+        if (!chestName.startsWith("Trick or Treat Bag")) return false
+
+        if (ItemUtils.isSkyBlockMenuItem(stack)) {
+            hideReason = "The SkyBlock Menu cannot be put into the trick or treat bag!"
+            return true
+        }
+
+        if (stack.cleanName() == "Green Candy" || stack.cleanName() == "Purple Candy") return false
+
+        hideReason = "This item is not a spooky candy!"
         return true
     }
 
@@ -378,8 +432,8 @@ class HideNotClickableItems {
         return result
     }
 
-    private fun hideNpcSell(chestName: String, stack: ItemStack): Boolean {
-        if (!tradeNpcFilter.match(chestName)) return false
+    private fun hideNpcSell(stack: ItemStack): Boolean {
+        if (!ShiftClickNPCSell.inInventory) return false
         if (VisitorAPI.inInventory) return false
         reverseColor = true
 
@@ -509,6 +563,5 @@ class HideNotClickableItems {
         event.move(3, "inventory.hideNotClickableOpacity", "inventory.hideNotClickable.opacity")
         event.move(3, "inventory.notClickableItemsBypass", "inventory.hideNotClickable.itemsBypass")
         event.move(3, "inventory.hideNotClickableItemsGreenLine", "inventory.hideNotClickable.itemsGreenLine")
-
     }
 }

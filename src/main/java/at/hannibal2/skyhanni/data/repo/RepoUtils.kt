@@ -1,5 +1,6 @@
 package at.hannibal2.skyhanni.data.repo
 
+import at.hannibal2.skyhanni.test.command.ErrorManager
 import com.google.gson.Gson
 import java.io.BufferedReader
 import java.io.File
@@ -31,7 +32,7 @@ object RepoUtils {
         // create output directory if it doesn't exist
         if (!dir.exists()) dir.mkdirs()
         val fis: FileInputStream
-        //buffer for read and write data to file
+        // buffer for read and write data to file
         val buffer = ByteArray(1024)
         try {
             fis = FileInputStream(zipFilePath)
@@ -42,7 +43,7 @@ object RepoUtils {
                     var fileName = ze.name
                     fileName = fileName.substring(fileName.split("/").toTypedArray()[0].length + 1)
                     val newFile = File(destDir + File.separator + fileName)
-                    //create directories for sub directories in zip
+                    // create directories for sub directories in zip
                     File(newFile.parent).mkdirs()
                     if (!isInTree(dir, newFile)) {
                         throw RuntimeException(
@@ -56,16 +57,21 @@ object RepoUtils {
                     }
                     fos.close()
                 }
-                //close this ZipEntry
+                // close this ZipEntry
                 zis.closeEntry()
                 ze = zis.nextEntry
             }
-            //close last ZipEntry
+            // close last ZipEntry
             zis.closeEntry()
             zis.close()
             fis.close()
         } catch (e: IOException) {
-            e.printStackTrace()
+            ErrorManager.logErrorWithData(
+                e,
+                "unzipIgnoreFirstFolder failed",
+                "zipFilePath" to zipFilePath,
+                "destDir" to destDir,
+            )
         }
     }
 

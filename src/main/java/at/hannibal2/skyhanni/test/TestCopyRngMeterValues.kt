@@ -4,24 +4,33 @@ import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.config.ConfigManager
 import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.events.InventoryFullyOpenedEvent
+import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
-import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.NEUInternalName
 import at.hannibal2.skyhanni.utils.NumberUtil.formatNumber
 import at.hannibal2.skyhanni.utils.OSUtils
 import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
+import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
 object TestCopyRngMeterValues {
+
+    private val patternGroup = RepoPattern.group("test.dev.copyrng")
+    private val slayerPattern by patternGroup.pattern(
+        "slayer",
+        "§7Slayer XP: §d.*§5/§d(?<xp>.*)"
+    )
+    private val dungeonPattern by patternGroup.pattern(
+        "dungeon",
+        "§7Dungeon Score: §d.*§5/§d(?<xp>.*)"
+    )
 
     @SubscribeEvent
     fun onInventoryOpen(event: InventoryFullyOpenedEvent) {
         if (!SkyHanniMod.feature.dev.debug.copyRngMeter) return
 
         val map = mutableMapOf<NEUInternalName, Long>()
-        val slayerPattern = "§7Slayer XP: §d.*§5/§d(?<xp>.*)".toPattern()
-        val dungeonPattern = "§7Dungeon Score: §d.*§5/§d(?<xp>.*)".toPattern()
         for (item in event.inventoryItems.values) {
             for (line in item.getLore()) {
                 slayerPattern.matchMatcher(line) {
@@ -35,7 +44,7 @@ object TestCopyRngMeterValues {
         if (map.isEmpty()) return
 
         OSUtils.copyToClipboard(ConfigManager.gson.toJson(map))
-        LorenzUtils.debug("${map.size} items saved to clipboard.")
+        ChatUtils.debug("${map.size} items saved to clipboard.")
     }
 
     @SubscribeEvent

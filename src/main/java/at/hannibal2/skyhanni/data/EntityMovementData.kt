@@ -13,6 +13,7 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 class EntityMovementData {
 
     companion object {
+
         private val entityLocation = mutableMapOf<Entity, LorenzVec>()
 
         fun addToTrack(entity: Entity) {

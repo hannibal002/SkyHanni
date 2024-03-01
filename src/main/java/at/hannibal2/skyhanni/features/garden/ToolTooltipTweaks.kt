@@ -3,7 +3,7 @@ package at.hannibal2.skyhanni.features.garden
 import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.config.features.garden.TooltipTweaksConfig.CropTooltipFortuneEntry
 import at.hannibal2.skyhanni.events.LorenzToolTipEvent
-import at.hannibal2.skyhanni.features.garden.FarmingFortuneDisplay.Companion.getAbilityFortune
+import at.hannibal2.skyhanni.features.garden.FarmingFortuneDisplay.getAbilityFortune
 import at.hannibal2.skyhanni.features.garden.GardenAPI.getCropType
 import at.hannibal2.skyhanni.features.garden.fortuneguide.FFGuideGUI
 import at.hannibal2.skyhanni.utils.ConfigUtils
@@ -20,6 +20,7 @@ import java.text.DecimalFormat
 import kotlin.math.roundToInt
 
 class ToolTooltipTweaks {
+
     private val config get() = GardenAPI.config.tooltipTweak
     private val tooltipFortunePattern =
         "^§5§o§7Farming Fortune: §a\\+([\\d.]+)(?: §2\\(\\+\\d\\))?(?: §9\\(\\+(\\d+)\\))?$".toRegex()
@@ -74,7 +75,6 @@ class ToolTooltipTweaks {
                 val greenThumbFortune = FarmingFortuneDisplay.greenThumbFortune
 
                 val totalFortune = displayedFortune + hiddenFortune
-
 
                 val ffdString = if (ffdFortune != 0) " §2(+${ffdFortune.formatStat()})" else ""
                 val reforgeString = if (reforgeFortune != 0.0) " §9(+${reforgeFortune.formatStat()})" else ""

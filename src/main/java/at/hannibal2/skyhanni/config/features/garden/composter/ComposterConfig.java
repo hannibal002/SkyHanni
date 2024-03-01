@@ -21,7 +21,7 @@ public class ComposterConfig {
 
     @Expose
     @ConfigOption(name = "Overlay Price", desc = "Toggle for Bazaar 'buy order' vs 'instant buy' price in composter overlay.")
-    @ConfigEditorDropdown()
+    @ConfigEditorDropdown
     public OverlayPriceTypeEntry overlayPriceType = OverlayPriceTypeEntry.INSTANT_BUY;
 
     public enum OverlayPriceTypeEntry implements HasLegacyId {
@@ -54,8 +54,8 @@ public class ComposterConfig {
 
     @Expose
     @ConfigOption(name = "Retrieve From", desc = "Change where to retrieve the materials from in the composter overlay: The Bazaar or Sacks.")
-    @ConfigEditorDropdown()
-    public RetrieveFromEntry retrieveFrom = RetrieveFromEntry.BAZAAR;
+    @ConfigEditorDropdown
+    public RetrieveFromEntry retrieveFrom = RetrieveFromEntry.SACKS;
 
     public enum RetrieveFromEntry implements HasLegacyId {
         BAZAAR("Bazaar", 0),

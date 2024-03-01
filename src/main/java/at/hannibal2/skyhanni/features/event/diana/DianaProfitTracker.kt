@@ -6,12 +6,14 @@ import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.ItemAddEvent
 import at.hannibal2.skyhanni.events.LorenzChatEvent
 import at.hannibal2.skyhanni.events.RepositoryReloadEvent
+import at.hannibal2.skyhanni.utils.ChatUtils
+import at.hannibal2.skyhanni.utils.CollectionUtils.addAsSingletonList
 import at.hannibal2.skyhanni.utils.LorenzUtils
-import at.hannibal2.skyhanni.utils.LorenzUtils.addAsSingletonList
 import at.hannibal2.skyhanni.utils.NEUInternalName
 import at.hannibal2.skyhanni.utils.NumberUtil
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.NumberUtil.formatNumber
+import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.StringUtils.matches
 import at.hannibal2.skyhanni.utils.renderables.Renderable
@@ -22,15 +24,17 @@ import com.google.gson.annotations.Expose
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
 object DianaProfitTracker {
+
     private val config get() = SkyHanniMod.feature.event.diana.dianaProfitTracker
     private var allowedDrops = listOf<NEUInternalName>()
 
-    private val chatDugOutPattern by RepoPattern.pattern(
-        "diana.chat.burrow.dug",
+    private val patternGroup = RepoPattern.group("diana.chat")
+    private val chatDugOutPattern by patternGroup.pattern(
+        "burrow.dug",
         "(§eYou dug out a Griffin Burrow!|§eYou finished the Griffin burrow chain!) .*"
     )
-    private val chatDugOutCoinsPattern by RepoPattern.pattern(
-        "diana.chat.coins",
+    private val chatDugOutCoinsPattern by patternGroup.pattern(
+        "coins",
         "§6§lWow! §r§eYou dug out §r§6(?<coins>.*) coins§r§e!"
     )
 
@@ -40,6 +44,7 @@ object DianaProfitTracker {
         { it.diana.dianaProfitTracker }) { drawDisplay(it) }
 
     class Data : ItemTrackerData() {
+
         override fun resetItems() {
             burrowsDug = 0
         }
@@ -81,19 +86,7 @@ object DianaProfitTracker {
             )
         )
 
-        val profitFormat = profit.addSeparators()
-        val profitPrefix = if (profit < 0) "§c" else "§6"
-
-        val profitPerBurrow = profit / data.burrowsDug
-        val profitPerBurrowFormat = NumberUtil.format(profitPerBurrow)
-
-        val text = "§eTotal Profit: $profitPrefix$profitFormat coins"
-        addAsSingletonList(
-            Renderable.hoverTips(
-                text,
-                listOf("§7Profit per burrow: $profitPrefix$profitPerBurrowFormat")
-            )
-        )
+        addAsSingletonList(tracker.addTotalProfit(profit, data.burrowsDug, "burrow"))
 
         tracker.addPriceFromButton(this)
     }
@@ -105,7 +98,7 @@ object DianaProfitTracker {
         val internalName = event.internalName
 
         if (!isAllowedItem(internalName)) {
-            LorenzUtils.debug("Ignored non-diana item pickup: '$internalName'")
+            ChatUtils.debug("Ignored non-diana item pickup: '$internalName'")
             return
         }
 
@@ -116,12 +109,14 @@ object DianaProfitTracker {
     fun onChat(event: LorenzChatEvent) {
         val message = event.message
         if (chatDugOutPattern.matches(message)) {
+            BurrowAPI.lastBurrowRelatedChatMessage = SimpleTimeMark.now()
             tracker.modify {
                 it.burrowsDug++
             }
             tryHide(event)
         }
         chatDugOutCoinsPattern.matchMatcher(message) {
+            BurrowAPI.lastBurrowRelatedChatMessage = SimpleTimeMark.now()
             val coins = group("coins").formatNumber().toInt()
             tracker.addCoins(coins)
             tryHide(event)
@@ -130,6 +125,7 @@ object DianaProfitTracker {
         if (message == "§6§lRARE DROP! §r§eYou dug out a §r§9Griffin Feather§r§e!" ||
             message == "§eFollow the arrows to find the §r§6treasure§r§e!"
         ) {
+            BurrowAPI.lastBurrowRelatedChatMessage = SimpleTimeMark.now()
             tryHide(event)
         }
     }

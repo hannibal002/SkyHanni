@@ -46,6 +46,7 @@ typealias TrackerDisplayMode = SkyHanniTracker.DefaultDisplayMode
 
 class ConfigManager {
     companion object {
+
         val gson = GsonBuilder().setPrettyPrinting()
             .excludeFieldsWithoutExposeAnnotation()
             .serializeSpecialFloatingPointValues()
@@ -66,8 +67,7 @@ class ConfigManager {
                 }
 
                 override fun read(reader: JsonReader): LorenzVec {
-                    val (x, y, z) = reader.nextString().split(":").map { it.toDouble() }
-                    return LorenzVec(x, y, z)
+                    return LorenzVec.decodeFromString(reader.nextString())
                 }
             }.nullSafe())
             .registerTypeAdapter(TrophyRarity::class.java, object : TypeAdapter<TrophyRarity>() {
@@ -210,11 +210,11 @@ class ConfigManager {
                 }
 
                 logger.log("Loaded $fileName from file")
-            } catch (error: Exception) {
-                error.printStackTrace()
+            } catch (e: Exception) {
+                e.printStackTrace()
                 val backupFile = file.resolveSibling("$fileName-${System.currentTimeMillis()}-backup.json")
                 logger.log("Exception while reading $file. Will load blank $fileName and save backup to $backupFile")
-                logger.log("Exception was $error")
+                logger.log("Exception was $e")
                 try {
                     file.copyTo(backupFile)
                 } catch (e: Exception) {

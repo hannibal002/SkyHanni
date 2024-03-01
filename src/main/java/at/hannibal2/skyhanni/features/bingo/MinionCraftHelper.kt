@@ -1,13 +1,14 @@
 package at.hannibal2.skyhanni.features.bingo
 
 import at.hannibal2.skyhanni.SkyHanniMod
+import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.InventoryFullyOpenedEvent
 import at.hannibal2.skyhanni.events.LorenzTickEvent
 import at.hannibal2.skyhanni.events.LorenzWorldChangeEvent
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName
-import at.hannibal2.skyhanni.utils.ItemUtils.getItemName
 import at.hannibal2.skyhanni.utils.ItemUtils.hasEnchantments
+import at.hannibal2.skyhanni.utils.ItemUtils.itemName
 import at.hannibal2.skyhanni.utils.ItemUtils.name
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.NEUInternalName
@@ -18,6 +19,9 @@ import at.hannibal2.skyhanni.utils.NumberUtil.romanToDecimalIfNecessary
 import at.hannibal2.skyhanni.utils.RenderUtils.renderStrings
 import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
+import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
+import com.google.gson.JsonArray
+import com.google.gson.JsonObject
 import io.github.moulberry.notenoughupdates.recipes.CraftingRecipe
 import net.minecraft.client.Minecraft
 import net.minecraft.item.ItemStack
@@ -25,10 +29,14 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import kotlin.time.Duration.Companion.seconds
 
 class MinionCraftHelper {
+
     private val config get() = SkyHanniMod.feature.event.bingo
 
-    // TODO USE SH-REPO
-    private var minionNamePattern = "(?<name>.*) Minion (?<number>.*)".toPattern()
+    private val minionNamePattern by RepoPattern.pattern(
+        "bingo.minion.name",
+        "(?<name>.*) Minion (?<number>.*)"
+    )
+
     private var display = emptyList<String>()
     private var hasMinionInInventory = false
     private var hasItemsForMinion = false
@@ -117,7 +125,7 @@ class MinionCraftHelper {
             }
         }
 
-        firstMinionTier(otherItems, minions)
+        FirstMinionTier.firstMinionTier(otherItems, minions, tierOneMinions, tierOneMinionsDone)
         return Pair(minions, otherItems)
     }
 
@@ -148,10 +156,11 @@ class MinionCraftHelper {
             val internalName = internalId.asInternalName()
             if (internalName.endsWith("_GENERATOR_1")) {
                 if (internalName == "REVENANT_GENERATOR_1".asInternalName() ||
-                internalName == "TARANTULA_GENERATOR_1".asInternalName() ||
-                internalName == "VOIDLING_GENERATOR_1".asInternalName() ||
-                internalName == "INFERNO_GENERATOR_1".asInternalName() ||
-                internalName == "VAMPIRE_GENERATOR_1".asInternalName()) continue
+                    internalName == "TARANTULA_GENERATOR_1".asInternalName() ||
+                    internalName == "VOIDLING_GENERATOR_1".asInternalName() ||
+                    internalName == "INFERNO_GENERATOR_1".asInternalName() ||
+                    internalName == "VAMPIRE_GENERATOR_1".asInternalName()
+                ) continue
                 tierOneMinions.add(internalName)
             }
 
@@ -165,27 +174,6 @@ class MinionCraftHelper {
                             allIngredients.add(id)
                         }
                     }
-                }
-            }
-        }
-    }
-
-    private fun firstMinionTier(otherItems: Map<NEUInternalName, Int>, minions: MutableMap<String, NEUInternalName>) {
-        val help = otherItems.filter { !it.key.startsWith("WOOD_") }
-        val tierOneMinionsFiltered = tierOneMinions.filter { it.asString() !in tierOneMinionsDone }
-        for (minionId in tierOneMinionsFiltered) {
-            val prefix = minionId.asString().dropLast(1)
-            if (minions.any { it.value.startsWith(prefix) }) {
-                tierOneMinionsDone.add(minionId.toString())
-            }
-        }
-        for (minionId in tierOneMinionsFiltered) {
-            for (recipe in NEUItems.getRecipes(minionId)) {
-                if (recipe !is CraftingRecipe) continue
-                if (recipe.getCachedIngredients().any { help.contains(it.internalItemId.asInternalName()) }) {
-                    val name = recipe.output.itemStack.name!!.removeColor()
-                    val abc = name.replace(" I", " 0")
-                    minions[abc] = minionId.replace("_1", "_0")
                 }
             }
         }
@@ -222,7 +210,7 @@ class MinionCraftHelper {
                 val needAmount = need * multiplier
                 val have = otherItems.getOrDefault(itemId, 0)
                 val percentage = have.toDouble() / needAmount
-                val itemName = rawId.getItemName()
+                val itemName = rawId.itemName
                 val isTool = itemId.startsWith("WOOD_")
                 if (percentage >= 1) {
                     val color = if (isTool) "§7" else "§a"
@@ -279,11 +267,38 @@ class MinionCraftHelper {
         for ((_, b) in event.inventoryItems) {
             val name = b.name ?: continue
             if (!name.startsWith("§e")) continue
-            val internalName = NEUItems.getRawInternalName("$name I")
+            val internalName = NEUInternalName.fromItemName("$name I")
                 .replace("MINION", "GENERATOR").replace(";", "_").replace("CAVE_SPIDER", "CAVESPIDER")
             if (!tierOneMinionsDone.contains(internalName)) {
                 tierOneMinionsDone.add(internalName)
             }
         }
+    }
+
+    @SubscribeEvent
+    fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
+        event.transform(19, "#player.bingoSessions") { element ->
+            for ((_, data) in element.asJsonObject.entrySet()) {
+                fixTierOneMinions(data.asJsonObject)
+            }
+            element
+        }
+    }
+
+    private fun fixTierOneMinions(data: JsonObject) {
+        val newList = JsonArray()
+        var counter = 0
+        for (entry in data["tierOneMinionsDone"].asJsonArray) {
+            val name = entry.asString
+            if (!name.startsWith("INTERNALNAME:")) {
+                newList.add(entry)
+            } else {
+                counter++
+            }
+        }
+        if (counter > 0) {
+            println("Removed $counter wrong entries in fixTierOneMinions.")
+        }
+        data.add("tierOneMinionsDone", newList)
     }
 }
