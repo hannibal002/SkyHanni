@@ -431,7 +431,6 @@ class FarmingWeightDisplay {
                     "url" to url,
                     "apiResponse" to apiResponse
                 )
-                error()
             }
             return -1
         }
@@ -470,13 +469,10 @@ class FarmingWeightDisplay {
                 ErrorManager.logErrorWithData(
                     e, "Error loading user farming weight",
                     "url" to url,
-                    "apiResponse" to apiResponse
+                    "apiResponse" to apiResponse,
+                    "localProfile" to localProfile
                 )
             }
-            error()
-        }
-
-        private fun error() {
             apiError = true
             ErrorManager.skyHanniError(
                 "Loading the farming weight data from elitebot.dev failed!\n"

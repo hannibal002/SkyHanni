@@ -117,9 +117,11 @@ object SkyHanniConfigSearchResetCommand {
             "§eChanged config element $term to $rawJson."
         } catch (e: Exception) {
             ErrorManager.logErrorWithData(
-                e, "Could not change config element '$term' to '$rawJson'",
+                e, "Could not change config element",
+                "term" to term,
+                "rawJson" to rawJson,
                 "args" to args.joinToString(" ")
-            )
+                )
             "§cCould not change config element '$term' to '$rawJson'"
         }
     }
