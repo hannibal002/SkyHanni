@@ -6,7 +6,7 @@ import at.hannibal2.skyhanni.config.features.garden.MoneyPerHourConfig.CustomFor
 import at.hannibal2.skyhanni.events.GardenToolChangeEvent
 import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.LorenzTickEvent
-import at.hannibal2.skyhanni.events.PreProfileSwitchEvent
+import at.hannibal2.skyhanni.events.ProfileJoinEvent
 import at.hannibal2.skyhanni.features.bazaar.BazaarApi.Companion.getBazaarData
 import at.hannibal2.skyhanni.features.bazaar.BazaarApi.Companion.isBazaarItem
 import at.hannibal2.skyhanni.features.bazaar.BazaarData
@@ -14,6 +14,7 @@ import at.hannibal2.skyhanni.features.garden.CropType
 import at.hannibal2.skyhanni.features.garden.CropType.Companion.getByNameOrNull
 import at.hannibal2.skyhanni.features.garden.GardenAPI
 import at.hannibal2.skyhanni.features.garden.GardenNextJacobContest
+import at.hannibal2.skyhanni.features.garden.composter.ComposterOverlay
 import at.hannibal2.skyhanni.features.garden.farming.GardenCropSpeed.getSpeed
 import at.hannibal2.skyhanni.features.garden.farming.GardenCropSpeed.isSpeedDataEmpty
 import at.hannibal2.skyhanni.test.command.ErrorManager
@@ -24,7 +25,7 @@ import at.hannibal2.skyhanni.utils.CollectionUtils.sortedDesc
 import at.hannibal2.skyhanni.utils.ConfigUtils
 import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName
-import at.hannibal2.skyhanni.utils.ItemUtils.getItemNameOrNull
+import at.hannibal2.skyhanni.utils.ItemUtils.itemNameWithoutColor
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.NEUInternalName
 import at.hannibal2.skyhanni.utils.NEUInternalName.Companion.asInternalName
@@ -37,7 +38,6 @@ import at.hannibal2.skyhanni.utils.NumberUtil
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.RenderUtils.renderStringsAndItems
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getReforgeName
-import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import kotlinx.coroutines.launch
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
@@ -60,7 +60,7 @@ object CropMoneyDisplay {
     private val toolHasBountiful get() = GardenAPI.storage?.toolWithBountiful
 
     @SubscribeEvent
-    fun onPreProfileSwitch(event: PreProfileSwitchEvent) {
+    fun onProfileJoin(event: ProfileJoinEvent) {
         display = emptyList()
     }
 
@@ -205,11 +205,16 @@ object CropMoneyDisplay {
                     list.add(getItemStack("BOX_OF_SEEDS"))
                 }
             } catch (e: NullPointerException) {
-                e.printStackTrace()
+                ErrorManager.logErrorWithData(
+                    e, "Error calculating seed price for money per hour display",
+                    "internalName" to internalName,
+                    "cropNames" to cropNames,
+                    "list" to list,
+                )
             }
 
             if (!config.compact) {
-                val itemName = internalName.getItemNameOrNull()?.removeColor() ?: continue
+                val itemName = internalName.itemNameWithoutColor
                 val currentColor = if (isCurrent) "§e" else "§7"
                 val contestFormat = if (GardenNextJacobContest.isNextCrop(crop)) "§n" else ""
                 list.add("$currentColor$contestFormat$itemName§7: ")
@@ -284,6 +289,8 @@ object CropMoneyDisplay {
                 (config.useCustomFormat && config.customFormat.singleOrNull() == CustomFormatEntry.NPC_PRICE)
 
         for ((internalName, amount) in multipliers.moveEntryToTop { isSeeds(it.key) }) {
+            if (internalName.equals("BOX_OF_SEEDS")) continue
+
             val crop = cropNames[internalName]!!
             // When only the NPC price is shown, display the price only for the base item
             if (onlyNpcPrice) {
@@ -403,12 +410,11 @@ object CropMoneyDisplay {
                 if (rawInternalName == "ENCHANTED_PAPER") continue
                 if (rawInternalName == "ENCHANTED_BREAD") continue
                 if (rawInternalName == "SIMPLE_CARROT_CANDY") continue
-                if (rawInternalName == "BOX_OF_SEEDS") continue
                 val internalName = rawInternalName.asInternalName()
                 if (!internalName.isBazaarItem()) continue
 
                 val (newId, amount) = NEUItems.getMultiplier(internalName)
-                val itemName = newId.getItemNameOrNull()?.removeColor() ?: continue
+                val itemName = newId.itemNameWithoutColor
                 val crop = getByNameOrNull(itemName)
                 crop?.let {
                     map[internalName] = amount

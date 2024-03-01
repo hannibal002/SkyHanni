@@ -4,6 +4,7 @@ import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
+import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraft.entity.EntityLivingBase
 import net.minecraft.entity.item.EntityArmorStand
 import net.minecraftforge.client.event.RenderLivingEvent
@@ -11,10 +12,15 @@ import net.minecraftforge.fml.common.eventhandler.EventPriority
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
 class TeleportPadCompactName {
-
-    // TODO USE SH-REPO
-    private val patternName = "§.✦ §aWarp To (?<name>.*)".toPattern()
-    private val patternNoName = "§.✦ §cNo Destination".toPattern()
+    private val patternGroup = RepoPattern.group("misc.teleportpad")
+    private val namePattern by patternGroup.pattern(
+        "name",
+        "§.✦ §aWarp To (?<name>.*)"
+    )
+    private val noNamePattern by patternGroup.pattern(
+        "noname",
+        "§.✦ §cNo Destination"
+    )
 
     @SubscribeEvent(priority = EventPriority.HIGH)
     fun onRenderLivingB(event: RenderLivingEvent.Specials.Pre<EntityLivingBase>) {
@@ -25,11 +31,11 @@ class TeleportPadCompactName {
 
         val name = entity.name
 
-        patternNoName.matchMatcher(name) {
+        noNamePattern.matchMatcher(name) {
             event.isCanceled = true
         }
 
-        patternName.matchMatcher(name) {
+        namePattern.matchMatcher(name) {
             entity.customNameTag = group("name")
         }
     }

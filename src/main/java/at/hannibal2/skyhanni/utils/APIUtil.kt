@@ -71,10 +71,15 @@ object APIUtil {
                                     "shtogglehypixelapierrors"
                                 )
                             }
-                            e.printStackTrace()
+                            ErrorManager.logErrorWithData(
+                                e, "502 Bad Gateway",
+                                "apiName" to apiName,
+                                "urlString" to urlString,
+                                "returnedData" to retSrc
+                            )
                         } else {
                             ErrorManager.logErrorWithData(
-                                e, "$apiName error for url: '$urlString'",
+                                e, "$apiName error",
                                 "apiName" to apiName,
                                 "urlString" to urlString,
                                 "returnedData" to retSrc
@@ -116,17 +121,18 @@ object APIUtil {
                 }
 
                 val message = "POST request to '$urlString' returned status ${status.statusCode}"
-                println(message)
                 ChatUtils.error("SkyHanni ran into an error. Status: ${status.statusCode}")
                 return ApiResponse(false, message, JsonObject())
             }
         } catch (throwable: Throwable) {
             if (silentError) {
                 throw throwable
-            } else {
-                throwable.printStackTrace()
-                ChatUtils.error("SkyHanni ran into an ${throwable::class.simpleName ?: "error"} whilst sending a resource. See logs for more details.")
             }
+            ErrorManager.logErrorWithData(
+                throwable, "SkyHanni ran into an ${throwable::class.simpleName ?: "error"} whilst sending a resource",
+                "urlString" to urlString,
+                "body" to body,
+            )
             return ApiResponse(false, throwable.message, JsonObject())
         } finally {
             client.close()
@@ -134,8 +140,10 @@ object APIUtil {
     }
 
     private fun readResponse(entity: HttpEntity): JsonObject {
-        val retSrc = EntityUtils.toString(entity)
-        return parser.parse(retSrc) as JsonObject
+        val retSrc = EntityUtils.toString(entity) ?: return JsonObject()
+        val parsed = parser.parse(retSrc)
+        if (parsed.isJsonNull) return JsonObject()
+        return parsed as JsonObject
     }
 
     fun postJSONIsSuccessful(url: String, body: String, silentError: Boolean = false): Boolean {
@@ -145,12 +153,12 @@ object APIUtil {
             return true
         }
 
-        println(response.message)
         ErrorManager.logErrorStateWithData(
             "An error occurred during the API request",
             "unsuccessful API response",
             "url" to url,
             "body" to body,
+            "message" to response.message,
             "response" to response,
         )
 

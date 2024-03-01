@@ -1,6 +1,5 @@
 package at.hannibal2.skyhanni.features.garden.visitor
 
-import at.hannibal2.skyhanni.data.ProfileStorageData
 import at.hannibal2.skyhanni.events.InventoryOpenEvent
 import at.hannibal2.skyhanni.events.LorenzChatEvent
 import at.hannibal2.skyhanni.events.garden.visitor.VisitorOpenEvent
@@ -24,10 +23,12 @@ import kotlin.time.Duration.Companion.seconds
  * Fixing the visitor detection problem with Anita and Jacob, as those two are on the garden twice when visiting.
  */
 object NPCVisitorFix {
-
-    private val storage get() = ProfileStorageData.profileSpecific?.garden
     private val staticVisitors = listOf("Jacob", "Anita")
-    private val barnSkinChangePattern by RepoPattern.pattern("garden.barn.skin.change", "§aChanging Barn skin to §r.*")
+
+    private val barnSkinChangePattern by RepoPattern.pattern(
+        "garden.barn.skin.change",
+        "§aChanging Barn skin to §r.*"
+    )
 
     @SubscribeEvent
     fun onInventoryOpen(event: InventoryOpenEvent) {
@@ -43,7 +44,7 @@ object NPCVisitorFix {
         // clicked on the real visitor, ignoring
         if (lastVisitorOpen.passedSince() < 1.seconds) return
 
-        val storage = storage ?: return
+        val storage = GardenAPI.storage ?: return
 
         val location = entity.getLorenzVec()
         storage.npcVisitorLocations[name]?.let {
@@ -65,7 +66,7 @@ object NPCVisitorFix {
     @SubscribeEvent
     fun onChat(event: LorenzChatEvent) {
         barnSkinChangePattern.matchMatcher(event.message) {
-            storage?.npcVisitorLocations?.clear()
+            GardenAPI.storage?.npcVisitorLocations?.clear()
         }
     }
 
@@ -77,7 +78,7 @@ object NPCVisitorFix {
             return nametags[0]
         }
 
-        val staticLocation = storage?.npcVisitorLocations?.get(visitorName) ?: return null
+        val staticLocation = GardenAPI.storage?.npcVisitorLocations?.get(visitorName) ?: return null
 
         for (entity in nametags.toMutableList()) {
             val distance = entity.distanceTo(staticLocation)

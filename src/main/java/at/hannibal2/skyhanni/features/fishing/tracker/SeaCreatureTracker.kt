@@ -32,12 +32,13 @@ object SeaCreatureTracker {
 
     private val config get() = SkyHanniMod.feature.fishing.seaCreatureTracker
 
-    private val tracker = SkyHanniTracker("Sea Creature Tracker", { Data() }, { it.fishing.seaCreatureTracker })
-    { drawDisplay(it) }
     private val trophyArmorNames by RepoPattern.pattern(
         "fishing.trophyfishing.armor",
         "(BRONZE|SILVER|GOLD|DIAMOND)_HUNTER_(HELMET|CHESTPLATE|LEGGINGS|BOOTS)"
     )
+
+    private val tracker = SkyHanniTracker("Sea Creature Tracker", { Data() }, { it.fishing.seaCreatureTracker })
+    { drawDisplay(it) }
     private var lastArmorCheck = SimpleTimeMark.farPast()
     private var isTrophyFishing = false
 
@@ -161,7 +162,7 @@ object SeaCreatureTracker {
     @SubscribeEvent
     fun onRenderOverlay(event: GuiRenderEvent) {
         if (!isEnabled()) return
-        if (!FishingAPI.isFishing()) return
+        if (!FishingAPI.isFishing(checkRodInHand = false)) return
 
         tracker.renderDisplay(config.position)
     }

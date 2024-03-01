@@ -43,7 +43,7 @@ public class FrozenTreasureConfig {
         name = "Text Format",
         desc = "Drag text to change the appearance of the overlay."
     )
-    @ConfigEditorDraggableList()
+    @ConfigEditorDraggableList
     public List<FrozenTreasureDisplayEntry> textFormat = new ArrayList<>(Arrays.asList(
         TITLE,
         TREASURES_MINED,

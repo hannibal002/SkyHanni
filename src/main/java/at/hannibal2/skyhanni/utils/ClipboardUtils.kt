@@ -46,7 +46,7 @@ object ClipboardUtils {
                 getClipboard()?.setContents(StringSelection(text), null)
             } catch (e: Exception) {
                 if (step == 3) {
-                    ErrorManager.logError(e, "Error while trying to access the clipboard.")
+                    ErrorManager.logErrorWithData(e, "Error while trying to access the clipboard.")
                 } else {
                     copyToClipboard(text, step + 1)
                 }
@@ -65,7 +65,7 @@ object ClipboardUtils {
             }
         } catch (e: Exception) {
             return if (step == 3) {
-                ErrorManager.logError(e, "Error while trying to access the clipboard.")
+                ErrorManager.logErrorWithData(e, "Error while trying to access the clipboard.")
                 null
             } else {
                 readFromClipboard(step + 1)

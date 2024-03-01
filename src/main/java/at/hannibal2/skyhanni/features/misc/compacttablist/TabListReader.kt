@@ -5,8 +5,10 @@ import at.hannibal2.skyhanni.events.LorenzTickEvent
 import at.hannibal2.skyhanni.mixins.transformers.AccessorGuiPlayerTabOverlay
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.StringUtils.removeResets
+import at.hannibal2.skyhanni.utils.StringUtils.removeSFormattingCode
 import at.hannibal2.skyhanni.utils.StringUtils.trimWhiteSpaceAndResets
 import at.hannibal2.skyhanni.utils.TabListData
+import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraft.client.Minecraft
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
@@ -15,15 +17,37 @@ object TabListReader {
 
     private val config get() = SkyHanniMod.feature.misc.compactTabList
 
-    // TODO USE SH-REPO
+    private val patternGroup = RepoPattern.group("misc.compacttablist")
+    val usernamePattern by patternGroup.pattern(
+        "username",
+        "^\\[(?<sblevel>\\d+)] (?:\\[\\w+] )?(?<username>\\w+)"
+    )
+    private val godPotPattern by patternGroup.pattern(
+        "effects.godpot",
+        "You have a God Potion active! (?<timer>[\\w ]+)"
+    )
+    private val activeEffectPattern by patternGroup.pattern(
+        "effects.active",
+        "Active Effects(?:§.)*(?:\\n(?:§.)*§7.+)*"
+    )
+    private val effectCountPattern by patternGroup.pattern(
+        "effects.count",
+        "You have (?<effectCount>[0-9]+) active effect"
+    )
+    private val cookiePattern by patternGroup.pattern(
+        "cookie",
+        "Cookie Buff(?:§.)*(?:\\n(§.)*§7.+)*"
+    )
+    private val dungeonBuffPattern by patternGroup.pattern(
+        "dungeonbuff",
+        "Dungeon Buffs(?:§.)*(?:\\n(§.)*§7.+)*"
+    )
+    private val upgradesPattern by patternGroup.pattern(
+        "upgrades",
+        "(?<firstPart>§e[A-Za-z ]+)(?<secondPart> §f[\\w ]+)"
+    )
+
     var hypixelAdvertisingString = "HYPIXEL.NET"
-    private val godPotPattern = "You have a God Potion active! (?<timer>[\\w ]+)".toPattern()
-    private val activeEffectPattern = "Active Effects(?:§.)*(?:\\n(?:§.)*§7.+)*".toPattern()
-    private val effectCountPattern = "You have (?<effectCount>[0-9]+) active effect".toPattern()
-    private val cookiePattern = "Cookie Buff(?:§.)*(?:\\n(§.)*§7.+)*".toPattern()
-    private val dungeonBuffPattern = "Dungeon Buffs(?:§.)*(?:\\n(§.)*§7.+)*".toPattern()
-    private val upgradesPattern = "(?<firstPart>§e[A-Za-z ]+)(?<secondPart> §f[\\w ]+)".toPattern()
-    private val tabListSPattern = "(?i)§S".toPattern()
 
     val renderColumns = mutableListOf<RenderColumn>()
 
@@ -83,7 +107,7 @@ object TabListReader {
 
         val column = TabColumn("§2§lOther")
 
-        var footer = tabListSPattern.matcher(tabList.footer_skyhanni.formattedText).replaceAll("")
+        var footer = tabList.footer_skyhanni.formattedText.removeSFormattingCode()
 
         var matcher = godPotPattern.matcher(tabList.footer_skyhanni.unformattedText)
         if (matcher.find()) {

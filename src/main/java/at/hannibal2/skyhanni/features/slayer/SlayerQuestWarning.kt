@@ -11,8 +11,8 @@ import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.LocationUtils.distanceToPlayer
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
-import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.getLorenzVec
+import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraft.entity.EntityLivingBase
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import kotlin.time.Duration.Companion.seconds
@@ -20,7 +20,12 @@ import kotlin.time.Duration.Companion.seconds
 class SlayerQuestWarning {
 
     private val config get() = SkyHanniMod.feature.slayer
-    private val talkToMaddoxPattern = " {3}§r§5§l» §r§7Talk to Maddox to claim your (.+) Slayer XP!".toPattern()
+
+    private  val talkToMaddoxPattern by RepoPattern.pattern(
+        "slayer.questwarning.talkto",
+        " {3}§r§5§l» §r§7Talk to Maddox to claim your .+ Slayer XP!"
+    )
+
     private var needSlayerQuest = false
     private var lastWarning = 0L
     private var currentReason = ""
@@ -80,11 +85,9 @@ class SlayerQuestWarning {
         var slayerQuest = false
         var bossSlain = false
         var slayBoss = false
-        var slayerTypeName = ""
         var nextIsType = false
         for (line in ScoreboardData.sidebarLinesFormatted) {
             if (nextIsType) {
-                slayerTypeName = line.removeColor()
                 nextIsType = false
             }
             if (line == "Slayer Quest") {

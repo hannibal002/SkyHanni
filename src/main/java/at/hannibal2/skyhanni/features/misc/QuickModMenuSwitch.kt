@@ -179,7 +179,7 @@ object QuickModMenuSwitch {
                 }
             }
         } catch (e: Exception) {
-            ErrorManager.logError(e, "Error trying to open the gui for mod " + mod.name)
+            ErrorManager.logErrorWithData(e, "Error trying to open the gui for mod " + mod.name)
         }
     }
 
