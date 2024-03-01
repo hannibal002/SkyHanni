@@ -271,7 +271,7 @@ class FarmingWeightDisplay {
                 } else {
                     leaderboardPosition--
                 }
-                ProfileStorageData.profileSpecific?.garden?.farmingWeight?.lastFarmingWeightLeaderboard =
+                GardenAPI.storage?.farmingWeight?.lastFarmingWeightLeaderboard =
                     leaderboardPosition
 
                 // Remove passed player to present the next one
@@ -374,7 +374,7 @@ class FarmingWeightDisplay {
                 if (wasNotLoaded && config.showLbChange) {
                     checkOffScreenLeaderboardChanges()
                 }
-                ProfileStorageData.profileSpecific?.garden?.farmingWeight?.lastFarmingWeightLeaderboard =
+                GardenAPI.storage?.farmingWeight?.lastFarmingWeightLeaderboard =
                     leaderboardPosition
                 lastLeaderboardUpdate = System.currentTimeMillis()
                 isLoadingLeaderboard = false
