@@ -1,4 +1,4 @@
-package at.hannibal2.skyhanni.features.bazaar
+package at.hannibal2.skyhanni.features.inventory.bazaar
 
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.events.LorenzChatEvent
@@ -56,5 +56,5 @@ class BazaarCancelledBuyOrderClipboard {
         }
     }
 
-    fun isEnabled() = LorenzUtils.inSkyBlock && SkyHanniMod.feature.bazaar.cancelledBuyOrderClipboard
+    fun isEnabled() = LorenzUtils.inSkyBlock && SkyHanniMod.feature.inventory.bazaar.cancelledBuyOrderClipboard
 }

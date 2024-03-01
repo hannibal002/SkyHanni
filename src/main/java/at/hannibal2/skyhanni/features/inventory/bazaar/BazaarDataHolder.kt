@@ -1,4 +1,4 @@
-package at.hannibal2.skyhanni.features.bazaar
+package at.hannibal2.skyhanni.features.inventory.bazaar
 
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.config.ConfigManager
