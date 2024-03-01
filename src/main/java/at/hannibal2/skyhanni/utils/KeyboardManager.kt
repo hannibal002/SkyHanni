@@ -1,5 +1,6 @@
 package at.hannibal2.skyhanni.utils
 
+import at.hannibal2.skyhanni.events.GuiKeyPressEvent
 import at.hannibal2.skyhanni.events.LorenzKeyPressEvent
 import at.hannibal2.skyhanni.events.LorenzTickEvent
 import at.hannibal2.skyhanni.test.command.ErrorManager
@@ -7,7 +8,9 @@ import io.github.moulberry.moulconfig.gui.GuiScreenElementWrapper
 import io.github.moulberry.moulconfig.internal.KeybindHelper
 import net.minecraft.client.Minecraft
 import net.minecraft.client.gui.GuiChat
+import net.minecraft.client.gui.inventory.GuiContainer
 import net.minecraft.client.settings.KeyBinding
+import net.minecraftforge.client.event.GuiScreenEvent
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import org.apache.commons.lang3.SystemUtils
 import org.lwjgl.input.Keyboard
@@ -33,6 +36,12 @@ object KeyboardManager {
      * allow the user to set a different option instead and just set the default key to isModifierKeyDown
      */
     fun getModifierKeyName(): String = if (SystemUtils.IS_OS_MAC) "Command" else "Control"
+
+    @SubscribeEvent
+    fun onGuiScreenKeybind(event: GuiScreenEvent.KeyboardInputEvent.Post) {
+        val guiScreen = event.gui as? GuiContainer ?: return
+        GuiKeyPressEvent(guiScreen).postAndCatch()
+    }
 
     @SubscribeEvent
     fun onTick(event: LorenzTickEvent) {
