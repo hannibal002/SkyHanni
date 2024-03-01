@@ -11,6 +11,7 @@ import at.hannibal2.skyhanni.features.garden.CropType
 import at.hannibal2.skyhanni.features.garden.CropType.Companion.getByNameOrNull
 import at.hannibal2.skyhanni.features.garden.GardenAPI
 import at.hannibal2.skyhanni.features.garden.GardenNextJacobContest
+import at.hannibal2.skyhanni.features.garden.composter.ComposterOverlay
 import at.hannibal2.skyhanni.features.garden.farming.GardenCropSpeed.getSpeed
 import at.hannibal2.skyhanni.features.garden.farming.GardenCropSpeed.isSpeedDataEmpty
 import at.hannibal2.skyhanni.features.inventory.bazaar.BazaarApi.Companion.getBazaarData
@@ -204,7 +205,12 @@ object CropMoneyDisplay {
                     list.add(getItemStack("BOX_OF_SEEDS"))
                 }
             } catch (e: NullPointerException) {
-                e.printStackTrace()
+                ErrorManager.logErrorWithData(
+                    e, "Error calculating seed price for money per hour display",
+                    "internalName" to internalName,
+                    "cropNames" to cropNames,
+                    "list" to list,
+                )
             }
 
             if (!config.compact) {
