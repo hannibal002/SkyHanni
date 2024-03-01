@@ -61,6 +61,7 @@ object SkyHanniConfigSearchResetCommand {
         } catch (e: Throwable) {
             ErrorManager.logErrorWithData(
                 e, "Could not reset config element '$term'",
+                "term" to term,
                 "args" to args.joinToString(" ")
             )
             return "§cCould not reset config element '$term'"
@@ -118,6 +119,7 @@ object SkyHanniConfigSearchResetCommand {
         } catch (e: Exception) {
             ErrorManager.logErrorWithData(
                 e, "Could not change config element",
+                "old" to shimmy.getJson(),
                 "term" to term,
                 "rawJson" to rawJson,
                 "args" to args.joinToString(" ")
@@ -145,7 +147,9 @@ object SkyHanniConfigSearchResetCommand {
         } catch (e: Exception) {
             ErrorManager.logErrorWithData(
                 e, "Error while trying to toggle config element",
-                "args" to args.joinToString(" ")
+                "path" to path,
+                "rawJson1" to rawJson1,
+                "rawJson2" to rawJson2,
             )
             "§cError while trying to toggle config element"
         }
