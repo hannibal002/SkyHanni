@@ -48,28 +48,30 @@ object MiningEventDisplay {
             else -> true
         }
 
-        events.firstOrNull { it.endsAt.asTimeMark().isInPast() }?.let {
-            when (islandType) {
-                IslandType.DWARVEN_MINES -> lastDwarvenEvent = it.event
-                IslandType.CRYSTAL_HOLLOWS -> lastCrystalEvent = it.event
-                else -> Unit
+        events.firstOrNull()?.let { firstEvent ->
+            if (firstEvent.endsAt.asTimeMark().isInPast()) {
+                when (islandType) {
+                    IslandType.DWARVEN_MINES -> lastDwarvenEvent = firstEvent.event
+                    IslandType.CRYSTAL_HOLLOWS -> lastCrystalEvent = firstEvent.event
+                    else -> Unit
+                }
             }
         }
 
         if (shouldShow) {
             val upcomingEvents = formatUpcomingEvents(events, lastEvent)
-            display.add("§a${islandType.displayName}§7: $upcomingEvents")
+            display.add("§a${islandType.displayName}§8: $upcomingEvents")
         }
     }
 
     private fun formatUpcomingEvents(events: List<RunningEvent>, lastEvent: MiningEvent?): String {
         val upcoming = events.filter { !it.endsAt.asTimeMark().isInPast() }
-            .map { if (it.isDouble) "${it.event} §7-> ${it.event}" else it.event.toString() }
+            .map { if (it.isDouble) "${it.event} §8-> ${it.event}" else it.event.toString() }
             .toMutableList()
 
         if (upcoming.isEmpty()) upcoming.add("§7???")
-        lastEvent?.let { upcoming.add(0, it.toPastString()) }
-        return upcoming.joinToString(" §7-> ")
+        if (config.passedEvents && upcoming.size < 4) lastEvent?.let { upcoming.add(0, it.toPastString()) }
+        return upcoming.joinToString(" §8-> ")
     }
 
     fun updateData(eventData: MiningEventData) {
@@ -78,8 +80,8 @@ object MiningEventDisplay {
 
         eventData.runningEvents.forEach { (islandType, events) ->
             when (islandType) {
-                IslandType.DWARVEN_MINES -> dwarvenEvents.addAll(events)
-                IslandType.CRYSTAL_HOLLOWS -> crystalEvents.addAll(events)
+                IslandType.DWARVEN_MINES -> dwarvenEvents.addAll(events.sortedBy { it.endsAt - it.event.defaultLength.inWholeMilliseconds })
+                IslandType.CRYSTAL_HOLLOWS -> crystalEvents.addAll(events.sortedBy { it.endsAt - it.event.defaultLength.inWholeMilliseconds })
                 else -> Unit
             }
         }
