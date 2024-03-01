@@ -8,7 +8,6 @@ import at.hannibal2.skyhanni.events.LorenzChatEvent
 import at.hannibal2.skyhanni.events.LorenzTickEvent
 import at.hannibal2.skyhanni.events.LorenzWorldChangeEvent
 import at.hannibal2.skyhanni.events.ProfileJoinEvent
-import at.hannibal2.skyhanni.events.ServerChatEvent
 import at.hannibal2.skyhanni.events.TabListUpdateEvent
 import at.hannibal2.skyhanni.features.bingo.BingoAPI
 import at.hannibal2.skyhanni.features.rift.RiftAPI
@@ -33,10 +32,6 @@ import kotlin.time.Duration.Companion.seconds
 class HypixelData {
 
     private val patternGroup = RepoPattern.group("data.hypixeldata")
-    private val lobbyTypePattern by patternGroup.pattern(
-        "lobbytype",
-        "(?<lobbyType>.*lobby)\\d+"
-    )
     private val islandNamePattern by patternGroup.pattern(
         "islandname",
         "(?:§.)*(Area|Dungeon): (?:§.)*(?<island>.*)"
@@ -53,6 +48,10 @@ class HypixelData {
         private val serverIdTablistPattern by patternGroup.pattern(
             "serverid.tablist",
             " Server: §r§8(?<serverid>\\S+)"
+        )
+        private val lobbyTypePattern by patternGroup.pattern(
+            "lobbytype",
+            "(?<lobbyType>.*lobby)\\d+"
         )
 
         var hypixelLive = false
@@ -113,6 +112,36 @@ class HypixelData {
             }
 
             return serverId
+        }
+
+        // This code is modified from NEU, and depends on NEU (or another mod) sending /locraw.
+        private val jsonBracketPattern = "^\\{.+}".toPattern()
+
+        //todo convert to proper json object
+        fun checkForLocraw(message: String) {
+            jsonBracketPattern.matchMatcher(message.removeColor()) {
+                try {
+                    val obj: JsonObject = gson.fromJson(group(), JsonObject::class.java)
+                    if (obj.has("server")) {
+                        locrawData = obj
+                        locraw.keys.forEach { key ->
+                            locraw[key] = obj[key]?.asString ?: ""
+                        }
+                        inLimbo = locraw["server"] == "limbo"
+                        inLobby = locraw["lobbyname"] != ""
+
+                        if (inLobby) {
+                            locraw["lobbyname"]?.let {
+                                lobbyTypePattern.matchMatcher(it) {
+                                    locraw["lobbytype"] = group("lobbyType")
+                                }
+                            }
+                        }
+                    }
+                } catch (e: Exception) {
+                    ErrorManager.logErrorWithData(e, "Failed to parse locraw data")
+                }
+            }
         }
     }
 
@@ -311,36 +340,5 @@ class HypixelData {
         val scoreboardTitle = displayName.removeColor()
         return scoreboardTitle.contains("SKYBLOCK") ||
             scoreboardTitle.contains("SKIBLOCK") // April 1st jokes are so funny
-    }
-
-    // This code is modified from NEU, and depends on NEU (or another mod) sending /locraw.
-    private val jsonBracketPattern = "^\\{.+}".toPattern()
-
-    //todo convert to proper json object
-    @SubscribeEvent
-    fun onServerChat(event: ServerChatEvent) {
-        jsonBracketPattern.matchMatcher(event.message.removeColor()) {
-            try {
-                val obj: JsonObject = gson.fromJson(group(), JsonObject::class.java)
-                if (obj.has("server")) {
-                    locrawData = obj
-                    locraw.keys.forEach { key ->
-                        locraw[key] = obj[key]?.asString ?: ""
-                    }
-                    inLimbo = locraw["server"] == "limbo"
-                    inLobby = locraw["lobbyname"] != ""
-
-                    if (inLobby) {
-                        locraw["lobbyname"]?.let {
-                            lobbyTypePattern.matchMatcher(it) {
-                                locraw["lobbytype"] = group("lobbyType")
-                            }
-                        }
-                    }
-                }
-            } catch (e: Exception) {
-                ErrorManager.logErrorWithData(e, "Failed to parse locraw data")
-            }
-        }
     }
 }

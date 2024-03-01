@@ -4,7 +4,6 @@ import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.events.LorenzChatEvent
 import at.hannibal2.skyhanni.events.MessageSendToServerEvent
 import at.hannibal2.skyhanni.events.PacketEvent
-import at.hannibal2.skyhanni.events.ServerChatEvent
 import at.hannibal2.skyhanni.features.chat.ChatFilterGui
 import at.hannibal2.skyhanni.utils.IdentityCharacteristics
 import at.hannibal2.skyhanni.utils.LorenzLogger
@@ -114,7 +113,7 @@ object ChatManager {
         val message = LorenzUtils.stripVanillaMessage(original.formattedText)
 
         if (message.startsWith("§f{\"server\":\"")) {
-            ServerChatEvent(message).postAndCatch()
+            HypixelData.checkForLocraw(message)
             return
         }
         val key = IdentityCharacteristics(original)
