@@ -71,10 +71,15 @@ object APIUtil {
                                     "shtogglehypixelapierrors"
                                 )
                             }
-                            e.printStackTrace()
+                            ErrorManager.logErrorWithData(
+                                e, "502 Bad Gateway",
+                                "apiName" to apiName,
+                                "urlString" to urlString,
+                                "returnedData" to retSrc
+                            )
                         } else {
                             ErrorManager.logErrorWithData(
-                                e, "$apiName error for url: '$urlString'",
+                                e, "$apiName error",
                                 "apiName" to apiName,
                                 "urlString" to urlString,
                                 "returnedData" to retSrc
@@ -122,10 +127,12 @@ object APIUtil {
         } catch (throwable: Throwable) {
             if (silentError) {
                 throw throwable
-            } else {
-                throwable.printStackTrace()
-                ChatUtils.error("SkyHanni ran into an ${throwable::class.simpleName ?: "error"} whilst sending a resource. See logs for more details.")
             }
+            ErrorManager.logErrorWithData(
+                throwable, "SkyHanni ran into an ${throwable::class.simpleName ?: "error"} whilst sending a resource",
+                "urlString" to urlString,
+                "body" to body,
+            )
             return ApiResponse(false, throwable.message, JsonObject())
         } finally {
             client.close()

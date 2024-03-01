@@ -12,6 +12,7 @@ import at.hannibal2.skyhanni.events.InventoryFullyOpenedEvent
 import at.hannibal2.skyhanni.events.LorenzTickEvent
 import at.hannibal2.skyhanni.events.TabListUpdateEvent
 import at.hannibal2.skyhanni.features.garden.GardenAPI.addCropIcon
+import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.APIUtil
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.ConfigUtils
@@ -451,7 +452,10 @@ object GardenNextJacobContest {
         try {
             UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName())
         } catch (e: java.lang.Exception) {
-            e.printStackTrace()
+            ErrorManager.logErrorWithData(
+                e, "Failed to open a popup window",
+                "message" to message
+            )
         }
 
         val frame = JFrame()
@@ -571,8 +575,11 @@ object GardenNextJacobContest {
                 saveConfig()
             }
         } catch (e: Exception) {
-            e.printStackTrace()
-            ChatUtils.error("Failed to fetch upcoming contests. Please report this error if it continues to occur.")
+            ErrorManager.logErrorWithData(
+                e,
+                "Failed to fetch upcoming contests. Please report this error if it continues to occur"
+            )
+
         }
     }
 
@@ -604,11 +611,14 @@ object GardenNextJacobContest {
         if (result) {
             ChatUtils.chat("Successfully submitted this years upcoming contests, thank you for helping everyone out!")
         } else {
-            ChatUtils.error("Something went wrong submitting upcoming contests!")
+            ErrorManager.logErrorStateWithData("Something went wrong submitting upcoming contests!",
+                "submitContestsToElite not sucessful")
         }
     } catch (e: Exception) {
-        e.printStackTrace()
-        ChatUtils.error("Failed to submit upcoming contests. Please report this error if it continues to occur.")
+        ErrorManager.logErrorWithData(
+            e, "Failed to submit upcoming contests. Please report this error if it continues to occur.",
+            "contests" to contests
+        )
         null
     }
 

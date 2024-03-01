@@ -160,6 +160,9 @@ object GriffinBurrowHelper {
         guessLocation = null
         targetLocation = null
         particleBurrows = emptyMap()
+        GriffinBurrowParticleFinder.reset()
+
+        BurrowWarpHelper.currentWarp = null
         update()
     }
 
@@ -262,7 +265,7 @@ object GriffinBurrowHelper {
                 val guessLocation = findBlock(it)
                 val distance = guessLocation.distance(playerLocation)
                 event.drawColor(guessLocation, LorenzColor.WHITE, distance > 10)
-                val color = if (currentWarp == null) "§f" else "§b"
+                val color = if (currentWarp != null && targetLocation == guessLocation) "§b" else "§f"
                 event.drawDynamicText(guessLocation.add(y = 1), "${color}Guess", 1.5)
                 if (distance > 5) {
                     val formattedDistance = LorenzUtils.formatInteger(distance.toInt())
@@ -336,7 +339,7 @@ object GriffinBurrowHelper {
         val type: BurrowType = when (strings[0].lowercase()) {
             "reset" -> {
                 resetAllData()
-                ChatUtils.chat("Manually reset all burrow waypoints.")
+                ChatUtils.chat("Manually reset all burrow data.")
                 return
             }
 

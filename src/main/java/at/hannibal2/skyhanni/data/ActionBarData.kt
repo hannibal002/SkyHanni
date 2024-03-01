@@ -22,8 +22,11 @@ object ActionBarData {
 
         val original = event.message
         val message = LorenzUtils.stripVanillaMessage(original.formattedText)
-        if (message == actionBar) return
         actionBar = message
-        ActionBarUpdateEvent(actionBar).postAndCatch()
+        val actionBarEvent = ActionBarUpdateEvent(actionBar, event.message)
+        actionBarEvent.postAndCatch()
+        if (event.message.formattedText != actionBarEvent.chatComponent.formattedText) {
+            event.message = actionBarEvent.chatComponent
+        }
     }
 }
