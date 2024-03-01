@@ -11,6 +11,7 @@ import at.hannibal2.skyhanni.api.SkillAPI.lastUpdate
 import at.hannibal2.skyhanni.api.SkillAPI.oldSkillInfoMap
 import at.hannibal2.skyhanni.api.SkillAPI.showDisplay
 import at.hannibal2.skyhanni.api.SkillAPI.skillXPInfoMap
+import at.hannibal2.skyhanni.config.features.skillprogress.SkillETADisplayConfig.TextEntry
 import at.hannibal2.skyhanni.config.features.skillprogress.SkillProgressConfig
 import at.hannibal2.skyhanni.events.ActionBarUpdateEvent
 import at.hannibal2.skyhanni.events.ConfigLoadEvent
@@ -152,7 +153,7 @@ object SkillProgress {
 
         if (event.repeatSeconds(1)) {
             allDisplay = formatAllDisplay(drawAllDisplay())
-            etaDisplay = drawETADisplay()
+            etaDisplay = formatETADisplay(drawETADisplay())
         }
 
         if (event.repeatSeconds(2)) {
@@ -267,6 +268,17 @@ object SkillProgress {
         return newList
     }
 
+    private fun formatETADisplay(map: Map<TextEntry, Renderable>): List<Renderable> {
+        val newList = mutableListOf<Renderable>()
+        if (map.isEmpty()) return newList
+        for (text in etaConfig.textEntry) {
+            map[text]?.let {
+                newList.add(it)
+            }
+        }
+        return newList
+    }
+
     private fun drawAllDisplay() = buildMap {
         val skillMap = SkillAPI.storage ?: return@buildMap
         val sortedMap = SkillType.entries.filter { it.displayName.isNotEmpty() }.sortedBy { it.displayName.take(2) }
@@ -321,11 +333,11 @@ object SkillProgress {
         }
     }
 
-    private fun drawETADisplay() = buildList {
-        val activeSkill = activeSkill ?: return@buildList
-        val skillInfo = SkillAPI.storage?.get(activeSkill) ?: return@buildList
-        val xpInfo = skillXPInfoMap[activeSkill] ?: return@buildList
-        val skillInfoLast = oldSkillInfoMap[activeSkill] ?: return@buildList
+    private fun drawETADisplay() = buildMap {
+        val activeSkill = activeSkill ?: return@buildMap
+        val skillInfo = SkillAPI.storage?.get(activeSkill) ?: return@buildMap
+        val xpInfo = skillXPInfoMap[activeSkill] ?: return@buildMap
+        val skillInfoLast = oldSkillInfoMap[activeSkill] ?: return@buildMap
         oldSkillInfoMap[activeSkill] = skillInfo
         val level = if (config.overflowConfig.enableInEtaDisplay.get() || config.customGoalConfig.enableInETADisplay) skillInfo.overflowLevel else skillInfo.level
 
@@ -347,40 +359,38 @@ object SkillProgress {
             }
         }
 
-        add(Renderable.string("§6Skill: §a${activeSkill.displayName} §8$level➜§3$targetLevel"))
-
-        if (useCustomGoalLevel)
-            add(Renderable.string("§7Needed XP: §e${remaining.addSeparators()}"))
+        this[TextEntry.SKILL] = Renderable.string("§6Skill: §a${activeSkill.displayName} §8$level➜§3$targetLevel")
+        this[TextEntry.XP_NEEDED] = Renderable.string("§7Needed XP: §e${remaining.addSeparators()}")
 
         var xpInterp = xpInfo.xpGainHour
 
         if (have > need) {
-            add(Renderable.string("§7In §cIncrease level cap!"))
+            this[TextEntry.TIME] = Renderable.string("§7In §cIncrease level cap!")
         } else if (xpInfo.xpGainHour < 1000) {
-            add(Renderable.string("§7In §cN/A"))
+            this[TextEntry.TIME] = Renderable.string("§7In §cN/A")
         } else {
             val duration = ((remaining) * 1000 * 60 * 60 / xpInterp.toLong()).milliseconds
             val format = duration.format(TimeUnit.DAY)
-            add(Renderable.string("§7In §b$format " +
-                if (xpInfo.isActive) "" else "§c(PAUSED)"))
+            this[TextEntry.TIME] = Renderable.string("§7In §b$format " +
+                if (xpInfo.isActive) "" else "§c(PAUSED)")
         }
 
         if (xpInfo.xpGainLast == xpInfo.xpGainHour && xpInfo.xpGainHour <= 0) {
-            add(Renderable.string("§7XP/h: §cN/A"))
+            this[TextEntry.XP_HOUR] = Renderable.string("§7XP/h: §cN/A")
         } else {
             xpInterp = interpolate(xpInfo.xpGainHour, xpInfo.xpGainLast, lastGainUpdate.toMillis())
-            add(Renderable.string("§7XP/h: §e${xpInterp.toLong().addSeparators()} " +
-                if (xpInfo.isActive) "" else "§c(PAUSED)"))
+            this[TextEntry.XP_HOUR] = Renderable.string("§7XP/h: §e${xpInterp.toLong().addSeparators()} " +
+                if (xpInfo.isActive) "" else "§c(PAUSED)")
         }
 
 
         val session = xpInfo.timeActive.seconds.format(TimeUnit.HOUR)
-        add(Renderable.clickAndHover("§7Session: §e$session ${if (xpInfo.sessionTimerActive) "" else "§c(PAUSED)"}",
+        this[TextEntry.SESSION] = Renderable.clickAndHover("§7Session: §e$session ${if (xpInfo.sessionTimerActive) "" else "§c(PAUSED)"}",
             listOf("§eClick to reset!")) {
             xpInfo.sessionTimerActive = false
             xpInfo.timeActive = 0L
             chat("Timer for §b${activeSkill.displayName} §ehas been reset!")
-        })
+        }
     }
 
     private fun drawDisplay() = buildList {
