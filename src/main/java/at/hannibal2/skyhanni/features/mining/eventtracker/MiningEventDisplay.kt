@@ -15,11 +15,12 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
 object MiningEventDisplay {
     private val config get() = SkyHanniMod.feature.mining.miningEvent
-
     private var display = mutableListOf<String>()
 
     private val dwarvenEvents = mutableListOf<RunningEvent>()
     private val crystalEvents = mutableListOf<RunningEvent>()
+    private var lastDwarvenEvent: MiningEvent? = null
+    private var lastCrystalEvent: MiningEvent? = null
 
     @SubscribeEvent
     fun onTick(event: LorenzTickEvent) {
@@ -30,58 +31,56 @@ object MiningEventDisplay {
     @SubscribeEvent
     fun onRenderOverlay(event: GuiRenderEvent.GuiOverlayRenderEvent) {
         if (!shouldDisplay()) return
-        config.position.renderStrings(display, posLabel = "True Farming Fortune")
+        config.position.renderStrings(display, posLabel = "Upcoming Events Display")
     }
 
     private fun updateDisplay() {
-        val shouldShowDwarven = when (config.showType) {
-            MiningEventConfig.ShowType.BOTH -> true
-            MiningEventConfig.ShowType.DWARVEN -> true
-            MiningEventConfig.ShowType.CURRENT -> IslandType.DWARVEN_MINES.isInIsland()
-            else -> false
-        }
-        val shouldShowCrystal = when (config.showType) {
-            MiningEventConfig.ShowType.BOTH -> true
-            MiningEventConfig.ShowType.CRYSTAL -> true
-            MiningEventConfig.ShowType.CURRENT -> IslandType.CRYSTAL_HOLLOWS.isInIsland()
-            else -> false
-        }
-
         display.clear()
-        if (shouldShowDwarven) display.add("§aDwarven Mines: ${dwarvenEvents.formatUpcomingEvents()}")
-        if (shouldShowCrystal) display.add("§aCrystal Hollows: ${crystalEvents.formatUpcomingEvents()}")
+        updateEvents(IslandType.DWARVEN_MINES, dwarvenEvents, lastDwarvenEvent)
+        updateEvents(IslandType.CRYSTAL_HOLLOWS, crystalEvents, lastCrystalEvent)
     }
 
-    private fun MutableList<RunningEvent>.formatUpcomingEvents(): String {
-        var output = ""
-        var foundCount = 0
-        for (event in this) {
-            val endsIn = event.endsAt.asTimeMark()
-            if (endsIn.isInPast()) continue
-
-            output = when (foundCount) {
-                0 -> event.event.toString()
-                else -> "$output §7-> ${event.event}"
-            }
-            if (event.isDouble) {
-                output = "$output §7-> ${event.event}"
-                foundCount ++
-            }
-            foundCount ++
+    private fun updateEvents(islandType: IslandType, events: List<RunningEvent>, lastEvent: MiningEvent?) {
+        val shouldShow = when (config.showType) {
+            MiningEventConfig.ShowType.DWARVEN -> islandType == IslandType.DWARVEN_MINES
+            MiningEventConfig.ShowType.CRYSTAL -> islandType == IslandType.CRYSTAL_HOLLOWS
+            MiningEventConfig.ShowType.CURRENT -> islandType.isInIsland()
+            else -> true
         }
-        if (output.isEmpty()) return "§8NONE"
-        return output
+
+        events.firstOrNull { it.endsAt.asTimeMark().isInPast() }?.let {
+            when (islandType) {
+                IslandType.DWARVEN_MINES -> lastDwarvenEvent = it.event
+                IslandType.CRYSTAL_HOLLOWS -> lastCrystalEvent = it.event
+                else -> Unit
+            }
+        }
+
+        if (shouldShow) {
+            val upcomingEvents = formatUpcomingEvents(events, lastEvent)
+            display.add("§a${islandType.displayName}§7: $upcomingEvents")
+        }
+    }
+
+    private fun formatUpcomingEvents(events: List<RunningEvent>, lastEvent: MiningEvent?): String {
+        val upcoming = events.filter { !it.endsAt.asTimeMark().isInPast() }
+            .map { if (it.isDouble) "${it.event} §7-> ${it.event}" else it.event.toString() }
+            .toMutableList()
+
+        if (upcoming.isEmpty()) upcoming.add("§7???")
+        lastEvent?.let { upcoming.add(0, it.toPastString()) }
+        return upcoming.joinToString(" §7-> ")
     }
 
     fun updateData(eventData: MiningEventData) {
         dwarvenEvents.clear()
         crystalEvents.clear()
 
-        for ((islandType, events) in eventData.runningEvents) {
+        eventData.runningEvents.forEach { (islandType, events) ->
             when (islandType) {
                 IslandType.DWARVEN_MINES -> dwarvenEvents.addAll(events)
                 IslandType.CRYSTAL_HOLLOWS -> crystalEvents.addAll(events)
-                else -> continue
+                else -> Unit
             }
         }
     }

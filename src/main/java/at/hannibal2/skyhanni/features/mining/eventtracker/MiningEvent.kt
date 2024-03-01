@@ -26,6 +26,10 @@ enum class MiningEvent(
         return if (config.compressedFormat) "§$colourCode$shortName" else "§$colourCode$eventName"
     }
 
+    fun toPastString(): String {
+        return if (config.compressedFormat) "§7$shortName" else "§7$eventName"
+    }
+
     companion object {
         fun fromBossbarName(bossbarName: String): MiningEvent? {
             return MiningEvent.entries.find { it.eventName == bossbarName.removeColor() }
