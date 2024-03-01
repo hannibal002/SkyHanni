@@ -24,6 +24,7 @@ import at.hannibal2.skyhanni.features.chroma.ChromaType
 import at.hannibal2.skyhanni.features.skillprogress.SkillUtil.XP_NEEDED_FOR_60
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.ChatUtils.chat
+import at.hannibal2.skyhanni.utils.CollectionUtils.addAsSingletonList
 import at.hannibal2.skyhanni.utils.ConditionalUtils.onToggle
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
@@ -40,6 +41,9 @@ import at.hannibal2.skyhanni.utils.TimeUnit
 import at.hannibal2.skyhanni.utils.TimeUtils.format
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 import at.hannibal2.skyhanni.utils.renderables.Renderable.Companion.horizontalContainer
+import at.hannibal2.skyhanni.utils.tracker.SkyHanniTracker
+import net.minecraft.client.Minecraft
+import net.minecraft.client.gui.inventory.GuiInventory
 import net.minecraftforge.fml.common.eventhandler.EventPriority
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import java.awt.Color
@@ -55,10 +59,11 @@ object SkillProgress {
     private var etaDisplay = emptyList<Renderable>()
     private var lastGainUpdate = SimpleTimeMark.farPast()
     private var maxWidth = 182
+    private var inventoryOpen = false
     var hideInActionBar = listOf<String>()
 
     @SubscribeEvent
-    fun onRenderOverlay(event: GuiRenderEvent.GuiOverlayRenderEvent) {
+    fun onRenderOverlay(event: GuiRenderEvent) {
         if (!isEnabled()) return
         if (display.isEmpty()) return
 
@@ -150,16 +155,37 @@ object SkillProgress {
     fun onTick(event: LorenzTickEvent) {
         if (!isEnabled()) return
         if (lastUpdate.passedSince() > 3.seconds) showDisplay = config.alwaysShow.get()
+        inventoryOpen = Minecraft.getMinecraft().currentScreen is GuiInventory
 
         if (event.repeatSeconds(1)) {
             allDisplay = formatAllDisplay(drawAllDisplay())
-            etaDisplay = formatETADisplay(drawETADisplay())
+            etaDisplay = buildFinalDisplay(formatETADisplay(drawETADisplay()))
         }
 
         if (event.repeatSeconds(2)) {
             update()
             updateSkillInfo()
         }
+    }
+
+    private fun buildFinalDisplay(rawList: List<Renderable>): List<Renderable> = rawList.toMutableList().also {
+        if (it.isEmpty()) return@also
+        if (inventoryOpen) {
+            it.add(buildSessionResetButton())
+        }
+    }
+
+    private fun buildSessionResetButton() = Renderable.clickAndHover(
+        "§cReset session!",
+        listOf(
+            "§cThis will reset your",
+            "§ccurrent session time."
+        ),
+    ) {
+        val xpInfo = skillXPInfoMap[activeSkill] ?: return@clickAndHover
+        xpInfo.sessionTimerActive = false
+        xpInfo.timeActive = 0L
+        chat("Timer for §b${activeSkill?.displayName} §ehas been reset!")
     }
 
     @SubscribeEvent
@@ -385,12 +411,7 @@ object SkillProgress {
 
 
         val session = xpInfo.timeActive.seconds.format(TimeUnit.HOUR)
-        this[TextEntry.SESSION] = Renderable.clickAndHover("§7Session: §e$session ${if (xpInfo.sessionTimerActive) "" else "§c(PAUSED)"}",
-            listOf("§eClick to reset!")) {
-            xpInfo.sessionTimerActive = false
-            xpInfo.timeActive = 0L
-            chat("Timer for §b${activeSkill.displayName} §ehas been reset!")
-        }
+        this[TextEntry.SESSION] = Renderable.string("§7Session: §e$session ${if (xpInfo.sessionTimerActive) "" else "§c(PAUSED)"}")
     }
 
     private fun drawDisplay() = buildList {
