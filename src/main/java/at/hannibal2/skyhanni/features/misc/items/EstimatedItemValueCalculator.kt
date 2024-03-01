@@ -576,7 +576,7 @@ object EstimatedItemValueCalculator {
                 level = 1
             }
             if (internalName.startsWith("ENCHANTED_BOOK_BUNDLE_")) {
-                multiplier = 5
+                multiplier = EstimatedItemValue.bookBundleAmount.getOrDefault(rawName, 5)
             }
             if (rawName in tieredEnchants) level = 1
 

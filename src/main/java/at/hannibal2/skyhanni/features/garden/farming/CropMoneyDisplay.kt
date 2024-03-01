@@ -283,6 +283,8 @@ object CropMoneyDisplay {
                 (config.useCustomFormat && config.customFormat.singleOrNull() == CustomFormatEntry.NPC_PRICE)
 
         for ((internalName, amount) in multipliers.moveEntryToTop { isSeeds(it.key) }) {
+            if (internalName.equals("BOX_OF_SEEDS")) continue
+
             val crop = cropNames[internalName]!!
             // When only the NPC price is shown, display the price only for the base item
             if (onlyNpcPrice) {
@@ -402,7 +404,6 @@ object CropMoneyDisplay {
                 if (rawInternalName == "ENCHANTED_PAPER") continue
                 if (rawInternalName == "ENCHANTED_BREAD") continue
                 if (rawInternalName == "SIMPLE_CARROT_CANDY") continue
-                if (rawInternalName == "BOX_OF_SEEDS") continue
                 val internalName = rawInternalName.asInternalName()
                 if (!internalName.isBazaarItem()) continue
 

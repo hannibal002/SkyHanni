@@ -7,7 +7,7 @@ import at.hannibal2.skyhanni.utils.CollectionUtils.sorted
 import at.hannibal2.skyhanni.utils.ItemUtils.itemName
 import at.hannibal2.skyhanni.utils.NEUItems
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
-import at.hannibal2.skyhanni.utils.NumberUtil.formatNumber
+import at.hannibal2.skyhanni.utils.NumberUtil.formatLongOrUserError
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.TimeUtils
 
@@ -26,13 +26,7 @@ object GardenCropTimeCommand {
             return
         }
 
-        val rawAmount = args[0]
-        val amount = try {
-            rawAmount.formatNumber()
-        } catch (e: NumberFormatException) {
-            ChatUtils.userError("Not a valid number: '$rawAmount'")
-            return
-        }
+        val amount = args[0].formatLongOrUserError() ?: return
         val multipliers = CropMoneyDisplay.multipliers
         if (multipliers.isEmpty()) {
             ChatUtils.userError("Data not loaded yet. Join the garden and display the money per hour display.")

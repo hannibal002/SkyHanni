@@ -90,7 +90,7 @@ object NumberUtil {
 
     fun Number.ordinal(): String {
         val long = this.toLong()
-        if (long % 100 in 11..13) return "th"
+        if (long % 100 in 11 .. 13) return "th"
         return when (long % 10) {
             1L -> "st"
             2L -> "nd"
@@ -188,9 +188,17 @@ object NumberUtil {
     }
 
     // TODO create new function formatLong, and eventually deprecate this function.
-    fun String.formatNumber(): Long = formatDouble().toLong()
+    @Deprecated("renamed", ReplaceWith("this.formatLong()"))
+    fun String.formatNumber(): Long = formatLong() ?: throw NumberFormatException("formatNumber has a NumberFormatException with '$this'")
 
-    fun String.formatDouble(): Double {
+    fun String.formatLong(): Long? = formatDouble()?.toLong()
+
+    fun String.formatLongOrUserError(): Long? = formatDouble()?.toLong() ?: run {
+        ChatUtils.userError("Not a valid number: '$this'")
+        return@run null
+    }
+
+    fun String.formatDouble(): Double? {
         var text = lowercase().replace(",", "")
 
         val multiplier = if (text.endsWith("k")) {
@@ -203,8 +211,9 @@ object NumberUtil {
             text = text.substring(0, text.length - 1)
             1.bilion
         } else 1.0
-        val d = text.toDouble()
-        return d * multiplier
+        return text.toDoubleOrNull()?.let {
+            it * multiplier
+        }
     }
 
     val Int.milion get() = this * 1_000_000.0
@@ -215,4 +224,15 @@ object NumberUtil {
     fun Number.fractionOf(maxValue: Number) = maxValue.toDouble().takeIf { it != 0.0 }?.let { max ->
         this.toDouble() / max
     }?.coerceIn(0.0, 1.0) ?: 1.0
+
+    fun interpolate(now: Float, last: Float, lastUpdate: Long): Float {
+        var interp = now
+        if (last >= 0 && last != now) {
+            var factor: Float = (SimpleTimeMark.now().toMillis() - lastUpdate) / 1000f
+            factor = factor.coerceIn(0f, 1f)
+            interp = last + (now - last) * factor
+        }
+        return interp
+    }
+
 }

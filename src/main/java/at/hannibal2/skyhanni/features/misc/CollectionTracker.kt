@@ -57,7 +57,7 @@ class CollectionTracker {
                 return
             }
 
-            val foundInternalName = NEUItems.getInternalNameOrNullIgnoreCase(rawName)
+            val foundInternalName = NEUItems.getInternalNameOrNull(rawName)
             if (foundInternalName == null) {
                 ChatUtils.error("Item '$rawName' does not exist!")
                 return
