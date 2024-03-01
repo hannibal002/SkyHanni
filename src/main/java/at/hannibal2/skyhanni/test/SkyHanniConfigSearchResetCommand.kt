@@ -61,7 +61,7 @@ object SkyHanniConfigSearchResetCommand {
         } catch (e: Throwable) {
             ErrorManager.logErrorWithData(
                 e, "Could not reset config element '$term'",
-                "args" to args.toList(),
+                "args" to args.joinToString(" ")
             )
             return "§cCould not reset config element '$term'"
         }
@@ -75,7 +75,7 @@ object SkyHanniConfigSearchResetCommand {
         } catch (e: Exception) {
             ErrorManager.logErrorWithData(
                 e, "Error while trying to search config",
-                "args" to args.toList()
+                "args" to args.joinToString(" ")
             )
             "§cError while trying to search config"
         }
@@ -118,7 +118,7 @@ object SkyHanniConfigSearchResetCommand {
         } catch (e: Exception) {
             ErrorManager.logErrorWithData(
                 e, "Could not change config element '$term' to '$rawJson'",
-                "args" to args.toList()
+                "args" to args.joinToString(" ")
             )
             "§cCould not change config element '$term' to '$rawJson'"
         }
@@ -135,17 +135,15 @@ object SkyHanniConfigSearchResetCommand {
             val (argsFilter) = createFilter(true) { path.lowercase() }
             val (classFilter) = createFilter(false) { path.lowercase() }
 
-            val currentValue = findConfigElements(argsFilter, classFilter, true).toString()
-            val newValue = when (currentValue) {
-                "[$rawJson1]" -> rawJson2
-                else -> rawJson1
-            }
+            val currentValue = findConfigElements(argsFilter, classFilter, onlyValue = true).toString()
+            val newValue = if (currentValue == "[$rawJson1]") rawJson2 else rawJson1
+
             setCommand(arrayOf("set", path, newValue))
 
         } catch (e: Exception) {
             ErrorManager.logErrorWithData(
                 e, "Error while trying to toggle config element",
-                "args" to args.toList()
+                "args" to args.joinToString(" ")
             )
             "§cError while trying to toggle config element"
         }
