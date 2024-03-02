@@ -374,9 +374,6 @@ public class Storage {
 
             @Expose
             public VerminTracker.Data verminTracker = new VerminTracker.Data();
-
-            @Expose
-            public Set<String> punchedPlayers = new HashSet<>();
         }
 
         @Expose

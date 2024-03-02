@@ -3,7 +3,6 @@ package at.hannibal2.skyhanni.features.rift.everywhere
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.data.HypixelData
 import at.hannibal2.skyhanni.data.IslandType
-import at.hannibal2.skyhanni.data.ProfileStorageData
 import at.hannibal2.skyhanni.events.IslandChangeEvent
 import at.hannibal2.skyhanni.events.LorenzChatEvent
 import at.hannibal2.skyhanni.events.RenderMobColoredEvent
@@ -36,15 +35,14 @@ class PunchcardHighlight {
         ""
     )
 
-    private val playerList: MutableSet<String>?
-        get() = ProfileStorageData.profileSpecific?.rift?.punchedPlayers
+    val playerList: MutableSet<String> = mutableSetOf()
 
     @SubscribeEvent
     fun onRenderMobColored(event: RenderMobColoredEvent) {
         if (!config.enabled) return
         if (!LorenzUtils.inSkyBlock) return
         if (!IslandType.THE_RIFT.isInIsland()) return
-        val size = playerList?.size ?: return
+        val size = playerList.size
         if (size >= 20) return
         val entity = event.entity
         if (entity is EntityPlayerSP) return
@@ -71,12 +69,12 @@ class PunchcardHighlight {
             delay(1500)
             if (IslandType.THE_RIFT.isInIsland() && HypixelData.server.isNotEmpty() && lastRiftServer != HypixelData.server) {
                 lastRiftServer = HypixelData.server
-                playerList?.clear()
+                playerList.clear()
             }
         }
     }
 
-    private fun addPunch(playerName: String) { playerList?.add(playerName) }
+    private fun addPunch(playerName: String) { playerList.add(playerName) }
 
-    private fun hasPunchedPlayer(player: EntityPlayer) = playerList?.contains(player.name) == true
+    private fun hasPunchedPlayer(player: EntityPlayer) = playerList.contains(player.name)
 }

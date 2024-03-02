@@ -8,7 +8,6 @@ import at.hannibal2.skyhanni.data.ChatManager
 import at.hannibal2.skyhanni.data.GardenCropMilestonesCommunityFix
 import at.hannibal2.skyhanni.data.GuiEditManager
 import at.hannibal2.skyhanni.data.PartyAPI
-import at.hannibal2.skyhanni.data.ProfileStorageData
 import at.hannibal2.skyhanni.data.TitleManager
 import at.hannibal2.skyhanni.features.bingo.card.BingoCardDisplay
 import at.hannibal2.skyhanni.features.bingo.card.nextstephelper.BingoNextStepHelper
@@ -53,6 +52,7 @@ import at.hannibal2.skyhanni.features.misc.discordrpc.DiscordRPCManager
 import at.hannibal2.skyhanni.features.misc.massconfiguration.DefaultConfigFeatures
 import at.hannibal2.skyhanni.features.misc.visualwords.VisualWordGui
 import at.hannibal2.skyhanni.features.rift.area.westvillage.VerminTracker
+import at.hannibal2.skyhanni.features.rift.everywhere.PunchcardHighlight
 import at.hannibal2.skyhanni.features.slayer.SlayerProfitTracker
 import at.hannibal2.skyhanni.test.DebugCommand
 import at.hannibal2.skyhanni.test.PacketTest
@@ -349,7 +349,7 @@ object Commands {
         registerCommand(
             "shresetpunchcard",
             "Resets the Rift Punchcard Artifact player list."
-        ) { ProfileStorageData.profileSpecific?.rift?.punchedPlayers?.clear() }
+        ) { PunchcardHighlight().playerList.clear() }
     }
 
     private fun developersDebugFeatures() {
