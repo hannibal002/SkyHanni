@@ -16,5 +16,5 @@ public class PunchcardConfig {
     @Expose
     @ConfigOption(name = "Color", desc = "Color used for highlighting.")
     @ConfigEditorColour
-    public String color = "0:255:255:255:255";
+    public String color = "0:163:122:11:143";
 }
