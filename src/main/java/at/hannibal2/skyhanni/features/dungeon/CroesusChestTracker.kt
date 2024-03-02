@@ -178,7 +178,7 @@ class CroesusChestTracker {
     private fun Int.getRun() = getRun(this)
 
     private fun getRun(run: Int = currentRunIndex) =
-        croesusChests?.takeIf { currentRunIndex < it.size }?.get(currentRunIndex)
+        croesusChests?.takeIf { run < it.size }?.get(run)
 
     private fun setKismetUsed() {
         getRun()?.kismetUsed = true
