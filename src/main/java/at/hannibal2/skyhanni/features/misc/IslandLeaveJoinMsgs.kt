@@ -49,17 +49,22 @@ object IslandLeaveJoinMsgs {
     @SubscribeEvent
     fun onTabListUpdate(event: TabListUpdateEvent) {
         if (!config.enabled) return
-        val onPrivateIslandGarden = IslandType.onPrivateWorld()
+        val onPrivateWorld = IslandType.onPrivateWorld()
         val guesting = IslandType.onPrivateWorld(guesting = true)
-        if (!(onPrivateIslandGarden || (config.onPublicIslands && !guesting) || (config.guestLeaveJoinMsgs && guesting))) return
+        if (!(onPrivateWorld || (config.onPublicIslands && !guesting) || (config.guestLeaveJoinMsgs && guesting))) return
 
         val playersNew = mutableListOf<String>()
 
         var inIslandCategory = false
         val islandOwners = mutableListOf<String>()
 
-        val joinMessage = " §${if (config.leaveJoinColor) "a" else "e"}joined §ethe island."
-        val leaveMessage = " §${if (config.leaveJoinColor) "c" else "e"}left §ethe island."
+        val islandMessage = when (LorenzUtils.skyBlockIsland) {
+            IslandType.PRIVATE_ISLAND -> "your island."
+            IslandType.GARDEN -> "your garden."
+            else -> "the island."
+        }
+        val joinMessage = " §${if (config.leaveJoinColor) "a" else "e"}joined §e$islandMessage"
+        val leaveMessage = " §${if (config.leaveJoinColor) "c" else "e"}left §e$islandMessage"
 
         for (line in event.tabList) {
             if (guesting) {
@@ -90,7 +95,7 @@ object IslandLeaveJoinMsgs {
                     return@matchMatcher
                 }
                 players.add(player)            // !onPrivateIslandGarden because a vanilla message gets sent
-                if (shouldSendMsg(player) && updatedSinceWorldSwitch && !onPrivateIslandGarden) {
+                if (shouldSendMsg(player) && updatedSinceWorldSwitch && !onPrivateWorld) {
                     ChatUtils.chat(player + joinMessage)
                 }
             }
