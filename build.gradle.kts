@@ -14,7 +14,7 @@ plugins {
 }
 
 group = "at.hannibal2.skyhanni"
-version = "0.23"
+version = "0.24.Beta.1"
 
 val gitHash by lazy {
     val baos = ByteArrayOutputStream()
@@ -146,7 +146,9 @@ loom {
     launchConfigs {
         "client" {
             property("mixin.debug", "true")
-            property("devauth.configDir", rootProject.file(".devauth").absolutePath)
+            if (System.getenv("repo_action") != "true") {
+                property("devauth.configDir", rootProject.file(".devauth").absolutePath)
+            }
             arg("--tweakClass", "org.spongepowered.asm.launch.MixinTweaker")
             arg("--tweakClass", "io.github.moulberry.moulconfig.tweaker.DevelopmentResourceTweaker")
             arg("--mods", devenvMod.resolve().joinToString(",") { it.relativeTo(file("run")).path })

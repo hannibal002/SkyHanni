@@ -1,4 +1,4 @@
-package at.hannibal2.skyhanni.features.bazaar
+package at.hannibal2.skyhanni.features.inventory.bazaar
 
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.utils.NEUInternalName
@@ -15,7 +15,7 @@ import kotlin.time.Duration.Companion.seconds
 
 class BazaarOpenPriceWebsite {
 
-    private val config get() = SkyHanniMod.feature.bazaar
+    private val config get() = SkyHanniMod.feature.inventory.bazaar
     private var lastClick = SimpleTimeMark.farPast()
 
     private val item by lazy {

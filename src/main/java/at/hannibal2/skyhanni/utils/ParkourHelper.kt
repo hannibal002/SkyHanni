@@ -43,7 +43,7 @@ class ParkourHelper(
 
     fun render(event: LorenzRenderWorldEvent) {
         if (locations.isEmpty()) {
-            ErrorManager.logError(
+            ErrorManager.logErrorWithData(
                 IllegalArgumentException("locations is empty"),
                 "Trying to render an empty parkour"
             )
@@ -125,7 +125,7 @@ class ParkourHelper(
                 }
             }
         } catch (e: Throwable) {
-            ErrorManager.logError(e, "Error while rendering a parkour")
+            ErrorManager.logErrorWithData(e, "Error while rendering a parkour")
         }
     }
 
