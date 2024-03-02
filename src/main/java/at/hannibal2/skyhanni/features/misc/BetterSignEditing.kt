@@ -38,8 +38,8 @@ class BetterSignEditing {
                 else if (KeyboardManager.isDeleteWordDown()) {
                     val currentLine = gui.tileSign.signText[gui.editLine].unformattedText
 
-                    val lastSpaceIndex = currentLine.lastIndexOf(' ')
-                    if (lastSpaceIndex >= 0) currentLine.substring(0, lastSpaceIndex + 1) else ""
+                    val lastSpaceIndex = currentLine.trimEnd().lastIndexOf(' ')
+                    if (lastSpaceIndex >= 0) currentLine.substring(0, lastSpaceIndex + 2) else ""
                 } else return@launch
                 LorenzUtils.setTextIntoSign(newLine, gui.editLine)
             }
