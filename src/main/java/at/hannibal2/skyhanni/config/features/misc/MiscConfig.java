@@ -234,14 +234,8 @@ public class MiscConfig {
     @Expose
     public Position inventoryLoadPos = new Position(394, 124, false, true);
 
-    @Expose
+    @Expose // TODO: migrate to storage
     public int limboTimePB = 0;
-
-    @Expose
-    public int limboPlaytime = 0;
-
-    @Expose
-    public float userLuck = 0;
   
     @Expose
     @ConfigOption(name = "Fix Ghost Entities", desc = "Removes ghost entities caused by a Hypixel bug. " +

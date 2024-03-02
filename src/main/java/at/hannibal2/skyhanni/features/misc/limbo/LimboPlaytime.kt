@@ -1,6 +1,6 @@
 package at.hannibal2.skyhanni.features.misc.limbo
 
-import at.hannibal2.skyhanni.SkyHanniMod
+import at.hannibal2.skyhanni.data.ProfileStorageData
 import at.hannibal2.skyhanni.events.InventoryOpenEvent
 import at.hannibal2.skyhanni.events.LorenzToolTipEvent
 import at.hannibal2.skyhanni.utils.LorenzUtils
@@ -33,7 +33,7 @@ class LimboPlaytime {
     private var wholeMinutes: Long = 0
     private var hoursString: String = ""
 
-    private val config get() = SkyHanniMod.feature.misc
+    private val storage get() = ProfileStorageData.playerSpecific?.limbo
 
     private val item = "ENDER_PEARL".asInternalName().getItemStack().item
     private val itemName = "§aLimbo"
@@ -45,7 +45,7 @@ class LimboPlaytime {
         if (event.inventory !is ContainerLocalMenu) return
         if (event.inventory.displayName.unformattedText != "Detailed /playtime") return
         if (event.slotNumber != 43) return
-        if (config.limboPlaytime == 0) return
+        if (storage?.playtime == 0) return
 
         if (lastCreateCooldown.passedSince() > 3.seconds) {
             lastCreateCooldown = SimpleTimeMark.now()
@@ -60,7 +60,7 @@ class LimboPlaytime {
         if (!LorenzUtils.inSkyBlock) return
         if (!event.slot.inventory.displayName.unformattedText.startsWith("Detailed /playtime")) return
         if (event.slot.slotIndex != 4) return
-        if (config.limboPlaytime == 0) return
+        if (storage?.playtime == 0) return
 
         val lore = event.toolTip
         val hoursList = lore.filter { hoursPattern.matches(it) }.toMutableList()
@@ -73,8 +73,9 @@ class LimboPlaytime {
     @SubscribeEvent
     fun onRenderGUI(event: InventoryOpenEvent) {
         if (event.inventoryName != "Detailed /playtime") return
-        if (config.limboPlaytime < 60) return
-        val playtime = config.limboPlaytime.seconds
+        val storedPlaytime = storage?.playtime ?: 0
+        if (storedPlaytime < 60) return
+        val playtime = storedPlaytime.seconds
         val wholeHours = playtime.inWholeHours
         wholeMinutes = playtime.inWholeMinutes
         if ((wholeMinutes%60).toInt() == 0) {
@@ -86,9 +87,10 @@ class LimboPlaytime {
     }
 
     private fun addLimbo(hoursList: MutableList<String>, minutesList: MutableList<String>) {
+        val storedPlaytime = storage?.playtime ?: 0
         if (wholeMinutes >= 60) {
-            val hours = config.limboPlaytime.seconds.inWholeHours
-            val minutes = (config.limboPlaytime.seconds.inWholeMinutes-(hours*60).toFloat()/6).toInt()
+            val hours = storedPlaytime.seconds.inWholeHours
+            val minutes = (storedPlaytime.seconds.inWholeMinutes-(hours*60).toFloat()/6).toInt()
             modifiedList = hoursList
             if (minutes == 0) modifiedList.add("§5§o§b$hours hours §7on Limbo")
             else modifiedList.add("§5§o§b$hoursString hours §7on Limbo")
@@ -101,7 +103,7 @@ class LimboPlaytime {
             setMinutes = false
         }
         else {
-            val minutes = config.limboPlaytime.seconds.inWholeMinutes
+            val minutes = storedPlaytime.seconds.inWholeMinutes
             modifiedList = minutesList
             modifiedList.add("§a$minutes minutes §7on Limbo")
             modifiedList = modifiedList.sortedByDescending {
