@@ -43,9 +43,11 @@ class PunchcardHighlight {
         if (!config.enabled) return
         if (!LorenzUtils.inSkyBlock) return
         if (!IslandType.THE_RIFT.isInIsland()) return
+        val size = playerList?.size ?: return
+        if (size >= 20) return
         val entity = event.entity
         if (entity is EntityPlayerSP) return
-        if (entity is EntityPlayer && !entity.isNPC() && !hasPunchedPlayer(entity) && entity.name != "martimavocado") {
+        if (entity is EntityPlayer && !entity.isNPC() && !hasPunchedPlayer(entity) && entity.name != ownIGN) {
             event.color = config.color.toChromaColor().rgb
         }
     }
