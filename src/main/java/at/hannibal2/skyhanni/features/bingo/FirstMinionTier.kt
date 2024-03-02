@@ -14,7 +14,7 @@ object FirstMinionTier {
         otherItems: Map<NEUInternalName, Int>,
         minions: MutableMap<String, NEUInternalName>,
         tierOneMinions: MutableList<NEUInternalName>,
-        tierOneMinionsDone: MutableList<NEUInternalName>,
+        tierOneMinionsDone: MutableSet<NEUInternalName>,
     ) {
         val help = helpMap(otherItems)
         val tierOneMinionsFiltered = getTierOneMinionsFiltered(tierOneMinions, tierOneMinionsDone)
@@ -51,7 +51,7 @@ object FirstMinionTier {
     private fun addMinion(
         tierOneMinionsFiltered: List<NEUInternalName>,
         minions: MutableMap<String, NEUInternalName>,
-        tierOneMinionsDone: MutableList<NEUInternalName>,
+        tierOneMinionsDone: MutableSet<NEUInternalName>,
     ) {
         for (minionId in tierOneMinionsFiltered) {
             val prefix = minionId.asString().dropLast(1)
@@ -63,7 +63,7 @@ object FirstMinionTier {
 
     private fun getTierOneMinionsFiltered(
         tierOneMinions: MutableList<NEUInternalName>,
-        tierOneMinionsDone: MutableList<NEUInternalName>,
+        tierOneMinionsDone: MutableSet<NEUInternalName>,
     ) = tierOneMinions.filter { it !in tierOneMinionsDone }
 
     private fun helpMap(otherItems: Map<NEUInternalName, Int>) =

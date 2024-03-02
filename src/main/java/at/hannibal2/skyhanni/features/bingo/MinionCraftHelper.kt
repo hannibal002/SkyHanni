@@ -283,14 +283,21 @@ class MinionCraftHelper {
             }
             element
         }
+        event.transform(26, "#player.bingoSessions") { element ->
+            for ((_, data) in element.asJsonObject.entrySet()) {
+                fixTierOneMinions(data.asJsonObject)
+            }
+            element
+        }
     }
 
     private fun fixTierOneMinions(data: JsonObject) {
+        val uniqueEntries = mutableSetOf<String>()
         val newList = JsonArray()
         var counter = 0
         for (entry in data["tierOneMinionsDone"].asJsonArray) {
             val name = entry.asString
-            if (!name.startsWith("INTERNALNAME:")) {
+            if (!name.startsWith("INTERNALNAME:") && uniqueEntries.add(name)) {
                 newList.add(entry)
             } else {
                 counter++
