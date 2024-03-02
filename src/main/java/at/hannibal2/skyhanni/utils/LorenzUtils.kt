@@ -29,8 +29,8 @@ import net.minecraft.util.ChatComponentText
 import net.minecraftforge.fml.common.FMLCommonHandler
 import java.text.DecimalFormat
 import java.text.SimpleDateFormat
+import java.util.*
 import java.util.Timer
-import java.util.TimerTask
 import java.util.regex.Matcher
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.seconds
@@ -370,4 +370,7 @@ object LorenzUtils {
 
     @Deprecated("moved", ReplaceWith("ChatUtils.sendMessageToServer"))
     fun sendMessageToServer(message: String) = ChatUtils.sendMessageToServer(message)
+
+    fun inMiningIsland() = IslandType.GOLD_MINES.isInIsland() || IslandType.DEEP_CAVERNS.isInIsland()
+            || IslandType.DWARVEN_MINES.isInIsland() || IslandType.CRYSTAL_HOLLOWS.isInIsland()
 }
