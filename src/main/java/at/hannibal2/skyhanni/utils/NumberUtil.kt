@@ -90,7 +90,7 @@ object NumberUtil {
 
     fun Number.ordinal(): String {
         val long = this.toLong()
-        if (long % 100 in 11 .. 13) return "th"
+        if (long % 100 in 11..13) return "th"
         return when (long % 10) {
             1L -> "st"
             2L -> "nd"
@@ -189,16 +189,33 @@ object NumberUtil {
 
     // TODO create new function formatLong, and eventually deprecate this function.
     @Deprecated("renamed", ReplaceWith("this.formatLong()"))
-    fun String.formatNumber(): Long = formatLong() ?: throw NumberFormatException("formatNumber has a NumberFormatException with '$this'")
+    fun String.formatNumber(): Long = formatLong()
 
-    fun String.formatLong(): Long? = formatDouble()?.toLong()
+    fun String.formatDouble(): Double =
+        formatDoubleOrNull() ?: throw NumberFormatException("formatDouble failed for '$this'")
 
-    fun String.formatLongOrUserError(): Long? = formatDouble()?.toLong() ?: run {
+    fun String.formatLong(): Long =
+        formatDoubleOrNull()?.toLong() ?: throw NumberFormatException("formatLong failed for '$this'")
+
+    fun String.formatInt(): Int =
+        formatDoubleOrNull()?.toInt() ?: throw NumberFormatException("formatInt failed for '$this'")
+
+    fun String.formatDoubleOrUserError(): Double? = formatDoubleOrNull() ?: run {
         ChatUtils.userError("Not a valid number: '$this'")
         return@run null
     }
 
-    fun String.formatDouble(): Double? {
+    fun String.formatLongOrUserError(): Long? = formatDoubleOrNull()?.toLong() ?: run {
+        ChatUtils.userError("Not a valid number: '$this'")
+        return@run null
+    }
+
+    fun String.formatIntOrUserError(): Int? = formatDoubleOrNull()?.toInt() ?: run {
+        ChatUtils.userError("Not a valid number: '$this'")
+        return@run null
+    }
+
+    private fun String.formatDoubleOrNull(): Double? {
         var text = lowercase().replace(",", "")
 
         val multiplier = if (text.endsWith("k")) {
