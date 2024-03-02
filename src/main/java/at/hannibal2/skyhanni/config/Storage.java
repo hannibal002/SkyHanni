@@ -4,6 +4,7 @@ import at.hannibal2.skyhanni.data.model.ComposterUpgrade;
 import at.hannibal2.skyhanni.features.bingo.card.goals.BingoGoal;
 import at.hannibal2.skyhanni.features.combat.endernodetracker.EnderNodeTracker;
 import at.hannibal2.skyhanni.features.combat.ghostcounter.GhostData;
+import at.hannibal2.skyhanni.features.dungeon.CroesusChestTracker;
 import at.hannibal2.skyhanni.features.dungeon.DungeonAPI;
 import at.hannibal2.skyhanni.features.event.diana.DianaProfitTracker;
 import at.hannibal2.skyhanni.features.event.diana.MythologicalCreatureTracker;
@@ -28,9 +29,11 @@ import at.hannibal2.skyhanni.utils.LorenzVec;
 import at.hannibal2.skyhanni.utils.NEUInternalName;
 import at.hannibal2.skyhanni.utils.tracker.SkyHanniTracker;
 import com.google.gson.annotations.Expose;
+import jline.internal.Nullable;
 import net.minecraft.item.ItemStack;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedList;
@@ -443,7 +446,31 @@ public class Storage {
             public Map<DungeonAPI.DungeonFloor, Integer> bosses = new HashMap<>();
 
             @Expose
-            public List<Boolean> kismetedRuns = new LinkedList<>();
+            public List<DungeonRunInfo> runs = new LinkedList<>(Collections.nCopies(CroesusChestTracker.Companion.getMaxChests(), new DungeonRunInfo()));
+
+            public static class DungeonRunInfo {
+
+                public DungeonRunInfo() {
+                }
+
+                public DungeonRunInfo(String floor) {
+                    this.floor = floor;
+                }
+
+                @Nullable
+                @Expose
+                public String floor = null;
+
+                @Expose
+                public Boolean opened = false;
+
+                @Expose
+                public Boolean keyUsed = false;
+
+                @Expose
+                public Boolean kismetUsed = false;
+
+            }
         }
 
         @Expose

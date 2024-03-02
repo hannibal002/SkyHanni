@@ -1,6 +1,7 @@
 package at.hannibal2.skyhanni.features.dungeon
 
 import at.hannibal2.skyhanni.SkyHanniMod
+import at.hannibal2.skyhanni.config.Storage.ProfileSpecific.DungeonStorage.DungeonRunInfo
 import at.hannibal2.skyhanni.data.ProfileStorageData
 import at.hannibal2.skyhanni.data.SackAPI
 import at.hannibal2.skyhanni.events.DungeonCompleteEvent
@@ -16,6 +17,7 @@ import at.hannibal2.skyhanni.utils.ItemUtils.name
 import at.hannibal2.skyhanni.utils.LorenzColor
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.NEUInternalName.Companion.asInternalName
+import at.hannibal2.skyhanni.utils.NumberUtil.romanToDecimal
 import at.hannibal2.skyhanni.utils.RenderUtils.highlight
 import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.StringUtils.matches
@@ -29,19 +31,20 @@ class CroesusChestTracker {
 
     private val config get() = SkyHanniMod.feature.dungeon.chest
 
-    private val croesusChests get() = ProfileStorageData.profileSpecific?.dungeons?.kismetedRuns
+    private val croesusChests get() = ProfileStorageData.profileSpecific?.dungeons?.runs
 
     private val croesusPattern by RepoPattern.pattern("dungeon.croesus.inventory", "Croesus")
     private val croesusEmptyPattern by RepoPattern.pattern("dungeon.croesus.empty", "§cYou already rerolled a chest!")
     private val kismetPattern by RepoPattern.pattern("dungeon.kismet.reroll", "§aReroll Chest")
     private val kismetUsedPattern by RepoPattern.pattern("dungeon.kismet.used", "§aYou already rerolled a chest!")
 
+    private val floorPattern by RepoPattern.pattern("dungeon.croesus.chest.floor", "§7Tier: §eFloor (<floor>[IV]+)")
+    private val masterPattern by RepoPattern.pattern("dungeon.croesus.chest.master", ".*Master.*")
+
     private val kismetSlotId = 50
     private val emptySlotId = 22
     private val frontArrowSlotId = 53
     private val backArrowSlotId = 45
-
-    private val maxChests = 60
 
     private val kismetInternalName = "KISMET_FEATHER".asInternalName()
 
@@ -62,12 +65,10 @@ class CroesusChestTracker {
         if (!SkyHanniMod.feature.dungeon.croesusUnopenedChestTracker) return
 
         if (inCroesusInventory) {
-            for (slot in InventoryUtils.getItemsInOpenChest()) {
-                val stack = slot.stack
-                val lore = stack.getLore()
-                if ("§eClick to view chests!" in lore && "§aNo more Chests to open!" !in lore) {
-                    val hasOpenedChests = lore.any { it.contains("Opened Chest") }
-                    slot highlight if (hasOpenedChests) LorenzColor.DARK_AQUA else LorenzColor.DARK_PURPLE
+            for ((run, slot) in InventoryUtils.getItemsInOpenChest()
+                .mapNotNull { slot -> croesusSlotMapToRun(slot.slotIndex)?.getRun()?.let { it to slot } }) {
+                if (!run.keyUsed) {
+                    slot highlight if (run.opened) LorenzColor.DARK_AQUA else LorenzColor.DARK_PURPLE
                 }
             }
         }
@@ -82,6 +83,21 @@ class CroesusChestTracker {
             croesusEmpty = croesusEmptyPattern.matches(event.inventoryItems[emptySlotId]?.name)
             if (event.inventoryItems[backArrowSlotId]?.item != Items.arrow) {
                 croesusPageNumber = 0
+            }
+
+
+
+            for ((run, item) in event.inventoryItems.mapNotNull { (key, value) ->
+                croesusSlotMapToRun(key)?.getRun()?.let { it to value }
+            }) {
+                val lore = item.getLore()
+
+                if (run.floor == null)
+                    run.floor = (if (masterPattern.matches(item.name)) "M" else "F") + (lore.firstNotNullOfOrNull {
+                        floorPattern.matchMatcher(it) { group("floor").romanToDecimal() }
+                    } ?: "0")
+                run.keyUsed = "§aNo more Chests to open!" !in lore
+                run.opened = lore.any { it.contains("Opened Chest") } || run.keyUsed
             }
             return
         }
@@ -152,18 +168,24 @@ class CroesusChestTracker {
     @SubscribeEvent
     fun onDungeonComplete(event: DungeonCompleteEvent) {
         if (event.floor == "E") return
-        croesusChests?.add(0, false)
+        croesusChests?.add(0, DungeonRunInfo(event.floor))
         currentRunIndex = 0
         if ((croesusChests?.size ?: 0) > maxChests) {
             croesusChests?.dropLast(1)
         }
     }
 
-    private fun setKismetUsed() =
-        croesusChests?.takeIf { currentRunIndex < it.size }?.set(currentRunIndex, true)
+    private fun Int.getRun() = getRun(this)
+
+    private fun getRun(run: Int = currentRunIndex) =
+        croesusChests?.takeIf { currentRunIndex < it.size }?.get(currentRunIndex)
+
+    private fun setKismetUsed() {
+        getRun()?.kismetUsed = true
+    }
 
     private fun getKismetUsed(runIndex: Int) =
-        croesusChests?.takeIf { runIndex < it.size }?.get(runIndex) ?: false
+        getRun(runIndex)?.kismetUsed ?: false
 
     private fun getKismetAmount() =
         (SackAPI.fetchSackItem(kismetInternalName).takeIf { it.statusIsCorrectOrAlright() }?.amount
@@ -178,4 +200,8 @@ class CroesusChestTracker {
     }?.let { it + croesusPageNumber * 28 }
 
     private fun ItemStack.isArrow() = this.item == Items.arrow
+
+    companion object {
+        val maxChests = 60
+    }
 }
