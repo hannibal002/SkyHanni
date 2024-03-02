@@ -1,5 +1,6 @@
 package at.hannibal2.skyhanni.features.bingo
 
+import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.ItemUtils.name
 import at.hannibal2.skyhanni.utils.NEUInternalName
 import at.hannibal2.skyhanni.utils.NEUInternalName.Companion.asInternalName
@@ -56,7 +57,16 @@ object FirstMinionTier {
         for (minionId in tierOneMinionsFiltered) {
             val prefix = minionId.asString().dropLast(1)
             if (minions.any { it.value.startsWith(prefix) }) {
-                tierOneMinionsDone.add(minionId)
+                val successful = tierOneMinionsDone.add(minionId)
+                if (!successful) {
+                    ErrorManager.logErrorWithData(
+                        IllegalStateException("Attempted to add $minionId to tierOneMinionsDone when it already exists"),
+                        "Attempted to add $minionId to tierOneMinionsDone when it already exists",
+                        "tierOneMinionsFiltered" to tierOneMinionsFiltered,
+                        "minions" to minions,
+                        "tierOneMinionsDone" to tierOneMinionsDone
+                    )
+                }
             }
         }
     }
