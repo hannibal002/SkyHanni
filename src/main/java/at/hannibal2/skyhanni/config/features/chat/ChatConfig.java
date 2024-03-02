@@ -2,7 +2,11 @@ package at.hannibal2.skyhanni.config.features.chat;
 
 import at.hannibal2.skyhanni.config.FeatureToggle;
 import com.google.gson.annotations.Expose;
-import io.github.moulberry.moulconfig.annotations.*;
+import io.github.moulberry.moulconfig.annotations.Accordion;
+import io.github.moulberry.moulconfig.annotations.ConfigEditorBoolean;
+import io.github.moulberry.moulconfig.annotations.ConfigEditorDraggableList;
+import io.github.moulberry.moulconfig.annotations.ConfigEditorKeybind;
+import io.github.moulberry.moulconfig.annotations.ConfigOption;
 import org.lwjgl.input.Keyboard;
 
 import java.util.ArrayList;
