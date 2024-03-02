@@ -486,16 +486,12 @@ open class VisualWordGui : GuiScreen() {
 
         if (keyCode == Keyboard.KEY_BACK) {
             if (currentText.isNotEmpty()) {
-                currentText = if (KeyboardManager.isModifierKeyDown()) {
-                    ""
-                } else if (KeyboardManager.isShiftKeyDown()) {
+                currentText = if (KeyboardManager.isDeleteLineDown()) ""
+                else if (KeyboardManager.isDeleteWordDown()) {
                     val lastSpaceIndex = currentText.lastIndexOf(' ')
-                    if (lastSpaceIndex >= 0) {
-                        currentText.substring(0, lastSpaceIndex)
-                    } else {
-                        ""
-                    }
-                } else {
+                    if (lastSpaceIndex >= 0) currentText.substring(0, lastSpaceIndex) else ""
+                }
+                else {
                     currentText.substring(0, currentText.length - 1)
                 }
                 saveTextChanges()
