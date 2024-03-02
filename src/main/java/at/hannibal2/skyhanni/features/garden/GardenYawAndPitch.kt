@@ -59,13 +59,12 @@ class GardenYawAndPitch {
         lastChange = SimpleTimeMark.farPast()
     }
 
+    private fun isEnabled() =
+        config.enabled && ((OutsideSbFeature.YAW_AND_PITCH.isSelected() && !LorenzUtils.inSkyBlock) ||
+            (LorenzUtils.inSkyBlock && (GardenAPI.inGarden() || config.showOutsideGarden)))
+
     @SubscribeEvent
     fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
-        event.move(18, "garden.yawPitchDisplay.everywhere", "garden.yawPitchDisplay.showOutsideGarden")
+        event.move(18, "garden.yawPitchDisplay.showEverywhere", "garden.yawPitchDisplay.showOutsideGarden")
     }
-
-    private fun isEnabled() = (
-            (OutsideSbFeature.YAW_AND_PITCH.isSelected() && !LorenzUtils.inSkyBlock) ||
-            (LorenzUtils.inSkyBlock && (GardenAPI.inGarden() || config.showOutsideGarden))
-            )
 }

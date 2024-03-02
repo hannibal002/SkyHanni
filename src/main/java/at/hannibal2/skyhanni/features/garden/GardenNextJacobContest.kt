@@ -513,9 +513,9 @@ object GardenNextJacobContest {
         }
     }
 
-    private fun isEnabled() = ((OutsideSbFeature.NEXT_JACOB_CONTEXT.isSelected() && !LorenzUtils.inSkyBlock) ||
-        (LorenzUtils.inSkyBlock && (GardenAPI.inGarden() || config.showOutsideGarden)))
-        && config.display
+    private fun isEnabled() =
+        config.display && ((LorenzUtils.inSkyBlock && (GardenAPI.inGarden() || config.showOutsideGarden)) ||
+            (OutsideSbFeature.NEXT_JACOB_CONTEXT.isSelected() && !LorenzUtils.inSkyBlock))
 
     private fun isFetchEnabled() = isEnabled() && config.fetchAutomatically
     private fun isSendEnabled() =
