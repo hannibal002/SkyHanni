@@ -7,6 +7,7 @@ import at.hannibal2.skyhanni.data.ProfileStorageData
 import at.hannibal2.skyhanni.events.IslandChangeEvent
 import at.hannibal2.skyhanni.events.LorenzChatEvent
 import at.hannibal2.skyhanni.events.RenderMobColoredEvent
+import at.hannibal2.skyhanni.events.withAlpha
 import at.hannibal2.skyhanni.utils.ColorUtils.toChromaColor
 import at.hannibal2.skyhanni.utils.EntityUtils.isNPC
 import at.hannibal2.skyhanni.utils.LorenzUtils
@@ -48,7 +49,12 @@ class PunchcardHighlight {
         val entity = event.entity
         if (entity is EntityPlayerSP) return
         if (entity is EntityPlayer && !entity.isNPC() && !hasPunchedPlayer(entity) && entity.name != ownIGN) {
-            event.color = config.color.toChromaColor().rgb
+            val alpha = when (config.color.toChromaColor().alpha) {
+                0 -> 0
+                255 -> 1
+                else -> 255-config.color.toChromaColor().alpha
+            }
+            event.color = config.color.toChromaColor().withAlpha(alpha)
         }
     }
 
