@@ -104,15 +104,21 @@ object HarpFeatures {
     @SubscribeEvent
     fun onInventoryOpen(event: InventoryFullyOpenedEvent) {
         if (!LorenzUtils.inSkyBlock) return
-        if (!config.guiScale) return
-        when {
-            isMenuGui(event.inventoryName) -> {
-                setGUIScale()
-                openTime = SimpleTimeMark.now()
+        if (config.quickRestart) {
+            when {
+                isMenuGui(event.inventoryName) -> {
+                    openTime = SimpleTimeMark.now()
+                }
             }
-
-            isHarpGui(event.inventoryName) -> {
-                setGUIScale()
+        }
+        if (config.guiScale) {
+            when {
+                isMenuGui(event.inventoryName) -> {
+                    setGUIScale()
+                }
+                isHarpGui(event.inventoryName) -> {
+                    setGUIScale()
+                }
             }
         }
     }
