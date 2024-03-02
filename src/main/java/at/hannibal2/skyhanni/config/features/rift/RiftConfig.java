@@ -40,6 +40,11 @@ public class RiftConfig {
     public MotesOrbsConfig motesOrbs = new MotesOrbsConfig();
 
     @Expose
+    @ConfigOption(name = "Punchcard Artifact", desc = "")
+    @Accordion
+    public PunchcardConfig punchcard = new PunchcardConfig();
+
+    @Expose
     @ConfigOption(name = "Highlight Guide", desc = "Highlight things to do in the Rift Guide.")
     @ConfigEditorBoolean
     @FeatureToggle

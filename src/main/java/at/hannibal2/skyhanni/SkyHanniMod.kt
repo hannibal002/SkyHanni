@@ -324,6 +324,7 @@ import at.hannibal2.skyhanni.features.rift.area.wyldwoods.ShyCruxWarnings
 import at.hannibal2.skyhanni.features.rift.everywhere.CruxTalismanDisplay
 import at.hannibal2.skyhanni.features.rift.everywhere.EnigmaSoulWaypoints
 import at.hannibal2.skyhanni.features.rift.everywhere.HighlightRiftGuide
+import at.hannibal2.skyhanni.features.rift.everywhere.PunchcardHighlight
 import at.hannibal2.skyhanni.features.rift.everywhere.RiftHorsezookaHider
 import at.hannibal2.skyhanni.features.rift.everywhere.RiftTimer
 import at.hannibal2.skyhanni.features.rift.everywhere.motes.RiftMotesOrb
@@ -754,6 +755,7 @@ class SkyHanniMod {
         loadModule(SkillProgress)
         loadModule(SkillTooltip())
         loadModule(QuiverNotification)
+        loadModule(PunchcardHighlight())
 
         init()
 
