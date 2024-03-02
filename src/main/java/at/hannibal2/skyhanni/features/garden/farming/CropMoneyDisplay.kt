@@ -7,15 +7,16 @@ import at.hannibal2.skyhanni.events.GardenToolChangeEvent
 import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.LorenzTickEvent
 import at.hannibal2.skyhanni.events.ProfileJoinEvent
-import at.hannibal2.skyhanni.features.bazaar.BazaarApi.Companion.getBazaarData
-import at.hannibal2.skyhanni.features.bazaar.BazaarApi.Companion.isBazaarItem
-import at.hannibal2.skyhanni.features.bazaar.BazaarData
 import at.hannibal2.skyhanni.features.garden.CropType
 import at.hannibal2.skyhanni.features.garden.CropType.Companion.getByNameOrNull
 import at.hannibal2.skyhanni.features.garden.GardenAPI
 import at.hannibal2.skyhanni.features.garden.GardenNextJacobContest
+import at.hannibal2.skyhanni.features.garden.composter.ComposterOverlay
 import at.hannibal2.skyhanni.features.garden.farming.GardenCropSpeed.getSpeed
 import at.hannibal2.skyhanni.features.garden.farming.GardenCropSpeed.isSpeedDataEmpty
+import at.hannibal2.skyhanni.features.inventory.bazaar.BazaarApi.Companion.getBazaarData
+import at.hannibal2.skyhanni.features.inventory.bazaar.BazaarApi.Companion.isBazaarItem
+import at.hannibal2.skyhanni.features.inventory.bazaar.BazaarData
 import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.CollectionUtils.addAsSingletonList
@@ -204,7 +205,12 @@ object CropMoneyDisplay {
                     list.add(getItemStack("BOX_OF_SEEDS"))
                 }
             } catch (e: NullPointerException) {
-                e.printStackTrace()
+                ErrorManager.logErrorWithData(
+                    e, "Error calculating seed price for money per hour display",
+                    "internalName" to internalName,
+                    "cropNames" to cropNames,
+                    "list" to list,
+                )
             }
 
             if (!config.compact) {
