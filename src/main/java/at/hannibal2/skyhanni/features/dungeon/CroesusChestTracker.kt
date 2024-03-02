@@ -31,14 +31,12 @@ class CroesusChestTracker {
 
     private val config get() = SkyHanniMod.feature.dungeon.chest
 
-    private val croesusChests get() = ProfileStorageData.profileSpecific?.dungeons?.runs
-
     private val croesusPattern by RepoPattern.pattern("dungeon.croesus.inventory", "Croesus")
     private val croesusEmptyPattern by RepoPattern.pattern("dungeon.croesus.empty", "§cYou already rerolled a chest!")
     private val kismetPattern by RepoPattern.pattern("dungeon.kismet.reroll", "§aReroll Chest")
     private val kismetUsedPattern by RepoPattern.pattern("dungeon.kismet.used", "§aYou already rerolled a chest!")
 
-    private val floorPattern by RepoPattern.pattern("dungeon.croesus.chest.floor", "§7Tier: §eFloor (<floor>[IV]+)")
+    private val floorPattern by RepoPattern.pattern("dungeon.croesus.chest.floor", "§7Tier: §eFloor (?<floor>[IV]+)")
     private val masterPattern by RepoPattern.pattern("dungeon.croesus.chest.master", ".*Master.*")
 
     private val kismetSlotId = 50
@@ -66,9 +64,12 @@ class CroesusChestTracker {
 
         if (inCroesusInventory) {
             for ((run, slot) in InventoryUtils.getItemsInOpenChest()
-                .mapNotNull { slot -> croesusSlotMapToRun(slot.slotIndex)?.getRun()?.let { it to slot } }) {
-                if (!run.keyUsed) {
-                    slot highlight if (run.opened) LorenzColor.DARK_AQUA else LorenzColor.DARK_PURPLE
+                .mapNotNull { slot -> runSlots(slot.slotIndex, slot) }) {
+
+                val state = run.openState
+
+                if (state != OpenedState.KEY_USED) {
+                    slot highlight if (state == OpenedState.OPENED) LorenzColor.DARK_AQUA else LorenzColor.DARK_PURPLE
                 }
             }
         }
@@ -85,20 +86,31 @@ class CroesusChestTracker {
                 croesusPageNumber = 0
             }
 
+            if (croesusEmpty) {
+                croesusChests?.forEach { it.floor = null }
+                return
+            }
 
+            for ((run, item) in event.inventoryItemsWithNull.mapNotNull { (key, value) -> runSlots(key, value) }) {
+                if (item == null) {
+                    run.floor = null
+                    continue
+                }
 
-            for ((run, item) in event.inventoryItems.mapNotNull { (key, value) ->
-                croesusSlotMapToRun(key)?.getRun()?.let { it to value }
-            }) {
                 val lore = item.getLore()
 
-                if (run.floor == null)
-                    run.floor = (if (masterPattern.matches(item.name)) "M" else "F") + (lore.firstNotNullOfOrNull {
+                if (run.floor == null) run.floor =
+                    (if (masterPattern.matches(item.name)) "M" else "F") + (lore.firstNotNullOfOrNull {
                         floorPattern.matchMatcher(it) { group("floor").romanToDecimal() }
                     } ?: "0")
-                run.keyUsed = "§aNo more Chests to open!" !in lore
-                run.opened = lore.any { it.contains("Opened Chest") } || run.keyUsed
+                run.openState = when {
+                    "§aNo more Chests to open!" in lore -> OpenedState.KEY_USED
+                    lore.any { it.contains("Opened Chest:") } -> OpenedState.OPENED
+                    lore.any { it.contains("§8No Chests Opened!") } -> OpenedState.UNOPENED
+                    else -> OpenedState.OPENED
+                }
             }
+
             return
         }
         if (config.kismet || config.kismetStackSize) {
@@ -158,6 +170,7 @@ class CroesusChestTracker {
         if (!LorenzUtils.inSkyBlock) return
         if (!config.kismet) return
         if (!inCroesusInventory) return
+        if (event.slot.slotIndex != event.slot.slotNumber) return
         val run = croesusSlotMapToRun(event.slot.slotIndex) ?: return
         if (!getKismetUsed(run)) return
         event.offsetY = -1
@@ -175,17 +188,15 @@ class CroesusChestTracker {
         }
     }
 
-    private fun Int.getRun() = getRun(this)
+    private fun Int.getRun() = getRun0(this)
 
-    private fun getRun(run: Int = currentRunIndex) =
-        croesusChests?.takeIf { run < it.size }?.get(run)
+    private fun getRun0(run: Int = currentRunIndex) = croesusChests?.takeIf { run < it.size }?.get(run)
 
     private fun setKismetUsed() {
-        getRun()?.kismetUsed = true
+        getRun0()?.kismetUsed = true
     }
 
-    private fun getKismetUsed(runIndex: Int) =
-        getRun(runIndex)?.kismetUsed ?: false
+    private fun getKismetUsed(runIndex: Int) = getRun0(runIndex)?.kismetUsed ?: false
 
     private fun getKismetAmount() =
         (SackAPI.fetchSackItem(kismetInternalName).takeIf { it.statusIsCorrectOrAlright() }?.amount
@@ -201,7 +212,22 @@ class CroesusChestTracker {
 
     private fun ItemStack.isArrow() = this.item == Items.arrow
 
+    private inline fun <reified T> runSlots(slotId: Int, any: T) =
+        croesusSlotMapToRun(slotId)?.getRun()?.let { it to any }
+
     companion object {
         val maxChests = 60
+
+        private val croesusChests get() = ProfileStorageData.profileSpecific?.dungeons?.runs
+
+        fun getLastActiveChest(includeDungeonKey: Boolean = false) =
+            (croesusChests?.indexOfLast { it.floor != null && (it.openState == OpenedState.UNOPENED || !(includeDungeonKey && it.openState == OpenedState.OPENED)) }
+                ?: -1) + 1
+
+        enum class OpenedState {
+            UNOPENED,
+            OPENED,
+            KEY_USED,
+        }
     }
 }

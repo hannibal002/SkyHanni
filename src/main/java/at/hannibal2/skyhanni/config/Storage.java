@@ -5,6 +5,7 @@ import at.hannibal2.skyhanni.features.bingo.card.goals.BingoGoal;
 import at.hannibal2.skyhanni.features.combat.endernodetracker.EnderNodeTracker;
 import at.hannibal2.skyhanni.features.combat.ghostcounter.GhostData;
 import at.hannibal2.skyhanni.features.dungeon.CroesusChestTracker;
+import at.hannibal2.skyhanni.features.dungeon.CroesusChestTracker.Companion.OpenedState;
 import at.hannibal2.skyhanni.features.dungeon.DungeonAPI;
 import at.hannibal2.skyhanni.features.event.diana.DianaProfitTracker;
 import at.hannibal2.skyhanni.features.event.diana.MythologicalCreatureTracker;
@@ -33,7 +34,6 @@ import jline.internal.Nullable;
 import net.minecraft.item.ItemStack;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedList;
@@ -41,6 +41,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 public class Storage {
 
@@ -446,7 +448,8 @@ public class Storage {
             public Map<DungeonAPI.DungeonFloor, Integer> bosses = new HashMap<>();
 
             @Expose
-            public List<DungeonRunInfo> runs = new LinkedList<>(Collections.nCopies(CroesusChestTracker.Companion.getMaxChests(), new DungeonRunInfo()));
+            public List<DungeonRunInfo> runs = Stream.generate(DungeonRunInfo::new).limit(CroesusChestTracker.Companion.getMaxChests()).collect(Collectors.toCollection(LinkedList::new));
+
 
             public static class DungeonRunInfo {
 
@@ -462,10 +465,7 @@ public class Storage {
                 public String floor = null;
 
                 @Expose
-                public Boolean opened = false;
-
-                @Expose
-                public Boolean keyUsed = false;
+                public OpenedState openState = OpenedState.UNOPENED;
 
                 @Expose
                 public Boolean kismetUsed = false;
