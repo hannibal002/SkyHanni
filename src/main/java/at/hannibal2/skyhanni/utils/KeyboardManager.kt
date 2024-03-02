@@ -2,6 +2,7 @@ package at.hannibal2.skyhanni.utils
 
 import at.hannibal2.skyhanni.events.LorenzKeyPressEvent
 import at.hannibal2.skyhanni.events.LorenzTickEvent
+import at.hannibal2.skyhanni.test.command.ErrorManager
 import io.github.moulberry.moulconfig.gui.GuiScreenElementWrapper
 import io.github.moulberry.moulconfig.internal.KeybindHelper
 import net.minecraft.client.Minecraft
@@ -74,8 +75,10 @@ object KeyboardManager {
         try {
             if (keyCode.isKeyHeld()) return true
         } catch (e: IndexOutOfBoundsException) {
-            println("KeyBinding isActive caused an IndexOutOfBoundsException with keyCode: $keyCode")
-            e.printStackTrace()
+            ErrorManager.logErrorWithData(
+                e, "Error while checking if a key is pressed.",
+                "keyCode" to keyCode,
+            )
             return false
         }
         return this.isKeyDown || this.isPressed
