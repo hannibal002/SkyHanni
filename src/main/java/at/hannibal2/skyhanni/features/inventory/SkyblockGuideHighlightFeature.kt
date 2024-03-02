@@ -253,7 +253,7 @@ class SkyblockGuideHighlightFeature private constructor(
                 { skyblockGuideConfig.collectionGuide },
                 "collections",
                 "\\w+ Collections|Collections",
-                "§7Progress to .*|§7Find this item to add it to your|§7Kill this boss once to view collection|§7Collections Maxed Out: §e.*|§7Collections Unlocked: §e.*|§7Boss Collections Unlocked: §e.*"
+                "§7Progress to .*|§7Find this item to add it to your|§7Kill this boss once to view collection|§7(?:Boss )?Collections (?:Unlocked|Maxed Out): §e.*"
             )
         }
     }
