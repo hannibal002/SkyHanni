@@ -5,8 +5,10 @@ import at.hannibal2.skyhanni.events.InventoryOpenEvent
 import at.hannibal2.skyhanni.events.LorenzToolTipEvent
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils.round
-import at.hannibal2.skyhanni.utils.NEUItems
+import at.hannibal2.skyhanni.utils.NEUInternalName.Companion.asInternalName
+import at.hannibal2.skyhanni.utils.NEUItems.getItemStack
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
+import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.StringUtils.matches
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import io.github.moulberry.notenoughupdates.events.ReplaceItemEvent
@@ -33,6 +35,11 @@ class LimboPlaytime {
 
     private val config get() = SkyHanniMod.feature.misc
 
+    private val item = "ENDER_PEARL".asInternalName().getItemStack().item
+    private val itemName = "§aLimbo"
+    private var limboItem = Utils.createItemStack(item, itemName)
+    private var lastCreateCooldown = SimpleTimeMark.farPast()
+
     @SubscribeEvent
     fun replaceItem(event: ReplaceItemEvent) {
         if (event.inventory !is ContainerLocalMenu) return
@@ -40,10 +47,10 @@ class LimboPlaytime {
         if (event.slotNumber != 43) return
         if (config.limboPlaytime == 0) return
 
-        val limboItem by lazy {
-            val neuItem = NEUItems.getItemStack("ENDER_PEARL")
-            if (wholeMinutes >= 60) Utils.createItemStack(neuItem.item, "§aLimbo", "§7Playtime: §a${wholeMinutes.addSeparators()} minutes", "§7Or: §b$hoursString hours")
-            else Utils.createItemStack(neuItem.item, "§aLimbo", "§7Playtime: §a$wholeMinutes minutes")
+        if (lastCreateCooldown.passedSince() > 3.seconds) {
+            lastCreateCooldown = SimpleTimeMark.now()
+            limboItem = if (wholeMinutes >= 60) Utils.createItemStack(item, itemName, "§7Playtime: §a${wholeMinutes.addSeparators()} minutes", "§7Or: §b$hoursString hours")
+            else Utils.createItemStack(item, itemName, "§7Playtime: §a$wholeMinutes minutes")
         }
         event.replaceWith(limboItem)
     }
