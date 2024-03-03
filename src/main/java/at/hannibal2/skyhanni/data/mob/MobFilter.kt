@@ -71,7 +71,7 @@ object MobFilter {
         "(?:\\[\\w+(?<level>\\d+)\\] )?(?<owner>\\w+)'s (?<name>\\w+ Jerry) \\d+ Hits"
     )
 
-    val petCareNamePattern by repoGroup.pattern("pattern.petcare", "^\\[\\w+ (\\d+)\\] (.*)")
+    val petCareNamePattern by repoGroup.pattern("pattern.petcare", "^\\[\\w+ (?<level>\\d+)\\] (?<name>.*)")
     val wokeSleepingGolemPattern by repoGroup.pattern("pattern.dungeon.woke.golem", "(?:§c§lWoke|§5§lSleeping) Golem§r")
     val summonOwnerPattern by repoGroup.pattern("pattern.summon.owner", ".*Spawned by: (?<name>.*).*")
 
@@ -439,9 +439,9 @@ object MobFilter {
                     baseEntity,
                     Mob.Type.Special,
                     armorStand = extraEntityList[1],
-                    name = this.group(2),
+                    name = this.group("name"),
                     additionalEntities = extraEntityList,
-                    levelOrTier = this.group(1).toInt()
+                    levelOrTier = this.group("level").toInt()
                 ),
             )
         } ?: MobResult.somethingWentWrong
