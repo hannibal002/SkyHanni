@@ -33,8 +33,12 @@ object MobFactories {
     ): Mob? =
         MobFilter.bossMobNameFilter.matchMatcher(armorStand.cleanName()) {
             Mob(
-                baseEntity = baseEntity, mobType = Mob.Type.Boss, armorStand = armorStand, name = overriddenName
-                    ?: this.group(3), additionalEntities = extraEntityList
+                baseEntity = baseEntity,
+                mobType = Mob.Type.Boss,
+                armorStand = armorStand,
+                name = overriddenName ?: this.group("name"),
+                levelOrTier = group("level")?.takeIf { it.isNotEmpty() }?.toInt() ?: -1,
+                additionalEntities = extraEntityList
             )
         }
 
