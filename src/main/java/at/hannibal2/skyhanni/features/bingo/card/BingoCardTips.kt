@@ -13,8 +13,6 @@ import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.RenderUtils.highlight
 import at.hannibal2.skyhanni.utils.StringUtils.matches
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
-import net.minecraft.client.Minecraft
-import net.minecraft.client.gui.inventory.GuiContainer
 import net.minecraft.inventory.ContainerChest
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
@@ -41,8 +39,7 @@ class BingoCardTips {
         if (!isEnabled()) return
         if (!inventoryPattern.matches(InventoryUtils.openInventoryName())) return
 
-        val gui = Minecraft.getMinecraft().currentScreen as? GuiContainer ?: return
-        val slot = gui.slotUnderMouse
+        val slot = event.slot
         val goal = BingoAPI.bingoGoals[slot.slotNumber] ?: return
 
         val toolTip = event.toolTip

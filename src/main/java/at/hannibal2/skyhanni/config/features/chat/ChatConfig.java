@@ -124,4 +124,16 @@ public class ChatConfig {
     @ConfigEditorBoolean
     @FeatureToggle
     public boolean skyBlockXPInChat = true;
+
+    @Expose
+    @ConfigOption(name = "Jacob's Event", desc = "Hide Anita Accessories' fortune bonus messages outside the Garden.")
+    @ConfigEditorBoolean
+    @FeatureToggle
+    public boolean hideJacob = true;
+
+    @Expose
+    @ConfigOption(name = "Sky Mall", desc = "Hides the Sky Mall message outside Mining Islands.")
+    @ConfigEditorBoolean
+    @FeatureToggle
+    public boolean hideSkyMall = true;
 }
