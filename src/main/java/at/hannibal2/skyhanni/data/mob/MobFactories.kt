@@ -85,9 +85,9 @@ object MobFactories {
                 baseEntity = baseEntity,
                 mobType = Mob.Type.Summon,
                 armorStand = armorStand,
-                name = this.group(2),
+                name = this.group("name"),
                 additionalEntities = extraEntityList,
-                ownerName = this.group(1)
+                ownerName = this.group("owner")
             )
         }
 
