@@ -62,7 +62,7 @@ object MobFilter {
     val bossMobNameFilter by repoGroup.pattern("filter.boss", "^. (\\[(.*)\\] )?(.*) ([\\d\\/Mk.,❤]+|█+) .$")
     val dungeonNameFilter by repoGroup.pattern(
         "filter.dungeon",
-        "^(?:(✯)\\s)?(?:(${DungeonAttribute.toRegexLine})\\s)?(?:\\[[\\w\\d]+\\]\\s)?(.+)\\s[^\\s]+$"
+        "^(?:(?<star>✯)\\s)?(?:(?<attribute>${DungeonAttribute.toRegexLine})\\s)?(?:\\[[\\w\\d]+\\]\\s)?(?<name>.+)\\s[^\\s]+$"
     )
     val summonFilter by repoGroup.pattern("filter.summon", "^(?<owner>\\w+)'s (?<name>.*) \\d+.*")
     val dojoFilter by repoGroup.pattern("filter.dojo", "^(?:(\\d+) pts|(\\w+))$")

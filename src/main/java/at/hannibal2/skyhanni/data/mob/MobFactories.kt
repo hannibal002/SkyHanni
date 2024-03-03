@@ -1,6 +1,7 @@
 package at.hannibal2.skyhanni.data.mob
 
 import at.hannibal2.skyhanni.utils.EntityUtils.cleanName
+import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.NumberUtil.romanToDecimal
 import at.hannibal2.skyhanni.utils.StringUtils.findMatcher
 import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
@@ -44,14 +45,17 @@ object MobFactories {
     ): Mob? =
         MobFilter.dungeonNameFilter.matchMatcher(armorStand.cleanName()) {
             Mob(
-                baseEntity,
-                Mob.Type.Dungeon,
-                armorStand,
-                this.group(3),
-                extraEntityList,
-                hasStar = this.group(1)?.isNotEmpty() ?: false,
-                attribute = this.group(2)?.takeIf { it.isNotEmpty() }
-                    ?.let { MobFilter.DungeonAttribute.valueOf(it) })
+                baseEntity = baseEntity,
+                mobType = Mob.Type.Dungeon,
+                armorStand = armorStand,
+                name = this.group("name"),
+                additionalEntities = extraEntityList,
+                hasStar = this.group("star")?.isNotEmpty() ?: false,
+                attribute = this.group("attribute")?.takeIf { it.isNotEmpty() }
+                    ?.let {
+                        LorenzUtils.enumValueOfOrNull<MobFilter.DungeonAttribute>(it)
+                    }
+            )
         }
 
     fun basic(
