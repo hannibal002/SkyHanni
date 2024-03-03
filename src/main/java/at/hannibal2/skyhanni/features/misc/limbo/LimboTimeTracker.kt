@@ -1,10 +1,8 @@
 package at.hannibal2.skyhanni.features.misc.limbo
 
 import at.hannibal2.skyhanni.SkyHanniMod
-import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.data.HypixelData
 import at.hannibal2.skyhanni.data.ProfileStorageData
-import at.hannibal2.skyhanni.events.ConfigLoadEvent
 import at.hannibal2.skyhanni.events.DebugDataCollectEvent
 import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.LorenzChatEvent
@@ -35,8 +33,8 @@ object LimboTimeTracker {
     private var shownPB = false
     private var oldPB: Duration = 0.seconds
     private var userLuck: Float = 0.0F
-    private val userLuckMultiplier = 0.000810185F
-    private val fireMultiplier = 1.01F
+    private const val luckMultiplier = 0.000810185F
+    private const val fireMultiplier = 1.01F
     private var onFire = false
 
     private val bedwarsLobbyLimbo = AxisAlignedBB(-662.0, 43.0, -76.0, -619.0, 86.0, -27.0)
@@ -44,19 +42,10 @@ object LimboTimeTracker {
     @SubscribeEvent
     fun onChat(event: LorenzChatEvent) {
         if (event.message == "§cYou are AFK. Move around to return from AFK." || event.message == "§cYou were spawned in Limbo.") {
+            tryMigration()
             limboJoinTime = SimpleTimeMark.now()
             inLimbo = true
             onFire = Minecraft.getMinecraft().thePlayer.isBurning
-        }
-    }
-
-    @SubscribeEvent
-    fun onConfigLoad(event: ConfigLoadEvent) {
-        val playtime = storage?.playtime ?: 0
-        val pb = storage?.personalBest ?: 0
-        if (playtime < pb) {
-            storage?.playtime = pb
-            ChatUtils.debug("Setting limboPlaytime = limboTimePB, since limboPlaytime was lower.")
         }
     }
 
@@ -81,6 +70,7 @@ object LimboTimeTracker {
         if (lobbyName.toString().startsWith("bedwarslobby")) {
             if (bedwarsLobbyLimbo.isPlayerInside()) {
                 if (inFakeLimbo) return
+                tryMigration()
                 limboJoinTime = SimpleTimeMark.now()
                 inLimbo = true
                 inFakeLimbo = true
@@ -122,7 +112,7 @@ object LimboTimeTracker {
         if (passedSince > currentPB) {
             oldPB = currentPB
             storage?.personalBest = passedSince.toInt(DurationUnit.SECONDS)
-            userLuck = ((storage?.personalBest ?: 0) * userLuckMultiplier).round(2)
+            userLuck = ((storage?.personalBest ?: 0) * luckMultiplier).round(2)
             if (onFire) userLuck *= fireMultiplier
             ChatUtils.chat("§fYou were in Limbo for §e$duration§f! §d§lPERSONAL BEST§r§f!")
             ChatUtils.chat("§fYour previous Personal Best was §e$oldPB.")
@@ -140,10 +130,10 @@ object LimboTimeTracker {
         shownPB = false
     }
 
-     @SubscribeEvent
-     fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
-         event.move(3, oldPath = "misc.limboTimePB", newPath = "storage.personalBest")
-     }
+//     @SubscribeEvent
+//     fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
+//         event.move(3, oldPath = "misc.limboTimePB", newPath = "#player.personalBest")
+//     }
 
     fun printStats(onlyPlaytime: Boolean = false) {
         val timeInLimbo: Int = if (inLimbo) limboJoinTime.passedSince().inWholeSeconds.toInt() else 0
@@ -174,9 +164,16 @@ object LimboTimeTracker {
         }
     }
 
-    @SubscribeEvent
-    fun onConfigMigrate(event: ConfigUpdaterMigrator.ConfigFixEvent) {
-
+    private fun tryMigration() {
+        if (config.limboTimePB != 0) {
+            ChatUtils.debug("Migrating limbo personalBest")
+            storage?.personalBest = config.limboTimePB
+            config.limboTimePB = 0
+        }
+        if ((storage?.personalBest ?: 0) > (storage?.playtime ?: 0)) {
+            ChatUtils.debug("Migrating limbo playtime")
+            storage?.playtime = (storage?.personalBest ?: 0)
+        }
     }
 
     fun isEnabled() = config.showTimeInLimbo
