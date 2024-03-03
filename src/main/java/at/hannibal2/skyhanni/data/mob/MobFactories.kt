@@ -72,12 +72,13 @@ object MobFactories {
                 baseEntity = baseEntity,
                 mobType = Mob.Type.Basic,
                 armorStand = armorStand,
-                name = this.group(4).removeCorruptedSuffix(
-                    this.group(3)?.isNotEmpty() ?: false
+                name = this.group("name").removeCorruptedSuffix(
+                    this.group("corrupted")?.isNotEmpty() ?: false
                 ),
                 additionalEntities = extraEntityList,
-                levelOrTier = this.group(2)?.takeIf { it.isNotEmpty() }
-                    ?.toInt() ?: -1)
+                levelOrTier = this.group("level")?.takeIf { it.isNotEmpty() }
+                    ?.toInt() ?: -1
+            )
         }
 
     fun basic(baseEntity: EntityLivingBase, name: String) =
