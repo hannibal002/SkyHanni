@@ -6,7 +6,6 @@ import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.LorenzTickEvent
 import at.hannibal2.skyhanni.features.fame.ReminderUtils
-import at.hannibal2.skyhanni.utils.LocationUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils.isInIsland
 import at.hannibal2.skyhanni.utils.RenderUtils.renderStrings
@@ -17,10 +16,10 @@ object MiningEventDisplay {
     private val config get() = SkyHanniMod.feature.mining.miningEvent
     private var display = mutableListOf<String>()
 
-    private val dwarvenEvents = mutableListOf<RunningEvent>()
-    private val crystalEvents = mutableListOf<RunningEvent>()
-    private var lastDwarvenEvent: MiningEvent? = null
-    private var lastCrystalEvent: MiningEvent? = null
+    private var dwarvenEvents = listOf<RunningEventType>()
+    private var crystalEvents = listOf<RunningEventType>()
+    private var lastDwarvenEvent: MiningEventType? = null
+    private var lastCrystalEvent: MiningEventType? = null
 
     @SubscribeEvent
     fun onTick(event: LorenzTickEvent) {
@@ -40,7 +39,7 @@ object MiningEventDisplay {
         updateEvents(IslandType.CRYSTAL_HOLLOWS, crystalEvents, lastCrystalEvent)
     }
 
-    private fun updateEvents(islandType: IslandType, events: List<RunningEvent>, lastEvent: MiningEvent?) {
+    private fun updateEvents(islandType: IslandType, events: List<RunningEventType>, lastEvent: MiningEventType?) {
         val shouldShow = when (config.showType) {
             MiningEventConfig.ShowType.DWARVEN -> islandType == IslandType.DWARVEN_MINES
             MiningEventConfig.ShowType.CRYSTAL -> islandType == IslandType.CRYSTAL_HOLLOWS
@@ -64,7 +63,7 @@ object MiningEventDisplay {
         }
     }
 
-    private fun formatUpcomingEvents(events: List<RunningEvent>, lastEvent: MiningEvent?): String {
+    private fun formatUpcomingEvents(events: List<RunningEventType>, lastEvent: MiningEventType?): String {
         val upcoming = events.filter { !it.endsAt.asTimeMark().isInPast() }
             .map { if (it.isDouble) "${it.event} §8-> ${it.event}" else it.event.toString() }
             .toMutableList()
@@ -75,18 +74,18 @@ object MiningEventDisplay {
     }
 
     fun updateData(eventData: MiningEventData) {
-        dwarvenEvents.clear()
-        crystalEvents.clear()
-
         eventData.runningEvents.forEach { (islandType, events) ->
             when (islandType) {
-                IslandType.DWARVEN_MINES -> dwarvenEvents.addAll(events.sortedBy { it.endsAt - it.event.defaultLength.inWholeMilliseconds })
-                IslandType.CRYSTAL_HOLLOWS -> crystalEvents.addAll(events.sortedBy { it.endsAt - it.event.defaultLength.inWholeMilliseconds })
+                IslandType.DWARVEN_MINES -> dwarvenEvents =
+                    (events.sortedBy { it.endsAt - it.event.defaultLength.inWholeMilliseconds })
+
+                IslandType.CRYSTAL_HOLLOWS -> crystalEvents =
+                    (events.sortedBy { it.endsAt - it.event.defaultLength.inWholeMilliseconds })
                 else -> Unit
             }
         }
     }
 
     private fun shouldDisplay() = LorenzUtils.inSkyBlock && config.enabled && !ReminderUtils.isBusy() &&
-        !(!config.outsideMining && !LocationUtils.inAdvancedMiningIsland())
+        !(!config.outsideMining && !LorenzUtils.inAdvancedMiningIsland())
 }

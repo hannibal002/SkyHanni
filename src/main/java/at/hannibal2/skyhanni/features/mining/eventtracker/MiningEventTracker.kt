@@ -11,7 +11,6 @@ import at.hannibal2.skyhanni.events.LorenzTickEvent
 import at.hannibal2.skyhanni.events.LorenzWorldChangeEvent
 import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.APIUtil
-import at.hannibal2.skyhanni.utils.LocationUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
@@ -50,7 +49,7 @@ class MiningEventTracker {
 
     private var lastWorldSwitch = SimpleTimeMark.farPast()
     private var eventEndTime = SimpleTimeMark.farPast()
-    private var lastSentEvent: MiningEvent? = null
+    private var lastSentEvent: MiningEventType? = null
 
     private var canRequestAt = SimpleTimeMark.farPast()
 
@@ -63,7 +62,7 @@ class MiningEventTracker {
 
     @SubscribeEvent
     fun onBossbarChange(event: BossbarUpdateEvent) {
-        if (!LocationUtils.inAdvancedMiningIsland()) return
+        if (!LorenzUtils.inAdvancedMiningIsland()) return
         if (lastWorldSwitch.passedSince() < 2.seconds) return
         if (!eventEndTime.isInPast()) {
             return
@@ -79,7 +78,7 @@ class MiningEventTracker {
 
     @SubscribeEvent
     fun onChat(event: LorenzChatEvent) {
-        if (!LocationUtils.inAdvancedMiningIsland()) return
+        if (!LorenzUtils.inAdvancedMiningIsland()) return
 
         eventStartedPattern.matchMatcher(event.message) {
             sendData(group("event"), null)
@@ -93,14 +92,14 @@ class MiningEventTracker {
     fun onTick(event: LorenzTickEvent) {
         if (!event.repeatSeconds(1)) return
         if (!config.enabled) return
-        if (!LorenzUtils.inSkyBlock || (!config.outsideMining && !LocationUtils.inAdvancedMiningIsland())) return
+        if (!LorenzUtils.inSkyBlock || (!config.outsideMining && !LorenzUtils.inAdvancedMiningIsland())) return
         if (!canRequestAt.isInPast()) return
 
         fetchData()
     }
 
     private fun sendData(eventName: String, time: String?) {
-        val eventType = MiningEvent.fromBossbarName(eventName)
+        val eventType = MiningEventType.fromBossbarName(eventName)
         if (lastSentEvent == eventType) return
         if (eventType == null) {
             if (!config.enabled) return

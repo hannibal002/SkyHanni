@@ -6,7 +6,7 @@ import kotlin.time.Duration
 import kotlin.time.Duration.Companion.minutes
 import kotlin.time.Duration.Companion.seconds
 
-enum class MiningEvent(
+enum class MiningEventType(
     val eventName: String,
     private val shortName: String,
     val defaultLength: Duration,
@@ -31,8 +31,8 @@ enum class MiningEvent(
     }
 
     companion object {
-        fun fromBossbarName(bossbarName: String): MiningEvent? {
-            return MiningEvent.entries.find { it.eventName == bossbarName.removeColor() }
+        fun fromBossbarName(bossbarName: String): MiningEventType? {
+            return MiningEventType.entries.find { it.eventName == bossbarName.removeColor() }
         }
     }
 }
