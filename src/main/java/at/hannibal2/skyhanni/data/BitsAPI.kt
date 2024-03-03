@@ -146,7 +146,7 @@ object BitsAPI {
             if (cookieStack != null) {
                 for (line in cookieStack.getLore()) {
                     bitsAvailableMenuPattern.matchMatcher(line) {
-                        bitsToClaim = group("toClaim").formatNumber().toInt()
+                        bitsToClaim = group("toClaim").formatLong()?.toInt() ?: return
 
                         return
                     }
@@ -177,5 +177,5 @@ object BitsAPI {
         }
     }
 
-    fun isEnabled() = LorenzUtils.inSkyBlock
+    fun isEnabled() = LorenzUtils.inSkyBlock && profileStorage != null
 }
