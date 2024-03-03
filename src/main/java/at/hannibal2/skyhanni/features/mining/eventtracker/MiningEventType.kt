@@ -20,8 +20,6 @@ enum class MiningEventType(
     MITHRIL_GOURMAND("MITHRIL GOURMAND", "Gourmand", 10.minutes, 'b'),
     ;
 
-    private val config get() = SkyHanniMod.feature.mining.miningEvent
-
     override fun toString(): String {
         return if (config.compressedFormat) "§$colourCode$shortName" else "§$colourCode$eventName"
     }
@@ -31,6 +29,8 @@ enum class MiningEventType(
     }
 
     companion object {
+        private val config get() = SkyHanniMod.feature.mining.miningEvent
+
         fun fromBossbarName(bossbarName: String): MiningEventType? {
             return MiningEventType.entries.find { it.eventName == bossbarName.removeColor() }
         }
