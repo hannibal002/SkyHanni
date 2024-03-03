@@ -34,7 +34,7 @@ public class TooltipTweaksConfig {
             "§fShow: §7Crop-specific Fortune indicated as §6[+196]\n" +
             "§fReplace: §7Edits the total Fortune to include crop-specific Fortune."
     )
-    @ConfigEditorDropdown()
+    @ConfigEditorDropdown
     public CropTooltipFortuneEntry cropTooltipFortune = CropTooltipFortuneEntry.SHOW;
 
     public enum CropTooltipFortuneEntry implements HasLegacyId {

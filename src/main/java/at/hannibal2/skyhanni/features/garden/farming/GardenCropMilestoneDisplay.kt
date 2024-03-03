@@ -20,9 +20,10 @@ import at.hannibal2.skyhanni.features.garden.GardenAPI.addCropIcon
 import at.hannibal2.skyhanni.features.garden.GardenAPI.getCropType
 import at.hannibal2.skyhanni.features.garden.farming.GardenCropSpeed.setSpeed
 import at.hannibal2.skyhanni.test.command.ErrorManager
+import at.hannibal2.skyhanni.utils.CollectionUtils.addAsSingletonList
+import at.hannibal2.skyhanni.utils.ConditionalUtils
 import at.hannibal2.skyhanni.utils.ConfigUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils
-import at.hannibal2.skyhanni.utils.LorenzUtils.addAsSingletonList
 import at.hannibal2.skyhanni.utils.LorenzUtils.round
 import at.hannibal2.skyhanni.utils.RenderUtils.renderStringsAndItems
 import at.hannibal2.skyhanni.utils.SoundUtils
@@ -34,6 +35,7 @@ import java.util.Collections
 import kotlin.time.Duration.Companion.seconds
 
 object GardenCropMilestoneDisplay {
+
     private var progressDisplay = emptyList<List<Any>>()
     private var mushroomCowPerkDisplay = emptyList<List<Any>>()
     private val cultivatingData = mutableMapOf<CropType, Long>()
@@ -45,7 +47,7 @@ object GardenCropMilestoneDisplay {
 
     @SubscribeEvent
     fun onConfigLoad(event: ConfigLoadEvent) {
-        LorenzUtils.onToggle(
+        ConditionalUtils.onToggle(
             config.bestShowMaxedNeeded,
             config.highestTimeFormat,
         ) {
@@ -114,7 +116,7 @@ object GardenCropMilestoneDisplay {
             }
             cultivatingData[crop] = counter
         } catch (e: Throwable) {
-            ErrorManager.logError(e, "Updating crop counter by reading farming tool nbt data.")
+            ErrorManager.logErrorWithData(e, "Updating crop counter by reading farming tool nbt data.")
         }
     }
 
@@ -145,7 +147,7 @@ object GardenCropMilestoneDisplay {
         if (crop.isMaxed()) {
             list.add("§7" + crop.cropName + " §eMAXED")
         } else {
-            list.add("§7" + crop.cropName + " $currentTier➜$nextTier")
+            list.add("§7" + crop.cropName + " §8$currentTier➜§3$nextTier")
         }
         lineMap[1] = list
 

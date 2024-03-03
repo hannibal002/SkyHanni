@@ -9,8 +9,8 @@ import at.hannibal2.skyhanni.events.LorenzToolTipEvent
 import at.hannibal2.skyhanni.events.RenderInventoryItemTipEvent
 import at.hannibal2.skyhanni.features.garden.CropType
 import at.hannibal2.skyhanni.features.garden.GardenAPI
+import at.hannibal2.skyhanni.utils.CollectionUtils.indexOfFirst
 import at.hannibal2.skyhanni.utils.LorenzUtils
-import at.hannibal2.skyhanni.utils.LorenzUtils.indexOfFirst
 import at.hannibal2.skyhanni.utils.LorenzUtils.round
 import at.hannibal2.skyhanni.utils.NumberUtil
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
@@ -18,6 +18,7 @@ import at.hannibal2.skyhanni.utils.StringUtils
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
 class GardenCropMilestoneInventory {
+
     private var average = -1.0
     private val config get() = GardenAPI.config
 
@@ -58,7 +59,7 @@ class GardenCropMilestoneInventory {
 
         val crop = GardenCropMilestones.getCropTypeByLore(event.itemStack) ?: return
         val tier = GardenCropMilestones.getTierForCropCount(crop.getCounter(), crop)
-        if (tier > 20) return
+        if (tier >= 20) return
 
         val maxTier = GardenCropMilestones.getMaxTier()
         val maxCounter = GardenCropMilestones.getCropsForTier(maxTier, crop)
@@ -72,7 +73,7 @@ class GardenCropMilestoneInventory {
         val percentageFormat = LorenzUtils.formatPercentage(percentage)
 
         event.toolTip.add(index, " ")
-        val progressBar = StringUtils.progressBar(percentage)
+        val progressBar = StringUtils.progressBar(percentage, 19)
         event.toolTip.add(index, "$progressBar §e${counter.addSeparators()}§6/§e${NumberUtil.format(maxCounter)}")
         event.toolTip.add(index, "§7Progress to Tier $maxTier: §e$percentageFormat")
     }

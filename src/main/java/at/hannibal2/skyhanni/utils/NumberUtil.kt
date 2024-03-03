@@ -7,6 +7,7 @@ import kotlin.math.pow
 import kotlin.math.roundToInt
 
 object NumberUtil {
+
     @JvmField
     val nf: NumberFormat = NumberFormat.getInstance(Locale.US)
     private val suffixes = TreeMap<Long, String>().apply {
@@ -45,15 +46,15 @@ object NumberUtil {
     fun format(value: Number, preciseBillions: Boolean = false): String {
         @Suppress("NAME_SHADOWING")
         val value = value.toLong()
-        //Long.MIN_VALUE == -Long.MIN_VALUE so we need an adjustment here
+        // Long.MIN_VALUE == -Long.MIN_VALUE so we need an adjustment here
         if (value == Long.MIN_VALUE) return format(Long.MIN_VALUE + 1, preciseBillions)
         if (value < 0) return "-" + format(-value, preciseBillions)
 
-        if (value < 1000) return value.toString() //deal with small numbers
+        if (value < 1000) return value.toString() // deal with small numbers
 
         val (divideBy, suffix) = suffixes.floorEntry(value)
 
-        val truncated = value / (divideBy / 10) //the number part of the output times 10
+        val truncated = value / (divideBy / 10) // the number part of the output times 10
 
         val truncatedAt = if (suffix == "M") 1000 else if (suffix == "B") 1000000 else 100
 
@@ -176,7 +177,7 @@ object NumberUtil {
     }
 
     fun percentageColor(have: Long, max: Long): LorenzColor {
-        val percentage = have.toDouble() / max.toDouble()
+        val percentage = have.fractionOf(max)
         return when {
             percentage > 0.9 -> LorenzColor.DARK_GREEN
             percentage > 0.75 -> LorenzColor.GREEN
@@ -186,7 +187,35 @@ object NumberUtil {
         }
     }
 
-    fun String.formatNumber(): Long {
+    // TODO create new function formatLong, and eventually deprecate this function.
+    @Deprecated("renamed", ReplaceWith("this.formatLong()"))
+    fun String.formatNumber(): Long = formatLong()
+
+    fun String.formatDouble(): Double =
+        formatDoubleOrNull() ?: throw NumberFormatException("formatDouble failed for '$this'")
+
+    fun String.formatLong(): Long =
+        formatDoubleOrNull()?.toLong() ?: throw NumberFormatException("formatLong failed for '$this'")
+
+    fun String.formatInt(): Int =
+        formatDoubleOrNull()?.toInt() ?: throw NumberFormatException("formatInt failed for '$this'")
+
+    fun String.formatDoubleOrUserError(): Double? = formatDoubleOrNull() ?: run {
+        ChatUtils.userError("Not a valid number: '$this'")
+        return@run null
+    }
+
+    fun String.formatLongOrUserError(): Long? = formatDoubleOrNull()?.toLong() ?: run {
+        ChatUtils.userError("Not a valid number: '$this'")
+        return@run null
+    }
+
+    fun String.formatIntOrUserError(): Int? = formatDoubleOrNull()?.toInt() ?: run {
+        ChatUtils.userError("Not a valid number: '$this'")
+        return@run null
+    }
+
+    private fun String.formatDoubleOrNull(): Double? {
         var text = lowercase().replace(",", "")
 
         val multiplier = if (text.endsWith("k")) {
@@ -199,11 +228,28 @@ object NumberUtil {
             text = text.substring(0, text.length - 1)
             1.bilion
         } else 1.0
-        val d = text.toDouble()
-        return (d * multiplier).toLong()
+        return text.toDoubleOrNull()?.let {
+            it * multiplier
+        }
     }
 
     val Int.milion get() = this * 1_000_000.0
     private val Int.bilion get() = this * 1_000_000_000.0
     val Double.milion get() = (this * 1_000_000.0).toLong()
+
+    /** @return clamped to [0.0, 1.0]**/
+    fun Number.fractionOf(maxValue: Number) = maxValue.toDouble().takeIf { it != 0.0 }?.let { max ->
+        this.toDouble() / max
+    }?.coerceIn(0.0, 1.0) ?: 1.0
+
+    fun interpolate(now: Float, last: Float, lastUpdate: Long): Float {
+        var interp = now
+        if (last >= 0 && last != now) {
+            var factor: Float = (SimpleTimeMark.now().toMillis() - lastUpdate) / 1000f
+            factor = factor.coerceIn(0f, 1f)
+            interp = last + (now - last) * factor
+        }
+        return interp
+    }
+
 }

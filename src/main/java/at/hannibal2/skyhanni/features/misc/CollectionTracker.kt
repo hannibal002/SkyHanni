@@ -4,6 +4,7 @@ import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.CollectionAPI
 import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.LorenzTickEvent
+import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName
 import at.hannibal2.skyhanni.utils.ItemUtils.name
@@ -39,32 +40,32 @@ class CollectionTracker {
         fun command(args: Array<String>) {
             if (args.isEmpty()) {
                 if (internalName == null) {
-                    LorenzUtils.userError("/shtrackcollection <item name>")
+                    ChatUtils.userError("/shtrackcollection <item name>")
                     return
                 }
-                LorenzUtils.chat("Stopped collection tracker.")
+                ChatUtils.chat("Stopped collection tracker.")
                 resetData()
                 return
             }
 
             val rawName = fixTypo(args.joinToString(" ").lowercase().replace("_", " "))
             if (rawName == "gemstone") {
-                LorenzUtils.userError("Gemstone collection is not supported!")
+                ChatUtils.userError("Gemstone collection is not supported!")
                 return
             } else if (rawName == "mushroom") {
-                LorenzUtils.userError("Mushroom collection is not supported!")
+                ChatUtils.userError("Mushroom collection is not supported!")
                 return
             }
 
-            val foundInternalName = NEUItems.getInternalNameOrNullIgnoreCase(rawName)
+            val foundInternalName = NEUItems.getInternalNameOrNull(rawName)
             if (foundInternalName == null) {
-                LorenzUtils.error("Item '$rawName' does not exist!")
+                ChatUtils.error("Item '$rawName' does not exist!")
                 return
             }
 
             val stack = foundInternalName.getItemStackOrNull()
             if (stack == null) {
-                LorenzUtils.error("Item '$rawName' does not exist!")
+                ChatUtils.error("Item '$rawName' does not exist!")
                 return
             }
             setNewCollection(foundInternalName, stack.name!!.removeColor())
@@ -97,7 +98,7 @@ class CollectionTracker {
         private fun setNewCollection(internalName: NEUInternalName, name: String) {
             val foundAmount = CollectionAPI.getCollectionCounter(internalName)
             if (foundAmount == null) {
-                LorenzUtils.userError("$name collection not found. Try to open the collection inventory!")
+                ChatUtils.userError("$name collection not found. Try to open the collection inventory!")
                 return
             }
             this.internalName = internalName
@@ -106,7 +107,7 @@ class CollectionTracker {
 
             lastAmountInInventory = countCurrentlyInInventory()
             updateDisplay()
-            LorenzUtils.chat("Started tracking $itemName §ecollection.")
+            ChatUtils.chat("Started tracking $itemName §ecollection.")
         }
 
         private fun resetData() {

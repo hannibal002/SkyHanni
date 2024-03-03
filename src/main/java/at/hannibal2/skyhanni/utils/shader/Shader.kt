@@ -1,9 +1,14 @@
 package at.hannibal2.skyhanni.utils.shader
 
+import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.LorenzUtils
+import net.minecraft.client.Minecraft
+import net.minecraft.client.renderer.OpenGlHelper
+import net.minecraft.client.resources.IReloadableResourceManager
 import net.minecraft.client.shader.ShaderLinkHelper
 import org.apache.commons.lang3.StringUtils
 import org.lwjgl.opengl.GL11
+import org.lwjgl.opengl.OpenGLException
 import java.util.function.Supplier
 
 /**
@@ -13,28 +18,74 @@ import java.util.function.Supplier
  *
  * Credit: [Shader.java](https://github.com/BiscuitDevelopment/SkyblockAddons/blob/main/src/main/java/codes/biscuit/skyblockaddons/shader/Shader.java)
  */
-abstract class Shader(vertex: String, fragment: String) {
+abstract class Shader(val vertex: String, val fragment: String) {
 
-    var shaderProgram: Int = ShaderLinkHelper.getStaticShaderLinkHelper().createProgram()
+    var shaderProgram: Int = -1
+    private var vertexShaderID: Int = -1
+    private var fragmentShaderID: Int = -1
+
     private val uniforms: MutableList<Uniform<*>> = mutableListOf()
 
+    var created = false
+
     init {
-        val vertexShaderID = ShaderManager.loadShader(ShaderType.VERTEX, vertex)
+        recompile()
+        (Minecraft.getMinecraft().resourceManager as IReloadableResourceManager).registerReloadListener {
+            recompile()
+        }
+    }
+
+    fun deleteOldShaders() {
+        if (vertexShaderID >= 0) {
+            OpenGlHelper.glDeleteShader(vertexShaderID)
+            vertexShaderID = -1
+        }
+        if (fragmentShaderID >= 0) {
+            OpenGlHelper.glDeleteShader(fragmentShaderID)
+            fragmentShaderID = -1
+        }
+        if (shaderProgram >= 0) {
+            OpenGlHelper.glDeleteProgram(shaderProgram)
+            shaderProgram = -1
+        }
+        uniforms.clear()
+        created = false
+    }
+
+    fun recompile() {
+        deleteOldShaders()
+        shaderProgram = ShaderLinkHelper.getStaticShaderLinkHelper().createProgram()
+        if (shaderProgram < 0) return
+
+        vertexShaderID = ShaderManager.loadShader(ShaderType.VERTEX, vertex)
+        if (vertexShaderID < 0) return
         ShaderManager.attachShader(shaderProgram, vertexShaderID)
-        val fragmentShaderID = ShaderManager.loadShader(ShaderType.FRAGMENT, fragment)
+
+        fragmentShaderID = ShaderManager.loadShader(ShaderType.FRAGMENT, fragment)
+        if (fragmentShaderID < 0) return
         ShaderManager.attachShader(shaderProgram, fragmentShaderID)
 
         ShaderHelper.glLinkProgram(shaderProgram)
 
-        val linkStatus = ShaderHelper.glGetProgrami(shaderProgram, ShaderHelper.GL_LINK_STATUS)
-        if (linkStatus == GL11.GL_FALSE) {
-            LorenzUtils.consoleLog(
-                "Error occurred when linking program with Vertex Shader: $vertex and Fragment Shader: $fragment : " +
-                    StringUtils.trim(ShaderHelper.glGetProgramInfoLog(shaderProgram, 1024))
-            )
+        if (ShaderHelper.glGetProgrami(shaderProgram, ShaderHelper.GL_LINK_STATUS) == GL11.GL_FALSE) {
+            val errorMessage = "Failed to link vertex shader $vertex and fragment shader $fragment. Features that " +
+                "utilise this shader will not work correctly, if at all"
+            val errorLog = StringUtils.trim(ShaderHelper.glGetShaderInfoLog(shaderProgram, 1024))
+
+            if (ShaderManager.inWorld()) {
+                ErrorManager.logErrorWithData(
+                    OpenGLException("Shader linking error."),
+                    errorMessage,
+                    "Link Error:\n" to errorLog
+                )
+            } else {
+                LorenzUtils.consoleLog("$errorMessage $errorLog")
+            }
+            return
         }
 
         this.registerUniforms()
+        created = true
     }
 
     abstract fun registerUniforms()

@@ -6,7 +6,7 @@ import at.hannibal2.skyhanni.events.ConfigLoadEvent
 import at.hannibal2.skyhanni.events.LorenzEvent
 import at.hannibal2.skyhanni.events.PreInitFinishedEvent
 import at.hannibal2.skyhanni.events.RepositoryReloadEvent
-import at.hannibal2.skyhanni.utils.LorenzUtils.afterChange
+import at.hannibal2.skyhanni.utils.ConditionalUtils.afterChange
 import at.hannibal2.skyhanni.utils.StringUtils.matches
 import net.minecraft.launchwrapper.Launch
 import net.minecraftforge.fml.common.FMLCommonHandler
@@ -19,6 +19,7 @@ import java.util.regex.PatternSyntaxException
  * Manages [RepoPattern]s.
  */
 object RepoPatternManager {
+
     val allPatterns: Collection<RepoPatternImpl> get() = usedKeys.values
 
     /**
@@ -38,7 +39,12 @@ object RepoPatternManager {
     private var usedKeys = mutableMapOf<String, RepoPatternImpl>()
 
     private var wasPreinitialized = false
-    private val isInDevEnv = Launch.blackboard["fml.deobfuscatedEnvironment"] as Boolean
+    private val isInDevEnv = try {
+        Launch.blackboard["fml.deobfuscatedEnvironment"] as Boolean
+    } catch (_: Exception) {
+        true
+    }
+
     private val config get() = SkyHanniMod.feature.dev.repoPattern
 
     /**
@@ -72,7 +78,6 @@ object RepoPatternManager {
         reloadPatterns()
     }
 
-
     @SubscribeEvent
     fun onConfigInit(event: ConfigLoadEvent) {
         config.forceLocal.afterChange { reloadPatterns() }
@@ -104,13 +109,13 @@ object RepoPatternManager {
         }
     }
 
-    val keyShape = Pattern.compile("^(?:[a-z0-9A-Z]+\\.)*[a-z0-9A-Z]+$")
+    val keyShape = Pattern.compile("^(?:[a-z0-9]+\\.)*[a-z0-9]+$")
 
     /**
      * Verify that a key has a valid shape or throw otherwise.
      */
     fun verifyKeyShape(key: String) {
-        require(keyShape.matches(key))
+        require(keyShape.matches(key)) { "pattern key: \"$key\" failed shape requirements" }
     }
 
     /**

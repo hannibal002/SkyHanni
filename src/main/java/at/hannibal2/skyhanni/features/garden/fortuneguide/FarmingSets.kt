@@ -4,8 +4,9 @@ enum class FarmingSets(
     val helmetIncrease: Double,
     val chestplateIncrease: Double,
     val leggingsIncrease: Double,
-    val bootsIncrease: Double
+    val bootsIncrease: Double,
 ) {
+
     MELON(15.0, 20.0, 20.0, 15.0),
     CROPIE(15.0, 20.0, 20.0, 15.0),
     SQUASH(15.0, 20.0, 20.0, 15.0),

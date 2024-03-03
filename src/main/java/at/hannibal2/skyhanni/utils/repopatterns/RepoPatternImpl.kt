@@ -10,6 +10,7 @@ class RepoPatternImpl(
     override val defaultPattern: String,
     override val key: String,
 ) : RepoPattern {
+
     var compiledPattern: Pattern = Pattern.compile(defaultPattern)
     var wasLoadedRemotely = false
     override var wasOverridden = false
@@ -36,7 +37,6 @@ class RepoPatternImpl(
         val owner = RepoPatternKeyOwner(thisRef?.javaClass, property)
         RepoPatternManager.checkExclusivity(owner, key)
     }
-
 
     override val value: Pattern
         get() {
