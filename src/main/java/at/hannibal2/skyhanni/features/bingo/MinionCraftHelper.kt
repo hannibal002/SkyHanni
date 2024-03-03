@@ -275,12 +275,6 @@ class MinionCraftHelper {
 
     @SubscribeEvent
     fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
-        event.transform(19, "#player.bingoSessions") { element ->
-            for ((_, data) in element.asJsonObject.entrySet()) {
-                fixTierOneMinions(data.asJsonObject)
-            }
-            element
-        }
         event.transform(26, "#player.bingoSessions") { element ->
             for ((_, data) in element.asJsonObject.entrySet()) {
                 fixTierOneMinions(data.asJsonObject)
