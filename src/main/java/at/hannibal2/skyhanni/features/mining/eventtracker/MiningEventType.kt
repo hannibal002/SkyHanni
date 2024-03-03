@@ -20,9 +20,8 @@ enum class MiningEventType(
     MITHRIL_GOURMAND("MITHRIL GOURMAND", "Gourmand", 10.minutes, 'b'),
     ;
 
-    override fun toString(): String {
-        return if (config.compressedFormat) "§$colourCode$shortName" else "§$colourCode$eventName"
-    }
+    override fun toString() =
+        if (config.compressedFormat) "§$colourCode$shortName" else "§$colourCode$eventName"
 
     fun toPastString(): String {
         return if (config.compressedFormat) "§7$shortName" else "§7$eventName"
