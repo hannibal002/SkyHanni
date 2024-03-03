@@ -107,7 +107,7 @@ class Mob(
             if (extraEntities.isNotEmpty()) makeRelativeBoundingBox() else null // Inlined updateBoundingBox()
 
         owner = (ownerName ?: if (mobType == Type.Slayer) hologram2?.let {
-            summonOwnerPattern.matchMatcher(it.cleanName()) { this.group(1) }
+            summonOwnerPattern.matchMatcher(it.cleanName()) { this.group("name") }
         } else null)?.let { MobUtils.OwnerShip(it) }
     }
 
