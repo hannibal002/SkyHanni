@@ -65,7 +65,7 @@ object MiningEventDisplay {
 
     private fun formatUpcomingEvents(events: List<RunningEventType>, lastEvent: MiningEventType?): String {
         val upcoming = events.filter { !it.endsAt.asTimeMark().isInPast() }
-            .map { if (it.isDouble) "${it.event} §8-> ${it.event}" else it.event.toString() }
+            .map { if (it.isDoubleEvent) "${it.event} §8-> ${it.event}" else it.event.toString() }
             .toMutableList()
 
         if (upcoming.isEmpty()) upcoming.add("§7???")

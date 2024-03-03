@@ -38,5 +38,5 @@ data class RunningEventType(
     @Expose val event: MiningEventType,
     @Expose @SerializedName("ends_at") val endsAt: Long,
     @Expose @SerializedName("lobby_count") val lobbyCount: Int,
-    @Expose @SerializedName("is_double") val isDouble: Boolean
+    @Expose @SerializedName("is_double") val isDoubleEvent: Boolean
 )
