@@ -19,7 +19,7 @@ public class GetFromSackConfig {
     public boolean bazaarGFS = false;
 
     @Expose
-    @ConfigOption(name = "Super Craft GfS", desc = "Send a clickable message after super crafting an item that grabs the item from your sacks when clicked.")
+    @ConfigOption(name = "Super Craft GfS", desc = "Send a clickable message after supercrafting an item that grabs the item from your sacks when clicked.")
     @ConfigEditorBoolean
     @FeatureToggle
     public boolean superCraftGFS = true;
