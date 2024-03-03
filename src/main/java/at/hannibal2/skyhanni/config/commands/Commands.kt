@@ -14,7 +14,6 @@ import at.hannibal2.skyhanni.features.bingo.card.nextstephelper.BingoNextStepHel
 import at.hannibal2.skyhanni.features.chat.Translator
 import at.hannibal2.skyhanni.features.combat.endernodetracker.EnderNodeTracker
 import at.hannibal2.skyhanni.features.combat.ghostcounter.GhostUtil
-import at.hannibal2.skyhanni.features.commands.LimboCommands
 import at.hannibal2.skyhanni.features.commands.PartyCommands
 import at.hannibal2.skyhanni.features.commands.WikiManager
 import at.hannibal2.skyhanni.features.event.diana.AllBurrowsList
@@ -50,6 +49,7 @@ import at.hannibal2.skyhanni.features.misc.CollectionTracker
 import at.hannibal2.skyhanni.features.misc.LockMouseLook
 import at.hannibal2.skyhanni.features.misc.MarkedPlayerManager
 import at.hannibal2.skyhanni.features.misc.discordrpc.DiscordRPCManager
+import at.hannibal2.skyhanni.features.misc.limbo.LimboTimeTracker
 import at.hannibal2.skyhanni.features.misc.massconfiguration.DefaultConfigFeatures
 import at.hannibal2.skyhanni.features.misc.visualwords.VisualWordGui
 import at.hannibal2.skyhanni.features.rift.area.westvillage.VerminTracker
@@ -287,17 +287,9 @@ object Commands {
             FarmingMilestoneCommand::onComplete
         )
         registerCommand(
-            "shlimbopb",
-            "Prints your Limbo Personal Best"
-        ) { LimboCommands.printPB() }
-        registerCommand(
-            "shlimboplaytime",
-            "Prints your Limbo Playtime"
-        ) { LimboCommands.printPlaytime() }
-        registerCommand(
-            "shlimbopt",
-            "Prints your Limbo Playtime"
-        ) { LimboCommands.printPlaytime() }
+            "shlimbo",
+            "Prints your Limbo Stats!"
+        ) { LimboTimeTracker().printStats() }
     }
 
     private fun usersBugFix() {

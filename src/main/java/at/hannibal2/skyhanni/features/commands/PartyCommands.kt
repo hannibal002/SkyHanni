@@ -5,6 +5,7 @@ import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.data.FriendAPI
 import at.hannibal2.skyhanni.data.PartyAPI
 import at.hannibal2.skyhanni.events.MessageSendToServerEvent
+import at.hannibal2.skyhanni.features.misc.limbo.LimboTimeTracker
 import at.hannibal2.skyhanni.utils.ChatUtils
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
@@ -42,8 +43,8 @@ object PartyCommands {
 
     fun transfer(args: Array<String>) {
         if (args.isEmpty()) {
-            if (LimboCommands.inLimbo) {
-                LimboCommands.printPlaytime(true)
+            if (LimboTimeTracker().inLimbo) {
+                LimboTimeTracker().printStats(true)
                 return
             }
             ChatUtils.sendCommandToServer("pt")

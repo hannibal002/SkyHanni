@@ -1,6 +1,7 @@
 package at.hannibal2.skyhanni.features.misc.limbo
 
 import at.hannibal2.skyhanni.SkyHanniMod
+import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.data.HypixelData
 import at.hannibal2.skyhanni.data.ProfileStorageData
 import at.hannibal2.skyhanni.events.ConfigLoadEvent
@@ -9,7 +10,6 @@ import at.hannibal2.skyhanni.events.LorenzChatEvent
 import at.hannibal2.skyhanni.events.LorenzTickEvent
 import at.hannibal2.skyhanni.events.LorenzWorldChangeEvent
 import at.hannibal2.skyhanni.events.MessageSendToServerEvent
-import at.hannibal2.skyhanni.features.commands.LimboCommands
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.LocationUtils.isPlayerInside
 import at.hannibal2.skyhanni.utils.LorenzUtils
@@ -29,7 +29,7 @@ class LimboTimeTracker {
     private val config get() = SkyHanniMod.feature.misc
 
     private var limboJoinTime = SimpleTimeMark.farPast()
-    private var inLimbo = false
+    var inLimbo = false
     private var inFakeLimbo = false
     private var shownPB = false
     private var oldPB: Duration = 0.seconds
@@ -45,7 +45,6 @@ class LimboTimeTracker {
         if (event.message == "§cYou are AFK. Move around to return from AFK." || event.message == "§cYou were spawned in Limbo.") {
             limboJoinTime = SimpleTimeMark.now()
             inLimbo = true
-            LimboCommands.enterLimbo(limboJoinTime)
             onFire = Minecraft.getMinecraft().thePlayer.isBurning
         }
     }
@@ -64,7 +63,7 @@ class LimboTimeTracker {
     fun catchPlaytime(event: MessageSendToServerEvent) {
         if (event.message.startsWith("/playtime") && inLimbo) {
             event.isCanceled
-            LimboCommands.printPlaytime(true)
+            printStats(true)
         }
     }
 
@@ -83,7 +82,6 @@ class LimboTimeTracker {
                 if (inFakeLimbo) return
                 limboJoinTime = SimpleTimeMark.now()
                 inLimbo = true
-                LimboCommands.enterLimbo(limboJoinTime)
                 inFakeLimbo = true
             }
             else {
@@ -141,10 +139,24 @@ class LimboTimeTracker {
         shownPB = false
     }
 
-//     @SubscribeEvent
-//     fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
-//         event.move(-1, oldPath = "config.limboTimePB", newPath = "storage.personalBest")
-//     }
+     @SubscribeEvent
+     fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
+         event.move(3, oldPath = "misc.limboTimePB", newPath = "storage.personalBest")
+     }
+
+    fun printStats(onlyPlaytime: Boolean = false) {
+        val timeInLimbo = if (inLimbo) limboJoinTime.passedSince().inWholeSeconds else 0
+        val playtime = (storage?.playtime ?: 0) + limboJoinTime.passedSince().inWholeSeconds
+        if (onlyPlaytime) {
+            ChatUtils.chat("§aYou have ${playtime/3600} hours and ${playtime%3600/60} minutes playtime!",false)
+        } else {
+            val currentPB = storage?.personalBest ?: 0
+            val userLuck = storage?.userLuck ?: 0f
+            val limboPB = if (currentPB < timeInLimbo) timeInLimbo else currentPB
+            ChatUtils.chat("§fYour current PB is §e$limboPB§f, granting you §a+${userLuck.round(2)}✴ SkyHanni User Luck§f!")
+            ChatUtils.chat("§fYou have §e${playtime.seconds} §fplaytime!")
+        }
+    }
 
     fun isEnabled() = config.showTimeInLimbo
 }

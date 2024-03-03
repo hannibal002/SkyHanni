@@ -3,6 +3,7 @@ package at.hannibal2.skyhanni.features.misc
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.events.ReceiveParticleEvent
+import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import net.minecraft.util.EnumParticleTypes
 import net.minecraftforge.client.event.RenderBlockOverlayEvent
@@ -50,5 +51,10 @@ class MiscFeatures {
     @SubscribeEvent
     fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
         event.move(2, "mobs", "combat.mobs")
+    }
+
+    @SubscribeEvent
+    fun goToLimbo() {
+        ChatUtils.sendMessageToServer("§")
     }
 }
