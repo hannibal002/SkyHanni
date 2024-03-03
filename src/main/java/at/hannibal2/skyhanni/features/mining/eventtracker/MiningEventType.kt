@@ -23,9 +23,8 @@ enum class MiningEventType(
     override fun toString() =
         if (config.compressedFormat) "§$colourCode$shortName" else "§$colourCode$eventName"
 
-    fun toPastString(): String {
-        return if (config.compressedFormat) "§7$shortName" else "§7$eventName"
-    }
+    fun toPastString() =
+        if (config.compressedFormat) "§7$shortName" else "§7$eventName"
 
     companion object {
         private val config get() = SkyHanniMod.feature.mining.miningEvent
