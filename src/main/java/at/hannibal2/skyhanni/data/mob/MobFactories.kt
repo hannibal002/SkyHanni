@@ -19,9 +19,9 @@ object MobFactories {
                 baseEntity = baseEntity,
                 mobType = Mob.Type.Slayer,
                 armorStand = armorStand,
-                name = this.group(1),
+                name = this.group("name"),
                 additionalEntities = extraEntityList,
-                levelOrTier = this.group(2).romanToDecimal()
+                levelOrTier = this.group("tier").romanToDecimal()
             )
         }
 
