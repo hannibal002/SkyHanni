@@ -6,19 +6,24 @@ import at.hannibal2.skyhanni.events.LorenzChatEvent
 import at.hannibal2.skyhanni.utils.DelayedRun
 import at.hannibal2.skyhanni.utils.NEUInternalName
 import at.hannibal2.skyhanni.utils.PrimitiveItemStack
+import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
+import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
 class SuperCraftFeatures {
-    private val regex = "§eYou Supercrafted §r§r§r§[^.*]([^x§]+?)(?:§r§8x(\\d+))?§r§e!".toRegex();
+    private val craftedPattern by RepoPattern.pattern(
+        "inventory.supercrafting.craft",
+        "§eYou Supercrafted §r§r§r§[^.*]([^x§]+?)(?:§r§8x(\\d+))?§r§e!"
+    )
     private val config get() = SkyHanniMod.feature.inventory.gfs
 
     @SubscribeEvent
     fun onChat(event: LorenzChatEvent) {
         if (!config.superCraftGFS) return
-        regex.matchEntire(event.message)?.let {
-            if (GetFromSackAPI.sackListInternalNames.contains(NEUInternalName.fromItemName(it.groups[1].toString()).asString())) {
+        craftedPattern.matchMatcher(event.message) {
+            if (GetFromSackAPI.sackListInternalNames.contains(NEUInternalName.fromItemName(this.group(1)).asString())) {
                 DelayedRun.runNextTick {
-                    GetFromSackAPI.getFromChatMessageSackItems(PrimitiveItemStack(NEUInternalName.fromItemName(it.groups[1].toString()), it.groups[2]?.value?.toInt() ?: 1));
+                    GetFromSackAPI.getFromChatMessageSackItems(PrimitiveItemStack(NEUInternalName.fromItemName(this.group(1)), this.group(2)?.toInt() ?: 1));
                 }
             }
         }
