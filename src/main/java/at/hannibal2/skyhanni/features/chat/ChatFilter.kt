@@ -264,6 +264,7 @@ class ChatFilter {
         "§bNew day! §r§eYour §r§2Sky Mall §r§ebuff changed!",
         "§8§oYou can disable this messaging by toggling Sky Mall in your /hotm!",
         "§e[NPC] Jacob§f: §rMy contest has started!",
+        "§eObtain a §r§6Booster Cookie §r§efrom the community shop in the hub!",
     )
 
     private val anitaFortunePattern by RepoPattern.pattern(
