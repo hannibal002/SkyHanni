@@ -17,4 +17,10 @@ public class GetFromSackConfig {
     @ConfigOption(name = "Bazaar GfS", desc = "If you don't have enough items in sack get a prompt to buy them from bazaar.")
     @ConfigEditorBoolean
     public boolean bazaarGFS = false;
+
+    @Expose
+    @ConfigOption(name = "Super Craft GfS", desc = "Send a clickable message after super crafting an item that grabs the item from your sacks when clicked.")
+    @ConfigEditorBoolean
+    @FeatureToggle
+    public boolean superCraftGFS = true;
 }
