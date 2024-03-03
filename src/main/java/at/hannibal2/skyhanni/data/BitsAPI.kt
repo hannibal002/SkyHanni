@@ -7,6 +7,7 @@ import at.hannibal2.skyhanni.events.ScoreboardChangeEvent
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.LorenzUtils
+import at.hannibal2.skyhanni.utils.NumberUtil.formatLong
 import at.hannibal2.skyhanni.utils.NumberUtil.formatNumber
 import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.StringUtils.matches
@@ -121,7 +122,7 @@ object BitsAPI {
         val message = event.message.trimWhiteSpace().removeResets()
 
         bitsFromFameRankUpChatPattern.matchMatcher(message) {
-            val amount = group("amount").formatNumber().toInt()
+            val amount = group("amount").formatLong()?.toInt() ?: return
             bitsToClaim += amount
 
             return
@@ -145,7 +146,7 @@ object BitsAPI {
             if (cookieStack != null) {
                 for (line in cookieStack.getLore()) {
                     bitsAvailableMenuPattern.matchMatcher(line) {
-                        bitsToClaim = group("toClaim").formatNumber().toInt()
+                        bitsToClaim = group("toClaim").formatLong()?.toInt() ?: return
 
                         return
                     }
@@ -176,5 +177,5 @@ object BitsAPI {
         }
     }
 
-    fun isEnabled() = LorenzUtils.inSkyBlock
+    fun isEnabled() = LorenzUtils.inSkyBlock && profileStorage != null
 }
