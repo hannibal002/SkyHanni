@@ -43,8 +43,8 @@ object PartyCommands {
 
     fun transfer(args: Array<String>) {
         if (args.isEmpty()) {
-            if (LimboTimeTracker().inLimbo) {
-                LimboTimeTracker().printStats(true)
+            if (LimboTimeTracker.inLimbo) {
+                LimboTimeTracker.printStats(true)
                 return
             }
             ChatUtils.sendCommandToServer("pt")

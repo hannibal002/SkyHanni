@@ -5,6 +5,7 @@ import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.data.HypixelData
 import at.hannibal2.skyhanni.data.ProfileStorageData
 import at.hannibal2.skyhanni.events.ConfigLoadEvent
+import at.hannibal2.skyhanni.events.DebugDataCollectEvent
 import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.LorenzChatEvent
 import at.hannibal2.skyhanni.events.LorenzTickEvent
@@ -24,7 +25,7 @@ import kotlin.time.Duration
 import kotlin.time.Duration.Companion.seconds
 import kotlin.time.DurationUnit
 
-class LimboTimeTracker {
+object LimboTimeTracker {
     private val storage get() = ProfileStorageData.playerSpecific?.limbo
     private val config get() = SkyHanniMod.feature.misc
 
@@ -116,12 +117,12 @@ class LimboTimeTracker {
         if (!isEnabled()) return
         val passedSince = limboJoinTime.passedSince()
         val duration = passedSince.format()
-        val currentPB = config.limboTimePB.seconds
+        val currentPB = (storage?.personalBest ?: 0).seconds
         val oldLuck = storage?.userLuck ?: 0f
         if (passedSince > currentPB) {
             oldPB = currentPB
-            config.limboTimePB = passedSince.toInt(DurationUnit.SECONDS)
-            userLuck = (config.limboTimePB * userLuckMultiplier).round(2)
+            storage?.personalBest = passedSince.toInt(DurationUnit.SECONDS)
+            userLuck = ((storage?.personalBest ?: 0) * userLuckMultiplier).round(2)
             if (onFire) userLuck *= fireMultiplier
             ChatUtils.chat("§fYou were in Limbo for §e$duration§f! §d§lPERSONAL BEST§r§f!")
             ChatUtils.chat("§fYour previous Personal Best was §e$oldPB.")
@@ -145,17 +146,37 @@ class LimboTimeTracker {
      }
 
     fun printStats(onlyPlaytime: Boolean = false) {
-        val timeInLimbo = if (inLimbo) limboJoinTime.passedSince().inWholeSeconds else 0
-        val playtime = (storage?.playtime ?: 0) + limboJoinTime.passedSince().inWholeSeconds
+        val timeInLimbo: Int = if (inLimbo) limboJoinTime.passedSince().inWholeSeconds.toInt() else 0
+        val playtime: Int = if (inLimbo) (storage?.playtime ?: 0) + limboJoinTime.passedSince().inWholeSeconds.toInt() else storage?.playtime ?: 0
         if (onlyPlaytime) {
             ChatUtils.chat("§aYou have ${playtime/3600} hours and ${playtime%3600/60} minutes playtime!",false)
         } else {
             val currentPB = storage?.personalBest ?: 0
             val userLuck = storage?.userLuck ?: 0f
-            val limboPB = if (currentPB < timeInLimbo) timeInLimbo else currentPB
-            ChatUtils.chat("§fYour current PB is §e$limboPB§f, granting you §a+${userLuck.round(2)}✴ SkyHanni User Luck§f!")
+            val limboPB: Int = if (currentPB < timeInLimbo) timeInLimbo else currentPB
+            ChatUtils.chat("§fYour current PB is §e${limboPB.seconds}§f, granting you §a+${userLuck.round(2)}✴ SkyHanni User Luck§f!")
             ChatUtils.chat("§fYou have §e${playtime.seconds} §fplaytime!")
         }
+    }
+
+    @SubscribeEvent
+    fun onDebugCollect(event: DebugDataCollectEvent) {
+        event.title("Limbo")
+        if (!inLimbo) {
+            event.addIrrelevant("not in limbo")
+            return
+        }
+
+        event.addData {
+            add("inLimbo: $inLimbo")
+            add("isLimboFake: $inFakeLimbo")
+            add("since: ${limboJoinTime.passedSince()}")
+        }
+    }
+
+    @SubscribeEvent
+    fun onConfigMigrate(event: ConfigUpdaterMigrator.ConfigFixEvent) {
+
     }
 
     fun isEnabled() = config.showTimeInLimbo

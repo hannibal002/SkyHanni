@@ -290,7 +290,7 @@ object Commands {
         registerCommand(
             "shlimbo",
             "Prints your Limbo Stats!"
-        ) { LimboTimeTracker().printStats() }
+        ) { LimboTimeTracker.printStats() }
         registerCommand(
             "shgotolimbo",
             "Warps you to Limbo."

@@ -14,6 +14,7 @@ import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import io.github.moulberry.notenoughupdates.events.ReplaceItemEvent
 import io.github.moulberry.notenoughupdates.util.Utils
 import net.minecraft.client.player.inventory.ContainerLocalMenu
+import net.minecraft.item.ItemStack
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import kotlin.time.Duration.Companion.seconds
 
@@ -35,9 +36,9 @@ class LimboPlaytime {
 
     private val storage get() = ProfileStorageData.playerSpecific?.limbo
 
-    private val item = "ENDER_PEARL".asInternalName().getItemStack().item
+    private val itemID = "ENDER_PEARL".asInternalName()
     private val itemName = "§aLimbo"
-    private var limboItem = Utils.createItemStack(item, itemName)
+    private lateinit var limboItem: ItemStack
     private var lastCreateCooldown = SimpleTimeMark.farPast()
 
     @SubscribeEvent
@@ -49,8 +50,8 @@ class LimboPlaytime {
 
         if (lastCreateCooldown.passedSince() > 3.seconds) {
             lastCreateCooldown = SimpleTimeMark.now()
-            limboItem = if (wholeMinutes >= 60) Utils.createItemStack(item, itemName, "§7Playtime: §a${wholeMinutes.addSeparators()} minutes", "§7Or: §b$hoursString hours")
-            else Utils.createItemStack(item, itemName, "§7Playtime: §a$wholeMinutes minutes")
+            limboItem = if (wholeMinutes >= 60) Utils.createItemStack(itemID.getItemStack().item, itemName, "§7Playtime: §a${wholeMinutes.addSeparators()} minutes", "§7Or: §b$hoursString hours")
+            else Utils.createItemStack(itemID.getItemStack().item, itemName, "§7Playtime: §a$wholeMinutes minutes")
         }
         event.replaceWith(limboItem)
     }
