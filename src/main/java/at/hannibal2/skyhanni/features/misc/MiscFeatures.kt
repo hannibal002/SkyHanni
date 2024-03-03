@@ -53,7 +53,6 @@ class MiscFeatures {
         event.move(2, "mobs", "combat.mobs")
     }
 
-    @SubscribeEvent
     fun goToLimbo() {
         ChatUtils.sendMessageToServer("§")
     }
