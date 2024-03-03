@@ -21,7 +21,7 @@ class SuperCraftFeatures {
     fun onChat(event: LorenzChatEvent) {
         if (!config.superCraftGFS) return
         val (internalName, amount) = craftedPattern.matchMatcher(event.message) {
-            NEUInternalName.fromItemName(this.group(1)) to (this.group(2)?.toInt() ?: 1)
+            NEUInternalName.fromItemName(this.group("item")) to (this.group("amount")?.toInt() ?: 1)
         } ?: return
         if (!GetFromSackAPI.sackListInternalNames.contains(internalName.asString())) return
         DelayedRun.runNextTick {
