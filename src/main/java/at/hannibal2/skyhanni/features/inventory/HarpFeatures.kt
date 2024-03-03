@@ -107,15 +107,8 @@ object HarpFeatures {
         if (config.quickRestart && isMenuGui(event.inventoryName)) {
             openTime = SimpleTimeMark.now()
         }
-        if (config.guiScale) {
-            when {
-                isMenuGui(event.inventoryName) -> {
-                    setGUIScale()
-                }
-                isHarpGui(event.inventoryName) -> {
-                    setGUIScale()
-                }
-            }
+        if (config.guiScale && (isMenuGui(event.inventoryName) || isHarpGui(event.inventoryName))) {
+            setGUIScale()
         }
     }
 
