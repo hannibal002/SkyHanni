@@ -81,7 +81,7 @@ object TestCopyBestiaryValues {
             return
         }
         val capLine = lore.nextAfter(overallProgress) ?: return
-        val rawCap = capLine.substringAfter("/").removeColor().formatLong()
+        val rawCap = capLine.substringAfter("/").removeColor().formatInt()
         obj.cap = rawCap.toInt()
 
         val mobs = mutableListOf<String>()
