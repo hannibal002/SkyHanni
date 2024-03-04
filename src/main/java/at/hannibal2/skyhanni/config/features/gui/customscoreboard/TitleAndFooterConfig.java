@@ -10,7 +10,7 @@ public class TitleAndFooterConfig {
     @Expose
     @ConfigOption(name = "Center Title and Footer", desc = "Center the title and footer to the scoreboard width.")
     @ConfigEditorBoolean
-    public boolean centerTitleAndFooter = false;
+    public boolean centerTitleAndFooter = true;
 
     @Expose
     @ConfigOption(name = "Custom Title", desc = "What should be displayed as the title of the scoreboard.\nUse & for colors.")
@@ -18,7 +18,8 @@ public class TitleAndFooterConfig {
     public Property<String> customTitle = Property.of("&6&lSKYBLOCK");
 
     @Expose
-    @ConfigOption(name = "Use Hypixel's Title Animation", desc = "Will overwrite the custom title with Hypixel's title animation.")
+    @ConfigOption(name = "Hypixel's Title Animation", desc = "Will overwrite the custom title with Hypixel's title animation." +
+        "\nWill also include \"COOP\" if you are in a coop.")
     @ConfigEditorBoolean
     public boolean useHypixelTitleAnimation = false;
 

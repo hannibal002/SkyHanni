@@ -10,7 +10,7 @@ public class PartyConfig {
     @Expose
     @ConfigOption(name = "Max Party List", desc = "Max number of party members to show in the party list (You are not included).")
     @ConfigEditorSlider(
-        minValue = 0,
+        minValue = 1,
         maxValue = 25, // why do I even set it so high
         minStep = 1
     )

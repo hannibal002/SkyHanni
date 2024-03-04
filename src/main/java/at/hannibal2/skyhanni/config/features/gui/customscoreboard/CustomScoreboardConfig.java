@@ -9,8 +9,6 @@ import io.github.moulberry.moulconfig.annotations.ConfigEditorBoolean;
 import io.github.moulberry.moulconfig.annotations.ConfigEditorDraggableList;
 import io.github.moulberry.moulconfig.annotations.ConfigOption;
 
-import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
 public class CustomScoreboardConfig {
@@ -29,7 +27,7 @@ public class CustomScoreboardConfig {
         desc = "Drag text to change the appearance of the advanced scoreboard." // supporting both custom & advanced search
     )
     @ConfigEditorDraggableList()
-    public List<ScoreboardElements> scoreboardEntries = new ArrayList<>(Arrays.asList(ScoreboardElements.values()));
+    public List<ScoreboardElements> scoreboardEntries = ScoreboardElements.getEntries();
 
     @Expose
     @ConfigOption(name = "Display Options", desc = "")

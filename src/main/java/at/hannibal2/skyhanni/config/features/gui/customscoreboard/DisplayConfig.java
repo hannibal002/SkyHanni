@@ -12,7 +12,7 @@ public class DisplayConfig {
     @ConfigOption(name = "Hide Vanilla Scoreboard", desc = "Hide the vanilla scoreboard.")
     @ConfigEditorBoolean
     @FeatureToggle
-    public boolean hideVanillaScoreboard = false;
+    public boolean hideVanillaScoreboard = true;
 
     @Expose
     @ConfigOption(name = "Display Numbers First", desc = "Determines whether the number or line name displays first. " +

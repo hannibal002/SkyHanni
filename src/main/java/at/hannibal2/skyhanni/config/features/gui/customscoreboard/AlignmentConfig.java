@@ -8,10 +8,10 @@ public class AlignmentConfig {
     @Expose
     @ConfigOption(name = "Align to the right", desc = "Align the scoreboard to the right side of the screen.")
     @ConfigEditorBoolean
-    public boolean alignRight = false;
+    public boolean alignRight = true;
 
     @Expose
     @ConfigOption(name = "Align to the center vertically", desc = "Align the scoreboard to the center of the screen vertically.")
     @ConfigEditorBoolean
-    public boolean alignCenterVertically = false;
+    public boolean alignCenterVertically = true;
 }
