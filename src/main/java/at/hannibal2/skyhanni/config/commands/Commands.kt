@@ -9,6 +9,7 @@ import at.hannibal2.skyhanni.data.GardenCropMilestonesCommunityFix
 import at.hannibal2.skyhanni.data.GuiEditManager
 import at.hannibal2.skyhanni.data.PartyAPI
 import at.hannibal2.skyhanni.data.TitleManager
+import at.hannibal2.skyhanni.events.LorenzWorldChangeEvent
 import at.hannibal2.skyhanni.features.bingo.card.BingoCardDisplay
 import at.hannibal2.skyhanni.features.bingo.card.nextstephelper.BingoNextStepHelper
 import at.hannibal2.skyhanni.features.chat.Translator
@@ -370,9 +371,9 @@ object Commands {
             "Sets a test burrow waypoint at your location"
         ) { GriffinBurrowHelper.setTestBurrow(it) }
         registerCommand(
-            "shsimulateworldswitch",
+            "shsimulateworldchange",
             "Triggers the LorenzWorldChangeEvent."
-        ) { SkyHanniDebugsAndTests.simulateWorldChange() }
+        ) { LorenzWorldChangeEvent().postAndCatch() }
     }
 
     private fun developersCodingHelp() {
