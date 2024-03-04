@@ -16,10 +16,11 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import kotlin.time.Duration.Companion.seconds
 
 class ChickenHeadTimer {
+    private val config get() = SkyHanniMod.feature.itemAbilities.chickenHead
 
     private var hasChickenHead = false
     private var lastTime = SimpleTimeMark.farPast()
-    private val config get() = SkyHanniMod.feature.itemAbilities.chickenHead
+    private val cooldown = 5.seconds
 
     @SubscribeEvent
     fun onTick(event: LorenzTickEvent) {
@@ -52,8 +53,7 @@ class ChickenHeadTimer {
         if (!isEnabled()) return
         if (!hasChickenHead) return
 
-        val remainingTime = 5.seconds - lastTime.passedSince()
-
+        val remainingTime = cooldown - lastTime.passedSince()
         val displayText = if (remainingTime.isNegative()) {
             "Chicken Head Timer: §aNow"
         } else {

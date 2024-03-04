@@ -8,7 +8,7 @@ import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.ItemUtils.getSkullOwner
 import at.hannibal2.skyhanni.utils.ItemUtils.getSkullTexture
 import at.hannibal2.skyhanni.utils.ItemUtils.name
-import at.hannibal2.skyhanni.utils.NumberUtil.formatLong
+import at.hannibal2.skyhanni.utils.NumberUtil.formatInt
 import at.hannibal2.skyhanni.utils.OSUtils
 import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
@@ -82,7 +82,7 @@ object TestCopyBestiaryValues {
         }
         val capLine = lore.nextAfter(overallProgress) ?: return
         val rawCap = capLine.substringAfter("/").removeColor().formatInt()
-        obj.cap = rawCap.toInt()
+        obj.cap = rawCap
 
         val mobs = mutableListOf<String>()
         for (i in 10..43) {

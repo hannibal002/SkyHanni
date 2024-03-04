@@ -25,6 +25,7 @@ import at.hannibal2.skyhanni.utils.NumberUtil
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.RenderUtils.highlight
 import at.hannibal2.skyhanni.utils.RenderUtils.renderStringsAndItems
+import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.StringUtils.matches
 import at.hannibal2.skyhanni.utils.TimeUtils
@@ -114,7 +115,8 @@ class CityProjectFeatures {
         }
 
         if (config.showReady) {
-            var nextTime = Long.MAX_VALUE
+            var nextTime = SimpleTimeMark.farFuture()
+            val now = SimpleTimeMark.now()
             for ((_, item) in event.inventoryItems) {
 
                 val lore = item.getLore()
@@ -124,17 +126,17 @@ class CityProjectFeatures {
                     contributeAgainPattern.matchMatcher(line) {
                         val rawTime = group("time")
                         if (rawTime.contains("Soon!")) return@matchMatcher
-                        val duration = TimeUtils.getDuration(rawTime).inWholeMilliseconds
-                        val endTime = System.currentTimeMillis() + duration
+                        val duration = TimeUtils.getDuration(rawTime)
+                        val endTime = now + duration
                         if (endTime < nextTime) {
                             nextTime = endTime
                         }
                     }
                 }
                 if (item.name != "§eContribute this component!") continue
-                nextTime = System.currentTimeMillis()
+                nextTime = now
             }
-            ProfileStorageData.playerSpecific?.nextCityProjectParticipationTime = nextTime
+            ProfileStorageData.playerSpecific?.nextCityProjectParticipationTime = nextTime.toMillis()
         }
     }
 
