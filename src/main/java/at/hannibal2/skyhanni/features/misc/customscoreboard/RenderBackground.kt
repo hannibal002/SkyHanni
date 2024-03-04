@@ -58,26 +58,29 @@ class RenderBackground {
 
         GlStateManager.color(1f, 1f, 1f, 1f)
 
-        if (backgroundConfig.enabled && backgroundConfig.useCustomBackgroundImage) {
-            val textureLocation = ResourceLocation("skyhanni", "scoreboard.png")
-            Minecraft.getMinecraft().textureManager.bindTexture(textureLocation)
 
-            Utils.drawTexturedRect(
-                (x - backgroundConfig.borderSize).toFloat(),
-                (y - backgroundConfig.borderSize).toFloat(),
-                (elementWidth + backgroundConfig.borderSize * 3).toFloat(),
-                (elementHeight + border * 2).toFloat(),
-                GL11.GL_NEAREST
-            )
-        } else if (backgroundConfig.enabled) {
-            RenderUtils.drawRoundRect(
-                x - backgroundConfig.borderSize,
-                y - backgroundConfig.borderSize,
-                elementWidth + backgroundConfig.borderSize * 3,
-                elementHeight + backgroundConfig.borderSize * 2,
-                SpecialColour.specialToChromaRGB(backgroundConfig.color),
-                backgroundConfig.roundedCornerSmoothness
-            )
+        if (backgroundConfig.enabled) {
+            if (backgroundConfig.useCustomBackgroundImage) {
+                val textureLocation = ResourceLocation("skyhanni", "scoreboard.png")
+                Minecraft.getMinecraft().textureManager.bindTexture(textureLocation)
+
+                Utils.drawTexturedRect(
+                    (x - backgroundConfig.borderSize).toFloat(),
+                    (y - backgroundConfig.borderSize).toFloat(),
+                    (elementWidth + backgroundConfig.borderSize * 3).toFloat(),
+                    (elementHeight + border * 2).toFloat(),
+                    GL11.GL_NEAREST
+                )
+            } else {
+                RenderUtils.drawRoundRect(
+                    x - backgroundConfig.borderSize,
+                    y - backgroundConfig.borderSize,
+                    elementWidth + backgroundConfig.borderSize * 3,
+                    elementHeight + backgroundConfig.borderSize * 2,
+                    SpecialColour.specialToChromaRGB(backgroundConfig.color),
+                    backgroundConfig.roundedCornerSmoothness
+                )
+            }
         }
 
         GlStateManager.popMatrix()

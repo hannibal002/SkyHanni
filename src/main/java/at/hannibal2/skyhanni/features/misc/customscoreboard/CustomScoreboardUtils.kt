@@ -38,7 +38,7 @@ object CustomScoreboardUtils {
                 BingoAPI.getIconFromScoreboard(it) != null
             }?.let {
                 BingoAPI.getIconFromScoreboard(it) + " "
-            }?: "§e❤ "
+            } ?: "§e❤ "
 
             else -> "§e"
         }
