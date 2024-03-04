@@ -249,6 +249,7 @@ object ItemUtils {
         if (itemCategory.isEmpty()) when {
             UtilsPatterns.abiPhonePattern.matches(name) -> ItemCategory.ABIPHONE
             PetAPI.hasPetName(cleanName) -> ItemCategory.PET
+            UtilsPatterns.baitPattern.matches(cleanName) -> ItemCategory.FISHING_BAIT
             UtilsPatterns.enchantedBookPattern.matches(name) -> ItemCategory.ENCHANTED_BOOK
             UtilsPatterns.potionPattern.matches(name) -> ItemCategory.POTION
             UtilsPatterns.sackPattern.matches(name) -> ItemCategory.SACK
@@ -290,7 +291,9 @@ object ItemUtils {
     private fun itemRarityLastCheck(data: CachedItemData) =
         data.itemRarityLastCheck.asTimeMark().passedSince() > 10.seconds
 
-    // extra method for shorter name and kotlin nullability logic
+    /**
+     * Member that provides the item name, is null save or throws visual error
+     */
     var ItemStack.name: String
         get() = this.displayName ?: ErrorManager.skyHanniError(
             "Could not get name if ItemStack",

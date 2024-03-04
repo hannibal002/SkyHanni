@@ -7,8 +7,9 @@ import at.hannibal2.skyhanni.events.LorenzRenderWorldEvent
 import at.hannibal2.skyhanni.events.LorenzTickEvent
 import at.hannibal2.skyhanni.test.GriffinUtils.drawWaypointFilled
 import at.hannibal2.skyhanni.utils.InventoryUtils
+import at.hannibal2.skyhanni.utils.ItemCategory
+import at.hannibal2.skyhanni.utils.ItemUtils.getItemCategoryOrNull
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
-import at.hannibal2.skyhanni.utils.ItemUtils.name
 import at.hannibal2.skyhanni.utils.LorenzColor
 import at.hannibal2.skyhanni.utils.LorenzUtils.isInIsland
 import at.hannibal2.skyhanni.utils.LorenzVec
@@ -37,7 +38,7 @@ class OdgerWaypoint {
 
     private fun isLavaFishingRod(): Boolean {
         val heldItem = InventoryUtils.getItemInHand() ?: return false
-        val isRod = heldItem.name.contains("Rod")
+        val isRod = heldItem.getItemCategoryOrNull() == ItemCategory.FISHING_ROD
         if (!isRod) return false
 
         return heldItem.getLore().any { it.contains("Lava Rod") }

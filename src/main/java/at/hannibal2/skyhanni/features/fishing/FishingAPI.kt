@@ -12,13 +12,13 @@ import at.hannibal2.skyhanni.features.fishing.trophy.TrophyFishManager.getFillet
 import at.hannibal2.skyhanni.features.fishing.trophy.TrophyRarity
 import at.hannibal2.skyhanni.utils.BlockUtils.getBlockAt
 import at.hannibal2.skyhanni.utils.InventoryUtils
+import at.hannibal2.skyhanni.utils.ItemCategory
+import at.hannibal2.skyhanni.utils.ItemUtils.getItemCategoryOrNull
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
-import at.hannibal2.skyhanni.utils.ItemUtils.name
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.LorenzVec
 import at.hannibal2.skyhanni.utils.NEUInternalName
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
-import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.getLorenzVec
 import net.minecraft.client.Minecraft
 import net.minecraft.entity.item.EntityArmorStand
@@ -86,9 +86,7 @@ object FishingAPI {
 
     private fun NEUInternalName.isFishingRod() = contains("ROD")
 
-    fun ItemStack.isBait(): Boolean {
-        return stackSize == 1 && name.removeColor().let { it.startsWith("Obfuscated") || it.endsWith(" Bait") }
-    }
+    fun ItemStack.isBait(): Boolean = stackSize == 1 && getItemCategoryOrNull() == ItemCategory.FISHING_BAIT
 
     @SubscribeEvent
     fun onItemInHandChange(event: ItemInHandChangeEvent) {
