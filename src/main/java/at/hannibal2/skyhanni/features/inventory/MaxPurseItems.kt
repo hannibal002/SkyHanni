@@ -86,9 +86,9 @@ class MaxPurseItems {
 
         config.maxPurseItemsPosition.renderStrings(
             listOf(
-                "§eWith your current purse, you can buy order",
-                "§e${buyOrders.addSeparators()}x of this item with your purse (at top order +0.1)",
-                "§eOr ${buyInstant.addSeparators()}x with instant buy at the bazaar"
+                "§7Max items with purse",
+                "§7Buy order +0.1: §e${buyOrders.addSeparators()}x",
+                "§7Instant buy: §e${buyInstant.addSeparators()}x"
             ), posLabel = "Max Items With Purse"
         )
     }
