@@ -80,6 +80,6 @@ object UtilsPatterns {
 
     val tabListProfilePattern by patternGroup.pattern(
         "tablist.profile",
-        "(?:§l§r)?§.§lProfile: §r§a(?<profile>.*)"
+        "(?:§.)+Profile: §r§a(?<profile>.*)"
     )
 }
