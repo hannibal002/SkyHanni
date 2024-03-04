@@ -3,6 +3,7 @@ package at.hannibal2.skyhanni.features.garden
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.config.ConfigFileType
 import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
+import at.hannibal2.skyhanni.config.enums.OutsideSbFeature
 import at.hannibal2.skyhanni.config.features.garden.NextJacobContestConfig.ShareContestsEntry
 import at.hannibal2.skyhanni.events.ConfigLoadEvent
 import at.hannibal2.skyhanni.events.DebugDataCollectEvent
@@ -510,8 +511,9 @@ object GardenNextJacobContest {
         }
     }
 
-    private fun isEnabled() = LorenzUtils.inSkyBlock && config.display
-        && (GardenAPI.inGarden() || config.everywhere)
+    private fun isEnabled() =
+        config.display && ((LorenzUtils.inSkyBlock && (GardenAPI.inGarden() || config.showOutsideGarden)) ||
+            (OutsideSbFeature.NEXT_JACOB_CONTEXT.isSelected() && !LorenzUtils.inSkyBlock))
 
     private fun isFetchEnabled() = isEnabled() && config.fetchAutomatically
     private fun isSendEnabled() =
@@ -640,6 +642,7 @@ object GardenNextJacobContest {
         event.transform(15, "garden.nextJacobContests.shareAutomatically") { element ->
             ConfigUtils.migrateIntToEnum(element, ShareContestsEntry::class.java)
         }
+        event.move(18, "garden.nextJacobContests.everywhere", "garden.nextJacobContests.showOutsideGarden")
     }
 }
 
