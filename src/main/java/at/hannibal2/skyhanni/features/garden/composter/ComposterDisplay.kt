@@ -153,20 +153,20 @@ class ComposterDisplay {
     }
 
     private fun checkWarningsAndOutsideGarden() {
-        val storage = GardenAPI.storage ?: return
-
-        val format = if (storage.composterEmptyTime != 0L) {
-            val duration = storage.composterEmptyTime - System.currentTimeMillis()
-            if (duration > 0) {
-                if (duration < 1000 * 60 * 20) {
-                    warn("Your composter in the garden is almost empty!")
+        val format = GardenAPI.storage?.let {
+            if (it.composterEmptyTime != 0L) {
+                val duration = it.composterEmptyTime - System.currentTimeMillis()
+                if (duration > 0) {
+                    if (duration < 1000 * 60 * 20) {
+                        warn("Your composter in the garden is almost empty!")
+                    }
+                    TimeUtils.formatDuration(duration, maxUnits = 3)
+                } else {
+                    warn("Your composter is empty!")
+                    "§cComposter is empty!"
                 }
-                TimeUtils.formatDuration(duration, maxUnits = 3)
-            } else {
-                warn("Your composter is empty!")
-                "§cComposter is empty!"
-            }
-        } else "?"
+            } else "?"
+        } ?: "§cJoin SkyBlock to show composter timer."
 
         val inSb = LorenzUtils.inSkyBlock && config.displayOutsideGarden
         val outsideSb = !LorenzUtils.inSkyBlock && OutsideSbFeature.COMPOSTER_TIME.isSelected()
