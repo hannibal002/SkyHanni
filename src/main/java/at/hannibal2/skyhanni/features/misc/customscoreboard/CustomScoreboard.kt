@@ -39,7 +39,7 @@ class CustomScoreboard {
 
     @SubscribeEvent
     fun onRenderOverlay(event: GuiRenderEvent.GuiOverlayRenderEvent) {
-        if (!isCustomScoreboardEnabled()) return
+        if (!isEnabled()) return
         if (display.isEmpty()) return
 
         RenderBackground().renderBackground()
@@ -54,7 +54,7 @@ class CustomScoreboard {
 
     @SubscribeEvent
     fun onTick(event: LorenzTickEvent) {
-        if (!isCustomScoreboardEnabled()) return
+        if (!isEnabled()) return
 
         // Creating the lines
         if (event.isMod(5)) {
@@ -111,7 +111,6 @@ class CustomScoreboard {
         }
     }
 
-    private fun isCustomScoreboardEnabled() = LorenzUtils.inSkyBlock && config.enabled
-    private fun isHideVanillaScoreboardEnabled() =
-        isCustomScoreboardEnabled() && config.displayConfig.hideVanillaScoreboard
+    private fun isEnabled() = LorenzUtils.inSkyBlock && config.enabled
+    private fun isHideVanillaScoreboardEnabled() = isEnabled() && config.displayConfig.hideVanillaScoreboard
 }
