@@ -25,14 +25,9 @@ class PunchcardHighlight {
     private val ownIGN get() = Minecraft.getMinecraft().thePlayer.name
     private var lastRiftServer: String = ""
 
-    private val patternGroup = RepoPattern.group("rift.punchcard")
-    private val punchedPattern by patternGroup.pattern(
-        "new",
+    private val punchedPattern by RepoPattern.pattern(
+        "rift.punchcard.new",
         "§5§lPUNCHCARD! §r§eYou punched §r§[\\da-z](?:.*?)?(\\w+)§r§[\\da-z] §r§eand both regained §r§a\\+25ф Rift Time§r§e!"
-    )
-    private val repeatPattern by patternGroup.pattern(
-        "repeat",
-        ""
     )
 
     val playerList: MutableSet<String> = mutableSetOf()
