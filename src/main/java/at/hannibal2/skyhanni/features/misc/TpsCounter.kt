@@ -91,7 +91,7 @@ class TpsCounter {
         config.tpsDisplayPosition.renderString(display, posLabel = "Tps Display")
     }
 
-    private fun isEnabled() = config.tpsDisplay && LorenzUtils.onHypixel &&
+    private fun isEnabled() = LorenzUtils.onHypixel && config.tpsDisplay &&
         (LorenzUtils.inSkyBlock || OutsideSbFeature.TPS_DISPLAY.isSelected())
 
     @SubscribeEvent
