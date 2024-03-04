@@ -72,6 +72,8 @@ object BingoAPI {
 
     fun getRankFromScoreboard(text: String) = if (detectionPattern.matches(text)) getRank(text) else null
 
+    fun getIconFromScoreboard(text: String) = getRankFromScoreboard(text)?.let { getIcon(it) }
+
     fun getRank(text: String) = ranks.entries.find { text.contains(it.key) }?.value
 
     fun getIcon(searchRank: Int) = ranks.entries.find { it.value == searchRank }?.key

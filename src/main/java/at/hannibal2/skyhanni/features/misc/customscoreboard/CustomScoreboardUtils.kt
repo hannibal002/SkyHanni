@@ -4,23 +4,23 @@ import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.config.features.gui.customscoreboard.DisplayConfig
 import at.hannibal2.skyhanni.data.HypixelData
 import at.hannibal2.skyhanni.data.ScoreboardData
-import at.hannibal2.skyhanni.mixins.transformers.AccessorGuiPlayerTabOverlay
+import at.hannibal2.skyhanni.features.bingo.BingoAPI
 import at.hannibal2.skyhanni.utils.NumberUtil
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
-import at.hannibal2.skyhanni.utils.NumberUtil.formatNumber
+import at.hannibal2.skyhanni.utils.NumberUtil.formatDouble
 import at.hannibal2.skyhanni.utils.RenderUtils.HorizontalAlignment
 import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.StringUtils.removeResets
-import at.hannibal2.skyhanni.utils.StringUtils.trimWhiteSpaceAndResets
-import net.minecraft.client.Minecraft
+import at.hannibal2.skyhanni.utils.StringUtils.trimWhiteSpace
+import at.hannibal2.skyhanni.utils.TabListData
 import java.util.regex.Pattern
 
 object CustomScoreboardUtils {
     private val config get() = SkyHanniMod.feature.gui.customScoreboard
-    val numberFormat get() = config.displayConfig.numberFormat
+    private val numberFormat get() = config.displayConfig.numberFormat
 
-    fun getGroupFromPattern(list: List<String>, pattern: Pattern, group: String): String {
-        val matchedLine = list.map { it.removeResets().trimWhiteSpaceAndResets().removeResets() }
+    internal fun getGroupFromPattern(list: List<String>, pattern: Pattern, group: String): String {
+        val matchedLine = list.map { it.removeResets().trimWhiteSpace() }
             .firstNotNullOfOrNull { line ->
                 pattern.matchMatcher(line) {
                     group(group)
@@ -32,35 +32,37 @@ object CustomScoreboardUtils {
 
     fun getProfileTypeSymbol(): String {
         return when {
-            HypixelData.ironman -> "§7♲ " // Ironman
-            HypixelData.stranded -> "§a☀ " // Stranded
-            HypixelData.bingo -> ScoreboardData.sidebarLines.firstOrNull { it.contains("Bingo") }?.substring(
-                0,
-                3
-            ) + "Ⓑ " // Bingo - gets the first 3 chars of " §9Ⓑ §9Bingo" (you are unable to get the Ⓑ for some reason)
-            else -> "§e" // Default case
+            HypixelData.ironman -> "§7♲ "
+            HypixelData.stranded -> "§a☀ "
+            HypixelData.bingo -> ScoreboardData.sidebarLinesFormatted.firstOrNull {
+                BingoAPI.getIconFromScoreboard(it) != null
+            }?.let {
+                BingoAPI.getIconFromScoreboard(it) + " "
+            }?: "§e❤ "
+
+            else -> "§e"
         }
     }
 
     fun getTablistFooter(): String {
-        val tabList = Minecraft.getMinecraft().ingameGUI.tabList as AccessorGuiPlayerTabOverlay
+        val tabList = TabListData.getPlayerTabOverlay()
         if (tabList.footer_skyhanni == null) return ""
         return tabList.footer_skyhanni.formattedText.replace("§r", "")
     }
 
-    fun getTitleAndFooterAlignment() = when (config.displayConfig.titleAndFooter.centerTitleAndFooter) {
+    internal fun getTitleAndFooterAlignment() = when (config.displayConfig.titleAndFooter.centerTitleAndFooter) {
         true -> HorizontalAlignment.CENTER
         false -> HorizontalAlignment.LEFT
     }
 
-    fun Int.formatNum(): String = when (numberFormat) {
+    internal fun Int.formatNum(): String = when (numberFormat) {
         DisplayConfig.NumberFormat.SHORT -> NumberUtil.format(this)
         DisplayConfig.NumberFormat.LONG -> this.addSeparators()
         else -> "0"
     }
 
-    fun String.formatNum(): String {
-        val number = this.formatNumber()//replace(",", "").toIntOrNull() ?: return "0"
+    internal fun String.formatNum(): String {
+        val number = this.formatDouble()
 
         return when (numberFormat) {
             DisplayConfig.NumberFormat.SHORT -> NumberUtil.format(number)
