@@ -344,7 +344,7 @@ object ItemUtils {
 
     private fun makePair(input: String, itemName: String, matcher: Matcher): Pair<String, Int> {
         val matcherAmount = matcher.group("amount")
-        val amount = matcherAmount.formatInt()
+        val amount = matcherAmount?.formatInt() ?: 1
         val pair = Pair(itemName, amount)
         itemAmountCache[input] = pair
         return pair
