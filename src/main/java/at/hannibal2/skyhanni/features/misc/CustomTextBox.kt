@@ -26,8 +26,18 @@ class CustomTextBox {
     private fun String.format() = replace("&", "§").split("\\n").toList()
 
     @SubscribeEvent
+    fun onRenderGUIOverlay(event: GuiRenderEvent.ChestGuiOverlayRenderEvent) {
+        if (!config.enabled) return
+        if (!config.onlyInGUI) return
+        if (!LorenzUtils.inSkyBlock) return
+
+        config.position.renderStrings(display, posLabel = "Custom Text Box")
+    }
+
+    @SubscribeEvent
     fun onRenderOverlay(event: GuiRenderEvent.GuiOverlayRenderEvent) {
         if (!config.enabled) return
+        if (config.onlyInGUI) return
         if (!LorenzUtils.inSkyBlock) return
 
         config.position.renderStrings(display, posLabel = "Custom Text Box")

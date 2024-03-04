@@ -170,7 +170,7 @@ object GardenVisitorDropStatistics {
             )
         } else {
             addAsSingletonList("§c?")
-            ErrorManager.logError(
+            ErrorManager.logErrorWithData(
                 RuntimeException("visitorRarities is empty, maybe visitor refusing was the cause?"),
                 "Error rendering visitor drop statistics"
             )

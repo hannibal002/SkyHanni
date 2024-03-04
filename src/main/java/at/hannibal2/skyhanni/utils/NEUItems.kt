@@ -2,8 +2,9 @@ package at.hannibal2.skyhanni.utils
 
 import at.hannibal2.skyhanni.config.ConfigManager
 import at.hannibal2.skyhanni.data.jsonobjects.repo.MultiFilterJson
+import at.hannibal2.skyhanni.events.NeuRepositoryReloadEvent
 import at.hannibal2.skyhanni.events.RepositoryReloadEvent
-import at.hannibal2.skyhanni.features.bazaar.BazaarDataHolder
+import at.hannibal2.skyhanni.features.inventory.bazaar.BazaarDataHolder
 import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.ItemBlink.checkBlinkItem
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName
@@ -40,6 +41,7 @@ object NEUItems {
     private val ingredientsCache = mutableMapOf<NeuRecipe, Set<Ingredient>>()
 
     var allItemsCache = mapOf<String, NEUInternalName>() // item name -> internal name
+    val allInternalNames = mutableListOf<NEUInternalName>()
     val ignoreItemsFilter = MultiFilter()
 
     private val fallbackItem by lazy {
@@ -56,15 +58,22 @@ object NEUItems {
         ignoreItemsFilter.load(ignoredItems)
     }
 
+    @SubscribeEvent
+    fun onNeuRepoReload(event: NeuRepositoryReloadEvent) {
+        allItemsCache = readAllNeuItems()
+    }
+
     @Deprecated("Use NEUInternalName rather than String", ReplaceWith("getInternalNameFromItemName()"))
     fun getRawInternalName(itemName: String): String = NEUInternalName.fromItemName(itemName).asString()
 
     fun readAllNeuItems(): Map<String, NEUInternalName> {
+        allInternalNames.clear()
         val map = mutableMapOf<String, NEUInternalName>()
         for (rawInternalName in allNeuRepoItems().keys) {
             val name = manager.createItem(rawInternalName).displayName.removeColor().lowercase()
             val internalName = rawInternalName.asInternalName()
             map[name] = internalName
+            allInternalNames.add(internalName)
         }
         return map
     }
@@ -130,11 +139,13 @@ object NEUItems {
         getItemStackOrNull() ?: run {
             getPriceOrNull() ?: return@run fallbackItem
             if (ignoreItemsFilter.match(this.asString())) return@run fallbackItem
-            ErrorManager.logError(
+            ErrorManager.logErrorWithData(
                 IllegalStateException("Something went wrong!"),
                 "Encountered an error getting the item for §7$this§c. " +
                     "This may be because your NEU repo is outdated. Please ask in the SkyHanni " +
-                    "Discord if this is the case"
+                    "Discord if this is the case.",
+                "Item name" to this.asString(),
+                "repo commit" to manager.latestRepoCommit
             )
             fallbackItem
         }

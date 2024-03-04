@@ -16,10 +16,11 @@ import at.hannibal2.skyhanni.events.LorenzToolTipEvent
 import at.hannibal2.skyhanni.events.NeuRepositoryReloadEvent
 import at.hannibal2.skyhanni.events.RepositoryReloadEvent
 import at.hannibal2.skyhanni.events.TabListUpdateEvent
-import at.hannibal2.skyhanni.features.bazaar.BazaarApi
 import at.hannibal2.skyhanni.features.garden.GardenAPI
 import at.hannibal2.skyhanni.features.garden.composter.ComposterAPI.getLevel
+import at.hannibal2.skyhanni.features.inventory.bazaar.BazaarApi
 import at.hannibal2.skyhanni.features.misc.items.EstimatedItemValue
+import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.CollectionUtils.addAsSingletonList
 import at.hannibal2.skyhanni.utils.CollectionUtils.sortedDesc
@@ -550,8 +551,10 @@ object ComposterOverlay {
         try {
             organicMatterFactors = updateOrganicMatterFactors(organicMatter)
         } catch (e: Exception) {
-            e.printStackTrace()
-            ChatUtils.error("error in RepositoryReloadEvent")
+            ErrorManager.logErrorWithData(
+                e, "Failed to calculate composter overlay data",
+                "organicMatter" to organicMatter
+            )
         }
     }
 

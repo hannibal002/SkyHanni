@@ -21,7 +21,7 @@ import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.cleanName
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
-import at.hannibal2.skyhanni.utils.NumberUtil.formatLong
+import at.hannibal2.skyhanni.utils.NumberUtil.formatLongOrUserError
 import at.hannibal2.skyhanni.utils.NumberUtil.formatNumber
 import at.hannibal2.skyhanni.utils.NumberUtil.romanToDecimalIfNecessary
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
@@ -36,7 +36,6 @@ import io.github.moulberry.notenoughupdates.util.Utils
 import net.minecraft.command.CommandBase
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import java.util.LinkedList
-import java.util.Timer
 import java.util.regex.Matcher
 import kotlin.concurrent.fixedRateTimer
 import kotlin.time.Duration.Companion.seconds
@@ -81,6 +80,33 @@ object SkillAPI {
     var showDisplay = false
     var lastUpdate = SimpleTimeMark.farPast()
 
+    init {
+        fixedRateTimer(name = "skyhanni-skillprogress-timer", initialDelay = 1_000L, period = 1_000L) {
+            tickSkill()
+        }
+    }
+
+    private fun tickSkill() {
+        val activeSkill = activeSkill ?: return
+        val info = skillXPInfoMap[activeSkill] ?: return
+        if (!info.sessionTimerActive) return
+
+        val time = when (activeSkill) {
+            SkillType.FARMING -> SkillProgress.etaConfig.farmingPauseTime
+            SkillType.MINING -> SkillProgress.etaConfig.miningPauseTime
+            SkillType.COMBAT -> SkillProgress.etaConfig.combatPauseTime
+            SkillType.FORAGING -> SkillProgress.etaConfig.foragingPauseTime
+            SkillType.FISHING -> SkillProgress.etaConfig.fishingPauseTime
+            else -> 0
+        }
+        if (info.lastUpdate.passedSince() > time.seconds) {
+            info.sessionTimerActive = false
+        }
+        if (info.sessionTimerActive) {
+            info.timeActive++
+        }
+    }
+
     @SubscribeEvent
     fun onActionBar(event: ActionBarUpdateEvent) {
         val actionBar = event.actionBar.removeColor()
@@ -105,11 +131,6 @@ object SkillAPI {
                 lastUpdate = SimpleTimeMark.now()
                 skillXp.lastUpdate = SimpleTimeMark.now()
                 skillXp.sessionTimerActive = true
-
-
-                if (skillType.timer == null) {
-                    skillType.timer = runTimer(skillType, skillXp)
-                }
                 SkillProgress.updateDisplay()
                 SkillProgress.hideInActionBar = listOf(component)
                 return
@@ -244,26 +265,6 @@ object SkillAPI {
         add("-  CustomGoalLevel: ${skillInfo.customGoalLevel}\n")
     }
 
-    // TODO only use one statuc timer for the whole feature. this timer just ticks the currently active skill.
-    private fun runTimer(skillType: SkillType, info: SkillXPInfo): Timer =
-        fixedRateTimer(name = "skyhanni-skillprogress-timer-${skillType.displayName}", initialDelay = 1_000L, period = 1_000L) {
-            if (skillType.timer != this) cancel()
-            val time = when (activeSkill) {
-                SkillType.FARMING -> SkillProgress.etaConfig.farmingPauseTime
-                SkillType.MINING -> SkillProgress.etaConfig.miningPauseTime
-                SkillType.COMBAT -> SkillProgress.etaConfig.combatPauseTime
-                SkillType.FORAGING -> SkillProgress.etaConfig.foragingPauseTime
-                SkillType.FISHING -> SkillProgress.etaConfig.fishingPauseTime
-                else -> 0
-            }
-            if (info.lastUpdate.passedSince() > time.seconds) {
-                info.sessionTimerActive = false
-            }
-            if (info.sessionTimerActive) {
-                info.timeActive++
-            }
-        }
-
     private fun handleSkillPattern(matcher: Matcher, skillType: SkillType, skillInfo: SkillInfo) {
         val currentXp = matcher.group("current").formatNumber()
         val maxXp = matcher.group("needed").formatNumber()
@@ -275,7 +276,7 @@ object SkillAPI {
             maxXp,
             currentXp
         )
-        if (skillInfo.overflowLevel != 0 && levelOverflow == skillInfo.overflowLevel + 1)
+        if (skillInfo.overflowLevel > 60 && levelOverflow == skillInfo.overflowLevel + 1)
             SkillOverflowLevelupEvent(skillType, skillInfo.overflowLevel, levelOverflow).postAndCatch()
 
         skillInfo.apply {
@@ -394,11 +395,7 @@ object SkillAPI {
             val second = it[1]
             when (first) {
                 "levelwithxp" -> {
-                    val xp = second.formatLong()
-                    if (xp == null) {
-                        ChatUtils.userError("Not a valid number: '$second'")
-                        return
-                    }
+                    val xp = second.formatLongOrUserError() ?: return
                     if (xp <= XP_NEEDED_FOR_60) {
                         val level = getLevel(xp)
                         ChatUtils.chat("With §b${xp.addSeparators()} §eXP you would be level §b$level")
@@ -489,7 +486,7 @@ object SkillAPI {
     private fun commandHelp() {
         ChatUtils.chat(
             listOf(
-                "§6/shskills levelwithxp <currentXP> - §bGet a level with the given current XP.",
+                "§6/shskills levelwithxp <xp> - §bGet a level with the given current XP.",
                 "§6/shskills xpforlevel <desiredLevel> - §bGet how much XP you need for a desired level.",
                 "§6/shskills goal - §bView your current goal",
                 "§6/shskills goal <skill> <level> - §bDefine your goal for <skill>",
