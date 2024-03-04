@@ -46,7 +46,6 @@ import at.hannibal2.skyhanni.features.mining.KingTalismanHelper
 import at.hannibal2.skyhanni.features.mining.powdertracker.PowderTracker
 import at.hannibal2.skyhanni.features.minion.MinionFeatures
 import at.hannibal2.skyhanni.features.misc.CollectionTracker
-import at.hannibal2.skyhanni.features.misc.IslandLeaveJoinMsgs
 import at.hannibal2.skyhanni.features.misc.LockMouseLook
 import at.hannibal2.skyhanni.features.misc.MarkedPlayerManager
 import at.hannibal2.skyhanni.features.misc.discordrpc.DiscordRPCManager
@@ -371,9 +370,9 @@ object Commands {
             "Sets a test burrow waypoint at your location"
         ) { GriffinBurrowHelper.setTestBurrow(it) }
         registerCommand(
-            "shclearstoredplayers",
-            "Clears the stored players on the island."
-        ) { IslandLeaveJoinMsgs.clearPlayers() }
+            "shsimulateworldswitch",
+            "Triggers the LorenzWorldChangeEvent."
+        ) { SkyHanniDebugsAndTests.simulateWorldChange() }
     }
 
     private fun developersCodingHelp() {

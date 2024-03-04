@@ -94,7 +94,7 @@ public class MiscConfig {
     public TrackerConfig tracker = new TrackerConfig();
 
     @Expose
-    @ConfigOption(name = "Leave/Join Messages", desc = "")
+    @ConfigOption(name = "Island Leave/Join Messages", desc = "")
     @Accordion
     public LeaveJoinMsgsConfig leaveJoinMsgs = new LeaveJoinMsgsConfig();
 

@@ -2,6 +2,7 @@ package at.hannibal2.skyhanni.features.misc.compacttablist
 
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
+import at.hannibal2.skyhanni.config.features.misc.KnownPlayersCustomization.IsFriendsKnown
 import at.hannibal2.skyhanni.config.features.misc.compacttablist.AdvancedPlayerListConfig.PlayerSortEntry
 import at.hannibal2.skyhanni.data.FriendAPI
 import at.hannibal2.skyhanni.data.GuildAPI
@@ -177,7 +178,7 @@ object AdvancedPlayerList {
             if (data.ironman) "§7♲" else data.bingoLevel?.let { getBingoIcon(it) } ?: ""
         } else data.nameSuffix
 
-        if (config.markSpecialPersons) {
+        if (config.markKnownPlayers) {
             val score = socialScore(data.name)
             suffix += " " + getSocialScoreIcon(score)
         }
@@ -204,12 +205,18 @@ object AdvancedPlayerList {
         return r
     }
 
-    private fun socialScore(name: String) = when {
+    fun socialScore(name: String) = when {
         LorenzUtils.getPlayerName() == name -> 10
-        MarkedPlayerManager.isMarkedPlayer(name) -> 8
-        PartyAPI.partyMembers.contains(name) -> 5
-        FriendAPI.getAllFriends().any { it.name.contains(name) } -> 4
-        GuildAPI.isInGuild(name) -> 3
+        config.knownPlayersCustomization.isMarkedPlayersKnown &&
+            MarkedPlayerManager.isMarkedPlayer(name) -> 8
+        !config.knownPlayersCustomization.isFriendsKnown.equals(IsFriendsKnown.NO_FRIENDS) &&
+            FriendAPI.isFriend(name, onlyBest = true) -> 6
+        config.knownPlayersCustomization.isPartyKnown &&
+            PartyAPI.partyMembers.contains(name) -> 5
+        config.knownPlayersCustomization.isFriendsKnown.equals(IsFriendsKnown.ALL_FRIENDS) &&
+            FriendAPI.isFriend(name) -> 4
+        config.knownPlayersCustomization.isGuildKnown &&
+            GuildAPI.isInGuild(name) -> 3
 
         else -> 1
     }
@@ -218,10 +225,10 @@ object AdvancedPlayerList {
 //        10 -> "§c§lME"
         10 -> ""
         8 -> "${SkyHanniMod.feature.markedPlayers.chatColor.getChatColor()}§lMARKED"
+        6 -> "§d§lBF"
         5 -> "§9§lP"
         4 -> "§d§lF"
         3 -> "§2§lG"
-
         else -> ""
     }
 
@@ -256,5 +263,10 @@ object AdvancedPlayerList {
         event.transform(15, "misc.compactTabList.advancedPlayerList.playerSortOrder") { element ->
             ConfigUtils.migrateIntToEnum(element, PlayerSortEntry::class.java)
         }
+        event.move(
+            24,
+            "misc.compactTabList.advancedPlayerList.markSpecialPersons",
+            "misc.compactTabList.advancedPlayerList.markKnownPlayers"
+        )
     }
 }

@@ -11,6 +11,7 @@ import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.LorenzChatEvent
 import at.hannibal2.skyhanni.events.LorenzRenderWorldEvent
 import at.hannibal2.skyhanni.events.LorenzToolTipEvent
+import at.hannibal2.skyhanni.events.LorenzWorldChangeEvent
 import at.hannibal2.skyhanni.events.PlaySoundEvent
 import at.hannibal2.skyhanni.events.ReceiveParticleEvent
 import at.hannibal2.skyhanni.features.garden.GardenNextJacobContest
@@ -106,6 +107,10 @@ class SkyHanniDebugsAndTests {
             val z = args[2].toDouble()
             testLocation = LorenzVec(x, y, z)
             ChatUtils.chat("set test waypoint")
+        }
+
+        fun simulateWorldChange() {
+            LorenzWorldChangeEvent().postAndCatch()
         }
 
         fun testCommand(args: Array<String>) {
