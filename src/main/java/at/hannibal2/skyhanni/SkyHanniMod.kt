@@ -222,6 +222,7 @@ import at.hannibal2.skyhanni.features.inventory.ShiftClickEquipment
 import at.hannibal2.skyhanni.features.inventory.ShiftClickNPCSell
 import at.hannibal2.skyhanni.features.inventory.SkyblockGuideHighlightFeature
 import at.hannibal2.skyhanni.features.inventory.StatsTuning
+import at.hannibal2.skyhanni.features.inventory.SuperCraftFeatures
 import at.hannibal2.skyhanni.features.inventory.bazaar.BazaarApi
 import at.hannibal2.skyhanni.features.inventory.bazaar.BazaarBestSellMethod
 import at.hannibal2.skyhanni.features.inventory.bazaar.BazaarCancelledBuyOrderClipboard
@@ -394,7 +395,7 @@ import org.apache.logging.log4j.Logger
     clientSideOnly = true,
     useMetadata = true,
     guiFactory = "at.hannibal2.skyhanni.config.ConfigGuiForgeInterop",
-    version = "0.24.Beta.1",
+    version = "0.24.Beta.3",
 )
 class SkyHanniMod {
 
@@ -757,6 +758,7 @@ class SkyHanniMod {
         loadModule(SkillTooltip())
         loadModule(QuiverNotification)
         loadModule(MaxPurseItems())
+        loadModule(SuperCraftFeatures())
         loadModule(PunchcardHighlight())
 
         init()

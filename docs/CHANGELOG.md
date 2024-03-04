@@ -14,15 +14,52 @@
 
 ### Improvements
 
-### Bug Fixes
+#### Chat Improvements
 
-#### Bingo
++ Added more messages to chat filter category annoying. - martimavocado
+    + Not enough breaking power for gems.
+    + Useless messages for sky mall and Jacob's event artifact.
++ Adding a toggle to hide sky mall perk messages outside mining islands. - martimavocado
++ Added a toggle to hide Jacob's event artifact message outside the garden. - martimavocado
++ Added Booster Cookie purchase reminder to chat filter category others. - alexia
+
+#### Inventory Improvements
+
++ Changed Max Items with Purse display format. - hannibal2
+
+#### GUI Improvements
+
++ Added option to only show Custom Text Box while an inventory is open. - martimavocado
++ Added option to hide Profit Trackers while not inside an inventory. - hannibal2
+
+### Fixes
+
+#### Bingo Fixes
 
 + Fixed Bingo Card Tips using wrong slot sometimes. - Thunderblade73
++ Fixed Bingo Minion Craft Helper sometimes causing performance problems. - CalMWolfs
 
-#### Mining
+#### Mining Fixes
 
 + Fixed a small typo in the Deep Caverns Parkour message. - alexia
+
+#### Inventory Fixes
+
++ Fixed copy underbid keybind not working. - Obsidian
++ Fixed SkyBlock guide highlight missing tasks not working properly for minions and collections. - Thunderblade73
++ Fixed Harp Quick Restart not working when Harp GUI Scale is disabled. - Zickles
+
+#### Chat Fixes
+
++ Fixed Fire Sale chat hider not working when multiple fire sales are ending. - Zickles
+
+#### Command Fixes
+
++ Fixed duplicate commands in /shcommands. - CalMWolfs
+
+#### Misc Fixes
+
++ Fixed skill level up message when below level 60. - HiZe
 
 ### Technical Details
 
