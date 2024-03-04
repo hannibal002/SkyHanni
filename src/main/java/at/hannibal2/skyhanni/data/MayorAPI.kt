@@ -4,6 +4,7 @@ import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.config.ConfigManager
 import at.hannibal2.skyhanni.data.Mayor.Companion.setMayorWithActivePerks
 import at.hannibal2.skyhanni.data.jsonobjects.local.MayorJson
+import at.hannibal2.skyhanni.events.DebugDataCollectEvent
 import at.hannibal2.skyhanni.events.LorenzTickEvent
 import at.hannibal2.skyhanni.utils.APIUtil
 import at.hannibal2.skyhanni.utils.CollectionUtils.put
@@ -106,4 +107,15 @@ object MayorAPI {
     private fun MayorJson.Election.getPairs() = year + 1 to candidates.bestCandidate()
 
     private fun List<MayorJson.Candidate>.bestCandidate() = maxBy { it.votes }
+
+    @SubscribeEvent
+    fun onDebugDataCollect(event: DebugDataCollectEvent) {
+        event.title("Mayor")
+        event.addIrrelevant {
+            add("Current Mayor: ${currentMayor?.name ?: "Unknown"}")
+            add("Active Perks: ${currentMayor?.activePerks}")
+            add("Last Update: $lastUpdate (${lastUpdate.passedSince()} ago)")
+            add("Time Till Next Mayor: $timeTillNextMayor")
+        }
+    }
 }
