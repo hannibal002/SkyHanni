@@ -15,6 +15,7 @@ import at.hannibal2.skyhanni.utils.renderables.RenderableUtils.calculateTableXOf
 import at.hannibal2.skyhanni.utils.renderables.RenderableUtils.calculateTableYOffsets
 import at.hannibal2.skyhanni.utils.renderables.RenderableUtils.renderXAligned
 import at.hannibal2.skyhanni.utils.renderables.RenderableUtils.renderXYAligned
+import at.hannibal2.skyhanni.utils.renderables.RenderableUtils.renderYAligned
 import io.github.moulberry.moulconfig.gui.GuiScreenElementWrapper
 import io.github.moulberry.notenoughupdates.util.Utils
 import net.minecraft.client.Minecraft
@@ -454,7 +455,14 @@ interface Renderable {
                 val mouseEventsValid = mouseEvent - mouseEventTime > 20L
                 mouseEventTime = mouseEvent
 
-                scroll = RenderableUtils.scrollInput(scroll, button, 0, virtualHeight - height, velocity, isHovered(posX, posY) && mouseEventsValid)
+                scroll = RenderableUtils.scrollInput(
+                    scroll,
+                    button,
+                    0,
+                    virtualHeight - height,
+                    velocity,
+                    isHovered(posX, posY) && mouseEventsValid
+                )
 
                 var renderY = 0
                 var virtualY = 0
@@ -506,25 +514,43 @@ interface Renderable {
                 val mouseEventsValid = mouseEvent - mouseEventTime > 20L
                 mouseEventTime = mouseEvent
 
-                scroll = RenderableUtils.scrollInput(scroll, button, minHeight, virtualHeight - height, velocity, isHovered(posX, posY) && mouseEventsValid)
+                scroll = RenderableUtils.scrollInput(
+                    scroll,
+                    button,
+                    minHeight,
+                    virtualHeight - height,
+                    velocity,
+                    isHovered(posX, posY) && mouseEventsValid
+                )
 
                 var renderY = 0
                 if (hasHeader) {
                     content[0].forEachIndexed { index, renderable ->
                         GlStateManager.translate(xOffsets[index].toFloat(), 0f, 0f)
-                        renderable?.renderXYAligned(posX + xOffsets[index], posY + renderY, xOffsets[index + 1] - xOffsets[index], yOffsets[1])
+                        renderable?.renderXYAligned(
+                            posX + xOffsets[index],
+                            posY + renderY,
+                            xOffsets[index + 1] - xOffsets[index],
+                            yOffsets[1]
+                        )
                         GlStateManager.translate(-xOffsets[index].toFloat(), 0f, 0f)
                     }
                     val yShift = yOffsets[1] - yOffsets[0]
                     GlStateManager.translate(0f, yShift.toFloat(), 0f)
                     renderY += yShift
                 }
-                val range = yOffsets.indexOfFirst { it >= scrollInt }..<(yOffsets.indexOfFirst { it >= end }.takeIf { it > 0 }
-                    ?: yOffsets.size) - 1
+                val range =
+                    yOffsets.indexOfFirst { it >= scrollInt }..<(yOffsets.indexOfFirst { it >= end }.takeIf { it > 0 }
+                        ?: yOffsets.size) - 1
                 for (rowIndex in range) {
                     content[rowIndex].forEachIndexed { index, renderable ->
                         GlStateManager.translate(xOffsets[index].toFloat(), 0f, 0f)
-                        renderable?.renderXYAligned(posX + xOffsets[index], posY + renderY, xOffsets[index + 1] - xOffsets[index], yOffsets[rowIndex + 1] - yOffsets[rowIndex])
+                        renderable?.renderXYAligned(
+                            posX + xOffsets[index],
+                            posY + renderY,
+                            xOffsets[index + 1] - xOffsets[index],
+                            yOffsets[rowIndex + 1] - yOffsets[rowIndex]
+                        )
                         GlStateManager.translate(-xOffsets[index].toFloat(), 0f, 0f)
                     }
                     val yShift = yOffsets[rowIndex + 1] - yOffsets[rowIndex]
