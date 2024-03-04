@@ -2,7 +2,7 @@ package at.hannibal2.skyhanni.data
 
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.config.ConfigManager
-import at.hannibal2.skyhanni.data.Mayors.Companion.setMayorWithActivePerks
+import at.hannibal2.skyhanni.data.Mayor.Companion.setMayorWithActivePerks
 import at.hannibal2.skyhanni.data.jsonobjects.local.MayorJson
 import at.hannibal2.skyhanni.events.LorenzTickEvent
 import at.hannibal2.skyhanni.utils.APIUtil
@@ -25,7 +25,7 @@ object MayorAPI {
     private var rawMayorData: MayorJson? = null
     var candidates = mapOf<Int, MayorJson.Candidate>()
         private set
-    var currentMayor: Mayors? = null
+    var currentMayor: Mayor? = null
         private set
     var timeTillNextMayor = Duration.ZERO
         private set
@@ -38,7 +38,7 @@ object MayorAPI {
      * @return: The neu color of the mayor; If no mayor was found, it will return "§cUnknown: §7"
      */
     fun mayorNameToColorCode(input: String): String {
-        return Mayors.getMayorFromName(input).color
+        return Mayor.getMayorFromName(input).color
     }
 
     /**

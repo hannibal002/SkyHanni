@@ -2,38 +2,38 @@ package at.hannibal2.skyhanni.data
 
 import at.hannibal2.skyhanni.data.jsonobjects.local.MayorJson
 
-enum class Mayors(
+enum class Mayor(
     val mayorName: String,
     val color: String,
-    private val perks: List<Perks>,
+    private vararg val perks: Perk,
 ) {
-    AATROX("Aatrox", "§3", listOf(Perks.SLASHED_PRICING, Perks.SLAYER_XP_BUFF, Perks.PATHFINDER)),
-    COLE("Cole", "§e", listOf(Perks.PROSPECTION, Perks.MINING_XP_BUFF, Perks.MINING_FIESTA)),
-    DIANA("Diana", "§2", listOf(Perks.LUCKY, Perks.MYTHOLOGICAL_RITUAL, Perks.PET_XP_BUFF)),
-    DIAZ("Diaz", "§6", listOf(Perks.BARRIER_STREET, Perks.SHOPPING_SPREE)),
-    FINNEGAN("Finnegan", "§c", listOf(Perks.FARMING_SIMULATOR, Perks.PELT_POCALYPSE, Perks.GOATED)),
-    FOXY("Foxy", "§d", listOf(Perks.SWEET_TOOTH, Perks.BENEVOLENCE, Perks.EXTRA_EVENT)),
-    MARINA("Marina", "§b", listOf(Perks.FISHING_XP_BUFF, Perks.LUCK_OF_THE_SEA, Perks.FISHING_FESTIVAL)),
-    PAUL("Paul", "§c", listOf(Perks.MARAUDER, Perks.EZPZ, Perks.BENEDICTION)),
+    AATROX("Aatrox", "§3", Perk.SLASHED_PRICING, Perk.SLAYER_XP_BUFF, Perk.PATHFINDER),
+    COLE("Cole", "§e", Perk.PROSPECTION, Perk.MINING_XP_BUFF, Perk.MINING_FIESTA),
+    DIANA("Diana", "§2", Perk.LUCKY, Perk.MYTHOLOGICAL_RITUAL, Perk.PET_XP_BUFF),
+    DIAZ("Diaz", "§6", Perk.BARRIER_STREET, Perk.SHOPPING_SPREE),
+    FINNEGAN("Finnegan", "§c", Perk.FARMING_SIMULATOR, Perk.PELT_POCALYPSE, Perk.GOATED),
+    FOXY("Foxy", "§d", Perk.SWEET_TOOTH, Perk.BENEVOLENCE, Perk.EXTRA_EVENT),
+    MARINA("Marina", "§b", Perk.FISHING_XP_BUFF, Perk.LUCK_OF_THE_SEA, Perk.FISHING_FESTIVAL),
+    PAUL("Paul", "§c", Perk.MARAUDER, Perk.EZPZ, Perk.BENEDICTION),
 
-    SCORPIUS("Scorpius", "§d", listOf(Perks.BRIBE, Perks.DARKER_AUCTIONS)),
-    JERRY("Jerry", "§d", listOf(Perks.PERKPOCALYPSE, Perks.STATSPOCALYPSE, Perks.JERRYPOCALYPSE)),
-    DERPY("Derpy", "§d", listOf(Perks.TURBO_MINIONS, Perks.AH_CLOSED, Perks.DOUBLE_MOBS_HP, Perks.MOAR_SKILLZ)),
+    SCORPIUS("Scorpius", "§d", Perk.BRIBE, Perk.DARKER_AUCTIONS),
+    JERRY("Jerry", "§d", Perk.PERKPOCALYPSE, Perk.STATSPOCALYPSE, Perk.JERRYPOCALYPSE),
+    DERPY("Derpy", "§d", Perk.TURBO_MINIONS, Perk.AH_CLOSED, Perk.DOUBLE_MOBS_HP, Perk.MOAR_SKILLZ),
 
-    UNKNOWN("Unknown", "§c", listOf()),
+    UNKNOWN("Unknown", "§c"),
     ;
 
-    val activePerks: MutableList<Perks> = mutableListOf()
+    val activePerks: MutableList<Perk> = mutableListOf()
 
     companion object {
         fun getMayorFromName(name: String) = entries.firstOrNull { it.mayorName == name } ?: UNKNOWN
 
-        fun setMayorWithActivePerks(name: String, perks: ArrayList<MayorJson.Perk>): Mayors {
+        fun setMayorWithActivePerks(name: String, perks: ArrayList<MayorJson.Perk>): Mayor {
             val mayor = getMayorFromName(name)
 
             mayor.perks.forEach { it.isActive = false }
             mayor.activePerks.clear()
-            perks.mapNotNull { perk -> Perks.entries.firstOrNull { it.perkName == perk.name } }
+            perks.mapNotNull { perk -> Perk.entries.firstOrNull { it.perkName == perk.name } }
                 .filter { mayor.perks.contains(it) }.forEach {
                     it.isActive = true
                     mayor.activePerks.add(it)
@@ -44,7 +44,7 @@ enum class Mayors(
     }
 }
 
-enum class Perks(val perkName: String) {
+enum class Perk(val perkName: String) {
     // Aatrox
     SLASHED_PRICING("SLASHED Pricing"),
     SLAYER_XP_BUFF("Slayer XP Buff"),

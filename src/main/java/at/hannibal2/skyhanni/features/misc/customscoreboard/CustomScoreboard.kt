@@ -30,12 +30,12 @@ import net.minecraftforge.client.GuiIngameForge
 import net.minecraftforge.client.event.RenderGameOverlayEvent
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
-typealias ScoreboardElement = Pair<String, HorizontalAlignment>
+typealias ScoreboardElementType = Pair<String, HorizontalAlignment>
 
 class CustomScoreboard {
     private val config get() = SkyHanniMod.feature.gui.customScoreboard
-    private var display = emptyList<ScoreboardElement>()
-    private var cache = emptyList<ScoreboardElement>()
+    private var display = emptyList<ScoreboardElementType>()
+    private var cache = emptyList<ScoreboardElementType>()
 
     @SubscribeEvent
     fun onRenderOverlay(event: GuiRenderEvent.GuiOverlayRenderEvent) {
@@ -65,7 +65,7 @@ class CustomScoreboard {
         UnknownLinesHandler.handleUnknownLines()
     }
 
-    private fun createLines() = buildList<ScoreboardElement> {
+    private fun createLines() = buildList<ScoreboardElementType> {
         val lineMap = HashMap<Int, List<Pair<String, HorizontalAlignment>>>()
         for (element in ScoreboardElements.entries) {
             lineMap[element.ordinal] =
@@ -75,8 +75,8 @@ class CustomScoreboard {
         return formatLines(lineMap)
     }
 
-    private fun formatLines(lineMap: HashMap<Int, List<ScoreboardElement>>): MutableList<ScoreboardElement> {
-        val newList = mutableListOf<ScoreboardElement>()
+    private fun formatLines(lineMap: HashMap<Int, List<ScoreboardElementType>>): MutableList<ScoreboardElementType> {
+        val newList = mutableListOf<ScoreboardElementType>()
         for (element in config.scoreboardEntries) {
             lineMap[element.ordinal]?.let {
                 // Hide consecutive empty lines
