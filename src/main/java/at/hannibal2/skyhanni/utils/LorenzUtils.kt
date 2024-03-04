@@ -3,7 +3,7 @@ package at.hannibal2.skyhanni.utils
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.data.HypixelData
 import at.hannibal2.skyhanni.data.IslandType
-import at.hannibal2.skyhanni.data.Perks
+import at.hannibal2.skyhanni.data.Perk
 import at.hannibal2.skyhanni.data.TitleManager
 import at.hannibal2.skyhanni.events.GuiContainerEvent
 import at.hannibal2.skyhanni.features.dungeon.DungeonAPI
@@ -27,14 +27,12 @@ import net.minecraft.entity.SharedMonsterAttributes
 import net.minecraft.launchwrapper.Launch
 import net.minecraft.util.ChatComponentText
 import net.minecraftforge.fml.common.FMLCommonHandler
-import java.io.Serializable
 import java.text.DecimalFormat
 import java.text.SimpleDateFormat
 import java.util.Timer
 import java.util.TimerTask
 import java.util.regex.Matcher
 import kotlin.time.Duration
-import kotlin.time.Duration.Companion.milliseconds
 import kotlin.time.Duration.Companion.seconds
 
 object LorenzUtils {
@@ -287,7 +285,7 @@ object LorenzUtils {
     }
 
     private val recalculateDerpy =
-        RecalculatingValue(1.seconds) { Perks.DOUBLE_MOBS_HP.isActive }
+        RecalculatingValue(1.seconds) { Perk.DOUBLE_MOBS_HP.isActive }
 
     val isDerpy get() = recalculateDerpy.getValue()
 
