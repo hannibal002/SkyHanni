@@ -30,7 +30,7 @@ Also provide them with exact information how and when you have bought your minec
 Good luck!
 This thread might help you as well: https://hypixel.net/threads/guide-how-to-handle-hacked-account-issues-with-microsoft-support.5429472/
 
-### Someone else logged in into my account, but i can still access the account myself
+### Someone else logged in into my account, but I can still access the account myself
 
 Disable the multiplayer mode on xbox account settings to prevent others from logging in your account immediately.
 Try to log in on hypixel to kick the other user off from hypixel.
