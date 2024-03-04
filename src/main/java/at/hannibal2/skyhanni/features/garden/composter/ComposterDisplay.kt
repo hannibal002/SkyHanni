@@ -8,7 +8,8 @@ import at.hannibal2.skyhanni.features.garden.GardenAPI
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.CollectionUtils.addAsSingletonList
 import at.hannibal2.skyhanni.utils.LorenzUtils
-import at.hannibal2.skyhanni.utils.NEUItems
+import at.hannibal2.skyhanni.utils.NEUInternalName.Companion.asInternalName
+import at.hannibal2.skyhanni.utils.NEUItems.getItemStack
 import at.hannibal2.skyhanni.utils.RenderUtils.renderStringsAndItems
 import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.TimeUtils
@@ -34,7 +35,7 @@ class ComposterDisplay {
         STORED_COMPOST(" Stored Compost: §r(.*)", "COMPOST");
 
         val displayItem by lazy {
-            NEUItems.getItemStack(icon)
+            icon.asInternalName().getItemStack()
         }
 
         val pattern by lazy { rawPattern.toPattern() }
@@ -43,6 +44,8 @@ class ComposterDisplay {
             return listOf(displayItem, map[this]!!)
         }
     }
+
+    private val BUCKET by lazy { "BUCKET".asInternalName().getItemStack() }
 
     @SubscribeEvent
     fun onTabListUpdate(event: TabListUpdateEvent) {
@@ -80,7 +83,7 @@ class ComposterDisplay {
         return if (emptyTime != null) {
             GardenAPI.storage?.composterEmptyTime = System.currentTimeMillis() + emptyTime.inWholeMilliseconds
             val format = emptyTime.format()
-            listOf(NEUItems.getItemStack("BUCKET"), "§b$format")
+            listOf(BUCKET, "§b$format")
         } else {
             listOf("§cOpen Composter Upgrades!")
         }
@@ -168,7 +171,7 @@ class ComposterDisplay {
         } else "?"
 
         if (!GardenAPI.inGarden() && config.displayOutsideGarden) {
-            val list = Collections.singletonList(listOf(NEUItems.getItemStack("BUCKET"), "§b$format"))
+            val list = Collections.singletonList(listOf(BUCKET, "§b$format"))
             config.outsideGardenPos.renderStringsAndItems(list, posLabel = "Composter Outside Garden Display")
         }
     }

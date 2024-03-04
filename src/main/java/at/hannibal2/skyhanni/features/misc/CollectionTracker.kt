@@ -11,9 +11,9 @@ import at.hannibal2.skyhanni.utils.ItemUtils.name
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.NEUInternalName
 import at.hannibal2.skyhanni.utils.NEUInternalName.Companion.asInternalName
-import at.hannibal2.skyhanni.utils.NEUItems
 import at.hannibal2.skyhanni.utils.NEUItems.getItemStack
 import at.hannibal2.skyhanni.utils.NEUItems.getItemStackOrNull
+import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.RenderUtils.renderStringsAndItems
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import net.minecraft.client.Minecraft
@@ -57,18 +57,18 @@ class CollectionTracker {
                 return
             }
 
-            val foundInternalName = NEUItems.getInternalNameOrNull(rawName)
+            val foundInternalName = NEUInternalName.fromItemNameOrNull(rawName)
             if (foundInternalName == null) {
-                ChatUtils.error("Item '$rawName' does not exist!")
+                ChatUtils.userError("Item '$rawName' does not exist!")
                 return
             }
 
             val stack = foundInternalName.getItemStackOrNull()
             if (stack == null) {
-                ChatUtils.error("Item '$rawName' does not exist!")
+                ChatUtils.userError("Item '$rawName' does not exist!")
                 return
             }
-            setNewCollection(foundInternalName, stack.name!!.removeColor())
+            setNewCollection(foundInternalName, stack.name.removeColor())
         }
 
         private fun fixTypo(rawName: String) = when (rawName) {
@@ -121,11 +121,11 @@ class CollectionTracker {
         }
 
         private fun updateDisplay() {
-            val format = LorenzUtils.formatInteger(itemAmount)
+            val format = itemAmount.addSeparators()
 
             var gainText = ""
             if (recentGain != 0) {
-                gainText = "§a+" + LorenzUtils.formatInteger(recentGain)
+                gainText = "§a+" + recentGain.addSeparators()
             }
 
             display = Collections.singletonList(buildList {

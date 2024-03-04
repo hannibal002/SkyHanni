@@ -27,14 +27,12 @@ import net.minecraft.entity.SharedMonsterAttributes
 import net.minecraft.launchwrapper.Launch
 import net.minecraft.util.ChatComponentText
 import net.minecraftforge.fml.common.FMLCommonHandler
-import java.io.Serializable
 import java.text.DecimalFormat
 import java.text.SimpleDateFormat
 import java.util.Timer
 import java.util.TimerTask
 import java.util.regex.Matcher
 import kotlin.time.Duration
-import kotlin.time.Duration.Companion.milliseconds
 import kotlin.time.Duration.Companion.seconds
 
 object LorenzUtils {
@@ -306,9 +304,6 @@ object LorenzUtils {
     fun sendTitle(text: String, duration: Duration, height: Double = 1.8, fontSize: Float = 4f) {
         TitleManager.sendTitle(text, duration, height, fontSize)
     }
-
-    @Deprecated("Dont use this approach at all. check with regex or equals instead.", ReplaceWith("Regex or equals"))
-    fun Iterable<String>.anyContains(element: String) = any { it.contains(element) }
 
     inline fun <reified T : Enum<T>> enumValueOfOrNull(name: String): T? {
         val enums = enumValues<T>()

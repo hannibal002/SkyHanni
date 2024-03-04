@@ -38,7 +38,7 @@ import at.hannibal2.skyhanni.utils.ItemUtils.name
 import at.hannibal2.skyhanni.utils.LorenzUtils.between
 import at.hannibal2.skyhanni.utils.NEUInternalName.Companion.asInternalName
 import at.hannibal2.skyhanni.utils.NumberUtil
-import at.hannibal2.skyhanni.utils.NumberUtil.formatNumber
+import at.hannibal2.skyhanni.utils.NumberUtil.formatLong
 import at.hannibal2.skyhanni.utils.NumberUtil.romanToDecimal
 import at.hannibal2.skyhanni.utils.NumberUtil.romanToDecimalIfNecessary
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getBottleOfJyrreSeconds
@@ -174,11 +174,10 @@ object ItemDisplayOverlayFeatures {
         if (COLLECTION_LEVEL.isSelected() && InventoryUtils.openInventoryName().endsWith(" Collections")) {
             if (lore.any { it.contains("Click to view!") }) {
                 if (CollectionAPI.isCollectionTier0(lore)) return "0"
-                item.name?.let {
-                    if (it.startsWith("§e")) {
-                        val text = it.split(" ").last()
-                        return "" + text.romanToDecimalIfNecessary()
-                    }
+                val name = item.name
+                if (name.startsWith("§e")) {
+                    val text = name.split(" ").last()
+                    return "" + text.romanToDecimalIfNecessary()
                 }
             }
         }
@@ -209,14 +208,12 @@ object ItemDisplayOverlayFeatures {
         }
 
         if (DUNGEON_POTION_LEVEL.isSelected() && itemName.startsWith("Dungeon ") && itemName.contains(" Potion")) {
-            item.name?.let {
-                dungeonPotionPattern.matchMatcher(it.removeColor()) {
-                    return when (val level = group("level").romanToDecimal()) {
-                        in 1 .. 2 -> "§f$level"
-                        in 3 .. 4 -> "§a$level"
-                        in 5 .. 6 -> "§9$level"
-                        else -> "§5$level"
-                    }
+            dungeonPotionPattern.matchMatcher(item.name.removeColor()) {
+                return when (val level = group("level").romanToDecimal()) {
+                    in 1..2 -> "§f$level"
+                    in 3..4 -> "§a$level"
+                    in 5..6 -> "§9$level"
+                    else -> "§5$level"
                 }
             }
         }
@@ -224,7 +221,7 @@ object ItemDisplayOverlayFeatures {
         if (VACUUM_GARDEN.isSelected() && item.getInternalNameOrNull() in PestAPI.vacuumVariants && isOwnVacuum(lore)) {
             for (line in lore) {
                 gardenVacuumPatterm.matchMatcher(line) {
-                    val pests = group("amount").formatNumber()
+                    val pests = group("amount").formatLong()
                     return if (config.vacuumBagCap) {
                         if (pests > 39) "§640+" else "$pests"
                     } else {
@@ -255,7 +252,7 @@ object ItemDisplayOverlayFeatures {
         if (BINGO_GOAL_RANK.isSelected() && chestName == "Bingo Card" && lore.lastOrNull() == "§aGOAL REACHED") {
             for (line in lore) {
                 bingoGoalRankPattern.matchMatcher(line) {
-                    val rank = group("rank").formatNumber()
+                    val rank = group("rank").formatLong()
                     if (rank < 10000) return "§6${NumberUtil.format(rank)}"
                 }
             }

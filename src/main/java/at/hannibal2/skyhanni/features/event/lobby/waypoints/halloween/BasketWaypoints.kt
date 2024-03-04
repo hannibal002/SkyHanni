@@ -11,7 +11,6 @@ import at.hannibal2.skyhanni.test.GriffinUtils.drawWaypointFilled
 import at.hannibal2.skyhanni.utils.LocationUtils.distanceSqToPlayer
 import at.hannibal2.skyhanni.utils.LorenzColor
 import at.hannibal2.skyhanni.utils.LorenzUtils
-import at.hannibal2.skyhanni.utils.LorenzUtils.anyContains
 import at.hannibal2.skyhanni.utils.RenderUtils.drawDynamicText
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
@@ -95,8 +94,20 @@ class BasketWaypoints {
     }
 
     private fun checkScoreboardHalloweenSpecific(): Boolean {
-        val list = ScoreboardData.sidebarLinesFormatted
-        return list.anyContains("Hypixel Level") && list.anyContains("Halloween") && list.anyContains("Baskets")
+        // TODO use actual regex instead.
+        var found = 0
+        for (lines in ScoreboardData.sidebarLinesFormatted) {
+            if (lines.contains("Hypixel Level")) {
+                found++
+            }
+            if (lines.contains("Halloween")) {
+                found++
+            }
+            if (lines.contains("Baskets")) {
+                found++
+            }
+        }
+        return found >= 3
     }
 
     @SubscribeEvent

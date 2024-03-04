@@ -65,8 +65,7 @@ class QuickCraftFeatures {
             if (slot == null) continue
             if (inventoryType.ignoreSlot(slot.slotNumber)) continue
             val stack = slot.stack ?: continue
-            val name = stack.name ?: continue
-            if (name == "§cQuick Crafting Slot") continue
+            if (stack.name == "§cQuick Crafting Slot") continue
             if (needsQuickCraftConfirmation(stack)) {
                 val color = LorenzColor.DARK_GRAY.addOpacity(180)
                 stack.background = color.rgb

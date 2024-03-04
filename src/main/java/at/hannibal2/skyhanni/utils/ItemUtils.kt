@@ -4,7 +4,7 @@ import at.hannibal2.skyhanni.data.PetAPI
 import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.NEUInternalName.Companion.asInternalName
 import at.hannibal2.skyhanni.utils.NEUItems.getItemStackOrNull
-import at.hannibal2.skyhanni.utils.NumberUtil.formatNumber
+import at.hannibal2.skyhanni.utils.NumberUtil.formatInt
 import at.hannibal2.skyhanni.utils.SimpleTimeMark.Companion.asTimeMark
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.cachedData
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getEnchantments
@@ -203,7 +203,6 @@ object ItemUtils {
     fun ItemStack.getItemRarityOrCommon() = getItemRarityOrNull() ?: LorenzRarity.COMMON
 
     private fun ItemStack.readItemCategoryAndRarity(): Pair<LorenzRarity?, ItemCategory?> {
-        val name = this.name ?: ""
         val cleanName = this.cleanName()
 
         if (PetAPI.hasPetName(cleanName)) {
@@ -292,15 +291,20 @@ object ItemUtils {
         data.itemRarityLastCheck.asTimeMark().passedSince() > 10.seconds
 
     // extra method for shorter name and kotlin nullability logic
-    var ItemStack.name: String?
-        get() = this.displayName
+    var ItemStack.name: String
+        get() = this.displayName ?: ErrorManager.skyHanniError(
+            "Could not get name if ItemStack",
+            "itemStack" to this,
+            "displayName" to displayName,
+            "internal name" to getInternalNameOrNull(),
+        )
         set(value) {
             setStackDisplayName(value)
         }
 
-    @Deprecated("outdated", ReplaceWith("itemName"))
+    @Deprecated("outdated", ReplaceWith("this.itemName"))
     val ItemStack.nameWithEnchantment: String?
-        get() = getInternalNameOrNull()?.itemName
+        get() = itemName
 
     fun isSkyBlockMenuItem(stack: ItemStack?): Boolean = stack?.getInternalName()?.equals("SKYBLOCK_MENU") ?: false
 
@@ -340,7 +344,7 @@ object ItemUtils {
 
     private fun makePair(input: String, itemName: String, matcher: Matcher): Pair<String, Int> {
         val matcherAmount = matcher.group("amount")
-        val amount = matcherAmount?.formatNumber()?.toInt() ?: 1
+        val amount = matcherAmount.formatInt()
         val pair = Pair(itemName, amount)
         itemAmountCache[input] = pair
         return pair

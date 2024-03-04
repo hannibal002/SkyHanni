@@ -8,7 +8,7 @@ import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.ItemUtils.getSkullOwner
 import at.hannibal2.skyhanni.utils.ItemUtils.getSkullTexture
 import at.hannibal2.skyhanni.utils.ItemUtils.name
-import at.hannibal2.skyhanni.utils.NumberUtil.formatNumber
+import at.hannibal2.skyhanni.utils.NumberUtil.formatLong
 import at.hannibal2.skyhanni.utils.OSUtils
 import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
@@ -67,8 +67,7 @@ object TestCopyBestiaryValues {
     }
 
     private fun copy(titleItem: ItemStack, inventoryItems: Map<Int, ItemStack>) {
-        val name = titleItem.name ?: return
-        val titleName = name.split(" ").dropLast(1).joinToString(" ")
+        val titleName = titleItem.name.split(" ").dropLast(1).joinToString(" ")
 
         val obj = BestiarityObject()
         obj.name = titleName
@@ -82,14 +81,13 @@ object TestCopyBestiaryValues {
             return
         }
         val capLine = lore.nextAfter(overallProgress) ?: return
-        val rawCap = capLine.substringAfter("/").removeColor().formatNumber()
+        val rawCap = capLine.substringAfter("/").removeColor().formatLong()
         obj.cap = rawCap.toInt()
 
         val mobs = mutableListOf<String>()
         for (i in 10..43) {
             val stack = inventoryItems[i] ?: continue
-            val stackName = stack.name ?: continue
-            bestiaryTypePattern.matchMatcher(stackName.removeColor()) {
+            bestiaryTypePattern.matchMatcher(stack.name.removeColor()) {
                 val lvl = group("lvl").toInt()
                 var text = group("text").lowercase().replace(" ", "_")
 

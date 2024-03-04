@@ -78,11 +78,8 @@ class TeleportPadInventoryNumber {
         if (LorenzUtils.skyBlockIsland != IslandType.PRIVATE_ISLAND) return
         if (!inTeleportPad) return
 
-        val name = event.stack.name?.lowercase() ?: return
-
-        padNumberPattern.matchMatcher(name) {
-            val text = group("number")
-            numbers[text]?.let {
+        padNumberPattern.matchMatcher(event.stack.name.lowercase()) {
+            numbers[group("number")]?.let {
                 event.stackTip = "$it"
             }
         }

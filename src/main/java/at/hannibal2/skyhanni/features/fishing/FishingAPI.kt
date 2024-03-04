@@ -87,8 +87,7 @@ object FishingAPI {
     private fun NEUInternalName.isFishingRod() = contains("ROD")
 
     fun ItemStack.isBait(): Boolean {
-        val name = name ?: return false
-        return stackSize == 1 && (name.removeColor().startsWith("Obfuscated") || name.endsWith(" Bait"))
+        return stackSize == 1 && name.removeColor().let { it.startsWith("Obfuscated") || it.endsWith(" Bait") }
     }
 
     @SubscribeEvent

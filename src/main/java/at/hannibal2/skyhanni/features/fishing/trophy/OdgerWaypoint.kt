@@ -37,7 +37,7 @@ class OdgerWaypoint {
 
     private fun isLavaFishingRod(): Boolean {
         val heldItem = InventoryUtils.getItemInHand() ?: return false
-        val isRod = heldItem.name?.contains("Rod") ?: return false
+        val isRod = heldItem.name.contains("Rod")
         if (!isRod) return false
 
         return heldItem.getLore().any { it.contains("Lava Rod") }
