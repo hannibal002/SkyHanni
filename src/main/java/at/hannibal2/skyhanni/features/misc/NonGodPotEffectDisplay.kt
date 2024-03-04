@@ -200,9 +200,9 @@ class NonGodPotEffectDisplay {
                         val duration = try {
                             TimeUtils.getMillis(line.split("§f")[1])
                         } catch (e: IndexOutOfBoundsException) {
-                            ErrorManager.logError(
-                                Exception("'§f' not found in line '$line'", e),
-                                "Error while reading Non God-Potion effects from tab list"
+                            ErrorManager.logErrorWithData(
+                                e, "Error while reading Non God-Potion effects from tab list",
+                                "line" to line
                             )
                             continue
                         }
