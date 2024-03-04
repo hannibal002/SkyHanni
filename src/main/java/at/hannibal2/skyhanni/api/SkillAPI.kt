@@ -131,7 +131,6 @@ object SkillAPI {
                 lastUpdate = SimpleTimeMark.now()
                 skillXp.lastUpdate = SimpleTimeMark.now()
                 skillXp.sessionTimerActive = true
-
                 SkillProgress.updateDisplay()
                 SkillProgress.hideInActionBar = listOf(component)
                 return
@@ -277,7 +276,7 @@ object SkillAPI {
             maxXp,
             currentXp
         )
-        if (skillInfo.overflowLevel != 0 && levelOverflow == skillInfo.overflowLevel + 1)
+        if (skillInfo.overflowLevel > 60 && levelOverflow == skillInfo.overflowLevel + 1)
             SkillOverflowLevelupEvent(skillType, skillInfo.overflowLevel, levelOverflow).postAndCatch()
 
         skillInfo.apply {

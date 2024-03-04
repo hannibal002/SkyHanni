@@ -94,7 +94,7 @@ object TrevorFeatures {
                         TrevorTracker.calculatePeltsPerHour()
                         if (questActive) TrevorSolver.findMob()
                     } catch (error: Throwable) {
-                        ErrorManager.logError(error, "Encountered an error when updating the trapper solver")
+                        ErrorManager.logErrorWithData(error, "Encountered an error when updating the trapper solver")
                     }
                 }
             }

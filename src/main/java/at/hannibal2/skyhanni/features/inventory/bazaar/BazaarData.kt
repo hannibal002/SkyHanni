@@ -1,4 +1,4 @@
-package at.hannibal2.skyhanni.features.bazaar
+package at.hannibal2.skyhanni.features.inventory.bazaar
 
 data class BazaarData(
     val displayName: String,
