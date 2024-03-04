@@ -1,9 +1,9 @@
-package at.hannibal2.skyhanni.features.bazaar
+package at.hannibal2.skyhanni.features.inventory.bazaar
 
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.events.BazaarOpenedProductEvent
 import at.hannibal2.skyhanni.events.InventoryCloseEvent
-import at.hannibal2.skyhanni.features.bazaar.BazaarApi.Companion.getBazaarData
+import at.hannibal2.skyhanni.features.inventory.bazaar.BazaarApi.Companion.getBazaarData
 import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName
 import at.hannibal2.skyhanni.utils.ItemUtils.itemName
@@ -18,6 +18,7 @@ import net.minecraftforge.fml.common.eventhandler.EventPriority
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
 class BazaarBestSellMethod {
+    private val config get() = SkyHanniMod.feature.inventory.bazaar
 
     private var display = ""
 
@@ -67,7 +68,7 @@ class BazaarBestSellMethod {
     fun renderOverlay(event: GuiScreenEvent.BackgroundDrawnEvent) {
         if (!isEnabled()) return
 
-        SkyHanniMod.feature.bazaar.bestSellMethodPos.renderString(display, posLabel = "Bazaar Best Sell Method")
+        config.bestSellMethodPos.renderString(display, posLabel = "Bazaar Best Sell Method")
     }
 
     @SubscribeEvent(priority = EventPriority.HIGH)
@@ -76,5 +77,5 @@ class BazaarBestSellMethod {
         nextCloseWillResetItem = false
     }
 
-    private fun isEnabled() = LorenzUtils.inSkyBlock && SkyHanniMod.feature.bazaar.bestSellMethod
+    private fun isEnabled() = LorenzUtils.inSkyBlock && config.bestSellMethod
 }

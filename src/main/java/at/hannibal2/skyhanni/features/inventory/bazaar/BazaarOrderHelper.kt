@@ -1,4 +1,4 @@
-package at.hannibal2.skyhanni.features.bazaar
+package at.hannibal2.skyhanni.features.inventory.bazaar
 
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.events.GuiContainerEvent
@@ -43,7 +43,7 @@ class BazaarOrderHelper {
     @SubscribeEvent
     fun onBackgroundDrawn(event: GuiContainerEvent.BackgroundDrawnEvent) {
         if (!LorenzUtils.inSkyBlock) return
-        if (!SkyHanniMod.feature.bazaar.orderHelper) return
+        if (!SkyHanniMod.feature.inventory.bazaar.orderHelper) return
         if (event.gui !is GuiChest) return
 
         val guiChest = event.gui
