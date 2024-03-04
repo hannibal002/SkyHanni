@@ -148,6 +148,11 @@ class CollectionTracker {
                 gainText = "§a+" + recentGain.addSeparators()
             }
 
+            if (itemAmount >= goalAmount) {
+                ChatUtils.chat("Collection goal of §a${goalAmount.addSeparators()} reached!")
+                goalAmount = -1L
+            }
+
             val goal = if (goalAmount == -1L) "" else " §f/ §b${goalAmount.addSeparators()} §f(§a${
                 itemAmount.percentWithColorCode(goalAmount, 1)
             }§f)"
