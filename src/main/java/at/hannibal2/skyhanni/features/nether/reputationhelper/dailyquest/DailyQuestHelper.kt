@@ -252,7 +252,7 @@ class DailyQuestHelper(val reputationHelper: CrimsonIsleReputationHelper) {
         val displayName = if (category == QuestCategory.FETCH || category == QuestCategory.FISHING) {
             val name = item.name
             if (category == QuestCategory.FISHING) {
-                name.split(" ").dropLast(1).joinToString(" ")
+                name.removeWordsAtEnd(1)
             } else name
         } else quest.displayName
 
