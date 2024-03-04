@@ -44,7 +44,7 @@ class CollectionTracker {
         fun command(args: Array<String>) {
             if (args.isEmpty()) {
                 if (internalName == null) {
-                    ChatUtils.userError("/shtrackcollection <item name> ?<goal amount>")
+                    ChatUtils.userError("/shtrackcollection <item name> [goal amount]")
                     return
                 }
                 ChatUtils.chat("Stopped collection tracker.")
