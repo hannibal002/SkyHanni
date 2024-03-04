@@ -93,21 +93,12 @@ class BasketWaypoints {
         return if (config.onlyClosest) closest == this else true
     }
 
+    // TODO use regex with the help of knowing the original lore. Will most likely need to wait until next halloween event
     private fun checkScoreboardHalloweenSpecific(): Boolean {
-        // TODO use actual regex instead.
-        var found = 0
-        for (lines in ScoreboardData.sidebarLinesFormatted) {
-            if (lines.contains("Hypixel Level")) {
-                found++
-            }
-            if (lines.contains("Halloween")) {
-                found++
-            }
-            if (lines.contains("Baskets")) {
-                found++
-            }
-        }
-        return found >= 3
+        val a = ScoreboardData.sidebarLinesFormatted.any { it.contains("Hypixel Level") }
+        val b = ScoreboardData.sidebarLinesFormatted.any { it.contains("Halloween") }
+        val c = ScoreboardData.sidebarLinesFormatted.any { it.contains("Baskets") }
+        return a && b && c
     }
 
     @SubscribeEvent
