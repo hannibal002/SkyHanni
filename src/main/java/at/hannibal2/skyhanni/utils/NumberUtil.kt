@@ -1,5 +1,7 @@
 package at.hannibal2.skyhanni.utils
 
+import at.hannibal2.skyhanni.utils.LorenzUtils.round
+import at.hannibal2.skyhanni.utils.StringUtils.matches
 import java.text.NumberFormat
 import java.util.Locale
 import java.util.TreeMap
@@ -171,20 +173,31 @@ object NumberUtil {
     }
 
     val pattern = "^[0-9]*$".toPattern()
+    val formatPattern = "^[0-9,.]*[kmb]?$".toPattern()
 
     fun String.isInt(): Boolean {
         return isNotEmpty() && pattern.matcher(this).matches()
     }
 
-    fun percentageColor(have: Long, max: Long): LorenzColor {
-        val percentage = have.fractionOf(max)
-        return when {
-            percentage > 0.9 -> LorenzColor.DARK_GREEN
-            percentage > 0.75 -> LorenzColor.GREEN
-            percentage > 0.5 -> LorenzColor.YELLOW
-            percentage > 0.25 -> LorenzColor.GOLD
-            else -> LorenzColor.RED
-        }
+    fun String.isFormatNumber(): Boolean {
+        return isNotEmpty() && formatPattern.matches(this)
+    }
+
+    fun percentageColor(percentage: Double) = when {
+        percentage > 0.9 -> LorenzColor.DARK_GREEN
+        percentage > 0.75 -> LorenzColor.GREEN
+        percentage > 0.5 -> LorenzColor.YELLOW
+        percentage > 0.25 -> LorenzColor.GOLD
+        else -> LorenzColor.RED
+    }
+
+    fun percentageColor(have: Long, max: Long): LorenzColor = percentageColor(have.fractionOf(max))
+
+    fun Number.percentWithColorCode(max: Number, round: Int = 1): String {
+        val fraction = this.fractionOf(max)
+        val color = percentageColor(fraction)
+        val amount = (fraction * 100.0).round(round)
+        return "${color.getChatColor()}$amount%"
     }
 
     // TODO create new function formatLong, and eventually deprecate this function.
