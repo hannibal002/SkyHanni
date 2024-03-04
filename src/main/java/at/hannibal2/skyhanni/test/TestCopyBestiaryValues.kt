@@ -67,7 +67,7 @@ object TestCopyBestiaryValues {
     }
 
     private fun copy(titleItem: ItemStack, inventoryItems: Map<Int, ItemStack>) {
-        val titleName = titleItem.name.split(" ").dropLast(1).joinToString(" ")
+        val titleName = titleItem.name.removeWordsAtEnd(1)
 
         val obj = BestiarityObject()
         obj.name = titleName
