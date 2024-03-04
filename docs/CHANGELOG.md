@@ -21,12 +21,23 @@
     + Useless messages for sky mall and Jacob's event artifact.
 + Adding a toggle to hide sky mall perk messages outside mining islands. - martimavocado
 + Added a toggle to hide Jacob's event artifact message outside the garden. - martimavocado
++ Added Booster Cookie purchase reminder to chat filter category others. - alexia
+
+#### Inventory Improvements
+
++ Changed Max Items with Purse display format. - hannibal2
+
+#### GUI Improvements
+
++ Added option to only show Custom Text Box while an inventory is open. - martimavocado
++ Added option to hide Profit Trackers while not inside an inventory. - hannibal2
 
 ### Fixes
 
 #### Bingo Fixes
 
 + Fixed Bingo Card Tips using wrong slot sometimes. - Thunderblade73
++ Fixed Bingo Minion Craft Helper sometimes causing performance problems. - CalMWolfs
 
 #### Mining Fixes
 
@@ -36,6 +47,7 @@
 
 + Fixed copy underbid keybind not working. - Obsidian
 + Fixed SkyBlock guide highlight missing tasks not working properly for minions and collections. - Thunderblade73
++ Fixed Harp Quick Restart not working when Harp GUI Scale is disabled. - Zickles
 
 #### Chat Fixes
 
