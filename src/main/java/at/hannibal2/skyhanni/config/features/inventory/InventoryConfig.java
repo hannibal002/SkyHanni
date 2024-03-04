@@ -9,6 +9,7 @@ import io.github.moulberry.moulconfig.annotations.Category;
 import io.github.moulberry.moulconfig.annotations.ConfigEditorBoolean;
 import io.github.moulberry.moulconfig.annotations.ConfigEditorDraggableList;
 import io.github.moulberry.moulconfig.annotations.ConfigOption;
+
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -56,6 +57,10 @@ public class InventoryConfig {
     public SkyblockGuideConfig skyblockGuideConfig = new SkyblockGuideConfig();
 
     @Expose
+    @Category(name = "Bazaar", desc = "Bazaar settings.")
+    public BazaarConfig bazaar = new BazaarConfig();
+
+    @Expose
     @Category(name = "Helpers", desc = "Settings for Helpers")
     public HelperConfig helper = new HelperConfig();
 
@@ -63,6 +68,11 @@ public class InventoryConfig {
     @ConfigOption(name = "Get From Sack", desc = "")
     @Accordion
     public GetFromSackConfig gfs = new GetFromSackConfig();
+
+    @Expose
+    @ConfigOption(name = "Auctions", desc = "")
+    @Accordion
+    public AuctionHouseConfig auctions = new AuctionHouseConfig();
 
     @Expose
     @ConfigOption(
@@ -173,32 +183,11 @@ public class InventoryConfig {
     public boolean powerStoneGuide = true;
 
     @Expose
-    @ConfigOption(name = "Highlight Auctions",
-        desc = "Highlight own items that are sold in green and that are expired in red.")
-    @ConfigEditorBoolean
-    @FeatureToggle
-    public boolean highlightAuctions = true;
-
-    @Expose
-    @ConfigOption(name = "Highlight Underbid Auctions",
-        desc = "Highlight underbid own lowest BIN auctions that are outbid.")
-    @ConfigEditorBoolean
-    @FeatureToggle
-    public boolean highlightAuctionsUnderbid = false;
-
-    @Expose
-    @ConfigOption(name = "Copy Underbid Price",
-        desc = "Copies the price of an item in the \"Create BIN Auction\" minus 1 coin into the clipboard for faster under-bidding.")
-    @ConfigEditorBoolean
-    @FeatureToggle
-    public boolean copyUnderbidPrice = false;
-
-    @Expose
     @ConfigOption(name = "Shift Click Equipment", desc = "Makes normal clicks to shift clicks in equipment inventory.")
     @ConfigEditorBoolean
     @FeatureToggle
     public boolean shiftClickForEquipment = false;
-
+    
     @Expose
     @ConfigOption(name = "Shift Click NPC sell", desc = "Makes normal clicks to shift clicks in npc inventory for selling.")
     @ConfigEditorBoolean

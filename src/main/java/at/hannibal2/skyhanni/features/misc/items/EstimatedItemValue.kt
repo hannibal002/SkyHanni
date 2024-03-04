@@ -16,7 +16,6 @@ import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.CollectionUtils.addAsSingletonList
 import at.hannibal2.skyhanni.utils.ConditionalUtils.onToggle
 import at.hannibal2.skyhanni.utils.InventoryUtils
-import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalNameOrNull
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.ItemUtils.isRune
@@ -158,9 +157,11 @@ object EstimatedItemValue {
         } catch (e: Exception) {
             ErrorManager.logErrorWithData(
                 e, "Error in Estimated Item Value renderer",
+                "openInventoryName" to openInventoryName,
                 "item" to item,
-                "itemName" to item.itemName,
-                "getInternalName" to item.getInternalName(),
+                "item name" to item.itemName,
+                "internal name" to item.getInternalNameOrNull(),
+                "lore" to item.getLore(),
             )
             listOf()
         }

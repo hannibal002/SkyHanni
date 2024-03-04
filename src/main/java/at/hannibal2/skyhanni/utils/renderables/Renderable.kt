@@ -294,6 +294,7 @@ interface Renderable {
 
         fun string(
             text: String,
+            color: Color = Color.WHITE,
             horizontalAlign: HorizontalAlignment = HorizontalAlignment.LEFT,
             verticalAlign: VerticalAlignment = VerticalAlignment.TOP,
         ) = object : Renderable {
@@ -305,7 +306,7 @@ interface Renderable {
             override val verticalAlign = verticalAlign
 
             override fun render(posX: Int, posY: Int) {
-                Minecraft.getMinecraft().fontRendererObj.drawStringWithShadow("§f$text", 1f, 1f, 0)
+                Minecraft.getMinecraft().fontRendererObj.drawStringWithShadow(text, 1f, 1f, color.rgb)
             }
         }
 
