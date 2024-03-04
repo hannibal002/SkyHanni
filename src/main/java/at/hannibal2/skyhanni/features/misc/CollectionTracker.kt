@@ -148,7 +148,7 @@ class CollectionTracker {
                 gainText = "§a+" + recentGain.addSeparators()
             }
 
-            val goal = if (goalAmount == -1L) "" else " §f/ §b$goalAmount §f(§a${
+            val goal = if (goalAmount == -1L) "" else " §f/ §b${goalAmount.addSeparators()} §f(§a${
                 itemAmount.percentWithColorCode(goalAmount, 1)
             }§f)"
 
