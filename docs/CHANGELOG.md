@@ -14,15 +14,40 @@
 
 ### Improvements
 
-### Bug Fixes
+#### Chat Improvements
 
-#### Bingo
++ Added more messages to chat filter category annoying. - martimavocado
+    + Not enough breaking power for gems.
+    + Useless messages for sky mall and Jacob's event artifact.
++ Adding a toggle to hide sky mall perk messages outside mining islands. - martimavocado
++ Added a toggle to hide Jacob's event artifact message outside the garden. - martimavocado
+
+### Fixes
+
+#### Bingo Fixes
 
 + Fixed Bingo Card Tips using wrong slot sometimes. - Thunderblade73
 
-#### Mining
+#### Mining Fixes
 
 + Fixed a small typo in the Deep Caverns Parkour message. - alexia
+
+#### Inventory Fixes
+
++ Fixed copy underbid keybind not working. - Obsidian
++ Fixed SkyBlock guide highlight missing tasks not working properly for minions and collections. - Thunderblade73
+
+#### Chat Fixes
+
++ Fixed Fire Sale chat hider not working when multiple fire sales are ending. - Zickles
+
+#### Command Fixes
+
++ Fixed duplicate commands in /shcommands. - CalMWolfs
+
+#### Misc Fixes
+
++ Fixed skill level up message when below level 60. - HiZe
 
 ### Technical Details
 
