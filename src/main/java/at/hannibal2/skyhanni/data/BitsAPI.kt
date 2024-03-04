@@ -8,7 +8,6 @@ import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.NumberUtil.formatInt
-import at.hannibal2.skyhanni.utils.NumberUtil.formatNumber
 import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.StringUtils.matches
 import at.hannibal2.skyhanni.utils.StringUtils.removeResets
@@ -103,7 +102,7 @@ object BitsAPI {
             val message = line.trimWhiteSpace().removeResets()
 
             bitsScoreboardPattern.matchMatcher(message) {
-                val amount = group("amount").formatNumber().toInt()
+                val amount = group("amount").formatInt()
 
                 if (amount > bits) {
                     bitsToClaim -= amount - bits
@@ -156,22 +155,21 @@ object BitsAPI {
         }
 
         if (fameRankGuiNamePattern.matches(event.inventoryName)) {
-            val fameRankStack = stacks.values.lastOrNull { fameRankGuiStackPattern.matches(it.displayName) }
-            if (fameRankStack != null) {
-                line@ for (line in fameRankStack.getLore()) {
-                    fameRankCommunityShopPattern.matchMatcher(line) {
-                        val rank = group("rank")
-                        currentFameRank = FameRank.entries.firstOrNull { it.rank == rank } ?: FameRank.NEW_PLAYER
+            val fameRankStack = stacks.values.lastOrNull { fameRankGuiStackPattern.matches(it.displayName) } ?: return
 
-                        continue@line
-                    }
+            line@ for (line in fameRankStack.getLore()) {
+                fameRankCommunityShopPattern.matchMatcher(line) {
+                    val rank = group("rank")
+                    currentFameRank = FameRank.entries.firstOrNull { it.rank == rank } ?: FameRank.NEW_PLAYER
 
-                    fameRankSbMenuPattern.matchMatcher(line) {
-                        val rank = group("rank")
-                        currentFameRank = FameRank.entries.firstOrNull { it.rank == rank } ?: FameRank.NEW_PLAYER
+                    continue@line
+                }
 
-                        continue@line
-                    }
+                fameRankSbMenuPattern.matchMatcher(line) {
+                    val rank = group("rank")
+                    currentFameRank = FameRank.entries.firstOrNull { it.rank == rank } ?: FameRank.NEW_PLAYER
+
+                    continue@line
                 }
             }
         }
