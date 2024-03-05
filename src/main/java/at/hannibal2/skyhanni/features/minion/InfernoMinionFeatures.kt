@@ -19,7 +19,7 @@ class InfernoMinionFeatures {
     private val config get() = SkyHanniMod.feature.minions
     private val infernoMinionTitlePattern by RepoPattern.pattern(
         "minion.infernominiontitle",
-        "Ice Minion .*"
+        "Inferno Minion .*"
     )
     private var fuelItemIds = listOf<NEUInternalName>()
     private var isInventory = false
