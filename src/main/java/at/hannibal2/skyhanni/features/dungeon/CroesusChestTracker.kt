@@ -32,7 +32,7 @@ class CroesusChestTracker {
     private val config get() = SkyHanniMod.feature.dungeon.chest
 
     private val croesusPattern by RepoPattern.pattern("dungeon.croesus.inventory", "Croesus")
-    private val croesusEmptyPattern by RepoPattern.pattern("dungeon.croesus.empty", "§cYou already rerolled a chest!")
+    private val croesusEmptyPattern by RepoPattern.pattern("dungeon.croesus.empty", "§cNo treasures!")
     private val kismetPattern by RepoPattern.pattern("dungeon.kismet.reroll", "§aReroll Chest")
     private val kismetUsedPattern by RepoPattern.pattern("dungeon.kismet.used", "§aYou already rerolled a chest!")
 
@@ -62,7 +62,7 @@ class CroesusChestTracker {
         if (!LorenzUtils.inSkyBlock) return
         if (!SkyHanniMod.feature.dungeon.croesusUnopenedChestTracker) return
 
-        if (inCroesusInventory) {
+        if (inCroesusInventory && !croesusEmpty) {
             for ((run, slot) in InventoryUtils.getItemsInOpenChest()
                 .mapNotNull { slot -> runSlots(slot.slotIndex, slot) }) {
 
