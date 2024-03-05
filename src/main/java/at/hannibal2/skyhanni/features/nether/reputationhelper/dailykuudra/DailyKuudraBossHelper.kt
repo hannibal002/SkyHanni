@@ -13,6 +13,7 @@ import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.CollectionUtils.addAsSingletonList
 import at.hannibal2.skyhanni.utils.LorenzColor
 import at.hannibal2.skyhanni.utils.LorenzUtils
+import at.hannibal2.skyhanni.utils.LorenzUtils.isInIsland
 import at.hannibal2.skyhanni.utils.LorenzVec
 import at.hannibal2.skyhanni.utils.NEUItems.getItemStack
 import at.hannibal2.skyhanni.utils.RenderUtils.drawDynamicText
@@ -29,9 +30,8 @@ class DailyKuudraBossHelper(private val reputationHelper: CrimsonIsleReputationH
 
     @SubscribeEvent
     fun onRenderWorld(event: LorenzRenderWorldEvent) {
-        if (!LorenzUtils.inSkyBlock) return
-        if (LorenzUtils.skyBlockIsland != IslandType.CRIMSON_ISLE) return
-        if (!reputationHelper.config.enabled) return
+        if (!IslandType.CRIMSON_ISLE.isInIsland()) return
+        if (!config.enabled) return
         if (!reputationHelper.showLocations()) return
         if (allKuudraDone) return
 
@@ -44,7 +44,7 @@ class DailyKuudraBossHelper(private val reputationHelper: CrimsonIsleReputationH
     @SubscribeEvent
     fun onChat(event: LorenzChatEvent) {
         if (!LorenzUtils.inKuudraFight) return
-        if (!reputationHelper.config.enabled) return
+        if (!config.enabled) return
 
         val message = event.message
         if (!message.contains("KUUDRA DOWN!") || message.contains(":")) return

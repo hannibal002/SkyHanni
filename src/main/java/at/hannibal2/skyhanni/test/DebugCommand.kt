@@ -6,6 +6,7 @@ import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.events.DebugDataCollectEvent
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils
+import at.hannibal2.skyhanni.utils.LorenzUtils.isInIsland
 import at.hannibal2.skyhanni.utils.OSUtils
 import at.hannibal2.skyhanni.utils.StringUtils.equalsIgnoreColor
 
@@ -102,7 +103,7 @@ object DebugCommand {
             event.addData("not on SkyBlock, but on Hypixel")
             return
         }
-        if (LorenzUtils.skyBlockIsland == IslandType.UNKNOWN) {
+        if (IslandType.UNKNOWN.isInIsland()) {
             event.addData("Unknown SkyBlock island!")
             return
         }
