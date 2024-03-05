@@ -32,7 +32,7 @@ class CraftMaterialsFromBazaar {
         ".* Recipe"
     )
 
-    private var inInventory = false
+    private var inRecipeInventory = false
     private var purchasing = false
     private var display = listOf<Renderable>()
     private var neededMaterials = mapOf<NEUInternalName, Int>()
@@ -40,12 +40,13 @@ class CraftMaterialsFromBazaar {
 
     @SubscribeEvent
     fun onInventoryOpen(event: InventoryFullyOpenedEvent) {
+        if (!isEnabled()) return
         val correctInventoryName = pattern.matches(event.inventoryName)
         val items = event.inventoryItems
         val correctItem = items[23]?.name == "§aCrafting Table"
 
-        inInventory = correctInventoryName && correctItem && !purchasing
-        if (!inInventory) return
+        inRecipeInventory = correctInventoryName && correctItem && !purchasing
+        if (!inRecipeInventory) return
 
         val recipeName = items[25]?.itemName ?: return
         showRecipe(calculateMaterialsNeeded(items), recipeName)
@@ -149,16 +150,17 @@ class CraftMaterialsFromBazaar {
 
     @SubscribeEvent
     fun onInventoryClose(event: InventoryCloseEvent) {
-        inInventory = false
+        inRecipeInventory = false
     }
 
     @SubscribeEvent
     fun onRenderOverlay(event: GuiRenderEvent.ChestGuiOverlayRenderEvent) {
         if (!isEnabled()) return
+        if (!inRecipeInventory && !purchasing) return
 
         config.craftMaterialsFromBazaarPosition.renderRenderables(display, posLabel = "Craft Materials From Bazaar")
     }
 
-    fun isEnabled() = LorenzUtils.inSkyBlock && config.craftMaterialsFromBazaar && (inInventory || purchasing)
+    fun isEnabled() = LorenzUtils.inSkyBlock && config.craftMaterialsFromBazaar
 
 }
