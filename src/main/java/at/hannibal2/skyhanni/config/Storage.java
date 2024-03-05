@@ -75,7 +75,7 @@ public class Storage {
     public Map<UUID, PlayerSpecific> players = new HashMap<>();
 
     @Expose
-    public FameRank currentFameRank = null;
+    public String currentFameRank = null;
 
     public static class PlayerSpecific {
 

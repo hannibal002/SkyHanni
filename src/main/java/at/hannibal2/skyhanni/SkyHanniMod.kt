@@ -18,6 +18,7 @@ import at.hannibal2.skyhanni.data.ChatManager
 import at.hannibal2.skyhanni.data.CropAccessoryData
 import at.hannibal2.skyhanni.data.EntityData
 import at.hannibal2.skyhanni.data.EntityMovementData
+import at.hannibal2.skyhanni.data.FameRanks
 import at.hannibal2.skyhanni.data.FriendAPI
 import at.hannibal2.skyhanni.data.GardenComposterUpgradesData
 import at.hannibal2.skyhanni.data.GardenCropMilestones
@@ -481,6 +482,7 @@ class SkyHanniMod {
         loadModule(RiftAPI)
         loadModule(SackAPI)
         loadModule(BingoAPI)
+        loadModule(FameRanks)
         loadModule(FishingAPI)
         loadModule(MaxwellAPI)
         loadModule(QuiverAPI)

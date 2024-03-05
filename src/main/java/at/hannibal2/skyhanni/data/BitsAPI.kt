@@ -1,9 +1,11 @@
 package at.hannibal2.skyhanni.data
 
 import at.hannibal2.skyhanni.SkyHanniMod
+import at.hannibal2.skyhanni.data.FameRanks.getFameRankByNameOrNull
 import at.hannibal2.skyhanni.events.InventoryFullyOpenedEvent
 import at.hannibal2.skyhanni.events.LorenzChatEvent
 import at.hannibal2.skyhanni.events.ScoreboardChangeEvent
+import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.LorenzUtils
@@ -20,17 +22,19 @@ object BitsAPI {
     private val playerStorage get() = SkyHanniMod.feature.storage
     var bits: Int
         get() = profileStorage?.bits ?: 0
-        set(value) {
+        private set(value) {
             profileStorage?.bits = value
         }
-    var currentFameRank: FameRank
-        get() = playerStorage?.currentFameRank ?: FameRank.NEW_PLAYER
-        set(value) {
-            playerStorage?.currentFameRank = value
+    var currentFameRank: FameRank?
+        get() = playerStorage?.currentFameRank?.let { getFameRankByNameOrNull(it) }
+        private set(value) {
+            if (value != null) {
+                playerStorage?.currentFameRank = value.name
+            }
         }
     var bitsToClaim: Int
         get() = profileStorage?.bitsToClaim ?: 0
-        set(value) {
+        private set(value) {
             profileStorage?.bitsToClaim = value
         }
 
@@ -128,7 +132,7 @@ object BitsAPI {
         }
 
         boosterCookieAte.matchMatcher(message) {
-            bitsToClaim += (defaultcookiebits * currentFameRank.bitsMultiplier).toInt()
+            bitsToClaim += (defaultcookiebits * (currentFameRank?.bitsMultiplier ?: return)).toInt()
 
             return
         }
@@ -160,14 +164,29 @@ object BitsAPI {
             line@ for (line in fameRankStack.getLore()) {
                 fameRankCommunityShopPattern.matchMatcher(line) {
                     val rank = group("rank")
-                    currentFameRank = FameRank.entries.firstOrNull { it.rank == rank } ?: FameRank.NEW_PLAYER
+
+                    currentFameRank = getFameRankByNameOrNull(rank)
+                        ?: return ErrorManager.logErrorWithData(
+                            FameRankNotFoundException(rank),
+                            "FameRank $rank not found",
+                            "Rank" to rank,
+                            "Lore" to fameRankStack.getLore(),
+                            "FameRanks" to FameRanks.fameRanks
+                        )
 
                     continue@line
                 }
 
                 fameRankSbMenuPattern.matchMatcher(line) {
                     val rank = group("rank")
-                    currentFameRank = FameRank.entries.firstOrNull { it.rank == rank } ?: FameRank.NEW_PLAYER
+                    currentFameRank = getFameRankByNameOrNull(rank)
+                        ?: return ErrorManager.logErrorWithData(
+                            FameRankNotFoundException(rank),
+                            "FameRank $rank not found",
+                            "Rank" to rank,
+                            "Lore" to fameRankStack.getLore(),
+                            "FameRanks" to FameRanks.fameRanks
+                        )
 
                     continue@line
                 }
@@ -176,4 +195,6 @@ object BitsAPI {
     }
 
     fun isEnabled() = LorenzUtils.inSkyBlock && profileStorage != null
+
+    class FameRankNotFoundException(rank: String) : Exception("FameRank not found: $rank")
 }
