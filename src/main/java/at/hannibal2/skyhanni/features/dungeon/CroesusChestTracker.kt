@@ -19,6 +19,7 @@ import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.NEUInternalName.Companion.asInternalName
 import at.hannibal2.skyhanni.utils.NumberUtil.romanToDecimal
 import at.hannibal2.skyhanni.utils.RenderUtils.highlight
+import at.hannibal2.skyhanni.utils.StringUtils.anyMatches
 import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.StringUtils.matches
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
@@ -31,13 +32,19 @@ class CroesusChestTracker {
 
     private val config get() = SkyHanniMod.feature.dungeon.chest
 
-    private val croesusPattern by RepoPattern.pattern("dungeon.croesus.inventory", "Croesus")
-    private val croesusEmptyPattern by RepoPattern.pattern("dungeon.croesus.empty", "§cNo treasures!")
-    private val kismetPattern by RepoPattern.pattern("dungeon.kismet.reroll", "§aReroll Chest")
-    private val kismetUsedPattern by RepoPattern.pattern("dungeon.kismet.used", "§aYou already rerolled a chest!")
+    private val repoGroup = RepoPattern.group("dungeon.croesus")
 
-    private val floorPattern by RepoPattern.pattern("dungeon.croesus.chest.floor", "§7Tier: §eFloor (?<floor>[IV]+)")
-    private val masterPattern by RepoPattern.pattern("dungeon.croesus.chest.master", ".*Master.*")
+    private val croesusPattern by repoGroup.pattern("inventory", "Croesus")
+    private val croesusEmptyPattern by repoGroup.pattern("empty", "§cNo treasures!")
+    private val kismetPattern by repoGroup.pattern("kismet.reroll", "§aReroll Chest")
+    private val kismetUsedPattern by repoGroup.pattern("kismet.used", "§aYou already rerolled a chest!")
+
+    private val floorPattern by repoGroup.pattern("chest.floor", "§7Tier: §eFloor (?<floor>[IV]+)")
+    private val masterPattern by repoGroup.pattern("chest.master", ".*Master.*")
+
+    private val keyUsedPattern by repoGroup.pattern("chest.state.keyused", "§aNo more Chests to open!")
+    private val openedPattern by repoGroup.pattern("chest.state.opened", "§8Opened Chest:.*")
+    private val unopenedPattern by repoGroup.pattern("chest.state.unopened", "§8No Chests Opened!")
 
     private val kismetSlotId = 50
     private val emptySlotId = 22
@@ -108,9 +115,9 @@ class CroesusChestTracker {
                         floorPattern.matchMatcher(it) { group("floor").romanToDecimal() }
                     } ?: "0")
                 run.openState = when {
-                    "§aNo more Chests to open!" in lore -> OpenedState.KEY_USED
-                    lore.any { it.contains("Opened Chest:") } -> OpenedState.OPENED
-                    lore.any { it.contains("§8No Chests Opened!") } -> OpenedState.UNOPENED
+                    keyUsedPattern.anyMatches(lore) -> OpenedState.KEY_USED
+                    openedPattern.anyMatches(lore) -> OpenedState.OPENED
+                    unopenedPattern.anyMatches(lore) -> OpenedState.UNOPENED
                     else -> OpenedState.OPENED
                 }
             }
