@@ -51,7 +51,7 @@ public class BazaarConfig {
     public Position maxPurseItemsPosition = new Position(346, 90, true, false);
 
     @Expose
-    @ConfigOption(name = "Craft Materials Bazaar", desc = "Show in a crafting view a shopping list of materials needed when buying from Bazaar.")
+    @ConfigOption(name = "Craft Materials Bazaar", desc = "In the crafting view, offer a shopping list of required materials for the craft along with a convenient shortcut for purchasing them from the Bazaar.")
     @ConfigEditorBoolean
     @FeatureToggle
     public boolean craftMaterialsFromBazaar = false;
