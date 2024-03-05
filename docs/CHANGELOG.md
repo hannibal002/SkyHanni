@@ -11,6 +11,8 @@
       purse.
 + Added Copy Underbid Keybind. - Obsidian
     + Copies the price of the hovered item in Auction House minus 1 coin into the clipboard for easier under-bidding.
++ Gfs message after super crafting. — Zickles
+    + Adding a clickable message to pick up the super crafted items from sacks.
 
 ### Improvements
 
@@ -31,6 +33,13 @@
 
 + Added option to only show Custom Text Box while an inventory is open. - martimavocado
 + Added option to hide Profit Trackers while not inside an inventory. - hannibal2
+
+#### Misc Improvements
+
++ Added option to show some features outside SkyBlock. - Obsidian
++ Added goal to collection tracker. - Thunderblade73
+    + /shtrackcollection \<item name> [goal amount]
+    + Shows a chat message once the goal has been reached.
 
 ### Fixes
 
@@ -60,6 +69,7 @@
 #### Misc Fixes
 
 + Fixed skill level up message when below level 60. - HiZe
++ Fixed SkyHanni not working on Alpha. - hannibal2 & CalMWolfs
 
 ### Technical Details
 
