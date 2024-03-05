@@ -13,7 +13,7 @@ enum class PowderChestReward(val displayName: String, pattern: String) {
     ),
     FLAWED_RUBY_GEMSTONE(
         "§aFlawed Sapphire Gemstone",
-        "§aYou received §r§f(?<amount>.*) §r§a❤ Flawed RubyGemstone§r§a."
+        "§aYou received §r§f(?<amount>.*) §r§a❤ Flawed Ruby Gemstone§r§a."
     ),
     FINE_RUBY_GEMSTONE(
         "§9Fine Ruby Gemstone",
@@ -145,11 +145,14 @@ enum class PowderChestReward(val displayName: String, pattern: String) {
     PREHISTORIC_EGG("§fPrehistoric Egg", "§aYou received §r§f(?<amount>.*) §r§fPrehistoric Egg§r§a."),
     OIL_BARREL("§aOil Barrel", "§aYou received §r§f(?<amount>.*) §r§aOil Barrel§r§a."),
 
-    DIAMOND_ESSENCE("§bDiamond Essence", "§aYou received §r§b[+](?<amount>.*) Diamond Essence"),
-    GOLD_ESSENCE("§6Gold Essence", "§aYou received §r§6[+](?<amount>.*) Gold Essence"),
+    DIAMOND_ESSENCE("§bDiamond Essence", "§aYou received §r§b[+](?<amount>.*) Diamond Essence§r§a."),
+    GOLD_ESSENCE("§6Gold Essence", "§aYou received §r§6[+](?<amount>.*) Gold Essence§r§a."),
     ;
 
-    val chatPattern by RepoPattern.pattern("mining.powder.tracker.reward." + this.patternName(), pattern)
+    val chatPattern by RepoPattern.pattern(
+        "mining.powder.tracker.reward." + this.patternName(),
+        pattern
+    )
 
     private fun patternName() = name.lowercase().replace("_", "")
 }

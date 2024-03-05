@@ -6,16 +6,16 @@ import at.hannibal2.skyhanni.events.InventoryCloseEvent
 import at.hannibal2.skyhanni.events.InventoryFullyOpenedEvent
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.LorenzUtils
+import at.hannibal2.skyhanni.utils.LorenzUtils.makeShiftClick
 import at.hannibal2.skyhanni.utils.StringUtils.matches
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
-import net.minecraft.client.Minecraft
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
 object ShiftClickNPCSell {
 
     private val config get() = SkyHanniMod.feature.inventory.shiftClickNPCSell
 
-    private val sellSlot = 49
+    private val sellSlot = -4
     private val lastLoreLineOfSellPattern by RepoPattern.pattern(
         "inventory.npc.sell.lore",
         "§7them to this Shop!|§eClick to buyback!"
@@ -29,7 +29,10 @@ object ShiftClickNPCSell {
     @SubscribeEvent
     fun onOpen(event: InventoryFullyOpenedEvent) {
         if (!LorenzUtils.inSkyBlock) return
-        inInventory = lastLoreLineOfSellPattern.matches(event.inventoryItems[sellSlot]?.getLore()?.lastOrNull())
+        if (event.inventoryItems.isEmpty()) return
+        val item = event.inventoryItems[event.inventoryItems.keys.last() + sellSlot] ?: return
+
+        inInventory = lastLoreLineOfSellPattern.matches(item.getLore().lastOrNull())
     }
 
     @SubscribeEvent
@@ -46,9 +49,6 @@ object ShiftClickNPCSell {
 
         if (slot.slotNumber == slot.slotIndex) return
 
-        event.isCanceled = true
-        Minecraft.getMinecraft().playerController.windowClick(
-            event.container.windowId, event.slot.slotNumber, event.clickedButton, 1, Minecraft.getMinecraft().thePlayer
-        )
+        event.makeShiftClick()
     }
 }

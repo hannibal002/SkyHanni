@@ -1,12 +1,14 @@
 package at.hannibal2.skyhanni.features.misc
 
 import at.hannibal2.skyhanni.SkyHanniMod
+import at.hannibal2.skyhanni.config.enums.OutsideSbFeature
 import at.hannibal2.skyhanni.events.ConfigLoadEvent
 import at.hannibal2.skyhanni.events.LorenzTickEvent
 import at.hannibal2.skyhanni.events.LorenzWorldChangeEvent
 import at.hannibal2.skyhanni.events.RenderMobColoredEvent
 import at.hannibal2.skyhanni.events.ResetEntityHurtEvent
 import at.hannibal2.skyhanni.events.withAlpha
+import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.EntityUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import net.minecraft.client.Minecraft
@@ -14,16 +16,16 @@ import net.minecraft.client.entity.EntityOtherPlayerMP
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
 class MarkedPlayerManager {
-
     private val config get() = SkyHanniMod.feature.markedPlayers
 
     companion object {
+
         val playerNamesToMark = mutableListOf<String>()
         private val markedPlayers = mutableMapOf<String, EntityOtherPlayerMP>()
 
         fun command(args: Array<String>) {
             if (args.size != 1) {
-                LorenzUtils.userError("Usage: /shmarkplayer <name>")
+                ChatUtils.userError("Usage: /shmarkplayer <name>")
                 return
             }
 
@@ -32,18 +34,18 @@ class MarkedPlayerManager {
 
 
             if (name == LorenzUtils.getPlayerName().lowercase()) {
-                LorenzUtils.userError("You can't add or remove yourself this way! Go to the settings and toggle 'Mark your own name'.")
+                ChatUtils.userError("You can't add or remove yourself this way! Go to the settings and toggle 'Mark your own name'.")
                 return
             }
 
             if (name !in playerNamesToMark) {
                 playerNamesToMark.add(name)
                 findPlayers()
-                LorenzUtils.chat("§aMarked §eplayer §b$displayName§e!")
+                ChatUtils.chat("§aMarked §eplayer §b$displayName§e!")
             } else {
                 playerNamesToMark.remove(name)
                 markedPlayers.remove(name)
-                LorenzUtils.chat("§cUnmarked §eplayer §b$displayName§e!")
+                ChatUtils.chat("§cUnmarked §eplayer §b$displayName§e!")
             }
         }
 
@@ -59,9 +61,7 @@ class MarkedPlayerManager {
         }
 
         fun isMarkedPlayer(player: String): Boolean = player.lowercase() in playerNamesToMark
-
     }
-
 
     @SubscribeEvent
     fun onConfigLoad(event: ConfigLoadEvent) {
@@ -79,7 +79,7 @@ class MarkedPlayerManager {
 
     @SubscribeEvent
     fun onTick(event: LorenzTickEvent) {
-        if (!LorenzUtils.inSkyBlock) return
+        if (!isEnabled()) return
 
         if (event.repeatSeconds(1)) {
             findPlayers()
@@ -106,6 +106,8 @@ class MarkedPlayerManager {
         }
     }
 
+    private fun isEnabled() = config.highlightInWorld && (LorenzUtils.inSkyBlock || OutsideSbFeature.MARKED_PLAYERS.isSelected())
+
     @SubscribeEvent
     fun onWorldChange(event: LorenzWorldChangeEvent) {
         if (Minecraft.getMinecraft().thePlayer == null) return
@@ -118,6 +120,4 @@ class MarkedPlayerManager {
             }
         }
     }
-
-    private fun isEnabled() = LorenzUtils.inSkyBlock && config.highlightInWorld
 }

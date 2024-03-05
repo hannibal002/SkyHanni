@@ -5,9 +5,9 @@ import at.hannibal2.skyhanni.events.LorenzChatEvent
 import at.hannibal2.skyhanni.events.LorenzRenderWorldEvent
 import at.hannibal2.skyhanni.features.garden.pests.SprayType
 import at.hannibal2.skyhanni.features.misc.LockMouseLook
+import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.name
 import at.hannibal2.skyhanni.utils.LocationUtils.isPlayerInside
-import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.LorenzVec
 import at.hannibal2.skyhanni.utils.RenderUtils.draw3DLine
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
@@ -23,10 +23,13 @@ import kotlin.time.Duration.Companion.minutes
 
 object GardenPlotAPI {
 
-    private val plotNamePattern by RepoPattern.pattern("garden.plot.name", "§.Plot §7- §b(?<name>.*)")
-
-    private val plotSprayedPattern by RepoPattern.pattern(
-        "garden.plot.spray.target",
+    private val patternGroup = RepoPattern.group("garden.plot")
+    private val plotNamePattern by patternGroup.pattern(
+        "name",
+        "§.Plot §7- §b(?<name>.*)"
+    )
+    private val plotSprayedPattern by patternGroup.pattern(
+        "spray.target",
         "§a§lSPRAYONATOR! §r§7You sprayed §r§aPlot §r§7- §r§b(?<plot>.*) §r§7with §r§a(?<spray>.*)§r§7!"
     )
 
@@ -55,12 +58,12 @@ object GardenPlotAPI {
         var sprayType: SprayType?,
 
         @Expose
-        var sprayHasNotified: Boolean
+        var sprayHasNotified: Boolean,
     )
 
     data class SprayData(
         val expiry: SimpleTimeMark,
-        val type: SprayType
+        val type: SprayType,
     )
 
     private fun Plot.getData() = GardenAPI.storage?.plotData?.getOrPut(id) { PlotData(id, "$id", 0, null, null, false) }
@@ -106,7 +109,7 @@ object GardenPlotAPI {
     fun Plot.isPlayerInside() = box.isPlayerInside()
 
     fun Plot.sendTeleportTo() {
-        LorenzUtils.sendCommandToServer("tptoplot $name")
+        ChatUtils.sendCommandToServer("tptoplot $name")
         LockMouseLook.autoDisable()
     }
 
@@ -172,7 +175,7 @@ object GardenPlotAPI {
         plot: Plot,
         lineColor: Color,
         cornerColor: Color,
-        showBuildLimit: Boolean = false
+        showBuildLimit: Boolean = false,
     ) {
 
         // These don't refer to Minecraft chunks but rather garden plots, but I use
@@ -244,7 +247,7 @@ object GardenPlotAPI {
         p2: LorenzVec,
         color: Color,
         lineWidth: Int,
-        depth: Boolean
+        depth: Boolean,
     ) {
         if (isOutOfBorders(p1)) return
         if (isOutOfBorders(p2)) return
@@ -259,5 +262,4 @@ object GardenPlotAPI {
 
         else -> false
     }
-
 }

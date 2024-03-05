@@ -6,14 +6,17 @@ import at.hannibal2.skyhanni.data.GuiEditManager.Companion.getAbsX
 import at.hannibal2.skyhanni.data.GuiEditManager.Companion.getAbsY
 import at.hannibal2.skyhanni.events.GuiRenderItemEvent
 import at.hannibal2.skyhanni.events.LorenzRenderWorldEvent
+import at.hannibal2.skyhanni.features.misc.RoundedRectangleShader
 import at.hannibal2.skyhanni.test.command.ErrorManager
-import at.hannibal2.skyhanni.utils.LorenzUtils.addAsSingletonList
 import at.hannibal2.skyhanni.utils.renderables.Renderable
+import at.hannibal2.skyhanni.utils.renderables.RenderableUtils.renderXAligned
+import at.hannibal2.skyhanni.utils.shader.ShaderManager
 import io.github.moulberry.moulconfig.internal.TextRenderUtils
 import io.github.moulberry.notenoughupdates.util.Utils
 import net.minecraft.client.Minecraft
 import net.minecraft.client.gui.FontRenderer
 import net.minecraft.client.gui.Gui
+import net.minecraft.client.gui.ScaledResolution
 import net.minecraft.client.renderer.GlStateManager
 import net.minecraft.client.renderer.Tessellator
 import net.minecraft.client.renderer.vertex.DefaultVertexFormats
@@ -33,6 +36,9 @@ import kotlin.time.Duration
 import kotlin.time.DurationUnit
 
 object RenderUtils {
+
+    enum class HorizontalAlignment { LEFT, CENTER, RIGHT }
+    enum class VerticalAlignment { TOP, CENTER, BOTTOM }
 
     private val beaconBeam = ResourceLocation("textures/entity/beacon_beam.png")
 
@@ -306,7 +312,7 @@ object RenderUtils {
         val z =
             pos.z - player.lastTickPosZ + (pos.z - player.posZ - (pos.z - player.lastTickPosZ)) * partialTicks
 
-        //7 – 25
+        // 7 – 25
 
         val translate = LorenzVec(x, y, z)
         val length = translate.length().toFloat()
@@ -413,15 +419,24 @@ object RenderUtils {
     fun Position.renderRenderables(
         renderables: List<Renderable>,
         extraSpace: Int = 0,
-        itemScale: Double = 1.0,
         posLabel: String,
     ) {
         if (renderables.isEmpty()) return
-        val list = mutableListOf<List<Any>>()
+        var longestY = 0
+        val longestX = renderables.maxOf { it.width }
         for (line in renderables) {
-            list.addAsSingletonList(line)
+            GlStateManager.pushMatrix()
+            val (x, y) = transform()
+            GlStateManager.translate(0f, longestY.toFloat(), 0F)
+            Renderable.withMousePosition(x, y) {
+                line.renderXAligned(0, longestY, longestX)
+            }
+
+            longestY += line.height + extraSpace + 2
+
+            GlStateManager.popMatrix()
         }
-        renderStringsAndItems(list, extraSpace, itemScale, posLabel)
+        GuiEditManager.add(this, posLabel, longestX, longestY)
     }
 
     /**
@@ -447,15 +462,10 @@ object RenderUtils {
                 offsetY += 10 + extraSpace + 2
             }
         } catch (e: NullPointerException) {
-            println(" ")
-            for (innerList in list) {
-                println("new inner list:")
-                for (any in innerList) {
-                    println("any: '$any'")
-                }
-            }
-            e.printStackTrace()
-            LorenzUtils.debug("NPE in renderStringsAndItems!")
+            ErrorManager.logErrorWithData(
+                e, "Failed to render an element",
+                "list" to list
+            )
         }
         GuiEditManager.add(this, posLabel, longestX, offsetY)
     }
@@ -534,7 +544,7 @@ object RenderUtils {
             val z: Double =
                 entity.lastTickPosZ + (entity.posZ - entity.lastTickPosZ) * partialTicks - renderManager.viewerPosZ
             val pix2 = Math.PI * 2.0
-            for (i in 0..90) {
+            for (i in 0 .. 90) {
                 color.bindColor()
                 worldRenderer.pos(x + rad * cos(i * pix2 / 45.0), y + il, z + rad * sin(i * pix2 / 45.0)).endVertex()
             }
@@ -653,7 +663,7 @@ object RenderUtils {
         val distToPlayerSq =
             (x - renderOffsetX) * (x - renderOffsetX) + (y - (renderOffsetY + eyeHeight)) * (y - (renderOffsetY + eyeHeight)) + (z - renderOffsetZ) * (z - renderOffsetZ)
         var distToPlayer = sqrt(distToPlayerSq)
-        //TODO this is optional maybe?
+        // TODO this is optional maybe?
         distToPlayer = distToPlayer.coerceAtLeast(smallestDistanceVew)
 
         if (distToPlayer < hideTooCloseAt) return
@@ -787,7 +797,7 @@ object RenderUtils {
         val worldRenderer = tessellator.worldRenderer
         GlStateManager.color(c.red / 255f, c.green / 255f, c.blue / 255f, c.alpha / 255f * alphaMultiplier)
 
-        //vertical
+        // vertical
         worldRenderer.begin(GL11.GL_QUADS, DefaultVertexFormats.POSITION)
         worldRenderer.pos(aabb.minX, aabb.minY, aabb.minZ).endVertex()
         worldRenderer.pos(aabb.maxX, aabb.minY, aabb.minZ).endVertex()
@@ -807,7 +817,7 @@ object RenderUtils {
             c.alpha / 255f * alphaMultiplier
         )
 
-        //x
+        // x
         worldRenderer.begin(GL11.GL_QUADS, DefaultVertexFormats.POSITION)
         worldRenderer.pos(aabb.minX, aabb.minY, aabb.maxZ).endVertex()
         worldRenderer.pos(aabb.minX, aabb.maxY, aabb.maxZ).endVertex()
@@ -826,7 +836,7 @@ object RenderUtils {
             c.blue / 255f * 0.9f,
             c.alpha / 255f * alphaMultiplier
         )
-        //z
+        // z
         worldRenderer.begin(GL11.GL_QUADS, DefaultVertexFormats.POSITION)
         worldRenderer.pos(aabb.minX, aabb.maxY, aabb.minZ).endVertex()
         worldRenderer.pos(aabb.maxX, aabb.maxY, aabb.minZ).endVertex()
@@ -853,7 +863,7 @@ object RenderUtils {
          * If set to `false`, will be relativized to [RenderUtils.getViewerPos].
          */
         renderRelativeToCamera: Boolean = false,
-        drawVerticalBarriers: Boolean = true
+        drawVerticalBarriers: Boolean = true,
     ) {
         drawFilledBoundingBox_nea(aabb, c, alphaMultiplier, renderRelativeToCamera, drawVerticalBarriers, partialTicks)
     }
@@ -953,7 +963,7 @@ object RenderUtils {
         val tessellator = Tessellator.getInstance()
         val worldRenderer = tessellator.worldRenderer
 
-        //vertical
+        // vertical
         if (drawVerticalBarriers) {
             GlStateManager.color(c.red / 255f, c.green / 255f, c.blue / 255f, c.alpha / 255f * alphaMultiplier)
             worldRenderer.begin(GL11.GL_QUADS, DefaultVertexFormats.POSITION)
@@ -978,7 +988,7 @@ object RenderUtils {
             c.alpha / 255f * alphaMultiplier
         )
 
-        //x
+        // x
         worldRenderer.begin(GL11.GL_QUADS, DefaultVertexFormats.POSITION)
         with(effectiveAABB) {
             worldRenderer.pos(minX, minY, maxZ).endVertex()
@@ -999,7 +1009,7 @@ object RenderUtils {
             c.blue / 255f * 0.9f,
             c.alpha / 255f * alphaMultiplier
         )
-        //z
+        // z
         worldRenderer.begin(GL11.GL_QUADS, DefaultVertexFormats.POSITION)
         with(effectiveAABB) {
             worldRenderer.pos(minX, maxY, minZ).endVertex()
@@ -1023,7 +1033,7 @@ object RenderUtils {
         boundingBox: AxisAlignedBB,
         lineWidth: Int,
         colour: Color,
-        depth: Boolean
+        depth: Boolean,
     ) {
         val cornerOne = LorenzVec(boundingBox.minX, boundingBox.maxY, boundingBox.minZ)
         val cornerTwo = LorenzVec(boundingBox.minX, boundingBox.maxY, boundingBox.maxZ)
@@ -1037,7 +1047,7 @@ object RenderUtils {
 
     // TODO nea please merge with 'draw3DLine'
     fun LorenzRenderWorldEvent.draw3DLine_nea(
-        p1: LorenzVec, p2: LorenzVec, color: Color, lineWidth: Int, depth: Boolean
+        p1: LorenzVec, p2: LorenzVec, color: Color, lineWidth: Int, depth: Boolean,
     ) {
         GlStateManager.disableDepth()
         GlStateManager.disableCull()
@@ -1082,7 +1092,7 @@ object RenderUtils {
         offset: Float = 0f,
         saturation: Float = 1F,
         brightness: Float = 0.8F,
-        timeOverride: Long = System.currentTimeMillis()
+        timeOverride: Long = System.currentTimeMillis(),
     ): Color {
         return Color(
             Color.HSBtoRGB(
@@ -1097,7 +1107,7 @@ object RenderUtils {
         xPos: Int,
         yPos: Int,
         text: String,
-        scale: Float
+        scale: Float,
     ) {
         val fontRenderer = Minecraft.getMinecraft().fontRendererObj
 
@@ -1117,5 +1127,40 @@ object RenderUtils {
 
         GlStateManager.enableLighting()
         GlStateManager.enableDepth()
+    }
+
+    /**
+     * Method to draw a rounded rectangle.
+     *
+     * **NOTE:** If you are using [GlStateManager.translate] or [GlStateManager.scale]
+     * with this method, ensure they are invoked in the correct order if you use both. That is, [GlStateManager.translate]
+     * is called **BEFORE** [GlStateManager.scale], otherwise the rectangle will not be rendered correctly
+     *
+     * @param color color of rect
+     * @param radius the radius of the corners (default 10)
+     * @param smoothness how smooth the corners will appear (default 2). NOTE: This does very
+     * little to the smoothness of the corners in reality due to how the final pixel color is calculated.
+     * It is best kept at its default.
+     */
+    fun drawRoundRect(x: Int, y: Int, width: Int, height: Int, color: Int, radius: Int = 10, smoothness: Int = 1) {
+        val scaledRes = ScaledResolution(Minecraft.getMinecraft())
+        val widthIn = width * scaledRes.scaleFactor
+        val heightIn = height * scaledRes.scaleFactor
+        val xIn = x * scaledRes.scaleFactor
+        val yIn = y * scaledRes.scaleFactor
+
+        RoundedRectangleShader.scaleFactor = scaledRes.scaleFactor.toFloat()
+        RoundedRectangleShader.radius = radius.toFloat()
+        RoundedRectangleShader.smoothness = smoothness.toFloat()
+        RoundedRectangleShader.halfSize = floatArrayOf(widthIn / 2f, heightIn / 2f)
+        RoundedRectangleShader.centerPos = floatArrayOf(xIn + (widthIn / 2f), yIn + (heightIn / 2f))
+
+        GlStateManager.pushMatrix()
+        ShaderManager.enableShader("rounded_rect")
+
+        Gui.drawRect(x, y, x + width, y + height, color)
+
+        ShaderManager.disableShader()
+        GlStateManager.popMatrix()
     }
 }

@@ -3,7 +3,7 @@ package at.hannibal2.skyhanni.features.event.winter
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.LorenzChatEvent
-import at.hannibal2.skyhanni.events.PreProfileSwitchEvent
+import at.hannibal2.skyhanni.events.ProfileJoinEvent
 import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.NEUInternalName.Companion.asInternalName
@@ -19,6 +19,7 @@ import kotlin.time.Duration.Companion.minutes
 import kotlin.time.Duration.Companion.seconds
 
 class JyrreTimer {
+
     private val config get() = SkyHanniMod.feature.event.winter.jyrreTimer
     private val drankBottlePattern by RepoPattern.pattern(
         "event.winter.drank.jyrre",
@@ -38,7 +39,7 @@ class JyrreTimer {
     }
 
     @SubscribeEvent
-    fun onPreProfileSwitch(event: PreProfileSwitchEvent) {
+    fun onProfileJoin(event: ProfileJoinEvent) {
         resetDisplay()
     }
 

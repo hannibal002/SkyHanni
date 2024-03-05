@@ -118,4 +118,22 @@ public class ChatConfig {
     @ConfigEditorBoolean
     @FeatureToggle
     public boolean translator = false;
+
+    @Expose
+    @ConfigOption(name = "Skyblock XP Chat", desc = "Sends the Skyblock XP message into the chat.")
+    @ConfigEditorBoolean
+    @FeatureToggle
+    public boolean skyBlockXPInChat = true;
+
+    @Expose
+    @ConfigOption(name = "Jacob's Event", desc = "Hide Anita Accessories' fortune bonus messages outside the Garden.")
+    @ConfigEditorBoolean
+    @FeatureToggle
+    public boolean hideJacob = true;
+
+    @Expose
+    @ConfigOption(name = "Sky Mall", desc = "Hides the Sky Mall message outside Mining Islands.")
+    @ConfigEditorBoolean
+    @FeatureToggle
+    public boolean hideSkyMall = true;
 }

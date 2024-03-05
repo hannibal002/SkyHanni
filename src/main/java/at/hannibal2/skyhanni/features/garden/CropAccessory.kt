@@ -7,8 +7,9 @@ enum class CropAccessory(
     val internalName: NEUInternalName?,
     private val affectedCrops: Set<CropType>,
     private val fortune: Double,
-    val upgradeCost: Pair<String, Int>?
+    val upgradeCost: Pair<String, Int>?,
 ) {
+
     NONE(null, emptySet(), 0.0, null),
     CROPIE(
         "CROPIE_TALISMAN".asInternalName(),
@@ -29,6 +30,7 @@ enum class CropAccessory(
     }
 
     companion object {
+
         fun getByName(internalName: NEUInternalName) = entries.firstOrNull { internalName == it.internalName }
     }
 }

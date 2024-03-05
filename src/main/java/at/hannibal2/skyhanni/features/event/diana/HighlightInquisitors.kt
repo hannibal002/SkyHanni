@@ -1,4 +1,4 @@
-package at.hannibal2.skyhanni.features.event.jerry
+package at.hannibal2.skyhanni.features.event.diana
 
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.events.withAlpha
@@ -10,6 +10,7 @@ import net.minecraftforge.event.entity.EntityJoinWorldEvent
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
 class HighlightInquisitors {
+
     private val config get() = SkyHanniMod.feature.event.diana
 
     @SubscribeEvent
