@@ -51,7 +51,7 @@ public class MinionsConfig {
     public boolean hideMobsNametagNearby = false;
 
     @Expose
-    @ConfigOption(name = "Inferno Fuel Blocker", desc = "Prevents the player from picking up the fuel or minion while there is active fuel")
+    @ConfigOption(name = "Inferno Fuel Blocker", desc = "Prevents the player from picking up the fuel or minion while there is active fuel.")
     @ConfigEditorBoolean
     @FeatureToggle
     public boolean infernoFuelBlocker = false;

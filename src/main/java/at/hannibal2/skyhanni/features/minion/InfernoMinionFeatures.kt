@@ -27,16 +27,16 @@ class InfernoMinionFeatures {
     @SubscribeEvent
     fun onRepoReload(event: RepositoryReloadEvent) {
         val data = event.getConstant<InfernoMinionFuelsJson>("InfernoMinionFuels")
-         fuelItemIds = data.inferno_minion_fuel ?: error("§cinferno_minion_fuel is missing from repo.")
+        fuelItemIds = data.minionFuels
     }
 
     @SubscribeEvent
-    fun onMinionOpen(event: InventoryFullyOpenedEvent) {
+    fun onInventoryOpen(event: InventoryFullyOpenedEvent) {
         isInventory = infernoMinionTitlePattern.matches(event.inventoryName)
     }
 
     @SubscribeEvent
-    fun onMinionClose(event: InventoryCloseEvent) {
+    fun onInventoryClose(event: InventoryCloseEvent) {
         isInventory = false
     }
 
@@ -56,7 +56,7 @@ class InfernoMinionFeatures {
     }
 
     @SubscribeEvent
-    fun blockedMessage(event: LorenzToolTipEvent) {
+    fun onTooltip(event: LorenzToolTipEvent) {
         if (!config.infernoFuelBlocker) return
         if (!isInventory) return
 
