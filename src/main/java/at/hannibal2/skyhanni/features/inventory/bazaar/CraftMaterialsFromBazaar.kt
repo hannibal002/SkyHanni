@@ -26,7 +26,7 @@ class CraftMaterialsFromBazaar {
 
     private val config get() = SkyHanniMod.feature.inventory.bazaar
 
-    private val matieralSlots = listOf(10, 11, 12, 19, 20, 21, 28, 29, 30)
+    private val materialSlots = listOf(10, 11, 12, 19, 20, 21, 28, 29, 30)
     private val pattern by RepoPattern.pattern(
         "inventory.recipe.title",
         ".* Recipe"
