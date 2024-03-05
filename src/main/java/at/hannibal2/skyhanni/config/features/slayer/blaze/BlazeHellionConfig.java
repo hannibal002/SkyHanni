@@ -29,7 +29,7 @@ public class BlazeHellionConfig {
 
     @Expose
     @ConfigOption(name = "First Dagger", desc = "Select the first, left sided dagger for the display.")
-    @ConfigEditorDropdown()
+    @ConfigEditorDropdown
     public FirstDaggerEntry firstDagger = FirstDaggerEntry.SPIRIT_OR_CRYSTAL;
 
     public enum FirstDaggerEntry implements HasLegacyId {

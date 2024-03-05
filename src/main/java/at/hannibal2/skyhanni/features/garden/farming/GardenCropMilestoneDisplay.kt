@@ -116,7 +116,7 @@ object GardenCropMilestoneDisplay {
             }
             cultivatingData[crop] = counter
         } catch (e: Throwable) {
-            ErrorManager.logError(e, "Updating crop counter by reading farming tool nbt data.")
+            ErrorManager.logErrorWithData(e, "Updating crop counter by reading farming tool nbt data.")
         }
     }
 
@@ -147,7 +147,7 @@ object GardenCropMilestoneDisplay {
         if (crop.isMaxed()) {
             list.add("§7" + crop.cropName + " §eMAXED")
         } else {
-            list.add("§7" + crop.cropName + " $currentTier➜$nextTier")
+            list.add("§7" + crop.cropName + " §8$currentTier➜§3$nextTier")
         }
         lineMap[1] = list
 

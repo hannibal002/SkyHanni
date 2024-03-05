@@ -1,12 +1,16 @@
 package at.hannibal2.skyhanni.utils.shader
 
-import at.hannibal2.skyhanni.features.chroma.ChromaShader
+import at.hannibal2.skyhanni.features.chroma.StandardChromaShader
+import at.hannibal2.skyhanni.features.chroma.TexturedChromaShader
+import at.hannibal2.skyhanni.features.misc.RoundedRectangleShader
+import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.LorenzUtils
+import java.io.BufferedReader
+import java.io.InputStreamReader
 import net.minecraft.client.Minecraft
 import net.minecraft.util.ResourceLocation
 import org.apache.commons.lang3.StringUtils
-import java.io.BufferedReader
-import java.io.InputStreamReader
+import org.lwjgl.opengl.OpenGLException
 
 /**
  * Object to handle shaders for SkyHanni
@@ -19,12 +23,16 @@ object ShaderManager {
      */
     enum class Shaders(val shader: Shader) {
 
-        CHROMA(ChromaShader.INSTANCE);
+        STANDARD_CHROMA(StandardChromaShader.INSTANCE),
+        TEXTURED_CHROMA(TexturedChromaShader.INSTANCE),
+        ROUNDED_RECTANGLE(RoundedRectangleShader.INSTANCE);
 
         companion object {
 
             fun getShaderInstance(shaderName: String): Shader? = when (shaderName) {
-                "chroma" -> CHROMA.shader
+                "standard_chroma" -> STANDARD_CHROMA.shader
+                "textured_chroma" -> TEXTURED_CHROMA.shader
+                "rounded_rect" -> ROUNDED_RECTANGLE.shader
                 else -> {
                     null
                 }
@@ -43,6 +51,8 @@ object ShaderManager {
             if (shader == null) return
             shaders[shaderName] = shader
         }
+
+        if (!shader.created) return
 
         activeShader = shader
         shader.enable()
@@ -75,14 +85,27 @@ object ShaderManager {
         ShaderHelper.glCompileShader(shaderID)
 
         if (ShaderHelper.glGetShaderi(shaderID, ShaderHelper.GL_COMPILE_STATUS) == 0) {
-            LorenzUtils.consoleLog(
-                "Error occurred when compiling shader $fileName${type.extension} : " +
-                    StringUtils.trim(ShaderHelper.glGetShaderInfoLog(shaderID, 1024))
-            )
+            val errorMessage = "Failed to compile shader $fileName${type.extension}. Features that utilise this " +
+                "shader will not work correctly, if at all"
+            val errorLog = StringUtils.trim(ShaderHelper.glGetShaderInfoLog(shaderID, 1024))
+
+            if (inWorld()) {
+                ErrorManager.logErrorWithData(
+                    OpenGLException("Shader compilation error."),
+                    errorMessage,
+                    "GLSL Compilation Error:\n" to errorLog
+                )
+            } else {
+                LorenzUtils.consoleLog("$errorMessage $errorLog")
+            }
+
+            return -1
         }
 
         return shaderID
     }
+
+    fun inWorld() = (Minecraft.getMinecraft().theWorld != null) && (Minecraft.getMinecraft().thePlayer != null)
 }
 
 enum class ShaderType(val extension: String, val shaderType: Int) {

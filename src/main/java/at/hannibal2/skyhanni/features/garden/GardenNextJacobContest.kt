@@ -3,14 +3,17 @@ package at.hannibal2.skyhanni.features.garden
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.config.ConfigFileType
 import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
+import at.hannibal2.skyhanni.config.enums.OutsideSbFeature
 import at.hannibal2.skyhanni.config.features.garden.NextJacobContestConfig.ShareContestsEntry
 import at.hannibal2.skyhanni.events.ConfigLoadEvent
+import at.hannibal2.skyhanni.events.DebugDataCollectEvent
 import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.InventoryCloseEvent
 import at.hannibal2.skyhanni.events.InventoryFullyOpenedEvent
 import at.hannibal2.skyhanni.events.LorenzTickEvent
 import at.hannibal2.skyhanni.events.TabListUpdateEvent
 import at.hannibal2.skyhanni.features.garden.GardenAPI.addCropIcon
+import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.APIUtil
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.ConfigUtils
@@ -21,12 +24,12 @@ import at.hannibal2.skyhanni.utils.RenderUtils.renderSingleLineWithItems
 import at.hannibal2.skyhanni.utils.RenderUtils.renderStrings
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.SimpleTimeMark.Companion.asTimeMark
-import at.hannibal2.skyhanni.utils.SimpleTimeMark.Companion.now
 import at.hannibal2.skyhanni.utils.SoundUtils
 import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.TabListData
 import at.hannibal2.skyhanni.utils.TimeUtils.format
+import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import com.google.gson.Gson
 import io.github.moulberry.notenoughupdates.util.SkyBlockTime
 import kotlinx.coroutines.Dispatchers
@@ -43,6 +46,7 @@ import javax.swing.JOptionPane
 import javax.swing.UIManager
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.days
+import kotlin.time.Duration.Companion.hours
 import kotlin.time.Duration.Companion.minutes
 import kotlin.time.Duration.Companion.seconds
 
@@ -54,9 +58,19 @@ object GardenNextJacobContest {
     var contests = mutableMapOf<SimpleTimeMark, FarmingContest>()
     private var inCalendar = false
 
-    private val patternDay = "§aDay (?<day>.*)".toPattern()
-    private val patternMonth = "(?<month>.*), Year (?<year>.*)".toPattern()
-    private val patternCrop = "§(e○|6☘) §7(?<crop>.*)".toPattern()
+    private val patternGroup = RepoPattern.group("garden.nextcontest")
+    private val dayPattern by patternGroup.pattern(
+        "day",
+        "§aDay (?<day>.*)"
+    )
+    private val monthPattern by patternGroup.pattern(
+        "month",
+        "(?<month>.*), Year (?<year>.*)"
+    )
+    private val cropPattern by patternGroup.pattern(
+        "crop",
+        "§(e○|6☘) §7(?<crop>.*)"
+    )
 
     private val closeToNewYear = "§7Close to new SB year!"
     private const val maxContestsPerYear = 124
@@ -70,6 +84,45 @@ object GardenNextJacobContest {
     var isFetchingContests = false
     var fetchedFromElite = false
     private var isSendingContests = false
+
+    @SubscribeEvent
+    fun onDebugDataCollect(event: DebugDataCollectEvent) {
+        event.title("Garden Next Jacob Contest")
+
+        if (!GardenAPI.inGarden()) {
+            event.addIrrelevant("not in garden")
+            return
+        }
+
+        event.addData {
+            add("Current time: ${SimpleTimeMark.now()}")
+            add("")
+
+            val display = display.filterIsInstance<String>().joinToString("")
+            add("Display: '$display'")
+            add("")
+
+            add("Contests:")
+            for (contest in contests) {
+                val time = contest.key
+                val passedSince = time.passedSince()
+                val timeUntil = time.timeUntil()
+                val farmingContest = contest.value
+                val crops = farmingContest.crops
+                val recently = 0.seconds..2.hours
+                if (passedSince in recently || timeUntil in recently) {
+                    add(" Time: $time")
+                    if (passedSince.isPositive()) {
+                        add("  Passed since: $passedSince")
+                    }
+                    if (timeUntil.isPositive()) {
+                        add("  Time until: $timeUntil")
+                    }
+                    add("  Crops: $crops")
+                }
+            }
+        }
+    }
 
     @SubscribeEvent
     fun onTabListUpdate(event: TabListUpdateEvent) {
@@ -140,7 +193,7 @@ object GardenNextJacobContest {
 
         inCalendar = true
 
-        patternMonth.matchMatcher(event.inventoryName) {
+        monthPattern.matchMatcher(event.inventoryName) {
             val month = LorenzUtils.getSBMonthByName(group("month"))
             val year = group("year").toInt()
 
@@ -175,13 +228,13 @@ object GardenNextJacobContest {
             if (!lore.any { it.contains("§6§eJacob's Farming Contest") }) continue
 
             val name = item.name ?: continue
-            val day = patternDay.matchMatcher(name) { group("day").toInt() } ?: continue
+            val day = dayPattern.matchMatcher(name) { group("day").toInt() } ?: continue
 
             val startTime = SkyBlockTime(year, month, day).asTimeMark()
 
             val crops = mutableListOf<CropType>()
             for (line in lore) {
-                patternCrop.matchMatcher(line) { crops.add(CropType.getByName(group("crop"))) }
+                cropPattern.matchMatcher(line) { crops.add(CropType.getByName(group("crop"))) }
             }
 
             contests[startTime] = FarmingContest(startTime + contestDuration, crops)
@@ -374,7 +427,7 @@ object GardenNextJacobContest {
         // Check that it only gets called once for the current event
         if (lastWarningTime.passedSince() < config.warnTime.seconds) return
 
-        lastWarningTime = now()
+        lastWarningTime = SimpleTimeMark.now()
         val cropText = crops.joinToString("§7, ") { (if (it == boostedCrop) "§6" else "§a") + it.cropName }
         ChatUtils.chat("Next farming contest: $cropText")
         LorenzUtils.sendTitle("§eFarming Contest!", 5.seconds)
@@ -400,7 +453,10 @@ object GardenNextJacobContest {
         try {
             UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName())
         } catch (e: java.lang.Exception) {
-            e.printStackTrace()
+            ErrorManager.logErrorWithData(
+                e, "Failed to open a popup window",
+                "message" to message
+            )
         }
 
         val frame = JFrame()
@@ -457,8 +513,9 @@ object GardenNextJacobContest {
         }
     }
 
-    private fun isEnabled() = LorenzUtils.inSkyBlock && config.display
-        && (GardenAPI.inGarden() || config.everywhere)
+    private fun isEnabled() =
+        config.display && ((LorenzUtils.inSkyBlock && (GardenAPI.inGarden() || config.showOutsideGarden)) ||
+            (OutsideSbFeature.NEXT_JACOB_CONTEXT.isSelected() && !LorenzUtils.inSkyBlock))
 
     private fun isFetchEnabled() = isEnabled() && config.fetchAutomatically
     private fun isSendEnabled() =
@@ -520,8 +577,11 @@ object GardenNextJacobContest {
                 saveConfig()
             }
         } catch (e: Exception) {
-            e.printStackTrace()
-            ChatUtils.error("Failed to fetch upcoming contests. Please report this error if it continues to occur.")
+            ErrorManager.logErrorWithData(
+                e,
+                "Failed to fetch upcoming contests. Please report this error if it continues to occur"
+            )
+
         }
     }
 
@@ -553,11 +613,14 @@ object GardenNextJacobContest {
         if (result) {
             ChatUtils.chat("Successfully submitted this years upcoming contests, thank you for helping everyone out!")
         } else {
-            ChatUtils.error("Something went wrong submitting upcoming contests!")
+            ErrorManager.logErrorStateWithData("Something went wrong submitting upcoming contests!",
+                "submitContestsToElite not sucessful")
         }
     } catch (e: Exception) {
-        e.printStackTrace()
-        ChatUtils.error("Failed to submit upcoming contests. Please report this error if it continues to occur.")
+        ErrorManager.logErrorWithData(
+            e, "Failed to submit upcoming contests. Please report this error if it continues to occur.",
+            "contests" to contests
+        )
         null
     }
 
@@ -581,5 +644,7 @@ object GardenNextJacobContest {
         event.transform(15, "garden.nextJacobContests.shareAutomatically") { element ->
             ConfigUtils.migrateIntToEnum(element, ShareContestsEntry::class.java)
         }
+        event.move(18, "garden.nextJacobContests.everywhere", "garden.nextJacobContests.showOutsideGarden")
     }
 }
+

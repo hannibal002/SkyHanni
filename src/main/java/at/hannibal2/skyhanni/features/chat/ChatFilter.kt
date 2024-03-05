@@ -3,14 +3,18 @@ package at.hannibal2.skyhanni.features.chat
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.events.LorenzChatEvent
+import at.hannibal2.skyhanni.features.garden.GardenAPI
+import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.StringUtils.matches
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.StringUtils.trimWhiteSpaceAndResets
+import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import java.util.regex.Pattern
 
 class ChatFilter {
 
+    private val generalConfig get() = SkyHanniMod.feature.chat
     private val config get() = SkyHanniMod.feature.chat.filterType
 
     /// <editor-fold desc="Regex Patterns & Messages">
@@ -31,6 +35,9 @@ class ChatFilter {
 
         // mystery dust
         "§b✦ §r§7You earned §r§b\\d+ §r§7Mystery Dust!".toPattern(),
+
+        // pet consumables
+        "§b✦ §r§7You earned §r§a\\d+ §r§7Pet Consumables?!".toPattern(),
     )
 
     private val lobbyMessages = listOf(
@@ -241,6 +248,7 @@ class ChatFilter {
     private val annoyingSpamPatterns = listOf(
         "§7Your Implosion hit (.*) for §r§c(.*) §r§7damage.".toPattern(),
         "§7Your Molten Wave hit (.*) for §r§c(.*) §r§7damage.".toPattern(),
+        "§cYou need a tool with a §r§aBreaking Power §r§cof §r§6(\\d)§r§c to mine (.*)§r§c! Speak to §r§dFragilis §r§cby the entrance to the Crystal Hollows to learn more!".toPattern()
     )
     private val annoyingSpamMessages = listOf(
         "§cThere are blocks in the way!",
@@ -253,6 +261,20 @@ class ChatFilter {
         "§6§lGOOD CATCH! §r§bYou found a §r§fLight Bait§r§b.",
         "§6§lGOOD CATCH! §r§bYou found a §r§aHot Bait§r§b.",
         "§6§lGOOD CATCH! §r§bYou found a §r§fSpooky Bait§r§b.",
+        "§bNew day! §r§eYour §r§2Sky Mall §r§ebuff changed!",
+        "§8§oYou can disable this messaging by toggling Sky Mall in your /hotm!",
+        "§e[NPC] Jacob§f: §rMy contest has started!",
+        "§eObtain a §r§6Booster Cookie §r§efrom the community shop in the hub!",
+    )
+
+    private val anitaFortunePattern by RepoPattern.pattern(
+        "chat.jacobevent.accessory",
+        "§e\\[NPC] Jacob§f: Your §9Anita's (\\w+) §fis giving you §6\\+(\\d{1,2})☘ (\\w+) Fortune §fduring the contest!"
+    )
+
+    private val skymallPerkPattern by RepoPattern.pattern(
+        "chat.skymall.perk",
+        "§eNew buff§r§r§r:(.*)"
     )
 
     // Winter Gift
@@ -306,7 +328,8 @@ class ChatFilter {
         "§c\\s*♨ .* (?:Skin|Rune|Dye) §e(?:for a limited time )?\\(.* §eleft\\)(?:§c|!)".toPattern(),
         "§c♨ §eVisit the Community Shop in the next §c.* §eto grab yours! §a§l\\[WARP]".toPattern(),
         "§c♨ §eA Fire Sale for .* §eis starting soon!".toPattern(),
-        "§c♨ §r§eFire Sale for .* §r§eended!".toPattern(),
+        "§c♨ §r§eFire Sales? for .* §r§eended!".toPattern(),
+        "§c {3}♨ §eAnd \\d+ more!".toPattern(),
     )
     private val powderMiningMessages = listOf(
         "§aYou uncovered a treasure chest!",
@@ -391,6 +414,8 @@ class ChatFilter {
         config.winterGift && message.isPresent("winter_gift") -> "winter_gift"
         config.powderMining && message.isPresent("powder_mining") -> "powder_mining"
         config.fireSale && message.isPresent("fire_sale") -> "fire_sale"
+        generalConfig.hideJacob && !GardenAPI.inGarden() && anitaFortunePattern.matches(message) -> "jacob_event"
+        generalConfig.hideSkyMall && !LorenzUtils.inMiningIsland() && skymallPerkPattern.matches(message) -> "skymall"
 
         else -> ""
     }

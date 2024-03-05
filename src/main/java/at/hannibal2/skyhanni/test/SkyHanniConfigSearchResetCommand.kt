@@ -37,8 +37,9 @@ object SkyHanniConfigSearchResetCommand {
             "reset" -> resetCommand(args)
             "search" -> searchCommand(args)
             "set" -> setCommand(args)
+            "toggle" -> toggleCommand(args)
 
-            else -> "§c/shconfig <search;reset;set>"
+            else -> "§c/shconfig <search;reset;set;toggle>"
         }
     }
 
@@ -58,7 +59,11 @@ object SkyHanniConfigSearchResetCommand {
             field.set(parent, defaultObject)
             return "§eSuccessfully reset config element '$term'"
         } catch (e: Throwable) {
-            ErrorManager.logError(e, "Could not reset config element '$term'")
+            ErrorManager.logErrorWithData(
+                e, "Could not reset config element '$term'",
+                "term" to term,
+                "args" to args.joinToString(" ")
+            )
             return "§cCould not reset config element '$term'"
         }
     }
@@ -69,7 +74,10 @@ object SkyHanniConfigSearchResetCommand {
         return try {
             startSearch(args)
         } catch (e: Exception) {
-            ErrorManager.logError(e, "Error while trying to search config")
+            ErrorManager.logErrorWithData(
+                e, "Error while trying to search config",
+                "args" to args.joinToString(" ")
+            )
             "§cError while trying to search config"
         }
     }
@@ -107,10 +115,43 @@ object SkyHanniConfigSearchResetCommand {
         val shimmy = Shimmy.makeShimmy(root, list) ?: return "§cCould not change config element '$term', not found!"
         return try {
             shimmy.setJson(element)
-            "§eChanged config element $term."
+            "§eChanged config element $term to $rawJson."
         } catch (e: Exception) {
-            ErrorManager.logError(e, "Could not change config element '$term' to '$rawJson'")
+            ErrorManager.logErrorWithData(
+                e, "Could not change config element",
+                "old" to shimmy.getJson(),
+                "term" to term,
+                "rawJson" to rawJson,
+                "args" to args.joinToString(" ")
+                )
             "§cCould not change config element '$term' to '$rawJson'"
+        }
+    }
+
+    private suspend fun toggleCommand(args: Array<String>): String {
+        if (args.size == 1 || args.size == 3) return "§c/shconfig toggle <config name> [value 1] [value 2]"
+
+        val path = args[1]
+        val rawJson1 = if (args.size > 2) args[2] else "true"
+        val rawJson2 = if (args.size > 2) args[3] else "false"
+
+        return try {
+            val (argsFilter) = createFilter(true) { path.lowercase() }
+            val (classFilter) = createFilter(false) { path.lowercase() }
+
+            val currentValue = findConfigElements(argsFilter, classFilter, onlyValue = true).toString()
+            val newValue = if (currentValue == "[$rawJson1]") rawJson2 else rawJson1
+
+            setCommand(arrayOf("set", path, newValue))
+
+        } catch (e: Exception) {
+            ErrorManager.logErrorWithData(
+                e, "Error while trying to toggle config element",
+                "path" to path,
+                "rawJson1" to rawJson1,
+                "rawJson2" to rawJson2,
+            )
+            "§cError while trying to toggle config element"
         }
     }
 
@@ -146,6 +187,7 @@ object SkyHanniConfigSearchResetCommand {
     private fun findConfigElements(
         configFilter: (String) -> Boolean,
         classFilter: (String) -> Boolean,
+        onlyValue: Boolean = false
     ): MutableList<String> {
         val list = mutableListOf<String>()
 
@@ -185,13 +227,19 @@ object SkyHanniConfigSearchResetCommand {
                         objectName.startsWith("at.hannibal2.skyhanni.config.Storage"))
                 ) {
                     "<category>"
+                } else if (onlyValue) {
+                    objectName
                 } else {
                     "$className = $objectName"
                 }
             } else "null"
 
             if (configFilter(name)) {
-                list.add("$name $description")
+                if (onlyValue) {
+                    list.add(description)
+                } else {
+                    list.add("$name $description")
+                }
             }
         }
         return list

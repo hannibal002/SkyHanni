@@ -15,7 +15,6 @@ import at.hannibal2.skyhanni.utils.CollectionUtils.editCopy
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.ItemUtils.name
-import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.NEUInternalName
 import at.hannibal2.skyhanni.utils.NEUInternalName.Companion.asInternalName
 import at.hannibal2.skyhanni.utils.NEUItems.getNpcPriceOrNull
@@ -298,8 +297,6 @@ object SackAPI {
         sackData = sackData.editCopy { this[item] = SackItem(0, 0, SackStatus.MISSING) }
         return sackData[item] ?: return SackItem(0, 0, SackStatus.MISSING)
     }
-
-    fun commandGetFromSacks(item: String, amount: Int) = LorenzUtils.sendCommandToServer("gfs $item $amount")
 
     private fun saveSackData() {
         ProfileStorageData.sackProfiles?.sackContents = sackData

@@ -45,7 +45,7 @@ public class DamageIndicatorConfig {
     @ConfigOption(
         name = "Boss Name",
         desc = "Change how the boss name should be displayed.")
-    @ConfigEditorDropdown()
+    @ConfigEditorDropdown
     public NameVisibility bossName = NameVisibility.FULL_NAME;
 
     public enum NameVisibility implements HasLegacyId {
@@ -83,7 +83,7 @@ public class DamageIndicatorConfig {
         name = "Select Boss",
         desc = "Change what type of boss you want the damage indicator be enabled for."
     )
-    @ConfigEditorDraggableList()
+    @ConfigEditorDraggableList
     //TODO only show currently working and tested features
     public List<BossCategory> bossesToShow = new ArrayList<>(Arrays.asList(
         NETHER_MINI_BOSSES,
