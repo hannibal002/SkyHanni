@@ -55,22 +55,22 @@ class InfernoMinionFeatures {
 
         val containsFuel = fuelItemIds.contains(NEUInternalName.fromItemNameOrNull(event.container.getSlot(19).stack.displayName)?.asString())
         if (event.slot?.slotNumber == 19 && containsFuel) {
-            if (KeyboardManager.isModifierKeyDown()) return;
+            if (KeyboardManager.isModifierKeyDown()) return
             event.cancel()
 
             val message = "§c§l[SkyHanni] is blocking you from taking this out! (Hold CTRL to override)"
             val data = event.slot.stack.tagCompound.getCompoundTag("display").getTagList("Lore", 8)
-            if (data.getStringTagAt(data.tagCount() - 1).toString() == message) return;
+            if (data.getStringTagAt(data.tagCount() - 1).toString() == message) return
             data.appendTag(NBTTagString(message))
         }
         if (event.slot?.slotNumber == 53) {
-            if (KeyboardManager.isModifierKeyDown()) return;
+            if (KeyboardManager.isModifierKeyDown()) return
             if (!containsFuel) return
             event.cancel()
 
             val message = "§c§l[SkyHanni] is blocking you from picking this minion up! (Hold CTRL to override)"
             val data = event.slot.stack.tagCompound.getCompoundTag("display").getTagList("Lore", 8)
-            if (data.getStringTagAt(data.tagCount() - 1).toString() == message) return;
+            if (data.getStringTagAt(data.tagCount() - 1).toString() == message) return
             data.appendTag(NBTTagString(message))
         }
     }
