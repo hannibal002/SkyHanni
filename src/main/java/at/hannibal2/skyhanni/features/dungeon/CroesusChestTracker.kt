@@ -66,7 +66,9 @@ class CroesusChestTracker {
             for ((run, slot) in InventoryUtils.getItemsInOpenChest()
                 .mapNotNull { slot -> runSlots(slot.slotIndex, slot) }) {
 
-                val state = run.openState
+                if (run.floor == null) return
+
+                val state = run.openState ?: OpenedState.UNOPENED
 
                 if (state != OpenedState.KEY_USED) {
                     slot highlight if (state == OpenedState.OPENED) LorenzColor.DARK_AQUA else LorenzColor.DARK_PURPLE
@@ -87,13 +89,15 @@ class CroesusChestTracker {
             }
 
             if (croesusEmpty) {
-                croesusChests?.forEach { it.floor = null }
+                croesusChests?.forEach {
+                    it.setValuesNull()
+                }
                 return
             }
 
             for ((run, item) in event.inventoryItemsWithNull.mapNotNull { (key, value) -> runSlots(key, value) }) {
                 if (item == null) {
-                    run.floor = null
+                    run.setValuesNull()
                     continue
                 }
 
@@ -121,6 +125,12 @@ class CroesusChestTracker {
                 setKismetUsed()
             }
         }
+    }
+
+    private fun DungeonRunInfo.setValuesNull() {
+        floor = null
+        openState = null
+        kismetUsed = null
     }
 
     @SubscribeEvent

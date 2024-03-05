@@ -463,6 +463,7 @@ public class Storage {
 
                 public DungeonRunInfo(String floor) {
                     this.floor = floor;
+                    this.openState = OpenedState.UNOPENED;
                 }
 
                 @Nullable
@@ -470,10 +471,12 @@ public class Storage {
                 public String floor = null;
 
                 @Expose
-                public OpenedState openState = OpenedState.UNOPENED;
+                @Nullable
+                public OpenedState openState = null;
 
                 @Expose
-                public Boolean kismetUsed = false;
+                @Nullable
+                public Boolean kismetUsed = null;
 
             }
         }
