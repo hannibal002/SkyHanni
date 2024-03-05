@@ -22,7 +22,7 @@ class InfernoMinionFeatures {
         "Inferno Minion .*"
     )
     private var fuelItemIds = listOf<NEUInternalName>()
-    private var isInventory = false
+    private var inInventory = false
 
     @SubscribeEvent
     fun onRepoReload(event: RepositoryReloadEvent) {
@@ -32,19 +32,19 @@ class InfernoMinionFeatures {
 
     @SubscribeEvent
     fun onInventoryOpen(event: InventoryFullyOpenedEvent) {
-        isInventory = infernoMinionTitlePattern.matches(event.inventoryName)
+        inInventory = infernoMinionTitlePattern.matches(event.inventoryName)
     }
 
     @SubscribeEvent
     fun onInventoryClose(event: InventoryCloseEvent) {
-        isInventory = false
+        inInventory = false
     }
 
     @SubscribeEvent
     fun onSlotClick(event: GuiContainerEvent.SlotClickEvent) {
         if (!LorenzUtils.inSkyBlock) return
         if (!config.infernoFuelBlocker) return
-        if (!isInventory) return
+        if (!inInventory) return
 
         val containsFuel = NEUInternalName.fromItemNameOrNull(event.container.getSlot(19).stack.name.toString()) in fuelItemIds
         if (!containsFuel) return
@@ -58,18 +58,20 @@ class InfernoMinionFeatures {
     @SubscribeEvent
     fun onTooltip(event: LorenzToolTipEvent) {
         if (!config.infernoFuelBlocker) return
-        if (!isInventory) return
+        if (!inInventory) return
 
         val containsFuel = NEUInternalName.fromItemNameOrNull(event.itemStack.name.toString()) in fuelItemIds
         if (!containsFuel) return
 
         if (event.slot.slotNumber == 19) {
             event.toolTip.add("")
-            event.toolTip.add("§c§l[SkyHanni] is blocking you from taking this out! (Hold CTRL to override)")
+            event.toolTip.add("§c[SkyHanni] is blocking you from taking this out!")
+            event.toolTip.add("  §7(Bypass by holding the ${KeyboardManager.getModifierKeyName()} key)")
         }
         if (event.slot.slotNumber == 53) {
             event.toolTip.add("")
-            event.toolTip.add("§c§l[SkyHanni] is blocking you from picking this minion up! (Hold CTRL to override)")
+            event.toolTip.add("§c[SkyHanni] is blocking you from picking this minion up!")
+            event.toolTip.add("  §7(Bypass by holding the ${KeyboardManager.getModifierKeyName()} key)")
         }
     }
 }
