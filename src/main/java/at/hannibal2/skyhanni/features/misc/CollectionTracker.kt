@@ -148,7 +148,7 @@ class CollectionTracker {
                 gainText = "§a+" + recentGain.addSeparators()
             }
 
-            if (goalAmount != -1 && itemAmount >= goalAmount) {
+            if (goalAmount != -1L && itemAmount >= goalAmount) {
                 ChatUtils.chat("Collection goal of §a${goalAmount.addSeparators()} reached!")
                 goalAmount = -1L
             }
