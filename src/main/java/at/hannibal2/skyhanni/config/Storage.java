@@ -38,7 +38,6 @@ import net.minecraft.item.ItemStack;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -453,7 +452,7 @@ public class Storage {
             public Map<DungeonAPI.DungeonFloor, Integer> bosses = new HashMap<>();
 
             @Expose
-            public List<DungeonRunInfo> runs = Stream.generate(DungeonRunInfo::new).limit(CroesusChestTracker.Companion.getMaxChests()).collect(Collectors.toCollection(LinkedList::new));
+            public List<DungeonRunInfo> runs = Stream.generate(DungeonRunInfo::new).limit(CroesusChestTracker.Companion.getMaxChests()).collect(Collectors.toCollection(ArrayList::new));
 
 
             public static class DungeonRunInfo {
