@@ -243,7 +243,7 @@ import at.hannibal2.skyhanni.features.minion.InfernoMinionFeatures
 import at.hannibal2.skyhanni.features.minion.MinionCollectLogic
 import at.hannibal2.skyhanni.features.minion.MinionFeatures
 import at.hannibal2.skyhanni.features.minion.MinionXp
-import at.hannibal2.skyhanni.features.misc.AuctionHouseCompareValue
+import at.hannibal2.skyhanni.features.misc.AuctionHousePriceComparison
 import at.hannibal2.skyhanni.features.misc.BetterSignEditing
 import at.hannibal2.skyhanni.features.misc.BetterWikiFromMenus
 import at.hannibal2.skyhanni.features.misc.BrewingStandOverlay
@@ -712,7 +712,7 @@ class SkyHanniMod {
         loadModule(EnderNodeTracker)
         loadModule(CompactBestiaryChatMessage())
         loadModule(WatchdogHider())
-        loadModule(AuctionHouseCompareValue())
+        loadModule(AuctionHousePriceComparison())
         loadModule(AccountUpgradeReminder())
         loadModule(PetExpTooltip())
         loadModule(Translator())
