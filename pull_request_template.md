@@ -4,7 +4,7 @@
 ## What
 Describe what this pull request does, including technical details, screenshots, links to discord, etc.
 
-(remove unused parts below)
+<!-- remove unused parts below -->
 ## Changelog New Features
 + Cool new feature. - your_name_here
     * extra info
