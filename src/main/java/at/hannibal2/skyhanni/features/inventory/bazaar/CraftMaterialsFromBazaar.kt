@@ -105,10 +105,8 @@ class CraftMaterialsFromBazaar {
             add(Renderable.string("§7Buy items from Bazaar:"))
             for ((material, amount) in neededMaterials) {
                 val priceMultiplier = amount * multiplier
-                var text = "§8${priceMultiplier.addSeparators()}x " + material.itemName
-                if (material.isBazaarItem()) {
-                    text += " §6${NumberUtil.format(material.getPrice() * priceMultiplier)}"
-                }
+                val text = "§8${priceMultiplier.addSeparators()}x " + material.itemName +
+                    " §6${NumberUtil.format(material.getPrice() * priceMultiplier)}"
                 add(Renderable.optionalLink(text, onClick = {
                     BazaarApi.searchForBazaarItem(material.itemNameWithoutColor, priceMultiplier)
                 }))
