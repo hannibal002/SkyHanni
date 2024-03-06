@@ -3,13 +3,12 @@ package at.hannibal2.skyhanni.features.misc
 import at.hannibal2.skyhanni.events.GuiContainerEvent
 import at.hannibal2.skyhanni.events.InventoryOpenEvent
 import at.hannibal2.skyhanni.events.LorenzToolTipEvent
-import at.hannibal2.skyhanni.features.misc.items.EstimatedItemValue
+import at.hannibal2.skyhanni.features.misc.items.EstimatedItemValueCalculator
 import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.ItemUtils.name
 import at.hannibal2.skyhanni.utils.LorenzColor
 import at.hannibal2.skyhanni.utils.LorenzUtils
-import at.hannibal2.skyhanni.utils.NumberUtil.addFormatting
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.NumberUtil.formatNumber
 import at.hannibal2.skyhanni.utils.RenderUtils.highlight
@@ -37,7 +36,7 @@ class AuctionHouseCompareValue {
         for ((slot, stack) in event.inventoryItems) {
             val buyLine = stack.getLore().find { it.contains("Buy it now:") } ?: continue
 //            val esitmatedPrice = EstimatedItemValue.getEstimatedItemPrice(stack) ?: continue
-            val pair = EstimatedItemValue.getData(stack, mutableListOf())
+            val pair = EstimatedItemValueCalculator.calculate(stack, mutableListOf())
             val (totalPrice, basePrice) = pair
             if (totalPrice == basePrice) continue
             val esitmatedPrice = totalPrice.toLong()
@@ -122,10 +121,10 @@ class AuctionHouseCompareValue {
 
         val diff = map[event.slot.slotIndex] ?: return
         if (diff >= 0) {
-            event.toolTip.add("§aThis item is §6${diff.addFormatting()} §aCHEAPER")
+            event.toolTip.add("§aThis item is §6${diff.addSeparators()} §aCHEAPER")
             event.toolTip.add("§athan the estimated item value!")
         } else {
-            event.toolTip.add("§cThis item is §6${(-diff).addFormatting()} §cMORE EXPENSIVE")
+            event.toolTip.add("§cThis item is §6${(-diff).addSeparators()} §cMORE EXPENSIVE")
             event.toolTip.add("§cthan the estimated item value!")
         }
 

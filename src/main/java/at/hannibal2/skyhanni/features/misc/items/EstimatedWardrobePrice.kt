@@ -35,7 +35,7 @@ class EstimatedWardrobePrice {
         toolTip.add(index++, "")
         toolTip.add(index++, "§aEstimated Armor Value:")
 
-        var totalPrice = 0L
+        var totalPrice = 0.0
         for (item in items) {
             val name = item.name
             val price = EstimatedItemValueCalculator.calculate(item, mutableListOf()).first
