@@ -85,6 +85,7 @@ object FishingAPI {
     }
 
     private fun NEUInternalName.isFishingRod() = contains("ROD")
+    fun ItemStack.isFishingRod() = getItemCategoryOrNull() == ItemCategory.FISHING_ROD || getItemCategoryOrNull() == ItemCategory.FISHING_WEAPON
 
     fun ItemStack.isBait(): Boolean = stackSize == 1 && getItemCategoryOrNull() == ItemCategory.FISHING_BAIT
 
