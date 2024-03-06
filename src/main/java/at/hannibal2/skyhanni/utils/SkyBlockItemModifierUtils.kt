@@ -49,6 +49,8 @@ object SkyBlockItemModifierUtils {
         getAttributeInt("upgrade_level") ?: getAttributeInt("dungeon_item_level")
     } else null
 
+    fun ItemStack.getUpgradeLevel() = getAttributeInt("upgrade_level") ?: getAttributeInt("dungeon_item_level")
+
     private fun ItemStack.isDungeonItem() = getLore().any { it.contains("DUNGEON ") }
 
     fun ItemStack.getPetExp() = getPetInfo()?.get("exp")?.asDouble

@@ -23,6 +23,7 @@ import at.hannibal2.skyhanni.config.features.inventory.InventoryConfig.ItemNumbe
 import at.hannibal2.skyhanni.config.features.inventory.InventoryConfig.ItemNumberEntry.VACUUM_GARDEN
 import at.hannibal2.skyhanni.data.PetAPI
 import at.hannibal2.skyhanni.events.RenderItemTipEvent
+import at.hannibal2.skyhanni.events.RenderObject
 import at.hannibal2.skyhanni.features.garden.pests.PestAPI
 import at.hannibal2.skyhanni.features.skillprogress.SkillType
 import at.hannibal2.skyhanni.utils.ConfigUtils
@@ -80,6 +81,25 @@ object ItemDisplayOverlayFeatures {
 
     @SubscribeEvent
     fun onRenderItemTip(event: RenderItemTipEvent) {
+        val itemName = event.stack.cleanName()
+        if (DUNGEON_HEAD_FLOOR_NUMBER.isSelected() && (itemName.contains("Golden ") || itemName.contains("Diamond "))) {
+            val number = when {
+                itemName.contains("Bonzo") -> "1"
+                itemName.contains("Scarf") -> "2"
+                itemName.contains("Professor") -> "3"
+                itemName.contains("Thorn") -> "4"
+                itemName.contains("Livid") -> "5"
+                itemName.contains("Sadan") -> "6"
+                itemName.contains("Necron") -> "7"
+                else -> ""
+            }
+
+            val renderObject = RenderObject(number)
+            renderObject.offsetX -= 11
+            renderObject.offsetY -= 10
+            event.renderObjects.add(renderObject)
+        }
+
         event.stackTip = getStackTip(event.stack)
     }
 
@@ -101,18 +121,6 @@ object ItemDisplayOverlayFeatures {
         if (MASTER_SKULL_TIER.isSelected()) {
             masterSkullPattern.matchMatcher(itemName) {
                 return itemName.substring(itemName.length - 1)
-            }
-        }
-
-        if (DUNGEON_HEAD_FLOOR_NUMBER.isSelected() && (itemName.contains("Golden ") || itemName.contains("Diamond "))) {
-            when {
-                itemName.contains("Bonzo") -> return "1"
-                itemName.contains("Scarf") -> return "2"
-                itemName.contains("Professor") -> return "3"
-                itemName.contains("Thorn") -> return "4"
-                itemName.contains("Livid") -> return "5"
-                itemName.contains("Sadan") -> return "6"
-                itemName.contains("Necron") -> return "7"
             }
         }
 
