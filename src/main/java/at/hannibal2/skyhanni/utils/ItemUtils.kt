@@ -291,6 +291,7 @@ object ItemUtils {
     private fun itemRarityLastCheck(data: CachedItemData) =
         data.itemRarityLastCheck.asTimeMark().passedSince() > 10.seconds
 
+    // use when compaaring the name (e.g. regex), not for showing to the user
     // extra method for shorter name and kotlin nullability logic
     var ItemStack.name: String?
         get() = this.displayName
@@ -365,11 +366,13 @@ object ItemUtils {
 
     fun NEUInternalName.isRune(): Boolean = contains("_RUNE;")
 
+    // use when showing the item name to the user (in guis, chat message, etc), not for comparing
     val ItemStack.itemName: String
         get() = getInternalName().itemName
 
     val ItemStack.itemNameWithoutColor: String get() = itemName.removeColor()
 
+    // use when showing the item name to the user (in guis, chat message, etc), not for comparing
     val NEUInternalName.itemName: String
         get() = itemNameCache.getOrPut(this) { grabItemName() }
 
