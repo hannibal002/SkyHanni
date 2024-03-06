@@ -6,7 +6,6 @@ import at.hannibal2.skyhanni.events.InventoryCloseEvent
 import at.hannibal2.skyhanni.events.InventoryFullyOpenedEvent
 import at.hannibal2.skyhanni.features.inventory.bazaar.BazaarApi.Companion.isBazaarItem
 import at.hannibal2.skyhanni.utils.CollectionUtils.addOrPut
-import at.hannibal2.skyhanni.utils.ItemUtils.getInternalNameOrNull
 import at.hannibal2.skyhanni.utils.ItemUtils.itemName
 import at.hannibal2.skyhanni.utils.ItemUtils.itemNameWithoutColor
 import at.hannibal2.skyhanni.utils.ItemUtils.name
@@ -15,11 +14,12 @@ import at.hannibal2.skyhanni.utils.NEUInternalName
 import at.hannibal2.skyhanni.utils.NEUItems.getPrice
 import at.hannibal2.skyhanni.utils.NumberUtil
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
+import at.hannibal2.skyhanni.utils.PrimitiveItemStack
+import at.hannibal2.skyhanni.utils.PrimitiveItemStack.Companion.makePrimitiveStack
 import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderables
 import at.hannibal2.skyhanni.utils.StringUtils.matches
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
-import net.minecraft.item.ItemStack
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
 class CraftMaterialsFromBazaar {
@@ -35,7 +35,7 @@ class CraftMaterialsFromBazaar {
     private var inRecipeInventory = false
     private var purchasing = false
     private var display = listOf<Renderable>()
-    private var neededMaterials = mapOf<NEUInternalName, Int>()
+    private var neededMaterials = listOf<PrimitiveItemStack>()
     private var multiplier = 1
 
     @SubscribeEvent
@@ -49,21 +49,23 @@ class CraftMaterialsFromBazaar {
         if (!inRecipeInventory) return
 
         val recipeName = items[25]?.itemName ?: return
-        showRecipe(calculateMaterialsNeeded(items), recipeName)
+        showRecipe(calculateMaterialsNeeded(event.inventoryItemsPrimitive), recipeName)
     }
 
     private fun showRecipe(
-        recipeMaterials: MutableMap<NEUInternalName, Int>,
+        recipeMaterials: List<PrimitiveItemStack>,
         recipeName: String,
     ) {
-        val neededMaterials = mutableMapOf<NEUInternalName, Int>()
+        val neededMaterials = mutableListOf<PrimitiveItemStack>()
         display = buildList {
             val totalPrice = calculateTotalPrice(recipeMaterials, 1)
             add(Renderable.string("§7Craft $recipeName §7(§6${NumberUtil.format(totalPrice)}§7)"))
-            for ((material, amount) in recipeMaterials) {
+            for (item in recipeMaterials) {
+                val material = item.internalName
+                val amount = item.amount
                 var text = "§8${amount.addSeparators()}x " + material.itemName
                 if (material.isBazaarItem()) {
-                    neededMaterials[material] = amount
+                    neededMaterials.add(item)
                     text += " §6${NumberUtil.format(material.getPrice() * amount)}"
                 }
                 add(Renderable.string(text))
@@ -81,18 +83,17 @@ class CraftMaterialsFromBazaar {
         }
     }
 
-    private fun calculateMaterialsNeeded(items: Map<Int, ItemStack>): MutableMap<NEUInternalName, Int> {
+    private fun calculateMaterialsNeeded(items: Map<Int, PrimitiveItemStack>): List<PrimitiveItemStack> {
         val recipeMaterials = mutableMapOf<NEUInternalName, Int>()
         for (slot in materialSlots) {
             val item = items[slot] ?: continue
-            val internalName = item.getInternalNameOrNull() ?: continue
-            val size = item.stackSize
-            recipeMaterials.addOrPut(internalName, size)
+            val internalName = item.internalName
+            recipeMaterials.addOrPut(internalName, item.amount)
         }
-        return recipeMaterials
+        return recipeMaterials.map { it.key.makePrimitiveStack(it.value) }
     }
 
-    private fun getFromBazaar(neededMaterials: MutableMap<NEUInternalName, Int>) {
+    private fun getFromBazaar(neededMaterials: MutableList<PrimitiveItemStack>) {
         this.neededMaterials = neededMaterials
         this.multiplier = 1
         purchasing = true
@@ -142,11 +143,10 @@ class CraftMaterialsFromBazaar {
         }
     }
 
-    private fun calculateTotalPrice(neededMaterials: Map<NEUInternalName, Int>, multiplier: Int): Double =
+    private fun calculateTotalPrice(neededMaterials: List<PrimitiveItemStack>, multiplier: Int): Double =
         neededMaterials
-            .filter { it.key.isBazaarItem() }
-            .map { it.key.getPrice() * it.value * multiplier }
-            .sum()
+            .filter { it.internalName.isBazaarItem() }
+            .sumOf { it.internalName.getPrice() * it.amount * multiplier }
 
     @SubscribeEvent
     fun onInventoryClose(event: InventoryCloseEvent) {

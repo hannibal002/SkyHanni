@@ -1,6 +1,8 @@
 package at.hannibal2.skyhanni.events
 
 import at.hannibal2.skyhanni.data.OtherInventoryData
+import at.hannibal2.skyhanni.utils.PrimitiveItemStack
+import at.hannibal2.skyhanni.utils.PrimitiveItemStack.Companion.toPrimitiveStackOrNull
 import net.minecraft.item.ItemStack
 
 open class InventoryOpenEvent(private val inventory: OtherInventoryData.Inventory) : LorenzEvent() {
@@ -9,6 +11,15 @@ open class InventoryOpenEvent(private val inventory: OtherInventoryData.Inventor
     val inventoryName: String by lazy { inventory.title }
     val inventorySize: Int by lazy { inventory.slotCount }
     val inventoryItems: Map<Int, ItemStack> by lazy { inventory.items }
+    val inventoryItemsPrimitive: Map<Int, PrimitiveItemStack> by lazy {
+        val map = mutableMapOf<Int, PrimitiveItemStack>()
+        for ((slot, item) in inventoryItems) {
+            item.toPrimitiveStackOrNull()?.let {
+                map[slot] = it
+            }
+        }
+        map
+    }
     val fullyOpenedOnce: Boolean get() = inventory.fullyOpenedOnce
 }
 
