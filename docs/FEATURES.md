@@ -157,6 +157,10 @@ Use `/sh` or `/skyhanni` to open the SkyHanni config in game.
       purse.
 + Copy Underbid Keybind. - Obsidian
     + Copies the price of the hovered item in Auction House minus 1 coin into the clipboard for easier under-bidding.
++ Gfs message after super crafting. — Zickles
+    + Adding a clickable message to pick up the super crafted items from sacks.
++ Added Inferno Minion Fuel pickup prevention. - Zickles (https://github.com/hannibal002/SkyHanni/pull/1103)
+    + Blocks picking up the Inferno Minion or replacing the fuel inside when expensive minion fuels are in use.
 
 </details>
 <details open><summary>

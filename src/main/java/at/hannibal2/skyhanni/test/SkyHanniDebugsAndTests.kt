@@ -36,6 +36,7 @@ import at.hannibal2.skyhanni.utils.NEUInternalName.Companion.asInternalName
 import at.hannibal2.skyhanni.utils.NEUItems
 import at.hannibal2.skyhanni.utils.NEUItems.getItemStackOrNull
 import at.hannibal2.skyhanni.utils.NEUItems.getNpcPriceOrNull
+import at.hannibal2.skyhanni.utils.NEUItems.getPriceOrNull
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.OSUtils
 import at.hannibal2.skyhanni.utils.ReflectionUtils.makeAccessible
@@ -386,16 +387,21 @@ class SkyHanniDebugsAndTests {
                 add("§bSkyHanni Test Item")
                 add("§einput: '§f$input§e'")
 
-                NEUInternalName.fromItemNameOrNull(input)?.let {
-                    add("§eitem name -> internalName: '§7${it.asString()}§e'")
-                    add("  §eitemName: '${it.itemName}§e'")
+                NEUInternalName.fromItemNameOrNull(input)?.let { internalName ->
+                    add("§eitem name -> internalName: '§7${internalName.asString()}§e'")
+                    add("  §eitemName: '${internalName.itemName}§e'")
+                    val price = internalName.getPriceOrNull()?.let { "§6" + it.addSeparators() } ?: "§7null"
+                    add("  §eprice: '§6${price}§e'")
                     return@buildList
                 }
 
-                input.asInternalName().getItemStackOrNull()?.let {
-                    val itemName = it.itemName
-                    add("§einternal name: §7${it.getInternalName().asString()}")
+                input.asInternalName().getItemStackOrNull()?.let { item ->
+                    val itemName = item.itemName
+                    val internalName = item.getInternalName()
+                    add("§einternal name: §7${internalName.asString()}")
                     add("§einternal name -> item name: '$itemName§e'")
+                    val price = internalName.getPriceOrNull()?.let { "§6" + it.addSeparators() } ?: "§7null"
+                    add("  §eprice: '§6${price}§e'")
                     return@buildList
                 }
 
