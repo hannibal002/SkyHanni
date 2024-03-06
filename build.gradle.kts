@@ -273,7 +273,7 @@ publishing.publications {
             licenses {
                 license {
                     name.set("GNU Lesser General Public License")
-                    url.set("https://github.com/hannibal002/SkyHanni/blob/master/COPYING.LESSER")
+                    url.set("https://github.com/hannibal002/SkyHanni/blob/HEAD/LICENSE")
                 }
             }
             developers {
