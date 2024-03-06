@@ -83,7 +83,7 @@ class CraftMaterialsFromBazaar {
 
     private fun calculateMaterialsNeeded(items: Map<Int, ItemStack>): MutableMap<NEUInternalName, Int> {
         val recipeMaterials = mutableMapOf<NEUInternalName, Int>()
-        for (slot in matieralSlots) {
+        for (slot in materialSlots) {
             val item = items[slot] ?: continue
             val internalName = item.getInternalNameOrNull() ?: continue
             val size = item.stackSize
