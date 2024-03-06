@@ -11,11 +11,9 @@ import at.hannibal2.skyhanni.features.fishing.trophy.TrophyFishManager
 import at.hannibal2.skyhanni.features.fishing.trophy.TrophyFishManager.getFilletValue
 import at.hannibal2.skyhanni.features.fishing.trophy.TrophyRarity
 import at.hannibal2.skyhanni.utils.BlockUtils.getBlockAt
-import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.ItemCategory
+import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName
 import at.hannibal2.skyhanni.utils.ItemUtils.getItemCategoryOrNull
-import at.hannibal2.skyhanni.utils.ItemUtils.getLore
-import at.hannibal2.skyhanni.utils.ItemUtils.name
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.LorenzVec
 import at.hannibal2.skyhanni.utils.NEUInternalName
@@ -85,9 +83,10 @@ object FishingAPI {
         }
     }
 
-    private fun NEUInternalName.isFishingRod() = contains("ROD")
-    fun ItemStack.isFishingRod() = getItemCategoryOrNull() == ItemCategory.FISHING_ROD || getItemCategoryOrNull() == ItemCategory.FISHING_WEAPON
-    fun NEUInternalName?.isFishingRod() = isLavaRod() || isWaterRod()
+//     private fun NEUInternalName.isFishingRod() = contains("ROD")
+//     fun ItemStack.isFishingRod() = getItemCategoryOrNull() == ItemCategory.FISHING_ROD || getItemCategoryOrNull() == ItemCategory.FISHING_WEAPON
+    fun ItemStack.isFishingRod() = getInternalName().isFishingRod()
+    fun NEUInternalName.isFishingRod() = isLavaRod() || isWaterRod()
 
     fun NEUInternalName?.isLavaRod() = this in lavaRods
 
