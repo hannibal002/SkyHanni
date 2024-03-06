@@ -198,7 +198,7 @@ class ChatFilter {
 
     // Useless Notification
     private val uselessNotificationPatterns = listOf(
-        "§aYou tipped (\\d+) (player|players)!".toPattern()
+        "§aYou tipped \\d+ players? in \\d+(?: different)? games?!".toPattern()
     )
     private val uselessNotificationMessages = listOf(
         "§eYour previous §r§6Plasmaflux Power Orb §r§ewas removed!",
