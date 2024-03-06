@@ -103,7 +103,7 @@ object DebugCommand {
             event.addData("not on SkyBlock, but on Hypixel")
             return
         }
-        if (IslandType.UNKNOWN.isInIsland()) {
+        if (LorenzUtils.skyBlockIsland == IslandType.UNKNOWN) {
             event.addData("Unknown SkyBlock island!")
             return
         }
