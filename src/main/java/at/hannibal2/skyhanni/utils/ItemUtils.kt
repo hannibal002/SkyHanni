@@ -292,6 +292,7 @@ object ItemUtils {
         data.itemRarityLastCheck.asTimeMark().passedSince() > 10.seconds
 
     /**
+     * Use when comparing the name (e.g. regex), not for showing to the user
      * Member that provides the item name, is null save or throws visual error
      */
     var ItemStack.name: String
@@ -372,11 +373,13 @@ object ItemUtils {
 
     fun NEUInternalName.isRune(): Boolean = contains("_RUNE;")
 
+    // use when showing the item name to the user (in guis, chat message, etc), not for comparing
     val ItemStack.itemName: String
         get() = getInternalName().itemName
 
     val ItemStack.itemNameWithoutColor: String get() = itemName.removeColor()
 
+    // use when showing the item name to the user (in guis, chat message, etc), not for comparing
     val NEUInternalName.itemName: String
         get() = itemNameCache.getOrPut(this) { grabItemName() }
 
