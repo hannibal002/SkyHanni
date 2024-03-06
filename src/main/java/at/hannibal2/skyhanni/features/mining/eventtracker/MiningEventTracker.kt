@@ -137,7 +137,7 @@ class MiningEventTracker {
     }
 
     private fun isEnabled() = (IslandType.DWARVEN_MINES.isInIsland() || IslandType.CRYSTAL_HOLLOWS.isInIsland())
-            && config.sendData
+        && config.sendData
 //         && config.enabled
 
     private fun sendData(json: String) {

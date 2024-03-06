@@ -92,7 +92,7 @@ object SkyBlockItemModifierUtils {
     @Suppress("CAST_NEVER_SUCCEEDS")
     inline val ItemStack.cachedData get() = (this as ItemStackCachedData).skyhanni_cachedData
 
-    fun ItemStack.getPetLevel(): Int = PetAPI.getPetLevel(displayName)?: 0
+    fun ItemStack.getPetLevel(): Int = PetAPI.getPetLevel(displayName) ?: 0
 
     fun ItemStack.getMaxPetLevel() = if (this.getInternalName() == "GOLDEN_DRAGON;4".asInternalName()) 200 else 100
 
