@@ -212,9 +212,9 @@ object ItemDisplayOverlayFeatures {
             item.name?.let {
                 dungeonPotionPattern.matchMatcher(it.removeColor()) {
                     return when (val level = group("level").romanToDecimal()) {
-                        in 1 .. 2 -> "§f$level"
-                        in 3 .. 4 -> "§a$level"
-                        in 5 .. 6 -> "§9$level"
+                        in 1..2 -> "§f$level"
+                        in 3..4 -> "§a$level"
+                        in 5..6 -> "§9$level"
                         else -> "§5$level"
                     }
                 }

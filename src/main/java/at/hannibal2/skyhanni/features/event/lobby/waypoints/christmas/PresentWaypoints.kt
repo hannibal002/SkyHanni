@@ -32,7 +32,7 @@ class PresentWaypoints {
     private val presentEntranceSet get() = presentEntranceLocations[HypixelData.lobbyType]
 
     private val patternGroup = RepoPattern.group("event.lobby.waypoint.presents")
-    private  val presentAlreadyFoundPattern by patternGroup.pattern(
+    private val presentAlreadyFoundPattern by patternGroup.pattern(
         "foundalready",
         "§cYou have already found this present!"
     )

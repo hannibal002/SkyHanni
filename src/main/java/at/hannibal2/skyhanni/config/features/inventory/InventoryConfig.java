@@ -187,7 +187,7 @@ public class InventoryConfig {
     @ConfigEditorBoolean
     @FeatureToggle
     public boolean shiftClickForEquipment = false;
-    
+
     @Expose
     @ConfigOption(name = "Shift Click NPC sell", desc = "Makes normal clicks to shift clicks in npc inventory for selling.")
     @ConfigEditorBoolean

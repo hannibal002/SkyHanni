@@ -27,6 +27,7 @@ object ColorUtils {
             max((red * factor).toInt(), 0),
             max((green * factor).toInt(), 0),
             max((blue * factor).toInt(), 0),
-            alpha)
+            alpha
+        )
     }
 }
