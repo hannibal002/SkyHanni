@@ -236,6 +236,7 @@ import at.hannibal2.skyhanni.features.itemabilities.abilitycooldown.ItemAbilityC
 import at.hannibal2.skyhanni.features.mining.DeepCavernsParkour
 import at.hannibal2.skyhanni.features.mining.HighlightMiningCommissionMobs
 import at.hannibal2.skyhanni.features.mining.KingTalismanHelper
+import at.hannibal2.skyhanni.features.mining.crystalhollows.CrystalHollowsLobbyAgeWarning
 import at.hannibal2.skyhanni.features.mining.crystalhollows.CrystalHollowsNamesInCore
 import at.hannibal2.skyhanni.features.mining.eventtracker.MiningEventTracker
 import at.hannibal2.skyhanni.features.mining.powdertracker.PowderTracker
@@ -616,6 +617,7 @@ class SkyHanniMod {
         loadModule(ArmorDropTracker)
         loadModule(JoinCrystalHollows())
         loadModule(CrystalHollowsNamesInCore())
+        loadModule(CrystalHollowsLobbyAgeWarning())
         loadModule(GardenVisitorColorNames)
         loadModule(TeleportPadCompactName())
         loadModule(AnitaMedalProfit())

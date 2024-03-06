@@ -29,9 +29,9 @@ import at.hannibal2.skyhanni.utils.ItemUtils.name
 import at.hannibal2.skyhanni.utils.LocationUtils
 import at.hannibal2.skyhanni.utils.LocationUtils.canBeSeen
 import at.hannibal2.skyhanni.utils.LorenzUtils
-import at.hannibal2.skyhanni.utils.LorenzUtils.formatInteger
 import at.hannibal2.skyhanni.utils.LorenzUtils.isInIsland
 import at.hannibal2.skyhanni.utils.LorenzVec
+import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.NumberUtil.romanToDecimal
 import at.hannibal2.skyhanni.utils.NumberUtil.romanToDecimalIfNecessary
 import at.hannibal2.skyhanni.utils.RenderUtils.drawString
@@ -255,7 +255,7 @@ class MinionFeatures {
 
         val coinsPerDay = (coins / (duration.toDouble())) * 1000 * 60 * 60 * 24
 
-        val format = formatInteger(coinsPerDay.toInt())
+        val format = coinsPerDay.addSeparators()
         val hopperName = stack.name
         return "§7Coins/day with $hopperName§7: §6$format coins"
     }

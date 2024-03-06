@@ -29,6 +29,11 @@ public class MiningConfig {
     public DeepCavernsParkourConfig deepCavernsParkour = new DeepCavernsParkourConfig();
 
     @Expose
+    @ConfigOption(name = "Crystal Hollows Lobby Age Warning", desc = "")
+    @Accordion
+    public CrystalHollowsLobbyAgeWarningConfig crystalHollowsLobbyAgeWarning = new CrystalHollowsLobbyAgeWarningConfig();
+
+    @Expose
     @ConfigOption(name = "Highlight Commission Mobs", desc = "Highlight Mobs that are part of active commissions.")
     @ConfigEditorBoolean
     @FeatureToggle
