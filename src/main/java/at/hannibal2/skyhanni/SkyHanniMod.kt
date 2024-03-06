@@ -54,11 +54,6 @@ import at.hannibal2.skyhanni.data.repo.RepoManager
 import at.hannibal2.skyhanni.events.LorenzTickEvent
 import at.hannibal2.skyhanni.events.PreInitFinishedEvent
 import at.hannibal2.skyhanni.features.anvil.AnvilCombineHelper
-import at.hannibal2.skyhanni.features.bazaar.BazaarApi
-import at.hannibal2.skyhanni.features.bazaar.BazaarBestSellMethod
-import at.hannibal2.skyhanni.features.bazaar.BazaarCancelledBuyOrderClipboard
-import at.hannibal2.skyhanni.features.bazaar.BazaarOpenPriceWebsite
-import at.hannibal2.skyhanni.features.bazaar.BazaarOrderHelper
 import at.hannibal2.skyhanni.features.bingo.BingoAPI
 import at.hannibal2.skyhanni.features.bingo.CompactBingoChat
 import at.hannibal2.skyhanni.features.bingo.MinionCraftHelper
@@ -227,6 +222,12 @@ import at.hannibal2.skyhanni.features.inventory.ShiftClickEquipment
 import at.hannibal2.skyhanni.features.inventory.ShiftClickNPCSell
 import at.hannibal2.skyhanni.features.inventory.SkyblockGuideHighlightFeature
 import at.hannibal2.skyhanni.features.inventory.StatsTuning
+import at.hannibal2.skyhanni.features.inventory.SuperCraftFeatures
+import at.hannibal2.skyhanni.features.inventory.bazaar.BazaarApi
+import at.hannibal2.skyhanni.features.inventory.bazaar.BazaarBestSellMethod
+import at.hannibal2.skyhanni.features.inventory.bazaar.BazaarCancelledBuyOrderClipboard
+import at.hannibal2.skyhanni.features.inventory.bazaar.BazaarOpenPriceWebsite
+import at.hannibal2.skyhanni.features.inventory.bazaar.BazaarOrderHelper
 import at.hannibal2.skyhanni.features.inventory.tiarelay.TiaRelayHelper
 import at.hannibal2.skyhanni.features.inventory.tiarelay.TiaRelayWaypoints
 import at.hannibal2.skyhanni.features.itemabilities.ChickenHeadTimer
@@ -238,6 +239,7 @@ import at.hannibal2.skyhanni.features.mining.KingTalismanHelper
 import at.hannibal2.skyhanni.features.mining.crystalhollows.CrystalHollowsNamesInCore
 import at.hannibal2.skyhanni.features.mining.eventtracker.MiningEventTracker
 import at.hannibal2.skyhanni.features.mining.powdertracker.PowderTracker
+import at.hannibal2.skyhanni.features.minion.InfernoMinionFeatures
 import at.hannibal2.skyhanni.features.minion.MinionCollectLogic
 import at.hannibal2.skyhanni.features.minion.MinionFeatures
 import at.hannibal2.skyhanni.features.minion.MinionXp
@@ -394,7 +396,7 @@ import org.apache.logging.log4j.Logger
     clientSideOnly = true,
     useMetadata = true,
     guiFactory = "at.hannibal2.skyhanni.config.ConfigGuiForgeInterop",
-    version = "0.23",
+    version = "0.24.Beta.5",
 )
 class SkyHanniMod {
 
@@ -758,6 +760,8 @@ class SkyHanniMod {
         loadModule(SkillTooltip())
         loadModule(QuiverNotification)
         loadModule(MaxPurseItems())
+        loadModule(SuperCraftFeatures())
+        loadModule(InfernoMinionFeatures())
 
         init()
 

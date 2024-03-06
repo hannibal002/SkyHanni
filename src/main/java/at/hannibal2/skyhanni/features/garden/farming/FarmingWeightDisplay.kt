@@ -3,6 +3,7 @@ package at.hannibal2.skyhanni.features.garden.farming
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.config.ConfigManager
 import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
+import at.hannibal2.skyhanni.config.enums.OutsideSbFeature
 import at.hannibal2.skyhanni.data.HypixelData
 import at.hannibal2.skyhanni.data.ProfileStorageData
 import at.hannibal2.skyhanni.data.jsonobjects.other.EliteLeaderboardJson
@@ -144,7 +145,7 @@ class FarmingWeightDisplay {
         private var lastOpenWebsite = SimpleTimeMark.farPast()
 
         private fun update() {
-            if (!GardenAPI.inGarden()) return
+            if (!isEnabled()) return
             if (apiError) {
                 display = errorMessage
                 return
@@ -153,10 +154,6 @@ class FarmingWeightDisplay {
             if (weight == -1.0) {
                 if (!isLoadingWeight) {
                     val localProfile = HypixelData.profileName
-                    if (localProfile == "") {
-                        display = Renderable.singeltonString("§cError: profileName is empty!")
-                        return
-                    }
 
                     isLoadingWeight = true
                     if (display.isEmpty()) {
@@ -338,7 +335,9 @@ class FarmingWeightDisplay {
             )
         }
 
-        private fun isEnabled() = GardenAPI.inGarden() && config.display
+        private fun isEnabled() = ((OutsideSbFeature.FARMING_WEIGHT.isSelected() && !LorenzUtils.inSkyBlock) ||
+            (LorenzUtils.inSkyBlock && (GardenAPI.inGarden() || config.showOutsideGarden))) && config.display
+
         private fun isEtaEnabled() = config.overtakeETA
 
         fun addCrop(crop: CropType, addedCounter: Int) {
@@ -452,7 +451,7 @@ class FarmingWeightDisplay {
                 val selectedProfileId = apiData.selectedProfileId
                 var selectedProfileEntry = apiData.profiles.find { it.profileId == selectedProfileId }
 
-                if (selectedProfileEntry == null || selectedProfileEntry.profileName.lowercase() != localProfile) {
+                if (selectedProfileEntry == null || (selectedProfileEntry.profileName.lowercase() != localProfile && localProfile != "")) {
                     selectedProfileEntry = apiData.profiles.find { it.profileName.lowercase() == localProfile }
                 }
 

@@ -14,7 +14,6 @@ import at.hannibal2.skyhanni.test.GriffinUtils.drawWaypointFilled
 import at.hannibal2.skyhanni.utils.CollectionUtils.addAsSingletonList
 import at.hannibal2.skyhanni.utils.LocationUtils
 import at.hannibal2.skyhanni.utils.LorenzColor
-import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils.isInIsland
 import at.hannibal2.skyhanni.utils.NEUItems.getItemStack
 import at.hannibal2.skyhanni.utils.RenderUtils.drawDynamicText
@@ -28,8 +27,7 @@ class DailyMiniBossHelper(private val reputationHelper: CrimsonIsleReputationHel
 
     @SubscribeEvent
     fun onChat(event: LorenzChatEvent) {
-        if (!IslandType.CRIMSON_ISLE.isInIsland()) return
-        if (!reputationHelper.config.enabled) return
+        if (!isEnabled()) return
 
         val message = event.message
         for (miniBoss in miniBosses) {
@@ -41,9 +39,7 @@ class DailyMiniBossHelper(private val reputationHelper: CrimsonIsleReputationHel
 
     @SubscribeEvent
     fun onRenderWorld(event: LorenzRenderWorldEvent) {
-        if (!LorenzUtils.inSkyBlock) return
-        if (LorenzUtils.skyBlockIsland != IslandType.CRIMSON_ISLE) return
-        if (!reputationHelper.config.enabled) return
+        if (!isEnabled()) return
         if (!reputationHelper.showLocations()) return
 
         val playerLocation = LocationUtils.playerLocation()
@@ -119,4 +115,5 @@ class DailyMiniBossHelper(private val reputationHelper: CrimsonIsleReputationHel
     }
 
     private fun getByDisplayName(name: String) = miniBosses.firstOrNull { it.displayName == name }
+    private fun isEnabled() = IslandType.CRIMSON_ISLE.isInIsland() && config.enabled
 }

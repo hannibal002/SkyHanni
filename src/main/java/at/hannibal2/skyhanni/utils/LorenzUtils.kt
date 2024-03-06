@@ -370,4 +370,7 @@ object LorenzUtils {
 
     @Deprecated("moved", ReplaceWith("ChatUtils.sendMessageToServer(message)"))
     fun sendMessageToServer(message: String) = ChatUtils.sendMessageToServer(message)
+
+    fun inMiningIsland() = IslandType.GOLD_MINES.isInIsland() || IslandType.DEEP_CAVERNS.isInIsland()
+            || IslandType.DWARVEN_MINES.isInIsland() || IslandType.CRYSTAL_HOLLOWS.isInIsland()
 }
