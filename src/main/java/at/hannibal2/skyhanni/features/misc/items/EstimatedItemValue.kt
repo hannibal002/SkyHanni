@@ -54,7 +54,10 @@ object EstimatedItemValue {
             ErrorManager.skyHanniError("Gemstone Slot Unlock Costs failed to load from neu repo!")
         }
 
-        gemstoneUnlockCosts = ConfigManager.gson.fromJson(data, object : TypeToken<HashMap<NEUInternalName, HashMap<String, List<String>>>>() {}.type)
+        gemstoneUnlockCosts = ConfigManager.gson.fromJson(
+            data,
+            object : TypeToken<HashMap<NEUInternalName, HashMap<String, List<String>>>>() {}.type
+        )
     }
 
     @SubscribeEvent

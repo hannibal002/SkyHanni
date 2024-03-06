@@ -22,7 +22,8 @@ class VisitorToolTipParserTest {
 
     @Test
     fun testParseItemsNeeded() {
-        val parsedData = VisitorTooltipParser.parse(lore,
+        val parsedData = VisitorTooltipParser.parse(
+            lore,
             GardenConfig()
         )
         assert(parsedData.itemsNeeded.isNotEmpty()) {
@@ -35,7 +36,8 @@ class VisitorToolTipParserTest {
 
     @Test
     fun testParseRewards() {
-        val parsedData = VisitorTooltipParser.parse(lore,
+        val parsedData = VisitorTooltipParser.parse(
+            lore,
             GardenConfig()
         )
         assert(parsedData.rewards.isNotEmpty()) {
@@ -60,7 +62,8 @@ class VisitorToolTipParserTest {
 
     @Test
     fun testParseCopper() {
-        val parsedData = VisitorTooltipParser.parse(lore,
+        val parsedData = VisitorTooltipParser.parse(
+            lore,
             GardenConfig()
         )
         val copper = parsedData.rewards["Copper"]

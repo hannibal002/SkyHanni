@@ -613,8 +613,10 @@ object GardenNextJacobContest {
         if (result) {
             ChatUtils.chat("Successfully submitted this years upcoming contests, thank you for helping everyone out!")
         } else {
-            ErrorManager.logErrorStateWithData("Something went wrong submitting upcoming contests!",
-                "submitContestsToElite not sucessful")
+            ErrorManager.logErrorStateWithData(
+                "Something went wrong submitting upcoming contests!",
+                "submitContestsToElite not sucessful"
+            )
         }
     } catch (e: Exception) {
         ErrorManager.logErrorWithData(

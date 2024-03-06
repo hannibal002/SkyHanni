@@ -148,7 +148,12 @@ class SkyHanniItemTracker<Data : ItemTrackerData>(
             lists.addAsSingletonList(renderable)
         }
         if (hiddenItemTexts.size > 0) {
-            lists.addAsSingletonList(Renderable.hoverTips(" §7${hiddenItemTexts.size} cheap items are hidden.", hiddenItemTexts))
+            lists.addAsSingletonList(
+                Renderable.hoverTips(
+                    " §7${hiddenItemTexts.size} cheap items are hidden.",
+                    hiddenItemTexts
+                )
+            )
         }
 
         return profit
