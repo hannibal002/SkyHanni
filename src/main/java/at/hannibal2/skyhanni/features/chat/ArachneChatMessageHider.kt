@@ -4,6 +4,7 @@ import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.events.LorenzChatEvent
 import at.hannibal2.skyhanni.utils.LorenzUtils
+import at.hannibal2.skyhanni.utils.LorenzUtils.isInIsland
 import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
@@ -30,7 +31,6 @@ class ArachneChatMessageHider {
     @SubscribeEvent
     fun onChat(event: LorenzChatEvent) {
         if (!isEnabled()) return
-        if (LorenzUtils.skyBlockIsland != IslandType.SPIDER_DEN) return
         if (LorenzUtils.skyBlockArea == "Arachne's Sanctuary") return
 
         if (shouldHide(event.message)) {
@@ -61,5 +61,5 @@ class ArachneChatMessageHider {
         return hideArachneDeadMessage
     }
 
-    fun isEnabled() = LorenzUtils.inSkyBlock && config.hideArachneMessages
+    fun isEnabled() = IslandType.SPIDER_DEN.isInIsland() && config.hideArachneMessages
 }
