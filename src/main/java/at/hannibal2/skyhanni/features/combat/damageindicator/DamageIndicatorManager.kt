@@ -18,7 +18,6 @@ import at.hannibal2.skyhanni.features.dungeon.DungeonAPI
 import at.hannibal2.skyhanni.features.slayer.blaze.HellionShield
 import at.hannibal2.skyhanni.features.slayer.blaze.setHellionShield
 import at.hannibal2.skyhanni.test.command.ErrorManager
-import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.CollectionUtils.editCopy
 import at.hannibal2.skyhanni.utils.CollectionUtils.put
 import at.hannibal2.skyhanni.utils.ConfigUtils
@@ -400,7 +399,13 @@ class DamageIndicatorManager {
                 val thorn = checkThorn(health, maxHealth)
                 if (thorn == null) {
                     val floor = DungeonAPI.dungeonFloor
-                    ChatUtils.error("problems with thorn detection! ($floor, $health/$maxHealth)")
+                    ErrorManager.logErrorStateWithData(
+                        "Could not detect thorn",
+                        "checkThorn returns null",
+                        "health" to health,
+                        "maxHealth" to maxHealth,
+                        "floor" to floor,
+                    )
                 }
                 return thorn
             }
@@ -563,7 +568,16 @@ class DamageIndicatorManager {
                     calcHealth = 0
                     break
                 } else {
-                    ChatUtils.error("unknown magma boss health sidebar format!")
+                    ErrorManager.logErrorStateWithData(
+                        "Unknown magma boss health sidebar format",
+                        "Damage Indicator could not find magma boss bar data",
+                        "line" to line,
+                        "ScoreboardData.sidebarLinesRaw" to ScoreboardData.sidebarLinesRaw,
+                        "calcHealth" to calcHealth,
+                        "slimeSize" to slimeSize,
+                        "entity" to entity,
+                        "entityData" to entityData,
+                    )
                     break
                 }
 
@@ -777,7 +791,11 @@ class DamageIndicatorManager {
                 }
             }
         } else {
-            ChatUtils.error("Invalid/impossible thorn floor!")
+            ErrorManager.logErrorStateWithData(
+                "Thorn in wrong floor detected",
+                "Invalid floor for thorn",
+                "dungeonFloor" to DungeonAPI.dungeonFloor,
+            )
             return null
         }
         val color = NumberUtil.percentageColor(health.toLong(), maxHealth.toLong())

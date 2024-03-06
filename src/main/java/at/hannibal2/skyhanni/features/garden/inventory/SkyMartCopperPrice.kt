@@ -8,13 +8,13 @@ import at.hannibal2.skyhanni.features.garden.GardenAPI
 import at.hannibal2.skyhanni.utils.CollectionUtils.addAsSingletonList
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
-import at.hannibal2.skyhanni.utils.ItemUtils.nameWithEnchantment
+import at.hannibal2.skyhanni.utils.ItemUtils.itemName
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.NEUInternalName
-import at.hannibal2.skyhanni.utils.NEUItems
 import at.hannibal2.skyhanni.utils.NEUItems.getPrice
 import at.hannibal2.skyhanni.utils.NEUItems.getPriceOrNull
 import at.hannibal2.skyhanni.utils.NumberUtil
+import at.hannibal2.skyhanni.utils.NumberUtil.formatInt
 import at.hannibal2.skyhanni.utils.RenderUtils.renderStringsAndItems
 import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
@@ -48,7 +48,7 @@ class SkyMartCopperPrice {
             if (!found) continue
             if (lines.isEmpty()) return list
 
-            NEUItems.getInternalNameOrNull(lines)?.let {
+            NEUInternalName.fromItemNameOrNull(lines)?.let {
                 list.add(it)
             }
         }
@@ -72,14 +72,14 @@ class SkyMartCopperPrice {
                 val profit = lowestBin - otherItemsPrice
 
                 val amount = copperPattern.matchMatcher(line) {
-                    group("amount").replace(",", "").toInt()
+                    group("amount").formatInt()
                 } ?: continue
                 val factor = profit / amount
                 val perFormat = NumberUtil.format(factor)
                 val priceFormat = NumberUtil.format(profit)
                 val amountFormat = NumberUtil.format(amount)
 
-                val name = stack.nameWithEnchantment!!
+                val name = stack.itemName
                 val advancedStats = if (config.copperPriceAdvancedStats) {
                     " §7(§6$priceFormat §7/ §c$amountFormat Copper§7)"
                 } else ""
