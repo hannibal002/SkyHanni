@@ -156,7 +156,7 @@ class DungeonFinderFeatures {
 
         val stack = event.itemStack
 
-        val classNames = mutableListOf("Healer", "Mage", "Berserker", "Archer", "Tank")
+        val classNames = mutableListOf("Healer", "Mage", "Berserk", "Archer", "Tank")
 
         for ((index, line) in stack.getLore().withIndex()) {
             classLevelPattern.matchMatcher(line) {
