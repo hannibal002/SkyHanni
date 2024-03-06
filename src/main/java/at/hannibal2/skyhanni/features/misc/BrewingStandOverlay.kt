@@ -36,7 +36,7 @@ class BrewingStandOverlay {
         if (name.contains(" or ")) return
 
         event.stackTip = name
-        event.offsetX = event.offsetX + 3
+        event.offsetX += 3
         event.offsetY = -5
         event.alignLeft = false
     }

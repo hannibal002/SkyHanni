@@ -1,26 +1,38 @@
 package at.hannibal2.skyhanni.features.garden
 
-import at.hannibal2.skyhanni.SkyHanniMod
+import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.InventoryCloseEvent
 import at.hannibal2.skyhanni.events.InventoryFullyOpenedEvent
-import at.hannibal2.skyhanni.features.garden.visitor.GardenVisitorFeatures
-import at.hannibal2.skyhanni.utils.*
+import at.hannibal2.skyhanni.features.garden.visitor.VisitorAPI
+import at.hannibal2.skyhanni.test.command.ErrorManager
+import at.hannibal2.skyhanni.utils.ChatUtils
+import at.hannibal2.skyhanni.utils.CollectionUtils.addAsSingletonList
+import at.hannibal2.skyhanni.utils.InventoryUtils
+import at.hannibal2.skyhanni.utils.ItemUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
+import at.hannibal2.skyhanni.utils.ItemUtils.itemName
+import at.hannibal2.skyhanni.utils.ItemUtils.name
 import at.hannibal2.skyhanni.utils.ItemUtils.nameWithEnchantment
-import at.hannibal2.skyhanni.utils.LorenzUtils.addAsSingletonList
+import at.hannibal2.skyhanni.utils.LorenzUtils
+import at.hannibal2.skyhanni.utils.NEUInternalName
 import at.hannibal2.skyhanni.utils.NEUInternalName.Companion.asInternalName
+import at.hannibal2.skyhanni.utils.NEUItems
 import at.hannibal2.skyhanni.utils.NEUItems.getPrice
+import at.hannibal2.skyhanni.utils.NumberUtil
 import at.hannibal2.skyhanni.utils.RenderUtils.renderStringsAndItems
+import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import net.minecraft.item.ItemStack
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
 class AnitaMedalProfit {
-    private val config get() = SkyHanniMod.feature.garden
+
+    private val config get() = GardenAPI.config.anitaShop
     private var display = emptyList<List<Any>>()
 
     companion object {
+
         var inInventory = false
     }
 
@@ -40,9 +52,9 @@ class AnitaMedalProfit {
 
     @SubscribeEvent
     fun onInventoryOpen(event: InventoryFullyOpenedEvent) {
-        if (!config.anitaMedalProfitEnabled) return
+        if (!config.medalProfitEnabled) return
         if (event.inventoryName != "Anita") return
-        if (GardenVisitorFeatures.inVisitorInventory) return
+        if (VisitorAPI.inInventory) return
 
         inInventory = true
 
@@ -51,8 +63,12 @@ class AnitaMedalProfit {
             try {
                 readItem(item, table)
             } catch (e: Throwable) {
-                LorenzUtils.error("Error in AnitaMedalProfit while reading item '$item'")
-                e.printStackTrace()
+                ErrorManager.logErrorWithData(
+                    e, "Error in AnitaMedalProfit while reading item '${item.nameWithEnchantment}'",
+                    "item" to item,
+                    "name" to item.nameWithEnchantment,
+                    "inventory name" to InventoryUtils.openInventoryName(),
+                )
             }
         }
 
@@ -63,7 +79,7 @@ class AnitaMedalProfit {
     }
 
     private fun readItem(item: ItemStack, table: MutableMap<Pair<String, String>, Pair<Double, NEUInternalName>>) {
-        val itemName = item.nameWithEnchantment ?: return
+        val itemName = getItemName(item) ?: return
         if (itemName == " ") return
         if (itemName == "§cClose") return
         if (itemName == "§eUnique Gold Medals") return
@@ -72,8 +88,7 @@ class AnitaMedalProfit {
         val fullCost = getFullCost(getRequiredItems(item))
         if (fullCost < 0) return
 
-        val (name, amount) = ItemUtils.readItemAmount(itemName)
-        if (name == null) return
+        val (name, amount) = ItemUtils.readItemAmount(itemName) ?: return
 
         var internalName = NEUItems.getInternalNameOrNull(name)
         if (internalName == null) {
@@ -89,23 +104,31 @@ class AnitaMedalProfit {
         table[Pair(itemName, "$color$format")] = Pair(profit, internalName)
     }
 
+    private fun getItemName(item: ItemStack): String? {
+        val name = item.name ?: return null
+        val isEnchantedBook = name.removeColor() == "Enchanted Book"
+        return if (isEnchantedBook) {
+            item.itemName
+        } else name
+    }
+
     private fun getFullCost(requiredItems: MutableList<String>): Double {
         val jacobTicketPrice = "JACOBS_TICKET".asInternalName().getPrice()
         var otherItemsPrice = 0.0
         for (rawItemName in requiredItems) {
-            val (name, amount) = ItemUtils.readItemAmount(rawItemName)
-            if (name == null) {
-                LorenzUtils.error("§c[SkyHanni] Could not read item '$rawItemName'")
+            val pair = ItemUtils.readItemAmount(rawItemName)
+            if (pair == null) {
+                ChatUtils.error("Could not read item '$rawItemName'")
                 continue
             }
 
+            val (name, amount) = pair
             val medal = getMedal(name)
             otherItemsPrice += if (medal != null) {
                 val bronze = medal.factorBronze * amount
                 bronze * jacobTicketPrice
             } else {
-                val internalName = NEUItems.getRawInternalName(name)
-                NEUItems.getPrice(internalName) * amount
+                NEUInternalName.fromItemName(name).getPrice() * amount
             }
         }
         return otherItemsPrice
@@ -132,14 +155,20 @@ class AnitaMedalProfit {
     }
 
     @SubscribeEvent
-    fun onBackgroundDraw(event: GuiRenderEvent.ChestBackgroundRenderEvent) {
+    fun onBackgroundDraw(event: GuiRenderEvent.ChestGuiOverlayRenderEvent) {
         if (inInventory) {
-            config.anitaMedalProfitPos.renderStringsAndItems(
+            config.medalProfitPos.renderStringsAndItems(
                 display,
                 extraSpace = 5,
                 itemScale = 1.7,
                 posLabel = "Anita Medal Profit"
             )
         }
+    }
+
+    @SubscribeEvent
+    fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
+        event.move(3, "garden.anitaMedalProfitEnabled", "garden.anitaShop.medalProfitEnabled")
+        event.move(3, "garden.anitaMedalProfitPos", "garden.anitaShop.medalProfitPos")
     }
 }

@@ -1,11 +1,15 @@
 package at.hannibal2.skyhanni.utils
 
+import at.hannibal2.skyhanni.utils.LorenzUtils.round
+import at.hannibal2.skyhanni.utils.StringUtils.matches
 import java.text.NumberFormat
-import java.util.*
+import java.util.Locale
+import java.util.TreeMap
 import kotlin.math.pow
 import kotlin.math.roundToInt
 
 object NumberUtil {
+
     @JvmField
     val nf: NumberFormat = NumberFormat.getInstance(Locale.US)
     private val suffixes = TreeMap<Long, String>().apply {
@@ -44,15 +48,15 @@ object NumberUtil {
     fun format(value: Number, preciseBillions: Boolean = false): String {
         @Suppress("NAME_SHADOWING")
         val value = value.toLong()
-        //Long.MIN_VALUE == -Long.MIN_VALUE so we need an adjustment here
+        // Long.MIN_VALUE == -Long.MIN_VALUE so we need an adjustment here
         if (value == Long.MIN_VALUE) return format(Long.MIN_VALUE + 1, preciseBillions)
         if (value < 0) return "-" + format(-value, preciseBillions)
 
-        if (value < 1000) return value.toString() //deal with small numbers
+        if (value < 1000) return value.toString() // deal with small numbers
 
         val (divideBy, suffix) = suffixes.floorEntry(value)
 
-        val truncated = value / (divideBy / 10) //the number part of the output times 10
+        val truncated = value / (divideBy / 10) // the number part of the output times 10
 
         val truncatedAt = if (suffix == "M") 1000 else if (suffix == "B") 1000000 else 100
 
@@ -103,9 +107,7 @@ object NumberUtil {
 
     fun Number.addSeparators() = NumberFormat.getNumberInstance().format(this)
 
-    fun Number.addFormatting() = format(this)
-
-    fun String.romanToDecimalIfNeeded() = toIntOrNull() ?: romanToDecimal()
+    fun String.romanToDecimalIfNecessary() = toIntOrNull() ?: romanToDecimal()
 
     /**
      * This code was converted to Kotlin and taken under CC BY-SA 3.0 license
@@ -164,42 +166,103 @@ object NumberUtil {
         } else romanSymbols[l] + (this - l).toRoman()
     }
 
-    private fun processDecimal(decimal: Int, lastNumber: Int, lastDecimal: Int): Int {
-        return if (lastNumber > decimal) {
-            lastDecimal - decimal
-        } else {
-            lastDecimal + decimal
-        }
+    private fun processDecimal(decimal: Int, lastNumber: Int, lastDecimal: Int) = if (lastNumber > decimal) {
+        lastDecimal - decimal
+    } else {
+        lastDecimal + decimal
     }
 
     val pattern = "^[0-9]*$".toPattern()
+    val formatPattern = "^[0-9,.]*[kmb]?$".toPattern()
 
     fun String.isInt(): Boolean {
         return isNotEmpty() && pattern.matcher(this).matches()
     }
 
-    fun percentageColor(have: Long, max: Long): LorenzColor {
-        val percentage = have.toDouble() / max.toDouble()
-        return when {
-            percentage > 0.9 -> LorenzColor.DARK_GREEN
-            percentage > 0.75 -> LorenzColor.GREEN
-            percentage > 0.5 -> LorenzColor.YELLOW
-            percentage > 0.25 -> LorenzColor.GOLD
-            else -> LorenzColor.RED
-        }
+    fun String.isFormatNumber(): Boolean {
+        return isNotEmpty() && formatPattern.matches(this)
     }
 
-    fun String.formatNumber(): Long {
-        var text = replace(",", "")
+    fun percentageColor(percentage: Double) = when {
+        percentage > 0.9 -> LorenzColor.DARK_GREEN
+        percentage > 0.75 -> LorenzColor.GREEN
+        percentage > 0.5 -> LorenzColor.YELLOW
+        percentage > 0.25 -> LorenzColor.GOLD
+        else -> LorenzColor.RED
+    }
+
+    fun percentageColor(have: Long, max: Long): LorenzColor = percentageColor(have.fractionOf(max))
+
+    fun Number.percentWithColorCode(max: Number, round: Int = 1): String {
+        val fraction = this.fractionOf(max)
+        val color = percentageColor(fraction)
+        val amount = (fraction * 100.0).round(round)
+        return "${color.getChatColor()}$amount%"
+    }
+
+    // TODO create new function formatLong, and eventually deprecate this function.
+    @Deprecated("renamed", ReplaceWith("this.formatLong()"))
+    fun String.formatNumber(): Long = formatLong()
+
+    fun String.formatDouble(): Double =
+        formatDoubleOrNull() ?: throw NumberFormatException("formatDouble failed for '$this'")
+
+    fun String.formatLong(): Long =
+        formatDoubleOrNull()?.toLong() ?: throw NumberFormatException("formatLong failed for '$this'")
+
+    fun String.formatInt(): Int =
+        formatDoubleOrNull()?.toInt() ?: throw NumberFormatException("formatInt failed for '$this'")
+
+    fun String.formatDoubleOrUserError(): Double? = formatDoubleOrNull() ?: run {
+        ChatUtils.userError("Not a valid number: '$this'")
+        return@run null
+    }
+
+    fun String.formatLongOrUserError(): Long? = formatDoubleOrNull()?.toLong() ?: run {
+        ChatUtils.userError("Not a valid number: '$this'")
+        return@run null
+    }
+
+    fun String.formatIntOrUserError(): Int? = formatDoubleOrNull()?.toInt() ?: run {
+        ChatUtils.userError("Not a valid number: '$this'")
+        return@run null
+    }
+
+    private fun String.formatDoubleOrNull(): Double? {
+        var text = lowercase().replace(",", "")
 
         val multiplier = if (text.endsWith("k")) {
             text = text.substring(0, text.length - 1)
-            1_000
+            1_000.0
         } else if (text.endsWith("m")) {
             text = text.substring(0, text.length - 1)
-            1_000_000
-        } else 1
-        val d = text.toDouble()
-        return (d * multiplier).toLong()
+            1.milion
+        } else if (text.endsWith("b")) {
+            text = text.substring(0, text.length - 1)
+            1.bilion
+        } else 1.0
+        return text.toDoubleOrNull()?.let {
+            it * multiplier
+        }
     }
+
+    val Int.milion get() = this * 1_000_000.0
+    private val Int.bilion get() = this * 1_000_000_000.0
+    val Double.milion get() = (this * 1_000_000.0).toLong()
+
+    /** @return clamped to [0.0, 1.0]**/
+    fun Number.fractionOf(maxValue: Number) = maxValue.toDouble().takeIf { it != 0.0 }?.let { max ->
+        this.toDouble() / max
+    }?.coerceIn(0.0, 1.0) ?: 1.0
+
+    fun interpolate(now: Float, last: Float, lastUpdate: Long): Float {
+        var interp = now
+        if (last >= 0 && last != now) {
+            var factor: Float = (SimpleTimeMark.now().toMillis() - lastUpdate) / 1000f
+            factor = factor.coerceIn(0f, 1f)
+            interp = last + (now - last) * factor
+        }
+        return interp
+    }
+
 }

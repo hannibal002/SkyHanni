@@ -6,12 +6,14 @@ import at.hannibal2.skyhanni.events.LorenzWorldChangeEvent
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.LorenzVec
 import at.hannibal2.skyhanni.utils.getLorenzVec
+import net.minecraft.client.Minecraft
 import net.minecraft.entity.Entity
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
 class EntityMovementData {
 
     companion object {
+
         private val entityLocation = mutableMapOf<Entity, LorenzVec>()
 
         fun addToTrack(entity: Entity) {
@@ -24,6 +26,7 @@ class EntityMovementData {
     @SubscribeEvent
     fun onTick(event: LorenzTickEvent) {
         if (!LorenzUtils.inSkyBlock) return
+        addToTrack(Minecraft.getMinecraft().thePlayer)
 
         for (entity in entityLocation.keys) {
             if (entity.isDead) continue

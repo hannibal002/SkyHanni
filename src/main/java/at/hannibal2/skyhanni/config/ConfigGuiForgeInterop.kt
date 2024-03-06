@@ -11,6 +11,7 @@ import java.io.IOException
 
 @Suppress("unused")
 class ConfigGuiForgeInterop : IModGuiFactory {
+
     override fun initialize(minecraft: Minecraft) {}
     override fun mainConfigGuiClass() = WrappedSkyHanniConfig::class.java
 
@@ -18,7 +19,9 @@ class ConfigGuiForgeInterop : IModGuiFactory {
 
     override fun getHandlerFor(element: RuntimeOptionCategoryElement): RuntimeOptionGuiHandler? = null
 
-    class WrappedSkyHanniConfig(private val parent: GuiScreen) : GuiScreenElementWrapper(ConfigGuiManager.editor) {
+    class WrappedSkyHanniConfig(private val parent: GuiScreen) :
+        GuiScreenElementWrapper(ConfigGuiManager.getEditorInstance()) {
+
         @Throws(IOException::class)
         override fun handleKeyboardInput() {
             if (Keyboard.getEventKeyState() && Keyboard.getEventKey() == Keyboard.KEY_ESCAPE) {

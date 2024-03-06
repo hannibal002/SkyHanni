@@ -5,11 +5,13 @@ import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.events.InventoryFullyOpenedEvent
 import at.hannibal2.skyhanni.events.RenderInventoryItemTipEvent
 import at.hannibal2.skyhanni.utils.ItemUtils.name
-import at.hannibal2.skyhanni.utils.LorenzUtils
+import at.hannibal2.skyhanni.utils.LorenzUtils.isInIsland
 import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
+import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
 class TeleportPadInventoryNumber {
+
     private val numbers: Map<String, Int> by lazy {
         val baseNumber = mapOf(
             "one" to 1,
@@ -59,7 +61,11 @@ class TeleportPadInventoryNumber {
     }
 
     private var inTeleportPad = false
-    private val pattern = "§.(?<number>.*) teleport pad".toPattern()
+
+    private val padNumberPattern by RepoPattern.pattern(
+        "misc.teleportpad.number",
+        "§.(?<number>.*) teleport pad"
+    )
 
     @SubscribeEvent
     fun onInventoryOpen(event: InventoryFullyOpenedEvent) {
@@ -69,12 +75,12 @@ class TeleportPadInventoryNumber {
 
     @SubscribeEvent
     fun onRenderItemTip(event: RenderInventoryItemTipEvent) {
-        if (LorenzUtils.skyBlockIsland != IslandType.PRIVATE_ISLAND) return
+        if (!IslandType.PRIVATE_ISLAND.isInIsland()) return
         if (!inTeleportPad) return
 
         val name = event.stack.name?.lowercase() ?: return
 
-        pattern.matchMatcher(name) {
+        padNumberPattern.matchMatcher(name) {
             val text = group("number")
             numbers[text]?.let {
                 event.stackTip = "$it"

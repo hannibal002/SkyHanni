@@ -12,6 +12,7 @@ import net.minecraftforge.fml.common.eventhandler.EventPriority
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
 class HighlightRiftGuide {
+
     private var inInventory = false
     private var highlightedItems = emptyList<Int>()
 
@@ -31,10 +32,8 @@ class HighlightRiftGuide {
         val highlightedItems = mutableListOf<Int>()
         for ((slot, stack) in event.inventoryItems) {
             val lore = stack.getLore()
-            if (lore.isNotEmpty()) {
-                if (lore.last() == "§8✖ Not completed yet!") {
-                    highlightedItems.add(slot)
-                }
+            if (lore.isNotEmpty() && lore.last() == "§8✖ Not completed yet!") {
+                highlightedItems.add(slot)
             }
         }
         inInventory = true

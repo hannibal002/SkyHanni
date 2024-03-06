@@ -1,6 +1,7 @@
 package at.hannibal2.skyhanni.features.rift.area.colosseum
 
 import at.hannibal2.skyhanni.SkyHanniMod
+import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.events.LorenzTickEvent
 import at.hannibal2.skyhanni.events.LorenzWorldChangeEvent
 import at.hannibal2.skyhanni.events.withAlpha
@@ -15,7 +16,7 @@ import java.awt.Color
 
 class BlobbercystsHighlight {
 
-    private val config get() = SkyHanniMod.feature.rift.area.colosseumConfig
+    private val config get() = SkyHanniMod.feature.rift.area.colosseum
     private val entityList = mutableListOf<EntityOtherPlayerMP>()
     private val blobberName = "Blobbercyst "
 
@@ -47,4 +48,9 @@ class BlobbercystsHighlight {
     }
 
     fun isEnabled() = RiftAPI.inRift() && config.highlightBlobbercysts && LorenzUtils.skyBlockArea == "Colosseum"
+
+    @SubscribeEvent
+    fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
+        event.move(9, "rift.area.colosseumConfig", "rift.area.colosseum")
+    }
 }

@@ -1,4 +1,6 @@
+import org.apache.commons.lang3.SystemUtils
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
+import java.io.ByteArrayOutputStream
 
 plugins {
     idea
@@ -8,10 +10,21 @@ plugins {
     id("com.github.johnrengelman.shadow") version "7.1.2"
     kotlin("jvm") version "1.9.0"
     id("com.bnorm.power.kotlin-power-assert") version "0.13.0"
+    id("moe.nea.shot") version "1.0.0"
 }
 
 group = "at.hannibal2.skyhanni"
-version = "0.20.Beta.7"
+version = "0.24.Beta.4"
+
+val gitHash by lazy {
+    val baos = ByteArrayOutputStream()
+    exec {
+        standardOutput = baos
+        commandLine("git", "rev-parse", "--short", "HEAD")
+        isIgnoreExitValue = true
+    }
+    baos.toByteArray().decodeToString().trim()
+}
 
 // Toolchains:
 java {
@@ -19,14 +32,15 @@ java {
 }
 
 sourceSets.main {
-    output.setResourcesDir(file("$buildDir/classes/java/main"))
+    output.setResourcesDir(sourceSets.main.flatMap { it.java.classesDirectory })
+    java.srcDir(layout.projectDirectory.dir("src/main/kotlin"))
+    kotlin.destinationDirectory.set(java.destinationDirectory)
 }
 
 repositories {
     mavenCentral()
     mavenLocal()
     maven("https://repo.spongepowered.org/maven/")
-    // If you don't want to log in with your real minecraft account, remove this line
     maven("https://pkgs.dev.azure.com/djtheredstoner/DevAuth/_packaging/public/maven/v1")
     maven("https://jitpack.io") {
         content {
@@ -34,20 +48,28 @@ repositories {
         }
     }
     maven("https://repo.nea.moe/releases")
+    maven("https://maven.notenoughupdates.org/releases")
 }
 
-val shadowImpl by configurations.creating {
+val shadowImpl: Configuration by configurations.creating {
     configurations.implementation.get().extendsFrom(this)
 }
 
-val shadowModImpl by configurations.creating {
+val shadowModImpl: Configuration by configurations.creating {
     configurations.modImplementation.get().extendsFrom(this)
 }
 
-val devenvMod by configurations.creating {
+val devenvMod: Configuration by configurations.creating {
     isTransitive = false
     isVisible = false
 }
+
+val headlessLwjgl by configurations.creating {
+    isTransitive = false
+    isVisible = false
+}
+
+val shot = shots.shot("minecraft", project.file("shots.txt"))
 
 dependencies {
     minecraft("com.mojang:minecraft:1.8.9")
@@ -55,13 +77,15 @@ dependencies {
     forge("net.minecraftforge:forge:1.8.9-11.15.1.2318-1.8.9")
 
     // Discord RPC client
-    shadowImpl("com.github.ILikePlayingGames:DiscordIPC:f91ed4b") {
+    shadowImpl("com.github.NetheriteMiner:DiscordIPC:3106be5") {
         exclude(module = "log4j")
         because("Different version conflicts with Minecraft's Log4J")
         exclude(module = "gson")
         because("Different version conflicts with Minecraft's Log4j")
     }
+    compileOnly(libs.jbAnnotations)
 
+    headlessLwjgl(libs.headlessLwjgl)
 
     shadowImpl("org.spongepowered:mixin:0.7.11-SNAPSHOT") {
         isTransitive = false
@@ -73,28 +97,32 @@ dependencies {
         exclude(group = "org.jetbrains.kotlin")
     }
 
-    // If you don't want to log in with your real minecraft account, remove this line
     modRuntimeOnly("me.djtheredstoner:DevAuth-forge-legacy:1.1.0")
 
-    @Suppress("VulnerableLibrariesLocal")
-    modImplementation("com.github.hannibal002:notenoughupdates:4957f0b:all") {
+    modCompileOnly("com.github.hannibal002:notenoughupdates:4957f0b:all") {
         exclude(module = "unspecified")
         isTransitive = false
     }
-    @Suppress("VulnerableLibrariesLocal")
-    devenvMod("com.github.hannibal002:notenoughupdates:4957f0b:all") {
+    devenvMod("com.github.NotEnoughUpdates:NotEnoughUpdates:v2.1.1-pre5:all") {
         exclude(module = "unspecified")
         isTransitive = false
     }
 
-    shadowModImpl("com.github.NotEnoughUpdates:MoulConfig:1.1.5")
-    devenvMod("com.github.NotEnoughUpdates:MoulConfig:1.1.5:test")
-
-    shadowImpl("moe.nea:libautoupdate:1.0.3")
+    shadowModImpl(libs.moulconfig)
+    shadowImpl(libs.libautoupdate)
     shadowImpl("org.jetbrains.kotlin:kotlin-reflect:1.9.0")
+    implementation(libs.hotswapagentforge)
 
 //    testImplementation(kotlin("test"))
+    testImplementation("com.github.NotEnoughUpdates:NotEnoughUpdates:v2.1.1-pre5:all") {
+        exclude(module = "unspecified")
+        isTransitive = false
+    }
     testImplementation("org.junit.jupiter:junit-jupiter:5.10.0")
+    testImplementation("io.mockk:mockk:1.12.5")
+}
+configurations.getByName("minecraftNamed").dependencies.forEach {
+    shot.applyTo(it as HasConfigurableAttributes<*>)
 }
 
 tasks.withType(Test::class) {
@@ -117,26 +145,30 @@ kotlin {
 loom {
     launchConfigs {
         "client" {
-            // If you don't want mixins, remove these lines
             property("mixin.debug", "true")
-            property("asmhelper.verbose", "true")
+            if (System.getenv("repo_action") != "true") {
+                property("devauth.configDir", rootProject.file(".devauth").absolutePath)
+            }
             arg("--tweakClass", "org.spongepowered.asm.launch.MixinTweaker")
-            arg("--mixin", "mixins.skyhanni.json")
-            val modFiles = devenvMod
-                .incoming.artifacts.resolvedArtifacts.get()
-            arg("--mods", modFiles.joinToString(",") { it.file.relativeTo(file("run")).path })
+            arg("--tweakClass", "io.github.moulberry.moulconfig.tweaker.DevelopmentResourceTweaker")
+            arg("--mods", devenvMod.resolve().joinToString(",") { it.relativeTo(file("run")).path })
         }
     }
     forge {
         pack200Provider.set(dev.architectury.pack200.java.Pack200Adapter())
-        // If you don't want mixins, remove this lines
         mixinConfig("mixins.skyhanni.json")
     }
-    // If you don't want mixins, remove these lines
+    @Suppress("UnstableApiUsage")
     mixin {
         defaultRefmapName.set("mixins.skyhanni.refmap.json")
     }
     runConfigs {
+        "client" {
+            if (SystemUtils.IS_OS_MAC_OSX) {
+                vmArgs.remove("-XstartOnFirstThread")
+            }
+            vmArgs.add("-Xmx4G")
+        }
         "server" {
             isIdeConfigGenerated = false
         }
@@ -151,6 +183,28 @@ tasks.processResources {
     }
 }
 
+val generateRepoPatterns by tasks.creating(JavaExec::class) {
+    javaLauncher.set(javaToolchains.launcherFor(java.toolchain))
+    mainClass.set("net.fabricmc.devlaunchinjector.Main")
+    workingDir(project.file("run"))
+    classpath(sourceSets.main.map { it.runtimeClasspath }, sourceSets.main.map { it.output })
+    jvmArgs(
+        "-Dfabric.dli.config=${project.file(".gradle/loom-cache/launch.cfg").absolutePath}",
+        "-Dfabric.dli.env=client",
+        "-Dfabric.dli.main=net.minecraft.launchwrapper.Launch",
+        "-Dorg.lwjgl.opengl.Display.allowSoftwareOpenGL=true",
+        "-agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=5006",
+        "-javaagent:${headlessLwjgl.singleFile.absolutePath}"
+    )
+    val outputFile = project.file("build/regexes/constants.json")
+    environment("SKYHANNI_DUMP_REGEXES", "${gitHash}:${outputFile.absolutePath}")
+    environment("SKYHANNI_DUMP_REGEXES_EXIT", "true")
+}
+
+tasks.compileJava {
+    dependsOn(tasks.processResources)
+}
+
 tasks.withType(JavaCompile::class) {
     options.encoding = "UTF-8"
 }
@@ -161,8 +215,8 @@ tasks.withType(Jar::class) {
     manifest.attributes.run {
         this["FMLCorePluginContainsFMLMod"] = "true"
         this["ForceLoadAsMod"] = "true"
+        this["Main-Class"] = "SkyHanniInstallerFrame"
 
-        // If you don't want mixins, remove these lines
         this["TweakClass"] = "org.spongepowered.asm.launch.MixinTweaker"
         this["MixinConfigs"] = "mixins.skyhanni.json"
     }
@@ -185,7 +239,7 @@ tasks.shadowJar {
         }
     }
     exclude("META-INF/versions/**")
-
+    mergeServiceFiles()
     relocate("io.github.moulberry.moulconfig", "at.hannibal2.skyhanni.deps.moulconfig")
     relocate("moe.nea.libautoupdate", "at.hannibal2.skyhanni.deps.libautoupdate")
 }

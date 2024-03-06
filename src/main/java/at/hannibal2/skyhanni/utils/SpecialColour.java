@@ -1,6 +1,6 @@
 package at.hannibal2.skyhanni.utils;
 
-import java.awt.*;
+import java.awt.Color;
 
 /**
  * Taken from NotEnoughUpdates

@@ -1,12 +1,13 @@
 package at.hannibal2.skyhanni.test
 
-import at.hannibal2.skyhanni.utils.LorenzUtils
+import at.hannibal2.skyhanni.utils.ChatUtils
 
 object TestBingo {
+
     var testBingo = false
 
     fun toggle() {
         testBingo = !testBingo
-        LorenzUtils.chat("§e[SkyHanni] Test Bingo " + (if (testBingo) "enabled" else "disabled"))
+        ChatUtils.chat("Test Bingo " + (if (testBingo) "enabled" else "disabled"))
     }
 }

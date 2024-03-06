@@ -25,7 +25,6 @@ class AnvilCombineHelper {
         if (chestName != "Anvil") return
 
         val matchLore = mutableListOf<String>()
-//        var compareItem: ItemStack? = null
 
         for (slot in chest.inventorySlots) {
             if (slot == null) continue
@@ -34,13 +33,9 @@ class AnvilCombineHelper {
             if (slot.stack == null) continue
 
             if (slot.slotNumber == 29) {
-//                slot highlight LorenzColor.GREEN
                 val lore = slot.stack.getLore()
-//                compareItem = slot.stack
                 matchLore.addAll(lore)
                 break
-//            } else if (slot.slotIndex == 29) {
-//                slot highlight LorenzColor.YELLOW
             }
         }
 
@@ -56,19 +51,6 @@ class AnvilCombineHelper {
             if (matchLore == slot.stack.getLore()) {
                 slot highlight LorenzColor.GREEN
             }
-
-//            if (compareItem == slot.stack) {
-//                slot highlight LorenzColor.GREEN
-//            } else if (compareItem.metadata == slot.stack.metadata) {
-//                slot highlight LorenzColor.YELLOW
-//            }
-
-//            if (slot.slotNumber == 3) {
-////                slot highlight LorenzColor.GREEN
-////            } else if (slot.slotIndex == 4) {
-////                slot highlight LorenzColor.YELLOW
-////            }
-//            }
         }
     }
 }

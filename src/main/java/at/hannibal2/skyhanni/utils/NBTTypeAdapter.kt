@@ -7,9 +7,10 @@ import net.minecraft.nbt.CompressedStreamTools
 import net.minecraft.nbt.NBTTagCompound
 import java.io.ByteArrayInputStream
 import java.io.ByteArrayOutputStream
-import java.util.*
+import java.util.Base64
 
 object NBTTypeAdapter : TypeAdapter<NBTTagCompound>() {
+
     override fun write(out: JsonWriter, value: NBTTagCompound) {
         val baos = ByteArrayOutputStream()
         CompressedStreamTools.writeCompressed(value, baos)

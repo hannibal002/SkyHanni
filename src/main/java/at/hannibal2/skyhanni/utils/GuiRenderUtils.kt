@@ -1,6 +1,9 @@
 package at.hannibal2.skyhanni.utils
 
-import at.hannibal2.skyhanni.features.garden.fortuneguide.FFGuideGUI
+import at.hannibal2.skyhanni.config.features.skillprogress.SkillProgressBarConfig
+import at.hannibal2.skyhanni.features.chroma.ChromaShaderManager
+import at.hannibal2.skyhanni.features.chroma.ChromaType
+import io.github.moulberry.notenoughupdates.util.Utils
 import net.minecraft.client.Minecraft
 import net.minecraft.client.gui.FontRenderer
 import net.minecraft.client.gui.GuiScreen
@@ -10,10 +13,12 @@ import net.minecraft.item.ItemStack
 import org.lwjgl.opengl.GL11
 import java.awt.Color
 import java.text.DecimalFormat
+import kotlin.math.ceil
+import kotlin.math.min
 import kotlin.math.roundToInt
 
 /**
- * Taken from NotEnoughUpdates
+ * Some functions taken from NotEnoughUpdates
  */
 object GuiRenderUtils {
 
@@ -60,7 +65,6 @@ object GuiRenderUtils {
 
         Minecraft.getMinecraft().fontRendererObj.drawString(firstString, x, y - 5, 0xffffff, true)
         Minecraft.getMinecraft().fontRendererObj.drawString(secondString, x, y + 5, 0xffffff, true)
-
     }
 
     fun drawStringCentered(str: String?, x: Int, y: Int) {
@@ -72,6 +76,10 @@ object GuiRenderUtils {
             true,
             0xffffff
         )
+    }
+
+    fun drawStringCentered(str: String?, x: Float, y: Float) {
+        drawStringCentered(str, x.toInt(), y.toInt())
     }
 
     fun renderItemStack(item: ItemStack, x: Int, y: Int) {
@@ -89,7 +97,7 @@ object GuiRenderUtils {
         mouseX: Int,
         mouseY: Int,
         screenHeight: Int,
-        fr: FontRenderer
+        fr: FontRenderer,
     ) {
         if (textLines.isNotEmpty()) {
             val borderColor = StringUtils.getColor(textLines[0], 0x505000FF)
@@ -162,9 +170,8 @@ object GuiRenderUtils {
         drawTooltip(textLines, mouseX, mouseY, screenHeight, Minecraft.getMinecraft().fontRendererObj)
     }
 
-    fun isPointInRect(x: Int, y: Int, left: Int, top: Int, width: Int, height: Int): Boolean {
-        return left <= x && x < left + width && top <= y && y < top + height
-    }
+    fun isPointInRect(x: Int, y: Int, left: Int, top: Int, width: Int, height: Int) =
+        left <= x && x < left + width && top <= y && y < top + height
 
     fun drawProgressBar(x: Int, y: Int, barWidth: Int, progress: Float) {
         GuiScreen.drawRect(x, y, x + barWidth, y + 6, 0xFF43464B.toInt())
@@ -179,26 +186,35 @@ object GuiRenderUtils {
         )
     }
 
-    fun renderItemAndTip(item: ItemStack?, x: Int, y: Int, mouseX: Int, mouseY: Int, color: Int = 0xFF43464B.toInt()) {
+    fun renderItemAndTip(
+        list: MutableList<String>,
+        item: ItemStack?,
+        x: Int,
+        y: Int,
+        mouseX: Int,
+        mouseY: Int,
+        color: Int = 0xFF43464B.toInt(),
+    ) {
         GuiScreen.drawRect(x, y, x + 16, y + 16, color)
         if (item != null) {
             renderItemStack(item, x, y)
             if (isPointInRect(mouseX, mouseY, x, y, 16, 16)) {
                 val tt: List<String> = item.getTooltip(Minecraft.getMinecraft().thePlayer, false)
-                FFGuideGUI.tooltipToDisplay.addAll(tt)
+                list.addAll(tt)
             }
         }
     }
 
     fun renderItemAndTip(
+        list: MutableList<String>,
         item: ItemStack?,
         x: Float,
         y: Float,
         mouseX: Float,
         mouseY: Float,
-        color: Int = 0xFF43464B.toInt()
+        color: Int = 0xFF43464B.toInt(),
     ) {
-        renderItemAndTip(item, x.toInt(), y.toInt(), mouseX.toInt(), mouseY.toInt(), color)
+        renderItemAndTip(list, item, x.toInt(), y.toInt(), mouseX.toInt(), mouseY.toInt(), color)
     }
 
     // assuming 70% font size
@@ -213,7 +229,7 @@ object GuiRenderUtils {
         mouseX: Int,
         mouseY: Int,
         output: MutableList<String>,
-        textScale: Float = .7f
+        textScale: Float = .7f,
     ) {
         var currentVal = currentValue.toDouble()
         currentVal = if (currentVal < 0) 0.0 else currentVal
@@ -236,7 +252,7 @@ object GuiRenderUtils {
         GlStateManager.scale(textScale, textScale, 1f)
         drawString(label, xPos * inverseScale, yPos * inverseScale)
         drawString(
-            "§2$current / ${DecimalFormat("0.#").format(maxValue)}☘",
+            "§2$current / ${DecimalFormat("0.##").format(maxValue)}☘",
             xPos * inverseScale,
             (yPos + 8) * inverseScale
         )
@@ -254,12 +270,10 @@ object GuiRenderUtils {
             if (filledWidth < 2) xPos + 1 else xPos + filledWidth - 1, yPos + 19, barColor
         )
 
-        if (tooltip != "") {
-            if (isPointInRect(mouseX, mouseY, xPos - 2, yPos - 2, width + 4, 20 + 4)) {
-                val split = tooltip.split("\n")
-                for (line in split) {
-                    output.add(line)
-                }
+        if (tooltip != "" && isPointInRect(mouseX, mouseY, xPos - 2, yPos - 2, width + 4, 20 + 4)) {
+            val split = tooltip.split("\n")
+            for (line in split) {
+                output.add(line)
             }
         }
     }
@@ -273,5 +287,58 @@ object GuiRenderUtils {
     fun Int.darkenColor(): Int {
         val color = Color(this)
         return Color(color.red / 5, color.green / 5, color.blue / 5).rgb
+    }
+
+    fun drawScaledRec(left: Int, top: Int, right: Int, bottom: Int, colour: Int, inverseScale: Float) {
+        GuiScreen.drawRect(
+            (left * inverseScale).toInt(), (top * inverseScale).toInt(),
+            (right * inverseScale).toInt(), (bottom * inverseScale).toInt(), colour
+        )
+    }
+
+    fun renderItemAndBackground(item: ItemStack, x: Int, y: Int, colour: Int) {
+        renderItemStack(item, x, y)
+        GuiScreen.drawRect(x, y, x + 16, y + 16, colour)
+    }
+
+    // Taken and edited from NEU <- it's broken
+    fun renderTexturedBar(x: Float, y: Float, xSize: Float, completed: Float, color: Color, useChroma: Boolean, texture: SkillProgressBarConfig.TexturedBar.UsedTexture, height: Float) {
+        GlStateManager.pushMatrix()
+        GlStateManager.translate(x, y, 0f)
+        val w = xSize.toInt()
+        val w_2 = w / 2
+        val k = min(w.toDouble(), ceil((completed * w).toDouble())).toInt()
+        val vanilla = texture == SkillProgressBarConfig.TexturedBar.UsedTexture.MATCH_PACK
+        val vMinEmpty = if (vanilla) 64 / 256f else 0f
+        val vMaxEmpty = if (vanilla) 69 / 256f else .5f
+        val vMinFilled = if (vanilla) 69 / 256f else .5f
+        val vMaxFilled = if (vanilla) 74 / 256f else 1f
+
+        if (useChroma) {
+            ChromaShaderManager.begin(ChromaType.TEXTURED)
+            GlStateManager.color(Color.LIGHT_GRAY.darker().red / 255f, Color.LIGHT_GRAY.darker().green / 255f, Color.LIGHT_GRAY.darker().blue / 255f, 1f)
+        } else {
+            GlStateManager.color(color.darker().red / 255f, color.darker().green / 255f, color.darker().blue / 255f, 1f)
+        }
+
+        Utils.drawTexturedRect(x, y, w_2.toFloat(), height, 0f, w_2 / xSize, vMinEmpty, vMaxEmpty, GL11.GL_NEAREST)
+        Utils.drawTexturedRect(x + w_2, y, w_2.toFloat(), height, 1 - w_2 / xSize, 1f, vMinEmpty, vMaxEmpty, GL11.GL_NEAREST)
+
+        if (useChroma) {
+            GlStateManager.color(Color.WHITE.red / 255f, Color.WHITE.green / 255f, Color.WHITE.blue / 255f, 1f)
+        } else {
+            GlStateManager.color(color.red / 255f, color.green / 255f, color.blue / 255f, 1f)
+        }
+
+         if (k > 0) {
+            Utils.drawTexturedRect(x, y, w_2.coerceAtMost(k).toFloat(), height, 0f, w_2.toDouble().coerceAtMost(k.toDouble() / xSize).toFloat(), vMinFilled, vMaxFilled, GL11.GL_NEAREST)
+            if (completed > 0.5f) {
+                Utils.drawTexturedRect(x + w_2, y, (k - w_2).toFloat(), height, 1 - w_2 / xSize, 1 + (k - w) / xSize, vMinFilled, vMaxFilled, GL11.GL_NEAREST)
+            }
+        }
+        if (useChroma) {
+            ChromaShaderManager.end()
+        }
+        GlStateManager.popMatrix()
     }
 }

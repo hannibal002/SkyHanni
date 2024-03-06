@@ -1,13 +1,16 @@
 package at.hannibal2.skyhanni.features.misc
 
 import at.hannibal2.skyhanni.SkyHanniMod
+import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
+import at.hannibal2.skyhanni.data.jsonobjects.repo.ModGuiSwitcherJson
+import at.hannibal2.skyhanni.config.enums.OutsideSbFeature
 import at.hannibal2.skyhanni.events.LorenzTickEvent
 import at.hannibal2.skyhanni.events.RepositoryReloadEvent
-import at.hannibal2.skyhanni.test.command.CopyErrorCommand
+import at.hannibal2.skyhanni.test.command.ErrorManager
+import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils
-import at.hannibal2.skyhanni.utils.LorenzUtils.makeAccessible
+import at.hannibal2.skyhanni.utils.ReflectionUtils.makeAccessible
 import at.hannibal2.skyhanni.utils.RenderUtils.renderStringsAndItems
-import at.hannibal2.skyhanni.utils.jsonobjects.ModsJson
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 import net.minecraft.client.Minecraft
 import net.minecraft.client.renderer.GlStateManager
@@ -16,6 +19,7 @@ import net.minecraftforge.client.event.GuiScreenEvent
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
 object QuickModMenuSwitch {
+
     private val config get() = SkyHanniMod.feature.misc.quickModMenuSwitch
     private var display = emptyList<List<Any>>()
     private var latestGuiPath = ""
@@ -27,7 +31,7 @@ object QuickModMenuSwitch {
 
     @SubscribeEvent
     fun onRepoReload(event: RepositoryReloadEvent) {
-        val modsJar = event.getConstant<ModsJson>("ModGuiSwitcher") ?: return
+        val modsJar = event.getConstant<ModGuiSwitcherJson>("ModGuiSwitcher")
         mods = buildList {
             out@ for ((name, mod) in modsJar.mods) {
                 for (path in mod.guiPath) {
@@ -51,7 +55,7 @@ object QuickModMenuSwitch {
         }
     }
 
-    class Mod(val name: String, val description: List<String>, val command: String, val guiPath: List<String>) {
+    class Mod(val name: String, val description: List<String>, val command: String, private val guiPath: List<String>) {
 
         fun isInGui() = guiPath.any { latestGuiPath.startsWith(it) }
     }
@@ -62,8 +66,8 @@ object QuickModMenuSwitch {
         if (latestGuiPath != openGui) {
             latestGuiPath = openGui
 
-            if (SkyHanniMod.feature.dev.modMenuLog) {
-                LorenzUtils.debug("Open GUI: $latestGuiPath")
+            if (SkyHanniMod.feature.dev.debug.modMenuLog) {
+                ChatUtils.debug("Open GUI: $latestGuiPath")
             }
         }
         val mods = mods ?: return
@@ -139,8 +143,6 @@ object QuickModMenuSwitch {
         try {
             when (mod.command) {
                 "patcher" -> {
-                    println("try opening patcher")
-                    // GuiUtil.open(Objects.requireNonNull(Patcher.instance.getPatcherConfig().gui()))
                     val patcher = Class.forName("club.sk1er.patcher.Patcher")
                     val instance = patcher.getDeclaredField("instance").get(null)
                     val config = instance.javaClass.getDeclaredMethod("getPatcherConfig").invoke(instance)
@@ -149,17 +151,14 @@ object QuickModMenuSwitch {
                     for (method in guiUtils.declaredMethods) {
                         try {
                             method.invoke(null, gui)
-                            println("opened patcher")
                             return
                         } catch (_: Exception) {
                         }
                     }
-                    LorenzUtils.chat("§c[SkyHanni] Error trying to open the gui for mod " + mod.name + "!")
+                    ChatUtils.error("Error trying to open the gui for mod " + mod.name + "!")
                 }
 
                 "hytil" -> {
-                    println("try opening hytil")
-                    // HytilsReborn.INSTANCE.getConfig().openGui()
                     val hytilsReborn = Class.forName("cc.woverflow.hytils.HytilsReborn")
                     val instance = hytilsReborn.getDeclaredField("INSTANCE").get(null)
                     val config = instance.javaClass.getDeclaredMethod("getConfig").invoke(instance)
@@ -168,12 +167,11 @@ object QuickModMenuSwitch {
                     for (method in guiUtils.declaredMethods) {
                         try {
                             method.invoke(null, gui)
-                            println("opened hytil")
                             return
                         } catch (_: Exception) {
                         }
                     }
-                    LorenzUtils.chat("§c[SkyHanni] Error trying to open the gui for mod " + mod.name + "!")
+                    ChatUtils.chat("Error trying to open the gui for mod " + mod.name + "!")
                 }
 
                 else -> {
@@ -182,7 +180,7 @@ object QuickModMenuSwitch {
                 }
             }
         } catch (e: Exception) {
-            CopyErrorCommand.logError(e, "Error trying to open the gui for mod " + mod.name)
+            ErrorManager.logErrorWithData(e, "Error trying to open the gui for mod " + mod.name)
         }
     }
 
@@ -195,5 +193,10 @@ object QuickModMenuSwitch {
         GlStateManager.popMatrix()
     }
 
-    fun isEnabled() = LorenzUtils.inSkyBlock && config.enabled
+    fun isEnabled() = (LorenzUtils.inSkyBlock || OutsideSbFeature.QUICK_MOD_MENU_SWITCH.isSelected()) && config.enabled
+
+    @SubscribeEvent
+    fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
+        event.move(3, "dev.modMenuLog", "dev.debug.modMenuLog")
+    }
 }

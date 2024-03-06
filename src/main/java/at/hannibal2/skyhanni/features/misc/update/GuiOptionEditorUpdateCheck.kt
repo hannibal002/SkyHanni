@@ -11,6 +11,7 @@ import net.minecraft.util.EnumChatFormatting.RED
 import org.lwjgl.input.Mouse
 
 class GuiOptionEditorUpdateCheck(option: ProcessedOption) : GuiOptionEditor(option) {
+
     val button = GuiElementButton("", -1) { }
 
     override fun render(x: Int, y: Int, width: Int) {
@@ -47,7 +48,7 @@ class GuiOptionEditorUpdateCheck(option: ProcessedOption) : GuiOptionEditor(opti
         val sameVersion = currentVersion.equals(nextVersion, true)
         TextRenderUtils.drawStringCenteredScaledMaxWidth(
             "${if (UpdateManager.updateState == UpdateManager.UpdateState.NONE) GREEN else RED}$currentVersion" +
-                    if (nextVersion != null && !sameVersion) "➜ ${GREEN}${nextVersion}" else "",
+                if (nextVersion != null && !sameVersion) "➜ ${GREEN}${nextVersion}" else "",
             fr,
             widthRemaining / 4F,
             10F,
@@ -59,23 +60,21 @@ class GuiOptionEditorUpdateCheck(option: ProcessedOption) : GuiOptionEditor(opti
         GlStateManager.popMatrix()
     }
 
-    fun getButtonPosition(width: Int) = width - button.width
+    private fun getButtonPosition(width: Int) = width - button.width
     override fun getHeight(): Int {
         return 55
     }
 
     override fun mouseInput(x: Int, y: Int, width: Int, mouseX: Int, mouseY: Int): Boolean {
         val width = width - 20
-        if (Mouse.getEventButtonState()) {
-            if ((mouseX - getButtonPosition(width) - x) in (0..button.width) && (mouseY - 10 - y) in (0..button.height)) {
-                when (UpdateManager.updateState) {
-                    UpdateManager.UpdateState.AVAILABLE -> UpdateManager.queueUpdate()
-                    UpdateManager.UpdateState.QUEUED -> {}
-                    UpdateManager.UpdateState.DOWNLOADED -> {}
-                    UpdateManager.UpdateState.NONE -> UpdateManager.checkUpdate()
-                }
-                return true
+        if (Mouse.getEventButtonState() && (mouseX - getButtonPosition(width) - x) in (0..button.width) && (mouseY - 10 - y) in (0..button.height)) {
+            when (UpdateManager.updateState) {
+                UpdateManager.UpdateState.AVAILABLE -> UpdateManager.queueUpdate()
+                UpdateManager.UpdateState.QUEUED -> {}
+                UpdateManager.UpdateState.DOWNLOADED -> {}
+                UpdateManager.UpdateState.NONE -> UpdateManager.checkUpdate()
             }
+            return true
         }
         return false
     }

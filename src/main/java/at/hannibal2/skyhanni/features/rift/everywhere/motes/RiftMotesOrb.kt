@@ -1,24 +1,32 @@
 package at.hannibal2.skyhanni.features.rift.everywhere.motes
 
+import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.events.LorenzChatEvent
+import at.hannibal2.skyhanni.events.LorenzRenderWorldEvent
 import at.hannibal2.skyhanni.events.ReceiveParticleEvent
 import at.hannibal2.skyhanni.features.rift.RiftAPI
 import at.hannibal2.skyhanni.test.GriffinUtils.drawWaypointFilled
+import at.hannibal2.skyhanni.utils.CollectionUtils.editCopy
 import at.hannibal2.skyhanni.utils.LocationUtils.distanceToPlayer
 import at.hannibal2.skyhanni.utils.LorenzColor
-import at.hannibal2.skyhanni.utils.LorenzUtils.editCopy
 import at.hannibal2.skyhanni.utils.LorenzUtils.round
 import at.hannibal2.skyhanni.utils.LorenzVec
 import at.hannibal2.skyhanni.utils.RenderUtils.drawDynamicText
 import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
+import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraft.util.EnumParticleTypes
-import net.minecraftforge.client.event.RenderWorldLastEvent
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
 class RiftMotesOrb {
-    private val config get() = RiftAPI.config.motesOrbsConfig
+
+    private val config get() = RiftAPI.config.motesOrbs
+
+    private val motesPattern by RepoPattern.pattern(
+        "rift.everywhere.motesorb",
+        "§5§lORB! §r§dPicked up §r§5+.* Motes§r§d.*"
+    )
+
     private var motesOrbs = emptyList<MotesOrb>()
-    private val pattern = "§5§lORB! §r§dPicked up §r§5+.* Motes§r§d.*".toPattern()
 
     class MotesOrb(
         var location: LorenzVec,
@@ -52,7 +60,7 @@ class RiftMotesOrb {
 
     @SubscribeEvent
     fun onChatMessage(event: LorenzChatEvent) {
-        pattern.matchMatcher(event.message) {
+        motesPattern.matchMatcher(event.message) {
             motesOrbs.minByOrNull { it.location.distanceToPlayer() }?.let {
                 it.pickedUp = true
             }
@@ -60,7 +68,7 @@ class RiftMotesOrb {
     }
 
     @SubscribeEvent
-    fun onRenderWorld(event: RenderWorldLastEvent) {
+    fun onRenderWorld(event: LorenzRenderWorldEvent) {
         if (!isEnabled()) return
 
         motesOrbs = motesOrbs.editCopy { removeIf { System.currentTimeMillis() > it.lastTime + 2000 } }
@@ -77,17 +85,19 @@ class RiftMotesOrb {
                 orb.pickedUp = true
             }
 
-            val location = orb.location
-
-            if (orb.pickedUp) {
-                event.drawDynamicText(location.add(0.0, 0.5, 0.0), "§7Motes Orb", 1.5, ignoreBlocks = false)
-                event.drawWaypointFilled(location, LorenzColor.GRAY.toColor())
-            } else {
-                event.drawDynamicText(location.add(0.0, 0.5, 0.0), "§dMotes Orb", 1.5, ignoreBlocks = false)
-                event.drawWaypointFilled(location, LorenzColor.LIGHT_PURPLE.toColor())
-            }
+            val location = orb.location.add(y = 0.5)
+            val sizeOffset = (5 - config.size) * -0.1
+            val color = if (orb.pickedUp) LorenzColor.GRAY else LorenzColor.LIGHT_PURPLE
+            val text = color.getChatColor() + "Motes Orb"
+            event.drawDynamicText(location, text, 1.5 + sizeOffset, ignoreBlocks = false)
+            event.drawWaypointFilled(location, color.toColor(), extraSize = sizeOffset)
         }
     }
 
     fun isEnabled() = RiftAPI.inRift() && config.enabled
+
+    @SubscribeEvent
+    fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
+        event.move(9, "rift.area.motesOrbsConfig", "rift.area.motesOrbs")
+    }
 }

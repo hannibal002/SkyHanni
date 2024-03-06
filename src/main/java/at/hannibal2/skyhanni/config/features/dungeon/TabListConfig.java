@@ -1,0 +1,15 @@
+package at.hannibal2.skyhanni.config.features.dungeon;
+
+import at.hannibal2.skyhanni.config.FeatureToggle;
+import com.google.gson.annotations.Expose;
+import io.github.moulberry.moulconfig.annotations.ConfigEditorBoolean;
+import io.github.moulberry.moulconfig.annotations.ConfigOption;
+
+public class TabListConfig {
+
+    @Expose
+    @ConfigOption(name = "Colored Class Level", desc = "Color class levels in tab list. (Also hides rank colors and emblems, because who needs that in Dungeons anyway?)")
+    @ConfigEditorBoolean
+    @FeatureToggle
+    public boolean coloredClassLevel = true;
+}

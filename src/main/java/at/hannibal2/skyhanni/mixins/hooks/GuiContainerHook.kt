@@ -4,6 +4,7 @@ import at.hannibal2.skyhanni.events.DrawScreenAfterEvent
 import at.hannibal2.skyhanni.events.GuiContainerEvent
 import at.hannibal2.skyhanni.events.GuiContainerEvent.CloseWindowEvent
 import at.hannibal2.skyhanni.events.GuiContainerEvent.SlotClickEvent
+import at.hannibal2.skyhanni.test.SkyHanniDebugsAndTests
 import net.minecraft.client.gui.inventory.GuiContainer
 import net.minecraft.inventory.Slot
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo
@@ -21,6 +22,7 @@ class GuiContainerHook(guiAny: Any) {
     }
 
     fun backgroundDrawn(mouseX: Int, mouseY: Int, partialTicks: Float) {
+        if (!SkyHanniDebugsAndTests.globalRender) return
         GuiContainerEvent.BackgroundDrawnEvent(gui, gui.inventorySlots, mouseX, mouseY, partialTicks).postAndCatch()
     }
 
@@ -38,7 +40,7 @@ class GuiContainerHook(guiAny: Any) {
     }
 
     fun onMouseClick(slot: Slot?, slotId: Int, clickedButton: Int, clickType: Int, ci: CallbackInfo) {
-        if (SlotClickEvent(gui, gui.inventorySlots, slot, slotId, clickedButton, clickType).postAndCatch()) ci.cancel()
+        if (SlotClickEvent(gui, gui.inventorySlots, gui.inventorySlots?.inventory?.takeIf { it.size > slotId && slotId >= 0 }?.get(slotId), slot, slotId, clickedButton, clickType).postAndCatch()) ci.cancel()
     }
 
     fun onDrawScreenAfter(

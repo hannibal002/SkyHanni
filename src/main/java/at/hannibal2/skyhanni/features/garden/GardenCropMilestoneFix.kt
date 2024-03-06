@@ -1,34 +1,41 @@
 package at.hannibal2.skyhanni.features.garden
 
 import at.hannibal2.skyhanni.data.GardenCropMilestones
-import at.hannibal2.skyhanni.data.GardenCropMilestones.Companion.getCounter
-import at.hannibal2.skyhanni.data.GardenCropMilestones.Companion.setCounter
+import at.hannibal2.skyhanni.data.GardenCropMilestones.getCounter
+import at.hannibal2.skyhanni.data.GardenCropMilestones.setCounter
 import at.hannibal2.skyhanni.data.ProfileStorageData
 import at.hannibal2.skyhanni.events.LorenzChatEvent
 import at.hannibal2.skyhanni.events.TabListUpdateEvent
 import at.hannibal2.skyhanni.features.garden.farming.GardenCropMilestoneDisplay
-import at.hannibal2.skyhanni.utils.LorenzUtils
+import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
-import at.hannibal2.skyhanni.utils.NumberUtil.romanToDecimalIfNeeded
+import at.hannibal2.skyhanni.utils.NumberUtil.romanToDecimalIfNecessary
 import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
+import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
-import java.util.regex.Pattern
 
 class GardenCropMilestoneFix {
-    private val tabListPattern = " Milestone: §r§a(?<crop>.*) (?<tier>.*): §r§3(?<percentage>.*)%".toPattern()
-    private val levelUpPattern = Pattern.compile("  §r§b§lGARDEN MILESTONE §3(?<crop>.*) §8(?:.*)➜§3(?<tier>.*)")
+    private val patternGroup = RepoPattern.group("garden.cropmilestone.fix")
+    private val tabListPattern by patternGroup.pattern(
+        "tablist",
+        " Milestone: §r§a(?<crop>.*) (?<tier>.*): §r§3(?<percentage>.*)%"
+    )
+    private val levelUpPattern by patternGroup.pattern(
+        "levelup",
+        " {2}§r§b§lGARDEN MILESTONE §3(?<crop>.*) §8.*➜§3(?<tier>.*)"
+    )
 
     private val tabListCropProgress = mutableMapOf<CropType, Long>()
 
     @SubscribeEvent
-    fun onChatMessage(event: LorenzChatEvent) {
+    fun onChat(event: LorenzChatEvent) {
         levelUpPattern.matchMatcher(event.message) {
             val cropName = group("crop")
             val crop = CropType.getByNameOrNull(cropName) ?: return
 
-            val tier = group("tier").romanToDecimalIfNeeded()
+            val tier = group("tier").romanToDecimalIfNecessary()
 
-            val crops = GardenCropMilestones.getCropsForTier(tier)
+            val crops = GardenCropMilestones.getCropsForTier(tier, crop)
             changedValue(crop, crops, "level up chat message", 0)
         }
     }
@@ -49,26 +56,25 @@ class GardenCropMilestoneFix {
 
     private fun check(cropName: String, tier: Int, percentage: Double) {
         if (!ProfileStorageData.loaded) return
-        val baseCrops = GardenCropMilestones.getCropsForTier(tier)
-        val next = GardenCropMilestones.getCropsForTier(tier + 1)
+
+        val crop = CropType.getByNameOrNull(cropName)
+        if (crop == null) {
+            ChatUtils.debug("GardenCropMilestoneFix: crop is null: '$cropName'")
+            return
+        }
+
+        val baseCrops = GardenCropMilestones.getCropsForTier(tier, crop)
+        val next = GardenCropMilestones.getCropsForTier(tier + 1, crop)
         val progressCrops = next - baseCrops
 
         val progress = progressCrops * (percentage / 100)
         val smallestPercentage = progressCrops * 0.0005
 
-        val crop = CropType.getByNameOrNull(cropName)
-        if (crop == null) {
-            LorenzUtils.debug("GardenCropMilestoneFix: crop is null: '$cropName'")
-            return
-        }
-
         val tabListValue = baseCrops + progress - smallestPercentage
 
         val newValue = tabListValue.toLong()
-        if (tabListCropProgress[crop] != newValue) {
-            if (tabListCropProgress.containsKey(crop)) {
-                changedValue(crop, newValue, "tab list", smallestPercentage.toInt())
-            }
+        if (tabListCropProgress[crop] != newValue && tabListCropProgress.containsKey(crop)) {
+            changedValue(crop, newValue, "tab list", smallestPercentage.toInt())
         }
         tabListCropProgress[crop] = newValue
     }
@@ -83,11 +89,11 @@ class GardenCropMilestoneFix {
             crop.setCounter(tabListValue)
             GardenCropMilestoneDisplay.update()
             if (!loadedCrops.contains(crop)) {
-                LorenzUtils.chat("§e[SkyHanni] Loaded ${crop.cropName} milestone data from $source!")
+                ChatUtils.chat("Loaded ${crop.cropName} milestone data from $source!")
                 loadedCrops.add(crop)
             }
         } else if (diff >= minDiff) {
-            LorenzUtils.debug("Fixed wrong ${crop.cropName} milestone data from $source: ${diff.addSeparators()}")
+            ChatUtils.debug("Fixed wrong ${crop.cropName} milestone data from $source: ${diff.addSeparators()}")
             crop.setCounter(tabListValue)
             GardenCropMilestoneDisplay.update()
         }

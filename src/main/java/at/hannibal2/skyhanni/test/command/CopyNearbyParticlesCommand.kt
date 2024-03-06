@@ -1,14 +1,19 @@
 package at.hannibal2.skyhanni.test.command
 
 import at.hannibal2.skyhanni.events.PacketEvent
-import at.hannibal2.skyhanni.utils.*
+import at.hannibal2.skyhanni.utils.ChatUtils
+import at.hannibal2.skyhanni.utils.LocationUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils.round
+import at.hannibal2.skyhanni.utils.LorenzVec
+import at.hannibal2.skyhanni.utils.OSUtils
+import at.hannibal2.skyhanni.utils.toLorenzVec
 import net.minecraft.network.play.server.S2APacketParticles
 import net.minecraftforge.fml.common.eventhandler.EventPriority
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
 // Note: Each particle is copied anywhere between 1-3 times. Different each time. Shouldn't affect using this for debugging or developing
 object CopyNearbyParticlesCommand {
+
     private var searchRadius = 0
     private var saveNextTick = false
     private var searchTime: Long = 0
@@ -37,10 +42,10 @@ object CopyNearbyParticlesCommand {
         if (resultList.isEmpty() && tickTime == 0L) tickTime = System.currentTimeMillis()
 
         if (System.currentTimeMillis() > tickTime + 30) {
-            if (counter == 0) LorenzUtils.chat("§e[SkyHanni] No particles found nearby, try a larger search radius") else {
+            if (counter == 0) ChatUtils.chat("No particles found nearby, try a larger search radius") else {
                 val string = resultList.joinToString("\n")
                 OSUtils.copyToClipboard(string)
-                LorenzUtils.chat("§e[SkyHanni] $counter particles copied into the clipboard!")
+                ChatUtils.chat("$counter particles copied into the clipboard!")
             }
             saveNextTick = false
             return
@@ -61,7 +66,7 @@ object CopyNearbyParticlesCommand {
             resultList.add("particle arguments: ${packet.particleArgs.asList()}")
             resultList.add("")
             resultList.add("")
-            counter ++
+            counter++
         }
     }
 }

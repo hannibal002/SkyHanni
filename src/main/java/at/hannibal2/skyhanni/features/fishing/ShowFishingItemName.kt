@@ -1,24 +1,28 @@
 package at.hannibal2.skyhanni.features.fishing
 
 import at.hannibal2.skyhanni.SkyHanniMod
+import at.hannibal2.skyhanni.events.LorenzRenderWorldEvent
 import at.hannibal2.skyhanni.events.LorenzTickEvent
-import at.hannibal2.skyhanni.utils.*
+import at.hannibal2.skyhanni.features.fishing.FishingAPI.isBait
+import at.hannibal2.skyhanni.utils.EntityUtils
+import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.name
+import at.hannibal2.skyhanni.utils.LocationUtils
+import at.hannibal2.skyhanni.utils.LorenzUtils
+import at.hannibal2.skyhanni.utils.LorenzVec
 import at.hannibal2.skyhanni.utils.RenderUtils.drawString
 import at.hannibal2.skyhanni.utils.RenderUtils.exactLocation
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
-import com.google.common.cache.CacheBuilder
+import at.hannibal2.skyhanni.utils.TimeLimitedCache
 import net.minecraft.entity.item.EntityItem
-import net.minecraftforge.client.event.RenderWorldLastEvent
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
-import java.util.concurrent.TimeUnit
+import kotlin.time.Duration.Companion.milliseconds
 
 class ShowFishingItemName {
+
     private val config get() = SkyHanniMod.feature.fishing.fishedItemName
     private var hasRodInHand = false
-    private var cache =
-        CacheBuilder.newBuilder().expireAfterWrite(750, TimeUnit.MILLISECONDS)
-            .build<EntityItem, Pair<LorenzVec, String>>()
+    private var cache = TimeLimitedCache<EntityItem, Pair<LorenzVec, String>>(750.milliseconds)
 
     // Taken from Skytils
     private val cheapCoins = setOf(
@@ -38,11 +42,11 @@ class ShowFishingItemName {
     private fun isFishingRod() = InventoryUtils.getItemInHand()?.name?.contains("Rod") ?: false
 
     @SubscribeEvent
-    fun onRenderWorld(event: RenderWorldLastEvent) {
+    fun onRenderWorld(event: LorenzRenderWorldEvent) {
         if (!isEnabled()) return
         if (hasRodInHand) {
             for (entityItem in EntityUtils.getEntities<EntityItem>()) {
-                val location = event.exactLocation(entityItem).add(0.0, 0.8, 0.0)
+                val location = event.exactLocation(entityItem).add(y = 0.8)
                 if (location.distance(LocationUtils.playerLocation()) > 15) continue
                 val itemStack = entityItem.entityItem
                 var name = itemStack.name ?: continue
@@ -51,8 +55,7 @@ class ShowFishingItemName {
                 if (name.removeColor() == "Stone") continue
 
                 val size = itemStack.stackSize
-                val isBait = name.endsWith(" Bait") && size == 1
-                val prefix = if (!isBait) {
+                val prefix = if (!itemStack.isBait()) {
                     "§a§l+"
                 } else {
                     if (!config.showBaits) continue
@@ -73,11 +76,10 @@ class ShowFishingItemName {
             }
         }
 
-        for ((location, text) in cache.asMap().values) {
+        for ((location, text) in cache.values()) {
             event.drawString(location, text)
         }
     }
 
     fun isEnabled() = LorenzUtils.inSkyBlock && config.enabled
-
 }

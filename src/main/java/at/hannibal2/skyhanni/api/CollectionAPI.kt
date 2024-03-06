@@ -2,40 +2,37 @@ package at.hannibal2.skyhanni.api
 
 import at.hannibal2.skyhanni.events.CollectionUpdateEvent
 import at.hannibal2.skyhanni.events.InventoryFullyOpenedEvent
-import at.hannibal2.skyhanni.events.ProfileApiDataLoadedEvent
+import at.hannibal2.skyhanni.events.ItemAddEvent
 import at.hannibal2.skyhanni.events.ProfileJoinEvent
+import at.hannibal2.skyhanni.utils.ChatUtils
+import at.hannibal2.skyhanni.utils.CollectionUtils.addOrPut
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.ItemUtils.name
-import at.hannibal2.skyhanni.utils.LorenzUtils
-import at.hannibal2.skyhanni.utils.LorenzUtils.addOrPut
 import at.hannibal2.skyhanni.utils.NEUInternalName
 import at.hannibal2.skyhanni.utils.NEUItems
 import at.hannibal2.skyhanni.utils.NEUItems.getItemStackOrNull
 import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
+import at.hannibal2.skyhanni.utils.StringUtils.matches
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
+import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
-class CollectionAPI {
-    private val counterPattern = "(?:.*) §e(?<amount>.*)§6\\/(?:.*)".toPattern()
-    private val singleCounterPattern = "§7Total Collected: §e(?<amount>.*)".toPattern()
+object CollectionAPI {
+    private val patternGroup = RepoPattern.group("data.collection.api")
+    private val counterPattern by patternGroup.pattern(
+        "counter",
+        ".* §e(?<amount>.*)§6/.*"
+    )
+    private val singleCounterPattern by patternGroup.pattern(
+        "singlecounter",
+        "§7Total Collected: §e(?<amount>.*)"
+    )
+    private val collectionTier0Pattern by patternGroup.pattern(
+        "tierzero",
+        "§7Progress to .* I: .*"
+    )
 
-    @SubscribeEvent
-    fun onProfileDataLoad(event: ProfileApiDataLoadedEvent) {
-        val profileData = event.profileData
-        val jsonElement = profileData["collection"] ?: return
-        val asJsonObject = jsonElement.asJsonObject ?: return
-        for ((hypixelId, rawCounter) in asJsonObject.entrySet()) {
-            val counter = rawCounter.asLong
-            val internalName = NEUItems.transHypixelNameToInternalName(hypixelId)
-
-            // MUSHROOM_COLLECTION,
-            internalName.getItemStackOrNull()?.displayName ?: continue
-
-            collectionValue[internalName] = counter
-        }
-
-        CollectionUpdateEvent().postAndCatch()
-    }
+    val collectionValue = mutableMapOf<NEUInternalName, Long>()
 
     @SubscribeEvent
     fun onProfileJoin(event: ProfileJoinEvent) {
@@ -84,21 +81,20 @@ class CollectionAPI {
         }
     }
 
-    companion object {
-        val collectionValue = mutableMapOf<NEUInternalName, Long>()
-        private val collectionTier0Pattern = "§7Progress to .* I: .*".toPattern()
-
-        fun isCollectionTier0(lore: List<String>) = lore.map { collectionTier0Pattern.matcher(it) }.any { it.matches() }
-
-        fun getCollectionCounter(internalName: NEUInternalName) = collectionValue[internalName]
+    @SubscribeEvent
+    fun onItemAdd(event: ItemAddEvent) {
+        val internalName = event.internalName
+        val (_, amount) = NEUItems.getMultiplier(internalName)
+        if (amount > 1) return
 
         // TODO add support for replenish (higher collection than actual items in inv)
-        fun addFromInventory(internalName: NEUInternalName, amount: Int) {
-            if (internalName.getItemStackOrNull() == null) {
-                LorenzUtils.debug("CollectionAPI.addFromInventory: item is null for '$internalName'")
-                return
-            }
-            collectionValue.addOrPut(internalName, amount.toLong())
+        if (internalName.getItemStackOrNull() == null) {
+            ChatUtils.debug("CollectionAPI.addFromInventory: item is null for '$internalName'")
+            return
         }
+        collectionValue.addOrPut(internalName, event.amount.toLong())
     }
+
+    fun isCollectionTier0(lore: List<String>) = lore.any { collectionTier0Pattern.matches(it) }
+    fun getCollectionCounter(internalName: NEUInternalName): Long? = collectionValue[internalName]
 }

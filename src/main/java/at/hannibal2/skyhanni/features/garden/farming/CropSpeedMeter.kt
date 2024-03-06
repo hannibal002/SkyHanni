@@ -1,20 +1,20 @@
 package at.hannibal2.skyhanni.features.garden.farming
 
-import at.hannibal2.skyhanni.SkyHanniMod
-import at.hannibal2.skyhanni.data.GardenCropMilestones.Companion.getCounter
+import at.hannibal2.skyhanni.data.GardenCropMilestones.getCounter
 import at.hannibal2.skyhanni.events.CropClickEvent
 import at.hannibal2.skyhanni.events.CropMilestoneUpdateEvent
 import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.LorenzTickEvent
 import at.hannibal2.skyhanni.features.garden.CropType
 import at.hannibal2.skyhanni.features.garden.GardenAPI
-import at.hannibal2.skyhanni.utils.LorenzUtils
+import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils.round
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.RenderUtils.renderStrings
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
 class CropSpeedMeter {
+
     private var display = emptyList<String>()
     private var currentCrop: CropType? = null
     private var currentBlocks = 0
@@ -113,22 +113,22 @@ class CropSpeedMeter {
     }
 
     companion object {
+
         var enabled = false
         private var startCrops = mapOf<CropType, Long>()
 
         fun toggle() {
             enabled = !enabled
-            LorenzUtils.chat("§e[SkyHanni] Crop Speed Meter " + if (enabled) "§aEnabled" else "§cDisabled")
+            ChatUtils.chat("Crop Speed Meter " + if (enabled) "§aEnabled" else "§cDisabled")
             startCrops = emptyMap()
-
         }
     }
 
     @SubscribeEvent
-    fun onRenderOverlay(event: GuiRenderEvent.GameOverlayRenderEvent) {
+    fun onRenderOverlay(event: GuiRenderEvent.GuiOverlayRenderEvent) {
         if (!isEnabled()) return
 
-        SkyHanniMod.feature.garden.cropSpeedMeterPos.renderStrings(display, posLabel = "Crop Speed Meter")
+        GardenAPI.config.cropSpeedMeterPos.renderStrings(display, posLabel = "Crop Speed Meter")
     }
 
     fun isEnabled() = enabled && GardenAPI.inGarden()
