@@ -517,5 +517,5 @@ object GhostCounter {
         }
     }
 
-    fun isEnabled() = config.enabled && IslandType.DWARVEN_MINES.isInIsland()
+    fun isEnabled() = IslandType.DWARVEN_MINES.isInIsland() && config.enabled
 }
