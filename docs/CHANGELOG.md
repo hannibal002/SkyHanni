@@ -4,7 +4,7 @@
 
 ### New Features
 
-#### Inventory
+#### Inventory Features
 
 + Added Max Items With Purse. - NetheriteMiner
     + Calculates the maximum number of items that can be purchased from the Bazaar with the number of coins in your
@@ -13,6 +13,11 @@
     + Copies the price of the hovered item in Auction House minus 1 coin into the clipboard for easier under-bidding.
 + Gfs message after super crafting. — Zickles
     + Adding a clickable message to pick up the super crafted items from sacks.
+
+#### Minion Features
+
++ Added Inferno Minion Fuel pickup prevention. - Zickles (https://github.com/hannibal002/SkyHanni/pull/1103)
+    + Blocks picking up the Inferno Minion or replacing the fuel inside when expensive minion fuels are in use.
 
 ### Improvements
 
@@ -61,6 +66,8 @@
 #### Chat Fixes
 
 + Fixed Fire Sale chat hider not working when multiple fire sales are ending. - Zickles
++ Fixed Auto Tip chat filter. - alexia (https://github.com/hannibal002/SkyHanni/pull/1105)
++ Fixed Hide Anita Accessories' fortune bonus chat message not getting hidden in the chat filter. - alexia (https://github.com/hannibal002/SkyHanni/pull/1106)
 
 #### Command Fixes
 
@@ -87,6 +94,7 @@
 + Added stacking enchants to the repo. - CalMWolfs
 + Moved bazaar config into inventory category. - hannibal2
 + Optimize IntelliJ icon. - nea
++ Used the isInIsland function more. - CalMWolfs (https://github.com/hannibal002/SkyHanni/pull/1107)
 
 ### Removed Features
 
