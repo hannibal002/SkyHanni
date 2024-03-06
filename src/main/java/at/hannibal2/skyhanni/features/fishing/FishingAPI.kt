@@ -83,8 +83,6 @@ object FishingAPI {
         }
     }
 
-//     private fun NEUInternalName.isFishingRod() = contains("ROD")
-//     fun ItemStack.isFishingRod() = getItemCategoryOrNull() == ItemCategory.FISHING_ROD || getItemCategoryOrNull() == ItemCategory.FISHING_WEAPON
     fun ItemStack.isFishingRod() = getInternalName().isFishingRod()
     fun NEUInternalName.isFishingRod() = isLavaRod() || isWaterRod()
 
@@ -105,8 +103,8 @@ object FishingAPI {
     @SubscribeEvent
     fun onRepoReload(event: RepositoryReloadEvent) {
         val data = event.getConstant<ItemsJson>("Items")
-        lavaRods = data.lava_fishing_rods ?: error("§clava_fishing_rods is missing from repo.")
-        waterRods = data.water_fishing_rods ?: error("§cwater_fishing_rods is missing from repo.")
+        lavaRods = data.lava_fishing_rods
+        waterRods = data.water_fishing_rods
     }
 
     private fun getAllowedBlocks() = if (holdingLavaRod) lavaBlocks else waterBlocks
