@@ -1,5 +1,6 @@
 package at.hannibal2.skyhanni.data.repo
 
+import at.hannibal2.skyhanni.test.command.ErrorManager
 import com.google.gson.Gson
 import java.io.BufferedReader
 import java.io.File
@@ -65,7 +66,12 @@ object RepoUtils {
             zis.close()
             fis.close()
         } catch (e: IOException) {
-            e.printStackTrace()
+            ErrorManager.logErrorWithData(
+                e,
+                "unzipIgnoreFirstFolder failed",
+                "zipFilePath" to zipFilePath,
+                "destDir" to destDir,
+            )
         }
     }
 

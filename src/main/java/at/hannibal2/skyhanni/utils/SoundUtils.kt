@@ -1,6 +1,7 @@
 package at.hannibal2.skyhanni.utils
 
 import at.hannibal2.skyhanni.SkyHanniMod
+import at.hannibal2.skyhanni.test.command.ErrorManager
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import net.minecraft.client.Minecraft
@@ -33,7 +34,10 @@ object SoundUtils {
                         }
                     }
                 }
-                e.printStackTrace()
+                ErrorManager.logErrorWithData(
+                    e, "Failed to play a sound",
+                    "soundLocation" to this.soundLocation
+                )
             } finally {
                 gameSettings.setSoundLevel(SoundCategory.PLAYERS, oldLevel)
             }

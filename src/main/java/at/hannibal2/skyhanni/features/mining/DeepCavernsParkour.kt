@@ -94,7 +94,7 @@ class DeepCavernsParkour {
             if (it.displayName != "§aObsidian Sanctuary") {
                 if (!show) {
                     start()
-                    ChatUtils.chat("Automatically enabling Deep Caverns Parkour, helping you find the way to the bottom of Deep Caverns and the path to Ryst.")
+                    ChatUtils.chat("Automatically enabling Deep Caverns Parkour, helping you find the way to the bottom of Deep Caverns and the path to Rhys.")
                 }
             }
         }

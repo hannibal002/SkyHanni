@@ -20,6 +20,7 @@ object ErrorManager {
     private val breakAfter = listOf(
         "at at.hannibal2.skyhanni.config.commands.Commands\$createCommand",
         "at net.minecraftforge.fml.common.eventhandler.EventBus.post",
+        "at at.hannibal2.skyhanni.mixins.hooks.NetHandlerPlayClientHookKt.onSendPacket",
     )
 
     private val replace = mapOf(
@@ -45,7 +46,7 @@ object ErrorManager {
         "at at.hannibal2.skyhanni.config.commands.SimpleCommand.",
         "at at.hannibal2.skyhanni.config.commands.Commands\$createCommand\$1.processCommand",
         "at at.hannibal2.skyhanni.test.command.ErrorManager.logError",
-        "at at.hannibal2.skyhanni.events.LorenzEvent.postAndCatchAndBlock",
+        "at at.hannibal2.skyhanni.events.LorenzEvent.postAndCatch",
         "at net.minecraft.launchwrapper.",
     )
 
@@ -53,9 +54,9 @@ object ErrorManager {
         cache.clear()
     }
 
-    fun skyHanniError(message: String): Nothing {
+    fun skyHanniError(message: String, vararg extraData: Pair<String, Any?>): Nothing {
         val exception = IllegalStateException(message)
-        logErrorWithData(exception, message)
+        logErrorWithData(exception, message, extraData = extraData)
         throw exception
     }
 
@@ -77,11 +78,6 @@ object ErrorManager {
             OSUtils.copyToClipboard(it)
             "$name copied into the clipboard, please report it on the SkyHanni discord!"
         } ?: "Error id not found!")
-    }
-
-    @Deprecated("Use data as well", ReplaceWith("ErrorManager.logErrorStateWithData(userMessage, internalMessage)"))
-    fun logErrorState(userMessage: String, internalMessage: String) {
-        logError(IllegalStateException(internalMessage), userMessage, ignoreErrorCache = false, noStackTrace = false)
     }
 
     fun logErrorStateWithData(
@@ -184,7 +180,6 @@ object ErrorManager {
         for (traceElement in stackTrace) {
             val text = "\tat $traceElement"
             if (!fullStackTrace && text in parent) {
-                println("broke at: $text")
                 break
             }
             var visualText = text
@@ -194,6 +189,7 @@ object ErrorManager {
                 }
             }
             if (!fullStackTrace && breakAfter.any { text.contains(it) }) {
+                add(visualText)
                 break
             }
             if (ignored.any { text.contains(it) }) continue

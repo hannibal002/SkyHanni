@@ -51,7 +51,7 @@ object PetAPI {
     }
 
     fun getPetLevel(nameWithLevel: String): Int? = petItemName.matchMatcher(nameWithLevel) {
-         group("level").toInt()
+        group("level").toInt()
     }
 
     fun hasPetName(name: String): Boolean = petItemName.matches(name) && !ignoredPetStrings.any { name.contains(it) }
