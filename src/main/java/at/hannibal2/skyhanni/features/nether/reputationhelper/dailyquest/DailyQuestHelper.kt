@@ -314,5 +314,5 @@ class DailyQuestHelper(val reputationHelper: CrimsonIsleReputationHelper) {
         }
     }
 
-    private fun isEnabled() = IslandType.CRIMSON_ISLE.isInIsland() && reputationHelper.config.enabled
+    private fun isEnabled() = IslandType.CRIMSON_ISLE.isInIsland() && config.enabled
 }

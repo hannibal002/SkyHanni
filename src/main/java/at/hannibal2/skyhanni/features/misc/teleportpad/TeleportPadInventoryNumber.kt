@@ -5,7 +5,7 @@ import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.events.InventoryFullyOpenedEvent
 import at.hannibal2.skyhanni.events.RenderInventoryItemTipEvent
 import at.hannibal2.skyhanni.utils.ItemUtils.name
-import at.hannibal2.skyhanni.utils.LorenzUtils
+import at.hannibal2.skyhanni.utils.LorenzUtils.isInIsland
 import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
@@ -75,7 +75,7 @@ class TeleportPadInventoryNumber {
 
     @SubscribeEvent
     fun onRenderItemTip(event: RenderInventoryItemTipEvent) {
-        if (LorenzUtils.skyBlockIsland != IslandType.PRIVATE_ISLAND) return
+        if (!IslandType.PRIVATE_ISLAND.isInIsland()) return
         if (!inTeleportPad) return
 
         padNumberPattern.matchMatcher(event.stack.name.lowercase()) {
