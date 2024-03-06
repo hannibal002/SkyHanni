@@ -403,7 +403,6 @@ object GhostCounter {
     @SubscribeEvent
     fun onChat(event: LorenzChatEvent) {
         if (!isEnabled()) return
-        if (LorenzUtils.skyBlockIsland != IslandType.DWARVEN_MINES) return
         for (opt in Option.entries) {
             val pattern = opt.pattern ?: continue
             pattern.matchMatcher(event.message) {
@@ -517,5 +516,5 @@ object GhostCounter {
         }
     }
 
-    fun isEnabled() = config.enabled && IslandType.DWARVEN_MINES.isInIsland()
+    fun isEnabled() = IslandType.DWARVEN_MINES.isInIsland() && config.enabled
 }

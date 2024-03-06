@@ -83,6 +83,9 @@ open class SkyHanniTracker<Data : TrackerData>(
         if (config.hideInEstimatedItemValue && EstimatedItemValue.isCurrentlyShowing()) return
 
         val currentlyOpen = Minecraft.getMinecraft().currentScreen is GuiInventory
+        if (!currentlyOpen && config.hideItemTrackersOutsideInventory && this is SkyHanniItemTracker) {
+            return
+        }
         if (inventoryOpen != currentlyOpen) {
             inventoryOpen = currentlyOpen
             update()

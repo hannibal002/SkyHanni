@@ -31,7 +31,6 @@ class GuiEditManager {
 
     @SubscribeEvent
     fun onKeyClick(event: LorenzKeyPressEvent) {
-        if (!LorenzUtils.onHypixel) return
         if (event.keyCode != SkyHanniMod.feature.gui.keyBindOpen) return
         if (isInGui()) return
 
