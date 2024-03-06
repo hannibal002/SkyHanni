@@ -173,11 +173,10 @@ object ItemDisplayOverlayFeatures {
         if (COLLECTION_LEVEL.isSelected() && InventoryUtils.openInventoryName().endsWith(" Collections")) {
             if (lore.any { it.contains("Click to view!") }) {
                 if (CollectionAPI.isCollectionTier0(lore)) return "0"
-                item.name?.let {
-                    if (it.startsWith("§e")) {
-                        val text = it.split(" ").last()
-                        return "" + text.romanToDecimalIfNecessary()
-                    }
+                val name = item.name
+                if (name.startsWith("§e")) {
+                    val text = name.split(" ").last()
+                    return "" + text.romanToDecimalIfNecessary()
                 }
             }
         }
@@ -208,14 +207,12 @@ object ItemDisplayOverlayFeatures {
         }
 
         if (DUNGEON_POTION_LEVEL.isSelected() && itemName.startsWith("Dungeon ") && itemName.contains(" Potion")) {
-            item.name?.let {
-                dungeonPotionPattern.matchMatcher(it.removeColor()) {
-                    return when (val level = group("level").romanToDecimal()) {
-                        in 1..2 -> "§f$level"
-                        in 3..4 -> "§a$level"
-                        in 5..6 -> "§9$level"
-                        else -> "§5$level"
-                    }
+            dungeonPotionPattern.matchMatcher(item.name.removeColor()) {
+                return when (val level = group("level").romanToDecimal()) {
+                    in 1..2 -> "§f$level"
+                    in 3..4 -> "§a$level"
+                    in 5..6 -> "§9$level"
+                    else -> "§5$level"
                 }
             }
         }

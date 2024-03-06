@@ -154,7 +154,7 @@ object SkyBlockItemModifierUtils {
     fun ItemStack.getReforgeName() = getAttributeString("modifier")?.let {
         when {
             it == "pitchin" -> "pitchin_koi"
-            it == "warped" && name!!.removeColor().startsWith("Hyper ") -> "endstone_geode"
+            it == "warped" && name.removeColor().startsWith("Hyper ") -> "endstone_geode"
 
             else -> it
         }

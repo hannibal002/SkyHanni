@@ -7,7 +7,6 @@ import at.hannibal2.skyhanni.events.LorenzTickEvent
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.LocationUtils.distanceToPlayer
 import at.hannibal2.skyhanni.utils.LorenzColor
-import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.LorenzVec
 import at.hannibal2.skyhanni.utils.OSUtils
 import at.hannibal2.skyhanni.utils.RenderUtils.drawColor
@@ -43,7 +42,7 @@ object AllBurrowsList {
         val burrowLocations = burrowLocations ?: return
         val list = burrowLocations.map { it.printWithAccuracy(0, ":") }
         OSUtils.copyToClipboard(list.joinToString(";"))
-        LorenzUtils.chat("Saved all ${list.size} burrow locations to clipboard.")
+        ChatUtils.chat("Saved all ${list.size} burrow locations to clipboard.")
     }
 
     fun addFromClipboard() {

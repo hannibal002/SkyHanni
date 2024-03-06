@@ -39,8 +39,7 @@ class JacobContestFFNeededDisplay {
             return
         }
 
-        val name = stack.name ?: return
-        val time = FarmingContestAPI.getSbTimeFor(name) ?: return
+        val time = FarmingContestAPI.getSbTimeFor(stack.name) ?: return
         val contest = FarmingContestAPI.getContestAtTime(time) ?: return
 
         val newDisplay = drawDisplay(contest)

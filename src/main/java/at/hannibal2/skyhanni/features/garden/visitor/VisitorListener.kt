@@ -101,7 +101,7 @@ class VisitorListener {
 
         val visitorOffer = VisitorAPI.VisitorOffer(offerItem)
 
-        var name = npcItem.name ?: return
+        var name = npcItem.name
         if (name.length == name.removeColor().length + 4) {
             name = name.substring(2)
         }

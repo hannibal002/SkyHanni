@@ -178,7 +178,7 @@ object EstimatedItemValue {
         val internalName = stack.getInternalNameOrNull() ?: return listOf()
 
         // Stats Breakdown
-        val name = stack.name ?: return listOf()
+        val name = stack.name
         if (name == "§6☘ Category: Item Ability (Passive)") return listOf()
         if (name.contains("Salesperson")) return listOf()
 

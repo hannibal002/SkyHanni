@@ -185,8 +185,7 @@ object GardenNextJacobContest {
         if (!config.display) return
 
         val backItem = event.inventoryItems[48] ?: return
-        val backName = backItem.name
-        if (backName != "§aGo Back") return
+        if (backItem.name != "§aGo Back") return
         val lore = backItem.getLore()
         if (lore.size != 1) return
         if (lore[0] != "§7To Calendar and Events") return
@@ -227,8 +226,7 @@ object GardenNextJacobContest {
             val lore = item.getLore()
             if (!lore.any { it.contains("§6§eJacob's Farming Contest") }) continue
 
-            val name = item.name ?: continue
-            val day = dayPattern.matchMatcher(name) { group("day").toInt() } ?: continue
+            val day = dayPattern.matchMatcher(item.name) { group("day").toInt() } ?: continue
 
             val startTime = SkyBlockTime(year, month, day).asTimeMark()
 
