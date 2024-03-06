@@ -156,6 +156,8 @@ class DungeonFinderFeatures {
 
         val stack = event.itemStack
 
+        val classNames = mutableListOf("Healer", "Mage", "Berserk", "Archer", "Tank")
+
         for ((index, line) in stack.getLore().withIndex()) {
             classLevelPattern.matchMatcher(line) {
                 val playerName = group("playerName")
@@ -163,8 +165,11 @@ class DungeonFinderFeatures {
                 val level = group("level").toInt()
                 val color = getColor(level)
                 event.toolTip[index + 1] = " §b$playerName§f: §e$className $color$level"
+                if(classNames.contains(className)) classNames.remove(className)
             }
         }
+        if(classNames.contains(selectedClass)) classNames[classNames.indexOf(selectedClass)] = "§a${selectedClass}§7"
+        if(config.showMissingClasses) event.toolTip.add("§eMissing: §7" + classNames.joinToString(", "))
     }
 
     @SubscribeEvent
