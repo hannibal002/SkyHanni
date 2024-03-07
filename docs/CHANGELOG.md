@@ -1,6 +1,113 @@
 # SkyHanni - Change Log
 
-## Version 0.23 (Unreleased)
+## Version 0.24 (Unreleased)
+
+### New Features
+
+#### Inventory Features
+
++ Added Max Items With Purse. - NetheriteMiner
+    + Calculates the maximum number of items that can be purchased from the Bazaar with the number of coins in your
+      purse.
++ Added Copy Underbid Keybind. - Obsidian
+    + Copies the price of the hovered item in Auction House minus 1 coin into the clipboard for easier under-bidding.
++ Gfs message after super crafting. — Zickles
+    + Adding a clickable message to pick up the super crafted items from sacks.
+
+#### Minion Features
+
++ Added Inferno Minion Fuel pickup prevention. - Zickles (https://github.com/hannibal002/SkyHanni/pull/1103)
+    + Blocks picking up the Inferno Minion or replacing the fuel inside when expensive minion fuels are in use.
+
+### Improvements
+
+#### Chat Improvements
+
++ Added more messages to chat filter category annoying. - martimavocado
+    + Not enough breaking power for gems.
+    + Useless messages for sky mall and Jacob's event artifact.
++ Adding a toggle to hide sky mall perk messages outside mining islands. - martimavocado
++ Added a toggle to hide Jacob's event artifact message outside the garden. - martimavocado
++ Added Booster Cookie purchase reminder to chat filter category others. - alexia
+
+#### Inventory Improvements
+
++ Changed Max Items with Purse display format. - hannibal2
+
+#### GUI Improvements
+
++ Added option to only show Custom Text Box while an inventory is open. - martimavocado
++ Added option to hide Profit Trackers while not inside an inventory. - hannibal2
+
+#### Misc Improvements
+
++ Added option to show some features outside SkyBlock. - Obsidian
++ Added goal to collection tracker. - Thunderblade73
+    + /shtrackcollection \<item name> [goal amount]
+    + Shows a chat message once the goal has been reached.
+
+### Fixes
+
+#### Bingo Fixes
+
++ Fixed Bingo Card Tips using wrong slot sometimes. - Thunderblade73
++ Fixed Bingo Minion Craft Helper sometimes causing performance problems. - CalMWolfs
+
+#### Mining Fixes
+
++ Fixed a small typo in the Deep Caverns Parkour message. - alexia
+
+#### Inventory Fixes
+
++ Fixed copy underbid keybind not working. - Obsidian
++ Fixed SkyBlock guide highlight missing tasks not working properly for minions and collections. - Thunderblade73
++ Fixed Harp Quick Restart not working when Harp GUI Scale is disabled. - Zickles
+
+#### Chat Fixes
+
++ Fixed Fire Sale chat hider not working when multiple fire sales are ending. - Zickles
++ Fixed Auto Tip chat filter. - alexia (https://github.com/hannibal002/SkyHanni/pull/1105)
++ Fixed Hide Anita Accessories' fortune bonus chat message not getting hidden in the chat filter. - alexia (https://github.com/hannibal002/SkyHanni/pull/1106)
+
+#### Command Fixes
+
++ Fixed duplicate commands in /shcommands. - CalMWolfs
+
+#### Misc Fixes
+
++ Fixed skill level up message when below level 60. - HiZe
++ Fixed SkyHanni not working on Alpha. - hannibal2 & CalMWolfs
+
+### Technical Details
+
++ Auto-enable + configure DevAuth. - nea
++ Improve performance of removeColor. - nea
++ Removed wildcard imports in VisualWorldGui. - CalMWolfs
++ printStackTrace -> ErrorManager. - hannibal2
++ Added command /shconfig toggle <path> <value 1> <value 2>. - Obsidian
++ Removes usage of logError everywhere in the code and replaces it with logErrorWithData. - CalMWolfs
++ Removed ErrorManager.logErrorState(). - CalMWolfs
++ Creating number utils functions for string -> int, long, double, with either error throwing or wrong usage to user
+  message.
++ Removed RenderWorldLastEvent usage in WorldEdit feature. - hannibal2
++ Using GardenAPI.storage everywhere. - hannibal2
++ Added stacking enchants to the repo. - CalMWolfs
++ Moved bazaar config into inventory category. - hannibal2
++ Optimize IntelliJ icon. - nea
++ Used the isInIsland function more. - CalMWolfs (https://github.com/hannibal002/SkyHanni/pull/1107)
++ Optimized item.isFishingRod logic. - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/1056)
++ Code cleanup in multiple files. - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/1113)
++ ItemStack.name no longer nullable. - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/1101)
++ Better error handling (more user facing errors - less hidden errors). - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/1101)
++ Replaced/fixed deprecated function calls. - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/1101)
++ Added item category FISHING_BAIT. - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/1101)
++ Use internal name more in ItemDisplayOverlayFeatures - CalMWolfs (https://github.com/hannibal002/SkyHanni/pull/1114)
++ Reformatted the code in a lot of files. - CalMWolfs (https://github.com/hannibal002/SkyHanni/pull/1109)
++ Changed line endings to be normalized over the whole project and prevents further breaks. - your_name_here (https://github.com/hannibal002/SkyHanni/pull/1112)
+
+### Removed Features
+
+## Version 0.23
 
 ### New Features
 
@@ -62,6 +169,10 @@
 + Added not fully completed tasks in Way to gain SkyBlock XP menus. - Thunderblade73
     + Works in the subcategories.
     + It does not work with infinite tasks.
++ Added Harp GUI Scale. - Thunderblade73
+    + Automatically sets the GUI scale to AUTO when entering the Harp.
++ Added Harp Quick Restart. - Thunderblade73
+    + Once you've launched the harp, quickly hit the close button in the harp menu to initiate the selected song.
 
 #### Item Features
 
@@ -96,15 +207,6 @@
     + ETA Display, exp, actions or percentage to next level, custom level goals, all skill display, chroma progress bar,
       and overflow levels for all those things.
     + A ton of settings.
-
-#### Misc Features
-
-+ Fixes Ghost Entities. - hannibal2 & nea & Thunderblade73
-    + Removes ghost entities caused by a Hypixel bug. This included Diana, Dungeon and Crimson Isle mobs and nametags.
-+ Added Harp GUI Scale. - Thunderblade73
-    + Automatically sets the GUI scale to AUTO when entering the Harp.
-+ Added Harp Quick Restart. - Thunderblade73
-    + Once you've launched the harp, quickly hit the close button in the harp menu to initiate the selected song.
 + Color the month names on the scoreboard. - J10a1n15
 
 ### Changes
@@ -212,6 +314,7 @@
 + Added /pd short command for party disband. - Empa
 + Added support for number abbreviations in /shskills. - hannibal2
     + "/shskills levelwithxp 750m"
++ Renamed currentXP to xp in /shskills description. - hannibal2
 
 #### Config Changes
 
@@ -240,6 +343,7 @@
 + Added shader reload capabilities for chroma resource packs. - nea
 + Added option to only show Ender Node tracker while holding a pickaxe. - Thunderblade73
 + Matched XP/h timer with the session timer in the skill ETA display. - HiZe
++ Talbot's Theodolite: Support exact height message. - alexia
 
 ### Fixes
 
@@ -266,6 +370,9 @@
 + Fixed wording of composter fuel warning. - alexia
 + Fixed Garden plot menu icon edit mode copies stack size. - hannibal2
 + Fixed the wrong color code on the visitor shopping list sacks number line. - hannibal2
++ Fixed Anita Medal Profit Display using wrong items. - hannibal2
++ Fixed Box of Seeds not working with /shcroptime. - alexia
++ Fixed Farming Weight Display sometimes not showing when joining the Garden. - CalMWolfs
 
 #### Combat Fixes
 
@@ -354,6 +461,7 @@
 + Fixed detecting bingo profile while visiting other players bingo island. - hannibal2
 + Fixed performance issues with Bingo Minion Craft Helper. - hannibal2
 + Fixed Bingo Minion Craft Helper not detecting crafted tier one minion. - hannibal2
++ Fixed rare error reading and rendering Bingo Card Tips in Bingo inventory. - Thunderblade73
 
 #### Chat Fixes
 
@@ -372,6 +480,8 @@
 + Fixed Skill progress display size too small when not using the progress bar. - Thunderblade73
 + Fixed the skill progress bar trying to get out of the screen. - HiZe
 + Fixed the negative time remaining in the skill ETA display. - HiZe
++ Fixed skill timer. - hannibal2
++ Fixed overflow level goal in skills tooltips. - HiZe
 
 #### Winter Fixes
 
@@ -411,6 +521,8 @@
 + Fixed item trackers duplicating items when taking items out of storage or chest. - hannibal2
 + Fixed current mayor is taking 20 minutes to get loaded. - Empa
     + This fixes active Diana detection not working, making the workaround (/sh always diana) unnecessary.
++ Fixes Ghost Entities. - hannibal2 & nea & Thunderblade73
+    + Removes ghost entities caused by a Hypixel bug. This included Diana, Dungeon and Crimson Isle mobs and nametags.
 
 ### Technical Changes
 

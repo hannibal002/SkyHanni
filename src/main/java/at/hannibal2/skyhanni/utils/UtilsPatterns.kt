@@ -32,6 +32,12 @@ object UtilsPatterns {
         "item.name.enchanted.book",
         ".{2}?Enchanted Book"
     )
+
+    val baitPattern by patternGroup.pattern(
+        "item.name.bait",
+        "^(Obfuscated.*|.* Bait)$"
+    )
+
     val enchantmentNamePattern by patternGroup.pattern(
         "item.neuitems.enchantmentname",
         "^(?<format>(?:§.)+)(?<name>[^§]+) (?<level>[IVXL]+)$"
@@ -80,6 +86,6 @@ object UtilsPatterns {
 
     val tabListProfilePattern by patternGroup.pattern(
         "tablist.profile",
-        "§.§lProfile: §r§a(?<profile>.*)"
+        "(?:§.)+Profile: §r§a(?<profile>.*)"
     )
 }

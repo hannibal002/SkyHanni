@@ -15,6 +15,7 @@ import net.minecraft.client.gui.ScaledResolution
 import net.minecraft.client.renderer.GlStateManager
 import net.minecraft.entity.player.EnumPlayerModelParts
 import net.minecraftforge.client.event.RenderGameOverlayEvent
+import net.minecraftforge.fml.common.eventhandler.EventPriority
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
 object TabListRenderer {
@@ -41,7 +42,8 @@ object TabListRenderer {
     private var isPressed = false
     private var isTabToggled = false
 
-    @SubscribeEvent
+    // compact scoreboard should render above other SkyHanni GUIs when toggle tab is in use.
+    @SubscribeEvent(priority = EventPriority.LOW)
     fun onRenderOverlay(event: GuiRenderEvent.GuiOverlayRenderEvent) {
         if (!LorenzUtils.inSkyBlock) return
         if (!config.enabled) return

@@ -7,13 +7,13 @@ import at.hannibal2.skyhanni.features.chroma.ChromaShaderManager
 import at.hannibal2.skyhanni.features.chroma.ChromaType
 import at.hannibal2.skyhanni.utils.ColorUtils
 import at.hannibal2.skyhanni.utils.ColorUtils.darker
-import at.hannibal2.skyhanni.utils.renderables.RenderableUtils.renderXAligned
-import at.hannibal2.skyhanni.utils.renderables.RenderableUtils.renderYAligned
 import at.hannibal2.skyhanni.utils.LorenzLogger
 import at.hannibal2.skyhanni.utils.NEUItems.renderOnScreen
 import at.hannibal2.skyhanni.utils.RenderUtils
 import at.hannibal2.skyhanni.utils.RenderUtils.HorizontalAlignment
 import at.hannibal2.skyhanni.utils.RenderUtils.VerticalAlignment
+import at.hannibal2.skyhanni.utils.renderables.RenderableUtils.renderXAligned
+import at.hannibal2.skyhanni.utils.renderables.RenderableUtils.renderYAligned
 import io.github.moulberry.moulconfig.gui.GuiScreenElementWrapper
 import io.github.moulberry.notenoughupdates.util.Utils
 import net.minecraft.client.Minecraft
@@ -35,8 +35,8 @@ interface Renderable {
     val horizontalAlign: HorizontalAlignment
     val verticalAlign: VerticalAlignment
     fun isHovered(posX: Int, posY: Int) = currentRenderPassMousePosition?.let { (x, y) ->
-        x in (posX .. posX + width)
-            && y in (posY .. posY + height) // TODO: adjust for variable height?
+        x in (posX..posX + width)
+            && y in (posY..posY + height) // TODO: adjust for variable height?
     } ?: false
 
     /**
@@ -277,6 +277,7 @@ interface Renderable {
 
         fun string(
             text: String,
+            color: Color = Color.WHITE,
             horizontalAlign: HorizontalAlignment = HorizontalAlignment.LEFT,
             verticalAlign: VerticalAlignment = VerticalAlignment.TOP,
         ) = object : Renderable {
@@ -288,7 +289,7 @@ interface Renderable {
             override val verticalAlign = verticalAlign
 
             override fun render(posX: Int, posY: Int) {
-                Minecraft.getMinecraft().fontRendererObj.drawStringWithShadow("§f$text", 1f, 1f, 0)
+                Minecraft.getMinecraft().fontRendererObj.drawStringWithShadow(text, 1f, 1f, color.rgb)
             }
         }
 
@@ -347,10 +348,20 @@ interface Renderable {
                         ChromaShaderManager.end()
                     }
                 } else {
-                    val (textureX, textureY) = if (texture == SkillProgressBarConfig.TexturedBar.UsedTexture.MATCH_PACK) Pair(0, 64) else Pair(0, 0)
+                    val (textureX, textureY) = if (texture == SkillProgressBarConfig.TexturedBar.UsedTexture.MATCH_PACK) Pair(
+                        0,
+                        64
+                    ) else Pair(0, 0)
 
                     Minecraft.getMinecraft().renderEngine.bindTexture(ResourceLocation(texture.path))
-                    Minecraft.getMinecraft().ingameGUI.drawTexturedModalRect(posX, posY, textureX, textureY, width, height)
+                    Minecraft.getMinecraft().ingameGUI.drawTexturedModalRect(
+                        posX,
+                        posY,
+                        textureX,
+                        textureY,
+                        width,
+                        height
+                    )
 
                     if (useChroma) {
                         ChromaShaderManager.begin(ChromaType.TEXTURED)
@@ -358,7 +369,14 @@ interface Renderable {
                     } else {
                         GlStateManager.color(color.red / 255f, color.green / 255f, color.blue / 255f, 1f)
                     }
-                    Minecraft.getMinecraft().ingameGUI.drawTexturedModalRect(posX, posY, textureX, textureY + height, progress, height)
+                    Minecraft.getMinecraft().ingameGUI.drawTexturedModalRect(
+                        posX,
+                        posY,
+                        textureX,
+                        textureY + height,
+                        progress,
+                        height
+                    )
 
                     if (useChroma) {
                         ChromaShaderManager.end()

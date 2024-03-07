@@ -1,5 +1,6 @@
 package at.hannibal2.skyhanni.utils
 
+import at.hannibal2.skyhanni.events.SkyHanniRenderEntityEvent
 import at.hannibal2.skyhanni.utils.ItemUtils.getSkullTexture
 import at.hannibal2.skyhanni.utils.LocationUtils.canBeSeen
 import at.hannibal2.skyhanni.utils.LocationUtils.distanceTo
@@ -14,6 +15,8 @@ import net.minecraft.entity.player.EntityPlayer
 import net.minecraft.item.ItemStack
 import net.minecraft.potion.Potion
 import net.minecraft.util.AxisAlignedBB
+import net.minecraftforge.client.event.RenderLivingEvent
+import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
 object EntityUtils {
 
@@ -157,4 +160,29 @@ object EntityUtils {
     fun Entity.canBeSeen(radius: Double = 150.0) = getLorenzVec().add(y = 0.5).canBeSeen(radius)
 
     fun getEntityByID(entityId: Int) = Minecraft.getMinecraft()?.thePlayer?.entityWorld?.getEntityByID(entityId)
+
+    @SubscribeEvent
+    fun onEntityRender(event: RenderLivingEvent<*>) {
+        SkyHanniRenderEntityEvent(event.entity, event.renderer, event.x, event.y, event.z).postAndCatch()
+    }
+
+    @SubscribeEvent
+    fun onEntityRenderPre(event: RenderLivingEvent.Pre<*>) {
+        SkyHanniRenderEntityEvent.Pre(event.entity, event.renderer, event.x, event.y, event.z).postAndCatch()
+    }
+
+    @SubscribeEvent
+    fun onEntityRenderPost(event: RenderLivingEvent.Post<*>) {
+        SkyHanniRenderEntityEvent.Post(event.entity, event.renderer, event.x, event.y, event.z).postAndCatch()
+    }
+
+    @SubscribeEvent
+    fun onEntityRenderSpecialsPre(event: RenderLivingEvent.Specials.Pre<*>) {
+        SkyHanniRenderEntityEvent.Specials.Pre(event.entity, event.renderer, event.x, event.y, event.z).postAndCatch()
+    }
+
+    @SubscribeEvent
+    fun onEntityRenderSpecialsPost(event: RenderLivingEvent.Specials.Post<*>) {
+        SkyHanniRenderEntityEvent.Specials.Post(event.entity, event.renderer, event.x, event.y, event.z).postAndCatch()
+    }
 }

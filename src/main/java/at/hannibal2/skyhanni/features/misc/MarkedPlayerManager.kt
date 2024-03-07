@@ -1,6 +1,7 @@
 package at.hannibal2.skyhanni.features.misc
 
 import at.hannibal2.skyhanni.SkyHanniMod
+import at.hannibal2.skyhanni.config.enums.OutsideSbFeature
 import at.hannibal2.skyhanni.events.ConfigLoadEvent
 import at.hannibal2.skyhanni.events.LorenzTickEvent
 import at.hannibal2.skyhanni.events.LorenzWorldChangeEvent
@@ -15,7 +16,6 @@ import net.minecraft.client.entity.EntityOtherPlayerMP
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
 class MarkedPlayerManager {
-
     private val config get() = SkyHanniMod.feature.markedPlayers
 
     companion object {
@@ -79,7 +79,7 @@ class MarkedPlayerManager {
 
     @SubscribeEvent
     fun onTick(event: LorenzTickEvent) {
-        if (!LorenzUtils.inSkyBlock) return
+        if (!isEnabled()) return
 
         if (event.repeatSeconds(1)) {
             findPlayers()
@@ -106,6 +106,9 @@ class MarkedPlayerManager {
         }
     }
 
+    private fun isEnabled() = (LorenzUtils.inSkyBlock || OutsideSbFeature.MARKED_PLAYERS.isSelected())
+        && config.highlightInWorld
+
     @SubscribeEvent
     fun onWorldChange(event: LorenzWorldChangeEvent) {
         if (Minecraft.getMinecraft().thePlayer == null) return
@@ -118,6 +121,4 @@ class MarkedPlayerManager {
             }
         }
     }
-
-    private fun isEnabled() = LorenzUtils.inSkyBlock && config.highlightInWorld
 }

@@ -1,4 +1,4 @@
-package at.hannibal2.skyhanni.config.features.bazaar;
+package at.hannibal2.skyhanni.config.features.inventory;
 
 import at.hannibal2.skyhanni.config.FeatureToggle;
 import at.hannibal2.skyhanni.config.core.config.Position;
@@ -40,4 +40,13 @@ public class BazaarConfig {
     @ConfigEditorBoolean
     @FeatureToggle
     public boolean openPriceWebsite = false;
+
+    @Expose
+    @ConfigOption(name = "Max Items With Purse", desc = "Calculates the maximum amount of items that can be purchased from the Bazaar with the amount of coins in your purse.")
+    @ConfigEditorBoolean
+    @FeatureToggle
+    public boolean maxPurseItems = false;
+
+    @Expose
+    public Position maxPurseItemsPosition = new Position(346, 90, true, false);
 }
