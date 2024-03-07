@@ -11,6 +11,7 @@ import at.hannibal2.skyhanni.events.InventoryFullyOpenedEvent
 import at.hannibal2.skyhanni.events.RenderInventoryItemTipEvent
 import at.hannibal2.skyhanni.events.RenderItemTipEvent
 import at.hannibal2.skyhanni.features.dungeon.DungeonAPI.DungeonChest
+import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.ItemUtils.name
@@ -137,7 +138,12 @@ class CroesusChestTracker {
                 keyUsedPattern.anyMatches(lore) -> OpenedState.KEY_USED
                 openedPattern.anyMatches(lore) -> OpenedState.OPENED
                 unopenedPattern.anyMatches(lore) -> OpenedState.UNOPENED
-                else -> OpenedState.OPENED
+                else -> ErrorManager.logErrorStateWithData(
+                    "Croesus Chest couldn't be read correctly.",
+                    "Openstate check failed for chest.",
+                    "run" to run,
+                    "lore" to lore
+                ).run { null }
             }
         }
     }
