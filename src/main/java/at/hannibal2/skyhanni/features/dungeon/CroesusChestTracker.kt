@@ -55,7 +55,7 @@ class CroesusChestTracker {
 
     private var inCroesusInventory = false
     private var croesusEmpty = false
-    private var croesusPageNumber = 0
+    private var currentPage = 0
     private var pageSwitchable = false
 
     private var chestInventory: DungeonChest? = null
@@ -92,7 +92,7 @@ class CroesusChestTracker {
             pageSwitchable = true
             croesusEmpty = croesusEmptyPattern.matches(event.inventoryItems[emptySlotId]?.name)
             if (event.inventoryItems[backArrowSlotId]?.item != Items.arrow) {
-                croesusPageNumber = 0
+                currentPage = 0
             }
 
             if (croesusEmpty) {
@@ -159,12 +159,12 @@ class CroesusChestTracker {
             when (event.slotId) {
                 frontArrowSlotId -> if (pageSwitchable && event.slot.stack.isArrow()) {
                     pageSwitchable = false
-                    croesusPageNumber++
+                    currentPage++
                 }
 
                 backArrowSlotId -> if (pageSwitchable && event.slot.stack.isArrow()) {
                     pageSwitchable = false
-                    croesusPageNumber--
+                    currentPage--
                 }
 
                 else -> croesusSlotMapToRun(event.slotId)?.let { currentRunIndex = it }
@@ -225,7 +225,7 @@ class CroesusChestTracker {
         in 28..34 -> slotId - 14 // 14 - 20
         in 37..43 -> slotId - 16 // 21 - 27
         else -> null
-    }?.let { it + croesusPageNumber * 28 }
+    }?.let { it + currentPage * 28 }
 
     private fun ItemStack.isArrow() = this.item == Items.arrow
 
