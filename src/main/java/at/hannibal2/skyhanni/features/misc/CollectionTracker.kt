@@ -4,15 +4,19 @@ import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.CollectionAPI
 import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.LorenzTickEvent
+import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName
 import at.hannibal2.skyhanni.utils.ItemUtils.name
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.NEUInternalName
 import at.hannibal2.skyhanni.utils.NEUInternalName.Companion.asInternalName
-import at.hannibal2.skyhanni.utils.NEUItems
 import at.hannibal2.skyhanni.utils.NEUItems.getItemStack
 import at.hannibal2.skyhanni.utils.NEUItems.getItemStackOrNull
+import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
+import at.hannibal2.skyhanni.utils.NumberUtil.formatLong
+import at.hannibal2.skyhanni.utils.NumberUtil.isFormatNumber
+import at.hannibal2.skyhanni.utils.NumberUtil.percentWithColorCode
 import at.hannibal2.skyhanni.utils.RenderUtils.renderStringsAndItems
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import net.minecraft.client.Minecraft
@@ -30,6 +34,7 @@ class CollectionTracker {
         private var itemName = ""
         private var internalName: NEUInternalName? = null
         private var itemAmount = -1L
+        private var goalAmount = -1L
 
         private var lastAmountInInventory = -1
 
@@ -39,35 +44,50 @@ class CollectionTracker {
         fun command(args: Array<String>) {
             if (args.isEmpty()) {
                 if (internalName == null) {
-                    LorenzUtils.userError("/shtrackcollection <item name>")
+                    ChatUtils.userError("/shtrackcollection <item name> [goal amount]")
                     return
                 }
-                LorenzUtils.chat("Stopped collection tracker.")
+                ChatUtils.chat("Stopped collection tracker.")
                 resetData()
                 return
             }
 
-            val rawName = fixTypo(args.joinToString(" ").lowercase().replace("_", " "))
+            val lastArg = args.last()
+
+            val nameArgs = if (lastArg.isFormatNumber()) {
+                val goal = lastArg.formatLong()
+                if (goal <= 0) {
+                    ChatUtils.chat("Invalid Amount for Goal.")
+                    return
+                }
+                goalAmount = goal
+                args.dropLast(1).toTypedArray()
+            } else {
+                goalAmount = -1L
+                args
+            }
+
+            val rawName = fixTypo(nameArgs.joinToString(" ").lowercase().replace("_", " "))
             if (rawName == "gemstone") {
-                LorenzUtils.userError("Gemstone collection is not supported!")
+                ChatUtils.userError("Gemstone collection is not supported!")
                 return
             } else if (rawName == "mushroom") {
-                LorenzUtils.userError("Mushroom collection is not supported!")
+                ChatUtils.userError("Mushroom collection is not supported!")
                 return
             }
 
-            val foundInternalName = NEUItems.getInternalNameOrNullIgnoreCase(rawName)
+            val foundInternalName = NEUInternalName.fromItemNameOrNull(rawName)
             if (foundInternalName == null) {
-                LorenzUtils.error("Item '$rawName' does not exist!")
+                ChatUtils.userError("Item '$rawName' does not exist!")
                 return
             }
 
             val stack = foundInternalName.getItemStackOrNull()
             if (stack == null) {
-                LorenzUtils.error("Item '$rawName' does not exist!")
+                ChatUtils.userError("Item '$rawName' does not exist!")
                 return
             }
-            setNewCollection(foundInternalName, stack.name!!.removeColor())
+            setNewCollection(foundInternalName, stack.name.removeColor())
         }
 
         private fun fixTypo(rawName: String) = when (rawName) {
@@ -97,7 +117,7 @@ class CollectionTracker {
         private fun setNewCollection(internalName: NEUInternalName, name: String) {
             val foundAmount = CollectionAPI.getCollectionCounter(internalName)
             if (foundAmount == null) {
-                LorenzUtils.userError("$name collection not found. Try to open the collection inventory!")
+                ChatUtils.userError("$name collection not found. Try to open the collection inventory!")
                 return
             }
             this.internalName = internalName
@@ -106,11 +126,12 @@ class CollectionTracker {
 
             lastAmountInInventory = countCurrentlyInInventory()
             updateDisplay()
-            LorenzUtils.chat("Started tracking $itemName §ecollection.")
+            ChatUtils.chat("Started tracking $itemName §ecollection.")
         }
 
         private fun resetData() {
-            itemAmount = -1
+            itemAmount = -1L
+            goalAmount = -1L
             internalName = null
 
             lastAmountInInventory = -1
@@ -120,18 +141,27 @@ class CollectionTracker {
         }
 
         private fun updateDisplay() {
-            val format = LorenzUtils.formatInteger(itemAmount)
+            val format = itemAmount.addSeparators()
 
             var gainText = ""
             if (recentGain != 0) {
-                gainText = "§a+" + LorenzUtils.formatInteger(recentGain)
+                gainText = "§a+" + recentGain.addSeparators()
             }
+
+            if (goalAmount != -1L && itemAmount >= goalAmount) {
+                ChatUtils.chat("Collection goal of §a${goalAmount.addSeparators()} reached!")
+                goalAmount = -1L
+            }
+
+            val goal = if (goalAmount == -1L) "" else " §f/ §b${goalAmount.addSeparators()} §f(§a${
+                itemAmount.percentWithColorCode(goalAmount, 1)
+            }§f)"
 
             display = Collections.singletonList(buildList {
                 internalName?.let {
                     add(it.getItemStack())
                 }
-                add("$itemName collection: §e$format $gainText")
+                add("$itemName collection: §e$format$goal $gainText")
             })
         }
 

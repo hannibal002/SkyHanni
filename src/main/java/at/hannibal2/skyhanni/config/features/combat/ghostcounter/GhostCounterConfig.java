@@ -40,7 +40,7 @@ public class GhostCounterConfig {
         name = "Display Text",
         desc = "Drag text to change the appearance of the overlay."
     )
-    @ConfigEditorDraggableList()
+    @ConfigEditorDraggableList
     public List<GhostDisplayEntry> ghostDisplayText = new ArrayList<>(Arrays.asList(
         TITLE,
         GHOSTS_KILLED,

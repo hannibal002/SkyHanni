@@ -19,6 +19,7 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import kotlin.time.Duration.Companion.milliseconds
 
 class ShowFishingItemName {
+
     private val config get() = SkyHanniMod.feature.fishing.fishedItemName
     private var hasRodInHand = false
     private var cache = TimeLimitedCache<EntityItem, Pair<LorenzVec, String>>(750.milliseconds)
@@ -48,7 +49,7 @@ class ShowFishingItemName {
                 val location = event.exactLocation(entityItem).add(y = 0.8)
                 if (location.distance(LocationUtils.playerLocation()) > 15) continue
                 val itemStack = entityItem.entityItem
-                var name = itemStack.name ?: continue
+                var name = itemStack.name
 
                 // Hypixel sometimes replaces the bait item mid air with a stone
                 if (name.removeColor() == "Stone") continue
@@ -81,5 +82,4 @@ class ShowFishingItemName {
     }
 
     fun isEnabled() = LorenzUtils.inSkyBlock && config.enabled
-
 }

@@ -39,6 +39,7 @@ enum class LorenzColor(private val chatColorCode: Char, private val color: Color
     override fun toString(): String = coloredLabel
 
     companion object {
+
         fun EnumDyeColor.toLorenzColor() = when (this) {
             EnumDyeColor.WHITE -> WHITE
             EnumDyeColor.MAGENTA -> LIGHT_PURPLE
@@ -52,7 +53,7 @@ enum class LorenzColor(private val chatColorCode: Char, private val color: Color
             EnumDyeColor.PURPLE -> DARK_PURPLE
             EnumDyeColor.YELLOW -> YELLOW
             else -> {
-                ErrorManager.logError(
+                ErrorManager.logErrorWithData(
                     Exception("Unknown dye color: $this"),
                     "Unknown dye color: $this"
                 )

@@ -4,9 +4,9 @@ import at.hannibal2.skyhanni.events.InventoryCloseEvent
 import at.hannibal2.skyhanni.events.InventoryFullyOpenedEvent
 import at.hannibal2.skyhanni.events.LorenzToolTipEvent
 import at.hannibal2.skyhanni.features.garden.GardenAPI
+import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
-import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.NEUItems.getItemStack
 import io.github.moulberry.notenoughupdates.events.ReplaceItemEvent
 import io.github.moulberry.notenoughupdates.events.SlotClickEvent
@@ -23,6 +23,8 @@ object GardenPlotIcon {
     private val plotList get() = GardenAPI.storage?.plotIcon?.plotList
     private var inInventory = false
     private var copyStack: ItemStack? = null
+
+    // TODO replace with enum
     private var editMode = 0 // 0 = off, 1 = on, 2 = reset
     private var lastClickedSlotId = -1
     private var originalStack = mutableMapOf<Int, ItemStack>()
@@ -103,9 +105,11 @@ object GardenPlotIcon {
         if (editMode != 0) {
             if (event.slotId in 54..89) {
                 event.isCanceled = true
-                copyStack = event.slot.stack ?: return
+                copyStack = event.slot.stack?.copy()?.also {
+                    it.stackSize = 1
+                } ?: return
                 // TODO different format, not bold or show not in chat at all.
-                LorenzUtils.chat("§6§lClick an item in the desk menu to replace it with that item!")
+                ChatUtils.chat("§6§lClick an item in the desk menu to replace it with that item!")
                 return
             }
             if (event.slotId != 53) {

@@ -4,10 +4,11 @@ import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.events.ConfigLoadEvent
 import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.LorenzChatEvent
+import at.hannibal2.skyhanni.utils.CollectionUtils.addAsSingletonList
+import at.hannibal2.skyhanni.utils.CollectionUtils.addOrPut
+import at.hannibal2.skyhanni.utils.CollectionUtils.sumAllValues
+import at.hannibal2.skyhanni.utils.ConditionalUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils
-import at.hannibal2.skyhanni.utils.LorenzUtils.addAsSingletonList
-import at.hannibal2.skyhanni.utils.LorenzUtils.addOrPut
-import at.hannibal2.skyhanni.utils.LorenzUtils.sumAllValues
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.StringUtils.matches
@@ -20,24 +21,40 @@ import java.util.regex.Pattern
 
 object MythologicalCreatureTracker {
 
-    private val group = RepoPattern.group("event.diana.mythological.tracker")
+    private val config get() = SkyHanniMod.feature.event.diana.mythologicalMobtracker
 
-    private val minotaurPattern by group.pattern("minotaur", ".* §r§eYou dug out a §r§2Minotaur§r§e!")
-    private val gaiaConstructPattern by group.pattern("gaiaconstruct", ".* §r§eYou dug out a §r§2Gaia Construct§r§e!")
-    private val minosChampionPattern by group.pattern("minoschampion", ".* §r§eYou dug out a §r§2Minos Champion§r§e!")
-    private val siameseLynxesPattern by group.pattern("siameselynxes", ".* §r§eYou dug out §r§2Siamese Lynxes§r§e!")
-    private val minosHunterPattern by group.pattern("minoshunter", ".* §r§eYou dug out a §r§2Minos Hunter§r§e!")
-    private val minosInquisitorPattern by group.pattern(
+    private val patternGroup = RepoPattern.group("event.diana.mythological.tracker")
+    private val minotaurPattern by patternGroup.pattern(
+        "minotaur",
+        ".* §r§eYou dug out a §r§2Minotaur§r§e!"
+    )
+    private val gaiaConstructPattern by patternGroup.pattern(
+        "gaiaconstruct",
+        ".* §r§eYou dug out a §r§2Gaia Construct§r§e!"
+    )
+    private val minosChampionPattern by patternGroup.pattern(
+        "minoschampion",
+        ".* §r§eYou dug out a §r§2Minos Champion§r§e!"
+    )
+    private val siameseLynxesPattern by patternGroup.pattern(
+        "siameselynxes",
+        ".* §r§eYou dug out §r§2Siamese Lynxes§r§e!"
+    )
+    private val minosHunterPattern by patternGroup.pattern(
+        "minoshunter",
+        ".* §r§eYou dug out a §r§2Minos Hunter§r§e!"
+    )
+    private val minosInquisitorPattern by patternGroup.pattern(
         "minosinquisitor",
         ".* §r§eYou dug out a §r§2Minos Inquisitor§r§e!"
     )
 
-    private val config get() = SkyHanniMod.feature.event.diana.mythologicalMobtracker
-
-    private val tracker = SkyHanniTracker("Mythological Creature Tracker", { Data() }, { it.diana.mythologicalMobTracker })
-    { drawDisplay(it) }
+    private val tracker =
+        SkyHanniTracker("Mythological Creature Tracker", { Data() }, { it.diana.mythologicalMobTracker })
+        { drawDisplay(it) }
 
     class Data : TrackerData() {
+
         override fun reset() {
             count.clear()
         }
@@ -86,7 +103,7 @@ object MythologicalCreatureTracker {
 
     @SubscribeEvent
     fun onConfigLoad(event: ConfigLoadEvent) {
-        LorenzUtils.onToggle(config.showPercentage) {
+        ConditionalUtils.onToggle(config.showPercentage) {
             tracker.update()
         }
     }

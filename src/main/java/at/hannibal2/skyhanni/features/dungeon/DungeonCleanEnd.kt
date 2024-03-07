@@ -9,6 +9,7 @@ import at.hannibal2.skyhanni.events.LorenzChatEvent
 import at.hannibal2.skyhanni.events.LorenzWorldChangeEvent
 import at.hannibal2.skyhanni.events.PlaySoundEvent
 import at.hannibal2.skyhanni.events.ReceiveParticleEvent
+import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
@@ -78,7 +79,7 @@ class DungeonCleanEnd {
 
         if (event.health <= 0.5) {
             val dungeonFloor = DungeonAPI.dungeonFloor
-            LorenzUtils.chat("§eFloor $dungeonFloor done!", false)
+            ChatUtils.chat("§eFloor $dungeonFloor done!", false)
             bossDone = true
         }
     }
@@ -126,5 +127,4 @@ class DungeonCleanEnd {
         event.move(3, "dungeon.cleanEndToggle", "dungeon.cleanEnd.enabled")
         event.move(3, "dungeon.cleanEndF3IgnoreGuardians", "dungeon.cleanEnd.F3IgnoreGuardians")
     }
-
 }

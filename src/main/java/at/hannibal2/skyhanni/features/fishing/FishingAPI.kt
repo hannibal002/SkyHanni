@@ -1,22 +1,24 @@
 package at.hannibal2.skyhanni.features.fishing
 
+import at.hannibal2.skyhanni.data.jsonobjects.repo.ItemsJson
 import at.hannibal2.skyhanni.events.FishingBobberCastEvent
-import at.hannibal2.skyhanni.events.IslandChangeEvent
+import at.hannibal2.skyhanni.events.FishingBobberInWaterEvent
 import at.hannibal2.skyhanni.events.ItemInHandChangeEvent
-import at.hannibal2.skyhanni.events.SkillExpGainEvent
-import at.hannibal2.skyhanni.features.fishing.tracker.FishingProfitTracker
+import at.hannibal2.skyhanni.events.LorenzTickEvent
+import at.hannibal2.skyhanni.events.LorenzWorldChangeEvent
+import at.hannibal2.skyhanni.events.RepositoryReloadEvent
 import at.hannibal2.skyhanni.features.fishing.trophy.TrophyFishManager
 import at.hannibal2.skyhanni.features.fishing.trophy.TrophyFishManager.getFilletValue
 import at.hannibal2.skyhanni.features.fishing.trophy.TrophyRarity
-import at.hannibal2.skyhanni.utils.DelayedRun
+import at.hannibal2.skyhanni.utils.BlockUtils.getBlockAt
 import at.hannibal2.skyhanni.utils.InventoryUtils
+import at.hannibal2.skyhanni.utils.ItemCategory
+import at.hannibal2.skyhanni.utils.ItemUtils.getItemCategoryOrNull
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
-import at.hannibal2.skyhanni.utils.ItemUtils.name
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.LorenzVec
 import at.hannibal2.skyhanni.utils.NEUInternalName
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
-import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.getLorenzVec
 import net.minecraft.client.Minecraft
 import net.minecraft.entity.item.EntityArmorStand
@@ -25,65 +27,86 @@ import net.minecraft.init.Blocks
 import net.minecraft.item.ItemStack
 import net.minecraftforge.event.entity.EntityJoinWorldEvent
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
-import kotlin.time.Duration.Companion.seconds
 
 object FishingAPI {
+
     val lavaBlocks = listOf(Blocks.lava, Blocks.flowing_lava)
     private val waterBlocks = listOf(Blocks.water, Blocks.flowing_water)
 
     var lastCastTime = SimpleTimeMark.farPast()
-    var lastActiveFishingTime = SimpleTimeMark.farPast()
+    var holdingRod = false
+    var holdingLavaRod = false
+    var holdingWaterRod = false
+
+    private var lavaRods = listOf<NEUInternalName>()
+    private var waterRods = listOf<NEUInternalName>()
+
+    var bobber: EntityFishHook? = null
+    var bobberHasTouchedWater = false
 
     @SubscribeEvent
     fun onJoinWorld(event: EntityJoinWorldEvent) {
-        if (!LorenzUtils.inSkyBlock || !hasFishingRodInHand()) return
+        if (!LorenzUtils.inSkyBlock || !holdingRod) return
         val entity = event.entity ?: return
         if (entity !is EntityFishHook) return
         if (entity.angler != Minecraft.getMinecraft().thePlayer) return
 
         lastCastTime = SimpleTimeMark.now()
+        bobber = entity
+        bobberHasTouchedWater = false
         FishingBobberCastEvent(entity).postAndCatch()
     }
 
+    private fun resetBobber() {
+        bobber = null
+        bobberHasTouchedWater = false
+    }
+
+    @SubscribeEvent
+    fun onWorldChange(event: LorenzWorldChangeEvent) {
+        resetBobber()
+    }
+
+    @SubscribeEvent
+    fun onTick(event: LorenzTickEvent) {
+        if (!LorenzUtils.inSkyBlock) return
+        val bobber = bobber ?: return
+        if (bobber.isDead) {
+            resetBobber()
+        } else {
+            if (!bobberHasTouchedWater) {
+                val block = bobber.getLorenzVec().getBlockAt()
+                if (block in getAllowedBlocks()) {
+                    bobberHasTouchedWater = true
+                    FishingBobberInWaterEvent().postAndCatch()
+                }
+            }
+        }
+    }
+
+    private fun NEUInternalName.isFishingRod() = contains("ROD")
+    fun ItemStack.isFishingRod() = getItemCategoryOrNull() == ItemCategory.FISHING_ROD || getItemCategoryOrNull() == ItemCategory.FISHING_WEAPON
+
+    fun ItemStack.isBait(): Boolean = stackSize == 1 && getItemCategoryOrNull() == ItemCategory.FISHING_BAIT
+
     @SubscribeEvent
     fun onItemInHandChange(event: ItemInHandChangeEvent) {
-        if (event.oldItem.isFishingRod()) {
-            lastActiveFishingTime = SimpleTimeMark.now()
-        }
-        if (event.newItem.isFishingRod()) {
-            DelayedRun.runDelayed(1.seconds) {
-                lastActiveFishingTime = SimpleTimeMark.now()
-            }
-        }
+        // TODO correct rod type per island water/lava
+        holdingRod = event.newItem.isFishingRod()
+        holdingLavaRod = event.newItem in lavaRods
+        holdingWaterRod = event.newItem in waterRods
     }
 
     @SubscribeEvent
-    fun onSkillExpGain(event: SkillExpGainEvent) {
-        val skill = event.skill
-        if (FishingProfitTracker.isEnabled()) {
-            if (skill != "fishing") {
-                lastActiveFishingTime = SimpleTimeMark.farPast()
-            }
-        }
-    }
-
-    @SubscribeEvent
-    fun onIslandChange(event: IslandChangeEvent) {
-        lastActiveFishingTime = SimpleTimeMark.farPast()
-    }
-
-    fun hasFishingRodInHand() = InventoryUtils.itemInHandId.isFishingRod()
-
-    fun NEUInternalName.isFishingRod() = contains("ROD")
-
-    fun ItemStack.isBait(): Boolean {
-        val name = name ?: return false
-        return stackSize == 1 && (name.removeColor().startsWith("Obfuscated") || name.endsWith(" Bait"))
+    fun onRepoReload(event: RepositoryReloadEvent) {
+        val data = event.getConstant<ItemsJson>("Items")
+        lavaRods = data.lava_fishing_rods ?: error("§clava_fishing_rods is missing from repo.")
+        waterRods = data.water_fishing_rods ?: error("§cwater_fishing_rods is missing from repo.")
     }
 
     fun isLavaRod() = InventoryUtils.getItemInHand()?.getLore()?.any { it.contains("Lava Rod") } ?: false
 
-    fun getAllowedBlocks() = if (isLavaRod()) lavaBlocks else waterBlocks
+    private fun getAllowedBlocks() = if (isLavaRod()) lavaBlocks else waterBlocks
 
     fun getFilletPerTrophy(internalName: NEUInternalName): Int {
         val internal = internalName.asString()
@@ -95,7 +118,7 @@ object FishingAPI {
         return info?.getFilletValue(rarity) ?: 0
     }
 
-    fun isFishing() = FishingDetection.isFishing
+    fun isFishing(checkRodInHand: Boolean = true) = IsFishingDetection.isFishing || (checkRodInHand && holdingRod)
 
     fun seaCreatureCount(entity: EntityArmorStand): Int {
         val name = entity.name
@@ -121,5 +144,4 @@ object FishingAPI {
         }
         return 1
     }
-
 }

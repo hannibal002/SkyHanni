@@ -4,6 +4,7 @@ import net.minecraft.item.Item
 import net.minecraft.item.ItemStack
 
 object ItemBlink {
+
     private val offsets = mutableMapOf<Item, Long>()
     private var lastOffset = 0L
     private var endOfBlink = 0L

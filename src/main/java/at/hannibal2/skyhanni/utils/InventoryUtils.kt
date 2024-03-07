@@ -12,6 +12,7 @@ import net.minecraft.item.ItemStack
 import kotlin.time.Duration.Companion.seconds
 
 object InventoryUtils {
+
     var itemInHandId = NEUInternalName.NONE
     var recentItemsInHand = mutableMapOf<Long, NEUInternalName>()
     var latestItemInHand: ItemStack? = null
@@ -42,7 +43,7 @@ object InventoryUtils {
 
     fun inStorage() = openInventoryName().let {
         (it.contains("Storage") && !it.contains("Rift Storage"))
-                || it.contains("Ender Chest") || it.contains("Backpack")
+            || it.contains("Ender Chest") || it.contains("Backpack")
     }
 
     fun getItemInHand(): ItemStack? = Minecraft.getMinecraft().thePlayer.heldItem
@@ -54,7 +55,6 @@ object InventoryUtils {
     fun getLeggings(): ItemStack? = getArmor()[1]
     fun getBoots(): ItemStack? = getArmor()[0]
 
-
     val isNeuStorageEnabled = RecalculatingValue(10.seconds) {
         try {
             val config = NotEnoughUpdates.INSTANCE.config
@@ -65,7 +65,7 @@ object InventoryUtils {
             val booleanField = storage.javaClass.getDeclaredField("enableStorageGUI3")
             booleanField.get(storage) as Boolean
         } catch (e: Throwable) {
-            ErrorManager.logError(e, "Could not read NEU config to determine if the neu storage is emabled.")
+            ErrorManager.logErrorWithData(e, "Could not read NEU config to determine if the neu storage is emabled.")
             false
         }
     }

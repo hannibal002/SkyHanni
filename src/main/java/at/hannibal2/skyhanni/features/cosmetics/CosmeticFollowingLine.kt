@@ -2,13 +2,14 @@ package at.hannibal2.skyhanni.features.cosmetics
 
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
+import at.hannibal2.skyhanni.config.enums.OutsideSbFeature
 import at.hannibal2.skyhanni.events.LorenzRenderWorldEvent
 import at.hannibal2.skyhanni.events.LorenzTickEvent
 import at.hannibal2.skyhanni.events.LorenzWorldChangeEvent
+import at.hannibal2.skyhanni.utils.CollectionUtils.editCopy
+import at.hannibal2.skyhanni.utils.ColorUtils.toChromaColor
 import at.hannibal2.skyhanni.utils.LocationUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils
-import at.hannibal2.skyhanni.utils.LorenzUtils.editCopy
-import at.hannibal2.skyhanni.utils.LorenzUtils.toChromaColor
 import at.hannibal2.skyhanni.utils.LorenzVec
 import at.hannibal2.skyhanni.utils.RenderUtils.draw3DLine
 import at.hannibal2.skyhanni.utils.RenderUtils.exactLocation
@@ -20,6 +21,7 @@ import kotlin.time.Duration.Companion.milliseconds
 import kotlin.time.Duration.Companion.seconds
 
 class CosmeticFollowingLine {
+
     private val config get() = SkyHanniMod.feature.misc.cosmetic.followingLine
 
     private var locations = mapOf<LorenzVec, LocationSpot>()
@@ -34,8 +36,7 @@ class CosmeticFollowingLine {
 
     @SubscribeEvent
     fun onRenderWorld(event: LorenzRenderWorldEvent) {
-        if (!LorenzUtils.inSkyBlock) return
-        if (!config.enabled) return
+        if (!isEnabled()) return
 
         updateClose(event)
 
@@ -49,7 +50,7 @@ class CosmeticFollowingLine {
     private fun renderFar(
         event: LorenzRenderWorldEvent,
         firstPerson: Boolean,
-        color: Color
+        color: Color,
     ) {
         val last7 = locations.keys.toList().takeLast(7)
         val last2 = locations.keys.toList().takeLast(2)
@@ -98,8 +99,7 @@ class CosmeticFollowingLine {
 
     @SubscribeEvent
     fun onTick(event: LorenzTickEvent) {
-        if (!LorenzUtils.inSkyBlock) return
-        if (!config.enabled) return
+        if (!isEnabled()) return
 
         if (event.isMod(5)) {
             locations = locations.editCopy { values.removeIf { it.time.passedSince() > config.secondsAlive.seconds } }
@@ -122,6 +122,8 @@ class CosmeticFollowingLine {
             }
         }
     }
+
+    private fun isEnabled() = (LorenzUtils.inSkyBlock || OutsideSbFeature.FOLLOWING_LINE.isSelected()) && config.enabled
 
     @SubscribeEvent
     fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {

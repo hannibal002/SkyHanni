@@ -8,5 +8,4 @@ class DamageCounter {
     var currentHealing = 0L
     var oldDamages = LinkedList<OldDamage>()
     var firstTick = 0L
-
 }

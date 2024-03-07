@@ -14,7 +14,7 @@ plugins {
 }
 
 group = "at.hannibal2.skyhanni"
-version = "0.23.Beta.17"
+version = "0.24.Beta.5"
 
 val gitHash by lazy {
     val baos = ByteArrayOutputStream()
@@ -103,7 +103,7 @@ dependencies {
         exclude(module = "unspecified")
         isTransitive = false
     }
-    devenvMod("com.github.NotEnoughUpdates:NotEnoughUpdates:v2.1.1-pre4:all") {
+    devenvMod("com.github.NotEnoughUpdates:NotEnoughUpdates:v2.1.1-pre5:all") {
         exclude(module = "unspecified")
         isTransitive = false
     }
@@ -114,7 +114,7 @@ dependencies {
     implementation(libs.hotswapagentforge)
 
 //    testImplementation(kotlin("test"))
-    testImplementation("com.github.NotEnoughUpdates:NotEnoughUpdates:v2.1.1-pre4:all") {
+    testImplementation("com.github.NotEnoughUpdates:NotEnoughUpdates:v2.1.1-pre5:all") {
         exclude(module = "unspecified")
         isTransitive = false
     }
@@ -146,7 +146,9 @@ loom {
     launchConfigs {
         "client" {
             property("mixin.debug", "true")
-            property("asmhelper.verbose", "true")
+            if (System.getenv("repo_action") != "true") {
+                property("devauth.configDir", rootProject.file(".devauth").absolutePath)
+            }
             arg("--tweakClass", "org.spongepowered.asm.launch.MixinTweaker")
             arg("--tweakClass", "io.github.moulberry.moulconfig.tweaker.DevelopmentResourceTweaker")
             arg("--mods", devenvMod.resolve().joinToString(",") { it.relativeTo(file("run")).path })

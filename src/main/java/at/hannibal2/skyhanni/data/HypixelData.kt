@@ -8,13 +8,18 @@ import at.hannibal2.skyhanni.events.LorenzChatEvent
 import at.hannibal2.skyhanni.events.LorenzTickEvent
 import at.hannibal2.skyhanni.events.LorenzWorldChangeEvent
 import at.hannibal2.skyhanni.events.ProfileJoinEvent
+import at.hannibal2.skyhanni.events.TabListUpdateEvent
 import at.hannibal2.skyhanni.features.bingo.BingoAPI
+import at.hannibal2.skyhanni.features.rift.RiftAPI
 import at.hannibal2.skyhanni.test.command.ErrorManager
+import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.LorenzLogger
 import at.hannibal2.skyhanni.utils.LorenzUtils
+import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.TabListData
+import at.hannibal2.skyhanni.utils.UtilsPatterns
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import com.google.gson.JsonObject
 import io.github.moulberry.notenoughupdates.NotEnoughUpdates
@@ -24,13 +29,11 @@ import net.minecraftforge.fml.common.eventhandler.EventPriority
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import net.minecraftforge.fml.common.network.FMLNetworkEvent
 import kotlin.concurrent.thread
+import kotlin.time.Duration.Companion.seconds
 
 class HypixelData {
+
     private val patternGroup = RepoPattern.group("data.hypixeldata")
-    private val tabListProfilePattern by patternGroup.pattern(
-        "tablistprofile",
-        "§e§lProfile: §r§a(?<profile>.*)"
-    )
     private val lobbyTypePattern by patternGroup.pattern(
         "lobbytype",
         "(?<lobbyType>.*lobby)\\d+"
@@ -40,7 +43,7 @@ class HypixelData {
         "(?:§.)*(Area|Dungeon): (?:§.)*(?<island>.*)"
     )
 
-    private var lastLocRaw = 0L
+    private var lastLocRaw = SimpleTimeMark.farPast()
 
     companion object {
         private val patternGroup = RepoPattern.group("data.hypixeldata")
@@ -61,7 +64,7 @@ class HypixelData {
         var skyBlockIsland = IslandType.UNKNOWN
         var serverId: String? = null
 
-        //Ironman, Stranded and Bingo
+        // Ironman, Stranded and Bingo
         var noTrade = false
 
         var ironman = false
@@ -95,16 +98,20 @@ class HypixelData {
             if (!LorenzUtils.inSkyBlock) return null
             if (serverId != null) return serverId
 
-            ScoreboardData.sidebarLinesFormatted.forEach { serverIdScoreboardPattern.matchMatcher(it) {
-                val serverType = if (group("servertype") == "M") "mega" else "mini"
-                serverId = "$serverType${group("serverid")}"
-                return serverId
-            } }
+            ScoreboardData.sidebarLinesFormatted.forEach {
+                serverIdScoreboardPattern.matchMatcher(it) {
+                    val serverType = if (group("servertype") == "M") "mega" else "mini"
+                    serverId = "$serverType${group("serverid")}"
+                    return serverId
+                }
+            }
 
-            TabListData.getTabList().forEach { serverIdTablistPattern.matchMatcher(it) {
-                serverId = group("serverid")
-                return serverId
-            } }
+            TabListData.getTabList().forEach {
+                serverIdTablistPattern.matchMatcher(it) {
+                    serverId = group("serverid")
+                    return serverId
+                }
+            }
 
             return serverId
         }
@@ -140,6 +147,7 @@ class HypixelData {
         val message = event.message.removeColor().lowercase()
         if (message.startsWith("your profile was changed to:")) {
             val newProfile = message.replace("your profile was changed to:", "").replace("(co-op)", "").trim()
+            if (profileName == newProfile) return
             profileName = newProfile
             ProfileJoinEvent(newProfile).postAndCatch()
         }
@@ -148,6 +156,21 @@ class HypixelData {
             if (profileName == newProfile) return
             profileName = newProfile
             ProfileJoinEvent(newProfile).postAndCatch()
+        }
+    }
+
+    @SubscribeEvent
+    fun onTabListUpdate(event: TabListUpdateEvent) {
+        for (line in event.tabList) {
+            UtilsPatterns.tabListProfilePattern.matchMatcher(line) {
+                var newProfile = group("profile").lowercase()
+                // Hypixel shows the profile name reversed while in the Rift
+                if (RiftAPI.inRift()) newProfile = newProfile.reversed()
+                if (profileName == newProfile) return
+                profileName = newProfile
+                ProfileJoinEvent(newProfile).postAndCatch()
+                return
+            }
         }
     }
 
@@ -162,9 +185,9 @@ class HypixelData {
             val currentTime = System.currentTimeMillis()
             if (LorenzUtils.onHypixel &&
                 locrawData == null &&
-                currentTime - lastLocRaw > 15000
+                lastLocRaw.passedSince() > 15.seconds
             ) {
-                lastLocRaw = System.currentTimeMillis()
+                lastLocRaw = SimpleTimeMark.now()
                 thread(start = true) {
                     Thread.sleep(1000)
                     NotEnoughUpdates.INSTANCE.sendChatMessage("/locraw")
@@ -206,7 +229,7 @@ class HypixelData {
     private fun checkProfileName(): Boolean {
         if (profileName.isEmpty()) {
             val text = TabListData.getTabList().firstOrNull { it.contains("Profile:") } ?: return true
-            tabListProfilePattern.matchMatcher(text) {
+            UtilsPatterns.tabListProfilePattern.matchMatcher(text) {
                 profileName = group("profile").lowercase()
                 ProfileJoinEvent(profileName).postAndCatch()
             }
@@ -262,7 +285,7 @@ class HypixelData {
         if (skyBlockIsland != islandType) {
             IslandChangeEvent(islandType, skyBlockIsland).postAndCatch()
             if (islandType == IslandType.UNKNOWN) {
-                LorenzUtils.debug("Unknown island detected: '$newIsland'")
+                ChatUtils.debug("Unknown island detected: '$newIsland'")
                 loggerIslandChange.log("Unknown: '$newIsland'")
             } else {
                 loggerIslandChange.log(islandType.name)
