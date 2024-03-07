@@ -49,7 +49,7 @@ class ShowFishingItemName {
                 val location = event.exactLocation(entityItem).add(y = 0.8)
                 if (location.distance(LocationUtils.playerLocation()) > 15) continue
                 val itemStack = entityItem.entityItem
-                var name = itemStack.name ?: continue
+                var name = itemStack.name
 
                 // Hypixel sometimes replaces the bait item mid air with a stone
                 if (name.removeColor() == "Stone") continue

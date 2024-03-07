@@ -142,7 +142,7 @@ object LorenzUtils {
 
     fun getSBMonthByName(month: String): Int {
         var monthNr = 0
-        for (i in 1 .. 12) {
+        for (i in 1..12) {
             val monthName = SkyBlockTime.monthName(i)
             if (month == monthName) {
                 monthNr = i
@@ -304,9 +304,6 @@ object LorenzUtils {
     fun sendTitle(text: String, duration: Duration, height: Double = 1.8, fontSize: Float = 4f) {
         TitleManager.sendTitle(text, duration, height, fontSize)
     }
-
-    @Deprecated("Dont use this approach at all. check with regex or equals instead.", ReplaceWith("Regex or equals"))
-    fun Iterable<String>.anyContains(element: String) = any { it.contains(element) }
 
     inline fun <reified T : Enum<T>> enumValueOfOrNull(name: String): T? {
         val enums = enumValues<T>()

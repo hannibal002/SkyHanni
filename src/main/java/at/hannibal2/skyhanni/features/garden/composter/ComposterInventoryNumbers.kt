@@ -6,6 +6,7 @@ import at.hannibal2.skyhanni.features.garden.GardenAPI
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.NumberUtil
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
+import at.hannibal2.skyhanni.utils.NumberUtil.formatInt
 import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
@@ -38,7 +39,7 @@ class ComposterInventoryNumbers {
         if (slotNumber == 13) {
             for (line in stack.getLore()) {
                 amountPattern.matchMatcher(line) {
-                    val total = group("amount").replace(",", "").toInt()
+                    val total = group("amount").formatInt()
                     event.offsetY = -2
                     event.offsetX = -20
                     event.stackTip = "§6${total.addSeparators()}"
@@ -51,7 +52,7 @@ class ComposterInventoryNumbers {
         if (slotNumber == 46 || slotNumber == 52) {
             for (line in stack.getLore()) {
                 valuePattern.matchMatcher(line) {
-                    val having = group("having").removeColor().replace(",", "").toDouble().toInt()
+                    val having = group("having").removeColor().formatInt()
                     val havingFormat = NumberUtil.format(having)
                     val total = group("total").removeColor()
 
