@@ -47,7 +47,7 @@ class MinionXp {
 
     private fun toPrimitiveItemStack(itemStack: ItemStack) =
         PrimitiveItemStack(itemStack.getInternalName(), itemStack.stackSize)
-    
+
     @SubscribeEvent
     fun onMinionOpen(event: MinionOpenEvent) {
         if (!config.xpDisplay) return
@@ -89,10 +89,13 @@ class MinionXp {
         }
     }
 
+    // TODO find the correct name of the list
+    private val listWithMissingName = listOf(21..26, 30..35, 39..44)
+
     private fun handleItems(inventoryItems: Map<Int, ItemStack>, isMinion: Boolean): EnumMap<SkillType, Double> {
         val xpTotal = EnumMap<SkillType, Double>(SkillType::class.java)
         inventoryItems.filter {
-            it.value.getLore().isNotEmpty() && (!isMinion || it.key in listOf(21 .. 26, 30 .. 35, 39 .. 44).flatten())
+            it.value.getLore().isNotEmpty() && (!isMinion || it.key in listWithMissingName.flatten())
         }.forEach { (_, itemStack) ->
             val item = toPrimitiveItemStack(itemStack)
             val name = item.internalName

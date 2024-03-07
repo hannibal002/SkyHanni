@@ -31,7 +31,10 @@ object TimeUtils {
         else -> default
     }
 
-    @Deprecated("Has an offset of one second", ReplaceWith("use kotlin Duration"))
+    @Deprecated(
+        "Has an offset of one second",
+        ReplaceWith("millis.toDuration(DurationUnit.MILLISECONDS).format(biggestUnit, showMilliSeconds, longName, maxUnits)")
+    )
     fun formatDuration(
         millis: Long,
         biggestUnit: TimeUnit = TimeUnit.YEAR,
@@ -79,7 +82,7 @@ object TimeUtils {
         return builder.toString().trim()
     }
 
-    @Deprecated("Do no longer use long for time", ReplaceWith("getDuration(string)"))
+    @Deprecated("Do no longer use long for time", ReplaceWith("TimeUtils.getDuration(string)"))
     fun getMillis(string: String) = getDuration(string).inWholeMilliseconds
 
     fun getDuration(string: String) = getMillis_(string.replace("m", "m ").replace("  ", " ").trim())

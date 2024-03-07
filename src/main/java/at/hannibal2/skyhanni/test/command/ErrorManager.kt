@@ -54,9 +54,9 @@ object ErrorManager {
         cache.clear()
     }
 
-    fun skyHanniError(message: String): Nothing {
+    fun skyHanniError(message: String, vararg extraData: Pair<String, Any?>): Nothing {
         val exception = IllegalStateException(message)
-        logErrorWithData(exception, message)
+        logErrorWithData(exception, message, extraData = extraData)
         throw exception
     }
 

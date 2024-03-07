@@ -66,9 +66,9 @@ class SkillTooltip {
                     val xpFor50 = SkillUtil.xpRequiredForLevel(50.0)
                     val xpFor60 = SkillUtil.xpRequiredForLevel(60.0)
 
-                    have += if (skillInfo.overflowLevel >= 60 && skill in excludedSkills || skillInfo.overflowLevel in 50 .. 59) xpFor50
-                        else if (skillInfo.overflowLevel >= 60 && skill !in excludedSkills) xpFor60
-                        else 0
+                    have += if (skillInfo.overflowLevel >= 60 && skill in excludedSkills || skillInfo.overflowLevel in 50..59) xpFor50
+                    else if (skillInfo.overflowLevel >= 60 && skill !in excludedSkills) xpFor60
+                    else 0
 
                     val progress = have.toDouble() / need
                     val progressBar = StringUtils.progressBar(progress)

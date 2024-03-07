@@ -46,7 +46,8 @@ class InfernoMinionFeatures {
         if (!config.infernoFuelBlocker) return
         if (!inInventory) return
 
-        val containsFuel = NEUInternalName.fromItemNameOrNull(event.container.getSlot(19).stack.name.toString()) in fuelItemIds
+        val containsFuel =
+            NEUInternalName.fromItemNameOrNull(event.container.getSlot(19).stack.name) in fuelItemIds
         if (!containsFuel) return
 
         if (event.slot?.slotNumber == 19 || event.slot?.slotNumber == 53) {
@@ -60,7 +61,7 @@ class InfernoMinionFeatures {
         if (!config.infernoFuelBlocker) return
         if (!inInventory) return
 
-        val containsFuel = NEUInternalName.fromItemNameOrNull(event.itemStack.name.toString()) in fuelItemIds
+        val containsFuel = NEUInternalName.fromItemNameOrNull(event.itemStack.name) in fuelItemIds
         if (!containsFuel) return
 
         if (event.slot.slotNumber == 19) {
