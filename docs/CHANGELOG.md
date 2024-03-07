@@ -1,5 +1,103 @@
 # SkyHanni - Change Log
 
+## Version 0.24 (Unreleased)
+
+### New Features
+
+#### Inventory Features
+
++ Added Max Items With Purse. - NetheriteMiner
+    + Calculates the maximum number of items that can be purchased from the Bazaar with the number of coins in your
+      purse.
++ Added Copy Underbid Keybind. - Obsidian
+    + Copies the price of the hovered item in Auction House minus 1 coin into the clipboard for easier under-bidding.
++ Gfs message after super crafting. — Zickles
+    + Adding a clickable message to pick up the super crafted items from sacks.
+
+#### Minion Features
+
++ Added Inferno Minion Fuel pickup prevention. - Zickles (https://github.com/hannibal002/SkyHanni/pull/1103)
+    + Blocks picking up the Inferno Minion or replacing the fuel inside when expensive minion fuels are in use.
+
+### Improvements
+
+#### Chat Improvements
+
++ Added more messages to chat filter category annoying. - martimavocado
+    + Not enough breaking power for gems.
+    + Useless messages for sky mall and Jacob's event artifact.
++ Adding a toggle to hide sky mall perk messages outside mining islands. - martimavocado
++ Added a toggle to hide Jacob's event artifact message outside the garden. - martimavocado
++ Added Booster Cookie purchase reminder to chat filter category others. - alexia
+
+#### Inventory Improvements
+
++ Changed Max Items with Purse display format. - hannibal2
+
+#### GUI Improvements
+
++ Added option to only show Custom Text Box while an inventory is open. - martimavocado
++ Added option to hide Profit Trackers while not inside an inventory. - hannibal2
+
+#### Misc Improvements
+
++ Added option to show some features outside SkyBlock. - Obsidian
++ Added goal to collection tracker. - Thunderblade73
+    + /shtrackcollection \<item name> [goal amount]
+    + Shows a chat message once the goal has been reached.
+
+### Fixes
+
+#### Bingo Fixes
+
++ Fixed Bingo Card Tips using wrong slot sometimes. - Thunderblade73
++ Fixed Bingo Minion Craft Helper sometimes causing performance problems. - CalMWolfs
+
+#### Mining Fixes
+
++ Fixed a small typo in the Deep Caverns Parkour message. - alexia
+
+#### Inventory Fixes
+
++ Fixed copy underbid keybind not working. - Obsidian
++ Fixed SkyBlock guide highlight missing tasks not working properly for minions and collections. - Thunderblade73
++ Fixed Harp Quick Restart not working when Harp GUI Scale is disabled. - Zickles
+
+#### Chat Fixes
+
++ Fixed Fire Sale chat hider not working when multiple fire sales are ending. - Zickles
++ Fixed Auto Tip chat filter. - alexia (https://github.com/hannibal002/SkyHanni/pull/1105)
++ Fixed Hide Anita Accessories' fortune bonus chat message not getting hidden in the chat filter. - alexia (https://github.com/hannibal002/SkyHanni/pull/1106)
+
+#### Command Fixes
+
++ Fixed duplicate commands in /shcommands. - CalMWolfs
+
+#### Misc Fixes
+
++ Fixed skill level up message when below level 60. - HiZe
++ Fixed SkyHanni not working on Alpha. - hannibal2 & CalMWolfs
+
+### Technical Details
+
++ Auto-enable + configure DevAuth. - nea
++ Improve performance of removeColor. - nea
++ Removed wildcard imports in VisualWorldGui. - CalMWolfs
++ printStackTrace -> ErrorManager. - hannibal2
++ Added command /shconfig toggle <path> <value 1> <value 2>. - Obsidian
++ Removes usage of logError everywhere in the code and replaces it with logErrorWithData. - CalMWolfs
++ Removed ErrorManager.logErrorState(). - CalMWolfs
++ Creating number utils functions for string -> int, long, double, with either error throwing or wrong usage to user
+  message.
++ Removed RenderWorldLastEvent usage in WorldEdit feature. - hannibal2
++ Using GardenAPI.storage everywhere. - hannibal2
++ Added stacking enchants to the repo. - CalMWolfs
++ Moved bazaar config into inventory category. - hannibal2
++ Optimize IntelliJ icon. - nea
++ Used the isInIsland function more. - CalMWolfs (https://github.com/hannibal002/SkyHanni/pull/1107)
+
+### Removed Features
+
 ## Version 0.23
 
 ### New Features

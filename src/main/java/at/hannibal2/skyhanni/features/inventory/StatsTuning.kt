@@ -37,8 +37,7 @@ class StatsTuning {
     }
 
     private fun templateStats(stack: ItemStack, event: RenderInventoryItemTipEvent): Boolean {
-        val name = stack.name ?: return true
-        if (name != "§aLoad") return false
+        if (stack.name != "§aLoad") return false
 
         var grab = false
         val list = mutableListOf<String>()
@@ -66,8 +65,7 @@ class StatsTuning {
     }
 
     private fun selectedStats(stack: ItemStack, event: RenderInventoryItemTipEvent): Boolean {
-        val name = stack.name ?: return true
-        if (name != "§aStats Tuning") return false
+        if (stack.name != "§aStats Tuning") return false
 
         var grab = false
         val list = mutableListOf<String>()

@@ -53,7 +53,7 @@ class GlowingDroppedItems {
         if (shouldHideShowcaseItem(entity)) return null
 
         val entityItem = item.entityItem
-        if (!config.highlightFishingBait && entityItem.name?.endsWith(" Bait") == true) {
+        if (!config.highlightFishingBait && entityItem.name.endsWith(" Bait")) {
             return null
         }
 

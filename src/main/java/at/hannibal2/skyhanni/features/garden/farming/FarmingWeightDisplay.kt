@@ -3,6 +3,7 @@ package at.hannibal2.skyhanni.features.garden.farming
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.config.ConfigManager
 import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
+import at.hannibal2.skyhanni.config.enums.OutsideSbFeature
 import at.hannibal2.skyhanni.data.HypixelData
 import at.hannibal2.skyhanni.data.ProfileStorageData
 import at.hannibal2.skyhanni.data.jsonobjects.other.EliteLeaderboardJson
@@ -85,7 +86,11 @@ class FarmingWeightDisplay {
         event.move(3, "garden.eliteFarmingWeightPos", "garden.eliteFarmingWeights.pos")
         event.move(3, "garden.eliteFarmingWeightLeaderboard", "garden.eliteFarmingWeights.leaderboard")
         event.move(3, "garden.eliteFarmingWeightOvertakeETA", "garden.eliteFarmingWeights.overtakeETA")
-        event.move(3, "garden.eliteFarmingWeightOffScreenDropMessage", "garden.eliteFarmingWeights.offScreenDropMessage")
+        event.move(
+            3,
+            "garden.eliteFarmingWeightOffScreenDropMessage",
+            "garden.eliteFarmingWeights.offScreenDropMessage"
+        )
         event.move(3, "garden.eliteFarmingWeightOvertakeETAAlways", "garden.eliteFarmingWeights.overtakeETAAlways")
         event.move(3, "garden.eliteFarmingWeightETAGoalRank", "garden.eliteFarmingWeights.ETAGoalRank")
         event.move(3, "garden.eliteFarmingWeightIgnoreLow", "garden.eliteFarmingWeights.ignoreLow")
@@ -144,7 +149,7 @@ class FarmingWeightDisplay {
         private var lastOpenWebsite = SimpleTimeMark.farPast()
 
         private fun update() {
-            if (!GardenAPI.inGarden()) return
+            if (!isEnabled()) return
             if (apiError) {
                 display = errorMessage
                 return
@@ -153,10 +158,6 @@ class FarmingWeightDisplay {
             if (weight == -1.0) {
                 if (!isLoadingWeight) {
                     val localProfile = HypixelData.profileName
-                    if (localProfile == "") {
-                        display = Renderable.singeltonString("§cError: profileName is empty!")
-                        return
-                    }
 
                     isLoadingWeight = true
                     if (display.isEmpty()) {
@@ -271,7 +272,7 @@ class FarmingWeightDisplay {
                 } else {
                     leaderboardPosition--
                 }
-                ProfileStorageData.profileSpecific?.garden?.farmingWeight?.lastFarmingWeightLeaderboard =
+                GardenAPI.storage?.farmingWeight?.lastFarmingWeightLeaderboard =
                     leaderboardPosition
 
                 // Remove passed player to present the next one
@@ -338,7 +339,9 @@ class FarmingWeightDisplay {
             )
         }
 
-        private fun isEnabled() = GardenAPI.inGarden() && config.display
+        private fun isEnabled() = ((OutsideSbFeature.FARMING_WEIGHT.isSelected() && !LorenzUtils.inSkyBlock) ||
+            (LorenzUtils.inSkyBlock && (GardenAPI.inGarden() || config.showOutsideGarden))) && config.display
+
         private fun isEtaEnabled() = config.overtakeETA
 
         fun addCrop(crop: CropType, addedCounter: Int) {
@@ -374,7 +377,7 @@ class FarmingWeightDisplay {
                 if (wasNotLoaded && config.showLbChange) {
                     checkOffScreenLeaderboardChanges()
                 }
-                ProfileStorageData.profileSpecific?.garden?.farmingWeight?.lastFarmingWeightLeaderboard =
+                GardenAPI.storage?.farmingWeight?.lastFarmingWeightLeaderboard =
                     leaderboardPosition
                 lastLeaderboardUpdate = System.currentTimeMillis()
                 isLoadingLeaderboard = false
@@ -431,7 +434,6 @@ class FarmingWeightDisplay {
                     "url" to url,
                     "apiResponse" to apiResponse
                 )
-                error()
             }
             return -1
         }
@@ -453,7 +455,7 @@ class FarmingWeightDisplay {
                 val selectedProfileId = apiData.selectedProfileId
                 var selectedProfileEntry = apiData.profiles.find { it.profileId == selectedProfileId }
 
-                if (selectedProfileEntry == null || selectedProfileEntry.profileName.lowercase() != localProfile) {
+                if (selectedProfileEntry == null || (selectedProfileEntry.profileName.lowercase() != localProfile && localProfile != "")) {
                     selectedProfileEntry = apiData.profiles.find { it.profileName.lowercase() == localProfile }
                 }
 
@@ -470,13 +472,10 @@ class FarmingWeightDisplay {
                 ErrorManager.logErrorWithData(
                     e, "Error loading user farming weight",
                     "url" to url,
-                    "apiResponse" to apiResponse
+                    "apiResponse" to apiResponse,
+                    "localProfile" to localProfile
                 )
             }
-            error()
-        }
-
-        private fun error() {
             apiError = true
             ErrorManager.skyHanniError(
                 "Loading the farming weight data from elitebot.dev failed!\n"
@@ -543,7 +542,10 @@ class FarmingWeightDisplay {
             val apiResponse = APIUtil.getJSONResponse(url)
 
             try {
-                val apiData = ConfigManager.gson.fromJson<Map<String, Double>>(apiResponse, object : TypeToken<Map<String, Double>>() {}.type)
+                val apiData = ConfigManager.gson.fromJson<Map<String, Double>>(
+                    apiResponse,
+                    object : TypeToken<Map<String, Double>>() {}.type
+                )
                 for (crop in apiData) {
                     val cropType = CropType.getByName(crop.key)
                     factorPerCrop[cropType] = crop.value

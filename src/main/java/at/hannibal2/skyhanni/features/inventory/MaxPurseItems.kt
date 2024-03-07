@@ -3,7 +3,7 @@ package at.hannibal2.skyhanni.features.inventory
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.data.PurseAPI
 import at.hannibal2.skyhanni.events.GuiRenderEvent
-import at.hannibal2.skyhanni.features.bazaar.BazaarApi
+import at.hannibal2.skyhanni.features.inventory.bazaar.BazaarApi
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
@@ -15,7 +15,7 @@ import net.minecraft.client.Minecraft
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
 class MaxPurseItems {
-    private val config get() = SkyHanniMod.feature.bazaar
+    private val config get() = SkyHanniMod.feature.inventory.bazaar
 
     private val patternGroup = RepoPattern.group("inventory.maxpurse")
     private val orderPattern by patternGroup.pattern(
@@ -34,7 +34,7 @@ class MaxPurseItems {
         "createinstant",
         "§aBuy Instantly"
     )
-    
+
     private var buyOrderPrice: Double? = null
     private var instantBuyPrice: Double? = null
 
@@ -86,9 +86,9 @@ class MaxPurseItems {
 
         config.maxPurseItemsPosition.renderStrings(
             listOf(
-                "§eWith your current purse, you can buy order",
-                "§e${buyOrders.addSeparators()}x of this item with your purse (at top order +0.1)",
-                "§eOr ${buyInstant.addSeparators()}x with instant buy at the bazaar"
+                "§7Max items with purse",
+                "§7Buy order +0.1: §e${buyOrders.addSeparators()}x",
+                "§7Instant buy: §e${buyInstant.addSeparators()}x"
             ), posLabel = "Max Items With Purse"
         )
     }
