@@ -28,7 +28,12 @@ class GeyserFishing {
     @SubscribeEvent(priority = EventPriority.LOW, receiveCanceled = true)
     fun onReceiveParticle(event: ReceiveParticleEvent) {
         if (!shouldProcessParticles()) return
-        if (event.type != EnumParticleTypes.CLOUD || event.count != 15 || event.speed != 0.05f || event.offset != LorenzVec(0.1f, 0.6f, 0.1f)) return
+        if (event.type != EnumParticleTypes.CLOUD || event.count != 15 || event.speed != 0.05f || event.offset != LorenzVec(
+                0.1f,
+                0.6f,
+                0.1f
+            )
+        ) return
 
         geyser = event.location
         val potentialGeyser = geyser ?: return
@@ -71,5 +76,6 @@ class GeyserFishing {
         }
     }
 
-    private fun shouldProcessParticles() = IslandType.CRIMSON_ISLE.isInIsland() && LorenzUtils.skyBlockArea == "Blazing Volcano" && (config.hideParticles || config.drawBox)
+    private fun shouldProcessParticles() =
+        IslandType.CRIMSON_ISLE.isInIsland() && LorenzUtils.skyBlockArea == "Blazing Volcano" && (config.hideParticles || config.drawBox)
 }

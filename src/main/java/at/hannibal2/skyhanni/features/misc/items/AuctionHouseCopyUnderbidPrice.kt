@@ -12,7 +12,7 @@ import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.NEUInternalName
 import at.hannibal2.skyhanni.utils.NEUItems.getPrice
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
-import at.hannibal2.skyhanni.utils.NumberUtil.formatNumber
+import at.hannibal2.skyhanni.utils.NumberUtil.formatLong
 import at.hannibal2.skyhanni.utils.OSUtils
 import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.StringUtils.matches
@@ -68,7 +68,7 @@ class AuctionHouseCopyUnderbidPrice {
 
         for (line in lore) {
             auctionPricePattern.matchMatcher(line) {
-                val underbid = group("coins").formatNumber() - 1
+                val underbid = group("coins").formatLong() - 1
                 OSUtils.copyToClipboard("$underbid")
                 ChatUtils.chat("Copied ${underbid.addSeparators()} to clipboard.")
                 return
