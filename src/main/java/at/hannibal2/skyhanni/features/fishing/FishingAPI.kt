@@ -86,9 +86,9 @@ object FishingAPI {
     fun ItemStack.isFishingRod() = getInternalName().isFishingRod()
     fun NEUInternalName.isFishingRod() = isLavaRod() || isWaterRod()
 
-    fun NEUInternalName?.isLavaRod() = this in lavaRods
+    fun NEUInternalName.isLavaRod() = this in lavaRods
 
-    fun NEUInternalName?.isWaterRod() = this in waterRods
+    fun NEUInternalName.isWaterRod() = this in waterRods
 
     fun ItemStack.isBait(): Boolean = stackSize == 1 && getItemCategoryOrNull() == ItemCategory.FISHING_BAIT
 
