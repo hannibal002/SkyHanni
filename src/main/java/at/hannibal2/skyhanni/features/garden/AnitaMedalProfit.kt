@@ -104,6 +104,7 @@ class AnitaMedalProfit {
             itemName,
             "",
             "§7Item price: §6${NumberUtil.format(itemPrice)} ",
+            // TODO add more exact material cost breakdown
             "§7Material cost: §6${NumberUtil.format(fullCost)} ",
             "§7Final profit: §6${NumberUtil.format(profit)} ",
         )
