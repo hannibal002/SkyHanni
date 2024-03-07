@@ -452,7 +452,9 @@ public class Storage {
             public Map<DungeonAPI.DungeonFloor, Integer> bosses = new HashMap<>();
 
             @Expose
-            public List<DungeonRunInfo> runs = Stream.generate(DungeonRunInfo::new).limit(CroesusChestTracker.Companion.getMaxChests()).collect(Collectors.toCollection(ArrayList::new));
+            public List<DungeonRunInfo> runs = Stream.generate(DungeonRunInfo::new)
+                .limit(CroesusChestTracker.Companion.getMaxChests())
+                .collect(Collectors.toCollection(ArrayList::new));
 
 
             public static class DungeonRunInfo {
