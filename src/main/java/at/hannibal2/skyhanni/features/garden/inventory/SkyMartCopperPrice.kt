@@ -66,7 +66,7 @@ class SkyMartCopperPrice {
         val table = mutableListOf<DisplayTableEntry>()
         for (stack in event.inventoryItems.values) {
             val lore = stack.getLore()
-            val otherItemsPrice = stack.loreCosts().sumOf { it.getPrice() }
+            val otherItemsPrice = stack.loreCosts().sumOf { it.getPrice() }.takeIf { it != -1.0 }
 
             for (line in lore) {
                 val copper = copperPattern.matchMatcher(line) {
@@ -75,23 +75,24 @@ class SkyMartCopperPrice {
 
                 val internalName = stack.getInternalName()
                 val lowestBin = internalName.getPriceOrNull() ?: continue
-                val profit = lowestBin - otherItemsPrice
+                val profit = lowestBin - (otherItemsPrice ?: 0.0)
 
                 val factor = profit / copper
                 val perFormat = NumberUtil.format(factor)
 
                 val itemName = stack.itemName
-                val hover = listOf(
-                    itemName,
-                    "",
-                    "§7Item price: §6${NumberUtil.format(lowestBin)} ",
-                    "§7Additional cost: §6${NumberUtil.format(otherItemsPrice)} ",
-                    "",
-                    "§7Profit per purchase: §6${NumberUtil.format(profit)} ",
-                    "§7Copper amount: §c${copper.addSeparators()} ",
-                    "",
-                    "§7Profit per copper: §6${perFormat} ",
-                )
+                val hover = buildList {
+                    add(itemName)
+                    add("")
+                    add("§7Item price: §6${NumberUtil.format(lowestBin)} ")
+                    otherItemsPrice?.let {
+                        add("§7Additional cost: §6${NumberUtil.format(it)} ")
+                    }
+                    add("§7Profit per purchase: §6${NumberUtil.format(profit)} ")
+                    add("")
+                    add("§7Copper amount: §c${copper.addSeparators()} ")
+                    add("§7Profit per copper: §6${perFormat} ")
+                }
                 table.add(DisplayTableEntry("$itemName§f:", "§6§l$perFormat", factor, internalName, hover))
             }
         }
