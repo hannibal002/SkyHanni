@@ -22,9 +22,9 @@ object DebugCommand {
         list.add("= Debug Information for SkyHanni ${SkyHanniMod.version} =")
         list.add("")
 
-        val search = args.getOrNull(0)
+        val search = args.joinToString(" ")
         list.add(
-            if (search != null) {
+            if (search.isNotEmpty()) {
                 if (search.equalsIgnoreColor("all")) {
                     "search for everything:"
                 } else "search '$search':"

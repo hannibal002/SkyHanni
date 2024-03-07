@@ -184,8 +184,10 @@ class QuestLoader(private val dailyQuestHelper: DailyQuestHelper) {
                     val haveAmount = split[3].toInt()
                     quest.haveAmount = haveAmount
                 } catch (e: IndexOutOfBoundsException) {
-                    println("text: '$text'")
-                    e.printStackTrace()
+                    ErrorManager.logErrorWithData(
+                        e, "Error loading Crimson Isle Quests from config.",
+                        "text" to text,
+                    )
                 }
             }
             addQuest(quest)

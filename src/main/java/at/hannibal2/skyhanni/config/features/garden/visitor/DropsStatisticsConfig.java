@@ -41,7 +41,7 @@ public class DropsStatisticsConfig {
         name = "Text Format",
         desc = "Drag text to change the appearance of the overlay."
     )
-    @ConfigEditorDraggableList()
+    @ConfigEditorDraggableList
     public List<DropsStatisticsTextEntry> textFormat = new ArrayList<>(Arrays.asList(
         TITLE,
         TOTAL_VISITORS,

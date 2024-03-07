@@ -6,14 +6,23 @@ import at.hannibal2.skyhanni.features.garden.GardenAPI
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.NumberUtil
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
+import at.hannibal2.skyhanni.utils.NumberUtil.formatInt
 import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
+import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
 class ComposterInventoryNumbers {
 
-    private val valuePattern = ".* §e(?<having>.*)§6/(?<total>.*)".toPattern()
-    private val compostsPattern = "§7§7Compost Available: §a(?<amount>.*)".toPattern()
+    private val patternGroup = RepoPattern.group("garden.composter.inventory.numbers")
+    private val valuePattern by patternGroup.pattern(
+        "value",
+        ".* §e(?<having>.*)§6/(?<total>.*)"
+    )
+    private val amountPattern by patternGroup.pattern(
+        "amount",
+        "§7§7Compost Available: §a(?<amount>.*)"
+    )
 
     @SubscribeEvent
     fun onRenderItemTip(event: RenderInventoryItemTipEvent) {
@@ -29,8 +38,8 @@ class ComposterInventoryNumbers {
         // Composts Available
         if (slotNumber == 13) {
             for (line in stack.getLore()) {
-                compostsPattern.matchMatcher(line) {
-                    val total = group("amount").replace(",", "").toInt()
+                amountPattern.matchMatcher(line) {
+                    val total = group("amount").formatInt()
                     event.offsetY = -2
                     event.offsetX = -20
                     event.stackTip = "§6${total.addSeparators()}"
@@ -43,7 +52,7 @@ class ComposterInventoryNumbers {
         if (slotNumber == 46 || slotNumber == 52) {
             for (line in stack.getLore()) {
                 valuePattern.matchMatcher(line) {
-                    val having = group("having").removeColor().replace(",", "").toDouble().toInt()
+                    val having = group("having").removeColor().formatInt()
                     val havingFormat = NumberUtil.format(having)
                     val total = group("total").removeColor()
 

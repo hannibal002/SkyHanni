@@ -91,7 +91,7 @@ class BingoCardDisplay {
             newList.add(Renderable.clickAndHover("§cOpen the §e/bingo §ccard.",
                 listOf("Click to run §e/bingo"),
                 onClick = {
-                    LorenzUtils.sendCommandToServer("bingo")
+                    ChatUtils.sendCommandToServer("bingo")
                 }
             ))
         } else {
@@ -123,7 +123,7 @@ class BingoCardDisplay {
         }
 
         if (hiddenGoals > 0) {
-            val name = StringUtils.canBePlural(hiddenGoals, "goal", "goals")
+            val name = StringUtils.pluralize(hiddenGoals, "goal")
             add(Renderable.string("§7+ $hiddenGoals more §cunknown §7community $name."))
         }
         add(Renderable.string(" "))
@@ -156,7 +156,7 @@ class BingoCardDisplay {
         addGoals(todo) { it.description.removeColor() }
 
         if (hiddenGoals > 0) {
-            val name = StringUtils.canBePlural(hiddenGoals, "goal", "goals")
+            val name = StringUtils.pluralize(hiddenGoals, "goal")
             add(Renderable.string("§7+ $hiddenGoals more §cunknown §7$name."))
         }
         hasHiddenPersonalGoals = config.nextTipDuration.get() && nextTip != 14.days

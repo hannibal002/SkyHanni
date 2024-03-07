@@ -13,8 +13,10 @@ import at.hannibal2.skyhanni.utils.CollectionUtils.nextAfter
 import at.hannibal2.skyhanni.utils.CollectionUtils.sortedDesc
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.LorenzUtils
+import at.hannibal2.skyhanni.utils.NumberUtil.formatInt
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
+import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import io.github.moulberry.notenoughupdates.util.SkyBlockTime
 import net.minecraft.item.ItemStack
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
@@ -22,15 +24,29 @@ import kotlin.time.Duration.Companion.minutes
 
 object FarmingContestAPI {
 
-    private val timePattern = "§a(?<month>.*) (?<day>.*)(?:rd|st|nd|th), Year (?<year>.*)".toPattern()
+    private val patternGroup = RepoPattern.group("garden.farming.contest")
+    private val timePattern by patternGroup.pattern(
+        "time",
+        "§a(?<month>.*) (?<day>.*)(?:rd|st|nd|th), Year (?<year>.*)"
+    )
+    private val cropPattern by patternGroup.pattern(
+        "crop",
+        "§8(?<crop>.*) Contest"
+    )
+    private val sidebarCropPattern by patternGroup.pattern(
+        "sidebarcrop",
+        "(?:§e○|§6☘) §f(?<crop>.*) §a.*"
+    )
+
     private val contests = mutableMapOf<Long, FarmingContest>()
-    private val cropPattern = "§8(?<crop>.*) Contest".toPattern()
     var inContest = false
     var contestCrop: CropType? = null
     private var startTime = SimpleTimeMark.farPast()
-    private val sidebarCropPattern = "(?:§e○|§6☘) §f(?<crop>.*) §a.*".toPattern()
-
     var inInventory = false
+
+    init {
+        ContestBracket.entries.forEach { it.bracketPattern }
+    }
 
     @SubscribeEvent
     fun onTick(event: LorenzTickEvent) {
@@ -116,8 +132,8 @@ object FarmingContestAPI {
         val brackets = buildMap {
             for (bracket in ContestBracket.entries) {
                 val amount = lore.firstNotNullOfOrNull {
-                    bracket.pattern.matchMatcher(it) {
-                        group("amount").replace(",", "").toInt()
+                    bracket.bracketPattern.matchMatcher(it) {
+                        group("amount").formatInt()
                     }
                 } ?: continue
                 put(bracket, amount)
