@@ -258,17 +258,28 @@ object Commands {
             "shofficialwikithis",
             "Searches the official wiki with SkyHanni's own method."
         ) { WikiManager.otherWikiCommands(it, false, true) }
-        registerCommand0("shcalccrop", "Calculate how many crops need to be farmed between different crop milestones.", {
-            FarmingMilestoneCommand.onCommand(it.getOrNull(0), it.getOrNull(1), it.getOrNull(2), false)
-        }, FarmingMilestoneCommand::onComplete)
-        registerCommand0("shcalccroptime", "Calculate how long you need to farm crops between different crop milestones.", {
-            FarmingMilestoneCommand.onCommand(it.getOrNull(0), it.getOrNull(1), it.getOrNull(2), true)
-        }, FarmingMilestoneCommand::onComplete)
+        registerCommand0(
+            "shcalccrop",
+            "Calculate how many crops need to be farmed between different crop milestones.",
+            {
+                FarmingMilestoneCommand.onCommand(it.getOrNull(0), it.getOrNull(1), it.getOrNull(2), false)
+            },
+            FarmingMilestoneCommand::onComplete
+        )
+        registerCommand0(
+            "shcalccroptime",
+            "Calculate how long you need to farm crops between different crop milestones.",
+            {
+                FarmingMilestoneCommand.onCommand(it.getOrNull(0), it.getOrNull(1), it.getOrNull(2), true)
+            },
+            FarmingMilestoneCommand::onComplete
+        )
         registerCommand0(
             "shskills",
             "Skills XP/Level related command",
             { SkillAPI.onCommand(it) },
-            SkillAPI::onComplete)
+            SkillAPI::onComplete
+        )
     }
 
     private fun usersBugFix() {
@@ -358,7 +369,10 @@ object Commands {
     private fun developersCodingHelp() {
         registerCommand("shrepopatterns", "See where regexes are loaded from") { RepoPatternGui.open() }
         registerCommand("shtest", "Unused test command.") { SkyHanniDebugsAndTests.testCommand(it) }
-        registerCommand("shtestitem", "test item internal name resolving") { SkyHanniDebugsAndTests.testItemCommand(it) }
+        registerCommand(
+            "shtestitem",
+            "test item internal name resolving"
+        ) { SkyHanniDebugsAndTests.testItemCommand(it) }
         registerCommand(
             "shfindnullconfig",
             "Find config elements that are null and prints them into the console"

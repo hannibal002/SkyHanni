@@ -11,7 +11,6 @@ import at.hannibal2.skyhanni.test.GriffinUtils.drawWaypointFilled
 import at.hannibal2.skyhanni.utils.LocationUtils.distanceSqToPlayer
 import at.hannibal2.skyhanni.utils.LorenzColor
 import at.hannibal2.skyhanni.utils.LorenzUtils
-import at.hannibal2.skyhanni.utils.LorenzUtils.anyContains
 import at.hannibal2.skyhanni.utils.RenderUtils.drawDynamicText
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
@@ -94,9 +93,12 @@ class BasketWaypoints {
         return if (config.onlyClosest) closest == this else true
     }
 
+    // TODO use regex with the help of knowing the original lore. Will most likely need to wait until next halloween event
     private fun checkScoreboardHalloweenSpecific(): Boolean {
-        val list = ScoreboardData.sidebarLinesFormatted
-        return list.anyContains("Hypixel Level") && list.anyContains("Halloween") && list.anyContains("Baskets")
+        val a = ScoreboardData.sidebarLinesFormatted.any { it.contains("Hypixel Level") }
+        val b = ScoreboardData.sidebarLinesFormatted.any { it.contains("Halloween") }
+        val c = ScoreboardData.sidebarLinesFormatted.any { it.contains("Baskets") }
+        return a && b && c
     }
 
     @SubscribeEvent

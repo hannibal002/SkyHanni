@@ -78,16 +78,16 @@ class CollectionTracker {
 
             val foundInternalName = NEUInternalName.fromItemNameOrNull(rawName)
             if (foundInternalName == null) {
-                ChatUtils.error("Item '$rawName' does not exist!")
+                ChatUtils.userError("Item '$rawName' does not exist!")
                 return
             }
 
             val stack = foundInternalName.getItemStackOrNull()
             if (stack == null) {
-                ChatUtils.error("Item '$rawName' does not exist!")
+                ChatUtils.userError("Item '$rawName' does not exist!")
                 return
             }
-            setNewCollection(foundInternalName, stack.name!!.removeColor())
+            setNewCollection(foundInternalName, stack.name.removeColor())
         }
 
         private fun fixTypo(rawName: String) = when (rawName) {

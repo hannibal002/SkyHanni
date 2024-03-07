@@ -128,7 +128,7 @@ object DicerRngDropTracker {
         val crop = event.crop
         cropInHand = if (crop == CropType.MELON || crop == CropType.PUMPKIN) crop else null
         if (cropInHand != null) {
-            toolName = event.toolItem!!.name!!
+            toolName = event.toolItem!!.name
         }
         tracker.update()
     }

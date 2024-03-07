@@ -27,14 +27,12 @@ import net.minecraft.entity.SharedMonsterAttributes
 import net.minecraft.launchwrapper.Launch
 import net.minecraft.util.ChatComponentText
 import net.minecraftforge.fml.common.FMLCommonHandler
-import java.io.Serializable
 import java.text.DecimalFormat
 import java.text.SimpleDateFormat
 import java.util.Timer
 import java.util.TimerTask
 import java.util.regex.Matcher
 import kotlin.time.Duration
-import kotlin.time.Duration.Companion.milliseconds
 import kotlin.time.Duration.Companion.seconds
 
 object LorenzUtils {
@@ -144,7 +142,7 @@ object LorenzUtils {
 
     fun getSBMonthByName(month: String): Int {
         var monthNr = 0
-        for (i in 1 .. 12) {
+        for (i in 1..12) {
             val monthName = SkyBlockTime.monthName(i)
             if (month == monthName) {
                 monthNr = i
@@ -307,9 +305,6 @@ object LorenzUtils {
         TitleManager.sendTitle(text, duration, height, fontSize)
     }
 
-    @Deprecated("Dont use this approach at all. check with regex or equals instead.", ReplaceWith("Regex or equals"))
-    fun Iterable<String>.anyContains(element: String) = any { it.contains(element) }
-
     inline fun <reified T : Enum<T>> enumValueOfOrNull(name: String): T? {
         val enums = enumValues<T>()
         return enums.firstOrNull { it.name == name }
@@ -372,5 +367,5 @@ object LorenzUtils {
     fun sendMessageToServer(message: String) = ChatUtils.sendMessageToServer(message)
 
     fun inMiningIsland() = IslandType.GOLD_MINES.isInIsland() || IslandType.DEEP_CAVERNS.isInIsland()
-            || IslandType.DWARVEN_MINES.isInIsland() || IslandType.CRYSTAL_HOLLOWS.isInIsland()
+        || IslandType.DWARVEN_MINES.isInIsland() || IslandType.CRYSTAL_HOLLOWS.isInIsland()
 }

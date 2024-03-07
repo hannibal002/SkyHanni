@@ -32,8 +32,7 @@ class BazaarCancelledBuyOrderClipboard {
         if (!isEnabled()) return
 
         val stack = event.itemStack
-        val name = stack.name ?: return
-        if (!name.contains("Cancel Order")) return
+        if (!stack.name.contains("Cancel Order")) return
 
         for (line in stack.getLore()) {
             lastAmountPattern.findMatcher(line) {
