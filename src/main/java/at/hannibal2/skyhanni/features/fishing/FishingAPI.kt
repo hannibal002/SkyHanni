@@ -11,10 +11,9 @@ import at.hannibal2.skyhanni.features.fishing.trophy.TrophyFishManager
 import at.hannibal2.skyhanni.features.fishing.trophy.TrophyFishManager.getFilletValue
 import at.hannibal2.skyhanni.features.fishing.trophy.TrophyRarity
 import at.hannibal2.skyhanni.utils.BlockUtils.getBlockAt
-import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.ItemCategory
+import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName
 import at.hannibal2.skyhanni.utils.ItemUtils.getItemCategoryOrNull
-import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.LorenzVec
 import at.hannibal2.skyhanni.utils.NEUInternalName
@@ -84,8 +83,12 @@ object FishingAPI {
         }
     }
 
-    private fun NEUInternalName.isFishingRod() = contains("ROD")
-    fun ItemStack.isFishingRod() = getItemCategoryOrNull() == ItemCategory.FISHING_ROD || getItemCategoryOrNull() == ItemCategory.FISHING_WEAPON
+    fun ItemStack.isFishingRod() = getInternalName().isFishingRod()
+    fun NEUInternalName.isFishingRod() = isLavaRod() || isWaterRod()
+
+    fun NEUInternalName?.isLavaRod() = this in lavaRods
+
+    fun NEUInternalName?.isWaterRod() = this in waterRods
 
     fun ItemStack.isBait(): Boolean = stackSize == 1 && getItemCategoryOrNull() == ItemCategory.FISHING_BAIT
 
@@ -93,20 +96,18 @@ object FishingAPI {
     fun onItemInHandChange(event: ItemInHandChangeEvent) {
         // TODO correct rod type per island water/lava
         holdingRod = event.newItem.isFishingRod()
-        holdingLavaRod = event.newItem in lavaRods
-        holdingWaterRod = event.newItem in waterRods
+        holdingLavaRod = event.newItem.isLavaRod()
+        holdingWaterRod = event.newItem.isWaterRod()
     }
 
     @SubscribeEvent
     fun onRepoReload(event: RepositoryReloadEvent) {
         val data = event.getConstant<ItemsJson>("Items")
-        lavaRods = data.lava_fishing_rods ?: error("§clava_fishing_rods is missing from repo.")
-        waterRods = data.water_fishing_rods ?: error("§cwater_fishing_rods is missing from repo.")
+        lavaRods = data.lava_fishing_rods
+        waterRods = data.water_fishing_rods
     }
 
-    fun isLavaRod() = InventoryUtils.getItemInHand()?.getLore()?.any { it.contains("Lava Rod") } ?: false
-
-    private fun getAllowedBlocks() = if (isLavaRod()) lavaBlocks else waterBlocks
+    private fun getAllowedBlocks() = if (holdingLavaRod) lavaBlocks else waterBlocks
 
     fun getFilletPerTrophy(internalName: NEUInternalName): Int {
         val internal = internalName.asString()

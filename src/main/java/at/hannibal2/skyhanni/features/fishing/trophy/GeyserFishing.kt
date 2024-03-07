@@ -60,6 +60,11 @@ class GeyserFishing {
         val geyser = geyser ?: return
         if (geyser.distanceToPlayerIgnoreY() > 96) return
 
+        if (!config.drawBox) return
+        if (!IslandType.CRIMSON_ISLE.isInIsland()) return
+        if (config.onlyWithRod && !FishingAPI.holdingLavaRod) return
+        if (geyser.distanceToPlayerIgnoreY() > 96) return
+
         val geyserBox = geyserBox ?: return
         val color = Color(SpecialColour.specialToChromaRGB(config.boxColor), true)
         event.drawFilledBoundingBox_nea(geyserBox, color)
