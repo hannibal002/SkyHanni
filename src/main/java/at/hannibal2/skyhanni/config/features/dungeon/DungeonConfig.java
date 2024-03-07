@@ -106,7 +106,7 @@ public class DungeonConfig {
 
     @Expose
     @ConfigOption(name = "Croesus Chest", desc = "Adds a visual highlight to the Croesus inventory that " +
-        "shows unopened chests.") // TODO move to chest
+        "shows unopened chests.") // TODO move( , "dungeon.croesusUnopenedChestTracker" ,"dungeon.chest.showUnopened" )
     @ConfigEditorBoolean
     @FeatureToggle
     public boolean croesusUnopenedChestTracker = true;
