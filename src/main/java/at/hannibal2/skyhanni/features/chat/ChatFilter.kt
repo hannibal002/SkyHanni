@@ -205,6 +205,7 @@ class ChatFilter {
         "§aYou used your §r§6Mining Speed Boost §r§aPickaxe Ability!",
         "§cYour Mining Speed Boost has expired!",
         "§a§r§6Mining Speed Boost §r§ais now available!",
+        "§aYou have just received §r§60 coins §r§aas interest in your personal bank account!",
     )
 
     // Party
