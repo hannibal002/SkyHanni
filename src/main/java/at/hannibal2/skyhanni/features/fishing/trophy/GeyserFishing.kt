@@ -22,19 +22,17 @@ import java.awt.Color
 class GeyserFishing {
     private val config get() = SkyHanniMod.feature.fishing.trophyFishing.geyserOptions
 
+    private val geyserOffset = LorenzVec(0.1f, 0.6f, 0.1f)
+
     private var geyser: LorenzVec? = null
     private var geyserBox: AxisAlignedBB? = null
 
     @SubscribeEvent(priority = EventPriority.LOW, receiveCanceled = true)
     fun onReceiveParticle(event: ReceiveParticleEvent) {
         if (!shouldProcessParticles()) return
-        if (event.type != EnumParticleTypes.CLOUD || event.count != 15 || event.speed != 0.05f || event.offset != LorenzVec(
-                0.1f,
-                0.6f,
-                0.1f
-            )
-        ) return
-
+        with(event) {
+            if (type != EnumParticleTypes.CLOUD || count != 15 || speed != 0.05f || offset != geyserOffset) return
+        }
         geyser = event.location
         val potentialGeyser = geyser ?: return
 

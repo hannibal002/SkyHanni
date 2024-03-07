@@ -95,17 +95,9 @@ object SkillProgress {
             SkillProgressConfig.TextAlignment.LEFT,
             SkillProgressConfig.TextAlignment.RIGHT,
             -> {
-                config.displayPosition.renderRenderables(
-                    listOf(
-                        Renderable.fixedSizeLine(
-                            horizontalContainer(
-                                display,
-                                horizontalAlign = textAlignment.alignment
-                            ), maxWidth
-                        )
-                    ),
-                    posLabel = "Skill Progress"
-                )
+                val content = horizontalContainer(display, horizontalAlign = textAlignment.alignment)
+                val renderables = listOf(Renderable.fixedSizeLine(content, maxWidth))
+                config.displayPosition.renderRenderables(renderables, posLabel = "Skill Progress")
             }
 
             else -> {}
