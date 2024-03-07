@@ -40,7 +40,7 @@ class DungeonFinderFeatures {
         if (!LorenzUtils.inSkyBlock || LorenzUtils.skyBlockArea != "Dungeon Hub") return
         if (!config.floorAsStackSize) return
 
-        val itemName = event.stack.name?.removeColor() ?: ""
+        val itemName = event.stack.name.removeColor()
         val invName = InventoryUtils.openInventoryName()
 
         if (invName == "Select Floor") {
@@ -105,8 +105,7 @@ class DungeonFinderFeatures {
             if (slot.slotNumber != slot.slotIndex) continue
             if (slot.stack == null) continue
 
-            val itemName = slot.stack.name ?: continue
-            if (!itemName.endsWith(" Party")) continue
+            if (!slot.stack.name.endsWith(" Party")) continue
 
             if (config.markIneligibleGroups && slot.stack.getLore().any { ineligiblePattern.matches(it) }) {
                 slot highlight LorenzColor.DARK_RED

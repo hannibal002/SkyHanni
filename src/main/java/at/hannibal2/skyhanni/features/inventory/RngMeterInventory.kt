@@ -25,8 +25,7 @@ class RngMeterInventory {
 
         val stack = event.stack
         if (config.floorName && chestName == "Catacombs RNG Meter") {
-            val name = stack.name ?: return
-            if (name.removeColor() == "RNG Meter") {
+            if (stack.name.removeColor() == "RNG Meter") {
                 event.stackTip = stack.getLore()[0].between("(", ")")
             }
         }

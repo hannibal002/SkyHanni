@@ -54,9 +54,9 @@ object ErrorManager {
         cache.clear()
     }
 
-    fun skyHanniError(message: String): Nothing {
+    fun skyHanniError(message: String, vararg extraData: Pair<String, Any?>): Nothing {
         val exception = IllegalStateException(message)
-        logErrorWithData(exception, message)
+        logErrorWithData(exception, message, extraData = extraData)
         throw exception
     }
 
@@ -78,11 +78,6 @@ object ErrorManager {
             OSUtils.copyToClipboard(it)
             "$name copied into the clipboard, please report it on the SkyHanni discord!"
         } ?: "Error id not found!")
-    }
-
-    @Deprecated("Use data as well", ReplaceWith("ErrorManager.logErrorStateWithData(userMessage, internalMessage)"))
-    fun logErrorState(userMessage: String, internalMessage: String) {
-        logError(IllegalStateException(internalMessage), userMessage, ignoreErrorCache = false, noStackTrace = false)
     }
 
     fun logErrorStateWithData(

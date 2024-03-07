@@ -1,7 +1,6 @@
 package at.hannibal2.skyhanni.features.event.diana
 
 import at.hannibal2.skyhanni.SkyHanniMod
-import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.events.EntityHealthUpdateEvent
 import at.hannibal2.skyhanni.events.LorenzChatEvent
 import at.hannibal2.skyhanni.events.LorenzKeyPressEvent
@@ -226,7 +225,7 @@ object InquisitorWaypointShare {
 
     @SubscribeEvent(priority = EventPriority.LOW, receiveCanceled = true)
     fun onFirstChatEvent(event: PacketEvent.ReceiveEvent) {
-        if (!isEnabled() || LorenzUtils.skyBlockIsland != IslandType.HUB) return
+        if (!isEnabled()) return
         val packet = event.packet
         if (packet !is S02PacketChat) return
         val messageComponent = packet.chatComponent
