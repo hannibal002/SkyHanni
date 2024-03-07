@@ -355,17 +355,9 @@ object GuiRenderUtils {
         }
 
         if (k > 0) {
-            Utils.drawTexturedRect(
-                x,
-                y,
-                w_2.coerceAtMost(k).toFloat(),
-                height,
-                0f,
-                w_2.toDouble().coerceAtMost(k.toDouble() / xSize).toFloat(),
-                vMinFilled,
-                vMaxFilled,
-                GL11.GL_NEAREST
-            )
+            val uMax = w_2.toDouble().coerceAtMost(k.toDouble() / xSize).toFloat()
+            val width = w_2.coerceAtMost(k).toFloat()
+            Utils.drawTexturedRect(x, y, width, height, 0f, uMax, vMinFilled, vMaxFilled, GL11.GL_NEAREST)
             if (completed > 0.5f) {
                 Utils.drawTexturedRect(
                     x + w_2,

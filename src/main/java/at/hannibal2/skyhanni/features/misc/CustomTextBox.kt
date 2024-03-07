@@ -43,7 +43,7 @@ class CustomTextBox {
     }
 
     private fun isEnabled() =
-        config.enabled && (LorenzUtils.inSkyBlock || OutsideSbFeature.CUSTOM_TEXT_BOX.isSelected())
+        (LorenzUtils.inSkyBlock || OutsideSbFeature.CUSTOM_TEXT_BOX.isSelected()) && config.enabled
 
     @SubscribeEvent
     fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
