@@ -73,6 +73,7 @@ class CroesusChestTracker {
             for ((run, slot) in InventoryUtils.getItemsInOpenChest()
                 .mapNotNull { slot -> runSlots(slot.slotIndex, slot) }) {
 
+                // If one chest is null every followup chest is null. Therefore, an early return is possible
                 if (run.floor == null) return
 
                 val state = run.openState ?: OpenedState.UNOPENED
