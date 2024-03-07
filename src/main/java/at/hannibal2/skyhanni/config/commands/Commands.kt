@@ -283,11 +283,11 @@ object Commands {
             SkillAPI::onComplete
         )
         registerCommand(
-            "shlimbo",
+            "shlimbostats",
             "Prints your Limbo Stats!"
         ) { LimboTimeTracker.printStats() }
         registerCommand(
-            "shgotolimbo",
+            "shlimbo",
             "Warps you to Limbo."
         ) { MiscFeatures().goToLimbo() }
     }
