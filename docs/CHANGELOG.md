@@ -95,6 +95,15 @@
 + Moved bazaar config into inventory category. - hannibal2
 + Optimize IntelliJ icon. - nea
 + Used the isInIsland function more. - CalMWolfs (https://github.com/hannibal002/SkyHanni/pull/1107)
++ Optimized item.isFishingRod logic. - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/1056)
++ Code cleanup in multiple files. - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/1113)
++ ItemStack.name no longer nullable. - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/1101)
++ Better error handling (more user facing errors - less hidden errors). - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/1101)
++ Replaced/fixed deprecated function calls. - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/1101)
++ Added item category FISHING_BAIT. - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/1101)
++ Use internal name more in ItemDisplayOverlayFeatures - CalMWolfs (https://github.com/hannibal002/SkyHanni/pull/1114)
++ Reformatted the code in a lot of files. - CalMWolfs (https://github.com/hannibal002/SkyHanni/pull/1109)
++ Changed line endings to be normalized over the whole project and prevents further breaks. - your_name_here (https://github.com/hannibal002/SkyHanni/pull/1112)
 
 ### Removed Features
 
