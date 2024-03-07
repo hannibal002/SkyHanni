@@ -170,7 +170,16 @@ object LorenzUtils {
 
             val hover = entry.hover
             entry.item.getItemStackOrNull()?.let {
-                add(listOf(it, Renderable.hoverTips("$displayName   ${entry.right}", tips = hover)))
+                add(
+                    listOf(
+                        it,
+                        Renderable.hoverTips(
+                            "$displayName   ${entry.right}",
+                            tips = hover,
+                            highlightsOnHoverSlots = entry.highlightsOnHoverSlots
+                        )
+                    )
+                )
             }
         }
     }
