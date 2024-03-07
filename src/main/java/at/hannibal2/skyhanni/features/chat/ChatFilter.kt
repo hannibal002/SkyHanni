@@ -198,7 +198,7 @@ class ChatFilter {
 
     // Useless Notification
     private val uselessNotificationPatterns = listOf(
-        "§aYou tipped (\\d+) (player|players)!".toPattern()
+        "§aYou tipped \\d+ players? in \\d+(?: different)? games?!".toPattern()
     )
     private val uselessNotificationMessages = listOf(
         "§eYour previous §r§6Plasmaflux Power Orb §r§ewas removed!",
@@ -269,7 +269,7 @@ class ChatFilter {
 
     private val anitaFortunePattern by RepoPattern.pattern(
         "chat.jacobevent.accessory",
-        "§e\\[NPC] Jacob§f: Your §9Anita's (\\w+) §fis giving you §6\\+(\\d{1,2})☘ (\\w+) Fortune §fduring the contest!"
+        "§e\\[NPC] Jacob§f: §rYour §9Anita's (\\w+) §fis giving you §6\\+(\\d{1,2})☘ (\\w+) Fortune §fduring the contest!"
     )
 
     private val skymallPerkPattern by RepoPattern.pattern(

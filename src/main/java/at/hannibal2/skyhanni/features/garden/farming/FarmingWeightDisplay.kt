@@ -86,7 +86,11 @@ class FarmingWeightDisplay {
         event.move(3, "garden.eliteFarmingWeightPos", "garden.eliteFarmingWeights.pos")
         event.move(3, "garden.eliteFarmingWeightLeaderboard", "garden.eliteFarmingWeights.leaderboard")
         event.move(3, "garden.eliteFarmingWeightOvertakeETA", "garden.eliteFarmingWeights.overtakeETA")
-        event.move(3, "garden.eliteFarmingWeightOffScreenDropMessage", "garden.eliteFarmingWeights.offScreenDropMessage")
+        event.move(
+            3,
+            "garden.eliteFarmingWeightOffScreenDropMessage",
+            "garden.eliteFarmingWeights.offScreenDropMessage"
+        )
         event.move(3, "garden.eliteFarmingWeightOvertakeETAAlways", "garden.eliteFarmingWeights.overtakeETAAlways")
         event.move(3, "garden.eliteFarmingWeightETAGoalRank", "garden.eliteFarmingWeights.ETAGoalRank")
         event.move(3, "garden.eliteFarmingWeightIgnoreLow", "garden.eliteFarmingWeights.ignoreLow")
@@ -538,7 +542,10 @@ class FarmingWeightDisplay {
             val apiResponse = APIUtil.getJSONResponse(url)
 
             try {
-                val apiData = ConfigManager.gson.fromJson<Map<String, Double>>(apiResponse, object : TypeToken<Map<String, Double>>() {}.type)
+                val apiData = ConfigManager.gson.fromJson<Map<String, Double>>(
+                    apiResponse,
+                    object : TypeToken<Map<String, Double>>() {}.type
+                )
                 for (crop in apiData) {
                     val cropType = CropType.getByName(crop.key)
                     factorPerCrop[cropType] = crop.value

@@ -106,7 +106,8 @@ class MarkedPlayerManager {
         }
     }
 
-    private fun isEnabled() = config.highlightInWorld && (LorenzUtils.inSkyBlock || OutsideSbFeature.MARKED_PLAYERS.isSelected())
+    private fun isEnabled() =
+        config.highlightInWorld && (LorenzUtils.inSkyBlock || OutsideSbFeature.MARKED_PLAYERS.isSelected())
 
     @SubscribeEvent
     fun onWorldChange(event: LorenzWorldChangeEvent) {

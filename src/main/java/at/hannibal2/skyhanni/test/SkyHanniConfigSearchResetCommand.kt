@@ -123,7 +123,7 @@ object SkyHanniConfigSearchResetCommand {
                 "term" to term,
                 "rawJson" to rawJson,
                 "args" to args.joinToString(" ")
-                )
+            )
             "§cCould not change config element '$term' to '$rawJson'"
         }
     }

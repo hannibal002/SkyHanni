@@ -69,10 +69,9 @@ class FishingBaitWarnings {
         for (entity in EntityUtils.getEntitiesNearby<EntityItem>(bobber.getLorenzVec(), 6.0)) {
             val itemStack = entity.entityItem ?: continue
             if (!itemStack.isBait()) continue
-            val name = itemStack.name ?: continue
             val ticksExisted = entity.ticksExisted
             if (ticksExisted in 6..15) {
-                return name
+                return itemStack.name
             }
 
             val distance = "distance: ${entity.getDistanceToEntity(bobber).addSeparators()}"

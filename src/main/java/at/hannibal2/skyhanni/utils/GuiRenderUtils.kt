@@ -302,7 +302,16 @@ object GuiRenderUtils {
     }
 
     // Taken and edited from NEU <- it's broken
-    fun renderTexturedBar(x: Float, y: Float, xSize: Float, completed: Float, color: Color, useChroma: Boolean, texture: SkillProgressBarConfig.TexturedBar.UsedTexture, height: Float) {
+    fun renderTexturedBar(
+        x: Float,
+        y: Float,
+        xSize: Float,
+        completed: Float,
+        color: Color,
+        useChroma: Boolean,
+        texture: SkillProgressBarConfig.TexturedBar.UsedTexture,
+        height: Float
+    ) {
         GlStateManager.pushMatrix()
         GlStateManager.translate(x, y, 0f)
         val w = xSize.toInt()
@@ -316,13 +325,28 @@ object GuiRenderUtils {
 
         if (useChroma) {
             ChromaShaderManager.begin(ChromaType.TEXTURED)
-            GlStateManager.color(Color.LIGHT_GRAY.darker().red / 255f, Color.LIGHT_GRAY.darker().green / 255f, Color.LIGHT_GRAY.darker().blue / 255f, 1f)
+            GlStateManager.color(
+                Color.LIGHT_GRAY.darker().red / 255f,
+                Color.LIGHT_GRAY.darker().green / 255f,
+                Color.LIGHT_GRAY.darker().blue / 255f,
+                1f
+            )
         } else {
             GlStateManager.color(color.darker().red / 255f, color.darker().green / 255f, color.darker().blue / 255f, 1f)
         }
 
         Utils.drawTexturedRect(x, y, w_2.toFloat(), height, 0f, w_2 / xSize, vMinEmpty, vMaxEmpty, GL11.GL_NEAREST)
-        Utils.drawTexturedRect(x + w_2, y, w_2.toFloat(), height, 1 - w_2 / xSize, 1f, vMinEmpty, vMaxEmpty, GL11.GL_NEAREST)
+        Utils.drawTexturedRect(
+            x + w_2,
+            y,
+            w_2.toFloat(),
+            height,
+            1 - w_2 / xSize,
+            1f,
+            vMinEmpty,
+            vMaxEmpty,
+            GL11.GL_NEAREST
+        )
 
         if (useChroma) {
             GlStateManager.color(Color.WHITE.red / 255f, Color.WHITE.green / 255f, Color.WHITE.blue / 255f, 1f)
@@ -330,10 +354,30 @@ object GuiRenderUtils {
             GlStateManager.color(color.red / 255f, color.green / 255f, color.blue / 255f, 1f)
         }
 
-         if (k > 0) {
-            Utils.drawTexturedRect(x, y, w_2.coerceAtMost(k).toFloat(), height, 0f, w_2.toDouble().coerceAtMost(k.toDouble() / xSize).toFloat(), vMinFilled, vMaxFilled, GL11.GL_NEAREST)
+        if (k > 0) {
+            Utils.drawTexturedRect(
+                x,
+                y,
+                w_2.coerceAtMost(k).toFloat(),
+                height,
+                0f,
+                w_2.toDouble().coerceAtMost(k.toDouble() / xSize).toFloat(),
+                vMinFilled,
+                vMaxFilled,
+                GL11.GL_NEAREST
+            )
             if (completed > 0.5f) {
-                Utils.drawTexturedRect(x + w_2, y, (k - w_2).toFloat(), height, 1 - w_2 / xSize, 1 + (k - w) / xSize, vMinFilled, vMaxFilled, GL11.GL_NEAREST)
+                Utils.drawTexturedRect(
+                    x + w_2,
+                    y,
+                    (k - w_2).toFloat(),
+                    height,
+                    1 - w_2 / xSize,
+                    1 + (k - w) / xSize,
+                    vMinFilled,
+                    vMaxFilled,
+                    GL11.GL_NEAREST
+                )
             }
         }
         if (useChroma) {
