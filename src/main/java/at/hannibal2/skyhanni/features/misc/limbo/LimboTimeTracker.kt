@@ -35,8 +35,8 @@ object LimboTimeTracker {
     private var shownPB = false
     private var oldPB: Duration = 0.seconds
     private var userLuck: Float = 0.0F
-    private const val luckMultiplier = 0.000810185F
-    private const val fireMultiplier = 1.01F
+    private const val USER_LUCK_MULTIPLIER = 0.000810185F
+    private const val FIRE_MULTIPLIER = 1.01F
     private var onFire = false
 
     private val bedwarsLobbyLimbo = AxisAlignedBB(-662.0, 43.0, -76.0, -619.0, 86.0, -27.0)
@@ -115,8 +115,8 @@ object LimboTimeTracker {
         if (passedSince > currentPB) {
             oldPB = currentPB
             storage?.personalBest = passedSince.toInt(DurationUnit.SECONDS)
-            userLuck = ((storage?.personalBest ?: 0) * luckMultiplier).round(2)
-            if (onFire) userLuck *= fireMultiplier
+            userLuck = ((storage?.personalBest ?: 0) * USER_LUCK_MULTIPLIER).round(2)
+            if (onFire) userLuck *= FIRE_MULTIPLIER
             ChatUtils.chat("§fYou were in Limbo for §e$duration§f! §d§lPERSONAL BEST§r§f!")
             ChatUtils.chat("§fYour previous Personal Best was §e$oldPB.")
         } else ChatUtils.chat("§fYou were in Limbo for §e$duration§f.")
@@ -150,7 +150,6 @@ object LimboTimeTracker {
             ChatUtils.chat("§fYour current PB is §e${limboPB.seconds}§f, granting you §a+${userLuck.round(2)}✴ SkyHanni User Luck§f!")
             ChatUtils.chat("§fYou have §e${playtime.seconds} §fplaytime!")
         }
-        ChatUtils.chat("hi!")
     }
 
     @SubscribeEvent
@@ -179,6 +178,7 @@ object LimboTimeTracker {
         if (unmigratedPB != 0) {
             ChatUtils.debug("Migrating limbo personalBest")
             storage?.personalBest = unmigratedPB
+            storage?.userLuck = unmigratedPB * USER_LUCK_MULTIPLIER
         }
         if ((storage?.personalBest ?: 0) > (storage?.playtime ?: 0)) {
             ChatUtils.debug("Migrating limbo playtime")
