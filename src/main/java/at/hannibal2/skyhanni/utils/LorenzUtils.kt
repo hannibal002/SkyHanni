@@ -157,21 +157,20 @@ object LorenzUtils {
 
     fun getPlayerName(): String = Minecraft.getMinecraft().thePlayer.name
 
-    // (key -> value) -> (sorting value -> key item icon)
-    fun fillTable(list: MutableList<List<Any>>, data: MutableMap<Pair<String, String>, Pair<Double, NEUInternalName>>) {
-        val keys = data.mapValues { (_, v) -> v.first }.sortedDesc().keys
+    fun MutableList<List<Any>>.fillTable(data: List<DisplayTableEntry>) {
+        val keys = data.associateWith { it.sort }.sortedDesc().keys
         val renderer = Minecraft.getMinecraft().fontRendererObj
-        val longest = keys.map { it.first }.maxOfOrNull { renderer.getStringWidth(it.removeColor()) } ?: 0
+        val longest = keys.map { it.left }.maxOfOrNull { renderer.getStringWidth(it.removeColor()) } ?: 0
 
-        for (pair in keys) {
-            val (name, second) = pair
-            var displayName = name
+        for (entry in data) {
+            var displayName = entry.left
             while (renderer.getStringWidth(displayName.removeColor()) < longest) {
                 displayName += " "
             }
 
-            data[pair]!!.second.getItemStackOrNull()?.let {
-                list.add(listOf(it, "$displayName   $second"))
+            val hover = entry.hover
+            entry.item.getItemStackOrNull()?.let {
+                add(listOf(it, Renderable.hoverTips("$displayName   ${entry.right}", tips = hover)))
             }
         }
     }
