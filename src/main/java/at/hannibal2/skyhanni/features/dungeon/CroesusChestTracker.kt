@@ -88,13 +88,8 @@ class CroesusChestTracker {
     @SubscribeEvent
     fun onInventoryOpen(event: InventoryFullyOpenedEvent) {
         if (!LorenzUtils.inSkyBlock) return
-        if (SkyHanniMod.feature.dungeon.croesusUnopenedChestTracker || config.kismet) croesusPattern.matchMatcher(event.inventoryName) {
-            inCroesusInventory = true
-            pageSwitchable = true
-            croesusEmpty = croesusEmptyPattern.matches(event.inventoryItems[emptySlotId]?.name)
-            if (event.inventoryItems[backArrowSlotId]?.item != Items.arrow) {
-                currentPage = 0
-            }
+        if ((SkyHanniMod.feature.dungeon.croesusUnopenedChestTracker || config.kismet) && croesusPattern.matches(event.inventoryName)) {
+            pageSetup(event)
 
             if (croesusEmpty) {
                 croesusChests?.forEach {
@@ -103,35 +98,56 @@ class CroesusChestTracker {
                 return
             }
 
-            for ((run, item) in event.inventoryItemsWithNull.mapNotNull { (key, value) -> runSlots(key, value) }) {
-                if (item == null) {
-                    run.setValuesNull()
-                    continue
-                }
-
-                val lore = item.getLore()
-
-                if (run.floor == null) run.floor =
-                    (if (masterPattern.matches(item.name)) "M" else "F") + (lore.firstNotNullOfOrNull {
-                        floorPattern.matchMatcher(it) { group("floor").romanToDecimal() }
-                    } ?: "0")
-                run.openState = when {
-                    keyUsedPattern.anyMatches(lore) -> OpenedState.KEY_USED
-                    openedPattern.anyMatches(lore) -> OpenedState.OPENED
-                    unopenedPattern.anyMatches(lore) -> OpenedState.UNOPENED
-                    else -> OpenedState.OPENED
-                }
-            }
+            // With null, since if an item is missing the chest will be set null
+            checkChests(event.inventoryItemsWithNull)
 
             return
         }
         if (config.kismet || config.kismetStackSize) {
-            chestInventory = DungeonChest.getByInventoryName(event.inventoryName) ?: return
+            kismetDungeonChestSetup(event)
+        }
+    }
+
+    private fun kismetDungeonChestSetup(event: InventoryFullyOpenedEvent) {
+        chestInventory = DungeonChest.getByInventoryName(event.inventoryName) ?: return
+        if (config.kismetStackSize) {
             kismetAmountCache = getKismetAmount().toInt()
+        }
+        if (config.kismet) {
             val kismetItem = event.inventoryItems[kismetSlotId] ?: return
-            if (config.kismet && kismetUsedPattern.matches(kismetItem.getLore().lastOrNull())) {
+            if (config.kismet && kismetUsedPattern.matches(kismetItem.getLore().lastOrNull()))
                 setKismetUsed()
+        }
+    }
+
+    private fun checkChests(inventory: Map<Int, ItemStack?>) {
+        for ((run, item) in inventory.mapNotNull { (key, value) -> runSlots(key, value) }) {
+            if (item == null) {
+                run.setValuesNull()
+                continue
             }
+
+            val lore = item.getLore()
+
+            if (run.floor == null) run.floor =
+                (if (masterPattern.matches(item.name)) "M" else "F") + (lore.firstNotNullOfOrNull {
+                    floorPattern.matchMatcher(it) { group("floor").romanToDecimal() }
+                } ?: "0")
+            run.openState = when {
+                keyUsedPattern.anyMatches(lore) -> OpenedState.KEY_USED
+                openedPattern.anyMatches(lore) -> OpenedState.OPENED
+                unopenedPattern.anyMatches(lore) -> OpenedState.UNOPENED
+                else -> OpenedState.OPENED
+            }
+        }
+    }
+
+    private fun pageSetup(event: InventoryFullyOpenedEvent) {
+        inCroesusInventory = true
+        pageSwitchable = true
+        croesusEmpty = croesusEmptyPattern.matches(event.inventoryItems[emptySlotId]?.name)
+        if (event.inventoryItems[backArrowSlotId]?.item != Items.arrow) {
+            currentPage = 0
         }
     }
 
