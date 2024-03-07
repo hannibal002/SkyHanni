@@ -14,7 +14,7 @@ plugins {
 }
 
 group = "at.hannibal2.skyhanni"
-version = "0.24.Beta.3"
+version = "0.24.Beta.6"
 
 val gitHash by lazy {
     val baos = ByteArrayOutputStream()

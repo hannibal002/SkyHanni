@@ -6,7 +6,6 @@ import at.hannibal2.skyhanni.events.InventoryCloseEvent
 import at.hannibal2.skyhanni.events.InventoryFullyOpenedEvent
 import at.hannibal2.skyhanni.features.garden.visitor.VisitorAPI
 import at.hannibal2.skyhanni.test.command.ErrorManager
-import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.CollectionUtils.addAsSingletonList
 import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.ItemUtils
@@ -14,11 +13,9 @@ import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.ItemUtils.itemName
 import at.hannibal2.skyhanni.utils.ItemUtils.name
-import at.hannibal2.skyhanni.utils.ItemUtils.nameWithEnchantment
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.NEUInternalName
 import at.hannibal2.skyhanni.utils.NEUInternalName.Companion.asInternalName
-import at.hannibal2.skyhanni.utils.NEUItems
 import at.hannibal2.skyhanni.utils.NEUItems.getPrice
 import at.hannibal2.skyhanni.utils.NumberUtil
 import at.hannibal2.skyhanni.utils.RenderUtils.renderStringsAndItems
@@ -64,9 +61,9 @@ class AnitaMedalProfit {
                 readItem(item, table)
             } catch (e: Throwable) {
                 ErrorManager.logErrorWithData(
-                    e, "Error in AnitaMedalProfit while reading item '${item.nameWithEnchantment}'",
+                    e, "Error in AnitaMedalProfit while reading item '${item.itemName}'",
                     "item" to item,
-                    "name" to item.nameWithEnchantment,
+                    "name" to item.itemName,
                     "inventory name" to InventoryUtils.openInventoryName(),
                 )
             }
@@ -90,7 +87,7 @@ class AnitaMedalProfit {
 
         val (name, amount) = ItemUtils.readItemAmount(itemName) ?: return
 
-        var internalName = NEUItems.getInternalNameOrNull(name)
+        var internalName = NEUInternalName.fromItemNameOrNull(name)
         if (internalName == null) {
             internalName = item.getInternalName()
         }
@@ -105,7 +102,7 @@ class AnitaMedalProfit {
     }
 
     private fun getItemName(item: ItemStack): String? {
-        val name = item.name ?: return null
+        val name = item.name
         val isEnchantedBook = name.removeColor() == "Enchanted Book"
         return if (isEnchantedBook) {
             item.itemName
@@ -118,7 +115,10 @@ class AnitaMedalProfit {
         for (rawItemName in requiredItems) {
             val pair = ItemUtils.readItemAmount(rawItemName)
             if (pair == null) {
-                ChatUtils.error("Could not read item '$rawItemName'")
+                ErrorManager.logErrorStateWithData(
+                    "Error in Anita Medal Contest", "Could not read item amount",
+                    "rawItemName" to rawItemName,
+                )
                 continue
             }
 
