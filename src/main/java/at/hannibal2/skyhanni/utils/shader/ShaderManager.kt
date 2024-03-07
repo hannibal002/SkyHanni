@@ -33,7 +33,6 @@ object ShaderManager {
                 "standard_chroma" -> STANDARD_CHROMA.shader
                 "textured_chroma" -> TEXTURED_CHROMA.shader
                 "rounded_rect" -> ROUNDED_RECTANGLE.shader
-                "rounded_rect" -> ROUNDED_RECTANGLE.shader
                 else -> {
                     null
                 }
@@ -87,7 +86,7 @@ object ShaderManager {
 
         if (ShaderHelper.glGetShaderi(shaderID, ShaderHelper.GL_COMPILE_STATUS) == 0) {
             val errorMessage = "Failed to compile shader $fileName${type.extension}. Features that utilise this " +
-                "shader will not work correctly, if at all."
+                "shader will not work correctly, if at all"
             val errorLog = StringUtils.trim(ShaderHelper.glGetShaderInfoLog(shaderID, 1024))
 
             if (inWorld()) {
