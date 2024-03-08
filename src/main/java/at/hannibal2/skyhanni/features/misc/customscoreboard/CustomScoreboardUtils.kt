@@ -49,21 +49,13 @@ object CustomScoreboardUtils {
         false -> HorizontalAlignment.LEFT
     }
 
-    internal fun Int.formatNum(): String = when (numberFormat) {
+    internal fun Number.formatNum(): String = when (numberFormat) {
         DisplayConfig.NumberFormat.SHORT -> NumberUtil.format(this)
         DisplayConfig.NumberFormat.LONG -> this.addSeparators()
         else -> "0"
     }
 
-    internal fun String.formatNum(): String {
-        val number = this.formatDouble()
-
-        return when (numberFormat) {
-            DisplayConfig.NumberFormat.SHORT -> NumberUtil.format(number)
-            DisplayConfig.NumberFormat.LONG -> number.addSeparators()
-            else -> "0"
-        }
-    }
+    internal fun String.formatNum() = this.formatDouble().foramtNum()
 
     class UndetectedScoreboardLines(message: String) : Exception(message)
 }
