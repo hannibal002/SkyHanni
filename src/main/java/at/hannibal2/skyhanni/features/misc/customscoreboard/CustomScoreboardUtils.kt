@@ -19,25 +19,19 @@ object CustomScoreboardUtils {
     private val config get() = SkyHanniMod.feature.gui.customScoreboard
     private val numberFormat get() = config.displayConfig.numberFormat
 
-    internal fun getGroupFromPattern(list: List<String>, pattern: Pattern, group: String): String {
-        val matchedLine = list.map { it.removeResets().trimWhiteSpace() }
-            .firstNotNullOfOrNull { line ->
-                pattern.matchMatcher(line) {
-                    group(group)
-                }
-            }
+    internal fun getGroupFromPattern(list: List<String>, pattern: Pattern, group: String) = list.map {
+        it.removeResets().trimWhiteSpace() 
+        }.firstNotNullOfOrNull { line ->
+             pattern.matchMatcher(line) {
+                 group(group)
+             }
+         }  ?: "0"
 
-        return matchedLine ?: "0"
-    }
-
-    fun getProfileTypeSymbol(): String {
-        return when {
+    fun getProfileTypeSymbol() = when {
             HypixelData.ironman -> "§7♲ "
             HypixelData.stranded -> "§a☀ "
-            HypixelData.bingo -> ScoreboardData.sidebarLinesFormatted.firstOrNull {
-                BingoAPI.getIconFromScoreboard(it) != null
-            }?.let {
-                BingoAPI.getIconFromScoreboard(it) + " "
+            HypixelData.bingo -> ScoreboardData.sidebarLinesFormatted.firstNotNullOfOrNull{
+                BingoAPI.getIconFromScoreboard(it)?.plus(" ")
             } ?: "§e❤ "
 
             else -> "§e"
@@ -55,21 +49,13 @@ object CustomScoreboardUtils {
         false -> HorizontalAlignment.LEFT
     }
 
-    internal fun Int.formatNum(): String = when (numberFormat) {
+    internal fun Number.formatNum(): String = when (numberFormat) {
         DisplayConfig.NumberFormat.SHORT -> NumberUtil.format(this)
         DisplayConfig.NumberFormat.LONG -> this.addSeparators()
         else -> "0"
     }
 
-    internal fun String.formatNum(): String {
-        val number = this.formatDouble()
-
-        return when (numberFormat) {
-            DisplayConfig.NumberFormat.SHORT -> NumberUtil.format(number)
-            DisplayConfig.NumberFormat.LONG -> number.addSeparators()
-            else -> "0"
-        }
-    }
+    internal fun String.formatNum() = this.formatDouble().foramtNum()
 
     class UndetectedScoreboardLines(message: String) : Exception(message)
 }
