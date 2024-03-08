@@ -20,6 +20,7 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 object BitsAPI {
     private val profileStorage get() = ProfileStorageData.profileSpecific?.bits
     private val playerStorage get() = SkyHanniMod.feature.storage
+    
     var bits: Int
         get() = profileStorage?.bits ?: 0
         private set(value) {
