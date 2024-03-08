@@ -68,32 +68,34 @@ class CustomScoreboard {
         return formatLines(lineMap)
     }
 
-    private fun formatLines(lineMap: Map<Int, List<ScoreboardElementType>>): MutableList<ScoreboardElementType> {
-        val newList = mutableListOf<ScoreboardElementType>()
-        for (element in config.scoreboardEntries) {
-            lineMap[element.ordinal]?.let {
+    private fun formatLines(lineMap: Map<Int, List<ScoreboardElementType>>): List<ScoreboardElementType> {
+        return buildList {
+            for (element in config.scoreboardEntries) {
+                val line = lineMap[element.ordinal] ?: continue
+
                 // Hide consecutive empty lines
-                if (config.informationFilteringConfig.hideConsecutiveEmptyLines && it[0].first == "<empty>" && newList.last().first.isEmpty()) {
+                if (
+                    config.informationFilteringConfig.hideConsecutiveEmptyLines &&
+                    line.isNotEmpty() && line[0].first == "<empty>" && lastOrNull()?.first?.isEmpty() == true
+                ) {
                     continue
                 }
 
                 // Adds empty lines
-                if (it[0].first == "<empty>") {
-                    newList.add("" to HorizontalAlignment.LEFT)
+                if (line[0].first == "<empty>") {
+                    add("" to HorizontalAlignment.LEFT)
                     continue
                 }
 
                 // Does not display this line
-                if (it.any { i -> i.first == "<hidden>" }) {
+                if (line.any { it.first == "<hidden>" }) {
                     continue
                 }
 
                 // Multiline and singular line support
-                newList.addAll(it.map { i -> i })
+                addAll(line)
             }
         }
-
-        return newList
     }
 
     // Thank you Apec for showing that the ElementType of the stupid scoreboard is FUCKING HELMET WTF
