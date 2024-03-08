@@ -14,7 +14,6 @@ import at.hannibal2.skyhanni.events.garden.visitor.VisitorRenderEvent
 import at.hannibal2.skyhanni.events.garden.visitor.VisitorToolTipEvent
 import at.hannibal2.skyhanni.features.garden.GardenAPI
 import at.hannibal2.skyhanni.features.garden.visitor.VisitorAPI.VisitorStatus
-import at.hannibal2.skyhanni.features.garden.visitor.VisitorAPI.config
 import at.hannibal2.skyhanni.mixins.transformers.gui.AccessorGuiContainer
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
@@ -35,9 +34,10 @@ import net.minecraftforge.fml.common.eventhandler.EventPriority
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import org.lwjgl.input.Keyboard
 
-private val config get() = VisitorAPI.config
 
 class VisitorListener {
+
+    private val config get() = VisitorAPI.config
 
     private var lastClickedNpc = 0
     private val logger = LorenzLogger("garden/visitors/listener")
