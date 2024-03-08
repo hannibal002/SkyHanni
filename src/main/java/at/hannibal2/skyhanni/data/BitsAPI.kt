@@ -146,8 +146,7 @@ object BitsAPI {
         val stacks = event.inventoryItems
 
         if (bitsGuiNamePattern.matches(event.inventoryName)) {
-            val cookieStack = stacks.values.lastOrNull { bitsGuiStackPattern.matches(it.displayName) }
-            if (cookieStack != null) {
+            val cookieStack = stacks.values.lastOrNull { bitsGuiStackPattern.matches(it.displayName) } ?: return
                 for (line in cookieStack.getLore()) {
                     bitsAvailableMenuPattern.matchMatcher(line) {
                         bitsToClaim = group("toClaim").formatInt()
@@ -155,7 +154,6 @@ object BitsAPI {
                         return
                     }
                 }
-            }
             return
         }
 
