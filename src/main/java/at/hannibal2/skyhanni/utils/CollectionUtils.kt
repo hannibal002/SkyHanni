@@ -101,16 +101,13 @@ object CollectionUtils {
         add(Collections.singletonList(text))
     }
 
-    @Deprecated("outdated", ReplaceWith("this.sortedBy"))
     fun <K, V : Comparable<V>> List<Pair<K, V>>.sorted(): List<Pair<K, V>> {
         return sortedBy { (_, value) -> value }
     }
 
-    @Deprecated("outdated", ReplaceWith("this.sortedBy"))
     fun <K, V : Comparable<V>> Map<K, V>.sorted(): Map<K, V> {
         return toList().sorted().toMap()
     }
-    @Deprecated("outdated", ReplaceWith("this.sortedBy"))
 
     fun <K, V : Comparable<V>> Map<K, V>.sortedDesc(): Map<K, V> {
         return toList().sorted().reversed().toMap()
