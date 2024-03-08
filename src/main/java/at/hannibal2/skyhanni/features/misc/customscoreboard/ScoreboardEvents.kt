@@ -155,7 +155,7 @@ private fun getVotingLines(): List<String> {
         list += "§7Waiting for"
         list += "§7your vote..."
     } else {
-        if (getSbLines().any { SbPattern.votesPattern.matches(it) }) {
+        if (SbPattern.votesPattern.anyMatches(getSbLines())) {
             list += getSbLines().filter { SbPattern.votesPattern.matches(it) }
         }
     }
