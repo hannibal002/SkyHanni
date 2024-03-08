@@ -472,12 +472,6 @@ class FarmingWeightDisplay {
 
             } catch (e: Exception) {
                 error = e
-                ErrorManager.logErrorWithData(
-                    e, "Error loading user farming weight",
-                    "url" to url,
-                    "apiResponse" to apiResponse,
-                    "localProfile" to localProfile
-                )
             }
             apiError = true
 
