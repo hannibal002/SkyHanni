@@ -144,9 +144,9 @@ object TimeUtils {
         val year = this.year
 
         val datePart = when {
-            !dayAndMonthElement && !yearElement -> ""
-            !yearElement -> "$month $day$daySuffix"
-            else -> "$month $day$daySuffix, Year $year"
+            yearElement -> "$month $day$daySuffix, Year $year"
+            dayAndMonthElement -> "$month $day$daySuffix"
+            else -> ""
         }
         val timePart = if (hoursAndMinutesElement) "$hour:$minute$timeOfDay" else ""
 
