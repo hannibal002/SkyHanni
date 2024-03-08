@@ -21,6 +21,11 @@ public class About {
     @ConfigEditorBoolean
     public boolean autoUpdates = true;
 
+    @ConfigOption(name = "Full Auto Updates", desc = "Automatically downloads new Versions on each startup")
+    @Expose
+    @ConfigEditorBoolean
+    public boolean fullAutoUpdates = false;
+
     @ConfigOption(name = "Update Stream", desc = "How frequently do you want updates for SkyHanni")
     @Expose
     @ConfigEditorDropdown
