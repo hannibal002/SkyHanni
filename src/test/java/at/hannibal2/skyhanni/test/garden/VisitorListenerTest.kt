@@ -34,11 +34,11 @@ class VisitorListenerTest {
         listener.onTabListUpdate(
             TabListUpdateEvent(
                 mutableListOf(
-                    "§b§lVisitors:",
-                    "§cSpaceman",
-                    "§cGrandma Wolf",
+                    "§b§lVisitors: §r§f(3)",
+                    " §r§cSpaceman",
+                    " §r§cGrandma Wolf",
+                    " Jacob",
                     "ThePlayerName",
-                    "Jacob",
                     "",
                 )
             )
@@ -57,7 +57,7 @@ class VisitorListenerTest {
 
         listener.onTabListUpdate(
             TabListUpdateEvent(
-                mutableListOf("§b§lVisitors:", "")
+                mutableListOf("§b§lVisitors: §r§f(0)", "")
             )
         )
 
@@ -74,7 +74,7 @@ class VisitorListenerTest {
 
         listener.onTabListUpdate(
             TabListUpdateEvent(
-                mutableListOf("§b§lVisitors:", "")
+                mutableListOf("§b§lVisitors: §r§f(0)", "")
             )
         )
 
