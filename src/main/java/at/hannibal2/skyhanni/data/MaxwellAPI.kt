@@ -21,7 +21,9 @@ import net.minecraft.item.ItemStack
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
 object MaxwellAPI {
+
     private val storage get() = ProfileStorageData.profileSpecific
+    
     var currentPower: String?
         get() = storage?.maxwell?.currentPower
         set(value) {
