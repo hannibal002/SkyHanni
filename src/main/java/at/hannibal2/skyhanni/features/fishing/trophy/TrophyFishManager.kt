@@ -5,8 +5,11 @@ import at.hannibal2.skyhanni.data.jsonobjects.repo.TrophyFishJson
 import at.hannibal2.skyhanni.data.jsonobjects.repo.TrophyFishJson.TrophyFishInfo
 import at.hannibal2.skyhanni.events.RepositoryReloadEvent
 import at.hannibal2.skyhanni.test.command.ErrorManager
+import at.hannibal2.skyhanni.utils.ChatUtils
+import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.StringUtils.splitLines
+import io.github.moulberry.notenoughupdates.events.ProfileDataLoadedEvent
 import net.minecraft.event.HoverEvent
 import net.minecraft.util.ChatComponentText
 import net.minecraft.util.ChatStyle
@@ -22,6 +25,46 @@ object TrophyFishManager {
 
     val fishes: MutableMap<String, MutableMap<TrophyRarity, Int>>?
         get() = ProfileStorageData.profileSpecific?.crimsonIsle?.trophyFishes
+
+    private var loadedNeu = false
+
+    @SubscribeEvent
+    fun onNeuPVDataLoaded(event: ProfileDataLoadedEvent) {
+        if (!LorenzUtils.inSkyBlock) return
+
+        try {
+            // This is alrady the current player data
+            val profileInfo = event.profileInfo ?: return
+            val neuData = profileInfo.get("trophy_fish") ?: return
+
+            // this event gets sent always with the first profile data found, does not work with profile switches.
+            // to correctly load tropy fish data from another profile, the user needs to restart on the new profile and run /pv again.
+            if (loadedNeu) return
+            loadedNeu = true
+
+            val savedFishes = fishes ?: return
+
+            var changed = false
+            for ((neuName, neuValue) in neuData.asJsonObject.entrySet()) {
+                val rarity = TrophyRarity.getByName(neuName) ?: continue
+                val name = neuName.split("_").dropLast(1).joinToString("")
+                val saved = savedFishes[name] ?: continue
+
+                val current = saved[rarity] ?: 0
+                val newValue = neuValue.asInt
+                if (newValue > current) {
+                    saved[rarity] = newValue
+                    ChatUtils.debug("Updated trophy fishing data from NEU PV:  $name $rarity: $current -> $neuValue")
+                    changed = true
+                }
+            }
+            if (changed) {
+                ChatUtils.chat("Updated Trophy Fishing data via NEU PV!")
+            }
+        } catch (t: Throwable) {
+            ErrorManager.logErrorWithData(t, "Failed to load trophy fishing data from NEU PV.")
+        }
+    }
 
     private var trophyFishInfo = mapOf<String, TrophyFishInfo>()
 
