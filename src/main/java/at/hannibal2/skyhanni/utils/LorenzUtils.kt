@@ -10,7 +10,6 @@ import at.hannibal2.skyhanni.features.dungeon.DungeonAPI
 import at.hannibal2.skyhanni.mixins.transformers.AccessorGuiEditSign
 import at.hannibal2.skyhanni.test.TestBingo
 import at.hannibal2.skyhanni.utils.ChatUtils.lastButtonClicked
-import at.hannibal2.skyhanni.utils.CollectionUtils.sortedDesc
 import at.hannibal2.skyhanni.utils.ItemUtils.getItemCategoryOrNull
 import at.hannibal2.skyhanni.utils.NEUItems.getItemStackOrNull
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
@@ -158,11 +157,11 @@ object LorenzUtils {
     fun getPlayerName(): String = Minecraft.getMinecraft().thePlayer.name
 
     fun MutableList<List<Any>>.fillTable(data: List<DisplayTableEntry>) {
-        val keys = data.associateWith { it.sort }.sortedDesc().keys
+        val sorted = data.sortedByDescending { it.sort }
         val renderer = Minecraft.getMinecraft().fontRendererObj
-        val longest = keys.map { it.left }.maxOfOrNull { renderer.getStringWidth(it.removeColor()) } ?: 0
+        val longest = sorted.maxOfOrNull { renderer.getStringWidth(it.left.removeColor()) } ?: 0
 
-        for (entry in data) {
+        for (entry in sorted) {
             var displayName = entry.left
             while (renderer.getStringWidth(displayName.removeColor()) < longest) {
                 displayName += " "
