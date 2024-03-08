@@ -19,16 +19,13 @@ object CustomScoreboardUtils {
     private val config get() = SkyHanniMod.feature.gui.customScoreboard
     private val numberFormat get() = config.displayConfig.numberFormat
 
-    internal fun getGroupFromPattern(list: List<String>, pattern: Pattern, group: String): String {
-        val matchedLine = list.map { it.removeResets().trimWhiteSpace() }
-            .firstNotNullOfOrNull { line ->
-                pattern.matchMatcher(line) {
-                    group(group)
-                }
-            }
-
-        return matchedLine ?: "0"
-    }
+    internal fun getGroupFromPattern(list: List<String>, pattern: Pattern, group: String) = list.map {
+        it.removeResets().trimWhiteSpace() 
+        }.firstNotNullOfOrNull { line ->
+             pattern.matchMatcher(line) {
+                 group(group)
+             }
+         }  ?: "0"
 
     fun getProfileTypeSymbol(): String {
         return when {
