@@ -103,7 +103,7 @@ object UnknownLinesHandler {
             RiftBloodEffigies.heartsPattern,
             SbPattern.wtfAreThoseLinesPattern,
             SbPattern.timeLeftPattern,
-            SbPattern.daCurrentItemPattern,
+            SbPattern.darkAuctionCurrentItemPattern,
         )
 
         unknownLines = unknownLines.filterNot { line ->
@@ -149,7 +149,7 @@ object UnknownLinesHandler {
 
         // da
         unknownLines = unknownLines.filter { sidebarLines.nextAfter(sidebarLines.firstOrNull { line ->
-            SbPattern.daCurrentItemPattern.matches(line)
+            SbPattern.darkAuctionCurrentItemPattern.matches(line)
         } ?: "Current Item:") != it }
     }
 }

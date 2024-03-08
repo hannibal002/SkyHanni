@@ -60,15 +60,15 @@ class CustomScoreboard {
     }
 
     private fun createLines() = buildList<ScoreboardElementType> {
-        val linemap = ScoreboardElement.entries.map{ 
-        it.ordinal to 
-        if (element.isVisible()) element.getPair() else listOf("<hidden>" to HorizontalAlignment.LEFT)
-        }.toMap()
+        val lineMap = ScoreboardElement.entries.associate {
+            it.ordinal to
+                if (it.isVisible()) it.getPair() else listOf("<hidden>" to HorizontalAlignment.LEFT)
+        }
 
         return formatLines(lineMap)
     }
 
-    private fun formatLines(lineMap: HashMap<Int, List<ScoreboardElementType>>): MutableList<ScoreboardElementType> {
+    private fun formatLines(lineMap: Map<Int, List<ScoreboardElementType>>): MutableList<ScoreboardElementType> {
         val newList = mutableListOf<ScoreboardElementType>()
         for (element in config.scoreboardEntries) {
             lineMap[element.ordinal]?.let {

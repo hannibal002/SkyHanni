@@ -20,22 +20,21 @@ object CustomScoreboardUtils {
     private val numberFormat get() = config.displayConfig.numberFormat
 
     internal fun getGroupFromPattern(list: List<String>, pattern: Pattern, group: String) = list.map {
-        it.removeResets().trimWhiteSpace() 
-        }.firstNotNullOfOrNull { line ->
-             pattern.matchMatcher(line) {
-                 group(group)
-             }
-         }  ?: "0"
+        it.removeResets().trimWhiteSpace()
+    }.firstNotNullOfOrNull { line ->
+        pattern.matchMatcher(line) {
+            group(group)
+        }
+    } ?: "0"
 
     fun getProfileTypeSymbol() = when {
-            HypixelData.ironman -> "§7♲ "
-            HypixelData.stranded -> "§a☀ "
-            HypixelData.bingo -> ScoreboardData.sidebarLinesFormatted.firstNotNullOfOrNull{
-                BingoAPI.getIconFromScoreboard(it)?.plus(" ")
-            } ?: "§e❤ "
+        HypixelData.ironman -> "§7♲ "
+        HypixelData.stranded -> "§a☀ "
+        HypixelData.bingo -> ScoreboardData.sidebarLinesFormatted.firstNotNullOfOrNull {
+            BingoAPI.getIconFromScoreboard(it)?.plus(" ")
+        } ?: "§e❤ "
 
-            else -> "§e"
-        }
+        else -> "§e"
     }
 
     fun getTablistFooter(): String {
@@ -55,7 +54,7 @@ object CustomScoreboardUtils {
         else -> "0"
     }
 
-    internal fun String.formatNum() = this.formatDouble().foramtNum()
+    internal fun String.formatNum() = this.formatDouble().formatNum()
 
     class UndetectedScoreboardLines(message: String) : Exception(message)
 }

@@ -99,7 +99,7 @@ object ScoreboardPattern {
     val thirdObjectiveLinePattern by miscSb.pattern("thirdobjectiveline", "(\\s*§.\\(§.\\w+§./§.\\w+§.\\)|§f Mages.*|§f Barbarians.*|§edefeat Kuudra|§eand stun him)")
     // collection of lines that just randomly exist and I have no clue how on earth to effectively remove them
     val wtfAreThoseLinesPattern by miscSb.pattern("wtfarethoselines", "^§eMine 10 Rubies$")
-    val daCurrentItemPattern by miscSb.pattern("dacurrentitem", "^Current Item:$")
+    val darkAuctionCurrentItemPattern by miscSb.pattern("darkauction.currentitem", "^Current Item:$")
     // events
     private val eventsSb = scoreboardGroup.group("events")
     val travelingZooPattern by eventsSb.pattern("travelingzoo", "§aTraveling Zoo§f \\d{0,2}:\\d{2}$")

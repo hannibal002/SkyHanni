@@ -421,7 +421,6 @@ object RenderUtils {
         }
         GL11.glTranslatef(x2, 0f, 0f)
         renderer.drawStringWithShadow(display, 0f, 0f, 0)
-        GL11.glTranslatef(-x2, 0f, 0f)
 
         GlStateManager.popMatrix()
 

@@ -7,9 +7,10 @@ import at.hannibal2.skyhanni.features.misc.ServerRestartTitle
 import at.hannibal2.skyhanni.features.misc.customscoreboard.ScoreboardEvents.VOTING
 import at.hannibal2.skyhanni.features.misc.customscoreboard.ScoreboardPattern
 import at.hannibal2.skyhanni.features.rift.area.stillgorechateau.RiftBloodEffigies
+import at.hannibal2.skyhanni.utils.CollectionUtils.nextAfter
 import at.hannibal2.skyhanni.utils.LorenzUtils.inDungeons
 import at.hannibal2.skyhanni.utils.LorenzUtils.isInIsland
-import at.hannibal2.skyhanni.utils.CollectionUtils.nextAfter
+import at.hannibal2.skyhanni.utils.StringUtils.anyMatches
 import at.hannibal2.skyhanni.utils.StringUtils.matches
 import at.hannibal2.skyhanni.utils.TabListData
 import java.util.function.Supplier
@@ -233,10 +234,10 @@ private fun getDarkAuctionLines(): List<String> {
 
     getSbLines().firstOrNull { SbPattern.startingInPattern.matches(it) }?.let { list.add(it) }
     getSbLines().firstOrNull { SbPattern.timeLeftPattern.matches(it) }?.let { list.add(it) }
-    if (getSbLines().any { SbPattern.daCurrentItemPattern.matches(it) }) {
-        list += getSbLines().first { SbPattern.daCurrentItemPattern.matches(it) }
+    if (getSbLines().any { SbPattern.darkAuctionCurrentItemPattern.matches(it) }) {
+        list += getSbLines().first { SbPattern.darkAuctionCurrentItemPattern.matches(it) }
         list += getSbLines().nextAfter(
-            getSbLines().first { SbPattern.daCurrentItemPattern.matches(it) }
+            getSbLines().first { SbPattern.darkAuctionCurrentItemPattern.matches(it) }
         ) ?: "§7No Item"
     }
 
