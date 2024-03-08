@@ -27,14 +27,11 @@ object CustomScoreboardUtils {
              }
          }  ?: "0"
 
-    fun getProfileTypeSymbol(): String {
-        return when {
+    fun getProfileTypeSymbol() = when {
             HypixelData.ironman -> "§7♲ "
             HypixelData.stranded -> "§a☀ "
-            HypixelData.bingo -> ScoreboardData.sidebarLinesFormatted.firstOrNull {
-                BingoAPI.getIconFromScoreboard(it) != null
-            }?.let {
-                BingoAPI.getIconFromScoreboard(it) + " "
+            HypixelData.bingo -> ScoreboardData.sidebarLinesFormatted.firstNotNullOfOrNull{
+                BingoAPI.getIconFromScoreboard(it)?.plus(" ")
             } ?: "§e❤ "
 
             else -> "§e"
