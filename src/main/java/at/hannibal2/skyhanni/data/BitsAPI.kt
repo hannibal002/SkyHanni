@@ -67,7 +67,7 @@ object BitsAPI {
 
     private val bitsAvailableMenuPattern by bitsGuiGroup.pattern(
         "availablemenu",
-        "§7Bits Available: §b(?<toClaim>[\\w,]+)(§3.+)?"
+        "§7Bits Available: §b(?<toClaim>[\\d,]+)(§3.+)?"
     )
 
     private val fameRankSbMenuPattern by bitsGuiGroup.pattern(
@@ -178,6 +178,7 @@ object BitsAPI {
 
                 fameRankSbMenuPattern.matchMatcher(line) {
                     val rank = group("rank")
+
                     currentFameRank = getFameRankByNameOrNull(rank)
                         ?: return ErrorManager.logErrorWithData(
                             FameRankNotFoundException(rank),
