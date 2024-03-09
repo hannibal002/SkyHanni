@@ -11,6 +11,9 @@ open class InventoryOpenEvent(private val inventory: OtherInventoryData.Inventor
     val inventoryName: String by lazy { inventory.title }
     val inventorySize: Int by lazy { inventory.slotCount }
     val inventoryItems: Map<Int, ItemStack> by lazy { inventory.items }
+    val inventoryItemsWithNull: Map<Int, ItemStack?> by lazy {
+        (0 until inventorySize).associateWith { inventoryItems[it] }
+    }
     val inventoryItemsPrimitive: Map<Int, PrimitiveItemStack> by lazy {
         val map = mutableMapOf<Int, PrimitiveItemStack>()
         for ((slot, item) in inventoryItems) {
