@@ -189,9 +189,6 @@ class SummoningMobManager {
     }
 
     private fun despawned() {
-        summoningMobs.forEach {
-            RenderLivingEntityHelper.removeCustomRender(it.key)
-        }
         summoningMobs.clear()
         summoningMobNametags.clear()
         summoningsSpawned = 0

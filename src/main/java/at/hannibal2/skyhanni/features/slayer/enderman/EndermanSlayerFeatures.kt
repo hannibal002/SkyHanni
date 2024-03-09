@@ -213,13 +213,7 @@ class EndermanSlayerFeatures {
     @SubscribeEvent
     fun onWorldChange(event: LorenzWorldChangeEvent) {
         endermenWithBeacons.clear()
-        flyingBeacons.forEach {
-            RenderLivingEntityHelper.removeEntityColor(it)
-        }
         flyingBeacons.clear()
-        nukekubiSkulls.forEach {
-            RenderLivingEntityHelper.removeEntityColor(it)
-        }
         nukekubiSkulls.clear()
         sittingBeacon = emptyMap()
         logger.log("Reset everything (world change)")

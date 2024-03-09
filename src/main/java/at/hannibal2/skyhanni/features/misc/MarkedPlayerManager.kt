@@ -99,7 +99,6 @@ class MarkedPlayerManager {
     fun onWorldChange(event: LorenzWorldChangeEvent) {
         if (Minecraft.getMinecraft().thePlayer == null) return
 
-        markedPlayers.forEach { RenderLivingEntityHelper.removeCustomRender(it.value) }
         markedPlayers.clear()
         if (config.markOwnName.get()) {
             val name = LorenzUtils.getPlayerName()

@@ -57,14 +57,13 @@ class RenderLivingEntityHelper {
             }
 
             // TODO remove event
-            if (!SkyHanniDebugsAndTests.globalRender) return 0
             val event = RenderMobColoredEvent(entity, 0)
             event.postAndCatch()
             return event.color
         }
 
         fun <T : EntityLivingBase> changeHurtTime(entity: T): Int {
-            if (!SkyHanniDebugsAndTests.globalRender) return 0
+            if (!SkyHanniDebugsAndTests.globalRender) return entity.hurtTime
             run {
                 val condition = entityNoHurTimeCondition[entity] ?: return@run
                 if (condition.invoke()) {

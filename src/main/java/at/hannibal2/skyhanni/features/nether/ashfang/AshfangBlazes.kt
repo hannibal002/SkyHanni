@@ -99,9 +99,6 @@ class AshfangBlazes {
 
     @SubscribeEvent
     fun onWorldChange(event: LorenzWorldChangeEvent) {
-        blazeColor.forEach {
-            RenderLivingEntityHelper.removeCustomRender(it.key)
-        }
         blazeColor.clear()
         blazeArmorStand = emptyMap()
     }
