@@ -33,7 +33,7 @@ public class AtmosphericFilterDisplayConfig {
     @Expose
     @ConfigOption(name = "Outside Garden", desc = "Shows this HUD everywhere, including outside of the Garden.")
     @ConfigEditorBoolean
-    public boolean everywhere = false;
+    public boolean outsideGarden = false;
 
     @Expose
     public Position position = new Position(10, 10, true, true);
