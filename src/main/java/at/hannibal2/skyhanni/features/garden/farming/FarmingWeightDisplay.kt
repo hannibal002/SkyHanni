@@ -449,6 +449,8 @@ class FarmingWeightDisplay {
             val url = "https://api.elitebot.dev/weight/$uuid"
             val apiResponse = APIUtil.getJSONResponse(url)
 
+            var error: Throwable? = null
+
             try {
                 val apiData = ConfigManager.gson.fromJson<EliteWeightJson>(apiResponse)
 
@@ -469,18 +471,19 @@ class FarmingWeightDisplay {
                 }
 
             } catch (e: Exception) {
-                ErrorManager.logErrorWithData(
-                    e, "Error loading user farming weight",
-                    "url" to url,
-                    "apiResponse" to apiResponse,
-                    "localProfile" to localProfile
-                )
+                error = e
             }
             apiError = true
-            ErrorManager.skyHanniError(
-                "Loading the farming weight data from elitebot.dev failed!\n"
-                    + "§eYou can re-enter the garden to try to fix the problem.\n" +
-                    "§cIf this message repeats, please report it on Discord!",
+
+            ErrorManager.logErrorWithData(
+                error ?: IllegalStateException("Error loading user farming weight"),
+                "Error loading user farming weight\n" +
+                    "§eLoading the farming weight data from elitebot.dev failed!\n" +
+                    "§eYou can re-enter the garden to try to fix the problem.\n" +
+                    "§cIf this message repeats, please report it on Discord!\n",
+                "url" to url,
+                "apiResponse" to apiResponse,
+                "localProfile" to localProfile
             )
         }
 

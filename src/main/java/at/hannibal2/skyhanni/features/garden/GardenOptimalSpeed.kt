@@ -68,6 +68,10 @@ class GardenOptimalSpeed {
 
     @SubscribeEvent
     fun onGuiOpen(event: GuiOpenEvent) {
+        if (!isRancherOverlayEnabled()) return
+        val gui = event.gui
+        if (gui !is GuiEditSign) return
+        if (!gui.isRancherSign()) return
         rancherOverlayList = CropType.entries.map { crop ->
             listOf(crop.icon, Renderable.link("${crop.cropName} - ${crop.getOptimalSpeed()}") {
                 LorenzUtils.setTextIntoSign("${crop.getOptimalSpeed()}")
