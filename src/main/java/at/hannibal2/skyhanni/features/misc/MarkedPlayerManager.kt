@@ -8,6 +8,7 @@ import at.hannibal2.skyhanni.events.LorenzWorldChangeEvent
 import at.hannibal2.skyhanni.mixins.hooks.RenderLivingEntityHelper
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.ColorUtils.withAlpha
+import at.hannibal2.skyhanni.utils.ConditionalUtils.onToggle
 import at.hannibal2.skyhanni.utils.EntityUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import net.minecraft.client.Minecraft
@@ -56,13 +57,22 @@ class MarkedPlayerManager {
                 val name = entity.name.lowercase()
                 if (name in playerNamesToMark) {
                     markedPlayers[name] = entity
-                    RenderLivingEntityHelper.setEntityColorWithNoHurtTime(
-                        entity,
-                        config.entityColor.toColor().withAlpha(127),
-                        ::isEnabled
-                    )
+                    entity.setColor()
                 }
             }
+        }
+
+        private fun refreshColours() =
+            markedPlayers.forEach {
+                it.value.setColor()
+            }
+
+        private fun EntityOtherPlayerMP.setColor() {
+            RenderLivingEntityHelper.setEntityColorWithNoHurtTime(
+                this,
+                config.entityColor.get().toColor().withAlpha(127),
+                ::isEnabled
+            )
         }
 
         fun isMarkedPlayer(player: String): Boolean = player.lowercase() in playerNamesToMark
@@ -83,6 +93,7 @@ class MarkedPlayerManager {
                 playerNamesToMark.remove(name)
             }
         }
+        config.entityColor.onToggle(::refreshColours)
     }
 
     @SubscribeEvent
