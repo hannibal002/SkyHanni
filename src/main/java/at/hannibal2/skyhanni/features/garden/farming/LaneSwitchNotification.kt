@@ -3,6 +3,7 @@ package at.hannibal2.skyhanni.features.garden.farming
 import at.hannibal2.skyhanni.events.LorenzTickEvent
 import at.hannibal2.skyhanni.features.garden.GardenAPI
 import at.hannibal2.skyhanni.features.garden.GardenPlotAPI
+import at.hannibal2.skyhanni.features.garden.GardenPlotAPI.isBarn
 import at.hannibal2.skyhanni.features.garden.GardenPlotAPI.plots
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.LocationUtils
@@ -43,6 +44,7 @@ class LaneSwitchNotification {
     }
 
     private fun getFarmBounds(plotIndex: Int, playerPos: LorenzVec, lastPos: LorenzVec): List<LorenzVec>? {
+        if(plots[plotIndex].isBarn() || plotIndex == 12) return null
         val xVelocity = playerPos.x - lastPos.x
         val zVelocity = playerPos.z - lastPos.z
         if (xVelocity.absoluteValue > zVelocity.absoluteValue) {
@@ -55,7 +57,7 @@ class LaneSwitchNotification {
                 LorenzVec(xValueMin, playerPos.y, playerPos.z), LorenzVec(xValueMax, playerPos.y, playerPos.z)
             )
         } else if (xVelocity.absoluteValue < zVelocity.absoluteValue) {
-            val row = (ceil(plotIndex / 5.0) - 1).toInt()
+            val row = (ceil((plotIndex / 5.0) + 0.2) - 1).toInt()
             val zValueTop = if (plotIndex - 1 == -1 || plotIndex - 5 < 0 || !plots[plotIndex - 5].unlocked || plots.indexOf(plots[plotIndex - 5]) == 12)
                 plots[plotIndex].box.minZ else plots[plotIndex - (5 * row)].box.minZ
             val zValueBottom = if (plotIndex + 5 > 24 || !plots[plotIndex + 5].unlocked || plots.indexOf(plots[plotIndex + 5]) == 12)
