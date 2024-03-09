@@ -67,7 +67,7 @@ class BazaarDataHolder {
             ChatUtils.debug("Bazaar data is null: '$internalName'")
             return null
         }
-        val displayName = stack.name!!.removeColor()
+        val displayName = stack.name.removeColor()
         val sellPrice = internalName.getPrice(true)
         val buyPrice = internalName.getPrice(false)
 

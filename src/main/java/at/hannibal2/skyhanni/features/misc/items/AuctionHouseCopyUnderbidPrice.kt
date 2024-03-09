@@ -2,6 +2,7 @@ package at.hannibal2.skyhanni.features.misc.items
 
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
+import at.hannibal2.skyhanni.events.GuiKeyPressEvent
 import at.hannibal2.skyhanni.events.InventoryUpdatedEvent
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.InventoryUtils
@@ -12,13 +13,11 @@ import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.NEUInternalName
 import at.hannibal2.skyhanni.utils.NEUItems.getPrice
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
-import at.hannibal2.skyhanni.utils.NumberUtil.formatNumber
+import at.hannibal2.skyhanni.utils.NumberUtil.formatLong
 import at.hannibal2.skyhanni.utils.OSUtils
 import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.StringUtils.matches
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
-import net.minecraft.client.gui.inventory.GuiContainer
-import net.minecraftforge.client.event.GuiScreenEvent
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
 class AuctionHouseCopyUnderbidPrice {
@@ -28,11 +27,11 @@ class AuctionHouseCopyUnderbidPrice {
     private val patternGroup = RepoPattern.group("auctions.underbid")
     private val auctionPricePattern by patternGroup.pattern(
         "price",
-        "^§7(?:Buy it now|Starting bid|Top bid): §6(?<coins>[0-9,]+) coins\$"
+        "§7(?:Buy it now|Starting bid|Top bid): §6(?<coins>[0-9,]+) coins"
     )
     private val allowedInventoriesPattern by patternGroup.pattern(
         "allowedinventories",
-        "^(?:Auctions Browser|Manage Auctions|Auctions: \".*\")$"
+        "(?:Auctions Browser|Manage Auctions|Auctions: \".*\"?)"
     )
 
     @SubscribeEvent
@@ -57,18 +56,16 @@ class AuctionHouseCopyUnderbidPrice {
     }
 
     @SubscribeEvent
-    fun onKeybind(event: GuiScreenEvent.KeyboardInputEvent.Post) {
+    fun onKeybind(event: GuiKeyPressEvent) {
         if (!config.copyUnderbidKeybind.isKeyHeld()) return
         if (!LorenzUtils.inSkyBlock) return
         if (!allowedInventoriesPattern.matches(InventoryUtils.openInventoryName())) return
-
-        val gui = event.gui as? GuiContainer ?: return
-        val stack = gui.slotUnderMouse?.stack ?: return
+        val stack = event.guiContainer.slotUnderMouse?.stack ?: return
         val lore = stack.getLore()
 
         for (line in lore) {
             auctionPricePattern.matchMatcher(line) {
-                val underbid = group("coins").formatNumber() - 1
+                val underbid = group("coins").formatLong() - 1
                 OSUtils.copyToClipboard("$underbid")
                 ChatUtils.chat("Copied ${underbid.addSeparators()} to clipboard.")
                 return

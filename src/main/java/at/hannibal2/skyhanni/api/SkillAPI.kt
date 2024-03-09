@@ -21,8 +21,9 @@ import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.cleanName
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
+import at.hannibal2.skyhanni.utils.NumberUtil.formatDouble
+import at.hannibal2.skyhanni.utils.NumberUtil.formatLong
 import at.hannibal2.skyhanni.utils.NumberUtil.formatLongOrUserError
-import at.hannibal2.skyhanni.utils.NumberUtil.formatNumber
 import at.hannibal2.skyhanni.utils.NumberUtil.romanToDecimalIfNecessary
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
@@ -170,7 +171,7 @@ object SkillAPI {
                     val previousLine = stack.getLore()[lineIndex - 1]
                     val progress = cleanLine.substring(cleanLine.lastIndexOf(' ') + 1)
                     if (previousLine == "§7§8Max Skill level reached!") {
-                        var totalXp = progress.formatNumber()
+                        var totalXp = progress.formatLong()
                         val minus = if (skillLevel == 50) 4_000_000 else if (skillLevel == 60) 7_000_000 else 0
                         totalXp -= minus
                         val (overflowLevel, overflowCurrent, overflowNeeded, overflowTotal) = getSkillInfo(
@@ -192,8 +193,8 @@ object SkillAPI {
                         }
                     } else {
                         val splitProgress = progress.split("/")
-                        val currentXp = splitProgress.first().formatNumber()
-                        val neededXp = splitProgress.last().formatNumber()
+                        val currentXp = splitProgress.first().formatLong()
+                        val neededXp = splitProgress.last().formatLong()
                         val levelingArray = levelArray()
                         val levelXp = calculateLevelXp(levelingArray, skillLevel - 1).toLong()
 
@@ -266,8 +267,8 @@ object SkillAPI {
     }
 
     private fun handleSkillPattern(matcher: Matcher, skillType: SkillType, skillInfo: SkillInfo) {
-        val currentXp = matcher.group("current").formatNumber()
-        val maxXp = matcher.group("needed").formatNumber()
+        val currentXp = matcher.group("current").formatLong()
+        val maxXp = matcher.group("needed").formatLong()
         val level = getLevelExact(maxXp)
 
         val (levelOverflow, currentOverflow, currentMaxOverflow, totalOverflow) = getSkillInfo(
@@ -276,7 +277,7 @@ object SkillAPI {
             maxXp,
             currentXp
         )
-        if (skillInfo.overflowLevel != 0 && levelOverflow == skillInfo.overflowLevel + 1)
+        if (skillInfo.overflowLevel > 60 && levelOverflow == skillInfo.overflowLevel + 1)
             SkillOverflowLevelupEvent(skillType, skillInfo.overflowLevel, levelOverflow).postAndCatch()
 
         skillInfo.apply {
@@ -311,8 +312,7 @@ object SkillAPI {
             }
         }
         val existingLevel = getSkillInfo(skillType) ?: SkillInfo()
-        val xpPercentageS = matcher.group("progress").replace(",", "")
-        val xpPercentage = xpPercentageS.toFloatOrNull() ?: return
+        val xpPercentage = matcher.group("progress").formatDouble()
         val levelingArray = levelArray()
         val levelXp = calculateLevelXp(levelingArray, existingLevel.level - 1)
         val nextLevelDiff = levelingArray[tablistLevel]?.asDouble ?: 7_600_000.0
@@ -341,8 +341,8 @@ object SkillAPI {
     }
 
     private fun handleSkillPatternMultiplier(matcher: Matcher, skillType: SkillType, skillInfo: SkillInfo) {
-        val currentXp = matcher.group("current").formatNumber()
-        val maxXp = matcher.group("needed").formatNumber()
+        val currentXp = matcher.group("current").formatLong()
+        val maxXp = matcher.group("needed").formatLong()
         val level = getLevelExact(maxXp)
         val levelingArray = levelArray()
         val levelXp = calculateLevelXp(levelingArray, level - 1).toLong() + currentXp

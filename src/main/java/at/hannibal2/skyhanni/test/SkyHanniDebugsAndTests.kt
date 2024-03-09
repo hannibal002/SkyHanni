@@ -7,6 +7,7 @@ import at.hannibal2.skyhanni.config.ConfigManager
 import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.config.core.config.Position
 import at.hannibal2.skyhanni.data.HypixelData
+import at.hannibal2.skyhanni.events.GuiKeyPressEvent
 import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.LorenzChatEvent
 import at.hannibal2.skyhanni.events.LorenzRenderWorldEvent
@@ -36,6 +37,7 @@ import at.hannibal2.skyhanni.utils.NEUInternalName.Companion.asInternalName
 import at.hannibal2.skyhanni.utils.NEUItems
 import at.hannibal2.skyhanni.utils.NEUItems.getItemStackOrNull
 import at.hannibal2.skyhanni.utils.NEUItems.getNpcPriceOrNull
+import at.hannibal2.skyhanni.utils.NEUItems.getPriceOrNull
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.OSUtils
 import at.hannibal2.skyhanni.utils.ReflectionUtils.makeAccessible
@@ -46,9 +48,7 @@ import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.SoundUtils
 import kotlinx.coroutines.launch
 import net.minecraft.client.Minecraft
-import net.minecraft.client.gui.inventory.GuiContainer
 import net.minecraft.nbt.NBTTagCompound
-import net.minecraftforge.client.event.GuiScreenEvent
 import net.minecraftforge.common.MinecraftForge
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import java.io.File
@@ -386,16 +386,21 @@ class SkyHanniDebugsAndTests {
                 add("§bSkyHanni Test Item")
                 add("§einput: '§f$input§e'")
 
-                NEUInternalName.fromItemNameOrNull(input)?.let {
-                    add("§eitem name -> internalName: '§7${it.asString()}§e'")
-                    add("  §eitemName: '${it.itemName}§e'")
+                NEUInternalName.fromItemNameOrNull(input)?.let { internalName ->
+                    add("§eitem name -> internalName: '§7${internalName.asString()}§e'")
+                    add("  §eitemName: '${internalName.itemName}§e'")
+                    val price = internalName.getPriceOrNull()?.let { "§6" + it.addSeparators() } ?: "§7null"
+                    add("  §eprice: '§6${price}§e'")
                     return@buildList
                 }
 
-                input.asInternalName().getItemStackOrNull()?.let {
-                    val itemName = it.itemName
-                    add("§einternal name: §7${it.getInternalName().asString()}")
+                input.asInternalName().getItemStackOrNull()?.let { item ->
+                    val itemName = item.itemName
+                    val internalName = item.getInternalName()
+                    add("§einternal name: §7${internalName.asString()}")
                     add("§einternal name -> item name: '$itemName§e'")
+                    val price = internalName.getPriceOrNull()?.let { "§6" + it.addSeparators() } ?: "§7null"
+                    add("  §eprice: '§6${price}§e'")
                     return@buildList
                 }
 
@@ -406,10 +411,9 @@ class SkyHanniDebugsAndTests {
     }
 
     @SubscribeEvent
-    fun onKeybind(event: GuiScreenEvent.KeyboardInputEvent.Post) {
+    fun onKeybind(event: GuiKeyPressEvent) {
         if (!debugConfig.copyInternalName.isKeyHeld()) return
-        val gui = event.gui as? GuiContainer ?: return
-        val focussedSlot = gui.slotUnderMouse ?: return
+        val focussedSlot = event.guiContainer.slotUnderMouse ?: return
         val stack = focussedSlot.stack ?: return
         val internalName = stack.getInternalNameOrNull() ?: return
         val rawInternalName = internalName.asString()

@@ -114,10 +114,25 @@ public class Storage {
         public static class BingoSession {
 
             @Expose
-            public List<NEUInternalName> tierOneMinionsDone = new ArrayList<>();
+            public Set<NEUInternalName> tierOneMinionsDone = new HashSet<>();
 
             @Expose
             public Map<Integer, BingoGoal> goals = new HashMap<>();
+        }
+
+        @Expose
+        public LimboStats limbo = new LimboStats();
+
+        public static class LimboStats {
+
+            @Expose
+            public int playtime = 0;
+
+            @Expose
+            public int personalBest = 0;
+
+            @Expose
+            public float userLuck = 0f;
         }
     }
 
