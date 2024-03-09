@@ -98,9 +98,7 @@ object IslandLeaveJoinMsgs {
                 val player = group("player")
                 playersNew.add(player)
                 if (guesting && inIslandCategory) { islandOwners.add(player) }
-                if (players.contains(player)) {
-                    return@matchMatcher
-                }
+                if (players.contains(player)) return@matchMatcher
                 players.add(player)         // !onPrivateIslandGarden because a vanilla message gets sent
                 if (shouldSendMsg(player) && updatedSinceWorldSwitch && !onPrivateWorld) {
                     ChatUtils.chat("$player$joinMessage")
@@ -108,7 +106,9 @@ object IslandLeaveJoinMsgs {
             }
             rawPlayerPattern.matchMatcher(line) {
                 val player = group("player")
-                if (!playersNew.contains(player)) playersNew.add(player)
+                if (playersNew.contains(player)) return@matchMatcher
+                playersNew.add(player)
+                players.add(player)
             }
         }
 
