@@ -35,7 +35,7 @@ class HighlightJerries {
 
         if (entity is EntityVillager && maxHealth in 3..6) {
             val color = listOfLorenzColors[maxHealth].toColor().withAlpha(20)
-            RenderLivingEntityHelper.setEntityColor(entity, color) { config.highlightJerries }
+            RenderLivingEntityHelper.setEntityColorWithNoHurtTime(entity, color) { config.highlightJerries }
         }
     }
 }

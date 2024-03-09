@@ -208,8 +208,7 @@ class SummoningMobManager {
 
     private infix fun EntityLivingBase.setColor(color: LorenzColor?) {
         if (color != null) {
-            RenderLivingEntityHelper.setNoHurtTime(this) { isEnabled() && config.summoningMobColored }
-            RenderLivingEntityHelper.setEntityColor(
+            RenderLivingEntityHelper.setEntityColorWithNoHurtTime(
                 this,
                 color.toColor().withAlpha(127),
             ) { isEnabled() && config.summoningMobColored }

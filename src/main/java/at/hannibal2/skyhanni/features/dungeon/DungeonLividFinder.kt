@@ -77,8 +77,10 @@ object DungeonLividFinder {
         if (!newLivid.name.contains("Livid")) return
 
         lividEntity = newLivid
-        RenderLivingEntityHelper.setEntityColor(newLivid, color.toColor().withAlpha(30)) { shouldHighlight() }
-        RenderLivingEntityHelper.setNoHurtTime(newLivid) { shouldHighlight() }
+        RenderLivingEntityHelper.setEntityColorWithNoHurtTime(
+            newLivid,
+            color.toColor().withAlpha(30)
+        ) { shouldHighlight() }
     }
 
     private fun shouldHighlight() = getLividAlive() != null && config.enabled

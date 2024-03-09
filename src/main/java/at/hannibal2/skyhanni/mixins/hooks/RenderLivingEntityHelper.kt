@@ -36,6 +36,11 @@ class RenderLivingEntityHelper {
             entityNoHurTimeCondition[entity] = condition
         }
 
+        fun <T : EntityLivingBase> setEntityColorWithNoHurtTime(entity: T, color: Int, condition: () -> Boolean) {
+            setEntityColor(entity, color, condition)
+            setNoHurtTime(entity, condition)
+        }
+
         fun <T : EntityLivingBase> removeNoHurtTime(entity: T) {
             entityNoHurTimeCondition.remove(entity)
         }

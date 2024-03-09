@@ -40,9 +40,8 @@ class SlayerMiniBossFeatures {
             if (bossType.clazz != entity.javaClass) continue
 
             miniBosses = miniBosses.editCopy { add(entity) }
-            RenderLivingEntityHelper.setEntityColor(entity, LorenzColor.AQUA.toColor().withAlpha(127))
+            RenderLivingEntityHelper.setEntityColorWithNoHurtTime(entity, LorenzColor.AQUA.toColor().withAlpha(127))
             { config.slayerMinibossHighlight }
-            RenderLivingEntityHelper.setNoHurtTime(entity) { config.slayerMinibossHighlight }
         }
     }
 

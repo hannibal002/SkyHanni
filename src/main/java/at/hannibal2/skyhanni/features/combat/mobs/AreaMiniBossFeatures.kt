@@ -52,9 +52,8 @@ class AreaMiniBossFeatures {
 
             if (config.areaBossHighlight) {
                 val color = bossType.color.toColor().withAlpha(bossType.colorOpacity)
-                RenderLivingEntityHelper.setEntityColor(entity, color)
+                RenderLivingEntityHelper.setEntityColorWithNoHurtTime(entity, color)
                 { config.areaBossHighlight && SlayerAPI.isInAnyArea }
-                RenderLivingEntityHelper.setNoHurtTime(entity) { config.areaBossHighlight && SlayerAPI.isInAnyArea }
             }
 
             // TODO add sound

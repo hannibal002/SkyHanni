@@ -56,8 +56,7 @@ class MarkedPlayerManager {
                 val name = entity.name.lowercase()
                 if (name in playerNamesToMark) {
                     markedPlayers[name] = entity
-                    RenderLivingEntityHelper.setNoHurtTime(entity, ::isEnabled)
-                    RenderLivingEntityHelper.setEntityColor(
+                    RenderLivingEntityHelper.setEntityColorWithNoHurtTime(
                         entity,
                         config.entityColor.toColor().withAlpha(127),
                         ::isEnabled

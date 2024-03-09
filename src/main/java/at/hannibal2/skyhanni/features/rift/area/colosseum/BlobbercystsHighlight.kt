@@ -26,8 +26,7 @@ class BlobbercystsHighlight {
         if (!event.isMod(5)) return
         EntityUtils.getEntities<EntityOtherPlayerMP>().forEach {
             if (it.name == blobberName) {
-                RenderLivingEntityHelper.setEntityColor(it, Color.RED.withAlpha(80)) { isEnabled() }
-                RenderLivingEntityHelper.setNoHurtTime(it) { isEnabled() }
+                RenderLivingEntityHelper.setEntityColorWithNoHurtTime(it, Color.RED.withAlpha(80)) { isEnabled() }
                 entityList.add(it)
             }
         }

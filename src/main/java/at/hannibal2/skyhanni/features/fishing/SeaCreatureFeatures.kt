@@ -50,9 +50,8 @@ class SeaCreatureFeatures {
             if (!entity.hasNameTagWith(3, creatureType.nametag)) continue
 
             rareSeaCreatures = rareSeaCreatures.editCopy { add(entity) }
-            RenderLivingEntityHelper.setEntityColor(entity, LorenzColor.RED.toColor().withAlpha(50))
+            RenderLivingEntityHelper.setEntityColorWithNoHurtTime(entity, LorenzColor.RED.toColor().withAlpha(50))
             { config.highlight }
-            RenderLivingEntityHelper.setNoHurtTime(entity) { config.highlight }
 
             // Water hydra splitting in two
             if (creatureType == RareSeaCreatureType.WATER_HYDRA && entity.health == (entity.baseMaxHealth.toFloat() / 2)) continue
