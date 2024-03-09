@@ -36,7 +36,7 @@ object TrophyFishManager {
         try {
             // This is alrady the current player data
             val profileInfo = event.neuEvent.profileInfo ?: return
-            val neuData = profileInfo.get("trophy_fish") ?: return
+            val neuDataJson = profileInfo.get("trophy_fish") ?: return
 
             // this event gets sent always with the first profile data found, does not work with profile switches.
             // to correctly load tropy fish data from another profile, the user needs to restart on the new profile and run /pv again.
@@ -46,25 +46,44 @@ object TrophyFishManager {
             val savedFishes = fishes ?: return
 
             var changed = false
-            for ((neuName, neuValue) in neuData.asJsonObject.entrySet()) {
+            val neuData = mutableListOf<Triple<String, TrophyRarity, Int>>()
+            for ((neuName, neuValue) in neuDataJson.asJsonObject.entrySet()) {
                 val rarity = TrophyRarity.getByName(neuName) ?: continue
                 val name = neuName.split("_").dropLast(1).joinToString("")
                 val saved = savedFishes[name] ?: continue
 
                 val current = saved[rarity] ?: 0
                 val newValue = neuValue.asInt
+                neuData.add(Triple(name, rarity, newValue))
                 if (newValue > current) {
-                    saved[rarity] = newValue
-                    ChatUtils.debug("Updated trophy fishing data from NEU PV:  $name $rarity: $current -> $neuValue")
                     changed = true
+                    break
                 }
             }
             if (changed) {
-                ChatUtils.chat("Updated Trophy Fishing data via NEU PV!")
+                ChatUtils.clickableChat("Click here to load data from NEU PV!", onClick = {
+                    updateFromNeuPv(savedFishes, neuData)
+                })
             }
         } catch (t: Throwable) {
             throw Exception("Failed to load trophy fishing data from NEU PV.", t)
         }
+    }
+
+    private fun updateFromNeuPv(
+        savedFishes: MutableMap<String, MutableMap<TrophyRarity, Int>>,
+        neuData: MutableList<Triple<String, TrophyRarity, Int>>,
+    ) {
+        for ((name, rarity, newValue) in neuData) {
+            val saved = savedFishes[name] ?: continue
+
+            val current = saved[rarity] ?: 0
+            if (newValue > current) {
+                saved[rarity] = newValue
+                ChatUtils.debug("Updated trophy fishing data from NEU PV:  $name $rarity: $current -> $newValue")
+            }
+        }
+        ChatUtils.chat("Updated Trophy Fishing data via NEU PV!")
     }
 
     private var trophyFishInfo = mapOf<String, TrophyFishInfo>()

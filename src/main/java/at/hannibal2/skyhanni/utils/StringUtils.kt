@@ -308,4 +308,6 @@ object StringUtils {
     fun String.isRoman(): Boolean {
         return UtilsPatterns.isRomanPattern.matches(this)
     }
+
+    fun generateRandomId() = UUID.randomUUID().toString()
 }

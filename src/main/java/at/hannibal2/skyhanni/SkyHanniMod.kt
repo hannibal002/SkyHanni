@@ -13,6 +13,7 @@ import at.hannibal2.skyhanni.data.ActionBarData
 import at.hannibal2.skyhanni.data.ActionBarStatsData
 import at.hannibal2.skyhanni.data.BlockData
 import at.hannibal2.skyhanni.data.BossbarData
+import at.hannibal2.skyhanni.data.ChatClickActionManager
 import at.hannibal2.skyhanni.data.ChatManager
 import at.hannibal2.skyhanni.data.CropAccessoryData
 import at.hannibal2.skyhanni.data.EntityData
@@ -465,6 +466,7 @@ class SkyHanniMod {
         loadModule(BossbarData)
         loadModule(EntityUtils)
         loadModule(ChatUtils)
+        loadModule(ChatClickActionManager)
 
         // APIs
         loadModule(BazaarApi())
