@@ -41,7 +41,7 @@ class RiftBloodEffigies {
 
     companion object {
         private val group = RepoPattern.group("rift.area.stillgore.effegies")
-        val effigieTimerPattern by group.pattern("respawn", "§eRespawn §c(?<time>.*) §7\\(or click!\\)")
+        val effigiesTimerPattern by group.pattern("respawn", "§eRespawn §c(?<time>.*) §7\\(or click!\\)")
         val heartsPattern by group.pattern("heart","Effigies: (?<hearts>((§[7c])?⧯)*)")
     }
 
@@ -71,7 +71,7 @@ class RiftBloodEffigies {
         if (!isEnabled()) return
 
         val line = event.newList.firstOrNull { it.startsWith("Effigies:") } ?: return
-        val hearts = effigieTimerPattern.matchMatcher(line) {
+        val hearts = heartsPattern.matchMatcher(line) {
             group("hearts")
         } ?: return
 
@@ -102,7 +102,7 @@ class RiftBloodEffigies {
         if (!isEnabled()) return
 
         for (entity in EntityUtils.getEntitiesNearby<EntityArmorStand>(LocationUtils.playerLocation(), 6.0)) {
-            effigieTimerPattern.matchMatcher(entity.name) {
+            effigiesTimerPattern.matchMatcher(entity.name) {
                 val nearest = locations.minByOrNull { it.distanceSq(entity.getLorenzVec()) } ?: return
                 val index = locations.indexOf(nearest)
 

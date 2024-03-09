@@ -131,7 +131,8 @@ enum class ScoreboardEvents(private val displayLine: Supplier<List<String>>, pri
         ::getRedstoneShowWhen
     ),
 
-    NONE( // maybe use default state tablist: "Events: smth"
+    // Maybe as a default state, use tablist "Events: ..."
+    NONE(
         ::getNoneLines,
         { false }
     );
