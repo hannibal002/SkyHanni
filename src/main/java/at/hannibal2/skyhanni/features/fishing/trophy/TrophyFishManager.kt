@@ -3,13 +3,13 @@ package at.hannibal2.skyhanni.features.fishing.trophy
 import at.hannibal2.skyhanni.data.ProfileStorageData
 import at.hannibal2.skyhanni.data.jsonobjects.repo.TrophyFishJson
 import at.hannibal2.skyhanni.data.jsonobjects.repo.TrophyFishJson.TrophyFishInfo
+import at.hannibal2.skyhanni.events.NeuProfileDataLoadedEvent
 import at.hannibal2.skyhanni.events.RepositoryReloadEvent
 import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.StringUtils.splitLines
-import io.github.moulberry.notenoughupdates.events.ProfileDataLoadedEvent
 import net.minecraft.event.HoverEvent
 import net.minecraft.util.ChatComponentText
 import net.minecraft.util.ChatStyle
@@ -29,12 +29,12 @@ object TrophyFishManager {
     private var loadedNeu = false
 
     @SubscribeEvent
-    fun onNeuPVDataLoaded(event: ProfileDataLoadedEvent) {
+    fun onNeuProfileDataLoaded(event: NeuProfileDataLoadedEvent) {
         if (!LorenzUtils.inSkyBlock) return
 
         try {
             // This is alrady the current player data
-            val profileInfo = event.profileInfo ?: return
+            val profileInfo = event.neuEvent.profileInfo ?: return
             val neuData = profileInfo.get("trophy_fish") ?: return
 
             // this event gets sent always with the first profile data found, does not work with profile switches.
