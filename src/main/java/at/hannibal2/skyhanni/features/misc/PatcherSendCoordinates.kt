@@ -14,6 +14,7 @@ import at.hannibal2.skyhanni.utils.RenderUtils.drawColor
 import at.hannibal2.skyhanni.utils.RenderUtils.drawString
 import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
+import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraftforge.fml.common.eventhandler.EventPriority
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
@@ -22,27 +23,29 @@ class PatcherSendCoordinates {
     private val patcherBeacon = mutableListOf<PatcherBeacon>()
     private val logger = LorenzLogger("misc/patchercoords")
 
-    // TODO USE SH-REPO
-    private val pattern = "(?<playerName>.*): x: (?<x>.*), y: (?<y>.*), z: (?<z>.*)".toPattern()
+    private val coordinatePattern by RepoPattern.pattern(
+        "misc.patchercoords.coords",
+        "(?<playerName>.*): [xX]: (?<x>[0-9.-]+),? [yY]: (?<y>[0-9.-]+),? [zZ]: (?<z>.*)"
+    )
 
     @SubscribeEvent
     fun onPatcherCoordinates(event: LorenzChatEvent) {
         if (!SkyHanniMod.feature.misc.patcherSendCoordWaypoint) return
 
         val message = event.message.removeColor()
-        pattern.matchMatcher(message) {
+        coordinatePattern.matchMatcher(message) {
             var description = group("playerName").split(" ").last()
-            val x = group("x").toInt()
-            val y = group("y").toInt()
+            val x = group("x").toFloat()
+            val y = group("y").toFloat()
 
             val end = group("z")
             val z = if (end.contains(" ")) {
                 val split = end.split(" ")
                 val extra = split.drop(1).joinToString(" ")
-                description += " " + extra
+                description += " $extra"
 
-                split.first().toInt()
-            } else end.toInt()
+                split.first().toFloat()
+            } else end.toFloat()
             patcherBeacon.add(PatcherBeacon(LorenzVec(x, y, z), description, System.currentTimeMillis() / 1000))
             logger.log("got patcher coords and username")
         }

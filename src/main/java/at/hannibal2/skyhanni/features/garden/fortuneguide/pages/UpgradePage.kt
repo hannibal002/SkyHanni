@@ -1,8 +1,8 @@
 package at.hannibal2.skyhanni.features.garden.fortuneguide.pages
 
-import at.hannibal2.skyhanni.features.bazaar.BazaarApi
 import at.hannibal2.skyhanni.features.garden.fortuneguide.FFGuideGUI
 import at.hannibal2.skyhanni.features.garden.fortuneguide.FortuneUpgrades
+import at.hannibal2.skyhanni.features.inventory.bazaar.BazaarApi
 import at.hannibal2.skyhanni.utils.GuiRenderUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.nameWithEnchantment
 import at.hannibal2.skyhanni.utils.NEUItems
@@ -12,6 +12,7 @@ import net.minecraft.util.MathHelper
 import java.text.DecimalFormat
 
 class UpgradePage : FFGuideGUI.FFGuidePage() {
+
     private var pageScroll = 0
     private var scrollVelocity = 0.0
     private val maxNoInputFrames = 100

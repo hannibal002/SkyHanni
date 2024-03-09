@@ -6,6 +6,7 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable
 
 class MixinPatcherFontRendererHookHook {
     companion object {
+
         @JvmStatic
         fun overridePatcherFontRenderer(string: String, shadow: Boolean, cir: CallbackInfoReturnable<Boolean>) {
             if (!LorenzUtils.onHypixel) return

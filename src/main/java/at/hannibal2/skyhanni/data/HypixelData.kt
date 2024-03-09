@@ -8,38 +8,61 @@ import at.hannibal2.skyhanni.events.LorenzChatEvent
 import at.hannibal2.skyhanni.events.LorenzTickEvent
 import at.hannibal2.skyhanni.events.LorenzWorldChangeEvent
 import at.hannibal2.skyhanni.events.ProfileJoinEvent
+import at.hannibal2.skyhanni.events.TabListUpdateEvent
 import at.hannibal2.skyhanni.features.bingo.BingoAPI
+import at.hannibal2.skyhanni.features.rift.RiftAPI
 import at.hannibal2.skyhanni.test.command.ErrorManager
+import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.LorenzLogger
 import at.hannibal2.skyhanni.utils.LorenzUtils
+import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.TabListData
+import at.hannibal2.skyhanni.utils.UtilsPatterns
+import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import com.google.gson.JsonObject
 import io.github.moulberry.notenoughupdates.NotEnoughUpdates
 import net.minecraft.client.Minecraft
-import net.minecraftforge.client.event.ClientChatReceivedEvent
-import net.minecraftforge.fml.common.eventhandler.EventPriority
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import net.minecraftforge.fml.common.network.FMLNetworkEvent
 import kotlin.concurrent.thread
+import kotlin.time.Duration.Companion.seconds
 
 class HypixelData {
-    // TODO USE SH-REPO
-    private val tabListProfilePattern = "§e§lProfile: §r§a(?<profile>.*)".toPattern()
-    private val lobbyTypePattern = "(?<lobbyType>.*lobby)\\d+".toPattern()
 
-    private var lastLocRaw = 0L
+    private val patternGroup = RepoPattern.group("data.hypixeldata")
+    private val islandNamePattern by patternGroup.pattern(
+        "islandname",
+        "(?:§.)*(Area|Dungeon): (?:§.)*(?<island>.*)"
+    )
+
+    private var lastLocRaw = SimpleTimeMark.farPast()
 
     companion object {
+        private val patternGroup = RepoPattern.group("data.hypixeldata")
+        private val serverIdScoreboardPattern by patternGroup.pattern(
+            "serverid.scoreboard",
+            "§7\\d+/\\d+/\\d+ §8(?<servertype>[mM])(?<serverid>\\S+)"
+        )
+        private val serverIdTablistPattern by patternGroup.pattern(
+            "serverid.tablist",
+            " Server: §r§8(?<serverid>\\S+)"
+        )
+        private val lobbyTypePattern by patternGroup.pattern(
+            "lobbytype",
+            "(?<lobbyType>.*lobby)\\d+"
+        )
+
         var hypixelLive = false
         var hypixelAlpha = false
         var inLobby = false
         var inLimbo = false
         var skyBlock = false
         var skyBlockIsland = IslandType.UNKNOWN
+        var serverId: String? = null
 
-        //Ironman, Stranded and Bingo
+        // Ironman, Stranded and Bingo
         var noTrade = false
 
         var ironman = false
@@ -68,6 +91,58 @@ class HypixelData {
         val lobbyType get() = locraw["lobbytype"] ?: ""
         val mode get() = locraw["mode"] ?: ""
         val map get() = locraw["map"] ?: ""
+
+        fun getCurrentServerId(): String? {
+            if (!LorenzUtils.inSkyBlock) return null
+            if (serverId != null) return serverId
+
+            ScoreboardData.sidebarLinesFormatted.forEach {
+                serverIdScoreboardPattern.matchMatcher(it) {
+                    val serverType = if (group("servertype") == "M") "mega" else "mini"
+                    serverId = "$serverType${group("serverid")}"
+                    return serverId
+                }
+            }
+
+            TabListData.getTabList().forEach {
+                serverIdTablistPattern.matchMatcher(it) {
+                    serverId = group("serverid")
+                    return serverId
+                }
+            }
+
+            return serverId
+        }
+
+        // This code is modified from NEU, and depends on NEU (or another mod) sending /locraw.
+        private val jsonBracketPattern = "^\\{.+}".toPattern()
+
+        //todo convert to proper json object
+        fun checkForLocraw(message: String) {
+            jsonBracketPattern.matchMatcher(message.removeColor()) {
+                try {
+                    val obj: JsonObject = gson.fromJson(group(), JsonObject::class.java)
+                    if (obj.has("server")) {
+                        locrawData = obj
+                        locraw.keys.forEach { key ->
+                            locraw[key] = obj[key]?.asString ?: ""
+                        }
+                        inLimbo = locraw["server"] == "limbo"
+                        inLobby = locraw["lobbyname"] != ""
+
+                        if (inLobby) {
+                            locraw["lobbyname"]?.let {
+                                lobbyTypePattern.matchMatcher(it) {
+                                    locraw["lobbytype"] = group("lobbyType")
+                                }
+                            }
+                        }
+                    }
+                } catch (e: Exception) {
+                    ErrorManager.logErrorWithData(e, "Failed to parse locraw data")
+                }
+            }
+        }
     }
 
     private var loggerIslandChange = LorenzLogger("debug/island_change")
@@ -80,6 +155,7 @@ class HypixelData {
         inLobby = false
         locraw.forEach { locraw[it.key] = "" }
         joinedWorld = System.currentTimeMillis()
+        serverId = null
     }
 
     @SubscribeEvent
@@ -93,12 +169,13 @@ class HypixelData {
     }
 
     @SubscribeEvent
-    fun onChatMessage(event: LorenzChatEvent) {
+    fun onChat(event: LorenzChatEvent) {
         if (!LorenzUtils.onHypixel) return
 
         val message = event.message.removeColor().lowercase()
         if (message.startsWith("your profile was changed to:")) {
             val newProfile = message.replace("your profile was changed to:", "").replace("(co-op)", "").trim()
+            if (profileName == newProfile) return
             profileName = newProfile
             ProfileJoinEvent(newProfile).postAndCatch()
         }
@@ -107,6 +184,21 @@ class HypixelData {
             if (profileName == newProfile) return
             profileName = newProfile
             ProfileJoinEvent(newProfile).postAndCatch()
+        }
+    }
+
+    @SubscribeEvent
+    fun onTabListUpdate(event: TabListUpdateEvent) {
+        for (line in event.tabList) {
+            UtilsPatterns.tabListProfilePattern.matchMatcher(line) {
+                var newProfile = group("profile").lowercase()
+                // Hypixel shows the profile name reversed while in the Rift
+                if (RiftAPI.inRift()) newProfile = newProfile.reversed()
+                if (profileName == newProfile) return
+                profileName = newProfile
+                ProfileJoinEvent(newProfile).postAndCatch()
+                return
+            }
         }
     }
 
@@ -121,9 +213,9 @@ class HypixelData {
             val currentTime = System.currentTimeMillis()
             if (LorenzUtils.onHypixel &&
                 locrawData == null &&
-                currentTime - lastLocRaw > 15000
+                lastLocRaw.passedSince() > 15.seconds
             ) {
-                lastLocRaw = System.currentTimeMillis()
+                lastLocRaw = SimpleTimeMark.now()
                 thread(start = true) {
                     Thread.sleep(1000)
                     NotEnoughUpdates.INSTANCE.sendChatMessage("/locraw")
@@ -165,7 +257,7 @@ class HypixelData {
     private fun checkProfileName(): Boolean {
         if (profileName.isEmpty()) {
             val text = TabListData.getTabList().firstOrNull { it.contains("Profile:") } ?: return true
-            tabListProfilePattern.matchMatcher(text) {
+            UtilsPatterns.tabListProfilePattern.matchMatcher(text) {
                 profileName = group("profile").lowercase()
                 ProfileJoinEvent(profileName).postAndCatch()
             }
@@ -188,7 +280,7 @@ class HypixelData {
         bingo = false
 
         for (line in ScoreboardData.sidebarLinesFormatted) {
-            if (BingoAPI.getRank(line) != null) {
+            if (BingoAPI.getRankFromScoreboard(line) != null) {
                 bingo = true
             }
             when (line) {
@@ -209,8 +301,8 @@ class HypixelData {
         var newIsland = ""
         var guesting = false
         for (line in TabListData.getTabList()) {
-            if (line.startsWith("§b§lArea: ")) {
-                newIsland = line.split(": ")[1].removeColor()
+            islandNamePattern.matchMatcher(line) {
+                newIsland = group("island").removeColor()
             }
             if (line == " Status: §r§9Guest") {
                 guesting = true
@@ -221,7 +313,7 @@ class HypixelData {
         if (skyBlockIsland != islandType) {
             IslandChangeEvent(islandType, skyBlockIsland).postAndCatch()
             if (islandType == IslandType.UNKNOWN) {
-                LorenzUtils.debug("Unknown island detected: '$newIsland'")
+                ChatUtils.debug("Unknown island detected: '$newIsland'")
                 loggerIslandChange.log("Unknown: '$newIsland'")
             } else {
                 loggerIslandChange.log(islandType.name)
@@ -248,35 +340,5 @@ class HypixelData {
         val scoreboardTitle = displayName.removeColor()
         return scoreboardTitle.contains("SKYBLOCK") ||
             scoreboardTitle.contains("SKIBLOCK") // April 1st jokes are so funny
-    }
-
-    // This code is modified from NEU, and depends on NEU (or another mod) sending /locraw.
-    private val jsonBracketPattern = "^\\{.+}".toPattern()
-
-    @SubscribeEvent(priority = EventPriority.LOW, receiveCanceled = true)
-    fun onChatMessage(event: ClientChatReceivedEvent) {
-        jsonBracketPattern.matchMatcher(event.message.unformattedText) {
-            try {
-                val obj: JsonObject = gson.fromJson(group(), JsonObject::class.java)
-                if (obj.has("server")) {
-                    locrawData = obj
-                    locraw.keys.forEach { key ->
-                        locraw[key] = obj[key]?.asString ?: ""
-                    }
-                    inLimbo = locraw["server"] == "limbo"
-                    inLobby = locraw["lobbyname"] != ""
-
-                    if (inLobby) {
-                        locraw["lobbyname"]?.let {
-                            lobbyTypePattern.matchMatcher(it) {
-                                locraw["lobbytype"] = group("lobbyType")
-                            }
-                        }
-                    }
-                }
-            } catch (e: Exception) {
-                ErrorManager.logErrorWithData(e, "Failed to parse locraw data")
-            }
-        }
     }
 }

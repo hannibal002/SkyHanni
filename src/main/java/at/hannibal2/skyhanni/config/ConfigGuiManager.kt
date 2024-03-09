@@ -18,5 +18,4 @@ object ConfigGuiManager {
         }
         SkyHanniMod.screenToOpen = GuiScreenElementWrapper(editor)
     }
-
 }

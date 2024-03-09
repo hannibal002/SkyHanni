@@ -15,9 +15,9 @@ class PlayerChatModifier {
     private val patterns = mutableListOf<Regex>()
 
     init {
-        patterns.add("§[ab6]\\[(?:VIP|MVP)(?:(?:§.|\\+)*)](?: {1,2})(?:§[7ab6])?(\\w{2,16})".toRegex()) // ranked player with prefix everywhere
-        patterns.add("§[7ab6]((?:\\w){2,16})§r(?!§7x)(?!\$)".toRegex()) // all players without rank prefix in notification messages
-        patterns.add("(?:§7 )?§7((?:\\w){2,16})§7§r".toRegex()) // nons user chat
+        patterns.add("§[ab6]\\[(?:VIP|MVP)(?:§.|\\+)*] {1,2}(?:§[7ab6])?(\\w{2,16})".toRegex()) // ranked player with prefix everywhere
+        patterns.add("§[7ab6](\\w{2,16})§r(?!§7x)(?!\$)".toRegex()) // all players without rank prefix in notification messages
+        patterns.add("(?:§7 )?§7(\\w{2,16})§7§r".toRegex()) // nons user chat
     }
 
     @SubscribeEvent
@@ -69,7 +69,7 @@ class PlayerChatModifier {
 
             // TODO remove workaround
             if (!DungeonMilestonesDisplay.isMilestoneMessage(input)) {
-                //all players same color in chat
+                // all players same color in chat
                 string = string.replace("§r§7: ", "§r§f: ")
             }
         }
@@ -93,6 +93,4 @@ class PlayerChatModifier {
         event.move(3, "chat.playerRankHider", "chat.playerMessage.playerRankHider")
         event.move(3, "chat.chatFilter", "chat.playerMessage.chatFilter")
     }
-
-
 }

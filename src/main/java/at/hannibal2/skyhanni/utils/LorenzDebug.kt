@@ -10,7 +10,7 @@ object LorenzDebug {
     }
 
     fun chatAndLog(text: String) {
-        LorenzUtils.debug(text)
+        ChatUtils.debug(text)
         log(text)
     }
 }

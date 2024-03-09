@@ -6,36 +6,40 @@ import io.github.moulberry.notenoughupdates.util.SkyBlockTime
 import java.time.LocalDate
 import java.time.ZoneId
 import kotlin.time.Duration
+import kotlin.time.Duration.Companion.milliseconds
+import kotlin.time.Duration.Companion.minutes
+import kotlin.time.Duration.Companion.seconds
 import kotlin.time.DurationUnit
 import kotlin.time.toDuration
 
 object TimeUtils {
-    private val pattern =
-        "(?:(?<y>\\d+) ?y(?:\\w* ?)?)?(?:(?<d>\\d+) ?d(?:\\w* ?)?)?(?:(?<h>\\d+) ?h(?:\\w* ?)?)?(?:(?<m>\\d+) ?m(?:\\w* ?)?)?(?:(?<s>\\d+) ?s(?:\\w* ?)?)?".toPattern()
-
-    fun formatDuration(
-        duration: Duration,
-        biggestUnit: TimeUnit = TimeUnit.YEAR,
-        showMilliSeconds: Boolean = false,
-        longName: Boolean = false,
-        maxUnits: Int = -1
-    ): String = duration.format(biggestUnit, showMilliSeconds, longName, maxUnits)
 
     fun Duration.format(
         biggestUnit: TimeUnit = TimeUnit.YEAR,
         showMilliSeconds: Boolean = false,
         longName: Boolean = false,
-        maxUnits: Int = -1
+        maxUnits: Int = -1,
     ): String = formatDuration(
         inWholeMilliseconds - 999, biggestUnit, showMilliSeconds, longName, maxUnits
     )
 
+    fun Duration.timerColor(default: String = "§f") = when (this) {
+        in 0.seconds..60.seconds -> "§c"
+        in 60.seconds..3.minutes -> "§6"
+        in 3.minutes..10.minutes -> "§e"
+        else -> default
+    }
+
+    @Deprecated(
+        "Has an offset of one second",
+        ReplaceWith("millis.toDuration(DurationUnit.MILLISECONDS).format(biggestUnit, showMilliSeconds, longName, maxUnits)")
+    )
     fun formatDuration(
         millis: Long,
         biggestUnit: TimeUnit = TimeUnit.YEAR,
         showMilliSeconds: Boolean = false,
         longName: Boolean = false,
-        maxUnits: Int = -1
+        maxUnits: Int = -1,
     ): String {
         // TODO: if this weird offset gets removed, also remove that subtraction from formatDuration(kotlin.time.Duration)
         var milliseconds = millis + 999
@@ -77,12 +81,12 @@ object TimeUtils {
         return builder.toString().trim()
     }
 
-    @Deprecated("Do no longer use long for time", ReplaceWith("getDuration()"))
+    @Deprecated("Do no longer use long for time", ReplaceWith("TimeUtils.getDuration(string)"))
     fun getMillis(string: String) = getDuration(string).inWholeMilliseconds
 
     fun getDuration(string: String) = getMillis_(string.replace("m", "m ").replace("  ", " ").trim())
 
-    private fun getMillis_(string: String) = pattern.matchMatcher(string.lowercase().trim()) {
+    private fun getMillis_(string: String) = UtilsPatterns.timeAmountPattern.matchMatcher(string.lowercase().trim()) {
         val years = group("y")?.toLong() ?: 0L
         val days = group("d")?.toLong() ?: 0L
         val hours = group("h")?.toLong() ?: 0L
@@ -141,6 +145,9 @@ object TimeUtils {
     }
 
     fun getCurrentLocalDate(): LocalDate = LocalDate.now(ZoneId.of("UTC"))
+
+    val Long.ticks get() = (this * 50).milliseconds
+    val Int.ticks get() = (this * 50).milliseconds
 }
 
 private const val FACTOR_SECONDS = 1000L

@@ -13,6 +13,7 @@ import net.minecraft.item.ItemStack
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
 class EstimatedWardrobePrice {
+
     private val config get() = SkyHanniMod.feature.misc.estimatedItemValues
     var data = mutableMapOf<Int, MutableList<ItemStack>>()
 
@@ -36,11 +37,10 @@ class EstimatedWardrobePrice {
 
         var totalPrice = 0.0
         for (item in items) {
-            val name = item.name
             val price = EstimatedItemValueCalculator.calculate(item, mutableListOf()).first
             totalPrice += price
 
-            toolTip.add(index++, "  §7- $name: §6${NumberUtil.format(price)}")
+            toolTip.add(index++, "  §7- ${item.name}: §6${NumberUtil.format(price)}")
         }
         toolTip.add(index, " §aTotal Value: §6§l${NumberUtil.format(totalPrice)} coins")
     }

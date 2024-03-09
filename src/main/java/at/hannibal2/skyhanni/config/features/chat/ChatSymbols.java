@@ -20,13 +20,13 @@ public class ChatSymbols {
     @Expose
     @ConfigOption(name = "Chat Symbol Location", desc = "Determines where the symbols should go in chat in relation to the " +
         "player's name. Hidden will hide all emblems from the chat. §eRequires above setting to be on to hide the symbols.")
-    @ConfigEditorDropdown()
+    @ConfigEditorDropdown
     public SymbolLocationEntry symbolLocation = SymbolLocationEntry.LEFT;
 
     public enum SymbolLocationEntry implements HasLegacyId {
         LEFT("Left", 0),
         RIGHT("Right", 1),
-        HIDDEN("Hidden)", 2);
+        HIDDEN("Hidden", 2);
 
         private final String str;
         private final int legacyId;

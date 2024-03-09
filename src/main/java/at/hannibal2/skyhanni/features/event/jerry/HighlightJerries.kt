@@ -10,9 +10,10 @@ import net.minecraft.entity.passive.EntityVillager
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
 class HighlightJerries {
+
     private val config get() = SkyHanniMod.feature.event.jerry
 
-    //RED RED WHITE LIGHT_PURPLE are fallbacks in case Hypixel admins do a little trolling
+    // RED RED WHITE LIGHT_PURPLE are fallbacks in case Hypixel admins do a little trolling
     private val listOfLorenzColors = listOf(
         LorenzColor.RED,
         LorenzColor.RED,

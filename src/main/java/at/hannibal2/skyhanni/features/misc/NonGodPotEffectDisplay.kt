@@ -2,33 +2,38 @@ package at.hannibal2.skyhanni.features.misc
 
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
+import at.hannibal2.skyhanni.data.ProfileStorageData
 import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.InventoryFullyOpenedEvent
 import at.hannibal2.skyhanni.events.LorenzChatEvent
 import at.hannibal2.skyhanni.events.LorenzTickEvent
 import at.hannibal2.skyhanni.events.LorenzWorldChangeEvent
 import at.hannibal2.skyhanni.events.PacketEvent
+import at.hannibal2.skyhanni.events.ProfileJoinEvent
 import at.hannibal2.skyhanni.features.rift.RiftAPI
 import at.hannibal2.skyhanni.test.command.ErrorManager
+import at.hannibal2.skyhanni.utils.ChatUtils
+import at.hannibal2.skyhanni.utils.CollectionUtils.sorted
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.ItemUtils.name
 import at.hannibal2.skyhanni.utils.LorenzUtils
-import at.hannibal2.skyhanni.utils.LorenzUtils.sorted
 import at.hannibal2.skyhanni.utils.RenderUtils.renderStrings
 import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.TimeUnit
 import at.hannibal2.skyhanni.utils.TimeUtils
+import at.hannibal2.skyhanni.utils.TimeUtils.format
+import at.hannibal2.skyhanni.utils.TimeUtils.timerColor
 import at.hannibal2.skyhanni.utils.Timer
+import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraft.network.play.server.S47PacketPlayerListHeaderFooter
 import net.minecraftforge.fml.common.eventhandler.EventPriority
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
-import kotlin.time.Duration
 import kotlin.time.Duration.Companion.hours
-import kotlin.time.Duration.Companion.milliseconds
 import kotlin.time.Duration.Companion.minutes
 import kotlin.time.Duration.Companion.seconds
 
 class NonGodPotEffectDisplay {
+
     private val config get() = SkyHanniMod.feature.misc.potionEffect
     private var checkFooter = false
     private val effectDuration = mutableMapOf<NonGodPotEffect, Timer>()
@@ -38,8 +43,9 @@ class NonGodPotEffectDisplay {
     enum class NonGodPotEffect(
         val tabListName: String,
         val isMixin: Boolean = false,
-        val inventoryItemName: String = tabListName
+        val inventoryItemName: String = tabListName,
     ) {
+
         SMOLDERING("§aSmoldering Polarization I"),
         GLOWY("§2Mushed Glowy Tonic I"),
         WISP("§bWisp's Ice-Flavored Water I"),
@@ -52,20 +58,34 @@ class NonGodPotEffectDisplay {
         SVEN("§bWolf Fur Mixin", true),
         VOID("§6Ender Portal Fumes", true),
         BLAZE("§fGabagoey", true),
+        GLOWING_MUSH("§2Glowing Mush Mixin", true),
 
         DEEP_TERROR("§4Deepterror", true),
 
         GREAT_SPOOK("§fGreat Spook I", inventoryItemName = "§fGreat Spook Potion"),
+
+        HARVEST_HARBINGER("§6Harvest Harbinger V"),
+
+        PEST_REPELLENT("§6Pest Repellent I§r"),
+        PEST_REPELLENT_MAX("§6Pest Repellent II"),
         ;
     }
 
-    // TODO USE SH-REPO
-    private var patternEffectsCount = "§7You have §e(?<name>\\d+) §7non-god effects\\.".toPattern()
+    private val effectsCountPattern by RepoPattern.pattern(
+        "misc.nongodpot.effects",
+        "§7You have §e(?<name>\\d+) §7non-god effects\\."
+    )
     private var totalEffectsCount = 0
+
+    @SubscribeEvent
+    fun onProfileJoin(event: ProfileJoinEvent) {
+        effectDuration.clear()
+        display = emptyList()
+    }
 
     // todo : cleanup and add support for poison candy I, and add support for splash / other formats
     @SubscribeEvent
-    fun onChatMessage(event: LorenzChatEvent) {
+    fun onChat(event: LorenzChatEvent) {
         if (event.message == "§aYou cleared all of your active effects!") {
             effectDuration.clear()
             update()
@@ -91,6 +111,18 @@ class NonGodPotEffectDisplay {
             update()
         }
 
+        if (event.message == "§a§lBUFF! §fYou have gained §r§6Harvest Harbinger V§r§f! Press TAB or type /effects to view your active effects!") {
+            effectDuration[NonGodPotEffect.HARVEST_HARBINGER] = Timer(25.minutes)
+            update()
+        }
+
+        if (event.message == "§a§lYUM! §r§6Pests §r§7will now spawn §r§a2x §r§7less while you break crops for the next §r§a60m§r§7!") {
+            effectDuration[NonGodPotEffect.PEST_REPELLENT] = Timer(1.hours)
+        }
+
+        if (event.message == "§a§lYUM! §r§6Pests §r§7will now spawn §r§a4x §r§7less while you break crops for the next §r§a60m§r§7!") {
+            effectDuration[NonGodPotEffect.PEST_REPELLENT_MAX] = Timer(1.hours)
+        }
 
         if (event.message == "§e[NPC] §6King Yolkar§f: §rThese eggs will help me stomach my pain.") {
             effectDuration[NonGodPotEffect.GOBLIN] = Timer(20.minutes)
@@ -105,7 +137,7 @@ class NonGodPotEffectDisplay {
 
     private fun update() {
         if (effectDuration.values.removeIf { it.ended }) {
-            //to fetch the real amount of active pots
+            // to fetch the real amount of active pots
             totalEffectsCount = 0
             checkFooter = true
         }
@@ -122,8 +154,8 @@ class NonGodPotEffectDisplay {
             if (effect.isMixin && !config.nonGodPotEffectShowMixins) continue
 
             val remaining = time.remaining.coerceAtLeast(0.seconds)
-            val format = TimeUtils.formatDuration(remaining.inWholeMilliseconds, TimeUnit.HOUR)
-            val color = colorForTime(remaining)
+            val format = remaining.format(TimeUnit.HOUR)
+            val color = remaining.timerColor()
 
             val displayName = effect.tabListName
             newDisplay.add("$displayName $color$format")
@@ -137,17 +169,11 @@ class NonGodPotEffectDisplay {
         return newDisplay
     }
 
-    private fun colorForTime(duration: Duration) = when (duration) {
-        in 0.seconds..60.seconds -> "§c"
-        in 60.seconds..3.minutes -> "§6"
-        in 3.minutes..10.minutes -> "§e"
-        else -> "§f"
-    }
-
     @SubscribeEvent
     fun onTick(event: LorenzTickEvent) {
         if (!isEnabled()) return
         if (!event.repeatSeconds(1)) return
+        if (!ProfileStorageData.loaded) return
 
         update()
     }
@@ -163,7 +189,7 @@ class NonGodPotEffectDisplay {
         if (!event.inventoryName.endsWith("Active Effects")) return
 
         for (stack in event.inventoryItems.values) {
-            val name = stack.name ?: continue
+            val name = stack.name
             for (effect in NonGodPotEffect.entries) {
                 if (!name.contains(effect.inventoryItemName)) continue
                 for (line in stack.getLore()) {
@@ -172,15 +198,15 @@ class NonGodPotEffectDisplay {
                         !line.contains("Remaining Uses")
                     ) {
                         val duration = try {
-                            TimeUtils.getMillis(line.split("§f")[1])
+                            TimeUtils.getDuration(line.split("§f")[1])
                         } catch (e: IndexOutOfBoundsException) {
-                            ErrorManager.logError(
-                                Exception("'§f' not found in line '$line'", e),
-                                "Error while reading Non God-Potion effects from tab list"
+                            ErrorManager.logErrorWithData(
+                                e, "Error while reading Non God-Potion effects from tab list",
+                                "line" to line
                             )
                             continue
                         }
-                        effectDuration[effect] = Timer(duration.milliseconds)
+                        effectDuration[effect] = Timer(duration)
                         update()
                     }
                 }
@@ -203,18 +229,18 @@ class NonGodPotEffectDisplay {
             for (line in lines) {
                 for (effect in NonGodPotEffect.entries) {
                     val tabListName = effect.tabListName
-                    if (line.startsWith(tabListName)) {
+                    if ("$line§r".startsWith(tabListName)) {
                         val string = line.substring(tabListName.length)
                         try {
-                            val duration = TimeUtils.getMillis(string.split("§f")[1])
-                            effectDuration[effect] = Timer(duration.milliseconds)
+                            val duration = TimeUtils.getDuration(string.split("§f")[1])
+                            effectDuration[effect] = Timer(duration)
                             update()
                         } catch (e: IndexOutOfBoundsException) {
-                            LorenzUtils.debug("Error while reading non god pot effects from tab list! line: '$line'")
+                            ChatUtils.debug("Error while reading non god pot effects from tab list! line: '$line'")
                         }
                     }
                 }
-                patternEffectsCount.matchMatcher(line) {
+                effectsCountPattern.matchMatcher(line) {
                     val group = group("name")
                     effectsCount = group.toInt()
                 }

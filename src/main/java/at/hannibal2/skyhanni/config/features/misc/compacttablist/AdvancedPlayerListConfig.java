@@ -10,7 +10,7 @@ public class AdvancedPlayerListConfig {
 
     @Expose
     @ConfigOption(name = "Player Sort", desc = "Change the sort order of player names in the tab list.")
-    @ConfigEditorDropdown()
+    @ConfigEditorDropdown
     public PlayerSortEntry playerSortOrder = PlayerSortEntry.RANK;
 
     public enum PlayerSortEntry implements HasLegacyId {

@@ -16,6 +16,7 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import org.lwjgl.input.Keyboard
 
 class BetterSignEditing {
+
     private var pasteLastClicked = false
     private var copyLastClicked = false
     private var deleteWordLastClicked = false

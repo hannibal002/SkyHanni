@@ -61,10 +61,12 @@ public class FishingConfig {
     public TotemOfCorruptionConfig totemOfCorruption = new TotemOfCorruptionConfig();
 
     @Expose
-    @ConfigOption(
-        name = "Shark Fish Counter",
-        desc = "Counts how many Sharks have been caught."
-    )
+    @ConfigOption(name = "Sea Creature Tracker", desc = "")
+    @Accordion
+    public SeaCreatureTrackerConfig seaCreatureTracker = new SeaCreatureTrackerConfig();
+
+    @Expose
+    @ConfigOption(name = "Shark Fish Counter", desc = "Counts how many Sharks have been caught.")
     @ConfigEditorBoolean
     @FeatureToggle
     public boolean sharkFishCounter = false;

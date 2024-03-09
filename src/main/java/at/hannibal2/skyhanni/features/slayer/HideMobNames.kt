@@ -1,11 +1,11 @@
 package at.hannibal2.skyhanni.features.slayer
 
 import at.hannibal2.skyhanni.SkyHanniMod
+import at.hannibal2.skyhanni.events.SkyHanniRenderEntityEvent
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
 import net.minecraft.entity.EntityLivingBase
 import net.minecraft.entity.item.EntityArmorStand
-import net.minecraftforge.client.event.RenderLivingEvent
 import net.minecraftforge.fml.common.eventhandler.EventPriority
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import java.util.regex.Pattern
@@ -42,11 +42,11 @@ class HideMobNames {
     }
 
     private fun addMobToHide(bossName: String) {
-        patterns.add("§8\\[§7Lv(?:\\d+)§8] §c$bossName§r §[ae](?<min>.+)§f/§a(?<max>.+)§c❤".toPattern())
+        patterns.add("§8\\[§7Lv\\d+§8] §c$bossName§r §[ae](?<min>.+)§f/§a(?<max>.+)§c❤".toPattern())
     }
 
     @SubscribeEvent(priority = EventPriority.HIGH)
-    fun onRenderLiving(event: RenderLivingEvent.Specials.Pre<EntityLivingBase>) {
+    fun onRenderLiving(event: SkyHanniRenderEntityEvent.Specials.Pre<EntityLivingBase>) {
         if (!LorenzUtils.inSkyBlock) return
         if (!SkyHanniMod.feature.slayer.hideMobNames) return
 

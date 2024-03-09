@@ -9,13 +9,13 @@ import at.hannibal2.skyhanni.config.features.inventory.SackDisplayConfig.Sorting
 import at.hannibal2.skyhanni.data.SackAPI
 import at.hannibal2.skyhanni.events.GuiContainerEvent
 import at.hannibal2.skyhanni.events.GuiRenderEvent
-import at.hannibal2.skyhanni.features.bazaar.BazaarApi
+import at.hannibal2.skyhanni.features.inventory.bazaar.BazaarApi
+import at.hannibal2.skyhanni.utils.CollectionUtils.addAsSingletonList
 import at.hannibal2.skyhanni.utils.ConfigUtils
 import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.LorenzColor
 import at.hannibal2.skyhanni.utils.LorenzUtils
-import at.hannibal2.skyhanni.utils.LorenzUtils.addAsSingletonList
 import at.hannibal2.skyhanni.utils.LorenzUtils.addButton
 import at.hannibal2.skyhanni.utils.LorenzUtils.addSelector
 import at.hannibal2.skyhanni.utils.NEUInternalName.Companion.asInternalName
@@ -30,6 +30,7 @@ import at.hannibal2.skyhanni.utils.renderables.Renderable
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
 object SackDisplay {
+
     private var display = emptyList<List<Any>>()
     private val config get() = SkyHanniMod.feature.inventory.sackDisplay
 
@@ -106,6 +107,7 @@ object SackDisplay {
                             NumberFormatEntry.UNFORMATTED -> "$colorCode${stored}§7/§b${
                                 total.formatNumber().addSeparators()
                             }"
+
                             else -> "$colorCode${stored}§7/§b${total}"
                         }
                     )
@@ -125,7 +127,6 @@ object SackDisplay {
                         )
                         add("MAGMA_FISH".asInternalName().getItemStack())
                         add("§7)")
-
                     }
                     if (config.showPrice && price != 0L) add(" §7(§6${format(price)}§7)")
                 })
@@ -194,15 +195,15 @@ object SackDisplay {
         if (SackAPI.gemstoneItem.isNotEmpty()) {
             newDisplay.addAsSingletonList("§7Gemstones:")
             for ((name, gem) in SackAPI.gemstoneItem) {
-                val (internalName, rough, flawed, fine, flawless, roughprice, flawedprice, fineprice, flawlessprice) = gem
+                val (internalName, rough, flawed, fine, roughprice, flawedprice, fineprice) = gem
                 newDisplay.add(buildList {
                     add(" §7- ")
                     add(internalName.getItemStack())
                     add(Renderable.optionalLink("$name: ", {
                         BazaarApi.searchForBazaarItem(name.dropLast(1))
                     }) { !NEUItems.neuHasFocus() })
-                    add(" ($rough-§a$flawed-§9$fine-§5$flawless)")
-                    val price = roughprice + flawedprice + fineprice + flawlessprice
+                    add(" ($rough-§a$flawed-§9$fine)")
+                    val price = roughprice + flawedprice + fineprice
                     totalPrice += price
                     if (config.showPrice && price != 0L) add(" §7(§6${format(price)}§7)")
                 })
@@ -227,7 +228,7 @@ object SackDisplay {
 
     enum class PriceFrom(val displayName: String) {
         BAZAAR("Bazaar Price"),
-        NPC("Npc Price"),
+        NPC("NPC Price"),
         ;
     }
 

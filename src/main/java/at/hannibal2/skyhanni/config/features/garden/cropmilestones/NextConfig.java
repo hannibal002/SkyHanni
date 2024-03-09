@@ -17,12 +17,12 @@ public class NextConfig {
         desc = "Lists all crops and their ETA till next milestone. Sorts for best crop for getting garden or SkyBlock levels.")
     @ConfigEditorBoolean
     @FeatureToggle
-    public boolean bestDisplay = true;
+    public boolean bestDisplay = false;
 
     // TODO moulconfig runnable support
     @Expose
     @ConfigOption(name = "Sort Type", desc = "Sort the crops by either garden or SkyBlock EXP.")
-    @ConfigEditorDropdown()
+    @ConfigEditorDropdown
     public BestTypeEntry bestType = BestTypeEntry.GARDEN_EXP;
 
     public enum BestTypeEntry implements HasLegacyId {

@@ -4,28 +4,60 @@ import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.events.BlockClickEvent
 import at.hannibal2.skyhanni.events.BurrowDetectEvent
 import at.hannibal2.skyhanni.events.BurrowDugEvent
+import at.hannibal2.skyhanni.events.DebugDataCollectEvent
 import at.hannibal2.skyhanni.events.LorenzChatEvent
 import at.hannibal2.skyhanni.events.LorenzWorldChangeEvent
 import at.hannibal2.skyhanni.events.PacketEvent
 import at.hannibal2.skyhanni.features.event.diana.DianaAPI.isDianaSpade
 import at.hannibal2.skyhanni.utils.BlockUtils.getBlockAt
+import at.hannibal2.skyhanni.utils.DelayedRun
 import at.hannibal2.skyhanni.utils.LorenzVec
+import at.hannibal2.skyhanni.utils.SimpleTimeMark
+import at.hannibal2.skyhanni.utils.TimeLimitedSet
 import at.hannibal2.skyhanni.utils.toLorenzVec
 import net.minecraft.init.Blocks
 import net.minecraft.network.play.server.S2APacketParticles
 import net.minecraftforge.fml.common.eventhandler.EventPriority
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
+import kotlin.time.Duration.Companion.minutes
+import kotlin.time.Duration.Companion.seconds
 
-class GriffinBurrowParticleFinder {
+object GriffinBurrowParticleFinder {
+
     private val config get() = SkyHanniMod.feature.event.diana
 
-    private val recentlyDugParticleBurrows = mutableListOf<LorenzVec>()
+    private val recentlyDugParticleBurrows = TimeLimitedSet<LorenzVec>(1.minutes)
     private val burrows = mutableMapOf<LorenzVec, Burrow>()
     private var lastDugParticleBurrow: LorenzVec? = null
 
+    // This exist to detect the unlucky timing when the user opens a burrow before it gets fully deteced
+    private var fakeBurrow: LorenzVec? = null
+
+    @SubscribeEvent
+    fun onDebugDataCollect(event: DebugDataCollectEvent) {
+        event.title("Griffin Burrow Particle Finder")
+
+        if (!DianaAPI.isDoingDiana()) {
+            event.addIrrelevant("not doing diana")
+            return
+        }
+
+        event.addData {
+            add("burrows: ${burrows.size}")
+            for (burrow in burrows.values) {
+                val location = burrow.location
+                val found = burrow.found
+                add(location.printWithAccuracy(1))
+                add(" type: " + burrow.getType())
+                add(" found: $found")
+                add(" ")
+            }
+        }
+    }
+
     @SubscribeEvent(priority = EventPriority.LOW, receiveCanceled = true)
     fun onChatPacket(event: PacketEvent.ReceiveEvent) {
-        if (!DianaAPI.featuresEnabled()) return
+        if (!isEnabled()) return
         if (!config.burrowsSoopyGuess) return
         val packet = event.packet
 
@@ -49,8 +81,8 @@ class GriffinBurrowParticleFinder {
                 if (burrow.hasEnchant && burrow.hasFootstep && burrow.type != -1) {
                     if (!burrow.found) {
                         BurrowDetectEvent(burrow.location, burrow.getType()).postAndCatch()
+                        burrow.found = true
                     }
-                    burrow.found = true
                 }
             }
         }
@@ -90,41 +122,69 @@ class GriffinBurrowParticleFinder {
 
     @SubscribeEvent
     fun onWorldChange(event: LorenzWorldChangeEvent) {
+        reset()
+    }
+
+    fun reset() {
         burrows.clear()
         recentlyDugParticleBurrows.clear()
     }
 
     @SubscribeEvent
-    fun onChatMessage(event: LorenzChatEvent) {
-        if (!DianaAPI.featuresEnabled()) return
+    fun onChat(event: LorenzChatEvent) {
+        if (!isEnabled()) return
         if (!config.burrowsSoopyGuess) return
         val message = event.message
         if (message.startsWith("§eYou dug out a Griffin Burrow!") ||
             message == "§eYou finished the Griffin burrow chain! §r§7(4/4)"
         ) {
+            BurrowAPI.lastBurrowRelatedChatMessage = SimpleTimeMark.now()
             val burrow = lastDugParticleBurrow
             if (burrow != null) {
-                recentlyDugParticleBurrows.add(burrow)
-                lastDugParticleBurrow = null
-                burrows.remove(burrow)?.let {
-                    if (it.found) {
-                        BurrowDugEvent(it.location).postAndCatch()
-                    }
+                if (!tryDig(burrow)) {
+                    fakeBurrow = burrow
                 }
             }
         }
+        if (message == "§cDefeat all the burrow defenders in order to dig it!") {
+            BurrowAPI.lastBurrowRelatedChatMessage = SimpleTimeMark.now()
+        }
+    }
+
+    private fun tryDig(location: LorenzVec, ignoreFound: Boolean = false): Boolean {
+        val burrow = burrows[location] ?: return false
+        if (!burrow.found && !ignoreFound) return false
+        burrows.remove(location)
+        recentlyDugParticleBurrows.add(location)
+        lastDugParticleBurrow = null
+
+        BurrowDugEvent(burrow.location).postAndCatch()
+        return true
     }
 
     @SubscribeEvent
     fun onBlockClick(event: BlockClickEvent) {
-        if (!DianaAPI.featuresEnabled()) return
+        if (!isEnabled()) return
         if (!config.burrowsSoopyGuess) return
 
-        val pos = event.position
-        if (event.itemInHand?.isDianaSpade != true || pos.getBlockAt() !== Blocks.grass) return
+        val location = event.position
+        if (event.itemInHand?.isDianaSpade != true || location.getBlockAt() !== Blocks.grass) return
 
-        if (burrows.containsKey(pos)) {
-            lastDugParticleBurrow = pos
+        if (location == fakeBurrow) {
+            fakeBurrow = null
+            // This exist to detect the unlucky timing when the user opens a burrow before it gets fully deteced
+            tryDig(location, ignoreFound = true)
+            return
+        }
+
+        if (burrows.containsKey(location)) {
+            lastDugParticleBurrow = location
+
+            DelayedRun.runDelayed(1.seconds) {
+                if (BurrowAPI.lastBurrowRelatedChatMessage.passedSince() > 2.seconds) {
+                    burrows.remove(location)
+                }
+            }
         }
     }
 
@@ -145,4 +205,6 @@ class GriffinBurrowParticleFinder {
             }
         }
     }
+
+    private fun isEnabled() = DianaAPI.isDoingDiana()
 }

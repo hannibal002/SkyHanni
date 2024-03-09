@@ -2,7 +2,6 @@ package at.hannibal2.skyhanni.features.fishing
 
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
-import at.hannibal2.skyhanni.data.TitleManager
 import at.hannibal2.skyhanni.events.EntityMaxHealthUpdateEvent
 import at.hannibal2.skyhanni.events.LorenzWorldChangeEvent
 import at.hannibal2.skyhanni.events.RenderEntityOutlineEvent
@@ -10,13 +9,14 @@ import at.hannibal2.skyhanni.events.SeaCreatureFishEvent
 import at.hannibal2.skyhanni.events.withAlpha
 import at.hannibal2.skyhanni.features.combat.damageindicator.DamageIndicatorManager
 import at.hannibal2.skyhanni.mixins.hooks.RenderLivingEntityHelper
+import at.hannibal2.skyhanni.utils.CollectionUtils.editCopy
 import at.hannibal2.skyhanni.utils.EntityUtils.hasMaxHealth
 import at.hannibal2.skyhanni.utils.EntityUtils.hasNameTagWith
 import at.hannibal2.skyhanni.utils.LocationUtils.distanceToPlayer
 import at.hannibal2.skyhanni.utils.LorenzColor
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils.baseMaxHealth
-import at.hannibal2.skyhanni.utils.LorenzUtils.editCopy
+import at.hannibal2.skyhanni.utils.LorenzUtils.ignoreDerpy
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.SoundUtils
 import net.minecraft.entity.Entity
@@ -31,6 +31,7 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import kotlin.time.Duration.Companion.seconds
 
 class SeaCreatureFeatures {
+
     private val config get() = SkyHanniMod.feature.fishing.rareCatches
     private var rareSeaCreatures = listOf<EntityLivingBase>()
     private var lastRareCatch = SimpleTimeMark.farPast()
@@ -41,7 +42,8 @@ class SeaCreatureFeatures {
         val entity = event.entity as? EntityLivingBase ?: return
         if (DamageIndicatorManager.isBoss(entity)) return
 
-        val maxHealth = event.maxHealth
+        // TODO remove workaround by change derpy logic either in hasMaxHealth or in EntityMaxHealthUpdateEvent
+        val maxHealth = event.maxHealth.ignoreDerpy()
         for (creatureType in RareSeaCreatureType.entries) {
             if (!creatureType.health.any { entity.hasMaxHealth(it, false, maxHealth) }) continue
             if (!creatureType.clazz.isInstance(entity)) continue
@@ -57,7 +59,8 @@ class SeaCreatureFeatures {
 
             if (config.alertOtherCatches && lastRareCatch.passedSince() > 1.seconds) {
                 val creature = SeaCreatureManager.allFishingMobs[creatureType.nametag]
-                TitleManager.sendTitle("${creature?.rarity?.chatColorCode ?: "§6"}RARE SEA CREATURE!", 1.5.seconds, 3.6, 7.0)
+                val text = "${creature?.rarity?.chatColorCode ?: "§6"}RARE SEA CREATURE!"
+                LorenzUtils.sendTitle(text, 1.5.seconds, 3.6, 7f)
                 if (config.playSound) SoundUtils.playBeepSound()
             }
         }
@@ -69,7 +72,7 @@ class SeaCreatureFeatures {
         if (!config.alertOwnCatches) return
 
         if (event.seaCreature.rare) {
-            TitleManager.sendTitle("${event.seaCreature.rarity.chatColorCode}RARE CATCH!", 3.seconds, 2.8, 7.0)
+            LorenzUtils.sendTitle("${event.seaCreature.rarity.chatColorCode}RARE CATCH!", 3.seconds, 2.8, 7f)
             if (config.playSound) SoundUtils.playBeepSound()
             lastRareCatch = SimpleTimeMark.now()
         }
@@ -103,8 +106,9 @@ class SeaCreatureFeatures {
     enum class RareSeaCreatureType(
         val clazz: Class<out EntityLivingBase>,
         val nametag: String,
-        vararg val health: Int
+        vararg val health: Int,
     ) {
+
         WATER_HYDRA(EntityZombie::class.java, "Water Hydra", 500_000),
         SEA_EMPEROR(EntityGuardian::class.java, "Sea Emperor", 750_000, 800_000),
         SEA_EMPEROR_RIDER(EntitySkeleton::class.java, "Sea Emperor", 750_000, 800_000),

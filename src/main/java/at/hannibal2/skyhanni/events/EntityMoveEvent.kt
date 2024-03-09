@@ -7,5 +7,5 @@ class EntityMoveEvent(
     val entity: Entity,
     val oldLocation: LorenzVec,
     val newLocation: LorenzVec,
-    val distance: Double
+    val distance: Double,
 ) : LorenzEvent()

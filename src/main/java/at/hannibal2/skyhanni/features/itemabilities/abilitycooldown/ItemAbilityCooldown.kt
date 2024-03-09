@@ -2,15 +2,17 @@ package at.hannibal2.skyhanni.features.itemabilities.abilitycooldown
 
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.data.ItemRenderBackground.Companion.background
-import at.hannibal2.skyhanni.events.BlockClickEvent
+import at.hannibal2.skyhanni.events.ActionBarUpdateEvent
 import at.hannibal2.skyhanni.events.ItemClickEvent
-import at.hannibal2.skyhanni.events.LorenzActionBarEvent
 import at.hannibal2.skyhanni.events.LorenzChatEvent
 import at.hannibal2.skyhanni.events.LorenzTickEvent
+import at.hannibal2.skyhanni.events.LorenzWorldChangeEvent
 import at.hannibal2.skyhanni.events.PlaySoundEvent
 import at.hannibal2.skyhanni.events.RenderItemTipEvent
 import at.hannibal2.skyhanni.events.RenderObject
 import at.hannibal2.skyhanni.features.itemabilities.abilitycooldown.ItemAbility.Companion.getMultiplier
+import at.hannibal2.skyhanni.features.nether.ashfang.AshfangFreezeCooldown
+import at.hannibal2.skyhanni.utils.CollectionUtils.equalsOneOf
 import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.ItemUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.cleanName
@@ -18,24 +20,35 @@ import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName
 import at.hannibal2.skyhanni.utils.LorenzColor
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils.between
-import at.hannibal2.skyhanni.utils.LorenzUtils.equalsOneOf
 import at.hannibal2.skyhanni.utils.LorenzUtils.round
 import at.hannibal2.skyhanni.utils.NEUInternalName.Companion.asInternalName
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getAbilityScrolls
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getItemId
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getItemUuid
 import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
+import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraft.client.Minecraft
 import net.minecraft.item.ItemStack
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import kotlin.math.max
 
 class ItemAbilityCooldown {
+
+    private val config get() = SkyHanniMod.feature.itemAbilities
+
+    private val patternGroup = RepoPattern.group("item.abilities.cooldown")
+    private val youAlignedOthersPattern by patternGroup.pattern(
+        "alignedother",
+        "§eYou aligned §r§a.* §r§eother player(s)?!"
+    )
+    private val youBuffedYourselfPattern by patternGroup.pattern(
+        "buffedyourself",
+        "§aYou buffed yourself for §r§c\\+\\d+❁ Strength"
+    )
+
     private var lastAbility = ""
     private var items = mapOf<ItemStack, List<ItemText>>()
     private var abilityItems = mapOf<ItemStack, MutableList<ItemAbility>>()
-    private val youAlignedOthersPattern = "§eYou aligned §r§a.* §r§eother player(s)?!".toPattern()
-    private val youBuffedYourselfPattern = "§aYou buffed yourself for §r§c\\+\\d+❁ Strength".toPattern()
     private val WEIRD_TUBA = "WEIRD_TUBA".asInternalName()
     private val WEIRDER_TUBA = "WEIRDER_TUBA".asInternalName()
     private val VOODOO_DOLL_WILTED = "VOODOO_DOLL_WILTED".asInternalName()
@@ -60,11 +73,11 @@ class ItemAbilityCooldown {
             }
             // Gyrokinetic Wand & Shadow Fury
             event.soundName == "mob.endermen.portal" -> {
-                //Gryokinetic Wand
+                // Gryokinetic Wand
                 if (event.pitch == 0.61904764f && event.volume == 1f) {
                     ItemAbility.GYROKINETIC_WAND_LEFT.sound()
                 }
-                //Shadow Fury
+                // Shadow Fury
                 if (event.pitch == 1f && event.volume == 1f) {
                     val internalName = InventoryUtils.getItemInHand()?.getInternalName() ?: return
                     if (!internalName.equalsOneOf(
@@ -157,12 +170,8 @@ class ItemAbilityCooldown {
     }
 
     @SubscribeEvent
-    fun onBlockClickSend(event: BlockClickEvent) {
-        handleItemClick(event.itemInHand)
-    }
-
-    @SubscribeEvent
     fun onItemClick(event: ItemClickEvent) {
+        if (AshfangFreezeCooldown.iscurrentlyFrozen()) return
         handleItemClick(event.itemInHand)
     }
 
@@ -174,10 +183,18 @@ class ItemAbilityCooldown {
     }
 
     @SubscribeEvent
-    fun onActionBar(event: LorenzActionBarEvent) {
+    fun onIslandChange(event: LorenzWorldChangeEvent) {
+        for (ability in ItemAbility.entries) {
+            ability.lastActivation = 0L
+            ability.specialColor = null
+        }
+    }
+
+    @SubscribeEvent
+    fun onActionBarUpdate(event: ActionBarUpdateEvent) {
         if (!isEnabled()) return
 
-        val message: String = event.message
+        val message: String = event.actionBar
         handleOldAbilities(message)
 
         when {
@@ -200,6 +217,7 @@ class ItemAbilityCooldown {
     }
 
     private fun handleOldAbilities(message: String) {
+        // TODO use regex
         if (message.contains(" (§6") && message.contains("§b) ")) {
             val name: String = message.between(" (§6", "§b) ")
             if (name == lastAbility) return
@@ -215,9 +233,7 @@ class ItemAbilityCooldown {
         lastAbility = ""
     }
 
-    private fun isEnabled(): Boolean {
-        return LorenzUtils.inSkyBlock && SkyHanniMod.feature.itemAbilities.itemAbilityCooldown
-    }
+    private fun isEnabled(): Boolean = LorenzUtils.inSkyBlock && config.itemAbilityCooldown
 
     private fun click(ability: ItemAbility) {
         if (ability.actionBarDetection) {
@@ -242,11 +258,10 @@ class ItemAbilityCooldown {
 
     private fun createItemText(ability: ItemAbility): ItemText {
         val specialColor = ability.specialColor
+        val readyText = if (config.itemAbilityShowWhenReady) "R" else ""
         return if (ability.isOnCooldown()) {
-            val duration: Long =
-                ability.lastActivation + ability.getCooldown() - System.currentTimeMillis()
-            val color =
-                specialColor ?: if (duration < 600) LorenzColor.RED else LorenzColor.YELLOW
+            val duration: Long = ability.lastActivation + ability.getCooldown() - System.currentTimeMillis()
+            val color = specialColor ?: if (duration < 600) LorenzColor.RED else LorenzColor.YELLOW
             ItemText(color, ability.getDurationText(), true, ability.alternativePosition)
         } else {
             if (specialColor != null) {
@@ -254,7 +269,7 @@ class ItemAbilityCooldown {
                 tryHandleNextPhase(ability, specialColor)
                 return createItemText(ability)
             }
-            ItemText(LorenzColor.GREEN, "R", false, ability.alternativePosition)
+            ItemText(LorenzColor.GREEN, readyText, false, ability.alternativePosition)
         }
     }
 
@@ -289,10 +304,11 @@ class ItemAbilityCooldown {
             event.renderObjects.add(renderObject)
 
             // fix multiple problems when having multiple abilities
-            if (SkyHanniMod.feature.itemAbilities.itemAbilityCooldownBackground) {
+            if (config.itemAbilityCooldownBackground) {
                 var opacity = 130
                 if (color == LorenzColor.GREEN) {
                     opacity = 80
+                    if (!config.itemAbilityShowWhenReady) return
                 }
                 stack.background = color.addOpacity(opacity).rgb
             }
@@ -302,7 +318,7 @@ class ItemAbilityCooldown {
     private fun ItemStack.getIdentifier() = getItemUuid() ?: getItemId()
 
     @SubscribeEvent
-    fun onChatMessage(event: LorenzChatEvent) {
+    fun onChat(event: LorenzChatEvent) {
         if (!isEnabled()) return
 
         val message = event.message

@@ -5,6 +5,7 @@ open class ItemsStep(displayName: String, val itemName: String, amountNeeded: Lo
 
 class PartialProgressItemsStep(displayName: String, itemName: String, amountNeeded: Long, variants: Map<String, Int>) :
     ItemsStep(displayName, itemName, amountNeeded, variants) {
+
     var amountHavingHidden: Int = 0
     override val amountNeeded: Long
         get() = super.amountNeeded - amountHavingHidden

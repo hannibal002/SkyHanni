@@ -1,15 +1,12 @@
 package at.hannibal2.skyhanni.features.chroma
 
 import at.hannibal2.skyhanni.SkyHanniMod
-import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.config.features.chroma.ChromaConfig.Direction
 import at.hannibal2.skyhanni.data.MinecraftData
 import at.hannibal2.skyhanni.mixins.transformers.AccessorMinecraft
-import at.hannibal2.skyhanni.utils.ConfigUtils
 import at.hannibal2.skyhanni.utils.shader.Shader
 import at.hannibal2.skyhanni.utils.shader.Uniform
 import net.minecraft.client.Minecraft
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
 /**
  * Modified from SkyblockAddons
@@ -17,10 +14,8 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
  * Credit: [ChromaShader.java](https://github.com/BiscuitDevelopment/SkyblockAddons/blob/main/src/main/java/codes/biscuit/skyblockaddons/shader/chroma/ChromaShader.java)
  */
 
-object ChromaShader : Shader("chroma", "chroma") {
+abstract class ChromaShader(vertex: String, fragment: String) : Shader(vertex, fragment) {
     val config get() = SkyHanniMod.feature.chroma
-    val INSTANCE: ChromaShader
-        get() = this
 
     override fun registerUniforms() {
         registerUniform(Uniform.UniformType.FLOAT, "chromaSize") {
@@ -48,13 +43,6 @@ object ChromaShader : Shader("chroma", "chroma") {
                 Direction.BACKWARD_RIGHT, Direction.BACKWARD_LEFT -> false
                 else -> true
             }
-        }
-    }
-
-    @SubscribeEvent
-    fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
-        event.transform(15, "config.chromaDirection") { element ->
-            ConfigUtils.migrateIntToEnum(element, Direction::class.java)
         }
     }
 }

@@ -34,7 +34,7 @@ public class EliteFarmingWeightConfig {
     @Expose
     @ConfigOption(name = "Show LB Change", desc = "Show the change of your position in the farming weight leaderboard while you were offline.")
     @ConfigEditorBoolean
-    public boolean showLbChange = true;
+    public boolean showLbChange = false;
 
     @Expose
     @ConfigOption(name = "Always ETA", desc = "Show the Overtake ETA always, even when not farming at the moment.")
@@ -50,4 +50,9 @@ public class EliteFarmingWeightConfig {
     @ConfigOption(name = "Show below 200", desc = "Show the farming weight data even if you are below 200 weight.")
     @ConfigEditorBoolean
     public boolean ignoreLow = false;
+
+    @Expose
+    @ConfigOption(name = "Show Outside Garden", desc = "Show the farming weight outside of the garden.")
+    @ConfigEditorBoolean
+    public boolean showOutsideGarden = false;
 }

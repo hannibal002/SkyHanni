@@ -1,5 +1,9 @@
 package at.hannibal2.skyhanni.utils
 
+import at.hannibal2.skyhanni.SkyHanniMod
+import at.hannibal2.skyhanni.test.command.ErrorManager
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 import net.minecraft.client.Minecraft
 import net.minecraft.client.audio.ISound
 import net.minecraft.client.audio.PositionedSound
@@ -7,9 +11,11 @@ import net.minecraft.client.audio.SoundCategory
 import net.minecraft.util.ResourceLocation
 
 object SoundUtils {
+
     private val beepSound by lazy { createSound("random.orb", 1f) }
     private val clickSound by lazy { createSound("gui.button.press", 1f) }
     private val errorSound by lazy { createSound("mob.endermen.portal", 0f) }
+    val plingSound by lazy { createSound("note.pling", 1f) }
     val centuryActiveTimerAlert by lazy { createSound("skyhanni:centurytimer.active", 1f) }
 
     fun ISound.playSound() {
@@ -28,7 +34,10 @@ object SoundUtils {
                         }
                     }
                 }
-                e.printStackTrace()
+                ErrorManager.logErrorWithData(
+                    e, "Failed to play a sound",
+                    "soundLocation" to this.soundLocation
+                )
             } finally {
                 gameSettings.setSoundLevel(SoundCategory.PLAYERS, oldLevel)
             }
@@ -56,9 +65,13 @@ object SoundUtils {
         clickSound.playSound()
     }
 
+    fun playPlingSound() {
+        plingSound.playSound()
+    }
+
     fun command(args: Array<String>) {
         if (args.isEmpty()) {
-            LorenzUtils.userError("Specify a sound effect to test")
+            ChatUtils.userError("Specify a sound effect to test")
             return
         }
 
@@ -71,5 +84,14 @@ object SoundUtils {
 
     fun playErrorSound() {
         errorSound.playSound()
+    }
+
+    fun repeatSound(delay: Long, repeat: Int, sound: ISound) {
+        SkyHanniMod.coroutineScope.launch {
+            repeat(repeat) {
+                sound.playSound()
+                delay(delay)
+            }
+        }
     }
 }

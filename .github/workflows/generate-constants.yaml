@@ -4,6 +4,7 @@ name: RepoPattern
 
 env:
     data_repo: hannibal002/SkyHanni-REPO
+    repo_action: true
 
 on:
     push:
@@ -51,6 +52,12 @@ jobs:
             -   name: Commit generated regex
                 run: |
                     mkdir -p constants/
+                    new_cmp="$(jq -S '.regexes' < constants.json)"
+                    old_cmp="$(jq -S '.regexes' < constants/regexes.json)"
+                    if [ "$new_cmp" = "$old_cmp" ]; then
+                        echo Old and new are the same. We are in a never ending loop.
+                        exit 0
+                    fi
                     mv constants.json constants/regexes.json
                     git config user.name 'github-actions[bot]'
                     git config user.email 'github-action@users.noreply.github.com'

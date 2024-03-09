@@ -16,6 +16,7 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo
  * Credit: [FontRendererHook.java](https://github.com/BiscuitDevelopment/SkyblockAddons/blob/main/src/main/java/codes/biscuit/skyblockaddons/asm/hooks/FontRendererHook.java)
  */
 object FontRendererHook {
+
     private var CHROMA_COLOR: Int = -0x1
     private val DRAW_CHROMA = ChromaFontRenderer(CHROMA_COLOR)
     private var CHROMA_COLOR_SHADOW: Int = -0xAAAAAB
@@ -23,6 +24,8 @@ object FontRendererHook {
 
     private var currentDrawState: ChromaFontRenderer? = null
     private var previewChroma = false
+
+    var cameFromChat = false
 
     /**
      * Setups the [ChromaFontRenderer][at.hannibal2.skyhanni.features.chroma.ChromaFontRenderer] for rendering text
@@ -61,6 +64,10 @@ object FontRendererHook {
     fun beginChromaRendering(text: String, shadow: Boolean) {
         if (!LorenzUtils.inSkyBlock) return
         if (!SkyHanniMod.feature.chroma.enabled) return
+        if (SkyHanniMod.feature.chroma.allChroma && SkyHanniMod.feature.chroma.ignoreChat && cameFromChat) {
+            endChromaFont()
+            return
+        }
 
         if (text == "§fPlease star the mod on GitHub!") {
             previewChroma = true
@@ -149,7 +156,7 @@ object FontRendererHook {
         ci: CallbackInfo,
         i: Int,
         c0: Char,
-        i1: Int
+        i1: Int,
     ): Boolean {
         if (!LorenzUtils.inSkyBlock) return false
         if (!SkyHanniMod.feature.chroma.enabled) return false
