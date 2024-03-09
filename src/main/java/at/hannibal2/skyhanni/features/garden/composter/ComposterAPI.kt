@@ -2,7 +2,7 @@ package at.hannibal2.skyhanni.features.garden.composter
 
 import at.hannibal2.skyhanni.data.model.ComposterUpgrade
 import at.hannibal2.skyhanni.features.garden.GardenAPI
-import at.hannibal2.skyhanni.utils.NumberUtil.formatNumber
+import at.hannibal2.skyhanni.utils.NumberUtil.formatLong
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.TimeUtils
 import kotlin.math.floor
@@ -52,9 +52,9 @@ object ComposterAPI {
         return timePerCompost * compostRemainingAfterNextCompostFinishes
     }
 
-    fun getFuel() = tabListData[ComposterDisplay.DataType.FUEL]?.removeColor()?.formatNumber() ?: 0
+    fun getFuel() = tabListData[ComposterDisplay.DataType.FUEL]?.removeColor()?.formatLong() ?: 0
 
-    fun getOrganicMatter() = tabListData[ComposterDisplay.DataType.ORGANIC_MATTER]?.removeColor()?.formatNumber() ?: 0
+    fun getOrganicMatter() = tabListData[ComposterDisplay.DataType.ORGANIC_MATTER]?.removeColor()?.formatLong() ?: 0
 
     fun maxOrganicMatter(addOne: ComposterUpgrade?) =
         40_000 + ComposterUpgrade.ORGANIC_MATTER_CAP.getLevel(addOne) * 20_000

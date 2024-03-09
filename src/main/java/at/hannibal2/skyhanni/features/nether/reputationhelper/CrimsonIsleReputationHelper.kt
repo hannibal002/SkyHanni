@@ -29,7 +29,7 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
 class CrimsonIsleReputationHelper(skyHanniMod: SkyHanniMod) {
 
-    val config get() = SkyHanniMod.feature.crimsonIsle.reputationHelper
+    private val config get() = SkyHanniMod.feature.crimsonIsle.reputationHelper
 
     val questHelper = DailyQuestHelper(this)
     val miniBossHelper = DailyMiniBossHelper(this)

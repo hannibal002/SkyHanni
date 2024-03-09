@@ -4,7 +4,7 @@
 
 ### New Features
 
-#### Inventory
+#### Inventory Features
 
 + Added Max Items With Purse. - NetheriteMiner
     + Calculates the maximum number of items that can be purchased from the Bazaar with the number of coins in your
@@ -13,6 +13,24 @@
     + Copies the price of the hovered item in Auction House minus 1 coin into the clipboard for easier under-bidding.
 + Gfs message after super crafting. — Zickles
     + Adding a clickable message to pick up the super crafted items from sacks.
+
+#### Minion Features
+
++ Added Inferno Minion Fuel pickup prevention. - Zickles (https://github.com/hannibal002/SkyHanni/pull/1103)
+    + Blocks picking up the Inferno Minion or replacing the fuel inside when expensive minion fuels are in use.
+
+#### Chat Features
++ Hide chat message about bank interest when the received interest is zero coins. - Alexia (https://github.com/hannibal002/SkyHanni/pull/1117)
+
+#### Misc Features
+
++ Added command `/shlimbo` for easier Limbo access. - martimavocado (https://github.com/hannibal002/SkyHanni/pull/848)
+    + Limbo time tracker also now works in the Slumber Hotel in the Bed Wars Lobby.
+    + A new secret method to get more SkyHanni User Luck from Limbo.
++ Added command `/shlimbostats` for a simple way to view your Limbo stats. - martimavocado (https://github.com/hannibal002/SkyHanni/pull/848)
+    + Support for `/playtime` and  `/pt` while in Limbo.
+    + Added your playtime to Hypixel's `/playtimedetailed`.
++ Added full auto-update for SkyHanni. - Thunderblade73 (https://github.com/hannibal002/SkyHanni/pull/1122)
 
 ### Improvements
 
@@ -40,6 +58,7 @@
 + Added goal to collection tracker. - Thunderblade73
     + /shtrackcollection \<item name> [goal amount]
     + Shows a chat message once the goal has been reached.
++ Added SkyHanni update download finished chat message. - Thunderblade73 (https://github.com/hannibal002/SkyHanni/pull/1122)
 
 ### Fixes
 
@@ -61,6 +80,14 @@
 #### Chat Fixes
 
 + Fixed Fire Sale chat hider not working when multiple fire sales are ending. - Zickles
++ Fixed Auto Tip chat filter. - alexia (https://github.com/hannibal002/SkyHanni/pull/1105)
++ Fixed Hide Anita Accessories' fortune bonus chat message not getting hidden in the chat filter. - alexia (https://github.com/hannibal002/SkyHanni/pull/1106)
++ Fixed some chat symbols showing twice in chat due to a Hypixel change. - CalMWolfs (https://github.com/hannibal002/SkyHanni/pull/1119)
++ Fixed Anita's Accessory chat filter not working with multi-word crops (Cocoa Beans, Nether Wart, Sugar Cane). - Alexia (https://github.com/hannibal002/SkyHanni/pull/1115)
+
+#### Garden Fixes
+
++ Stop SkyHanni from saying that Next Visitor is visiting your garden. - CalMWolfs (https://github.com/hannibal002/SkyHanni/pull/1125)
 
 #### Command Fixes
 
@@ -70,6 +97,8 @@
 
 + Fixed skill level up message when below level 60. - HiZe
 + Fixed SkyHanni not working on Alpha. - hannibal2 & CalMWolfs
++ Fixed getting profile name from tab list on alpha for special profiles. - CalMWolfs (https://github.com/hannibal002/SkyHanni/pull/1120)
+    + Fixes for any Ironman, Stranded and maybe Bingo players.
 
 ### Technical Details
 
@@ -87,6 +116,25 @@
 + Added stacking enchants to the repo. - CalMWolfs
 + Moved bazaar config into inventory category. - hannibal2
 + Optimize IntelliJ icon. - nea
++ Used the isInIsland function more. - CalMWolfs (https://github.com/hannibal002/SkyHanni/pull/1107)
++ Optimized item.isFishingRod logic. - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/1056)
++ Code cleanup in multiple files. - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/1113)
++ ItemStack.name no longer nullable. - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/1101)
++ Better error handling (more user facing errors - less hidden errors). - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/1101)
++ Replaced/fixed deprecated function calls. - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/1101)
++ Added item category FISHING_BAIT. - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/1101)
++ Use internal name more in ItemDisplayOverlayFeatures - CalMWolfs (https://github.com/hannibal002/SkyHanni/pull/1114)
++ Reformatted the code in a lot of files. - CalMWolfs (https://github.com/hannibal002/SkyHanni/pull/1109)
++ Changed line endings to be normalized over the whole project and prevents further breaks. - your_name_here (https://github.com/hannibal002/SkyHanni/pull/1112)
++ Added more error logging to getting farming weight. - CalMWolfs (https://github.com/hannibal002/SkyHanni/pull/1120)
++ Removed unnecessary capturing groups from the Anita's Accessory chat filter regex. - Alexia (https://github.com/hannibal002/SkyHanni/pull/1115)
++ Add maven publication details, allowing other mods to integrate more easily with Skyhanni. - !nea (https://github.com/hannibal002/SkyHanni/pull/935)
++ Created Pull Request template. - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/1108)
+    + For better maintainability and automatic beta changelog creation.
++ Use less forge events throughout the mod to reduce possible crashes. - CalMWolfs (https://github.com/hannibal002/SkyHanni/pull/1085)
++ Fix entity click not being canceled - Thunderblade73 (https://github.com/hannibal002/SkyHanni/pull/1072)
++ Cleanup ItemClickData. - Thunderblade73 (https://github.com/hannibal002/SkyHanni/pull/1072)
++ Fixes minecraft bug where text that is bold can render weirdly. - CalMWolfs (https://github.com/hannibal002/SkyHanni/pull/1126)
 
 ### Removed Features
 

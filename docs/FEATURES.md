@@ -159,6 +159,8 @@ Use `/sh` or `/skyhanni` to open the SkyHanni config in game.
     + Copies the price of the hovered item in Auction House minus 1 coin into the clipboard for easier under-bidding.
 + Gfs message after super crafting. — Zickles
     + Adding a clickable message to pick up the super crafted items from sacks.
++ Added Inferno Minion Fuel pickup prevention. - Zickles (https://github.com/hannibal002/SkyHanni/pull/1103)
+    + Blocks picking up the Inferno Minion or replacing the fuel inside when expensive minion fuels are in use.
 
 </details>
 <details open><summary>
@@ -975,10 +977,16 @@ Use `/sh` or `/skyhanni` to open the SkyHanni config in game.
     + Stops the white geyser smoke particles from rendering if your bobber is near the geyser.
     + Draws a box around the effective area of the geyser.
     + Change the color of the box around the geyser.
-+ Added Skill Progress Display. - HiZe
++ Skill Progress Display. - HiZe
     + ETA Display, exp, actions or percentage to next level, custom level goals, all skill display, chroma progress bar,
       and overflow levels for all those things.
     + A ton of settings.
++ Command `/shlimbo` for easier Limbo access. - martimavocado (https://github.com/hannibal002/SkyHanni/pull/848)
+    + Limbo time tracker also now works in the Slumber Hotel in the Bed Wars Lobby.
+    + A new secret method to get more SkyHanni User Luck from Limbo.
++ Command `/shlimbostats` for a simple way to view your Limbo stats. - martimavocado (https://github.com/hannibal002/SkyHanni/pull/848)
+    + Support for `/playtime` and  `/pt` while in Limbo.
+    + Added your playtime to Hypixel's `/playtimedetailed`.
 
 </details>
 <details open><summary>

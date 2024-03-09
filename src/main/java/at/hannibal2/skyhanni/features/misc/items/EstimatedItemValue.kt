@@ -54,7 +54,10 @@ object EstimatedItemValue {
             ErrorManager.skyHanniError("Gemstone Slot Unlock Costs failed to load from neu repo!")
         }
 
-        gemstoneUnlockCosts = ConfigManager.gson.fromJson(data, object : TypeToken<HashMap<NEUInternalName, HashMap<String, List<String>>>>() {}.type)
+        gemstoneUnlockCosts = ConfigManager.gson.fromJson(
+            data,
+            object : TypeToken<HashMap<NEUInternalName, HashMap<String, List<String>>>>() {}.type
+        )
     }
 
     @SubscribeEvent
@@ -175,7 +178,7 @@ object EstimatedItemValue {
         val internalName = stack.getInternalNameOrNull() ?: return listOf()
 
         // Stats Breakdown
-        val name = stack.name ?: return listOf()
+        val name = stack.name
         if (name == "§6☘ Category: Item Ability (Passive)") return listOf()
         if (name.contains("Salesperson")) return listOf()
 

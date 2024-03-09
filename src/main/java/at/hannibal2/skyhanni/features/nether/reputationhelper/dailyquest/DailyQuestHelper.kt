@@ -40,6 +40,7 @@ import at.hannibal2.skyhanni.utils.NEUItems.getItemStack
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.RenderUtils.drawDynamicText
 import at.hannibal2.skyhanni.utils.RenderUtils.highlight
+import at.hannibal2.skyhanni.utils.StringUtils.removeWordsAtEnd
 import net.minecraft.client.gui.inventory.GuiChest
 import net.minecraft.inventory.ContainerChest
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
@@ -99,9 +100,8 @@ class DailyQuestHelper(val reputationHelper: CrimsonIsleReputationHelper) {
                 if (slot == null) continue
                 if (slot.slotNumber != slot.slotIndex) continue
                 val stack = slot.stack ?: continue
-                val itemName = stack.name ?: continue
 
-                if (itemName.contains(dojoQuest.dojoName)) {
+                if (stack.name.contains(dojoQuest.dojoName)) {
                     slot highlight LorenzColor.AQUA
                 }
             }
@@ -143,7 +143,7 @@ class DailyQuestHelper(val reputationHelper: CrimsonIsleReputationHelper) {
 
         val itemName = fetchQuest.itemName
 
-        val count = InventoryUtils.countItemsInLowerInventory { it.name?.contains(itemName) ?: false }
+        val count = InventoryUtils.countItemsInLowerInventory { it.name.contains(itemName) }
         updateProcessQuest(fetchQuest, count)
     }
 
@@ -253,7 +253,7 @@ class DailyQuestHelper(val reputationHelper: CrimsonIsleReputationHelper) {
         val displayName = if (category == QuestCategory.FETCH || category == QuestCategory.FISHING) {
             val name = item.name
             if (category == QuestCategory.FISHING) {
-                name!!.split(" ").dropLast(1).joinToString(" ")
+                name.removeWordsAtEnd(1)
             } else name
         } else quest.displayName
 
@@ -314,5 +314,5 @@ class DailyQuestHelper(val reputationHelper: CrimsonIsleReputationHelper) {
         }
     }
 
-    private fun isEnabled() = IslandType.CRIMSON_ISLE.isInIsland() && reputationHelper.config.enabled
+    private fun isEnabled() = IslandType.CRIMSON_ISLE.isInIsland() && config.enabled
 }
