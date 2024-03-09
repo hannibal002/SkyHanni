@@ -16,7 +16,7 @@ class DungeonBossMessages {
     )
 
     private val messageList = listOf(
-        //M7 – Dragons
+        // M7 – Dragons
         "§cThe Crystal withers your soul as you hold it in your hands!",
         "§cIt doesn't seem like that is supposed to go there."
     )

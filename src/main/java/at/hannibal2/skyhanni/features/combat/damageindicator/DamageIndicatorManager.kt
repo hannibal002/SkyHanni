@@ -14,10 +14,13 @@ import at.hannibal2.skyhanni.events.LorenzChatEvent
 import at.hannibal2.skyhanni.events.LorenzRenderWorldEvent
 import at.hannibal2.skyhanni.events.LorenzTickEvent
 import at.hannibal2.skyhanni.events.LorenzWorldChangeEvent
+import at.hannibal2.skyhanni.events.SkyHanniRenderEntityEvent
 import at.hannibal2.skyhanni.features.dungeon.DungeonAPI
 import at.hannibal2.skyhanni.features.slayer.blaze.HellionShield
 import at.hannibal2.skyhanni.features.slayer.blaze.setHellionShield
 import at.hannibal2.skyhanni.test.command.ErrorManager
+import at.hannibal2.skyhanni.utils.CollectionUtils.editCopy
+import at.hannibal2.skyhanni.utils.CollectionUtils.put
 import at.hannibal2.skyhanni.utils.ConfigUtils
 import at.hannibal2.skyhanni.utils.EntityUtils
 import at.hannibal2.skyhanni.utils.EntityUtils.canBeSeen
@@ -28,10 +31,7 @@ import at.hannibal2.skyhanni.utils.LocationUtils.distanceToPlayer
 import at.hannibal2.skyhanni.utils.LorenzColor
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils.baseMaxHealth
-import at.hannibal2.skyhanni.utils.LorenzUtils.editCopy
-import at.hannibal2.skyhanni.utils.LorenzUtils.put
 import at.hannibal2.skyhanni.utils.LorenzUtils.round
-import at.hannibal2.skyhanni.utils.LorenzUtils.ticks
 import at.hannibal2.skyhanni.utils.LorenzVec
 import at.hannibal2.skyhanni.utils.NumberUtil
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
@@ -41,6 +41,7 @@ import at.hannibal2.skyhanni.utils.SimpleTimeMark.Companion.asTimeMark
 import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.TimeUtils.format
+import at.hannibal2.skyhanni.utils.TimeUtils.ticks
 import at.hannibal2.skyhanni.utils.getLorenzVec
 import com.google.gson.JsonArray
 import net.minecraft.client.Minecraft
@@ -53,7 +54,6 @@ import net.minecraft.entity.monster.EntityEnderman
 import net.minecraft.entity.monster.EntityMagmaCube
 import net.minecraft.entity.monster.EntityZombie
 import net.minecraft.entity.passive.EntityWolf
-import net.minecraftforge.client.event.RenderLivingEvent
 import net.minecraftforge.event.entity.EntityJoinWorldEvent
 import net.minecraftforge.fml.common.eventhandler.EventPriority
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
@@ -71,6 +71,7 @@ class DamageIndicatorManager {
     private val enderSlayerHitsNumberPattern = ".* §[5fd]§l(?<hits>\\d+) Hits?".toPattern()
 
     companion object {
+
         private var data = mapOf<UUID, EntityData>()
         private val damagePattern = "[✧✯]?(\\d+[⚔+✧❤♞☄✷ﬗ✯]*)".toPattern()
 
@@ -129,7 +130,7 @@ class DamageIndicatorManager {
         GlStateManager.disableDepth()
         GlStateManager.disableCull()
 
-        //TODO config to define between 100ms and 5 sec
+        // TODO config to define between 100ms and 5 sec
         val filter = data.filter {
             val waitForRemoval = if (it.value.dead && !noDeathDisplay(it.value.bossType)) 4_000 else 100
             (System.currentTimeMillis() > it.value.timeLastTick + waitForRemoval) || (it.value.dead && noDeathDisplay(it.value.bossType))
@@ -169,7 +170,7 @@ class DamageIndicatorManager {
 
         for (data in data.values) {
 
-            //TODO test end stone protector in hole? - maybe change eye pos
+            // TODO test end stone protector in hole? - maybe change eye pos
 //            data.ignoreBlocks =
 //                data.bossType == BossType.END_ENDSTONE_PROTECTOR && Minecraft.getMinecraft().thePlayer.isSneaking
 
@@ -266,7 +267,6 @@ class DamageIndicatorManager {
                     diff += 9f
                 }
             }
-
         }
         GlStateManager.enableDepth()
         GlStateManager.enableCull()
@@ -285,7 +285,7 @@ class DamageIndicatorManager {
             BossType.SLAYER_BLAZE_QUAZII_3,
             BossType.SLAYER_BLAZE_QUAZII_4,
 
-                //TODO f3/m3 4 guardians, f2/m2 4 boss room fighters
+                // TODO f3/m3 4 guardians, f2/m2 4 boss room fighters
             -> true
 
             else -> false
@@ -399,7 +399,13 @@ class DamageIndicatorManager {
                 val thorn = checkThorn(health, maxHealth)
                 if (thorn == null) {
                     val floor = DungeonAPI.dungeonFloor
-                    LorenzUtils.error("problems with thorn detection! ($floor, $health/$maxHealth)")
+                    ErrorManager.logErrorStateWithData(
+                        "Could not detect thorn",
+                        "checkThorn returns null",
+                        "health" to health,
+                        "maxHealth" to maxHealth,
+                        "floor" to floor,
+                    )
                 }
                 return thorn
             }
@@ -437,7 +443,7 @@ class DamageIndicatorManager {
 
             BossType.SLAYER_ZOMBIE_5 -> {
                 if ((entity as EntityZombie).hasNameTagWith(3, "§fBoom!")) {
-                    //TODO fix
+                    // TODO fix
 //                    val ticksAlive = entity.ticksExisted % (20 * 5)
 //                    val remainingTicks = (5 * 20).toLong() - ticksAlive
 //                    val format = formatDelay(remainingTicks * 50)
@@ -545,9 +551,9 @@ class DamageIndicatorManager {
             }
         } + " §f"
 
-        //hide while in the middle
+        // hide while in the middle
 //        val position = entity.getLorenzVec()
-        //TODO other logic or something
+        // TODO other logic or something
 //        entityData.healthLineHidden = position.x == -368.0 && position.z == -804.0
 
         var calcHealth = -1
@@ -562,7 +568,16 @@ class DamageIndicatorManager {
                     calcHealth = 0
                     break
                 } else {
-                    LorenzUtils.error("unknown magma boss health sidebar format!")
+                    ErrorManager.logErrorStateWithData(
+                        "Unknown magma boss health sidebar format",
+                        "Damage Indicator could not find magma boss bar data",
+                        "line" to line,
+                        "ScoreboardData.sidebarLinesRaw" to ScoreboardData.sidebarLinesRaw,
+                        "calcHealth" to calcHealth,
+                        "slimeSize" to slimeSize,
+                        "entity" to entity,
+                        "entityData" to entityData,
+                    )
                     break
                 }
 
@@ -641,7 +656,7 @@ class DamageIndicatorManager {
             entityData.namePrefix = ""
         }
 
-        //Hit phase
+        // Hit phase
         var hitPhaseText: String? = null
         val armorStandHits = entity.getNameTagWith(3, " Hit")
         if (armorStandHits != null) {
@@ -659,7 +674,7 @@ class DamageIndicatorManager {
             hitPhaseText = NumberUtil.percentageColor(hits.toLong(), maxHits.toLong()).getChatColor() + "$hits Hits"
         }
 
-        //Laser phase
+        // Laser phase
         if (config.enderSlayer.laserPhaseTimer && entity.ridingEntity != null) {
             val totalTimeAlive = 8.2.seconds
 
@@ -776,7 +791,11 @@ class DamageIndicatorManager {
                 }
             }
         } else {
-            LorenzUtils.error("Invalid/impossible thorn floor!")
+            ErrorManager.logErrorStateWithData(
+                "Thorn in wrong floor detected",
+                "Invalid floor for thorn",
+                "dungeonFloor" to DungeonAPI.dungeonFloor,
+            )
             return null
         }
         val color = NumberUtil.percentageColor(health.toLong(), maxHealth.toLong())
@@ -791,7 +810,7 @@ class DamageIndicatorManager {
             damageCounter.currentDamage += damage
         }
         if (healing > 0) {
-            //Hide auto heal every 10 ticks (with rounding errors)
+            // Hide auto heal every 10 ticks (with rounding errors)
             if ((healing == 15_000L || healing == 15_001L) && entityData.bossType == BossType.SLAYER_ZOMBIE_5) return
 
             val damageCounter = entityData.damageCounter
@@ -838,7 +857,7 @@ class DamageIndicatorManager {
     private val dummyDamageCache = mutableListOf<UUID>()
 
     @SubscribeEvent(priority = EventPriority.HIGH)
-    fun onRenderLiving(event: RenderLivingEvent.Specials.Pre<EntityLivingBase>) {
+    fun onRenderLiving(event: SkyHanniRenderEntityEvent.Specials.Pre<EntityLivingBase>) {
         val entity = event.entity
 
         val entityData = data.values.find {
@@ -905,7 +924,6 @@ class DamageIndicatorManager {
 
             result
         }
-
     }
 
     fun isEnabled() = LorenzUtils.inSkyBlock && config.enabled

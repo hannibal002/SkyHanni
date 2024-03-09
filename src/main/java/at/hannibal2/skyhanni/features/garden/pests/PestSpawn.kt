@@ -6,19 +6,28 @@ import at.hannibal2.skyhanni.config.features.garden.pests.PestSpawnConfig.ChatMe
 import at.hannibal2.skyhanni.events.LorenzChatEvent
 import at.hannibal2.skyhanni.events.garden.pests.PestSpawnEvent
 import at.hannibal2.skyhanni.features.garden.GardenAPI
+import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.ConfigUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.StringUtils
 import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
+import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import kotlin.time.Duration.Companion.seconds
 
 class PestSpawn {
+
     private val config get() = PestAPI.config.pestSpawn
 
-    private val patternOnePest = "§6§l.*! §7A §6Pest §7has appeared in §aPlot §7- §b(?<plot>.*)§7!".toPattern()
-    private val patternMultiplePests =
-        "§6§l.*! §6(?<amount>\\d) Pests §7have spawned in §aPlot §7- §b(?<plot>.*)§7!".toPattern()
+    private val patternGroup = RepoPattern.group("garden.pests.spawn")
+    private val onePestPattern by patternGroup.pattern(
+        "one",
+        "§6§l.*! §7A §6Pest §7has appeared in §aPlot §7- §b(?<plot>.*)§7!"
+    )
+    private val multiplePestSpawn by patternGroup.pattern(
+        "multiple",
+        "§6§l.*! §6(?<amount>\\d) Pests §7have spawned in §aPlot §7- §b(?<plot>.*)§7!"
+    )
 
     @SubscribeEvent
     fun onChat(event: LorenzChatEvent) {
@@ -26,11 +35,11 @@ class PestSpawn {
 
         var blocked = false
 
-        patternOnePest.matchMatcher(event.message) {
+        onePestPattern.matchMatcher(event.message) {
             pestSpawn(1, group("plot"))
             blocked = true
         }
-        patternMultiplePests.matchMatcher(event.message) {
+        multiplePestSpawn.matchMatcher(event.message) {
             pestSpawn(group("amount").toInt(), group("plot"))
             blocked = true
         }
@@ -47,7 +56,7 @@ class PestSpawn {
 
     private fun pestSpawn(amount: Int, plotName: String) {
         PestSpawnEvent(amount, plotName).postAndCatch()
-        val pestName = StringUtils.canBePlural(amount, "Pest", "Pests")
+        val pestName = StringUtils.pluralize(amount, "Pest")
         val message = "§e$amount §a$pestName Spawned in §b$plotName§a!"
 
         if (config.showTitle) {
@@ -55,7 +64,7 @@ class PestSpawn {
         }
 
         if (config.chatMessageFormat == PestSpawnConfig.ChatMessageFormatEntry.COMPACT) {
-            LorenzUtils.clickableChat(message, "tptoplot $plotName")
+            ChatUtils.clickableChat(message, "tptoplot $plotName")
         }
     }
 

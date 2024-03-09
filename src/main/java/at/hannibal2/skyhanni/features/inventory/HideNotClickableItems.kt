@@ -8,11 +8,13 @@ import at.hannibal2.skyhanni.data.jsonobjects.repo.HideNotClickableItemsJson
 import at.hannibal2.skyhanni.data.jsonobjects.repo.HideNotClickableItemsJson.SalvageFilter
 import at.hannibal2.skyhanni.events.GuiContainerEvent
 import at.hannibal2.skyhanni.events.RepositoryReloadEvent
-import at.hannibal2.skyhanni.features.bazaar.BazaarApi
 import at.hannibal2.skyhanni.features.garden.composter.ComposterOverlay
 import at.hannibal2.skyhanni.features.garden.visitor.VisitorAPI
+import at.hannibal2.skyhanni.features.inventory.bazaar.BazaarApi
 import at.hannibal2.skyhanni.features.rift.RiftAPI
 import at.hannibal2.skyhanni.features.rift.RiftAPI.motesNpcPrice
+import at.hannibal2.skyhanni.utils.ChatUtils
+import at.hannibal2.skyhanni.utils.CollectionUtils.equalsOneOf
 import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.InventoryUtils.getInventoryName
 import at.hannibal2.skyhanni.utils.ItemUtils
@@ -24,7 +26,6 @@ import at.hannibal2.skyhanni.utils.ItemUtils.isVanilla
 import at.hannibal2.skyhanni.utils.KeyboardManager
 import at.hannibal2.skyhanni.utils.LorenzColor
 import at.hannibal2.skyhanni.utils.LorenzUtils
-import at.hannibal2.skyhanni.utils.LorenzUtils.equalsOneOf
 import at.hannibal2.skyhanni.utils.MultiFilter
 import at.hannibal2.skyhanni.utils.NEUInternalName.Companion.asInternalName
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.isRiftExportable
@@ -41,6 +42,7 @@ import net.minecraftforge.fml.common.eventhandler.EventPriority
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
 class HideNotClickableItems {
+
     private val config get() = SkyHanniMod.feature.inventory.hideNotClickable
 
     private var hideReason = ""
@@ -132,7 +134,7 @@ class HideNotClickableItems {
             event.toolTip.add("")
             if (hideReason == "") {
                 event.toolTip.add("§4No hide reason!")
-                LorenzUtils.error("No hide reason for not clickable item!")
+                ChatUtils.error("No hide reason for not clickable item!")
             } else {
                 event.toolTip.add("§c$hideReason")
                 if (config.itemsBypass) {
@@ -561,6 +563,5 @@ class HideNotClickableItems {
         event.move(3, "inventory.hideNotClickableOpacity", "inventory.hideNotClickable.opacity")
         event.move(3, "inventory.notClickableItemsBypass", "inventory.hideNotClickable.itemsBypass")
         event.move(3, "inventory.hideNotClickableItemsGreenLine", "inventory.hideNotClickable.itemsGreenLine")
-
     }
 }

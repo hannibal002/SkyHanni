@@ -20,11 +20,6 @@ public class CrimsonIsleConfig {
     @Expose
     public ReputationHelperConfig reputationHelper = new ReputationHelperConfig();
 
-    @ConfigOption(name = "Sulphur Skitter Box", desc = "")
-    @Accordion
-    @Expose
-    public SulphurSkitterBoxConfig sulphurSkitterBoxConfig = new SulphurSkitterBoxConfig();
-
     @Expose
     @ConfigOption(name = "Pablo NPC Helper", desc = "Shows a clickable message that grabs the flower needed from your sacks.")
     @ConfigEditorBoolean

@@ -4,27 +4,29 @@ import at.hannibal2.skyhanni.data.ProfileStorageData
 import at.hannibal2.skyhanni.data.ScoreboardData
 import at.hannibal2.skyhanni.events.DebugDataCollectEvent
 import at.hannibal2.skyhanni.events.DungeonBossRoomEnterEvent
+import at.hannibal2.skyhanni.events.DungeonCompleteEvent
 import at.hannibal2.skyhanni.events.DungeonEnterEvent
 import at.hannibal2.skyhanni.events.DungeonStartEvent
 import at.hannibal2.skyhanni.events.InventoryFullyOpenedEvent
 import at.hannibal2.skyhanni.events.LorenzChatEvent
 import at.hannibal2.skyhanni.events.LorenzTickEvent
 import at.hannibal2.skyhanni.events.LorenzWorldChangeEvent
+import at.hannibal2.skyhanni.utils.CollectionUtils.addOrPut
+import at.hannibal2.skyhanni.utils.CollectionUtils.equalsOneOf
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.ItemUtils.name
 import at.hannibal2.skyhanni.utils.LorenzUtils
-import at.hannibal2.skyhanni.utils.LorenzUtils.addOrPut
-import at.hannibal2.skyhanni.utils.LorenzUtils.equalsOneOf
-import at.hannibal2.skyhanni.utils.LorenzUtils.getOrNull
 import at.hannibal2.skyhanni.utils.NumberUtil.formatNumber
 import at.hannibal2.skyhanni.utils.NumberUtil.romanToDecimalIfNecessary
 import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.TabListData
+import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraft.item.ItemStack
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
 class DungeonAPI {
+
     private val floorPattern = " §7⏣ §cThe Catacombs §7\\((?<floor>.*)\\)".toPattern()
     private val uniqueClassBonus =
         "^Your ([A-Za-z]+) stats are doubled because you are the only player using this class!$".toRegex()
@@ -37,6 +39,7 @@ class DungeonAPI {
     private val totalKillsPattern = "§7Total Kills: §e(?<kills>.*)".toPattern()
 
     companion object {
+
         var dungeonFloor: String? = null
         var started = false
         var inBossRoom = false
@@ -47,6 +50,13 @@ class DungeonAPI {
         val bossStorage: MutableMap<DungeonFloor, Int>? get() = ProfileStorageData.profileSpecific?.dungeons?.bosses
         private val timePattern =
             "Time Elapsed:( )?(?:(?<minutes>\\d+)m)? (?<seconds>\\d+)s".toPattern() // Examples: Time Elapsed: 10m 10s, Time Elapsed: 2s
+
+        private val patternGroup = RepoPattern.group("dungeon")
+
+        private val dungeonComplete by patternGroup.pattern(
+            "complete",
+            "§.\\s+§.§.(?:The|Master Mode) Catacombs §.§.- §.§.Floor (?<floor>M?[IV]{1,3}|Entrance)"
+        )
 
         fun inDungeon() = dungeonFloor != null
 
@@ -152,6 +162,11 @@ class DungeonAPI {
             if (matches() && boss != null && boss !in bossCollections) {
                 bossCollections.addOrPut(boss, 1)
             }
+            return
+        }
+        dungeonComplete.matchMatcher(event.message) {
+            DungeonCompleteEvent(floor).postAndCatch()
+            return
         }
     }
 
@@ -170,7 +185,7 @@ class DungeonAPI {
     private fun readOneMaxCollection(
         bossCollections: MutableMap<DungeonFloor, Int>,
         inventoryItems: Map<Int, ItemStack>,
-        inventoryName: String
+        inventoryName: String,
     ) {
         inventoryItems[48]?.let { item ->
             if (item.name == "§aGo Back") {
@@ -248,6 +263,7 @@ class DungeonAPI {
         F7("Necron");
 
         companion object {
+
             fun byBossName(bossName: String) = DungeonFloor.entries.firstOrNull { it.bossName == bossName }
         }
     }
@@ -258,5 +274,19 @@ class DungeonAPI {
         HEALER("Healer"),
         MAGE("Mage"),
         TANK("Tank")
+    }
+
+    enum class DungeonChest(val inventory: String) {
+        WOOD("Wood Chest"),
+        GOLD("Gold Chest"),
+        DIAMOND("Diamond Chest"),
+        EMERALD("Emerald Chest"),
+        OBSIDIAN("Obsidian Chest"),
+        BEDROCK("Bedrock Chest"),
+        ;
+
+        companion object {
+            fun getByInventoryName(inventory: String) = entries.firstOrNull { it.inventory == inventory }
+        }
     }
 }

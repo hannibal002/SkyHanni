@@ -6,18 +6,26 @@ import at.hannibal2.skyhanni.data.jsonobjects.repo.AnitaUpgradeCostsJson.Price
 import at.hannibal2.skyhanni.events.LorenzToolTipEvent
 import at.hannibal2.skyhanni.events.RepositoryReloadEvent
 import at.hannibal2.skyhanni.features.garden.GardenAPI
+import at.hannibal2.skyhanni.utils.CollectionUtils.indexOfFirst
 import at.hannibal2.skyhanni.utils.InventoryUtils
-import at.hannibal2.skyhanni.utils.LorenzUtils.indexOfFirst
 import at.hannibal2.skyhanni.utils.NEUInternalName.Companion.asInternalName
 import at.hannibal2.skyhanni.utils.NEUItems.getPrice
 import at.hannibal2.skyhanni.utils.NumberUtil
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
-import at.hannibal2.skyhanni.utils.NumberUtil.formatNumber
+import at.hannibal2.skyhanni.utils.NumberUtil.formatDouble
 import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
+import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
 class AnitaExtraFarmingFortune {
+
     private val config get() = GardenAPI.config.anitaShop
+
+    private val realAmountPattern by RepoPattern.pattern(
+        "garden.inventory.anita.extrafortune.realamount",
+        "§5§o§aJacob's Ticket §8x(?<realAmount>.*)"
+    )
+
     private var levelPrice = mapOf<Int, Price>()
 
     @SubscribeEvent
@@ -33,8 +41,8 @@ class AnitaExtraFarmingFortune {
         var contributionFactor = 1.0
         val baseAmount = levelPrice[anitaUpgrade + 1]?.jacob_tickets ?: return
         for (line in event.toolTip) {
-            "§5§o§aJacob's Ticket §8x(?<realAmount>.*)".toPattern().matchMatcher(line) {
-                val realAmount = group("realAmount").formatNumber().toDouble()
+            realAmountPattern.matchMatcher(line) {
+                val realAmount = group("realAmount").formatDouble()
                 contributionFactor = realAmount / baseAmount
             }
         }

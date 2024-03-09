@@ -1,0 +1,14 @@
+* text=auto
+
+# Always Unix-style line endings
+*.sh    text eol=lf
+
+# Always Windows-style line endings
+*.bat   text eol=crlf
+*.cmd   text eol=crlf
+
+# Always binary
+*.jpg   -text
+*.ogg   -text
+*.png   -text
+*.xcf   -text

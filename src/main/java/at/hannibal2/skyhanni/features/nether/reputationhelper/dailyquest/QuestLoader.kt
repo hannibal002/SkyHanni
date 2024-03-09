@@ -14,6 +14,7 @@ import at.hannibal2.skyhanni.features.nether.reputationhelper.dailyquest.quest.R
 import at.hannibal2.skyhanni.features.nether.reputationhelper.dailyquest.quest.TrophyFishQuest
 import at.hannibal2.skyhanni.features.nether.reputationhelper.dailyquest.quest.UnknownQuest
 import at.hannibal2.skyhanni.test.command.ErrorManager
+import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.TabListData
@@ -21,6 +22,7 @@ import at.hannibal2.skyhanni.utils.TabListData
 class QuestLoader(private val dailyQuestHelper: DailyQuestHelper) {
 
     companion object {
+
         val quests = mutableMapOf<String, Pair<String, ReputationQuest>>()
         fun loadQuests(data: Map<String, ReputationQuest>, questType: String) {
             for ((questName, questInfo) in data) {
@@ -79,7 +81,7 @@ class QuestLoader(private val dailyQuestHelper: DailyQuestHelper) {
             if (green && oldQuest.state != QuestState.READY_TO_COLLECT && oldQuest.state != QuestState.COLLECTED) {
                 oldQuest.state = QuestState.READY_TO_COLLECT
                 dailyQuestHelper.update()
-                LorenzUtils.debug("Reputation Helper: Tab-List updated ${oldQuest.internalName} (This should not happen)")
+                ChatUtils.debug("Reputation Helper: Tab-List updated ${oldQuest.internalName} (This should not happen)")
             }
             return
         }
@@ -182,8 +184,10 @@ class QuestLoader(private val dailyQuestHelper: DailyQuestHelper) {
                     val haveAmount = split[3].toInt()
                     quest.haveAmount = haveAmount
                 } catch (e: IndexOutOfBoundsException) {
-                    println("text: '$text'")
-                    e.printStackTrace()
+                    ErrorManager.logErrorWithData(
+                        e, "Error loading Crimson Isle Quests from config.",
+                        "text" to text,
+                    )
                 }
             }
             addQuest(quest)

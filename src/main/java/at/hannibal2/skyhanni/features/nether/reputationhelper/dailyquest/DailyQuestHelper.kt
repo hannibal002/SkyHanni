@@ -1,5 +1,6 @@
 package at.hannibal2.skyhanni.features.nether.reputationhelper.dailyquest
 
+import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.config.Storage
 import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.data.SackAPI
@@ -26,18 +27,20 @@ import at.hannibal2.skyhanni.features.nether.reputationhelper.dailyquest.quest.T
 import at.hannibal2.skyhanni.features.nether.reputationhelper.dailyquest.quest.UnknownQuest
 import at.hannibal2.skyhanni.features.nether.reputationhelper.miniboss.CrimsonMiniBoss
 import at.hannibal2.skyhanni.test.GriffinUtils.drawWaypointFilled
+import at.hannibal2.skyhanni.utils.ChatUtils
+import at.hannibal2.skyhanni.utils.CollectionUtils.addAsSingletonList
 import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.InventoryUtils.getInventoryName
 import at.hannibal2.skyhanni.utils.ItemUtils.name
 import at.hannibal2.skyhanni.utils.LorenzColor
 import at.hannibal2.skyhanni.utils.LorenzUtils
-import at.hannibal2.skyhanni.utils.LorenzUtils.addAsSingletonList
 import at.hannibal2.skyhanni.utils.LorenzUtils.isInIsland
 import at.hannibal2.skyhanni.utils.LorenzVec
 import at.hannibal2.skyhanni.utils.NEUItems.getItemStack
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.RenderUtils.drawDynamicText
 import at.hannibal2.skyhanni.utils.RenderUtils.highlight
+import at.hannibal2.skyhanni.utils.StringUtils.removeWordsAtEnd
 import net.minecraft.client.gui.inventory.GuiChest
 import net.minecraft.inventory.ContainerChest
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
@@ -50,6 +53,8 @@ class DailyQuestHelper(val reputationHelper: CrimsonIsleReputationHelper) {
     private val questLoader = QuestLoader(this)
     val quests = mutableListOf<Quest>()
     var greatSpook = false
+
+    private val config get() = SkyHanniMod.feature.crimsonIsle.reputationHelper
 
     @SubscribeEvent
     fun onInventoryOpen(event: InventoryFullyOpenedEvent) {
@@ -95,9 +100,8 @@ class DailyQuestHelper(val reputationHelper: CrimsonIsleReputationHelper) {
                 if (slot == null) continue
                 if (slot.slotNumber != slot.slotIndex) continue
                 val stack = slot.stack ?: continue
-                val itemName = stack.name ?: continue
 
-                if (itemName.contains(dojoQuest.dojoName)) {
+                if (stack.name.contains(dojoQuest.dojoName)) {
                     slot highlight LorenzColor.AQUA
                 }
             }
@@ -139,7 +143,7 @@ class DailyQuestHelper(val reputationHelper: CrimsonIsleReputationHelper) {
 
         val itemName = fetchQuest.itemName
 
-        val count = InventoryUtils.countItemsInLowerInventory { it.name?.contains(itemName) ?: false }
+        val count = InventoryUtils.countItemsInLowerInventory { it.name.contains(itemName) }
         updateProcessQuest(fetchQuest, count)
     }
 
@@ -150,7 +154,7 @@ class DailyQuestHelper(val reputationHelper: CrimsonIsleReputationHelper) {
             count = needAmount
         }
         if (quest.haveAmount == count) return
-        LorenzUtils.chat("${quest.displayName} progress: $count/$needAmount")
+        ChatUtils.chat("${quest.displayName} progress: $count/$needAmount")
 
         quest.haveAmount = count
         quest.state = if (count == needAmount) QuestState.READY_TO_COLLECT else QuestState.ACCEPTED
@@ -198,7 +202,8 @@ class DailyQuestHelper(val reputationHelper: CrimsonIsleReputationHelper) {
         display.addAsSingletonList("")
         display.addAsSingletonList("§7Daily Quests (§e$done§8/§e5 collected§7)")
         if (done != 5) {
-            quests.mapTo(display) { renderQuest(it) }
+            val filteredQuests = quests.filter { !config.hideComplete.get() || it.state != QuestState.COLLECTED }
+            filteredQuests.mapTo(display) { renderQuest(it) }
         }
     }
 
@@ -232,7 +237,6 @@ class DailyQuestHelper(val reputationHelper: CrimsonIsleReputationHelper) {
                 }
                 " §7($color${amountInSacks.addSeparators()} §7in sacks)"
             }
-
         } else {
             ""
         }
@@ -249,7 +253,7 @@ class DailyQuestHelper(val reputationHelper: CrimsonIsleReputationHelper) {
         val displayName = if (category == QuestCategory.FETCH || category == QuestCategory.FISHING) {
             val name = item.name
             if (category == QuestCategory.FISHING) {
-                name!!.split(" ").dropLast(1).joinToString(" ")
+                name.removeWordsAtEnd(1)
             } else name
         } else quest.displayName
 
@@ -258,7 +262,6 @@ class DailyQuestHelper(val reputationHelper: CrimsonIsleReputationHelper) {
         result.add("  $stateText$categoryName: ")
         result.add(item)
         result.add("§f$displayName$progressText$sacksText")
-
         return result
     }
 
@@ -271,7 +274,7 @@ class DailyQuestHelper(val reputationHelper: CrimsonIsleReputationHelper) {
 
     fun finishKuudra(kuudraTier: KuudraTier) {
         val kuudraQuest = getQuest<KuudraQuest>() ?: return
-        //TODO make inline method for this two lines
+        // TODO make inline method for this two lines
         if (kuudraQuest.kuudraTier == kuudraTier && kuudraQuest.state == QuestState.ACCEPTED) {
             kuudraQuest.state = QuestState.READY_TO_COLLECT
         }
@@ -311,5 +314,5 @@ class DailyQuestHelper(val reputationHelper: CrimsonIsleReputationHelper) {
         }
     }
 
-    private fun isEnabled() = IslandType.CRIMSON_ISLE.isInIsland() && reputationHelper.config.enabled
+    private fun isEnabled() = IslandType.CRIMSON_ISLE.isInIsland() && config.enabled
 }

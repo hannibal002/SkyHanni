@@ -45,20 +45,20 @@ import java.util.UUID
 
 class MobFinder {
 
-    //F1
+    // F1
     private var floor1bonzo1 = false
     private var floor1bonzo1SpawnTime = 0L
     private var floor1bonzo2 = false
     private var floor1bonzo2SpawnTime = 0L
 
-    //F2
+    // F2
     private var floor2summons1 = false
     private var floor2summons1SpawnTime = 0L
     private var floor2summonsDiedOnce = mutableListOf<EntityOtherPlayerMP>()
     private var floor2secondPhase = false
     private var floor2secondPhaseSpawnTime = 0L
 
-    //F3
+    // F3
     private var floor3GuardianShield = false
     private var floor3GuardianShieldSpawnTime = 0L
     private var guardians = mutableListOf<EntityGuardian>()
@@ -69,13 +69,13 @@ class MobFinder {
     private var floor3ProfessorGuardian = false
     private var floor3ProfessorGuardianEntity: EntityGuardian? = null
 
-    //F5
+    // F5
     private var floor5lividEntity: EntityOtherPlayerMP? = null
     private var floor5lividEntitySpawnTime = 0L
     private val correctLividPattern =
         "§c\\[BOSS] (.*) Livid§r§f: Impossible! How did you figure out which one I was\\?!".toPattern()
 
-    //F6
+    // F6
     private var floor6Giants = false
     private var floor6GiantsSpawnTime = 0L
     private var floor6GiantsSeparateDelay = mutableMapOf<UUID, Pair<Long, BossType>>()
@@ -166,7 +166,7 @@ class MobFinder {
         }
 
         if (floor2secondPhase && entity is EntityOtherPlayerMP) {
-            //TODO only show scarf after (all/at least x) summons are dead?
+            // TODO only show scarf after (all/at least x) summons are dead?
             if (entity.name == "Scarf ") {
                 return EntityResult(
                     floor2secondPhaseSpawnTime,
@@ -343,7 +343,7 @@ class MobFinder {
         }
     }
 
-    //TODO testing and use sidebar data
+    // TODO testing and use sidebar data
     private fun tryAddEntityDragon(entity: EntityLivingBase) = when {
         IslandType.THE_END.isInIsland() -> EntityResult(bossType = BossType.END_ENDER_DRAGON)
         IslandType.WINTER.isInIsland() -> EntityResult(bossType = BossType.WINTER_REINDRAKE)
@@ -482,29 +482,27 @@ class MobFinder {
 
         var pos = 0
 
-
         val type: BossType
         if (loc.x > middle.x && loc.z > middle.z) {
-        //first
+            // first
             pos = 2
             type = BossType.DUNGEON_F6_GIANT_3
         } else if (loc.x > middle.x && loc.z < middle.z) {
-        //second
+            // second
             pos = 3
             type = BossType.DUNGEON_F6_GIANT_4
         } else if (loc.x < middle.x && loc.z < middle.z) {
-        //third
+            // third
             pos = 0
             type = BossType.DUNGEON_F6_GIANT_1
         } else if (loc.x < middle.x && loc.z > middle.z) {
-        //fourth
+            // fourth
             pos = 1
             type = BossType.DUNGEON_F6_GIANT_2
         } else {
             pos = 0
             type = BossType.DUNGEON_F6_GIANT_1
         }
-
 
         val extraDelay = 900L * pos
         val pair = Pair(extraDelay, type)
@@ -516,7 +514,7 @@ class MobFinder {
     fun handleChat(message: String) {
         if (!LorenzUtils.inDungeons) return
         when (message) {
-            //F1
+            // F1
             "§c[BOSS] Bonzo§r§f: Gratz for making it this far, but I'm basically unbeatable." -> {
                 floor1bonzo1 = true
                 floor1bonzo1SpawnTime = System.currentTimeMillis() + 11_250
@@ -535,7 +533,7 @@ class MobFinder {
                 floor1bonzo2 = false
             }
 
-            //F2
+            // F2
             "§c[BOSS] Scarf§r§f: ARISE, MY CREATIONS!" -> {
                 floor2summons1 = true
                 floor2summons1SpawnTime = System.currentTimeMillis() + 3_500
@@ -554,7 +552,7 @@ class MobFinder {
                 floor2secondPhase = false
             }
 
-            //F3
+            // F3
             "§c[BOSS] The Professor§r§f: I was burdened with terrible news recently..." -> {
                 floor3GuardianShield = true
                 floor3GuardianShieldSpawnTime = System.currentTimeMillis() + 15_400
@@ -582,13 +580,13 @@ class MobFinder {
                 floor3ProfessorGuardian = false
             }
 
-            //F5
+            // F5
             "§c[BOSS] Livid§r§f: This Orb you see, is Thorn, or what is left of him." -> {
                 floor5lividEntity = DungeonLividFinder.lividEntity
                 floor5lividEntitySpawnTime = System.currentTimeMillis() + 13_000
             }
 
-            //F6
+            // F6
             "§c[BOSS] Sadan§r§f: ENOUGH!" -> {
                 floor6Giants = true
                 floor6GiantsSpawnTime = System.currentTimeMillis() + 7_400
@@ -614,7 +612,6 @@ class MobFinder {
         if (LorenzUtils.inDungeons && floor3ProfessorGuardian && entity is EntityGuardian && floor3ProfessorGuardianEntity == null) {
             floor3ProfessorGuardianEntity = entity
             floor3ProfessorGuardianPrepare = false
-
         }
     }
 

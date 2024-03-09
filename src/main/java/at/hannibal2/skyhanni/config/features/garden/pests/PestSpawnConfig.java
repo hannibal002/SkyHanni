@@ -13,7 +13,7 @@ public class PestSpawnConfig {
     @ConfigOption(
         name = "Chat Message Format",
         desc = "Change how the pest spawn chat message should be formatted.")
-    @ConfigEditorDropdown()
+    @ConfigEditorDropdown
     public ChatMessageFormatEntry chatMessageFormat = ChatMessageFormatEntry.HYPIXEL;
 
     public enum ChatMessageFormatEntry implements HasLegacyId {

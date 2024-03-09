@@ -1,10 +1,12 @@
 package at.hannibal2.skyhanni.features.misc.compacttablist
 
 import at.hannibal2.skyhanni.SkyHanniMod
+import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.SkipTabListLineEvent
 import at.hannibal2.skyhanni.mixins.transformers.AccessorGuiPlayerTabOverlay
+import at.hannibal2.skyhanni.utils.CollectionUtils.filterToMutable
+import at.hannibal2.skyhanni.utils.KeyboardManager.isActive
 import at.hannibal2.skyhanni.utils.LorenzUtils
-import at.hannibal2.skyhanni.utils.LorenzUtils.filterToMutable
 import at.hannibal2.skyhanni.utils.StringUtils.matches
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraft.client.Minecraft
@@ -13,9 +15,11 @@ import net.minecraft.client.gui.ScaledResolution
 import net.minecraft.client.renderer.GlStateManager
 import net.minecraft.entity.player.EnumPlayerModelParts
 import net.minecraftforge.client.event.RenderGameOverlayEvent
+import net.minecraftforge.fml.common.eventhandler.EventPriority
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
 object TabListRenderer {
+
     private val config get() = SkyHanniMod.feature.misc.compactTabList
 
     const val maxLines = 22
@@ -30,6 +34,37 @@ object TabListRenderer {
         if (!config.enabled) return
         event.isCanceled = true
 
+        if (config.toggleTab) return
+
+        drawTabList()
+    }
+
+    private var isPressed = false
+    private var isTabToggled = false
+
+    // compact scoreboard should render above other SkyHanni GUIs when toggle tab is in use.
+    @SubscribeEvent(priority = EventPriority.LOW)
+    fun onRenderOverlay(event: GuiRenderEvent.GuiOverlayRenderEvent) {
+        if (!LorenzUtils.inSkyBlock) return
+        if (!config.enabled) return
+        if (!config.toggleTab) return
+        if (Minecraft.getMinecraft().currentScreen != null) return
+
+        if (Minecraft.getMinecraft().gameSettings.keyBindPlayerList.isActive()) {
+            if (!isPressed) {
+                isPressed = true
+                isTabToggled = !isTabToggled
+            }
+        } else {
+            isPressed = false
+        }
+
+        if (isTabToggled) {
+            drawTabList()
+        }
+    }
+
+    private fun drawTabList() {
         val columns = TabListReader.renderColumns
 
         if (columns.isEmpty()) return
@@ -138,7 +173,8 @@ object TabListRenderer {
                     middleX += 8 + 2
                 }
 
-                val text = if (AdvancedPlayerList.ignoreCustomTabList()) tabLine.text else tabLine.customName
+                var text = if (AdvancedPlayerList.ignoreCustomTabList()) tabLine.text else tabLine.customName
+                if (text.contains("§l")) text = "§r$text"
                 if (tabLine.type == TabStringType.TITLE) {
                     minecraft.fontRendererObj.drawStringWithShadow(
                         text,
@@ -174,13 +210,15 @@ object TabListRenderer {
         }
     }
 
-    private val fireSalePattern by RepoPattern.pattern("tablist.firesaletitle", "§b§lFire Sales: §r§f\\([0-9]+\\)")
+    private val fireSalePattern by RepoPattern.pattern(
+        "tablist.firesaletitle",
+        "§b§lFire Sales: §r§f\\([0-9]+\\)"
+    )
 
     @SubscribeEvent
-    fun hideFireFromTheTabListBecauseWhoWantsThose(event: SkipTabListLineEvent) {
+    fun onSkipTablistLine(event: SkipTabListLineEvent) {
         if (config.hideFiresales && event.lastSubTitle != null && fireSalePattern.matches(event.lastSubTitle.text)) {
             event.cancel()
         }
     }
-
 }

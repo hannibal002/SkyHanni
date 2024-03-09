@@ -10,6 +10,7 @@ import net.minecraftforge.event.entity.EntityJoinWorldEvent
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
 class HighlightInquisitors {
+
     private val config get() = SkyHanniMod.feature.event.diana
 
     @SubscribeEvent
@@ -20,7 +21,8 @@ class HighlightInquisitors {
         val entity = event.entity
 
         if (entity is EntityPlayer && entity.name == "Minos Inquisitor") {
-            RenderLivingEntityHelper.setEntityColor(entity, LorenzColor.AQUA.toColor().withAlpha(127)) { config.highlightInquisitors }
+            val color = LorenzColor.AQUA.toColor().withAlpha(127)
+            RenderLivingEntityHelper.setEntityColor(entity, color) { config.highlightInquisitors }
             RenderLivingEntityHelper.setNoHurtTime(entity) { config.highlightInquisitors }
         }
     }

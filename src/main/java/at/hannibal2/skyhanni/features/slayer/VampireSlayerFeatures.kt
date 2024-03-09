@@ -8,10 +8,13 @@ import at.hannibal2.skyhanni.events.LorenzRenderWorldEvent
 import at.hannibal2.skyhanni.events.LorenzTickEvent
 import at.hannibal2.skyhanni.events.LorenzWorldChangeEvent
 import at.hannibal2.skyhanni.events.ReceiveParticleEvent
+import at.hannibal2.skyhanni.events.SkyHanniRenderEntityEvent
 import at.hannibal2.skyhanni.events.withAlpha
 import at.hannibal2.skyhanni.features.rift.RiftAPI
 import at.hannibal2.skyhanni.mixins.hooks.RenderLivingEntityHelper
 import at.hannibal2.skyhanni.test.GriffinUtils.drawWaypointFilled
+import at.hannibal2.skyhanni.utils.CollectionUtils.editCopy
+import at.hannibal2.skyhanni.utils.ColorUtils.toChromaColor
 import at.hannibal2.skyhanni.utils.DelayedRun
 import at.hannibal2.skyhanni.utils.EntityUtils
 import at.hannibal2.skyhanni.utils.EntityUtils.canBeSeen
@@ -22,8 +25,6 @@ import at.hannibal2.skyhanni.utils.LocationUtils
 import at.hannibal2.skyhanni.utils.LorenzColor
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils.baseMaxHealth
-import at.hannibal2.skyhanni.utils.LorenzUtils.editCopy
-import at.hannibal2.skyhanni.utils.LorenzUtils.toChromaColor
 import at.hannibal2.skyhanni.utils.RenderUtils.draw3DLine
 import at.hannibal2.skyhanni.utils.RenderUtils.drawColor
 import at.hannibal2.skyhanni.utils.RenderUtils.drawDynamicText
@@ -40,7 +41,6 @@ import net.minecraft.client.renderer.GlStateManager
 import net.minecraft.entity.EntityLivingBase
 import net.minecraft.entity.item.EntityArmorStand
 import net.minecraft.util.EnumParticleTypes
-import net.minecraftforge.client.event.RenderLivingEvent
 import net.minecraftforge.event.entity.living.LivingDeathEvent
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import kotlin.time.Duration.Companion.milliseconds
@@ -259,7 +259,7 @@ object VampireSlayerFeatures {
     }
 
     @SubscribeEvent
-    fun pre(event: RenderLivingEvent.Pre<EntityOtherPlayerMP>) {
+    fun pre(event: SkyHanniRenderEntityEvent.Pre<EntityOtherPlayerMP>) {
         if (!isEnabled()) return
         if (!config.seeThrough) return
         if (entityList.contains(event.entity) && event.entity.canBeSeen()) {
@@ -268,7 +268,7 @@ object VampireSlayerFeatures {
     }
 
     @SubscribeEvent
-    fun pre(event: RenderLivingEvent.Post<EntityOtherPlayerMP>) {
+    fun post(event: SkyHanniRenderEntityEvent.Post<EntityOtherPlayerMP>) {
         if (!isEnabled()) return
         if (!config.seeThrough) return
         if (entityList.contains(event.entity) && event.entity.canBeSeen()) {

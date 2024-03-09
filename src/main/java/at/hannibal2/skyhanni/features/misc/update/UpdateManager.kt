@@ -4,9 +4,9 @@ import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.config.features.About
 import at.hannibal2.skyhanni.events.ConfigLoadEvent
 import at.hannibal2.skyhanni.events.LorenzTickEvent
+import at.hannibal2.skyhanni.utils.ChatUtils
+import at.hannibal2.skyhanni.utils.ConditionalUtils.onToggle
 import at.hannibal2.skyhanni.utils.LorenzLogger
-import at.hannibal2.skyhanni.utils.LorenzUtils
-import at.hannibal2.skyhanni.utils.LorenzUtils.onToggle
 import io.github.moulberry.moulconfig.processor.MoulConfigProcessor
 import io.github.moulberry.notenoughupdates.util.MinecraftExecutor
 import moe.nea.libautoupdate.CurrentVersion
@@ -48,7 +48,7 @@ object UpdateManager {
     fun onTick(event: LorenzTickEvent) {
         Minecraft.getMinecraft().thePlayer ?: return
         MinecraftForge.EVENT_BUS.unregister(this)
-        if (config.autoUpdates)
+        if (config.autoUpdates || config.fullAutoUpdates)
             checkUpdate()
     }
 
@@ -95,11 +95,16 @@ object UpdateManager {
                 potentialUpdate = it
                 if (it.isUpdateAvailable) {
                     updateState = UpdateState.AVAILABLE
-                    LorenzUtils.clickableChat(
-                        "§aSkyHanni found a new update: ${it.update.versionName}. " +
+                    if (config.fullAutoUpdates) {
+                        ChatUtils.chat("§aSkyHanni found a new update: ${it.update.versionName}, starting to download now. ")
+                        queueUpdate()
+                    } else if (config.autoUpdates) {
+                        ChatUtils.clickableChat(
+                            "§aSkyHanni found a new update: ${it.update.versionName}. " +
                                 "Check §b/sh download update §afor more info.",
-                        "sh"
-                    )
+                            "sh"
+                        )
+                    }
                 }
             }, MinecraftExecutor.OnThread)
     }
@@ -116,6 +121,8 @@ object UpdateManager {
             logger.log("Update download completed, setting exit hook")
             updateState = UpdateState.DOWNLOADED
             potentialUpdate!!.executePreparedUpdate()
+            ChatUtils.chat("Download of update complete. ")
+            ChatUtils.chat("§aThe update will be installed after your next restart.")
         }, MinecraftExecutor.OnThread)
     }
 
