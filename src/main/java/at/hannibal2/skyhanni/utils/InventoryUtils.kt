@@ -1,6 +1,7 @@
 package at.hannibal2.skyhanni.utils
 
 import at.hannibal2.skyhanni.test.command.ErrorManager
+import at.hannibal2.skyhanni.utils.ItemUtils.getInternalNameOrNull
 import io.github.moulberry.notenoughupdates.NotEnoughUpdates
 import net.minecraft.client.Minecraft
 import net.minecraft.client.gui.inventory.GuiChest
@@ -74,4 +75,9 @@ object InventoryUtils {
         val screen = Minecraft.getMinecraft().currentScreen as? GuiContainer ?: return false
         return screen.slotUnderMouse.inventory is InventoryPlayer && screen.slotUnderMouse.stack == itemStack
     }
+
+    fun getAmountOfItemInInventory(name: NEUInternalName) =
+        countItemsInLowerInventory { it.getInternalNameOrNull() == name }
+
+    fun isItemInInventory(name: NEUInternalName) = getAmountOfItemInInventory(name) > 0
 }
