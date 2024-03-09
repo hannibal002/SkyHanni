@@ -31,7 +31,7 @@ class PlayerChatSymbols {
     )
     private val symbolPattern by patternGroup.pattern(
         "symbol",
-        "((?:§\\w)+\\S)"
+        "(?:§.)+(\\S)"
     )
 
     @SubscribeEvent

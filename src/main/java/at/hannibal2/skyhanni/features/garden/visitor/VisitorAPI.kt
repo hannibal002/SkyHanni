@@ -151,7 +151,7 @@ object VisitorAPI {
             }
             if (!found) continue
 
-            if (line.isEmpty() || line.contains("Account Info")) {
+            if (line.isEmpty() || line.contains("Account Info") || line.contains("Next Visitor")) {
                 found = false
                 continue
             }

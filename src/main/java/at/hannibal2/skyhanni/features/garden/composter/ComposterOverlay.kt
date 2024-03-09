@@ -47,6 +47,7 @@ import at.hannibal2.skyhanni.utils.SoundUtils
 import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.TimeUtils
+import at.hannibal2.skyhanni.utils.TimeUtils.format
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 import net.minecraftforge.fml.common.eventhandler.EventPriority
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
@@ -105,6 +106,8 @@ object ComposterOverlay {
         ChatUtils.chat("Composter test offset set to $testOffset.")
     }
 
+    private val COMPOST by lazy { "COMPOST".asInternalName() }
+
     @SubscribeEvent
     fun onInventoryClose(event: InventoryCloseEvent) {
         inInventory = false
@@ -143,15 +146,14 @@ object ComposterOverlay {
         if (!inComposterUpgrades) return
         update()
         for (upgrade in ComposterUpgrade.entries) {
-            event.itemStack.name?.let {
-                if (it.contains(upgrade.displayName)) {
-                    maxLevel = ComposterUpgrade.regex.matchMatcher(it) {
-                        group("level")?.romanToDecimalIfNecessary() ?: 0
-                    } == 25
-                    extraComposterUpgrade = upgrade
-                    update()
-                    return
-                }
+            val name = event.itemStack.name
+            if (name.contains(upgrade.displayName)) {
+                maxLevel = ComposterUpgrade.regex.matchMatcher(name) {
+                    group("level")?.romanToDecimalIfNecessary() ?: 0
+                } == 25
+                extraComposterUpgrade = upgrade
+                update()
+                return
             }
         }
         if (extraComposterUpgrade != null) {
@@ -249,8 +251,7 @@ object ComposterOverlay {
         return newList
     }
 
-    private fun formatTime(timePerCompost1: Duration) =
-        TimeUtils.formatDuration(timePerCompost1.toLong(DurationUnit.MILLISECONDS), maxUnits = 2)
+    private fun formatTime(duration: Duration) = duration.format(maxUnits = 2)
 
     private fun drawOrganicMatterDisplay(): MutableList<List<Any>> {
         val maxOrganicMatter = ComposterAPI.maxOrganicMatter(if (maxLevel) null else extraComposterUpgrade)
@@ -367,7 +368,7 @@ object ComposterOverlay {
             " §7Material costs per $timeText: §6${NumberUtil.format(totalCost)}$materialCostFormatPreview"
         newList.addAsSingletonList(materialCostFormat)
 
-        val priceCompost = getPrice("COMPOST")
+        val priceCompost = COMPOST.getPrice()
         val profit = ((priceCompost * multiDropFactor) - (fuelPricePer + organicMatterPricePer)) * timeMultiplier
         val profitPreview =
             ((priceCompost * multiDropFactorPreview) - (fuelPricePerPreview + organicMatterPricePerPreview)) * timeMultiplierPreview
@@ -392,7 +393,7 @@ object ComposterOverlay {
         }
 
         val testOffset = if (testOffset_ > map.size) {
-            ChatUtils.error("Invalid Composter Overlay Offset! $testOffset cannot be greater than ${map.size}!")
+            ChatUtils.userError("Invalid Composter Overlay Offset! $testOffset cannot be greater than ${map.size}!")
             ComposterOverlay.testOffset = 0
             0
         } else testOffset_
@@ -425,7 +426,6 @@ object ComposterOverlay {
             val factor = factors[internalName]!!
 
             val item = internalName.getItemStack()
-            val itemName = item.name!!
             val price = getPrice(internalName)
             val itemsNeeded = if (config.roundDown) {
                 val amount = missing / factor
@@ -444,7 +444,7 @@ object ComposterOverlay {
                 list.add("#$i ")
             }
             list.add(item)
-            formatPrice(totalPrice, internalName, itemName, list, itemsNeeded, onClick)
+            formatPrice(totalPrice, internalName, item.name, list, itemsNeeded, onClick)
             bigList.add(list)
             if (i == 10 + testOffset) break
         }
@@ -571,13 +571,13 @@ object ComposterOverlay {
                 || internalName == "SIMPLE_CARROT_CANDY"
             ) continue
 
-            var (newId, amount) = NEUItems.getMultiplier(internalName)
+            var (newId, amount) = NEUItems.getMultiplier(internalName.asInternalName())
             if (amount <= 9) continue
             if (internalName == "ENCHANTED_HUGE_MUSHROOM_1" || internalName == "ENCHANTED_HUGE_MUSHROOM_2") {
                 //  160 * 8 * 4 is 5120 and not 5184, but hypixel made an error, so we have to copy the error
                 amount = 5184
             }
-            baseValues[newId.asInternalName()]?.let {
+            baseValues[newId]?.let {
                 map[internalName.asInternalName()] = it * amount
             }
         }

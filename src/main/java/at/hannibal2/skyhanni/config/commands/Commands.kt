@@ -48,7 +48,9 @@ import at.hannibal2.skyhanni.features.minion.MinionFeatures
 import at.hannibal2.skyhanni.features.misc.CollectionTracker
 import at.hannibal2.skyhanni.features.misc.LockMouseLook
 import at.hannibal2.skyhanni.features.misc.MarkedPlayerManager
+import at.hannibal2.skyhanni.features.misc.MiscFeatures
 import at.hannibal2.skyhanni.features.misc.discordrpc.DiscordRPCManager
+import at.hannibal2.skyhanni.features.misc.limbo.LimboTimeTracker
 import at.hannibal2.skyhanni.features.misc.massconfiguration.DefaultConfigFeatures
 import at.hannibal2.skyhanni.features.misc.visualwords.VisualWordGui
 import at.hannibal2.skyhanni.features.rift.area.westvillage.VerminTracker
@@ -258,17 +260,36 @@ object Commands {
             "shofficialwikithis",
             "Searches the official wiki with SkyHanni's own method."
         ) { WikiManager.otherWikiCommands(it, false, true) }
-        registerCommand0("shcalccrop", "Calculate how many crops need to be farmed between different crop milestones.", {
-            FarmingMilestoneCommand.onCommand(it.getOrNull(0), it.getOrNull(1), it.getOrNull(2), false)
-        }, FarmingMilestoneCommand::onComplete)
-        registerCommand0("shcalccroptime", "Calculate how long you need to farm crops between different crop milestones.", {
-            FarmingMilestoneCommand.onCommand(it.getOrNull(0), it.getOrNull(1), it.getOrNull(2), true)
-        }, FarmingMilestoneCommand::onComplete)
+        registerCommand0(
+            "shcalccrop",
+            "Calculate how many crops need to be farmed between different crop milestones.",
+            {
+                FarmingMilestoneCommand.onCommand(it.getOrNull(0), it.getOrNull(1), it.getOrNull(2), false)
+            },
+            FarmingMilestoneCommand::onComplete
+        )
+        registerCommand0(
+            "shcalccroptime",
+            "Calculate how long you need to farm crops between different crop milestones.",
+            {
+                FarmingMilestoneCommand.onCommand(it.getOrNull(0), it.getOrNull(1), it.getOrNull(2), true)
+            },
+            FarmingMilestoneCommand::onComplete
+        )
         registerCommand0(
             "shskills",
             "Skills XP/Level related command",
             { SkillAPI.onCommand(it) },
-            SkillAPI::onComplete)
+            SkillAPI::onComplete
+        )
+        registerCommand(
+            "shlimbostats",
+            "Prints your Limbo Stats!"
+        ) { LimboTimeTracker.printStats() }
+        registerCommand(
+            "shlimbo",
+            "Warps you to Limbo."
+        ) { MiscFeatures().goToLimbo() }
     }
 
     private fun usersBugFix() {
@@ -358,7 +379,10 @@ object Commands {
     private fun developersCodingHelp() {
         registerCommand("shrepopatterns", "See where regexes are loaded from") { RepoPatternGui.open() }
         registerCommand("shtest", "Unused test command.") { SkyHanniDebugsAndTests.testCommand(it) }
-        registerCommand("shtestitem", "test item internal name resolving") { SkyHanniDebugsAndTests.testItemCommand(it) }
+        registerCommand(
+            "shtestitem",
+            "test item internal name resolving"
+        ) { SkyHanniDebugsAndTests.testItemCommand(it) }
         registerCommand(
             "shfindnullconfig",
             "Find config elements that are null and prints them into the console"

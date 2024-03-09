@@ -2,11 +2,12 @@ package at.hannibal2.skyhanni.features.garden.inventory
 
 import at.hannibal2.skyhanni.events.LorenzToolTipEvent
 import at.hannibal2.skyhanni.features.garden.GardenAPI
-import at.hannibal2.skyhanni.utils.ChatUtils
+import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.ItemUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.name
-import at.hannibal2.skyhanni.utils.NEUItems
+import at.hannibal2.skyhanni.utils.NEUInternalName
+import at.hannibal2.skyhanni.utils.NEUItems.getPrice
 import at.hannibal2.skyhanni.utils.NumberUtil
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
@@ -19,8 +20,7 @@ class GardenNextPlotPrice {
 
         if (InventoryUtils.openInventoryName() != "Configure Plots") return
 
-        val name = event.itemStack.name ?: return
-        if (!name.startsWith("§ePlot")) return
+        if (!event.itemStack.name.startsWith("§ePlot")) return
 
         var next = false
         val list = event.toolTip
@@ -36,12 +36,17 @@ class GardenNextPlotPrice {
                 val readItemAmount = ItemUtils.readItemAmount(line)
                 readItemAmount?.let {
                     val (itemName, amount) = it
-                    val lowestBin = NEUItems.getPrice(NEUItems.getRawInternalName(itemName))
+                    val lowestBin = NEUInternalName.fromItemName(itemName).getPrice()
                     val price = lowestBin * amount
                     val format = NumberUtil.format(price)
                     list[i] = list[i] + " §7(§6$format§7)"
-                } ?: {
-                    ChatUtils.error("Could not read item '$line'")
+                } ?: run {
+                    ErrorManager.logErrorStateWithData(
+                        "Garden Next Plot Price error",
+                        "Could not read item amount from line",
+                        "line" to line,
+                        "event.toolTip" to event.toolTip,
+                    )
                 }
                 break
             }

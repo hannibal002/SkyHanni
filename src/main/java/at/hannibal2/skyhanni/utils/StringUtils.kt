@@ -249,8 +249,9 @@ object StringUtils {
         modifyFirstChatComponent(chatComponent) { component ->
             if (component is ChatComponentText) {
                 component as AccessorChatComponentText
-                if (component.text_skyhanni().contains(toReplace)) {
-                    component.setText_skyhanni(component.text_skyhanni().replace(toReplace, replacement))
+                val componentText = component.text_skyhanni()
+                if (componentText.contains(toReplace)) {
+                    component.setText_skyhanni(componentText.replace(toReplace, replacement))
                     return@modifyFirstChatComponent true
                 }
                 return@modifyFirstChatComponent false

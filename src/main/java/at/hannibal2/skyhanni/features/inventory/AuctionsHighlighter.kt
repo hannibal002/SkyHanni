@@ -9,7 +9,7 @@ import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.LorenzColor
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.NEUItems.getPriceOrNull
-import at.hannibal2.skyhanni.utils.NumberUtil.formatNumber
+import at.hannibal2.skyhanni.utils.NumberUtil.formatLong
 import at.hannibal2.skyhanni.utils.RenderUtils.highlight
 import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
@@ -53,7 +53,7 @@ class AuctionsHighlighter {
             if (config.highlightAuctionsUnderbid) {
                 for (line in lore) {
                     buyItNowPattern.matchMatcher(line) {
-                        val coins = group("coins").formatNumber()
+                        val coins = group("coins").formatLong()
                         stack.getInternalNameOrNull()?.getPriceOrNull()?.let {
                             if (coins > it) {
                                 slot highlight LorenzColor.GOLD
