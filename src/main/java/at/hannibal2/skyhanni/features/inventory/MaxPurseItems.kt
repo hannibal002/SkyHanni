@@ -34,7 +34,7 @@ class MaxPurseItems {
         "createinstant",
         "§aBuy Instantly"
     )
-    
+
     private var buyOrderPrice: Double? = null
     private var instantBuyPrice: Double? = null
 
