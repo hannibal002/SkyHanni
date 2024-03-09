@@ -7,21 +7,28 @@ import at.hannibal2.skyhanni.data.ProfileStorageData
 import at.hannibal2.skyhanni.events.LorenzChatEvent
 import at.hannibal2.skyhanni.events.TabListUpdateEvent
 import at.hannibal2.skyhanni.features.garden.farming.GardenCropMilestoneDisplay
-import at.hannibal2.skyhanni.utils.LorenzUtils
+import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.NumberUtil.romanToDecimalIfNecessary
 import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
+import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
-import java.util.regex.Pattern
 
 class GardenCropMilestoneFix {
-    private val tabListPattern = " Milestone: §r§a(?<crop>.*) (?<tier>.*): §r§3(?<percentage>.*)%".toPattern()
-    private val levelUpPattern = " {2}§r§b§lGARDEN MILESTONE §3(?<crop>.*) §8.*➜§3(?<tier>.*)".toPattern()
+    private val patternGroup = RepoPattern.group("garden.cropmilestone.fix")
+    private val tabListPattern by patternGroup.pattern(
+        "tablist",
+        " Milestone: §r§a(?<crop>.*) (?<tier>.*): §r§3(?<percentage>.*)%"
+    )
+    private val levelUpPattern by patternGroup.pattern(
+        "levelup",
+        " {2}§r§b§lGARDEN MILESTONE §3(?<crop>.*) §8.*➜§3(?<tier>.*)"
+    )
 
     private val tabListCropProgress = mutableMapOf<CropType, Long>()
 
     @SubscribeEvent
-    fun onChatMessage(event: LorenzChatEvent) {
+    fun onChat(event: LorenzChatEvent) {
         levelUpPattern.matchMatcher(event.message) {
             val cropName = group("crop")
             val crop = CropType.getByNameOrNull(cropName) ?: return
@@ -52,7 +59,7 @@ class GardenCropMilestoneFix {
 
         val crop = CropType.getByNameOrNull(cropName)
         if (crop == null) {
-            LorenzUtils.debug("GardenCropMilestoneFix: crop is null: '$cropName'")
+            ChatUtils.debug("GardenCropMilestoneFix: crop is null: '$cropName'")
             return
         }
 
@@ -82,11 +89,11 @@ class GardenCropMilestoneFix {
             crop.setCounter(tabListValue)
             GardenCropMilestoneDisplay.update()
             if (!loadedCrops.contains(crop)) {
-                LorenzUtils.chat("Loaded ${crop.cropName} milestone data from $source!")
+                ChatUtils.chat("Loaded ${crop.cropName} milestone data from $source!")
                 loadedCrops.add(crop)
             }
         } else if (diff >= minDiff) {
-            LorenzUtils.debug("Fixed wrong ${crop.cropName} milestone data from $source: ${diff.addSeparators()}")
+            ChatUtils.debug("Fixed wrong ${crop.cropName} milestone data from $source: ${diff.addSeparators()}")
             crop.setCounter(tabListValue)
             GardenCropMilestoneDisplay.update()
         }

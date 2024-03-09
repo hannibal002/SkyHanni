@@ -11,36 +11,45 @@ import at.hannibal2.skyhanni.events.SackDataUpdateEvent
 import at.hannibal2.skyhanni.features.fishing.FishingAPI
 import at.hannibal2.skyhanni.features.fishing.trophy.TrophyRarity
 import at.hannibal2.skyhanni.features.inventory.SackDisplay
+import at.hannibal2.skyhanni.utils.CollectionUtils.editCopy
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.ItemUtils.name
-import at.hannibal2.skyhanni.utils.LorenzUtils
-import at.hannibal2.skyhanni.utils.LorenzUtils.editCopy
 import at.hannibal2.skyhanni.utils.NEUInternalName
 import at.hannibal2.skyhanni.utils.NEUInternalName.Companion.asInternalName
 import at.hannibal2.skyhanni.utils.NEUItems.getNpcPriceOrNull
 import at.hannibal2.skyhanni.utils.NEUItems.getPrice
-import at.hannibal2.skyhanni.utils.NumberUtil.formatNumber
+import at.hannibal2.skyhanni.utils.NumberUtil.formatInt
+import at.hannibal2.skyhanni.utils.NumberUtil.formatLong
 import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.StringUtils.matches
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
+import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import com.google.gson.annotations.Expose
 import net.minecraft.item.ItemStack
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
 object SackAPI {
+
     private val sackDisplayConfig get() = SkyHanniMod.feature.inventory.sackDisplay
     private val chatConfig get() = SkyHanniMod.feature.chat
     private var lastOpenedInventory = ""
 
     var inSackInventory = false
 
-    // TODO USE SH-REPO
-    private val sackPattern = "^(.* Sack|Enchanted .* Sack)$".toPattern()
-    private val numPattern =
-        "(?:(?:§[0-9a-f](?<level>I{1,3})§7:)?|(?:§7Stored:)?) (?<color>§[0-9a-f])(?<stored>[0-9.,kKmMbB]+)§7/(?<total>\\d+(?:[0-9.,]+)?[kKmMbB]?)".toPattern()
-    private val gemstonePattern =
-        " §[0-9a-f](?<gemrarity>[A-z]*): §[0-9a-f](?<stored>\\d+(?:\\.\\d+)?(?:(?:,\\d+)?)+[kKmM]?)(?: §[0-9a-f]\\(\\d+(?:\\.\\d+)?(?:(?:,\\d+)?)+[kKmM]?\\))?".toPattern()
+    private val patternGroup = RepoPattern.group("data.sacks")
+    private val sackPattern by patternGroup.pattern(
+        "sack",
+        "^(.* Sack|Enchanted .* Sack)\$"
+    )
+    private val numPattern by patternGroup.pattern(
+        "number",
+        "(?:(?:§[0-9a-f](?<level>I{1,3})§7:)?|(?:§7Stored:)?) (?<color>§[0-9a-f])(?<stored>[0-9.,kKmMbB]+)§7/(?<total>\\d+(?:[0-9.,]+)?[kKmMbB]?)"
+    )
+    private val gemstonePattern by patternGroup.pattern(
+        "gemstone",
+        " §[0-9a-f](?<gemrarity>[A-z]*): §[0-9a-f](?<stored>\\d+(?:\\.\\d+)?(?:(?:,\\d+)?)+[kKmM]?)(?: §[0-9a-f]\\(\\d+(?:\\.\\d+)?(?:(?:,\\d+)?)+[kKmM]?\\))?"
+    )
 
     private var isRuneSack = false
     private var isGemstoneSack = false
@@ -91,12 +100,12 @@ object SackAPI {
     }
 
     private fun NEUInternalName.sackPrice(stored: String) = when (sackDisplayConfig.priceFrom) {
-        PriceFrom.BAZAAR -> (getPrice(true) * stored.formatNumber()).toLong()
+        PriceFrom.BAZAAR -> (getPrice(true) * stored.formatLong()).toLong()
             .let { if (it < 0) 0L else it }
 
         PriceFrom.NPC -> try {
             val npcPrice = getNpcPriceOrNull() ?: 0.0
-            (npcPrice * stored.formatNumber()).toLong()
+            (npcPrice * stored.formatLong()).toLong()
         } catch (e: Exception) {
             0L
         }
@@ -107,7 +116,7 @@ object SackAPI {
     fun getSacksData(savingSacks: Boolean) {
         if (savingSacks) sackData = ProfileStorageData.sackProfiles?.sackContents ?: return
         for ((_, stack) in stackList) {
-            val name = stack.name ?: continue
+            val name = stack.name
             val lore = stack.getLore()
             val gem = SackGemstone()
             val rune = SackRune()
@@ -127,19 +136,19 @@ object SackAPI {
                                 "Rough" -> {
                                     gem.rough = stored
                                     gem.roughPrice = internalName.sackPrice(stored)
-                                    if (savingSacks) setSackItem(internalName, stored.formatNumber())
+                                    if (savingSacks) setSackItem(internalName, stored.formatLong())
                                 }
 
                                 "Flawed" -> {
                                     gem.flawed = stored
                                     gem.flawedPrice = internalName.sackPrice(stored)
-                                    if (savingSacks) setSackItem(internalName, stored.formatNumber())
+                                    if (savingSacks) setSackItem(internalName, stored.formatLong())
                                 }
 
                                 "Fine" -> {
                                     gem.fine = stored
                                     gem.finePrice = internalName.sackPrice(stored)
-                                    if (savingSacks) setSackItem(internalName, stored.formatNumber())
+                                    if (savingSacks) setSackItem(internalName, stored.formatLong())
                                 }
                             }
                             gemstoneItem[name] = gem
@@ -154,10 +163,10 @@ object SackAPI {
                         item.stored = stored
                         item.total = group("total")
 
-                        if (savingSacks) setSackItem(item.internalName, item.stored.formatNumber())
+                        if (savingSacks) setSackItem(item.internalName, item.stored.formatLong())
                         item.price = if (isTrophySack) {
                             val filletPerTrophy = FishingAPI.getFilletPerTrophy(stack.getInternalName())
-                            val filletValue = filletPerTrophy * stored.formatNumber()
+                            val filletValue = filletPerTrophy * stored.formatLong()
                             item.magmaFish = filletValue
                             "MAGMA_FISH".asInternalName().sackPrice(filletValue.toString())
                         } else {
@@ -219,7 +228,7 @@ object SackAPI {
 
         val sackChanges = ArrayList<SackChange>()
         for (match in sackChangeRegex.findAll(sackChangeText)) {
-            val delta = match.groups[1]!!.value.replace(",", "").toInt()
+            val delta = match.groups[1]!!.value.formatInt()
             val item = match.groups[2]!!.value
             val sacks = match.groups[3]!!.value.split(", ")
 
@@ -286,11 +295,9 @@ object SackAPI {
             return sackData[item] ?: return SackItem(0, 0, SackStatus.MISSING)
         }
 
-        sackData = sackData.editCopy { this[item] = SackItem(0, 0, SackStatus.OUTDATED) }
+        sackData = sackData.editCopy { this[item] = SackItem(0, 0, SackStatus.MISSING) }
         return sackData[item] ?: return SackItem(0, 0, SackStatus.MISSING)
     }
-
-    fun commandGetFromSacks(item: String, amount: Int) = LorenzUtils.sendCommandToServer("gfs $item $amount")
 
     private fun saveSackData() {
         ProfileStorageData.sackProfiles?.sackContents = sackData
@@ -329,11 +336,11 @@ object SackAPI {
 data class SackItem(
     @Expose val amount: Long,
     @Expose val lastChange: Int,
-    @Expose private val status: SackStatus?
+    @Expose private val status: SackStatus?,
 ) {
+
     fun getStatus() = status ?: SackStatus.MISSING
 }
-
 
 private val gemstoneMap = mapOf(
     "Jade Gemstones" to "ROUGH_JADE_GEM".asInternalName(),
@@ -348,6 +355,7 @@ private val gemstoneMap = mapOf(
 
 // ideally should be correct but using alright should also be fine unless they sold their whole sacks
 enum class SackStatus {
+
     MISSING,
     CORRECT,
     ALRIGHT,

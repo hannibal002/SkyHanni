@@ -21,14 +21,18 @@ class RenderData {
     @SubscribeEvent
     fun onRenderOverlay(event: RenderGameOverlayEvent.Pre) {
         if (event.type != RenderGameOverlayEvent.ElementType.HOTBAR) return
+        if (!canRender()) return
         if (!SkyHanniDebugsAndTests.globalRender) return
         if (GuiEditManager.isInGui() || VisualWordGui.isInGui()) return
 
+        GlStateManager.translate(0f, 0f, -3f)
         GuiRenderEvent.GuiOverlayRenderEvent().postAndCatch()
+        GlStateManager.translate(0f, 0f, 3f)
     }
 
     @SubscribeEvent
     fun onBackgroundDraw(event: GuiScreenEvent.BackgroundDrawnEvent) {
+        if (!canRender()) return
         if (!SkyHanniDebugsAndTests.globalRender) return
         if (GuiEditManager.isInGui() || VisualWordGui.isInGui()) return
         val currentScreen = Minecraft.getMinecraft().currentScreen ?: return
@@ -38,13 +42,17 @@ class RenderData {
         GlStateManager.enableDepth()
 
         if (GuiEditManager.isInGui()) {
+            GlStateManager.translate(0f, 0f, -3f)
             GuiRenderEvent.GuiOverlayRenderEvent().postAndCatch()
+            GlStateManager.translate(0f, 0f, 3f)
         }
 
         GuiRenderEvent.ChestGuiOverlayRenderEvent().postAndCatch()
 
         GlStateManager.popMatrix()
     }
+
+    private fun canRender(): Boolean = Minecraft.getMinecraft()?.renderManager?.fontRenderer != null
 
     @SubscribeEvent
     fun onRenderWorld(event: RenderWorldLastEvent) {

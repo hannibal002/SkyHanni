@@ -10,10 +10,12 @@ plugins {
     id("com.github.johnrengelman.shadow") version "7.1.2"
     kotlin("jvm") version "1.9.0"
     id("com.bnorm.power.kotlin-power-assert") version "0.13.0"
+    `maven-publish`
+    id("moe.nea.shot") version "1.0.0"
 }
 
 group = "at.hannibal2.skyhanni"
-version = "0.23.Beta.5"
+version = "0.24.Beta.7"
 
 val gitHash by lazy {
     val baos = ByteArrayOutputStream()
@@ -68,6 +70,8 @@ val headlessLwjgl by configurations.creating {
     isVisible = false
 }
 
+val shot = shots.shot("minecraft", project.file("shots.txt"))
+
 dependencies {
     minecraft("com.mojang:minecraft:1.8.9")
     mappings("de.oceanlabs.mcp:mcp_stable:22-1.8.9")
@@ -100,7 +104,7 @@ dependencies {
         exclude(module = "unspecified")
         isTransitive = false
     }
-    devenvMod("com.github.NotEnoughUpdates:NotEnoughUpdates:v2.1.1-pre4:all") {
+    devenvMod("com.github.NotEnoughUpdates:NotEnoughUpdates:v2.1.1-pre5:all") {
         exclude(module = "unspecified")
         isTransitive = false
     }
@@ -108,14 +112,18 @@ dependencies {
     shadowModImpl(libs.moulconfig)
     shadowImpl(libs.libautoupdate)
     shadowImpl("org.jetbrains.kotlin:kotlin-reflect:1.9.0")
+    implementation(libs.hotswapagentforge)
 
 //    testImplementation(kotlin("test"))
-    testImplementation("com.github.NotEnoughUpdates:NotEnoughUpdates:v2.1.1-pre4:all") {
+    testImplementation("com.github.NotEnoughUpdates:NotEnoughUpdates:v2.1.1-pre5:all") {
         exclude(module = "unspecified")
         isTransitive = false
     }
     testImplementation("org.junit.jupiter:junit-jupiter:5.10.0")
     testImplementation("io.mockk:mockk:1.12.5")
+}
+configurations.getByName("minecraftNamed").dependencies.forEach {
+    shot.applyTo(it as HasConfigurableAttributes<*>)
 }
 
 tasks.withType(Test::class) {
@@ -139,7 +147,9 @@ loom {
     launchConfigs {
         "client" {
             property("mixin.debug", "true")
-            property("asmhelper.verbose", "true")
+            if (System.getenv("repo_action") != "true") {
+                property("devauth.configDir", rootProject.file(".devauth").absolutePath)
+            }
             arg("--tweakClass", "org.spongepowered.asm.launch.MixinTweaker")
             arg("--tweakClass", "io.github.moulberry.moulconfig.tweaker.DevelopmentResourceTweaker")
             arg("--mods", devenvMod.resolve().joinToString(",") { it.relativeTo(file("run")).path })
@@ -158,6 +168,7 @@ loom {
             if (SystemUtils.IS_OS_MAC_OSX) {
                 vmArgs.remove("-XstartOnFirstThread")
             }
+            vmArgs.add("-Xmx4G")
         }
         "server" {
             isIdeConfigGenerated = false
@@ -247,3 +258,31 @@ val compileTestKotlin: KotlinCompile by tasks
 compileTestKotlin.kotlinOptions {
     jvmTarget = "1.8"
 }
+val sourcesJar by tasks.creating(Jar::class) {
+    destinationDirectory.set(layout.buildDirectory.dir("badjars"))
+    archiveClassifier.set("src")
+    from(sourceSets.main.get().allSource)
+}
+
+publishing.publications {
+    create<MavenPublication>("maven") {
+        artifact(tasks.remapJar)
+        artifact(sourcesJar) { classifier = "sources" }
+        pom {
+            name.set("SkyHanni")
+            licenses {
+                license {
+                    name.set("GNU Lesser General Public License")
+                    url.set("https://github.com/hannibal002/SkyHanni/blob/HEAD/LICENSE")
+                }
+            }
+            developers {
+                developer { name.set("hannibal002") }
+                developer { name.set("The SkyHanni contributors") }
+            }
+        }
+    }
+}
+
+
+

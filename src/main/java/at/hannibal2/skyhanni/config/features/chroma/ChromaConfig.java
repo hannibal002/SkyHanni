@@ -41,7 +41,7 @@ public class ChromaConfig {
 
     @Expose
     @ConfigOption(name = "Chroma Direction", desc = "Change the slant and direction of the chroma.")
-    @ConfigEditorDropdown()
+    @ConfigEditorDropdown
     public Direction chromaDirection = Direction.FORWARD_RIGHT;
 
     public enum Direction implements HasLegacyId {
@@ -83,11 +83,17 @@ public class ChromaConfig {
     @ConfigEditorBoolean
     public boolean allChroma = false;
 
+    @Expose
+    @ConfigOption(name = "Ignore Chat", desc = "Prevents Everything Chroma from applying to the chat if you unironically use that feature...")
+    @ConfigEditorBoolean
+    public boolean ignoreChat = false;
+
     private void resetChromaSettings() {
         SkyHanniMod.getFeature().chroma.chromaSize = 30f;
         SkyHanniMod.getFeature().chroma.chromaSpeed = 6f;
         SkyHanniMod.getFeature().chroma.chromaSaturation = 0.75f;
         SkyHanniMod.getFeature().chroma.allChroma = false;
+        SkyHanniMod.getFeature().chroma.ignoreChat = false;
         SkyHanniMod.getFeature().chroma.chromaDirection = Direction.FORWARD_RIGHT;
     }
 }

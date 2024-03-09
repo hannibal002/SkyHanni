@@ -21,6 +21,7 @@ import net.minecraft.inventory.ContainerChest
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
 class DungeonFinderFeatures {
+
     private val config get() = SkyHanniMod.feature.dungeon.partyFinder
 
     private val pricePattern = "([0-9]{2,3}K|[0-9]{1,3}M|[0-9]+\\.[0-9]M|[0-9] ?mil)".toRegex(RegexOption.IGNORE_CASE)
@@ -39,7 +40,7 @@ class DungeonFinderFeatures {
         if (!LorenzUtils.inSkyBlock || LorenzUtils.skyBlockArea != "Dungeon Hub") return
         if (!config.floorAsStackSize) return
 
-        val itemName = event.stack.name?.removeColor() ?: ""
+        val itemName = event.stack.name.removeColor()
         val invName = InventoryUtils.openInventoryName()
 
         if (invName == "Select Floor") {
@@ -104,8 +105,7 @@ class DungeonFinderFeatures {
             if (slot.slotNumber != slot.slotIndex) continue
             if (slot.stack == null) continue
 
-            val itemName = slot.stack.name ?: continue
-            if (!itemName.endsWith(" Party")) continue
+            if (!slot.stack.name.endsWith(" Party")) continue
 
             if (config.markIneligibleGroups && slot.stack.getLore().any { ineligiblePattern.matches(it) }) {
                 slot highlight LorenzColor.DARK_RED
@@ -170,7 +170,6 @@ class DungeonFinderFeatures {
     fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
         event.move(2, "dungeon.partyFinderColoredClassLevel", "dungeon.partyFinder.coloredClassLevel")
     }
-
 }
 
 fun getColor(level: Int): String {

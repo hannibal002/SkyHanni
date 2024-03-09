@@ -22,7 +22,7 @@ public class NextConfig {
     // TODO moulconfig runnable support
     @Expose
     @ConfigOption(name = "Sort Type", desc = "Sort the crops by either garden or SkyBlock EXP.")
-    @ConfigEditorDropdown()
+    @ConfigEditorDropdown
     public BestTypeEntry bestType = BestTypeEntry.GARDEN_EXP;
 
     public enum BestTypeEntry implements HasLegacyId {

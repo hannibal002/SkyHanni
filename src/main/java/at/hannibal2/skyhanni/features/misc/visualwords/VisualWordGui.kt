@@ -3,8 +3,12 @@ package at.hannibal2.skyhanni.features.misc.visualwords
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.config.ConfigManager
 import at.hannibal2.skyhanni.test.command.ErrorManager
-import at.hannibal2.skyhanni.utils.*
-import at.hannibal2.skyhanni.utils.LorenzUtils.chat
+import at.hannibal2.skyhanni.utils.ChatUtils.chat
+import at.hannibal2.skyhanni.utils.GuiRenderUtils
+import at.hannibal2.skyhanni.utils.ItemUtils
+import at.hannibal2.skyhanni.utils.KeyboardManager
+import at.hannibal2.skyhanni.utils.OSUtils
+import at.hannibal2.skyhanni.utils.SoundUtils
 import at.hannibal2.skyhanni.utils.StringUtils.convertToFormatted
 import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
 import com.google.gson.JsonObject
@@ -22,6 +26,7 @@ import java.io.FileReader
 import java.io.IOException
 
 open class VisualWordGui : GuiScreen() {
+
     private var guiLeft = 0
     private var guiTop = 0
     private var screenHeight = 0
@@ -54,6 +59,7 @@ open class VisualWordGui : GuiScreen() {
     private val shouldDrawImport get() = drawImport && !SkyHanniMod.feature.storage.visualWordsImported
 
     companion object {
+
         fun isInGui() = Minecraft.getMinecraft().currentScreen is VisualWordGui
         var sbeConfigPath = File("." + File.separator + "config" + File.separator + "SkyblockExtras.cfg")
         var drawImport = false
@@ -75,7 +81,6 @@ open class VisualWordGui : GuiScreen() {
                     "RmNTlkYjg5MGM4MDA0MTU2YjcyN2M3N2NhNjk1YzQzOTlkOGUwZGE1Y2U5MjI3Y2Y4MzZiYjhlMiJ9fX0="
             )
         }
-
     }
 
     override fun drawScreen(unusedX: Int, unusedY: Int, partialTicks: Float) {
@@ -554,7 +559,7 @@ open class VisualWordGui : GuiScreen() {
 
     private fun saveChanges() {
         ModifyVisualWords.modifiedWords = modifiedWords
-        ModifyVisualWords.textCache.invalidateAll()
+        ModifyVisualWords.textCache.clear()
         SkyHanniMod.feature.storage.modifiedWords = modifiedWords
     }
 
@@ -586,8 +591,8 @@ open class VisualWordGui : GuiScreen() {
                 SkyHanniMod.feature.storage.visualWordsImported = true
                 drawImport = false
             }
-        } catch (t: Throwable) {
-            ErrorManager.logError(t, "Failed to load visual words from SBE")
+        } catch (e: Throwable) {
+            ErrorManager.logErrorWithData(e, "Failed to load visual words from SBE")
         }
     }
 

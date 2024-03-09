@@ -13,10 +13,10 @@ class VisitorTooltipParser {
     enum class ParsingSection {
         ITEMS_NEEDED,
         REWARDS
-
     }
 
     companion object {
+
         fun parse(lore: List<String>, config: GardenConfig?): ParsedTooltip {
             var section = ParsingSection.ITEMS_NEEDED
             val parsedData = ParsedTooltip(mutableMapOf(), mutableMapOf(), config ?: GardenConfig())
