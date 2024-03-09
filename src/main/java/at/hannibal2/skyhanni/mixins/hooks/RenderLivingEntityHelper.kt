@@ -1,8 +1,6 @@
 package at.hannibal2.skyhanni.mixins.hooks
 
 import at.hannibal2.skyhanni.events.LorenzWorldChangeEvent
-import at.hannibal2.skyhanni.events.RenderMobColoredEvent
-import at.hannibal2.skyhanni.events.ResetEntityHurtEvent
 import at.hannibal2.skyhanni.test.SkyHanniDebugsAndTests
 import net.minecraft.entity.EntityLivingBase
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
@@ -55,11 +53,7 @@ class RenderLivingEntityHelper {
                     return entityColorMap[entity]!!
                 }
             }
-
-            // TODO remove event
-            val event = RenderMobColoredEvent(entity, 0)
-            event.postAndCatch()
-            return event.color
+            return 0
         }
 
         fun <T : EntityLivingBase> changeHurtTime(entity: T): Int {
@@ -70,11 +64,7 @@ class RenderLivingEntityHelper {
                     return 0
                 }
             }
-
-            // TODO remove event
-            val event = ResetEntityHurtEvent(entity, false)
-            event.postAndCatch()
-            return if (event.shouldReset) 0 else entity.hurtTime
+            return entity.hurtTime
         }
     }
 }
