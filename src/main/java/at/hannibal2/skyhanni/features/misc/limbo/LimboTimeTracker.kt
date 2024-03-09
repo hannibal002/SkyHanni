@@ -77,8 +77,7 @@ object LimboTimeTracker {
                 limboJoinTime = SimpleTimeMark.now()
                 inLimbo = true
                 inFakeLimbo = true
-            }
-            else {
+            } else {
                 if (inLimbo) {
                     leaveLimbo()
                     inFakeLimbo = false
@@ -133,22 +132,23 @@ object LimboTimeTracker {
         shownPB = false
     }
 
-     @SubscribeEvent
-     fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
-         event.move(27, oldPath = "misc.limboTimePB", newPath = "#player.personalBest")
-     }
+    @SubscribeEvent
+    fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
+        event.move(27, oldPath = "misc.limboTimePB", newPath = "#player.personalBest")
+    }
 
     fun printStats(onlyPlaytime: Boolean = false) {
         val timeInLimbo: Int = if (inLimbo) limboJoinTime.passedSince().inWholeSeconds.toInt() else 0
-        val playtime: Int = if (inLimbo) (storage?.playtime ?: 0) + limboJoinTime.passedSince().inWholeSeconds.toInt() else storage?.playtime ?: 0
+        val playtime: Int = if (inLimbo) (storage?.playtime
+            ?: 0) + limboJoinTime.passedSince().inWholeSeconds.toInt() else storage?.playtime ?: 0
         if (onlyPlaytime) {
-            ChatUtils.chat("§aYou have ${playtime/3600} hours and ${playtime%3600/60} minutes playtime!",false)
+            ChatUtils.chat("§aYou have ${playtime / 3600} hours and ${playtime % 3600 / 60} minutes playtime!", false)
         } else {
             val currentPB = storage?.personalBest ?: 0
             val userLuck = storage?.userLuck ?: 0f
             val limboPB: Int = if (currentPB < timeInLimbo) timeInLimbo else currentPB
-            ChatUtils.chat("§fYour current PB is §e${limboPB.seconds}§f, granting you §a+${userLuck.round(2)}✴ SkyHanni User Luck§f!")
-            ChatUtils.chat("§fYou have §e${playtime.seconds} §fplaytime!")
+            ChatUtils.chat("§fYour current PB is §e${limboPB.seconds}§f, granting you §a+${userLuck.round(2)}✴ §fSkyHanni User Luck!")
+            ChatUtils.chat("§fYou have §e${playtime.seconds} §fof playtime!")
         }
     }
 

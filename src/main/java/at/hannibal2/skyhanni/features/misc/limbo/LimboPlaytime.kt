@@ -50,7 +50,12 @@ class LimboPlaytime {
 
         if (lastCreateCooldown.passedSince() > 3.seconds) {
             lastCreateCooldown = SimpleTimeMark.now()
-            limboItem = if (wholeMinutes >= 60) Utils.createItemStack(itemID.getItemStack().item, itemName, "§7Playtime: §a${wholeMinutes.addSeparators()} minutes", "§7Or: §b$hoursString hours")
+            limboItem = if (wholeMinutes >= 60) Utils.createItemStack(
+                itemID.getItemStack().item,
+                itemName,
+                "§7Playtime: §a${wholeMinutes.addSeparators()} minutes",
+                "§7Or: §b$hoursString hours"
+            )
             else Utils.createItemStack(itemID.getItemStack().item, itemName, "§7Playtime: §a$wholeMinutes minutes")
         }
         event.replaceWith(limboItem)
@@ -79,11 +84,11 @@ class LimboPlaytime {
         val playtime = storedPlaytime.seconds
         val wholeHours = playtime.inWholeHours
         wholeMinutes = playtime.inWholeMinutes
-        if ((wholeMinutes%60).toInt() == 0) {
+        if ((wholeMinutes % 60).toInt() == 0) {
             hoursString = "$wholeHours"
         } else {
-            val minutes:Float = ((wholeMinutes - wholeHours * 60).toFloat() / 60)
-            hoursString = wholeHours.addSeparators()+minutes.round(1).toString().replace("0", "")
+            val minutes: Float = ((wholeMinutes - wholeHours * 60).toFloat() / 60)
+            hoursString = wholeHours.addSeparators() + minutes.round(1).toString().replace("0", "")
         }
     }
 
@@ -91,7 +96,7 @@ class LimboPlaytime {
         val storedPlaytime = storage?.playtime ?: 0
         if (wholeMinutes >= 60) {
             val hours = storedPlaytime.seconds.inWholeHours
-            val minutes = (storedPlaytime.seconds.inWholeMinutes-(hours*60).toFloat()/6).toInt()
+            val minutes = (storedPlaytime.seconds.inWholeMinutes - (hours * 60).toFloat() / 6).toInt()
             modifiedList = hoursList
             if (minutes == 0) modifiedList.add("§5§o§b$hours hours §7on Limbo")
             else modifiedList.add("§5§o§b$hoursString hours §7on Limbo")
@@ -102,8 +107,7 @@ class LimboPlaytime {
                 } else 0.0
             }.toMutableList()
             setMinutes = false
-        }
-        else {
+        } else {
             val minutes = storedPlaytime.seconds.inWholeMinutes
             modifiedList = minutesList
             modifiedList.add("§a$minutes minutes §7on Limbo")
@@ -114,7 +118,11 @@ class LimboPlaytime {
         }
     }
 
-    private fun remakeList(toolTip: MutableList<String>, minutesList: MutableList<String>, hoursList: MutableList<String>) {
+    private fun remakeList(
+        toolTip: MutableList<String>,
+        minutesList: MutableList<String>,
+        hoursList: MutableList<String>
+    ) {
         val firstLine = toolTip.first()
         val totalPlaytime = toolTip.last()
         toolTip.clear()
