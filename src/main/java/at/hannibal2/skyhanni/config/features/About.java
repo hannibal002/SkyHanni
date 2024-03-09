@@ -1,5 +1,6 @@
 package at.hannibal2.skyhanni.config.features;
 
+import at.hannibal2.skyhanni.config.FeatureToggle;
 import at.hannibal2.skyhanni.features.misc.update.ConfigVersionDisplay;
 import at.hannibal2.skyhanni.utils.OSUtils;
 import com.google.gson.annotations.Expose;
@@ -23,6 +24,7 @@ public class About {
 
     @ConfigOption(name = "Full Auto Updates", desc = "Automatically downloads new version on each startup.")
     @Expose
+    @FeatureToggle
     @ConfigEditorBoolean
     public boolean fullAutoUpdates = false;
 
