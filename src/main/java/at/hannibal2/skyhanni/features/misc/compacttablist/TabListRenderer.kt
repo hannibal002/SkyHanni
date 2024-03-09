@@ -173,7 +173,8 @@ object TabListRenderer {
                     middleX += 8 + 2
                 }
 
-                val text = if (AdvancedPlayerList.ignoreCustomTabList()) tabLine.text else tabLine.customName
+                var text = if (AdvancedPlayerList.ignoreCustomTabList()) tabLine.text else tabLine.customName
+                if (text.contains("§l")) text = "§r$text"
                 if (tabLine.type == TabStringType.TITLE) {
                     minecraft.fontRendererObj.drawStringWithShadow(
                         text,
@@ -215,7 +216,7 @@ object TabListRenderer {
     )
 
     @SubscribeEvent
-    fun hideFireFromTheTabListBecauseWhoWantsThose(event: SkipTabListLineEvent) {
+    fun onSkipTablistLine(event: SkipTabListLineEvent) {
         if (config.hideFiresales && event.lastSubTitle != null && fireSalePattern.matches(event.lastSubTitle.text)) {
             event.cancel()
         }

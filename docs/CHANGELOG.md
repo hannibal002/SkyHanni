@@ -68,6 +68,8 @@
 + Fixed Fire Sale chat hider not working when multiple fire sales are ending. - Zickles
 + Fixed Auto Tip chat filter. - alexia (https://github.com/hannibal002/SkyHanni/pull/1105)
 + Fixed Hide Anita Accessories' fortune bonus chat message not getting hidden in the chat filter. - alexia (https://github.com/hannibal002/SkyHanni/pull/1106)
++ Fixed some chat symbols showing twice in chat due to a Hypixel change. - CalMWolfs (https://github.com/hannibal002/SkyHanni/pull/1119)
++ Fixed Anita's Accessory chat filter not working with multi-word crops (Cocoa Beans, Nether Wart, Sugar Cane). - Alexia (https://github.com/hannibal002/SkyHanni/pull/1115)
 
 #### Command Fixes
 
@@ -77,6 +79,8 @@
 
 + Fixed skill level up message when below level 60. - HiZe
 + Fixed SkyHanni not working on Alpha. - hannibal2 & CalMWolfs
++ Fixed getting profile name from tab list on alpha for special profiles. - CalMWolfs (https://github.com/hannibal002/SkyHanni/pull/1120)
+    + Fixes for any Ironman, Stranded and maybe Bingo players.
 
 ### Technical Details
 
@@ -104,6 +108,14 @@
 + Use internal name more in ItemDisplayOverlayFeatures - CalMWolfs (https://github.com/hannibal002/SkyHanni/pull/1114)
 + Reformatted the code in a lot of files. - CalMWolfs (https://github.com/hannibal002/SkyHanni/pull/1109)
 + Changed line endings to be normalized over the whole project and prevents further breaks. - your_name_here (https://github.com/hannibal002/SkyHanni/pull/1112)
++ Added more error logging to getting farming weight. - CalMWolfs (https://github.com/hannibal002/SkyHanni/pull/1120)
++ Removed unnecessary capturing groups from the Anita's Accessory chat filter regex. - Alexia (https://github.com/hannibal002/SkyHanni/pull/1115)
++ Add maven publication details, allowing other mods to integrate more easily with Skyhanni. - !nea (https://github.com/hannibal002/SkyHanni/pull/935)
++ Created Pull Request template. - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/1108)
+    + For better maintainability and automatic beta changelog creation.
++ Use less forge events throughout the mod to reduce possible crashes. - CalMWolfs (https://github.com/hannibal002/SkyHanni/pull/1085)
++ Fix entity click not being canceled - Thunderblade73 (https://github.com/hannibal002/SkyHanni/pull/1072)
++ Cleanup ItemClickData. - Thunderblade73 (https://github.com/hannibal002/SkyHanni/pull/1072)
 
 ### Removed Features
 
