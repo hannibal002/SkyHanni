@@ -13,6 +13,7 @@ import at.hannibal2.skyhanni.utils.CollectionUtils.nextAfter
 import at.hannibal2.skyhanni.utils.CollectionUtils.sortedDesc
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.LorenzUtils
+import at.hannibal2.skyhanni.utils.NumberUtil.formatInt
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
@@ -132,7 +133,7 @@ object FarmingContestAPI {
             for (bracket in ContestBracket.entries) {
                 val amount = lore.firstNotNullOfOrNull {
                     bracket.bracketPattern.matchMatcher(it) {
-                        group("amount").replace(",", "").toInt()
+                        group("amount").formatInt()
                     }
                 } ?: continue
                 put(bracket, amount)

@@ -112,7 +112,10 @@ object ChatManager {
         val original = event.message
         val message = LorenzUtils.stripVanillaMessage(original.formattedText)
 
-        if (message.startsWith("§f{\"server\":\"")) return
+        if (message.startsWith("§f{\"server\":\"")) {
+            HypixelData.checkForLocraw(message)
+            return
+        }
         val key = IdentityCharacteristics(original)
         val chatEvent = LorenzChatEvent(message, original)
         if (!isSoopyMessage(event.message)) {

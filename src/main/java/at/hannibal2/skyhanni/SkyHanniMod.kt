@@ -367,6 +367,7 @@ import at.hannibal2.skyhanni.test.command.CopyNearbyParticlesCommand
 import at.hannibal2.skyhanni.test.hotswap.HotswapSupport
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.EntityOutlineRenderer
+import at.hannibal2.skyhanni.utils.EntityUtils
 import at.hannibal2.skyhanni.utils.KeyboardManager
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.MinecraftConsoleFilter.Companion.initLogging
@@ -396,7 +397,7 @@ import org.apache.logging.log4j.Logger
     clientSideOnly = true,
     useMetadata = true,
     guiFactory = "at.hannibal2.skyhanni.config.ConfigGuiForgeInterop",
-    version = "0.24.Beta.5",
+    version = "0.24.Beta.7",
 )
 class SkyHanniMod {
 
@@ -462,6 +463,7 @@ class SkyHanniMod {
         loadModule(UtilsPatterns)
         loadModule(PetAPI)
         loadModule(BossbarData)
+        loadModule(EntityUtils)
         loadModule(ChatUtils)
 
         // APIs
