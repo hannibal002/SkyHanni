@@ -288,7 +288,9 @@ private fun getTrapperLines(): List<String> {
 }
 
 private fun getTrapperShowWhen(): Boolean {
-    return SbPattern.peltsPattern.anyMatches(getSbLines()) || SbPattern.mobLocationPattern.anyMatches(getSbLines())
+    return getSbLines().any {
+        ScoreboardPattern.peltsPattern.matches(it) || ScoreboardPattern.mobLocationPattern.matches(it)
+    }
 }
 
 private fun getGardenCleanUpLines(): List<String> {
@@ -330,9 +332,9 @@ private fun getWinterLines(): List<String> {
 }
 
 private fun getWinterShowWhen(): Boolean {
-    return SbPattern.winterEventStartPattern.anyMatches(getSbLines())
-        || getSbLines().any { SbPattern.winterNextWavePattern.matches(it) && !it.endsWith("Soon!") }
-        || SbPattern.winterWavePattern.anyMatches(getSbLines())
+    return getSbLines().any { ScoreboardPattern.winterEventStartPattern.matches(it) }
+        || getSbLines().any { ScoreboardPattern.winterNextWavePattern.matches(it) && !it.endsWith("Soon!") }
+        || getSbLines().any { ScoreboardPattern.winterWavePattern.matches(it) }
 }
 
 private fun getSpookyLines(): List<String> {
@@ -466,7 +468,7 @@ private fun getDamageLines(): List<String> {
 }
 
 private fun getDamageShowWhen(): Boolean {
-    return SbPattern.bossHPPattern.anyMatches(getSbLines()) || SbPattern.bossDamagePattern.anyMatches(getSbLines())
+    return getSbLines().any { SbPattern.bossHPPattern.matches(it) || SbPattern.bossDamagePattern.matches(it) }
 }
 
 private fun getMagmaBossLines(): List<String> {
