@@ -199,6 +199,11 @@ class HypixelData {
                 ProfileJoinEvent(newProfile).postAndCatch()
                 return
             }
+
+            TabListData.fullyLoaded = false
+            islandNamePattern.matchMatcher(line) {
+                TabListData.fullyLoaded = true
+            }
         }
     }
 
