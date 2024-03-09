@@ -2,12 +2,12 @@ package at.hannibal2.skyhanni.features.inventory
 
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.data.ItemRenderBackground.Companion.background
+import at.hannibal2.skyhanni.data.PetAPI
 import at.hannibal2.skyhanni.events.GuiContainerEvent
 import at.hannibal2.skyhanni.events.InventoryCloseEvent
 import at.hannibal2.skyhanni.events.InventoryOpenEvent
 import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.cleanName
-import at.hannibal2.skyhanni.utils.ItemUtils.isPet
 import at.hannibal2.skyhanni.utils.KeyboardManager.isKeyHeld
 import at.hannibal2.skyhanni.utils.LorenzColor
 import at.hannibal2.skyhanni.utils.LorenzUtils
@@ -47,7 +47,7 @@ class UnclickableAuctions {
         val itemStack = event.itemStack ?: return
         val itemName = itemStack.cleanName()
         if (itemName in auctionButtonNames) return
-        val (itemType, hideReason) = if (isPet(itemName)) Pair("pet", "tier-boosted") else Pair("item", "recombobulated")
+        val (itemType, hideReason) = if (PetAPI.isCurrentPet(itemName)) Pair("pet", "tier-boosted") else Pair("item", "recombobulated")
         event.toolTip.clear()
         event.toolTip.addAll(listOf("§7${itemName.removeColor()}", "§cThe $itemType up for auction is hidden as it is $hideReason."))
         if (config.bypassKey != Keyboard.KEY_NONE) event.toolTip.add("§7(To bypass this, press & hold the ${Keyboard.getKeyName(config.bypassKey)} key.)")
@@ -98,7 +98,7 @@ class UnclickableAuctions {
         itemIsRecombOrBoosted = false
     }
 
-    private fun ItemStack.isTierBoostedPet(): Boolean = isPet(this.cleanName()) && this.getPetItem() == "PET_ITEM_TIER_BOOST"
+    private fun ItemStack.isTierBoostedPet(): Boolean = PetAPI.isCurrentPet(this.cleanName()) && this.getPetItem() == "PET_ITEM_TIER_BOOST"
     private fun isEnabled(): Boolean = LorenzUtils.inSkyBlock && config.enabled
     private fun isBypassActive(): Boolean = config.bypassKey.isKeyHeld()
 }
