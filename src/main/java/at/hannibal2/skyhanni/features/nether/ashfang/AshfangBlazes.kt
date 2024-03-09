@@ -2,20 +2,20 @@ package at.hannibal2.skyhanni.features.nether.ashfang
 
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
+import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.events.EntityHealthUpdateEvent
 import at.hannibal2.skyhanni.events.LorenzTickEvent
 import at.hannibal2.skyhanni.events.LorenzWorldChangeEvent
-import at.hannibal2.skyhanni.events.RenderMobColoredEvent
-import at.hannibal2.skyhanni.events.ResetEntityHurtEvent
 import at.hannibal2.skyhanni.events.SkyHanniRenderEntityEvent
 import at.hannibal2.skyhanni.events.withAlpha
 import at.hannibal2.skyhanni.features.combat.damageindicator.BossType
 import at.hannibal2.skyhanni.features.combat.damageindicator.DamageIndicatorManager
+import at.hannibal2.skyhanni.mixins.hooks.RenderLivingEntityHelper
 import at.hannibal2.skyhanni.utils.CollectionUtils.editCopy
 import at.hannibal2.skyhanni.utils.EntityUtils
 import at.hannibal2.skyhanni.utils.EntityUtils.getAllNameTagsWith
 import at.hannibal2.skyhanni.utils.LorenzColor
-import at.hannibal2.skyhanni.utils.LorenzUtils
+import at.hannibal2.skyhanni.utils.LorenzUtils.isInIsland
 import net.minecraft.entity.EntityLivingBase
 import net.minecraft.entity.item.EntityArmorStand
 import net.minecraft.entity.monster.EntityBlaze
@@ -59,7 +59,7 @@ class AshfangBlazes {
                     blazeArmorStand = blazeArmorStand.editCopy {
                         this[entity] = armorStand
                     }
-                    blazeColor[entity] = color
+                    entity setBlazeColor color
                 }
             }
         }
@@ -83,24 +83,6 @@ class AshfangBlazes {
         nearAshfang = EntityUtils.getEntities<EntityArmorStand>().any { it.name.contains("Ashfang") }
     }
 
-    @SubscribeEvent
-    fun onRenderMobColored(event: RenderMobColoredEvent) {
-        if (!isEnabled()) return
-        if (!config.highlightBlazes) return
-        val entity = event.entity
-        event.color = blazeColor[entity]?.toColor()?.withAlpha(40) ?: 0
-    }
-
-    @SubscribeEvent
-    fun onResetEntityHurtTime(event: ResetEntityHurtEvent) {
-        if (!isEnabled()) return
-        if (!config.highlightBlazes) return
-        val entity = event.entity
-        if (entity in blazeColor) {
-            event.shouldReset = true
-        }
-    }
-
     @SubscribeEvent(priority = EventPriority.HIGH)
     fun onRenderLiving(event: SkyHanniRenderEntityEvent.Specials.Pre<EntityLivingBase>) {
         if (!isEnabled()) return
@@ -117,6 +99,9 @@ class AshfangBlazes {
 
     @SubscribeEvent
     fun onWorldChange(event: LorenzWorldChangeEvent) {
+        blazeColor.forEach {
+            RenderLivingEntityHelper.removeCustomRender(it.key)
+        }
         blazeColor.clear()
         blazeArmorStand = emptyMap()
     }
@@ -129,6 +114,15 @@ class AshfangBlazes {
     }
 
     private fun isEnabled(): Boolean {
-        return LorenzUtils.inSkyBlock && DamageIndicatorManager.isBossSpawned(BossType.NETHER_ASHFANG)
+        return IslandType.CRIMSON_ISLE.isInIsland() && DamageIndicatorManager.isBossSpawned(BossType.NETHER_ASHFANG)
+    }
+
+    private infix fun EntityBlaze.setBlazeColor(color: LorenzColor) {
+        blazeColor[this] = color
+        RenderLivingEntityHelper.setNoHurtTime(this) { isEnabled() && config.highlightBlazes }
+        RenderLivingEntityHelper.setEntityColor(
+            this,
+            color.toColor().withAlpha(40),
+        ) { isEnabled() && config.highlightBlazes }
     }
 }

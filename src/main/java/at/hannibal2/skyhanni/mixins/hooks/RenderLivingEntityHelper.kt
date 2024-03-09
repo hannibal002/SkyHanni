@@ -42,6 +42,11 @@ class RenderLivingEntityHelper {
             entityNoHurTimeCondition.remove(entity)
         }
 
+        fun <T : EntityLivingBase> removeCustomRender(entity: T) {
+            removeEntityColor(entity)
+            removeNoHurtTime(entity)
+        }
+
         fun <T : EntityLivingBase> setColorMultiplier(entity: T): Int {
             if (!SkyHanniDebugsAndTests.globalRender) return 0
             if (entityColorMap.containsKey(entity)) {
