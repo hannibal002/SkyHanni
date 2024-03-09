@@ -97,10 +97,10 @@ class CraftMaterialsFromBazaar {
         this.neededMaterials = neededMaterials
         this.multiplier = 1
         purchasing = true
-        update()
+        updateBazaarDisplay()
     }
 
-    private fun update() {
+    private fun updateBazaarDisplay() {
         display = buildList {
             add(Renderable.string("§7Buy items from Bazaar:"))
             for ((material, amount) in neededMaterials) {
@@ -135,7 +135,7 @@ class CraftMaterialsFromBazaar {
                     listOf("§eClick here to multiply the items needed times $m!"),
                     onClick = {
                         multiplier = m
-                        update()
+                        updateBazaarDisplay()
                     })
             )
         }
