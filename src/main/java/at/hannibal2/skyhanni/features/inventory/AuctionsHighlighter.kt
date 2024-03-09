@@ -17,13 +17,17 @@ import net.minecraft.client.gui.inventory.GuiChest
 import net.minecraft.inventory.ContainerChest
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
-class AuctionsHighlighter {
+object AuctionsHighlighter {
 
     private val config get() = SkyHanniMod.feature.inventory.auctions
 
-    private val buyItNowPattern by RepoPattern.pattern(
+    val buyItNowPattern by RepoPattern.pattern(
         "auctions.highlight.buyitnow",
         "§7Buy it now: §6(?<coins>.*) coins"
+    )
+    val auctionPattern by RepoPattern.pattern(
+        "auctions.highlight.auction",
+        "§7Top bid: §6(?<coins>.*) coins"
     )
 
     @SubscribeEvent

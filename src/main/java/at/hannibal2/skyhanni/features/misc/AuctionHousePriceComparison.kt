@@ -4,6 +4,7 @@ import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.events.GuiContainerEvent
 import at.hannibal2.skyhanni.events.InventoryOpenEvent
 import at.hannibal2.skyhanni.events.LorenzToolTipEvent
+import at.hannibal2.skyhanni.features.inventory.AuctionsHighlighter
 import at.hannibal2.skyhanni.features.misc.items.EstimatedItemValueCalculator
 import at.hannibal2.skyhanni.utils.ColorUtils.toChromaColor
 import at.hannibal2.skyhanni.utils.InventoryUtils
@@ -13,19 +14,13 @@ import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.NumberUtil.formatLong
 import at.hannibal2.skyhanni.utils.RenderUtils.highlight
 import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
-import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
+import net.minecraft.item.ItemStack
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import java.awt.Color
 
 class AuctionHousePriceComparison {
 
     private val config get() = SkyHanniMod.feature.inventory.auctionsPriceComparison
-
-    //todo this is the same as in AuctionsHighlighter, need to not use it twice
-    private val buyItNowPattern by RepoPattern.pattern(
-        "auctions.highlight.compare.buyitnow",
-        "§7Buy it now: §6(?<coins>.*) coins"
-    )
 
     private var slotPriceMap = mapOf<Int, Long>()
     private var bestPrice = 0L
@@ -44,28 +39,34 @@ class AuctionHousePriceComparison {
         val map = mutableMapOf<Int, Long>()
 
         for ((slot, stack) in event.inventoryItems) {
-            val buyLine = stack.getLore().find { it.contains("Buy it now:") } ?: continue
-            val binPrice = buyItNowPattern.matchMatcher(buyLine) {
-                group("coins").formatLong()
-            } ?: continue
-
-            val (totalPrice, basePrice) = EstimatedItemValueCalculator.calculate(stack, mutableListOf())
-            if (totalPrice == basePrice) continue
-            val estimatedPrice = totalPrice.toLong()
-
-            val diff = estimatedPrice - binPrice
-            map[slot] = diff
-            if (diff >= 0) {
-                if (diff > bestPrice) {
-                    bestPrice = diff
+            for (line in stack.getLore()) {
+                AuctionsHighlighter.buyItNowPattern.matchMatcher(line) {
+                    map.add(stack, group("coins").formatLong(), slot)
                 }
-            } else {
-                if (diff < worstPrice) {
-                    worstPrice = diff
+                AuctionsHighlighter.auctionPattern.matchMatcher(line) {
+                    map.add(stack, group("coins").formatLong(), slot)
                 }
             }
         }
         this.slotPriceMap = map
+    }
+
+    private fun MutableMap<Int, Long>.add(stack: ItemStack, binPrice: Long, slot: Int) {
+        val (totalPrice, basePrice) = EstimatedItemValueCalculator.calculate(stack, mutableListOf())
+        if (totalPrice == basePrice) return
+        val estimatedPrice = totalPrice.toLong()
+
+        val diff = estimatedPrice - binPrice
+        this[slot] = diff
+        if (diff >= 0) {
+            if (diff > bestPrice) {
+                bestPrice = diff
+            }
+        } else {
+            if (diff < worstPrice) {
+                worstPrice = diff
+            }
+        }
     }
 
     @SubscribeEvent

@@ -490,7 +490,7 @@ class SkyHanniMod {
 
         // features
         loadModule(BazaarOrderHelper())
-        loadModule(AuctionsHighlighter())
+        loadModule(AuctionsHighlighter)
         loadModule(ChatFilter())
         loadModule(PlayerChatModifier())
         loadModule(DungeonChatFilter())
