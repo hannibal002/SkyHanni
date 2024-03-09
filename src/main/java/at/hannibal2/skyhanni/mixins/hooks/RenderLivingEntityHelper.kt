@@ -14,7 +14,6 @@ class RenderLivingEntityHelper {
         entityColorMap.clear()
         entityColorCondition.clear()
 
-        entityNoHurTime.clear()
         entityNoHurTimeCondition.clear()
     }
 
@@ -23,7 +22,6 @@ class RenderLivingEntityHelper {
         private val entityColorMap = mutableMapOf<EntityLivingBase, Int>()
         private val entityColorCondition = mutableMapOf<EntityLivingBase, () -> Boolean>()
 
-        private val entityNoHurTime = mutableListOf<EntityLivingBase>()
         private val entityNoHurTimeCondition = mutableMapOf<EntityLivingBase, () -> Boolean>()
 
         fun <T : EntityLivingBase> removeEntityColor(entity: T) {
@@ -37,8 +35,11 @@ class RenderLivingEntityHelper {
         }
 
         fun <T : EntityLivingBase> setNoHurtTime(entity: T, condition: () -> Boolean) {
-            entityNoHurTime.add(entity)
             entityNoHurTimeCondition[entity] = condition
+        }
+
+        fun <T : EntityLivingBase> removeNoHurtTime(entity: T) {
+            entityNoHurTimeCondition.remove(entity)
         }
 
         fun <T : EntityLivingBase> setColorMultiplier(entity: T): Int {
@@ -59,8 +60,8 @@ class RenderLivingEntityHelper {
 
         fun <T : EntityLivingBase> changeHurtTime(entity: T): Int {
             if (!SkyHanniDebugsAndTests.globalRender) return 0
-            if (entityNoHurTime.contains(entity)) {
-                val condition = entityNoHurTimeCondition[entity]!!
+            run {
+                val condition = entityNoHurTimeCondition[entity] ?: return@run
                 if (condition.invoke()) {
                     return 0
                 }
