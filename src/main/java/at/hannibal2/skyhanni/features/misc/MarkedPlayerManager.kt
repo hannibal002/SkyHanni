@@ -5,7 +5,6 @@ import at.hannibal2.skyhanni.config.enums.OutsideSbFeature
 import at.hannibal2.skyhanni.events.ConfigLoadEvent
 import at.hannibal2.skyhanni.events.LorenzTickEvent
 import at.hannibal2.skyhanni.events.LorenzWorldChangeEvent
-import at.hannibal2.skyhanni.events.RenderMobColoredEvent
 import at.hannibal2.skyhanni.events.withAlpha
 import at.hannibal2.skyhanni.mixins.hooks.RenderLivingEntityHelper
 import at.hannibal2.skyhanni.utils.ChatUtils
@@ -44,7 +43,7 @@ class MarkedPlayerManager {
                 ChatUtils.chat("§aMarked §eplayer §b$displayName§e!")
             } else {
                 playerNamesToMark.remove(name)
-                markedPlayers[name]?.let { RenderLivingEntityHelper.removeNoHurtTime(it) }
+                markedPlayers[name]?.let { RenderLivingEntityHelper.removeCustomRender(it) }
                 markedPlayers.remove(name)
                 ChatUtils.chat("§cUnmarked §eplayer §b$displayName§e!")
             }
@@ -58,6 +57,11 @@ class MarkedPlayerManager {
                 if (name in playerNamesToMark) {
                     markedPlayers[name] = entity
                     RenderLivingEntityHelper.setNoHurtTime(entity, ::isEnabled)
+                    RenderLivingEntityHelper.setEntityColor(
+                        entity,
+                        config.entityColor.toColor().withAlpha(127),
+                        ::isEnabled
+                    )
                 }
             }
         }
@@ -92,20 +96,10 @@ class MarkedPlayerManager {
     }
 
     @SubscribeEvent
-    fun onRenderMobColored(event: RenderMobColoredEvent) {
-        if (!isEnabled()) return
-
-        val entity = event.entity
-        if (entity in markedPlayers.values) {
-            event.color = config.entityColor.toColor().withAlpha(127)
-        }
-    }
-
-    @SubscribeEvent
     fun onWorldChange(event: LorenzWorldChangeEvent) {
         if (Minecraft.getMinecraft().thePlayer == null) return
 
-        markedPlayers.forEach { RenderLivingEntityHelper.removeNoHurtTime(it.value) }
+        markedPlayers.forEach { RenderLivingEntityHelper.removeCustomRender(it.value) }
         markedPlayers.clear()
         if (config.markOwnName.get()) {
             val name = LorenzUtils.getPlayerName()
