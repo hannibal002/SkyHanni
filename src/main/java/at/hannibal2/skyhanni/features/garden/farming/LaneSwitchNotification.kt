@@ -81,7 +81,7 @@ class LaneSwitchNotification {
 
     @SubscribeEvent
     fun onTick(event: LorenzTickEvent) {
-        if (!config.enabled || !GardenAPI.inGarden() || !plotsLoaded() || !isFarming()) return
+        if (!isEnabled()) return
         val notificationSettings = config.notification.settings
         val plot = GardenPlotAPI.getCurrentPlot() ?: return
 
@@ -111,7 +111,7 @@ class LaneSwitchNotification {
 
     @SubscribeEvent
     fun onRenderOverlay(event: GuiRenderEvent.GuiOverlayRenderEvent) {
-        if (!config.distanceUntilSwitch || !GardenAPI.inGarden() || !plotsLoaded() || !isFarming()) return
+        if (!config.distanceUntilSwitch || !isEnabled()) return
         if (distancesUntilSwitch.isEmpty()) return
         if (lastDistancesUntilSwitch.isEmpty()) { lastDistancesUntilSwitch = distancesUntilSwitch }
 
@@ -128,13 +128,15 @@ class LaneSwitchNotification {
     }
 
     private fun plotsLoaded(): Boolean {
-        if (!plots.any { it.unlocked } && lastWarning.passedSince() >= 30.seconds) {
-            ChatUtils.clickableChat("§eOpen your configure plots for lane switch detection to work.", "/desk")
-            lastWarning = SimpleTimeMark.now()
+        if (!plots.any { it.unlocked }) {
+            if (lastWarning.passedSince() >= 30.seconds) {
+                ChatUtils.clickableChat("§eOpen your configure plots for lane switch detection to work.", "/desk")
+                lastWarning = SimpleTimeMark.now()
+            }
             return false
         }
         return true
     }
 
-    private fun isFarming(): Boolean = GardenCropSpeed.averageBlocksPerSecond <= 0.0
+    fun isEnabled(): Boolean = config.enabled && GardenAPI.inGarden() && plotsLoaded() && GardenCropSpeed.averageBlocksPerSecond > 0.0
 }
