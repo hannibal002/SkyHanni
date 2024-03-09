@@ -4,6 +4,7 @@ import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.data.HypixelData
 import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.data.ScoreboardData
+import at.hannibal2.skyhanni.features.garden.contest.FarmingContestAPI.sidebarCropPattern
 import at.hannibal2.skyhanni.features.misc.ServerRestartTitle
 import at.hannibal2.skyhanni.features.misc.customscoreboard.ScoreboardEvents.VOTING
 import at.hannibal2.skyhanni.features.misc.customscoreboard.ScoreboardPattern
@@ -252,16 +253,18 @@ private fun getDarkAuctionShowWhen(): Boolean {
 private fun getJacobContestLines(): List<String> {
     val list = mutableListOf<String>()
 
-    list += "§eJacob's Contest"
-    list += getSbLines().nextAfter("§eJacob's Contest") ?: "§7No Event"
-    list += getSbLines().nextAfter("§eJacob's Contest", 2) ?: "§7No Ranking"
-    list += getSbLines().nextAfter("§eJacob's Contest", 3) ?: "§7No Amount for next"
+    val jacobsContestLine = getSbLines().firstOrNull { SbPattern.jacobsContestPattern.matches(it) } ?: return list
+
+    list += jacobsContestLine
+    list += getSbLines().nextAfter(jacobsContestLine) ?: "§7No Event"
+    list += getSbLines().nextAfter(jacobsContestLine, 2) ?: "§7No Ranking"
+    list += getSbLines().nextAfter(jacobsContestLine, 3) ?: "§7No Amount for next"
 
     return list
 }
 
 private fun getJacobContestShowWhen(): Boolean {
-    return getSbLines().any { it.startsWith("§e○ §f") || it.startsWith("§6☘ §f") }
+    return sidebarCropPattern.anyMatches(getSbLines())
 }
 
 private fun getJacobMedalsLines(): List<String> {
