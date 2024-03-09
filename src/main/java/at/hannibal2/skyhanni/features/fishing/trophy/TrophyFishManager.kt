@@ -1,5 +1,6 @@
 package at.hannibal2.skyhanni.features.fishing.trophy
 
+import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.data.ProfileStorageData
 import at.hannibal2.skyhanni.data.jsonobjects.repo.TrophyFishJson
 import at.hannibal2.skyhanni.data.jsonobjects.repo.TrophyFishJson.TrophyFishInfo
@@ -16,6 +17,7 @@ import net.minecraft.util.ChatStyle
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
 object TrophyFishManager {
+    private val config get() = SkyHanniMod.feature.fishing.trophyFishing
 
     @SubscribeEvent
     fun onRepoReload(event: RepositoryReloadEvent) {
@@ -30,8 +32,7 @@ object TrophyFishManager {
 
     @SubscribeEvent
     fun onNeuProfileDataLoaded(event: NeuProfileDataLoadedEvent) {
-        if (!LorenzUtils.inSkyBlock) return
-
+        if (!LorenzUtils.inSkyBlock || !config.loadFromNeuPV) return
         try {
             // This is alrady the current player data
             val profileInfo = event.neuEvent.profileInfo ?: return
@@ -62,7 +63,7 @@ object TrophyFishManager {
                 ChatUtils.chat("Updated Trophy Fishing data via NEU PV!")
             }
         } catch (t: Throwable) {
-            ErrorManager.logErrorWithData(t, "Failed to load trophy fishing data from NEU PV.")
+            throw Exception("Failed to load trophy fishing data from NEU PV.", t)
         }
     }
 
