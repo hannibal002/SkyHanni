@@ -19,7 +19,7 @@ public class MiningEventConfig {
     @Expose
     @ConfigOption(name = "Show Outside Mining Islands", desc = "Shows the event tracker when you are not inside of the Dwarven Mines or Crystal Hollows.")
     @ConfigEditorBoolean
-    public boolean outsideMining = true;
+    public boolean outsideMining = false;
 
     @Expose
     @ConfigOption(name = "What to Show", desc = "Choose which island's events are shown in the gui.")
