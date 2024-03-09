@@ -17,7 +17,7 @@ import at.hannibal2.skyhanni.data.SlayerAPI
 import at.hannibal2.skyhanni.features.misc.customscoreboard.CustomScoreboardUtils.formatNum
 import at.hannibal2.skyhanni.features.misc.customscoreboard.CustomScoreboardUtils.getGroupFromPattern
 import at.hannibal2.skyhanni.features.misc.customscoreboard.CustomScoreboardUtils.getTitleAndFooterAlignment
-import at.hannibal2.skyhanni.mixins.hooks.replaceString
+import at.hannibal2.skyhanni.mixins.hooks.tryToReplaceScoreboardLine
 import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.CollectionUtils.nextAfter
 import at.hannibal2.skyhanni.utils.LorenzUtils.inAnyIsland
@@ -372,7 +372,7 @@ private fun getIslandDisplayPair() =
 
 private fun getLocationDisplayPair() =
     listOf(
-        (replaceString(
+        (tryToReplaceScoreboardLine(
             getGroupFromPattern(
                 ScoreboardData.sidebarLinesFormatted,
                 ScoreboardPattern.locationPattern,

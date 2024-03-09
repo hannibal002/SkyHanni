@@ -1,6 +1,6 @@
 package at.hannibal2.skyhanni.utils
 
-import at.hannibal2.skyhanni.mixins.hooks.replaceString
+import at.hannibal2.skyhanni.mixins.hooks.tryToReplaceScoreboardLine
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
 import io.github.moulberry.notenoughupdates.util.SkyBlockTime
@@ -150,7 +150,10 @@ object TimeUtils {
         }
         val timePart = if (hoursAndMinutesElement) "$hour:$minute$timeOfDay" else ""
 
-        return replaceString(
+        /**
+         * We replace the line here, because the user might want color month names
+         */
+        return tryToReplaceScoreboardLine(
             if (datePart.isNotEmpty() && timePart.isNotEmpty()) {
                 "$datePart, $timePart"
             } else {
