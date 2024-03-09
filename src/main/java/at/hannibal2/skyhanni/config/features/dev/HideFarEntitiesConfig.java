@@ -13,6 +13,6 @@ public class HideFarEntitiesConfig {
 
     @Expose
     @ConfigOption(name = "Amount", desc = "Keep showing this amount of nearest entities.")
-    @ConfigEditorSlider(minValue = 5f, maxValue = 150f, minStep = 5f)
-    public float amount = 50f;
+    @ConfigEditorSlider(minValue = 5, maxValue = 150, minStep = 5)
+    public int amount = 50;
 }

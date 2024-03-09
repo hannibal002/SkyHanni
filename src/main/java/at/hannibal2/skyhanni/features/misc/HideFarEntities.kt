@@ -17,7 +17,7 @@ class HideFarEntities {
     @SubscribeEvent
     fun onTick(event: LorenzTickEvent) {
         if (isEnabled()) {
-            val min = config.amount.toInt().coerceAtLeast(1)
+            val min = config.amount.coerceAtLeast(1)
             ignored = EntityUtils.getAllEntities()
                 .map { it to it.distanceToPlayer() }
                 .toMap()
