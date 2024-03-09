@@ -6,8 +6,8 @@ import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.events.EntityMaxHealthUpdateEvent
 import at.hannibal2.skyhanni.events.LorenzTickEvent
 import at.hannibal2.skyhanni.events.TabListUpdateEvent
-import at.hannibal2.skyhanni.events.withAlpha
 import at.hannibal2.skyhanni.mixins.hooks.RenderLivingEntityHelper
+import at.hannibal2.skyhanni.utils.ColorUtils.withAlpha
 import at.hannibal2.skyhanni.utils.EntityUtils
 import at.hannibal2.skyhanni.utils.EntityUtils.hasMaxHealth
 import at.hannibal2.skyhanni.utils.LorenzColor
