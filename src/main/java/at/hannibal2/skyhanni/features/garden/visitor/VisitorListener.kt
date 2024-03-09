@@ -2,6 +2,7 @@ package at.hannibal2.skyhanni.features.garden.visitor
 
 import at.hannibal2.skyhanni.config.features.garden.visitor.VisitorConfig
 import at.hannibal2.skyhanni.events.CheckRenderEntityEvent
+import at.hannibal2.skyhanni.events.GuiKeyPressEvent
 import at.hannibal2.skyhanni.events.InventoryCloseEvent
 import at.hannibal2.skyhanni.events.InventoryFullyOpenedEvent
 import at.hannibal2.skyhanni.events.LorenzRenderWorldEvent
@@ -29,7 +30,6 @@ import net.minecraft.client.Minecraft
 import net.minecraft.client.gui.inventory.GuiContainer
 import net.minecraft.entity.item.EntityArmorStand
 import net.minecraft.network.play.client.C02PacketUseEntity
-import net.minecraftforge.client.event.GuiScreenEvent.KeyboardInputEvent
 import net.minecraftforge.event.entity.player.ItemTooltipEvent
 import net.minecraftforge.fml.common.eventhandler.EventPriority
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
@@ -119,10 +119,10 @@ class VisitorListener {
     }
 
     @SubscribeEvent
-    fun onKeybind(event: KeyboardInputEvent.Post) {
+    fun onKeybind(event: GuiKeyPressEvent) {
         if (!VisitorAPI.inInventory) return
         if (!config.acceptHotkey.isKeyHeld()) return
-        val inventory = event.gui as? AccessorGuiContainer ?: return
+        val inventory = event.guiContainer as? AccessorGuiContainer ?: return
         inventory as GuiContainer
         val slot = inventory.inventorySlots.getSlot(29)
         inventory.handleMouseClick_skyhanni(slot, slot.slotIndex, 0, 0)
