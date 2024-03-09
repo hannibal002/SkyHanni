@@ -2,7 +2,6 @@ package at.hannibal2.skyhanni.config;
 
 import at.hannibal2.skyhanni.SkyHanniMod;
 import at.hannibal2.skyhanni.config.features.About;
-import at.hannibal2.skyhanni.config.features.bazaar.BazaarConfig;
 import at.hannibal2.skyhanni.config.features.chat.ChatConfig;
 import at.hannibal2.skyhanni.config.features.chroma.ChromaConfig;
 import at.hannibal2.skyhanni.config.features.combat.CombatConfig;
@@ -76,10 +75,6 @@ public class Features extends Config {
     @Expose
     @Category(name = "GUI", desc = "Change the locations of GUI elements (§e/sh gui§7).")
     public GUIConfig gui = new GUIConfig();
-
-    @Expose
-    @Category(name = "Bazaar", desc = "Bazaar settings.")
-    public BazaarConfig bazaar = new BazaarConfig();
 
     @Expose
     @Category(name = "Chat", desc = "Change how the chat looks.")

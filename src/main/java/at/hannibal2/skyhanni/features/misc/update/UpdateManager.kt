@@ -48,7 +48,7 @@ object UpdateManager {
     fun onTick(event: LorenzTickEvent) {
         Minecraft.getMinecraft().thePlayer ?: return
         MinecraftForge.EVENT_BUS.unregister(this)
-        if (config.autoUpdates)
+        if (config.autoUpdates || config.fullAutoUpdates)
             checkUpdate()
     }
 
@@ -95,11 +95,16 @@ object UpdateManager {
                 potentialUpdate = it
                 if (it.isUpdateAvailable) {
                     updateState = UpdateState.AVAILABLE
-                    ChatUtils.clickableChat(
-                        "§aSkyHanni found a new update: ${it.update.versionName}. " +
-                            "Check §b/sh download update §afor more info.",
-                        "sh"
-                    )
+                    if (config.fullAutoUpdates) {
+                        ChatUtils.chat("§aSkyHanni found a new update: ${it.update.versionName}, starting to download now. ")
+                        queueUpdate()
+                    } else if (config.autoUpdates) {
+                        ChatUtils.clickableChat(
+                            "§aSkyHanni found a new update: ${it.update.versionName}. " +
+                                "Check §b/sh download update §afor more info.",
+                            "sh"
+                        )
+                    }
                 }
             }, MinecraftExecutor.OnThread)
     }
@@ -116,6 +121,8 @@ object UpdateManager {
             logger.log("Update download completed, setting exit hook")
             updateState = UpdateState.DOWNLOADED
             potentialUpdate!!.executePreparedUpdate()
+            ChatUtils.chat("Download of update complete. ")
+            ChatUtils.chat("§aThe update will be installed after your next restart.")
         }, MinecraftExecutor.OnThread)
     }
 

@@ -6,7 +6,7 @@ import at.hannibal2.skyhanni.config.core.config.Position
 import at.hannibal2.skyhanni.config.features.misc.TrackerConfig.PriceFromEntry
 import at.hannibal2.skyhanni.data.ProfileStorageData
 import at.hannibal2.skyhanni.data.TrackerManager
-import at.hannibal2.skyhanni.features.bazaar.BazaarApi.Companion.getBazaarData
+import at.hannibal2.skyhanni.features.inventory.bazaar.BazaarApi.Companion.getBazaarData
 import at.hannibal2.skyhanni.features.misc.items.EstimatedItemValue
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.CollectionUtils.addAsSingletonList
@@ -83,6 +83,9 @@ open class SkyHanniTracker<Data : TrackerData>(
         if (config.hideInEstimatedItemValue && EstimatedItemValue.isCurrentlyShowing()) return
 
         val currentlyOpen = Minecraft.getMinecraft().currentScreen is GuiInventory
+        if (!currentlyOpen && config.hideItemTrackersOutsideInventory && this is SkyHanniItemTracker) {
+            return
+        }
         if (inventoryOpen != currentlyOpen) {
             inventoryOpen = currentlyOpen
             update()

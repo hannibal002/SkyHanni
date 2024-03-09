@@ -64,6 +64,7 @@ object FarmingFortuneDisplay {
         "lotusability",
         "§7Piece Bonus: §6+(?<bonus>.*)☘"
     )
+
     // todo make pattern work on Melon and Cropie armor
     private val armorAbilityFortunePattern by patternGroup.pattern(
         "armorabilityfortune",
