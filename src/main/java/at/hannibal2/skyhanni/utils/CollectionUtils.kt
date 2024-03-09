@@ -106,6 +106,8 @@ object CollectionUtils {
         return newList
     }
 
+    fun List<String>.addIfNotNull(element: String?) = element?.let { plus(it) } ?: this
+
     fun <K, V> Map<K, V>.editCopy(function: MutableMap<K, V>.() -> Unit) =
         toMutableMap().also { function(it) }.toMap()
 
