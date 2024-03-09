@@ -1,14 +1,17 @@
 package at.hannibal2.skyhanni.features.garden.farming
 
+import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.LorenzTickEvent
 import at.hannibal2.skyhanni.features.garden.GardenAPI
-import at.hannibal2.skyhanni.features.garden.GardenPlotAPI
+import at.hannibal2.skyhanni.features.garden.GardenPlotAPI.getCurrentPlot
 import at.hannibal2.skyhanni.features.garden.GardenPlotAPI.isBarn
 import at.hannibal2.skyhanni.features.garden.GardenPlotAPI.plots
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.LocationUtils
+import at.hannibal2.skyhanni.utils.LorenzUtils.round
 import at.hannibal2.skyhanni.utils.LorenzUtils.sendTitle
 import at.hannibal2.skyhanni.utils.LorenzVec
+import at.hannibal2.skyhanni.utils.RenderUtils.renderString
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.SoundUtils
 import at.hannibal2.skyhanni.utils.SoundUtils.playSound
@@ -22,10 +25,13 @@ class LaneSwitchNotification {
     private val config get() = GardenAPI.config.laneswitch
 
     private var blocksPerSecond = 0.0
+    private var distancesUntilSwitch: List<Double> = listOf()
     private var lastBlocksPerSecond = 0.0
     private var lastPos = LorenzVec(0, 0, 0)
     private var lastLaneSwitch = SimpleTimeMark.farPast()
     private var lastWarning = SimpleTimeMark.farPast()
+    private var lastDistancesUntilSwitch: List<Double> = listOf()
+    private var lastDistance = 0.0
 
     companion object {
         private val config get() = GardenAPI.config.laneswitch
@@ -75,22 +81,17 @@ class LaneSwitchNotification {
 
     @SubscribeEvent
     fun onTick(event: LorenzTickEvent) {
-        if (!config.enabled || !GardenAPI.inGarden()) return
-        if (!plots.any { it.unlocked } && lastWarning.passedSince() >= 30.seconds) {
-            ChatUtils.clickableChat("§eOpen your configure plots for lane switch detection to work.", "/desk")
-            this.lastWarning = SimpleTimeMark.now()
-            return
-        }
-        if (GardenCropSpeed.averageBlocksPerSecond <= 0.0 && config.farmingOnly) return
+        if (!config.enabled || !GardenAPI.inGarden() || !plotsLoaded() || !isFarming()) return
         val notificationSettings = config.notification.settings
-        val plot = GardenPlotAPI.getCurrentPlot() ?: return
+        val plot = getCurrentPlot() ?: return
 
         val plotIndex = plots.indexOf(plot)
         val playerPos = LocationUtils.playerLocation()
         val farmEnd = getFarmBounds(plotIndex, playerPos, lastPos) ?: return
         val farmLength = farmEnd[0].distance(farmEnd[1])
-        this.lastPos = playerPos
-        this.blocksPerSecond = LocationUtils.distanceFromPreviousTick() ?: return
+        lastPos = playerPos
+        blocksPerSecond = LocationUtils.distanceFromPreviousTick()
+        distancesUntilSwitch = farmEnd.map { end -> end.distance(playerPos).round(2) }
 
         val farmTraverseTime = ((farmLength / blocksPerSecond) - (notificationSettings.notificationThreshold * 2)).seconds
         val bpsDifference = (blocksPerSecond - lastBlocksPerSecond).absoluteValue
@@ -102,9 +103,38 @@ class LaneSwitchNotification {
                     notificationSettings.notificationDuration.seconds
                 )
                 playUserSound()
-                this.lastLaneSwitch = SimpleTimeMark.now()
+                lastLaneSwitch = SimpleTimeMark.now()
             }
         }
-        this.lastBlocksPerSecond = blocksPerSecond
+        lastBlocksPerSecond = blocksPerSecond
     }
+
+    @SubscribeEvent
+    fun onRenderOverlay(event: GuiRenderEvent.GuiOverlayRenderEvent) {
+        if (!config.distanceUntilSwitch || !GardenAPI.inGarden() || !plotsLoaded() || !isFarming()) return
+        if (distancesUntilSwitch.isEmpty()) return
+        if (lastDistancesUntilSwitch.isEmpty()) { lastDistancesUntilSwitch = distancesUntilSwitch }
+
+        val distances = listOf(distancesUntilSwitch[0] - lastDistancesUntilSwitch[0], distancesUntilSwitch[1] - lastDistancesUntilSwitch[1])
+        val distance = if (distances.all { it != 0.0 }) {
+            if (distances[0] > 0) distancesUntilSwitch[1] else distancesUntilSwitch[0]
+        } else {
+            lastDistance
+        }
+
+        config.distanceUntilSwitchPos.renderString("Distance until Switch: $distance", posLabel = "Movement Speed")
+        lastDistancesUntilSwitch = distancesUntilSwitch
+        lastDistance = distance
+    }
+
+    private fun plotsLoaded(): Boolean {
+        if (!plots.any { it.unlocked } && lastWarning.passedSince() >= 30.seconds) {
+            ChatUtils.clickableChat("§eOpen your configure plots for lane switch detection to work.", "/desk")
+            lastWarning = SimpleTimeMark.now()
+            return false
+        }
+        return true
+    }
+
+    private fun isFarming(): Boolean = GardenCropSpeed.averageBlocksPerSecond <= 0.0
 }
