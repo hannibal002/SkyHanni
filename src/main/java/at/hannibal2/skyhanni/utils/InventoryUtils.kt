@@ -77,7 +77,7 @@ object InventoryUtils {
     }
 
     fun getAmountOfItemInInventory(name: NEUInternalName) =
-        getItemsInOwnInventory().filter { it.getInternalNameOrNull() == name }.sumOf { it.stackSize }
+        countItemsInLowerInventory { it.getInternalNameOrNull() == name }
 
     fun isItemInInventory(name: NEUInternalName) = getAmountOfItemInInventory(name) > 0
 }
