@@ -3,7 +3,7 @@ package at.hannibal2.skyhanni.features.garden.farming
 import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.LorenzTickEvent
 import at.hannibal2.skyhanni.features.garden.GardenAPI
-import at.hannibal2.skyhanni.features.garden.GardenPlotAPI.getCurrentPlot
+import at.hannibal2.skyhanni.features.garden.GardenPlotAPI
 import at.hannibal2.skyhanni.features.garden.GardenPlotAPI.isBarn
 import at.hannibal2.skyhanni.features.garden.GardenPlotAPI.plots
 import at.hannibal2.skyhanni.utils.ChatUtils
@@ -83,7 +83,7 @@ class LaneSwitchNotification {
     fun onTick(event: LorenzTickEvent) {
         if (!config.enabled || !GardenAPI.inGarden() || !plotsLoaded() || !isFarming()) return
         val notificationSettings = config.notification.settings
-        val plot = getCurrentPlot() ?: return
+        val plot = GardenPlotAPI.getCurrentPlot() ?: return
 
         val plotIndex = plots.indexOf(plot)
         val playerPos = LocationUtils.playerLocation()
