@@ -23,6 +23,6 @@ public class LaneSwitchConfig {
     @Expose
     @ConfigOption(name = "Notifications", desc = "")
     @Accordion
-    public LaneswitchNotificationConfig notification = new LaneswitchNotificationConfig();
+    public LaneSwitchNotificationConfig notification = new LaneSwitchNotificationConfig();
 
 }

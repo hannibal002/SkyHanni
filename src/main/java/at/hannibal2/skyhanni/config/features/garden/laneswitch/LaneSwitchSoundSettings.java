@@ -1,6 +1,6 @@
 package at.hannibal2.skyhanni.config.features.garden.laneswitch;
 
-import at.hannibal2.skyhanni.features.garden.farming.LaneswitchNotification;
+import at.hannibal2.skyhanni.features.garden.farming.LaneSwitchNotification;
 import at.hannibal2.skyhanni.utils.OSUtils;
 import com.google.gson.annotations.Expose;
 import io.github.moulberry.moulconfig.annotations.ConfigEditorButton;
@@ -8,7 +8,7 @@ import io.github.moulberry.moulconfig.annotations.ConfigEditorSlider;
 import io.github.moulberry.moulconfig.annotations.ConfigEditorText;
 import io.github.moulberry.moulconfig.annotations.ConfigOption;
 
-public class LaneswitchSoundSettings {
+public class LaneSwitchSoundSettings {
     @Expose
     @ConfigOption(name = "Notification Sound", desc = "The sound played for the notification.")
     @ConfigEditorText
@@ -21,7 +21,7 @@ public class LaneswitchSoundSettings {
 
     @ConfigOption(name = "Test Sound", desc = "Test current sound settings.")
     @ConfigEditorButton(buttonText = "Test")
-    public Runnable testSound = LaneswitchNotification::playUserSound;
+    public Runnable testSound = LaneSwitchNotification::playUserSound;
 
     @ConfigOption(name = "List of Sounds", desc = "A list of available sounds.")
     @ConfigEditorButton(buttonText = "Open")

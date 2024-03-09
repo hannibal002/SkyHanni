@@ -4,9 +4,8 @@ import at.hannibal2.skyhanni.events.LorenzTickEvent
 import at.hannibal2.skyhanni.features.garden.GardenAPI
 import at.hannibal2.skyhanni.features.garden.GardenPlotAPI
 import at.hannibal2.skyhanni.features.garden.GardenPlotAPI.plots
-import at.hannibal2.skyhanni.features.misc.MovementSpeedDisplay
+import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.LocationUtils
-import at.hannibal2.skyhanni.utils.LorenzColor
 import at.hannibal2.skyhanni.utils.LorenzUtils.sendTitle
 import at.hannibal2.skyhanni.utils.LorenzVec
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
@@ -14,13 +13,14 @@ import at.hannibal2.skyhanni.utils.SoundUtils
 import at.hannibal2.skyhanni.utils.SoundUtils.playSound
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import kotlin.math.absoluteValue
+import kotlin.math.ceil
 import kotlin.time.Duration.Companion.seconds
 
-class LaneswitchNotification {
+class LaneSwitchNotification {
 
     private val config get() = GardenAPI.config.laneswitch
 
-    private var blocksPerSecond = MovementSpeedDisplay.currentBPS
+    private var blocksPerSecond = 0.0
     private var lastBlocksPerSecond = 0.0
     private var lastPos = LorenzVec(0, 0, 0)
     private var lastLaneSwitch = SimpleTimeMark.farPast()
@@ -55,25 +55,27 @@ class LaneswitchNotification {
                 LorenzVec(xValueMin, playerPos.y, playerPos.z), LorenzVec(xValueMax, playerPos.y, playerPos.z)
             )
         } else if (xVelocity.absoluteValue < zVelocity.absoluteValue) {
+            val row = (ceil(plotIndex / 5.0) - 1).toInt()
             val zValueTop = if (plotIndex - 1 == -1 || plotIndex - 5 < 0 || !plots[plotIndex - 5].unlocked || plots.indexOf(plots[plotIndex - 5]) == 12)
-                plots[plotIndex].box.minZ else plots[plotIndex - 5].box.minZ
-            val zValueBottom = if ((plotIndex + 1) % 5 == 0 || plotIndex + 5 > 24 || !plots[plotIndex + 5].unlocked || plots.indexOf(plots[plotIndex + 5]) == 12)
-                plots[plotIndex].box.maxZ else plots[plotIndex + 5].box.maxZ
+                plots[plotIndex].box.minZ else plots[plotIndex - (5 * row)].box.minZ
+            val zValueBottom = if (plotIndex + 5 > 24 || !plots[plotIndex + 5].unlocked || plots.indexOf(plots[plotIndex + 5]) == 12)
+                plots[plotIndex].box.maxZ else plots[plotIndex + ((4 - row)) * 5].box.maxZ
 
             return listOf(
                 LorenzVec(playerPos.x, playerPos.y, zValueTop), LorenzVec(playerPos.x, playerPos.y, zValueBottom)
             )
         } else if (xVelocity.absoluteValue == 0.0 && zVelocity.absoluteValue == 0.0) {
             return null
+        } else {
+            return null
         }
-        return null
     }
 
     @SubscribeEvent
     fun onTick(event: LorenzTickEvent) {
         if (!config.enabled || !GardenAPI.inGarden()) return
         if (!plots.any { it.unlocked } && lastWarning.passedSince() >= 30.seconds) {
-            sendTitle(LorenzColor.RED.getChatColor() + "Plots aren't loaded, open 'Configure Plots'", 2.seconds)
+            ChatUtils.clickableChat("§eOpen your configure plots for lane switch detection to work.", "/desk")
             this.lastWarning = SimpleTimeMark.now()
             return
         }
@@ -86,6 +88,7 @@ class LaneswitchNotification {
         val farmEnd = getFarmBounds(plotIndex, playerPos, lastPos) ?: return
         val farmLength = farmEnd[0].distance(farmEnd[1])
         this.lastPos = playerPos
+        this.blocksPerSecond = LocationUtils.distanceFromPreviousTick() ?: return
 
         val farmTraverseTime = ((farmLength / blocksPerSecond) - (notificationSettings.notificationThreshold * 2)).seconds
         val bpsDifference = (blocksPerSecond - lastBlocksPerSecond).absoluteValue

@@ -7,7 +7,7 @@ import io.github.moulberry.moulconfig.annotations.ConfigEditorSlider;
 import io.github.moulberry.moulconfig.annotations.ConfigEditorText;
 import io.github.moulberry.moulconfig.annotations.ConfigOption;
 
-public class LaneswitchNotificationSettings {
+public class LaneSwitchNotificationSettings {
 
     @Expose
     @ConfigOption(name = "Notification Text", desc = "The text to be displayed as the notification.")
