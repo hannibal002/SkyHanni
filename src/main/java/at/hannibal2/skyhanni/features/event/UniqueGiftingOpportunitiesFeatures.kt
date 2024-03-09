@@ -80,6 +80,7 @@ object UniqueGiftingOpportunitiesFeatures {
     @SubscribeEvent
     fun onRenderMobColored(event: RenderMobColoredEvent) {
         if (!isEnabled()) return
+
         val entity = event.entity
         if (entity is EntityPlayerSP) return
         if (entity is EntityPlayer && !entity.isNPC() && !isIronman(entity) && !isBingo(entity) &&

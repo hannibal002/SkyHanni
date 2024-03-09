@@ -200,6 +200,7 @@ class DungeonHideItems {
     fun onRenderMobColored(event: RenderMobColoredEvent) {
         if (!LorenzUtils.inDungeons) return
         if (!SkyHanniMod.feature.dungeon.highlightSkeletonSkull) return
+
         val entity = event.entity
         if (entity is EntityArmorStand && isSkeletonSkull(entity)) {
             val lastMove = movingSkeletonSkulls.getOrDefault(entity, 0)
@@ -213,6 +214,7 @@ class DungeonHideItems {
     fun onResetEntityHurtTime(event: ResetEntityHurtEvent) {
         if (!LorenzUtils.inDungeons) return
         if (!SkyHanniMod.feature.dungeon.highlightSkeletonSkull) return
+
         val entity = event.entity
         if (entity is EntityArmorStand && isSkeletonSkull(entity)) {
             val lastMove = movingSkeletonSkulls.getOrDefault(entity, 0)
