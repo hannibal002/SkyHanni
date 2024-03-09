@@ -35,7 +35,7 @@ class PetExpTooltip {
 
         val itemStack = event.itemStack ?: return
         val petExperience = itemStack.getPetExp()?.round(1) ?: return
-        val name = itemStack.name ?: return
+        val name = itemStack.name
         try {
 
             val index = findIndex(event.toolTip) ?: return

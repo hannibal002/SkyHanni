@@ -49,8 +49,9 @@ object MythologicalCreatureTracker {
         ".* §r§eYou dug out a §r§2Minos Inquisitor§r§e!"
     )
 
-    private val tracker = SkyHanniTracker("Mythological Creature Tracker", { Data() }, { it.diana.mythologicalMobTracker })
-    { drawDisplay(it) }
+    private val tracker =
+        SkyHanniTracker("Mythological Creature Tracker", { Data() }, { it.diana.mythologicalMobTracker })
+        { drawDisplay(it) }
 
     class Data : TrackerData() {
 

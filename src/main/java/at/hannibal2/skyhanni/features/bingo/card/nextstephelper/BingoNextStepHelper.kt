@@ -22,6 +22,8 @@ import at.hannibal2.skyhanni.utils.CollectionUtils.editCopy
 import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.name
 import at.hannibal2.skyhanni.utils.LorenzUtils
+import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
+import at.hannibal2.skyhanni.utils.NumberUtil.formatInt
 import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
@@ -122,9 +124,7 @@ class BingoNextStepHelper {
             return if (having > 0) {
                 val needed = step.amountNeeded
                 val percentage = LorenzUtils.formatPercentage(having.toDouble() / needed)
-                val havingFormat = LorenzUtils.formatInteger(having)
-                val neededFormat = LorenzUtils.formatInteger(needed)
-                " $percentage ($havingFormat/$neededFormat)"
+                " $percentage (${having.addSeparators()}/${needed.addSeparators()})"
             } else ""
         }
     }
@@ -183,7 +183,7 @@ class BingoNextStepHelper {
             if (step is ItemsStep) {
                 var totalCount = 0L
                 for ((itemName, multiplier) in step.variants) {
-                    val count = InventoryUtils.countItemsInLowerInventory { it.name?.removeColor() == itemName }
+                    val count = InventoryUtils.countItemsInLowerInventory { it.name.removeColor() == itemName }
                     totalCount += count * multiplier
                 }
                 if (step.amountHaving != totalCount) {
@@ -263,7 +263,7 @@ class BingoNextStepHelper {
 
     private fun readDescription(description: String): NextStep? {
         collectionPattern.matchMatcher(description) {
-            val amount = group("amount").replace(",", "").toInt()
+            val amount = group("amount").formatInt()
             val name = group("name")
 
             return CollectionStep(name, amount) withItemIslandRequirement name
