@@ -45,7 +45,7 @@ class RenderLivingEntityHelper {
             removeNoHurtTime(entity)
         }
 
-        fun <T : EntityLivingBase> setColorMultiplier(entity: T): Int {
+        fun <T : EntityLivingBase> internalSetColorMultiplier(entity: T): Int {
             if (!SkyHanniDebugsAndTests.globalRender) return 0
             if (entityColorMap.containsKey(entity)) {
                 val condition = entityColorCondition[entity]!!
@@ -56,7 +56,7 @@ class RenderLivingEntityHelper {
             return 0
         }
 
-        fun <T : EntityLivingBase> changeHurtTime(entity: T): Int {
+        fun <T : EntityLivingBase> internalChangeHurtTime(entity: T): Int {
             if (!SkyHanniDebugsAndTests.globalRender) return entity.hurtTime
             run {
                 val condition = entityNoHurTimeCondition[entity] ?: return@run
