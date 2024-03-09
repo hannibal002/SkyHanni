@@ -3,6 +3,7 @@ package at.hannibal2.skyhanni.features.fishing
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.LorenzTickEvent
+import at.hannibal2.skyhanni.events.ReceiveParticleEvent
 import at.hannibal2.skyhanni.utils.EntityUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.RenderUtils.renderStrings
@@ -11,6 +12,7 @@ import at.hannibal2.skyhanni.utils.StringUtils.matches
 import at.hannibal2.skyhanni.utils.getLorenzVec
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraft.entity.item.EntityArmorStand
+import net.minecraft.util.EnumParticleTypes
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
 private val config get() = SkyHanniMod.feature.fishing.totemOfCorruption
@@ -35,13 +37,13 @@ class TotemOfCorruption {
 
     @SubscribeEvent
     fun onRender(event: GuiRenderEvent.GuiOverlayRenderEvent) {
-        if (!enabled() || display.isEmpty()) return
+        if (!isOverlayEnabled() || display.isEmpty()) return
         config.position.renderStrings(display, posLabel = "Totem of Corruption")
     }
 
     @SubscribeEvent
     fun onTick(event: LorenzTickEvent) {
-        if (!enabled()) return
+        if (!isOverlayEnabled()) return
         totems = getTotems()
             .filterNotNull()
             .mapNotNull { totem ->
@@ -55,6 +57,19 @@ class TotemOfCorruption {
             }
 
         display = createLines()
+    }
+
+    @SubscribeEvent
+    fun onChatPacket(event: ReceiveParticleEvent) {
+        if (!isHideParticlesEnabled()) return
+
+        for (totem in totems) {
+            if (event.type == EnumParticleTypes.SPELL_WITCH && event.speed == 0.0f) {
+                if (totem.totemEntity.getLorenzVec().distance(event.location) < 4.0) {
+                    event.isCanceled = true
+                }
+            }
+        }
     }
 
     private fun getTimeRemaining(totem: EntityArmorStand): Int? {
@@ -102,7 +117,8 @@ class TotemOfCorruption {
             .filter { totemNamePattern.matches(it.name) }.toList()
     }
 
-    private fun enabled() = config.enabled && LorenzUtils.inSkyBlock
+    private fun isOverlayEnabled() = config.showOverlay && LorenzUtils.inSkyBlock
+    private fun isHideParticlesEnabled() = config.hideParticles && LorenzUtils.inSkyBlock
 }
 
 class Totem(

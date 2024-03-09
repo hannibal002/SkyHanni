@@ -12,7 +12,13 @@ public class TotemOfCorruptionConfig {
     @ConfigOption(name = "Enabled", desc = "Show the Totem of Corruption overlay.")
     @ConfigEditorBoolean
     @FeatureToggle
-    public boolean enabled = true;
+    public boolean showOverlay = true;
+
+    @Expose
+    @ConfigOption(name = "Hide Particles", desc = "Hide the particles of the Totem of Corruption.")
+    @ConfigEditorBoolean
+    @FeatureToggle
+    public boolean hideParticles = true;
 
     @Expose
     public Position position = new Position(50, 20, false, true);
