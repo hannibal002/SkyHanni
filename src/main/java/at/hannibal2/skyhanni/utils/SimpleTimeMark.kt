@@ -43,6 +43,8 @@ value class SimpleTimeMark(private val millis: Long) : Comparable<SimpleTimeMark
         fun farPast() = SimpleTimeMark(0)
         fun farFuture() = SimpleTimeMark(Long.MAX_VALUE)
 
+        fun Duration.fromNow() = now() + this
+
         fun Long.asTimeMark() = SimpleTimeMark(this)
         fun SkyBlockTime.asTimeMark() = SimpleTimeMark(toMillis())
     }
