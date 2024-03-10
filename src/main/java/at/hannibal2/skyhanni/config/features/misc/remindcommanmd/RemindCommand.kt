@@ -1,4 +1,4 @@
-package at.hannibal2.skyhanni.config.commands
+package at.hannibal2.skyhanni.config.features.misc.remindcommanmd
 
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.TimeUtils
