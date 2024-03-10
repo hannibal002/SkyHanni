@@ -1,7 +1,6 @@
 package at.hannibal2.skyhanni.features.misc.items.enchants
 
 import at.hannibal2.skyhanni.SkyHanniMod
-import at.hannibal2.skyhanni.config.ConfigManager
 import at.hannibal2.skyhanni.config.features.enchantparsing.EnchantParsingConfig
 import at.hannibal2.skyhanni.config.features.enchantparsing.EnchantParsingConfig.ColorEnchants.CommaFormat
 import at.hannibal2.skyhanni.events.ChatHoverEvent
@@ -12,11 +11,6 @@ import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.NumberUtil.romanToDecimal
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getEnchantments
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
-import com.google.gson.Gson
-import com.google.gson.reflect.TypeToken
-import java.io.File
-import java.io.FileInputStream
-import java.io.InputStreamReader
 import java.util.TreeSet
 import java.util.regex.Pattern
 import net.minecraft.event.HoverEvent
@@ -36,26 +30,30 @@ object EnchantParser {
     private val GRAY_ENCHANT_PATTERN = Pattern.compile("^(Respiration|Aqua Affinity|Depth Strider|Efficiency).*")
 
     private var indexOfLastGrayEnchant = -1
+    private var startEnchant = -1
+    private var endEnchant = -1
+    // Stacking enchants with their progress visible should have the
+    // enchants stacked in a single column
+    private var shouldBeSingleColumn = false
+    // Used to determine how many enchants are used on each line
+    // for this particular item, since consistency is not Hypixel's strong point
+    private var maxEnchantsPerLine = 0
     private var loreLines: MutableList<String> = mutableListOf()
+    private var orderedEnchants: TreeSet<FormattedEnchant> = TreeSet()
 
-    private val gson = Gson()
     private val loreCache: Cache = Cache()
     // Maps for all enchants
     private var enchants: Enchants = Enchants()
 
     @SubscribeEvent
     fun onRepoReload(event: RepositoryReloadEvent) {
-        val enchantsType = object : TypeToken<Enchants>(){}.type
-        val inputStreamReader = InputStreamReader(
-            FileInputStream(File(ConfigManager.configDirectory, "/repo/constants/Enchants.json")))
-        val data = gson.fromJson<Enchants>(inputStreamReader, enchantsType)
-        enchants = data
+        this.enchants = event.getConstant<Enchants>("Enchants")
     }
 
     @SubscribeEvent
     fun onTooltipEvent(event: LorenzToolTipEvent) {
         // If enchants doesn't have any enchant data then we have no data to parse enchants correctly
-        if (!isEnabled() || !enchants.hasEnchantData()) return
+        if (!isEnabled() || !this.enchants.hasEnchantData()) return
 
         // The enchants we expect to find in the lore, found from the items NBT data
         val enchants = event.itemStack.getEnchantments() ?: return
@@ -72,7 +70,7 @@ object EnchantParser {
     @SubscribeEvent
     fun onChatHoverEvent(event: ChatHoverEvent) {
         if (event.action != HoverEvent.Action.SHOW_TEXT) return
-        if (!isEnabled() || !enchants.hasEnchantData()) return
+        if (!isEnabled() || !this.enchants.hasEnchantData()) return
 
         val lore = event.component.formattedText.split("\n").toMutableList()
 
@@ -90,10 +88,61 @@ object EnchantParser {
         }
         loreCache.updateBefore(loreList)
 
+        // Find where the enchants start and end
+        enchantStartAndEnd(loreList, enchants)
+
+        if (endEnchant == -1) {
+            loreCache.updateAfter(loreList)
+            return
+        }
+
+        shouldBeSingleColumn = false
+        loreLines = mutableListOf()
+        orderedEnchants = TreeSet()
+        maxEnchantsPerLine = 0
+
+        // Order all enchants
+        orderEnchants(loreList)
+
+        if (orderedEnchants.isEmpty()) {
+            loreCache.updateAfter(loreList)
+            return
+        }
+
+        // If we have color parsing off and hide enchant descriptions on, remove them and return from method
+        if (!config.colorEnchants.colorParsing) {
+            if (config.hideEnchantDescriptions) {
+                loreList.removeAll(loreLines)
+                loreCache.updateAfter(loreList)
+                if (chatComponent != null) editChatComponent(chatComponent, loreList)
+                return
+            }
+            return
+        }
+
+        // Remove enchantment lines so we can insert ours
+        loreList.subList(startEnchant, endEnchant + 1).clear()
+
+        val insertEnchants: MutableList<String> = mutableListOf()
+
+        // Format enchants based on format config option
+        formatEnchants(insertEnchants)
+
+        // Add our parsed enchants back into the lore
+        loreList.addAll(startEnchant, insertEnchants)
+        // Cache parsed lore
+        loreCache.updateAfter(loreList)
+
+        // Alter the chat component value if one was passed
+        if (chatComponent != null) {
+            editChatComponent(chatComponent, loreList)
+        }
+    }
+
+    private fun enchantStartAndEnd(loreList: MutableList<String>, enchants: Map<String, Int>) {
         var startEnchant = -1
         var endEnchant = -1
 
-        // Find where the enchants start and end
         val startIndex = if (indexOfLastGrayEnchant == -1) 0 else indexOfLastGrayEnchant + 1
         for (i in startIndex until loreList.size) {
             val strippedLine = loreList[i].removeColor()
@@ -103,24 +152,13 @@ object EnchantParser {
             } else if (strippedLine.trim().isEmpty() && endEnchant == -1) endEnchant = i - 1
         }
 
-        if (endEnchant == -1) {
-            loreCache.updateAfter(loreList)
-            return
-        }
+        this.startEnchant = startEnchant
+        this.endEnchant = endEnchant
+    }
 
-        loreLines = mutableListOf()
-
-        // Stacking enchants with their progress visible should have the
-        // enchants stacked in a single column
-        var shouldBeSingleColumn = false
-        val orderedEnchants: TreeSet<FormattedEnchant> = TreeSet()
+    private fun orderEnchants(loreList: MutableList<String>) {
         var lastEnchant: FormattedEnchant? = null
 
-        // Used to determine how many enchants are used on each line
-        // for this particular item, since consistency is not Hypixel's strong point
-        var maxEnchantsPerLine = 0
-
-        // Order all enchants
         for (i in startEnchant..endEnchant) {
             val unformattedLine = loreList[i].removeColor()
             val matcher = ENCHANTMENT_PATTERN.matcher(unformattedLine)
@@ -159,27 +197,9 @@ object EnchantParser {
                 loreLines.add(loreList[i])
             }
         }
+    }
 
-        if (orderedEnchants.isEmpty()) {
-            loreCache.updateAfter(loreList)
-            return
-        }
-
-        // If we have color parsing off and hide enchant descriptions on, remove them and return from method
-        if (!config.colorEnchants.colorParsing) {
-            if (config.hideEnchantDescriptions) {
-                loreList.removeAll(loreLines)
-                loreCache.updateAfter(loreList)
-                if (chatComponent != null) editChatComponent(chatComponent, loreList)
-                return
-            }
-            return
-        }
-
-        // Remove enchantment lines so we can insert ours
-        loreList.subList(startEnchant, endEnchant + 1).clear()
-
-        val insertEnchants: MutableList<String> = mutableListOf()
+    private fun formatEnchants(insertEnchants: MutableList<String>) {
         val commaFormat = config.colorEnchants.commaFormat
 
         // Normal is leaving the formatting as Hypixel provides it
@@ -244,16 +264,6 @@ object EnchantParser {
                     insertEnchants.add(enchant.getFormattedString())
                 }
             }
-        }
-
-        // Add our parsed enchants back into the lore
-        loreList.addAll(startEnchant, insertEnchants)
-        // Cache parsed lore
-        loreCache.updateAfter(loreList)
-
-        // Alter the chat component value if one was passed
-        if (chatComponent != null) {
-            editChatComponent(chatComponent, loreList)
         }
     }
 
