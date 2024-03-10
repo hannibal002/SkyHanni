@@ -48,12 +48,12 @@ class LaneSwitchNotification {
         return from.distance(to) <= speed * time
     }
 
-    private fun isBoundaryPlot(plotIndex: Int, direction: String, value: String): Boolean {
-        if (direction == "WE") {
+    private fun isBoundaryPlot(plotIndex: Int, direction: Direction, value: Value): Boolean {
+        if (direction == Direction.WEST_EAST) {
             val isNextNewRow: Boolean
             val isNextUnlocked: Boolean
             val isNextBarn: Boolean
-            if (value == "MIN") {
+            if (value == Value.MIN) {
                 if (plotIndex - 1 == -1) return true // check if next plot is out of bounds
                 isNextNewRow = plots[plotIndex - 1].box.maxX.absoluteValue.round(0) == 240.0 //Check if the next plot's border is 240 and therefore in the previous row
                 isNextUnlocked = plots[plotIndex - 1].unlocked
@@ -65,11 +65,11 @@ class LaneSwitchNotification {
                 isNextBarn = plots[plotIndex + 1].isBarn()
             }
             return isNextNewRow || !isNextUnlocked || isNextBarn
-        } else if (direction == "NS"){
+        } else if (direction == Direction.NORTH_SOUTH){
             val isNextUnlocked: Boolean
             val isNextBarn: Boolean
 
-            if (value == "TOP") {
+            if (value == Value.MAX) {
                 if (plotIndex - 1 == -1 || (plotIndex - 5) < 0) return true // check if next plot is out of bounds
                 isNextUnlocked = plots[plotIndex - 5].unlocked
                 isNextBarn = plots[plotIndex - 5].isBarn()
@@ -83,6 +83,20 @@ class LaneSwitchNotification {
         return false
     }
 
+    enum class Direction {
+        WEST_EAST,
+        NORTH_SOUTH,
+        ;
+    }
+
+    enum class Value {
+        MIN,
+        MAX,
+        TOP,
+        BOTTOM,
+        ;
+    }
+
     private fun getFarmBounds(plotIndex: Int, playerPos: LorenzVec, lastPos: LorenzVec): List<LorenzVec>? {
         if(plots[plotIndex].isBarn() || plotIndex == 12) return null
         val xVelocity = playerPos.x - lastPos.x
@@ -92,10 +106,10 @@ class LaneSwitchNotification {
             var xValueMax = 0.0
 
             for(i in 0..4) {
-                if(isBoundaryPlot(plotIndex - i, "WE", "MIN")) { xValueMin = plots[plotIndex - i].box.minX; break }
+                if(isBoundaryPlot(plotIndex - i, Direction.WEST_EAST, Value.MIN)) { xValueMin = plots[plotIndex - i].box.minX; break }
             }
             for(i in 0..4) {
-                if(isBoundaryPlot(plotIndex + i, "WE", "MAX")) { xValueMax = plots[plotIndex + i].box.maxX; break }
+                if(isBoundaryPlot(plotIndex + i, Direction.WEST_EAST, Value.MAX)) { xValueMax = plots[plotIndex + i].box.maxX; break }
             }
 
             return listOf(
@@ -107,10 +121,10 @@ class LaneSwitchNotification {
             var zValueBottom = 0.0
 
             for(i in 0..4) {
-                if(isBoundaryPlot(plotIndex - (i * 5), "NS", "TOP")) { zValueTop = plots[plotIndex - (i * 5)].box.minZ; break }
+                if(isBoundaryPlot(plotIndex - (i * 5), Direction.NORTH_SOUTH, Value.TOP)) { zValueTop = plots[plotIndex - (i * 5)].box.minZ; break }
             }
             for(i in 0..4) {
-                if(isBoundaryPlot(plotIndex + (i * 5), "NS", "BOTTOM")) { zValueBottom = plots[plotIndex + (i * 5)].box.maxZ; break }
+                if(isBoundaryPlot(plotIndex + (i * 5), Direction.NORTH_SOUTH, Value.BOTTOM)) { zValueBottom = plots[plotIndex + (i * 5)].box.maxZ; break }
             }
 
             return listOf(
