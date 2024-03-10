@@ -21,7 +21,8 @@ class HighlightInquisitors {
         val entity = event.entity
 
         if (entity is EntityPlayer && entity.name == "Minos Inquisitor") {
-            RenderLivingEntityHelper.setEntityColor(entity, LorenzColor.AQUA.toColor().withAlpha(127)) { config.highlightInquisitors }
+            val color = LorenzColor.AQUA.toColor().withAlpha(127)
+            RenderLivingEntityHelper.setEntityColor(entity, color) { config.highlightInquisitors }
             RenderLivingEntityHelper.setNoHurtTime(entity) { config.highlightInquisitors }
         }
     }

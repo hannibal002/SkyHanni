@@ -50,6 +50,7 @@ enum class ChromaType(val shaderName: String) {
      * See [StandardChromaShader]
      */
     STANDARD("standard_chroma"),
+
     /**
      * See [TexturedChromaShader]
      */

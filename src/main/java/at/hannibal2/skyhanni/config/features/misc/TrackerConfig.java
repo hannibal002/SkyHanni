@@ -118,6 +118,10 @@ public class TrackerConfig {
         @ConfigOption(name = "Still Show Above", desc = "Always show items above this §6price in 1k §7even when not in the top # of items.")
         @ConfigEditorSlider(minValue = 5, maxValue = 500, minStep = 5)
         public Property<Integer> minPrice = Property.of(100);
-
     }
+
+    @Expose
+    @ConfigOption(name = "Hide outside Inventory", desc = "Hide Profit Trackers while not insidie an inventory.")
+    @ConfigEditorBoolean
+    public boolean hideItemTrackersOutsideInventory = false;
 }

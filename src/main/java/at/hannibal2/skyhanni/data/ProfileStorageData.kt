@@ -3,12 +3,9 @@ package at.hannibal2.skyhanni.data
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.config.SackData
 import at.hannibal2.skyhanni.config.Storage
-import at.hannibal2.skyhanni.data.HypixelData
 import at.hannibal2.skyhanni.events.ConfigLoadEvent
 import at.hannibal2.skyhanni.events.HypixelJoinEvent
-import at.hannibal2.skyhanni.events.LorenzChatEvent
 import at.hannibal2.skyhanni.events.LorenzTickEvent
-import at.hannibal2.skyhanni.events.LorenzWorldChangeEvent
 import at.hannibal2.skyhanni.events.ProfileJoinEvent
 import at.hannibal2.skyhanni.events.TabListUpdateEvent
 import at.hannibal2.skyhanni.utils.ChatUtils
@@ -16,10 +13,9 @@ import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.UtilsPatterns
-import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
-import kotlin.time.Duration.Companion.seconds
 import net.minecraftforge.fml.common.eventhandler.EventPriority
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
+import kotlin.time.Duration.Companion.seconds
 
 object ProfileStorageData {
 
@@ -27,14 +23,6 @@ object ProfileStorageData {
     var profileSpecific: Storage.ProfileSpecific? = null
     var loaded = false
     private var noTabListTime = SimpleTimeMark.farPast()
-
-    private var nextProfile: String? = null
-
-    private val patternGroup = RepoPattern.group("data.profile")
-    private val profileSwitchPattern by patternGroup.pattern(
-        "switch",
-        "§7Switching to profile (?<name>.*)\\.\\.\\."
-    )
 
     private var sackPlayers: SackData.PlayerSpecific? = null
     var sackProfiles: SackData.ProfileSpecific? = null

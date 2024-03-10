@@ -22,7 +22,7 @@ object LocationUtils {
 
     fun LorenzVec.distanceToPlayerSqIgnoreY() = distanceSqIgnoreY(playerLocation())
 
-    fun Entity.distanceToPlayer() = getLorenzVec().distance(playerLocation())
+    fun Entity.distanceToPlayer() = getLorenzVec().distanceToPlayer()
 
     fun Entity.distanceTo(location: LorenzVec) = getLorenzVec().distance(location)
     fun Entity.distanceTo(other: Entity) = getLorenzVec().distance(other.getLorenzVec())

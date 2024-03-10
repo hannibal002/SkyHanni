@@ -31,7 +31,7 @@ class GardenCropUpgrades {
     fun onInventoryOpen(event: InventoryFullyOpenedEvent) {
         if (event.inventoryName != "Crop Upgrades") return
         event.inventoryItems.forEach { (_, item) ->
-            val crop = item.name?.removeColor()?.let { CropType.getByNameOrNull(it) } ?: return@forEach
+            val crop = CropType.getByNameOrNull(item.name.removeColor()) ?: return@forEach
             val level = item.getLore()
                 .firstNotNullOfOrNull { tierPattern.matchEntire(it)?.groups?.get(1)?.value?.toIntOrNull() } ?: 0
             crop.setUpgradeLevel(level)
