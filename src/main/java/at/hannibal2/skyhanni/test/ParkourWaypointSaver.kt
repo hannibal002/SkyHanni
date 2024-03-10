@@ -25,7 +25,7 @@ class ParkourWaypointSaver {
 
     @SubscribeEvent
     fun onKeyClick(event: LorenzKeyPressEvent) {
-        if (!LorenzUtils.inSkyBlock) return
+        if (!LorenzUtils.inSkyBlock && !config.parkourOutsideSB) return
         if (Minecraft.getMinecraft().currentScreen != null) return
         if (NEUItems.neuHasFocus()) return
         if (timeLastSaved.passedSince() < 250.milliseconds) return
@@ -67,7 +67,7 @@ class ParkourWaypointSaver {
 
     @SubscribeEvent
     fun onRenderWorld(event: LorenzRenderWorldEvent) {
-        if (!LorenzUtils.inSkyBlock) return
+        if (!LorenzUtils.inSkyBlock && !config.parkourOutsideSB) return
 
         if (locations.size > 1) {
             parkourHelper?.render(event)

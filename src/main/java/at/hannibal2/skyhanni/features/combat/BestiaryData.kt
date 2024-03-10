@@ -18,7 +18,7 @@ import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils.addButton
 import at.hannibal2.skyhanni.utils.NumberUtil
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
-import at.hannibal2.skyhanni.utils.NumberUtil.formatNumber
+import at.hannibal2.skyhanni.utils.NumberUtil.formatLong
 import at.hannibal2.skyhanni.utils.NumberUtil.romanToDecimalIfNecessary
 import at.hannibal2.skyhanni.utils.NumberUtil.roundToPrecision
 import at.hannibal2.skyhanni.utils.NumberUtil.toRoman
@@ -150,12 +150,12 @@ object BestiaryData {
                 val progress = line.substring(line.lastIndexOf(' ') + 1)
                 if (previousLine.contains("Families Found")) {
                     progressPattern.matchMatcher(progress) {
-                        familiesFound = group("current").formatNumber()
-                        totalFamilies = group("needed").formatNumber()
+                        familiesFound = group("current").formatLong()
+                        totalFamilies = group("needed").formatLong()
                     }
                 } else if (previousLine.contains("Families Completed")) {
                     progressPattern.matchMatcher(progress) {
-                        familiesCompleted = group("current").formatNumber()
+                        familiesCompleted = group("current").formatLong()
                     }
                 }
             }
@@ -178,7 +178,7 @@ object BestiaryData {
             for ((lineIndex, line) in stack.getLore().withIndex()) {
                 val loreLine = line.removeColor()
                 if (loreLine.startsWith("Kills: ")) {
-                    actualRealTotalKill = "([0-9,.]+)".toRegex().find(loreLine)?.groupValues?.get(1)?.formatNumber()
+                    actualRealTotalKill = "([0-9,.]+)".toRegex().find(loreLine)?.groupValues?.get(1)?.formatLong()
                         ?: 0
                 }
                 if (!loreLine.startsWith("                    ")) continue
@@ -186,13 +186,13 @@ object BestiaryData {
                 val progress = loreLine.substring(loreLine.lastIndexOf(' ') + 1)
                 if (previousLine.contains("Progress to Tier")) {
                     progressPattern.matchMatcher(progress) {
-                        totalKillToTier = group("needed").formatNumber()
-                        currentKillToTier = group("current").formatNumber()
+                        totalKillToTier = group("needed").formatLong()
+                        currentKillToTier = group("current").formatLong()
                     }
                 } else if (previousLine.contains("Overall Progress")) {
                     progressPattern.matchMatcher(progress) {
-                        totalKillToMax = group("needed").formatNumber()
-                        currentTotalKill = group("current").formatNumber()
+                        totalKillToMax = group("needed").formatLong()
+                        currentTotalKill = group("current").formatLong()
                     }
                 }
             }

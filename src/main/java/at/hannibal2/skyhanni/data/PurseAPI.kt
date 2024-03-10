@@ -76,4 +76,6 @@ object PurseAPI {
             return PurseChangeCause.LOSE_UNKNOWN
         }
     }
+
+    fun getPurse(): Double = currentPurse
 }

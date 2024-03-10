@@ -116,7 +116,7 @@ object GardenCropMilestoneDisplay {
             }
             cultivatingData[crop] = counter
         } catch (e: Throwable) {
-            ErrorManager.logError(e, "Updating crop counter by reading farming tool nbt data.")
+            ErrorManager.logErrorWithData(e, "Updating crop counter by reading farming tool nbt data.")
         }
     }
 

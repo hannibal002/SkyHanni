@@ -5,12 +5,12 @@ import at.hannibal2.skyhanni.features.chroma.TexturedChromaShader
 import at.hannibal2.skyhanni.features.misc.RoundedRectangleShader
 import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.LorenzUtils
-import java.io.BufferedReader
-import java.io.InputStreamReader
 import net.minecraft.client.Minecraft
 import net.minecraft.util.ResourceLocation
 import org.apache.commons.lang3.StringUtils
 import org.lwjgl.opengl.OpenGLException
+import java.io.BufferedReader
+import java.io.InputStreamReader
 
 /**
  * Object to handle shaders for SkyHanni

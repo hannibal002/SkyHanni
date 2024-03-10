@@ -16,8 +16,7 @@ class GardenComposterUpgradesData {
         if (!GardenAPI.inGarden()) return
         if (event.inventoryName != "Composter Upgrades") return
         for (item in event.inventoryItems.values) {
-            val itemName = item.name ?: continue
-            ComposterUpgrade.regex.matchMatcher(itemName) {
+            ComposterUpgrade.regex.matchMatcher(item.name) {
                 val name = group("name")
                 val level = group("level")?.romanToDecimalIfNecessary() ?: 0
                 val composterUpgrade = ComposterUpgrade.getByName(name)!!

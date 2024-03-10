@@ -15,6 +15,11 @@ public class TextBoxConfig {
     public boolean enabled = false;
 
     @Expose
+    @ConfigOption(name = "Only in GUI", desc = "Only show the textbox while an Inventory is open.")
+    @ConfigEditorBoolean
+    public boolean onlyInGUI = false;
+
+    @Expose
     @ConfigOption(name = "Text", desc = "Enter text you want to display here.\n" +
         "§eUse '&' as the colour code character.\n" +
         "§eUse '\\n' as the line break character.")
