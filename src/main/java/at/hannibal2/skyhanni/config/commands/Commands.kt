@@ -153,7 +153,7 @@ object Commands {
                 it.getOrNull(0) ?: "null", it.getOrNull(1) ?: "null"
             )
         }, DefaultConfigFeatures::onComplete)
-        registerCommand("shremind", "set a reminder for yourself") { RemindCommand.command(it) }
+        registerCommand("shremind", "Set a reminder for yourself") { RemindCommand.command(it) }
     }
 
     private fun usersNormal() {
