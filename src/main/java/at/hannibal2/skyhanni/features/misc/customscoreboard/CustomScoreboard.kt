@@ -14,8 +14,10 @@
 package at.hannibal2.skyhanni.features.misc.customscoreboard
 
 import at.hannibal2.skyhanni.SkyHanniMod
+import at.hannibal2.skyhanni.events.GuiPositionMovedEvent
 import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.LorenzTickEvent
+import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.RenderUtils.HorizontalAlignment
 import at.hannibal2.skyhanni.utils.RenderUtils.renderStringsAlignedWidth
@@ -30,6 +32,7 @@ class CustomScoreboard {
     private val config get() = SkyHanniMod.feature.gui.customScoreboard
     private var display = emptyList<ScoreboardElementType>()
     private var cache = emptyList<ScoreboardElementType>()
+    private val guiName = "Custom Scoreboard"
 
     @SubscribeEvent
     fun onRenderOverlay(event: GuiRenderEvent.GuiOverlayRenderEvent) {
@@ -39,10 +42,23 @@ class CustomScoreboard {
         RenderBackground().renderBackground()
 
         if (!TabListData.fullyLoaded && config.displayConfig.cacheScoreboardOnIslandSwitch && cache.isNotEmpty()) {
-            config.position.renderStringsAlignedWidth(cache, posLabel = "Custom Scoreboard")
+            config.position.renderStringsAlignedWidth(cache, posLabel = guiName)
         } else {
-            config.position.renderStringsAlignedWidth(display, posLabel = "Custom Scoreboard")
+            config.position.renderStringsAlignedWidth(display, posLabel = guiName)
+
             cache = display
+        }
+    }
+
+    @SubscribeEvent
+    fun onGuiPositionMoved(event: GuiPositionMovedEvent) {
+        if (event.guiName == guiName) {
+            val alignmentConfig = config.displayConfig.alignment
+            if (alignmentConfig.alignRight || alignmentConfig.alignRight || alignmentConfig.alignCenterVertically) {
+                alignmentConfig.alignRight = false
+                alignmentConfig.alignCenterVertically = false
+                ChatUtils.chat("Disabled Custom Scoreboard auto-alignment.")
+            }
         }
     }
 
