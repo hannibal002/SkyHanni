@@ -150,8 +150,6 @@ class DungeonFinderFeatures {
     fun onItemTooltip(event: LorenzToolTipEvent) {
         if (!LorenzUtils.inSkyBlock) return
 
-        val coloredClass = config.coloredClassLevel
-
         val chestName = InventoryUtils.openInventoryName()
         if (chestName != "Party Finder") return
 
@@ -164,7 +162,7 @@ class DungeonFinderFeatures {
                 val className = group("className")
                 val level = group("level").toInt()
                 val color = getColor(level)
-                if (coloredClass) event.toolTip[index + 1] = " §b$playerName§f: §e$className $color$level"
+                if (config.coloredClassLevel) event.toolTip[index + 1] = " §b$playerName§f: §e$className $color$level"
                 classNames.remove(className)
             }
         }
