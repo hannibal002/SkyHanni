@@ -5,7 +5,6 @@ import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.LorenzTickEvent
 import at.hannibal2.skyhanni.features.garden.GardenAPI
 import at.hannibal2.skyhanni.features.garden.GardenPlotAPI
-import at.hannibal2.skyhanni.features.garden.GardenPlotAPI.isBarn
 import at.hannibal2.skyhanni.features.garden.GardenPlotAPI.plots
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.LocationUtils
@@ -49,100 +48,6 @@ class LaneSwitchNotification {
         return from.distance(to) <= speed * time
     }
 
-    private fun isBoundaryPlot(plotIndex: Int, direction: Direction, value: Value): Boolean {
-        if (direction == Direction.WEST_EAST) {
-            val isNextNewRow: Boolean
-            val isNextUnlocked: Boolean
-            val isNextBarn: Boolean
-            if (value == Value.MIN) {
-                if (plotIndex - 1 == -1) return true // check if next plot is out of bounds
-                //Check if the next plot's border is 240 and therefore in the previous row
-                isNextNewRow = plots[plotIndex - 1].box.maxX.absoluteValue.round(0) == 240.0
-                isNextUnlocked = plots[plotIndex - 1].unlocked
-                isNextBarn = plots[plotIndex - 1].isBarn()
-            } else {
-                if (plotIndex + 1 == 25) return true // check if next plot is out of bounds
-                isNextNewRow = (plotIndex + 1) % 5 == 0
-                isNextUnlocked = plots[plotIndex + 1].unlocked
-                isNextBarn = plots[plotIndex + 1].isBarn()
-            }
-            return isNextNewRow || !isNextUnlocked || isNextBarn
-        } else if (direction == Direction.NORTH_SOUTH) {
-            val isNextUnlocked: Boolean
-            val isNextBarn: Boolean
-
-            if (value == Value.MAX) {
-                if (plotIndex - 1 == -1 || (plotIndex - 5) < 0) return true // check if next plot is out of bounds
-                isNextUnlocked = plots[plotIndex - 5].unlocked
-                isNextBarn = plots[plotIndex - 5].isBarn()
-            } else {
-                if (plotIndex + 5 > 24) return true // check if next plot is out of bounds
-                isNextUnlocked = plots[plotIndex + 5].unlocked
-                isNextBarn = plots[plotIndex + 5].isBarn()
-            }
-            return !isNextUnlocked || isNextBarn
-        }
-        return false
-    }
-
-    enum class Direction {
-        WEST_EAST,
-        NORTH_SOUTH,
-        ;
-    }
-
-    enum class Value {
-        MIN,
-        MAX,
-        TOP,
-        BOTTOM,
-        ;
-    }
-
-    private fun getFarmBounds(plotIndex: Int, current: LorenzVec, last: LorenzVec): List<LorenzVec>? {
-        if (plots[plotIndex].isBarn() || plotIndex == 12) return null
-        val xVelocity = current.x - last.x
-        val zVelocity = current.z - last.z
-        return if (xVelocity.absoluteValue > zVelocity.absoluteValue) {
-            var xValueMin = 0.0
-            var xValueMax = 0.0
-
-            for (i in 0..4) {
-                if (isBoundaryPlot(plotIndex - i, Direction.WEST_EAST, Value.MIN)) {
-                    xValueMin = plots[plotIndex - i].box.minX; break
-                }
-            }
-            for (i in 0..4) {
-                if (isBoundaryPlot(plotIndex + i, Direction.WEST_EAST, Value.MAX)) {
-                    xValueMax = plots[plotIndex + i].box.maxX; break
-                }
-            }
-
-            val a = LorenzVec(xValueMin, current.y, current.z)
-            val b = LorenzVec(xValueMax, current.y, current.z)
-            listOf(a, b)
-        } else if (xVelocity.absoluteValue < zVelocity.absoluteValue) {
-            // i * 5 because going vertically is always 5 plots before or after the current
-            var zValueTop = 0.0
-            var zValueBottom = 0.0
-
-            for (i in 0..4) {
-                if (isBoundaryPlot(plotIndex - (i * 5), Direction.NORTH_SOUTH, Value.TOP)) {
-                    zValueTop = plots[plotIndex - (i * 5)].box.minZ; break
-                }
-            }
-            for (i in 0..4) {
-                if (isBoundaryPlot(plotIndex + (i * 5), Direction.NORTH_SOUTH, Value.BOTTOM)) {
-                    zValueBottom = plots[plotIndex + (i * 5)].box.maxZ; break
-                }
-            }
-
-            val a = LorenzVec(current.x, current.y, zValueTop)
-            val b = LorenzVec(current.x, current.y, zValueBottom)
-            listOf(a, b)
-        } else null
-    }
-
     @SubscribeEvent
     fun onTick(event: LorenzTickEvent) {
         if (!isEnabled()) return
@@ -152,7 +57,7 @@ class LaneSwitchNotification {
 
         val plotIndex = plots.indexOf(plot)
         val positon = LocationUtils.playerLocation()
-        val farmEnd = getFarmBounds(plotIndex, positon, lastPosition) ?: return
+        val farmEnd = LaneSwitchUtils.getFarmBounds(plotIndex, positon, lastPosition) ?: return
         val farmLength = farmEnd[0].distance(farmEnd[1])
         lastPosition = positon
         bps = LocationUtils.distanceFromPreviousTick()
