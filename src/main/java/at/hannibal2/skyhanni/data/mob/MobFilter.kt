@@ -241,7 +241,7 @@ object MobFilter {
             return MobResult.found(
                 Mob(
                     baseEntity,
-                    Mob.Type.Basic,
+                    Mob.Type.BASIC,
                     armorStand,
                     name = name,
                     ownerName = owner,
@@ -295,7 +295,7 @@ object MobFilter {
 
                 baseEntity is EntityIronGolem && wokeSleepingGolemPattern.matches(
                     armorStand?.name ?: ""
-                ) -> MobResult.found(Mob(baseEntity, Mob.Type.Dungeon, armorStand, "Sleeping Golem")) // Consistency fix
+                ) -> MobResult.found(Mob(baseEntity, Mob.Type.DUNGEON, armorStand, "Sleeping Golem")) // Consistency fix
                 else -> null
             }
         } else when (LorenzUtils.skyBlockIsland) {
@@ -312,14 +312,14 @@ object MobFilter {
                     .startsWith("﴾ [Lv10] B") -> MobResult.found(
                     Mob(
                         baseEntity,
-                        Mob.Type.Boss,
+                        Mob.Type.BOSS,
                         armorStand,
                         name = "Bacte"
                     )
                 )
 
                 baseEntity is EntityOtherPlayerMP && baseEntity.isNPC() && baseEntity.name == "Branchstrutter " -> MobResult.found(
-                    Mob(baseEntity, Mob.Type.DisplayNPC, name = "Branchstrutter")
+                    Mob(baseEntity, Mob.Type.DISPLAY_NPC, name = "Branchstrutter")
                 )
 
                 else -> null
@@ -335,21 +335,21 @@ object MobFilter {
 
                 baseEntity is EntityPig && nextEntity is EntityPig -> MobResult.illegal // Matriarch Tongue
                 baseEntity is EntityOtherPlayerMP && baseEntity.isNPC() && baseEntity.name == "BarbarianGuard " -> MobResult.found(
-                    Mob(baseEntity, Mob.Type.DisplayNPC, name = "Barbarian Guard")
+                    Mob(baseEntity, Mob.Type.DISPLAY_NPC, name = "Barbarian Guard")
                 )
 
                 baseEntity is EntityOtherPlayerMP && baseEntity.isNPC() && baseEntity.name == "MageGuard " -> MobResult.found(
-                    Mob(baseEntity, Mob.Type.DisplayNPC, name = "Mage Guard")
+                    Mob(baseEntity, Mob.Type.DISPLAY_NPC, name = "Mage Guard")
                 )
 
                 baseEntity is EntityOtherPlayerMP && baseEntity.isNPC() && baseEntity.name == "Mage Outlaw" -> MobResult.found(
-                    Mob(baseEntity, Mob.Type.Boss, armorStand, name = "Mage Outlaw")
+                    Mob(baseEntity, Mob.Type.BOSS, armorStand, name = "Mage Outlaw")
                 ) // fix for wierd name
                 baseEntity is EntityPigZombie && baseEntity.inventory?.get(4)
                     ?.getSkullTexture() == NPCTurdSkull -> MobResult.found(
                     Mob(
                         baseEntity,
-                        Mob.Type.DisplayNPC,
+                        Mob.Type.DISPLAY_NPC,
                         name = "Turd"
                     )
                 )
@@ -362,7 +362,7 @@ object MobFilter {
                 baseEntity is EntityCreeper && baseEntity.baseMaxHealth.derpy() == 120 -> MobResult.found(
                     Mob(
                         baseEntity,
-                        Mob.Type.Basic,
+                        Mob.Type.BASIC,
                         name = "Sneaky Creeper",
                         levelOrTier = 3
                     )
@@ -381,7 +381,7 @@ object MobFilter {
 
             IslandType.CRYSTAL_HOLLOWS -> when {
                 baseEntity is EntityMagmaCube && armorStand != null && armorStand.cleanName() == "[Lv100] Bal ???❤" -> MobResult.found(
-                    Mob(baseEntity, Mob.Type.Boss, armorStand, "Bal", levelOrTier = 100)
+                    Mob(baseEntity, Mob.Type.BOSS, armorStand, "Bal", levelOrTier = 100)
                 )
 
                 else -> null
@@ -417,7 +417,7 @@ object MobFilter {
                 baseEntity is EntityOtherPlayerMP && baseEntity.isNPC() -> MobResult.found(
                     Mob(
                         baseEntity,
-                        Mob.Type.DisplayNPC,
+                        Mob.Type.DISPLAY_NPC,
                         name = baseEntity.cleanName()
                     )
                 )
@@ -443,7 +443,7 @@ object MobFilter {
             MobResult.found(
                 Mob(
                     baseEntity,
-                    Mob.Type.Special,
+                    Mob.Type.SPECIAL,
                     armorStand = extraEntityList[1],
                     name = this.group("name"),
                     additionalEntities = extraEntityList,
@@ -528,7 +528,7 @@ object MobFilter {
             MobResult.found(
                 Mob(
                     baseEntity = baseEntity,
-                    mobType = Mob.Type.Basic,
+                    mobType = Mob.Type.BASIC,
                     armorStand = it,
                     name = "Rat"
                 )

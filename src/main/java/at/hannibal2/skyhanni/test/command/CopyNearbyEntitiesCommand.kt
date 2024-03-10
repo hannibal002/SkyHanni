@@ -168,7 +168,7 @@ object CopyNearbyEntitiesCommand {
                         resultList.add("-  invulTime: '$invulTime'")
                     }
                 }
-                if (mob != null && mob.mobType != Mob.Type.Player) {
+                if (mob != null && mob.mobType != Mob.Type.PLAYER) {
                     resultList.add("MobInfo: ")
                     resultList.addAll(getMobInfo(mob).map { "-  $it" })
                 }
@@ -207,7 +207,7 @@ object CopyNearbyEntitiesCommand {
         if (entity is EntityLivingBase && entity.isDisplayNPC()) append("DisplayNPC, ")
         if (entity is EntityPlayer && entity.isNPC()) append("NPC, ")
         if (entity is EntityPlayer && entity.isRealPlayer()) append("RealPlayer, ")
-        if (mob?.mobType == Mob.Type.Summon) append("Summon, ")
+        if (mob?.mobType == Mob.Type.SUMMON) append("Summon, ")
         if (entity.isSkyBlockMob()) {
             append("SkyblockMob(")
 
@@ -250,7 +250,7 @@ object CopyNearbyEntitiesCommand {
             add("Owner: ${mob.owner.ownerName}")
         }
         add("Level or Tier: ${mob.levelOrTier.takeIf { it != -1 }}")
-        if (mob.mobType == Mob.Type.Dungeon) {
+        if (mob.mobType == Mob.Type.DUNGEON) {
             add("Is Starred: ${mob.hasStar}")
             add("Attribute: ${mob.attribute ?: "NONE"}")
         }

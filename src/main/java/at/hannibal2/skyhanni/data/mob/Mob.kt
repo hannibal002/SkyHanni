@@ -31,24 +31,24 @@ import net.minecraft.util.AxisAlignedBB
  * @property extraEntities Additional entities associated with the Mob.
  *
  * Avoid caching, as they may change without notice.
- * @property owner Valid for: [Type.Summon], [Type.Slayer]
+ * @property owner Valid for: [Type.SUMMON], [Type.SLAYER]
  *
  * The owner of the Mob.
- * @property hasStar Valid for: [Type.Dungeon]
+ * @property hasStar Valid for: [Type.DUNGEON]
  *
  * Indicates whether the Mob has a star.
- * @property attribute Valid for: [Type.Dungeon]
+ * @property attribute Valid for: [Type.DUNGEON]
  *
  * The attribute of the Mob.
- * @property levelOrTier Valid for: [Type.Basic], [Type.Slayer]
+ * @property levelOrTier Valid for: [Type.BASIC], [Type.SLAYER]
  *
  * The level or tier of the Mob.
- * @property hologram1 Valid for: [Type.Basic], [Type.Slayer]
+ * @property hologram1 Valid for: [Type.BASIC], [Type.SLAYER]
  *
  * Gives back the first additional armor stand.
  *
  *   (should be called in the [MobEvent.Spawn] since it is a lazy)
- * @property hologram2 Valid for: [Type.Basic], [Type.Slayer]
+ * @property hologram2 Valid for: [Type.BASIC], [Type.SLAYER]
  *
  * Gives back the second additional armor stand.
  *
@@ -80,10 +80,10 @@ class Mob(
     val extraEntities: List<EntityLivingBase> = extraEntitiesList
 
     enum class Type {
-        DisplayNPC, Summon, Basic, Dungeon, Boss, Slayer, Player, Projectile, Special;
+        DISPLAY_NPC, SUMMON, BASIC, DUNGEON, BOSS, SLAYER, PLAYER, PROJECTILE, SPECIAL;
 
         fun isSkyblockMob() = when (this) {
-            Basic, Dungeon, Boss, Slayer -> true
+            BASIC, DUNGEON, BOSS, SLAYER -> true
             else -> false
         }
     }
@@ -106,7 +106,7 @@ class Mob(
         relativeBoundingBox =
             if (extraEntities.isNotEmpty()) makeRelativeBoundingBox() else null // Inlined updateBoundingBox()
 
-        owner = (ownerName ?: if (mobType == Type.Slayer) hologram2?.let {
+        owner = (ownerName ?: if (mobType == Type.SLAYER) hologram2?.let {
             summonOwnerPattern.matchMatcher(it.cleanName()) { this.group("name") }
         } else null)?.let { MobUtils.OwnerShip(it) }
     }
