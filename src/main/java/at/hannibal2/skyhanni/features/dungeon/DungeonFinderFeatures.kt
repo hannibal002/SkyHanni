@@ -164,13 +164,13 @@ class DungeonFinderFeatures {
                 val className = group("className")
                 val level = group("level").toInt()
                 val color = getColor(level)
-                if(coloredClass) event.toolTip[index + 1] = " §b$playerName§f: §e$className $color$level"
+                if (coloredClass) event.toolTip[index + 1] = " §b$playerName§f: §e$className $color$level"
                 classNames.remove(className)
             }
         }
-        if(!config.showMissingClasses) return
-        if(!stack.getLore()[0].removeColor().startsWith("Dungeon:")) return
-        if(classNames.contains(selectedClass)) classNames[classNames.indexOf(selectedClass)] = "§a${selectedClass}§7"
+        if (!config.showMissingClasses) return
+        if (!stack.getLore()[0].removeColor().startsWith("Dungeon:")) return
+        if (classNames.contains(selectedClass)) classNames[classNames.indexOf(selectedClass)] = "§a${selectedClass}§7"
         event.toolTip.add("")
         event.toolTip.add("§cMissing: §7" + createCommaSeparatedList(classNames))
     }
