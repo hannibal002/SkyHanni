@@ -66,6 +66,7 @@ import at.hannibal2.skyhanni.features.chat.ChatFilter
 import at.hannibal2.skyhanni.features.chat.CompactBestiaryChatMessage
 import at.hannibal2.skyhanni.features.chat.CompactSplashPotionMessage
 import at.hannibal2.skyhanni.features.chat.PlayerDeathMessages
+import at.hannibal2.skyhanni.features.chat.RareDropMessages
 import at.hannibal2.skyhanni.features.chat.SkyblockXPInChat
 import at.hannibal2.skyhanni.features.chat.Translator
 import at.hannibal2.skyhanni.features.chat.WatchdogHider
@@ -762,6 +763,7 @@ class SkyHanniMod {
         loadModule(MaxPurseItems())
         loadModule(SuperCraftFeatures())
         loadModule(InfernoMinionFeatures())
+        loadModule(RareDropMessages())
 
         init()
 
