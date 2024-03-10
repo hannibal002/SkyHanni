@@ -12,7 +12,12 @@ public class HideFarEntitiesConfig {
     public boolean enabled = false;
 
     @Expose
-    @ConfigOption(name = "Amount", desc = "Keep showing this amount of nearest entities.")
-    @ConfigEditorSlider(minValue = 5, maxValue = 150, minStep = 5)
-    public int amount = 50;
+    @ConfigOption(name = "Min Distance", desc = "Always shows mobs that are at least that close to the player.")
+    @ConfigEditorSlider(minValue = 3, maxValue = 30, minStep = 1)
+    public int minDistance = 10;
+
+    @Expose
+    @ConfigOption(name = "Max Amount", desc = "Not showing more than this amount of nearest entities.")
+    @ConfigEditorSlider(minValue = 1, maxValue = 150, minStep = 1)
+    public int maxAmount = 30;
 }
