@@ -977,10 +977,16 @@ Use `/sh` or `/skyhanni` to open the SkyHanni config in game.
     + Stops the white geyser smoke particles from rendering if your bobber is near the geyser.
     + Draws a box around the effective area of the geyser.
     + Change the color of the box around the geyser.
-+ Added Skill Progress Display. - HiZe
++ Skill Progress Display. - HiZe
     + ETA Display, exp, actions or percentage to next level, custom level goals, all skill display, chroma progress bar,
       and overflow levels for all those things.
     + A ton of settings.
++ Command `/shlimbo` for easier Limbo access. - martimavocado (https://github.com/hannibal002/SkyHanni/pull/848)
+    + Limbo time tracker also now works in the Slumber Hotel in the Bed Wars Lobby.
+    + A new secret method to get more SkyHanni User Luck from Limbo.
++ Command `/shlimbostats` for a simple way to view your Limbo stats. - martimavocado (https://github.com/hannibal002/SkyHanni/pull/848)
+    + Support for `/playtime` and  `/pt` while in Limbo.
+    + Added your playtime to Hypixel's `/playtimedetailed`.
 
 </details>
 <details open><summary>

@@ -91,7 +91,7 @@ import at.hannibal2.skyhanni.features.commands.tabcomplete.PlayerTabComplete
 import at.hannibal2.skyhanni.features.commands.tabcomplete.WarpTabComplete
 import at.hannibal2.skyhanni.features.cosmetics.ArrowTrail
 import at.hannibal2.skyhanni.features.cosmetics.CosmeticFollowingLine
-import at.hannibal2.skyhanni.features.dungeon.CroesusUnopenedChestTracker
+import at.hannibal2.skyhanni.features.dungeon.CroesusChestTracker
 import at.hannibal2.skyhanni.features.dungeon.DungeonAPI
 import at.hannibal2.skyhanni.features.dungeon.DungeonBossHideDamageSplash
 import at.hannibal2.skyhanni.features.dungeon.DungeonBossMessages
@@ -238,6 +238,7 @@ import at.hannibal2.skyhanni.features.mining.DeepCavernsParkour
 import at.hannibal2.skyhanni.features.mining.HighlightMiningCommissionMobs
 import at.hannibal2.skyhanni.features.mining.KingTalismanHelper
 import at.hannibal2.skyhanni.features.mining.crystalhollows.CrystalHollowsNamesInCore
+import at.hannibal2.skyhanni.features.mining.eventtracker.MiningEventDisplay
 import at.hannibal2.skyhanni.features.mining.eventtracker.MiningEventTracker
 import at.hannibal2.skyhanni.features.mining.powdertracker.PowderTracker
 import at.hannibal2.skyhanni.features.minion.InfernoMinionFeatures
@@ -258,7 +259,6 @@ import at.hannibal2.skyhanni.features.misc.HideArmor
 import at.hannibal2.skyhanni.features.misc.InGameDateDisplay
 import at.hannibal2.skyhanni.features.misc.JoinCrystalHollows
 import at.hannibal2.skyhanni.features.misc.LesserOrbHider
-import at.hannibal2.skyhanni.features.misc.LimboTimeTracker
 import at.hannibal2.skyhanni.features.misc.LockMouseLook
 import at.hannibal2.skyhanni.features.misc.MarkedPlayerManager
 import at.hannibal2.skyhanni.features.misc.MiscFeatures
@@ -288,6 +288,8 @@ import at.hannibal2.skyhanni.features.misc.items.AuctionHouseCopyUnderbidPrice
 import at.hannibal2.skyhanni.features.misc.items.EstimatedItemValue
 import at.hannibal2.skyhanni.features.misc.items.EstimatedWardrobePrice
 import at.hannibal2.skyhanni.features.misc.items.GlowingDroppedItems
+import at.hannibal2.skyhanni.features.misc.limbo.LimboPlaytime
+import at.hannibal2.skyhanni.features.misc.limbo.LimboTimeTracker
 import at.hannibal2.skyhanni.features.misc.massconfiguration.DefaultConfigFeatures
 import at.hannibal2.skyhanni.features.misc.teleportpad.TeleportPadCompactName
 import at.hannibal2.skyhanni.features.misc.teleportpad.TeleportPadInventoryNumber
@@ -397,7 +399,7 @@ import org.apache.logging.log4j.Logger
     clientSideOnly = true,
     useMetadata = true,
     guiFactory = "at.hannibal2.skyhanni.config.ConfigGuiForgeInterop",
-    version = "0.24.Beta.6",
+    version = "0.24.Beta.8",
 )
 class SkyHanniMod {
 
@@ -576,7 +578,7 @@ class SkyHanniMod {
         loadModule(HighlightBonzoMasks())
         loadModule(BazaarCancelledBuyOrderClipboard())
         loadModule(CompactSplashPotionMessage())
-        loadModule(CroesusUnopenedChestTracker())
+        loadModule(CroesusChestTracker())
         loadModule(CompactBingoChat())
         loadModule(BrewingStandOverlay())
         loadModule(FishingTimer())
@@ -676,6 +678,7 @@ class SkyHanniMod {
         loadModule(ArachneChatMessageHider())
         loadModule(ShowItemUuid())
         loadModule(FrozenTreasureTracker)
+        loadModule(MiningEventDisplay)
         loadModule(SlayerRngMeterDisplay())
         loadModule(GhostCounter)
         loadModule(RiftTimer())
@@ -733,7 +736,7 @@ class SkyHanniMod {
         loadModule(FixNEUHeavyPearls())
         loadModule(QuickCraftFeatures())
         loadModule(SkyBlockKickDuration())
-        loadModule(LimboTimeTracker())
+        loadModule(LimboTimeTracker)
         loadModule(PartyMemberOutlines())
         loadModule(ArrowTrail())
         loadModule(ShiftClickEquipment())
@@ -763,6 +766,7 @@ class SkyHanniMod {
         loadModule(MaxPurseItems())
         loadModule(SuperCraftFeatures())
         loadModule(InfernoMinionFeatures())
+        loadModule(LimboPlaytime())
         loadModule(RareDropMessages())
 
         init()
