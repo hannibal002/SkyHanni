@@ -115,7 +115,7 @@ class LivingCaveDefenseBlocks {
             val entity = getNearestMovingDefenseBlock(location)?.entity ?: return
             staticBlocks = staticBlocks.editCopy {
                 add(DefenseBlock(entity, location))
-                RenderLivingEntityHelper.setEntityColor(
+                RenderLivingEntityHelper.setEntityColorWithNoHurtTime(
                     entity,
                     color.withAlpha(50)
                 ) { isEnabled() && staticBlocks.any { it.entity == entity } }

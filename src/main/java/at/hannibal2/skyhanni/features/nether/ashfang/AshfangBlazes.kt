@@ -116,8 +116,7 @@ class AshfangBlazes {
 
     private infix fun EntityBlaze.setBlazeColor(color: LorenzColor) {
         blazeColor[this] = color
-        RenderLivingEntityHelper.setNoHurtTime(this) { isEnabled() && config.highlightBlazes }
-        RenderLivingEntityHelper.setEntityColor(
+        RenderLivingEntityHelper.setEntityColorWithNoHurtTime(
             this,
             color.toColor().withAlpha(40),
         ) { isEnabled() && config.highlightBlazes }

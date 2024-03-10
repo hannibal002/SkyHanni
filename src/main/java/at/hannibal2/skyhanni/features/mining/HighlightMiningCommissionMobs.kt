@@ -54,7 +54,10 @@ class HighlightMiningCommissionMobs {
         val entities = EntityUtils.getEntities<EntityLivingBase>()
         for ((type, entity) in active.flatMap { type -> entities.map { type to it } }) {
             if (type.isMob(entity)) {
-                RenderLivingEntityHelper.setEntityColor(entity, LorenzColor.YELLOW.toColor().withAlpha(127))
+                RenderLivingEntityHelper.setEntityColorWithNoHurtTime(
+                    entity,
+                    LorenzColor.YELLOW.toColor().withAlpha(127)
+                )
                 { isEnabled() && type in active }
             }
         }
@@ -82,7 +85,10 @@ class HighlightMiningCommissionMobs {
         val entity = event.entity
         for (type in active) {
             if (type.isMob(entity)) {
-                RenderLivingEntityHelper.setEntityColor(entity, LorenzColor.YELLOW.toColor().withAlpha(127))
+                RenderLivingEntityHelper.setEntityColorWithNoHurtTime(
+                    entity,
+                    LorenzColor.YELLOW.toColor().withAlpha(127)
+                )
                 { isEnabled() && type in active }
             }
         }
