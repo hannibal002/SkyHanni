@@ -428,7 +428,7 @@ private fun getPowerDisplayPair() = when (MaxwellAPI.currentPower) {
 
             false -> listOf(
                 "Power: ${MaxwellAPI.currentPower?.replace("Power", "")} " +
-                    "§7(§6${MaxwellAPI.magicalPower}§7)" to HorizontalAlignment.LEFT
+                    "§7(§6${MaxwellAPI.magicalPower?.addSeparators()}§7)" to HorizontalAlignment.LEFT
             )
         }
 }
