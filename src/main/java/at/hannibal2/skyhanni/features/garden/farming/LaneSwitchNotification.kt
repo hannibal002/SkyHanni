@@ -102,7 +102,7 @@ class LaneSwitchNotification {
         if (plots[plotIndex].isBarn() || plotIndex == 12) return null
         val xVelocity = currentPosition.x - lastPosition.x
         val zVelocity = currentPosition.z - lastPosition.z
-        if (xVelocity.absoluteValue > zVelocity.absoluteValue) {
+        return if (xVelocity.absoluteValue > zVelocity.absoluteValue) {
             var xValueMin = 0.0
             var xValueMax = 0.0
 
@@ -119,7 +119,7 @@ class LaneSwitchNotification {
 
             val a = LorenzVec(xValueMin, currentPosition.y, currentPosition.z)
             val b = LorenzVec(xValueMax, currentPosition.y, currentPosition.z)
-            return listOf(a, b)
+            listOf(a, b)
         } else if (xVelocity.absoluteValue < zVelocity.absoluteValue) {
             // i * 5 because going vertically is always 5 plots before or after the current
             var zValueTop = 0.0
@@ -138,9 +138,8 @@ class LaneSwitchNotification {
 
             val a = LorenzVec(currentPosition.x, currentPosition.y, zValueTop)
             val b = LorenzVec(currentPosition.x, currentPosition.y, zValueBottom)
-            return listOf(a, b)
-        }
-        return null
+            listOf(a, b)
+        } else null
     }
 
     @SubscribeEvent
