@@ -17,7 +17,6 @@ import at.hannibal2.skyhanni.utils.SoundUtils
 import at.hannibal2.skyhanni.utils.SoundUtils.playSound
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import kotlin.math.absoluteValue
-import kotlin.math.ceil
 import kotlin.time.Duration.Companion.seconds
 
 class LaneSwitchNotification {
@@ -49,25 +48,70 @@ class LaneSwitchNotification {
         return from.distance(to) <= speed * time
     }
 
+    private fun isBoundaryPlot(plotIndex: Int, direction: String, value: String): Boolean {
+        if (direction == "WE") {
+            val isNextNewRow: Boolean
+            val isNextUnlocked: Boolean
+            val isNextBarn: Boolean
+            if (value == "MIN") {
+                if (plotIndex - 1 == -1) return true // check if next plot is out of bounds
+                isNextNewRow = plots[plotIndex - 1].box.maxX.absoluteValue.round(0) == 240.0 //Check if the next plot's border is 240 and therefore in the previous row
+                isNextUnlocked = plots[plotIndex - 1].unlocked
+                isNextBarn = plots[plotIndex - 1].isBarn()
+            } else {
+                if (plotIndex + 1 == 25) return true // check if next plot is out of bounds
+                isNextNewRow = (plotIndex + 1) % 5 == 0
+                isNextUnlocked = plots[plotIndex + 1].unlocked
+                isNextBarn = plots[plotIndex + 1].isBarn()
+            }
+            return isNextNewRow || !isNextUnlocked || isNextBarn
+        } else if (direction == "NS"){
+            val isNextUnlocked: Boolean
+            val isNextBarn: Boolean
+
+            if (value == "TOP") {
+                if (plotIndex - 1 == -1 || (plotIndex - 5) < 0) return true // check if next plot is out of bounds
+                isNextUnlocked = plots[plotIndex - 5].unlocked
+                isNextBarn = plots[plotIndex - 5].isBarn()
+            } else {
+                if (plotIndex + 5 > 24) return true // check if next plot is out of bounds
+                isNextUnlocked = plots[plotIndex + 5].unlocked
+                isNextBarn = plots[plotIndex + 5].isBarn()
+            }
+            return !isNextUnlocked || isNextBarn
+        }
+        return false
+    }
+
     private fun getFarmBounds(plotIndex: Int, playerPos: LorenzVec, lastPos: LorenzVec): List<LorenzVec>? {
         if(plots[plotIndex].isBarn() || plotIndex == 12) return null
         val xVelocity = playerPos.x - lastPos.x
         val zVelocity = playerPos.z - lastPos.z
         if (xVelocity.absoluteValue > zVelocity.absoluteValue) {
-            val xValueMin = if (plotIndex - 1 == -1 || !plots[plotIndex - 1].unlocked || plots.indexOf(plots[plotIndex - 1]) == 12)
-                plots[plotIndex].box.minX else plots[plotIndex - plotIndex % 5].box.minX
-            val xValueMax = if ((plotIndex + 1) % 5 == 0 || plotIndex + 1 == 25 || !plots[plotIndex + 1].unlocked || plots.indexOf(plots[plotIndex + 1]) == 12)
-                plots[plotIndex].box.maxX else plots[plotIndex + (4 - (plotIndex % 5))].box.maxX
+            var xValueMin = 0.0
+            var xValueMax = 0.0
+
+            for(i in 0..4) {
+                if(isBoundaryPlot(plotIndex - i, "WE", "MIN")) { xValueMin = plots[plotIndex - i].box.minX; break }
+            }
+            for(i in 0..4) {
+                if(isBoundaryPlot(plotIndex + i, "WE", "MAX")) { xValueMax = plots[plotIndex + i].box.maxX; break }
+            }
 
             return listOf(
                 LorenzVec(xValueMin, playerPos.y, playerPos.z), LorenzVec(xValueMax, playerPos.y, playerPos.z)
             )
         } else if (xVelocity.absoluteValue < zVelocity.absoluteValue) {
-            val row = (ceil((plotIndex / 5.0) + 0.2) - 1).toInt()
-            val zValueTop = if (plotIndex - 1 == -1 || plotIndex - 5 < 0 || !plots[plotIndex - 5].unlocked || plots.indexOf(plots[plotIndex - 5]) == 12)
-                plots[plotIndex].box.minZ else plots[plotIndex - (5 * row)].box.minZ
-            val zValueBottom = if (plotIndex + 5 > 24 || !plots[plotIndex + 5].unlocked || plots.indexOf(plots[plotIndex + 5]) == 12)
-                plots[plotIndex].box.maxZ else plots[plotIndex + ((4 - row)) * 5].box.maxZ
+            // i * 5 because going vertically is always 5 plots before or after the current
+            var zValueTop = 0.0
+            var zValueBottom = 0.0
+
+            for(i in 0..4) {
+                if(isBoundaryPlot(plotIndex - (i * 5), "NS", "TOP")) { zValueTop = plots[plotIndex - (i * 5)].box.minZ; break }
+            }
+            for(i in 0..4) {
+                if(isBoundaryPlot(plotIndex + (i * 5), "NS", "BOTTOM")) { zValueBottom = plots[plotIndex + (i * 5)].box.maxZ; break }
+            }
 
             return listOf(
                 LorenzVec(playerPos.x, playerPos.y, zValueTop), LorenzVec(playerPos.x, playerPos.y, zValueBottom)
@@ -82,6 +126,7 @@ class LaneSwitchNotification {
         if (!isEnabled()) return
         val notificationSettings = config.notification.settings
         val plot = GardenPlotAPI.getCurrentPlot() ?: return
+        if (!plot.unlocked) return
 
         val plotIndex = plots.indexOf(plot)
         val playerPos = LocationUtils.playerLocation()
@@ -91,7 +136,8 @@ class LaneSwitchNotification {
         blocksPerSecond = LocationUtils.distanceFromPreviousTick()
         distancesUntilSwitch = farmEnd.map { end -> end.distance(playerPos).round(2) }
 
-        val farmTraverseTime = ((farmLength / blocksPerSecond) - (notificationSettings.notificationThreshold * 2)).seconds
+        // farmLength / bps to get the time needed to travel the distance, - the threshold times the farm length divided by the length of 2 plots (to give some room)
+        val farmTraverseTime = ((farmLength / blocksPerSecond) - (notificationSettings.notificationThreshold * (farmLength / 192))).seconds
         val bpsDifference = (blocksPerSecond - lastBlocksPerSecond).absoluteValue
 
         if (farmEnd.isNotEmpty() && lastLaneSwitch.passedSince() >= farmTraverseTime && bpsDifference <= 20) {
@@ -113,11 +159,11 @@ class LaneSwitchNotification {
         if (distancesUntilSwitch.isEmpty()) return
         if (lastDistancesUntilSwitch.isEmpty()) { lastDistancesUntilSwitch = distancesUntilSwitch }
 
-        val distances = listOf(distancesUntilSwitch[0] - lastDistancesUntilSwitch[0], distancesUntilSwitch[1] - lastDistancesUntilSwitch[1])
+        val distances = listOf(distancesUntilSwitch[0] - lastDistancesUntilSwitch[0], distancesUntilSwitch[1] - lastDistancesUntilSwitch[1]) //Get changes in the distances
         val distance = if (distances.all { it != 0.0 }) {
-            if (distances[0] > 0) distancesUntilSwitch[1] else distancesUntilSwitch[0]
+            if (distances[0] > 0) distancesUntilSwitch[1] else distancesUntilSwitch[0] // get the direction the player is traveling and get the distance to display from that
         } else {
-            lastDistance
+            lastDistance // display last value if no change is detected
         }
 
         config.distanceUntilSwitchPos.renderString("Distance until Switch: $distance", posLabel = "Movement Speed")
