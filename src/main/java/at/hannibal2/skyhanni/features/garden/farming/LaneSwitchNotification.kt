@@ -58,21 +58,20 @@ class LaneSwitchNotification {
         val plotIndex = plots.indexOf(plot)
         val positon = LocationUtils.playerLocation()
         val farmEnd = LaneSwitchUtils.getFarmBounds(plotIndex, positon, lastPosition) ?: return
-        val farmLength = farmEnd[0].distance(farmEnd[1])
         lastPosition = positon
         bps = LocationUtils.distanceFromPreviousTick()
         distancesUntilSwitch = farmEnd.map { end -> end.distance(positon).round(2) }
 
-        testForLaneSwitch(settings, farmLength, farmEnd, positon)
+        testForLaneSwitch(settings, farmEnd, positon)
         lastBps = bps
     }
 
     private fun testForLaneSwitch(
         settings: LaneSwitchNotificationSettings,
-        farmLength: Double,
         farmEnd: List<LorenzVec>,
         positon: LorenzVec,
     ) {
+        val farmLength = farmEnd[0].distance(farmEnd[1])
         // farmLength / bps to get the time needed to travel the distance, - the threshold times the farm length divided by the length of 2 plots (to give some room)
         val threshold = settings.threshold
         // TODO find a name for this variable
