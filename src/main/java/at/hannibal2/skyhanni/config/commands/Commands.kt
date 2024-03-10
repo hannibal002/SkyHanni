@@ -4,7 +4,7 @@ import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.SkillAPI
 import at.hannibal2.skyhanni.config.ConfigFileType
 import at.hannibal2.skyhanni.config.ConfigGuiManager
-import at.hannibal2.skyhanni.config.features.misc.remindcommanmd.RemindCommand
+import at.hannibal2.skyhanni.config.features.misc.reminders.ReminderManager
 import at.hannibal2.skyhanni.data.ChatManager
 import at.hannibal2.skyhanni.data.GardenCropMilestonesCommunityFix
 import at.hannibal2.skyhanni.data.GuiEditManager
@@ -154,7 +154,7 @@ object Commands {
                 it.getOrNull(0) ?: "null", it.getOrNull(1) ?: "null"
             )
         }, DefaultConfigFeatures::onComplete)
-        registerCommand("shremind", "Set a reminder for yourself") { RemindCommand.command(it) }
+        registerCommand("shremind", "Set a reminder for yourself") { ReminderManager.command(it) }
     }
 
     private fun usersNormal() {

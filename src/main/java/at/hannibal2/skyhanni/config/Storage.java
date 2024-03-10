@@ -1,6 +1,7 @@
 package at.hannibal2.skyhanni.config;
 
 import at.hannibal2.skyhanni.api.SkillAPI;
+import at.hannibal2.skyhanni.config.features.misc.reminders.Reminder;
 import at.hannibal2.skyhanni.data.model.ComposterUpgrade;
 import at.hannibal2.skyhanni.features.bingo.card.goals.BingoGoal;
 import at.hannibal2.skyhanni.features.combat.endernodetracker.EnderNodeTracker;
@@ -62,6 +63,18 @@ public class Storage {
 
     @Expose
     public List<VisualWord> modifiedWords = new ArrayList<>();
+
+    @Expose
+    public ReminderData reminderData = new ReminderData();
+
+    public static class ReminderData {
+
+        @Expose
+        public List<Reminder> reminders = new ArrayList<>();
+
+        @Expose
+        public int currentReminderId = 0;
+    }
 
     @Expose
     public boolean visualWordsImported = false;
