@@ -41,16 +41,14 @@ object TrackSoundsCommand {
         }
         isRecording = true
         sounds.clear()
-        val duration: Duration?
-        if (args.firstOrNull()?.isInt() != true) {
-            duration = null
+        cutOfTime = args.firstOrNull()?.toInt()?.seconds?.let {
+            ChatUtils.chat("Now started tracking sounds for ${it.inWholeSeconds} Seconds")
+            SimpleTimeMark.future(it)
+        } ?: run {
             ChatUtils.chat("Now started tracking sounds until manually ended")
-        } else {
-            duration = args.firstOrNull()?.toInt()?.seconds
-            ChatUtils.chat("Now started tracking sounds for ${duration?.inWholeSeconds} Seconds")
+            SimpleTimeMark.farFuture()
         }
         startTime = SimpleTimeMark.now()
-        cutOfTime = duration?.let { SimpleTimeMark.future(it) } ?: SimpleTimeMark.farFuture()
     }
 
     @SubscribeEvent
