@@ -1,4 +1,4 @@
-package at.hannibal2.skyhanni.features.misc.customscoreboard
+package at.hannibal2.skyhanni.features.gui.customscoreboard
 
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 
