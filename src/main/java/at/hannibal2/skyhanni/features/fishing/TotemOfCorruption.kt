@@ -2,11 +2,14 @@ package at.hannibal2.skyhanni.features.fishing
 
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.events.GuiRenderEvent
+import at.hannibal2.skyhanni.events.LorenzRenderWorldEvent
 import at.hannibal2.skyhanni.events.LorenzTickEvent
 import at.hannibal2.skyhanni.events.ReceiveParticleEvent
 import at.hannibal2.skyhanni.utils.EntityUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils
+import at.hannibal2.skyhanni.utils.RenderUtils
 import at.hannibal2.skyhanni.utils.RenderUtils.renderStrings
+import at.hannibal2.skyhanni.utils.SpecialColour
 import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.StringUtils.matches
 import at.hannibal2.skyhanni.utils.getLorenzVec
@@ -14,11 +17,15 @@ import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraft.entity.item.EntityArmorStand
 import net.minecraft.util.EnumParticleTypes
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
+import java.awt.Color
 
 private val config get() = SkyHanniMod.feature.fishing.totemOfCorruption
 
 private var display = emptyList<String>()
 private var totems: List<Totem> = emptyList()
+
+private var EFFECTIVE_TOTEM_RADIUS = 16.0 // Center is upper half of banner
+private var TOTEM_UI_OVERLAY_RADIUS = 20.0
 
 class TotemOfCorruption {
     private val group = RepoPattern.group("features.fishing.totemofcorruption")
@@ -72,6 +79,17 @@ class TotemOfCorruption {
         }
     }
 
+    @SubscribeEvent
+    fun onRenderWorld(event: LorenzRenderWorldEvent) {
+        val color = Color(SpecialColour.specialToChromaRGB(config.color), true)
+        getTotemToShow()?.let { totem ->
+            val x = totem.totemEntity.posX
+            val y = totem.totemEntity.posY + 1.0
+            val z = totem.totemEntity.posZ
+            RenderUtils.drawSphereInWorld(color, x, y, z, 3.5f, 4.5f, event.partialTicks)
+        }
+    }
+
     private fun getTimeRemaining(totem: EntityArmorStand): Int? {
         return EntityUtils.getEntitiesNearby<EntityArmorStand>(totem.getLorenzVec(), 2.0)
             .firstOrNull { timeRemainingPattern.matches(it.name) }
@@ -113,7 +131,7 @@ class TotemOfCorruption {
     }
 
     private fun getTotems(): List<EntityArmorStand?> {
-        return EntityUtils.getEntitiesNextToPlayer<EntityArmorStand>(20.0)
+        return EntityUtils.getEntitiesNextToPlayer<EntityArmorStand>(TOTEM_UI_OVERLAY_RADIUS)
             .filter { totemNamePattern.matches(it.name) }.toList()
     }
 

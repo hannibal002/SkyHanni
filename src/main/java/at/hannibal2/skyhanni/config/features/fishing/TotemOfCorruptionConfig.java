@@ -4,6 +4,7 @@ import at.hannibal2.skyhanni.config.FeatureToggle;
 import at.hannibal2.skyhanni.config.core.config.Position;
 import com.google.gson.annotations.Expose;
 import io.github.moulberry.moulconfig.annotations.ConfigEditorBoolean;
+import io.github.moulberry.moulconfig.annotations.ConfigEditorColour;
 import io.github.moulberry.moulconfig.annotations.ConfigOption;
 
 public class TotemOfCorruptionConfig {
@@ -19,6 +20,11 @@ public class TotemOfCorruptionConfig {
     @ConfigEditorBoolean
     @FeatureToggle
     public boolean hideParticles = true;
+
+    @Expose
+    @ConfigOption(name = "Color", desc = "color")
+    @ConfigEditorColour
+    public String color = "0:120:255:85:85";
 
     @Expose
     public Position position = new Position(50, 20, false, true);

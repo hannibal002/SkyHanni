@@ -19,6 +19,7 @@ import net.minecraft.client.gui.Gui
 import net.minecraft.client.gui.ScaledResolution
 import net.minecraft.client.renderer.GlStateManager
 import net.minecraft.client.renderer.Tessellator
+import net.minecraft.client.renderer.WorldRenderer
 import net.minecraft.client.renderer.vertex.DefaultVertexFormats
 import net.minecraft.enchantment.Enchantment
 import net.minecraft.entity.Entity
@@ -621,6 +622,56 @@ object RenderUtils {
         GlStateManager.color(1.0f, 1.0f, 1.0f, 1.0f)
         GlStateManager.popMatrix()
     }
+
+    fun drawSphereInWorld(
+        color: Color,
+        x: Double,
+        y: Double,
+        z: Double,
+        radius: Float,
+        height: Float,
+        partialTicks: Float,
+    ) {
+        val minecraft = Minecraft.getMinecraft()
+
+        GlStateManager.pushMatrix()
+        GlStateManager.translate(x - minecraft.renderManager.viewerPosX, y - minecraft.renderManager.viewerPosY, z - minecraft.renderManager.viewerPosZ)
+        GlStateManager.disableTexture2D()
+        GlStateManager.enableBlend()
+        GlStateManager.disableAlpha()
+        GlStateManager.tryBlendFuncSeparate(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA, GL11.GL_ONE, GL11.GL_ZERO)
+        GlStateManager.shadeModel(GL11.GL_SMOOTH)
+
+        val tessellator = Tessellator.getInstance()
+        val worldRenderer = tessellator.worldRenderer
+        worldRenderer.begin(GL11.GL_TRIANGLE_FAN, WorldRenderer.POSITION_COLOR)
+
+        val red = color.red.toFloat() / 255.0f
+        val green = color.green.toFloat() / 255.0f
+        val blue = color.blue.toFloat() / 255.0f
+
+        val segments = 32
+        val increment = 360.0 / segments
+
+        worldRenderer.pos(0.0, height, 0.0).color(red, green, blue, 1.0f).endVertex()
+
+        for (angle in 0 until 360 step increment.toInt()) {
+            val radians = Math.toRadians(angle.toDouble())
+            val xPos = radius * Math.cos(radians)
+            val zPos = radius * Math.sin(radians)
+
+            worldRenderer.pos(xPos, height, zPos).color(red, green, blue, 1.0f).endVertex()
+        }
+
+        tessellator.draw()
+
+        GlStateManager.shadeModel(GL11.GL_FLAT)
+        GlStateManager.disableBlend()
+        GlStateManager.enableAlpha()
+        GlStateManager.enableTexture2D()
+        GlStateManager.popMatrix()
+    }
+
 
     private fun Color.bindColor() =
         GlStateManager.color(this.red / 255f, this.green / 255f, this.blue / 255f, this.alpha / 255f)
