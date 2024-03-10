@@ -41,8 +41,14 @@ class RiftBloodEffigies {
 
     companion object {
         private val group = RepoPattern.group("rift.area.stillgore.effegies")
-        val effigiesTimerPattern by group.pattern("respawn", "§eRespawn §c(?<time>.*) §7\\(or click!\\)")
-        val heartsPattern by group.pattern("heart","Effigies: (?<hearts>((§[7c])?⧯)*)")
+        val effigiesTimerPattern by group.pattern(
+            "respawn",
+            "§eRespawn §c(?<time>.*) §7\\(or click!\\)"
+        )
+        val heartsPattern by group.pattern(
+            "heart",
+            "Effigies: (?<hearts>((§[7c])?⧯)*)"
+        )
     }
 
     @SubscribeEvent
