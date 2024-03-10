@@ -80,6 +80,12 @@ Use `/sh` or `/skyhanni` to open the SkyHanni config in game.
 + Soulweaver Skull Hider in the Dungeon Object Hider. - nea
     + Hide the annoying soulweaver skulls that float around you if you have the soulweaver gloves equipped.
 + Hide particles and damage splashes during the terracotta phase in dungeons F6 and M6. - hannibal2
++ Added available classes in the tooltip. - Conutik
+    + Shows in the dungeon party finder when hovering over a group.
+    + Highlights your selected class in green if it's available.
++ Kismet tracking for dungeon chests. - Thunderblade73
+    + Highlight chests which have been rerolled inside Croesus
+    + Shows kismet amount at the reroll button
 
 </details>
 <details open><summary>
@@ -615,6 +621,9 @@ Use `/sh` or `/skyhanni` to open the SkyHanni config in game.
     + Changes by how much the sensitivity is lowered by.
     + Show a GUI element while the feature is enabled.
     + Option to only allow this feature while on ground and/or on barn plot.
++ Lane Switch Notification - ILike2WatchMemes
+    + Sends a notification when approaching the end of a lane in Garden while farming.
+    + Displays the distance until the end of a lane.
 
 </details>
 <details open><summary>
@@ -710,6 +719,8 @@ Use `/sh` or `/skyhanni` to open the SkyHanni config in game.
     + Option to hide while not grinding powder.
 + Added Deep Caverns Parkour. - hannibal2
     + Shows a parkour to the bottom of Deep Caverns and to Rhys.
++ Display upcoming mining events. - CalMWolfs
+    + Show what mining events are currently occurring in both the Dwarven Mines and Crystal Hollows.
 
 </details>
 <details open><summary>

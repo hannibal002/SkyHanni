@@ -1,6 +1,6 @@
 # SkyHanni - Change Log
 
-## Version 0.24 (Unreleased)
+## Version 0.24 (In Beta)
 
 ### New Features
 
@@ -21,6 +21,26 @@
 
 #### Chat Features
 + Hide chat message about bank interest when the received interest is zero coins. - Alexia (https://github.com/hannibal002/SkyHanni/pull/1117)
+
+#### Dungeon Features
+
++ Added available classes in the tooltip. - Conutik
+    + Shows in the dungeon party finder when hovering over a group.
+    + Highlights your selected class in green if it's available.
++ Kismet tracking for dungeon chests. - Thunderblade73
+    + Highlight chests which have been rerolled inside Croesus
+    + Shows kismet amount at the reroll button
+
+#### Garden Features
+
++ Lane Switch Notification - ILike2WatchMemes
+    + Sends a notification when approaching the end of a lane in Garden while farming.
+    + Displays the distance until the end of a lane.
+
+#### Mining Features
+
++ Display upcoming mining events. - CalMWolfs
+    + Show what mining events are currently occurring in both the Dwarven Mines and Crystal Hollows.
 
 #### Misc Features
 
@@ -51,6 +71,10 @@
 
 + Added option to only show Custom Text Box while an inventory is open. - martimavocado
 + Added option to hide Profit Trackers while not inside an inventory. - hannibal2
+
+#### Chat Improvements
+
++ Hide the TNT Run Tournament advertisement message in the main lobby. - Alexia
 
 #### Misc Improvements
 
@@ -87,7 +111,10 @@
 
 #### Garden Fixes
 
-+ Stop SkyHanni from saying that Next Visitor is visiting your garden. - CalMWolfs (https://github.com/hannibal002/SkyHanni/pull/1125)
++ Stop SkyHanni from saying that Next Visitor is visiting your garden. - CalMWolfs (https://github.com/hannibal002/SkyHanni/pull/1125) 
++ Fixed typos/grammar. - Obsidian
+    + Typos in pest features.
+    + Grammar in Farming Weight Display
 
 #### Command Fixes
 
@@ -99,6 +126,7 @@
 + Fixed SkyHanni not working on Alpha. - hannibal2 & CalMWolfs
 + Fixed getting profile name from tab list on alpha for special profiles. - CalMWolfs (https://github.com/hannibal002/SkyHanni/pull/1120)
     + Fixes for any Ironman, Stranded and maybe Bingo players.
++ Fixed minion hopper profit display feature not getting changed by /shdefaultoptions. - hannibal2
 
 ### Technical Details
 
@@ -135,6 +163,11 @@
 + Fix entity click not being canceled - Thunderblade73 (https://github.com/hannibal002/SkyHanni/pull/1072)
 + Cleanup ItemClickData. - Thunderblade73 (https://github.com/hannibal002/SkyHanni/pull/1072)
 + Fixes minecraft bug where text that is bold can render weirdly. - CalMWolfs (https://github.com/hannibal002/SkyHanni/pull/1126)
++ Added "unlocked" parameter for the GardenPlotAPI - ILike2WatchMemes (https://github.com/hannibal002/SkyHanni/pull/1075)
++ Updated MovementSpeedDisplay to use new calculations - ILike2WatchMemes (https://github.com/hannibal002/SkyHanni/pull/1075)
++ Added Track Sounds Command - Thunderblade73 (https://github.com/hannibal002/SkyHanni/pull/855)
++ Removed unused Sound Test - martimavocado (https://github.com/hannibal002/SkyHanni/pull/855)
++ Gson serialize the mining event data sent and received. - CalMWolfs (https://github.com/hannibal002/SkyHanni/pull/1040)
 
 ### Removed Features
 

@@ -185,6 +185,7 @@ import at.hannibal2.skyhanni.features.garden.farming.GardenCropMilestoneDisplay
 import at.hannibal2.skyhanni.features.garden.farming.GardenCropSpeed
 import at.hannibal2.skyhanni.features.garden.farming.GardenCustomKeybinds
 import at.hannibal2.skyhanni.features.garden.farming.GardenStartLocation
+import at.hannibal2.skyhanni.features.garden.farming.LaneSwitchNotification
 import at.hannibal2.skyhanni.features.garden.farming.WildStrawberryDyeNotification
 import at.hannibal2.skyhanni.features.garden.farming.WrongFungiCutterWarning
 import at.hannibal2.skyhanni.features.garden.fortuneguide.CaptureFarmingGear
@@ -405,7 +406,7 @@ import org.apache.logging.log4j.Logger
     clientSideOnly = true,
     useMetadata = true,
     guiFactory = "at.hannibal2.skyhanni.config.ConfigGuiForgeInterop",
-    version = "0.24.Beta.8",
+    version = "0.24.Beta.9",
 )
 class SkyHanniMod {
 
@@ -630,6 +631,7 @@ class SkyHanniMod {
         loadModule(GardenNextJacobContest)
         loadModule(WrongFungiCutterWarning())
         loadModule(ArmorDropTracker)
+        loadModule(LaneSwitchNotification())
         loadModule(JoinCrystalHollows())
         loadModule(CrystalHollowsNamesInCore())
         loadModule(GardenVisitorColorNames)
