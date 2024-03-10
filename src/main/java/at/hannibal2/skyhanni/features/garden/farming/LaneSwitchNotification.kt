@@ -91,7 +91,7 @@ class LaneSwitchNotification {
 
     @SubscribeEvent
     fun onRenderOverlay(event: GuiRenderEvent.GuiOverlayRenderEvent) {
-        if (!config.distanceUntilSwitch || !isEnabled()) return
+        if (!isEnabled() || !config.distanceUntilSwitch) return
         if (distancesUntilSwitch.isEmpty()) return
         if (lastDistancesUntilSwitch.isEmpty()) {
             lastDistancesUntilSwitch = distancesUntilSwitch
