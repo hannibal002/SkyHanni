@@ -14,6 +14,7 @@ import at.hannibal2.skyhanni.utils.LorenzColor
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.NumberUtil.romanToDecimalIfNecessary
 import at.hannibal2.skyhanni.utils.RenderUtils.highlight
+import at.hannibal2.skyhanni.utils.StringUtils.createCommaSeparatedList
 import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import net.minecraft.client.gui.inventory.GuiChest
@@ -148,22 +149,28 @@ class DungeonFinderFeatures {
     @SubscribeEvent
     fun onItemTooltip(event: LorenzToolTipEvent) {
         if (!LorenzUtils.inSkyBlock) return
-        if (!config.coloredClassLevel) return
 
         val chestName = InventoryUtils.openInventoryName()
         if (chestName != "Party Finder") return
 
         val stack = event.itemStack
 
+        val classNames = mutableListOf("Healer", "Mage", "Berserk", "Archer", "Tank")
         for ((index, line) in stack.getLore().withIndex()) {
             classLevelPattern.matchMatcher(line) {
                 val playerName = group("playerName")
                 val className = group("className")
                 val level = group("level").toInt()
                 val color = getColor(level)
-                event.toolTip[index + 1] = " §b$playerName§f: §e$className $color$level"
+                if (config.coloredClassLevel) event.toolTip[index + 1] = " §b$playerName§f: §e$className $color$level"
+                classNames.remove(className)
             }
         }
+        if (!config.showMissingClasses) return
+        if (!stack.getLore()[0].removeColor().startsWith("Dungeon:")) return
+        if (classNames.contains(selectedClass)) classNames[classNames.indexOf(selectedClass)] = "§a${selectedClass}§7"
+        event.toolTip.add("")
+        event.toolTip.add("§cMissing: §7" + createCommaSeparatedList(classNames))
     }
 
     @SubscribeEvent
