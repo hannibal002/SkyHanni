@@ -163,9 +163,9 @@ object GardenPlotAPI {
         if (event.inventoryName != "Configure Plots") return
 
         for (plot in plots) {
-            plot.unlocked = event.inventoryItems[plot.inventorySlot]?.getLore()?.any { it.contains("§7Cost:") } == false
-            val itemName = event.inventoryItems[plot.inventorySlot]?.name ?: continue
-            plotNamePattern.matchMatcher(itemName) {
+            val itemStack = event.inventoryItems[plot.inventorySlot] ?: continue
+            plot.unlocked = itemStack.getLore().all { !it.contains("§7Cost:") }
+            plotNamePattern.matchMatcher(itemStack.name) {
                 plot.name = group("name")
             }
         }

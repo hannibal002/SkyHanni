@@ -72,8 +72,6 @@ class LaneSwitchNotification {
             return listOf(
                 LorenzVec(playerPos.x, playerPos.y, zValueTop), LorenzVec(playerPos.x, playerPos.y, zValueBottom)
             )
-        } else if (xVelocity.absoluteValue == 0.0 && zVelocity.absoluteValue == 0.0) {
-            return null
         } else {
             return null
         }
@@ -99,7 +97,7 @@ class LaneSwitchNotification {
         if (farmEnd.isNotEmpty() && lastLaneSwitch.passedSince() >= farmTraverseTime && bpsDifference <= 20) {
             if (farmEnd.any {switchPossibleInTime(playerPos, it, blocksPerSecond, notificationSettings.notificationThreshold)}) {
                 sendTitle(
-                    config.notification.settings.notificationColor.getChatColor() + notificationSettings.notificationText,
+                    notificationSettings.notificationColor.getChatColor() + notificationSettings.notificationText,
                     notificationSettings.notificationDuration.seconds
                 )
                 playUserSound()
