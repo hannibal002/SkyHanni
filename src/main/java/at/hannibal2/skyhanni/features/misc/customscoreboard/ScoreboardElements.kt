@@ -227,7 +227,7 @@ private fun getProfileDisplayPair() =
     listOf(CustomScoreboardUtils.getProfileTypeSymbol() + HypixelData.profileName.firstLetterUppercase() to HorizontalAlignment.LEFT)
 
 private fun getPurseDisplayPair(): List<ScoreboardElementType> {
-    var purse = PurseAPI.currentPurse.toString().formatNum()
+    var purse = PurseAPI.currentPurse.formatNum()
 
     val earned = getGroupFromPattern(ScoreboardData.sidebarLinesFormatted, PurseAPI.coinsPattern, "earned")
 

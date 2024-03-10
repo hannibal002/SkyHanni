@@ -9,6 +9,9 @@
 //  - countdown events like fishing festival + fiesta when its not on tablist
 //  - CookieAPI https://discord.com/channels/997079228510117908/1162844830360146080/1195695210433351821
 //  - Rng meter display
+//  - shorten time till next mayor https://discord.com/channels/997079228510117908/1162844830360146080/1216440046320746596
+//  - option to hide coins earned
+//  - color options in the purse etc lines
 //
 
 package at.hannibal2.skyhanni.features.misc.customscoreboard
@@ -46,7 +49,7 @@ class CustomScoreboard {
         } else {
             config.position.renderStringsAlignedWidth(display, posLabel = guiName)
 
-            cache = display
+            if (cache != display) cache = display
         }
     }
 

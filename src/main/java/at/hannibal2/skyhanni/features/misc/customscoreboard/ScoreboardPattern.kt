@@ -72,6 +72,7 @@ object ScoreboardPattern {
     val yourGoblinKillsPattern by miningSb.pattern("yourgoblin", "^Your kills: §c\\d+ ☠( §a\\(\\+\\d+\\))?$")
     // combat
     private val combatSb = scoreboardGroup.group("combat")
+    val magmaChamberPattern by combatSb.pattern("magmachamber", "^Magma Chamber$")
     val magmaBossPattern by combatSb.pattern("magmaboss", "^§7Boss: §[c6e]\\d{1,3}%$")
     val damageSoakedPattern by combatSb.pattern("damagesoaked", "^§7Damage Soaked:")
     val killMagmasPattern by combatSb.pattern("killmagmas", "^§6Kill the Magmas:$")
@@ -122,4 +123,6 @@ object ScoreboardPattern {
     val bankPattern by tablistGroup.pattern("bank", "^Bank: §6(?<bank>\\d*,?(\\.\\d+)?[a-zA-Z]?(/\\d*,?(\\.\\d+)?[a-zA-Z]?)?)$")
     val mithrilPowderPattern by tablistGroup.pattern("mithrilpowder", "^§fMithril Powder: §2(?<mithrilpowder>.*)$")
     val gemstonePowderPattern by tablistGroup.pattern("gemstonepowder", "^§fGemstone Powder: §d(?<gemstonepowder>.*)$")
+    val eventNamePattern by tablistGroup.pattern("event", "^§e§lEvent: §r(?<name>§.*)$")
+    val eventTimeEndsPattern by tablistGroup.pattern("eventtime", "^\\s+Ends In: §r§e(?<time>.*)$")
 }

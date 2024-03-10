@@ -19,6 +19,7 @@ import net.minecraftforge.fml.relauncher.Side
 import net.minecraftforge.fml.relauncher.SideOnly
 
 class TabListData {
+
     companion object {
 
         private var cache = emptyList<String>()
