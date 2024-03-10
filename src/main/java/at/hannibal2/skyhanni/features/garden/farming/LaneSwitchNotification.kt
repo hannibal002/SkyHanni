@@ -130,9 +130,8 @@ class LaneSwitchNotification {
             return listOf(
                 LorenzVec(playerPos.x, playerPos.y, zValueTop), LorenzVec(playerPos.x, playerPos.y, zValueBottom)
             )
-        } else {
-            return null
         }
+        return null
     }
 
     @SubscribeEvent
