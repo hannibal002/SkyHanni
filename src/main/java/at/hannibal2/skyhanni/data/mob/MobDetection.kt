@@ -73,14 +73,7 @@ class MobDetection {
 
     private fun mobDetectionReset() {
         MobData.currentMobs.map {
-            when (it.mobType) {
-                Mob.Type.DisplayNPC -> MobEvent.DeSpawn.DisplayNPC(it)
-                Mob.Type.Summon -> MobEvent.DeSpawn.Summon(it)
-                Mob.Type.Basic, Mob.Type.Dungeon, Mob.Type.Boss, Mob.Type.Slayer -> MobEvent.DeSpawn.SkyblockMob(it)
-                Mob.Type.Player -> MobEvent.DeSpawn.Player(it)
-                Mob.Type.Projectile -> MobEvent.DeSpawn.Projectile(it)
-                Mob.Type.Special -> MobEvent.DeSpawn.Special(it)
-            }
+            it.createDeSpawnEvent()
         }.forEach { it.postAndCatch() }
     }
 
@@ -241,17 +234,17 @@ class MobDetection {
     }
 
     private fun entityDeSpawn(entity: EntityLivingBase) {
-        MobData.entityToMob[entity]?.let {
-            when (it.mobType) {
-                Mob.Type.Player -> MobEvent.DeSpawn.Player(it)
-                Mob.Type.Summon -> MobEvent.DeSpawn.Summon(it)
-                Mob.Type.Special -> MobEvent.DeSpawn.Special(it)
-                Mob.Type.Projectile -> MobEvent.DeSpawn.Projectile(it)
-                Mob.Type.DisplayNPC -> MobEvent.DeSpawn.DisplayNPC(it)
-                Mob.Type.Basic, Mob.Type.Dungeon, Mob.Type.Boss, Mob.Type.Slayer -> MobEvent.DeSpawn.SkyblockMob(it)
-            }.postAndCatch()
-        } ?: removeRetry(entity)
+        MobData.entityToMob[entity]?.createDeSpawnEvent()?.postAndCatch() ?: removeRetry(entity)
         allEntitiesViaPacketId.remove(entity.entityId)
+    }
+
+    private fun Mob.createDeSpawnEvent() = when (this.mobType) {
+        Mob.Type.Player -> MobEvent.DeSpawn.Player(this)
+        Mob.Type.Summon -> MobEvent.DeSpawn.Summon(this)
+        Mob.Type.Special -> MobEvent.DeSpawn.Special(this)
+        Mob.Type.Projectile -> MobEvent.DeSpawn.Projectile(this)
+        Mob.Type.DisplayNPC -> MobEvent.DeSpawn.DisplayNPC(this)
+        Mob.Type.Basic, Mob.Type.Dungeon, Mob.Type.Boss, Mob.Type.Slayer -> MobEvent.DeSpawn.SkyblockMob(this)
     }
 
     private fun handleRetries() {
