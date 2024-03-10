@@ -400,7 +400,7 @@ import org.apache.logging.log4j.Logger
     clientSideOnly = true,
     useMetadata = true,
     guiFactory = "at.hannibal2.skyhanni.config.ConfigGuiForgeInterop",
-    version = "0.24.Beta.8",
+    version = "0.24.Beta.9",
 )
 class SkyHanniMod {
 
