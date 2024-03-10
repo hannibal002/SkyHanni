@@ -51,6 +51,7 @@ class ChatFilter {
         // hypixel tournament notifications
         "§r§e§6§lHYPIXEL§e is hosting a §b§lBED WARS DOUBLES§e tournament!",
         "§r§e§6§lHYPIXEL BED WARS DOUBLES§e tournament is live!",
+        "§r§e§6§lHYPIXEL§e is hosting a §b§lTNT RUN§e tournament!",
 
         // other
         "§aYou are still radiating with §bGenerosity§r§a!"

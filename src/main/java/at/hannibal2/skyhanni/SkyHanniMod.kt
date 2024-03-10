@@ -238,6 +238,7 @@ import at.hannibal2.skyhanni.features.mining.DeepCavernsParkour
 import at.hannibal2.skyhanni.features.mining.HighlightMiningCommissionMobs
 import at.hannibal2.skyhanni.features.mining.KingTalismanHelper
 import at.hannibal2.skyhanni.features.mining.crystalhollows.CrystalHollowsNamesInCore
+import at.hannibal2.skyhanni.features.mining.eventtracker.MiningEventDisplay
 import at.hannibal2.skyhanni.features.mining.eventtracker.MiningEventTracker
 import at.hannibal2.skyhanni.features.mining.powdertracker.PowderTracker
 import at.hannibal2.skyhanni.features.minion.InfernoMinionFeatures
@@ -365,6 +366,7 @@ import at.hannibal2.skyhanni.test.TestExportTools
 import at.hannibal2.skyhanni.test.TestShowSlotNumber
 import at.hannibal2.skyhanni.test.WorldEdit
 import at.hannibal2.skyhanni.test.command.CopyNearbyParticlesCommand
+import at.hannibal2.skyhanni.test.command.TrackSoundsCommand
 import at.hannibal2.skyhanni.test.hotswap.HotswapSupport
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.EntityOutlineRenderer
@@ -678,6 +680,7 @@ class SkyHanniMod {
         loadModule(ArachneChatMessageHider())
         loadModule(ShowItemUuid())
         loadModule(FrozenTreasureTracker)
+        loadModule(MiningEventDisplay)
         loadModule(SlayerRngMeterDisplay())
         loadModule(GhostCounter)
         loadModule(RiftTimer())
@@ -773,6 +776,7 @@ class SkyHanniMod {
         loadModule(SkyHanniDebugsAndTests())
         loadModule(FixGhostEntities)
         loadModule(CopyNearbyParticlesCommand)
+        loadModule(TrackSoundsCommand)
         loadModule(ButtonOnPause())
         loadModule(PacketTest)
         loadModule(TestBingo)
