@@ -237,6 +237,7 @@ import at.hannibal2.skyhanni.features.mining.DeepCavernsParkour
 import at.hannibal2.skyhanni.features.mining.HighlightMiningCommissionMobs
 import at.hannibal2.skyhanni.features.mining.KingTalismanHelper
 import at.hannibal2.skyhanni.features.mining.crystalhollows.CrystalHollowsNamesInCore
+import at.hannibal2.skyhanni.features.mining.eventtracker.MiningEventDisplay
 import at.hannibal2.skyhanni.features.mining.eventtracker.MiningEventTracker
 import at.hannibal2.skyhanni.features.mining.powdertracker.PowderTracker
 import at.hannibal2.skyhanni.features.minion.InfernoMinionFeatures
@@ -677,6 +678,7 @@ class SkyHanniMod {
         loadModule(ArachneChatMessageHider())
         loadModule(ShowItemUuid())
         loadModule(FrozenTreasureTracker)
+        loadModule(MiningEventDisplay)
         loadModule(SlayerRngMeterDisplay())
         loadModule(GhostCounter)
         loadModule(RiftTimer())

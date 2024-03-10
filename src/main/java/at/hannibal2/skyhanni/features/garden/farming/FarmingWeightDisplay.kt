@@ -179,7 +179,7 @@ class FarmingWeightDisplay {
             val list = mutableListOf<Renderable>()
             list.add(Renderable.clickAndHover(
                 "§6Farming Weight§7: $weight$leaderboard",
-                listOf("§eClick to open the Farming Profile of you.")
+                listOf("§eClick to open your Farming Profile.")
             ) {
                 openWebsite(LorenzUtils.getPlayerName())
             })
