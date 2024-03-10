@@ -141,7 +141,7 @@ public class ChatConfig {
     @ConfigOption(
         name = "Pet Drop Rarity",
         desc = "Shows what rarity the pet drop is in the pet drop message.\n" +
-            "§6§lPET DROP! §r§5§lEPIC §r§5Slug §6(§6+1300☘)"
+            "§6§lPET DROP! §5§lEPIC §5Slug §6(§6+1300☘)"
     )
     @ConfigEditorBoolean
     @FeatureToggle

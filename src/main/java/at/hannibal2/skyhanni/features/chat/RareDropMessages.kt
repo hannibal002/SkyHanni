@@ -13,29 +13,25 @@ class RareDropMessages {
 
     private val petDropPattern by RepoPattern.pattern(
         "pet.petdropmessage",
-        "(?<message1>§6§lPET DROP!|§5§lGREAT CATCH! §r§bYou found a §r§7\\[Lvl 1]) (?:§r)?§(?<rarityColor>.)(?<petName>[^§(.]+)(?<message2>.*)"
+        "(?<typeOfDrop>§6§lPET DROP!|§5§lGREAT CATCH! §r§bYou found a §r§7\\[Lvl 1]) (?:§r)?§(?<rarityColor>.)(?<petName>[^§(.]+)(?<magicFindOrFarmingFortune>.*)"
     )
 
-    val config get() = SkyHanniMod.feature.chat.petRarityDropMessage
+    private val config get() = SkyHanniMod.feature.chat.petRarityDropMessage
 
     @SubscribeEvent
     fun onChat(event: LorenzChatEvent) {
         if (!LorenzUtils.inSkyBlock) return
-        if (!config) return;
-        var rarityColor = ""
-        var petName = ""
-        var message1 = ""
-        var message2 = ""
+        if (!config) return
 
         petDropPattern.matchMatcher(event.message) {
-            message1 = group("message1")
-            rarityColor = group("rarityColor")
-            petName = group("petName")
-            message2 = group("message2")
-        } ?: return
+            val typeOfDrop = group("typeOfDrop")
+            val rarityColor = group("rarityColor")
+            val petName = group("petName")
+            val magicFindOrFarmingFortune = group("magicFindOrFarmingFortune")
 
-        event.chatComponent = ChatComponentText(
-            "$message1 §r§$rarityColor§l${colorCodeToRarity(rarityColor.first()).uppercase()} §r§$rarityColor$petName$message2"
-        )
+            event.chatComponent = ChatComponentText(
+                "$typeOfDrop §$rarityColor§l${colorCodeToRarity(rarityColor.first()).uppercase()} §$rarityColor$petName$magicFindOrFarmingFortune"
+            )
+        } ?: return
     }
 }
