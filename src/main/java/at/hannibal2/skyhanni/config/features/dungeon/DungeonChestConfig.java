@@ -9,10 +9,10 @@ public class DungeonChestConfig {
 
 
     @Expose
-    @ConfigOption(name = "Kismet", desc = "Adds a visual highlight for used kismet feather to the Croesus inventory.")
+    @ConfigOption(name = "Show Used Kismet", desc = "Adds a visual highlight for used kismet feather to the Croesus inventory.")
     @ConfigEditorBoolean
     @FeatureToggle
-    public boolean kismet = true;
+    public boolean showUsedKismets = true;
 
     @Expose
     @ConfigOption(name = "Kismet Amount", desc = "Shows the amount of kismet feathers as stack size.")

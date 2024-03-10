@@ -89,7 +89,7 @@ class CroesusChestTracker {
     @SubscribeEvent
     fun onInventoryOpen(event: InventoryFullyOpenedEvent) {
         if (!LorenzUtils.inSkyBlock) return
-        if ((SkyHanniMod.feature.dungeon.croesusUnopenedChestTracker || config.kismet) && croesusPattern.matches(event.inventoryName)) {
+        if ((SkyHanniMod.feature.dungeon.croesusUnopenedChestTracker || config.showUsedKismets) && croesusPattern.matches(event.inventoryName)) {
             pageSetup(event)
 
             if (croesusEmpty) {
@@ -104,7 +104,7 @@ class CroesusChestTracker {
 
             return
         }
-        if (config.kismet || config.kismetStackSize) {
+        if (config.showUsedKismets || config.kismetStackSize) {
             kismetDungeonChestSetup(event)
         }
     }
@@ -114,9 +114,9 @@ class CroesusChestTracker {
         if (config.kismetStackSize) {
             kismetAmountCache = getKismetAmount().toInt()
         }
-        if (config.kismet) {
+        if (config.showUsedKismets) {
             val kismetItem = event.inventoryItems[kismetSlotId] ?: return
-            if (config.kismet && kismetUsedPattern.matches(kismetItem.getLore().lastOrNull()))
+            if (config.showUsedKismets && kismetUsedPattern.matches(kismetItem.getLore().lastOrNull()))
                 setKismetUsed()
         }
     }
@@ -172,7 +172,7 @@ class CroesusChestTracker {
     @SubscribeEvent
     fun onSlotClicked(event: GuiContainerEvent.SlotClickEvent) {
         if (!LorenzUtils.inSkyBlock) return
-        if (!config.kismet) return
+        if (!config.showUsedKismets) return
         if (chestInventory != null && event.slotId == kismetSlotId) {
             setKismetUsed()
             return
@@ -208,7 +208,7 @@ class CroesusChestTracker {
     @SubscribeEvent
     fun onRenderItemTipIsKismetable(event: RenderInventoryItemTipEvent) {
         if (!LorenzUtils.inSkyBlock) return
-        if (!config.kismet) return
+        if (!config.showUsedKismets) return
         if (!inCroesusInventory) return
         if (event.slot.slotIndex != event.slot.slotNumber) return
         val run = croesusSlotMapToRun(event.slot.slotIndex) ?: return
