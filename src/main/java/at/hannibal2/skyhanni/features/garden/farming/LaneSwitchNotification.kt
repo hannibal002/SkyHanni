@@ -76,8 +76,8 @@ class LaneSwitchNotification {
         // farmLength / bps to get the time needed to travel the distance, - the threshold times the farm length divided by the length of 2 plots (to give some room)
         val threshold = settings.threshold
         // TODO find a name for this variable
-        val findVariableName = threshold * (farmLength / 192)
-        val farmTraverseTime = ((farmLength / bps) - findVariableName).seconds
+        val FIND_A_NAME_FOR_ME = threshold * (farmLength / 192)
+        val farmTraverseTime = ((farmLength / bps) - FIND_A_NAME_FOR_ME).seconds
         val bpsDifference = (bps - lastBps).absoluteValue
 
         if (farmEnd.isEmpty() || lastLaneSwitch.passedSince() < farmTraverseTime || bpsDifference > 20) return
@@ -114,16 +114,14 @@ class LaneSwitchNotification {
     }
 
     private fun plotsLoaded(): Boolean {
-        if (!plots.any { it.unlocked }) {
-            if (lastWarning.passedSince() >= 30.seconds) {
-                ChatUtils.clickableChat("§eOpen your configure plots for lane switch detection to work.", "/desk")
-                lastWarning = SimpleTimeMark.now()
-            }
-            return false
+        if (plots.any { it.unlocked }) return true
+
+        if (lastWarning.passedSince() >= 30.seconds) {
+            ChatUtils.clickableChat("§eOpen your configure plots for lane switch detection to work.", "/desk")
+            lastWarning = SimpleTimeMark.now()
         }
-        return true
+        return false
     }
 
-    fun isEnabled(): Boolean =
-        config.enabled && GardenAPI.inGarden() && plotsLoaded() && GardenCropSpeed.averageBlocksPerSecond > 0.0
+    private fun isEnabled() = GardenAPI.isCurrentlyFarming() && config.enabled && plotsLoaded()
 }
