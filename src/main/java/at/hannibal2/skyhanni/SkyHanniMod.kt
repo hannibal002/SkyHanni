@@ -365,6 +365,7 @@ import at.hannibal2.skyhanni.test.TestExportTools
 import at.hannibal2.skyhanni.test.TestShowSlotNumber
 import at.hannibal2.skyhanni.test.WorldEdit
 import at.hannibal2.skyhanni.test.command.CopyNearbyParticlesCommand
+import at.hannibal2.skyhanni.test.command.TrackSoundsCommand
 import at.hannibal2.skyhanni.test.hotswap.HotswapSupport
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.EntityOutlineRenderer
@@ -773,6 +774,7 @@ class SkyHanniMod {
         loadModule(SkyHanniDebugsAndTests())
         loadModule(FixGhostEntities)
         loadModule(CopyNearbyParticlesCommand)
+        loadModule(TrackSoundsCommand)
         loadModule(ButtonOnPause())
         loadModule(PacketTest)
         loadModule(TestBingo)
