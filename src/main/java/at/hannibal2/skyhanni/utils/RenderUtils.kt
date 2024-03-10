@@ -38,7 +38,16 @@ import kotlin.time.DurationUnit
 
 object RenderUtils {
 
-    enum class HorizontalAlignment { LEFT, CENTER, RIGHT }
+    enum class HorizontalAlignment(private val value: String) {
+        LEFT("Left"),
+        CENTER("Center"),
+        RIGHT("Right"),
+        ;
+
+        override fun toString(): String {
+            return value
+        }
+    }
     enum class VerticalAlignment { TOP, CENTER, BOTTOM }
 
     private val beaconBeam = ResourceLocation("textures/entity/beacon_beam.png")
@@ -403,13 +412,18 @@ object RenderUtils {
     }
 
     // Aligns using the width of element to render
-    private fun Position.renderString0(string: String?, offsetX: Int = 0, offsetY: Int = 0, alignmentEnum: HorizontalAlignment): Int {
+    private fun Position.renderString0(
+        string: String?,
+        offsetX: Int = 0,
+        offsetY: Int = 0,
+        alignmentEnum: HorizontalAlignment
+    ): Int {
         val display = "§f$string"
         GlStateManager.pushMatrix()
         transform()
         val minecraft = Minecraft.getMinecraft()
         val renderer = minecraft.renderManager.fontRenderer
-        val width = this.getDummySize().x  / this.scale
+        val width = this.getDummySize().x / this.scale
 
         GlStateManager.translate(offsetX + 1.0, offsetY + 1.0, 0.0)
 
@@ -442,7 +456,11 @@ object RenderUtils {
         GuiEditManager.add(this, posLabel, longestX, offsetY)
     }
 
-    fun Position.renderStringsAlignedWidth(list: List<Pair<String, HorizontalAlignment>>, extraSpace: Int = 0, posLabel: String){
+    fun Position.renderStringsAlignedWidth(
+        list: List<Pair<String, HorizontalAlignment>>,
+        extraSpace: Int = 0,
+        posLabel: String
+    ) {
         if (list.isEmpty()) return
 
         var offsetY = 0

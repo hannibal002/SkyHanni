@@ -1,11 +1,12 @@
 package at.hannibal2.skyhanni.features.gui.customscoreboard
 
-import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.config.core.config.Position
 import at.hannibal2.skyhanni.data.GuiEditManager
 import at.hannibal2.skyhanni.data.GuiEditManager.Companion.getAbsX
 import at.hannibal2.skyhanni.data.GuiEditManager.Companion.getAbsY
 import at.hannibal2.skyhanni.data.GuiEditManager.Companion.getDummySize
+import at.hannibal2.skyhanni.features.gui.customscoreboard.CustomScoreboard.Companion.backgroundConfig
+import at.hannibal2.skyhanni.features.gui.customscoreboard.CustomScoreboard.Companion.config
 import at.hannibal2.skyhanni.utils.RenderUtils
 import at.hannibal2.skyhanni.utils.SpecialColour
 import io.github.moulberry.notenoughupdates.util.Utils
@@ -16,9 +17,6 @@ import net.minecraft.util.ResourceLocation
 import org.lwjgl.opengl.GL11
 
 class RenderBackground {
-    private val config get() = SkyHanniMod.feature.gui.customScoreboard
-    private val backgroundConfig get() = config.backgroundConfig
-
     fun renderBackground() {
         val position = config.position
         val border = 5

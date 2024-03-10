@@ -32,7 +32,7 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 typealias ScoreboardElementType = Pair<String, HorizontalAlignment>
 
 class CustomScoreboard {
-    private val config get() = SkyHanniMod.feature.gui.customScoreboard
+
     private var display = emptyList<ScoreboardElementType>()
     private var cache = emptyList<ScoreboardElementType>()
     private val guiName = "Custom Scoreboard"
@@ -78,42 +78,38 @@ class CustomScoreboard {
         UnknownLinesHandler.handleUnknownLines()
     }
 
-    private fun createLines() = buildList<ScoreboardElementType> {
-        val lineMap = ScoreboardElement.entries.associate {
-            it.ordinal to
-                if (it.isVisible()) it.getPair() else listOf("<hidden>" to HorizontalAlignment.LEFT)
-        }
-
-        return formatLines(lineMap)
+    companion object {
+        internal val config get() = SkyHanniMod.feature.gui.customScoreboard
+        internal val displayConfig get() = config.displayConfig
+        internal val informationFilteringConfig get() = config.informationFilteringConfig
+        internal val backgroundConfig get() = config.backgroundConfig
     }
 
-    private fun formatLines(lineMap: Map<Int, List<ScoreboardElementType>>): List<ScoreboardElementType> {
-        return buildList {
-            for (element in config.scoreboardEntries) {
-                val line = lineMap[element.ordinal] ?: continue
+    private fun createLines() = buildList<ScoreboardElementType> {
+        for (element in config.scoreboardEntries) {
+            val line = element.getVisiblePair()
 
-                // Hide consecutive empty lines
-                if (
-                    config.informationFilteringConfig.hideConsecutiveEmptyLines &&
-                    line.isNotEmpty() && line[0].first == "<empty>" && lastOrNull()?.first?.isEmpty() == true
-                ) {
-                    continue
-                }
-
-                // Adds empty lines
-                if (line[0].first == "<empty>") {
-                    add("" to HorizontalAlignment.LEFT)
-                    continue
-                }
-
-                // Does not display this line
-                if (line.any { it.first == "<hidden>" }) {
-                    continue
-                }
-
-                // Multiline and singular line support
-                addAll(line)
+            // Hide consecutive empty lines
+            if (
+                config.informationFilteringConfig.hideConsecutiveEmptyLines &&
+                line.isNotEmpty() && line[0].first == "<empty>" && lastOrNull()?.first?.isEmpty() == true
+            ) {
+                continue
             }
+
+            // Adds empty lines
+            if (line[0].first == "<empty>") {
+                add("" to HorizontalAlignment.LEFT)
+                continue
+            }
+
+            // Does not display this line
+            if (line.any { it.first == "<hidden>" }) {
+                continue
+            }
+
+            // Multiline and singular line support
+            addAll(line)
         }
     }
 

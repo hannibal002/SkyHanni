@@ -5,6 +5,9 @@ import io.github.moulberry.moulconfig.annotations.ConfigEditorBoolean;
 import io.github.moulberry.moulconfig.annotations.ConfigOption;
 
 public class AlignmentConfig {
+    // TODO: Switch to Dropdowns with multiple different alignment ways in the future
+    // Horizontal: Left, Center, Right
+    // Vertical: Top, Center, Bottom
     @Expose
     @ConfigOption(name = "Align to the right", desc = "Align the scoreboard to the right side of the screen.")
     @ConfigEditorBoolean

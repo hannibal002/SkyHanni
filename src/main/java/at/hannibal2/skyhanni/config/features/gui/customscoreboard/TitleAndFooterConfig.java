@@ -1,16 +1,18 @@
 package at.hannibal2.skyhanni.config.features.gui.customscoreboard;
 
+import at.hannibal2.skyhanni.utils.RenderUtils;
 import com.google.gson.annotations.Expose;
 import io.github.moulberry.moulconfig.annotations.ConfigEditorBoolean;
+import io.github.moulberry.moulconfig.annotations.ConfigEditorDropdown;
 import io.github.moulberry.moulconfig.annotations.ConfigEditorText;
 import io.github.moulberry.moulconfig.annotations.ConfigOption;
 import io.github.moulberry.moulconfig.observer.Property;
 
 public class TitleAndFooterConfig {
     @Expose
-    @ConfigOption(name = "Center Title and Footer", desc = "Center the title and footer to the scoreboard width.")
-    @ConfigEditorBoolean
-    public boolean centerTitleAndFooter = true;
+    @ConfigOption(name = "Title and Footer Alignment", desc = "Align the title and footer in the scoreboard.")
+    @ConfigEditorDropdown
+    public RenderUtils.HorizontalAlignment alignTitleAndFooter = RenderUtils.HorizontalAlignment.CENTER;
 
     @Expose
     @ConfigOption(name = "Custom Title", desc = "What should be displayed as the title of the scoreboard.\nUse & for colors.")
