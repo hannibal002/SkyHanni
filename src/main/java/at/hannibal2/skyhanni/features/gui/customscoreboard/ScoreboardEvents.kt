@@ -5,9 +5,9 @@ import at.hannibal2.skyhanni.data.HypixelData
 import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.data.ScoreboardData
 import at.hannibal2.skyhanni.features.garden.contest.FarmingContestAPI.sidebarCropPattern
+import at.hannibal2.skyhanni.features.gui.customscoreboard.ScoreboardEvents.VOTING
+import at.hannibal2.skyhanni.features.gui.customscoreboard.ScoreboardPattern
 import at.hannibal2.skyhanni.features.misc.ServerRestartTitle
-import at.hannibal2.skyhanni.features.misc.customscoreboard.ScoreboardEvents.VOTING
-import at.hannibal2.skyhanni.features.misc.customscoreboard.ScoreboardPattern
 import at.hannibal2.skyhanni.features.rift.area.stillgorechateau.RiftBloodEffigies
 import at.hannibal2.skyhanni.utils.CollectionUtils.addIfNotNull
 import at.hannibal2.skyhanni.utils.CollectionUtils.nextAfter
@@ -19,13 +19,13 @@ import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.StringUtils.matches
 import at.hannibal2.skyhanni.utils.TabListData
 import java.util.function.Supplier
-import at.hannibal2.skyhanni.features.misc.customscoreboard.ScoreboardPattern as SbPattern
+import at.hannibal2.skyhanni.features.gui.customscoreboard.ScoreboardPattern as SbPattern
 
 private val config get() = SkyHanniMod.feature.gui.customScoreboard
 
 /**
  * This enum contains all the lines that either are events or other lines that are so rare/not often seen that they
- * don't fit in the normal [ScoreboardElements] enum.
+ * don't fit in the normal [ScoreboardElement] enum.
  *
  * We for example have the [VOTING] Event, while this is clearly not an event, I don't consider them as normal lines
  * because they are visible for a maximum of like 1 minute every 5 days and ~12 hours.

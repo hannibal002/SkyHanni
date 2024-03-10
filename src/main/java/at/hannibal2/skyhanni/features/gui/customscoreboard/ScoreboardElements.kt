@@ -14,9 +14,9 @@ import at.hannibal2.skyhanni.data.QuiverAPI.asArrowPercentage
 import at.hannibal2.skyhanni.data.QuiverAPI.getArrowByNameOrNull
 import at.hannibal2.skyhanni.data.ScoreboardData
 import at.hannibal2.skyhanni.data.SlayerAPI
-import at.hannibal2.skyhanni.features.misc.customscoreboard.CustomScoreboardUtils.formatNum
-import at.hannibal2.skyhanni.features.misc.customscoreboard.CustomScoreboardUtils.getGroupFromPattern
-import at.hannibal2.skyhanni.features.misc.customscoreboard.CustomScoreboardUtils.getTitleAndFooterAlignment
+import at.hannibal2.skyhanni.features.gui.customscoreboard.CustomScoreboardUtils.formatNum
+import at.hannibal2.skyhanni.features.gui.customscoreboard.CustomScoreboardUtils.getGroupFromPattern
+import at.hannibal2.skyhanni.features.gui.customscoreboard.CustomScoreboardUtils.getTitleAndFooterAlignment
 import at.hannibal2.skyhanni.mixins.hooks.tryToReplaceScoreboardLine
 import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.CollectionUtils.nextAfter

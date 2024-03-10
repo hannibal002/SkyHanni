@@ -2,9 +2,6 @@ package at.hannibal2.skyhanni.features.gui.customscoreboard
 
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 
-// "Regex is torture" ~J10a1n15 (26.12.2023)
-// Thank you Ery for helping with some regexes!
-
 object ScoreboardPattern {
     val group = RepoPattern.group("features.misc.customscoreboard")
 
