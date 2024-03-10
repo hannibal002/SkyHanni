@@ -20,7 +20,7 @@ public class TotemOfCorruptionConfig {
     @Expose
     @ConfigOption(name = "Distance Threshold", desc = "The distance from the player to the Totem of Corruption for the overlay to be shown. " +
         "\nThe effective distance of the totem is 16." +
-        "\n§cLimited by the far you can see the nametags.")
+        "\n§cLimited by how far you can see the nametags.")
     @ConfigEditorSlider(minValue = 0, maxValue = 100, minStep = 1)
     public int distanceThreshold = 16;
 
