@@ -36,7 +36,10 @@ object TrackSoundsCommand {
             return
         }
         if (isRecording) {
-            ChatUtils.userError("Still tracking sounds, wait for the other tracking to complete before starting a new one or type in \"end\" to end it prematurely")
+            ChatUtils.userError(
+                "Still tracking sounds, wait for the other tracking to complete before starting a new one, " +
+                    "or type §e/shtracksoundsend end §cto end it prematurely"
+            )
             return
         }
         isRecording = true
