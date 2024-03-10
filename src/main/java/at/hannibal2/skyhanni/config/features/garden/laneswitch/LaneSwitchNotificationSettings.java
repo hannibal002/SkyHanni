@@ -12,12 +12,12 @@ public class LaneSwitchNotificationSettings {
     @Expose
     @ConfigOption(name = "Notification Text", desc = "The text to be displayed as the notification.")
     @ConfigEditorText
-    public String notificationText = "Lane Switch incoming.";
+    public String text = "Lane Switch incoming.";
 
     @ConfigOption(name = "Text Color", desc = "Notification text color. §eIf Chroma is gray, enable Chroma in Chroma settings.")
     @Expose
     @ConfigEditorDropdown
-    public LorenzColor notificationColor = LorenzColor.YELLOW;
+    public LorenzColor color = LorenzColor.YELLOW;
 
     @Expose
     @ConfigOption(name = "Duration", desc = "The time the notification is displayed.")
@@ -26,7 +26,7 @@ public class LaneSwitchNotificationSettings {
         maxValue = 10F,
         minStep = 0.5F
     )
-    public double notificationDuration = 2.5;
+    public double duration = 2.5;
 
     @Expose
     @ConfigOption(name = "Threshold", desc = "How early the notification will be displayed (Seconds before the Lane Switching notification).")
@@ -35,5 +35,5 @@ public class LaneSwitchNotificationSettings {
         maxValue = 10,
         minStep = 1
     )
-    public int notificationThreshold = 5;
+    public int threshold = 5;
 }
