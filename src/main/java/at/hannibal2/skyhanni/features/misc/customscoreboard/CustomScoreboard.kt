@@ -54,7 +54,7 @@ class CustomScoreboard {
     fun onGuiPositionMoved(event: GuiPositionMovedEvent) {
         if (event.guiName == guiName) {
             val alignmentConfig = config.displayConfig.alignment
-            if (alignmentConfig.alignRight || alignmentConfig.alignRight || alignmentConfig.alignCenterVertically) {
+            if (alignmentConfig.alignRight || alignmentConfig.alignCenterVertically) {
                 alignmentConfig.alignRight = false
                 alignmentConfig.alignCenterVertically = false
                 ChatUtils.chat("Disabled Custom Scoreboard auto-alignment.")
