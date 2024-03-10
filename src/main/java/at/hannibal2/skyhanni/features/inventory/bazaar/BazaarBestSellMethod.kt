@@ -48,7 +48,7 @@ class BazaarBestSellMethod {
         if (internalName == null) {
             return "§cUnknown Bazaar item!"
         }
-        var having = InventoryUtils.countItemsInLowerInventory { it.getInternalName() == internalName }
+        var having = InventoryUtils.getAmountOfItemInInventory(internalName)
         lastClickedItem?.let {
             if (it.getInternalName() == internalName) {
                 having += it.stackSize

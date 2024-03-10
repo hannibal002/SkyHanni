@@ -340,6 +340,7 @@ data class SackItem(
 ) {
 
     fun getStatus() = status ?: SackStatus.MISSING
+    fun statusIsCorrectOrAlright() = getStatus().let { it == SackStatus.CORRECT || it == SackStatus.ALRIGHT }
 }
 
 private val gemstoneMap = mapOf(
@@ -355,7 +356,6 @@ private val gemstoneMap = mapOf(
 
 // ideally should be correct but using alright should also be fine unless they sold their whole sacks
 enum class SackStatus {
-
     MISSING,
     CORRECT,
     ALRIGHT,
