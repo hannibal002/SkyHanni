@@ -11,7 +11,8 @@ import io.github.moulberry.moulconfig.annotations.ConfigOption;
 public class TotemOfCorruptionConfig {
 
     @Expose
-    @ConfigOption(name = "Show Overlay", desc = "Show the Totem of Corruption overlay.")
+    @ConfigOption(name = "Show Overlay", desc = "Show the Totem of Corruption overlay." +
+        "\nShows the totem, in which effective area you are in, with the longest time left.")
     @ConfigEditorBoolean
     @FeatureToggle
     public boolean showOverlay = true;
