@@ -1,5 +1,6 @@
 package at.hannibal2.skyhanni.features.garden.farming
 
+import at.hannibal2.skyhanni.config.features.garden.laneswitch.LaneSwitchNotificationSettings
 import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.LorenzTickEvent
 import at.hannibal2.skyhanni.features.garden.GardenAPI
@@ -98,10 +99,10 @@ class LaneSwitchNotification {
         ;
     }
 
-    private fun getFarmBounds(plotIndex: Int, currentPosition: LorenzVec, lastPosition: LorenzVec): List<LorenzVec>? {
+    private fun getFarmBounds(plotIndex: Int, current: LorenzVec, last: LorenzVec): List<LorenzVec>? {
         if (plots[plotIndex].isBarn() || plotIndex == 12) return null
-        val xVelocity = currentPosition.x - lastPosition.x
-        val zVelocity = currentPosition.z - lastPosition.z
+        val xVelocity = current.x - last.x
+        val zVelocity = current.z - last.z
         return if (xVelocity.absoluteValue > zVelocity.absoluteValue) {
             var xValueMin = 0.0
             var xValueMax = 0.0
@@ -117,8 +118,8 @@ class LaneSwitchNotification {
                 }
             }
 
-            val a = LorenzVec(xValueMin, currentPosition.y, currentPosition.z)
-            val b = LorenzVec(xValueMax, currentPosition.y, currentPosition.z)
+            val a = LorenzVec(xValueMin, current.y, current.z)
+            val b = LorenzVec(xValueMax, current.y, current.z)
             listOf(a, b)
         } else if (xVelocity.absoluteValue < zVelocity.absoluteValue) {
             // i * 5 because going vertically is always 5 plots before or after the current
@@ -136,8 +137,8 @@ class LaneSwitchNotification {
                 }
             }
 
-            val a = LorenzVec(currentPosition.x, currentPosition.y, zValueTop)
-            val b = LorenzVec(currentPosition.x, currentPosition.y, zValueBottom)
+            val a = LorenzVec(current.x, current.y, zValueTop)
+            val b = LorenzVec(current.x, current.y, zValueBottom)
             listOf(a, b)
         } else null
     }
@@ -157,6 +158,16 @@ class LaneSwitchNotification {
         bps = LocationUtils.distanceFromPreviousTick()
         distancesUntilSwitch = farmEnd.map { end -> end.distance(positon).round(2) }
 
+        testForLaneSwitch(settings, farmLength, farmEnd, positon)
+        lastBps = bps
+    }
+
+    private fun testForLaneSwitch(
+        settings: LaneSwitchNotificationSettings,
+        farmLength: Double,
+        farmEnd: List<LorenzVec>,
+        positon: LorenzVec,
+    ) {
         // farmLength / bps to get the time needed to travel the distance, - the threshold times the farm length divided by the length of 2 plots (to give some room)
         val threshold = settings.threshold
         // TODO find a name for this variable
@@ -164,16 +175,14 @@ class LaneSwitchNotification {
         val farmTraverseTime = ((farmLength / bps) - findVariableName).seconds
         val bpsDifference = (bps - lastBps).absoluteValue
 
-        if (farmEnd.isNotEmpty() && lastLaneSwitch.passedSince() >= farmTraverseTime && bpsDifference <= 20) {
-            if (farmEnd.any { switchPossibleInTime(positon, it, bps, threshold) }) {
-                with(settings) {
-                    sendTitle(color.getChatColor() + text, duration.seconds)
-                }
-                playUserSound()
-                lastLaneSwitch = SimpleTimeMark.now()
-            }
+        if (farmEnd.isEmpty() || lastLaneSwitch.passedSince() < farmTraverseTime || bpsDifference > 20) return
+        if (!farmEnd.any { switchPossibleInTime(positon, it, bps, threshold) }) return
+
+        with(settings) {
+            sendTitle(color.getChatColor() + text, duration.seconds)
         }
-        lastBps = bps
+        playUserSound()
+        lastLaneSwitch = SimpleTimeMark.now()
     }
 
     @SubscribeEvent
