@@ -114,5 +114,5 @@ public class DebugConfig {
     public boolean currentAreaDebug = true;
 
     @Expose
-    public Position trackSoundLog = new Position(0, 0);
+    public Position trackSoundPosition = new Position(0, 0);
 }

@@ -11,6 +11,10 @@ class PlaySoundEvent(val soundName: String, val location: LorenzVec, val pitch: 
 
     val distanceToPlayer by lazy { location.distanceToPlayer() }
     override fun toString(): String {
-        return "PlaySoundEvent(soundName='$soundName', pitch=$pitch, volume=$volume, location=$location, distanceToPlayer=${distanceToPlayer.round(1)})"
+        return "PlaySoundEvent(soundName='$soundName', pitch=$pitch, volume=$volume, location=${location.round(1)}, distanceToPlayer=${
+            distanceToPlayer.round(
+                1
+            )
+        })"
     }
 }
