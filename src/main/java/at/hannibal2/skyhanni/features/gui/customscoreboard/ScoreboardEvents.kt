@@ -441,7 +441,7 @@ private fun getMiningEventsLines() = buildList {
 }
 
 private fun getMiningEventsShowWhen(): Boolean {
-    return inMiningIsland()
+    return inAdvancedMiningIsland()
 }
 
 private fun getDamageLines(): List<String> {
