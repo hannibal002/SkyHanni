@@ -583,9 +583,10 @@ private fun getPartyDisplayPair() =
 private fun getPartyShowWhen() = if (inDungeons) {
     false // Hidden bc the scoreboard lines already exist
 } else {
-    when (config.partyConfig.showPartyEverywhere) {
-        true -> true
-        false -> inAnyIsland(
+    if (config.partyConfig.showPartyEverywhere) {
+        true
+    } else {
+        inAnyIsland(
             IslandType.DUNGEON_HUB,
             IslandType.KUUDRA_ARENA,
             IslandType.CRIMSON_ISLE
