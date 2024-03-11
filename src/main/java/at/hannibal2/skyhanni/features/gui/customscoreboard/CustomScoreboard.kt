@@ -12,6 +12,7 @@
 //  - shorten time till next mayor https://discord.com/channels/997079228510117908/1162844830360146080/1216440046320746596
 //  - option to hide coins earned
 //  - color options in the purse etc lines
+//  - choose the amount of decimal places in shorten nums
 //
 
 package at.hannibal2.skyhanni.features.gui.customscoreboard
