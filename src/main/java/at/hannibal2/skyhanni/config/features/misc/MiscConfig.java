@@ -251,9 +251,6 @@ public class MiscConfig {
     public Position inventoryLoadPos = new Position(394, 124, false, true);
 
     @Expose
-    public int limboTimePB = 0;
-
-    @Expose
     @ConfigOption(name = "Fix Ghost Entities", desc = "Removes ghost entities caused by a Hypixel bug. " +
         "This included Diana, Dungeon and Crimson Isle mobs and nametags.")
     @ConfigEditorBoolean

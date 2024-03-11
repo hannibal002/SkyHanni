@@ -21,6 +21,7 @@ object ErrorManager {
         "at at.hannibal2.skyhanni.config.commands.Commands\$createCommand",
         "at net.minecraftforge.fml.common.eventhandler.EventBus.post",
         "at at.hannibal2.skyhanni.mixins.hooks.NetHandlerPlayClientHookKt.onSendPacket",
+        "at net.minecraft.client.main.Main.main",
     )
 
     private val replace = mapOf(

@@ -97,7 +97,7 @@ class AnitaMedalProfit {
         if (itemPrice < 0) return
 
         val profit = itemPrice - fullCost
-        val format = NumberUtil.format(profit)
+        val profitFormat = NumberUtil.format(profit)
         val color = if (profit > 0) "§6" else "§c"
 
         val hover = listOf(
@@ -106,9 +106,9 @@ class AnitaMedalProfit {
             "§7Item price: §6${NumberUtil.format(itemPrice)} ",
             // TODO add more exact material cost breakdown
             "§7Material cost: §6${NumberUtil.format(fullCost)} ",
-            "§7Final profit: §6${NumberUtil.format(profit)} ",
+            "§7Final profit: §6${profitFormat} ",
         )
-        table.add(DisplayTableEntry(itemName, "$color$format", profit, internalName, hover, highlightsOnHoverSlots = listOf(slot)))
+        table.add(DisplayTableEntry(itemName, "$color$profitFormat", profit, internalName, hover, highlightsOnHoverSlots = listOf(slot)))
     }
 
     private fun getItemName(item: ItemStack): String? {

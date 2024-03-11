@@ -47,4 +47,10 @@ public class PartyFinderConfig {
     @ConfigEditorBoolean
     @FeatureToggle
     public boolean markMissingClass = true;
+
+    @Expose
+    @ConfigOption(name = "Show Missing Classes", desc = "Show missing classes in a party in the tooltip.")
+    @ConfigEditorBoolean
+    @FeatureToggle
+    public boolean showMissingClasses = true;
 }
