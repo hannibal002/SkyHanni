@@ -54,7 +54,7 @@ object QuiverAPI {
     const val MAX_ARROW_AMOUNT = 2880
     private val SKELETON_MASTER_CHESTPLATE = "SKELETON_MASTER_CHESTPLATE".asInternalName()
 
-    private var NONE_ARROW_TYPE: ArrowType? = null
+    var NONE_ARROW_TYPE: ArrowType? = null
     private var FLINT_ARROW_TYPE: ArrowType? = null
 
     private val group = RepoPattern.group("data.quiver")
