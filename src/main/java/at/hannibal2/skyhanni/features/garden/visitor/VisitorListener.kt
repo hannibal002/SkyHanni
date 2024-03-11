@@ -12,6 +12,8 @@ import at.hannibal2.skyhanni.events.garden.visitor.VisitorOpenEvent
 import at.hannibal2.skyhanni.events.garden.visitor.VisitorRenderEvent
 import at.hannibal2.skyhanni.events.garden.visitor.VisitorToolTipEvent
 import at.hannibal2.skyhanni.features.garden.GardenAPI
+import at.hannibal2.skyhanni.features.garden.visitor.VisitorAPI.ACCEPT_SLOT
+import at.hannibal2.skyhanni.features.garden.visitor.VisitorAPI.INFO_SLOT
 import at.hannibal2.skyhanni.features.garden.visitor.VisitorAPI.lastClickedNpc
 import at.hannibal2.skyhanni.mixins.transformers.gui.AccessorGuiContainer
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
@@ -21,7 +23,9 @@ import at.hannibal2.skyhanni.utils.LocationUtils.distanceToPlayer
 import at.hannibal2.skyhanni.utils.LorenzLogger
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.RenderUtils.exactLocation
+import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
+import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraft.client.Minecraft
 import net.minecraft.client.gui.inventory.GuiContainer
 import net.minecraft.entity.item.EntityArmorStand
@@ -34,15 +38,12 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 private val config get() = VisitorAPI.config
 
 class VisitorListener {
+    private val offersAcceptedPattern by RepoPattern.pattern(
+        "garden.visitor.offersaccepted",
+        "§7Offers Accepted: §a(?<offersAccepted>\\d+)"
+    )
 
     private val logger = LorenzLogger("garden/visitors/listener")
-
-    companion object {
-
-        private const val INFO_SLOT = 13
-        private const val ACCEPT_SLOT = 29
-        private const val REFUSE_SLOT = 33
-    }
 
     @SubscribeEvent
     fun onPreProfileSwitch(event: PreProfileSwitchEvent) {
@@ -103,6 +104,7 @@ class VisitorListener {
 
         val visitor = VisitorAPI.getOrCreateVisitor(name) ?: return
 
+        visitor.offersAccepted = offersAcceptedPattern.matchMatcher(lore[3]) { group("offersAccepted").toInt() }
         visitor.entityId = lastClickedNpc
         visitor.offer = visitorOffer
         VisitorOpenEvent(visitor).postAndCatch()

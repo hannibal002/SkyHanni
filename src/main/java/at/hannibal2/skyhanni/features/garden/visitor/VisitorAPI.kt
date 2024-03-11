@@ -24,6 +24,10 @@ object VisitorAPI {
     val config get() = GardenAPI.config.visitors
     private val logger = LorenzLogger("garden/visitors/api")
 
+    const val INFO_SLOT = 13
+    const val ACCEPT_SLOT = 29
+    const val REFUSE_SLOT = 33
+
     fun getVisitorsMap() = visitors
     fun getVisitors() = visitors.values
     fun getVisitor(id: Int) = visitors.map { it.value }.find { it.entityId == id }
@@ -114,7 +118,8 @@ object VisitorAPI {
         val shoppingList: MutableMap<NEUInternalName, Int> = mutableMapOf(),
         var offer: VisitorOffer? = null,
     ) {
-        var pricePerCopper: Int = -1
+        var offersAccepted: Int? = null
+        var pricePerCopper: Int? = null
         var lore: List<String> = emptyList()
         var allRewards = listOf<NEUInternalName>()
         var lastLore = listOf<String>()
