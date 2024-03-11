@@ -214,9 +214,10 @@ enum class ScoreboardElement(
 }
 
 
-private fun getTitleDisplayPair() = when (displayConfig.titleAndFooter.useHypixelTitleAnimation) {
-    true -> listOf(ScoreboardData.objectiveTitle to displayConfig.titleAndFooter.alignTitleAndFooter)
-    false -> listOf(
+private fun getTitleDisplayPair() = if (displayConfig.titleAndFooter.useHypixelTitleAnimation) {
+    listOf(ScoreboardData.objectiveTitle to displayConfig.titleAndFooter.alignTitleAndFooter)
+} else {
+    listOf(
         displayConfig.titleAndFooter.customTitle.get().toString()
             .replace("&", "§") to displayConfig.titleAndFooter.alignTitleAndFooter
     )
@@ -422,13 +423,12 @@ private fun getPowerDisplayPair() = listOf(
     when (MaxwellAPI.currentPower) {
         null -> "§cOpen \"Your Bags\"!"
         else ->
-            when (displayConfig.displayNumbersFirst) {
-                true -> "${MaxwellAPI.currentPower?.replace("Power", "")} Power " +
+            if (displayConfig.displayNumbersFirst) {
+                "${MaxwellAPI.currentPower?.replace("Power", "")} Power " +
                     "§7(§6${MaxwellAPI.magicalPower}§7)"
-
-                false ->
-                    "Power: ${MaxwellAPI.currentPower?.replace("Power", "")} " +
-                        "§7(§6${MaxwellAPI.magicalPower?.addSeparators()}§7)"
+            } else {
+                "Power: ${MaxwellAPI.currentPower?.replace("Power", "")} " +
+                    "§7(§6${MaxwellAPI.magicalPower?.addSeparators()}§7)"
             }
     } to HorizontalAlignment.LEFT
 )
@@ -506,9 +506,10 @@ private fun getQuiverDisplayPair(): List<ScoreboardElementType> {
     }
 
     return listOf(
-        when (displayConfig.displayNumbersFirst) {
-            true -> "$amountString ${QuiverAPI.currentArrow?.arrow}s"
-            false -> "${QuiverAPI.currentArrow?.arrow?.replace(" Arrow", "")}: $amountString Arrows"
+        if (displayConfig.displayNumbersFirst) {
+            "$amountString ${QuiverAPI.currentArrow?.arrow}s"
+        } else {
+            "${ QuiverAPI.currentArrow?.arrow?.replace(" Arrow", "") }: $amountString Arrows"
         } to HorizontalAlignment.LEFT
     )
 }
