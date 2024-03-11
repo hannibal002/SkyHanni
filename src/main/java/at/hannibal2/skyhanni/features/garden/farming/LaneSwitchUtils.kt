@@ -88,7 +88,7 @@ object LaneSwitchUtils {
             val isNextUnlocked: Boolean
             val isNextBarn: Boolean
 
-            if (value == Value.MAX) {
+            if (value == Value.TOP) {
                 if (plotIndex - 1 == -1 || (plotIndex - 5) < 0) return true // check if next plot is out of bounds
                 isNextUnlocked = GardenPlotAPI.plots[plotIndex - 5].unlocked
                 isNextBarn = GardenPlotAPI.plots[plotIndex - 5].isBarn()
