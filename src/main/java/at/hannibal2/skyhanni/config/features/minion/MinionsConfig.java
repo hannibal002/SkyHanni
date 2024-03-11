@@ -33,6 +33,7 @@ public class MinionsConfig {
     @Expose
     @ConfigOption(name = "Hopper Profit Display", desc = "Use the hopper's held coins and the last empty time to calculate the coins per day.")
     @ConfigEditorBoolean
+    @FeatureToggle
     public boolean hopperProfitDisplay = true;
 
     @Expose

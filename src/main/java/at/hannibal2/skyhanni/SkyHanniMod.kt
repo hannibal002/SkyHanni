@@ -66,6 +66,7 @@ import at.hannibal2.skyhanni.features.chat.ChatFilter
 import at.hannibal2.skyhanni.features.chat.CompactBestiaryChatMessage
 import at.hannibal2.skyhanni.features.chat.CompactSplashPotionMessage
 import at.hannibal2.skyhanni.features.chat.PlayerDeathMessages
+import at.hannibal2.skyhanni.features.chat.RareDropMessages
 import at.hannibal2.skyhanni.features.chat.SkyblockXPInChat
 import at.hannibal2.skyhanni.features.chat.Translator
 import at.hannibal2.skyhanni.features.chat.WatchdogHider
@@ -181,6 +182,7 @@ import at.hannibal2.skyhanni.features.garden.farming.GardenCropMilestoneDisplay
 import at.hannibal2.skyhanni.features.garden.farming.GardenCropSpeed
 import at.hannibal2.skyhanni.features.garden.farming.GardenCustomKeybinds
 import at.hannibal2.skyhanni.features.garden.farming.GardenStartLocation
+import at.hannibal2.skyhanni.features.garden.farming.LaneSwitchNotification
 import at.hannibal2.skyhanni.features.garden.farming.WildStrawberryDyeNotification
 import at.hannibal2.skyhanni.features.garden.farming.WrongFungiCutterWarning
 import at.hannibal2.skyhanni.features.garden.fortuneguide.CaptureFarmingGear
@@ -238,6 +240,7 @@ import at.hannibal2.skyhanni.features.mining.DeepCavernsParkour
 import at.hannibal2.skyhanni.features.mining.HighlightMiningCommissionMobs
 import at.hannibal2.skyhanni.features.mining.KingTalismanHelper
 import at.hannibal2.skyhanni.features.mining.crystalhollows.CrystalHollowsNamesInCore
+import at.hannibal2.skyhanni.features.mining.eventtracker.MiningEventDisplay
 import at.hannibal2.skyhanni.features.mining.eventtracker.MiningEventTracker
 import at.hannibal2.skyhanni.features.mining.powdertracker.PowderTracker
 import at.hannibal2.skyhanni.features.minion.InfernoMinionFeatures
@@ -365,6 +368,7 @@ import at.hannibal2.skyhanni.test.TestExportTools
 import at.hannibal2.skyhanni.test.TestShowSlotNumber
 import at.hannibal2.skyhanni.test.WorldEdit
 import at.hannibal2.skyhanni.test.command.CopyNearbyParticlesCommand
+import at.hannibal2.skyhanni.test.command.TrackSoundsCommand
 import at.hannibal2.skyhanni.test.hotswap.HotswapSupport
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.EntityOutlineRenderer
@@ -398,7 +402,7 @@ import org.apache.logging.log4j.Logger
     clientSideOnly = true,
     useMetadata = true,
     guiFactory = "at.hannibal2.skyhanni.config.ConfigGuiForgeInterop",
-    version = "0.24.Beta.8",
+    version = "0.24.Beta.9",
 )
 class SkyHanniMod {
 
@@ -618,6 +622,7 @@ class SkyHanniMod {
         loadModule(GardenNextJacobContest)
         loadModule(WrongFungiCutterWarning())
         loadModule(ArmorDropTracker)
+        loadModule(LaneSwitchNotification())
         loadModule(JoinCrystalHollows())
         loadModule(CrystalHollowsNamesInCore())
         loadModule(GardenVisitorColorNames)
@@ -677,6 +682,7 @@ class SkyHanniMod {
         loadModule(ArachneChatMessageHider())
         loadModule(ShowItemUuid())
         loadModule(FrozenTreasureTracker)
+        loadModule(MiningEventDisplay)
         loadModule(SlayerRngMeterDisplay())
         loadModule(GhostCounter)
         loadModule(RiftTimer())
@@ -765,6 +771,7 @@ class SkyHanniMod {
         loadModule(SuperCraftFeatures())
         loadModule(InfernoMinionFeatures())
         loadModule(LimboPlaytime())
+        loadModule(RareDropMessages())
         loadModule(CraftMaterialsFromBazaar())
 
         init()
@@ -773,6 +780,7 @@ class SkyHanniMod {
         loadModule(SkyHanniDebugsAndTests())
         loadModule(FixGhostEntities)
         loadModule(CopyNearbyParticlesCommand)
+        loadModule(TrackSoundsCommand)
         loadModule(ButtonOnPause())
         loadModule(PacketTest)
         loadModule(TestBingo)
