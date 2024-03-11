@@ -7,6 +7,7 @@ import at.hannibal2.skyhanni.events.InventoryFullyOpenedEvent
 import at.hannibal2.skyhanni.events.LorenzChatEvent
 import at.hannibal2.skyhanni.events.PlaySoundEvent
 import at.hannibal2.skyhanni.events.RepositoryReloadEvent
+import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.CollectionUtils.addOrPut
 import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.ItemCategory
@@ -33,7 +34,7 @@ private var infinityQuiverLevelMultiplier = 0.03f
 object QuiverAPI {
     private val storage get() = ProfileStorageData.profileSpecific
     var currentArrow: ArrowType?
-        get() =  storage?.arrows?.currentArrow?.asInternalName()?.let{ getArrowByNameOrNull(it) } ?: NONE_ARROW_TYPE
+        get() = storage?.arrows?.currentArrow?.asInternalName()?.let { getArrowByNameOrNull(it) } ?: NONE_ARROW_TYPE
         set(value) {
             storage?.arrows?.currentArrow = value?.toString() ?: return
         }
@@ -84,15 +85,25 @@ object QuiverAPI {
         val message = event.message.trimWhiteSpace().removeResets()
 
         selectPattern.matchMatcher(message) {
-            val arrow = group("arrow")
-            currentArrow = getArrowByNameOrNull(arrow) ?: return
+            val type = group("arrow")
+            currentArrow = getArrowByNameOrNull(type)
+                ?: return ErrorManager.logErrorWithData(
+                    UnknownArrowType("Unknown arrow type: $type"),
+                    "Unknown arrow type: $type",
+                    "message" to message,
+                )
             return
         }
 
         fillUpJaxPattern.matchMatcher(message) {
             val type = group("type")
             val amount = group("amount").formatNumber().toFloat()
-            val filledUpType = getArrowByNameOrNull(type) ?: return
+            val filledUpType = getArrowByNameOrNull(type)
+                ?: return ErrorManager.logErrorWithData(
+                    UnknownArrowType("Unknown arrow type: $type"),
+                    "Unknown arrow type: $type",
+                    "message" to message,
+                )
 
             arrowAmount.addOrPut(filledUpType.internalName, amount)
             return
@@ -109,7 +120,12 @@ object QuiverAPI {
             val type = group("type")
             val amount = group("amount").formatNumber().toFloat()
 
-            val filledUpType = getArrowByNameOrNull(type) ?: return
+            val filledUpType = getArrowByNameOrNull(type)
+                ?: return ErrorManager.logErrorWithData(
+                    UnknownArrowType("Unknown arrow type: $type"),
+                    "Unknown arrow type: $type",
+                    "message" to message,
+                )
 
             arrowAmount.addOrPut(filledUpType.internalName, amount)
             return
@@ -235,4 +251,6 @@ object QuiverAPI {
         NONE_ARROW_TYPE = getArrowByNameOrNull("NONE".asInternalName())
         FLINT_ARROW_TYPE = getArrowByNameOrNull("FLINT".asInternalName())
     }
+
+    class UnknownArrowType(message: String) : Exception(message)
 }
