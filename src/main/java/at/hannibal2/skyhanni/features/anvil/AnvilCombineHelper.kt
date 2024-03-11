@@ -30,7 +30,7 @@ class AnvilCombineHelper {
 
         for ((slot, stack) in chest.getUpperItems()) {
             if (slot.slotNumber == 29) {
-                val lore = slot.stack.getLore()
+                val lore = stack.getLore()
                 matchLore.addAll(lore)
                 break
             }
@@ -39,7 +39,7 @@ class AnvilCombineHelper {
         if (matchLore.isEmpty()) return
 
         for ((slot, stack) in chest.getLowerItems()) {
-            if (matchLore == slot.stack.getLore()) {
+            if (matchLore == stack.getLore()) {
                 slot highlight LorenzColor.GREEN
             }
         }

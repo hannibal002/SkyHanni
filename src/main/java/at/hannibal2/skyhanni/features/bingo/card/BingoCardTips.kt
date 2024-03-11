@@ -84,7 +84,7 @@ class BingoCardTips {
 
         val guiChest = event.gui
         val chest = guiChest.inventorySlots as ContainerChest
-        for ((slot, stack) in chest.getAllItems()) {
+        for ((slot, _) in chest.getAllItems()) {
             val goal = BingoAPI.bingoGoals[slot.slotNumber] ?: continue
             if (config.hideDoneDifficulty && goal.done) continue
 

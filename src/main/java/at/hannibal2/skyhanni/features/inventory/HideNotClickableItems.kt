@@ -97,14 +97,14 @@ class HideNotClickableItems {
         val chest = guiChest.inventorySlots as ContainerChest
         val chestName = chest.getInventoryName()
 
-        for ((slot, stack) in chest.getLowerItems()) {
-            if (hide(chestName, slot.stack)) {
+        for ((_, stack) in chest.getLowerItems()) {
+            if (hide(chestName, stack)) {
                 val opacity = config.opacity
                 val color = LorenzColor.DARK_GRAY.addOpacity(opacity)
-                slot.stack.background = color.rgb
+                stack.background = color.rgb
             } else if (reverseColor && config.itemsGreenLine) {
                 val color = LorenzColor.GREEN.addOpacity(200)
-                slot.stack.borderLine = color.rgb
+                stack.borderLine = color.rgb
             }
         }
     }

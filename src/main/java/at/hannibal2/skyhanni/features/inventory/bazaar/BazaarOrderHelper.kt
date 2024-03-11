@@ -55,7 +55,6 @@ class BazaarOrderHelper {
         if (!isBazaarOrderInventory(inventoryName)) return
 
         for ((slot, stack) in chest.getUpperItems()) {
-
             bazaarItemNamePattern.matchMatcher(stack.name) {
                 val buyOrSell = group("type").let { (it == "BUY") to (it == "SELL") }
                 if (buyOrSell.let { !it.first && !it.second }) return

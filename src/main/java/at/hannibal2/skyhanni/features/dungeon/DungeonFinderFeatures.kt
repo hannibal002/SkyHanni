@@ -103,15 +103,15 @@ class DungeonFinderFeatures {
         if (inventoryName != "Party Finder") return
 
         for ((slot, stack) in chest.getUpperItems()) {
-            if (!slot.stack.name.endsWith(" Party")) continue
+            if (!stack.name.endsWith(" Party")) continue
 
-            if (config.markIneligibleGroups && slot.stack.getLore().any { ineligiblePattern.matches(it) }) {
+            if (config.markIneligibleGroups && stack.getLore().any { ineligiblePattern.matches(it) }) {
                 slot highlight LorenzColor.DARK_RED
                 continue
             }
 
             if (config.markPaidCarries) {
-                val note = slot.stack.getLore().filter { notePattern.containsMatchIn(it) }.joinToString(" ")
+                val note = stack.getLore().filter { notePattern.containsMatchIn(it) }.joinToString(" ")
 
                 if (pricePattern.containsMatchIn(note) && carryPattern.containsMatchIn(note)) {
                     slot highlight LorenzColor.RED
