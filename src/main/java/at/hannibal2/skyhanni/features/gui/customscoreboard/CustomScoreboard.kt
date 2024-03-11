@@ -73,6 +73,9 @@ class CustomScoreboard {
         // Creating the lines
         if (event.isMod(5)) {
             display = createLines()
+            if(TabListData.fullyLoaded){
+               cache = display.toList()
+            }
         }
 
         // Remove Known Lines, so we can get the unknown ones
