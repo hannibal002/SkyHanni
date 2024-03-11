@@ -45,13 +45,12 @@ class CustomScoreboard {
 
         RenderBackground().renderBackground()
 
-        if (!TabListData.fullyLoaded && config.displayConfig.cacheScoreboardOnIslandSwitch && cache.isNotEmpty()) {
-            config.position.renderStringsAlignedWidth(cache, posLabel = guiName)
+        val render = if (!TabListData.fullyLoaded && config.displayConfig.cacheScoreboardOnIslandSwitch && cache.isNotEmpty()) {
+            cache
         } else {
-            config.position.renderStringsAlignedWidth(display, posLabel = guiName)
-
-            if (cache != display) cache = display
+            display
         }
+        config.position.renderStringsAlignedWidth(render, posLabel = guiName)
     }
 
     @SubscribeEvent
