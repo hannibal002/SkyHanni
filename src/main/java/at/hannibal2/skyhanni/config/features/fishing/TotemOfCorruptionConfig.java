@@ -42,5 +42,11 @@ public class TotemOfCorruptionConfig {
     public String color = "0:153:18:159:85";
 
     @Expose
+    @ConfigOption(name = "Warn when about to expire", desc = "Select the time in seconds when the totem is about to expire to warn you." +
+        "\nSelect 0 to disable.")
+    @ConfigEditorSlider(minValue = 0, maxValue = 60, minStep = 1)
+    public int warnWhenAboutToExpire = 5;
+
+    @Expose
     public Position position = new Position(50, 20, false, true);
 }

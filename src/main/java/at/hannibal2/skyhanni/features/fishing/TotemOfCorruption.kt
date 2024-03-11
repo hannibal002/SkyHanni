@@ -8,8 +8,10 @@ import at.hannibal2.skyhanni.events.ReceiveParticleEvent
 import at.hannibal2.skyhanni.utils.EntityUtils
 import at.hannibal2.skyhanni.utils.LocationUtils.distanceToPlayer
 import at.hannibal2.skyhanni.utils.LorenzUtils
+import at.hannibal2.skyhanni.utils.LorenzUtils.sendTitle
 import at.hannibal2.skyhanni.utils.RenderUtils
 import at.hannibal2.skyhanni.utils.RenderUtils.renderStrings
+import at.hannibal2.skyhanni.utils.SoundUtils.playPlingSound
 import at.hannibal2.skyhanni.utils.SpecialColour
 import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.StringUtils.matches
@@ -19,6 +21,7 @@ import net.minecraft.entity.item.EntityArmorStand
 import net.minecraft.util.EnumParticleTypes
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import java.awt.Color
+import kotlin.time.Duration.Companion.seconds
 
 private val config get() = SkyHanniMod.feature.fishing.totemOfCorruption
 
@@ -48,13 +51,19 @@ class TotemOfCorruption {
 
     @SubscribeEvent
     fun onTick(event: LorenzTickEvent) {
+        if (event.repeatSeconds(1)) return
         if (!isOverlayEnabled()) return
+
         totems = getTotems()
             .filterNotNull()
             .mapNotNull { totem ->
                 val timeRemaining = getTimeRemaining(totem)
                 val owner = getOwner(totem)
                 if (timeRemaining != null && owner != null) {
+                    if (timeRemaining <= config.warnWhenAboutToExpire && config.warnWhenAboutToExpire > 0) {
+                        playPlingSound()
+                        sendTitle("§c§lTotem of Corruption §eabout to expire!", 5.seconds)
+                    }
                     Totem(totem, timeRemaining, owner)
                 } else {
                     null
@@ -90,7 +99,7 @@ class TotemOfCorruption {
         }
     }
 
-    private fun getTimeRemaining(totem: EntityArmorStand) =
+    private fun getTimeRemaining(totem: EntityArmorStand): Int? =
         EntityUtils.getEntitiesNearby<EntityArmorStand>(totem.getLorenzVec(), 2.0)
             .firstOrNull { timeRemainingPattern.matches(it.name) }
             ?.let {
@@ -100,7 +109,7 @@ class TotemOfCorruption {
                 }
             }
 
-    private fun getOwner(totem: EntityArmorStand) =
+    private fun getOwner(totem: EntityArmorStand): String? =
         EntityUtils.getEntitiesNearby<EntityArmorStand>(totem.getLorenzVec(), 2.0)
             .firstOrNull { ownerPattern.matches(it.name) }
             ?.let {
