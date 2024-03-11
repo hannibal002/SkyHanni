@@ -439,12 +439,13 @@ private fun getCookieDisplayPair(): List<ScoreboardElementType> {
     val timeLine = CustomScoreboardUtils.getTablistFooter().split("\n")
         .nextAfter("§d§lCookie Buff") ?: "<hidden>"
 
-    return listOf(
-        "§d§lCookie Buff" to HorizontalAlignment.LEFT
-    ) + when (timeLine.contains("Not active")) {
-        true -> listOf(" §7- §cNot active" to HorizontalAlignment.LEFT)
-        false -> listOf(" §7- §e${timeLine.substringAfter("§d§lCookie Buff").trim()}" to HorizontalAlignment.LEFT)
-    }
+return listOf(
+        "§d§lCookie Buff" to HorizontalAlignment.LEFT,
+        if (timeLine.contains("Not active"))
+            " §7- §cNot active" to HorizontalAlignment.LEFT
+        else
+            " §7- §e${timeLine.substringAfter("§d§lCookie Buff").trim()}" to HorizontalAlignment.LEFT
+    )
 }
 
 private fun getCookieShowWhen(): Boolean {
