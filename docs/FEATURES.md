@@ -33,6 +33,7 @@ Use `/sh` or `/skyhanni` to open the SkyHanni config in game.
 + Add tab list fire sale advertisement hider. - nea
 + SkyBlock XP Chat. - Thunderblade73
     + Sends the SkyBlock XP message from the action bar into the chat.
++ Rarity text to pet drop messages. - Empa (https://github.com/hannibal002/SkyHanni/pull/1136)
 
 #### Chat Filter
 
