@@ -52,7 +52,7 @@ object MayorAPI {
     fun onTick(event: LorenzTickEvent) {
         if (!LorenzUtils.onHypixel) return
 
-        if (event.repeatSeconds(3)) {
+        if (event.repeatSeconds(2)) {
             checkHypixelAPI()
             getTimeTillNextMayor()
         }
