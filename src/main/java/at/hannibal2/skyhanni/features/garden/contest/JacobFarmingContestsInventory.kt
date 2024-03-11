@@ -56,10 +56,8 @@ class JacobFarmingContestsInventory {
         for ((slot, item) in event.inventoryItems) {
             if (!item.getLore().any { it.startsWith("§7Your score: §e") }) continue
 
-            val name = item.name!!
-
-            foundEvents.add(name)
-            val time = FarmingContestAPI.getSbTimeFor(name) ?: continue
+            foundEvents.add(item.name)
+            val time = FarmingContestAPI.getSbTimeFor(item.name) ?: continue
             FarmingContestAPI.addContest(time, item)
             if (config.realTime) {
                 readRealTime(time, slot)

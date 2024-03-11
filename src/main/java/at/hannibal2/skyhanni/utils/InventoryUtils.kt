@@ -1,6 +1,7 @@
 package at.hannibal2.skyhanni.utils
 
 import at.hannibal2.skyhanni.test.command.ErrorManager
+import at.hannibal2.skyhanni.utils.ItemUtils.getInternalNameOrNull
 import io.github.moulberry.notenoughupdates.NotEnoughUpdates
 import net.minecraft.client.Minecraft
 import net.minecraft.client.gui.inventory.GuiChest
@@ -65,7 +66,7 @@ object InventoryUtils {
             val booleanField = storage.javaClass.getDeclaredField("enableStorageGUI3")
             booleanField.get(storage) as Boolean
         } catch (e: Throwable) {
-            ErrorManager.logError(e, "Could not read NEU config to determine if the neu storage is emabled.")
+            ErrorManager.logErrorWithData(e, "Could not read NEU config to determine if the neu storage is emabled.")
             false
         }
     }
@@ -74,6 +75,11 @@ object InventoryUtils {
         val screen = Minecraft.getMinecraft().currentScreen as? GuiContainer ?: return false
         return screen.slotUnderMouse.inventory is InventoryPlayer && screen.slotUnderMouse.stack == itemStack
     }
+
+    fun getAmountOfItemInInventory(name: NEUInternalName) =
+        countItemsInLowerInventory { it.getInternalNameOrNull() == name }
+
+    fun isItemInInventory(name: NEUInternalName) = getAmountOfItemInInventory(name) > 0
 
     fun ContainerChest.getUpperItems(): Map<Slot, ItemStack> = buildMap {
         for ((slot, stack) in getAllItems()) {

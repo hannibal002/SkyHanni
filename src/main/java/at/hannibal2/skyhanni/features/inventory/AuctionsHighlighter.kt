@@ -1,6 +1,7 @@
 package at.hannibal2.skyhanni.features.inventory
 
 import at.hannibal2.skyhanni.SkyHanniMod
+import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.events.GuiContainerEvent
 import at.hannibal2.skyhanni.utils.InventoryUtils.getInventoryName
 import at.hannibal2.skyhanni.utils.InventoryUtils.getUpperItems
@@ -9,7 +10,7 @@ import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.LorenzColor
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.NEUItems.getPriceOrNull
-import at.hannibal2.skyhanni.utils.NumberUtil.formatNumber
+import at.hannibal2.skyhanni.utils.NumberUtil.formatLong
 import at.hannibal2.skyhanni.utils.RenderUtils.highlight
 import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
@@ -19,7 +20,7 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
 class AuctionsHighlighter {
 
-    private val config get() = SkyHanniMod.feature.inventory
+    private val config get() = SkyHanniMod.feature.inventory.auctions
 
     private val buyItNowPattern by RepoPattern.pattern(
         "auctions.highlight.buyitnow",
@@ -49,7 +50,7 @@ class AuctionsHighlighter {
             if (config.highlightAuctionsUnderbid) {
                 for (line in lore) {
                     buyItNowPattern.matchMatcher(line) {
-                        val coins = group("coins").formatNumber()
+                        val coins = group("coins").formatLong()
                         stack.getInternalNameOrNull()?.getPriceOrNull()?.let {
                             if (coins > it) {
                                 slot highlight LorenzColor.GOLD
@@ -59,5 +60,11 @@ class AuctionsHighlighter {
                 }
             }
         }
+    }
+
+    @SubscribeEvent
+    fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
+        event.move(25, "inventory.highlightAuctions", "inventory.auctions.highlightAuctions")
+        event.move(25, "inventory.highlightAuctionsUnderbid", "inventory.auctions.highlightAuctionsUnderbid")
     }
 }

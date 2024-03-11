@@ -24,6 +24,17 @@ class QuickCraftFeatures {
     private val quickCraftSlots = listOf(16, 25, 34)
     private var quickCraftableItems = emptyList<String>()
 
+    enum class InventoryType(val inventoryName: String) {
+        CRAFT_ITEM("Craft Item"),
+        MORE_QUICK_CRAFT_OPTIONS("Quick Crafting"),
+        ;
+    }
+
+    private fun InventoryType.ignoreSlot(slotNumber: Int?): Boolean = when (this) {
+        InventoryType.CRAFT_ITEM -> slotNumber !in quickCraftSlots
+        InventoryType.MORE_QUICK_CRAFT_OPTIONS -> slotNumber !in 10..44
+    }
+
     @SubscribeEvent
     fun onRepoReload(event: RepositoryReloadEvent) {
         quickCraftableItems = event.getConstant<List<String>>("QuickCraftableItems")
@@ -31,7 +42,8 @@ class QuickCraftFeatures {
 
     @SubscribeEvent
     fun onToolTip(event: LorenzToolTipEvent) {
-        if (!isEnabled() || !quickCraftSlots.contains(event.slot.slotNumber)) return
+        val inventoryType = getInventoryType() ?: return
+        if (inventoryType.ignoreSlot(event.slot.slotNumber)) return
 
         if (needsQuickCraftConfirmation(event.itemStack)) {
             event.toolTip.replaceAll {
@@ -45,15 +57,14 @@ class QuickCraftFeatures {
 
     @SubscribeEvent
     fun onBackgroundDrawn(event: GuiContainerEvent.BackgroundDrawnEvent) {
-        if (!isEnabled()) return
+        val inventoryType = getInventoryType() ?: return
         if (KeyboardManager.isModifierKeyDown()) return
         if (event.gui !is GuiChest) return
         val chest = event.gui.inventorySlots as ContainerChest
 
         for ((slot, stack) in chest.getAllItems()) {
-            if (slot.slotNumber !in quickCraftSlots) continue
-            val name = stack.name ?: continue
-            if (name == "§cQuick Crafting Slot") continue
+            if (inventoryType.ignoreSlot(slot.slotNumber)) continue
+            if (stack.name == "§cQuick Crafting Slot") continue
             if (needsQuickCraftConfirmation(stack)) {
                 val color = LorenzColor.DARK_GRAY.addOpacity(180)
                 stack.background = color.rgb
@@ -63,10 +74,10 @@ class QuickCraftFeatures {
 
     @SubscribeEvent(priority = EventPriority.HIGH)
     fun onSlotClick(event: GuiContainerEvent.SlotClickEvent) {
-        if (!isEnabled() || !quickCraftSlots.contains(event.slot?.slotNumber)) return
+        val inventoryType = getInventoryType() ?: return
+        if (inventoryType.ignoreSlot(event.slot?.slotNumber)) return
 
         val clickedItem = event.slot?.stack ?: return
-
         if (!KeyboardManager.isModifierKeyDown() && needsQuickCraftConfirmation(clickedItem)) {
             event.isCanceled = true
         }
@@ -76,6 +87,10 @@ class QuickCraftFeatures {
         return !quickCraftableItems.contains(item.displayName.removeColor())
     }
 
-    fun isEnabled() =
-        LorenzUtils.inSkyBlock && config.quickCraftingConfirmation && InventoryUtils.openInventoryName() == "Craft Item"
+    private fun getInventoryType(): InventoryType? {
+        if (!LorenzUtils.inSkyBlock || !config.quickCraftingConfirmation) return null
+
+        val inventoryName = InventoryUtils.openInventoryName()
+        return InventoryType.entries.firstOrNull { it.inventoryName == inventoryName }
+    }
 }

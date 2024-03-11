@@ -5,6 +5,7 @@ import at.hannibal2.skyhanni.events.GuiContainerEvent
 import at.hannibal2.skyhanni.events.InventoryCloseEvent
 import at.hannibal2.skyhanni.events.InventoryFullyOpenedEvent
 import at.hannibal2.skyhanni.events.LorenzToolTipEvent
+import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.ItemUtils.name
@@ -55,7 +56,13 @@ class SkyblockGuideHighlightFeature private constructor(
         loreCondition: RepoPattern,
         onSlotClicked: (GuiContainerEvent.SlotClickEvent) -> Unit = {},
         onTooltip: (LorenzToolTipEvent) -> Unit = {},
-    ) : this(config, patternGroup.pattern("$key.$keyPrefixInventory", inventory), loreCondition, onSlotClicked, onTooltip)
+    ) : this(
+        config,
+        patternGroup.pattern("$key.$keyPrefixInventory", inventory),
+        loreCondition,
+        onSlotClicked,
+        onTooltip
+    )
 
     init {
         objectList.add(this)
@@ -118,7 +125,7 @@ class SkyblockGuideHighlightFeature private constructor(
 
             for ((slot, item) in event.inventoryItems) {
                 if (slot == 4) continue // Overview Item
-                val loreAndName = listOf(item.name ?: "") + item.getLore()
+                val loreAndName = listOf(item.name) + item.getLore()
                 if (!current.conditionPattern.anyMatches(loreAndName)) continue
                 missing.add(slot)
             }
@@ -130,12 +137,15 @@ class SkyblockGuideHighlightFeature private constructor(
         private val totalProgressPattern =
             patternGroup.pattern("$keyPrefixCondition.total", "§7Total Progress: §3\\d{1,2}(?:\\.\\d)?%")
         private val categoryProgressPattern =
-            patternGroup.pattern("$keyPrefixCondition.category", "§7Progress to Complete Category: §6\\d{1,2}(?:\\.\\d)?%")
+            patternGroup.pattern(
+                "$keyPrefixCondition.category",
+                "§7Progress to Complete Category: §6\\d{1,2}(?:\\.\\d)?%"
+            )
 
         private val openWikiOnClick: (GuiContainerEvent.SlotClickEvent) -> Unit = { event ->
             val internalName = event.item?.getInternalName()
             if (internalName != null) {
-                LorenzUtils.sendCommandToServer("wiki ${internalName.asString()}")
+                ChatUtils.sendCommandToServer("wiki ${internalName.asString()}")
             }
         }
 
@@ -165,7 +175,7 @@ class SkyblockGuideHighlightFeature private constructor(
                 "travel",
                 "Core ➜ Fast Travels Unlocked",
                 taskOnlyCompleteOncePattern,
-                { LorenzUtils.sendCommandToServer("wiki MUSEUM_TRAVEL_SCROLL") }, // The items do not have proper internal names and using the fact that all travel scrolls lead to the same wiki page
+                { ChatUtils.sendCommandToServer("wiki MUSEUM_TRAVEL_SCROLL") }, // The items do not have proper internal names and using the fact that all travel scrolls lead to the same wiki page
                 openWikiTooltip
             )
             SkyblockGuideHighlightFeature(
@@ -208,7 +218,12 @@ class SkyblockGuideHighlightFeature private constructor(
                 taskOnlyCompleteOncePattern
             )
             SkyblockGuideHighlightFeature({ skyblockGuideConfig.essenceGuide }, "essence", "Essence Shop ➜.*", xPattern)
-            SkyblockGuideHighlightFeature({ skyblockGuideConfig.minionGuide }, "minion", "Crafted Minions", xPattern)
+            SkyblockGuideHighlightFeature(
+                { skyblockGuideConfig.minionGuide },
+                "minion",
+                "Crafted Minions",
+                "§c ?✖.*|§7You haven't crafted this minion."
+            )
             SkyblockGuideHighlightFeature(
                 { skyblockGuideConfig.storyGuide }, "harp", "Miscellaneous ➜ Harp Songs", xPattern
             )
@@ -239,7 +254,7 @@ class SkyblockGuideHighlightFeature private constructor(
                 { skyblockGuideConfig.collectionGuide },
                 "collections",
                 "\\w+ Collections|Collections",
-                "§7Progress to .*|§7Find this item to add it to your|§7Kill this boss once to view collection|§7Collections Maxed Out: §e.*|§7Boss Collections Unlocked: §e.*"
+                "§7Progress to .*|§7Find this item to add it to your|§7Kill this boss once to view collection|§7(?:Boss )?Collections (?:Unlocked|Maxed Out): §e.*"
             )
         }
     }
