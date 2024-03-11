@@ -479,15 +479,11 @@ private fun getObjectiveShowWhen(): Boolean =
         && ScoreboardData.sidebarLinesFormatted.none { ScoreboardPattern.objectivePattern.matches(it) }
 
 
-private fun getSlayerDisplayPair(): List<ScoreboardElementType> {
-    return listOf(
-        (if (SlayerAPI.hasActiveSlayerQuest()) "Slayer Quest" else "<hidden>") to HorizontalAlignment.LEFT
-    ) + (
-        " §7- §e${SlayerAPI.latestSlayerCategory.trim()}" to HorizontalAlignment.LEFT
-        ) + (
-        " §7- §e${SlayerAPI.latestSlayerProgress.trim()}" to HorizontalAlignment.LEFT
-        )
-}
+private fun getSlayerDisplayPair(): List<ScoreboardElementType> = listOf(
+    (if (SlayerAPI.hasActiveSlayerQuest()) "Slayer Quest" else "<hidden>") to HorizontalAlignment.LEFT,
+    (" §7- §e${SlayerAPI.latestSlayerCategory.trim()}" to HorizontalAlignment.LEFT),
+    (" §7- §e${SlayerAPI.latestSlayerProgress.trim()}" to HorizontalAlignment.LEFT)
+)
 
 // TODO: Redo the Slayer showWhen
 private fun getSlayerShowWhen() = true
