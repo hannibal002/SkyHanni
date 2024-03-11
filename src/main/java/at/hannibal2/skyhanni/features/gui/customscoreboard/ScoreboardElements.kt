@@ -439,7 +439,7 @@ private fun getCookieDisplayPair(): List<ScoreboardElementType> {
     val timeLine = CustomScoreboardUtils.getTablistFooter().split("\n")
         .nextAfter("§d§lCookie Buff") ?: "<hidden>"
 
-return listOf(
+    return listOf(
         "§d§lCookie Buff" to HorizontalAlignment.LEFT,
         if (timeLine.contains("Not active"))
             " §7- §cNot active" to HorizontalAlignment.LEFT
@@ -538,28 +538,28 @@ private fun getPowderDisplayPair(): List<ScoreboardElementType> {
 private fun getPowderShowWhen() = inAdvancedMiningIsland()
 
 private fun getEventsDisplayPair(): List<ScoreboardElementType> {
-   return ScoreboardEvents.getEvent()
-   .flatMap { it.getLines().map { i -> i to HorizontalAlignment.LEFT } }
-   .takeIf{ it.isNotEmpty } ?: listOf("<hidden>" to HorizontalAlignment.LEFT)
+    return ScoreboardEvents.getEvent()
+        .flatMap { it.getLines().map { i -> i to HorizontalAlignment.LEFT } }
+        .takeIf { it.isNotEmpty() } ?: listOf("<hidden>" to HorizontalAlignment.LEFT)
 }
 
 private fun getEventsShowWhen() = ScoreboardEvents.getEvent().isNotEmpty()
 
-private fun getMayorDisplayPair(): List<ScoreboardElementType> {
-    return listOf(
-        (MayorAPI.currentMayor?.mayorName?.let { MayorAPI.mayorNameWithColorCode(it) }
+private fun getMayorDisplayPair() = buildList {
+    add(
+        ((MayorAPI.currentMayor?.mayorName?.let { MayorAPI.mayorNameWithColorCode(it) }
             ?: "<hidden>") +
             (if (config.mayorConfig.showTimeTillNextMayor) {
                 "§7 (§e${MayorAPI.timeTillNextMayor.format()}§7)"
             } else {
                 ""
-            }) to HorizontalAlignment.LEFT
-    ) + (if (config.mayorConfig.showMayorPerks) {
-        MayorAPI.currentMayor?.activePerks?.map { " §7- §e${it.perkName}" to HorizontalAlignment.LEFT }
-            ?: emptyList()
-    } else {
-        emptyList()
-    })
+            })) to HorizontalAlignment.LEFT
+    )
+    if (config.mayorConfig.showMayorPerks) {
+        MayorAPI.currentMayor?.activePerks?.forEach {
+            add(" §7- §e${it.perkName}" to HorizontalAlignment.LEFT)
+        }
+    }
 }
 
 private fun getMayorShowWhen() =

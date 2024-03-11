@@ -45,11 +45,12 @@ class CustomScoreboard {
 
         RenderBackground().renderBackground()
 
-        val render = if (!TabListData.fullyLoaded && config.displayConfig.cacheScoreboardOnIslandSwitch && cache.isNotEmpty()) {
-            cache
-        } else {
-            display
-        }
+        val render =
+            if (!TabListData.fullyLoaded && config.displayConfig.cacheScoreboardOnIslandSwitch && cache.isNotEmpty()) {
+                cache
+            } else {
+                display
+            }
         config.position.renderStringsAlignedWidth(render, posLabel = guiName)
     }
 
@@ -72,8 +73,8 @@ class CustomScoreboard {
         // Creating the lines
         if (event.isMod(5)) {
             display = createLines()
-            if(TabListData.fullyLoaded){
-               cache = display.toList()
+            if (TabListData.fullyLoaded) {
+                cache = display.toList()
             }
         }
 
@@ -111,7 +112,6 @@ class CustomScoreboard {
                 continue
             }
 
-            // Multiline and singular line support
             addAll(line)
         }
     }
