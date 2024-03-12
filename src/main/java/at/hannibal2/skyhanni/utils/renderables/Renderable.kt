@@ -443,31 +443,24 @@ interface Renderable {
 
             private val virtualHeight = list.maxOf { it.height }
 
-            var scroll = 0.0
-            val scrollInt get() = scroll.toInt()
+            private val scroll = RenderableUtils.VerticalScrollInput(
+                0,
+                virtualHeight - height,
+                velocity,
+                button
+            )
 
-            private val end get() = scrollInt + height
-
-            var mouseEventTime = 0L
+            private val end get() = scroll.asInt() + height
 
             override fun render(posX: Int, posY: Int) {
-                val mouseEvent = Mouse.getEventNanoseconds()
-                val mouseEventsValid = mouseEvent - mouseEventTime > 20L
-                mouseEventTime = mouseEvent
-
-                scroll = RenderableUtils.scrollInput(
-                    scroll,
-                    button,
-                    0,
-                    virtualHeight - height,
-                    velocity,
-                    isHovered(posX, posY) && mouseEventsValid
+                scroll.update(
+                    isHovered(posX, posY)
                 )
 
                 var renderY = 0
                 var virtualY = 0
                 list.forEach {
-                    if (virtualY in scrollInt..end) {
+                    if (virtualY in scroll.asInt()..end) {
                         it.renderXAligned(posX, posY + renderY, width)
                         GlStateManager.translate(0f, it.height.toFloat(), 0f)
                         renderY += it.height
@@ -500,27 +493,18 @@ interface Renderable {
 
             private val virtualHeight = yOffsets.last() - yPadding
 
-            private val end get() = scrollInt + height - yPadding - 1// TODO fix the -1 "fix"
-            private val minHeight = if (hasHeader) yOffsets[1] else 0
+            private val end get() = scroll.asInt() + height - yPadding - 1
 
-            var scroll = minHeight.toDouble()
-
-            val scrollInt get() = scroll.toInt()
-
-            var mouseEventTime = 0L
+            private val scroll = RenderableUtils.VerticalScrollInput(
+                if (hasHeader) yOffsets[1] else 0,
+                virtualHeight - height,
+                velocity,
+                button
+            )
 
             override fun render(posX: Int, posY: Int) {
-                val mouseEvent = Mouse.getEventNanoseconds()
-                val mouseEventsValid = mouseEvent - mouseEventTime > 20L
-                mouseEventTime = mouseEvent
-
-                scroll = RenderableUtils.scrollInput(
-                    scroll,
-                    button,
-                    minHeight,
-                    virtualHeight - height,
-                    velocity,
-                    isHovered(posX, posY) && mouseEventsValid
+                scroll.update(
+                    isHovered(posX, posY)
                 )
 
                 var renderY = 0
@@ -540,7 +524,8 @@ interface Renderable {
                     renderY += yShift
                 }
                 val range =
-                    yOffsets.indexOfFirst { it >= scrollInt }..<(yOffsets.indexOfFirst { it >= end }.takeIf { it > 0 }
+                    yOffsets.indexOfFirst { it >= scroll.asInt() }..<(yOffsets.indexOfFirst { it >= end }
+                        .takeIf { it > 0 }
                         ?: yOffsets.size) - 1
                 for (rowIndex in range) {
                     content[rowIndex].forEachIndexed { index, renderable ->
