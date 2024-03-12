@@ -28,6 +28,7 @@ import at.hannibal2.skyhanni.utils.NumberUtil.formatLong
 import at.hannibal2.skyhanni.utils.NumberUtil.formatLongOrUserError
 import at.hannibal2.skyhanni.utils.NumberUtil.romanToDecimalIfNecessary
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
+import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.TabListData
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
@@ -311,17 +312,17 @@ object SkillAPI {
 
     private fun handleSkillPatternPercent(matcher: Matcher, skillType: SkillType) {
         var tablistLevel = 0
-        for (line in TabListData.getTabList()) {
-            var levelMatcher = skillTabPattern.matcher(line)
-            if (levelMatcher.matches()) {
-                tablistLevel = levelMatcher.group("level").toInt()
-                if (levelMatcher.group("type").lowercase() != activeSkill?.lowercaseName) tablistLevel = 0
-            } else {
-                levelMatcher = maxSkillTabPattern.matcher(line)
-                if (levelMatcher.matches()) {
-                    tablistLevel = levelMatcher.group("level").toInt()
-                    if (levelMatcher.group("type").lowercase() != activeSkill?.lowercaseName) tablistLevel = 0
-                }
+        loop@ for (line in TabListData.getTabList()) {
+            skillTabPattern.matchMatcher(line) {
+                val type = group("type")
+                if (type != skillType.displayName) continue@loop
+                tablistLevel = group("level").toInt()
+                if (group("type").lowercase() != activeSkill?.lowercaseName) tablistLevel = 0
+                continue@loop
+            }
+            maxSkillTabPattern.matchMatcher(line) {
+                tablistLevel = group("level").toInt()
+                if (group("type").lowercase() != activeSkill?.lowercaseName) tablistLevel = 0
             }
         }
         val existingLevel = getSkillInfo(skillType) ?: SkillInfo()
