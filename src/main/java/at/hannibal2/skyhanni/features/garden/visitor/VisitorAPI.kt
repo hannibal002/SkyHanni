@@ -168,8 +168,10 @@ object VisitorAPI {
                 logger.log("Ignore wrong own name: '$name'")
                 continue
             }
-
-            visitorsInTab.add(name)
+            val finalName = if (name.endsWith(" §b§lNEW!")) {
+                name.split(" §b§lNEW!")[0]
+            } else name
+            visitorsInTab.add(finalName)
         }
         return visitorsInTab
     }
