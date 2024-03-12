@@ -237,6 +237,7 @@ enum class TabWidget(
 
     fun isEventForThis(event: TabWidgetUpdate) = event.widget == this
 
+    /** Both are inclusive */
     var boundary = -1 to -1
 
     /** Do not get the value inside of [TabWidgetUpdate] since it will be wrong*/
@@ -266,18 +267,22 @@ enum class TabWidget(
             separatorIndexes.forEach {
                 it.second?.activeAfterCheck = false
             }
+
             separatorIndexes.clear()
+
             for ((index, line) in tabList.withIndex()) {
                 val match = entries.firstOrNull { it.pattern.matches(line) }
                     ?: if (extraPatterns.any { it.matches(line) }) null else continue
                 separatorIndexes.add(index to match)
             }
             separatorIndexes.add(tabList.size to null)
+
             separatorIndexes.zipWithNext { (firstIndex, widget), (secondIndex, _) ->
                 widget?.boundary = firstIndex to secondIndex - 1
                 widget?.activeAfterCheck = true
                 widget?.postEvent(tabList.subList(firstIndex, secondIndex).filter { it.isNotEmpty() })
             }
+
             entries.forEach { it.updateIsActive() }
         }
 
@@ -294,14 +299,12 @@ enum class TabWidget(
 
             val removeIndexes = mutableListOf<Int>()
 
-            for ((index, header) in headers) {
-                when {
-                    PLAYER_LIST.pattern.matches(header) -> if (playerListFound) removeIndexes.add(index - removeIndexes.size) else playerListFound =
-                        true
+            for ((index, header) in headers) when {
+                PLAYER_LIST.pattern.matches(header) -> if (playerListFound) removeIndexes.add(index - removeIndexes.size) else playerListFound =
+                    true
 
-                    INFO.pattern.matches(header) -> if (infoFound) removeIndexes.add(index - removeIndexes.size) else infoFound =
-                        true
-                }
+                INFO.pattern.matches(header) -> if (infoFound) removeIndexes.add(index - removeIndexes.size) else infoFound =
+                    true
             }
 
             return tabList.transformIf({ size > 81 }, { dropLast(size - 80) }).editCopy {

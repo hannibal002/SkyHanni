@@ -159,8 +159,7 @@ object RepoPatternManager {
 
     fun getUnusedPatterns(prefix: String): List<Pattern> {
         if (config.forceLocal.get()) return emptyList()
-        val map = regexes?.regexes ?: return emptyList()
-        val matched = map.filterKeys { it.startsWith(prefix) && usedKeys[it] == null }
-        return matched.map { it.value.toPattern() }
+        return regexes?.regexes?.filterKeys { it.startsWith(prefix) && usedKeys[it] == null }
+            ?.map { it.value.toPattern() } ?: emptyList()
     }
 }
