@@ -14,67 +14,215 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 enum class TabWidget(
     pattern0: String
 ) {
-    PLAYER_LIST("(?:§.)*Players (?:§.)*\\(\\d+\\)"),
-    INFO("(?:§.)*Info"),
-    AREA("(?:§.)*(Area|Dungeon): (?:§.)*(?<island>.*)"),
+    PLAYER_LIST(
+        // language=RegExp
+        "(?:§.)*Players (?:§.)*\\(\\d+\\)"
+    ),
+    INFO(
+        // language=RegExp
+        "(?:§.)*Info"
+    ),
+    AREA(
+        // language=RegExp
+        "(?:§.)*(Area|Dungeon): (?:§.)*(?<island>.*)"
+    ),
     SERVER(
+        // language=RegExp
         "Server: (?:§.)*(?<server>.*)"
     ),
-    GEMS("Gems: (?:§.)*(?<gems>.*)"),
-    FAIRY_SOULS("Fairy Souls: (?:§.)*(?<got>\\d+)(?:§.)*\\/(?:§.)*(?<max>\\d+)"),
-    PROFILE("(?:§.)*Profile: (?:§.)*(?<profile>\\S+) .*"),
+    GEMS(
+        // language=RegExp
+        "Gems: (?:§.)*(?<gems>.*)"
+    ),
+    FAIRY_SOULS(
+        // language=RegExp
+        "Fairy Souls: (?:§.)*(?<got>\\d+)(?:§.)*\\/(?:§.)*(?<max>\\d+)"
+    ),
+    PROFILE(
+        // language=RegExp
+        "(?:§.)*Profile: (?:§.)*(?<profile>\\S+) .*"
+    ),
     SB_LEVEL(
+        // language=RegExp
         "SB Level(?:§.)*: (?:§.)*\\[(?:§.)*(?<level>\\d+)(?:§.)*\\] (?:§.)*(?<xp>\\d+).*"
     ),
-    BANK("Bank: (?:§.)*(?<amount>[^§]+)(?:\\(?:§.)*(?:\\/(?:§.)*(?<personal>.*))?"),
-    INTEREST("Interest: (?:§.)*(?<time>[^§]+)(?:§.)* \\((?<amount>[^)]+)\\)"),
-    SOULFLOW("Soulflow: (?:§.)*(?<amount>.*)"),
+    BANK(
+        // language=RegExp
+        "Bank: (?:§.)*(?<amount>[^§]+)(?:\\(?:§.)*(?:\\/(?:§.)*(?<personal>.*))?"
+    ),
+    INTEREST(
+        // language=RegExp
+        "Interest: (?:§.)*(?<time>[^§]+)(?:§.)* \\((?<amount>[^)]+)\\)"
+    ),
+    SOULFLOW(
+        // language=RegExp
+        "Soulflow: (?:§.)*(?<amount>.*)"
+    ),
     PET(
+        // language=RegExp
         "(?:§.)*Pet:"
     ),
-    PET_TRANING("(?:§.)*Pet Training:"),
+    PET_TRANING(
+        // language=RegExp
+        "(?:§.)*Pet Training:"
+    ),
 
-    PET_SITTER("Kat: .*"),
-    FIRE_SALE("(?:§.)*Fire Sales: .*"),
-    ELECTION("(?:§.)*Election: (?:§.)*(?<time>.*)"),
-    EVENT("(?:§.)*Event: (?:§.)*(?<event>.*)"),
+    PET_SITTER(
+        // language=RegExp
+        "Kat: .*"
+    ),
+    FIRE_SALE(
+        // language=RegExp
+        "(?:§.)*Fire Sales: .*"
+    ),
+    ELECTION(
+        // language=RegExp
+        "(?:§.)*Election: (?:§.)*(?<time>.*)"
+    ),
+    EVENT(
+        // language=RegExp
+        "(?:§.)*Event: (?:§.)*(?<event>.*)"
+    ),
     SKILLS(
+        // language=RegExp
         "(?:§.)*Skills: ?(?<avg>.*)"
     ),
-    STATS("(?:§.)*Stats:"),
-    GUESTS("(?:§.)*Guests (?:§.)*.*"),
-    COOP("(?:§.)*Coop (?:§.)*.*"),
-    MINION("(?:§.)*Minions; (?:§.)*(?<used>\\d+)(?:§.)*\\/(?:§.)*(?<max>\\d+)"),
-    JERRY_ISLAND_CLOSING("Island closes in: (?:§.)*(?<time>.*)"),
-    NORTH_STARS("North Stars: (?:§.)*(?<amount>)"),
-    COLLECTION("(?:§.)*Collection:"),
-    JACOB_CONTEST("(?:§.)*Jacob's Contest: .*"),
-    SLAYER("(?:§.)*Slayer:"),
-    DAILY_QUESTS("(?:§.)*Daily Quests:"),
-    ACTIVE_EFFECTS("(?:§.)*Active Effects: (?:§.)*\\((?<amount>\\d+)\\)"),
-    BESTIARY("(?:§.)*Bestiary:"),
-    ESSENCE("(?:§.)*Essence:.*"),
-    FORGE("(?:§.)*Forges:"),
-    TIMERS("(?:§.)*Timers:"),
-    DUNGEON_STATS("(?:§.)*Dungeons:"),
-    PARTY("(?:§.)*Party:.*"),
-    TRAPPER("(?:§.)*Trapper:"),
-    COMMISSIONS("(?:§.)*lCommissions:"),
-    POWDER("(?:§.)*Powders:"),
-    CRYSTAL("(?:§.)*Crystals:"),
-    UNCLAIMED_CHESTS("Unclaimed chests: (?:§.)*(?<amount>\\d+)"),
-    RAIN("(?<type>Thunder|Rain): (?:§.)*(?<time>.*)"),
-    BROODMOTHER("Broodmother: (?:§.)*(?<time>.*)"),
-    EYES_PLACED("Eyes placed: (?:§.)*(?<amount>\\d).*|(?:§.)*Dragon spawned!|(?:§.)*Egg respawning!"),
-    PROTECTOR("Protector: (?:§.)*(?<time>.*)"),
-    DRAGON("(?:§.)*Dragon: (?:§.)*\\((?<type>[^)])\\)"),
-    VOLCANO("Volcano: (?:§.)*(?<time>.*)"),
-    REPUTATION("(?:§.)*(Barbarian|Mage) Reputation:"),
-    FACTION_QUESTS("(?:§.)*Faction Quests:"),
-    TROPHY_FISH("(?:§.)*Trophy Fish:"),
-    RIFT_INFO("(?:§.)*Good to know:"),
-    RIFT_SHEN("(?:§.)*Shen: (?:§.)*\\((?<time>[^)])\\)"),
-    RIFT_BARRY("(?:§.)*Advertisement:"),
+    STATS(
+        // language=RegExp
+        "(?:§.)*Stats:"
+    ),
+    GUESTS(
+        // language=RegExp
+        "(?:§.)*Guests (?:§.)*.*"
+    ),
+    COOP(
+        // language=RegExp
+        "(?:§.)*Coop (?:§.)*.*"
+    ),
+    MINION(
+        // language=RegExp
+        "(?:§.)*Minions; (?:§.)*(?<used>\\d+)(?:§.)*\\/(?:§.)*(?<max>\\d+)"
+    ),
+    JERRY_ISLAND_CLOSING(
+        // language=RegExp
+        "Island closes in: (?:§.)*(?<time>.*)"
+    ),
+    NORTH_STARS(
+        // language=RegExp
+        "North Stars: (?:§.)*(?<amount>\\d+)"
+    ),
+    COLLECTION(
+        // language=RegExp
+        "(?:§.)*Collection:"
+    ),
+    JACOB_CONTEST(
+        // language=RegExp
+        "(?:§.)*Jacob's Contest: .*"
+    ),
+    SLAYER(
+        // language=RegExp
+        "(?:§.)*Slayer:"
+    ),
+    DAILY_QUESTS(
+        // language=RegExp
+        "(?:§.)*Daily Quests:"
+    ),
+    ACTIVE_EFFECTS(
+        // language=RegExp
+        "(?:§.)*Active Effects: (?:§.)*\\((?<amount>\\d+)\\)"
+    ),
+    BESTIARY(
+        // language=RegExp
+        "(?:§.)*Bestiary:"
+    ),
+    ESSENCE(
+        // language=RegExp
+        "(?:§.)*Essence:.*"
+    ),
+    FORGE(
+        // language=RegExp
+        "(?:§.)*Forges:"
+    ),
+    TIMERS(
+        // language=RegExp
+        "(?:§.)*Timers:"
+    ),
+    DUNGEON_STATS(
+        // language=RegExp
+        "(?:§.)*Dungeons:"
+    ),
+    PARTY(
+        // language=RegExp
+        "(?:§.)*Party:.*"
+    ),
+    TRAPPER(
+        // language=RegExp
+        "(?:§.)*Trapper:"
+    ),
+    COMMISSIONS(
+        // language=RegExp
+        "(?:§.)*lCommissions:"
+    ),
+    POWDER(
+        // language=RegExp
+        "(?:§.)*Powders:"
+    ),
+    CRYSTAL(
+        // language=RegExp
+        "(?:§.)*Crystals:"
+    ),
+    UNCLAIMED_CHESTS(
+        // language=RegExp
+        "Unclaimed chests: (?:§.)*(?<amount>\\d+)"
+    ),
+    RAIN(
+        // language=RegExp
+        "(?<type>Thunder|Rain): (?:§.)*(?<time>.*)"
+    ),
+    BROODMOTHER(
+        // language=RegExp
+        "Broodmother: (?:§.)*(?<time>.*)"
+    ),
+    EYES_PLACED(
+        // language=RegExp
+        "Eyes placed: (?:§.)*(?<amount>\\d).*|(?:§.)*Dragon spawned!|(?:§.)*Egg respawning!"
+    ),
+    PROTECTOR(
+        // language=RegExp
+        "Protector: (?:§.)*(?<time>.*)"
+    ),
+    DRAGON(
+        // language=RegExp
+        "(?:§.)*Dragon: (?:§.)*\\((?<type>[^)])\\)"
+    ),
+    VOLCANO(
+        // language=RegExp
+        "Volcano: (?:§.)*(?<time>.*)"
+    ),
+    REPUTATION(
+        // language=RegExp
+        "(?:§.)*(Barbarian|Mage) Reputation:"
+    ),
+    FACTION_QUESTS(
+        // language=RegExp
+        "(?:§.)*Faction Quests:"
+    ),
+    TROPHY_FISH(
+        // language=RegExp
+        "(?:§.)*Trophy Fish:"
+    ),
+    RIFT_INFO(
+        // language=RegExp
+        "(?:§.)*Good to know:"
+    ),
+    RIFT_SHEN(
+        // language=RegExp
+        "(?:§.)*Shen: (?:§.)*\\((?<time>[^)])\\)"
+    ),
+    RIFT_BARRY(
+        // language=RegExp
+        "(?:§.)*Advertisement:"
+    ),
 
     ;
 
