@@ -15,6 +15,7 @@ import at.hannibal2.skyhanni.utils.RenderUtils.renderString
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.SoundUtils
 import at.hannibal2.skyhanni.utils.SoundUtils.playSound
+import net.minecraft.client.Minecraft
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import kotlin.math.absoluteValue
 import kotlin.time.Duration.Companion.seconds
@@ -51,6 +52,7 @@ class LaneSwitchNotification {
     @SubscribeEvent
     fun onTick(event: LorenzTickEvent) {
         if (!isEnabled()) return
+        if (!Minecraft.getMinecraft().thePlayer.onGround) return
         val settings = config.notification.settings
         val plot = GardenPlotAPI.getCurrentPlot() ?: return
         if (!plot.unlocked) return
@@ -92,6 +94,7 @@ class LaneSwitchNotification {
     @SubscribeEvent
     fun onRenderOverlay(event: GuiRenderEvent.GuiOverlayRenderEvent) {
         if (!isEnabled() || !config.distanceUntilSwitch) return
+        if (!Minecraft.getMinecraft().thePlayer.onGround) return
         if (distancesUntilSwitch.isEmpty()) return
         if (lastDistancesUntilSwitch.isEmpty()) {
             lastDistancesUntilSwitch = distancesUntilSwitch
