@@ -179,11 +179,11 @@ class PestFinder {
         }
     }
 
-    private fun getNearestInfectedPest() = getPlotsWithPests().minByOrNull { it.middle.distanceSqToPlayer() }
+    private fun getNearestInfestedPest() = getPlotsWithPests().minByOrNull { it.middle.distanceSqToPlayer() }
 
     private fun removeNearestPest() {
-        val plot = getNearestInfectedPest() ?: run {
-            ChatUtils.error("Can not remove nearest pest: No infected plots detected.")
+        val plot = getNearestInfestedPest() ?: run {
+            ChatUtils.error("Can not remove nearest pest: No infested plots detected.")
             return
         }
         plot.pests--
@@ -238,13 +238,13 @@ class PestFinder {
         if (lastKeyPress.passedSince() < 2.seconds) return
         lastKeyPress = SimpleTimeMark.now()
 
-        val plot = getNearestInfectedPest() ?: run {
-            ChatUtils.userError("No infected plots detected to warp to!")
+        val plot = getNearestInfestedPest() ?: run {
+            ChatUtils.userError("No infested plots detected to warp to!")
             return
         }
 
         if (plot.isPlayerInside()) {
-            ChatUtils.userError("You stand already on the infected plot!")
+            ChatUtils.userError("You're already in an infested plot!")
             return
         }
 

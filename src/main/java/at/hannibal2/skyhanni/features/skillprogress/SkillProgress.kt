@@ -218,7 +218,7 @@ object SkillProgress {
 
     @SubscribeEvent(priority = EventPriority.LOW)
     fun onActionBar(event: ActionBarUpdateEvent) {
-        if (!config.hideInActionBar) return
+        if (!config.hideInActionBar || !isEnabled()) return
         if (event.isCanceled) return
         var msg = event.actionBar
         for (line in hideInActionBar) {
