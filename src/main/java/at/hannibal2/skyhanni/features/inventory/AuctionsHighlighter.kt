@@ -4,6 +4,7 @@ import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.events.GuiContainerEvent
 import at.hannibal2.skyhanni.utils.InventoryUtils.getInventoryName
+import at.hannibal2.skyhanni.utils.InventoryUtils.getUpperItems
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalNameOrNull
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.LorenzColor
@@ -36,11 +37,7 @@ class AuctionsHighlighter {
         val chest = guiChest.inventorySlots as ContainerChest
         if (chest.getInventoryName() != "Manage Auctions") return
 
-        for (slot in chest.inventorySlots) {
-            if (slot == null) continue
-            if (slot.slotNumber != slot.slotIndex) continue
-            val stack = slot.stack ?: continue
-
+        for ((slot, stack) in chest.getUpperItems()) {
             val lore = stack.getLore()
             if (lore.any { it == "§7Status: §aSold!" }) {
                 slot highlight LorenzColor.GREEN
