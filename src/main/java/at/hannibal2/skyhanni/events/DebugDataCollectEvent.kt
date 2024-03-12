@@ -2,7 +2,7 @@ package at.hannibal2.skyhanni.events
 
 import at.hannibal2.skyhanni.utils.StringUtils.equalsIgnoreColor
 
-class DebugDataCollectEvent(private val list: MutableList<String>, private val search: String?) : LorenzEvent() {
+class DebugDataCollectEvent(private val list: MutableList<String>, private val search: String) : LorenzEvent() {
 
     var empty = true
     private var currentTitle = ""
@@ -35,8 +35,8 @@ class DebugDataCollectEvent(private val list: MutableList<String>, private val s
     }
 
     private fun writeData(text: List<String>) {
-        if (irrelevant && search == null) return
-        search?.let {
+        if (irrelevant && search.isEmpty()) return
+        if (search.isNotEmpty()) {
             if (!search.equalsIgnoreColor("all")) {
                 if (!currentTitle.contains(search, ignoreCase = true)) {
                     return

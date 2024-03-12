@@ -1,5 +1,6 @@
 package at.hannibal2.skyhanni.config.features.dev;
 
+import at.hannibal2.skyhanni.config.core.config.Position;
 import com.google.gson.annotations.Expose;
 import io.github.moulberry.moulconfig.annotations.ConfigEditorBoolean;
 import io.github.moulberry.moulconfig.annotations.ConfigEditorKeybind;
@@ -45,6 +46,11 @@ public class DebugConfig {
     @ConfigOption(name = "Show Item Category", desc = "Show item categories in item lore.")
     @ConfigEditorBoolean
     public boolean showItemCategory = false;
+
+    @Expose
+    @ConfigOption(name = "Show Item Name", desc = "Show the SkyHanni item name for an item.")
+    @ConfigEditorBoolean
+    public boolean showItemName = false;
 
     @Expose
     @ConfigOption(name = "Copy Internal Name", desc = "Copies the internal name of an item on key press in the clipboard.")
@@ -96,6 +102,9 @@ public class DebugConfig {
     @ConfigOption(name = "SkyBlock Area", desc = "Show your current area in SkyBlock while f3 is open.")
     @ConfigEditorBoolean
     public boolean currentAreaDebug = true;
+
+    @Expose
+    public Position trackSoundPosition = new Position(0, 0);
 
     @Expose
     @ConfigOption(name = "Copy Item Data", desc = "Copies item NBT data on key press in a GUI to clipboard.")

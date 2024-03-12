@@ -5,8 +5,8 @@ import at.hannibal2.skyhanni.data.SlayerAPI
 import at.hannibal2.skyhanni.events.EntityMaxHealthUpdateEvent
 import at.hannibal2.skyhanni.events.LorenzRenderWorldEvent
 import at.hannibal2.skyhanni.events.LorenzWorldChangeEvent
-import at.hannibal2.skyhanni.events.withAlpha
 import at.hannibal2.skyhanni.mixins.hooks.RenderLivingEntityHelper
+import at.hannibal2.skyhanni.utils.ColorUtils.withAlpha
 import at.hannibal2.skyhanni.utils.EntityUtils.hasMaxHealth
 import at.hannibal2.skyhanni.utils.LocationUtils
 import at.hannibal2.skyhanni.utils.LorenzColor
@@ -52,9 +52,8 @@ class AreaMiniBossFeatures {
 
             if (config.areaBossHighlight) {
                 val color = bossType.color.toColor().withAlpha(bossType.colorOpacity)
-                RenderLivingEntityHelper.setEntityColor(entity, color)
+                RenderLivingEntityHelper.setEntityColorWithNoHurtTime(entity, color)
                 { config.areaBossHighlight && SlayerAPI.isInAnyArea }
-                RenderLivingEntityHelper.setNoHurtTime(entity) { config.areaBossHighlight && SlayerAPI.isInAnyArea }
             }
 
             // TODO add sound
@@ -108,6 +107,13 @@ class AreaMiniBossFeatures {
             LorenzVec(-268.5, 90.0, 97.7),
             LorenzVec(-258.1, 94.0, 75.5),
             LorenzVec(-225.7, 92.0, 127.5),
+        ),
+        SOUL_OF_THE_ALPHA(
+            EntityWolf::class.java, 31_150, LorenzColor.GOLD, 60,
+            LorenzVec(-381.5, 56.0, -94.5),
+            LorenzVec(-394.5, 63.0, -52.5),
+            LorenzVec(-386.5, 50.0, -2.5),
+            LorenzVec(-396.5, 58.0, 29.5),
         ),
         VOIDLING_EXTREMIST(
             EntityEnderman::class.java, 8_000_000, LorenzColor.LIGHT_PURPLE, 127,

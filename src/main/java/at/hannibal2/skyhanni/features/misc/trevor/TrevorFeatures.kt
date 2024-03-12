@@ -11,13 +11,15 @@ import at.hannibal2.skyhanni.events.LorenzChatEvent
 import at.hannibal2.skyhanni.events.LorenzKeyPressEvent
 import at.hannibal2.skyhanni.events.LorenzRenderWorldEvent
 import at.hannibal2.skyhanni.events.LorenzWorldChangeEvent
-import at.hannibal2.skyhanni.events.withAlpha
 import at.hannibal2.skyhanni.features.garden.farming.GardenCropSpeed
 import at.hannibal2.skyhanni.mixins.hooks.RenderLivingEntityHelper
 import at.hannibal2.skyhanni.test.GriffinUtils.drawWaypointFilled
 import at.hannibal2.skyhanni.test.command.ErrorManager
+import at.hannibal2.skyhanni.utils.ChatUtils
+import at.hannibal2.skyhanni.utils.ColorUtils.withAlpha
 import at.hannibal2.skyhanni.utils.ConfigUtils
 import at.hannibal2.skyhanni.utils.EntityUtils
+import at.hannibal2.skyhanni.utils.LocationUtils
 import at.hannibal2.skyhanni.utils.LocationUtils.distanceToPlayer
 import at.hannibal2.skyhanni.utils.LorenzColor
 import at.hannibal2.skyhanni.utils.LorenzUtils
@@ -33,6 +35,7 @@ import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.TabListData
 import at.hannibal2.skyhanni.utils.getLorenzVec
+import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraft.client.Minecraft
 import net.minecraft.entity.EntityLivingBase
 import net.minecraft.entity.item.EntityArmorStand
@@ -43,15 +46,27 @@ import kotlin.time.Duration.Companion.milliseconds
 import kotlin.time.Duration.Companion.seconds
 
 object TrevorFeatures {
-
-    // TODO USE SH-REPO
-    private val trapperPattern =
-        "\\[NPC] Trevor: You can find your (?<rarity>.*) animal near the (?<location>.*).".toPattern()
-    private val talbotPatternAbove =
-        "The target is around (?<height>.*) blocks above, at a (?<angle>.*) degrees angle!".toPattern()
-    private val talbotPatternBelow =
-        "The target is around (?<height>.*) blocks below, at a (?<angle>.*) degrees angle!".toPattern()
-    private val locationPattern = "Zone: (?<zone>.*)".toPattern()
+    private val patternGroup = RepoPattern.group("misc.trevor")
+    private val trapperPattern by patternGroup.pattern(
+        "trapper",
+        "\\[NPC] Trevor: You can find your (?<rarity>.*) animal near the (?<location>.*)."
+    )
+    private val talbotPatternAbove by patternGroup.pattern(
+        "above",
+        "The target is around (?<height>.*) blocks above, at a (?<angle>.*) degrees angle!"
+    )
+    private val talbotPatternBelow by patternGroup.pattern(
+        "below",
+        "The target is around (?<height>.*) blocks below, at a (?<angle>.*) degrees angle!"
+    )
+    private val talbotPatternAt by patternGroup.pattern(
+        "at",
+        "You are at the exact height!",
+    )
+    private val locationPattern by patternGroup.pattern(
+        "zone",
+        "Zone: (?<zone>.*)"
+    )
 
     private var timeUntilNextReady = 0
     private var trapperReady: Boolean = true
@@ -79,7 +94,7 @@ object TrevorFeatures {
                         TrevorTracker.calculatePeltsPerHour()
                         if (questActive) TrevorSolver.findMob()
                     } catch (error: Throwable) {
-                        ErrorManager.logError(error, "Encountered an error when updating the trapper solver")
+                        ErrorManager.logErrorWithData(error, "Encountered an error when updating the trapper solver")
                     }
                 }
             }
@@ -89,6 +104,9 @@ object TrevorFeatures {
     @SubscribeEvent
     fun onChat(event: LorenzChatEvent) {
         if (!onFarmingIsland()) return
+
+        val formattedMessage = event.message.removeColor()
+
         if (event.message == "§aReturn to the Trapper soon to get a new animal to hunt!") {
             TrevorSolver.resetLocation()
             if (config.trapperMobDiedMessage) {
@@ -107,30 +125,29 @@ object TrevorFeatures {
             TrevorSolver.mobLocation = CurrentMobArea.NONE
         }
 
-        var matcher = trapperPattern.matcher(event.message.removeColor())
-        if (matcher.matches()) {
+        trapperPattern.matchMatcher(formattedMessage) {
             timeUntilNextReady = if (GardenCropSpeed.finneganPerkActive()) 16 else 21
             currentStatus = TrapperStatus.ACTIVE
             currentLabel = "§cActive Quest"
             trapperReady = false
-            TrevorTracker.startQuest(matcher)
+            TrevorTracker.startQuest(this)
             updateTrapper()
             lastChatPromptTime = SimpleTimeMark.farPast()
         }
 
-        matcher = talbotPatternAbove.matcher(event.message.removeColor())
-        if (matcher.matches()) {
-            val height = matcher.group("height").toInt()
+        talbotPatternAbove.matchMatcher(formattedMessage) {
+            val height = group("height").toInt()
             TrevorSolver.findMobHeight(height, true)
         }
-
-        matcher = talbotPatternBelow.matcher(event.message.removeColor())
-        if (matcher.matches()) {
-            val height = matcher.group("height").toInt()
+        talbotPatternBelow.matchMatcher(formattedMessage) {
+            val height = group("height").toInt()
             TrevorSolver.findMobHeight(height, false)
         }
+        talbotPatternAt.matchMatcher(formattedMessage) {
+            TrevorSolver.averageHeight = LocationUtils.playerLocation().y
+        }
 
-        if (event.message.removeColor() == "[NPC] Trevor: You will have 10 minutes to find the mob from when you accept the task.") {
+        if (formattedMessage == "[NPC] Trevor: You will have 10 minutes to find the mob from when you accept the task.") {
             teleportBlock = SimpleTimeMark.now()
         }
 
@@ -219,7 +236,7 @@ object TrevorFeatures {
         var entityTrapper = EntityUtils.getEntityByID(trapperID)
         if (entityTrapper !is EntityLivingBase) entityTrapper = EntityUtils.getEntityByID(backupTrapperID)
         if (entityTrapper is EntityLivingBase && config.trapperTalkCooldown) {
-            RenderLivingEntityHelper.setEntityColor(entityTrapper, currentStatus.color)
+            RenderLivingEntityHelper.setEntityColorWithNoHurtTime(entityTrapper, currentStatus.color)
             { config.trapperTalkCooldown }
             entityTrapper.getLorenzVec().let {
                 if (it.distanceToPlayer() < 15) {
@@ -260,7 +277,7 @@ object TrevorFeatures {
             val timeSince = lastChatPromptTime.passedSince()
             if (timeSince > 200.milliseconds && timeSince < 5.seconds) {
                 lastChatPromptTime = SimpleTimeMark.farPast()
-                LorenzUtils.sendCommandToServer(lastChatPrompt)
+                ChatUtils.sendCommandToServer(lastChatPrompt)
                 lastChatPrompt = ""
                 timeLastWarped = SimpleTimeMark.now()
                 return
@@ -268,7 +285,7 @@ object TrevorFeatures {
         }
 
         if (config.warpToTrapper && timeLastWarped.passedSince() > 3.seconds && teleportBlock.passedSince() > 5.seconds) {
-            LorenzUtils.sendCommandToServer("warp trapper")
+            ChatUtils.sendCommandToServer("warp trapper")
             timeLastWarped = SimpleTimeMark.now()
         }
     }

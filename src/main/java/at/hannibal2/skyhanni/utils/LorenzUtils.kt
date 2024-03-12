@@ -3,14 +3,14 @@ package at.hannibal2.skyhanni.utils
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.data.HypixelData
 import at.hannibal2.skyhanni.data.IslandType
-import at.hannibal2.skyhanni.data.MayorElection
+import at.hannibal2.skyhanni.data.Perk
 import at.hannibal2.skyhanni.data.TitleManager
 import at.hannibal2.skyhanni.events.GuiContainerEvent
 import at.hannibal2.skyhanni.features.dungeon.DungeonAPI
 import at.hannibal2.skyhanni.mixins.transformers.AccessorGuiEditSign
 import at.hannibal2.skyhanni.test.TestBingo
 import at.hannibal2.skyhanni.utils.ChatUtils.lastButtonClicked
-import at.hannibal2.skyhanni.utils.CollectionUtils.sortedDesc
+import at.hannibal2.skyhanni.utils.ItemUtils.getItemCategoryOrNull
 import at.hannibal2.skyhanni.utils.NEUItems.getItemStackOrNull
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.StringUtils.capAtMinecraftLength
@@ -112,13 +112,13 @@ object LorenzUtils {
     fun formatPercentage(percentage: Double, format: String?): String =
         DecimalFormat(format).format(percentage * 100).replace(',', '.') + "%"
 
-    @Deprecated("old code", ReplaceWith("addSeparators()"))
+    @Deprecated("old code", ReplaceWith("i.addSeparators()"))
     fun formatInteger(i: Int): String = i.addSeparators()
 
-    @Deprecated("old code", ReplaceWith("addSeparators()"))
+    @Deprecated("old code", ReplaceWith("l.addSeparators()"))
     fun formatInteger(l: Long): String = l.addSeparators()
 
-    @Deprecated("old code", ReplaceWith("round() and addSeparators()"))
+    @Deprecated("old code", ReplaceWith("d.round(round).addSeparators()"))
     fun formatDouble(d: Double, round: Int = 1): String {
         return d.round(round).addSeparators()
     }
@@ -156,21 +156,20 @@ object LorenzUtils {
 
     fun getPlayerName(): String = Minecraft.getMinecraft().thePlayer.name
 
-    // (key -> value) -> (sorting value -> key item icon)
-    fun fillTable(list: MutableList<List<Any>>, data: MutableMap<Pair<String, String>, Pair<Double, NEUInternalName>>) {
-        val keys = data.mapValues { (_, v) -> v.first }.sortedDesc().keys
+    fun MutableList<List<Any>>.fillTable(data: List<DisplayTableEntry>) {
+        val sorted = data.sortedByDescending { it.sort }
         val renderer = Minecraft.getMinecraft().fontRendererObj
-        val longest = keys.map { it.first }.maxOfOrNull { renderer.getStringWidth(it.removeColor()) } ?: 0
+        val longest = sorted.maxOfOrNull { renderer.getStringWidth(it.left.removeColor()) } ?: 0
 
-        for (pair in keys) {
-            val (name, second) = pair
-            var displayName = name
+        for (entry in sorted) {
+            var displayName = entry.left
             while (renderer.getStringWidth(displayName.removeColor()) < longest) {
                 displayName += " "
             }
 
-            data[pair]!!.second.getItemStackOrNull()?.let {
-                list.add(listOf(it, "$displayName   $second"))
+            val hover = entry.hover
+            entry.item.getItemStackOrNull()?.let {
+                add(listOf(it, Renderable.hoverTips("$displayName   ${entry.right}", tips = hover)))
             }
         }
     }
@@ -271,15 +270,20 @@ object LorenzUtils {
 
     fun IslandType.isInIsland() = inSkyBlock && skyBlockIsland == this
 
-    fun GuiContainerEvent.SlotClickEvent.makeShiftClick() =
+    fun inAnyIsland(vararg islandTypes: IslandType) = inSkyBlock && islandTypes.any { it.isInIsland() }
+
+    fun GuiContainerEvent.SlotClickEvent.makeShiftClick() {
+        if (this.clickedButton == 1 && slot?.stack?.getItemCategoryOrNull() == ItemCategory.SACK) return
         slot?.slotNumber?.let { slotNumber ->
             Minecraft.getMinecraft().playerController.windowClick(
                 container.windowId, slotNumber, 0, 1, Minecraft.getMinecraft().thePlayer
-            )?.also { isCanceled = true }
+            )
+            isCanceled = true
         }
+    }
 
     private val recalculateDerpy =
-        RecalculatingValue(1.seconds) { MayorElection.isPerkActive("Derpy", "DOUBLE MOBS HP!!!") }
+        RecalculatingValue(1.seconds) { Perk.DOUBLE_MOBS_HP.isActive }
 
     val isDerpy get() = recalculateDerpy.getValue()
 
@@ -300,9 +304,6 @@ object LorenzUtils {
     fun sendTitle(text: String, duration: Duration, height: Double = 1.8, fontSize: Float = 4f) {
         TitleManager.sendTitle(text, duration, height, fontSize)
     }
-
-    @Deprecated("Dont use this approach at all. check with regex or equals instead.", ReplaceWith("Regex or equals"))
-    fun Iterable<String>.anyContains(element: String) = any { it.contains(element) }
 
     inline fun <reified T : Enum<T>> enumValueOfOrNull(name: String): T? {
         val enums = enumValues<T>()
@@ -326,8 +327,9 @@ object LorenzUtils {
         FMLCommonHandler.instance().handleExit(-1)
     }
 
+    @Deprecated("moved", ReplaceWith("ChatUtils.sendCommandToServer(command)"))
     fun sendCommandToServer(command: String) {
-        ChatUtils.sendMessageToServer("/$command")
+        ChatUtils.sendCommandToServer(command)
     }
 
     /**
@@ -338,21 +340,21 @@ object LorenzUtils {
         return runCatching { this.group(groupName) }.getOrNull()
     }
 
-    @Deprecated("moved", ReplaceWith("ChatUtils.debug"))
+    @Deprecated("moved", ReplaceWith("ChatUtils.debug(message)"))
     fun debug(message: String) = ChatUtils.debug(message)
 
-    @Deprecated("moved", ReplaceWith("ChatUtils.userError"))
+    @Deprecated("moved", ReplaceWith("ChatUtils.userError(message)"))
     fun userError(message: String) = ChatUtils.userError(message)
 
-    @Deprecated("moved", ReplaceWith("ChatUtils.chat"))
+    @Deprecated("moved", ReplaceWith("ChatUtils.chat(message, prefix, prefixColor)"))
     fun chat(message: String, prefix: Boolean = true, prefixColor: String = "§e") =
         ChatUtils.chat(message, prefix, prefixColor)
 
-    @Deprecated("moved", ReplaceWith("ChatUtils.clickableChat"))
+    @Deprecated("moved", ReplaceWith("ChatUtils.clickableChat(message, command, prefix, prefixColor)"))
     fun clickableChat(message: String, command: String, prefix: Boolean = true, prefixColor: String = "§e") =
         ChatUtils.clickableChat(message, command, prefix, prefixColor)
 
-    @Deprecated("moved", ReplaceWith("ChatUtils.hoverableChat"))
+    @Deprecated("moved", ReplaceWith("ChatUtils.hoverableChat(message, hover, command, prefix, prefixColor)"))
     fun hoverableChat(
         message: String,
         hover: List<String>,
@@ -361,6 +363,11 @@ object LorenzUtils {
         prefixColor: String = "§e",
     ) = ChatUtils.hoverableChat(message, hover, command, prefix, prefixColor)
 
-    @Deprecated("moved", ReplaceWith("ChatUtils.sendMessageToServer"))
+    @Deprecated("moved", ReplaceWith("ChatUtils.sendMessageToServer(message)"))
     fun sendMessageToServer(message: String) = ChatUtils.sendMessageToServer(message)
+
+    fun inAdvancedMiningIsland() = IslandType.DWARVEN_MINES.isInIsland() || IslandType.CRYSTAL_HOLLOWS.isInIsland()
+
+    fun inMiningIsland() = IslandType.GOLD_MINES.isInIsland() || IslandType.DEEP_CAVERNS.isInIsland()
+        || inAdvancedMiningIsland()
 }

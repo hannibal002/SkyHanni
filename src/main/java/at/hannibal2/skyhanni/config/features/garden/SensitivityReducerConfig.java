@@ -15,7 +15,7 @@ public class SensitivityReducerConfig {
     @ConfigOption(
         name = "Mode",
         desc = "Lowers mouse sensitivity while in the garden.")
-    @ConfigEditorDropdown()
+    @ConfigEditorDropdown
     public Mode mode = Mode.OFF;
 
     public enum Mode {
@@ -27,6 +27,7 @@ public class SensitivityReducerConfig {
         Mode(String str) {
             this.str = str;
         }
+
         @Override
         public String toString() {
             return str;

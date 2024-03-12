@@ -16,6 +16,15 @@ public class CompactTabListConfig {
     public boolean enabled = false;
 
     @Expose
+    @ConfigOption(
+        name = "Toggle Tab",
+        desc = "Use the tab key to toggle the tab list, not show tab list while the key is pressed. " +
+            "Similar to patcher's feature."
+    )
+    @ConfigEditorBoolean
+    public boolean toggleTab = false;
+
+    @Expose
     @ConfigOption(name = "Hide Hypixel Adverts", desc = "Hides text from advertising the Hypixel server or store in the tablist.")
     @ConfigEditorBoolean
     public boolean hideAdverts = false;

@@ -14,14 +14,17 @@ import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.NumberUtil.ordinal
 import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
+import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraft.util.ChatComponentText
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
 class TrophyFishMessages {
-
-    private val trophyFishPattern =
-        "§6§lTROPHY FISH! §r§bYou caught an? §r(?<displayName>§[0-9a-f](?:§k)?[\\w -]+) §r(?<displayRarity>§[0-9a-f]§l\\w+)§r§b\\.".toPattern()
     private val config get() = SkyHanniMod.feature.fishing.trophyFishing.chatMessages
+
+    private val trophyFishPattern by RepoPattern.pattern(
+        "fishing.trophy.trophyfish",
+        "§6§lTROPHY FISH! §r§bYou caught an? §r(?<displayName>§[0-9a-f](?:§k)?[\\w -]+) §r(?<displayRarity>§[0-9a-f]§l\\w+)§r§b\\."
+    )
 
     @SubscribeEvent
     fun onStatusBar(event: LorenzChatEvent) {
@@ -55,7 +58,7 @@ class TrophyFishMessages {
             edited = ChatComponentText(
                 "§6§lTROPHY FISH! " + when (config.design) {
                     DesignFormat.STYLE_1 -> if (amount == 1) "§c§lFIRST §r$displayRarity $displayName"
-                    else "§7$amount. §r$displayRarity $displayName"
+                    else "§7$amount${amount.ordinal()} §r$displayRarity $displayName"
 
                     DesignFormat.STYLE_2 -> "§bYou caught a $displayName $displayRarity§b. §7(${amount.addSeparators()})"
                     else -> "§bYou caught your ${amount.addSeparators()}${amount.ordinal()} $displayRarity $displayName§b."
@@ -65,7 +68,8 @@ class TrophyFishMessages {
 
         if (config.totalAmount) {
             val total = trophyFishCounts.sumAllValues()
-            edited.appendSibling(ChatComponentText(" §7(${total.addSeparators()}. total)"))
+
+            edited.appendSibling(ChatComponentText(" §7(${total.addSeparators()}${total.ordinal()} total)"))
         }
 
         if (config.tooltip) {

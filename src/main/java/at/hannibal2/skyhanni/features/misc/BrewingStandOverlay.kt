@@ -16,7 +16,7 @@ class BrewingStandOverlay {
         if (event.inventoryName != "Brewing Stand") return
 
         val stack = event.stack
-        val name = stack.name ?: return
+        val name = stack.name
 
         val slotNumber = event.slot.slotNumber
         when (slotNumber) {
