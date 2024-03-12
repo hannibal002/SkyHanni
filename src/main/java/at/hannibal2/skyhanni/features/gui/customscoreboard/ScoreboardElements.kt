@@ -372,9 +372,8 @@ private fun getEmptyLineDisplayPair() = listOf("<empty>" to HorizontalAlignment.
 private fun getIslandDisplayPair() =
     listOf("§7㋖ §a" + HypixelData.skyBlockIsland.displayName to HorizontalAlignment.LEFT)
 
-private fun getLocationDisplayPair() =
-    listOf(
-        (tryToReplaceScoreboardLine(
+private fun getLocationDisplayPair() = buildList {
+		add((tryToReplaceScoreboardLine(
             getGroupFromPattern(
                 ScoreboardData.sidebarLinesFormatted,
                 ScoreboardPattern.locationPattern,
@@ -382,8 +381,11 @@ private fun getLocationDisplayPair() =
             )
         )?.trim()
             ?: "<hidden>") to HorizontalAlignment.LEFT
-    )
+		)
 
+		val plotLine = ScoreboardData.sidebarLinesFormatted.first { ScoreboardPattern.plotPattern.matches(it) }
+		if (plotLine != null) add(plotLine)
+}
 
 private fun getVisitDisplayPair() =
     listOf(
