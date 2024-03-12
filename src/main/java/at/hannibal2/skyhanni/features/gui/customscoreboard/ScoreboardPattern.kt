@@ -154,6 +154,10 @@ object ScoreboardPattern {
         "jacobscontest",
         "^§eJacob's Contest$"
     )
+		val plotPattern by farmingSb.pattern(
+				"plot",
+				"\\s*§aPlot §7-.*"
+		)
 
     // mining
     private val miningSb = scoreboardGroup.group("mining")
