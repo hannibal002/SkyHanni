@@ -6,6 +6,7 @@ import at.hannibal2.skyhanni.features.garden.GardenAPI
 import at.hannibal2.skyhanni.features.garden.GardenPlotAPI
 import at.hannibal2.skyhanni.features.garden.GardenPlotAPI.isBarn
 import at.hannibal2.skyhanni.features.garden.GardenPlotAPI.name
+import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
 import net.minecraft.client.gui.FontRenderer
 
@@ -25,6 +26,18 @@ fun drawString(
  * @return The replaced line, or null if it should be hidden
  */
 fun tryToReplaceScoreboardLine(text: String): String? {
+    try {
+        return tryToReplaceScoreboardLineHarder(text)
+    } catch (t: Throwable) {
+        ErrorManager.logErrorWithData(
+            t, "Error while changing the scoreboard text.",
+            "text" to text
+        )
+        return text
+    }
+}
+
+private fun tryToReplaceScoreboardLineHarder(text: String): String? {
     if (SkyHanniMod.feature.misc.hideScoreboardNumbers && text.startsWith("§c") && text.length <= 4) {
         return null
     }
