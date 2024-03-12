@@ -379,11 +379,11 @@ object ScoreboardPattern {
     private val tablistGroup = group.group("tablist")
     val gemsPattern by tablistGroup.pattern(
         "gems",
-        "^Gems: §a(?<gems>\\d*,?(\\.\\d+)?[a-zA-Z]?)$"
+        "^\\s*Gems: §a(?<gems>\\d*,?(\\.\\d+)?[a-zA-Z]?)$"
     )
     val bankPattern by tablistGroup.pattern(
         "bank",
-        "^Bank: §6(?<bank>\\d*,?(\\.\\d+)?[a-zA-Z]?(/\\d*,?(\\.\\d+)?[a-zA-Z]?)?)$"
+        "^\\s*Bank: §6(?<bank>\\d*,?(\\.\\d+)?[a-zA-Z]?(/\\d*,?(\\.\\d+)?[a-zA-Z]?)?)$"
     )
     val mithrilPowderPattern by tablistGroup.pattern(
         "mithrilpowder",
@@ -395,7 +395,7 @@ object ScoreboardPattern {
     )
     val eventNamePattern by tablistGroup.pattern(
         "event",
-        "^§e§lEvent: §r(?<name>§.*)$"
+        "^\\s*§e§lEvent: §r(?<name>§.*)$"
     )
     val eventTimeEndsPattern by tablistGroup.pattern(
         "eventtime",
