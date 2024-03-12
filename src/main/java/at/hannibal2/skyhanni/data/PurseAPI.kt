@@ -4,7 +4,7 @@ import at.hannibal2.skyhanni.events.InventoryCloseEvent
 import at.hannibal2.skyhanni.events.LorenzTickEvent
 import at.hannibal2.skyhanni.events.PurseChangeCause
 import at.hannibal2.skyhanni.events.PurseChangeEvent
-import at.hannibal2.skyhanni.utils.NumberUtil.formatNumber
+import at.hannibal2.skyhanni.utils.NumberUtil.formatDouble
 import at.hannibal2.skyhanni.utils.NumberUtil.million
 import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
@@ -24,7 +24,7 @@ object PurseAPI {
 
     private var inventoryCloseTime = 0L
     var currentPurse = 0.0
-      private set;
+      private set
 
     @SubscribeEvent
     fun onInventoryClose(event: InventoryCloseEvent) {
@@ -35,7 +35,7 @@ object PurseAPI {
     fun onTick(event: LorenzTickEvent) {
         for (line in ScoreboardData.sidebarLinesFormatted) {
             val newPurse = coinsPattern.matchMatcher(line) {
-                group("coins").formatNumber().toDouble()
+                group("coins").formatDouble()
             } ?: continue
             val diff = newPurse - currentPurse
             if (diff == 0.0) continue
