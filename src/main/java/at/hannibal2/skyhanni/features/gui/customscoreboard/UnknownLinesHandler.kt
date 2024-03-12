@@ -53,6 +53,7 @@ object UnknownLinesHandler {
             SbPattern.peltsPattern,
             SbPattern.mobLocationPattern,
             SbPattern.jacobsContestPattern,
+						SbPattern.plotPattern,
             SbPattern.powderPattern,
             SbPattern.windCompassPattern,
             SbPattern.windCompassArrowPattern,
