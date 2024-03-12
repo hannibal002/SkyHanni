@@ -4,6 +4,7 @@ import at.hannibal2.skyhanni.config.Storage.PlayerSpecific.BingoSession
 import at.hannibal2.skyhanni.data.ProfileStorageData
 import at.hannibal2.skyhanni.data.jsonobjects.repo.BingoJson
 import at.hannibal2.skyhanni.data.jsonobjects.repo.BingoRanksJson
+import at.hannibal2.skyhanni.events.DebugDataCollectEvent
 import at.hannibal2.skyhanni.events.RepositoryReloadEvent
 import at.hannibal2.skyhanni.features.bingo.card.goals.BingoGoal
 import at.hannibal2.skyhanni.features.bingo.card.goals.GoalType
@@ -33,12 +34,45 @@ object BingoAPI {
     )
 
     @SubscribeEvent
+    fun onDebugDataCollect(event: DebugDataCollectEvent) {
+        event.title("Bingo Card")
+
+        if (!LorenzUtils.isBingoProfile) {
+            event.addIrrelevant("not on bingo")
+            return
+        }
+
+        event.addData {
+            add("bingoGoals: ${bingoGoals.size}")
+            for (bingoGoal in bingoGoals) {
+                val goal = bingoGoal.value
+                add("  type: '${goal.type}'")
+                add("  displayName: '${goal.displayName}'")
+                add("  description: '${goal.description}'")
+                add("  guide: '${goal.guide}'")
+                add("  done: '${goal.done}'")
+                add("  highlight: '${goal.highlight}'")
+                add("  communtyGoalPercentage: '${goal.communtyGoalPercentage}'")
+                val hiddenGoalData = goal.hiddenGoalData
+                add("  hiddenGoalData")
+                add("    unknownTip: '${hiddenGoalData.unknownTip}'")
+                add("    nextHintTime: '${hiddenGoalData.nextHintTime}'")
+                add("    tipNote: '${hiddenGoalData.tipNote}'")
+                add(" ")
+
+            }
+        }
+    }
+
+    @SubscribeEvent
     fun onRepoReload(event: RepositoryReloadEvent) {
         ranks = event.getConstant<BingoRanksJson>("BingoRanks").ranks
         data = event.getConstant<BingoJson>("Bingo").bingo_tips
     }
 
     fun getRankFromScoreboard(text: String) = if (detectionPattern.matches(text)) getRank(text) else null
+
+    fun getIconFromScoreboard(text: String) = getRankFromScoreboard(text)?.let { getIcon(it) }
 
     fun getRank(text: String) = ranks.entries.find { text.contains(it.key) }?.value
 

@@ -12,11 +12,11 @@ class SendCoordinatedCommand {
         val message = event.message
         if (message == "/sendcoords") {
             event.isCanceled = true
-            ChatUtils.sendCommandToServer(getCoordinates())
+            ChatUtils.sendMessageToServer(getCoordinates())
         } else if (message.startsWith("/sendcoords ")) {
             event.isCanceled = true
             val description = message.split(" ").drop(1).joinToString(" ")
-            ChatUtils.sendCommandToServer("${getCoordinates()} $description")
+            ChatUtils.sendMessageToServer("${getCoordinates()} $description")
         }
     }
 

@@ -2,6 +2,7 @@ package at.hannibal2.skyhanni.features.inventory
 
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.CollectionAPI
+import at.hannibal2.skyhanni.api.SkillAPI
 import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.config.features.inventory.InventoryConfig.ItemNumberEntry
 import at.hannibal2.skyhanni.config.features.inventory.InventoryConfig.ItemNumberEntry.BINGO_GOAL_RANK
@@ -23,24 +24,24 @@ import at.hannibal2.skyhanni.config.features.inventory.InventoryConfig.ItemNumbe
 import at.hannibal2.skyhanni.data.PetAPI
 import at.hannibal2.skyhanni.events.RenderItemTipEvent
 import at.hannibal2.skyhanni.features.garden.pests.PestAPI
+import at.hannibal2.skyhanni.features.skillprogress.SkillType
 import at.hannibal2.skyhanni.utils.ConfigUtils
 import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.ItemCategory
 import at.hannibal2.skyhanni.utils.ItemUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.cleanName
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName
-import at.hannibal2.skyhanni.utils.ItemUtils.getInternalNameOrNull
 import at.hannibal2.skyhanni.utils.ItemUtils.getItemCategoryOrNull
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.ItemUtils.name
-import at.hannibal2.skyhanni.utils.LorenzUtils.between
 import at.hannibal2.skyhanni.utils.NEUInternalName.Companion.asInternalName
 import at.hannibal2.skyhanni.utils.NumberUtil
-import at.hannibal2.skyhanni.utils.NumberUtil.formatNumber
+import at.hannibal2.skyhanni.utils.NumberUtil.formatLong
 import at.hannibal2.skyhanni.utils.NumberUtil.romanToDecimal
 import at.hannibal2.skyhanni.utils.NumberUtil.romanToDecimalIfNecessary
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getBottleOfJyrreSeconds
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getEdition
+import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getExtraAttributes
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getPetLevel
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getRanchersSpeed
 import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
@@ -53,10 +54,6 @@ object ItemDisplayOverlayFeatures {
     private val config get() = SkyHanniMod.feature.inventory
 
     private val patternGroup = RepoPattern.group("inventory.item.overlay")
-    private val petLevelPattern by patternGroup.pattern(
-        "pet.level",
-        "\\[Lvl (?<level>\\d+)] .*"
-    )
     private val masterSkullPattern by patternGroup.pattern(
         "masterskull",
         "(.*)Master Skull - Tier ."
@@ -78,8 +75,6 @@ object ItemDisplayOverlayFeatures {
         "(§.)*You were the (§.)*(?<rank>[\\w]+)(?<ordinal>(st|nd|rd|th)) (§.)*to"
     )
 
-    private val bottleOfJyrre = "NEW_BOTTLE_OF_JYRRE".asInternalName()
-
     @SubscribeEvent
     fun onRenderItemTip(event: RenderItemTipEvent) {
         event.stackTip = getStackTip(event.stack)
@@ -87,16 +82,17 @@ object ItemDisplayOverlayFeatures {
 
     private fun getStackTip(item: ItemStack): String {
         val itemName = item.cleanName()
+        val internalName = item.getInternalName()
         val chestName = InventoryUtils.openInventoryName()
         val lore = item.getLore()
 
         if (MASTER_STAR_TIER.isSelected()) {
-            when (itemName) {
-                "First Master Star" -> return "1"
-                "Second Master Star" -> return "2"
-                "Third Master Star" -> return "3"
-                "Fourth Master Star" -> return "4"
-                "Fifth Master Star" -> return "5"
+            when (internalName) {
+                "FIRST_MASTER_STAR".asInternalName() -> return "1"
+                "SECOND_MASTER_STAR".asInternalName() -> return "2"
+                "THIRD_MASTER_STAR".asInternalName() -> return "3"
+                "FOURTH_MASTER_STAR".asInternalName() -> return "4"
+                "FIFTH_MASTER_STAR".asInternalName() -> return "5"
             }
         }
 
@@ -118,8 +114,9 @@ object ItemDisplayOverlayFeatures {
             }
         }
 
-        if (NEW_YEAR_CAKE.isSelected() && itemName.startsWith("New Year Cake (")) {
-            return "§b" + itemName.between("(Year ", ")")
+        if (NEW_YEAR_CAKE.isSelected() && internalName == "NEW_YEAR_CAKE".asInternalName()) {
+            val year = item.getExtraAttributes()?.getInteger("new_years_cake")?.toString() ?: ""
+            return "§b$year"
         }
 
         if (PET_LEVEL.isSelected()) {
@@ -145,12 +142,12 @@ object ItemDisplayOverlayFeatures {
         }
 
         if (KUUDRA_KEY.isSelected() && itemName.contains("Kuudra Key")) {
-            return when (itemName) {
-                "Kuudra Key" -> "§a1"
-                "Hot Kuudra Key" -> "§22"
-                "Burning Kuudra Key" -> "§e3"
-                "Fiery Kuudra Key" -> "§64"
-                "Infernal Kuudra Key" -> "§c5"
+            return when (internalName) {
+                "KUUDRA_TIER_KEY".asInternalName() -> "§a1"
+                "KUUDRA_HOT_TIER_KEY".asInternalName() -> "§22"
+                "KUUDRA_BURNING_TIER_KEY".asInternalName() -> "§e3"
+                "KUUDRA_FIERY_TIER_KEY".asInternalName() -> "§64"
+                "KUUDRA_INFERNAL_TIER_KEY".asInternalName() -> "§c5"
                 else -> "§4?"
             }
         }
@@ -162,25 +159,29 @@ object ItemDisplayOverlayFeatures {
             if (CollectionAPI.isCollectionTier0(lore)) return "0"
             val split = itemName.split(" ")
             if (!itemName.contains("Dungeon")) {
+                val skillName = split.first()
                 val text = split.last()
                 if (split.size < 2) return "0"
-                return "" + text.romanToDecimalIfNecessary()
+                val level = "" + text.romanToDecimalIfNecessary()
+                val skill = SkillType.getByNameOrNull(skillName) ?: return level
+                val skillInfo = SkillAPI.storage?.get(skill) ?: return level
+                return if (SkyHanniMod.feature.skillProgress.overflowConfig.enableInSkillMenuAsStackSize)
+                    "" + skillInfo.overflowLevel else level
             }
         }
 
         if (COLLECTION_LEVEL.isSelected() && InventoryUtils.openInventoryName().endsWith(" Collections")) {
             if (lore.any { it.contains("Click to view!") }) {
                 if (CollectionAPI.isCollectionTier0(lore)) return "0"
-                item.name?.let {
-                    if (it.startsWith("§e")) {
-                        val text = it.split(" ").last()
-                        return "" + text.romanToDecimalIfNecessary()
-                    }
+                val name = item.name
+                if (name.startsWith("§e")) {
+                    val text = name.split(" ").last()
+                    return "" + text.romanToDecimalIfNecessary()
                 }
             }
         }
 
-        if (RANCHERS_BOOTS_SPEED.isSelected() && itemName.contains("Rancher's Boots")) {
+        if (RANCHERS_BOOTS_SPEED.isSelected() && internalName == "RANCHERS_BOOTS".asInternalName()) {
             item.getRanchersSpeed()?.let {
                 return if (it > 400 && !(PetAPI.isCurrentPet("Black Cat") ||
                         InventoryUtils.getHelmet()?.getInternalName() == "RACING_HELMET".asInternalName())
@@ -192,7 +193,7 @@ object ItemDisplayOverlayFeatures {
             }
         }
 
-        if (LARVA_HOOK.isSelected() && itemName.contains("Larva Hook")) {
+        if (LARVA_HOOK.isSelected() && internalName == "LARVA_HOOK".asInternalName()) {
             for (line in lore) {
                 harvestPattern.matchMatcher(line) {
                     val amount = group("amount").toInt()
@@ -206,22 +207,20 @@ object ItemDisplayOverlayFeatures {
         }
 
         if (DUNGEON_POTION_LEVEL.isSelected() && itemName.startsWith("Dungeon ") && itemName.contains(" Potion")) {
-            item.name?.let {
-                dungeonPotionPattern.matchMatcher(it.removeColor()) {
-                    return when (val level = group("level").romanToDecimal()) {
-                        in 1..2 -> "§f$level"
-                        in 3..4 -> "§a$level"
-                        in 5..6 -> "§9$level"
-                        else -> "§5$level"
-                    }
+            dungeonPotionPattern.matchMatcher(item.name.removeColor()) {
+                return when (val level = group("level").romanToDecimal()) {
+                    in 1..2 -> "§f$level"
+                    in 3..4 -> "§a$level"
+                    in 5..6 -> "§9$level"
+                    else -> "§5$level"
                 }
             }
         }
 
-        if (VACUUM_GARDEN.isSelected() && item.getInternalNameOrNull() in PestAPI.vacuumVariants && isOwnVacuum(lore)) {
+        if (VACUUM_GARDEN.isSelected() && internalName in PestAPI.vacuumVariants && isOwnVacuum(lore)) {
             for (line in lore) {
                 gardenVacuumPatterm.matchMatcher(line) {
-                    val pests = group("amount").formatNumber()
+                    val pests = group("amount").formatLong()
                     return if (config.vacuumBagCap) {
                         if (pests > 39) "§640+" else "$pests"
                     } else {
@@ -236,7 +235,7 @@ object ItemDisplayOverlayFeatures {
             }
         }
 
-        if (BOTTLE_OF_JYRRE.isSelected() && item.getInternalNameOrNull() == bottleOfJyrre) {
+        if (BOTTLE_OF_JYRRE.isSelected() && internalName == "NEW_BOTTLE_OF_JYRRE".asInternalName()) {
             val seconds = item.getBottleOfJyrreSeconds() ?: 0
             return "§a${(seconds / 3600)}"
         }
@@ -252,7 +251,7 @@ object ItemDisplayOverlayFeatures {
         if (BINGO_GOAL_RANK.isSelected() && chestName == "Bingo Card" && lore.lastOrNull() == "§aGOAL REACHED") {
             for (line in lore) {
                 bingoGoalRankPattern.matchMatcher(line) {
-                    val rank = group("rank").formatNumber()
+                    val rank = group("rank").formatLong()
                     if (rank < 10000) return "§6${NumberUtil.format(rank)}"
                 }
             }

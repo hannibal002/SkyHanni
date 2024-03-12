@@ -11,9 +11,12 @@ import at.hannibal2.skyhanni.utils.ItemUtils.name
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.NEUInternalName
 import at.hannibal2.skyhanni.utils.NEUInternalName.Companion.asInternalName
-import at.hannibal2.skyhanni.utils.NEUItems
 import at.hannibal2.skyhanni.utils.NEUItems.getItemStack
 import at.hannibal2.skyhanni.utils.NEUItems.getItemStackOrNull
+import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
+import at.hannibal2.skyhanni.utils.NumberUtil.formatLong
+import at.hannibal2.skyhanni.utils.NumberUtil.isFormatNumber
+import at.hannibal2.skyhanni.utils.NumberUtil.percentWithColorCode
 import at.hannibal2.skyhanni.utils.RenderUtils.renderStringsAndItems
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import net.minecraft.client.Minecraft
@@ -31,6 +34,7 @@ class CollectionTracker {
         private var itemName = ""
         private var internalName: NEUInternalName? = null
         private var itemAmount = -1L
+        private var goalAmount = -1L
 
         private var lastAmountInInventory = -1
 
@@ -40,7 +44,7 @@ class CollectionTracker {
         fun command(args: Array<String>) {
             if (args.isEmpty()) {
                 if (internalName == null) {
-                    ChatUtils.userError("/shtrackcollection <item name>")
+                    ChatUtils.userError("/shtrackcollection <item name> [goal amount]")
                     return
                 }
                 ChatUtils.chat("Stopped collection tracker.")
@@ -48,7 +52,22 @@ class CollectionTracker {
                 return
             }
 
-            val rawName = fixTypo(args.joinToString(" ").lowercase().replace("_", " "))
+            val lastArg = args.last()
+
+            val nameArgs = if (lastArg.isFormatNumber()) {
+                val goal = lastArg.formatLong()
+                if (goal <= 0) {
+                    ChatUtils.chat("Invalid Amount for Goal.")
+                    return
+                }
+                goalAmount = goal
+                args.dropLast(1).toTypedArray()
+            } else {
+                goalAmount = -1L
+                args
+            }
+
+            val rawName = fixTypo(nameArgs.joinToString(" ").lowercase().replace("_", " "))
             if (rawName == "gemstone") {
                 ChatUtils.userError("Gemstone collection is not supported!")
                 return
@@ -57,18 +76,18 @@ class CollectionTracker {
                 return
             }
 
-            val foundInternalName = NEUItems.getInternalNameOrNullIgnoreCase(rawName)
+            val foundInternalName = NEUInternalName.fromItemNameOrNull(rawName)
             if (foundInternalName == null) {
-                ChatUtils.error("Item '$rawName' does not exist!")
+                ChatUtils.userError("Item '$rawName' does not exist!")
                 return
             }
 
             val stack = foundInternalName.getItemStackOrNull()
             if (stack == null) {
-                ChatUtils.error("Item '$rawName' does not exist!")
+                ChatUtils.userError("Item '$rawName' does not exist!")
                 return
             }
-            setNewCollection(foundInternalName, stack.name!!.removeColor())
+            setNewCollection(foundInternalName, stack.name.removeColor())
         }
 
         private fun fixTypo(rawName: String) = when (rawName) {
@@ -111,7 +130,8 @@ class CollectionTracker {
         }
 
         private fun resetData() {
-            itemAmount = -1
+            itemAmount = -1L
+            goalAmount = -1L
             internalName = null
 
             lastAmountInInventory = -1
@@ -121,18 +141,27 @@ class CollectionTracker {
         }
 
         private fun updateDisplay() {
-            val format = LorenzUtils.formatInteger(itemAmount)
+            val format = itemAmount.addSeparators()
 
             var gainText = ""
             if (recentGain != 0) {
-                gainText = "§a+" + LorenzUtils.formatInteger(recentGain)
+                gainText = "§a+" + recentGain.addSeparators()
             }
+
+            if (goalAmount != -1L && itemAmount >= goalAmount) {
+                ChatUtils.chat("Collection goal of §a${goalAmount.addSeparators()} reached!")
+                goalAmount = -1L
+            }
+
+            val goal = if (goalAmount == -1L) "" else " §f/ §b${goalAmount.addSeparators()} §f(§a${
+                itemAmount.percentWithColorCode(goalAmount, 1)
+            }§f)"
 
             display = Collections.singletonList(buildList {
                 internalName?.let {
                     add(it.getItemStack())
                 }
-                add("$itemName collection: §e$format $gainText")
+                add("$itemName collection: §e$format$goal $gainText")
             })
         }
 

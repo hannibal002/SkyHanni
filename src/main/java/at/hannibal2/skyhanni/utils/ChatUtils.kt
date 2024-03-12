@@ -67,7 +67,7 @@ object ChatUtils {
      */
     @Deprecated(
         "Do not send the user a non clickable non stacktrace containing error message.",
-        ReplaceWith("ErrorManager.logErrorStateWithData")
+        ReplaceWith("ErrorManager.logErrorStateWithData(message)")
     )
     fun error(message: String) {
         println("error: '$message'")
@@ -219,4 +219,9 @@ object ChatUtils {
 
     fun MessageSendToServerEvent.isCommand(commandsWithSlash: Collection<String>) =
         splitMessage.takeIf { it.isNotEmpty() }?.get(0) in commandsWithSlash
+
+    fun MessageSendToServerEvent.senderIsSkyhanni() = originatingModContainer?.modId == "skyhanni"
+
+    fun MessageSendToServerEvent.eventWithNewMessage(message: String) =
+        MessageSendToServerEvent(message, message.split(" "), this.originatingModContainer)
 }

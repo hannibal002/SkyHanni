@@ -1,7 +1,6 @@
 package at.hannibal2.skyhanni.features.event.diana
 
 import at.hannibal2.skyhanni.SkyHanniMod
-import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.events.EntityHealthUpdateEvent
 import at.hannibal2.skyhanni.events.LorenzChatEvent
 import at.hannibal2.skyhanni.events.LorenzKeyPressEvent
@@ -129,6 +128,7 @@ object InquisitorWaypointShare {
         logger.log("FOUND: $name")
 
         inquisitorsNearby = inquisitorsNearby.editCopy { add(entity) }
+        GriffinBurrowHelper.update()
 
         val diff = System.currentTimeMillis() - time
         time = System.currentTimeMillis()
@@ -225,7 +225,7 @@ object InquisitorWaypointShare {
 
     @SubscribeEvent(priority = EventPriority.LOW, receiveCanceled = true)
     fun onFirstChatEvent(event: PacketEvent.ReceiveEvent) {
-        if (!isEnabled() || LorenzUtils.skyBlockIsland != IslandType.HUB) return
+        if (!isEnabled()) return
         val packet = event.packet
         if (packet !is S02PacketChat) return
         val messageComponent = packet.chatComponent
@@ -251,6 +251,7 @@ object InquisitorWaypointShare {
             }
             val inquis = SharedInquisitor(name, displayName, location, SimpleTimeMark.now())
             waypoints = waypoints.editCopy { this[name] = inquis }
+            GriffinBurrowHelper.update()
 
             event.isCanceled = true
         }
@@ -259,6 +260,7 @@ object InquisitorWaypointShare {
             val name = rawName.cleanPlayerName()
             val displayName = rawName.cleanPlayerName(displayName = true)
             waypoints = waypoints.editCopy { remove(name) }
+            GriffinBurrowHelper.update()
             logger.log("Inquisitor died from '$displayName'")
         }
     }
@@ -268,7 +270,8 @@ object InquisitorWaypointShare {
     fun maybeRemove(inquis: SharedInquisitor) {
         if (inquisitorsNearby.isEmpty()) {
             waypoints = waypoints.editCopy { remove(inquis.fromPlayer) }
-            ChatUtils.chat("Inquisitor from ${inquis.displayName} not found, deleting.")
+            GriffinBurrowHelper.update()
+            ChatUtils.chat("Inquisitor from ${inquis.displayName} §enot found, deleting.")
         }
     }
 }

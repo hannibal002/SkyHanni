@@ -32,6 +32,12 @@ object UtilsPatterns {
         "item.name.enchanted.book",
         ".{2}?Enchanted Book"
     )
+
+    val baitPattern by patternGroup.pattern(
+        "item.name.bait",
+        "^(Obfuscated.*|.* Bait)$"
+    )
+
     val enchantmentNamePattern by patternGroup.pattern(
         "item.neuitems.enchantmentname",
         "^(?<format>(?:§.)+)(?<name>[^§]+) (?<level>[IVXL]+)$"
@@ -40,10 +46,6 @@ object UtilsPatterns {
     val potionPattern by patternGroup.pattern(
         "item.name.potion",
         ".*Potion"
-    )
-    val petLevelPattern by patternGroup.pattern(
-        "item.petlevel",
-        "(?:§f§f)?(?:§7)?\\[Lvl (?<level>\\d+)] .*"
     )
     val readAmountBeforePattern by patternGroup.pattern(
         "item.amount.front",
@@ -80,5 +82,10 @@ object UtilsPatterns {
     val seasonPattern by patternGroup.pattern(
         "skyblocktime.season",
         "(?:Early |Late )?(?<season>Spring|Summer|Autumn|Winter)"
+    )
+
+    val tabListProfilePattern by patternGroup.pattern(
+        "tablist.profile",
+        "(?:§.)+Profile: §r§a(?<profile>\\S+).*"
     )
 }

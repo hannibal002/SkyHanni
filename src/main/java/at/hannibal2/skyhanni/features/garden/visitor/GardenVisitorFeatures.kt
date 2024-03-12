@@ -10,8 +10,9 @@ import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.LorenzChatEvent
 import at.hannibal2.skyhanni.events.LorenzTickEvent
 import at.hannibal2.skyhanni.events.OwnInventoryItemUpdateEvent
-import at.hannibal2.skyhanni.events.PreProfileSwitchEvent
+import at.hannibal2.skyhanni.events.ProfileJoinEvent
 import at.hannibal2.skyhanni.events.SackDataUpdateEvent
+import at.hannibal2.skyhanni.events.SkyHanniRenderEntityEvent
 import at.hannibal2.skyhanni.events.garden.visitor.VisitorAcceptEvent
 import at.hannibal2.skyhanni.events.garden.visitor.VisitorAcceptedEvent
 import at.hannibal2.skyhanni.events.garden.visitor.VisitorArrivalEvent
@@ -19,10 +20,10 @@ import at.hannibal2.skyhanni.events.garden.visitor.VisitorOpenEvent
 import at.hannibal2.skyhanni.events.garden.visitor.VisitorRefusedEvent
 import at.hannibal2.skyhanni.events.garden.visitor.VisitorRenderEvent
 import at.hannibal2.skyhanni.events.garden.visitor.VisitorToolTipEvent
-import at.hannibal2.skyhanni.features.bazaar.BazaarApi
 import at.hannibal2.skyhanni.features.garden.CropType.Companion.getByNameOrNull
 import at.hannibal2.skyhanni.features.garden.GardenAPI
 import at.hannibal2.skyhanni.features.garden.farming.GardenCropSpeed.getSpeed
+import at.hannibal2.skyhanni.features.inventory.bazaar.BazaarApi
 import at.hannibal2.skyhanni.mixins.hooks.RenderLivingEntityHelper
 import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.ChatUtils
@@ -46,6 +47,7 @@ import at.hannibal2.skyhanni.utils.NEUItems.getItemStack
 import at.hannibal2.skyhanni.utils.NEUItems.getPrice
 import at.hannibal2.skyhanni.utils.NumberUtil
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
+import at.hannibal2.skyhanni.utils.NumberUtil.formatInt
 import at.hannibal2.skyhanni.utils.RenderUtils.drawString
 import at.hannibal2.skyhanni.utils.RenderUtils.renderStringsAndItems
 import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
@@ -62,7 +64,6 @@ import net.minecraft.entity.EntityLivingBase
 import net.minecraft.entity.item.EntityArmorStand
 import net.minecraft.item.ItemStack
 import net.minecraftforge.client.event.GuiScreenEvent.DrawScreenEvent
-import net.minecraftforge.client.event.RenderLivingEvent
 import net.minecraftforge.fml.common.eventhandler.EventPriority
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import kotlin.math.round
@@ -100,7 +101,7 @@ class GardenVisitorFeatures {
     private var lastFullPrice = 0.0
 
     @SubscribeEvent
-    fun onPreProfileSwitch(event: PreProfileSwitchEvent) {
+    fun onProfileJoin(event: ProfileJoinEvent) {
         display = emptyList()
     }
 
@@ -207,7 +208,7 @@ class GardenVisitorFeatures {
                     val itemAmount = sackItemData.amount
                     if (itemStatus != SackStatus.OUTDATED) {
                         val textColour = if (itemAmount >= amount) "a" else "e"
-                        list.add(" (§${textColour}x${sackItemData.amount.addSeparators()} §7in sacks)")
+                        list.add(" §7(§${textColour}x${sackItemData.amount.addSeparators()} §7in sacks)")
                     }
                 }
 
@@ -251,12 +252,7 @@ class GardenVisitorFeatures {
                         list.add("§7(§fAny§7)")
                     } else {
                         for (item in items) {
-                            val internalName = NEUItems.getInternalNameOrNull(item)
-                            if (internalName != null) {
-                                list.add(internalName.getItemStack())
-                            } else {
-                                list.add(" '$item' ")
-                            }
+                            list.add(NEUInternalName.fromItemName(item).getItemStack())
                         }
                     }
                 }
@@ -344,7 +340,7 @@ class GardenVisitorFeatures {
             }
 
             val (itemName, amount) = ItemUtils.readItemAmount(formattedLine) ?: continue
-            val internalName = NEUItems.getInternalNameOrNull(itemName)?.replace("◆_", "") ?: continue
+            val internalName = NEUInternalName.fromItemNameOrNull(itemName)?.replace("◆_", "") ?: continue
 
             // Ignoring custom NEU items like copper
             if (internalName.startsWith("SKYBLOCK_")) continue
@@ -381,14 +377,14 @@ class GardenVisitorFeatures {
             val index = i + offset
             if (config.inventory.experiencePrice) {
                 gardenExperiencePattern.matchMatcher(formattedLine) {
-                    val gardenExp = group("amount").replace(",", "").toInt()
+                    val gardenExp = group("amount").formatInt()
                     val pricePerCopper = NumberUtil.format((totalPrice / gardenExp).toInt())
                     finalList.set(index, "$formattedLine §7(§6$pricePerCopper §7per)")
                 }
             }
 
             copperPattern.matchMatcher(formattedLine) {
-                val copper = group("amount").replace(",", "").toInt()
+                val copper = group("amount").formatInt()
                 val pricePerCopper = NumberUtil.format((totalPrice / copper).toInt())
                 visitor.pricePerCopper = (totalPrice / copper).toInt()
                 val timePerCopper = TimeUtils.formatDuration((farmingTimeRequired / copper) * 1000)
@@ -405,7 +401,7 @@ class GardenVisitorFeatures {
             }
 
             val (itemName, amount) = ItemUtils.readItemAmount(formattedLine) ?: continue
-            val internalName = NEUItems.getInternalNameOrNull(itemName)?.replace("◆_", "") ?: continue
+            val internalName = NEUInternalName.fromItemNameOrNull(itemName)?.replace("◆_", "") ?: continue
 
             // Ignoring custom NEU items like copper
             if (internalName.startsWith("SKYBLOCK_")) continue
@@ -422,8 +418,7 @@ class GardenVisitorFeatures {
             val cropType = getByNameOrNull(rawName) ?: continue
 
             val cropAmount = multiplier.second.toLong() * amount
-            val formattedAmount = LorenzUtils.formatInteger(cropAmount)
-            val formattedName = "§e$formattedAmount§7x ${cropType.cropName} "
+            val formattedName = "§e${cropAmount.addSeparators()}§7x ${cropType.cropName} "
             val formattedSpeed = cropType.getSpeed()?.let { speed ->
                 farmingTimeRequired = cropAmount / speed
                 val duration = TimeUtils.formatDuration(farmingTimeRequired * 1000)
@@ -554,7 +549,7 @@ class GardenVisitorFeatures {
     private fun hasItemsInInventory(visitor: VisitorAPI.Visitor): Boolean {
         var ready = true
         for ((internalName, required) in visitor.shoppingList) {
-            val having = InventoryUtils.countItemsInLowerInventory { it.getInternalName() == internalName }
+            val having = InventoryUtils.getAmountOfItemInInventory(internalName)
             if (having < required) {
                 ready = false
             }
@@ -606,7 +601,7 @@ class GardenVisitorFeatures {
     }
 
     @SubscribeEvent(priority = EventPriority.HIGH)
-    fun onRenderLiving(event: RenderLivingEvent.Specials.Pre<EntityLivingBase>) {
+    fun onRenderLiving(event: SkyHanniRenderEntityEvent.Specials.Pre<EntityLivingBase>) {
         if (!config.coloredName) return
         val entity = event.entity
         val entityId = entity.entityId

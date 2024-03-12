@@ -1,6 +1,7 @@
 package at.hannibal2.skyhanni.config.commands
 
 import at.hannibal2.skyhanni.SkyHanniMod
+import at.hannibal2.skyhanni.api.SkillAPI
 import at.hannibal2.skyhanni.config.ConfigFileType
 import at.hannibal2.skyhanni.config.ConfigGuiManager
 import at.hannibal2.skyhanni.data.ChatManager
@@ -14,6 +15,8 @@ import at.hannibal2.skyhanni.features.chat.Translator
 import at.hannibal2.skyhanni.features.combat.endernodetracker.EnderNodeTracker
 import at.hannibal2.skyhanni.features.combat.ghostcounter.GhostUtil
 import at.hannibal2.skyhanni.features.commands.PartyCommands
+import at.hannibal2.skyhanni.features.commands.WikiManager
+import at.hannibal2.skyhanni.features.event.diana.AllBurrowsList
 import at.hannibal2.skyhanni.features.event.diana.BurrowWarpHelper
 import at.hannibal2.skyhanni.features.event.diana.DianaProfitTracker
 import at.hannibal2.skyhanni.features.event.diana.GriffinBurrowHelper
@@ -45,7 +48,9 @@ import at.hannibal2.skyhanni.features.minion.MinionFeatures
 import at.hannibal2.skyhanni.features.misc.CollectionTracker
 import at.hannibal2.skyhanni.features.misc.LockMouseLook
 import at.hannibal2.skyhanni.features.misc.MarkedPlayerManager
+import at.hannibal2.skyhanni.features.misc.MiscFeatures
 import at.hannibal2.skyhanni.features.misc.discordrpc.DiscordRPCManager
+import at.hannibal2.skyhanni.features.misc.limbo.LimboTimeTracker
 import at.hannibal2.skyhanni.features.misc.massconfiguration.DefaultConfigFeatures
 import at.hannibal2.skyhanni.features.misc.visualwords.VisualWordGui
 import at.hannibal2.skyhanni.features.rift.area.westvillage.VerminTracker
@@ -64,6 +69,7 @@ import at.hannibal2.skyhanni.test.command.CopyNearbyParticlesCommand
 import at.hannibal2.skyhanni.test.command.CopyScoreboardCommand
 import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.test.command.TestChatCommand
+import at.hannibal2.skyhanni.test.command.TrackSoundsCommand
 import at.hannibal2.skyhanni.utils.APIUtil
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils
@@ -239,6 +245,22 @@ object Commands {
             "shresetseacreaturetracker",
             "Resets the Sea Creature Tracker"
         ) { SeaCreatureTracker.resetCommand(it) }
+        registerCommand(
+            "shfandomwiki",
+            "Searches the fandom wiki with SkyHanni's own method."
+        ) { WikiManager.otherWikiCommands(it, true) }
+        registerCommand(
+            "shfandomwikithis",
+            "Searches the fandom wiki with SkyHanni's own method."
+        ) { WikiManager.otherWikiCommands(it, true, true) }
+        registerCommand(
+            "shofficialwiki",
+            "Searches the official wiki with SkyHanni's own method."
+        ) { WikiManager.otherWikiCommands(it, false) }
+        registerCommand(
+            "shofficialwikithis",
+            "Searches the official wiki with SkyHanni's own method."
+        ) { WikiManager.otherWikiCommands(it, false, true) }
         registerCommand0(
             "shcalccrop",
             "Calculate how many crops need to be farmed between different crop milestones.",
@@ -255,6 +277,20 @@ object Commands {
             },
             FarmingMilestoneCommand::onComplete
         )
+        registerCommand0(
+            "shskills",
+            "Skills XP/Level related command",
+            { SkillAPI.onCommand(it) },
+            SkillAPI::onComplete
+        )
+        registerCommand(
+            "shlimbostats",
+            "Prints your Limbo Stats!"
+        ) { LimboTimeTracker.printStats() }
+        registerCommand(
+            "shlimbo",
+            "Warps you to Limbo."
+        ) { MiscFeatures().goToLimbo() }
     }
 
     private fun usersBugFix() {
@@ -345,6 +381,10 @@ object Commands {
         registerCommand("shrepopatterns", "See where regexes are loaded from") { RepoPatternGui.open() }
         registerCommand("shtest", "Unused test command.") { SkyHanniDebugsAndTests.testCommand(it) }
         registerCommand(
+            "shtestitem",
+            "test item internal name resolving"
+        ) { SkyHanniDebugsAndTests.testItemCommand(it) }
+        registerCommand(
             "shfindnullconfig",
             "Find config elements that are null and prints them into the console"
         ) { SkyHanniDebugsAndTests.findNullConfig(it) }
@@ -368,6 +408,10 @@ object Commands {
             "shcopyentities",
             "Copies entities in the specified radius around the player to the clipboard"
         ) { CopyNearbyEntitiesCommand.command(it) }
+        registerCommand(
+            "shtracksounds",
+            "Tracks the sounds for the specified duration (in seconds) and copies it to the clipboard"
+        ) { TrackSoundsCommand.command(it) }
         registerCommand(
             "shcopytablist",
             "Copies the tab list data to the clipboard"
@@ -421,6 +465,14 @@ object Commands {
             "readcropmilestonefromclipboard",
             "Read crop milestone from clipboard. This helps fixing wrong crop milestone data"
         ) { GardenCropMilestonesCommunityFix.readDataFromClipboard() }
+        registerCommand(
+            "shcopyfoundburrowlocations",
+            "Copy all ever found burrow locations to clipboard"
+        ) { AllBurrowsList.copyToClipboard() }
+        registerCommand(
+            "shaddfoundburrowlocationsfromclipboard",
+            "Add all ever found burrow locations from clipboard"
+        ) { AllBurrowsList.addFromClipboard() }
     }
 
     private fun internalCommands() {

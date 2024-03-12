@@ -12,11 +12,20 @@ object PetAPI {
     )
     private val petItemName by patternGroup.pattern(
         "item.name",
-        "§.\\[Lvl (?<level>\\d)] (?<name>.*)"
+        "(?:§.)*\\[Lvl (?<level>\\d+)] (?<name>.*)"
     )
     private val neuRepoPetItemName by patternGroup.pattern(
         "item.name.neu.format",
         "(§f§f)?§7\\[Lvl 1➡(100|200)] (?<name>.*)"
+    )
+
+    private val ignoredPetStrings = listOf(
+        "Archer",
+        "Berserk",
+        "Mage",
+        "Tank",
+        "Healer",
+        "➡",
     )
 
     fun isPetMenu(inventoryTitle: String): Boolean = petMenuPattern.matches(inventoryTitle)
@@ -40,4 +49,10 @@ object PetAPI {
 
         return null
     }
+
+    fun getPetLevel(nameWithLevel: String): Int? = petItemName.matchMatcher(nameWithLevel) {
+        group("level").toInt()
+    }
+
+    fun hasPetName(name: String): Boolean = petItemName.matches(name) && !ignoredPetStrings.any { name.contains(it) }
 }

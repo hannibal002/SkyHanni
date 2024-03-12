@@ -1,5 +1,6 @@
 package at.hannibal2.skyhanni.config.features.dev;
 
+import at.hannibal2.skyhanni.config.core.config.Position;
 import com.google.gson.annotations.Expose;
 import io.github.moulberry.moulconfig.annotations.ConfigEditorBoolean;
 import io.github.moulberry.moulconfig.annotations.ConfigEditorKeybind;
@@ -111,4 +112,7 @@ public class DebugConfig {
     @ConfigOption(name = "SkyBlock Area", desc = "Show your current area in SkyBlock while f3 is open.")
     @ConfigEditorBoolean
     public boolean currentAreaDebug = true;
+
+    @Expose
+    public Position trackSoundPosition = new Position(0, 0);
 }
