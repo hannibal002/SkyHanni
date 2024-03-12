@@ -3,7 +3,6 @@ package at.hannibal2.skyhanni.features.gui.customscoreboard
 import at.hannibal2.skyhanni.data.HypixelData
 import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.data.ScoreboardData
-import at.hannibal2.skyhanni.features.garden.contest.FarmingContestAPI.sidebarCropPattern
 import at.hannibal2.skyhanni.features.gui.customscoreboard.CustomScoreboard.Companion.config
 import at.hannibal2.skyhanni.features.gui.customscoreboard.ScoreboardEvents.VOTING
 import at.hannibal2.skyhanni.features.gui.customscoreboard.ScoreboardPattern
@@ -259,7 +258,7 @@ private fun getJacobContestLines() = buildList {
 }
 
 private fun getJacobContestShowWhen(): Boolean {
-    return sidebarCropPattern.anyMatches(getSbLines())
+    return SbPattern.jacobsContestPattern.anyMatches(getSbLines())
 }
 
 private fun getJacobMedalsLines(): List<String> {
