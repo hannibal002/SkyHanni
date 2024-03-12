@@ -24,4 +24,9 @@ public class SkillColorConfig {
     @ConfigEditorText
     public String displayPercentageColorString = "0:10:c;10:25:6;25:50:e;50:75:2;75:100:a";
 
+    @Expose
+    @ConfigOption(name = "Level Color", desc = "Change the level display color like Skyblock Level does.")
+    @ConfigEditorBoolean
+    public Property<Boolean> scalingColorLevel = Property.of(false);
+
 }

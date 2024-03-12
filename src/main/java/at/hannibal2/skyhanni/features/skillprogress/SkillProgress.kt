@@ -9,7 +9,9 @@ import at.hannibal2.skyhanni.api.SkillAPI.customGoalConfig
 import at.hannibal2.skyhanni.api.SkillAPI.etaConfig
 import at.hannibal2.skyhanni.api.SkillAPI.lastUpdate
 import at.hannibal2.skyhanni.api.SkillAPI.oldSkillInfoMap
+import at.hannibal2.skyhanni.api.SkillAPI.overflowConfig
 import at.hannibal2.skyhanni.api.SkillAPI.showDisplay
+import at.hannibal2.skyhanni.api.SkillAPI.skillColorConfig
 import at.hannibal2.skyhanni.api.SkillAPI.skillXPInfoMap
 import at.hannibal2.skyhanni.config.features.skillprogress.SkillETADisplayConfig.TextEntry
 import at.hannibal2.skyhanni.config.features.skillprogress.SkillProgressConfig
@@ -22,6 +24,7 @@ import at.hannibal2.skyhanni.events.SkillOverflowLevelupEvent
 import at.hannibal2.skyhanni.features.chroma.ChromaShaderManager
 import at.hannibal2.skyhanni.features.chroma.ChromaType
 import at.hannibal2.skyhanni.features.skillprogress.SkillUtil.XP_NEEDED_FOR_60
+import at.hannibal2.skyhanni.features.skillprogress.SkillUtil.getColorForLevel
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.ChatUtils.chat
 import at.hannibal2.skyhanni.utils.ConditionalUtils.onToggle
@@ -233,10 +236,11 @@ object SkillProgress {
             config.useIcon,
             config.usePercentage,
             config.useSkillName,
-            config.overflowConfig.enableInDisplay,
-            config.overflowConfig.enableInProgressBar,
-            config.overflowConfig.enableInEtaDisplay,
-            config.skillColorConfig.matchBarColor,
+            overflowConfig.enableInDisplay,
+            overflowConfig.enableInProgressBar,
+            overflowConfig.enableInEtaDisplay,
+            skillColorConfig.matchBarColor,
+            skillColorConfig.scalingColorLevel,
             barConfig.enabled,
             barConfig.useChroma,
             barConfig.useTexturedBar,
@@ -250,7 +254,7 @@ object SkillProgress {
             barConfig.enchantingBarColor,
             barConfig.fishingBarColor,
             allSkillConfig.enabled,
-            etaConfig.enabled
+            etaConfig.enabled,
         ) {
             updateDisplay()
             update()
@@ -441,7 +445,8 @@ object SkillProgress {
         val color = Color(SpecialColour.specialToChromaRGB(SkillType.getBarColor(activeSkill)))
 
         if (config.showLevel.get()) {
-            val levelString = if (matchColor) "[$level] " else "§9[§d$level§9] "
+            val colorLevel = if (config.skillColorConfig.scalingColorLevel.get()) getColorForLevel(level) else "§d"
+            val levelString = if (matchColor) "[$level] " else "§9[$colorLevel$level§9] "
             add(Renderable.string(levelString, color))
         }
 
