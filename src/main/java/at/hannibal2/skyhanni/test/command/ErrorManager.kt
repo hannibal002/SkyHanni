@@ -101,8 +101,9 @@ object ErrorManager {
         message: String,
         vararg extraData: Pair<String, Any?>,
         ignoreErrorCache: Boolean = false,
+        noStackTrace: Boolean = false,
     ) {
-        logError(throwable, message, ignoreErrorCache, noStackTrace = false, *extraData)
+        logError(throwable, message, ignoreErrorCache, noStackTrace, *extraData)
     }
 
     private fun logError(

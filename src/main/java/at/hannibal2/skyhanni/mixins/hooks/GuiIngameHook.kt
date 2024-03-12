@@ -15,11 +15,16 @@ fun drawString(
     x: Int,
     y: Int,
     color: Int,
-) = replaceString(text)?.let {
+) = tryToReplaceScoreboardLine(text)?.let {
     instance.drawString(it, x, y, color)
 } ?: 0
 
-private fun replaceString(text: String): String? {
+/**
+ * Tries to replace a scoreboard line with a modified one
+ * @param text The line to check and possibly replace
+ * @return The replaced line, or null if it should be hidden
+ */
+fun tryToReplaceScoreboardLine(text: String): String? {
     if (SkyHanniMod.feature.misc.hideScoreboardNumbers && text.startsWith("§c") && text.length <= 4) {
         return null
     }

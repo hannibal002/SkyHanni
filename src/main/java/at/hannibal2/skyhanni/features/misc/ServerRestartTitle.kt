@@ -16,10 +16,17 @@ class ServerRestartTitle {
 
     private val config get() = SkyHanniMod.feature.misc
 
-    private val restartPattern by RepoPattern.pattern(
-        "misc.serverrestart.restart",
-        "§cServer closing: (?<minutes>\\d+):(?<seconds>\\d+) §8.*"
-    )
+    companion object {
+        private val restartingGroup = RepoPattern.group("features.misc.serverrestart")
+        private val restartingPattern by restartingGroup.pattern(
+            "time",
+            "§cServer closing: (?<minutes>\\d+):(?<seconds>\\d+) ?§8.*"
+        )
+        val restartingGreedyPattern by restartingGroup.pattern(
+            "greedy",
+            "§cServer closing:.*"
+        )
+    }
 
     @SubscribeEvent
     fun onTick(event: LorenzTickEvent) {
@@ -29,7 +36,7 @@ class ServerRestartTitle {
         if (!event.repeatSeconds(1)) return
 
         for (line in ScoreboardData.sidebarLinesFormatted) {
-            restartPattern.matchMatcher(line) {
+            restartingPattern.matchMatcher(line) {
                 try {
                     val minutes = group("minutes").toInt().minutes
                     val seconds = group("seconds").toInt().seconds
@@ -39,9 +46,9 @@ class ServerRestartTitle {
                     LorenzUtils.sendTitle("§cServer Restart in §b$time", 2.seconds)
                 } catch (e: Throwable) {
                     ErrorManager.logErrorWithData(
-                        e, "Error reading server restart time from socreboard",
+                        e, "Error reading server restart time from scoreboard",
                         "line" to line,
-                        "restartPattern" to restartPattern.pattern(),
+                        "restartPattern" to restartingPattern.pattern(),
                     )
                 }
             }
