@@ -6,6 +6,7 @@ import at.hannibal2.skyhanni.events.TabWidgetUpdate
 import at.hannibal2.skyhanni.utils.CollectionUtils.editCopy
 import at.hannibal2.skyhanni.utils.CollectionUtils.getOrNull
 import at.hannibal2.skyhanni.utils.ConditionalUtils.transformIf
+import at.hannibal2.skyhanni.utils.LorenzDebug
 import at.hannibal2.skyhanni.utils.StringUtils.matches
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPatternManager
@@ -122,7 +123,7 @@ enum class TabWidget(
     ),
     JACOB_CONTEST(
         // language=RegExp
-        "(?:§.)*Jacob's Contest: .*"
+        "(?:§.)*Jacob's Contest:.*"
     ),
     SLAYER(
         // language=RegExp
@@ -228,6 +229,30 @@ enum class TabWidget(
         // language=RegExp
         "(?:§.)*Advertisement:"
     ),
+    COMPOSTER(
+        // language=RegExp
+        "(?:§.)*Composter:"
+    ),
+    GARDEN_LEVEL(
+        // language=RegExp
+        "Garden Level: (?:§.)*(?<level>.*)"
+    ),
+    COPPER(
+        // language=RegExp
+        "Copper: (?:§.)*(?<amount>\\d+)"
+    ),
+    PESTS(
+        // language=RegExp
+        "(?:§.)*Pests:"
+    ),
+    VISITORS(
+        // language=RegExp
+        "(?:§.)*Visitors: (?:§.)*\\((?<count>\\d+)\\)"
+    ),
+    CROP_MILESTONE(
+        // language=RegExp
+        "(?:§.)*Crop Milestones:"
+    ),
 
     ;
 
@@ -263,6 +288,8 @@ enum class TabWidget(
         @SubscribeEvent(priority = EventPriority.HIGH)
         fun onTabListUpdate(event: TabListUpdateEvent) {
             val tabList = filterTabList(event.tabList)
+
+            LorenzDebug.log(tabList.toString())
 
             separatorIndexes.forEach {
                 it.second?.activeAfterCheck = false
