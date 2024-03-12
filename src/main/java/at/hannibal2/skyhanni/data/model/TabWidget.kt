@@ -26,7 +26,7 @@ enum class TabWidget(
     SB_LEVEL(
         "SB Level(?:§.)*: (?:§.)*\\[(?:§.)*(?<level>\\d+)(?:§.)*\\] (?:§.)*(?<xp>\\d+).*"
     ),
-    BANK("Bank: (?:§.)*(?<amount>[^§]+)(?:\\(?:§.)*/(?:§.)*(?<personal>.*))?"),
+    BANK("Bank: (?:§.)*(?<amount>[^§]+)(?:\\(?:§.)*(?:\\/(?:§.)*(?<personal>.*))?"),
     INTEREST("Interest: (?:§.)*(?<time>[^§]+)(?:§.)* \\((?<amount>[^)]+)\\)"),
     SOULFLOW("Soulflow: (?:§.)*(?<amount>.*)"),
     PET(
