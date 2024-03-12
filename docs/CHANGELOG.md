@@ -45,6 +45,15 @@
 + Display upcoming mining events. - CalMWolfs
     + Show what mining events are currently occurring in both the Dwarven Mines and Crystal Hollows.
 
+#### Gui Features
+
++ Added Custom Scoreboard - j10a1n15 (https://github.com/hannibal002/SkyHanni/pull/893)
+    + Customizable; New, never seen before lines like the current mayor with perks, your party, and more!
+    + Custom Title and Footer, align them on different sides of the scoreboard.
+    + Hide the Hypixel Scoreboard, add a custom Image as a background, rounded corners.
+    + Supports colored month names & better garden plot names.
+    + A ton of settings.
+
 #### Misc Features
 
 + Added command `/shlimbo` for easier Limbo access. - martimavocado (https://github.com/hannibal002/SkyHanni/pull/848)
@@ -93,6 +102,8 @@
     + Shows a chat message once the goal has been reached.
 + Added SkyHanni update download finished chat message. -
   Thunderblade73 (https://github.com/hannibal002/SkyHanni/pull/1122)
++ Better chat error when profile name is disabled via Hypixel widgets. -
+  hannibal2 (https://github.com/hannibal002/SkyHanni/pull/1153)
 
 ### Fixes
 
@@ -123,6 +134,7 @@
   CalMWolfs (https://github.com/hannibal002/SkyHanni/pull/1119)
 + Fixed Anita's Accessory chat filter not working with multi-word crops (Cocoa Beans, Nether Wart, Sugar Cane). -
   Alexia (https://github.com/hannibal002/SkyHanni/pull/1115)
++ Fixed fire sale chat hider. - Empa (https://github.com/hannibal002/SkyHanni/pull/1147)
 
 #### Garden Fixes
 
@@ -132,6 +144,10 @@
     + Typos in pest features.
     + Grammar in Farming Weight Display
 + Fixed the Lane Switch Calculation - ILike2WatchMemes (https://github.com/hannibal002/SkyHanni/pull/1138)
++ Fixed coins per copper display not working with new sub categories of SkyMart. -
+  hannibal2 (https://github.com/hannibal002/SkyHanni/pull/1154)
++ Fixed tab list visitor name detection breaking when tab list said "new" -
+  hannibal2 (https://github.com/hannibal002/SkyHanni/pull/1151)
 
 #### Command Fixes
 
@@ -153,6 +169,7 @@
 + Disable action bar hider if Skill Progress feature is disabled. -
   ooffyy (https://github.com/hannibal002/SkyHanni/pull/1137)
 + Improved performance of custom colored mobs. - Thunderblade73 (https://github.com/hannibal002/SkyHanni/pull/1127)
++ Fixed Skill Progress Pattern. - HiZe_ (https://github.com/hannibal002/SkyHanni/pull/1148)
 
 ### Technical Details
 
@@ -206,6 +223,33 @@
 + Changed fillTable to use a list of DisplayTableEntry. - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/1116)
 + Removed the RenderMobColoredEvent & ResetEntityHurtEvent. -
   Thunderblade73 (https://github.com/hannibal002/SkyHanni/pull/1127)
++ Added BitsAPI with current bits, bits to claim & current Fame Rank. -
+  j10a1n15 (https://github.com/hannibal002/SkyHanni/pull/893)
++ Added FameRanks, which includes all ranks with important data. -
+  j10a1n15 (https://github.com/hannibal002/SkyHanni/pull/893)
++ Added QuiverAPI with current arrow type and amount, and a hashmap of the arrows of the player. -
+  j10a1n15 (https://github.com/hannibal002/SkyHanni/pull/893)
++ Added MaxwellAPI with current power and magical power. - j10a1n15 (https://github.com/hannibal002/SkyHanni/pull/893)
++ Added Mayor & Perk Enum. - j10a1n15 (https://github.com/hannibal002/SkyHanni/pull/893)
++ Added method to render a string on element width. - j10a1n15 (https://github.com/hannibal002/SkyHanni/pull/893)
++ Updated MayorAPI with new debug data, better PerkActive method & a method to give a mayor a color. -
+  j10a1n15 (https://github.com/hannibal002/SkyHanni/pull/893)
++ Updated ScoreboardData to only remove the second color code when it's the same as the old one. -
+  j10a1n15 (https://github.com/hannibal002/SkyHanni/pull/893)
++ Updated TablistData with a new getPlayerTabOverlay() and a fullyLoaded var. -
+  j10a1n15 (https://github.com/hannibal002/SkyHanni/pull/893)
++ Added LorenzUtils.inAnyIsland(). - j10a1n15 (https://github.com/hannibal002/SkyHanni/pull/893)
++ Added List.removeNextAfter() to CollectionUtils. - j10a1n15 (https://github.com/hannibal002/SkyHanni/pull/893)
++ Added noStackTrace param to .logErrorWithData() in ErrorManager. -
+  j10a1n15 (https://github.com/hannibal002/SkyHanni/pull/893)
++ Updated some patterns to RepoPatterns. - j10a1n15 (https://github.com/hannibal002/SkyHanni/pull/893)
++ Created GuiPositionMovedEvent. - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/893)
++ More features for /shtestmessage - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/1145)
+    + Supports -clipboard parameter, uses the clipboard as text.
+    + Supports blocked or modified chat events.
++ Code cleanup in LaneSwitchUtils.isBoundaryPlot. - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/1143)
++ Creating and using ContainerChest.getAllItems(), getUpperItems() and getLowerItems(). -
+  hannibal2 (https://github.com/hannibal002/SkyHanni/pull/1047)
 
 ### Removed Features
 
