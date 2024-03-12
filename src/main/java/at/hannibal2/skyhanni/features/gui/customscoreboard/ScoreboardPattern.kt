@@ -3,7 +3,7 @@ package at.hannibal2.skyhanni.features.gui.customscoreboard
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 
 object ScoreboardPattern {
-    val group = RepoPattern.group("features.misc.customscoreboard")
+    val group = RepoPattern.group("features.gui.customscoreboard")
 
     // Stats from the scoreboard
     private val scoreboardGroup = group.group("scoreboard")
@@ -383,7 +383,7 @@ object ScoreboardPattern {
     )
     val bankPattern by tablistGroup.pattern(
         "bank",
-        "^\\s*Bank: §6(?<bank>\\d*,?(\\.\\d+)?[a-zA-Z]?(/\\d*,?(\\.\\d+)?[a-zA-Z]?)?)$"
+        "^\\s*Bank: §6(?<bank>[\\w.,]+(?:§7 \\/ §6(?<coop>[\\w.,]+))?)$"
     )
     val mithrilPowderPattern by tablistGroup.pattern(
         "mithrilpowder",
