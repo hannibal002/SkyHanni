@@ -13,7 +13,7 @@
 //  - option to hide coins earned
 //  - color options in the purse etc lines
 //  - choose the amount of decimal places in shorten nums
-//  - very important bug fix: duplex is weird :(
+//  - ~~very important bug fix: duplex is weird :(~~ will be fixed with empas quiverapi overhaul
 //
 
 package at.hannibal2.skyhanni.features.gui.customscoreboard
