@@ -373,7 +373,8 @@ private fun getIslandDisplayPair() =
     listOf("§7㋖ §a" + HypixelData.skyBlockIsland.displayName to HorizontalAlignment.LEFT)
 
 private fun getLocationDisplayPair() = buildList {
-		add((tryToReplaceScoreboardLine(
+    add(
+        (tryToReplaceScoreboardLine(
             getGroupFromPattern(
                 ScoreboardData.sidebarLinesFormatted,
                 ScoreboardPattern.locationPattern,
@@ -381,10 +382,10 @@ private fun getLocationDisplayPair() = buildList {
             )
         )?.trim()
             ?: "<hidden>") to HorizontalAlignment.LEFT
-		)
+    )
 
-		val plotLine = ScoreboardData.sidebarLinesFormatted.first { ScoreboardPattern.plotPattern.matches(it) }
-		if (plotLine != null) add(plotLine to HorizontalAlignment.LEFT)
+    val plotLine = ScoreboardData.sidebarLinesFormatted.firstOrNull { ScoreboardPattern.plotPattern.matches(it) }
+    if (plotLine != null) add(plotLine to HorizontalAlignment.LEFT)
 }
 
 private fun getVisitDisplayPair() =
@@ -511,7 +512,7 @@ private fun getQuiverDisplayPair(): List<ScoreboardElementType> {
         if (displayConfig.displayNumbersFirst) {
             "$amountString ${QuiverAPI.currentArrow?.arrow}s"
         } else {
-            "${ QuiverAPI.currentArrow?.arrow?.replace(" Arrow", "") }: $amountString Arrows"
+            "${QuiverAPI.currentArrow?.arrow?.replace(" Arrow", "")}: $amountString Arrows"
         } to HorizontalAlignment.LEFT
     )
 }
