@@ -51,7 +51,7 @@ class TotemOfCorruption {
 
     @SubscribeEvent
     fun onTick(event: LorenzTickEvent) {
-        if (event.repeatSeconds(1)) return
+        if (!event.repeatSeconds(2)) return
         if (!isOverlayEnabled()) return
 
         totems = getTotems()
@@ -60,7 +60,7 @@ class TotemOfCorruption {
                 val timeRemaining = getTimeRemaining(totem)
                 val owner = getOwner(totem)
                 if (timeRemaining != null && owner != null) {
-                    if (timeRemaining <= config.warnWhenAboutToExpire && config.warnWhenAboutToExpire > 0) {
+                    if (timeRemaining == config.warnWhenAboutToExpire && config.warnWhenAboutToExpire > 0) {
                         playPlingSound()
                         sendTitle("§c§lTotem of Corruption §eabout to expire!", 5.seconds)
                     }
