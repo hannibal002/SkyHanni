@@ -333,7 +333,7 @@ object Commands {
         registerCommand(
             "shresetpunchcard",
             "Resets the Rift Punchcard Artifact player list."
-        ) { PunchcardHighlight().playerList.clear() }
+        ) { PunchcardHighlight().clearList() }
     }
 
     private fun developersDebugFeatures() {

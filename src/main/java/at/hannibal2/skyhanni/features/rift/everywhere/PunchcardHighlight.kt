@@ -8,17 +8,17 @@ import at.hannibal2.skyhanni.events.LorenzChatEvent
 import at.hannibal2.skyhanni.events.RenderMobColoredEvent
 import at.hannibal2.skyhanni.events.withAlpha
 import at.hannibal2.skyhanni.utils.ColorUtils.toChromaColor
+import at.hannibal2.skyhanni.utils.DelayedRun
 import at.hannibal2.skyhanni.utils.EntityUtils.isNPC
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils.isInIsland
 import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
-import kotlinx.coroutines.delay
-import kotlinx.coroutines.launch
 import net.minecraft.client.Minecraft
 import net.minecraft.client.entity.EntityPlayerSP
 import net.minecraft.entity.player.EntityPlayer
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
+import kotlin.time.Duration.Companion.milliseconds
 
 class PunchcardHighlight {
     private val config get() = SkyHanniMod.feature.rift.punchcard
@@ -27,10 +27,10 @@ class PunchcardHighlight {
 
     private val punchedPattern by RepoPattern.pattern(
         "rift.punchcard.new",
-        "§5§lPUNCHCARD! §r§eYou punched §r§[\\da-z](?:.*?)?(\\w+)§r§[\\da-z] §r§eand both regained §r§a\\+25ф Rift Time§r§e!"
+        "§5§lPUNCHCARD! §r§eYou punched §r§[\\da-z](?:.*?)?(?<name>\\w+)§r§[\\da-z] §r§eand both regained §r§a\\+25ф Rift Time§r§e!"
     )
 
-    val playerList: MutableSet<String> = mutableSetOf()
+    private val playerList: MutableSet<String> = mutableSetOf()
 
     @SubscribeEvent
     fun onRenderMobColored(event: RenderMobColoredEvent) {
@@ -54,20 +54,21 @@ class PunchcardHighlight {
     @SubscribeEvent
     fun onChat(event: LorenzChatEvent) {
         punchedPattern.matchMatcher(event.message) {
-            addPunch(group(1))
+            addPunch(group("name"))
         }
     }
 
     @SubscribeEvent
     fun onWorldSwitch(event: IslandChangeEvent) {
-        SkyHanniMod.coroutineScope.launch {
-            delay(1500)
+        DelayedRun.runDelayed(1500.milliseconds) {
             if (IslandType.THE_RIFT.isInIsland() && HypixelData.server.isNotEmpty() && lastRiftServer != HypixelData.server) {
                 lastRiftServer = HypixelData.server
                 playerList.clear()
             }
         }
     }
+
+    fun clearList() { playerList.clear() }
 
     private fun addPunch(playerName: String) { playerList.add(playerName) }
 
