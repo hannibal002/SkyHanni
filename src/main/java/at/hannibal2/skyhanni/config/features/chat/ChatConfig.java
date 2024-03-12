@@ -136,4 +136,14 @@ public class ChatConfig {
     @ConfigEditorBoolean
     @FeatureToggle
     public boolean hideSkyMall = true;
+
+    @Expose
+    @ConfigOption(
+        name = "Pet Drop Rarity",
+        desc = "Shows what rarity the pet drop is in the pet drop message.\n" +
+            "§6§lPET DROP! §5§lEPIC §5Slug §6(§6+1300☘)"
+    )
+    @ConfigEditorBoolean
+    @FeatureToggle
+    public boolean petRarityDropMessage = true;
 }

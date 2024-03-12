@@ -33,6 +33,7 @@ public class MinionsConfig {
     @Expose
     @ConfigOption(name = "Hopper Profit Display", desc = "Use the hopper's held coins and the last empty time to calculate the coins per day.")
     @ConfigEditorBoolean
+    @FeatureToggle
     public boolean hopperProfitDisplay = true;
 
     @Expose
@@ -49,4 +50,10 @@ public class MinionsConfig {
     @ConfigEditorBoolean
     @FeatureToggle
     public boolean hideMobsNametagNearby = false;
+
+    @Expose
+    @ConfigOption(name = "Inferno Fuel Blocker", desc = "Prevents the player from picking up the fuel or minion while there is active fuel.")
+    @ConfigEditorBoolean
+    @FeatureToggle
+    public boolean infernoFuelBlocker = false;
 }

@@ -1,5 +1,6 @@
 package at.hannibal2.skyhanni.utils
 
+import at.hannibal2.skyhanni.utils.LorenzUtils.round
 import net.minecraft.client.Minecraft
 import net.minecraft.entity.Entity
 import net.minecraft.util.AxisAlignedBB
@@ -11,6 +12,13 @@ object LocationUtils {
 
     fun playerLocation() = Minecraft.getMinecraft().thePlayer.getLorenzVec()
 
+    fun distanceFromPreviousTick(): Double = with(Minecraft.getMinecraft().thePlayer) {
+        val oldPos = LorenzVec(prevPosX, prevPosY, prevPosZ)
+        val newPos = LorenzVec(posX, posY, posZ)
+
+        (oldPos.distance(newPos) * 20).round(2)
+    }
+
     fun LorenzVec.distanceToPlayer() = distance(playerLocation())
 
     fun LorenzVec.distanceToPlayerIgnoreY() = distanceIgnoreY(playerLocation())
@@ -19,7 +27,7 @@ object LocationUtils {
 
     fun LorenzVec.distanceToPlayerSqIgnoreY() = distanceSqIgnoreY(playerLocation())
 
-    fun Entity.distanceToPlayer() = getLorenzVec().distance(playerLocation())
+    fun Entity.distanceToPlayer() = getLorenzVec().distanceToPlayer()
 
     fun Entity.distanceTo(location: LorenzVec) = getLorenzVec().distance(location)
 

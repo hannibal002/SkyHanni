@@ -86,7 +86,11 @@ class FarmingWeightDisplay {
         event.move(3, "garden.eliteFarmingWeightPos", "garden.eliteFarmingWeights.pos")
         event.move(3, "garden.eliteFarmingWeightLeaderboard", "garden.eliteFarmingWeights.leaderboard")
         event.move(3, "garden.eliteFarmingWeightOvertakeETA", "garden.eliteFarmingWeights.overtakeETA")
-        event.move(3, "garden.eliteFarmingWeightOffScreenDropMessage", "garden.eliteFarmingWeights.offScreenDropMessage")
+        event.move(
+            3,
+            "garden.eliteFarmingWeightOffScreenDropMessage",
+            "garden.eliteFarmingWeights.offScreenDropMessage"
+        )
         event.move(3, "garden.eliteFarmingWeightOvertakeETAAlways", "garden.eliteFarmingWeights.overtakeETAAlways")
         event.move(3, "garden.eliteFarmingWeightETAGoalRank", "garden.eliteFarmingWeights.ETAGoalRank")
         event.move(3, "garden.eliteFarmingWeightIgnoreLow", "garden.eliteFarmingWeights.ignoreLow")
@@ -175,7 +179,7 @@ class FarmingWeightDisplay {
             val list = mutableListOf<Renderable>()
             list.add(Renderable.clickAndHover(
                 "§6Farming Weight§7: $weight$leaderboard",
-                listOf("§eClick to open the Farming Profile of you.")
+                listOf("§eClick to open your Farming Profile.")
             ) {
                 openWebsite(LorenzUtils.getPlayerName())
             })
@@ -445,6 +449,8 @@ class FarmingWeightDisplay {
             val url = "https://api.elitebot.dev/weight/$uuid"
             val apiResponse = APIUtil.getJSONResponse(url)
 
+            var error: Throwable? = null
+
             try {
                 val apiData = ConfigManager.gson.fromJson<EliteWeightJson>(apiResponse)
 
@@ -465,18 +471,19 @@ class FarmingWeightDisplay {
                 }
 
             } catch (e: Exception) {
-                ErrorManager.logErrorWithData(
-                    e, "Error loading user farming weight",
-                    "url" to url,
-                    "apiResponse" to apiResponse,
-                    "localProfile" to localProfile
-                )
+                error = e
             }
             apiError = true
-            ErrorManager.skyHanniError(
-                "Loading the farming weight data from elitebot.dev failed!\n"
-                    + "§eYou can re-enter the garden to try to fix the problem.\n" +
-                    "§cIf this message repeats, please report it on Discord!",
+
+            ErrorManager.logErrorWithData(
+                error ?: IllegalStateException("Error loading user farming weight"),
+                "Error loading user farming weight\n" +
+                    "§eLoading the farming weight data from elitebot.dev failed!\n" +
+                    "§eYou can re-enter the garden to try to fix the problem.\n" +
+                    "§cIf this message repeats, please report it on Discord!\n",
+                "url" to url,
+                "apiResponse" to apiResponse,
+                "localProfile" to localProfile
             )
         }
 
@@ -538,7 +545,10 @@ class FarmingWeightDisplay {
             val apiResponse = APIUtil.getJSONResponse(url)
 
             try {
-                val apiData = ConfigManager.gson.fromJson<Map<String, Double>>(apiResponse, object : TypeToken<Map<String, Double>>() {}.type)
+                val apiData = ConfigManager.gson.fromJson<Map<String, Double>>(
+                    apiResponse,
+                    object : TypeToken<Map<String, Double>>() {}.type
+                )
                 for (crop in apiData) {
                     val cropType = CropType.getByName(crop.key)
                     factorPerCrop[cropType] = crop.value

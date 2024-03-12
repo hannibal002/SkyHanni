@@ -14,8 +14,8 @@ import at.hannibal2.skyhanni.utils.RenderUtils.renderString
 import at.hannibal2.skyhanni.utils.RenderUtils.renderStringsAndItems
 import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.renderables.Renderable
-import io.github.moulberry.moulconfig.observer.Property
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
+import io.github.moulberry.moulconfig.observer.Property
 import net.minecraft.client.Minecraft
 import net.minecraft.client.gui.inventory.GuiEditSign
 import net.minecraftforge.client.event.GuiOpenEvent
@@ -68,6 +68,10 @@ class GardenOptimalSpeed {
 
     @SubscribeEvent
     fun onGuiOpen(event: GuiOpenEvent) {
+        if (!isRancherOverlayEnabled()) return
+        val gui = event.gui
+        if (gui !is GuiEditSign) return
+        if (!gui.isRancherSign()) return
         rancherOverlayList = CropType.entries.map { crop ->
             listOf(crop.icon, Renderable.link("${crop.cropName} - ${crop.getOptimalSpeed()}") {
                 LorenzUtils.setTextIntoSign("${crop.getOptimalSpeed()}")

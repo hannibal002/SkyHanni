@@ -10,7 +10,6 @@ import at.hannibal2.skyhanni.features.dungeon.DungeonAPI
 import at.hannibal2.skyhanni.mixins.transformers.AccessorGuiEditSign
 import at.hannibal2.skyhanni.test.TestBingo
 import at.hannibal2.skyhanni.utils.ChatUtils.lastButtonClicked
-import at.hannibal2.skyhanni.utils.CollectionUtils.sortedDesc
 import at.hannibal2.skyhanni.utils.ItemUtils.getItemCategoryOrNull
 import at.hannibal2.skyhanni.utils.NEUItems.getItemStackOrNull
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
@@ -27,14 +26,12 @@ import net.minecraft.entity.SharedMonsterAttributes
 import net.minecraft.launchwrapper.Launch
 import net.minecraft.util.ChatComponentText
 import net.minecraftforge.fml.common.FMLCommonHandler
-import java.io.Serializable
 import java.text.DecimalFormat
 import java.text.SimpleDateFormat
 import java.util.Timer
 import java.util.TimerTask
 import java.util.regex.Matcher
 import kotlin.time.Duration
-import kotlin.time.Duration.Companion.milliseconds
 import kotlin.time.Duration.Companion.seconds
 
 object LorenzUtils {
@@ -144,7 +141,7 @@ object LorenzUtils {
 
     fun getSBMonthByName(month: String): Int {
         var monthNr = 0
-        for (i in 1 .. 12) {
+        for (i in 1..12) {
             val monthName = SkyBlockTime.monthName(i)
             if (month == monthName) {
                 monthNr = i
@@ -159,21 +156,20 @@ object LorenzUtils {
 
     fun getPlayerName(): String = Minecraft.getMinecraft().thePlayer.name
 
-    // (key -> value) -> (sorting value -> key item icon)
-    fun fillTable(list: MutableList<List<Any>>, data: MutableMap<Pair<String, String>, Pair<Double, NEUInternalName>>) {
-        val keys = data.mapValues { (_, v) -> v.first }.sortedDesc().keys
+    fun MutableList<List<Any>>.fillTable(data: List<DisplayTableEntry>) {
+        val sorted = data.sortedByDescending { it.sort }
         val renderer = Minecraft.getMinecraft().fontRendererObj
-        val longest = keys.map { it.first }.maxOfOrNull { renderer.getStringWidth(it.removeColor()) } ?: 0
+        val longest = sorted.maxOfOrNull { renderer.getStringWidth(it.left.removeColor()) } ?: 0
 
-        for (pair in keys) {
-            val (name, second) = pair
-            var displayName = name
+        for (entry in sorted) {
+            var displayName = entry.left
             while (renderer.getStringWidth(displayName.removeColor()) < longest) {
                 displayName += " "
             }
 
-            data[pair]!!.second.getItemStackOrNull()?.let {
-                list.add(listOf(it, "$displayName   $second"))
+            val hover = entry.hover
+            entry.item.getItemStackOrNull()?.let {
+                add(listOf(it, Renderable.hoverTips("$displayName   ${entry.right}", tips = hover)))
             }
         }
     }
@@ -307,9 +303,6 @@ object LorenzUtils {
         TitleManager.sendTitle(text, duration, height, fontSize)
     }
 
-    @Deprecated("Dont use this approach at all. check with regex or equals instead.", ReplaceWith("Regex or equals"))
-    fun Iterable<String>.anyContains(element: String) = any { it.contains(element) }
-
     inline fun <reified T : Enum<T>> enumValueOfOrNull(name: String): T? {
         val enums = enumValues<T>()
         return enums.firstOrNull { it.name == name }
@@ -371,6 +364,8 @@ object LorenzUtils {
     @Deprecated("moved", ReplaceWith("ChatUtils.sendMessageToServer(message)"))
     fun sendMessageToServer(message: String) = ChatUtils.sendMessageToServer(message)
 
+    fun inAdvancedMiningIsland() = IslandType.DWARVEN_MINES.isInIsland() || IslandType.CRYSTAL_HOLLOWS.isInIsland()
+
     fun inMiningIsland() = IslandType.GOLD_MINES.isInIsland() || IslandType.DEEP_CAVERNS.isInIsland()
-            || IslandType.DWARVEN_MINES.isInIsland() || IslandType.CRYSTAL_HOLLOWS.isInIsland()
+        || inAdvancedMiningIsland()
 }
