@@ -1,5 +1,6 @@
 package at.hannibal2.skyhanni.data.model
 
+import at.hannibal2.skyhanni.events.RepositoryReloadEvent
 import at.hannibal2.skyhanni.events.TabListUpdateEvent
 import at.hannibal2.skyhanni.events.TabWidgetUpdate
 import at.hannibal2.skyhanni.utils.CollectionUtils.editCopy
@@ -7,9 +8,13 @@ import at.hannibal2.skyhanni.utils.CollectionUtils.getOrNull
 import at.hannibal2.skyhanni.utils.ConditionalUtils.transformIf
 import at.hannibal2.skyhanni.utils.StringUtils.matches
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
+import at.hannibal2.skyhanni.utils.repopatterns.RepoPatternManager
 import io.github.moulberry.moulconfig.observer.Property
 import net.minecraftforge.fml.common.eventhandler.EventPriority
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
+import java.util.regex.Pattern
+
+private val repoGroup = RepoPattern.group("tab.widget")
 
 enum class TabWidget(
     pattern0: String
@@ -226,7 +231,7 @@ enum class TabWidget(
 
     ;
 
-    val pattern by RepoPattern.pattern("tab.widget.${name.replace("_", ".").lowercase()}", "\\s*$pattern0")
+    val pattern by repoGroup.pattern(name.replace("_", ".").lowercase(), "\\s*$pattern0")
 
     fun postEvent(lines: List<String>) = TabWidgetUpdate(this, lines).postAndCatch()
 
@@ -248,6 +253,8 @@ enum class TabWidget(
 
         private val separatorIndexes = mutableListOf<Pair<Int, TabWidget?>>()
 
+        private var extraPatterns: List<Pattern> = emptyList()
+
         init {
             entries.forEach { it.pattern }
         }
@@ -261,7 +268,8 @@ enum class TabWidget(
             }
             separatorIndexes.clear()
             for ((index, line) in tabList.withIndex()) {
-                val match = entries.firstOrNull { it.pattern.matches(line) } ?: continue
+                val match = entries.firstOrNull { it.pattern.matches(line) }
+                    ?: if (extraPatterns.any { it.matches(line) }) null else continue
                 separatorIndexes.add(index to match)
             }
             separatorIndexes.add(tabList.size to null)
@@ -271,6 +279,11 @@ enum class TabWidget(
                 widget?.postEvent(tabList.subList(firstIndex, secondIndex).filter { it.isNotEmpty() })
             }
             entries.forEach { it.updateIsActive() }
+        }
+
+        @SubscribeEvent(priority = EventPriority.LOW)
+        fun onRepoReload(event: RepositoryReloadEvent) {
+            extraPatterns = RepoPatternManager.getUnusedPatterns(repoGroup.prefix)
         }
 
         private fun filterTabList(tabList: List<String>): List<String> {
