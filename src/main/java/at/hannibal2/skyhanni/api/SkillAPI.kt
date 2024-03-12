@@ -57,7 +57,7 @@ object SkillAPI {
     )
     private val skillTabPattern by patternGroup.pattern(
         "skill.tab",
-        "^§e§lSkills: §r§a(?<type>\\w+) (?<level>\\d+): §r§3(?<progress>.+)%\$"
+        "(?<type>\\w+) (?<level>\\d+): §r§a(?<progress>.+)%$"
     )
     private val maxSkillTabPattern by patternGroup.pattern(
         "skill.tab.max",
@@ -301,6 +301,8 @@ object SkillAPI {
         for (line in TabListData.getTabList()) {
             var levelMatcher = skillTabPattern.matcher(line)
             if (levelMatcher.matches()) {
+                val type = levelMatcher.group("type")
+                if (type != skillType.displayName) continue
                 tablistLevel = levelMatcher.group("level").toInt()
                 if (levelMatcher.group("type").lowercase() != activeSkill?.lowercaseName) tablistLevel = 0
             } else {
