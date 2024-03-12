@@ -8,6 +8,7 @@ import at.hannibal2.skyhanni.events.InventoryCloseEvent
 import at.hannibal2.skyhanni.events.InventoryUpdatedEvent
 import at.hannibal2.skyhanni.events.LorenzToolTipEvent
 import at.hannibal2.skyhanni.utils.InventoryUtils
+import at.hannibal2.skyhanni.utils.InventoryUtils.getUpperItems
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.ItemUtils.name
 import at.hannibal2.skyhanni.utils.LorenzColor
@@ -55,10 +56,8 @@ class JacobFarmingContestsInventory {
         for ((slot, item) in event.inventoryItems) {
             if (!item.getLore().any { it.startsWith("§7Your score: §e") }) continue
 
-            val name = item.name!!
-
-            foundEvents.add(name)
-            val time = FarmingContestAPI.getSbTimeFor(name) ?: continue
+            foundEvents.add(item.name)
+            val time = FarmingContestAPI.getSbTimeFor(item.name) ?: continue
             FarmingContestAPI.addContest(time, item)
             if (config.realTime) {
                 readRealTime(time, slot)
@@ -87,10 +86,7 @@ class JacobFarmingContestsInventory {
         val guiChest = event.gui
         val chest = guiChest.inventorySlots as ContainerChest
 
-        for (slot in chest.inventorySlots) {
-            if (slot == null) continue
-            if (slot.slotNumber != slot.slotIndex) continue
-            val stack = slot.stack ?: continue
+        for ((slot, stack) in chest.getUpperItems()) {
             if (stack.getLore().any { it == "§eClick to claim reward!" }) {
                 slot highlight LorenzColor.GREEN
             }

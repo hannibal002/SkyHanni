@@ -642,25 +642,6 @@ public class SkyHanniInstallerFrame extends JFrame implements ActionListener, Mo
         return version;
     }
 
-//    private String getVersionFromMcmodInfo() {
-//        String version = "";
-//        try {
-//            BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(Objects.requireNonNull(getClass()
-//                    .getClassLoader()
-//                    .getResourceAsStream("mcmod.info"), "mcmod.info not found.")));
-//            while ((version = bufferedReader.readLine()) != null) {
-//                if (version.contains("\"version\": \"")) {
-//                    version = version.split(Pattern.quote("\"version\": \""))[1];
-//                    version = version.substring(0, version.length() - 2);
-//                    break;
-//                }
-//            }
-//        } catch (Exception ex) {
-//            // It's okay, I guess just don't use the version lol.
-//        }
-//        return version;
-//    }
-
     private File getThisFile() {
         try {
             return new File(SkyHanniInstallerFrame.class

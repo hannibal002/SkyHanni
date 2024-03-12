@@ -1,4 +1,4 @@
-package at.hannibal2.skyhanni.features.bazaar
+package at.hannibal2.skyhanni.features.inventory.bazaar
 
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.events.LorenzChatEvent
@@ -32,8 +32,7 @@ class BazaarCancelledBuyOrderClipboard {
         if (!isEnabled()) return
 
         val stack = event.itemStack
-        val name = stack.name ?: return
-        if (!name.contains("Cancel Order")) return
+        if (!stack.name.contains("Cancel Order")) return
 
         for (line in stack.getLore()) {
             lastAmountPattern.findMatcher(line) {
@@ -56,5 +55,5 @@ class BazaarCancelledBuyOrderClipboard {
         }
     }
 
-    fun isEnabled() = LorenzUtils.inSkyBlock && SkyHanniMod.feature.bazaar.cancelledBuyOrderClipboard
+    fun isEnabled() = LorenzUtils.inSkyBlock && SkyHanniMod.feature.inventory.bazaar.cancelledBuyOrderClipboard
 }

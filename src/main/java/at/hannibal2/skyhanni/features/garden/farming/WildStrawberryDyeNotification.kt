@@ -37,7 +37,7 @@ class WildStrawberryDyeNotification {
 
         val internalName = itemStack.getInternalName()
         if (internalName == item) {
-            val name = itemStack.name!!
+            val name = itemStack.name
             LorenzUtils.sendTitle(name, 5.seconds)
             ChatUtils.chat("You found a $name§e!")
             SoundUtils.playBeepSound()

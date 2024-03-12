@@ -30,6 +30,7 @@ import at.hannibal2.skyhanni.utils.ChatUtils.chat
 import at.hannibal2.skyhanni.utils.ConditionalUtils.onToggle
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
+import at.hannibal2.skyhanni.utils.NumberUtil.formatDouble
 import at.hannibal2.skyhanni.utils.NumberUtil.interpolate
 import at.hannibal2.skyhanni.utils.NumberUtil.roundToPrecision
 import at.hannibal2.skyhanni.utils.Quad
@@ -106,9 +107,9 @@ object SkillProgress {
             SkillProgressConfig.TextAlignment.LEFT,
             SkillProgressConfig.TextAlignment.RIGHT,
             -> {
-                config.displayPosition.renderRenderables(
-                    listOf(Renderable.fixedSizeLine(horizontalContainer(display, horizontalAlign = textAlignment.alignment), maxWidth)),
-                    posLabel = "Skill Progress")
+                val content = horizontalContainer(display, horizontalAlign = textAlignment.alignment)
+                val renderables = listOf(Renderable.fixedSizeLine(content, maxWidth))
+                config.displayPosition.renderRenderables(renderables, posLabel = "Skill Progress")
             }
 
             else -> {}
@@ -127,7 +128,8 @@ object SkillProgress {
                 startColor = Color(SpecialColour.specialToChromaRGB(color)),
                 endColor = Color(SpecialColour.specialToChromaRGB(color)),
                 texture = barConfig.texturedBar.usedTexture.get(),
-                useChroma = barConfig.useChroma.get())
+                useChroma = barConfig.useChroma.get()
+            )
 
         } else {
             maxWidth = barConfig.regularBar.width
@@ -138,7 +140,8 @@ object SkillProgress {
                 endColor = Color(SpecialColour.specialToChromaRGB(color)),
                 width = maxWidth,
                 height = barConfig.regularBar.height,
-                useChroma = barConfig.useChroma.get())
+                useChroma = barConfig.useChroma.get()
+            )
         }
 
         config.barPosition.renderRenderables(listOf(progress), posLabel = "Skill Progress Bar")
@@ -263,7 +266,7 @@ object SkillProgress {
 
     @SubscribeEvent(priority = EventPriority.LOW)
     fun onActionBar(event: ActionBarUpdateEvent) {
-        if (!config.hideInActionBar) return
+        if (!config.hideInActionBar || !isEnabled()) return
         if (event.isCanceled) return
         var msg = event.actionBar
         for (line in hideInActionBar) {
@@ -314,7 +317,8 @@ object SkillProgress {
         for (skill in sortedMap) {
             val skillInfo = skillMap[skill] ?: SkillAPI.SkillInfo(level = -1, overflowLevel = -1)
             val lockedLevels = skillInfo.overflowCurrentXp > skillInfo.overflowCurrentXpMax
-            val useCustomGoalLevel = skillInfo.customGoalLevel != 0 && skillInfo.customGoalLevel > skillInfo.overflowLevel && customGoalConfig.enableInAllDisplay
+            val useCustomGoalLevel =
+                skillInfo.customGoalLevel != 0 && skillInfo.customGoalLevel > skillInfo.overflowLevel && customGoalConfig.enableInAllDisplay
             val targetLevel = skillInfo.customGoalLevel
             var xp = skillInfo.overflowTotalXp
             if (targetLevel in 50 .. 60 && skillInfo.overflowLevel >= 50) xp += SkillUtil.xpRequiredForLevel(50.0)
@@ -329,7 +333,12 @@ object SkillProgress {
                 if (useCustomGoalLevel)
                     Quad(skillInfo.overflowLevel, have, need, xp)
                 else if (config.overflowConfig.enableInAllDisplay.get() && !lockedLevels)
-                    Quad(skillInfo.overflowLevel, skillInfo.overflowCurrentXp, skillInfo.overflowCurrentXpMax, skillInfo.overflowTotalXp)
+                    Quad(
+                        skillInfo.overflowLevel,
+                        skillInfo.overflowCurrentXp,
+                        skillInfo.overflowCurrentXpMax,
+                        skillInfo.overflowTotalXp
+                    )
                 else
                     Quad(skillInfo.level, skillInfo.currentXp, skillInfo.currentXpMax, skillInfo.totalXp)
 
@@ -367,9 +376,11 @@ object SkillProgress {
         val xpInfo = skillXPInfoMap[activeSkill] ?: return@buildMap
         val skillInfoLast = oldSkillInfoMap[activeSkill] ?: return@buildMap
         oldSkillInfoMap[activeSkill] = skillInfo
-        val level = if (config.overflowConfig.enableInEtaDisplay.get() || config.customGoalConfig.enableInETADisplay) skillInfo.overflowLevel else skillInfo.level
+        val level =
+            if (config.overflowConfig.enableInEtaDisplay.get() || config.customGoalConfig.enableInETADisplay) skillInfo.overflowLevel else skillInfo.level
 
-        val useCustomGoalLevel = skillInfo.customGoalLevel != 0 && skillInfo.customGoalLevel > skillInfo.overflowLevel && customGoalConfig.enableInETADisplay
+        val useCustomGoalLevel =
+            skillInfo.customGoalLevel != 0 && skillInfo.customGoalLevel > skillInfo.overflowLevel && customGoalConfig.enableInETADisplay
         var targetLevel = if (useCustomGoalLevel) skillInfo.customGoalLevel else level + 1
         if (targetLevel <= level || targetLevel > 400) targetLevel = (level + 1)
 
@@ -383,7 +394,8 @@ object SkillProgress {
 
         if (!useCustomGoalLevel && have < need) {
             if (skillInfo.overflowCurrentXpMax == skillInfoLast.overflowCurrentXpMax) {
-                remaining = interpolate(remaining.toFloat(), (need - have).toFloat(), lastGainUpdate.toMillis()).toLong()
+                remaining =
+                    interpolate(remaining.toFloat(), (need - have).toFloat(), lastGainUpdate.toMillis()).toLong()
             }
         }
 
@@ -492,8 +504,8 @@ object SkillProgress {
 
             if (config.showActionLeft.get() && percent != 100f) {
                 append(" - ")
-                val gain = skill.lastGain.replace(",", "")
-                val actionLeft = (ceil(currentXpMax.toDouble() - currentXp) / gain.toDouble()).toLong().addSeparators()
+                val gain = skill.lastGain.formatDouble()
+                val actionLeft = (ceil(currentXpMax.toDouble() - currentXp) / gain).toLong().addSeparators()
                 if (skill.lastGain != "" && !actionLeft.contains("-")) {
                     val actionLeftString = if (matchColor) "$actionLeft Left" else "$percentColor$actionLeft Left"
                     append(actionLeftString)

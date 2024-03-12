@@ -33,6 +33,7 @@ Use `/sh` or `/skyhanni` to open the SkyHanni config in game.
 + Add tab list fire sale advertisement hider. - nea
 + SkyBlock XP Chat. - Thunderblade73
     + Sends the SkyBlock XP message from the action bar into the chat.
++ Rarity text to pet drop messages. - Empa (https://github.com/hannibal002/SkyHanni/pull/1136)
 
 #### Chat Filter
 
@@ -80,6 +81,12 @@ Use `/sh` or `/skyhanni` to open the SkyHanni config in game.
 + Soulweaver Skull Hider in the Dungeon Object Hider. - nea
     + Hide the annoying soulweaver skulls that float around you if you have the soulweaver gloves equipped.
 + Hide particles and damage splashes during the terracotta phase in dungeons F6 and M6. - hannibal2
++ Added available classes in the tooltip. - Conutik
+    + Shows in the dungeon party finder when hovering over a group.
+    + Highlights your selected class in green if it's available.
++ Kismet tracking for dungeon chests. - Thunderblade73
+    + Highlight chests which have been rerolled inside Croesus
+    + Shows kismet amount at the reroll button
 
 </details>
 <details open><summary>
@@ -152,6 +159,15 @@ Use `/sh` or `/skyhanni` to open the SkyHanni config in game.
 + Added not fully completed tasks in Way to gain SkyBlock XP menus. - Thunderblade73
     + Works in the subcategories.
     + It does not work with infinite tasks.
++ Max Items With Purse. - NetheriteMiner
+    + Calculates the maximum number of items that can be purchased from the Bazaar with the number of coins in your
+      purse.
++ Copy Underbid Keybind. - Obsidian
+    + Copies the price of the hovered item in Auction House minus 1 coin into the clipboard for easier under-bidding.
++ Gfs message after super crafting. — Zickles
+    + Adding a clickable message to pick up the super crafted items from sacks.
++ Added Inferno Minion Fuel pickup prevention. - Zickles (https://github.com/hannibal002/SkyHanni/pull/1103)
+    + Blocks picking up the Inferno Minion or replacing the fuel inside when expensive minion fuels are in use.
 
 </details>
 <details open><summary>
@@ -606,6 +622,9 @@ Use `/sh` or `/skyhanni` to open the SkyHanni config in game.
     + Changes by how much the sensitivity is lowered by.
     + Show a GUI element while the feature is enabled.
     + Option to only allow this feature while on ground and/or on barn plot.
++ Lane Switch Notification - ILike2WatchMemes
+    + Sends a notification when approaching the end of a lane in Garden while farming.
+    + Displays the distance until the end of a lane.
 
 </details>
 <details open><summary>
@@ -701,6 +720,8 @@ Use `/sh` or `/skyhanni` to open the SkyHanni config in game.
     + Option to hide while not grinding powder.
 + Added Deep Caverns Parkour. - hannibal2
     + Shows a parkour to the bottom of Deep Caverns and to Rhys.
++ Display upcoming mining events. - CalMWolfs
+    + Show what mining events are currently occurring in both the Dwarven Mines and Crystal Hollows.
 
 </details>
 <details open><summary>
@@ -968,10 +989,16 @@ Use `/sh` or `/skyhanni` to open the SkyHanni config in game.
     + Stops the white geyser smoke particles from rendering if your bobber is near the geyser.
     + Draws a box around the effective area of the geyser.
     + Change the color of the box around the geyser.
-+ Added Skill Progress Display. - HiZe
++ Skill Progress Display. - HiZe
     + ETA Display, exp, actions or percentage to next level, custom level goals, all skill display, chroma progress bar,
       and overflow levels for all those things.
     + A ton of settings.
++ Command `/shlimbo` for easier Limbo access. - martimavocado (https://github.com/hannibal002/SkyHanni/pull/848)
+    + Limbo time tracker also now works in the Slumber Hotel in the Bed Wars Lobby.
+    + A new secret method to get more SkyHanni User Luck from Limbo.
++ Command `/shlimbostats` for a simple way to view your Limbo stats. - martimavocado (https://github.com/hannibal002/SkyHanni/pull/848)
+    + Support for `/playtime` and  `/pt` while in Limbo.
+    + Added your playtime to Hypixel's `/playtimedetailed`.
 
 </details>
 <details open><summary>

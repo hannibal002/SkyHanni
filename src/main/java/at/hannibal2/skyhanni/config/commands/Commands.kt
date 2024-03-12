@@ -48,7 +48,9 @@ import at.hannibal2.skyhanni.features.minion.MinionFeatures
 import at.hannibal2.skyhanni.features.misc.CollectionTracker
 import at.hannibal2.skyhanni.features.misc.LockMouseLook
 import at.hannibal2.skyhanni.features.misc.MarkedPlayerManager
+import at.hannibal2.skyhanni.features.misc.MiscFeatures
 import at.hannibal2.skyhanni.features.misc.discordrpc.DiscordRPCManager
+import at.hannibal2.skyhanni.features.misc.limbo.LimboTimeTracker
 import at.hannibal2.skyhanni.features.misc.massconfiguration.DefaultConfigFeatures
 import at.hannibal2.skyhanni.features.misc.visualwords.VisualWordGui
 import at.hannibal2.skyhanni.features.rift.area.westvillage.VerminTracker
@@ -67,6 +69,7 @@ import at.hannibal2.skyhanni.test.command.CopyNearbyParticlesCommand
 import at.hannibal2.skyhanni.test.command.CopyScoreboardCommand
 import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.test.command.TestChatCommand
+import at.hannibal2.skyhanni.test.command.TrackSoundsCommand
 import at.hannibal2.skyhanni.utils.APIUtil
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils
@@ -258,17 +261,6 @@ object Commands {
             "shofficialwikithis",
             "Searches the official wiki with SkyHanni's own method."
         ) { WikiManager.otherWikiCommands(it, false, true) }
-        registerCommand0("shcalccrop", "Calculate how many crops need to be farmed between different crop milestones.", {
-            FarmingMilestoneCommand.onCommand(it.getOrNull(0), it.getOrNull(1), it.getOrNull(2), false)
-        }, FarmingMilestoneCommand::onComplete)
-        registerCommand0("shcalccroptime", "Calculate how long you need to farm crops between different crop milestones.", {
-            FarmingMilestoneCommand.onCommand(it.getOrNull(0), it.getOrNull(1), it.getOrNull(2), true)
-        }, FarmingMilestoneCommand::onComplete)
-        registerCommand0(
-            "shskills",
-            "Skills XP/Level related command",
-            { SkillAPI.onCommand(it) },
-            SkillAPI::onComplete)
         registerCommand0(
             "shcalccrop",
             "Calculate how many crops need to be farmed between different crop milestones.",
@@ -285,6 +277,20 @@ object Commands {
             },
             FarmingMilestoneCommand::onComplete
         )
+        registerCommand0(
+            "shskills",
+            "Skills XP/Level related command",
+            { SkillAPI.onCommand(it) },
+            SkillAPI::onComplete
+        )
+        registerCommand(
+            "shlimbostats",
+            "Prints your Limbo Stats!"
+        ) { LimboTimeTracker.printStats() }
+        registerCommand(
+            "shlimbo",
+            "Warps you to Limbo."
+        ) { MiscFeatures().goToLimbo() }
     }
 
     private fun usersBugFix() {
@@ -374,7 +380,10 @@ object Commands {
     private fun developersCodingHelp() {
         registerCommand("shrepopatterns", "See where regexes are loaded from") { RepoPatternGui.open() }
         registerCommand("shtest", "Unused test command.") { SkyHanniDebugsAndTests.testCommand(it) }
-        registerCommand("shtestitem", "test item internal name resolving") { SkyHanniDebugsAndTests.testItemCommand(it) }
+        registerCommand(
+            "shtestitem",
+            "test item internal name resolving"
+        ) { SkyHanniDebugsAndTests.testItemCommand(it) }
         registerCommand(
             "shfindnullconfig",
             "Find config elements that are null and prints them into the console"
@@ -399,6 +408,10 @@ object Commands {
             "shcopyentities",
             "Copies entities in the specified radius around the player to the clipboard"
         ) { CopyNearbyEntitiesCommand.command(it) }
+        registerCommand(
+            "shtracksounds",
+            "Tracks the sounds for the specified duration (in seconds) and copies it to the clipboard"
+        ) { TrackSoundsCommand.command(it) }
         registerCommand(
             "shcopytablist",
             "Copies the tab list data to the clipboard"

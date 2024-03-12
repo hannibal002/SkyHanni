@@ -91,7 +91,7 @@ object SkillUtil {
         var xpForCurr = 7000000 + slope
         var totalXpRequired = 0L
 
-        for (i in 61 .. level) {
+        for (i in 61..level) {
             totalXpRequired += xpForCurr
             xpForCurr += slope
             if (i % 10 == 0) slope *= 2
