@@ -20,7 +20,10 @@
     + Blocks picking up the Inferno Minion or replacing the fuel inside when expensive minion fuels are in use.
 
 #### Chat Features
-+ Hide chat message about bank interest when the received interest is zero coins. - Alexia (https://github.com/hannibal002/SkyHanni/pull/1117)
+
++ Hide chat message about bank interest when the received interest is zero coins. -
+  Alexia (https://github.com/hannibal002/SkyHanni/pull/1117)
++ Rarity text to pet drop messages. - Empa (https://github.com/hannibal002/SkyHanni/pull/1136)
 
 #### Dungeon Features
 
@@ -47,7 +50,8 @@
 + Added command `/shlimbo` for easier Limbo access. - martimavocado (https://github.com/hannibal002/SkyHanni/pull/848)
     + Limbo time tracker also now works in the Slumber Hotel in the Bed Wars Lobby.
     + A new secret method to get more SkyHanni User Luck from Limbo.
-+ Added command `/shlimbostats` for a simple way to view your Limbo stats. - martimavocado (https://github.com/hannibal002/SkyHanni/pull/848)
++ Added command `/shlimbostats` for a simple way to view your Limbo stats. -
+  martimavocado (https://github.com/hannibal002/SkyHanni/pull/848)
     + Support for `/playtime` and  `/pt` while in Limbo.
     + Added your playtime to Hypixel's `/playtimedetailed`.
 + Added full auto-update for SkyHanni. - Thunderblade73 (https://github.com/hannibal002/SkyHanni/pull/1122)
@@ -76,13 +80,19 @@
 
 + Hide the TNT Run Tournament advertisement message in the main lobby. - Alexia
 
+##### Garden Improvements
+
++ Show calculation breakdowns when hovering over Anita Medal Profit or SkyMart Coins per copper displays. -
+  hannibal2 (https://github.com/hannibal002/SkyHanni/pull/1116)
+
 #### Misc Improvements
 
 + Added option to show some features outside SkyBlock. - Obsidian
 + Added goal to collection tracker. - Thunderblade73
     + /shtrackcollection \<item name> [goal amount]
     + Shows a chat message once the goal has been reached.
-+ Added SkyHanni update download finished chat message. - Thunderblade73 (https://github.com/hannibal002/SkyHanni/pull/1122)
++ Added SkyHanni update download finished chat message. -
+  Thunderblade73 (https://github.com/hannibal002/SkyHanni/pull/1122)
 
 ### Fixes
 
@@ -94,6 +104,8 @@
 #### Mining Fixes
 
 + Fixed a small typo in the Deep Caverns Parkour message. - alexia
++ Stopped Dwarven Mines events from showing in Crystal Hollows in the mining event tracker. -
+  CalMWolfs (https://github.com/hannibal002/SkyHanni/pull/1142)
 
 #### Inventory Fixes
 
@@ -105,28 +117,42 @@
 
 + Fixed Fire Sale chat hider not working when multiple fire sales are ending. - Zickles
 + Fixed Auto Tip chat filter. - alexia (https://github.com/hannibal002/SkyHanni/pull/1105)
-+ Fixed Hide Anita Accessories' fortune bonus chat message not getting hidden in the chat filter. - alexia (https://github.com/hannibal002/SkyHanni/pull/1106)
-+ Fixed some chat symbols showing twice in chat due to a Hypixel change. - CalMWolfs (https://github.com/hannibal002/SkyHanni/pull/1119)
-+ Fixed Anita's Accessory chat filter not working with multi-word crops (Cocoa Beans, Nether Wart, Sugar Cane). - Alexia (https://github.com/hannibal002/SkyHanni/pull/1115)
++ Fixed Hide Anita Accessories' fortune bonus chat message not getting hidden in the chat filter. -
+  alexia (https://github.com/hannibal002/SkyHanni/pull/1106)
++ Fixed some chat symbols showing twice in chat due to a Hypixel change. -
+  CalMWolfs (https://github.com/hannibal002/SkyHanni/pull/1119)
++ Fixed Anita's Accessory chat filter not working with multi-word crops (Cocoa Beans, Nether Wart, Sugar Cane). -
+  Alexia (https://github.com/hannibal002/SkyHanni/pull/1115)
 
 #### Garden Fixes
 
-+ Stop SkyHanni from saying that Next Visitor is visiting your garden. - CalMWolfs (https://github.com/hannibal002/SkyHanni/pull/1125) 
++ Stop SkyHanni from saying that Next Visitor is visiting your garden. -
+  CalMWolfs (https://github.com/hannibal002/SkyHanni/pull/1125)
 + Fixed typos/grammar. - Obsidian
     + Typos in pest features.
     + Grammar in Farming Weight Display
++ Fixed the Lane Switch Calculation - ILike2WatchMemes (https://github.com/hannibal002/SkyHanni/pull/1138)
 
 #### Command Fixes
 
 + Fixed duplicate commands in /shcommands. - CalMWolfs
 
+#### Slayer Fixes
+
++ Added Burningsoul Demon (75M HP miniboss) to line to miniboss and highlight slayer minibosses. -
+  Empa (https://github.com/hannibal002/SkyHanni/pull/1144)
+
 #### Misc Fixes
 
 + Fixed skill level up message when below level 60. - HiZe
 + Fixed SkyHanni not working on Alpha. - hannibal2 & CalMWolfs
-+ Fixed getting profile name from tab list on alpha for special profiles. - CalMWolfs (https://github.com/hannibal002/SkyHanni/pull/1120)
++ Fixed getting profile name from tab list on alpha for special profiles. -
+  CalMWolfs (https://github.com/hannibal002/SkyHanni/pull/1120)
     + Fixes for any Ironman, Stranded and maybe Bingo players.
 + Fixed minion hopper profit display feature not getting changed by /shdefaultoptions. - hannibal2
++ Disable action bar hider if Skill Progress feature is disabled. -
+  ooffyy (https://github.com/hannibal002/SkyHanni/pull/1137)
++ Improved performance of custom colored mobs. - Thunderblade73 (https://github.com/hannibal002/SkyHanni/pull/1127)
 
 ### Technical Details
 
@@ -148,28 +174,43 @@
 + Optimized item.isFishingRod logic. - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/1056)
 + Code cleanup in multiple files. - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/1113)
 + ItemStack.name no longer nullable. - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/1101)
-+ Better error handling (more user facing errors - less hidden errors). - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/1101)
++ Better error handling (more user facing errors - less hidden errors). -
+  hannibal2 (https://github.com/hannibal002/SkyHanni/pull/1101)
 + Replaced/fixed deprecated function calls. - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/1101)
 + Added item category FISHING_BAIT. - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/1101)
 + Use internal name more in ItemDisplayOverlayFeatures - CalMWolfs (https://github.com/hannibal002/SkyHanni/pull/1114)
 + Reformatted the code in a lot of files. - CalMWolfs (https://github.com/hannibal002/SkyHanni/pull/1109)
-+ Changed line endings to be normalized over the whole project and prevents further breaks. - your_name_here (https://github.com/hannibal002/SkyHanni/pull/1112)
++ Changed line endings to be normalized over the whole project and prevents further breaks. -
+  your_name_here (https://github.com/hannibal002/SkyHanni/pull/1112)
 + Added more error logging to getting farming weight. - CalMWolfs (https://github.com/hannibal002/SkyHanni/pull/1120)
-+ Removed unnecessary capturing groups from the Anita's Accessory chat filter regex. - Alexia (https://github.com/hannibal002/SkyHanni/pull/1115)
-+ Add maven publication details, allowing other mods to integrate more easily with Skyhanni. - !nea (https://github.com/hannibal002/SkyHanni/pull/935)
++ Removed unnecessary capturing groups from the Anita's Accessory chat filter regex. -
+  Alexia (https://github.com/hannibal002/SkyHanni/pull/1115)
++ Add maven publication details, allowing other mods to integrate more easily with Skyhanni. - !
+  nea (https://github.com/hannibal002/SkyHanni/pull/935)
 + Created Pull Request template. - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/1108)
     + For better maintainability and automatic beta changelog creation.
-+ Use less forge events throughout the mod to reduce possible crashes. - CalMWolfs (https://github.com/hannibal002/SkyHanni/pull/1085)
++ Use less forge events throughout the mod to reduce possible crashes. -
+  CalMWolfs (https://github.com/hannibal002/SkyHanni/pull/1085)
 + Fix entity click not being canceled - Thunderblade73 (https://github.com/hannibal002/SkyHanni/pull/1072)
 + Cleanup ItemClickData. - Thunderblade73 (https://github.com/hannibal002/SkyHanni/pull/1072)
-+ Fixes minecraft bug where text that is bold can render weirdly. - CalMWolfs (https://github.com/hannibal002/SkyHanni/pull/1126)
-+ Added "unlocked" parameter for the GardenPlotAPI - ILike2WatchMemes (https://github.com/hannibal002/SkyHanni/pull/1075)
-+ Updated MovementSpeedDisplay to use new calculations - ILike2WatchMemes (https://github.com/hannibal002/SkyHanni/pull/1075)
++ Fixes minecraft bug where text that is bold can render weirdly. -
+  CalMWolfs (https://github.com/hannibal002/SkyHanni/pull/1126)
++ Added "unlocked" parameter for the GardenPlotAPI -
+  ILike2WatchMemes (https://github.com/hannibal002/SkyHanni/pull/1075)
++ Updated MovementSpeedDisplay to use new calculations -
+  ILike2WatchMemes (https://github.com/hannibal002/SkyHanni/pull/1075)
 + Added Track Sounds Command - Thunderblade73 (https://github.com/hannibal002/SkyHanni/pull/855)
 + Removed unused Sound Test - martimavocado (https://github.com/hannibal002/SkyHanni/pull/855)
-+ Gson serialize the mining event data sent and received. - CalMWolfs (https://github.com/hannibal002/SkyHanni/pull/1040)
++ Gson serialize the mining event data sent and received. -
+  CalMWolfs (https://github.com/hannibal002/SkyHanni/pull/1040)
++ Changed fillTable to use a list of DisplayTableEntry. - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/1116)
++ Removed the RenderMobColoredEvent & ResetEntityHurtEvent. -
+  Thunderblade73 (https://github.com/hannibal002/SkyHanni/pull/1127)
 
 ### Removed Features
+
++ Removed Advanced Stats in SkyMart Copper price. - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/1116)
+    + The same information is now always visible via hovering.
 
 ## Version 0.23
 

@@ -70,6 +70,7 @@ import at.hannibal2.skyhanni.features.chat.ChatFilter
 import at.hannibal2.skyhanni.features.chat.CompactBestiaryChatMessage
 import at.hannibal2.skyhanni.features.chat.CompactSplashPotionMessage
 import at.hannibal2.skyhanni.features.chat.PlayerDeathMessages
+import at.hannibal2.skyhanni.features.chat.RareDropMessages
 import at.hannibal2.skyhanni.features.chat.SkyblockXPInChat
 import at.hannibal2.skyhanni.features.chat.Translator
 import at.hannibal2.skyhanni.features.chat.WatchdogHider
@@ -406,7 +407,7 @@ import org.apache.logging.log4j.Logger
     clientSideOnly = true,
     useMetadata = true,
     guiFactory = "at.hannibal2.skyhanni.config.ConfigGuiForgeInterop",
-    version = "0.24.Beta.9",
+    version = "0.24.Beta.10",
 )
 class SkyHanniMod {
 
@@ -781,6 +782,7 @@ class SkyHanniMod {
         loadModule(SuperCraftFeatures())
         loadModule(InfernoMinionFeatures())
         loadModule(LimboPlaytime())
+        loadModule(RareDropMessages())
 
         init()
 
