@@ -5,9 +5,9 @@ import at.hannibal2.skyhanni.data.HypixelData
 import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.events.IslandChangeEvent
 import at.hannibal2.skyhanni.events.LorenzChatEvent
-import at.hannibal2.skyhanni.events.RenderMobColoredEvent
-import at.hannibal2.skyhanni.events.withAlpha
+import at.hannibal2.skyhanni.mixins.hooks.RenderLivingEntityHelper
 import at.hannibal2.skyhanni.utils.ColorUtils.toChromaColor
+import at.hannibal2.skyhanni.utils.ColorUtils.withAlpha
 import at.hannibal2.skyhanni.utils.DelayedRun
 import at.hannibal2.skyhanni.utils.EntityUtils.isNPC
 import at.hannibal2.skyhanni.utils.LorenzUtils
@@ -17,6 +17,7 @@ import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraft.client.Minecraft
 import net.minecraft.client.entity.EntityPlayerSP
 import net.minecraft.entity.player.EntityPlayer
+import net.minecraftforge.event.entity.EntityJoinWorldEvent
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import kotlin.time.Duration.Companion.milliseconds
 
@@ -33,7 +34,7 @@ class PunchcardHighlight {
     private val playerList: MutableSet<String> = mutableSetOf()
 
     @SubscribeEvent
-    fun onRenderMobColored(event: RenderMobColoredEvent) {
+    fun onRenderMobColored(event: EntityJoinWorldEvent) {
         if (!config.enabled) return
         if (!LorenzUtils.inSkyBlock) return
         if (!IslandType.THE_RIFT.isInIsland()) return
@@ -47,7 +48,8 @@ class PunchcardHighlight {
                 255 -> 1
                 else -> 255-config.color.toChromaColor().alpha
             }
-            event.color = config.color.toChromaColor().withAlpha(alpha)
+            val color = config.color.toChromaColor().withAlpha(alpha)
+            RenderLivingEntityHelper.setEntityColor(entity, color) { IslandType.THE_RIFT.isInIsland() && playerList.size < 20 }
         }
     }
 
