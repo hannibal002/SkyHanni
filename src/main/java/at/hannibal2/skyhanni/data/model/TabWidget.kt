@@ -53,7 +53,7 @@ enum class TabWidget(
     ),
     BANK(
         // language=RegExp
-        "Bank: (?:§.)*(?<amount>[^§]+)(?:\\(?:§.)*(?:\\/(?:§.)*(?<personal>.*))?"
+        "Bank: (?:§.)*(?<amount>[^§]+)(?:(?:§.)* \\/ (?:§.)*(?<personal>.*))?"
     ),
     INTEREST(
         // language=RegExp
@@ -71,7 +71,6 @@ enum class TabWidget(
         // language=RegExp
         "(?:§.)*Pet Training:"
     ),
-
     PET_SITTER(
         // language=RegExp
         "Kat: .*"
@@ -252,6 +251,10 @@ enum class TabWidget(
         // language=RegExp
         "(?:§.)*Crop Milestones:"
     ),
+    PRIVATE_ISLAND_CRYSTALS(
+        // language=RegExp
+        "Crystals: (?:§.)*(?<count>\\d+)"
+    )
 
     ;
 
