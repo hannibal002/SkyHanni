@@ -1,7 +1,7 @@
 package at.hannibal2.skyhanni.test.command
 
 import at.hannibal2.skyhanni.data.BossbarData
-import at.hannibal2.skyhanni.utils.LorenzUtils
+import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.OSUtils
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 
@@ -11,10 +11,10 @@ object CopyBossbarCommand {
         val bossbarName = if (noFormattingCodes) BossbarData.getBossbar().removeColor() else BossbarData.getBossbar()
         val status = if (noFormattingCodes) "without" else "with"
         if (bossbarName.isBlank()) {
-            LorenzUtils.chat("Boss bar appears to be blank.")
+            ChatUtils.chat("Boss bar appears to be blank.")
         } else {
             OSUtils.copyToClipboard(bossbarName)
-            LorenzUtils.chat("Boss bar name copied to clipboard $status formatting codes!")
+            ChatUtils.chat("Boss bar name copied to clipboard $status formatting codes!")
         }
     }
 }

@@ -30,6 +30,7 @@ import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.StringUtils
 import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.renderables.Renderable
+import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraft.client.Minecraft
 import net.minecraftforge.fml.common.eventhandler.EventPriority
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
@@ -39,8 +40,15 @@ class PestFinder {
 
     private val config get() = PestAPI.config.pestFinder
 
-    // TODO repo pattern
-    private val pestsInScoreboardPattern = " §7⏣ §[ac]The Garden §4§lൠ§7 x(?<pests>.*)".toPattern()
+    private val patternGroup = RepoPattern.group("garden.pests.finder")
+    private val pestsInScoreboardPattern by patternGroup.pattern(
+        "scoreboard",
+        " §7⏣ §[ac]The Garden §4§lൠ§7 x(?<pests>.*)"
+    )
+    private val pestInventoryPattern by patternGroup.pattern(
+        "inventory",
+        "§4§lൠ §cThis plot has §6(?<amount>\\d) Pests?§c!"
+    )
 
     private var display = emptyList<Renderable>()
     private var lastTimeVacuumHold = SimpleTimeMark.farPast()
@@ -62,8 +70,6 @@ class PestFinder {
     fun onInventoryOpen(event: InventoryFullyOpenedEvent) {
         if (!isEnabled()) return
         if (event.inventoryName != "Configure Plots") return
-
-        val pestInventoryPattern = "§4§lൠ §cThis plot has §6(?<amount>\\d) Pests?§c!".toPattern()
 
         for (plot in GardenPlotAPI.plots) {
             plot.pests = 0
@@ -96,7 +102,7 @@ class PestFinder {
         for (plot in getPlotsWithPests()) {
             val pests = plot.pests
             val plotName = plot.name
-            val pestsName = StringUtils.optionalPlural(pests, "pest", "pests")
+            val pestsName = StringUtils.pluralize(pests, "pest", withNumber = true)
             val renderable = Renderable.clickAndHover(
                 "§c$pestsName §7in §b$plotName",
                 listOf(
@@ -173,11 +179,11 @@ class PestFinder {
         }
     }
 
-    private fun getNearestInfectedPest() = getPlotsWithPests().minByOrNull { it.middle.distanceSqToPlayer() }
+    private fun getNearestInfestedPest() = getPlotsWithPests().minByOrNull { it.middle.distanceSqToPlayer() }
 
     private fun removeNearestPest() {
-        val plot = getNearestInfectedPest() ?: run {
-            ChatUtils.error("Can not remove nearest pest: No infected plots detected.")
+        val plot = getNearestInfestedPest() ?: run {
+            ChatUtils.error("Can not remove nearest pest: No infested plots detected.")
             return
         }
         plot.pests--
@@ -211,7 +217,7 @@ class PestFinder {
             }
             event.renderPlot(plot, LorenzColor.GOLD.toColor(), LorenzColor.RED.toColor())
 
-            val pestsName = StringUtils.optionalPlural(plot.pests, "pest", "pests")
+            val pestsName = StringUtils.pluralize(plot.pests, "pest", withNumber = true)
             val plotName = plot.name
             val middle = plot.middle
             val location = playerLocation.copy(x = middle.x, z = middle.z)
@@ -232,13 +238,13 @@ class PestFinder {
         if (lastKeyPress.passedSince() < 2.seconds) return
         lastKeyPress = SimpleTimeMark.now()
 
-        val plot = getNearestInfectedPest() ?: run {
-            ChatUtils.userError("No infected plots detected to warp to!")
+        val plot = getNearestInfestedPest() ?: run {
+            ChatUtils.userError("No infested plots detected to warp to!")
             return
         }
 
         if (plot.isPlayerInside()) {
-            ChatUtils.userError("You stand already on the infected plot!")
+            ChatUtils.userError("You're already in an infested plot!")
             return
         }
 

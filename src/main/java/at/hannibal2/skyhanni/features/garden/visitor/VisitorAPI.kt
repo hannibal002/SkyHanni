@@ -4,11 +4,11 @@ import at.hannibal2.skyhanni.events.garden.visitor.VisitorAcceptedEvent
 import at.hannibal2.skyhanni.events.garden.visitor.VisitorArrivalEvent
 import at.hannibal2.skyhanni.events.garden.visitor.VisitorLeftEvent
 import at.hannibal2.skyhanni.events.garden.visitor.VisitorRefusedEvent
-import at.hannibal2.skyhanni.events.withAlpha
 import at.hannibal2.skyhanni.features.garden.GardenAPI
 import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.CollectionUtils.editCopy
+import at.hannibal2.skyhanni.utils.ColorUtils.withAlpha
 import at.hannibal2.skyhanni.utils.EntityUtils
 import at.hannibal2.skyhanni.utils.LorenzColor
 import at.hannibal2.skyhanni.utils.LorenzLogger
@@ -151,7 +151,7 @@ object VisitorAPI {
             }
             if (!found) continue
 
-            if (line.isEmpty() || line.contains("Account Info")) {
+            if (line.isEmpty() || line.contains("Account Info") || line.contains("Next Visitor")) {
                 found = false
                 continue
             }
@@ -168,8 +168,10 @@ object VisitorAPI {
                 logger.log("Ignore wrong own name: '$name'")
                 continue
             }
-
-            visitorsInTab.add(name)
+            val finalName = if (name.endsWith(" §b§lNEW!")) {
+                name.split(" §b§lNEW!")[0]
+            } else name
+            visitorsInTab.add(finalName)
         }
         return visitorsInTab
     }

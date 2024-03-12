@@ -32,7 +32,7 @@ class PabloHelper {
             group("flower")
         } ?: return
 
-        if (InventoryUtils.countItemsInLowerInventory { it.name?.contains(itemName) == true } > 0) return
+        if (InventoryUtils.countItemsInLowerInventory { it.name.contains(itemName) } > 0) return
 
         ChatUtils.clickableChat("Click here to grab an $itemName from sacks!", "gfs $itemName 1")
         lastSentMessage = SimpleTimeMark.now()

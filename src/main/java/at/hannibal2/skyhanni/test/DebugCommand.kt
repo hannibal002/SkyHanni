@@ -22,9 +22,9 @@ object DebugCommand {
         list.add("= Debug Information for SkyHanni ${SkyHanniMod.version} =")
         list.add("")
 
-        val search = args.getOrNull(0)
+        val search = args.joinToString(" ")
         list.add(
-            if (search != null) {
+            if (search.isNotEmpty()) {
                 if (search.equalsIgnoreColor("all")) {
                     "search for everything:"
                 } else "search '$search':"
@@ -58,7 +58,7 @@ object DebugCommand {
     private fun profileType(event: DebugDataCollectEvent) {
         event.title("Profile Type")
         if (!LorenzUtils.inSkyBlock) {
-            event.addIrrelevant("Not on SkyBlcok")
+            event.addIrrelevant("Not on SkyBlock")
             return
         }
 
@@ -81,7 +81,7 @@ object DebugCommand {
     private fun profileName(event: DebugDataCollectEvent) {
         event.title("Profile Name")
         if (!LorenzUtils.inSkyBlock) {
-            event.addIrrelevant("Not on SkyBlcok")
+            event.addIrrelevant("Not on SkyBlock")
             return
         }
 

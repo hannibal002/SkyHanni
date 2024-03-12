@@ -14,11 +14,8 @@ import net.minecraft.client.Minecraft
  * Credit: [ChromaShader.java](https://github.com/BiscuitDevelopment/SkyblockAddons/blob/main/src/main/java/codes/biscuit/skyblockaddons/shader/chroma/ChromaShader.java)
  */
 
-object ChromaShader : Shader("chroma", "chroma") {
-
+abstract class ChromaShader(vertex: String, fragment: String) : Shader(vertex, fragment) {
     val config get() = SkyHanniMod.feature.chroma
-    val INSTANCE: ChromaShader
-        get() = this
 
     override fun registerUniforms() {
         registerUniform(Uniform.UniformType.FLOAT, "chromaSize") {

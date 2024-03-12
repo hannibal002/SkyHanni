@@ -24,7 +24,7 @@ public class NextJacobContestConfig {
     @Expose
     @ConfigOption(name = "Outside Garden", desc = "Show the timer not only in the Garden but everywhere in SkyBlock.")
     @ConfigEditorBoolean
-    public boolean everywhere = false;
+    public boolean showOutsideGarden = false;
 
     @Expose
     @ConfigOption(name = "In Other Guis", desc = "Mark the current or next Farming Contest crops in other farming GUIs as underlined.")
@@ -38,7 +38,7 @@ public class NextJacobContestConfig {
 
     @Expose
     @ConfigOption(name = "Share Contests", desc = "Share the list of upcoming Contests to elitebot.dev for everyone else to then fetch automatically.")
-    @ConfigEditorDropdown()
+    @ConfigEditorDropdown
     public ShareContestsEntry shareAutomatically = ShareContestsEntry.ASK;
 
     public enum ShareContestsEntry implements HasLegacyId {

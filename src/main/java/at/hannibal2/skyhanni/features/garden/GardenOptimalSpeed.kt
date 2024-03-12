@@ -14,6 +14,7 @@ import at.hannibal2.skyhanni.utils.RenderUtils.renderString
 import at.hannibal2.skyhanni.utils.RenderUtils.renderStringsAndItems
 import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.renderables.Renderable
+import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import io.github.moulberry.moulconfig.observer.Property
 import net.minecraft.client.Minecraft
 import net.minecraft.client.gui.inventory.GuiEditSign
@@ -26,6 +27,12 @@ import kotlin.time.Duration.Companion.seconds
 class GardenOptimalSpeed {
 
     private val config get() = GardenAPI.config.optimalSpeeds
+
+    private val currentSpeedPattern by RepoPattern.pattern(
+        "garden.optimalspeed.currentspeed",
+        " Speed: §r§f✦(?<speed>.*)"
+    )
+
     private val configCustomSpeed get() = config.customSpeed
     private var sneakingTime = 0.seconds
     private val sneaking get() = Minecraft.getMinecraft().thePlayer.isSneaking
@@ -37,7 +44,6 @@ class GardenOptimalSpeed {
             _currentSpeed = value
         }
     private var optimalSpeed = -1
-    private val currentSpeedPattern = " Speed: §r§f✦(?<speed>.*)".toPattern()
     private var lastWarnTime = 0L
     private var cropInHand: CropType? = null
     private var rancherOverlayList: List<List<Any?>> = emptyList()
@@ -62,6 +68,10 @@ class GardenOptimalSpeed {
 
     @SubscribeEvent
     fun onGuiOpen(event: GuiOpenEvent) {
+        if (!isRancherOverlayEnabled()) return
+        val gui = event.gui
+        if (gui !is GuiEditSign) return
+        if (!gui.isRancherSign()) return
         rancherOverlayList = CropType.entries.map { crop ->
             listOf(crop.icon, Renderable.link("${crop.cropName} - ${crop.getOptimalSpeed()}") {
                 LorenzUtils.setTextIntoSign("${crop.getOptimalSpeed()}")

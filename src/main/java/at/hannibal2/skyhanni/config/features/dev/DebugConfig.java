@@ -1,5 +1,6 @@
 package at.hannibal2.skyhanni.config.features.dev;
 
+import at.hannibal2.skyhanni.config.core.config.Position;
 import com.google.gson.annotations.Expose;
 import io.github.moulberry.moulconfig.annotations.ConfigEditorBoolean;
 import io.github.moulberry.moulconfig.annotations.ConfigEditorKeybind;
@@ -45,6 +46,11 @@ public class DebugConfig {
     @ConfigOption(name = "Show Item Category", desc = "Show item categories in item lore.")
     @ConfigEditorBoolean
     public boolean showItemCategory = false;
+
+    @Expose
+    @ConfigOption(name = "Show Item Name", desc = "Show the SkyHanni item name for an item.")
+    @ConfigEditorBoolean
+    public boolean showItemName = false;
 
     @Expose
     @ConfigOption(name = "Copy Internal Name", desc = "Copies the internal name of an item on key press in the clipboard.")
@@ -98,7 +104,15 @@ public class DebugConfig {
     public boolean eventCounter = false;
 
     @Expose
-    @ConfigOption(name = "Bypass Advanced Tab List", desc = "The Advaced Player Tab list is disabled whie pressing this hotkey.")
+    @ConfigOption(name = "Bypass Advanced Tab List", desc = "The Advanced Player Tab list is disabled whie pressing this hotkey.")
     @ConfigEditorKeybind(defaultKey = Keyboard.KEY_NONE)
     public int bypassAdvancedPlayerTabList = Keyboard.KEY_NONE;
+
+    @Expose
+    @ConfigOption(name = "SkyBlock Area", desc = "Show your current area in SkyBlock while f3 is open.")
+    @ConfigEditorBoolean
+    public boolean currentAreaDebug = true;
+
+    @Expose
+    public Position trackSoundPosition = new Position(0, 0);
 }

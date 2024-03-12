@@ -1,5 +1,6 @@
 package at.hannibal2.skyhanni.utils
 
+import at.hannibal2.skyhanni.mixins.hooks.tryToReplaceScoreboardLine
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
 import io.github.moulberry.notenoughupdates.util.SkyBlockTime
@@ -13,9 +14,6 @@ import kotlin.time.DurationUnit
 import kotlin.time.toDuration
 
 object TimeUtils {
-
-    private val pattern =
-        "(?:(?<y>\\d+) ?y(?:\\w* ?)?)?(?:(?<d>\\d+) ?d(?:\\w* ?)?)?(?:(?<h>\\d+) ?h(?:\\w* ?)?)?(?:(?<m>\\d+) ?m(?:\\w* ?)?)?(?:(?<s>\\d+) ?s(?:\\w* ?)?)?".toPattern()
 
     fun Duration.format(
         biggestUnit: TimeUnit = TimeUnit.YEAR,
@@ -33,7 +31,10 @@ object TimeUtils {
         else -> default
     }
 
-    @Deprecated("off sets by one second", ReplaceWith("Duration.format()"))
+    @Deprecated(
+        "Has an offset of one second",
+        ReplaceWith("millis.toDuration(DurationUnit.MILLISECONDS).format(biggestUnit, showMilliSeconds, longName, maxUnits)")
+    )
     fun formatDuration(
         millis: Long,
         biggestUnit: TimeUnit = TimeUnit.YEAR,
@@ -85,12 +86,12 @@ object TimeUtils {
         get() = (inWholeMilliseconds / 50).toInt()
 
 
-    @Deprecated("Do no longer use long for time", ReplaceWith("getDuration()"))
+    @Deprecated("Do no longer use long for time", ReplaceWith("TimeUtils.getDuration(string)"))
     fun getMillis(string: String) = getDuration(string).inWholeMilliseconds
 
     fun getDuration(string: String) = getMillis_(string.replace("m", "m ").replace("  ", " ").trim())
 
-    private fun getMillis_(string: String) = pattern.matchMatcher(string.lowercase().trim()) {
+    private fun getMillis_(string: String) = UtilsPatterns.timeAmountPattern.matchMatcher(string.lowercase().trim()) {
         val years = group("y")?.toLong() ?: 0L
         val days = group("d")?.toLong() ?: 0L
         val hours = group("h")?.toLong() ?: 0L
@@ -133,19 +134,36 @@ object TimeUtils {
         }.toLong().toDuration(DurationUnit.MILLISECONDS)
     }
 
-    fun SkyBlockTime.formatted(): String {
+    fun SkyBlockTime.formatted(
+        dayAndMonthElement: Boolean = true,
+        yearElement: Boolean = true,
+        hoursAndMinutesElement: Boolean = true
+    ): String {
         val hour = if (this.hour > 12) this.hour - 12 else this.hour
-        val timeOfDay = if (this.hour > 11) "pm" else "am" // hooray for 12-hour clocks
-        var minute = this.minute.toString()
-        if (minute.length != 2) {
-            minute = minute.padStart(2, '0')
-        }
-
+        val timeOfDay = if (this.hour > 11) "pm" else "am"
+        val minute = this.minute.toString().padStart(2, '0')
         val month = SkyBlockTime.monthName(this.month)
         val day = this.day
         val daySuffix = SkyBlockTime.daySuffix(day)
         val year = this.year
-        return "$month $day$daySuffix, Year $year $hour:${minute}$timeOfDay" // Early Winter 1st Year 300, 12:03pm
+
+        val datePart = when {
+            yearElement -> "$month $day$daySuffix, Year $year"
+            dayAndMonthElement -> "$month $day$daySuffix"
+            else -> ""
+        }
+        val timePart = if (hoursAndMinutesElement) "$hour:$minute$timeOfDay" else ""
+
+        /**
+         * We replace the line here, because the user might want color month names
+         */
+        return tryToReplaceScoreboardLine(
+            if (datePart.isNotEmpty() && timePart.isNotEmpty()) {
+                "$datePart, $timePart"
+            } else {
+                "$datePart$timePart".trim()
+            }
+        ) ?: ""
     }
 
     fun getCurrentLocalDate(): LocalDate = LocalDate.now(ZoneId.of("UTC"))

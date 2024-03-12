@@ -1,5 +1,6 @@
 package at.hannibal2.skyhanni.features.nether.reputationhelper.dailykuudra
 
+import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.config.Storage
 import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.data.ScoreboardData
@@ -12,6 +13,7 @@ import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.CollectionUtils.addAsSingletonList
 import at.hannibal2.skyhanni.utils.LorenzColor
 import at.hannibal2.skyhanni.utils.LorenzUtils
+import at.hannibal2.skyhanni.utils.LorenzUtils.isInIsland
 import at.hannibal2.skyhanni.utils.LorenzVec
 import at.hannibal2.skyhanni.utils.NEUItems.getItemStack
 import at.hannibal2.skyhanni.utils.RenderUtils.drawDynamicText
@@ -24,11 +26,12 @@ class DailyKuudraBossHelper(private val reputationHelper: CrimsonIsleReputationH
     private var kuudraLocation: LorenzVec? = null
     private var allKuudraDone = true
 
+    private val config get() = SkyHanniMod.feature.crimsonIsle.reputationHelper
+
     @SubscribeEvent
     fun onRenderWorld(event: LorenzRenderWorldEvent) {
-        if (!LorenzUtils.inSkyBlock) return
-        if (LorenzUtils.skyBlockIsland != IslandType.CRIMSON_ISLE) return
-        if (!reputationHelper.config.enabled) return
+        if (!IslandType.CRIMSON_ISLE.isInIsland()) return
+        if (!config.enabled) return
         if (!reputationHelper.showLocations()) return
         if (allKuudraDone) return
 
@@ -41,7 +44,7 @@ class DailyKuudraBossHelper(private val reputationHelper: CrimsonIsleReputationH
     @SubscribeEvent
     fun onChat(event: LorenzChatEvent) {
         if (!LorenzUtils.inKuudraFight) return
-        if (!reputationHelper.config.enabled) return
+        if (!config.enabled) return
 
         val message = event.message
         if (!message.contains("KUUDRA DOWN!") || message.contains(":")) return
@@ -70,6 +73,7 @@ class DailyKuudraBossHelper(private val reputationHelper: CrimsonIsleReputationH
         display.addAsSingletonList("§7Daily Kuudra (§e$done§8/§e5 killed§7)")
         if (done < 5) {
             for (tier in kuudraTiers) {
+                if (config.hideComplete.get() && tier.doneToday) continue
                 val result = if (tier.doneToday) "§aDone" else "§bTodo"
                 val displayName = tier.getDisplayName()
                 val displayItem = tier.displayItem

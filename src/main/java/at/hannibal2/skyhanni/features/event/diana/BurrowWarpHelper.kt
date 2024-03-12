@@ -33,7 +33,7 @@ class BurrowWarpHelper {
         currentWarp?.let {
             if (lastWarpTime.passedSince() > 5.seconds) {
                 lastWarpTime = SimpleTimeMark.now()
-                LorenzUtils.sendCommandToServer("warp " + currentWarp?.name)
+                ChatUtils.sendCommandToServer("warp " + currentWarp?.name)
                 lastWarp = currentWarp
                 GriffinBurrowHelper.lastTitleSentTime = SimpleTimeMark.now() + 2.seconds
                 TitleManager.optionalResetTitle {

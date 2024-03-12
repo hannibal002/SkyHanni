@@ -5,9 +5,10 @@ import at.hannibal2.skyhanni.events.LorenzChatEvent
 import at.hannibal2.skyhanni.events.LorenzRenderWorldEvent
 import at.hannibal2.skyhanni.features.garden.pests.SprayType
 import at.hannibal2.skyhanni.features.misc.LockMouseLook
+import at.hannibal2.skyhanni.utils.ChatUtils
+import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.ItemUtils.name
 import at.hannibal2.skyhanni.utils.LocationUtils.isPlayerInside
-import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.LorenzVec
 import at.hannibal2.skyhanni.utils.RenderUtils.draw3DLine
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
@@ -23,10 +24,13 @@ import kotlin.time.Duration.Companion.minutes
 
 object GardenPlotAPI {
 
-    private val plotNamePattern by RepoPattern.pattern("garden.plot.name", "§.Plot §7- §b(?<name>.*)")
-
-    private val plotSprayedPattern by RepoPattern.pattern(
-        "garden.plot.spray.target",
+    private val patternGroup = RepoPattern.group("garden.plot")
+    private val plotNamePattern by patternGroup.pattern(
+        "name",
+        "§.Plot §7- §b(?<name>.*)"
+    )
+    private val plotSprayedPattern by patternGroup.pattern(
+        "spray.target",
         "§a§lSPRAYONATOR! §r§7You sprayed §r§aPlot §r§7- §r§b(?<plot>.*) §r§7with §r§a(?<spray>.*)§r§7!"
     )
 
@@ -36,7 +40,7 @@ object GardenPlotAPI {
         return plots.firstOrNull { it.isPlayerInside() }
     }
 
-    class Plot(val id: Int, var inventorySlot: Int, val box: AxisAlignedBB, val middle: LorenzVec)
+    class Plot(val id: Int, var unlocked: Boolean, var inventorySlot: Int, val box: AxisAlignedBB, val middle: LorenzVec)
 
     class PlotData(
         @Expose
@@ -106,7 +110,7 @@ object GardenPlotAPI {
     fun Plot.isPlayerInside() = box.isPlayerInside()
 
     fun Plot.sendTeleportTo() {
-        LorenzUtils.sendCommandToServer("tptoplot $name")
+        ChatUtils.sendCommandToServer("tptoplot $name")
         LockMouseLook.autoDisable()
     }
 
@@ -130,7 +134,7 @@ object GardenPlotAPI {
                 val b = LorenzVec(maxX, 256.0, maxY)
                 val middle = a.interpolate(b, 0.5).copy(y = 10.0)
                 val box = a.axisAlignedTo(b).expand(0.0001, 0.0, 0.0001)
-                list.add(Plot(id, slot, box, middle))
+                list.add(Plot(id, false, slot, box, middle))
                 slot++
             }
             slot += 4
@@ -159,8 +163,9 @@ object GardenPlotAPI {
         if (event.inventoryName != "Configure Plots") return
 
         for (plot in plots) {
-            val itemName = event.inventoryItems[plot.inventorySlot]?.name ?: continue
-            plotNamePattern.matchMatcher(itemName) {
+            val itemStack = event.inventoryItems[plot.inventorySlot] ?: continue
+            plot.unlocked = itemStack.getLore().all { !it.contains("§7Cost:") }
+            plotNamePattern.matchMatcher(itemStack.name) {
                 plot.name = group("name")
             }
         }

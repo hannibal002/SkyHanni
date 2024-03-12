@@ -38,9 +38,6 @@ abstract class ItemTrackerData : TrackerData() {
     class TrackedItem {
 
         @Expose
-        var internalName: NEUInternalName? = null
-
-        @Expose
         var timesGained: Long = 0
 
         @Expose

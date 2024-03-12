@@ -6,10 +6,10 @@ import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.LorenzChatEvent
 import at.hannibal2.skyhanni.events.LorenzTickEvent
 import at.hannibal2.skyhanni.events.LorenzWorldChangeEvent
-import at.hannibal2.skyhanni.events.RenderMobColoredEvent
-import at.hannibal2.skyhanni.events.ResetEntityHurtEvent
-import at.hannibal2.skyhanni.events.withAlpha
+import at.hannibal2.skyhanni.events.SkyHanniRenderEntityEvent
+import at.hannibal2.skyhanni.mixins.hooks.RenderLivingEntityHelper
 import at.hannibal2.skyhanni.utils.ChatUtils
+import at.hannibal2.skyhanni.utils.ColorUtils.withAlpha
 import at.hannibal2.skyhanni.utils.EntityUtils
 import at.hannibal2.skyhanni.utils.LocationUtils
 import at.hannibal2.skyhanni.utils.LorenzColor
@@ -19,10 +19,10 @@ import at.hannibal2.skyhanni.utils.NumberUtil
 import at.hannibal2.skyhanni.utils.RenderUtils.renderStrings
 import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.getLorenzVec
+import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraft.entity.EntityLiving
 import net.minecraft.entity.EntityLivingBase
 import net.minecraft.entity.item.EntityArmorStand
-import net.minecraftforge.client.event.RenderLivingEvent
 import net.minecraftforge.fml.common.eventhandler.EventPriority
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
@@ -36,16 +36,23 @@ class SummoningMobManager {
     private var searchArmorStands = false
     private var searchMobs = false
 
-    // TODO repo
-    //§aYou have spawned your Tank Zombie §r§asoul! §r§d(249 Mana)
-    private val spawnPattern = "§aYou have spawned your (.+) §r§asoul! §r§d\\((\\d+) Mana\\)".toPattern()
-    private val despawnPattern = "§cYou have despawned your (monster|monsters)!".toPattern()
-
-    //§a§ohannibal2's Tank Zombie§r §a160k§c❤
-    private val healthPattern = "§a§o(.+)'s (.+)§r §[ae]([\\dkm]+)§c❤".toPattern()
-
-    //§cThe Seraph recalled your 3 summoned allies!
-    private val seraphRecallPattern = "§cThe Seraph recalled your (\\d) summoned allies!".toPattern()
+    private val patternGroup = RepoPattern.group("summoning.mobs")
+    private val spawnPattern by patternGroup.pattern( //§aYou have spawned your Tank Zombie §r§asoul! §r§d(249 Mana)
+        "spawn",
+        "§aYou have spawned your (.+) §r§asoul! §r§d\\((\\d+) Mana\\)"
+    )
+    private val despawnPattern by patternGroup.pattern(
+        "despawn",
+        "§cYou have despawned your (monster|monsters)!"
+    )
+    private val healthPattern by patternGroup.pattern( //§a§ohannibal2's Tank Zombie§r §a160k§c❤
+        "health",
+        "§a§o(.+)'s (.+)§r §[ae]([\\dkm]+)§c❤"
+    )
+    private val seraphRecallPattern by patternGroup.pattern( //§cThe Seraph recalled your 3 summoned allies!
+        "seraphrecall",
+        "§cThe Seraph recalled your (\\d) summoned allies!"
+    )
 
     @SubscribeEvent
     fun onChat(event: LorenzChatEvent) {
@@ -106,6 +113,7 @@ class SummoningMobManager {
                     .distance(playerLocation) < 10 && it.ticksExisted < 2
             }.forEach {
                 summoningMobs[it] = SummoningMob(System.currentTimeMillis(), name = "Mob")
+                it.setColor(LorenzColor.GREEN)
                 updateData()
                 if (summoningMobs.size == summoningsSpawned) {
                     searchMobs = false
@@ -125,6 +133,7 @@ class SummoningMobManager {
             val name = summoningMob.name
             if (currentHealth == 0) {
                 summoningMobs.remove(entityLiving)
+                entityLiving.setColor(null)
                 ChatUtils.chat("Your Summoning Mob just §cdied!")
                 continue
             }
@@ -162,7 +171,7 @@ class SummoningMobManager {
     }
 
     @SubscribeEvent(priority = EventPriority.HIGH)
-    fun onRenderLiving(event: RenderLivingEvent.Specials.Pre<EntityLivingBase>) {
+    fun onRenderLiving(event: SkyHanniRenderEntityEvent.Specials.Pre<EntityLivingBase>) {
         if (!LorenzUtils.inSkyBlock) return
         if (!config.summoningMobHideNametag) return
 
@@ -172,24 +181,6 @@ class SummoningMobManager {
         if (entity.isDead) return
 
         event.isCanceled = entity in summoningMobNametags
-    }
-
-    @SubscribeEvent
-    fun onRenderMobColored(event: RenderMobColoredEvent) {
-        if (config.summoningMobColored) {
-            val entity = event.entity
-            if (entity is EntityLiving && entity in summoningMobs.keys) {
-                event.color = LorenzColor.GREEN.toColor().withAlpha(127)
-            }
-        }
-    }
-
-    @SubscribeEvent
-    fun onResetEntityHurtTime(event: ResetEntityHurtEvent) {
-        val entity = event.entity
-        if (config.summoningMobColored && entity in summoningMobs.keys) {
-            event.shouldReset = true
-        }
     }
 
     @SubscribeEvent
@@ -214,4 +205,15 @@ class SummoningMobManager {
         var name: String = "",
         var lastDisplayName: String = "",
     )
+
+    private infix fun EntityLivingBase.setColor(color: LorenzColor?) {
+        if (color != null) {
+            RenderLivingEntityHelper.setEntityColorWithNoHurtTime(
+                this,
+                color.toColor().withAlpha(127),
+            ) { isEnabled() && config.summoningMobColored }
+        } else {
+            RenderLivingEntityHelper.removeCustomRender(this)
+        }
+    }
 }
