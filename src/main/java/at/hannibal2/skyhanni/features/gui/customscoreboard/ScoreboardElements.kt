@@ -522,7 +522,7 @@ private fun getQuiverShowWhen(): Boolean {
     return !inAnyIsland(IslandType.THE_RIFT)
 }
 
-private fun getPowderDisplayPair(): List<ScoreboardElementType> {
+private fun getPowderDisplayPair() = buildList {
     val mithrilPowder =
         getGroupFromPattern(TabListData.getTabList(), ScoreboardPattern.mithrilPowderPattern, "mithrilpowder")
             .formatNum()
@@ -530,13 +530,19 @@ private fun getPowderDisplayPair(): List<ScoreboardElementType> {
         getGroupFromPattern(TabListData.getTabList(), ScoreboardPattern.gemstonePowderPattern, "gemstonepowder")
             .formatNum()
 
-    return listOf(
-        when {
-            informationFilteringConfig.hideEmptyLines && mithrilPowder == "0" && gemstonePowder == "0" -> "<hidden>"
-            displayConfig.displayNumbersFirst -> "§9§lPowder §7- §2$mithrilPowder Mithril §7- §d$gemstonePowder Gemstone"
-            else -> "§9§lPowder §7- §fMithril: §2$mithrilPowder §7- §fGemstone: §d$gemstonePowder"
-        } to HorizontalAlignment.LEFT
-    )
+    add("§9§lPowder" to HorizontalAlignment.LEFT)
+
+    if (informationFilteringConfig.hideEmptyLines && mithrilPowder == "0" && gemstonePowder == "0") {
+        add(0, "<hidden>" to HorizontalAlignment.LEFT)
+    } else {
+        if (displayConfig.displayNumbersFirst) {
+            add(" §7- §2$mithrilPowder Mithril" to HorizontalAlignment.LEFT)
+            add(" §7- §d$gemstonePowder Gemstone" to HorizontalAlignment.LEFT)
+        } else {
+            add(" §7- §fMithril: §2$mithrilPowder" to HorizontalAlignment.LEFT)
+            add(" §7- §fGemstone: §d$gemstonePowder" to HorizontalAlignment.LEFT)
+        }
+    }
 }
 
 private fun getPowderShowWhen() = inAdvancedMiningIsland()
