@@ -258,9 +258,15 @@ enum class TabWidget(
 
     val pattern by repoGroup.pattern(name.replace("_", ".").lowercase(), "\\s*$pattern0")
 
-    fun postEvent(lines: List<String>) = TabWidgetUpdate(this, lines).postAndCatch()
+    fun postEvent(lines: List<String>) {
+        this.lines = lines
+        TabWidgetUpdate(this, lines).postAndCatch()
+    }
 
     fun isEventForThis(event: TabWidgetUpdate) = event.widget == this
+
+    var lines: List<String> = emptyList()
+        private set
 
     /** Both are inclusive */
     var boundary = -1 to -1
@@ -273,6 +279,9 @@ enum class TabWidget(
     private fun updateIsActive() {
         if (isActive.get() == activeAfterCheck) return
         isActive.set(activeAfterCheck)
+        if (!activeAfterCheck) {
+            lines = emptyList()
+        }
     }
 
     companion object {
