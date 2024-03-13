@@ -88,6 +88,10 @@ object ScoreboardPattern {
 
     // dungeon scoreboard
     private val dungeonSb = scoreboardGroup.group("dungeon")
+    val m7dragonsPattern by dungeonSb.pattern(
+        "m7dragons",
+        "^(§cNo Alive Dragons|§8- (§.)+[\\w\\s]+Dragon§a \\w+§.❤)$"
+    )
     val keysPattern by dungeonSb.pattern(
         "keys",
         "Keys: §.■ §.[✗✓] §.■ §a.x$"
@@ -144,7 +148,7 @@ object ScoreboardPattern {
     )
     val peltsPattern by farmingSb.pattern(
         "pelts",
-        "^(§.)*Pelts: (§.)*(?<pelts>[\\d,]+)( (§.)*\\([+-](?<diff>[\\w,.]+)\\))?\$"
+        "^(§.)*Pelts: (§.)*([\\d,]+).*$"
     )
     val mobLocationPattern by farmingSb.pattern(
         "moblocation",
@@ -154,10 +158,10 @@ object ScoreboardPattern {
         "jacobscontest",
         "^§eJacob's Contest$"
     )
-		val plotPattern by farmingSb.pattern(
-				"plot",
-				"\\s*§aPlot §7-.*"
-		)
+    val plotPattern by farmingSb.pattern(
+        "plot",
+        "\\s*§aPlot §7-.*"
+    )
 
     // mining
     private val miningSb = scoreboardGroup.group("mining")
@@ -313,11 +317,13 @@ object ScoreboardPattern {
         "objective",
         "^(§.)*(Objective|Quest).*"
     )
+
     // this thirdObjectiveLinePattern includes all those weird objective lines that go into a third scoreboard line
     val thirdObjectiveLinePattern by miscSb.pattern(
         "thirdobjectiveline",
         "(\\s*§.\\(§.\\w+§./§.\\w+§.\\)|§f Mages.*|§f Barbarians.*|§edefeat Kuudra|§eand stun him)"
     )
+
     // collection of lines that just randomly exist and I have no clue how on earth to effectively remove them
     val wtfAreThoseLinesPattern by miscSb.pattern(
         "wtfarethoselines",

@@ -13,7 +13,8 @@
 //  - option to hide coins earned
 //  - color options in the purse etc lines
 //  - choose the amount of decimal places in shorten nums
-//  - very important bug fix: duplex is weird :(
+//  - ~~very important bug fix: duplex is weird :(~~ will be fixed with empas quiverapi overhaul
+//  - more anchor points (alignment enums in renderutils)
 //
 
 package at.hannibal2.skyhanni.features.gui.customscoreboard
@@ -91,12 +92,13 @@ class CustomScoreboard {
     }
 
     private fun createLines() = buildList<ScoreboardElementType> {
-        for (element in config.scoreboardEntries) {
+        val configEntries = removeEmptyLinesFromEdges(config.scoreboardEntries)
+        for (element in configEntries) {
             val line = element.getVisiblePair()
 
             // Hide consecutive empty lines
             if (
-                config.informationFilteringConfig.hideConsecutiveEmptyLines &&
+                informationFilteringConfig.hideConsecutiveEmptyLines &&
                 line.isNotEmpty() && line[0].first == "<empty>" && lastOrNull()?.first?.isEmpty() == true
             ) {
                 continue
@@ -117,11 +119,21 @@ class CustomScoreboard {
         }
     }
 
+    private fun removeEmptyLinesFromEdges(entries: MutableList<ScoreboardElement>): List<ScoreboardElement> {
+        if (config.informationFilteringConfig.hideEmptyLinesAtTopAndBottom) {
+            return entries
+                .dropWhile { it.getVisiblePair().all { it.first == "<empty>" } }
+                .dropLastWhile { it.getVisiblePair().all { it.first == "<empty>" } }
+        }
+        return entries
+    }
+
     // Thank you Apec for showing that the ElementType of the stupid scoreboard is FUCKING HELMET WTF
     @SubscribeEvent
     fun onRenderScoreboard(event: RenderGameOverlayEvent.Post) {
         if (event.type == RenderGameOverlayEvent.ElementType.HELMET) {
-            GuiIngameForge.renderObjective = !isHideVanillaScoreboardEnabled()
+            if (isHideVanillaScoreboardEnabled())
+                GuiIngameForge.renderObjective = false
         }
     }
 

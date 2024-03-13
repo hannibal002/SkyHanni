@@ -15,8 +15,6 @@ import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.StringUtils.removeResets
 import at.hannibal2.skyhanni.utils.StringUtils.trimWhiteSpace
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
-import net.minecraft.enchantment.Enchantment
-import net.minecraft.enchantment.Enchantment.power
 import net.minecraft.item.ItemStack
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
@@ -89,15 +87,15 @@ object MaxwellAPI {
                 event.inventoryItems.values.find {
                     powerSelectedPattern.matches(it.getLore().lastOrNull())
                 } ?: return
-            val displayName = selectedPowerStack.displayName.removeColor()
+            val displayName = selectedPowerStack.displayName.removeColor().trim()
 
             currentPower = getPowerByNameOrNull(displayName)
                 ?: return ErrorManager.logErrorWithData(
-                    UnknownMaxwellPower("Unknown power: $power"),
-                    "Unknown power: $power",
-                    "power" to power,
+                    UnknownMaxwellPower("Unknown power: $displayName"),
+                    "Unknown power: $displayName",
                     "displayName" to displayName,
-                    "lore" to selectedPowerStack.getLore()
+                    "lore" to selectedPowerStack.getLore(),
+                    noStackTrace = true
                 )
             return
         }
@@ -126,11 +124,11 @@ object MaxwellAPI {
                 val power = group("power")
                 currentPower = getPowerByNameOrNull(power)
                     ?: return@matchMatcher ErrorManager.logErrorWithData(
-                    UnknownMaxwellPower("Unknown power: ${Enchantment.power}"),
-                    "Unknown power: ${Enchantment.power}",
-                    "power" to Enchantment.power,
+                    UnknownMaxwellPower("Unknown power: ${stack.displayName}"),
+                    "Unknown power: ${stack.displayName}",
                     "displayName" to stack.displayName,
-                    "lore" to stack.getLore()
+                    "lore" to stack.getLore(),
+                    noStackTrace = true
                 )
                 return@matchMatcher
             }
