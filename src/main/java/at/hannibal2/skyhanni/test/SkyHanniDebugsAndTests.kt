@@ -129,7 +129,7 @@ class SkyHanniDebugsAndTests {
 //            b = args[1].toDouble()
 //            c = args[2].toDouble()
 
-//            for (line in (Minecraft.getMinecraft().ingameGUI.tabList as AccessorGuiPlayerTabOverlay).footer.unformattedText
+//            for (line in getPlayerTabOverlay().footer.unformattedText
 //                .split("\n")) {
 //                println("footer: '$line'")
 //            }

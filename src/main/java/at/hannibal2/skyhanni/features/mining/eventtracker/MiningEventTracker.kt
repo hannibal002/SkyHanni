@@ -4,6 +4,7 @@ import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.config.ConfigManager
 import at.hannibal2.skyhanni.data.BossbarData
 import at.hannibal2.skyhanni.data.HypixelData
+import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.data.ScoreboardData
 import at.hannibal2.skyhanni.events.BossbarUpdateEvent
 import at.hannibal2.skyhanni.events.LorenzChatEvent
@@ -12,6 +13,7 @@ import at.hannibal2.skyhanni.events.LorenzWorldChangeEvent
 import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.APIUtil
 import at.hannibal2.skyhanni.utils.LorenzUtils
+import at.hannibal2.skyhanni.utils.LorenzUtils.isInIsland
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.TabListData
@@ -63,7 +65,7 @@ class MiningEventTracker {
     @SubscribeEvent
     fun onBossbarChange(event: BossbarUpdateEvent) {
         if (!LorenzUtils.inAdvancedMiningIsland()) return
-        if (lastWorldSwitch.passedSince() < 2.seconds) return
+        if (lastWorldSwitch.passedSince() < 5.seconds) return
         if (!eventEndTime.isInPast()) {
             return
         }
@@ -99,9 +101,7 @@ class MiningEventTracker {
     }
 
     private fun sendData(eventName: String, time: String?) {
-        val eventType = MiningEventType.fromBossbarName(eventName)
-        if (lastSentEvent == eventType) return
-        if (eventType == null) {
+        val eventType = MiningEventType.fromEventName(eventName) ?: run {
             if (!config.enabled) return
             ErrorManager.logErrorWithData(
                 Exception("UnknownMiningEvent"), "Unknown mining event detected from string $eventName",
@@ -112,6 +112,10 @@ class MiningEventTracker {
             )
             return
         }
+
+        if (IslandType.CRYSTAL_HOLLOWS.isInIsland() && eventType.dwarvenSpecific) return
+
+        if (lastSentEvent == eventType) return
         lastSentEvent = eventType
 
         val timeRemaining = if (time == null) {
@@ -121,8 +125,7 @@ class MiningEventTracker {
         }
         eventEndTime = SimpleTimeMark.now() + timeRemaining
 
-        val serverId = HypixelData.getCurrentServerId()
-        if (serverId == null) {
+        val serverId = HypixelData.getCurrentServerId() ?: run {
             ErrorManager.logErrorWithData(
                 Exception("NoServerId"), "Could not find server id",
                 "islandType" to LorenzUtils.skyBlockIsland,

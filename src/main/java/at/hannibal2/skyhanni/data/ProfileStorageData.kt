@@ -12,6 +12,7 @@ import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
+import at.hannibal2.skyhanni.utils.TabListData
 import at.hannibal2.skyhanni.utils.UtilsPatterns
 import net.minecraftforge.fml.common.eventhandler.EventPriority
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
@@ -66,10 +67,18 @@ object ProfileStorageData {
 
         if (noTabListTime.passedSince() > 3.seconds) {
             noTabListTime = SimpleTimeMark.now()
-            ChatUtils.chat(
-                "Extra Information from Tab list not found! " +
-                    "Enable it: SkyBlock Menu ➜ Settings ➜ Personal ➜ User Interface ➜ Player List Info"
-            )
+            val foundSkyBlockTabList = TabListData.getTabList().any { it.contains("§b§lArea:") }
+            if (foundSkyBlockTabList) {
+                ChatUtils.clickableChat(
+                    "§cCan not read profile name from tab list! Open /widget and enable Profile Widget",
+                    command = "widget"
+                )
+            } else {
+                ChatUtils.chat(
+                    "§cExtra Information from Tab list not found! " +
+                        "Enable it: SkyBlock Menu ➜ Settings ➜ Personal ➜ User Interface ➜ Player List Info"
+                )
+            }
         }
     }
 

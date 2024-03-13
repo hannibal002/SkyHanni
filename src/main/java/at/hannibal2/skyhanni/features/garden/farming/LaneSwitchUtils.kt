@@ -67,38 +67,33 @@ object LaneSwitchUtils {
     }
 
     private fun isBoundaryPlot(plotIndex: Int, direction: Direction, value: Value): Boolean {
-        if (direction == Direction.WEST_EAST) {
-            val isNextNewRow: Boolean
-            val isNextUnlocked: Boolean
-            val isNextBarn: Boolean
+        return if (direction == Direction.WEST_EAST) {
             if (value == Value.MIN) {
                 if (plotIndex - 1 == -1) return true // check if next plot is out of bounds
                 //Check if the next plot's border is 240 and therefore in the previous row
-                isNextNewRow = GardenPlotAPI.plots[plotIndex - 1].box.maxX.absoluteValue.round(0) == 240.0
-                isNextUnlocked = GardenPlotAPI.plots[plotIndex - 1].unlocked
-                isNextBarn = GardenPlotAPI.plots[plotIndex - 1].isBarn()
+                val isNextNewRow = GardenPlotAPI.plots[plotIndex - 1].box.maxX.absoluteValue.round(0) == 240.0
+                val isNextUnlocked = GardenPlotAPI.plots[plotIndex - 1].unlocked
+                val isNextBarn = GardenPlotAPI.plots[plotIndex - 1].isBarn()
+                isNextNewRow || !isNextUnlocked || isNextBarn
             } else {
                 if (plotIndex + 1 == 25) return true // check if next plot is out of bounds
-                isNextNewRow = (plotIndex + 1) % 5 == 0
-                isNextUnlocked = GardenPlotAPI.plots[plotIndex + 1].unlocked
-                isNextBarn = GardenPlotAPI.plots[plotIndex + 1].isBarn()
+                val isNextNewRow = (plotIndex + 1) % 5 == 0
+                val isNextUnlocked = GardenPlotAPI.plots[plotIndex + 1].unlocked
+                val isNextBarn = GardenPlotAPI.plots[plotIndex + 1].isBarn()
+                isNextNewRow || !isNextUnlocked || isNextBarn
             }
-            return isNextNewRow || !isNextUnlocked || isNextBarn
         } else if (direction == Direction.NORTH_SOUTH) {
-            val isNextUnlocked: Boolean
-            val isNextBarn: Boolean
-
-            if (value == Value.MAX) {
+            if (value == Value.TOP) {
                 if (plotIndex - 1 == -1 || (plotIndex - 5) < 0) return true // check if next plot is out of bounds
-                isNextUnlocked = GardenPlotAPI.plots[plotIndex - 5].unlocked
-                isNextBarn = GardenPlotAPI.plots[plotIndex - 5].isBarn()
+                val isNextUnlocked = GardenPlotAPI.plots[plotIndex - 5].unlocked
+                val isNextBarn = GardenPlotAPI.plots[plotIndex - 5].isBarn()
+                !isNextUnlocked || isNextBarn
             } else {
                 if (plotIndex + 5 > 24) return true // check if next plot is out of bounds
-                isNextUnlocked = GardenPlotAPI.plots[plotIndex + 5].unlocked
-                isNextBarn = GardenPlotAPI.plots[plotIndex + 5].isBarn()
+                val isNextUnlocked = GardenPlotAPI.plots[plotIndex + 5].unlocked
+                val isNextBarn = GardenPlotAPI.plots[plotIndex + 5].isBarn()
+                !isNextUnlocked || isNextBarn
             }
-            return !isNextUnlocked || isNextBarn
-        }
-        return false
+        } else false
     }
 }
