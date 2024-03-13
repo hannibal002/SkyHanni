@@ -247,13 +247,11 @@ private fun getDarkAuctionShowWhen(): Boolean {
 }
 
 private fun getJacobContestLines() = buildList {
-    val jacobsContestLine = getSbLines().firstOrNull { SbPattern.jacobsContestPattern.matches(it) }
-
-    jacobsContestLine?.let {
-        addIfNotNull(it)
-        addIfNotNull(getSbLines().nextAfter(it))
-        addIfNotNull(getSbLines().nextAfter(it, 2))
-        addIfNotNull(getSbLines().nextAfter(it, 3))
+    getSbLines().firstOrNull { SbPattern.jacobsContestPattern.matches(it) }?.let { line ->
+        add(line)
+        getSbLines().nextAfter(line)?.let { add(it) }
+        getSbLines().nextAfter(line, 2)?.let { add(it) }
+        getSbLines().nextAfter(line, 3)?.let { add(it) }
     }
 }
 
