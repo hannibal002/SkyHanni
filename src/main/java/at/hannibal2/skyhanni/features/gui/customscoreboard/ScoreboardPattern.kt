@@ -140,7 +140,7 @@ object ScoreboardPattern {
     )
     val pastingPattern by farmingSb.pattern(
         "pasting",
-        "^\\s*§f(Barn )?Pasting§7: (§.)*[\\d,]+%$"
+        "^\\s*§f(Barn )?Pasting§7: (§.)*[\\d,.]+%$"
     )
     val peltsPattern by farmingSb.pattern(
         "pelts",
