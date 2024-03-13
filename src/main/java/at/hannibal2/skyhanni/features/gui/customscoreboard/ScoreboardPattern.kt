@@ -48,7 +48,7 @@ object ScoreboardPattern {
     )
     val votesPattern by mainSb.pattern(
         "votes",
-        "(?<votes>§[caebd]\\|+(§f)?\\|+ §(.+)$)$)"
+        "(?<votes>§[caebd]\\|+(§f)?\\|+ §(.+)$)"
     )
     val waitingForVotePattern by mainSb.pattern(
         "waitingforvote",
