@@ -387,7 +387,7 @@ object ScoreboardPattern {
     )
     val mithrilPowderPattern by tablistGroup.pattern(
         "mithrilpowder",
-        "^\\s*Gemstone Powder: (?:§.)+(?<mithrilpowder>[\\d,\\.]+)$"
+        "^\\s*Mithril Powder: (?:§.)+(?<mithrilpowder>[\\d,\\.]+)$"
     )
     val gemstonePowderPattern by tablistGroup.pattern(
         "gemstonepowder",
