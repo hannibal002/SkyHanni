@@ -427,14 +427,14 @@ private fun getTimeDisplayPair(): List<ScoreboardElementType> {
 }
 
 private fun getLobbyDisplayPair(): List<ScoreboardElementType> {
-    val lobbyCode = getGroupFromPattern(
-        ScoreboardData.sidebarLinesFormatted,
-        ScoreboardPattern.lobbyCodePattern,
-        "code"
+    val lobbyCode = HypixelData.serverId ?: "<hidden>"
+    return listOf(
+        if (lobbyCode == "<hidden>") {
+            "<hidden>"
+        } else {
+            "§8$lobbyCode"
+        } to HorizontalAlignment.LEFT
     )
-
-    val displayValue = if (lobbyCode == "0") "<hidden>" else "§8$lobbyCode"
-    return listOf(displayValue to HorizontalAlignment.LEFT)
 }
 
 private fun getPowerDisplayPair() = listOf(
