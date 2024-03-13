@@ -16,6 +16,11 @@ public class InformationFilteringConfig {
     public boolean hideConsecutiveEmptyLines = true;
 
     @Expose
+    @ConfigOption(name = "Hide empty lines at top/bottom", desc = "Hide empty lines at the top or bottom of the scoreboard.")
+    @ConfigEditorBoolean
+    public boolean hideEmptyLinesAtTopAndBottom = true;
+
+    @Expose
     @ConfigOption(name = "Hide non relevant info", desc = "Hide lines that are not relevant to the current location." +
         "\n§cIt's generally not recommended to turn this off.")
     @ConfigEditorBoolean

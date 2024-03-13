@@ -191,6 +191,21 @@ enum class ScoreboardElement(
         ::getExtraShowWhen,
         "§cUnknown lines the mod is not detecting"
     ),
+    EMPTY_LINE4(
+        ::getEmptyLineDisplayPair,
+        { true },
+        ""
+    ),
+    EMPTY_LINE5(
+        ::getEmptyLineDisplayPair,
+        { true },
+        ""
+    ),
+    EMPTY_LINE6(
+        ::getEmptyLineDisplayPair,
+        { true },
+        ""
+    ),
     ;
 
     override fun toString(): String {
