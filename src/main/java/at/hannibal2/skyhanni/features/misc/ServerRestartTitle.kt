@@ -24,7 +24,7 @@ class ServerRestartTitle {
         )
         val restartingGreedyPattern by restartingGroup.pattern(
             "greedy",
-            "§cServer closing:.*"
+            "§cServer closing.*"
         )
     }
 
