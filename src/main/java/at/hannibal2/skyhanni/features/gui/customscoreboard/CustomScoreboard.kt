@@ -14,8 +14,6 @@
 //  - color options in the purse etc lines
 //  - choose the amount of decimal places in shorten nums
 //  - ~~very important bug fix: duplex is weird :(~~ will be fixed with empas quiverapi overhaul
-//  - add more empty fields 
-//  - warn about other scorecoard mods
 //  - more anchor points (alignment enums in renderutils)
 //
 

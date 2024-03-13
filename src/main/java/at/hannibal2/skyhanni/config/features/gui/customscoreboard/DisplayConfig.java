@@ -9,7 +9,8 @@ import io.github.moulberry.moulconfig.annotations.ConfigOption;
 
 public class DisplayConfig {
     @Expose
-    @ConfigOption(name = "Hide Vanilla Scoreboard", desc = "Hide the vanilla scoreboard.")
+    @ConfigOption(name = "Hide Vanilla Scoreboard", desc = "Hide the vanilla scoreboard." +
+        "\n§cUsing mods that add their own scoreboard will not be affected by this setting!")
     @ConfigEditorBoolean
     @FeatureToggle
     public boolean hideVanillaScoreboard = true;
