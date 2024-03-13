@@ -48,7 +48,7 @@ object ScoreboardPattern {
     )
     val votesPattern by mainSb.pattern(
         "votes",
-        "(?<votes>§[caebd]\\|+§f\\|+ §(.+)\$)"
+        "(?<votes>§[caebd]\\|+(§f)?\\|+ §(.+)$)$)"
     )
     val waitingForVotePattern by mainSb.pattern(
         "waitingforvote",
@@ -144,7 +144,7 @@ object ScoreboardPattern {
     )
     val pastingPattern by farmingSb.pattern(
         "pasting",
-        "^\\s*§f(Barn )?Pasting§7: (§.)*[\\d,]+%$"
+        "^\\s*§f(Barn )?Pasting§7: (§.)*[\\d,.]+%$"
     )
     val peltsPattern by farmingSb.pattern(
         "pelts",
@@ -307,11 +307,11 @@ object ScoreboardPattern {
     )
     val dojoPointsPattern by miscSb.pattern(
         "dojopoints",
-        "^(§.)*Points: (§.)*(?<points>[\\w,.]+) ?( (§.)*\\((§.)*[+-](§.)*(?<difference>[\\w,.]+)(§.)*\\))?\$"
+        "^(§.)*Points: (§.)*[\\w.]+( §7\\(§.*§7\\))?$"
     )
     val dojoTimePattern by miscSb.pattern(
         "dojotime",
-        "^(§.)*Time: (§.)*(?<time>(?<seconds>\\w+s))( (§.)*\\((§.)*[+-](§.)*(?<difference>[\\w,.]+)(§.)*\\))?$"
+        "^(§.)*Time: (§.)*[\\w.]+( §7\\(§.*§7\\))?$"
     )
     val objectivePattern by miscSb.pattern(
         "objective",
@@ -393,7 +393,7 @@ object ScoreboardPattern {
     )
     val mithrilPowderPattern by tablistGroup.pattern(
         "mithrilpowder",
-        "^\\s*Gemstone Powder: (?:§.)+(?<mithrilpowder>[\\d,\\.]+)$"
+        "^\\s*Mithril Powder: (?:§.)+(?<mithrilpowder>[\\d,\\.]+)$"
     )
     val gemstonePowderPattern by tablistGroup.pattern(
         "gemstonepowder",
