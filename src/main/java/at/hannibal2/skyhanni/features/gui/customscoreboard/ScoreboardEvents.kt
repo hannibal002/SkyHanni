@@ -8,7 +8,6 @@ import at.hannibal2.skyhanni.features.gui.customscoreboard.ScoreboardEvents.VOTI
 import at.hannibal2.skyhanni.features.gui.customscoreboard.ScoreboardPattern
 import at.hannibal2.skyhanni.features.misc.ServerRestartTitle
 import at.hannibal2.skyhanni.features.rift.area.stillgorechateau.RiftBloodEffigies
-import at.hannibal2.skyhanni.utils.CollectionUtils.addIfNotNull
 import at.hannibal2.skyhanni.utils.CollectionUtils.nextAfter
 import at.hannibal2.skyhanni.utils.LorenzUtils.inAdvancedMiningIsland
 import at.hannibal2.skyhanni.utils.LorenzUtils.inDungeons
@@ -154,7 +153,7 @@ private fun getVotingLines() = buildList {
     val sbLines = getSbLines()
 
     val yearLine = sbLines.firstOrNull { SbPattern.yearVotesPattern.matches(it) } ?: return emptyList<String>()
-    addIfNotNull(yearLine)
+    add(yearLine)
 
     if (sbLines.nextAfter(yearLine) == "§7Waiting for") {
         add("§7Waiting for")
@@ -237,8 +236,8 @@ private fun getDarkAuctionLines() = buildList {
         getSbLines().firstOrNull { SbPattern.darkAuctionCurrentItemPattern.matches(it) }
 
     if (darkAuctionCurrentItemLine != null) {
-        addIfNotNull(darkAuctionCurrentItemLine)
-        addIfNotNull(getSbLines().nextAfter(darkAuctionCurrentItemLine))
+        add(darkAuctionCurrentItemLine)
+        getSbLines().nextAfter(darkAuctionCurrentItemLine)?.let { add(it) }
     }
 }
 
@@ -268,12 +267,12 @@ private fun getJacobMedalsShowWhen(): Boolean {
 }
 
 private fun getTrapperLines() = buildList {
-    addIfNotNull(getSbLines().firstOrNull { SbPattern.peltsPattern.matches(it) })
+    getSbLines().firstOrNull { SbPattern.peltsPattern.matches(it) }?.let { add(it) }
 
     val trapperMobLocationLine = getSbLines().firstOrNull { SbPattern.mobLocationPattern.matches(it) }
     if (trapperMobLocationLine != null) {
         add("Tracker Mob Location:")
-        addIfNotNull(getSbLines().nextAfter(trapperMobLocationLine))
+        getSbLines().nextAfter(trapperMobLocationLine)?.let { add(it) }
     }
 }
 
@@ -308,12 +307,12 @@ private fun getFlightDurationShowWhen(): Boolean {
 }
 
 private fun getWinterLines() = buildList {
-    addIfNotNull(getSbLines().firstOrNull { SbPattern.winterEventStartPattern.matches(it) })
-    addIfNotNull(getSbLines().firstOrNull { SbPattern.winterNextWavePattern.matches(it) && !it.endsWith("Soon!") })
-    addIfNotNull(getSbLines().firstOrNull { SbPattern.winterWavePattern.matches(it) })
-    addIfNotNull(getSbLines().firstOrNull { SbPattern.winterMagmaLeftPattern.matches(it) })
-    addIfNotNull(getSbLines().firstOrNull { SbPattern.winterTotalDmgPattern.matches(it) })
-    addIfNotNull(getSbLines().firstOrNull { SbPattern.winterCubeDmgPattern.matches(it) })
+    getSbLines().firstOrNull { SbPattern.winterEventStartPattern.matches(it) }?.let { add(it) }
+    getSbLines().firstOrNull { SbPattern.winterNextWavePattern.matches(it) && !it.endsWith("Soon!") }?.let { add(it) }
+    getSbLines().firstOrNull { SbPattern.winterWavePattern.matches(it) }?.let { add(it) }
+    getSbLines().firstOrNull { SbPattern.winterMagmaLeftPattern.matches(it) }?.let { add(it) }
+    getSbLines().firstOrNull { SbPattern.winterTotalDmgPattern.matches(it) }?.let { add(it) }
+    getSbLines().firstOrNull { SbPattern.winterCubeDmgPattern.matches(it) }?.let { add(it) }
 }
 
 private fun getWinterShowWhen(): Boolean {
@@ -325,9 +324,9 @@ private fun getWinterShowWhen(): Boolean {
 }
 
 private fun getSpookyLines() = buildList {
-    addIfNotNull(getSbLines().firstOrNull { SbPattern.spookyPattern.matches(it) }) // Time
-    addIfNotNull("§7Your Candy: ")
-    addIfNotNull(
+    getSbLines().firstOrNull { SbPattern.spookyPattern.matches(it) }?.let { add(it) } // Time
+    add("§7Your Candy: ")
+    add(
         CustomScoreboardUtils.getTablistFooter()
             .split("\n")
             .firstOrNull { it.startsWith("§7Your Candy:") }
