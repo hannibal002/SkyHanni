@@ -2,7 +2,15 @@ package at.hannibal2.skyhanni.events
 
 import at.hannibal2.skyhanni.data.model.TabWidget
 
-class TabWidgetUpdate(
+open class TabWidgetUpdate(
     val widget: TabWidget,
-    val lines: List<String>,
-) : LorenzEvent()
+) : LorenzEvent() {
+    class NewValues(
+        widget: TabWidget,
+        val lines: List<String>
+    ) : TabWidgetUpdate(widget)
+
+    class Clear(
+        widget: TabWidget,
+    ) : TabWidgetUpdate(widget)
+}

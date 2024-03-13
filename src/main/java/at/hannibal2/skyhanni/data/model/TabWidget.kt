@@ -9,7 +9,6 @@ import at.hannibal2.skyhanni.utils.ConditionalUtils.transformIf
 import at.hannibal2.skyhanni.utils.StringUtils.matches
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPatternManager
-import io.github.moulberry.moulconfig.observer.Property
 import net.minecraftforge.fml.common.eventhandler.EventPriority
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import java.util.regex.Pattern
@@ -260,29 +259,36 @@ enum class TabWidget(
 
     val pattern by repoGroup.pattern(name.replace("_", ".").lowercase(), "\\s*$pattern0")
 
-    fun postEvent(lines: List<String>) {
-        this.lines = lines
-        TabWidgetUpdate(this, lines).postAndCatch()
-    }
-
-    fun isEventForThis(event: TabWidgetUpdate) = event.widget == this
-
     var lines: List<String> = emptyList()
         private set
 
     /** Both are inclusive */
     var boundary = -1 to -1
 
-    /** Do not get the value inside of [TabWidgetUpdate] since it will be wrong*/
-    val isActive: Property<Boolean> = Property.of(false)
+    var isActive: Boolean = false
+        private set
 
-    private var activeAfterCheck = false
+    fun isEventForThis(event: TabWidgetUpdate) = event.widget == this
+
+    private var gotChecked = false
+
+    private fun postNewEvent(lines: List<String>) {
+        // Prevent Post if lines are equal
+        if (lines == this.lines) return
+        this.lines = lines
+        TabWidgetUpdate.NewValues(this, lines).postAndCatch()
+    }
+
+    private fun postClearEvent() {
+        lines = emptyList()
+        TabWidgetUpdate.Clear(this)
+    }
 
     private fun updateIsActive() {
-        if (isActive.get() == activeAfterCheck) return
-        isActive.set(activeAfterCheck)
-        if (!activeAfterCheck) {
-            lines = emptyList()
+        if (isActive == gotChecked) return
+        isActive = gotChecked
+        if (!gotChecked) {
+            postClearEvent()
         }
     }
 
@@ -301,7 +307,7 @@ enum class TabWidget(
             val tabList = filterTabList(event.tabList)
 
             separatorIndexes.forEach {
-                it.second?.activeAfterCheck = false
+                it.second?.gotChecked = false
             }
 
             separatorIndexes.clear()
@@ -315,8 +321,8 @@ enum class TabWidget(
 
             separatorIndexes.zipWithNext { (firstIndex, widget), (secondIndex, _) ->
                 widget?.boundary = firstIndex to secondIndex - 1
-                widget?.activeAfterCheck = true
-                widget?.postEvent(tabList.subList(firstIndex, secondIndex).filter { it.isNotEmpty() })
+                widget?.gotChecked = true
+                widget?.postNewEvent(tabList.subList(firstIndex, secondIndex).filter { it.isNotEmpty() })
             }
 
             entries.forEach { it.updateIsActive() }
