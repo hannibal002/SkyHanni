@@ -89,10 +89,6 @@ enum class ScoreboardEvents(private val displayLine: Supplier<List<String>>, pri
         ::getSpookyLines,
         ::getSpookyShowWhen
     ),
-    ACTIVE_TABLIST_EVENTS(
-        ::getActiveEventLine,
-        ::getActiveEventShowWhen
-    ),
     BROODMOTHER(
         ::getBroodmotherLines,
         ::getBroodmotherShowWhen
@@ -124,6 +120,10 @@ enum class ScoreboardEvents(private val displayLine: Supplier<List<String>>, pri
     EFFIGIES(
         ::getEffigiesLines,
         ::getEffigiesShowWhen
+    ),
+    ACTIVE_TABLIST_EVENTS(
+        ::getActiveEventLine,
+        ::getActiveEventShowWhen
     ),
     REDSTONE(
         ::getRedstoneLines,
