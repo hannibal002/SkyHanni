@@ -303,11 +303,11 @@ object ScoreboardPattern {
     )
     val dojoPointsPattern by miscSb.pattern(
         "dojopoints",
-        "^(§.)*Points: (§.)*(?<points>[\\w,.]+) ?( (§.)*\\((§.)*[+-](§.)*(?<difference>[\\w,.]+)(§.)*\\))?\$"
+        "^(§.)*Points: (§.)*[\\w.]+( §7\\(§.*§7\\))?$"
     )
     val dojoTimePattern by miscSb.pattern(
         "dojotime",
-        "^(§.)*Time: (§.)*(?<time>(?<seconds>\\w+s))( (§.)*\\((§.)*[+-](§.)*(?<difference>[\\w,.]+)(§.)*\\))?$"
+        "^(§.)*Time: (§.)*[\\w.]+( §7\\(§.*§7\\))?$"
     )
     val objectivePattern by miscSb.pattern(
         "objective",
