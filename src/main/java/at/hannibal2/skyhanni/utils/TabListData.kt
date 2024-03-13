@@ -60,9 +60,8 @@ class TabListData {
             val tabFooter =
                 tabList.footer_skyhanni.conditionalTransform(noColor, { unformattedText }, { formattedText })
 
-            val widgets =
-                TabWidget.entries.filter { it.isActive.get() }.map { "\n${it.name} : \n${it.lines.joinToString("\n")}" }
-                    .joinToString("\n")
+            val widgets = TabWidget.entries.filter { it.isActive }
+                .joinToString("\n") { "\n${it.name} : \n${it.lines.joinToString("\n")}" }
             val string =
                 "Header:\n\n$tabHeader\n\nBody:\n\n${resultList.joinToString("\n")}\n\nFooter:\n\n$tabFooter\n\nWidgets:$widgets"
             OSUtils.copyToClipboard(string)
