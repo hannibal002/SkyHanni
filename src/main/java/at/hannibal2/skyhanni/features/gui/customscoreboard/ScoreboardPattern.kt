@@ -88,6 +88,10 @@ object ScoreboardPattern {
 
     // dungeon scoreboard
     private val dungeonSb = scoreboardGroup.group("dungeon")
+    val m7dragonsPattern by dungeonSb.pattern(
+        "m7dragons",
+        "^(§cNo Alive Dragons|§8- (§.)+[\\w\\s]+Dragon§a \\w+§.❤)$"
+    )
     val keysPattern by dungeonSb.pattern(
         "keys",
         "Keys: §.■ §.[✗✓] §.■ §a.x$"

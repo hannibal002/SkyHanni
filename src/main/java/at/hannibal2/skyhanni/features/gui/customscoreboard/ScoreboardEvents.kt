@@ -180,6 +180,7 @@ private fun getServerCloseShowWhen(): Boolean {
 }
 
 private fun getDungeonsLines() = listOf(
+    SbPattern.m7dragonsPattern,
     SbPattern.autoClosingPattern,
     SbPattern.startingInPattern,
     SbPattern.keysPattern,
