@@ -25,9 +25,14 @@ object VisitorAPI {
     val config get() = GardenAPI.config.visitors
     private val logger = LorenzLogger("garden/visitors/api")
 
-    private val visitorCountPattern by RepoPattern.pattern(
-        "garden.visitor.api.visitorcount",
+    val patternGroup = RepoPattern.group("garden.visitor.api")
+    private val visitorCountPattern by patternGroup.pattern(
+        "visitor.count",
         "§b§lVisitors: §r§f\\((?<info>.*)\\)"
+    )
+    private val visitorNamePattern by patternGroup.pattern(
+        "visitor.name",
+        " (?:§.)+(?<name>§.[^§]+).*"
     )
 
     fun getVisitorsMap() = visitors
@@ -172,10 +177,11 @@ object VisitorAPI {
                 continue
             }
 
-            val name = fromHypixelName(line)
-            visitorsRemaining--
+            visitorNamePattern.matchMatcher(line) {
+                visitorsInTab.add(group("name").trim())
+            }
 
-            visitorsInTab.add(name)
+            visitorsRemaining--
         }
         return visitorsInTab
     }

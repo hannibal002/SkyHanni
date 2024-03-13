@@ -36,8 +36,8 @@ class VisitorListenerTest {
                 mutableListOf(
                     "§b§lVisitors: §r§f(3)",
                     " §r§cSpaceman",
-                    " §r§cGrandma Wolf",
-                    " Jacob",
+                    " §r§6Madame Eleanor Q. Goldsworth III §r§fCarrot §r§c333 C §r§3107k FXP §r§275 GXP",
+                    " §r§fJacob",
                     "ThePlayerName",
                     "",
                 )
@@ -46,7 +46,7 @@ class VisitorListenerTest {
 
         verify { VisitorAPI.addVisitor("§fJacob") }
         verify { VisitorAPI.addVisitor("§cSpaceman") }
-        verify { VisitorAPI.addVisitor("§cGrandma Wolf") }
+        verify { VisitorAPI.addVisitor("§6Madame Eleanor Q. Goldsworth III") }
     }
 
     @Test
