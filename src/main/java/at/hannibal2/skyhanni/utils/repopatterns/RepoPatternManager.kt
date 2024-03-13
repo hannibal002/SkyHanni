@@ -6,6 +6,7 @@ import at.hannibal2.skyhanni.events.ConfigLoadEvent
 import at.hannibal2.skyhanni.events.LorenzEvent
 import at.hannibal2.skyhanni.events.PreInitFinishedEvent
 import at.hannibal2.skyhanni.events.RepositoryReloadEvent
+import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.ConditionalUtils.afterChange
 import at.hannibal2.skyhanni.utils.StringUtils.matches
 import net.minecraft.launchwrapper.Launch
@@ -157,9 +158,25 @@ object RepoPatternManager {
         return RepoPatternImpl(fallback, key).also { usedKeys[key] = it }
     }
 
+    /**
+     * This is a dangerous method, do not use unless you know what your doing.
+     *
+     * Because this circumvents the exclusivity for the repo patterns
+     * @param prefix the prefix to search without the dot at the end (the match includes the .)
+     * */
     fun getUnusedPatterns(prefix: String): List<Pattern> {
         if (config.forceLocal.get()) return emptyList()
-        return regexes?.regexes?.filterKeys { it.startsWith(prefix) && usedKeys[it] == null }
-            ?.map { it.value.toPattern() } ?: emptyList()
+        try {
+            verifyKeyShape(prefix)
+        } catch (e: IllegalArgumentException) {
+            ErrorManager.logErrorWithData(e, "getUnusedPatterns failed do to invalid key shape", "prefix" to prefix)
+            return emptyList()
+        }
+        val prefixWithDot = "$prefix."
+        return regexes?.regexes?.filterKeys { it.startsWith(prefixWithDot) && usedKeys[it] == null }
+            ?.map {
+
+                it.value.toPattern()
+            } ?: emptyList()
     }
 }
