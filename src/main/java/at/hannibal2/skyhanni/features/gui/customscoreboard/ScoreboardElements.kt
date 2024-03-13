@@ -130,7 +130,7 @@ enum class ScoreboardElement(
     POWER(
         ::getPowerDisplayPair,
         ::getPowerShowWhen,
-        "Power: Sighted"
+        "Power: §aSighted"
     ),
     COOKIE(
         ::getCookieDisplayPair,
@@ -442,10 +442,10 @@ private fun getPowerDisplayPair() = listOf(
         null -> "§cOpen \"Your Bags\"!"
         else ->
             if (displayConfig.displayNumbersFirst) {
-                "${MaxwellAPI.currentPower?.replace("Power", "")} Power " +
+                "§a${MaxwellAPI.currentPower?.replace("Power", "")} Power " +
                     "§7(§6${MaxwellAPI.magicalPower}§7)"
             } else {
-                "Power: ${MaxwellAPI.currentPower?.replace("Power", "")} " +
+                "Power: §a${MaxwellAPI.currentPower?.replace("Power", "")} " +
                     "§7(§6${MaxwellAPI.magicalPower?.addSeparators()}§7)"
             }
     } to HorizontalAlignment.LEFT
