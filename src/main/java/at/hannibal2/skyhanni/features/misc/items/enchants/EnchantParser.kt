@@ -11,8 +11,8 @@ import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.NumberUtil.romanToDecimal
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getEnchantments
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
+import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import java.util.TreeSet
-import java.util.regex.Pattern
 import net.minecraft.event.HoverEvent
 import net.minecraft.item.ItemStack
 import net.minecraft.util.ChatComponentText
@@ -26,8 +26,9 @@ object EnchantParser {
 
     private val config get() = SkyHanniMod.feature.enchantParsing
 
-    val ENCHANTMENT_PATTERN: Pattern = Pattern.compile("(?<enchant>[A-Za-z][A-Za-z -]+) (?<levelNumeral>[IVXLCDM]+)(?<stacking>, |\$| \\d{1,3}(,\\d{3})*)")
-    private val GRAY_ENCHANT_PATTERN = Pattern.compile("^(Respiration|Aqua Affinity|Depth Strider|Efficiency).*")
+    val patternGroup = RepoPattern.group("misc.items.enchantparsing")
+    val ENCHANTMENT_PATTERN by patternGroup.pattern("enchants", "(?<enchant>[A-Za-z][A-Za-z -]+) (?<levelNumeral>[IVXLCDM]+)(?<stacking>, |\$| \\d{1,3}(,\\d{3})*)")
+    private val GRAY_ENCHANT_PATTERN by patternGroup.pattern("grayenchants", "^(Respiration|Aqua Affinity|Depth Strider|Efficiency).*")
 
     private var indexOfLastGrayEnchant = -1
     private var startEnchant = -1
