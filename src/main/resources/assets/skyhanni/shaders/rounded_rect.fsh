@@ -1,4 +1,4 @@
-#version 130
+#version 120
 
 uniform float scaleFactor;
 uniform float radius;
@@ -6,7 +6,7 @@ uniform float smoothness;
 uniform vec2 halfSize;
 uniform vec2 centerPos;
 
-in vec4 color;
+varying vec4 color;
 
 // From https://www.shadertoy.com/view/WtdSDs
 float roundedRectSDF(vec2 center, vec2 halfSize, float radius) {
