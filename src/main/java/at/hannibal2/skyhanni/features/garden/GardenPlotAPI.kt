@@ -33,6 +33,10 @@ object GardenPlotAPI {
         "spray.target",
         "§a§lSPRAYONATOR! §r§7You sprayed §r§aPlot §r§7- §r§b(?<plot>.*) §r§7with §r§a(?<spray>.*)§r§7!"
     )
+    private val portableWasherPattern by patternGroup.pattern(
+        "spray.cleared",
+        "§9§lSPLASH! §r§6Your §r§bGarden §r§6was cleared of all active §r§aSprayonator §r§6effects!"
+    )
 
     var plots = listOf<Plot>()
 
@@ -97,7 +101,7 @@ object GardenPlotAPI {
         getData()?.apply { sprayHasNotified = true }
     }
 
-    private fun Plot.setSpray(spray: SprayType, duration: Duration) {
+    private fun Plot.setSpray(spray: SprayType?, duration: Duration) {
         getData()?.apply {
             sprayType = spray
             sprayExpiryTime = SimpleTimeMark.now() + duration
@@ -154,6 +158,14 @@ object GardenPlotAPI {
             val spray = SprayType.getByName(sprayName) ?: return
 
             plot?.setSpray(spray, 30.minutes)
+        }
+
+        portableWasherPattern.matchMatcher(event.message) {
+            for (plot in plots) {
+                if (plot.currentSpray != null) {
+                    plot.setSpray(null, 0.minutes)
+                }
+            }
         }
     }
 
