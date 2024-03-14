@@ -9,11 +9,10 @@ import at.hannibal2.skyhanni.utils.LorenzColor
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.RenderUtils.highlight
 import net.minecraft.client.gui.inventory.GuiChest
-import net.minecraft.init.Items
 import net.minecraft.inventory.ContainerChest
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
-class TabWidgets {
+class TabWidgetSettings {
 
     private val mainPageWidgetPattern = "^§7Currently:.*".toRegex()
 
