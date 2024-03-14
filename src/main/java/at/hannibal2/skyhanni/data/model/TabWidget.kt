@@ -12,8 +12,8 @@ import at.hannibal2.skyhanni.utils.repopatterns.RepoPatternManager
 import net.minecraftforge.fml.common.eventhandler.EventPriority
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import java.util.regex.Pattern
-
-private val repoGroup = RepoPattern.group("tab.widget")
+// This group / prefix is not allowed to be used anywhere else (tab.widget is allowed as prefix)
+private val repoGroup = RepoPattern.group("tab.widget.enum")
 
 enum class TabWidget(
     pattern0: String
