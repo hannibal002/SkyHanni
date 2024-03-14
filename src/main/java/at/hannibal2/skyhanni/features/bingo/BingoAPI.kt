@@ -1,6 +1,6 @@
 package at.hannibal2.skyhanni.features.bingo
 
-import at.hannibal2.skyhanni.config.Storage.PlayerSpecific.BingoSession
+import at.hannibal2.skyhanni.config.storage.PlayerSpecificStorage.BingoSession
 import at.hannibal2.skyhanni.data.ProfileStorageData
 import at.hannibal2.skyhanni.data.jsonobjects.repo.BingoJson
 import at.hannibal2.skyhanni.data.jsonobjects.repo.BingoRanksJson

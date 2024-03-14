@@ -1,8 +1,8 @@
 package at.hannibal2.skyhanni.features.garden.visitor
 
 import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
-import at.hannibal2.skyhanni.config.Storage
 import at.hannibal2.skyhanni.config.features.garden.visitor.DropsStatisticsConfig.DropsStatisticsTextEntry
+import at.hannibal2.skyhanni.config.storage.ProfileSpecificStorage
 import at.hannibal2.skyhanni.data.ProfileStorageData
 import at.hannibal2.skyhanni.events.ConfigLoadEvent
 import at.hannibal2.skyhanni.events.GuiRenderEvent
@@ -155,7 +155,7 @@ object GardenVisitorDropStatistics {
     /**
      * Do not change the order of the elements getting added to the list. See DropsStatisticsTextEntry for the order.
      */
-    private fun drawDisplay(storage: Storage.ProfileSpecific.GardenStorage.VisitorDrops) = buildList<List<Any>> {
+    private fun drawDisplay(storage: ProfileSpecificStorage.GardenStorage.VisitorDrops) = buildList<List<Any>> {
         addAsSingletonList("§e§lVisitor Statistics")
         addAsSingletonList(format(totalVisitors, "Total", "§e", ""))
         val visitorRarities = storage.visitorRarities

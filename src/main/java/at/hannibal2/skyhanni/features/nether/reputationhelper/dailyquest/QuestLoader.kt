@@ -1,6 +1,6 @@
 package at.hannibal2.skyhanni.features.nether.reputationhelper.dailyquest
 
-import at.hannibal2.skyhanni.config.Storage
+import at.hannibal2.skyhanni.config.storage.ProfileSpecificStorage
 import at.hannibal2.skyhanni.data.jsonobjects.repo.CrimsonIsleReputationJson.ReputationQuest
 import at.hannibal2.skyhanni.events.InventoryFullyOpenedEvent
 import at.hannibal2.skyhanni.features.nether.reputationhelper.dailyquest.quest.DojoQuest
@@ -170,7 +170,7 @@ class QuestLoader(private val dailyQuestHelper: DailyQuestHelper) {
         }
     }
 
-    fun loadConfig(storage: Storage.ProfileSpecific.CrimsonIsleStorage) {
+    fun loadConfig(storage: ProfileSpecificStorage.CrimsonIsleStorage) {
         if (dailyQuestHelper.greatSpook) return
         if (storage.quests.toList().any { hasGreatSpookLine(it) }) {
             dailyQuestHelper.greatSpook = true

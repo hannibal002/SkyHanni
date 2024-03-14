@@ -2,102 +2,100 @@ package at.hannibal2.skyhanni.data
 
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.config.SackData
-import at.hannibal2.skyhanni.config.Storage
+import at.hannibal2.skyhanni.config.storage.PlayerSpecificStorage
+import at.hannibal2.skyhanni.config.storage.ProfileSpecificStorage
 import at.hannibal2.skyhanni.events.ConfigLoadEvent
 import at.hannibal2.skyhanni.events.HypixelJoinEvent
-import at.hannibal2.skyhanni.events.LorenzTickEvent
-import at.hannibal2.skyhanni.events.ProfileJoinEvent
-import at.hannibal2.skyhanni.events.TabListUpdateEvent
+import at.hannibal2.skyhanni.events.LorenzChatEvent
+import at.hannibal2.skyhanni.events.LorenzWorldChangeEvent
+import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils
-import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.TabListData
-import at.hannibal2.skyhanni.utils.UtilsPatterns
-import net.minecraftforge.fml.common.eventhandler.EventPriority
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
-import kotlin.time.Duration.Companion.seconds
+import java.util.UUID
 
 object ProfileStorageData {
 
-    var playerSpecific: Storage.PlayerSpecific? = null
-    var profileSpecific: Storage.ProfileSpecific? = null
-    var loaded = false
-    private var noTabListTime = SimpleTimeMark.farPast()
+    var playerSpecific: PlayerSpecificStorage? = null
+    var profileSpecific: ProfileSpecificStorage? = null
+    val loaded get() = profileSpecific != null
+    private var profileId: UUID? = null
+    private var lastChatProfile: String? = null
 
     private var sackPlayers: SackData.PlayerSpecific? = null
     var sackProfiles: SackData.ProfileSpecific? = null
 
-    @SubscribeEvent(priority = EventPriority.HIGHEST)
-    fun onProfileJoin(event: ProfileJoinEvent) {
-        val playerSpecific = playerSpecific
-        val sackPlayers = sackPlayers
-        if (playerSpecific == null) {
-            ChatUtils.error("playerSpecific is null in ProfileJoinEvent!")
-            return
+    @SubscribeEvent
+    fun onChat(event: LorenzChatEvent) {
+        val inSkyBlock = LorenzUtils.inSkyBlock
+        if (!inSkyBlock) return
+        val message = event.message
+
+        "§aYou are playing on profile: §e(?<name>.*)§b( \\(Co-op\\))?".toPattern().matchMatcher(message) {
+            lastChatProfile = group("name")
         }
-        if (sackPlayers == null) {
-            ChatUtils.error("sackPlayers is null in ProfileJoinEvent!")
+
+        "§8Profile ID: (?<uuid>.*)".toPattern().matchMatcher(message) {
+            load(UUID.fromString(group("uuid")))
+        }
+    }
+
+    private fun load(uuid: UUID) {
+        val playerSpecific = playerSpecific ?: ErrorManager.skyHanniError("Can not load user profile", "uuid" to uuid)
+        if (profileId == uuid) {
+            profileSpecific = playerSpecific.uuidProfiles[uuid]
             return
         }
 
-        val profileName = event.name
-        loadProfileSpecific(playerSpecific, sackPlayers, profileName)
+        profileId = uuid
+        profileSpecific = loadProfile(playerSpecific, uuid)
+
         ConfigLoadEvent().postAndCatch()
     }
 
-    @SubscribeEvent
-    fun onTabListUpdate(event: TabListUpdateEvent) {
-        if (!LorenzUtils.inSkyBlock) return
+    private fun loadProfile(
+        playerSpecific: PlayerSpecificStorage,
+        uuid: UUID,
+    ): ProfileSpecificStorage? {
+        val newProfile = playerSpecific.uuidProfiles.getOrPut(uuid) { ProfileSpecificStorage() }
+        if (!newProfile.migrated) {
+            val lastProfile = lastChatProfile ?: getProfileFromTab()
+            for ((name, data) in playerSpecific.profiles) {
+                if (name.equals(lastProfile, ignoreCase = true)) {
+                    ChatUtils.debug("successfully migrated!")
+                    playerSpecific.uuidProfiles[uuid] = data
+                    profileSpecific = data
+                    data.migrated = true
+                    return data
+                }
+            }
+        }
+        return newProfile
+    }
 
-        for (line in event.tabList) {
-            UtilsPatterns.tabListProfilePattern.matchMatcher(line) {
-                noTabListTime = SimpleTimeMark.farPast()
-                return
+    private fun getProfileFromTab(): String? {
+        val pattern = "§l§r§e§lProfile: §r§a(?<name>.*)".toPattern()
+        for (line in TabListData.getTabList()) {
+            pattern.matchMatcher(line) {
+                return group("name")
             }
         }
 
-        noTabListTime = SimpleTimeMark.now()
+        return null
     }
 
     @SubscribeEvent
-    fun onTick(event: LorenzTickEvent) {
-        if (!LorenzUtils.inSkyBlock) return
-        if (noTabListTime == SimpleTimeMark.farPast()) return
-
-        if (noTabListTime.passedSince() > 3.seconds) {
-            noTabListTime = SimpleTimeMark.now()
-            val foundSkyBlockTabList = TabListData.getTabList().any { it.contains("§b§lArea:") }
-            if (foundSkyBlockTabList) {
-                ChatUtils.clickableChat(
-                    "§cCan not read profile name from tab list! Open /widget and enable Profile Widget",
-                    command = "widget"
-                )
-            } else {
-                ChatUtils.chat(
-                    "§cExtra Information from Tab list not found! " +
-                        "Enable it: SkyBlock Menu ➜ Settings ➜ Personal ➜ User Interface ➜ Player List Info"
-                )
-            }
-        }
-    }
-
-    private fun loadProfileSpecific(
-        playerSpecific: Storage.PlayerSpecific,
-        sackProfile: SackData.PlayerSpecific,
-        profileName: String,
-    ) {
-        noTabListTime = SimpleTimeMark.farPast()
-        profileSpecific = playerSpecific.profiles.getOrPut(profileName) { Storage.ProfileSpecific() }
-        sackProfiles = sackProfile.profiles.getOrPut(profileName) { SackData.ProfileSpecific() }
-        loaded = true
-        ConfigLoadEvent().postAndCatch()
+    fun onWorldChange(event: LorenzWorldChangeEvent) {
+        lastChatProfile = null
+        profileSpecific = null
     }
 
     @SubscribeEvent
     fun onHypixelJoin(event: HypixelJoinEvent) {
         val playerUuid = LorenzUtils.getRawPlayerUuid()
-        playerSpecific = SkyHanniMod.feature.storage.players.getOrPut(playerUuid) { Storage.PlayerSpecific() }
+        playerSpecific = SkyHanniMod.feature.storage.players.getOrPut(playerUuid) { PlayerSpecificStorage() }
         sackPlayers = SkyHanniMod.sackData.players.getOrPut(playerUuid) { SackData.PlayerSpecific() }
         ConfigLoadEvent().postAndCatch()
     }
