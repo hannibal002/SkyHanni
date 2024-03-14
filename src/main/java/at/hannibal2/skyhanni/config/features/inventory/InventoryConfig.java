@@ -75,6 +75,11 @@ public class InventoryConfig {
     public AuctionHouseConfig auctions = new AuctionHouseConfig();
 
     @Expose
+    @ConfigOption(name = "Auctions Price Comparison", desc = "")
+    @Accordion
+    public AuctionHousePriceComparisonConfig auctionsPriceComparison = new AuctionHousePriceComparisonConfig();
+
+    @Expose
     @ConfigOption(
         name = "Item Number",
         desc = "Showing the item number as a stack size for these items."
