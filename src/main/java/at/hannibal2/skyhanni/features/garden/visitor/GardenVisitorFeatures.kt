@@ -41,7 +41,9 @@ import at.hannibal2.skyhanni.utils.ItemUtils.name
 import at.hannibal2.skyhanni.utils.LorenzLogger
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils.isInIsland
+import at.hannibal2.skyhanni.utils.LorenzUtils.runDelayed
 import at.hannibal2.skyhanni.utils.NEUInternalName
+import at.hannibal2.skyhanni.utils.NEUInternalName.Companion.asInternalName
 import at.hannibal2.skyhanni.utils.NEUItems
 import at.hannibal2.skyhanni.utils.NEUItems.getItemStack
 import at.hannibal2.skyhanni.utils.NEUItems.getPrice
@@ -62,11 +64,13 @@ import net.minecraft.client.Minecraft
 import net.minecraft.client.gui.inventory.GuiEditSign
 import net.minecraft.entity.EntityLivingBase
 import net.minecraft.entity.item.EntityArmorStand
+import net.minecraft.init.Items
 import net.minecraft.item.ItemStack
 import net.minecraftforge.client.event.GuiScreenEvent.DrawScreenEvent
 import net.minecraftforge.fml.common.eventhandler.EventPriority
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import kotlin.math.round
+import kotlin.time.Duration.Companion.parse
 import kotlin.time.Duration.Companion.seconds
 
 private val config get() = VisitorAPI.config
@@ -129,6 +133,35 @@ class GardenVisitorFeatures {
             val (itemName, amount) = pair
             val internalName = NEUInternalName.fromItemName(itemName)
             visitor.shoppingList[internalName] = amount
+//
+//            GET SUPERCRAFT FOR SACKS CODE
+//
+            val item =
+                NEUItems.getRecipes(internalName).first { !it.ingredients.first().internalItemId.contains("PEST") }
+            val ingredients = item.ingredients
+                val ingredientReqs = mutableMapOf<String, Int>()
+                for(ingredient in ingredients) {
+                    val ing = ingredient.serialize().split(":")
+                    ingredientReqs[ing[0]] = ingredientReqs.getOrDefault(ing[0], 0) + ing[1].toDouble().toInt()
+                }
+            println(ingredientReqs)
+            var hasIngredients = false;
+            for((key, value) in ingredientReqs) {
+                val sackItem = SackAPI.fetchSackItem(key.asInternalName())
+                if(sackItem.amount >= value*amount) {
+//                     runDelayed(parse("10ms")) {
+//                         print(InventoryUtils.getItemsInOpenChest())
+//                     }
+                    hasIngredients = true;
+//                     InventoryUtils.getItemsInOpenChest()[31].putStack(ItemStack(Items.golden_pickaxe))
+                } else {
+                    hasIngredients = false;
+                    break;
+                }
+            }
+            if(hasIngredients) runDelayed(parse("10ms")) {
+                        InventoryUtils.getItemsInOpenChest()[31].putStack(ItemStack(Items.golden_pickaxe))
+                    }
         }
 
         readToolTip(visitor, offerItem)
