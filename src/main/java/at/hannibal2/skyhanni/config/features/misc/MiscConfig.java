@@ -89,6 +89,12 @@ public class MiscConfig {
     public CompactTabListConfig compactTabList = new CompactTabListConfig();
 
     @Expose
+    @ConfigOption(name = "Highlight Widgets", desc = "Highlight enabled and disabled widgets in /tab.")
+    @ConfigEditorBoolean
+    @FeatureToggle
+    public boolean highlightWidgets = true;
+
+    @Expose
     @ConfigOption(name = "Kick Duration", desc = "")
     @Accordion
     public KickDurationConfig kickDuration = new KickDurationConfig();
