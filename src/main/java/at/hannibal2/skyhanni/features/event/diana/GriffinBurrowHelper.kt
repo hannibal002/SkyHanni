@@ -4,21 +4,26 @@ import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.data.EntityMovementData
 import at.hannibal2.skyhanni.data.IslandType
+import at.hannibal2.skyhanni.events.BlockClickEvent
 import at.hannibal2.skyhanni.events.BurrowDetectEvent
 import at.hannibal2.skyhanni.events.BurrowDugEvent
 import at.hannibal2.skyhanni.events.BurrowGuessEvent
+import at.hannibal2.skyhanni.events.DebugDataCollectEvent
 import at.hannibal2.skyhanni.events.EntityMoveEvent
 import at.hannibal2.skyhanni.events.LorenzChatEvent
 import at.hannibal2.skyhanni.events.LorenzRenderWorldEvent
 import at.hannibal2.skyhanni.events.LorenzTickEvent
 import at.hannibal2.skyhanni.events.LorenzWorldChangeEvent
+import at.hannibal2.skyhanni.features.event.diana.DianaAPI.isDianaSpade
 import at.hannibal2.skyhanni.utils.BlockUtils.getBlockAt
+import at.hannibal2.skyhanni.utils.ChatUtils
+import at.hannibal2.skyhanni.utils.CollectionUtils.editCopy
+import at.hannibal2.skyhanni.utils.DelayedRun
 import at.hannibal2.skyhanni.utils.KeyboardManager
 import at.hannibal2.skyhanni.utils.LocationUtils
 import at.hannibal2.skyhanni.utils.LocationUtils.distanceToPlayer
 import at.hannibal2.skyhanni.utils.LorenzColor
 import at.hannibal2.skyhanni.utils.LorenzUtils
-import at.hannibal2.skyhanni.utils.LorenzUtils.editCopy
 import at.hannibal2.skyhanni.utils.LorenzUtils.isInIsland
 import at.hannibal2.skyhanni.utils.LorenzVec
 import at.hannibal2.skyhanni.utils.RenderUtils.draw3DLine
@@ -34,14 +39,33 @@ import org.lwjgl.input.Keyboard
 import kotlin.time.Duration.Companion.seconds
 
 object GriffinBurrowHelper {
+
     private val config get() = SkyHanniMod.feature.event.diana
 
     var targetLocation: LorenzVec? = null
     private var guessLocation: LorenzVec? = null
     private var particleBurrows = mapOf<LorenzVec, BurrowType>()
-
-    private var lastGuessTime = 0L
     var lastTitleSentTime = SimpleTimeMark.farPast()
+    private var shouldFocusOnInquis = false
+
+    @SubscribeEvent
+    fun onDebugDataCollect(event: DebugDataCollectEvent) {
+        event.title("Griffin Burrow Helper")
+
+        if (!DianaAPI.isDoingDiana()) {
+            event.addIrrelevant("not doing diana")
+            return
+        }
+
+        event.addData {
+            add("targetLocation: ${targetLocation?.printWithAccuracy(1)}")
+            add("guessLocation: ${guessLocation?.printWithAccuracy(1)}")
+            add("particleBurrows: ${particleBurrows.size}")
+            for ((location, type) in particleBurrows) {
+                add(location.printWithAccuracy(1) + " " + type)
+            }
+        }
+    }
 
     @SubscribeEvent
     fun onTick(event: LorenzTickEvent) {
@@ -51,16 +75,26 @@ object GriffinBurrowHelper {
         update()
     }
 
-    private fun update() {
+    fun update() {
         if (config.burrowsNearbyDetection) {
             checkRemoveGuess()
         }
 
-        val locations = particleBurrows.keys.toMutableList()
-        guessLocation?.let {
-            locations.add(findBlock(it))
+        val locations = mutableListOf<LorenzVec>()
+
+        if (config.inquisitorSharing.enabled) {
+            for (waypoint in InquisitorWaypointShare.waypoints) {
+                locations.add(waypoint.value.location)
+            }
         }
-        locations.addAll(InquisitorWaypointShare.waypoints.values.map { it.location })
+        shouldFocusOnInquis = config.inquisitorSharing.focusInquisitor && locations.isNotEmpty()
+        if (!shouldFocusOnInquis) {
+            locations.addAll(particleBurrows.keys.toMutableList())
+            guessLocation?.let {
+                locations.add(findBlock(it))
+            }
+            locations.addAll(InquisitorWaypointShare.waypoints.values.map { it.location })
+        }
         targetLocation = locations.minByOrNull { it.distanceToPlayer() }
 
         if (config.burrowNearestWarp) {
@@ -73,7 +107,6 @@ object GriffinBurrowHelper {
     @SubscribeEvent
     fun onBurrowGuess(event: BurrowGuessEvent) {
         EntityMovementData.addToTrack(Minecraft.getMinecraft().thePlayer)
-        lastGuessTime = System.currentTimeMillis()
 
         guessLocation = event.guessLocation
         update()
@@ -111,21 +144,31 @@ object GriffinBurrowHelper {
     }
 
     @SubscribeEvent
-    fun onChatMessage(event: LorenzChatEvent) {
+    fun onChat(event: LorenzChatEvent) {
         if (!isEnabled()) return
         if (event.message.startsWith("§c ☠ §r§7You were killed by §r")) {
             particleBurrows = particleBurrows.editCopy { keys.removeIf { this[it] == BurrowType.MOB } }
         }
+
+        // talking to Diana NPC
         if (event.message == "§6Poof! §r§eYou have cleared your griffin burrows!") {
-            guessLocation = null
-            particleBurrows = emptyMap()
+            resetAllData()
         }
+    }
+
+    private fun resetAllData() {
+        guessLocation = null
+        targetLocation = null
+        particleBurrows = emptyMap()
+        GriffinBurrowParticleFinder.reset()
+
+        BurrowWarpHelper.currentWarp = null
+        update()
     }
 
     @SubscribeEvent
     fun onWorldChange(event: LorenzWorldChangeEvent) {
-        guessLocation = null
-        particleBurrows = emptyMap()
+        resetAllData()
     }
 
     private fun findBlock(point: LorenzVec): LorenzVec {
@@ -190,7 +233,7 @@ object GriffinBurrowHelper {
                 color = LorenzColor.AQUA
                 currentWarp.location
             } else {
-                color = LorenzColor.WHITE
+                color = if (shouldFocusOnInquis) LorenzColor.LIGHT_PURPLE else LorenzColor.WHITE
                 targetLocation?.add(0.5, 0.5, 0.5) ?: return
             }
 
@@ -222,7 +265,7 @@ object GriffinBurrowHelper {
                 val guessLocation = findBlock(it)
                 val distance = guessLocation.distance(playerLocation)
                 event.drawColor(guessLocation, LorenzColor.WHITE, distance > 10)
-                val color = if (currentWarp == null) "§f" else "§b"
+                val color = if (currentWarp != null && targetLocation == guessLocation) "§b" else "§f"
                 event.drawDynamicText(guessLocation.add(y = 1), "${color}Guess", 1.5)
                 if (distance > 5) {
                     val formattedDistance = LorenzUtils.formatInteger(distance.toInt())
@@ -237,10 +280,28 @@ object GriffinBurrowHelper {
         event.move(2, "diana", "event.diana")
     }
 
+    @SubscribeEvent
+    fun onBlockClick(event: BlockClickEvent) {
+        if (!isEnabled()) return
+
+        val location = event.position
+        if (event.itemInHand?.isDianaSpade != true || location.getBlockAt() !== Blocks.grass) return
+
+        if (particleBurrows.containsKey(location)) {
+            DelayedRun.runDelayed(1.seconds) {
+                if (BurrowAPI.lastBurrowRelatedChatMessage.passedSince() > 2.seconds) {
+                    if (particleBurrows.containsKey(location)) {
+                        // workaround
+                        particleBurrows = particleBurrows.editCopy { keys.remove(location) }
+                    }
+                }
+            }
+        }
+    }
+
     private fun showWarpSuggestions() {
         if (!config.burrowNearestWarp) return
         val warp = BurrowWarpHelper.currentWarp ?: return
-
 
         val text = "§bWarp to " + warp.displayName
         val keybindSuffix = if (config.keyBindWarp != Keyboard.KEY_NONE) {
@@ -257,29 +318,28 @@ object GriffinBurrowHelper {
 
     fun setTestBurrow(strings: Array<String>) {
         if (!IslandType.HUB.isInIsland()) {
-            LorenzUtils.userError("You can only create test burrows on the hub island!")
+            ChatUtils.userError("You can only create test burrows on the hub island!")
             return
         }
 
         if (!isEnabled()) {
             if (!config.alwaysDiana) {
-                LorenzUtils.clickableChat("§cEnable Always Diana in the config!", "sh always diana")
+                ChatUtils.clickableChat("§cEnable Always Diana in the config!", "sh always diana")
             } else {
-                LorenzUtils.userError("Have an Ancestral Spade in the inventory!")
+                ChatUtils.userError("Have an Ancestral Spade in the inventory!")
             }
             return
         }
 
         if (strings.size != 1) {
-            LorenzUtils.userError("/shtestburrow <type>")
+            ChatUtils.userError("/shtestburrow <type>")
             return
         }
 
         val type: BurrowType = when (strings[0].lowercase()) {
             "reset" -> {
-                particleBurrows = emptyMap()
-                update()
-                LorenzUtils.chat("Manually reset all burrow waypoints.")
+                resetAllData()
+                ChatUtils.chat("Manually reset all burrow data.")
                 return
             }
 
@@ -287,7 +347,7 @@ object GriffinBurrowHelper {
             "2", "mob" -> BurrowType.MOB
             "3", "treasure" -> BurrowType.TREASURE
             else -> {
-                LorenzUtils.userError("Unknown burrow type! Try 1-3 instead.")
+                ChatUtils.userError("Unknown burrow type! Try 1-3 instead.")
                 return
             }
         }

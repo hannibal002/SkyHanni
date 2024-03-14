@@ -9,10 +9,11 @@ import at.hannibal2.skyhanni.events.LorenzRenderWorldEvent
 import at.hannibal2.skyhanni.events.RepositoryReloadEvent
 import at.hannibal2.skyhanni.features.rift.RiftAPI
 import at.hannibal2.skyhanni.test.GriffinUtils.drawWaypointFilled
+import at.hannibal2.skyhanni.utils.ChatUtils
+import at.hannibal2.skyhanni.utils.InventoryUtils.getAllItems
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.LocationUtils.distanceToPlayer
 import at.hannibal2.skyhanni.utils.LorenzColor
-import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.LorenzVec
 import at.hannibal2.skyhanni.utils.NEUItems
 import at.hannibal2.skyhanni.utils.RenderUtils.drawDynamicText
@@ -28,6 +29,7 @@ import net.minecraftforge.fml.common.eventhandler.EventPriority
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
 object EnigmaSoulWaypoints {
+
     private val config get() = RiftAPI.config.enigmaSoulWaypoints
     private var inInventory = false
     private var soulLocations = mapOf<String, LorenzVec>()
@@ -98,11 +100,11 @@ object EnigmaSoulWaypoints {
             event.usePickblockInstead()
             if (soulLocations.contains(split.last())) {
                 if (!trackedSouls.contains(split.last())) {
-                    LorenzUtils.chat("§5Tracking the ${split.last()} Enigma Soul!", prefixColor = "§5")
+                    ChatUtils.chat("§5Tracking the ${split.last()} Enigma Soul!", prefixColor = "§5")
                     trackedSouls.add(split.last())
                 } else {
                     trackedSouls.remove(split.last())
-                    LorenzUtils.chat("§5No longer tracking the ${split.last()} Enigma Soul!", prefixColor = "§5")
+                    ChatUtils.chat("§5No longer tracking the ${split.last()} Enigma Soul!", prefixColor = "§5")
                 }
             }
         }
@@ -116,10 +118,7 @@ object EnigmaSoulWaypoints {
         val guiChest = event.gui
         val chest = guiChest.inventorySlots as ContainerChest
 
-        for (slot in chest.inventorySlots) {
-            if (slot == null) continue
-            val stack = slot.stack ?: continue
-
+        for ((slot, stack) in chest.getAllItems()) {
             for (soul in trackedSouls) {
                 if (stack.displayName.removeColor().contains(soul)) {
                     slot highlight LorenzColor.DARK_PURPLE
@@ -176,7 +175,7 @@ object EnigmaSoulWaypoints {
         }
         if (closestSoul in trackedSouls) {
             trackedSouls.remove(closestSoul)
-            LorenzUtils.chat("§5Found the $closestSoul Enigma Soul!", prefixColor = "§5")
+            ChatUtils.chat("§5Found the $closestSoul Enigma Soul!", prefixColor = "§5")
         }
     }
 

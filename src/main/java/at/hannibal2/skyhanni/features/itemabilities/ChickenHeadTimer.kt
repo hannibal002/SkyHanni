@@ -10,35 +10,38 @@ import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.name
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.RenderUtils.renderString
-import at.hannibal2.skyhanni.utils.TimeUtils
+import at.hannibal2.skyhanni.utils.SimpleTimeMark
+import at.hannibal2.skyhanni.utils.TimeUtils.format
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
+import kotlin.time.Duration.Companion.seconds
 
 class ChickenHeadTimer {
-    private var hasChickenHead = false
-    private var lastTime = 0L
     private val config get() = SkyHanniMod.feature.itemAbilities.chickenHead
+
+    private var hasChickenHead = false
+    private var lastTime = SimpleTimeMark.farPast()
+    private val cooldown = 5.seconds
 
     @SubscribeEvent
     fun onTick(event: LorenzTickEvent) {
         if (!isEnabled()) return
         if (!event.isMod(5)) return
 
-        val itemStack = InventoryUtils.getHelmet()
-        val name = itemStack?.name ?: ""
+        val name = InventoryUtils.getHelmet()?.name ?: ""
         hasChickenHead = name.contains("Chicken Head")
     }
 
     @SubscribeEvent
     fun onWorldChange(event: LorenzWorldChangeEvent) {
-        lastTime = System.currentTimeMillis()
+        lastTime = SimpleTimeMark.now()
     }
 
     @SubscribeEvent
-    fun onChatMessage(event: LorenzChatEvent) {
+    fun onChat(event: LorenzChatEvent) {
         if (!isEnabled()) return
         if (!hasChickenHead) return
         if (event.message == "§aYou laid an egg!") {
-            lastTime = System.currentTimeMillis()
+            lastTime = SimpleTimeMark.now()
             if (config.hideChat) {
                 event.blockedReason = "chicken_head_timer"
             }
@@ -50,14 +53,11 @@ class ChickenHeadTimer {
         if (!isEnabled()) return
         if (!hasChickenHead) return
 
-        val sinceLastTime = System.currentTimeMillis() - lastTime
-        val cooldown = 5_000
-        val remainingTime = cooldown - sinceLastTime
-
-        val displayText = if (remainingTime < 0) {
+        val remainingTime = cooldown - lastTime.passedSince()
+        val displayText = if (remainingTime.isNegative()) {
             "Chicken Head Timer: §aNow"
         } else {
-            val formatDuration = TimeUtils.formatDuration(remainingTime)
+            val formatDuration = remainingTime.format()
             "Chicken Head Timer: §b$formatDuration"
         }
 

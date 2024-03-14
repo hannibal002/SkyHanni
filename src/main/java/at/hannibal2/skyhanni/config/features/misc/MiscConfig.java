@@ -2,6 +2,7 @@ package at.hannibal2.skyhanni.config.features.misc;
 
 import at.hannibal2.skyhanni.config.FeatureToggle;
 import at.hannibal2.skyhanni.config.core.config.Position;
+import at.hannibal2.skyhanni.config.enums.OutsideSbFeature;
 import at.hannibal2.skyhanni.config.features.misc.compacttablist.CompactTabListConfig;
 import at.hannibal2.skyhanni.config.features.misc.cosmetic.CosmeticConfig;
 import at.hannibal2.skyhanni.config.features.misc.pets.PetConfig;
@@ -9,7 +10,11 @@ import com.google.gson.annotations.Expose;
 import io.github.moulberry.moulconfig.annotations.Accordion;
 import io.github.moulberry.moulconfig.annotations.Category;
 import io.github.moulberry.moulconfig.annotations.ConfigEditorBoolean;
+import io.github.moulberry.moulconfig.annotations.ConfigEditorDraggableList;
 import io.github.moulberry.moulconfig.annotations.ConfigOption;
+
+import java.util.ArrayList;
+import java.util.List;
 
 public class MiscConfig {
 
@@ -20,7 +25,7 @@ public class MiscConfig {
     @ConfigOption(name = "Hide Armor", desc = "")
     @Accordion
     @Expose
-    // TOOD maybe we can migrate this already
+    // TODO maybe we can migrate this already
     public HideArmorConfig hideArmor2 = new HideArmorConfig();
 
     @Expose
@@ -99,6 +104,11 @@ public class MiscConfig {
     public PetCandyDisplayConfig petCandy = new PetCandyDisplayConfig();
 
     @Expose
+    @ConfigOption(name = "Show Outside SB", desc = "Show these features outside of SkyBlock.")
+    @ConfigEditorDraggableList
+    public List<OutsideSbFeature> showOutsideSB = new ArrayList<>();
+
+    @Expose
     @ConfigOption(name = "Exp Bottles", desc = "Hides all the experience orbs lying on the ground.")
     @ConfigEditorBoolean
     @FeatureToggle
@@ -113,6 +123,7 @@ public class MiscConfig {
     @FeatureToggle
     public boolean brewingStandOverlay = true;
 
+    // TODO move into scoreboard accordion
     @Expose
     @ConfigOption(name = "Red Scoreboard Numbers", desc = "Hide the red scoreboard numbers on the right side of the screen.")
     @ConfigEditorBoolean
@@ -124,6 +135,12 @@ public class MiscConfig {
     @ConfigEditorBoolean
     @FeatureToggle
     public boolean hidePiggyScoreboard = true;
+
+    @Expose
+    @ConfigOption(name = "Color Month Names", desc = "Color the month names in the Scoreboard.\nAlso applies to the Custom Scoreboard.")
+    @ConfigEditorBoolean
+    @FeatureToggle
+    public boolean colorMonthNames = false;
 
     @Expose
     @ConfigOption(name = "Explosions Hider", desc = "Hide explosions.")
@@ -157,6 +174,12 @@ public class MiscConfig {
 
     @Expose
     public Position playerMovementSpeedPos = new Position(394, 124, false, true);
+
+    @Expose
+    @ConfigOption(name = "Pet Candy Used", desc = "Show the number of Pet Candy used on a pet.")
+    @ConfigEditorBoolean
+    @FeatureToggle
+    public boolean petCandyUsed = true;
 
     @Expose
     @ConfigOption(name = "Server Restart Title", desc = "Show a title with seconds remaining until the server restarts after a Game Update or Scheduled Restart.")
@@ -228,11 +251,8 @@ public class MiscConfig {
     public Position inventoryLoadPos = new Position(394, 124, false, true);
 
     @Expose
-    public int limboTimePB = 0;
-
-    @Expose
     @ConfigOption(name = "Fix Ghost Entities", desc = "Removes ghost entities caused by a Hypixel bug. " +
-            "This included Diana, Dungeon and Crimson Isle mobs and nametags.")
+        "This included Diana, Dungeon and Crimson Isle mobs and nametags.")
     @ConfigEditorBoolean
     @FeatureToggle
     public boolean fixGhostEntities = true;

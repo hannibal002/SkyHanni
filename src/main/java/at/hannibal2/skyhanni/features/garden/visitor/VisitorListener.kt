@@ -2,19 +2,20 @@ package at.hannibal2.skyhanni.features.garden.visitor
 
 import at.hannibal2.skyhanni.config.features.garden.visitor.VisitorConfig
 import at.hannibal2.skyhanni.events.CheckRenderEntityEvent
+import at.hannibal2.skyhanni.events.GuiKeyPressEvent
 import at.hannibal2.skyhanni.events.InventoryCloseEvent
 import at.hannibal2.skyhanni.events.InventoryFullyOpenedEvent
 import at.hannibal2.skyhanni.events.LorenzRenderWorldEvent
 import at.hannibal2.skyhanni.events.PacketEvent
-import at.hannibal2.skyhanni.events.PreProfileSwitchEvent
+import at.hannibal2.skyhanni.events.ProfileJoinEvent
 import at.hannibal2.skyhanni.events.TabListUpdateEvent
 import at.hannibal2.skyhanni.events.garden.visitor.VisitorOpenEvent
 import at.hannibal2.skyhanni.events.garden.visitor.VisitorRenderEvent
 import at.hannibal2.skyhanni.events.garden.visitor.VisitorToolTipEvent
 import at.hannibal2.skyhanni.features.garden.GardenAPI
 import at.hannibal2.skyhanni.features.garden.visitor.VisitorAPI.VisitorStatus
-import at.hannibal2.skyhanni.features.garden.visitor.VisitorAPI.config
 import at.hannibal2.skyhanni.mixins.transformers.gui.AccessorGuiContainer
+import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.ItemUtils.name
 import at.hannibal2.skyhanni.utils.KeyboardManager.isKeyHeld
@@ -28,26 +29,28 @@ import net.minecraft.client.Minecraft
 import net.minecraft.client.gui.inventory.GuiContainer
 import net.minecraft.entity.item.EntityArmorStand
 import net.minecraft.network.play.client.C02PacketUseEntity
-import net.minecraftforge.client.event.GuiScreenEvent.KeyboardInputEvent
 import net.minecraftforge.event.entity.player.ItemTooltipEvent
 import net.minecraftforge.fml.common.eventhandler.EventPriority
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import org.lwjgl.input.Keyboard
 
-private val config get() = VisitorAPI.config
 
 class VisitorListener {
+
+    private val config get() = VisitorAPI.config
+
     private var lastClickedNpc = 0
     private val logger = LorenzLogger("garden/visitors/listener")
 
     companion object {
+
         private val VISITOR_INFO_ITEM_SLOT = 13
         private val VISITOR_ACCEPT_ITEM_SLOT = 29
         private val VISITOR_REFUSE_ITEM_SLOT = 33
     }
 
     @SubscribeEvent
-    fun onPreProfileSwitch(event: PreProfileSwitchEvent) {
+    fun onProfileJoin(event: ProfileJoinEvent) {
         VisitorAPI.reset()
     }
 
@@ -98,7 +101,7 @@ class VisitorListener {
 
         val visitorOffer = VisitorAPI.VisitorOffer(offerItem)
 
-        var name = npcItem.name ?: return
+        var name = npcItem.name
         if (name.length == name.removeColor().length + 4) {
             name = name.substring(2)
         }
@@ -116,10 +119,10 @@ class VisitorListener {
     }
 
     @SubscribeEvent
-    fun onKeybind(event: KeyboardInputEvent.Post) {
+    fun onKeybind(event: GuiKeyPressEvent) {
         if (!VisitorAPI.inInventory) return
         if (!config.acceptHotkey.isKeyHeld()) return
-        val inventory = event.gui as? AccessorGuiContainer ?: return
+        val inventory = event.guiContainer as? AccessorGuiContainer ?: return
         inventory as GuiContainer
         val slot = inventory.inventorySlots.getSlot(29)
         inventory.handleMouseClick_skyhanni(slot, slot.slotIndex, 0, 0)
@@ -138,13 +141,13 @@ class VisitorListener {
             visitor.hasReward()?.let {
                 if (config.rewardWarning.preventRefusing) {
                     if (config.rewardWarning.bypassKey.isKeyHeld()) {
-                        LorenzUtils.chat("§cBypassed blocking refusal of visitor ${visitor.visitorName} §7(${it.displayName}§7)")
+                        ChatUtils.chat("§cBypassed blocking refusal of visitor ${visitor.visitorName} §7(${it.displayName}§7)")
                         return
                     }
                     event.isCanceled = true
-                    LorenzUtils.chat("§cBlocked refusing visitor ${visitor.visitorName} §7(${it.displayName}§7)")
+                    ChatUtils.chat("§cBlocked refusing visitor ${visitor.visitorName} §7(${it.displayName}§7)")
                     if (config.rewardWarning.bypassKey == Keyboard.KEY_NONE) {
-                        LorenzUtils.clickableChat(
+                        ChatUtils.clickableChat(
                             "§eIf you want to deny this visitor, set a keybind in §e/sh bypass",
                             "sh bypass",
                             false

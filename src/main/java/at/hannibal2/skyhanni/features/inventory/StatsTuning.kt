@@ -11,13 +11,19 @@ import at.hannibal2.skyhanni.utils.LorenzColor
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.RenderUtils.highlight
 import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
+import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraft.item.ItemStack
 import net.minecraftforge.fml.common.eventhandler.EventPriority
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
 class StatsTuning {
+
     private val config get() = SkyHanniMod.feature.inventory.statsTuning
-    private val patternStatPoints = "§7Stat has: §e(?<amount>\\d+) points?".toPattern()
+
+    private val statPointsPattern by RepoPattern.pattern(
+        "inventory.statstuning.points",
+        "§7Stat has: §e(?<amount>\\d+) points?"
+    )
 
     @SubscribeEvent
     fun onRenderItemTip(event: RenderInventoryItemTipEvent) {
@@ -28,12 +34,10 @@ class StatsTuning {
         if (config.templateStats && inventoryName == "Stats Tuning") if (templateStats(stack, event)) return
         if (config.selectedStats && inventoryName == "Accessory Bag Thaumaturgy" && selectedStats(stack, event)) return
         if (config.points && inventoryName == "Stats Tuning") points(stack, event)
-
     }
 
     private fun templateStats(stack: ItemStack, event: RenderInventoryItemTipEvent): Boolean {
-        val name = stack.name ?: return true
-        if (name != "§aLoad") return false
+        if (stack.name != "§aLoad") return false
 
         var grab = false
         val list = mutableListOf<String>()
@@ -61,8 +65,7 @@ class StatsTuning {
     }
 
     private fun selectedStats(stack: ItemStack, event: RenderInventoryItemTipEvent): Boolean {
-        val name = stack.name ?: return true
-        if (name != "§aStats Tuning") return false
+        if (stack.name != "§aStats Tuning") return false
 
         var grab = false
         val list = mutableListOf<String>()
@@ -89,7 +92,7 @@ class StatsTuning {
 
     private fun points(stack: ItemStack, event: RenderInventoryItemTipEvent) {
         for (line in stack.getLore()) {
-            patternStatPoints.matchMatcher(line) {
+            statPointsPattern.matchMatcher(line) {
                 val points = group("amount")
                 event.stackTip = points
             }

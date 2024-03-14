@@ -18,10 +18,12 @@ object FixGhostEntities {
     private val config get() = SkyHanniMod.feature.misc
 
     private var recentlyRemovedEntities = ArrayDeque<Int>()
+    private var recentlySpawnedEntities = ArrayDeque<Int>()
 
     @SubscribeEvent
     fun onWorldChange(event: LorenzWorldChangeEvent) {
         recentlyRemovedEntities = ArrayDeque()
+        recentlySpawnedEntities = ArrayDeque()
     }
 
     @SubscribeEvent
@@ -34,15 +36,20 @@ object FixGhostEntities {
             if (packet.entityID in recentlyRemovedEntities) {
                 event.cancel()
             }
+            recentlySpawnedEntities.addLast(packet.entityID)
         } else if (packet is S0FPacketSpawnMob) {
             if (packet.entityID in recentlyRemovedEntities) {
                 event.cancel()
             }
+            recentlySpawnedEntities.addLast(packet.entityID)
         } else if (packet is S13PacketDestroyEntities) {
             for (entityID in packet.entityIDs) {
-                recentlyRemovedEntities.addLast(entityID)
-                if (recentlyRemovedEntities.size == 10) {
-                    recentlyRemovedEntities.removeFirst()
+                // ingore entities that got properly spawned and then removed
+                if (entityID !in recentlySpawnedEntities) {
+                    recentlyRemovedEntities.addLast(entityID)
+                    if (recentlyRemovedEntities.size == 10) {
+                        recentlyRemovedEntities.removeFirst()
+                    }
                 }
             }
         }

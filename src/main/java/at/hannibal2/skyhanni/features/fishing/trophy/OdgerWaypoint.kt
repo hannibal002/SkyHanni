@@ -5,10 +5,10 @@ import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.events.LorenzRenderWorldEvent
 import at.hannibal2.skyhanni.events.LorenzTickEvent
+import at.hannibal2.skyhanni.features.fishing.FishingAPI.isFishingRod
 import at.hannibal2.skyhanni.test.GriffinUtils.drawWaypointFilled
 import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
-import at.hannibal2.skyhanni.utils.ItemUtils.name
 import at.hannibal2.skyhanni.utils.LorenzColor
 import at.hannibal2.skyhanni.utils.LorenzUtils.isInIsland
 import at.hannibal2.skyhanni.utils.LorenzVec
@@ -16,6 +16,7 @@ import at.hannibal2.skyhanni.utils.RenderUtils.drawDynamicText
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
 class OdgerWaypoint {
+
     private val config get() = SkyHanniMod.feature.fishing.trophyFishing
     private val location = LorenzVec(-373, 207, -808)
 
@@ -36,8 +37,7 @@ class OdgerWaypoint {
 
     private fun isLavaFishingRod(): Boolean {
         val heldItem = InventoryUtils.getItemInHand() ?: return false
-        val isRod = heldItem.name?.contains("Rod") ?: return false
-        if (!isRod) return false
+        if (!heldItem.isFishingRod()) return false
 
         return heldItem.getLore().any { it.contains("Lava Rod") }
     }

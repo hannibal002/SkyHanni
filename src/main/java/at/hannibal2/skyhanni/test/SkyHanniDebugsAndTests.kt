@@ -7,20 +7,22 @@ import at.hannibal2.skyhanni.config.ConfigManager
 import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.config.core.config.Position
 import at.hannibal2.skyhanni.data.HypixelData
+import at.hannibal2.skyhanni.events.GuiKeyPressEvent
 import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.LorenzChatEvent
 import at.hannibal2.skyhanni.events.LorenzRenderWorldEvent
 import at.hannibal2.skyhanni.events.LorenzToolTipEvent
-import at.hannibal2.skyhanni.events.PlaySoundEvent
 import at.hannibal2.skyhanni.events.ReceiveParticleEvent
 import at.hannibal2.skyhanni.features.garden.GardenNextJacobContest
 import at.hannibal2.skyhanni.features.garden.visitor.GardenVisitorColorNames
 import at.hannibal2.skyhanni.test.GriffinUtils.drawWaypointFilled
+import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalNameOrNull
 import at.hannibal2.skyhanni.utils.ItemUtils.getItemCategoryOrNull
 import at.hannibal2.skyhanni.utils.ItemUtils.getItemRarityOrNull
+import at.hannibal2.skyhanni.utils.ItemUtils.itemName
 import at.hannibal2.skyhanni.utils.ItemUtils.name
 import at.hannibal2.skyhanni.utils.KeyboardManager.isKeyHeld
 import at.hannibal2.skyhanni.utils.LocationUtils
@@ -28,13 +30,16 @@ import at.hannibal2.skyhanni.utils.LorenzColor
 import at.hannibal2.skyhanni.utils.LorenzDebug
 import at.hannibal2.skyhanni.utils.LorenzLogger
 import at.hannibal2.skyhanni.utils.LorenzUtils
-import at.hannibal2.skyhanni.utils.LorenzUtils.makeAccessible
 import at.hannibal2.skyhanni.utils.LorenzVec
 import at.hannibal2.skyhanni.utils.NEUInternalName
+import at.hannibal2.skyhanni.utils.NEUInternalName.Companion.asInternalName
 import at.hannibal2.skyhanni.utils.NEUItems
+import at.hannibal2.skyhanni.utils.NEUItems.getItemStackOrNull
 import at.hannibal2.skyhanni.utils.NEUItems.getNpcPriceOrNull
+import at.hannibal2.skyhanni.utils.NEUItems.getPriceOrNull
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.OSUtils
+import at.hannibal2.skyhanni.utils.ReflectionUtils.makeAccessible
 import at.hannibal2.skyhanni.utils.RenderUtils.drawDynamicText
 import at.hannibal2.skyhanni.utils.RenderUtils.renderString
 import at.hannibal2.skyhanni.utils.RenderUtils.renderStringsAndItems
@@ -42,9 +47,7 @@ import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.SoundUtils
 import kotlinx.coroutines.launch
 import net.minecraft.client.Minecraft
-import net.minecraft.client.gui.inventory.GuiContainer
 import net.minecraft.nbt.NBTTagCompound
-import net.minecraftforge.client.event.GuiScreenEvent
 import net.minecraftforge.common.MinecraftForge
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import java.io.File
@@ -53,6 +56,7 @@ import kotlin.time.Duration.Companion.seconds
 class SkyHanniDebugsAndTests {
 
     companion object {
+
         private val config get() = SkyHanniMod.feature.dev
         private val debugConfig get() = config.debug
         var displayLine = ""
@@ -93,14 +97,14 @@ class SkyHanniDebugsAndTests {
 
             if (args.isEmpty()) {
                 testLocation = null
-                LorenzUtils.chat("reset test waypoint")
+                ChatUtils.chat("reset test waypoint")
             }
 
             val x = args[0].toDouble()
             val y = args[1].toDouble()
             val z = args[2].toDouble()
             testLocation = LorenzVec(x, y, z)
-            LorenzUtils.chat("set test waypoint")
+            ChatUtils.chat("set test waypoint")
         }
 
         fun testCommand(args: Array<String>) {
@@ -125,7 +129,7 @@ class SkyHanniDebugsAndTests {
 //            b = args[1].toDouble()
 //            c = args[2].toDouble()
 
-//            for (line in (Minecraft.getMinecraft().ingameGUI.tabList as AccessorGuiPlayerTabOverlay).footer.unformattedText
+//            for (line in getPlayerTabOverlay().footer.unformattedText
 //                .split("\n")) {
 //                println("footer: '$line'")
 //            }
@@ -184,7 +188,7 @@ class SkyHanniDebugsAndTests {
                 return
             }
 
-            LorenzUtils.clickableChat(
+            ChatUtils.clickableChat(
                 "§cTHIS WILL RESET YOUR SkyHanni CONFIG! Click here to procceed.",
                 "shconfigmanagerreset confirm",
                 false
@@ -209,7 +213,7 @@ class SkyHanniDebugsAndTests {
 
                 // resetting the MoulConfigProcessor in use
                 ConfigGuiManager.editor = null
-                LorenzUtils.chat("Reset the config manager!")
+                ChatUtils.chat("Reset the config manager!")
             }.start()
         }
 
@@ -239,7 +243,7 @@ class SkyHanniDebugsAndTests {
                         val internalName = NEUItems.getRawInternalName(itemName)
                         list.add(NEUItems.getItemStack(internalName))
                     } catch (e: Error) {
-                        LorenzUtils.debug("itemName '$itemName' is invalid for visitor '$name'")
+                        ChatUtils.debug("itemName '$itemName' is invalid for visitor '$name'")
                         errors++
                     }
                 }
@@ -251,9 +255,9 @@ class SkyHanniDebugsAndTests {
             bigList.add(list)
             displayList = bigList
             if (errors == 0) {
-                LorenzUtils.debug("Test garden visitor renderer: no errors")
+                ChatUtils.debug("Test garden visitor renderer: no errors")
             } else {
-                LorenzUtils.debug("Test garden visitor renderer: $errors errors")
+                ChatUtils.debug("Test garden visitor renderer: $errors errors")
             }
         }
 
@@ -282,7 +286,7 @@ class SkyHanniDebugsAndTests {
                     println("Skipped registering listener $simpleName")
                 }
             }
-            LorenzUtils.chat("reloaded ${modules.size} listener classes.")
+            ChatUtils.chat("reloaded ${modules.size} listener classes.")
         }
 
         fun stopListeners() {
@@ -293,22 +297,22 @@ class SkyHanniDebugsAndTests {
                 MinecraftForge.EVENT_BUS.unregister(original)
                 println("Unregistered listener $simpleName")
             }
-            LorenzUtils.chat("stopped ${modules.size} listener classes.")
+            ChatUtils.chat("stopped ${modules.size} listener classes.")
         }
 
         fun whereAmI() {
             if (LorenzUtils.inSkyBlock) {
-                LorenzUtils.chat("§eYou are currently in ${LorenzUtils.skyBlockIsland}.")
+                ChatUtils.chat("§eYou are currently in ${LorenzUtils.skyBlockIsland}.")
                 return
             }
-            LorenzUtils.chat("§eYou are not in Skyblock.")
+            ChatUtils.chat("§eYou are not in Skyblock.")
         }
 
         private var lastManualContestDataUpdate = SimpleTimeMark.farPast()
 
         fun clearContestData() {
             if (lastManualContestDataUpdate.passedSince() < 30.seconds) {
-                LorenzUtils.userError("§cYou already cleared Jacob's Contest data recently!")
+                ChatUtils.userError("§cYou already cleared Jacob's Contest data recently!")
                 return
             }
             lastManualContestDataUpdate = SimpleTimeMark.now()
@@ -338,48 +342,82 @@ class SkyHanniDebugsAndTests {
 
         fun debugVersion() {
             val name = "SkyHanni ${SkyHanniMod.version}"
-            LorenzUtils.chat("§eYou are using $name")
+            ChatUtils.chat("§eYou are using $name")
             OSUtils.copyToClipboard(name)
         }
 
         fun copyItemInternalName() {
             val hand = InventoryUtils.getItemInHand()
             if (hand == null) {
-                LorenzUtils.userError("No item in hand!")
+                ChatUtils.userError("No item in hand!")
                 return
             }
 
             val internalName = hand.getInternalNameOrNull()
             if (internalName == null) {
-                LorenzUtils.error("§cInternal name is null for item ${hand.name}")
+                ChatUtils.error("§cInternal name is null for item ${hand.name}")
                 return
             }
 
             val rawInternalName = internalName.asString()
             OSUtils.copyToClipboard(rawInternalName)
-            LorenzUtils.chat("§eCopied internal name §7$rawInternalName §eto the clipboard!")
+            ChatUtils.chat("§eCopied internal name §7$rawInternalName §eto the clipboard!")
         }
 
         fun toggleRender() {
             globalRender = !globalRender
             if (globalRender) {
-                LorenzUtils.chat("§aEnabled global renderer!")
+                ChatUtils.chat("§aEnabled global renderer!")
             } else {
-                LorenzUtils.chat("§cDisabled global renderer! Run this command again to show SkyHanni rendering again.")
+                ChatUtils.chat("§cDisabled global renderer! Run this command again to show SkyHanni rendering again.")
             }
+        }
+
+        fun testItemCommand(args: Array<String>) {
+            if (args.isEmpty()) {
+                ChatUtils.userError("Usage: /shtestitem <item name or internal name>")
+                return
+            }
+
+            val input = args.joinToString(" ")
+            val result = buildList {
+                add("")
+                add("§bSkyHanni Test Item")
+                add("§einput: '§f$input§e'")
+
+                NEUInternalName.fromItemNameOrNull(input)?.let { internalName ->
+                    add("§eitem name -> internalName: '§7${internalName.asString()}§e'")
+                    add("  §eitemName: '${internalName.itemName}§e'")
+                    val price = internalName.getPriceOrNull()?.let { "§6" + it.addSeparators() } ?: "§7null"
+                    add("  §eprice: '§6${price}§e'")
+                    return@buildList
+                }
+
+                input.asInternalName().getItemStackOrNull()?.let { item ->
+                    val itemName = item.itemName
+                    val internalName = item.getInternalName()
+                    add("§einternal name: §7${internalName.asString()}")
+                    add("§einternal name -> item name: '$itemName§e'")
+                    val price = internalName.getPriceOrNull()?.let { "§6" + it.addSeparators() } ?: "§7null"
+                    add("  §eprice: '§6${price}§e'")
+                    return@buildList
+                }
+
+                add("§cNothing found!")
+            }
+            ChatUtils.chat(result.joinToString("\n"), prefix = false)
         }
     }
 
     @SubscribeEvent
-    fun onKeybind(event: GuiScreenEvent.KeyboardInputEvent.Post) {
+    fun onKeybind(event: GuiKeyPressEvent) {
         if (!debugConfig.copyInternalName.isKeyHeld()) return
-        val gui = event.gui as? GuiContainer ?: return
-        val focussedSlot = gui.slotUnderMouse ?: return
+        val focussedSlot = event.guiContainer.slotUnderMouse ?: return
         val stack = focussedSlot.stack ?: return
         val internalName = stack.getInternalNameOrNull() ?: return
         val rawInternalName = internalName.asString()
         OSUtils.copyToClipboard(rawInternalName)
-        LorenzUtils.chat("§eCopied internal name §7$rawInternalName §eto the clipboard!")
+        ChatUtils.chat("§eCopied internal name §7$rawInternalName §eto the clipboard!")
     }
 
     @SubscribeEvent
@@ -390,7 +428,6 @@ class SkyHanniDebugsAndTests {
         val internalName = itemStack.getInternalName()
         if ((internalName == NEUInternalName.NONE) && !debugConfig.showEmptyNames) return
         event.toolTip.add("Internal Name: '${internalName.asString()}'")
-
     }
 
     @SubscribeEvent
@@ -414,18 +451,32 @@ class SkyHanniDebugsAndTests {
     }
 
     @SubscribeEvent
-    fun onSHowNpcPrice(event: LorenzToolTipEvent) {
+    fun onShowNpcPrice(event: LorenzToolTipEvent) {
         if (!LorenzUtils.inSkyBlock) return
         if (!debugConfig.showNpcPrice) return
         val internalName = event.itemStack.getInternalNameOrNull() ?: return
 
         val npcPrice = internalName.getNpcPriceOrNull() ?: return
-        event.toolTip.add("§7Npc price: §6${npcPrice.addSeparators()}")
+        event.toolTip.add("§7NPC price: §6${npcPrice.addSeparators()}")
+    }
+
+    @SubscribeEvent
+    fun onShowItemName(event: LorenzToolTipEvent) {
+        if (!LorenzUtils.inSkyBlock) return
+        if (!debugConfig.showItemName) return
+        val itemStack = event.itemStack
+        val internalName = itemStack.getInternalName()
+        if (internalName == NEUInternalName.NONE) {
+            event.toolTip.add("Item name: no item.")
+            return
+        }
+        val name = internalName.itemName
+        event.toolTip.add("Item name: '$name§7'")
     }
 
     @SubscribeEvent
     fun onRenderLocation(event: GuiRenderEvent.GuiOverlayRenderEvent) {
-        if (LorenzUtils.inSkyBlock && Minecraft.getMinecraft().gameSettings.showDebugInfo) {
+        if (LorenzUtils.inSkyBlock && Minecraft.getMinecraft().gameSettings.showDebugInfo && debugConfig.currentAreaDebug) {
             config.debugLocationPos.renderString(
                 "Current Area: ${HypixelData.skyBlockArea}",
                 posLabel = "SkyBlock Area (Debug)"
@@ -434,8 +485,7 @@ class SkyHanniDebugsAndTests {
     }
 
     @SubscribeEvent
-    fun onChatMessage(event: LorenzChatEvent) {
-
+    fun onChat(event: LorenzChatEvent) {
     }
 
     @SubscribeEvent
@@ -447,186 +497,6 @@ class SkyHanniDebugsAndTests {
             config.debugPos.renderString("test: $displayLine", posLabel = "Test")
         }
         config.debugPos.renderStringsAndItems(displayList, posLabel = "Test Display")
-    }
-
-    @SubscribeEvent
-    fun onSoundPlay(event: PlaySoundEvent) {
-//        val location = event.location
-//        val distance = location.distanceToPlayer()
-//        val soundName = event.soundName
-//        val pitch = event.pitch
-//        val volume = event.volume
-
-        // background music
-//        if (soundName == "note.harp") {
-////                if (distance < 2) {
-//
-//
-//            //Wilderness
-//            val list = mutableListOf<Float>()
-////                list.add(0.4920635)
-////                list.add(0.74603176)
-////                list.add(0.8888889)
-////                list.add(1.1746032)
-////                list.add(1.7777778)
-////                list.add(0.5873016)
-////                list.add(1f)
-////                list.add(1.4920635)
-////                list.add(0.4920635)
-////                list.add(1.8730159)
-////                list.add(0.82539684)
-////                list.add(1.1111112)
-////                list.add(1.6666666)
-////                list.add(0.5555556)
-////                list.add(0.6984127)
-////                list.add(0.93650794)
-////                list.add(1.4126984)
-////                list.add(1.3333334)
-////                list.add(1.5873016)
-//
-//            if (pitch in list) {
-//                if (Minecraft.getMinecraft().thePlayer.isSneaking) {
-//                    event.isCanceled = true
-//                }
-//                return
-//            }
-//        }
-
-        // diana ancestral spade
-//        if (soundName == "note.harp") {
-//            val list = mutableListOf<Float>()
-//            list.add(0.52380955f)
-//            list.add(0.5555556f)
-//            list.add(0.6031746f)
-//            list.add(0.63492066f)
-//            list.add(0.6825397f)
-//            list.add(0.71428573f)
-//            list.add(0.7619048f)
-//            list.add(0.7936508f)
-//            list.add(0.84126985f)
-//            list.add(0.8888889f)
-//            list.add(0.9206349f)
-//            list.add(0.96825397f)
-//            list.add(1.476191f)
-//            list.add(1.476191f)
-//            list.add(0.50793654f)
-//            list.add(0.6507937f)
-//            list.add(0.6984127f)
-//            list.add(0.74603176f)
-//            list.add(0.93650794f)
-//            list.add(0.984127f)
-//            list.add(1.968254f)
-//            list.add(0.4920635f)
-//            list.add(1.1587307f)
-//            list.add(1.1587301f)
-//            list.add(1.2857143f)
-//            list.add(1.4126984f)
-//            list.add(1.6825397f)
-//            list.add(1.8095238f)
-//            list.add(1.9365079f)
-//            list.add(1.4920635f)
-//            list.add(1.5396825f)
-//            list.add(0.8730159f)
-//            list.add(1.2539682f)
-//            list.add(1.4285715f)
-//            list.add(1.6190476f)
-//            list.add(1.4920635f)
-//            list.add(0.9047619f)
-//            list.add(1.1111112f)
-//            list.add(1.3174603f)
-//            list.add(1.5238096f)
-//            list.add(1.7301587f)
-//
-//            list.add(0.5873016f)
-//            list.add(0.61904764f)
-//            list.add(0.6666667f)
-//            list.add(0.73015875f)
-//            list.add(0.7777778f)
-//            list.add(0.8095238f)
-//            list.add(0.8095238f)
-//            list.add(0.82539684f)
-//
-//            list.add(0.5714286f)
-//            list.add(0.85714287f)
-//            list.add(1.3174603f)
-//            list.add(1.9523809f)
-//            list.add(1.1428572f)
-//            list.add(1.2063493f)
-//            list.add(1.2698413f)
-//            list.add(1.6349206f)
-//            list.add(1.2380953f)
-//            list.add(1.7936507f)
-//            list.add(1.9841269f)
-//            list.add(1.1746032f)
-//            list.add(1.3492063f)
-//            list.add(1.6984127f)
-//            list.add(1.8571428f)
-//
-//            if (pitch in list) {
-//                return
-//            }
-//        }
-
-        // use ancestral spade
-//        if (soundName == "mob.zombie.infect") {
-//            if (pitch == 1.968254f) {
-//                if (volume == 0.3f) {
-//                    LorenzUtils.chat("used ancestral spade!")
-//                    return
-//                }
-//            }
-//        }
-
-        // wither shield activated
-//        if (soundName == "mob.zombie.remedy") {
-//            if (pitch == 0.6984127f) {
-//                if (volume == 1f) {
-//                    return
-//                }
-//            }
-//        }
-
-        // wither shield cooldown over
-//        if (soundName == "random.levelup") {
-//            if (pitch == 3f) {
-//                if (volume == 1f) {
-//                    return
-//                }
-//            }
-//        }
-
-        // teleport (hyp or aote)
-//        if (soundName == "mob.endermen.portal") {
-//            if (pitch == 1f && volume == 1f) {
-//                return
-//            }
-//        }
-
-        // hyp wither impact
-//        if (soundName == "random.explode") {
-//            if (pitch == 1f && volume == 1f) {
-//                return
-//            }
-//        }
-
-        // pick coins up
-//        if (soundName == "random.orb") {
-//            if (pitch == 1.4920635f && volume == 1f) {
-//                return
-//            }
-//        }
-
-//        if (soundName == "game.player.hurt") return
-//        if (soundName.startsWith("step.")) return
-
-//        if (soundName != "mob.chicken.plop") return
-
-//        println("")
-//        println("PlaySoundEvent")
-//        println("soundName: $soundName")
-//        println("distance: $distance")
-//        println("pitch: ${pitch}f")
-//        println("volume: ${volume}f")
     }
 
     @SubscribeEvent
@@ -662,6 +532,5 @@ class SkyHanniDebugsAndTests {
         event.move(3, "dev.showItemRarity", "dev.debug.showItemRarity")
         event.move(3, "dev.copyInternalName", "dev.debug.copyInternalName")
         event.move(3, "dev.showNpcPrice", "dev.debug.showNpcPrice")
-
     }
 }

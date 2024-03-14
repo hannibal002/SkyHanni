@@ -6,10 +6,11 @@ import at.hannibal2.skyhanni.config.core.config.Position
 import at.hannibal2.skyhanni.config.features.misc.TrackerConfig.PriceFromEntry
 import at.hannibal2.skyhanni.data.ProfileStorageData
 import at.hannibal2.skyhanni.data.TrackerManager
-import at.hannibal2.skyhanni.features.bazaar.BazaarApi.Companion.getBazaarData
+import at.hannibal2.skyhanni.features.inventory.bazaar.BazaarApi.Companion.getBazaarData
 import at.hannibal2.skyhanni.features.misc.items.EstimatedItemValue
+import at.hannibal2.skyhanni.utils.ChatUtils
+import at.hannibal2.skyhanni.utils.CollectionUtils.addAsSingletonList
 import at.hannibal2.skyhanni.utils.LorenzUtils
-import at.hannibal2.skyhanni.utils.LorenzUtils.addAsSingletonList
 import at.hannibal2.skyhanni.utils.NEUInternalName
 import at.hannibal2.skyhanni.utils.NEUItems.getNpcPriceOrNull
 import at.hannibal2.skyhanni.utils.NEUItems.getPriceOrNull
@@ -26,6 +27,7 @@ open class SkyHanniTracker<Data : TrackerData>(
     private val getStorage: (Storage.ProfileSpecific) -> Data,
     private val drawDisplay: (Data) -> List<List<Any>>,
 ) {
+
     private var inventoryOpen = false
     private var displayMode: DisplayMode? = null
     private val currentSessions = mutableMapOf<Storage.ProfileSpecific, Data>()
@@ -34,6 +36,7 @@ open class SkyHanniTracker<Data : TrackerData>(
     private var dirty = false
 
     companion object {
+
         val config get() = SkyHanniMod.feature.misc.tracker
         private val storedTrackers get() = SkyHanniMod.feature.storage.trackerDisplayModes
 
@@ -53,7 +56,7 @@ open class SkyHanniTracker<Data : TrackerData>(
             return
         }
 
-        LorenzUtils.clickableChat(
+        ChatUtils.clickableChat(
             "Are you sure you want to reset your total $name? Click here to confirm.",
             "$command confirm"
         )
@@ -80,6 +83,9 @@ open class SkyHanniTracker<Data : TrackerData>(
         if (config.hideInEstimatedItemValue && EstimatedItemValue.isCurrentlyShowing()) return
 
         val currentlyOpen = Minecraft.getMinecraft().currentScreen is GuiInventory
+        if (!currentlyOpen && config.hideItemTrackersOutsideInventory && this is SkyHanniItemTracker) {
+            return
+        }
         if (inventoryOpen != currentlyOpen) {
             inventoryOpen = currentlyOpen
             update()
@@ -145,7 +151,7 @@ open class SkyHanniTracker<Data : TrackerData>(
     private fun reset(displayMode: DisplayMode, message: String) {
         getSharedTracker()?.let {
             it.get(displayMode).reset()
-            LorenzUtils.chat(message)
+            ChatUtils.chat(message)
             update()
         }
     }
@@ -163,6 +169,7 @@ open class SkyHanniTracker<Data : TrackerData>(
     }
 
     class SharedTracker<Data : TrackerData>(private val total: Data, private val currentSession: Data) {
+
         fun modify(modifyFunction: (Data) -> Unit) {
             modifyFunction(total)
             modifyFunction(currentSession)

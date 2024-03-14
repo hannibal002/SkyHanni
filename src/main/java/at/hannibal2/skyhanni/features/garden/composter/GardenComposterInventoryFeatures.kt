@@ -4,7 +4,9 @@ import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.events.GuiContainerEvent
 import at.hannibal2.skyhanni.events.LorenzToolTipEvent
 import at.hannibal2.skyhanni.features.garden.GardenAPI
+import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.InventoryUtils
+import at.hannibal2.skyhanni.utils.InventoryUtils.getUpperItems
 import at.hannibal2.skyhanni.utils.ItemUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.LorenzColor
@@ -18,6 +20,7 @@ import net.minecraft.inventory.ContainerChest
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
 class GardenComposterInventoryFeatures {
+
     private val config get() = GardenAPI.config.composters
 
     @SubscribeEvent
@@ -45,12 +48,12 @@ class GardenComposterInventoryFeatures {
                 if (line.endsWith(" Copper")) continue
                 if (line == "") break
                 val (itemName, amount) = ItemUtils.readItemAmount(line) ?: run {
-                    LorenzUtils.error("Could not read item '$line'")
+                    ChatUtils.error("Could not read item '$line'")
                     continue
                 }
                 val internalName = NEUItems.getInternalNameOrNull(itemName)
                 if (internalName == null) {
-                    LorenzUtils.error(
+                    ChatUtils.error(
                         "Error reading internal name for item '$itemName§c' " +
                             "(in GardenComposterInventoryFeatures)"
                     )
@@ -81,11 +84,7 @@ class GardenComposterInventoryFeatures {
             val guiChest = event.gui
             val chest = guiChest.inventorySlots as ContainerChest
 
-            for (slot in chest.inventorySlots) {
-                if (slot == null) continue
-                if (slot.slotNumber != slot.slotIndex) continue
-                val stack = slot.stack ?: continue
-
+            for ((slot, stack) in chest.getUpperItems()) {
                 if (stack.getLore().any { it == "§eClick to upgrade!" }) {
                     slot highlight LorenzColor.GOLD
                 }

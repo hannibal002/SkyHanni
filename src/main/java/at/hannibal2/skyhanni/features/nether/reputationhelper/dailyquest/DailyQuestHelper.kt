@@ -1,7 +1,10 @@
 package at.hannibal2.skyhanni.features.nether.reputationhelper.dailyquest
 
+import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.config.Storage
 import at.hannibal2.skyhanni.data.IslandType
+import at.hannibal2.skyhanni.data.SackAPI
+import at.hannibal2.skyhanni.data.SackStatus
 import at.hannibal2.skyhanni.events.GuiContainerEvent
 import at.hannibal2.skyhanni.events.InventoryFullyOpenedEvent
 import at.hannibal2.skyhanni.events.LorenzChatEvent
@@ -24,18 +27,21 @@ import at.hannibal2.skyhanni.features.nether.reputationhelper.dailyquest.quest.T
 import at.hannibal2.skyhanni.features.nether.reputationhelper.dailyquest.quest.UnknownQuest
 import at.hannibal2.skyhanni.features.nether.reputationhelper.miniboss.CrimsonMiniBoss
 import at.hannibal2.skyhanni.test.GriffinUtils.drawWaypointFilled
+import at.hannibal2.skyhanni.utils.ChatUtils
+import at.hannibal2.skyhanni.utils.CollectionUtils.addAsSingletonList
 import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.InventoryUtils.getInventoryName
-import at.hannibal2.skyhanni.utils.ItemUtils.getLore
+import at.hannibal2.skyhanni.utils.InventoryUtils.getUpperItems
 import at.hannibal2.skyhanni.utils.ItemUtils.name
 import at.hannibal2.skyhanni.utils.LorenzColor
 import at.hannibal2.skyhanni.utils.LorenzUtils
-import at.hannibal2.skyhanni.utils.LorenzUtils.addAsSingletonList
 import at.hannibal2.skyhanni.utils.LorenzUtils.isInIsland
 import at.hannibal2.skyhanni.utils.LorenzVec
-import at.hannibal2.skyhanni.utils.NEUItems
+import at.hannibal2.skyhanni.utils.NEUItems.getItemStack
+import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.RenderUtils.drawDynamicText
 import at.hannibal2.skyhanni.utils.RenderUtils.highlight
+import at.hannibal2.skyhanni.utils.StringUtils.removeWordsAtEnd
 import net.minecraft.client.gui.inventory.GuiChest
 import net.minecraft.inventory.ContainerChest
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
@@ -47,8 +53,9 @@ class DailyQuestHelper(val reputationHelper: CrimsonIsleReputationHelper) {
 
     private val questLoader = QuestLoader(this)
     val quests = mutableListOf<Quest>()
-    private val sacksCache = mutableMapOf<String, Long>()
     var greatSpook = false
+
+    private val config get() = SkyHanniMod.feature.crimsonIsle.reputationHelper
 
     @SubscribeEvent
     fun onInventoryOpen(event: InventoryFullyOpenedEvent) {
@@ -90,45 +97,8 @@ class DailyQuestHelper(val reputationHelper: CrimsonIsleReputationHelper) {
             val dojoQuest = getQuest<DojoQuest>() ?: return
             if (dojoQuest.state != QuestState.ACCEPTED) return
 
-            for (slot in chest.inventorySlots) {
-                if (slot == null) continue
-                if (slot.slotNumber != slot.slotIndex) continue
-                val stack = slot.stack ?: continue
-                val itemName = stack.name ?: continue
-
-                if (itemName.contains(dojoQuest.dojoName)) {
-                    slot highlight LorenzColor.AQUA
-                }
-            }
-        }
-        if (chestName == "Sack of Sacks") {
-            val fetchQuest = getQuest<FetchQuest>() ?: return
-            if (fetchQuest.state != QuestState.ACCEPTED) return
-
-            val fetchItem = fetchQuest.itemName
-            for (slot in chest.inventorySlots) {
-                if (slot == null) continue
-                if (slot.slotNumber != slot.slotIndex) continue
-                val stack = slot.stack ?: continue
-                if (stack.name!!.contains("Enchanted")) continue
-
-                if (stack.getLore().any { it.contains(fetchItem) }) {
-                    slot highlight LorenzColor.AQUA
-                }
-            }
-        }
-        if (chestName.contains("Nether Sack")) {
-            val fetchQuest = getQuest<FetchQuest>() ?: return
-            if (fetchQuest.state != QuestState.ACCEPTED) return
-
-            val fetchItem = fetchQuest.itemName
-            for (slot in chest.inventorySlots) {
-                if (slot == null) continue
-                if (slot.slotNumber != slot.slotIndex) continue
-                val stack = slot.stack ?: continue
-                val itemName = stack.name ?: continue
-
-                if (itemName.contains(fetchItem)) {
+            for ((slot, stack) in chest.getUpperItems()) {
+                if (stack.name.contains(dojoQuest.dojoName)) {
                     slot highlight LorenzColor.AQUA
                 }
             }
@@ -170,7 +140,7 @@ class DailyQuestHelper(val reputationHelper: CrimsonIsleReputationHelper) {
 
         val itemName = fetchQuest.itemName
 
-        val count = InventoryUtils.countItemsInLowerInventory { it.name?.contains(itemName) ?: false }
+        val count = InventoryUtils.countItemsInLowerInventory { it.name.contains(itemName) }
         updateProcessQuest(fetchQuest, count)
     }
 
@@ -181,7 +151,7 @@ class DailyQuestHelper(val reputationHelper: CrimsonIsleReputationHelper) {
             count = needAmount
         }
         if (quest.haveAmount == count) return
-        LorenzUtils.chat("${quest.displayName} progress: $count/$needAmount")
+        ChatUtils.chat("${quest.displayName} progress: $count/$needAmount")
 
         quest.haveAmount = count
         quest.state = if (count == needAmount) QuestState.READY_TO_COLLECT else QuestState.ACCEPTED
@@ -206,7 +176,10 @@ class DailyQuestHelper(val reputationHelper: CrimsonIsleReputationHelper) {
     }
 
     private fun renderTownBoard(event: LorenzRenderWorldEvent) {
-        if (quests.any { it.state == QuestState.READY_TO_COLLECT || it.state == QuestState.NOT_ACCEPTED }) {
+        if (quests.any {
+                it.state == QuestState.READY_TO_COLLECT ||
+                it.state == QuestState.NOT_ACCEPTED ||
+                (it is RescueMissionQuest && it.state == QuestState.ACCEPTED) }) {
             val location = when (reputationHelper.factionType) {
                 FactionType.BARBARIAN -> townBoardBarbarian
                 FactionType.MAGE -> townBoardMage
@@ -229,7 +202,8 @@ class DailyQuestHelper(val reputationHelper: CrimsonIsleReputationHelper) {
         display.addAsSingletonList("")
         display.addAsSingletonList("§7Daily Quests (§e$done§8/§e5 collected§7)")
         if (done != 5) {
-            quests.mapTo(display) { renderQuest(it) }
+            val filteredQuests = quests.filter { !config.hideComplete.get() || it.state != QuestState.COLLECTED }
+            filteredQuests.mapTo(display) { renderQuest(it) }
         }
     }
 
@@ -247,16 +221,22 @@ class DailyQuestHelper(val reputationHelper: CrimsonIsleReputationHelper) {
         }
 
         val sacksText = if (quest is FetchQuest && quest.state != QuestState.COLLECTED) {
-            val name = quest.itemName.uppercase().replace(" ", "_")
-            val amount = sacksCache.getOrDefault(name, 0)
-            val needAmount = quest.needAmount
-            val amountFormat = LorenzUtils.formatInteger(amount)
-            val color = if (amount >= needAmount) {
-                "§a"
+            val sackItem = SackAPI.fetchSackItem(quest.displayItem)
+            val sackStatus = sackItem.getStatus()
+
+            if (sackStatus == SackStatus.OUTDATED) {
+                " §7(§eSack data outdated§7)"
             } else {
-                "§c"
+                val amountInSacks = sackItem.amount
+                val needAmount = quest.needAmount
+
+                val color = if (amountInSacks >= needAmount) {
+                    "§a"
+                } else {
+                    "§c"
+                }
+                " §7($color${amountInSacks.addSeparators()} §7in sacks)"
             }
-            " §7($color$amountFormat §7in sacks)"
         } else {
             ""
         }
@@ -268,32 +248,20 @@ class DailyQuestHelper(val reputationHelper: CrimsonIsleReputationHelper) {
         }
 
         val result = mutableListOf<Any>()
-        val internalItemName = quest.displayItem
+        val item = quest.displayItem.getItemStack()
 
         val displayName = if (category == QuestCategory.FETCH || category == QuestCategory.FISHING) {
-            if (internalItemName != null) {
-                val name = NEUItems.getItemStack(internalItemName).name
-                if (category == QuestCategory.FISHING) {
-                    name!!.split(" ").dropLast(1).joinToString(" ")
-                } else name
-
-            } else {
-                quest.displayName
-            }
+            val name = item.name
+            if (category == QuestCategory.FISHING) {
+                name.removeWordsAtEnd(1)
+            } else name
         } else quest.displayName
 
         val categoryName = category.displayName
-        if (internalItemName == null) {
-            result.add("  $stateText$categoryName: §f$displayName$progressText$sacksText")
-        } else {
-            result.add("  $stateText$categoryName: ")
-            try {
-                result.add(NEUItems.getItemStack(internalItemName))
-            } catch (e: RuntimeException) {
-                e.printStackTrace()
-            }
-            result.add("§f$displayName$progressText$sacksText")
-        }
+
+        result.add("  $stateText$categoryName: ")
+        result.add(item)
+        result.add("§f$displayName$progressText$sacksText")
         return result
     }
 
@@ -306,7 +274,7 @@ class DailyQuestHelper(val reputationHelper: CrimsonIsleReputationHelper) {
 
     fun finishKuudra(kuudraTier: KuudraTier) {
         val kuudraQuest = getQuest<KuudraQuest>() ?: return
-        //TODO make inline method for this two lines
+        // TODO make inline method for this two lines
         if (kuudraQuest.kuudraTier == kuudraTier && kuudraQuest.state == QuestState.ACCEPTED) {
             kuudraQuest.state = QuestState.READY_TO_COLLECT
         }
@@ -346,5 +314,5 @@ class DailyQuestHelper(val reputationHelper: CrimsonIsleReputationHelper) {
         }
     }
 
-    private fun isEnabled() = IslandType.CRIMSON_ISLE.isInIsland() && reputationHelper.config.enabled
+    private fun isEnabled() = IslandType.CRIMSON_ISLE.isInIsland() && config.enabled
 }
