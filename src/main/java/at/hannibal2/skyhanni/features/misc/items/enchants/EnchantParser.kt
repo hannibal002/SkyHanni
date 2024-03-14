@@ -2,7 +2,7 @@ package at.hannibal2.skyhanni.features.misc.items.enchants
 
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.config.features.enchantparsing.EnchantParsingConfig
-import at.hannibal2.skyhanni.config.features.enchantparsing.EnchantParsingConfig.ColorEnchants.CommaFormat
+import at.hannibal2.skyhanni.config.features.enchantparsing.EnchantParsingConfig.CommaFormat
 import at.hannibal2.skyhanni.events.ChatHoverEvent
 import at.hannibal2.skyhanni.events.LorenzToolTipEvent
 import at.hannibal2.skyhanni.events.RepositoryReloadEvent
@@ -111,7 +111,7 @@ object EnchantParser {
         }
 
         // If we have color parsing off and hide enchant descriptions on, remove them and return from method
-        if (!config.colorEnchants.colorParsing) {
+        if (!config.colorParsing) {
             if (config.hideEnchantDescriptions) {
                 loreList.removeAll(loreLines)
                 loreCache.updateAfter(loreList)
@@ -201,7 +201,7 @@ object EnchantParser {
     }
 
     private fun formatEnchants(insertEnchants: MutableList<String>) {
-        val commaFormat = config.colorEnchants.commaFormat
+        val commaFormat = config.commaFormat
 
         // Normal is leaving the formatting as Hypixel provides it
         if (config.format == EnchantParsingConfig.EnchantFormat.NORMAL) {
@@ -303,7 +303,7 @@ object EnchantParser {
         return if (removeGrayEnchants) -1 else lastGrayEnchant
     }
 
-    fun isEnabled() = LorenzUtils.inSkyBlock && config.enabled
+    fun isEnabled() = LorenzUtils.inSkyBlock
 
     fun markCacheDirty() {
         loreCache.configChanged = true
