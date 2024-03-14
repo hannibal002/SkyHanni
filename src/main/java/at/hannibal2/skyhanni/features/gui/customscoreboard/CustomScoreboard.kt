@@ -92,8 +92,7 @@ class CustomScoreboard {
     }
 
     private fun createLines() = buildList<ScoreboardElementType> {
-        val configEntries = removeEmptyLinesFromEdges(config.scoreboardEntries)
-        for (element in configEntries) {
+        for (element in config.scoreboardEntries) {
             val line = element.getVisiblePair()
 
             // Hide consecutive empty lines
