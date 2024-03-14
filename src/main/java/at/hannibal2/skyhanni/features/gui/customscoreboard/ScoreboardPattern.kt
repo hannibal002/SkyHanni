@@ -79,7 +79,7 @@ object ScoreboardPattern {
     )
     val instanceShutdownPattern by multiUseSb.pattern(
         "instanceshutdown",
-        "(§.)*Instance Shutdown: (§.)*(?<time>(\\w+[ydhms] ?)+)$"
+        "(§.)*Instance Shutdown In: (§.)*(?<time>(\\w+[ydhms] ?)+)$"
     )
     val timeLeftPattern by multiUseSb.pattern(
         "timeleft",
