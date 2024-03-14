@@ -570,7 +570,7 @@ private fun getMayorDisplayPair() = buildList {
         ((MayorAPI.currentMayor?.mayorName?.let { MayorAPI.mayorNameWithColorCode(it) }
             ?: "<hidden>") +
             (if (config.mayorConfig.showTimeTillNextMayor) {
-                "§7 (§e${MayorAPI.timeTillNextMayor.format()}§7)"
+                "§7 (§e${MayorAPI.timeTillNextMayor.format(maxUnits = 2)}§7)"
             } else {
                 ""
             })) to HorizontalAlignment.LEFT
