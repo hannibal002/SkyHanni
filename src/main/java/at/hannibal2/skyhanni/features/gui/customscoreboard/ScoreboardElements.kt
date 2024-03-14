@@ -594,7 +594,7 @@ private fun getPartyDisplayPair() =
         val partyList = PartyAPI.partyMembers
             .take(config.partyConfig.maxPartyList.get())
             .map {
-                " §7- §7$it"
+                " §7- §f$it"
             }
             .toTypedArray()
         listOf(title, *partyList).map { it to HorizontalAlignment.LEFT }
