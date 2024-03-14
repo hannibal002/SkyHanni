@@ -53,7 +53,7 @@ class CustomScoreboard {
             } else {
                 display
             }
-        config.position.renderStringsAlignedWidth(render, posLabel = guiName)
+        config.position.renderStringsAlignedWidth(render, posLabel = guiName, extraSpace = displayConfig.lineSpacing - 10)
     }
 
     @SubscribeEvent
@@ -74,7 +74,7 @@ class CustomScoreboard {
 
         // Creating the lines
         if (event.isMod(5)) {
-            display = createLines()
+            display = createLines().removeEmptyLinesFromEdges()
             if (TabListData.fullyLoaded) {
                 cache = display.toList()
             }
@@ -92,8 +92,7 @@ class CustomScoreboard {
     }
 
     private fun createLines() = buildList<ScoreboardElementType> {
-        val configEntries = removeEmptyLinesFromEdges(config.scoreboardEntries)
-        for (element in configEntries) {
+        for (element in config.scoreboardEntries) {
             val line = element.getVisiblePair()
 
             // Hide consecutive empty lines
@@ -119,13 +118,13 @@ class CustomScoreboard {
         }
     }
 
-    private fun removeEmptyLinesFromEdges(entries: MutableList<ScoreboardElement>): List<ScoreboardElement> {
+    private fun List<ScoreboardElementType>.removeEmptyLinesFromEdges(): List<ScoreboardElementType> {
         if (config.informationFilteringConfig.hideEmptyLinesAtTopAndBottom) {
-            return entries
-                .dropWhile { it.getVisiblePair().all { it.first == "<empty>" } }
-                .dropLastWhile { it.getVisiblePair().all { it.first == "<empty>" } }
+            return this
+                .dropWhile { it.first.isEmpty() }
+                .dropLastWhile { it.first.isEmpty() }
         }
-        return entries
+        return this
     }
 
     // Thank you Apec for showing that the ElementType of the stupid scoreboard is FUCKING HELMET WTF

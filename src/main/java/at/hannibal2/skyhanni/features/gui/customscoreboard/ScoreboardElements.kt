@@ -18,7 +18,6 @@ import at.hannibal2.skyhanni.features.gui.customscoreboard.CustomScoreboard.Comp
 import at.hannibal2.skyhanni.features.gui.customscoreboard.CustomScoreboard.Companion.informationFilteringConfig
 import at.hannibal2.skyhanni.features.gui.customscoreboard.CustomScoreboardUtils.formatNum
 import at.hannibal2.skyhanni.features.gui.customscoreboard.CustomScoreboardUtils.getGroupFromPattern
-import at.hannibal2.skyhanni.mixins.hooks.tryToReplaceScoreboardLine
 import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.CollectionUtils.nextAfter
 import at.hannibal2.skyhanni.utils.LorenzUtils.inAdvancedMiningIsland
@@ -389,15 +388,11 @@ private fun getIslandDisplayPair() =
 
 private fun getLocationDisplayPair() = buildList {
     add(
-        (tryToReplaceScoreboardLine(
-            getGroupFromPattern(
-                ScoreboardData.sidebarLinesFormatted,
-                ScoreboardPattern.locationPattern,
-                "location"
-            )
-        )?.trim()
-            ?: "<hidden>") to HorizontalAlignment.LEFT
-    )
+        getGroupFromPattern(
+            ScoreboardData.sidebarLinesFormatted,
+            ScoreboardPattern.locationPattern,
+            "location"
+        ).trim() to HorizontalAlignment.LEFT)
 
     val plotLine = ScoreboardData.sidebarLinesFormatted.firstOrNull { ScoreboardPattern.plotPattern.matches(it) }
     if (plotLine != null) add(plotLine to HorizontalAlignment.LEFT)
@@ -427,14 +422,14 @@ private fun getTimeDisplayPair(): List<ScoreboardElementType> {
 }
 
 private fun getLobbyDisplayPair(): List<ScoreboardElementType> {
-    val lobbyCode = getGroupFromPattern(
-        ScoreboardData.sidebarLinesFormatted,
-        ScoreboardPattern.lobbyCodePattern,
-        "code"
+    val lobbyCode = HypixelData.serverId ?: "<hidden>"
+    return listOf(
+        if (lobbyCode == "<hidden>") {
+            "<hidden>"
+        } else {
+            "§8$lobbyCode"
+        } to HorizontalAlignment.LEFT
     )
-
-    val displayValue = if (lobbyCode == "0") "<hidden>" else "§8$lobbyCode"
-    return listOf(displayValue to HorizontalAlignment.LEFT)
 }
 
 private fun getPowerDisplayPair() = listOf(
