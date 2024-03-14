@@ -2,10 +2,6 @@ package at.hannibal2.skyhanni.mixins.hooks
 
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.data.PurseAPI
-import at.hannibal2.skyhanni.features.garden.GardenAPI
-import at.hannibal2.skyhanni.features.garden.GardenPlotAPI
-import at.hannibal2.skyhanni.features.garden.GardenPlotAPI.isBarn
-import at.hannibal2.skyhanni.features.garden.GardenPlotAPI.name
 import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
 import net.minecraft.client.gui.FontRenderer
@@ -45,25 +41,6 @@ private fun tryToReplaceScoreboardLineHarder(text: String): String? {
         PurseAPI.piggyPattern.matchMatcher(text) {
             val coins = group("coins")
             return "Purse: $coins"
-        }
-    }
-
-    if (SkyHanniMod.feature.garden.plotNameInScoreboard && GardenAPI.inGarden()) {
-        if (text.contains("⏣")) {
-            val plot = GardenPlotAPI.getCurrentPlot()
-            val hasPests = text.contains("ൠ")
-            val pestSuffix = if (hasPests) {
-                val pests = text.last().digitToInt()
-                val color = if (pests >= 4) "§c" else "§6"
-                " §7(${color}${pests}ൠ§7)"
-            } else ""
-            val name = plot?.let {
-                if (it.isBarn()) "§aThe Barn" else {
-                    val namePrefix = if (hasPests) "" else "§aPlot §7- "
-                    "$namePrefix§b" + it.name
-                }
-            } ?: "§aGarden §coutside"
-            return " §7⏣ $name$pestSuffix"
         }
     }
 
