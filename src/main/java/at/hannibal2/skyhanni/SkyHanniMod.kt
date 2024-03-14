@@ -237,6 +237,7 @@ import at.hannibal2.skyhanni.features.inventory.bazaar.BazaarBestSellMethod
 import at.hannibal2.skyhanni.features.inventory.bazaar.BazaarCancelledBuyOrderClipboard
 import at.hannibal2.skyhanni.features.inventory.bazaar.BazaarOpenPriceWebsite
 import at.hannibal2.skyhanni.features.inventory.bazaar.BazaarOrderHelper
+import at.hannibal2.skyhanni.features.inventory.bazaar.CraftMaterialsFromBazaar
 import at.hannibal2.skyhanni.features.inventory.tiarelay.TiaRelayHelper
 import at.hannibal2.skyhanni.features.inventory.tiarelay.TiaRelayWaypoints
 import at.hannibal2.skyhanni.features.itemabilities.ChickenHeadTimer
@@ -253,6 +254,7 @@ import at.hannibal2.skyhanni.features.minion.InfernoMinionFeatures
 import at.hannibal2.skyhanni.features.minion.MinionCollectLogic
 import at.hannibal2.skyhanni.features.minion.MinionFeatures
 import at.hannibal2.skyhanni.features.minion.MinionXp
+import at.hannibal2.skyhanni.features.misc.AuctionHousePriceComparison
 import at.hannibal2.skyhanni.features.misc.BetterSignEditing
 import at.hannibal2.skyhanni.features.misc.BetterWikiFromMenus
 import at.hannibal2.skyhanni.features.misc.BrewingStandOverlay
@@ -506,7 +508,7 @@ class SkyHanniMod {
 
         // features
         loadModule(BazaarOrderHelper())
-        loadModule(AuctionsHighlighter())
+        loadModule(AuctionsHighlighter)
         loadModule(ChatFilter())
         loadModule(PlayerChatModifier())
         loadModule(DungeonChatFilter())
@@ -733,6 +735,7 @@ class SkyHanniMod {
         loadModule(EnderNodeTracker)
         loadModule(CompactBestiaryChatMessage())
         loadModule(WatchdogHider())
+        loadModule(AuctionHousePriceComparison())
         loadModule(AccountUpgradeReminder())
         loadModule(PetExpTooltip())
         loadModule(Translator())
@@ -785,6 +788,7 @@ class SkyHanniMod {
         loadModule(InfernoMinionFeatures())
         loadModule(LimboPlaytime())
         loadModule(RareDropMessages())
+        loadModule(CraftMaterialsFromBazaar())
 
         init()
 
