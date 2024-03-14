@@ -409,7 +409,7 @@ public class ProfileSpecificStorage {
 
             public DungeonRunInfo(String floor) {
                 this.floor = floor;
-                this.openState = CroesusChestTracker.Companion.OpenedState.UNOPENED;
+                this.openState = CroesusChestTracker.OpenedState.UNOPENED;
             }
 
             @Nullable
@@ -418,7 +418,7 @@ public class ProfileSpecificStorage {
 
             @Expose
             @Nullable
-            public CroesusChestTracker.Companion.OpenedState openState = null;
+            public CroesusChestTracker.OpenedState openState = null;
 
             @Expose
             @Nullable

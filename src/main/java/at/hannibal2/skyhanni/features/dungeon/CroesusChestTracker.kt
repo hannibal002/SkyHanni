@@ -265,11 +265,11 @@ class CroesusChestTracker {
                 it.floor != null &&
                     (it.openState == OpenedState.UNOPENED || (includeDungeonKey && it.openState == OpenedState.OPENED))
             } ?: -1) + 1
+    }
 
-        enum class OpenedState {
-            UNOPENED,
-            OPENED,
-            KEY_USED,
-        }
+    enum class OpenedState {
+        UNOPENED,
+        OPENED,
+        KEY_USED,
     }
 }
