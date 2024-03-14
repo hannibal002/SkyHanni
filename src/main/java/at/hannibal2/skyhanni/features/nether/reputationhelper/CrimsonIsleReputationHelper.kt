@@ -45,7 +45,7 @@ class CrimsonIsleReputationHelper(skyHanniMod: SkyHanniMod) {
 
     val tabListQuestPattern by RepoPattern.pattern(
         "crimson.reputation.tablist",
-        " §r§d.*"
+        " §r§[cdea].*"
     )
 
     init {
