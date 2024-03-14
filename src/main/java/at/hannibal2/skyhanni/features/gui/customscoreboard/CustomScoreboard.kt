@@ -132,8 +132,7 @@ class CustomScoreboard {
     @SubscribeEvent
     fun onRenderScoreboard(event: RenderGameOverlayEvent.Post) {
         if (event.type == RenderGameOverlayEvent.ElementType.HELMET) {
-            if (isHideVanillaScoreboardEnabled())
-                GuiIngameForge.renderObjective = false
+            GuiIngameForge.renderObjective = !isHideVanillaScoreboardEnabled()
         }
     }
 
