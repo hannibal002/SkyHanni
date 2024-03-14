@@ -92,26 +92,30 @@ class HypixelData {
         val mode get() = locraw["mode"] ?: ""
         val map get() = locraw["map"] ?: ""
 
-        fun getCurrentServerId(): String? {
-            if (!LorenzUtils.inSkyBlock) return null
-            if (serverId != null) return serverId
+        fun checkCurrentServerId() {
+            if (!LorenzUtils.inSkyBlock) return
 
             ScoreboardData.sidebarLinesFormatted.forEach {
                 serverIdScoreboardPattern.matchMatcher(it) {
                     val serverType = if (group("servertype") == "M") "mega" else "mini"
                     serverId = "$serverType${group("serverid")}"
-                    return serverId
+                    return
                 }
             }
 
             TabListData.getTabList().forEach {
                 serverIdTablistPattern.matchMatcher(it) {
                     serverId = group("serverid")
-                    return serverId
+                    return
                 }
             }
 
-            return serverId
+            ErrorManager.logErrorWithData(
+                Exception("NoServerId"), "Could not find server id",
+                "islandType" to LorenzUtils.skyBlockIsland,
+                "tablist" to TabListData.getTabList(),
+                "scoreboard" to ScoreboardData.sidebarLinesFormatted
+            )
         }
 
         // This code is modified from NEU, and depends on NEU (or another mod) sending /locraw.
@@ -248,7 +252,7 @@ class HypixelData {
         if (inSkyBlock) {
             checkIsland()
             checkSidebar()
-            getCurrentServerId()
+            checkCurrentServerId()
         }
 
         if (inSkyBlock == skyBlock) return
