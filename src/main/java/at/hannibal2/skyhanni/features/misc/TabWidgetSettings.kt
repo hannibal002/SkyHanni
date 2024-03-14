@@ -2,46 +2,64 @@ package at.hannibal2.skyhanni.features.misc
 
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.events.GuiContainerEvent
+import at.hannibal2.skyhanni.events.InventoryCloseEvent
+import at.hannibal2.skyhanni.events.InventoryFullyOpenedEvent
 import at.hannibal2.skyhanni.utils.InventoryUtils.getInventoryName
 import at.hannibal2.skyhanni.utils.InventoryUtils.getUpperItems
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.LorenzColor
 import at.hannibal2.skyhanni.utils.LorenzUtils
+import at.hannibal2.skyhanni.utils.NEUInternalName
 import at.hannibal2.skyhanni.utils.RenderUtils.highlight
+import at.hannibal2.skyhanni.utils.StringUtils.matches
+import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraft.client.gui.inventory.GuiChest
 import net.minecraft.inventory.ContainerChest
+import net.minecraft.inventory.Slot
+import net.minecraft.item.Item
+import net.minecraft.item.ItemStack
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
 class TabWidgetSettings {
 
-    private val mainPageWidgetPattern = "^§7Currently:.*".toRegex()
+//     private val mainPageWidgetPattern = "^§7Currently:.*".toRegex()
+//
+//     private val subPageWidgetPattern = "^§eClick to .*".toRegex(RegexOption.IGNORE_CASE)
+//
+//     private val shownSettingPattern = "Shown .* Setting.* |.*Widget Settings".toRegex(RegexOption.IGNORE_CASE)
 
-    private val subPageWidgetPattern = "^§eClick to .*".toRegex(RegexOption.IGNORE_CASE)
+    private val repoGroup = RepoPattern.group("tab.widget.setting")
+    private val mainPageSettingPattern by repoGroup.pattern("gui","^WIDGETS.*")
+    private val mainPageWidgetPattern by repoGroup.pattern("main","^§7Currently:.*")
+    private val subPageWidgetPattern by repoGroup.pattern("sub","^§eClick to .*")
+    private val shownSettingPattern by repoGroup.pattern("show","Shown .* Setting.* |.*Widget Settings")
 
-    private val shownSettingPattern = "Shown .* Setting.*".toRegex(RegexOption.IGNORE_CASE)
+    var inInventory = false;
+    private var highlights = mutableMapOf<Int, LorenzColor>()
 
     @SubscribeEvent
-    fun onBackgroundDrawn(event: GuiContainerEvent.BackgroundDrawnEvent) {
+    fun onInventoryOpen(event: InventoryFullyOpenedEvent) {
         if (!LorenzUtils.inSkyBlock) return
-        if (event.gui !is GuiChest) return
         if (!SkyHanniMod.feature.misc.highlightWidgets) return
+        highlights.clear()
 
-        val chest = event.gui.inventorySlots as ContainerChest
-        val inventoryName = chest.getInventoryName()
-        if (inventoryName.startsWith("Widgets ")) {
-            val items = chest.getUpperItems().filter { it.value.getLore().any { mainPageWidgetPattern.matches(it) } }
+//         val chest = event.gui.inventorySlots as ContainerChest
+        val inventoryName = event.inventoryName
+        println(mainPageSettingPattern.matches(inventoryName.uppercase()))
+        if (mainPageSettingPattern.matches(inventoryName.uppercase())) {
+            val items = event.inventoryItems.filter { it.value.getLore().any { mainPageWidgetPattern.matches(it) } }
             for ((slot, stack) in items) {
                 if (stack.getLore().any() { it.contains("ENABLED") }) {
-                    slot highlight LorenzColor.GREEN
+                    highlights[slot] = LorenzColor.GREEN
                 } else {
-                    slot highlight LorenzColor.RED
+                    highlights[slot] = LorenzColor.RED
                 }
             }
         }
 
-        if (inventoryName.endsWith("Widget Settings") || shownSettingPattern.matches(inventoryName)) {
+        if (shownSettingPattern.matches(inventoryName)) {
 
-            val items = chest.getUpperItems().filter {
+            val items = event.inventoryItems.filter {
                 val loreLastLine = it.value.getLore().lastOrNull()
                 subPageWidgetPattern.matches(loreLastLine ?: "")
             }
@@ -51,13 +69,36 @@ class TabWidgetSettings {
 
                 if (subPageWidgetPattern.matches(loreLastLine ?: "")) {
                     if (stack.getLore().any() { it.contains("disable!") }) {
-                        slot highlight LorenzColor.GREEN
+                        highlights[slot] = LorenzColor.GREEN
                     } else {
-                        slot highlight LorenzColor.RED
+                        highlights[slot] = LorenzColor.RED
                     }
                 }
             }
         }
 
+
+    }
+    @SubscribeEvent
+    fun onInventoryClose(event: InventoryCloseEvent) {
+        inInventory = false
+        highlights.clear()
+    }
+
+    @SubscribeEvent
+    fun onInventoryClose(event: GuiContainerEvent.CloseWindowEvent) {
+        inInventory = false
+        highlights.clear()
+    }
+
+
+    @SubscribeEvent
+    fun onBackgroundDrawn(event: GuiContainerEvent.BackgroundDrawnEvent) {
+        if (!LorenzUtils.inSkyBlock) return
+        if (!SkyHanniMod.feature.misc.highlightWidgets) return
+
+        event.gui.inventorySlots.inventorySlots
+            .filter { highlights.containsKey(it.slotNumber) }
+            .forEach { it highlight highlights[it.slotNumber]!! }
     }
 }
