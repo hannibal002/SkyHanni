@@ -17,6 +17,7 @@ import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.LorenzUtils
+import at.hannibal2.skyhanni.utils.StringUtils.matches
 import at.hannibal2.skyhanni.utils.TabListData
 
 class QuestLoader(private val dailyQuestHelper: DailyQuestHelper) {
@@ -51,6 +52,8 @@ class QuestLoader(private val dailyQuestHelper: DailyQuestHelper) {
     }
 
     private fun readQuest(line: String) {
+        if (!dailyQuestHelper.reputationHelper.tabListQuestPattern.matches(line)) return
+
         if (line.contains("The Great Spook")) {
             dailyQuestHelper.greatSpook = true
             dailyQuestHelper.update()
