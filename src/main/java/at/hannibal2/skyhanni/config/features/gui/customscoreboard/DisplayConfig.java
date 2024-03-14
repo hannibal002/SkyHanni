@@ -32,6 +32,12 @@ public class DisplayConfig {
     @ConfigEditorBoolean
     public boolean showAllActiveEvents = false;
 
+
+    @Expose
+    @ConfigOption(name = "Show Magical Power", desc = "Show your amount of Magical Power in the scoreboard.")
+    @ConfigEditorBoolean
+    public boolean showMagicalPower = true;
+
     @Expose
     @ConfigOption(name = "Number Format", desc = "")
     @ConfigEditorDropdown

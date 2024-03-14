@@ -129,7 +129,7 @@ enum class ScoreboardElement(
     POWER(
         ::getPowerDisplayPair,
         ::getPowerShowWhen,
-        "Power: §aSighted"
+        "Power: §aSighted §7(§61.263§7)"
     ),
     COOKIE(
         ::getCookieDisplayPair,
@@ -436,14 +436,14 @@ private fun getLobbyDisplayPair(): List<ScoreboardElementType> {
 private fun getPowerDisplayPair() = listOf(
     when (MaxwellAPI.currentPower) {
         null -> "§cOpen \"Your Bags\"!"
-        else ->
+        else -> {
+            val mp = if (displayConfig.showMagicalPower) "§7(§6${MaxwellAPI.magicalPower?.addSeparators()}§7)" else ""
             if (displayConfig.displayNumbersFirst) {
-                "§a${MaxwellAPI.currentPower?.replace("Power", "")} Power " +
-                    "§7(§6${MaxwellAPI.magicalPower}§7)"
+                "§a${MaxwellAPI.currentPower?.replace("Power", "")} Power $mp"
             } else {
-                "Power: §a${MaxwellAPI.currentPower?.replace("Power", "")} " +
-                    "§7(§6${MaxwellAPI.magicalPower?.addSeparators()}§7)"
+                "Power: §a${MaxwellAPI.currentPower?.replace("Power", "")} $mp"
             }
+        }
     } to HorizontalAlignment.LEFT
 )
 
