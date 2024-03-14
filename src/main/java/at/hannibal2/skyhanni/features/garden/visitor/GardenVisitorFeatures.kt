@@ -156,21 +156,23 @@ class GardenVisitorFeatures {
 //
 //            GET SUPERCRAFT FOR SACKS CODE
 //
-            val item =
-                NEUItems.getRecipes(internalName).first { !it.ingredients.first().internalItemId.contains("PEST") }
-            val ingredients = item.ingredients
+            if (config.shoppingList.showSuperCraft) {
+                val item =
+                    NEUItems.getRecipes(internalName).first { !it.ingredients.first().internalItemId.contains("PEST") }
+                val ingredients = item.ingredients
                 val ingredientReqs = mutableMapOf<String, Int>()
-                for(ingredient in ingredients) {
+                for (ingredient in ingredients) {
                     val ing = ingredient.serialize().split(":")
                     ingredientReqs[ing[0]] = ingredientReqs.getOrDefault(ing[0], 0) + ing[1].toDouble().toInt()
                 }
-            hasIngredients = true;
-            for((key, value) in ingredientReqs) {
-                val sackItem = SackAPI.fetchSackItem(key.asInternalName())
-                lastSuperCraftMaterial = internalName.itemName
-                if(sackItem.amount < value*amount) {
-                    hasIngredients = false;
-                    break;
+                hasIngredients = true;
+                for ((key, value) in ingredientReqs) {
+                    val sackItem = SackAPI.fetchSackItem(key.asInternalName())
+                    lastSuperCraftMaterial = internalName.itemName
+                    if (sackItem.amount < value * amount) {
+                        hasIngredients = false;
+                        break;
+                    }
                 }
             }
         }
@@ -331,7 +333,9 @@ class GardenVisitorFeatures {
 
     @SubscribeEvent
     fun onInventoryClose(event: InventoryCloseEvent) {
-        if(hasIngredients) { hasIngredients = false }
+        if (hasIngredients) {
+            hasIngredients = false
+        }
     }
 
     @SubscribeEvent
