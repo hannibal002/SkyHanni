@@ -4,18 +4,14 @@ import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.config.features.crimsonisle.SulphurSkitterBoxConfig
 import at.hannibal2.skyhanni.data.IslandType
-import at.hannibal2.skyhanni.data.jsonobjects.repo.ItemsJson
 import at.hannibal2.skyhanni.events.LorenzRenderWorldEvent
 import at.hannibal2.skyhanni.events.LorenzTickEvent
 import at.hannibal2.skyhanni.events.LorenzWorldChangeEvent
-import at.hannibal2.skyhanni.events.RepositoryReloadEvent
 import at.hannibal2.skyhanni.features.fishing.FishingAPI
 import at.hannibal2.skyhanni.utils.BlockUtils.getBlockAt
-import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.LocationUtils
 import at.hannibal2.skyhanni.utils.LocationUtils.distanceToPlayer
 import at.hannibal2.skyhanni.utils.LorenzUtils.isInIsland
-import at.hannibal2.skyhanni.utils.NEUInternalName
 import at.hannibal2.skyhanni.utils.RenderUtils
 import at.hannibal2.skyhanni.utils.RenderUtils.expandBlock
 import at.hannibal2.skyhanni.utils.SpecialColour
@@ -29,7 +25,6 @@ import java.awt.Color
 class SulphurSkitterBox {
 
     private val config get() = SkyHanniMod.feature.fishing.trophyFishing.sulphurSkitterBox
-    private var rods = listOf<NEUInternalName>()
     private var spongeBlocks = listOf<BlockPos>()
     private var closestBlock: BlockPos? = null
     private val radius = 8
@@ -102,18 +97,8 @@ class SulphurSkitterBox {
         }
     }
 
-    @SubscribeEvent
-    fun onRepoReload(event: RepositoryReloadEvent) {
-        val data = event.getConstant<ItemsJson>("Items")
-        rods = data.lava_fishing_rods ?: emptyList()
-
-        if (rods.isEmpty()) {
-            error("§cConstants Items is missing data, please use /shupdaterepo")
-        }
-    }
-
     fun isEnabled() =
-        IslandType.CRIMSON_ISLE.isInIsland() && config.enabled && (!config.onlyWithRods || InventoryUtils.itemInHandId in rods)
+        IslandType.CRIMSON_ISLE.isInIsland() && config.enabled && (!config.onlyWithRods || FishingAPI.holdingLavaRod)
 
 
     @SubscribeEvent

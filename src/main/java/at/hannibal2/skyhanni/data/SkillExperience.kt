@@ -7,7 +7,7 @@ import at.hannibal2.skyhanni.events.SkillExpGainEvent
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.ItemUtils.name
 import at.hannibal2.skyhanni.utils.LorenzUtils
-import at.hannibal2.skyhanni.utils.NumberUtil.formatNumber
+import at.hannibal2.skyhanni.utils.NumberUtil.formatLong
 import at.hannibal2.skyhanni.utils.NumberUtil.romanToDecimal
 import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
@@ -40,8 +40,8 @@ class SkillExperience {
 
         actionBarPattern.matchMatcher(event.actionBar) {
             val skill = group("skill").lowercase()
-            val overflow = group("overflow").formatNumber()
-            val neededForNextLevel = group("needed").formatNumber()
+            val overflow = group("overflow").formatLong()
+            val neededForNextLevel = group("needed").formatLong()
             val nextLevel = getLevelForExpExactly(neededForNextLevel)
             val baseExp = getExpForLevel(nextLevel - 1)
             val totalExp = baseExp + overflow
@@ -59,7 +59,7 @@ class SkillExperience {
         if (event.inventoryName != "Your Skills") return
 
         for ((_, stack) in event.inventoryItems) {
-            val name = stack.name?.removeColor() ?: continue
+            val name = stack.name.removeColor()
             if (!name.contains(" ")) continue
 
             val lore = stack.getLore()
@@ -76,8 +76,7 @@ class SkillExperience {
                     val level = split[1].romanToDecimal()
                     val baseExp = getExpForLevel(level)
                     inventoryPattern.matchMatcher(line) {
-                        val rawNumber = group("number")
-                        val overflow = rawNumber.formatNumber()
+                        val overflow = group("number").formatLong()
                         val experience = baseExp + overflow
                         skillExp[skillName] = experience
                     }

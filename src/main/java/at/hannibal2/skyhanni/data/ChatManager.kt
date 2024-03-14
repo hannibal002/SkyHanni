@@ -93,7 +93,13 @@ object ChatManager {
         )
 
         messageHistory[IdentityCharacteristics(component)] = result
-        if (MessageSendToServerEvent(message, message.split(" "), originatingModContainer).postAndCatch()) {
+        val trimmedMessage = message.trimEnd()
+        if (MessageSendToServerEvent(
+                trimmedMessage,
+                trimmedMessage.split(" "),
+                originatingModContainer
+            ).postAndCatch()
+        ) {
             event.isCanceled = true
             messageHistory[IdentityCharacteristics(component)] = result.copy(actionKind = ActionKind.OUTGOING_BLOCKED)
         }
@@ -106,7 +112,10 @@ object ChatManager {
         val original = event.message
         val message = LorenzUtils.stripVanillaMessage(original.formattedText)
 
-        if (message.startsWith("§f{\"server\":\"")) return
+        if (message.startsWith("§f{\"server\":\"")) {
+            HypixelData.checkForLocraw(message)
+            return
+        }
         val key = IdentityCharacteristics(original)
         val chatEvent = LorenzChatEvent(message, original)
         if (!isSoopyMessage(event.message)) {

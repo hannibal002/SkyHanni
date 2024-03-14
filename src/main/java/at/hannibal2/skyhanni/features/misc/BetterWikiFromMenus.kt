@@ -35,7 +35,8 @@ class BetterWikiFromMenus {
         val isWiki = event.slotId == 11 && itemClickedName.contains("Wiki Command")
         val isWikithis = event.slotId == 15 && itemClickedName.contains("Wikithis Command")
         val inBiblioInventory = chestName == "SkyBlock Wiki" && (isWiki || isWikithis)
-        val inSBGuideInventory = (itemClickedStack.getLore().let { it.any { line -> line == "§7§eClick to view on the SkyBlock Wiki!" } })
+        val inSBGuideInventory =
+            (itemClickedStack.getLore().let { it.any { line -> line == "§7§eClick to view on the SkyBlock Wiki!" } })
 
         if (inBiblioInventory) {
             if (isWiki) {

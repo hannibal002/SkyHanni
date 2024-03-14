@@ -1,10 +1,10 @@
 package at.hannibal2.skyhanni.utils
 
+import at.hannibal2.skyhanni.utils.LorenzUtils.round
+import at.hannibal2.skyhanni.utils.StringUtils.matches
 import java.text.NumberFormat
 import java.util.Locale
 import java.util.TreeMap
-import kotlin.math.max
-import kotlin.math.min
 import kotlin.math.pow
 import kotlin.math.roundToInt
 
@@ -92,7 +92,7 @@ object NumberUtil {
 
     fun Number.ordinal(): String {
         val long = this.toLong()
-        if (long % 100 in 11 .. 13) return "th"
+        if (long % 100 in 11..13) return "th"
         return when (long % 10) {
             1L -> "st"
             2L -> "nd"
@@ -173,26 +173,62 @@ object NumberUtil {
     }
 
     val pattern = "^[0-9]*$".toPattern()
+    val formatPattern = "^[0-9,.]*[kmb]?$".toPattern()
 
     fun String.isInt(): Boolean {
         return isNotEmpty() && pattern.matcher(this).matches()
     }
 
-    fun percentageColor(have: Long, max: Long): LorenzColor {
-        val percentage = have.fractionOf(max)
-        return when {
-            percentage > 0.9 -> LorenzColor.DARK_GREEN
-            percentage > 0.75 -> LorenzColor.GREEN
-            percentage > 0.5 -> LorenzColor.YELLOW
-            percentage > 0.25 -> LorenzColor.GOLD
-            else -> LorenzColor.RED
-        }
+    fun String.isFormatNumber(): Boolean {
+        return isNotEmpty() && formatPattern.matches(this)
+    }
+
+    fun percentageColor(percentage: Double) = when {
+        percentage > 0.9 -> LorenzColor.DARK_GREEN
+        percentage > 0.75 -> LorenzColor.GREEN
+        percentage > 0.5 -> LorenzColor.YELLOW
+        percentage > 0.25 -> LorenzColor.GOLD
+        else -> LorenzColor.RED
+    }
+
+    fun percentageColor(have: Long, max: Long): LorenzColor = percentageColor(have.fractionOf(max))
+
+    fun Number.percentWithColorCode(max: Number, round: Int = 1): String {
+        val fraction = this.fractionOf(max)
+        val color = percentageColor(fraction)
+        val amount = (fraction * 100.0).round(round)
+        return "${color.getChatColor()}$amount%"
     }
 
     // TODO create new function formatLong, and eventually deprecate this function.
-    fun String.formatNumber(): Long = formatDouble().toLong()
+    @Deprecated("renamed", ReplaceWith("this.formatLong()"))
+    fun String.formatNumber(): Long = formatLong()
 
-    fun String.formatDouble(): Double {
+    fun String.formatDouble(): Double =
+        formatDoubleOrNull() ?: throw NumberFormatException("formatDouble failed for '$this'")
+
+    fun String.formatLong(): Long =
+        formatDoubleOrNull()?.toLong() ?: throw NumberFormatException("formatLong failed for '$this'")
+
+    fun String.formatInt(): Int =
+        formatDoubleOrNull()?.toInt() ?: throw NumberFormatException("formatInt failed for '$this'")
+
+    fun String.formatDoubleOrUserError(): Double? = formatDoubleOrNull() ?: run {
+        ChatUtils.userError("Not a valid number: '$this'")
+        return@run null
+    }
+
+    fun String.formatLongOrUserError(): Long? = formatDoubleOrNull()?.toLong() ?: run {
+        ChatUtils.userError("Not a valid number: '$this'")
+        return@run null
+    }
+
+    fun String.formatIntOrUserError(): Int? = formatDoubleOrNull()?.toInt() ?: run {
+        ChatUtils.userError("Not a valid number: '$this'")
+        return@run null
+    }
+
+    private fun String.formatDoubleOrNull(): Double? {
         var text = lowercase().replace(",", "")
 
         val multiplier = if (text.endsWith("k")) {
@@ -200,19 +236,22 @@ object NumberUtil {
             1_000.0
         } else if (text.endsWith("m")) {
             text = text.substring(0, text.length - 1)
-            1.milion
+            1.million
         } else if (text.endsWith("b")) {
             text = text.substring(0, text.length - 1)
-            1.bilion
+            1.billion
         } else 1.0
-        val d = text.toDouble()
-        return d * multiplier
+        return text.toDoubleOrNull()?.let {
+            it * multiplier
+        }
     }
 
-    val Int.milion get() = this * 1_000_000.0
-    private val Int.bilion get() = this * 1_000_000_000.0
-    val Double.milion get() = (this * 1_000_000.0).toLong()
 
+    // Sometimes we just take an L, never find it and forget to write it down
+    val Int.million get() = this * 1_000_000.0
+    private val Int.billion get() = this * 1_000_000_000.0
+    val Double.million get() = (this * 1_000_000.0).toLong()
+    
     /** @return clamped to [0.0, 1.0]**/
     fun Number.fractionOf(maxValue: Number) = maxValue.toDouble().takeIf { it != 0.0 }?.let { max ->
         this.toDouble() / max

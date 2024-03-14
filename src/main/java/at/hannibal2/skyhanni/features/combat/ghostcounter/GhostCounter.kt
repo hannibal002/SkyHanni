@@ -15,7 +15,6 @@ import at.hannibal2.skyhanni.events.LorenzTickEvent
 import at.hannibal2.skyhanni.events.PurseChangeCause
 import at.hannibal2.skyhanni.events.PurseChangeEvent
 import at.hannibal2.skyhanni.events.TabListUpdateEvent
-import at.hannibal2.skyhanni.features.bazaar.BazaarApi.Companion.getBazaarData
 import at.hannibal2.skyhanni.features.combat.ghostcounter.GhostData.Option
 import at.hannibal2.skyhanni.features.combat.ghostcounter.GhostData.Option.KILLS
 import at.hannibal2.skyhanni.features.combat.ghostcounter.GhostData.bestiaryData
@@ -24,6 +23,7 @@ import at.hannibal2.skyhanni.features.combat.ghostcounter.GhostUtil.formatText
 import at.hannibal2.skyhanni.features.combat.ghostcounter.GhostUtil.isUsingCTGhostCounter
 import at.hannibal2.skyhanni.features.combat.ghostcounter.GhostUtil.preFormat
 import at.hannibal2.skyhanni.features.combat.ghostcounter.GhostUtil.prettyTime
+import at.hannibal2.skyhanni.features.inventory.bazaar.BazaarApi.Companion.getBazaarData
 import at.hannibal2.skyhanni.utils.ChatUtils.chat
 import at.hannibal2.skyhanni.utils.ChatUtils.clickableChat
 import at.hannibal2.skyhanni.utils.CollectionUtils.addAsSingletonList
@@ -182,7 +182,7 @@ object GhostCounter {
         val bestiary = if (config.showMax) {
             when (nextLevel) {
                 26 -> bestiaryFormatting.maxed.replace("%currentKill%", currentKill.addSeparators())
-                in 1 .. 25 -> {
+                in 1..25 -> {
                     val sum = bestiaryData.filterKeys { it <= nextLevel - 1 }.values.sum()
 
                     val cKill = sum + currentKill
@@ -195,7 +195,7 @@ object GhostCounter {
         } else {
             when (nextLevel) {
                 26 -> bestiaryFormatting.maxed
-                in 1 .. 25 -> bestiaryFormatting.progress
+                in 1..25 -> bestiaryFormatting.progress
                 else -> bestiaryFormatting.openMenu
             }
         }
@@ -301,7 +301,7 @@ object GhostCounter {
                     val res = current.formatNumber().toString()
                     gain = (res.toLong() - lastXp.toLong()).toDouble().roundToInt()
                     num = (gain.toDouble() / gained)
-                    if (gained in 150.0 .. 450.0 && lastXp != "0" && num >= 0) {
+                    if (gained in 150.0..450.0 && lastXp != "0" && num >= 0) {
                         KILLS.add(num)
                         KILLS.add(num, true)
                         Option.GHOSTSINCESORROW.add(num)
@@ -403,7 +403,6 @@ object GhostCounter {
     @SubscribeEvent
     fun onChat(event: LorenzChatEvent) {
         if (!isEnabled()) return
-        if (LorenzUtils.skyBlockIsland != IslandType.DWARVEN_MINES) return
         for (opt in Option.entries) {
             val pattern = opt.pattern ?: continue
             pattern.matchMatcher(event.message) {
@@ -517,5 +516,5 @@ object GhostCounter {
         }
     }
 
-    fun isEnabled() = config.enabled && IslandType.DWARVEN_MINES.isInIsland()
+    fun isEnabled() = IslandType.DWARVEN_MINES.isInIsland() && config.enabled
 }

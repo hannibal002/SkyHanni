@@ -11,14 +11,15 @@ import at.hannibal2.skyhanni.events.LorenzChatEvent
 import at.hannibal2.skyhanni.events.LorenzKeyPressEvent
 import at.hannibal2.skyhanni.events.LorenzRenderWorldEvent
 import at.hannibal2.skyhanni.events.LorenzWorldChangeEvent
-import at.hannibal2.skyhanni.events.withAlpha
 import at.hannibal2.skyhanni.features.garden.farming.GardenCropSpeed
 import at.hannibal2.skyhanni.mixins.hooks.RenderLivingEntityHelper
 import at.hannibal2.skyhanni.test.GriffinUtils.drawWaypointFilled
 import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.ChatUtils
+import at.hannibal2.skyhanni.utils.ColorUtils.withAlpha
 import at.hannibal2.skyhanni.utils.ConfigUtils
 import at.hannibal2.skyhanni.utils.EntityUtils
+import at.hannibal2.skyhanni.utils.LocationUtils
 import at.hannibal2.skyhanni.utils.LocationUtils.distanceToPlayer
 import at.hannibal2.skyhanni.utils.LorenzColor
 import at.hannibal2.skyhanni.utils.LorenzUtils
@@ -58,6 +59,10 @@ object TrevorFeatures {
         "below",
         "The target is around (?<height>.*) blocks below, at a (?<angle>.*) degrees angle!"
     )
+    private val talbotPatternAt by patternGroup.pattern(
+        "at",
+        "You are at the exact height!",
+    )
     private val locationPattern by patternGroup.pattern(
         "zone",
         "Zone: (?<zone>.*)"
@@ -89,7 +94,7 @@ object TrevorFeatures {
                         TrevorTracker.calculatePeltsPerHour()
                         if (questActive) TrevorSolver.findMob()
                     } catch (error: Throwable) {
-                        ErrorManager.logError(error, "Encountered an error when updating the trapper solver")
+                        ErrorManager.logErrorWithData(error, "Encountered an error when updating the trapper solver")
                     }
                 }
             }
@@ -137,6 +142,9 @@ object TrevorFeatures {
         talbotPatternBelow.matchMatcher(formattedMessage) {
             val height = group("height").toInt()
             TrevorSolver.findMobHeight(height, false)
+        }
+        talbotPatternAt.matchMatcher(formattedMessage) {
+            TrevorSolver.averageHeight = LocationUtils.playerLocation().y
         }
 
         if (formattedMessage == "[NPC] Trevor: You will have 10 minutes to find the mob from when you accept the task.") {
@@ -228,7 +236,7 @@ object TrevorFeatures {
         var entityTrapper = EntityUtils.getEntityByID(trapperID)
         if (entityTrapper !is EntityLivingBase) entityTrapper = EntityUtils.getEntityByID(backupTrapperID)
         if (entityTrapper is EntityLivingBase && config.trapperTalkCooldown) {
-            RenderLivingEntityHelper.setEntityColor(entityTrapper, currentStatus.color)
+            RenderLivingEntityHelper.setEntityColorWithNoHurtTime(entityTrapper, currentStatus.color)
             { config.trapperTalkCooldown }
             entityTrapper.getLorenzVec().let {
                 if (it.distanceToPlayer() < 15) {
