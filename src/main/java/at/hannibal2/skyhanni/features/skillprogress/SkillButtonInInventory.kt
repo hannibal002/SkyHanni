@@ -23,6 +23,7 @@ class SkillButtonInInventory {
             stack.item,
             "§aStack Size Currently ON",
             13,
+            "§8(From SkyHanni)",
             "",
             "§7§eClick to toggle!")
     }
@@ -33,6 +34,7 @@ class SkillButtonInInventory {
             stack.item,
             "§aTooltip Currently ON",
             13,
+            "§8(From SkyHanni)",
             "",
             "§7§eClick to toggle!")
 
@@ -44,6 +46,7 @@ class SkillButtonInInventory {
             stack.item,
             "§aCustom Goal Currently ON",
             13,
+            "§8(From SkyHanni)",
             "",
             "§7§eClick to toggle!")
 
@@ -55,6 +58,7 @@ class SkillButtonInInventory {
             stack.item,
             "§cStack Size Currently OFF",
             14,
+            "§8(From SkyHanni)",
             "",
             "§7§eClick to toggle!")
     }
@@ -65,6 +69,7 @@ class SkillButtonInInventory {
             stack.item,
             "§cTooltip Currently OFF",
             14,
+            "§8(From SkyHanni)",
             "",
             "§7§eClick to toggle!")
     }
@@ -75,6 +80,7 @@ class SkillButtonInInventory {
             stack.item,
             "§cCustom Goal Currently OFF",
             14,
+            "§8(From SkyHanni)",
             "",
             "§7§eClick to toggle!")
     }
