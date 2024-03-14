@@ -208,6 +208,7 @@ import at.hannibal2.skyhanni.features.garden.visitor.GardenVisitorFeatures
 import at.hannibal2.skyhanni.features.garden.visitor.GardenVisitorTimer
 import at.hannibal2.skyhanni.features.garden.visitor.HighlightVisitorsOutsideOfGarden
 import at.hannibal2.skyhanni.features.garden.visitor.NPCVisitorFix
+import at.hannibal2.skyhanni.features.garden.visitor.VisitorAPI
 import at.hannibal2.skyhanni.features.garden.visitor.VisitorListener
 import at.hannibal2.skyhanni.features.garden.visitor.VisitorRewardWarning
 import at.hannibal2.skyhanni.features.gui.customscoreboard.CustomScoreboard
@@ -408,7 +409,7 @@ import org.apache.logging.log4j.Logger
     clientSideOnly = true,
     useMetadata = true,
     guiFactory = "at.hannibal2.skyhanni.config.ConfigGuiForgeInterop",
-    version = "0.24.Beta.11",
+    version = "0.24.Beta.12",
 )
 class SkyHanniMod {
 
@@ -500,6 +501,7 @@ class SkyHanniMod {
         loadModule(BitsAPI)
         loadModule(MayorAPI)
         loadModule(SkillAPI)
+        loadModule(VisitorAPI)
         loadModule(IsFishingDetection)
         loadModule(LorenzUtils)
         loadModule(NEUItems)

@@ -16,6 +16,7 @@ import at.hannibal2.skyhanni.features.garden.GardenAPI
 import at.hannibal2.skyhanni.features.garden.visitor.VisitorAPI.ACCEPT_SLOT
 import at.hannibal2.skyhanni.features.garden.visitor.VisitorAPI.INFO_SLOT
 import at.hannibal2.skyhanni.features.garden.visitor.VisitorAPI.lastClickedNpc
+import at.hannibal2.skyhanni.features.garden.visitor.VisitorAPI.VisitorStatus
 import at.hannibal2.skyhanni.mixins.transformers.gui.AccessorGuiContainer
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.ItemUtils.name
@@ -35,13 +36,14 @@ import net.minecraftforge.event.entity.player.ItemTooltipEvent
 import net.minecraftforge.fml.common.eventhandler.EventPriority
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
-private val config get() = VisitorAPI.config
 
 class VisitorListener {
     private val offersAcceptedPattern by RepoPattern.pattern(
         "garden.visitor.offersaccepted",
         "§7Offers Accepted: §a(?<offersAccepted>\\d+)"
     )
+
+    private val config get() = VisitorAPI.config
 
     private val logger = LorenzLogger("garden/visitors/listener")
 

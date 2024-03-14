@@ -130,7 +130,7 @@ enum class ScoreboardElement(
     POWER(
         ::getPowerDisplayPair,
         ::getPowerShowWhen,
-        "Power: Sighted"
+        "Power: §aSighted"
     ),
     COOKIE(
         ::getCookieDisplayPair,
@@ -179,7 +179,7 @@ enum class ScoreboardElement(
     PARTY(
         ::getPartyDisplayPair,
         ::getPartyShowWhen,
-        "§9§lParty (4):\n §7- §fhannibal2\n §7- §fMoulberry\n §7- §fVahvl\n §7- §fJ10a1n15"
+        "§9§lParty (4):\n §7- §fhannibal2\n §7- §fMoulberry\n §7- §fVahvl\n §7- §fSkirtwearer"
     ),
     FOOTER(
         ::getFooterDisplayPair,
@@ -190,6 +190,21 @@ enum class ScoreboardElement(
         ::getExtraDisplayPair,
         ::getExtraShowWhen,
         "§cUnknown lines the mod is not detecting"
+    ),
+    EMPTY_LINE4(
+        ::getEmptyLineDisplayPair,
+        { true },
+        ""
+    ),
+    EMPTY_LINE5(
+        ::getEmptyLineDisplayPair,
+        { true },
+        ""
+    ),
+    EMPTY_LINE6(
+        ::getEmptyLineDisplayPair,
+        { true },
+        ""
     ),
     ;
 
@@ -427,10 +442,10 @@ private fun getPowerDisplayPair() = listOf(
         null -> "§cOpen \"Your Bags\"!"
         else ->
             if (displayConfig.displayNumbersFirst) {
-                "${MaxwellAPI.currentPower?.replace("Power", "")} Power " +
+                "§a${MaxwellAPI.currentPower?.replace("Power", "")} Power " +
                     "§7(§6${MaxwellAPI.magicalPower}§7)"
             } else {
-                "Power: ${MaxwellAPI.currentPower?.replace("Power", "")} " +
+                "Power: §a${MaxwellAPI.currentPower?.replace("Power", "")} " +
                     "§7(§6${MaxwellAPI.magicalPower?.addSeparators()}§7)"
             }
     } to HorizontalAlignment.LEFT

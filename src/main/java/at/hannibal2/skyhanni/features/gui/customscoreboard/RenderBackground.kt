@@ -19,7 +19,7 @@ import org.lwjgl.opengl.GL11
 class RenderBackground {
     fun renderBackground() {
         val position = config.position
-        val border = 5
+        val border = backgroundConfig.borderSize
 
         val x = position.getAbsX()
         val y = position.getAbsY()
@@ -38,7 +38,7 @@ class RenderBackground {
             position.set(
                 Position(
                     if (config.displayConfig.alignment.alignRight)
-                        scaledWidth - elementWidth - (backgroundConfig.borderSize * 2)
+                        scaledWidth - elementWidth - (border * 2)
                     else x,
                     if (config.displayConfig.alignment.alignCenterVertically)
                         scaledHeight / 2 - elementHeight / 2
@@ -63,18 +63,18 @@ class RenderBackground {
                 Minecraft.getMinecraft().textureManager.bindTexture(textureLocation)
 
                 Utils.drawTexturedRect(
-                    (x - backgroundConfig.borderSize).toFloat(),
-                    (y - backgroundConfig.borderSize).toFloat(),
-                    (elementWidth + backgroundConfig.borderSize * 3).toFloat(),
+                    (x - border).toFloat(),
+                    (y - border).toFloat(),
+                    (elementWidth + border * 3).toFloat(),
                     (elementHeight + border * 2).toFloat(),
                     GL11.GL_NEAREST
                 )
             } else {
                 RenderUtils.drawRoundRect(
-                    x - backgroundConfig.borderSize,
-                    y - backgroundConfig.borderSize,
-                    elementWidth + backgroundConfig.borderSize * 3,
-                    elementHeight + backgroundConfig.borderSize * 2,
+                    x - border,
+                    y - border,
+                    elementWidth + border * 3,
+                    elementHeight + border * 2,
                     SpecialColour.specialToChromaRGB(backgroundConfig.color),
                     backgroundConfig.roundedCornerSmoothness
                 )
