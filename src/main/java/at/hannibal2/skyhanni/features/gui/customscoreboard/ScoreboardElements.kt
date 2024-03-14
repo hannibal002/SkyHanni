@@ -499,8 +499,7 @@ private fun getSlayerDisplayPair(): List<ScoreboardElementType> = listOf(
     (" §7- §e${SlayerAPI.latestSlayerProgress.trim()}" to HorizontalAlignment.LEFT)
 )
 
-// TODO: Redo the Slayer showWhen
-private fun getSlayerShowWhen() = true
+private fun getSlayerShowWhen() = informationFilteringConfig.hideIrrelevantLines && SlayerAPI.isInCorrectArea
 
 private fun getQuiverDisplayPair(): List<ScoreboardElementType> {
     if (QuiverAPI.currentArrow == null)
