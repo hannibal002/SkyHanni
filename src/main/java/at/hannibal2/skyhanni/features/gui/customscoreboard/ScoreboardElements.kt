@@ -540,11 +540,11 @@ private fun getPowderDisplayPair() = buildList {
         getGroupFromPattern(TabListData.getTabList(), ScoreboardPattern.gemstonePowderPattern, "gemstonepowder")
             .formatNum()
 
-    add("§9§lPowder" to HorizontalAlignment.LEFT)
-
     if (informationFilteringConfig.hideEmptyLines && mithrilPowder == "0" && gemstonePowder == "0") {
-        add(0, "<hidden>" to HorizontalAlignment.LEFT)
+        add("<hidden>" to HorizontalAlignment.LEFT)
     } else {
+        add("§9§lPowder" to HorizontalAlignment.LEFT)
+
         if (displayConfig.displayNumbersFirst) {
             add(" §7- §2$mithrilPowder Mithril" to HorizontalAlignment.LEFT)
             add(" §7- §d$gemstonePowder Gemstone" to HorizontalAlignment.LEFT)
