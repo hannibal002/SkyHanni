@@ -31,6 +31,7 @@ import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.CollectionUtils.addAsSingletonList
 import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.InventoryUtils.getInventoryName
+import at.hannibal2.skyhanni.utils.InventoryUtils.getUpperItems
 import at.hannibal2.skyhanni.utils.ItemUtils.name
 import at.hannibal2.skyhanni.utils.LorenzColor
 import at.hannibal2.skyhanni.utils.LorenzUtils
@@ -96,11 +97,7 @@ class DailyQuestHelper(val reputationHelper: CrimsonIsleReputationHelper) {
             val dojoQuest = getQuest<DojoQuest>() ?: return
             if (dojoQuest.state != QuestState.ACCEPTED) return
 
-            for (slot in chest.inventorySlots) {
-                if (slot == null) continue
-                if (slot.slotNumber != slot.slotIndex) continue
-                val stack = slot.stack ?: continue
-
+            for ((slot, stack) in chest.getUpperItems()) {
                 if (stack.name.contains(dojoQuest.dojoName)) {
                     slot highlight LorenzColor.AQUA
                 }
@@ -179,7 +176,10 @@ class DailyQuestHelper(val reputationHelper: CrimsonIsleReputationHelper) {
     }
 
     private fun renderTownBoard(event: LorenzRenderWorldEvent) {
-        if (quests.any { it.state == QuestState.READY_TO_COLLECT || it.state == QuestState.NOT_ACCEPTED }) {
+        if (quests.any {
+                it.state == QuestState.READY_TO_COLLECT ||
+                it.state == QuestState.NOT_ACCEPTED ||
+                (it is RescueMissionQuest && it.state == QuestState.ACCEPTED) }) {
             val location = when (reputationHelper.factionType) {
                 FactionType.BARBARIAN -> townBoardBarbarian
                 FactionType.MAGE -> townBoardMage

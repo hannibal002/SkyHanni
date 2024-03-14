@@ -80,4 +80,26 @@ object InventoryUtils {
         countItemsInLowerInventory { it.getInternalNameOrNull() == name }
 
     fun isItemInInventory(name: NEUInternalName) = getAmountOfItemInInventory(name) > 0
+
+    fun ContainerChest.getUpperItems(): Map<Slot, ItemStack> = buildMap {
+        for ((slot, stack) in getAllItems()) {
+            if (slot.slotNumber != slot.slotIndex) continue
+            this[slot] = stack
+        }
+    }
+
+    fun ContainerChest.getLowerItems(): Map<Slot, ItemStack> = buildMap {
+        for ((slot, stack) in getAllItems()) {
+            if (slot.slotNumber == slot.slotIndex) continue
+            this[slot] = stack
+        }
+    }
+
+    fun ContainerChest.getAllItems(): Map<Slot, ItemStack> = buildMap {
+        for (slot in inventorySlots) {
+            if (slot == null) continue
+            val stack = slot.stack ?: continue
+            this[slot] = stack
+        }
+    }
 }

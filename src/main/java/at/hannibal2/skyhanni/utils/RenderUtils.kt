@@ -4,6 +4,7 @@ import at.hannibal2.skyhanni.config.core.config.Position
 import at.hannibal2.skyhanni.data.GuiEditManager
 import at.hannibal2.skyhanni.data.GuiEditManager.Companion.getAbsX
 import at.hannibal2.skyhanni.data.GuiEditManager.Companion.getAbsY
+import at.hannibal2.skyhanni.data.GuiEditManager.Companion.getDummySize
 import at.hannibal2.skyhanni.events.GuiRenderItemEvent
 import at.hannibal2.skyhanni.events.LorenzRenderWorldEvent
 import at.hannibal2.skyhanni.features.misc.RoundedRectangleShader
@@ -37,7 +38,16 @@ import kotlin.time.DurationUnit
 
 object RenderUtils {
 
-    enum class HorizontalAlignment { LEFT, CENTER, RIGHT }
+    enum class HorizontalAlignment(private val value: String) {
+        LEFT("Left"),
+        CENTER("Center"),
+        RIGHT("Right"),
+        ;
+
+        override fun toString(): String {
+            return value
+        }
+    }
     enum class VerticalAlignment { TOP, CENTER, BOTTOM }
 
     private val beaconBeam = ResourceLocation("textures/entity/beacon_beam.png")
@@ -401,6 +411,36 @@ object RenderUtils {
         return renderer.getStringWidth(display)
     }
 
+    // Aligns using the width of element to render
+    private fun Position.renderString0(
+        string: String?,
+        offsetX: Int = 0,
+        offsetY: Int = 0,
+        alignmentEnum: HorizontalAlignment
+    ): Int {
+        val display = "§f$string"
+        GlStateManager.pushMatrix()
+        transform()
+        val minecraft = Minecraft.getMinecraft()
+        val renderer = minecraft.renderManager.fontRenderer
+        val width = this.getDummySize().x / this.scale
+
+        GlStateManager.translate(offsetX + 1.0, offsetY + 1.0, 0.0)
+
+        val strLen: Int = renderer.getStringWidth(string)
+        val x2 = when (alignmentEnum) {
+            HorizontalAlignment.LEFT -> offsetX.toFloat()
+            HorizontalAlignment.CENTER -> offsetX + width / 2f - strLen / 2f
+            HorizontalAlignment.RIGHT -> offsetX + width - strLen.toFloat()
+        }
+        GL11.glTranslatef(x2, 0f, 0f)
+        renderer.drawStringWithShadow(display, 0f, 0f, 0)
+
+        GlStateManager.popMatrix()
+
+        return renderer.getStringWidth(display)
+    }
+
     fun Position.renderStrings(list: List<String>, extraSpace: Int = 0, posLabel: String) {
         if (list.isEmpty()) return
 
@@ -408,6 +448,25 @@ object RenderUtils {
         var longestX = 0
         for (s in list) {
             val x = renderString0(s, offsetY = offsetY, centered = false)
+            if (x > longestX) {
+                longestX = x
+            }
+            offsetY += 10 + extraSpace
+        }
+        GuiEditManager.add(this, posLabel, longestX, offsetY)
+    }
+
+    fun Position.renderStringsAlignedWidth(
+        list: List<Pair<String, HorizontalAlignment>>,
+        extraSpace: Int = 0,
+        posLabel: String
+    ) {
+        if (list.isEmpty()) return
+
+        var offsetY = 0
+        var longestX = 0
+        for (pair in list) {
+            val x = renderString0(pair.first, offsetY = offsetY, alignmentEnum = pair.second)
             if (x > longestX) {
                 longestX = x
             }

@@ -44,6 +44,11 @@ public class DevConfig {
     @ConfigEditorBoolean
     public boolean worldEdit = false;
 
+    @Expose
+    @ConfigOption(name = "Bow Sound distance", desc = "The distance in blocks where the sound of shooting a bow will be used for the QuiverAPI.")
+    @ConfigEditorSlider(minValue = 0, maxValue = 50, minStep = 1)
+    public int bowSoundDistance = 5;
+
     @ConfigOption(name = "Parkour Waypoints", desc = "")
     @Accordion
     @Expose

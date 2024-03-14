@@ -3,11 +3,11 @@ package at.hannibal2.skyhanni.features.misc.compacttablist
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.SkipTabListLineEvent
-import at.hannibal2.skyhanni.mixins.transformers.AccessorGuiPlayerTabOverlay
 import at.hannibal2.skyhanni.utils.CollectionUtils.filterToMutable
 import at.hannibal2.skyhanni.utils.KeyboardManager.isActive
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.StringUtils.matches
+import at.hannibal2.skyhanni.utils.TabListData.Companion.getPlayerTabOverlay
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraft.client.Minecraft
 import net.minecraft.client.gui.Gui
@@ -15,7 +15,6 @@ import net.minecraft.client.gui.ScaledResolution
 import net.minecraft.client.renderer.GlStateManager
 import net.minecraft.entity.player.EnumPlayerModelParts
 import net.minecraftforge.client.event.RenderGameOverlayEvent
-import net.minecraftforge.fml.common.eventhandler.EventPriority
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
 object TabListRenderer {
@@ -42,8 +41,7 @@ object TabListRenderer {
     private var isPressed = false
     private var isTabToggled = false
 
-    // compact scoreboard should render above other SkyHanni GUIs when toggle tab is in use.
-    @SubscribeEvent(priority = EventPriority.LOW)
+    @SubscribeEvent
     fun onRenderOverlay(event: GuiRenderEvent.GuiOverlayRenderEvent) {
         if (!LorenzUtils.inSkyBlock) return
         if (!config.enabled) return
@@ -64,10 +62,14 @@ object TabListRenderer {
         }
     }
 
+    private val tabZOffest = 10f
+
     private fun drawTabList() {
         val columns = TabListReader.renderColumns
 
         if (columns.isEmpty()) return
+
+        GlStateManager.translate(0f, 0f, tabZOffest)
 
         var maxLines = 0
         var totalWidth = 0 - columnSpacing
@@ -78,7 +80,7 @@ object TabListRenderer {
         }
 
         var totalHeight = maxLines * lineHeight
-        val tabList = Minecraft.getMinecraft().ingameGUI.tabList as AccessorGuiPlayerTabOverlay
+        val tabList = getPlayerTabOverlay()
 
         var header = listOf<String>()
         if (tabList.header_skyhanni != null) {
@@ -208,6 +210,7 @@ object TabListRenderer {
                 footerY += lineHeight
             }
         }
+        GlStateManager.translate(0f, 0f, -tabZOffest)
     }
 
     private val fireSalePattern by RepoPattern.pattern(

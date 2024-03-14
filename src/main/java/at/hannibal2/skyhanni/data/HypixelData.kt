@@ -300,9 +300,12 @@ class HypixelData {
     private fun checkIsland() {
         var newIsland = ""
         var guesting = false
+        TabListData.fullyLoaded = false
+
         for (line in TabListData.getTabList()) {
             islandNamePattern.matchMatcher(line) {
                 newIsland = group("island").removeColor()
+                TabListData.fullyLoaded = true
             }
             if (line == " Status: §r§9Guest") {
                 guesting = true
