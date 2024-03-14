@@ -83,10 +83,10 @@ class GardenLevelDisplay {
     fun onInventoryOpen(event: InventoryFullyOpenedEvent) {
         if (!GardenAPI.inGarden()) return
         val item = when (event.inventoryName) {
-            "Desk" -> event.inventoryItems[4]!!
-            "SkyBlock Menu" -> event.inventoryItems[10]!!
-            else -> null
-        } ?: return
+            "Desk" -> event.inventoryItems[4] ?: return
+            "SkyBlock Menu" -> event.inventoryItems[10] ?: return
+            else -> return
+        }
         gardenItemNamePattern.matchMatcher(item.name.removeColor()) {} ?: return
         var nextLevelExp = 0L
         var currentLevel = 0
