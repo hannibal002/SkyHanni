@@ -226,6 +226,13 @@ public class MiscConfig {
     @FeatureToggle
     public boolean showTimeInLimbo = true;
 
+    
+    @Expose
+    @ConfigOption(name = "Abiphone Contacts Progress", desc = "Displays the progress you've been making on upgrading your Abiphone contact slots.")
+    @ConfigEditorBoolean
+    @FeatureToggle
+    public boolean abiphoneContactsProgress = false;
+
     @Expose
     @ConfigOption(
         name = "Lesser Orb of Healing Hider",
