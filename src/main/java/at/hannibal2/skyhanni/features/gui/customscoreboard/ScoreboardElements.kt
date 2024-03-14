@@ -392,10 +392,11 @@ private fun getLocationDisplayPair() = buildList {
             ScoreboardData.sidebarLinesFormatted,
             ScoreboardPattern.locationPattern,
             "location"
-        ).trim() to HorizontalAlignment.LEFT)
+        ).trim() to HorizontalAlignment.LEFT
+    )
 
-    val plotLine = ScoreboardData.sidebarLinesFormatted.firstOrNull { ScoreboardPattern.plotPattern.matches(it) }
-    if (plotLine != null) add(plotLine to HorizontalAlignment.LEFT)
+    ScoreboardData.sidebarLinesFormatted.firstOrNull { ScoreboardPattern.plotPattern.matches(it) }
+        ?.let { add(it to HorizontalAlignment.LEFT) }
 }
 
 private fun getVisitDisplayPair() =
