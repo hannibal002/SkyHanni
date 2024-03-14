@@ -1,5 +1,6 @@
 package at.hannibal2.skyhanni.config;
 
+import at.hannibal2.skyhanni.data.FameRank;
 import at.hannibal2.skyhanni.api.SkillAPI;
 import at.hannibal2.skyhanni.data.model.ComposterUpgrade;
 import at.hannibal2.skyhanni.features.bingo.card.goals.BingoGoal;
@@ -78,6 +79,9 @@ public class Storage {
     @Expose
     public Map<UUID, PlayerSpecific> players = new HashMap<>();
 
+    @Expose
+    public String currentFameRank = null;
+
     public static class PlayerSpecific {
 
         @Expose
@@ -145,6 +149,39 @@ public class Storage {
 
         @Expose
         public String currentPet = "";
+
+        @Expose
+        public MaxwellPowerStorage maxwell = new MaxwellPowerStorage();
+
+        public static class MaxwellPowerStorage {
+            @Expose
+            public String currentPower = null;
+
+            @Expose
+            public int magicalPower = -1;
+        }
+
+        @Expose
+        public ArrowsStorage arrows = new ArrowsStorage();
+
+        public static class ArrowsStorage {
+            @Expose
+            public String currentArrow = null;
+
+            @Expose
+            public Map<NEUInternalName, Float> arrowAmount = new HashMap<>();
+        }
+
+        @Expose
+        public BitsStorage bits = new BitsStorage();
+
+        public static class BitsStorage {
+            @Expose
+            public int bits = -1;
+
+            @Expose
+            public int bitsToClaim = -1;
+        }
 
         @Expose
         public Map<LorenzVec, MinionConfig> minions = new HashMap<>();

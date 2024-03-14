@@ -33,7 +33,7 @@ object FarmingContestAPI {
         "crop",
         "§8(?<crop>.*) Contest"
     )
-    private val sidebarCropPattern by patternGroup.pattern(
+    val sidebarCropPattern by patternGroup.pattern(
         "sidebarcrop",
         "(?:§e○|§6☘) §f(?<crop>.*) §a.*"
     )
