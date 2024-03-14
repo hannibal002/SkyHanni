@@ -36,6 +36,39 @@ public class CropMilestonesConfig {
     public boolean progress = true;
 
     @Expose
+    @ConfigOption(name = "Overflow", desc = "")
+    @Accordion
+    public Overflow overflow = new Overflow();
+
+    public static class Overflow {
+
+        @Expose
+        @ConfigOption(name = "Display", desc = "Overflow in display.")
+        @ConfigEditorBoolean
+        public boolean display = false;
+
+        @Expose
+        @ConfigOption(name = "Inventory", desc = "Overflow as stack size in crop milestones inventory. (will change milestones avg too.")
+        @ConfigEditorBoolean
+        public boolean inventoryStackSize = false;
+
+        @Expose
+        @ConfigOption(name = "Tooltip", desc = "Show overflow level progress in the item tooltip on the garden crop milestones inventory.")
+        @ConfigEditorBoolean
+        public boolean inventoryTooltip = false;
+
+        @Expose
+        @ConfigOption(name = "Discord RPC", desc = "Overflow in discord RPC milestones display.")
+        @ConfigEditorBoolean
+        public boolean discordRPC = false;
+
+        @Expose
+        @ConfigOption(name = "Chat", desc = "Send chat message when gaining overflow level.")
+        @ConfigEditorBoolean
+        public boolean chat = false;
+    }
+
+    @Expose
     @ConfigOption(
         name = "Warn When Close",
         desc = "Warn with title and sound when the next crop milestone upgrade happens in 5 seconds. " +
@@ -88,6 +121,13 @@ public class CropMilestonesConfig {
         desc = "Calculate the progress and ETA till maxed milestone (46) instead of next milestone.")
     @ConfigEditorBoolean
     public Property<Boolean> bestShowMaxedNeeded = Property.of(false);
+
+    @Expose
+    @ConfigOption(
+        name = "Overflow Milestones",
+        desc = "Show overflow crop milestones beyond 46.")
+    @ConfigEditorBoolean
+    public boolean overflowMilestones = false;
 
     @Expose
     @ConfigOption(

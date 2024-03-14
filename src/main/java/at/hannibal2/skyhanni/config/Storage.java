@@ -382,6 +382,9 @@ public class Storage {
 
             @Expose
             public Map<String, LorenzVec> npcVisitorLocations = new HashMap<>();
+
+            @Expose
+            public Map<CropType, Integer> customGoalMilestone = new HashMap<>();
         }
 
         @Expose

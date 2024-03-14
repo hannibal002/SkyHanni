@@ -29,7 +29,7 @@ class GardenCropMilestoneInventory {
         val tiers = mutableListOf<Double>()
         for (cropType in CropType.entries) {
             val counter = cropType.getCounter()
-            val tier = GardenCropMilestones.getTierForCropCount(counter, cropType)
+            val tier = GardenCropMilestones.getTierForCropCount(counter, cropType, config.cropMilestones.overflow.inventoryStackSize)
             tiers.add(tier.toDouble())
         }
         average = (tiers.sum() / CropType.entries.size).round(2)

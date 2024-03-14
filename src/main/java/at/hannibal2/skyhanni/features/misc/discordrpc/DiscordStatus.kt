@@ -13,6 +13,7 @@ import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.data.PetAPI
 import at.hannibal2.skyhanni.data.ScoreboardData
 import at.hannibal2.skyhanni.features.dungeon.DungeonAPI
+import at.hannibal2.skyhanni.features.garden.GardenAPI
 import at.hannibal2.skyhanni.features.garden.GardenAPI.getCropType
 import at.hannibal2.skyhanni.features.rift.RiftAPI
 import at.hannibal2.skyhanni.utils.InventoryUtils
@@ -235,14 +236,13 @@ enum class DiscordStatus(private val displayMessageSupplier: Supplier<String>?) 
     CROP_MILESTONES({
         val crop = InventoryUtils.getItemInHand()?.getCropType()
         val cropCounter = crop?.getCounter()
-        val tier = cropCounter?.let { getTierForCropCount(it, crop) }
-
+        val tier = cropCounter?.let { getTierForCropCount(it, crop, GardenAPI.config.cropMilestones.overflow.discordRPC) }
         val progress = tier?.let {
-            LorenzUtils.formatPercentage(crop.progressToNextLevel())
+            LorenzUtils.formatPercentage(crop.progressToNextLevel(GardenAPI.config.cropMilestones.overflow.discordRPC))
         } ?: 100 // percentage to next milestone
 
         if (tier != null) {
-            "${crop.cropName}: ${if (!crop.isMaxed()) "Milestone $tier ($progress)" else "MAXED (${cropCounter.addSeparators()} crops collected)"}"
+            "${crop.cropName}: ${if (crop.isMaxed() && !GardenAPI.config.cropMilestones.overflow.discordRPC) "MAXED (${cropCounter.addSeparators()} crops collected)" else "Milestone $tier ($progress)"}"
         } else AutoStatus.CROP_MILESTONES.placeholderText
     }),
 
