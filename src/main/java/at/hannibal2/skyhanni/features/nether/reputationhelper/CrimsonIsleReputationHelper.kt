@@ -43,6 +43,12 @@ class CrimsonIsleReputationHelper(skyHanniMod: SkyHanniMod) {
     private var display = emptyList<List<Any>>()
     private var dirty = true
 
+    /**
+     *  c - Barbarian Not Accepted
+     *  d - Mage Not Accepted
+     *  e - Accepted
+     *  a - Completed
+     */
     val tabListQuestPattern by RepoPattern.pattern(
         "crimson.reputation.tablist",
         " §r§[cdea].*"
