@@ -12,7 +12,7 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 class HideFarEntities {
     private val config get() = SkyHanniMod.feature.dev.hideFarEntities
 
-    private var ignored = emptyList<Int>()
+    private var ignored = emptySet<Int>()
 
     @SubscribeEvent
     fun onTick(event: LorenzTickEvent) {
@@ -24,7 +24,7 @@ class HideFarEntities {
                 .toMap()
                 .filter { it.value > minDistance }
                 .sorted().keys.drop(maxAmount)
-                .map { it.entityId }
+                .map { it.entityId }.toSet()
 
         }
     }
