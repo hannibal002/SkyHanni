@@ -50,6 +50,18 @@ public class BackgroundConfig {
 
     @Expose
     @ConfigOption(
+        name = "Right Margin",
+        desc = "The margin on the right side of the scoreboard."
+    )
+    @ConfigEditorSlider(
+        minValue = 0,
+        maxValue = 20,
+        minStep = 1
+    )
+    public int rightMargin = 0;
+
+    @Expose
+    @ConfigOption(
         name = "Use Custom Background Image",
         desc = "Put that image into a resource pack, using the path \"skyhanni/scoreboard.png\"."
     )
