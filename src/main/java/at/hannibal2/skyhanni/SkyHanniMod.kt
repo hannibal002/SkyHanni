@@ -192,7 +192,6 @@ import at.hannibal2.skyhanni.features.garden.farming.WrongFungiCutterWarning
 import at.hannibal2.skyhanni.features.garden.fortuneguide.CaptureFarmingGear
 import at.hannibal2.skyhanni.features.garden.inventory.AnitaExtraFarmingFortune
 import at.hannibal2.skyhanni.features.garden.inventory.GardenCropMilestoneInventory
-import at.hannibal2.skyhanni.features.garden.inventory.GardenDeskInSBMenu
 import at.hannibal2.skyhanni.features.garden.inventory.GardenInventoryNumbers
 import at.hannibal2.skyhanni.features.garden.inventory.GardenNextPlotPrice
 import at.hannibal2.skyhanni.features.garden.inventory.GardenPlotIcon
@@ -411,7 +410,7 @@ import org.apache.logging.log4j.Logger
     clientSideOnly = true,
     useMetadata = true,
     guiFactory = "at.hannibal2.skyhanni.config.ConfigGuiForgeInterop",
-    version = "0.24.Beta.12",
+    version = "0.24.Beta.13",
 )
 class SkyHanniMod {
 
@@ -627,7 +626,6 @@ class SkyHanniMod {
         loadModule(GardenCustomKeybinds)
         loadModule(ChickenHeadTimer())
         loadModule(GardenOptimalSpeed())
-        loadModule(GardenDeskInSBMenu())
         loadModule(GardenLevelDisplay())
         loadModule(FarmingWeightDisplay())
         loadModule(DicerRngDropTracker)
