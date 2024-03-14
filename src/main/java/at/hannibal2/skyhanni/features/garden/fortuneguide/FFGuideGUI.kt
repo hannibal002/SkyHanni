@@ -65,7 +65,7 @@ open class FFGuideGUI : GuiScreen() {
             ItemStack(Blocks.barrier).setStackDisplayName(name)
         }
 
-        fun isFallbackItem(item: ItemStack) = item.name!!.startsWith("§cNo saved ")
+        fun isFallbackItem(item: ItemStack) = item.name.startsWith("§cNo saved ")
     }
 
     init {

@@ -13,7 +13,8 @@ import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.ItemUtils.name
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
-import at.hannibal2.skyhanni.utils.NumberUtil.formatNumber
+import at.hannibal2.skyhanni.utils.NumberUtil.formatInt
+import at.hannibal2.skyhanni.utils.NumberUtil.formatLong
 import at.hannibal2.skyhanni.utils.NumberUtil.romanToDecimalIfNecessary
 import at.hannibal2.skyhanni.utils.OSUtils
 import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
@@ -79,8 +80,7 @@ object GardenCropMilestonesCommunityFix {
         crop: CropType,
         wrongData: MutableList<String>,
     ) {
-        val name = stack.name ?: return
-        val rawNumber = name.removeColor().replace(crop.cropName, "").trim()
+        val rawNumber = stack.name.removeColor().replace(crop.cropName, "").trim()
         val realTier = if (rawNumber == "") 0 else rawNumber.romanToDecimalIfNecessary()
 
         val lore = stack.getLore()
@@ -97,7 +97,7 @@ object GardenCropMilestonesCommunityFix {
         ) - GardenCropMilestones.getCropsForTier(realTier, crop)
 //         debug("guessNextMax: ${guessNextMax.addSeparators()}")
         val nextMax = amountPattern.matchMatcher(next) {
-            group("max").formatNumber()
+            group("max").formatLong()
         } ?: return
 //         debug("nextMax real: ${nextMax.addSeparators()}")
         if (nextMax != guessNextMax) {
@@ -108,7 +108,7 @@ object GardenCropMilestonesCommunityFix {
         val guessTotalMax = GardenCropMilestones.getCropsForTier(46, crop)
 //         println("guessTotalMax: ${guessTotalMax.addSeparators()}")
         val totalMax = amountPattern.matchMatcher(total) {
-            group("max").formatNumber()
+            group("max").formatLong()
         } ?: return
 //         println("totalMax real: ${totalMax.addSeparators()}")
         val totalOffBy = guessTotalMax - totalMax
@@ -150,7 +150,7 @@ object GardenCropMilestonesCommunityFix {
             val (rawCrop, tier, amount) = split
             val crop = LorenzUtils.enumValueOf<CropType>(rawCrop)
 
-            if (tryFix(crop, tier.toInt(), amount.formatNumber().toInt())) {
+            if (tryFix(crop, tier.toInt(), amount.formatInt())) {
                 fixed++
             } else {
                 alreadyCorrect++

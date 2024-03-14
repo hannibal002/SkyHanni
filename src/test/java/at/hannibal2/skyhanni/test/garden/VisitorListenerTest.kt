@@ -34,11 +34,11 @@ class VisitorListenerTest {
         listener.onTabListUpdate(
             TabListUpdateEvent(
                 mutableListOf(
-                    "§b§lVisitors:",
-                    "§cSpaceman",
-                    "§cGrandma Wolf",
+                    "§b§lVisitors: §r§f(3)",
+                    " §r§cSpaceman",
+                    " §r§6Madame Eleanor Q. Goldsworth III §r§fCarrot §r§c333 C §r§3107k FXP §r§275 GXP",
+                    " §r§fJacob",
                     "ThePlayerName",
-                    "Jacob",
                     "",
                 )
             )
@@ -46,7 +46,7 @@ class VisitorListenerTest {
 
         verify { VisitorAPI.addVisitor("§fJacob") }
         verify { VisitorAPI.addVisitor("§cSpaceman") }
-        verify { VisitorAPI.addVisitor("§cGrandma Wolf") }
+        verify { VisitorAPI.addVisitor("§6Madame Eleanor Q. Goldsworth III") }
     }
 
     @Test
@@ -57,7 +57,7 @@ class VisitorListenerTest {
 
         listener.onTabListUpdate(
             TabListUpdateEvent(
-                mutableListOf("§b§lVisitors:", "")
+                mutableListOf("§b§lVisitors: §r§f(0)", "")
             )
         )
 
@@ -74,7 +74,7 @@ class VisitorListenerTest {
 
         listener.onTabListUpdate(
             TabListUpdateEvent(
-                mutableListOf("§b§lVisitors:", "")
+                mutableListOf("§b§lVisitors: §r§f(0)", "")
             )
         )
 

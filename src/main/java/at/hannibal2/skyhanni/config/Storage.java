@@ -1,10 +1,13 @@
 package at.hannibal2.skyhanni.config;
 
+import at.hannibal2.skyhanni.data.FameRank;
 import at.hannibal2.skyhanni.api.SkillAPI;
 import at.hannibal2.skyhanni.data.model.ComposterUpgrade;
 import at.hannibal2.skyhanni.features.bingo.card.goals.BingoGoal;
 import at.hannibal2.skyhanni.features.combat.endernodetracker.EnderNodeTracker;
 import at.hannibal2.skyhanni.features.combat.ghostcounter.GhostData;
+import at.hannibal2.skyhanni.features.dungeon.CroesusChestTracker;
+import at.hannibal2.skyhanni.features.dungeon.CroesusChestTracker.Companion.OpenedState;
 import at.hannibal2.skyhanni.features.dungeon.DungeonAPI;
 import at.hannibal2.skyhanni.features.event.diana.DianaProfitTracker;
 import at.hannibal2.skyhanni.features.event.diana.MythologicalCreatureTracker;
@@ -30,6 +33,7 @@ import at.hannibal2.skyhanni.utils.LorenzVec;
 import at.hannibal2.skyhanni.utils.NEUInternalName;
 import at.hannibal2.skyhanni.utils.tracker.SkyHanniTracker;
 import com.google.gson.annotations.Expose;
+import jline.internal.Nullable;
 import net.minecraft.item.ItemStack;
 
 import java.util.ArrayList;
@@ -39,6 +43,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 public class Storage {
 
@@ -72,6 +78,9 @@ public class Storage {
 
     @Expose
     public Map<UUID, PlayerSpecific> players = new HashMap<>();
+
+    @Expose
+    public String currentFameRank = null;
 
     public static class PlayerSpecific {
 
@@ -114,10 +123,25 @@ public class Storage {
         public static class BingoSession {
 
             @Expose
-            public List<NEUInternalName> tierOneMinionsDone = new ArrayList<>();
+            public Set<NEUInternalName> tierOneMinionsDone = new HashSet<>();
 
             @Expose
             public Map<Integer, BingoGoal> goals = new HashMap<>();
+        }
+
+        @Expose
+        public LimboStats limbo = new LimboStats();
+
+        public static class LimboStats {
+
+            @Expose
+            public int playtime = 0;
+
+            @Expose
+            public int personalBest = 0;
+
+            @Expose
+            public float userLuck = 0f;
         }
     }
 
@@ -125,6 +149,39 @@ public class Storage {
 
         @Expose
         public String currentPet = "";
+
+        @Expose
+        public MaxwellPowerStorage maxwell = new MaxwellPowerStorage();
+
+        public static class MaxwellPowerStorage {
+            @Expose
+            public String currentPower = null;
+
+            @Expose
+            public int magicalPower = -1;
+        }
+
+        @Expose
+        public ArrowsStorage arrows = new ArrowsStorage();
+
+        public static class ArrowsStorage {
+            @Expose
+            public String currentArrow = null;
+
+            @Expose
+            public Map<NEUInternalName, Float> arrowAmount = new HashMap<>();
+        }
+
+        @Expose
+        public BitsStorage bits = new BitsStorage();
+
+        public static class BitsStorage {
+            @Expose
+            public int bits = -1;
+
+            @Expose
+            public int bitsToClaim = -1;
+        }
 
         @Expose
         public Map<LorenzVec, MinionConfig> minions = new HashMap<>();
@@ -445,6 +502,36 @@ public class Storage {
 
             @Expose
             public Map<DungeonAPI.DungeonFloor, Integer> bosses = new HashMap<>();
+
+            @Expose
+            public List<DungeonRunInfo> runs = Stream.generate(DungeonRunInfo::new)
+                .limit(CroesusChestTracker.Companion.getMaxChests())
+                .collect(Collectors.toCollection(ArrayList::new));
+
+
+            public static class DungeonRunInfo {
+
+                public DungeonRunInfo() {
+                }
+
+                public DungeonRunInfo(String floor) {
+                    this.floor = floor;
+                    this.openState = OpenedState.UNOPENED;
+                }
+
+                @Nullable
+                @Expose
+                public String floor = null;
+
+                @Expose
+                @Nullable
+                public OpenedState openState = null;
+
+                @Expose
+                @Nullable
+                public Boolean kismetUsed = null;
+
+            }
         }
 
         @Expose

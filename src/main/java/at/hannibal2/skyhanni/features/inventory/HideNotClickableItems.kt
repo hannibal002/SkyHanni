@@ -8,15 +8,16 @@ import at.hannibal2.skyhanni.data.jsonobjects.repo.HideNotClickableItemsJson
 import at.hannibal2.skyhanni.data.jsonobjects.repo.HideNotClickableItemsJson.SalvageFilter
 import at.hannibal2.skyhanni.events.GuiContainerEvent
 import at.hannibal2.skyhanni.events.RepositoryReloadEvent
-import at.hannibal2.skyhanni.features.bazaar.BazaarApi
 import at.hannibal2.skyhanni.features.garden.composter.ComposterOverlay
 import at.hannibal2.skyhanni.features.garden.visitor.VisitorAPI
+import at.hannibal2.skyhanni.features.inventory.bazaar.BazaarApi
 import at.hannibal2.skyhanni.features.rift.RiftAPI
 import at.hannibal2.skyhanni.features.rift.RiftAPI.motesNpcPrice
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.CollectionUtils.equalsOneOf
 import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.InventoryUtils.getInventoryName
+import at.hannibal2.skyhanni.utils.InventoryUtils.getLowerItems
 import at.hannibal2.skyhanni.utils.ItemUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.cleanName
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName
@@ -96,19 +97,14 @@ class HideNotClickableItems {
         val chest = guiChest.inventorySlots as ContainerChest
         val chestName = chest.getInventoryName()
 
-        for (slot in chest.inventorySlots) {
-            if (slot == null) continue
-
-            if (slot.slotNumber == slot.slotIndex) continue
-            if (slot.stack == null) continue
-
-            if (hide(chestName, slot.stack)) {
+        for ((_, stack) in chest.getLowerItems()) {
+            if (hide(chestName, stack)) {
                 val opacity = config.opacity
                 val color = LorenzColor.DARK_GRAY.addOpacity(opacity)
-                slot.stack.background = color.rgb
+                stack.background = color.rgb
             } else if (reverseColor && config.itemsGreenLine) {
                 val color = LorenzColor.GREEN.addOpacity(200)
-                slot.stack.borderLine = color.rgb
+                stack.borderLine = color.rgb
             }
         }
     }
