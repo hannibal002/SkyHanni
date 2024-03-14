@@ -10,11 +10,15 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.UUID;
 
 public class PlayerSpecificStorage {
 
+    // TODO no longer use this
     @Expose
     public Map<String, ProfileSpecificStorage> profiles = new HashMap<>(); // profile name
+
+    public Map<UUID, ProfileSpecificStorage> uuidProfiles  = new HashMap<>();
 
     @Expose
     public Integer gardenCommunityUpgrade = -1;

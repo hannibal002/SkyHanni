@@ -41,6 +41,9 @@ import java.util.stream.Stream;
 public class ProfileSpecificStorage {
 
     @Expose
+    public boolean migrated = false;
+
+    @Expose
     public String currentPet = "";
 
     @Expose
