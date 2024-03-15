@@ -53,7 +53,7 @@ object UnknownLinesHandler {
             SbPattern.peltsPattern,
             SbPattern.mobLocationPattern,
             SbPattern.jacobsContestPattern,
-						SbPattern.plotPattern,
+            SbPattern.plotPattern,
             SbPattern.powderPattern,
             SbPattern.windCompassPattern,
             SbPattern.windCompassArrowPattern,
@@ -149,8 +149,10 @@ object UnknownLinesHandler {
         }
 
         // da
-        unknownLines = unknownLines.filter { sidebarLines.nextAfter(sidebarLines.firstOrNull { line ->
-            SbPattern.darkAuctionCurrentItemPattern.matches(line)
-        } ?: "Current Item:") != it }
+        unknownLines = unknownLines.filter {
+            sidebarLines.nextAfter(sidebarLines.firstOrNull { line ->
+                SbPattern.darkAuctionCurrentItemPattern.matches(line)
+            } ?: "Current Item:") != it
+        }
     }
 }

@@ -22,7 +22,7 @@ public class BackgroundConfig {
         desc = "The color of the background."
     )
     @ConfigEditorColour
-    public String color = "0:102:0:0:0";
+    public String color = "0:80:0:0:0";
 
     @Expose
     @ConfigOption(

@@ -248,6 +248,7 @@ class HypixelData {
         if (inSkyBlock) {
             checkIsland()
             checkSidebar()
+            getCurrentServerId()
         }
 
         if (inSkyBlock == skyBlock) return
