@@ -324,7 +324,6 @@ public class ProfileSpecificStorage {
 
         @Expose
         public VerminTracker.Data verminTracker = new VerminTracker.Data();
-
     }
 
     @Expose
