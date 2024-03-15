@@ -213,7 +213,7 @@ class DungeonFinderFeatures {
         if(!isEnabled()) return
         if(!config.floorAsStackSize) return
         if(floorStackSize[event.slot.slotIndex].isNullOrEmpty()) return
-        event.stackTip = floorStackSize[event.slot.slotIndex].toString()
+        event.stackTip = floorStackSize[event.slot.slotIndex] ?: ""
     }
 
     @SubscribeEvent
