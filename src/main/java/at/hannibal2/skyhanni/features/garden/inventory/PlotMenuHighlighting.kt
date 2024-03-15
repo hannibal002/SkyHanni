@@ -68,14 +68,10 @@ class PlotMenuHighlighting {
 
         for (slot in InventoryUtils.getItemsInOpenChest()) {
             val plot = plots.find { it.inventorySlot == slot.slotIndex } ?: continue
-            println(plot.id to GardenPlotAPI.getCurrentPlot()?.id)
-
             if (plot.pests >= 1) list.add("§cPests")
             if (plot.currentSpray != null) list.add("§eSprays")
             if (!plot.unlocked) list.add("§7Locked")
             if (plot == GardenPlotAPI.getCurrentPlot()) list.add("§aCurrent plot")
-
-            println(list)
 
             val index = getLowestIndexItem(list)
 
