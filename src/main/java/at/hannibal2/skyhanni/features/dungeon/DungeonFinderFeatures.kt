@@ -119,7 +119,7 @@ class DungeonFinderFeatures {
                 for((slot, stack) in event.inventoryItems) {
                     val lore = stack.getLore()
                     if(!checkIfPartyPattern.matches(stack.displayName)) continue
-                    if (config.markIneligibleGroups && lore.any { ineligiblePattern.matches(it) }) {
+                    if (config.markIneligibleGroups && ineligiblePattern.anyMatches(lore)) {
                         highlightParty[slot] = LorenzColor.DARK_RED
                         continue
                     }
