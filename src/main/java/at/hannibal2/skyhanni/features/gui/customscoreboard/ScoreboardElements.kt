@@ -406,7 +406,12 @@ private fun getLocationDisplayPair() = buildList {
 
 fun getPlayerAmountDisplayPair() = buildList {
     val amount = getGroupFromPattern(TabListData.getTabList(), ScoreboardPattern.playerAmountPattern, "amount")
-    add("§7Players: §a$amount" to HorizontalAlignment.LEFT)
+    val max = if (displayConfig.showMaxIslandPlayers) {
+        "§7/§a${if (HypixelData.serverId?.startsWith("mega") == true) 80 else 26}"
+    } else {
+        ""
+    }
+    add("§7Players: §a$amount$max" to HorizontalAlignment.LEFT)
 }
 
 private fun getVisitDisplayPair() =

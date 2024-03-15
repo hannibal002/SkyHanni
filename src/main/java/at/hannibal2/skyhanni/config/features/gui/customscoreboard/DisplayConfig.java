@@ -9,6 +9,17 @@ import io.github.moulberry.moulconfig.annotations.ConfigEditorSlider;
 import io.github.moulberry.moulconfig.annotations.ConfigOption;
 
 public class DisplayConfig {
+
+    @Expose
+    @ConfigOption(name = "Alignment Options", desc = "")
+    @Accordion
+    public AlignmentConfig alignment = new AlignmentConfig();
+
+    @Expose
+    @ConfigOption(name = "Title and Footer Options", desc = "")
+    @Accordion
+    public TitleAndFooterConfig titleAndFooter = new TitleAndFooterConfig();
+
     @Expose
     @ConfigOption(name = "Hide Vanilla Scoreboard", desc = "Hide the vanilla scoreboard." +
         "\n§cUsing mods that add their own scoreboard will not be affected by this setting!")
@@ -37,6 +48,11 @@ public class DisplayConfig {
     @ConfigOption(name = "Show Magical Power", desc = "Show your amount of Magical Power in the scoreboard.")
     @ConfigEditorBoolean
     public boolean showMagicalPower = true;
+
+    @Expose
+    @ConfigOption(name = "Show Max Island Players", desc = "Show the maximum amount of players that can join your current island.")
+    @ConfigEditorBoolean
+    public boolean showMaxIslandPlayers = true;
 
     @Expose
     @ConfigOption(name = "Number Format", desc = "")
@@ -96,14 +112,4 @@ public class DisplayConfig {
         desc = "Will stop the Scoreboard from updating while switching islands.\nRemoves the shaking when loading data.")
     @ConfigEditorBoolean
     public boolean cacheScoreboardOnIslandSwitch = false;
-
-    @Expose
-    @ConfigOption(name = "Alignment Options", desc = "")
-    @Accordion
-    public AlignmentConfig alignment = new AlignmentConfig();
-
-    @Expose
-    @ConfigOption(name = "Title and Footer Options", desc = "")
-    @Accordion
-    public TitleAndFooterConfig titleAndFooter = new TitleAndFooterConfig();
 }
