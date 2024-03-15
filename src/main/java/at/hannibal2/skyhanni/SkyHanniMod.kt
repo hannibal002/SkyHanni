@@ -196,6 +196,7 @@ import at.hannibal2.skyhanni.features.garden.inventory.GardenDeskInSBMenu
 import at.hannibal2.skyhanni.features.garden.inventory.GardenInventoryNumbers
 import at.hannibal2.skyhanni.features.garden.inventory.GardenNextPlotPrice
 import at.hannibal2.skyhanni.features.garden.inventory.GardenPlotIcon
+import at.hannibal2.skyhanni.features.garden.inventory.PlotMenuHighlighting
 import at.hannibal2.skyhanni.features.garden.inventory.SkyMartCopperPrice
 import at.hannibal2.skyhanni.features.garden.pests.PestFinder
 import at.hannibal2.skyhanni.features.garden.pests.PestSpawn
@@ -611,6 +612,7 @@ class SkyHanniMod {
         loadModule(TpsCounter())
         loadModule(ParticleHider())
         loadModule(MiscFeatures())
+        loadModule(PlotMenuHighlighting())
         loadModule(SkyMartCopperPrice())
         loadModule(GardenVisitorFeatures())
         loadModule(NPCVisitorFix)

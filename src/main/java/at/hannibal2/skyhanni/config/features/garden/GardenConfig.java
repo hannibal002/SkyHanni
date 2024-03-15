@@ -120,6 +120,11 @@ public class GardenConfig {
     public CropStartLocationConfig cropStartLocation = new CropStartLocationConfig();
 
     @Expose
+    @ConfigOption(name = "Plot Menu Highlighting", desc = "")
+    @Accordion
+    public PlotMenuHighlightingConfig plotMenuHighlighting = new PlotMenuHighlightingConfig();
+
+    @Expose
     @ConfigOption(name = "Garden Plot Icon", desc = "")
     @Accordion
     public PlotIconConfig plotIcon = new PlotIconConfig();
