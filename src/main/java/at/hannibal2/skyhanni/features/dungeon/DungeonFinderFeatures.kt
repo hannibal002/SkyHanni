@@ -13,31 +13,46 @@ import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.NumberUtil.romanToDecimalIfNecessary
 import at.hannibal2.skyhanni.utils.RenderUtils.highlight
 import at.hannibal2.skyhanni.utils.StringUtils
+import at.hannibal2.skyhanni.utils.StringUtils.anyMatches
 import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.StringUtils.matches
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import kotlin.time.Duration
+import kotlin.time.Duration.Companion.milliseconds
 
 class DungeonFinderFeatures {
     private val config get() = SkyHanniMod.feature.dungeon.partyFinder
 
-//  Repo group and patterns
+    //  Repo group and patterns
     private val repoGroup = RepoPattern.group("dungeon.finder.features")
     private val pricePattern by repoGroup.pattern("price", "([0-9]{2,3}K|[0-9]{1,3}M|[0-9]+\\.[0-9]M|[0-9] ?MIL)")
     private val carryPattern by repoGroup.pattern("carry", "(CARRY|CARY|CARRIES|CARIES|COMP|TO CATA [0-9]{2})")
     private val nonPugPattern by repoGroup.pattern("nonpug", "(PERM|VC|DISCORD)")
-    private val memberPattern by repoGroup.pattern("member", ".*§.\\w+§f: §e(\\w+)§b \\(§e(\\d+)§b\\)")
-    private val ineligiblePattern by repoGroup.pattern("ineligible", "^§c(Requires .*$|You don't meet the requirement!|Complete previous floor first!$)")
-    private val classLevelPattern by repoGroup.pattern("classlevel", " §.(?<playerName>.*)§f: §e(?<className>.*)§b \\(§e(?<level>.*)§b\\)")
+    private val memberPattern by repoGroup.pattern("member", ".*§.(?<playerName>.*)§f: §e(?<className>.*)§b \\(§e(?<level>.*)§b\\)")
+    private val ineligiblePattern by repoGroup.pattern(
+        "ineligible",
+        "^§c(Requires .*$|You don't meet the requirement!|Complete previous floor first!$)"
+    )
+    private val classLevelPattern by repoGroup.pattern(
+        "classlevel",
+        " §.(?<playerName>.*)§f: §e(?<className>.*)§b \\(§e(?<level>.*)§b\\)"
+    )
     private val notePattern by repoGroup.pattern("note", "^(§7§7Note: |§f[^§])")
     private val floorTypePattern by repoGroup.pattern("floortype", "(The Catacombs).*|.*(MM Catacombs).*")
     private val checkIfPartyPattern by repoGroup.pattern("checkifparty", ".*('s Party)")
     private val partyFinderTitlePattern by repoGroup.pattern("pfindertitle", "(Party Finder)")
     private val catacombsGatePattern by repoGroup.pattern("catagate", "(Catacombs Gate)")
     private val selectFloorPattern by repoGroup.pattern("selectfloor", "(Select Floor)")
-//  Variables used
+    private val entranceFloorPattern by repoGroup.pattern("entrance", "(.*Entrance)")
+    private val floorPattern by repoGroup.pattern("floor", "(Floor .*)")
+    private val anyFloorPattern by repoGroup.pattern("anyfloor", "(Any)")
+    private val masterModeFloorPattern by repoGroup.pattern("mmfloor", "(MM )|(.*Master Mode Catacombs)")
+    private val dungeonFloorPattern by repoGroup.pattern("dungeonfloor", "(Dungeon: .*)")
+    private val floorFloorPattern by repoGroup.pattern("floorpattern", "(Floor: .*)")
+
+    //  Variables used
     private var selectedClass = ""
     private var floorStackSize = mutableMapOf<Int, String>()
     private var highlightParty = mutableMapOf<Int, LorenzColor>()
@@ -55,54 +70,62 @@ class DungeonFinderFeatures {
 //
 //        Code for Stack Tip
 //
-            if(catacombsGatePattern.matches(inventoryName)) {
+            if (catacombsGatePattern.matches(inventoryName)) {
                 val lore = event.inventoryItems[45]?.getLore()
                 inInventory = true
-                if (lore.size > 3 && lore[0] == "§7View and select a dungeon class.") {
-                    selectedClass = lore[2].split(" ").last().removeColor()
+                if (lore != null) {
+                    if (lore.size > 3 && lore[0] == "§7View and select a dungeon class.") {
+                        selectedClass = lore[2].split(" ").last().removeColor()
+                    }
                 }
 
-                for((slot, stack) in event.inventoryItems) {
-                    val name = stack.displayName.removeColor()
-                    if(floorTypePattern.matches(name)) {
-                        val floorNum = name.split(" ").last().romanToDecimalIfNecessary().toString()
-                        if(name.contains("Entrance")) {
-                            floorStackSize[slot] = "E"
-                        } else if(name.contains("MM ")) {
-                            floorStackSize[slot] = "M$floorNum"
-                        } else {
-                            floorStackSize[slot] = floorNum
+                if(config.floorAsStackSize) {
+                    for ((slot, stack) in event.inventoryItems) {
+                        val name = stack.displayName.removeColor()
+                        if (floorTypePattern.matches(name)) {
+                            val floorNum = name.split(" ").last().romanToDecimalIfNecessary().toString()
+                            if (entranceFloorPattern.matches(name)) {
+                                floorStackSize[slot] = "E"
+                            } else if (masterModeFloorPattern.matches(name)) {
+                                floorStackSize[slot] = "M$floorNum"
+                            } else {
+                                floorStackSize[slot] = floorNum
+                            }
                         }
                     }
                 }
             }
 
-            if(config.floorAsStackSize) {
-                if(selectFloorPattern.matches(inventoryName)) {
+            if (config.floorAsStackSize) {
+                if (selectFloorPattern.matches(inventoryName)) {
                     inInventory = true
-                    for((slot, stack) in event.inventoryItems) {
-                        if(stack.displayName == "Any") {
+                    for ((slot, stack) in event.inventoryItems) {
+                        val name = stack.displayName.removeColor()
+                        if (anyFloorPattern.matches(name)) {
                             floorStackSize[slot] = "A"
-                        } else if(stack.displayName == "Entrance") {
+                        } else if (entranceFloorPattern.matches(name)) {
                             floorStackSize[slot] = "E"
-                        } else if(stack.displayName.startsWith("Floor ")) {
-                            floorStackSize[slot] = stack.displayName.split(' ').last().romanToDecimalIfNecessary().toString()
+                        } else if (floorPattern.matches(name)) {
+                            floorStackSize[slot] =
+                                name.split(' ').last().romanToDecimalIfNecessary().toString()
                         }
                     }
                 }
 
-                if(partyFinderTitlePattern.matches(inventoryName)) {
+                if (partyFinderTitlePattern.matches(inventoryName)) {
                     inInventory = true
-                    for((slot, stack) in event.inventoryItems) {
+                    for ((slot, stack) in event.inventoryItems) {
                         val name = stack.displayName.removeColor()
-                        if(checkIfPartyPattern.matches(name)) {
+                        if (checkIfPartyPattern.matches(name)) {
                             val lore = stack.getLore()
-                            val floor = lore.find { it.startsWith("§7Floor: ") } ?: return@runDelayed
-                            val dungeon = lore.find { it.startsWith("§7Dungeon: ") } ?: return@runDelayed
+                            val floor = lore.find { floorFloorPattern.matches(it.removeColor()) }
+                            val dungeon =
+                                lore.find { dungeonFloorPattern.matches(it.removeColor()) }
+                            if (floor == null || dungeon == null) continue
                             val floorNum = floor.split(' ').last().romanToDecimalIfNecessary().toString()
-                            if (floor.contains("Entrance")) {
+                            if (entranceFloorPattern.matches(floor)) {
                                 floorStackSize[slot] = "E"
-                            } else if (dungeon.contains("Master Mode")) {
+                            } else if (masterModeFloorPattern.matches(dungeon)) {
                                 floorStackSize[slot] = "M$floorNum"
                             } else {
                                 floorStackSize[slot] = "F$floorNum"
@@ -114,11 +137,11 @@ class DungeonFinderFeatures {
 //
 //        Code for Highlighting
 //
-            if(partyFinderTitlePattern.matches(inventoryName)) {
+            if (partyFinderTitlePattern.matches(inventoryName)) {
                 inInventory = true
-                for((slot, stack) in event.inventoryItems) {
+                for ((slot, stack) in event.inventoryItems) {
                     val lore = stack.getLore()
-                    if(!checkIfPartyPattern.matches(stack.displayName)) continue
+                    if (!checkIfPartyPattern.matches(stack.displayName)) continue
                     if (config.markIneligibleGroups && ineligiblePattern.anyMatches(lore)) {
                         highlightParty[slot] = LorenzColor.DARK_RED
                         continue
@@ -147,11 +170,12 @@ class DungeonFinderFeatures {
                     }
                     val memberLevels = members.map {
                         memberPattern.matchMatcher(it) {
-                            group(2).toInt()
-                        } }
+                            group("level").toInt()
+                        }
+                    }
                     val memberClasses = members.map {
                         memberPattern.matchMatcher(it) {
-                            group(1)
+                            group("className")
                         }
                     }
                     if (memberLevels.any { it!! <= config.markBelowClassLevel }) {
@@ -168,27 +192,31 @@ class DungeonFinderFeatures {
 //        Code for ToolTip
 //
 
-            if(partyFinderTitlePattern.matches(inventoryName)) {
+            if (partyFinderTitlePattern.matches(inventoryName)) {
                 inInventory = true
-                for((slot, stack) in event.inventoryItems) {
+                for ((slot, stack) in event.inventoryItems) {
                     val classNames = mutableListOf("Healer", "Mage", "Berserk", "Archer", "Tank")
                     val toolTip = stack.getLore().toMutableList()
                     for ((index, line) in stack.getLore().withIndex()) {
                         classLevelPattern.matchMatcher(line) {
-                            val playerName = group(1)
-                            val className = group(2)
-                            val level = group(3).toInt()
+                            val playerName = group("playerName")
+                            val className = group("className")
+                            val level = group("level").toInt()
                             val color = getColor(level)
                             if (config.coloredClassLevel) toolTip[index] = " §b$playerName§f: §e$className $color$level"
                             classNames.remove(className)
                         }
                     }
-                    if (config.showMissingClasses && stack.getLore().firstOrNull()?.removeColor()?.startsWith("Dungeon:") == true) {
-                        if (classNames.contains(selectedClass)) classNames[classNames.indexOf(selectedClass)] = "§a${selectedClass}§7"
+                    if (config.showMissingClasses && dungeonFloorPattern.matches(
+                            stack.getLore().firstOrNull()?.removeColor()
+                        )
+                    ) {
+                        if (classNames.contains(selectedClass)) classNames[classNames.indexOf(selectedClass)] =
+                            "§a${selectedClass}§7"
                         toolTip.add("")
                         toolTip.add("§cMissing: §7" + StringUtils.createCommaSeparatedList(classNames))
                     }
-                    if(toolTip.isNotEmpty()) toolTipMap[slot] = toolTip
+                    if (toolTip.isNotEmpty()) toolTipMap[slot] = toolTip
                 }
             }
         }
@@ -202,17 +230,21 @@ class DungeonFinderFeatures {
         if (!inInventory) return
         val toolTip = toolTipMap[event.slot.slotIndex]
         if (toolTip.isNullOrEmpty()) return
-        toolTip.withIndex().forEach { (index, line) ->
-            if(index >= event.toolTip.size) event.toolTip.add(line)
-                else event.toolTip[index] = line
+        val oldToolTip = event.toolTip
+        for((index, line) in toolTip.withIndex()) {
+            if (index >= event.toolTip.size-1) {
+                event.toolTip.add(line)
+                continue
+            }
+            if(oldToolTip[index] != line) event.toolTip[index + 1] = line
         }
     }
 
     @SubscribeEvent
     fun onRenderItemTip(event: RenderInventoryItemTipEvent) {
-        if(!isEnabled()) return
-        if(!config.floorAsStackSize) return
-        if(floorStackSize[event.slot.slotIndex].isNullOrEmpty()) return
+        if (!isEnabled()) return
+        if (!config.floorAsStackSize) return
+        if (floorStackSize[event.slot.slotIndex].isNullOrEmpty()) return
         event.stackTip = floorStackSize[event.slot.slotIndex] ?: ""
     }
 
