@@ -49,7 +49,7 @@ class DungeonFinderFeatures {
         if (!isEnabled()) return
         val inventoryName = event.inventoryName
 
-        DelayedRun.runDelayed(Duration.parse("10ms")) {
+        DelayedRun.runDelayed(10.0.milliseconds) {
             floorStackSize.clear()
             highlightParty.clear()
 //
