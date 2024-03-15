@@ -53,7 +53,11 @@ class CustomScoreboard {
             } else {
                 display
             }
-        config.position.renderStringsAlignedWidth(render, posLabel = guiName, extraSpace = displayConfig.lineSpacing - 10)
+        config.position.renderStringsAlignedWidth(
+            render,
+            posLabel = guiName,
+            extraSpace = displayConfig.lineSpacing - 10
+        )
     }
 
     @SubscribeEvent

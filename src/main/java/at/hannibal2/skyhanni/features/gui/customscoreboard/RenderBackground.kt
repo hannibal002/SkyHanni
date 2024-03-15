@@ -20,7 +20,6 @@ class RenderBackground {
     fun renderBackground() {
         val position = config.position
         val border = backgroundConfig.borderSize
-        val rightMargin = backgroundConfig.rightMargin
 
         val x = position.getAbsX()
         val y = position.getAbsY()
@@ -39,7 +38,7 @@ class RenderBackground {
             position.set(
                 Position(
                     if (config.displayConfig.alignment.alignRight)
-                        scaledWidth - elementWidth - (border * 2) - rightMargin
+                        scaledWidth - elementWidth - (border * 2)
                     else x,
                     if (config.displayConfig.alignment.alignCenterVertically)
                         scaledHeight / 2 - elementHeight / 2
@@ -66,7 +65,7 @@ class RenderBackground {
                 Utils.drawTexturedRect(
                     (x - border).toFloat(),
                     (y - border).toFloat(),
-                    (elementWidth + border * 3 + rightMargin).toFloat(),
+                    (elementWidth + border * 3).toFloat(),
                     (elementHeight + border * 2).toFloat(),
                     GL11.GL_NEAREST
                 )
@@ -74,7 +73,7 @@ class RenderBackground {
                 RenderUtils.drawRoundRect(
                     x - border,
                     y - border,
-                    elementWidth + border * 3 + rightMargin,
+                    elementWidth + border * 3,
                     elementHeight + border * 2,
                     SpecialColour.specialToChromaRGB(backgroundConfig.color),
                     backgroundConfig.roundedCornerSmoothness
