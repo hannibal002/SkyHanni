@@ -58,7 +58,7 @@ class DungeonFinderFeatures {
             if(catacombsGatePattern.matches(inventoryName)) {
                 val lore = event.inventoryItems[45]?.getLore()
                 inInventory = true
-                if (!lore.isNullOrEmpty() && lore[0] == "§7View and select a dungeon class.") {
+                if (lore.size > 3 && lore[0] == "§7View and select a dungeon class.") {
                     selectedClass = lore[2].split(" ").last().removeColor()
                 }
 
