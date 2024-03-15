@@ -114,7 +114,7 @@ class HypixelData {
             return serverId
         }
 
-        fun getMaxPlayersForServer(): Int = if (serverId?.startsWith("mega") == true) 80 else 26
+        fun getMaxPlayersForCurrentServer(): Int = if (serverId?.startsWith("mega") == true) 80 else 26
 
         // This code is modified from NEU, and depends on NEU (or another mod) sending /locraw.
         private val jsonBracketPattern = "^\\{.+}".toPattern()
