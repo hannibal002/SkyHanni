@@ -20,12 +20,12 @@
 package at.hannibal2.skyhanni.features.gui.customscoreboard
 
 import at.hannibal2.skyhanni.SkyHanniMod
+import at.hannibal2.skyhanni.events.DebugDataCollectEvent
 import at.hannibal2.skyhanni.events.GuiPositionMovedEvent
 import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.LorenzTickEvent
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils
-import at.hannibal2.skyhanni.utils.OSUtils
 import at.hannibal2.skyhanni.utils.RenderUtils.HorizontalAlignment
 import at.hannibal2.skyhanni.utils.RenderUtils.renderStringsAlignedWidth
 import at.hannibal2.skyhanni.utils.StringUtils.firstLetterUppercase
@@ -95,17 +95,6 @@ class CustomScoreboard {
         internal val displayConfig get() = config.displayConfig
         internal val informationFilteringConfig get() = config.informationFilteringConfig
         internal val backgroundConfig get() = config.backgroundConfig
-
-        fun copyScoreboard() {
-            ScoreboardElement.entries.map { element ->
-                "${element.name.firstLetterUppercase()} - " +
-                    "${element.showWhen.invoke()} - " +
-                    "${element.getVisiblePair().map { it.first }}"
-            }.let {
-                OSUtils.copyToClipboard(it.joinToString("\n"))
-                ChatUtils.chat("Copied the current scoreboard to the config.")
-            }
-        }
     }
 
     private fun createLines() = buildList<ScoreboardElementType> {
@@ -149,6 +138,20 @@ class CustomScoreboard {
     fun onRenderScoreboard(event: RenderGameOverlayEvent.Post) {
         if (event.type == RenderGameOverlayEvent.ElementType.HELMET) {
             GuiIngameForge.renderObjective = !isHideVanillaScoreboardEnabled()
+        }
+    }
+
+    @SubscribeEvent
+    fun onDebugDataCollect(event: DebugDataCollectEvent) {
+        event.title("Custom Scoreboard")
+        event.addIrrelevant {
+            ScoreboardElement.entries.map { element ->
+                add(
+                    "${element.name.firstLetterUppercase()} - " +
+                        "${element.showWhen.invoke()} - " +
+                        "${element.getVisiblePair().map { it.first }}"
+                )
+            }
         }
     }
 
