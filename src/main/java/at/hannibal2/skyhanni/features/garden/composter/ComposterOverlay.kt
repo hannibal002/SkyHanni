@@ -26,7 +26,6 @@ import at.hannibal2.skyhanni.utils.CollectionUtils.addAsSingletonList
 import at.hannibal2.skyhanni.utils.CollectionUtils.sortedDesc
 import at.hannibal2.skyhanni.utils.ConfigUtils
 import at.hannibal2.skyhanni.utils.InventoryUtils
-import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName
 import at.hannibal2.skyhanni.utils.ItemUtils.name
 import at.hannibal2.skyhanni.utils.KeyboardManager
 import at.hannibal2.skyhanni.utils.LorenzUtils
@@ -480,7 +479,7 @@ object ComposterOverlay {
             BazaarApi.searchForBazaarItem(itemName, itemsNeeded)
             return
         }
-        val having = InventoryUtils.countItemsInLowerInventory { it.getInternalName() == internalName }
+        val having = InventoryUtils.getAmountOfItemInInventory(internalName)
         if (having >= itemsNeeded) {
             ChatUtils.chat("$itemName §8x${itemsNeeded} §ealready found in inventory!")
             return

@@ -19,6 +19,7 @@
 package at.hannibal2.skyhanni.config.core.config.gui
 
 import at.hannibal2.skyhanni.config.core.config.Position
+import at.hannibal2.skyhanni.data.GuiEditManager
 import at.hannibal2.skyhanni.data.GuiEditManager.Companion.getAbsX
 import at.hannibal2.skyhanni.data.GuiEditManager.Companion.getAbsY
 import at.hannibal2.skyhanni.data.GuiEditManager.Companion.getDummySize
@@ -216,6 +217,7 @@ class GuiPositionEditor(private val positions: List<Position>, private val borde
             val elementHeight = position.getDummySize(true).y
             grabbedX += position.moveX(mouseX - grabbedX, elementWidth)
             grabbedY += position.moveY(mouseY - grabbedY, elementHeight)
+            GuiEditManager.handleGuiPositionMoved(position.internalName)
         }
     }
 

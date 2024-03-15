@@ -24,6 +24,7 @@ import at.hannibal2.skyhanni.config.features.rift.RiftConfig;
 import at.hannibal2.skyhanni.config.features.skillprogress.SkillProgressConfig;
 import at.hannibal2.skyhanni.config.features.slayer.SlayerConfig;
 import at.hannibal2.skyhanni.config.features.stranded.StrandedConfig;
+import at.hannibal2.skyhanni.config.storage.Storage;
 import at.hannibal2.skyhanni.features.misc.items.enchants.EnchantParser;
 import com.google.gson.annotations.Expose;
 import io.github.moulberry.moulconfig.Config;

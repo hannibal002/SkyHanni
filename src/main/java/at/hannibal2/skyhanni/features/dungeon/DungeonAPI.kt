@@ -4,6 +4,7 @@ import at.hannibal2.skyhanni.data.ProfileStorageData
 import at.hannibal2.skyhanni.data.ScoreboardData
 import at.hannibal2.skyhanni.events.DebugDataCollectEvent
 import at.hannibal2.skyhanni.events.DungeonBossRoomEnterEvent
+import at.hannibal2.skyhanni.events.DungeonCompleteEvent
 import at.hannibal2.skyhanni.events.DungeonEnterEvent
 import at.hannibal2.skyhanni.events.DungeonStartEvent
 import at.hannibal2.skyhanni.events.InventoryFullyOpenedEvent
@@ -20,6 +21,7 @@ import at.hannibal2.skyhanni.utils.NumberUtil.romanToDecimalIfNecessary
 import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.TabListData
+import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraft.item.ItemStack
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
@@ -48,6 +50,13 @@ class DungeonAPI {
         val bossStorage: MutableMap<DungeonFloor, Int>? get() = ProfileStorageData.profileSpecific?.dungeons?.bosses
         private val timePattern =
             "Time Elapsed:( )?(?:(?<minutes>\\d+)m)? (?<seconds>\\d+)s".toPattern() // Examples: Time Elapsed: 10m 10s, Time Elapsed: 2s
+
+        private val patternGroup = RepoPattern.group("dungeon")
+
+        private val dungeonComplete by patternGroup.pattern(
+            "complete",
+            "§.\\s+§.§.(?:The|Master Mode) Catacombs §.§.- §.§.Floor (?<floor>M?[IV]{1,3}|Entrance)"
+        )
 
         fun inDungeon() = dungeonFloor != null
 
@@ -153,6 +162,11 @@ class DungeonAPI {
             if (matches() && boss != null && boss !in bossCollections) {
                 bossCollections.addOrPut(boss, 1)
             }
+            return
+        }
+        dungeonComplete.matchMatcher(event.message) {
+            DungeonCompleteEvent(floor).postAndCatch()
+            return
         }
     }
 
@@ -260,5 +274,19 @@ class DungeonAPI {
         HEALER("Healer"),
         MAGE("Mage"),
         TANK("Tank")
+    }
+
+    enum class DungeonChest(val inventory: String) {
+        WOOD("Wood Chest"),
+        GOLD("Gold Chest"),
+        DIAMOND("Diamond Chest"),
+        EMERALD("Emerald Chest"),
+        OBSIDIAN("Obsidian Chest"),
+        BEDROCK("Bedrock Chest"),
+        ;
+
+        companion object {
+            fun getByInventoryName(inventory: String) = entries.firstOrNull { it.inventory == inventory }
+        }
     }
 }

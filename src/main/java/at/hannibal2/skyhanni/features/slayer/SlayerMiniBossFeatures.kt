@@ -4,10 +4,10 @@ import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.events.EntityMaxHealthUpdateEvent
 import at.hannibal2.skyhanni.events.LorenzRenderWorldEvent
 import at.hannibal2.skyhanni.events.LorenzWorldChangeEvent
-import at.hannibal2.skyhanni.events.withAlpha
 import at.hannibal2.skyhanni.features.combat.damageindicator.DamageIndicatorManager
 import at.hannibal2.skyhanni.mixins.hooks.RenderLivingEntityHelper
 import at.hannibal2.skyhanni.utils.CollectionUtils.editCopy
+import at.hannibal2.skyhanni.utils.ColorUtils.withAlpha
 import at.hannibal2.skyhanni.utils.EntityUtils.hasMaxHealth
 import at.hannibal2.skyhanni.utils.LocationUtils.distanceToPlayer
 import at.hannibal2.skyhanni.utils.LorenzColor
@@ -40,9 +40,8 @@ class SlayerMiniBossFeatures {
             if (bossType.clazz != entity.javaClass) continue
 
             miniBosses = miniBosses.editCopy { add(entity) }
-            RenderLivingEntityHelper.setEntityColor(entity, LorenzColor.AQUA.toColor().withAlpha(127))
+            RenderLivingEntityHelper.setEntityColorWithNoHurtTime(entity, LorenzColor.AQUA.toColor().withAlpha(127))
             { config.slayerMinibossHighlight }
-            RenderLivingEntityHelper.setNoHurtTime(entity) { config.slayerMinibossHighlight }
         }
     }
 
@@ -76,7 +75,7 @@ class SlayerMiniBossFeatures {
         TARANTULA(EntitySpider::class.java, 54_000, 144_000, 576_000),
         SVEN(EntityWolf::class.java, 45_000, 120_000, 480_000),
         VOIDLING(EntityEnderman::class.java, 8_400_000, 17_500_000, 52_500_000),
-        INFERNAL(EntityBlaze::class.java, 12_000_000, 25_000_000),
+        INFERNAL(EntityBlaze::class.java, 12_000_000, 25_000_000, 75_000_000),
         ;
     }
 }

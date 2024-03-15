@@ -10,6 +10,7 @@ import at.hannibal2.skyhanni.events.RepositoryReloadEvent
 import at.hannibal2.skyhanni.features.rift.RiftAPI
 import at.hannibal2.skyhanni.test.GriffinUtils.drawWaypointFilled
 import at.hannibal2.skyhanni.utils.ChatUtils
+import at.hannibal2.skyhanni.utils.InventoryUtils.getAllItems
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.LocationUtils.distanceToPlayer
 import at.hannibal2.skyhanni.utils.LorenzColor
@@ -117,10 +118,7 @@ object EnigmaSoulWaypoints {
         val guiChest = event.gui
         val chest = guiChest.inventorySlots as ContainerChest
 
-        for (slot in chest.inventorySlots) {
-            if (slot == null) continue
-            val stack = slot.stack ?: continue
-
+        for ((slot, stack) in chest.getAllItems()) {
             for (soul in trackedSouls) {
                 if (stack.displayName.removeColor().contains(soul)) {
                     slot highlight LorenzColor.DARK_PURPLE

@@ -58,7 +58,7 @@ class TrophyFishMessages {
             edited = ChatComponentText(
                 "§6§lTROPHY FISH! " + when (config.design) {
                     DesignFormat.STYLE_1 -> if (amount == 1) "§c§lFIRST §r$displayRarity $displayName"
-                    else "§7$amount. §r$displayRarity $displayName"
+                    else "§7$amount${amount.ordinal()} §r$displayRarity $displayName"
 
                     DesignFormat.STYLE_2 -> "§bYou caught a $displayName $displayRarity§b. §7(${amount.addSeparators()})"
                     else -> "§bYou caught your ${amount.addSeparators()}${amount.ordinal()} $displayRarity $displayName§b."
@@ -68,7 +68,8 @@ class TrophyFishMessages {
 
         if (config.totalAmount) {
             val total = trophyFishCounts.sumAllValues()
-            edited.appendSibling(ChatComponentText(" §7(${total.addSeparators()}. total)"))
+
+            edited.appendSibling(ChatComponentText(" §7(${total.addSeparators()}${total.ordinal()} total)"))
         }
 
         if (config.tooltip) {
