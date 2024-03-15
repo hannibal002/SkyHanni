@@ -407,4 +407,8 @@ object ScoreboardPattern {
         "eventtime",
         "^\\s+Ends In: §r§e(?<time>.*)$"
     )
+    val playerAmountPattern by tablistGroup.pattern(
+        "playeramount",
+        "^\\s*(?:§.)+Players (?:§.)+\\((?<amount>\\d+)\\)\\s*$"
+    )
 }

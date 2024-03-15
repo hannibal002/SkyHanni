@@ -106,6 +106,11 @@ enum class ScoreboardElement(
         { true },
         "§7⏣ §bVillage"
     ),
+    PLAYER_AMOUNT(
+        ::getPlayerAmountDisplayPair,
+        { true },
+        "§7Players: §a69"
+    ),
     VISITING(
         ::getVisitDisplayPair,
         ::getVisitShowWhen,
@@ -397,6 +402,11 @@ private fun getLocationDisplayPair() = buildList {
 
     ScoreboardData.sidebarLinesFormatted.firstOrNull { ScoreboardPattern.plotPattern.matches(it) }
         ?.let { add(it to HorizontalAlignment.LEFT) }
+}
+
+fun getPlayerAmountDisplayPair() = buildList {
+    val amount = getGroupFromPattern(TabListData.getTabList(), ScoreboardPattern.playerAmountPattern, "amount")
+    add("§7Players: §a$amount" to HorizontalAlignment.LEFT)
 }
 
 private fun getVisitDisplayPair() =
