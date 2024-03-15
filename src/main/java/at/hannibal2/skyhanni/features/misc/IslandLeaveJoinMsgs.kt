@@ -102,7 +102,7 @@ object IslandLeaveJoinMsgs {
                 if (players.contains(player)) return@matchMatcher
                 players.add(player)         // !onPrivateIslandGarden because a vanilla message gets sent
                 if (shouldSendMsg(player) && updatedSinceWorldSwitch && !onPrivateWorld) {
-                    ChatUtils.chat("${player.cleanPlayerName(displayName = config.alwaysOnKnownIslands)}$joinMessage")
+                    ChatUtils.chat("${player.cleanPlayerName(displayName = true)}$joinMessage")
                 }
             }
             rawPlayerPattern.matchMatcher(line) {
