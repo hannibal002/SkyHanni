@@ -449,17 +449,15 @@ private fun getLobbyDisplayPair(): List<ScoreboardElementType> {
 }
 
 private fun getPowerDisplayPair() = listOf(
-    when (MaxwellAPI.currentPower) {
-        null -> "§cOpen \"Your Bags\"!"
-        else -> {
-            val mp = if (displayConfig.showMagicalPower) "§7(§6${MaxwellAPI.magicalPower?.addSeparators()}§7)" else ""
-            if (displayConfig.displayNumbersFirst) {
-                "§a${MaxwellAPI.currentPower?.replace("Power", "")} Power $mp"
-            } else {
-                "Power: §a${MaxwellAPI.currentPower?.replace("Power", "")} $mp"
-            }
+    (MaxwellAPI.currentPower?.let {
+        val mp = if (displayConfig.showMagicalPower) "§7(§6${MaxwellAPI.magicalPower?.addSeparators()}§7)" else ""
+        if (displayConfig.displayNumbersFirst) {
+            "§a${MaxwellAPI.currentPower?.replace("Power", "")} Power $mp"
+        } else {
+            "Power: §a${MaxwellAPI.currentPower?.replace("Power", "")} $mp"
         }
-    } to HorizontalAlignment.LEFT
+    }
+        ?: "§cOpen \"Your Bags\"!") to HorizontalAlignment.LEFT
 )
 
 private fun getPowerShowWhen() = !inAnyIsland(IslandType.THE_RIFT)
@@ -525,7 +523,10 @@ private fun getQuiverDisplayPair(): List<ScoreboardElementType> {
         return listOf("No Arrows selected" to HorizontalAlignment.LEFT)
 
     val amountString = (if (displayConfig.colorArrowAmount) {
-        percentageColor(QuiverAPI.currentAmount.toLong(), QuiverAPI.MAX_ARROW_AMOUNT.toLong()).getChatColor()
+        percentageColor(
+            QuiverAPI.currentAmount.toLong(),
+            QuiverAPI.MAX_ARROW_AMOUNT.toLong()
+        ).getChatColor()
     } else {
         ""
     }) + when (displayConfig.arrowAmountDisplay) {
@@ -550,10 +551,18 @@ private fun getQuiverShowWhen(): Boolean {
 
 private fun getPowderDisplayPair() = buildList {
     val mithrilPowder =
-        getGroupFromPattern(TabListData.getTabList(), ScoreboardPattern.mithrilPowderPattern, "mithrilpowder")
+        getGroupFromPattern(
+            TabListData.getTabList(),
+            ScoreboardPattern.mithrilPowderPattern,
+            "mithrilpowder"
+        )
             .formatNum()
     val gemstonePowder =
-        getGroupFromPattern(TabListData.getTabList(), ScoreboardPattern.gemstonePowderPattern, "gemstonepowder")
+        getGroupFromPattern(
+            TabListData.getTabList(),
+            ScoreboardPattern.gemstonePowderPattern,
+            "gemstonepowder"
+        )
             .formatNum()
 
     if (informationFilteringConfig.hideEmptyLines && mithrilPowder == "0" && gemstonePowder == "0") {
