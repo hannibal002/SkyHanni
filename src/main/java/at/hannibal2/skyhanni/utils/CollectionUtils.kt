@@ -1,14 +1,40 @@
 package at.hannibal2.skyhanni.utils
 
 import java.util.Collections
+import java.util.Queue
 import java.util.WeakHashMap
-import java.util.concurrent.ConcurrentLinkedQueue
 
 object CollectionUtils {
 
-    fun <E> ConcurrentLinkedQueue<E>.drainTo(list: MutableCollection<E>) {
+    inline fun <reified T> Queue<T>.drainForEach(action: (T) -> Unit) {
+        while (true) {
+            val value = this.poll() ?: break
+            action(value)
+        }
+    }
+
+    inline fun <reified T : Queue<E>, reified E> T.drain(amount: Int): T {
+        for (i in 1..amount) {
+            this.poll() ?: break
+        }
+        return this
+    }
+
+    inline fun <reified T : Queue<E>, reified E, reified K, reified L : MutableCollection<K>>
+        T.drainTo(
+        list: L,
+        action: (E) -> K
+    ): L {
+        while (true)
+            list.add(action(this.poll() ?: break))
+        return list
+    }
+
+    inline fun <reified T : Queue<E>, reified E, reified L : MutableCollection<E>>
+        T.drainTo(list: L): L {
         while (true)
             list.add(this.poll() ?: break)
+        return list
     }
 
     // Let garbage collector handle the removal of entries in this list
