@@ -18,7 +18,6 @@ import at.hannibal2.skyhanni.features.gui.customscoreboard.CustomScoreboard.Comp
 import at.hannibal2.skyhanni.features.gui.customscoreboard.CustomScoreboard.Companion.informationFilteringConfig
 import at.hannibal2.skyhanni.features.gui.customscoreboard.CustomScoreboardUtils.formatNum
 import at.hannibal2.skyhanni.features.gui.customscoreboard.CustomScoreboardUtils.getGroupFromPattern
-import at.hannibal2.skyhanni.mixins.hooks.tryToReplaceScoreboardLine
 import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.CollectionUtils.nextAfter
 import at.hannibal2.skyhanni.utils.LorenzUtils.inAdvancedMiningIsland
@@ -130,7 +129,7 @@ enum class ScoreboardElement(
     POWER(
         ::getPowerDisplayPair,
         ::getPowerShowWhen,
-        "Power: Sighted"
+        "Power: §aSighted"
     ),
     COOKIE(
         ::getCookieDisplayPair,
@@ -179,7 +178,7 @@ enum class ScoreboardElement(
     PARTY(
         ::getPartyDisplayPair,
         ::getPartyShowWhen,
-        "§9§lParty (4):\n §7- §fhannibal2\n §7- §fMoulberry\n §7- §fVahvl\n §7- §fJ10a1n15"
+        "§9§lParty (4):\n §7- §fhannibal2\n §7- §fMoulberry\n §7- §fVahvl\n §7- §fSkirtwearer"
     ),
     FOOTER(
         ::getFooterDisplayPair,
@@ -190,6 +189,21 @@ enum class ScoreboardElement(
         ::getExtraDisplayPair,
         ::getExtraShowWhen,
         "§cUnknown lines the mod is not detecting"
+    ),
+    EMPTY_LINE4(
+        ::getEmptyLineDisplayPair,
+        { true },
+        ""
+    ),
+    EMPTY_LINE5(
+        ::getEmptyLineDisplayPair,
+        { true },
+        ""
+    ),
+    EMPTY_LINE6(
+        ::getEmptyLineDisplayPair,
+        { true },
+        ""
     ),
     ;
 
@@ -374,15 +388,11 @@ private fun getIslandDisplayPair() =
 
 private fun getLocationDisplayPair() = buildList {
     add(
-        (tryToReplaceScoreboardLine(
-            getGroupFromPattern(
-                ScoreboardData.sidebarLinesFormatted,
-                ScoreboardPattern.locationPattern,
-                "location"
-            )
-        )?.trim()
-            ?: "<hidden>") to HorizontalAlignment.LEFT
-    )
+        getGroupFromPattern(
+            ScoreboardData.sidebarLinesFormatted,
+            ScoreboardPattern.locationPattern,
+            "location"
+        ).trim() to HorizontalAlignment.LEFT)
 
     val plotLine = ScoreboardData.sidebarLinesFormatted.firstOrNull { ScoreboardPattern.plotPattern.matches(it) }
     if (plotLine != null) add(plotLine to HorizontalAlignment.LEFT)
@@ -412,14 +422,14 @@ private fun getTimeDisplayPair(): List<ScoreboardElementType> {
 }
 
 private fun getLobbyDisplayPair(): List<ScoreboardElementType> {
-    val lobbyCode = getGroupFromPattern(
-        ScoreboardData.sidebarLinesFormatted,
-        ScoreboardPattern.lobbyCodePattern,
-        "code"
+    val lobbyCode = HypixelData.serverId ?: "<hidden>"
+    return listOf(
+        if (lobbyCode == "<hidden>") {
+            "<hidden>"
+        } else {
+            "§8$lobbyCode"
+        } to HorizontalAlignment.LEFT
     )
-
-    val displayValue = if (lobbyCode == "0") "<hidden>" else "§8$lobbyCode"
-    return listOf(displayValue to HorizontalAlignment.LEFT)
 }
 
 private fun getPowerDisplayPair() = listOf(
@@ -427,10 +437,10 @@ private fun getPowerDisplayPair() = listOf(
         null -> "§cOpen \"Your Bags\"!"
         else ->
             if (displayConfig.displayNumbersFirst) {
-                "${MaxwellAPI.currentPower?.replace("Power", "")} Power " +
+                "§a${MaxwellAPI.currentPower?.replace("Power", "")} Power " +
                     "§7(§6${MaxwellAPI.magicalPower}§7)"
             } else {
-                "Power: ${MaxwellAPI.currentPower?.replace("Power", "")} " +
+                "Power: §a${MaxwellAPI.currentPower?.replace("Power", "")} " +
                     "§7(§6${MaxwellAPI.magicalPower?.addSeparators()}§7)"
             }
     } to HorizontalAlignment.LEFT

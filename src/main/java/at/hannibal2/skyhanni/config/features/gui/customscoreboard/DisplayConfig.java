@@ -5,11 +5,13 @@ import com.google.gson.annotations.Expose;
 import io.github.moulberry.moulconfig.annotations.Accordion;
 import io.github.moulberry.moulconfig.annotations.ConfigEditorBoolean;
 import io.github.moulberry.moulconfig.annotations.ConfigEditorDropdown;
+import io.github.moulberry.moulconfig.annotations.ConfigEditorSlider;
 import io.github.moulberry.moulconfig.annotations.ConfigOption;
 
 public class DisplayConfig {
     @Expose
-    @ConfigOption(name = "Hide Vanilla Scoreboard", desc = "Hide the vanilla scoreboard.")
+    @ConfigOption(name = "Hide Vanilla Scoreboard", desc = "Hide the vanilla scoreboard." +
+        "\n§cUsing mods that add their own scoreboard will not be affected by this setting!")
     @ConfigEditorBoolean
     @FeatureToggle
     public boolean hideVanillaScoreboard = true;
@@ -29,12 +31,6 @@ public class DisplayConfig {
     @ConfigOption(name = "Show all active events", desc = "Show all active events in the scoreboard instead of one.")
     @ConfigEditorBoolean
     public boolean showAllActiveEvents = false;
-
-    @Expose
-    @ConfigOption(name = "Cache Scoreboard on Island Switch",
-        desc = "Will stop the Scoreboard from updating while switching islands.\nRemoves the shaking when loading data.")
-    @ConfigEditorBoolean
-    public boolean cacheScoreboardOnIslandSwitch = false;
 
     @Expose
     @ConfigOption(name = "Number Format", desc = "")
@@ -83,6 +79,17 @@ public class DisplayConfig {
     @ConfigOption(name = "Color Arrow Amount", desc = "Color the arrow amount based on the percentage.")
     @ConfigEditorBoolean
     public boolean colorArrowAmount = false;
+
+    @Expose
+    @ConfigOption(name = "Line Spacing", desc = "The amount of space between each line.")
+    @ConfigEditorSlider(minValue = 0, maxValue = 20, minStep = 1)
+    public int lineSpacing = 10;
+
+    @Expose
+    @ConfigOption(name = "Cache Scoreboard on Island Switch",
+        desc = "Will stop the Scoreboard from updating while switching islands.\nRemoves the shaking when loading data.")
+    @ConfigEditorBoolean
+    public boolean cacheScoreboardOnIslandSwitch = false;
 
     @Expose
     @ConfigOption(name = "Alignment Options", desc = "")

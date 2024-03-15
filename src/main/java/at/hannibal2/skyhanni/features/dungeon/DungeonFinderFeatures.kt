@@ -164,8 +164,8 @@ class DungeonFinderFeatures {
             }
         }
         if (!config.showMissingClasses) return
-        if (!stack.getLore()[0].removeColor().startsWith("Dungeon:")) return
-        if (classNames.contains(selectedClass)) classNames[classNames.indexOf(selectedClass)] = "§a${selectedClass}§7"
+        if (stack.getLore().firstOrNull()?.removeColor()?.startsWith("Dungeon:") == false) return
+        if (classNames.contains(selectedClass)) selectedClass = "§a${selectedClass}§7"
         event.toolTip.add("")
         event.toolTip.add("§cMissing: §7" + createCommaSeparatedList(classNames))
     }

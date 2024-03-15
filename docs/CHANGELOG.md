@@ -13,6 +13,11 @@
     + Copies the price of the hovered item in Auction House minus 1 coin into the clipboard for easier under-bidding.
 + Gfs message after super crafting. — Zickles
     + Adding a clickable message to pick up the super crafted items from sacks.
++ Added Craft Materials From Bazaar. - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/1104)
+    + Show in a crafting view a shopping list of materials needed when buying from the Bazaar.
++ Added AH Show Price Comparison. - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/339)
+    + Highlight auctions based on the difference between their estimated value and the value they are listed for.
+    + Options to change the colours
 
 #### Minion Features
 
@@ -84,6 +89,11 @@
 
 + Added option to only show Custom Text Box while an inventory is open. - martimavocado
 + Added option to hide Profit Trackers while not inside an inventory. - hannibal2
++ Custom Scoreboard improvements. - j10a1n15 (https://github.com/hannibal002/SkyHanni/pull/1156)
+    + Added a warning to config about other mods.
+    + Added three empty lines.
+    + Added option to hide empty lines at the top/bottom.
++ Option to change line spacing in Custom Scoreboard. - j10a1n15 (https://github.com/hannibal002/SkyHanni/pull/1174)
 
 #### Chat Improvements
 
@@ -93,6 +103,11 @@
 
 + Show calculation breakdowns when hovering over Anita Medal Profit or SkyMart Coins per copper displays. -
   hannibal2 (https://github.com/hannibal002/SkyHanni/pull/1116)
+
+#### Crimson Improvelemts
+
++ Show Town Board waypoint when there is an accepted Rescue Mission quest. -
+  Alexia (https://github.com/hannibal002/SkyHanni/pull/1157)
 
 #### Misc Improvements
 
@@ -157,6 +172,38 @@
 
 + Added Burningsoul Demon (75M HP miniboss) to line to miniboss and highlight slayer minibosses. -
   Empa (https://github.com/hannibal002/SkyHanni/pull/1144)
+
+#### Gui Fixes
+
++ Fixed voting line, dojo, server-restart & plot pasting errors in custom scoreboard. -
+  j10a1n15 (https://github.com/hannibal002/SkyHanni/pull/1152)
++ Fixed Mithril Powder showing Gemstone Powder instead. - j10a1n15 (https://github.com/hannibal002/SkyHanni/pull/1152)
++ Custom Scoreboard fixes. - j10a1n15 (https://github.com/hannibal002/SkyHanni/pull/1156)
+    + Fixed Jacob's Contest, Trevor the Trapper & M7 Dragons.
+    + Fixed the bottom border not working when using a custom background.
+    + Fixed Hypixel scoreboard being shown while using Apec.
++ Fixed skill detection from tab list again. - HiZe_ (https://github.com/hannibal002/SkyHanni/pull/1160)
++ Fixed other GUIs rendering over Compact Tab List. - Thunderblade73 (https://github.com/hannibal002/SkyHanni/pull/1161)
++ Tab list fixes. - CalMWolfs (https://github.com/hannibal002/SkyHanni/pull/1121)
+    + Fixed garden spam because of wrong tab list visitor format.
+    + Fixed the next visitor timer.
+    + Allowed you to use extended visitor info and still have visitor display work.
++ Scoreboard Fixed. - j10a1n15 (https://github.com/hannibal002/SkyHanni/pull/1174)
+    + Fixed "Hide empty lines at top/bottom" sometimes not actually hiding them .
+    + Fixed Server ID sometimes not showing.
+    + Fixed instance shutdown error while in Kuudra.
++ Fixed Hypixel scoreboard never reappearing. - j10a1n15 (https://github.com/hannibal002/SkyHanni/pull/1170)
++ Fixed pet name in tab list getting detected as player name with widget settings. -
+  hannibal2 (https://github.com/hannibal002/SkyHanni/pull/1166)
+
+#### Dungeon Fixes
+
++ Fixed error in Dungeon Finder Features. - Thunderblade73 (https://github.com/hannibal002/SkyHanni/pull/1162)
+
+#### Crimson Isle Fixes
+
++ Fixed wrong crimson isle quests detection after tab list widget update. -
+  hannibal2 (https://github.com/hannibal002/SkyHanni/pull/1167)
 
 #### Misc Fixes
 
@@ -250,11 +297,21 @@
 + Code cleanup in LaneSwitchUtils.isBoundaryPlot. - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/1143)
 + Creating and using ContainerChest.getAllItems(), getUpperItems() and getLowerItems(). -
   hannibal2 (https://github.com/hannibal002/SkyHanni/pull/1047)
++ Fixed unknown power errors in the Custom Scoreboard. - j10a1n15 (https://github.com/hannibal002/SkyHanni/pull/1156)
++ Use a repo pattern for getting the visitor count. - CalMWolfs (https://github.com/hannibal002/SkyHanni/pull/1121)
++ Calling server ID getter method now in HypixelData. - j10a1n15 (https://github.com/hannibal002/SkyHanni/pull/1174)
++ Revert shader version for Mac compatibility. - Vixid (https://github.com/hannibal002/SkyHanni/pull/1176)
++ Added ItemStack.toPrimitiveStackOrNull(). - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/1104)
++ Added InventoryOpenEvent.inventoryItemsPrimitive. - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/1104)
 
 ### Removed Features
 
 + Removed Advanced Stats in SkyMart Copper price. - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/1116)
     + The same information is now always visible via hovering.
++ Removed desk in the SB menu in favour of Hypixel's version. -
+  CalMWolfs (https://github.com/hannibal002/SkyHanni/pull/1158)
++ Removed Plot Name in Scoreboard. - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/1168)
+    + Hypixel added their own compact format now.
 
 ## Version 0.23
 

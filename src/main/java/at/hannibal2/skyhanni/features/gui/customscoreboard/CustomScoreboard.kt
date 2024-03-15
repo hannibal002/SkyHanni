@@ -13,7 +13,8 @@
 //  - option to hide coins earned
 //  - color options in the purse etc lines
 //  - choose the amount of decimal places in shorten nums
-//  - very important bug fix: duplex is weird :(
+//  - ~~very important bug fix: duplex is weird :(~~ will be fixed with empas quiverapi overhaul
+//  - more anchor points (alignment enums in renderutils)
 //
 
 package at.hannibal2.skyhanni.features.gui.customscoreboard
@@ -52,7 +53,7 @@ class CustomScoreboard {
             } else {
                 display
             }
-        config.position.renderStringsAlignedWidth(render, posLabel = guiName)
+        config.position.renderStringsAlignedWidth(render, posLabel = guiName, extraSpace = displayConfig.lineSpacing - 10)
     }
 
     @SubscribeEvent
@@ -73,7 +74,7 @@ class CustomScoreboard {
 
         // Creating the lines
         if (event.isMod(5)) {
-            display = createLines()
+            display = createLines().removeEmptyLinesFromEdges()
             if (TabListData.fullyLoaded) {
                 cache = display.toList()
             }
@@ -96,7 +97,7 @@ class CustomScoreboard {
 
             // Hide consecutive empty lines
             if (
-                config.informationFilteringConfig.hideConsecutiveEmptyLines &&
+                informationFilteringConfig.hideConsecutiveEmptyLines &&
                 line.isNotEmpty() && line[0].first == "<empty>" && lastOrNull()?.first?.isEmpty() == true
             ) {
                 continue
@@ -115,6 +116,15 @@ class CustomScoreboard {
 
             addAll(line)
         }
+    }
+
+    private fun List<ScoreboardElementType>.removeEmptyLinesFromEdges(): List<ScoreboardElementType> {
+        if (config.informationFilteringConfig.hideEmptyLinesAtTopAndBottom) {
+            return this
+                .dropWhile { it.first.isEmpty() }
+                .dropLastWhile { it.first.isEmpty() }
+        }
+        return this
     }
 
     // Thank you Apec for showing that the ElementType of the stupid scoreboard is FUCKING HELMET WTF
