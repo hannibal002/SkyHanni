@@ -7,6 +7,7 @@ import at.hannibal2.skyhanni.events.TabListUpdateEvent
 import at.hannibal2.skyhanni.features.misc.compacttablist.AdvancedPlayerList
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils
+import at.hannibal2.skyhanni.utils.StringUtils.cleanPlayerName
 import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
@@ -101,7 +102,7 @@ object IslandLeaveJoinMsgs {
                 if (players.contains(player)) return@matchMatcher
                 players.add(player)         // !onPrivateIslandGarden because a vanilla message gets sent
                 if (shouldSendMsg(player) && updatedSinceWorldSwitch && !onPrivateWorld) {
-                    ChatUtils.chat("$player$joinMessage")
+                    ChatUtils.chat("${player.cleanPlayerName(displayName = config.alwaysOnKnownIslands)}$joinMessage")
                 }
             }
             rawPlayerPattern.matchMatcher(line) {
