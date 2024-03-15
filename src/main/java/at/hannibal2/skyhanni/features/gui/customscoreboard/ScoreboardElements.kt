@@ -361,7 +361,7 @@ private fun getHeatDisplayPair(): List<ScoreboardElementType> {
     return listOf(
         when {
             informationFilteringConfig.hideEmptyLines && heat == "§c♨ 0" -> "<hidden>"
-            displayConfig.displayNumbersFirst -> if (heat == "0") "§c♨ 0 Heat" else "$heat Heat"
+            displayConfig.displayNumbersFirst/* && heat != "§6IMMUNE" */-> if (heat == "0") "§c♨ 0 Heat" else "$heat Heat"
             else -> if (heat == "0") "Heat: §c♨ 0" else "Heat: $heat"
         } to HorizontalAlignment.LEFT
     )
