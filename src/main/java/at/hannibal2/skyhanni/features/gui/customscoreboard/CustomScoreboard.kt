@@ -25,8 +25,10 @@ import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.LorenzTickEvent
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils
+import at.hannibal2.skyhanni.utils.OSUtils
 import at.hannibal2.skyhanni.utils.RenderUtils.HorizontalAlignment
 import at.hannibal2.skyhanni.utils.RenderUtils.renderStringsAlignedWidth
+import at.hannibal2.skyhanni.utils.StringUtils.firstLetterUppercase
 import at.hannibal2.skyhanni.utils.TabListData
 import net.minecraftforge.client.GuiIngameForge
 import net.minecraftforge.client.event.RenderGameOverlayEvent
@@ -93,6 +95,17 @@ class CustomScoreboard {
         internal val displayConfig get() = config.displayConfig
         internal val informationFilteringConfig get() = config.informationFilteringConfig
         internal val backgroundConfig get() = config.backgroundConfig
+
+        fun copyScoreboard() {
+            ScoreboardElement.entries.map { element ->
+                "${element.name.firstLetterUppercase()} - " +
+                    "${element.showWhen.invoke()} - " +
+                    "${element.getVisiblePair().map { it.first }}"
+            }.let {
+                OSUtils.copyToClipboard(it.joinToString("\n"))
+                ChatUtils.chat("Copied the current scoreboard to the config.")
+            }
+        }
     }
 
     private fun createLines() = buildList<ScoreboardElementType> {

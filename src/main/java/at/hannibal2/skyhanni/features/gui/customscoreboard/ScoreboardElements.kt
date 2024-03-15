@@ -39,7 +39,7 @@ internal var amountOfUnknownLines = 0
 
 enum class ScoreboardElement(
     private val displayPair: Supplier<List<ScoreboardElementType>>,
-    private val showWhen: () -> Boolean,
+    val showWhen: () -> Boolean,
     private val configLine: String
 ) {
     TITLE(
