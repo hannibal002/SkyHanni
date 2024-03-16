@@ -1,12 +1,18 @@
 package at.hannibal2.skyhanni.features.garden.farming
 
 import at.hannibal2.skyhanni.config.features.garden.laneswitch.LaneSwitchNotificationSettings
+import at.hannibal2.skyhanni.events.GuiContainerEvent
 import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.LorenzTickEvent
+import at.hannibal2.skyhanni.events.LorenzToolTipEvent
 import at.hannibal2.skyhanni.features.garden.GardenAPI
 import at.hannibal2.skyhanni.features.garden.GardenPlotAPI
+import at.hannibal2.skyhanni.features.garden.GardenPlotAPI.isBarn
 import at.hannibal2.skyhanni.features.garden.GardenPlotAPI.plots
+import at.hannibal2.skyhanni.features.garden.farming.LaneSwitchUtils.canBeEnabled
+import at.hannibal2.skyhanni.features.garden.farming.LaneSwitchUtils.enabledContainsPlot
 import at.hannibal2.skyhanni.utils.ChatUtils
+import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.LocationUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils.round
 import at.hannibal2.skyhanni.utils.LorenzUtils.sendTitle
@@ -15,6 +21,12 @@ import at.hannibal2.skyhanni.utils.RenderUtils.renderString
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.SoundUtils
 import at.hannibal2.skyhanni.utils.SoundUtils.playSound
+import io.github.moulberry.notenoughupdates.events.ReplaceItemEvent
+import net.minecraft.client.player.inventory.ContainerLocalMenu
+import net.minecraft.init.Blocks
+import net.minecraft.init.Items
+import net.minecraft.item.EnumDyeColor
+import net.minecraft.item.ItemStack
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import kotlin.math.absoluteValue
 import kotlin.time.Duration.Companion.seconds
@@ -56,20 +68,20 @@ class LaneSwitchNotification {
         if (!plot.unlocked) return
 
         val plotIndex = plots.indexOf(plot)
-        val positon = LocationUtils.playerLocation()
-        val farmEnd = LaneSwitchUtils.getFarmBounds(plotIndex, positon, lastPosition) ?: return
-        lastPosition = positon
+        val position = LocationUtils.playerLocation()
+        val farmEnd = LaneSwitchUtils.getFarmBounds(plotIndex, position, lastPosition, enabledPlots) ?: return
+        lastPosition = position
         bps = LocationUtils.distanceFromPreviousTick()
-        distancesUntilSwitch = farmEnd.map { end -> end.distance(positon).round(2) }
+        distancesUntilSwitch = farmEnd.map { end -> end.distance(position).round(1) }
 
-        testForLaneSwitch(settings, farmEnd, positon)
+        testForLaneSwitch(settings, farmEnd, position)
         lastBps = bps
     }
 
     private fun testForLaneSwitch(
         settings: LaneSwitchNotificationSettings,
         farmEnd: List<LorenzVec>,
-        positon: LorenzVec,
+        position: LorenzVec,
     ) {
         val farmLength = farmEnd[0].distance(farmEnd[1])
         // farmLength / bps to get the time needed to travel the distance, - the threshold times the farm length divided by the length of 2 plots (to give some room)
@@ -80,7 +92,7 @@ class LaneSwitchNotification {
         val bpsDifference = (bps - lastBps).absoluteValue
 
         if (farmEnd.isEmpty() || lastLaneSwitch.passedSince() < farmTraverseTime || bpsDifference > 20) return
-        if (!farmEnd.any { switchPossibleInTime(positon, it, bps, threshold) }) return
+        if (!farmEnd.any { switchPossibleInTime(position, it, bps, threshold) }) return
 
         with(settings) {
             sendTitle(color.getChatColor() + text, duration.seconds)
@@ -123,4 +135,90 @@ class LaneSwitchNotification {
     }
 
     private fun isEnabled() = GardenAPI.isCurrentlyFarming() && config.enabled && plotsLoaded()
+
+    public var enabledPlots: MutableList<Int> = mutableListOf()
+    private var enableEditing = false
+
+    private val grayDyeItem = ItemStack(Items.dye, 1, EnumDyeColor.GRAY.dyeDamage)
+    private val limeDyeItem = ItemStack(Items.dye, 1, EnumDyeColor.LIME.dyeDamage)
+    private val barrierItem = ItemStack(Blocks.barrier, 1)
+    private val resetItem = ItemStack(Blocks.redstone_block, 1)
+    private var ironPickaxeItem = ItemStack(Items.iron_pickaxe, 1)
+
+    @SubscribeEvent
+    fun replaceItem(event: ReplaceItemEvent) {
+        if (!isMenuEnabled()) return
+
+        if (event.inventory is ContainerLocalMenu) {
+            if (event.slotNumber == 50) event.replaceWith(ironPickaxeItem)
+            if (!enableEditing) return
+            if (event.slotNumber == 8) event.replaceWith(resetItem)
+
+            val plot = plots.find { it.inventorySlot == event.slotNumber } ?: return
+            val plotIndex = plots.indexOf(plot)
+            if (!plot.unlocked || plot.isBarn()) {
+                event.replaceWith(barrierItem)
+                return
+            }
+            if (!enabledPlots.contains(plotIndex)) {
+                event.replaceWith(grayDyeItem)
+            } else {
+                event.replaceWith(limeDyeItem)
+            }
+        }
+    }
+
+    @SubscribeEvent
+    fun onTooltip(event: LorenzToolTipEvent) {
+        if (!isMenuEnabled()) return
+
+        val list = event.toolTip
+        val index = event.slot.slotNumber
+        if (index == 50) {
+            list.clear()
+            list.add(if (enableEditing) "§aConfigure Lane Switch Plots" else "§cConfigure Lane Switch Plots")
+        }
+        if (!enableEditing) return
+        if (index == 8) {
+            list.clear()
+            list.add("§cClick to reset Config")
+        }
+        val plot = plots.find { it.inventorySlot == event.slot.slotNumber } ?: return
+        list.clear()
+        if (!plot.unlocked) {
+            list.add("§cPlot not unlocked")
+            return
+        } else if (plot.isBarn()) {
+            list.add("§cBarn")
+            return
+        }
+        list.add(if (enabledContainsPlot(plot, enabledPlots)) "§cClick to disable Plot for Lane Switch" else "§aClick to enable Plot for Lane Switch")
+    }
+
+    @SubscribeEvent
+    fun onStackClick(event: GuiContainerEvent.SlotClickEvent) {
+        if (!isMenuEnabled()) return
+        if (event.slotId == 50) {
+            event.isCanceled = true
+            enableEditing = if (enableEditing) false else true
+        }
+        if (!enableEditing) return
+        if (event.slotId == 8) {
+            event.isCanceled = true
+            enabledPlots.clear()
+        }
+        val plot = plots.find { it.inventorySlot == event.slotId } ?: return
+        val plotIndex = plots.indexOf(plot)
+        event.isCanceled = true
+        if (!plot.unlocked || plot.isBarn()) return
+        if (enabledContainsPlot(plot, enabledPlots)) {
+            enabledPlots.remove(plotIndex)
+        } else {
+            if (!canBeEnabled(plotIndex, enabledPlots)) return
+            enabledPlots.add(plotIndex)
+        }
+    }
+
+    fun isMenuEnabled() =
+        GardenAPI.inGarden() && (InventoryUtils.openInventoryName() == "Configure Plots" || InventoryUtils.openInventoryName() == "Configure Lane Switch Plots") && config.enabled
 }
