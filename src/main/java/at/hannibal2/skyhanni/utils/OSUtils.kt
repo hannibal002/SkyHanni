@@ -23,7 +23,7 @@ object OSUtils {
         } else {
             copyToClipboard(url)
             ErrorManager.logErrorStateWithData(
-                "Cannot open website! Copied url to clipboard.", "Web browser is not supported",
+                "Cannot open website! Copied url to clipboard instead", "Web browser is not supported",
                 "url" to url,
                 "desktopSupported" to desktopSupported,
                 "supportedActionBrowse" to supportedActionBrowse,
