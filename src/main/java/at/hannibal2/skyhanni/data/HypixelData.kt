@@ -148,14 +148,15 @@ class HypixelData {
                 playerAmountGuestingPattern
             )
 
-            for (line in TabListData.getTabList()) {
-                playerPatternList.matchMatchers(line) {
-                    amount += group("amount").toInt()
-                }
-                soloProfileAmountPattern.matchMatcher(line) {
-                    amount++
+            out@for (pattern in playerPatternList) {
+                for (line in TabListData.getTabList()) {
+                    pattern.matchMatcher(line) {
+                        amount += group("amount").toInt()
+                        continue@out
+                    }
                 }
             }
+            amount += TabListData.getTabList().count { soloProfileAmountPattern.matches(it) }
 
             return amount
         }
