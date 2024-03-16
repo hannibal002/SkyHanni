@@ -541,7 +541,7 @@ class GardenVisitorFeatures {
     private fun hasItemsInInventory(visitor: VisitorAPI.Visitor): Boolean {
         var ready = true
         for ((internalName, required) in visitor.shoppingList) {
-            val having = InventoryUtils.countItemsInLowerInventory { it.getInternalName() == internalName }
+            val having = InventoryUtils.getAmountOfItemInInventory(internalName)
             if (having < required) {
                 ready = false
             }

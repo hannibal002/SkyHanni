@@ -4,6 +4,7 @@ import at.hannibal2.skyhanni.config.FeatureToggle;
 import at.hannibal2.skyhanni.config.core.config.Position;
 import at.hannibal2.skyhanni.config.features.garden.composter.ComposterConfig;
 import at.hannibal2.skyhanni.config.features.garden.cropmilestones.CropMilestonesConfig;
+import at.hannibal2.skyhanni.config.features.garden.laneswitch.LaneSwitchConfig;
 import at.hannibal2.skyhanni.config.features.garden.optimalspeed.OptimalSpeedConfig;
 import at.hannibal2.skyhanni.config.features.garden.pests.PestsConfig;
 import at.hannibal2.skyhanni.config.features.garden.visitor.VisitorConfig;
@@ -15,7 +16,6 @@ import io.github.moulberry.moulconfig.annotations.ConfigEditorSlider;
 import io.github.moulberry.moulconfig.annotations.ConfigOption;
 
 public class GardenConfig {
-
     @Expose
     @ConfigOption(name = "SkyMart", desc = "")
     @Accordion
@@ -43,6 +43,11 @@ public class GardenConfig {
     @Expose
     @Category(name = "Optimal Speed", desc = "Optimal Speed Settings")
     public OptimalSpeedConfig optimalSpeeds = new OptimalSpeedConfig();
+
+    @Expose
+    @ConfigOption(name = "Lane Switching", desc = "")
+    @Accordion
+    public LaneSwitchConfig laneswitch = new LaneSwitchConfig();
 
     @Expose
     @ConfigOption(name = "Garden Level", desc = "")
@@ -136,12 +141,6 @@ public class GardenConfig {
     public boolean plotPrice = true;
 
     @Expose
-    @ConfigOption(name = "Desk in Menu", desc = "Show a Desk button in the SkyBlock Menu. Opens the /desk command on click.")
-    @ConfigEditorBoolean
-    @FeatureToggle
-    public boolean deskInSkyBlockMenu = true;
-
-    @Expose
     @ConfigOption(name = "Fungi Cutter Warning", desc = "Warn when breaking mushroom with the wrong Fungi Cutter mode.")
     @ConfigEditorBoolean
     @FeatureToggle
@@ -223,12 +222,6 @@ public class GardenConfig {
     @ConfigEditorBoolean
     @FeatureToggle
     public boolean plotBorders = true;
-
-    @Expose
-    @ConfigOption(name = "Plot Name in Scoreboard", desc = "Showing a more compact plot name in scoreboard. Updates faster and doesnt hide when pests are spawned.")
-    @ConfigEditorBoolean
-    @FeatureToggle
-    public boolean plotNameInScoreboard = true;
 
     @Expose
     @ConfigOption(name = "Copy Milestone Data", desc = "Copy wrong crop milestone data in clipboard when opening the crop milestone menu. Please share this data in SkyHanni discord.")
