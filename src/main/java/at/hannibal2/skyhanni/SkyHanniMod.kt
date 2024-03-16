@@ -853,7 +853,7 @@ class SkyHanniMod {
 
         @JvmStatic
         val feature: Features get() = configManager.features
-        val sackData: SackData get() = configManager.sackData 
+        val sackData: SackData get() = configManager.sackData
         val friendsData: FriendsJson get() = configManager.friendsData
         val knownFeaturesData: KnownFeaturesJson get() = configManager.knownFeaturesData
         val jacobContestsData: JacobContestsJson get() = configManager.jacobContestData
