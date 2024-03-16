@@ -452,10 +452,11 @@ private fun getLobbyDisplayPair(): List<ScoreboardElementType> {
 private fun getPowerDisplayPair() = listOf(
     (MaxwellAPI.currentPower?.let {
         val mp = if (displayConfig.showMagicalPower) "§7(§6${MaxwellAPI.magicalPower?.addSeparators()}§7)" else ""
+        val name = it.replace("Power", "")
         if (displayConfig.displayNumbersFirst) {
-            "§a${MaxwellAPI.currentPower?.replace("Power", "")} Power $mp"
+            "§a$name Power $mp"
         } else {
-            "Power: §a${MaxwellAPI.currentPower?.replace("Power", "")} $mp"
+            "Power: §a$name $mp"
         }
     }
         ?: "§cOpen \"Your Bags\"!") to HorizontalAlignment.LEFT
