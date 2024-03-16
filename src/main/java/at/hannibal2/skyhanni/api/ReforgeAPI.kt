@@ -1,7 +1,7 @@
 package at.hannibal2.skyhanni.api
 
 import at.hannibal2.skyhanni.config.ConfigManager
-import at.hannibal2.skyhanni.data.jsonobjects.ReforgeStoneJson
+import at.hannibal2.skyhanni.data.jsonobjects.repo.neu.NeuReforgeStoneJson
 import at.hannibal2.skyhanni.events.NeuRepositoryReloadEvent
 import at.hannibal2.skyhanni.events.RepositoryReloadEvent
 import at.hannibal2.skyhanni.test.command.ErrorManager
@@ -12,11 +12,9 @@ import at.hannibal2.skyhanni.utils.LorenzRarity
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.NEUInternalName
 import at.hannibal2.skyhanni.utils.NEUInternalName.Companion.asInternalName
-import at.hannibal2.skyhanni.utils.NEUItems
 import at.hannibal2.skyhanni.utils.StringUtils.allLettersFirstUppercase
 import at.hannibal2.skyhanni.utils.fromJson
 import io.github.moulberry.notenoughupdates.util.Utils
-import net.minecraft.item.Item
 import net.minecraft.item.ItemStack
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import java.util.EnumMap
@@ -161,7 +159,8 @@ object ReforgeAPI {
     fun onNeuRepoReload(event: NeuRepositoryReloadEvent) {
         val data = event.getConstant("reforgestones") ?: ErrorManager.skyHanniError("NEU reforgestones data is null")
         try {
-            val reforgeStoneData = ConfigManager.gson.fromJson<Map<String, ReforgeStoneJson>>(data).values
+            val reforgeStoneData = ConfigManager.gson.fromJson<Map<String, NeuReforgeStoneJson>>(data).values
+            reforgeStoneData.forEach { it.init() }
 
             reforgeList = reforgeStoneData.map {
                 reforge(it)
@@ -176,12 +175,12 @@ object ReforgeAPI {
         }
     }
 
-    private fun reforge(it: ReforgeStoneJson): Reforge {
-        val type = it.getItemType() ?: throw IllegalStateException()
+    private fun reforge(it: NeuReforgeStoneJson): Reforge {
+        val type = it.itemType
         return Reforge(
             name = it.reforgeName,
             type = LorenzUtils.enumValueOf<ReforgeType>(type.first),
-            stats = it.reforgeStats?.map {
+            stats = it.reforgeStats.map {
                 LorenzUtils.enumValueOf<LorenzRarity>(
                     it.key.replace(
                         " ",
@@ -189,10 +188,10 @@ object ReforgeAPI {
                     )
                 ) to StatList.fromJson(it.value)
             }
-                ?.toMap() ?: emptyMap(),
+                .toMap(),
             reforgeStone = it.internalName.asInternalName(),
             specialItems = type.second.takeIf { it.isNotEmpty() },
-            extraProperty = it.getReforgeAbility()
+            extraProperty = it.reforgeAbility
                 .mapKeys { LorenzUtils.enumValueOf<LorenzRarity>(it.key.replace(" ", "_")) }
         )
     }
@@ -279,38 +278,4 @@ object ReforgeAPI {
         }
     }
 
-    fun ReforgeStoneJson.getReforgeAbility(): Map<String, String> {
-        val any = this.reforgeAbility ?: return emptyMap()
-        return when (any) {
-            is String -> {
-                this.requiredRarities.associateWith { any }
-            }
-
-            is Map<*, *> -> any as? Map<String, String> ?: emptyMap()
-            else -> emptyMap()
-        }
-    }
-
-    fun ReforgeStoneJson.getItemType(): Pair<String, List<NEUInternalName>>? {
-        val any = this.itemTypes ?: return null
-        return when (any) {
-            is String -> {
-                any.replace("/", "_AND_").uppercase() to emptyList()
-            }
-
-            is Map<*, *> -> {
-                val type = ReforgeType.SPECIAL_ITEMS.name
-                val map = any as? Map<String, List<String>> ?: return type to emptyList()
-                val internalNames = map["internalName"]?.map { it.asInternalName() } ?: emptyList()
-                val itemType =
-                    map["itemid"]?.map {
-                        NEUItems.getInternalNamesForItemId(Item.getByNameOrId(it))
-                    }?.flatten()
-                        ?: emptyList()
-                type to (internalNames + itemType)
-            }
-
-            else -> null
-        }
-    }
 }
