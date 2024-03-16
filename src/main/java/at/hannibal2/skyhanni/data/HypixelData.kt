@@ -73,6 +73,7 @@ class HypixelData {
         val scoreboardVisitingAmoutPattern by patternGroup.pattern(
             "scoreboard.visiting.amount",
             "\\s+§.✌ §.\\(§.(?<currentamount>\\d+)§.\\/(?<maxamount>\\d+)\\)"
+        )
         private val guestPattern by patternGroup.pattern(
             "guesting.scoreboard",
             "SKYBLOCK GUEST"
