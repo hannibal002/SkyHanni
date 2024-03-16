@@ -31,6 +31,7 @@ import at.hannibal2.skyhanni.utils.RenderUtils.drawString
 import at.hannibal2.skyhanni.utils.RenderUtils.renderString
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.SoundUtils
+import at.hannibal2.skyhanni.utils.StringUtils.findMatcher
 import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.TabListData
@@ -65,7 +66,7 @@ object TrevorFeatures {
     )
     private val locationPattern by patternGroup.pattern(
         "zone",
-        "Zone: (?<zone>.*)"
+        "Location: (?<zone>.*)"
     )
     private val mobDiedPattern by patternGroup.pattern(
         "mob.died",
@@ -74,6 +75,14 @@ object TrevorFeatures {
     private val startDialoguePattern by patternGroup.pattern(
         "start.dialogue",
         "[NPC] Trevor: You will have 10 minutes to find the mob from when you accept the task."
+    )
+    private val outOfTimePattern by patternGroup.pattern(
+        "outoftime",
+        "You ran out of time and the animal disappeared!"
+    )
+    private val clickOptionPattern by patternGroup.pattern(
+        "clickoption",
+        "Click an option: §r§a§l\\[YES]§r§7 - §r§c§l\\[NO]"
     )
 
     private var timeUntilNextReady = 0
@@ -158,12 +167,13 @@ object TrevorFeatures {
         startDialoguePattern.matchMatcher(formattedMessage) {
             teleportBlock = SimpleTimeMark.now()
         }
+        outOfTimePattern.matchMatcher(formattedMessage) {
+            resetTrapper()
+        }
 
-        if (event.message.contains("§r§7Click an option: §r§a§l[YES]§r§7 - §r§c§l[NO]")) {
-
-            val siblings = event.chatComponent.siblings
-
-            for (sibling in siblings) {
+        clickOptionPattern.findMatcher(event.message) {
+            println("did match")
+            event.chatComponent.siblings.forEach { sibling ->
                 if (sibling.chatStyle.chatClickEvent != null && sibling.chatStyle.chatClickEvent.value.contains("YES")) {
                     lastChatPromptTime = SimpleTimeMark.now()
                     lastChatPrompt = sibling.chatStyle.chatClickEvent.value.drop(1)
@@ -308,13 +318,17 @@ object TrevorFeatures {
         }
     }
 
-    @SubscribeEvent
-    fun onWorldChange(event: LorenzWorldChangeEvent) {
+    private fun resetTrapper() {
         TrevorSolver.resetLocation()
         currentStatus = TrapperStatus.READY
         currentLabel = "§2Ready"
         questActive = false
         inBetweenQuests = false
+    }
+
+    @SubscribeEvent
+    fun onWorldChange(event: LorenzWorldChangeEvent) {
+        resetTrapper()
     }
 
     enum class TrapperStatus(baseColor: LorenzColor) {

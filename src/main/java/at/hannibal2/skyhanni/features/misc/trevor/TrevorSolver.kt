@@ -57,9 +57,9 @@ object TrevorSolver {
             if (animalHealths.any { it == entityHealth } && currentMob != null) {
                 if (foundID == entity.entityId) {
                     val dist = entity.position.toLorenzVec().distanceToPlayer()
-                    if ((currentMob == TrevorMob.RABBIT || currentMob == TrevorMob.SHEEP) && mobLocation == TrapperMobArea.OASIS) {
-                        println("This is unfortunate")
-                    } else canSee = entity.canBeSeen() && dist < currentMob!!.renderDistance
+                    if ((currentMob == TrevorMob.RABBIT || currentMob == TrevorMob.SHEEP) && mobLocation == TrapperMobArea.OASIS) return
+
+                    canSee = entity.canBeSeen() && dist < currentMob!!.renderDistance
                     if (canSee) {
                         if (mobLocation != TrapperMobArea.FOUND) {
                             LorenzUtils.sendTitle("§2Saw ${currentMob!!.mobName}!", 3.seconds)
