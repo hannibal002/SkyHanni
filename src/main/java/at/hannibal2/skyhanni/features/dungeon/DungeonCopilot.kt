@@ -23,15 +23,6 @@ class DungeonCopilot {
 
     private val config get() = SkyHanniMod.feature.dungeon
 
-//     private val countdownPattern =
-//         "(.*) has started the dungeon countdown. The dungeon will begin in 1 minute.".toPattern()
-//     private val keyPatternsList = listOf(
-//         "§eA §r§a§r§[6c]§r§[8c](?<key>Wither|Blood) Key§r§e was picked up!".toPattern(),
-//         "(.*) §r§ehas obtained §r§a§r§[6c]§r§[8c](?<key>Wither|Blood) Key§r§e!".toPattern()
-//     )
-//     private val witherDoorPattern = "(.*) opened a §r§8§lWITHER §r§adoor!".toPattern()
-//     private val bloodDoorPattern = "§cThe §r§c§lBLOOD DOOR§r§c has been opened!".toPattern()
-
     private val patternGroup = RepoPattern.group("dungeon.copilot")
     private val countdownPattern by patternGroup.pattern(
         "countdown",
