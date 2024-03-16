@@ -210,7 +210,7 @@ object QuiverAPI {
 
     @SubscribeEvent
     fun onInventoryUpdate(event: OwnInventoryItemUpdateEvent) {
-        if (!isEnabled() && (event.slot != 44)) return
+        if (!isEnabled() && event.slot != 44) return
         val stack = event.itemStack
         if (stack.getExtraAttributes()?.hasKey("quiver_arrow") == true) {
             for (line in stack.getLore()) {
@@ -228,7 +228,6 @@ object QuiverAPI {
                         currentAmount = amount
                         QuiverUpdateEvent(currentArrowType, currentAmount, shouldShowAmount()).postAndCatch()
                     }
-                    return
                 }
             }
         }
