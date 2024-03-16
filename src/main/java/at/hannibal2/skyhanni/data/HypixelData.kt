@@ -17,6 +17,7 @@ import at.hannibal2.skyhanni.utils.LorenzLogger
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
+import at.hannibal2.skyhanni.utils.StringUtils.matchMatchers
 import at.hannibal2.skyhanni.utils.StringUtils.matches
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.TabListData
@@ -54,23 +55,23 @@ class HypixelData {
             "lobbytype",
             "(?<lobbyType>.*lobby)\\d+"
         )
-        val playerAmountPattern by patternGroup.pattern(
+        private val playerAmountPattern by patternGroup.pattern(
             "playeramount",
             "^\\s*(?:§.)+Players (?:§.)+\\((?<amount>\\d+)\\)\\s*$"
         )
-        val playerAmountCoopPattern by patternGroup.pattern(
+        private val playerAmountCoopPattern by patternGroup.pattern(
             "playeramount.coop",
             "^\\s*(?:§.)*Coop (?:§.)*\\((?<amount>\\d+)\\)\\s*$"
         )
-        val playerAmountGuestingPattern by patternGroup.pattern(
+        private val playerAmountGuestingPattern by patternGroup.pattern(
             "playeramount.guesting",
             "^\\s*(?:§.)*Guests (?:§.)*\\((?<amount>\\d+)\\)\\s*$"
         )
-        val soloProfileAmountPattern by patternGroup.pattern(
+        private val soloProfileAmountPattern by patternGroup.pattern(
             "solo.profile.amount",
             "^\\s*(?:§.)*Island\\s*$"
         )
-        val scoreboardVisitingAmoutPattern by patternGroup.pattern(
+        private val scoreboardVisitingAmoutPattern by patternGroup.pattern(
             "scoreboard.visiting.amount",
             "\\s+§.✌ §.\\(§.(?<currentamount>\\d+)§.\\/(?<maxamount>\\d+)\\)"
         )
@@ -141,15 +142,14 @@ class HypixelData {
 
         fun getPlayersOnCurrentServer(): Int {
             var amount = 0
+            val playerPatternList = listOf(
+                playerAmountPattern,
+                playerAmountCoopPattern,
+                playerAmountGuestingPattern
+            )
 
             for (line in TabListData.getTabList()) {
-                playerAmountPattern.matchMatcher(line) {
-                    amount += group("amount").toInt()
-                }
-                playerAmountCoopPattern.matchMatcher(line) {
-                    amount += group("amount").toInt()
-                }
-                playerAmountGuestingPattern.matchMatcher(line) {
+                playerPatternList.matchMatchers(line) {
                     amount += group("amount").toInt()
                 }
                 soloProfileAmountPattern.matchMatcher(line) {
