@@ -1,8 +1,7 @@
 package at.hannibal2.skyhanni.api
 
 import at.hannibal2.skyhanni.SkyHanniMod
-import at.hannibal2.skyhanni.config.ConfigManager
-import at.hannibal2.skyhanni.data.jsonobjects.other.NeuSacksJson
+import at.hannibal2.skyhanni.data.jsonobjects.repo.neu.NeuSacksJson
 import at.hannibal2.skyhanni.events.GuiContainerEvent
 import at.hannibal2.skyhanni.events.InventoryCloseEvent
 import at.hannibal2.skyhanni.events.LorenzChatEvent
@@ -25,7 +24,6 @@ import at.hannibal2.skyhanni.utils.PrimitiveItemStack.Companion.makePrimitiveSta
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
-import at.hannibal2.skyhanni.utils.fromJson
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import io.github.moulberry.notenoughupdates.util.Utils
 import net.minecraft.inventory.Slot
@@ -227,7 +225,7 @@ object GetFromSackAPI {
     fun onNeuRepoReload(event: NeuRepositoryReloadEvent) {
         val data = event.getConstant("sacks") ?: ErrorManager.skyHanniError("NEU sacks data is null.")
         try {
-            val sacksData = ConfigManager.gson.fromJson<NeuSacksJson>(data).sacks
+            val sacksData = event.readConstant<NeuSacksJson>("sacks").sacks
             val uniqueSackItems = mutableSetOf<NEUInternalName>()
 
             sacksData.values.forEach { sackInfo ->
