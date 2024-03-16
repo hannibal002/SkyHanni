@@ -98,7 +98,9 @@ class TabWidgetSettings {
         if (!SkyHanniMod.feature.misc.highlightWidgets) return
 
         event.gui.inventorySlots.inventorySlots
-            .filter { highlights.containsKey(it.slotNumber) }
-            .forEach { it highlight highlights[it.slotNumber]!! }
+            .associateWith { highlights[it.slotNumber] }
+            .forEach { (slot, color) ->
+                color?.let { slot.highlight(it) }
+            }
     }
 }
