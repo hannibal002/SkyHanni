@@ -66,8 +66,15 @@ object QuiverAPI {
         "fillup",
         "§aYou filled your quiver with §f(?<flintAmount>.*) §aextra arrows!"
     )
-    private val clearedPattern by chatGroup.pattern("cleared", "§aCleared your quiver!")
-    private val arrowResetPattern by chatGroup.pattern("arrowreset", "§cYour favorite arrow has been reset!")
+    private val clearedPattern by chatGroup.pattern(
+        "cleared",
+        "§aCleared your quiver!|§c§lYour quiver is now completely empty!"
+    )
+    private val arrowRanOutPattern by chatGroup.pattern(
+        "ranout",
+        "§c§lQUIVER! §cYou have run out of §f(?<type>.*)§c!"
+    )
+    private val arrowResetPattern by chatGroup.pattern("arractowreset", "§cYour favorite arrow has been reset!")
     private val addedToQuiverPattern by chatGroup.pattern(
         "addedtoquiver",
         "(§.)*You've added (§.)*(?<type>.*) x(?<amount>.*) (§.)*to your quiver!"
@@ -95,6 +102,17 @@ object QuiverAPI {
                     "message" to message,
                 )
             return
+        }
+
+        arrowRanOutPattern.matchMatcher(message) {
+            val type = group("type")
+            val ranOutType = getArrowByNameOrNull(type)
+                ?: return ErrorManager.logErrorWithData(
+                    UnknownArrowType("Unknown arrow type: $type"),
+                    "Unknown arrow type: $type",
+                    "message" to message,
+                )
+            arrowAmount[ranOutType.internalName] = 0F
         }
 
         fillUpJaxPattern.matchMatcher(message) {
