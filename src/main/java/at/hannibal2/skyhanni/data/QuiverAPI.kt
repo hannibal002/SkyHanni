@@ -4,12 +4,15 @@ import at.hannibal2.skyhanni.data.jsonobjects.repo.ArrowTypeJson
 import at.hannibal2.skyhanni.data.jsonobjects.repo.ItemsJson
 import at.hannibal2.skyhanni.events.InventoryFullyOpenedEvent
 import at.hannibal2.skyhanni.events.LorenzChatEvent
+import at.hannibal2.skyhanni.events.LorenzTickEvent
 import at.hannibal2.skyhanni.events.OwnInventoryItemUpdateEvent
+import at.hannibal2.skyhanni.events.QuiverUpdateEvent
 import at.hannibal2.skyhanni.events.RepositoryReloadEvent
 import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.CollectionUtils.addOrPut
 import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.ItemCategory
+import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalNameOrNull
 import at.hannibal2.skyhanni.utils.ItemUtils.getItemCategoryOrNull
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
@@ -17,6 +20,7 @@ import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils.round
 import at.hannibal2.skyhanni.utils.NEUInternalName
 import at.hannibal2.skyhanni.utils.NEUInternalName.Companion.asInternalName
+import at.hannibal2.skyhanni.utils.NumberUtil.formatInt
 import at.hannibal2.skyhanni.utils.NumberUtil.formatNumber
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getExtraAttributes
 import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
@@ -49,6 +53,8 @@ object QuiverAPI {
 
     private var arrows: List<ArrowType> = listOf()
 
+    private var wearingSkeletonMasterChestplate = false
+
     const val MAX_ARROW_AMOUNT = 2880
     private val SKELETON_MASTER_CHESTPLATE = "SKELETON_MASTER_CHESTPLATE".asInternalName()
 
@@ -72,9 +78,9 @@ object QuiverAPI {
     )
     private val arrowRanOutPattern by chatGroup.pattern(
         "ranout",
-        "§c§lQUIVER! §cYou have run out of §f(?<type>.*)§c!"
+        "§c§lQUIVER! §cYou have run out of §f(?<type>.*)s§c!"
     )
-    private val arrowResetPattern by chatGroup.pattern("arractowreset", "§cYour favorite arrow has been reset!")
+    private val arrowResetPattern by chatGroup.pattern("arrowreset", "§cYour favorite arrow has been reset!")
     private val addedToQuiverPattern by chatGroup.pattern(
         "addedtoquiver",
         "(§.)*You've added (§.)*(?<type>.*) x(?<amount>.*) (§.)*to your quiver!"
@@ -101,6 +107,7 @@ object QuiverAPI {
                     "Unknown arrow type: $type",
                     "message" to message,
                 )
+            QuiverUpdateEvent(currentArrow, currentAmount, shouldShowAmount()).postAndCatch()
             return
         }
 
@@ -113,6 +120,7 @@ object QuiverAPI {
                     "message" to message,
                 )
             arrowAmount[ranOutType.internalName] = 0F
+            QuiverUpdateEvent(ranOutType, currentAmount, shouldShowAmount()).postAndCatch()
         }
 
         fillUpJaxPattern.matchMatcher(message) {
@@ -126,13 +134,21 @@ object QuiverAPI {
                 )
 
             arrowAmount.addOrPut(filledUpType.internalName, amount)
+            if (filledUpType == currentArrow) {
+                QuiverUpdateEvent(filledUpType, currentAmount, shouldShowAmount()).postAndCatch()
+            }
             return
+
         }
 
         fillUpPattern.matchMatcher(message) {
             val flintAmount = group("flintAmount").formatNumber().toFloat()
 
             FLINT_ARROW_TYPE?.let { arrowAmount.addOrPut(it.internalName, flintAmount) }
+
+            if (currentArrow == FLINT_ARROW_TYPE) {
+                QuiverUpdateEvent(currentArrow, currentAmount, shouldShowAmount()).postAndCatch()
+            }
             return
         }
 
@@ -148,6 +164,9 @@ object QuiverAPI {
                 )
 
             arrowAmount.addOrPut(filledUpType.internalName, amount)
+            if (filledUpType == currentArrow) {
+                QuiverUpdateEvent(currentArrow, currentAmount, shouldShowAmount()).postAndCatch()
+            }
             return
         }
 
@@ -155,6 +174,7 @@ object QuiverAPI {
             currentAmount = 0
             arrowAmount.clear()
 
+            QuiverUpdateEvent(currentArrow, currentAmount, shouldShowAmount()).postAndCatch()
             return
         }
 
@@ -162,6 +182,7 @@ object QuiverAPI {
             currentArrow = NONE_ARROW_TYPE
             currentAmount = 0
 
+            QuiverUpdateEvent(currentArrow, currentAmount, shouldShowAmount()).postAndCatch()
             return
         }
     }
@@ -195,14 +216,18 @@ object QuiverAPI {
             for (line in stack.getLore()) {
                 quiverInventoryPattern.matchMatcher(line) {
                     val type = group("type")
-                    val amount = group("amount").formatNumber().toFloat()
+                    val amount = group("amount").formatInt()
                     val currentArrowType = getArrowByNameOrNull(type)
                         ?: return ErrorManager.logErrorWithData(
                             UnknownArrowType("Unknown arrow type: $type"),
-                            "Unknown arrow type: $type"
+                            "Unknown arrow type: $type",
+                            "line" to line,
                         )
-                    currentArrow = currentArrowType
-                    arrowAmount[currentArrowType.internalName] = amount
+                    if (currentArrowType != currentArrow || amount != currentAmount) {
+                        currentArrow = currentArrowType
+                        currentAmount = amount
+                        QuiverUpdateEvent(currentArrowType, currentAmount, shouldShowAmount()).postAndCatch()
+                    }
                     return
                 }
             }
@@ -227,6 +252,24 @@ object QuiverAPI {
 
     fun isEnabled() = LorenzUtils.inSkyBlock && storage != null
 
+    private fun shouldShowAmount() = !wearingSkeletonMasterChestplate
+
+    private fun checkChestplate() {
+        val wasWearing = wearingSkeletonMasterChestplate
+        wearingSkeletonMasterChestplate = InventoryUtils.getChestplate()?.getInternalName()?.equals(
+            SKELETON_MASTER_CHESTPLATE) ?: false
+        if (wasWearing != wearingSkeletonMasterChestplate) {
+            QuiverUpdateEvent(currentArrow, currentAmount, shouldShowAmount()).postAndCatch()
+        }
+    }
+
+    @SubscribeEvent
+    fun onTick(event: LorenzTickEvent) {
+        if (!isEnabled()) return
+        if (event.repeatSeconds(3)) {
+            checkChestplate()
+        }
+    }
 
     // Load arrows from repo
     @SubscribeEvent

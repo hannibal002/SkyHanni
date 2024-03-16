@@ -2,10 +2,9 @@ package at.hannibal2.skyhanni.features.misc
 
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.data.QuiverAPI
-import at.hannibal2.skyhanni.data.QuiverAPI.NONE_ARROW_TYPE
 import at.hannibal2.skyhanni.events.GuiRenderEvent
-import at.hannibal2.skyhanni.events.LorenzTickEvent
 import at.hannibal2.skyhanni.events.ProfileJoinEvent
+import at.hannibal2.skyhanni.events.QuiverUpdateEvent
 import at.hannibal2.skyhanni.utils.ItemUtils.getItemRarityOrNull
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.NEUItems
@@ -20,10 +19,14 @@ class QuiverDisplay {
 
     private val config get() = SkyHanniMod.feature.misc.quiverDisplay
     private var display = emptyList<Renderable>()
+    private var arrow = QuiverAPI.currentArrow
+    private var amount = 0
+    private var showAmount = true
 
     @SubscribeEvent
     fun onProfileJoin(event: ProfileJoinEvent) {
         display = emptyList()
+        updateDisplay()
     }
 
     private fun updateDisplay() {
@@ -31,23 +34,26 @@ class QuiverDisplay {
     }
 
     private fun drawDisplay() = buildList {
-        val arrowType = QuiverAPI.currentArrow ?: return@buildList
-        val arrowAmount = QuiverAPI.currentAmount
-        val itemStack = NEUItems.getItemStackOrNull(arrowType.internalName.asString()) ?: ItemStack(Items.arrow)
+        val arrow = arrow ?: return@buildList
+        val itemStack = NEUItems.getItemStackOrNull(arrow.internalName.asString()) ?: ItemStack(Items.arrow)
 
         val rarity = itemStack.getItemRarityOrNull()?.chatColorCode ?: "§f"
-        val arrowName = if (arrowType != NONE_ARROW_TYPE) StringUtils.pluralize(arrowAmount, arrowType.arrow) else arrowType.arrow
+        val arrowDisplayName = if (showAmount) StringUtils.pluralize(amount, arrow.arrow) else arrow.arrow
 
         if (config.showIcon) {
             add(Renderable.itemStack(itemStack,1.68))
         }
-
-        add(Renderable.string("§b${arrowAmount}x $rarity$arrowName"))
+        if (showAmount) {
+            add(Renderable.string(" §b${amount}x"))
+        }
+        add(Renderable.string(" $rarity$arrowDisplayName"))
     }
 
     @SubscribeEvent
-    fun onTick(event: LorenzTickEvent) {
-        if (!isEnabled()) return
+    fun onQuiverUpdate(event: QuiverUpdateEvent) {
+        arrow = event.currentArrow
+        amount = event.currentAmount
+        showAmount = event.showAmount
         updateDisplay()
     }
 
