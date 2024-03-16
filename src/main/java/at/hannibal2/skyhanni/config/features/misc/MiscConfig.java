@@ -108,7 +108,6 @@ public class MiscConfig {
     @Accordion
     public QuiverDisplayConfig quiverDisplay = new QuiverDisplayConfig();
 
-
     @Expose
     @ConfigOption(name = "Show Outside SB", desc = "Show these features outside of SkyBlock.")
     @ConfigEditorDraggableList
