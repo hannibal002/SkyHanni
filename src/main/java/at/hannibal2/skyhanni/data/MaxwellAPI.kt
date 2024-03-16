@@ -5,6 +5,7 @@ import at.hannibal2.skyhanni.events.InventoryFullyOpenedEvent
 import at.hannibal2.skyhanni.events.LorenzChatEvent
 import at.hannibal2.skyhanni.events.RepositoryReloadEvent
 import at.hannibal2.skyhanni.test.command.ErrorManager
+import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils.isInIsland
@@ -120,9 +121,10 @@ object MaxwellAPI {
     private fun processStack(stack: ItemStack) {
         for (line in stack.getLore()) {
             redstoneCollectionRequirementPattern.matchMatcher(line) {
-                // Redstone Collection is required for the bag
-                currentPower = "Redstone Collection"
-                return@matchMatcher
+                ChatUtils.chat("Seems like you don't have the Requirement for the Accessory Bag yet, setting power to No Power and magical power to 0.")
+                currentPower = getPowerByNameOrNull("No Power")
+                magicalPower = 0
+                return
             }
 
             inventoryMPPattern.matchMatcher(line) {
