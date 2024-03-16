@@ -52,7 +52,7 @@ class QuiverDisplay {
     }
 
     @SubscribeEvent
-    fun onGuiRender(event: GuiRenderEvent) {
+    fun onRenderOverlay(event: GuiRenderEvent.GuiOverlayRenderEvent) {
         if (!isEnabled()) return
         if (display.isEmpty()) return
         config.quiverDisplayPos.renderStringsAndItems(listOf(display), posLabel = "Quiver Display")
