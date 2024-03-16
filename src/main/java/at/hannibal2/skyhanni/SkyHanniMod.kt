@@ -282,6 +282,7 @@ import at.hannibal2.skyhanni.features.misc.PlayerChatSymbols
 import at.hannibal2.skyhanni.features.misc.PocketSackInASackDisplay
 import at.hannibal2.skyhanni.features.misc.PrivateIslandNoPickaxeAbility
 import at.hannibal2.skyhanni.features.misc.QuickModMenuSwitch
+import at.hannibal2.skyhanni.features.misc.QuiverDisplay
 import at.hannibal2.skyhanni.features.misc.RestorePieceOfWizardPortalLore
 import at.hannibal2.skyhanni.features.misc.ServerRestartTitle
 import at.hannibal2.skyhanni.features.misc.SkyBlockKickDuration
@@ -785,6 +786,7 @@ class SkyHanniMod {
         loadModule(InfernoMinionFeatures())
         loadModule(LimboPlaytime())
         loadModule(RareDropMessages())
+        loadModule(QuiverDisplay())
 
         init()
 
