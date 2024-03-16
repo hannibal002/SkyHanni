@@ -87,7 +87,7 @@ class LaneSwitchNotification {
         // farmLength / bps to get the time needed to travel the distance, - the threshold times the farm length divided by the length of 2 plots (to give some room)
         val threshold = settings.threshold
         // TODO find a name for this variable
-        val FIND_A_NAME_FOR_ME = threshold * (farmLength / 192)
+        val FIND_A_NAME_FOR_ME = threshold * (farmLength / 480)
         val farmTraverseTime = ((farmLength / bps) - FIND_A_NAME_FOR_ME).seconds
         val bpsDifference = (bps - lastBps).absoluteValue
 
