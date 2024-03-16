@@ -145,13 +145,16 @@ class CustomScoreboard {
     fun onDebugDataCollect(event: DebugDataCollectEvent) {
         event.title("Custom Scoreboard")
         event.addIrrelevant {
-            if (!config.enabled) add("Custom Scoreboard disabled.")
-            ScoreboardElement.entries.map { element ->
-                add(
-                    "${element.name.firstLetterUppercase()} - " +
-                        "${element.showWhen.invoke()} - " +
-                        "${element.getVisiblePair().map { it.first }}"
-                )
+            if (!config.enabled) {
+                add("Custom Scoreboard disabled.")
+            } else {
+                ScoreboardElement.entries.map { element ->
+                    add(
+                        "${element.name.firstLetterUppercase()} - " +
+                            "${element.showWhen.invoke()} - " +
+                            "${element.getVisiblePair().map { it.first }}"
+                    )
+                }
             }
         }
     }
