@@ -144,19 +144,17 @@ class CustomScoreboard {
     @SubscribeEvent
     fun onDebugDataCollect(event: DebugDataCollectEvent) {
         event.title("Custom Scoreboard")
-        if (config.enabled) {
-            event.addData("Custom Scoreboard enabled.")
-        } else {
-            event.addData("Custom Scoreboard disabled.")
-        }
-
         event.addIrrelevant {
-            ScoreboardElement.entries.map { element ->
-                add(
-                    "${element.name.firstLetterUppercase()} - " +
-                        "${element.showWhen.invoke()} - " +
-                        "${element.getVisiblePair().map { it.first }}"
-                )
+            if (!config.enabled) {
+                add("Custom Scoreboard disabled.")
+            } else {
+                ScoreboardElement.entries.map { element ->
+                    add(
+                        "${element.name.firstLetterUppercase()} - " +
+                            "${element.showWhen.invoke()} - " +
+                            "${element.getVisiblePair().map { it.first }}"
+                    )
+                }
             }
         }
     }
