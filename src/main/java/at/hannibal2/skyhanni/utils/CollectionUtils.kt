@@ -6,32 +6,27 @@ import java.util.WeakHashMap
 
 object CollectionUtils {
 
-    inline fun <reified T> Queue<T>.drainForEach(action: (T) -> Unit) {
-        while (true) {
-            val value = this.poll() ?: break
-            action(value)
-        }
-    }
-
-    inline fun <reified T : Queue<E>, reified E> T.drain(amount: Int): T {
-        for (i in 1..amount) {
-            this.poll() ?: break
-        }
+    inline fun <reified T : Queue<E>, reified E> T.drainForEach(action: (E) -> Unit): T {
+        while (true)
+            action(this.poll() ?: break)
         return this
     }
 
-    inline fun <reified T : Queue<E>, reified E, reified K, reified L : MutableCollection<K>>
-        T.drainTo(
-        list: L,
-        action: (E) -> K
-    ): L {
+    inline fun <reified T : Queue<E>, reified E> T.drain(amount: Int): T {
+        for (i in 1..amount)
+            this.poll() ?: break
+        return this
+    }
+
+    inline fun <reified E, reified K, reified L : MutableCollection<K>>
+        Queue<E>.drainTo(list: L, action: (E) -> K): L {
         while (true)
             list.add(action(this.poll() ?: break))
         return list
     }
 
-    inline fun <reified T : Queue<E>, reified E, reified L : MutableCollection<E>>
-        T.drainTo(list: L): L {
+    inline fun <reified E, reified L : MutableCollection<E>>
+        Queue<E>.drainTo(list: L): L {
         while (true)
             list.add(this.poll() ?: break)
         return list
