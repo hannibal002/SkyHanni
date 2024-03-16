@@ -23,7 +23,7 @@ public class PestFinderConfig {
     @Expose
     @ConfigOption(
         name = "Show Plot in World",
-        desc = "Mark infected plot names and world border in the world."
+        desc = "Mark infested plot names and world border in the world."
     )
     @ConfigEditorBoolean
     @FeatureToggle

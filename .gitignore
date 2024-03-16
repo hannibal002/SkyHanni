@@ -12,3 +12,6 @@ gradle.properties
 
 # other
 .DS_STORE
+
+.devauth/*
+!.devauth/config.toml

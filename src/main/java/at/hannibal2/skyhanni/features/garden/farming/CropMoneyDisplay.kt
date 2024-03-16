@@ -7,15 +7,15 @@ import at.hannibal2.skyhanni.events.GardenToolChangeEvent
 import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.LorenzTickEvent
 import at.hannibal2.skyhanni.events.ProfileJoinEvent
-import at.hannibal2.skyhanni.features.bazaar.BazaarApi.Companion.getBazaarData
-import at.hannibal2.skyhanni.features.bazaar.BazaarApi.Companion.isBazaarItem
-import at.hannibal2.skyhanni.features.bazaar.BazaarData
 import at.hannibal2.skyhanni.features.garden.CropType
 import at.hannibal2.skyhanni.features.garden.CropType.Companion.getByNameOrNull
 import at.hannibal2.skyhanni.features.garden.GardenAPI
 import at.hannibal2.skyhanni.features.garden.GardenNextJacobContest
 import at.hannibal2.skyhanni.features.garden.farming.GardenCropSpeed.getSpeed
 import at.hannibal2.skyhanni.features.garden.farming.GardenCropSpeed.isSpeedDataEmpty
+import at.hannibal2.skyhanni.features.inventory.bazaar.BazaarApi.Companion.getBazaarData
+import at.hannibal2.skyhanni.features.inventory.bazaar.BazaarApi.Companion.isBazaarItem
+import at.hannibal2.skyhanni.features.inventory.bazaar.BazaarData
 import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.CollectionUtils.addAsSingletonList
@@ -57,6 +57,8 @@ object CropMoneyDisplay {
     private var ready = false
     private val cropNames = mutableMapOf<NEUInternalName, CropType>()
     private val toolHasBountiful get() = GardenAPI.storage?.toolWithBountiful
+
+    val BOX_OF_SEEDS by lazy { "BOX_OF_SEEDS".asInternalName().getItemStack() }
 
     @SubscribeEvent
     fun onProfileJoin(event: ProfileJoinEvent) {
@@ -142,12 +144,17 @@ object CropMoneyDisplay {
                 extraMushroomCowPerkCoins = perSecond * 60 * 60
             }
 
-            if (InventoryUtils.getItemInHand()?.getInternalName()?.contains("DICER") == true && config.dicer) {
+            val itemInHand = InventoryUtils.getItemInHand()?.getInternalName()
+            if (itemInHand?.contains("DICER") == true && config.dicer) {
                 val (dicerDrops, internalName) = when (it) {
                     CropType.MELON -> GardenCropSpeed.latestMelonDicer to "ENCHANTED_MELON".asInternalName()
                     CropType.PUMPKIN -> GardenCropSpeed.latestPumpkinDicer to "ENCHANTED_PUMPKIN".asInternalName()
 
-                    else -> ErrorManager.skyHanniError("Unknown dicer: $it")
+                    else -> ErrorManager.skyHanniError(
+                        "Unknown dicer detected.",
+                        "crop" to it,
+                        "item in hand" to itemInHand,
+                    )
                 }
                 val bazaarData = internalName.getBazaarData()
                 val price =
@@ -195,16 +202,21 @@ object CropMoneyDisplay {
 
             try {
                 if (isSeeds(internalName)) {
-                    list.add(getItemStack("BOX_OF_SEEDS"))
+                    list.add(BOX_OF_SEEDS)
                 } else {
                     list.add(internalName.getItemStack())
                 }
 
                 if (cropNames[internalName] == CropType.WHEAT && config.mergeSeeds) {
-                    list.add(getItemStack("BOX_OF_SEEDS"))
+                    list.add(BOX_OF_SEEDS)
                 }
             } catch (e: NullPointerException) {
-                e.printStackTrace()
+                ErrorManager.logErrorWithData(
+                    e, "Error calculating seed price for money per hour display",
+                    "internalName" to internalName,
+                    "cropNames" to cropNames,
+                    "list" to list,
+                )
             }
 
             if (!config.compact) {
@@ -269,7 +281,7 @@ object CropMoneyDisplay {
     private fun format(moneyPerHour: Double) = if (config.compactPrice) {
         NumberUtil.format(moneyPerHour)
     } else {
-        LorenzUtils.formatInteger(moneyPerHour.toLong())
+        moneyPerHour.toLong().addSeparators()
     }
 
     private fun calculateMoneyPerHour(debugList: MutableList<List<Any>>): Map<NEUInternalName, Array<Double>> {
@@ -283,6 +295,8 @@ object CropMoneyDisplay {
                 (config.useCustomFormat && config.customFormat.singleOrNull() == CustomFormatEntry.NPC_PRICE)
 
         for ((internalName, amount) in multipliers.moveEntryToTop { isSeeds(it.key) }) {
+            if (internalName.equals("BOX_OF_SEEDS")) continue
+
             val crop = cropNames[internalName]!!
             // When only the NPC price is shown, display the price only for the base item
             if (onlyNpcPrice) {
@@ -402,7 +416,6 @@ object CropMoneyDisplay {
                 if (rawInternalName == "ENCHANTED_PAPER") continue
                 if (rawInternalName == "ENCHANTED_BREAD") continue
                 if (rawInternalName == "SIMPLE_CARROT_CANDY") continue
-                if (rawInternalName == "BOX_OF_SEEDS") continue
                 val internalName = rawInternalName.asInternalName()
                 if (!internalName.isBazaarItem()) continue
 

@@ -16,7 +16,7 @@ object ItemNameResolver {
         }
 
         if (itemName == "§cmissing repo item") {
-                return itemNameCache.getOrPut(lowercase) { NEUInternalName.MISSING_ITEM }
+            return itemNameCache.getOrPut(lowercase) { NEUInternalName.MISSING_ITEM }
         }
 
         resolveEnchantmentByName(itemName)?.let {
@@ -74,6 +74,7 @@ object ItemNameResolver {
         if (NEUItems.allItemsCache.isEmpty()) {
             NEUItems.allItemsCache = NEUItems.readAllNeuItems()
         }
+
         NEUItems.allItemsCache[lowercase]?.let {
             itemNameCache[lowercase] = it
             return it

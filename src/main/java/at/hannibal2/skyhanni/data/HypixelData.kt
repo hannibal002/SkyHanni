@@ -17,6 +17,7 @@ import at.hannibal2.skyhanni.utils.LorenzLogger
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
+import at.hannibal2.skyhanni.utils.StringUtils.matches
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.TabListData
 import at.hannibal2.skyhanni.utils.UtilsPatterns
@@ -24,8 +25,6 @@ import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import com.google.gson.JsonObject
 import io.github.moulberry.notenoughupdates.NotEnoughUpdates
 import net.minecraft.client.Minecraft
-import net.minecraftforge.client.event.ClientChatReceivedEvent
-import net.minecraftforge.fml.common.eventhandler.EventPriority
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import net.minecraftforge.fml.common.network.FMLNetworkEvent
 import kotlin.concurrent.thread
@@ -34,10 +33,6 @@ import kotlin.time.Duration.Companion.seconds
 class HypixelData {
 
     private val patternGroup = RepoPattern.group("data.hypixeldata")
-    private val lobbyTypePattern by patternGroup.pattern(
-        "lobbytype",
-        "(?<lobbyType>.*lobby)\\d+"
-    )
     private val islandNamePattern by patternGroup.pattern(
         "islandname",
         "(?:§.)*(Area|Dungeon): (?:§.)*(?<island>.*)"
@@ -54,6 +49,14 @@ class HypixelData {
         private val serverIdTablistPattern by patternGroup.pattern(
             "serverid.tablist",
             " Server: §r§8(?<serverid>\\S+)"
+        )
+        private val lobbyTypePattern by patternGroup.pattern(
+            "lobbytype",
+            "(?<lobbyType>.*lobby)\\d+"
+        )
+        private val guestPattern by patternGroup.pattern(
+            "guesting.scoreboard",
+            "SKYBLOCK GUEST"
         )
 
         var hypixelLive = false
@@ -114,6 +117,36 @@ class HypixelData {
             }
 
             return serverId
+        }
+
+        // This code is modified from NEU, and depends on NEU (or another mod) sending /locraw.
+        private val jsonBracketPattern = "^\\{.+}".toPattern()
+
+        //todo convert to proper json object
+        fun checkForLocraw(message: String) {
+            jsonBracketPattern.matchMatcher(message.removeColor()) {
+                try {
+                    val obj: JsonObject = gson.fromJson(group(), JsonObject::class.java)
+                    if (obj.has("server")) {
+                        locrawData = obj
+                        locraw.keys.forEach { key ->
+                            locraw[key] = obj[key]?.asString ?: ""
+                        }
+                        inLimbo = locraw["server"] == "limbo"
+                        inLobby = locraw["lobbyname"] != ""
+
+                        if (inLobby) {
+                            locraw["lobbyname"]?.let {
+                                lobbyTypePattern.matchMatcher(it) {
+                                    locraw["lobbytype"] = group("lobbyType")
+                                }
+                            }
+                        }
+                    }
+                } catch (e: Exception) {
+                    ErrorManager.logErrorWithData(e, "Failed to parse locraw data")
+                }
+            }
         }
     }
 
@@ -220,6 +253,7 @@ class HypixelData {
         if (inSkyBlock) {
             checkIsland()
             checkSidebar()
+            getCurrentServerId()
         }
 
         if (inSkyBlock == skyBlock) return
@@ -271,16 +305,17 @@ class HypixelData {
 
     private fun checkIsland() {
         var newIsland = ""
-        var guesting = false
+        TabListData.fullyLoaded = false
+
         for (line in TabListData.getTabList()) {
             islandNamePattern.matchMatcher(line) {
                 newIsland = group("island").removeColor()
-            }
-            if (line == " Status: §r§9Guest") {
-                guesting = true
+                TabListData.fullyLoaded = true
             }
         }
 
+        // Can not use color coding, because of the color effect (§f§lSKYB§6§lL§e§lOCK§A§L GUEST)
+        val guesting = guestPattern.matches(ScoreboardData.objectiveTitle.removeColor())
         val islandType = getIslandType(newIsland, guesting)
         if (skyBlockIsland != islandType) {
             IslandChangeEvent(islandType, skyBlockIsland).postAndCatch()
@@ -294,8 +329,8 @@ class HypixelData {
         }
     }
 
-    private fun getIslandType(newIsland: String, guesting: Boolean): IslandType {
-        val islandType = IslandType.getByNameOrUnknown(newIsland)
+    private fun getIslandType(name: String, guesting: Boolean): IslandType {
+        val islandType = IslandType.getByNameOrUnknown(name)
         if (guesting) {
             if (islandType == IslandType.PRIVATE_ISLAND) return IslandType.PRIVATE_ISLAND_GUEST
             if (islandType == IslandType.GARDEN) return IslandType.GARDEN_GUEST
@@ -312,35 +347,5 @@ class HypixelData {
         val scoreboardTitle = displayName.removeColor()
         return scoreboardTitle.contains("SKYBLOCK") ||
             scoreboardTitle.contains("SKIBLOCK") // April 1st jokes are so funny
-    }
-
-    // This code is modified from NEU, and depends on NEU (or another mod) sending /locraw.
-    private val jsonBracketPattern = "^\\{.+}".toPattern()
-
-    @SubscribeEvent(priority = EventPriority.LOW, receiveCanceled = true)
-    fun onChatMessage(event: ClientChatReceivedEvent) {
-        jsonBracketPattern.matchMatcher(event.message.unformattedText) {
-            try {
-                val obj: JsonObject = gson.fromJson(group(), JsonObject::class.java)
-                if (obj.has("server")) {
-                    locrawData = obj
-                    locraw.keys.forEach { key ->
-                        locraw[key] = obj[key]?.asString ?: ""
-                    }
-                    inLimbo = locraw["server"] == "limbo"
-                    inLobby = locraw["lobbyname"] != ""
-
-                    if (inLobby) {
-                        locraw["lobbyname"]?.let {
-                            lobbyTypePattern.matchMatcher(it) {
-                                locraw["lobbytype"] = group("lobbyType")
-                            }
-                        }
-                    }
-                }
-            } catch (e: Exception) {
-                ErrorManager.logErrorWithData(e, "Failed to parse locraw data")
-            }
-        }
     }
 }

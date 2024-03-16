@@ -15,6 +15,7 @@ import at.hannibal2.skyhanni.utils.NEUInternalName
 import at.hannibal2.skyhanni.utils.NEUInternalName.Companion.asInternalName
 import at.hannibal2.skyhanni.utils.NEUItems
 import at.hannibal2.skyhanni.utils.NEUItems.getCachedIngredients
+import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.NumberUtil.romanToDecimalIfNecessary
 import at.hannibal2.skyhanni.utils.RenderUtils.renderStrings
 import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
@@ -222,8 +223,8 @@ class MinionCraftHelper {
                         return
                     }
                     val format = LorenzUtils.formatPercentage(percentage)
-                    val haveFormat = LorenzUtils.formatInteger(have)
-                    val needFormat = LorenzUtils.formatInteger(needAmount)
+                    val haveFormat = have.addSeparators()
+                    val needFormat = needAmount.addSeparators()
                     newDisplay.add("$itemName§8: §e$format §8(§7$haveFormat§8/§7$needFormat§8)")
                     allDone = false
                 }
@@ -265,19 +266,17 @@ class MinionCraftHelper {
         if (event.inventoryName != "Crafted Minions") return
 
         for ((_, b) in event.inventoryItems) {
-            val name = b.name ?: continue
+            val name = b.name
             if (!name.startsWith("§e")) continue
             val internalName = NEUInternalName.fromItemName("$name I")
                 .replace("MINION", "GENERATOR").replace(";", "_").replace("CAVE_SPIDER", "CAVESPIDER")
-            if (!tierOneMinionsDone.contains(internalName)) {
-                tierOneMinionsDone.add(internalName)
-            }
+            tierOneMinionsDone.add(internalName)
         }
     }
 
     @SubscribeEvent
     fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
-        event.transform(19, "#player.bingoSessions") { element ->
+        event.transform(26, "#player.bingoSessions") { element ->
             for ((_, data) in element.asJsonObject.entrySet()) {
                 fixTierOneMinions(data.asJsonObject)
             }
@@ -286,11 +285,12 @@ class MinionCraftHelper {
     }
 
     private fun fixTierOneMinions(data: JsonObject) {
+        val uniqueEntries = mutableSetOf<String>()
         val newList = JsonArray()
         var counter = 0
         for (entry in data["tierOneMinionsDone"].asJsonArray) {
             val name = entry.asString
-            if (!name.startsWith("INTERNALNAME:")) {
+            if (!name.startsWith("INTERNALNAME:") && uniqueEntries.add(name)) {
                 newList.add(entry)
             } else {
                 counter++

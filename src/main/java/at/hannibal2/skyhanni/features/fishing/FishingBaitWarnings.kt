@@ -2,89 +2,94 @@ package at.hannibal2.skyhanni.features.fishing
 
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.events.FishingBobberCastEvent
-import at.hannibal2.skyhanni.events.LorenzRenderWorldEvent
-import at.hannibal2.skyhanni.events.LorenzTickEvent
+import at.hannibal2.skyhanni.events.FishingBobberInWaterEvent
+import at.hannibal2.skyhanni.events.LorenzWorldChangeEvent
 import at.hannibal2.skyhanni.features.fishing.FishingAPI.isBait
-import at.hannibal2.skyhanni.utils.BlockUtils.getBlockAt
 import at.hannibal2.skyhanni.utils.ChatUtils
+import at.hannibal2.skyhanni.utils.DelayedRun
 import at.hannibal2.skyhanni.utils.EntityUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.name
 import at.hannibal2.skyhanni.utils.LorenzUtils
+import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.SoundUtils
-import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.getLorenzVec
 import net.minecraft.entity.item.EntityItem
 import net.minecraft.entity.projectile.EntityFishHook
-import net.minecraft.item.ItemStack
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
+import kotlin.time.Duration.Companion.milliseconds
 import kotlin.time.Duration.Companion.seconds
 
 class FishingBaitWarnings {
 
     private val config get() = SkyHanniMod.feature.fishing.fishingBaitWarnings
-    private var bobber: EntityFishHook? = null
-    private var lastBait: String? = null
-    private var isUsingBait: Boolean = false
 
     @SubscribeEvent
     fun onBobberThrow(event: FishingBobberCastEvent) {
-        bobber = event.bobber
-        isUsingBait = false
+    }
+
+    private var lastBait: String? = null
+    private var wasUsingBait = true
+
+    @SubscribeEvent
+    fun onWorldChange(event: LorenzWorldChangeEvent) {
+        lastBait = null
+        wasUsingBait = true
     }
 
     @SubscribeEvent
-    fun onTick(event: LorenzTickEvent) {
-        if (!isEnabled()) return
-        val bobber = bobber ?: return
-        if (bobber.isDead) {
-            this.bobber = null
-            return
+    fun onBobberInWater(event: FishingBobberInWaterEvent) {
+        DelayedRun.runDelayed(500.milliseconds) {
+            checkBobber()
         }
-        if (!event.isMod(5)) return
-        if (FishingAPI.lastCastTime.passedSince() < 1.seconds) return
-
-        val block = bobber.getLorenzVec().getBlockAt()
-        if (block !in FishingAPI.getAllowedBlocks()) return
-
-        if (!isUsingBait && config.noBaitWarning) showNoBaitWarning()
-        reset()
     }
 
-    fun reset() {
-        bobber = null
-        isUsingBait = false
-    }
-
-    @SubscribeEvent
-    fun onRenderWorld(event: LorenzRenderWorldEvent) {
-        if (!isEnabled() || !config.baitChangeWarning) return
-        val bobber = bobber ?: return
-        EntityUtils.getEntitiesNearby<EntityItem>(bobber.getLorenzVec(), 1.5)
-            .forEach { onBaitDetection(it.entityItem) }
-    }
-
-    private fun onBaitDetection(itemStack: ItemStack) {
-        if (!itemStack.isBait()) return
-        val name = itemStack.name?.removeColor() ?: return
-
-        isUsingBait = true
-        lastBait?.let {
-            if (name == it) return
-            showBaitChangeWarning(it, name)
+    private fun checkBobber() {
+        val bobber = FishingAPI.bobber ?: return
+        val bait = detectBait(bobber)
+        if (bait == null) {
+            if (config.noBaitWarning) {
+                if (!wasUsingBait) {
+                    showNoBaitWarning()
+                }
+            }
+        } else {
+            if (config.baitChangeWarning) {
+                lastBait?.let {
+                    if (it != bait) {
+                        showBaitChangeWarning(it, bait)
+                    }
+                }
+            }
         }
-        lastBait = name
+        wasUsingBait = bait != null
+        lastBait = bait
+    }
+
+    private fun detectBait(bobber: EntityFishHook): String? {
+        for (entity in EntityUtils.getEntitiesNearby<EntityItem>(bobber.getLorenzVec(), 6.0)) {
+            val itemStack = entity.entityItem ?: continue
+            if (!itemStack.isBait()) continue
+            val ticksExisted = entity.ticksExisted
+            if (ticksExisted in 6..15) {
+                return itemStack.name
+            }
+
+            val distance = "distance: ${entity.getDistanceToEntity(bobber).addSeparators()}"
+            ChatUtils.debug("fishing bait: ticksExisted: $ticksExisted, $distance")
+        }
+        return null
     }
 
     private fun showBaitChangeWarning(before: String, after: String) {
         SoundUtils.playClickSound()
         LorenzUtils.sendTitle("§eBait changed!", 2.seconds)
-        ChatUtils.chat("Fishing Bait changed: $before -> $after")
+        ChatUtils.chat("Fishing Bait changed: $before §e-> $after")
     }
 
     private fun showNoBaitWarning() {
         SoundUtils.playErrorSound()
         LorenzUtils.sendTitle("§cNo bait is used!", 2.seconds)
-        ChatUtils.chat("You do not use any fishing baits!")
+        ChatUtils.chat("You're not using any fishing baits!")
     }
 
     private fun isEnabled() = LorenzUtils.inSkyBlock && FishingAPI.isFishing() && !LorenzUtils.inKuudraFight

@@ -1,5 +1,6 @@
 package at.hannibal2.skyhanni.utils
 
+import at.hannibal2.skyhanni.events.SkyHanniRenderEntityEvent
 import at.hannibal2.skyhanni.utils.ItemUtils.getSkullTexture
 import at.hannibal2.skyhanni.utils.LocationUtils.canBeSeen
 import at.hannibal2.skyhanni.utils.LocationUtils.distanceTo
@@ -14,6 +15,9 @@ import net.minecraft.entity.player.EntityPlayer
 import net.minecraft.item.ItemStack
 import net.minecraft.potion.Potion
 import net.minecraft.util.AxisAlignedBB
+import net.minecraftforge.client.event.RenderLivingEvent
+import net.minecraftforge.fml.common.eventhandler.Event
+import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
 object EntityUtils {
 
@@ -157,4 +161,48 @@ object EntityUtils {
     fun Entity.canBeSeen(radius: Double = 150.0) = getLorenzVec().add(y = 0.5).canBeSeen(radius)
 
     fun getEntityByID(entityId: Int) = Minecraft.getMinecraft()?.thePlayer?.entityWorld?.getEntityByID(entityId)
+
+    @SubscribeEvent
+    fun onEntityRender(event: RenderLivingEvent<*>) {
+        val shEvent = SkyHanniRenderEntityEvent(event.entity, event.renderer, event.x, event.y, event.z)
+        if (shEvent.postAndCatch()) {
+            event.cancel()
+        }
+    }
+
+    @SubscribeEvent
+    fun onEntityRenderPre(event: RenderLivingEvent.Pre<*>) {
+        val shEvent = SkyHanniRenderEntityEvent.Pre(event.entity, event.renderer, event.x, event.y, event.z)
+        if (shEvent.postAndCatch()) {
+            event.cancel()
+        }
+    }
+
+    @SubscribeEvent
+    fun onEntityRenderPost(event: RenderLivingEvent.Post<*>) {
+        val shEvent = SkyHanniRenderEntityEvent.Post(event.entity, event.renderer, event.x, event.y, event.z)
+        if (shEvent.postAndCatch()) {
+            event.cancel()
+        }
+    }
+
+    @SubscribeEvent
+    fun onEntityRenderSpecialsPre(event: RenderLivingEvent.Specials.Pre<*>) {
+        val shEvent = SkyHanniRenderEntityEvent.Specials.Pre(event.entity, event.renderer, event.x, event.y, event.z)
+        if (shEvent.postAndCatch()) {
+            event.cancel()
+        }
+    }
+
+    @SubscribeEvent
+    fun onEntityRenderSpecialsPost(event: RenderLivingEvent.Specials.Post<*>) {
+        val shEvent = SkyHanniRenderEntityEvent.Specials.Post(event.entity, event.renderer, event.x, event.y, event.z)
+        if (shEvent.postAndCatch()) {
+            event.cancel()
+        }
+    }
+}
+
+private fun Event.cancel() {
+    isCanceled = true
 }
