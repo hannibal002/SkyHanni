@@ -2,6 +2,7 @@ package at.hannibal2.skyhanni.features.garden.contest
 
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
+import at.hannibal2.skyhanni.data.HypixelData
 import at.hannibal2.skyhanni.events.GuiContainerEvent
 import at.hannibal2.skyhanni.events.GuiRenderItemEvent
 import at.hannibal2.skyhanni.events.InventoryCloseEvent
@@ -11,13 +12,17 @@ import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.InventoryUtils.getUpperItems
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.ItemUtils.name
+import at.hannibal2.skyhanni.utils.KeyboardManager.isKeyHeld
 import at.hannibal2.skyhanni.utils.LorenzColor
 import at.hannibal2.skyhanni.utils.LorenzUtils
+import at.hannibal2.skyhanni.utils.OSUtils
 import at.hannibal2.skyhanni.utils.RenderUtils.drawSlotText
 import at.hannibal2.skyhanni.utils.RenderUtils.highlight
 import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
+import at.hannibal2.skyhanni.utils.StringUtils.matches
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
+import io.github.moulberry.notenoughupdates.events.SlotClickEvent
 import net.minecraft.client.gui.inventory.GuiChest
 import net.minecraft.inventory.ContainerChest
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
@@ -34,9 +39,14 @@ class JacobFarmingContestsInventory {
 
     // Render the contests a tick delayed to feel smoother
     private var hideEverything = true
-    private val medalPattern by RepoPattern.pattern(
-        "garden.jacob.contests.inventory.medal",
+    private val patternGroup = RepoPattern.group("garden.jacob.contests.inventory")
+    private val medalPattern by patternGroup.pattern(
+        "medal",
         "§7§7You placed in the (?<medal>.*) §7bracket!"
+    )
+    private val allowedInventoriesPattern by patternGroup.pattern(
+        "openonline.allowedinventories",
+        "Your Contests|Jacob's Farming Contests"
     )
 
     @SubscribeEvent
@@ -71,6 +81,28 @@ class JacobFarmingContestsInventory {
         val startTimeFormat = formatTime.format(time)
         val endTimeFormat = formatTime.format(time + 1000 * 60 * 20)
         realTime[slot] = "$dayFormat $startTimeFormat-$endTimeFormat"
+    }
+
+    @SubscribeEvent
+    fun onSlotClick(event: SlotClickEvent) {
+        if (!config.openOnline.isKeyHeld()) return
+        if (!LorenzUtils.inSkyBlock) return
+        val invName = InventoryUtils.openInventoryName()
+        if (!allowedInventoriesPattern.matches(invName)) return
+        val name = event.slot.stack.name
+
+        if (invName == "Your Contests" && name.contains(", Year")) {
+            OSUtils.openBrowser("https://elitebot.dev/contests/${FarmingContestAPI.getSbDateFor(name)}")
+            event.isCanceled = true
+        } else if (invName == "Jacob's Farming Contests") {
+            when (name) {
+                "§6Upcoming Contests" -> OSUtils.openBrowser("https://elitebot.dev/contests/upcoming")
+                "§bClaim your rewards!" -> OSUtils.openBrowser("https://elitebot.dev/@${LorenzUtils.getPlayerName()}/${HypixelData.profileName}/contests")
+                "§aWhat is this?" -> OSUtils.openBrowser("https://elitebot.dev/contests")
+                else -> return
+            }
+            event.isCanceled = true
+        }
     }
 
     @SubscribeEvent

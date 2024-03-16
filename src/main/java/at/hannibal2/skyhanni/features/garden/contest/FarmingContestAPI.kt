@@ -119,6 +119,15 @@ object FarmingContestAPI {
         SkyBlockTime(year, monthNr, day).toMillis()
     }
 
+    fun getSbDateFor(text: String) = timePattern.matchMatcher(text) {
+        val month = group("month")
+        val monthNr = LorenzUtils.getSBMonthByName(month)
+
+        val year = group("year").toInt()
+        val day = group("day").toInt()
+        "$year/$monthNr/$day"
+    }
+
     fun addContest(time: Long, item: ItemStack) {
         contests.putIfAbsent(time, createContest(time, item))
     }
