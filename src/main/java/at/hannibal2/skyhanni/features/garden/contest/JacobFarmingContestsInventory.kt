@@ -3,14 +3,22 @@ package at.hannibal2.skyhanni.features.garden.contest
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.data.HypixelData
-import at.hannibal2.skyhanni.events.*
+import at.hannibal2.skyhanni.events.GuiContainerEvent
+import at.hannibal2.skyhanni.events.GuiRenderItemEvent
+import at.hannibal2.skyhanni.events.InventoryCloseEvent
+import at.hannibal2.skyhanni.events.InventoryUpdatedEvent
+import at.hannibal2.skyhanni.events.LorenzToolTipEvent
 import at.hannibal2.skyhanni.features.garden.GardenNextJacobContest
-import at.hannibal2.skyhanni.utils.*
+import at.hannibal2.skyhanni.utils.ChatUtils
+import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.InventoryUtils.getUpperItems
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.ItemUtils.name
 import at.hannibal2.skyhanni.utils.KeyboardManager.isKeyHeld
+import at.hannibal2.skyhanni.utils.LorenzColor
+import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.NumberUtil.addSuffix
+import at.hannibal2.skyhanni.utils.OSUtils
 import at.hannibal2.skyhanni.utils.RenderUtils.drawSlotText
 import at.hannibal2.skyhanni.utils.RenderUtils.highlight
 import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
@@ -23,7 +31,7 @@ import net.minecraft.inventory.ContainerChest
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import java.net.URLEncoder
 import java.text.SimpleDateFormat
-import java.util.*
+import java.util.Locale
 
 class JacobFarmingContestsInventory {
 
@@ -83,31 +91,35 @@ class JacobFarmingContestsInventory {
 
         when (invName) {
             "Your Contests" -> {
-                FarmingContestAPI.timePattern.matchMatcher(name) {
-                    val date = getDate(group("year"), group("month"), group("day"))
-                    OSUtils.openBrowser("https://elitebot.dev/contests/$date")
-                    ChatUtils.chat("Opening contest in elitebot.dev")
-                    event.isCanceled = true
-                }
+                val (year, month, day) = FarmingContestAPI.getTimeFromItemName(name) ?: return
+                val date = getDate(year, month, day)
+                OSUtils.openBrowser("https://elitebot.dev/contests/$date")
+                ChatUtils.chat("Opening contest in elitebot.dev")
+                event.isCanceled = true
             }
+
             "Jacob's Farming Contests" -> {
                 when (name) {
                     "§6Upcoming Contests" -> {
                         OSUtils.openBrowser("https://elitebot.dev/contests/upcoming")
                         ChatUtils.chat("Opening upcoming contests in elitebot.dev")
                     }
+
                     "§bClaim your rewards!" -> {
                         OSUtils.openBrowser("https://elitebot.dev/@${LorenzUtils.getPlayerName()}/${HypixelData.profileName}/contests")
                         ChatUtils.chat("Opening your contests in elitebot.dev")
                     }
+
                     "§aWhat is this?" -> {
                         OSUtils.openBrowser("https://elitebot.dev/contests")
                         ChatUtils.chat("Opening contest page in elitebot.dev")
                     }
+
                     else -> return
                 }
                 event.isCanceled = true
             }
+
             else -> {
                 GardenNextJacobContest.monthPattern.matchMatcher(invName) {
                     if (!event.slot.stack.getLore().any { it.contains("§eJacob's Farming Contest") }) return

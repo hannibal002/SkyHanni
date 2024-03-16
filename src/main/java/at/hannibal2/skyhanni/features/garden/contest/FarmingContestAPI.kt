@@ -1,7 +1,11 @@
 package at.hannibal2.skyhanni.features.garden.contest
 
 import at.hannibal2.skyhanni.data.ScoreboardData
-import at.hannibal2.skyhanni.events.*
+import at.hannibal2.skyhanni.events.FarmingContestEvent
+import at.hannibal2.skyhanni.events.GuiContainerEvent
+import at.hannibal2.skyhanni.events.InventoryCloseEvent
+import at.hannibal2.skyhanni.events.InventoryFullyOpenedEvent
+import at.hannibal2.skyhanni.events.LorenzTickEvent
 import at.hannibal2.skyhanni.features.garden.CropType
 import at.hannibal2.skyhanni.features.garden.GardenAPI
 import at.hannibal2.skyhanni.utils.CollectionUtils.addOrPut
@@ -21,7 +25,7 @@ import kotlin.time.Duration.Companion.minutes
 object FarmingContestAPI {
 
     private val patternGroup = RepoPattern.group("garden.farming.contest")
-    val timePattern by patternGroup.pattern(
+    private val timePattern by patternGroup.pattern(
         "time",
         "§a(?<month>.*) (?<day>.*)(?:rd|st|nd|th), Year (?<year>.*)"
     )
@@ -29,7 +33,7 @@ object FarmingContestAPI {
         "crop",
         "§8(?<crop>.*) Contest"
     )
-    val sidebarCropPattern by patternGroup.pattern(
+    private val sidebarCropPattern by patternGroup.pattern(
         "sidebarcrop",
         "(?:§e○|§6☘) §f(?<crop>.*) §a.*"
     )
@@ -106,13 +110,15 @@ object FarmingContestAPI {
         inInventory = false
     }
 
-    fun getSbTimeFor(text: String) = timePattern.matchMatcher(text) {
-        val month = group("month")
+    fun getTimeFromItemName(text: String): List<String>? = timePattern.matchMatcher(text) {
+        listOf(group("year"), group("month"), group("day"))
+    }
+
+    fun getSbTimeFor(text: String): Long? {
+        val (year, month, day) = getTimeFromItemName(text) ?: return null
         val monthNr = LorenzUtils.getSBMonthByName(month)
 
-        val year = group("year").toInt()
-        val day = group("day").toInt()
-        SkyBlockTime(year, monthNr, day).toMillis()
+        return SkyBlockTime(year.toInt(), monthNr, day.toInt()).toMillis()
     }
 
     fun addContest(time: Long, item: ItemStack) {
