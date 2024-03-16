@@ -126,6 +126,7 @@ import at.hannibal2.skyhanni.features.event.diana.SoopyGuessBurrow
 import at.hannibal2.skyhanni.features.event.jerry.HighlightJerries
 import at.hannibal2.skyhanni.features.event.jerry.frozentreasure.FrozenTreasureTracker
 import at.hannibal2.skyhanni.features.event.lobby.waypoints.christmas.PresentWaypoints
+import at.hannibal2.skyhanni.features.event.lobby.waypoints.easter.EggWaypoints
 import at.hannibal2.skyhanni.features.event.lobby.waypoints.halloween.BasketWaypoints
 import at.hannibal2.skyhanni.features.event.spook.TheGreatSpook
 import at.hannibal2.skyhanni.features.event.winter.JyrreTimer
@@ -608,6 +609,7 @@ class SkyHanniMod {
         loadModule(TiaRelayHelper())
         loadModule(TiaRelayWaypoints())
         loadModule(BasketWaypoints())
+        loadModule(EggWaypoints())
         loadModule(BingoCardDisplay())
         loadModule(BingoNextStepHelper())
         loadModule(MinionCraftHelper())
