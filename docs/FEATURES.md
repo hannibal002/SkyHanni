@@ -168,6 +168,9 @@ Use `/sh` or `/skyhanni` to open the SkyHanni config in game.
     + Adding a clickable message to pick up the super crafted items from sacks.
 + Added Inferno Minion Fuel pickup prevention. - Zickles (https://github.com/hannibal002/SkyHanni/pull/1103)
     + Blocks picking up the Inferno Minion or replacing the fuel inside when expensive minion fuels are in use.
++ AH Show Price Comparison. - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/339)
+    + Highlight auctions based on the difference between their estimated value and the value they are listed for.
+    + Options to change the colours
 
 </details>
 <details open><summary>
@@ -244,6 +247,8 @@ Use `/sh` or `/skyhanni` to open the SkyHanni config in game.
 + Update Timer showing when the next api data update happens.
 + Price Website button. - hannibal2
     + Adds a button to the bazaar product inventory that will open the item page in skyblock.bz.
++ Craft Materials From Bazaar. - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/1104)
+    + Show in a crafting view a shopping list of materials needed when buying from the Bazaar.
 
 </details>
 <details open><summary>

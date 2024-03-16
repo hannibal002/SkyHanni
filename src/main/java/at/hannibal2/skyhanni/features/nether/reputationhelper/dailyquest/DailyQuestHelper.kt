@@ -1,7 +1,7 @@
 package at.hannibal2.skyhanni.features.nether.reputationhelper.dailyquest
 
 import at.hannibal2.skyhanni.SkyHanniMod
-import at.hannibal2.skyhanni.config.Storage
+import at.hannibal2.skyhanni.config.storage.ProfileSpecificStorage
 import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.data.SackAPI
 import at.hannibal2.skyhanni.data.SackStatus
@@ -284,12 +284,12 @@ class DailyQuestHelper(val reputationHelper: CrimsonIsleReputationHelper) {
         quests.clear()
     }
 
-    fun load(storage: Storage.ProfileSpecific.CrimsonIsleStorage) {
+    fun load(storage: ProfileSpecificStorage.CrimsonIsleStorage) {
         reset()
         questLoader.loadConfig(storage)
     }
 
-    fun saveConfig(storage: Storage.ProfileSpecific.CrimsonIsleStorage) {
+    fun saveConfig(storage: ProfileSpecificStorage.CrimsonIsleStorage) {
         storage.quests.clear()
         for (quest in quests) {
             val builder = StringBuilder()
