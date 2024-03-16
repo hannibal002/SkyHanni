@@ -53,6 +53,22 @@ class HypixelData {
             "lobbytype",
             "(?<lobbyType>.*lobby)\\d+"
         )
+        val playerAmountPattern by patternGroup.pattern(
+            "playeramount",
+            "^\\s*(?:§.)+Players (?:§.)+\\((?<amount>\\d+)\\)\\s*$"
+        )
+        val playerAmountCoopPattern by patternGroup.pattern(
+            "playeramount.coop",
+            "^\\s*(?:§.)*Coop (?:§.)*\\((?<amount>\\d+)\\)\\s*$"
+        )
+        val playerAmountGuestingPattern by patternGroup.pattern(
+            "playeramount.guesting",
+            "^\\s*(?:§.)*Guests (?:§.)*\\((?<amount>\\d+)\\)\\s*$"
+        )
+        val soloProfileAmountPattern by patternGroup.pattern(
+            "solo.profile.amount",
+            "^\\s*(?:§.)*Island\\s*$"
+        )
 
         var hypixelLive = false
         var hypixelAlpha = false
@@ -112,6 +128,27 @@ class HypixelData {
             }
 
             return serverId
+        }
+
+        fun getPlayersOnCurrentServer(): Int {
+            var amount = 0
+
+            for (line in TabListData.getTabList()) {
+                playerAmountPattern.matchMatcher(line) {
+                    amount += group("amount").toInt()
+                }
+                playerAmountCoopPattern.matchMatcher(line) {
+                    amount += group("amount").toInt()
+                }
+                playerAmountGuestingPattern.matchMatcher(line) {
+                    amount += group("amount").toInt()
+                }
+                soloProfileAmountPattern.matchMatcher(line) {
+                    amount++
+                }
+            }
+
+            return amount
         }
 
         fun getMaxPlayersForCurrentServer(): Int = if (serverId?.startsWith("mega") == true) 80 else 26

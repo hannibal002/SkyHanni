@@ -4,6 +4,7 @@ import at.hannibal2.skyhanni.config.features.gui.customscoreboard.DisplayConfig.
 import at.hannibal2.skyhanni.data.BitsAPI
 import at.hannibal2.skyhanni.data.HypixelData
 import at.hannibal2.skyhanni.data.HypixelData.Companion.getMaxPlayersForCurrentServer
+import at.hannibal2.skyhanni.data.HypixelData.Companion.getPlayersOnCurrentServer
 import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.data.MaxwellAPI
 import at.hannibal2.skyhanni.data.MayorAPI
@@ -406,13 +407,12 @@ private fun getLocationDisplayPair() = buildList {
 }
 
 fun getPlayerAmountDisplayPair() = buildList {
-    val amount = getGroupFromPattern(TabListData.getTabList(), ScoreboardPattern.playerAmountPattern, "amount")
     val max = if (displayConfig.showMaxIslandPlayers) {
         "§7/§a${getMaxPlayersForCurrentServer()}"
     } else {
         ""
     }
-    add("§7Players: §a$amount$max" to HorizontalAlignment.LEFT)
+    add("§7Players: §a${getPlayersOnCurrentServer()}$max" to HorizontalAlignment.LEFT)
 }
 
 private fun getVisitDisplayPair() =
