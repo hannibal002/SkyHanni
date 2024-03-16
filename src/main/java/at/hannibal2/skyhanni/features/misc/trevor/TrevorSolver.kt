@@ -74,7 +74,6 @@ object TrevorSolver {
             }
         }
         if (foundID != -1) {
-            println("Cannot find mob anymore")
             mobCoordinates = LorenzVec(0.0, 0.0, 0.0)
             foundID = -1
         }

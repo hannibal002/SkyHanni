@@ -172,7 +172,6 @@ object TrevorFeatures {
         }
 
         clickOptionPattern.findMatcher(event.message) {
-            println("did match")
             event.chatComponent.siblings.forEach { sibling ->
                 if (sibling.chatStyle.chatClickEvent != null && sibling.chatStyle.chatClickEvent.value.contains("YES")) {
                     lastChatPromptTime = SimpleTimeMark.now()
