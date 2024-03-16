@@ -69,6 +69,10 @@ class HypixelData {
             "solo.profile.amount",
             "^\\s*(?:§.)*Island\\s*$"
         )
+        val scoreboardVisitingAmoutPattern by patternGroup.pattern(
+            "scoreboard.visiting.amount",
+            "\\s+§.✌ §.\\(§.(?<currentamount>\\d+)§.\\/(?<maxamount>\\d+)\\)"
+        )
 
         var hypixelLive = false
         var hypixelAlpha = false
@@ -151,7 +155,14 @@ class HypixelData {
             return amount
         }
 
-        fun getMaxPlayersForCurrentServer(): Int = if (serverId?.startsWith("mega") == true) 80 else 26
+        fun getMaxPlayersForCurrentServer(): Int {
+            for (line in ScoreboardData.sidebarLinesFormatted) {
+                scoreboardVisitingAmoutPattern.matchMatcher(line) {
+                    return group("maxamount").toInt()
+                }
+            }
+            return if (serverId?.startsWith("mega") == true) 80 else 26
+        }
 
         // This code is modified from NEU, and depends on NEU (or another mod) sending /locraw.
         private val jsonBracketPattern = "^\\{.+}".toPattern()
