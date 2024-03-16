@@ -5,6 +5,7 @@ import at.hannibal2.skyhanni.events.InventoryFullyOpenedEvent
 import at.hannibal2.skyhanni.events.LorenzChatEvent
 import at.hannibal2.skyhanni.events.RepositoryReloadEvent
 import at.hannibal2.skyhanni.test.command.ErrorManager
+import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils.isInIsland
@@ -21,7 +22,7 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 object MaxwellAPI {
 
     private val storage get() = ProfileStorageData.profileSpecific
-    
+
     var currentPower: String?
         get() = storage?.maxwell?.currentPower
         set(value) {
@@ -59,6 +60,14 @@ object MaxwellAPI {
     private val powerSelectedPattern by group.pattern(
         "gui.selectedpower",
         "§aPower is selected!"
+    )
+    private val accessoryBagStack by group.pattern(
+        "stack.accessorybag",
+        "§.Accessory Bag"
+    )
+    private val redstoneCollectionRequirementPattern by group.pattern(
+        "collection.redstone.requirement",
+        "(?:§.)*Requires (?:§.)*Redstone Collection I+(?:§.)*\\."
     )
 
     @SubscribeEvent
@@ -104,13 +113,20 @@ object MaxwellAPI {
             val stacks = event.inventoryItems
 
             for (stack in stacks.values) {
-                processStack(stack)
+                if (accessoryBagStack.matches(stack.displayName)) processStack(stack)
             }
         }
     }
 
     private fun processStack(stack: ItemStack) {
         for (line in stack.getLore()) {
+            redstoneCollectionRequirementPattern.matchMatcher(line) {
+                ChatUtils.chat("Seems like you don't have the Requirement for the Accessory Bag yet, setting power to No Power and magical power to 0.")
+                currentPower = getPowerByNameOrNull("No Power")
+                magicalPower = 0
+                return
+            }
+
             inventoryMPPattern.matchMatcher(line) {
                 // MagicalPower is boosted in catacombs
                 if (IslandType.CATACOMBS.isInIsland()) return@matchMatcher
@@ -124,12 +140,12 @@ object MaxwellAPI {
                 val power = group("power")
                 currentPower = getPowerByNameOrNull(power)
                     ?: return@matchMatcher ErrorManager.logErrorWithData(
-                    UnknownMaxwellPower("Unknown power: ${stack.displayName}"),
-                    "Unknown power: ${stack.displayName}",
-                    "displayName" to stack.displayName,
-                    "lore" to stack.getLore(),
-                    noStackTrace = true
-                )
+                        UnknownMaxwellPower("Unknown power: ${stack.displayName}"),
+                        "Unknown power: ${stack.displayName}",
+                        "displayName" to stack.displayName,
+                        "lore" to stack.getLore(),
+                        noStackTrace = true
+                    )
                 return@matchMatcher
             }
         }

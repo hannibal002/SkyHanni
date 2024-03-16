@@ -54,6 +54,26 @@ class HypixelData {
             "lobbytype",
             "(?<lobbyType>.*lobby)\\d+"
         )
+        private val playerAmountPattern by patternGroup.pattern(
+            "playeramount",
+            "^\\s*(?:§.)+Players (?:§.)+\\((?<amount>\\d+)\\)\\s*$"
+        )
+        private val playerAmountCoopPattern by patternGroup.pattern(
+            "playeramount.coop",
+            "^\\s*(?:§.)*Coop (?:§.)*\\((?<amount>\\d+)\\)\\s*$"
+        )
+        private val playerAmountGuestingPattern by patternGroup.pattern(
+            "playeramount.guesting",
+            "^\\s*(?:§.)*Guests (?:§.)*\\((?<amount>\\d+)\\)\\s*$"
+        )
+        private val soloProfileAmountPattern by patternGroup.pattern(
+            "solo.profile.amount",
+            "^\\s*(?:§.)*Island\\s*$"
+        )
+        private val scoreboardVisitingAmoutPattern by patternGroup.pattern(
+            "scoreboard.visiting.amount",
+            "\\s+§.✌ §.\\(§.(?<currentamount>\\d+)§.\\/(?<maxamount>\\d+)\\)"
+        )
         private val guestPattern by patternGroup.pattern(
             "guesting.scoreboard",
             "SKYBLOCK GUEST"
@@ -117,6 +137,36 @@ class HypixelData {
             }
 
             return serverId
+        }
+
+        fun getPlayersOnCurrentServer(): Int {
+            var amount = 0
+            val playerPatternList = listOf(
+                playerAmountPattern,
+                playerAmountCoopPattern,
+                playerAmountGuestingPattern
+            )
+
+            out@for (pattern in playerPatternList) {
+                for (line in TabListData.getTabList()) {
+                    pattern.matchMatcher(line) {
+                        amount += group("amount").toInt()
+                        continue@out
+                    }
+                }
+            }
+            amount += TabListData.getTabList().count { soloProfileAmountPattern.matches(it) }
+
+            return amount
+        }
+
+        fun getMaxPlayersForCurrentServer(): Int {
+            for (line in ScoreboardData.sidebarLinesFormatted) {
+                scoreboardVisitingAmoutPattern.matchMatcher(line) {
+                    return group("maxamount").toInt()
+                }
+            }
+            return if (serverId?.startsWith("mega") == true) 80 else 26
         }
 
         // This code is modified from NEU, and depends on NEU (or another mod) sending /locraw.
