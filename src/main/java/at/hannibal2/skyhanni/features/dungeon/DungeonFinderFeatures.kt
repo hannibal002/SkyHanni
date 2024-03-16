@@ -98,7 +98,18 @@ class DungeonFinderFeatures {
         "floor.pattern",
         "(Floor: .*)"
     )
-    private val floorNumberPattern by patternGroup.pattern("floor.number",".* (?<floorNum>[IV\\d]+)")
+    private val floorNumberPattern by patternGroup.pattern(
+        "floor.number",
+        ".* (?<floorNum>[IV\\d]+)"
+    )
+    private val getDungeonClassPattern by patternGroup.pattern(
+        "get.dungeon.class",
+        ".* (?<class>.*)"
+    )
+    private val detectDungeonClassPattern by patternGroup.pattern(
+        "detect.dungeon.class",
+        "(View and select a dungeon class.)"
+    )
 
     //  Variables used
     private var selectedClass = ""
@@ -127,77 +138,85 @@ class DungeonFinderFeatures {
 
     private fun stackTip(event: InventoryFullyOpenedEvent) {
         val inventoryName = event.inventoryName
-        if (catacombsGatePattern.matches(inventoryName)) {
-            val dungeonClassItemIndex = 45
-            val lore = event.inventoryItems[dungeonClassItemIndex]?.getLore()
-            inInventory = true
-            if (lore != null) {
-                if (lore.size > 3 && lore[0] == "§7View and select a dungeon class.") {
-                    selectedClass = lore[2].split(" ").last().removeColor()
+        if (catacombsGatePattern.matches(inventoryName)) catacombsGateStackTip(event)
+        if (!config.floorAsStackSize) return
+        if (selectFloorPattern.matches(inventoryName)) selectFloorStackTip(event)
+        if (partyFinderTitlePattern.matches(inventoryName)) partyFinderStackTip(event)
+    }
+
+    private fun selectFloorStackTip(event: InventoryFullyOpenedEvent) {
+        inInventory = true
+        for ((slot, stack) in event.inventoryItems) {
+            val name = stack.displayName.removeColor()
+            if (anyFloorPattern.matches(name)) {
+                floorStackSize[slot] = "A"
+            } else if (entranceFloorPattern.matches(name)) {
+                floorStackSize[slot] = "E"
+            } else if (floorPattern.matches(name)) {
+                floorStackSize[slot] =
+                    floorNumberPattern.matchMatcher(name) { group("floorNum").romanToDecimalIfNecessary().toString() }
+                        .toString()
+            }
+        }
+    }
+
+    private fun partyFinderStackTip(event: InventoryFullyOpenedEvent) {
+        inInventory = true
+        for ((slot, stack) in event.inventoryItems) {
+            val name = stack.displayName.removeColor()
+            if (checkIfPartyPattern.matches(name)) {
+                val lore = stack.getLore()
+                val floor = lore.find { floorFloorPattern.matches(it.removeColor()) }
+                val dungeon =
+                    lore.find { dungeonFloorPattern.matches(it.removeColor()) }
+                if (floor == null || dungeon == null) continue
+                val floorNum =
+                    floorNumberPattern.matchMatcher(floor) { group("floorNum").romanToDecimalIfNecessary().toString() }
+                        .toString()
+                print(floorNum + "\n")
+                if (entranceFloorPattern.matches(floor)) {
+                    floorStackSize[slot] = "E"
+                } else if (masterModeFloorPattern.matches(dungeon)) {
+                    floorStackSize[slot] = "M$floorNum"
+                } else {
+                    floorStackSize[slot] = "F$floorNum"
                 }
             }
+        }
 
-            if (config.floorAsStackSize) {
-                for ((slot, stack) in event.inventoryItems) {
-                    val name = stack.displayName.removeColor()
-                    if (floorTypePattern.matches(name)) {
-                        val floorNum =
-                            floorNumberPattern.matchMatcher(name){ group("floorNum").romanToDecimalIfNecessary().toString() }
-                                .toString()
-                        if (entranceFloorPattern.matches(name)) {
-                            floorStackSize[slot] = "E"
-                        } else if (masterModeFloorPattern.matches(name)) {
-                            floorStackSize[slot] = "M$floorNum"
-                        } else {
-                            floorStackSize[slot] = floorNum
-                        }
-                    }
-                }
+    }
+
+    private fun catacombsGateStackTip(event: InventoryFullyOpenedEvent) {
+        val dungeonClassItemIndex = 45
+        val lore = event.inventoryItems[dungeonClassItemIndex]?.getLore()
+        inInventory = true
+        if (lore != null) {
+            if (lore.size > 3 && detectDungeonClassPattern.matches(lore[0])) {
+                selectedClass = getDungeonClassPattern.matchMatcher(lore[2].removeColor()) {
+                    group("class")
+                }.toString()
             }
         }
 
         if (config.floorAsStackSize) {
-            if (selectFloorPattern.matches(inventoryName)) {
-                inInventory = true
-                for ((slot, stack) in event.inventoryItems) {
-                    val name = stack.displayName.removeColor()
-                    if (anyFloorPattern.matches(name)) {
-                        floorStackSize[slot] = "A"
-                    } else if (entranceFloorPattern.matches(name)) {
+            for ((slot, stack) in event.inventoryItems) {
+                val name = stack.displayName.removeColor()
+                if (floorTypePattern.matches(name)) {
+                    val floorNum =
+                        floorNumberPattern.matchMatcher(name) {
+                            group("floorNum").romanToDecimalIfNecessary().toString()
+                        } ?: continue
+                    if (entranceFloorPattern.matches(name)) {
                         floorStackSize[slot] = "E"
-                    } else if (floorPattern.matches(name)) {
-                        floorStackSize[slot] =
-                            floorNumberPattern.matchMatcher(name){ group("floorNum").romanToDecimalIfNecessary().toString() }
-                                .toString()
-                    }
-                }
-            }
-
-            if (partyFinderTitlePattern.matches(inventoryName)) {
-                inInventory = true
-                for ((slot, stack) in event.inventoryItems) {
-                    val name = stack.displayName.removeColor()
-                    if (checkIfPartyPattern.matches(name)) {
-                        val lore = stack.getLore()
-                        val floor = lore.find { floorFloorPattern.matches(it.removeColor()) }
-                        val dungeon =
-                            lore.find { dungeonFloorPattern.matches(it.removeColor()) }
-                        if (floor == null || dungeon == null) continue
-                        val floorNum =
-                            floorNumberPattern.matchMatcher(floor){ group("floorNum").romanToDecimalIfNecessary().toString() }
-                                .toString()
-                        print(floorNum + "\n")
-                        if (entranceFloorPattern.matches(floor)) {
-                            floorStackSize[slot] = "E"
-                        } else if (masterModeFloorPattern.matches(dungeon)) {
-                            floorStackSize[slot] = "M$floorNum"
-                        } else {
-                            floorStackSize[slot] = "F$floorNum"
-                        }
+                    } else if (masterModeFloorPattern.matches(name)) {
+                        floorStackSize[slot] = "M$floorNum"
+                    } else {
+                        floorStackSize[slot] = floorNum
                     }
                 }
             }
         }
+
     }
 
     private fun highlightingHandler(event: InventoryFullyOpenedEvent) {
@@ -355,6 +374,3 @@ class DungeonFinderFeatures {
 
     fun isEnabled() = LorenzUtils.inSkyBlock && LorenzUtils.skyBlockArea == "Dungeon Hub"
 }
-
-
-
