@@ -57,6 +57,12 @@ public class DungeonConfig {
     public boolean highlightTeammates = true;
 
     @Expose
+    @ConfigOption(name = "Architect Notifier", desc = "Notifies you to use the Architect in Dungeons when a puzzle is failed.")
+    @ConfigEditorBoolean
+    @FeatureToggle
+    public boolean architectNotifier = false;
+
+    @Expose
     @ConfigOption(name = "Object Hider", desc = "Hide various things in Dungeons.")
     @Accordion
     public ObjectHiderConfig objectHider = new ObjectHiderConfig();

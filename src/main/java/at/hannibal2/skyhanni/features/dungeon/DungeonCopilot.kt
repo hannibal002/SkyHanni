@@ -9,24 +9,62 @@ import at.hannibal2.skyhanni.events.DungeonStartEvent
 import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.LorenzChatEvent
 import at.hannibal2.skyhanni.events.LorenzWorldChangeEvent
+import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.RenderUtils.renderString
 import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
+import at.hannibal2.skyhanni.utils.StringUtils.matches
+import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraft.entity.item.EntityArmorStand
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
+import kotlin.time.Duration.Companion.seconds
 
 class DungeonCopilot {
 
-    private val config get() = SkyHanniMod.feature.dungeon.dungeonCopilot
+    private val config get() = SkyHanniMod.feature.dungeon
 
-    private val countdownPattern =
-        "(.*) has started the dungeon countdown. The dungeon will begin in 1 minute.".toPattern()
-    private val keyPatternsList = listOf(
-        "§eA §r§a§r§[6c]§r§[8c](?<key>Wither|Blood) Key§r§e was picked up!".toPattern(),
-        "(.*) §r§ehas obtained §r§a§r§[6c]§r§[8c](?<key>Wither|Blood) Key§r§e!".toPattern()
+//     private val countdownPattern =
+//         "(.*) has started the dungeon countdown. The dungeon will begin in 1 minute.".toPattern()
+//     private val keyPatternsList = listOf(
+//         "§eA §r§a§r§[6c]§r§[8c](?<key>Wither|Blood) Key§r§e was picked up!".toPattern(),
+//         "(.*) §r§ehas obtained §r§a§r§[6c]§r§[8c](?<key>Wither|Blood) Key§r§e!".toPattern()
+//     )
+//     private val witherDoorPattern = "(.*) opened a §r§8§lWITHER §r§adoor!".toPattern()
+//     private val bloodDoorPattern = "§cThe §r§c§lBLOOD DOOR§r§c has been opened!".toPattern()
+
+    private val patternGroup = RepoPattern.group("dungeon.copilot")
+    private val countdownPattern by patternGroup.pattern(
+        "countdown",
+        "(.*) has started the dungeon countdown. The dungeon will begin in 1 minute."
     )
-    private val witherDoorPattern = "(.*) opened a §r§8§lWITHER §r§adoor!".toPattern()
-    private val bloodDoorPattern = "§cThe §r§c§lBLOOD DOOR§r§c has been opened!".toPattern()
+    private val keyPatternsList = listOf(
+        patternGroup.pattern(
+            "key.one",
+            "§eA §r§a§r§[6c]§r§[8c](?<key>Wither|Blood) Key§r§e was picked up!"
+        ).value,
+
+        patternGroup.pattern(
+            "key.two",
+            "(.*) §r§ehas obtained §r§a§r§[6c]§r§[8c](?<key>Wither|Blood) Key§r§e!"
+        ).value
+    )
+    private val witherDoorPattern by patternGroup.pattern(
+        "wither.door",
+        "(.*) opened a §r§8§lWITHER §r§adoor!"
+    )
+    private val bloodDoorPattern by patternGroup.pattern(
+        "blood.door",
+        "§cThe §r§c§lBLOOD DOOR§r§c has been opened!"
+    )
+    private val puzzleFailPattern by patternGroup.pattern(
+        "normal.puzzle.fail",
+        "(?:§c§lPUZZLE FAIL!|§4) §.§.(?<name>\\S*) .*"
+    )
+    private val quizPuzzleFailPattern by patternGroup.pattern(
+        "quiz.puzzle.fail",
+        "§4\\[STATUE\\] Oruo the Omniscient§r§f: (?:§.)*(?<name>\\S*) (?:§.)*chose the wrong .*"
+    )
+
 
     private var nextStep = ""
     private var searchForKey = false
@@ -34,6 +72,29 @@ class DungeonCopilot {
     @SubscribeEvent
     fun onChat(event: LorenzChatEvent) {
         if (!isEnabled()) return
+
+        if(config.architectNotifier) {
+            puzzleFailPattern.matchMatcher(event.message) {
+                val key = group("name")
+                ChatUtils.clickableChat(
+                    "§c§lPUZZLE FAILED! §r§b$key §r§ehas failed a puzzle.\n§3§l[CLICK HERE TO GET ARCHITECT]",
+                    "/gfs ARCHITECT_FIRST_DRAFT 1",
+                    false
+                )
+                LorenzUtils.sendTitle("§c§lPUZZLE FAILED!", 3.seconds)
+                event.blockedReason = "puzzle_fail"
+            }
+            quizPuzzleFailPattern.matchMatcher(event.message) {
+                val key = group("name")
+                ChatUtils.clickableChat(
+                    "§c§lPUZZLE FAILED! §r§b$key §r§ehas failed a puzzle.\n§3§l[CLICK HERE TO GET ARCHITECT]",
+                    "/gfs ARCHITECT_FIRST_DRAFT 1",
+                    false
+                )
+                LorenzUtils.sendTitle("§c§lPUZZLE FAILED!", 3.seconds)
+                event.blockedReason = "puzzle_fail"
+            }
+        }
 
         copilot(event.message)?.let {
             event.blockedReason = it
@@ -127,14 +188,14 @@ class DungeonCopilot {
     }
 
     private fun isEnabled(): Boolean {
-        return LorenzUtils.inDungeons && config.enabled
+        return LorenzUtils.inDungeons && config.dungeonCopilot.enabled
     }
 
     @SubscribeEvent
     fun onRenderOverlay(event: GuiRenderEvent.GuiOverlayRenderEvent) {
         if (!isEnabled()) return
 
-        config.pos.renderString(nextStep, posLabel = "Dungeon Copilot")
+        config.dungeonCopilot.pos.renderString(nextStep, posLabel = "Dungeon Copilot")
     }
 
     @SubscribeEvent
