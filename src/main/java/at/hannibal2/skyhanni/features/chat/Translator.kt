@@ -19,6 +19,7 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import java.net.URLDecoder
 import java.net.URLEncoder
 
+// TODO split into two classes: TranslatorCommand and GoogleTransaltor. only communicates via getTranslationFromEnglish and getTranslationToEnglish
 class Translator {
 
     private val messageContentRegex = Regex(".*: (.*)")
