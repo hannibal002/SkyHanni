@@ -18,6 +18,7 @@ import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.StringUtils.matchMatchers
+import at.hannibal2.skyhanni.utils.StringUtils.matches
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.TabListData
 import at.hannibal2.skyhanni.utils.UtilsPatterns
@@ -73,6 +74,10 @@ class HypixelData {
         private val scoreboardVisitingAmoutPattern by patternGroup.pattern(
             "scoreboard.visiting.amount",
             "\\s+§.✌ §.\\(§.(?<currentamount>\\d+)§.\\/(?<maxamount>\\d+)\\)"
+        )
+        private val guestPattern by patternGroup.pattern(
+            "guesting.scoreboard",
+            "SKYBLOCK GUEST"
         )
 
         var hypixelLive = false
@@ -350,7 +355,6 @@ class HypixelData {
 
     private fun checkIsland() {
         var newIsland = ""
-        var guesting = false
         TabListData.fullyLoaded = false
 
         for (line in TabListData.getTabList()) {
@@ -358,11 +362,10 @@ class HypixelData {
                 newIsland = group("island").removeColor()
                 TabListData.fullyLoaded = true
             }
-            if (line == " Status: §r§9Guest") {
-                guesting = true
-            }
         }
 
+        // Can not use color coding, because of the color effect (§f§lSKYB§6§lL§e§lOCK§A§L GUEST)
+        val guesting = guestPattern.matches(ScoreboardData.objectiveTitle.removeColor())
         val islandType = getIslandType(newIsland, guesting)
         if (skyBlockIsland != islandType) {
             IslandChangeEvent(islandType, skyBlockIsland).postAndCatch()
@@ -376,8 +379,8 @@ class HypixelData {
         }
     }
 
-    private fun getIslandType(newIsland: String, guesting: Boolean): IslandType {
-        val islandType = IslandType.getByNameOrUnknown(newIsland)
+    private fun getIslandType(name: String, guesting: Boolean): IslandType {
+        val islandType = IslandType.getByNameOrUnknown(name)
         if (guesting) {
             if (islandType == IslandType.PRIVATE_ISLAND) return IslandType.PRIVATE_ISLAND_GUEST
             if (islandType == IslandType.GARDEN) return IslandType.GARDEN_GUEST

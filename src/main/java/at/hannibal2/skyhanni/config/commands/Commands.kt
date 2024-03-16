@@ -391,7 +391,7 @@ object Commands {
         registerCommand("shtestwaypoint", "Set a waypoint on that location") { SkyHanniDebugsAndTests.waypoint(it) }
         registerCommand("shtesttablist", "Set your clipboard as a fake tab list.") { TabListData.toggleDebugCommand() }
         registerCommand("shreloadlocalrepo", "Reloading the local repo data") { SkyHanniMod.repo.reloadLocalRepo() }
-        registerCommand("shchathistory", "Show the unfiltered chat history") { ChatManager.openChatFilterGUI() }
+        registerCommand("shchathistory", "Show the unfiltered chat history") { ChatManager.openChatFilterGUI(it) }
         registerCommand(
             "shstoplisteners",
             "Unregistering all loaded forge event listeners"
