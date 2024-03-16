@@ -67,6 +67,14 @@ object TrevorFeatures {
         "zone",
         "Zone: (?<zone>.*)"
     )
+    private val mobDiedPattern by patternGroup.pattern(
+        "mob.died",
+        "§aReturn to the Trapper soon to get a new animal to hunt!"
+    )
+    private val startDialoguePattern by patternGroup.pattern(
+        "start.dialogue",
+        "[NPC] Trevor: You will have 10 minutes to find the mob from when you accept the task."
+    )
 
     private var timeUntilNextReady = 0
     private var trapperReady: Boolean = true
@@ -107,14 +115,14 @@ object TrevorFeatures {
 
         val formattedMessage = event.message.removeColor()
 
-        if (event.message == "§aReturn to the Trapper soon to get a new animal to hunt!") {
+        mobDiedPattern.matchMatcher(event.message) {
             TrevorSolver.resetLocation()
             if (config.trapperMobDiedMessage) {
                 LorenzUtils.sendTitle("§2Mob Died ", 5.seconds)
                 SoundUtils.playBeepSound()
             }
             trapperReady = true
-            TrevorSolver.mobLocation = CurrentMobArea.NONE
+            TrevorSolver.mobLocation = TrapperMobArea.NONE
             if (timeUntilNextReady <= 0) {
                 currentStatus = TrapperStatus.READY
                 currentLabel = "§2Ready"
@@ -122,7 +130,7 @@ object TrevorFeatures {
                 currentStatus = TrapperStatus.WAITING
                 currentLabel = if (timeUntilNextReady == 1) "§31 second left" else "§3$timeUntilNextReady seconds left"
             }
-            TrevorSolver.mobLocation = CurrentMobArea.NONE
+            TrevorSolver.mobLocation = TrapperMobArea.NONE
         }
 
         trapperPattern.matchMatcher(formattedMessage) {
@@ -147,7 +155,7 @@ object TrevorFeatures {
             TrevorSolver.averageHeight = LocationUtils.playerLocation().y
         }
 
-        if (formattedMessage == "[NPC] Trevor: You will have 10 minutes to find the mob from when you accept the task.") {
+        startDialoguePattern.matchMatcher(formattedMessage) {
             teleportBlock = SimpleTimeMark.now()
         }
 
@@ -207,18 +215,18 @@ object TrevorFeatures {
                 active = true
             }
 
-            CurrentMobArea.entries.firstOrNull { it.location == formattedLine }?.let {
+            TrapperMobArea.entries.firstOrNull { it.location == formattedLine }?.let {
                 TrevorSolver.mobLocation = it
                 found = true
             }
             locationPattern.matchMatcher(formattedLine) {
                 val zone = group("zone")
-                TrevorSolver.mobLocation = CurrentMobArea.entries.firstOrNull { it.location == zone }
-                    ?: CurrentMobArea.NONE
+                TrevorSolver.mobLocation = TrapperMobArea.entries.firstOrNull { it.location == zone }
+                    ?: TrapperMobArea.NONE
                 found = true
             }
         }
-        if (!found) TrevorSolver.mobLocation = CurrentMobArea.NONE
+        if (!found) TrevorSolver.mobLocation = TrapperMobArea.NONE
         if (!active) {
             trapperReady = true
         } else {
@@ -247,11 +255,11 @@ object TrevorFeatures {
 
         if (config.trapperSolver) {
             var location = TrevorSolver.mobLocation.coordinates
-            if (TrevorSolver.mobLocation == CurrentMobArea.NONE) return
+            if (TrevorSolver.mobLocation == TrapperMobArea.NONE) return
             if (TrevorSolver.averageHeight != 0.0) {
                 location = LorenzVec(location.x, TrevorSolver.averageHeight, location.z)
             }
-            if (TrevorSolver.mobLocation == CurrentMobArea.FOUND) {
+            if (TrevorSolver.mobLocation == TrapperMobArea.FOUND) {
                 val displayName = if (TrevorSolver.currentMob == null) "Mob Location" else {
                     TrevorSolver.currentMob!!.mobName
                 }
