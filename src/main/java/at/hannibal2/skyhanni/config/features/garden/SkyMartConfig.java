@@ -15,11 +15,6 @@ public class SkyMartConfig {
     public boolean copperPrice = false;
 
     @Expose
-    @ConfigOption(name = "Advanced Stats", desc = "Show the BIN price and copper price for every item.")
-    @ConfigEditorBoolean
-    public boolean copperPriceAdvancedStats = false;
-
-    @Expose
     @ConfigOption(name = "Item Scale", desc = "Change the size of the items.")
     @ConfigEditorSlider(minValue = 0.3f, maxValue = 5, minStep = 0.1f)
     public double itemScale = 1.7;

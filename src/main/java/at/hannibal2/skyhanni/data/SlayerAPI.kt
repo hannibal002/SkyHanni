@@ -30,7 +30,7 @@ object SlayerAPI {
     var latestSlayerCategory = ""
     private var latestProgressChangeTime = 0L
     var latestWrongAreaWarning = 0L
-    private var latestSlayerProgress = ""
+    var latestSlayerProgress = ""
 
     fun hasActiveSlayerQuest() = latestSlayerCategory != ""
 
