@@ -66,7 +66,7 @@ object MaxwellAPI {
     )
     private val redstoneCollectionRequirementPattern by group.pattern(
         "collection.redstone.requirement",
-        "§7Redstone Collection §8- §7Tier §6(?<tier>[\\d,]+)"
+        "(?:§.)*Requires (?:§.)*Redstone Collection I+(?:§.)*\\."
     )
 
     @SubscribeEvent
@@ -119,6 +119,12 @@ object MaxwellAPI {
 
     private fun processStack(stack: ItemStack) {
         for (line in stack.getLore()) {
+            redstoneCollectionRequirementPattern.matchMatcher(line) {
+                // Redstone Collection is required for the bag
+                currentPower = "Redstone Collection"
+                return@matchMatcher
+            }
+
             inventoryMPPattern.matchMatcher(line) {
                 // MagicalPower is boosted in catacombs
                 if (IslandType.CATACOMBS.isInIsland()) return@matchMatcher
