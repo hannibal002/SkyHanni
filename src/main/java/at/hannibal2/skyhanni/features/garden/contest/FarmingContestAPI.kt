@@ -1,11 +1,7 @@
 package at.hannibal2.skyhanni.features.garden.contest
 
 import at.hannibal2.skyhanni.data.ScoreboardData
-import at.hannibal2.skyhanni.events.FarmingContestEvent
-import at.hannibal2.skyhanni.events.GuiContainerEvent
-import at.hannibal2.skyhanni.events.InventoryCloseEvent
-import at.hannibal2.skyhanni.events.InventoryFullyOpenedEvent
-import at.hannibal2.skyhanni.events.LorenzTickEvent
+import at.hannibal2.skyhanni.events.*
 import at.hannibal2.skyhanni.features.garden.CropType
 import at.hannibal2.skyhanni.features.garden.GardenAPI
 import at.hannibal2.skyhanni.utils.CollectionUtils.addOrPut
@@ -25,7 +21,7 @@ import kotlin.time.Duration.Companion.minutes
 object FarmingContestAPI {
 
     private val patternGroup = RepoPattern.group("garden.farming.contest")
-    private val timePattern by patternGroup.pattern(
+    val timePattern by patternGroup.pattern(
         "time",
         "§a(?<month>.*) (?<day>.*)(?:rd|st|nd|th), Year (?<year>.*)"
     )
@@ -117,13 +113,6 @@ object FarmingContestAPI {
         val year = group("year").toInt()
         val day = group("day").toInt()
         SkyBlockTime(year, monthNr, day).toMillis()
-    }
-
-    fun getSbDateFor(text: String) = timePattern.matchMatcher(text) {
-        val month = LorenzUtils.getSBMonthByName(group("month"))
-        val year = group("year")
-        val day = group("day")
-        "$year/$month/$day"
     }
 
     fun addContest(time: Long, item: ItemStack) {

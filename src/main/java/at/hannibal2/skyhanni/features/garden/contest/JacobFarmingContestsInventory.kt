@@ -3,31 +3,27 @@ package at.hannibal2.skyhanni.features.garden.contest
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.data.HypixelData
-import at.hannibal2.skyhanni.events.GuiContainerEvent
-import at.hannibal2.skyhanni.events.GuiRenderItemEvent
-import at.hannibal2.skyhanni.events.InventoryCloseEvent
-import at.hannibal2.skyhanni.events.InventoryUpdatedEvent
-import at.hannibal2.skyhanni.events.LorenzToolTipEvent
-import at.hannibal2.skyhanni.utils.InventoryUtils
+import at.hannibal2.skyhanni.events.*
+import at.hannibal2.skyhanni.features.garden.GardenNextJacobContest
+import at.hannibal2.skyhanni.utils.*
 import at.hannibal2.skyhanni.utils.InventoryUtils.getUpperItems
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.ItemUtils.name
 import at.hannibal2.skyhanni.utils.KeyboardManager.isKeyHeld
-import at.hannibal2.skyhanni.utils.LorenzColor
-import at.hannibal2.skyhanni.utils.LorenzUtils
-import at.hannibal2.skyhanni.utils.OSUtils
+import at.hannibal2.skyhanni.utils.NumberUtil.addSuffix
 import at.hannibal2.skyhanni.utils.RenderUtils.drawSlotText
 import at.hannibal2.skyhanni.utils.RenderUtils.highlight
 import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
-import at.hannibal2.skyhanni.utils.StringUtils.matches
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import io.github.moulberry.notenoughupdates.events.SlotClickEvent
+import io.github.moulberry.notenoughupdates.util.SkyBlockTime
 import net.minecraft.client.gui.inventory.GuiChest
 import net.minecraft.inventory.ContainerChest
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
+import java.net.URLEncoder
 import java.text.SimpleDateFormat
-import java.util.Locale
+import java.util.*
 
 class JacobFarmingContestsInventory {
 
@@ -39,14 +35,9 @@ class JacobFarmingContestsInventory {
 
     // Render the contests a tick delayed to feel smoother
     private var hideEverything = true
-    private val patternGroup = RepoPattern.group("garden.jacob.contests.inventory")
-    private val medalPattern by patternGroup.pattern(
-        "medal",
+    private val medalPattern by RepoPattern.pattern(
+        "garden.jacob.contests.inventory.medal",
         "§7§7You placed in the (?<medal>.*) §7bracket!"
-    )
-    private val allowedInventoriesPattern by patternGroup.pattern(
-        "openonline.allowedinventories",
-        "Your Contests|Jacob's Farming Contests"
     )
 
     @SubscribeEvent
@@ -88,22 +79,60 @@ class JacobFarmingContestsInventory {
         if (!config.openOnline.isKeyHeld()) return
         if (!LorenzUtils.inSkyBlock) return
         val invName = InventoryUtils.openInventoryName()
-        if (!allowedInventoriesPattern.matches(invName)) return
         val name = event.slot.stack.name
 
-        if (invName == "Your Contests" && name.contains(", Year")) {
-            OSUtils.openBrowser("https://elitebot.dev/contests/${FarmingContestAPI.getSbDateFor(name)}")
-            event.isCanceled = true
-        } else if (invName == "Jacob's Farming Contests") {
-            when (name) {
-                "§6Upcoming Contests" -> OSUtils.openBrowser("https://elitebot.dev/contests/upcoming")
-                "§bClaim your rewards!" -> OSUtils.openBrowser("https://elitebot.dev/@${LorenzUtils.getPlayerName()}/${HypixelData.profileName}/contests")
-                "§aWhat is this?" -> OSUtils.openBrowser("https://elitebot.dev/contests")
-                else -> return
+        when (invName) {
+            "Your Contests" -> {
+                FarmingContestAPI.timePattern.matchMatcher(name) {
+                    val date = getDate(group("year"), group("month"), group("day"))
+                    OSUtils.openBrowser("https://elitebot.dev/contests/$date")
+                    ChatUtils.chat("Opening contest in elitebot.dev")
+                    event.isCanceled = true
+                }
             }
-            event.isCanceled = true
+            "Jacob's Farming Contests" -> {
+                when (name) {
+                    "§6Upcoming Contests" -> {
+                        OSUtils.openBrowser("https://elitebot.dev/contests/upcoming")
+                        ChatUtils.chat("Opening upcoming contests in elitebot.dev")
+                    }
+                    "§bClaim your rewards!" -> {
+                        OSUtils.openBrowser("https://elitebot.dev/@${LorenzUtils.getPlayerName()}/${HypixelData.profileName}/contests")
+                        ChatUtils.chat("Opening your contests in elitebot.dev")
+                    }
+                    "§aWhat is this?" -> {
+                        OSUtils.openBrowser("https://elitebot.dev/contests")
+                        ChatUtils.chat("Opening contest page in elitebot.dev")
+                    }
+                    else -> return
+                }
+                event.isCanceled = true
+            }
+            else -> {
+                GardenNextJacobContest.monthPattern.matchMatcher(invName) {
+                    if (!event.slot.stack.getLore().any { it.contains("§eJacob's Farming Contest") }) return
+
+                    val day = GardenNextJacobContest.dayPattern.matchMatcher(name) { group("day") } ?: return
+                    val year = group("year")
+                    val month = group("month")
+                    val time = SkyBlockTime(year.toInt(), LorenzUtils.getSBMonthByName(month), day.toInt()).toMillis()
+                    if (time < SkyBlockTime.now().toMillis()) {
+                        val date = getDate(year, month, day)
+                        OSUtils.openBrowser("https://elitebot.dev/contests/$date")
+                        ChatUtils.chat("Opening contest in elitebot.dev")
+                    } else {
+                        val highlightText = URLEncoder.encode("$month ${day.toInt().addSuffix()}, Year $year", "UTF-8").replace("+", "%20")
+                        OSUtils.openBrowser("https://elitebot.dev/contests/upcoming#:~:text=$highlightText")
+                        println("highlight: $highlightText")
+                        ChatUtils.chat("Opening upcoming contests in elitebot.dev")
+                    }
+                    event.isCanceled = true
+                }
+            }
         }
     }
+
+    private fun getDate(year: String, month: String, day: String) = "$year/${LorenzUtils.getSBMonthByName(month)}/$day"
 
     @SubscribeEvent
     fun onBackgroundDrawn(event: GuiContainerEvent.BackgroundDrawnEvent) {
