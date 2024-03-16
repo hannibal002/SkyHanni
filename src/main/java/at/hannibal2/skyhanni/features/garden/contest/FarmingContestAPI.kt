@@ -120,12 +120,10 @@ object FarmingContestAPI {
     }
 
     fun getSbDateFor(text: String) = timePattern.matchMatcher(text) {
-        val month = group("month")
-        val monthNr = LorenzUtils.getSBMonthByName(month)
-
-        val year = group("year").toInt()
-        val day = group("day").toInt()
-        "$year/$monthNr/$day"
+        val month = LorenzUtils.getSBMonthByName(group("month"))
+        val year = group("year")
+        val day = group("day")
+        "$year/$month/$day"
     }
 
     fun addContest(time: Long, item: ItemStack) {
