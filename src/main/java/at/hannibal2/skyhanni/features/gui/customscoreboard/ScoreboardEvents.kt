@@ -129,7 +129,6 @@ enum class ScoreboardEvents(private val displayLine: Supplier<List<String>>, pri
         ::getRedstoneShowWhen
     ),
 
-    // Maybe as a default state, use tablist "Events: ..."
     NONE(
         ::getNoneLines,
         { false }
@@ -251,7 +250,9 @@ private fun getJacobContestLines() = buildList {
         add(line)
         getSbLines().nextAfter(line)?.let { add(it) }
         getSbLines().nextAfter(line, 2)?.let { add(it) }
-        getSbLines().nextAfter(line, 3)?.let { add(it) }
+        getSbLines().nextAfter(line, 3)?.let {
+            if (!SbPattern.footerPattern.matches(it)) add(it)
+        }
     }
 }
 
