@@ -21,7 +21,7 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 object MaxwellAPI {
 
     private val storage get() = ProfileStorageData.profileSpecific
-    
+
     var currentPower: String?
         get() = storage?.maxwell?.currentPower
         set(value) {
@@ -59,6 +59,14 @@ object MaxwellAPI {
     private val powerSelectedPattern by group.pattern(
         "gui.selectedpower",
         "§aPower is selected!"
+    )
+    private val accessoryBagStack by group.pattern(
+        "stack.accessorybag",
+        "§.Accessory Bag"
+    )
+    private val redstoneCollectionRequirementPattern by group.pattern(
+        "collection.redstone.requirement",
+        "§7Redstone Collection §8- §7Tier §6(?<tier>[\\d,]+)"
     )
 
     @SubscribeEvent
@@ -104,7 +112,7 @@ object MaxwellAPI {
             val stacks = event.inventoryItems
 
             for (stack in stacks.values) {
-                processStack(stack)
+                if (accessoryBagStack.matches(stack.displayName)) processStack(stack)
             }
         }
     }
@@ -124,12 +132,12 @@ object MaxwellAPI {
                 val power = group("power")
                 currentPower = getPowerByNameOrNull(power)
                     ?: return@matchMatcher ErrorManager.logErrorWithData(
-                    UnknownMaxwellPower("Unknown power: ${stack.displayName}"),
-                    "Unknown power: ${stack.displayName}",
-                    "displayName" to stack.displayName,
-                    "lore" to stack.getLore(),
-                    noStackTrace = true
-                )
+                        UnknownMaxwellPower("Unknown power: ${stack.displayName}"),
+                        "Unknown power: ${stack.displayName}",
+                        "displayName" to stack.displayName,
+                        "lore" to stack.getLore(),
+                        noStackTrace = true
+                    )
                 return@matchMatcher
             }
         }
