@@ -84,6 +84,7 @@ object EnigmaSoulWaypoints {
         if (!inInventory || !isEnabled()) return
 
         if (event.slotId == 31 && inventoryUnfound.isNotEmpty()) {
+            // TODO
             event.usePickblockInstead()
             if (adding) {
                 trackedSouls.addAll(inventoryUnfound)
@@ -97,6 +98,7 @@ object EnigmaSoulWaypoints {
         if (event.slot.stack == null) return
         val split = event.slot.stack.displayName.split("Enigma: ")
         if (split.size == 2) {
+            // TODO
             event.usePickblockInstead()
             if (soulLocations.contains(split.last())) {
                 if (!trackedSouls.contains(split.last())) {

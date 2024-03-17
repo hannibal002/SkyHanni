@@ -112,6 +112,7 @@ class KloonHacking {
     @SubscribeEvent(priority = EventPriority.HIGH)
     fun onSlotClick(event: SlotClickEvent) {
         if (!inTerminalInventory || !RiftAPI.inRift()) return
+        // TODO
         event.usePickblockInstead()
     }
 

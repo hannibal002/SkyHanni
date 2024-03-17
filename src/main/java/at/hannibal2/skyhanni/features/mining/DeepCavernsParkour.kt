@@ -4,6 +4,7 @@ import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.data.jsonobjects.repo.ParkourJson
 import at.hannibal2.skyhanni.events.ConfigLoadEvent
+import at.hannibal2.skyhanni.events.GuiContainerEvent
 import at.hannibal2.skyhanni.events.InventoryCloseEvent
 import at.hannibal2.skyhanni.events.InventoryFullyOpenedEvent
 import at.hannibal2.skyhanni.events.IslandChangeEvent
@@ -18,7 +19,6 @@ import at.hannibal2.skyhanni.utils.NEUInternalName.Companion.asInternalName
 import at.hannibal2.skyhanni.utils.NEUItems.getItemStack
 import at.hannibal2.skyhanni.utils.ParkourHelper
 import io.github.moulberry.notenoughupdates.events.ReplaceItemEvent
-import io.github.moulberry.notenoughupdates.events.SlotClickEvent
 import io.github.moulberry.notenoughupdates.util.Utils
 import net.minecraft.client.player.inventory.ContainerLocalMenu
 import net.minecraftforge.fml.common.eventhandler.EventPriority
@@ -126,7 +126,7 @@ class DeepCavernsParkour {
     }
 
     @SubscribeEvent(priority = EventPriority.HIGH)
-    fun onStackClick(event: SlotClickEvent) {
+    fun onStackClick(event: GuiContainerEvent.SlotClickEvent) {
         if (showStartIcon && event.slotId == 40) {
             event.isCanceled = true
             ChatUtils.chat("Manually enabled Deep Caverns Parkour.")
