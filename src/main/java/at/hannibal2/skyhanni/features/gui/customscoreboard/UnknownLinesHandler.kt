@@ -43,6 +43,7 @@ object UnknownLinesHandler {
             SbPattern.soloPattern,
             SbPattern.teammatesPattern,
             SbPattern.floor3GuardiansPattern,
+            SbPattern.m7dragonsPattern,
             SbPattern.wavePattern,
             SbPattern.tokensPattern,
             SbPattern.submergesPattern,

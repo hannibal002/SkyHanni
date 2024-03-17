@@ -399,13 +399,11 @@ private fun getIslandDisplayPair() =
     listOf("§7㋖ §a" + HypixelData.skyBlockIsland.displayName to HorizontalAlignment.LEFT)
 
 private fun getLocationDisplayPair() = buildList {
-    add(
-        getGroupFromPattern(
-            ScoreboardData.sidebarLinesFormatted,
-            ScoreboardPattern.locationPattern,
-            "location"
-        ).trim() to HorizontalAlignment.LEFT
-    )
+    val location =
+        getGroupFromPattern(ScoreboardData.sidebarLinesFormatted, ScoreboardPattern.locationPattern, "location").trim()
+    if (location == "0") return@buildList
+
+    add(location to HorizontalAlignment.LEFT)
 
     ScoreboardData.sidebarLinesFormatted.firstOrNull { ScoreboardPattern.plotPattern.matches(it) }
         ?.let { add(it to HorizontalAlignment.LEFT) }
