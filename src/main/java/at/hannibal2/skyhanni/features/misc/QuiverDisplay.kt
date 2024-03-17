@@ -21,7 +21,7 @@ class QuiverDisplay {
     private var display = emptyList<Renderable>()
     private var arrow = QuiverAPI.currentArrow
     private var amount = 0
-    private var showAmount = true
+    private var hideAmount = false
 
     @SubscribeEvent
     fun onProfileJoin(event: ProfileJoinEvent) {
@@ -38,12 +38,12 @@ class QuiverDisplay {
         val itemStack = NEUItems.getItemStackOrNull(arrow.internalName.asString()) ?: ItemStack(Items.arrow)
 
         val rarity = itemStack.getItemRarityOrNull()?.chatColorCode ?: "§f"
-        val arrowDisplayName = if (showAmount) StringUtils.pluralize(amount, arrow.arrow) else arrow.arrow
+        val arrowDisplayName = if (hideAmount) arrow.arrow else StringUtils.pluralize(amount, arrow.arrow)
 
         if (config.showIcon) {
             add(Renderable.itemStack(itemStack,1.68))
         }
-        if (showAmount) {
+        if (!hideAmount) {
             add(Renderable.string(" §b${amount}x"))
         }
         add(Renderable.string(" $rarity$arrowDisplayName"))
@@ -53,7 +53,7 @@ class QuiverDisplay {
     fun onQuiverUpdate(event: QuiverUpdateEvent) {
         arrow = event.currentArrow
         amount = event.currentAmount
-        showAmount = event.showAmount
+        hideAmount = event.hideAmount
         updateDisplay()
     }
 

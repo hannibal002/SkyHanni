@@ -66,7 +66,7 @@ object QuiverAPI {
     private val selectPattern by chatGroup.pattern("select", "§aYou set your selected arrow type to §.(?<arrow>.*)§a!")
     private val fillUpJaxPattern by chatGroup.pattern(
         "fillupjax",
-        "(§.)*Jax forged (§.)*(?<type>.*?)(§.)* x(?<amount>[\\d,]+)( (§.)*for (§.)*(?<coins>[\\d,]+) Coins)?(§.)*!"
+        "(?:§.)*Jax forged (?:§.)*(?<type>.*?)(?:§.)* x(?<amount>[\\d,]+)(?: (?:§.)*for (?:§.)*(?<coins>[\\d,]+) Coins)?(?:§.)*!"
     )
     private val fillUpPattern by chatGroup.pattern(
         "fillup",
@@ -83,7 +83,7 @@ object QuiverAPI {
     private val arrowResetPattern by chatGroup.pattern("arrowreset", "§cYour favorite arrow has been reset!")
     private val addedToQuiverPattern by chatGroup.pattern(
         "addedtoquiver",
-        "(§.)*You've added (§.)*(?<type>.*) x(?<amount>.*) (§.)*to your quiver!"
+        "(?:§.)*You've added (?:§.)*(?<type>.*) x(?<amount>.*) (?:§.)*to your quiver!"
     )
 
     // Bows that don't use the players arrows, checked using the SkyBlock Id
@@ -107,7 +107,7 @@ object QuiverAPI {
                     "Unknown arrow type: $type",
                     "message" to message,
                 )
-            QuiverUpdateEvent(currentArrow, currentAmount, shouldShowAmount()).postAndCatch()
+            QuiverUpdateEvent(currentArrow, currentAmount, shouldHideAmount()).postAndCatch()
             return
         }
 
@@ -120,7 +120,7 @@ object QuiverAPI {
                     "message" to message,
                 )
             arrowAmount[ranOutType.internalName] = 0F
-            QuiverUpdateEvent(ranOutType, currentAmount, shouldShowAmount()).postAndCatch()
+            QuiverUpdateEvent(ranOutType, currentAmount, shouldHideAmount()).postAndCatch()
         }
 
         fillUpJaxPattern.matchMatcher(message) {
@@ -135,7 +135,7 @@ object QuiverAPI {
 
             arrowAmount.addOrPut(filledUpType.internalName, amount)
             if (filledUpType == currentArrow) {
-                QuiverUpdateEvent(filledUpType, currentAmount, shouldShowAmount()).postAndCatch()
+                QuiverUpdateEvent(filledUpType, currentAmount, shouldHideAmount()).postAndCatch()
             }
             return
 
@@ -147,7 +147,7 @@ object QuiverAPI {
             FLINT_ARROW_TYPE?.let { arrowAmount.addOrPut(it.internalName, flintAmount) }
 
             if (currentArrow == FLINT_ARROW_TYPE) {
-                QuiverUpdateEvent(currentArrow, currentAmount, shouldShowAmount()).postAndCatch()
+                QuiverUpdateEvent(currentArrow, currentAmount, shouldHideAmount()).postAndCatch()
             }
             return
         }
@@ -165,7 +165,7 @@ object QuiverAPI {
 
             arrowAmount.addOrPut(filledUpType.internalName, amount)
             if (filledUpType == currentArrow) {
-                QuiverUpdateEvent(currentArrow, currentAmount, shouldShowAmount()).postAndCatch()
+                QuiverUpdateEvent(currentArrow, currentAmount, shouldHideAmount()).postAndCatch()
             }
             return
         }
@@ -174,7 +174,7 @@ object QuiverAPI {
             currentAmount = 0
             arrowAmount.clear()
 
-            QuiverUpdateEvent(currentArrow, currentAmount, shouldShowAmount()).postAndCatch()
+            QuiverUpdateEvent(currentArrow, currentAmount, shouldHideAmount()).postAndCatch()
             return
         }
 
@@ -182,7 +182,7 @@ object QuiverAPI {
             currentArrow = NONE_ARROW_TYPE
             currentAmount = 0
 
-            QuiverUpdateEvent(currentArrow, currentAmount, shouldShowAmount()).postAndCatch()
+            QuiverUpdateEvent(currentArrow, currentAmount, shouldHideAmount()).postAndCatch()
             return
         }
     }
@@ -226,7 +226,7 @@ object QuiverAPI {
                     if (currentArrowType != currentArrow || amount != currentAmount) {
                         currentArrow = currentArrowType
                         currentAmount = amount
-                        QuiverUpdateEvent(currentArrowType, currentAmount, shouldShowAmount()).postAndCatch()
+                        QuiverUpdateEvent(currentArrowType, currentAmount, shouldHideAmount()).postAndCatch()
                     }
                 }
             }
@@ -236,7 +236,9 @@ object QuiverAPI {
     fun Int.asArrowPercentage() = ((this.toFloat() / MAX_ARROW_AMOUNT) * 100).round(1)
 
     fun hasBowInInventory(): Boolean {
-        return InventoryUtils.getItemsInOwnInventory().any { it.item is ItemBow }
+        return InventoryUtils.getItemsInOwnInventory().any {
+            it.item is ItemBow && !fakeBowsPattern.matches(it.getInternalName().asString())
+        }
     }
 
     fun getArrowByNameOrNull(name: String): ArrowType? {
@@ -251,14 +253,14 @@ object QuiverAPI {
 
     fun isEnabled() = LorenzUtils.inSkyBlock && storage != null
 
-    private fun shouldShowAmount() = !wearingSkeletonMasterChestplate
+    private fun shouldHideAmount() = wearingSkeletonMasterChestplate
 
     private fun checkChestplate() {
         val wasWearing = wearingSkeletonMasterChestplate
         wearingSkeletonMasterChestplate = InventoryUtils.getChestplate()?.getInternalName()?.equals(
             SKELETON_MASTER_CHESTPLATE) ?: false
         if (wasWearing != wearingSkeletonMasterChestplate) {
-            QuiverUpdateEvent(currentArrow, currentAmount, shouldShowAmount()).postAndCatch()
+            QuiverUpdateEvent(currentArrow, currentAmount, shouldHideAmount()).postAndCatch()
         }
     }
 

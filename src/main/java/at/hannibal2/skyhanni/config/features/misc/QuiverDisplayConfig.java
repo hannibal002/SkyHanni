@@ -23,7 +23,7 @@ public class QuiverDisplayConfig {
     public boolean showIcon = true;
 
     @Expose
-    @ConfigOption(name = "Show only with bow", desc = "Only show when a bow is in your inventory")
+    @ConfigOption(name = "Show only with bow", desc = "Only show when a bow is in your inventory.")
     @ConfigEditorBoolean
     public boolean onlyWithBow = true;
 
@@ -31,11 +31,21 @@ public class QuiverDisplayConfig {
     @ConfigOption(
         name = "Low Quiver Alert",
         desc = "Notifies you when your quiver\n" +
-            "reaches an amount of arrows"
+            "reaches an amount of arrows."
     )
     @ConfigEditorBoolean
     @FeatureToggle
     public boolean lowQuiverNotification = false;
+
+    @Expose
+    @ConfigOption(
+        name = "Reminder After Run",
+        desc = "Reminds you to buy arrows after\n" +
+            "a Dungeons/Kuudra run if you're low."
+    )
+    @ConfigEditorBoolean
+    @FeatureToggle
+    public boolean reminderAfterRun = false;
 
     @Expose
     @ConfigOption(name = "Low Quiver Amount", desc = "")
