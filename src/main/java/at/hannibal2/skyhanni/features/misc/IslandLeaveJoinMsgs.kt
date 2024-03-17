@@ -32,7 +32,7 @@ object IslandLeaveJoinMsgs {
     )
     private val offlinePlayerPattern by patternGroup.pattern(
         "offlineplayers",
-        "(?<player>§[0-9a-f]\\w+)(?: §r§7\\(Offline [0-9dh+]+§r§7\\))?"
+        "(?<player>§[0-9a-f]\\w+)(?: §r§7\\(Offline [0-9Mdh+]+§r§7\\))?"
     )
     private val islandCategoryPattern by patternGroup.pattern(
         "islandcategory",
@@ -109,14 +109,13 @@ object IslandLeaveJoinMsgs {
                 val player = group("player")
                 if (playersNew.contains(player)) return@matchMatcher
                 playersNew.add(player)
-                players.add(player)
             }
         }
 
         if (players.isEmpty()) return
 
         // rather arbitrary multiplier to fix totalPlayers sometimes having a couple more than players
-        if (players.size >= totalPlayers * 0.9 || players.size >= 37) {
+        if (players.size >= totalPlayers * 0.9 || players.size >= 37 && System.currentTimeMillis() - LorenzUtils.lastWorldSwitch > 2_000) {
             updatedSinceWorldSwitch = true
         }
 
