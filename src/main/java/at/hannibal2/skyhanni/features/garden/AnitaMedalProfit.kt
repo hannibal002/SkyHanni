@@ -7,13 +7,14 @@ import at.hannibal2.skyhanni.events.InventoryFullyOpenedEvent
 import at.hannibal2.skyhanni.features.garden.visitor.VisitorAPI
 import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.CollectionUtils.addAsSingletonList
+import at.hannibal2.skyhanni.utils.DisplayTableEntry
 import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.ItemUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.ItemUtils.itemName
 import at.hannibal2.skyhanni.utils.ItemUtils.name
-import at.hannibal2.skyhanni.utils.LorenzUtils
+import at.hannibal2.skyhanni.utils.LorenzUtils.fillTable
 import at.hannibal2.skyhanni.utils.NEUInternalName
 import at.hannibal2.skyhanni.utils.NEUInternalName.Companion.asInternalName
 import at.hannibal2.skyhanni.utils.NEUItems.getPrice
@@ -55,7 +56,7 @@ class AnitaMedalProfit {
 
         inInventory = true
 
-        val table = mutableMapOf<Pair<String, String>, Pair<Double, NEUInternalName>>()
+        val table = mutableListOf<DisplayTableEntry>()
         for ((_, item) in event.inventoryItems) {
             try {
                 readItem(item, table)
@@ -71,11 +72,11 @@ class AnitaMedalProfit {
 
         val newList = mutableListOf<List<Any>>()
         newList.addAsSingletonList("§eMedal Profit")
-        LorenzUtils.fillTable(newList, table)
+        newList.fillTable(table)
         display = newList
     }
 
-    private fun readItem(item: ItemStack, table: MutableMap<Pair<String, String>, Pair<Double, NEUInternalName>>) {
+    private fun readItem(item: ItemStack, table: MutableList<DisplayTableEntry>) {
         val itemName = getItemName(item) ?: return
         if (itemName == " ") return
         if (itemName == "§cClose") return
@@ -96,9 +97,18 @@ class AnitaMedalProfit {
         if (itemPrice < 0) return
 
         val profit = itemPrice - fullCost
-        val format = NumberUtil.format(profit)
+        val profitFormat = NumberUtil.format(profit)
         val color = if (profit > 0) "§6" else "§c"
-        table[Pair(itemName, "$color$format")] = Pair(profit, internalName)
+
+        val hover = listOf(
+            itemName,
+            "",
+            "§7Item price: §6${NumberUtil.format(itemPrice)} ",
+            // TODO add more exact material cost breakdown
+            "§7Material cost: §6${NumberUtil.format(fullCost)} ",
+            "§7Final profit: §6${profitFormat} ",
+        )
+        table.add(DisplayTableEntry(itemName, "$color$profitFormat", profit, internalName, hover))
     }
 
     private fun getItemName(item: ItemStack): String? {

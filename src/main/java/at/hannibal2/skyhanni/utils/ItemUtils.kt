@@ -395,6 +395,9 @@ object ItemUtils {
         if (this == NEUInternalName.NONE) {
             error("NEUInternalName.NONE has no name!")
         }
+        if (NEUItems.ignoreItemsFilter.match(this.asString())) {
+            return "§cBugged Item"
+        }
 
         val itemStack = getItemStackOrNull()
         val name = itemStack?.name ?: error("Could not find item name for $this")

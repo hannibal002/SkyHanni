@@ -137,7 +137,7 @@ public class MiscConfig {
     public boolean hidePiggyScoreboard = true;
 
     @Expose
-    @ConfigOption(name = "Color Month Names", desc = "Color the month names in the Scoreboard.")
+    @ConfigOption(name = "Color Month Names", desc = "Color the month names in the Scoreboard.\nAlso applies to the Custom Scoreboard.")
     @ConfigEditorBoolean
     @FeatureToggle
     public boolean colorMonthNames = false;
@@ -174,12 +174,6 @@ public class MiscConfig {
 
     @Expose
     public Position playerMovementSpeedPos = new Position(394, 124, false, true);
-
-    @Expose
-    @ConfigOption(name = "Pet Candy Used", desc = "Show the number of Pet Candy used on a pet.")
-    @ConfigEditorBoolean
-    @FeatureToggle
-    public boolean petCandyUsed = true;
 
     @Expose
     @ConfigOption(name = "Server Restart Title", desc = "Show a title with seconds remaining until the server restarts after a Game Update or Scheduled Restart.")

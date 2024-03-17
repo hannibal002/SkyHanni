@@ -6,6 +6,7 @@ import at.hannibal2.skyhanni.events.LorenzRenderWorldEvent
 import at.hannibal2.skyhanni.features.garden.pests.SprayType
 import at.hannibal2.skyhanni.features.misc.LockMouseLook
 import at.hannibal2.skyhanni.utils.ChatUtils
+import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.ItemUtils.name
 import at.hannibal2.skyhanni.utils.LocationUtils.isPlayerInside
 import at.hannibal2.skyhanni.utils.LorenzVec
@@ -39,7 +40,7 @@ object GardenPlotAPI {
         return plots.firstOrNull { it.isPlayerInside() }
     }
 
-    class Plot(val id: Int, var inventorySlot: Int, val box: AxisAlignedBB, val middle: LorenzVec)
+    class Plot(val id: Int, var unlocked: Boolean, var inventorySlot: Int, val box: AxisAlignedBB, val middle: LorenzVec)
 
     class PlotData(
         @Expose
@@ -133,7 +134,7 @@ object GardenPlotAPI {
                 val b = LorenzVec(maxX, 256.0, maxY)
                 val middle = a.interpolate(b, 0.5).copy(y = 10.0)
                 val box = a.axisAlignedTo(b).expand(0.0001, 0.0, 0.0001)
-                list.add(Plot(id, slot, box, middle))
+                list.add(Plot(id, false, slot, box, middle))
                 slot++
             }
             slot += 4
@@ -162,8 +163,9 @@ object GardenPlotAPI {
         if (event.inventoryName != "Configure Plots") return
 
         for (plot in plots) {
-            val itemName = event.inventoryItems[plot.inventorySlot]?.name ?: continue
-            plotNamePattern.matchMatcher(itemName) {
+            val itemStack = event.inventoryItems[plot.inventorySlot] ?: continue
+            plot.unlocked = itemStack.getLore().all { !it.contains("§7Cost:") }
+            plotNamePattern.matchMatcher(itemStack.name) {
                 plot.name = group("name")
             }
         }

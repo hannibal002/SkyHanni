@@ -8,12 +8,14 @@ import at.hannibal2.skyhanni.events.LorenzToolTipEvent
 import at.hannibal2.skyhanni.events.RenderItemTipEvent
 import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.InventoryUtils.getInventoryName
+import at.hannibal2.skyhanni.utils.InventoryUtils.getUpperItems
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.ItemUtils.name
 import at.hannibal2.skyhanni.utils.LorenzColor
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.NumberUtil.romanToDecimalIfNecessary
 import at.hannibal2.skyhanni.utils.RenderUtils.highlight
+import at.hannibal2.skyhanni.utils.StringUtils.createCommaSeparatedList
 import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import net.minecraft.client.gui.inventory.GuiChest
@@ -100,20 +102,16 @@ class DungeonFinderFeatures {
         val inventoryName = chest.getInventoryName()
         if (inventoryName != "Party Finder") return
 
-        for (slot in chest.inventorySlots) {
-            if (slot == null) continue
-            if (slot.slotNumber != slot.slotIndex) continue
-            if (slot.stack == null) continue
+        for ((slot, stack) in chest.getUpperItems()) {
+            if (!stack.name.endsWith(" Party")) continue
 
-            if (!slot.stack.name.endsWith(" Party")) continue
-
-            if (config.markIneligibleGroups && slot.stack.getLore().any { ineligiblePattern.matches(it) }) {
+            if (config.markIneligibleGroups && stack.getLore().any { ineligiblePattern.matches(it) }) {
                 slot highlight LorenzColor.DARK_RED
                 continue
             }
 
             if (config.markPaidCarries) {
-                val note = slot.stack.getLore().filter { notePattern.containsMatchIn(it) }.joinToString(" ")
+                val note = stack.getLore().filter { notePattern.containsMatchIn(it) }.joinToString(" ")
 
                 if (pricePattern.containsMatchIn(note) && carryPattern.containsMatchIn(note)) {
                     slot highlight LorenzColor.RED
@@ -148,22 +146,28 @@ class DungeonFinderFeatures {
     @SubscribeEvent
     fun onItemTooltip(event: LorenzToolTipEvent) {
         if (!LorenzUtils.inSkyBlock) return
-        if (!config.coloredClassLevel) return
 
         val chestName = InventoryUtils.openInventoryName()
         if (chestName != "Party Finder") return
 
         val stack = event.itemStack
 
+        val classNames = mutableListOf("Healer", "Mage", "Berserk", "Archer", "Tank")
         for ((index, line) in stack.getLore().withIndex()) {
             classLevelPattern.matchMatcher(line) {
                 val playerName = group("playerName")
                 val className = group("className")
                 val level = group("level").toInt()
                 val color = getColor(level)
-                event.toolTip[index + 1] = " §b$playerName§f: §e$className $color$level"
+                if (config.coloredClassLevel) event.toolTip[index + 1] = " §b$playerName§f: §e$className $color$level"
+                classNames.remove(className)
             }
         }
+        if (!config.showMissingClasses) return
+        if (stack.getLore().firstOrNull()?.removeColor()?.startsWith("Dungeon:") == false) return
+        if (classNames.contains(selectedClass)) selectedClass = "§a${selectedClass}§7"
+        event.toolTip.add("")
+        event.toolTip.add("§cMissing: §7" + classNames.createCommaSeparatedList())
     }
 
     @SubscribeEvent
