@@ -112,7 +112,6 @@ object UnknownLinesHandler {
             patternsToExclude.any { pattern -> pattern.matches(line) }
         }
 
-
         /*
          * remove known text
         */

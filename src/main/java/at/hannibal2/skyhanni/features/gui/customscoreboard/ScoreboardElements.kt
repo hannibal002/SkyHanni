@@ -398,6 +398,7 @@ private fun getEmptyLineDisplayPair() = listOf("<empty>" to HorizontalAlignment.
 private fun getIslandDisplayPair() =
     listOf("§7㋖ §a" + HypixelData.skyBlockIsland.displayName to HorizontalAlignment.LEFT)
 
+// TODO merge with LorenzUtils.skyBlockArea
 private fun getLocationDisplayPair() = buildList {
     val location =
         getGroupFromPattern(ScoreboardData.sidebarLinesFormatted, ScoreboardPattern.locationPattern, "location").trim()
