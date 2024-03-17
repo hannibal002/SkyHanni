@@ -6,6 +6,7 @@ import at.hannibal2.skyhanni.events.LorenzChatEvent
 import at.hannibal2.skyhanni.events.RepositoryReloadEvent
 import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.ChatUtils
+import at.hannibal2.skyhanni.utils.CollectionUtils.sortedDesc
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils.isInIsland
@@ -17,6 +18,7 @@ import at.hannibal2.skyhanni.utils.StringUtils.removeResets
 import at.hannibal2.skyhanni.utils.StringUtils.trimWhiteSpace
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraft.item.ItemStack
+import net.minecraftforge.fml.common.eventhandler.EventPriority
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
 object MaxwellAPI {
@@ -28,10 +30,17 @@ object MaxwellAPI {
         set(value) {
             storage?.maxwell?.currentPower = value ?: return
         }
+
     var magicalPower: Int?
         get() = storage?.maxwell?.magicalPower
         set(value) {
             storage?.maxwell?.magicalPower = value ?: return
+        }
+
+    var tunings: Map<String, Int>?
+        get() = storage?.maxwell?.tunings
+        set(value) {
+            storage?.maxwell?.tunings = value ?: return
         }
 
     private var powers = mutableListOf<String>()
@@ -49,7 +58,7 @@ object MaxwellAPI {
         "inventory.magicalpower",
         "§7Magical Power: §6(?<mp>[\\d,]+)"
     )
-    private val thaumaturgyGuiPattern by group.pattern(
+    val thaumaturgyGuiPattern by group.pattern(
         "gui.thaumaturgy",
         "Accessory Bag Thaumaturgy"
     )
@@ -87,35 +96,67 @@ object MaxwellAPI {
         }
     }
 
-    @SubscribeEvent
+    // load earler, so that other features can already use the api in this event
+    @SubscribeEvent(priority = EventPriority.HIGH)
     fun onInventoryFullyLoaded(event: InventoryFullyOpenedEvent) {
         if (!isEnabled()) return
 
         if (thaumaturgyGuiPattern.matches(event.inventoryName)) {
-            val selectedPowerStack =
-                event.inventoryItems.values.find {
-                    powerSelectedPattern.matches(it.getLore().lastOrNull())
-                } ?: return
-            val displayName = selectedPowerStack.displayName.removeColor().trim()
-
-            currentPower = getPowerByNameOrNull(displayName)
-                ?: return ErrorManager.logErrorWithData(
-                    UnknownMaxwellPower("Unknown power: $displayName"),
-                    "Unknown power: $displayName",
-                    "displayName" to displayName,
-                    "lore" to selectedPowerStack.getLore(),
-                    noStackTrace = true
-                )
-            return
+            loadThaumaturgyGui(event.inventoryItems)
         }
 
         if (yourBagsGuiPattern.matches(event.inventoryName)) {
-            val stacks = event.inventoryItems
-
-            for (stack in stacks.values) {
+            for (stack in event.inventoryItems.values) {
                 if (accessoryBagStack.matches(stack.displayName)) processStack(stack)
             }
         }
+    }
+
+    private fun loadCurrentPower(inventoryItems: Map<Int, ItemStack>) {
+        val selectedPowerStack =
+            inventoryItems.values.find {
+                powerSelectedPattern.matches(it.getLore().lastOrNull())
+            } ?: return
+        val displayName = selectedPowerStack.displayName.removeColor().trim()
+
+        currentPower = getPowerByNameOrNull(displayName)
+            ?: return ErrorManager.logErrorWithData(
+                UnknownMaxwellPower("Unknown power: $displayName"),
+                "Unknown power: $displayName",
+                "displayName" to displayName,
+                "lore" to selectedPowerStack.getLore(),
+                noStackTrace = true
+            )
+    }
+
+    private fun loadThaumaturgyGui(inventoryItems: Map<Int, ItemStack>) {
+        loadCurrentPower(inventoryItems)
+        loadTunings(inventoryItems)
+    }
+
+    private fun loadTunings(inventoryItems: Map<Int, ItemStack>) {
+        val item = inventoryItems[51] ?: return
+        var active = false
+        val map = mutableMapOf<String, Int>()
+        for (line in item.getLore()) {
+            if (line == "§7Your tuning:") {
+                active = true
+                continue
+            }
+            if (active) {
+                if (line.isEmpty()) {
+                    break
+                }
+                "§(?<color>.)\\+(?<amount>\\d+)(?<icon>.) .+".toPattern().matchMatcher(line) {
+                    val color = group("color")
+                    val icon = group("icon")
+                    val name = "§$color$icon"
+                    val amount = group("amount").formatInt()
+                    map[name] = amount
+                }
+            }
+        }
+        tunings = map.sortedDesc().toList().take(3).toMap()
     }
 
     private fun processStack(stack: ItemStack) {
