@@ -14,7 +14,10 @@ object UnknownLinesHandler {
     fun handleUnknownLines() {
         val sidebarLines = ScoreboardData.sidebarLinesFormatted
 
-        unknownLines = sidebarLines.toMutableList().map { it.removeResets() }.filter { it.isNotBlank() }
+        unknownLines = sidebarLines
+            .map { it.removeResets() }
+            .filter { it.isNotBlank() }
+            .filter { it.trim().length > 3 }
 
         /*
          * remove with pattern
