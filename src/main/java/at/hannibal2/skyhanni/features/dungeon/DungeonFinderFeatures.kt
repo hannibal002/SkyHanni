@@ -4,29 +4,28 @@ import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.events.GuiContainerEvent
 import at.hannibal2.skyhanni.events.InventoryCloseEvent
-import at.hannibal2.skyhanni.events.InventoryFullyOpenedEvent
+import at.hannibal2.skyhanni.events.InventoryOpenEvent
 import at.hannibal2.skyhanni.events.LorenzToolTipEvent
 import at.hannibal2.skyhanni.events.RenderInventoryItemTipEvent
-import at.hannibal2.skyhanni.utils.DelayedRun
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.LorenzColor
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.NumberUtil.romanToDecimalIfNecessary
 import at.hannibal2.skyhanni.utils.RenderUtils.highlight
-import at.hannibal2.skyhanni.utils.StringUtils
 import at.hannibal2.skyhanni.utils.StringUtils.anyMatches
+import at.hannibal2.skyhanni.utils.StringUtils.createCommaSeparatedList
 import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.StringUtils.matches
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
+import net.minecraft.item.ItemStack
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
-import kotlin.time.Duration.Companion.milliseconds
 
 class DungeonFinderFeatures {
     private val config get() = SkyHanniMod.feature.dungeon.partyFinder
 
     //  Repo group and patterns
-    private val patternGroup = RepoPattern.group("dungeon.finder.features")
+    private val patternGroup = RepoPattern.group("dungeon.finder")
     private val pricePattern by patternGroup.pattern(
         "price",
         "([0-9]{2,3}K|[0-9]{1,3}M|[0-9]+\\.[0-9]M|[0-9] ?MIL)"
@@ -114,193 +113,180 @@ class DungeonFinderFeatures {
 
     //  Variables used
     private var selectedClass = ""
-    private var floorStackSize = mutableMapOf<Int, String>()
-    private var highlightParty = mutableMapOf<Int, LorenzColor>()
-    private var toolTipMap = mutableMapOf<Int, MutableList<String>>()
+    private var floorStackSize = mapOf<Int, String>()
+    private var highlightParty = mapOf<Int, LorenzColor>()
+    private var toolTipMap = mapOf<Int, List<String>>()
     private var inInventory = false
 
     @SubscribeEvent
-    fun onInventoryOpen(event: InventoryFullyOpenedEvent) {
+    fun onInventoryOpen(event: InventoryOpenEvent) {
         if (!isEnabled()) return
 
-        DelayedRun.runDelayed(10.0.milliseconds) {
-            floorStackSize.clear()
-            highlightParty.clear()
-            toolTipMap.clear()
-
-            stackTip(event)
-
-            highlightingHandler(event)
-
-            toolTipHandler(event)
-        }
-
+        floorStackSize = stackTip(event)
+        highlightParty = highlightingHandler(event)
+        toolTipMap = toolTipHandler(event)
     }
 
-    private fun stackTip(event: InventoryFullyOpenedEvent) {
+    private fun stackTip(event: InventoryOpenEvent): Map<Int, String> {
+        val map = mutableMapOf<Int, String>()
         val inventoryName = event.inventoryName
-        if (catacombsGatePattern.matches(inventoryName)) catacombsGateStackTip(event)
-        if (!config.floorAsStackSize) return
-        if (selectFloorPattern.matches(inventoryName)) selectFloorStackTip(event)
-        if (partyFinderTitlePattern.matches(inventoryName)) partyFinderStackTip(event)
+        if (catacombsGatePattern.matches(inventoryName)) catacombsGateStackTip(event.inventoryItems, map)
+        if (!config.floorAsStackSize) return map
+        if (selectFloorPattern.matches(inventoryName)) selectFloorStackTip(event.inventoryItems, map)
+        if (partyFinderTitlePattern.matches(inventoryName)) partyFinderStackTip(event.inventoryItems, map)
+        return map
     }
 
-    private fun selectFloorStackTip(event: InventoryFullyOpenedEvent) {
+    private fun selectFloorStackTip(inventoryItems: Map<Int, ItemStack>, map: MutableMap<Int, String>) {
         inInventory = true
-        for ((slot, stack) in event.inventoryItems) {
+        for ((slot, stack) in inventoryItems) {
             val name = stack.displayName.removeColor()
-            if (anyFloorPattern.matches(name)) {
-                floorStackSize[slot] = "A"
+            map[slot] = if (anyFloorPattern.matches(name)) {
+                "A"
             } else if (entranceFloorPattern.matches(name)) {
-                floorStackSize[slot] = "E"
+                "E"
             } else if (floorPattern.matches(name)) {
-                floorStackSize[slot] =
-                    floorNumberPattern.matchMatcher(name) { group("floorNum").romanToDecimalIfNecessary().toString() } ?: continue
+                floorNumberPattern.matchMatcher(name) {
+                    group("floorNum").romanToDecimalIfNecessary().toString()
+                } ?: continue
+            } else continue
+        }
+    }
+
+    private fun partyFinderStackTip(inventoryItems: Map<Int, ItemStack>, map: MutableMap<Int, String>) {
+        inInventory = true
+        for ((slot, stack) in inventoryItems) {
+            val name = stack.displayName.removeColor()
+            if (!checkIfPartyPattern.matches(name)) continue
+            val lore = stack.getLore()
+            val floor = lore.find { floorFloorPattern.matches(it.removeColor()) } ?: continue
+            val dungeon = lore.find { dungeonFloorPattern.matches(it.removeColor()) } ?: continue
+            val floorNum = floorNumberPattern.matchMatcher(floor) {
+                group("floorNum").romanToDecimalIfNecessary()
+            }
+            map[slot] = if (entranceFloorPattern.matches(floor)) {
+                "E"
+            } else if (masterModeFloorPattern.matches(dungeon)) {
+                "M$floorNum"
+            } else {
+                "F$floorNum"
             }
         }
     }
 
-    private fun partyFinderStackTip(event: InventoryFullyOpenedEvent) {
+    private fun catacombsGateStackTip(inventoryItems: Map<Int, ItemStack>, map: MutableMap<Int, String>) {
+        val dungeonClassItemIndex = 45
+        inInventory = true
+        inventoryItems[dungeonClassItemIndex]?.getLore()?.let {
+            if (it.size > 3 && detectDungeonClassPattern.matches(it[0])) {
+                getDungeonClassPattern.matchMatcher(it[2].removeColor()) {
+                    selectedClass = group("class")
+                }
+            }
+        }
+
+        if (!config.floorAsStackSize) return
+        for ((slot, stack) in inventoryItems) {
+            val name = stack.displayName.removeColor()
+            if (!floorTypePattern.matches(name)) continue
+            val floorNum = floorNumberPattern.matchMatcher(name) {
+                group("floorNum").romanToDecimalIfNecessary()
+            } ?: continue
+            map[slot] = if (entranceFloorPattern.matches(name)) {
+                "E"
+            } else if (masterModeFloorPattern.matches(name)) {
+                "M$floorNum"
+            } else {
+                "F$floorNum"
+            }
+        }
+
+    }
+
+    private fun highlightingHandler(event: InventoryOpenEvent): Map<Int, LorenzColor> {
+        val map = mutableMapOf<Int, LorenzColor>()
+        if (!partyFinderTitlePattern.matches(event.inventoryName)) return map
         inInventory = true
         for ((slot, stack) in event.inventoryItems) {
-            val name = stack.displayName.removeColor()
-            if (checkIfPartyPattern.matches(name)) {
-                val lore = stack.getLore()
-                val floor = lore.find { floorFloorPattern.matches(it.removeColor()) }
-                val dungeon =
-                    lore.find { dungeonFloorPattern.matches(it.removeColor()) }
-                if (floor == null || dungeon == null) continue
-                val floorNum =
-                    floorNumberPattern.matchMatcher(floor) { group("floorNum").romanToDecimalIfNecessary().toString() }
-                if (entranceFloorPattern.matches(floor)) {
-                    floorStackSize[slot] = "E"
-                } else if (masterModeFloorPattern.matches(dungeon)) {
-                    floorStackSize[slot] = "M$floorNum"
-                } else {
-                    floorStackSize[slot] = "F$floorNum"
+            val lore = stack.getLore()
+            if (!checkIfPartyPattern.matches(stack.displayName)) continue
+            if (config.markIneligibleGroups && ineligiblePattern.anyMatches(lore)) {
+                map[slot] = LorenzColor.DARK_RED
+                continue
+            }
+
+            if (config.markPaidCarries) {
+                val note = lore.filter { notePattern.matches(it) }.joinToString(" ").uppercase()
+
+                if (pricePattern.matches(note) && carryPattern.matches(note)) {
+                    map[slot] = LorenzColor.RED
+                    continue
                 }
             }
-        }
 
+            if (config.markNonPugs) {
+                val note = lore.filter { notePattern.matches(it) }.joinToString(" ").uppercase()
+
+                if (nonPugPattern.matches(note)) {
+                    map[slot] = LorenzColor.LIGHT_PURPLE
+                    continue
+                }
+            }
+
+            val members = lore.filter { memberPattern.matches(it) }
+            val memberLevels = members.map {
+                memberPattern.matchMatcher(it) {
+                    group("level").toInt()
+                }
+            }
+            val memberClasses = members.map {
+                memberPattern.matchMatcher(it) {
+                    group("className")
+                }
+            }
+            if (memberLevels.any { (it ?: Integer.MAX_VALUE) <= config.markBelowClassLevel }) {
+                map[slot] = LorenzColor.YELLOW
+                continue
+            }
+
+            if (config.markMissingClass && memberClasses.none { it == selectedClass }) {
+                map[slot] = LorenzColor.GREEN
+            }
+        }
+        return map
     }
 
-    private fun catacombsGateStackTip(event: InventoryFullyOpenedEvent) {
-        val dungeonClassItemIndex = 45
-        val lore = event.inventoryItems[dungeonClassItemIndex]?.getLore()
+    private fun toolTipHandler(event: InventoryOpenEvent): Map<Int, List<String>> {
+        val map = mutableMapOf<Int, List<String>>()
+        val inventoryName = event.inventoryName
+        if (!partyFinderTitlePattern.matches(inventoryName)) return map
         inInventory = true
-        if (lore != null) {
-            if (lore.size > 3 && detectDungeonClassPattern.matches(lore[0])) {
-                selectedClass = getDungeonClassPattern.matchMatcher(lore[2].removeColor()) {
-                    group("class")
-                }.toString()
-            }
-        }
-
-        if (config.floorAsStackSize) {
-            for ((slot, stack) in event.inventoryItems) {
-                val name = stack.displayName.removeColor()
-                if (floorTypePattern.matches(name)) {
-                    val floorNum =
-                        floorNumberPattern.matchMatcher(name) {
-                            group("floorNum").romanToDecimalIfNecessary().toString()
-                        } ?: continue
-                    if (entranceFloorPattern.matches(name)) {
-                        floorStackSize[slot] = "E"
-                    } else if (masterModeFloorPattern.matches(name)) {
-                        floorStackSize[slot] = "M$floorNum"
-                    } else {
-                        floorStackSize[slot] = floorNum
-                    }
+        for ((slot, stack) in event.inventoryItems) {
+            val classNames = mutableListOf("Healer", "Mage", "Berserk", "Archer", "Tank")
+            val toolTip = stack.getLore().toMutableList()
+            for ((index, line) in stack.getLore().withIndex()) {
+                classLevelPattern.matchMatcher(line) {
+                    val playerName = group("playerName")
+                    val className = group("className")
+                    val level = group("level").toInt()
+                    val color = getColor(level)
+                    if (config.coloredClassLevel) toolTip[index] = " §b$playerName§f: §e$className $color$level"
+                    classNames.remove(className)
                 }
             }
-        }
-
-    }
-
-    private fun highlightingHandler(event: InventoryFullyOpenedEvent) {
-        val inventoryName = event.inventoryName
-        if (partyFinderTitlePattern.matches(inventoryName)) {
-            inInventory = true
-            for ((slot, stack) in event.inventoryItems) {
-                val lore = stack.getLore()
-                if (!checkIfPartyPattern.matches(stack.displayName)) continue
-                if (config.markIneligibleGroups && ineligiblePattern.anyMatches(lore)) {
-                    highlightParty[slot] = LorenzColor.DARK_RED
-                    continue
+            val name = stack.getLore().firstOrNull()?.removeColor()
+            if (config.showMissingClasses && dungeonFloorPattern.matches(name)) {
+                if (classNames.contains(selectedClass)) {
+                    classNames[classNames.indexOf(selectedClass)] = "§a${selectedClass}§7"
                 }
-
-                if (config.markPaidCarries) {
-                    val note = lore.filter { notePattern.matches(it) }.joinToString(" ").uppercase()
-
-                    if (pricePattern.matches(note) && carryPattern.matches(note)) {
-                        highlightParty[slot] = LorenzColor.RED
-                        continue
-                    }
-                }
-
-                if (config.markNonPugs) {
-                    val note = lore.filter { notePattern.matches(it) }.joinToString(" ").uppercase()
-
-                    if (nonPugPattern.matches(note)) {
-                        highlightParty[slot] = LorenzColor.LIGHT_PURPLE
-                        continue
-                    }
-                }
-
-                val members = lore.filter {
-                    memberPattern.matches(it)
-                }
-                val memberLevels = members.map {
-                    memberPattern.matchMatcher(it) {
-                        group("level").toInt()
-                    }
-                }
-                val memberClasses = members.map {
-                    memberPattern.matchMatcher(it) {
-                        group("className")
-                    }
-                }
-                if (memberLevels.any { (it ?: Integer.MAX_VALUE) <= config.markBelowClassLevel }) {
-                    highlightParty[slot] = LorenzColor.YELLOW
-                    continue
-                }
-
-                if (config.markMissingClass && memberClasses.none { it == selectedClass }) {
-                    highlightParty[slot] = LorenzColor.GREEN
-                }
+                toolTip.add("")
+                toolTip.add("§cMissing: §7" + classNames.createCommaSeparatedList())
+            }
+            if (toolTip.isNotEmpty()) {
+                map[slot] = toolTip
             }
         }
-    }
-
-    private fun toolTipHandler(event: InventoryFullyOpenedEvent) {
-        val inventoryName = event.inventoryName
-        if (partyFinderTitlePattern.matches(inventoryName)) {
-            inInventory = true
-            for ((slot, stack) in event.inventoryItems) {
-                val classNames = mutableListOf("Healer", "Mage", "Berserk", "Archer", "Tank")
-                val toolTip = stack.getLore().toMutableList()
-                for ((index, line) in stack.getLore().withIndex()) {
-                    classLevelPattern.matchMatcher(line) {
-                        val playerName = group("playerName")
-                        val className = group("className")
-                        val level = group("level").toInt()
-                        val color = getColor(level)
-                        if (config.coloredClassLevel) toolTip[index] = " §b$playerName§f: §e$className $color$level"
-                        classNames.remove(className)
-                    }
-                }
-                if (config.showMissingClasses && dungeonFloorPattern.matches(
-                        stack.getLore().firstOrNull()?.removeColor()
-                    )
-                ) {
-                    if (classNames.contains(selectedClass)) classNames[classNames.indexOf(selectedClass)] =
-                        "§a${selectedClass}§7"
-                    toolTip.add("")
-                    toolTip.add("§cMissing: §7" + StringUtils.createCommaSeparatedList(classNames))
-                }
-                if (toolTip.isNotEmpty()) toolTipMap[slot] = toolTip
-            }
-        }
+        return map
     }
 
     @SubscribeEvent
@@ -324,8 +310,8 @@ class DungeonFinderFeatures {
     fun onRenderItemTip(event: RenderInventoryItemTipEvent) {
         if (!isEnabled()) return
         if (!config.floorAsStackSize) return
-        if (floorStackSize[event.slot.slotIndex].isNullOrEmpty()) return
-        event.stackTip = floorStackSize[event.slot.slotIndex] ?: ""
+        event.stackTip = (floorStackSize[event.slot.slotIndex]
+            ?.takeIf { it.isNotEmpty() } ?: return)
     }
 
     @SubscribeEvent
@@ -338,15 +324,14 @@ class DungeonFinderFeatures {
             .forEach { (slot, color) ->
                 color?.let { slot.highlight(it) }
             }
-
     }
 
     @SubscribeEvent
     fun onInventoryClose(event: InventoryCloseEvent) {
         inInventory = false
-        floorStackSize.clear()
-        highlightParty.clear()
-        toolTipMap.clear()
+        floorStackSize = emptyMap()
+        highlightParty = emptyMap()
+        toolTipMap = emptyMap()
     }
 
     @SubscribeEvent
@@ -355,15 +340,13 @@ class DungeonFinderFeatures {
     }
 
     companion object {
-        fun getColor(level: Int): String {
-            return when {
-                level >= 30 -> "§a"
-                level >= 25 -> "§b"
-                level >= 20 -> "§e"
-                level >= 15 -> "§6"
-                level >= 10 -> "§c"
-                else -> "§4"
-            }
+        fun getColor(level: Int): String = when {
+            level >= 30 -> "§a"
+            level >= 25 -> "§b"
+            level >= 20 -> "§e"
+            level >= 15 -> "§6"
+            level >= 10 -> "§c"
+            else -> "§4"
         }
     }
 
