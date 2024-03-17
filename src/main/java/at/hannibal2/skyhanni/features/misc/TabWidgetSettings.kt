@@ -22,13 +22,6 @@ import net.minecraft.item.ItemStack
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
 class TabWidgetSettings {
-
-//     private val mainPageWidgetPattern = "^§7Currently:.*".toRegex()
-//
-//     private val subPageWidgetPattern = "^§eClick to .*".toRegex(RegexOption.IGNORE_CASE)
-//
-//     private val shownSettingPattern = "Shown .* Setting.* |.*Widget Settings".toRegex(RegexOption.IGNORE_CASE)
-
     private val patternGroup = RepoPattern.group("tab.widget.setting")
     private val mainPageSettingPattern by patternGroup.pattern(
         "gui",
@@ -55,7 +48,6 @@ class TabWidgetSettings {
         ".*(ENABLED)"
     )
 
-
     var inInventory = false;
     private var highlights = mutableMapOf<Int, LorenzColor>()
 
@@ -65,7 +57,6 @@ class TabWidgetSettings {
         if (!SkyHanniMod.feature.misc.highlightWidgets) return
         highlights.clear()
 
-//         val chest = event.gui.inventorySlots as ContainerChest
         val inventoryName = event.inventoryName
         if (mainPageSettingPattern.matches(inventoryName.uppercase())) {
             val items = event.inventoryItems.filter { mainPageWidgetPattern.anyMatches(it.value.getLore()) }
@@ -79,7 +70,6 @@ class TabWidgetSettings {
         }
 
         if (shownSettingPattern.matches(inventoryName)) {
-
             val items = event.inventoryItems.filter {
                 val loreLastLine = it.value.getLore().lastOrNull()
                 subPageWidgetPattern.matches(loreLastLine)
@@ -97,15 +87,13 @@ class TabWidgetSettings {
                 }
             }
         }
-
-
     }
+
     @SubscribeEvent
     fun onInventoryClose(event: InventoryCloseEvent) {
         inInventory = false
         highlights.clear()
     }
-
 
     @SubscribeEvent
     fun onBackgroundDrawn(event: GuiContainerEvent.BackgroundDrawnEvent) {
