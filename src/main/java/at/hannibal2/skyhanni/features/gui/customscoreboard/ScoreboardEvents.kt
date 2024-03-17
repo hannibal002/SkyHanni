@@ -191,7 +191,7 @@ private fun getDungeonsLines() = listOf(
     SbPattern.floor3GuardiansPattern
 ).let { patterns ->
     // BetterMap adds a random §r at the start, making it go black
-    getSbLines().filter { line -> patterns.any { it.matches(line.replace("§r", "")) } }
+    getSbLines().filter { line -> patterns.any { it.matches(line) } }.map { it.removePrefix("§r") }
 }
 
 private fun getDungeonsShowWhen(): Boolean {
