@@ -19,20 +19,19 @@ object ShaderManager {
 
     /**
      * For any future shaders add the object instance in this enum and
-     * in the when expression
+     * in the when-expression
      */
     enum class Shaders(val shader: Shader) {
-
         STANDARD_CHROMA(StandardChromaShader.INSTANCE),
         TEXTURED_CHROMA(TexturedChromaShader.INSTANCE),
-        ROUNDED_RECTANGLE(RoundedRectangleShader.INSTANCE);
+        ROUNDED_RECTANGLE(RoundedRectangleShader.INSTANCE),
+        ;
 
         companion object {
 
             fun getShaderInstance(shaderName: String): Shader? = when (shaderName) {
                 "standard_chroma" -> STANDARD_CHROMA.shader
                 "textured_chroma" -> TEXTURED_CHROMA.shader
-                "rounded_rect" -> ROUNDED_RECTANGLE.shader
                 "rounded_rect" -> ROUNDED_RECTANGLE.shader
                 else -> {
                     null
@@ -87,7 +86,7 @@ object ShaderManager {
 
         if (ShaderHelper.glGetShaderi(shaderID, ShaderHelper.GL_COMPILE_STATUS) == 0) {
             val errorMessage = "Failed to compile shader $fileName${type.extension}. Features that utilise this " +
-                "shader will not work correctly, if at all."
+                "shader will not work correctly, if at all"
             val errorLog = StringUtils.trim(ShaderHelper.glGetShaderInfoLog(shaderID, 1024))
 
             if (inWorld()) {
