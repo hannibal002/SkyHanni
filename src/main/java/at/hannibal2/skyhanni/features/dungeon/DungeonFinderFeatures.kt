@@ -154,8 +154,7 @@ class DungeonFinderFeatures {
                 floorStackSize[slot] = "E"
             } else if (floorPattern.matches(name)) {
                 floorStackSize[slot] =
-                    floorNumberPattern.matchMatcher(name) { group("floorNum").romanToDecimalIfNecessary().toString() }
-                        .toString()
+                    floorNumberPattern.matchMatcher(name) { group("floorNum").romanToDecimalIfNecessary().toString() } ?: continue
             }
         }
     }
@@ -172,8 +171,6 @@ class DungeonFinderFeatures {
                 if (floor == null || dungeon == null) continue
                 val floorNum =
                     floorNumberPattern.matchMatcher(floor) { group("floorNum").romanToDecimalIfNecessary().toString() }
-                        .toString()
-                print(floorNum + "\n")
                 if (entranceFloorPattern.matches(floor)) {
                     floorStackSize[slot] = "E"
                 } else if (masterModeFloorPattern.matches(dungeon)) {
@@ -345,14 +342,6 @@ class DungeonFinderFeatures {
 
     @SubscribeEvent
     fun onInventoryClose(event: InventoryCloseEvent) {
-        inInventory = false
-        floorStackSize.clear()
-        highlightParty.clear()
-        toolTipMap.clear()
-    }
-
-    @SubscribeEvent
-    fun onInventoryClose(event: GuiContainerEvent.CloseWindowEvent) {
         inInventory = false
         floorStackSize.clear()
         highlightParty.clear()
