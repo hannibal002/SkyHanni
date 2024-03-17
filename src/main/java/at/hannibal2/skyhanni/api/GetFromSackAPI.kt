@@ -1,20 +1,18 @@
 package at.hannibal2.skyhanni.api
 
 import at.hannibal2.skyhanni.SkyHanniMod
-import at.hannibal2.skyhanni.data.jsonobjects.repo.neu.NeuSacksJson
+import at.hannibal2.skyhanni.data.SackAPI
 import at.hannibal2.skyhanni.events.GuiContainerEvent
 import at.hannibal2.skyhanni.events.InventoryCloseEvent
 import at.hannibal2.skyhanni.events.LorenzChatEvent
 import at.hannibal2.skyhanni.events.LorenzTickEvent
 import at.hannibal2.skyhanni.events.LorenzToolTipEvent
 import at.hannibal2.skyhanni.events.MessageSendToServerEvent
-import at.hannibal2.skyhanni.events.NeuRepositoryReloadEvent
 import at.hannibal2.skyhanni.features.commands.tabcomplete.GetFromSacksTabComplete
 import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.ChatUtils.isCommand
 import at.hannibal2.skyhanni.utils.ChatUtils.senderIsSkyhanni
-import at.hannibal2.skyhanni.utils.ItemUtils.itemNameWithoutColor
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.NEUInternalName
 import at.hannibal2.skyhanni.utils.NEUInternalName.Companion.asInternalName
@@ -25,7 +23,6 @@ import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
-import io.github.moulberry.notenoughupdates.util.Utils
 import net.minecraft.inventory.Slot
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import java.util.Deque
@@ -73,11 +70,11 @@ object GetFromSackAPI {
 
     private var lastItemStack: PrimitiveItemStack? = null
 
-    var sackListInternalNames = emptySet<String>()
-        private set
+    @Deprecated("", ReplaceWith("SackAPI.sackListInternalNames"))
+    val sackListInternalNames get() = SackAPI.sackListInternalNames
 
-    var sackListNames = emptySet<String>()
-        private set
+    @Deprecated("", ReplaceWith("SackAPI.sackListNames"))
+    val sackListNames get() = SackAPI.sackListNames
 
     private fun addToQueue(items: List<PrimitiveItemStack>) = queue.addAll(items)
 
@@ -219,30 +216,5 @@ object GetFromSackAPI {
         WRONG_IDENTIFIER,
         WRONG_AMOUNT,
         INTERNAL_ERROR
-    }
-
-    @SubscribeEvent
-    fun onNeuRepoReload(event: NeuRepositoryReloadEvent) {
-        val data = event.getConstant("sacks") ?: ErrorManager.skyHanniError("NEU sacks data is null.")
-        try {
-            val sacksData = event.readConstant<NeuSacksJson>("sacks").sacks
-            val uniqueSackItems = mutableSetOf<NEUInternalName>()
-
-            sacksData.values.forEach { sackInfo ->
-                sackInfo.contents.forEach { content ->
-                    uniqueSackItems.add(content)
-                }
-            }
-
-            sackListInternalNames = uniqueSackItems.map { it.asString() }.toSet()
-            sackListNames = uniqueSackItems.map { it.itemNameWithoutColor.uppercase() }.toSet()
-
-        } catch (e: Exception) {
-            ErrorManager.logErrorWithData(
-                e, "Error getting NEU sacks data, make sure your neu repo is updated.",
-                "sacksJson" to data
-            )
-            Utils.showOutdatedRepoNotification()
-        }
     }
 }
