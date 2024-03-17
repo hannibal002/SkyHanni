@@ -4,6 +4,8 @@ import at.hannibal2.skyhanni.data.jsonobjects.repo.MaxwellPowersJson
 import at.hannibal2.skyhanni.events.InventoryOpenEvent
 import at.hannibal2.skyhanni.events.LorenzChatEvent
 import at.hannibal2.skyhanni.events.RepositoryReloadEvent
+import at.hannibal2.skyhanni.features.gui.customscoreboard.CustomScoreboard
+import at.hannibal2.skyhanni.features.gui.customscoreboard.ScoreboardElement
 import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
@@ -81,6 +83,10 @@ object MaxwellAPI {
         "thaumaturgy.statstuning",
         "§7You have: .+ §7\\+ §(?<color>.)(?<amount>[^ ]+) (?<icon>.)"
     )
+    private val tuningAutoAssignedPattern by group.pattern(
+        "tuningpoints.chat.autoassigned",
+        "§aYour §r§eTuning Points §r§awere auto-assigned as convenience!"
+    )
     private val yourBagsGuiPattern by group.pattern(
         "gui.yourbags",
         "Your Bags"
@@ -114,6 +120,14 @@ object MaxwellAPI {
                     "power" to power,
                     "message" to message
                 )
+        }
+        tuningAutoAssignedPattern.matchMatcher(event.message) {
+            if (tunings?.isNotEmpty() == true) {
+                val tuningsInScoreboard = ScoreboardElement.TUNING in CustomScoreboard.config.scoreboardEntries
+                if (tuningsInScoreboard) {
+                    ChatUtils.chat("Talk to Maxwell again to update the tuning data in scoreboard.")
+                }
+            }
         }
     }
 
