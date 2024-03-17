@@ -14,7 +14,7 @@ import at.hannibal2.skyhanni.utils.InventoryUtils.getAllItems
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.LocationUtils.distanceToPlayer
 import at.hannibal2.skyhanni.utils.LorenzColor
-import at.hannibal2.skyhanni.utils.LorenzUtils.usePickblockInstead
+import at.hannibal2.skyhanni.utils.LorenzUtils.makePickblock
 import at.hannibal2.skyhanni.utils.LorenzVec
 import at.hannibal2.skyhanni.utils.NEUItems
 import at.hannibal2.skyhanni.utils.RenderUtils.drawDynamicText
@@ -84,7 +84,7 @@ object EnigmaSoulWaypoints {
         if (!inInventory || !isEnabled()) return
 
         if (event.slotId == 31 && inventoryUnfound.isNotEmpty()) {
-            event.usePickblockInstead()
+            event.makePickblock()
             if (adding) {
                 trackedSouls.addAll(inventoryUnfound)
                 adding = false
@@ -97,7 +97,7 @@ object EnigmaSoulWaypoints {
         if (event.slot?.stack == null) return
         val split = event.slot.stack.displayName.split("Enigma: ")
         if (split.size == 2) {
-            event.usePickblockInstead()
+            event.makePickblock()
             if (soulLocations.contains(split.last())) {
                 if (!trackedSouls.contains(split.last())) {
                     ChatUtils.chat("§5Tracking the ${split.last()} Enigma Soul!", prefixColor = "§5")

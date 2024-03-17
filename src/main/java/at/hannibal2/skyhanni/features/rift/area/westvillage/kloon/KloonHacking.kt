@@ -16,7 +16,7 @@ import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.LocationUtils.distanceToPlayer
 import at.hannibal2.skyhanni.utils.LorenzColor
-import at.hannibal2.skyhanni.utils.LorenzUtils.usePickblockInstead
+import at.hannibal2.skyhanni.utils.LorenzUtils.makePickblock
 import at.hannibal2.skyhanni.utils.RenderUtils.highlight
 import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
@@ -112,7 +112,7 @@ class KloonHacking {
     @SubscribeEvent(priority = EventPriority.HIGH)
     fun onSlotClick(event: GuiContainerEvent.SlotClickEvent) {
         if (!inTerminalInventory || !RiftAPI.inRift()) return
-        event.usePickblockInstead()
+        event.makePickblock()
     }
 
     @SubscribeEvent

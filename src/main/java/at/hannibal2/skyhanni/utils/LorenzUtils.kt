@@ -282,7 +282,7 @@ object LorenzUtils {
         }
     }
 
-    fun GuiContainerEvent.SlotClickEvent.usePickblockInstead() {
+    fun GuiContainerEvent.SlotClickEvent.makePickblock() {
         if (this.clickedButton == 2 && this.clickType == 3) return
         slot?.slotNumber?.let { slotNumber ->
             Minecraft.getMinecraft().playerController.windowClick(
