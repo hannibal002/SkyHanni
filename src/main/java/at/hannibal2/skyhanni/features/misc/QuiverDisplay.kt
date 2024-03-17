@@ -2,6 +2,7 @@ package at.hannibal2.skyhanni.features.misc
 
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.data.QuiverAPI
+import at.hannibal2.skyhanni.data.QuiverAPI.NONE_ARROW_TYPE
 import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.ProfileJoinEvent
 import at.hannibal2.skyhanni.events.QuiverUpdateEvent
@@ -38,7 +39,7 @@ class QuiverDisplay {
         val itemStack = NEUItems.getItemStackOrNull(arrow.internalName.asString()) ?: ItemStack(Items.arrow)
 
         val rarity = itemStack.getItemRarityOrNull()?.chatColorCode ?: "§f"
-        val arrowDisplayName = if (hideAmount) arrow.arrow else StringUtils.pluralize(amount, arrow.arrow)
+        val arrowDisplayName = if (hideAmount || arrow == NONE_ARROW_TYPE) arrow.arrow else StringUtils.pluralize(amount, arrow.arrow)
 
         if (config.showIcon) {
             add(Renderable.itemStack(itemStack,1.68))
@@ -60,10 +61,11 @@ class QuiverDisplay {
     @SubscribeEvent
     fun onRenderOverlay(event: GuiRenderEvent.GuiOverlayRenderEvent) {
         if (!isEnabled()) return
-        if (display.isEmpty()) return
         if (config.onlyWithBow && !QuiverAPI.hasBowInInventory()) {
             if (display.isNotEmpty()) display = emptyList()
-            return
+        } else {
+            updateDisplay()
+            if (display.isEmpty()) return
         }
         config.quiverDisplayPos.renderStringsAndItems(listOf(display), posLabel = "Quiver Display")
     }
