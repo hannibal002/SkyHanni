@@ -1,12 +1,11 @@
 package at.hannibal2.skyhanni.data
 
 import at.hannibal2.skyhanni.data.jsonobjects.repo.MaxwellPowersJson
-import at.hannibal2.skyhanni.events.InventoryFullyOpenedEvent
+import at.hannibal2.skyhanni.events.InventoryOpenEvent
 import at.hannibal2.skyhanni.events.LorenzChatEvent
 import at.hannibal2.skyhanni.events.RepositoryReloadEvent
 import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.ChatUtils
-import at.hannibal2.skyhanni.utils.CollectionUtils.sortedDesc
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils.isInIsland
@@ -20,6 +19,7 @@ import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraft.item.ItemStack
 import net.minecraftforge.fml.common.eventhandler.EventPriority
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
+import java.util.regex.Pattern
 
 object MaxwellAPI {
 
@@ -37,7 +37,7 @@ object MaxwellAPI {
             storage?.maxwell?.magicalPower = value ?: return
         }
 
-    var tunings: Map<String, Int>?
+    var tunings: Map<String, String>?
         get() = storage?.maxwell?.tunings
         set(value) {
             storage?.maxwell?.tunings = value ?: return
@@ -68,7 +68,15 @@ object MaxwellAPI {
     )
     private val thaumaturgyDataPattern by group.pattern(
         "gui.thaumaturgy.data",
-        "§(?<color>.)\\+(?<amount>\\d+)(?<icon>.) .+"
+        "§(?<color>.)\\+(?<amount>[^ ]+)(?<icon>.) .+"
+    )
+    private val statsTuningGuiPattern by group.pattern(
+        "gui.thaumaturgy.statstuning",
+        "Stats Tuning"
+    )
+    private val statsTuningDataPattern by group.pattern(
+        "thaumaturgy.statstuning",
+        "§7You have: .+ §7\\+ §(?<color>.)(?<amount>[^ ]+) (?<icon>.)"
     )
     private val yourBagsGuiPattern by group.pattern(
         "gui.yourbags",
@@ -108,7 +116,7 @@ object MaxwellAPI {
 
     // load earler, so that other features can already use the api in this event
     @SubscribeEvent(priority = EventPriority.HIGH)
-    fun onInventoryFullyLoaded(event: InventoryFullyOpenedEvent) {
+    fun onInventoryFullyLoaded(event: InventoryOpenEvent) {
         if (!isEnabled()) return
 
         if (isThaumaturgyInventory(event.inventoryName)) {
@@ -120,6 +128,29 @@ object MaxwellAPI {
             for (stack in event.inventoryItems.values) {
                 if (accessoryBagStack.matches(stack.displayName)) processStack(stack)
             }
+        }
+        if (statsTuningGuiPattern.matches(event.inventoryName)) {
+            loadThaumaturgyTuningsFromTuning(event.inventoryItems)
+        }
+    }
+
+    private fun loadThaumaturgyTuningsFromTuning(inventoryItems: Map<Int, ItemStack>) {
+        val map = mutableMapOf<String, String>()
+        for (stack in inventoryItems.values) {
+            for (line in stack.getLore()) {
+                map.readTuningFromLine(statsTuningDataPattern, line)
+            }
+        }
+        tunings = map
+    }
+
+    private fun MutableMap<String, String>.readTuningFromLine(pattern: Pattern, line: String) {
+        pattern.matchMatcher(line) {
+            val color = group("color")
+            val icon = group("icon")
+            val name = "§$color$icon"
+            val amount = group("amount")
+            put(name, amount)
         }
     }
 
@@ -141,28 +172,24 @@ object MaxwellAPI {
     }
 
     private fun loadThaumaturgyTunings(inventoryItems: Map<Int, ItemStack>) {
+        val tunings = tunings ?: return
+
+        // Only load those rounded values if we dont have any valurs at all
+        if (tunings.isNotEmpty()) return
+
         val item = inventoryItems[51] ?: return
         var active = false
-        val map = mutableMapOf<String, Int>()
+        val map = mutableMapOf<String, String>()
         for (line in item.getLore()) {
             if (thaumaturgyStartPattern.matches(line)) {
                 active = true
                 continue
             }
             if (!active) continue
-
-            if (line.isEmpty()) {
-                break
-            }
-            thaumaturgyDataPattern.matchMatcher(line) {
-                val color = group("color")
-                val icon = group("icon")
-                val name = "§$color$icon"
-                val amount = group("amount").formatInt()
-                map[name] = amount
-            }
+            if (line.isEmpty()) break
+            map.readTuningFromLine(thaumaturgyDataPattern, line)
         }
-        tunings = map.sortedDesc()
+        this.tunings = map
     }
 
     private fun processStack(stack: ItemStack) {

@@ -54,7 +54,7 @@ public class ProfileSpecificStorage {
         public int magicalPower = -1;
 
         @Expose
-        public Map<String, Integer> tunings = new HashMap<>();
+        public Map<String, String> tunings = new HashMap<>();
     }
 
     @Expose
