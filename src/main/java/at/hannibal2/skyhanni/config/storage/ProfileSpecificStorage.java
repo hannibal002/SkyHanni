@@ -55,7 +55,7 @@ public class ProfileSpecificStorage {
         public int magicalPower = -1;
 
         @Expose
-        public List<MaxwellAPI.Tuning> tunings = new ArrayList<>();
+        public List<MaxwellAPI.ThaumaturgyPowerTuning> tunings = new ArrayList<>();
     }
 
     @Expose

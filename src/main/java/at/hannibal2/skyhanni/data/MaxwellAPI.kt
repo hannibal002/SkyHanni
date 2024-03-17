@@ -42,7 +42,7 @@ object MaxwellAPI {
             storage?.maxwell?.magicalPower = value ?: return
         }
 
-    var tunings: List<Tuning>?
+    var tunings: List<ThaumaturgyPowerTuning>?
         get() = storage?.maxwell?.tunings
         set(value) {
             storage?.maxwell?.tunings = value ?: return
@@ -152,7 +152,7 @@ object MaxwellAPI {
     }
 
     private fun loadThaumaturgyTuningsFromTuning(inventoryItems: Map<Int, ItemStack>) {
-        val map = mutableListOf<Tuning>()
+        val map = mutableListOf<ThaumaturgyPowerTuning>()
         for (stack in inventoryItems.values) {
             for (line in stack.getLore()) {
                 statsTuningDataPattern.readTuningFromLine(line)?.let {
@@ -170,13 +170,13 @@ object MaxwellAPI {
         tunings = map
     }
 
-    private fun Pattern.readTuningFromLine(line: String): Tuning? {
+    private fun Pattern.readTuningFromLine(line: String): ThaumaturgyPowerTuning? {
         return matchMatcher(line) {
             val color = "§" + group("color")
             val icon = group("icon")
             val name = groupOrNull("name") ?: "<missing>"
             val value = group("amount")
-            Tuning(value, color, name, icon)
+            ThaumaturgyPowerTuning(value, color, name, icon)
         }
     }
 
@@ -205,7 +205,7 @@ object MaxwellAPI {
 
         val item = inventoryItems[51] ?: return
         var active = false
-        val map = mutableListOf<Tuning>()
+        val map = mutableListOf<ThaumaturgyPowerTuning>()
         for (line in item.getLore()) {
             if (thaumaturgyStartPattern.matches(line)) {
                 active = true
@@ -266,7 +266,7 @@ object MaxwellAPI {
 
     class UnknownMaxwellPower(message: String) : Exception(message)
 
-    class Tuning(
+    class ThaumaturgyPowerTuning(
         @Expose val value: String,
         @Expose val color: String,
         @Expose var name: String,
