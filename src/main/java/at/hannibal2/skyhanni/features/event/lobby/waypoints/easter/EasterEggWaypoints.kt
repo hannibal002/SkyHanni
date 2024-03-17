@@ -13,10 +13,10 @@ import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.RenderUtils.drawDynamicText
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
-class EggWaypoints {
+class EasterEggWaypoints {
 
     private val config get() = SkyHanniMod.feature.event.lobbyWaypoints.easterEgg
-    private var closest: Egg? = null
+    private var closest: EasterEgg? = null
     private var isEgg: Boolean = false
 
     @SubscribeEvent
@@ -29,9 +29,9 @@ class EggWaypoints {
 
         val message = event.message
         if (message.startsWith("§a§lYou found an Easter Egg! §r") || message == "§aYou have received the §bsuper reward§a!" || message == "§cYou already found this egg!") {
-            val Egg = Egg.entries.minByOrNull { it.waypoint.distanceSqToPlayer() }!!
-            Egg.found = true
-            if (closest == Egg) {
+            val egg = EasterEgg.entries.minByOrNull { it.waypoint.distanceSqToPlayer() }!!
+            egg.found = true
+            if (closest == egg) {
                 closest = null
             }
         }
@@ -50,7 +50,7 @@ class EggWaypoints {
         if (isEgg) {
             if (config.onlyClosest) {
                 if (closest == null) {
-                    val notFoundEggs = Egg.entries.filter { !it.found }
+                    val notFoundEggs = EasterEgg.entries.filter { !it.found }
                     if (notFoundEggs.isEmpty()) return
                     closest = notFoundEggs.minByOrNull { it.waypoint.distanceSqToPlayer() }!!
                 }
@@ -65,16 +65,16 @@ class EggWaypoints {
         if (!isEgg) return
 
         if (config.allWaypoints) {
-            for (Egg in Egg.entries) {
-                if (!Egg.shouldShow()) continue
-                event.drawWaypointFilled(Egg.waypoint, LorenzColor.AQUA.toColor())
-                event.drawDynamicText(Egg.waypoint, "§3" + Egg.eggName, 1.5)
+            for (egg in EasterEgg.entries) {
+                if (!egg.shouldShow()) continue
+                event.drawWaypointFilled(egg.waypoint, LorenzColor.AQUA.toColor())
+                event.drawDynamicText(egg.waypoint, "§3" + egg.eggName, 1.5)
             }
         }
 
         if (config.allEntranceWaypoints) {
             for (eggEntrance in EggEntrances.entries) {
-                if (!eggEntrance.egg.any { it.shouldShow() }) continue
+                if (!eggEntrance.easterEgg.any { it.shouldShow() }) continue
                 event.drawWaypointFilled(eggEntrance.waypoint, LorenzColor.YELLOW.toColor())
                 event.drawDynamicText(eggEntrance.waypoint, "§e" + eggEntrance.eggEntranceName, 1.5)
             }
@@ -84,7 +84,7 @@ class EggWaypoints {
         if (LorenzUtils.skyBlockArea == "?") return
     }
 
-    private fun Egg.shouldShow(): Boolean {
+    private fun EasterEgg.shouldShow(): Boolean {
         if (found) {
             return false
         }
