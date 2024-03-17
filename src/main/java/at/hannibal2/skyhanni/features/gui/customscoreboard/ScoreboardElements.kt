@@ -28,6 +28,7 @@ import at.hannibal2.skyhanni.utils.LorenzUtils.inDungeons
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.NumberUtil.percentageColor
 import at.hannibal2.skyhanni.utils.RenderUtils.HorizontalAlignment
+import at.hannibal2.skyhanni.utils.StringUtils
 import at.hannibal2.skyhanni.utils.StringUtils.firstLetterUppercase
 import at.hannibal2.skyhanni.utils.StringUtils.matches
 import at.hannibal2.skyhanni.utils.TabListData
@@ -467,25 +468,27 @@ private fun getPowerDisplayPair() = listOf(
 
 private fun getTuningDisplayPair(): List<Pair<String, HorizontalAlignment>> {
     val tunings = MaxwellAPI.tunings ?: return listOf("§cTalk to \"Maxwell\"!" to HorizontalAlignment.LEFT)
+    if (tunings.isEmpty()) return listOf("§cNo Maxwell Tunings :(" to HorizontalAlignment.LEFT)
 
+    val title = StringUtils.pluralize(tunings.size, "Tuning", "Tunings")
     return if (displayConfig.compactTuning) {
         val tuning = tunings
             .take(3)
             .joinToString("§7, ") { tuning ->
                 with(tuning) {
                     if (displayConfig.displayNumbersFirst) {
-                        "$color$value $icon"
+                        "$color$value$icon"
                     } else {
-                        "$color$icon $value"
+                        "$color$icon$value"
                     }
                 }
 
             }
         listOf(
             if (displayConfig.displayNumbersFirst) {
-                "$tuning §fTuning"
+                "$tuning §f$title"
             } else {
-                "Tuning: $tuning"
+                "$title: $tuning"
             } to HorizontalAlignment.LEFT
         )
     } else {
@@ -501,7 +504,7 @@ private fun getTuningDisplayPair(): List<Pair<String, HorizontalAlignment>> {
                 }
 
             }.toTypedArray()
-        listOf("Tuning:", *tuning).map { it to HorizontalAlignment.LEFT }
+        listOf("$title:", *tuning).map { it to HorizontalAlignment.LEFT }
     }
 }
 
