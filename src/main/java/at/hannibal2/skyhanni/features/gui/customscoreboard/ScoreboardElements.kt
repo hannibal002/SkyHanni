@@ -493,7 +493,7 @@ private fun getTuningDisplayPair(): List<Pair<String, HorizontalAlignment>> {
         )
     } else {
         val tuning = tunings
-            .take(displayConfig.tuningAmount)
+            .take(displayConfig.tuningAmount.coerceAtLeast(1))
             .map { tuning ->
                 with(tuning) {
                     " §7- §f" + if (displayConfig.displayNumbersFirst) {
