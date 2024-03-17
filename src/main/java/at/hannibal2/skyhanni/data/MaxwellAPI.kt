@@ -58,9 +58,17 @@ object MaxwellAPI {
         "inventory.magicalpower",
         "§7Magical Power: §6(?<mp>[\\d,]+)"
     )
-    val thaumaturgyGuiPattern by group.pattern(
+    private val thaumaturgyGuiPattern by group.pattern(
         "gui.thaumaturgy",
         "Accessory Bag Thaumaturgy"
+    )
+    private val thaumaturgyStartPattern by group.pattern(
+        "gui.thaumaturgy.start",
+        "§7Your tuning:"
+    )
+    private val thaumaturgyDataPattern by group.pattern(
+        "gui.thaumaturgy.data",
+        "§(?<color>.)\\+(?<amount>\\d+)(?<icon>.) .+"
     )
     private val yourBagsGuiPattern by group.pattern(
         "gui.yourbags",
@@ -78,6 +86,8 @@ object MaxwellAPI {
         "collection.redstone.requirement",
         "(?:§.)*Requires (?:§.)*Redstone Collection I+(?:§.)*\\."
     )
+
+    fun isThaumaturgyInventory(inventoryName: String) = thaumaturgyGuiPattern.matches(inventoryName)
 
     @SubscribeEvent
     fun onChat(event: LorenzChatEvent) {
@@ -101,7 +111,7 @@ object MaxwellAPI {
     fun onInventoryFullyLoaded(event: InventoryFullyOpenedEvent) {
         if (!isEnabled()) return
 
-        if (thaumaturgyGuiPattern.matches(event.inventoryName)) {
+        if (isThaumaturgyInventory(event.inventoryName)) {
             loadThaumaturgyGui(event.inventoryItems)
         }
 
@@ -139,21 +149,21 @@ object MaxwellAPI {
         var active = false
         val map = mutableMapOf<String, Int>()
         for (line in item.getLore()) {
-            if (startPattern.matches(line)) {
+            if (thaumaturgyStartPattern.matches(line)) {
                 active = true
                 continue
             }
-            if (active) {
-                if (line.isEmpty()) {
-                    break
-                }
-                dataPattern.matchMatcher(line) {
-                    val color = group("color")
-                    val icon = group("icon")
-                    val name = "§$color$icon"
-                    val amount = group("amount").formatInt()
-                    map[name] = amount
-                }
+            if (!active) continue
+
+            if (line.isEmpty()) {
+                break
+            }
+            thaumaturgyDataPattern.matchMatcher(line) {
+                val color = group("color")
+                val icon = group("icon")
+                val name = "§$color$icon"
+                val amount = group("amount").formatInt()
+                map[name] = amount
             }
         }
         tunings = map.sortedDesc()
@@ -194,7 +204,7 @@ object MaxwellAPI {
 
     private fun getPowerByNameOrNull(name: String) = powers.find { it == name }
 
-    fun isEnabled() = LorenzUtils.inSkyBlock && storage != null
+    private fun isEnabled() = LorenzUtils.inSkyBlock && storage != null
 
     // Load powers from repo
     @SubscribeEvent

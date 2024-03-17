@@ -13,7 +13,6 @@ import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.RenderUtils.highlight
 import at.hannibal2.skyhanni.utils.StringUtils.createCommaSeparatedList
 import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
-import at.hannibal2.skyhanni.utils.StringUtils.matches
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraft.item.ItemStack
 import net.minecraftforge.fml.common.eventhandler.EventPriority
@@ -35,7 +34,7 @@ class StatsTuning {
         val stack = event.stack
 
         if (config.templateStats && inventoryName == "Stats Tuning") if (templateStats(stack, event)) return
-        if (config.selectedStats && MaxwellAPI.thaumaturgyGuiPattern.matches(inventoryName) && renderTunings(stack, event)) return
+        if (config.selectedStats && MaxwellAPI.isThaumaturgyInventory(inventoryName) && renderTunings(stack, event)) return
         if (config.points && inventoryName == "Stats Tuning") points(stack, event)
     }
 
