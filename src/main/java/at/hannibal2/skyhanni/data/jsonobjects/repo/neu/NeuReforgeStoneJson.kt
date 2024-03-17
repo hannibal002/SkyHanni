@@ -26,7 +26,7 @@ data class NeuReforgeStoneJson(
 
     val reforgeAbility
         get() = if (this::reforgeAbilityField.isInitialized) reforgeAbilityField
-        else run {
+        else {
             reforgeAbilityField = when (this.rawReforgeAbility) {
                 is String -> {
                     this.requiredRarities.associateWith { this.rawReforgeAbility }
