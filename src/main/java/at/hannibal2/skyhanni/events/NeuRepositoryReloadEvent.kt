@@ -5,6 +5,7 @@ import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.NEUItems.manager
 import at.hannibal2.skyhanni.utils.fromJson
 import com.google.gson.JsonObject
+import com.google.gson.JsonSyntaxException
 import java.io.File
 
 class NeuRepositoryReloadEvent : LorenzEvent() {
@@ -14,6 +15,14 @@ class NeuRepositoryReloadEvent : LorenzEvent() {
 
     inline fun <reified T : Any> readConstant(file: String): T {
         val data = getConstant(file) ?: ErrorManager.skyHanniError("$file failed to load from neu repo!")
-        return ConfigManager.gson.fromJson<T>(data)
+        return try {
+            ConfigManager.gson.fromJson<T>(data)
+        } catch (e: JsonSyntaxException) {
+            ErrorManager.logErrorWithData(
+                e, "$file failed to read from neu repo!",
+                "data" to data
+            )
+            throw e
+        }
     }
 }
