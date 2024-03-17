@@ -1,12 +1,14 @@
 package at.hannibal2.skyhanni.data.jsonobjects.repo.neu;
 
+import at.hannibal2.skyhanni.utils.LorenzRarity
+import at.hannibal2.skyhanni.utils.NEUInternalName
 import com.google.gson.annotations.Expose
 import com.google.gson.annotations.SerializedName
 
 data class NeuReforgeStoneJson(
 
     @Expose
-    val internalName: String,
+    val internalName: NEUInternalName,
 
     @Expose
     val reforgeName: String,
@@ -16,52 +18,56 @@ data class NeuReforgeStoneJson(
     val rawItemTypes: Any,
 
     @Expose
-    val requiredRarities: List<String>,
+    val requiredRarities: List<LorenzRarity>,
 
     @Expose
-    val reforgeCosts: Map<String, Long>,
+    val reforgeCosts: Map<LorenzRarity, Long>,
 
     @Expose
-    val reforgeStats: Map<String, Map<String, Double>>,
+    val reforgeStats: Map<LorenzRarity, Map<String, Double>>,
 
     @Expose
     @SerializedName("reforgeAbility")
     val rawReforgeAbility: Any?,
 ) {
+
+    val reforgeAbility by lazy {
+        when (this.rawReforgeAbility) {
+            is String -> {
+                this.requiredRarities.associateWith { this.rawReforgeAbility }
+            }
+
+            is Map<*, *> -> (this.rawReforgeAbility as? Map<String, String>)?.mapKeys {
+                LorenzRarity.valueOf(
+                    it.key.uppercase().replace(" ", "_")
+                )
+            }
+                ?: emptyMap()
+
+            else -> emptyMap()
+        }
+    }
     /* used in ReforgeAPI which isn't in beta yet
-        lateinit var reforgeAbility: Map<String, String>
-
-        lateinit var itemType: Pair<String, List<NEUInternalName>>
-
-        fun init() {
-            reforgeAbility = when (this.rawReforgeAbility) {
+        val itemType: Pair<String, List<NEUInternalName>> by lazy {
+            val any = this.rawItemTypes
+            return@lazy when (any) {
                 is String -> {
-                    this.requiredRarities.associateWith { this.rawReforgeAbility }
+                    any.replace("/", "_AND_").uppercase() to emptyList()
                 }
 
-                is Map<*, *> -> this.rawReforgeAbility as? Map<String, String> ?: emptyMap()
-                else -> emptyMap()
-            }
-            itemType = run {
-                val any = this.rawItemTypes
-                return@run when (any) {
-                    is String -> {
-                        any.replace("/", "_AND_").uppercase() to emptyList()
-                    }
-
-                    is Map<*, *> -> {
-                        val type = "SPECIAL_ITEMS"
-                        val map = any as? Map<String, List<String>> ?: return@run type to emptyList()
-                        val internalNames = map["internalName"]?.map { it.asInternalName() } ?: emptyList()
-                        val itemType = map["itemid"]?.map {
-                            NEUItems.getInternalNamesForItemId(Item.getByNameOrId(it))
-                        }?.flatten()
-                            ?: emptyList()
-                        type to (internalNames + itemType)
-                    }
-
-                    else -> throw IllegalStateException()
+                is Map<*, *> -> {
+                    val type = "SPECIAL_ITEMS"
+                    val map = any as? Map<String, List<String>> ?: return@lazy type to emptyList()
+                    val internalNames = map["internalName"]?.map { it.asInternalName() } ?: emptyList()
+                    val itemType = map["itemid"]?.map {
+                        NEUItems.getInternalNamesForItemId(Item.getByNameOrId(it))
+                    }?.flatten()
+                        ?: emptyList()
+                    type to (internalNames + itemType)
                 }
+
+                else -> throw IllegalStateException()
             }
-        } */
+        }
+*/
 }

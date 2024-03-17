@@ -42,7 +42,7 @@ object EstimatedItemValue {
     private val cache = mutableMapOf<ItemStack, List<List<Any>>>()
     private var lastToolTipTime = 0L
     var gemstoneUnlockCosts = HashMap<NEUInternalName, HashMap<String, List<String>>>()
-    var reforges = mapOf<String, NeuReforgeStoneJson>()
+    var reforges = mapOf<NEUInternalName, NeuReforgeStoneJson>()
     var bookBundleAmount = mapOf<String, Int>()
     private var currentlyShowing = false
 
@@ -53,7 +53,7 @@ object EstimatedItemValue {
         gemstoneUnlockCosts =
             event.readConstant<HashMap<NEUInternalName, HashMap<String, List<String>>>>("gemstonecosts")
         reforges =
-            event.readConstant<Map<String, NeuReforgeStoneJson>>("reforgestones")
+            event.readConstant<Map<NEUInternalName, NeuReforgeStoneJson>>("reforgestones")
     }
 
     @SubscribeEvent

@@ -166,9 +166,9 @@ object EstimatedItemValueCalculator {
         val rawReforgeName = stack.getReforgeName() ?: return 0.0
 
         val reforge = EstimatedItemValue.reforges.values.firstOrNull {
-            rawReforgeName == it.reforgeName.lowercase() || rawReforgeName == it.internalName.lowercase()
+            rawReforgeName == it.reforgeName.lowercase() || rawReforgeName == it.internalName.asString().lowercase()
         } ?: return 0.0
-        val internalName = reforge.internalName.asInternalName()
+        val internalName = reforge.internalName.asString().asInternalName()
         val reforgeStonePrice = internalName.getPrice()
         val reforgeStoneName = internalName.itemName
         val applyCost = getReforgeStoneApplyCost(stack, reforge.reforgeCosts, internalName) ?: return 0.0
@@ -181,7 +181,7 @@ object EstimatedItemValueCalculator {
 
     private fun getReforgeStoneApplyCost(
         stack: ItemStack,
-        reforgeCosts: Map<String, Long>,
+        reforgeCosts: Map<LorenzRarity, Long>,
         reforgeStone: NEUInternalName,
     ): Int? {
         var itemRarity = stack.getItemRarityOrNull() ?: return null
@@ -205,14 +205,11 @@ object EstimatedItemValueCalculator {
                 itemRarity = oneBelow
             }
         }
-        val rarityName = itemRarity.name
-        reforgeCosts[rarityName]
 
-        return reforgeCosts[rarityName]?.toInt() ?: run {
+        return reforgeCosts[itemRarity]?.toInt() ?: run {
             ErrorManager.logErrorStateWithData(
                 "Could not calculate reforge cost for item ${stack.name}",
                 "Item not in NEU repo reforge cost",
-                "rarityName" to rarityName,
                 "reforgeCosts" to reforgeCosts,
                 "itemRarity" to itemRarity,
                 "internal name" to stack.getInternalName(),
