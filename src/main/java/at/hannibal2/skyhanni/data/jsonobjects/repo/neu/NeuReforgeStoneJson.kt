@@ -7,46 +7,42 @@ import com.google.gson.annotations.SerializedName
 
 data class NeuReforgeStoneJson(
 
-    @Expose
-    val internalName: NEUInternalName,
+    @Expose val internalName: NEUInternalName,
 
-    @Expose
-    val reforgeName: String,
+    @Expose val reforgeName: String,
 
-    @Expose
-    @SerializedName("itemTypes")
-    val rawItemTypes: Any,
+    @Expose @SerializedName("itemTypes") val rawItemTypes: Any,
 
-    @Expose
-    val requiredRarities: List<LorenzRarity>,
+    @Expose val requiredRarities: List<LorenzRarity>,
 
-    @Expose
-    val reforgeCosts: Map<LorenzRarity, Long>,
+    @Expose val reforgeCosts: Map<LorenzRarity, Long>,
 
-    @Expose
-    val reforgeStats: Map<LorenzRarity, Map<String, Double>>,
+    @Expose val reforgeStats: Map<LorenzRarity, Map<String, Double>>,
 
-    @Expose
-    @SerializedName("reforgeAbility")
-    val rawReforgeAbility: Any?,
+    @Expose @SerializedName("reforgeAbility") val rawReforgeAbility: Any?,
 ) {
 
-    val reforgeAbility by lazy {
-        when (this.rawReforgeAbility) {
-            is String -> {
-                this.requiredRarities.associateWith { this.rawReforgeAbility }
-            }
+    private lateinit var reforgeAbilityField: Map<LorenzRarity, String>
 
-            is Map<*, *> -> (this.rawReforgeAbility as? Map<String, String>)?.mapKeys {
-                LorenzRarity.valueOf(
-                    it.key.uppercase().replace(" ", "_")
-                )
-            }
-                ?: emptyMap()
+    val reforgeAbility
+        get() = if (this::reforgeAbilityField.isInitialized) reforgeAbilityField
+        else run {
+            reforgeAbilityField = when (this.rawReforgeAbility) {
+                is String -> {
+                    this.requiredRarities.associateWith { this.rawReforgeAbility }
+                }
 
-            else -> emptyMap()
+                is Map<*, *> -> (this.rawReforgeAbility as? Map<String, String>)?.mapKeys {
+                    LorenzRarity.valueOf(
+                        it.key.uppercase().replace(" ", "_")
+                    )
+                } ?: emptyMap()
+
+                else -> emptyMap()
+            }
+            reforgeAbilityField
         }
-    }
+
     /* used in ReforgeAPI which isn't in beta yet
         val itemType: Pair<String, List<NEUInternalName>> by lazy {
             val any = this.rawItemTypes
@@ -71,3 +67,4 @@ data class NeuReforgeStoneJson(
         }
 */
 }
+
