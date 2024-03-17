@@ -20,6 +20,7 @@
 package at.hannibal2.skyhanni.features.gui.customscoreboard
 
 import at.hannibal2.skyhanni.SkyHanniMod
+import at.hannibal2.skyhanni.events.DebugDataCollectEvent
 import at.hannibal2.skyhanni.events.GuiPositionMovedEvent
 import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.LorenzTickEvent
@@ -27,6 +28,7 @@ import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.RenderUtils.HorizontalAlignment
 import at.hannibal2.skyhanni.utils.RenderUtils.renderStringsAlignedWidth
+import at.hannibal2.skyhanni.utils.StringUtils.firstLetterUppercase
 import at.hannibal2.skyhanni.utils.TabListData
 import net.minecraftforge.client.GuiIngameForge
 import net.minecraftforge.client.event.RenderGameOverlayEvent
@@ -53,7 +55,11 @@ class CustomScoreboard {
             } else {
                 display
             }
-        config.position.renderStringsAlignedWidth(render, posLabel = guiName, extraSpace = displayConfig.lineSpacing - 10)
+        config.position.renderStringsAlignedWidth(
+            render,
+            posLabel = guiName,
+            extraSpace = displayConfig.lineSpacing - 10
+        )
     }
 
     @SubscribeEvent
@@ -132,6 +138,24 @@ class CustomScoreboard {
     fun onRenderScoreboard(event: RenderGameOverlayEvent.Post) {
         if (event.type == RenderGameOverlayEvent.ElementType.HELMET) {
             GuiIngameForge.renderObjective = !isHideVanillaScoreboardEnabled()
+        }
+    }
+
+    @SubscribeEvent
+    fun onDebugDataCollect(event: DebugDataCollectEvent) {
+        event.title("Custom Scoreboard")
+        event.addIrrelevant {
+            if (!config.enabled) {
+                add("Custom Scoreboard disabled.")
+            } else {
+                ScoreboardElement.entries.map { element ->
+                    add(
+                        "${element.name.firstLetterUppercase()} - " +
+                            "${element.showWhen.invoke()} - " +
+                            "${element.getVisiblePair().map { it.first }}"
+                    )
+                }
+            }
         }
     }
 
