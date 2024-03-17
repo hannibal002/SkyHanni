@@ -103,6 +103,16 @@ public class DisplayConfig {
     public boolean colorArrowAmount = false;
 
     @Expose
+    @ConfigOption(name = "Compact Tuning", desc = "Show tuning stats compact")
+    @ConfigEditorBoolean
+    public boolean compactTuning = false;
+
+    @Expose
+    @ConfigOption(name = "Tuning Amount", desc = "Only show the first # tunings.\n§cDoes not work with Compact Tuning.")
+    @ConfigEditorSlider(minValue = 1, maxValue = 8, minStep = 1)
+    public int tuningAmount = 2;
+
+    @Expose
     @ConfigOption(name = "Line Spacing", desc = "The amount of space between each line.")
     @ConfigEditorSlider(minValue = 0, maxValue = 20, minStep = 1)
     public int lineSpacing = 10;

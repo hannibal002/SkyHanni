@@ -1,6 +1,7 @@
 package at.hannibal2.skyhanni.config.storage;
 
 import at.hannibal2.skyhanni.api.SkillAPI;
+import at.hannibal2.skyhanni.data.MaxwellAPI;
 import at.hannibal2.skyhanni.data.model.ComposterUpgrade;
 import at.hannibal2.skyhanni.features.combat.endernodetracker.EnderNodeTracker;
 import at.hannibal2.skyhanni.features.combat.ghostcounter.GhostData;
@@ -54,7 +55,7 @@ public class ProfileSpecificStorage {
         public int magicalPower = -1;
 
         @Expose
-        public Map<String, String> tunings = new HashMap<>();
+        public List<MaxwellAPI.Tuning> tunings = new ArrayList<>();
     }
 
     @Expose

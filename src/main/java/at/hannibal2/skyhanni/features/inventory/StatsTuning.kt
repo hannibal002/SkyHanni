@@ -34,7 +34,11 @@ class StatsTuning {
         val stack = event.stack
 
         if (config.templateStats && inventoryName == "Stats Tuning") if (templateStats(stack, event)) return
-        if (config.selectedStats && MaxwellAPI.isThaumaturgyInventory(inventoryName) && renderTunings(stack, event)) return
+        if (config.selectedStats && MaxwellAPI.isThaumaturgyInventory(inventoryName) && renderTunings(
+                stack,
+                event
+            )
+        ) return
         if (config.points && inventoryName == "Stats Tuning") points(stack, event)
     }
 
@@ -71,7 +75,11 @@ class StatsTuning {
         val tunings = MaxwellAPI.tunings ?: return false
 
         event.stackTip = tunings
-            .map { it.key + it.value }
+            .map { tuning ->
+                with(tuning) {
+                    "$color$value$icon"
+                }
+            }
             .createCommaSeparatedList("§7")
         event.offsetX = 3
         event.offsetY = -5

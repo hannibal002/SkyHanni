@@ -16,6 +16,7 @@ import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.StringUtils.removeResets
 import at.hannibal2.skyhanni.utils.StringUtils.trimWhiteSpace
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
+import com.google.gson.annotations.Expose
 import net.minecraft.item.ItemStack
 import net.minecraftforge.fml.common.eventhandler.EventPriority
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
@@ -37,7 +38,7 @@ object MaxwellAPI {
             storage?.maxwell?.magicalPower = value ?: return
         }
 
-    var tunings: Map<String, String>?
+    var tunings: List<Tuning>?
         get() = storage?.maxwell?.tunings
         set(value) {
             storage?.maxwell?.tunings = value ?: return
@@ -135,7 +136,7 @@ object MaxwellAPI {
     }
 
     private fun loadThaumaturgyTuningsFromTuning(inventoryItems: Map<Int, ItemStack>) {
-        val map = mutableMapOf<String, String>()
+        val map = mutableListOf<Tuning>()
         for (stack in inventoryItems.values) {
             for (line in stack.getLore()) {
                 map.readTuningFromLine(statsTuningDataPattern, line)
@@ -144,13 +145,13 @@ object MaxwellAPI {
         tunings = map
     }
 
-    private fun MutableMap<String, String>.readTuningFromLine(pattern: Pattern, line: String) {
+    private fun MutableList<Tuning>.readTuningFromLine(pattern: Pattern, line: String) {
         pattern.matchMatcher(line) {
-            val color = group("color")
+            val color = "§" + group("color")
             val icon = group("icon")
-            val name = "§$color$icon"
-            val amount = group("amount")
-            put(name, amount)
+            val name = "<name>"
+            val value = group("amount")
+            add(Tuning(value, color, name, icon))
         }
     }
 
@@ -179,7 +180,7 @@ object MaxwellAPI {
 
         val item = inventoryItems[51] ?: return
         var active = false
-        val map = mutableMapOf<String, String>()
+        val map = mutableListOf<Tuning>()
         for (line in item.getLore()) {
             if (thaumaturgyStartPattern.matches(line)) {
                 active = true
@@ -237,4 +238,11 @@ object MaxwellAPI {
     }
 
     class UnknownMaxwellPower(message: String) : Exception(message)
+
+    class Tuning(
+        @Expose val value: String,
+        @Expose val color: String,
+        @Expose val name: String,
+        @Expose val icon: String,
+    )
 }

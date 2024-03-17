@@ -28,7 +28,6 @@ import at.hannibal2.skyhanni.utils.LorenzUtils.inDungeons
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.NumberUtil.percentageColor
 import at.hannibal2.skyhanni.utils.RenderUtils.HorizontalAlignment
-import at.hannibal2.skyhanni.utils.StringUtils.createCommaSeparatedList
 import at.hannibal2.skyhanni.utils.StringUtils.firstLetterUppercase
 import at.hannibal2.skyhanni.utils.StringUtils.matches
 import at.hannibal2.skyhanni.utils.TabListData
@@ -141,7 +140,7 @@ enum class ScoreboardElement(
     ),
     TUNING(
         ::getTuningDisplayPair,
-        { MaxwellAPI.tunings?.isNotEmpty() ?: false },
+        ::getPowerShowWhen,
         "Tuning: §c❁34§7, §e⚔20§7, and §9☣7"
     ),
     COOKIE(
@@ -466,16 +465,45 @@ private fun getPowerDisplayPair() = listOf(
         ?: "§cOpen \"Your Bags\"!") to HorizontalAlignment.LEFT
 )
 
-private fun getTuningDisplayPair() = listOf(
-    (MaxwellAPI.tunings?.let {
-        val tuning = it.toList()
+private fun getTuningDisplayPair(): List<Pair<String, HorizontalAlignment>> {
+    val tunings = MaxwellAPI.tunings ?: return listOf("§cTalk to \"Maxwell\"!" to HorizontalAlignment.LEFT)
+
+    return if (displayConfig.compactTuning) {
+        val tuning = tunings
             .take(3)
-            .map { (key, value) -> key + value }
-            .createCommaSeparatedList("§7")
-        "Tuning: $tuning"
+            .joinToString("§7, ") { tuning ->
+                with(tuning) {
+                    if (displayConfig.displayNumbersFirst) {
+                        "$color$value $icon"
+                    } else {
+                        "$color$icon $value"
+                    }
+                }
+
+            }
+        listOf(
+            if (displayConfig.displayNumbersFirst) {
+                "$tuning §fTuning"
+            } else {
+                "Tuning: $tuning"
+            } to HorizontalAlignment.LEFT
+        )
+    } else {
+        val tuning = tunings
+            .take(displayConfig.tuningAmount)
+            .map { tuning ->
+                with(tuning) {
+                    " §7- §f" + if (displayConfig.displayNumbersFirst) {
+                        "$color$value$icon $name"
+                    } else {
+                        "$name: $color$value$icon"
+                    }
+                }
+
+            }.toTypedArray()
+        listOf("Tuning:", *tuning).map { it to HorizontalAlignment.LEFT }
     }
-        ?: "§cTalk to \"Maxwell\"!") to HorizontalAlignment.LEFT
-)
+}
 
 private fun getPowerShowWhen() = !inAnyIsland(IslandType.THE_RIFT)
 
@@ -506,7 +534,8 @@ private fun getCookieShowWhen(): Boolean {
 }
 
 private fun getObjectiveDisplayPair() = buildList {
-    val objective = ScoreboardData.sidebarLinesFormatted.first { ScoreboardPattern.objectivePattern.matches(it) }
+    val objective =
+        ScoreboardData.sidebarLinesFormatted.first { ScoreboardPattern.objectivePattern.matches(it) }
 
     add(objective to HorizontalAlignment.LEFT)
     add((ScoreboardData.sidebarLinesFormatted.nextAfter(objective) ?: "<hidden>") to HorizontalAlignment.LEFT)
