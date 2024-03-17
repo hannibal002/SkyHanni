@@ -54,6 +54,7 @@ object QuiverAPI {
     private var arrows: List<ArrowType> = listOf()
 
     private var wearingSkeletonMasterChestplate = false
+    private var hasBow = false
 
     const val MAX_ARROW_AMOUNT = 2880
     private val SKELETON_MASTER_CHESTPLATE = "SKELETON_MASTER_CHESTPLATE".asInternalName()
@@ -235,11 +236,7 @@ object QuiverAPI {
 
     fun Int.asArrowPercentage() = ((this.toFloat() / MAX_ARROW_AMOUNT) * 100).round(1)
 
-    fun hasBowInInventory(): Boolean {
-        return InventoryUtils.getItemsInOwnInventory().any {
-            it.item is ItemBow && !fakeBowsPattern.matches(it.getInternalName().asString())
-        }
-    }
+    fun hasBowInInventory() = hasBow
 
     fun getArrowByNameOrNull(name: String): ArrowType? {
         return arrows.firstOrNull { it.arrow == name }
@@ -255,6 +252,12 @@ object QuiverAPI {
 
     private fun shouldHideAmount() = wearingSkeletonMasterChestplate
 
+    private fun checkBow() {
+        hasBow = InventoryUtils.getItemsInOwnInventory().any {
+            it.item is ItemBow && !fakeBowsPattern.matches(it.getInternalName().asString())
+        }
+    }
+
     private fun checkChestplate() {
         val wasWearing = wearingSkeletonMasterChestplate
         wearingSkeletonMasterChestplate = InventoryUtils.getChestplate()?.getInternalName()?.equals(
@@ -269,6 +272,7 @@ object QuiverAPI {
         if (!isEnabled()) return
         if (event.repeatSeconds(3)) {
             checkChestplate()
+            checkBow()
         }
     }
 

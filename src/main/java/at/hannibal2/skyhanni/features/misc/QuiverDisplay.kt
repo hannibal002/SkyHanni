@@ -61,6 +61,10 @@ class QuiverDisplay {
     fun onRenderOverlay(event: GuiRenderEvent.GuiOverlayRenderEvent) {
         if (!isEnabled()) return
         if (display.isEmpty()) return
+        if (config.onlyWithBow && !QuiverAPI.hasBowInInventory()) {
+            if (display.isNotEmpty()) display = emptyList()
+            return
+        }
         config.quiverDisplayPos.renderStringsAndItems(listOf(display), posLabel = "Quiver Display")
     }
 
