@@ -497,7 +497,7 @@ private fun getTuningDisplayPair(): List<Pair<String, HorizontalAlignment>> {
             .map { tuning ->
                 with(tuning) {
                     " §7- §f" + if (displayConfig.displayNumbersFirst) {
-                        "$color$value$icon $name"
+                        "$color$value $icon $name"
                     } else {
                         "$name: $color$value$icon"
                     }

@@ -7,7 +7,9 @@ import at.hannibal2.skyhanni.events.RepositoryReloadEvent
 import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
+import at.hannibal2.skyhanni.utils.ItemUtils.name
 import at.hannibal2.skyhanni.utils.LorenzUtils
+import at.hannibal2.skyhanni.utils.LorenzUtils.groupOrNull
 import at.hannibal2.skyhanni.utils.LorenzUtils.isInIsland
 import at.hannibal2.skyhanni.utils.NumberUtil.formatInt
 import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
@@ -69,7 +71,7 @@ object MaxwellAPI {
     )
     private val thaumaturgyDataPattern by group.pattern(
         "gui.thaumaturgy.data",
-        "§(?<color>.)\\+(?<amount>[^ ]+)(?<icon>.) .+"
+        "§(?<color>.)\\+(?<amount>[^ ]+)(?<icon>.) (?<name>.+)"
     )
     private val statsTuningGuiPattern by group.pattern(
         "gui.thaumaturgy.statstuning",
@@ -139,19 +141,28 @@ object MaxwellAPI {
         val map = mutableListOf<Tuning>()
         for (stack in inventoryItems.values) {
             for (line in stack.getLore()) {
-                map.readTuningFromLine(statsTuningDataPattern, line)
+                statsTuningDataPattern.readTuningFromLine(line)?.let {
+                    it.name = "§.. (?<name>.+)".toPattern().matchMatcher(stack.name) {
+                        group("name")
+                    } ?: ErrorManager.skyHanniError(
+                        "found no name in thaumaturgy",
+                        "stack name" to stack.name,
+                        "line" to line
+                    )
+                    map.add(it)
+                }
             }
         }
         tunings = map
     }
 
-    private fun MutableList<Tuning>.readTuningFromLine(pattern: Pattern, line: String) {
-        pattern.matchMatcher(line) {
+    private fun Pattern.readTuningFromLine(line: String): Tuning? {
+        return matchMatcher(line) {
             val color = "§" + group("color")
             val icon = group("icon")
-            val name = "<name>"
+            val name = groupOrNull("name") ?: "<missing>"
             val value = group("amount")
-            add(Tuning(value, color, name, icon))
+            Tuning(value, color, name, icon)
         }
     }
 
@@ -188,7 +199,9 @@ object MaxwellAPI {
             }
             if (!active) continue
             if (line.isEmpty()) break
-            map.readTuningFromLine(thaumaturgyDataPattern, line)
+            thaumaturgyDataPattern.readTuningFromLine(line)?.let {
+                map.add(it)
+            }
         }
         this.tunings = map
     }
@@ -242,7 +255,7 @@ object MaxwellAPI {
     class Tuning(
         @Expose val value: String,
         @Expose val color: String,
-        @Expose val name: String,
+        @Expose var name: String,
         @Expose val icon: String,
     )
 }
