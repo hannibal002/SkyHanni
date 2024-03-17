@@ -248,7 +248,7 @@ object ScoreboardPattern {
     )
     val reformingPattern by combatSb.pattern(
         "magmareforming",
-        "^§cThe boss is reforming!$"
+        "^§cThe boss is (?:re)?forming!$"
     )
     val bossHealthPattern by combatSb.pattern(
         "magmabosshealth",
