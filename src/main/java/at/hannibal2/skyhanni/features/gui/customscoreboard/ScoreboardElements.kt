@@ -28,6 +28,7 @@ import at.hannibal2.skyhanni.utils.LorenzUtils.inDungeons
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.NumberUtil.percentageColor
 import at.hannibal2.skyhanni.utils.RenderUtils.HorizontalAlignment
+import at.hannibal2.skyhanni.utils.StringUtils.createCommaSeparatedList
 import at.hannibal2.skyhanni.utils.StringUtils.firstLetterUppercase
 import at.hannibal2.skyhanni.utils.StringUtils.matches
 import at.hannibal2.skyhanni.utils.TabListData
@@ -42,7 +43,7 @@ internal var amountOfUnknownLines = 0
 enum class ScoreboardElement(
     private val displayPair: Supplier<List<ScoreboardElementType>>,
     val showWhen: () -> Boolean,
-    private val configLine: String
+    private val configLine: String,
 ) {
     TITLE(
         ::getTitleDisplayPair,
@@ -137,6 +138,11 @@ enum class ScoreboardElement(
         ::getPowerDisplayPair,
         ::getPowerShowWhen,
         "Power: §aSighted §7(§61.263§7)"
+    ),
+    TUNING(
+        ::getTuningDisplayPair,
+        { MaxwellAPI.tunings?.isNotEmpty() ?: false },
+        "Tuning: §c❁34§7, §e⚔20§7, and §9☣7"
     ),
     COOKIE(
         ::getCookieDisplayPair,
@@ -233,7 +239,6 @@ enum class ScoreboardElement(
         return showWhen()
     }
 }
-
 
 private fun getTitleDisplayPair() = if (displayConfig.titleAndFooter.useHypixelTitleAnimation) {
     listOf(ScoreboardData.objectiveTitle to displayConfig.titleAndFooter.alignTitleAndFooter)
@@ -428,7 +433,6 @@ private fun getDateDisplayPair() =
         SkyBlockTime.now().formatted(yearElement = false, hoursAndMinutesElement = false) to HorizontalAlignment.LEFT
     )
 
-
 private fun getTimeDisplayPair(): List<ScoreboardElementType> {
     var symbol = getGroupFromPattern(ScoreboardData.sidebarLinesFormatted, ScoreboardPattern.timePattern, "symbol")
     if (symbol == "0") symbol = ""
@@ -460,6 +464,17 @@ private fun getPowerDisplayPair() = listOf(
         }
     }
         ?: "§cOpen \"Your Bags\"!") to HorizontalAlignment.LEFT
+)
+
+private fun getTuningDisplayPair() = listOf(
+    (MaxwellAPI.tunings?.let {
+        val tuning = it.toList()
+            .take(3)
+            .map { (key, value) -> key + value }
+            .createCommaSeparatedList("§7")
+        "Tuning: $tuning"
+    }
+        ?: "§cTalk to \"Maxwell\"!") to HorizontalAlignment.LEFT
 )
 
 private fun getPowerShowWhen() = !inAnyIsland(IslandType.THE_RIFT)
@@ -507,7 +522,6 @@ private fun getObjectiveDisplayPair() = buildList {
 private fun getObjectiveShowWhen(): Boolean =
     !inAnyIsland(IslandType.KUUDRA_ARENA)
         && ScoreboardData.sidebarLinesFormatted.none { ScoreboardPattern.objectivePattern.matches(it) }
-
 
 private fun getSlayerDisplayPair(): List<ScoreboardElementType> = listOf(
     (if (SlayerAPI.hasActiveSlayerQuest()) "Slayer Quest" else "<hidden>") to HorizontalAlignment.LEFT,

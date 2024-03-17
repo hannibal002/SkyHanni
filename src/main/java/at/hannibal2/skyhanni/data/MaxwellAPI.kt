@@ -139,7 +139,7 @@ object MaxwellAPI {
         var active = false
         val map = mutableMapOf<String, Int>()
         for (line in item.getLore()) {
-            if (line == "§7Your tuning:") {
+            if (startPattern.matches(line)) {
                 active = true
                 continue
             }
@@ -147,7 +147,7 @@ object MaxwellAPI {
                 if (line.isEmpty()) {
                     break
                 }
-                "§(?<color>.)\\+(?<amount>\\d+)(?<icon>.) .+".toPattern().matchMatcher(line) {
+                dataPattern.matchMatcher(line) {
                     val color = group("color")
                     val icon = group("icon")
                     val name = "§$color$icon"
@@ -156,7 +156,7 @@ object MaxwellAPI {
                 }
             }
         }
-        tunings = map.sortedDesc().toList().take(3).toMap()
+        tunings = map.sortedDesc()
     }
 
     private fun processStack(stack: ItemStack) {

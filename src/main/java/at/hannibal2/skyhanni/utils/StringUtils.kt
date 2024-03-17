@@ -189,11 +189,6 @@ object StringUtils {
         return "$allButLast$delimiterColor, and ${this[lastIndex]}"
     }
 
-    @Deprecated("outdated", ReplaceWith("list.createCommaSeparatedList(delimiterColor)"))
-    fun createCommaSeparatedList(list: List<String>, delimiterColor: String = ""): String {
-        return list.createCommaSeparatedList(delimiterColor)
-    }
-
     fun pluralize(number: Int, singular: String, plural: String? = null, withNumber: Boolean = false): String {
         val pluralForm = plural ?: "${singular}s"
         var str = if (number == 1) singular else pluralForm

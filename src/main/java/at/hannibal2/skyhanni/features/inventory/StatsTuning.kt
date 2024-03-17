@@ -71,9 +71,8 @@ class StatsTuning {
         if (stack.name != "§aStats Tuning") return false
         val tunings = MaxwellAPI.tunings ?: return false
 
-        event.stackTip = tunings.toList()
-            .take(3)
-            .map { it.first + it.second }
+        event.stackTip = tunings
+            .map { it.key + it.value }
             .createCommaSeparatedList("§7")
         event.offsetX = 3
         event.offsetY = -5
