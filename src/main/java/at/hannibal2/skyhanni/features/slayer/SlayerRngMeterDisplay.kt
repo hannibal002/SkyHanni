@@ -17,6 +17,7 @@ import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.ItemUtils.nameWithEnchantment
 import at.hannibal2.skyhanni.utils.LorenzUtils
+import at.hannibal2.skyhanni.utils.NEUInternalName
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.NumberUtil.formatNumber
 import at.hannibal2.skyhanni.utils.RenderUtils.renderString
@@ -49,7 +50,7 @@ class SlayerRngMeterDisplay {
     private var display = ""
     private var lastItemDroppedTime = 0L
 
-    var rngScore = mapOf<String, Map<String, Long>>()
+    var rngScore = mapOf<String, Map<NEUInternalName, Long>>()
 
     @SubscribeEvent
     fun onTick(event: LorenzTickEvent) {
@@ -142,11 +143,11 @@ class SlayerRngMeterDisplay {
             storage.goalNeeded = -1
         } else {
             storage.itemGoal = selectedItem.nameWithEnchantment
-            storage.goalNeeded = rngScore[getCurrentSlayer()]?.get(selectedItem.getInternalName().asString())
+            storage.goalNeeded = rngScore[getCurrentSlayer()]?.get(selectedItem.getInternalName())
                 ?: ErrorManager.skyHanniError(
                     "RNG Meter goal setting failed",
                     "selectedItem" to selectedItem,
-                    "selectedItemInternalName" to selectedItem.getInternalName().asString(),
+                    "selectedItemInternalName" to selectedItem.getInternalName(),
                     "currentSlayer" to getCurrentSlayer(),
                     "repo" to rngScore
                 )
