@@ -112,7 +112,8 @@ object MaxwellAPI {
         if (!isEnabled()) return
 
         if (isThaumaturgyInventory(event.inventoryName)) {
-            loadThaumaturgyGui(event.inventoryItems)
+            loadThaumaturgyCurrentPower(event.inventoryItems)
+            loadThaumaturgyTunings(event.inventoryItems)
         }
 
         if (yourBagsGuiPattern.matches(event.inventoryName)) {
@@ -122,7 +123,7 @@ object MaxwellAPI {
         }
     }
 
-    private fun loadCurrentPower(inventoryItems: Map<Int, ItemStack>) {
+    private fun loadThaumaturgyCurrentPower(inventoryItems: Map<Int, ItemStack>) {
         val selectedPowerStack =
             inventoryItems.values.find {
                 powerSelectedPattern.matches(it.getLore().lastOrNull())
@@ -139,12 +140,7 @@ object MaxwellAPI {
             )
     }
 
-    private fun loadThaumaturgyGui(inventoryItems: Map<Int, ItemStack>) {
-        loadCurrentPower(inventoryItems)
-        loadTunings(inventoryItems)
-    }
-
-    private fun loadTunings(inventoryItems: Map<Int, ItemStack>) {
+    private fun loadThaumaturgyTunings(inventoryItems: Map<Int, ItemStack>) {
         val item = inventoryItems[51] ?: return
         var active = false
         val map = mutableMapOf<String, Int>()
