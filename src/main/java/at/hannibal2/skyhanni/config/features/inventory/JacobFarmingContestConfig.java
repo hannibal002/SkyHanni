@@ -21,7 +21,7 @@ public class JacobFarmingContestConfig {
     public boolean realTime = true;
 
     @Expose
-    @ConfigOption(name = "Open Online", desc = "Opens the contest on §eelitebot.dev§7 when clicking with this key held.")
+    @ConfigOption(name = "Open On Elite", desc = "Opens the contest on §eelitebot.dev§7 when pressing this key in Jacob's menu or the calendar.")
     @ConfigEditorKeybind(defaultKey = Keyboard.KEY_NONE)
     public int openOnline = Keyboard.KEY_NONE;
 
