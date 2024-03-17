@@ -123,6 +123,7 @@ object UnknownLinesHandler {
             sidebarLines.firstOrNull { SbPattern.objectivePattern.matches(it) }
                 ?: "Objective"
         unknownLines = unknownLines.filter { sidebarLines.nextAfter(objectiveLine) != it }
+        // TODO create function
         unknownLines = unknownLines.filter {
             sidebarLines.nextAfter(objectiveLine, 2) != it
                 && !SbPattern.thirdObjectiveLinePattern.matches(it)
