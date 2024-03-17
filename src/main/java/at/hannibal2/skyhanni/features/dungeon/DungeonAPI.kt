@@ -55,7 +55,7 @@ class DungeonAPI {
 
         private val dungeonComplete by patternGroup.pattern(
             "complete",
-            "§.\\s+§.§.(?:The|Master Mode) Catacombs §.§.- §.§.Floor (?<floor>M?[IV]{1,3}|Entrance)"
+            "§.\\s+§.§.(?:The|Master Mode) Catacombs §.§.- §.§.(?:Floor )?(?<floor>M?[IV]{1,3}|Entrance)"
         )
 
         fun inDungeon() = dungeonFloor != null
