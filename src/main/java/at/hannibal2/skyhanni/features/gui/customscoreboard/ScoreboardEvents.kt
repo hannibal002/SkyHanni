@@ -92,10 +92,6 @@ enum class ScoreboardEvents(private val displayLine: Supplier<List<String>>, pri
         ::getBroodmotherLines,
         ::getBroodmotherShowWhen
     ),
-    NEW_YEAR(
-        ::getNewYearLines,
-        ::getNewYearShowWhen
-    ),
     ORINGO(
         ::getOringoLines,
         ::getOringoShowWhen
@@ -368,14 +364,6 @@ private fun getBroodmotherLines(): List<String> {
 
 private fun getBroodmotherShowWhen(): Boolean {
     return getSbLines().any { SbPattern.broodmotherPattern.matches(it) }
-}
-
-private fun getNewYearLines(): List<String> {
-    return listOf(getSbLines().first { SbPattern.newYearPattern.matches(it) })
-}
-
-private fun getNewYearShowWhen(): Boolean {
-    return getSbLines().any { SbPattern.newYearPattern.matches(it) }
 }
 
 private fun getOringoLines(): List<String> {
