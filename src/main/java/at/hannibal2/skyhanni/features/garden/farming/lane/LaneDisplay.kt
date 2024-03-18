@@ -45,6 +45,7 @@ object LaneDisplay {
     fun onGardenToolChange(event: GardenToolChangeEvent) {
         val crop = event.crop
         currentLane = lanes[crop]
+        display = emptyList()
         if (crop != null && currentLane == null) {
             if (config.distanceDisplay || config.laneSwitchNotification.enabled) {
                 ChatUtils.clickableChat(
@@ -118,15 +119,12 @@ object LaneDisplay {
         val speedTooSlow = speedPerSecond < 1
         if (speedTooSlow) {
             validSpeed = false
-//             validFarming = false
             return
         }
         // only use time if it is consistent
         if (lastSpeed != speedPerSecond) {
             lastSpeed = speedPerSecond
             validSpeed = false
-//             lastTimeFarming = SimpleTimeMark.farPast()
-//             validFarming = false
             return
         }
 
@@ -134,7 +132,7 @@ object LaneDisplay {
 
         val timeRemaining = (remainingDistance / speedPerSecond).seconds
         val switchSettings = config.laneSwitchNotification
-        LaneDisplay.timeRemaining = timeRemaining
+        LaneDisplay.timeRemaining = timeRemaining + 1.seconds
         val warnAt = switchSettings.secondsBefore.seconds
         if (timeRemaining >= warnAt) {
             lastTimeFarming = SimpleTimeMark.now()
@@ -145,7 +143,7 @@ object LaneDisplay {
         if (lastTimeFarming.passedSince() > warnAt) return
 
         with(switchSettings) {
-            LorenzUtils.sendTitle(text.replace("&", "§"), 1.seconds)
+            LorenzUtils.sendTitle(text.replace("&", "§"), 2.seconds)
         }
         playUserSound()
     }
