@@ -15,7 +15,6 @@ import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils.round
 import at.hannibal2.skyhanni.utils.RenderUtils.drawDynamicText
 import at.hannibal2.skyhanni.utils.RenderUtils.renderStrings
-import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.SoundUtils
 import at.hannibal2.skyhanni.utils.SoundUtils.playSound
 import at.hannibal2.skyhanni.utils.TimeUtils.format
@@ -33,10 +32,11 @@ object LaneDisplay {
     private var oldValue: Double? = null
     private var currentDirection = 0
     private var remainingDistance = 0.0
-    private var lastValueSaved = SimpleTimeMark.farPast()
 
     private var display = listOf<String>()
     private var timeRemaining: Duration? = null
+    private var lastSpeed = 0.0
+    private var validSpeed = false
 
     @SubscribeEvent
     fun onGardenToolChange(event: GardenToolChangeEvent) {
@@ -46,8 +46,6 @@ object LaneDisplay {
     @SubscribeEvent
     fun onTick(event: LorenzTickEvent) {
         if (!GardenAPI.inGarden()) return
-//         if (!Minecraft.getMinecraft().thePlayer.onGround) return
-
         if (!event.isMod(2)) return
 
         val lane = currentLane ?: return
@@ -56,7 +54,10 @@ object LaneDisplay {
         val max = lane.max
         val position = direction.getValue(LocationUtils.playerLocation())
         val outside = position !in min..max
-        if (outside) return
+        if (outside) {
+            display = emptyList()
+            return
+        }
 
         val oldValue = oldValue ?: run {
             oldValue = position
@@ -64,9 +65,6 @@ object LaneDisplay {
         }
         val diff = oldValue - position
         LaneDisplay.oldValue = position
-
-        if (lastValueSaved.passedSince() < 1.seconds) return
-        lastValueSaved = SimpleTimeMark.now()
 
         if (diff > 0) {
             currentDirection = 1
@@ -84,7 +82,8 @@ object LaneDisplay {
         if (config.distanceUntilSwitch) {
             display = buildList {
                 add("§7Distance until Switch: §e${remainingDistance.round(1)}")
-                add("§7Time remaining: §b${timeRemaining?.format()}")
+                val color = if (validSpeed) "§b" else "§8"
+                add("§7Time remaining: $color${timeRemaining?.format()}")
             }
         }
         if (config.switchNotification) {
@@ -93,14 +92,27 @@ object LaneDisplay {
     }
 
     private fun sendWarning() {
-        val speedPerSecond = LocationUtils.distanceFromPreviousTick()
+        val speedPerSecond = LocationUtils.distanceFromPreviousTick().round(2)
         if (speedPerSecond == 0.0) return
+        val speedTooSlow = speedPerSecond < 1
+        if (speedTooSlow) {
+            validSpeed = false
+            return
+        }
+        // only use time if it is consistent
+        if (lastSpeed != speedPerSecond) {
+            lastSpeed = speedPerSecond
+            validSpeed = false
+            return
+        }
+
+        validSpeed = true
 
         val timeRemaining = (remainingDistance / speedPerSecond).seconds
         val settings = config.notification.settings
+        LaneDisplay.timeRemaining = timeRemaining
         if (timeRemaining >= settings.warnSeconds.seconds) return
 
-        LaneDisplay.timeRemaining = timeRemaining
         with(settings) {
             LorenzUtils.sendTitle(color.getChatColor() + text, duration.seconds)
         }
@@ -125,12 +137,14 @@ object LaneDisplay {
                 event.drawWaypointFilled(min, LorenzColor.YELLOW.toColor(), beacon = true)
                 event.drawDynamicText(min, "§eLane Corner", 1.5)
             }
+
             1 -> {
                 event.drawWaypointFilled(min, LorenzColor.RED.toColor(), beacon = true)
                 event.drawDynamicText(min, "§cLane End", 1.5)
                 event.drawWaypointFilled(max, LorenzColor.GREEN.toColor(), beacon = true)
                 event.drawDynamicText(max, "§aLane Start", 1.5)
             }
+
             -1 -> {
                 event.drawWaypointFilled(min, LorenzColor.GREEN.toColor(), beacon = true)
                 event.drawDynamicText(min, "§aLane Start", 1.5)
