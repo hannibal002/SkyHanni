@@ -46,7 +46,7 @@ object LaneDisplay {
         val crop = event.crop
         currentLane = lanes[crop]
         if (crop != null && currentLane == null) {
-            if (config.distanceUntilSwitch || config.switchNotification) {
+            if (config.distanceDisplay || config.laneSwitchNotification.enabled) {
                 ChatUtils.clickableChat(
                     "No ${crop.cropName} lane defined yet! Use §e/shlanedetection",
                     command = "shlanedetection"
@@ -100,14 +100,14 @@ object LaneDisplay {
 
         if (!GardenAPI.isCurrentlyFarming()) return
 
-        if (config.distanceUntilSwitch) {
+        if (config.distanceDisplay) {
             display = buildList {
                 add("§7Distance until Switch: §e${remainingDistance.round(1)}")
                 val color = if (validSpeed) "§b" else "§8"
                 add("§7Time remaining: $color${timeRemaining?.format()}")
             }
         }
-        if (config.switchNotification) {
+        if (config.laneSwitchNotification.enabled) {
             sendWarning()
         }
     }
@@ -133,7 +133,7 @@ object LaneDisplay {
         validSpeed = true
 
         val timeRemaining = (remainingDistance / speedPerSecond).seconds
-        val switchSettings = config.switchSettings
+        val switchSettings = config.laneSwitchNotification
         LaneDisplay.timeRemaining = timeRemaining
         val warnAt = switchSettings.secondsBefore.seconds
         if (timeRemaining >= warnAt) {
@@ -170,14 +170,14 @@ object LaneDisplay {
     @SubscribeEvent
     fun onRenderOverlay(event: GuiRenderEvent.GuiOverlayRenderEvent) {
         if (!GardenAPI.inGarden()) return
-        if (!config.distanceUntilSwitch) return
+        if (!config.distanceDisplay) return
 
         config.distanceUntilSwitchPosition.renderStrings(display, posLabel = "Lane Display")
     }
 
     @JvmStatic
     fun playUserSound() {
-        with(config.switchSounds) {
+        with(config.laneSwitchNotification.sound) {
             SoundUtils.createSound(name, pitch).playSound()
         }
     }

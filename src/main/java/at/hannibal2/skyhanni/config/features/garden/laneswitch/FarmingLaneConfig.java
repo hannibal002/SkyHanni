@@ -16,16 +16,15 @@ public class FarmingLaneConfig {
     public boolean tutorial = false;
 
     @Expose
-    @ConfigOption(name = "Switch Notification", desc = "Sends a notification when approaching the end of a lane and you should switch lanes.")
-    @ConfigEditorBoolean
-    @FeatureToggle
-    public boolean switchNotification = false;
+    @ConfigOption(name = "Lane Switch Notification", desc = "")
+    @Accordion
+    public LaneSwitchNotificationConfig laneSwitchNotification = new LaneSwitchNotificationConfig();
 
     @Expose
-    @ConfigOption(name = "Distance until Switch", desc = "Displays the remaining distance until the next switch.")
+    @ConfigOption(name = "Distance Display", desc = "Shows the remaining distance and time until you reach the end of the current lane.")
     @ConfigEditorBoolean
     @FeatureToggle
-    public boolean distanceUntilSwitch = false;
+    public boolean distanceDisplay = false;
 
     @Expose
     public Position distanceUntilSwitchPosition = new Position(0, 200, false, true);
@@ -35,15 +34,5 @@ public class FarmingLaneConfig {
     @ConfigEditorBoolean
     @FeatureToggle
     public boolean cornerWaypoints = false;
-
-    @Expose
-    @ConfigOption(name = "Sound Settings", desc = "")
-    @Accordion
-    public LaneSwitchSoundSettings switchSounds = new LaneSwitchSoundSettings();
-
-    @Expose
-    @ConfigOption(name = "Notification Settings", desc = "")
-    @Accordion
-    public LaneSwitchNotificationConfig switchSettings = new LaneSwitchNotificationConfig();
 
 }
