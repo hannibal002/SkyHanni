@@ -90,7 +90,9 @@ object FarmingLaneFeatures {
             display = buildList {
                 add("§7Distance until Switch: §e${remainingDistance.round(1)}")
                 val color = if (validSpeed) "§b" else "§8"
-                add("§7Time remaining: $color${timeRemaining?.format()}")
+                val timeRemaining = timeRemaining ?: return@buildList
+                val format = timeRemaining.format(showMilliSeconds = timeRemaining < 5.seconds)
+                add("§7Time remaining: $color$format")
             }
         }
         if (config.laneSwitchNotification.enabled) {
