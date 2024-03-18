@@ -20,6 +20,7 @@ import at.hannibal2.skyhanni.utils.NEUItems
 import at.hannibal2.skyhanni.utils.RenderUtils.renderStringsAndItems
 import at.hannibal2.skyhanni.utils.SoundUtils
 import at.hannibal2.skyhanni.utils.StringUtils
+import at.hannibal2.skyhanni.utils.StringUtils.createCommaSeparatedList
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 import net.minecraft.init.Items
 import net.minecraft.item.ItemStack
@@ -73,7 +74,7 @@ class QuiverDisplay {
     private fun instanceAlert() {
         DelayedRun.runNextTick {
             TitleManager.sendTitle("§cLow on arrows!", 5.seconds, 3.6, 7f)
-            ChatUtils.chat("Low on ${StringUtils.createCommaSeparatedList(arrowsToAlert)}!")
+            ChatUtils.chat("Low on ${arrowsToAlert.createCommaSeparatedList()}!")
             SoundUtils.repeatSound(100, 30, SoundUtils.plingSound)
         }
     }
