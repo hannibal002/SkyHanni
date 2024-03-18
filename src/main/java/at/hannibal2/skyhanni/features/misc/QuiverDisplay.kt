@@ -60,10 +60,6 @@ class QuiverDisplay {
         inInstance = false
     }
 
-    /*
-    TODO: merge onDungeonEnter and onKuudraEnter into onInstanceEnter,
-     and onDungeonComplete and onKuudraComplete into onInstanceComplete
-     */
     @SubscribeEvent
     fun onDungeonEnter(event: DungeonEnterEvent) {
         onInstanceEnter()
