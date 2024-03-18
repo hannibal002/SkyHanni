@@ -12,6 +12,7 @@ import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils.isRancherSign
 import at.hannibal2.skyhanni.utils.RenderUtils.renderString
 import at.hannibal2.skyhanni.utils.RenderUtils.renderStringsAndItems
+import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
@@ -47,6 +48,7 @@ class GardenOptimalSpeed {
     private var lastWarnTime = 0L
     private var cropInHand: CropType? = null
     private var rancherOverlayList: List<List<Any?>> = emptyList()
+    private var lastToolSwitch = SimpleTimeMark.farPast()
 
     @SubscribeEvent
     fun onTick(event: LorenzTickEvent) {
@@ -93,6 +95,7 @@ class GardenOptimalSpeed {
 
     @SubscribeEvent
     fun onGardenToolChange(event: GardenToolChangeEvent) {
+        lastToolSwitch = SimpleTimeMark.now()
         cropInHand = event.crop
         optimalSpeed = cropInHand?.getOptimalSpeed() ?: -1
     }
@@ -138,13 +141,15 @@ class GardenOptimalSpeed {
             text += " (§eCurrent: §f$currentSpeed"
             if (sneaking) text += " §7[Sneaking]"
             text += "§f)"
-
-            if (config.showOnHUD) config.pos.renderString("§c$text", posLabel = "Garden Optimal Speed")
-            if (sneaking && !sneakingPersistent) return
-            warn()
-        } else {
-            if (config.showOnHUD) config.pos.renderString("§a$text", posLabel = "Garden Optimal Speed")
         }
+
+        val recentlySwitchedTool = lastToolSwitch.passedSince() < 1.5.seconds
+        val recentlyStartedSneaking = sneaking && !sneakingPersistent
+
+        val colorCode = if (recentlySwitchedTool || recentlyStartedSneaking) "7" else if (optimalSpeed != currentSpeed) "c" else "a"
+
+        if (config.showOnHUD) config.pos.renderString("§$colorCode$text", posLabel = "Garden Optimal Speed")
+        if (optimalSpeed != currentSpeed && !recentlySwitchedTool && !recentlyStartedSneaking) warn()
     }
 
     private fun warn() {

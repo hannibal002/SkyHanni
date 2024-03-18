@@ -47,6 +47,7 @@ object UnknownLinesHandler {
             SbPattern.soloPattern,
             SbPattern.teammatesPattern,
             SbPattern.floor3GuardiansPattern,
+            SbPattern.m7dragonsPattern,
             SbPattern.wavePattern,
             SbPattern.tokensPattern,
             SbPattern.submergesPattern,
@@ -115,7 +116,6 @@ object UnknownLinesHandler {
             patternsToExclude.any { pattern -> pattern.matches(line) }
         }
 
-
         /*
          * remove known text
         */
@@ -124,6 +124,7 @@ object UnknownLinesHandler {
             sidebarLines.firstOrNull { SbPattern.objectivePattern.matches(it) }
                 ?: "Objective"
         unknownLines = unknownLines.filter { sidebarLines.nextAfter(objectiveLine) != it }
+        // TODO create function
         unknownLines = unknownLines.filter {
             sidebarLines.nextAfter(objectiveLine, 2) != it
                 && !SbPattern.thirdObjectiveLinePattern.matches(it)

@@ -167,7 +167,7 @@ class DungeonFinderFeatures {
         if (stack.getLore().firstOrNull()?.removeColor()?.startsWith("Dungeon:") == false) return
         if (classNames.contains(selectedClass)) selectedClass = "§a${selectedClass}§7"
         event.toolTip.add("")
-        event.toolTip.add("§cMissing: §7" + createCommaSeparatedList(classNames))
+        event.toolTip.add("§cMissing: §7" + classNames.createCommaSeparatedList())
     }
 
     @SubscribeEvent
