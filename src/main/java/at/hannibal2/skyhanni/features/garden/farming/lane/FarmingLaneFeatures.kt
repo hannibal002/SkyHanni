@@ -12,6 +12,7 @@ import at.hannibal2.skyhanni.utils.LocationUtils
 import at.hannibal2.skyhanni.utils.LorenzColor
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils.round
+import at.hannibal2.skyhanni.utils.LorenzVec
 import at.hannibal2.skyhanni.utils.RenderUtils.drawDynamicText
 import at.hannibal2.skyhanni.utils.RenderUtils.renderStrings
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
@@ -149,14 +150,16 @@ object FarmingLaneFeatures {
         val lane = FarmingLaneAPI.currentLane ?: return
         val direction = lane.direction
         val location = LocationUtils.playerLocation()
-        val min = direction.setValue(location, lane.min)
-        val max = direction.setValue(location, lane.max)
+        val min = direction.setValue(location, lane.min).capAtBuildHeight()
+        val max = direction.setValue(location, lane.max).capAtBuildHeight()
 
         event.drawWaypointFilled(min, LorenzColor.YELLOW.toColor(), beacon = true)
         event.drawDynamicText(min, "§eLane Corner", 1.5)
         event.drawWaypointFilled(max, LorenzColor.YELLOW.toColor(), beacon = true)
         event.drawDynamicText(max, "§eLane Corner", 1.5)
     }
+
+    private fun LorenzVec.capAtBuildHeight(): LorenzVec = if (y > 76) copy(y = 76.0) else this
 
     @SubscribeEvent
     fun onRenderOverlay(event: GuiRenderEvent.GuiOverlayRenderEvent) {
