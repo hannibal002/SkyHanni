@@ -29,11 +29,11 @@ public class LaneSwitchNotificationSettings {
     public double duration = 2.5;
 
     @Expose
-    @ConfigOption(name = "Threshold", desc = "How early the notification will be displayed (Seconds before the Lane Switching notification).")
+    @ConfigOption(name = "Seconds Before Duration", desc = "How many seconds before reaching the end of the lane should the warning happen?")
     @ConfigEditorSlider(
         minValue = 1,
         maxValue = 10,
         minStep = 1
     )
-    public int threshold = 5;
+    public int warnSeconds = 5;
 }
