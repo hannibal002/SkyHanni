@@ -26,7 +26,7 @@ import kotlin.time.Duration
 import kotlin.time.Duration.Companion.seconds
 
 object LaneDisplay {
-    private val config get() = GardenAPI.config.laneswitch
+    private val config get() = GardenAPI.config.farmingLane
 
     val lanes = mutableMapOf<CropType, FarmingLane>()
 
@@ -85,16 +85,17 @@ object LaneDisplay {
         } else {
             0
         }
+
+        remainingDistance = when (newDirection) {
+            1 -> (min - position).absoluteValue
+            -1 -> (max - position).absoluteValue
+            else -> remainingDistance
+        }
+
         if (newDirection != lastDirection) {
             // reset farming time, to prevent wrong lane warnings
             lastTimeFarming = SimpleTimeMark.farPast()
             lastDirection = newDirection
-        }
-
-        remainingDistance = when (lastDirection) {
-            1 -> (min - position).absoluteValue
-            -1 -> (max - position).absoluteValue
-            else -> remainingDistance
         }
 
         if (!GardenAPI.isCurrentlyFarming()) return
@@ -144,7 +145,7 @@ object LaneDisplay {
         if (lastTimeFarming.passedSince() > warnAt) return
 
         with(switchSettings) {
-            LorenzUtils.sendTitle(text.replace("&", "§"), duration.seconds)
+            LorenzUtils.sendTitle(text.replace("&", "§"), 1.seconds)
         }
         playUserSound()
     }
@@ -152,7 +153,7 @@ object LaneDisplay {
     @SubscribeEvent
     fun onRenderWorld(event: LorenzRenderWorldEvent) {
         if (!GardenAPI.inGarden()) return
-        if (!config.startEndWaypoints) return
+        if (!config.cornerWaypoints) return
 
         val lane = currentLane ?: return
         val direction = lane.direction
