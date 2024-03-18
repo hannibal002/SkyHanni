@@ -11,14 +11,13 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
 class RareDropMessages {
 
-    /*
-    Example Chat Messages:
-    §5§lGREAT CATCH! §r§bYou found a §r§7[Lvl 1] §r§aGuardian§r§b.
-    §6§lPET DROP! §r§5Baby Yeti §r§b(+§r§b168% §r§b✯ Magic Find§r§b)
-    §6§lPET DROP! §r§5Slug §6(§6+1300☘)
-    §aYou claimed a §5Tarantula Pet§a! §r§aYou can manage your Pets in the §r§fPets Menu§r§a in your §r§fSkyBlock Menu§r§a.
-    §b[MVP§r§c+§r§b] Empa_§r§f §r§ehas obtained §r§a§r§7[Lvl 1] §r§6Bal§r§e!
-    */
+    /**
+     * REGEX-TEST: §5§lGREAT CATCH! §r§bYou found a §r§7[Lvl 1] §r§aGuardian§r§b.
+     * REGEX-TEST: §6§lPET DROP! §r§5Baby Yeti §r§b(+§r§b168% §r§b✯ Magic Find§r§b)
+     * REGEX-TEST: §6§lPET DROP! §r§5Slug §6(§6+1300☘)
+     * REGEX-TEST: §aYou claimed a §5Tarantula Pet§a! §r§aYou can manage your Pets in the §r§fPets Menu§r§a in your §r§fSkyBlock Menu§r§a.
+     * REGEX-TEST: §b[MVP§r§c+§r§b] Empa_§r§f §r§ehas obtained §r§a§r§7[Lvl 1] §r§6Bal§r§e!
+     */
     private val petDropPattern by RepoPattern.pattern(
         "pet.petdropmessage",
         "(?<typeOfDrop>(?:§.)*PET DROP!|(?:§.)*GREAT CATCH! (?:§.)*You found a (?:§.)*\\[Lvl 1]|(?:§.)*You claimed an?|(?:§.)*(?:\\[.*])? ?(?:§.)?[a-zA-Z0-9_]{2,16}(?:§.)* (?:§.)*has obtained (?:§.)*\\[Lvl 1]) (?:§r)?§(?<rarityColor>.)(?<petName>[^§(.]+)(?<magicFindOrFarmingFortune>.*)"
