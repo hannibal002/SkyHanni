@@ -24,8 +24,7 @@ class EasterEggWaypoints {
         if (!config.allWaypoints && !config.allEntranceWaypoints) return
         if (!isEgg) return
 
-        if (!HypixelData.hypixelLive) return
-        if (LorenzUtils.inSkyBlock) return
+        if (!isEnabled()) return
 
         val message = event.message
         if (message.startsWith("§a§lYou found an Easter Egg! §r") || message == "§aYou have received the §bsuper reward§a!" || message == "§cYou already found this egg!") {
@@ -40,8 +39,7 @@ class EasterEggWaypoints {
     @SubscribeEvent
     fun onTick(event: LorenzTickEvent) {
         if (!config.allWaypoints && !config.allEntranceWaypoints) return
-        if (!HypixelData.hypixelLive) return // don't show outside live hypixel network (it's disabled on alpha)
-        if (LorenzUtils.inSkyBlock) return
+        if (!isEnabled()) return
 
         if (event.repeatSeconds(1)) {
             isEgg = checkScoreboardEasterSpecific()
@@ -60,8 +58,7 @@ class EasterEggWaypoints {
 
     @SubscribeEvent
     fun onRenderWorld(event: LorenzRenderWorldEvent) {
-        if (!HypixelData.hypixelLive) return // don't show outside live hypixel network (it's disabled on alpha)
-        if (LorenzUtils.inSkyBlock) return
+        if (!isEnabled()) return
         if (!isEgg) return
 
         if (config.allWaypoints) {
@@ -119,4 +116,5 @@ class EasterEggWaypoints {
         val c = ScoreboardData.sidebarLinesFormatted.any { it.contains("Easter Eggs") }
         return a && b && c
     }
+    private fun isEnabled() = HypixelData.hypixelLive && !LorenzUtils.inSkyBlock
 }
