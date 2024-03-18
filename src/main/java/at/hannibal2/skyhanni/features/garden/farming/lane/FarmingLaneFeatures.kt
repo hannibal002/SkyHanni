@@ -26,8 +26,8 @@ import kotlin.time.Duration.Companion.seconds
 object FarmingLaneFeatures {
     val config get() = FarmingLaneAPI.config
 
-    private var oldValue: Double? = null
-    private var remainingDistance = 0.0
+    private var currentPositon: Double? = null
+    private var currentDistance = 0.0
 
     private var display = listOf<String>()
     private var timeRemaining: Duration? = null
@@ -45,45 +45,7 @@ object FarmingLaneFeatures {
     fun onTick(event: LorenzTickEvent) {
         if (!GardenAPI.inGarden()) return
         if (!event.isMod(2)) return
-
-        val lane = FarmingLaneAPI.currentLane ?: return
-        val direction = lane.direction
-        val min = lane.min
-        val max = lane.max
-        val position = direction.getValue(LocationUtils.playerLocation())
-        val outside = position !in min..max
-        if (outside) {
-            display = emptyList()
-            return
-        }
-
-        val oldValue = oldValue ?: run {
-            oldValue = position
-            return
-        }
-        val diff = oldValue - position
-        FarmingLaneFeatures.oldValue = position
-
-        val newDirection = if (diff > 0) {
-            1
-        } else if (diff < 0) {
-            -1
-        } else {
-            0
-        }
-
-        remainingDistance = when (newDirection) {
-            1 -> (min - position).absoluteValue
-            -1 -> (max - position).absoluteValue
-            else -> remainingDistance
-        }
-
-        if (newDirection != lastDirection) {
-            // reset farming time, to prevent wrong lane warnings
-            lastTimeFarming = SimpleTimeMark.farPast()
-            lastDirection = newDirection
-        }
-
+        if (!calculateInFarm()) return
         if (!GardenAPI.isCurrentlyFarming()) return
 
         if (config.laneSwitchNotification.enabled) {
@@ -92,12 +54,56 @@ object FarmingLaneFeatures {
 
         if (config.distanceDisplay) {
             display = buildList {
-                add("§7Distance until switch: §e${remainingDistance.round(1)}")
+                add("§7Distance until switch: §e${currentDistance.round(1)}")
                 val color = if (validSpeed) "§b" else "§8"
                 val timeRemaining = timeRemaining ?: return@buildList
                 val format = timeRemaining.format(showMilliSeconds = timeRemaining < 5.seconds)
                 add("§7Time remaining: $color$format")
             }
+        }
+    }
+
+    private fun calculateInFarm(): Boolean {
+        val lane = FarmingLaneAPI.currentLane ?: return false
+        val min = lane.min
+        val max = lane.max
+        val position = lane.direction.getValue(LocationUtils.playerLocation())
+        val outside = position !in min..max
+        if (outside) {
+            display = emptyList()
+            return false
+        }
+
+        val direction = calculateDirection(position) ?: return false
+
+        currentDistance = when (direction) {
+            1 -> (min - position).absoluteValue
+            -1 -> (max - position).absoluteValue
+            else -> currentDistance
+        }
+
+        if (direction != lastDirection) {
+            // reset farming time, to prevent wrong lane warnings
+            lastTimeFarming = SimpleTimeMark.farPast()
+            lastDirection = direction
+        }
+        return true
+    }
+
+    private fun calculateDirection(newPositon: Double): Int? {
+        val position = currentPositon ?: run {
+            currentPositon = newPositon
+            return null
+        }
+        currentPositon = newPositon
+
+        val diff = position - newPositon
+        return if (diff > 0) {
+            1
+        } else if (diff < 0) {
+            -1
+        } else {
+            0
         }
     }
 
@@ -117,7 +123,7 @@ object FarmingLaneFeatures {
         }
         validSpeed = true
 
-        val timeRemaining = (remainingDistance / speedPerSecond).seconds
+        val timeRemaining = (currentDistance / speedPerSecond).seconds
         val switchSettings = config.laneSwitchNotification
         FarmingLaneFeatures.timeRemaining = timeRemaining + 1.seconds
         val warnAt = switchSettings.secondsBefore.seconds
