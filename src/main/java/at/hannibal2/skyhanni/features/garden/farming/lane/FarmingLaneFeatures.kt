@@ -4,7 +4,6 @@ import at.hannibal2.skyhanni.events.GardenToolChangeEvent
 import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.LorenzRenderWorldEvent
 import at.hannibal2.skyhanni.events.LorenzTickEvent
-import at.hannibal2.skyhanni.features.garden.CropType
 import at.hannibal2.skyhanni.features.garden.GardenAPI
 import at.hannibal2.skyhanni.features.garden.farming.lane.FarmingLaneAPI.getValue
 import at.hannibal2.skyhanni.features.garden.farming.lane.FarmingLaneAPI.setValue
@@ -25,10 +24,8 @@ import kotlin.math.absoluteValue
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.seconds
 
-object LaneDisplay {
+object FarmingLaneFeatures {
     private val config get() = GardenAPI.config.farmingLane
-
-    val lanes = mutableMapOf<CropType, FarmingLane>()
 
     var currentLane: FarmingLane? = null
     private var oldValue: Double? = null
@@ -44,7 +41,7 @@ object LaneDisplay {
     @SubscribeEvent
     fun onGardenToolChange(event: GardenToolChangeEvent) {
         val crop = event.crop
-        currentLane = lanes[crop]
+        currentLane = FarmingLaneAPI.lanes[crop]
         display = emptyList()
         if (crop != null && currentLane == null) {
             if (config.distanceDisplay || config.laneSwitchNotification.enabled) {
@@ -77,7 +74,7 @@ object LaneDisplay {
             return
         }
         val diff = oldValue - position
-        LaneDisplay.oldValue = position
+        FarmingLaneFeatures.oldValue = position
 
         val newDirection = if (diff > 0) {
             1
@@ -132,7 +129,7 @@ object LaneDisplay {
 
         val timeRemaining = (remainingDistance / speedPerSecond).seconds
         val switchSettings = config.laneSwitchNotification
-        LaneDisplay.timeRemaining = timeRemaining + 1.seconds
+        FarmingLaneFeatures.timeRemaining = timeRemaining + 1.seconds
         val warnAt = switchSettings.secondsBefore.seconds
         if (timeRemaining >= warnAt) {
             lastTimeFarming = SimpleTimeMark.now()

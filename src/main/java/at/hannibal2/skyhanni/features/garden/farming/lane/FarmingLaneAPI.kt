@@ -1,8 +1,11 @@
 package at.hannibal2.skyhanni.features.garden.farming.lane
 
+import at.hannibal2.skyhanni.features.garden.CropType
 import at.hannibal2.skyhanni.utils.LorenzVec
 
 object FarmingLaneAPI {
+
+    val lanes = mutableMapOf<CropType, FarmingLane>()
 
     fun FarmingDirection.getValue(location: LorenzVec): Double = when (this) {
         FarmingDirection.NORTH_SOUTH -> location.z

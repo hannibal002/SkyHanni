@@ -16,19 +16,19 @@ import kotlin.math.absoluteValue
 import kotlin.math.max
 import kotlin.math.min
 
-object LaneDetection {
+object FarmingLaneCreator {
 
-    private var laneDetection = false
+    private var detection = false
     private var start: LorenzVec? = null
     private var lastLocation: LorenzVec? = null
     private var potentialEnd: LorenzVec? = null
     private var crop: CropType? = null
     private var maxDistance = 0.0
 
-    fun toggleCommand() {
-        laneDetection = !laneDetection
-        if (laneDetection) {
-            ChatUtils.chat("Enabled lane detection. Start farming one layer until we say to stop.")
+    fun commandLaneDetection() {
+        detection = !detection
+        if (detection) {
+            ChatUtils.chat("Enabled lane detection. Farm two layers to detect the lane border position.")
         } else {
             ChatUtils.chat("Stopped lane detection.")
         }
@@ -75,8 +75,8 @@ object LaneDetection {
 
     private fun saveLane(a: LorenzVec, b: LorenzVec, crop: CropType) {
         val lane = createLane(a, b)
-        LaneDisplay.lanes[crop] = lane
-        LaneDisplay.currentLane = lane
+        FarmingLaneAPI.lanes[crop] = lane
+        FarmingLaneFeatures.currentLane = lane
         ChatUtils.chat("${crop.cropName} lane saved. You can stop now.")
         reset()
     }
@@ -97,7 +97,7 @@ object LaneDetection {
         lastLocation = null
         crop = null
         maxDistance = 0.0
-        laneDetection = false
+        detection = false
     }
 
     @SubscribeEvent
@@ -118,5 +118,5 @@ object LaneDetection {
         }
     }
 
-    private fun isEnabled() = GardenAPI.inGarden() && laneDetection
+    private fun isEnabled() = GardenAPI.inGarden() && detection
 }
