@@ -9,12 +9,14 @@ import at.hannibal2.skyhanni.features.garden.GardenAPI
 import at.hannibal2.skyhanni.features.garden.farming.lane.FarmingLaneAPI.getValue
 import at.hannibal2.skyhanni.features.garden.farming.lane.FarmingLaneAPI.setValue
 import at.hannibal2.skyhanni.test.GriffinUtils.drawWaypointFilled
+import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.LocationUtils
 import at.hannibal2.skyhanni.utils.LorenzColor
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils.round
 import at.hannibal2.skyhanni.utils.RenderUtils.drawDynamicText
 import at.hannibal2.skyhanni.utils.RenderUtils.renderStrings
+import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.SoundUtils
 import at.hannibal2.skyhanni.utils.SoundUtils.playSound
 import at.hannibal2.skyhanni.utils.TimeUtils.format
@@ -36,6 +38,8 @@ object LaneDisplay {
     private var timeRemaining: Duration? = null
     private var lastSpeed = 0.0
     private var validSpeed = false
+    private var lastTimeFarming = SimpleTimeMark.farPast()
+    private var lastDirection = 0
 
     @SubscribeEvent
     fun onGardenToolChange(event: GardenToolChangeEvent) {
@@ -65,12 +69,23 @@ object LaneDisplay {
         val diff = oldValue - position
         LaneDisplay.oldValue = position
 
-        remainingDistance = if (diff > 0) {
-            (min - position).absoluteValue
+        val newDirection = if (diff > 0) {
+            1
         } else if (diff < 0) {
-            (max - position).absoluteValue
+            -1
         } else {
-            remainingDistance
+            0
+        }
+        if (newDirection != lastDirection) {
+            // reset farming time, to prevent wrong lane warnings
+            lastTimeFarming = SimpleTimeMark.farPast()
+            lastDirection = newDirection
+        }
+
+        remainingDistance = when (lastDirection) {
+            1 -> (min - position).absoluteValue
+            -1 -> (max - position).absoluteValue
+            else -> remainingDistance
         }
 
         if (!GardenAPI.isCurrentlyFarming()) return
@@ -93,12 +108,15 @@ object LaneDisplay {
         val speedTooSlow = speedPerSecond < 1
         if (speedTooSlow) {
             validSpeed = false
+//             validFarming = false
             return
         }
         // only use time if it is consistent
         if (lastSpeed != speedPerSecond) {
             lastSpeed = speedPerSecond
             validSpeed = false
+//             lastTimeFarming = SimpleTimeMark.farPast()
+//             validFarming = false
             return
         }
 
@@ -107,7 +125,14 @@ object LaneDisplay {
         val timeRemaining = (remainingDistance / speedPerSecond).seconds
         val settings = config.notification.settings
         LaneDisplay.timeRemaining = timeRemaining
-        if (timeRemaining >= settings.warnSeconds.seconds) return
+        val warnAt = settings.secondsBefore.seconds
+        if (timeRemaining >= warnAt) {
+            lastTimeFarming = SimpleTimeMark.now()
+            return
+        }
+
+        // When the player was not inside the farm yet
+        if (lastTimeFarming.passedSince() > warnAt) return
 
         with(settings) {
             LorenzUtils.sendTitle(color.getChatColor() + text, duration.seconds)

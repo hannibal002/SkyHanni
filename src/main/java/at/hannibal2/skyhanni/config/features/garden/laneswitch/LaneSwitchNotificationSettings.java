@@ -29,11 +29,11 @@ public class LaneSwitchNotificationSettings {
     public double duration = 2.5;
 
     @Expose
-    @ConfigOption(name = "Seconds Before Duration", desc = "How many seconds before reaching the end of the lane should the warning happen?")
+    @ConfigOption(name = "Seconds Before", desc = "How many seconds before reaching the end of the lane should the warning happen?")
     @ConfigEditorSlider(
         minValue = 1,
         maxValue = 10,
         minStep = 1
     )
-    public int warnSeconds = 5;
+    public int secondsBefore = 5;
 }
