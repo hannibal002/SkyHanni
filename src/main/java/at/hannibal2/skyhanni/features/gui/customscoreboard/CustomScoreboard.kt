@@ -9,11 +9,9 @@
 //  - countdown events like fishing festival + fiesta when its not on tablist
 //  - CookieAPI https://discord.com/channels/997079228510117908/1162844830360146080/1195695210433351821
 //  - Rng meter display
-//  - shorten time till next mayor https://discord.com/channels/997079228510117908/1162844830360146080/1216440046320746596
 //  - option to hide coins earned
 //  - color options in the purse etc lines
 //  - choose the amount of decimal places in shorten nums
-//  - ~~very important bug fix: duplex is weird :(~~ will be fixed with empas quiverapi overhaul
 //  - more anchor points (alignment enums in renderutils)
 //
 
