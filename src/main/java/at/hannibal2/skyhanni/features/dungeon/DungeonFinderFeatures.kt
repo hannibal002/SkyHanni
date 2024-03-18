@@ -149,6 +149,8 @@ class DungeonFinderFeatures {
 
         val chestName = InventoryUtils.openInventoryName()
         if (chestName != "Party Finder") return
+        val allowedSlots = (10..34).filter { it !in listOf(17, 18, 26, 27) }
+        if (event.slot.slotNumber !in allowedSlots) return
 
         val stack = event.itemStack
 
