@@ -32,8 +32,8 @@ class QuiverDisplay {
     private val config get() = SkyHanniMod.feature.misc.quiverDisplay
 
     private var display = emptyList<Renderable>()
-    private var arrow = QuiverAPI.currentArrow
-    private var amount = 0
+    private var arrow: ArrowType? = null
+    private var amount = QuiverAPI.currentAmount
     private var hideAmount = false
     private var arrowsUsedInRun = mutableListOf<ArrowType>()
     private var arrowsToAlert = mutableListOf<String>()
@@ -42,6 +42,8 @@ class QuiverDisplay {
     @SubscribeEvent
     fun onProfileJoin(event: ProfileJoinEvent) {
         display = emptyList()
+        arrow = QuiverAPI.currentArrow
+        amount = QuiverAPI.currentAmount
         updateDisplay()
     }
 
