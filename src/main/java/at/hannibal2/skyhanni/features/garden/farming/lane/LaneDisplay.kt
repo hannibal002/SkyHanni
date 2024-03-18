@@ -43,7 +43,16 @@ object LaneDisplay {
 
     @SubscribeEvent
     fun onGardenToolChange(event: GardenToolChangeEvent) {
-        currentLane = lanes[event.crop]
+        val crop = event.crop
+        currentLane = lanes[crop]
+        if (crop != null && currentLane == null) {
+            if (config.distanceUntilSwitch || config.switchNotification) {
+                ChatUtils.clickableChat(
+                    "No ${crop.cropName} lane defined yet! Use §e/shlanedetection",
+                    command = "shlanedetection"
+                )
+            }
+        }
     }
 
     @SubscribeEvent
