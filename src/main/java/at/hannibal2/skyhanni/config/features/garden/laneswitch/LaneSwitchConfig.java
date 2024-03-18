@@ -10,10 +10,10 @@ import io.github.moulberry.moulconfig.annotations.ConfigOption;
 public class LaneSwitchConfig {
 
     @Expose
-    @ConfigOption(name = "Enabled", desc = "Sends a notification when approaching the end of a lane.")
+    @ConfigOption(name = "Switch Notification", desc = "Sends a notification when approaching the end of a lane and you should switch lanes.")
     @ConfigEditorBoolean
     @FeatureToggle
-    public boolean enabled = false;
+    public boolean switchNotification = false;
 
     @Expose
     @ConfigOption(name = "Distance until Switch", desc = "Displays the remaining distance until the next switch.")
