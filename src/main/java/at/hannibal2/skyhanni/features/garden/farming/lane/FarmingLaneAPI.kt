@@ -14,7 +14,7 @@ import kotlin.time.Duration.Companion.seconds
 object FarmingLaneAPI {
     val config get() = GardenAPI.config.farmingLane
 
-    val lanes = mutableMapOf<CropType, FarmingLane>()
+    val lanes get() = GardenAPI.storage?.farmingLanes
     var currentLane: FarmingLane? = null
     private var lastNoLaneWarning = SimpleTimeMark.farPast()
     private var lastCrop: CropType? = null
@@ -33,6 +33,7 @@ object FarmingLaneAPI {
         if (crop == lastCrop) return
         lastCrop = crop
 
+        val lanes = lanes ?: return
         val lane = lanes[crop]
         if (lane == null) {
             warnNoLane(crop)

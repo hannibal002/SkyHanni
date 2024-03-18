@@ -76,7 +76,8 @@ object FarmingLaneCreator {
 
     private fun saveLane(a: LorenzVec, b: LorenzVec, crop: CropType) {
         val lane = createLane(a, b)
-        FarmingLaneAPI.lanes[crop] = lane
+        val lanes = FarmingLaneAPI.lanes ?: return
+        lanes[crop] = lane
         FarmingLaneAPI.currentLane = lane
         ChatUtils.chat("${crop.cropName} lane saved! Farming Lane features are now working.")
         reset()
@@ -85,7 +86,8 @@ object FarmingLaneCreator {
     private fun createLane(a: LorenzVec, b: LorenzVec): FarmingLane {
         val diffX = a.x - b.x
         val diffZ = a.z - b.z
-        val direction = if (diffZ.absoluteValue > diffX.absoluteValue) FarmingDirection.NORTH_SOUTH else FarmingDirection.OST_WEST
+        val direction =
+            if (diffZ.absoluteValue > diffX.absoluteValue) FarmingDirection.NORTH_SOUTH else FarmingDirection.OST_WEST
 
         val min = min(direction.getValue(a), direction.getValue(b))
         val max = max(direction.getValue(a), direction.getValue(b))
