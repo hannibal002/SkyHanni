@@ -58,7 +58,7 @@ object FarmingLaneFeatures {
                 add("§7Distance until switch: §e${currentDistance.round(1)}")
                 val color = if (validSpeed) "§b" else "§8"
                 val timeRemaining = timeRemaining ?: return@buildList
-                val format = timeRemaining.format(showMilliSeconds = timeRemaining < 5.seconds)
+                val format = timeRemaining.format(showMilliSeconds = timeRemaining < 20.seconds)
                 add("§7Time remaining: $color$format")
             }
         }
