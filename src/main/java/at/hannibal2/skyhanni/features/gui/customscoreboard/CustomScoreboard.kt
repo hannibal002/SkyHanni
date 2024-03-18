@@ -99,28 +99,29 @@ class CustomScoreboard {
 
     private fun createLines() = buildList<ScoreboardElementType> {
         for (element in config.scoreboardEntries) {
-            val line = element.getVisiblePair()
+            val lines = element.getVisiblePair()
+            if (lines.isEmpty()) continue
 
             // Hide consecutive empty lines
             if (
                 informationFilteringConfig.hideConsecutiveEmptyLines &&
-                line.isNotEmpty() && line[0].first == "<empty>" && lastOrNull()?.first?.isEmpty() == true
+                lines.isNotEmpty() && lines[0].first == "<empty>" && lastOrNull()?.first?.isEmpty() == true
             ) {
                 continue
             }
 
             // Adds empty lines
-            if (line[0].first == "<empty>") {
+            if (lines[0].first == "<empty>") {
                 add("" to HorizontalAlignment.LEFT)
                 continue
             }
 
             // Does not display this line
-            if (line.any { it.first == "<hidden>" }) {
+            if (lines.any { it.first == "<hidden>" }) {
                 continue
             }
 
-            addAll(line)
+            addAll(lines)
         }
     }
 
