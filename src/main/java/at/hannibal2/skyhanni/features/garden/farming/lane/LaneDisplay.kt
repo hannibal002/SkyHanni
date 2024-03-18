@@ -30,7 +30,6 @@ object LaneDisplay {
 
     var currentLane: FarmingLane? = null
     private var oldValue: Double? = null
-    private var currentDirection = 0
     private var remainingDistance = 0.0
 
     private var display = listOf<String>()
@@ -66,16 +65,13 @@ object LaneDisplay {
         val diff = oldValue - position
         LaneDisplay.oldValue = position
 
-        if (diff > 0) {
-            currentDirection = 1
+        remainingDistance = if (diff > 0) {
+            (min - position).absoluteValue
         } else if (diff < 0) {
-            currentDirection = -1
+            (max - position).absoluteValue
+        } else {
+            remainingDistance
         }
-        remainingDistance = when (currentDirection) {
-            1 -> min - position
-            -1 -> max - position
-            else -> return
-        }.absoluteValue
 
         if (!GardenAPI.isCurrentlyFarming()) return
 
@@ -130,28 +126,10 @@ object LaneDisplay {
         val min = direction.setValue(location, lane.min)
         val max = direction.setValue(location, lane.max)
 
-        when (currentDirection) {
-            0 -> {
-                event.drawWaypointFilled(min, LorenzColor.YELLOW.toColor(), beacon = true)
-                event.drawDynamicText(min, "§eLane Corner", 1.5)
-                event.drawWaypointFilled(min, LorenzColor.YELLOW.toColor(), beacon = true)
-                event.drawDynamicText(min, "§eLane Corner", 1.5)
-            }
-
-            1 -> {
-                event.drawWaypointFilled(min, LorenzColor.RED.toColor(), beacon = true)
-                event.drawDynamicText(min, "§cLane End", 1.5)
-                event.drawWaypointFilled(max, LorenzColor.GREEN.toColor(), beacon = true)
-                event.drawDynamicText(max, "§aLane Start", 1.5)
-            }
-
-            -1 -> {
-                event.drawWaypointFilled(min, LorenzColor.GREEN.toColor(), beacon = true)
-                event.drawDynamicText(min, "§aLane Start", 1.5)
-                event.drawWaypointFilled(max, LorenzColor.RED.toColor(), beacon = true)
-                event.drawDynamicText(max, "§cLane End", 1.5)
-            }
-        }
+        event.drawWaypointFilled(min, LorenzColor.YELLOW.toColor(), beacon = true)
+        event.drawDynamicText(min, "§eLane Corner", 1.5)
+        event.drawWaypointFilled(max, LorenzColor.YELLOW.toColor(), beacon = true)
+        event.drawDynamicText(max, "§eLane Corner", 1.5)
     }
 
     @SubscribeEvent
