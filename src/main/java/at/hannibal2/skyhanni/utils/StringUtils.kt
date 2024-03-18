@@ -307,4 +307,7 @@ object StringUtils {
     fun String.isRoman(): Boolean {
         return UtilsPatterns.isRomanPattern.matches(this)
     }
+    fun isEmpty(message: String): Boolean {
+        return message.removeColor().trimWhiteSpaceAndResets().isEmpty()
+    }
 }
