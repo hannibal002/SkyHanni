@@ -87,7 +87,7 @@ object FarmingLaneCreator {
         val diffX = a.x - b.x
         val diffZ = a.z - b.z
         val direction =
-            if (diffZ.absoluteValue > diffX.absoluteValue) FarmingDirection.NORTH_SOUTH else FarmingDirection.OST_WEST
+            if (diffZ.absoluteValue > diffX.absoluteValue) FarmingDirection.NORTH_SOUTH else FarmingDirection.EAST_WEST
 
         val min = min(direction.getValue(a), direction.getValue(b))
         val max = max(direction.getValue(a), direction.getValue(b))
