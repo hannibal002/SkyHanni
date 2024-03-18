@@ -125,13 +125,13 @@ object MaxwellAPI {
             if (tunings?.isNotEmpty() == true) {
                 val tuningsInScoreboard = ScoreboardElement.TUNING in CustomScoreboard.config.scoreboardEntries
                 if (tuningsInScoreboard) {
-                    ChatUtils.chat("Talk to Maxwell again to update the tuning data in scoreboard.")
+                    ChatUtils.chat("Talk to Maxwell and open the Tuning Page again to update the tuning data in scoreboard.")
                 }
             }
         }
     }
 
-    // load earler, so that other features can already use the api in this event
+    // load earlier, so that other features can already use the api in this event
     @SubscribeEvent(priority = EventPriority.HIGH)
     fun onInventoryFullyLoaded(event: InventoryOpenEvent) {
         if (!isEnabled()) return
@@ -200,7 +200,7 @@ object MaxwellAPI {
     private fun loadThaumaturgyTunings(inventoryItems: Map<Int, ItemStack>) {
         val tunings = tunings ?: return
 
-        // Only load those rounded values if we dont have any valurs at all
+        // Only load those rounded values if we dont have any values at all
         if (tunings.isNotEmpty()) return
 
         val item = inventoryItems[51] ?: return
