@@ -6,7 +6,6 @@ import at.hannibal2.skyhanni.events.KuudraEnterEvent
 import at.hannibal2.skyhanni.events.LorenzChatEvent
 import at.hannibal2.skyhanni.events.LorenzTickEvent
 import at.hannibal2.skyhanni.events.LorenzWorldChangeEvent
-import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.LorenzVec
 import at.hannibal2.skyhanni.utils.NEUInternalName
 import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
@@ -40,8 +39,6 @@ class KuudraAPI {
             for (line in ScoreboardData.sidebarLinesFormatted) {
                 tierPattern.matchMatcher(line) {
                     val tier = group("tier").toInt()
-                    ChatUtils.chat("a")
-                    ChatUtils.chat("Entered kuudra tier $tier")
                     kuudraTier = tier
                     KuudraEnterEvent(tier).postAndCatch()
                 }
@@ -59,7 +56,6 @@ class KuudraAPI {
         val message = event.message
         completePattern.matchMatcher(message) {
             val tier = kuudraTier ?: return
-            ChatUtils.chat("completed $tier")
             KuudraCompleteEvent(tier).postAndCatch()
         }
     }
