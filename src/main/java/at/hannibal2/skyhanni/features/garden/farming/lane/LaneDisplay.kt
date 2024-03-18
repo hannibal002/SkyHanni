@@ -123,9 +123,9 @@ object LaneDisplay {
         validSpeed = true
 
         val timeRemaining = (remainingDistance / speedPerSecond).seconds
-        val settings = config.notification.settings
+        val switchSettings = config.switchSettings
         LaneDisplay.timeRemaining = timeRemaining
-        val warnAt = settings.secondsBefore.seconds
+        val warnAt = switchSettings.secondsBefore.seconds
         if (timeRemaining >= warnAt) {
             lastTimeFarming = SimpleTimeMark.now()
             return
@@ -134,8 +134,8 @@ object LaneDisplay {
         // When the player was not inside the farm yet
         if (lastTimeFarming.passedSince() > warnAt) return
 
-        with(settings) {
-            LorenzUtils.sendTitle(color.getChatColor() + text, duration.seconds)
+        with(switchSettings) {
+            LorenzUtils.sendTitle(text.replace("&", "§"), duration.seconds)
         }
         playUserSound()
     }
@@ -167,9 +167,8 @@ object LaneDisplay {
 
     @JvmStatic
     fun playUserSound() {
-        SoundUtils.createSound(
-            config.notification.sound.notificationSound,
-            config.notification.sound.notificationPitch,
-        ).playSound()
+        with(config.switchSounds) {
+            SoundUtils.createSound(name, pitch).playSound()
+        }
     }
 }

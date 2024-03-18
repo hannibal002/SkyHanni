@@ -1,8 +1,6 @@
 package at.hannibal2.skyhanni.config.features.garden.laneswitch;
 
-import at.hannibal2.skyhanni.utils.LorenzColor;
 import com.google.gson.annotations.Expose;
-import io.github.moulberry.moulconfig.annotations.ConfigEditorDropdown;
 import io.github.moulberry.moulconfig.annotations.ConfigEditorSlider;
 import io.github.moulberry.moulconfig.annotations.ConfigEditorText;
 import io.github.moulberry.moulconfig.annotations.ConfigOption;
@@ -10,14 +8,9 @@ import io.github.moulberry.moulconfig.annotations.ConfigOption;
 public class LaneSwitchNotificationSettings {
 
     @Expose
-    @ConfigOption(name = "Notification Text", desc = "The text to be displayed as the notification.")
+    @ConfigOption(name = "Notification Text", desc = "The text with color to be displayed as the notification.")
     @ConfigEditorText
-    public String text = "Lane Switch incoming.";
-
-    @ConfigOption(name = "Text Color", desc = "Notification text color. §eIf Chroma is gray, enable Chroma in Chroma settings.")
-    @Expose
-    @ConfigEditorDropdown
-    public LorenzColor color = LorenzColor.YELLOW;
+    public String text = "&eLane Switch incoming.";
 
     @Expose
     @ConfigOption(name = "Duration", desc = "The time the notification is displayed.")

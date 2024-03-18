@@ -25,14 +25,19 @@ public class LaneSwitchConfig {
     public Position distanceUntilSwitchPosition = new Position(0, 200, false, true);
 
     @Expose
-    @ConfigOption(name = "Start End Waypoints", desc = "Show start and end waypoints in the world.")
+    @ConfigOption(name = "Start End Waypoints", desc = "Show start and end waypoints for the current lane in the world.")
     @ConfigEditorBoolean
     @FeatureToggle
     public boolean startEndWaypoints = false;
 
     @Expose
-    @ConfigOption(name = "Notifications", desc = "")
+    @ConfigOption(name = "Sound Settings", desc = "")
     @Accordion
-    public LaneSwitchNotificationConfig notification = new LaneSwitchNotificationConfig();
+    public LaneSwitchSoundSettings switchSounds = new LaneSwitchSoundSettings();
+
+    @Expose
+    @ConfigOption(name = "Notification Settings", desc = "")
+    @Accordion
+    public LaneSwitchNotificationSettings switchSettings = new LaneSwitchNotificationSettings();
 
 }

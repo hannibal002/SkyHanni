@@ -12,12 +12,12 @@ public class LaneSwitchSoundSettings {
     @Expose
     @ConfigOption(name = "Notification Sound", desc = "The sound played for the notification.")
     @ConfigEditorText
-    public String notificationSound = "random.orb";
+    public String name = "random.orb";
 
     @Expose
     @ConfigOption(name = "Pitch", desc = "The pitch of the notification sound.")
     @ConfigEditorSlider(minValue = 0.5f, maxValue = 2.0f, minStep = 0.1f)
-    public float notificationPitch = 1.0f;
+    public float pitch = 1.0f;
 
     @ConfigOption(name = "Test Sound", desc = "Test current sound settings.")
     @ConfigEditorButton(buttonText = "Test")
