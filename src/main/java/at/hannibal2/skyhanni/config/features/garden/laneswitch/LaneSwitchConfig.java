@@ -22,13 +22,13 @@ public class LaneSwitchConfig {
     public boolean distanceUntilSwitch = false;
 
     @Expose
+    public Position distanceUntilSwitchPosition = new Position(0, 200, false, true);
+
+    @Expose
     @ConfigOption(name = "Start End Waypoints", desc = "Show start and end waypoints in the world.")
     @ConfigEditorBoolean
     @FeatureToggle
     public boolean startEndWaypoints = false;
-
-    @Expose
-    public Position distanceUntilSwitchPosition = new Position(0, 200, false, true);
 
     @Expose
     @ConfigOption(name = "Notifications", desc = "")

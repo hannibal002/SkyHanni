@@ -1,6 +1,6 @@
 package at.hannibal2.skyhanni.config.features.garden.laneswitch;
 
-import at.hannibal2.skyhanni.features.garden.farming.LaneDisplay;
+import at.hannibal2.skyhanni.features.garden.farming.lane.LaneDisplay;
 import at.hannibal2.skyhanni.utils.OSUtils;
 import com.google.gson.annotations.Expose;
 import io.github.moulberry.moulconfig.annotations.ConfigEditorButton;

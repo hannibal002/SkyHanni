@@ -4,7 +4,6 @@ import at.hannibal2.skyhanni.events.CropClickEvent
 import at.hannibal2.skyhanni.events.LorenzRenderWorldEvent
 import at.hannibal2.skyhanni.features.garden.CropType
 import at.hannibal2.skyhanni.features.garden.GardenAPI
-import at.hannibal2.skyhanni.features.garden.farming.LaneDisplay
 import at.hannibal2.skyhanni.features.garden.farming.lane.FarmingLaneAPI.getValue
 import at.hannibal2.skyhanni.test.GriffinUtils.drawWaypointFilled
 import at.hannibal2.skyhanni.utils.ChatUtils

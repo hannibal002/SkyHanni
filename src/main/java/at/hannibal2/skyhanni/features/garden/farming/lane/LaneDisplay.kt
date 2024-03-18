@@ -1,4 +1,4 @@
-package at.hannibal2.skyhanni.features.garden.farming
+package at.hannibal2.skyhanni.features.garden.farming.lane
 
 import at.hannibal2.skyhanni.events.GardenToolChangeEvent
 import at.hannibal2.skyhanni.events.GuiRenderEvent
@@ -6,7 +6,6 @@ import at.hannibal2.skyhanni.events.LorenzRenderWorldEvent
 import at.hannibal2.skyhanni.events.LorenzTickEvent
 import at.hannibal2.skyhanni.features.garden.CropType
 import at.hannibal2.skyhanni.features.garden.GardenAPI
-import at.hannibal2.skyhanni.features.garden.farming.lane.FarmingLane
 import at.hannibal2.skyhanni.features.garden.farming.lane.FarmingLaneAPI.getValue
 import at.hannibal2.skyhanni.features.garden.farming.lane.FarmingLaneAPI.setValue
 import at.hannibal2.skyhanni.test.GriffinUtils.drawWaypointFilled
@@ -65,7 +64,7 @@ object LaneDisplay {
             return
         }
         val diff = oldValue - position
-        this.oldValue = position
+        LaneDisplay.oldValue = position
 
         if (lastValueSaved.passedSince() > 1.seconds) return
         lastValueSaved = SimpleTimeMark.now()
@@ -94,7 +93,7 @@ object LaneDisplay {
         val timeRemaining = (remainingDistance / speedPerSecond).seconds
         val settings = config.notification.settings
         if (timeRemaining >= settings.warnSeconds.seconds) return
-        this.timeRemaining = timeRemaining
+        LaneDisplay.timeRemaining = timeRemaining
 
         with(settings) {
             LorenzUtils.sendTitle(color.getChatColor() + text, duration.seconds)
@@ -143,6 +142,6 @@ object LaneDisplay {
             ).playSound()
         }
 
-    private fun isEnabled() = GardenAPI.inGarden() && config.enabled
+    private fun isEnabled() = GardenAPI.isCurrentlyFarming() && config.enabled
 
 }
