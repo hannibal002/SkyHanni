@@ -125,7 +125,7 @@ object FarmingLaneFeatures {
 
         val timeRemaining = (currentDistance / speedPerSecond).seconds
         val switchSettings = config.laneSwitchNotification
-        FarmingLaneFeatures.timeRemaining = timeRemaining + 1.seconds
+        FarmingLaneFeatures.timeRemaining = timeRemaining
         val warnAt = switchSettings.secondsBefore.seconds
         if (timeRemaining >= warnAt) {
             lastTimeFarming = SimpleTimeMark.now()
