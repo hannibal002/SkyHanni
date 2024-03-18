@@ -86,17 +86,18 @@ object FarmingLaneFeatures {
 
         if (!GardenAPI.isCurrentlyFarming()) return
 
+        if (config.laneSwitchNotification.enabled) {
+            sendWarning()
+        }
+
         if (config.distanceDisplay) {
             display = buildList {
-                add("§7Distance until Switch: §e${remainingDistance.round(1)}")
+                add("§7Distance until switch: §e${remainingDistance.round(1)}")
                 val color = if (validSpeed) "§b" else "§8"
                 val timeRemaining = timeRemaining ?: return@buildList
                 val format = timeRemaining.format(showMilliSeconds = timeRemaining < 5.seconds)
                 add("§7Time remaining: $color$format")
             }
-        }
-        if (config.laneSwitchNotification.enabled) {
-            sendWarning()
         }
     }
 
