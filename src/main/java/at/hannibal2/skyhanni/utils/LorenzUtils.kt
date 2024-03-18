@@ -7,6 +7,7 @@ import at.hannibal2.skyhanni.data.Perk
 import at.hannibal2.skyhanni.data.TitleManager
 import at.hannibal2.skyhanni.events.GuiContainerEvent
 import at.hannibal2.skyhanni.features.dungeon.DungeonAPI
+import at.hannibal2.skyhanni.features.nether.KuudraAPI
 import at.hannibal2.skyhanni.mixins.transformers.AccessorGuiEditSign
 import at.hannibal2.skyhanni.test.TestBingo
 import at.hannibal2.skyhanni.utils.ChatUtils.lastButtonClicked
@@ -55,7 +56,7 @@ object LorenzUtils {
 
     val skyBlockArea get() = if (inSkyBlock) HypixelData.skyBlockArea else "?"
 
-    val inKuudraFight get() = IslandType.KUUDRA_ARENA.isInIsland()
+    val inKuudraFight get() = inSkyBlock && KuudraAPI.inKuudra()
 
     val noTradeMode get() = HypixelData.noTrade
 

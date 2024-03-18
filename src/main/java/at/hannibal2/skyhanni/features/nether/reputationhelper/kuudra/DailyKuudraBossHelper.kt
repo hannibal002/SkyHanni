@@ -1,18 +1,17 @@
-package at.hannibal2.skyhanni.features.nether.reputationhelper.dailykuudra
+package at.hannibal2.skyhanni.features.nether.reputationhelper.kuudra
 
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.config.storage.ProfileSpecificStorage
 import at.hannibal2.skyhanni.data.IslandType
-import at.hannibal2.skyhanni.data.ScoreboardData
 import at.hannibal2.skyhanni.data.jsonobjects.repo.CrimsonIsleReputationJson.ReputationQuest
-import at.hannibal2.skyhanni.events.LorenzChatEvent
+import at.hannibal2.skyhanni.events.KuudraCompleteEvent
 import at.hannibal2.skyhanni.events.LorenzRenderWorldEvent
+import at.hannibal2.skyhanni.features.nether.KuudraAPI
 import at.hannibal2.skyhanni.features.nether.reputationhelper.CrimsonIsleReputationHelper
 import at.hannibal2.skyhanni.test.GriffinUtils.drawWaypointFilled
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.CollectionUtils.addAsSingletonList
 import at.hannibal2.skyhanni.utils.LorenzColor
-import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils.isInIsland
 import at.hannibal2.skyhanni.utils.LorenzVec
 import at.hannibal2.skyhanni.utils.NEUItems.getItemStack
@@ -21,7 +20,7 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
 class DailyKuudraBossHelper(private val reputationHelper: CrimsonIsleReputationHelper) {
 
-    val kuudraTiers = mutableListOf<KuudraTier>()
+    val kuudraTiers = mutableListOf<KuudraAPI.KuudraTier>()
 
     private var kuudraLocation: LorenzVec? = null
     private var allKuudraDone = true
@@ -42,25 +41,10 @@ class DailyKuudraBossHelper(private val reputationHelper: CrimsonIsleReputationH
     }
 
     @SubscribeEvent
-    fun onChat(event: LorenzChatEvent) {
-        if (!LorenzUtils.inKuudraFight) return
-        if (!config.enabled) return
-
-        val message = event.message
-        if (!message.contains("KUUDRA DOWN!") || message.contains(":")) return
-
-        for (line in ScoreboardData.sidebarLines) {
-            if (line.contains("Kuudra's") && line.contains("Hollow") && line.contains("(")) {
-                val tier = line.substringAfter("(T").substring(0, 1).toInt()
-                val kuudraTier = getByTier(tier)!!
-                finished(kuudraTier)
-                return
-            }
-        }
-    }
-
-    private fun finished(kuudraTier: KuudraTier) {
-        ChatUtils.debug("Detected kuudra tier done: $kuudraTier")
+    fun onKuudraDone(event: KuudraCompleteEvent) {
+        val tier = event.kuudraTier
+        val kuudraTier = getByTier(tier) ?: return
+        ChatUtils.debug("Detected kuudra tier done: ${kuudraTier.getDisplayName()}")
         reputationHelper.questHelper.finishKuudra(kuudraTier)
         kuudraTier.doneToday = true
         updateAllKuudraDone()
@@ -109,7 +93,7 @@ class DailyKuudraBossHelper(private val reputationHelper: CrimsonIsleReputationH
             if (location != null) {
                 kuudraLocation = location
             }
-            kuudraTiers.add(KuudraTier(displayName, displayItem, location, tier))
+            kuudraTiers.add(KuudraAPI.KuudraTier(displayName, displayItem, location, tier))
 
             tier++
         }
@@ -118,7 +102,7 @@ class DailyKuudraBossHelper(private val reputationHelper: CrimsonIsleReputationH
     fun loadData(storage: ProfileSpecificStorage.CrimsonIsleStorage) {
         if (kuudraTiers.isEmpty()) return
         for (name in storage.kuudraTiersDone) {
-            getByDisplayName(name)!!.doneToday = true
+            getByDisplayName(name)?.doneToday = true
         }
         updateAllKuudraDone()
     }
