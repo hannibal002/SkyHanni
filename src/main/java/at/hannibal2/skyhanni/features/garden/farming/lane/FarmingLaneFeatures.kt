@@ -1,14 +1,13 @@
 package at.hannibal2.skyhanni.features.garden.farming.lane
 
-import at.hannibal2.skyhanni.events.GardenToolChangeEvent
 import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.LorenzRenderWorldEvent
 import at.hannibal2.skyhanni.events.LorenzTickEvent
+import at.hannibal2.skyhanni.events.farming.FarmingLaneSwitchEvent
 import at.hannibal2.skyhanni.features.garden.GardenAPI
 import at.hannibal2.skyhanni.features.garden.farming.lane.FarmingLaneAPI.getValue
 import at.hannibal2.skyhanni.features.garden.farming.lane.FarmingLaneAPI.setValue
 import at.hannibal2.skyhanni.test.GriffinUtils.drawWaypointFilled
-import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.LocationUtils
 import at.hannibal2.skyhanni.utils.LorenzColor
 import at.hannibal2.skyhanni.utils.LorenzUtils
@@ -25,9 +24,8 @@ import kotlin.time.Duration
 import kotlin.time.Duration.Companion.seconds
 
 object FarmingLaneFeatures {
-    private val config get() = GardenAPI.config.farmingLane
+    val config get() = FarmingLaneAPI.config
 
-    var currentLane: FarmingLane? = null
     private var oldValue: Double? = null
     private var remainingDistance = 0.0
 
@@ -39,18 +37,8 @@ object FarmingLaneFeatures {
     private var lastDirection = 0
 
     @SubscribeEvent
-    fun onGardenToolChange(event: GardenToolChangeEvent) {
-        val crop = event.crop
-        currentLane = FarmingLaneAPI.lanes[crop]
+    fun onFarmingLaneSwitch(event: FarmingLaneSwitchEvent) {
         display = emptyList()
-        if (crop != null && currentLane == null) {
-            if (config.distanceDisplay || config.laneSwitchNotification.enabled) {
-                ChatUtils.clickableChat(
-                    "No ${crop.cropName} lane defined yet! Use §e/shlanedetection",
-                    command = "shlanedetection"
-                )
-            }
-        }
     }
 
     @SubscribeEvent
@@ -58,7 +46,7 @@ object FarmingLaneFeatures {
         if (!GardenAPI.inGarden()) return
         if (!event.isMod(2)) return
 
-        val lane = currentLane ?: return
+        val lane = FarmingLaneAPI.currentLane ?: return
         val direction = lane.direction
         val min = lane.min
         val max = lane.max
@@ -118,13 +106,12 @@ object FarmingLaneFeatures {
             validSpeed = false
             return
         }
-        // only use time if it is consistent
+        // only calculate the time if the speed has not changed
         if (lastSpeed != speedPerSecond) {
             lastSpeed = speedPerSecond
             validSpeed = false
             return
         }
-
         validSpeed = true
 
         val timeRemaining = (remainingDistance / speedPerSecond).seconds
@@ -136,7 +123,7 @@ object FarmingLaneFeatures {
             return
         }
 
-        // When the player was not inside the farm yet
+        // When the player was not inside the farm previously
         if (lastTimeFarming.passedSince() > warnAt) return
 
         with(switchSettings) {
@@ -150,7 +137,7 @@ object FarmingLaneFeatures {
         if (!GardenAPI.inGarden()) return
         if (!config.cornerWaypoints) return
 
-        val lane = currentLane ?: return
+        val lane = FarmingLaneAPI.currentLane ?: return
         val direction = lane.direction
         val location = LocationUtils.playerLocation()
         val min = direction.setValue(location, lane.min)
@@ -167,7 +154,7 @@ object FarmingLaneFeatures {
         if (!GardenAPI.inGarden()) return
         if (!config.distanceDisplay) return
 
-        config.distanceUntilSwitchPosition.renderStrings(display, posLabel = "Lane Display")
+        config.distanceDisplayPosition.renderStrings(display, posLabel = "Lane Display")
     }
 
     @JvmStatic

@@ -27,7 +27,7 @@ public class FarmingLaneConfig {
     public boolean distanceDisplay = false;
 
     @Expose
-    public Position distanceUntilSwitchPosition = new Position(0, 200, false, true);
+    public Position distanceDisplayPosition = new Position(0, 200, false, true);
 
     @Expose
     @ConfigOption(name = "Corner Waypoints", desc = "Show the corner for the current lane in the world.")

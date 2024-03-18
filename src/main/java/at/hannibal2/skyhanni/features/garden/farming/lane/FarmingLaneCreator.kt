@@ -17,6 +17,7 @@ import kotlin.math.max
 import kotlin.math.min
 
 object FarmingLaneCreator {
+    val config get() = FarmingLaneAPI.config
 
     private var detection = false
     private var start: LorenzVec? = null
@@ -76,8 +77,8 @@ object FarmingLaneCreator {
     private fun saveLane(a: LorenzVec, b: LorenzVec, crop: CropType) {
         val lane = createLane(a, b)
         FarmingLaneAPI.lanes[crop] = lane
-        FarmingLaneFeatures.currentLane = lane
-        ChatUtils.chat("${crop.cropName} lane saved. You can stop now.")
+        FarmingLaneAPI.currentLane = lane
+        ChatUtils.chat("${crop.cropName} lane saved! Farming Lane features are now working.")
         reset()
     }
 
