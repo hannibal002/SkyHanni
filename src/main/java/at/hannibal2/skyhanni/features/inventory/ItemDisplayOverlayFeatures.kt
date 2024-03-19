@@ -184,12 +184,13 @@ object ItemDisplayOverlayFeatures {
 
         if (RANCHERS_BOOTS_SPEED.isSelected() && internalName == "RANCHERS_BOOTS".asInternalName()) {
             item.getRanchersSpeed()?.let {
-                val text = if (it > 999) "1k" else "$it"
-                var effectiveSpeedCap = 400
-                if (PetAPI.isCurrentPet("Black Cat") ||
-                        InventoryUtils.getHelmet()?.getInternalName() == "RACING_HELMET".asInternalName() ||
-                        (GardenAPI.inGarden() && InventoryUtils.getItemInHand()?.getInternalName() == "CACTUS_KNIFE".asInternalName())) {
-                    effectiveSpeedCap = 500
+                val isUsingBlackCat = PetAPI.isCurrentPet("Black Cat")
+                val helmet = InventoryUtils.getHelmet()?.getInternalName()
+                val hand = InventoryUtils.getItemInHand()?.getInternalName()
+                val racingHelmet = "RACING_HELMET".asInternalName()
+                val cactusKnife = "CACTUS_KNIFE".asInternalName()
+                val is500 = isUsingBlackCat || helmet == racingHelmet || (GardenAPI.inGarden() && hand == cactusKnife)
+                val effectiveSpeedCap = if (is500) 500 else 400
                 }
                 return if (it > effectiveSpeedCap) "§c$text" else "§a$text"
             }
