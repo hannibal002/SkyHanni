@@ -32,104 +32,143 @@ private fun getSbLines(): List<String> {
     return ScoreboardData.sidebarLinesFormatted
 }
 
-enum class ScoreboardEvents(private val displayLine: Supplier<List<String>>, private val showWhen: () -> Boolean) {
+enum class ScoreboardEvents(
+    private val displayLine: Supplier<List<String>>,
+    private val showWhen: () -> Boolean,
+    private val configLine: String
+) {
     VOTING(
         ::getVotingLines,
-        ::getVotingShowWhen
+        ::getVotingShowWhen,
+        "§7(All Voting Lines)"
     ),
     SERVER_CLOSE(
         ::getServerCloseLines,
-        ::getServerCloseShowWhen
+        ::getServerCloseShowWhen,
+        "§cServer closing soon!"
     ),
     DUNGEONS(
         ::getDungeonsLines,
-        ::getDungeonsShowWhen
+        ::getDungeonsShowWhen,
+        "§7(All Dungeons Lines)"
     ),
     KUUDRA(
         ::getKuudraLines,
-        ::getKuudraShowWhen
+        ::getKuudraShowWhen,
+        "§7(All Kuudra Lines)"
     ),
     DOJO(
         ::getDojoLines,
-        ::getDojoShowWhen
+        ::getDojoShowWhen,
+        "§7(ALl Dojo Lines)"
     ),
     DARK_AUCTION(
         ::getDarkAuctionLines,
-        ::getDarkAuctionShowWhen
+        ::getDarkAuctionShowWhen,
+        "Time Left: §b11\n" +
+            "Current Item:\n" +
+            " §5Travel Scroll to Sirius"
     ),
     JACOB_CONTEST(
         ::getJacobContestLines,
-        ::getJacobContestShowWhen
+        ::getJacobContestShowWhen,
+        "§eJacob's Contest\n" +
+            "§e○ §fCarrot §a18m17s\n" +
+            " Collected §e8,264"
     ),
     JACOB_MEDALS(
         ::getJacobMedalsLines,
-        ::getJacobMedalsShowWhen
+        ::getJacobMedalsShowWhen,
+        "§6§lGOLD §fmedals: §613\n" +
+            "§f§lSILVER §fmedals: §f3\n" +
+            "§c§lBRONZE §fmedals: §c4"
     ),
     TRAPPER(
         ::getTrapperLines,
-        ::getTrapperShowWhen
+        ::getTrapperShowWhen,
+        "Pelts: §5711\n" +
+            "Tracker Mob Location:\n" +
+            "§bMushroom Gorge"
     ),
     GARDEN_CLEAN_UP(
         ::getGardenCleanUpLines,
-        ::getGardenCleanUpShowWhen
+        ::getGardenCleanUpShowWhen,
+        "Cleanup: §c12.6%"
     ),
     GARDEN_PASTING(
         ::getGardenPastingLines,
-        ::getGardenPastingShowWhen
+        ::getGardenPastingShowWhen,
+        "§fBarn Pasting§7: §e12.3%"
     ),
     FLIGHT_DURATION(
         ::getFlightDurationLines,
-        ::getFlightDurationShowWhen
+        ::getFlightDurationShowWhen,
+        "Flight Duration: §a10m 0s"
     ),
     WINTER(
         ::getWinterLines,
-        ::getWinterShowWhen
+        ::getWinterShowWhen,
+        "§7(All Winter Event Lines)"
     ),
     SPOOKY(
         ::getSpookyLines,
-        ::getSpookyShowWhen
+        ::getSpookyShowWhen,
+        "§7(All Spooky Event Lines)"
     ),
     BROODMOTHER(
         ::getBroodmotherLines,
-        ::getBroodmotherShowWhen
-    ),
-    ORINGO(
-        ::getOringoLines,
-        ::getOringoShowWhen
+        ::getBroodmotherShowWhen,
+        "§4Broodmother§7: §eDormant"
     ),
     MINING_EVENTS(
         ::getMiningEventsLines,
-        ::getMiningEventsShowWhen
+        ::getMiningEventsShowWhen,
+        "§7(All Mining Event Lines)"
     ),
     DAMAGE(
         ::getDamageLines,
-        ::getDamageShowWhen
+        ::getDamageShowWhen,
+        "Dragon HP: §a6,180,925 §c❤\n" +
+            "Your Damage: §c375,298.5"
     ),
     MAGMA_BOSS(
         ::getMagmaBossLines,
-        ::getMagmaBossShowWhen
+        ::getMagmaBossShowWhen,
+        "§7(All Magma Boss Lines)\n" +
+            "§7Boss: §c0%\n" +
+            "§7Damage Soaked:\n" +
+            "§e▎▎▎▎▎▎▎▎▎▎▎▎▎▎▎▎▎▎▎▎§7▎▎▎▎▎"
     ),
     ESSENCE(
         ::getEssenceLines,
-        ::getEssenceShowWhen
+        ::getEssenceShowWhen,
+        "Dragon Essence: §d1,285"
     ),
     EFFIGIES(
         ::getEffigiesLines,
-        ::getEffigiesShowWhen
+        ::getEffigiesShowWhen,
+        "Effigies: §c⧯§c⧯⧯§7⧯§c⧯§c⧯"
     ),
     ACTIVE_TABLIST_EVENTS(
         ::getActiveEventLine,
-        ::getActiveEventShowWhen
+        ::getActiveEventShowWhen,
+        "§7(All Active Tablist Events)"
     ),
     REDSTONE(
         ::getRedstoneLines,
-        ::getRedstoneShowWhen
+        ::getRedstoneShowWhen,
+        "§e§l⚡ §cRedstone: §e§b7%"
     ),
 
     NONE(
         ::getNoneLines,
-        { false }
+        { false },
+        "§cNo Events."
     );
+
+    override fun toString(): String {
+        return configLine
+    }
 
     fun getLines(): List<String> {
         return displayLine.get()
