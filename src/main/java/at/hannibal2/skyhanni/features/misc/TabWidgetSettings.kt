@@ -61,10 +61,10 @@ class TabWidgetSettings {
         if (mainPageSettingPattern.matches(inventoryName.uppercase())) {
             val items = event.inventoryItems.filter { mainPageWidgetPattern.anyMatches(it.value.getLore()) }
             for ((slot, stack) in items) {
-                if (enabledPattern.anyMatches(stack.getLore())) {
-                    highlights[slot] = LorenzColor.GREEN
+                highlights[slot] =  if (enabledPattern.anyMatches(stack.getLore())) {
+                    LorenzColor.GREEN
                 } else {
-                    highlights[slot] = LorenzColor.RED
+                    LorenzColor.RED
                 }
             }
         }
