@@ -18,7 +18,7 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
 class DungeonCopilot {
 
-    private val config get() = SkyHanniMod.feature.dungeon
+    private val config get() = SkyHanniMod.feature.dungeon.dungeonCopilot
 
     private val patternGroup = RepoPattern.group("dungeon.copilot")
     private val countdownPattern by patternGroup.pattern(
@@ -145,14 +145,14 @@ class DungeonCopilot {
     }
 
     private fun isEnabled(): Boolean {
-        return LorenzUtils.inDungeons && config.dungeonCopilot.enabled
+        return LorenzUtils.inDungeons && config.enabled
     }
 
     @SubscribeEvent
     fun onRenderOverlay(event: GuiRenderEvent.GuiOverlayRenderEvent) {
         if (!isEnabled()) return
 
-        config.dungeonCopilot.pos.renderString(nextStep, posLabel = "Dungeon Copilot")
+        config.pos.renderString(nextStep, posLabel = "Dungeon Copilot")
     }
 
     @SubscribeEvent
