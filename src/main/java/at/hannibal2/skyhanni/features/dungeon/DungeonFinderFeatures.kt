@@ -109,7 +109,7 @@ class DungeonFinderFeatures {
     )
     private val detectDungeonClassPattern by patternGroup.pattern(
         "detect.dungeon.class",
-        "(View and select a dungeon class.)"
+        "§7View and select a dungeon class."
     )
 
     private val allowedSlots = (10..34).filter { it !in listOf(17, 18, 26, 27) }
@@ -146,7 +146,6 @@ class DungeonFinderFeatures {
             val name = stack.displayName.removeColor()
             map[slot] = if (anyFloorPattern.matches(name)) {
                 "A"
-
             } else if (entranceFloorPattern.matches(name)) {
                 "E"
             } else if (floorPattern.matches(name)) {
