@@ -35,6 +35,8 @@ class DungeonFinderFeatures {
     private val classLevelPattern = " §.(?<playerName>.*)§f: §e(?<className>.*)§b \\(§e(?<level>.*)§b\\)".toPattern()
     private val notePattern = "^(§7§7Note: |§f[^§])".toRegex()
 
+    private val allowedSlots = (10..34).filter { it !in listOf(17, 18, 26, 27) }
+
     private var selectedClass = ""
 
     @SubscribeEvent
@@ -147,9 +149,7 @@ class DungeonFinderFeatures {
     fun onItemTooltip(event: LorenzToolTipEvent) {
         if (!LorenzUtils.inSkyBlock) return
 
-        val chestName = InventoryUtils.openInventoryName()
-        if (chestName != "Party Finder") return
-        val allowedSlots = (10..34).filter { it !in listOf(17, 18, 26, 27) }
+        if (InventoryUtils.openInventoryName() != "Party Finder") return
         if (event.slot.slotNumber !in allowedSlots) return
 
         val stack = event.itemStack
