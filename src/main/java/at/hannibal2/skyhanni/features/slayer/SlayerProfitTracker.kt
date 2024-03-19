@@ -181,7 +181,7 @@ object SlayerProfitTracker {
                     listOf("§7You paid §c$mobKillCoinsFormat §7in total", "§7for starting the slayer quests.")
                 )
             )
-            profit -= slayerSpawnCost
+            profit += slayerSpawnCost
         }
 
         val slayerCompletedCount = itemLog.slayerCompletedCount
