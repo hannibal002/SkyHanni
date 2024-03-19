@@ -44,6 +44,8 @@
 + Lane Switch Notification - ILike2WatchMemes
     + Sends a notification when approaching the end of a lane in Garden while farming.
     + Displays the distance until the end of a lane.
++ Made Rancher's Boots the stack size display account for the Cactus Knife now giving +100 speed cap while in the Garden. - Alexia Luna (https://github.com/hannibal002/SkyHanni/pull/1149)
+    + Speed cap above 500 will now display as red because Hypixel now allows this for some reason, but it is practically unachievable. Also, the 1000 speed cap will now show up as 1k, so the text doesn't overflow into the slot to the left.
 
 #### Mining Features
 
@@ -58,6 +60,10 @@
     + Hide the Hypixel Scoreboard, add a custom Image as a background, rounded corners.
     + Supports colored month names & better garden plot names.
     + A ton of settings.
+
+#### Event Features
+
++ Easter Egg Hunt 2024 waypoints. - Erymanthus + walker (https://github.com/hannibal002/SkyHanni/pull/1193)
 
 #### Misc Features
 
@@ -103,6 +109,12 @@
 + Show calculation breakdowns when hovering over Anita Medal Profit or SkyMart Coins per copper displays. -
   hannibal2 (https://github.com/hannibal002/SkyHanni/pull/1116)
 + Get garden level from SkyBlock Menu and Desk. - Empa (https://github.com/hannibal002/SkyHanni/pull/1164)
++ Partially rewrote the Lane Switch Warning feature. - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/1208)
+    + Works with every lane size.
+    + Option to show the corner of the current lane.
+    + Removed the need to open the plot inventory.
+    + More precise timer/distance calculation.
+    + Reordered Farming Lane config.
 
 #### Crimson Improvelemts
 
@@ -125,6 +137,7 @@
     + Option to show in compact mode.
     + Supports "Values First" option.
     + Change the number of tunings shown.
++ Improved the stats tuning message when Hypixel auto-adjusts your tuning points. - j10a1n15 (https://github.com/hannibal002/SkyHanni/pull/1212)
 
 #### Fishing Improvements
 
@@ -162,6 +175,7 @@
 + Fixed copy underbid keybind not working. - Obsidian
 + Fixed SkyBlock guide highlight missing tasks not working properly for minions and collections. - Thunderblade73
 + Fixed Harp Quick Restart not working when Harp GUI Scale is disabled. - Zickles
++ Fixed "Mark Missing Class" highlighting every party. - martimavocado (https://github.com/hannibal002/SkyHanni/pull/1211)
 
 #### Chat Fixes
 
@@ -188,6 +202,7 @@
 + Fixed tab list visitor name detection breaking when tab list said "new" -
   hannibal2 (https://github.com/hannibal002/SkyHanni/pull/1151)
 + Fixed garden features appearing while visiting other player's garden. - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/1188)
++ Fixed rare crash in /ff display. - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/1217)
 
 #### Command Fixes
 
@@ -198,6 +213,7 @@
 + Added Burningsoul Demon (75M HP miniboss) to line to miniboss and highlight slayer minibosses. -
   Empa (https://github.com/hannibal002/SkyHanni/pull/1144)
 + Fixed Damage Indicator not hiding vanilla names. - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/1179)
++ Fixed Slayer Profit Tracker not detecting the slayer spawn cost when taking money from the bank. - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/1218)
 
 #### Gui Fixes
 
@@ -234,6 +250,11 @@
     + Fixed dragon's line not being properly removed.
     + Fixed a line randomly showing "0" sometimes.
     + Fixed "Cleared..." line sometimes being black.
++ Custom Scoreboard Fixes. - j10a1n15 (https://github.com/hannibal002/SkyHanni/pull/1212)
+    + Fixed IndexOutOfBoundException.
+    + Fixed Instance Shutdown Line not being hidden.
+    + Fixed a broken Hypixel Scoreboard Line.
+    + Fixed New Year Line appearing twice.
 
 #### Dungeon Fixes
 
@@ -360,6 +381,12 @@
 + Added more repo patterns to the trapper feature and improved enum names. - CalMWolfs (https://github.com/hannibal002/SkyHanni/pull/1186)
 + Extracted player and profile specific storage into their own classes in a new packet. - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/1171)
 + Moved Thaumaturgy Tuning Points detection into MaxwellAPI, and saving it in the profile-specific config. - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/1201)
++ Add "open in regex101.com" IntelliJ intention. - !nea (https://github.com/hannibal002/SkyHanni/pull/1210)
+    + Press ALT+ENTER while hovering over a RepoPattern.pattern call with your text cursor to select the "Open regex101.com" option
+    + Add a Kotlin doc comment with `REGEX-TEST: someString` lines to add test cases
++ Creating and using FarmingLaneSwitchEvent. - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/1208)
++ Refactored all of `DungeonFinderFeatures.kt`. - Conutik (https://github.com/hannibal002/SkyHanni/pull/1180)
+    + Less laggy and resource intensive.
 
 ### Removed Features
 
