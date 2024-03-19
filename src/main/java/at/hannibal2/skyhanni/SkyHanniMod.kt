@@ -186,9 +186,11 @@ import at.hannibal2.skyhanni.features.garden.farming.GardenCropMilestoneDisplay
 import at.hannibal2.skyhanni.features.garden.farming.GardenCropSpeed
 import at.hannibal2.skyhanni.features.garden.farming.GardenCustomKeybinds
 import at.hannibal2.skyhanni.features.garden.farming.GardenStartLocation
-import at.hannibal2.skyhanni.features.garden.farming.LaneSwitchNotification
 import at.hannibal2.skyhanni.features.garden.farming.WildStrawberryDyeNotification
 import at.hannibal2.skyhanni.features.garden.farming.WrongFungiCutterWarning
+import at.hannibal2.skyhanni.features.garden.farming.lane.FarmingLaneAPI
+import at.hannibal2.skyhanni.features.garden.farming.lane.FarmingLaneCreator
+import at.hannibal2.skyhanni.features.garden.farming.lane.FarmingLaneFeatures
 import at.hannibal2.skyhanni.features.garden.fortuneguide.CaptureFarmingGear
 import at.hannibal2.skyhanni.features.garden.inventory.AnitaExtraFarmingFortune
 import at.hannibal2.skyhanni.features.garden.inventory.GardenCropMilestoneInventory
@@ -634,7 +636,9 @@ class SkyHanniMod {
         loadModule(GardenNextJacobContest)
         loadModule(WrongFungiCutterWarning())
         loadModule(ArmorDropTracker)
-        loadModule(LaneSwitchNotification())
+        loadModule(FarmingLaneAPI)
+        loadModule(FarmingLaneFeatures)
+        loadModule(FarmingLaneCreator)
         loadModule(JoinCrystalHollows())
         loadModule(CrystalHollowsNamesInCore())
         loadModule(GardenVisitorColorNames)
