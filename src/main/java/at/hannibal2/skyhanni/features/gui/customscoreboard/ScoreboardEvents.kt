@@ -180,6 +180,10 @@ enum class ScoreboardEvents(
                 add(eventsConfig.eventEntries.firstOrNull { it.showWhen() })
             }
         }
+
+        // I don't know why, but this field is needed for it to work
+        @kotlin.jvm.JvmField
+        val defaultOption = listOf(VOTING, SERVER_CLOSE, DUNGEONS, KUUDRA, DOJO, DARK_AUCTION, JACOB_CONTEST, JACOB_MEDALS, TRAPPER, GARDEN_CLEAN_UP, GARDEN_PASTING, FLIGHT_DURATION, WINTER, SPOOKY, BROODMOTHER, MINING_EVENTS, DAMAGE, MAGMA_BOSS, ESSENCE, EFFIGIES, ACTIVE_TABLIST_EVENTS)
     }
 }
 

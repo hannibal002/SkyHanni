@@ -17,7 +17,7 @@ public class EventsConfig {
         desc = "Drag your list to select the priority of each event."
     )
     @ConfigEditorDraggableList()
-    public List<ScoreboardEvents> eventEntries = new ArrayList<>(ScoreboardEvents.getEntries());
+    public List<ScoreboardEvents> eventEntries = new ArrayList<>(ScoreboardEvents.defaultOption);
 
 
     @Expose
