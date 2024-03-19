@@ -149,6 +149,8 @@ class DungeonFinderFeatures {
 
         val chestName = InventoryUtils.openInventoryName()
         if (chestName != "Party Finder") return
+        val allowedSlots = (10..34).filter { it !in listOf(17, 18, 26, 27) }
+        if (event.slot.slotNumber !in allowedSlots) return
 
         val stack = event.itemStack
 
@@ -165,9 +167,14 @@ class DungeonFinderFeatures {
         }
         if (!config.showMissingClasses) return
         if (stack.getLore().firstOrNull()?.removeColor()?.startsWith("Dungeon:") == false) return
-        if (classNames.contains(selectedClass)) selectedClass = "§a${selectedClass}§7"
+        var uncoloredSelectedClass = ""
+        if (classNames.contains(selectedClass)) {
+            uncoloredSelectedClass = selectedClass
+            selectedClass = "§a${selectedClass}§7"
+        }
         event.toolTip.add("")
         event.toolTip.add("§cMissing: §7" + classNames.createCommaSeparatedList())
+        if (uncoloredSelectedClass.isNotEmpty()) selectedClass = uncoloredSelectedClass
     }
 
     @SubscribeEvent
