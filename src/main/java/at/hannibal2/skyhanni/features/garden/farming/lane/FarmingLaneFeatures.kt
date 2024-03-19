@@ -46,11 +46,13 @@ object FarmingLaneFeatures {
     fun onTick(event: LorenzTickEvent) {
         if (!GardenAPI.inGarden()) return
         if (!event.isMod(2)) return
-        if (!calculateInFarm()) return
+        if (!config.distanceDisplay && !config.laneSwitchNotification.enabled) return
+
+        if (!calculateDistance()) return
         if (!GardenAPI.isCurrentlyFarming()) return
 
-        if (config.laneSwitchNotification.enabled) {
-            sendWarning()
+        if (calculateSpeed()) {
+            showWarning()
         }
 
         if (config.distanceDisplay) {
@@ -64,7 +66,7 @@ object FarmingLaneFeatures {
         }
     }
 
-    private fun calculateInFarm(): Boolean {
+    private fun calculateDistance(): Boolean {
         val lane = FarmingLaneAPI.currentLane ?: return false
         val min = lane.min
         val max = lane.max
@@ -108,38 +110,41 @@ object FarmingLaneFeatures {
         }
     }
 
-    private fun sendWarning() {
+    private fun showWarning() {
+        with(config.laneSwitchNotification) {
+            if (enabled) {
+                LorenzUtils.sendTitle(text.replace("&", "§"), 2.seconds)
+                playUserSound()
+            }
+        }
+    }
+
+    private fun calculateSpeed(): Boolean {
         val speedPerSecond = LocationUtils.distanceFromPreviousTick().round(2)
-        if (speedPerSecond == 0.0) return
+        if (speedPerSecond == 0.0) return false
         val speedTooSlow = speedPerSecond < 1
         if (speedTooSlow) {
             validSpeed = false
-            return
+            return false
         }
         // only calculate the time if the speed has not changed
         if (lastSpeed != speedPerSecond) {
             lastSpeed = speedPerSecond
             validSpeed = false
-            return
+            return false
         }
         validSpeed = true
 
         val timeRemaining = (currentDistance / speedPerSecond).seconds
-        val switchSettings = config.laneSwitchNotification
         FarmingLaneFeatures.timeRemaining = timeRemaining
-        val warnAt = switchSettings.secondsBefore.seconds
+        val warnAt = config.laneSwitchNotification.secondsBefore.seconds
         if (timeRemaining >= warnAt) {
             lastTimeFarming = SimpleTimeMark.now()
-            return
+            return false
         }
 
         // When the player was not inside the farm previously
-        if (lastTimeFarming.passedSince() > warnAt) return
-
-        with(switchSettings) {
-            LorenzUtils.sendTitle(text.replace("&", "§"), 2.seconds)
-        }
-        playUserSound()
+        return lastTimeFarming.passedSince() < warnAt
     }
 
     @SubscribeEvent
