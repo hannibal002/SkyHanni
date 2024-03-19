@@ -111,6 +111,8 @@ class DungeonFinderFeatures {
         "(View and select a dungeon class.)"
     )
 
+    private val allowedSlots = (10..34).filter { it !in listOf(17, 18, 26, 27) }
+
     //  Variables used
     private var selectedClass = ""
     private var floorStackSize = mapOf<Int, String>()
