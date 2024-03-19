@@ -6,19 +6,12 @@ import com.google.gson.annotations.Expose
 import com.google.gson.annotations.SerializedName
 
 data class NeuReforgeStoneJson(
-
     @Expose val internalName: NEUInternalName,
-
     @Expose val reforgeName: String,
-
     @Expose @SerializedName("itemTypes") val rawItemTypes: Any,
-
     @Expose val requiredRarities: List<LorenzRarity>,
-
     @Expose val reforgeCosts: Map<LorenzRarity, Long>,
-
     @Expose val reforgeStats: Map<LorenzRarity, Map<String, Double>>,
-
     @Expose @SerializedName("reforgeAbility") val rawReforgeAbility: Any?,
 ) {
 
