@@ -191,7 +191,7 @@ object ItemDisplayOverlayFeatures {
                 val cactusKnife = "CACTUS_KNIFE".asInternalName()
                 val is500 = isUsingBlackCat || helmet == racingHelmet || (GardenAPI.inGarden() && hand == cactusKnife)
                 val effectiveSpeedCap = if (is500) 500 else 400
-                }
+                val text = if (it > 999) "1k" else "$it"
                 return if (it > effectiveSpeedCap) "§c$text" else "§a$text"
             }
         }
