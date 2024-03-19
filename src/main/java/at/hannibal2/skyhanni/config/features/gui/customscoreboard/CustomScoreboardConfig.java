@@ -28,7 +28,7 @@ public class CustomScoreboardConfig {
         desc = "Drag text to change the appearance of the advanced scoreboard." // supporting both custom & advanced search
     )
     @ConfigEditorDraggableList()
-    public List<ScoreboardElement> scoreboardEntries = new ArrayList<>(ScoreboardElement.getEntries());
+    public List<ScoreboardElement> scoreboardEntries = new ArrayList<>(ScoreboardElement.defaultOption);
 
     @Expose
     @ConfigOption(name = "Display Options", desc = "")
