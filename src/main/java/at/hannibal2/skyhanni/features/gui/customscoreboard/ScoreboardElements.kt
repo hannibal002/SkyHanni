@@ -263,6 +263,7 @@ enum class ScoreboardElement(
             TIME,
             EVENTS,
             OBJECTIVE,
+            COOKIE,
             EMPTY_LINE3,
             QUIVER,
             POWER,
