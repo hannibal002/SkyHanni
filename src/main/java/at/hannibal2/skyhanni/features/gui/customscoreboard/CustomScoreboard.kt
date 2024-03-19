@@ -9,11 +9,9 @@
 //  - countdown events like fishing festival + fiesta when its not on tablist
 //  - CookieAPI https://discord.com/channels/997079228510117908/1162844830360146080/1195695210433351821
 //  - Rng meter display
-//  - shorten time till next mayor https://discord.com/channels/997079228510117908/1162844830360146080/1216440046320746596
 //  - option to hide coins earned
 //  - color options in the purse etc lines
 //  - choose the amount of decimal places in shorten nums
-//  - ~~very important bug fix: duplex is weird :(~~ will be fixed with empas quiverapi overhaul
 //  - more anchor points (alignment enums in renderutils)
 //
 
@@ -99,28 +97,29 @@ class CustomScoreboard {
 
     private fun createLines() = buildList<ScoreboardElementType> {
         for (element in config.scoreboardEntries) {
-            val line = element.getVisiblePair()
+            val lines = element.getVisiblePair()
+            if (lines.isEmpty()) continue
 
             // Hide consecutive empty lines
             if (
                 informationFilteringConfig.hideConsecutiveEmptyLines &&
-                line.isNotEmpty() && line[0].first == "<empty>" && lastOrNull()?.first?.isEmpty() == true
+                lines.first().first == "<empty>" && lastOrNull()?.first?.isEmpty() == true
             ) {
                 continue
             }
 
             // Adds empty lines
-            if (line[0].first == "<empty>") {
+            if (lines.first().first == "<empty>") {
                 add("" to HorizontalAlignment.LEFT)
                 continue
             }
 
             // Does not display this line
-            if (line.any { it.first == "<hidden>" }) {
+            if (lines.any { it.first == "<hidden>" }) {
                 continue
             }
 
-            addAll(line)
+            addAll(lines)
         }
     }
 

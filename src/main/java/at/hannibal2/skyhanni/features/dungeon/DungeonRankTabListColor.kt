@@ -25,7 +25,7 @@ class DungeonRankTabListColor {
 
             val className = group("className")
             val level = group("classLevel").romanToDecimal()
-            val color = getColor(level)
+            val color = DungeonFinderFeatures.getColor(level)
 
             event.text = "$sbLevel $cleanName §7(§e$className $color$level§7)"
         }
