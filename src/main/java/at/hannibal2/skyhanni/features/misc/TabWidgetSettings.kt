@@ -79,10 +79,11 @@ class TabWidgetSettings {
                 val loreLastLine = stack.getLore().lastOrNull()
 
                 if (subPageWidgetPattern.matches(loreLastLine ?: "")) {
-                    if (clickToDisablePattern.anyMatches(stack.getLore())) {
-                        highlights[slot] = LorenzColor.GREEN
+                    highlights[slot] = if (clickToDisablePattern.anyMatches(stack.getLore())) {
+                        LorenzColor.GREEN
                     } else {
-                        highlights[slot] = LorenzColor.RED
+                        LorenzColor.RED
+                    }
                     }
                 }
             }
