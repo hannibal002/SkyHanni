@@ -4,6 +4,7 @@ import at.hannibal2.skyhanni.data.HypixelData
 import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.data.ScoreboardData
 import at.hannibal2.skyhanni.features.gui.customscoreboard.CustomScoreboard.Companion.config
+import at.hannibal2.skyhanni.features.gui.customscoreboard.CustomScoreboard.Companion.eventsConfig
 import at.hannibal2.skyhanni.features.gui.customscoreboard.ScoreboardEvents.VOTING
 import at.hannibal2.skyhanni.features.gui.customscoreboard.ScoreboardPattern
 import at.hannibal2.skyhanni.features.misc.ServerRestartTitle
@@ -136,7 +137,7 @@ enum class ScoreboardEvents(private val displayLine: Supplier<List<String>>, pri
 
     companion object {
         fun getEvent(): List<ScoreboardEvents> {
-            if (config.displayConfig.showAllActiveEvents) {
+            if (eventsConfig.showAllActiveEvents) {
                 return entries.filter { it.showWhen() }
             }
             return listOf(entries.firstOrNull { it.showWhen() } ?: NONE)

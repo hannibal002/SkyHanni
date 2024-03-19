@@ -36,11 +36,6 @@ public class CustomScoreboardConfig {
     public DisplayConfig displayConfig = new DisplayConfig();
 
     @Expose
-    @ConfigOption(name = "Information Filtering", desc = "")
-    @Accordion
-    public InformationFilteringConfig informationFilteringConfig = new InformationFilteringConfig();
-
-    @Expose
     @ConfigOption(name = "Background Options", desc = "")
     @Accordion
     public BackgroundConfig backgroundConfig = new BackgroundConfig();
@@ -54,6 +49,12 @@ public class CustomScoreboardConfig {
     @ConfigOption(name = "Mayor Options", desc = "")
     @Accordion
     public MayorConfig mayorConfig = new MayorConfig();
+
+    @Expose
+    @ConfigOption(name = "Information Filtering", desc = "")
+    @Accordion
+    public InformationFilteringConfig informationFilteringConfig = new InformationFilteringConfig();
+
 
     @Expose
     @ConfigOption(name = "Unknown Lines warning", desc = "Gives a chat warning when unknown lines are found in the scoreboard.")
