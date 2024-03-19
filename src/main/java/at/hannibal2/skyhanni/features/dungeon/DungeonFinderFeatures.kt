@@ -21,6 +21,7 @@ import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraft.item.ItemStack
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
+// TODO Remove all removeColor calls in this class. Deal with the color code in regex.
 class DungeonFinderFeatures {
     private val config get() = SkyHanniMod.feature.dungeon.partyFinder
 
@@ -145,6 +146,7 @@ class DungeonFinderFeatures {
             val name = stack.displayName.removeColor()
             map[slot] = if (anyFloorPattern.matches(name)) {
                 "A"
+
             } else if (entranceFloorPattern.matches(name)) {
                 "E"
             } else if (floorPattern.matches(name)) {
@@ -166,13 +168,8 @@ class DungeonFinderFeatures {
             val floorNum = floorNumberPattern.matchMatcher(floor) {
                 group("floorNum").romanToDecimalIfNecessary()
             }
-            map[slot] = if (entranceFloorPattern.matches(floor)) {
-                "E"
-            } else if (masterModeFloorPattern.matches(dungeon)) {
-                "M$floorNum"
-            } else {
-                "F$floorNum"
-            }
+
+            map[slot] = getFloorName(floor, dungeon, floorNum)
         }
     }
 
@@ -194,16 +191,19 @@ class DungeonFinderFeatures {
             val floorNum = floorNumberPattern.matchMatcher(name) {
                 group("floorNum").romanToDecimalIfNecessary()
             } ?: continue
-            map[slot] = if (entranceFloorPattern.matches(name)) {
-                "E"
-            } else if (masterModeFloorPattern.matches(name)) {
-                "M$floorNum"
-            } else {
-                "F$floorNum"
-            }
+            map[slot] = getFloorName(name, name, floorNum)
         }
 
     }
+
+    private fun getFloorName(floor: String, dungeon: String, floorNum: Int?): String =
+        if (entranceFloorPattern.matches(floor)) {
+            "E"
+        } else if (masterModeFloorPattern.matches(dungeon)) {
+            "M$floorNum"
+        } else {
+            "F$floorNum"
+        }
 
     private fun highlightingHandler(event: InventoryOpenEvent): Map<Int, LorenzColor> {
         val map = mutableMapOf<Int, LorenzColor>()
