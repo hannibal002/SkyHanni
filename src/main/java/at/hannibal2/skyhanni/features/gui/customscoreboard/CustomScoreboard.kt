@@ -103,13 +103,13 @@ class CustomScoreboard {
             // Hide consecutive empty lines
             if (
                 informationFilteringConfig.hideConsecutiveEmptyLines &&
-                lines.isNotEmpty() && lines[0].first == "<empty>" && lastOrNull()?.first?.isEmpty() == true
+                lines.first().first == "<empty>" && lastOrNull()?.first?.isEmpty() == true
             ) {
                 continue
             }
 
             // Adds empty lines
-            if (lines[0].first == "<empty>") {
+            if (lines.first().first == "<empty>") {
                 add("" to HorizontalAlignment.LEFT)
                 continue
             }
