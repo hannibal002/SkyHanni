@@ -3,7 +3,6 @@ package at.hannibal2.skyhanni.features.gui.customscoreboard
 import at.hannibal2.skyhanni.data.HypixelData
 import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.data.ScoreboardData
-import at.hannibal2.skyhanni.features.gui.customscoreboard.CustomScoreboard.Companion.config
 import at.hannibal2.skyhanni.features.gui.customscoreboard.CustomScoreboard.Companion.eventsConfig
 import at.hannibal2.skyhanni.features.gui.customscoreboard.ScoreboardEvents.VOTING
 import at.hannibal2.skyhanni.features.gui.customscoreboard.ScoreboardPattern
@@ -60,7 +59,7 @@ enum class ScoreboardEvents(
     DOJO(
         ::getDojoLines,
         ::getDojoShowWhen,
-        "§7(ALl Dojo Lines)"
+        "§7(All Dojo Lines)"
     ),
     DARK_AUCTION(
         ::getDarkAuctionLines,
@@ -159,12 +158,7 @@ enum class ScoreboardEvents(
         ::getRedstoneShowWhen,
         "§e§l⚡ §cRedstone: §e§b7%"
     ),
-
-    NONE(
-        ::getNoneLines,
-        { false },
-        "§cNo Events."
-    );
+    ;
 
     override fun toString(): String {
         return configLine
@@ -175,11 +169,16 @@ enum class ScoreboardEvents(
     }
 
     companion object {
-        fun getEvent(): List<ScoreboardEvents> {
+        fun getEvent() = buildList<ScoreboardEvents?> {
             if (eventsConfig.showAllActiveEvents) {
-                return entries.filter { it.showWhen() }
+                for (event in eventsConfig.eventEntries) {
+                    if (event.showWhen()) {
+                        add(event)
+                    }
+                }
+            } else {
+                add(eventsConfig.eventEntries.firstOrNull { it.showWhen() })
             }
-            return listOf(entries.firstOrNull { it.showWhen() } ?: NONE)
         }
     }
 }
@@ -514,11 +513,4 @@ private fun getRedstoneLines(): List<String> {
 
 private fun getRedstoneShowWhen(): Boolean {
     return SbPattern.redstonePattern.anyMatches(getSbLines())
-}
-
-private fun getNoneLines(): List<String> {
-    return when {
-        config.informationFilteringConfig.hideEmptyLines -> listOf("<hidden>")
-        else -> listOf("§cNo Event")
-    }
 }
