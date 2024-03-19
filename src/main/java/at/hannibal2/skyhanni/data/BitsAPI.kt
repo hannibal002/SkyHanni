@@ -20,7 +20,7 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 object BitsAPI {
     private val profileStorage get() = ProfileStorageData.profileSpecific?.bits
     private val playerStorage get() = SkyHanniMod.feature.storage
-    
+
     var bits: Int
         get() = profileStorage?.bits ?: 0
         private set(value) {
@@ -146,14 +146,21 @@ object BitsAPI {
         val stacks = event.inventoryItems
 
         if (bitsGuiNamePattern.matches(event.inventoryName)) {
-            val cookieStack = stacks.values.lastOrNull { bitsGuiStackPattern.matches(it.displayName) } ?: return
-                for (line in cookieStack.getLore()) {
-                    bitsAvailableMenuPattern.matchMatcher(line) {
-                        bitsToClaim = group("toClaim").formatInt()
+            val cookieStack = stacks.values.lastOrNull { bitsGuiStackPattern.matches(it.displayName) }
 
-                        return
-                    }
+            // If the cookie stack is null, then the player should not have any bits to claim
+            if (cookieStack == null) {
+                bitsToClaim = 0
+                return
+            }
+
+            for (line in cookieStack.getLore()) {
+                bitsAvailableMenuPattern.matchMatcher(line) {
+                    bitsToClaim = group("toClaim").formatInt()
+
+                    return
                 }
+            }
             return
         }
 

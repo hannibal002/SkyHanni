@@ -4,7 +4,7 @@ import at.hannibal2.skyhanni.config.FeatureToggle;
 import at.hannibal2.skyhanni.config.core.config.Position;
 import at.hannibal2.skyhanni.config.features.garden.composter.ComposterConfig;
 import at.hannibal2.skyhanni.config.features.garden.cropmilestones.CropMilestonesConfig;
-import at.hannibal2.skyhanni.config.features.garden.laneswitch.LaneSwitchConfig;
+import at.hannibal2.skyhanni.config.features.garden.laneswitch.FarmingLaneConfig;
 import at.hannibal2.skyhanni.config.features.garden.optimalspeed.OptimalSpeedConfig;
 import at.hannibal2.skyhanni.config.features.garden.pests.PestsConfig;
 import at.hannibal2.skyhanni.config.features.garden.visitor.VisitorConfig;
@@ -45,9 +45,9 @@ public class GardenConfig {
     public OptimalSpeedConfig optimalSpeeds = new OptimalSpeedConfig();
 
     @Expose
-    @ConfigOption(name = "Lane Switching", desc = "")
+    @ConfigOption(name = "Farming Lane", desc = "")
     @Accordion
-    public LaneSwitchConfig laneswitch = new LaneSwitchConfig();
+    public FarmingLaneConfig farmingLane = new FarmingLaneConfig();
 
     @Expose
     @ConfigOption(name = "Garden Level", desc = "")
