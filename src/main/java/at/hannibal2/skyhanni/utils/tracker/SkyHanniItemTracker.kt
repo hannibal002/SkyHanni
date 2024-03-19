@@ -1,8 +1,8 @@
 package at.hannibal2.skyhanni.utils.tracker
 
 import at.hannibal2.skyhanni.SkyHanniMod
-import at.hannibal2.skyhanni.config.Storage
 import at.hannibal2.skyhanni.config.features.misc.TrackerConfig.PriceFromEntry
+import at.hannibal2.skyhanni.config.storage.ProfileSpecificStorage
 import at.hannibal2.skyhanni.data.SlayerAPI
 import at.hannibal2.skyhanni.test.PriceSource
 import at.hannibal2.skyhanni.utils.ChatUtils
@@ -22,7 +22,7 @@ import kotlin.time.Duration.Companion.seconds
 class SkyHanniItemTracker<Data : ItemTrackerData>(
     name: String,
     createNewSession: () -> Data,
-    getStorage: (Storage.ProfileSpecific) -> Data,
+    getStorage: (ProfileSpecificStorage) -> Data,
     drawDisplay: (Data) -> List<List<Any>>,
 ) : SkyHanniTracker<Data>(name, createNewSession, getStorage, drawDisplay) {
 

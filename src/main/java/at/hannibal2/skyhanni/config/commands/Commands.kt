@@ -216,11 +216,13 @@ object Commands {
         ) { FarmingWeightDisplay.lookUpCommand(it) }
         registerCommand(
             "shcopytranslation",
-            "<language code (2 letters)> <messsage to translate>\n" +
-                "Requires the Chat > Translator feature to be enabled.\n" +
-                "Copies the translation for a given message to your clipboard. " +
-                "Language codes are at the end of the translation when you click on a message."
+            "Copy the English translation of a message in another language to the clipboard.\n" +
+                "Uses a 2 letter language code that can be found at the end of a translation message."
         ) { Translator.fromEnglish(it) }
+        registerCommand(
+            "shtranslate",
+            "Translate a message in another language to English."
+        ) { Translator.toEnglish(it) }
         registerCommand(
             "shmouselock",
             "Lock/Unlock the mouse so it will no longer rotate the player (for farming)"
@@ -391,7 +393,7 @@ object Commands {
         registerCommand("shtestwaypoint", "Set a waypoint on that location") { SkyHanniDebugsAndTests.waypoint(it) }
         registerCommand("shtesttablist", "Set your clipboard as a fake tab list.") { TabListData.toggleDebugCommand() }
         registerCommand("shreloadlocalrepo", "Reloading the local repo data") { SkyHanniMod.repo.reloadLocalRepo() }
-        registerCommand("shchathistory", "Show the unfiltered chat history") { ChatManager.openChatFilterGUI() }
+        registerCommand("shchathistory", "Show the unfiltered chat history") { ChatManager.openChatFilterGUI(it) }
         registerCommand(
             "shstoplisteners",
             "Unregistering all loaded forge event listeners"
@@ -482,10 +484,6 @@ object Commands {
         registerCommand("shsendcontests", "") { GardenNextJacobContest.shareContestConfirmed(it) }
         registerCommand("shwords", "Opens the config list for modifying visual words") { openVisualWords() }
         registerCommand("shstopaccountupgradereminder", "") { AccountUpgradeReminder.disable() }
-        registerCommand(
-            "shsendtranslation",
-            "Respond with a translation of the message that the user clicks"
-        ) { Translator.toEnglish(it) }
     }
 
     private fun shortenedCommands() {

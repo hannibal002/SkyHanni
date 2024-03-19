@@ -11,12 +11,14 @@ import at.hannibal2.skyhanni.config.SackData
 import at.hannibal2.skyhanni.config.commands.Commands.init
 import at.hannibal2.skyhanni.data.ActionBarData
 import at.hannibal2.skyhanni.data.ActionBarStatsData
+import at.hannibal2.skyhanni.data.BitsAPI
 import at.hannibal2.skyhanni.data.BlockData
 import at.hannibal2.skyhanni.data.BossbarData
 import at.hannibal2.skyhanni.data.ChatManager
 import at.hannibal2.skyhanni.data.CropAccessoryData
 import at.hannibal2.skyhanni.data.EntityData
 import at.hannibal2.skyhanni.data.EntityMovementData
+import at.hannibal2.skyhanni.data.FameRanks
 import at.hannibal2.skyhanni.data.FriendAPI
 import at.hannibal2.skyhanni.data.GardenComposterUpgradesData
 import at.hannibal2.skyhanni.data.GardenCropMilestones
@@ -30,7 +32,8 @@ import at.hannibal2.skyhanni.data.ItemClickData
 import at.hannibal2.skyhanni.data.ItemRenderBackground
 import at.hannibal2.skyhanni.data.ItemTipHelper
 import at.hannibal2.skyhanni.data.LocationFixData
-import at.hannibal2.skyhanni.data.MayorElection
+import at.hannibal2.skyhanni.data.MaxwellAPI
+import at.hannibal2.skyhanni.data.MayorAPI
 import at.hannibal2.skyhanni.data.MinecraftData
 import at.hannibal2.skyhanni.data.OtherInventoryData
 import at.hannibal2.skyhanni.data.OwnInventoryData
@@ -38,6 +41,7 @@ import at.hannibal2.skyhanni.data.PartyAPI
 import at.hannibal2.skyhanni.data.PetAPI
 import at.hannibal2.skyhanni.data.ProfileStorageData
 import at.hannibal2.skyhanni.data.PurseAPI
+import at.hannibal2.skyhanni.data.QuiverAPI
 import at.hannibal2.skyhanni.data.RenderData
 import at.hannibal2.skyhanni.data.SackAPI
 import at.hannibal2.skyhanni.data.ScoreboardData
@@ -188,7 +192,6 @@ import at.hannibal2.skyhanni.features.garden.farming.WrongFungiCutterWarning
 import at.hannibal2.skyhanni.features.garden.fortuneguide.CaptureFarmingGear
 import at.hannibal2.skyhanni.features.garden.inventory.AnitaExtraFarmingFortune
 import at.hannibal2.skyhanni.features.garden.inventory.GardenCropMilestoneInventory
-import at.hannibal2.skyhanni.features.garden.inventory.GardenDeskInSBMenu
 import at.hannibal2.skyhanni.features.garden.inventory.GardenInventoryNumbers
 import at.hannibal2.skyhanni.features.garden.inventory.GardenNextPlotPrice
 import at.hannibal2.skyhanni.features.garden.inventory.GardenPlotIcon
@@ -204,7 +207,10 @@ import at.hannibal2.skyhanni.features.garden.visitor.GardenVisitorFeatures
 import at.hannibal2.skyhanni.features.garden.visitor.GardenVisitorTimer
 import at.hannibal2.skyhanni.features.garden.visitor.HighlightVisitorsOutsideOfGarden
 import at.hannibal2.skyhanni.features.garden.visitor.NPCVisitorFix
+import at.hannibal2.skyhanni.features.garden.visitor.VisitorAPI
 import at.hannibal2.skyhanni.features.garden.visitor.VisitorListener
+import at.hannibal2.skyhanni.features.gui.customscoreboard.CustomScoreboard
+import at.hannibal2.skyhanni.features.gui.customscoreboard.ScoreboardPattern
 import at.hannibal2.skyhanni.features.inventory.AuctionsHighlighter
 import at.hannibal2.skyhanni.features.inventory.ChestValue
 import at.hannibal2.skyhanni.features.inventory.DojoRankDisplay
@@ -230,6 +236,7 @@ import at.hannibal2.skyhanni.features.inventory.bazaar.BazaarBestSellMethod
 import at.hannibal2.skyhanni.features.inventory.bazaar.BazaarCancelledBuyOrderClipboard
 import at.hannibal2.skyhanni.features.inventory.bazaar.BazaarOpenPriceWebsite
 import at.hannibal2.skyhanni.features.inventory.bazaar.BazaarOrderHelper
+import at.hannibal2.skyhanni.features.inventory.bazaar.CraftMaterialsFromBazaar
 import at.hannibal2.skyhanni.features.inventory.tiarelay.TiaRelayHelper
 import at.hannibal2.skyhanni.features.inventory.tiarelay.TiaRelayWaypoints
 import at.hannibal2.skyhanni.features.itemabilities.ChickenHeadTimer
@@ -246,6 +253,7 @@ import at.hannibal2.skyhanni.features.minion.InfernoMinionFeatures
 import at.hannibal2.skyhanni.features.minion.MinionCollectLogic
 import at.hannibal2.skyhanni.features.minion.MinionFeatures
 import at.hannibal2.skyhanni.features.minion.MinionXp
+import at.hannibal2.skyhanni.features.misc.AuctionHousePriceComparison
 import at.hannibal2.skyhanni.features.misc.BetterSignEditing
 import at.hannibal2.skyhanni.features.misc.BetterWikiFromMenus
 import at.hannibal2.skyhanni.features.misc.BrewingStandOverlay
@@ -401,7 +409,7 @@ import org.apache.logging.log4j.Logger
     clientSideOnly = true,
     useMetadata = true,
     guiFactory = "at.hannibal2.skyhanni.config.ConfigGuiForgeInterop",
-    version = "0.24.Beta.10",
+    version = "0.24.Beta.15",
 )
 class SkyHanniMod {
 
@@ -445,7 +453,6 @@ class SkyHanniMod {
         loadModule(GetFromSackAPI)
         loadModule(UpdateManager)
         loadModule(CropAccessoryData())
-        loadModule(MayorElection())
         loadModule(GardenComposterUpgradesData())
         loadModule(ActionBarStatsData)
         loadModule(GardenCropMilestoneInventory())
@@ -464,6 +471,7 @@ class SkyHanniMod {
         loadModule(GardenBestCropTime())
         loadModule(ActionBarData)
         loadModule(TrackerManager)
+        loadModule(ScoreboardPattern)
         loadModule(UtilsPatterns)
         loadModule(PetAPI)
         loadModule(BossbarData)
@@ -485,15 +493,21 @@ class SkyHanniMod {
         loadModule(RiftAPI)
         loadModule(SackAPI)
         loadModule(BingoAPI)
+        loadModule(FameRanks)
         loadModule(FishingAPI)
+        loadModule(MaxwellAPI)
+        loadModule(QuiverAPI)
+        loadModule(BitsAPI)
+        loadModule(MayorAPI)
         loadModule(SkillAPI)
+        loadModule(VisitorAPI)
         loadModule(IsFishingDetection)
         loadModule(LorenzUtils)
         loadModule(NEUItems)
 
         // features
         loadModule(BazaarOrderHelper())
-        loadModule(AuctionsHighlighter())
+        loadModule(AuctionsHighlighter)
         loadModule(ChatFilter())
         loadModule(PlayerChatModifier())
         loadModule(DungeonChatFilter())
@@ -611,7 +625,6 @@ class SkyHanniMod {
         loadModule(GardenCustomKeybinds)
         loadModule(ChickenHeadTimer())
         loadModule(GardenOptimalSpeed())
-        loadModule(GardenDeskInSBMenu())
         loadModule(GardenLevelDisplay())
         loadModule(FarmingWeightDisplay())
         loadModule(DicerRngDropTracker)
@@ -720,6 +733,7 @@ class SkyHanniMod {
         loadModule(EnderNodeTracker)
         loadModule(CompactBestiaryChatMessage())
         loadModule(WatchdogHider())
+        loadModule(AuctionHousePriceComparison())
         loadModule(AccountUpgradeReminder())
         loadModule(PetExpTooltip())
         loadModule(Translator())
@@ -748,6 +762,7 @@ class SkyHanniMod {
         loadModule(DungeonFinderFeatures())
         loadModule(PabloHelper())
         loadModule(FishingBaitWarnings())
+        loadModule(CustomScoreboard())
         loadModule(RepoPatternManager)
         loadModule(PestSpawn())
         loadModule(PestSpawnTimer)
@@ -771,6 +786,7 @@ class SkyHanniMod {
         loadModule(InfernoMinionFeatures())
         loadModule(LimboPlaytime())
         loadModule(RareDropMessages())
+        loadModule(CraftMaterialsFromBazaar())
 
         init()
 

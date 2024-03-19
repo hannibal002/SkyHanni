@@ -141,12 +141,6 @@ public class GardenConfig {
     public boolean plotPrice = true;
 
     @Expose
-    @ConfigOption(name = "Desk in Menu", desc = "Show a Desk button in the SkyBlock Menu. Opens the /desk command on click.")
-    @ConfigEditorBoolean
-    @FeatureToggle
-    public boolean deskInSkyBlockMenu = true;
-
-    @Expose
     @ConfigOption(name = "Fungi Cutter Warning", desc = "Warn when breaking mushroom with the wrong Fungi Cutter mode.")
     @ConfigEditorBoolean
     @FeatureToggle
@@ -228,12 +222,6 @@ public class GardenConfig {
     @ConfigEditorBoolean
     @FeatureToggle
     public boolean plotBorders = true;
-
-    @Expose
-    @ConfigOption(name = "Plot Name in Scoreboard", desc = "Showing a more compact plot name in scoreboard. Updates faster and doesnt hide when pests are spawned.")
-    @ConfigEditorBoolean
-    @FeatureToggle
-    public boolean plotNameInScoreboard = true;
 
     @Expose
     @ConfigOption(name = "Copy Milestone Data", desc = "Copy wrong crop milestone data in clipboard when opening the crop milestone menu. Please share this data in SkyHanni discord.")
