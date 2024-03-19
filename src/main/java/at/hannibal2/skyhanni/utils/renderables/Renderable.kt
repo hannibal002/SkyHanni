@@ -103,7 +103,11 @@ interface Renderable {
             onClick: () -> Unit,
             onHover: () -> Unit = {},
         ): Renderable {
-            return clickable(hoverTips(text, tips, bypassChecks = bypassChecks, onHover = onHover), onClick, bypassChecks = bypassChecks)
+            return clickable(
+                hoverTips(text, tips, bypassChecks = bypassChecks, onHover = onHover),
+                onClick,
+                bypassChecks = bypassChecks
+            )
         }
 
         fun clickable(
@@ -136,17 +140,18 @@ interface Renderable {
             }
 
         fun hoverTips(
-            text: Any,
+            content: Any,
             tips: List<Any>,
             indexes: List<Int> = listOf(),
             stack: ItemStack? = null,
             color: LorenzColor? = null,
             bypassChecks: Boolean = false,
+            snapsToTopIfToLong: Boolean = true,
             condition: () -> Boolean = { true },
             onHover: () -> Unit = {},
         ): Renderable {
 
-            val render = fromAny(text) ?: string("Error")
+            val render = fromAny(content) ?: string("Error")
             return object : Renderable {
                 override val width = render.width
                 override val height = render.height
@@ -165,13 +170,14 @@ interface Renderable {
                             GlStateManager.translate(0F, 0F, 400F)
 
                             RenderLineTooltips.drawHoveringText(
-                                posX,
-                                posY,
-                                tipsRender,
-                                stack,
-                                color,
-                                currentRenderPassMousePosition?.first ?: Utils.getMouseX(),
-                                currentRenderPassMousePosition?.second ?: Utils.getMouseY(),
+                                posX = posX,
+                                posY = posY,
+                                tips = tipsRender,
+                                stack = stack,
+                                borderColor = color,
+                                snapsToTopIfToLong = snapsToTopIfToLong,
+                                mouseX = currentRenderPassMousePosition?.first ?: Utils.getMouseX(),
+                                mouseY = currentRenderPassMousePosition?.second ?: Utils.getMouseY(),
                             )
                             GlStateManager.popMatrix()
                         }

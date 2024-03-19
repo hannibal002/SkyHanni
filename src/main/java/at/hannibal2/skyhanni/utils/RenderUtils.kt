@@ -18,6 +18,7 @@ import net.minecraft.client.Minecraft
 import net.minecraft.client.gui.FontRenderer
 import net.minecraft.client.gui.Gui
 import net.minecraft.client.gui.ScaledResolution
+import net.minecraft.client.renderer.GLAllocation
 import net.minecraft.client.renderer.GlStateManager
 import net.minecraft.client.renderer.Tessellator
 import net.minecraft.client.renderer.vertex.DefaultVertexFormats
@@ -48,9 +49,12 @@ object RenderUtils {
             return value
         }
     }
+
     enum class VerticalAlignment { TOP, CENTER, BOTTOM }
 
     private val beaconBeam = ResourceLocation("textures/entity/beacon_beam.png")
+
+    private val matrixBuffer = GLAllocation.createDirectFloatBuffer(16);
 
     infix fun Slot.highlight(color: LorenzColor) {
         highlight(color.toColor())
@@ -114,6 +118,23 @@ object RenderUtils {
         GlStateManager.enableDepth()
         GlStateManager.enableCull()
     }
+
+    val absoluteTranslation
+        get() = run {
+            matrixBuffer.clear()
+
+            GlStateManager.getFloat(GL11.GL_MODELVIEW_MATRIX, matrixBuffer)
+
+            val read = generateSequence(0) { it + 1 }.take(16).map { matrixBuffer.get() }.toList()
+
+            val xTranslate = read[12].toInt()
+            val yTranslate = read[13].toInt()
+            val zTranslate = read[14].toInt()
+
+            matrixBuffer.flip()
+
+            Triple(xTranslate, yTranslate, zTranslate)
+        }
 
     fun getViewerPos(partialTicks: Float) = exactLocation(Minecraft.getMinecraft().renderViewEntity, partialTicks)
 
