@@ -51,6 +51,7 @@ class ChatFilter {
         // hypixel tournament notifications
         "§r§e§6§lHYPIXEL§e is hosting a §b§lBED WARS DOUBLES§e tournament!",
         "§r§e§6§lHYPIXEL BED WARS DOUBLES§e tournament is live!",
+        "§r§e§6§lHYPIXEL§e is hosting a §b§lTNT RUN§e tournament!",
 
         // other
         "§aYou are still radiating with §bGenerosity§r§a!"
@@ -198,13 +199,16 @@ class ChatFilter {
 
     // Useless Notification
     private val uselessNotificationPatterns = listOf(
-        "§aYou tipped (\\d+) (player|players)!".toPattern()
+        "§aYou tipped \\d+ players? in \\d+(?: different)? games?!".toPattern()
     )
     private val uselessNotificationMessages = listOf(
         "§eYour previous §r§6Plasmaflux Power Orb §r§ewas removed!",
         "§aYou used your §r§6Mining Speed Boost §r§aPickaxe Ability!",
         "§cYour Mining Speed Boost has expired!",
         "§a§r§6Mining Speed Boost §r§ais now available!",
+        "§aYou have just received §r§60 coins §r§aas interest in your personal bank account!",
+        "§aSince you've been away you earned §r§60 coins §r§aas interest in your personal bank account!",
+        "§aYou have just received §r§60 coins §r§aas interest in your co-op bank account!",
     )
 
     // Party
@@ -267,9 +271,12 @@ class ChatFilter {
         "§eObtain a §r§6Booster Cookie §r§efrom the community shop in the hub!",
     )
 
+    /**
+     * REGEX-TEST: §e[NPC] Jacob§f: §rYour §9Anita's Talisman §fis giving you §6+25☘ Carrot Fortune §fduring the contest!
+     */
     private val anitaFortunePattern by RepoPattern.pattern(
         "chat.jacobevent.accessory",
-        "§e\\[NPC] Jacob§f: Your §9Anita's (\\w+) §fis giving you §6\\+(\\d{1,2})☘ (\\w+) Fortune §fduring the contest!"
+        "§e\\[NPC] Jacob§f: §rYour §9Anita's \\w+ §fis giving you §6\\+\\d{1,2}☘ .+ Fortune §fduring the contest!"
     )
 
     private val skymallPerkPattern by RepoPattern.pattern(
@@ -322,6 +329,11 @@ class ChatFilter {
         // Useful, maybe in another chat
         "§aYou received §r§b\\+\\d{1,3} §r§a(Mithril|Gemstone) Powder.".toPattern(),
         "§aYou received §r(§6|§b)\\+[1-2] (Diamond|Gold) Essence§r§a.".toPattern(),
+    )
+
+    private val fireSalePattern by RepoPattern.pattern(
+        "chat.firesale",
+        "§6§k§lA§r §c§lFIRE SALE §r§6§k§lA(?:\\n|.)*"
     )
     private val fireSalePatterns = listOf(
         "§c♨ §eFire Sales for .* §eare starting soon!".toPattern(),
@@ -413,7 +425,7 @@ class ChatFilter {
 
         config.winterGift && message.isPresent("winter_gift") -> "winter_gift"
         config.powderMining && message.isPresent("powder_mining") -> "powder_mining"
-        config.fireSale && message.isPresent("fire_sale") -> "fire_sale"
+        config.fireSale && (fireSalePattern.matches(message) || message.isPresent("fire_sale")) -> "fire_sale"
         generalConfig.hideJacob && !GardenAPI.inGarden() && anitaFortunePattern.matches(message) -> "jacob_event"
         generalConfig.hideSkyMall && !LorenzUtils.inMiningIsland() && skymallPerkPattern.matches(message) -> "skymall"
 

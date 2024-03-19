@@ -75,6 +75,11 @@ public class InventoryConfig {
     public AuctionHouseConfig auctions = new AuctionHouseConfig();
 
     @Expose
+    @ConfigOption(name = "Auctions Price Comparison", desc = "")
+    @Accordion
+    public AuctionHousePriceComparisonConfig auctionsPriceComparison = new AuctionHousePriceComparisonConfig();
+
+    @Expose
     @ConfigOption(
         name = "Item Number",
         desc = "Showing the item number as a stack size for these items."
@@ -187,7 +192,7 @@ public class InventoryConfig {
     @ConfigEditorBoolean
     @FeatureToggle
     public boolean shiftClickForEquipment = false;
-    
+
     @Expose
     @ConfigOption(name = "Shift Click NPC sell", desc = "Makes normal clicks to shift clicks in npc inventory for selling.")
     @ConfigEditorBoolean

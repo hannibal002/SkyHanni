@@ -2,6 +2,7 @@ package at.hannibal2.skyhanni.config.features.misc;
 
 import at.hannibal2.skyhanni.config.FeatureToggle;
 import at.hannibal2.skyhanni.config.core.config.Position;
+import at.hannibal2.skyhanni.config.enums.OutsideSbFeature;
 import at.hannibal2.skyhanni.config.features.misc.compacttablist.CompactTabListConfig;
 import at.hannibal2.skyhanni.config.features.misc.cosmetic.CosmeticConfig;
 import at.hannibal2.skyhanni.config.features.misc.pets.PetConfig;
@@ -9,7 +10,11 @@ import com.google.gson.annotations.Expose;
 import io.github.moulberry.moulconfig.annotations.Accordion;
 import io.github.moulberry.moulconfig.annotations.Category;
 import io.github.moulberry.moulconfig.annotations.ConfigEditorBoolean;
+import io.github.moulberry.moulconfig.annotations.ConfigEditorDraggableList;
 import io.github.moulberry.moulconfig.annotations.ConfigOption;
+
+import java.util.ArrayList;
+import java.util.List;
 
 public class MiscConfig {
 
@@ -99,6 +104,11 @@ public class MiscConfig {
     public PetCandyDisplayConfig petCandy = new PetCandyDisplayConfig();
 
     @Expose
+    @ConfigOption(name = "Show Outside SB", desc = "Show these features outside of SkyBlock.")
+    @ConfigEditorDraggableList
+    public List<OutsideSbFeature> showOutsideSB = new ArrayList<>();
+
+    @Expose
     @ConfigOption(name = "Exp Bottles", desc = "Hides all the experience orbs lying on the ground.")
     @ConfigEditorBoolean
     @FeatureToggle
@@ -127,7 +137,7 @@ public class MiscConfig {
     public boolean hidePiggyScoreboard = true;
 
     @Expose
-    @ConfigOption(name = "Color Month Names", desc = "Color the month names in the Scoreboard.")
+    @ConfigOption(name = "Color Month Names", desc = "Color the month names in the Scoreboard.\nAlso applies to the Custom Scoreboard.")
     @ConfigEditorBoolean
     @FeatureToggle
     public boolean colorMonthNames = false;
@@ -233,9 +243,6 @@ public class MiscConfig {
 
     @Expose
     public Position inventoryLoadPos = new Position(394, 124, false, true);
-
-    @Expose
-    public int limboTimePB = 0;
 
     @Expose
     @ConfigOption(name = "Fix Ghost Entities", desc = "Removes ghost entities caused by a Hypixel bug. " +

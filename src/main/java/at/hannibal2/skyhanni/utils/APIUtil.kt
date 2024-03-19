@@ -121,7 +121,12 @@ object APIUtil {
                 }
 
                 val message = "POST request to '$urlString' returned status ${status.statusCode}"
-                ChatUtils.error("SkyHanni ran into an error. Status: ${status.statusCode}")
+                ErrorManager.logErrorStateWithData(
+                    "Error communicating with API", "APIUtil POST request returned an error code",
+                    "statusCode" to status.statusCode,
+                    "urlString" to urlString,
+                    "body" to body,
+                )
                 return ApiResponse(false, message, JsonObject())
             }
         } catch (throwable: Throwable) {

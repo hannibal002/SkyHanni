@@ -21,7 +21,7 @@ class SlayerQuestWarning {
 
     private val config get() = SkyHanniMod.feature.slayer
 
-    private  val talkToMaddoxPattern by RepoPattern.pattern(
+    private val talkToMaddoxPattern by RepoPattern.pattern(
         "slayer.questwarning.talkto",
         " {3}§r§5§l» §r§7Talk to Maddox to claim your .+ Slayer XP!"
     )
