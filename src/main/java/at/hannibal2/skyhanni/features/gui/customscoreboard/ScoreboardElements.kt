@@ -238,6 +238,43 @@ enum class ScoreboardElement(
         if (!informationFilteringConfig.hideIrrelevantLines) return true
         return showWhen()
     }
+
+    companion object {
+        // I don't know why, but this field is needed for it to work
+        @kotlin.jvm.JvmField
+        val defaultOption = listOf(
+            TITLE,
+            PROFILE,
+            PURSE,
+            BANK,
+            MOTES,
+            BITS,
+            COPPER,
+            NORTH_STARS,
+            HEAT,
+            EMPTY_LINE,
+            ISLAND,
+            LOCATION,
+            LOBBY_CODE,
+            PLAYER_AMOUNT,
+            VISITING,
+            EMPTY_LINE2,
+            DATE,
+            TIME,
+            EVENTS,
+            OBJECTIVE,
+            EMPTY_LINE3,
+            QUIVER,
+            POWER,
+            TUNING,
+            EMPTY_LINE4,
+            POWDER,
+            MAYOR,
+            PARTY,
+            FOOTER,
+            EXTRA
+        )
+    }
 }
 
 private fun getTitleDisplayPair() = if (displayConfig.titleAndFooter.useHypixelTitleAnimation) {

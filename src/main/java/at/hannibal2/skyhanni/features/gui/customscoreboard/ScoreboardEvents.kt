@@ -183,7 +183,29 @@ enum class ScoreboardEvents(
 
         // I don't know why, but this field is needed for it to work
         @kotlin.jvm.JvmField
-        val defaultOption = listOf(VOTING, SERVER_CLOSE, DUNGEONS, KUUDRA, DOJO, DARK_AUCTION, JACOB_CONTEST, JACOB_MEDALS, TRAPPER, GARDEN_CLEAN_UP, GARDEN_PASTING, FLIGHT_DURATION, WINTER, SPOOKY, BROODMOTHER, MINING_EVENTS, DAMAGE, MAGMA_BOSS, ESSENCE, EFFIGIES, ACTIVE_TABLIST_EVENTS)
+        val defaultOption = listOf(
+            VOTING,
+            SERVER_CLOSE,
+            DUNGEONS,
+            KUUDRA,
+            DOJO,
+            DARK_AUCTION,
+            JACOB_CONTEST,
+            JACOB_MEDALS,
+            TRAPPER,
+            GARDEN_CLEAN_UP,
+            GARDEN_PASTING,
+            FLIGHT_DURATION,
+            WINTER,
+            SPOOKY,
+            BROODMOTHER,
+            MINING_EVENTS,
+            DAMAGE,
+            MAGMA_BOSS,
+            ESSENCE,
+            EFFIGIES,
+            ACTIVE_TABLIST_EVENTS
+        )
     }
 }
 
@@ -271,8 +293,7 @@ private fun getDarkAuctionLines() = buildList {
     getSbLines().firstOrNull { SbPattern.startingInPattern.matches(it) }?.let { add(it) }
     getSbLines().firstOrNull { SbPattern.timeLeftPattern.matches(it) }?.let { add(it) }
 
-    val darkAuctionCurrentItemLine =
-        getSbLines().firstOrNull { SbPattern.darkAuctionCurrentItemPattern.matches(it) }
+    val darkAuctionCurrentItemLine = getSbLines().firstOrNull { SbPattern.darkAuctionCurrentItemPattern.matches(it) }
 
     if (darkAuctionCurrentItemLine != null) {
         add(darkAuctionCurrentItemLine)
