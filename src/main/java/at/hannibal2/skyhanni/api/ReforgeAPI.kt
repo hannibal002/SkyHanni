@@ -160,7 +160,6 @@ object ReforgeAPI {
         val data = event.getConstant("reforgestones") ?: ErrorManager.skyHanniError("NEU reforgestones data is null")
         try {
             val reforgeStoneData = ConfigManager.gson.fromJson<Map<String, NeuReforgeStoneJson>>(data).values
-            reforgeStoneData.forEach { it.init() }
 
             reforgeList = reforgeStoneData.map {
                 reforge(it)
