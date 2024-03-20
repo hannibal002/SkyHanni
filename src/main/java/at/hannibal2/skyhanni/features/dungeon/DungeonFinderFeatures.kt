@@ -342,12 +342,17 @@ class DungeonFinderFeatures {
 
     companion object {
         fun getColor(level: Int): String = when {
-            level >= 30 -> "§a"
+            level >= 50 -> "§c§l"
+            level >= 45 -> "§c"
+            level >= 40 -> "§6"
+            level >= 35 -> "§d"
+            level >= 30 -> "§9"
             level >= 25 -> "§b"
-            level >= 20 -> "§e"
-            level >= 15 -> "§6"
-            level >= 10 -> "§c"
-            else -> "§4"
+            level >= 20 -> "§2"
+            level >= 15 -> "§a"
+            level >= 10 -> "§e"
+            level >= 5 -> "§f"
+            else -> "§7"
         }
     }
 
