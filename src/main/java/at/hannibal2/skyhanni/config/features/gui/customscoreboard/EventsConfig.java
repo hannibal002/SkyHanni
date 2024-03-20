@@ -19,9 +19,8 @@ public class EventsConfig {
     @ConfigEditorDraggableList()
     public List<ScoreboardEvents> eventEntries = new ArrayList<>(ScoreboardEvents.defaultOption);
 
-
     @Expose
-    @ConfigOption(name = "Show all active events", desc = "Show all active events in the scoreboard instead of one.")
+    @ConfigOption(name = "Show all active events", desc = "Show all active events in the scoreboard instead of the one with the highest priority.")
     @ConfigEditorBoolean
     public boolean showAllActiveEvents = false;
 
