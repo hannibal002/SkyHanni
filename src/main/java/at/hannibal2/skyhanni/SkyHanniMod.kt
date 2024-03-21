@@ -196,9 +196,9 @@ import at.hannibal2.skyhanni.features.garden.fortuneguide.CaptureFarmingGear
 import at.hannibal2.skyhanni.features.garden.inventory.AnitaExtraFarmingFortune
 import at.hannibal2.skyhanni.features.garden.inventory.GardenCropMilestoneInventory
 import at.hannibal2.skyhanni.features.garden.inventory.GardenInventoryNumbers
-import at.hannibal2.skyhanni.features.garden.inventory.GardenNextPlotPrice
-import at.hannibal2.skyhanni.features.garden.inventory.GardenPlotIcon
-import at.hannibal2.skyhanni.features.garden.inventory.PlotMenuHighlighting
+import at.hannibal2.skyhanni.features.garden.inventory.plots.GardenNextPlotPrice
+import at.hannibal2.skyhanni.features.garden.inventory.plots.GardenPlotIcon
+import at.hannibal2.skyhanni.features.garden.inventory.plots.GardenPlotMenuHighlighting
 import at.hannibal2.skyhanni.features.garden.inventory.SkyMartCopperPrice
 import at.hannibal2.skyhanni.features.garden.pests.PestFinder
 import at.hannibal2.skyhanni.features.garden.pests.PestSpawn
@@ -619,7 +619,7 @@ class SkyHanniMod {
         loadModule(TpsCounter())
         loadModule(ParticleHider())
         loadModule(MiscFeatures())
-        loadModule(PlotMenuHighlighting())
+        loadModule(GardenPlotMenuHighlighting())
         loadModule(SkyMartCopperPrice())
         loadModule(GardenVisitorFeatures())
         loadModule(NPCVisitorFix)
