@@ -37,25 +37,43 @@ object TrophyFishManager {
 
         loadedNeu = true
 
-        val savedFish = fish ?: return
+        val savedFishes = fish ?: return
         var changed = false
 
+        val neuData = mutableListOf<Triple<String, TrophyRarity, Int>>()
         for ((fishName, apiAmount) in caughtTrophyFish) {
             val rarity = TrophyRarity.getByName(fishName) ?: continue
             val name = fishName.split("_").dropLast(1).joinToString("")
 
-            val savedFishData = savedFish.getOrPut(name) { mutableMapOf() }
+            val savedFishData = savedFishes.getOrPut(name) { mutableMapOf() }
 
             val currentSavedAmount = savedFishData[rarity] ?: 0
+            neuData.add(Triple(name, rarity, apiAmount))
             if (apiAmount > currentSavedAmount) {
-                savedFishData[rarity] = apiAmount
-                ChatUtils.debug("Updated trophy fishing data from NEU PV: $name $rarity: $currentSavedAmount -> $apiAmount")
                 changed = true
             }
         }
         if (changed) {
-            ChatUtils.chat("Updated Trophy Fishing data via NEU PV!")
+            ChatUtils.clickableChat("Click here to load data from NEU PV!", onClick = {
+                updateFromNeuPv(savedFishes, neuData)
+            })
         }
+    }
+
+    private fun updateFromNeuPv(
+        savedFishes: MutableMap<String, MutableMap<TrophyRarity, Int>>,
+        neuData: MutableList<Triple<String, TrophyRarity, Int>>,
+    ) {
+        for ((name, rarity, newValue) in neuData) {
+            val saved = savedFishes[name] ?: continue
+
+            val current = saved[rarity] ?: 0
+            if (newValue > current) {
+                saved[rarity] = newValue
+                ChatUtils.debug("Updated trophy fishing data from NEU PV:  $name $rarity: $current -> $newValue")
+            }
+        }
+        ChatUtils.chat("Updated Trophy Fishing data via NEU PV!")
     }
 
     private var trophyFishInfo = mapOf<String, TrophyFishInfo>()
