@@ -3,7 +3,7 @@ package at.hannibal2.skyhanni.features.inventory.bazaar
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.events.BazaarOpenedProductEvent
 import at.hannibal2.skyhanni.events.InventoryCloseEvent
-import at.hannibal2.skyhanni.features.inventory.bazaar.BazaarApi.Companion.getBazaarData
+import at.hannibal2.skyhanni.features.inventory.bazaar.BazaarApi.Companion.getBazaarDataOrError
 import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName
 import at.hannibal2.skyhanni.utils.ItemUtils.itemName
@@ -48,7 +48,7 @@ class BazaarBestSellMethod {
         if (internalName == null) {
             return "§cUnknown Bazaar item!"
         }
-        var having = InventoryUtils.countItemsInLowerInventory { it.getInternalName() == internalName }
+        var having = InventoryUtils.getAmountOfItemInInventory(internalName)
         lastClickedItem?.let {
             if (it.getInternalName() == internalName) {
                 having += it.stackSize
@@ -56,7 +56,7 @@ class BazaarBestSellMethod {
         }
         if (having <= 0) return ""
 
-        val data = internalName.getBazaarData() ?: return ""
+        val data = internalName.getBazaarDataOrError()
         val totalDiff = (data.buyPrice - data.sellPrice) * having
         val result = NumberUtil.format(totalDiff.toInt())
 

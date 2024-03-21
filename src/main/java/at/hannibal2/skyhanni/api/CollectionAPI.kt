@@ -11,6 +11,7 @@ import at.hannibal2.skyhanni.utils.ItemUtils.name
 import at.hannibal2.skyhanni.utils.NEUInternalName
 import at.hannibal2.skyhanni.utils.NEUItems
 import at.hannibal2.skyhanni.utils.NEUItems.getItemStackOrNull
+import at.hannibal2.skyhanni.utils.NumberUtil.formatLong
 import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.StringUtils.matches
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
@@ -46,10 +47,9 @@ object CollectionAPI {
             val stack = event.inventoryItems[4] ?: return
             loop@ for (line in stack.getLore()) {
                 singleCounterPattern.matchMatcher(line) {
-                    val counter = group("amount").replace(",", "").toLong()
+                    val counter = group("amount").formatLong()
                     val name = inventoryName.split(" ").dropLast(1).joinToString(" ")
-                    val internalName = NEUItems.getInternalNameOrNull(name) ?: continue@loop
-                    collectionValue[internalName] = counter
+                    collectionValue[NEUInternalName.fromItemName(name)] = counter
                 }
             }
             CollectionUpdateEvent().postAndCatch()
@@ -59,7 +59,7 @@ object CollectionAPI {
             if (inventoryName == "Boss Collections") return
 
             for ((_, stack) in event.inventoryItems) {
-                var name = stack.name?.removeColor() ?: continue
+                var name = stack.name.removeColor()
                 if (name.contains("Collections")) continue
 
                 val lore = stack.getLore()
@@ -71,9 +71,8 @@ object CollectionAPI {
 
                 loop@ for (line in lore) {
                     counterPattern.matchMatcher(line) {
-                        val counter = group("amount").replace(",", "").toLong()
-                        val internalName = NEUItems.getInternalNameOrNull(name) ?: continue@loop
-                        collectionValue[internalName] = counter
+                        val counter = group("amount").formatLong()
+                        collectionValue[NEUInternalName.fromItemName(name)] = counter
                     }
                 }
             }

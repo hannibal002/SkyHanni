@@ -33,6 +33,7 @@ Use `/sh` or `/skyhanni` to open the SkyHanni config in game.
 + Add tab list fire sale advertisement hider. - nea
 + SkyBlock XP Chat. - Thunderblade73
     + Sends the SkyBlock XP message from the action bar into the chat.
++ Rarity text to pet drop messages. - Empa (https://github.com/hannibal002/SkyHanni/pull/1136)
 
 #### Chat Filter
 
@@ -80,6 +81,12 @@ Use `/sh` or `/skyhanni` to open the SkyHanni config in game.
 + Soulweaver Skull Hider in the Dungeon Object Hider. - nea
     + Hide the annoying soulweaver skulls that float around you if you have the soulweaver gloves equipped.
 + Hide particles and damage splashes during the terracotta phase in dungeons F6 and M6. - hannibal2
++ Added available classes in the tooltip. - Conutik
+    + Shows in the dungeon party finder when hovering over a group.
+    + Highlights your selected class in green if it's available.
++ Kismet tracking for dungeon chests. - Thunderblade73
+    + Highlight chests which have been rerolled inside Croesus
+    + Shows kismet amount at the reroll button
 
 </details>
 <details open><summary>
@@ -157,6 +164,13 @@ Use `/sh` or `/skyhanni` to open the SkyHanni config in game.
       purse.
 + Copy Underbid Keybind. - Obsidian
     + Copies the price of the hovered item in Auction House minus 1 coin into the clipboard for easier under-bidding.
++ Gfs message after super crafting. — Zickles
+    + Adding a clickable message to pick up the super crafted items from sacks.
++ Added Inferno Minion Fuel pickup prevention. - Zickles (https://github.com/hannibal002/SkyHanni/pull/1103)
+    + Blocks picking up the Inferno Minion or replacing the fuel inside when expensive minion fuels are in use.
++ AH Show Price Comparison. - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/339)
+    + Highlight auctions based on the difference between their estimated value and the value they are listed for.
+    + Options to change the colours
 
 </details>
 <details open><summary>
@@ -233,6 +247,8 @@ Use `/sh` or `/skyhanni` to open the SkyHanni config in game.
 + Update Timer showing when the next api data update happens.
 + Price Website button. - hannibal2
     + Adds a button to the bazaar product inventory that will open the item page in skyblock.bz.
++ Craft Materials From Bazaar. - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/1104)
+    + Show in a crafting view a shopping list of materials needed when buying from the Bazaar.
 
 </details>
 <details open><summary>
@@ -611,6 +627,9 @@ Use `/sh` or `/skyhanni` to open the SkyHanni config in game.
     + Changes by how much the sensitivity is lowered by.
     + Show a GUI element while the feature is enabled.
     + Option to only allow this feature while on ground and/or on barn plot.
++ Lane Switch Notification - ILike2WatchMemes
+    + Sends a notification when approaching the end of a lane in Garden while farming.
+    + Displays the distance until the end of a lane.
 
 </details>
 <details open><summary>
@@ -706,6 +725,8 @@ Use `/sh` or `/skyhanni` to open the SkyHanni config in game.
     + Option to hide while not grinding powder.
 + Added Deep Caverns Parkour. - hannibal2
     + Shows a parkour to the bottom of Deep Caverns and to Rhys.
++ Display upcoming mining events. - CalMWolfs
+    + Show what mining events are currently occurring in both the Dwarven Mines and Crystal Hollows.
 
 </details>
 <details open><summary>
@@ -973,9 +994,22 @@ Use `/sh` or `/skyhanni` to open the SkyHanni config in game.
     + Stops the white geyser smoke particles from rendering if your bobber is near the geyser.
     + Draws a box around the effective area of the geyser.
     + Change the color of the box around the geyser.
-+ Added Skill Progress Display. - HiZe
++ Skill Progress Display. - HiZe
     + ETA Display, exp, actions or percentage to next level, custom level goals, all skill display, chroma progress bar,
       and overflow levels for all those things.
+    + A ton of settings.
++ Command `/shlimbo` for easier Limbo access. - martimavocado (https://github.com/hannibal002/SkyHanni/pull/848)
+    + Limbo time tracker also now works in the Slumber Hotel in the Bed Wars Lobby.
+    + A new secret method to get more SkyHanni User Luck from Limbo.
++ Command `/shlimbostats` for a simple way to view your Limbo stats. -
+  martimavocado (https://github.com/hannibal002/SkyHanni/pull/848)
+    + Support for `/playtime` and  `/pt` while in Limbo.
+    + Added your playtime to Hypixel's `/playtimedetailed`.
++ Custom Scoreboard - j10a1n15 (https://github.com/hannibal002/SkyHanni/pull/893)
+    + Customizable; New, never seen before lines like the current mayor with perks, your party, and more!
+    + Custom Title and Footer, align them on different sides of the scoreboard.
+    + Hide the Hypixel Scoreboard, add a custom Image as a background, rounded corners.
+    + Supports colored month names & better garden plot names.
     + A ton of settings.
 
 </details>

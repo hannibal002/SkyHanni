@@ -48,7 +48,9 @@ import at.hannibal2.skyhanni.features.minion.MinionFeatures
 import at.hannibal2.skyhanni.features.misc.CollectionTracker
 import at.hannibal2.skyhanni.features.misc.LockMouseLook
 import at.hannibal2.skyhanni.features.misc.MarkedPlayerManager
+import at.hannibal2.skyhanni.features.misc.MiscFeatures
 import at.hannibal2.skyhanni.features.misc.discordrpc.DiscordRPCManager
+import at.hannibal2.skyhanni.features.misc.limbo.LimboTimeTracker
 import at.hannibal2.skyhanni.features.misc.massconfiguration.DefaultConfigFeatures
 import at.hannibal2.skyhanni.features.misc.visualwords.VisualWordGui
 import at.hannibal2.skyhanni.features.rift.area.westvillage.VerminTracker
@@ -67,6 +69,7 @@ import at.hannibal2.skyhanni.test.command.CopyNearbyParticlesCommand
 import at.hannibal2.skyhanni.test.command.CopyScoreboardCommand
 import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.test.command.TestChatCommand
+import at.hannibal2.skyhanni.test.command.TrackSoundsCommand
 import at.hannibal2.skyhanni.utils.APIUtil
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils
@@ -213,11 +216,13 @@ object Commands {
         ) { FarmingWeightDisplay.lookUpCommand(it) }
         registerCommand(
             "shcopytranslation",
-            "<language code (2 letters)> <messsage to translate>\n" +
-                "Requires the Chat > Translator feature to be enabled.\n" +
-                "Copies the translation for a given message to your clipboard. " +
-                "Language codes are at the end of the translation when you click on a message."
+            "Copy the English translation of a message in another language to the clipboard.\n" +
+                "Uses a 2 letter language code that can be found at the end of a translation message."
         ) { Translator.fromEnglish(it) }
+        registerCommand(
+            "shtranslate",
+            "Translate a message in another language to English."
+        ) { Translator.toEnglish(it) }
         registerCommand(
             "shmouselock",
             "Lock/Unlock the mouse so it will no longer rotate the player (for farming)"
@@ -258,17 +263,36 @@ object Commands {
             "shofficialwikithis",
             "Searches the official wiki with SkyHanni's own method."
         ) { WikiManager.otherWikiCommands(it, false, true) }
-        registerCommand0("shcalccrop", "Calculate how many crops need to be farmed between different crop milestones.", {
-            FarmingMilestoneCommand.onCommand(it.getOrNull(0), it.getOrNull(1), it.getOrNull(2), false)
-        }, FarmingMilestoneCommand::onComplete)
-        registerCommand0("shcalccroptime", "Calculate how long you need to farm crops between different crop milestones.", {
-            FarmingMilestoneCommand.onCommand(it.getOrNull(0), it.getOrNull(1), it.getOrNull(2), true)
-        }, FarmingMilestoneCommand::onComplete)
+        registerCommand0(
+            "shcalccrop",
+            "Calculate how many crops need to be farmed between different crop milestones.",
+            {
+                FarmingMilestoneCommand.onCommand(it.getOrNull(0), it.getOrNull(1), it.getOrNull(2), false)
+            },
+            FarmingMilestoneCommand::onComplete
+        )
+        registerCommand0(
+            "shcalccroptime",
+            "Calculate how long you need to farm crops between different crop milestones.",
+            {
+                FarmingMilestoneCommand.onCommand(it.getOrNull(0), it.getOrNull(1), it.getOrNull(2), true)
+            },
+            FarmingMilestoneCommand::onComplete
+        )
         registerCommand0(
             "shskills",
             "Skills XP/Level related command",
             { SkillAPI.onCommand(it) },
-            SkillAPI::onComplete)
+            SkillAPI::onComplete
+        )
+        registerCommand(
+            "shlimbostats",
+            "Prints your Limbo Stats!"
+        ) { LimboTimeTracker.printStats() }
+        registerCommand(
+            "shlimbo",
+            "Warps you to Limbo."
+        ) { MiscFeatures().goToLimbo() }
     }
 
     private fun usersBugFix() {
@@ -358,7 +382,10 @@ object Commands {
     private fun developersCodingHelp() {
         registerCommand("shrepopatterns", "See where regexes are loaded from") { RepoPatternGui.open() }
         registerCommand("shtest", "Unused test command.") { SkyHanniDebugsAndTests.testCommand(it) }
-        registerCommand("shtestitem", "test item internal name resolving") { SkyHanniDebugsAndTests.testItemCommand(it) }
+        registerCommand(
+            "shtestitem",
+            "test item internal name resolving"
+        ) { SkyHanniDebugsAndTests.testItemCommand(it) }
         registerCommand(
             "shfindnullconfig",
             "Find config elements that are null and prints them into the console"
@@ -366,7 +393,7 @@ object Commands {
         registerCommand("shtestwaypoint", "Set a waypoint on that location") { SkyHanniDebugsAndTests.waypoint(it) }
         registerCommand("shtesttablist", "Set your clipboard as a fake tab list.") { TabListData.toggleDebugCommand() }
         registerCommand("shreloadlocalrepo", "Reloading the local repo data") { SkyHanniMod.repo.reloadLocalRepo() }
-        registerCommand("shchathistory", "Show the unfiltered chat history") { ChatManager.openChatFilterGUI() }
+        registerCommand("shchathistory", "Show the unfiltered chat history") { ChatManager.openChatFilterGUI(it) }
         registerCommand(
             "shstoplisteners",
             "Unregistering all loaded forge event listeners"
@@ -383,6 +410,10 @@ object Commands {
             "shcopyentities",
             "Copies entities in the specified radius around the player to the clipboard"
         ) { CopyNearbyEntitiesCommand.command(it) }
+        registerCommand(
+            "shtracksounds",
+            "Tracks the sounds for the specified duration (in seconds) and copies it to the clipboard"
+        ) { TrackSoundsCommand.command(it) }
         registerCommand(
             "shcopytablist",
             "Copies the tab list data to the clipboard"
@@ -453,10 +484,6 @@ object Commands {
         registerCommand("shsendcontests", "") { GardenNextJacobContest.shareContestConfirmed(it) }
         registerCommand("shwords", "Opens the config list for modifying visual words") { openVisualWords() }
         registerCommand("shstopaccountupgradereminder", "") { AccountUpgradeReminder.disable() }
-        registerCommand(
-            "shsendtranslation",
-            "Respond with a translation of the message that the user clicks"
-        ) { Translator.toEnglish(it) }
     }
 
     private fun shortenedCommands() {

@@ -65,7 +65,7 @@ object NEUItems {
         allItemsCache = readAllNeuItems()
     }
 
-    @Deprecated("Use NEUInternalName rather than String", ReplaceWith("getInternalNameFromItemName()"))
+    @Deprecated("Use NEUInternalName rather than String", ReplaceWith("NEUInternalName.fromItemName(itemName)"))
     fun getRawInternalName(itemName: String): String = NEUInternalName.fromItemName(itemName).asString()
 
     fun readAllNeuItems(): Map<String, NEUInternalName> {
@@ -113,7 +113,7 @@ object NEUItems {
         if (result != -1.0) return result
 
         if (equals("JACK_O_LANTERN")) {
-            return getPrice("PUMPKIN", useSellingPrice) + 1
+            return "PUMPKIN".asInternalName().getPrice(useSellingPrice) + 1
         }
         if (equals("GOLDEN_CARROT")) {
             // 6.8 for some players
@@ -133,7 +133,7 @@ object NEUItems {
     fun getItemStackOrNull(internalName: String) = internalName.asInternalName().getItemStackOrNull()
 
     // TODO remove
-    @Deprecated("Use NEUInternalName rather than String", ReplaceWith("getItemStack()"))
+    @Deprecated("Use NEUInternalName rather than String", ReplaceWith("internalName.asInternalName().getItemStack()"))
     fun getItemStack(internalName: String): ItemStack =
         internalName.asInternalName().getItemStack()
 
@@ -281,7 +281,7 @@ object NEUItems {
         return result
     }
 
-    @Deprecated("Do not use strings as id", ReplaceWith("getMultiplier with NEUInternalName"))
+    @Deprecated("Do not use strings as id", ReplaceWith("NEUItems.getMultiplier(internalName.asInternalName())"))
     fun getMultiplier(internalName: String, tryCount: Int = 0): Pair<String, Int> {
         val pair = getMultiplier(internalName.asInternalName(), tryCount)
         return Pair(pair.first.asString(), pair.second)

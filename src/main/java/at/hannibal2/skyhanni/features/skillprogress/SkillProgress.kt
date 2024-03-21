@@ -20,6 +20,7 @@ import at.hannibal2.skyhanni.utils.ChatUtils.chat
 import at.hannibal2.skyhanni.utils.ConditionalUtils.onToggle
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
+import at.hannibal2.skyhanni.utils.NumberUtil.formatDouble
 import at.hannibal2.skyhanni.utils.NumberUtil.interpolate
 import at.hannibal2.skyhanni.utils.NumberUtil.roundToPrecision
 import at.hannibal2.skyhanni.utils.Quad
@@ -94,17 +95,9 @@ object SkillProgress {
             SkillProgressConfig.TextAlignment.LEFT,
             SkillProgressConfig.TextAlignment.RIGHT,
             -> {
-                config.displayPosition.renderRenderables(
-                    listOf(
-                        Renderable.fixedSizeLine(
-                            horizontalContainer(
-                                display,
-                                horizontalAlign = textAlignment.alignment
-                            ), maxWidth
-                        )
-                    ),
-                    posLabel = "Skill Progress"
-                )
+                val content = horizontalContainer(display, horizontalAlign = textAlignment.alignment)
+                val renderables = listOf(Renderable.fixedSizeLine(content, maxWidth))
+                config.displayPosition.renderRenderables(renderables, posLabel = "Skill Progress")
             }
 
             else -> {}
@@ -225,7 +218,7 @@ object SkillProgress {
 
     @SubscribeEvent(priority = EventPriority.LOW)
     fun onActionBar(event: ActionBarUpdateEvent) {
-        if (!config.hideInActionBar) return
+        if (!config.hideInActionBar || !isEnabled()) return
         if (event.isCanceled) return
         var msg = event.actionBar
         for (line in hideInActionBar) {
@@ -456,8 +449,8 @@ object SkillProgress {
 
             if (config.showActionLeft.get() && percent != 100f) {
                 append(" - ")
-                val gain = skill.lastGain.replace(",", "")
-                val actionLeft = (ceil(currentXpMax.toDouble() - currentXp) / gain.toDouble()).toLong().addSeparators()
+                val gain = skill.lastGain.formatDouble()
+                val actionLeft = (ceil(currentXpMax.toDouble() - currentXp) / gain).toLong().addSeparators()
                 if (skill.lastGain != "" && !actionLeft.contains("-")) {
                     append("§6$actionLeft Left")
                 } else {

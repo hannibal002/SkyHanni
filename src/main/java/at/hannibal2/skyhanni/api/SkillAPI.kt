@@ -1,10 +1,11 @@
 package at.hannibal2.skyhanni.api
 
 import at.hannibal2.skyhanni.data.ProfileStorageData
+import at.hannibal2.skyhanni.data.jsonobjects.repo.neu.NeuSkillLevelJson
 import at.hannibal2.skyhanni.events.ActionBarUpdateEvent
-import at.hannibal2.skyhanni.events.ConfigLoadEvent
 import at.hannibal2.skyhanni.events.DebugDataCollectEvent
 import at.hannibal2.skyhanni.events.InventoryFullyOpenedEvent
+import at.hannibal2.skyhanni.events.NeuRepositoryReloadEvent
 import at.hannibal2.skyhanni.events.SkillOverflowLevelupEvent
 import at.hannibal2.skyhanni.features.skillprogress.SkillProgress
 import at.hannibal2.skyhanni.features.skillprogress.SkillType
@@ -15,24 +16,20 @@ import at.hannibal2.skyhanni.features.skillprogress.SkillUtil.calculateOverFlow
 import at.hannibal2.skyhanni.features.skillprogress.SkillUtil.getLevel
 import at.hannibal2.skyhanni.features.skillprogress.SkillUtil.getLevelExact
 import at.hannibal2.skyhanni.features.skillprogress.SkillUtil.getSkillInfo
-import at.hannibal2.skyhanni.features.skillprogress.SkillUtil.levelArray
 import at.hannibal2.skyhanni.features.skillprogress.SkillUtil.xpRequiredForLevel
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.cleanName
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
+import at.hannibal2.skyhanni.utils.NumberUtil.formatDouble
+import at.hannibal2.skyhanni.utils.NumberUtil.formatLong
 import at.hannibal2.skyhanni.utils.NumberUtil.formatLongOrUserError
-import at.hannibal2.skyhanni.utils.NumberUtil.formatNumber
 import at.hannibal2.skyhanni.utils.NumberUtil.romanToDecimalIfNecessary
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.TabListData
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
-import com.google.gson.GsonBuilder
 import com.google.gson.annotations.Expose
-import com.google.gson.reflect.TypeToken
-import io.github.moulberry.notenoughupdates.util.Constants
-import io.github.moulberry.notenoughupdates.util.Utils
 import net.minecraft.command.CommandBase
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import java.util.LinkedList
@@ -56,7 +53,7 @@ object SkillAPI {
     )
     private val skillTabPattern by patternGroup.pattern(
         "skill.tab",
-        "^§e§lSkills: §r§a(?<type>\\w+) (?<level>\\d+): §r§3(?<progress>.+)%\$"
+        " (?<type>\\w+) (?<level>\\d+): §r§a(?<progress>.+)%$"
     )
     private val maxSkillTabPattern by patternGroup.pattern(
         "skill.tab.max",
@@ -68,6 +65,7 @@ object SkillAPI {
     val storage get() = ProfileStorageData.profileSpecific?.skillData
     var exactLevelingMap = mapOf<Int, Int>()
     var levelingMap = mapOf<Int, Int>()
+    var levelArray = listOf<Int>()
     var activeSkill: SkillType? = null
 
     // TODO Use a map maxSkillLevel and move it into the repo
@@ -139,14 +137,10 @@ object SkillAPI {
     }
 
     @SubscribeEvent
-    fun onConfigLoad(event: ConfigLoadEvent) {
-        val gson = GsonBuilder().create()
-        val xpList: List<Int> = gson.fromJson(
-            Utils.getElement(Constants.LEVELING, "leveling_xp").asJsonArray.toString(),
-            object : TypeToken<List<Int>>() {}.type
-        )
-        levelingMap = xpList.withIndex().associate { (index, xp) -> index to xp }
-        exactLevelingMap = xpList.withIndex().associate { (index, xp) -> xp to index }
+    fun onNEURepoReload(event: NeuRepositoryReloadEvent) {
+        levelArray = event.readConstant<NeuSkillLevelJson>("leveling").levelingXp
+        levelingMap = levelArray.withIndex().associate { (index, xp) -> index to xp }
+        exactLevelingMap = levelArray.withIndex().associate { (index, xp) -> xp to index }
     }
 
     @SubscribeEvent
@@ -170,7 +164,7 @@ object SkillAPI {
                     val previousLine = stack.getLore()[lineIndex - 1]
                     val progress = cleanLine.substring(cleanLine.lastIndexOf(' ') + 1)
                     if (previousLine == "§7§8Max Skill level reached!") {
-                        var totalXp = progress.formatNumber()
+                        var totalXp = progress.formatLong()
                         val minus = if (skillLevel == 50) 4_000_000 else if (skillLevel == 60) 7_000_000 else 0
                         totalXp -= minus
                         val (overflowLevel, overflowCurrent, overflowNeeded, overflowTotal) = getSkillInfo(
@@ -192,10 +186,9 @@ object SkillAPI {
                         }
                     } else {
                         val splitProgress = progress.split("/")
-                        val currentXp = splitProgress.first().formatNumber()
-                        val neededXp = splitProgress.last().formatNumber()
-                        val levelingArray = levelArray()
-                        val levelXp = calculateLevelXp(levelingArray, skillLevel - 1).toLong()
+                        val currentXp = splitProgress.first().formatLong()
+                        val neededXp = splitProgress.last().formatLong()
+                        val levelXp = calculateLevelXp(skillLevel - 1).toLong()
 
                         skillInfo?.apply {
                             this.currentXp = currentXp
@@ -266,8 +259,8 @@ object SkillAPI {
     }
 
     private fun handleSkillPattern(matcher: Matcher, skillType: SkillType, skillInfo: SkillInfo) {
-        val currentXp = matcher.group("current").formatNumber()
-        val maxXp = matcher.group("needed").formatNumber()
+        val currentXp = matcher.group("current").formatLong()
+        val maxXp = matcher.group("needed").formatLong()
         val level = getLevelExact(maxXp)
 
         val (levelOverflow, currentOverflow, currentMaxOverflow, totalOverflow) = getSkillInfo(
@@ -300,6 +293,8 @@ object SkillAPI {
         for (line in TabListData.getTabList()) {
             var levelMatcher = skillTabPattern.matcher(line)
             if (levelMatcher.matches()) {
+                val type = levelMatcher.group("type")
+                if (type != skillType.displayName) continue
                 tablistLevel = levelMatcher.group("level").toInt()
                 if (levelMatcher.group("type").lowercase() != activeSkill?.lowercaseName) tablistLevel = 0
             } else {
@@ -311,11 +306,9 @@ object SkillAPI {
             }
         }
         val existingLevel = getSkillInfo(skillType) ?: SkillInfo()
-        val xpPercentageS = matcher.group("progress").replace(",", "")
-        val xpPercentage = xpPercentageS.toFloatOrNull() ?: return
-        val levelingArray = levelArray()
-        val levelXp = calculateLevelXp(levelingArray, existingLevel.level - 1)
-        val nextLevelDiff = levelingArray[tablistLevel]?.asDouble ?: 7_600_000.0
+        val xpPercentage = matcher.group("progress").formatDouble()
+        val levelXp = calculateLevelXp(existingLevel.level - 1)
+        val nextLevelDiff = levelArray.getOrNull(tablistLevel)?.toDouble() ?: 7_600_000.0
         val nextLevelProgress = nextLevelDiff * xpPercentage / 100
         val totalXp = levelXp + nextLevelProgress
         val (_, currentOverflow, currentMaxOverflow, totalOverflow) = getSkillInfo(
@@ -341,11 +334,10 @@ object SkillAPI {
     }
 
     private fun handleSkillPatternMultiplier(matcher: Matcher, skillType: SkillType, skillInfo: SkillInfo) {
-        val currentXp = matcher.group("current").formatNumber()
-        val maxXp = matcher.group("needed").formatNumber()
+        val currentXp = matcher.group("current").formatLong()
+        val maxXp = matcher.group("needed").formatLong()
         val level = getLevelExact(maxXp)
-        val levelingArray = levelArray()
-        val levelXp = calculateLevelXp(levelingArray, level - 1).toLong() + currentXp
+        val levelXp = calculateLevelXp(level - 1).toLong() + currentXp
         val (currentLevel, currentOverflow, currentMaxOverflow, totalOverflow) = getSkillInfo(
             level,
             currentXp,

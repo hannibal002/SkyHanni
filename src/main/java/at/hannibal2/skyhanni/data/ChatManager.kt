@@ -5,12 +5,14 @@ import at.hannibal2.skyhanni.events.LorenzChatEvent
 import at.hannibal2.skyhanni.events.MessageSendToServerEvent
 import at.hannibal2.skyhanni.events.PacketEvent
 import at.hannibal2.skyhanni.features.chat.ChatFilterGui
+import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.IdentityCharacteristics
 import at.hannibal2.skyhanni.utils.LorenzLogger
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.ReflectionUtils.getClassInstance
 import at.hannibal2.skyhanni.utils.ReflectionUtils.getModContainer
 import at.hannibal2.skyhanni.utils.ReflectionUtils.makeAccessible
+import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import net.minecraft.client.Minecraft
 import net.minecraft.client.gui.ChatLine
 import net.minecraft.client.gui.GuiNewChat
@@ -39,6 +41,10 @@ object ChatManager {
         }
 
     private fun getRecentMessageHistory(): List<MessageFilteringResult> = messageHistory.toList().map { it.second }
+
+    private fun getRecentMessageHistoryWithSearch(searchTerm: String): List<MessageFilteringResult> =
+        messageHistory.toList().map { it.second }
+            .filter { it.message.formattedText.removeColor().contains(searchTerm, ignoreCase = true) }
 
     enum class ActionKind(format: Any) {
         BLOCKED(EnumChatFormatting.RED.toString() + EnumChatFormatting.BOLD),
@@ -112,7 +118,10 @@ object ChatManager {
         val original = event.message
         val message = LorenzUtils.stripVanillaMessage(original.formattedText)
 
-        if (message.startsWith("§f{\"server\":\"")) return
+        if (message.startsWith("§f{\"server\":\"")) {
+            HypixelData.checkForLocraw(message)
+            return
+        }
         val key = IdentityCharacteristics(original)
         val chatEvent = LorenzChatEvent(message, original)
         if (!isSoopyMessage(event.message)) {
@@ -179,8 +188,18 @@ object ChatManager {
         return false
     }
 
-    fun openChatFilterGUI() {
-        SkyHanniMod.screenToOpen = ChatFilterGui(getRecentMessageHistory())
+    fun openChatFilterGUI(args: Array<String>) {
+        SkyHanniMod.screenToOpen = if (args.isEmpty()) {
+            ChatFilterGui(getRecentMessageHistory())
+        } else {
+            val searchTerm = args.joinToString(" ")
+            val history = getRecentMessageHistoryWithSearch(searchTerm)
+            if (history.isEmpty()) {
+                ChatUtils.chat("§eNot found in chat history! ($searchTerm)")
+                return
+            }
+            ChatFilterGui(history)
+        }
     }
 
     private val chatLinesField by lazy {

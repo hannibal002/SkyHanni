@@ -3,9 +3,11 @@ package at.hannibal2.skyhanni.data
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.config.ConfigFileType
 import at.hannibal2.skyhanni.config.features.inventory.SackDisplayConfig.PriceFrom
+import at.hannibal2.skyhanni.data.jsonobjects.repo.neu.NeuSacksJson
 import at.hannibal2.skyhanni.events.InventoryCloseEvent
 import at.hannibal2.skyhanni.events.InventoryFullyOpenedEvent
 import at.hannibal2.skyhanni.events.LorenzChatEvent
+import at.hannibal2.skyhanni.events.NeuRepositoryReloadEvent
 import at.hannibal2.skyhanni.events.SackChangeEvent
 import at.hannibal2.skyhanni.events.SackDataUpdateEvent
 import at.hannibal2.skyhanni.features.fishing.FishingAPI
@@ -14,12 +16,14 @@ import at.hannibal2.skyhanni.features.inventory.SackDisplay
 import at.hannibal2.skyhanni.utils.CollectionUtils.editCopy
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
+import at.hannibal2.skyhanni.utils.ItemUtils.itemNameWithoutColor
 import at.hannibal2.skyhanni.utils.ItemUtils.name
 import at.hannibal2.skyhanni.utils.NEUInternalName
 import at.hannibal2.skyhanni.utils.NEUInternalName.Companion.asInternalName
 import at.hannibal2.skyhanni.utils.NEUItems.getNpcPriceOrNull
 import at.hannibal2.skyhanni.utils.NEUItems.getPrice
-import at.hannibal2.skyhanni.utils.NumberUtil.formatNumber
+import at.hannibal2.skyhanni.utils.NumberUtil.formatInt
+import at.hannibal2.skyhanni.utils.NumberUtil.formatLong
 import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.StringUtils.matches
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
@@ -60,6 +64,12 @@ object SackAPI {
     val gemstoneItem = mutableMapOf<String, SackGemstone>()
     private val stackList = mutableMapOf<Int, ItemStack>()
 
+    var sackListInternalNames = emptySet<String>()
+        private set
+
+    var sackListNames = emptySet<String>()
+        private set
+
     @SubscribeEvent
     fun onInventoryClose(event: InventoryCloseEvent) {
         inSackInventory = false
@@ -99,12 +109,12 @@ object SackAPI {
     }
 
     private fun NEUInternalName.sackPrice(stored: String) = when (sackDisplayConfig.priceFrom) {
-        PriceFrom.BAZAAR -> (getPrice(true) * stored.formatNumber()).toLong()
+        PriceFrom.BAZAAR -> (getPrice(true) * stored.formatLong()).toLong()
             .let { if (it < 0) 0L else it }
 
         PriceFrom.NPC -> try {
             val npcPrice = getNpcPriceOrNull() ?: 0.0
-            (npcPrice * stored.formatNumber()).toLong()
+            (npcPrice * stored.formatLong()).toLong()
         } catch (e: Exception) {
             0L
         }
@@ -115,7 +125,7 @@ object SackAPI {
     fun getSacksData(savingSacks: Boolean) {
         if (savingSacks) sackData = ProfileStorageData.sackProfiles?.sackContents ?: return
         for ((_, stack) in stackList) {
-            val name = stack.name ?: continue
+            val name = stack.name
             val lore = stack.getLore()
             val gem = SackGemstone()
             val rune = SackRune()
@@ -135,19 +145,19 @@ object SackAPI {
                                 "Rough" -> {
                                     gem.rough = stored
                                     gem.roughPrice = internalName.sackPrice(stored)
-                                    if (savingSacks) setSackItem(internalName, stored.formatNumber())
+                                    if (savingSacks) setSackItem(internalName, stored.formatLong())
                                 }
 
                                 "Flawed" -> {
                                     gem.flawed = stored
                                     gem.flawedPrice = internalName.sackPrice(stored)
-                                    if (savingSacks) setSackItem(internalName, stored.formatNumber())
+                                    if (savingSacks) setSackItem(internalName, stored.formatLong())
                                 }
 
                                 "Fine" -> {
                                     gem.fine = stored
                                     gem.finePrice = internalName.sackPrice(stored)
-                                    if (savingSacks) setSackItem(internalName, stored.formatNumber())
+                                    if (savingSacks) setSackItem(internalName, stored.formatLong())
                                 }
                             }
                             gemstoneItem[name] = gem
@@ -162,10 +172,10 @@ object SackAPI {
                         item.stored = stored
                         item.total = group("total")
 
-                        if (savingSacks) setSackItem(item.internalName, item.stored.formatNumber())
+                        if (savingSacks) setSackItem(item.internalName, item.stored.formatLong())
                         item.price = if (isTrophySack) {
                             val filletPerTrophy = FishingAPI.getFilletPerTrophy(stack.getInternalName())
-                            val filletValue = filletPerTrophy * stored.formatNumber()
+                            val filletValue = filletPerTrophy * stored.formatLong()
                             item.magmaFish = filletValue
                             "MAGMA_FISH".asInternalName().sackPrice(filletValue.toString())
                         } else {
@@ -227,7 +237,7 @@ object SackAPI {
 
         val sackChanges = ArrayList<SackChange>()
         for (match in sackChangeRegex.findAll(sackChangeText)) {
-            val delta = match.groups[1]!!.value.replace(",", "").toInt()
+            val delta = match.groups[1]!!.value.formatInt()
             val item = match.groups[2]!!.value
             val sacks = match.groups[3]!!.value.split(", ")
 
@@ -240,6 +250,21 @@ object SackAPI {
         if (chatConfig.hideSacksChange) {
             event.blockedReason = "sacks_change"
         }
+    }
+
+    @SubscribeEvent
+    fun onNeuRepoReload(event: NeuRepositoryReloadEvent) {
+        val sacksData = event.readConstant<NeuSacksJson>("sacks").sacks
+        val uniqueSackItems = mutableSetOf<NEUInternalName>()
+
+        sacksData.values.forEach { sackInfo ->
+            sackInfo.contents.forEach { content ->
+                uniqueSackItems.add(content)
+            }
+        }
+
+        sackListInternalNames = uniqueSackItems.map { it.asString() }.toSet()
+        sackListNames = uniqueSackItems.map { it.itemNameWithoutColor.uppercase() }.toSet()
     }
 
     private fun updateSacks(changes: SackChangeEvent) {
@@ -339,6 +364,7 @@ data class SackItem(
 ) {
 
     fun getStatus() = status ?: SackStatus.MISSING
+    fun statusIsCorrectOrAlright() = getStatus().let { it == SackStatus.CORRECT || it == SackStatus.ALRIGHT }
 }
 
 private val gemstoneMap = mapOf(
@@ -354,7 +380,6 @@ private val gemstoneMap = mapOf(
 
 // ideally should be correct but using alright should also be fine unless they sold their whole sacks
 enum class SackStatus {
-
     MISSING,
     CORRECT,
     ALRIGHT,

@@ -21,6 +21,7 @@ object ErrorManager {
         "at at.hannibal2.skyhanni.config.commands.Commands\$createCommand",
         "at net.minecraftforge.fml.common.eventhandler.EventBus.post",
         "at at.hannibal2.skyhanni.mixins.hooks.NetHandlerPlayClientHookKt.onSendPacket",
+        "at net.minecraft.client.main.Main.main",
     )
 
     private val replace = mapOf(
@@ -54,9 +55,9 @@ object ErrorManager {
         cache.clear()
     }
 
-    fun skyHanniError(message: String): Nothing {
+    fun skyHanniError(message: String, vararg extraData: Pair<String, Any?>): Nothing {
         val exception = IllegalStateException(message)
-        logErrorWithData(exception, message)
+        logErrorWithData(exception, message, extraData = extraData)
         throw exception
     }
 
@@ -100,8 +101,9 @@ object ErrorManager {
         message: String,
         vararg extraData: Pair<String, Any?>,
         ignoreErrorCache: Boolean = false,
+        noStackTrace: Boolean = false,
     ) {
-        logError(throwable, message, ignoreErrorCache, noStackTrace = false, *extraData)
+        logError(throwable, message, ignoreErrorCache, noStackTrace, *extraData)
     }
 
     private fun logError(

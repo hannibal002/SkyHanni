@@ -1,19 +1,23 @@
 package at.hannibal2.skyhanni.features.slayer
 
 import at.hannibal2.skyhanni.SkyHanniMod
-import at.hannibal2.skyhanni.config.Storage
+import at.hannibal2.skyhanni.config.storage.ProfileSpecificStorage
 import at.hannibal2.skyhanni.data.ProfileStorageData
 import at.hannibal2.skyhanni.data.SlayerAPI
+import at.hannibal2.skyhanni.data.jsonobjects.repo.neu.NeuRNGScore
 import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.InventoryFullyOpenedEvent
 import at.hannibal2.skyhanni.events.LorenzChatEvent
 import at.hannibal2.skyhanni.events.LorenzTickEvent
+import at.hannibal2.skyhanni.events.NeuRepositoryReloadEvent
 import at.hannibal2.skyhanni.events.SlayerChangeEvent
+import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.ItemUtils.nameWithEnchantment
 import at.hannibal2.skyhanni.utils.LorenzUtils
+import at.hannibal2.skyhanni.utils.NEUInternalName
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.NumberUtil.formatNumber
 import at.hannibal2.skyhanni.utils.RenderUtils.renderString
@@ -21,7 +25,6 @@ import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.StringUtils.removeWordsAtEnd
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
-import io.github.moulberry.notenoughupdates.util.Constants
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import kotlin.math.ceil
 import kotlin.time.Duration.Companion.seconds
@@ -46,6 +49,8 @@ class SlayerRngMeterDisplay {
 
     private var display = ""
     private var lastItemDroppedTime = 0L
+
+    var rngScore = mapOf<String, Map<NEUInternalName, Long>>()
 
     @SubscribeEvent
     fun onTick(event: LorenzTickEvent) {
@@ -111,9 +116,9 @@ class SlayerRngMeterDisplay {
         update()
     }
 
-    private fun getStorage(): Storage.ProfileSpecific.SlayerRngMeterStorage? {
+    private fun getStorage(): ProfileSpecificStorage.SlayerRngMeterStorage? {
         return ProfileStorageData.profileSpecific?.slayerRngMeter?.getOrPut(getCurrentSlayer()) {
-            Storage.ProfileSpecific.SlayerRngMeterStorage()
+            ProfileSpecificStorage.SlayerRngMeterStorage()
         }
     }
 
@@ -138,10 +143,22 @@ class SlayerRngMeterDisplay {
             storage.goalNeeded = -1
         } else {
             storage.itemGoal = selectedItem.nameWithEnchantment
-            val jsonObject = Constants.RNGSCORE["slayer"].asJsonObject.get(getCurrentSlayer()).asJsonObject
-            storage.goalNeeded = jsonObject.get(selectedItem.getInternalName().asString()).asLong
+            storage.goalNeeded = rngScore[getCurrentSlayer()]?.get(selectedItem.getInternalName())
+                ?: ErrorManager.skyHanniError(
+                    "RNG Meter goal setting failed",
+                    "selectedItem" to selectedItem,
+                    "selectedItemInternalName" to selectedItem.getInternalName(),
+                    "currentSlayer" to getCurrentSlayer(),
+                    "repo" to rngScore
+                )
+
         }
         update()
+    }
+
+    @SubscribeEvent
+    fun onNeuRepoReload(event: NeuRepositoryReloadEvent) {
+        rngScore = event.readConstant<NeuRNGScore>("rngscore").slayer
     }
 
     private fun update() {
