@@ -133,14 +133,11 @@ class GardenVisitorFeatures {
 
         readToolTip(visitor, offerItem)
 
-        if (visitor.status == VisitorAPI.VisitorStatus.NEW) {
-            val alreadyReady = offerItem.getLore().any { it == "§eClick to give!" }
-            if (alreadyReady) {
-                VisitorAPI.changeStatus(visitor, VisitorAPI.VisitorStatus.READY, "inSacks")
-                visitor.inSacks = true
-            } else {
-                VisitorAPI.changeStatus(visitor, VisitorAPI.VisitorStatus.WAITING, "firstContact")
-            }
+        val alreadyReady = offerItem.getLore().any { it == "§eClick to give!" }
+        if (alreadyReady) {
+            VisitorAPI.changeStatus(visitor, VisitorAPI.VisitorStatus.READY, "tooltipClickToGive")
+        } else {
+            VisitorAPI.changeStatus(visitor, VisitorAPI.VisitorStatus.WAITING, "tooltipMissingItems")
         }
         update()
     }
@@ -505,12 +502,11 @@ class GardenVisitorFeatures {
                 }
             }
 
-            if (!visitor.inSacks) {
-                val status = visitor.status
-                if (status == VisitorAPI.VisitorStatus.WAITING || status == VisitorAPI.VisitorStatus.READY) {
-                    val newStatus =
-                        if (hasItemsInInventory(visitor)) VisitorAPI.VisitorStatus.READY else VisitorAPI.VisitorStatus.WAITING
-                    VisitorAPI.changeStatus(visitor, newStatus, "hasItemsInInventory")
+            if (visitor.status in setOf(VisitorAPI.VisitorStatus.WAITING, VisitorAPI.VisitorStatus.READY)) {
+                if (hasItems(visitor)) {
+                    VisitorAPI.changeStatus(visitor, VisitorAPI.VisitorStatus.READY, "hasItems")
+                } else {
+                    VisitorAPI.changeStatus(visitor, VisitorAPI.VisitorStatus.WAITING, "noLongerHasItems")
                 }
             }
 
@@ -538,10 +534,16 @@ class GardenVisitorFeatures {
         }
     }
 
-    private fun hasItemsInInventory(visitor: VisitorAPI.Visitor): Boolean {
+    private fun hasItems(visitor: VisitorAPI.Visitor): Boolean {
         var ready = true
         for ((internalName, required) in visitor.shoppingList) {
-            val having = InventoryUtils.getAmountOfItemInInventory(internalName)
+            val inventoryAmount = InventoryUtils.getAmountOfItemInInventory(internalName)
+
+            val sackItemData = SackAPI.fetchSackItem(internalName)
+            val sacksAmount = sackItemData.amount
+
+            val having = inventoryAmount + sacksAmount
+
             if (having < required) {
                 ready = false
             }
@@ -610,9 +612,6 @@ class GardenVisitorFeatures {
                 add(" ")
                 add("visitorName: '${visitor.visitorName}'")
                 add("status: '${visitor.status}'")
-                if (visitor.inSacks) {
-                    add("inSacks!")
-                }
                 if (visitor.shoppingList.isNotEmpty()) {
                     add("shoppingList: '${visitor.shoppingList}'")
                 }

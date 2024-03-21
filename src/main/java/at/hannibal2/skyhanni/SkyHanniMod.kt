@@ -427,7 +427,7 @@ class SkyHanniMod {
         loadModule(ChatManager)
         loadModule(HypixelData())
         loadModule(LocationFixData)
-        loadModule(DungeonAPI())
+        loadModule(DungeonAPI)
         loadModule(ScoreboardData())
         loadModule(SeaCreatureFeatures())
         loadModule(SeaCreatureManager())
