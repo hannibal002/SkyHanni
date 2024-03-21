@@ -100,7 +100,7 @@ class TotemOfCorruption {
     fun onRenderWorld(event: LorenzRenderWorldEvent) {
         if (!isEffectiveAreaEnabled()) return
 
-        val color = Color(SpecialColour.specialToChromaRGB(config.color), true)
+        val color = config.color.toChromaColor()
         for (totem in totems) {
             // The center of the totem is the upper part
             event.drawSphereInWorld(color, totem.location.add(y = 1), 16f)
