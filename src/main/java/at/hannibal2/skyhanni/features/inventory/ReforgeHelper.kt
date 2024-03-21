@@ -358,7 +358,7 @@ class ReforgeHelper {
 
     private fun colorReforgeStone(color: Int, reforgeStone: String?) {
         val inventory = inventoryContainer?.inventory ?: return
-        val itemStack = inventory.firstOrNull { it.cleanName() == reforgeStone }
+        val itemStack = inventory.firstOrNull { it?.cleanName() == reforgeStone }
         if (itemStack != null) {
             itemStack.background = color
         } else {
