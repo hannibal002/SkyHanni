@@ -123,13 +123,17 @@ object ChatUtils {
      * @see CHAT_PREFIX
      */
     fun clickableChat(message: String, command: String, prefix: Boolean = true, prefixColor: String = "§e") {
-        val msgPrefix = if (prefix) prefixColor + CHAT_PREFIX else ""
-        val text = ChatComponentText(msgPrefix + message)
+        multiComponentMessage(listOf(createClickableChat(message, command)), prefix, prefixColor)
+    }
+
+    fun createClickableChat(message: String, command: String): ChatComponentText {
+        val text = ChatComponentText(message)
         val fullCommand = "/" + command.removePrefix("/")
         text.chatStyle.chatClickEvent = ClickEvent(ClickEvent.Action.RUN_COMMAND, fullCommand)
         text.chatStyle.chatHoverEvent =
             HoverEvent(HoverEvent.Action.SHOW_TEXT, ChatComponentText("§eExecute $fullCommand"))
-        internalChat(text)
+
+        return text
     }
 
     /**
@@ -149,15 +153,19 @@ object ChatUtils {
         prefix: Boolean = true,
         prefixColor: String = "§e",
     ) {
-        val msgPrefix = if (prefix) prefixColor + CHAT_PREFIX else ""
-        val text = ChatComponentText(msgPrefix + message)
+        multiComponentMessage(listOf(createHoverableChat(message, hover, command)), prefix, prefixColor)
+    }
+
+    fun createHoverableChat(message: String, hover: List<String>, command: String? = null): ChatComponentText {
+        val text = ChatComponentText(message)
         text.chatStyle.chatHoverEvent =
             HoverEvent(HoverEvent.Action.SHOW_TEXT, ChatComponentText(hover.joinToString("\n")))
 
         command?.let {
             text.chatStyle.chatClickEvent = ClickEvent(ClickEvent.Action.RUN_COMMAND, "/${it.removePrefix("/")}")
         }
-        internalChat(text)
+
+        return text
     }
 
     /**
@@ -193,12 +201,11 @@ object ChatUtils {
      * @param prefix Whether to prefix the message with the chat prefix, default true
      * @param prefixColor Color that the prefix should be, default yellow (§e)
      *
-     * Prefixes can be used for these messages but because they are longer they are disabled by default
      * @see CHAT_PREFIX
      */
     fun multiComponentMessage(
         components: List<ChatComponentText>,
-        prefix: Boolean = false,
+        prefix: Boolean = true,
         prefixColor: String = "§e"
     ) {
         val msgPrefix = if (prefix) prefixColor + CHAT_PREFIX else ""
