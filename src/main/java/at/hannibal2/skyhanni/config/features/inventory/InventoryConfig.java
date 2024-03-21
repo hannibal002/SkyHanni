@@ -80,6 +80,11 @@ public class InventoryConfig {
     public AuctionHousePriceComparisonConfig auctionsPriceComparison = new AuctionHousePriceComparisonConfig();
 
     @Expose
+    @ConfigOption(name = "Soulbound Items", desc = "")
+    @Accordion
+    public SoulBoundItemConfig soulbound = new SoulBoundItemConfig();
+
+    @Expose
     @ConfigOption(
         name = "Item Number",
         desc = "Showing the item number as a stack size for these items."

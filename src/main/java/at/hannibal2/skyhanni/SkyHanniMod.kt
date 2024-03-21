@@ -289,6 +289,7 @@ import at.hannibal2.skyhanni.features.misc.QuickModMenuSwitch
 import at.hannibal2.skyhanni.features.misc.RestorePieceOfWizardPortalLore
 import at.hannibal2.skyhanni.features.misc.ServerRestartTitle
 import at.hannibal2.skyhanni.features.misc.SkyBlockKickDuration
+import at.hannibal2.skyhanni.features.inventory.SoulboundItemIcon
 import at.hannibal2.skyhanni.features.misc.SuperpairsClicksAlert
 import at.hannibal2.skyhanni.features.misc.TimeFeatures
 import at.hannibal2.skyhanni.features.misc.TpsCounter
@@ -793,6 +794,7 @@ class SkyHanniMod {
         loadModule(LimboPlaytime())
         loadModule(RareDropMessages())
         loadModule(CraftMaterialsFromBazaar())
+        loadModule(SoulboundItemIcon())
 
         init()
 
