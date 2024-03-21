@@ -17,6 +17,7 @@ import at.hannibal2.skyhanni.utils.LorenzColor
 import at.hannibal2.skyhanni.utils.LorenzRarity
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.NumberUtil.toStringWithPlus
+import at.hannibal2.skyhanni.utils.RenderUtils
 import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderables
 import at.hannibal2.skyhanni.utils.RenderUtils.renderStrings
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getReforgeName
@@ -276,7 +277,7 @@ class ReforgeHelper {
         val icon: String
         val tip: String
         if (stat == null) {
-            icon = "§7D."
+            icon = "§7D"
             tip = "§7Default"
         } else {
             icon = stat.icon
@@ -288,7 +289,10 @@ class ReforgeHelper {
         val sortField =
             Renderable.drawInsideRoundedRect(
                 Renderable.hoverTips(
-                    icon, listOf("§6Sort after", tip)
+                    Renderable.fixedSizeLine(
+                        Renderable.string(icon, horizontalAlign = RenderUtils.HorizontalAlignment.CENTER),
+                        ReforgeAPI.StatType.fontSizeOfLargestIcon
+                    ), listOf("§6Sort after", tip)
                 ), fieldColor.toColor(), radius = 15, padding = 1
             )
         return if (sortAfter == stat) {

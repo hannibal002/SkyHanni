@@ -1,6 +1,7 @@
 package at.hannibal2.skyhanni.config
 
 import at.hannibal2.skyhanni.SkyHanniMod
+import at.hannibal2.skyhanni.api.ReforgeAPI
 import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.data.jsonobjects.local.FriendsJson
 import at.hannibal2.skyhanni.data.jsonobjects.local.JacobContestsJson
@@ -134,10 +135,47 @@ class ConfigManager {
                     return reader.nextString().toLong().asTimeMark()
                 }
             }.nullSafe())
+            .registerTypeAdapter(ReforgeAPI.StatType::class.java, object : TypeAdapter<ReforgeAPI.StatType>() {
+                override fun write(out: JsonWriter, value: ReforgeAPI.StatType) {
+                    out.value(value.name.lowercase()) // F you guy who made the stats lowercase
+                }
+
+                override fun read(reader: JsonReader): ReforgeAPI.StatType {
+                    return ReforgeAPI.StatType.valueOf(reader.nextString().uppercase())
+                }
+            }.nullSafe())
+            .registerTypeAdapter<ReforgeAPI.StatList>({ out, value ->
+                out.beginObject()
+                value.forEach {
+                    out.name(it.key.name.lowercase()).value(it.value)
+                }
+                out.endObject()
+            }, { reader ->
+                reader.beginObject()
+                val list = ReforgeAPI.StatList()
+                while (reader.hasNext()) {
+                    val name = reader.nextName()
+                    val value = reader.nextDouble()
+                    list[ReforgeAPI.StatType.valueOf(name.uppercase())] = value
+                }
+                reader.endObject()
+                list
+            })
             .enableComplexMapKeySerialization()
             .create()
 
         var configDirectory = File("config/skyhanni")
+
+        private inline fun <reified T> GsonBuilder.registerTypeAdapter(
+            crossinline write: (JsonWriter, T) -> Unit,
+            crossinline read: (JsonReader) -> T
+        ): GsonBuilder {
+            this.registerTypeAdapter(T::class.java, object : TypeAdapter<T>() {
+                override fun write(out: JsonWriter, value: T) = write(out, value)
+                override fun read(reader: JsonReader) = read(reader)
+            }.nullSafe())
+            return this
+        }
     }
 
     val features get() = jsonHolder[ConfigFileType.FEATURES] as Features

@@ -166,12 +166,12 @@ object EstimatedItemValueCalculator {
         val rawReforgeName = stack.getReforgeName() ?: return 0.0
 
         val reforge = EstimatedItemValue.reforges.values.firstOrNull {
-            rawReforgeName == it.reforgeName.lowercase() || rawReforgeName == it.internalName.asString().lowercase()
+            rawReforgeName == it.reforgeName.lowercase() || rawReforgeName == it.internalName?.asString()?.lowercase()
         } ?: return 0.0
-        val internalName = reforge.internalName.asString().asInternalName()
+        val internalName = reforge.internalName ?: return 0.0
         val reforgeStonePrice = internalName.getPrice()
         val reforgeStoneName = internalName.itemName
-        val applyCost = getReforgeStoneApplyCost(stack, reforge.reforgeCosts, internalName) ?: return 0.0
+        val applyCost = reforge.reforgeCosts?.let { getReforgeStoneApplyCost(stack, it, internalName) } ?: return 0.0
 
         list.add("§7Reforge: §9${reforge.reforgeName}")
         list.add("  §7Stone $reforgeStoneName §7(§6" + NumberUtil.format(reforgeStonePrice) + "§7)")

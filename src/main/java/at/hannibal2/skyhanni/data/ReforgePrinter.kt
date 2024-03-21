@@ -3,12 +3,13 @@ package at.hannibal2.skyhanni.data
 import at.hannibal2.skyhanni.api.ReforgeAPI
 import at.hannibal2.skyhanni.api.ReforgeAPI.ReforgeType
 import at.hannibal2.skyhanni.api.ReforgeAPI.StatType
+import at.hannibal2.skyhanni.config.ConfigManager
 import at.hannibal2.skyhanni.utils.LorenzRarity
 import at.hannibal2.skyhanni.utils.NEUInternalName.Companion.asInternalName
-import com.google.gson.GsonBuilder
+import com.google.gson.annotations.Expose
 import java.io.FileOutputStream
 
-class ReforgePrinter {
+object ReforgePrinter {
     val reforgesPrint = listOf(
         ReforgeAPI.Reforge(
             "Epic", ReforgeType.SWORD_AND_ROD, mapOf(
@@ -2387,22 +2388,39 @@ class ReforgePrinter {
         )).map { it.asInternalName() })
     )
 
-    class reforges1(list: List<ReforgeAPI.Reforge>) {
-        val reforges = list.sortedBy { it.name }.map { it.name to re(it) }.toMap()
+    fun reforges1(list: List<ReforgeAPI.Reforge>) = list.sortedBy { it.name }.map { it.name to re(it) }.toMap()
 
-        class re(r: ReforgeAPI.Reforge) {
-            val reforgeStone: String? = r.reforgeStone?.asString()
-            val type = r.type
-            val specialItems = r.specialItems?.map { it.asString() }
-            val reforgeAbility = r.extraProperty
-            val stats = r.stats
+    class re(r: ReforgeAPI.Reforge) {
+        @Expose
+        val reforgeStone: String? = r.reforgeStone?.asString()
+
+        @Expose
+        val reforgeName = r.name
+
+        @Expose
+        val itemTypes = r.type.name.replace("_AND_", "/")
+
+        @Expose
+        val requiredRarities = r.stats.keys
+
+        @Expose
+        val reforgeAbility = r.extraProperty.takeIf { it.isNotEmpty() }?.let {
+            val temp = it.values.first()
+            if (it.values.all { it == temp }) {
+                temp
+            } else {
+                it
+            }
         }
+
+        @Expose
+        val reforgeStats = r.stats
     }
 
     val print = run {
-        val gson = GsonBuilder().setPrettyPrinting().create()
+        val gson = ConfigManager.gson
         val string = gson.toJson(reforges1(reforgesPrint.filterNot { it.isReforgeStone }))
-        val stream = FileOutputStream(".\\Reforges.json")
+        val stream = FileOutputStream(".\\reforges.json")
         stream.write(string.toByteArray())
         stream.close()
     }

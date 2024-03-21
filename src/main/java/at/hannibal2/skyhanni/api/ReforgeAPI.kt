@@ -1,10 +1,8 @@
 package at.hannibal2.skyhanni.api
 
-import at.hannibal2.skyhanni.config.ConfigManager
-import at.hannibal2.skyhanni.data.jsonobjects.repo.neu.NeuReforgeStoneJson
+import at.hannibal2.skyhanni.data.jsonobjects.repo.neu.NeuReforgeJson
 import at.hannibal2.skyhanni.events.NeuRepositoryReloadEvent
 import at.hannibal2.skyhanni.events.RepositoryReloadEvent
-import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.ItemCategory
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName
 import at.hannibal2.skyhanni.utils.ItemUtils.getItemCategoryOrNull
@@ -14,13 +12,16 @@ import at.hannibal2.skyhanni.utils.LorenzUtils.round
 import at.hannibal2.skyhanni.utils.NEUInternalName
 import at.hannibal2.skyhanni.utils.NEUInternalName.Companion.asInternalName
 import at.hannibal2.skyhanni.utils.StringUtils.allLettersFirstUppercase
-import at.hannibal2.skyhanni.utils.fromJson
-import io.github.moulberry.notenoughupdates.util.Utils
+import net.minecraft.client.Minecraft
 import net.minecraft.item.ItemStack
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import java.util.EnumMap
 
 object ReforgeAPI {
+
+    init {
+//         ReforgePrinter.print
+    }
 
     var reforgeList: List<Reforge> = emptyList()
         private set
@@ -173,41 +174,22 @@ object ReforgeAPI {
 
     @SubscribeEvent
     fun onNeuRepoReload(event: NeuRepositoryReloadEvent) {
-        val data = event.getConstant("reforgestones") ?: ErrorManager.skyHanniError("NEU reforgestones data is null")
-        try {
-            val reforgeStoneData = ConfigManager.gson.fromJson<Map<String, NeuReforgeStoneJson>>(data).values
-
-            reforgeList = reforgeStoneData.map {
-                reforge(it)
-            }
-
-        } catch (e: Exception) {
-            ErrorManager.logErrorWithData(
-                e, "Error getting NEU reforgestones data, make sure your neu repo is updated.",
-                "reforgeStoneJson" to data
-            )
-            Utils.showOutdatedRepoNotification()
+        val reforgeStoneData = event.readConstant<Map<String, NeuReforgeJson>>("reforgestones").values
+        val reforgeData = event.readConstant<Map<String, NeuReforgeJson>>("reforges").values
+        reforgeList = (reforgeStoneData + reforgeData).map {
+            reforge(it)
         }
     }
 
-    private fun reforge(it: NeuReforgeStoneJson): Reforge {
+    private fun reforge(it: NeuReforgeJson): Reforge {
         val type = it.itemType
         return Reforge(
             name = it.reforgeName,
             type = LorenzUtils.enumValueOf<ReforgeType>(type.first),
-            stats = it.reforgeStats.map {
-                LorenzUtils.enumValueOf<LorenzRarity>(
-                    it.key.replace(
-                        " ",
-                        "_"
-                    )
-                ) to StatList.fromJson(it.value)
-            }
-                .toMap(),
-            reforgeStone = it.internalName.asInternalName(),
+            stats = it.reforgeStats ?: emptyMap(),
+            reforgeStone = it.internalName,
             specialItems = type.second.takeIf { it.isNotEmpty() },
             extraProperty = it.reforgeAbility
-                .mapKeys { LorenzUtils.enumValueOf<LorenzRarity>(it.key.replace(" ", "_")) }
         )
     }
 
@@ -258,9 +240,15 @@ object ReforgeAPI {
         val iconWithName = "$icon $fname"
 
         fun asString(value: Int) = (if (value > 0) "+" else "") + value.toString() + " " + this.icon
+
+        companion object {
+            val fontSizeOfLargestIcon by lazy {
+                entries.maxOf { Minecraft.getMinecraft().fontRendererObj.getStringWidth(it.icon) }
+            }
+        }
     }
 
-    class StatList : EnumMap<StatType, Double>(StatType::class.java) {
+    class StatList : EnumMap<StatType, Double>(StatType::class.java), Map<StatType, Double> {
         operator fun minus(other: StatList): StatList {
             return StatList().apply {
                 for ((key, value) in this@StatList) {
