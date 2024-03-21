@@ -56,12 +56,11 @@ object ChatUtils {
      * This should be used for errors that are not caused by the user.
      *
      * Why deprecate this? Even if this message is descriptive for the user and the developer,
-     * we don't want inconsitencies in errors, and we would need to search
+     * we don't want inconsistencies in errors, and we would need to search
      * for the code line where this error gets printed any way.
      * so it's better to use the stack trace still.
      *
      * @param message The message to be sent
-     * @param prefix Whether to prefix the message with the error prefix, default true
      *
      * @see ERROR_PREFIX
      */
@@ -186,6 +185,29 @@ object ChatUtils {
         text.chatStyle.chatHoverEvent = HoverEvent(HoverEvent.Action.SHOW_TEXT, ChatComponentText("$prefixColor$hover"))
         internalChat(text)
         if (autoOpen) OSUtils.openBrowser(url)
+    }
+
+    /**
+     * Sends a message to the user that combines many message components e.g. clickable, hoverable and regular text
+     * @param components The list of components to be joined together to form the final message
+     * @param prefix Whether to prefix the message with the chat prefix, default true
+     * @param prefixColor Color that the prefix should be, default yellow (§e)
+     *
+     * Prefixes can be used for these messages but because they are longer they are disabled by default
+     * @see CHAT_PREFIX
+     */
+    fun multiComponentMessage(
+        components: List<ChatComponentText>,
+        prefix: Boolean = false,
+        prefixColor: String = "§e"
+    ) {
+        val msgPrefix = if (prefix) prefixColor + CHAT_PREFIX else ""
+        val baseMessage = ChatComponentText(msgPrefix)
+        for (component in components) {
+            baseMessage.appendSibling(component)
+            baseMessage.appendSibling(ChatComponentText(" "))
+        }
+        internalChat(baseMessage)
     }
 
     private var lastMessageSent = SimpleTimeMark.farPast()
