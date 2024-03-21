@@ -681,22 +681,20 @@ object RenderUtils {
         GlStateManager.popMatrix()
     }
 
-    fun drawSphereInWorld(
+    fun LorenzRenderWorldEvent.drawSphereInWorld(
         color: Color,
         location: LorenzVec,
         radius: Float,
-        partialTicks: Float,
     ) {
-        drawSphereInWorld(color, location.x, location.y, location.z, radius, partialTicks)
+        drawSphereInWorld(color, location.x, location.y, location.z, radius)
     }
 
-    fun drawSphereInWorld(
+    fun LorenzRenderWorldEvent.drawSphereInWorld(
         color: Color,
         x: Double,
         y: Double,
         z: Double,
         radius: Float,
-        partialTicks: Float,
     ) {
         GlStateManager.pushMatrix()
         GL11.glNormal3f(0.0f, 1.0f, 0.0f)
