@@ -202,7 +202,7 @@ class GardenVisitorTimer {
     }
 
     @SubscribeEvent
-    fun onBlockBreak(event: CropClickEvent) {
+    fun onCropClick(event: CropClickEvent) {
         if (!isEnabled()) return
         sixthVisitorArrivalTime -= 100.milliseconds
 

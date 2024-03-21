@@ -18,7 +18,7 @@ class JacobContestStatsSummary {
     private var startTime = SimpleTimeMark.farPast()
 
     @SubscribeEvent
-    fun onBlockClick(event: CropClickEvent) {
+    fun onCropClick(event: CropClickEvent) {
         if (!isEnabled()) return
         if (event.clickType != ClickType.LEFT_CLICK) return
 

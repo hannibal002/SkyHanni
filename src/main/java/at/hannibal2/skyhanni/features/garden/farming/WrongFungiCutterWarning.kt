@@ -30,7 +30,7 @@ class WrongFungiCutterWarning {
     }
 
     @SubscribeEvent
-    fun onBlockClick(event: CropClickEvent) {
+    fun onCropClick(event: CropClickEvent) {
         if (event.clickType != ClickType.LEFT_CLICK) return
         if (event.crop != CropType.MUSHROOM) return
 
