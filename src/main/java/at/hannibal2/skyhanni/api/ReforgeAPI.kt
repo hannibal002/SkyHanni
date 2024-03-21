@@ -18,11 +18,6 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import java.util.EnumMap
 
 object ReforgeAPI {
-
-    init {
-//         ReforgePrinter.print
-    }
-
     var reforgeList: List<Reforge> = emptyList()
         private set
 
