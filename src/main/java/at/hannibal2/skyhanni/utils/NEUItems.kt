@@ -1,6 +1,7 @@
 package at.hannibal2.skyhanni.utils
 
 import at.hannibal2.skyhanni.config.ConfigManager
+import at.hannibal2.skyhanni.data.jsonobjects.other.HypixelPlayerApiJson
 import at.hannibal2.skyhanni.data.jsonobjects.repo.MultiFilterJson
 import at.hannibal2.skyhanni.events.NeuProfileDataLoadedEvent
 import at.hannibal2.skyhanni.events.NeuRepositoryReloadEvent
@@ -67,7 +68,17 @@ object NEUItems {
 
     @SubscribeEvent
     fun onProfileDataLoaded(event: ProfileDataLoadedEvent) {
-        NeuProfileDataLoadedEvent(event).postAndCatch()
+        val apiData = event.data ?: return
+        try {
+            val playerData = ConfigManager.gson.fromJson<HypixelPlayerApiJson>(apiData)
+            NeuProfileDataLoadedEvent(playerData).postAndCatch()
+
+        } catch (e: Exception) {
+            ErrorManager.logErrorWithData(
+                e, "Error reading hypixel player api data",
+                "data" to apiData
+            )
+        }
     }
 
     @Deprecated("Use NEUInternalName rather than String", ReplaceWith("NEUInternalName.fromItemName(itemName)"))
