@@ -162,13 +162,19 @@ object ChatUtils {
         internalChat(createHoverableChat(fullMessage, hover, command))
     }
 
-    fun createHoverableChat(message: String, hover: List<String>, command: String? = null): ChatComponentText {
+    fun createHoverableChat(
+        message: String,
+        hover: List<String>,
+        command: String? = null,
+        runCommand: Boolean = true
+    ): ChatComponentText {
         val text = ChatComponentText(message)
         text.chatStyle.chatHoverEvent =
             HoverEvent(HoverEvent.Action.SHOW_TEXT, ChatComponentText(hover.joinToString("\n")))
 
         command?.let {
-            text.chatStyle.chatClickEvent = ClickEvent(ClickEvent.Action.RUN_COMMAND, "/${it.removePrefix("/")}")
+            val eventType = if (runCommand) ClickEvent.Action.RUN_COMMAND else ClickEvent.Action.SUGGEST_COMMAND
+            text.chatStyle.chatClickEvent = ClickEvent(eventType, "/${it.removePrefix("/")}")
         }
 
         return text
@@ -216,10 +222,9 @@ object ChatUtils {
     ) {
         val msgPrefix = if (prefix) prefixColor + CHAT_PREFIX else ""
         val baseMessage = ChatComponentText(msgPrefix)
-        for (component in components) {
-            baseMessage.appendSibling(component)
-            baseMessage.appendSibling(ChatComponentText(" "))
-        }
+
+        for (component in components) baseMessage.appendSibling(component)
+
         internalChat(baseMessage)
     }
 
