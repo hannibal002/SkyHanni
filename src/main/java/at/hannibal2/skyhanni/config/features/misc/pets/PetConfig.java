@@ -68,4 +68,9 @@ public class PetConfig {
             return str;
         }
     }
+
+    @Expose
+    @ConfigOption(name = "George Display", desc = "")
+    @Accordion
+    public GeorgeConfig george = new GeorgeConfig();
 }

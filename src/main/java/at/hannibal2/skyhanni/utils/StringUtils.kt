@@ -307,4 +307,6 @@ object StringUtils {
     fun String.isRoman(): Boolean {
         return UtilsPatterns.isRomanPattern.matches(this)
     }
+
+    fun String.convertToInternalNameString(): String = this.uppercase().replace(" ", "_")
 }

@@ -267,6 +267,7 @@ import at.hannibal2.skyhanni.features.misc.CustomTextBox
 import at.hannibal2.skyhanni.features.misc.ExpOrbsOnGroundHider
 import at.hannibal2.skyhanni.features.misc.FixGhostEntities
 import at.hannibal2.skyhanni.features.misc.FixNEUHeavyPearls
+import at.hannibal2.skyhanni.features.misc.GeorgeDisplay
 import at.hannibal2.skyhanni.features.misc.HideArmor
 import at.hannibal2.skyhanni.features.misc.InGameDateDisplay
 import at.hannibal2.skyhanni.features.misc.JoinCrystalHollows
@@ -757,6 +758,7 @@ class SkyHanniMod {
         loadModule(VolcanoExplosivityDisplay())
         loadModule(PlayerChatSymbols())
         loadModule(FixNEUHeavyPearls())
+        loadModule(GeorgeDisplay())
         loadModule(QuickCraftFeatures())
         loadModule(SkyBlockKickDuration())
         loadModule(LimboTimeTracker)
