@@ -58,7 +58,7 @@ class SharkFishCounter {
         val g = counter[3] // Great White
         val total = count.addSeparators()
         val funnyComment = funnyComment(count)
-        ChatUtils.chat("You caught $total §f(§a$n §9$b §5$t §6$g§f) §esharks during this fishing contest. $funnyComment")
+        ChatUtils.chat("You caught $total §f(§a$n §9$b §5$t §6$g§f) §esharks during this fishing festival. $funnyComment")
         counter = mutableListOf(0, 0, 0, 0)
         display = ""
     }

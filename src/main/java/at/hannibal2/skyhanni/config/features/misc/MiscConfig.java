@@ -176,12 +176,6 @@ public class MiscConfig {
     public Position playerMovementSpeedPos = new Position(394, 124, false, true);
 
     @Expose
-    @ConfigOption(name = "Pet Candy Used", desc = "Show the number of Pet Candy used on a pet.")
-    @ConfigEditorBoolean
-    @FeatureToggle
-    public boolean petCandyUsed = true;
-
-    @Expose
     @ConfigOption(name = "Server Restart Title", desc = "Show a title with seconds remaining until the server restarts after a Game Update or Scheduled Restart.")
     @ConfigEditorBoolean
     @FeatureToggle

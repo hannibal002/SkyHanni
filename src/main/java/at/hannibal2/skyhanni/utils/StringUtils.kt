@@ -91,10 +91,7 @@ object StringUtils {
         return cleanedString.toString()
     }
 
-    fun UUID.toDashlessUUID(): String {
-        return toString().replace("-", "")
-    }
-
+    fun UUID.toDashlessUUID(): String = toString().replace("-", "")
 
     inline fun <T> Pattern.matchMatcher(text: String, consumer: Matcher.() -> T) =
         matcher(text).let { if (it.matches()) consumer(it) else null }
@@ -181,13 +178,13 @@ object StringUtils {
      * @param delimiterColor - the color code of the delimiter, inserted before each delimiter (commas and "and").
      * @return a string representing the list joined with the Oxford comma and the word "and".
      */
-    fun createCommaSeparatedList(list: List<String>, delimiterColor: String = ""): String {
-        if (list.isEmpty()) return ""
-        if (list.size == 1) return list[0]
-        if (list.size == 2) return "${list[0]}$delimiterColor and ${list[1]}"
-        val lastIndex = list.size - 1
-        val allButLast = list.subList(0, lastIndex).joinToString("$delimiterColor, ")
-        return "$allButLast$delimiterColor, and ${list[lastIndex]}"
+    fun List<String>.createCommaSeparatedList(delimiterColor: String = ""): String {
+        if (this.isEmpty()) return ""
+        if (this.size == 1) return this[0]
+        if (this.size == 2) return "${this[0]}$delimiterColor and ${this[1]}"
+        val lastIndex = this.size - 1
+        val allButLast = this.subList(0, lastIndex).joinToString("$delimiterColor, ")
+        return "$allButLast$delimiterColor, and ${this[lastIndex]}"
     }
 
     fun pluralize(number: Int, singular: String, plural: String? = null, withNumber: Boolean = false): String {
@@ -261,15 +258,9 @@ object StringUtils {
         return chatComponent
     }
 
-    fun String.getPlayerNameFromChatMessage(): String? {
-        val matcher = matchPlayerChatMessage(this) ?: return null
-        return matcher.group("username")
-    }
+    fun String.getPlayerNameFromChatMessage(): String? = matchPlayerChatMessage(this)?.group("username")
 
-    fun String.getPlayerNameAndRankFromChatMessage(): String? {
-        val matcher = matchPlayerChatMessage(this) ?: return null
-        return matcher.group("rankedName")
-    }
+    fun String.getPlayerNameAndRankFromChatMessage(): String? = matchPlayerChatMessage(this)?.group("rankedName")
 
     private fun matchPlayerChatMessage(string: String): Matcher? {
         var username = ""
@@ -305,7 +296,7 @@ object StringUtils {
 
     fun String?.equalsIgnoreColor(string: String?) = this?.let { it.removeColor() == string?.removeColor() } ?: false
 
-    fun String.isRoman(): Boolean {
-        return UtilsPatterns.isRomanPattern.matches(this)
-    }
+    fun String.isRoman(): Boolean = UtilsPatterns.isRomanPattern.matches(this)
+
+    fun isEmpty(message: String): Boolean = message.removeColor().trimWhiteSpaceAndResets().isEmpty()
 }
