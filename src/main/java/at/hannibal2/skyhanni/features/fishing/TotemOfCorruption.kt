@@ -123,10 +123,8 @@ class TotemOfCorruption {
                 val timeRemaining = getTimeRemaining(totem) ?: return@mapNotNull null
                 val owner = getOwner(totem) ?: return@mapNotNull null
 
-                if (
-                    timeRemaining == config.warnWhenAboutToExpire.seconds
-                    && config.warnWhenAboutToExpire.seconds > 0.seconds
-                ) {
+                val timeToWarn = config.warnWhenAboutToExpire.seconds
+                if (timeToWarn > 0.seconds && timeRemaining == timeToWarn) {
                     playPlingSound()
                     sendTitle("§c§lTotem of Corruption §eabout to expire!", 5.seconds)
                 }
