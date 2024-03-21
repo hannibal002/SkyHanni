@@ -36,6 +36,7 @@ object CollectionAPI {
 
     val collectionValue = mutableMapOf<NEUInternalName, Long>()
 
+    // TODO repo
     private val incorrectCollectionNames = mapOf(
         "Mushroom" to "RED_MUSHROOM".asInternalName()
     )
