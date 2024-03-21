@@ -503,13 +503,10 @@ class GardenVisitorFeatures {
             }
 
             if (visitor.status in setOf(VisitorAPI.VisitorStatus.WAITING, VisitorAPI.VisitorStatus.READY)) {
-                var newStatus: VisitorAPI.VisitorStatus
                 if (hasItems(visitor)) {
-                    newStatus = VisitorAPI.VisitorStatus.READY
-                    VisitorAPI.changeStatus(visitor, newStatus, "hasItems")
+                    VisitorAPI.changeStatus(visitor, VisitorAPI.VisitorStatus.READY, "hasItems")
                 } else {
-                    newStatus = VisitorAPI.VisitorStatus.WAITING
-                    VisitorAPI.changeStatus(visitor, newStatus, "noLongerHasItems")
+                    VisitorAPI.changeStatus(visitor, VisitorAPI.VisitorStatus.WAITING, "noLongerHasItems")
                 }
             }
 
