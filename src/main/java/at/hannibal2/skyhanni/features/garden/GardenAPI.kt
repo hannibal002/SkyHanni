@@ -191,7 +191,7 @@ object GardenAPI {
         }
 
         lastLocation = position
-        CropClickEvent(cropBroken, blockState, event.clickType, event.itemInHand).postAndCatch()
+        CropClickEvent(position, cropBroken, blockState, event.clickType, event.itemInHand).postAndCatch()
     }
 
     fun getExpForLevel(requestedLevel: Int): Long {

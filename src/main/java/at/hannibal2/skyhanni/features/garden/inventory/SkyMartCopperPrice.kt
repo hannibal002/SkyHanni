@@ -60,7 +60,7 @@ class SkyMartCopperPrice {
     @SubscribeEvent
     fun onInventoryOpen(event: InventoryFullyOpenedEvent) {
         if (!isEnabled()) return
-        if (event.inventoryName != "SkyMart") return
+        if (!event.inventoryName.startsWith("SkyMart ")) return
 
         inInventory = true
         val table = mutableListOf<DisplayTableEntry>()
