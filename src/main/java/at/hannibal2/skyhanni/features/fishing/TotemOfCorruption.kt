@@ -68,7 +68,7 @@ class TotemOfCorruption {
                 val owner = getOwner(totem)
                 if (timeRemaining != null && owner != null) {
                     if (
-                        timeRemaining == config.warnWhenAboutToExpire.toDuration(DurationUnit.SECONDS)
+                        timeRemaining == config.warnWhenAboutToExpire.seconds
                         && config.warnWhenAboutToExpire.toDuration(DurationUnit.SECONDS) > 0.seconds
                     ) {
                         playPlingSound()
