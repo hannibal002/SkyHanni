@@ -413,7 +413,7 @@ import org.apache.logging.log4j.Logger
     clientSideOnly = true,
     useMetadata = true,
     guiFactory = "at.hannibal2.skyhanni.config.ConfigGuiForgeInterop",
-    version = "0.24.Beta.16",
+    version = "0.24.Beta.17",
 )
 class SkyHanniMod {
 
@@ -428,7 +428,7 @@ class SkyHanniMod {
         loadModule(ChatManager)
         loadModule(HypixelData())
         loadModule(LocationFixData)
-        loadModule(DungeonAPI())
+        loadModule(DungeonAPI)
         loadModule(ScoreboardData())
         loadModule(SeaCreatureFeatures())
         loadModule(SeaCreatureManager())
