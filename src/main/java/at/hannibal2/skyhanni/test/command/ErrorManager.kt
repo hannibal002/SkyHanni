@@ -113,17 +113,16 @@ object ErrorManager {
         noStackTrace: Boolean,
         vararg extraData: Pair<String, Any?>,
     ) {
-        val error = Error(message, throwable)
-        error.printStackTrace()
-        Minecraft.getMinecraft().thePlayer ?: return
-
         if (!ignoreErrorCache) {
             val pair = if (throwable.stackTrace.isNotEmpty()) {
-                throwable.stackTrace[0].let { it.fileName!! to it.lineNumber }
+                throwable.stackTrace[0].let { (it.fileName ?: "<unknown>") to it.lineNumber }
             } else message to 0
             if (cache.contains(pair)) return
             cache.add(pair)
         }
+
+        Error(message, throwable).printStackTrace()
+        Minecraft.getMinecraft().thePlayer ?: return
 
         val fullStackTrace: String
         val stackTrace: String
@@ -175,7 +174,7 @@ object ErrorManager {
 
     private fun Throwable.getCustomStackTrace(
         fullStackTrace: Boolean,
-        parent: List<String> = emptyList()
+        parent: List<String> = emptyList(),
     ): List<String> = buildList {
         add("Caused by ${this@getCustomStackTrace.javaClass.name}: $message")
 
