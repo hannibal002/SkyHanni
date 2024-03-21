@@ -129,7 +129,7 @@ class SkyHanniItemTracker<Data : ItemTrackerData>(
             }
 
             val lore = buildLore(data, itemProfit, hidden, newDrop, internalName)
-            val renderable = if (isInventoryOpen()) Renderable.clickAndHover(displayName, lore) {
+            val renderable = if (isInventoryOpen()) Renderable.clickAndHover(displayName, lore, onClick = {
                 if (System.currentTimeMillis() > lastClickDelay + 150) {
                     if (KeyboardManager.isModifierKeyDown()) {
                         data.items.remove(internalName)
@@ -143,7 +143,7 @@ class SkyHanniItemTracker<Data : ItemTrackerData>(
                     }
                     update()
                 }
-            } else Renderable.string(displayName)
+            }) else Renderable.string(displayName)
 
             lists.addAsSingletonList(renderable)
         }
