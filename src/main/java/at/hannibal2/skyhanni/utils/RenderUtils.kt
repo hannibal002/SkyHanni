@@ -683,6 +683,15 @@ object RenderUtils {
 
     fun drawSphereInWorld(
         color: Color,
+        location: LorenzVec,
+        radius: Float,
+        partialTicks: Float,
+    ) {
+        drawSphereInWorld(color, location.x, location.y, location.z, radius, partialTicks)
+    }
+
+    fun drawSphereInWorld(
+        color: Color,
         x: Double,
         y: Double,
         z: Double,

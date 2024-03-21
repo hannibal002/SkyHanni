@@ -18,7 +18,7 @@ public class TotemOfCorruptionConfig {
     public boolean showOverlay = true;
 
     @Expose
-    @ConfigOption(name = "Distance Threshold", desc = "The distance from the player to the Totem of Corruption for the overlay to be shown. " +
+    @ConfigOption(name = "Distance Threshold", desc = "The minimum distance to the Totem of Corruption for the overlay." +
         "\nThe effective distance of the totem is 16." +
         "\n§cLimited by how far you can see the nametags.")
     @ConfigEditorSlider(minValue = 0, maxValue = 100, minStep = 1)
@@ -27,13 +27,11 @@ public class TotemOfCorruptionConfig {
     @Expose
     @ConfigOption(name = "Hide Particles", desc = "Hide the particles of the Totem of Corruption.")
     @ConfigEditorBoolean
-    @FeatureToggle
     public boolean hideParticles = true;
 
     @Expose
     @ConfigOption(name = "Show Effective Area", desc = "Show the effective area (16 blocks) of the Totem of Corruption.")
     @ConfigEditorBoolean
-    @FeatureToggle
     public boolean showEffectiveArea = true;
 
     @Expose

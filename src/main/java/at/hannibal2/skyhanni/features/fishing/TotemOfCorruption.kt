@@ -9,19 +9,25 @@ import at.hannibal2.skyhanni.utils.EntityUtils
 import at.hannibal2.skyhanni.utils.LocationUtils.distanceToPlayer
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils.sendTitle
+import at.hannibal2.skyhanni.utils.LorenzVec
 import at.hannibal2.skyhanni.utils.RenderUtils
 import at.hannibal2.skyhanni.utils.RenderUtils.renderStrings
 import at.hannibal2.skyhanni.utils.SoundUtils.playPlingSound
 import at.hannibal2.skyhanni.utils.SpecialColour
 import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.StringUtils.matches
+import at.hannibal2.skyhanni.utils.TimeUnit
+import at.hannibal2.skyhanni.utils.TimeUtils.format
 import at.hannibal2.skyhanni.utils.getLorenzVec
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraft.entity.item.EntityArmorStand
 import net.minecraft.util.EnumParticleTypes
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import java.awt.Color
+import kotlin.time.Duration
 import kotlin.time.Duration.Companion.seconds
+import kotlin.time.DurationUnit
+import kotlin.time.toDuration
 
 private val config get() = SkyHanniMod.feature.fishing.totemOfCorruption
 
@@ -29,6 +35,7 @@ private var display = emptyList<String>()
 private var totems: List<Totem> = emptyList()
 
 class TotemOfCorruption {
+
     private val group = RepoPattern.group("features.fishing.totemofcorruption")
     private val totemNamePattern by group.pattern(
         "totemname",
@@ -60,17 +67,20 @@ class TotemOfCorruption {
                 val timeRemaining = getTimeRemaining(totem)
                 val owner = getOwner(totem)
                 if (timeRemaining != null && owner != null) {
-                    if (timeRemaining == config.warnWhenAboutToExpire && config.warnWhenAboutToExpire > 0) {
+                    if (
+                        timeRemaining == config.warnWhenAboutToExpire.toDuration(DurationUnit.SECONDS)
+                        && config.warnWhenAboutToExpire.toDuration(DurationUnit.SECONDS) > 0.seconds
+                    ) {
                         playPlingSound()
                         sendTitle("§c§lTotem of Corruption §eabout to expire!", 5.seconds)
                     }
-                    Totem(totem, timeRemaining, owner)
+                    Totem(totem.getLorenzVec(), timeRemaining, owner)
                 } else {
                     null
                 }
             }
 
-        display = createLines()
+        display = createDisplay()
     }
 
     @SubscribeEvent
@@ -79,7 +89,7 @@ class TotemOfCorruption {
 
         for (totem in totems) {
             if (event.type == EnumParticleTypes.SPELL_WITCH && event.speed == 0.0f) {
-                if (totem.totemEntity.getLorenzVec().distance(event.location) < 4.0) {
+                if (totem.location.distance(event.location) < 4.0) {
                     event.isCanceled = true
                 }
             }
@@ -92,64 +102,54 @@ class TotemOfCorruption {
 
         val color = Color(SpecialColour.specialToChromaRGB(config.color), true)
         for (totem in totems) {
-            val x = totem.totemEntity.posX
-            val y = totem.totemEntity.posY + 1.0 // The center of the totem is the upper part
-            val z = totem.totemEntity.posZ
-            RenderUtils.drawSphereInWorld(color, x, y, z, 16f, event.partialTicks)
+            // The center of the totem is the upper part
+            RenderUtils.drawSphereInWorld(color, totem.location.add(y = 1), 16f, event.partialTicks)
         }
     }
 
-    private fun getTimeRemaining(totem: EntityArmorStand): Int? =
+    private fun getTimeRemaining(totem: EntityArmorStand): Duration? =
         EntityUtils.getEntitiesNearby<EntityArmorStand>(totem.getLorenzVec(), 2.0)
-            .firstOrNull { timeRemainingPattern.matches(it.name) }
-            ?.let {
-                timeRemainingPattern.matchMatcher(it.name) {
-                    group("min")?.toInt()?.let { min -> min * 60 + group("sec").toInt() }
-                        ?: group("sec").toInt()
+            .firstNotNullOfOrNull { entity ->
+                timeRemainingPattern.matchMatcher(entity.name) {
+                    val minutes = group("min")?.toIntOrNull() ?: 0
+                    val seconds = group("sec")?.toInt() ?: 0
+                    (minutes * 60 + seconds).seconds
                 }
             }
 
     private fun getOwner(totem: EntityArmorStand): String? =
         EntityUtils.getEntitiesNearby<EntityArmorStand>(totem.getLorenzVec(), 2.0)
-            .firstOrNull { ownerPattern.matches(it.name) }
-            ?.let {
-                ownerPattern.matchMatcher(it.name) {
+            .firstNotNullOfOrNull { entity ->
+                ownerPattern.matchMatcher(entity.name) {
                     group("owner")
                 }
             }
 
-    private fun createLines() = buildList {
+
+    private fun createDisplay() = buildList {
         val totem = getTotemToShow() ?: return@buildList
         add("§5§lTotem of Corruption")
-        add("§7Remaining: §e${totem.timeRemainingFormatted()}")
+        add("§7Remaining: §e${totem.timeRemaining.format(TimeUnit.MINUTE)}")
         add("§7Owner: §e${totem.ownerName}")
     }
 
-    private fun Totem.timeRemainingFormatted() = if (timeRemainingSeconds < 60) {
-        "§e${timeRemainingSeconds % 60}s"
-    } else {
-        "§e${timeRemainingSeconds / 60}min ${timeRemainingSeconds % 60}s"
-    }
-
-    private fun getTotemToShow(): Totem? {
-        return totems
-            .filter { it.distance < config.distanceThreshold }
-            .maxByOrNull { it.timeRemainingSeconds }
-    }
+    private fun getTotemToShow(): Totem? = totems
+        .filter { it.distance < config.distanceThreshold }
+        .maxByOrNull { it.timeRemaining }
 
     private fun getTotems(): List<EntityArmorStand?> {
         return EntityUtils.getEntitiesNextToPlayer<EntityArmorStand>(100.0)
             .filter { totemNamePattern.matches(it.name) }.toList()
     }
 
-    private fun isOverlayEnabled() = config.showOverlay && LorenzUtils.inSkyBlock
-    private fun isHideParticlesEnabled() = config.hideParticles && LorenzUtils.inSkyBlock
-    private fun isEffectiveAreaEnabled() = config.showEffectiveArea && LorenzUtils.inSkyBlock
+    private fun isOverlayEnabled() = LorenzUtils.inSkyBlock && config.showOverlay
+    private fun isHideParticlesEnabled() = LorenzUtils.inSkyBlock && config.hideParticles
+    private fun isEffectiveAreaEnabled() = LorenzUtils.inSkyBlock && config.showEffectiveArea
 }
 
 class Totem(
-    val totemEntity: EntityArmorStand,
-    val timeRemainingSeconds: Int,
+    val location: LorenzVec,
+    val timeRemaining: Duration,
     val ownerName: String,
-    val distance: Double = totemEntity.getLorenzVec().distanceToPlayer()
+    val distance: Double = location.distanceToPlayer()
 )
