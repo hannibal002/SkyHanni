@@ -127,6 +127,7 @@ import at.hannibal2.skyhanni.features.event.diana.SoopyGuessBurrow
 import at.hannibal2.skyhanni.features.event.jerry.HighlightJerries
 import at.hannibal2.skyhanni.features.event.jerry.frozentreasure.FrozenTreasureTracker
 import at.hannibal2.skyhanni.features.event.lobby.waypoints.christmas.PresentWaypoints
+import at.hannibal2.skyhanni.features.event.lobby.waypoints.easter.EasterEggWaypoints
 import at.hannibal2.skyhanni.features.event.lobby.waypoints.halloween.BasketWaypoints
 import at.hannibal2.skyhanni.features.event.spook.TheGreatSpook
 import at.hannibal2.skyhanni.features.event.winter.JyrreTimer
@@ -187,9 +188,11 @@ import at.hannibal2.skyhanni.features.garden.farming.GardenCropMilestoneDisplay
 import at.hannibal2.skyhanni.features.garden.farming.GardenCropSpeed
 import at.hannibal2.skyhanni.features.garden.farming.GardenCustomKeybinds
 import at.hannibal2.skyhanni.features.garden.farming.GardenStartLocation
-import at.hannibal2.skyhanni.features.garden.farming.LaneSwitchNotification
 import at.hannibal2.skyhanni.features.garden.farming.WildStrawberryDyeNotification
 import at.hannibal2.skyhanni.features.garden.farming.WrongFungiCutterWarning
+import at.hannibal2.skyhanni.features.garden.farming.lane.FarmingLaneAPI
+import at.hannibal2.skyhanni.features.garden.farming.lane.FarmingLaneCreator
+import at.hannibal2.skyhanni.features.garden.farming.lane.FarmingLaneFeatures
 import at.hannibal2.skyhanni.features.garden.fortuneguide.CaptureFarmingGear
 import at.hannibal2.skyhanni.features.garden.inventory.AnitaExtraFarmingFortune
 import at.hannibal2.skyhanni.features.garden.inventory.GardenCropMilestoneInventory
@@ -412,7 +415,7 @@ import org.apache.logging.log4j.Logger
     clientSideOnly = true,
     useMetadata = true,
     guiFactory = "at.hannibal2.skyhanni.config.ConfigGuiForgeInterop",
-    version = "0.24.Beta.14",
+    version = "0.24.Beta.16",
 )
 class SkyHanniMod {
 
@@ -427,7 +430,7 @@ class SkyHanniMod {
         loadModule(ChatManager)
         loadModule(HypixelData())
         loadModule(LocationFixData)
-        loadModule(DungeonAPI())
+        loadModule(DungeonAPI)
         loadModule(ScoreboardData())
         loadModule(SeaCreatureFeatures())
         loadModule(SeaCreatureManager())
@@ -614,6 +617,7 @@ class SkyHanniMod {
         loadModule(TiaRelayHelper())
         loadModule(TiaRelayWaypoints())
         loadModule(BasketWaypoints())
+        loadModule(EasterEggWaypoints())
         loadModule(BingoCardDisplay())
         loadModule(BingoNextStepHelper())
         loadModule(MinionCraftHelper())
@@ -640,7 +644,9 @@ class SkyHanniMod {
         loadModule(GardenNextJacobContest)
         loadModule(WrongFungiCutterWarning())
         loadModule(ArmorDropTracker)
-        loadModule(LaneSwitchNotification())
+        loadModule(FarmingLaneAPI)
+        loadModule(FarmingLaneFeatures)
+        loadModule(FarmingLaneCreator)
         loadModule(JoinCrystalHollows())
         loadModule(CrystalHollowsNamesInCore())
         loadModule(GardenVisitorColorNames)
