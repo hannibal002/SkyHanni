@@ -1,344 +1,2390 @@
 package at.hannibal2.skyhanni.data
-/*
 
 import at.hannibal2.skyhanni.api.ReforgeAPI
+import at.hannibal2.skyhanni.api.ReforgeAPI.ReforgeType
+import at.hannibal2.skyhanni.api.ReforgeAPI.StatType
 import at.hannibal2.skyhanni.utils.LorenzRarity
 import at.hannibal2.skyhanni.utils.NEUInternalName.Companion.asInternalName
 import com.google.gson.GsonBuilder
 import java.io.FileOutputStream
 
 class ReforgePrinter {
-    private val reforges = listOf(
+    val reforgesPrint = listOf(
         ReforgeAPI.Reforge(
-            "Epic", ReforgeAPI.ReforgeType.FishingRodsAndSwords, mapOf(
-            LorenzRarity.COMMON to ReforgeAPI.StatList.mapOf(ReforgeAPI.StatType.Strength to 15.0, ReforgeAPI.StatType.Crit_Damage to 10.0, ReforgeAPI.StatType.Bonus_Attack_Speed to 1.0), LorenzRarity.UNCOMMON to ReforgeAPI.StatList.mapOf(ReforgeAPI.StatType.Strength to 20.0, ReforgeAPI.StatType.Crit_Damage to 15.0, ReforgeAPI.StatType.Bonus_Attack_Speed to 2.0), LorenzRarity.RARE to ReforgeAPI.StatList.mapOf(ReforgeAPI.StatType.Strength to 25.0, ReforgeAPI.StatType.Crit_Damage to 20.0, ReforgeAPI.StatType.Bonus_Attack_Speed to 4.0), LorenzRarity.EPIC to ReforgeAPI.StatList.mapOf(ReforgeAPI.StatType.Strength to 32.0, ReforgeAPI.StatType.Crit_Damage to 27.0, ReforgeAPI.StatType.Bonus_Attack_Speed to 7.0), LorenzRarity.LEGENDARY to ReforgeAPI.StatList.mapOf(ReforgeAPI.StatType.Strength to 40.0, ReforgeAPI.StatType.Crit_Damage to 35.0, ReforgeAPI.StatType.Bonus_Attack_Speed to 10.0), LorenzRarity.MYTHIC to ReforgeAPI.StatList.mapOf(ReforgeAPI.StatType.Strength to 50.0, ReforgeAPI.StatType.Crit_Damage to 45.0, ReforgeAPI.StatType.Bonus_Attack_Speed to 15.0)
-        )
+            "Epic", ReforgeType.SWORD_AND_ROD, mapOf(
+                LorenzRarity.COMMON to ReforgeAPI.StatList.mapOf(
+                    StatType.STRENGTH to 15.0, StatType.CRIT_DAMAGE to 10.0, StatType.BONUS_ATTACK_SPEED to 1.0
+                ), LorenzRarity.UNCOMMON to ReforgeAPI.StatList.mapOf(
+                    StatType.STRENGTH to 20.0, StatType.CRIT_DAMAGE to 15.0, StatType.BONUS_ATTACK_SPEED to 2.0
+                ), LorenzRarity.RARE to ReforgeAPI.StatList.mapOf(
+                    StatType.STRENGTH to 25.0, StatType.CRIT_DAMAGE to 20.0, StatType.BONUS_ATTACK_SPEED to 4.0
+                ), LorenzRarity.EPIC to ReforgeAPI.StatList.mapOf(
+                    StatType.STRENGTH to 32.0, StatType.CRIT_DAMAGE to 27.0, StatType.BONUS_ATTACK_SPEED to 7.0
+                ), LorenzRarity.LEGENDARY to ReforgeAPI.StatList.mapOf(
+                    StatType.STRENGTH to 40.0, StatType.CRIT_DAMAGE to 35.0, StatType.BONUS_ATTACK_SPEED to 10.0
+                ), LorenzRarity.MYTHIC to ReforgeAPI.StatList.mapOf(
+                    StatType.STRENGTH to 50.0, StatType.CRIT_DAMAGE to 45.0, StatType.BONUS_ATTACK_SPEED to 15.0
+                )
+            )
+        ), ReforgeAPI.Reforge(
+            "Fair", ReforgeType.SWORD_AND_ROD, mapOf(
+                LorenzRarity.COMMON to ReforgeAPI.StatList.mapOf(
+                    StatType.STRENGTH to 2.0,
+                    StatType.CRIT_CHANCE to 2.0,
+                    StatType.CRIT_DAMAGE to 2.0,
+                    StatType.INTELLIGENCE to 2.0,
+                    StatType.BONUS_ATTACK_SPEED to 2.0
+                ), LorenzRarity.UNCOMMON to ReforgeAPI.StatList.mapOf(
+                    StatType.STRENGTH to 3.0,
+                    StatType.CRIT_CHANCE to 3.0,
+                    StatType.CRIT_DAMAGE to 3.0,
+                    StatType.INTELLIGENCE to 3.0,
+                    StatType.BONUS_ATTACK_SPEED to 3.0
+                ), LorenzRarity.RARE to ReforgeAPI.StatList.mapOf(
+                    StatType.STRENGTH to 4.0,
+                    StatType.CRIT_CHANCE to 4.0,
+                    StatType.CRIT_DAMAGE to 4.0,
+                    StatType.INTELLIGENCE to 4.0,
+                    StatType.BONUS_ATTACK_SPEED to 4.0
+                ), LorenzRarity.EPIC to ReforgeAPI.StatList.mapOf(
+                    StatType.STRENGTH to 7.0,
+                    StatType.CRIT_CHANCE to 7.0,
+                    StatType.CRIT_DAMAGE to 7.0,
+                    StatType.INTELLIGENCE to 7.0,
+                    StatType.BONUS_ATTACK_SPEED to 7.0
+                ), LorenzRarity.LEGENDARY to ReforgeAPI.StatList.mapOf(
+                    StatType.STRENGTH to 10.0,
+                    StatType.CRIT_CHANCE to 10.0,
+                    StatType.CRIT_DAMAGE to 10.0,
+                    StatType.INTELLIGENCE to 10.0,
+                    StatType.BONUS_ATTACK_SPEED to 10.0
+                ), LorenzRarity.MYTHIC to ReforgeAPI.StatList.mapOf(
+                    StatType.STRENGTH to 12.0,
+                    StatType.CRIT_CHANCE to 12.0,
+                    StatType.CRIT_DAMAGE to 12.0,
+                    StatType.INTELLIGENCE to 12.0,
+                    StatType.BONUS_ATTACK_SPEED to 12.0
+                )
+            )
+        ), ReforgeAPI.Reforge(
+            "Fast", ReforgeType.SWORD_AND_ROD, mapOf(
+                LorenzRarity.COMMON to ReforgeAPI.StatList.mapOf(
+                    StatType.BONUS_ATTACK_SPEED to 10.0
+                ),
+                LorenzRarity.UNCOMMON to ReforgeAPI.StatList.mapOf(StatType.BONUS_ATTACK_SPEED to 20.0),
+                LorenzRarity.RARE to ReforgeAPI.StatList.mapOf(
+                    StatType.BONUS_ATTACK_SPEED to 30.0
+                ),
+                LorenzRarity.EPIC to ReforgeAPI.StatList.mapOf(StatType.BONUS_ATTACK_SPEED to 40.0),
+                LorenzRarity.LEGENDARY to ReforgeAPI.StatList.mapOf(
+                    StatType.BONUS_ATTACK_SPEED to 50.0
+                ),
+                LorenzRarity.MYTHIC to ReforgeAPI.StatList.mapOf(StatType.BONUS_ATTACK_SPEED to 60.0)
+            )
+        ), ReforgeAPI.Reforge(
+            "Gentle", ReforgeType.SWORD_AND_ROD, mapOf(
+                LorenzRarity.COMMON to ReforgeAPI.StatList.mapOf(
+                    StatType.STRENGTH to 3.0, StatType.BONUS_ATTACK_SPEED to 8.0
+                ), LorenzRarity.UNCOMMON to ReforgeAPI.StatList.mapOf(
+                    StatType.STRENGTH to 5.0, StatType.BONUS_ATTACK_SPEED to 10.0
+                ), LorenzRarity.RARE to ReforgeAPI.StatList.mapOf(
+                    StatType.STRENGTH to 7.0, StatType.BONUS_ATTACK_SPEED to 15.0
+                ), LorenzRarity.EPIC to ReforgeAPI.StatList.mapOf(
+                    StatType.STRENGTH to 10.0, StatType.BONUS_ATTACK_SPEED to 20.0
+                ), LorenzRarity.LEGENDARY to ReforgeAPI.StatList.mapOf(
+                    StatType.STRENGTH to 15.0, StatType.BONUS_ATTACK_SPEED to 25.0
+                ), LorenzRarity.MYTHIC to ReforgeAPI.StatList.mapOf(
+                    StatType.STRENGTH to 20.0, StatType.BONUS_ATTACK_SPEED to 30.0
+                )
+            )
+        ), ReforgeAPI.Reforge(
+            "Heroic", ReforgeType.SWORD_AND_ROD, mapOf(
+                LorenzRarity.COMMON to ReforgeAPI.StatList.mapOf(
+                    StatType.STRENGTH to 15.0, StatType.INTELLIGENCE to 40.0, StatType.BONUS_ATTACK_SPEED to 1.0
+                ), LorenzRarity.UNCOMMON to ReforgeAPI.StatList.mapOf(
+                    StatType.STRENGTH to 20.0, StatType.INTELLIGENCE to 50.0, StatType.BONUS_ATTACK_SPEED to 2.0
+                ), LorenzRarity.RARE to ReforgeAPI.StatList.mapOf(
+                    StatType.STRENGTH to 25.0, StatType.INTELLIGENCE to 65.0, StatType.BONUS_ATTACK_SPEED to 2.0
+                ), LorenzRarity.EPIC to ReforgeAPI.StatList.mapOf(
+                    StatType.STRENGTH to 32.0, StatType.INTELLIGENCE to 80.0, StatType.BONUS_ATTACK_SPEED to 3.0
+                ), LorenzRarity.LEGENDARY to ReforgeAPI.StatList.mapOf(
+                    StatType.STRENGTH to 40.0, StatType.INTELLIGENCE to 100.0, StatType.BONUS_ATTACK_SPEED to 5.0
+                ), LorenzRarity.MYTHIC to ReforgeAPI.StatList.mapOf(
+                    StatType.STRENGTH to 50.0, StatType.INTELLIGENCE to 125.0, StatType.BONUS_ATTACK_SPEED to 7.0
+                )
+            )
+        ), ReforgeAPI.Reforge(
+            "Legendary", ReforgeType.SWORD_AND_ROD, mapOf(
+                LorenzRarity.COMMON to ReforgeAPI.StatList.mapOf(
+                    StatType.STRENGTH to 3.0,
+                    StatType.CRIT_CHANCE to 5.0,
+                    StatType.CRIT_DAMAGE to 5.0,
+                    StatType.INTELLIGENCE to 5.0,
+                    StatType.BONUS_ATTACK_SPEED to 2.0
+                ), LorenzRarity.UNCOMMON to ReforgeAPI.StatList.mapOf(
+                    StatType.STRENGTH to 7.0,
+                    StatType.CRIT_CHANCE to 7.0,
+                    StatType.CRIT_DAMAGE to 10.0,
+                    StatType.INTELLIGENCE to 8.0,
+                    StatType.BONUS_ATTACK_SPEED to 3.0
+                ), LorenzRarity.RARE to ReforgeAPI.StatList.mapOf(
+                    StatType.STRENGTH to 12.0,
+                    StatType.CRIT_CHANCE to 9.0,
+                    StatType.CRIT_DAMAGE to 15.0,
+                    StatType.INTELLIGENCE to 12.0,
+                    StatType.BONUS_ATTACK_SPEED to 5.0
+                ), LorenzRarity.EPIC to ReforgeAPI.StatList.mapOf(
+                    StatType.STRENGTH to 18.0,
+                    StatType.CRIT_CHANCE to 12.0,
+                    StatType.CRIT_DAMAGE to 22.0,
+                    StatType.INTELLIGENCE to 18.0,
+                    StatType.BONUS_ATTACK_SPEED to 7.0
+                ), LorenzRarity.LEGENDARY to ReforgeAPI.StatList.mapOf(
+                    StatType.STRENGTH to 25.0,
+                    StatType.CRIT_CHANCE to 15.0,
+                    StatType.CRIT_DAMAGE to 28.0,
+                    StatType.INTELLIGENCE to 25.0,
+                    StatType.BONUS_ATTACK_SPEED to 10.0
+                ), LorenzRarity.MYTHIC to ReforgeAPI.StatList.mapOf(
+                    StatType.STRENGTH to 32.0,
+                    StatType.CRIT_CHANCE to 18.0,
+                    StatType.CRIT_DAMAGE to 36.0,
+                    StatType.INTELLIGENCE to 35.0,
+                    StatType.BONUS_ATTACK_SPEED to 15.0
+                )
+            )
+        ), ReforgeAPI.Reforge(
+            "Odd", ReforgeType.SWORD_AND_ROD, mapOf(
+                LorenzRarity.COMMON to ReforgeAPI.StatList.mapOf(
+                    StatType.CRIT_CHANCE to 10.0, StatType.CRIT_DAMAGE to 5.0, StatType.INTELLIGENCE to -5.0
+                ), LorenzRarity.UNCOMMON to ReforgeAPI.StatList.mapOf(
+                    StatType.CRIT_CHANCE to 12.0, StatType.CRIT_DAMAGE to 10.0, StatType.INTELLIGENCE to -10.0
+                ), LorenzRarity.RARE to ReforgeAPI.StatList.mapOf(
+                    StatType.CRIT_CHANCE to 15.0, StatType.CRIT_DAMAGE to 15.0, StatType.INTELLIGENCE to -18.0
+                ), LorenzRarity.EPIC to ReforgeAPI.StatList.mapOf(
+                    StatType.CRIT_CHANCE to 20.0, StatType.CRIT_DAMAGE to 22.0, StatType.INTELLIGENCE to -32.0
+                ), LorenzRarity.LEGENDARY to ReforgeAPI.StatList.mapOf(
+                    StatType.CRIT_CHANCE to 25.0, StatType.CRIT_DAMAGE to 30.0, StatType.INTELLIGENCE to -50.0
+                ), LorenzRarity.MYTHIC to ReforgeAPI.StatList.mapOf(
+                    StatType.CRIT_CHANCE to 30.0, StatType.CRIT_DAMAGE to 40.0, StatType.INTELLIGENCE to -75.0
+                )
+            )
+        ), ReforgeAPI.Reforge(
+            "Sharp", ReforgeType.SWORD_AND_ROD, mapOf(
+                LorenzRarity.COMMON to ReforgeAPI.StatList.mapOf(
+                    StatType.CRIT_CHANCE to 10.0, StatType.CRIT_DAMAGE to 20.0
+                ), LorenzRarity.UNCOMMON to ReforgeAPI.StatList.mapOf(
+                    StatType.CRIT_CHANCE to 12.0, StatType.CRIT_DAMAGE to 30.0
+                ), LorenzRarity.RARE to ReforgeAPI.StatList.mapOf(
+                    StatType.CRIT_CHANCE to 14.0, StatType.CRIT_DAMAGE to 40.0
+                ), LorenzRarity.EPIC to ReforgeAPI.StatList.mapOf(
+                    StatType.CRIT_CHANCE to 17.0, StatType.CRIT_DAMAGE to 55.0
+                ), LorenzRarity.LEGENDARY to ReforgeAPI.StatList.mapOf(
+                    StatType.CRIT_CHANCE to 20.0, StatType.CRIT_DAMAGE to 75.0
+                ), LorenzRarity.MYTHIC to ReforgeAPI.StatList.mapOf(
+                    StatType.CRIT_CHANCE to 25.0, StatType.CRIT_DAMAGE to 90.0
+                )
+            )
+        ), ReforgeAPI.Reforge(
+            "Spicy", ReforgeType.SWORD_AND_ROD, mapOf(
+                LorenzRarity.COMMON to ReforgeAPI.StatList.mapOf(
+                    StatType.STRENGTH to 2.0,
+                    StatType.CRIT_CHANCE to 1.0,
+                    StatType.CRIT_DAMAGE to 25.0,
+                    StatType.BONUS_ATTACK_SPEED to 2.0
+                ), LorenzRarity.UNCOMMON to ReforgeAPI.StatList.mapOf(
+                    StatType.STRENGTH to 3.0,
+                    StatType.CRIT_CHANCE to 1.0,
+                    StatType.CRIT_DAMAGE to 35.0,
+                    StatType.BONUS_ATTACK_SPEED to 3.0
+                ), LorenzRarity.RARE to ReforgeAPI.StatList.mapOf(
+                    StatType.STRENGTH to 4.0,
+                    StatType.CRIT_CHANCE to 1.0,
+                    StatType.CRIT_DAMAGE to 45.0,
+                    StatType.BONUS_ATTACK_SPEED to 5.0
+                ), LorenzRarity.EPIC to ReforgeAPI.StatList.mapOf(
+                    StatType.STRENGTH to 7.0,
+                    StatType.CRIT_CHANCE to 1.0,
+                    StatType.CRIT_DAMAGE to 60.0,
+                    StatType.BONUS_ATTACK_SPEED to 7.0
+                ), LorenzRarity.LEGENDARY to ReforgeAPI.StatList.mapOf(
+                    StatType.STRENGTH to 10.0,
+                    StatType.CRIT_CHANCE to 1.0,
+                    StatType.CRIT_DAMAGE to 80.0,
+                    StatType.BONUS_ATTACK_SPEED to 10.0
+                ), LorenzRarity.MYTHIC to ReforgeAPI.StatList.mapOf(
+                    StatType.STRENGTH to 12.0,
+                    StatType.CRIT_CHANCE to 1.0,
+                    StatType.CRIT_DAMAGE to 100.0,
+                    StatType.BONUS_ATTACK_SPEED to 15.0
+                )
+            )
+        ), ReforgeAPI.Reforge(
+            "Awkward", ReforgeType.BOW, mapOf(
+                LorenzRarity.COMMON to ReforgeAPI.StatList.mapOf(
+                    StatType.CRIT_CHANCE to 10.0, StatType.CRIT_DAMAGE to 5.0, StatType.INTELLIGENCE to -5.0
+                ), LorenzRarity.UNCOMMON to ReforgeAPI.StatList.mapOf(
+                    StatType.CRIT_CHANCE to 12.0, StatType.CRIT_DAMAGE to 10.0, StatType.INTELLIGENCE to -10.0
+                ), LorenzRarity.RARE to ReforgeAPI.StatList.mapOf(
+                    StatType.CRIT_CHANCE to 15.0, StatType.CRIT_DAMAGE to 15.0, StatType.INTELLIGENCE to -18.0
+                ), LorenzRarity.EPIC to ReforgeAPI.StatList.mapOf(
+                    StatType.CRIT_CHANCE to 20.0, StatType.CRIT_DAMAGE to 22.0, StatType.INTELLIGENCE to -32.0
+                ), LorenzRarity.LEGENDARY to ReforgeAPI.StatList.mapOf(
+                    StatType.CRIT_CHANCE to 25.0, StatType.CRIT_DAMAGE to 30.0, StatType.INTELLIGENCE to -50.0
+                ), LorenzRarity.MYTHIC to ReforgeAPI.StatList.mapOf(
+                    StatType.CRIT_CHANCE to 30.0, StatType.CRIT_DAMAGE to 35.0, StatType.INTELLIGENCE to -72.0
+                )
+            )
+        ), ReforgeAPI.Reforge(
+            "Deadly", ReforgeType.BOW, mapOf(
+                LorenzRarity.COMMON to ReforgeAPI.StatList.mapOf(
+                    StatType.CRIT_CHANCE to 10.0, StatType.CRIT_DAMAGE to 5.0
+                ), LorenzRarity.UNCOMMON to ReforgeAPI.StatList.mapOf(
+                    StatType.CRIT_CHANCE to 13.0, StatType.CRIT_DAMAGE to 10.0
+                ), LorenzRarity.RARE to ReforgeAPI.StatList.mapOf(
+                    StatType.CRIT_CHANCE to 16.0, StatType.CRIT_DAMAGE to 18.0
+                ), LorenzRarity.EPIC to ReforgeAPI.StatList.mapOf(
+                    StatType.CRIT_CHANCE to 19.0, StatType.CRIT_DAMAGE to 32.0
+                ), LorenzRarity.LEGENDARY to ReforgeAPI.StatList.mapOf(
+                    StatType.CRIT_CHANCE to 22.0, StatType.CRIT_DAMAGE to 50.0
+                ), LorenzRarity.MYTHIC to ReforgeAPI.StatList.mapOf(
+                    StatType.CRIT_CHANCE to 25.0, StatType.CRIT_DAMAGE to 78.0
+                )
+            )
+        ), ReforgeAPI.Reforge(
+            "Fine", ReforgeType.BOW, mapOf(
+                LorenzRarity.COMMON to ReforgeAPI.StatList.mapOf(
+                    StatType.STRENGTH to 3.0, StatType.CRIT_CHANCE to 5.0, StatType.CRIT_DAMAGE to 2.0
+                ), LorenzRarity.UNCOMMON to ReforgeAPI.StatList.mapOf(
+                    StatType.STRENGTH to 7.0, StatType.CRIT_CHANCE to 7.0, StatType.CRIT_DAMAGE to 4.0
+                ), LorenzRarity.RARE to ReforgeAPI.StatList.mapOf(
+                    StatType.STRENGTH to 12.0, StatType.CRIT_CHANCE to 9.0, StatType.CRIT_DAMAGE to 7.0
+                ), LorenzRarity.EPIC to ReforgeAPI.StatList.mapOf(
+                    StatType.STRENGTH to 18.0, StatType.CRIT_CHANCE to 12.0, StatType.CRIT_DAMAGE to 10.0
+                ), LorenzRarity.LEGENDARY to ReforgeAPI.StatList.mapOf(
+                    StatType.STRENGTH to 25.0, StatType.CRIT_CHANCE to 15.0, StatType.CRIT_DAMAGE to 15.0
+                ), LorenzRarity.MYTHIC to ReforgeAPI.StatList.mapOf(
+                    StatType.STRENGTH to 33.0, StatType.CRIT_CHANCE to 18.0, StatType.CRIT_DAMAGE to 20.0
+                )
+            )
+        ), ReforgeAPI.Reforge(
+            "Grand", ReforgeType.BOW, mapOf(
+                LorenzRarity.COMMON to ReforgeAPI.StatList.mapOf(
+                    StatType.STRENGTH to 25.0
+                ),
+                LorenzRarity.UNCOMMON to ReforgeAPI.StatList.mapOf(StatType.STRENGTH to 32.0),
+                LorenzRarity.RARE to ReforgeAPI.StatList.mapOf(
+                    StatType.STRENGTH to 40.0
+                ),
+                LorenzRarity.EPIC to ReforgeAPI.StatList.mapOf(StatType.STRENGTH to 50.0),
+                LorenzRarity.LEGENDARY to ReforgeAPI.StatList.mapOf(
+                    StatType.STRENGTH to 60.0
+                ),
+                LorenzRarity.MYTHIC to ReforgeAPI.StatList.mapOf(StatType.STRENGTH to 75.0)
+            )
+        ), ReforgeAPI.Reforge(
+            "Hasty", ReforgeType.BOW, mapOf(
+                LorenzRarity.COMMON to ReforgeAPI.StatList.mapOf(
+                    StatType.STRENGTH to 3.0, StatType.CRIT_CHANCE to 20.0
+                ), LorenzRarity.UNCOMMON to ReforgeAPI.StatList.mapOf(
+                    StatType.STRENGTH to 5.0, StatType.CRIT_CHANCE to 25.0
+                ), LorenzRarity.RARE to ReforgeAPI.StatList.mapOf(
+                    StatType.STRENGTH to 7.0, StatType.CRIT_CHANCE to 30.0
+                ), LorenzRarity.EPIC to ReforgeAPI.StatList.mapOf(
+                    StatType.STRENGTH to 10.0, StatType.CRIT_CHANCE to 40.0
+                ), LorenzRarity.LEGENDARY to ReforgeAPI.StatList.mapOf(
+                    StatType.STRENGTH to 15.0, StatType.CRIT_CHANCE to 50.0
+                ), LorenzRarity.MYTHIC to ReforgeAPI.StatList.mapOf(
+                    StatType.STRENGTH to 20.0, StatType.CRIT_CHANCE to 60.0
+                )
+            )
+        ), ReforgeAPI.Reforge(
+            "Neat", ReforgeType.BOW, mapOf(
+                LorenzRarity.COMMON to ReforgeAPI.StatList.mapOf(
+                    StatType.CRIT_CHANCE to 10.0, StatType.CRIT_DAMAGE to 4.0, StatType.INTELLIGENCE to 3.0
+                ), LorenzRarity.UNCOMMON to ReforgeAPI.StatList.mapOf(
+                    StatType.CRIT_CHANCE to 12.0, StatType.CRIT_DAMAGE to 8.0, StatType.INTELLIGENCE to 6.0
+                ), LorenzRarity.RARE to ReforgeAPI.StatList.mapOf(
+                    StatType.CRIT_CHANCE to 14.0, StatType.CRIT_DAMAGE to 14.0, StatType.INTELLIGENCE to 10.0
+                ), LorenzRarity.EPIC to ReforgeAPI.StatList.mapOf(
+                    StatType.CRIT_CHANCE to 17.0, StatType.CRIT_DAMAGE to 20.0, StatType.INTELLIGENCE to 15.0
+                ), LorenzRarity.LEGENDARY to ReforgeAPI.StatList.mapOf(
+                    StatType.CRIT_CHANCE to 20.0, StatType.CRIT_DAMAGE to 30.0, StatType.INTELLIGENCE to 20.0
+                ), LorenzRarity.MYTHIC to ReforgeAPI.StatList.mapOf(
+                    StatType.CRIT_CHANCE to 25.0, StatType.CRIT_DAMAGE to 40.0, StatType.INTELLIGENCE to 30.0
+                )
+            )
+        ), ReforgeAPI.Reforge(
+            "Rapid", ReforgeType.BOW, mapOf(
+                LorenzRarity.COMMON to ReforgeAPI.StatList.mapOf(
+                    StatType.STRENGTH to 2.0, StatType.CRIT_DAMAGE to 35.0
+                ), LorenzRarity.UNCOMMON to ReforgeAPI.StatList.mapOf(
+                    StatType.STRENGTH to 3.0, StatType.CRIT_DAMAGE to 45.0
+                ), LorenzRarity.RARE to ReforgeAPI.StatList.mapOf(
+                    StatType.STRENGTH to 4.0, StatType.CRIT_DAMAGE to 55.0
+                ), LorenzRarity.EPIC to ReforgeAPI.StatList.mapOf(
+                    StatType.STRENGTH to 7.0, StatType.CRIT_DAMAGE to 65.0
+                ), LorenzRarity.LEGENDARY to ReforgeAPI.StatList.mapOf(
+                    StatType.STRENGTH to 10.0, StatType.CRIT_DAMAGE to 75.0
+                ), LorenzRarity.MYTHIC to ReforgeAPI.StatList.mapOf(
+                    StatType.STRENGTH to 12.0, StatType.CRIT_DAMAGE to 90.0
+                )
+            )
+        ), ReforgeAPI.Reforge(
+            "Rich", ReforgeType.BOW, mapOf(
+                LorenzRarity.COMMON to ReforgeAPI.StatList.mapOf(
+                    StatType.CRIT_CHANCE to 10.0, StatType.CRIT_DAMAGE to 2.0, StatType.INTELLIGENCE to 3.0
+                ), LorenzRarity.UNCOMMON to ReforgeAPI.StatList.mapOf(
+                    StatType.CRIT_CHANCE to 12.0, StatType.CRIT_DAMAGE to 4.0, StatType.INTELLIGENCE to 5.0
+                ), LorenzRarity.RARE to ReforgeAPI.StatList.mapOf(
+                    StatType.CRIT_CHANCE to 14.0, StatType.CRIT_DAMAGE to 7.0, StatType.INTELLIGENCE to 6.0
+                ), LorenzRarity.EPIC to ReforgeAPI.StatList.mapOf(
+                    StatType.CRIT_CHANCE to 17.0, StatType.CRIT_DAMAGE to 10.0, StatType.INTELLIGENCE to 15.0
+                ), LorenzRarity.LEGENDARY to ReforgeAPI.StatList.mapOf(
+                    StatType.CRIT_CHANCE to 20.0, StatType.CRIT_DAMAGE to 15.0, StatType.INTELLIGENCE to 20.0
+                ), LorenzRarity.MYTHIC to ReforgeAPI.StatList.mapOf(
+                    StatType.CRIT_CHANCE to 25.0, StatType.CRIT_DAMAGE to 20.0, StatType.INTELLIGENCE to 30.0
+                )
+            )
+        ), ReforgeAPI.Reforge(
+            "Unreal", ReforgeType.BOW, mapOf(
+                LorenzRarity.COMMON to ReforgeAPI.StatList.mapOf(
+                    StatType.STRENGTH to 3.0, StatType.CRIT_CHANCE to 8.0, StatType.CRIT_DAMAGE to 5.0
+                ), LorenzRarity.UNCOMMON to ReforgeAPI.StatList.mapOf(
+                    StatType.STRENGTH to 7.0, StatType.CRIT_CHANCE to 9.0, StatType.CRIT_DAMAGE to 10.0
+                ), LorenzRarity.RARE to ReforgeAPI.StatList.mapOf(
+                    StatType.STRENGTH to 12.0, StatType.CRIT_CHANCE to 10.0, StatType.CRIT_DAMAGE to 18.0
+                ), LorenzRarity.EPIC to ReforgeAPI.StatList.mapOf(
+                    StatType.STRENGTH to 18.0, StatType.CRIT_CHANCE to 11.0, StatType.CRIT_DAMAGE to 32.0
+                ), LorenzRarity.LEGENDARY to ReforgeAPI.StatList.mapOf(
+                    StatType.STRENGTH to 25.0, StatType.CRIT_CHANCE to 13.0, StatType.CRIT_DAMAGE to 50.0
+                ), LorenzRarity.MYTHIC to ReforgeAPI.StatList.mapOf(
+                    StatType.STRENGTH to 34.0, StatType.CRIT_CHANCE to 15.0, StatType.CRIT_DAMAGE to 70.0
+                )
+            )
+        ), ReforgeAPI.Reforge(
+            "Clean", ReforgeType.ARMOR, mapOf(
+                LorenzRarity.COMMON to ReforgeAPI.StatList.mapOf(
+                    StatType.HEALTH to 5.0, StatType.DEFENSE to 5.0, StatType.CRIT_CHANCE to 2.0
+                ), LorenzRarity.UNCOMMON to ReforgeAPI.StatList.mapOf(
+                    StatType.HEALTH to 7.0, StatType.DEFENSE to 7.0, StatType.CRIT_CHANCE to 4.0
+                ), LorenzRarity.RARE to ReforgeAPI.StatList.mapOf(
+                    StatType.HEALTH to 10.0, StatType.DEFENSE to 10.0, StatType.CRIT_CHANCE to 6.0
+                ), LorenzRarity.EPIC to ReforgeAPI.StatList.mapOf(
+                    StatType.HEALTH to 15.0, StatType.DEFENSE to 15.0, StatType.CRIT_CHANCE to 8.0
+                ), LorenzRarity.LEGENDARY to ReforgeAPI.StatList.mapOf(
+                    StatType.HEALTH to 20.0, StatType.DEFENSE to 20.0, StatType.CRIT_CHANCE to 10.0
+                ), LorenzRarity.MYTHIC to ReforgeAPI.StatList.mapOf(
+                    StatType.HEALTH to 25.0, StatType.DEFENSE to 25.0, StatType.CRIT_CHANCE to 12.0
+                )
+            )
+        ), ReforgeAPI.Reforge(
+            "Fierce", ReforgeType.ARMOR, mapOf(
+                LorenzRarity.COMMON to ReforgeAPI.StatList.mapOf(
+                    StatType.STRENGTH to 2.0, StatType.CRIT_CHANCE to 2.0, StatType.CRIT_DAMAGE to 4.0
+                ), LorenzRarity.UNCOMMON to ReforgeAPI.StatList.mapOf(
+                    StatType.STRENGTH to 4.0, StatType.CRIT_CHANCE to 3.0, StatType.CRIT_DAMAGE to 7.0
+                ), LorenzRarity.RARE to ReforgeAPI.StatList.mapOf(
+                    StatType.STRENGTH to 6.0, StatType.CRIT_CHANCE to 4.0, StatType.CRIT_DAMAGE to 10.0
+                ), LorenzRarity.EPIC to ReforgeAPI.StatList.mapOf(
+                    StatType.STRENGTH to 8.0, StatType.CRIT_CHANCE to 5.0, StatType.CRIT_DAMAGE to 14.0
+                ), LorenzRarity.LEGENDARY to ReforgeAPI.StatList.mapOf(
+                    StatType.STRENGTH to 10.0, StatType.CRIT_CHANCE to 6.0, StatType.CRIT_DAMAGE to 18.0
+                ), LorenzRarity.MYTHIC to ReforgeAPI.StatList.mapOf(
+                    StatType.STRENGTH to 12.0, StatType.CRIT_CHANCE to 8.0, StatType.CRIT_DAMAGE to 24.0
+                )
+            )
+        ), ReforgeAPI.Reforge(
+            "Heavy", ReforgeType.ARMOR, mapOf(
+                LorenzRarity.COMMON to ReforgeAPI.StatList.mapOf(
+                    StatType.DEFENSE to 25.0, StatType.CRIT_DAMAGE to -1.0, StatType.SPEED to -1.0
+                ), LorenzRarity.UNCOMMON to ReforgeAPI.StatList.mapOf(
+                    StatType.DEFENSE to 35.0, StatType.CRIT_DAMAGE to -2.0, StatType.SPEED to -1.0
+                ), LorenzRarity.RARE to ReforgeAPI.StatList.mapOf(
+                    StatType.DEFENSE to 50.0, StatType.CRIT_DAMAGE to -2.0, StatType.SPEED to -1.0
+                ), LorenzRarity.EPIC to ReforgeAPI.StatList.mapOf(
+                    StatType.DEFENSE to 65.0, StatType.CRIT_DAMAGE to -3.0, StatType.SPEED to -1.0
+                ), LorenzRarity.LEGENDARY to ReforgeAPI.StatList.mapOf(
+                    StatType.DEFENSE to 80.0, StatType.CRIT_DAMAGE to -5.0, StatType.SPEED to -1.0
+                ), LorenzRarity.MYTHIC to ReforgeAPI.StatList.mapOf(
+                    StatType.DEFENSE to 110.0, StatType.CRIT_DAMAGE to -7.0, StatType.SPEED to -1.0
+                )
+            )
+        ), ReforgeAPI.Reforge(
+            "Light", ReforgeType.ARMOR, mapOf(
+                LorenzRarity.COMMON to ReforgeAPI.StatList.mapOf(
+                    StatType.HEALTH to 5.0,
+                    StatType.DEFENSE to 1.0,
+                    StatType.CRIT_CHANCE to 1.0,
+                    StatType.CRIT_DAMAGE to 1.0,
+                    StatType.SPEED to 1.0,
+                    StatType.BONUS_ATTACK_SPEED to 1.0
+                ), LorenzRarity.UNCOMMON to ReforgeAPI.StatList.mapOf(
+                    StatType.HEALTH to 7.0,
+                    StatType.DEFENSE to 2.0,
+                    StatType.CRIT_CHANCE to 1.0,
+                    StatType.CRIT_DAMAGE to 2.0,
+                    StatType.SPEED to 2.0,
+                    StatType.BONUS_ATTACK_SPEED to 2.0
+                ), LorenzRarity.RARE to ReforgeAPI.StatList.mapOf(
+                    StatType.HEALTH to 10.0,
+                    StatType.DEFENSE to 3.0,
+                    StatType.CRIT_CHANCE to 2.0,
+                    StatType.CRIT_DAMAGE to 3.0,
+                    StatType.SPEED to 3.0,
+                    StatType.BONUS_ATTACK_SPEED to 3.0
+                ), LorenzRarity.EPIC to ReforgeAPI.StatList.mapOf(
+                    StatType.HEALTH to 15.0,
+                    StatType.DEFENSE to 4.0,
+                    StatType.CRIT_CHANCE to 2.0,
+                    StatType.CRIT_DAMAGE to 4.0,
+                    StatType.SPEED to 4.0,
+                    StatType.BONUS_ATTACK_SPEED to 4.0
+                ), LorenzRarity.LEGENDARY to ReforgeAPI.StatList.mapOf(
+                    StatType.HEALTH to 20.0,
+                    StatType.DEFENSE to 5.0,
+                    StatType.CRIT_CHANCE to 3.0,
+                    StatType.CRIT_DAMAGE to 5.0,
+                    StatType.SPEED to 5.0,
+                    StatType.BONUS_ATTACK_SPEED to 5.0
+                ), LorenzRarity.MYTHIC to ReforgeAPI.StatList.mapOf(
+                    StatType.HEALTH to 25.0,
+                    StatType.DEFENSE to 6.0,
+                    StatType.CRIT_CHANCE to 3.0,
+                    StatType.CRIT_DAMAGE to 6.0,
+                    StatType.SPEED to 6.0,
+                    StatType.BONUS_ATTACK_SPEED to 6.0
+                )
+            )
+        ), ReforgeAPI.Reforge(
+            "Mythic", ReforgeType.ARMOR, mapOf(
+                LorenzRarity.COMMON to ReforgeAPI.StatList.mapOf(
+                    StatType.HEALTH to 2.0,
+                    StatType.DEFENSE to 2.0,
+                    StatType.STRENGTH to 2.0,
+                    StatType.CRIT_CHANCE to 1.0,
+                    StatType.SPEED to 2.0,
+                    StatType.INTELLIGENCE to 20.0
+                ), LorenzRarity.UNCOMMON to ReforgeAPI.StatList.mapOf(
+                    StatType.HEALTH to 4.0,
+                    StatType.DEFENSE to 3.0,
+                    StatType.STRENGTH to 4.0,
+                    StatType.CRIT_CHANCE to 2.0,
+                    StatType.SPEED to 2.0,
+                    StatType.INTELLIGENCE to 25.0
+                ), LorenzRarity.RARE to ReforgeAPI.StatList.mapOf(
+                    StatType.HEALTH to 6.0,
+                    StatType.DEFENSE to 6.0,
+                    StatType.STRENGTH to 6.0,
+                    StatType.CRIT_CHANCE to 3.0,
+                    StatType.SPEED to 2.0,
+                    StatType.INTELLIGENCE to 30.0
+                ), LorenzRarity.EPIC to ReforgeAPI.StatList.mapOf(
+                    StatType.HEALTH to 8.0,
+                    StatType.DEFENSE to 8.0,
+                    StatType.STRENGTH to 8.0,
+                    StatType.CRIT_CHANCE to 4.0,
+                    StatType.SPEED to 2.0,
+                    StatType.INTELLIGENCE to 40.0
+                ), LorenzRarity.LEGENDARY to ReforgeAPI.StatList.mapOf(
+                    StatType.HEALTH to 10.0,
+                    StatType.DEFENSE to 10.0,
+                    StatType.STRENGTH to 10.0,
+                    StatType.CRIT_CHANCE to 5.0,
+                    StatType.SPEED to 2.0,
+                    StatType.INTELLIGENCE to 50.0
+                ), LorenzRarity.MYTHIC to ReforgeAPI.StatList.mapOf(
+                    StatType.HEALTH to 12.0,
+                    StatType.DEFENSE to 12.0,
+                    StatType.STRENGTH to 12.0,
+                    StatType.CRIT_CHANCE to 6.0,
+                    StatType.SPEED to 2.0,
+                    StatType.INTELLIGENCE to 60.0
+                )
+            )
+        ), ReforgeAPI.Reforge(
+            "Pure", ReforgeType.ARMOR, mapOf(
+                LorenzRarity.COMMON to ReforgeAPI.StatList.mapOf(
+                    StatType.HEALTH to 2.0,
+                    StatType.DEFENSE to 2.0,
+                    StatType.STRENGTH to 2.0,
+                    StatType.CRIT_CHANCE to 2.0,
+                    StatType.CRIT_DAMAGE to 2.0,
+                    StatType.SPEED to 1.0,
+                    StatType.INTELLIGENCE to 2.0,
+                    StatType.BONUS_ATTACK_SPEED to 1.0
+                ), LorenzRarity.UNCOMMON to ReforgeAPI.StatList.mapOf(
+                    StatType.HEALTH to 3.0,
+                    StatType.DEFENSE to 3.0,
+                    StatType.STRENGTH to 3.0,
+                    StatType.CRIT_CHANCE to 4.0,
+                    StatType.CRIT_DAMAGE to 3.0,
+                    StatType.SPEED to 1.0,
+                    StatType.INTELLIGENCE to 3.0,
+                    StatType.BONUS_ATTACK_SPEED to 1.0
+                ), LorenzRarity.RARE to ReforgeAPI.StatList.mapOf(
+                    StatType.HEALTH to 4.0,
+                    StatType.DEFENSE to 4.0,
+                    StatType.STRENGTH to 4.0,
+                    StatType.CRIT_CHANCE to 6.0,
+                    StatType.CRIT_DAMAGE to 4.0,
+                    StatType.SPEED to 1.0,
+                    StatType.INTELLIGENCE to 4.0,
+                    StatType.BONUS_ATTACK_SPEED to 2.0
+                ), LorenzRarity.EPIC to ReforgeAPI.StatList.mapOf(
+                    StatType.HEALTH to 6.0,
+                    StatType.DEFENSE to 6.0,
+                    StatType.STRENGTH to 6.0,
+                    StatType.CRIT_CHANCE to 8.0,
+                    StatType.CRIT_DAMAGE to 6.0,
+                    StatType.SPEED to 1.0,
+                    StatType.INTELLIGENCE to 6.0,
+                    StatType.BONUS_ATTACK_SPEED to 3.0
+                ), LorenzRarity.LEGENDARY to ReforgeAPI.StatList.mapOf(
+                    StatType.HEALTH to 8.0,
+                    StatType.DEFENSE to 8.0,
+                    StatType.STRENGTH to 8.0,
+                    StatType.CRIT_CHANCE to 10.0,
+                    StatType.CRIT_DAMAGE to 8.0,
+                    StatType.SPEED to 1.0,
+                    StatType.INTELLIGENCE to 8.0,
+                    StatType.BONUS_ATTACK_SPEED to 4.0
+                ), LorenzRarity.MYTHIC to ReforgeAPI.StatList.mapOf(
+                    StatType.HEALTH to 10.0,
+                    StatType.DEFENSE to 10.0,
+                    StatType.STRENGTH to 10.0,
+                    StatType.CRIT_CHANCE to 12.0,
+                    StatType.CRIT_DAMAGE to 10.0,
+                    StatType.SPEED to 1.0,
+                    StatType.INTELLIGENCE to 10.0,
+                    StatType.BONUS_ATTACK_SPEED to 5.0
+                )
+            )
+        ), ReforgeAPI.Reforge(
+            "Titanic", ReforgeType.ARMOR, mapOf(
+                LorenzRarity.COMMON to ReforgeAPI.StatList.mapOf(
+                    StatType.HEALTH to 10.0, StatType.DEFENSE to 10.0
+                ),
+                LorenzRarity.UNCOMMON to ReforgeAPI.StatList.mapOf(
+                    StatType.HEALTH to 15.0, StatType.DEFENSE to 15.0
+                ),
+                LorenzRarity.RARE to ReforgeAPI.StatList.mapOf(StatType.HEALTH to 20.0, StatType.DEFENSE to 20.0),
+                LorenzRarity.EPIC to ReforgeAPI.StatList.mapOf(
+                    StatType.HEALTH to 25.0, StatType.DEFENSE to 25.0
+                ),
+                LorenzRarity.LEGENDARY to ReforgeAPI.StatList.mapOf(
+                    StatType.HEALTH to 35.0, StatType.DEFENSE to 35.0
+                ),
+                LorenzRarity.MYTHIC to ReforgeAPI.StatList.mapOf(
+                    StatType.HEALTH to 50.0, StatType.DEFENSE to 50.0
+                )
+            )
+        ), ReforgeAPI.Reforge(
+            "Smart", ReforgeType.ARMOR, mapOf(
+                LorenzRarity.COMMON to ReforgeAPI.StatList.mapOf(
+                    StatType.HEALTH to 4.0, StatType.DEFENSE to 4.0, StatType.INTELLIGENCE to 20.0
+                ), LorenzRarity.UNCOMMON to ReforgeAPI.StatList.mapOf(
+                    StatType.HEALTH to 6.0, StatType.DEFENSE to 6.0, StatType.INTELLIGENCE to 40.0
+                ), LorenzRarity.RARE to ReforgeAPI.StatList.mapOf(
+                    StatType.HEALTH to 9.0, StatType.DEFENSE to 9.0, StatType.INTELLIGENCE to 60.0
+                ), LorenzRarity.EPIC to ReforgeAPI.StatList.mapOf(
+                    StatType.HEALTH to 12.0, StatType.DEFENSE to 12.0, StatType.INTELLIGENCE to 80.0
+                ), LorenzRarity.LEGENDARY to ReforgeAPI.StatList.mapOf(
+                    StatType.HEALTH to 15.0, StatType.DEFENSE to 15.0, StatType.INTELLIGENCE to 100.0
+                ), LorenzRarity.MYTHIC to ReforgeAPI.StatList.mapOf(
+                    StatType.HEALTH to 20.0, StatType.DEFENSE to 20.0, StatType.INTELLIGENCE to 120.0
+                )
+            )
+        ), ReforgeAPI.Reforge(
+            "Wise", ReforgeType.ARMOR, mapOf(
+                LorenzRarity.COMMON to ReforgeAPI.StatList.mapOf(
+                    StatType.HEALTH to 6.0, StatType.SPEED to 1.0, StatType.INTELLIGENCE to 25.0
+                ), LorenzRarity.UNCOMMON to ReforgeAPI.StatList.mapOf(
+                    StatType.HEALTH to 8.0, StatType.SPEED to 1.0, StatType.INTELLIGENCE to 50.0
+                ), LorenzRarity.RARE to ReforgeAPI.StatList.mapOf(
+                    StatType.HEALTH to 10.0, StatType.SPEED to 1.0, StatType.INTELLIGENCE to 75.0
+                ), LorenzRarity.EPIC to ReforgeAPI.StatList.mapOf(
+                    StatType.HEALTH to 12.0, StatType.SPEED to 2.0, StatType.INTELLIGENCE to 100.0
+                ), LorenzRarity.LEGENDARY to ReforgeAPI.StatList.mapOf(
+                    StatType.HEALTH to 15.0, StatType.SPEED to 2.0, StatType.INTELLIGENCE to 125.0
+                ), LorenzRarity.MYTHIC to ReforgeAPI.StatList.mapOf(
+                    StatType.HEALTH to 20.0, StatType.SPEED to 3.0, StatType.INTELLIGENCE to 150.0
+                )
+            )
+        ), ReforgeAPI.Reforge(
+            "Stained", ReforgeType.EQUIPMENT, mapOf(
+                LorenzRarity.COMMON to ReforgeAPI.StatList.mapOf(
+                    StatType.DEFENSE to 2.0, StatType.HEALTH to 2.0, StatType.CRIT_CHANCE to 1.0
+                ), LorenzRarity.UNCOMMON to ReforgeAPI.StatList.mapOf(
+                    StatType.DEFENSE to 3.0, StatType.HEALTH to 3.0, StatType.CRIT_CHANCE to 1.0
+                ), LorenzRarity.RARE to ReforgeAPI.StatList.mapOf(
+                    StatType.DEFENSE to 4.0, StatType.HEALTH to 4.0, StatType.CRIT_CHANCE to 2.0
+                ), LorenzRarity.EPIC to ReforgeAPI.StatList.mapOf(
+                    StatType.DEFENSE to 5.0, StatType.HEALTH to 5.0, StatType.CRIT_CHANCE to 2.0
+                ), LorenzRarity.LEGENDARY to ReforgeAPI.StatList.mapOf(
+                    StatType.DEFENSE to 6.0, StatType.HEALTH to 5.0, StatType.CRIT_CHANCE to 3.0
+                ), LorenzRarity.MYTHIC to ReforgeAPI.StatList.mapOf(
+                    StatType.DEFENSE to 7.0, StatType.HEALTH to 7.0, StatType.CRIT_CHANCE to 4.0
+                )
+            )
+        ), ReforgeAPI.Reforge(
+            "Menacing", ReforgeType.EQUIPMENT, mapOf(
+                LorenzRarity.COMMON to ReforgeAPI.StatList.mapOf(
+                    StatType.CRIT_CHANCE to 1.0, StatType.CRIT_DAMAGE to 2.0
+                ), LorenzRarity.UNCOMMON to ReforgeAPI.StatList.mapOf(
+                    StatType.CRIT_CHANCE to 1.0, StatType.CRIT_DAMAGE to 3.0
+                ), LorenzRarity.RARE to ReforgeAPI.StatList.mapOf(
+                    StatType.CRIT_CHANCE to 1.0, StatType.CRIT_DAMAGE to 3.0
+                ), LorenzRarity.EPIC to ReforgeAPI.StatList.mapOf(
+                    StatType.CRIT_CHANCE to 1.0, StatType.CRIT_DAMAGE to 4.0
+                ), LorenzRarity.LEGENDARY to ReforgeAPI.StatList.mapOf(
+                    StatType.CRIT_CHANCE to 2.0, StatType.CRIT_DAMAGE to 4.0
+                ), LorenzRarity.MYTHIC to ReforgeAPI.StatList.mapOf(
+                    StatType.CRIT_CHANCE to 2.0, StatType.CRIT_DAMAGE to 5.0
+                )
+            )
+        ), ReforgeAPI.Reforge(
+            "Hefty", ReforgeType.EQUIPMENT, mapOf(
+                LorenzRarity.COMMON to ReforgeAPI.StatList.mapOf(
+                    StatType.DEFENSE to 7.0, StatType.SPEED to -1.0, StatType.CRIT_DAMAGE to -2.0
+                ), LorenzRarity.UNCOMMON to ReforgeAPI.StatList.mapOf(
+                    StatType.DEFENSE to 9.0, StatType.SPEED to -1.0, StatType.CRIT_DAMAGE to -2.0
+                ), LorenzRarity.RARE to ReforgeAPI.StatList.mapOf(
+                    StatType.DEFENSE to 12.0, StatType.SPEED to -1.0, StatType.CRIT_DAMAGE to -3.0
+                ), LorenzRarity.EPIC to ReforgeAPI.StatList.mapOf(
+                    StatType.DEFENSE to 15.0, StatType.SPEED to -1.0, StatType.CRIT_DAMAGE to -3.0
+                ), LorenzRarity.LEGENDARY to ReforgeAPI.StatList.mapOf(
+                    StatType.DEFENSE to 20.0, StatType.SPEED to -1.0, StatType.CRIT_DAMAGE to -4.0
+                ), LorenzRarity.MYTHIC to ReforgeAPI.StatList.mapOf(
+                    StatType.DEFENSE to 25.0, StatType.SPEED to -1.0, StatType.CRIT_DAMAGE to -5.0
+                )
+            )
+        ), ReforgeAPI.Reforge(
+            "Soft", ReforgeType.EQUIPMENT, mapOf(
+                LorenzRarity.COMMON to ReforgeAPI.StatList.mapOf(
+                    StatType.DEFENSE to 1.0,
+                    StatType.SPEED to 1.0,
+                    StatType.HEALTH to 2.0,
+                    StatType.CRIT_CHANCE to 1.0,
+                    StatType.CRIT_DAMAGE to 1.0,
+                    StatType.BONUS_ATTACK_SPEED to 1.0
+                ), LorenzRarity.UNCOMMON to ReforgeAPI.StatList.mapOf(
+                    StatType.DEFENSE to 1.0,
+                    StatType.SPEED to 1.0,
+                    StatType.HEALTH to 3.0,
+                    StatType.CRIT_CHANCE to 1.0,
+                    StatType.CRIT_DAMAGE to 1.0,
+                    StatType.BONUS_ATTACK_SPEED to 1.0
+                ), LorenzRarity.RARE to ReforgeAPI.StatList.mapOf(
+                    StatType.DEFENSE to 1.0,
+                    StatType.SPEED to 1.0,
+                    StatType.HEALTH to 4.0,
+                    StatType.CRIT_CHANCE to 1.0,
+                    StatType.CRIT_DAMAGE to 1.0,
+                    StatType.BONUS_ATTACK_SPEED to 1.0
+                ), LorenzRarity.EPIC to ReforgeAPI.StatList.mapOf(
+                    StatType.DEFENSE to 1.0,
+                    StatType.SPEED to 1.0,
+                    StatType.HEALTH to 5.0,
+                    StatType.CRIT_CHANCE to 1.0,
+                    StatType.CRIT_DAMAGE to 2.0,
+                    StatType.BONUS_ATTACK_SPEED to 1.0
+                ), LorenzRarity.LEGENDARY to ReforgeAPI.StatList.mapOf(
+                    StatType.DEFENSE to 2.0,
+                    StatType.SPEED to 2.0,
+                    StatType.HEALTH to 6.0,
+                    StatType.CRIT_CHANCE to 1.0,
+                    StatType.CRIT_DAMAGE to 2.0,
+                    StatType.BONUS_ATTACK_SPEED to 1.0
+                ), LorenzRarity.MYTHIC to ReforgeAPI.StatList.mapOf(
+                    StatType.DEFENSE to 2.0,
+                    StatType.SPEED to 2.0,
+                    StatType.HEALTH to 7.0,
+                    StatType.CRIT_CHANCE to 1.0,
+                    StatType.CRIT_DAMAGE to 2.0,
+                    StatType.BONUS_ATTACK_SPEED to 2.0
+                )
+            )
+        ), ReforgeAPI.Reforge(
+            "Honored", ReforgeType.EQUIPMENT, mapOf(
+                LorenzRarity.COMMON to ReforgeAPI.StatList.mapOf(
+                    StatType.STRENGTH to 0.0,
+                    StatType.DEFENSE to 1.0,
+                    StatType.SPEED to 1.0,
+                    StatType.HEALTH to 1.0,
+                    StatType.CRIT_CHANCE to 1.0,
+                    StatType.INTELLIGENCE to 3.0
+                ), LorenzRarity.UNCOMMON to ReforgeAPI.StatList.mapOf(
+                    StatType.STRENGTH to 1.0,
+                    StatType.DEFENSE to 2.0,
+                    StatType.SPEED to 1.0,
+                    StatType.HEALTH to 1.0,
+                    StatType.CRIT_CHANCE to 1.0,
+                    StatType.INTELLIGENCE to 3.0
+                ), LorenzRarity.RARE to ReforgeAPI.StatList.mapOf(
+                    StatType.STRENGTH to 2.0,
+                    StatType.DEFENSE to 2.0,
+                    StatType.SPEED to 1.0,
+                    StatType.HEALTH to 2.0,
+                    StatType.CRIT_CHANCE to 1.0,
+                    StatType.INTELLIGENCE to 4.0
+                ), LorenzRarity.EPIC to ReforgeAPI.StatList.mapOf(
+                    StatType.STRENGTH to 2.0,
+                    StatType.DEFENSE to 3.0,
+                    StatType.SPEED to 1.0,
+                    StatType.HEALTH to 2.0,
+                    StatType.CRIT_CHANCE to 2.0,
+                    StatType.INTELLIGENCE to 5.0
+                ), LorenzRarity.LEGENDARY to ReforgeAPI.StatList.mapOf(
+                    StatType.STRENGTH to 3.0,
+                    StatType.DEFENSE to 3.0,
+                    StatType.SPEED to 1.0,
+                    StatType.HEALTH to 3.0,
+                    StatType.CRIT_CHANCE to 2.0,
+                    StatType.INTELLIGENCE to 6.0
+                ), LorenzRarity.MYTHIC to ReforgeAPI.StatList.mapOf(
+                    StatType.STRENGTH to 3.0,
+                    StatType.DEFENSE to 4.0,
+                    StatType.SPEED to 1.0,
+                    StatType.HEALTH to 4.0,
+                    StatType.CRIT_CHANCE to 2.0,
+                    StatType.INTELLIGENCE to 7.0
+                )
+            )
+        ), ReforgeAPI.Reforge(
+            "Blended", ReforgeType.EQUIPMENT, mapOf(
+                LorenzRarity.COMMON to ReforgeAPI.StatList.mapOf(
+                    StatType.STRENGTH to 0.0,
+                    StatType.DEFENSE to 1.0,
+                    StatType.SPEED to 1.0,
+                    StatType.HEALTH to 1.0,
+                    StatType.CRIT_CHANCE to 1.0,
+                    StatType.CRIT_DAMAGE to 1.0,
+                    StatType.INTELLIGENCE to 1.0,
+                    StatType.BONUS_ATTACK_SPEED to 1.0
+                ), LorenzRarity.UNCOMMON to ReforgeAPI.StatList.mapOf(
+                    StatType.STRENGTH to 1.0,
+                    StatType.DEFENSE to 1.0,
+                    StatType.SPEED to 1.0,
+                    StatType.HEALTH to 1.0,
+                    StatType.CRIT_CHANCE to 1.0,
+                    StatType.CRIT_DAMAGE to 2.0,
+                    StatType.INTELLIGENCE to 1.0,
+                    StatType.BONUS_ATTACK_SPEED to 1.0
+                ), LorenzRarity.RARE to ReforgeAPI.StatList.mapOf(
+                    StatType.STRENGTH to 1.0,
+                    StatType.DEFENSE to 1.0,
+                    StatType.SPEED to 1.0,
+                    StatType.HEALTH to 2.0,
+                    StatType.CRIT_CHANCE to 2.0,
+                    StatType.CRIT_DAMAGE to 2.0,
+                    StatType.INTELLIGENCE to 1.0,
+                    StatType.BONUS_ATTACK_SPEED to 1.0
+                ), LorenzRarity.EPIC to ReforgeAPI.StatList.mapOf(
+                    StatType.STRENGTH to 2.0,
+                    StatType.DEFENSE to 2.0,
+                    StatType.SPEED to 1.0,
+                    StatType.HEALTH to 2.0,
+                    StatType.CRIT_CHANCE to 2.0,
+                    StatType.CRIT_DAMAGE to 2.0,
+                    StatType.INTELLIGENCE to 2.0,
+                    StatType.BONUS_ATTACK_SPEED to 1.0
+                ), LorenzRarity.LEGENDARY to ReforgeAPI.StatList.mapOf(
+                    StatType.STRENGTH to 2.0,
+                    StatType.DEFENSE to 3.0,
+                    StatType.SPEED to 1.0,
+                    StatType.HEALTH to 2.0,
+                    StatType.CRIT_CHANCE to 3.0,
+                    StatType.CRIT_DAMAGE to 2.0,
+                    StatType.INTELLIGENCE to 2.0,
+                    StatType.BONUS_ATTACK_SPEED to 1.0
+                ), LorenzRarity.MYTHIC to ReforgeAPI.StatList.mapOf(
+                    StatType.STRENGTH to 2.0,
+                    StatType.DEFENSE to 3.0,
+                    StatType.SPEED to 1.0,
+                    StatType.HEALTH to 3.0,
+                    StatType.CRIT_CHANCE to 3.0,
+                    StatType.CRIT_DAMAGE to 2.0,
+                    StatType.INTELLIGENCE to 3.0,
+                    StatType.BONUS_ATTACK_SPEED to 1.0
+                )
+            )
+        ), ReforgeAPI.Reforge(
+            "Astute", ReforgeType.EQUIPMENT, mapOf(
+                LorenzRarity.COMMON to ReforgeAPI.StatList.mapOf(
+                    StatType.DEFENSE to 1.0, StatType.HEALTH to 1.0, StatType.INTELLIGENCE to 3.0
+                ), LorenzRarity.UNCOMMON to ReforgeAPI.StatList.mapOf(
+                    StatType.DEFENSE to 2.0, StatType.HEALTH to 1.0, StatType.INTELLIGENCE to 4.0
+                ), LorenzRarity.RARE to ReforgeAPI.StatList.mapOf(
+                    StatType.DEFENSE to 2.0, StatType.HEALTH to 2.0, StatType.INTELLIGENCE to 5.0
+                ), LorenzRarity.EPIC to ReforgeAPI.StatList.mapOf(
+                    StatType.DEFENSE to 3.0, StatType.HEALTH to 3.0, StatType.INTELLIGENCE to 6.0
+                ), LorenzRarity.LEGENDARY to ReforgeAPI.StatList.mapOf(
+                    StatType.DEFENSE to 4.0, StatType.HEALTH to 4.0, StatType.INTELLIGENCE to 8.0
+                ), LorenzRarity.MYTHIC to ReforgeAPI.StatList.mapOf(
+                    StatType.DEFENSE to 5.0, StatType.HEALTH to 5.0, StatType.INTELLIGENCE to 10.0
+                )
+            )
+        ), ReforgeAPI.Reforge(
+            "Colossal", ReforgeType.EQUIPMENT, mapOf(
+                LorenzRarity.COMMON to ReforgeAPI.StatList.mapOf(
+                    StatType.DEFENSE to 3.0, StatType.HEALTH to 3.0
+                ),
+                LorenzRarity.UNCOMMON to ReforgeAPI.StatList.mapOf(
+                    StatType.DEFENSE to 4.0, StatType.HEALTH to 4.0
+                ),
+                LorenzRarity.RARE to ReforgeAPI.StatList.mapOf(StatType.DEFENSE to 6.0, StatType.HEALTH to 6.0),
+                LorenzRarity.EPIC to ReforgeAPI.StatList.mapOf(
+                    StatType.DEFENSE to 8.0, StatType.HEALTH to 8.0
+                ),
+                LorenzRarity.LEGENDARY to ReforgeAPI.StatList.mapOf(
+                    StatType.DEFENSE to 10.0, StatType.HEALTH to 10.0
+                ),
+                LorenzRarity.MYTHIC to ReforgeAPI.StatList.mapOf(
+                    StatType.DEFENSE to 12.0, StatType.HEALTH to 12.0
+                )
+            )
+        ), ReforgeAPI.Reforge(
+            "Brilliant", ReforgeType.EQUIPMENT, mapOf(
+                LorenzRarity.COMMON to ReforgeAPI.StatList.mapOf(
+                    StatType.SPEED to 1.0, StatType.HEALTH to 1.0, StatType.INTELLIGENCE to 5.0
+                ), LorenzRarity.UNCOMMON to ReforgeAPI.StatList.mapOf(
+                    StatType.SPEED to 1.0, StatType.HEALTH to 1.0, StatType.INTELLIGENCE to 6.0
+                ), LorenzRarity.RARE to ReforgeAPI.StatList.mapOf(
+                    StatType.SPEED to 2.0, StatType.HEALTH to 2.0, StatType.INTELLIGENCE to 7.0
+                ), LorenzRarity.EPIC to ReforgeAPI.StatList.mapOf(
+                    StatType.SPEED to 2.0, StatType.HEALTH to 3.0, StatType.INTELLIGENCE to 9.0
+                ), LorenzRarity.LEGENDARY to ReforgeAPI.StatList.mapOf(
+                    StatType.SPEED to 2.0, StatType.HEALTH to 4.0, StatType.INTELLIGENCE to 12.0
+                ), LorenzRarity.MYTHIC to ReforgeAPI.StatList.mapOf(
+                    StatType.SPEED to 2.0, StatType.HEALTH to 5.0, StatType.INTELLIGENCE to 15.0
+                )
+            )
+        ), ReforgeAPI.Reforge(
+            "Unyielding", ReforgeType.PICKAXE, mapOf(
+                LorenzRarity.COMMON to ReforgeAPI.StatList.mapOf(
+                    StatType.SPEED to 1.0, StatType.MINING_FORTUNE to 1.0
+                ), LorenzRarity.UNCOMMON to ReforgeAPI.StatList.mapOf(
+                    StatType.SPEED to 2.0, StatType.MINING_FORTUNE to 2.0
+                ), LorenzRarity.RARE to ReforgeAPI.StatList.mapOf(
+                    StatType.SPEED to 3.0, StatType.MINING_FORTUNE to 3.0
+                ), LorenzRarity.EPIC to ReforgeAPI.StatList.mapOf(
+                    StatType.SPEED to 5.0, StatType.MINING_FORTUNE to 4.0
+                ), LorenzRarity.LEGENDARY to ReforgeAPI.StatList.mapOf(
+                    StatType.SPEED to 7.0, StatType.MINING_FORTUNE to 5.0
+                ), LorenzRarity.MYTHIC to ReforgeAPI.StatList.mapOf(
+                    StatType.SPEED to 9.0, StatType.MINING_FORTUNE to 6.0
+                )
+            )
+        ), ReforgeAPI.Reforge(
+            "Prospector's", ReforgeType.PICKAXE, mapOf(
+                LorenzRarity.COMMON to ReforgeAPI.StatList.mapOf(
+                    StatType.SPEED to 1.0, StatType.MINING_WISDOM to 0.5
+                ), LorenzRarity.UNCOMMON to ReforgeAPI.StatList.mapOf(
+                    StatType.SPEED to 2.0, StatType.MINING_WISDOM to 0.75
+                ), LorenzRarity.RARE to ReforgeAPI.StatList.mapOf(
+                    StatType.SPEED to 3.0, StatType.MINING_WISDOM to 1.0
+                ), LorenzRarity.EPIC to ReforgeAPI.StatList.mapOf(
+                    StatType.SPEED to 5.0, StatType.MINING_WISDOM to 1.25
+                ), LorenzRarity.LEGENDARY to ReforgeAPI.StatList.mapOf(
+                    StatType.SPEED to 7.0, StatType.MINING_WISDOM to 2.0
+                ), LorenzRarity.MYTHIC to ReforgeAPI.StatList.mapOf(
+                    StatType.SPEED to 9.0, StatType.MINING_WISDOM to 2.5
+                )
+            )
+        ), ReforgeAPI.Reforge(
+            "Excellent", ReforgeType.PICKAXE, mapOf(
+                LorenzRarity.COMMON to ReforgeAPI.StatList.mapOf(
+                    StatType.SPEED to 1.0, StatType.MINING_SPEED to 4.0
+                ), LorenzRarity.UNCOMMON to ReforgeAPI.StatList.mapOf(
+                    StatType.SPEED to 2.0, StatType.MINING_SPEED to 8.0
+                ), LorenzRarity.RARE to ReforgeAPI.StatList.mapOf(
+                    StatType.SPEED to 3.0, StatType.MINING_SPEED to 12.0
+                ), LorenzRarity.EPIC to ReforgeAPI.StatList.mapOf(
+                    StatType.SPEED to 4.0, StatType.MINING_SPEED to 16.0
+                ), LorenzRarity.LEGENDARY to ReforgeAPI.StatList.mapOf(
+                    StatType.SPEED to 5.0, StatType.MINING_SPEED to 20.0
+                ), LorenzRarity.MYTHIC to ReforgeAPI.StatList.mapOf(
+                    StatType.SPEED to 7.0, StatType.MINING_SPEED to 25.0
+                )
+            )
+        ), ReforgeAPI.Reforge(
+            "Sturdy", ReforgeType.PICKAXE, mapOf(
+                LorenzRarity.COMMON to ReforgeAPI.StatList.mapOf(
+                    StatType.DEFENSE to 3.0, StatType.MINING_SPEED to 3.0
+                ), LorenzRarity.UNCOMMON to ReforgeAPI.StatList.mapOf(
+                    StatType.DEFENSE to 6.0, StatType.MINING_SPEED to 6.0
+                ), LorenzRarity.RARE to ReforgeAPI.StatList.mapOf(
+                    StatType.DEFENSE to 9.0, StatType.MINING_SPEED to 9.0
+                ), LorenzRarity.EPIC to ReforgeAPI.StatList.mapOf(
+                    StatType.DEFENSE to 12.0, StatType.MINING_SPEED to 12.0
+                ), LorenzRarity.LEGENDARY to ReforgeAPI.StatList.mapOf(
+                    StatType.DEFENSE to 15.0, StatType.MINING_SPEED to 15.0
+                ), LorenzRarity.MYTHIC to ReforgeAPI.StatList.mapOf(
+                    StatType.DEFENSE to 20.0, StatType.MINING_SPEED to 20.0
+                )
+            )
+        ), ReforgeAPI.Reforge(
+            "Fortunate", ReforgeType.PICKAXE, mapOf(
+                LorenzRarity.COMMON to ReforgeAPI.StatList.mapOf(
+                    StatType.MINING_SPEED to 1.0, StatType.MINING_FORTUNE to 1.0
+                ), LorenzRarity.UNCOMMON to ReforgeAPI.StatList.mapOf(
+                    StatType.MINING_SPEED to 2.0, StatType.MINING_FORTUNE to 1.0
+                ), LorenzRarity.RARE to ReforgeAPI.StatList.mapOf(
+                    StatType.MINING_SPEED to 3.0, StatType.MINING_FORTUNE to 1.0
+                ), LorenzRarity.EPIC to ReforgeAPI.StatList.mapOf(
+                    StatType.MINING_SPEED to 4.0, StatType.MINING_FORTUNE to 2.0
+                ), LorenzRarity.LEGENDARY to ReforgeAPI.StatList.mapOf(
+                    StatType.MINING_SPEED to 6.0, StatType.MINING_FORTUNE to 2.0
+                ), LorenzRarity.MYTHIC to ReforgeAPI.StatList.mapOf(
+                    StatType.MINING_SPEED to 8.0, StatType.MINING_FORTUNE to 3.0
+                )
+            )
+        ), ReforgeAPI.Reforge(
+            "Great", ReforgeType.AXE, mapOf(
+                LorenzRarity.COMMON to ReforgeAPI.StatList.mapOf(
+                    StatType.SPEED to 1.0, StatType.STRENGTH to 2.0, StatType.CRIT_DAMAGE to 2.0
+                ), LorenzRarity.UNCOMMON to ReforgeAPI.StatList.mapOf(
+                    StatType.SPEED to 2.0, StatType.STRENGTH to 4.0, StatType.CRIT_DAMAGE to 4.0
+                ), LorenzRarity.RARE to ReforgeAPI.StatList.mapOf(
+                    StatType.SPEED to 3.0, StatType.STRENGTH to 6.0, StatType.CRIT_DAMAGE to 6.0
+                ), LorenzRarity.EPIC to ReforgeAPI.StatList.mapOf(
+                    StatType.SPEED to 4.0, StatType.STRENGTH to 9.0, StatType.CRIT_DAMAGE to 9.0
+                ), LorenzRarity.LEGENDARY to ReforgeAPI.StatList.mapOf(
+                    StatType.SPEED to 5.0, StatType.STRENGTH to 12.0, StatType.CRIT_DAMAGE to 12.0
+                ), LorenzRarity.MYTHIC to ReforgeAPI.StatList.mapOf(
+                    StatType.SPEED to 7.0, StatType.STRENGTH to 16.0, StatType.CRIT_DAMAGE to 16.0
+                )
+            )
+        ), ReforgeAPI.Reforge(
+            "Rugged", ReforgeType.AXE, mapOf(
+                LorenzRarity.COMMON to ReforgeAPI.StatList.mapOf(
+                    StatType.STRENGTH to 4.0, StatType.CRIT_DAMAGE to 3.0
+                ), LorenzRarity.UNCOMMON to ReforgeAPI.StatList.mapOf(
+                    StatType.STRENGTH to 6.0, StatType.CRIT_DAMAGE to 5.0
+                ), LorenzRarity.RARE to ReforgeAPI.StatList.mapOf(
+                    StatType.STRENGTH to 9.0, StatType.CRIT_DAMAGE to 8.0
+                ), LorenzRarity.EPIC to ReforgeAPI.StatList.mapOf(
+                    StatType.STRENGTH to 13.0, StatType.CRIT_DAMAGE to 12.0
+                ), LorenzRarity.LEGENDARY to ReforgeAPI.StatList.mapOf(
+                    StatType.STRENGTH to 18.0, StatType.CRIT_DAMAGE to 16.0
+                ), LorenzRarity.MYTHIC to ReforgeAPI.StatList.mapOf(
+                    StatType.STRENGTH to 24.0, StatType.CRIT_DAMAGE to 22.0
+                )
+            )
+        ), ReforgeAPI.Reforge(
+            "Lush", ReforgeType.AXE, mapOf(
+                LorenzRarity.COMMON to ReforgeAPI.StatList.mapOf(
+                    StatType.SPEED to 3.0, StatType.FORAGING_FORTUNE to 1.0
+                ), LorenzRarity.UNCOMMON to ReforgeAPI.StatList.mapOf(
+                    StatType.SPEED to 4.0, StatType.FORAGING_FORTUNE to 1.0
+                ), LorenzRarity.RARE to ReforgeAPI.StatList.mapOf(
+                    StatType.SPEED to 5.0, StatType.FORAGING_FORTUNE to 2.0
+                ), LorenzRarity.EPIC to ReforgeAPI.StatList.mapOf(
+                    StatType.SPEED to 7.0, StatType.FORAGING_FORTUNE to 2.0
+                ), LorenzRarity.LEGENDARY to ReforgeAPI.StatList.mapOf(
+                    StatType.SPEED to 10.0, StatType.FORAGING_FORTUNE to 3.0
+                ), LorenzRarity.MYTHIC to ReforgeAPI.StatList.mapOf(
+                    StatType.SPEED to 15.0, StatType.FORAGING_FORTUNE to 5.0
+                )
+            )
+        ), ReforgeAPI.Reforge(
+            "Lumberjack's", ReforgeType.AXE, mapOf(
+                LorenzRarity.COMMON to ReforgeAPI.StatList.mapOf(
+                    StatType.SPEED to 1.0, StatType.FORAGING_WISDOM to 0.5
+                ), LorenzRarity.UNCOMMON to ReforgeAPI.StatList.mapOf(
+                    StatType.SPEED to 2.0, StatType.FORAGING_WISDOM to 0.75
+                ), LorenzRarity.RARE to ReforgeAPI.StatList.mapOf(
+                    StatType.SPEED to 3.0, StatType.FORAGING_WISDOM to 1.0
+                ), LorenzRarity.EPIC to ReforgeAPI.StatList.mapOf(
+                    StatType.SPEED to 5.0, StatType.FORAGING_WISDOM to 1.25
+                ), LorenzRarity.LEGENDARY to ReforgeAPI.StatList.mapOf(
+                    StatType.SPEED to 7.0, StatType.FORAGING_WISDOM to 2.0
+                ), LorenzRarity.MYTHIC to ReforgeAPI.StatList.mapOf(
+                    StatType.SPEED to 9.0, StatType.FORAGING_WISDOM to 2.5
+                )
+            )
+        ), ReforgeAPI.Reforge(
+            "Double-Bit", ReforgeType.AXE, mapOf(
+                LorenzRarity.COMMON to ReforgeAPI.StatList.mapOf(
+                    StatType.FORAGING_FORTUNE to 1.0, StatType.SPEED to 1.0
+                ), LorenzRarity.UNCOMMON to ReforgeAPI.StatList.mapOf(
+                    StatType.FORAGING_FORTUNE to 2.0, StatType.SPEED to 2.0
+                ), LorenzRarity.RARE to ReforgeAPI.StatList.mapOf(
+                    StatType.FORAGING_FORTUNE to 3.0, StatType.SPEED to 2.0
+                ), LorenzRarity.EPIC to ReforgeAPI.StatList.mapOf(
+                    StatType.FORAGING_FORTUNE to 4.0, StatType.SPEED to 3.0
+                ), LorenzRarity.LEGENDARY to ReforgeAPI.StatList.mapOf(
+                    StatType.FORAGING_FORTUNE to 5.0, StatType.SPEED to 5.0
+                ), LorenzRarity.MYTHIC to ReforgeAPI.StatList.mapOf(
+                    StatType.FORAGING_FORTUNE to 6.0, StatType.SPEED to 7.0
+                )
+            )
+        ), ReforgeAPI.Reforge(
+            "Robust", ReforgeType.HOE, mapOf(
+                LorenzRarity.COMMON to ReforgeAPI.StatList.mapOf(
+                    StatType.FARMING_FORTUNE to 2.0
+                ),
+                LorenzRarity.UNCOMMON to ReforgeAPI.StatList.mapOf(StatType.FARMING_FORTUNE to 3.0),
+                LorenzRarity.RARE to ReforgeAPI.StatList.mapOf(
+                    StatType.FARMING_FORTUNE to 4.0
+                ),
+                LorenzRarity.EPIC to ReforgeAPI.StatList.mapOf(StatType.FARMING_FORTUNE to 6.0),
+                LorenzRarity.LEGENDARY to ReforgeAPI.StatList.mapOf(
+                    StatType.FARMING_FORTUNE to 8.0
+                ),
+                LorenzRarity.MYTHIC to ReforgeAPI.StatList.mapOf(StatType.FARMING_FORTUNE to 10.0)
+            )
+        ), ReforgeAPI.Reforge(
+            "Zooming", ReforgeType.HOE, mapOf(
+                LorenzRarity.COMMON to ReforgeAPI.StatList.mapOf(
+                    StatType.SPEED to 5.0
+                ),
+                LorenzRarity.UNCOMMON to ReforgeAPI.StatList.mapOf(StatType.SPEED to 8.0),
+                LorenzRarity.RARE to ReforgeAPI.StatList.mapOf(
+                    StatType.SPEED to 12.0
+                ),
+                LorenzRarity.EPIC to ReforgeAPI.StatList.mapOf(StatType.SPEED to 16.0),
+                LorenzRarity.LEGENDARY to ReforgeAPI.StatList.mapOf(
+                    StatType.SPEED to 20.0
+                ),
+                LorenzRarity.MYTHIC to ReforgeAPI.StatList.mapOf(StatType.SPEED to 25.0)
+            )
+        ), ReforgeAPI.Reforge(
+            "Peasant's", ReforgeType.HOE, mapOf(
+                LorenzRarity.COMMON to ReforgeAPI.StatList.mapOf(
+                    StatType.SPEED to 1.0, StatType.FARMING_WISDOM to 0.5
+                ), LorenzRarity.UNCOMMON to ReforgeAPI.StatList.mapOf(
+                    StatType.SPEED to 2.0, StatType.FARMING_WISDOM to 0.75
+                ), LorenzRarity.RARE to ReforgeAPI.StatList.mapOf(
+                    StatType.SPEED to 3.0, StatType.FARMING_WISDOM to 1.0
+                ), LorenzRarity.EPIC to ReforgeAPI.StatList.mapOf(
+                    StatType.SPEED to 5.0, StatType.FARMING_WISDOM to 1.25
+                ), LorenzRarity.LEGENDARY to ReforgeAPI.StatList.mapOf(
+                    StatType.SPEED to 7.0, StatType.FARMING_WISDOM to 2.0
+                ), LorenzRarity.MYTHIC to ReforgeAPI.StatList.mapOf(
+                    StatType.SPEED to 9.0, StatType.FARMING_WISDOM to 2.5
+                )
+            )
+        ), ReforgeAPI.Reforge(
+            "Green Thumb", ReforgeType.HOE, mapOf(
+                LorenzRarity.COMMON to ReforgeAPI.StatList.mapOf(
+                    StatType.SPEED to 1.0, StatType.FARMING_FORTUNE to 1.0
+                ), LorenzRarity.UNCOMMON to ReforgeAPI.StatList.mapOf(
+                    StatType.SPEED to 2.0, StatType.FARMING_FORTUNE to 2.0
+                ), LorenzRarity.RARE to ReforgeAPI.StatList.mapOf(
+                    StatType.SPEED to 2.0, StatType.FARMING_FORTUNE to 3.0
+                ), LorenzRarity.EPIC to ReforgeAPI.StatList.mapOf(
+                    StatType.SPEED to 3.0, StatType.FARMING_FORTUNE to 4.0
+                ), LorenzRarity.LEGENDARY to ReforgeAPI.StatList.mapOf(
+                    StatType.SPEED to 5.0, StatType.FARMING_FORTUNE to 5.0
+                ), LorenzRarity.MYTHIC to ReforgeAPI.StatList.mapOf(
+                    StatType.SPEED to 7.0, StatType.FARMING_FORTUNE to 6.0
+                )
+            )
         ),
-        ReforgeAPI.Reforge(
-            "Fair", ReforgeAPI.ReforgeType.FishingRodsAndSwords, mapOf(
-            LorenzRarity.COMMON to ReforgeAPI.StatList.mapOf(ReforgeAPI.StatType.Strength to 2.0, ReforgeAPI.StatType.Crit_Chance to 2.0, ReforgeAPI.StatType.Crit_Damage to 2.0, ReforgeAPI.StatType.Intelligence to 2.0, ReforgeAPI.StatType.Bonus_Attack_Speed to 2.0), LorenzRarity.UNCOMMON to ReforgeAPI.StatList.mapOf(ReforgeAPI.StatType.Strength to 3.0, ReforgeAPI.StatType.Crit_Chance to 3.0, ReforgeAPI.StatType.Crit_Damage to 3.0, ReforgeAPI.StatType.Intelligence to 3.0, ReforgeAPI.StatType.Bonus_Attack_Speed to 3.0), LorenzRarity.RARE to ReforgeAPI.StatList.mapOf(ReforgeAPI.StatType.Strength to 4.0, ReforgeAPI.StatType.Crit_Chance to 4.0, ReforgeAPI.StatType.Crit_Damage to 4.0, ReforgeAPI.StatType.Intelligence to 4.0, ReforgeAPI.StatType.Bonus_Attack_Speed to 4.0), LorenzRarity.EPIC to ReforgeAPI.StatList.mapOf(ReforgeAPI.StatType.Strength to 7.0, ReforgeAPI.StatType.Crit_Chance to 7.0, ReforgeAPI.StatType.Crit_Damage to 7.0, ReforgeAPI.StatType.Intelligence to 7.0, ReforgeAPI.StatType.Bonus_Attack_Speed to 7.0), LorenzRarity.LEGENDARY to ReforgeAPI.StatList.mapOf(ReforgeAPI.StatType.Strength to 10.0, ReforgeAPI.StatType.Crit_Chance to 10.0, ReforgeAPI.StatType.Crit_Damage to 10.0, ReforgeAPI.StatType.Intelligence to 10.0, ReforgeAPI.StatType.Bonus_Attack_Speed to 10.0), LorenzRarity.MYTHIC to ReforgeAPI.StatList.mapOf(ReforgeAPI.StatType.Strength to 12.0, ReforgeAPI.StatType.Crit_Chance to 12.0, ReforgeAPI.StatType.Crit_Damage to 12.0, ReforgeAPI.StatType.Intelligence to 12.0, ReforgeAPI.StatType.Bonus_Attack_Speed to 12.0)
-        )
-        ),
-        ReforgeAPI.Reforge("Fast", ReforgeAPI.ReforgeType.FishingRodsAndSwords, mapOf(LorenzRarity.COMMON to ReforgeAPI.StatList.mapOf(ReforgeAPI.StatType.Bonus_Attack_Speed to 10.0), LorenzRarity.UNCOMMON to ReforgeAPI.StatList.mapOf(ReforgeAPI.StatType.Bonus_Attack_Speed to 20.0), LorenzRarity.RARE to ReforgeAPI.StatList.mapOf(ReforgeAPI.StatType.Bonus_Attack_Speed to 30.0), LorenzRarity.EPIC to ReforgeAPI.StatList.mapOf(ReforgeAPI.StatType.Bonus_Attack_Speed to 40.0), LorenzRarity.LEGENDARY to ReforgeAPI.StatList.mapOf(ReforgeAPI.StatType.Bonus_Attack_Speed to 50.0), LorenzRarity.MYTHIC to ReforgeAPI.StatList.mapOf(ReforgeAPI.StatType.Bonus_Attack_Speed to 60.0))),
-        ReforgeAPI.Reforge("Gentle", ReforgeAPI.ReforgeType.FishingRodsAndSwords, mapOf(LorenzRarity.COMMON to ReforgeAPI.StatList.mapOf(ReforgeAPI.StatType.Strength to 3.0, ReforgeAPI.StatType.Bonus_Attack_Speed to 8.0), LorenzRarity.UNCOMMON to ReforgeAPI.StatList.mapOf(ReforgeAPI.StatType.Strength to 5.0, ReforgeAPI.StatType.Bonus_Attack_Speed to 10.0), LorenzRarity.RARE to ReforgeAPI.StatList.mapOf(ReforgeAPI.StatType.Strength to 7.0, ReforgeAPI.StatType.Bonus_Attack_Speed to 15.0), LorenzRarity.EPIC to ReforgeAPI.StatList.mapOf(ReforgeAPI.StatType.Strength to 10.0, ReforgeAPI.StatType.Bonus_Attack_Speed to 20.0), LorenzRarity.LEGENDARY to ReforgeAPI.StatList.mapOf(ReforgeAPI.StatType.Strength to 15.0, ReforgeAPI.StatType.Bonus_Attack_Speed to 25.0), LorenzRarity.MYTHIC to ReforgeAPI.StatList.mapOf(ReforgeAPI.StatType.Strength to 20.0, ReforgeAPI.StatType.Bonus_Attack_Speed to 30.0))),
-        ReforgeAPI.Reforge(
-            "Heroic", ReforgeAPI.ReforgeType.FishingRodsAndSwords, mapOf(
-            LorenzRarity.COMMON to ReforgeAPI.StatList.mapOf(ReforgeAPI.StatType.Strength to 15.0, ReforgeAPI.StatType.Intelligence to 40.0, ReforgeAPI.StatType.Bonus_Attack_Speed to 1.0), LorenzRarity.UNCOMMON to ReforgeAPI.StatList.mapOf(ReforgeAPI.StatType.Strength to 20.0, ReforgeAPI.StatType.Intelligence to 50.0, ReforgeAPI.StatType.Bonus_Attack_Speed to 2.0), LorenzRarity.RARE to ReforgeAPI.StatList.mapOf(ReforgeAPI.StatType.Strength to 25.0, ReforgeAPI.StatType.Intelligence to 65.0, ReforgeAPI.StatType.Bonus_Attack_Speed to 2.0), LorenzRarity.EPIC to ReforgeAPI.StatList.mapOf(ReforgeAPI.StatType.Strength to 32.0, ReforgeAPI.StatType.Intelligence to 80.0, ReforgeAPI.StatType.Bonus_Attack_Speed to 3.0), LorenzRarity.LEGENDARY to ReforgeAPI.StatList.mapOf(ReforgeAPI.StatType.Strength to 40.0, ReforgeAPI.StatType.Intelligence to 100.0, ReforgeAPI.StatType.Bonus_Attack_Speed to 5.0), LorenzRarity.MYTHIC to ReforgeAPI.StatList.mapOf(ReforgeAPI.StatType.Strength to 50.0, ReforgeAPI.StatType.Intelligence to 125.0, ReforgeAPI.StatType.Bonus_Attack_Speed to 7.0)
-        )
-        ),
-        ReforgeAPI.Reforge(
-            "Legendary", ReforgeAPI.ReforgeType.FishingRodsAndSwords, mapOf(
-            LorenzRarity.COMMON to ReforgeAPI.StatList.mapOf(ReforgeAPI.StatType.Strength to 3.0, ReforgeAPI.StatType.Crit_Chance to 5.0, ReforgeAPI.StatType.Crit_Damage to 5.0, ReforgeAPI.StatType.Intelligence to 5.0, ReforgeAPI.StatType.Bonus_Attack_Speed to 2.0), LorenzRarity.UNCOMMON to ReforgeAPI.StatList.mapOf(ReforgeAPI.StatType.Strength to 7.0, ReforgeAPI.StatType.Crit_Chance to 7.0, ReforgeAPI.StatType.Crit_Damage to 10.0, ReforgeAPI.StatType.Intelligence to 8.0, ReforgeAPI.StatType.Bonus_Attack_Speed to 3.0), LorenzRarity.RARE to ReforgeAPI.StatList.mapOf(ReforgeAPI.StatType.Strength to 12.0, ReforgeAPI.StatType.Crit_Chance to 9.0, ReforgeAPI.StatType.Crit_Damage to 15.0, ReforgeAPI.StatType.Intelligence to 12.0, ReforgeAPI.StatType.Bonus_Attack_Speed to 5.0), LorenzRarity.EPIC to ReforgeAPI.StatList.mapOf(ReforgeAPI.StatType.Strength to 18.0, ReforgeAPI.StatType.Crit_Chance to 12.0, ReforgeAPI.StatType.Crit_Damage to 22.0, ReforgeAPI.StatType.Intelligence to 18.0, ReforgeAPI.StatType.Bonus_Attack_Speed to 7.0), LorenzRarity.LEGENDARY to ReforgeAPI.StatList.mapOf(ReforgeAPI.StatType.Strength to 25.0, ReforgeAPI.StatType.Crit_Chance to 15.0, ReforgeAPI.StatType.Crit_Damage to 28.0, ReforgeAPI.StatType.Intelligence to 25.0, ReforgeAPI.StatType.Bonus_Attack_Speed to 10.0), LorenzRarity.MYTHIC to ReforgeAPI.StatList.mapOf(ReforgeAPI.StatType.Strength to 32.0, ReforgeAPI.StatType.Crit_Chance to 18.0, ReforgeAPI.StatType.Crit_Damage to 36.0, ReforgeAPI.StatType.Intelligence to 35.0, ReforgeAPI.StatType.Bonus_Attack_Speed to 15.0)
-        )
-        ),
-        ReforgeAPI.Reforge(
-            "Odd", ReforgeAPI.ReforgeType.FishingRodsAndSwords, mapOf(
-            LorenzRarity.COMMON to ReforgeAPI.StatList.mapOf(ReforgeAPI.StatType.Crit_Chance to 10.0, ReforgeAPI.StatType.Crit_Damage to 5.0, ReforgeAPI.StatType.Intelligence to -5.0), LorenzRarity.UNCOMMON to ReforgeAPI.StatList.mapOf(ReforgeAPI.StatType.Crit_Chance to 12.0, ReforgeAPI.StatType.Crit_Damage to 10.0, ReforgeAPI.StatType.Intelligence to -10.0), LorenzRarity.RARE to ReforgeAPI.StatList.mapOf(ReforgeAPI.StatType.Crit_Chance to 15.0, ReforgeAPI.StatType.Crit_Damage to 15.0, ReforgeAPI.StatType.Intelligence to -18.0), LorenzRarity.EPIC to ReforgeAPI.StatList.mapOf(ReforgeAPI.StatType.Crit_Chance to 20.0, ReforgeAPI.StatType.Crit_Damage to 22.0, ReforgeAPI.StatType.Intelligence to -32.0), LorenzRarity.LEGENDARY to ReforgeAPI.StatList.mapOf(ReforgeAPI.StatType.Crit_Chance to 25.0, ReforgeAPI.StatType.Crit_Damage to 30.0, ReforgeAPI.StatType.Intelligence to -50.0), LorenzRarity.MYTHIC to ReforgeAPI.StatList.mapOf(ReforgeAPI.StatType.Crit_Chance to 30.0, ReforgeAPI.StatType.Crit_Damage to 40.0, ReforgeAPI.StatType.Intelligence to -75.0)
-        )
-        ),
-        ReforgeAPI.Reforge("Sharp", ReforgeAPI.ReforgeType.FishingRodsAndSwords, mapOf(LorenzRarity.COMMON to ReforgeAPI.StatList.mapOf(ReforgeAPI.StatType.Crit_Chance to 10.0, ReforgeAPI.StatType.Crit_Damage to 20.0), LorenzRarity.UNCOMMON to ReforgeAPI.StatList.mapOf(ReforgeAPI.StatType.Crit_Chance to 12.0, ReforgeAPI.StatType.Crit_Damage to 30.0), LorenzRarity.RARE to ReforgeAPI.StatList.mapOf(ReforgeAPI.StatType.Crit_Chance to 14.0, ReforgeAPI.StatType.Crit_Damage to 40.0), LorenzRarity.EPIC to ReforgeAPI.StatList.mapOf(ReforgeAPI.StatType.Crit_Chance to 17.0, ReforgeAPI.StatType.Crit_Damage to 55.0), LorenzRarity.LEGENDARY to ReforgeAPI.StatList.mapOf(ReforgeAPI.StatType.Crit_Chance to 20.0, ReforgeAPI.StatType.Crit_Damage to 75.0), LorenzRarity.MYTHIC to ReforgeAPI.StatList.mapOf(ReforgeAPI.StatType.Crit_Chance to 25.0, ReforgeAPI.StatType.Crit_Damage to 90.0))),
-        ReforgeAPI.Reforge(
-            "Spicy", ReforgeAPI.ReforgeType.FishingRodsAndSwords, mapOf(
-            LorenzRarity.COMMON to ReforgeAPI.StatList.mapOf(ReforgeAPI.StatType.Strength to 2.0, ReforgeAPI.StatType.Crit_Chance to 1.0, ReforgeAPI.StatType.Crit_Damage to 25.0, ReforgeAPI.StatType.Bonus_Attack_Speed to 2.0), LorenzRarity.UNCOMMON to ReforgeAPI.StatList.mapOf(ReforgeAPI.StatType.Strength to 3.0, ReforgeAPI.StatType.Crit_Chance to 1.0, ReforgeAPI.StatType.Crit_Damage to 35.0, ReforgeAPI.StatType.Bonus_Attack_Speed to 3.0), LorenzRarity.RARE to ReforgeAPI.StatList.mapOf(ReforgeAPI.StatType.Strength to 4.0, ReforgeAPI.StatType.Crit_Chance to 1.0, ReforgeAPI.StatType.Crit_Damage to 45.0, ReforgeAPI.StatType.Bonus_Attack_Speed to 5.0), LorenzRarity.EPIC to ReforgeAPI.StatList.mapOf(ReforgeAPI.StatType.Strength to 7.0, ReforgeAPI.StatType.Crit_Chance to 1.0, ReforgeAPI.StatType.Crit_Damage to 60.0, ReforgeAPI.StatType.Bonus_Attack_Speed to 7.0), LorenzRarity.LEGENDARY to ReforgeAPI.StatList.mapOf(ReforgeAPI.StatType.Strength to 10.0, ReforgeAPI.StatType.Crit_Chance to 1.0, ReforgeAPI.StatType.Crit_Damage to 80.0, ReforgeAPI.StatType.Bonus_Attack_Speed to 10.0), LorenzRarity.MYTHIC to ReforgeAPI.StatList.mapOf(ReforgeAPI.StatType.Strength to 12.0, ReforgeAPI.StatType.Crit_Chance to 1.0, ReforgeAPI.StatType.Crit_Damage to 100.0, ReforgeAPI.StatType.Bonus_Attack_Speed to 15.0)
-        )
-        ),
-        ReforgeAPI.Reforge(
-            "Awkward", ReforgeAPI.ReforgeType.Bows, mapOf(
-            LorenzRarity.COMMON to ReforgeAPI.StatList.mapOf(ReforgeAPI.StatType.Crit_Chance to 10.0, ReforgeAPI.StatType.Crit_Damage to 5.0, ReforgeAPI.StatType.Intelligence to -5.0), LorenzRarity.UNCOMMON to ReforgeAPI.StatList.mapOf(ReforgeAPI.StatType.Crit_Chance to 12.0, ReforgeAPI.StatType.Crit_Damage to 10.0, ReforgeAPI.StatType.Intelligence to -10.0), LorenzRarity.RARE to ReforgeAPI.StatList.mapOf(ReforgeAPI.StatType.Crit_Chance to 15.0, ReforgeAPI.StatType.Crit_Damage to 15.0, ReforgeAPI.StatType.Intelligence to -18.0), LorenzRarity.EPIC to ReforgeAPI.StatList.mapOf(ReforgeAPI.StatType.Crit_Chance to 20.0, ReforgeAPI.StatType.Crit_Damage to 22.0, ReforgeAPI.StatType.Intelligence to -32.0), LorenzRarity.LEGENDARY to ReforgeAPI.StatList.mapOf(ReforgeAPI.StatType.Crit_Chance to 25.0, ReforgeAPI.StatType.Crit_Damage to 30.0, ReforgeAPI.StatType.Intelligence to -50.0), LorenzRarity.MYTHIC to ReforgeAPI.StatList.mapOf(ReforgeAPI.StatType.Crit_Chance to 30.0, ReforgeAPI.StatType.Crit_Damage to 35.0, ReforgeAPI.StatType.Intelligence to -72.0)
-        )
-        ),
-        ReforgeAPI.Reforge("Deadly", ReforgeAPI.ReforgeType.Bows, mapOf(LorenzRarity.COMMON to ReforgeAPI.StatList.mapOf(ReforgeAPI.StatType.Crit_Chance to 10.0, ReforgeAPI.StatType.Crit_Damage to 5.0), LorenzRarity.UNCOMMON to ReforgeAPI.StatList.mapOf(ReforgeAPI.StatType.Crit_Chance to 13.0, ReforgeAPI.StatType.Crit_Damage to 10.0), LorenzRarity.RARE to ReforgeAPI.StatList.mapOf(ReforgeAPI.StatType.Crit_Chance to 16.0, ReforgeAPI.StatType.Crit_Damage to 18.0), LorenzRarity.EPIC to ReforgeAPI.StatList.mapOf(ReforgeAPI.StatType.Crit_Chance to 19.0, ReforgeAPI.StatType.Crit_Damage to 32.0), LorenzRarity.LEGENDARY to ReforgeAPI.StatList.mapOf(ReforgeAPI.StatType.Crit_Chance to 22.0, ReforgeAPI.StatType.Crit_Damage to 50.0), LorenzRarity.MYTHIC to ReforgeAPI.StatList.mapOf(ReforgeAPI.StatType.Crit_Chance to 25.0, ReforgeAPI.StatType.Crit_Damage to 78.0))),
-        ReforgeAPI.Reforge(
-            "Fine", ReforgeAPI.ReforgeType.Bows, mapOf(
-            LorenzRarity.COMMON to ReforgeAPI.StatList.mapOf(ReforgeAPI.StatType.Strength to 3.0, ReforgeAPI.StatType.Crit_Chance to 5.0, ReforgeAPI.StatType.Crit_Damage to 2.0), LorenzRarity.UNCOMMON to ReforgeAPI.StatList.mapOf(ReforgeAPI.StatType.Strength to 7.0, ReforgeAPI.StatType.Crit_Chance to 7.0, ReforgeAPI.StatType.Crit_Damage to 4.0), LorenzRarity.RARE to ReforgeAPI.StatList.mapOf(ReforgeAPI.StatType.Strength to 12.0, ReforgeAPI.StatType.Crit_Chance to 9.0, ReforgeAPI.StatType.Crit_Damage to 7.0), LorenzRarity.EPIC to ReforgeAPI.StatList.mapOf(ReforgeAPI.StatType.Strength to 18.0, ReforgeAPI.StatType.Crit_Chance to 12.0, ReforgeAPI.StatType.Crit_Damage to 10.0), LorenzRarity.LEGENDARY to ReforgeAPI.StatList.mapOf(ReforgeAPI.StatType.Strength to 25.0, ReforgeAPI.StatType.Crit_Chance to 15.0, ReforgeAPI.StatType.Crit_Damage to 15.0), LorenzRarity.MYTHIC to ReforgeAPI.StatList.mapOf(ReforgeAPI.StatType.Strength to 33.0, ReforgeAPI.StatType.Crit_Chance to 18.0, ReforgeAPI.StatType.Crit_Damage to 20.0)
-        )
-        ),
-        ReforgeAPI.Reforge("Grand", ReforgeAPI.ReforgeType.Bows, mapOf(LorenzRarity.COMMON to ReforgeAPI.StatList.mapOf(ReforgeAPI.StatType.Strength to 25.0), LorenzRarity.UNCOMMON to ReforgeAPI.StatList.mapOf(ReforgeAPI.StatType.Strength to 32.0), LorenzRarity.RARE to ReforgeAPI.StatList.mapOf(ReforgeAPI.StatType.Strength to 40.0), LorenzRarity.EPIC to ReforgeAPI.StatList.mapOf(ReforgeAPI.StatType.Strength to 50.0), LorenzRarity.LEGENDARY to ReforgeAPI.StatList.mapOf(ReforgeAPI.StatType.Strength to 60.0), LorenzRarity.MYTHIC to ReforgeAPI.StatList.mapOf(ReforgeAPI.StatType.Strength to 75.0))),
-        ReforgeAPI.Reforge("Hasty", ReforgeAPI.ReforgeType.Bows, mapOf(LorenzRarity.COMMON to ReforgeAPI.StatList.mapOf(ReforgeAPI.StatType.Strength to 3.0, ReforgeAPI.StatType.Crit_Chance to 20.0), LorenzRarity.UNCOMMON to ReforgeAPI.StatList.mapOf(ReforgeAPI.StatType.Strength to 5.0, ReforgeAPI.StatType.Crit_Chance to 25.0), LorenzRarity.RARE to ReforgeAPI.StatList.mapOf(ReforgeAPI.StatType.Strength to 7.0, ReforgeAPI.StatType.Crit_Chance to 30.0), LorenzRarity.EPIC to ReforgeAPI.StatList.mapOf(ReforgeAPI.StatType.Strength to 10.0, ReforgeAPI.StatType.Crit_Chance to 40.0), LorenzRarity.LEGENDARY to ReforgeAPI.StatList.mapOf(ReforgeAPI.StatType.Strength to 15.0, ReforgeAPI.StatType.Crit_Chance to 50.0), LorenzRarity.MYTHIC to ReforgeAPI.StatList.mapOf(ReforgeAPI.StatType.Strength to 20.0, ReforgeAPI.StatType.Crit_Chance to 60.0))),
-        ReforgeAPI.Reforge(
-            "Neat", ReforgeAPI.ReforgeType.Bows, mapOf(
-            LorenzRarity.COMMON to ReforgeAPI.StatList.mapOf(ReforgeAPI.StatType.Crit_Chance to 10.0, ReforgeAPI.StatType.Crit_Damage to 4.0, ReforgeAPI.StatType.Intelligence to 3.0), LorenzRarity.UNCOMMON to ReforgeAPI.StatList.mapOf(ReforgeAPI.StatType.Crit_Chance to 12.0, ReforgeAPI.StatType.Crit_Damage to 8.0, ReforgeAPI.StatType.Intelligence to 6.0), LorenzRarity.RARE to ReforgeAPI.StatList.mapOf(ReforgeAPI.StatType.Crit_Chance to 14.0, ReforgeAPI.StatType.Crit_Damage to 14.0, ReforgeAPI.StatType.Intelligence to 10.0), LorenzRarity.EPIC to ReforgeAPI.StatList.mapOf(ReforgeAPI.StatType.Crit_Chance to 17.0, ReforgeAPI.StatType.Crit_Damage to 20.0, ReforgeAPI.StatType.Intelligence to 15.0), LorenzRarity.LEGENDARY to ReforgeAPI.StatList.mapOf(ReforgeAPI.StatType.Crit_Chance to 20.0, ReforgeAPI.StatType.Crit_Damage to 30.0, ReforgeAPI.StatType.Intelligence to 20.0), LorenzRarity.MYTHIC to ReforgeAPI.StatList.mapOf(ReforgeAPI.StatType.Crit_Chance to 25.0, ReforgeAPI.StatType.Crit_Damage to 40.0, ReforgeAPI.StatType.Intelligence to 30.0)
-        )
-        ),
-        ReforgeAPI.Reforge("Rapid", ReforgeAPI.ReforgeType.Bows, mapOf(LorenzRarity.COMMON to ReforgeAPI.StatList.mapOf(ReforgeAPI.StatType.Strength to 2.0, ReforgeAPI.StatType.Crit_Damage to 35.0), LorenzRarity.UNCOMMON to ReforgeAPI.StatList.mapOf(ReforgeAPI.StatType.Strength to 3.0, ReforgeAPI.StatType.Crit_Damage to 45.0), LorenzRarity.RARE to ReforgeAPI.StatList.mapOf(ReforgeAPI.StatType.Strength to 4.0, ReforgeAPI.StatType.Crit_Damage to 55.0), LorenzRarity.EPIC to ReforgeAPI.StatList.mapOf(ReforgeAPI.StatType.Strength to 7.0, ReforgeAPI.StatType.Crit_Damage to 65.0), LorenzRarity.LEGENDARY to ReforgeAPI.StatList.mapOf(ReforgeAPI.StatType.Strength to 10.0, ReforgeAPI.StatType.Crit_Damage to 75.0), LorenzRarity.MYTHIC to ReforgeAPI.StatList.mapOf(ReforgeAPI.StatType.Strength to 12.0, ReforgeAPI.StatType.Crit_Damage to 90.0))),
-        ReforgeAPI.Reforge(
-            "Rich", ReforgeAPI.ReforgeType.Bows, mapOf(
-            LorenzRarity.COMMON to ReforgeAPI.StatList.mapOf(ReforgeAPI.StatType.Crit_Chance to 10.0, ReforgeAPI.StatType.Crit_Damage to 2.0, ReforgeAPI.StatType.Intelligence to 3.0), LorenzRarity.UNCOMMON to ReforgeAPI.StatList.mapOf(ReforgeAPI.StatType.Crit_Chance to 12.0, ReforgeAPI.StatType.Crit_Damage to 4.0, ReforgeAPI.StatType.Intelligence to 5.0), LorenzRarity.RARE to ReforgeAPI.StatList.mapOf(ReforgeAPI.StatType.Crit_Chance to 14.0, ReforgeAPI.StatType.Crit_Damage to 7.0, ReforgeAPI.StatType.Intelligence to 6.0), LorenzRarity.EPIC to ReforgeAPI.StatList.mapOf(ReforgeAPI.StatType.Crit_Chance to 17.0, ReforgeAPI.StatType.Crit_Damage to 10.0, ReforgeAPI.StatType.Intelligence to 15.0), LorenzRarity.LEGENDARY to ReforgeAPI.StatList.mapOf(ReforgeAPI.StatType.Crit_Chance to 20.0, ReforgeAPI.StatType.Crit_Damage to 15.0, ReforgeAPI.StatType.Intelligence to 20.0), LorenzRarity.MYTHIC to ReforgeAPI.StatList.mapOf(ReforgeAPI.StatType.Crit_Chance to 25.0, ReforgeAPI.StatType.Crit_Damage to 20.0, ReforgeAPI.StatType.Intelligence to 30.0)
-        )
-        ),
-        ReforgeAPI.Reforge(
-            "Unreal", ReforgeAPI.ReforgeType.Bows, mapOf(
-            LorenzRarity.COMMON to ReforgeAPI.StatList.mapOf(ReforgeAPI.StatType.Strength to 3.0, ReforgeAPI.StatType.Crit_Chance to 8.0, ReforgeAPI.StatType.Crit_Damage to 5.0), LorenzRarity.UNCOMMON to ReforgeAPI.StatList.mapOf(ReforgeAPI.StatType.Strength to 7.0, ReforgeAPI.StatType.Crit_Chance to 9.0, ReforgeAPI.StatType.Crit_Damage to 10.0), LorenzRarity.RARE to ReforgeAPI.StatList.mapOf(ReforgeAPI.StatType.Strength to 12.0, ReforgeAPI.StatType.Crit_Chance to 10.0, ReforgeAPI.StatType.Crit_Damage to 18.0), LorenzRarity.EPIC to ReforgeAPI.StatList.mapOf(ReforgeAPI.StatType.Strength to 18.0, ReforgeAPI.StatType.Crit_Chance to 11.0, ReforgeAPI.StatType.Crit_Damage to 32.0), LorenzRarity.LEGENDARY to ReforgeAPI.StatList.mapOf(ReforgeAPI.StatType.Strength to 25.0, ReforgeAPI.StatType.Crit_Chance to 13.0, ReforgeAPI.StatType.Crit_Damage to 50.0), LorenzRarity.MYTHIC to ReforgeAPI.StatList.mapOf(ReforgeAPI.StatType.Strength to 34.0, ReforgeAPI.StatType.Crit_Chance to 15.0, ReforgeAPI.StatType.Crit_Damage to 70.0)
-        )
-        ),
-        ReforgeAPI.Reforge(
-            "Clean", ReforgeAPI.ReforgeType.Armor, mapOf(
-            LorenzRarity.COMMON to ReforgeAPI.StatList.mapOf(ReforgeAPI.StatType.Health to 5.0, ReforgeAPI.StatType.Defense to 5.0, ReforgeAPI.StatType.Crit_Chance to 2.0), LorenzRarity.UNCOMMON to ReforgeAPI.StatList.mapOf(ReforgeAPI.StatType.Health to 7.0, ReforgeAPI.StatType.Defense to 7.0, ReforgeAPI.StatType.Crit_Chance to 4.0), LorenzRarity.RARE to ReforgeAPI.StatList.mapOf(ReforgeAPI.StatType.Health to 10.0, ReforgeAPI.StatType.Defense to 10.0, ReforgeAPI.StatType.Crit_Chance to 6.0), LorenzRarity.EPIC to ReforgeAPI.StatList.mapOf(ReforgeAPI.StatType.Health to 15.0, ReforgeAPI.StatType.Defense to 15.0, ReforgeAPI.StatType.Crit_Chance to 8.0), LorenzRarity.LEGENDARY to ReforgeAPI.StatList.mapOf(ReforgeAPI.StatType.Health to 20.0, ReforgeAPI.StatType.Defense to 20.0, ReforgeAPI.StatType.Crit_Chance to 10.0), LorenzRarity.MYTHIC to ReforgeAPI.StatList.mapOf(ReforgeAPI.StatType.Health to 25.0, ReforgeAPI.StatType.Defense to 25.0, ReforgeAPI.StatType.Crit_Chance to 12.0)
-        )
-        ),
-        ReforgeAPI.Reforge(
-            "Fierce", ReforgeAPI.ReforgeType.Armor, mapOf(
-            LorenzRarity.COMMON to ReforgeAPI.StatList.mapOf(ReforgeAPI.StatType.Strength to 2.0, ReforgeAPI.StatType.Crit_Chance to 2.0, ReforgeAPI.StatType.Crit_Damage to 4.0), LorenzRarity.UNCOMMON to ReforgeAPI.StatList.mapOf(ReforgeAPI.StatType.Strength to 4.0, ReforgeAPI.StatType.Crit_Chance to 3.0, ReforgeAPI.StatType.Crit_Damage to 7.0), LorenzRarity.RARE to ReforgeAPI.StatList.mapOf(ReforgeAPI.StatType.Strength to 6.0, ReforgeAPI.StatType.Crit_Chance to 4.0, ReforgeAPI.StatType.Crit_Damage to 10.0), LorenzRarity.EPIC to ReforgeAPI.StatList.mapOf(ReforgeAPI.StatType.Strength to 8.0, ReforgeAPI.StatType.Crit_Chance to 5.0, ReforgeAPI.StatType.Crit_Damage to 14.0), LorenzRarity.LEGENDARY to ReforgeAPI.StatList.mapOf(ReforgeAPI.StatType.Strength to 10.0, ReforgeAPI.StatType.Crit_Chance to 6.0, ReforgeAPI.StatType.Crit_Damage to 18.0), LorenzRarity.MYTHIC to ReforgeAPI.StatList.mapOf(ReforgeAPI.StatType.Strength to 12.0, ReforgeAPI.StatType.Crit_Chance to 8.0, ReforgeAPI.StatType.Crit_Damage to 24.0)
-        )
-        ),
-        ReforgeAPI.Reforge(
-            "Heavy", ReforgeAPI.ReforgeType.Armor, mapOf(
-            LorenzRarity.COMMON to ReforgeAPI.StatList.mapOf(ReforgeAPI.StatType.Defense to 25.0, ReforgeAPI.StatType.Crit_Damage to -1.0, ReforgeAPI.StatType.Speed to -1.0), LorenzRarity.UNCOMMON to ReforgeAPI.StatList.mapOf(ReforgeAPI.StatType.Defense to 35.0, ReforgeAPI.StatType.Crit_Damage to -2.0, ReforgeAPI.StatType.Speed to -1.0), LorenzRarity.RARE to ReforgeAPI.StatList.mapOf(ReforgeAPI.StatType.Defense to 50.0, ReforgeAPI.StatType.Crit_Damage to -2.0, ReforgeAPI.StatType.Speed to -1.0), LorenzRarity.EPIC to ReforgeAPI.StatList.mapOf(ReforgeAPI.StatType.Defense to 65.0, ReforgeAPI.StatType.Crit_Damage to -3.0, ReforgeAPI.StatType.Speed to -1.0), LorenzRarity.LEGENDARY to ReforgeAPI.StatList.mapOf(ReforgeAPI.StatType.Defense to 80.0, ReforgeAPI.StatType.Crit_Damage to -5.0, ReforgeAPI.StatType.Speed to -1.0), LorenzRarity.MYTHIC to ReforgeAPI.StatList.mapOf(ReforgeAPI.StatType.Defense to 110.0, ReforgeAPI.StatType.Crit_Damage to -7.0, ReforgeAPI.StatType.Speed to -1.0)
-        )
-        ),
-        ReforgeAPI.Reforge(
-            "Light", ReforgeAPI.ReforgeType.Armor, mapOf(
-            LorenzRarity.COMMON to ReforgeAPI.StatList.mapOf(ReforgeAPI.StatType.Health to 5.0, ReforgeAPI.StatType.Defense to 1.0, ReforgeAPI.StatType.Crit_Chance to 1.0, ReforgeAPI.StatType.Crit_Damage to 1.0, ReforgeAPI.StatType.Speed to 1.0, ReforgeAPI.StatType.Bonus_Attack_Speed to 1.0), LorenzRarity.UNCOMMON to ReforgeAPI.StatList.mapOf(ReforgeAPI.StatType.Health to 7.0, ReforgeAPI.StatType.Defense to 2.0, ReforgeAPI.StatType.Crit_Chance to 1.0, ReforgeAPI.StatType.Crit_Damage to 2.0, ReforgeAPI.StatType.Speed to 2.0, ReforgeAPI.StatType.Bonus_Attack_Speed to 2.0), LorenzRarity.RARE to ReforgeAPI.StatList.mapOf(ReforgeAPI.StatType.Health to 10.0, ReforgeAPI.StatType.Defense to 3.0, ReforgeAPI.StatType.Crit_Chance to 2.0, ReforgeAPI.StatType.Crit_Damage to 3.0, ReforgeAPI.StatType.Speed to 3.0, ReforgeAPI.StatType.Bonus_Attack_Speed to 3.0), LorenzRarity.EPIC to ReforgeAPI.StatList.mapOf(ReforgeAPI.StatType.Health to 15.0, ReforgeAPI.StatType.Defense to 4.0, ReforgeAPI.StatType.Crit_Chance to 2.0, ReforgeAPI.StatType.Crit_Damage to 4.0, ReforgeAPI.StatType.Speed to 4.0, ReforgeAPI.StatType.Bonus_Attack_Speed to 4.0), LorenzRarity.LEGENDARY to ReforgeAPI.StatList.mapOf(ReforgeAPI.StatType.Health to 20.0, ReforgeAPI.StatType.Defense to 5.0, ReforgeAPI.StatType.Crit_Chance to 3.0, ReforgeAPI.StatType.Crit_Damage to 5.0, ReforgeAPI.StatType.Speed to 5.0, ReforgeAPI.StatType.Bonus_Attack_Speed to 5.0), LorenzRarity.MYTHIC to ReforgeAPI.StatList.mapOf(ReforgeAPI.StatType.Health to 25.0, ReforgeAPI.StatType.Defense to 6.0, ReforgeAPI.StatType.Crit_Chance to 3.0, ReforgeAPI.StatType.Crit_Damage to 6.0, ReforgeAPI.StatType.Speed to 6.0, ReforgeAPI.StatType.Bonus_Attack_Speed to 6.0)
-        )
-        ),
-        ReforgeAPI.Reforge(
-            "Mythic", ReforgeAPI.ReforgeType.Armor, mapOf(
-            LorenzRarity.COMMON to ReforgeAPI.StatList.mapOf(ReforgeAPI.StatType.Health to 2.0, ReforgeAPI.StatType.Defense to 2.0, ReforgeAPI.StatType.Strength to 2.0, ReforgeAPI.StatType.Crit_Chance to 1.0, ReforgeAPI.StatType.Speed to 2.0, ReforgeAPI.StatType.Intelligence to 20.0), LorenzRarity.UNCOMMON to ReforgeAPI.StatList.mapOf(ReforgeAPI.StatType.Health to 4.0, ReforgeAPI.StatType.Defense to 3.0, ReforgeAPI.StatType.Strength to 4.0, ReforgeAPI.StatType.Crit_Chance to 2.0, ReforgeAPI.StatType.Speed to 2.0, ReforgeAPI.StatType.Intelligence to 25.0), LorenzRarity.RARE to ReforgeAPI.StatList.mapOf(ReforgeAPI.StatType.Health to 6.0, ReforgeAPI.StatType.Defense to 6.0, ReforgeAPI.StatType.Strength to 6.0, ReforgeAPI.StatType.Crit_Chance to 3.0, ReforgeAPI.StatType.Speed to 2.0, ReforgeAPI.StatType.Intelligence to 30.0), LorenzRarity.EPIC to ReforgeAPI.StatList.mapOf(ReforgeAPI.StatType.Health to 8.0, ReforgeAPI.StatType.Defense to 8.0, ReforgeAPI.StatType.Strength to 8.0, ReforgeAPI.StatType.Crit_Chance to 4.0, ReforgeAPI.StatType.Speed to 2.0, ReforgeAPI.StatType.Intelligence to 40.0), LorenzRarity.LEGENDARY to ReforgeAPI.StatList.mapOf(ReforgeAPI.StatType.Health to 10.0, ReforgeAPI.StatType.Defense to 10.0, ReforgeAPI.StatType.Strength to 10.0, ReforgeAPI.StatType.Crit_Chance to 5.0, ReforgeAPI.StatType.Speed to 2.0, ReforgeAPI.StatType.Intelligence to 50.0), LorenzRarity.MYTHIC to ReforgeAPI.StatList.mapOf(ReforgeAPI.StatType.Health to 12.0, ReforgeAPI.StatType.Defense to 12.0, ReforgeAPI.StatType.Strength to 12.0, ReforgeAPI.StatType.Crit_Chance to 6.0, ReforgeAPI.StatType.Speed to 2.0, ReforgeAPI.StatType.Intelligence to 60.0)
-        )
-        ),
-        ReforgeAPI.Reforge(
-            "Pure", ReforgeAPI.ReforgeType.Armor, mapOf(
-            LorenzRarity.COMMON to ReforgeAPI.StatList.mapOf(ReforgeAPI.StatType.Health to 2.0, ReforgeAPI.StatType.Defense to 2.0, ReforgeAPI.StatType.Strength to 2.0, ReforgeAPI.StatType.Crit_Chance to 2.0, ReforgeAPI.StatType.Crit_Damage to 2.0, ReforgeAPI.StatType.Speed to 1.0, ReforgeAPI.StatType.Intelligence to 2.0, ReforgeAPI.StatType.Bonus_Attack_Speed to 1.0), LorenzRarity.UNCOMMON to ReforgeAPI.StatList.mapOf(ReforgeAPI.StatType.Health to 3.0, ReforgeAPI.StatType.Defense to 3.0, ReforgeAPI.StatType.Strength to 3.0, ReforgeAPI.StatType.Crit_Chance to 4.0, ReforgeAPI.StatType.Crit_Damage to 3.0, ReforgeAPI.StatType.Speed to 1.0, ReforgeAPI.StatType.Intelligence to 3.0, ReforgeAPI.StatType.Bonus_Attack_Speed to 1.0), LorenzRarity.RARE to ReforgeAPI.StatList.mapOf(ReforgeAPI.StatType.Health to 4.0, ReforgeAPI.StatType.Defense to 4.0, ReforgeAPI.StatType.Strength to 4.0, ReforgeAPI.StatType.Crit_Chance to 6.0, ReforgeAPI.StatType.Crit_Damage to 4.0, ReforgeAPI.StatType.Speed to 1.0, ReforgeAPI.StatType.Intelligence to 4.0, ReforgeAPI.StatType.Bonus_Attack_Speed to 2.0), LorenzRarity.EPIC to ReforgeAPI.StatList.mapOf(ReforgeAPI.StatType.Health to 6.0, ReforgeAPI.StatType.Defense to 6.0, ReforgeAPI.StatType.Strength to 6.0, ReforgeAPI.StatType.Crit_Chance to 8.0, ReforgeAPI.StatType.Crit_Damage to 6.0, ReforgeAPI.StatType.Speed to 1.0, ReforgeAPI.StatType.Intelligence to 6.0, ReforgeAPI.StatType.Bonus_Attack_Speed to 3.0), LorenzRarity.LEGENDARY to ReforgeAPI.StatList.mapOf(ReforgeAPI.StatType.Health to 8.0, ReforgeAPI.StatType.Defense to 8.0, ReforgeAPI.StatType.Strength to 8.0, ReforgeAPI.StatType.Crit_Chance to 10.0, ReforgeAPI.StatType.Crit_Damage to 8.0, ReforgeAPI.StatType.Speed to 1.0, ReforgeAPI.StatType.Intelligence to 8.0, ReforgeAPI.StatType.Bonus_Attack_Speed to 4.0), LorenzRarity.MYTHIC to ReforgeAPI.StatList.mapOf(ReforgeAPI.StatType.Health to 10.0, ReforgeAPI.StatType.Defense to 10.0, ReforgeAPI.StatType.Strength to 10.0, ReforgeAPI.StatType.Crit_Chance to 12.0, ReforgeAPI.StatType.Crit_Damage to 10.0, ReforgeAPI.StatType.Speed to 1.0, ReforgeAPI.StatType.Intelligence to 10.0, ReforgeAPI.StatType.Bonus_Attack_Speed to 5.0)
-        )
-        ),
-        ReforgeAPI.Reforge("Titanic", ReforgeAPI.ReforgeType.Armor, mapOf(LorenzRarity.COMMON to ReforgeAPI.StatList.mapOf(ReforgeAPI.StatType.Health to 10.0, ReforgeAPI.StatType.Defense to 10.0), LorenzRarity.UNCOMMON to ReforgeAPI.StatList.mapOf(ReforgeAPI.StatType.Health to 15.0, ReforgeAPI.StatType.Defense to 15.0), LorenzRarity.RARE to ReforgeAPI.StatList.mapOf(ReforgeAPI.StatType.Health to 20.0, ReforgeAPI.StatType.Defense to 20.0), LorenzRarity.EPIC to ReforgeAPI.StatList.mapOf(ReforgeAPI.StatType.Health to 25.0, ReforgeAPI.StatType.Defense to 25.0), LorenzRarity.LEGENDARY to ReforgeAPI.StatList.mapOf(ReforgeAPI.StatType.Health to 35.0, ReforgeAPI.StatType.Defense to 35.0), LorenzRarity.MYTHIC to ReforgeAPI.StatList.mapOf(ReforgeAPI.StatType.Health to 50.0, ReforgeAPI.StatType.Defense to 50.0))),
-        ReforgeAPI.Reforge(
-            "Smart", ReforgeAPI.ReforgeType.Armor, mapOf(
-            LorenzRarity.COMMON to ReforgeAPI.StatList.mapOf(ReforgeAPI.StatType.Health to 4.0, ReforgeAPI.StatType.Defense to 4.0, ReforgeAPI.StatType.Intelligence to 20.0), LorenzRarity.UNCOMMON to ReforgeAPI.StatList.mapOf(ReforgeAPI.StatType.Health to 6.0, ReforgeAPI.StatType.Defense to 6.0, ReforgeAPI.StatType.Intelligence to 40.0), LorenzRarity.RARE to ReforgeAPI.StatList.mapOf(ReforgeAPI.StatType.Health to 9.0, ReforgeAPI.StatType.Defense to 9.0, ReforgeAPI.StatType.Intelligence to 60.0), LorenzRarity.EPIC to ReforgeAPI.StatList.mapOf(ReforgeAPI.StatType.Health to 12.0, ReforgeAPI.StatType.Defense to 12.0, ReforgeAPI.StatType.Intelligence to 80.0), LorenzRarity.LEGENDARY to ReforgeAPI.StatList.mapOf(ReforgeAPI.StatType.Health to 15.0, ReforgeAPI.StatType.Defense to 15.0, ReforgeAPI.StatType.Intelligence to 100.0), LorenzRarity.MYTHIC to ReforgeAPI.StatList.mapOf(ReforgeAPI.StatType.Health to 20.0, ReforgeAPI.StatType.Defense to 20.0, ReforgeAPI.StatType.Intelligence to 120.0)
-        )
-        ),
-        ReforgeAPI.Reforge(
-            "Wise", ReforgeAPI.ReforgeType.Armor, mapOf(
-            LorenzRarity.COMMON to ReforgeAPI.StatList.mapOf(ReforgeAPI.StatType.Health to 6.0, ReforgeAPI.StatType.Speed to 1.0, ReforgeAPI.StatType.Intelligence to 25.0), LorenzRarity.UNCOMMON to ReforgeAPI.StatList.mapOf(ReforgeAPI.StatType.Health to 8.0, ReforgeAPI.StatType.Speed to 1.0, ReforgeAPI.StatType.Intelligence to 50.0), LorenzRarity.RARE to ReforgeAPI.StatList.mapOf(ReforgeAPI.StatType.Health to 10.0, ReforgeAPI.StatType.Speed to 1.0, ReforgeAPI.StatType.Intelligence to 75.0), LorenzRarity.EPIC to ReforgeAPI.StatList.mapOf(ReforgeAPI.StatType.Health to 12.0, ReforgeAPI.StatType.Speed to 2.0, ReforgeAPI.StatType.Intelligence to 100.0), LorenzRarity.LEGENDARY to ReforgeAPI.StatList.mapOf(ReforgeAPI.StatType.Health to 15.0, ReforgeAPI.StatType.Speed to 2.0, ReforgeAPI.StatType.Intelligence to 125.0), LorenzRarity.MYTHIC to ReforgeAPI.StatList.mapOf(ReforgeAPI.StatType.Health to 20.0, ReforgeAPI.StatType.Speed to 3.0, ReforgeAPI.StatType.Intelligence to 150.0)
-        )
-        ),
-        ReforgeAPI.Reforge(
-            "Stained", ReforgeAPI.ReforgeType.Equipment, mapOf(
-            LorenzRarity.COMMON to ReforgeAPI.StatList.mapOf(ReforgeAPI.StatType.Defense to 2.0, ReforgeAPI.StatType.Health to 2.0, ReforgeAPI.StatType.Crit_Chance to 1.0), LorenzRarity.UNCOMMON to ReforgeAPI.StatList.mapOf(ReforgeAPI.StatType.Defense to 3.0, ReforgeAPI.StatType.Health to 3.0, ReforgeAPI.StatType.Crit_Chance to 1.0), LorenzRarity.RARE to ReforgeAPI.StatList.mapOf(ReforgeAPI.StatType.Defense to 4.0, ReforgeAPI.StatType.Health to 4.0, ReforgeAPI.StatType.Crit_Chance to 2.0), LorenzRarity.EPIC to ReforgeAPI.StatList.mapOf(ReforgeAPI.StatType.Defense to 5.0, ReforgeAPI.StatType.Health to 5.0, ReforgeAPI.StatType.Crit_Chance to 2.0), LorenzRarity.LEGENDARY to ReforgeAPI.StatList.mapOf(ReforgeAPI.StatType.Defense to 6.0, ReforgeAPI.StatType.Health to 5.0, ReforgeAPI.StatType.Crit_Chance to 3.0), LorenzRarity.MYTHIC to ReforgeAPI.StatList.mapOf(ReforgeAPI.StatType.Defense to 7.0, ReforgeAPI.StatType.Health to 7.0, ReforgeAPI.StatType.Crit_Chance to 4.0)
-        )
-        ),
-        ReforgeAPI.Reforge("Menacing", ReforgeAPI.ReforgeType.Equipment, mapOf(LorenzRarity.COMMON to ReforgeAPI.StatList.mapOf(ReforgeAPI.StatType.Crit_Chance to 1.0, ReforgeAPI.StatType.Crit_Damage to 2.0), LorenzRarity.UNCOMMON to ReforgeAPI.StatList.mapOf(ReforgeAPI.StatType.Crit_Chance to 1.0, ReforgeAPI.StatType.Crit_Damage to 3.0), LorenzRarity.RARE to ReforgeAPI.StatList.mapOf(ReforgeAPI.StatType.Crit_Chance to 1.0, ReforgeAPI.StatType.Crit_Damage to 3.0), LorenzRarity.EPIC to ReforgeAPI.StatList.mapOf(ReforgeAPI.StatType.Crit_Chance to 1.0, ReforgeAPI.StatType.Crit_Damage to 4.0), LorenzRarity.LEGENDARY to ReforgeAPI.StatList.mapOf(ReforgeAPI.StatType.Crit_Chance to 2.0, ReforgeAPI.StatType.Crit_Damage to 4.0), LorenzRarity.MYTHIC to ReforgeAPI.StatList.mapOf(ReforgeAPI.StatType.Crit_Chance to 2.0, ReforgeAPI.StatType.Crit_Damage to 5.0))),
-        ReforgeAPI.Reforge(
-            "Hefty", ReforgeAPI.ReforgeType.Equipment, mapOf(
-            LorenzRarity.COMMON to ReforgeAPI.StatList.mapOf(ReforgeAPI.StatType.Defense to 7.0, ReforgeAPI.StatType.Speed to -1.0, ReforgeAPI.StatType.Crit_Damage to -2.0), LorenzRarity.UNCOMMON to ReforgeAPI.StatList.mapOf(ReforgeAPI.StatType.Defense to 9.0, ReforgeAPI.StatType.Speed to -1.0, ReforgeAPI.StatType.Crit_Damage to -2.0), LorenzRarity.RARE to ReforgeAPI.StatList.mapOf(ReforgeAPI.StatType.Defense to 12.0, ReforgeAPI.StatType.Speed to -1.0, ReforgeAPI.StatType.Crit_Damage to -3.0), LorenzRarity.EPIC to ReforgeAPI.StatList.mapOf(ReforgeAPI.StatType.Defense to 15.0, ReforgeAPI.StatType.Speed to -1.0, ReforgeAPI.StatType.Crit_Damage to -3.0), LorenzRarity.LEGENDARY to ReforgeAPI.StatList.mapOf(ReforgeAPI.StatType.Defense to 20.0, ReforgeAPI.StatType.Speed to -1.0, ReforgeAPI.StatType.Crit_Damage to -4.0), LorenzRarity.MYTHIC to ReforgeAPI.StatList.mapOf(ReforgeAPI.StatType.Defense to 25.0, ReforgeAPI.StatType.Speed to -1.0, ReforgeAPI.StatType.Crit_Damage to -5.0)
-        )
-        ),
-        ReforgeAPI.Reforge(
-            "Soft", ReforgeAPI.ReforgeType.Equipment, mapOf(
-            LorenzRarity.COMMON to ReforgeAPI.StatList.mapOf(ReforgeAPI.StatType.Defense to 1.0, ReforgeAPI.StatType.Speed to 1.0, ReforgeAPI.StatType.Health to 2.0, ReforgeAPI.StatType.Crit_Chance to 1.0, ReforgeAPI.StatType.Crit_Damage to 1.0, ReforgeAPI.StatType.Bonus_Attack_Speed to 1.0), LorenzRarity.UNCOMMON to ReforgeAPI.StatList.mapOf(ReforgeAPI.StatType.Defense to 1.0, ReforgeAPI.StatType.Speed to 1.0, ReforgeAPI.StatType.Health to 3.0, ReforgeAPI.StatType.Crit_Chance to 1.0, ReforgeAPI.StatType.Crit_Damage to 1.0, ReforgeAPI.StatType.Bonus_Attack_Speed to 1.0), LorenzRarity.RARE to ReforgeAPI.StatList.mapOf(ReforgeAPI.StatType.Defense to 1.0, ReforgeAPI.StatType.Speed to 1.0, ReforgeAPI.StatType.Health to 4.0, ReforgeAPI.StatType.Crit_Chance to 1.0, ReforgeAPI.StatType.Crit_Damage to 1.0, ReforgeAPI.StatType.Bonus_Attack_Speed to 1.0), LorenzRarity.EPIC to ReforgeAPI.StatList.mapOf(ReforgeAPI.StatType.Defense to 1.0, ReforgeAPI.StatType.Speed to 1.0, ReforgeAPI.StatType.Health to 5.0, ReforgeAPI.StatType.Crit_Chance to 1.0, ReforgeAPI.StatType.Crit_Damage to 2.0, ReforgeAPI.StatType.Bonus_Attack_Speed to 1.0), LorenzRarity.LEGENDARY to ReforgeAPI.StatList.mapOf(ReforgeAPI.StatType.Defense to 2.0, ReforgeAPI.StatType.Speed to 2.0, ReforgeAPI.StatType.Health to 6.0, ReforgeAPI.StatType.Crit_Chance to 1.0, ReforgeAPI.StatType.Crit_Damage to 2.0, ReforgeAPI.StatType.Bonus_Attack_Speed to 1.0), LorenzRarity.MYTHIC to ReforgeAPI.StatList.mapOf(ReforgeAPI.StatType.Defense to 2.0, ReforgeAPI.StatType.Speed to 2.0, ReforgeAPI.StatType.Health to 7.0, ReforgeAPI.StatType.Crit_Chance to 1.0, ReforgeAPI.StatType.Crit_Damage to 2.0, ReforgeAPI.StatType.Bonus_Attack_Speed to 2.0)
-        )
-        ),
-        ReforgeAPI.Reforge(
-            "Honored", ReforgeAPI.ReforgeType.Equipment, mapOf(
-            LorenzRarity.COMMON to ReforgeAPI.StatList.mapOf(ReforgeAPI.StatType.Strength to 0.0, ReforgeAPI.StatType.Defense to 1.0, ReforgeAPI.StatType.Speed to 1.0, ReforgeAPI.StatType.Health to 1.0, ReforgeAPI.StatType.Crit_Chance to 1.0, ReforgeAPI.StatType.Intelligence to 3.0), LorenzRarity.UNCOMMON to ReforgeAPI.StatList.mapOf(ReforgeAPI.StatType.Strength to 1.0, ReforgeAPI.StatType.Defense to 2.0, ReforgeAPI.StatType.Speed to 1.0, ReforgeAPI.StatType.Health to 1.0, ReforgeAPI.StatType.Crit_Chance to 1.0, ReforgeAPI.StatType.Intelligence to 3.0), LorenzRarity.RARE to ReforgeAPI.StatList.mapOf(ReforgeAPI.StatType.Strength to 2.0, ReforgeAPI.StatType.Defense to 2.0, ReforgeAPI.StatType.Speed to 1.0, ReforgeAPI.StatType.Health to 2.0, ReforgeAPI.StatType.Crit_Chance to 1.0, ReforgeAPI.StatType.Intelligence to 4.0), LorenzRarity.EPIC to ReforgeAPI.StatList.mapOf(ReforgeAPI.StatType.Strength to 2.0, ReforgeAPI.StatType.Defense to 3.0, ReforgeAPI.StatType.Speed to 1.0, ReforgeAPI.StatType.Health to 2.0, ReforgeAPI.StatType.Crit_Chance to 2.0, ReforgeAPI.StatType.Intelligence to 5.0), LorenzRarity.LEGENDARY to ReforgeAPI.StatList.mapOf(ReforgeAPI.StatType.Strength to 3.0, ReforgeAPI.StatType.Defense to 3.0, ReforgeAPI.StatType.Speed to 1.0, ReforgeAPI.StatType.Health to 3.0, ReforgeAPI.StatType.Crit_Chance to 2.0, ReforgeAPI.StatType.Intelligence to 6.0), LorenzRarity.MYTHIC to ReforgeAPI.StatList.mapOf(ReforgeAPI.StatType.Strength to 3.0, ReforgeAPI.StatType.Defense to 4.0, ReforgeAPI.StatType.Speed to 1.0, ReforgeAPI.StatType.Health to 4.0, ReforgeAPI.StatType.Crit_Chance to 2.0, ReforgeAPI.StatType.Intelligence to 7.0)
-        )
-        ),
-        ReforgeAPI.Reforge(
-            "Blended", ReforgeAPI.ReforgeType.Equipment, mapOf(
-            LorenzRarity.COMMON to ReforgeAPI.StatList.mapOf(ReforgeAPI.StatType.Strength to 0.0, ReforgeAPI.StatType.Defense to 1.0, ReforgeAPI.StatType.Speed to 1.0, ReforgeAPI.StatType.Health to 1.0, ReforgeAPI.StatType.Crit_Chance to 1.0, ReforgeAPI.StatType.Crit_Damage to 1.0, ReforgeAPI.StatType.Intelligence to 1.0, ReforgeAPI.StatType.Bonus_Attack_Speed to 1.0), LorenzRarity.UNCOMMON to ReforgeAPI.StatList.mapOf(ReforgeAPI.StatType.Strength to 1.0, ReforgeAPI.StatType.Defense to 1.0, ReforgeAPI.StatType.Speed to 1.0, ReforgeAPI.StatType.Health to 1.0, ReforgeAPI.StatType.Crit_Chance to 1.0, ReforgeAPI.StatType.Crit_Damage to 2.0, ReforgeAPI.StatType.Intelligence to 1.0, ReforgeAPI.StatType.Bonus_Attack_Speed to 1.0), LorenzRarity.RARE to ReforgeAPI.StatList.mapOf(ReforgeAPI.StatType.Strength to 1.0, ReforgeAPI.StatType.Defense to 1.0, ReforgeAPI.StatType.Speed to 1.0, ReforgeAPI.StatType.Health to 2.0, ReforgeAPI.StatType.Crit_Chance to 2.0, ReforgeAPI.StatType.Crit_Damage to 2.0, ReforgeAPI.StatType.Intelligence to 1.0, ReforgeAPI.StatType.Bonus_Attack_Speed to 1.0), LorenzRarity.EPIC to ReforgeAPI.StatList.mapOf(ReforgeAPI.StatType.Strength to 2.0, ReforgeAPI.StatType.Defense to 2.0, ReforgeAPI.StatType.Speed to 1.0, ReforgeAPI.StatType.Health to 2.0, ReforgeAPI.StatType.Crit_Chance to 2.0, ReforgeAPI.StatType.Crit_Damage to 2.0, ReforgeAPI.StatType.Intelligence to 2.0, ReforgeAPI.StatType.Bonus_Attack_Speed to 1.0), LorenzRarity.LEGENDARY to ReforgeAPI.StatList.mapOf(ReforgeAPI.StatType.Strength to 2.0, ReforgeAPI.StatType.Defense to 3.0, ReforgeAPI.StatType.Speed to 1.0, ReforgeAPI.StatType.Health to 2.0, ReforgeAPI.StatType.Crit_Chance to 3.0, ReforgeAPI.StatType.Crit_Damage to 2.0, ReforgeAPI.StatType.Intelligence to 2.0, ReforgeAPI.StatType.Bonus_Attack_Speed to 1.0), LorenzRarity.MYTHIC to ReforgeAPI.StatList.mapOf(ReforgeAPI.StatType.Strength to 2.0, ReforgeAPI.StatType.Defense to 3.0, ReforgeAPI.StatType.Speed to 1.0, ReforgeAPI.StatType.Health to 3.0, ReforgeAPI.StatType.Crit_Chance to 3.0, ReforgeAPI.StatType.Crit_Damage to 2.0, ReforgeAPI.StatType.Intelligence to 3.0, ReforgeAPI.StatType.Bonus_Attack_Speed to 1.0)
-        )
-        ),
-        ReforgeAPI.Reforge(
-            "Astute", ReforgeAPI.ReforgeType.Equipment, mapOf(
-            LorenzRarity.COMMON to ReforgeAPI.StatList.mapOf(ReforgeAPI.StatType.Defense to 1.0, ReforgeAPI.StatType.Health to 1.0, ReforgeAPI.StatType.Intelligence to 3.0), LorenzRarity.UNCOMMON to ReforgeAPI.StatList.mapOf(ReforgeAPI.StatType.Defense to 2.0, ReforgeAPI.StatType.Health to 1.0, ReforgeAPI.StatType.Intelligence to 4.0), LorenzRarity.RARE to ReforgeAPI.StatList.mapOf(ReforgeAPI.StatType.Defense to 2.0, ReforgeAPI.StatType.Health to 2.0, ReforgeAPI.StatType.Intelligence to 5.0), LorenzRarity.EPIC to ReforgeAPI.StatList.mapOf(ReforgeAPI.StatType.Defense to 3.0, ReforgeAPI.StatType.Health to 3.0, ReforgeAPI.StatType.Intelligence to 6.0), LorenzRarity.LEGENDARY to ReforgeAPI.StatList.mapOf(ReforgeAPI.StatType.Defense to 4.0, ReforgeAPI.StatType.Health to 4.0, ReforgeAPI.StatType.Intelligence to 8.0), LorenzRarity.MYTHIC to ReforgeAPI.StatList.mapOf(ReforgeAPI.StatType.Defense to 5.0, ReforgeAPI.StatType.Health to 5.0, ReforgeAPI.StatType.Intelligence to 10.0)
-        )
-        ),
-        ReforgeAPI.Reforge("Colossal", ReforgeAPI.ReforgeType.Equipment, mapOf(LorenzRarity.COMMON to ReforgeAPI.StatList.mapOf(ReforgeAPI.StatType.Defense to 3.0, ReforgeAPI.StatType.Health to 3.0), LorenzRarity.UNCOMMON to ReforgeAPI.StatList.mapOf(ReforgeAPI.StatType.Defense to 4.0, ReforgeAPI.StatType.Health to 4.0), LorenzRarity.RARE to ReforgeAPI.StatList.mapOf(ReforgeAPI.StatType.Defense to 6.0, ReforgeAPI.StatType.Health to 6.0), LorenzRarity.EPIC to ReforgeAPI.StatList.mapOf(ReforgeAPI.StatType.Defense to 8.0, ReforgeAPI.StatType.Health to 8.0), LorenzRarity.LEGENDARY to ReforgeAPI.StatList.mapOf(ReforgeAPI.StatType.Defense to 10.0, ReforgeAPI.StatType.Health to 10.0), LorenzRarity.MYTHIC to ReforgeAPI.StatList.mapOf(ReforgeAPI.StatType.Defense to 12.0, ReforgeAPI.StatType.Health to 12.0))),
-        ReforgeAPI.Reforge(
-            "Brilliant", ReforgeAPI.ReforgeType.Equipment, mapOf(
-            LorenzRarity.COMMON to ReforgeAPI.StatList.mapOf(ReforgeAPI.StatType.Speed to 1.0, ReforgeAPI.StatType.Health to 1.0, ReforgeAPI.StatType.Intelligence to 5.0), LorenzRarity.UNCOMMON to ReforgeAPI.StatList.mapOf(ReforgeAPI.StatType.Speed to 1.0, ReforgeAPI.StatType.Health to 1.0, ReforgeAPI.StatType.Intelligence to 6.0), LorenzRarity.RARE to ReforgeAPI.StatList.mapOf(ReforgeAPI.StatType.Speed to 2.0, ReforgeAPI.StatType.Health to 2.0, ReforgeAPI.StatType.Intelligence to 7.0), LorenzRarity.EPIC to ReforgeAPI.StatList.mapOf(ReforgeAPI.StatType.Speed to 2.0, ReforgeAPI.StatType.Health to 3.0, ReforgeAPI.StatType.Intelligence to 9.0), LorenzRarity.LEGENDARY to ReforgeAPI.StatList.mapOf(ReforgeAPI.StatType.Speed to 2.0, ReforgeAPI.StatType.Health to 4.0, ReforgeAPI.StatType.Intelligence to 12.0), LorenzRarity.MYTHIC to ReforgeAPI.StatList.mapOf(ReforgeAPI.StatType.Speed to 2.0, ReforgeAPI.StatType.Health to 5.0, ReforgeAPI.StatType.Intelligence to 15.0)
-        )
-        ),
-        ReforgeAPI.Reforge("Unyielding", ReforgeAPI.ReforgeType.Pickaxes, mapOf(LorenzRarity.COMMON to ReforgeAPI.StatList.mapOf(ReforgeAPI.StatType.Speed to 1.0, ReforgeAPI.StatType.Mining_Fortune to 1.0), LorenzRarity.UNCOMMON to ReforgeAPI.StatList.mapOf(ReforgeAPI.StatType.Speed to 2.0, ReforgeAPI.StatType.Mining_Fortune to 2.0), LorenzRarity.RARE to ReforgeAPI.StatList.mapOf(ReforgeAPI.StatType.Speed to 3.0, ReforgeAPI.StatType.Mining_Fortune to 3.0), LorenzRarity.EPIC to ReforgeAPI.StatList.mapOf(ReforgeAPI.StatType.Speed to 5.0, ReforgeAPI.StatType.Mining_Fortune to 4.0), LorenzRarity.LEGENDARY to ReforgeAPI.StatList.mapOf(ReforgeAPI.StatType.Speed to 7.0, ReforgeAPI.StatType.Mining_Fortune to 5.0), LorenzRarity.MYTHIC to ReforgeAPI.StatList.mapOf(ReforgeAPI.StatType.Speed to 9.0, ReforgeAPI.StatType.Mining_Fortune to 6.0))),
-        ReforgeAPI.Reforge("Prospector's", ReforgeAPI.ReforgeType.Pickaxes, mapOf(LorenzRarity.COMMON to ReforgeAPI.StatList.mapOf(ReforgeAPI.StatType.Speed to 1.0, ReforgeAPI.StatType.Mining_Wisdom to 0.5), LorenzRarity.UNCOMMON to ReforgeAPI.StatList.mapOf(ReforgeAPI.StatType.Speed to 2.0, ReforgeAPI.StatType.Mining_Wisdom to 0.75), LorenzRarity.RARE to ReforgeAPI.StatList.mapOf(ReforgeAPI.StatType.Speed to 3.0, ReforgeAPI.StatType.Mining_Wisdom to 1.0), LorenzRarity.EPIC to ReforgeAPI.StatList.mapOf(ReforgeAPI.StatType.Speed to 5.0, ReforgeAPI.StatType.Mining_Wisdom to 1.25), LorenzRarity.LEGENDARY to ReforgeAPI.StatList.mapOf(ReforgeAPI.StatType.Speed to 7.0, ReforgeAPI.StatType.Mining_Wisdom to 2.0), LorenzRarity.MYTHIC to ReforgeAPI.StatList.mapOf(ReforgeAPI.StatType.Speed to 9.0, ReforgeAPI.StatType.Mining_Wisdom to 2.5))),
-        ReforgeAPI.Reforge("Excellent", ReforgeAPI.ReforgeType.Pickaxes, mapOf(LorenzRarity.COMMON to ReforgeAPI.StatList.mapOf(ReforgeAPI.StatType.Speed to 1.0, ReforgeAPI.StatType.Mining_Speed to 4.0), LorenzRarity.UNCOMMON to ReforgeAPI.StatList.mapOf(ReforgeAPI.StatType.Speed to 2.0, ReforgeAPI.StatType.Mining_Speed to 8.0), LorenzRarity.RARE to ReforgeAPI.StatList.mapOf(ReforgeAPI.StatType.Speed to 3.0, ReforgeAPI.StatType.Mining_Speed to 12.0), LorenzRarity.EPIC to ReforgeAPI.StatList.mapOf(ReforgeAPI.StatType.Speed to 4.0, ReforgeAPI.StatType.Mining_Speed to 16.0), LorenzRarity.LEGENDARY to ReforgeAPI.StatList.mapOf(ReforgeAPI.StatType.Speed to 5.0, ReforgeAPI.StatType.Mining_Speed to 20.0), LorenzRarity.MYTHIC to ReforgeAPI.StatList.mapOf(ReforgeAPI.StatType.Speed to 7.0, ReforgeAPI.StatType.Mining_Speed to 25.0))),
-        ReforgeAPI.Reforge("Sturdy", ReforgeAPI.ReforgeType.Pickaxes, mapOf(LorenzRarity.COMMON to ReforgeAPI.StatList.mapOf(ReforgeAPI.StatType.Defense to 3.0, ReforgeAPI.StatType.Mining_Speed to 3.0), LorenzRarity.UNCOMMON to ReforgeAPI.StatList.mapOf(ReforgeAPI.StatType.Defense to 6.0, ReforgeAPI.StatType.Mining_Speed to 6.0), LorenzRarity.RARE to ReforgeAPI.StatList.mapOf(ReforgeAPI.StatType.Defense to 9.0, ReforgeAPI.StatType.Mining_Speed to 9.0), LorenzRarity.EPIC to ReforgeAPI.StatList.mapOf(ReforgeAPI.StatType.Defense to 12.0, ReforgeAPI.StatType.Mining_Speed to 12.0), LorenzRarity.LEGENDARY to ReforgeAPI.StatList.mapOf(ReforgeAPI.StatType.Defense to 15.0, ReforgeAPI.StatType.Mining_Speed to 15.0), LorenzRarity.MYTHIC to ReforgeAPI.StatList.mapOf(ReforgeAPI.StatType.Defense to 20.0, ReforgeAPI.StatType.Mining_Speed to 20.0))),
-        ReforgeAPI.Reforge("Fortunate", ReforgeAPI.ReforgeType.Pickaxes, mapOf(LorenzRarity.COMMON to ReforgeAPI.StatList.mapOf(ReforgeAPI.StatType.Mining_Speed to 1.0, ReforgeAPI.StatType.Mining_Fortune to 1.0), LorenzRarity.UNCOMMON to ReforgeAPI.StatList.mapOf(ReforgeAPI.StatType.Mining_Speed to 2.0, ReforgeAPI.StatType.Mining_Fortune to 1.0), LorenzRarity.RARE to ReforgeAPI.StatList.mapOf(ReforgeAPI.StatType.Mining_Speed to 3.0, ReforgeAPI.StatType.Mining_Fortune to 1.0), LorenzRarity.EPIC to ReforgeAPI.StatList.mapOf(ReforgeAPI.StatType.Mining_Speed to 4.0, ReforgeAPI.StatType.Mining_Fortune to 2.0), LorenzRarity.LEGENDARY to ReforgeAPI.StatList.mapOf(ReforgeAPI.StatType.Mining_Speed to 6.0, ReforgeAPI.StatType.Mining_Fortune to 2.0), LorenzRarity.MYTHIC to ReforgeAPI.StatList.mapOf(ReforgeAPI.StatType.Mining_Speed to 8.0, ReforgeAPI.StatType.Mining_Fortune to 3.0))),
-        ReforgeAPI.Reforge(
-            "Great", ReforgeAPI.ReforgeType.Axes, mapOf(
-            LorenzRarity.COMMON to ReforgeAPI.StatList.mapOf(ReforgeAPI.StatType.Speed to 1.0, ReforgeAPI.StatType.Strength to 2.0, ReforgeAPI.StatType.Crit_Damage to 2.0), LorenzRarity.UNCOMMON to ReforgeAPI.StatList.mapOf(ReforgeAPI.StatType.Speed to 2.0, ReforgeAPI.StatType.Strength to 4.0, ReforgeAPI.StatType.Crit_Damage to 4.0), LorenzRarity.RARE to ReforgeAPI.StatList.mapOf(ReforgeAPI.StatType.Speed to 3.0, ReforgeAPI.StatType.Strength to 6.0, ReforgeAPI.StatType.Crit_Damage to 6.0), LorenzRarity.EPIC to ReforgeAPI.StatList.mapOf(ReforgeAPI.StatType.Speed to 4.0, ReforgeAPI.StatType.Strength to 9.0, ReforgeAPI.StatType.Crit_Damage to 9.0), LorenzRarity.LEGENDARY to ReforgeAPI.StatList.mapOf(ReforgeAPI.StatType.Speed to 5.0, ReforgeAPI.StatType.Strength to 12.0, ReforgeAPI.StatType.Crit_Damage to 12.0), LorenzRarity.MYTHIC to ReforgeAPI.StatList.mapOf(ReforgeAPI.StatType.Speed to 7.0, ReforgeAPI.StatType.Strength to 16.0, ReforgeAPI.StatType.Crit_Damage to 16.0)
-        )
-        ),
-        ReforgeAPI.Reforge("Rugged", ReforgeAPI.ReforgeType.Axes, mapOf(LorenzRarity.COMMON to ReforgeAPI.StatList.mapOf(ReforgeAPI.StatType.Strength to 4.0, ReforgeAPI.StatType.Crit_Damage to 3.0), LorenzRarity.UNCOMMON to ReforgeAPI.StatList.mapOf(ReforgeAPI.StatType.Strength to 6.0, ReforgeAPI.StatType.Crit_Damage to 5.0), LorenzRarity.RARE to ReforgeAPI.StatList.mapOf(ReforgeAPI.StatType.Strength to 9.0, ReforgeAPI.StatType.Crit_Damage to 8.0), LorenzRarity.EPIC to ReforgeAPI.StatList.mapOf(ReforgeAPI.StatType.Strength to 13.0, ReforgeAPI.StatType.Crit_Damage to 12.0), LorenzRarity.LEGENDARY to ReforgeAPI.StatList.mapOf(ReforgeAPI.StatType.Strength to 18.0, ReforgeAPI.StatType.Crit_Damage to 16.0), LorenzRarity.MYTHIC to ReforgeAPI.StatList.mapOf(ReforgeAPI.StatType.Strength to 24.0, ReforgeAPI.StatType.Crit_Damage to 22.0))),
-        ReforgeAPI.Reforge("Lush", ReforgeAPI.ReforgeType.Axes, mapOf(LorenzRarity.COMMON to ReforgeAPI.StatList.mapOf(ReforgeAPI.StatType.Speed to 3.0, ReforgeAPI.StatType.Foraging_Fortune to 1.0), LorenzRarity.UNCOMMON to ReforgeAPI.StatList.mapOf(ReforgeAPI.StatType.Speed to 4.0, ReforgeAPI.StatType.Foraging_Fortune to 1.0), LorenzRarity.RARE to ReforgeAPI.StatList.mapOf(ReforgeAPI.StatType.Speed to 5.0, ReforgeAPI.StatType.Foraging_Fortune to 2.0), LorenzRarity.EPIC to ReforgeAPI.StatList.mapOf(ReforgeAPI.StatType.Speed to 7.0, ReforgeAPI.StatType.Foraging_Fortune to 2.0), LorenzRarity.LEGENDARY to ReforgeAPI.StatList.mapOf(ReforgeAPI.StatType.Speed to 10.0, ReforgeAPI.StatType.Foraging_Fortune to 3.0), LorenzRarity.MYTHIC to ReforgeAPI.StatList.mapOf(ReforgeAPI.StatType.Speed to 15.0, ReforgeAPI.StatType.Foraging_Fortune to 5.0))),
-        ReforgeAPI.Reforge("Lumberjack's", ReforgeAPI.ReforgeType.Axes, mapOf(LorenzRarity.COMMON to ReforgeAPI.StatList.mapOf(ReforgeAPI.StatType.Speed to 1.0, ReforgeAPI.StatType.Foraging_Wisdom to 0.5), LorenzRarity.UNCOMMON to ReforgeAPI.StatList.mapOf(ReforgeAPI.StatType.Speed to 2.0, ReforgeAPI.StatType.Foraging_Wisdom to 0.75), LorenzRarity.RARE to ReforgeAPI.StatList.mapOf(ReforgeAPI.StatType.Speed to 3.0, ReforgeAPI.StatType.Foraging_Wisdom to 1.0), LorenzRarity.EPIC to ReforgeAPI.StatList.mapOf(ReforgeAPI.StatType.Speed to 5.0, ReforgeAPI.StatType.Foraging_Wisdom to 1.25), LorenzRarity.LEGENDARY to ReforgeAPI.StatList.mapOf(ReforgeAPI.StatType.Speed to 7.0, ReforgeAPI.StatType.Foraging_Wisdom to 2.0), LorenzRarity.MYTHIC to ReforgeAPI.StatList.mapOf(ReforgeAPI.StatType.Speed to 9.0, ReforgeAPI.StatType.Foraging_Wisdom to 2.5))),
-        ReforgeAPI.Reforge("Double-Bit", ReforgeAPI.ReforgeType.Axes, mapOf(LorenzRarity.COMMON to ReforgeAPI.StatList.mapOf(ReforgeAPI.StatType.Foraging_Fortune to 1.0, ReforgeAPI.StatType.Speed to 1.0), LorenzRarity.UNCOMMON to ReforgeAPI.StatList.mapOf(ReforgeAPI.StatType.Foraging_Fortune to 2.0, ReforgeAPI.StatType.Speed to 2.0), LorenzRarity.RARE to ReforgeAPI.StatList.mapOf(ReforgeAPI.StatType.Foraging_Fortune to 3.0, ReforgeAPI.StatType.Speed to 2.0), LorenzRarity.EPIC to ReforgeAPI.StatList.mapOf(ReforgeAPI.StatType.Foraging_Fortune to 4.0, ReforgeAPI.StatType.Speed to 3.0), LorenzRarity.LEGENDARY to ReforgeAPI.StatList.mapOf(ReforgeAPI.StatType.Foraging_Fortune to 5.0, ReforgeAPI.StatType.Speed to 5.0), LorenzRarity.MYTHIC to ReforgeAPI.StatList.mapOf(ReforgeAPI.StatType.Foraging_Fortune to 6.0, ReforgeAPI.StatType.Speed to 7.0))),
-        ReforgeAPI.Reforge("Robust", ReforgeAPI.ReforgeType.Hoes, mapOf(LorenzRarity.COMMON to ReforgeAPI.StatList.mapOf(ReforgeAPI.StatType.Farming_Fortune to 2.0), LorenzRarity.UNCOMMON to ReforgeAPI.StatList.mapOf(ReforgeAPI.StatType.Farming_Fortune to 3.0), LorenzRarity.RARE to ReforgeAPI.StatList.mapOf(ReforgeAPI.StatType.Farming_Fortune to 4.0), LorenzRarity.EPIC to ReforgeAPI.StatList.mapOf(ReforgeAPI.StatType.Farming_Fortune to 6.0), LorenzRarity.LEGENDARY to ReforgeAPI.StatList.mapOf(ReforgeAPI.StatType.Farming_Fortune to 8.0), LorenzRarity.MYTHIC to ReforgeAPI.StatList.mapOf(ReforgeAPI.StatType.Farming_Fortune to 10.0))),
-        ReforgeAPI.Reforge("Zooming", ReforgeAPI.ReforgeType.Hoes, mapOf(LorenzRarity.COMMON to ReforgeAPI.StatList.mapOf(ReforgeAPI.StatType.Speed to 5.0), LorenzRarity.UNCOMMON to ReforgeAPI.StatList.mapOf(ReforgeAPI.StatType.Speed to 8.0), LorenzRarity.RARE to ReforgeAPI.StatList.mapOf(ReforgeAPI.StatType.Speed to 12.0), LorenzRarity.EPIC to ReforgeAPI.StatList.mapOf(ReforgeAPI.StatType.Speed to 16.0), LorenzRarity.LEGENDARY to ReforgeAPI.StatList.mapOf(ReforgeAPI.StatType.Speed to 20.0), LorenzRarity.MYTHIC to ReforgeAPI.StatList.mapOf(ReforgeAPI.StatType.Speed to 25.0))),
-        ReforgeAPI.Reforge("Peasant's", ReforgeAPI.ReforgeType.Hoes, mapOf(LorenzRarity.COMMON to ReforgeAPI.StatList.mapOf(ReforgeAPI.StatType.Speed to 1.0, ReforgeAPI.StatType.Farming_Wisdom to 0.5), LorenzRarity.UNCOMMON to ReforgeAPI.StatList.mapOf(ReforgeAPI.StatType.Speed to 2.0, ReforgeAPI.StatType.Farming_Wisdom to 0.75), LorenzRarity.RARE to ReforgeAPI.StatList.mapOf(ReforgeAPI.StatType.Speed to 3.0, ReforgeAPI.StatType.Farming_Wisdom to 1.0), LorenzRarity.EPIC to ReforgeAPI.StatList.mapOf(ReforgeAPI.StatType.Speed to 5.0, ReforgeAPI.StatType.Farming_Wisdom to 1.25), LorenzRarity.LEGENDARY to ReforgeAPI.StatList.mapOf(ReforgeAPI.StatType.Speed to 7.0, ReforgeAPI.StatType.Farming_Wisdom to 2.0), LorenzRarity.MYTHIC to ReforgeAPI.StatList.mapOf(ReforgeAPI.StatType.Speed to 9.0, ReforgeAPI.StatType.Farming_Wisdom to 2.5))),
-        ReforgeAPI.Reforge("Green Thumb", ReforgeAPI.ReforgeType.Hoes, mapOf(LorenzRarity.COMMON to ReforgeAPI.StatList.mapOf(ReforgeAPI.StatType.Speed to 1.0, ReforgeAPI.StatType.Farming_Fortune to 1.0), LorenzRarity.UNCOMMON to ReforgeAPI.StatList.mapOf(ReforgeAPI.StatType.Speed to 2.0, ReforgeAPI.StatType.Farming_Fortune to 2.0), LorenzRarity.RARE to ReforgeAPI.StatList.mapOf(ReforgeAPI.StatType.Speed to 2.0, ReforgeAPI.StatType.Farming_Fortune to 3.0), LorenzRarity.EPIC to ReforgeAPI.StatList.mapOf(ReforgeAPI.StatType.Speed to 3.0, ReforgeAPI.StatType.Farming_Fortune to 4.0), LorenzRarity.LEGENDARY to ReforgeAPI.StatList.mapOf(ReforgeAPI.StatType.Speed to 5.0, ReforgeAPI.StatType.Farming_Fortune to 5.0), LorenzRarity.MYTHIC to ReforgeAPI.StatList.mapOf(ReforgeAPI.StatType.Speed to 7.0, ReforgeAPI.StatType.Farming_Fortune to 6.0))),
         // Special
         // TODO Greater Spook
-        ReforgeAPI.Reforge(
-            "Coldfused", ReforgeAPI.ReforgeType.SpecialItems, mapOf(
-            LorenzRarity.COMMON to ReforgeAPI.StatList.mapOf(ReforgeAPI.StatType.Strength to 15.0, ReforgeAPI.StatType.Crit_Damage to 20.0, ReforgeAPI.StatType.Magic_Find to 2.0), LorenzRarity.UNCOMMON to ReforgeAPI.StatList.mapOf(ReforgeAPI.StatType.Strength to 20.0, ReforgeAPI.StatType.Crit_Damage to 30.0, ReforgeAPI.StatType.Magic_Find to 2.0), LorenzRarity.RARE to ReforgeAPI.StatList.mapOf(ReforgeAPI.StatType.Strength to 25.0, ReforgeAPI.StatType.Crit_Damage to 40.0, ReforgeAPI.StatType.Magic_Find to 2.0), LorenzRarity.EPIC to ReforgeAPI.StatList.mapOf(ReforgeAPI.StatType.Strength to 35.0, ReforgeAPI.StatType.Crit_Damage to 50.0, ReforgeAPI.StatType.Magic_Find to 2.0), LorenzRarity.LEGENDARY to ReforgeAPI.StatList.mapOf(ReforgeAPI.StatType.Strength to 45.0, ReforgeAPI.StatType.Crit_Damage to 60.0, ReforgeAPI.StatType.Magic_Find to 2.0), LorenzRarity.MYTHIC to ReforgeAPI.StatList.mapOf(ReforgeAPI.StatType.Strength to 55.0, ReforgeAPI.StatType.Crit_Damage to 75.0, ReforgeAPI.StatType.Magic_Find to 2.0)
-        ), "Entropy_Suppressor".asInternalName(), extraPropertyText = "$7Only if Wisp is equipped\n§c+75${
-            ReforgeAPI.StatType.Strength.iconWithName
-        }\n§9+55 ${ReforgeAPI.StatType.Crit_Damage.iconWithName}\n§fDeal §62x§f to fire pillars, breaking one grants +30 ${ReforgeAPI.StatType.True_Defence.iconWithName} and §c+1.15x damage§f for §a60s§f.",
-            specialItems = (listOf("Firedust_Dagger", "Kindlebane_Dagger", "Mawdredge_Dagger", "Pyrochaos_Dagger", "Twilight_Dagger", "Deathripper_Dagger")).map { it.asInternalName() }
-        ),
-        ReforgeAPI.Reforge(
-            "Dirty", ReforgeAPI.ReforgeType.FishingRodsAndSwords, mapOf(
-            LorenzRarity.COMMON to ReforgeAPI.StatList.mapOf(ReforgeAPI.StatType.Strength to 2.0, ReforgeAPI.StatType.Bonus_Attack_Speed to 2.0, ReforgeAPI.StatType.Ferocity to 2.0), LorenzRarity.UNCOMMON to ReforgeAPI.StatList.mapOf(ReforgeAPI.StatType.Strength to 4.0, ReforgeAPI.StatType.Bonus_Attack_Speed to 3.0, ReforgeAPI.StatType.Ferocity to 3.0), LorenzRarity.RARE to ReforgeAPI.StatList.mapOf(ReforgeAPI.StatType.Strength to 6.0, ReforgeAPI.StatType.Bonus_Attack_Speed to 5.0, ReforgeAPI.StatType.Ferocity to 6.0), LorenzRarity.EPIC to ReforgeAPI.StatList.mapOf(ReforgeAPI.StatType.Strength to 10.0, ReforgeAPI.StatType.Bonus_Attack_Speed to 10.0, ReforgeAPI.StatType.Ferocity to 9.0), LorenzRarity.LEGENDARY to ReforgeAPI.StatList.mapOf(ReforgeAPI.StatType.Strength to 12.0, ReforgeAPI.StatType.Bonus_Attack_Speed to 15.0, ReforgeAPI.StatType.Ferocity to 12.0), LorenzRarity.MYTHIC to ReforgeAPI.StatList.mapOf(ReforgeAPI.StatType.Strength to 15.0, ReforgeAPI.StatType.Bonus_Attack_Speed to 20.0, ReforgeAPI.StatType.Ferocity to 15.0)
-        ), "Dirt_Bottle".asInternalName()
-        ),
-        ReforgeAPI.Reforge("Fabled", ReforgeAPI.ReforgeType.Swords, mapOf(LorenzRarity.COMMON to ReforgeAPI.StatList.mapOf(ReforgeAPI.StatType.Strength to 30.0, ReforgeAPI.StatType.Crit_Damage to 15.0), LorenzRarity.UNCOMMON to ReforgeAPI.StatList.mapOf(ReforgeAPI.StatType.Strength to 35.0, ReforgeAPI.StatType.Crit_Damage to 20.0), LorenzRarity.RARE to ReforgeAPI.StatList.mapOf(ReforgeAPI.StatType.Strength to 40.0, ReforgeAPI.StatType.Crit_Damage to 25.0), LorenzRarity.EPIC to ReforgeAPI.StatList.mapOf(ReforgeAPI.StatType.Strength to 50.0, ReforgeAPI.StatType.Crit_Damage to 32.0), LorenzRarity.LEGENDARY to ReforgeAPI.StatList.mapOf(ReforgeAPI.StatType.Strength to 60.0, ReforgeAPI.StatType.Crit_Damage to 40.0), LorenzRarity.MYTHIC to ReforgeAPI.StatList.mapOf(ReforgeAPI.StatType.Strength to 75.0, ReforgeAPI.StatType.Crit_Damage to 50.0)), "Dragon_Claw".asInternalName(), extraPropertyText = "§fCritical hits hava a chance to deal up to §a+15%§f extra damage."),
-        ReforgeAPI.Reforge("Gilded", ReforgeAPI.ReforgeType.SpecialItems, mapOf(LorenzRarity.LEGENDARY to ReforgeAPI.StatList.mapOf(ReforgeAPI.StatType.Damage to 75.0, ReforgeAPI.StatType.Strength to 75.0, ReforgeAPI.StatType.Intelligence to 350.0), LorenzRarity.MYTHIC to ReforgeAPI.StatList.mapOf(ReforgeAPI.StatType.Damage to 90.0, ReforgeAPI.StatType.Strength to 90.0, ReforgeAPI.StatType.Intelligence to 400.0)), "Midas_Jewel".asInternalName(), listOf("Midas'_Sword".asInternalName(), "Midas_Staff".asInternalName()), "§fUpon killing an enemy you have a low (§a1%§f) chance to grant a random amount of §6Coins§f to another player around you"),
-        ReforgeAPI.Reforge(
-            "Suspicious", ReforgeAPI.ReforgeType.Swords, mapOf(LorenzRarity.COMMON to ReforgeAPI.StatList.mapOf(ReforgeAPI.StatType.Crit_Damage to 30.0, ReforgeAPI.StatType.Crit_Chance to 1.0), LorenzRarity.UNCOMMON to ReforgeAPI.StatList.mapOf(ReforgeAPI.StatType.Crit_Damage to 40.0, ReforgeAPI.StatType.Crit_Chance to 2.0), LorenzRarity.RARE to ReforgeAPI.StatList.mapOf(ReforgeAPI.StatType.Crit_Damage to 50.0, ReforgeAPI.StatType.Crit_Chance to 3.0), LorenzRarity.EPIC to ReforgeAPI.StatList.mapOf(ReforgeAPI.StatType.Crit_Damage to 65.0, ReforgeAPI.StatType.Crit_Chance to 5.0), LorenzRarity.LEGENDARY to ReforgeAPI.StatList.mapOf(ReforgeAPI.StatType.Crit_Damage to 85.0, ReforgeAPI.StatType.Crit_Chance to 7.0), LorenzRarity.MYTHIC to ReforgeAPI.StatList.mapOf(ReforgeAPI.StatType.Crit_Damage to 110.0, ReforgeAPI.StatType.Crit_Chance to 10.0)), "Suspicious_Vial".asInternalName(), extraPropertyText = "§fIncreases weapon ${ReforgeAPI.StatType.Damage.iconWithName}§f by §c+15§f."
-        ),
-        ReforgeAPI.Reforge("Warped", ReforgeAPI.ReforgeType.SpecialItems, mapOf(LorenzRarity.RARE to ReforgeAPI.StatList.mapOf(ReforgeAPI.StatType.Damage to 165.0, ReforgeAPI.StatType.Strength to 165.0), LorenzRarity.EPIC to ReforgeAPI.StatList.mapOf(ReforgeAPI.StatType.Damage to 165.0, ReforgeAPI.StatType.Strength to 165.0), LorenzRarity.LEGENDARY to ReforgeAPI.StatList.mapOf(ReforgeAPI.StatType.Damage to 165.0, ReforgeAPI.StatType.Strength to 165.0, ReforgeAPI.StatType.Intelligence to 65.0)), "Warped_Stone".asInternalName(), listOf("Aspect_of_the_End".asInternalName(), "Aspect_of_the_Void".asInternalName())),
-        ReforgeAPI.Reforge("Withered", ReforgeAPI.ReforgeType.Swords, mapOf(LorenzRarity.COMMON to ReforgeAPI.StatList.mapOf(ReforgeAPI.StatType.Strength to 60.0), LorenzRarity.UNCOMMON to ReforgeAPI.StatList.mapOf(ReforgeAPI.StatType.Strength to 75.0), LorenzRarity.RARE to ReforgeAPI.StatList.mapOf(ReforgeAPI.StatType.Strength to 90.0), LorenzRarity.EPIC to ReforgeAPI.StatList.mapOf(ReforgeAPI.StatType.Strength to 110.0), LorenzRarity.LEGENDARY to ReforgeAPI.StatList.mapOf(ReforgeAPI.StatType.Strength to 135.0), LorenzRarity.MYTHIC to ReforgeAPI.StatList.mapOf(ReforgeAPI.StatType.Strength to 170.0)), "Wither_Blood".asInternalName(), extraPropertyText = "§fGrants §c+1 ${ReforgeAPI.StatType.Strength.iconWithName}§f per §cCatacombs§f level."),
-        ReforgeAPI.Reforge("Bulky", ReforgeAPI.ReforgeType.Swords, mapOf(LorenzRarity.COMMON to ReforgeAPI.StatList.mapOf(ReforgeAPI.StatType.Health to 4.0, ReforgeAPI.StatType.Defense to 2.0), LorenzRarity.UNCOMMON to ReforgeAPI.StatList.mapOf(ReforgeAPI.StatType.Health to 6.0, ReforgeAPI.StatType.Defense to 3.0), LorenzRarity.RARE to ReforgeAPI.StatList.mapOf(ReforgeAPI.StatType.Health to 9.0, ReforgeAPI.StatType.Defense to 5.0), LorenzRarity.EPIC to ReforgeAPI.StatList.mapOf(ReforgeAPI.StatType.Health to 12.0, ReforgeAPI.StatType.Defense to 8.0), LorenzRarity.LEGENDARY to ReforgeAPI.StatList.mapOf(ReforgeAPI.StatType.Health to 15.0, ReforgeAPI.StatType.Defense to 13.0), LorenzRarity.MYTHIC to ReforgeAPI.StatList.mapOf(ReforgeAPI.StatType.Health to 20.0, ReforgeAPI.StatType.Defense to 21.0)), "Bulky_Stone".asInternalName()),
-        ReforgeAPI.Reforge("Jerry's", ReforgeAPI.ReforgeType.SpecialItems, mapOf(LorenzRarity.COMMON to ReforgeAPI.StatList.mapOf(ReforgeAPI.StatType.Crit_Damage to 50.0, ReforgeAPI.StatType.Crit_Chance to 10.0, ReforgeAPI.StatType.Strength to 25.0), LorenzRarity.UNCOMMON to ReforgeAPI.StatList.mapOf(ReforgeAPI.StatType.Crit_Damage to 50.0, ReforgeAPI.StatType.Crit_Chance to 10.0, ReforgeAPI.StatType.Strength to 25.0), LorenzRarity.RARE to ReforgeAPI.StatList.mapOf(ReforgeAPI.StatType.Crit_Damage to 50.0, ReforgeAPI.StatType.Crit_Chance to 10.0, ReforgeAPI.StatType.Strength to 25.0)), "Jerry_Stone".asInternalName(), listOf("ASPECT_OF_THE_JERRY".asInternalName(), "ASPECT_OF_THE_JERRY_SIGNATURE".asInternalName()), "§6Item Ability: No Parley\n§fConsumes all your mana and adds 10% of that amount as damage on your next AotJ hit."),
-        ReforgeAPI.Reforge(
-            "Fanged", ReforgeAPI.ReforgeType.SpecialItems, mapOf(
-            LorenzRarity.COMMON to ReforgeAPI.StatList.mapOf(ReforgeAPI.StatType.Strength to 30.0, ReforgeAPI.StatType.Crit_Chance to 3.0, ReforgeAPI.StatType.Bonus_Attack_Speed to 2.0), LorenzRarity.UNCOMMON to ReforgeAPI.StatList.mapOf(ReforgeAPI.StatType.Strength to 35.0, ReforgeAPI.StatType.Crit_Chance to 4.0, ReforgeAPI.StatType.Bonus_Attack_Speed to 3.0), LorenzRarity.RARE to ReforgeAPI.StatList.mapOf(ReforgeAPI.StatType.Strength to 40.0, ReforgeAPI.StatType.Crit_Chance to 5.0, ReforgeAPI.StatType.Bonus_Attack_Speed to 4.0), LorenzRarity.EPIC to ReforgeAPI.StatList.mapOf(ReforgeAPI.StatType.Strength to 50.0, ReforgeAPI.StatType.Crit_Chance to 7.0, ReforgeAPI.StatType.Bonus_Attack_Speed to 6.0), LorenzRarity.LEGENDARY to ReforgeAPI.StatList.mapOf(ReforgeAPI.StatType.Strength to 60.0, ReforgeAPI.StatType.Crit_Chance to 8.0, ReforgeAPI.StatType.Bonus_Attack_Speed to 9.0), LorenzRarity.MYTHIC to ReforgeAPI.StatList.mapOf(ReforgeAPI.StatType.Strength to 65.0, ReforgeAPI.StatType.Crit_Chance to 10.0, ReforgeAPI.StatType.Bonus_Attack_Speed to 10.0)
-        ), "Full-Jaw_Fanging_Kit".asInternalName(), (listOf("Iron_Sword", "Hunter_Knife", "Flaming_Sword", "Squire_Sword", "Undead_Sword", "Spider_Sword", "Golem_Sword", "Zombie_Sword", "Yeti_Sword", "Blade_of_the_Volacno", "Recluse_Fang", "Shaman_Sword", "Voidwalker_Katana", "Twilight_Dagger", "Mawdredge_Dagger", "Deathripper_Dagger", "Dreadlord_Sword", "Zombie_Knight_Sword", "Zombie_Soldier_Cutlass", "Slient_Death", "Spirit_Sword", "Livid_Dagger", "Giant_Sword", "Necromancer_Sword", "Necron's_Blade_(Unrefined)", "Valkyrie", "Hyperion", "Scylla", "Astraea", "Dreadlord_Sword")).map { it.asInternalName() }, "§fEvery §c7th§f melee hit on an enemy deals §c+100%§f damage."
-        ),
-        ReforgeAPI.Reforge(
-            "Precise", ReforgeAPI.ReforgeType.Bows, mapOf(
-            LorenzRarity.COMMON to ReforgeAPI.StatList.mapOf(ReforgeAPI.StatType.Strength to 3.0, ReforgeAPI.StatType.Crit_Chance to 8.0, ReforgeAPI.StatType.Crit_Damage to 5.0), LorenzRarity.UNCOMMON to ReforgeAPI.StatList.mapOf(ReforgeAPI.StatType.Strength to 7.0, ReforgeAPI.StatType.Crit_Chance to 9.0, ReforgeAPI.StatType.Crit_Damage to 10.0), LorenzRarity.RARE to ReforgeAPI.StatList.mapOf(ReforgeAPI.StatType.Strength to 12.0, ReforgeAPI.StatType.Crit_Chance to 10.0, ReforgeAPI.StatType.Crit_Damage to 18.0), LorenzRarity.EPIC to ReforgeAPI.StatList.mapOf(ReforgeAPI.StatType.Strength to 18.0, ReforgeAPI.StatType.Crit_Chance to 11.0, ReforgeAPI.StatType.Crit_Damage to 32.0), LorenzRarity.LEGENDARY to ReforgeAPI.StatList.mapOf(ReforgeAPI.StatType.Strength to 25.0, ReforgeAPI.StatType.Crit_Chance to 13.0, ReforgeAPI.StatType.Crit_Damage to 50.0), LorenzRarity.MYTHIC to ReforgeAPI.StatList.mapOf(ReforgeAPI.StatType.Strength to 34.0, ReforgeAPI.StatType.Crit_Chance to 15.0, ReforgeAPI.StatType.Crit_Damage to 70.0)
-        ), "OPTICAL_LENSE".asInternalName(), extraPropertyText = "§fDeal §a+10%§f extra damage when arrows hit the head of a mob"
-        ),
-        ReforgeAPI.Reforge(
-            "Spiritual", ReforgeAPI.ReforgeType.Bows, mapOf(
-            LorenzRarity.COMMON to ReforgeAPI.StatList.mapOf(ReforgeAPI.StatType.Strength to 4.0, ReforgeAPI.StatType.Crit_Chance to 7.0, ReforgeAPI.StatType.Crit_Damage to 10.0), LorenzRarity.UNCOMMON to ReforgeAPI.StatList.mapOf(ReforgeAPI.StatType.Strength to 8.0, ReforgeAPI.StatType.Crit_Chance to 8.0, ReforgeAPI.StatType.Crit_Damage to 15.0), LorenzRarity.RARE to ReforgeAPI.StatList.mapOf(ReforgeAPI.StatType.Strength to 14.0, ReforgeAPI.StatType.Crit_Chance to 9.0, ReforgeAPI.StatType.Crit_Damage to 23.0), LorenzRarity.EPIC to ReforgeAPI.StatList.mapOf(ReforgeAPI.StatType.Strength to 20.0, ReforgeAPI.StatType.Crit_Chance to 10.0, ReforgeAPI.StatType.Crit_Damage to 37.0), LorenzRarity.LEGENDARY to ReforgeAPI.StatList.mapOf(ReforgeAPI.StatType.Strength to 28.0, ReforgeAPI.StatType.Crit_Chance to 12.0, ReforgeAPI.StatType.Crit_Damage to 55.0), LorenzRarity.MYTHIC to ReforgeAPI.StatList.mapOf(ReforgeAPI.StatType.Strength to 38.0, ReforgeAPI.StatType.Crit_Chance to 14.0, ReforgeAPI.StatType.Crit_Damage to 75.0)
-        ), "SPIRIT_STONE".asInternalName(), extraPropertyText = "§fGrants a §a10%§f chance to spawn a Spirit Decoy when you kill an enemy in a Dungeon"
-        ),
-        ReforgeAPI.Reforge(
-            "Headstrong", ReforgeAPI.ReforgeType.Bows, mapOf(
-            LorenzRarity.COMMON to ReforgeAPI.StatList.mapOf(ReforgeAPI.StatType.Strength to 2.0, ReforgeAPI.StatType.Crit_Chance to 10.0, ReforgeAPI.StatType.Crit_Damage to 4.0), LorenzRarity.UNCOMMON to ReforgeAPI.StatList.mapOf(ReforgeAPI.StatType.Strength to 5.0, ReforgeAPI.StatType.Crit_Chance to 11.0, ReforgeAPI.StatType.Crit_Damage to 8.0), LorenzRarity.RARE to ReforgeAPI.StatList.mapOf(ReforgeAPI.StatType.Strength to 10.0, ReforgeAPI.StatType.Crit_Chance to 12.0, ReforgeAPI.StatType.Crit_Damage to 16.0), LorenzRarity.EPIC to ReforgeAPI.StatList.mapOf(ReforgeAPI.StatType.Strength to 16.0, ReforgeAPI.StatType.Crit_Chance to 13.0, ReforgeAPI.StatType.Crit_Damage to 28.0), LorenzRarity.LEGENDARY to ReforgeAPI.StatList.mapOf(ReforgeAPI.StatType.Strength to 23.0, ReforgeAPI.StatType.Crit_Chance to 15.0, ReforgeAPI.StatType.Crit_Damage to 42.0), LorenzRarity.MYTHIC to ReforgeAPI.StatList.mapOf(ReforgeAPI.StatType.Strength to 33.0, ReforgeAPI.StatType.Crit_Chance to 17.0, ReforgeAPI.StatType.Crit_Damage to 60.0)
-        ), "SALMON_OPAL".asInternalName(), extraPropertyText = "§fDeal §a+8%§f extra damage when arrows hit the head of a mob"
-        ),
-        ReforgeAPI.Reforge("Candied", ReforgeAPI.ReforgeType.Armor, mapOf(LorenzRarity.COMMON to ReforgeAPI.StatList.mapOf(ReforgeAPI.StatType.Health to 1.0, ReforgeAPI.StatType.Defense to 1.0), LorenzRarity.UNCOMMON to ReforgeAPI.StatList.mapOf(ReforgeAPI.StatType.Health to 2.0, ReforgeAPI.StatType.Defense to 1.0), LorenzRarity.RARE to ReforgeAPI.StatList.mapOf(ReforgeAPI.StatType.Health to 4.0, ReforgeAPI.StatType.Defense to 2.0), LorenzRarity.EPIC to ReforgeAPI.StatList.mapOf(ReforgeAPI.StatType.Health to 6.0, ReforgeAPI.StatType.Defense to 3.0), LorenzRarity.LEGENDARY to ReforgeAPI.StatList.mapOf(ReforgeAPI.StatType.Health to 8.0, ReforgeAPI.StatType.Defense to 4.0), LorenzRarity.MYTHIC to ReforgeAPI.StatList.mapOf(ReforgeAPI.StatType.Health to 10.0, ReforgeAPI.StatType.Defense to 5.0)), "Candy_Corn".asInternalName(), extraPropertyText = "§fIncreases the chance to find candy during the §6Spooky Festival§f by §a+1%§f."),
-        ReforgeAPI.Reforge(
-            "Submerged", ReforgeAPI.ReforgeType.Armor, mapOf(
-            LorenzRarity.COMMON to ReforgeAPI.StatList.mapOf(ReforgeAPI.StatType.Crit_Chance to 2.0, ReforgeAPI.StatType.Sea_Creature_Chance to 0.5, ReforgeAPI.StatType.Fishing_Speed to 1.0), LorenzRarity.UNCOMMON to ReforgeAPI.StatList.mapOf(ReforgeAPI.StatType.Crit_Chance to 4.0, ReforgeAPI.StatType.Sea_Creature_Chance to 0.6, ReforgeAPI.StatType.Fishing_Speed to 1.0), LorenzRarity.RARE to ReforgeAPI.StatList.mapOf(ReforgeAPI.StatType.Crit_Chance to 6.0, ReforgeAPI.StatType.Sea_Creature_Chance to 0.7, ReforgeAPI.StatType.Fishing_Speed to 2.0), LorenzRarity.EPIC to ReforgeAPI.StatList.mapOf(ReforgeAPI.StatType.Crit_Chance to 8.0, ReforgeAPI.StatType.Sea_Creature_Chance to 0.8, ReforgeAPI.StatType.Fishing_Speed to 3.0), LorenzRarity.LEGENDARY to ReforgeAPI.StatList.mapOf(ReforgeAPI.StatType.Crit_Chance to 10.0, ReforgeAPI.StatType.Sea_Creature_Chance to 0.9, ReforgeAPI.StatType.Fishing_Speed to 4.0), LorenzRarity.MYTHIC to ReforgeAPI.StatList.mapOf(ReforgeAPI.StatType.Crit_Chance to 12.0, ReforgeAPI.StatType.Sea_Creature_Chance to 1.0, ReforgeAPI.StatType.Fishing_Speed to 5.0)
-        ), "Deep_Sea_Orb".asInternalName()
-        ),
-        ReforgeAPI.Reforge("Perfect", ReforgeAPI.ReforgeType.Armor, mapOf(LorenzRarity.COMMON to ReforgeAPI.StatList.mapOf(ReforgeAPI.StatType.Defense to 25.0), LorenzRarity.UNCOMMON to ReforgeAPI.StatList.mapOf(ReforgeAPI.StatType.Defense to 35.0), LorenzRarity.RARE to ReforgeAPI.StatList.mapOf(ReforgeAPI.StatType.Defense to 50.0), LorenzRarity.EPIC to ReforgeAPI.StatList.mapOf(ReforgeAPI.StatType.Defense to 65.0), LorenzRarity.LEGENDARY to ReforgeAPI.StatList.mapOf(ReforgeAPI.StatType.Defense to 80.0), LorenzRarity.MYTHIC to ReforgeAPI.StatList.mapOf(ReforgeAPI.StatType.Defense to 110.0)), "Diamond_Atom".asInternalName(), extraPropertyText = "§fIncreases ${ReforgeAPI.StatType.Defense.iconWithName}§f by §a+2%§f."),
-        ReforgeAPI.Reforge("Reinforced", ReforgeAPI.ReforgeType.Armor, mapOf(LorenzRarity.COMMON to ReforgeAPI.StatList.mapOf(ReforgeAPI.StatType.Defense to 25.0), LorenzRarity.UNCOMMON to ReforgeAPI.StatList.mapOf(ReforgeAPI.StatType.Defense to 35.0), LorenzRarity.RARE to ReforgeAPI.StatList.mapOf(ReforgeAPI.StatType.Defense to 50.0), LorenzRarity.EPIC to ReforgeAPI.StatList.mapOf(ReforgeAPI.StatType.Defense to 65.0), LorenzRarity.LEGENDARY to ReforgeAPI.StatList.mapOf(ReforgeAPI.StatType.Defense to 80.0), LorenzRarity.MYTHIC to ReforgeAPI.StatList.mapOf(ReforgeAPI.StatType.Defense to 110.0)), "Rare_Diamond".asInternalName()),
-        ReforgeAPI.Reforge(
-            "Renowned", ReforgeAPI.ReforgeType.Armor, mapOf(
-            LorenzRarity.COMMON to ReforgeAPI.StatList.mapOf(ReforgeAPI.StatType.Strength to 3.0, ReforgeAPI.StatType.Crit_Chance to 2.0, ReforgeAPI.StatType.Crit_Damage to 3.0, ReforgeAPI.StatType.Bonus_Attack_Speed to 1.0, ReforgeAPI.StatType.Health to 2.0, ReforgeAPI.StatType.Defense to 2.0, ReforgeAPI.StatType.Speed to 1.0, ReforgeAPI.StatType.Intelligence to 3.0), LorenzRarity.UNCOMMON to ReforgeAPI.StatList.mapOf(ReforgeAPI.StatType.Strength to 4.0, ReforgeAPI.StatType.Crit_Chance to 4.0, ReforgeAPI.StatType.Crit_Damage to 4.0, ReforgeAPI.StatType.Bonus_Attack_Speed to 1.0, ReforgeAPI.StatType.Health to 3.0, ReforgeAPI.StatType.Defense to 3.0, ReforgeAPI.StatType.Speed to 1.0, ReforgeAPI.StatType.Intelligence to 4.0), LorenzRarity.RARE to ReforgeAPI.StatList.mapOf(ReforgeAPI.StatType.Strength to 6.0, ReforgeAPI.StatType.Crit_Chance to 6.0, ReforgeAPI.StatType.Crit_Damage to 6.0, ReforgeAPI.StatType.Bonus_Attack_Speed to 2.0, ReforgeAPI.StatType.Health to 4.0, ReforgeAPI.StatType.Defense to 4.0, ReforgeAPI.StatType.Speed to 1.0, ReforgeAPI.StatType.Intelligence to 6.0), LorenzRarity.EPIC to ReforgeAPI.StatList.mapOf(ReforgeAPI.StatType.Strength to 8.0, ReforgeAPI.StatType.Crit_Chance to 8.0, ReforgeAPI.StatType.Crit_Damage to 8.0, ReforgeAPI.StatType.Bonus_Attack_Speed to 3.0, ReforgeAPI.StatType.Health to 6.0, ReforgeAPI.StatType.Defense to 6.0, ReforgeAPI.StatType.Speed to 1.0, ReforgeAPI.StatType.Intelligence to 8.0), LorenzRarity.LEGENDARY to ReforgeAPI.StatList.mapOf(ReforgeAPI.StatType.Strength to 10.0, ReforgeAPI.StatType.Crit_Chance to 10.0, ReforgeAPI.StatType.Crit_Damage to 10.0, ReforgeAPI.StatType.Bonus_Attack_Speed to 4.0, ReforgeAPI.StatType.Health to 8.0, ReforgeAPI.StatType.Defense to 8.0, ReforgeAPI.StatType.Speed to 1.0, ReforgeAPI.StatType.Intelligence to 10.0), LorenzRarity.MYTHIC to ReforgeAPI.StatList.mapOf(ReforgeAPI.StatType.Strength to 12.0, ReforgeAPI.StatType.Crit_Chance to 12.0, ReforgeAPI.StatType.Crit_Damage to 12.0, ReforgeAPI.StatType.Bonus_Attack_Speed to 5.0, ReforgeAPI.StatType.Health to 10.0, ReforgeAPI.StatType.Defense to 10.0, ReforgeAPI.StatType.Speed to 1.0, ReforgeAPI.StatType.Intelligence to 12.0)
-        ), "Dragon_Horn".asInternalName(), extraPropertyText = "§fIncreases most stats by §a1%§f."
-        ),
-        ReforgeAPI.Reforge(
-            "Spiked", ReforgeAPI.ReforgeType.Armor, mapOf(
-            LorenzRarity.COMMON to ReforgeAPI.StatList.mapOf(ReforgeAPI.StatType.Strength to 3.0, ReforgeAPI.StatType.Crit_Chance to 2.0, ReforgeAPI.StatType.Crit_Damage to 3.0, ReforgeAPI.StatType.Bonus_Attack_Speed to 1.0, ReforgeAPI.StatType.Health to 2.0, ReforgeAPI.StatType.Defense to 2.0, ReforgeAPI.StatType.Speed to 1.0, ReforgeAPI.StatType.Intelligence to 3.0), LorenzRarity.UNCOMMON to ReforgeAPI.StatList.mapOf(ReforgeAPI.StatType.Strength to 4.0, ReforgeAPI.StatType.Crit_Chance to 4.0, ReforgeAPI.StatType.Crit_Damage to 4.0, ReforgeAPI.StatType.Bonus_Attack_Speed to 1.0, ReforgeAPI.StatType.Health to 3.0, ReforgeAPI.StatType.Defense to 3.0, ReforgeAPI.StatType.Speed to 1.0, ReforgeAPI.StatType.Intelligence to 4.0), LorenzRarity.RARE to ReforgeAPI.StatList.mapOf(ReforgeAPI.StatType.Strength to 6.0, ReforgeAPI.StatType.Crit_Chance to 6.0, ReforgeAPI.StatType.Crit_Damage to 6.0, ReforgeAPI.StatType.Bonus_Attack_Speed to 2.0, ReforgeAPI.StatType.Health to 4.0, ReforgeAPI.StatType.Defense to 4.0, ReforgeAPI.StatType.Speed to 1.0, ReforgeAPI.StatType.Intelligence to 6.0), LorenzRarity.EPIC to ReforgeAPI.StatList.mapOf(ReforgeAPI.StatType.Strength to 8.0, ReforgeAPI.StatType.Crit_Chance to 8.0, ReforgeAPI.StatType.Crit_Damage to 8.0, ReforgeAPI.StatType.Bonus_Attack_Speed to 3.0, ReforgeAPI.StatType.Health to 6.0, ReforgeAPI.StatType.Defense to 6.0, ReforgeAPI.StatType.Speed to 1.0, ReforgeAPI.StatType.Intelligence to 8.0), LorenzRarity.LEGENDARY to ReforgeAPI.StatList.mapOf(ReforgeAPI.StatType.Strength to 10.0, ReforgeAPI.StatType.Crit_Chance to 10.0, ReforgeAPI.StatType.Crit_Damage to 10.0, ReforgeAPI.StatType.Bonus_Attack_Speed to 4.0, ReforgeAPI.StatType.Health to 8.0, ReforgeAPI.StatType.Defense to 8.0, ReforgeAPI.StatType.Speed to 1.0, ReforgeAPI.StatType.Intelligence to 10.0), LorenzRarity.MYTHIC to ReforgeAPI.StatList.mapOf(ReforgeAPI.StatType.Strength to 12.0, ReforgeAPI.StatType.Crit_Chance to 12.0, ReforgeAPI.StatType.Crit_Damage to 12.0, ReforgeAPI.StatType.Bonus_Attack_Speed to 5.0, ReforgeAPI.StatType.Health to 10.0, ReforgeAPI.StatType.Defense to 10.0, ReforgeAPI.StatType.Speed to 1.0, ReforgeAPI.StatType.Intelligence to 12.0)
-        ), "Dragon_Scale".asInternalName()
-        ),
-        ReforgeAPI.Reforge(
-            "Hyper", ReforgeAPI.ReforgeType.Armor, mapOf(
-            LorenzRarity.COMMON to ReforgeAPI.StatList.mapOf(ReforgeAPI.StatType.Strength to 2.0, ReforgeAPI.StatType.Bonus_Attack_Speed to 2.0, ReforgeAPI.StatType.Speed to 1.0), LorenzRarity.UNCOMMON to ReforgeAPI.StatList.mapOf(ReforgeAPI.StatType.Strength to 4.0, ReforgeAPI.StatType.Bonus_Attack_Speed to 3.0, ReforgeAPI.StatType.Speed to 1.0), LorenzRarity.RARE to ReforgeAPI.StatList.mapOf(ReforgeAPI.StatType.Strength to 6.0, ReforgeAPI.StatType.Bonus_Attack_Speed to 4.0, ReforgeAPI.StatType.Speed to 2.0), LorenzRarity.EPIC to ReforgeAPI.StatList.mapOf(ReforgeAPI.StatType.Strength to 7.0, ReforgeAPI.StatType.Bonus_Attack_Speed to 5.0, ReforgeAPI.StatType.Speed to 2.0), LorenzRarity.LEGENDARY to ReforgeAPI.StatList.mapOf(ReforgeAPI.StatType.Strength to 10.0, ReforgeAPI.StatType.Bonus_Attack_Speed to 6.0, ReforgeAPI.StatType.Speed to 3.0), LorenzRarity.MYTHIC to ReforgeAPI.StatList.mapOf(ReforgeAPI.StatType.Strength to 12.0, ReforgeAPI.StatType.Bonus_Attack_Speed to 7.0, ReforgeAPI.StatType.Speed to 3.0)
-        ), "End_Stone_Geode".asInternalName(), extraPropertyText = "§fGain §a+$${ReforgeAPI.StatType.Speed.iconWithName} for §a5s§f after teleporting.", customStat = mapOf(LorenzRarity.COMMON to 1.0, LorenzRarity.UNCOMMON to 2.0, LorenzRarity.RARE to 3.0, LorenzRarity.EPIC to 4.0, LorenzRarity.LEGENDARY to 5.0, LorenzRarity.MYTHIC to 6.0)
-        ),
-        ReforgeAPI.Reforge("Giant", ReforgeAPI.ReforgeType.Armor, mapOf(LorenzRarity.COMMON to ReforgeAPI.StatList.mapOf(ReforgeAPI.StatType.Health to 50.0), LorenzRarity.UNCOMMON to ReforgeAPI.StatList.mapOf(ReforgeAPI.StatType.Health to 60.0), LorenzRarity.RARE to ReforgeAPI.StatList.mapOf(ReforgeAPI.StatType.Health to 80.0), LorenzRarity.EPIC to ReforgeAPI.StatList.mapOf(ReforgeAPI.StatType.Health to 120.0), LorenzRarity.LEGENDARY to ReforgeAPI.StatList.mapOf(ReforgeAPI.StatType.Health to 180.0), LorenzRarity.MYTHIC to ReforgeAPI.StatList.mapOf(ReforgeAPI.StatType.Health to 240.0)), "Giant_Tooth".asInternalName()),
-        ReforgeAPI.Reforge("Jaded", ReforgeAPI.ReforgeType.Armor, mapOf(LorenzRarity.COMMON to ReforgeAPI.StatList.mapOf(ReforgeAPI.StatType.Mining_Speed to 5.0, ReforgeAPI.StatType.Mining_Fortune to 5.0), LorenzRarity.UNCOMMON to ReforgeAPI.StatList.mapOf(ReforgeAPI.StatType.Mining_Speed to 12.0, ReforgeAPI.StatType.Mining_Fortune to 10.0), LorenzRarity.RARE to ReforgeAPI.StatList.mapOf(ReforgeAPI.StatType.Mining_Speed to 20.0, ReforgeAPI.StatType.Mining_Fortune to 15.0), LorenzRarity.EPIC to ReforgeAPI.StatList.mapOf(ReforgeAPI.StatType.Mining_Speed to 30.0, ReforgeAPI.StatType.Mining_Fortune to 20.0), LorenzRarity.LEGENDARY to ReforgeAPI.StatList.mapOf(ReforgeAPI.StatType.Mining_Speed to 45.0, ReforgeAPI.StatType.Mining_Fortune to 25.0), LorenzRarity.MYTHIC to ReforgeAPI.StatList.mapOf(ReforgeAPI.StatType.Mining_Speed to 60.0, ReforgeAPI.StatType.Mining_Fortune to 30.0)), "Jaderald".asInternalName()),
-        ReforgeAPI.Reforge("Cubic", ReforgeAPI.ReforgeType.Armor, mapOf(LorenzRarity.COMMON to ReforgeAPI.StatList.mapOf(ReforgeAPI.StatType.Strength to 3.0, ReforgeAPI.StatType.Health to 5.0), LorenzRarity.UNCOMMON to ReforgeAPI.StatList.mapOf(ReforgeAPI.StatType.Strength to 5.0, ReforgeAPI.StatType.Health to 7.0), LorenzRarity.RARE to ReforgeAPI.StatList.mapOf(ReforgeAPI.StatType.Strength to 7.0, ReforgeAPI.StatType.Health to 10.0), LorenzRarity.EPIC to ReforgeAPI.StatList.mapOf(ReforgeAPI.StatType.Strength to 10.0, ReforgeAPI.StatType.Health to 15.0), LorenzRarity.LEGENDARY to ReforgeAPI.StatList.mapOf(ReforgeAPI.StatType.Strength to 12.0, ReforgeAPI.StatType.Health to 20.0), LorenzRarity.MYTHIC to ReforgeAPI.StatList.mapOf(ReforgeAPI.StatType.Strength to 15.0, ReforgeAPI.StatType.Health to 25.0)), "Molten_Cube".asInternalName(), extraPropertyText = "§Decreases damage taken from Nether mobs by §a2%§f."),
-        ReforgeAPI.Reforge("Necrotic", ReforgeAPI.ReforgeType.Armor, mapOf(LorenzRarity.COMMON to ReforgeAPI.StatList.mapOf(ReforgeAPI.StatType.Intelligence to 30.0), LorenzRarity.UNCOMMON to ReforgeAPI.StatList.mapOf(ReforgeAPI.StatType.Intelligence to 60.0), LorenzRarity.RARE to ReforgeAPI.StatList.mapOf(ReforgeAPI.StatType.Intelligence to 90.0), LorenzRarity.EPIC to ReforgeAPI.StatList.mapOf(ReforgeAPI.StatType.Intelligence to 120.0), LorenzRarity.LEGENDARY to ReforgeAPI.StatList.mapOf(ReforgeAPI.StatType.Intelligence to 150.0), LorenzRarity.MYTHIC to ReforgeAPI.StatList.mapOf(ReforgeAPI.StatType.Intelligence to 200.0)), "Necromancer's_Brooch".asInternalName()),
-        ReforgeAPI.Reforge(
-            "Empowered", ReforgeAPI.ReforgeType.Armor, mapOf(LorenzRarity.COMMON to ReforgeAPI.StatList.mapOf(ReforgeAPI.StatType.Health to 10.0, ReforgeAPI.StatType.Defense to 10.0), LorenzRarity.UNCOMMON to ReforgeAPI.StatList.mapOf(ReforgeAPI.StatType.Health to 15.0, ReforgeAPI.StatType.Defense to 15.0), LorenzRarity.RARE to ReforgeAPI.StatList.mapOf(ReforgeAPI.StatType.Health to 20.0, ReforgeAPI.StatType.Defense to 20.0), LorenzRarity.EPIC to ReforgeAPI.StatList.mapOf(ReforgeAPI.StatType.Health to 25.0, ReforgeAPI.StatType.Defense to 25.0), LorenzRarity.LEGENDARY to ReforgeAPI.StatList.mapOf(ReforgeAPI.StatType.Health to 35.0, ReforgeAPI.StatType.Defense to 35.0), LorenzRarity.MYTHIC to ReforgeAPI.StatList.mapOf(ReforgeAPI.StatType.Health to 50.0, ReforgeAPI.StatType.Defense to 50.0)), "Sadan's_Brooch".asInternalName(), extraPropertyText = "§Grants §a+10 ${ReforgeAPI.StatType.Mending.iconWithName}§f while in Dungeons, which increases your healing on others."
-        ),
-        ReforgeAPI.Reforge(
-            "Ancient", ReforgeAPI.ReforgeType.Armor, mapOf(
-            LorenzRarity.COMMON to ReforgeAPI.StatList.mapOf(ReforgeAPI.StatType.Strength to 4.0, ReforgeAPI.StatType.Crit_Chance to 3.0, ReforgeAPI.StatType.Health to 7.0, ReforgeAPI.StatType.Defense to 7.0, ReforgeAPI.StatType.Intelligence to 6.0), LorenzRarity.UNCOMMON to ReforgeAPI.StatList.mapOf(ReforgeAPI.StatType.Strength to 8.0, ReforgeAPI.StatType.Crit_Chance to 5.0, ReforgeAPI.StatType.Health to 7.0, ReforgeAPI.StatType.Defense to 7.0, ReforgeAPI.StatType.Intelligence to 9.0), LorenzRarity.RARE to ReforgeAPI.StatList.mapOf(ReforgeAPI.StatType.Strength to 12.0, ReforgeAPI.StatType.Crit_Chance to 7.0, ReforgeAPI.StatType.Health to 7.0, ReforgeAPI.StatType.Defense to 7.0, ReforgeAPI.StatType.Intelligence to 12.0), LorenzRarity.EPIC to ReforgeAPI.StatList.mapOf(ReforgeAPI.StatType.Strength to 18.0, ReforgeAPI.StatType.Crit_Chance to 9.0, ReforgeAPI.StatType.Health to 7.0, ReforgeAPI.StatType.Defense to 7.0, ReforgeAPI.StatType.Intelligence to 16.0), LorenzRarity.LEGENDARY to ReforgeAPI.StatList.mapOf(ReforgeAPI.StatType.Strength to 25.0, ReforgeAPI.StatType.Crit_Chance to 12.0, ReforgeAPI.StatType.Health to 7.0, ReforgeAPI.StatType.Defense to 7.0, ReforgeAPI.StatType.Intelligence to 20.0), LorenzRarity.MYTHIC to ReforgeAPI.StatList.mapOf(ReforgeAPI.StatType.Strength to 35.0, ReforgeAPI.StatType.Crit_Chance to 15.0, ReforgeAPI.StatType.Health to 7.0, ReforgeAPI.StatType.Defense to 7.0, ReforgeAPI.StatType.Intelligence to 25.0)
-        ), "Precursor_Gear".asInternalName(), extraPropertyText = "§f Grants §9+1 ${ReforgeAPI.StatType.Crit_Damage.iconWithName}§f per Catacombs level."
-        ),
-        ReforgeAPI.Reforge(
-            "Undead", ReforgeAPI.ReforgeType.Armor, mapOf(
-            LorenzRarity.COMMON to ReforgeAPI.StatList.mapOf(ReforgeAPI.StatType.Strength to 1.0, ReforgeAPI.StatType.Bonus_Attack_Speed to 1.0, ReforgeAPI.StatType.Health to 6.0, ReforgeAPI.StatType.Defense to 6.0), LorenzRarity.UNCOMMON to ReforgeAPI.StatList.mapOf(ReforgeAPI.StatType.Strength to 2.0, ReforgeAPI.StatType.Bonus_Attack_Speed to 2.0, ReforgeAPI.StatType.Health to 8.0, ReforgeAPI.StatType.Defense to 8.0), LorenzRarity.RARE to ReforgeAPI.StatList.mapOf(ReforgeAPI.StatType.Strength to 2.0, ReforgeAPI.StatType.Bonus_Attack_Speed to 3.0, ReforgeAPI.StatType.Health to 12.0, ReforgeAPI.StatType.Defense to 12.0), LorenzRarity.EPIC to ReforgeAPI.StatList.mapOf(ReforgeAPI.StatType.Strength to 3.0, ReforgeAPI.StatType.Bonus_Attack_Speed to 4.0, ReforgeAPI.StatType.Health to 18.0, ReforgeAPI.StatType.Defense to 18.0), LorenzRarity.LEGENDARY to ReforgeAPI.StatList.mapOf(ReforgeAPI.StatType.Strength to 5.0, ReforgeAPI.StatType.Bonus_Attack_Speed to 5.0, ReforgeAPI.StatType.Health to 25.0, ReforgeAPI.StatType.Defense to 25.0), LorenzRarity.MYTHIC to ReforgeAPI.StatList.mapOf(ReforgeAPI.StatType.Strength to 7.0, ReforgeAPI.StatType.Bonus_Attack_Speed to 6.0, ReforgeAPI.StatType.Health to 33.0, ReforgeAPI.StatType.Defense to 33.0)
-        ), "Premium_Flesh".asInternalName(), extraPropertyText = "§fDecreases damage taken from Zombie Pigmen, Zombies, Withers, and Skeltons, by §a+2"
-        ),
-        ReforgeAPI.Reforge(
-            "Loving", ReforgeAPI.ReforgeType.Chestplates, mapOf(
-            LorenzRarity.COMMON to ReforgeAPI.StatList.mapOf(ReforgeAPI.StatType.Health to 4.0, ReforgeAPI.StatType.Defense to 4.0, ReforgeAPI.StatType.Intelligence to 20.0, ReforgeAPI.StatType.Ability_Damage to 5.0), LorenzRarity.UNCOMMON to ReforgeAPI.StatList.mapOf(ReforgeAPI.StatType.Health to 5.0, ReforgeAPI.StatType.Defense to 5.0, ReforgeAPI.StatType.Intelligence to 40.0, ReforgeAPI.StatType.Ability_Damage to 5.0), LorenzRarity.RARE to ReforgeAPI.StatList.mapOf(ReforgeAPI.StatType.Health to 6.0, ReforgeAPI.StatType.Defense to 6.0, ReforgeAPI.StatType.Intelligence to 60.0, ReforgeAPI.StatType.Ability_Damage to 5.0), LorenzRarity.EPIC to ReforgeAPI.StatList.mapOf(ReforgeAPI.StatType.Health to 8.0, ReforgeAPI.StatType.Defense to 7.0, ReforgeAPI.StatType.Intelligence to 80.0, ReforgeAPI.StatType.Ability_Damage to 5.0), LorenzRarity.LEGENDARY to ReforgeAPI.StatList.mapOf(ReforgeAPI.StatType.Health to 10.0, ReforgeAPI.StatType.Defense to 10.0, ReforgeAPI.StatType.Intelligence to 100.0, ReforgeAPI.StatType.Ability_Damage to 5.0), LorenzRarity.MYTHIC to ReforgeAPI.StatList.mapOf(ReforgeAPI.StatType.Health to 14.0, ReforgeAPI.StatType.Defense to 14.0, ReforgeAPI.StatType.Intelligence to 120.0, ReforgeAPI.StatType.Ability_Damage to 5.0)
-        ), "Red_Scarf".asInternalName()
-        ),
-        ReforgeAPI.Reforge(
-            "Ridiculous", ReforgeAPI.ReforgeType.Helmets, mapOf(
-            LorenzRarity.COMMON to ReforgeAPI.StatList.mapOf(ReforgeAPI.StatType.Crit_Chance to 1.0, ReforgeAPI.StatType.Health to 10.0, ReforgeAPI.StatType.Defense to 10.0), LorenzRarity.UNCOMMON to ReforgeAPI.StatList.mapOf(ReforgeAPI.StatType.Crit_Chance to 2.0, ReforgeAPI.StatType.Health to 15.0, ReforgeAPI.StatType.Defense to 15.0), LorenzRarity.RARE to ReforgeAPI.StatList.mapOf(ReforgeAPI.StatType.Crit_Chance to 3.0, ReforgeAPI.StatType.Health to 20.0, ReforgeAPI.StatType.Defense to 20.0), LorenzRarity.EPIC to ReforgeAPI.StatList.mapOf(ReforgeAPI.StatType.Crit_Chance to 4.0, ReforgeAPI.StatType.Health to 25.0, ReforgeAPI.StatType.Defense to 25.0), LorenzRarity.LEGENDARY to ReforgeAPI.StatList.mapOf(ReforgeAPI.StatType.Crit_Chance to 5.0, ReforgeAPI.StatType.Health to 35.0, ReforgeAPI.StatType.Defense to 35.0), LorenzRarity.MYTHIC to ReforgeAPI.StatList.mapOf(ReforgeAPI.StatType.Crit_Chance to 6.0, ReforgeAPI.StatType.Health to 50.0, ReforgeAPI.StatType.Defense to 50.0)
-        ), "Red_Nose".asInternalName(), extraPropertyText = "§fFart when you sneak. Reduces your ${ReforgeAPI.StatType.Crit_Chance.iconWithName}§f by §c20%§f for §a20s§f but grants §a+30 ${ReforgeAPI.StatType.Defense.iconWithName}§f for §a5s§f and §b+50 ${ReforgeAPI.StatType.Intelligence.icon} Mana§f. Requires at least §920% ${ReforgeAPI.StatType.Crit_Chance.iconWithName}§f to activate."
-        ),
-        ReforgeAPI.Reforge("Bustling", ReforgeAPI.ReforgeType.Armor, mapOf(LorenzRarity.COMMON to ReforgeAPI.StatList.mapOf(ReforgeAPI.StatType.Farming_Fortune to 1.0), LorenzRarity.UNCOMMON to ReforgeAPI.StatList.mapOf(ReforgeAPI.StatType.Farming_Fortune to 2.0), LorenzRarity.RARE to ReforgeAPI.StatList.mapOf(ReforgeAPI.StatType.Farming_Fortune to 4.0), LorenzRarity.EPIC to ReforgeAPI.StatList.mapOf(ReforgeAPI.StatType.Farming_Fortune to 6.0), LorenzRarity.LEGENDARY to ReforgeAPI.StatList.mapOf(ReforgeAPI.StatType.Farming_Fortune to 8.0), LorenzRarity.MYTHIC to ReforgeAPI.StatList.mapOf(ReforgeAPI.StatType.Farming_Fortune to 10.0)), "SkyMart_Brochure".asInternalName()),
-        ReforgeAPI.Reforge("Mossy", ReforgeAPI.ReforgeType.Armor, mapOf(LorenzRarity.COMMON to ReforgeAPI.StatList.mapOf(ReforgeAPI.StatType.Farming_Fortune to 5.0, ReforgeAPI.StatType.Speed to 3.0), LorenzRarity.UNCOMMON to ReforgeAPI.StatList.mapOf(ReforgeAPI.StatType.Farming_Fortune to 10.0, ReforgeAPI.StatType.Speed to 3.0), LorenzRarity.RARE to ReforgeAPI.StatList.mapOf(ReforgeAPI.StatType.Farming_Fortune to 15.0, ReforgeAPI.StatType.Speed to 5.0), LorenzRarity.EPIC to ReforgeAPI.StatList.mapOf(ReforgeAPI.StatType.Farming_Fortune to 20.0, ReforgeAPI.StatType.Speed to 5.0), LorenzRarity.LEGENDARY to ReforgeAPI.StatList.mapOf(ReforgeAPI.StatType.Farming_Fortune to 25.0, ReforgeAPI.StatType.Speed to 7.0), LorenzRarity.MYTHIC to ReforgeAPI.StatList.mapOf(ReforgeAPI.StatType.Farming_Fortune to 30.0, ReforgeAPI.StatType.Speed to 7.0)), "Overgrown_Grass".asInternalName()),
-        ReforgeAPI.Reforge(
-            "Festive", ReforgeAPI.ReforgeType.Armor, mapOf(
-            LorenzRarity.COMMON to ReforgeAPI.StatList.mapOf(ReforgeAPI.StatType.Sea_Creature_Chance to 0.05, ReforgeAPI.StatType.Intelligence to 5.0, ReforgeAPI.StatType.Fishing_Speed to 2.0), LorenzRarity.UNCOMMON to ReforgeAPI.StatList.mapOf(ReforgeAPI.StatType.Sea_Creature_Chance to 0.05, ReforgeAPI.StatType.Intelligence to 10.0, ReforgeAPI.StatType.Fishing_Speed to 3.0), LorenzRarity.RARE to ReforgeAPI.StatList.mapOf(ReforgeAPI.StatType.Sea_Creature_Chance to 0.1, ReforgeAPI.StatType.Intelligence to 15.0, ReforgeAPI.StatType.Fishing_Speed to 4.0), LorenzRarity.EPIC to ReforgeAPI.StatList.mapOf(ReforgeAPI.StatType.Sea_Creature_Chance to 0.15, ReforgeAPI.StatType.Intelligence to 20.0, ReforgeAPI.StatType.Fishing_Speed to 6.0), LorenzRarity.LEGENDARY to ReforgeAPI.StatList.mapOf(ReforgeAPI.StatType.Sea_Creature_Chance to 0.2, ReforgeAPI.StatType.Intelligence to 25.0, ReforgeAPI.StatType.Fishing_Speed to 8.0), LorenzRarity.MYTHIC to ReforgeAPI.StatList.mapOf(ReforgeAPI.StatType.Sea_Creature_Chance to 0.25, ReforgeAPI.StatType.Intelligence to 30.0, ReforgeAPI.StatType.Fishing_Speed to 10.0)
-        ), "Frozen_Bauble".asInternalName()
-        ),
-        ReforgeAPI.Reforge(
-            "Glistening", ReforgeAPI.ReforgeType.Equipment, mapOf(
-            LorenzRarity.COMMON to ReforgeAPI.StatList.mapOf(ReforgeAPI.StatType.Intelligence to 2.0, ReforgeAPI.StatType.Mining_Fortune to 5.0), LorenzRarity.UNCOMMON to ReforgeAPI.StatList.mapOf(ReforgeAPI.StatType.Intelligence to 3.0, ReforgeAPI.StatType.Mining_Fortune to 6.0), LorenzRarity.RARE to ReforgeAPI.StatList.mapOf(ReforgeAPI.StatType.Intelligence to 4.0, ReforgeAPI.StatType.Mining_Fortune to 8.0), LorenzRarity.EPIC to ReforgeAPI.StatList.mapOf(ReforgeAPI.StatType.Intelligence to 5.0, ReforgeAPI.StatType.Mining_Fortune to 10.0), LorenzRarity.LEGENDARY to ReforgeAPI.StatList.mapOf(ReforgeAPI.StatType.Intelligence to 6.0, ReforgeAPI.StatType.Mining_Fortune to 12.0), LorenzRarity.MYTHIC to ReforgeAPI.StatList.mapOf(ReforgeAPI.StatType.Intelligence to 7.0, ReforgeAPI.StatType.Mining_Fortune to 15.0), LorenzRarity.DIVINE to ReforgeAPI.StatList.mapOf(ReforgeAPI.StatType.Intelligence to 8.0, ReforgeAPI.StatType.Mining_Fortune to 18.0)
-        ), "Shiny_Prism".asInternalName()
-        ),
-        ReforgeAPI.Reforge(
-            "Strengthened", ReforgeAPI.ReforgeType.Equipment, mapOf(LorenzRarity.COMMON to ReforgeAPI.StatList.mapOf(ReforgeAPI.StatType.Defense to 3.0, ReforgeAPI.StatType.Strength to 2.0), LorenzRarity.UNCOMMON to ReforgeAPI.StatList.mapOf(ReforgeAPI.StatType.Defense to 4.0, ReforgeAPI.StatType.Strength to 3.0), LorenzRarity.RARE to ReforgeAPI.StatList.mapOf(ReforgeAPI.StatType.Defense to 5.0, ReforgeAPI.StatType.Strength to 4.0), LorenzRarity.EPIC to ReforgeAPI.StatList.mapOf(ReforgeAPI.StatType.Defense to 6.0, ReforgeAPI.StatType.Strength to 5.0), LorenzRarity.LEGENDARY to ReforgeAPI.StatList.mapOf(ReforgeAPI.StatType.Defense to 8.0, ReforgeAPI.StatType.Strength to 6.0), LorenzRarity.MYTHIC to ReforgeAPI.StatList.mapOf(ReforgeAPI.StatType.Defense to 10.0, ReforgeAPI.StatType.Strength to 7.0), LorenzRarity.DIVINE to ReforgeAPI.StatList.mapOf(ReforgeAPI.StatType.Defense to 12.0, ReforgeAPI.StatType.Strength to 8.0)), "Searing_Stone".asInternalName()
-        ),
-        ReforgeAPI.Reforge(
-            "Waxed", ReforgeAPI.ReforgeType.Equipment, mapOf(LorenzRarity.COMMON to ReforgeAPI.StatList.mapOf(ReforgeAPI.StatType.Health to 5.0, ReforgeAPI.StatType.Crit_Chance to 2.0), LorenzRarity.UNCOMMON to ReforgeAPI.StatList.mapOf(ReforgeAPI.StatType.Health to 6.0, ReforgeAPI.StatType.Crit_Chance to 3.0), LorenzRarity.RARE to ReforgeAPI.StatList.mapOf(ReforgeAPI.StatType.Health to 8.0, ReforgeAPI.StatType.Crit_Chance to 4.0), LorenzRarity.EPIC to ReforgeAPI.StatList.mapOf(ReforgeAPI.StatType.Health to 10.0, ReforgeAPI.StatType.Crit_Chance to 5.0), LorenzRarity.LEGENDARY to ReforgeAPI.StatList.mapOf(ReforgeAPI.StatType.Health to 12.0, ReforgeAPI.StatType.Crit_Chance to 6.0), LorenzRarity.MYTHIC to ReforgeAPI.StatList.mapOf(ReforgeAPI.StatType.Health to 15.0, ReforgeAPI.StatType.Crit_Chance to 7.0), LorenzRarity.DIVINE to ReforgeAPI.StatList.mapOf(ReforgeAPI.StatType.Health to 20.0, ReforgeAPI.StatType.Crit_Chance to 8.0)), "Blaze_Wax".asInternalName()
-        ),
-        ReforgeAPI.Reforge("Fortified", ReforgeAPI.ReforgeType.Equipment, mapOf(LorenzRarity.COMMON to ReforgeAPI.StatList.mapOf(ReforgeAPI.StatType.Defense to 12.0), LorenzRarity.UNCOMMON to ReforgeAPI.StatList.mapOf(ReforgeAPI.StatType.Defense to 14.0), LorenzRarity.RARE to ReforgeAPI.StatList.mapOf(ReforgeAPI.StatType.Defense to 17.0), LorenzRarity.EPIC to ReforgeAPI.StatList.mapOf(ReforgeAPI.StatType.Defense to 20.0), LorenzRarity.LEGENDARY to ReforgeAPI.StatList.mapOf(ReforgeAPI.StatType.Defense to 25.0), LorenzRarity.MYTHIC to ReforgeAPI.StatList.mapOf(ReforgeAPI.StatType.Defense to 30.0), LorenzRarity.DIVINE to ReforgeAPI.StatList.mapOf(ReforgeAPI.StatType.Defense to 36.0)), "Meteor_Shard".asInternalName()),
-        ReforgeAPI.Reforge("Rooted", ReforgeAPI.ReforgeType.Equipment, mapOf(LorenzRarity.COMMON to ReforgeAPI.StatList.mapOf(ReforgeAPI.StatType.Farming_Fortune to 6.0, ReforgeAPI.StatType.Health to 2.0), LorenzRarity.UNCOMMON to ReforgeAPI.StatList.mapOf(ReforgeAPI.StatType.Farming_Fortune to 9.0, ReforgeAPI.StatType.Health to 5.0), LorenzRarity.RARE to ReforgeAPI.StatList.mapOf(ReforgeAPI.StatType.Farming_Fortune to 12.0, ReforgeAPI.StatType.Health to 8.0), LorenzRarity.EPIC to ReforgeAPI.StatList.mapOf(ReforgeAPI.StatType.Farming_Fortune to 15.0, ReforgeAPI.StatType.Health to 11.0), LorenzRarity.LEGENDARY to ReforgeAPI.StatList.mapOf(ReforgeAPI.StatType.Farming_Fortune to 18.0, ReforgeAPI.StatType.Health to 14.0), LorenzRarity.MYTHIC to ReforgeAPI.StatList.mapOf(ReforgeAPI.StatType.Farming_Fortune to 21.0, ReforgeAPI.StatType.Health to 17.0)), "Burrowing_Spores".asInternalName()),
-        ReforgeAPI.Reforge("Blooming", ReforgeAPI.ReforgeType.Equipment, mapOf(LorenzRarity.COMMON to ReforgeAPI.StatList.mapOf(ReforgeAPI.StatType.Farming_Fortune to 1.0, ReforgeAPI.StatType.Speed to 4.0), LorenzRarity.UNCOMMON to ReforgeAPI.StatList.mapOf(ReforgeAPI.StatType.Farming_Fortune to 2.0, ReforgeAPI.StatType.Speed to 4.0), LorenzRarity.RARE to ReforgeAPI.StatList.mapOf(ReforgeAPI.StatType.Farming_Fortune to 3.0, ReforgeAPI.StatType.Speed to 5.0), LorenzRarity.EPIC to ReforgeAPI.StatList.mapOf(ReforgeAPI.StatType.Farming_Fortune to 4.0, ReforgeAPI.StatType.Speed to 5.0), LorenzRarity.LEGENDARY to ReforgeAPI.StatList.mapOf(ReforgeAPI.StatType.Farming_Fortune to 5.0, ReforgeAPI.StatType.Speed to 6.0), LorenzRarity.MYTHIC to ReforgeAPI.StatList.mapOf(ReforgeAPI.StatType.Farming_Fortune to 6.0, ReforgeAPI.StatType.Speed to 6.0)), "Flowering_Bouquet".asInternalName()),
-        ReforgeAPI.Reforge("Snowy", ReforgeAPI.ReforgeType.Equipment, mapOf(LorenzRarity.COMMON to ReforgeAPI.StatList.mapOf(ReforgeAPI.StatType.Sea_Creature_Chance to 0.2, ReforgeAPI.StatType.Fishing_Speed to 0.5), LorenzRarity.UNCOMMON to ReforgeAPI.StatList.mapOf(ReforgeAPI.StatType.Sea_Creature_Chance to 0.2, ReforgeAPI.StatType.Fishing_Speed to 1.0), LorenzRarity.RARE to ReforgeAPI.StatList.mapOf(ReforgeAPI.StatType.Sea_Creature_Chance to 0.4, ReforgeAPI.StatType.Fishing_Speed to 1.5), LorenzRarity.EPIC to ReforgeAPI.StatList.mapOf(ReforgeAPI.StatType.Sea_Creature_Chance to 0.6, ReforgeAPI.StatType.Fishing_Speed to 2.0), LorenzRarity.LEGENDARY to ReforgeAPI.StatList.mapOf(ReforgeAPI.StatType.Sea_Creature_Chance to 0.8, ReforgeAPI.StatType.Fishing_Speed to 2.5), LorenzRarity.MYTHIC to ReforgeAPI.StatList.mapOf(ReforgeAPI.StatType.Sea_Creature_Chance to 1.0, ReforgeAPI.StatType.Fishing_Speed to 3.0)), "Terry's_Snowglobe".asInternalName()),
-        ReforgeAPI.Reforge(
-            "Blood-Soaked", ReforgeAPI.ReforgeType.Cloaks, mapOf(
-            LorenzRarity.COMMON to ReforgeAPI.StatList.mapOf(ReforgeAPI.StatType.Health to 6.0, ReforgeAPI.StatType.Vitality to 1.0, ReforgeAPI.StatType.Defense to 1.0), LorenzRarity.UNCOMMON to ReforgeAPI.StatList.mapOf(ReforgeAPI.StatType.Health to 8.0, ReforgeAPI.StatType.Vitality to 1.0, ReforgeAPI.StatType.Defense to 2.0), LorenzRarity.RARE to ReforgeAPI.StatList.mapOf(ReforgeAPI.StatType.Health to 8.0, ReforgeAPI.StatType.Vitality to 2.0, ReforgeAPI.StatType.Defense to 3.0), LorenzRarity.EPIC to ReforgeAPI.StatList.mapOf(ReforgeAPI.StatType.Health to 9.0, ReforgeAPI.StatType.Vitality to 2.0, ReforgeAPI.StatType.Defense to 4.0), LorenzRarity.LEGENDARY to ReforgeAPI.StatList.mapOf(ReforgeAPI.StatType.Health to 10.0, ReforgeAPI.StatType.Vitality to 3.0, ReforgeAPI.StatType.Defense to 5.0), LorenzRarity.MYTHIC to ReforgeAPI.StatList.mapOf(ReforgeAPI.StatType.Health to 12.0, ReforgeAPI.StatType.Vitality to 3.0, ReforgeAPI.StatType.Defense to 6.0), LorenzRarity.DIVINE to ReforgeAPI.StatList.mapOf(ReforgeAPI.StatType.Health to 14.0, ReforgeAPI.StatType.Vitality to 4.0, ReforgeAPI.StatType.Defense to 7.0)
-        ), "Presumed_Gallon_Of_Red_Paint".asInternalName(), extraPropertyText = "§fHeal §a1.15x§f more from Vampirism and Lifesteal"
-        ),
-        ReforgeAPI.Reforge("Salty", ReforgeAPI.ReforgeType.FishingRods, mapOf(LorenzRarity.COMMON to ReforgeAPI.StatList.mapOf(ReforgeAPI.StatType.Sea_Creature_Chance to 1.0), LorenzRarity.UNCOMMON to ReforgeAPI.StatList.mapOf(ReforgeAPI.StatType.Sea_Creature_Chance to 2.0), LorenzRarity.RARE to ReforgeAPI.StatList.mapOf(ReforgeAPI.StatType.Sea_Creature_Chance to 2.0), LorenzRarity.EPIC to ReforgeAPI.StatList.mapOf(ReforgeAPI.StatType.Sea_Creature_Chance to 3.0), LorenzRarity.LEGENDARY to ReforgeAPI.StatList.mapOf(ReforgeAPI.StatType.Sea_Creature_Chance to 5.0), LorenzRarity.MYTHIC to ReforgeAPI.StatList.mapOf(ReforgeAPI.StatType.Sea_Creature_Chance to 7.0)), "Salt_Cube".asInternalName()),
-        ReforgeAPI.Reforge("Treacherous", ReforgeAPI.ReforgeType.FishingRods, mapOf(LorenzRarity.COMMON to ReforgeAPI.StatList.mapOf(ReforgeAPI.StatType.Strength to 5.0, ReforgeAPI.StatType.Sea_Creature_Chance to 1.0), LorenzRarity.UNCOMMON to ReforgeAPI.StatList.mapOf(ReforgeAPI.StatType.Strength to 10.0, ReforgeAPI.StatType.Sea_Creature_Chance to 2.0), LorenzRarity.RARE to ReforgeAPI.StatList.mapOf(ReforgeAPI.StatType.Strength to 15.0, ReforgeAPI.StatType.Sea_Creature_Chance to 2.0), LorenzRarity.EPIC to ReforgeAPI.StatList.mapOf(ReforgeAPI.StatType.Strength to 20.0, ReforgeAPI.StatType.Sea_Creature_Chance to 3.0), LorenzRarity.LEGENDARY to ReforgeAPI.StatList.mapOf(ReforgeAPI.StatType.Strength to 25.0, ReforgeAPI.StatType.Sea_Creature_Chance to 5.0), LorenzRarity.MYTHIC to ReforgeAPI.StatList.mapOf(ReforgeAPI.StatType.Strength to 30.0, ReforgeAPI.StatType.Sea_Creature_Chance to 7.0)), "Rusty_Anchor".asInternalName()),
-        ReforgeAPI.Reforge("Lucky", ReforgeAPI.ReforgeType.FishingRods, mapOf(LorenzRarity.COMMON to ReforgeAPI.StatList.mapOf(ReforgeAPI.StatType.Magic_Find to 1.0, ReforgeAPI.StatType.Sea_Creature_Chance to 1.0), LorenzRarity.UNCOMMON to ReforgeAPI.StatList.mapOf(ReforgeAPI.StatType.Magic_Find to 2.0, ReforgeAPI.StatType.Sea_Creature_Chance to 2.0), LorenzRarity.RARE to ReforgeAPI.StatList.mapOf(ReforgeAPI.StatType.Magic_Find to 3.0, ReforgeAPI.StatType.Sea_Creature_Chance to 2.0), LorenzRarity.EPIC to ReforgeAPI.StatList.mapOf(ReforgeAPI.StatType.Magic_Find to 4.0, ReforgeAPI.StatType.Sea_Creature_Chance to 3.0), LorenzRarity.LEGENDARY to ReforgeAPI.StatList.mapOf(ReforgeAPI.StatType.Magic_Find to 5.0, ReforgeAPI.StatType.Sea_Creature_Chance to 5.0), LorenzRarity.MYTHIC to ReforgeAPI.StatList.mapOf(ReforgeAPI.StatType.Magic_Find to 6.0, ReforgeAPI.StatType.Sea_Creature_Chance to 7.0)), "Lucky_Dice".asInternalName()),
-        ReforgeAPI.Reforge("Stiff", ReforgeAPI.ReforgeType.FishingRods, mapOf(LorenzRarity.COMMON to ReforgeAPI.StatList.mapOf(ReforgeAPI.StatType.Strength to 2.0, ReforgeAPI.StatType.Sea_Creature_Chance to 1.0), LorenzRarity.UNCOMMON to ReforgeAPI.StatList.mapOf(ReforgeAPI.StatType.Strength to 4.0, ReforgeAPI.StatType.Sea_Creature_Chance to 2.0), LorenzRarity.RARE to ReforgeAPI.StatList.mapOf(ReforgeAPI.StatType.Strength to 6.0, ReforgeAPI.StatType.Sea_Creature_Chance to 2.0), LorenzRarity.EPIC to ReforgeAPI.StatList.mapOf(ReforgeAPI.StatType.Strength to 8.0, ReforgeAPI.StatType.Sea_Creature_Chance to 3.0), LorenzRarity.LEGENDARY to ReforgeAPI.StatList.mapOf(ReforgeAPI.StatType.Strength to 10.0, ReforgeAPI.StatType.Sea_Creature_Chance to 5.0), LorenzRarity.MYTHIC to ReforgeAPI.StatList.mapOf(ReforgeAPI.StatType.Strength to 12.0, ReforgeAPI.StatType.Sea_Creature_Chance to 7.0)), "Hardened_Wood".asInternalName()),
-        ReforgeAPI.Reforge(
-            "Chomp", ReforgeAPI.ReforgeType.FishingRods, mapOf(
-            LorenzRarity.COMMON to ReforgeAPI.StatList.mapOf(ReforgeAPI.StatType.Strength to 5.0, ReforgeAPI.StatType.Crit_Chance to 5.0, ReforgeAPI.StatType.Fishing_Speed to 2.0), LorenzRarity.UNCOMMON to ReforgeAPI.StatList.mapOf(ReforgeAPI.StatType.Strength to 10.0, ReforgeAPI.StatType.Crit_Chance to 10.0, ReforgeAPI.StatType.Fishing_Speed to 3.0), LorenzRarity.RARE to ReforgeAPI.StatList.mapOf(ReforgeAPI.StatType.Strength to 17.0, ReforgeAPI.StatType.Crit_Chance to 17.0, ReforgeAPI.StatType.Fishing_Speed to 5.0), LorenzRarity.EPIC to ReforgeAPI.StatList.mapOf(ReforgeAPI.StatType.Strength to 25.0, ReforgeAPI.StatType.Crit_Chance to 25.0, ReforgeAPI.StatType.Fishing_Speed to 7.0), LorenzRarity.LEGENDARY to ReforgeAPI.StatList.mapOf(ReforgeAPI.StatType.Strength to 35.0, ReforgeAPI.StatType.Crit_Chance to 35.0, ReforgeAPI.StatType.Fishing_Speed to 9.0), LorenzRarity.MYTHIC to ReforgeAPI.StatList.mapOf(ReforgeAPI.StatType.Strength to 50.0, ReforgeAPI.StatType.Crit_Chance to 50.0, ReforgeAPI.StatType.Fishing_Speed to 11.0)
-        ), "Kuudra_Mandible".asInternalName(), extraPropertyText = "§fDecreases the health of Lava Sea Creatures by §c1%§f for each unique Lava Sea Creature you have killed with this rod in your inventory"
-        ),
-        ReforgeAPI.Reforge("Pitchin'", ReforgeAPI.ReforgeType.FishingRods, mapOf(LorenzRarity.COMMON to ReforgeAPI.StatList.mapOf(ReforgeAPI.StatType.Sea_Creature_Chance to 1.0, ReforgeAPI.StatType.Fishing_Speed to 1.0), LorenzRarity.UNCOMMON to ReforgeAPI.StatList.mapOf(ReforgeAPI.StatType.Sea_Creature_Chance to 1.0, ReforgeAPI.StatType.Fishing_Speed to 2.0), LorenzRarity.RARE to ReforgeAPI.StatList.mapOf(ReforgeAPI.StatType.Sea_Creature_Chance to 2.0, ReforgeAPI.StatType.Fishing_Speed to 4.0), LorenzRarity.EPIC to ReforgeAPI.StatList.mapOf(ReforgeAPI.StatType.Sea_Creature_Chance to 3.0, ReforgeAPI.StatType.Fishing_Speed to 6.0), LorenzRarity.LEGENDARY to ReforgeAPI.StatList.mapOf(ReforgeAPI.StatType.Sea_Creature_Chance to 4.0, ReforgeAPI.StatType.Fishing_Speed to 8.0), LorenzRarity.MYTHIC to ReforgeAPI.StatList.mapOf(ReforgeAPI.StatType.Sea_Creature_Chance to 5.0, ReforgeAPI.StatType.Fishing_Speed to 10.0)), "Pitchin'_Koi".asInternalName()),
-        ReforgeAPI.Reforge("Ambered", ReforgeAPI.ReforgeType.Pickaxes, mapOf(LorenzRarity.COMMON to ReforgeAPI.StatList.mapOf(ReforgeAPI.StatType.Mining_Speed to 25.0), LorenzRarity.UNCOMMON to ReforgeAPI.StatList.mapOf(ReforgeAPI.StatType.Mining_Speed to 31.0), LorenzRarity.RARE to ReforgeAPI.StatList.mapOf(ReforgeAPI.StatType.Mining_Speed to 38.0), LorenzRarity.EPIC to ReforgeAPI.StatList.mapOf(ReforgeAPI.StatType.Mining_Speed to 46.0), LorenzRarity.LEGENDARY to ReforgeAPI.StatList.mapOf(ReforgeAPI.StatType.Mining_Speed to 55.0), LorenzRarity.MYTHIC to ReforgeAPI.StatList.mapOf(ReforgeAPI.StatType.Mining_Speed to 65.0), LorenzRarity.DIVINE to ReforgeAPI.StatList.mapOf(ReforgeAPI.StatType.Mining_Speed to 75.0)), "Amber_Material".asInternalName()),
-        ReforgeAPI.Reforge(
-            "Auspicious", ReforgeAPI.ReforgeType.Pickaxes, mapOf(
-            LorenzRarity.COMMON to ReforgeAPI.StatList.mapOf(ReforgeAPI.StatType.Mining_Speed to 7.0, ReforgeAPI.StatType.Mining_Fortune to 8.0), LorenzRarity.UNCOMMON to ReforgeAPI.StatList.mapOf(ReforgeAPI.StatType.Mining_Speed to 14.0, ReforgeAPI.StatType.Mining_Fortune to 8.0), LorenzRarity.RARE to ReforgeAPI.StatList.mapOf(ReforgeAPI.StatType.Mining_Speed to 23.0, ReforgeAPI.StatType.Mining_Fortune to 8.0), LorenzRarity.EPIC to ReforgeAPI.StatList.mapOf(ReforgeAPI.StatType.Mining_Speed to 34.0, ReforgeAPI.StatType.Mining_Fortune to 8.0), LorenzRarity.LEGENDARY to ReforgeAPI.StatList.mapOf(ReforgeAPI.StatType.Mining_Speed to 45.0, ReforgeAPI.StatType.Mining_Fortune to 8.0), LorenzRarity.MYTHIC to ReforgeAPI.StatList.mapOf(ReforgeAPI.StatType.Mining_Speed to 60.0, ReforgeAPI.StatType.Mining_Fortune to 8.0), LorenzRarity.DIVINE to ReforgeAPI.StatList.mapOf(ReforgeAPI.StatType.Mining_Speed to 75.0, ReforgeAPI.StatType.Mining_Fortune to 8.0)
-        ), "Rock_Gemstone".asInternalName()
-        ),
-        ReforgeAPI.Reforge("Fleet", ReforgeAPI.ReforgeType.Pickaxes, mapOf(LorenzRarity.COMMON to ReforgeAPI.StatList.mapOf(ReforgeAPI.StatType.Mining_Speed to 9.0), LorenzRarity.UNCOMMON to ReforgeAPI.StatList.mapOf(ReforgeAPI.StatType.Mining_Speed to 15.0), LorenzRarity.RARE to ReforgeAPI.StatList.mapOf(ReforgeAPI.StatType.Mining_Speed to 25.0), LorenzRarity.EPIC to ReforgeAPI.StatList.mapOf(ReforgeAPI.StatType.Mining_Speed to 40.0), LorenzRarity.LEGENDARY to ReforgeAPI.StatList.mapOf(ReforgeAPI.StatType.Mining_Speed to 55.0), LorenzRarity.MYTHIC to ReforgeAPI.StatList.mapOf(ReforgeAPI.StatType.Mining_Speed to 75.0), LorenzRarity.DIVINE to ReforgeAPI.StatList.mapOf(ReforgeAPI.StatType.Mining_Speed to 90.0)), "Diamonite".asInternalName()),
-        ReforgeAPI.Reforge("Heated", ReforgeAPI.ReforgeType.Pickaxes, mapOf(), "Hot_Stuff".asInternalName(), extraPropertyText = "§fGrants §aincreased ${ReforgeAPI.StatType.Mining_Speed.iconWithName}§f the deeper your venture."),
-        ReforgeAPI.Reforge(
-            "Magnetic", ReforgeAPI.ReforgeType.Pickaxes, mapOf(LorenzRarity.COMMON to ReforgeAPI.StatList.mapOf(ReforgeAPI.StatType.Defense to 4.0), LorenzRarity.UNCOMMON to ReforgeAPI.StatList.mapOf(ReforgeAPI.StatType.Defense to 5.0), LorenzRarity.RARE to ReforgeAPI.StatList.mapOf(ReforgeAPI.StatType.Defense to 6.0), LorenzRarity.EPIC to ReforgeAPI.StatList.mapOf(ReforgeAPI.StatType.Defense to 8.0), LorenzRarity.LEGENDARY to ReforgeAPI.StatList.mapOf(ReforgeAPI.StatType.Defense to 10.0), LorenzRarity.MYTHIC to ReforgeAPI.StatList.mapOf(ReforgeAPI.StatType.Defense to 14.0), LorenzRarity.DIVINE to ReforgeAPI.StatList.mapOf(ReforgeAPI.StatType.Defense to 18.0)), "Lapis_Crystal".asInternalName(), extraPropertyText = "§Gain §a+$%§f extra experience when mining", customStat = mapOf(LorenzRarity.COMMON to 10.0, LorenzRarity.UNCOMMON to 12.0, LorenzRarity.RARE to 14.0, LorenzRarity.EPIC to 16.0, LorenzRarity.LEGENDARY to 18.0, LorenzRarity.MYTHIC to 20.0, LorenzRarity.DIVINE to 22.0)
-        ),
-        ReforgeAPI.Reforge("Mithraic", ReforgeAPI.ReforgeType.Pickaxes, mapOf(LorenzRarity.COMMON to ReforgeAPI.StatList.mapOf(ReforgeAPI.StatType.Mining_Speed to 6.0), LorenzRarity.UNCOMMON to ReforgeAPI.StatList.mapOf(ReforgeAPI.StatType.Mining_Speed to 12.0), LorenzRarity.RARE to ReforgeAPI.StatList.mapOf(ReforgeAPI.StatType.Mining_Speed to 20.0), LorenzRarity.EPIC to ReforgeAPI.StatList.mapOf(ReforgeAPI.StatType.Mining_Speed to 30.0), LorenzRarity.LEGENDARY to ReforgeAPI.StatList.mapOf(ReforgeAPI.StatType.Mining_Speed to 40.0), LorenzRarity.MYTHIC to ReforgeAPI.StatList.mapOf(ReforgeAPI.StatType.Mining_Speed to 55.0), LorenzRarity.DIVINE to ReforgeAPI.StatList.mapOf(ReforgeAPI.StatType.Mining_Speed to 70.0)), "Pure_Mithril".asInternalName(), extraPropertyText = "§Grants a §a10%§f chance to gain §a1§f extra Mithril when mining Mithril Ore."),
-        ReforgeAPI.Reforge(
-            "Refined", ReforgeAPI.ReforgeType.Pickaxes, mapOf(LorenzRarity.COMMON to ReforgeAPI.StatList.mapOf(ReforgeAPI.StatType.Defense to 5.0, ReforgeAPI.StatType.Mining_Wisdom to 1.0), LorenzRarity.UNCOMMON to ReforgeAPI.StatList.mapOf(ReforgeAPI.StatType.Defense to 7.0, ReforgeAPI.StatType.Mining_Wisdom to 2.0), LorenzRarity.RARE to ReforgeAPI.StatList.mapOf(ReforgeAPI.StatType.Defense to 9.0, ReforgeAPI.StatType.Mining_Wisdom to 3.0), LorenzRarity.EPIC to ReforgeAPI.StatList.mapOf(ReforgeAPI.StatType.Defense to 13.0, ReforgeAPI.StatType.Mining_Wisdom to 4.0), LorenzRarity.LEGENDARY to ReforgeAPI.StatList.mapOf(ReforgeAPI.StatType.Defense to 16.0, ReforgeAPI.StatType.Mining_Wisdom to 5.0), LorenzRarity.MYTHIC to ReforgeAPI.StatList.mapOf(ReforgeAPI.StatType.Defense to 20.0, ReforgeAPI.StatType.Mining_Wisdom to 6.0), LorenzRarity.DIVINE to ReforgeAPI.StatList.mapOf(ReforgeAPI.StatType.Defense to 24.0, ReforgeAPI.StatType.Mining_Wisdom to 7.0)), "Refined_Amber".asInternalName(), extraPropertyText = "§fGain a §a0.1%§f chacne to drop an enchanted item for ores that you mine."
-        ),
-        ReforgeAPI.Reforge(
-            "Stellar", ReforgeAPI.ReforgeType.Pickaxes, mapOf(
-            LorenzRarity.COMMON to ReforgeAPI.StatList.mapOf(ReforgeAPI.StatType.Strength to 5.0, ReforgeAPI.StatType.Defense to 5.0, ReforgeAPI.StatType.Mining_Speed to 3.0), LorenzRarity.UNCOMMON to ReforgeAPI.StatList.mapOf(ReforgeAPI.StatType.Strength to 8.0, ReforgeAPI.StatType.Defense to 8.0, ReforgeAPI.StatType.Mining_Speed to 6.0), LorenzRarity.RARE to ReforgeAPI.StatList.mapOf(ReforgeAPI.StatType.Strength to 12.0, ReforgeAPI.StatType.Defense to 12.0, ReforgeAPI.StatType.Mining_Speed to 9.0), LorenzRarity.EPIC to ReforgeAPI.StatList.mapOf(ReforgeAPI.StatType.Strength to 16.0, ReforgeAPI.StatType.Defense to 16.0, ReforgeAPI.StatType.Mining_Speed to 12.0), LorenzRarity.LEGENDARY to ReforgeAPI.StatList.mapOf(ReforgeAPI.StatType.Strength to 20.0, ReforgeAPI.StatType.Defense to 20.0, ReforgeAPI.StatType.Mining_Speed to 15.0), LorenzRarity.MYTHIC to ReforgeAPI.StatList.mapOf(ReforgeAPI.StatType.Strength to 25.0, ReforgeAPI.StatType.Defense to 25.0, ReforgeAPI.StatType.Mining_Speed to 20.0), LorenzRarity.DIVINE to ReforgeAPI.StatList.mapOf(ReforgeAPI.StatType.Strength to 30.0, ReforgeAPI.StatType.Defense to 30.0, ReforgeAPI.StatType.Mining_Speed to 25.0)
-        ), "Petrified_Starfall".asInternalName(), extraPropertyText = "§fDeal §a+1§f extra damage to Star Sentries and increases the chance for Starfall to drop form them by §a20%§f."
-        ),
-        ReforgeAPI.Reforge(
-            "Fruitful", ReforgeAPI.ReforgeType.Pickaxes, mapOf(
-            LorenzRarity.COMMON to ReforgeAPI.StatList.mapOf(ReforgeAPI.StatType.Defense to 3.0, ReforgeAPI.StatType.Intelligence to 1.0, ReforgeAPI.StatType.Mining_Fortune to 3.0), LorenzRarity.UNCOMMON to ReforgeAPI.StatList.mapOf(ReforgeAPI.StatType.Defense to 4.0, ReforgeAPI.StatType.Intelligence to 1.0, ReforgeAPI.StatType.Mining_Fortune to 3.0), LorenzRarity.RARE to ReforgeAPI.StatList.mapOf(ReforgeAPI.StatType.Defense to 5.0, ReforgeAPI.StatType.Intelligence to 1.0, ReforgeAPI.StatType.Mining_Fortune to 3.0), LorenzRarity.EPIC to ReforgeAPI.StatList.mapOf(ReforgeAPI.StatType.Defense to 7.0, ReforgeAPI.StatType.Intelligence to 1.0, ReforgeAPI.StatType.Mining_Fortune to 3.0), LorenzRarity.LEGENDARY to ReforgeAPI.StatList.mapOf(ReforgeAPI.StatType.Defense to 9.0, ReforgeAPI.StatType.Intelligence to 1.0, ReforgeAPI.StatType.Mining_Fortune to 3.0), LorenzRarity.MYTHIC to ReforgeAPI.StatList.mapOf(ReforgeAPI.StatType.Defense to 12.0, ReforgeAPI.StatType.Intelligence to 1.0, ReforgeAPI.StatType.Mining_Fortune to 3.0)
-        ), "Onyx".asInternalName()
-        ),
-        ReforgeAPI.Reforge("Moil", ReforgeAPI.ReforgeType.Axes, mapOf(LorenzRarity.COMMON to ReforgeAPI.StatList.mapOf(ReforgeAPI.StatType.Foraging_Wisdom to 1.0), LorenzRarity.UNCOMMON to ReforgeAPI.StatList.mapOf(ReforgeAPI.StatType.Foraging_Wisdom to 1.0), LorenzRarity.RARE to ReforgeAPI.StatList.mapOf(ReforgeAPI.StatType.Foraging_Wisdom to 2.0), LorenzRarity.EPIC to ReforgeAPI.StatList.mapOf(ReforgeAPI.StatType.Foraging_Wisdom to 2.0), LorenzRarity.LEGENDARY to ReforgeAPI.StatList.mapOf(ReforgeAPI.StatType.Foraging_Wisdom to 3.0, ReforgeAPI.StatType.Foraging_Wisdom to 3.0)), "Moil_Log".asInternalName()),
-        ReforgeAPI.Reforge(
-            "Toil", ReforgeAPI.ReforgeType.Axes, mapOf(
-            LorenzRarity.COMMON to ReforgeAPI.StatList.mapOf(ReforgeAPI.StatType.Strength to 5.0, ReforgeAPI.StatType.Crit_Damage to 5.0, ReforgeAPI.StatType.Foraging_Wisdom to 1.0), LorenzRarity.UNCOMMON to ReforgeAPI.StatList.mapOf(ReforgeAPI.StatType.Strength to 7.0, ReforgeAPI.StatType.Crit_Damage to 7.0, ReforgeAPI.StatType.Foraging_Wisdom to 2.0), LorenzRarity.RARE to ReforgeAPI.StatList.mapOf(ReforgeAPI.StatType.Strength to 9.0, ReforgeAPI.StatType.Crit_Damage to 9.0, ReforgeAPI.StatType.Foraging_Wisdom to 3.0), LorenzRarity.EPIC to ReforgeAPI.StatList.mapOf(ReforgeAPI.StatType.Strength to 13.0, ReforgeAPI.StatType.Crit_Damage to 13.0, ReforgeAPI.StatType.Foraging_Wisdom to 4.0), LorenzRarity.LEGENDARY to ReforgeAPI.StatList.mapOf(ReforgeAPI.StatType.Strength to 16.0, ReforgeAPI.StatType.Crit_Damage to 16.0, ReforgeAPI.StatType.Foraging_Wisdom to 5.0), LorenzRarity.MYTHIC to ReforgeAPI.StatList.mapOf(ReforgeAPI.StatType.Strength to 20.0, ReforgeAPI.StatType.Crit_Damage to 20.0, ReforgeAPI.StatType.Foraging_Wisdom to 6.0)
-        ), "Toil_Log".asInternalName()
-        ),
-        ReforgeAPI.Reforge(
-            "Blessed", ReforgeAPI.ReforgeType.HoesAndAxes, mapOf(
-            LorenzRarity.COMMON to ReforgeAPI.StatList.mapOf(ReforgeAPI.StatType.Speed to 5.0, ReforgeAPI.StatType.Farming_Fortune to 5.0, ReforgeAPI.StatType.Farming_Wisdom to 1.0), LorenzRarity.UNCOMMON to ReforgeAPI.StatList.mapOf(ReforgeAPI.StatType.Speed to 7.0, ReforgeAPI.StatType.Farming_Fortune to 7.0, ReforgeAPI.StatType.Farming_Wisdom to 2.0), LorenzRarity.RARE to ReforgeAPI.StatList.mapOf(ReforgeAPI.StatType.Speed to 9.0, ReforgeAPI.StatType.Farming_Fortune to 9.0, ReforgeAPI.StatType.Farming_Wisdom to 3.0), LorenzRarity.EPIC to ReforgeAPI.StatList.mapOf(ReforgeAPI.StatType.Speed to 13.0, ReforgeAPI.StatType.Farming_Fortune to 13.0, ReforgeAPI.StatType.Farming_Wisdom to 4.0), LorenzRarity.LEGENDARY to ReforgeAPI.StatList.mapOf(ReforgeAPI.StatType.Speed to 16.0, ReforgeAPI.StatType.Farming_Fortune to 16.0, ReforgeAPI.StatType.Farming_Wisdom to 5.0), LorenzRarity.MYTHIC to ReforgeAPI.StatList.mapOf(ReforgeAPI.StatType.Speed to 20.0, ReforgeAPI.StatType.Farming_Fortune to 20.0, ReforgeAPI.StatType.Farming_Wisdom to 6.0)
-        ), "Blessed_Fruit".asInternalName()
-        ),
-        ReforgeAPI.Reforge("Earthy", ReforgeAPI.ReforgeType.Axes, mapOf(LorenzRarity.COMMON to ReforgeAPI.StatList.mapOf(ReforgeAPI.StatType.Farming_Fortune to 2.0, ReforgeAPI.StatType.Speed to 1.0), LorenzRarity.UNCOMMON to ReforgeAPI.StatList.mapOf(ReforgeAPI.StatType.Farming_Fortune to 4.0, ReforgeAPI.StatType.Speed to 1.0), LorenzRarity.RARE to ReforgeAPI.StatList.mapOf(ReforgeAPI.StatType.Farming_Fortune to 6.0, ReforgeAPI.StatType.Speed to 1.0), LorenzRarity.EPIC to ReforgeAPI.StatList.mapOf(ReforgeAPI.StatType.Farming_Fortune to 8.0, ReforgeAPI.StatType.Speed to 1.0), LorenzRarity.LEGENDARY to ReforgeAPI.StatList.mapOf(ReforgeAPI.StatType.Farming_Fortune to 10.0, ReforgeAPI.StatType.Speed to 1.0), LorenzRarity.MYTHIC to ReforgeAPI.StatList.mapOf(ReforgeAPI.StatType.Farming_Fortune to 12.0, ReforgeAPI.StatType.Speed to 1.0)), "Large_Walnut".asInternalName()),
-        ReforgeAPI.Reforge("Bountiful", ReforgeAPI.ReforgeType.Hoes, mapOf(LorenzRarity.COMMON to ReforgeAPI.StatList.mapOf(ReforgeAPI.StatType.Speed to 1.0, ReforgeAPI.StatType.Farming_Fortune to 1.0), LorenzRarity.UNCOMMON to ReforgeAPI.StatList.mapOf(ReforgeAPI.StatType.Speed to 2.0, ReforgeAPI.StatType.Farming_Fortune to 2.0), LorenzRarity.RARE to ReforgeAPI.StatList.mapOf(ReforgeAPI.StatType.Speed to 3.0, ReforgeAPI.StatType.Farming_Fortune to 3.0), LorenzRarity.EPIC to ReforgeAPI.StatList.mapOf(ReforgeAPI.StatType.Speed to 5.0, ReforgeAPI.StatType.Farming_Fortune to 5.0), LorenzRarity.LEGENDARY to ReforgeAPI.StatList.mapOf(ReforgeAPI.StatType.Speed to 8.0, ReforgeAPI.StatType.Farming_Fortune to 7.0), LorenzRarity.MYTHIC to ReforgeAPI.StatList.mapOf(ReforgeAPI.StatType.Speed to 13.0, ReforgeAPI.StatType.Farming_Fortune to 10.0)), "Golden_Ball".asInternalName(), extraPropertyText = "§fGrants §6+0.2 Coins§f per crop dorpped."),
-        ReforgeAPI.Reforge("Beady", ReforgeAPI.ReforgeType.Vacuums, mapOf(LorenzRarity.COMMON to ReforgeAPI.StatList.mapOf(ReforgeAPI.StatType.Damage to 5.0, ReforgeAPI.StatType.Intelligence to 10.0), LorenzRarity.UNCOMMON to ReforgeAPI.StatList.mapOf(ReforgeAPI.StatType.Damage to 10.0, ReforgeAPI.StatType.Intelligence to 20.0), LorenzRarity.RARE to ReforgeAPI.StatList.mapOf(ReforgeAPI.StatType.Damage to 15.0, ReforgeAPI.StatType.Intelligence to 30.0), LorenzRarity.EPIC to ReforgeAPI.StatList.mapOf(ReforgeAPI.StatType.Damage to 20.0, ReforgeAPI.StatType.Intelligence to 40.0), LorenzRarity.LEGENDARY to ReforgeAPI.StatList.mapOf(ReforgeAPI.StatType.Damage to 25.0, ReforgeAPI.StatType.Intelligence to 50.0), LorenzRarity.MYTHIC to ReforgeAPI.StatList.mapOf(ReforgeAPI.StatType.Damage to 30.0, ReforgeAPI.StatType.Intelligence to 60.0)), "Beady_Eyes".asInternalName(), extraPropertyText = "§6Pests§f drop §a+3§f crops."),
-        ReforgeAPI.Reforge("Buzzing", ReforgeAPI.ReforgeType.Vacuums, mapOf(LorenzRarity.COMMON to ReforgeAPI.StatList.mapOf(ReforgeAPI.StatType.Speed to 3.0), LorenzRarity.UNCOMMON to ReforgeAPI.StatList.mapOf(ReforgeAPI.StatType.Speed to 4.0), LorenzRarity.RARE to ReforgeAPI.StatList.mapOf(ReforgeAPI.StatType.Speed to 5.0), LorenzRarity.EPIC to ReforgeAPI.StatList.mapOf(ReforgeAPI.StatType.Speed to 7.0), LorenzRarity.LEGENDARY to ReforgeAPI.StatList.mapOf(ReforgeAPI.StatType.Speed to 10.0), LorenzRarity.MYTHIC to ReforgeAPI.StatList.mapOf(ReforgeAPI.StatType.Speed to 15.0)), "Clipped_Wings".asInternalName(), extraPropertyText = "§fDoubles the ${ReforgeAPI.StatType.Damage.iconWithName}§f dealt by §aVacuums§f."),
-        ReforgeAPI.Reforge("Greater Spook", ReforgeAPI.ReforgeType.SpecialItems, mapOf(LorenzRarity.EPIC to ReforgeAPI.StatList.mapOf(ReforgeAPI.StatType.Fear to 1.0), LorenzRarity.LEGENDARY to ReforgeAPI.StatList.mapOf(ReforgeAPI.StatType.Fear to 1.0)), "Boo_Stone".asInternalName(), specialItems = (listOf("GREAT_SPOOK_HELMET", "GREAT_SPOOK_CHESTPLATE", "GREAT_SPOOK_LEGGINGS", "GREAT_SPOOK_BOOTS", "GREAT_SPOOK_BELT", "GREAT_SPOOK_CLOAK", "GREAT_SPOOK_NECKLACE", "GREAT_SPOOK_GLOVES")).map { it.asInternalName() })
+        ReforgeAPI.Reforge("Coldfused",
+            ReforgeType.SPECIAL_ITEMS,
+            mapOf(
+                LorenzRarity.COMMON to ReforgeAPI.StatList.mapOf(
+                    StatType.STRENGTH to 15.0, StatType.CRIT_DAMAGE to 20.0, StatType.MAGIC_FIND to 2.0
+                ), LorenzRarity.UNCOMMON to ReforgeAPI.StatList.mapOf(
+                    StatType.STRENGTH to 20.0, StatType.CRIT_DAMAGE to 30.0, StatType.MAGIC_FIND to 2.0
+                ), LorenzRarity.RARE to ReforgeAPI.StatList.mapOf(
+                    StatType.STRENGTH to 25.0, StatType.CRIT_DAMAGE to 40.0, StatType.MAGIC_FIND to 2.0
+                ), LorenzRarity.EPIC to ReforgeAPI.StatList.mapOf(
+                    StatType.STRENGTH to 35.0, StatType.CRIT_DAMAGE to 50.0, StatType.MAGIC_FIND to 2.0
+                ), LorenzRarity.LEGENDARY to ReforgeAPI.StatList.mapOf(
+                    StatType.STRENGTH to 45.0, StatType.CRIT_DAMAGE to 60.0, StatType.MAGIC_FIND to 2.0
+                ), LorenzRarity.MYTHIC to ReforgeAPI.StatList.mapOf(
+                    StatType.STRENGTH to 55.0, StatType.CRIT_DAMAGE to 75.0, StatType.MAGIC_FIND to 2.0
+                )
+            ),
+            "Entropy_Suppressor".asInternalName(),
+            extraPropertyText = "$7Only if Wisp is equipped\n§c+75${
+                StatType.STRENGTH.iconWithName
+            }\n§9+55 ${StatType.CRIT_DAMAGE.iconWithName}\n§fDeal §62x§f to fire pillars, breaking one grants +30 ${StatType.TRUE_DEFENCE.iconWithName} and §c+1.15x damage§f for §a60s§f.",
+            specialItems = (listOf(
+                "Firedust_Dagger",
+                "Kindlebane_Dagger",
+                "Mawdredge_Dagger",
+                "Pyrochaos_Dagger",
+                "Twilight_Dagger",
+                "Deathripper_Dagger"
+            )).map { it.asInternalName() }), ReforgeAPI.Reforge(
+            "Dirty", ReforgeType.SWORD_AND_ROD, mapOf(
+                LorenzRarity.COMMON to ReforgeAPI.StatList.mapOf(
+                    StatType.STRENGTH to 2.0, StatType.BONUS_ATTACK_SPEED to 2.0, StatType.FEROCITY to 2.0
+                ), LorenzRarity.UNCOMMON to ReforgeAPI.StatList.mapOf(
+                    StatType.STRENGTH to 4.0, StatType.BONUS_ATTACK_SPEED to 3.0, StatType.FEROCITY to 3.0
+                ), LorenzRarity.RARE to ReforgeAPI.StatList.mapOf(
+                    StatType.STRENGTH to 6.0, StatType.BONUS_ATTACK_SPEED to 5.0, StatType.FEROCITY to 6.0
+                ), LorenzRarity.EPIC to ReforgeAPI.StatList.mapOf(
+                    StatType.STRENGTH to 10.0, StatType.BONUS_ATTACK_SPEED to 10.0, StatType.FEROCITY to 9.0
+                ), LorenzRarity.LEGENDARY to ReforgeAPI.StatList.mapOf(
+                    StatType.STRENGTH to 12.0, StatType.BONUS_ATTACK_SPEED to 15.0, StatType.FEROCITY to 12.0
+                ), LorenzRarity.MYTHIC to ReforgeAPI.StatList.mapOf(
+                    StatType.STRENGTH to 15.0, StatType.BONUS_ATTACK_SPEED to 20.0, StatType.FEROCITY to 15.0
+                )
+            ), "Dirt_Bottle".asInternalName()
+        ), ReforgeAPI.Reforge(
+            "Fabled",
+            ReforgeType.SWORD,
+            mapOf(
+                LorenzRarity.COMMON to ReforgeAPI.StatList.mapOf(
+                    StatType.STRENGTH to 30.0, StatType.CRIT_DAMAGE to 15.0
+                ), LorenzRarity.UNCOMMON to ReforgeAPI.StatList.mapOf(
+                    StatType.STRENGTH to 35.0, StatType.CRIT_DAMAGE to 20.0
+                ), LorenzRarity.RARE to ReforgeAPI.StatList.mapOf(
+                    StatType.STRENGTH to 40.0, StatType.CRIT_DAMAGE to 25.0
+                ), LorenzRarity.EPIC to ReforgeAPI.StatList.mapOf(
+                    StatType.STRENGTH to 50.0, StatType.CRIT_DAMAGE to 32.0
+                ), LorenzRarity.LEGENDARY to ReforgeAPI.StatList.mapOf(
+                    StatType.STRENGTH to 60.0, StatType.CRIT_DAMAGE to 40.0
+                ), LorenzRarity.MYTHIC to ReforgeAPI.StatList.mapOf(
+                    StatType.STRENGTH to 75.0, StatType.CRIT_DAMAGE to 50.0
+                )
+            ),
+            "Dragon_Claw".asInternalName(),
+            extraPropertyText = "§fCritical hits hava a chance to deal up to §a+15%§f extra damage."
+        ), ReforgeAPI.Reforge(
+            "Gilded",
+            ReforgeType.SPECIAL_ITEMS,
+            mapOf(
+                LorenzRarity.LEGENDARY to ReforgeAPI.StatList.mapOf(
+                    StatType.DAMAGE to 75.0, StatType.STRENGTH to 75.0, StatType.INTELLIGENCE to 350.0
+                ), LorenzRarity.MYTHIC to ReforgeAPI.StatList.mapOf(
+                    StatType.DAMAGE to 90.0, StatType.STRENGTH to 90.0, StatType.INTELLIGENCE to 400.0
+                )
+            ),
+            "Midas_Jewel".asInternalName(),
+            listOf("Midas'_Sword".asInternalName(), "Midas_Staff".asInternalName()),
+            "§fUpon killing an enemy you have a low (§a1%§f) chance to grant a random amount of §6Coins§f to another player around you"
+        ), ReforgeAPI.Reforge(
+            "Suspicious",
+            ReforgeType.SWORD,
+            mapOf(
+                LorenzRarity.COMMON to ReforgeAPI.StatList.mapOf(
+                    StatType.CRIT_DAMAGE to 30.0, StatType.CRIT_CHANCE to 1.0
+                ), LorenzRarity.UNCOMMON to ReforgeAPI.StatList.mapOf(
+                    StatType.CRIT_DAMAGE to 40.0, StatType.CRIT_CHANCE to 2.0
+                ), LorenzRarity.RARE to ReforgeAPI.StatList.mapOf(
+                    StatType.CRIT_DAMAGE to 50.0, StatType.CRIT_CHANCE to 3.0
+                ), LorenzRarity.EPIC to ReforgeAPI.StatList.mapOf(
+                    StatType.CRIT_DAMAGE to 65.0, StatType.CRIT_CHANCE to 5.0
+                ), LorenzRarity.LEGENDARY to ReforgeAPI.StatList.mapOf(
+                    StatType.CRIT_DAMAGE to 85.0, StatType.CRIT_CHANCE to 7.0
+                ), LorenzRarity.MYTHIC to ReforgeAPI.StatList.mapOf(
+                    StatType.CRIT_DAMAGE to 110.0, StatType.CRIT_CHANCE to 10.0
+                )
+            ),
+            "Suspicious_Vial".asInternalName(),
+            extraPropertyText = "§fIncreases weapon ${StatType.DAMAGE.iconWithName}§f by §c+15§f."
+        ), ReforgeAPI.Reforge(
+            "Warped",
+            ReforgeType.SPECIAL_ITEMS,
+            mapOf(
+                LorenzRarity.RARE to ReforgeAPI.StatList.mapOf(
+                    StatType.DAMAGE to 165.0, StatType.STRENGTH to 165.0
+                ), LorenzRarity.EPIC to ReforgeAPI.StatList.mapOf(
+                    StatType.DAMAGE to 165.0, StatType.STRENGTH to 165.0
+                ), LorenzRarity.LEGENDARY to ReforgeAPI.StatList.mapOf(
+                    StatType.DAMAGE to 165.0, StatType.STRENGTH to 165.0, StatType.INTELLIGENCE to 65.0
+                )
+            ),
+            "Warped_Stone".asInternalName(),
+            listOf("Aspect_of_the_End".asInternalName(), "Aspect_of_the_Void".asInternalName())
+        ), ReforgeAPI.Reforge(
+            "Withered",
+            ReforgeType.SWORD,
+            mapOf(
+                LorenzRarity.COMMON to ReforgeAPI.StatList.mapOf(
+                    StatType.STRENGTH to 60.0
+                ),
+                LorenzRarity.UNCOMMON to ReforgeAPI.StatList.mapOf(StatType.STRENGTH to 75.0),
+                LorenzRarity.RARE to ReforgeAPI.StatList.mapOf(
+                    StatType.STRENGTH to 90.0
+                ),
+                LorenzRarity.EPIC to ReforgeAPI.StatList.mapOf(StatType.STRENGTH to 110.0),
+                LorenzRarity.LEGENDARY to ReforgeAPI.StatList.mapOf(
+                    StatType.STRENGTH to 135.0
+                ),
+                LorenzRarity.MYTHIC to ReforgeAPI.StatList.mapOf(StatType.STRENGTH to 170.0)
+            ),
+            "Wither_Blood".asInternalName(),
+            extraPropertyText = "§fGrants §c+1 ${StatType.STRENGTH.iconWithName}§f per §cCatacombs§f level."
+        ), ReforgeAPI.Reforge(
+            "Bulky", ReforgeType.SWORD, mapOf(
+                LorenzRarity.COMMON to ReforgeAPI.StatList.mapOf(
+                    StatType.HEALTH to 4.0, StatType.DEFENSE to 2.0
+                ),
+                LorenzRarity.UNCOMMON to ReforgeAPI.StatList.mapOf(
+                    StatType.HEALTH to 6.0, StatType.DEFENSE to 3.0
+                ),
+                LorenzRarity.RARE to ReforgeAPI.StatList.mapOf(StatType.HEALTH to 9.0, StatType.DEFENSE to 5.0),
+                LorenzRarity.EPIC to ReforgeAPI.StatList.mapOf(
+                    StatType.HEALTH to 12.0, StatType.DEFENSE to 8.0
+                ),
+                LorenzRarity.LEGENDARY to ReforgeAPI.StatList.mapOf(
+                    StatType.HEALTH to 15.0, StatType.DEFENSE to 13.0
+                ),
+                LorenzRarity.MYTHIC to ReforgeAPI.StatList.mapOf(
+                    StatType.HEALTH to 20.0, StatType.DEFENSE to 21.0
+                )
+            ), "Bulky_Stone".asInternalName()
+        ), ReforgeAPI.Reforge(
+            "Jerry's",
+            ReforgeType.SPECIAL_ITEMS,
+            mapOf(
+                LorenzRarity.COMMON to ReforgeAPI.StatList.mapOf(
+                    StatType.CRIT_DAMAGE to 50.0, StatType.CRIT_CHANCE to 10.0, StatType.STRENGTH to 25.0
+                ), LorenzRarity.UNCOMMON to ReforgeAPI.StatList.mapOf(
+                    StatType.CRIT_DAMAGE to 50.0, StatType.CRIT_CHANCE to 10.0, StatType.STRENGTH to 25.0
+                ), LorenzRarity.RARE to ReforgeAPI.StatList.mapOf(
+                    StatType.CRIT_DAMAGE to 50.0, StatType.CRIT_CHANCE to 10.0, StatType.STRENGTH to 25.0
+                )
+            ),
+            "Jerry_Stone".asInternalName(),
+            listOf("ASPECT_OF_THE_JERRY".asInternalName(), "ASPECT_OF_THE_JERRY_SIGNATURE".asInternalName()),
+            "§6Item Ability: No Parley\n§fConsumes all your mana and adds 10% of that amount as damage on your next AotJ hit."
+        ), ReforgeAPI.Reforge(
+            "Fanged", ReforgeType.SPECIAL_ITEMS, mapOf(
+                LorenzRarity.COMMON to ReforgeAPI.StatList.mapOf(
+                    StatType.STRENGTH to 30.0, StatType.CRIT_CHANCE to 3.0, StatType.BONUS_ATTACK_SPEED to 2.0
+                ), LorenzRarity.UNCOMMON to ReforgeAPI.StatList.mapOf(
+                    StatType.STRENGTH to 35.0, StatType.CRIT_CHANCE to 4.0, StatType.BONUS_ATTACK_SPEED to 3.0
+                ), LorenzRarity.RARE to ReforgeAPI.StatList.mapOf(
+                    StatType.STRENGTH to 40.0, StatType.CRIT_CHANCE to 5.0, StatType.BONUS_ATTACK_SPEED to 4.0
+                ), LorenzRarity.EPIC to ReforgeAPI.StatList.mapOf(
+                    StatType.STRENGTH to 50.0, StatType.CRIT_CHANCE to 7.0, StatType.BONUS_ATTACK_SPEED to 6.0
+                ), LorenzRarity.LEGENDARY to ReforgeAPI.StatList.mapOf(
+                    StatType.STRENGTH to 60.0, StatType.CRIT_CHANCE to 8.0, StatType.BONUS_ATTACK_SPEED to 9.0
+                ), LorenzRarity.MYTHIC to ReforgeAPI.StatList.mapOf(
+                    StatType.STRENGTH to 65.0, StatType.CRIT_CHANCE to 10.0, StatType.BONUS_ATTACK_SPEED to 10.0
+                )
+            ), "Full-Jaw_Fanging_Kit".asInternalName(), (listOf(
+                "Iron_Sword",
+                "Hunter_Knife",
+                "Flaming_Sword",
+                "Squire_Sword",
+                "Undead_Sword",
+                "Spider_Sword",
+                "Golem_Sword",
+                "Zombie_Sword",
+                "Yeti_Sword",
+                "Blade_of_the_Volacno",
+                "Recluse_Fang",
+                "Shaman_Sword",
+                "Voidwalker_Katana",
+                "Twilight_Dagger",
+                "Mawdredge_Dagger",
+                "Deathripper_Dagger",
+                "Dreadlord_Sword",
+                "Zombie_Knight_Sword",
+                "Zombie_Soldier_Cutlass",
+                "Slient_Death",
+                "Spirit_Sword",
+                "Livid_Dagger",
+                "Giant_Sword",
+                "Necromancer_Sword",
+                "Necron's_Blade_(Unrefined)",
+                "Valkyrie",
+                "Hyperion",
+                "Scylla",
+                "Astraea",
+                "Dreadlord_Sword"
+            )).map { it.asInternalName() }, "§fEvery §c7th§f melee hit on an enemy deals §c+100%§f damage."
+        ), ReforgeAPI.Reforge(
+            "Precise",
+            ReforgeType.BOW,
+            mapOf(
+                LorenzRarity.COMMON to ReforgeAPI.StatList.mapOf(
+                    StatType.STRENGTH to 3.0, StatType.CRIT_CHANCE to 8.0, StatType.CRIT_DAMAGE to 5.0
+                ), LorenzRarity.UNCOMMON to ReforgeAPI.StatList.mapOf(
+                    StatType.STRENGTH to 7.0, StatType.CRIT_CHANCE to 9.0, StatType.CRIT_DAMAGE to 10.0
+                ), LorenzRarity.RARE to ReforgeAPI.StatList.mapOf(
+                    StatType.STRENGTH to 12.0, StatType.CRIT_CHANCE to 10.0, StatType.CRIT_DAMAGE to 18.0
+                ), LorenzRarity.EPIC to ReforgeAPI.StatList.mapOf(
+                    StatType.STRENGTH to 18.0, StatType.CRIT_CHANCE to 11.0, StatType.CRIT_DAMAGE to 32.0
+                ), LorenzRarity.LEGENDARY to ReforgeAPI.StatList.mapOf(
+                    StatType.STRENGTH to 25.0, StatType.CRIT_CHANCE to 13.0, StatType.CRIT_DAMAGE to 50.0
+                ), LorenzRarity.MYTHIC to ReforgeAPI.StatList.mapOf(
+                    StatType.STRENGTH to 34.0, StatType.CRIT_CHANCE to 15.0, StatType.CRIT_DAMAGE to 70.0
+                )
+            ),
+            "OPTICAL_LENSE".asInternalName(),
+            extraPropertyText = "§fDeal §a+10%§f extra damage when arrows hit the head of a mob"
+        ), ReforgeAPI.Reforge(
+            "Spiritual",
+            ReforgeType.BOW,
+            mapOf(
+                LorenzRarity.COMMON to ReforgeAPI.StatList.mapOf(
+                    StatType.STRENGTH to 4.0, StatType.CRIT_CHANCE to 7.0, StatType.CRIT_DAMAGE to 10.0
+                ), LorenzRarity.UNCOMMON to ReforgeAPI.StatList.mapOf(
+                    StatType.STRENGTH to 8.0, StatType.CRIT_CHANCE to 8.0, StatType.CRIT_DAMAGE to 15.0
+                ), LorenzRarity.RARE to ReforgeAPI.StatList.mapOf(
+                    StatType.STRENGTH to 14.0, StatType.CRIT_CHANCE to 9.0, StatType.CRIT_DAMAGE to 23.0
+                ), LorenzRarity.EPIC to ReforgeAPI.StatList.mapOf(
+                    StatType.STRENGTH to 20.0, StatType.CRIT_CHANCE to 10.0, StatType.CRIT_DAMAGE to 37.0
+                ), LorenzRarity.LEGENDARY to ReforgeAPI.StatList.mapOf(
+                    StatType.STRENGTH to 28.0, StatType.CRIT_CHANCE to 12.0, StatType.CRIT_DAMAGE to 55.0
+                ), LorenzRarity.MYTHIC to ReforgeAPI.StatList.mapOf(
+                    StatType.STRENGTH to 38.0, StatType.CRIT_CHANCE to 14.0, StatType.CRIT_DAMAGE to 75.0
+                )
+            ),
+            "SPIRIT_STONE".asInternalName(),
+            extraPropertyText = "§fGrants a §a10%§f chance to spawn a Spirit Decoy when you kill an enemy in a Dungeon"
+        ), ReforgeAPI.Reforge(
+            "Headstrong",
+            ReforgeType.BOW,
+            mapOf(
+                LorenzRarity.COMMON to ReforgeAPI.StatList.mapOf(
+                    StatType.STRENGTH to 2.0, StatType.CRIT_CHANCE to 10.0, StatType.CRIT_DAMAGE to 4.0
+                ), LorenzRarity.UNCOMMON to ReforgeAPI.StatList.mapOf(
+                    StatType.STRENGTH to 5.0, StatType.CRIT_CHANCE to 11.0, StatType.CRIT_DAMAGE to 8.0
+                ), LorenzRarity.RARE to ReforgeAPI.StatList.mapOf(
+                    StatType.STRENGTH to 10.0, StatType.CRIT_CHANCE to 12.0, StatType.CRIT_DAMAGE to 16.0
+                ), LorenzRarity.EPIC to ReforgeAPI.StatList.mapOf(
+                    StatType.STRENGTH to 16.0, StatType.CRIT_CHANCE to 13.0, StatType.CRIT_DAMAGE to 28.0
+                ), LorenzRarity.LEGENDARY to ReforgeAPI.StatList.mapOf(
+                    StatType.STRENGTH to 23.0, StatType.CRIT_CHANCE to 15.0, StatType.CRIT_DAMAGE to 42.0
+                ), LorenzRarity.MYTHIC to ReforgeAPI.StatList.mapOf(
+                    StatType.STRENGTH to 33.0, StatType.CRIT_CHANCE to 17.0, StatType.CRIT_DAMAGE to 60.0
+                )
+            ),
+            "SALMON_OPAL".asInternalName(),
+            extraPropertyText = "§fDeal §a+8%§f extra damage when arrows hit the head of a mob"
+        ), ReforgeAPI.Reforge(
+            "Candied",
+            ReforgeType.ARMOR,
+            mapOf(
+                LorenzRarity.COMMON to ReforgeAPI.StatList.mapOf(
+                    StatType.HEALTH to 1.0, StatType.DEFENSE to 1.0
+                ),
+                LorenzRarity.UNCOMMON to ReforgeAPI.StatList.mapOf(
+                    StatType.HEALTH to 2.0, StatType.DEFENSE to 1.0
+                ),
+                LorenzRarity.RARE to ReforgeAPI.StatList.mapOf(StatType.HEALTH to 4.0, StatType.DEFENSE to 2.0),
+                LorenzRarity.EPIC to ReforgeAPI.StatList.mapOf(
+                    StatType.HEALTH to 6.0, StatType.DEFENSE to 3.0
+                ),
+                LorenzRarity.LEGENDARY to ReforgeAPI.StatList.mapOf(
+                    StatType.HEALTH to 8.0, StatType.DEFENSE to 4.0
+                ),
+                LorenzRarity.MYTHIC to ReforgeAPI.StatList.mapOf(StatType.HEALTH to 10.0, StatType.DEFENSE to 5.0)
+            ),
+            "Candy_Corn".asInternalName(),
+            extraPropertyText = "§fIncreases the chance to find candy during the §6Spooky Festival§f by §a+1%§f."
+        ), ReforgeAPI.Reforge(
+            "Submerged", ReforgeType.ARMOR, mapOf(
+                LorenzRarity.COMMON to ReforgeAPI.StatList.mapOf(
+                    StatType.CRIT_CHANCE to 2.0, StatType.SEA_CREATURE_CHANCE to 0.5, StatType.FISHING_SPEED to 1.0
+                ), LorenzRarity.UNCOMMON to ReforgeAPI.StatList.mapOf(
+                    StatType.CRIT_CHANCE to 4.0, StatType.SEA_CREATURE_CHANCE to 0.6, StatType.FISHING_SPEED to 1.0
+                ), LorenzRarity.RARE to ReforgeAPI.StatList.mapOf(
+                    StatType.CRIT_CHANCE to 6.0, StatType.SEA_CREATURE_CHANCE to 0.7, StatType.FISHING_SPEED to 2.0
+                ), LorenzRarity.EPIC to ReforgeAPI.StatList.mapOf(
+                    StatType.CRIT_CHANCE to 8.0, StatType.SEA_CREATURE_CHANCE to 0.8, StatType.FISHING_SPEED to 3.0
+                ), LorenzRarity.LEGENDARY to ReforgeAPI.StatList.mapOf(
+                    StatType.CRIT_CHANCE to 10.0, StatType.SEA_CREATURE_CHANCE to 0.9, StatType.FISHING_SPEED to 4.0
+                ), LorenzRarity.MYTHIC to ReforgeAPI.StatList.mapOf(
+                    StatType.CRIT_CHANCE to 12.0, StatType.SEA_CREATURE_CHANCE to 1.0, StatType.FISHING_SPEED to 5.0
+                )
+            ), "Deep_Sea_Orb".asInternalName()
+        ), ReforgeAPI.Reforge(
+            "Perfect",
+            ReforgeType.ARMOR,
+            mapOf(
+                LorenzRarity.COMMON to ReforgeAPI.StatList.mapOf(
+                    StatType.DEFENSE to 25.0
+                ),
+                LorenzRarity.UNCOMMON to ReforgeAPI.StatList.mapOf(StatType.DEFENSE to 35.0),
+                LorenzRarity.RARE to ReforgeAPI.StatList.mapOf(
+                    StatType.DEFENSE to 50.0
+                ),
+                LorenzRarity.EPIC to ReforgeAPI.StatList.mapOf(StatType.DEFENSE to 65.0),
+                LorenzRarity.LEGENDARY to ReforgeAPI.StatList.mapOf(
+                    StatType.DEFENSE to 80.0
+                ),
+                LorenzRarity.MYTHIC to ReforgeAPI.StatList.mapOf(StatType.DEFENSE to 110.0)
+            ),
+            "Diamond_Atom".asInternalName(),
+            extraPropertyText = "§fIncreases ${StatType.DEFENSE.iconWithName}§f by §a+2%§f."
+        ), ReforgeAPI.Reforge(
+            "Reinforced", ReforgeType.ARMOR, mapOf(
+                LorenzRarity.COMMON to ReforgeAPI.StatList.mapOf(
+                    StatType.DEFENSE to 25.0
+                ),
+                LorenzRarity.UNCOMMON to ReforgeAPI.StatList.mapOf(StatType.DEFENSE to 35.0),
+                LorenzRarity.RARE to ReforgeAPI.StatList.mapOf(
+                    StatType.DEFENSE to 50.0
+                ),
+                LorenzRarity.EPIC to ReforgeAPI.StatList.mapOf(StatType.DEFENSE to 65.0),
+                LorenzRarity.LEGENDARY to ReforgeAPI.StatList.mapOf(
+                    StatType.DEFENSE to 80.0
+                ),
+                LorenzRarity.MYTHIC to ReforgeAPI.StatList.mapOf(StatType.DEFENSE to 110.0)
+            ), "Rare_Diamond".asInternalName()
+        ), ReforgeAPI.Reforge(
+            "Renowned", ReforgeType.ARMOR, mapOf(
+                LorenzRarity.COMMON to ReforgeAPI.StatList.mapOf(
+                    StatType.STRENGTH to 3.0,
+                    StatType.CRIT_CHANCE to 2.0,
+                    StatType.CRIT_DAMAGE to 3.0,
+                    StatType.BONUS_ATTACK_SPEED to 1.0,
+                    StatType.HEALTH to 2.0,
+                    StatType.DEFENSE to 2.0,
+                    StatType.SPEED to 1.0,
+                    StatType.INTELLIGENCE to 3.0
+                ), LorenzRarity.UNCOMMON to ReforgeAPI.StatList.mapOf(
+                    StatType.STRENGTH to 4.0,
+                    StatType.CRIT_CHANCE to 4.0,
+                    StatType.CRIT_DAMAGE to 4.0,
+                    StatType.BONUS_ATTACK_SPEED to 1.0,
+                    StatType.HEALTH to 3.0,
+                    StatType.DEFENSE to 3.0,
+                    StatType.SPEED to 1.0,
+                    StatType.INTELLIGENCE to 4.0
+                ), LorenzRarity.RARE to ReforgeAPI.StatList.mapOf(
+                    StatType.STRENGTH to 6.0,
+                    StatType.CRIT_CHANCE to 6.0,
+                    StatType.CRIT_DAMAGE to 6.0,
+                    StatType.BONUS_ATTACK_SPEED to 2.0,
+                    StatType.HEALTH to 4.0,
+                    StatType.DEFENSE to 4.0,
+                    StatType.SPEED to 1.0,
+                    StatType.INTELLIGENCE to 6.0
+                ), LorenzRarity.EPIC to ReforgeAPI.StatList.mapOf(
+                    StatType.STRENGTH to 8.0,
+                    StatType.CRIT_CHANCE to 8.0,
+                    StatType.CRIT_DAMAGE to 8.0,
+                    StatType.BONUS_ATTACK_SPEED to 3.0,
+                    StatType.HEALTH to 6.0,
+                    StatType.DEFENSE to 6.0,
+                    StatType.SPEED to 1.0,
+                    StatType.INTELLIGENCE to 8.0
+                ), LorenzRarity.LEGENDARY to ReforgeAPI.StatList.mapOf(
+                    StatType.STRENGTH to 10.0,
+                    StatType.CRIT_CHANCE to 10.0,
+                    StatType.CRIT_DAMAGE to 10.0,
+                    StatType.BONUS_ATTACK_SPEED to 4.0,
+                    StatType.HEALTH to 8.0,
+                    StatType.DEFENSE to 8.0,
+                    StatType.SPEED to 1.0,
+                    StatType.INTELLIGENCE to 10.0
+                ), LorenzRarity.MYTHIC to ReforgeAPI.StatList.mapOf(
+                    StatType.STRENGTH to 12.0,
+                    StatType.CRIT_CHANCE to 12.0,
+                    StatType.CRIT_DAMAGE to 12.0,
+                    StatType.BONUS_ATTACK_SPEED to 5.0,
+                    StatType.HEALTH to 10.0,
+                    StatType.DEFENSE to 10.0,
+                    StatType.SPEED to 1.0,
+                    StatType.INTELLIGENCE to 12.0
+                )
+            ), "Dragon_Horn".asInternalName(), extraPropertyText = "§fIncreases most stats by §a1%§f."
+        ), ReforgeAPI.Reforge(
+            "Spiked", ReforgeType.ARMOR, mapOf(
+                LorenzRarity.COMMON to ReforgeAPI.StatList.mapOf(
+                    StatType.STRENGTH to 3.0,
+                    StatType.CRIT_CHANCE to 2.0,
+                    StatType.CRIT_DAMAGE to 3.0,
+                    StatType.BONUS_ATTACK_SPEED to 1.0,
+                    StatType.HEALTH to 2.0,
+                    StatType.DEFENSE to 2.0,
+                    StatType.SPEED to 1.0,
+                    StatType.INTELLIGENCE to 3.0
+                ), LorenzRarity.UNCOMMON to ReforgeAPI.StatList.mapOf(
+                    StatType.STRENGTH to 4.0,
+                    StatType.CRIT_CHANCE to 4.0,
+                    StatType.CRIT_DAMAGE to 4.0,
+                    StatType.BONUS_ATTACK_SPEED to 1.0,
+                    StatType.HEALTH to 3.0,
+                    StatType.DEFENSE to 3.0,
+                    StatType.SPEED to 1.0,
+                    StatType.INTELLIGENCE to 4.0
+                ), LorenzRarity.RARE to ReforgeAPI.StatList.mapOf(
+                    StatType.STRENGTH to 6.0,
+                    StatType.CRIT_CHANCE to 6.0,
+                    StatType.CRIT_DAMAGE to 6.0,
+                    StatType.BONUS_ATTACK_SPEED to 2.0,
+                    StatType.HEALTH to 4.0,
+                    StatType.DEFENSE to 4.0,
+                    StatType.SPEED to 1.0,
+                    StatType.INTELLIGENCE to 6.0
+                ), LorenzRarity.EPIC to ReforgeAPI.StatList.mapOf(
+                    StatType.STRENGTH to 8.0,
+                    StatType.CRIT_CHANCE to 8.0,
+                    StatType.CRIT_DAMAGE to 8.0,
+                    StatType.BONUS_ATTACK_SPEED to 3.0,
+                    StatType.HEALTH to 6.0,
+                    StatType.DEFENSE to 6.0,
+                    StatType.SPEED to 1.0,
+                    StatType.INTELLIGENCE to 8.0
+                ), LorenzRarity.LEGENDARY to ReforgeAPI.StatList.mapOf(
+                    StatType.STRENGTH to 10.0,
+                    StatType.CRIT_CHANCE to 10.0,
+                    StatType.CRIT_DAMAGE to 10.0,
+                    StatType.BONUS_ATTACK_SPEED to 4.0,
+                    StatType.HEALTH to 8.0,
+                    StatType.DEFENSE to 8.0,
+                    StatType.SPEED to 1.0,
+                    StatType.INTELLIGENCE to 10.0
+                ), LorenzRarity.MYTHIC to ReforgeAPI.StatList.mapOf(
+                    StatType.STRENGTH to 12.0,
+                    StatType.CRIT_CHANCE to 12.0,
+                    StatType.CRIT_DAMAGE to 12.0,
+                    StatType.BONUS_ATTACK_SPEED to 5.0,
+                    StatType.HEALTH to 10.0,
+                    StatType.DEFENSE to 10.0,
+                    StatType.SPEED to 1.0,
+                    StatType.INTELLIGENCE to 12.0
+                )
+            ), "Dragon_Scale".asInternalName()
+        ), ReforgeAPI.Reforge(
+            "Hyper",
+            ReforgeType.ARMOR,
+            mapOf(
+                LorenzRarity.COMMON to ReforgeAPI.StatList.mapOf(
+                    StatType.STRENGTH to 2.0, StatType.BONUS_ATTACK_SPEED to 2.0, StatType.SPEED to 1.0
+                ), LorenzRarity.UNCOMMON to ReforgeAPI.StatList.mapOf(
+                    StatType.STRENGTH to 4.0, StatType.BONUS_ATTACK_SPEED to 3.0, StatType.SPEED to 1.0
+                ), LorenzRarity.RARE to ReforgeAPI.StatList.mapOf(
+                    StatType.STRENGTH to 6.0, StatType.BONUS_ATTACK_SPEED to 4.0, StatType.SPEED to 2.0
+                ), LorenzRarity.EPIC to ReforgeAPI.StatList.mapOf(
+                    StatType.STRENGTH to 7.0, StatType.BONUS_ATTACK_SPEED to 5.0, StatType.SPEED to 2.0
+                ), LorenzRarity.LEGENDARY to ReforgeAPI.StatList.mapOf(
+                    StatType.STRENGTH to 10.0, StatType.BONUS_ATTACK_SPEED to 6.0, StatType.SPEED to 3.0
+                ), LorenzRarity.MYTHIC to ReforgeAPI.StatList.mapOf(
+                    StatType.STRENGTH to 12.0, StatType.BONUS_ATTACK_SPEED to 7.0, StatType.SPEED to 3.0
+                )
+            ),
+            "End_Stone_Geode".asInternalName(),
+            extraPropertyText = "§fGain §a+$${StatType.SPEED.iconWithName} for §a5s§f after teleporting.",
+            customStat = mapOf(
+                LorenzRarity.COMMON to 1.0,
+                LorenzRarity.UNCOMMON to 2.0,
+                LorenzRarity.RARE to 3.0,
+                LorenzRarity.EPIC to 4.0,
+                LorenzRarity.LEGENDARY to 5.0,
+                LorenzRarity.MYTHIC to 6.0
+            )
+        ), ReforgeAPI.Reforge(
+            "Giant", ReforgeType.ARMOR, mapOf(
+                LorenzRarity.COMMON to ReforgeAPI.StatList.mapOf(
+                    StatType.HEALTH to 50.0
+                ),
+                LorenzRarity.UNCOMMON to ReforgeAPI.StatList.mapOf(StatType.HEALTH to 60.0),
+                LorenzRarity.RARE to ReforgeAPI.StatList.mapOf(
+                    StatType.HEALTH to 80.0
+                ),
+                LorenzRarity.EPIC to ReforgeAPI.StatList.mapOf(StatType.HEALTH to 120.0),
+                LorenzRarity.LEGENDARY to ReforgeAPI.StatList.mapOf(
+                    StatType.HEALTH to 180.0
+                ),
+                LorenzRarity.MYTHIC to ReforgeAPI.StatList.mapOf(StatType.HEALTH to 240.0)
+            ), "Giant_Tooth".asInternalName()
+        ), ReforgeAPI.Reforge(
+            "Jaded", ReforgeType.ARMOR, mapOf(
+                LorenzRarity.COMMON to ReforgeAPI.StatList.mapOf(
+                    StatType.MINING_SPEED to 5.0, StatType.MINING_FORTUNE to 5.0
+                ), LorenzRarity.UNCOMMON to ReforgeAPI.StatList.mapOf(
+                    StatType.MINING_SPEED to 12.0, StatType.MINING_FORTUNE to 10.0
+                ), LorenzRarity.RARE to ReforgeAPI.StatList.mapOf(
+                    StatType.MINING_SPEED to 20.0, StatType.MINING_FORTUNE to 15.0
+                ), LorenzRarity.EPIC to ReforgeAPI.StatList.mapOf(
+                    StatType.MINING_SPEED to 30.0, StatType.MINING_FORTUNE to 20.0
+                ), LorenzRarity.LEGENDARY to ReforgeAPI.StatList.mapOf(
+                    StatType.MINING_SPEED to 45.0, StatType.MINING_FORTUNE to 25.0
+                ), LorenzRarity.MYTHIC to ReforgeAPI.StatList.mapOf(
+                    StatType.MINING_SPEED to 60.0, StatType.MINING_FORTUNE to 30.0
+                )
+            ), "Jaderald".asInternalName()
+        ), ReforgeAPI.Reforge(
+            "Cubic", ReforgeType.ARMOR, mapOf(
+                LorenzRarity.COMMON to ReforgeAPI.StatList.mapOf(
+                    StatType.STRENGTH to 3.0, StatType.HEALTH to 5.0
+                ),
+                LorenzRarity.UNCOMMON to ReforgeAPI.StatList.mapOf(
+                    StatType.STRENGTH to 5.0, StatType.HEALTH to 7.0
+                ),
+                LorenzRarity.RARE to ReforgeAPI.StatList.mapOf(StatType.STRENGTH to 7.0, StatType.HEALTH to 10.0),
+                LorenzRarity.EPIC to ReforgeAPI.StatList.mapOf(
+                    StatType.STRENGTH to 10.0, StatType.HEALTH to 15.0
+                ),
+                LorenzRarity.LEGENDARY to ReforgeAPI.StatList.mapOf(
+                    StatType.STRENGTH to 12.0, StatType.HEALTH to 20.0
+                ),
+                LorenzRarity.MYTHIC to ReforgeAPI.StatList.mapOf(
+                    StatType.STRENGTH to 15.0, StatType.HEALTH to 25.0
+                )
+            ), "Molten_Cube".asInternalName(), extraPropertyText = "§Decreases damage taken from Nether mobs by §a2%§f."
+        ), ReforgeAPI.Reforge(
+            "Necrotic", ReforgeType.ARMOR, mapOf(
+                LorenzRarity.COMMON to ReforgeAPI.StatList.mapOf(
+                    StatType.INTELLIGENCE to 30.0
+                ),
+                LorenzRarity.UNCOMMON to ReforgeAPI.StatList.mapOf(StatType.INTELLIGENCE to 60.0),
+                LorenzRarity.RARE to ReforgeAPI.StatList.mapOf(
+                    StatType.INTELLIGENCE to 90.0
+                ),
+                LorenzRarity.EPIC to ReforgeAPI.StatList.mapOf(StatType.INTELLIGENCE to 120.0),
+                LorenzRarity.LEGENDARY to ReforgeAPI.StatList.mapOf(
+                    StatType.INTELLIGENCE to 150.0
+                ),
+                LorenzRarity.MYTHIC to ReforgeAPI.StatList.mapOf(StatType.INTELLIGENCE to 200.0)
+            ), "Necromancer's_Brooch".asInternalName()
+        ), ReforgeAPI.Reforge(
+            "Empowered",
+            ReforgeType.ARMOR,
+            mapOf(
+                LorenzRarity.COMMON to ReforgeAPI.StatList.mapOf(StatType.HEALTH to 10.0, StatType.DEFENSE to 10.0),
+                LorenzRarity.UNCOMMON to ReforgeAPI.StatList.mapOf(
+                    StatType.HEALTH to 15.0, StatType.DEFENSE to 15.0
+                ),
+                LorenzRarity.RARE to ReforgeAPI.StatList.mapOf(
+                    StatType.HEALTH to 20.0, StatType.DEFENSE to 20.0
+                ),
+                LorenzRarity.EPIC to ReforgeAPI.StatList.mapOf(
+                    StatType.HEALTH to 25.0, StatType.DEFENSE to 25.0
+                ),
+                LorenzRarity.LEGENDARY to ReforgeAPI.StatList.mapOf(
+                    StatType.HEALTH to 35.0, StatType.DEFENSE to 35.0
+                ),
+                LorenzRarity.MYTHIC to ReforgeAPI.StatList.mapOf(
+                    StatType.HEALTH to 50.0, StatType.DEFENSE to 50.0
+                )
+            ),
+            "Sadan's_Brooch".asInternalName(),
+            extraPropertyText = "§Grants §a+10 ${StatType.MENDING.iconWithName}§f while in Dungeons, which increases your healing on others."
+        ), ReforgeAPI.Reforge(
+            "Ancient",
+            ReforgeType.ARMOR,
+            mapOf(
+                LorenzRarity.COMMON to ReforgeAPI.StatList.mapOf(
+                    StatType.STRENGTH to 4.0,
+                    StatType.CRIT_CHANCE to 3.0,
+                    StatType.HEALTH to 7.0,
+                    StatType.DEFENSE to 7.0,
+                    StatType.INTELLIGENCE to 6.0
+                ), LorenzRarity.UNCOMMON to ReforgeAPI.StatList.mapOf(
+                    StatType.STRENGTH to 8.0,
+                    StatType.CRIT_CHANCE to 5.0,
+                    StatType.HEALTH to 7.0,
+                    StatType.DEFENSE to 7.0,
+                    StatType.INTELLIGENCE to 9.0
+                ), LorenzRarity.RARE to ReforgeAPI.StatList.mapOf(
+                    StatType.STRENGTH to 12.0,
+                    StatType.CRIT_CHANCE to 7.0,
+                    StatType.HEALTH to 7.0,
+                    StatType.DEFENSE to 7.0,
+                    StatType.INTELLIGENCE to 12.0
+                ), LorenzRarity.EPIC to ReforgeAPI.StatList.mapOf(
+                    StatType.STRENGTH to 18.0,
+                    StatType.CRIT_CHANCE to 9.0,
+                    StatType.HEALTH to 7.0,
+                    StatType.DEFENSE to 7.0,
+                    StatType.INTELLIGENCE to 16.0
+                ), LorenzRarity.LEGENDARY to ReforgeAPI.StatList.mapOf(
+                    StatType.STRENGTH to 25.0,
+                    StatType.CRIT_CHANCE to 12.0,
+                    StatType.HEALTH to 7.0,
+                    StatType.DEFENSE to 7.0,
+                    StatType.INTELLIGENCE to 20.0
+                ), LorenzRarity.MYTHIC to ReforgeAPI.StatList.mapOf(
+                    StatType.STRENGTH to 35.0,
+                    StatType.CRIT_CHANCE to 15.0,
+                    StatType.HEALTH to 7.0,
+                    StatType.DEFENSE to 7.0,
+                    StatType.INTELLIGENCE to 25.0
+                )
+            ),
+            "Precursor_Gear".asInternalName(),
+            extraPropertyText = "§f Grants §9+1 ${StatType.CRIT_DAMAGE.iconWithName}§f per Catacombs level."
+        ), ReforgeAPI.Reforge(
+            "Undead",
+            ReforgeType.ARMOR,
+            mapOf(
+                LorenzRarity.COMMON to ReforgeAPI.StatList.mapOf(
+                    StatType.STRENGTH to 1.0,
+                    StatType.BONUS_ATTACK_SPEED to 1.0,
+                    StatType.HEALTH to 6.0,
+                    StatType.DEFENSE to 6.0
+                ), LorenzRarity.UNCOMMON to ReforgeAPI.StatList.mapOf(
+                    StatType.STRENGTH to 2.0,
+                    StatType.BONUS_ATTACK_SPEED to 2.0,
+                    StatType.HEALTH to 8.0,
+                    StatType.DEFENSE to 8.0
+                ), LorenzRarity.RARE to ReforgeAPI.StatList.mapOf(
+                    StatType.STRENGTH to 2.0,
+                    StatType.BONUS_ATTACK_SPEED to 3.0,
+                    StatType.HEALTH to 12.0,
+                    StatType.DEFENSE to 12.0
+                ), LorenzRarity.EPIC to ReforgeAPI.StatList.mapOf(
+                    StatType.STRENGTH to 3.0,
+                    StatType.BONUS_ATTACK_SPEED to 4.0,
+                    StatType.HEALTH to 18.0,
+                    StatType.DEFENSE to 18.0
+                ), LorenzRarity.LEGENDARY to ReforgeAPI.StatList.mapOf(
+                    StatType.STRENGTH to 5.0,
+                    StatType.BONUS_ATTACK_SPEED to 5.0,
+                    StatType.HEALTH to 25.0,
+                    StatType.DEFENSE to 25.0
+                ), LorenzRarity.MYTHIC to ReforgeAPI.StatList.mapOf(
+                    StatType.STRENGTH to 7.0,
+                    StatType.BONUS_ATTACK_SPEED to 6.0,
+                    StatType.HEALTH to 33.0,
+                    StatType.DEFENSE to 33.0
+                )
+            ),
+            "Premium_Flesh".asInternalName(),
+            extraPropertyText = "§fDecreases damage taken from Zombie Pigmen, Zombies, Withers, and Skeltons, by §a+2"
+        ), ReforgeAPI.Reforge(
+            "Loving", ReforgeType.CHESTPLATE, mapOf(
+                LorenzRarity.COMMON to ReforgeAPI.StatList.mapOf(
+                    StatType.HEALTH to 4.0,
+                    StatType.DEFENSE to 4.0,
+                    StatType.INTELLIGENCE to 20.0,
+                    StatType.ABILITY_DAMAGE to 5.0
+                ), LorenzRarity.UNCOMMON to ReforgeAPI.StatList.mapOf(
+                    StatType.HEALTH to 5.0,
+                    StatType.DEFENSE to 5.0,
+                    StatType.INTELLIGENCE to 40.0,
+                    StatType.ABILITY_DAMAGE to 5.0
+                ), LorenzRarity.RARE to ReforgeAPI.StatList.mapOf(
+                    StatType.HEALTH to 6.0,
+                    StatType.DEFENSE to 6.0,
+                    StatType.INTELLIGENCE to 60.0,
+                    StatType.ABILITY_DAMAGE to 5.0
+                ), LorenzRarity.EPIC to ReforgeAPI.StatList.mapOf(
+                    StatType.HEALTH to 8.0,
+                    StatType.DEFENSE to 7.0,
+                    StatType.INTELLIGENCE to 80.0,
+                    StatType.ABILITY_DAMAGE to 5.0
+                ), LorenzRarity.LEGENDARY to ReforgeAPI.StatList.mapOf(
+                    StatType.HEALTH to 10.0,
+                    StatType.DEFENSE to 10.0,
+                    StatType.INTELLIGENCE to 100.0,
+                    StatType.ABILITY_DAMAGE to 5.0
+                ), LorenzRarity.MYTHIC to ReforgeAPI.StatList.mapOf(
+                    StatType.HEALTH to 14.0,
+                    StatType.DEFENSE to 14.0,
+                    StatType.INTELLIGENCE to 120.0,
+                    StatType.ABILITY_DAMAGE to 5.0
+                )
+            ), "Red_Scarf".asInternalName()
+        ), ReforgeAPI.Reforge(
+            "Ridiculous",
+            ReforgeType.HELMET,
+            mapOf(
+                LorenzRarity.COMMON to ReforgeAPI.StatList.mapOf(
+                    StatType.CRIT_CHANCE to 1.0, StatType.HEALTH to 10.0, StatType.DEFENSE to 10.0
+                ), LorenzRarity.UNCOMMON to ReforgeAPI.StatList.mapOf(
+                    StatType.CRIT_CHANCE to 2.0, StatType.HEALTH to 15.0, StatType.DEFENSE to 15.0
+                ), LorenzRarity.RARE to ReforgeAPI.StatList.mapOf(
+                    StatType.CRIT_CHANCE to 3.0, StatType.HEALTH to 20.0, StatType.DEFENSE to 20.0
+                ), LorenzRarity.EPIC to ReforgeAPI.StatList.mapOf(
+                    StatType.CRIT_CHANCE to 4.0, StatType.HEALTH to 25.0, StatType.DEFENSE to 25.0
+                ), LorenzRarity.LEGENDARY to ReforgeAPI.StatList.mapOf(
+                    StatType.CRIT_CHANCE to 5.0, StatType.HEALTH to 35.0, StatType.DEFENSE to 35.0
+                ), LorenzRarity.MYTHIC to ReforgeAPI.StatList.mapOf(
+                    StatType.CRIT_CHANCE to 6.0, StatType.HEALTH to 50.0, StatType.DEFENSE to 50.0
+                )
+            ),
+            "Red_Nose".asInternalName(),
+            extraPropertyText = "§fFart when you sneak. Reduces your ${StatType.CRIT_CHANCE.iconWithName}§f by §c20%§f for §a20s§f but grants §a+30 ${StatType.DEFENSE.iconWithName}§f for §a5s§f and §b+50 ${StatType.INTELLIGENCE.icon} Mana§f. Requires at least §920% ${StatType.CRIT_CHANCE.iconWithName}§f to activate."
+        ), ReforgeAPI.Reforge(
+            "Bustling", ReforgeType.ARMOR, mapOf(
+                LorenzRarity.COMMON to ReforgeAPI.StatList.mapOf(
+                    StatType.FARMING_FORTUNE to 1.0
+                ),
+                LorenzRarity.UNCOMMON to ReforgeAPI.StatList.mapOf(StatType.FARMING_FORTUNE to 2.0),
+                LorenzRarity.RARE to ReforgeAPI.StatList.mapOf(
+                    StatType.FARMING_FORTUNE to 4.0
+                ),
+                LorenzRarity.EPIC to ReforgeAPI.StatList.mapOf(StatType.FARMING_FORTUNE to 6.0),
+                LorenzRarity.LEGENDARY to ReforgeAPI.StatList.mapOf(
+                    StatType.FARMING_FORTUNE to 8.0
+                ),
+                LorenzRarity.MYTHIC to ReforgeAPI.StatList.mapOf(StatType.FARMING_FORTUNE to 10.0)
+            ), "SkyMart_Brochure".asInternalName()
+        ), ReforgeAPI.Reforge(
+            "Mossy", ReforgeType.ARMOR, mapOf(
+                LorenzRarity.COMMON to ReforgeAPI.StatList.mapOf(
+                    StatType.FARMING_FORTUNE to 5.0, StatType.SPEED to 3.0
+                ), LorenzRarity.UNCOMMON to ReforgeAPI.StatList.mapOf(
+                    StatType.FARMING_FORTUNE to 10.0, StatType.SPEED to 3.0
+                ), LorenzRarity.RARE to ReforgeAPI.StatList.mapOf(
+                    StatType.FARMING_FORTUNE to 15.0, StatType.SPEED to 5.0
+                ), LorenzRarity.EPIC to ReforgeAPI.StatList.mapOf(
+                    StatType.FARMING_FORTUNE to 20.0, StatType.SPEED to 5.0
+                ), LorenzRarity.LEGENDARY to ReforgeAPI.StatList.mapOf(
+                    StatType.FARMING_FORTUNE to 25.0, StatType.SPEED to 7.0
+                ), LorenzRarity.MYTHIC to ReforgeAPI.StatList.mapOf(
+                    StatType.FARMING_FORTUNE to 30.0, StatType.SPEED to 7.0
+                )
+            ), "Overgrown_Grass".asInternalName()
+        ), ReforgeAPI.Reforge(
+            "Festive", ReforgeType.ARMOR, mapOf(
+                LorenzRarity.COMMON to ReforgeAPI.StatList.mapOf(
+                    StatType.SEA_CREATURE_CHANCE to 0.05, StatType.INTELLIGENCE to 5.0, StatType.FISHING_SPEED to 2.0
+                ), LorenzRarity.UNCOMMON to ReforgeAPI.StatList.mapOf(
+                    StatType.SEA_CREATURE_CHANCE to 0.05, StatType.INTELLIGENCE to 10.0, StatType.FISHING_SPEED to 3.0
+                ), LorenzRarity.RARE to ReforgeAPI.StatList.mapOf(
+                    StatType.SEA_CREATURE_CHANCE to 0.1, StatType.INTELLIGENCE to 15.0, StatType.FISHING_SPEED to 4.0
+                ), LorenzRarity.EPIC to ReforgeAPI.StatList.mapOf(
+                    StatType.SEA_CREATURE_CHANCE to 0.15, StatType.INTELLIGENCE to 20.0, StatType.FISHING_SPEED to 6.0
+                ), LorenzRarity.LEGENDARY to ReforgeAPI.StatList.mapOf(
+                    StatType.SEA_CREATURE_CHANCE to 0.2, StatType.INTELLIGENCE to 25.0, StatType.FISHING_SPEED to 8.0
+                ), LorenzRarity.MYTHIC to ReforgeAPI.StatList.mapOf(
+                    StatType.SEA_CREATURE_CHANCE to 0.25, StatType.INTELLIGENCE to 30.0, StatType.FISHING_SPEED to 10.0
+                )
+            ), "Frozen_Bauble".asInternalName()
+        ), ReforgeAPI.Reforge(
+            "Glistening", ReforgeType.EQUIPMENT, mapOf(
+                LorenzRarity.COMMON to ReforgeAPI.StatList.mapOf(
+                    StatType.INTELLIGENCE to 2.0, StatType.MINING_FORTUNE to 5.0
+                ), LorenzRarity.UNCOMMON to ReforgeAPI.StatList.mapOf(
+                    StatType.INTELLIGENCE to 3.0, StatType.MINING_FORTUNE to 6.0
+                ), LorenzRarity.RARE to ReforgeAPI.StatList.mapOf(
+                    StatType.INTELLIGENCE to 4.0, StatType.MINING_FORTUNE to 8.0
+                ), LorenzRarity.EPIC to ReforgeAPI.StatList.mapOf(
+                    StatType.INTELLIGENCE to 5.0, StatType.MINING_FORTUNE to 10.0
+                ), LorenzRarity.LEGENDARY to ReforgeAPI.StatList.mapOf(
+                    StatType.INTELLIGENCE to 6.0, StatType.MINING_FORTUNE to 12.0
+                ), LorenzRarity.MYTHIC to ReforgeAPI.StatList.mapOf(
+                    StatType.INTELLIGENCE to 7.0, StatType.MINING_FORTUNE to 15.0
+                ), LorenzRarity.DIVINE to ReforgeAPI.StatList.mapOf(
+                    StatType.INTELLIGENCE to 8.0, StatType.MINING_FORTUNE to 18.0
+                )
+            ), "Shiny_Prism".asInternalName()
+        ), ReforgeAPI.Reforge(
+            "STRENGTHened", ReforgeType.EQUIPMENT, mapOf(
+                LorenzRarity.COMMON to ReforgeAPI.StatList.mapOf(
+                    StatType.DEFENSE to 3.0, StatType.STRENGTH to 2.0
+                ), LorenzRarity.UNCOMMON to ReforgeAPI.StatList.mapOf(
+                    StatType.DEFENSE to 4.0, StatType.STRENGTH to 3.0
+                ), LorenzRarity.RARE to ReforgeAPI.StatList.mapOf(
+                    StatType.DEFENSE to 5.0, StatType.STRENGTH to 4.0
+                ), LorenzRarity.EPIC to ReforgeAPI.StatList.mapOf(
+                    StatType.DEFENSE to 6.0, StatType.STRENGTH to 5.0
+                ), LorenzRarity.LEGENDARY to ReforgeAPI.StatList.mapOf(
+                    StatType.DEFENSE to 8.0, StatType.STRENGTH to 6.0
+                ), LorenzRarity.MYTHIC to ReforgeAPI.StatList.mapOf(
+                    StatType.DEFENSE to 10.0, StatType.STRENGTH to 7.0
+                ), LorenzRarity.DIVINE to ReforgeAPI.StatList.mapOf(
+                    StatType.DEFENSE to 12.0, StatType.STRENGTH to 8.0
+                )
+            ), "Searing_Stone".asInternalName()
+        ), ReforgeAPI.Reforge(
+            "Waxed", ReforgeType.EQUIPMENT, mapOf(
+                LorenzRarity.COMMON to ReforgeAPI.StatList.mapOf(StatType.HEALTH to 5.0, StatType.CRIT_CHANCE to 2.0),
+                LorenzRarity.UNCOMMON to ReforgeAPI.StatList.mapOf(
+                    StatType.HEALTH to 6.0, StatType.CRIT_CHANCE to 3.0
+                ),
+                LorenzRarity.RARE to ReforgeAPI.StatList.mapOf(
+                    StatType.HEALTH to 8.0, StatType.CRIT_CHANCE to 4.0
+                ),
+                LorenzRarity.EPIC to ReforgeAPI.StatList.mapOf(
+                    StatType.HEALTH to 10.0, StatType.CRIT_CHANCE to 5.0
+                ),
+                LorenzRarity.LEGENDARY to ReforgeAPI.StatList.mapOf(
+                    StatType.HEALTH to 12.0, StatType.CRIT_CHANCE to 6.0
+                ),
+                LorenzRarity.MYTHIC to ReforgeAPI.StatList.mapOf(
+                    StatType.HEALTH to 15.0, StatType.CRIT_CHANCE to 7.0
+                ),
+                LorenzRarity.DIVINE to ReforgeAPI.StatList.mapOf(
+                    StatType.HEALTH to 20.0, StatType.CRIT_CHANCE to 8.0
+                )
+            ), "Blaze_Wax".asInternalName()
+        ), ReforgeAPI.Reforge(
+            "Fortified", ReforgeType.EQUIPMENT, mapOf(
+                LorenzRarity.COMMON to ReforgeAPI.StatList.mapOf(
+                    StatType.DEFENSE to 12.0
+                ),
+                LorenzRarity.UNCOMMON to ReforgeAPI.StatList.mapOf(StatType.DEFENSE to 14.0),
+                LorenzRarity.RARE to ReforgeAPI.StatList.mapOf(
+                    StatType.DEFENSE to 17.0
+                ),
+                LorenzRarity.EPIC to ReforgeAPI.StatList.mapOf(StatType.DEFENSE to 20.0),
+                LorenzRarity.LEGENDARY to ReforgeAPI.StatList.mapOf(
+                    StatType.DEFENSE to 25.0
+                ),
+                LorenzRarity.MYTHIC to ReforgeAPI.StatList.mapOf(StatType.DEFENSE to 30.0),
+                LorenzRarity.DIVINE to ReforgeAPI.StatList.mapOf(
+                    StatType.DEFENSE to 36.0
+                )
+            ), "Meteor_Shard".asInternalName()
+        ), ReforgeAPI.Reforge(
+            "Rooted", ReforgeType.EQUIPMENT, mapOf(
+                LorenzRarity.COMMON to ReforgeAPI.StatList.mapOf(
+                    StatType.FARMING_FORTUNE to 6.0, StatType.HEALTH to 2.0
+                ), LorenzRarity.UNCOMMON to ReforgeAPI.StatList.mapOf(
+                    StatType.FARMING_FORTUNE to 9.0, StatType.HEALTH to 5.0
+                ), LorenzRarity.RARE to ReforgeAPI.StatList.mapOf(
+                    StatType.FARMING_FORTUNE to 12.0, StatType.HEALTH to 8.0
+                ), LorenzRarity.EPIC to ReforgeAPI.StatList.mapOf(
+                    StatType.FARMING_FORTUNE to 15.0, StatType.HEALTH to 11.0
+                ), LorenzRarity.LEGENDARY to ReforgeAPI.StatList.mapOf(
+                    StatType.FARMING_FORTUNE to 18.0, StatType.HEALTH to 14.0
+                ), LorenzRarity.MYTHIC to ReforgeAPI.StatList.mapOf(
+                    StatType.FARMING_FORTUNE to 21.0, StatType.HEALTH to 17.0
+                )
+            ), "Burrowing_Spores".asInternalName()
+        ), ReforgeAPI.Reforge(
+            "Blooming", ReforgeType.EQUIPMENT, mapOf(
+                LorenzRarity.COMMON to ReforgeAPI.StatList.mapOf(
+                    StatType.FARMING_FORTUNE to 1.0, StatType.SPEED to 4.0
+                ), LorenzRarity.UNCOMMON to ReforgeAPI.StatList.mapOf(
+                    StatType.FARMING_FORTUNE to 2.0, StatType.SPEED to 4.0
+                ), LorenzRarity.RARE to ReforgeAPI.StatList.mapOf(
+                    StatType.FARMING_FORTUNE to 3.0, StatType.SPEED to 5.0
+                ), LorenzRarity.EPIC to ReforgeAPI.StatList.mapOf(
+                    StatType.FARMING_FORTUNE to 4.0, StatType.SPEED to 5.0
+                ), LorenzRarity.LEGENDARY to ReforgeAPI.StatList.mapOf(
+                    StatType.FARMING_FORTUNE to 5.0, StatType.SPEED to 6.0
+                ), LorenzRarity.MYTHIC to ReforgeAPI.StatList.mapOf(
+                    StatType.FARMING_FORTUNE to 6.0, StatType.SPEED to 6.0
+                )
+            ), "Flowering_Bouquet".asInternalName()
+        ), ReforgeAPI.Reforge(
+            "Snowy", ReforgeType.EQUIPMENT, mapOf(
+                LorenzRarity.COMMON to ReforgeAPI.StatList.mapOf(
+                    StatType.SEA_CREATURE_CHANCE to 0.2, StatType.FISHING_SPEED to 0.5
+                ), LorenzRarity.UNCOMMON to ReforgeAPI.StatList.mapOf(
+                    StatType.SEA_CREATURE_CHANCE to 0.2, StatType.FISHING_SPEED to 1.0
+                ), LorenzRarity.RARE to ReforgeAPI.StatList.mapOf(
+                    StatType.SEA_CREATURE_CHANCE to 0.4, StatType.FISHING_SPEED to 1.5
+                ), LorenzRarity.EPIC to ReforgeAPI.StatList.mapOf(
+                    StatType.SEA_CREATURE_CHANCE to 0.6, StatType.FISHING_SPEED to 2.0
+                ), LorenzRarity.LEGENDARY to ReforgeAPI.StatList.mapOf(
+                    StatType.SEA_CREATURE_CHANCE to 0.8, StatType.FISHING_SPEED to 2.5
+                ), LorenzRarity.MYTHIC to ReforgeAPI.StatList.mapOf(
+                    StatType.SEA_CREATURE_CHANCE to 1.0, StatType.FISHING_SPEED to 3.0
+                )
+            ), "Terry's_Snowglobe".asInternalName()
+        ), ReforgeAPI.Reforge(
+            "Blood-Soaked",
+            ReforgeType.CLOAK,
+            mapOf(
+                LorenzRarity.COMMON to ReforgeAPI.StatList.mapOf(
+                    StatType.HEALTH to 6.0, StatType.VITALITY to 1.0, StatType.DEFENSE to 1.0
+                ), LorenzRarity.UNCOMMON to ReforgeAPI.StatList.mapOf(
+                    StatType.HEALTH to 8.0, StatType.VITALITY to 1.0, StatType.DEFENSE to 2.0
+                ), LorenzRarity.RARE to ReforgeAPI.StatList.mapOf(
+                    StatType.HEALTH to 8.0, StatType.VITALITY to 2.0, StatType.DEFENSE to 3.0
+                ), LorenzRarity.EPIC to ReforgeAPI.StatList.mapOf(
+                    StatType.HEALTH to 9.0, StatType.VITALITY to 2.0, StatType.DEFENSE to 4.0
+                ), LorenzRarity.LEGENDARY to ReforgeAPI.StatList.mapOf(
+                    StatType.HEALTH to 10.0, StatType.VITALITY to 3.0, StatType.DEFENSE to 5.0
+                ), LorenzRarity.MYTHIC to ReforgeAPI.StatList.mapOf(
+                    StatType.HEALTH to 12.0, StatType.VITALITY to 3.0, StatType.DEFENSE to 6.0
+                ), LorenzRarity.DIVINE to ReforgeAPI.StatList.mapOf(
+                    StatType.HEALTH to 14.0, StatType.VITALITY to 4.0, StatType.DEFENSE to 7.0
+                )
+            ),
+            "Presumed_Gallon_Of_Red_Paint".asInternalName(),
+            extraPropertyText = "§fHeal §a1.15x§f more from Vampirism and Lifesteal"
+        ), ReforgeAPI.Reforge(
+            "Salty", ReforgeType.ROD, mapOf(
+                LorenzRarity.COMMON to ReforgeAPI.StatList.mapOf(
+                    StatType.SEA_CREATURE_CHANCE to 1.0
+                ),
+                LorenzRarity.UNCOMMON to ReforgeAPI.StatList.mapOf(StatType.SEA_CREATURE_CHANCE to 2.0),
+                LorenzRarity.RARE to ReforgeAPI.StatList.mapOf(
+                    StatType.SEA_CREATURE_CHANCE to 2.0
+                ),
+                LorenzRarity.EPIC to ReforgeAPI.StatList.mapOf(StatType.SEA_CREATURE_CHANCE to 3.0),
+                LorenzRarity.LEGENDARY to ReforgeAPI.StatList.mapOf(
+                    StatType.SEA_CREATURE_CHANCE to 5.0
+                ),
+                LorenzRarity.MYTHIC to ReforgeAPI.StatList.mapOf(StatType.SEA_CREATURE_CHANCE to 7.0)
+            ), "Salt_Cube".asInternalName()
+        ), ReforgeAPI.Reforge(
+            "Treacherous", ReforgeType.ROD, mapOf(
+                LorenzRarity.COMMON to ReforgeAPI.StatList.mapOf(
+                    StatType.STRENGTH to 5.0, StatType.SEA_CREATURE_CHANCE to 1.0
+                ), LorenzRarity.UNCOMMON to ReforgeAPI.StatList.mapOf(
+                    StatType.STRENGTH to 10.0, StatType.SEA_CREATURE_CHANCE to 2.0
+                ), LorenzRarity.RARE to ReforgeAPI.StatList.mapOf(
+                    StatType.STRENGTH to 15.0, StatType.SEA_CREATURE_CHANCE to 2.0
+                ), LorenzRarity.EPIC to ReforgeAPI.StatList.mapOf(
+                    StatType.STRENGTH to 20.0, StatType.SEA_CREATURE_CHANCE to 3.0
+                ), LorenzRarity.LEGENDARY to ReforgeAPI.StatList.mapOf(
+                    StatType.STRENGTH to 25.0, StatType.SEA_CREATURE_CHANCE to 5.0
+                ), LorenzRarity.MYTHIC to ReforgeAPI.StatList.mapOf(
+                    StatType.STRENGTH to 30.0, StatType.SEA_CREATURE_CHANCE to 7.0
+                )
+            ), "Rusty_Anchor".asInternalName()
+        ), ReforgeAPI.Reforge(
+            "Lucky", ReforgeType.ROD, mapOf(
+                LorenzRarity.COMMON to ReforgeAPI.StatList.mapOf(
+                    StatType.MAGIC_FIND to 1.0, StatType.SEA_CREATURE_CHANCE to 1.0
+                ), LorenzRarity.UNCOMMON to ReforgeAPI.StatList.mapOf(
+                    StatType.MAGIC_FIND to 2.0, StatType.SEA_CREATURE_CHANCE to 2.0
+                ), LorenzRarity.RARE to ReforgeAPI.StatList.mapOf(
+                    StatType.MAGIC_FIND to 3.0, StatType.SEA_CREATURE_CHANCE to 2.0
+                ), LorenzRarity.EPIC to ReforgeAPI.StatList.mapOf(
+                    StatType.MAGIC_FIND to 4.0, StatType.SEA_CREATURE_CHANCE to 3.0
+                ), LorenzRarity.LEGENDARY to ReforgeAPI.StatList.mapOf(
+                    StatType.MAGIC_FIND to 5.0, StatType.SEA_CREATURE_CHANCE to 5.0
+                ), LorenzRarity.MYTHIC to ReforgeAPI.StatList.mapOf(
+                    StatType.MAGIC_FIND to 6.0, StatType.SEA_CREATURE_CHANCE to 7.0
+                )
+            ), "Lucky_Dice".asInternalName()
+        ), ReforgeAPI.Reforge(
+            "Stiff", ReforgeType.ROD, mapOf(
+                LorenzRarity.COMMON to ReforgeAPI.StatList.mapOf(
+                    StatType.STRENGTH to 2.0, StatType.SEA_CREATURE_CHANCE to 1.0
+                ), LorenzRarity.UNCOMMON to ReforgeAPI.StatList.mapOf(
+                    StatType.STRENGTH to 4.0, StatType.SEA_CREATURE_CHANCE to 2.0
+                ), LorenzRarity.RARE to ReforgeAPI.StatList.mapOf(
+                    StatType.STRENGTH to 6.0, StatType.SEA_CREATURE_CHANCE to 2.0
+                ), LorenzRarity.EPIC to ReforgeAPI.StatList.mapOf(
+                    StatType.STRENGTH to 8.0, StatType.SEA_CREATURE_CHANCE to 3.0
+                ), LorenzRarity.LEGENDARY to ReforgeAPI.StatList.mapOf(
+                    StatType.STRENGTH to 10.0, StatType.SEA_CREATURE_CHANCE to 5.0
+                ), LorenzRarity.MYTHIC to ReforgeAPI.StatList.mapOf(
+                    StatType.STRENGTH to 12.0, StatType.SEA_CREATURE_CHANCE to 7.0
+                )
+            ), "Hardened_Wood".asInternalName()
+        ), ReforgeAPI.Reforge(
+            "Chomp",
+            ReforgeType.ROD,
+            mapOf(
+                LorenzRarity.COMMON to ReforgeAPI.StatList.mapOf(
+                    StatType.STRENGTH to 5.0, StatType.CRIT_CHANCE to 5.0, StatType.FISHING_SPEED to 2.0
+                ), LorenzRarity.UNCOMMON to ReforgeAPI.StatList.mapOf(
+                    StatType.STRENGTH to 10.0, StatType.CRIT_CHANCE to 10.0, StatType.FISHING_SPEED to 3.0
+                ), LorenzRarity.RARE to ReforgeAPI.StatList.mapOf(
+                    StatType.STRENGTH to 17.0, StatType.CRIT_CHANCE to 17.0, StatType.FISHING_SPEED to 5.0
+                ), LorenzRarity.EPIC to ReforgeAPI.StatList.mapOf(
+                    StatType.STRENGTH to 25.0, StatType.CRIT_CHANCE to 25.0, StatType.FISHING_SPEED to 7.0
+                ), LorenzRarity.LEGENDARY to ReforgeAPI.StatList.mapOf(
+                    StatType.STRENGTH to 35.0, StatType.CRIT_CHANCE to 35.0, StatType.FISHING_SPEED to 9.0
+                ), LorenzRarity.MYTHIC to ReforgeAPI.StatList.mapOf(
+                    StatType.STRENGTH to 50.0, StatType.CRIT_CHANCE to 50.0, StatType.FISHING_SPEED to 11.0
+                )
+            ),
+            "Kuudra_Mandible".asInternalName(),
+            extraPropertyText = "§fDecreases the health of Lava Sea Creatures by §c1%§f for each unique Lava Sea Creature you have killed with this rod in your inventory"
+        ), ReforgeAPI.Reforge(
+            "Pitchin'", ReforgeType.ROD, mapOf(
+                LorenzRarity.COMMON to ReforgeAPI.StatList.mapOf(
+                    StatType.SEA_CREATURE_CHANCE to 1.0, StatType.FISHING_SPEED to 1.0
+                ), LorenzRarity.UNCOMMON to ReforgeAPI.StatList.mapOf(
+                    StatType.SEA_CREATURE_CHANCE to 1.0, StatType.FISHING_SPEED to 2.0
+                ), LorenzRarity.RARE to ReforgeAPI.StatList.mapOf(
+                    StatType.SEA_CREATURE_CHANCE to 2.0, StatType.FISHING_SPEED to 4.0
+                ), LorenzRarity.EPIC to ReforgeAPI.StatList.mapOf(
+                    StatType.SEA_CREATURE_CHANCE to 3.0, StatType.FISHING_SPEED to 6.0
+                ), LorenzRarity.LEGENDARY to ReforgeAPI.StatList.mapOf(
+                    StatType.SEA_CREATURE_CHANCE to 4.0, StatType.FISHING_SPEED to 8.0
+                ), LorenzRarity.MYTHIC to ReforgeAPI.StatList.mapOf(
+                    StatType.SEA_CREATURE_CHANCE to 5.0, StatType.FISHING_SPEED to 10.0
+                )
+            ), "Pitchin'_Koi".asInternalName()
+        ), ReforgeAPI.Reforge(
+            "Ambered", ReforgeType.PICKAXE, mapOf(
+                LorenzRarity.COMMON to ReforgeAPI.StatList.mapOf(
+                    StatType.MINING_SPEED to 25.0
+                ),
+                LorenzRarity.UNCOMMON to ReforgeAPI.StatList.mapOf(StatType.MINING_SPEED to 31.0),
+                LorenzRarity.RARE to ReforgeAPI.StatList.mapOf(
+                    StatType.MINING_SPEED to 38.0
+                ),
+                LorenzRarity.EPIC to ReforgeAPI.StatList.mapOf(StatType.MINING_SPEED to 46.0),
+                LorenzRarity.LEGENDARY to ReforgeAPI.StatList.mapOf(
+                    StatType.MINING_SPEED to 55.0
+                ),
+                LorenzRarity.MYTHIC to ReforgeAPI.StatList.mapOf(StatType.MINING_SPEED to 65.0),
+                LorenzRarity.DIVINE to ReforgeAPI.StatList.mapOf(
+                    StatType.MINING_SPEED to 75.0
+                )
+            ), "Amber_Material".asInternalName()
+        ), ReforgeAPI.Reforge(
+            "Auspicious", ReforgeType.PICKAXE, mapOf(
+                LorenzRarity.COMMON to ReforgeAPI.StatList.mapOf(
+                    StatType.MINING_SPEED to 7.0, StatType.MINING_FORTUNE to 8.0
+                ), LorenzRarity.UNCOMMON to ReforgeAPI.StatList.mapOf(
+                    StatType.MINING_SPEED to 14.0, StatType.MINING_FORTUNE to 8.0
+                ), LorenzRarity.RARE to ReforgeAPI.StatList.mapOf(
+                    StatType.MINING_SPEED to 23.0, StatType.MINING_FORTUNE to 8.0
+                ), LorenzRarity.EPIC to ReforgeAPI.StatList.mapOf(
+                    StatType.MINING_SPEED to 34.0, StatType.MINING_FORTUNE to 8.0
+                ), LorenzRarity.LEGENDARY to ReforgeAPI.StatList.mapOf(
+                    StatType.MINING_SPEED to 45.0, StatType.MINING_FORTUNE to 8.0
+                ), LorenzRarity.MYTHIC to ReforgeAPI.StatList.mapOf(
+                    StatType.MINING_SPEED to 60.0, StatType.MINING_FORTUNE to 8.0
+                ), LorenzRarity.DIVINE to ReforgeAPI.StatList.mapOf(
+                    StatType.MINING_SPEED to 75.0, StatType.MINING_FORTUNE to 8.0
+                )
+            ), "Rock_Gemstone".asInternalName()
+        ), ReforgeAPI.Reforge(
+            "Fleet", ReforgeType.PICKAXE, mapOf(
+                LorenzRarity.COMMON to ReforgeAPI.StatList.mapOf(
+                    StatType.MINING_SPEED to 9.0
+                ),
+                LorenzRarity.UNCOMMON to ReforgeAPI.StatList.mapOf(StatType.MINING_SPEED to 15.0),
+                LorenzRarity.RARE to ReforgeAPI.StatList.mapOf(
+                    StatType.MINING_SPEED to 25.0
+                ),
+                LorenzRarity.EPIC to ReforgeAPI.StatList.mapOf(StatType.MINING_SPEED to 40.0),
+                LorenzRarity.LEGENDARY to ReforgeAPI.StatList.mapOf(
+                    StatType.MINING_SPEED to 55.0
+                ),
+                LorenzRarity.MYTHIC to ReforgeAPI.StatList.mapOf(StatType.MINING_SPEED to 75.0),
+                LorenzRarity.DIVINE to ReforgeAPI.StatList.mapOf(
+                    StatType.MINING_SPEED to 90.0
+                )
+            ), "Diamonite".asInternalName()
+        ), ReforgeAPI.Reforge(
+            "Heated",
+            ReforgeType.PICKAXE,
+            mapOf(),
+            "Hot_Stuff".asInternalName(),
+            extraPropertyText = "§fGrants §aincreased ${StatType.MINING_SPEED.iconWithName}§f the deeper your venture."
+        ), ReforgeAPI.Reforge(
+            "Magnetic",
+            ReforgeType.PICKAXE,
+            mapOf(
+                LorenzRarity.COMMON to ReforgeAPI.StatList.mapOf(StatType.DEFENSE to 4.0),
+                LorenzRarity.UNCOMMON to ReforgeAPI.StatList.mapOf(
+                    StatType.DEFENSE to 5.0
+                ),
+                LorenzRarity.RARE to ReforgeAPI.StatList.mapOf(StatType.DEFENSE to 6.0),
+                LorenzRarity.EPIC to ReforgeAPI.StatList.mapOf(
+                    StatType.DEFENSE to 8.0
+                ),
+                LorenzRarity.LEGENDARY to ReforgeAPI.StatList.mapOf(StatType.DEFENSE to 10.0),
+                LorenzRarity.MYTHIC to ReforgeAPI.StatList.mapOf(
+                    StatType.DEFENSE to 14.0
+                ),
+                LorenzRarity.DIVINE to ReforgeAPI.StatList.mapOf(StatType.DEFENSE to 18.0)
+            ),
+            "Lapis_Crystal".asInternalName(),
+            extraPropertyText = "§Gain §a+$%§f extra experience when mining",
+            customStat = mapOf(
+                LorenzRarity.COMMON to 10.0,
+                LorenzRarity.UNCOMMON to 12.0,
+                LorenzRarity.RARE to 14.0,
+                LorenzRarity.EPIC to 16.0,
+                LorenzRarity.LEGENDARY to 18.0,
+                LorenzRarity.MYTHIC to 20.0,
+                LorenzRarity.DIVINE to 22.0
+            )
+        ), ReforgeAPI.Reforge(
+            "Mithraic",
+            ReforgeType.PICKAXE,
+            mapOf(
+                LorenzRarity.COMMON to ReforgeAPI.StatList.mapOf(
+                    StatType.MINING_SPEED to 6.0
+                ),
+                LorenzRarity.UNCOMMON to ReforgeAPI.StatList.mapOf(StatType.MINING_SPEED to 12.0),
+                LorenzRarity.RARE to ReforgeAPI.StatList.mapOf(
+                    StatType.MINING_SPEED to 20.0
+                ),
+                LorenzRarity.EPIC to ReforgeAPI.StatList.mapOf(StatType.MINING_SPEED to 30.0),
+                LorenzRarity.LEGENDARY to ReforgeAPI.StatList.mapOf(
+                    StatType.MINING_SPEED to 40.0
+                ),
+                LorenzRarity.MYTHIC to ReforgeAPI.StatList.mapOf(StatType.MINING_SPEED to 55.0),
+                LorenzRarity.DIVINE to ReforgeAPI.StatList.mapOf(
+                    StatType.MINING_SPEED to 70.0
+                )
+            ),
+            "Pure_Mithril".asInternalName(),
+            extraPropertyText = "§Grants a §a10%§f chance to gain §a1§f extra Mithril when mining Mithril Ore."
+        ), ReforgeAPI.Reforge(
+            "Refined",
+            ReforgeType.PICKAXE,
+            mapOf(
+                LorenzRarity.COMMON to ReforgeAPI.StatList.mapOf(
+                    StatType.DEFENSE to 5.0, StatType.MINING_WISDOM to 1.0
+                ), LorenzRarity.UNCOMMON to ReforgeAPI.StatList.mapOf(
+                    StatType.DEFENSE to 7.0, StatType.MINING_WISDOM to 2.0
+                ), LorenzRarity.RARE to ReforgeAPI.StatList.mapOf(
+                    StatType.DEFENSE to 9.0, StatType.MINING_WISDOM to 3.0
+                ), LorenzRarity.EPIC to ReforgeAPI.StatList.mapOf(
+                    StatType.DEFENSE to 13.0, StatType.MINING_WISDOM to 4.0
+                ), LorenzRarity.LEGENDARY to ReforgeAPI.StatList.mapOf(
+                    StatType.DEFENSE to 16.0, StatType.MINING_WISDOM to 5.0
+                ), LorenzRarity.MYTHIC to ReforgeAPI.StatList.mapOf(
+                    StatType.DEFENSE to 20.0, StatType.MINING_WISDOM to 6.0
+                ), LorenzRarity.DIVINE to ReforgeAPI.StatList.mapOf(
+                    StatType.DEFENSE to 24.0, StatType.MINING_WISDOM to 7.0
+                )
+            ),
+            "Refined_Amber".asInternalName(),
+            extraPropertyText = "§fGain a §a0.1%§f chacne to drop an enchanted item for ores that you mine."
+        ), ReforgeAPI.Reforge(
+            "Stellar",
+            ReforgeType.PICKAXE,
+            mapOf(
+                LorenzRarity.COMMON to ReforgeAPI.StatList.mapOf(
+                    StatType.STRENGTH to 5.0, StatType.DEFENSE to 5.0, StatType.MINING_SPEED to 3.0
+                ), LorenzRarity.UNCOMMON to ReforgeAPI.StatList.mapOf(
+                    StatType.STRENGTH to 8.0, StatType.DEFENSE to 8.0, StatType.MINING_SPEED to 6.0
+                ), LorenzRarity.RARE to ReforgeAPI.StatList.mapOf(
+                    StatType.STRENGTH to 12.0, StatType.DEFENSE to 12.0, StatType.MINING_SPEED to 9.0
+                ), LorenzRarity.EPIC to ReforgeAPI.StatList.mapOf(
+                    StatType.STRENGTH to 16.0, StatType.DEFENSE to 16.0, StatType.MINING_SPEED to 12.0
+                ), LorenzRarity.LEGENDARY to ReforgeAPI.StatList.mapOf(
+                    StatType.STRENGTH to 20.0, StatType.DEFENSE to 20.0, StatType.MINING_SPEED to 15.0
+                ), LorenzRarity.MYTHIC to ReforgeAPI.StatList.mapOf(
+                    StatType.STRENGTH to 25.0, StatType.DEFENSE to 25.0, StatType.MINING_SPEED to 20.0
+                ), LorenzRarity.DIVINE to ReforgeAPI.StatList.mapOf(
+                    StatType.STRENGTH to 30.0, StatType.DEFENSE to 30.0, StatType.MINING_SPEED to 25.0
+                )
+            ),
+            "Petrified_Starfall".asInternalName(),
+            extraPropertyText = "§fDeal §a+1§f extra damage to Star Sentries and increases the chance for Starfall to drop form them by §a20%§f."
+        ), ReforgeAPI.Reforge(
+            "Fruitful", ReforgeType.PICKAXE, mapOf(
+                LorenzRarity.COMMON to ReforgeAPI.StatList.mapOf(
+                    StatType.DEFENSE to 3.0, StatType.INTELLIGENCE to 1.0, StatType.MINING_FORTUNE to 3.0
+                ), LorenzRarity.UNCOMMON to ReforgeAPI.StatList.mapOf(
+                    StatType.DEFENSE to 4.0, StatType.INTELLIGENCE to 1.0, StatType.MINING_FORTUNE to 3.0
+                ), LorenzRarity.RARE to ReforgeAPI.StatList.mapOf(
+                    StatType.DEFENSE to 5.0, StatType.INTELLIGENCE to 1.0, StatType.MINING_FORTUNE to 3.0
+                ), LorenzRarity.EPIC to ReforgeAPI.StatList.mapOf(
+                    StatType.DEFENSE to 7.0, StatType.INTELLIGENCE to 1.0, StatType.MINING_FORTUNE to 3.0
+                ), LorenzRarity.LEGENDARY to ReforgeAPI.StatList.mapOf(
+                    StatType.DEFENSE to 9.0, StatType.INTELLIGENCE to 1.0, StatType.MINING_FORTUNE to 3.0
+                ), LorenzRarity.MYTHIC to ReforgeAPI.StatList.mapOf(
+                    StatType.DEFENSE to 12.0, StatType.INTELLIGENCE to 1.0, StatType.MINING_FORTUNE to 3.0
+                )
+            ), "Onyx".asInternalName()
+        ), ReforgeAPI.Reforge(
+            "Moil", ReforgeType.AXE, mapOf(
+                LorenzRarity.COMMON to ReforgeAPI.StatList.mapOf(
+                    StatType.FORAGING_WISDOM to 1.0
+                ),
+                LorenzRarity.UNCOMMON to ReforgeAPI.StatList.mapOf(StatType.FORAGING_WISDOM to 1.0),
+                LorenzRarity.RARE to ReforgeAPI.StatList.mapOf(
+                    StatType.FORAGING_WISDOM to 2.0
+                ),
+                LorenzRarity.EPIC to ReforgeAPI.StatList.mapOf(StatType.FORAGING_WISDOM to 2.0),
+                LorenzRarity.LEGENDARY to ReforgeAPI.StatList.mapOf(
+                    StatType.FORAGING_WISDOM to 3.0, StatType.FORAGING_WISDOM to 3.0
+                )
+            ), "Moil_Log".asInternalName()
+        ), ReforgeAPI.Reforge(
+            "Toil", ReforgeType.AXE, mapOf(
+                LorenzRarity.COMMON to ReforgeAPI.StatList.mapOf(
+                    StatType.STRENGTH to 5.0, StatType.CRIT_DAMAGE to 5.0, StatType.FORAGING_WISDOM to 1.0
+                ), LorenzRarity.UNCOMMON to ReforgeAPI.StatList.mapOf(
+                    StatType.STRENGTH to 7.0, StatType.CRIT_DAMAGE to 7.0, StatType.FORAGING_WISDOM to 2.0
+                ), LorenzRarity.RARE to ReforgeAPI.StatList.mapOf(
+                    StatType.STRENGTH to 9.0, StatType.CRIT_DAMAGE to 9.0, StatType.FORAGING_WISDOM to 3.0
+                ), LorenzRarity.EPIC to ReforgeAPI.StatList.mapOf(
+                    StatType.STRENGTH to 13.0, StatType.CRIT_DAMAGE to 13.0, StatType.FORAGING_WISDOM to 4.0
+                ), LorenzRarity.LEGENDARY to ReforgeAPI.StatList.mapOf(
+                    StatType.STRENGTH to 16.0, StatType.CRIT_DAMAGE to 16.0, StatType.FORAGING_WISDOM to 5.0
+                ), LorenzRarity.MYTHIC to ReforgeAPI.StatList.mapOf(
+                    StatType.STRENGTH to 20.0, StatType.CRIT_DAMAGE to 20.0, StatType.FORAGING_WISDOM to 6.0
+                )
+            ), "Toil_Log".asInternalName()
+        ), ReforgeAPI.Reforge(
+            "Blessed", ReforgeType.AXE_AND_HOE, mapOf(
+                LorenzRarity.COMMON to ReforgeAPI.StatList.mapOf(
+                    StatType.SPEED to 5.0, StatType.FARMING_FORTUNE to 5.0, StatType.FARMING_WISDOM to 1.0
+                ), LorenzRarity.UNCOMMON to ReforgeAPI.StatList.mapOf(
+                    StatType.SPEED to 7.0, StatType.FARMING_FORTUNE to 7.0, StatType.FARMING_WISDOM to 2.0
+                ), LorenzRarity.RARE to ReforgeAPI.StatList.mapOf(
+                    StatType.SPEED to 9.0, StatType.FARMING_FORTUNE to 9.0, StatType.FARMING_WISDOM to 3.0
+                ), LorenzRarity.EPIC to ReforgeAPI.StatList.mapOf(
+                    StatType.SPEED to 13.0, StatType.FARMING_FORTUNE to 13.0, StatType.FARMING_WISDOM to 4.0
+                ), LorenzRarity.LEGENDARY to ReforgeAPI.StatList.mapOf(
+                    StatType.SPEED to 16.0, StatType.FARMING_FORTUNE to 16.0, StatType.FARMING_WISDOM to 5.0
+                ), LorenzRarity.MYTHIC to ReforgeAPI.StatList.mapOf(
+                    StatType.SPEED to 20.0, StatType.FARMING_FORTUNE to 20.0, StatType.FARMING_WISDOM to 6.0
+                )
+            ), "Blessed_Fruit".asInternalName()
+        ), ReforgeAPI.Reforge(
+            "Earthy", ReforgeType.AXE, mapOf(
+                LorenzRarity.COMMON to ReforgeAPI.StatList.mapOf(
+                    StatType.FARMING_FORTUNE to 2.0, StatType.SPEED to 1.0
+                ), LorenzRarity.UNCOMMON to ReforgeAPI.StatList.mapOf(
+                    StatType.FARMING_FORTUNE to 4.0, StatType.SPEED to 1.0
+                ), LorenzRarity.RARE to ReforgeAPI.StatList.mapOf(
+                    StatType.FARMING_FORTUNE to 6.0, StatType.SPEED to 1.0
+                ), LorenzRarity.EPIC to ReforgeAPI.StatList.mapOf(
+                    StatType.FARMING_FORTUNE to 8.0, StatType.SPEED to 1.0
+                ), LorenzRarity.LEGENDARY to ReforgeAPI.StatList.mapOf(
+                    StatType.FARMING_FORTUNE to 10.0, StatType.SPEED to 1.0
+                ), LorenzRarity.MYTHIC to ReforgeAPI.StatList.mapOf(
+                    StatType.FARMING_FORTUNE to 12.0, StatType.SPEED to 1.0
+                )
+            ), "Large_Walnut".asInternalName()
+        ), ReforgeAPI.Reforge(
+            "Bountiful", ReforgeType.HOE, mapOf(
+                LorenzRarity.COMMON to ReforgeAPI.StatList.mapOf(
+                    StatType.SPEED to 1.0, StatType.FARMING_FORTUNE to 1.0
+                ), LorenzRarity.UNCOMMON to ReforgeAPI.StatList.mapOf(
+                    StatType.SPEED to 2.0, StatType.FARMING_FORTUNE to 2.0
+                ), LorenzRarity.RARE to ReforgeAPI.StatList.mapOf(
+                    StatType.SPEED to 3.0, StatType.FARMING_FORTUNE to 3.0
+                ), LorenzRarity.EPIC to ReforgeAPI.StatList.mapOf(
+                    StatType.SPEED to 5.0, StatType.FARMING_FORTUNE to 5.0
+                ), LorenzRarity.LEGENDARY to ReforgeAPI.StatList.mapOf(
+                    StatType.SPEED to 8.0, StatType.FARMING_FORTUNE to 7.0
+                ), LorenzRarity.MYTHIC to ReforgeAPI.StatList.mapOf(
+                    StatType.SPEED to 13.0, StatType.FARMING_FORTUNE to 10.0
+                )
+            ), "Golden_Ball".asInternalName(), extraPropertyText = "§fGrants §6+0.2 Coins§f per crop dorpped."
+        ), ReforgeAPI.Reforge(
+            "Beady", ReforgeType.VACUUM, mapOf(
+                LorenzRarity.COMMON to ReforgeAPI.StatList.mapOf(
+                    StatType.DAMAGE to 5.0, StatType.INTELLIGENCE to 10.0
+                ), LorenzRarity.UNCOMMON to ReforgeAPI.StatList.mapOf(
+                    StatType.DAMAGE to 10.0, StatType.INTELLIGENCE to 20.0
+                ), LorenzRarity.RARE to ReforgeAPI.StatList.mapOf(
+                    StatType.DAMAGE to 15.0, StatType.INTELLIGENCE to 30.0
+                ), LorenzRarity.EPIC to ReforgeAPI.StatList.mapOf(
+                    StatType.DAMAGE to 20.0, StatType.INTELLIGENCE to 40.0
+                ), LorenzRarity.LEGENDARY to ReforgeAPI.StatList.mapOf(
+                    StatType.DAMAGE to 25.0, StatType.INTELLIGENCE to 50.0
+                ), LorenzRarity.MYTHIC to ReforgeAPI.StatList.mapOf(
+                    StatType.DAMAGE to 30.0, StatType.INTELLIGENCE to 60.0
+                )
+            ), "Beady_Eyes".asInternalName(), extraPropertyText = "§6Pests§f drop §a+3§f crops."
+        ), ReforgeAPI.Reforge(
+            "Buzzing",
+            ReforgeType.VACUUM,
+            mapOf(
+                LorenzRarity.COMMON to ReforgeAPI.StatList.mapOf(
+                    StatType.SPEED to 3.0
+                ),
+                LorenzRarity.UNCOMMON to ReforgeAPI.StatList.mapOf(StatType.SPEED to 4.0),
+                LorenzRarity.RARE to ReforgeAPI.StatList.mapOf(
+                    StatType.SPEED to 5.0
+                ),
+                LorenzRarity.EPIC to ReforgeAPI.StatList.mapOf(StatType.SPEED to 7.0),
+                LorenzRarity.LEGENDARY to ReforgeAPI.StatList.mapOf(
+                    StatType.SPEED to 10.0
+                ),
+                LorenzRarity.MYTHIC to ReforgeAPI.StatList.mapOf(StatType.SPEED to 15.0)
+            ),
+            "Clipped_Wings".asInternalName(),
+            extraPropertyText = "§fDoubles the ${StatType.DAMAGE.iconWithName}§f dealt by §aVACUUM§f."
+        ), ReforgeAPI.Reforge("Greater Spook", ReforgeType.SPECIAL_ITEMS, mapOf(
+            LorenzRarity.EPIC to ReforgeAPI.StatList.mapOf(
+                StatType.FEAR to 1.0
+            ), LorenzRarity.LEGENDARY to ReforgeAPI.StatList.mapOf(StatType.FEAR to 1.0)
+        ), "Boo_Stone".asInternalName(), specialItems = (listOf(
+            "GREAT_SPOOK_HELMET",
+            "GREAT_SPOOK_CHESTPLATE",
+            "GREAT_SPOOK_LEGGINGS",
+            "GREAT_SPOOK_BOOTS",
+            "GREAT_SPOOK_BELT",
+            "GREAT_SPOOK_CLOAK",
+            "GREAT_SPOOK_NECKLACE",
+            "GREAT_SPOOK_GLOVES"
+        )).map { it.asInternalName() })
     )
 
     class reforges1(list: List<ReforgeAPI.Reforge>) {
@@ -348,29 +2394,17 @@ class ReforgePrinter {
             val reforgeStone: String? = r.reforgeStone?.asString()
             val type = r.type
             val specialItems = r.specialItems?.map { it.asString() }
-            val extraProperty = r.extraPropertyText
-            val customStat = r.customStat
+            val reforgeAbility = r.extraProperty
             val stats = r.stats
-            */
-/* val stats = EnumMap<StatType, Map<LorenzRarity, Double>>(StatType::class.java).apply {
-                r.stats.forEach {
-                    it.value.forEach { stat ->
-                        val te = this.getOrDefault(stat.key, emptyMap()).toMutableMap()
-                        te.put(it.key, stat.value)
-                        this[stat.key] = te
-                    }
-                }
-            } *//*
-
         }
     }
 
     val print = run {
         val gson = GsonBuilder().setPrettyPrinting().create()
-        val string = gson.toJson(reforges1(reforges))
+        val string = gson.toJson(reforges1(reforgesPrint.filterNot { it.isReforgeStone }))
         val stream = FileOutputStream(".\\Reforges.json")
         stream.write(string.toByteArray())
         stream.close()
     }
 }
-*/
+

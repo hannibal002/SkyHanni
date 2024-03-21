@@ -10,6 +10,7 @@ import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName
 import at.hannibal2.skyhanni.utils.ItemUtils.getItemCategoryOrNull
 import at.hannibal2.skyhanni.utils.LorenzRarity
 import at.hannibal2.skyhanni.utils.LorenzUtils
+import at.hannibal2.skyhanni.utils.LorenzUtils.round
 import at.hannibal2.skyhanni.utils.NEUInternalName
 import at.hannibal2.skyhanni.utils.NEUInternalName.Companion.asInternalName
 import at.hannibal2.skyhanni.utils.StringUtils.allLettersFirstUppercase
@@ -38,6 +39,21 @@ object ReforgeAPI {
         val specialItems: List<NEUInternalName>? = null,
         val extraProperty: Map<LorenzRarity, String> = emptyMap()
     ) {
+
+        constructor(
+            name: String,
+            type: ReforgeType,
+            stats: Map<LorenzRarity, StatList>,
+            reforgeStone: NEUInternalName? = null,
+            specialItems: List<NEUInternalName>? = null,
+            extraPropertyText: String? = null,
+            customStat: Map<LorenzRarity, Double>? = null
+        ) : this(name, type, stats, reforgeStone, specialItems,
+            extraPropertyText?.let { t ->
+                customStat?.map { it.key to t.replace("$", it.value.round(1).toString()) }?.toMap()
+                    ?: stats.keys.associateWith { t }
+            } ?: emptyMap())
+
         val isReforgeStone = reforgeStone != null
 
         private val internalNameToRawName = "(_.)".toRegex()
