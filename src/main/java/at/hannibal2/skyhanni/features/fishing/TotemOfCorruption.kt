@@ -25,17 +25,15 @@ import net.minecraft.util.EnumParticleTypes
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.seconds
-import kotlin.time.DurationUnit
-import kotlin.time.toDuration
-
-private val config get() = SkyHanniMod.feature.fishing.totemOfCorruption
-
-private var display = emptyList<String>()
-private var totems: List<Totem> = emptyList()
 
 class TotemOfCorruption {
 
-    private val group = RepoPattern.group("features.fishing.totemofcorruption")
+    private val config get() = SkyHanniMod.feature.fishing.totemOfCorruption
+
+    private var display = emptyList<String>()
+    private var totems: List<Totem> = emptyList()
+
+    private val group = RepoPattern.group("fishing.totemofcorruption")
     private val totemNamePattern by group.pattern(
         "totemname",
         "§5§lTotem of Corruption"
@@ -61,24 +59,6 @@ class TotemOfCorruption {
         if (!isOverlayEnabled()) return
 
         totems = getTotems()
-            .filterNotNull()
-            .mapNotNull { totem ->
-                val timeRemaining = getTimeRemaining(totem)
-                val owner = getOwner(totem)
-                if (timeRemaining != null && owner != null) {
-                    if (
-                        timeRemaining == config.warnWhenAboutToExpire.seconds
-                        && config.warnWhenAboutToExpire.toDuration(DurationUnit.SECONDS) > 0.seconds
-                    ) {
-                        playPlingSound()
-                        sendTitle("§c§lTotem of Corruption §eabout to expire!", 5.seconds)
-                    }
-                    Totem(totem.getLorenzVec(), timeRemaining, owner)
-                } else {
-                    null
-                }
-            }
-
         display = createDisplay()
     }
 
@@ -136,9 +116,22 @@ class TotemOfCorruption {
         .filter { it.distance < config.distanceThreshold }
         .maxByOrNull { it.timeRemaining }
 
-    private fun getTotems(): List<EntityArmorStand?> {
+    private fun getTotems(): List<Totem> {
         return EntityUtils.getEntitiesNextToPlayer<EntityArmorStand>(100.0)
             .filter { totemNamePattern.matches(it.name) }.toList()
+            .mapNotNull { totem ->
+                val timeRemaining = getTimeRemaining(totem) ?: return@mapNotNull null
+                val owner = getOwner(totem) ?: return@mapNotNull null
+
+                if (
+                    timeRemaining == config.warnWhenAboutToExpire.seconds
+                    && config.warnWhenAboutToExpire.seconds > 0.seconds
+                ) {
+                    playPlingSound()
+                    sendTitle("§c§lTotem of Corruption §eabout to expire!", 5.seconds)
+                }
+                Totem(totem.getLorenzVec(), timeRemaining, owner)
+            }
     }
 
     private fun isOverlayEnabled() = LorenzUtils.inSkyBlock && config.showOverlay
