@@ -3,16 +3,13 @@ package at.hannibal2.skyhanni.features.itemabilities
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.config.features.itemability.FireVeilWandConfig.DisplayEntry
-import at.hannibal2.skyhanni.data.ClickType
-import at.hannibal2.skyhanni.events.ItemClickEvent
 import at.hannibal2.skyhanni.events.LorenzRenderWorldEvent
 import at.hannibal2.skyhanni.events.ReceiveParticleEvent
-import at.hannibal2.skyhanni.features.nether.ashfang.AshfangFreezeCooldown
+import at.hannibal2.skyhanni.events.item.ItemAbilityCastEvent
+import at.hannibal2.skyhanni.features.itemabilities.abilitycooldown.ItemAbilityType
 import at.hannibal2.skyhanni.utils.ColorUtils.toChromaColor
 import at.hannibal2.skyhanni.utils.ConfigUtils
-import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName
 import at.hannibal2.skyhanni.utils.LorenzUtils
-import at.hannibal2.skyhanni.utils.NEUInternalName.Companion.asInternalName
 import at.hannibal2.skyhanni.utils.RenderUtils
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import net.minecraft.client.Minecraft
@@ -23,7 +20,6 @@ import kotlin.time.Duration.Companion.seconds
 class FireVeilWandParticles {
 
     private val config get() = SkyHanniMod.feature.itemAbilities.fireVeilWands
-    private val item by lazy { "FIRE_VEIL_WAND".asInternalName() }
 
     private var lastClick = SimpleTimeMark.farPast()
 
@@ -38,14 +34,8 @@ class FireVeilWandParticles {
     }
 
     @SubscribeEvent
-    fun onItemClick(event: ItemClickEvent) {
-        if (!LorenzUtils.inSkyBlock) return
-        if (event.clickType != ClickType.RIGHT_CLICK) return
-        val internalName = event.itemInHand?.getInternalName()
-
-        if (AshfangFreezeCooldown.iscurrentlyFrozen()) return
-
-        if (internalName == item) {
+    fun onItemAbilityCast(event: ItemAbilityCastEvent) {
+        if (event.itemAbility == ItemAbilityType.FIRE_VEIL_WAND) {
             lastClick = SimpleTimeMark.now()
         }
     }

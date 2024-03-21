@@ -1,5 +1,8 @@
 package at.hannibal2.skyhanni.utils
 
+import at.hannibal2.skyhanni.data.ItemRenderBackground
+import at.hannibal2.skyhanni.features.itemabilities.abilitycooldown.ActiveAbility
+
 data class CachedItemData(
     // -1 = not loaded
     var petCandies: Int? = -1,
@@ -27,4 +30,8 @@ data class CachedItemData(
     var lastInternalName: NEUInternalName? = null,
 
     var lastInternalNameFetchTime: Long = 0L, // Still can't use SimpleTimeMark here
+
+    var itemAbilities: List<ActiveAbility>? = null,
+
+    var renderBackground: ItemRenderBackground.RenderBackgroundData = ItemRenderBackground.RenderBackgroundData(),
 )
