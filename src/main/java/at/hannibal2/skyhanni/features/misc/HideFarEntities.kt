@@ -22,11 +22,10 @@ class HideFarEntities {
         val minDistance = config.minDistance.coerceAtLeast(3)
 
         ignored = EntityUtils.getAllEntities()
-            .map { it to it.distanceToPlayer() }
-            .toMap()
-            .filter { it.value > minDistance }
-            .sorted().keys.drop(maxAmount)
-            .map { it.entityId }.toSet()
+            .map { it.entityId to it.distanceToPlayer() }
+            .filter { it.second > minDistance }
+            .sortedBy { it.second }.drop(maxAmount)
+            .map { it.first }.toSet()
     }
 
     @SubscribeEvent
