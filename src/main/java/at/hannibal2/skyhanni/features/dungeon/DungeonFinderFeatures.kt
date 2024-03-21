@@ -270,7 +270,7 @@ class DungeonFinderFeatures {
                     val playerName = group("playerName")
                     val className = group("className")
                     val level = group("level").toInt()
-                    val color = getColor(level)
+                    val color = DungeonAPI.getColor(level)
                     if (config.coloredClassLevel) toolTip[index] = " §b$playerName§f: §e$className $color$level"
                     classNames.remove(className)
                 }
@@ -338,22 +338,6 @@ class DungeonFinderFeatures {
     @SubscribeEvent
     fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
         event.move(2, "dungeon.partyFinderColoredClassLevel", "dungeon.partyFinder.coloredClassLevel")
-    }
-
-    companion object {
-        fun getColor(level: Int): String = when {
-            level >= 50 -> "§c§l"
-            level >= 45 -> "§c"
-            level >= 40 -> "§6"
-            level >= 35 -> "§d"
-            level >= 30 -> "§9"
-            level >= 25 -> "§b"
-            level >= 20 -> "§2"
-            level >= 15 -> "§a"
-            level >= 10 -> "§e"
-            level >= 5 -> "§f"
-            else -> "§7"
-        }
     }
 
     fun isEnabled() = LorenzUtils.inSkyBlock && LorenzUtils.skyBlockArea == "Dungeon Hub"
