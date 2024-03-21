@@ -10,6 +10,7 @@ public class HideFarEntitiesConfig {
     @Expose
     @ConfigOption(name = "Enabled", desc = "Hide all entities from rendering except the nearest ones.")
     @ConfigEditorBoolean
+    @FeatureToggle
     public boolean enabled = false;
 
     @Expose
