@@ -85,9 +85,14 @@ object BitsAPI {
         "^SkyBlock Menu$"
     )
 
-    private val bitsGuiStackPattern by bitsGuiGroup.pattern(
+    private val cookieGuiStackPattern by bitsGuiGroup.pattern(
         "mainmenustack",
         "^§6Booster Cookie$"
+    )
+
+    private val bitsStackPattern by bitsGuiGroup.pattern(
+        "bitsstack",
+        "§bBits"
     )
 
     private val fameRankGuiNamePattern by bitsGuiGroup.pattern(
@@ -146,7 +151,7 @@ object BitsAPI {
         val stacks = event.inventoryItems
 
         if (bitsGuiNamePattern.matches(event.inventoryName)) {
-            val cookieStack = stacks.values.lastOrNull { bitsGuiStackPattern.matches(it.displayName) }
+            val cookieStack = stacks.values.lastOrNull { cookieGuiStackPattern.matches(it.displayName) }
 
             // If the cookie stack is null, then the player should not have any bits to claim
             if (cookieStack == null) {
@@ -165,6 +170,7 @@ object BitsAPI {
         }
 
         if (fameRankGuiNamePattern.matches(event.inventoryName)) {
+            val bitsStack = stacks.values.lastOrNull { bitsStackPattern.matches(it.displayName) } ?: return
             val fameRankStack = stacks.values.lastOrNull { fameRankGuiStackPattern.matches(it.displayName) } ?: return
 
             line@ for (line in fameRankStack.getLore()) {
@@ -194,6 +200,14 @@ object BitsAPI {
                             "Lore" to fameRankStack.getLore(),
                             "FameRanks" to FameRanks.fameRanks
                         )
+
+                    continue@line
+                }
+            }
+
+            line@ for (line in bitsStack.getLore()) {
+                bitsAvailableMenuPattern.matchMatcher(line) {
+                    bitsToClaim = group("toClaim").formatInt()
 
                     continue@line
                 }
