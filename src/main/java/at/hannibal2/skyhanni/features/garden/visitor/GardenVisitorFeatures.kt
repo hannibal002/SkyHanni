@@ -592,18 +592,6 @@ class GardenVisitorFeatures {
         return false
     }
 
-    @SubscribeEvent(priority = EventPriority.HIGH)
-    fun onRenderLiving(event: SkyHanniRenderEntityEvent.Specials.Pre<EntityLivingBase>) {
-        if (!config.coloredName) return
-        val entity = event.entity
-        val entityId = entity.entityId
-        for (visitor in VisitorAPI.getVisitors()) {
-            if (visitor.nameTagEntityId == entityId) {
-                entity.customNameTag = GardenVisitorColorNames.getColoredName(entity.name)
-            }
-        }
-    }
-
     @SubscribeEvent
     fun onDebugDataCollect(event: DebugDataCollectEvent) {
         event.title("Garden Visitor Stats")
