@@ -123,7 +123,10 @@ object ChatUtils {
      * @see CHAT_PREFIX
      */
     fun clickableChat(message: String, command: String, prefix: Boolean = true, prefixColor: String = "§e") {
-        multiComponentMessage(listOf(createClickableChat(message, command)), prefix, prefixColor)
+        val msgPrefix = if (prefix) prefixColor + CHAT_PREFIX else ""
+        val fullMessage = msgPrefix + message
+
+        internalChat(createClickableChat(fullMessage, command))
     }
 
     fun createClickableChat(message: String, command: String): ChatComponentText {
@@ -153,7 +156,10 @@ object ChatUtils {
         prefix: Boolean = true,
         prefixColor: String = "§e",
     ) {
-        multiComponentMessage(listOf(createHoverableChat(message, hover, command)), prefix, prefixColor)
+        val msgPrefix = if (prefix) prefixColor + CHAT_PREFIX else ""
+        val fullMessage = msgPrefix + message
+
+        internalChat(createHoverableChat(fullMessage, hover, command))
     }
 
     fun createHoverableChat(message: String, hover: List<String>, command: String? = null): ChatComponentText {
