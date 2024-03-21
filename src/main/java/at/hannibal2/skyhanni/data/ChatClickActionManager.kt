@@ -11,7 +11,6 @@ object ChatClickActionManager {
         val action = ClickableAction(StringUtils.generateRandomId(), message, onClick)
         actions.add(action)
         action.sendToChat()
-
     }
 
     private fun ClickableAction.sendToChat() {
@@ -31,9 +30,7 @@ object ChatClickActionManager {
         }
     }
 
-
     private fun getActionByToken(token: String) = actions.find { it.token == token }
 
     class ClickableAction(val token: String, val message: String, val onClick: () -> Any, val oneTime: Boolean = true)
-
 }
