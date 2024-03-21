@@ -18,9 +18,13 @@ object ReforgeAPI {
         private set(value) {
             field = value
             nonePowerStoneReforge = value.filterNot { it.isReforgeStone }
+            onlyPowerStoneReforge = value.filter { it.isReforgeStone }
         }
 
     var nonePowerStoneReforge: List<Reforge> = emptyList()
+        private set
+
+    var onlyPowerStoneReforge: List<Reforge> = emptyList()
         private set
 
     enum class ReforgeType {
@@ -33,7 +37,8 @@ object ReforgeAPI {
         val stats: Map<LorenzRarity, SkyblockStatList>,
         val reforgeStone: NEUInternalName? = null,
         val specialItems: List<NEUInternalName>? = null,
-        val extraProperty: Map<LorenzRarity, String> = emptyMap()
+        val extraProperty: Map<LorenzRarity, String> = emptyMap(),
+        val costs: Map<LorenzRarity, Long>? = null
     ) {
 
         val isReforgeStone = reforgeStone != null
@@ -145,7 +150,8 @@ object ReforgeAPI {
             stats = it.reforgeStats ?: emptyMap(),
             reforgeStone = it.internalName,
             specialItems = type.second.takeIf { it.isNotEmpty() },
-            extraProperty = it.reforgeAbility
+            extraProperty = it.reforgeAbility,
+            costs = it.reforgeCosts
         )
     }
 
