@@ -7,6 +7,7 @@ import at.hannibal2.skyhanni.features.chroma.ChromaShaderManager
 import at.hannibal2.skyhanni.features.chroma.ChromaType
 import at.hannibal2.skyhanni.utils.ColorUtils
 import at.hannibal2.skyhanni.utils.ColorUtils.darker
+import at.hannibal2.skyhanni.utils.LorenzColor
 import at.hannibal2.skyhanni.utils.LorenzLogger
 import at.hannibal2.skyhanni.utils.NEUItems.renderOnScreen
 import at.hannibal2.skyhanni.utils.RenderUtils.HorizontalAlignment
@@ -96,12 +97,17 @@ interface Renderable {
         }
 
         fun clickAndHover(
-            text: String,
-            tips: List<String>,
+            text: Any,
+            tips: List<Any>,
             bypassChecks: Boolean = false,
             onClick: () -> Unit,
+            onHover: () -> Unit = {},
         ): Renderable {
-            return clickable(hoverTips(text, tips, bypassChecks = bypassChecks), onClick, bypassChecks = bypassChecks)
+            return clickable(
+                hoverTips(text, tips, bypassChecks = bypassChecks, onHover = onHover),
+                onClick,
+                bypassChecks = bypassChecks
+            )
         }
 
         fun clickable(
@@ -134,34 +140,44 @@ interface Renderable {
             }
 
         fun hoverTips(
-            text: String,
-            tips: List<String>,
+            content: Any,
+            tips: List<Any>,
             indexes: List<Int> = listOf(),
             stack: ItemStack? = null,
+            color: LorenzColor? = null,
             bypassChecks: Boolean = false,
+            snapsToTopIfToLong: Boolean = true,
             condition: () -> Boolean = { true },
+            onHover: () -> Unit = {},
         ): Renderable {
 
-            val render = string(text)
+            val render = fromAny(content) ?: string("Error")
             return object : Renderable {
                 override val width = render.width
                 override val height = render.height
                 override val horizontalAlign = render.horizontalAlign
                 override val verticalAlign = render.verticalAlign
 
+                val tipsRender = tips.mapNotNull { fromAny(it) }
+
                 override fun render(posX: Int, posY: Int) {
                     render.render(posX, posY)
                     if (isHovered(posX, posY)) {
                         if (condition() && shouldAllowLink(true, bypassChecks)) {
+                            onHover.invoke()
                             list[Pair(posX, posY)] = indexes
                             GlStateManager.pushMatrix()
                             GlStateManager.translate(0F, 0F, 400F)
 
                             RenderLineTooltips.drawHoveringText(
-                                posX, posY, tips,
-                                stack,
-                                currentRenderPassMousePosition?.first ?: Utils.getMouseX(),
-                                currentRenderPassMousePosition?.second ?: Utils.getMouseY(),
+                                posX = posX,
+                                posY = posY,
+                                tips = tipsRender,
+                                stack = stack,
+                                borderColor = color,
+                                snapsToTopIfToLong = snapsToTopIfToLong,
+                                mouseX = currentRenderPassMousePosition?.first ?: Utils.getMouseX(),
+                                mouseY = currentRenderPassMousePosition?.second ?: Utils.getMouseY(),
                             )
                             GlStateManager.popMatrix()
                         }

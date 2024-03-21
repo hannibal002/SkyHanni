@@ -110,7 +110,7 @@ object ScoreboardPattern {
     )
     val floor3GuardiansPattern by dungeonSb.pattern(
         "floor3guardians",
-        "^§. - §.(Healthy|Reinforced|Laser|Chaos)§a ([\\w,.]?)+§c❤$"
+        "§. - §.(?:Healthy|Reinforced|Laser|Chaos)§a ([\\\\w,.]?)+(?:§c❤)?"
     )
 
     // kuudra
@@ -283,7 +283,7 @@ object ScoreboardPattern {
     )
     val brokenRedstonePattern by miscSb.pattern(
         "brokenredstone",
-        "\\s*e: §e§b\\d{1,3}%$"
+        "\\s*(?:(?:§.)*⚡ (§.)*Redston|e: (?:§.)*\\d+%)\\s*"
     )
     val redstonePattern by miscSb.pattern(
         "redstone",
@@ -307,7 +307,7 @@ object ScoreboardPattern {
     )
     val dojoPointsPattern by miscSb.pattern(
         "dojopoints",
-        "^(§.)*Points: (§.)*[\\w.]+( §7\\(§.*§7\\))?$"
+        "^(§.)*Points: (§.)*[\\w.]+ ?(§7\\(§.*§7\\))?\$"
     )
     val dojoTimePattern by miscSb.pattern(
         "dojotime",
