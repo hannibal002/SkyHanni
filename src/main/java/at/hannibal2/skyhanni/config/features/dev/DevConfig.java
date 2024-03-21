@@ -64,9 +64,4 @@ public class DevConfig {
     @Category(name = "Minecraft Console", desc = "Minecraft Console Settings")
     public MinecraftConsoleConfig minecraftConsoles = new MinecraftConsoleConfig();
 
-    @ConfigOption(name = "Hide Far Entities", desc = "")
-    @Accordion
-    @Expose
-    public HideFarEntitiesConfig hideFarEntities = new HideFarEntitiesConfig();
-
 }
