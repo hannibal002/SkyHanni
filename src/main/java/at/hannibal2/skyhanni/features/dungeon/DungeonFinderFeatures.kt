@@ -109,7 +109,7 @@ class DungeonFinderFeatures {
     )
     private val detectDungeonClassPattern by patternGroup.pattern(
         "detect.dungeon.class",
-        "(View and select a dungeon class.)"
+        "§7View and select a dungeon class."
     )
 
     private val allowedSlots = (10..34).filter { it !in listOf(17, 18, 26, 27) }
@@ -146,7 +146,6 @@ class DungeonFinderFeatures {
             val name = stack.displayName.removeColor()
             map[slot] = if (anyFloorPattern.matches(name)) {
                 "A"
-
             } else if (entranceFloorPattern.matches(name)) {
                 "E"
             } else if (floorPattern.matches(name)) {
@@ -271,7 +270,7 @@ class DungeonFinderFeatures {
                     val playerName = group("playerName")
                     val className = group("className")
                     val level = group("level").toInt()
-                    val color = getColor(level)
+                    val color = DungeonAPI.getColor(level)
                     if (config.coloredClassLevel) toolTip[index] = " §b$playerName§f: §e$className $color$level"
                     classNames.remove(className)
                 }
@@ -339,17 +338,6 @@ class DungeonFinderFeatures {
     @SubscribeEvent
     fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
         event.move(2, "dungeon.partyFinderColoredClassLevel", "dungeon.partyFinder.coloredClassLevel")
-    }
-
-    companion object {
-        fun getColor(level: Int): String = when {
-            level >= 30 -> "§a"
-            level >= 25 -> "§b"
-            level >= 20 -> "§e"
-            level >= 15 -> "§6"
-            level >= 10 -> "§c"
-            else -> "§4"
-        }
     }
 
     fun isEnabled() = LorenzUtils.inSkyBlock && LorenzUtils.skyBlockArea == "Dungeon Hub"
