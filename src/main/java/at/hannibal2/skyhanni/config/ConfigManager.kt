@@ -5,6 +5,7 @@ import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.data.jsonobjects.local.FriendsJson
 import at.hannibal2.skyhanni.data.jsonobjects.local.JacobContestsJson
 import at.hannibal2.skyhanni.data.jsonobjects.local.KnownFeaturesJson
+import at.hannibal2.skyhanni.data.jsonobjects.other.HypixelApiTrophyFish
 import at.hannibal2.skyhanni.features.fishing.trophy.TrophyRarity
 import at.hannibal2.skyhanni.features.misc.update.UpdateManager
 import at.hannibal2.skyhanni.utils.KotlinTypeAdapterFactory
@@ -15,6 +16,7 @@ import at.hannibal2.skyhanni.utils.LorenzVec
 import at.hannibal2.skyhanni.utils.NEUInternalName
 import at.hannibal2.skyhanni.utils.NEUInternalName.Companion.asInternalName
 import at.hannibal2.skyhanni.utils.NEUItems
+import at.hannibal2.skyhanni.utils.NumberUtil.isInt
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.SimpleTimeMark.Companion.asTimeMark
 import at.hannibal2.skyhanni.utils.tracker.SkyHanniTracker
@@ -22,6 +24,7 @@ import com.google.gson.GsonBuilder
 import com.google.gson.JsonObject
 import com.google.gson.TypeAdapter
 import com.google.gson.stream.JsonReader
+import com.google.gson.stream.JsonToken
 import com.google.gson.stream.JsonWriter
 import io.github.moulberry.moulconfig.observer.PropertyTypeAdapterFactory
 import io.github.moulberry.moulconfig.processor.BuiltinMoulConfigGuis
@@ -132,6 +135,32 @@ class ConfigManager {
 
                 override fun read(reader: JsonReader): SimpleTimeMark {
                     return reader.nextString().toLong().asTimeMark()
+                }
+            }.nullSafe())
+            .registerTypeAdapter(HypixelApiTrophyFish::class.java, object : TypeAdapter<HypixelApiTrophyFish>() {
+                override fun write(out: JsonWriter, value: HypixelApiTrophyFish) {}
+
+                override fun read(reader: JsonReader): HypixelApiTrophyFish {
+                    val trophyFish = mutableMapOf<String, Int>()
+                    var totalCaught = 0
+                    reader.beginObject()
+                    while (reader.hasNext()) {
+                        val key = reader.nextName()
+                        if (key == "total_caught") {
+                            totalCaught = reader.nextInt()
+                            continue
+                        }
+                        if (reader.peek() == JsonToken.NUMBER) {
+                            val valueAsString = reader.nextString()
+                            if (valueAsString.isInt()) {
+                                trophyFish[key] = valueAsString.toInt()
+                                continue
+                            }
+                        }
+                        reader.skipValue()
+                    }
+                    reader.endObject()
+                    return HypixelApiTrophyFish(totalCaught, trophyFish)
                 }
             }.nullSafe())
             .enableComplexMapKeySerialization()
