@@ -1,5 +1,6 @@
 package at.hannibal2.skyhanni.config.features.misc;
 
+import at.hannibal2.skyhanni.config.FeatureToggle;
 import com.google.gson.annotations.Expose;
 import io.github.moulberry.moulconfig.annotations.ConfigEditorBoolean;
 import io.github.moulberry.moulconfig.annotations.ConfigEditorSlider;
@@ -20,4 +21,9 @@ public class HideFarEntitiesConfig {
     @ConfigOption(name = "Max Amount", desc = "Not showing more than this amount of nearest entities.")
     @ConfigEditorSlider(minValue = 1, maxValue = 150, minStep = 1)
     public int maxAmount = 30;
+
+    @Expose
+    @ConfigOption(name = "Exclude Garden", desc = "Disable this feature while in the Garden.")
+    @ConfigEditorBoolean
+    public boolean excludeGarden = false;
 }

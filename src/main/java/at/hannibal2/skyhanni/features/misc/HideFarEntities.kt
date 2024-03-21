@@ -3,6 +3,7 @@ package at.hannibal2.skyhanni.features.misc
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.events.CheckRenderEntityEvent
 import at.hannibal2.skyhanni.events.LorenzTickEvent
+import at.hannibal2.skyhanni.features.garden.GardenAPI
 import at.hannibal2.skyhanni.utils.EntityUtils
 import at.hannibal2.skyhanni.utils.LocationUtils.distanceToPlayer
 import at.hannibal2.skyhanni.utils.LorenzUtils
@@ -34,5 +35,5 @@ class HideFarEntities {
         }
     }
 
-    fun isEnabled() = LorenzUtils.inSkyBlock && config.enabled
+    fun isEnabled() = LorenzUtils.inSkyBlock && config.enabled && !(GardenAPI.inGarden() && config.excludeGarden)
 }
