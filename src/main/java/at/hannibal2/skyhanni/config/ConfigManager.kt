@@ -1,11 +1,12 @@
 package at.hannibal2.skyhanni.config
 
 import at.hannibal2.skyhanni.SkyHanniMod
-import at.hannibal2.skyhanni.api.ReforgeAPI
 import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.data.jsonobjects.local.FriendsJson
 import at.hannibal2.skyhanni.data.jsonobjects.local.JacobContestsJson
 import at.hannibal2.skyhanni.data.jsonobjects.local.KnownFeaturesJson
+import at.hannibal2.skyhanni.data.model.SkyblockStat
+import at.hannibal2.skyhanni.data.model.SkyblockStatList
 import at.hannibal2.skyhanni.features.fishing.trophy.TrophyRarity
 import at.hannibal2.skyhanni.features.misc.update.UpdateManager
 import at.hannibal2.skyhanni.utils.KotlinTypeAdapterFactory
@@ -135,16 +136,16 @@ class ConfigManager {
                     return reader.nextString().toLong().asTimeMark()
                 }
             }.nullSafe())
-            .registerTypeAdapter(ReforgeAPI.StatType::class.java, object : TypeAdapter<ReforgeAPI.StatType>() {
-                override fun write(out: JsonWriter, value: ReforgeAPI.StatType) {
+            .registerTypeAdapter(SkyblockStat::class.java, object : TypeAdapter<SkyblockStat>() {
+                override fun write(out: JsonWriter, value: SkyblockStat) {
                     out.value(value.name.lowercase()) // F you guy who made the stats lowercase
                 }
 
-                override fun read(reader: JsonReader): ReforgeAPI.StatType {
-                    return ReforgeAPI.StatType.valueOf(reader.nextString().uppercase())
+                override fun read(reader: JsonReader): SkyblockStat {
+                    return SkyblockStat.valueOf(reader.nextString().uppercase())
                 }
             }.nullSafe())
-            .registerTypeAdapter<ReforgeAPI.StatList>({ out, value ->
+            .registerTypeAdapter<SkyblockStatList>({ out, value ->
                 out.beginObject()
                 value.forEach {
                     out.name(it.key.name.lowercase()).value(it.value)
@@ -152,11 +153,11 @@ class ConfigManager {
                 out.endObject()
             }, { reader ->
                 reader.beginObject()
-                val list = ReforgeAPI.StatList()
+                val list = SkyblockStatList()
                 while (reader.hasNext()) {
                     val name = reader.nextName()
                     val value = reader.nextDouble()
-                    list[ReforgeAPI.StatType.valueOf(name.uppercase())] = value
+                    list[SkyblockStat.valueOf(name.uppercase())] = value
                 }
                 reader.endObject()
                 list

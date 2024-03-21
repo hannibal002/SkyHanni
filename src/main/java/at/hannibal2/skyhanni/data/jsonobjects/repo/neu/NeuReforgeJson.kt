@@ -1,6 +1,6 @@
 package at.hannibal2.skyhanni.data.jsonobjects.repo.neu;
 
-import at.hannibal2.skyhanni.api.ReforgeAPI
+import at.hannibal2.skyhanni.data.model.SkyblockStatList
 import at.hannibal2.skyhanni.utils.LorenzRarity
 import at.hannibal2.skyhanni.utils.NEUInternalName
 import at.hannibal2.skyhanni.utils.NEUInternalName.Companion.asInternalName
@@ -15,7 +15,7 @@ data class NeuReforgeJson(
     @Expose @SerializedName("itemTypes") val rawItemTypes: Any,
     @Expose val requiredRarities: List<LorenzRarity>,
     @Expose val reforgeCosts: Map<LorenzRarity, Long>?,
-    @Expose val reforgeStats: Map<LorenzRarity, ReforgeAPI.StatList>?,
+    @Expose val reforgeStats: Map<LorenzRarity, SkyblockStatList>?,
     @Expose @SerializedName("reforgeAbility") val rawReforgeAbility: Any?,
 ) {
 
