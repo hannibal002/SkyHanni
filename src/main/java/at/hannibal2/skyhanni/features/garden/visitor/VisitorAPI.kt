@@ -121,7 +121,6 @@ object VisitorAPI {
         var entityId: Int = -1,
         var nameTagEntityId: Int = -1,
         var status: VisitorStatus,
-        var inSacks: Boolean = false,
         val shoppingList: MutableMap<NEUInternalName, Int> = mutableMapOf(),
         var offer: VisitorOffer? = null,
     ) {

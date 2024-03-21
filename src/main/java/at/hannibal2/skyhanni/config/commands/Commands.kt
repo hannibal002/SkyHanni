@@ -41,6 +41,7 @@ import at.hannibal2.skyhanni.features.garden.farming.CropSpeedMeter
 import at.hannibal2.skyhanni.features.garden.farming.DicerRngDropTracker
 import at.hannibal2.skyhanni.features.garden.farming.FarmingWeightDisplay
 import at.hannibal2.skyhanni.features.garden.farming.GardenStartLocation
+import at.hannibal2.skyhanni.features.garden.farming.lane.FarmingLaneCreator
 import at.hannibal2.skyhanni.features.garden.fortuneguide.CaptureFarmingGear
 import at.hannibal2.skyhanni.features.garden.fortuneguide.FFGuideGUI
 import at.hannibal2.skyhanni.features.mining.KingTalismanHelper
@@ -294,6 +295,10 @@ object Commands {
             "shlimbo",
             "Warps you to Limbo."
         ) { MiscFeatures().goToLimbo() }
+        registerCommand(
+            "shlanedetection",
+            "Detect a farming lane in garden"
+        ) { FarmingLaneCreator.commandLaneDetection() }
     }
 
     private fun usersBugFix() {
