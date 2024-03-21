@@ -91,20 +91,26 @@ object ChatUtils {
     }
 
     private fun internalChat(message: String): Boolean {
-        log.log(message)
+        return internalChat(ChatComponentText(message))
+    }
+
+    private fun internalChat(message: ChatComponentText): Boolean {
+        val formattedMessage = message.formattedText
+        log.log(formattedMessage)
+
         val minecraft = Minecraft.getMinecraft()
         if (minecraft == null) {
-            LorenzUtils.consoleLog(message.removeColor())
+            LorenzUtils.consoleLog(formattedMessage.removeColor())
             return false
         }
 
         val thePlayer = minecraft.thePlayer
         if (thePlayer == null) {
-            LorenzUtils.consoleLog(message.removeColor())
+            LorenzUtils.consoleLog(formattedMessage.removeColor())
             return false
         }
 
-        thePlayer.addChatMessage(ChatComponentText(message))
+        thePlayer.addChatMessage(message)
         return true
     }
 
@@ -124,7 +130,7 @@ object ChatUtils {
         text.chatStyle.chatClickEvent = ClickEvent(ClickEvent.Action.RUN_COMMAND, fullCommand)
         text.chatStyle.chatHoverEvent =
             HoverEvent(HoverEvent.Action.SHOW_TEXT, ChatComponentText("§eExecute $fullCommand"))
-        Minecraft.getMinecraft().thePlayer.addChatMessage(text)
+        internalChat(text)
     }
 
     /**
@@ -152,8 +158,7 @@ object ChatUtils {
         command?.let {
             text.chatStyle.chatClickEvent = ClickEvent(ClickEvent.Action.RUN_COMMAND, "/${it.removePrefix("/")}")
         }
-
-        Minecraft.getMinecraft().thePlayer.addChatMessage(text)
+        internalChat(text)
     }
 
     /**
@@ -179,7 +184,7 @@ object ChatUtils {
         val text = ChatComponentText(msgPrefix + message)
         text.chatStyle.chatClickEvent = ClickEvent(ClickEvent.Action.OPEN_URL, url)
         text.chatStyle.chatHoverEvent = HoverEvent(HoverEvent.Action.SHOW_TEXT, ChatComponentText("$prefixColor$hover"))
-        Minecraft.getMinecraft().thePlayer.addChatMessage(text)
+        internalChat(text)
         if (autoOpen) OSUtils.openBrowser(url)
     }
 
