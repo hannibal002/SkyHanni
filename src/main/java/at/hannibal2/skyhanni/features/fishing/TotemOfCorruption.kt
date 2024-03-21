@@ -116,21 +116,19 @@ class TotemOfCorruption {
         .filter { it.distance < config.distanceThreshold }
         .maxByOrNull { it.timeRemaining }
 
-    private fun getTotems(): List<Totem> {
-        return EntityUtils.getEntitiesNextToPlayer<EntityArmorStand>(100.0)
-            .filter { totemNamePattern.matches(it.name) }.toList()
-            .mapNotNull { totem ->
-                val timeRemaining = getTimeRemaining(totem) ?: return@mapNotNull null
-                val owner = getOwner(totem) ?: return@mapNotNull null
+    private fun getTotems(): List<Totem> = EntityUtils.getEntitiesNextToPlayer<EntityArmorStand>(100.0)
+        .filter { totemNamePattern.matches(it.name) }.toList()
+        .mapNotNull { totem ->
+            val timeRemaining = getTimeRemaining(totem) ?: return@mapNotNull null
+            val owner = getOwner(totem) ?: return@mapNotNull null
 
-                val timeToWarn = config.warnWhenAboutToExpire.seconds
-                if (timeToWarn > 0.seconds && timeRemaining == timeToWarn) {
-                    playPlingSound()
-                    sendTitle("§c§lTotem of Corruption §eabout to expire!", 5.seconds)
-                }
-                Totem(totem.getLorenzVec(), timeRemaining, owner)
+            val timeToWarn = config.warnWhenAboutToExpire.seconds
+            if (timeToWarn > 0.seconds && timeRemaining == timeToWarn) {
+                playPlingSound()
+                sendTitle("§c§lTotem of Corruption §eabout to expire!", 5.seconds)
             }
-    }
+            Totem(totem.getLorenzVec(), timeRemaining, owner)
+        }
 
     private fun isOverlayEnabled() = LorenzUtils.inSkyBlock && config.showOverlay
     private fun isHideParticlesEnabled() = LorenzUtils.inSkyBlock && config.hideParticles
