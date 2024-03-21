@@ -87,6 +87,7 @@
 + Added a toggle to hide Jacob's event artifact message outside the garden. - martimavocado
 + Added Booster Cookie purchase reminder to chat filter category others. - Alexia Luna
 + Hide the TNT Run Tournament advertisement message in the main lobby. - Alexia Luna
++ Add event level up message to chat filter. - Zickles (https://github.com/hannibal002/SkyHanni/pull/1214)
 
 #### Inventory Improvements
 
@@ -138,6 +139,8 @@
     + Supports "Values First" option.
     + Change the number of tunings shown.
 + Improved the stats tuning message when Hypixel auto-adjusts your tuning points. - j10a1n15 (https://github.com/hannibal002/SkyHanni/pull/1212)
++ Updating "bits to claim" in the Custom Scoreboard when opening the GUI /boostercookiemenu. - j10a1n15 (https://github.com/hannibal002/SkyHanni/pull/1230)
++ Added "Curse of Greed" to non-God Potion effect display. - Alexia Luna (https://github.com/hannibal002/SkyHanni/pull/1225)
 
 #### Fishing Improvements
 
@@ -145,6 +148,10 @@
     + Added custom text when ready to pull.
     + The text is now aligned to the center of the GUI element.
 + Added a delay after tool swap before warning about wrong farming speed. - Alexia Luna (https://github.com/hannibal002/SkyHanni/pull/840)
+
+#### Dungeon Improvements
+
++ Add new class level colors in the Party Finder. - martimavocado (https://github.com/hannibal002/SkyHanni/pull/1219)
 
 #### Misc Improvements
 
@@ -156,6 +163,7 @@
   Thunderblade73 (https://github.com/hannibal002/SkyHanni/pull/1122)
 + Better chat error when profile name is disabled via Hypixel widgets. -
   hannibal2 (https://github.com/hannibal002/SkyHanni/pull/1153)
++ Single line Hover messages are now closer to the cursor - Thunderblade73 (https://github.com/hannibal002/SkyHanni/pull/821)
 
 ### Fixes
 
@@ -203,6 +211,9 @@
   hannibal2 (https://github.com/hannibal002/SkyHanni/pull/1151)
 + Fixed garden features appearing while visiting other player's garden. - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/1188)
 + Fixed rare crash in /ff display. - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/1217)
++ Fixed NEUInternalName is null for item name 'Mushroom'. - CalMWolfs (https://github.com/hannibal002/SkyHanni/pull/1226)
++ Fixed visitor status not updating to Ready when you have enough items in sacks after first talking to the visitor. - Alexia Luna (https://github.com/hannibal002/SkyHanni/pull/1224)
++ Fixed visitor status not updating to Waiting when you no longer have enough items when talking to them. - Alexia Luna (https://github.com/hannibal002/SkyHanni/pull/1224)
 
 #### Command Fixes
 
@@ -214,6 +225,7 @@
   Empa (https://github.com/hannibal002/SkyHanni/pull/1144)
 + Fixed Damage Indicator not hiding vanilla names. - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/1179)
 + Fixed Slayer Profit Tracker not detecting the slayer spawn cost when taking money from the bank. - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/1218)
++ Fixed slayer cost from bank counting plus instead of minus profit. - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/1220)
 
 #### Gui Fixes
 
@@ -255,10 +267,12 @@
     + Fixed Instance Shutdown Line not being hidden.
     + Fixed a broken Hypixel Scoreboard Line.
     + Fixed New Year Line appearing twice.
++ Fixed Scoreboard Unknown Lines error during a dojo and a floor 3 run. - j10a1n15 (https://github.com/hannibal002/SkyHanni/pull/1229)
 
 #### Dungeon Fixes
 
 + Fixed error in Dungeon Finder Features. - Thunderblade73 (https://github.com/hannibal002/SkyHanni/pull/1162)
++ Fix getting current class in Party Finder. - martimavocado (https://github.com/hannibal002/SkyHanni/pull/1219)
 
 #### Crimson Isle Fixes
 
@@ -273,6 +287,10 @@
 
 + Removed a second "Pet Candy Used" config option that did nothing. - CalMWolfs (https://github.com/hannibal002/SkyHanni/pull/1198)
 + Fixed game crash when open browser button in config fails. - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/1195)
+
+#### Fishign Fixes
+
++ Renamed "fishing contest" to "fishing festival". - Empa (https://github.com/hannibal002/SkyHanni/pull/1222)
 
 #### Misc Fixes
 
@@ -290,6 +308,7 @@
 + Fixed wrong pattern causing trapper mob area to not get a waypoint. - CalMWolfs (https://github.com/hannibal002/SkyHanni/pull/1186)
 + Fixed Superboom TNT not working with Queued GFS. - Thunderblade73 (https://github.com/hannibal002/SkyHanni/pull/1196)
 + Fixed detection of Party Leader when their username ends with an `s`. - Alexia Luna (https://github.com/hannibal002/SkyHanni/pull/1203)
++ Hover messages can't go off-screen anymore - Thunderblade73 (https://github.com/hannibal002/SkyHanni/pull/821)
 
 ### Technical Details
 
@@ -387,6 +406,12 @@
 + Creating and using FarmingLaneSwitchEvent. - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/1208)
 + Refactored all of `DungeonFinderFeatures.kt`. - Conutik (https://github.com/hannibal002/SkyHanni/pull/1180)
     + Less laggy and resource intensive.
++ Code cleanup in RenderLineTooltips. - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/1232)
++ Added JSON objects for Hypixel player API data, which can be used for other stuff later. - CalMWolfs (https://github.com/hannibal002/SkyHanni/pull/1146)
++ Renderable.hoverTips now supports renderables as tips and content - Thunderblade73 (https://github.com/hannibal002/SkyHanni/pull/821)
++ Added more debug when internal name from item name is null. - CalMWolfs (https://github.com/hannibal002/SkyHanni/pull/1226)
++ Refactored visitor handling code slightly. - Alexia Luna (https://github.com/hannibal002/SkyHanni/pull/1224)
+    + Removed unneeded inSacks property.
 
 ### Removed Features
 
@@ -397,6 +422,8 @@
 + Removed Plot Name in Scoreboard. - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/1168)
     + Hypixel added their own compact format now.
 + Removed max pet XP tooltip because Hypixel added it. - Obsidian (https://github.com/hannibal002/SkyHanni/pull/1132)
++ Removed colored name tag option for Garden visitors. - Alexia Luna (https://github.com/hannibal002/SkyHanni/pull/1228)
+    + Hypixel has added this feature themselves.
 
 ## Version 0.23
 
