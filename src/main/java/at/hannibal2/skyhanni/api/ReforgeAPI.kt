@@ -243,7 +243,7 @@ object ReforgeAPI {
 
         companion object {
             val fontSizeOfLargestIcon by lazy {
-                entries.maxOf { Minecraft.getMinecraft().fontRendererObj.getStringWidth(it.icon) }
+                entries.maxOf { Minecraft.getMinecraft().fontRendererObj.getStringWidth(it.icon) } + 1
             }
         }
     }
