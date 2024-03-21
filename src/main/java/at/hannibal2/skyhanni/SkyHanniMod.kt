@@ -269,6 +269,7 @@ import at.hannibal2.skyhanni.features.misc.FixGhostEntities
 import at.hannibal2.skyhanni.features.misc.FixNEUHeavyPearls
 import at.hannibal2.skyhanni.features.misc.HideArmor
 import at.hannibal2.skyhanni.features.misc.InGameDateDisplay
+import at.hannibal2.skyhanni.features.misc.IslandLeaveJoinMsgs
 import at.hannibal2.skyhanni.features.misc.JoinCrystalHollows
 import at.hannibal2.skyhanni.features.misc.LesserOrbHider
 import at.hannibal2.skyhanni.features.misc.LockMouseLook
@@ -765,6 +766,7 @@ class SkyHanniMod {
         loadModule(ShiftClickEquipment())
         loadModule(LockMouseLook)
         loadModule(SensitivityReducer)
+        loadModule(IslandLeaveJoinMsgs)
         loadModule(DungeonFinderFeatures())
         loadModule(PabloHelper())
         loadModule(FishingBaitWarnings())
