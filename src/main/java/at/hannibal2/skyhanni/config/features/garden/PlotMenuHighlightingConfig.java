@@ -20,9 +20,9 @@ public class PlotMenuHighlightingConfig {
     @Expose
     @ConfigOption(name = "Statuses", desc = "Change the hierarchy of the different plot statuses.")
     @ConfigEditorDraggableList
-    public List<PlotStatusTypes> deskPlotStatusTypes = new ArrayList<>();
+    public List<PlotStatusType> deskPlotStatusTypes = new ArrayList<>();
 
-    public enum PlotStatusTypes {
+    public enum PlotStatusType {
         PESTS("§cPests", LorenzColor.RED),
         SPRAYS("§eSprays", LorenzColor.YELLOW),
         LOCKED("§7Locked", LorenzColor.DARK_GRAY),
@@ -32,7 +32,7 @@ public class PlotMenuHighlightingConfig {
         public final String name;
         public final LorenzColor highlightColor;
 
-        PlotStatusTypes(String name, LorenzColor highlightColor) {
+        PlotStatusType(String name, LorenzColor highlightColor) {
             this.name = name;
             this.highlightColor = highlightColor;
         }
