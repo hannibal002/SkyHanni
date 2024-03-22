@@ -28,7 +28,7 @@ class MovementSpeedDisplay {
     }
 
     private fun checkSpeed() {
-        if (!isEnabled()) return
+        if (!LorenzUtils.onHypixel) return
 
         speedInLastTick = with(Minecraft.getMinecraft().thePlayer) {
             val oldPos = LorenzVec(prevPosX, prevPosY, prevPosZ)
@@ -37,7 +37,9 @@ class MovementSpeedDisplay {
             // Distance from previous tick, multiplied by TPS
             oldPos.distance(newPos) * 20
         }
-        display = "Movement Speed: ${speedInLastTick.round(2)}"
+        if (isEnabled()) {
+            display = "Movement Speed: ${speedInLastTick.round(2)}"
+        }
     }
 
     @SubscribeEvent
