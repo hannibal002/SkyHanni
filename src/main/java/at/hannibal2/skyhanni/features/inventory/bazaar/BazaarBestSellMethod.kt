@@ -4,7 +4,7 @@ import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.events.BazaarOpenedProductEvent
 import at.hannibal2.skyhanni.events.InventoryCloseEvent
 import at.hannibal2.skyhanni.features.inventory.bazaar.BazaarApi.Companion.getBazaarDataOrError
-import at.hannibal2.skyhanni.utils.InventoryUtils
+import at.hannibal2.skyhanni.utils.InventoryUtils.getAmountInInventory
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName
 import at.hannibal2.skyhanni.utils.ItemUtils.itemName
 import at.hannibal2.skyhanni.utils.LorenzUtils
@@ -48,7 +48,7 @@ class BazaarBestSellMethod {
         if (internalName == null) {
             return "§cUnknown Bazaar item!"
         }
-        var having = InventoryUtils.getAmountOfItemInInventory(internalName)
+        var having = internalName.getAmountInInventory()
         lastClickedItem?.let {
             if (it.getInternalName() == internalName) {
                 having += it.stackSize

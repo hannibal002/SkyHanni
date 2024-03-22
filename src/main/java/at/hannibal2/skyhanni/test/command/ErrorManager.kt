@@ -4,10 +4,10 @@ import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.KeyboardManager
 import at.hannibal2.skyhanni.utils.OSUtils
+import at.hannibal2.skyhanni.utils.StringUtils
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.TimeLimitedSet
 import net.minecraft.client.Minecraft
-import java.util.UUID
 import kotlin.time.Duration.Companion.minutes
 
 object ErrorManager {
@@ -101,8 +101,9 @@ object ErrorManager {
         message: String,
         vararg extraData: Pair<String, Any?>,
         ignoreErrorCache: Boolean = false,
+        noStackTrace: Boolean = false,
     ) {
-        logError(throwable, message, ignoreErrorCache, noStackTrace = false, *extraData)
+        logError(throwable, message, ignoreErrorCache, noStackTrace, *extraData)
     }
 
     private fun logError(
@@ -112,17 +113,16 @@ object ErrorManager {
         noStackTrace: Boolean,
         vararg extraData: Pair<String, Any?>,
     ) {
-        val error = Error(message, throwable)
-        error.printStackTrace()
-        Minecraft.getMinecraft().thePlayer ?: return
-
         if (!ignoreErrorCache) {
             val pair = if (throwable.stackTrace.isNotEmpty()) {
-                throwable.stackTrace[0].let { it.fileName!! to it.lineNumber }
+                throwable.stackTrace[0].let { (it.fileName ?: "<unknown>") to it.lineNumber }
             } else message to 0
             if (cache.contains(pair)) return
             cache.add(pair)
         }
+
+        Error(message, throwable).printStackTrace()
+        Minecraft.getMinecraft().thePlayer ?: return
 
         val fullStackTrace: String
         val stackTrace: String
@@ -134,7 +134,7 @@ object ErrorManager {
             fullStackTrace = throwable.getCustomStackTrace(true).joinToString("\n")
             stackTrace = throwable.getCustomStackTrace(false).joinToString("\n")
         }
-        val randomId = UUID.randomUUID().toString()
+        val randomId = StringUtils.generateRandomId()
 
         val extraDataString = buildExtraDataString(extraData)
         val rawMessage = message.removeColor()
@@ -174,7 +174,7 @@ object ErrorManager {
 
     private fun Throwable.getCustomStackTrace(
         fullStackTrace: Boolean,
-        parent: List<String> = emptyList()
+        parent: List<String> = emptyList(),
     ): List<String> = buildList {
         add("Caused by ${this@getCustomStackTrace.javaClass.name}: $message")
 

@@ -1,7 +1,9 @@
 package at.hannibal2.skyhanni.utils
 
 import at.hannibal2.skyhanni.config.ConfigManager
+import at.hannibal2.skyhanni.data.jsonobjects.other.HypixelPlayerApiJson
 import at.hannibal2.skyhanni.data.jsonobjects.repo.MultiFilterJson
+import at.hannibal2.skyhanni.events.NeuProfileDataLoadedEvent
 import at.hannibal2.skyhanni.events.NeuRepositoryReloadEvent
 import at.hannibal2.skyhanni.events.RepositoryReloadEvent
 import at.hannibal2.skyhanni.features.inventory.bazaar.BazaarDataHolder
@@ -15,6 +17,7 @@ import com.google.gson.JsonPrimitive
 import io.github.moulberry.notenoughupdates.NEUManager
 import io.github.moulberry.notenoughupdates.NEUOverlay
 import io.github.moulberry.notenoughupdates.NotEnoughUpdates
+import io.github.moulberry.notenoughupdates.events.ProfileDataLoadedEvent
 import io.github.moulberry.notenoughupdates.overlays.AuctionSearchOverlay
 import io.github.moulberry.notenoughupdates.overlays.BazaarSearchOverlay
 import io.github.moulberry.notenoughupdates.recipes.CraftingRecipe
@@ -61,6 +64,21 @@ object NEUItems {
     @SubscribeEvent
     fun onNeuRepoReload(event: NeuRepositoryReloadEvent) {
         allItemsCache = readAllNeuItems()
+    }
+
+    @SubscribeEvent
+    fun onProfileDataLoaded(event: ProfileDataLoadedEvent) {
+        val apiData = event.data ?: return
+        try {
+            val playerData = ConfigManager.gson.fromJson<HypixelPlayerApiJson>(apiData)
+            NeuProfileDataLoadedEvent(playerData).postAndCatch()
+
+        } catch (e: Exception) {
+            ErrorManager.logErrorWithData(
+                e, "Error reading hypixel player api data",
+                "data" to apiData
+            )
+        }
     }
 
     @Deprecated("Use NEUInternalName rather than String", ReplaceWith("NEUInternalName.fromItemName(itemName)"))

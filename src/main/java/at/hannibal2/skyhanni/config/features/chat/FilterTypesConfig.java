@@ -81,6 +81,12 @@ public class FilterTypesConfig {
     public boolean fireSale = true;
 
     @Expose
+    @ConfigOption(name = "Event Level Up", desc = "Hide the message that shows on event level up.")
+    @ConfigEditorBoolean
+    @FeatureToggle
+    public boolean eventLevelUp = false;
+
+    @Expose
     @ConfigOption(name = "Diana", desc = "Hide chat messages around griffin burrow chains and griffin feather drops and coin drops.")
     @ConfigEditorBoolean
     @FeatureToggle
