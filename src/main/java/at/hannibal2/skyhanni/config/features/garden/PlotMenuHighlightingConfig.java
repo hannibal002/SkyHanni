@@ -18,7 +18,7 @@ public class PlotMenuHighlightingConfig {
     public boolean enabled = false;
 
     @Expose
-    @ConfigOption(name = "Statuses", desc = "Change the hierarchy of the different plot statuses.")
+    @ConfigOption(name = "Statuses", desc = "Change which statuses are enabled, and the hierarchy of them.")
     @ConfigEditorDraggableList
     public List<PlotStatusType> deskPlotStatusTypes = new ArrayList<>();
 
