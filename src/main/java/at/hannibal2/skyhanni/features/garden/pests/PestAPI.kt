@@ -112,7 +112,7 @@ object PestAPI {
                 ChatUtils.userError("Open Plot Management Menu to load plot names and pest locations!")
                 return
             }
-            if (event.unkownAmount) {
+            if (event.unknownAmount) {
                 plot.isPestCountInaccurate = true
             } else {
                 plot.pests += event.amountPests
