@@ -6,12 +6,16 @@ import at.hannibal2.skyhanni.events.TabWidgetUpdate
 import at.hannibal2.skyhanni.utils.CollectionUtils.editCopy
 import at.hannibal2.skyhanni.utils.CollectionUtils.getOrNull
 import at.hannibal2.skyhanni.utils.ConditionalUtils.transformIf
+import at.hannibal2.skyhanni.utils.LorenzUtils
+import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.StringUtils.matches
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPatternManager
 import net.minecraftforge.fml.common.eventhandler.EventPriority
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
+import java.util.regex.Matcher
 import java.util.regex.Pattern
+
 // This group / prefix is not allowed to be used anywhere else (tab.widget is allowed as prefix)
 private val repoGroup = RepoPattern.group("tab.widget.enum")
 
@@ -32,7 +36,7 @@ enum class TabWidget(
     ),
     SERVER(
         // language=RegExp
-        "Server: (?:§.)*(?<server>.*)"
+        "Server: (?:§.)*(?<serverid>.*)"
     ),
     GEMS(
         // language=RegExp
@@ -44,7 +48,7 @@ enum class TabWidget(
     ),
     PROFILE(
         // language=RegExp
-        "(?:§.)*Profile: (?:§.)*(?<profile>\\S+) .*"
+        "(?:§.)*Profile: (?:§.)*(?<profile>\\S+).*"
     ),
     SB_LEVEL(
         // language=RegExp
@@ -272,16 +276,22 @@ enum class TabWidget(
 
     private var gotChecked = false
 
+    inline fun <T> matchMatcherFirstLine(consumer: Matcher.() -> T) =
+        if (isActive)
+            pattern.matchMatcher(lines.first(), consumer)
+        else null
+
     private fun postNewEvent(lines: List<String>) {
         // Prevent Post if lines are equal
         if (lines == this.lines) return
         this.lines = lines
+        isActive = true
         TabWidgetUpdate.NewValues(this, lines).postAndCatch()
     }
 
     private fun postClearEvent() {
         lines = emptyList()
-        TabWidgetUpdate.Clear(this)
+        TabWidgetUpdate.Clear(this).postAndCatch()
     }
 
     private fun updateIsActive() {
@@ -304,11 +314,15 @@ enum class TabWidget(
 
         @SubscribeEvent(priority = EventPriority.HIGH)
         fun onTabListUpdate(event: TabListUpdateEvent) {
-            val tabList = filterTabList(event.tabList)
-
-            separatorIndexes.forEach {
-                it.second?.gotChecked = false
+            if (!LorenzUtils.inSkyBlock) {
+                if (separatorIndexes.isNotEmpty()) {
+                    separatorIndexes.forEach { it.second?.updateIsActive() }
+                    separatorIndexes.clear()
+                }
+                return
             }
+
+            val tabList = filterTabList(event.tabList)
 
             separatorIndexes.clear()
 
@@ -326,6 +340,10 @@ enum class TabWidget(
             }
 
             entries.forEach { it.updateIsActive() }
+
+            separatorIndexes.forEach {
+                it.second?.gotChecked = false
+            }
         }
 
         @SubscribeEvent(priority = EventPriority.LOW)
