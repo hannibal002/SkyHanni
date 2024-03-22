@@ -64,23 +64,23 @@ class SkyMartCopperPrice {
 
         inInventory = true
         val table = mutableListOf<DisplayTableEntry>()
-        for (stack in event.inventoryItems.values) {
-            val lore = stack.getLore()
-            val otherItemsPrice = stack.loreCosts().sumOf { it.getPrice() }.takeIf { it != -1.0 }
+        for ((slot, item) in event.inventoryItems) {
+            val lore = item.getLore()
+            val otherItemsPrice = item.loreCosts().sumOf { it.getPrice() }.takeIf { it != -1.0 }
 
             for (line in lore) {
                 val copper = copperPattern.matchMatcher(line) {
                     group("amount").formatInt()
                 } ?: continue
 
-                val internalName = stack.getInternalName()
+                val internalName = item.getInternalName()
                 val lowestBin = internalName.getPriceOrNull() ?: continue
                 val profit = lowestBin - (otherItemsPrice ?: 0.0)
 
                 val factor = profit / copper
                 val perFormat = NumberUtil.format(factor)
 
-                val itemName = stack.itemName
+                val itemName = item.itemName
                 val hover = buildList {
                     add(itemName)
                     add("")
@@ -93,7 +93,7 @@ class SkyMartCopperPrice {
                     add("§7Copper amount: §c${copper.addSeparators()} ")
                     add("§7Profit per copper: §6${perFormat} ")
                 }
-                table.add(DisplayTableEntry("$itemName§f:", "§6§l$perFormat", factor, internalName, hover))
+                table.add(DisplayTableEntry("$itemName§f:", "§6§l$perFormat", factor, internalName, hover, highlightsOnHoverSlots = listOf(slot)))
             }
         }
 
