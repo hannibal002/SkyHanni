@@ -113,7 +113,7 @@ class MiningEventTracker {
             return
         }
 
-        if (IslandType.CRYSTAL_HOLLOWS.isInIsland() && eventType.dwarvenSpecific) return
+        if (!IslandType.DWARVEN_MINES.isInIsland() && eventType.dwarvenSpecific) return
 
         if (lastSentEvent == eventType) return
         lastSentEvent = eventType
