@@ -2,13 +2,14 @@ package at.hannibal2.skyhanni.data
 
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.config.ConfigManager.Companion.gson
+import at.hannibal2.skyhanni.data.model.TabWidget
 import at.hannibal2.skyhanni.events.HypixelJoinEvent
 import at.hannibal2.skyhanni.events.IslandChangeEvent
 import at.hannibal2.skyhanni.events.LorenzChatEvent
 import at.hannibal2.skyhanni.events.LorenzTickEvent
 import at.hannibal2.skyhanni.events.LorenzWorldChangeEvent
 import at.hannibal2.skyhanni.events.ProfileJoinEvent
-import at.hannibal2.skyhanni.events.TabListUpdateEvent
+import at.hannibal2.skyhanni.events.TabWidgetUpdate
 import at.hannibal2.skyhanni.features.bingo.BingoAPI
 import at.hannibal2.skyhanni.features.rift.RiftAPI
 import at.hannibal2.skyhanni.test.command.ErrorManager
@@ -45,10 +46,6 @@ class HypixelData {
         private val serverIdScoreboardPattern by patternGroup.pattern(
             "serverid.scoreboard",
             "§7\\d+/\\d+/\\d+ §8(?<servertype>[mM])(?<serverid>\\S+)"
-        )
-        private val serverIdTablistPattern by patternGroup.pattern(
-            "serverid.tablist",
-            " Server: §r§8(?<serverid>\\S+)"
         )
         private val lobbyTypePattern by patternGroup.pattern(
             "lobbytype",
@@ -121,17 +118,15 @@ class HypixelData {
             if (!LorenzUtils.inSkyBlock) return null
             if (serverId != null) return serverId
 
+            TabWidget.SERVER.matchMatcherFirstLine {
+                serverId = group("serverid")
+                return serverId
+            }
+
             ScoreboardData.sidebarLinesFormatted.forEach {
                 serverIdScoreboardPattern.matchMatcher(it) {
                     val serverType = if (group("servertype") == "M") "mega" else "mini"
                     serverId = "$serverType${group("serverid")}"
-                    return serverId
-                }
-            }
-
-            TabListData.getTabList().forEach {
-                serverIdTablistPattern.matchMatcher(it) {
-                    serverId = group("serverid")
                     return serverId
                 }
             }
@@ -147,7 +142,7 @@ class HypixelData {
                 playerAmountGuestingPattern
             )
 
-            out@for (pattern in playerPatternList) {
+            out@ for (pattern in playerPatternList) {
                 for (line in TabListData.getTabList()) {
                     pattern.matchMatcher(line) {
                         amount += group("amount").toInt()
@@ -243,17 +238,16 @@ class HypixelData {
     }
 
     @SubscribeEvent
-    fun onTabListUpdate(event: TabListUpdateEvent) {
-        for (line in event.tabList) {
-            UtilsPatterns.tabListProfilePattern.matchMatcher(line) {
-                var newProfile = group("profile").lowercase()
-                // Hypixel shows the profile name reversed while in the Rift
-                if (RiftAPI.inRift()) newProfile = newProfile.reversed()
-                if (profileName == newProfile) return
-                profileName = newProfile
-                ProfileJoinEvent(newProfile).postAndCatch()
-                return
-            }
+    fun onTabListUpdate(event: TabWidgetUpdate.NewValues) {
+        if (!TabWidget.PROFILE.isEventForThis(event)) return
+
+        TabWidget.PROFILE.matchMatcherFirstLine() {
+            var newProfile = group("profile").lowercase()
+            // Hypixel shows the profile name reversed while in the Rift
+            if (RiftAPI.inRift()) newProfile = newProfile.reversed()
+            if (profileName == newProfile) return
+            profileName = newProfile
+            ProfileJoinEvent(newProfile).postAndCatch()
         }
     }
 
@@ -301,13 +295,20 @@ class HypixelData {
 
         val inSkyBlock = checkScoreboard()
         if (inSkyBlock) {
-            checkIsland()
             checkSidebar()
             getCurrentServerId()
         }
 
         if (inSkyBlock == skyBlock) return
         skyBlock = inSkyBlock
+    }
+
+    @SubscribeEvent
+    fun onTabListUpdate(event: TabWidgetUpdate) {
+        when (event.widget) {
+            TabWidget.AREA -> checkIsland(event)
+            else -> Unit
+        }
     }
 
     private fun checkProfileName(): Boolean {
@@ -353,20 +354,26 @@ class HypixelData {
         noTrade = ironman || stranded || bingo
     }
 
-    private fun checkIsland() {
-        var newIsland = ""
-        TabListData.fullyLoaded = false
-
-        for (line in TabListData.getTabList()) {
-            islandNamePattern.matchMatcher(line) {
-                newIsland = group("island").removeColor()
-                TabListData.fullyLoaded = true
+    private fun checkIsland(event: TabWidgetUpdate) {
+        val islandType: IslandType
+        val newIsland: String
+        when (event) {
+            is TabWidgetUpdate.Clear -> {
+                TabListData.fullyLoaded = false
+                islandType = IslandType.NONE
+                newIsland = ""
             }
-        }
 
-        // Can not use color coding, because of the color effect (§f§lSKYB§6§lL§e§lOCK§A§L GUEST)
-        val guesting = guestPattern.matches(ScoreboardData.objectiveTitle.removeColor())
-        val islandType = getIslandType(newIsland, guesting)
+            is TabWidgetUpdate.NewValues -> {
+                TabListData.fullyLoaded = true
+                // Can not use color coding, because of the color effect (§f§lSKYB§6§lL§e§lOCK§A§L GUEST)
+                val guesting = guestPattern.matches(ScoreboardData.objectiveTitle.removeColor())
+                newIsland = TabWidget.AREA.matchMatcherFirstLine { group("island").removeColor() } ?: ""
+                islandType = getIslandType(newIsland, guesting)
+            }
+
+            else -> ErrorManager.skyHanniError("Unmanaged Event for Island check")
+        }
         if (skyBlockIsland != islandType) {
             IslandChangeEvent(islandType, skyBlockIsland).postAndCatch()
             if (islandType == IslandType.UNKNOWN) {
