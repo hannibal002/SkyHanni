@@ -394,7 +394,7 @@ private fun getColdDisplayPair(): List<ScoreboardElementType> {
     )
 }
 
-private fun getColdShowWhen() = inAnyIsland(IslandType.DWARVEN_MINES) // todo: add calm's island thing as a dependency
+private fun getColdShowWhen() = inAnyIsland(IslandType.DWARVEN_MINES, IslandType.MINESHAFT)
     && ScoreboardData.sidebarLinesFormatted.any { ScoreboardPattern.coldPattern.matches(it) }
 
 private fun getNorthStarsDisplayPair(): List<ScoreboardElementType> {
