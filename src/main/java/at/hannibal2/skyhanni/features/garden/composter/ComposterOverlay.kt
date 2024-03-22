@@ -4,8 +4,7 @@ import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.config.features.garden.composter.ComposterConfig
 import at.hannibal2.skyhanni.config.features.garden.composter.ComposterConfig.OverlayPriceTypeEntry
 import at.hannibal2.skyhanni.config.features.garden.composter.ComposterConfig.RetrieveFromEntry
-import at.hannibal2.skyhanni.data.SackAPI
-import at.hannibal2.skyhanni.data.SackStatus
+import at.hannibal2.skyhanni.data.SackAPI.getAmountInSacksOrNull
 import at.hannibal2.skyhanni.data.jsonobjects.repo.GardenJson
 import at.hannibal2.skyhanni.data.model.ComposterUpgrade
 import at.hannibal2.skyhanni.events.GuiRenderEvent
@@ -25,7 +24,7 @@ import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.CollectionUtils.addAsSingletonList
 import at.hannibal2.skyhanni.utils.CollectionUtils.sortedDesc
 import at.hannibal2.skyhanni.utils.ConfigUtils
-import at.hannibal2.skyhanni.utils.InventoryUtils
+import at.hannibal2.skyhanni.utils.InventoryUtils.getAmountInInventory
 import at.hannibal2.skyhanni.utils.ItemUtils.name
 import at.hannibal2.skyhanni.utils.KeyboardManager
 import at.hannibal2.skyhanni.utils.LorenzUtils
@@ -479,18 +478,15 @@ object ComposterOverlay {
             BazaarApi.searchForBazaarItem(itemName, itemsNeeded)
             return
         }
-        val having = InventoryUtils.getAmountOfItemInInventory(internalName)
-        if (having >= itemsNeeded) {
+        val havingInInventory = internalName.getAmountInInventory()
+        if (havingInInventory >= itemsNeeded) {
             ChatUtils.chat("$itemName §8x${itemsNeeded} §ealready found in inventory!")
             return
         }
 
-        val sackItem = SackAPI.fetchSackItem(internalName)
-        val amountInSacks = sackItem.amount
-        val sackStatus = sackItem.getStatus()
-
-        if (sackStatus == SackStatus.MISSING || sackStatus == SackStatus.OUTDATED) {
-            ChatUtils.sendCommandToServer("gfs ${internalName.asString()} ${itemsNeeded - having}")
+        val havingInSacks = internalName.getAmountInSacksOrNull()
+        if (havingInSacks == null) {
+            ChatUtils.sendCommandToServer("gfs ${internalName.asString()} ${itemsNeeded - havingInInventory}")
             // TODO Add sack type repo data
 
             val isDwarvenMineable =
@@ -501,7 +497,7 @@ object ComposterOverlay {
                 "sax"
             )
             return
-        } else if (amountInSacks == 0L) {
+        } else if (havingInSacks == 0L) {
             SoundUtils.playErrorSound()
             if (LorenzUtils.noTradeMode) {
                 ChatUtils.chat("No $itemName §efound in sacks.")
@@ -512,8 +508,8 @@ object ComposterOverlay {
             return
         }
 
-        ChatUtils.sendCommandToServer("gfs ${internalName.asString()} ${itemsNeeded - having}")
-        if (amountInSacks <= itemsNeeded - having) {
+        ChatUtils.sendCommandToServer("gfs ${internalName.asString()} ${itemsNeeded - havingInInventory}")
+        if (itemsNeeded > havingInInventory - havingInSacks) {
             if (LorenzUtils.noTradeMode) {
                 ChatUtils.chat("You're out of $itemName §ein your sacks!")
             } else {

@@ -3,8 +3,8 @@ package at.hannibal2.skyhanni.features.garden.visitor
 import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.config.features.garden.visitor.VisitorConfig.HighlightMode
 import at.hannibal2.skyhanni.data.IslandType
-import at.hannibal2.skyhanni.data.SackAPI
-import at.hannibal2.skyhanni.data.SackStatus
+import at.hannibal2.skyhanni.data.SackAPI.getAmountInSacks
+import at.hannibal2.skyhanni.data.SackAPI.getAmountInSacksOrNull
 import at.hannibal2.skyhanni.events.DebugDataCollectEvent
 import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.LorenzChatEvent
@@ -30,7 +30,7 @@ import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.CollectionUtils.addAsSingletonList
 import at.hannibal2.skyhanni.utils.ConfigUtils
 import at.hannibal2.skyhanni.utils.EntityUtils
-import at.hannibal2.skyhanni.utils.InventoryUtils
+import at.hannibal2.skyhanni.utils.InventoryUtils.getAmountInInventory
 import at.hannibal2.skyhanni.utils.ItemBlink
 import at.hannibal2.skyhanni.utils.ItemUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName
@@ -200,12 +200,9 @@ class GardenVisitorFeatures {
                 }
 
                 if (config.shoppingList.showSackCount) {
-                    val sackItemData = SackAPI.fetchSackItem(internalName)
-                    val itemStatus = sackItemData.getStatus()
-                    val itemAmount = sackItemData.amount
-                    if (itemStatus != SackStatus.OUTDATED) {
-                        val textColour = if (itemAmount >= amount) "a" else "e"
-                        list.add(" §7(§${textColour}x${sackItemData.amount.addSeparators()} §7in sacks)")
+                    internalName.getAmountInSacksOrNull()?.let {
+                        val textColour = if (it >= amount) "a" else "e"
+                        list.add(" §7(§${textColour}x${it.addSeparators()} §7in sacks)")
                     }
                 }
 
@@ -537,13 +534,7 @@ class GardenVisitorFeatures {
     private fun hasItems(visitor: VisitorAPI.Visitor): Boolean {
         var ready = true
         for ((internalName, required) in visitor.shoppingList) {
-            val inventoryAmount = InventoryUtils.getAmountOfItemInInventory(internalName)
-
-            val sackItemData = SackAPI.fetchSackItem(internalName)
-            val sacksAmount = sackItemData.amount
-
-            val having = inventoryAmount + sacksAmount
-
+            val having = internalName.getAmountInInventory() + internalName.getAmountInSacks()
             if (having < required) {
                 ready = false
             }
