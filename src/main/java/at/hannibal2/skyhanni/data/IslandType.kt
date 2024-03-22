@@ -1,6 +1,6 @@
 package at.hannibal2.skyhanni.data
 
-enum class IslandType(val displayName: String, val modeName: String = "null") {
+enum class IslandType(val displayName: String) {
     // TODO USE SH-REPO (for displayName only)
     PRIVATE_ISLAND("Private Island"),
     PRIVATE_ISLAND_GUEST("Private Island Guest"),
@@ -8,21 +8,22 @@ enum class IslandType(val displayName: String, val modeName: String = "null") {
     KUUDRA_ARENA("Kuudra"),
     CRIMSON_ISLE("Crimson Isle"),
     DWARVEN_MINES("Dwarven Mines"),
-    DUNGEON_HUB("Dungeon Hub", "dungeon_hub"),
-    CATACOMBS("Catacombs", "dungeon"),
+    DUNGEON_HUB("Dungeon Hub"),
+    CATACOMBS("Catacombs"),
 
-    HUB("Hub", "village"),
+    HUB("Hub"),
     DARK_AUCTION("Dark Auction"),
     THE_FARMING_ISLANDS("The Farming Islands"),
     CRYSTAL_HOLLOWS("Crystal Hollows"),
-    THE_PARK("The Park", "floating_islands_1"),
-    DEEP_CAVERNS("Deep Caverns", "deep_caverns"),
-    GOLD_MINES("Gold Mine", "gold_mine"),// TODO confirm
+    THE_PARK("The Park"),
+    DEEP_CAVERNS("Deep Caverns"),
+    GOLD_MINES("Gold Mine"),
     GARDEN("Garden"),
     GARDEN_GUEST("Garden Guest"),
     SPIDER_DEN("Spider's Den"),
     WINTER("Jerry's Workshop"),
     THE_RIFT("The Rift"),
+    MINESHAFT("Mineshaft"),
 
     NONE(""),
     UNKNOWN("???"),
