@@ -254,7 +254,6 @@ class PestFinder {
                 }
             }
         }
-        //resetAllPests(newPests)
     }
 
     @SubscribeEvent
