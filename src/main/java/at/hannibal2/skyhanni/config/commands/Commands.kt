@@ -4,6 +4,7 @@ import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.SkillAPI
 import at.hannibal2.skyhanni.config.ConfigFileType
 import at.hannibal2.skyhanni.config.ConfigGuiManager
+import at.hannibal2.skyhanni.data.ChatClickActionManager
 import at.hannibal2.skyhanni.data.ChatManager
 import at.hannibal2.skyhanni.data.GardenCropMilestonesCommunityFix
 import at.hannibal2.skyhanni.data.GuiEditManager
@@ -489,6 +490,7 @@ object Commands {
         registerCommand("shsendcontests", "") { GardenNextJacobContest.shareContestConfirmed(it) }
         registerCommand("shwords", "Opens the config list for modifying visual words") { openVisualWords() }
         registerCommand("shstopaccountupgradereminder", "") { AccountUpgradeReminder.disable() }
+        registerCommand("shaction", "") { ChatClickActionManager.onCommand(it) }
     }
 
     private fun shortenedCommands() {
