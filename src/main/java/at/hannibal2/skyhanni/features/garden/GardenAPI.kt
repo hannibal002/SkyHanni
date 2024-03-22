@@ -143,6 +143,8 @@ object GardenAPI {
 
     fun inGarden() = IslandType.GARDEN.isInIsland()
 
+    fun isCurrentlyFarming() = inGarden() && GardenCropSpeed.averageBlocksPerSecond > 0.0
+
     fun ItemStack.getCropType(): CropType? {
         val internalName = getInternalName()
         return CropType.entries.firstOrNull { internalName.startsWith(it.toolName) }
@@ -189,7 +191,7 @@ object GardenAPI {
         }
 
         lastLocation = position
-        CropClickEvent(cropBroken, blockState, event.clickType, event.itemInHand).postAndCatch()
+        CropClickEvent(position, cropBroken, blockState, event.clickType, event.itemInHand).postAndCatch()
     }
 
     fun getExpForLevel(requestedLevel: Int): Long {

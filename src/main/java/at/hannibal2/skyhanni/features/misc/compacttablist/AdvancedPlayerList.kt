@@ -12,7 +12,7 @@ import at.hannibal2.skyhanni.events.RepositoryReloadEvent
 import at.hannibal2.skyhanni.features.bingo.BingoAPI
 import at.hannibal2.skyhanni.features.misc.MarkedPlayerManager
 import at.hannibal2.skyhanni.test.SkyHanniDebugsAndTests
-import at.hannibal2.skyhanni.utils.ChatUtils
+import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.ConfigUtils
 import at.hannibal2.skyhanni.utils.KeyboardManager.isKeyHeld
 import at.hannibal2.skyhanni.utils.LorenzUtils
@@ -56,6 +56,7 @@ object AdvancedPlayerList {
             i++
             if (i == 1) continue
             if (line.isEmpty() || line.contains("Server Info")) break
+            if (line == "               §r§3§lInfo") break
             if (line.contains("§r§a§lPlayers")) {
                 extraTitles++
                 continue
@@ -103,9 +104,11 @@ object AdvancedPlayerList {
                         playerData.nameSuffix = ""
                     }
                 } catch (e: NumberFormatException) {
-                    val message = "Special user (youtube or admin?): '$line'"
-                    ChatUtils.debug(message)
-                    println(message)
+                    ErrorManager.logErrorWithData(e, "Advanced Player List failed to parse user name",
+                        "line" to line,
+                        "i" to i,
+                        "original" to original,
+                        )
                 }
             }
         }

@@ -546,6 +546,7 @@ object EstimatedItemValueCalculator {
         var totalPrice = 0.0
         val map = mutableMapOf<String, Double>()
 
+        //todo use repo
         val tieredEnchants = listOf("compact", "cultivating", "champion", "expertise", "hecatomb")
         val onlyTierOnePrices =
             listOf("ultimate_chimera", "ultimate_fatal_tempo", "smoldering", "ultimate_flash", "divine_gift")

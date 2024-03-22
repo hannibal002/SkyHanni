@@ -16,22 +16,27 @@ object ItemNameResolver {
         }
 
         if (itemName == "§cmissing repo item") {
-                return itemNameCache.getOrPut(lowercase) { NEUInternalName.MISSING_ITEM }
+            return itemNameCache.getOrPut(lowercase) { NEUInternalName.MISSING_ITEM }
         }
 
         resolveEnchantmentByName(itemName)?.let {
             return itemNameCache.getOrPut(lowercase) { fixEnchantmentName(it) }
         }
 
-        val internalName = ItemResolutionQuery.findInternalNameByDisplayName(itemName, true)?.let {
+        val internalName = when (itemName) {
+            "SUPERBOOM TNT" -> "SUPERBOOM_TNT".asInternalName()
+            else -> {
+                ItemResolutionQuery.findInternalNameByDisplayName(itemName, true)?.let {
 
-            // This fixes a NEU bug with §9Hay Bale (cosmetic item)
-            // TODO remove workaround when this is fixed in neu
-            val rawInternalName = if (it == "HAY_BALE") "HAY_BLOCK" else it
-            rawInternalName.asInternalName()
-        } ?: run {
-            getInternalNameOrNullIgnoreCase(itemName)
-        } ?: return null
+                    // This fixes a NEU bug with §9Hay Bale (cosmetic item)
+                    // TODO remove workaround when this is fixed in neu
+                    val rawInternalName = if (it == "HAY_BALE") "HAY_BLOCK" else it
+                    rawInternalName.asInternalName()
+                } ?: run {
+                    getInternalNameOrNullIgnoreCase(itemName)
+                } ?: return null
+            }
+        }
 
         itemNameCache[lowercase] = internalName
         return internalName

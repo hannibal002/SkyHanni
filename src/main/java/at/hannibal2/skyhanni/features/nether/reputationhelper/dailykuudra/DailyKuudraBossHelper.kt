@@ -1,7 +1,7 @@
 package at.hannibal2.skyhanni.features.nether.reputationhelper.dailykuudra
 
 import at.hannibal2.skyhanni.SkyHanniMod
-import at.hannibal2.skyhanni.config.Storage
+import at.hannibal2.skyhanni.config.storage.ProfileSpecificStorage
 import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.data.ScoreboardData
 import at.hannibal2.skyhanni.data.jsonobjects.repo.CrimsonIsleReputationJson.ReputationQuest
@@ -13,6 +13,7 @@ import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.CollectionUtils.addAsSingletonList
 import at.hannibal2.skyhanni.utils.LorenzColor
 import at.hannibal2.skyhanni.utils.LorenzUtils
+import at.hannibal2.skyhanni.utils.LorenzUtils.isInIsland
 import at.hannibal2.skyhanni.utils.LorenzVec
 import at.hannibal2.skyhanni.utils.NEUItems.getItemStack
 import at.hannibal2.skyhanni.utils.RenderUtils.drawDynamicText
@@ -29,9 +30,8 @@ class DailyKuudraBossHelper(private val reputationHelper: CrimsonIsleReputationH
 
     @SubscribeEvent
     fun onRenderWorld(event: LorenzRenderWorldEvent) {
-        if (!LorenzUtils.inSkyBlock) return
-        if (LorenzUtils.skyBlockIsland != IslandType.CRIMSON_ISLE) return
-        if (!reputationHelper.config.enabled) return
+        if (!IslandType.CRIMSON_ISLE.isInIsland()) return
+        if (!config.enabled) return
         if (!reputationHelper.showLocations()) return
         if (allKuudraDone) return
 
@@ -44,7 +44,7 @@ class DailyKuudraBossHelper(private val reputationHelper: CrimsonIsleReputationH
     @SubscribeEvent
     fun onChat(event: LorenzChatEvent) {
         if (!LorenzUtils.inKuudraFight) return
-        if (!reputationHelper.config.enabled) return
+        if (!config.enabled) return
 
         val message = event.message
         if (!message.contains("KUUDRA DOWN!") || message.contains(":")) return
@@ -93,7 +93,7 @@ class DailyKuudraBossHelper(private val reputationHelper: CrimsonIsleReputationH
         updateAllKuudraDone()
     }
 
-    fun saveConfig(storage: Storage.ProfileSpecific.CrimsonIsleStorage) {
+    fun saveConfig(storage: ProfileSpecificStorage.CrimsonIsleStorage) {
         storage.kuudraTiersDone.clear()
 
         kuudraTiers.filter { it.doneToday }
@@ -115,7 +115,7 @@ class DailyKuudraBossHelper(private val reputationHelper: CrimsonIsleReputationH
         }
     }
 
-    fun loadData(storage: Storage.ProfileSpecific.CrimsonIsleStorage) {
+    fun loadData(storage: ProfileSpecificStorage.CrimsonIsleStorage) {
         if (kuudraTiers.isEmpty()) return
         for (name in storage.kuudraTiersDone) {
             getByDisplayName(name)!!.doneToday = true

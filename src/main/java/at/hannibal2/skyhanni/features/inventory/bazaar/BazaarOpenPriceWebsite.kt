@@ -2,7 +2,8 @@ package at.hannibal2.skyhanni.features.inventory.bazaar
 
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.utils.NEUInternalName
-import at.hannibal2.skyhanni.utils.NEUItems
+import at.hannibal2.skyhanni.utils.NEUInternalName.Companion.asInternalName
+import at.hannibal2.skyhanni.utils.NEUItems.getItemStack
 import at.hannibal2.skyhanni.utils.OSUtils
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import io.github.moulberry.notenoughupdates.events.ReplaceItemEvent
@@ -19,7 +20,7 @@ class BazaarOpenPriceWebsite {
     private var lastClick = SimpleTimeMark.farPast()
 
     private val item by lazy {
-        val neuItem = NEUItems.getItemStack("PAPER")
+        val neuItem = "PAPER".asInternalName().getItemStack()
         Utils.createItemStack(
             neuItem.item,
             "§bPrice History",

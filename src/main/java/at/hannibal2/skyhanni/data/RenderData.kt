@@ -21,6 +21,7 @@ class RenderData {
     @SubscribeEvent
     fun onRenderOverlay(event: RenderGameOverlayEvent.Pre) {
         if (event.type != RenderGameOverlayEvent.ElementType.HOTBAR) return
+        if (!canRender()) return
         if (!SkyHanniDebugsAndTests.globalRender) return
         if (GuiEditManager.isInGui() || VisualWordGui.isInGui()) return
 
@@ -31,6 +32,7 @@ class RenderData {
 
     @SubscribeEvent
     fun onBackgroundDraw(event: GuiScreenEvent.BackgroundDrawnEvent) {
+        if (!canRender()) return
         if (!SkyHanniDebugsAndTests.globalRender) return
         if (GuiEditManager.isInGui() || VisualWordGui.isInGui()) return
         val currentScreen = Minecraft.getMinecraft().currentScreen ?: return
@@ -49,6 +51,8 @@ class RenderData {
 
         GlStateManager.popMatrix()
     }
+
+    private fun canRender(): Boolean = Minecraft.getMinecraft()?.renderManager?.fontRenderer != null
 
     @SubscribeEvent
     fun onRenderWorld(event: RenderWorldLastEvent) {
