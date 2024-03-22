@@ -154,7 +154,7 @@ class PestFinder {
     }
 
     private fun drawDisplay() = buildList {
-        add(Renderable.string("§eTotal pests in garden: §c${PestAPI.scoreboardPests}§7/§c8"))
+        add(Renderable.string("§6Total pests in garden: §e${PestAPI.scoreboardPests}§6/§e8"))
 
         for (plot in getPlotsWithAllPests()) {
             val pests = plot.pests
@@ -162,9 +162,9 @@ class PestFinder {
             val isInaccurate = plot.isPestCountInaccurate
             val pestsName = StringUtils.pluralize(pests, "pest")
             val renderable = Renderable.clickAndHover(
-                "§f" + if (isInaccurate) "?" else {pests} + " §c$pestsName §7in §b$plotName",
+                "§e" + if (isInaccurate) "1+?" else {pests} + " §c$pestsName §7in §b$plotName",
                 listOf(
-                    "§7Pests Found: " + if (isInaccurate) "Unknown" else pests,
+                    "§7Pests Found: §e" + if (isInaccurate) "Unknown" else pests,
                     "§7In plot §b$plotName",
                     "",
                     "§eClick here to warp!"
@@ -177,9 +177,9 @@ class PestFinder {
         }
 
         if (getPlotsWithAllPests().isEmpty() && PestAPI.scoreboardPests != 0) {
-            add(Renderable.string("§f${PestAPI.scoreboardPests} §cBugged pests!"))
+            add(Renderable.string("§e${PestAPI.scoreboardPests} §6Bugged pests!"))
             add(Renderable.clickAndHover(
-                "§eTry opening your plots menu.",
+                "§cTry opening your plots menu.",
                 listOf(
                     "Runs /desk."
                 ),
