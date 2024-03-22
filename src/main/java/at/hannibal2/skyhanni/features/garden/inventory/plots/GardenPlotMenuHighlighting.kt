@@ -17,33 +17,6 @@ class GardenPlotMenuHighlighting {
 
     private var highlightedPlots = mutableMapOf<GardenPlotAPI.Plot, PlotStatusType>()
 
-    private fun isHighlighted(plot: GardenPlotAPI.Plot) = highlightedPlots.containsKey(plot)
-    private fun isCurrentHighlight(plot: GardenPlotAPI.Plot, current: PlotStatusType) =
-        highlightedPlots[plot] == current
-
-    private fun handleStackSize(plot: GardenPlotAPI.Plot, status: PlotStatusType): Int {
-        return when (status.name) {
-            "§cPests" -> return plot.pests
-            "§eSprays" -> return plot.currentSpray?.expiry?.timeUntil()?.inWholeMinutes?.toInt() ?: 1
-            else -> 1
-        }
-    }
-
-    private fun handleCurrent(plot: GardenPlotAPI.Plot, status: PlotStatusType) {
-        val isHighlighted = isHighlighted(plot)
-        val isCurrent = isCurrentHighlight(plot, status)
-        if (!isHighlighted || isCurrent) {
-            if (!isHighlighted) highlightedPlots[plot] = status
-        } else {
-            highlightedPlots[plot] = status
-        }
-    }
-
-    private fun getLowestIndexItem(array: MutableList<PlotStatusType>): Int? {
-        return array.mapNotNull { status -> config.deskPlotStatusTypes.find { it == status } }
-            .minOfOrNull { config.deskPlotStatusTypes.indexOf(it) }
-    }
-
     @SubscribeEvent
     fun onInventoryOpen(event: InventoryFullyOpenedEvent) {
         if (!isEnabled()) return
@@ -78,6 +51,33 @@ class GardenPlotMenuHighlighting {
                 slot highlight plot.value.highlightColor
             }
         }
+    }
+
+    private fun isHighlighted(plot: GardenPlotAPI.Plot) = highlightedPlots.containsKey(plot)
+    private fun isCurrentHighlight(plot: GardenPlotAPI.Plot, current: PlotStatusType) =
+        highlightedPlots[plot] == current
+
+    private fun handleStackSize(plot: GardenPlotAPI.Plot, status: PlotStatusType): Int {
+        return when (status.name) {
+            "§cPests" -> return plot.pests
+            "§eSprays" -> return plot.currentSpray?.expiry?.timeUntil()?.inWholeMinutes?.toInt() ?: 1
+            else -> 1
+        }
+    }
+
+    private fun handleCurrent(plot: GardenPlotAPI.Plot, status: PlotStatusType) {
+        val isHighlighted = isHighlighted(plot)
+        val isCurrent = isCurrentHighlight(plot, status)
+        if (!isHighlighted || isCurrent) {
+            if (!isHighlighted) highlightedPlots[plot] = status
+        } else {
+            highlightedPlots[plot] = status
+        }
+    }
+
+    private fun getLowestIndexItem(array: MutableList<PlotStatusType>): Int? {
+        return array.mapNotNull { status -> config.deskPlotStatusTypes.find { it == status } }
+            .minOfOrNull { config.deskPlotStatusTypes.indexOf(it) }
     }
 
     private fun isEnabled() =
