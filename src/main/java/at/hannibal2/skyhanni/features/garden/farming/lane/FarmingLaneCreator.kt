@@ -19,7 +19,7 @@ import kotlin.math.min
 object FarmingLaneCreator {
     val config get() = FarmingLaneAPI.config
 
-    private var detection = false
+    var detection = false
     private var start: LorenzVec? = null
     private var lastLocation: LorenzVec? = null
     private var potentialEnd: LorenzVec? = null
