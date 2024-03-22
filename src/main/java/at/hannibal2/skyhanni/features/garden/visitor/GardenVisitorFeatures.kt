@@ -7,7 +7,6 @@ import at.hannibal2.skyhanni.data.SackAPI
 import at.hannibal2.skyhanni.data.SackStatus
 import at.hannibal2.skyhanni.events.DebugDataCollectEvent
 import at.hannibal2.skyhanni.events.GuiRenderEvent
-import at.hannibal2.skyhanni.events.InventoryCloseEvent
 import at.hannibal2.skyhanni.events.LorenzChatEvent
 import at.hannibal2.skyhanni.events.LorenzTickEvent
 import at.hannibal2.skyhanni.events.OwnInventoryItemUpdateEvent
@@ -42,19 +41,15 @@ import at.hannibal2.skyhanni.utils.ItemUtils.name
 import at.hannibal2.skyhanni.utils.LorenzLogger
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils.isInIsland
-import at.hannibal2.skyhanni.utils.LorenzUtils.runDelayed
 import at.hannibal2.skyhanni.utils.NEUInternalName
-import at.hannibal2.skyhanni.utils.NEUInternalName.Companion.asInternalName
 import at.hannibal2.skyhanni.utils.NEUItems
 import at.hannibal2.skyhanni.utils.NEUItems.getItemStack
 import at.hannibal2.skyhanni.utils.NEUItems.getPrice
 import at.hannibal2.skyhanni.utils.NumberUtil
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.NumberUtil.formatInt
-import at.hannibal2.skyhanni.utils.OSUtils
 import at.hannibal2.skyhanni.utils.RenderUtils.drawString
 import at.hannibal2.skyhanni.utils.RenderUtils.renderStringsAndItems
-import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.TimeUtils
@@ -63,21 +58,15 @@ import at.hannibal2.skyhanni.utils.renderables.Renderable
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import com.google.gson.JsonArray
 import com.google.gson.JsonPrimitive
-import io.github.moulberry.notenoughupdates.events.ReplaceItemEvent
-import io.github.moulberry.notenoughupdates.events.SlotClickEvent
-import io.github.moulberry.notenoughupdates.util.Utils
 import net.minecraft.client.Minecraft
 import net.minecraft.client.gui.inventory.GuiEditSign
 import net.minecraft.entity.EntityLivingBase
 import net.minecraft.entity.item.EntityArmorStand
-import net.minecraft.entity.player.InventoryPlayer
-import net.minecraft.init.Items
 import net.minecraft.item.ItemStack
 import net.minecraftforge.client.event.GuiScreenEvent.DrawScreenEvent
 import net.minecraftforge.fml.common.eventhandler.EventPriority
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import kotlin.math.round
-import kotlin.time.Duration.Companion.parse
 import kotlin.time.Duration.Companion.seconds
 
 private val config get() = VisitorAPI.config
@@ -110,19 +99,6 @@ class GardenVisitorFeatures {
 
     private val logger = LorenzLogger("garden/visitors")
     private var lastFullPrice = 0.0
-    private var hasIngredients = false;
-    private var lastClick = SimpleTimeMark.farPast()
-    private var lastSuperCraftMaterial = ""
-
-    private val superCraftItem by lazy {
-        val neuItem = "GOLD_PICKAXE".asInternalName().getItemStack()
-        Utils.createItemStack(
-            neuItem.item,
-            "§bSuper Craft",
-            "§7You have the items to craft",
-            "§7Click me to open the super crafter!"
-        )
-    }
 
     @SubscribeEvent
     fun onProfileJoin(event: ProfileJoinEvent) {
@@ -153,28 +129,6 @@ class GardenVisitorFeatures {
             val (itemName, amount) = pair
             val internalName = NEUInternalName.fromItemName(itemName)
             visitor.shoppingList[internalName] = amount
-//
-//            GET SUPERCRAFT FOR SACKS CODE
-//
-            if (config.shoppingList.showSuperCraft) {
-                val item =
-                    NEUItems.getRecipes(internalName).first { !it.ingredients.first().internalItemId.contains("PEST") }
-                val ingredients = item.ingredients
-                val ingredientReqs = mutableMapOf<String, Int>()
-                for (ingredient in ingredients) {
-                    val ing = ingredient.serialize().split(":")
-                    ingredientReqs[ing[0]] = ingredientReqs.getOrDefault(ing[0], 0) + ing[1].toDouble().toInt()
-                }
-                hasIngredients = true;
-                for ((key, value) in ingredientReqs) {
-                    val sackItem = SackAPI.fetchSackItem(key.asInternalName())
-                    lastSuperCraftMaterial = internalName.itemName
-                    if (sackItem.amount < value * amount) {
-                        hasIngredients = false;
-                        break;
-                    }
-                }
-            }
         }
 
         readToolTip(visitor, offerItem)
@@ -305,36 +259,6 @@ class GardenVisitorFeatures {
 
                 add(list)
             }
-        }
-    }
-
-    @SubscribeEvent
-    fun replaceItem(event: ReplaceItemEvent) {
-        if (!hasIngredients) return
-        if (event.inventory is InventoryPlayer) return
-
-        if (event.slotNumber == 31) {
-            event.replaceWith(superCraftItem)
-        }
-    }
-
-    @SubscribeEvent(priority = EventPriority.HIGH)
-    fun onStackClick(event: SlotClickEvent) {
-        if (!hasIngredients) return
-
-        if (event.slotId == 31) {
-            event.isCanceled = true
-            if (lastClick.passedSince() > 0.3.seconds) {
-                ChatUtils.sendCommandToServer("recipe $lastSuperCraftMaterial")
-                lastClick = SimpleTimeMark.now()
-            }
-        }
-    }
-
-    @SubscribeEvent
-    fun onInventoryClose(event: InventoryCloseEvent) {
-        if (hasIngredients) {
-            hasIngredients = false
         }
     }
 
