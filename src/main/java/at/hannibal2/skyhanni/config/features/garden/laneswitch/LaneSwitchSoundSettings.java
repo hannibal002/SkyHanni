@@ -24,7 +24,10 @@ public class LaneSwitchSoundSettings {
     public Runnable testSound = FarmingLaneFeatures::playUserSound;
 
     @Expose
-    @ConfigOption(name = "Repeat Duration", desc = "Change in how many ticks the sound will repeat. Change to 20 for only once per second.")
+    @ConfigOption(
+        name = "Repeat Duration",
+        desc = "Change how often the sound should be repeated in ticks. Change to 20 for only once per second."
+    )
     @ConfigEditorSlider(minValue = 1, maxValue = 20, minStep = 1)
     public int repeatDuration = 20;
 
