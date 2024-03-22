@@ -20,6 +20,7 @@ import net.minecraft.item.ItemStack
 import net.minecraft.potion.Potion
 import net.minecraft.util.AxisAlignedBB
 import net.minecraftforge.client.event.RenderLivingEvent
+import net.minecraftforge.fml.common.eventhandler.Event
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
 object EntityUtils {
@@ -170,27 +171,42 @@ object EntityUtils {
 
     @SubscribeEvent
     fun onEntityRender(event: RenderLivingEvent<*>) {
-        SkyHanniRenderEntityEvent(event.entity, event.renderer, event.x, event.y, event.z).postAndCatch()
+        val shEvent = SkyHanniRenderEntityEvent(event.entity, event.renderer, event.x, event.y, event.z)
+        if (shEvent.postAndCatch()) {
+            event.cancel()
+        }
     }
 
     @SubscribeEvent
     fun onEntityRenderPre(event: RenderLivingEvent.Pre<*>) {
-        SkyHanniRenderEntityEvent.Pre(event.entity, event.renderer, event.x, event.y, event.z).postAndCatch()
+        val shEvent = SkyHanniRenderEntityEvent.Pre(event.entity, event.renderer, event.x, event.y, event.z)
+        if (shEvent.postAndCatch()) {
+            event.cancel()
+        }
     }
 
     @SubscribeEvent
     fun onEntityRenderPost(event: RenderLivingEvent.Post<*>) {
-        SkyHanniRenderEntityEvent.Post(event.entity, event.renderer, event.x, event.y, event.z).postAndCatch()
+        val shEvent = SkyHanniRenderEntityEvent.Post(event.entity, event.renderer, event.x, event.y, event.z)
+        if (shEvent.postAndCatch()) {
+            event.cancel()
+        }
     }
 
     @SubscribeEvent
     fun onEntityRenderSpecialsPre(event: RenderLivingEvent.Specials.Pre<*>) {
-        SkyHanniRenderEntityEvent.Specials.Pre(event.entity, event.renderer, event.x, event.y, event.z).postAndCatch()
+        val shEvent = SkyHanniRenderEntityEvent.Specials.Pre(event.entity, event.renderer, event.x, event.y, event.z)
+        if (shEvent.postAndCatch()) {
+            event.cancel()
+        }
     }
 
     @SubscribeEvent
     fun onEntityRenderSpecialsPost(event: RenderLivingEvent.Specials.Post<*>) {
-        SkyHanniRenderEntityEvent.Specials.Post(event.entity, event.renderer, event.x, event.y, event.z).postAndCatch()
+        val shEvent = SkyHanniRenderEntityEvent.Specials.Post(event.entity, event.renderer, event.x, event.y, event.z)
+        if (shEvent.postAndCatch()) {
+            event.cancel()
+        }
     }
 
     fun EntityLivingBase.isCorrupted() = baseMaxHealth == health.toInt().derpy() * 3 || isRunicAndCorrupt()
@@ -198,4 +214,8 @@ object EntityUtils {
     fun EntityLivingBase.isRunicAndCorrupt() = baseMaxHealth == health.toInt().derpy() * 3 * 4
 
     fun Entity.cleanName() = this.name.removeColor()
+}
+
+private fun Event.cancel() {
+    isCanceled = true
 }

@@ -24,6 +24,7 @@ class TabListData {
 
         private var cache = emptyList<String>()
         private var debugCache: List<String>? = null
+        var fullyLoaded = false
 
         // TODO replace with TabListUpdateEvent
         fun getTabList() = debugCache ?: cache
@@ -53,7 +54,7 @@ class TabListData {
                 val tabListLine = line.transformIf({ noColor }) { removeColor() }
                 if (tabListLine != "") resultList.add("'$tabListLine'")
             }
-            val tabList = Minecraft.getMinecraft().ingameGUI.tabList as AccessorGuiPlayerTabOverlay
+            val tabList = getPlayerTabOverlay()
             val tabHeader =
                 tabList.header_skyhanni.conditionalTransform(noColor, { unformattedText }, { formattedText })
             val tabFooter =
@@ -61,6 +62,10 @@ class TabListData {
             val string = "Header:\n\n$tabHeader\n\nBody:\n\n${resultList.joinToString("\n")}\n\nFooter:\n\n$tabFooter"
             OSUtils.copyToClipboard(string)
             ChatUtils.chat("Tab list copied into the clipboard!")
+        }
+
+        fun getPlayerTabOverlay(): AccessorGuiPlayerTabOverlay {
+            return Minecraft.getMinecraft().ingameGUI.tabList as AccessorGuiPlayerTabOverlay
         }
     }
 

@@ -218,7 +218,7 @@ object SkillProgress {
 
     @SubscribeEvent(priority = EventPriority.LOW)
     fun onActionBar(event: ActionBarUpdateEvent) {
-        if (!config.hideInActionBar) return
+        if (!config.hideInActionBar || !isEnabled()) return
         if (event.isCanceled) return
         var msg = event.actionBar
         for (line in hideInActionBar) {
@@ -374,17 +374,18 @@ object SkillProgress {
             )
         }
 
-
         val session = xpInfo.timeActive.seconds.format(TimeUnit.HOUR)
         add(
-            Renderable.clickAndHover(
-                "§7Session: §e$session ${if (xpInfo.sessionTimerActive) "" else "§c(PAUSED)"}",
-                listOf("§eClick to reset!")
-            ) {
-            xpInfo.sessionTimerActive = false
-            xpInfo.timeActive = 0L
-            chat("Timer for §b${activeSkill.displayName} §ehas been reset!")
-        })
+            Renderable.clickAndHover("§7Session: §e$session ${if (xpInfo.sessionTimerActive) "" else "§c(PAUSED)"}",
+                listOf("§eClick to reset!"),
+                onClick = {
+                    xpInfo.sessionTimerActive = false
+
+                    xpInfo.timeActive = 0L
+                    chat("Timer for §b${activeSkill.displayName} §ehas been reset!")
+                }
+            )
+        )
     }
 
     private fun drawDisplay() = buildList {

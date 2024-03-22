@@ -10,14 +10,15 @@ enum class MiningEventType(
     val eventName: String,
     private val shortName: String,
     val defaultLength: Duration,
-    private val colourCode: Char
+    private val colourCode: Char,
+    val dwarvenSpecific: Boolean,
 ) {
-    GONE_WITH_THE_WIND("GONE WITH THE WIND", "Wind", 18.minutes, '9'),
-    DOUBLE_POWDER("2X POWDER", "2x", 15.minutes, 'b'),
-    GOBLIN_RAID("GOBLIN RAID", "Raid", 5.minutes, 'c'),
-    BETTER_TOGETHER("BETTER TOGETHER", "Better", 18.minutes, 'd'),
-    RAFFLE("RAFFLE", "Raffle", 160.seconds, '6'),
-    MITHRIL_GOURMAND("MITHRIL GOURMAND", "Gourmand", 10.minutes, 'b'),
+    GONE_WITH_THE_WIND("GONE WITH THE WIND", "Wind", 18.minutes, '9', false),
+    DOUBLE_POWDER("2X POWDER", "2x", 15.minutes, 'b', false),
+    GOBLIN_RAID("GOBLIN RAID", "Raid", 5.minutes, 'c', true),
+    BETTER_TOGETHER("BETTER TOGETHER", "Better", 18.minutes, 'd', false),
+    RAFFLE("RAFFLE", "Raffle", 160.seconds, '6', true),
+    MITHRIL_GOURMAND("MITHRIL GOURMAND", "Gourmand", 10.minutes, 'b', true),
     ;
 
     override fun toString() =
@@ -29,7 +30,7 @@ enum class MiningEventType(
     companion object {
         private val config get() = SkyHanniMod.feature.mining.miningEvent
 
-        fun fromBossbarName(bossbarName: String): MiningEventType? {
+        fun fromEventName(bossbarName: String): MiningEventType? {
             return MiningEventType.entries.find { it.eventName == bossbarName.removeColor() }
         }
     }

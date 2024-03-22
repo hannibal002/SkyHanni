@@ -1,10 +1,9 @@
 package at.hannibal2.skyhanni.features.nether.reputationhelper.dailyquest
 
 import at.hannibal2.skyhanni.SkyHanniMod
-import at.hannibal2.skyhanni.config.Storage
+import at.hannibal2.skyhanni.config.storage.ProfileSpecificStorage
 import at.hannibal2.skyhanni.data.IslandType
-import at.hannibal2.skyhanni.data.SackAPI
-import at.hannibal2.skyhanni.data.SackStatus
+import at.hannibal2.skyhanni.data.SackAPI.getAmountInSacksOrNull
 import at.hannibal2.skyhanni.events.GuiContainerEvent
 import at.hannibal2.skyhanni.events.InventoryFullyOpenedEvent
 import at.hannibal2.skyhanni.events.LorenzChatEvent
@@ -31,6 +30,7 @@ import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.CollectionUtils.addAsSingletonList
 import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.InventoryUtils.getInventoryName
+import at.hannibal2.skyhanni.utils.InventoryUtils.getUpperItems
 import at.hannibal2.skyhanni.utils.ItemUtils.name
 import at.hannibal2.skyhanni.utils.LorenzColor
 import at.hannibal2.skyhanni.utils.LorenzUtils
@@ -96,11 +96,7 @@ class DailyQuestHelper(val reputationHelper: CrimsonIsleReputationHelper) {
             val dojoQuest = getQuest<DojoQuest>() ?: return
             if (dojoQuest.state != QuestState.ACCEPTED) return
 
-            for (slot in chest.inventorySlots) {
-                if (slot == null) continue
-                if (slot.slotNumber != slot.slotIndex) continue
-                val stack = slot.stack ?: continue
-
+            for ((slot, stack) in chest.getUpperItems()) {
                 if (stack.name.contains(dojoQuest.dojoName)) {
                     slot highlight LorenzColor.AQUA
                 }
@@ -179,7 +175,10 @@ class DailyQuestHelper(val reputationHelper: CrimsonIsleReputationHelper) {
     }
 
     private fun renderTownBoard(event: LorenzRenderWorldEvent) {
-        if (quests.any { it.state == QuestState.READY_TO_COLLECT || it.state == QuestState.NOT_ACCEPTED }) {
+        if (quests.any {
+                it.state == QuestState.READY_TO_COLLECT ||
+                it.state == QuestState.NOT_ACCEPTED ||
+                (it is RescueMissionQuest && it.state == QuestState.ACCEPTED) }) {
             val location = when (reputationHelper.factionType) {
                 FactionType.BARBARIAN -> townBoardBarbarian
                 FactionType.MAGE -> townBoardMage
@@ -221,22 +220,14 @@ class DailyQuestHelper(val reputationHelper: CrimsonIsleReputationHelper) {
         }
 
         val sacksText = if (quest is FetchQuest && quest.state != QuestState.COLLECTED) {
-            val sackItem = SackAPI.fetchSackItem(quest.displayItem)
-            val sackStatus = sackItem.getStatus()
-
-            if (sackStatus == SackStatus.OUTDATED) {
-                " §7(§eSack data outdated§7)"
-            } else {
-                val amountInSacks = sackItem.amount
-                val needAmount = quest.needAmount
-
-                val color = if (amountInSacks >= needAmount) {
+            quest.displayItem.getAmountInSacksOrNull()?.let {
+                val color = if (it >= quest.needAmount) {
                     "§a"
                 } else {
                     "§c"
                 }
-                " §7($color${amountInSacks.addSeparators()} §7in sacks)"
-            }
+                " §7($color${it.addSeparators()} §7in sacks)"
+            } ?: " §7(§eSack data outdated/missing§7)"
         } else {
             ""
         }
@@ -284,12 +275,12 @@ class DailyQuestHelper(val reputationHelper: CrimsonIsleReputationHelper) {
         quests.clear()
     }
 
-    fun load(storage: Storage.ProfileSpecific.CrimsonIsleStorage) {
+    fun load(storage: ProfileSpecificStorage.CrimsonIsleStorage) {
         reset()
         questLoader.loadConfig(storage)
     }
 
-    fun saveConfig(storage: Storage.ProfileSpecific.CrimsonIsleStorage) {
+    fun saveConfig(storage: ProfileSpecificStorage.CrimsonIsleStorage) {
         storage.quests.clear()
         for (quest in quests) {
             val builder = StringBuilder()

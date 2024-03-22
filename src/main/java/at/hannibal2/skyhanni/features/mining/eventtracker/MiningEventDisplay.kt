@@ -77,10 +77,11 @@ object MiningEventDisplay {
         eventData.runningEvents.forEach { (islandType, events) ->
             when (islandType) {
                 IslandType.DWARVEN_MINES -> dwarvenEvents =
-                    (events.sortedBy { it.endsAt - it.event.defaultLength.inWholeMilliseconds })
+                    events.sortedBy { it.endsAt - it.event.defaultLength.inWholeMilliseconds }
 
                 IslandType.CRYSTAL_HOLLOWS -> crystalEvents =
-                    (events.sortedBy { it.endsAt - it.event.defaultLength.inWholeMilliseconds })
+                    events.filter { !it.event.dwarvenSpecific }
+                        .sortedBy { it.endsAt - it.event.defaultLength.inWholeMilliseconds }
                 else -> Unit
             }
         }
