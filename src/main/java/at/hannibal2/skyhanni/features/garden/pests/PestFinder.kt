@@ -126,12 +126,12 @@ class PestFinder {
                 }
             }
         }
-        fixPests()
         update()
     }
 
     private fun update() {
         if (isEnabled()) {
+            fixPests()
             display = drawDisplay()
         }
     }
@@ -149,6 +149,14 @@ class PestFinder {
             val plot = getPlotsWithInaccuratePests().firstOrNull()
             plot?.pests = PestAPI.scoreboardPests - accurateAmount
             plot?.isPestCountInaccurate = false
+        }
+    }
+
+    private fun resetAllPests() {
+        PestAPI.scoreboardPests = 0
+        GardenPlotAPI.plots.forEach {
+            it.pests = 0
+            it.isPestCountInaccurate = false
         }
         update()
     }
@@ -199,11 +207,7 @@ class PestFinder {
     fun onChat(event: LorenzChatEvent) {
         if (!isEnabled()) return
         if (event.message == "§cThere are not any Pests on your Garden right now! Keep farming!") {
-            GardenPlotAPI.plots.forEach {
-                it.pests = 0
-                it.isPestCountInaccurate = false
-            }
-            update()
+            resetAllPests()
         }
     }
 
@@ -212,26 +216,23 @@ class PestFinder {
         if (!GardenAPI.inGarden()) return
 
         for (line in event.newList) {
+            // gets the total amount of pests in the garden
             pestsInScoreboardPattern.matchMatcher(line) {
                 val newPests = group("pests").formatNumber().toInt()
                 if (newPests != PestAPI.scoreboardPests) {
                     removePests(PestAPI.scoreboardPests - newPests)
                     PestAPI.scoreboardPests = newPests
-                    fixPests()
                     update()
                 }
             }
+            // gets if there are no pests remaining in the garden
             noPestsInScoreboardPattern.matchMatcher(line) {
                 if (PestAPI.scoreboardPests != 0) {
-                    PestAPI.scoreboardPests = 0
-                    GardenPlotAPI.plots.forEach {
-                        it.pests = 0
-                        it.isPestCountInaccurate = false
-                    }
-                    update()
+                    resetAllPests()
                 }
             }
 
+            // gets the amount of pests in the current plot
             pestsInPlotScoreboardPattern.matchMatcher(line) {
                 val plotName = group("plot")
                 val pestsInPlot = group("pests").toInt()
@@ -239,17 +240,17 @@ class PestFinder {
                 if (pestsInPlot != plot?.pests || plot.isPestCountInaccurate) {
                     plot?.pests = pestsInPlot
                     plot?.isPestCountInaccurate = false
-                    fixPests()
                     update()
                 }
             }
+
+            // gets if there are no pests remaining in the current plot
             noPestsInPlotScoreboardPattern.matchMatcher(line) {
                 val plotName = group("plot")
                 val plot = getPlotByName(plotName)
                 if (plot?.pests != 0 || plot.isPestCountInaccurate) {
                     getPlotByName(plotName)?.pests = 0
                     getPlotByName(plotName)?.isPestCountInaccurate = false
-                    fixPests()
                     update()
                 }
             }
@@ -279,7 +280,6 @@ class PestFinder {
                     }
                 }
                 previousLine = line
-                fixPests()
                 update()
             }
         }
