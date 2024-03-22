@@ -6,6 +6,7 @@ import at.hannibal2.skyhanni.data.jsonobjects.local.FriendsJson
 import at.hannibal2.skyhanni.data.jsonobjects.local.JacobContestsJson
 import at.hannibal2.skyhanni.data.jsonobjects.local.KnownFeaturesJson
 import at.hannibal2.skyhanni.data.jsonobjects.other.HypixelApiTrophyFish
+import at.hannibal2.skyhanni.data.jsonobjects.local.VisualWordsJson
 import at.hannibal2.skyhanni.features.fishing.trophy.TrophyRarity
 import at.hannibal2.skyhanni.features.misc.update.UpdateManager
 import at.hannibal2.skyhanni.utils.KotlinTypeAdapterFactory
@@ -174,6 +175,7 @@ class ConfigManager {
     val friendsData get() = jsonHolder[ConfigFileType.FRIENDS] as FriendsJson
     val knownFeaturesData get() = jsonHolder[ConfigFileType.KNOWN_FEATURES] as KnownFeaturesJson
     val jacobContestData get() = jsonHolder[ConfigFileType.JACOB_CONTESTS] as JacobContestsJson
+    val visualWordsData get() = jsonHolder[ConfigFileType.VISUAL_WORDS] as VisualWordsJson
 
     private val logger = LorenzLogger("config_manager")
 
@@ -301,6 +303,7 @@ enum class ConfigFileType(val fileName: String, val clazz: Class<*>) {
     FRIENDS("friends", FriendsJson::class.java),
     KNOWN_FEATURES("known_features", KnownFeaturesJson::class.java),
     JACOB_CONTESTS("jacob_contests", JacobContestsJson::class.java),
+    VISUAL_WORDS("visual_words", VisualWordsJson::class.java),
     ;
 
     val file by lazy { File(ConfigManager.configDirectory, "$fileName.json") }
