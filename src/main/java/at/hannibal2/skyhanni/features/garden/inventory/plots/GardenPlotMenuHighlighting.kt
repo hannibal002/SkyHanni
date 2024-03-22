@@ -59,8 +59,6 @@ class GardenPlotMenuHighlighting {
             if (!plot.unlocked && locksEnabled) list.add(PlotStatusType.LOCKED)
             if (plot == GardenPlotAPI.getCurrentPlot() && currentEnabled) list.add(PlotStatusType.CURRENT)
 
-            println(list)
-
             getLowestIndexItem(list)?.let { index ->
                 val status = config.deskPlotStatusTypes[index]
                 handleCurrent(plot, status)
