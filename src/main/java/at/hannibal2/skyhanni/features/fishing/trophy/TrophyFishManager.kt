@@ -1,10 +1,13 @@
 package at.hannibal2.skyhanni.features.fishing.trophy
 
+import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.data.ProfileStorageData
 import at.hannibal2.skyhanni.data.jsonobjects.repo.TrophyFishJson
 import at.hannibal2.skyhanni.data.jsonobjects.repo.TrophyFishJson.TrophyFishInfo
+import at.hannibal2.skyhanni.events.NeuProfileDataLoadedEvent
 import at.hannibal2.skyhanni.events.RepositoryReloadEvent
 import at.hannibal2.skyhanni.test.command.ErrorManager
+import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.StringUtils.splitLines
 import net.minecraft.event.HoverEvent
@@ -13,6 +16,7 @@ import net.minecraft.util.ChatStyle
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
 object TrophyFishManager {
+    private val config get() = SkyHanniMod.feature.fishing.trophyFishing
 
     @SubscribeEvent
     fun onRepoReload(event: RepositoryReloadEvent) {
@@ -20,8 +24,39 @@ object TrophyFishManager {
         trophyFishInfo = data.trophy_fish
     }
 
-    val fishes: MutableMap<String, MutableMap<TrophyRarity, Int>>?
+    val fish: MutableMap<String, MutableMap<TrophyRarity, Int>>?
         get() = ProfileStorageData.profileSpecific?.crimsonIsle?.trophyFishes
+
+    private var loadedNeu = false
+
+    @SubscribeEvent
+    fun onNeuProfileDataLoaded(event: NeuProfileDataLoadedEvent) {
+        if (loadedNeu || !config.loadFromNeuPV) return
+
+        val caughtTrophyFish = event.getCurrentPlayerData()?.trophyFish?.caught ?: return
+
+        loadedNeu = true
+
+        val savedFish = fish ?: return
+        var changed = false
+
+        for ((fishName, apiAmount) in caughtTrophyFish) {
+            val rarity = TrophyRarity.getByName(fishName) ?: continue
+            val name = fishName.split("_").dropLast(1).joinToString("")
+
+            val savedFishData = savedFish.getOrPut(name) { mutableMapOf() }
+
+            val currentSavedAmount = savedFishData[rarity] ?: 0
+            if (apiAmount > currentSavedAmount) {
+                savedFishData[rarity] = apiAmount
+                ChatUtils.debug("Updated trophy fishing data from NEU PV: $name $rarity: $currentSavedAmount -> $apiAmount")
+                changed = true
+            }
+        }
+        if (changed) {
+            ChatUtils.chat("Updated Trophy Fishing data via NEU PV!")
+        }
+    }
 
     private var trophyFishInfo = mapOf<String, TrophyFishInfo>()
 
