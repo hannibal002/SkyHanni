@@ -18,6 +18,10 @@ object ScoreboardPattern {
         "heat",
         "^Heat: (?<heat>.*)$"
     ) // this line is weird (either text or number), ill leave it as is; it even has different colors?
+    val coldPattern by mainSb.pattern(
+        "cold",
+        "^Cold: §.❄ (?<cold>-?\\d+)$"
+    )
     val copperPattern by mainSb.pattern(
         "copper",
         "^(§.)*Copper: (§.)*(?<copper>[\\d,]+).*$"
@@ -167,7 +171,7 @@ object ScoreboardPattern {
     private val miningSb = scoreboardGroup.group("mining")
     val powderPattern by miningSb.pattern(
         "powder",
-        "(§.)*᠅ §f(Gemstone|Mithril)( Powder)?(§.)*:?.*$"
+        "(§.)*᠅ §.(Gemstone|Mithril|Glacite)( Powder)?(§.)*:?.*$"
     )
     val windCompassPattern by miningSb.pattern(
         "windcompass",
@@ -279,7 +283,7 @@ object ScoreboardPattern {
     private val miscSb = scoreboardGroup.group("misc")
     val essencePattern by miscSb.pattern(
         "essence",
-        "^\\s*(.*)?Essence: §.(?<essence>-?\\d+(:?,\\d{3})*(?:\\.\\d+)?)$"
+        "^\\s*.*Essence: §.(?<essence>-?\\d+(:?,\\d{3})*(?:\\.\\d+)?)$"
     )
     val brokenRedstonePattern by miscSb.pattern(
         "brokenredstone",
