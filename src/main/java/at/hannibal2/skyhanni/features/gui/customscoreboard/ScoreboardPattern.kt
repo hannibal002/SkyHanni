@@ -403,6 +403,10 @@ object ScoreboardPattern {
         "gemstonepowder",
         "^\\s*Gemstone Powder: (?:§.)+(?<gemstonepowder>[\\d,\\.]+)$"
     )
+    val glacitePowderPattern by tablistGroup.pattern(
+        "glacitepowder",
+        "^\\s*Glacite Powder: (?:§.)+(?<glacitepowder>[\\d,\\.]+)$"
+    )
     val eventNamePattern by tablistGroup.pattern(
         "event",
         "^\\s*§e§lEvent: §r(?<name>§.*)$"

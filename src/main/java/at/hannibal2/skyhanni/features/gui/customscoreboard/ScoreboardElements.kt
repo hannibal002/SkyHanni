@@ -627,7 +627,12 @@ private fun getPowderDisplayPair() = buildList {
             TabListData.getTabList(),
             ScoreboardPattern.gemstonePowderPattern,
             "gemstonepowder"
-        ).formatNum()
+        ).formatNum(),
+        "§bGlacite" to getGroupFromPattern(
+            TabListData.getTabList(),
+            ScoreboardPattern.glacitePowderPattern,
+            "glacitepowder"
+        ).formatNum(),
     )
 
     if (informationFilteringConfig.hideEmptyLines && powderTypes.all { it.second == "0" }) {
