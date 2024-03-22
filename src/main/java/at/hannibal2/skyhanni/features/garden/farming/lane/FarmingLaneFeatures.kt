@@ -1,5 +1,6 @@
 package at.hannibal2.skyhanni.features.garden.farming.lane
 
+import at.hannibal2.skyhanni.events.GardenToolChangeEvent
 import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.LorenzRenderWorldEvent
 import at.hannibal2.skyhanni.events.LorenzTickEvent
@@ -7,6 +8,7 @@ import at.hannibal2.skyhanni.events.farming.FarmingLaneSwitchEvent
 import at.hannibal2.skyhanni.features.garden.GardenAPI
 import at.hannibal2.skyhanni.features.garden.farming.lane.FarmingLaneAPI.getValue
 import at.hannibal2.skyhanni.features.garden.farming.lane.FarmingLaneAPI.setValue
+import at.hannibal2.skyhanni.features.misc.MovementSpeedDisplay
 import at.hannibal2.skyhanni.test.GriffinUtils.drawWaypointFilled
 import at.hannibal2.skyhanni.utils.LocationUtils
 import at.hannibal2.skyhanni.utils.LorenzColor
@@ -19,6 +21,7 @@ import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.SoundUtils
 import at.hannibal2.skyhanni.utils.SoundUtils.playSound
 import at.hannibal2.skyhanni.utils.TimeUtils.format
+import at.hannibal2.skyhanni.utils.TimeUtils.ticks
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import kotlin.math.absoluteValue
 import kotlin.time.Duration
@@ -35,10 +38,16 @@ object FarmingLaneFeatures {
     private var lastSpeed = 0.0
     private var validSpeed = false
     private var lastTimeFarming = SimpleTimeMark.farPast()
+    private var lastPlaySound = SimpleTimeMark.farPast()
     private var lastDirection = 0
 
     @SubscribeEvent
     fun onFarmingLaneSwitch(event: FarmingLaneSwitchEvent) {
+        display = emptyList()
+    }
+
+    @SubscribeEvent
+    fun onGardenToolChange(event: GardenToolChangeEvent) {
         display = emptyList()
     }
 
@@ -114,13 +123,16 @@ object FarmingLaneFeatures {
         with(config.laneSwitchNotification) {
             if (enabled) {
                 LorenzUtils.sendTitle(text.replace("&", "§"), 2.seconds)
-                playUserSound()
+                if (lastPlaySound.passedSince() >= sound.repeatDuration.ticks) {
+                    lastPlaySound = SimpleTimeMark.now()
+                    playUserSound()
+                }
             }
         }
     }
 
     private fun calculateSpeed(): Boolean {
-        val speedPerSecond = LocationUtils.distanceFromPreviousTick().round(2)
+        val speedPerSecond = MovementSpeedDisplay.speedInLastTick.round(2)
         if (speedPerSecond == 0.0) return false
         val speedTooSlow = speedPerSecond < 1
         if (speedTooSlow) {
