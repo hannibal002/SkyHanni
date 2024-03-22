@@ -8,6 +8,7 @@ import at.hannibal2.skyhanni.events.farming.FarmingLaneSwitchEvent
 import at.hannibal2.skyhanni.features.garden.GardenAPI
 import at.hannibal2.skyhanni.features.garden.farming.lane.FarmingLaneAPI.getValue
 import at.hannibal2.skyhanni.features.garden.farming.lane.FarmingLaneAPI.setValue
+import at.hannibal2.skyhanni.features.misc.MovementSpeedDisplay
 import at.hannibal2.skyhanni.test.GriffinUtils.drawWaypointFilled
 import at.hannibal2.skyhanni.utils.LocationUtils
 import at.hannibal2.skyhanni.utils.LorenzColor
@@ -126,7 +127,7 @@ object FarmingLaneFeatures {
     }
 
     private fun calculateSpeed(): Boolean {
-        val speedPerSecond = LocationUtils.distanceFromPreviousTick().round(2)
+        val speedPerSecond = MovementSpeedDisplay.speedInLastTick.round(2)
         if (speedPerSecond == 0.0) return false
         val speedTooSlow = speedPerSecond < 1
         if (speedTooSlow) {
