@@ -43,7 +43,6 @@ object ReforgeAPI {
 
         val isReforgeStone = reforgeStone != null
 
-        private val internalNameToRawName = "(_.)".toRegex()
         val rawReforgeStoneName = reforgeStone?.itemNameWithoutColor
 
         val lowercaseName = name.lowercase()
