@@ -21,6 +21,7 @@ import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.SoundUtils
 import at.hannibal2.skyhanni.utils.SoundUtils.playSound
 import at.hannibal2.skyhanni.utils.TimeUtils.format
+import at.hannibal2.skyhanni.utils.TimeUtils.ticks
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import kotlin.math.absoluteValue
 import kotlin.time.Duration
@@ -37,6 +38,7 @@ object FarmingLaneFeatures {
     private var lastSpeed = 0.0
     private var validSpeed = false
     private var lastTimeFarming = SimpleTimeMark.farPast()
+    private var lastPlaySound = SimpleTimeMark.farPast()
     private var lastDirection = 0
 
     @SubscribeEvent
@@ -121,7 +123,10 @@ object FarmingLaneFeatures {
         with(config.laneSwitchNotification) {
             if (enabled) {
                 LorenzUtils.sendTitle(text.replace("&", "§"), 2.seconds)
-                playUserSound()
+                if (lastPlaySound.passedSince() >= sound.repeatDuration.ticks) {
+                    lastPlaySound = SimpleTimeMark.now()
+                    playUserSound()
+                }
             }
         }
     }
