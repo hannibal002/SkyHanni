@@ -276,7 +276,13 @@ class ReforgeHelper {
     }
 
     private fun getReforgeEffect(reforge: ReforgeAPI.Reforge?, rarity: LorenzRarity) =
-        reforge?.extraProperty?.get(rarity)?.split('\n')?.map { rString(it) }
+        reforge?.extraProperty?.get(rarity)?.let {
+            Renderable.wrappedString(
+                it,
+                190,
+                color = LorenzColor.GRAY.toColor()
+            )
+        }
 
     private fun getSortSelector(
         itemRarity: LorenzRarity,
