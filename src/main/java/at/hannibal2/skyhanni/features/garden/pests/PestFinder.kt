@@ -115,14 +115,13 @@ class PestFinder {
         if (event.inventoryName != "Configure Plots") return
 
         for (plot in GardenPlotAPI.plots) {
-            if (!plot.isBarn()) {
-                plot.pests = 0
-                plot.isPestCountInaccurate = false
-                val item = event.inventoryItems[plot.inventorySlot] ?: continue
-                for (line in item.getLore()) {
-                    pestInventoryPattern.matchMatcher(line) {
-                        plot.pests = group("amount").formatNumber().toInt()
-                    }
+            if (plot.isBarn()) continue
+            plot.pests = 0
+            plot.isPestCountInaccurate = false
+            val item = event.inventoryItems[plot.inventorySlot] ?: continue
+            for (line in item.getLore()) {
+                pestInventoryPattern.matchMatcher(line) {
+                    plot.pests = group("amount").formatNumber().toInt()
                 }
             }
         }
