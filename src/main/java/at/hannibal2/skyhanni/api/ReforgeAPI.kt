@@ -6,10 +6,10 @@ import at.hannibal2.skyhanni.events.NeuRepositoryReloadEvent
 import at.hannibal2.skyhanni.utils.ItemCategory
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName
 import at.hannibal2.skyhanni.utils.ItemUtils.getItemCategoryOrNull
+import at.hannibal2.skyhanni.utils.ItemUtils.itemNameWithoutColor
 import at.hannibal2.skyhanni.utils.LorenzRarity
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.NEUInternalName
-import at.hannibal2.skyhanni.utils.NEUInternalName.Companion.asInternalName
 import net.minecraft.item.ItemStack
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
@@ -44,15 +44,7 @@ object ReforgeAPI {
         val isReforgeStone = reforgeStone != null
 
         private val internalNameToRawName = "(_.)".toRegex()
-        val rawReforgeStoneName = when (reforgeStone) {
-            "SKYMART_BROCHURE".asInternalName() -> "SkyMart Brochure"
-            "FULL-JAW_FANGING_KIT".asInternalName() -> "Full-Jaw Fanging Kit"
-            else -> reforgeStone?.asString()?.lowercase()?.let {
-                internalNameToRawName.replace(it) {
-                    " " + it.groupValues[1][1].uppercase()
-                }.replaceFirstChar { it.uppercase() }
-            }
-        }
+        val rawReforgeStoneName = reforgeStone?.itemNameWithoutColor
 
         val lowercaseName = name.lowercase()
 
