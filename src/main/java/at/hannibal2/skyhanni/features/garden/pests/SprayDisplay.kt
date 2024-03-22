@@ -13,6 +13,7 @@ import at.hannibal2.skyhanni.features.garden.GardenPlotAPI.markExpiredSprayAsNot
 import at.hannibal2.skyhanni.features.garden.GardenPlotAPI.name
 import at.hannibal2.skyhanni.features.garden.GardenPlotAPI.plots
 import at.hannibal2.skyhanni.utils.ChatUtils
+import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.RenderUtils.renderString
 import at.hannibal2.skyhanni.utils.StringUtils.createCommaSeparatedList
 import at.hannibal2.skyhanni.utils.TimeUtils.format
@@ -44,6 +45,7 @@ class SprayDisplay {
 
     @SubscribeEvent
     fun onJoin(event: IslandChangeEvent) {
+        if (!LorenzUtils.inSkyBlock) return
         if (!config.expiryNotification || event.newIsland != IslandType.GARDEN) return
         sendExpiredPlotsToChat(true)
     }
