@@ -367,7 +367,7 @@ object LorenzUtils {
     fun sendMessageToServer(message: String) = ChatUtils.sendMessageToServer(message)
 
     fun inAdvancedMiningIsland() =
-        inAnyIsland(IslandType.DWARVEN_MINES, IslandType.CRYSTAL_HOLLOWS, IslandType.MINESHAFT)
+        IslandType.DWARVEN_MINES.isInIsland() || IslandType.CRYSTAL_HOLLOWS.isInIsland() || IslandType.MINESHAFT.isInIsland()
 
     fun inMiningIsland() = IslandType.GOLD_MINES.isInIsland() || IslandType.DEEP_CAVERNS.isInIsland()
         || inAdvancedMiningIsland()
