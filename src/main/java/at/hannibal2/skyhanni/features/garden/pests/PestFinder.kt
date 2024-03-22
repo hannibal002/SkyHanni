@@ -146,9 +146,9 @@ class PestFinder {
             }
         }
         if (inaccurateAmount == 1) { // if we can assume all the inaccurate pests are in the only inaccurate plot
-            val plot = getPlotsWithInaccuratePests()[0]
-            plot.pests = PestAPI.scoreboardPests - accurateAmount
-            plot.isPestCountInaccurate = false
+            val plot = getPlotsWithInaccuratePests().firstOrNull()
+            plot?.pests = PestAPI.scoreboardPests - accurateAmount
+            plot?.isPestCountInaccurate = false
         }
         update()
     }
@@ -345,7 +345,7 @@ class PestFinder {
             val isInaccurate = plot.isPestCountInaccurate
             val location = playerLocation.copy(x = middle.x, z = middle.z)
             event.drawWaypointFilled(location, LorenzColor.RED.toColor())
-            event.drawDynamicText(location, "§f" + if (isInaccurate) "?" else {pests} + " §c$pestsName §7in §b$plotName", 1.5)
+            event.drawDynamicText(location, "§e" + if (isInaccurate) "?" else {pests} + " §c$pestsName §7in §b$plotName", 1.5)
         }
     }
 

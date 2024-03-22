@@ -114,7 +114,7 @@ class PestSpawn {
         PestSpawnEvent(amount, plotNames, unknownAmount).postAndCatch()
 
         if (unknownAmount) return // todo make this work with offline pest spawn messages
-        val plotName = plotNames[0]
+        val plotName = plotNames.firstOrNull()
         val pestName = StringUtils.pluralize(amount, "Pest")
         val message = "§e$amount §a$pestName Spawned in §b$plotName§a!"
 
