@@ -17,7 +17,7 @@ class TabWidgetSettings {
     private val patternGroup = RepoPattern.group("tab.widget.setting")
     private val mainPageSettingPattern by patternGroup.pattern(
         "gui",
-        "WIDGETS.*"
+        "Widgets on.*"
     )
     private val mainPageWidgetPattern by patternGroup.pattern(
         "main",
@@ -40,7 +40,7 @@ class TabWidgetSettings {
         ".*(ENABLED)"
     )
 
-    var inInventory = false;
+    var inInventory = false
     var highlights = mutableMapOf<Int, LorenzColor>()
 
     @SubscribeEvent
@@ -49,7 +49,8 @@ class TabWidgetSettings {
         highlights.clear()
 
         val inventoryName = event.inventoryName
-        if (mainPageSettingPattern.matches(inventoryName.uppercase())) {
+        if (mainPageSettingPattern.matches(inventoryName)) {
+            inInventory = true
             val items = event.inventoryItems.filter { mainPageWidgetPattern.anyMatches(it.value.getLore()) }
             for ((slot, stack) in items) {
                 highlights[slot] = if (enabledPattern.anyMatches(stack.getLore())) {
@@ -61,17 +62,16 @@ class TabWidgetSettings {
         }
 
         if (shownSettingPattern.matches(inventoryName)) {
+            inInventory = true
             val items = event.inventoryItems.filter {
                 subPageWidgetPattern.matches(it.value.getLore().lastOrNull())
             }
 
             for ((slot, stack) in items) {
-                if (subPageWidgetPattern.matches(stack.getLore().lastOrNull())) {
-                    highlights[slot] = if (clickToDisablePattern.anyMatches(stack.getLore())) {
-                        LorenzColor.GREEN
-                    } else {
-                        LorenzColor.RED
-                    }
+                highlights[slot] = if (clickToDisablePattern.anyMatches(stack.getLore())) {
+                    LorenzColor.GREEN
+                } else {
+                    LorenzColor.RED
                 }
             }
         }
