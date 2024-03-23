@@ -40,7 +40,6 @@ object FarmingLaneFeatures {
     private var lastPlaySound = SimpleTimeMark.farPast()
     private var lastDirection = 0
     private var movementState = MovementState.CALCULATING
-    private var sameSpeedCounter = 0
 
     enum class MovementState(val label: String) {
         NOT_MOVING("§eMove to update!"),
@@ -148,32 +147,12 @@ object FarmingLaneFeatures {
         }
     }
 
+    private var sameSpeedCounter = 0
+
     private fun calculateSpeed(): Boolean {
         val speed = MovementSpeedDisplay.speed.round(2)
-        if (speed == 0.0) {
-            movementState = MovementState.NOT_MOVING
-            return false
-        }
-        val speedTooSlow = speed < 1
-        if (speedTooSlow) {
-            movementState = MovementState.TOO_SLOW
-            return false
-        }
-        // only calculate the time if the speed has not changed
-        if (!MovementSpeedDisplay.usingSoulsandSpeed) {
-            if (lastSpeed != speed) {
-                lastSpeed = speed
-                sameSpeedCounter = 0
-                movementState = MovementState.CALCULATING
-                return false
-            }
-            sameSpeedCounter++
-            if (sameSpeedCounter < 5) {
-                movementState = MovementState.CALCULATING
-                return false
-            }
-        }
-        movementState = MovementState.NORMAL
+        movementState = calculateMovementState(speed)
+        if (movementState != MovementState.NORMAL) return false
 
         val timeRemaining = (currentDistance / speed).seconds
         FarmingLaneFeatures.timeRemaining = timeRemaining
@@ -185,6 +164,26 @@ object FarmingLaneFeatures {
 
         // When the player was not inside the farm previously
         return lastTimeFarming.passedSince() < warnAt
+    }
+
+    private fun calculateMovementState(speed: Double): MovementState {
+        if (speed == 0.0) return MovementState.NOT_MOVING
+        val speedTooSlow = speed < 1
+        if (speedTooSlow) return MovementState.TOO_SLOW
+        // only calculate the time if the speed has not changed
+        if (!MovementSpeedDisplay.usingSoulsandSpeed) {
+            if (lastSpeed != speed) {
+                lastSpeed = speed
+                sameSpeedCounter = 0
+                return MovementState.CALCULATING
+            }
+            sameSpeedCounter++
+            if (sameSpeedCounter < 5) {
+                return MovementState.CALCULATING
+            }
+        }
+
+        return MovementState.NORMAL
     }
 
     @SubscribeEvent
