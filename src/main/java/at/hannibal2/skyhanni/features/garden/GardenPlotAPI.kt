@@ -6,6 +6,7 @@ import at.hannibal2.skyhanni.events.LorenzRenderWorldEvent
 import at.hannibal2.skyhanni.features.garden.pests.SprayType
 import at.hannibal2.skyhanni.features.misc.LockMouseLook
 import at.hannibal2.skyhanni.utils.ChatUtils
+import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.ItemUtils.name
 import at.hannibal2.skyhanni.utils.LocationUtils.isPlayerInside
 import at.hannibal2.skyhanni.utils.LorenzVec
@@ -24,9 +25,20 @@ import kotlin.time.Duration.Companion.minutes
 object GardenPlotAPI {
 
     private val patternGroup = RepoPattern.group("garden.plot")
+
+    /**
+     * REGEX-TEST: §aPlot §7- §b4
+     */
     private val plotNamePattern by patternGroup.pattern(
         "name",
         "§.Plot §7- §b(?<name>.*)"
+    )
+    /**
+     * REGEX-TEST: §aThe Barn
+     */
+    private val barnNamePattern by patternGroup.pattern(
+        "barnname",
+        "§.(?<name>The Barn)"
     )
     private val plotSprayedPattern by patternGroup.pattern(
         "spray.target",
@@ -39,7 +51,7 @@ object GardenPlotAPI {
         return plots.firstOrNull { it.isPlayerInside() }
     }
 
-    class Plot(val id: Int, var inventorySlot: Int, val box: AxisAlignedBB, val middle: LorenzVec)
+    class Plot(val id: Int, var unlocked: Boolean, var inventorySlot: Int, val box: AxisAlignedBB, val middle: LorenzVec)
 
     class PlotData(
         @Expose
@@ -59,6 +71,9 @@ object GardenPlotAPI {
 
         @Expose
         var sprayHasNotified: Boolean,
+
+        @Expose
+        var isPestCountInaccurate: Boolean,
     )
 
     data class SprayData(
@@ -66,7 +81,7 @@ object GardenPlotAPI {
         val type: SprayType,
     )
 
-    private fun Plot.getData() = GardenAPI.storage?.plotData?.getOrPut(id) { PlotData(id, "$id", 0, null, null, false) }
+    private fun Plot.getData() = GardenAPI.storage?.plotData?.getOrPut(id) { PlotData(id, "$id", 0, null, null, false, false) }
 
     var Plot.name: String
         get() = getData()?.name ?: "$id"
@@ -92,6 +107,12 @@ object GardenPlotAPI {
             !it.sprayHasNotified && it.sprayExpiryTime?.isInPast() == true
         } == true
 
+    var Plot.isPestCountInaccurate: Boolean
+        get() = this.getData()?.isPestCountInaccurate ?: false
+        set(value) {
+            this.getData()?.isPestCountInaccurate = value
+        }
+
     fun Plot.markExpiredSprayAsNotified() {
         getData()?.apply { sprayHasNotified = true }
     }
@@ -104,12 +125,13 @@ object GardenPlotAPI {
         }
     }
 
-    fun Plot.isBarn() = id == -1
+    fun Plot.isBarn() = id == 0
 
     fun Plot.isPlayerInside() = box.isPlayerInside()
 
     fun Plot.sendTeleportTo() {
-        ChatUtils.sendCommandToServer("tptoplot $name")
+        if (isBarn()) ChatUtils.sendCommandToServer("tptoplot barn")
+        else ChatUtils.sendCommandToServer("tptoplot $name")
         LockMouseLook.autoDisable()
     }
 
@@ -117,7 +139,7 @@ object GardenPlotAPI {
         val plotMap = listOf(
             listOf(21, 13, 9, 14, 22),
             listOf(15, 5, 1, 6, 16),
-            listOf(10, 2, -1, 3, 11),
+            listOf(10, 2, 0, 3, 11),
             listOf(17, 7, 4, 8, 18),
             listOf(23, 19, 12, 20, 24),
         )
@@ -133,7 +155,7 @@ object GardenPlotAPI {
                 val b = LorenzVec(maxX, 256.0, maxY)
                 val middle = a.interpolate(b, 0.5).copy(y = 10.0)
                 val box = a.axisAlignedTo(b).expand(0.0001, 0.0, 0.0001)
-                list.add(Plot(id, slot, box, middle))
+                list.add(Plot(id, false, slot, box, middle))
                 slot++
             }
             slot += 4
@@ -162,8 +184,13 @@ object GardenPlotAPI {
         if (event.inventoryName != "Configure Plots") return
 
         for (plot in plots) {
-            val itemName = event.inventoryItems[plot.inventorySlot]?.name ?: continue
-            plotNamePattern.matchMatcher(itemName) {
+            val itemStack = event.inventoryItems[plot.inventorySlot] ?: continue
+            plot.unlocked = itemStack.getLore().all { !it.contains("§7Cost:") }
+            plotNamePattern.matchMatcher(itemStack.name) {
+                val plotName = group("name")
+                plot.name = plotName
+            }
+            barnNamePattern.matchMatcher(itemStack.name) {
                 plot.name = group("name")
             }
         }

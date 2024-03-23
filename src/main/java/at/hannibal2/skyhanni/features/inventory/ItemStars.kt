@@ -33,7 +33,7 @@ class ItemStars {
         val stack = event.itemStack ?: return
         if (stack.stackSize != 1) return
 
-        val itemName = stack.name ?: return
+        val itemName = stack.name
         val stars = getStars(itemName)
 
         if (stars > 0) {
@@ -61,7 +61,7 @@ class ItemStars {
     fun onRenderItemTip(event: RenderItemTipEvent) {
         if (!CRIMSON_ARMOR.isSelected()) return
         val stack = event.stack
-        val number = getCrimsonStars(stack.name ?: return)
+        val number = getCrimsonStars(stack.name)
         if (number != -1) {
             event.stackTip = number.toString()
         }

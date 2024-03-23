@@ -21,7 +21,7 @@ class CropSpeedMeter {
     private var snapshot = emptyList<String>()
 
     @SubscribeEvent
-    fun onBlockBreak(event: CropClickEvent) {
+    fun onCropClick(event: CropClickEvent) {
         if (!isEnabled()) return
         if (startCrops.isEmpty()) return
 

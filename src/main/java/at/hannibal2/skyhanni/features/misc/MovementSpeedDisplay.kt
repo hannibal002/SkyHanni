@@ -1,6 +1,7 @@
 package at.hannibal2.skyhanni.features.misc
 
 import at.hannibal2.skyhanni.SkyHanniMod
+import at.hannibal2.skyhanni.config.enums.OutsideSbFeature
 import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils.round
@@ -13,7 +14,12 @@ import kotlin.concurrent.fixedRateTimer
 class MovementSpeedDisplay {
 
     private val config get() = SkyHanniMod.feature.misc
+
     private var display = ""
+
+    companion object {
+        var speedInLastTick = 0.0
+    }
 
     init {
         fixedRateTimer(name = "skyhanni-movement-speed-display", period = 250, initialDelay = 1_000) {
@@ -22,16 +28,18 @@ class MovementSpeedDisplay {
     }
 
     private fun checkSpeed() {
-        if (!isEnabled()) return
+        if (!LorenzUtils.onHypixel) return
 
-        val distance = with(Minecraft.getMinecraft().thePlayer) {
+        speedInLastTick = with(Minecraft.getMinecraft().thePlayer) {
             val oldPos = LorenzVec(prevPosX, prevPosY, prevPosZ)
             val newPos = LorenzVec(posX, posY, posZ)
 
             // Distance from previous tick, multiplied by TPS
             oldPos.distance(newPos) * 20
         }
-        display = "Movement Speed: ${distance.round(2)}"
+        if (isEnabled()) {
+            display = "Movement Speed: ${speedInLastTick.round(2)}"
+        }
     }
 
     @SubscribeEvent
@@ -41,5 +49,7 @@ class MovementSpeedDisplay {
         config.playerMovementSpeedPos.renderString(display, posLabel = "Movement Speed")
     }
 
-    fun isEnabled() = LorenzUtils.inSkyBlock && config.playerMovementSpeed
+    fun isEnabled() = LorenzUtils.onHypixel &&
+        (LorenzUtils.inSkyBlock || OutsideSbFeature.MOVEMENT_SPEED.isSelected()) &&
+        config.playerMovementSpeed
 }

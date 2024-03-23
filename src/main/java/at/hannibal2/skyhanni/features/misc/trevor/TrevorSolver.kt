@@ -16,14 +16,14 @@ import kotlin.time.Duration.Companion.seconds
 
 object TrevorSolver {
 
-    private val animalHealths = intArrayOf(100, 200, 500, 1000, 2000, 5000, 10000, 30000)
+    private val animalHealths = setOf(100, 200, 500, 1000, 2000, 5000, 10000, 30000)
 
-    var currentMob: TrevorMobs? = null
+    var currentMob: TrevorMob? = null
     private var maxHeight: Double = 0.0
     private var minHeight: Double = 0.0
     private var foundID = -1
     var mobCoordinates = LorenzVec(0.0, 0.0, 0.0)
-    var mobLocation = CurrentMobArea.NONE
+    var mobLocation = TrapperMobArea.NONE
     var averageHeight = (minHeight + maxHeight) / 2
 
     fun findMobHeight(height: Int, above: Boolean) {
@@ -53,18 +53,18 @@ object TrevorSolver {
             if (entity is EntityOtherPlayerMP) continue
             val name = entity.name
             val entityHealth = if (entity is EntityLivingBase) entity.baseMaxHealth.derpy() else 0
-            currentMob = TrevorMobs.entries.firstOrNull { it.mobName.contains(name) }
+            currentMob = TrevorMob.entries.firstOrNull { it.mobName.contains(name) }
             if (animalHealths.any { it == entityHealth } && currentMob != null) {
                 if (foundID == entity.entityId) {
                     val dist = entity.position.toLorenzVec().distanceToPlayer()
-                    if ((currentMob == TrevorMobs.RABBIT || currentMob == TrevorMobs.SHEEP) && mobLocation == CurrentMobArea.OASIS) {
-                        println("This is unfortunate")
-                    } else canSee = entity.canBeSeen() && dist < currentMob!!.renderDistance
+                    if ((currentMob == TrevorMob.RABBIT || currentMob == TrevorMob.SHEEP) && mobLocation == TrapperMobArea.OASIS) return
+
+                    canSee = entity.canBeSeen() && dist < currentMob!!.renderDistance
                     if (canSee) {
-                        if (mobLocation != CurrentMobArea.FOUND) {
+                        if (mobLocation != TrapperMobArea.FOUND) {
                             LorenzUtils.sendTitle("§2Saw ${currentMob!!.mobName}!", 3.seconds)
                         }
-                        mobLocation = CurrentMobArea.FOUND
+                        mobLocation = TrapperMobArea.FOUND
                         mobCoordinates = entity.position.toLorenzVec()
                     }
                 } else {
@@ -74,7 +74,6 @@ object TrevorSolver {
             }
         }
         if (foundID != -1) {
-            println("Cannot find mob anymore")
             mobCoordinates = LorenzVec(0.0, 0.0, 0.0)
             foundID = -1
         }

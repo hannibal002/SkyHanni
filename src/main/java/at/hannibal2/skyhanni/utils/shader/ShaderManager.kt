@@ -5,12 +5,12 @@ import at.hannibal2.skyhanni.features.chroma.TexturedChromaShader
 import at.hannibal2.skyhanni.features.misc.RoundedRectangleShader
 import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.LorenzUtils
-import java.io.BufferedReader
-import java.io.InputStreamReader
 import net.minecraft.client.Minecraft
 import net.minecraft.util.ResourceLocation
 import org.apache.commons.lang3.StringUtils
 import org.lwjgl.opengl.OpenGLException
+import java.io.BufferedReader
+import java.io.InputStreamReader
 
 /**
  * Object to handle shaders for SkyHanni
@@ -19,13 +19,13 @@ object ShaderManager {
 
     /**
      * For any future shaders add the object instance in this enum and
-     * in the when expression
+     * in the when-expression
      */
     enum class Shaders(val shader: Shader) {
-
         STANDARD_CHROMA(StandardChromaShader.INSTANCE),
         TEXTURED_CHROMA(TexturedChromaShader.INSTANCE),
-        ROUNDED_RECTANGLE(RoundedRectangleShader.INSTANCE);
+        ROUNDED_RECTANGLE(RoundedRectangleShader.INSTANCE),
+        ;
 
         companion object {
 

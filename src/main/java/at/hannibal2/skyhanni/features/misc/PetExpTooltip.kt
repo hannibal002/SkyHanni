@@ -35,7 +35,7 @@ class PetExpTooltip {
 
         val itemStack = event.itemStack ?: return
         val petExperience = itemStack.getPetExp()?.round(1) ?: return
-        val name = itemStack.name ?: return
+        val name = itemStack.name
         try {
 
             val index = findIndex(event.toolTip) ?: return
@@ -45,10 +45,8 @@ class PetExpTooltip {
             val percentage = petExperience / maxXp
             val percentageFormat = LorenzUtils.formatPercentage(percentage)
 
-            event.toolTip.add(index, " ")
-            if (percentage >= 1) {
-                event.toolTip.add(index, "§7Total experience: §e${NumberUtil.format(petExperience)}")
-            } else {
+            if (percentage < 1) {
+                event.toolTip.add(index, " ")
                 val progressBar = StringUtils.progressBar(percentage)
                 val isBelowLegendary = itemStack.getItemRarityOrNull()?.let { it < LorenzRarity.LEGENDARY } ?: false
                 val addLegendaryColor = if (isBelowLegendary) "§6" else ""
