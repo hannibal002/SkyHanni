@@ -155,7 +155,7 @@ object QuiverAPI {
 
         addedToQuiverPattern.matchMatcher(message) {
             val type = group("type")
-            val amount = group("amount").formatNumber().toFloat()
+            val amount = group("amount").toFloat()
 
             val filledUpType = getArrowByNameOrNull(type)
                 ?: return ErrorManager.logErrorWithData(
@@ -286,7 +286,7 @@ object QuiverAPI {
         arrows = arrowData.arrows.map { ArrowType(it.value.arrow, it.key.asInternalName()) }
 
         NONE_ARROW_TYPE = getArrowByNameOrNull("NONE".asInternalName())
-        FLINT_ARROW_TYPE = getArrowByNameOrNull("FLINT".asInternalName())
+        FLINT_ARROW_TYPE = getArrowByNameOrNull("ARROW".asInternalName())
     }
 
     class UnknownArrowType(message: String) : Exception(message)

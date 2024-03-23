@@ -18,12 +18,16 @@ public class QuiverDisplayConfig {
     public Position quiverDisplayPos = new Position(260, 80);
 
     @Expose
-    @ConfigOption(name = "Show arrow icon", desc = "")
+    @ConfigOption(name = "Show arrow icon", desc = "Displays an icon next to the Quiver Display.")
     @ConfigEditorBoolean
     public boolean showIcon = true;
 
     @Expose
-    @ConfigOption(name = "Show only with bow", desc = "Only show when a bow is in your inventory.")
+    @ConfigOption(
+        name = "Show only with bow",
+        desc = "Only show the quiver display when\n" +
+            "a bow is in your inventory."
+    )
     @ConfigEditorBoolean
     public boolean onlyWithBow = true;
 
@@ -48,7 +52,7 @@ public class QuiverDisplayConfig {
     public boolean reminderAfterRun = false;
 
     @Expose
-    @ConfigOption(name = "Low Quiver Amount", desc = "")
+    @ConfigOption(name = "Low Quiver Amount", desc = "Amount at which to notify you.")
     @ConfigEditorSlider(minValue = 50, maxValue = 500, minStep = 50)
     public int lowQuiverAmount = 100;
 }
