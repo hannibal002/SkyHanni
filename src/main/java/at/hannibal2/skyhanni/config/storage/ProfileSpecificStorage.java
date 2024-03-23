@@ -1,6 +1,7 @@
 package at.hannibal2.skyhanni.config.storage;
 
 import at.hannibal2.skyhanni.api.SkillAPI;
+import at.hannibal2.skyhanni.data.MaxwellAPI;
 import at.hannibal2.skyhanni.data.model.ComposterUpgrade;
 import at.hannibal2.skyhanni.features.combat.endernodetracker.EnderNodeTracker;
 import at.hannibal2.skyhanni.features.combat.ghostcounter.GhostData;
@@ -17,6 +18,7 @@ import at.hannibal2.skyhanni.features.garden.CropType;
 import at.hannibal2.skyhanni.features.garden.GardenPlotAPI;
 import at.hannibal2.skyhanni.features.garden.farming.ArmorDropTracker;
 import at.hannibal2.skyhanni.features.garden.farming.DicerRngDropTracker;
+import at.hannibal2.skyhanni.features.garden.farming.lane.FarmingLane;
 import at.hannibal2.skyhanni.features.garden.fortuneguide.FarmingItems;
 import at.hannibal2.skyhanni.features.garden.visitor.VisitorReward;
 import at.hannibal2.skyhanni.features.mining.powdertracker.PowderTracker;
@@ -52,6 +54,9 @@ public class ProfileSpecificStorage {
 
         @Expose
         public int magicalPower = -1;
+
+        @Expose
+        public List<MaxwellAPI.ThaumaturgyPowerTuning> tunings = new ArrayList<>();
     }
 
     @Expose
@@ -224,6 +229,9 @@ public class ProfileSpecificStorage {
 
         @Expose
         public Map<CropType, LorenzVec> cropStartLocations = new HashMap<>();
+
+        @Expose
+        public Map<CropType, FarmingLane> farmingLanes = new HashMap<>();
 
         @Expose
         public GardenStorage.Fortune fortune = new GardenStorage.Fortune();

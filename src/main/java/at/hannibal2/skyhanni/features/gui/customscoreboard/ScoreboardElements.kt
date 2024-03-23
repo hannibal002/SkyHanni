@@ -28,6 +28,7 @@ import at.hannibal2.skyhanni.utils.LorenzUtils.inDungeons
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.NumberUtil.percentageColor
 import at.hannibal2.skyhanni.utils.RenderUtils.HorizontalAlignment
+import at.hannibal2.skyhanni.utils.StringUtils
 import at.hannibal2.skyhanni.utils.StringUtils.firstLetterUppercase
 import at.hannibal2.skyhanni.utils.StringUtils.matches
 import at.hannibal2.skyhanni.utils.TabListData
@@ -42,7 +43,7 @@ internal var amountOfUnknownLines = 0
 enum class ScoreboardElement(
     private val displayPair: Supplier<List<ScoreboardElementType>>,
     val showWhen: () -> Boolean,
-    private val configLine: String
+    private val configLine: String,
 ) {
     TITLE(
         ::getTitleDisplayPair,
@@ -88,6 +89,11 @@ enum class ScoreboardElement(
         ::getHeatDisplayPair,
         ::getHeatShowWhen,
         "Heat: §c♨ 0"
+    ),
+    COLD(
+        ::getColdDisplayPair,
+        ::getColdShowWhen,
+        "Cold: §b❄ 0"
     ),
     NORTH_STARS(
         ::getNorthStarsDisplayPair,
@@ -137,6 +143,11 @@ enum class ScoreboardElement(
         ::getPowerDisplayPair,
         ::getPowerShowWhen,
         "Power: §aSighted §7(§61.263§7)"
+    ),
+    TUNING(
+        ::getTuningDisplayPair,
+        ::getPowerShowWhen,
+        "Tuning: §c❁34§7, §e⚔20§7, and §9☣7"
     ),
     COOKIE(
         ::getCookieDisplayPair,
@@ -233,7 +244,6 @@ enum class ScoreboardElement(
         return showWhen()
     }
 }
-
 
 private fun getTitleDisplayPair() = if (displayConfig.titleAndFooter.useHypixelTitleAnimation) {
     listOf(ScoreboardData.objectiveTitle to displayConfig.titleAndFooter.alignTitleAndFooter)
@@ -372,6 +382,21 @@ private fun getHeatDisplayPair(): List<ScoreboardElementType> {
 private fun getHeatShowWhen() = inAnyIsland(IslandType.CRYSTAL_HOLLOWS)
     && ScoreboardData.sidebarLinesFormatted.any { ScoreboardPattern.heatPattern.matches(it) }
 
+private fun getColdDisplayPair(): List<ScoreboardElementType> {
+    val cold = getGroupFromPattern(ScoreboardData.sidebarLinesFormatted, ScoreboardPattern.coldPattern, "cold")
+
+    return listOf(
+        when {
+            informationFilteringConfig.hideEmptyLines && cold == "0" -> "<hidden>"
+            displayConfig.displayNumbersFirst -> "§b❄ $cold Cold"
+            else -> "Cold: §b❄ $cold"
+        } to HorizontalAlignment.LEFT
+    )
+}
+
+private fun getColdShowWhen() = inAnyIsland(IslandType.DWARVEN_MINES, IslandType.MINESHAFT)
+    && ScoreboardData.sidebarLinesFormatted.any { ScoreboardPattern.coldPattern.matches(it) }
+
 private fun getNorthStarsDisplayPair(): List<ScoreboardElementType> {
     val northStars =
         getGroupFromPattern(ScoreboardData.sidebarLinesFormatted, ScoreboardPattern.northstarsPattern, "northstars")
@@ -393,14 +418,13 @@ private fun getEmptyLineDisplayPair() = listOf("<empty>" to HorizontalAlignment.
 private fun getIslandDisplayPair() =
     listOf("§7㋖ §a" + HypixelData.skyBlockIsland.displayName to HorizontalAlignment.LEFT)
 
+// TODO merge with LorenzUtils.skyBlockArea
 private fun getLocationDisplayPair() = buildList {
-    add(
-        getGroupFromPattern(
-            ScoreboardData.sidebarLinesFormatted,
-            ScoreboardPattern.locationPattern,
-            "location"
-        ).trim() to HorizontalAlignment.LEFT
-    )
+    val location =
+        getGroupFromPattern(ScoreboardData.sidebarLinesFormatted, ScoreboardPattern.locationPattern, "location").trim()
+    if (location == "0") return@buildList
+
+    add(location to HorizontalAlignment.LEFT)
 
     ScoreboardData.sidebarLinesFormatted.firstOrNull { ScoreboardPattern.plotPattern.matches(it) }
         ?.let { add(it to HorizontalAlignment.LEFT) }
@@ -427,7 +451,6 @@ private fun getDateDisplayPair() =
     listOf(
         SkyBlockTime.now().formatted(yearElement = false, hoursAndMinutesElement = false) to HorizontalAlignment.LEFT
     )
-
 
 private fun getTimeDisplayPair(): List<ScoreboardElementType> {
     var symbol = getGroupFromPattern(ScoreboardData.sidebarLinesFormatted, ScoreboardPattern.timePattern, "symbol")
@@ -462,6 +485,48 @@ private fun getPowerDisplayPair() = listOf(
         ?: "§cOpen \"Your Bags\"!") to HorizontalAlignment.LEFT
 )
 
+private fun getTuningDisplayPair(): List<Pair<String, HorizontalAlignment>> {
+    val tunings = MaxwellAPI.tunings ?: return listOf("§cTalk to \"Maxwell\"!" to HorizontalAlignment.LEFT)
+    if (tunings.isEmpty()) return listOf("§cNo Maxwell Tunings :(" to HorizontalAlignment.LEFT)
+
+    val title = StringUtils.pluralize(tunings.size, "Tuning", "Tunings")
+    return if (displayConfig.compactTuning) {
+        val tuning = tunings
+            .take(3)
+            .joinToString("§7, ") { tuning ->
+                with(tuning) {
+                    if (displayConfig.displayNumbersFirst) {
+                        "$color$value$icon"
+                    } else {
+                        "$color$icon$value"
+                    }
+                }
+
+            }
+        listOf(
+            if (displayConfig.displayNumbersFirst) {
+                "$tuning §f$title"
+            } else {
+                "$title: $tuning"
+            } to HorizontalAlignment.LEFT
+        )
+    } else {
+        val tuning = tunings
+            .take(displayConfig.tuningAmount.coerceAtLeast(1))
+            .map { tuning ->
+                with(tuning) {
+                    " §7- §f" + if (displayConfig.displayNumbersFirst) {
+                        "$color$value $icon $name"
+                    } else {
+                        "$name: $color$value$icon"
+                    }
+                }
+
+            }.toTypedArray()
+        listOf("$title:", *tuning).map { it to HorizontalAlignment.LEFT }
+    }
+}
+
 private fun getPowerShowWhen() = !inAnyIsland(IslandType.THE_RIFT)
 
 private fun getCookieDisplayPair(): List<ScoreboardElementType> {
@@ -491,7 +556,8 @@ private fun getCookieShowWhen(): Boolean {
 }
 
 private fun getObjectiveDisplayPair() = buildList {
-    val objective = ScoreboardData.sidebarLinesFormatted.first { ScoreboardPattern.objectivePattern.matches(it) }
+    val objective =
+        ScoreboardData.sidebarLinesFormatted.first { ScoreboardPattern.objectivePattern.matches(it) }
 
     add(objective to HorizontalAlignment.LEFT)
     add((ScoreboardData.sidebarLinesFormatted.nextAfter(objective) ?: "<hidden>") to HorizontalAlignment.LEFT)
@@ -507,7 +573,6 @@ private fun getObjectiveDisplayPair() = buildList {
 private fun getObjectiveShowWhen(): Boolean =
     !inAnyIsland(IslandType.KUUDRA_ARENA)
         && ScoreboardData.sidebarLinesFormatted.none { ScoreboardPattern.objectivePattern.matches(it) }
-
 
 private fun getSlayerDisplayPair(): List<ScoreboardElementType> = listOf(
     (if (SlayerAPI.hasActiveSlayerQuest()) "Slayer Quest" else "<hidden>") to HorizontalAlignment.LEFT,
@@ -552,32 +617,33 @@ private fun getQuiverShowWhen(): Boolean {
 }
 
 private fun getPowderDisplayPair() = buildList {
-    val mithrilPowder =
-        getGroupFromPattern(
+    val powderTypes = listOf(
+        "§2Mithril" to getGroupFromPattern(
             TabListData.getTabList(),
             ScoreboardPattern.mithrilPowderPattern,
             "mithrilpowder"
-        )
-            .formatNum()
-    val gemstonePowder =
-        getGroupFromPattern(
+        ).formatNum(),
+        "§dGemstone" to getGroupFromPattern(
             TabListData.getTabList(),
             ScoreboardPattern.gemstonePowderPattern,
             "gemstonepowder"
-        )
-            .formatNum()
+        ).formatNum(),
+        "§bGlacite" to getGroupFromPattern(
+            TabListData.getTabList(),
+            ScoreboardPattern.glacitePowderPattern,
+            "glacitepowder"
+        ).formatNum(),
+    )
 
-    if (informationFilteringConfig.hideEmptyLines && mithrilPowder == "0" && gemstonePowder == "0") {
+    if (informationFilteringConfig.hideEmptyLines && powderTypes.all { it.second == "0" }) {
         add("<hidden>" to HorizontalAlignment.LEFT)
     } else {
         add("§9§lPowder" to HorizontalAlignment.LEFT)
 
-        if (displayConfig.displayNumbersFirst) {
-            add(" §7- §2$mithrilPowder Mithril" to HorizontalAlignment.LEFT)
-            add(" §7- §d$gemstonePowder Gemstone" to HorizontalAlignment.LEFT)
-        } else {
-            add(" §7- §fMithril: §2$mithrilPowder" to HorizontalAlignment.LEFT)
-            add(" §7- §fGemstone: §d$gemstonePowder" to HorizontalAlignment.LEFT)
+        for ((type, value) in powderTypes) {
+            if (value != "0") {
+                add(" §7- §f$type: $value" to HorizontalAlignment.LEFT)
+            }
         }
     }
 }

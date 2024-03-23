@@ -3,8 +3,8 @@ package at.hannibal2.skyhanni.features.garden.visitor
 import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.config.features.garden.visitor.VisitorConfig.HighlightMode
 import at.hannibal2.skyhanni.data.IslandType
-import at.hannibal2.skyhanni.data.SackAPI
-import at.hannibal2.skyhanni.data.SackStatus
+import at.hannibal2.skyhanni.data.SackAPI.getAmountInSacks
+import at.hannibal2.skyhanni.data.SackAPI.getAmountInSacksOrNull
 import at.hannibal2.skyhanni.events.DebugDataCollectEvent
 import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.LorenzChatEvent
@@ -30,7 +30,7 @@ import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.CollectionUtils.addAsSingletonList
 import at.hannibal2.skyhanni.utils.ConfigUtils
 import at.hannibal2.skyhanni.utils.EntityUtils
-import at.hannibal2.skyhanni.utils.InventoryUtils
+import at.hannibal2.skyhanni.utils.InventoryUtils.getAmountInInventory
 import at.hannibal2.skyhanni.utils.ItemBlink
 import at.hannibal2.skyhanni.utils.ItemUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName
@@ -133,14 +133,11 @@ class GardenVisitorFeatures {
 
         readToolTip(visitor, offerItem)
 
-        if (visitor.status == VisitorAPI.VisitorStatus.NEW) {
-            val alreadyReady = offerItem.getLore().any { it == "§eClick to give!" }
-            if (alreadyReady) {
-                VisitorAPI.changeStatus(visitor, VisitorAPI.VisitorStatus.READY, "inSacks")
-                visitor.inSacks = true
-            } else {
-                VisitorAPI.changeStatus(visitor, VisitorAPI.VisitorStatus.WAITING, "firstContact")
-            }
+        val alreadyReady = offerItem.getLore().any { it == "§eClick to give!" }
+        if (alreadyReady) {
+            VisitorAPI.changeStatus(visitor, VisitorAPI.VisitorStatus.READY, "tooltipClickToGive")
+        } else {
+            VisitorAPI.changeStatus(visitor, VisitorAPI.VisitorStatus.WAITING, "tooltipMissingItems")
         }
         update()
     }
@@ -203,12 +200,9 @@ class GardenVisitorFeatures {
                 }
 
                 if (config.shoppingList.showSackCount) {
-                    val sackItemData = SackAPI.fetchSackItem(internalName)
-                    val itemStatus = sackItemData.getStatus()
-                    val itemAmount = sackItemData.amount
-                    if (itemStatus != SackStatus.OUTDATED) {
-                        val textColour = if (itemAmount >= amount) "a" else "e"
-                        list.add(" §7(§${textColour}x${sackItemData.amount.addSeparators()} §7in sacks)")
+                    internalName.getAmountInSacksOrNull()?.let {
+                        val textColour = if (it >= amount) "a" else "e"
+                        list.add(" §7(§${textColour}x${it.addSeparators()} §7in sacks)")
                     }
                 }
 
@@ -505,12 +499,11 @@ class GardenVisitorFeatures {
                 }
             }
 
-            if (!visitor.inSacks) {
-                val status = visitor.status
-                if (status == VisitorAPI.VisitorStatus.WAITING || status == VisitorAPI.VisitorStatus.READY) {
-                    val newStatus =
-                        if (hasItemsInInventory(visitor)) VisitorAPI.VisitorStatus.READY else VisitorAPI.VisitorStatus.WAITING
-                    VisitorAPI.changeStatus(visitor, newStatus, "hasItemsInInventory")
+            if (visitor.status in setOf(VisitorAPI.VisitorStatus.WAITING, VisitorAPI.VisitorStatus.READY)) {
+                if (hasItems(visitor)) {
+                    VisitorAPI.changeStatus(visitor, VisitorAPI.VisitorStatus.READY, "hasItems")
+                } else {
+                    VisitorAPI.changeStatus(visitor, VisitorAPI.VisitorStatus.WAITING, "noLongerHasItems")
                 }
             }
 
@@ -538,10 +531,10 @@ class GardenVisitorFeatures {
         }
     }
 
-    private fun hasItemsInInventory(visitor: VisitorAPI.Visitor): Boolean {
+    private fun hasItems(visitor: VisitorAPI.Visitor): Boolean {
         var ready = true
         for ((internalName, required) in visitor.shoppingList) {
-            val having = InventoryUtils.getAmountOfItemInInventory(internalName)
+            val having = internalName.getAmountInInventory() + internalName.getAmountInSacks()
             if (having < required) {
                 ready = false
             }
@@ -592,18 +585,6 @@ class GardenVisitorFeatures {
         return false
     }
 
-    @SubscribeEvent(priority = EventPriority.HIGH)
-    fun onRenderLiving(event: SkyHanniRenderEntityEvent.Specials.Pre<EntityLivingBase>) {
-        if (!config.coloredName) return
-        val entity = event.entity
-        val entityId = entity.entityId
-        for (visitor in VisitorAPI.getVisitors()) {
-            if (visitor.nameTagEntityId == entityId) {
-                entity.customNameTag = GardenVisitorColorNames.getColoredName(entity.name)
-            }
-        }
-    }
-
     @SubscribeEvent
     fun onDebugDataCollect(event: DebugDataCollectEvent) {
         event.title("Garden Visitor Stats")
@@ -622,9 +603,6 @@ class GardenVisitorFeatures {
                 add(" ")
                 add("visitorName: '${visitor.visitorName}'")
                 add("status: '${visitor.status}'")
-                if (visitor.inSacks) {
-                    add("inSacks!")
-                }
                 if (visitor.shoppingList.isNotEmpty()) {
                     add("shoppingList: '${visitor.shoppingList}'")
                 }
