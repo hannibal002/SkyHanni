@@ -12,11 +12,11 @@ import at.hannibal2.skyhanni.events.ProfileJoinEvent
 import at.hannibal2.skyhanni.events.TabListUpdateEvent
 import at.hannibal2.skyhanni.events.garden.visitor.VisitorOpenEvent
 import at.hannibal2.skyhanni.events.garden.visitor.VisitorRenderEvent
-import at.hannibal2.skyhanni.events.garden.visitor.VisitorToolTipEvent
 import at.hannibal2.skyhanni.features.garden.GardenAPI
 import at.hannibal2.skyhanni.features.garden.visitor.VisitorAPI.VisitorStatus
 import at.hannibal2.skyhanni.mixins.transformers.gui.AccessorGuiContainer
 import at.hannibal2.skyhanni.utils.ChatUtils
+import at.hannibal2.skyhanni.utils.DelayedRun
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.ItemUtils.name
 import at.hannibal2.skyhanni.utils.KeyboardManager.isKeyHeld
@@ -24,7 +24,9 @@ import at.hannibal2.skyhanni.utils.LocationUtils.distanceToPlayer
 import at.hannibal2.skyhanni.utils.LorenzLogger
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.RenderUtils.exactLocation
+import at.hannibal2.skyhanni.utils.StringUtils.matches
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
+import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraft.client.Minecraft
 import net.minecraft.client.gui.inventory.GuiContainer
 import net.minecraft.entity.item.EntityArmorStand
@@ -33,6 +35,7 @@ import net.minecraftforge.event.entity.player.ItemTooltipEvent
 import net.minecraftforge.fml.common.eventhandler.EventPriority
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import org.lwjgl.input.Keyboard
+import kotlin.time.Duration.Companion.seconds
 
 class VisitorListener {
 
@@ -40,6 +43,12 @@ class VisitorListener {
 
     private var lastClickedNpc = 0
     private val logger = LorenzLogger("garden/visitors/listener")
+
+    private val patternGroup = RepoPattern.group("garden.visitor")
+    private val tablistExistPattern by patternGroup.pattern(
+        "tablist.enabled",
+        "§b§lVisitors:.*"
+    )
 
     companion object {
 
@@ -70,6 +79,9 @@ class VisitorListener {
     fun onTabListUpdate(event: TabListUpdateEvent) {
         if (!GardenAPI.inGarden()) return
         val visitorsInTab = VisitorAPI.visitorsInTabList(event.tabList)
+
+        val hasVisitorInfo = event.tabList.any { tablistExistPattern.matches(it) }
+        if (!hasVisitorInfo) return
 
         VisitorAPI.getVisitors().forEach {
             val name = it.visitorName
@@ -158,6 +170,10 @@ class VisitorListener {
             }
 
             VisitorAPI.changeStatus(visitor, VisitorStatus.REFUSED, "refused")
+            // fallback if tab list is disabled
+            DelayedRun.runDelayed(10.seconds) {
+                VisitorAPI.removeVisitor(visitor.visitorName)
+            }
             return
         }
         if (event.slotId == VISITOR_ACCEPT_ITEM_SLOT && event.slot?.stack?.getLore()
@@ -173,7 +189,7 @@ class VisitorListener {
         if (!GardenAPI.onBarnPlot) return
         if (!VisitorAPI.inInventory) return
         val visitor = VisitorAPI.getVisitor(lastClickedNpc) ?: return
-        VisitorToolTipEvent(visitor, event.itemStack, event.toolTip).postAndCatch()
+        GardenVisitorFeatures.onTooltip(visitor, event.itemStack, event.toolTip)
     }
 
     @SubscribeEvent
