@@ -3,6 +3,7 @@ package at.hannibal2.skyhanni
 import at.hannibal2.skyhanni.api.CollectionAPI
 import at.hannibal2.skyhanni.api.DataWatcherAPI
 import at.hannibal2.skyhanni.api.GetFromSackAPI
+import at.hannibal2.skyhanni.api.ReforgeAPI
 import at.hannibal2.skyhanni.api.SkillAPI
 import at.hannibal2.skyhanni.config.ConfigFileType
 import at.hannibal2.skyhanni.config.ConfigManager
@@ -228,6 +229,7 @@ import at.hannibal2.skyhanni.features.inventory.MaxPurseItems
 import at.hannibal2.skyhanni.features.inventory.PowerStoneGuideFeatures
 import at.hannibal2.skyhanni.features.inventory.QuickCraftFeatures
 import at.hannibal2.skyhanni.features.inventory.QuiverNotification
+import at.hannibal2.skyhanni.features.inventory.ReforgeHelper
 import at.hannibal2.skyhanni.features.inventory.RngMeterInventory
 import at.hannibal2.skyhanni.features.inventory.SackDisplay
 import at.hannibal2.skyhanni.features.inventory.ShiftClickBrewing
@@ -390,6 +392,7 @@ import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.MinecraftConsoleFilter.Companion.initLogging
 import at.hannibal2.skyhanni.utils.NEUItems
 import at.hannibal2.skyhanni.utils.NEUVersionCheck.checkIfNeuIsLoaded
+import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils
 import at.hannibal2.skyhanni.utils.TabListData
 import at.hannibal2.skyhanni.utils.UtilsPatterns
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPatternManager
@@ -476,6 +479,7 @@ class SkyHanniMod {
         loadModule(GardenBestCropTime())
         loadModule(ActionBarData)
         loadModule(TrackerManager)
+        loadModule(SkyBlockItemModifierUtils)
         loadModule(ScoreboardPattern)
         loadModule(UtilsPatterns)
         loadModule(PetAPI)
@@ -510,6 +514,7 @@ class SkyHanniMod {
         loadModule(LorenzUtils)
         loadModule(NEUItems)
         loadModule(PestAPI)
+        loadModule(ReforgeAPI)
 
         // features
         loadModule(BazaarOrderHelper())
@@ -539,6 +544,7 @@ class SkyHanniMod {
         loadModule(BazaarBestSellMethod())
         loadModule(ShiftClickBrewing())
         loadModule(BazaarOpenPriceWebsite())
+        loadModule(ReforgeHelper())
         loadModule(AuctionHouseCopyUnderbidPrice())
         loadModule(AnvilCombineHelper())
         loadModule(SeaCreatureMessageShortener())

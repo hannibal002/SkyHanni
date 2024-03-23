@@ -45,4 +45,9 @@ public class HelperConfig {
     @ConfigOption(name = "Tia Relay Abiphone Network Maintenance", desc = "")
     @Accordion
     public TiaRelayConfig tiaRelay = new TiaRelayConfig();
+
+    @Expose
+    @ConfigOption(name = "Reforge Helper", desc = "")
+    @Accordion
+    public ReforgeHelperConfig reforge = new ReforgeHelperConfig();
 }

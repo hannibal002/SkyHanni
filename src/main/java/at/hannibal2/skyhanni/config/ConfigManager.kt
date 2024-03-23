@@ -5,6 +5,8 @@ import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.data.jsonobjects.local.FriendsJson
 import at.hannibal2.skyhanni.data.jsonobjects.local.JacobContestsJson
 import at.hannibal2.skyhanni.data.jsonobjects.local.KnownFeaturesJson
+import at.hannibal2.skyhanni.data.model.SkyblockStat
+import at.hannibal2.skyhanni.data.model.SkyblockStatList
 import at.hannibal2.skyhanni.data.jsonobjects.other.HypixelApiTrophyFish
 import at.hannibal2.skyhanni.data.jsonobjects.local.VisualWordsJson
 import at.hannibal2.skyhanni.features.fishing.trophy.TrophyRarity
@@ -108,7 +110,7 @@ class ConfigManager {
                 }
 
                 override fun read(reader: JsonReader): LorenzRarity {
-                    return LorenzRarity.valueOf(reader.nextString().uppercase())
+                    return LorenzRarity.valueOf(reader.nextString().uppercase().replace(" ", "_"))
                 }
             }.nullSafe())
             .registerTypeAdapter(IslandType::class.java, object : TypeAdapter<IslandType>() {
@@ -164,10 +166,47 @@ class ConfigManager {
                     return HypixelApiTrophyFish(totalCaught, trophyFish)
                 }
             }.nullSafe())
+            .registerTypeAdapter(SkyblockStat::class.java, object : TypeAdapter<SkyblockStat>() {
+                override fun write(out: JsonWriter, value: SkyblockStat) {
+                    out.value(value.name.lowercase()) // F you guy who made the stats lowercase
+                }
+
+                override fun read(reader: JsonReader): SkyblockStat {
+                    return SkyblockStat.valueOf(reader.nextString().uppercase())
+                }
+            }.nullSafe())
+            .registerTypeAdapter<SkyblockStatList>({ out, value ->
+                out.beginObject()
+                value.forEach {
+                    out.name(it.key.name.lowercase()).value(it.value)
+                }
+                out.endObject()
+            }, { reader ->
+                reader.beginObject()
+                val list = SkyblockStatList()
+                while (reader.hasNext()) {
+                    val name = reader.nextName()
+                    val value = reader.nextDouble()
+                    list[SkyblockStat.valueOf(name.uppercase())] = value
+                }
+                reader.endObject()
+                list
+            })
             .enableComplexMapKeySerialization()
             .create()
 
         var configDirectory = File("config/skyhanni")
+
+        private inline fun <reified T> GsonBuilder.registerTypeAdapter(
+            crossinline write: (JsonWriter, T) -> Unit,
+            crossinline read: (JsonReader) -> T
+        ): GsonBuilder {
+            this.registerTypeAdapter(T::class.java, object : TypeAdapter<T>() {
+                override fun write(out: JsonWriter, value: T) = write(out, value)
+                override fun read(reader: JsonReader) = read(reader)
+            }.nullSafe())
+            return this
+        }
     }
 
     val features get() = jsonHolder[ConfigFileType.FEATURES] as Features
