@@ -1,6 +1,5 @@
 package at.hannibal2.skyhanni.utils
 
-import at.hannibal2.skyhanni.utils.LorenzUtils.round
 import net.minecraft.client.Minecraft
 import net.minecraft.entity.Entity
 import net.minecraft.util.AxisAlignedBB
@@ -11,13 +10,6 @@ object LocationUtils {
         Minecraft.getMinecraft().theWorld.rayTraceBlocks(a.toVec3(), b.toVec3(), false, true, false) == null
 
     fun playerLocation() = Minecraft.getMinecraft().thePlayer.getLorenzVec()
-
-    fun distanceFromPreviousTick(): Double = with(Minecraft.getMinecraft().thePlayer) {
-        val oldPos = LorenzVec(prevPosX, prevPosY, prevPosZ)
-        val newPos = LorenzVec(posX, posY, posZ)
-
-        (oldPos.distance(newPos) * 20).round(2)
-    }
 
     fun LorenzVec.distanceToPlayer() = distance(playerLocation())
 
