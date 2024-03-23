@@ -282,6 +282,16 @@ object LorenzUtils {
         }
     }
 
+    fun GuiContainerEvent.SlotClickEvent.makePickblock() {
+        if (this.clickedButton == 2 && this.clickType == 3) return
+        slot?.slotNumber?.let { slotNumber ->
+            Minecraft.getMinecraft().playerController.windowClick(
+                container.windowId, slotNumber, 2, 3, Minecraft.getMinecraft().thePlayer
+            )
+            isCanceled = true
+        }
+    }
+
     private val recalculateDerpy =
         RecalculatingValue(1.seconds) { Perk.DOUBLE_MOBS_HP.isActive }
 
