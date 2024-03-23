@@ -21,7 +21,6 @@ import at.hannibal2.skyhanni.utils.LorenzUtils.round
 import at.hannibal2.skyhanni.utils.NEUInternalName
 import at.hannibal2.skyhanni.utils.NEUInternalName.Companion.asInternalName
 import at.hannibal2.skyhanni.utils.NumberUtil.formatInt
-import at.hannibal2.skyhanni.utils.NumberUtil.formatNumber
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getExtraAttributes
 import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.StringUtils.matches
@@ -40,7 +39,7 @@ object QuiverAPI {
         set(value) {
             storage?.arrows?.currentArrow = value?.toString() ?: return
         }
-    var arrowAmount: MutableMap<NEUInternalName, Float>
+    var arrowAmount: MutableMap<NEUInternalName, Int>
         get() = storage?.arrows?.arrowAmount ?: mutableMapOf()
         set(value) {
             storage?.arrows?.arrowAmount = value
@@ -48,7 +47,7 @@ object QuiverAPI {
     var currentAmount: Int
         get() = arrowAmount[currentArrow?.internalName]?.toInt() ?: 0
         set(value) {
-            arrowAmount[currentArrow?.internalName ?: return] = value.toFloat()
+            arrowAmount[currentArrow?.internalName ?: return] = value
         }
 
     private var arrows: List<ArrowType> = listOf()
@@ -120,13 +119,13 @@ object QuiverAPI {
                     "Unknown arrow type: $type",
                     "message" to message,
                 )
-            arrowAmount[ranOutType.internalName] = 0F
+            arrowAmount[ranOutType.internalName] = 0
             QuiverUpdateEvent(ranOutType, currentAmount, shouldHideAmount()).postAndCatch()
         }
 
         fillUpJaxPattern.matchMatcher(message) {
             val type = group("type")
-            val amount = group("amount").formatNumber().toFloat()
+            val amount = group("amount").formatInt()
             val filledUpType = getArrowByNameOrNull(type)
                 ?: return ErrorManager.logErrorWithData(
                     UnknownArrowType("Unknown arrow type: $type"),
@@ -143,7 +142,7 @@ object QuiverAPI {
         }
 
         fillUpPattern.matchMatcher(message) {
-            val flintAmount = group("flintAmount").formatNumber().toFloat()
+            val flintAmount = group("flintAmount").formatInt()
 
             FLINT_ARROW_TYPE?.let { arrowAmount.addOrPut(it.internalName, flintAmount) }
 
@@ -155,7 +154,7 @@ object QuiverAPI {
 
         addedToQuiverPattern.matchMatcher(message) {
             val type = group("type")
-            val amount = group("amount").toFloat()
+            val amount = group("amount").formatInt()
 
             val filledUpType = getArrowByNameOrNull(type)
                 ?: return ErrorManager.logErrorWithData(
@@ -205,7 +204,7 @@ object QuiverAPI {
 
             val arrowType = getArrowByNameOrNull(arrow) ?: continue
 
-            arrowAmount.addOrPut(arrowType.internalName, stack.stackSize.toFloat())
+            arrowAmount.addOrPut(arrowType.internalName, stack.stackSize)
         }
     }
 
