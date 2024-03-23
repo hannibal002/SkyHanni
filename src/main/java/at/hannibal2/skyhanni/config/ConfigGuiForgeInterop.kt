@@ -1,5 +1,6 @@
 package at.hannibal2.skyhanni.config
 
+import cc.polyfrost.oneconfig.utils.IgnoredGuiFactory
 import io.github.moulberry.moulconfig.gui.GuiScreenElementWrapper
 import net.minecraft.client.Minecraft
 import net.minecraft.client.gui.GuiScreen
@@ -10,8 +11,7 @@ import org.lwjgl.input.Keyboard
 import java.io.IOException
 
 @Suppress("unused")
-class ConfigGuiForgeInterop : IModGuiFactory {
-
+class ConfigGuiForgeInterop : IModGuiFactory, IgnoredGuiFactory {
     override fun initialize(minecraft: Minecraft) {}
     override fun mainConfigGuiClass() = WrappedSkyHanniConfig::class.java
 
