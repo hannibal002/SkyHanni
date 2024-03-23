@@ -85,7 +85,7 @@ object FarmingLaneFeatures {
                 } else ""
                 add("§7Time remaining: $color$format$suffix")
                 if (MovementSpeedDisplay.usingSoulsandSpeed) {
-                    add("§7Using inaccurate soulsand speed!")
+                    add("§7Using inaccurate soul sand speed!")
                 }
             }
         }
