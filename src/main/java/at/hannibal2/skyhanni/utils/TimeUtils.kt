@@ -135,7 +135,7 @@ object TimeUtils {
         yearElement: Boolean = true,
         hoursAndMinutesElement: Boolean = true
     ): String {
-        val hour = if (this.hour > 12) this.hour - 12 else this.hour
+        val hour = (this.hour + 11) % 12 + 1
         val timeOfDay = if (this.hour > 11) "pm" else "am"
         val minute = this.minute.toString().padStart(2, '0')
         val month = SkyBlockTime.monthName(this.month)
