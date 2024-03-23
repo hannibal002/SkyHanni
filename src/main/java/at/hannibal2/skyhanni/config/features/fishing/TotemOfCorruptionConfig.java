@@ -5,6 +5,7 @@ import at.hannibal2.skyhanni.config.core.config.Position;
 import com.google.gson.annotations.Expose;
 import io.github.moulberry.moulconfig.annotations.ConfigEditorBoolean;
 import io.github.moulberry.moulconfig.annotations.ConfigEditorColour;
+import io.github.moulberry.moulconfig.annotations.ConfigEditorDropdown;
 import io.github.moulberry.moulconfig.annotations.ConfigEditorSlider;
 import io.github.moulberry.moulconfig.annotations.ConfigOption;
 
@@ -32,8 +33,26 @@ public class TotemOfCorruptionConfig {
 
     @Expose
     @ConfigOption(name = "Show Effective Area", desc = "Show the effective area (16 blocks) of the Totem of Corruption.")
-    @ConfigEditorBoolean
-    public boolean showEffectiveArea = true;
+    @ConfigEditorDropdown()
+    public OutlineType outlineType = OutlineType.FILLED;
+
+    public enum OutlineType {
+        NONE("No Outline"),
+        FILLED("Filled"),
+        WIREFRAME("Wireframe"),
+        ;
+
+        private final String str;
+
+        OutlineType(String str) {
+            this.str = str;
+        }
+
+        @Override
+        public String toString() {
+            return str;
+        }
+    }
 
     @Expose
     @ConfigOption(name = "Color of the area", desc = "The color of the area of the Totem of Corruption.")
