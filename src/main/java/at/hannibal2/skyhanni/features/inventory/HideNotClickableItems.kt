@@ -273,7 +273,7 @@ class HideNotClickableItems {
         }
 
         if (ItemUtils.isSkyBlockMenuItem(stack)) {
-            hideReason = "The SkyBlock Menu cannot be put into the potion bag!"
+            hideReason = "The SkyBlock Menu cannot be put into your equipment!"
             return true
         }
 
