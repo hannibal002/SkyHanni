@@ -26,14 +26,14 @@ class OverviewPage : FFGuideGUI.FFGuidePage() {
             FFGuideGUI.guiLeft + 15, FFGuideGUI.guiTop + 5, 90, mouseX, mouseY, FFGuideGUI.tooltipToDisplay
         )
 
-        var line = if (FFStats.baseFF[FFTypes.ANITA]!! < 0.0) "§cAnita buff not saved\n§eVisit Anita to set it!"
+        var line = if (FFTypes.ANITA.notSaved()) "§cAnita buff not saved\n§eVisit Anita to set it!"
         else "§7§2Fortune for levelling your Anita extra crops\n§2You get 4☘ per buff level"
         GuiRenderUtils.drawFarmingBar(
             "§2Anita Buff", line, FFStats.baseFF[FFTypes.ANITA] ?: 0.0, 60, FFGuideGUI.guiLeft + 15,
             FFGuideGUI.guiTop + 30, 90, mouseX, mouseY, FFGuideGUI.tooltipToDisplay
         )
 
-        line = if (FFStats.baseFF[FFTypes.FARMING_LVL]!! < 0.0) "§cFarming level not saved\n§eOpen /skills to set it!"
+        line = if (FFTypes.FARMING_LVL.notSaved()) "§cFarming level not saved\n§eOpen /skills to set it!"
         else "§7§2Fortune for levelling your farming skill\n§2You get 4☘ per farming level"
         GuiRenderUtils.drawFarmingBar(
             "§2Farming Level", line, FFStats.baseFF[FFTypes.FARMING_LVL] ?: 0.0, 240, FFGuideGUI.guiLeft + 15,
@@ -41,7 +41,7 @@ class OverviewPage : FFGuideGUI.FFGuidePage() {
         )
 
         line =
-            if (FFStats.baseFF[FFTypes.COMMUNITY_SHOP]!! < 0.0) "§cCommunity upgrade level not saved\n§eVisit Elizabeth to set it!"
+            if (FFTypes.COMMUNITY_SHOP.notSaved()) "§cCommunity upgrade level not saved\n§eVisit Elizabeth to set it!"
             else "§7§2Fortune for community shop upgrades\n§2You get 4☘ per upgrade tier"
         GuiRenderUtils.drawFarmingBar(
             "§2Community upgrades", line, FFStats.baseFF[FFTypes.COMMUNITY_SHOP] ?: 0.0,
@@ -49,7 +49,7 @@ class OverviewPage : FFGuideGUI.FFGuidePage() {
         )
 
         line =
-            if (FFStats.baseFF[FFTypes.PLOTS]!! < 0.0) "§cUnlocked plot count not saved\n§eOpen /desk and view your plots to set it!"
+            if (FFTypes.PLOTS.notSaved()) "§cUnlocked plot count not saved\n§eOpen /desk and view your plots to set it!"
             else "§7§2Fortune for unlocking garden plots\n§2You get 3☘ per plot unlocked"
         GuiRenderUtils.drawFarmingBar(
             "§2Garden Plots", line, FFStats.baseFF[FFTypes.PLOTS] ?: 0.0, 72, FFGuideGUI.guiLeft + 15,
@@ -263,4 +263,8 @@ class OverviewPage : FFGuideGUI.FFGuidePage() {
             FFGuideGUI.guiLeft + 255, FFGuideGUI.guiTop + 130, 90, mouseX, mouseY, FFGuideGUI.tooltipToDisplay
         )
     }
+
+    private fun FFTypes.notSaved(): Boolean = FFStats.baseFF[this]?.let {
+        it < 0.0
+    } ?: true
 }
