@@ -234,9 +234,9 @@ object GardenVisitorDropStatistics {
         display = formatDisplay(drawDisplay(storage))
     }
 
-    fun reset(args: Array<String>) {
-        if (args.size == 1 && args[0].lowercase() == "confirm") {
-            val storage = GardenAPI.storage?.visitorDrops ?: return
+    fun reset() {
+        val storage = GardenAPI.storage?.visitorDrops ?: return
+        ChatUtils.clickableChat("Click here to reset Visitor Drops Statistics.", onClick = {
             acceptedVisitors = 0
             deniedVisitors = 0
             totalVisitors = 0
@@ -251,13 +251,7 @@ object GardenVisitorDropStatistics {
             storage.rewardsCount = mapOf<VisitorReward, Int>()
             ChatUtils.chat("Visitor Drop Statistics reset!")
             saveAndUpdate()
-            return
-        }
-
-        ChatUtils.clickableChat(
-            "Are you sure you want to reset Visitor Drops Statistics ? Click here to confirm.",
-            "shresetvisitordrops confirm"
-        )
+        })
     }
 
     @SubscribeEvent
