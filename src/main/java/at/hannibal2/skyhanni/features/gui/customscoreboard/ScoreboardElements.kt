@@ -257,6 +257,7 @@ enum class ScoreboardElement(
             COPPER,
             NORTH_STARS,
             HEAT,
+            COLD,
             EMPTY_LINE,
             ISLAND,
             LOCATION,
