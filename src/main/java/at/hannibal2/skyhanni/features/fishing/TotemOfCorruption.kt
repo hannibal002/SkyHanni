@@ -11,7 +11,7 @@ import at.hannibal2.skyhanni.utils.LocationUtils.distanceToPlayer
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils.sendTitle
 import at.hannibal2.skyhanni.utils.LorenzVec
-import at.hannibal2.skyhanni.utils.RenderUtils.drawSphereInWorld
+import at.hannibal2.skyhanni.utils.RenderUtils.drawSphereWireframeInWorld
 import at.hannibal2.skyhanni.utils.RenderUtils.renderStrings
 import at.hannibal2.skyhanni.utils.SoundUtils.playPlingSound
 import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
@@ -82,7 +82,7 @@ class TotemOfCorruption {
         val color = config.color.toChromaColor()
         for (totem in totems) {
             // The center of the totem is the upper part
-            event.drawSphereInWorld(color, totem.location.add(y = 1), 16f)
+            event.drawSphereWireframeInWorld(color, totem.location.add(y = 1), 16f)
         }
     }
 
