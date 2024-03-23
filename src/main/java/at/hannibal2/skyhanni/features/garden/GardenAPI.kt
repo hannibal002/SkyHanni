@@ -143,7 +143,12 @@ object GardenAPI {
 
     fun inGarden() = IslandType.GARDEN.isInIsland()
 
-    fun isCurrentlyFarming() = inGarden() && GardenCropSpeed.averageBlocksPerSecond > 0.0
+    fun isCurrentlyFarming() = inGarden() && GardenCropSpeed.averageBlocksPerSecond > 0.0 && hasFarmingToolInHand()
+
+    fun hasFarmingToolInHand() = InventoryUtils.getItemInHand()?.let {
+        val crop = it.getCropType()
+        getToolInHand(it, crop) != null
+    } ?: false
 
     fun ItemStack.getCropType(): CropType? {
         val internalName = getInternalName()
