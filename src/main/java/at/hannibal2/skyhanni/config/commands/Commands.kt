@@ -215,7 +215,7 @@ object Commands {
         registerCommand(
             "shresetvisitordrops",
             "Reset the Visitors Drop Statistics"
-        ) { GardenVisitorDropStatistics.reset() }
+        ) { GardenVisitorDropStatistics.resetCommand() }
         registerCommand("shbingotoggle", "Toggle the bingo card display mode") { BingoCardDisplay.toggleCommand() }
         registerCommand(
             "shfarmingprofile",

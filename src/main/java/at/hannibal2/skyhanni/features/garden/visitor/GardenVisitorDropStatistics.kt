@@ -234,7 +234,7 @@ object GardenVisitorDropStatistics {
         display = formatDisplay(drawDisplay(storage))
     }
 
-    fun reset() {
+    fun resetCommand() {
         val storage = GardenAPI.storage?.visitorDrops ?: return
         ChatUtils.clickableChat("Click here to reset Visitor Drops Statistics.", onClick = {
             acceptedVisitors = 0
