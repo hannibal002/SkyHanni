@@ -42,7 +42,7 @@ object FarmingLaneFeatures {
     private var movementState = MovementState.CALCULATING
 
     enum class MovementState(val label: String) {
-        NOT_MOVING("§eMove to update!"),
+        NOT_MOVING("§ePaused"),
         TOO_SLOW("§cToo slow!"),
         CALCULATING("§aCalculating.."),
         NORMAL(""),
@@ -167,18 +167,22 @@ object FarmingLaneFeatures {
     }
 
     private fun calculateMovementState(speed: Double): MovementState {
-        if (speed == 0.0) return MovementState.NOT_MOVING
+        if (lastSpeed != speed) {
+            lastSpeed = speed
+            sameSpeedCounter = 0
+        }
+        sameSpeedCounter++
+
+        if (speed == 0.0 && sameSpeedCounter > 1) {
+            return MovementState.NOT_MOVING
+        }
         val speedTooSlow = speed < 1
-        if (speedTooSlow) return MovementState.TOO_SLOW
+        if (speedTooSlow && sameSpeedCounter > 5) {
+            return MovementState.TOO_SLOW
+        }
         // only calculate the time if the speed has not changed
         if (!MovementSpeedDisplay.usingSoulsandSpeed) {
-            if (lastSpeed != speed) {
-                lastSpeed = speed
-                sameSpeedCounter = 0
-                return MovementState.CALCULATING
-            }
-            sameSpeedCounter++
-            if (sameSpeedCounter < 5) {
+            if (sameSpeedCounter < 6) {
                 return MovementState.CALCULATING
             }
         }
