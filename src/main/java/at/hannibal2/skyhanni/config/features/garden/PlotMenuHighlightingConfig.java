@@ -8,6 +8,7 @@ import io.github.moulberry.moulconfig.annotations.ConfigEditorDraggableList;
 import io.github.moulberry.moulconfig.annotations.ConfigOption;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 public class PlotMenuHighlightingConfig {
@@ -20,13 +21,18 @@ public class PlotMenuHighlightingConfig {
     @Expose
     @ConfigOption(name = "Statuses", desc = "Change which statuses are enabled, and the hierarchy of them.")
     @ConfigEditorDraggableList
-    public List<PlotStatusType> deskPlotStatusTypes = new ArrayList<>();
+    public List<PlotStatusType> deskPlotStatusTypes = new ArrayList<>(Arrays.asList(
+        PlotStatusType.CURRENT,
+        PlotStatusType.PESTS,
+        PlotStatusType.SPRAYS,
+        PlotStatusType.LOCKED
+    ));
 
     public enum PlotStatusType {
         PESTS("§cPests", LorenzColor.RED),
         SPRAYS("§eSprays", LorenzColor.YELLOW),
         LOCKED("§7Locked", LorenzColor.DARK_GRAY),
-        CURRENT("§aCurrent plot", LorenzColor.GREEN)
+        CURRENT("§aCurrent plot", LorenzColor.GREEN),
         ;
 
         public final String name;
