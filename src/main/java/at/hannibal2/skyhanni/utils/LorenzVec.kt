@@ -1,6 +1,7 @@
 package at.hannibal2.skyhanni.utils
 
 import at.hannibal2.skyhanni.utils.LorenzUtils.round
+import net.minecraft.client.renderer.GlStateManager
 import net.minecraft.entity.Entity
 import net.minecraft.network.play.server.S2APacketParticles
 import net.minecraft.util.AxisAlignedBB
@@ -150,6 +151,8 @@ data class LorenzVec(
         return LorenzVec(x, y, z)
     }
 
+    fun negated() = LorenzVec(-x, -y, -z)
+
     companion object {
 
         fun getFromYawPitch(yaw: Double, pitch: Double): LorenzVec {
@@ -169,6 +172,8 @@ data class LorenzVec(
         }
 
         fun getBlockBelowPlayer() = LocationUtils.playerLocation().roundLocationToBlock().add(y = -1.0)
+
+        val expandVector = LorenzVec(0.0020000000949949026, 0.0020000000949949026, 0.0020000000949949026)
     }
 }
 
@@ -191,3 +196,7 @@ fun S2APacketParticles.toLorenzVec() = LorenzVec(xCoordinate, yCoordinate, zCoor
 fun Array<Double>.toLorenzVec(): LorenzVec {
     return LorenzVec(this[0], this[1], this[2])
 }
+
+fun RenderUtils.translate(vec: LorenzVec) = GlStateManager.translate(vec.x, vec.y, vec.z)
+
+fun AxisAlignedBB.expand(vec: LorenzVec) = this.expand(vec.x, vec.y, vec.z)

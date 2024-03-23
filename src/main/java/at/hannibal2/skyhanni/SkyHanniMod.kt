@@ -251,6 +251,7 @@ import at.hannibal2.skyhanni.features.mining.DeepCavernsParkour
 import at.hannibal2.skyhanni.features.mining.HighlightMiningCommissionMobs
 import at.hannibal2.skyhanni.features.mining.KingTalismanHelper
 import at.hannibal2.skyhanni.features.mining.crystalhollows.CrystalHollowsNamesInCore
+import at.hannibal2.skyhanni.features.mining.crystalhollows.CrystalHollowsWalls
 import at.hannibal2.skyhanni.features.mining.eventtracker.MiningEventDisplay
 import at.hannibal2.skyhanni.features.mining.eventtracker.MiningEventTracker
 import at.hannibal2.skyhanni.features.mining.powdertracker.PowderTracker
@@ -544,6 +545,7 @@ class SkyHanniMod {
         loadModule(SeaCreatureMessageShortener())
         loadModule(AshfangFreezeCooldown)
         loadModule(AshfangNextResetCooldown())
+        loadModule(CrystalHollowsWalls())
         loadModule(SummoningSoulsName())
         loadModule(AshfangGravityOrbs())
         loadModule(AshfangBlazingSouls())
