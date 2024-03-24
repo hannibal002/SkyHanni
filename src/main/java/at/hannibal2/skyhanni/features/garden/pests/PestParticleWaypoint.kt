@@ -121,7 +121,6 @@ class PestParticleWaypoint {
         return pos
     }
 
-    // TODO toggle
     fun isEnabled() = GardenAPI.inGarden() && config.enabled
 
 }
