@@ -3,6 +3,7 @@ package at.hannibal2.skyhanni.features.garden.pests
 import at.hannibal2.skyhanni.data.ClickType
 import at.hannibal2.skyhanni.events.ItemClickEvent
 import at.hannibal2.skyhanni.events.LorenzRenderWorldEvent
+import at.hannibal2.skyhanni.events.LorenzWorldChangeEvent
 import at.hannibal2.skyhanni.events.ReceiveParticleEvent
 import at.hannibal2.skyhanni.features.garden.GardenAPI
 import at.hannibal2.skyhanni.test.GriffinUtils.drawWaypointFilled
@@ -35,14 +36,25 @@ class PestParticleWaypoint {
         if (PestAPI.hasVacuumInHand()) {
             if (event.clickType == ClickType.LEFT_CLICK && !Minecraft.getMinecraft().thePlayer.isSneaking) {
                 lastPestTrackerUse = SimpleTimeMark.now()
-                locs.clear()
-                guessPoint = null
-                lastParticlePoint = null
-                firstParticlePoint = null
-                secondParticlePoint = null
-                particles = 0
+                reset()
             }
         }
+    }
+
+    @SubscribeEvent
+    fun onWorldChange(event: LorenzWorldChangeEvent) {
+        lastPestTrackerUse = SimpleTimeMark.farPast()
+        reset()
+    }
+
+    private fun reset() {
+        locs.clear()
+        guessPoint = null
+        lastParticlePoint = null
+        firstParticlePoint = null
+        secondParticlePoint = null
+        particles = 0
+        lastParticles = 0
     }
 
     @SubscribeEvent
@@ -58,60 +70,53 @@ class PestParticleWaypoint {
         if (firstParticlePoint == null) {
             if (playerLocation().distance(location) > 5) return
             firstParticlePoint = location
-            ++particles
         } else if (secondParticlePoint == null) {
             secondParticlePoint = location
             lastParticlePoint = location
             locs.add(location)
-            ++particles
         } else {
             val firstDistance = secondParticlePoint?.let { firstParticlePoint?.distance(it) } ?: return
             val distance = lastParticlePoint?.distance(location) ?: return
             if ((distance-firstDistance).absoluteValue > 0.1) return
             lastParticlePoint = location
             locs.add(location)
-            ++particles
         }
+        ++particles
     }
 
     @SubscribeEvent
     fun onRenderWorld(event: LorenzRenderWorldEvent) {
         if (!isEnabled()) return
         // TODO time in config
+        if (locs.isEmpty()) return
         if (lastPestTrackerUse.passedSince() > 20.seconds) {
-            locs.clear()
-            guessPoint = null
+            reset()
             return
         }
-
-        if (locs.isEmpty()) return
-        var waypoint = guessPoint ?: getWaypoint(locs)
-        if (lastParticles != particles) waypoint = getWaypoint(locs)
-        guessPoint = waypoint
+        val waypoint = if (lastParticles != particles || guessPoint == null) {
+            getWaypoint(locs).also {
+                guessPoint = it
+                lastParticles = particles
+            }
+        } else {
+            guessPoint ?: return
+        }
         event.drawWaypointFilled(waypoint, Color(255, 0, 255,100), beacon = true)
         event.drawDynamicText(waypoint, "§cPest Guess", 1.3)
     }
 
     private fun getWaypoint(list: MutableList<LorenzVec>): LorenzVec {
-        var x = 0.0
-        var y = 0.0
-        var z = 0.0
-        var i = 1
+        var pos = LorenzVec(0.0,0.0,0.0)
 
         val firstParticle = firstParticlePoint
-        if (firstParticle?.x == null) return LorenzVec(0, 0, 0)
+        if (firstParticle?.x == null) return pos
 
-        for (particle in list) {
-            x += (particle.x - firstParticle.x) / i
-            y += (particle.y - firstParticle.y) / i
-            z += (particle.z - firstParticle.z) / i
-            ++i
+        for ((i , particle) in list.withIndex()) {
+            pos = particle.subtract(firstParticle).divide(i.toDouble())
         }
-        x = (x / list.size) * 120
-        y = (y / list.size) * 120
-        z = (z / list.size) * 120
+        pos = pos.multiply(120/list.size)
 
-        return LorenzVec(firstParticle.x+x, firstParticle.y+y, firstParticle.z+z)
+        return pos
     }
 
     // TODO toggle
