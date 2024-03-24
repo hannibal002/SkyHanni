@@ -436,14 +436,6 @@ private fun getBroodmotherShowWhen(): Boolean {
     return getSbLines().any { SbPattern.broodmotherPattern.matches(it) }
 }
 
-private fun getOringoLines(): List<String> {
-    return listOf(getSbLines().first { SbPattern.travelingZooPattern.matches(it) })
-}
-
-private fun getOringoShowWhen(): Boolean {
-    return getSbLines().any { SbPattern.travelingZooPattern.matches(it) }
-}
-
 private fun getMiningEventsLines() = buildList {
     // Wind
     if (getSbLines().any { SbPattern.windCompassPattern.matches(it) }
@@ -524,7 +516,7 @@ private fun getMagmaBossShowWhen(): Boolean {
 
 private fun getHotDogLines(): List<String> {
     return listOf(getSbLines().first { SbPattern.riftHotdogTitlePattern.matches(it) }
-        + getSbLines().first { SbPattern.riftHotdogEatenPattern.matches(it) })
+    ) + ( getSbLines().first { SbPattern.riftHotdogEatenPattern.matches(it) })
 }
 
 private fun getHotDogShowWhen(): Boolean {
