@@ -6,14 +6,24 @@ import at.hannibal2.skyhanni.events.LorenzToolTipEvent
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.RenderUtils.drawSlotText
+import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
+import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
 class SoulboundItemIcon {
     val config get() = SkyHanniMod.feature.inventory.soulbound
+    val coopSoulboundPattern by RepoPattern.pattern(
+        "inventory.coopsoulbound",
+        "§8§l* §8Co-op Soulbound §8§l*"
+    )
+    val soulboundPattern by RepoPattern.pattern(
+        "inventory.soulbound",
+        "§8§l* §8Soulbound §8§l*"
+    )
     @SubscribeEvent
     fun onRenderItemOverlayPost(event: GuiRenderItemEvent.RenderOverlayEvent.GuiRenderItemPost) {
         if (!LorenzUtils.inSkyBlock) return
-        if (!config.icon) return
+        if (!config.showSymbol) return
 
         val stack = event.stack ?: return
 
@@ -21,10 +31,10 @@ class SoulboundItemIcon {
         val y = event.y - 2
 
         for (line in stack.getLore()) {
-            if (line == "§8§l* §8Soulbound §8§l*") {
+            soulboundPattern.matchMatcher(line) {
                 event.drawSlotText(x, y, "§5§l☍", 1.2f)
             }
-            if (line == "§8§l* §8Co-op Soulbound §8§l*") {
+            coopSoulboundPattern.matchMatcher(line) {
                 event.drawSlotText(x, y, "§d§l☍", 1.2f)
             }
         }
@@ -33,7 +43,7 @@ class SoulboundItemIcon {
     @SubscribeEvent
     fun onTooltip(event: LorenzToolTipEvent) {
         if (!LorenzUtils.inSkyBlock) return
-        if (!config.text) return
+        if (!config.removeTooltip) return
         for (line in event.toolTip) {
             if (line.contains("§8§l* §8Soulbound §8§l*") || line.contains("§8§l* §8Co-op Soulbound §8§l*")) {
                 event.toolTip.remove(line)

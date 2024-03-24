@@ -11,11 +11,11 @@ public class SoulBoundItemConfig {
     @ConfigOption(name = "Symbol", desc = "Shows a symbol next to item to indicate if it is soulbound.")
     @ConfigEditorBoolean
     @FeatureToggle
-    public boolean icon = false;
+    public boolean showSymbol = false;
 
     @Expose
     @ConfigOption(name = "Remove Soulbound Text", desc = "Removes soulbound text from the bottom of the item.")
     @ConfigEditorBoolean
     @FeatureToggle
-    public boolean text = false;
+    public boolean removeTooltip = false;
 }
