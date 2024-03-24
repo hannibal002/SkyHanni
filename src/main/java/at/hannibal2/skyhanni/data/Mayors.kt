@@ -35,7 +35,7 @@ enum class Mayor(
 
             mayor.perks.forEach { it.isActive = false }
             mayor.activePerks.clear()
-            perks.mapNotNull { perk -> Perk.entries.firstOrNull { it.perkName == perk.tryAndGetExtraFoxyEvent() } }
+            perks.mapNotNull { perk -> Perk.entries.firstOrNull { it.perkName == perk.renameIfFoxyExtraEventPerkFound() } }
                 .filter { mayor.perks.contains(it) }.forEach {
                     it.isActive = true
                     mayor.activePerks.add(it)
@@ -44,7 +44,7 @@ enum class Mayor(
             return mayor
         }
 
-        private fun MayorJson.Perk.tryAndGetExtraFoxyEvent(): String? {
+        private fun MayorJson.Perk.renameIfFoxyExtraEventPerkFound(): String? {
             val foxyExtraEventPairs = mapOf(
                 "Spooky Festival" to "Extra Event (Spooky)",
                 "Mining Fiesta" to "Extra Event (Mining)",
