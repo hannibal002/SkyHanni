@@ -69,6 +69,9 @@ class LimboPlaytime {
         if (storage?.playtime == 0) return
 
         val lore = event.toolTip
+        println("------")
+        lore.forEach{ println(it) }
+        println("------")
         val hoursList = lore.filter { hoursPattern.matches(it) }.toMutableList()
         val minutesList = lore.filter { minutesPattern.matches(it) }.toMutableList()
 
@@ -110,9 +113,12 @@ class LimboPlaytime {
         } else {
             val minutes = storedPlaytime.seconds.inWholeMinutes
             modifiedList = minutesList
-            modifiedList.add("§a$minutes minutes §7on Limbo")
+            modifiedList.add("§5§o§a$minutes minutes §7on Limbo")
             modifiedList = modifiedList.sortedByDescending {
-                it.substringAfter("§a").substringBefore(" minutes").toDoubleOrNull()
+                val matcher = minutesPattern.matcher(it)
+                if (matcher.find()) {
+                    matcher.group(1).toDoubleOrNull() ?: 0.0
+                } else 0.0
             }.toMutableList()
             setMinutes = true
         }
