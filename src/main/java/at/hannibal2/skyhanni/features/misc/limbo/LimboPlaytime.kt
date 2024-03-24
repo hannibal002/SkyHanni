@@ -89,7 +89,7 @@ class LimboPlaytime {
             hoursString = "$wholeHours"
         } else {
             val minutes: Float = ((wholeMinutes - wholeHours * 60).toFloat() / 60).round(1)
-            hoursString = wholeHours.addSeparators() //+ minutes.round(1).toString()
+            hoursString = wholeHours.addSeparators()
             if (findFloatDecimalPlace(minutes) != 0) {
                 hoursString += minutes.toString()
             }
