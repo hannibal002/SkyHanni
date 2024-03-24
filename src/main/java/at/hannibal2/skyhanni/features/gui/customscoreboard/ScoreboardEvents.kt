@@ -516,7 +516,7 @@ private fun getMagmaBossShowWhen(): Boolean {
 
 private fun getHotDogLines(): List<String> {
     return listOf(getSbLines().first { SbPattern.riftHotdogTitlePattern.matches(it) }
-    ) + ( getSbLines().first { SbPattern.riftHotdogEatenPattern.matches(it) })
+    ) + (getSbLines().first { SbPattern.riftHotdogEatenPattern.matches(it) })
 }
 
 private fun getHotDogShowWhen(): Boolean {
