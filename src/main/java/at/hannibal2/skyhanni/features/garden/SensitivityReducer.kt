@@ -139,11 +139,11 @@ object SensitivityReducer {
 
         if (!LockMouseLook.lockedMouse) {
             storage.savedMouseloweredSensitivity = gameSettings.mouseSensitivity
+            val newSens = doTheMath(storage.savedMouseloweredSensitivity)
+            gameSettings?.mouseSensitivity = newSens
         } else {
             storage.savedMouseloweredSensitivity = storage.savedMouselockedSensitivity
         }
-        val newSens = doTheMath(storage.savedMouseloweredSensitivity)
-        gameSettings?.mouseSensitivity = newSens
         if (showMessage) ChatUtils.chat("§bMouse sensitivity is now lowered. Type /shsensreduce to restore your sensitivity.")
     }
 
