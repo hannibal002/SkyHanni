@@ -56,7 +56,7 @@ object GardenPlotAPI {
         "§aUnlocked Garden §r§aPlot §r§7- §r§b(?<plot>.*)§r§a!"
     )
     /**
-     * §aPlot §r§7- §r§b10 §r§ais now clean!
+     * REGEX-TEST: §aPlot §r§7- §r§b10 §r§ais now clean!
      */
     private val cleanPlotChatPattern by patternGroup.pattern(
         "chat.clean",
