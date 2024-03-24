@@ -27,9 +27,17 @@ public class PestWaypointConfig {
 
     @Expose
     @ConfigOption(
+        name = "Draw Line",
+        desc = "Draw line to waypoint."
+    )
+    @ConfigEditorBoolean
+    public boolean drawLine = true;
+
+    @Expose
+    @ConfigOption(
         name = "Show For Seconds",
         desc = "Shows waypoint for that amount of seconds."
     )
     @ConfigEditorSlider(minStep = 1, minValue = 5, maxValue = 20)
-    public double showWaypointForSeconds = 10;
+    public double showWaypointForSeconds = 15;
 }
