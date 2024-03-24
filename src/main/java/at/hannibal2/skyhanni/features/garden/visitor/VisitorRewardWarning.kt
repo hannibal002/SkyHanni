@@ -12,7 +12,6 @@ import at.hannibal2.skyhanni.utils.KeyboardManager.isKeyHeld
 import at.hannibal2.skyhanni.utils.LorenzColor
 import at.hannibal2.skyhanni.utils.NumberUtil
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
-import io.github.moulberry.notenoughupdates.events.SlotClickEvent
 import net.minecraft.item.ItemStack
 import net.minecraftforge.event.entity.player.ItemTooltipEvent
 import net.minecraftforge.fml.common.eventhandler.EventPriority
@@ -46,8 +45,9 @@ class VisitorRewardWarning {
     }
 
     @SubscribeEvent(priority = EventPriority.HIGH)
-    fun onStackClick(event: SlotClickEvent) {
+    fun onStackClick(event: GuiContainerEvent.SlotClickEvent) {
         if (!VisitorAPI.inInventory) return
+        val slot = event.slot ?: return
 
         val visitor = VisitorAPI.getVisitor(lastClickedNpc) ?: return
         val blockReason = visitor.blockReason(event.slotId == ACCEPT_SLOT, event.slotId == REFUSE_SLOT)
@@ -58,12 +58,12 @@ class VisitorRewardWarning {
         }
 
         if (event.slotId == REFUSE_SLOT) {
-            if (event.slot.stack?.name != "§cRefuse Offer") return
+            if (slot.stack?.name != "§cRefuse Offer") return
             VisitorAPI.changeStatus(visitor, VisitorAPI.VisitorStatus.REFUSED, "refused")
             return
         }
         if (event.slotId == ACCEPT_SLOT) {
-            if (event.slot.stack?.name != "§eClick to give!") return
+            if (slot.stack?.name != "§eClick to give!") return
             VisitorAPI.changeStatus(visitor, VisitorAPI.VisitorStatus.ACCEPTED, "accepted")
             return
         }
