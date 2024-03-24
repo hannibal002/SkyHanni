@@ -155,7 +155,6 @@
 + Improved Plot Menu Highlighting. - ILike2WatchMemes (https://github.com/hannibal002/SkyHanni/pull/1254)
     + Added 'Pasting' status.
     + Changed Event used for checking for statuses.
-+ Added isBeingPasted variable for plots. - ILike2WatchMemes (https://github.com/hannibal002/SkyHanni/pull/1254)
 + Hide the Sensitivity Reducer overlay when the mouse is locked. -
   martimavocado (https://github.com/hannibal002/SkyHanni/pull/1253)
 
@@ -299,7 +298,7 @@
   hannibal2 (https://github.com/hannibal002/SkyHanni/pull/1256)
 + Fixed incorrect pest amount in plots under certain conditions. -
   Empa (https://github.com/hannibal002/SkyHanni/pull/1260)
-+ Fixed pests in uncleaned plots not getting detected. - Empa (https://github.com/hannibal002/SkyHanni/pull/1260)
++ Fixed pests in uncleared plots not getting detected. - Empa (https://github.com/hannibal002/SkyHanni/pull/1260)
 + Fixed another Sensitivity Reducer + Mouse Lock incompatibility. -
   martimavocado (https://github.com/hannibal002/SkyHanni/pull/1253)
 
@@ -364,7 +363,7 @@
 + Fixed time in Custom Scoreboard displaying 0 instead of 12. -
   j10a1n15 (https://github.com/hannibal002/SkyHanni/pull/1249)
 + Fixed custom scoreboard issue with cold line. - j10a1n15 (https://github.com/hannibal002/SkyHanni/pull/1244)
-+ Fixed server id error appearing in chat. - CalMWolfs (https://github.com/hannibal002/SkyHanni/pull/1262)
++ Fixed server ID error appearing in chat. - CalMWolfs (https://github.com/hannibal002/SkyHanni/pull/1262)
 + Fixed two Scoreboard Errors. - j10a1n15 (https://github.com/hannibal002/SkyHanni/pull/1255)
     + During the F3/M3 boss fight.
     + During a garden cleanup
@@ -543,6 +542,7 @@
 + Made LorenzUtils.lastWorldSwitch use SimpleTimeMark instead of currentTimeMillis. -
   CalMWolfs (https://github.com/hannibal002/SkyHanni/pull/1262)
 + Repo Pattens now work inside Unit Tests. - Thunderblade73 (https://github.com/hannibal002/SkyHanni/pull/1258)
++ Added isBeingPasted variable for plots. - ILike2WatchMemes (https://github.com/hannibal002/SkyHanni/pull/1254)
 
 ### Removed Features
 
