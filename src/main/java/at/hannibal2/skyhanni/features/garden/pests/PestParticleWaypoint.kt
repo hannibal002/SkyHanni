@@ -1,5 +1,6 @@
 package at.hannibal2.skyhanni.features.garden.pests
 
+import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.data.ClickType
 import at.hannibal2.skyhanni.events.ItemClickEvent
 import at.hannibal2.skyhanni.events.LorenzRenderWorldEvent
@@ -20,13 +21,15 @@ import kotlin.time.Duration.Companion.seconds
 
 class PestParticleWaypoint {
 
+    private val config get() = SkyHanniMod.feature.garden.pests.pestWaypoint
+
     private var lastPestTrackerUse = SimpleTimeMark.farPast()
 
     private var firstParticlePoint: LorenzVec? = null
     private var secondParticlePoint: LorenzVec? = null
     private var lastParticlePoint: LorenzVec? = null
     private var guessPoint: LorenzVec? = null
-    private var locs = mutableListOf<LorenzVec>()
+    private var locations = mutableListOf<LorenzVec>()
     private var particles = 0
     private var lastParticles = 0
 
@@ -48,7 +51,7 @@ class PestParticleWaypoint {
     }
 
     private fun reset() {
-        locs.clear()
+        locations.clear()
         guessPoint = null
         lastParticlePoint = null
         firstParticlePoint = null
@@ -60,11 +63,11 @@ class PestParticleWaypoint {
     @SubscribeEvent
     fun onReceiveParticle(event: ReceiveParticleEvent) {
         if (!isEnabled()) return
-        // TODO time in config
-        if (lastPestTrackerUse.passedSince() > 5.seconds) return
+        if (lastPestTrackerUse.passedSince() > 3.seconds) return
 
         if (event.type != EnumParticleTypes.REDSTONE) return
         val location = event.location
+        if (config.hideParticles) event.isCanceled //not working
 
         if (particles > 5) return
         if (firstParticlePoint == null) {
@@ -73,13 +76,13 @@ class PestParticleWaypoint {
         } else if (secondParticlePoint == null) {
             secondParticlePoint = location
             lastParticlePoint = location
-            locs.add(location)
+            locations.add(location)
         } else {
             val firstDistance = secondParticlePoint?.let { firstParticlePoint?.distance(it) } ?: return
             val distance = lastParticlePoint?.distance(location) ?: return
             if ((distance-firstDistance).absoluteValue > 0.1) return
             lastParticlePoint = location
-            locs.add(location)
+            locations.add(location)
         }
         ++particles
     }
@@ -87,14 +90,13 @@ class PestParticleWaypoint {
     @SubscribeEvent
     fun onRenderWorld(event: LorenzRenderWorldEvent) {
         if (!isEnabled()) return
-        // TODO time in config
-        if (locs.isEmpty()) return
-        if (lastPestTrackerUse.passedSince() > 20.seconds) {
+        if (locations.isEmpty()) return
+        if (lastPestTrackerUse.passedSince() > config.showWaypointForSeconds.seconds) {
             reset()
             return
         }
         val waypoint = if (lastParticles != particles || guessPoint == null) {
-            getWaypoint(locs).also {
+            getWaypoint(locations).also {
                 guessPoint = it
                 lastParticles = particles
             }
@@ -120,6 +122,6 @@ class PestParticleWaypoint {
     }
 
     // TODO toggle
-    fun isEnabled() = GardenAPI.inGarden()
+    fun isEnabled() = GardenAPI.inGarden() && config.enabled
 
 }
