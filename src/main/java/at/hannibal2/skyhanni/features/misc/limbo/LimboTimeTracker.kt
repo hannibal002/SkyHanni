@@ -147,7 +147,7 @@ object LimboTimeTracker {
             val currentPB = storage?.personalBest ?: 0
             val userLuck = storage?.userLuck ?: 0f
             val limboPB: Int = if (currentPB < timeInLimbo) timeInLimbo else currentPB
-            ChatUtils.chat("§fYour current PB is §e${limboPB.seconds}§f, granting you §a+${userLuck.round(2)}✴ §fSkyHanni User Luck!")
+            ChatUtils.chat("§fYour current PB is §e${limboPB.seconds}§f, granting you §a+${userLuck.round(2)}✴ SkyHanni User Luck§f!")
             ChatUtils.chat("§fYou have §e${playtime.seconds} §fof playtime!")
         }
     }
