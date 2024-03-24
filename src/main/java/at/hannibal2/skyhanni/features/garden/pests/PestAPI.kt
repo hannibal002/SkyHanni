@@ -90,13 +90,10 @@ object PestAPI {
                 plot.pests = 1
                 plot.isPestCountInaccurate = false
             }
-            return
-        }
-        if (inaccurateAmount == 1) { // if we can assume all the inaccurate pests are in the only inaccurate plot
+        } else if (inaccurateAmount == 1) { // if we can assume all the inaccurate pests are in the only inaccurate plot
             val plot = getPlotsWithInaccuratePests().firstOrNull()
             plot?.pests = scoreboardPests - accurateAmount
             plot?.isPestCountInaccurate = false
-            return
         }
     }
 
