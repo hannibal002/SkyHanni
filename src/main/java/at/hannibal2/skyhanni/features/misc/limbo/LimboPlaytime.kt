@@ -46,7 +46,8 @@ class LimboPlaytime {
         if (event.inventory !is ContainerLocalMenu) return
         if (event.inventory.displayName.unformattedText != "Detailed /playtime") return
         if (event.slotNumber != 43) return
-        if (storage?.playtime == 0) return
+        val playtime = storage?.playtime ?: 0
+        if (playtime < 60) return
 
         if (lastCreateCooldown.passedSince() > 3.seconds) {
             lastCreateCooldown = SimpleTimeMark.now()
