@@ -46,6 +46,8 @@
     + Displays the distance until the end of a lane.
 + Made Rancher's Boots the stack size display account for the Cactus Knife now giving +100 speed cap while in the Garden. - Alexia Luna (https://github.com/hannibal002/SkyHanni/pull/1149)
     + Speed cap above 500 will now display as red because Hypixel now allows this for some reason, but it is practically unachievable. Also, the 1000 speed cap will now show up as 1k, so the text doesn't overflow into the slot to the left.
++ Added Plot Menu Highlighting - ILike2WatchMemes (https://github.com/hannibal002/SkyHanni/pull/1181)
+    + Plot highlighting based on plot statuses (pests, active spray, current plot, locked plot)
 
 #### Mining Features
 
@@ -65,6 +67,14 @@
 #### Event Features
 
 + Easter Egg Hunt 2024 waypoints. - Erymanthus + walker (https://github.com/hannibal002/SkyHanni/pull/1193)
+
+#### Fishing Features
+
++ Added Totem Overlay. - j10a1n15 (https://github.com/hannibal002/SkyHanni/pull/1139)
+    + Option to change the overlay distance.
+    + Option to hide Totem Particles.
+    + Option to show the effective area of a totem.
+    + Option to get reminded when a totem is about to expire.
 
 #### Misc Features
 
@@ -122,6 +132,8 @@
 + Added support for offline pest messages. - Empa (https://github.com/hannibal002/SkyHanni/pull/1237)
 + Lane detection works faster now. - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/1239)
 + Added option to change how often the Lane Switch sound should play. - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/1239)
++ Allow using the teleport hotkey when in an infested plot. - Obsidian (https://github.com/hannibal002/SkyHanni/pull/1140)
++ Added the command `/shresetvisitordrops` to reset your Garden Visitor Drops Statistics. - HiZe (https://github.com/hannibal002/SkyHanni/pull/1135)
 
 #### Crimson Improvelemts
 
@@ -156,6 +168,7 @@
     + The text is now aligned to the center of the GUI element.
 + Added a delay after tool swap before warning about wrong farming speed. - Alexia Luna (https://github.com/hannibal002/SkyHanni/pull/840)
 + Loading Trophy Fish information from NEU PV. - hannibal2 & CalMWolfs (https://github.com/hannibal002/SkyHanni/pull/1123)
++ Added wireframe as a valid Totem of Corruption outline. - j10a1n15 (https://github.com/hannibal002/SkyHanni/pull/1248)
 
 #### Dungeon Improvements
 
@@ -192,6 +205,7 @@
 + Fixed SkyBlock guide highlight missing tasks not working properly for minions and collections. - Thunderblade73
 + Fixed Harp Quick Restart not working when Harp GUI Scale is disabled. - Zickles
 + Fixed "Mark Missing Class" highlighting every party. - martimavocado (https://github.com/hannibal002/SkyHanni/pull/1211)
++ Fix a typo in Not Clickable Items in the /equipment menu. - martimavocado (https://github.com/hannibal002/SkyHanni/pull/1242)
 
 #### Chat Fixes
 
@@ -204,6 +218,7 @@
 + Fixed Anita's Accessory chat filter not working with multi-word crops (Cocoa Beans, Nether Wart, Sugar Cane). -
   Alexia Luna (https://github.com/hannibal002/SkyHanni/pull/1115)
 + Fixed fire sale chat hider. - Empa (https://github.com/hannibal002/SkyHanni/pull/1147)
++ Fix event level up chat filter. - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/1250)
 
 #### Garden Fixes
 
@@ -227,6 +242,9 @@
 + Fix lane corners showing while not farming. - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/1239)
 + Fix Movement Speed display while on soulsand. - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/1239)
 + Fix Farming Lane time remaining display while on soulsand. - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/1239)
++ Lane Switch warning and remaining time ETA now supports soul sand farming and shows the current state of movement. - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/1245)
++ Made drops from pests get added to crop milestones. - Empa (https://github.com/hannibal002/SkyHanni/pull/1243)
++ Fixed Lane Detection warning and time remaining not working when movement speed feature is disabled. - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/1241)
 
 #### Command Fixes
 
@@ -282,6 +300,8 @@
     + Fixed New Year Line appearing twice.
 + Fixed Scoreboard Unknown Lines error during a dojo and a floor 3 run. - j10a1n15 (https://github.com/hannibal002/SkyHanni/pull/1229)
 + Fixed all new custom scoreboard errors. - j10a1n15 (https://github.com/hannibal002/SkyHanni/pull/1238)
++ Fixed time in Custom Scoreboard displaying 0 instead of 12. - j10a1n15 (https://github.com/hannibal002/SkyHanni/pull/1249)
++ Fixed custom scoreboard issue with cold line. - j10a1n15 (https://github.com/hannibal002/SkyHanni/pull/1244)
 
 #### Dungeon Fixes
 
@@ -305,6 +325,7 @@
 #### Fishign Fixes
 
 + Renamed "fishing contest" to "fishing festival". - Empa (https://github.com/hannibal002/SkyHanni/pull/1222)
++ Fixed duplicate chat prefix when updating trophy fishing data from NEU PV. - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/1246)
 
 #### Misc Fixes
 
@@ -433,6 +454,10 @@
 + Added NeuProfileDataLoadedEvent. - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/1123)
 + Add mineshaft islandType. - CalMWolfs (https://github.com/hannibal002/SkyHanni/pull/1235)
 + Removed distanceFromPreviousTick as it is not accurate while on soulsand. - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/1239)
++ Added bindCamera() method and started using it. - j10a1n15 (https://github.com/hannibal002/SkyHanni/pull/1248)
++ Added drawSphereInWorld() method. - j10a1n15 (https://github.com/hannibal002/SkyHanni/pull/1139)
++ Removal of NEU's SlotClickEvent. - Thunderblade73 (https://github.com/hannibal002/SkyHanni/pull/1206)
++ Fixed usage of checkCurrentServerId. - j10a1n15 (https://github.com/hannibal002/SkyHanni/pull/1177)
 
 ### Removed Features
 

@@ -44,6 +44,7 @@ import at.hannibal2.skyhanni.features.garden.farming.GardenStartLocation
 import at.hannibal2.skyhanni.features.garden.farming.lane.FarmingLaneCreator
 import at.hannibal2.skyhanni.features.garden.fortuneguide.CaptureFarmingGear
 import at.hannibal2.skyhanni.features.garden.fortuneguide.FFGuideGUI
+import at.hannibal2.skyhanni.features.garden.visitor.GardenVisitorDropStatistics
 import at.hannibal2.skyhanni.features.mining.KingTalismanHelper
 import at.hannibal2.skyhanni.features.mining.powdertracker.PowderTracker
 import at.hannibal2.skyhanni.features.minion.MinionFeatures
@@ -211,6 +212,10 @@ object Commands {
             "shresetfishingtracker",
             "Resets the Fishing Profit Tracker"
         ) { FishingProfitTracker.resetCommand(it) }
+        registerCommand(
+            "shresetvisitordrops",
+            "Reset the Visitors Drop Statistics"
+        ) { GardenVisitorDropStatistics.resetCommand() }
         registerCommand("shbingotoggle", "Toggle the bingo card display mode") { BingoCardDisplay.toggleCommand() }
         registerCommand(
             "shfarmingprofile",
@@ -289,7 +294,7 @@ object Commands {
         )
         registerCommand(
             "shlimbostats",
-            "Prints your Limbo Stats!"
+            "Prints your Limbo Stats.\n §7This includes your Personal Best, Playtime, and §aSkyHanni User Luck§7!"
         ) { LimboTimeTracker.printStats() }
         registerCommand(
             "shlimbo",

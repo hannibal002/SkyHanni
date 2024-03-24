@@ -1,4 +1,4 @@
-package at.hannibal2.skyhanni.features.garden.inventory
+package at.hannibal2.skyhanni.features.garden.inventory.plots
 
 import at.hannibal2.skyhanni.events.LorenzToolTipEvent
 import at.hannibal2.skyhanni.features.garden.GardenAPI

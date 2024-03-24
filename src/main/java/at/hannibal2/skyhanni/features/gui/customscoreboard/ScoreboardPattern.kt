@@ -20,7 +20,7 @@ object ScoreboardPattern {
     ) // this line is weird (either text or number), ill leave it as is; it even has different colors?
     val coldPattern by mainSb.pattern(
         "cold",
-        "^Cold: §.❄ (?<cold>-?\\d+)$"
+        "^(?:§.)*Cold: §.❄ (?<cold>-?\\d+)$"
     )
     val copperPattern by mainSb.pattern(
         "copper",
@@ -114,7 +114,7 @@ object ScoreboardPattern {
     )
     val floor3GuardiansPattern by dungeonSb.pattern(
         "floor3guardians",
-        "§. - §.(?:Healthy|Reinforced|Laser|Chaos)§a ([\\\\w,.]?)+(?:§c❤)?"
+        "§. - §.(?:Healthy|Reinforced|Laser|Chaos)§a [\\w,.]*(?:§c❤)?"
     )
 
     // kuudra
@@ -144,11 +144,11 @@ object ScoreboardPattern {
     )
     val cleanUpPattern by farmingSb.pattern(
         "cleanup",
-        "^\\s*(§.)*Cleanup(§.)*: (§.)*[\\d,.]+%$"
+        "^\\s*(§.)*Cleanup(§.)*: (§.)*[\\d,.]*%?$"
     )
     val pastingPattern by farmingSb.pattern(
         "pasting",
-        "^\\s*§f(Barn )?Pasting§7: (§.)*[\\d,.]+%$"
+        "^\\s*§f(Barn )?Pasting§7: (§.)*[\\d,.]+%?$"
     )
     val peltsPattern by farmingSb.pattern(
         "pelts",

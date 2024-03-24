@@ -28,7 +28,6 @@ object GardenPlotAPI {
 
     /**
      * REGEX-TEST: §aPlot §7- §b4
-     * REGEX-TEST: §ePlot §7- §b21
      */
     private val plotNamePattern by patternGroup.pattern(
         "name",
@@ -95,6 +94,9 @@ object GardenPlotAPI {
         var sprayHasNotified: Boolean,
 
         @Expose
+        var isBeingPasted: Boolean,
+
+        @Expose
         var isPestCountInaccurate: Boolean,
 
         @Expose
@@ -109,7 +111,7 @@ object GardenPlotAPI {
         val type: SprayType,
     )
 
-    private fun Plot.getData() = GardenAPI.storage?.plotData?.getOrPut(id) { PlotData(id, "$id", 0, null, null, false, false, true, false) }
+    private fun Plot.getData() = GardenAPI.storage?.plotData?.getOrPut(id) { PlotData(id, "$id", 0, null, null, false, false, false, true, false) }
 
     var Plot.name: String
         get() = getData()?.name ?: "$id"
@@ -134,6 +136,12 @@ object GardenPlotAPI {
         get() = this.getData()?.let {
             !it.sprayHasNotified && it.sprayExpiryTime?.isInPast() == true
         } == true
+
+    var Plot.isBeingPasted: Boolean
+        get() = this.getData()?.isBeingPasted ?: false
+        set(value) {
+            this.getData()?.isBeingPasted = value
+        }
 
     var Plot.isPestCountInaccurate: Boolean
         get() = this.getData()?.isPestCountInaccurate ?: false
@@ -240,6 +248,7 @@ object GardenPlotAPI {
             }
             for (line in lore) {
                 plot.locked = line.contains("§7Cost:")
+                plot.isBeingPasted = line.contains("§7Pasting in progress:")
                 plot.uncleared = false
                 uncleanedPlotPattern.matchMatcher(line) {
                     plot.uncleared = true
