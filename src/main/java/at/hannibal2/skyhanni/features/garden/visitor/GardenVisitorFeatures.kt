@@ -477,7 +477,7 @@ class GardenVisitorFeatures {
 
     private fun hideVisitorMessage(message: String) = visitorChatMessagePattern.matchMatcher(message) {
         val color = group("color")
-        if (color == "§e") return false // Non-visitor NPC, probably Jacob
+        if (color == null || color == "§e") return false // Non-visitor NPC, probably Jacob
 
         val name = group("name")
         if (name == "Spaceman") return false
