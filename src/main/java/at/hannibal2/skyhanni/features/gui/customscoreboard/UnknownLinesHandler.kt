@@ -111,6 +111,8 @@ object UnknownLinesHandler {
             SbPattern.timeLeftPattern,
             SbPattern.darkAuctionCurrentItemPattern,
             SbPattern.coldPattern,
+            SbPattern.riftHotdogTitlePattern,
+            SbPattern.riftHotdogEatenPattern,
         )
 
         unknownLines = unknownLines.filterNot { line ->

@@ -138,6 +138,12 @@ enum class ScoreboardEvents(
             "§7Damage Soaked:\n" +
             "§e▎▎▎▎▎▎▎▎▎▎▎▎▎▎▎▎▎▎▎▎§7▎▎▎▎▎"
     ),
+    HOT_DOG_CONTEST(
+        ::getHotDogLines,
+        ::getHotDogShowWhen,
+        "§6Hot Dog Contest\n" +
+            "Eaten: §c0/50"
+    ),
     ESSENCE(
         ::getEssenceLines,
         ::getEssenceShowWhen,
@@ -202,6 +208,7 @@ enum class ScoreboardEvents(
             MINING_EVENTS,
             DAMAGE,
             MAGMA_BOSS,
+            HOT_DOG_CONTEST,
             ESSENCE,
             EFFIGIES,
             ACTIVE_TABLIST_EVENTS
@@ -513,6 +520,15 @@ private fun getMagmaBossLines() = getSbLines().filter { line ->
 
 private fun getMagmaBossShowWhen(): Boolean {
     return SbPattern.magmaChamberPattern.matches(HypixelData.skyBlockArea)
+}
+
+private fun getHotDogLines(): List<String> {
+    return listOf(getSbLines().first { SbPattern.riftHotdogTitlePattern.matches(it) }
+        + getSbLines().first { SbPattern.riftHotdogEatenPattern.matches(it) })
+}
+
+private fun getHotDogShowWhen(): Boolean {
+    return SbPattern.riftHotdogTitlePattern.anyMatches(getSbLines())
 }
 
 private fun getEssenceLines(): List<String> {
