@@ -11,7 +11,7 @@ public class AreaWallsConfig {
     @ConfigOption(name = "Area Walls", desc = "Show walls between the main areas of the Crystal Hollows.")
     @ConfigEditorBoolean
     @FeatureToggle
-    public boolean enable = true;
+    public boolean enable = false;
 
     @Expose
     @ConfigOption(name = "In Nucleus", desc = "Shows the walls also when inside the Nucleus")
