@@ -68,7 +68,7 @@ class LimboPlaytime {
         if (!event.slot.inventory.displayName.unformattedText.startsWith("Detailed /playtime")) return
         if (event.slot.slotIndex != 4) return
         val playtime = storage?.playtime ?: 0
-        if (playtime <= 60) return
+        if (playtime <= 120) return
 
         val lore = event.toolTip
         val hoursList = lore.filter { hoursPattern.matches(it) }.toMutableList()
