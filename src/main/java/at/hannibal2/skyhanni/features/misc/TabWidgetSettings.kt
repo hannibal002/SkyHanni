@@ -17,7 +17,7 @@ class TabWidgetSettings {
     private val patternGroup = RepoPattern.group("tab.widget.setting")
     private val mainPageSettingPattern by patternGroup.pattern(
         "gui",
-        "Widgets on.*"
+        "(Widgets in.*|Widgets on.*)"
     )
     private val mainPageWidgetPattern by patternGroup.pattern(
         "main",
@@ -29,7 +29,7 @@ class TabWidgetSettings {
     )
     private val shownSettingPattern by patternGroup.pattern(
         "show",
-        "Shown .* Setting.* |.*Widget Settings"
+        "Shown .* Setting.*|.*Widget Settings"
     )
     private val clickToDisablePattern by patternGroup.pattern(
         "click.disable",
@@ -37,7 +37,7 @@ class TabWidgetSettings {
     )
     private val enabledPattern by patternGroup.pattern(
         "is.enabled",
-        ".*(ENABLED)"
+        ".*ENABLED"
     )
 
     var inInventory = false
