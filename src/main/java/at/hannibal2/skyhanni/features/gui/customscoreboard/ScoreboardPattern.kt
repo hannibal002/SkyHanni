@@ -415,4 +415,12 @@ object ScoreboardPattern {
         "eventtime",
         "^\\s+Ends In: §r§e(?<time>.*)$"
     )
+    val boosterCookieEffectsWidgetPattern by tablistGroup.pattern(
+        "boostereffects",
+        "\\s*(?:§.)*Cookie Buff(?:§.)*: (?:§r)*(?<time>.*)"
+    )
+    val cookieNotActivePattern by tablistGroup.pattern(
+        "cookienotactive",
+        "Not active|§c§lINACTIVE"
+    )
 }
