@@ -143,7 +143,7 @@ class PestFinder {
             return
         }
 
-        if (plot.isPlayerInside()) {
+        if (plot.isPlayerInside() && !config.alwaysTp) {
             ChatUtils.userError("You're already in an infested plot!")
             return
         }

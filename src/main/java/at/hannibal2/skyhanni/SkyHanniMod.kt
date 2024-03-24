@@ -294,6 +294,7 @@ import at.hannibal2.skyhanni.features.misc.RestorePieceOfWizardPortalLore
 import at.hannibal2.skyhanni.features.misc.ServerRestartTitle
 import at.hannibal2.skyhanni.features.misc.SkyBlockKickDuration
 import at.hannibal2.skyhanni.features.misc.SuperpairsClicksAlert
+import at.hannibal2.skyhanni.features.misc.TabWidgetSettings
 import at.hannibal2.skyhanni.features.misc.TimeFeatures
 import at.hannibal2.skyhanni.features.misc.TpsCounter
 import at.hannibal2.skyhanni.features.misc.compacttablist.AdvancedPlayerList
@@ -416,7 +417,7 @@ import org.apache.logging.log4j.Logger
     clientSideOnly = true,
     useMetadata = true,
     guiFactory = "at.hannibal2.skyhanni.config.ConfigGuiForgeInterop",
-    version = "0.24.Beta.18",
+    version = "0.24.Beta.19",
 )
 class SkyHanniMod {
 
@@ -772,6 +773,7 @@ class SkyHanniMod {
         loadModule(LockMouseLook)
         loadModule(SensitivityReducer)
         loadModule(DungeonFinderFeatures())
+        loadModule(TabWidgetSettings())
         loadModule(PabloHelper())
         loadModule(FishingBaitWarnings())
         loadModule(CustomScoreboard())

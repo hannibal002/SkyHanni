@@ -1,6 +1,7 @@
 package at.hannibal2.skyhanni.features.fishing
 
 import at.hannibal2.skyhanni.SkyHanniMod
+import at.hannibal2.skyhanni.config.features.fishing.TotemOfCorruptionConfig.OutlineType
 import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.LorenzRenderWorldEvent
 import at.hannibal2.skyhanni.events.LorenzTickEvent
@@ -12,6 +13,7 @@ import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils.sendTitle
 import at.hannibal2.skyhanni.utils.LorenzVec
 import at.hannibal2.skyhanni.utils.RenderUtils.drawSphereInWorld
+import at.hannibal2.skyhanni.utils.RenderUtils.drawSphereWireframeInWorld
 import at.hannibal2.skyhanni.utils.RenderUtils.renderStrings
 import at.hannibal2.skyhanni.utils.SoundUtils.playPlingSound
 import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
@@ -81,8 +83,18 @@ class TotemOfCorruption {
 
         val color = config.color.toChromaColor()
         for (totem in totems) {
-            // The center of the totem is the upper part
-            event.drawSphereInWorld(color, totem.location.add(y = 1), 16f)
+            // The center of the totem is the upper part of the armor stand
+            when (config.outlineType) {
+                OutlineType.FILLED -> {
+                    event.drawSphereInWorld(color, totem.location.add(y = 1), 16f)
+                }
+
+                OutlineType.WIREFRAME -> {
+                    event.drawSphereWireframeInWorld(color, totem.location.add(y = 1), 16f)
+                }
+
+                else -> return
+            }
         }
     }
 
@@ -132,7 +144,7 @@ class TotemOfCorruption {
 
     private fun isOverlayEnabled() = LorenzUtils.inSkyBlock && config.showOverlay
     private fun isHideParticlesEnabled() = LorenzUtils.inSkyBlock && config.hideParticles
-    private fun isEffectiveAreaEnabled() = LorenzUtils.inSkyBlock && config.showEffectiveArea
+    private fun isEffectiveAreaEnabled() = LorenzUtils.inSkyBlock && config.outlineType != OutlineType.NONE
 }
 
 class Totem(

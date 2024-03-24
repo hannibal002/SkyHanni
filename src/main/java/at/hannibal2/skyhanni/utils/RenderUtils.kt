@@ -664,20 +664,8 @@ object RenderUtils {
         GlStateManager.enableAlpha()
         GlStateManager.disableTexture2D()
         color.bindColor()
+        bindCamera()
 
-        var x1 = x
-        var y1 = y
-        var z1 = z
-        val renderViewEntity = Minecraft.getMinecraft().renderViewEntity
-        val viewX =
-            renderViewEntity.prevPosX + (renderViewEntity.posX - renderViewEntity.prevPosX) * partialTicks.toDouble()
-        val viewY =
-            renderViewEntity.prevPosY + (renderViewEntity.posY - renderViewEntity.prevPosY) * partialTicks.toDouble()
-        val viewZ =
-            renderViewEntity.prevPosZ + (renderViewEntity.posZ - renderViewEntity.prevPosZ) * partialTicks.toDouble()
-        x1 -= viewX
-        y1 -= viewY
-        z1 -= viewZ
         val tessellator = Tessellator.getInstance()
         val worldrenderer = tessellator.worldRenderer
         worldrenderer.begin(GL11.GL_QUAD_STRIP, DefaultVertexFormats.POSITION)
@@ -686,12 +674,12 @@ object RenderUtils {
         while (currentAngle < 2 * Math.PI) {
             val xOffset = radius * cos(currentAngle.toDouble()).toFloat()
             val zOffset = radius * sin(currentAngle.toDouble()).toFloat()
-            worldrenderer.pos(x1 + xOffset, y1 + height, z1 + zOffset).endVertex()
-            worldrenderer.pos(x1 + xOffset, y1 + 0, z1 + zOffset).endVertex()
+            worldrenderer.pos(x + xOffset, y + height, z + zOffset).endVertex()
+            worldrenderer.pos(x + xOffset, y + 0, z + zOffset).endVertex()
             currentAngle += angleStep
         }
-        worldrenderer.pos(x1 + radius, y1 + height, z1).endVertex()
-        worldrenderer.pos(x1 + radius, y1 + 0.0, z1).endVertex()
+        worldrenderer.pos(x + radius, y + height, z).endVertex()
+        worldrenderer.pos(x + radius, y + 0.0, z).endVertex()
         tessellator.draw()
 
         GlStateManager.enableCull()
@@ -728,20 +716,7 @@ object RenderUtils {
         GlStateManager.enableAlpha()
         GlStateManager.disableTexture2D()
         color.bindColor()
-
-        var x1 = x
-        var y1 = y
-        var z1 = z
-        val renderViewEntity = Minecraft.getMinecraft().renderViewEntity
-        val viewX =
-            renderViewEntity.prevPosX + (renderViewEntity.posX - renderViewEntity.prevPosX) * partialTicks.toDouble()
-        val viewY =
-            renderViewEntity.prevPosY + (renderViewEntity.posY - renderViewEntity.prevPosY) * partialTicks.toDouble()
-        val viewZ =
-            renderViewEntity.prevPosZ + (renderViewEntity.posZ - renderViewEntity.prevPosZ) * partialTicks.toDouble()
-        x1 -= viewX
-        y1 -= viewY
-        z1 -= viewZ
+        bindCamera()
 
         val tessellator = Tessellator.getInstance()
         val worldrenderer = tessellator.worldRenderer
@@ -751,27 +726,27 @@ object RenderUtils {
 
         for (phi in 0 until segments) {
             for (theta in 0 until segments * 2) {
-                val x2 = x1 + radius * sin(Math.PI * phi / segments) * cos(2.0 * Math.PI * theta / (segments * 2))
-                val y2 = y1 + radius * cos(Math.PI * phi / segments)
-                val z2 = z1 + radius * sin(Math.PI * phi / segments) * sin(2.0 * Math.PI * theta / (segments * 2))
+                val x1 = x + radius * sin(Math.PI * phi / segments) * cos(2.0 * Math.PI * theta / (segments * 2))
+                val y1 = y + radius * cos(Math.PI * phi / segments)
+                val z1 = z + radius * sin(Math.PI * phi / segments) * sin(2.0 * Math.PI * theta / (segments * 2))
 
-                val x3 = x1 + radius * sin(Math.PI * (phi + 1) / segments) * cos(2.0 * Math.PI * theta / (segments * 2))
-                val y3 = y1 + radius * cos(Math.PI * (phi + 1) / segments)
-                val z3 = z1 + radius * sin(Math.PI * (phi + 1) / segments) * sin(2.0 * Math.PI * theta / (segments * 2))
+                val x2 = x + radius * sin(Math.PI * (phi + 1) / segments) * cos(2.0 * Math.PI * theta / (segments * 2))
+                val y2 = y + radius * cos(Math.PI * (phi + 1) / segments)
+                val z2 = z + radius * sin(Math.PI * (phi + 1) / segments) * sin(2.0 * Math.PI * theta / (segments * 2))
 
+                worldrenderer.pos(x1, y1, z1).endVertex()
                 worldrenderer.pos(x2, y2, z2).endVertex()
+
+                val x3 = x + radius * sin(Math.PI * (phi + 1) / segments) * cos(2.0 * Math.PI * (theta + 1) / (segments * 2))
+                val y3 = y + radius * cos(Math.PI * (phi + 1) / segments)
+                val z3 = z + radius * sin(Math.PI * (phi + 1) / segments) * sin(2.0 * Math.PI * (theta + 1) / (segments * 2))
+
+                val x4 = x + radius * sin(Math.PI * phi / segments) * cos(2.0 * Math.PI * (theta + 1) / (segments * 2))
+                val y4 = y + radius * cos(Math.PI * phi / segments)
+                val z4 = z + radius * sin(Math.PI * phi / segments) * sin(2.0 * Math.PI * (theta + 1) / (segments * 2))
+
                 worldrenderer.pos(x3, y3, z3).endVertex()
-
-                val x4 = x1 + radius * sin(Math.PI * (phi + 1) / segments) * cos(2.0 * Math.PI * (theta + 1) / (segments * 2))
-                val y4 = y1 + radius * cos(Math.PI * (phi + 1) / segments)
-                val z4 = z1 + radius * sin(Math.PI * (phi + 1) / segments) * sin(2.0 * Math.PI * (theta + 1) / (segments * 2))
-
-                val x5 = x1 + radius * sin(Math.PI * phi / segments) * cos(2.0 * Math.PI * (theta + 1) / (segments * 2))
-                val y5 = y1 + radius * cos(Math.PI * phi / segments)
-                val z5 = z1 + radius * sin(Math.PI * phi / segments) * sin(2.0 * Math.PI * (theta + 1) / (segments * 2))
-
                 worldrenderer.pos(x4, y4, z4).endVertex()
-                worldrenderer.pos(x5, y5, z5).endVertex()
             }
         }
 
@@ -785,8 +760,84 @@ object RenderUtils {
         GlStateManager.popMatrix()
     }
 
+    fun LorenzRenderWorldEvent.drawSphereWireframeInWorld(
+        color: Color,
+        location: LorenzVec,
+        radius: Float,
+    ) {
+        drawSphereWireframeInWorld(color, location.x, location.y, location.z, radius)
+    }
+
+    fun LorenzRenderWorldEvent.drawSphereWireframeInWorld(
+        color: Color,
+        x: Double,
+        y: Double,
+        z: Double,
+        radius: Float,
+    ) {
+        GlStateManager.pushMatrix()
+        GL11.glNormal3f(0.0f, 1.0f, 0.0f)
+
+        GlStateManager.disableTexture2D()
+        color.bindColor()
+        bindCamera()
+
+        val tessellator = Tessellator.getInstance()
+        val worldrenderer = tessellator.worldRenderer
+        worldrenderer.begin(GL11.GL_LINES, DefaultVertexFormats.POSITION)
+
+        val segments = 32
+
+        for (phi in 0 until segments) {
+            for (theta in 0 until segments * 2) {
+                val x1 = x + radius * sin(Math.PI * phi / segments) * cos(2.0 * Math.PI * theta / (segments * 2))
+                val y1 = y + radius * cos(Math.PI * phi / segments)
+                val z1 = z + radius * sin(Math.PI * phi / segments) * sin(2.0 * Math.PI * theta / (segments * 2))
+
+                val x2 = x + radius * sin(Math.PI * (phi + 1) / segments) * cos(2.0 * Math.PI * theta / (segments * 2))
+                val y2 = y + radius * cos(Math.PI * (phi + 1) / segments)
+                val z2 = z + radius * sin(Math.PI * (phi + 1) / segments) * sin(2.0 * Math.PI * theta / (segments * 2))
+
+                val x3 = x + radius * sin(Math.PI * (phi + 1) / segments) * cos(2.0 * Math.PI * (theta + 1) / (segments * 2))
+                val y3 = y + radius * cos(Math.PI * (phi + 1) / segments)
+                val z3 = z + radius * sin(Math.PI * (phi + 1) / segments) * sin(2.0 * Math.PI * (theta + 1) / (segments * 2))
+
+                val x4 = x + radius * sin(Math.PI * phi / segments) * cos(2.0 * Math.PI * (theta + 1) / (segments * 2))
+                val y4 = y + radius * cos(Math.PI * phi / segments)
+                val z4 = z + radius * sin(Math.PI * phi / segments) * sin(2.0 * Math.PI * (theta + 1) / (segments * 2))
+
+
+                worldrenderer.pos(x1, y1, z1).endVertex()
+                worldrenderer.pos(x2, y2, z2).endVertex()
+
+                worldrenderer.pos(x2, y2, z2).endVertex()
+                worldrenderer.pos(x3, y3, z3).endVertex()
+
+                worldrenderer.pos(x3, y3, z3).endVertex()
+                worldrenderer.pos(x4, y4, z4).endVertex()
+
+                worldrenderer.pos(x4, y4, z4).endVertex()
+                worldrenderer.pos(x1, y1, z1).endVertex()
+            }
+        }
+
+        tessellator.draw()
+
+        GlStateManager.enableTexture2D()
+        GlStateManager.color(1.0f, 1.0f, 1.0f, 1.0f)
+        GlStateManager.popMatrix()
+    }
+
     private fun Color.bindColor() =
         GlStateManager.color(this.red / 255f, this.green / 255f, this.blue / 255f, this.alpha / 255f)
+
+    private fun bindCamera() {
+        val renderManager = Minecraft.getMinecraft().renderManager
+        val viewer = renderManager.viewerPosX
+        val viewY = renderManager.viewerPosY
+        val viewZ = renderManager.viewerPosZ
+        GlStateManager.translate(-viewer, -viewY, -viewZ)
+    }
 
     fun drawStringScaledMaxWidth(
         str: String?,

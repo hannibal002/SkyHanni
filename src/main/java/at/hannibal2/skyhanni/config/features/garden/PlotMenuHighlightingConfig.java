@@ -30,9 +30,10 @@ public class PlotMenuHighlightingConfig {
 
     public enum PlotStatusType {
         PESTS("§cPests", LorenzColor.RED),
-        SPRAYS("§eSprays", LorenzColor.YELLOW),
+        SPRAYS("§6Sprays", LorenzColor.GOLD),
         LOCKED("§7Locked", LorenzColor.DARK_GRAY),
         CURRENT("§aCurrent plot", LorenzColor.GREEN),
+        PASTING("§ePasting", LorenzColor.YELLOW)
         ;
 
         public final String name;
