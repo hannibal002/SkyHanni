@@ -89,7 +89,7 @@ class PestParticleWaypoint {
         if (lastParticles != particles) waypoint = getWaypoint(locs)
         guessPoint = waypoint
         event.drawWaypointFilled(waypoint, Color(255, 0, 255,100), beacon = true)
-        event.drawDynamicText(waypoint, "§cAccurate Guess", 1.3)
+        event.drawDynamicText(waypoint, "§cPest Guess", 1.3)
     }
 
     private fun getWaypoint(list: MutableList<LorenzVec>): LorenzVec {
