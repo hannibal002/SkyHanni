@@ -15,16 +15,13 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 class KuudraAPI {
 
     private val group = RepoPattern.group("data.kuudra")
-    private val scoreboardGroup = group.group("scoreboard")
-    private val chatGroup = group.group("chat")
 
-    private val tierPattern by scoreboardGroup.pattern(
-        "tier",
+    private val tierPattern by group.pattern(
+        "scoreboard.tier",
         " §7⏣ §cKuudra's Hollow §8\\(T(?<tier>.*)\\)"
     )
-
-    private val completePattern by chatGroup.pattern(
-        "complete",
+    private val completePattern by group.pattern(
+        "chat.complete",
         "§.\\s*(?:§.)*KUUDRA DOWN!"
     )
 
@@ -71,5 +68,3 @@ class KuudraAPI {
     }
 
 }
-
-
