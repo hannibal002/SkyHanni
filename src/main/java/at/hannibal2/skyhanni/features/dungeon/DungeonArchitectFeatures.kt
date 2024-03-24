@@ -14,7 +14,7 @@ import kotlin.time.Duration.Companion.seconds
 class DungeonArchitectFeatures {
 
     private val config get() = SkyHanniMod.feature.dungeon
-    private val patternGroup = RepoPattern.group("dungeon.copilot")
+    private val patternGroup = RepoPattern.group("dungeon.architectsdraft")
 
     private val puzzleFailPattern by patternGroup.pattern(
         "normal.puzzle.fail",
@@ -22,14 +22,13 @@ class DungeonArchitectFeatures {
     )
     private val quizPuzzleFailPattern by patternGroup.pattern(
         "quiz.puzzle.fail",
-        "§4\\[STATUE\\] Oruo the Omniscient§r§f: (?:§.)*(?<name>\\S*) (?:§.)*chose the wrong .*"
+        "§4\\[STATUE] Oruo the Omniscient§r§f: (?:§.)*(?<name>\\S*) (?:§.)*chose the wrong .*"
     )
 
     @SubscribeEvent
     fun onChat(event: LorenzChatEvent) {
         if (!isEnabled()) return
 
-        if (!config.architectNotifier) return
         puzzleFailPattern.matchMatcher(event.message) {
             generateMessage(group("name"), event)
         }
@@ -38,11 +37,13 @@ class DungeonArchitectFeatures {
         }
     }
 
-    private fun generateMessage(key: String, event: LorenzChatEvent) {
+    private fun generateMessage(name: String, event: LorenzChatEvent) {
         val architectItem = SackAPI.fetchSackItem("ARCHITECT_FIRST_DRAFT".asInternalName())
         if (architectItem.amount <= 0) return
+
         ChatUtils.clickableChat(
-            "§c§lPUZZLE FAILED! §r§b$key §r§ehas failed a puzzle.\n§3§l[CLICK HERE TO GET ARCHITECT'S FIRST DRAFT] (${architectItem.amount}x left)§r§e",
+            "§c§lPUZZLE FAILED! §r§b$name §r§failed a puzzle.\n" +
+                "§eClick here to get §5Architect's First Draft §7(§e${architectItem.amount}x left§7)",
             "/gfs ARCHITECT_FIRST_DRAFT 1",
             false
         )
@@ -51,7 +52,6 @@ class DungeonArchitectFeatures {
     }
 
     private fun isEnabled(): Boolean {
-        return LorenzUtils.inDungeons && config.dungeonCopilot.enabled
+        return LorenzUtils.inDungeons && config.architectNotifier
     }
-
 }
