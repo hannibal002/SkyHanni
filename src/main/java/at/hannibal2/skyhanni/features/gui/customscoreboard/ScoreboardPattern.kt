@@ -114,7 +114,7 @@ object ScoreboardPattern {
     )
     val floor3GuardiansPattern by dungeonSb.pattern(
         "floor3guardians",
-        "§. - §.(?:Healthy|Reinforced|Laser|Chaos)§a ([\\\\w,.]?)+(?:§c❤)?"
+        "§. - §.(?:Healthy|Reinforced|Laser|Chaos)§a [\\w,.]*(?:§c❤)?"
     )
 
     // kuudra
