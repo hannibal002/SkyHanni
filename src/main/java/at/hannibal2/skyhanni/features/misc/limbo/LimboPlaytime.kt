@@ -44,45 +44,37 @@ class LimboPlaytime {
     @SubscribeEvent
     fun replaceItem(event: ReplaceItemEvent) {
         if (event.inventory !is ContainerLocalMenu) return
-        if (event.inventory.displayName.unformattedText != "Detailed /playtime") return
+        if (event.inventory.name != "Detailed /playtime") return
         if (event.slotNumber != 43) return
         val playtime = storage?.playtime ?: 0
         if (playtime < 60) return
 
         if (lastCreateCooldown.passedSince() > 3.seconds) {
             lastCreateCooldown = SimpleTimeMark.now()
-            limboItem = when {
-                wholeMinutes >= 60 -> {
-                    Utils.createItemStack(
-                        itemID.getItemStack().item,
-                        itemName,
-                        "§7Playtime: §a${wholeMinutes.addSeparators()} minutes",
-                        "§7Or: §b$hoursString hours"
-                    )
-                }
-                wholeMinutes == 1 -> {
-                    Utils.createItemStack(
-                        itemID.getItemStack().item,
-                        itemName,
-                        "§7Playtime: §a$wholeMinutes minute"
-                    )
-                }
-                else -> {
-                    Utils.createItemStack(
-                        itemID.getItemStack().item,
-                        itemName,
-                        "§7Playtime: §a$wholeMinutes minutes"
-                    )
-                }
-            }
+            limboItem = Utils.createItemStack(
+                itemID.getItemStack().item,
+                itemName,
+                *createItemLore()
+            )
         }
         event.replaceWith(limboItem)
+    }
+
+    private fun createItemLore(): Array<String> = when {
+        wholeMinutes >= 60 -> arrayOf(
+            "§7Playtime: §a${wholeMinutes.addSeparators()} minutes",
+            "§7Or: §b$hoursString hours"
+        )
+
+        wholeMinutes == 1 -> arrayOf("§7Playtime: §a$wholeMinutes minute")
+
+        else -> arrayOf("§7Playtime: §a$wholeMinutes minutes")
     }
 
     @SubscribeEvent
     fun onHoverItem(event: LorenzToolTipEvent) {
         if (!LorenzUtils.inSkyBlock) return
-        if (!event.slot.inventory.displayName.unformattedText.startsWith("Detailed /playtime")) return
+        if (!event.slot.inventory.name.startsWith("Detailed /playtime")) return
         if (event.slot.slotIndex != 4) return
         val playtime = storage?.playtime ?: 0
         if (playtime <= 120) return
@@ -98,9 +90,8 @@ class LimboPlaytime {
     @SubscribeEvent
     fun onRenderGUI(event: InventoryOpenEvent) {
         if (event.inventoryName != "Detailed /playtime") return
-        val storedPlaytime = storage?.playtime ?: 0
-        if (storedPlaytime < 60) return
-        val playtime = storedPlaytime.seconds
+        val playtime = (storage?.playtime ?: 0).seconds
+        if (playtime < 60.seconds) return
         val wholeHours = playtime.inWholeHours
         wholeMinutes = playtime.inWholeMinutes.toInt()
         if ((wholeMinutes % 60) == 0) {
@@ -144,7 +135,7 @@ class LimboPlaytime {
     private fun remakeList(
         toolTip: MutableList<String>,
         minutesList: MutableList<String>,
-        hoursList: MutableList<String>
+        hoursList: MutableList<String>,
     ) {
         val firstLine = toolTip.first()
         val totalPlaytime = toolTip.last()
@@ -163,6 +154,6 @@ class LimboPlaytime {
     private fun findFloatDecimalPlace(input: Float): Int {
         val string = input.toString()
         val dotIndex = string.indexOf(".")
-        return (string[dotIndex+1].toString().toInt())
+        return (string[dotIndex + 1].toString().toInt())
     }
 }
