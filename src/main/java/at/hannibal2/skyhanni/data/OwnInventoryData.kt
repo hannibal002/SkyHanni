@@ -25,6 +25,7 @@ import net.minecraftforge.fml.common.eventhandler.EventPriority
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.milliseconds
+import kotlin.time.Duration.Companion.seconds
 
 class OwnInventoryData {
 
@@ -133,12 +134,10 @@ class OwnInventoryData {
     class IgnoredItem(val condition: (NEUInternalName) -> Boolean, val blockedUntil: SimpleTimeMark)
 
     private fun addItem(internalName: NEUInternalName, add: Int) {
-        val diffWorld = System.currentTimeMillis() - LorenzUtils.lastWorldSwitch
-        if (diffWorld < 3_000) return
+        if (LorenzUtils.lastWorldSwitch.passedSince() < 3.seconds) return
 
         ignoredItemsUntil.removeIf { it.blockedUntil.isInPast() }
         if (ignoredItemsUntil.any { it.condition(internalName) }) {
-//             println("ignored: $internalName")
             return
         }
 
