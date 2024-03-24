@@ -31,7 +31,7 @@ class LimboPlaytime {
         "§5§o§b([\\d.,]+) hours.+\$"
     )
 
-    private var wholeMinutes: Long = 0
+    private var wholeMinutes = 0
     private var hoursString: String = ""
 
     private val storage get() = ProfileStorageData.playerSpecific?.limbo
@@ -51,13 +51,30 @@ class LimboPlaytime {
 
         if (lastCreateCooldown.passedSince() > 3.seconds) {
             lastCreateCooldown = SimpleTimeMark.now()
-            limboItem = if (wholeMinutes >= 60) Utils.createItemStack(
-                itemID.getItemStack().item,
-                itemName,
-                "§7Playtime: §a${wholeMinutes.addSeparators()} minutes",
-                "§7Or: §b$hoursString hours"
-            )
-            else Utils.createItemStack(itemID.getItemStack().item, itemName, "§7Playtime: §a$wholeMinutes minutes")
+            limboItem = when {
+                wholeMinutes >= 60 -> {
+                    Utils.createItemStack(
+                        itemID.getItemStack().item,
+                        itemName,
+                        "§7Playtime: §a${wholeMinutes.addSeparators()} minutes",
+                        "§7Or: §b$hoursString hours"
+                    )
+                }
+                wholeMinutes == 1 -> {
+                    Utils.createItemStack(
+                        itemID.getItemStack().item,
+                        itemName,
+                        "§7Playtime: §a$wholeMinutes minute"
+                    )
+                }
+                else -> {
+                    Utils.createItemStack(
+                        itemID.getItemStack().item,
+                        itemName,
+                        "§7Playtime: §a$wholeMinutes minutes"
+                    )
+                }
+            }
         }
         event.replaceWith(limboItem)
     }
@@ -85,7 +102,7 @@ class LimboPlaytime {
         if (storedPlaytime < 60) return
         val playtime = storedPlaytime.seconds
         val wholeHours = playtime.inWholeHours
-        wholeMinutes = playtime.inWholeMinutes
+        wholeMinutes = playtime.inWholeMinutes.toInt()
         if ((wholeMinutes % 60).toInt() == 0) {
             hoursString = "$wholeHours"
         } else {
