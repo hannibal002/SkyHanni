@@ -243,6 +243,45 @@ enum class ScoreboardElement(
         if (!informationFilteringConfig.hideIrrelevantLines) return true
         return showWhen()
     }
+
+    companion object {
+        // I don't know why, but this field is needed for it to work
+        @kotlin.jvm.JvmField
+        val defaultOption = listOf(
+            TITLE,
+            PROFILE,
+            PURSE,
+            BANK,
+            MOTES,
+            BITS,
+            COPPER,
+            NORTH_STARS,
+            HEAT,
+            COLD,
+            EMPTY_LINE,
+            ISLAND,
+            LOCATION,
+            LOBBY_CODE,
+            PLAYER_AMOUNT,
+            VISITING,
+            EMPTY_LINE2,
+            DATE,
+            TIME,
+            EVENTS,
+            OBJECTIVE,
+            COOKIE,
+            EMPTY_LINE3,
+            QUIVER,
+            POWER,
+            TUNING,
+            EMPTY_LINE4,
+            POWDER,
+            MAYOR,
+            PARTY,
+            FOOTER,
+            EXTRA
+        )
+    }
 }
 
 private fun getTitleDisplayPair() = if (displayConfig.titleAndFooter.useHypixelTitleAnimation) {
@@ -652,6 +691,7 @@ private fun getPowderShowWhen() = inAdvancedMiningIsland()
 
 private fun getEventsDisplayPair(): List<ScoreboardElementType> {
     return ScoreboardEvents.getEvent()
+        .filterNotNull()
         .flatMap { it.getLines().map { i -> i to HorizontalAlignment.LEFT } }
         .takeIf { it.isNotEmpty() } ?: listOf("<hidden>" to HorizontalAlignment.LEFT)
 }
