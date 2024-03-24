@@ -4,10 +4,12 @@ import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.data.ClickType
 import at.hannibal2.skyhanni.events.ItemClickEvent
 import at.hannibal2.skyhanni.events.LorenzRenderWorldEvent
+import at.hannibal2.skyhanni.events.LorenzTickEvent
 import at.hannibal2.skyhanni.events.LorenzWorldChangeEvent
 import at.hannibal2.skyhanni.events.ReceiveParticleEvent
 import at.hannibal2.skyhanni.features.garden.GardenAPI
 import at.hannibal2.skyhanni.test.GriffinUtils.drawWaypointFilled
+import at.hannibal2.skyhanni.utils.LocationUtils.distanceToPlayer
 import at.hannibal2.skyhanni.utils.LocationUtils.playerLocation
 import at.hannibal2.skyhanni.utils.LorenzVec
 import at.hannibal2.skyhanni.utils.RenderUtils.drawDynamicText
@@ -105,6 +107,17 @@ class PestParticleWaypoint {
         }
         event.drawWaypointFilled(waypoint, Color(255, 0, 255,100), beacon = true)
         event.drawDynamicText(waypoint, "§cPest Guess", 1.3)
+    }
+
+    @SubscribeEvent
+    fun onTick(event: LorenzTickEvent) {
+        if (!isEnabled()) return
+        if (event.repeatSeconds(2)) {
+            if ((guessPoint?.distanceToPlayer() ?: 1.0) < 3.0) {
+                lastPestTrackerUse = SimpleTimeMark.farPast()
+                reset()
+            }
+        }
     }
 
     private fun getWaypoint(list: MutableList<LorenzVec>): LorenzVec {
