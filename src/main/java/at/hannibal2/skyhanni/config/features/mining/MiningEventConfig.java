@@ -38,7 +38,7 @@ public class MiningEventConfig {
     public boolean passedEvents = false;
 
     public enum ShowType {
-        ALL("Both Mining Islands"),
+        ALL("All Mining Islands"),
         CRYSTAL("Crystal Hollows Only"),
         DWARVEN("Dwarven Mines Only"),
         MINESHAFT("Mineshaft Only"),
