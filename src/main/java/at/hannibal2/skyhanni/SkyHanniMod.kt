@@ -19,6 +19,7 @@ import at.hannibal2.skyhanni.data.CropAccessoryData
 import at.hannibal2.skyhanni.data.EntityData
 import at.hannibal2.skyhanni.data.EntityMovementData
 import at.hannibal2.skyhanni.data.FameRanks
+import at.hannibal2.skyhanni.data.FixedRateTimerManager
 import at.hannibal2.skyhanni.data.FriendAPI
 import at.hannibal2.skyhanni.data.GardenComposterUpgradesData
 import at.hannibal2.skyhanni.data.GardenCropMilestones
@@ -485,6 +486,7 @@ class SkyHanniMod {
         loadModule(BossbarData)
         loadModule(EntityUtils)
         loadModule(ChatUtils)
+        loadModule(FixedRateTimerManager())
 
         // APIs
         loadModule(BazaarApi())
