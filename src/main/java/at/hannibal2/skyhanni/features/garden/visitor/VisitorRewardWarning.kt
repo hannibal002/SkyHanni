@@ -80,26 +80,31 @@ class VisitorRewardWarning {
 
         val blockReason = visitor.blockReason(isAcceptSlot, isRefuseSlot)?: return
 
-        val copiedTooltip = event.toolTip.toList()
-        event.toolTip.clear()
+        if (visitor.blockedLore.isEmpty()) {
+            println("Rendering blocked tooltip now")
+            val copiedTooltip = event.toolTip.toList()
+            val blockedToolTip = mutableListOf<String>()
 
-        for (line in copiedTooltip) {
-            if (line.contains("§aAccept Offer§r")) {
-                event.toolTip.add(line.replace("§aAccept Offer§r", "§7Accept Offer§8"))
+            for (line in copiedTooltip) {
+                if (line.contains("§aAccept Offer§r")) {
+                    blockedToolTip.add(line.replace("§aAccept Offer§r", "§7Accept Offer§8"))
+                } else if (line.contains("§cRefuse Offer§r")) {
+                    blockedToolTip.add(line.replace("§cRefuse Offer§r", "§7Refuse Offer§8"))
+                } else if (!line.contains("minecraft:") && !line.contains("NBT:")) {
+                    blockedToolTip.add("§8" + line.removeColor())
+                }
             }
-            else if (line.contains("§cRefuse Offer§r")) {
-                event.toolTip.add(line.replace("§cRefuse Offer§r", "§7Refuse Offer§8"))
-            }
-            else if (!line.contains("minecraft:") && !line.contains("NBT:")) {
-                event.toolTip.add("§8" + line.removeColor())
-            }
+            blockedToolTip.add("")
+            val pricePerCopper = visitor.pricePerCopper?.let { NumberUtil.format(it) }
+            if (blockReason == VisitorBlockReason.CHEAP_COPPER || blockReason == VisitorBlockReason.EXPENSIVE_COPPER) {
+                blockedToolTip.add("${blockReason.description} §7(§6$pricePerCopper §7per)")
+            } else blockedToolTip.add(blockReason.description)
+            blockedToolTip.add("  §7(Bypass by holding ${Keyboard.getKeyName(config.bypassKey)})")
+
+            visitor.blockedLore = blockedToolTip
         }
-        event.toolTip.add("")
-        val pricePerCopper = visitor.pricePerCopper?.let { NumberUtil.format(it) }
-        if (blockReason == VisitorBlockReason.CHEAP_COPPER || blockReason == VisitorBlockReason.EXPENSIVE_COPPER) {
-            event.toolTip.add("${blockReason.description} §7(§6$pricePerCopper §7per)")
-        } else event.toolTip.add(blockReason.description)
-        event.toolTip.add("  §7(Bypass by holding ${Keyboard.getKeyName(config.bypassKey)})")
+        event.toolTip.clear()
+        event.toolTip.addAll(visitor.blockedLore)
     }
 
     private fun VisitorAPI.Visitor.blockReason(

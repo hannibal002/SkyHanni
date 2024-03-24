@@ -134,6 +134,7 @@ object VisitorAPI {
         var lore: List<String> = emptyList()
         var allRewards = listOf<NEUInternalName>()
         var lastLore = listOf<String>()
+        var blockedLore = listOf<String>()
 
         fun getEntity() = EntityUtils.getEntityByID(entityId)
         fun getNameTagEntity() = EntityUtils.getEntityByID(nameTagEntityId)
