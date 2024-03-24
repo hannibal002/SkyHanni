@@ -223,6 +223,26 @@ enum class ScoreboardElement(
         { true },
         ""
     ),
+    EMPTY_LINE7(
+        ::getEmptyLineDisplayPair,
+        { true },
+        ""
+    ),
+    EMPTY_LINE8(
+        ::getEmptyLineDisplayPair,
+        { true },
+        ""
+    ),
+    EMPTY_LINE9(
+        ::getEmptyLineDisplayPair,
+        { true },
+        ""
+    ),
+    EMPTY_LINE10(
+        ::getEmptyLineDisplayPair,
+        { true },
+        ""
+    ),
     ;
 
     override fun toString(): String {
