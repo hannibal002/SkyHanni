@@ -12,23 +12,21 @@ import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
-class KuudraAPI {
+object KuudraAPI {
 
-    private val group = RepoPattern.group("data.kuudra")
+    private val patternGroup = RepoPattern.group("data.kuudra")
 
-    private val tierPattern by group.pattern(
+    private val tierPattern by patternGroup.pattern(
         "scoreboard.tier",
         " §7⏣ §cKuudra's Hollow §8\\(T(?<tier>.*)\\)"
     )
-    private val completePattern by group.pattern(
+    private val completePattern by patternGroup.pattern(
         "chat.complete",
         "§.\\s*(?:§.)*KUUDRA DOWN!"
     )
 
-    companion object {
-        var kuudraTier: Int? = null
-        fun inKuudra() = kuudraTier != null
-    }
+    var kuudraTier: Int? = null
+    fun inKuudra() = kuudraTier != null
 
     @SubscribeEvent
     fun onTick(event: LorenzTickEvent) {
@@ -66,5 +64,4 @@ class KuudraAPI {
     ) {
         fun getDisplayName() = "Tier $tierNumber ($name)"
     }
-
 }
