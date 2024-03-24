@@ -28,6 +28,7 @@ object GardenPlotAPI {
 
     /**
      * REGEX-TEST: §aPlot §7- §b4
+     * REGEX-TEST: §ePlot §7- §b21
      */
     private val plotNamePattern by patternGroup.pattern(
         "name",
@@ -40,6 +41,27 @@ object GardenPlotAPI {
         "barnname",
         "§.(?<name>The Barn)"
     )
+    /**
+     * REGEX-TEST: §7Cleanup: §b0% Completed
+     */
+    private val uncleanedPlotPattern by patternGroup.pattern(
+        "uncleaned",
+        "§7Cleanup: .* (?:§.)*Completed"
+    )
+    /**
+     * REGEX-TEST: §aUnlocked Garden §r§aPlot §r§7- §r§b10§r§a!
+     */
+    private val unlockPlotChatPattern by patternGroup.pattern(
+        "chat.unlock",
+        "§aUnlocked Garden §r§aPlot §r§7- §r§b(?<plot>.*)§r§a!"
+    )
+    /**
+     * §aPlot §r§7- §r§b10 §r§ais now clean!
+     */
+    private val cleanPlotChatPattern by patternGroup.pattern(
+        "chat.clean",
+        "§aPlot §r§7- §r§b(?<plot>.*) §r§ais now clean!"
+    )
     private val plotSprayedPattern by patternGroup.pattern(
         "spray.target",
         "§a§lSPRAYONATOR! §r§7You sprayed §r§aPlot §r§7- §r§b(?<plot>.*) §r§7with §r§a(?<spray>.*)§r§7!"
@@ -51,7 +73,7 @@ object GardenPlotAPI {
         return plots.firstOrNull { it.isPlayerInside() }
     }
 
-    class Plot(val id: Int, var unlocked: Boolean, var inventorySlot: Int, val box: AxisAlignedBB, val middle: LorenzVec)
+    class Plot(val id: Int, var inventorySlot: Int, val box: AxisAlignedBB, val middle: LorenzVec)
 
     class PlotData(
         @Expose
@@ -74,6 +96,12 @@ object GardenPlotAPI {
 
         @Expose
         var isPestCountInaccurate: Boolean,
+
+        @Expose
+        var locked: Boolean,
+
+        @Expose
+        var uncleared: Boolean,
     )
 
     data class SprayData(
@@ -81,7 +109,7 @@ object GardenPlotAPI {
         val type: SprayType,
     )
 
-    private fun Plot.getData() = GardenAPI.storage?.plotData?.getOrPut(id) { PlotData(id, "$id", 0, null, null, false, false) }
+    private fun Plot.getData() = GardenAPI.storage?.plotData?.getOrPut(id) { PlotData(id, "$id", 0, null, null, false, false, true, false) }
 
     var Plot.name: String
         get() = getData()?.name ?: "$id"
@@ -111,6 +139,18 @@ object GardenPlotAPI {
         get() = this.getData()?.isPestCountInaccurate ?: false
         set(value) {
             this.getData()?.isPestCountInaccurate = value
+        }
+
+    var Plot.uncleared: Boolean
+        get() = this.getData()?.uncleared ?: false
+        set(value) {
+            this.getData()?.uncleared = value
+        }
+
+    var Plot.locked: Boolean
+        get() = this.getData()?.locked ?: false
+        set(value) {
+            this.getData()?.locked = value
         }
 
     fun Plot.markExpiredSprayAsNotified() {
@@ -155,7 +195,7 @@ object GardenPlotAPI {
                 val b = LorenzVec(maxX, 256.0, maxY)
                 val middle = a.interpolate(b, 0.5).copy(y = 10.0)
                 val box = a.axisAlignedTo(b).expand(0.0001, 0.0, 0.0001)
-                list.add(Plot(id, false, slot, box, middle))
+                list.add(Plot(id, slot, box, middle))
                 slot++
             }
             slot += 4
@@ -176,6 +216,11 @@ object GardenPlotAPI {
 
             plot?.setSpray(spray, 30.minutes)
         }
+        cleanPlotChatPattern.matchMatcher(event.message) {
+            val plotId = group("plot").toInt()
+            val plot = getPlotByID(plotId)
+            plot?.uncleared = false
+        }
     }
 
     @SubscribeEvent
@@ -185,7 +230,7 @@ object GardenPlotAPI {
 
         for (plot in plots) {
             val itemStack = event.inventoryItems[plot.inventorySlot] ?: continue
-            plot.unlocked = itemStack.getLore().all { !it.contains("§7Cost:") }
+            val lore = itemStack.getLore()
             plotNamePattern.matchMatcher(itemStack.name) {
                 val plotName = group("name")
                 plot.name = plotName
@@ -193,10 +238,19 @@ object GardenPlotAPI {
             barnNamePattern.matchMatcher(itemStack.name) {
                 plot.name = group("name")
             }
+            for (line in lore) {
+                plot.locked = line.contains("§7Cost:")
+                plot.uncleared = false
+                uncleanedPlotPattern.matchMatcher(line) {
+                    plot.uncleared = true
+                }
+            }
         }
     }
 
     fun getPlotByName(plotName: String) = plots.firstOrNull { it.name == plotName }
+
+    fun getPlotByID(plotId: Int) = plots.firstOrNull { it.id == plotId }
 
     fun LorenzRenderWorldEvent.renderPlot(
         plot: Plot,
