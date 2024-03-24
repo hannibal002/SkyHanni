@@ -92,7 +92,7 @@ enum class TabWidget(
     ),
     SKILLS(
         // language=RegExp
-        "(?:§.)*Skills: ?(?<avg>.*)"
+        "(?:§.)*Skills: ?(?:§.)*(?<avg>[\\d.]*)"
     ),
     STATS(
         // language=RegExp
@@ -156,7 +156,7 @@ enum class TabWidget(
     ),
     DUNGEON_STATS(
         // language=RegExp
-        "(?:§.)*Dungeons:"
+        "Opened Rooms: (?:§.)*(?<opend>\\d+)"
     ),
     PARTY(
         // language=RegExp
@@ -168,7 +168,7 @@ enum class TabWidget(
     ),
     COMMISSIONS(
         // language=RegExp
-        "(?:§.)*lCommissions:"
+        "(?:§.)*Commissions:"
     ),
     POWDER(
         // language=RegExp
@@ -257,6 +257,34 @@ enum class TabWidget(
     PRIVATE_ISLAND_CRYSTALS(
         // language=RegExp
         "Crystals: (?:§.)*(?<count>\\d+)"
+    ),
+    OLD_PET_SITTER(
+        // language=RegExp
+        "Pet Sitter:.*"
+    ),
+    DUNGEON_PUZZLE(
+        // language=RegExp
+        "(?:§.)*Puzzles: (?:§.)*\\((?<amount>\\d+)\\)"
+    ),
+    DUNGEON_PARTY(
+        // language=RegExp
+        "(?:§.)*Party (?:§.)*\\(\\d+\\)"
+    ),
+    DUNGEON_PLAYER_STATS(
+        // language=RegExp
+        "(?:§.)*Player Stats"
+    ),
+    DUNGEON_SKILLS_AND_STATS(
+        // language=RegExp
+        "(?:§.)*Skills: (?:§.)*\\w+ \\d+: (?:§.)*[\\d.]+%"
+    ),
+    DUNGEON_ACCOUNT_INFO_LINE(
+        // language=RegExp
+        "(?:§.)*Account Info"
+    ),
+    DUNGEON_Stats_LINE(
+        // language=RegExp
+        "(?:§.)*Dungeon Stats"
     )
 
     ;

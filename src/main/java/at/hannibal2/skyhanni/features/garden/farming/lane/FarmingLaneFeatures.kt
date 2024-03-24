@@ -1,5 +1,6 @@
 package at.hannibal2.skyhanni.features.garden.farming.lane
 
+import at.hannibal2.skyhanni.events.GardenToolChangeEvent
 import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.LorenzRenderWorldEvent
 import at.hannibal2.skyhanni.events.LorenzTickEvent
@@ -7,6 +8,7 @@ import at.hannibal2.skyhanni.events.farming.FarmingLaneSwitchEvent
 import at.hannibal2.skyhanni.features.garden.GardenAPI
 import at.hannibal2.skyhanni.features.garden.farming.lane.FarmingLaneAPI.getValue
 import at.hannibal2.skyhanni.features.garden.farming.lane.FarmingLaneAPI.setValue
+import at.hannibal2.skyhanni.features.misc.MovementSpeedDisplay
 import at.hannibal2.skyhanni.test.GriffinUtils.drawWaypointFilled
 import at.hannibal2.skyhanni.utils.LocationUtils
 import at.hannibal2.skyhanni.utils.LorenzColor
@@ -19,6 +21,7 @@ import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.SoundUtils
 import at.hannibal2.skyhanni.utils.SoundUtils.playSound
 import at.hannibal2.skyhanni.utils.TimeUtils.format
+import at.hannibal2.skyhanni.utils.TimeUtils.ticks
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import kotlin.math.absoluteValue
 import kotlin.time.Duration
@@ -33,12 +36,26 @@ object FarmingLaneFeatures {
     private var display = listOf<String>()
     private var timeRemaining: Duration? = null
     private var lastSpeed = 0.0
-    private var validSpeed = false
     private var lastTimeFarming = SimpleTimeMark.farPast()
+    private var lastPlaySound = SimpleTimeMark.farPast()
     private var lastDirection = 0
+    private var movementState = MovementState.CALCULATING
+
+    enum class MovementState(val label: String) {
+        NOT_MOVING("§ePaused"),
+        TOO_SLOW("§cToo slow!"),
+        CALCULATING("§aCalculating.."),
+        NORMAL(""),
+        ;
+    }
 
     @SubscribeEvent
     fun onFarmingLaneSwitch(event: FarmingLaneSwitchEvent) {
+        display = emptyList()
+    }
+
+    @SubscribeEvent
+    fun onGardenToolChange(event: GardenToolChangeEvent) {
         display = emptyList()
     }
 
@@ -58,10 +75,18 @@ object FarmingLaneFeatures {
         if (config.distanceDisplay) {
             display = buildList {
                 add("§7Distance until switch: §e${currentDistance.round(1)}")
-                val color = if (validSpeed) "§b" else "§8"
+
+                val normal = movementState == MovementState.NORMAL
+                val color = if (normal) "§b" else "§8"
                 val timeRemaining = timeRemaining ?: return@buildList
                 val format = timeRemaining.format(showMilliSeconds = timeRemaining < 20.seconds)
-                add("§7Time remaining: $color$format")
+                val suffix = if (!normal) {
+                    " §7(${movementState.label}§7)"
+                } else ""
+                add("§7Time remaining: $color$format$suffix")
+                if (MovementSpeedDisplay.usingSoulsandSpeed) {
+                    add("§7Using inaccurate soul sand speed!")
+                }
             }
         }
     }
@@ -114,28 +139,22 @@ object FarmingLaneFeatures {
         with(config.laneSwitchNotification) {
             if (enabled) {
                 LorenzUtils.sendTitle(text.replace("&", "§"), 2.seconds)
-                playUserSound()
+                if (lastPlaySound.passedSince() >= sound.repeatDuration.ticks) {
+                    lastPlaySound = SimpleTimeMark.now()
+                    playUserSound()
+                }
             }
         }
     }
 
-    private fun calculateSpeed(): Boolean {
-        val speedPerSecond = LocationUtils.distanceFromPreviousTick().round(2)
-        if (speedPerSecond == 0.0) return false
-        val speedTooSlow = speedPerSecond < 1
-        if (speedTooSlow) {
-            validSpeed = false
-            return false
-        }
-        // only calculate the time if the speed has not changed
-        if (lastSpeed != speedPerSecond) {
-            lastSpeed = speedPerSecond
-            validSpeed = false
-            return false
-        }
-        validSpeed = true
+    private var sameSpeedCounter = 0
 
-        val timeRemaining = (currentDistance / speedPerSecond).seconds
+    private fun calculateSpeed(): Boolean {
+        val speed = MovementSpeedDisplay.speed.round(2)
+        movementState = calculateMovementState(speed)
+        if (movementState != MovementState.NORMAL) return false
+
+        val timeRemaining = (currentDistance / speed).seconds
         FarmingLaneFeatures.timeRemaining = timeRemaining
         val warnAt = config.laneSwitchNotification.secondsBefore.seconds
         if (timeRemaining >= warnAt) {
@@ -145,6 +164,30 @@ object FarmingLaneFeatures {
 
         // When the player was not inside the farm previously
         return lastTimeFarming.passedSince() < warnAt
+    }
+
+    private fun calculateMovementState(speed: Double): MovementState {
+        if (lastSpeed != speed) {
+            lastSpeed = speed
+            sameSpeedCounter = 0
+        }
+        sameSpeedCounter++
+
+        if (speed == 0.0 && sameSpeedCounter > 1) {
+            return MovementState.NOT_MOVING
+        }
+        val speedTooSlow = speed < 1
+        if (speedTooSlow && sameSpeedCounter > 5) {
+            return MovementState.TOO_SLOW
+        }
+        // only calculate the time if the speed has not changed
+        if (!MovementSpeedDisplay.usingSoulsandSpeed) {
+            if (sameSpeedCounter < 6) {
+                return MovementState.CALCULATING
+            }
+        }
+
+        return MovementState.NORMAL
     }
 
     @SubscribeEvent
