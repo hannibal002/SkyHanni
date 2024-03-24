@@ -479,11 +479,9 @@ class SkyHanniMod {
         loadModule(TrackerManager)
         loadModule(ScoreboardPattern)
         loadModule(UtilsPatterns)
-        loadModule(PetAPI)
         loadModule(BossbarData)
         loadModule(EntityUtils)
         loadModule(ChatUtils)
-        loadModule(KuudraAPI())
 
         // APIs
         loadModule(BazaarApi())
@@ -508,6 +506,8 @@ class SkyHanniMod {
         loadModule(MayorAPI)
         loadModule(SkillAPI)
         loadModule(VisitorAPI)
+        loadModule(KuudraAPI)
+        loadModule(PetAPI)
         loadModule(IsFishingDetection)
         loadModule(LorenzUtils)
         loadModule(NEUItems)
