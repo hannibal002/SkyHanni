@@ -246,7 +246,7 @@ enum class ScoreboardElement(
 
     companion object {
         // I don't know why, but this field is needed for it to work
-        @kotlin.jvm.JvmField
+        @JvmField
         val defaultOption = listOf(
             TITLE,
             PROFILE,

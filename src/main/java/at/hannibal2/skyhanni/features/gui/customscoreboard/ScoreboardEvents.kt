@@ -34,7 +34,7 @@ private fun getSbLines(): List<String> {
 enum class ScoreboardEvents(
     private val displayLine: Supplier<List<String>>,
     private val showWhen: () -> Boolean,
-    private val configLine: String
+    private val configLine: String,
 ) {
     VOTING(
         ::getVotingLines,
@@ -182,7 +182,7 @@ enum class ScoreboardEvents(
         }
 
         // I don't know why, but this field is needed for it to work
-        @kotlin.jvm.JvmField
+        @JvmField
         val defaultOption = listOf(
             VOTING,
             SERVER_CLOSE,
@@ -224,7 +224,6 @@ private fun getVotingLines() = buildList {
         }
     }
 }
-
 
 private fun getVotingShowWhen(): Boolean {
     return SbPattern.yearVotesPattern.anyMatches(getSbLines())
