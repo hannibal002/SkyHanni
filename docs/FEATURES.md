@@ -294,6 +294,11 @@ Use `/sh` or `/skyhanni` to open the SkyHanni config in game.
     + Option to warn when used bait is changed.
 + Sea Creature Tracker. - hannibal2
     + Allows to only show single variants, e.g. water or lava or winter.
++ Totem Overlay. - j10a1n15 (https://github.com/hannibal002/SkyHanni/pull/1139)
+    + Option to change the overlay distance.
+    + Option to hide Totem Particles.
+    + Option to show the effective area of a totem.
+    + Option to get reminded when a totem is about to expire.
 
 </details>
 <details open><summary>
@@ -632,6 +637,8 @@ Use `/sh` or `/skyhanni` to open the SkyHanni config in game.
     + Displays the distance until the end of a lane.
 + Made Rancher's Boots the stack size display account for the Cactus Knife now giving +100 speed cap while in the Garden. - Alexia Luna (https://github.com/hannibal002/SkyHanni/pull/1149)
     + Speed cap above 500 will now display as red because Hypixel now allows this for some reason, but it is practically unachievable. Also, the 1000 speed cap will now show up as 1k, so the text doesn't overflow into the slot to the left.
++ Plot Menu Highlighting - ILike2WatchMemes (https://github.com/hannibal002/SkyHanni/pull/1181)
+    + Plot highlighting based on plot statuses (pests, active spray, current plot, locked plot)
 
 </details>
 <details open><summary>

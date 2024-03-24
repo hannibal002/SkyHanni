@@ -73,6 +73,9 @@ object GardenPlotAPI {
         var sprayHasNotified: Boolean,
 
         @Expose
+        var isBeingPasted: Boolean,
+
+        @Expose
         var isPestCountInaccurate: Boolean,
     )
 
@@ -81,7 +84,7 @@ object GardenPlotAPI {
         val type: SprayType,
     )
 
-    private fun Plot.getData() = GardenAPI.storage?.plotData?.getOrPut(id) { PlotData(id, "$id", 0, null, null, false, false) }
+    private fun Plot.getData() = GardenAPI.storage?.plotData?.getOrPut(id) { PlotData(id, "$id", 0, null, null, false, false, false) }
 
     var Plot.name: String
         get() = getData()?.name ?: "$id"
@@ -106,6 +109,12 @@ object GardenPlotAPI {
         get() = this.getData()?.let {
             !it.sprayHasNotified && it.sprayExpiryTime?.isInPast() == true
         } == true
+
+    var Plot.isBeingPasted: Boolean
+        get() = this.getData()?.isBeingPasted ?: false
+        set(value) {
+            this.getData()?.isBeingPasted = value
+        }
 
     var Plot.isPestCountInaccurate: Boolean
         get() = this.getData()?.isPestCountInaccurate ?: false
@@ -185,6 +194,7 @@ object GardenPlotAPI {
 
         for (plot in plots) {
             val itemStack = event.inventoryItems[plot.inventorySlot] ?: continue
+            plot.isBeingPasted = itemStack.getLore().any { it.contains("§7Pasting in progress:") }
             plot.unlocked = itemStack.getLore().all { !it.contains("§7Cost:") }
             plotNamePattern.matchMatcher(itemStack.name) {
                 val plotName = group("name")
