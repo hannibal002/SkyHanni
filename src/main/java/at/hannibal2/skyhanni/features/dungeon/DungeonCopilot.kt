@@ -25,17 +25,6 @@ class DungeonCopilot {
         "countdown",
         "(.*) has started the dungeon countdown. The dungeon will begin in 1 minute."
     )
-    private val keyPatternsList = listOf(
-        patternGroup.pattern(
-            "key.one",
-            "§eA §r§a§r§[6c]§r§[8c](?<key>Wither|Blood) Key§r§e was picked up!"
-        ).value,
-
-        patternGroup.pattern(
-            "key.two",
-            "(.*) §r§ehas obtained §r§a§r§[6c]§r§[8c](?<key>Wither|Blood) Key§r§e!"
-        ).value
-    )
     private val witherDoorPattern by patternGroup.pattern(
         "wither.door",
         "(.*) opened a §r§8§lWITHER §r§adoor!"
@@ -45,6 +34,10 @@ class DungeonCopilot {
         "§cThe §r§c§lBLOOD DOOR§r§c has been opened!"
     )
 
+    private val keyPatternsList = listOf(
+        "§eA §r§a§r§[6c]§r§[8c](?<key>Wither|Blood) Key§r§e was picked up!".toPattern(),
+        "(.*) §r§ehas obtained §r§a§r§[6c]§r§[8c](?<key>Wither|Blood) Key§r§e!".toPattern()
+    )
 
     private var nextStep = ""
     private var searchForKey = false
