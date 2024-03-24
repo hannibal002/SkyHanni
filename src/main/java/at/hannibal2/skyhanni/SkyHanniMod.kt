@@ -147,6 +147,7 @@ import at.hannibal2.skyhanni.features.fishing.SeaCreatureMessageShortener
 import at.hannibal2.skyhanni.features.fishing.SharkFishCounter
 import at.hannibal2.skyhanni.features.fishing.ShowFishingItemName
 import at.hannibal2.skyhanni.features.fishing.ThunderSparksHighlight
+import at.hannibal2.skyhanni.features.fishing.TotemOfCorruption
 import at.hannibal2.skyhanni.features.fishing.tracker.FishingProfitTracker
 import at.hannibal2.skyhanni.features.fishing.tracker.SeaCreatureTracker
 import at.hannibal2.skyhanni.features.fishing.trophy.GeyserFishing
@@ -197,9 +198,10 @@ import at.hannibal2.skyhanni.features.garden.fortuneguide.CaptureFarmingGear
 import at.hannibal2.skyhanni.features.garden.inventory.AnitaExtraFarmingFortune
 import at.hannibal2.skyhanni.features.garden.inventory.GardenCropMilestoneInventory
 import at.hannibal2.skyhanni.features.garden.inventory.GardenInventoryNumbers
-import at.hannibal2.skyhanni.features.garden.inventory.GardenNextPlotPrice
-import at.hannibal2.skyhanni.features.garden.inventory.GardenPlotIcon
 import at.hannibal2.skyhanni.features.garden.inventory.SkyMartCopperPrice
+import at.hannibal2.skyhanni.features.garden.inventory.plots.GardenNextPlotPrice
+import at.hannibal2.skyhanni.features.garden.inventory.plots.GardenPlotIcon
+import at.hannibal2.skyhanni.features.garden.inventory.plots.GardenPlotMenuHighlighting
 import at.hannibal2.skyhanni.features.garden.pests.PestAPI
 import at.hannibal2.skyhanni.features.garden.pests.PestFinder
 import at.hannibal2.skyhanni.features.garden.pests.PestSpawn
@@ -415,7 +417,7 @@ import org.apache.logging.log4j.Logger
     clientSideOnly = true,
     useMetadata = true,
     guiFactory = "at.hannibal2.skyhanni.config.ConfigGuiForgeInterop",
-    version = "0.24.Beta.18",
+    version = "0.24.Beta.19",
 )
 class SkyHanniMod {
 
@@ -623,6 +625,7 @@ class SkyHanniMod {
         loadModule(TpsCounter())
         loadModule(ParticleHider())
         loadModule(MiscFeatures())
+        loadModule(GardenPlotMenuHighlighting())
         loadModule(SkyMartCopperPrice())
         loadModule(GardenVisitorFeatures())
         loadModule(NPCVisitorFix)
@@ -785,6 +788,7 @@ class SkyHanniMod {
         loadModule(PresentWaypoints())
         loadModule(MiningEventTracker())
         loadModule(JyrreTimer())
+        loadModule(TotemOfCorruption())
         loadModule(NewYearCakeReminder())
         loadModule(SulphurSkitterBox())
         loadModule(HighlightInquisitors())
