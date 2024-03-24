@@ -2,10 +2,11 @@ package at.hannibal2.skyhanni.features.garden.inventory.plots
 
 import at.hannibal2.skyhanni.config.features.garden.PlotMenuHighlightingConfig.PlotStatusType
 import at.hannibal2.skyhanni.events.GuiContainerEvent
-import at.hannibal2.skyhanni.events.InventoryOpenEvent
+import at.hannibal2.skyhanni.events.InventoryUpdatedEvent
 import at.hannibal2.skyhanni.features.garden.GardenAPI
 import at.hannibal2.skyhanni.features.garden.GardenPlotAPI
 import at.hannibal2.skyhanni.features.garden.GardenPlotAPI.currentSpray
+import at.hannibal2.skyhanni.features.garden.GardenPlotAPI.isBeingPasted
 import at.hannibal2.skyhanni.features.garden.GardenPlotAPI.pests
 import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.RenderUtils.highlight
@@ -18,19 +19,21 @@ class GardenPlotMenuHighlighting {
     private var highlightedPlots = mutableMapOf<GardenPlotAPI.Plot, PlotStatusType>()
 
     @SubscribeEvent
-    fun onInventoryOpen(event: InventoryOpenEvent) {
+    fun onInventoryUpdate(event: InventoryUpdatedEvent) {
         if (!isEnabled()) return
 
         for (slot in InventoryUtils.getItemsInOpenChest()) {
             val list = mutableListOf<PlotStatusType>()
             val plot = GardenPlotAPI.plots.find { it.inventorySlot == slot.slotIndex } ?: continue
 
-            val (pestsEnabled, spraysEnabled, locksEnabled, currentEnabled) = PlotStatusType.entries.map { it in config.deskPlotStatusTypes }
+            val (pestsEnabled, spraysEnabled, locksEnabled, currentEnabled, pastesEnabled) = PlotStatusType.entries.map { it in config.deskPlotStatusTypes }
 
             if (plot.pests >= 1 && pestsEnabled) list.add(PlotStatusType.PESTS)
             if (plot.currentSpray != null && spraysEnabled) list.add(PlotStatusType.SPRAYS)
             if (!plot.unlocked && locksEnabled) list.add(PlotStatusType.LOCKED)
             if (plot == GardenPlotAPI.getCurrentPlot() && currentEnabled) list.add(PlotStatusType.CURRENT)
+            if (plot.isBeingPasted && pastesEnabled) list.add(PlotStatusType.PASTING)
+            println(plot.isBeingPasted)
 
             getLowestIndexItem(list)?.let { index ->
                 val status = config.deskPlotStatusTypes[index]
