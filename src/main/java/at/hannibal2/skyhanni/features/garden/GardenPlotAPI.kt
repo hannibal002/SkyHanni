@@ -229,6 +229,11 @@ object GardenPlotAPI {
             val plot = getPlotByID(plotId)
             plot?.uncleared = false
         }
+        unlockPlotChatPattern.matchMatcher(event.message) {
+            val plotId = group("plot").toInt()
+            val plot = getPlotByID(plotId)
+            plot?.locked = false
+        }
     }
 
     @SubscribeEvent
