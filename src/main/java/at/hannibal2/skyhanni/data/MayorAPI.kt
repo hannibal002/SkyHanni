@@ -24,7 +24,7 @@ object MayorAPI {
 
     val foxyExtraEventPattern by RepoPattern.pattern(
         "mayorapi.foxy.extraevent",
-        "Schedules an extra §.(?<event>Mining Fiesta) §.event during the year\\."
+        "Schedules an extra §.(?<event>.*) §.event during the year\\."
     )
 
     var lastUpdate = SimpleTimeMark.farPast()
