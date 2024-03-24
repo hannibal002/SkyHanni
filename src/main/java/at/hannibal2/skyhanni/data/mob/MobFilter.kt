@@ -79,6 +79,10 @@ object MobFilter {
 
     val petCareNamePattern by repoGroup.pattern("pattern.petcare", "^\\[\\w+ (?<level>\\d+)\\] (?<name>.*)")
     val wokeSleepingGolemPattern by repoGroup.pattern("pattern.dungeon.woke.golem", "(?:§c§lWoke|§5§lSleeping) Golem§r")
+    val jerryMagmaCubePattern by repoGroup.pattern(
+        "pattern.jerry.magma.cube",
+        "§c(?:Cubie|Maggie|Cubert|Cübe|Cubette|Magmalene|Lucky 7|8ball|Mega Cube|Super Cube) §a\\d+§8\\/§a\\d+§c❤"
+    )
     val summonOwnerPattern by repoGroup.pattern("pattern.summon.owner", ".*Spawned by: (?<name>.*).*")
 
     private val RatSkull =
@@ -429,6 +433,25 @@ object MobFilter {
                 baseEntity is EntityMagmaCube && nextEntity is EntityMagmaCube -> MobResult.illegal
                 baseEntity is EntityZombie && nextEntity is EntityZombie -> MobResult.illegal
                 baseEntity is EntityZombie && nextEntity is EntityGiantZombie -> MobResult.illegal
+                else -> null
+            }
+
+            IslandType.WINTER -> when {
+                baseEntity is EntityMagmaCube && jerryMagmaCubePattern.matches(
+                    MobUtils.getArmorStand(
+                        baseEntity,
+                        2
+                    )?.name
+                ) ->
+                    MobResult.found(
+                        Mob(
+                            baseEntity,
+                            Mob.Type.BOSS,
+                            MobUtils.getArmorStand(baseEntity, 2),
+                            "Jerry Magma Cube"
+                        )
+                    )
+
                 else -> null
             }
 
