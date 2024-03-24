@@ -289,7 +289,7 @@ object Commands {
         )
         registerCommand(
             "shlimbostats",
-            "Prints your Limbo Stats!"
+            "Prints your Limbo Stats.\n §7This includes your Personal Best, Playtime, and §aSkyHanni User Luck§7!"
         ) { LimboTimeTracker.printStats() }
         registerCommand(
             "shlimbo",
