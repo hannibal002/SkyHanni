@@ -66,7 +66,8 @@ class LimboPlaytime {
         if (!LorenzUtils.inSkyBlock) return
         if (!event.slot.inventory.displayName.unformattedText.startsWith("Detailed /playtime")) return
         if (event.slot.slotIndex != 4) return
-        if (storage?.playtime == 0) return
+        val playtime = storage?.playtime ?: 0
+        if (playtime <= 60) return
 
         val lore = event.toolTip
         println("------")
