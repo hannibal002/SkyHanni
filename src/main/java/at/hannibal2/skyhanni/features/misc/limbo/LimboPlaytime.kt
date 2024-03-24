@@ -70,9 +70,6 @@ class LimboPlaytime {
         if (playtime <= 60) return
 
         val lore = event.toolTip
-        println("------")
-        lore.forEach{ println(it) }
-        println("------")
         val hoursList = lore.filter { hoursPattern.matches(it) }.toMutableList()
         val minutesList = lore.filter { minutesPattern.matches(it) }.toMutableList()
 
@@ -91,19 +88,19 @@ class LimboPlaytime {
         if ((wholeMinutes % 60).toInt() == 0) {
             hoursString = "$wholeHours"
         } else {
-            val minutes: Float = ((wholeMinutes - wholeHours * 60).toFloat() / 60)
-            hoursString = wholeHours.addSeparators() + minutes.round(1).toString().replace("0", "")
+            val minutes: Float = ((wholeMinutes - wholeHours * 60).toFloat() / 60).round(1)
+            hoursString = wholeHours.addSeparators() //+ minutes.round(1).toString()
+            if (findFloatDecimalPlace(minutes) != 0) {
+                hoursString += minutes.toString()
+            }
         }
     }
 
     private fun addLimbo(hoursList: MutableList<String>, minutesList: MutableList<String>) {
         val storedPlaytime = storage?.playtime ?: 0
         if (wholeMinutes >= 60) {
-            val hours = storedPlaytime.seconds.inWholeHours
-            val minutes = (storedPlaytime.seconds.inWholeMinutes - (hours * 60).toFloat() / 6).toInt()
             modifiedList = hoursList
-            if (minutes == 0) modifiedList.add("§5§o§b$hours hours §7on Limbo")
-            else modifiedList.add("§5§o§b$hoursString hours §7on Limbo")
+            modifiedList.add("§5§o§b$hoursString hours §7on Limbo")
             modifiedList = modifiedList.sortedByDescending {
                 val matcher = hoursPattern.matcher(it)
                 if (matcher.find()) {
@@ -142,5 +139,11 @@ class LimboPlaytime {
             toolTip.addAll(modifiedList)
         }
         toolTip.add(totalPlaytime)
+    }
+
+    private fun findFloatDecimalPlace(input: Float): Int {
+        val string = input.toString()
+        val dotIndex = string.indexOf(".")
+        return (string[dotIndex+1].toString().toInt())
     }
 }
