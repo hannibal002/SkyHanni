@@ -103,13 +103,14 @@ class LimboPlaytime {
         val playtime = storedPlaytime.seconds
         val wholeHours = playtime.inWholeHours
         wholeMinutes = playtime.inWholeMinutes.toInt()
-        if ((wholeMinutes % 60).toInt() == 0) {
+        if ((wholeMinutes % 60) == 0) {
             hoursString = "$wholeHours"
         } else {
             val minutes: Float = ((wholeMinutes - wholeHours * 60).toFloat() / 60).round(1)
             hoursString = wholeHours.addSeparators()
             if (findFloatDecimalPlace(minutes) != 0) {
-                hoursString += minutes.toString()
+                val minutesString = minutes.toString()
+                hoursString += minutesString.substring(minutesString.indexOf("."))
             }
         }
     }
