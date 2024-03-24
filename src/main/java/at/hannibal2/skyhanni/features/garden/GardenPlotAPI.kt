@@ -246,9 +246,11 @@ object GardenPlotAPI {
             barnNamePattern.matchMatcher(itemStack.name) {
                 plot.name = group("name")
             }
+            plot.locked = false
+            plot.isBeingPasted = false
             for (line in lore) {
-                plot.locked = line.contains("§7Cost:")
-                plot.isBeingPasted = line.contains("§7Pasting in progress:")
+                if (line.contains("§7Cost:")) plot.locked = true
+                if (line.contains("§7Pasting in progress:")) plot.isBeingPasted = true
                 plot.uncleared = false
                 uncleanedPlotPattern.matchMatcher(line) {
                     plot.uncleared = true
