@@ -17,21 +17,15 @@ object FarmingLaneAPI {
     val lanes get() = GardenAPI.storage?.farmingLanes
     var currentLane: FarmingLane? = null
     private var lastNoLaneWarning = SimpleTimeMark.farPast()
-    private var lastCrop: CropType? = null
 
     @SubscribeEvent
     fun onGardenToolChange(event: GardenToolChangeEvent) {
-        handleLaneSwitch(event.crop)
+        currentLane = null
     }
 
     @SubscribeEvent
     fun onCropClick(event: CropClickEvent) {
-        handleLaneSwitch(event.crop)
-    }
-
-    private fun handleLaneSwitch(crop: CropType?) {
-        if (crop == lastCrop) return
-        lastCrop = crop
+        val crop = event.crop
 
         val lanes = lanes ?: return
         val lane = lanes[crop]
@@ -46,6 +40,8 @@ object FarmingLaneAPI {
 
     private fun warnNoLane(crop: CropType?) {
         if (crop == null || currentLane != null) return
+        if (!GardenAPI.isCurrentlyFarming()) return
+        if (FarmingLaneCreator.detection) return
         if (!config.distanceDisplay && !config.laneSwitchNotification.enabled) return
 
         if (lastNoLaneWarning.passedSince() < 30.seconds) return
