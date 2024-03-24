@@ -23,7 +23,6 @@ public class PestWaypointConfig {
         desc = "Hide the particles of the ability."
     )
     @ConfigEditorBoolean
-    @FeatureToggle
     public boolean hideParticles = true;
 
     @Expose

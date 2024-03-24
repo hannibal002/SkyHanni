@@ -14,6 +14,7 @@ import at.hannibal2.skyhanni.utils.RenderUtils.drawDynamicText
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import net.minecraft.client.Minecraft
 import net.minecraft.util.EnumParticleTypes
+import net.minecraftforge.fml.common.eventhandler.EventPriority
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import java.awt.Color
 import kotlin.math.absoluteValue
@@ -60,14 +61,13 @@ class PestParticleWaypoint {
         lastParticles = 0
     }
 
-    @SubscribeEvent
+    @SubscribeEvent(priority = EventPriority.LOW, receiveCanceled = true)
     fun onReceiveParticle(event: ReceiveParticleEvent) {
         if (!isEnabled()) return
-        if (lastPestTrackerUse.passedSince() > 3.seconds) return
-
         if (event.type != EnumParticleTypes.REDSTONE) return
         val location = event.location
-        if (config.hideParticles) event.isCanceled //not working
+        if (config.hideParticles) event.cancel()
+        if (lastPestTrackerUse.passedSince() > 3.seconds) return
 
         if (particles > 5) return
         if (firstParticlePoint == null) {
