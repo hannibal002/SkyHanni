@@ -74,7 +74,10 @@ object MiningEventDisplay {
 
             val oldData = islandEventData[islandType]
             if (oldData == null) {
-                islandEventData[islandType] = MiningIslandEventInfo(sorted)
+                //todo remove once mineshaft is on main server
+                if (sorted.isNotEmpty() || islandType != IslandType.MINESHAFT) {
+                    islandEventData[islandType] = MiningIslandEventInfo(sorted)
+                }
             } else {
                 oldData.islandEvents = sorted
             }
