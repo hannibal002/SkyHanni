@@ -5,10 +5,11 @@ import at.hannibal2.skyhanni.events.ItemClickEvent
 import at.hannibal2.skyhanni.events.LorenzRenderWorldEvent
 import at.hannibal2.skyhanni.events.ReceiveParticleEvent
 import at.hannibal2.skyhanni.features.garden.GardenAPI
-import at.hannibal2.skyhanni.utils.CollectionUtils.editCopy
-import at.hannibal2.skyhanni.utils.LorenzUtils.round
+import at.hannibal2.skyhanni.test.GriffinUtils.drawWaypointFilled
+import at.hannibal2.skyhanni.utils.DelayedRun
 import at.hannibal2.skyhanni.utils.LorenzVec
 import at.hannibal2.skyhanni.utils.RenderUtils.draw3DLine_nea
+import at.hannibal2.skyhanni.utils.RenderUtils.drawDynamicText
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import net.minecraft.util.EnumParticleTypes
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
@@ -17,8 +18,10 @@ import kotlin.time.Duration.Companion.seconds
 
 class PestParticleLine {
 
+    class ParticleLocation(val location: LorenzVec, val color: Color, val spawnTime: SimpleTimeMark)
+
     private var lastPestTrackerUse = SimpleTimeMark.farPast()
-    private var locations = mapOf<LorenzVec, Color>()
+    private val locations = mutableListOf<MutableList<ParticleLocation>>()
 
     @SubscribeEvent
     fun onItemClick(event: ItemClickEvent) {
@@ -26,7 +29,6 @@ class PestParticleLine {
         if (PestAPI.hasVacuumInHand()) {
             if (event.clickType == ClickType.LEFT_CLICK) {
                 lastPestTrackerUse = SimpleTimeMark.now()
-                locations = emptyMap()
             }
         }
     }
@@ -34,37 +36,69 @@ class PestParticleLine {
     @SubscribeEvent
     fun onReceiveParticle(event: ReceiveParticleEvent) {
         if (!isEnabled()) return
-        val passedSince = lastPestTrackerUse.passedSince()
-        if (passedSince > 5.seconds) return
+        // TODO time in config
+        if (lastPestTrackerUse.passedSince() > 5.seconds) return
 
-        if (event.type == EnumParticleTypes.REDSTONE) {
-            val (a, b, c) = event.offset.toDoubleArray().map { it.toFloat() }
-            val color = Color(a, b, c)
+        if (event.type != EnumParticleTypes.REDSTONE) return
+        val location = event.location
+        val (a, b, c) = event.offset.toDoubleArray().map { it.toFloat() }
+        val color = Color(a, b, c)
 
-            if (locations.isNotEmpty()) {
-                val diff = event.location.distance(locations.toList().last().first)
-                println("diff: ${diff.round(2)}")
-            }
+        // run in main thread to avoid concurrent errors
+        DelayedRun.runNextTick {
+            getCurrentList(location).add(ParticleLocation(location, color, SimpleTimeMark.now()))
+        }
+    }
 
-            locations = locations.editCopy {
-                put(event.location, color)
+    private fun getCurrentList(location: LorenzVec): MutableList<ParticleLocation> {
+        locations.lastOrNull()?.let {
+            val distance = it.last().location.distance(location)
+            if (distance < 2) {
+                return it
             }
         }
+
+        val newList = mutableListOf<ParticleLocation>()
+        locations.add(newList)
+        if (locations.size == 5) {
+            locations.removeAt(0)
+        }
+        return newList
     }
 
     @SubscribeEvent
     fun onRenderWorld(event: LorenzRenderWorldEvent) {
         if (!isEnabled()) return
-        if (lastPestTrackerUse.passedSince() > 20.seconds) return
+        // TODO time in config
+        if (lastPestTrackerUse.passedSince() > 10.seconds) {
+            locations.clear()
+            return
+        }
 
-        for ((prev, next) in locations.asSequence().zipWithNext()) {
+        for (list in locations) {
+            draw(event, list)
+        }
+    }
+
+    private fun draw(event: LorenzRenderWorldEvent, list: List<ParticleLocation>) {
+        for ((prev, next) in list.asSequence().zipWithNext()) {
+            // TODO time in config
+            if (next.spawnTime.passedSince() > 5.seconds) continue
+            val location = next.location
+            val color = next.color
             event.draw3DLine_nea(
-                prev.key,
-                next.key,
-                next.value,
+                prev.location,
+                location,
+                color,
                 3,
                 false
             )
+            val isVeryLast = list == locations.lastOrNull() && next == list.lastOrNull()
+            if (isVeryLast) {
+                val lastLocation = location.add(-0.5, -0.5, -0.5)
+                event.drawWaypointFilled(lastLocation, color, beacon = true)
+                event.drawDynamicText(lastLocation, "§cPest Guess", 1.3)
+            }
         }
     }
 
