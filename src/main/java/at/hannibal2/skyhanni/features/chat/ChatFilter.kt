@@ -7,8 +7,6 @@ import at.hannibal2.skyhanni.features.garden.GardenAPI
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.StringUtils
 import at.hannibal2.skyhanni.utils.StringUtils.matches
-import at.hannibal2.skyhanni.utils.StringUtils.removeColor
-import at.hannibal2.skyhanni.utils.StringUtils.trimWhiteSpaceAndResets
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import java.util.regex.Pattern
@@ -345,9 +343,9 @@ class ChatFilter {
         "§c {3}♨ §eAnd \\d+ more!".toPattern(),
     )
     private val eventPatterns = listOf(
-        "§r§7You are now §r§.Event Level §r§.*§r§7!".toPattern(),
-        "§r§7You earned §r§.* Event Silver§r§7!".toPattern(),
-        "§r§.§k#§r§. LEVEL UP! §r§.§k#".toPattern(),
+        "§f +§r§7You are now §r§.Event Level §r§.*§r§7!".toPattern(),
+        "§f +§r§7You earned §r§.* Event Silver§r§7!".toPattern(),
+        "§f +§r§.§k#§r§. LEVEL UP! §r§.§k#".toPattern(),
     )
     private val powderMiningMessages = listOf(
         "§aYou uncovered a treasure chest!",

@@ -23,6 +23,14 @@ public class LaneSwitchSoundSettings {
     @ConfigEditorButton(buttonText = "Test")
     public Runnable testSound = FarmingLaneFeatures::playUserSound;
 
+    @Expose
+    @ConfigOption(
+        name = "Repeat Duration",
+        desc = "Change how often the sound should be repeated in ticks. Change to 20 for only once per second."
+    )
+    @ConfigEditorSlider(minValue = 1, maxValue = 20, minStep = 1)
+    public int repeatDuration = 20;
+
     @ConfigOption(name = "List of Sounds", desc = "A list of available sounds.")
     @ConfigEditorButton(buttonText = "Open")
     public Runnable listOfSounds = () -> OSUtils.openBrowser("https://www.minecraftforum.net/forums/mapping-and-modding-java-edition/mapping-and-modding-tutorials/2213619-1-8-all-playsound-sound-arguments");
