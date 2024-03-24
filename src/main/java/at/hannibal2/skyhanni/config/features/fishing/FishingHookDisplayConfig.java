@@ -4,6 +4,7 @@ import at.hannibal2.skyhanni.config.FeatureToggle;
 import at.hannibal2.skyhanni.config.core.config.Position;
 import com.google.gson.annotations.Expose;
 import io.github.moulberry.moulconfig.annotations.ConfigEditorBoolean;
+import io.github.moulberry.moulconfig.annotations.ConfigEditorText;
 import io.github.moulberry.moulconfig.annotations.ConfigOption;
 
 public class FishingHookDisplayConfig {
@@ -16,6 +17,15 @@ public class FishingHookDisplayConfig {
 
     @Expose
     @ConfigOption(
+        name = "Custom Alert",
+        desc = "Replaces the default §c§l!!!§r Hypixel\n" +
+            "§7alert with your own custom one."
+    )
+    @ConfigEditorText
+    public String customAlertText = "&c&l!!!";
+
+    @Expose
+    @ConfigOption(
         name = "Hide Armor Stand",
         desc = "Hide the original armor stand from Hypixel when the SkyHanni display is enabled."
     )
@@ -23,5 +33,5 @@ public class FishingHookDisplayConfig {
     public boolean hideArmorStand = true;
 
     @Expose
-    public Position position = new Position(460, -240, 3.4f);
+    public Position position = new Position(-475, -240, 3.4f, true);
 }

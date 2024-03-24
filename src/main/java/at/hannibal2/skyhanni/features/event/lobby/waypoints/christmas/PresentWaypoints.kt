@@ -11,15 +11,18 @@ import at.hannibal2.skyhanni.events.RepositoryReloadEvent
 import at.hannibal2.skyhanni.features.event.lobby.waypoints.EventWaypoint
 import at.hannibal2.skyhanni.features.event.lobby.waypoints.loadEventWaypoints
 import at.hannibal2.skyhanni.test.GriffinUtils.drawWaypointFilled
+import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.LocationUtils.distanceSqToPlayer
 import at.hannibal2.skyhanni.utils.LorenzColor
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.RenderUtils.drawDynamicText
 import at.hannibal2.skyhanni.utils.StringUtils.matches
+import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
 // todo: create abstract class for this and BasketWaypoints
 class PresentWaypoints {
+
     private val config get() = SkyHanniMod.feature.event.lobbyWaypoints.christmasPresent
     private var presentLocations = mapOf<String, MutableSet<EventWaypoint>>()
     private var presentEntranceLocations = mapOf<String, MutableSet<EventWaypoint>>()
@@ -28,10 +31,19 @@ class PresentWaypoints {
     private val presentSet get() = presentLocations[HypixelData.lobbyType]
     private val presentEntranceSet get() = presentEntranceLocations[HypixelData.lobbyType]
 
-    // TODO use repo pattern
-    private val presentAlreadyFoundPattern = "§cYou have already found this present!".toPattern()
-    private val presentFoundPattern = "§aYou found a.*present! §r§e\\(§r§b\\d+§r§e/§r§b\\d+§r§e\\)".toPattern()
-    private val allFoundPattern = "§aCongratulations! You found all the presents in every lobby!".toPattern()
+    private val patternGroup = RepoPattern.group("event.lobby.waypoint.presents")
+    private val presentAlreadyFoundPattern by patternGroup.pattern(
+        "foundalready",
+        "§cYou have already found this present!"
+    )
+    private val presentFoundPattern by patternGroup.pattern(
+        "found",
+        "§aYou found a.*present! §r§e\\(§r§b\\d+§r§e/§r§b\\d+§r§e\\)"
+    )
+    private val allFoundPattern by patternGroup.pattern(
+        "foundall",
+        "§aCongratulations! You found all the presents in every lobby!"
+    )
 
     @SubscribeEvent
     fun onWorldChange(event: LorenzWorldChangeEvent) {
@@ -67,7 +79,7 @@ class PresentWaypoints {
 
     private fun handleAllPresentsFound() {
         // If all presents are found, disable the feature
-        LorenzUtils.chat("Congratulations! As all presents are found, we are disabling the Christmas Present Waypoints feature.")
+        ChatUtils.chat("Congratulations! As all presents are found, we are disabling the Christmas Present Waypoints feature.")
         config.allWaypoints = false
         config.allEntranceWaypoints = false
     }
@@ -90,7 +102,7 @@ class PresentWaypoints {
     }
 
     private fun LorenzRenderWorldEvent.drawWaypoints(
-        waypoints: Set<EventWaypoint>, shouldDraw: Boolean, color: LorenzColor, prefix: String
+        waypoints: Set<EventWaypoint>, shouldDraw: Boolean, color: LorenzColor, prefix: String,
     ) {
         if (!shouldDraw) return
         waypoints.forEach { waypoint ->

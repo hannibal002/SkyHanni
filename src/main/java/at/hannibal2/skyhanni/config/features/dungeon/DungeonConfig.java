@@ -86,6 +86,12 @@ public class DungeonConfig {
     @Accordion
     public LividFinderConfig lividFinder = new LividFinderConfig();
 
+
+    @Expose
+    @ConfigOption(name = "Terracotta Phase", desc = "")
+    @Accordion
+    public TerracottaPhaseConfig terracottaPhase = new TerracottaPhaseConfig();
+
     @Expose
     @ConfigOption(name = "Moving Skeleton Skulls", desc = "Highlight Skeleton Skulls when combining into an " +
         "orange Skeletor (not useful when combined with feature Hide Skeleton Skull).")
@@ -94,8 +100,13 @@ public class DungeonConfig {
     public boolean highlightSkeletonSkull = true;
 
     @Expose
+    @ConfigOption(name = "Chests Config", desc = "")
+    @Accordion
+    public DungeonChestConfig chest = new DungeonChestConfig();
+
+    @Expose
     @ConfigOption(name = "Croesus Chest", desc = "Adds a visual highlight to the Croesus inventory that " +
-        "shows unopened chests.")
+        "shows unopened chests.") // TODO move( , "dungeon.croesusUnopenedChestTracker" ,"dungeon.chest.showUnopened" )
     @ConfigEditorBoolean
     @FeatureToggle
     public boolean croesusUnopenedChestTracker = true;

@@ -12,11 +12,12 @@ import at.hannibal2.skyhanni.events.InventoryOpenEvent
 import at.hannibal2.skyhanni.events.LorenzTickEvent
 import at.hannibal2.skyhanni.features.misc.items.EstimatedItemValue
 import at.hannibal2.skyhanni.features.misc.items.EstimatedItemValueCalculator
+import at.hannibal2.skyhanni.utils.CollectionUtils.addAsSingletonList
 import at.hannibal2.skyhanni.utils.ConfigUtils
 import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalNameOrNull
+import at.hannibal2.skyhanni.utils.ItemUtils.itemName
 import at.hannibal2.skyhanni.utils.LorenzUtils
-import at.hannibal2.skyhanni.utils.LorenzUtils.addAsSingletonList
 import at.hannibal2.skyhanni.utils.LorenzUtils.addButton
 import at.hannibal2.skyhanni.utils.LorenzUtils.isInIsland
 import at.hannibal2.skyhanni.utils.NEUItems.getItemStackOrNull
@@ -127,14 +128,14 @@ class ChestValue {
             totalPrice += total
             if (rendered >= config.itemToShow) continue
             if (total < config.hideBelow) continue
-            val textAmount = " §7x$amount:"
+            val textAmount = " §7x${amount.addSeparators()}:"
             val width = Minecraft.getMinecraft().fontRendererObj.getStringWidth(textAmount)
-            val name = "${stack.displayName.reduceStringLength((config.nameLength - width), ' ')} $textAmount"
+            val name = "${stack.itemName.reduceStringLength((config.nameLength - width), ' ')} $textAmount"
             val price = "§6${(total).formatPrice()}"
             val text = if (config.alignedDisplay)
                 "$name $price"
             else
-                "${stack.displayName} §7x$amount: §6${total.formatPrice()}"
+                "${stack.itemName} §7x$amount: §6${total.formatPrice()}"
             newDisplay.add(buildList {
                 val renderable = Renderable.hoverTips(
                     text,
@@ -285,7 +286,7 @@ class ChestValue {
         var amount: Int,
         val stack: ItemStack,
         var total: Double,
-        val tips: MutableList<String>
+        val tips: MutableList<String>,
     )
 
     private fun isEnabled() = LorenzUtils.inSkyBlock && config.enabled

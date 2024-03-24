@@ -1,32 +1,37 @@
 package at.hannibal2.skyhanni.features.nether.reputationhelper.dailykuudra
 
-import at.hannibal2.skyhanni.config.Storage
+import at.hannibal2.skyhanni.SkyHanniMod
+import at.hannibal2.skyhanni.config.storage.ProfileSpecificStorage
 import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.data.ScoreboardData
+import at.hannibal2.skyhanni.data.jsonobjects.repo.CrimsonIsleReputationJson.ReputationQuest
 import at.hannibal2.skyhanni.events.LorenzChatEvent
 import at.hannibal2.skyhanni.events.LorenzRenderWorldEvent
 import at.hannibal2.skyhanni.features.nether.reputationhelper.CrimsonIsleReputationHelper
 import at.hannibal2.skyhanni.test.GriffinUtils.drawWaypointFilled
+import at.hannibal2.skyhanni.utils.ChatUtils
+import at.hannibal2.skyhanni.utils.CollectionUtils.addAsSingletonList
 import at.hannibal2.skyhanni.utils.LorenzColor
 import at.hannibal2.skyhanni.utils.LorenzUtils
-import at.hannibal2.skyhanni.utils.LorenzUtils.addAsSingletonList
+import at.hannibal2.skyhanni.utils.LorenzUtils.isInIsland
 import at.hannibal2.skyhanni.utils.LorenzVec
-import at.hannibal2.skyhanni.utils.NEUItems
+import at.hannibal2.skyhanni.utils.NEUItems.getItemStack
 import at.hannibal2.skyhanni.utils.RenderUtils.drawDynamicText
-import at.hannibal2.skyhanni.data.jsonobjects.repo.CrimsonIsleReputationJson.ReputationQuest
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
 class DailyKuudraBossHelper(private val reputationHelper: CrimsonIsleReputationHelper) {
+
     val kuudraTiers = mutableListOf<KuudraTier>()
 
     private var kuudraLocation: LorenzVec? = null
     private var allKuudraDone = true
 
+    private val config get() = SkyHanniMod.feature.crimsonIsle.reputationHelper
+
     @SubscribeEvent
     fun onRenderWorld(event: LorenzRenderWorldEvent) {
-        if (!LorenzUtils.inSkyBlock) return
-        if (LorenzUtils.skyBlockIsland != IslandType.CRIMSON_ISLE) return
-        if (!reputationHelper.config.enabled) return
+        if (!IslandType.CRIMSON_ISLE.isInIsland()) return
+        if (!config.enabled) return
         if (!reputationHelper.showLocations()) return
         if (allKuudraDone) return
 
@@ -38,9 +43,8 @@ class DailyKuudraBossHelper(private val reputationHelper: CrimsonIsleReputationH
 
     @SubscribeEvent
     fun onChat(event: LorenzChatEvent) {
-        if (!LorenzUtils.inSkyBlock) return
-        if (LorenzUtils.skyBlockIsland != IslandType.KUUDRA_ARENA) return
-        if (!reputationHelper.config.enabled) return
+        if (!LorenzUtils.inKuudraFight) return
+        if (!config.enabled) return
 
         val message = event.message
         if (!message.contains("KUUDRA DOWN!") || message.contains(":")) return
@@ -56,7 +60,7 @@ class DailyKuudraBossHelper(private val reputationHelper: CrimsonIsleReputationH
     }
 
     private fun finished(kuudraTier: KuudraTier) {
-        LorenzUtils.debug("Detected kuudra tier done: $kuudraTier")
+        ChatUtils.debug("Detected kuudra tier done: $kuudraTier")
         reputationHelper.questHelper.finishKuudra(kuudraTier)
         kuudraTier.doneToday = true
         updateAllKuudraDone()
@@ -69,18 +73,15 @@ class DailyKuudraBossHelper(private val reputationHelper: CrimsonIsleReputationH
         display.addAsSingletonList("§7Daily Kuudra (§e$done§8/§e5 killed§7)")
         if (done < 5) {
             for (tier in kuudraTiers) {
+                if (config.hideComplete.get() && tier.doneToday) continue
                 val result = if (tier.doneToday) "§aDone" else "§bTodo"
                 val displayName = tier.getDisplayName()
                 val displayItem = tier.displayItem
-                if (displayItem == null) {
-                    display.addAsSingletonList("  $displayName: $result")
-                } else {
-                    val lineList = mutableListOf<Any>()
-                    lineList.add(" ")
-                    lineList.add(NEUItems.getItemStack(displayItem))
-                    lineList.add("$displayName: $result")
-                    display.add(lineList)
-                }
+                val lineList = mutableListOf<Any>()
+                lineList.add(" ")
+                lineList.add(displayItem.getItemStack())
+                lineList.add("$displayName: $result")
+                display.add(lineList)
             }
         }
     }
@@ -92,7 +93,7 @@ class DailyKuudraBossHelper(private val reputationHelper: CrimsonIsleReputationH
         updateAllKuudraDone()
     }
 
-    fun saveConfig(storage: Storage.ProfileSpecific.CrimsonIsleStorage) {
+    fun saveConfig(storage: ProfileSpecificStorage.CrimsonIsleStorage) {
         storage.kuudraTiersDone.clear()
 
         kuudraTiers.filter { it.doneToday }
@@ -114,7 +115,7 @@ class DailyKuudraBossHelper(private val reputationHelper: CrimsonIsleReputationH
         }
     }
 
-    fun loadData(storage: Storage.ProfileSpecific.CrimsonIsleStorage) {
+    fun loadData(storage: ProfileSpecificStorage.CrimsonIsleStorage) {
         if (kuudraTiers.isEmpty()) return
         for (name in storage.kuudraTiersDone) {
             getByDisplayName(name)!!.doneToday = true

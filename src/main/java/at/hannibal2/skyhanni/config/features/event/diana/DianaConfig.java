@@ -70,7 +70,13 @@ public class DianaConfig {
     public DianaProfitTrackerConfig dianaProfitTracker = new DianaProfitTrackerConfig();
 
     @Expose
-    @ConfigOption(name = "Mythological Mob Tracker", desc = "")
+    @ConfigOption(name = "Mythological Creature Tracker", desc = "")
     @Accordion
+    // TODO renmae
     public MythologicalMobTrackerConfig mythologicalMobtracker = new MythologicalMobTrackerConfig();
+
+    @Expose
+    @ConfigOption(name = "All Burrows List", desc = "")
+    @Accordion
+    public AllBurrowsListConfig allBurrowsList = new AllBurrowsListConfig();
 }

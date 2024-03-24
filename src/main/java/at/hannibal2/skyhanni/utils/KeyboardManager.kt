@@ -1,23 +1,37 @@
 package at.hannibal2.skyhanni.utils
 
+import at.hannibal2.skyhanni.events.GuiKeyPressEvent
 import at.hannibal2.skyhanni.events.LorenzKeyPressEvent
 import at.hannibal2.skyhanni.events.LorenzTickEvent
+import at.hannibal2.skyhanni.test.command.ErrorManager
 import io.github.moulberry.moulconfig.gui.GuiScreenElementWrapper
 import io.github.moulberry.moulconfig.internal.KeybindHelper
 import net.minecraft.client.Minecraft
 import net.minecraft.client.gui.GuiChat
+import net.minecraft.client.gui.inventory.GuiContainer
 import net.minecraft.client.settings.KeyBinding
+import net.minecraftforge.client.event.GuiScreenEvent
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import org.apache.commons.lang3.SystemUtils
 import org.lwjgl.input.Keyboard
 import org.lwjgl.input.Mouse
 
 object KeyboardManager {
+
     private var lastClickedMouseButton = -1
 
     // A mac-only key, represents Windows key on windows (but different key code)
     private fun isCommandKeyDown() = Keyboard.KEY_LMETA.isKeyHeld() || Keyboard.KEY_RMETA.isKeyHeld()
+
+    // Windows: Alt key Mac: Option key
+    private fun isMenuKeyDown() = Keyboard.KEY_LMENU.isKeyHeld() || Keyboard.KEY_RMENU.isKeyHeld()
+
     private fun isControlKeyDown() = Keyboard.KEY_LCONTROL.isKeyHeld() || Keyboard.KEY_RCONTROL.isKeyHeld()
+
+    fun isDeleteWordDown() = Keyboard.KEY_BACK.isKeyHeld() && if (SystemUtils.IS_OS_MAC) isMenuKeyDown() else isControlKeyDown()
+
+    fun isDeleteLineDown() = Keyboard.KEY_BACK.isKeyHeld() && if (SystemUtils.IS_OS_MAC) isCommandKeyDown() else isControlKeyDown() && isShiftKeyDown()
+
     fun isShiftKeyDown() = Keyboard.KEY_LSHIFT.isKeyHeld() || Keyboard.KEY_RSHIFT.isKeyHeld()
 
     fun isPastingKeysDown() = isModifierKeyDown() && Keyboard.KEY_V.isKeyHeld()
@@ -31,6 +45,12 @@ object KeyboardManager {
      * allow the user to set a different option instead and just set the default key to isModifierKeyDown
      */
     fun getModifierKeyName(): String = if (SystemUtils.IS_OS_MAC) "Command" else "Control"
+
+    @SubscribeEvent
+    fun onGuiScreenKeybind(event: GuiScreenEvent.KeyboardInputEvent.Post) {
+        val guiScreen = event.gui as? GuiContainer ?: return
+        GuiKeyPressEvent(guiScreen).postAndCatch()
+    }
 
     @SubscribeEvent
     fun onTick(event: LorenzTickEvent) {
@@ -73,8 +93,10 @@ object KeyboardManager {
         try {
             if (keyCode.isKeyHeld()) return true
         } catch (e: IndexOutOfBoundsException) {
-            println("KeyBinding isActive caused an IndexOutOfBoundsException with keyCode: $keyCode")
-            e.printStackTrace()
+            ErrorManager.logErrorWithData(
+                e, "Error while checking if a key is pressed.",
+                "keyCode" to keyCode,
+            )
             return false
         }
         return this.isKeyDown || this.isPressed

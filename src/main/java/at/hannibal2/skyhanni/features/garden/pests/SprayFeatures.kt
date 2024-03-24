@@ -19,6 +19,7 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import kotlin.time.Duration.Companion.seconds
 
 class SprayFeatures {
+
     private val config get() = PestAPI.config.spray
 
     private var display: String? = null
@@ -31,7 +32,7 @@ class SprayFeatures {
 
     @SubscribeEvent
     fun onChat(event: LorenzChatEvent) {
-        if (!config.pestWhenSelector) return
+        if (!isEnabled()) return
 
         val type = changeMaterialPattern.matchMatcher(event.message) {
             val sprayName = group("spray")
@@ -49,7 +50,6 @@ class SprayFeatures {
         display = "§a${type.displayName} §7(§6$pests§7)"
 
         lastChangeTime = SimpleTimeMark.now()
-
     }
 
     @SubscribeEvent

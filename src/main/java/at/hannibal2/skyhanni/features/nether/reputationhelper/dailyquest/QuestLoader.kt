@@ -1,6 +1,7 @@
 package at.hannibal2.skyhanni.features.nether.reputationhelper.dailyquest
 
-import at.hannibal2.skyhanni.config.Storage
+import at.hannibal2.skyhanni.config.storage.ProfileSpecificStorage
+import at.hannibal2.skyhanni.data.jsonobjects.repo.CrimsonIsleReputationJson.ReputationQuest
 import at.hannibal2.skyhanni.events.InventoryFullyOpenedEvent
 import at.hannibal2.skyhanni.features.nether.reputationhelper.dailyquest.quest.DojoQuest
 import at.hannibal2.skyhanni.features.nether.reputationhelper.dailyquest.quest.FetchQuest
@@ -12,14 +13,17 @@ import at.hannibal2.skyhanni.features.nether.reputationhelper.dailyquest.quest.Q
 import at.hannibal2.skyhanni.features.nether.reputationhelper.dailyquest.quest.RescueMissionQuest
 import at.hannibal2.skyhanni.features.nether.reputationhelper.dailyquest.quest.TrophyFishQuest
 import at.hannibal2.skyhanni.features.nether.reputationhelper.dailyquest.quest.UnknownQuest
+import at.hannibal2.skyhanni.test.command.ErrorManager
+import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.LorenzUtils
+import at.hannibal2.skyhanni.utils.StringUtils.matches
 import at.hannibal2.skyhanni.utils.TabListData
-import at.hannibal2.skyhanni.data.jsonobjects.repo.CrimsonIsleReputationJson.ReputationQuest
 
 class QuestLoader(private val dailyQuestHelper: DailyQuestHelper) {
 
     companion object {
+
         val quests = mutableMapOf<String, Pair<String, ReputationQuest>>()
         fun loadQuests(data: Map<String, ReputationQuest>, questType: String) {
             for ((questName, questInfo) in data) {
@@ -48,6 +52,8 @@ class QuestLoader(private val dailyQuestHelper: DailyQuestHelper) {
     }
 
     private fun readQuest(line: String) {
+        if (!dailyQuestHelper.reputationHelper.tabListQuestPattern.matches(line)) return
+
         if (line.contains("The Great Spook")) {
             dailyQuestHelper.greatSpook = true
             dailyQuestHelper.update()
@@ -78,7 +84,7 @@ class QuestLoader(private val dailyQuestHelper: DailyQuestHelper) {
             if (green && oldQuest.state != QuestState.READY_TO_COLLECT && oldQuest.state != QuestState.COLLECTED) {
                 oldQuest.state = QuestState.READY_TO_COLLECT
                 dailyQuestHelper.update()
-                LorenzUtils.debug("Reputation Helper: Tab-List updated ${oldQuest.internalName} (This should not happen)")
+                ChatUtils.debug("Reputation Helper: Tab-List updated ${oldQuest.internalName} (This should not happen)")
             }
             return
         }
@@ -122,7 +128,16 @@ class QuestLoader(private val dailyQuestHelper: DailyQuestHelper) {
                 "DOJO" -> return DojoQuest(questName, location, displayItem, dojoGoal, state)
             }
         }
-        LorenzUtils.error("Unknown Crimson Isle quest: '$name'")
+        ErrorManager.logErrorStateWithData(
+            "Unknown Crimson Isle quest: '$name'",
+            "Unknown quest detected",
+            "name" to name,
+            "questName" to questName,
+            "dojoGoal" to dojoGoal,
+            "state" to state,
+            "needAmount" to needAmount,
+            "tablist" to TabListData.getTabList(),
+        )
         return UnknownQuest(name)
     }
 
@@ -155,7 +170,7 @@ class QuestLoader(private val dailyQuestHelper: DailyQuestHelper) {
         }
     }
 
-    fun loadConfig(storage: Storage.ProfileSpecific.CrimsonIsleStorage) {
+    fun loadConfig(storage: ProfileSpecificStorage.CrimsonIsleStorage) {
         if (dailyQuestHelper.greatSpook) return
         if (storage.quests.toList().any { hasGreatSpookLine(it) }) {
             dailyQuestHelper.greatSpook = true
@@ -172,8 +187,10 @@ class QuestLoader(private val dailyQuestHelper: DailyQuestHelper) {
                     val haveAmount = split[3].toInt()
                     quest.haveAmount = haveAmount
                 } catch (e: IndexOutOfBoundsException) {
-                    println("text: '$text'")
-                    e.printStackTrace()
+                    ErrorManager.logErrorWithData(
+                        e, "Error loading Crimson Isle Quests from config.",
+                        "text" to text,
+                    )
                 }
             }
             addQuest(quest)

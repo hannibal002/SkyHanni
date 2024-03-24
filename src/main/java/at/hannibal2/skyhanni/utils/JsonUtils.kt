@@ -2,6 +2,7 @@ package at.hannibal2.skyhanni.utils
 
 import com.google.gson.Gson
 import com.google.gson.JsonElement
+import com.google.gson.JsonObject
 import java.io.Reader
 import kotlin.reflect.jvm.javaType
 import kotlin.reflect.typeOf

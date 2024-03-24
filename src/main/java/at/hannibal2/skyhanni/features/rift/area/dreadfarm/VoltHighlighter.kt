@@ -4,9 +4,9 @@ import at.hannibal2.skyhanni.events.EntityEquipmentChangeEvent
 import at.hannibal2.skyhanni.events.LorenzRenderWorldEvent
 import at.hannibal2.skyhanni.features.rift.RiftAPI
 import at.hannibal2.skyhanni.mixins.hooks.RenderLivingEntityHelper
+import at.hannibal2.skyhanni.utils.CollectionUtils.editCopy
 import at.hannibal2.skyhanni.utils.EntityUtils.getEntities
 import at.hannibal2.skyhanni.utils.ItemUtils.getSkullTexture
-import at.hannibal2.skyhanni.utils.LorenzUtils.editCopy
 import at.hannibal2.skyhanni.utils.RenderUtils
 import at.hannibal2.skyhanni.utils.RenderUtils.drawDynamicText
 import at.hannibal2.skyhanni.utils.RenderUtils.exactLocation
@@ -53,7 +53,7 @@ class VoltHighlighter {
             if (state == VoltState.NO_VOLT) continue
 
             if (config.voltMoodMeter)
-                RenderLivingEntityHelper.setEntityColor(
+                RenderLivingEntityHelper.setEntityColorWithNoHurtTime(
                     entity, when (state) {
                         VoltState.FRIENDLY -> 0x8000FF00.toInt()
                         VoltState.DOING_LIGHTNING -> 0x800000FF.toInt()
@@ -108,7 +108,6 @@ class VoltHighlighter {
 
             else -> VoltState.NO_VOLT
         }
-
     }
 
     private fun getVoltState(entity: Entity): VoltState {

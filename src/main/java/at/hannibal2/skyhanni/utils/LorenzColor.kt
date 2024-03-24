@@ -4,7 +4,7 @@ import at.hannibal2.skyhanni.test.command.ErrorManager
 import net.minecraft.item.EnumDyeColor
 import java.awt.Color
 
-enum class LorenzColor(private val chatColorCode: Char, private val color: Color, private val coloredLabel: String) {
+enum class LorenzColor(val chatColorCode: Char, private val color: Color, private val coloredLabel: String) {
     BLACK('0', Color(0, 0, 0), "§0Black"),
     DARK_BLUE('1', Color(0, 0, 170), "§1Dark Blue"),
     DARK_GREEN('2', Color(0, 170, 0), "§2Dark Green"),
@@ -38,7 +38,10 @@ enum class LorenzColor(private val chatColorCode: Char, private val color: Color
 
     override fun toString(): String = coloredLabel
 
+    fun toConfigColour(): String = "0:255:${color.red}:${color.green}:${color.blue}"
+
     companion object {
+
         fun EnumDyeColor.toLorenzColor() = when (this) {
             EnumDyeColor.WHITE -> WHITE
             EnumDyeColor.MAGENTA -> LIGHT_PURPLE
@@ -52,7 +55,7 @@ enum class LorenzColor(private val chatColorCode: Char, private val color: Color
             EnumDyeColor.PURPLE -> DARK_PURPLE
             EnumDyeColor.YELLOW -> YELLOW
             else -> {
-                ErrorManager.logError(
+                ErrorManager.logErrorWithData(
                     Exception("Unknown dye color: $this"),
                     "Unknown dye color: $this"
                 )

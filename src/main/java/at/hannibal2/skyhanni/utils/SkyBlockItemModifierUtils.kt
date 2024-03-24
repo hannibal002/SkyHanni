@@ -1,12 +1,12 @@
 package at.hannibal2.skyhanni.utils
 
 import at.hannibal2.skyhanni.config.ConfigManager
+import at.hannibal2.skyhanni.data.PetAPI
 import at.hannibal2.skyhanni.mixins.hooks.ItemStackCachedData
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.ItemUtils.name
 import at.hannibal2.skyhanni.utils.NEUInternalName.Companion.asInternalName
-import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import com.google.gson.JsonObject
 import net.minecraft.item.Item
@@ -15,10 +15,8 @@ import net.minecraft.util.ResourceLocation
 import java.util.Locale
 
 object SkyBlockItemModifierUtils {
-    private val drillPartTypes = listOf("drill_part_upgrade_module", "drill_part_engine", "drill_part_fuel_tank")
 
-    // TODO USE SH-REPO
-    private val petLevelPattern = "§7\\[Lvl (?<level>.*)\\] .*".toPattern()
+    private val drillPartTypes = listOf("drill_part_upgrade_module", "drill_part_engine", "drill_part_fuel_tank")
 
     fun ItemStack.getHotPotatoCount() = getAttributeInt("hot_potato_count")
 
@@ -63,6 +61,7 @@ object SkyBlockItemModifierUtils {
         return data.petCandies
     }
 
+    // TODO use NeuInternalName here
     fun ItemStack.getPetItem(): String? {
         val data = cachedData
         if (data.heldItem == "") {
@@ -93,12 +92,9 @@ object SkyBlockItemModifierUtils {
     @Suppress("CAST_NEVER_SUCCEEDS")
     inline val ItemStack.cachedData get() = (this as ItemStackCachedData).skyhanni_cachedData
 
-    fun ItemStack.getPetLevel(): Int {
-        petLevelPattern.matchMatcher(this.displayName) {
-            return group("level").toInt()
-        }
-        return 0
-    }
+    fun ItemStack.getPetLevel(): Int = PetAPI.getPetLevel(displayName) ?: 0
+
+    fun ItemStack.getMaxPetLevel() = if (this.getInternalName() == "GOLDEN_DRAGON;4".asInternalName()) 200 else 100
 
     fun ItemStack.getDrillUpgrades() = getExtraAttributes()?.let {
         val list = mutableListOf<NEUInternalName>()
@@ -158,7 +154,7 @@ object SkyBlockItemModifierUtils {
     fun ItemStack.getReforgeName() = getAttributeString("modifier")?.let {
         when {
             it == "pitchin" -> "pitchin_koi"
-            it == "warped" && name!!.removeColor().startsWith("Hyper ") -> "endstone_geode"
+            it == "warped" && name.removeColor().startsWith("Hyper ") -> "endstone_geode"
 
             else -> it
         }
@@ -226,7 +222,7 @@ object SkyBlockItemModifierUtils {
 
                 val quality = GemstoneQuality.getByName(value)
                 if (quality == null) {
-                    LorenzUtils.debug("Gemstone quality is null for item $name: ('$key' = '$value')")
+                    ChatUtils.debug("Gemstone quality is null for item $name: ('$key' = '$value')")
                     continue
                 }
                 if (type != null) {
@@ -235,7 +231,7 @@ object SkyBlockItemModifierUtils {
                     val newKey = gemstones.getString(key + "_gem")
                     val newType = GemstoneType.getByName(newKey)
                     if (newType == null) {
-                        LorenzUtils.debug("Gemstone type is null for item $name: ('$newKey' with '$key' = '$value')")
+                        ChatUtils.debug("Gemstone type is null for item $name: ('$newKey' with '$key' = '$value')")
                         continue
                     }
                     list.add(GemstoneSlot(newType, quality))
@@ -261,6 +257,7 @@ object SkyBlockItemModifierUtils {
     fun ItemStack.getExtraAttributes() = tagCompound?.getCompoundTag("ExtraAttributes")
 
     class GemstoneSlot(val type: GemstoneType, val quality: GemstoneQuality) {
+
         fun getInternalName() = "${quality}_${type}_GEM".asInternalName()
     }
 
@@ -273,6 +270,7 @@ object SkyBlockItemModifierUtils {
         ;
 
         companion object {
+
             fun getByName(name: String) = entries.firstOrNull { it.name == name }
         }
     }
@@ -289,6 +287,7 @@ object SkyBlockItemModifierUtils {
         ;
 
         companion object {
+
             fun getByName(name: String) = entries.firstOrNull { it.name == name }
         }
     }
@@ -310,6 +309,7 @@ object SkyBlockItemModifierUtils {
         ;
 
         companion object {
+
             fun getColorCode(name: String) = entries.stream().filter {
                 name.uppercase(Locale.ENGLISH).contains(it.name)
             }.findFirst().get().colorCode

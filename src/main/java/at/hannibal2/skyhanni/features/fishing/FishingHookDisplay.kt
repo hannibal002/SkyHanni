@@ -13,6 +13,7 @@ import net.minecraftforge.event.entity.EntityJoinWorldEvent
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
 class FishingHookDisplay {
+
     private val config get() = SkyHanniMod.feature.fishing.fishingHookDisplay
     private var armorStand: EntityArmorStand? = null
     private val potentionArmorStands = mutableListOf<EntityArmorStand>()
@@ -74,8 +75,9 @@ class FishingHookDisplay {
             return
         }
         if (!armorStand.hasCustomName()) return
+        val alertText = if (armorStand.name == "§c§l!!!") config.customAlertText.replace("&", "§") else armorStand.name
 
-        config.position.renderString(armorStand.name, posLabel = "Fishing Hook Display")
+        config.position.renderString(alertText, posLabel = "Fishing Hook Display")
     }
 
     private fun EntityArmorStand.hasCorrectName(): Boolean {
@@ -85,5 +87,5 @@ class FishingHookDisplay {
         return pattern.matcher(name).matches()
     }
 
-    fun isEnabled() = LorenzUtils.inSkyBlock && config.enabled && FishingAPI.hasFishingRodInHand()
+    fun isEnabled() = LorenzUtils.inSkyBlock && config.enabled && FishingAPI.holdingRod
 }

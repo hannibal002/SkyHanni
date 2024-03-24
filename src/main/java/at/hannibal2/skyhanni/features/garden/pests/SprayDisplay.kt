@@ -12,14 +12,16 @@ import at.hannibal2.skyhanni.features.garden.GardenPlotAPI.isSprayExpired
 import at.hannibal2.skyhanni.features.garden.GardenPlotAPI.markExpiredSprayAsNotified
 import at.hannibal2.skyhanni.features.garden.GardenPlotAPI.name
 import at.hannibal2.skyhanni.features.garden.GardenPlotAPI.plots
+import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.RenderUtils.renderString
-import at.hannibal2.skyhanni.utils.StringUtils
+import at.hannibal2.skyhanni.utils.StringUtils.createCommaSeparatedList
 import at.hannibal2.skyhanni.utils.TimeUtils.format
 import at.hannibal2.skyhanni.utils.TimeUtils.timerColor
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
 class SprayDisplay {
+
     private val config get() = PestAPI.config.spray
     private var display: String? = null
 
@@ -43,6 +45,7 @@ class SprayDisplay {
 
     @SubscribeEvent
     fun onJoin(event: IslandChangeEvent) {
+        if (!LorenzUtils.inSkyBlock) return
         if (!config.expiryNotification || event.newIsland != IslandType.GARDEN) return
         sendExpiredPlotsToChat(true)
     }
@@ -60,9 +63,9 @@ class SprayDisplay {
 
         expiredPlots.forEach { it.markExpiredSprayAsNotified() }
         val wasAwayString = if (wasAway) "§7While you were away, your" else "§7Your"
-        val plotString = StringUtils.createCommaSeparatedList(expiredPlots.map { "§b${it.name}" }, "§7")
+        val plotString = expiredPlots.map { "§b${it.name}" }.createCommaSeparatedList("§7")
         val sprayString = if (expiredPlots.size > 1) "sprays" else "spray"
         val out = "$wasAwayString $sprayString on §aPlot §7- $plotString §7expired."
-        LorenzUtils.chat(out)
+        ChatUtils.chat(out)
     }
 }

@@ -9,10 +9,11 @@ import at.hannibal2.skyhanni.events.bingo.BingoCardUpdateEvent
 import at.hannibal2.skyhanni.features.bingo.BingoAPI
 import at.hannibal2.skyhanni.features.bingo.card.goals.BingoGoal
 import at.hannibal2.skyhanni.features.bingo.card.nextstephelper.BingoNextStepHelper
+import at.hannibal2.skyhanni.utils.ChatUtils
+import at.hannibal2.skyhanni.utils.ConditionalUtils.onToggle
 import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.ItemUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils
-import at.hannibal2.skyhanni.utils.LorenzUtils.onToggle
 import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderables
 import at.hannibal2.skyhanni.utils.RenderUtils.renderStrings
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
@@ -34,6 +35,7 @@ class BingoCardDisplay {
     private var hasHiddenPersonalGoals = false
 
     companion object {
+
         private const val MAX_PERSONAL_GOALS = 20
         private const val MAX_COMMUNITY_GOALS = 5
 
@@ -50,11 +52,11 @@ class BingoCardDisplay {
 
         fun toggleCommand() {
             if (!LorenzUtils.isBingoProfile) {
-                LorenzUtils.userError("This command only works on a bingo profile!")
+                ChatUtils.userError("This command only works on a bingo profile!")
                 return
             }
             if (!config.enabled) {
-                LorenzUtils.userError("Bingo Card is disabled in the config!")
+                ChatUtils.userError("Bingo Card is disabled in the config!")
                 return
             }
             toggleMode()
@@ -89,7 +91,7 @@ class BingoCardDisplay {
             newList.add(Renderable.clickAndHover("§cOpen the §e/bingo §ccard.",
                 listOf("Click to run §e/bingo"),
                 onClick = {
-                    LorenzUtils.sendCommandToServer("bingo")
+                    ChatUtils.sendCommandToServer("bingo")
                 }
             ))
         } else {
@@ -121,7 +123,7 @@ class BingoCardDisplay {
         }
 
         if (hiddenGoals > 0) {
-            val name = StringUtils.canBePlural(hiddenGoals, "goal", "goals")
+            val name = StringUtils.pluralize(hiddenGoals, "goal")
             add(Renderable.string("§7+ $hiddenGoals more §cunknown §7community $name."))
         }
         add(Renderable.string(" "))
@@ -154,7 +156,7 @@ class BingoCardDisplay {
         addGoals(todo) { it.description.removeColor() }
 
         if (hiddenGoals > 0) {
-            val name = StringUtils.canBePlural(hiddenGoals, "goal", "goals")
+            val name = StringUtils.pluralize(hiddenGoals, "goal")
             add(Renderable.string("§7+ $hiddenGoals more §cunknown §7$name."))
         }
         hasHiddenPersonalGoals = config.nextTipDuration.get() && nextTip != 14.days
@@ -188,16 +190,20 @@ class BingoCardDisplay {
                 val clickName = if (currentlyHighlighted) "remove" else "add"
                 Renderable.clickAndHover(
                     display,
-                    listOf(
-                        "§a" + it.displayName,
-                        "",
-                        "§eClick to $clickName this goal as highlight!",
-                    ),
+                    buildList {
+                        add("§a" + it.displayName)
+                        for (s in it.guide) {
+                            add(s)
+                        }
+                        add("")
+                        add("§eClick to $clickName this goal as highlight!")
+                    },
                     onClick = {
                         if (lastClick.passedSince() < 300.milliseconds) return@clickAndHover
                         lastClick = SimpleTimeMark.now()
 
                         it.highlight = !currentlyHighlighted
+                        it.displayName
                         update()
                     }
                 )

@@ -4,7 +4,7 @@ import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.events.CropClickEvent
 import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.LorenzWorldChangeEvent
-import at.hannibal2.skyhanni.events.PreProfileSwitchEvent
+import at.hannibal2.skyhanni.events.ProfileJoinEvent
 import at.hannibal2.skyhanni.events.garden.visitor.VisitorArrivalEvent
 import at.hannibal2.skyhanni.features.garden.GardenAPI
 import at.hannibal2.skyhanni.test.command.ErrorManager
@@ -18,6 +18,7 @@ import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.TabListData
 import at.hannibal2.skyhanni.utils.TimeUtils
 import at.hannibal2.skyhanni.utils.TimeUtils.format
+import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import kotlin.concurrent.fixedRateTimer
 import kotlin.time.Duration
@@ -28,8 +29,14 @@ import kotlin.time.DurationUnit
 import kotlin.time.toDuration
 
 class GardenVisitorTimer {
+
     private val config get() = GardenAPI.config.visitors.timer
-    private val pattern = "§b§lVisitors: §r§f\\((?<time>.*)\\)".toPattern()
+
+    private val timePattern by RepoPattern.pattern(
+        "garden.visitor.timer.time.new",
+        " Next Visitor: §r(?<info>.*)"
+    )
+
     private var display = ""
     private var lastMillis = 0.seconds
     private var sixthVisitorArrivalTime = SimpleTimeMark.farPast()
@@ -38,7 +45,7 @@ class GardenVisitorTimer {
     private var lastTimerValue = ""
     private var lastTimerUpdate = SimpleTimeMark.farPast()
 
-    //TODO nea?
+    // TODO nea?
 //    private val visitorInterval by dynamic(GardenAPI::config, Storage.ProfileSpecific.GardenStorage::visitorInterval)
     private var visitorInterval: Duration?
         get() = GardenAPI.storage?.visitorInterval?.toDuration(DurationUnit.MILLISECONDS)
@@ -49,6 +56,7 @@ class GardenVisitorTimer {
         }
 
     companion object {
+
         var lastVisitors: Int = -1
     }
 
@@ -62,7 +70,7 @@ class GardenVisitorTimer {
             try {
                 updateVisitorDisplay()
             } catch (error: Throwable) {
-                ErrorManager.logError(error, "Encountered an error when updating visitor display")
+                ErrorManager.logErrorWithData(error, "Encountered an error when updating visitor display")
             }
             try {
                 GardenVisitorDropStatistics.saveAndUpdate()
@@ -72,7 +80,7 @@ class GardenVisitorTimer {
     }
 
     @SubscribeEvent
-    fun onPreProfileSwitch(event: PreProfileSwitchEvent) {
+    fun onProfileJoin(event: ProfileJoinEvent) {
         display = ""
         lastMillis = 0.seconds
         sixthVisitorArrivalTime = SimpleTimeMark.farPast()
@@ -87,23 +95,19 @@ class GardenVisitorTimer {
         var visitorInterval = visitorInterval ?: return
         var millis = visitorInterval
         var queueFull = false
-        for (line in TabListData.getTabList()) {
-            if (line == "§b§lVisitors: §r§f(§r§c§lQueue Full!§r§f)") {
-                queueFull = true
-                continue
-            }
-            if (line == "§b§lVisitors: §r§f(§r§cNot Unlocked!§r§f)") {
-                display = ""
-                return
-            }
-
-            pattern.matchMatcher(line) {
-                val rawTime = group("time").removeColor()
-                if (lastTimerValue != rawTime) {
-                    lastTimerUpdate = SimpleTimeMark.now()
-                    lastTimerValue = rawTime
+        loop@ for (line in TabListData.getTabList()) {
+            timePattern.matchMatcher(line) {
+                val timeInfo = group("info").removeColor()
+                if (timeInfo == "Queue Full!") {
+                    queueFull = true
+                    break@loop
                 }
-                millis = TimeUtils.getDuration(rawTime)
+                if (lastTimerValue != timeInfo) {
+                    lastTimerUpdate = SimpleTimeMark.now()
+                    lastTimerValue = timeInfo
+                }
+                millis = TimeUtils.getDuration(timeInfo)
+                break@loop
             }
         }
 
@@ -198,7 +202,7 @@ class GardenVisitorTimer {
     }
 
     @SubscribeEvent
-    fun onBlockBreak(event: CropClickEvent) {
+    fun onCropClick(event: CropClickEvent) {
         if (!isEnabled()) return
         sixthVisitorArrivalTime -= 100.milliseconds
 

@@ -19,6 +19,7 @@
 package at.hannibal2.skyhanni.config.core.config.gui
 
 import at.hannibal2.skyhanni.config.core.config.Position
+import at.hannibal2.skyhanni.data.GuiEditManager
 import at.hannibal2.skyhanni.data.GuiEditManager.Companion.getAbsX
 import at.hannibal2.skyhanni.data.GuiEditManager.Companion.getAbsY
 import at.hannibal2.skyhanni.data.GuiEditManager.Companion.getDummySize
@@ -35,6 +36,7 @@ import org.lwjgl.input.Mouse
 import java.io.IOException
 
 class GuiPositionEditor(private val positions: List<Position>, private val border: Int) : GuiScreen() {
+
     private var grabbedX = 0
     private var grabbedY = 0
     private var clickedPos = -1
@@ -42,6 +44,9 @@ class GuiPositionEditor(private val positions: List<Position>, private val borde
     override fun onGuiClosed() {
         super.onGuiClosed()
         clickedPos = -1
+        for (position in positions) {
+            position.clicked = false
+        }
         OtherInventoryData.close()
     }
 
@@ -212,6 +217,7 @@ class GuiPositionEditor(private val positions: List<Position>, private val borde
             val elementHeight = position.getDummySize(true).y
             grabbedX += position.moveX(mouseX - grabbedX, elementWidth)
             grabbedY += position.moveY(mouseY - grabbedY, elementHeight)
+            GuiEditManager.handleGuiPositionMoved(position.internalName)
         }
     }
 

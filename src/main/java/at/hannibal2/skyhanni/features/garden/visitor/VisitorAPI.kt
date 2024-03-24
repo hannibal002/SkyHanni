@@ -4,22 +4,36 @@ import at.hannibal2.skyhanni.events.garden.visitor.VisitorAcceptedEvent
 import at.hannibal2.skyhanni.events.garden.visitor.VisitorArrivalEvent
 import at.hannibal2.skyhanni.events.garden.visitor.VisitorLeftEvent
 import at.hannibal2.skyhanni.events.garden.visitor.VisitorRefusedEvent
-import at.hannibal2.skyhanni.events.withAlpha
 import at.hannibal2.skyhanni.features.garden.GardenAPI
 import at.hannibal2.skyhanni.test.command.ErrorManager
+import at.hannibal2.skyhanni.utils.ChatUtils
+import at.hannibal2.skyhanni.utils.CollectionUtils.editCopy
+import at.hannibal2.skyhanni.utils.ColorUtils.withAlpha
 import at.hannibal2.skyhanni.utils.EntityUtils
 import at.hannibal2.skyhanni.utils.LorenzColor
 import at.hannibal2.skyhanni.utils.LorenzLogger
-import at.hannibal2.skyhanni.utils.LorenzUtils
-import at.hannibal2.skyhanni.utils.LorenzUtils.editCopy
 import at.hannibal2.skyhanni.utils.NEUInternalName
+import at.hannibal2.skyhanni.utils.NumberUtil.isInt
+import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
+import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraft.item.ItemStack
 
 object VisitorAPI {
+
     private var visitors = mapOf<String, Visitor>()
     var inInventory = false
     val config get() = GardenAPI.config.visitors
     private val logger = LorenzLogger("garden/visitors/api")
+
+    val patternGroup = RepoPattern.group("garden.visitor.api")
+    private val visitorCountPattern by patternGroup.pattern(
+        "visitor.count",
+        "§b§lVisitors: §r§f\\((?<info>.*)\\)"
+    )
+    private val visitorNamePattern by patternGroup.pattern(
+        "visitor.name",
+        " (?:§.)+(?<name>§.[^§]+).*"
+    )
 
     fun getVisitorsMap() = visitors
     fun getVisitors() = visitors.values
@@ -54,7 +68,7 @@ object VisitorAPI {
         if (visitor == null) {
             // workaround if the tab list has not yet updated when opening the visitor
             addVisitor(name)
-            LorenzUtils.debug("Found visitor from npc that is not in tab list. Adding it still.")
+            ChatUtils.debug("Found visitor from npc that is not in tab list. Adding it still.")
             visitor = visitors[name]
         }
 
@@ -99,7 +113,7 @@ object VisitorAPI {
     }
 
     class VisitorOffer(
-        val offerItem: ItemStack
+        val offerItem: ItemStack,
     )
 
     class Visitor(
@@ -107,10 +121,10 @@ object VisitorAPI {
         var entityId: Int = -1,
         var nameTagEntityId: Int = -1,
         var status: VisitorStatus,
-        var inSacks: Boolean = false,
-        val items: MutableMap<NEUInternalName, Int> = mutableMapOf(),
+        val shoppingList: MutableMap<NEUInternalName, Int> = mutableMapOf(),
         var offer: VisitorOffer? = null,
     ) {
+
         var lore: List<String> = emptyList()
         var allRewards = listOf<NEUInternalName>()
         var lastLore = listOf<String>()
@@ -139,34 +153,34 @@ object VisitorAPI {
     }
 
     fun visitorsInTabList(tabList: List<String>): MutableList<String> {
+        var visitorCount = 0
         var found = false
-        val visitorsInTab = mutableListOf<String>()
-        for (line in tabList) {
-            if (line.startsWith("§b§lVisitors:")) {
-                found = true
-                continue
-            }
-            if (!found) continue
+        var visitorsRemaining = 0
 
-            if (line.isEmpty() || line.contains("Account Info")) {
+        val visitorsInTab = mutableListOf<String>()
+        loop@ for (line in tabList) {
+            visitorCountPattern.matchMatcher(line) {
+                found = true
+                val countInfo = group("info")
+                if (countInfo.isInt()) {
+                    visitorCount = countInfo.toInt()
+                } else if (countInfo == "§r§c§lQueue Full!§r§f") visitorCount = 5
+
+                visitorsRemaining = visitorCount
+                continue@loop
+            }
+
+            if (!found) continue
+            if (visitorsRemaining <= 0) {
                 found = false
                 continue
             }
-            val name = fromHypixelName(line)
 
-            // Hide hypixel watchdog entries
-            if (name.contains("§c") && !name.contains("Spaceman") && !name.contains("Grandma Wolf")) {
-                logger.log("Ignore wrong red name: '$name'")
-                continue
+            visitorNamePattern.matchMatcher(line) {
+                visitorsInTab.add(group("name").trim())
             }
 
-            //hide own player name
-            if (name.contains(LorenzUtils.getPlayerName())) {
-                logger.log("Ignore wrong own name: '$name'")
-                continue
-            }
-
-            visitorsInTab.add(name)
+            visitorsRemaining--
         }
         return visitorsInTab
     }

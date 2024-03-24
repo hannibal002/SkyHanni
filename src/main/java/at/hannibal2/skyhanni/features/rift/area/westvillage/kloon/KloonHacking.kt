@@ -19,15 +19,18 @@ import at.hannibal2.skyhanni.utils.LorenzColor
 import at.hannibal2.skyhanni.utils.RenderUtils.highlight
 import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
-import io.github.moulberry.notenoughupdates.events.SlotClickEvent
+import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraftforge.fml.common.eventhandler.EventPriority
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
 class KloonHacking {
+
     private val config get() = RiftAPI.config.area.westVillage.hacking
 
-    // TODO USE SH-REPO
-    val pattern = "You've set the color of this terminal to (?<colour>.*)!".toPattern()
+    private val colourPattern by RepoPattern.pattern(
+        "rift.area.westvillage.kloon.colour",
+        "You've set the color of this terminal to (?<colour>.*)!"
+    )
 
     private var wearingHelmet = false
     private var inTerminalInventory = false
@@ -106,9 +109,9 @@ class KloonHacking {
     }
 
     @SubscribeEvent(priority = EventPriority.HIGH)
-    fun onSlotClick(event: SlotClickEvent) {
+    fun onSlotClick(event: GuiContainerEvent.SlotClickEvent) {
         if (!inTerminalInventory || !RiftAPI.inRift()) return
-        event.usePickblockInstead()
+        event.makePickblock()
     }
 
     @SubscribeEvent
@@ -128,7 +131,7 @@ class KloonHacking {
     fun onChat(event: LorenzChatEvent) {
         if (!RiftAPI.inRift()) return
         if (!wearingHelmet) return
-        pattern.matchMatcher(event.message.removeColor()) {
+        colourPattern.matchMatcher(event.message.removeColor()) {
             val storage = ProfileStorageData.profileSpecific?.rift ?: return
             val colour = group("colour")
             val completedTerminal = KloonTerminal.entries.firstOrNull { it.name == colour } ?: return

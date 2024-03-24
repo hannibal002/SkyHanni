@@ -13,6 +13,7 @@ import at.hannibal2.skyhanni.utils.LorenzUtils.isInIsland
 import at.hannibal2.skyhanni.utils.LorenzVec
 import at.hannibal2.skyhanni.utils.RenderUtils.renderString
 import at.hannibal2.skyhanni.utils.SoundUtils
+import at.hannibal2.skyhanni.utils.StringUtils
 import at.hannibal2.skyhanni.utils.TimeUnit
 import at.hannibal2.skyhanni.utils.TimeUtils
 import net.minecraft.client.Minecraft
@@ -21,6 +22,7 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import kotlin.time.Duration.Companion.seconds
 
 class FishingTimer {
+
     private val config get() = SkyHanniMod.feature.fishing.barnTimer
     private val barnLocation = LorenzVec(108, 89, -252)
 
@@ -75,15 +77,8 @@ class FishingTimer {
         }
     }
 
-    private fun countMobs() = EntityUtils.getEntities<EntityArmorStand>()
-        .map { entity ->
-            val name = entity.name
-            val isSummonedSoul = name.contains("'")
-            val hasFishingMobName = SeaCreatureManager.allFishingMobs.keys.any { name.contains(it) }
-            if (hasFishingMobName && !isSummonedSoul) {
-                if (name == "Sea Emperor" || name == "Rider of the Deep") 2 else 1
-            } else 0
-        }.sum()
+    private fun countMobs() =
+        EntityUtils.getEntities<EntityArmorStand>().map { entity -> FishingAPI.seaCreatureCount(entity) }.sum()
 
     private fun isRightLocation(): Boolean {
         inHollows = false
@@ -112,12 +107,13 @@ class FishingTimer {
         if (!config.enabled) return
         if (!rightLocation) return
         if (currentCount == 0) return
+        if (!FishingAPI.isFishing()) return
 
         val duration = System.currentTimeMillis() - startTime
         val barnTimerAlertTime = config.alertTime * 1_000
         val color = if (duration > barnTimerAlertTime) "§c" else "§e"
         val timeFormat = TimeUtils.formatDuration(duration, biggestUnit = TimeUnit.MINUTE)
-        val name = if (currentCount == 1) "sea creature" else "sea creatures"
+        val name = StringUtils.pluralize(currentCount, "sea creature")
         val text = "$color$timeFormat §8(§e$currentCount §b$name§8)"
 
         config.pos.renderString(text, posLabel = "BarnTimer")

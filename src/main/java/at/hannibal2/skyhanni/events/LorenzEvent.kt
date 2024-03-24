@@ -5,7 +5,7 @@ import at.hannibal2.skyhanni.mixins.hooks.getValue
 import at.hannibal2.skyhanni.mixins.hooks.setValue
 import at.hannibal2.skyhanni.mixins.transformers.AccessorEventBus
 import at.hannibal2.skyhanni.test.command.ErrorManager
-import at.hannibal2.skyhanni.utils.LorenzUtils
+import at.hannibal2.skyhanni.utils.ChatUtils
 import net.minecraftforge.common.MinecraftForge
 import net.minecraftforge.fml.common.eventhandler.Event
 import net.minecraftforge.fml.common.eventhandler.IEventListener
@@ -19,6 +19,7 @@ abstract class LorenzEvent : Event() {
     fun postAndCatch() = postAndCatchAndBlock {}
 
     companion object {
+
         var eventHandlerDepth by object : ThreadLocal<Int>() {
             override fun initialValue(): Int {
                 return 0
@@ -45,8 +46,8 @@ abstract class LorenzEvent : Event() {
                 if (printError && errors <= visibleErrors) {
                     val callerName = listener.toString().split(" ")[1].split("@")[0].split(".").last()
                     val errorName = throwable::class.simpleName ?: "error"
-                    val message = "Caught an $errorName at $eventName in $callerName: '${throwable.message}'"
-                    ErrorManager.logError(throwable, message, ignoreErrorCache)
+                    val message = "Caught an $errorName at $eventName in $callerName: ${throwable.message}"
+                    ErrorManager.logErrorWithData(throwable, message, ignoreErrorCache = ignoreErrorCache)
                 }
                 onError(throwable)
                 if (stopOnFirstError) break
@@ -55,7 +56,7 @@ abstract class LorenzEvent : Event() {
         eventHandlerDepth--
         if (errors > visibleErrors) {
             val hiddenErrors = errors - visibleErrors
-            LorenzUtils.error("$hiddenErrors more errors in $eventName are hidden!")
+            ChatUtils.error("$hiddenErrors more errors in $eventName are hidden!")
         }
         return if (isCancelable) isCanceled else false
     }
@@ -66,4 +67,9 @@ abstract class LorenzEvent : Event() {
     }
 
     fun postWithoutCatch() = MinecraftForge.EVENT_BUS.post(this)
+
+    // TODO let walker use this function for all 101 other uses
+    fun cancel() {
+        isCanceled = true
+    }
 }
