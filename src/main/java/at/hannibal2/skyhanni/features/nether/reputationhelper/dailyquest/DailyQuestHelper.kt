@@ -1,10 +1,9 @@
 package at.hannibal2.skyhanni.features.nether.reputationhelper.dailyquest
 
 import at.hannibal2.skyhanni.SkyHanniMod
-import at.hannibal2.skyhanni.config.Storage
+import at.hannibal2.skyhanni.config.storage.ProfileSpecificStorage
 import at.hannibal2.skyhanni.data.IslandType
-import at.hannibal2.skyhanni.data.SackAPI
-import at.hannibal2.skyhanni.data.SackStatus
+import at.hannibal2.skyhanni.data.SackAPI.getAmountInSacksOrNull
 import at.hannibal2.skyhanni.events.GuiContainerEvent
 import at.hannibal2.skyhanni.events.InventoryFullyOpenedEvent
 import at.hannibal2.skyhanni.events.LorenzChatEvent
@@ -221,22 +220,14 @@ class DailyQuestHelper(val reputationHelper: CrimsonIsleReputationHelper) {
         }
 
         val sacksText = if (quest is FetchQuest && quest.state != QuestState.COLLECTED) {
-            val sackItem = SackAPI.fetchSackItem(quest.displayItem)
-            val sackStatus = sackItem.getStatus()
-
-            if (sackStatus == SackStatus.OUTDATED) {
-                " §7(§eSack data outdated§7)"
-            } else {
-                val amountInSacks = sackItem.amount
-                val needAmount = quest.needAmount
-
-                val color = if (amountInSacks >= needAmount) {
+            quest.displayItem.getAmountInSacksOrNull()?.let {
+                val color = if (it >= quest.needAmount) {
                     "§a"
                 } else {
                     "§c"
                 }
-                " §7($color${amountInSacks.addSeparators()} §7in sacks)"
-            }
+                " §7($color${it.addSeparators()} §7in sacks)"
+            } ?: " §7(§eSack data outdated/missing§7)"
         } else {
             ""
         }
@@ -284,12 +275,12 @@ class DailyQuestHelper(val reputationHelper: CrimsonIsleReputationHelper) {
         quests.clear()
     }
 
-    fun load(storage: Storage.ProfileSpecific.CrimsonIsleStorage) {
+    fun load(storage: ProfileSpecificStorage.CrimsonIsleStorage) {
         reset()
         questLoader.loadConfig(storage)
     }
 
-    fun saveConfig(storage: Storage.ProfileSpecific.CrimsonIsleStorage) {
+    fun saveConfig(storage: ProfileSpecificStorage.CrimsonIsleStorage) {
         storage.quests.clear()
         for (quest in quests) {
             val builder = StringBuilder()

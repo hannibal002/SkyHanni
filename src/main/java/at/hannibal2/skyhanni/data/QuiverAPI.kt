@@ -59,7 +59,7 @@ object QuiverAPI {
 
     private val group = RepoPattern.group("data.quiver")
     private val chatGroup = group.group("chat")
-    private val selectPattern by chatGroup.pattern("select", "§aYou set your selected arrow type to §f(?<arrow>.*)§a!")
+    private val selectPattern by chatGroup.pattern("select", "§aYou set your selected arrow type to §.(?<arrow>.*)§a!")
     private val fillUpJaxPattern by chatGroup.pattern(
         "fillupjax",
         "(§.)*Jax forged (§.)*(?<type>.*?)(§.)* x(?<amount>[\\d,]+)( (§.)*for (§.)*(?<coins>[\\d,]+) Coins)?(§.)*!"

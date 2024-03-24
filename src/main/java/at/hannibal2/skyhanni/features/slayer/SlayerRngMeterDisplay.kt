@@ -1,7 +1,7 @@
 package at.hannibal2.skyhanni.features.slayer
 
 import at.hannibal2.skyhanni.SkyHanniMod
-import at.hannibal2.skyhanni.config.Storage
+import at.hannibal2.skyhanni.config.storage.ProfileSpecificStorage
 import at.hannibal2.skyhanni.data.ProfileStorageData
 import at.hannibal2.skyhanni.data.SlayerAPI
 import at.hannibal2.skyhanni.events.GuiRenderEvent
@@ -111,9 +111,9 @@ class SlayerRngMeterDisplay {
         update()
     }
 
-    private fun getStorage(): Storage.ProfileSpecific.SlayerRngMeterStorage? {
+    private fun getStorage(): ProfileSpecificStorage.SlayerRngMeterStorage? {
         return ProfileStorageData.profileSpecific?.slayerRngMeter?.getOrPut(getCurrentSlayer()) {
-            Storage.ProfileSpecific.SlayerRngMeterStorage()
+            ProfileSpecificStorage.SlayerRngMeterStorage()
         }
     }
 

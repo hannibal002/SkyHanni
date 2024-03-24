@@ -2,7 +2,8 @@ package at.hannibal2.skyhanni.data
 
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.config.SackData
-import at.hannibal2.skyhanni.config.Storage
+import at.hannibal2.skyhanni.config.storage.PlayerSpecificStorage
+import at.hannibal2.skyhanni.config.storage.ProfileSpecificStorage
 import at.hannibal2.skyhanni.events.ConfigLoadEvent
 import at.hannibal2.skyhanni.events.HypixelJoinEvent
 import at.hannibal2.skyhanni.events.LorenzTickEvent
@@ -20,8 +21,8 @@ import kotlin.time.Duration.Companion.seconds
 
 object ProfileStorageData {
 
-    var playerSpecific: Storage.PlayerSpecific? = null
-    var profileSpecific: Storage.ProfileSpecific? = null
+    var playerSpecific: PlayerSpecificStorage? = null
+    var profileSpecific: ProfileSpecificStorage? = null
     var loaded = false
     private var noTabListTime = SimpleTimeMark.farPast()
 
@@ -83,12 +84,12 @@ object ProfileStorageData {
     }
 
     private fun loadProfileSpecific(
-        playerSpecific: Storage.PlayerSpecific,
+        playerSpecific: PlayerSpecificStorage,
         sackProfile: SackData.PlayerSpecific,
         profileName: String,
     ) {
         noTabListTime = SimpleTimeMark.farPast()
-        profileSpecific = playerSpecific.profiles.getOrPut(profileName) { Storage.ProfileSpecific() }
+        profileSpecific = playerSpecific.profiles.getOrPut(profileName) { ProfileSpecificStorage() }
         sackProfiles = sackProfile.profiles.getOrPut(profileName) { SackData.ProfileSpecific() }
         loaded = true
         ConfigLoadEvent().postAndCatch()
@@ -97,7 +98,7 @@ object ProfileStorageData {
     @SubscribeEvent
     fun onHypixelJoin(event: HypixelJoinEvent) {
         val playerUuid = LorenzUtils.getRawPlayerUuid()
-        playerSpecific = SkyHanniMod.feature.storage.players.getOrPut(playerUuid) { Storage.PlayerSpecific() }
+        playerSpecific = SkyHanniMod.feature.storage.players.getOrPut(playerUuid) { PlayerSpecificStorage() }
         sackPlayers = SkyHanniMod.sackData.players.getOrPut(playerUuid) { SackData.PlayerSpecific() }
         ConfigLoadEvent().postAndCatch()
     }

@@ -2,6 +2,7 @@ package at.hannibal2.skyhanni.features.garden.visitor
 
 import at.hannibal2.skyhanni.config.features.garden.visitor.VisitorConfig
 import at.hannibal2.skyhanni.events.CheckRenderEntityEvent
+import at.hannibal2.skyhanni.events.GuiContainerEvent
 import at.hannibal2.skyhanni.events.GuiKeyPressEvent
 import at.hannibal2.skyhanni.events.InventoryCloseEvent
 import at.hannibal2.skyhanni.events.InventoryFullyOpenedEvent
@@ -35,7 +36,8 @@ import net.minecraft.network.play.client.C02PacketUseEntity
 import net.minecraftforge.event.entity.player.ItemTooltipEvent
 import net.minecraftforge.fml.common.eventhandler.EventPriority
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
-
+import org.lwjgl.input.Keyboard
+import kotlin.time.Duration.Companion.seconds
 
 class VisitorListener {
     private val offersAcceptedPattern by RepoPattern.pattern(
@@ -70,13 +72,14 @@ class VisitorListener {
         if (!GardenAPI.inGarden()) return
         val visitorsInTab = VisitorAPI.visitorsInTabList(event.tabList)
 
-        VisitorAPI.getVisitors().forEach {
-            val name = it.visitorName
-            val time = System.currentTimeMillis() - LorenzUtils.lastWorldSwitch
-            val removed = name !in visitorsInTab && time > 2_000
-            if (removed) {
-                logger.log("Removed old visitor: '$name'")
-                VisitorAPI.removeVisitor(name)
+        if (LorenzUtils.lastWorldSwitch.passedSince() > 2.seconds) {
+            VisitorAPI.getVisitors().forEach {
+                val name = it.visitorName
+                val removed = name !in visitorsInTab
+                if (removed) {
+                    logger.log("Removed old visitor: '$name'")
+                    VisitorAPI.removeVisitor(name)
+                }
             }
         }
 

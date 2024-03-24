@@ -106,6 +106,7 @@ object SensitivityReducer {
     fun onRenderOverlay(event: GuiRenderEvent.GuiOverlayRenderEvent) {
         if (!(isToggled || isManualToggle)) return
         if (!config.showGUI) return
+        if (LockMouseLook.lockedMouse) return
         config.position.renderString("§eSensitivity Lowered", posLabel = "Sensitivity Lowered")
     }
 
@@ -136,7 +137,11 @@ object SensitivityReducer {
         val divisor = config.reducingFactor.get()
         ChatUtils.debug("dividing by $divisor")
 
-        storage.savedMouseloweredSensitivity = gameSettings.mouseSensitivity
+        if (!LockMouseLook.lockedMouse) {
+            storage.savedMouseloweredSensitivity = gameSettings.mouseSensitivity
+        } else {
+            storage.savedMouseloweredSensitivity = storage.savedMouselockedSensitivity
+        }
         val newSens = doTheMath(storage.savedMouseloweredSensitivity)
         gameSettings?.mouseSensitivity = newSens
         if (showMessage) ChatUtils.chat("§bMouse sensitivity is now lowered. Type /shsensreduce to restore your sensitivity.")

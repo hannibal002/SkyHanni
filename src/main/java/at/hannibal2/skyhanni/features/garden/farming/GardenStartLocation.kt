@@ -45,7 +45,7 @@ object GardenStartLocation {
     }
 
     @SubscribeEvent
-    fun onBlockClick(event: CropClickEvent) {
+    fun onCropClick(event: CropClickEvent) {
         if (!isEnabled()) return
         val startLocations = GardenAPI.storage?.cropStartLocations ?: return
         val crop = GardenAPI.getCurrentlyFarmedCrop() ?: return

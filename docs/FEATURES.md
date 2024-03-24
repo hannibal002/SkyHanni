@@ -168,6 +168,12 @@ Use `/sh` or `/skyhanni` to open the SkyHanni config in game.
     + Adding a clickable message to pick up the super crafted items from sacks.
 + Added Inferno Minion Fuel pickup prevention. - Zickles (https://github.com/hannibal002/SkyHanni/pull/1103)
     + Blocks picking up the Inferno Minion or replacing the fuel inside when expensive minion fuels are in use.
++ AH Show Price Comparison. - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/339)
+    + Highlight auctions based on the difference between their estimated value and the value they are listed for.
+    + Options to change the colours
++ Highlight options in /tab. - Conutik (https://github.com/hannibal002/SkyHanni/pull/1175)
+    + Green for enabled
+    + Red for disabled
 
 </details>
 <details open><summary>
@@ -244,6 +250,8 @@ Use `/sh` or `/skyhanni` to open the SkyHanni config in game.
 + Update Timer showing when the next api data update happens.
 + Price Website button. - hannibal2
     + Adds a button to the bazaar product inventory that will open the item page in skyblock.bz.
++ Craft Materials From Bazaar. - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/1104)
+    + Show in a crafting view a shopping list of materials needed when buying from the Bazaar.
 
 </details>
 <details open><summary>
@@ -289,6 +297,11 @@ Use `/sh` or `/skyhanni` to open the SkyHanni config in game.
     + Option to warn when used bait is changed.
 + Sea Creature Tracker. - hannibal2
     + Allows to only show single variants, e.g. water or lava or winter.
++ Totem Overlay. - j10a1n15 (https://github.com/hannibal002/SkyHanni/pull/1139)
+    + Option to change the overlay distance.
+    + Option to hide Totem Particles.
+    + Option to show the effective area of a totem.
+    + Option to get reminded when a totem is about to expire.
 
 </details>
 <details open><summary>
@@ -625,6 +638,10 @@ Use `/sh` or `/skyhanni` to open the SkyHanni config in game.
 + Lane Switch Notification - ILike2WatchMemes
     + Sends a notification when approaching the end of a lane in Garden while farming.
     + Displays the distance until the end of a lane.
++ Made Rancher's Boots the stack size display account for the Cactus Knife now giving +100 speed cap while in the Garden. - Alexia Luna (https://github.com/hannibal002/SkyHanni/pull/1149)
+    + Speed cap above 500 will now display as red because Hypixel now allows this for some reason, but it is practically unachievable. Also, the 1000 speed cap will now show up as 1k, so the text doesn't overflow into the slot to the left.
++ Plot Menu Highlighting - ILike2WatchMemes (https://github.com/hannibal002/SkyHanni/pull/1181)
+    + Plot highlighting based on plot statuses (pests, active spray, current plot, locked plot)
 
 </details>
 <details open><summary>
@@ -753,6 +770,7 @@ Use `/sh` or `/skyhanni` to open the SkyHanni config in game.
     + A timer showing the remaining duration of your intelligence boost.
     + Option to show the timer when inactive rather than removing it.
 + New Year Cake Reminder. - hannibal2
++ Easter Egg Hunt 2024 waypoints. - Erymanthus + walker (https://github.com/hannibal002/SkyHanni/pull/1193)
 
 </details>
 <details open><summary>
