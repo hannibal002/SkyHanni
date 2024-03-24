@@ -10,7 +10,9 @@ import at.hannibal2.skyhanni.features.garden.GardenAPI
 import at.hannibal2.skyhanni.features.garden.GardenPlotAPI
 import at.hannibal2.skyhanni.features.garden.GardenPlotAPI.isBarn
 import at.hannibal2.skyhanni.features.garden.GardenPlotAPI.isPestCountInaccurate
+import at.hannibal2.skyhanni.features.garden.GardenPlotAPI.locked
 import at.hannibal2.skyhanni.features.garden.GardenPlotAPI.pests
+import at.hannibal2.skyhanni.features.garden.GardenPlotAPI.uncleared
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
@@ -130,7 +132,7 @@ object PestAPI {
         if (event.inventoryName != "Configure Plots") return
 
         for (plot in GardenPlotAPI.plots) {
-            if (plot.isBarn()) continue
+            if (plot.isBarn() || plot.locked || plot.uncleared) continue
             plot.pests = 0
             plot.isPestCountInaccurate = false
             val item = event.inventoryItems[plot.inventorySlot] ?: continue
