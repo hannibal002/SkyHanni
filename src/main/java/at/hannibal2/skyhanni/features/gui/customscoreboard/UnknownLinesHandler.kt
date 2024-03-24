@@ -110,6 +110,7 @@ object UnknownLinesHandler {
             SbPattern.wtfAreThoseLinesPattern,
             SbPattern.timeLeftPattern,
             SbPattern.darkAuctionCurrentItemPattern,
+            SbPattern.coldPattern,
         )
 
         unknownLines = unknownLines.filterNot { line ->

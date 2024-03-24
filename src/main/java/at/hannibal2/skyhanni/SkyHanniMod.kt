@@ -54,6 +54,7 @@ import at.hannibal2.skyhanni.data.TrackerManager
 import at.hannibal2.skyhanni.data.jsonobjects.local.FriendsJson
 import at.hannibal2.skyhanni.data.jsonobjects.local.JacobContestsJson
 import at.hannibal2.skyhanni.data.jsonobjects.local.KnownFeaturesJson
+import at.hannibal2.skyhanni.data.jsonobjects.local.VisualWordsJson
 import at.hannibal2.skyhanni.data.repo.RepoManager
 import at.hannibal2.skyhanni.events.LorenzTickEvent
 import at.hannibal2.skyhanni.events.PreInitFinishedEvent
@@ -146,6 +147,7 @@ import at.hannibal2.skyhanni.features.fishing.SeaCreatureMessageShortener
 import at.hannibal2.skyhanni.features.fishing.SharkFishCounter
 import at.hannibal2.skyhanni.features.fishing.ShowFishingItemName
 import at.hannibal2.skyhanni.features.fishing.ThunderSparksHighlight
+import at.hannibal2.skyhanni.features.fishing.TotemOfCorruption
 import at.hannibal2.skyhanni.features.fishing.tracker.FishingProfitTracker
 import at.hannibal2.skyhanni.features.fishing.tracker.SeaCreatureTracker
 import at.hannibal2.skyhanni.features.fishing.trophy.GeyserFishing
@@ -196,9 +198,11 @@ import at.hannibal2.skyhanni.features.garden.fortuneguide.CaptureFarmingGear
 import at.hannibal2.skyhanni.features.garden.inventory.AnitaExtraFarmingFortune
 import at.hannibal2.skyhanni.features.garden.inventory.GardenCropMilestoneInventory
 import at.hannibal2.skyhanni.features.garden.inventory.GardenInventoryNumbers
-import at.hannibal2.skyhanni.features.garden.inventory.GardenNextPlotPrice
-import at.hannibal2.skyhanni.features.garden.inventory.GardenPlotIcon
 import at.hannibal2.skyhanni.features.garden.inventory.SkyMartCopperPrice
+import at.hannibal2.skyhanni.features.garden.inventory.plots.GardenNextPlotPrice
+import at.hannibal2.skyhanni.features.garden.inventory.plots.GardenPlotIcon
+import at.hannibal2.skyhanni.features.garden.inventory.plots.GardenPlotMenuHighlighting
+import at.hannibal2.skyhanni.features.garden.pests.PestAPI
 import at.hannibal2.skyhanni.features.garden.pests.PestFinder
 import at.hannibal2.skyhanni.features.garden.pests.PestSpawn
 import at.hannibal2.skyhanni.features.garden.pests.PestSpawnTimer
@@ -290,6 +294,7 @@ import at.hannibal2.skyhanni.features.misc.RestorePieceOfWizardPortalLore
 import at.hannibal2.skyhanni.features.misc.ServerRestartTitle
 import at.hannibal2.skyhanni.features.misc.SkyBlockKickDuration
 import at.hannibal2.skyhanni.features.misc.SuperpairsClicksAlert
+import at.hannibal2.skyhanni.features.misc.TabWidgetSettings
 import at.hannibal2.skyhanni.features.misc.TimeFeatures
 import at.hannibal2.skyhanni.features.misc.TpsCounter
 import at.hannibal2.skyhanni.features.misc.compacttablist.AdvancedPlayerList
@@ -412,7 +417,7 @@ import org.apache.logging.log4j.Logger
     clientSideOnly = true,
     useMetadata = true,
     guiFactory = "at.hannibal2.skyhanni.config.ConfigGuiForgeInterop",
-    version = "0.24.Beta.17",
+    version = "0.24.Beta.19",
 )
 class SkyHanniMod {
 
@@ -507,6 +512,7 @@ class SkyHanniMod {
         loadModule(IsFishingDetection)
         loadModule(LorenzUtils)
         loadModule(NEUItems)
+        loadModule(PestAPI)
 
         // features
         loadModule(BazaarOrderHelper())
@@ -618,6 +624,7 @@ class SkyHanniMod {
         loadModule(TpsCounter())
         loadModule(ParticleHider())
         loadModule(MiscFeatures())
+        loadModule(GardenPlotMenuHighlighting())
         loadModule(SkyMartCopperPrice())
         loadModule(GardenVisitorFeatures())
         loadModule(NPCVisitorFix)
@@ -766,6 +773,7 @@ class SkyHanniMod {
         loadModule(LockMouseLook)
         loadModule(SensitivityReducer)
         loadModule(DungeonFinderFeatures())
+        loadModule(TabWidgetSettings())
         loadModule(PabloHelper())
         loadModule(FishingBaitWarnings())
         loadModule(CustomScoreboard())
@@ -780,6 +788,7 @@ class SkyHanniMod {
         loadModule(PresentWaypoints())
         loadModule(MiningEventTracker())
         loadModule(JyrreTimer())
+        loadModule(TotemOfCorruption())
         loadModule(NewYearCakeReminder())
         loadModule(SulphurSkitterBox())
         loadModule(HighlightInquisitors())
@@ -863,6 +872,7 @@ class SkyHanniMod {
         val friendsData: FriendsJson get() = configManager.friendsData
         val knownFeaturesData: KnownFeaturesJson get() = configManager.knownFeaturesData
         val jacobContestsData: JacobContestsJson get() = configManager.jacobContestData
+        val visualWordsData: VisualWordsJson get() = configManager.visualWordsData
 
         lateinit var repo: RepoManager
         lateinit var configManager: ConfigManager

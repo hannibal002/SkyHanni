@@ -21,6 +21,11 @@ public class DisplayConfig {
     public TitleAndFooterConfig titleAndFooter = new TitleAndFooterConfig();
 
     @Expose
+    @ConfigOption(name = "Events Options", desc = "")
+    @Accordion
+    public EventsConfig eventsConfig = new EventsConfig();
+
+    @Expose
     @ConfigOption(name = "Hide Vanilla Scoreboard", desc = "Hide the vanilla scoreboard." +
         "\n§cUsing mods that add their own scoreboard will not be affected by this setting!")
     @ConfigEditorBoolean
@@ -37,12 +42,6 @@ public class DisplayConfig {
     @ConfigOption(name = "Show unclaimed bits", desc = "Show the amount of available Bits that can still be claimed.")
     @ConfigEditorBoolean
     public boolean showUnclaimedBits = false;
-
-    @Expose
-    @ConfigOption(name = "Show all active events", desc = "Show all active events in the scoreboard instead of one.")
-    @ConfigEditorBoolean
-    public boolean showAllActiveEvents = false;
-
 
     @Expose
     @ConfigOption(name = "Show Magical Power", desc = "Show your amount of Magical Power in the scoreboard.")
