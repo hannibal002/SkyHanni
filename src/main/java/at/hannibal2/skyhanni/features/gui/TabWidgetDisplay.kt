@@ -15,7 +15,21 @@ enum class TabWidgetDisplay(val configName: String?, vararg val widgets: TabWidg
     SOULFLOW(null, TabWidget.SOULFLOW),
     COINS("Bank and Interest", TabWidget.BANK, TabWidget.INTEREST),
     SB_LEVEL("Skyblock Level", TabWidget.SB_LEVEL),
-    PROFILE(null, TabWidget.PROFILE)
+    PROFILE(null, TabWidget.PROFILE),
+    PLAYER_LIST("Players", TabWidget.PLAYER_LIST),
+    PET_TRAINING("Pet Upgrade Info", TabWidget.PET_SITTER, TabWidget.PET_TRANING),
+    STATS(null, TabWidget.SKILLS, TabWidget.DUNGEON_SKILLS_AND_STATS),
+    DUNGEON_TEAM("Dungeon Info about every person", TabWidget.DUNGEON_PARTY),
+    DUNGEON_PUZZLE("Dungeon Info about puzzles", TabWidget.DUNGEON_PUZZLE),
+    DUNGEON_OVERALL("Dungeon General Info (very long)", TabWidget.DUNGEON_STATS),
+    BESTIARY(null, TabWidget.BESTIARY),
+    DRAGON("Dragon Fight Info", TabWidget.DRAGON),
+    PROTECTOR("Protector State", TabWidget.PROTECTOR),
+    SHEN_RIFT("Shen's Auction inside the Rift", TabWidget.RIFT_SHEN),
+    MINION("Minion Info", TabWidget.MINION),
+    COLLECTION(null, TabWidget.COLLECTION),
+    TIMERS(null, TabWidget.TIMERS),
+    FIRE_SALE(null, TabWidget.FIRE_SALE)
     ;
 
     val position get() = config.displayPositions[ordinal]
