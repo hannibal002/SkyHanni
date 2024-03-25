@@ -92,7 +92,7 @@ class HypixelData {
         var bingo = false
 
         var profileName = ""
-        var joinedWorld = 0L
+        var joinedWorld = SimpleTimeMark.farPast()
 
         var skyBlockArea = "?"
 
@@ -116,6 +116,7 @@ class HypixelData {
 
         fun checkCurrentServerId() {
             if (!LorenzUtils.inSkyBlock) return
+            if (LorenzUtils.lastWorldSwitch.passedSince() < 1.seconds) return
 
             TabWidget.SERVER.matchMatcherFirstLine {
                 serverId = group("serverid")
@@ -208,7 +209,7 @@ class HypixelData {
         inLimbo = false
         inLobby = false
         locraw.forEach { locraw[it.key] = "" }
-        joinedWorld = System.currentTimeMillis()
+        joinedWorld = SimpleTimeMark.now()
         serverId = null
     }
 

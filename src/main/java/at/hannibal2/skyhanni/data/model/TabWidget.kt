@@ -282,7 +282,7 @@ enum class TabWidget(
         // language=RegExp
         "(?:§.)*Account Info"
     ),
-    DUNGEON_Stats_LINE(
+    DUNGEON_STATS_LINE(
         // language=RegExp
         "(?:§.)*Dungeon Stats"
     )
