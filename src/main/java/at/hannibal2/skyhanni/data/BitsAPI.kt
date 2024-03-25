@@ -2,6 +2,7 @@ package at.hannibal2.skyhanni.data
 
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.data.FameRanks.getFameRankByNameOrNull
+import at.hannibal2.skyhanni.events.BitsUpdateEvent
 import at.hannibal2.skyhanni.events.InventoryFullyOpenedEvent
 import at.hannibal2.skyhanni.events.LorenzChatEvent
 import at.hannibal2.skyhanni.events.ScoreboardChangeEvent
@@ -117,6 +118,7 @@ object BitsAPI {
                 if (amount > bits) {
                     bitsToClaim -= amount - bits
                     ChatUtils.debug("You have gained §3${amount - bits} Bits §7according to the scoreboard!")
+                    BitsUpdateEvent().postAndCatch()
                 }
                 bits = amount
 
@@ -133,12 +135,14 @@ object BitsAPI {
         bitsFromFameRankUpChatPattern.matchMatcher(message) {
             val amount = group("amount").formatInt()
             bitsToClaim += amount
+            BitsUpdateEvent().postAndCatch()
 
             return
         }
 
         boosterCookieAte.matchMatcher(message) {
             bitsToClaim += (defaultcookiebits * (currentFameRank?.bitsMultiplier ?: return)).toInt()
+            BitsUpdateEvent().postAndCatch()
 
             return
         }
@@ -161,7 +165,11 @@ object BitsAPI {
 
             for (line in cookieStack.getLore()) {
                 bitsAvailableMenuPattern.matchMatcher(line) {
-                    bitsToClaim = group("toClaim").formatInt()
+                    val amount = group("toClaim").formatInt()
+                    if (bitsToClaim != amount) {
+                        bitsToClaim = amount
+                        BitsUpdateEvent().postAndCatch()
+                    }
 
                     return
                 }
@@ -207,7 +215,12 @@ object BitsAPI {
 
             line@ for (line in bitsStack.getLore()) {
                 bitsAvailableMenuPattern.matchMatcher(line) {
-                    bitsToClaim = group("toClaim").formatInt()
+                    val amount = group("toClaim").formatInt()
+                    if (amount != bitsToClaim) {
+                        bitsToClaim = amount
+                        BitsUpdateEvent().postAndCatch()
+                    }
+
 
                     continue@line
                 }
