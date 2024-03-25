@@ -49,7 +49,6 @@ class MiningEventTracker {
 
     private val defaultCooldown = 1.minutes
 
-    private var lastWorldSwitch = SimpleTimeMark.farPast()
     private var eventEndTime = SimpleTimeMark.farPast()
     private var lastSentEvent: MiningEventType? = null
 
@@ -57,7 +56,6 @@ class MiningEventTracker {
 
     @SubscribeEvent
     fun onWorldChange(event: LorenzWorldChangeEvent) {
-        lastWorldSwitch = SimpleTimeMark.farPast()
         eventEndTime = SimpleTimeMark.farPast()
         lastSentEvent = null
     }
@@ -65,7 +63,7 @@ class MiningEventTracker {
     @SubscribeEvent
     fun onBossbarChange(event: BossbarUpdateEvent) {
         if (!LorenzUtils.inAdvancedMiningIsland()) return
-        if (lastWorldSwitch.passedSince() < 5.seconds) return
+        if (LorenzUtils.lastWorldSwitch.passedSince() < 5.seconds) return
         if (!eventEndTime.isInPast()) {
             return
         }
