@@ -9,7 +9,7 @@ import at.hannibal2.skyhanni.events.LorenzWorldChangeEvent
 import at.hannibal2.skyhanni.events.ReceiveParticleEvent
 import at.hannibal2.skyhanni.features.garden.GardenAPI
 import at.hannibal2.skyhanni.test.GriffinUtils.drawWaypointFilled
-import at.hannibal2.skyhanni.utils.LocationUtils.distanceToPlayer
+import at.hannibal2.skyhanni.utils.LocationUtils.distanceToPlayerIgnoreY
 import at.hannibal2.skyhanni.utils.LocationUtils.playerLocation
 import at.hannibal2.skyhanni.utils.LorenzVec
 import at.hannibal2.skyhanni.utils.RenderUtils.drawDynamicText
@@ -113,7 +113,7 @@ class PestParticleWaypoint {
     fun onTick(event: LorenzTickEvent) {
         if (!isEnabled()) return
         if (event.repeatSeconds(2)) {
-            if ((guessPoint?.distanceToPlayer() ?: 1.0) < 3.0) {
+            if ((guessPoint?.distanceToPlayerIgnoreY() ?: 1.0) < 5.0) {
                 lastPestTrackerUse = SimpleTimeMark.farPast()
                 reset()
             }
