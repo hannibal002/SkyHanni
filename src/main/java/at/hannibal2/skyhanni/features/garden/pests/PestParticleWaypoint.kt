@@ -9,10 +9,13 @@ import at.hannibal2.skyhanni.events.LorenzWorldChangeEvent
 import at.hannibal2.skyhanni.events.ReceiveParticleEvent
 import at.hannibal2.skyhanni.features.garden.GardenAPI
 import at.hannibal2.skyhanni.test.GriffinUtils.drawWaypointFilled
-import at.hannibal2.skyhanni.utils.LocationUtils.distanceToPlayerIgnoreY
+import at.hannibal2.skyhanni.utils.LocationUtils.distanceToPlayer
 import at.hannibal2.skyhanni.utils.LocationUtils.playerLocation
+import at.hannibal2.skyhanni.utils.LorenzColor
 import at.hannibal2.skyhanni.utils.LorenzVec
+import at.hannibal2.skyhanni.utils.RenderUtils.draw3DLine
 import at.hannibal2.skyhanni.utils.RenderUtils.drawDynamicText
+import at.hannibal2.skyhanni.utils.RenderUtils.exactPlayerEyeLocation
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import net.minecraft.client.Minecraft
 import net.minecraft.util.EnumParticleTypes
@@ -107,13 +110,14 @@ class PestParticleWaypoint {
         }
         event.drawWaypointFilled(waypoint, Color(255, 0, 255,100), beacon = true)
         event.drawDynamicText(waypoint, "§cPest Guess", 1.3)
+        if (config.drawLine) event.draw3DLine(event.exactPlayerEyeLocation(), waypoint, LorenzColor.AQUA.toColor(), 3, false)
     }
 
     @SubscribeEvent
     fun onTick(event: LorenzTickEvent) {
         if (!isEnabled()) return
-        if (event.repeatSeconds(2)) {
-            if ((guessPoint?.distanceToPlayerIgnoreY() ?: 1.0) < 5.0) {
+        if (event.repeatSeconds(1)) {
+            if ((guessPoint?.distanceToPlayer() ?: return) < 8.0 && lastPestTrackerUse.passedSince() > 1.seconds) {
                 lastPestTrackerUse = SimpleTimeMark.farPast()
                 reset()
             }
