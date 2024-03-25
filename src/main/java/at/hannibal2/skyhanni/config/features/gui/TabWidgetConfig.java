@@ -6,6 +6,7 @@ import at.hannibal2.skyhanni.features.gui.TabWidgetDisplay;
 import com.google.gson.annotations.Expose;
 import io.github.moulberry.moulconfig.annotations.ConfigEditorBoolean;
 import io.github.moulberry.moulconfig.annotations.ConfigEditorDraggableList;
+import io.github.moulberry.moulconfig.annotations.ConfigEditorInfoText;
 import io.github.moulberry.moulconfig.annotations.ConfigOption;
 
 import java.util.ArrayList;
@@ -20,6 +21,20 @@ public class TabWidgetConfig {
     @ConfigEditorBoolean
     @FeatureToggle
     public boolean enabled = false;
+
+    @ConfigOption(
+        name = "Not working Info",
+        desc = "If the information isn't shown in the tablist it won't show anything. Use /widget to turn on the information you need."
+    )
+    @ConfigEditorInfoText
+    public String text1;
+
+    @ConfigOption(
+        name = "Enable Info",
+        desc = "Drag only one new value at time into the list, since the default locations are all the same."
+    )
+    @ConfigEditorInfoText
+    public String text2;
 
     @Expose
     @ConfigOption(name = "Widgets", desc = "")
