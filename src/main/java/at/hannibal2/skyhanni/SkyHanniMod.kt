@@ -217,6 +217,7 @@ import at.hannibal2.skyhanni.features.garden.visitor.HighlightVisitorsOutsideOfG
 import at.hannibal2.skyhanni.features.garden.visitor.NPCVisitorFix
 import at.hannibal2.skyhanni.features.garden.visitor.VisitorAPI
 import at.hannibal2.skyhanni.features.garden.visitor.VisitorListener
+import at.hannibal2.skyhanni.features.gui.TabWidgetDisplay
 import at.hannibal2.skyhanni.features.gui.customscoreboard.CustomScoreboard
 import at.hannibal2.skyhanni.features.gui.customscoreboard.ScoreboardPattern
 import at.hannibal2.skyhanni.features.inventory.AuctionsHighlighter
@@ -732,6 +733,7 @@ class SkyHanniMod {
         loadModule(ShowMotesNpcSellPrice())
         loadModule(LivingMetalSuitProgress())
         loadModule(VampireSlayerFeatures)
+        loadModule(TabWidgetDisplay)
         loadModule(BlobbercystsHighlight())
         loadModule(LivingCaveDefenseBlocks())
         loadModule(LivingCaveLivingMetalHelper())

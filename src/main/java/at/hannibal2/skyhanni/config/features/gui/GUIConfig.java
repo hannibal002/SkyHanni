@@ -45,6 +45,11 @@ public class GUIConfig {
     public TextBoxConfig customTextBox = new TextBoxConfig();
 
     @Expose
+    @ConfigOption(name = "Tab Widget", desc = "")
+    @Accordion
+    public TabWidgetConfig tabWidget = new TabWidgetConfig();
+
+    @Expose
     @ConfigOption(name = "Real Time", desc = "Display the current computer time, a handy feature when playing in full-screen mode.")
     @ConfigEditorBoolean
     @FeatureToggle
