@@ -36,6 +36,7 @@ abstract class LorenzEvent : Event() {
         ignoreErrorCache: Boolean = false,
         onError: (Throwable) -> Unit,
     ): Boolean {
+        // Stop banned event classes from getting fired
         if (BannedClasses.isBanned(this.javaClass)) return false
 
         EventCounter.count(eventName)
@@ -44,6 +45,7 @@ abstract class LorenzEvent : Event() {
         eventHandlerDepth++
         for (listener in getListeners()) {
             val shListener = (listener as? ASMEventHandlerExt)?.target_skyhanni
+            // Stop banned listener classes from accepting events
             if (BannedClasses.isBanned(shListener?.javaClass)) {
                 continue
             }
