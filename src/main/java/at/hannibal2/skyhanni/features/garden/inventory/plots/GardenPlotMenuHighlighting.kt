@@ -7,6 +7,7 @@ import at.hannibal2.skyhanni.features.garden.GardenAPI
 import at.hannibal2.skyhanni.features.garden.GardenPlotAPI
 import at.hannibal2.skyhanni.features.garden.GardenPlotAPI.currentSpray
 import at.hannibal2.skyhanni.features.garden.GardenPlotAPI.isBeingPasted
+import at.hannibal2.skyhanni.features.garden.GardenPlotAPI.locked
 import at.hannibal2.skyhanni.features.garden.GardenPlotAPI.pests
 import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.RenderUtils.highlight
@@ -30,7 +31,7 @@ class GardenPlotMenuHighlighting {
 
             if (plot.pests >= 1 && pestsEnabled) list.add(PlotStatusType.PESTS)
             if (plot.currentSpray != null && spraysEnabled) list.add(PlotStatusType.SPRAYS)
-            if (!plot.unlocked && locksEnabled) list.add(PlotStatusType.LOCKED)
+            if (plot.locked && locksEnabled) list.add(PlotStatusType.LOCKED)
             if (plot == GardenPlotAPI.getCurrentPlot() && currentEnabled) list.add(PlotStatusType.CURRENT)
             if (plot.isBeingPasted && pastesEnabled) list.add(PlotStatusType.PASTING)
 

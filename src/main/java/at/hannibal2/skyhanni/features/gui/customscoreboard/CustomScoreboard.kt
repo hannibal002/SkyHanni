@@ -13,11 +13,14 @@
 //  - color options in the purse etc lines
 //  - choose the amount of decimal places in shorten nums
 //  - more anchor points (alignment enums in renderutils)
+//  - 24h instead of 12h for skyblock time
+//  - only alert for lines that exist longer than 1s
 //
 
 package at.hannibal2.skyhanni.features.gui.customscoreboard
 
 import at.hannibal2.skyhanni.SkyHanniMod
+import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.events.DebugDataCollectEvent
 import at.hannibal2.skyhanni.events.GuiPositionMovedEvent
 import at.hannibal2.skyhanni.events.GuiRenderEvent
@@ -91,6 +94,7 @@ class CustomScoreboard {
     companion object {
         internal val config get() = SkyHanniMod.feature.gui.customScoreboard
         internal val displayConfig get() = config.displayConfig
+        internal val eventsConfig get() = displayConfig.eventsConfig
         internal val informationFilteringConfig get() = config.informationFilteringConfig
         internal val backgroundConfig get() = config.backgroundConfig
     }
@@ -160,4 +164,9 @@ class CustomScoreboard {
 
     private fun isEnabled() = LorenzUtils.inSkyBlock && config.enabled
     private fun isHideVanillaScoreboardEnabled() = isEnabled() && config.displayConfig.hideVanillaScoreboard
+
+    @SubscribeEvent
+    fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
+        event.move(28, "gui.customscoreboard.displayConfig.showAllActiveEvents", "gui.customscoreboard.displayConfig.eventsConfig.showAllActiveEvents")
+    }
 }

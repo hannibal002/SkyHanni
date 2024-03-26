@@ -25,6 +25,7 @@ import at.hannibal2.skyhanni.utils.LorenzLogger
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.RenderUtils.exactLocation
 import at.hannibal2.skyhanni.utils.StringUtils.matches
+import at.hannibal2.skyhanni.utils.StringUtils.matches
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import net.minecraft.client.Minecraft
 import net.minecraft.client.gui.inventory.GuiContainer
@@ -75,13 +76,14 @@ class VisitorListener {
         val hasVisitorInfo = event.tabList.any { VisitorAPI.visitorCountPattern.matches(it) }
         if (!hasVisitorInfo) return
 
-        VisitorAPI.getVisitors().forEach {
-            val name = it.visitorName
-            val time = System.currentTimeMillis() - LorenzUtils.lastWorldSwitch
-            val removed = name !in visitorsInTab && time > 2_000
-            if (removed) {
-                logger.log("Removed old visitor: '$name'")
-                VisitorAPI.removeVisitor(name)
+        if (LorenzUtils.lastWorldSwitch.passedSince() > 2.seconds) {
+            VisitorAPI.getVisitors().forEach {
+                val name = it.visitorName
+                val removed = name !in visitorsInTab
+                if (removed) {
+                    logger.log("Removed old visitor: '$name'")
+                    VisitorAPI.removeVisitor(name)
+                }
             }
         }
 

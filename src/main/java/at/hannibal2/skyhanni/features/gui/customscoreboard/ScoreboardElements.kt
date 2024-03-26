@@ -30,6 +30,7 @@ import at.hannibal2.skyhanni.utils.NumberUtil.percentageColor
 import at.hannibal2.skyhanni.utils.RenderUtils.HorizontalAlignment
 import at.hannibal2.skyhanni.utils.StringUtils
 import at.hannibal2.skyhanni.utils.StringUtils.firstLetterUppercase
+import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.StringUtils.matches
 import at.hannibal2.skyhanni.utils.TabListData
 import at.hannibal2.skyhanni.utils.TimeUtils.format
@@ -223,6 +224,26 @@ enum class ScoreboardElement(
         { true },
         ""
     ),
+    EMPTY_LINE7(
+        ::getEmptyLineDisplayPair,
+        { true },
+        ""
+    ),
+    EMPTY_LINE8(
+        ::getEmptyLineDisplayPair,
+        { true },
+        ""
+    ),
+    EMPTY_LINE9(
+        ::getEmptyLineDisplayPair,
+        { true },
+        ""
+    ),
+    EMPTY_LINE10(
+        ::getEmptyLineDisplayPair,
+        { true },
+        ""
+    ),
     ;
 
     override fun toString(): String {
@@ -242,6 +263,45 @@ enum class ScoreboardElement(
     private fun isVisible(): Boolean {
         if (!informationFilteringConfig.hideIrrelevantLines) return true
         return showWhen()
+    }
+
+    companion object {
+        // I don't know why, but this field is needed for it to work
+        @JvmField
+        val defaultOption = listOf(
+            TITLE,
+            PROFILE,
+            PURSE,
+            BANK,
+            MOTES,
+            BITS,
+            COPPER,
+            NORTH_STARS,
+            HEAT,
+            COLD,
+            EMPTY_LINE,
+            ISLAND,
+            LOCATION,
+            LOBBY_CODE,
+            PLAYER_AMOUNT,
+            VISITING,
+            EMPTY_LINE2,
+            DATE,
+            TIME,
+            EVENTS,
+            OBJECTIVE,
+            COOKIE,
+            EMPTY_LINE3,
+            QUIVER,
+            POWER,
+            TUNING,
+            EMPTY_LINE4,
+            POWDER,
+            MAYOR,
+            PARTY,
+            FOOTER,
+            EXTRA
+        )
     }
 }
 
@@ -529,16 +589,32 @@ private fun getTuningDisplayPair(): List<Pair<String, HorizontalAlignment>> {
 
 private fun getPowerShowWhen() = !inAnyIsland(IslandType.THE_RIFT)
 
+private fun getCookieTime(): String? {
+    return CustomScoreboardUtils.getTablistFooter().split("\n")
+        .nextAfter("§d§lCookie Buff")
+        ?: run {
+            for (line in TabListData.getTabList()) {
+                ScoreboardPattern.boosterCookieEffectsWidgetPattern.matchMatcher(line) {
+                    return group("time")
+                }
+            }
+            null
+        }
+}
+
 private fun getCookieDisplayPair(): List<ScoreboardElementType> {
-    val timeLine = CustomScoreboardUtils.getTablistFooter().split("\n")
-        .nextAfter("§d§lCookie Buff") ?: "<hidden>"
+    val timeLine: String = getCookieTime()
+        ?: return listOf(
+            "§d§lCookie Buff" to HorizontalAlignment.LEFT,
+            " §7- §cNot active" to HorizontalAlignment.LEFT
+        )
 
     return listOf(
         "§d§lCookie Buff" to HorizontalAlignment.LEFT,
-        if (timeLine.contains("Not active"))
+        if (ScoreboardPattern.cookieNotActivePattern.matches(timeLine))
             " §7- §cNot active" to HorizontalAlignment.LEFT
         else
-            " §7- §e${timeLine.substringAfter("§d§lCookie Buff").trim()}" to HorizontalAlignment.LEFT
+            " §7- §f${timeLine}" to HorizontalAlignment.LEFT
     )
 }
 
@@ -546,10 +622,7 @@ private fun getCookieShowWhen(): Boolean {
     if (HypixelData.bingo) return false
 
     return if (informationFilteringConfig.hideEmptyLines) {
-        CustomScoreboardUtils.getTablistFooter().split("\n").any {
-            CustomScoreboardUtils.getTablistFooter().split("\n").nextAfter("§d§lCookie Buff")?.contains(it)
-                ?: false
-        }
+        getCookieTime() != null
     } else {
         true
     }
@@ -652,6 +725,7 @@ private fun getPowderShowWhen() = inAdvancedMiningIsland()
 
 private fun getEventsDisplayPair(): List<ScoreboardElementType> {
     return ScoreboardEvents.getEvent()
+        .filterNotNull()
         .flatMap { it.getLines().map { i -> i to HorizontalAlignment.LEFT } }
         .takeIf { it.isNotEmpty() } ?: listOf("<hidden>" to HorizontalAlignment.LEFT)
 }

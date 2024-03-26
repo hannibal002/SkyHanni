@@ -431,8 +431,9 @@ object GardenVisitorFeatures {
         update()
 
         logger.log("New visitor detected: '$name'")
+        val recentWorldSwitch = LorenzUtils.lastWorldSwitch.passedSince() < 2.seconds
 
-        if (config.notificationTitle && System.currentTimeMillis() > LorenzUtils.lastWorldSwitch + 2_000) {
+        if (config.notificationTitle && !recentWorldSwitch) {
             LorenzUtils.sendTitle("§eNew Visitor", 5.seconds)
         }
         if (config.notificationChat) {
@@ -440,7 +441,7 @@ object GardenVisitorFeatures {
             ChatUtils.chat("$displayName §eis visiting your garden!")
         }
 
-        if (System.currentTimeMillis() > LorenzUtils.lastWorldSwitch + 2_000) {
+        if (!recentWorldSwitch) {
             if (name.removeColor().contains("Jerry")) {
                 logger.log("Jerry!")
                 ItemBlink.setBlink(NEUItems.getItemStackOrNull("JERRY;4"), 5_000)
