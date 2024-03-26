@@ -8,6 +8,7 @@ import at.hannibal2.skyhanni.events.LorenzEvent
 import at.hannibal2.skyhanni.events.PreInitFinishedEvent
 import at.hannibal2.skyhanni.events.RepositoryReloadEvent
 import at.hannibal2.skyhanni.utils.ConditionalUtils.afterChange
+import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.StringUtils.matches
 import net.minecraft.launchwrapper.Launch
 import net.minecraftforge.fml.common.FMLCommonHandler
@@ -97,8 +98,9 @@ object RepoPatternManager {
      * Reload patterns in [usedKeys] from [regexes] or their fallbacks.
      */
     private fun reloadPatterns() {
+        val localLoading = config.forceLocal.get() || LorenzUtils.isInDevEnviromen()
         val remotePatterns =
-            if (config.forceLocal.get()) mapOf()
+            if (localLoading) mapOf()
             else regexes?.regexes ?: mapOf()
 
         for (it in usedKeys.values) {
