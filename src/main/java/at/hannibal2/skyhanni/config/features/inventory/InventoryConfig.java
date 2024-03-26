@@ -100,7 +100,6 @@ public class InventoryConfig {
         PET_LEVEL("§bPet Level", 4),
         MINION_TIER("§bMinion Tier", 5),
         CRIMSON_ARMOR("§bCrimson Armor", 6),
-        REMOVED("§7(Removed)", 7),
         KUUDRA_KEY("§bKuudra Key", 8),
         SKILL_LEVEL("§bSkill Level", 9),
         COLLECTION_LEVEL("§bCollection Level", 10),
@@ -136,6 +135,12 @@ public class InventoryConfig {
             return str;
         }
     }
+
+    @Expose
+    @ConfigOption(name = "Highlight Widgets", desc = "Highlight enabled and disabled widgets in /tab.")
+    @ConfigEditorBoolean
+    @FeatureToggle
+    public boolean highlightWidgets = true;
 
     @Expose
     @ConfigOption(name = " Vacuum Bag Cap", desc = "Cap the Garden Vacuum Bag item number display to 40.")

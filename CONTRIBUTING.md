@@ -154,7 +154,7 @@ at [DiscordRPCManager.kt](https://github.com/hannibal002/SkyHanni/blob/beta/src/
 
 We use the [auto update library](https://github.com/nea89o/libautoupdate) from nea89.
 
-## Additional Useful Developement Tools
+## Additional Useful Development Tools
 
 ### DevAuth
 

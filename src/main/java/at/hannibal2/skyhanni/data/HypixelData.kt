@@ -44,7 +44,7 @@ class HypixelData {
         private val patternGroup = RepoPattern.group("data.hypixeldata")
         private val serverIdScoreboardPattern by patternGroup.pattern(
             "serverid.scoreboard",
-            "§7\\d+/\\d+/\\d+ §8(?<servertype>[mM])(?<serverid>\\S+)"
+            "§7\\d+/\\d+/\\d+ §8(?<servertype>[mM])(?<serverid>\\S+).*"
         )
         private val serverIdTablistPattern by patternGroup.pattern(
             "serverid.tablist",
@@ -95,7 +95,7 @@ class HypixelData {
         var bingo = false
 
         var profileName = ""
-        var joinedWorld = 0L
+        var joinedWorld = SimpleTimeMark.farPast()
 
         var skyBlockArea = "?"
 
@@ -117,26 +117,32 @@ class HypixelData {
         val mode get() = locraw["mode"] ?: ""
         val map get() = locraw["map"] ?: ""
 
-        fun getCurrentServerId(): String? {
-            if (!LorenzUtils.inSkyBlock) return null
-            if (serverId != null) return serverId
+        fun checkCurrentServerId() {
+            if (!LorenzUtils.inSkyBlock) return
+            if (LorenzUtils.lastWorldSwitch.passedSince() < 1.seconds) return
+            if (!TabListData.fullyLoaded) return
 
             ScoreboardData.sidebarLinesFormatted.forEach {
                 serverIdScoreboardPattern.matchMatcher(it) {
                     val serverType = if (group("servertype") == "M") "mega" else "mini"
                     serverId = "$serverType${group("serverid")}"
-                    return serverId
+                    return
                 }
             }
 
             TabListData.getTabList().forEach {
                 serverIdTablistPattern.matchMatcher(it) {
                     serverId = group("serverid")
-                    return serverId
+                    return
                 }
             }
 
-            return serverId
+            ErrorManager.logErrorWithData(
+                Exception("NoServerId"), "Could not find server id",
+                "islandType" to LorenzUtils.skyBlockIsland,
+                "tablist" to TabListData.getTabList(),
+                "scoreboard" to ScoreboardData.sidebarLinesFormatted
+            )
         }
 
         fun getPlayersOnCurrentServer(): Int {
@@ -209,7 +215,7 @@ class HypixelData {
         inLimbo = false
         inLobby = false
         locraw.forEach { locraw[it.key] = "" }
-        joinedWorld = System.currentTimeMillis()
+        joinedWorld = SimpleTimeMark.now()
         serverId = null
     }
 
@@ -303,7 +309,7 @@ class HypixelData {
         if (inSkyBlock) {
             checkIsland()
             checkSidebar()
-            getCurrentServerId()
+            checkCurrentServerId()
         }
 
         if (inSkyBlock == skyBlock) return

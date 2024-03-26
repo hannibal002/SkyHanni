@@ -12,7 +12,6 @@ import at.hannibal2.skyhanni.events.LorenzTickEvent
 import at.hannibal2.skyhanni.events.OwnInventoryItemUpdateEvent
 import at.hannibal2.skyhanni.events.ProfileJoinEvent
 import at.hannibal2.skyhanni.events.SackDataUpdateEvent
-import at.hannibal2.skyhanni.events.SkyHanniRenderEntityEvent
 import at.hannibal2.skyhanni.events.garden.visitor.VisitorAcceptEvent
 import at.hannibal2.skyhanni.events.garden.visitor.VisitorAcceptedEvent
 import at.hannibal2.skyhanni.events.garden.visitor.VisitorArrivalEvent
@@ -90,7 +89,7 @@ class GardenVisitorFeatures {
     )
     private val visitorChatMessagePattern by patternGroup.pattern(
         "visitorchat",
-        "§e\\[NPC] (§.)?(?<name>.*)§f: §r.*"
+        "§e\\[NPC] (?<color>§.)?(?<name>.*)§f: §r.*"
     )
     private val partialAcceptedPattern by patternGroup.pattern(
         "partialaccepted",
@@ -437,8 +436,9 @@ class GardenVisitorFeatures {
         update()
 
         logger.log("New visitor detected: '$name'")
+        val recentWorldSwitch = LorenzUtils.lastWorldSwitch.passedSince() < 2.seconds
 
-        if (config.notificationTitle && System.currentTimeMillis() > LorenzUtils.lastWorldSwitch + 2_000) {
+        if (config.notificationTitle && !recentWorldSwitch) {
             LorenzUtils.sendTitle("§eNew Visitor", 5.seconds)
         }
         if (config.notificationChat) {
@@ -446,7 +446,7 @@ class GardenVisitorFeatures {
             ChatUtils.chat("$displayName §eis visiting your garden!")
         }
 
-        if (System.currentTimeMillis() > LorenzUtils.lastWorldSwitch + 2_000) {
+        if (!recentWorldSwitch) {
             if (name.removeColor().contains("Jerry")) {
                 logger.log("Jerry!")
                 ItemBlink.setBlink(NEUItems.getItemStackOrNull("JERRY;4"), 5_000)
@@ -476,8 +476,10 @@ class GardenVisitorFeatures {
     }
 
     private fun hideVisitorMessage(message: String) = visitorChatMessagePattern.matchMatcher(message) {
+        val color = group("color")
+        if (color == null || color == "§e") return false // Non-visitor NPC, probably Jacob
+
         val name = group("name")
-        if (name == "Jacob") return false
         if (name == "Spaceman") return false
         if (name == "Beth") return false
 
