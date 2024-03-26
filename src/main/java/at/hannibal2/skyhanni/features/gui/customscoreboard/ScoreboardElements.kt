@@ -30,6 +30,7 @@ import at.hannibal2.skyhanni.utils.NumberUtil.percentageColor
 import at.hannibal2.skyhanni.utils.RenderUtils.HorizontalAlignment
 import at.hannibal2.skyhanni.utils.StringUtils
 import at.hannibal2.skyhanni.utils.StringUtils.firstLetterUppercase
+import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.StringUtils.matches
 import at.hannibal2.skyhanni.utils.TabListData
 import at.hannibal2.skyhanni.utils.TimeUtils.format
@@ -588,16 +589,32 @@ private fun getTuningDisplayPair(): List<Pair<String, HorizontalAlignment>> {
 
 private fun getPowerShowWhen() = !inAnyIsland(IslandType.THE_RIFT)
 
+private fun getCookieTime(): String? {
+    return CustomScoreboardUtils.getTablistFooter().split("\n")
+        .nextAfter("§d§lCookie Buff")
+        ?: run {
+            for (line in TabListData.getTabList()) {
+                ScoreboardPattern.boosterCookieEffectsWidgetPattern.matchMatcher(line) {
+                    return group("time")
+                }
+            }
+            null
+        }
+}
+
 private fun getCookieDisplayPair(): List<ScoreboardElementType> {
-    val timeLine = CustomScoreboardUtils.getTablistFooter().split("\n")
-        .nextAfter("§d§lCookie Buff") ?: "<hidden>"
+    val timeLine: String = getCookieTime()
+        ?: return listOf(
+            "§d§lCookie Buff" to HorizontalAlignment.LEFT,
+            " §7- §cNot active" to HorizontalAlignment.LEFT
+        )
 
     return listOf(
         "§d§lCookie Buff" to HorizontalAlignment.LEFT,
-        if (timeLine.contains("Not active"))
+        if (ScoreboardPattern.cookieNotActivePattern.matches(timeLine))
             " §7- §cNot active" to HorizontalAlignment.LEFT
         else
-            " §7- §e${timeLine.substringAfter("§d§lCookie Buff").trim()}" to HorizontalAlignment.LEFT
+            " §7- §f${timeLine}" to HorizontalAlignment.LEFT
     )
 }
 
@@ -605,10 +622,7 @@ private fun getCookieShowWhen(): Boolean {
     if (HypixelData.bingo) return false
 
     return if (informationFilteringConfig.hideEmptyLines) {
-        CustomScoreboardUtils.getTablistFooter().split("\n").any {
-            CustomScoreboardUtils.getTablistFooter().split("\n").nextAfter("§d§lCookie Buff")?.contains(it)
-                ?: false
-        }
+        getCookieTime() != null
     } else {
         true
     }

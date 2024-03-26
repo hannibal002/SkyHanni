@@ -13,6 +13,8 @@
 //  - color options in the purse etc lines
 //  - choose the amount of decimal places in shorten nums
 //  - more anchor points (alignment enums in renderutils)
+//  - 24h instead of 12h for skyblock time
+//  - only alert for lines that exist longer than 1s
 //
 
 package at.hannibal2.skyhanni.features.gui.customscoreboard
