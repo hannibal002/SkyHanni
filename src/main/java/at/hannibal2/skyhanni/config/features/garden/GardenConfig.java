@@ -233,4 +233,7 @@ public class GardenConfig {
     @ConfigEditorBoolean
     @FeatureToggle
     public boolean copyMilestoneData = true;
+
+    @Expose
+    public Position logBookStatsPos = new Position(427, 92, false, true);
 }
