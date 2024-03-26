@@ -6,6 +6,7 @@ import at.hannibal2.skyhanni.events.ItemClickEvent
 import at.hannibal2.skyhanni.events.LorenzRenderWorldEvent
 import at.hannibal2.skyhanni.events.LorenzTickEvent
 import at.hannibal2.skyhanni.events.LorenzWorldChangeEvent
+import at.hannibal2.skyhanni.events.PacketEvent
 import at.hannibal2.skyhanni.events.ReceiveParticleEvent
 import at.hannibal2.skyhanni.features.garden.GardenAPI
 import at.hannibal2.skyhanni.features.garden.GardenPlotAPI
@@ -19,6 +20,7 @@ import at.hannibal2.skyhanni.utils.RenderUtils.drawDynamicText
 import at.hannibal2.skyhanni.utils.RenderUtils.exactPlayerEyeLocation
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import net.minecraft.client.Minecraft
+import net.minecraft.network.play.server.S0EPacketSpawnObject
 import net.minecraft.util.EnumParticleTypes
 import net.minecraftforge.fml.common.eventhandler.EventPriority
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
@@ -85,11 +87,18 @@ class PestParticleWaypoint {
         } else {
             val firstDistance = secondParticlePoint?.let { firstParticlePoint?.distance(it) } ?: return
             val distance = lastParticlePoint?.distance(location) ?: return
-            if ((distance-firstDistance).absoluteValue > 0.1) return
+            if ((distance - firstDistance).absoluteValue > 0.1) return
             lastParticlePoint = location
             locations.add(location)
         }
         ++particles
+    }
+
+    @SubscribeEvent
+    fun onFireWorkSpawn(event: PacketEvent.ReceiveEvent) {
+        if (event.packet !is S0EPacketSpawnObject) return
+        if (!GardenAPI.inGarden() || !config.hideParticles) return
+        if (event.packet.type == 76) event.cancel() // 76 is id for Fireworks
     }
 
     @SubscribeEvent
@@ -113,14 +122,21 @@ class PestParticleWaypoint {
         val color = if (isCloseToPlotCenter) LorenzColor.RED else LorenzColor.GREEN
         event.drawWaypointFilled(waypoint, color.toColor(), beacon = true)
         event.drawDynamicText(waypoint, text, 1.3)
-        if (config.drawLine) event.draw3DLine(event.exactPlayerEyeLocation(), waypoint, LorenzColor.AQUA.toColor(), 3, false)
+        if (config.drawLine) event.draw3DLine(
+            event.exactPlayerEyeLocation(),
+            waypoint,
+            LorenzColor.AQUA.toColor(),
+            3,
+            false
+        )
     }
 
     @SubscribeEvent
     fun onTick(event: LorenzTickEvent) {
         if (!isEnabled()) return
         if (lastPestTrackerUse.passedSince() < 1.seconds ||
-            lastPestTrackerUse.passedSince() > config.showWaypointForSeconds.seconds) return
+            lastPestTrackerUse.passedSince() > config.showWaypointForSeconds.seconds
+        ) return
         if ((guessPoint?.distanceToPlayer() ?: return) < 8.0) {
             lastPestTrackerUse = SimpleTimeMark.farPast()
             reset()
@@ -128,15 +144,15 @@ class PestParticleWaypoint {
     }
 
     private fun getWaypoint(list: MutableList<LorenzVec>): LorenzVec {
-        var pos = LorenzVec(0.0,0.0,0.0)
+        var pos = LorenzVec(0.0, 0.0, 0.0)
 
         val firstParticle = firstParticlePoint
         if (firstParticle?.x == null) return pos
 
         for ((i, particle) in list.withIndex()) {
-            pos = pos.add((particle.subtract(firstParticle)).divide(i.toDouble()+1.0))
+            pos = pos.add((particle.subtract(firstParticle)).divide(i.toDouble() + 1.0))
         }
-        pos = firstParticle.add(pos.multiply(120.0/list.size))
+        pos = firstParticle.add(pos.multiply(120.0 / list.size))
 
         return pos
     }
