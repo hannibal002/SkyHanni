@@ -429,6 +429,6 @@ object ScoreboardPattern {
     )
     val cookieNotActivePattern by tablistGroup.pattern(
         "cookienotactive",
-        "Not active|§c§lINACTIVE"
+        "((?:§.)*Not active.*)|(§c§lINACTIVE)"
     )
 }
