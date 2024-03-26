@@ -31,6 +31,7 @@ import at.hannibal2.skyhanni.utils.RenderUtils.HorizontalAlignment
 import at.hannibal2.skyhanni.utils.RenderUtils.renderStringsAlignedWidth
 import at.hannibal2.skyhanni.utils.StringUtils.firstLetterUppercase
 import at.hannibal2.skyhanni.utils.TabListData
+import com.google.gson.JsonPrimitive
 import net.minecraftforge.client.GuiIngameForge
 import net.minecraftforge.client.event.RenderGameOverlayEvent
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
@@ -167,6 +168,12 @@ class CustomScoreboard {
 
     @SubscribeEvent
     fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
-        event.move(28, "gui.customscoreboard.displayConfig.showAllActiveEvents", "gui.customscoreboard.displayConfig.eventsConfig.showAllActiveEvents")
+        val prefix = "gui.customscoreboard.displayConfig"
+        event.move(28, "$prefix.showAllActiveEvents", "$prefix.eventsConfig.showAllActiveEvents")
+        event.transform(30, "$prefix.eventsConfig.eventEntries") { element ->
+            val array = element.asJsonArray
+            array.add(JsonPrimitive(ScoreboardEvents.HOT_DOG_CONTEST.toString()))
+            array
+        }
     }
 }
