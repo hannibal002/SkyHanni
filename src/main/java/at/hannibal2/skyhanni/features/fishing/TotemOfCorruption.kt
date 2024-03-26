@@ -65,7 +65,7 @@ class TotemOfCorruption {
     }
 
     @SubscribeEvent
-    fun onChatPacket(event: ReceiveParticleEvent) {
+    fun onReceiveParticle(event: ReceiveParticleEvent) {
         if (!isHideParticlesEnabled()) return
 
         for (totem in totems) {

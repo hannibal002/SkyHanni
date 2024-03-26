@@ -48,6 +48,8 @@ import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getRanchersSpeed
 import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
+import com.google.gson.JsonArray
+import com.google.gson.JsonElement
 import net.minecraft.item.ItemStack
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
@@ -282,6 +284,19 @@ object ItemDisplayOverlayFeatures {
         event.transform(11, "inventory.itemNumberAsStackSize") { element ->
             ConfigUtils.migrateIntArrayListToEnumArrayList(element, ItemNumberEntry::class.java)
         }
+        event.transform(29, "inventory.itemNumberAsStackSize") { element ->
+            fixRemovedConfigElement(element)
+        }
+    }
+
+    private fun fixRemovedConfigElement(data: JsonElement): JsonElement {
+        if (!data.isJsonArray) return data
+        val newList = JsonArray()
+        for (element in data.asJsonArray) {
+            if (element.asString == "REMOVED") continue
+            newList.add(element)
+        }
+        return newList
     }
 
     fun ItemNumberEntry.isSelected() = config.itemNumberAsStackSize.contains(this)
