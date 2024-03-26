@@ -623,9 +623,7 @@ private fun getCookieShowWhen(): Boolean {
 
     return if (informationFilteringConfig.hideEmptyLines) {
         getCookieTime() != null
-    } else {
-        true
-    }
+    } else true
 }
 
 private fun getObjectiveDisplayPair() = buildList {
