@@ -25,7 +25,6 @@ import at.hannibal2.skyhanni.utils.LorenzLogger
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.RenderUtils.exactLocation
 import at.hannibal2.skyhanni.utils.StringUtils.matches
-import at.hannibal2.skyhanni.utils.StringUtils.matches
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import net.minecraft.client.Minecraft
 import net.minecraft.client.gui.inventory.GuiContainer
@@ -71,11 +70,11 @@ class VisitorListener {
     @SubscribeEvent
     fun onTabListUpdate(event: TabListUpdateEvent) {
         if (!GardenAPI.inGarden()) return
-        val visitorsInTab = VisitorAPI.visitorsInTabList(event.tabList)
 
         val hasVisitorInfo = event.tabList.any { VisitorAPI.visitorCountPattern.matches(it) }
         if (!hasVisitorInfo) return
 
+        val visitorsInTab = VisitorAPI.visitorsInTabList(event.tabList)
         if (LorenzUtils.lastWorldSwitch.passedSince() > 2.seconds) {
             VisitorAPI.getVisitors().forEach {
                 val name = it.visitorName
