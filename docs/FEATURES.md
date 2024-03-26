@@ -642,6 +642,11 @@ Use `/sh` or `/skyhanni` to open the SkyHanni config in game.
     + Speed cap above 500 will now display as red because Hypixel now allows this for some reason, but it is practically unachievable. Also, the 1000 speed cap will now show up as 1k, so the text doesn't overflow into the slot to the left.
 + Plot Menu Highlighting - ILike2WatchMemes (https://github.com/hannibal002/SkyHanni/pull/1181)
     + Plot highlighting based on plot statuses (pests, active spray, current plot, locked plot)
++ Pest Waypoint. - Empa + hannibal2 + Thunderblade73 (https://github.com/hannibal002/SkyHanni/pull/1268)
+    + Show a waypoint of the next pest when using a vacuum. Only points to the center of the plot the pest is in, if too far away.
+    + Uses the particles and math to detect the location from everywhere in the garden.
+    + Option to draw a line to waypoint.
+    + Option to change the number of seconds until the waypoint will disappear.
 
 </details>
 <details open><summary>
