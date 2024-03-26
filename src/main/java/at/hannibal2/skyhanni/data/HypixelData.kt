@@ -17,6 +17,7 @@ import at.hannibal2.skyhanni.utils.LorenzLogger
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
+import at.hannibal2.skyhanni.utils.StringUtils.matches
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.TabListData
 import at.hannibal2.skyhanni.utils.UtilsPatterns
@@ -53,6 +54,30 @@ class HypixelData {
             "lobbytype",
             "(?<lobbyType>.*lobby)\\d+"
         )
+        private val playerAmountPattern by patternGroup.pattern(
+            "playeramount",
+            "^\\s*(?:§.)+Players (?:§.)+\\((?<amount>\\d+)\\)\\s*$"
+        )
+        private val playerAmountCoopPattern by patternGroup.pattern(
+            "playeramount.coop",
+            "^\\s*(?:§.)*Coop (?:§.)*\\((?<amount>\\d+)\\)\\s*$"
+        )
+        private val playerAmountGuestingPattern by patternGroup.pattern(
+            "playeramount.guesting",
+            "^\\s*(?:§.)*Guests (?:§.)*\\((?<amount>\\d+)\\)\\s*$"
+        )
+        private val soloProfileAmountPattern by patternGroup.pattern(
+            "solo.profile.amount",
+            "^\\s*(?:§.)*Island\\s*$"
+        )
+        private val scoreboardVisitingAmoutPattern by patternGroup.pattern(
+            "scoreboard.visiting.amount",
+            "\\s+§.✌ §.\\(§.(?<currentamount>\\d+)§.\\/(?<maxamount>\\d+)\\)"
+        )
+        private val guestPattern by patternGroup.pattern(
+            "guesting.scoreboard",
+            "SKYBLOCK GUEST"
+        )
 
         var hypixelLive = false
         var hypixelAlpha = false
@@ -70,7 +95,7 @@ class HypixelData {
         var bingo = false
 
         var profileName = ""
-        var joinedWorld = 0L
+        var joinedWorld = SimpleTimeMark.farPast()
 
         var skyBlockArea = "?"
 
@@ -92,26 +117,61 @@ class HypixelData {
         val mode get() = locraw["mode"] ?: ""
         val map get() = locraw["map"] ?: ""
 
-        fun getCurrentServerId(): String? {
-            if (!LorenzUtils.inSkyBlock) return null
-            if (serverId != null) return serverId
+        fun checkCurrentServerId() {
+            if (!LorenzUtils.inSkyBlock) return
+            if (LorenzUtils.lastWorldSwitch.passedSince() < 1.seconds) return
 
             ScoreboardData.sidebarLinesFormatted.forEach {
                 serverIdScoreboardPattern.matchMatcher(it) {
                     val serverType = if (group("servertype") == "M") "mega" else "mini"
                     serverId = "$serverType${group("serverid")}"
-                    return serverId
+                    return
                 }
             }
 
             TabListData.getTabList().forEach {
                 serverIdTablistPattern.matchMatcher(it) {
                     serverId = group("serverid")
-                    return serverId
+                    return
                 }
             }
 
-            return serverId
+            ErrorManager.logErrorWithData(
+                Exception("NoServerId"), "Could not find server id",
+                "islandType" to LorenzUtils.skyBlockIsland,
+                "tablist" to TabListData.getTabList(),
+                "scoreboard" to ScoreboardData.sidebarLinesFormatted
+            )
+        }
+
+        fun getPlayersOnCurrentServer(): Int {
+            var amount = 0
+            val playerPatternList = listOf(
+                playerAmountPattern,
+                playerAmountCoopPattern,
+                playerAmountGuestingPattern
+            )
+
+            out@for (pattern in playerPatternList) {
+                for (line in TabListData.getTabList()) {
+                    pattern.matchMatcher(line) {
+                        amount += group("amount").toInt()
+                        continue@out
+                    }
+                }
+            }
+            amount += TabListData.getTabList().count { soloProfileAmountPattern.matches(it) }
+
+            return amount
+        }
+
+        fun getMaxPlayersForCurrentServer(): Int {
+            for (line in ScoreboardData.sidebarLinesFormatted) {
+                scoreboardVisitingAmoutPattern.matchMatcher(line) {
+                    return group("maxamount").toInt()
+                }
+            }
+            return if (serverId?.startsWith("mega") == true) 80 else 26
         }
 
         // This code is modified from NEU, and depends on NEU (or another mod) sending /locraw.
@@ -154,7 +214,7 @@ class HypixelData {
         inLimbo = false
         inLobby = false
         locraw.forEach { locraw[it.key] = "" }
-        joinedWorld = System.currentTimeMillis()
+        joinedWorld = SimpleTimeMark.now()
         serverId = null
     }
 
@@ -248,6 +308,7 @@ class HypixelData {
         if (inSkyBlock) {
             checkIsland()
             checkSidebar()
+            checkCurrentServerId()
         }
 
         if (inSkyBlock == skyBlock) return
@@ -299,7 +360,6 @@ class HypixelData {
 
     private fun checkIsland() {
         var newIsland = ""
-        var guesting = false
         TabListData.fullyLoaded = false
 
         for (line in TabListData.getTabList()) {
@@ -307,11 +367,10 @@ class HypixelData {
                 newIsland = group("island").removeColor()
                 TabListData.fullyLoaded = true
             }
-            if (line == " Status: §r§9Guest") {
-                guesting = true
-            }
         }
 
+        // Can not use color coding, because of the color effect (§f§lSKYB§6§lL§e§lOCK§A§L GUEST)
+        val guesting = guestPattern.matches(ScoreboardData.objectiveTitle.removeColor())
         val islandType = getIslandType(newIsland, guesting)
         if (skyBlockIsland != islandType) {
             IslandChangeEvent(islandType, skyBlockIsland).postAndCatch()
@@ -325,8 +384,8 @@ class HypixelData {
         }
     }
 
-    private fun getIslandType(newIsland: String, guesting: Boolean): IslandType {
-        val islandType = IslandType.getByNameOrUnknown(newIsland)
+    private fun getIslandType(name: String, guesting: Boolean): IslandType {
+        val islandType = IslandType.getByNameOrUnknown(name)
         if (guesting) {
             if (islandType == IslandType.PRIVATE_ISLAND) return IslandType.PRIVATE_ISLAND_GUEST
             if (islandType == IslandType.GARDEN) return IslandType.GARDEN_GUEST

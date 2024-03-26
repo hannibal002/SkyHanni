@@ -33,8 +33,8 @@ class GardenVisitorTimer {
     private val config get() = GardenAPI.config.visitors.timer
 
     private val timePattern by RepoPattern.pattern(
-        "garden.visitor.timer.time",
-        "§b§lVisitors: §r§f\\((?<time>.*)\\)"
+        "garden.visitor.timer.time.new",
+        " Next Visitor: §r(?<info>.*)"
     )
 
     private var display = ""
@@ -95,23 +95,19 @@ class GardenVisitorTimer {
         var visitorInterval = visitorInterval ?: return
         var millis = visitorInterval
         var queueFull = false
-        for (line in TabListData.getTabList()) {
-            if (line == "§b§lVisitors: §r§f(§r§c§lQueue Full!§r§f)") {
-                queueFull = true
-                continue
-            }
-            if (line == "§b§lVisitors: §r§f(§r§cNot Unlocked!§r§f)") {
-                display = ""
-                return
-            }
-
+        loop@ for (line in TabListData.getTabList()) {
             timePattern.matchMatcher(line) {
-                val rawTime = group("time").removeColor()
-                if (lastTimerValue != rawTime) {
-                    lastTimerUpdate = SimpleTimeMark.now()
-                    lastTimerValue = rawTime
+                val timeInfo = group("info").removeColor()
+                if (timeInfo == "Queue Full!") {
+                    queueFull = true
+                    break@loop
                 }
-                millis = TimeUtils.getDuration(rawTime)
+                if (lastTimerValue != timeInfo) {
+                    lastTimerUpdate = SimpleTimeMark.now()
+                    lastTimerValue = timeInfo
+                }
+                millis = TimeUtils.getDuration(timeInfo)
+                break@loop
             }
         }
 
@@ -206,7 +202,7 @@ class GardenVisitorTimer {
     }
 
     @SubscribeEvent
-    fun onBlockBreak(event: CropClickEvent) {
+    fun onCropClick(event: CropClickEvent) {
         if (!isEnabled()) return
         sixthVisitorArrivalTime -= 100.milliseconds
 

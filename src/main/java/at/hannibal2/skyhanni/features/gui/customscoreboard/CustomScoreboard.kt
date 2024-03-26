@@ -9,16 +9,17 @@
 //  - countdown events like fishing festival + fiesta when its not on tablist
 //  - CookieAPI https://discord.com/channels/997079228510117908/1162844830360146080/1195695210433351821
 //  - Rng meter display
-//  - shorten time till next mayor https://discord.com/channels/997079228510117908/1162844830360146080/1216440046320746596
 //  - option to hide coins earned
 //  - color options in the purse etc lines
 //  - choose the amount of decimal places in shorten nums
-//  - very important bug fix: duplex is weird :(
+//  - more anchor points (alignment enums in renderutils)
 //
 
 package at.hannibal2.skyhanni.features.gui.customscoreboard
 
 import at.hannibal2.skyhanni.SkyHanniMod
+import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
+import at.hannibal2.skyhanni.events.DebugDataCollectEvent
 import at.hannibal2.skyhanni.events.GuiPositionMovedEvent
 import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.LorenzTickEvent
@@ -26,6 +27,7 @@ import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.RenderUtils.HorizontalAlignment
 import at.hannibal2.skyhanni.utils.RenderUtils.renderStringsAlignedWidth
+import at.hannibal2.skyhanni.utils.StringUtils.firstLetterUppercase
 import at.hannibal2.skyhanni.utils.TabListData
 import net.minecraftforge.client.GuiIngameForge
 import net.minecraftforge.client.event.RenderGameOverlayEvent
@@ -52,7 +54,11 @@ class CustomScoreboard {
             } else {
                 display
             }
-        config.position.renderStringsAlignedWidth(render, posLabel = guiName)
+        config.position.renderStringsAlignedWidth(
+            render,
+            posLabel = guiName,
+            extraSpace = displayConfig.lineSpacing - 10
+        )
     }
 
     @SubscribeEvent
@@ -73,7 +79,7 @@ class CustomScoreboard {
 
         // Creating the lines
         if (event.isMod(5)) {
-            display = createLines()
+            display = createLines().removeEmptyLinesFromEdges()
             if (TabListData.fullyLoaded) {
                 cache = display.toList()
             }
@@ -86,35 +92,46 @@ class CustomScoreboard {
     companion object {
         internal val config get() = SkyHanniMod.feature.gui.customScoreboard
         internal val displayConfig get() = config.displayConfig
+        internal val eventsConfig get() = displayConfig.eventsConfig
         internal val informationFilteringConfig get() = config.informationFilteringConfig
         internal val backgroundConfig get() = config.backgroundConfig
     }
 
     private fun createLines() = buildList<ScoreboardElementType> {
         for (element in config.scoreboardEntries) {
-            val line = element.getVisiblePair()
+            val lines = element.getVisiblePair()
+            if (lines.isEmpty()) continue
 
             // Hide consecutive empty lines
             if (
-                config.informationFilteringConfig.hideConsecutiveEmptyLines &&
-                line.isNotEmpty() && line[0].first == "<empty>" && lastOrNull()?.first?.isEmpty() == true
+                informationFilteringConfig.hideConsecutiveEmptyLines &&
+                lines.first().first == "<empty>" && lastOrNull()?.first?.isEmpty() == true
             ) {
                 continue
             }
 
             // Adds empty lines
-            if (line[0].first == "<empty>") {
+            if (lines.first().first == "<empty>") {
                 add("" to HorizontalAlignment.LEFT)
                 continue
             }
 
             // Does not display this line
-            if (line.any { it.first == "<hidden>" }) {
+            if (lines.any { it.first == "<hidden>" }) {
                 continue
             }
 
-            addAll(line)
+            addAll(lines)
         }
+    }
+
+    private fun List<ScoreboardElementType>.removeEmptyLinesFromEdges(): List<ScoreboardElementType> {
+        if (config.informationFilteringConfig.hideEmptyLinesAtTopAndBottom) {
+            return this
+                .dropWhile { it.first.isEmpty() }
+                .dropLastWhile { it.first.isEmpty() }
+        }
+        return this
     }
 
     // Thank you Apec for showing that the ElementType of the stupid scoreboard is FUCKING HELMET WTF
@@ -125,6 +142,29 @@ class CustomScoreboard {
         }
     }
 
+    @SubscribeEvent
+    fun onDebugDataCollect(event: DebugDataCollectEvent) {
+        event.title("Custom Scoreboard")
+        event.addIrrelevant {
+            if (!config.enabled) {
+                add("Custom Scoreboard disabled.")
+            } else {
+                ScoreboardElement.entries.map { element ->
+                    add(
+                        "${element.name.firstLetterUppercase()} - " +
+                            "${element.showWhen.invoke()} - " +
+                            "${element.getVisiblePair().map { it.first }}"
+                    )
+                }
+            }
+        }
+    }
+
     private fun isEnabled() = LorenzUtils.inSkyBlock && config.enabled
     private fun isHideVanillaScoreboardEnabled() = isEnabled() && config.displayConfig.hideVanillaScoreboard
+
+    @SubscribeEvent
+    fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
+        event.move(28, "gui.customscoreboard.displayConfig.showAllActiveEvents", "gui.customscoreboard.displayConfig.eventsConfig.showAllActiveEvents")
+    }
 }

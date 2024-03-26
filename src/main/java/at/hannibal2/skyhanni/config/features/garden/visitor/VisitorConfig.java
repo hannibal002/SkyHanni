@@ -78,12 +78,6 @@ public class VisitorConfig {
     }
 
     @Expose
-    @ConfigOption(name = "Colored Name", desc = "Show the visitor name in the color of the rarity.")
-    @ConfigEditorBoolean
-    @FeatureToggle
-    public boolean coloredName = true;
-
-    @Expose
     @ConfigOption(name = "Hypixel Message", desc = "Hide the chat message from Hypixel that a new visitor has arrived at your garden.")
     @ConfigEditorBoolean
     @FeatureToggle

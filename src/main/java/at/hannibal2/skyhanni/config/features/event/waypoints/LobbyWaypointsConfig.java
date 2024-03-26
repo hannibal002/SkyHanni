@@ -7,6 +7,11 @@ import io.github.moulberry.moulconfig.annotations.ConfigOption;
 public class LobbyWaypointsConfig {
 
     @Expose
+    @ConfigOption(name = "Easter Egg Waypoints", desc = "")
+    @Accordion
+    public EasterEggConfig easterEgg = new EasterEggConfig();
+
+    @Expose
     @ConfigOption(name = "Halloween Basket Waypoints", desc = "")
     @Accordion
     public HalloweenBasketConfig halloweenBasket = new HalloweenBasketConfig();

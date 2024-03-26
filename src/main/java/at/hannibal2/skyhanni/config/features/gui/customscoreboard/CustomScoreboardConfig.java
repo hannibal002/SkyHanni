@@ -28,17 +28,12 @@ public class CustomScoreboardConfig {
         desc = "Drag text to change the appearance of the advanced scoreboard." // supporting both custom & advanced search
     )
     @ConfigEditorDraggableList()
-    public List<ScoreboardElement> scoreboardEntries = new ArrayList<>(ScoreboardElement.getEntries());
+    public List<ScoreboardElement> scoreboardEntries = new ArrayList<>(ScoreboardElement.defaultOption);
 
     @Expose
     @ConfigOption(name = "Display Options", desc = "")
     @Accordion
     public DisplayConfig displayConfig = new DisplayConfig();
-
-    @Expose
-    @ConfigOption(name = "Information Filtering", desc = "")
-    @Accordion
-    public InformationFilteringConfig informationFilteringConfig = new InformationFilteringConfig();
 
     @Expose
     @ConfigOption(name = "Background Options", desc = "")
@@ -54,6 +49,12 @@ public class CustomScoreboardConfig {
     @ConfigOption(name = "Mayor Options", desc = "")
     @Accordion
     public MayorConfig mayorConfig = new MayorConfig();
+
+    @Expose
+    @ConfigOption(name = "Information Filtering", desc = "")
+    @Accordion
+    public InformationFilteringConfig informationFilteringConfig = new InformationFilteringConfig();
+
 
     @Expose
     @ConfigOption(name = "Unknown Lines warning", desc = "Gives a chat warning when unknown lines are found in the scoreboard.")
