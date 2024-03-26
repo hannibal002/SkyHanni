@@ -9,7 +9,6 @@ import at.hannibal2.skyhanni.events.LorenzWorldChangeEvent
 import at.hannibal2.skyhanni.events.PacketEvent
 import at.hannibal2.skyhanni.events.ReceiveParticleEvent
 import at.hannibal2.skyhanni.features.garden.GardenAPI
-import at.hannibal2.skyhanni.features.garden.GardenPlotAPI
 import at.hannibal2.skyhanni.test.GriffinUtils.drawWaypointFilled
 import at.hannibal2.skyhanni.utils.LocationUtils.distanceToPlayer
 import at.hannibal2.skyhanni.utils.LocationUtils.playerLocation
@@ -40,6 +39,7 @@ class PestParticleWaypoint {
     private var locations = mutableListOf<LorenzVec>()
     private var particles = 0
     private var lastParticles = 0
+    private var isPointingToPest = false
 
     @SubscribeEvent
     fun onItemClick(event: ItemClickEvent) {
@@ -71,8 +71,15 @@ class PestParticleWaypoint {
     @SubscribeEvent(priority = EventPriority.LOW, receiveCanceled = true)
     fun onReceiveParticle(event: ReceiveParticleEvent) {
         if (!isEnabled()) return
-        if (event.type != EnumParticleTypes.REDSTONE) return
+        if (event.type != EnumParticleTypes.REDSTONE || event.speed != 1f) return
+
+        isPointingToPest = when (event.offset) {
+            LorenzVec(0.8, 0.0, 0.0) -> false
+            LorenzVec(0.8, 0.4, 0.0) -> true
+            else -> return
+        }
         val location = event.location
+
         if (config.hideParticles) event.cancel()
         if (lastPestTrackerUse.passedSince() > 3.seconds) return
 
@@ -112,11 +119,9 @@ class PestParticleWaypoint {
         }
 
         val waypoint = getWaypoint() ?: return
-        val distance = GardenPlotAPI.closestCenterPlot(waypoint)?.distanceIgnoreY(waypoint) ?: return
-        val isCloseToPlotCenter = distance < 4
 
-        val text = if (isCloseToPlotCenter) "§cInfected Plot Guess" else "§aPest Guess"
-        val color = if (isCloseToPlotCenter) LorenzColor.RED else LorenzColor.GREEN
+        val text = if (isPointingToPest) "§aPest Guess" else "§cInfected Plot Guess"
+        val color = if (isPointingToPest) LorenzColor.GREEN else LorenzColor.RED
 
         event.drawWaypointFilled(waypoint, color.toColor(), beacon = true)
         event.drawDynamicText(waypoint, text, 1.3)
