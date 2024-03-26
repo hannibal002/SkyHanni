@@ -58,6 +58,8 @@ object RepoPatternManager {
             }
         }
 
+    val localLoading: Boolean get() = config.forceLocal.get() || LorenzUtils.isInDevEnviromen()
+
     /**
      * Crash if in a development environment, or if inside a guarded event handler.
      */
@@ -98,7 +100,6 @@ object RepoPatternManager {
      * Reload patterns in [usedKeys] from [regexes] or their fallbacks.
      */
     private fun reloadPatterns() {
-        val localLoading = config.forceLocal.get() || LorenzUtils.isInDevEnviromen()
         val remotePatterns =
             if (localLoading) mapOf()
             else regexes?.regexes ?: mapOf()
