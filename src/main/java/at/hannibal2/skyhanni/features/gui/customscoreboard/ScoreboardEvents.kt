@@ -177,7 +177,7 @@ enum class ScoreboardEvents(
                     }
                 }
             } else {
-                add(eventsConfig.eventEntries.firstOrNull { it.showWhen() })
+                add(eventsConfig.eventEntries.firstOrNull { it.showWhen() && it.getLines().isNotEmpty() })
             }
         }
 
