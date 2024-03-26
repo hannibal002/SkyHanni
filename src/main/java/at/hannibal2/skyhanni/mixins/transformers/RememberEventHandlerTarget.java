@@ -7,6 +7,7 @@ import net.minecraftforge.fml.common.eventhandler.ASMEventHandler;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
+import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 import java.lang.reflect.Method;
 
@@ -15,8 +16,8 @@ import java.lang.reflect.Method;
 public class RememberEventHandlerTarget implements ASMEventHandlerExt {
     private Object skyhanni_target;
 
-    @Inject(method = "<init>", at = @At("TAIL"))
-    private void onInject(Object target, Method method, ModContainer owner) {
+    @Inject(method = "<init>", at = @At("RETURN"))
+    private void onInject(Object target, Method method, ModContainer owner, CallbackInfo ci) {
         skyhanni_target = target;
     }
 

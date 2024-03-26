@@ -36,8 +36,7 @@ abstract class LorenzEvent : Event() {
         ignoreErrorCache: Boolean = false,
         onError: (Throwable) -> Unit,
     ): Boolean {
-        // TODO remove comment
-//         if (BannedClasses.isBanned(this.javaClass)) return false
+        if (BannedClasses.isBanned(this.javaClass)) return false
 
         EventCounter.count(eventName)
         val visibleErrors = 3
@@ -45,15 +44,14 @@ abstract class LorenzEvent : Event() {
         eventHandlerDepth++
         for (listener in getListeners()) {
             val shListener = (listener as? ASMEventHandlerExt)?.target_skyhanni
-            shListener?.let {
-                if (BannedClasses.isBanned(it.javaClass)) continue
+            if (BannedClasses.isBanned(shListener?.javaClass)) {
+                continue
             }
             try {
                 listener.invoke(this)
             } catch (throwable: Throwable) {
                 errors++
                 if (printError && errors <= visibleErrors) {
-//                     val callerName = listener.toString().split(" ")[1].split("@")[0].split(".").last()
                     val callerName = shListener?.javaClass?.name ?: "<caller is null>"
                     val errorName = throwable::class.simpleName ?: "error"
                     val message = "Caught an $errorName at $eventName in $callerName: ${throwable.message}"

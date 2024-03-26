@@ -14,5 +14,8 @@ object BannedClasses {
         list = event.getConstant<BannedClassesJson>("BannedClasses").bannedClasses[SkyHanniMod.version] ?: emptyList()
     }
 
-    fun isBanned(javaClass: Class<*>): Boolean = list.contains(javaClass.name)
+    fun isBanned(provider: () -> Class<*>?): Boolean =
+        list.isNotEmpty() && isBanned(provider())
+
+    fun isBanned(javaClass: Class<*>?): Boolean = javaClass?.name?.let(list::contains) ?: false
 }
