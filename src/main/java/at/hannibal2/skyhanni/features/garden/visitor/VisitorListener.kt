@@ -26,7 +26,6 @@ import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.RenderUtils.exactLocation
 import at.hannibal2.skyhanni.utils.StringUtils.matches
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
-import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraft.client.Minecraft
 import net.minecraft.client.gui.inventory.GuiContainer
 import net.minecraft.entity.item.EntityArmorStand
@@ -44,14 +43,7 @@ class VisitorListener {
     private var lastClickedNpc = 0
     private val logger = LorenzLogger("garden/visitors/listener")
 
-    private val patternGroup = RepoPattern.group("garden.visitor")
-    private val tablistExistPattern by patternGroup.pattern(
-        "tablist.enabled",
-        "§b§lVisitors:.*"
-    )
-
     companion object {
-
         private val VISITOR_INFO_ITEM_SLOT = 13
         private val VISITOR_ACCEPT_ITEM_SLOT = 29
         private val VISITOR_REFUSE_ITEM_SLOT = 33
@@ -80,7 +72,7 @@ class VisitorListener {
         if (!GardenAPI.inGarden()) return
         val visitorsInTab = VisitorAPI.visitorsInTabList(event.tabList)
 
-        val hasVisitorInfo = event.tabList.any { tablistExistPattern.matches(it) }
+        val hasVisitorInfo = event.tabList.any { VisitorAPI.visitorCountPattern.matches(it) }
         if (!hasVisitorInfo) return
 
         VisitorAPI.getVisitors().forEach {
