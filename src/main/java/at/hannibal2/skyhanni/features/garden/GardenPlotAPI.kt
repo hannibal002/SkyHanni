@@ -177,6 +177,14 @@ object GardenPlotAPI {
 
     fun Plot.isPlayerInside() = box.isPlayerInside()
 
+    fun closestCenterPlot(location: LorenzVec): LorenzVec {
+        val plotSize = 96.0
+        val halfPlotSize = plotSize/2
+        val x = ((location.x + halfPlotSize) / plotSize).toInt() * plotSize
+        val z = ((location.z + halfPlotSize) / plotSize).toInt() * plotSize
+        return LorenzVec(x,77.0,z)
+    }
+
     fun Plot.sendTeleportTo() {
         if (isBarn()) ChatUtils.sendCommandToServer("tptoplot barn")
         else ChatUtils.sendCommandToServer("tptoplot $name")

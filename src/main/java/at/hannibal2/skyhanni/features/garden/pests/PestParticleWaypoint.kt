@@ -8,6 +8,7 @@ import at.hannibal2.skyhanni.events.LorenzTickEvent
 import at.hannibal2.skyhanni.events.LorenzWorldChangeEvent
 import at.hannibal2.skyhanni.events.ReceiveParticleEvent
 import at.hannibal2.skyhanni.features.garden.GardenAPI
+import at.hannibal2.skyhanni.features.garden.GardenPlotAPI
 import at.hannibal2.skyhanni.test.GriffinUtils.drawWaypointFilled
 import at.hannibal2.skyhanni.utils.LocationUtils.distanceToPlayer
 import at.hannibal2.skyhanni.utils.LocationUtils.playerLocation
@@ -107,19 +108,22 @@ class PestParticleWaypoint {
         } else {
             guessPoint ?: return
         }
-        event.drawWaypointFilled(waypoint, LorenzColor.GREEN.toColor(), beacon = true)
-        event.drawDynamicText(waypoint, "§aPest Guess", 1.3)
+        val isCloseToPlotCenter = GardenPlotAPI.closestCenterPlot(waypoint).distanceIgnoreY(waypoint) < 1
+        val text = if (isCloseToPlotCenter) "§cInfected Plot Guess" else "§aPest Guess"
+        val color = if (isCloseToPlotCenter) LorenzColor.RED else LorenzColor.GREEN
+        event.drawWaypointFilled(waypoint, color.toColor(), beacon = true)
+        event.drawDynamicText(waypoint, text, 1.3)
         if (config.drawLine) event.draw3DLine(event.exactPlayerEyeLocation(), waypoint, LorenzColor.AQUA.toColor(), 3, false)
     }
 
     @SubscribeEvent
     fun onTick(event: LorenzTickEvent) {
         if (!isEnabled()) return
-        if (event.repeatSeconds(1)) {
-            if ((guessPoint?.distanceToPlayer() ?: return) < 8.0 && lastPestTrackerUse.passedSince() > 1.seconds) {
-                lastPestTrackerUse = SimpleTimeMark.farPast()
-                reset()
-            }
+        if (lastPestTrackerUse.passedSince() < 1.seconds ||
+            lastPestTrackerUse.passedSince() > config.showWaypointForSeconds.seconds) return
+        if ((guessPoint?.distanceToPlayer() ?: return) < 8.0) {
+            lastPestTrackerUse = SimpleTimeMark.farPast()
+            reset()
         }
     }
 
