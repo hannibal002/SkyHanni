@@ -98,26 +98,20 @@ class PestParticleWaypoint {
     fun onFireWorkSpawn(event: PacketEvent.ReceiveEvent) {
         if (event.packet !is S0EPacketSpawnObject) return
         if (!GardenAPI.inGarden() || !config.hideParticles) return
-        if (event.packet.type == 76) event.cancel() // 76 is id for Fireworks
+        val fireworkId = 76
+        if (event.packet.type == fireworkId) event.cancel()
     }
 
     @SubscribeEvent
     fun onRenderWorld(event: LorenzRenderWorldEvent) {
         if (!isEnabled()) return
         if (locations.isEmpty()) return
-        if (lastPestTrackerUse.passedSince() > config.showWaypointForSeconds.seconds) {
+        if (lastPestTrackerUse.passedSince() > config.showForSeconds.seconds) {
             reset()
             return
         }
 
-        val waypoint = if (lastParticles != particles || guessPoint == null) {
-            getWaypoint(locations)?.also {
-                guessPoint = it
-                lastParticles = particles
-            }
-        } else {
-            guessPoint
-        } ?: return
+        val waypoint = getWaypoint() ?: return
         val distance = GardenPlotAPI.closestCenterPlot(waypoint)?.distanceIgnoreY(waypoint) ?: return
         val isCloseToPlotCenter = distance < 4
 
@@ -135,24 +129,28 @@ class PestParticleWaypoint {
         )
     }
 
+    private fun getWaypoint() = if (lastParticles != particles || guessPoint == null) {
+        calculateWaypoint(locations)?.also {
+            guessPoint = it
+            lastParticles = particles
+        }
+    } else guessPoint
+
     @SubscribeEvent
     fun onTick(event: LorenzTickEvent) {
         if (!isEnabled()) return
-        if (lastPestTrackerUse.passedSince() < 1.seconds ||
-            lastPestTrackerUse.passedSince() > config.showWaypointForSeconds.seconds
-        ) return
-        if ((guessPoint?.distanceToPlayer() ?: return) < 8.0) {
-            lastPestTrackerUse = SimpleTimeMark.farPast()
-            reset()
-        }
+        if (lastPestTrackerUse.passedSince() !in 1.seconds..config.showForSeconds.seconds) return
+        val guessPoint = guessPoint ?: return
+        if (guessPoint.distanceToPlayer() > 8.0) return
+
+        lastPestTrackerUse = SimpleTimeMark.farPast()
+        reset()
     }
 
-    private fun getWaypoint(list: MutableList<LorenzVec>): LorenzVec? {
+    private fun calculateWaypoint(list: MutableList<LorenzVec>): LorenzVec? {
+        val firstParticle = firstParticlePoint ?: return null
+
         var pos = LorenzVec(0.0, 0.0, 0.0)
-
-        val firstParticle = firstParticlePoint
-        if (firstParticle?.x == null) return null
-
         for ((i, particle) in list.withIndex()) {
             pos = pos.add(particle.subtract(firstParticle).divide(i.toDouble() + 1.0))
         }

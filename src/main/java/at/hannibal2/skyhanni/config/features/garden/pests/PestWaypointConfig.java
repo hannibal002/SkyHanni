@@ -38,6 +38,6 @@ public class PestWaypointConfig {
         name = "Show For Seconds",
         desc = "The waypoint will disappear after this number of seconds."
     )
-    @ConfigEditorSlider(minStep = 1, minValue = 5, maxValue = 20)
-    public double showWaypointForSeconds = 15;
+    @ConfigEditorSlider(minValue = 5, maxValue = 20, minStep = 1)
+    public int showForSeconds = 15;
 }
