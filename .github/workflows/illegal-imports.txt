@@ -4,3 +4,4 @@
 # <directory without src/main/java prefix> <illegal import>
 
 at/hannibal2/skyhanni/ scala.
+at/hannibal2/skyhanni/ io.github.moulberry.notenoughupdates.events.SlotClickEvent

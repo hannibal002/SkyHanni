@@ -2,6 +2,7 @@ package at.hannibal2.skyhanni.utils.repopatterns
 
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.config.ConfigManager
+import at.hannibal2.skyhanni.config.features.dev.RepoPatternConfig
 import at.hannibal2.skyhanni.events.ConfigLoadEvent
 import at.hannibal2.skyhanni.events.LorenzEvent
 import at.hannibal2.skyhanni.events.PreInitFinishedEvent
@@ -45,7 +46,16 @@ object RepoPatternManager {
         true
     }
 
-    private val config get() = SkyHanniMod.feature.dev.repoPattern
+    private val insideTest = Launch.blackboard == null
+
+    private val config
+        get() = if (!insideTest) {
+            SkyHanniMod.feature.dev.repoPattern
+        } else {
+            RepoPatternConfig().apply {
+                tolerateDuplicateUsage = true
+            }
+        }
 
     /**
      * Crash if in a development environment, or if inside a guarded event handler.

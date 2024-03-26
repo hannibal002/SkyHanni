@@ -138,6 +138,12 @@ public class InventoryConfig {
     }
 
     @Expose
+    @ConfigOption(name = "Highlight Widgets", desc = "Highlight enabled and disabled widgets in /tab.")
+    @ConfigEditorBoolean
+    @FeatureToggle
+    public boolean highlightWidgets = true;
+
+    @Expose
     @ConfigOption(name = " Vacuum Bag Cap", desc = "Cap the Garden Vacuum Bag item number display to 40.")
     @ConfigEditorBoolean
     public boolean vacuumBagCap = true;
