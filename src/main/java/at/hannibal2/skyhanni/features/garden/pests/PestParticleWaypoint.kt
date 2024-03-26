@@ -109,17 +109,21 @@ class PestParticleWaypoint {
             reset()
             return
         }
+
         val waypoint = if (lastParticles != particles || guessPoint == null) {
-            getWaypoint(locations).also {
+            getWaypoint(locations)?.also {
                 guessPoint = it
                 lastParticles = particles
             }
         } else {
-            guessPoint ?: return
-        }
-        val isCloseToPlotCenter = GardenPlotAPI.closestCenterPlot(waypoint).distanceIgnoreY(waypoint) < 1
+            guessPoint
+        } ?: return
+        val distance = GardenPlotAPI.closestCenterPlot(waypoint)?.distanceIgnoreY(waypoint) ?: return
+        val isCloseToPlotCenter = distance < 4
+
         val text = if (isCloseToPlotCenter) "§cInfected Plot Guess" else "§aPest Guess"
         val color = if (isCloseToPlotCenter) LorenzColor.RED else LorenzColor.GREEN
+
         event.drawWaypointFilled(waypoint, color.toColor(), beacon = true)
         event.drawDynamicText(waypoint, text, 1.3)
         if (config.drawLine) event.draw3DLine(
@@ -143,11 +147,11 @@ class PestParticleWaypoint {
         }
     }
 
-    private fun getWaypoint(list: MutableList<LorenzVec>): LorenzVec {
+    private fun getWaypoint(list: MutableList<LorenzVec>): LorenzVec? {
         var pos = LorenzVec(0.0, 0.0, 0.0)
 
         val firstParticle = firstParticlePoint
-        if (firstParticle?.x == null) return pos
+        if (firstParticle?.x == null) return null
 
         for ((i, particle) in list.withIndex()) {
             pos = pos.add(particle.subtract(firstParticle).divide(i.toDouble() + 1.0))
