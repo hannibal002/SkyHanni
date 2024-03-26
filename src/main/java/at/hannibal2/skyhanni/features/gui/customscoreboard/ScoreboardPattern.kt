@@ -383,6 +383,14 @@ object ScoreboardPattern {
         "dimension",
         "^\\s*§fRift Dimension$"
     )
+    val riftHotdogTitlePattern by riftSb.pattern(
+        "hotdogtitle",
+        "^§6Hot Dog Contest$"
+    )
+    val riftHotdogEatenPattern by riftSb.pattern(
+        "hotdogeaten",
+        "^Eaten: §.\\d+\\/\\d+$"
+    )
 
 
     // Stats from the tablist
