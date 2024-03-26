@@ -29,21 +29,11 @@ class GardenOptimalSpeed {
 
     private val config get() = GardenAPI.config.optimalSpeeds
 
-    private val currentSpeedPattern by RepoPattern.pattern(
-        "garden.optimalspeed.currentspeed",
-        " Speed: §r§f✦(?<speed>.*)"
-    )
-
     private val configCustomSpeed get() = config.customSpeed
     private var sneakingTime = 0.seconds
     private val sneaking get() = Minecraft.getMinecraft().thePlayer.isSneaking
     private val sneakingPersistent get() = sneakingTime > 5.seconds
-    private var _currentSpeed = 100
-    private var currentSpeed: Int
-        get() = (_currentSpeed * (if (sneaking) 0.3 else 1.0)).toInt()
-        set(value) {
-            _currentSpeed = value
-        }
+    private var currentSpeed = 100
     private var optimalSpeed = -1
     private var lastWarnTime = 0L
     private var cropInHand: CropType? = null
@@ -52,19 +42,13 @@ class GardenOptimalSpeed {
 
     @SubscribeEvent
     fun onTick(event: LorenzTickEvent) {
+        currentSpeed = (Minecraft.getMinecraft().thePlayer.capabilities.walkSpeed * 1000).toInt()
+
         if (sneaking) {
+            currentSpeed = (currentSpeed * 0.3).toInt()
             sneakingTime += 50.milliseconds
         } else {
             sneakingTime = 0.seconds
-        }
-    }
-
-    @SubscribeEvent
-    fun onTabListUpdate(event: TabListUpdateEvent) {
-        for (line in event.tabList) {
-            currentSpeedPattern.matchMatcher(line) {
-                currentSpeed = group("speed").toInt()
-            }
         }
     }
 
