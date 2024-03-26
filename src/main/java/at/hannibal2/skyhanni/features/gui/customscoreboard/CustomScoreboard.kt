@@ -172,7 +172,7 @@ class CustomScoreboard {
         event.move(28, "$prefix.showAllActiveEvents", "$prefix.eventsConfig.showAllActiveEvents")
         event.transform(30, "$prefix.eventsConfig.eventEntries") { element ->
             val array = element.asJsonArray
-            array.add(JsonPrimitive(ScoreboardEvents.HOT_DOG_CONTEST.toString()))
+            array.add(JsonPrimitive(ScoreboardEvents.HOT_DOG_CONTEST.name))
             array
         }
     }
