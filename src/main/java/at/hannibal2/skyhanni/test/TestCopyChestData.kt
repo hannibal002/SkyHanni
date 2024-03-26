@@ -2,6 +2,7 @@ package at.hannibal2.skyhanni.test
 
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.test.command.CopyItemCommand.grabItemData
+import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.KeyboardManager.isKeyHeld
 import at.hannibal2.skyhanni.utils.LorenzUtils
@@ -32,7 +33,7 @@ object TestCopyChestData {
             return
         } else if (InventoryUtils.openInventoryName().isNotEmpty()) {
             OSUtils.copyToClipboard(InventoryUtils.openInventoryName())
-            LorenzUtils.chat("Chest name copied to clipboard.")
+            ChatUtils.chat("Chest name copied to clipboard.")
             return
         }
     }
@@ -51,7 +52,7 @@ object TestCopyChestData {
             }
         }
         OSUtils.copyToClipboard(copyList.joinToString("\n"))
-        LorenzUtils.chat("Inventory $DEBUG_SUFFIX")
+        ChatUtils.chat("Inventory $DEBUG_SUFFIX")
     }
     private fun copyChestData(chest: List<Slot>) {
         val copyList = mutableListOf<String>("relevant config:", "includeNullSlots: ${config.includeNullSlots}", "includeUnnamedItems: ${config.includeUnnamedItems}", "includeArmor: ${config.includeArmor}", "", "chest name: '${InventoryUtils.openInventoryName()}'", "")
@@ -69,7 +70,7 @@ object TestCopyChestData {
             }
         }
         OSUtils.copyToClipboard(copyList.joinToString("\n"))
-        LorenzUtils.chat("Chest $DEBUG_SUFFIX")
+        ChatUtils.chat("Chest $DEBUG_SUFFIX")
     }
     private fun ItemStack.getStackInfo(): List<String> {
         val returnList = mutableListOf<String>()
