@@ -42,7 +42,7 @@ class GardenOptimalSpeed {
 
     @SubscribeEvent
     fun onTick(event: LorenzTickEvent) {
-        currentSpeed = (Minecraft.getMinecraft().thePlayer.capabilities.getWalkSpeed() * 1000).toInt()
+        currentSpeed = (Minecraft.getMinecraft().thePlayer.capabilities.walkSpeed * 1000).toInt()
 
         if (sneaking) {
             currentSpeed = (currentSpeed * 0.3).toInt()
