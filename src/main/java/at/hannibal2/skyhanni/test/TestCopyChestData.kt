@@ -15,7 +15,7 @@ import net.minecraftforge.client.event.GuiScreenEvent
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
 object TestCopyChestData {
-    private val config get() = SkyHanniMod.feature.dev.debug
+    private val config get() = SkyHanniMod.feature.dev.debug.copyInventory
     private val mc = Minecraft.getMinecraft()
     private const val HOTBAR_SIZE = 9
     private const val INVENTORY_SIZE = 27

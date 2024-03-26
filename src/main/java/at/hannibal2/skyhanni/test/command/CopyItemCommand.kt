@@ -58,7 +58,6 @@ object CopyItemCommand {
             val tagCompound = itemStack.tagCompound
             recurseTag(tagCompound, "  ", resultList)
         }
-
         return resultList
     }
 }
