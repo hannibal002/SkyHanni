@@ -500,7 +500,7 @@ class SkyHanniDebugsAndTests {
     }
 
     @SubscribeEvent
-    fun onParticlePlay(event: ReceiveParticleEvent) {
+    fun onReceiveParticle(event: ReceiveParticleEvent) {
 //        val particleType = event.type
 //        val distance = LocationUtils.playerLocation().distance(event.location).round(2)
 //

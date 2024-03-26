@@ -89,7 +89,7 @@ class GardenVisitorFeatures {
     )
     private val visitorChatMessagePattern by patternGroup.pattern(
         "visitorchat",
-        "§e\\[NPC] (§.)?(?<name>.*)§f: §r.*"
+        "§e\\[NPC] (?<color>§.)?(?<name>.*)§f: §r.*"
     )
     private val partialAcceptedPattern by patternGroup.pattern(
         "partialaccepted",
@@ -476,8 +476,10 @@ class GardenVisitorFeatures {
     }
 
     private fun hideVisitorMessage(message: String) = visitorChatMessagePattern.matchMatcher(message) {
+        val color = group("color")
+        if (color == null || color == "§e") return false // Non-visitor NPC, probably Jacob
+
         val name = group("name")
-        if (name == "Jacob") return false
         if (name == "Spaceman") return false
         if (name == "Beth") return false
 
