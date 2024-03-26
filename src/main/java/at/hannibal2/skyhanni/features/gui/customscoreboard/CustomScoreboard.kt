@@ -168,7 +168,7 @@ class CustomScoreboard {
 
     @SubscribeEvent
     fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
-        val prefix = "gui.customscoreboard.displayConfig"
+        val prefix = "gui.customScoreboard.displayConfig"
         event.move(28, "$prefix.showAllActiveEvents", "$prefix.eventsConfig.showAllActiveEvents")
         event.transform(30, "$prefix.eventsConfig.eventEntries") { element ->
             val array = element.asJsonArray
