@@ -22,6 +22,17 @@ class MovementSpeedDisplay {
     private val soulsandSpeeds = mutableListOf<Double>()
 
     companion object {
+        /**
+         * This speed value represents the walking speed, not the speed stat.
+         *
+         * It has an absolute speed cap of 500, and items that normally increase the cap do not apply here:
+         * (Black Cat pet, Cactus knife, Racing Helmet or Young Dragon Armor)
+         *
+         * If this information ever gets abstracted away and made available outside this class,
+         * and some features need the actual value of the Speed stat instead,
+         * we can always just have two separate variables, like walkSpeed and speedStat.
+         * But since this change is confined to Garden-specific code, it's fine the way it is for now.
+          */
         var speed = 0.0
         var usingSoulsandSpeed = false
     }
