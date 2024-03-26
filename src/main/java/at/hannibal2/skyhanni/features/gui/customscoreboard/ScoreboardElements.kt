@@ -688,32 +688,40 @@ private fun getQuiverShowWhen(): Boolean {
 }
 
 private fun getPowderDisplayPair() = buildList {
-    val powderTypes = listOf(
-        "§2Mithril" to getGroupFromPattern(
+    val powderTypes: List<Triple<String, String, String>> = listOf(
+        Triple("Mithril", "§2", getGroupFromPattern(
             TabListData.getTabList(),
             ScoreboardPattern.mithrilPowderPattern,
             "mithrilpowder"
-        ).formatNum(),
-        "§dGemstone" to getGroupFromPattern(
+        ).formatNum()),
+        Triple("Gemstone", "§d", getGroupFromPattern(
             TabListData.getTabList(),
             ScoreboardPattern.gemstonePowderPattern,
             "gemstonepowder"
-        ).formatNum(),
-        "§bGlacite" to getGroupFromPattern(
+        ).formatNum()),
+        Triple("Glacite", "§b", getGroupFromPattern(
             TabListData.getTabList(),
             ScoreboardPattern.glacitePowderPattern,
             "glacitepowder"
-        ).formatNum(),
+        ).formatNum())
     )
 
-    if (informationFilteringConfig.hideEmptyLines && powderTypes.all { it.second == "0" }) {
+    if (informationFilteringConfig.hideEmptyLines && powderTypes.all { it.third == "0" }) {
         add("<hidden>" to HorizontalAlignment.LEFT)
     } else {
         add("§9§lPowder" to HorizontalAlignment.LEFT)
 
-        for ((type, value) in powderTypes) {
-            if (value != "0") {
-                add(" §7- §f$type: $value" to HorizontalAlignment.LEFT)
+        if (displayConfig.displayNumbersFirst) {
+            for ((type, color, value) in powderTypes) {
+                if (value != "0") {
+                    add(" §7- $color$value $type" to HorizontalAlignment.LEFT)
+                }
+            }
+        } else {
+            for ((type, color, value) in powderTypes) {
+                if (value != "0") {
+                    add(" §7- §f$type: $color$value" to HorizontalAlignment.LEFT)
+                }
             }
         }
     }
