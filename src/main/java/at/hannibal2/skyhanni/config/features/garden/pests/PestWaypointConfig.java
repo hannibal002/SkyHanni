@@ -11,7 +11,7 @@ public class PestWaypointConfig {
     @Expose
     @ConfigOption(
         name = "Enabled",
-        desc = "Show a waypoint to the pest when using a vacuum."
+        desc = "Show a waypoint of the next pest when using a vacuum. Uses the particles and math to detect the location from everywhere in the garden."
     )
     @ConfigEditorBoolean
     @FeatureToggle
@@ -28,7 +28,7 @@ public class PestWaypointConfig {
     @Expose
     @ConfigOption(
         name = "Draw Line",
-        desc = "Draw line to waypoint."
+        desc = "Draw a line to the waypoint."
     )
     @ConfigEditorBoolean
     public boolean drawLine = true;
@@ -36,7 +36,7 @@ public class PestWaypointConfig {
     @Expose
     @ConfigOption(
         name = "Show For Seconds",
-        desc = "Shows waypoint for that amount of seconds."
+        desc = "The waypoint will disappear after this number of seconds."
     )
     @ConfigEditorSlider(minStep = 1, minValue = 5, maxValue = 20)
     public double showWaypointForSeconds = 15;

@@ -150,11 +150,9 @@ class PestParticleWaypoint {
         if (firstParticle?.x == null) return pos
 
         for ((i, particle) in list.withIndex()) {
-            pos = pos.add((particle.subtract(firstParticle)).divide(i.toDouble() + 1.0))
+            pos = pos.add(particle.subtract(firstParticle).divide(i.toDouble() + 1.0))
         }
-        pos = firstParticle.add(pos.multiply(120.0 / list.size))
-
-        return pos
+        return firstParticle.add(pos.multiply(120.0 / list.size))
     }
 
     fun isEnabled() = GardenAPI.inGarden() && config.enabled
