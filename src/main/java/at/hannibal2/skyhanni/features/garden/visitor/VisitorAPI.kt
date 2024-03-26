@@ -22,8 +22,13 @@ object VisitorAPI {
 
     private var visitors = mapOf<String, Visitor>()
     var inInventory = false
+    var lastClickedNpc = 0
     val config get() = GardenAPI.config.visitors
     private val logger = LorenzLogger("garden/visitors/api")
+
+    const val INFO_SLOT = 13
+    const val ACCEPT_SLOT = 29
+    const val REFUSE_SLOT = 33
 
     val patternGroup = RepoPattern.group("garden.visitor.api")
     private val visitorCountPattern by patternGroup.pattern(
@@ -124,10 +129,12 @@ object VisitorAPI {
         val shoppingList: MutableMap<NEUInternalName, Int> = mutableMapOf(),
         var offer: VisitorOffer? = null,
     ) {
-
+        var offersAccepted: Int? = null
+        var pricePerCopper: Int? = null
         var lore: List<String> = emptyList()
         var allRewards = listOf<NEUInternalName>()
         var lastLore = listOf<String>()
+        var blockedLore = listOf<String>()
 
         fun getEntity() = EntityUtils.getEntityByID(entityId)
         fun getNameTagEntity() = EntityUtils.getEntityByID(nameTagEntityId)

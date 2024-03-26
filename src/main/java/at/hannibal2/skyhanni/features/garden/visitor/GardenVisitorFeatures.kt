@@ -303,13 +303,20 @@ class GardenVisitorFeatures {
 
         val visitor = event.visitor
         val toolTip = event.toolTip
+        val copiedTooltip = toolTip.toList()
         toolTip.clear()
 
         if (visitor.lastLore.isEmpty()) {
             readToolTip(visitor, event.itemStack)
         }
 
+        toolTip.add(copiedTooltip[0]) // reconstruct title
         toolTip.addAll(visitor.lastLore)
+        val toolTipSize = copiedTooltip.size
+        if (event.showAdvancedItemTooltips && toolTipSize >= 3) { // reconstruct advanced tooltips
+            toolTip.add(copiedTooltip[toolTipSize - 2])
+            toolTip.add(copiedTooltip[toolTipSize - 1])
+        }
     }
 
     private fun readToolTip(visitor: VisitorAPI.Visitor, itemStack: ItemStack?) {
@@ -372,6 +379,7 @@ class GardenVisitorFeatures {
             copperPattern.matchMatcher(formattedLine) {
                 val copper = group("amount").formatInt()
                 val pricePerCopper = NumberUtil.format((totalPrice / copper).toInt())
+                visitor.pricePerCopper = (totalPrice / copper).toInt()
                 val timePerCopper = TimeUtils.formatDuration((farmingTimeRequired / copper) * 1000)
                 var copperLine = formattedLine
                 if (config.inventory.copperPrice) copperLine += " §7(§6$pricePerCopper §7per)"
