@@ -16,7 +16,7 @@ class ParticleHider {
     private fun inM7Boss() = LorenzUtils.inDungeons && DungeonAPI.dungeonFloor == "M7" && DungeonAPI.inBossRoom
 
     @SubscribeEvent
-    fun onHypExplosions(event: ReceiveParticleEvent) {
+    fun onReceiveParticle(event: ReceiveParticleEvent) {
         val distanceToPlayer = event.distanceToPlayer
         if (SkyHanniMod.feature.misc.particleHiders.hideFarParticles && distanceToPlayer > 40 && !inM7Boss()) {
             event.isCanceled = true
