@@ -21,7 +21,6 @@ import net.minecraft.client.Minecraft
 import net.minecraft.util.EnumParticleTypes
 import net.minecraftforge.fml.common.eventhandler.EventPriority
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
-import java.awt.Color
 import kotlin.math.absoluteValue
 import kotlin.time.Duration.Companion.seconds
 
@@ -108,8 +107,8 @@ class PestParticleWaypoint {
         } else {
             guessPoint ?: return
         }
-        event.drawWaypointFilled(waypoint, Color(255, 0, 255,100), beacon = true)
-        event.drawDynamicText(waypoint, "§cPest Guess", 1.3)
+        event.drawWaypointFilled(waypoint, LorenzColor.GREEN.toColor(), beacon = true)
+        event.drawDynamicText(waypoint, "§aPest Guess", 1.3)
         if (config.drawLine) event.draw3DLine(event.exactPlayerEyeLocation(), waypoint, LorenzColor.AQUA.toColor(), 3, false)
     }
 
