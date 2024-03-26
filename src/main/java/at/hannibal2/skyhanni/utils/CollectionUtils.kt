@@ -139,4 +139,28 @@ object CollectionUtils {
     fun <K, V : Comparable<V>> Map<K, V>.sortedDesc(): Map<K, V> {
         return toList().sorted().reversed().toMap()
     }
+
+    inline fun <reified T> ConcurrentLinkedQueue<T>.drainForEach(action: (T) -> Unit) {
+        while (true) {
+            val value = this.poll() ?: break
+            action(value)
+        }
+    }
+
+    fun <T> Sequence<T>.takeWhileInclusive(predicate: (T) -> Boolean) = sequence {
+        with(iterator()) {
+            while (hasNext()) {
+                val next = next()
+                yield(next)
+                if (!predicate(next)) break
+            }
+        }
+    }
+
+    /** Updates a value if it is present in the set (equals), useful if the newValue is not reference equal with the value in the set */
+    inline fun <reified T> MutableSet<T>.refreshReference(newValue: T) = if (this.contains(newValue)) {
+        this.remove(newValue)
+        this.add(newValue)
+        true
+    } else false
 }
