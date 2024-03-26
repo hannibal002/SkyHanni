@@ -14,7 +14,7 @@ enum class Mayor(
     DIANA("Diana", "§2", Perk.LUCKY, Perk.MYTHOLOGICAL_RITUAL, Perk.PET_XP_BUFF),
     DIAZ("Diaz", "§6", Perk.BARRIER_STREET, Perk.SHOPPING_SPREE),
     FINNEGAN("Finnegan", "§c", Perk.FARMING_SIMULATOR, Perk.PELT_POCALYPSE, Perk.GOATED),
-    FOXY("Foxy", "§d", Perk.SWEET_TOOTH, Perk.BENEVOLENCE, Perk.EXTRA_EVENT_M, Perk.EXTRA_EVENT_F, Perk.EXTRA_EVENT_S),
+    FOXY("Foxy", "§d", Perk.SWEET_TOOTH, Perk.BENEVOLENCE, Perk.EXTRA_EVENT_MINING, Perk.EXTRA_EVENT_FISHING, Perk.EXTRA_EVENT_SPOOKY),
     MARINA("Marina", "§b", Perk.FISHING_XP_BUFF, Perk.LUCK_OF_THE_SEA, Perk.FISHING_FESTIVAL),
     PAUL("Paul", "§c", Perk.MARAUDER, Perk.EZPZ, Perk.BENEDICTION),
 
@@ -87,9 +87,9 @@ enum class Perk(val perkName: String) {
     // Foxy
     SWEET_TOOTH("Sweet Tooth"),
     BENEVOLENCE("Benevolence"),
-    EXTRA_EVENT_M("Extra Event (Mining)"),
-    EXTRA_EVENT_F("Extra Event (Fishing)"),
-    EXTRA_EVENT_S("Extra Event (Spooky)"),
+    EXTRA_EVENT_MINING("Extra Event (Mining)"),
+    EXTRA_EVENT_FISHING("Extra Event (Fishing)"),
+    EXTRA_EVENT_SPOOKY("Extra Event (Spooky)"),
 
     // Marina
     FISHING_XP_BUFF("Fishing XP Buff"),
