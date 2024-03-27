@@ -814,7 +814,6 @@ private fun getExtraDisplayPair(): List<ScoreboardElementType> {
             "Island" to HypixelData.skyBlockIsland,
             "Area" to HypixelData.skyBlockArea,
             noStackTrace = true,
-            betaOnly = true,
         )
         amountOfUnknownLines = size
     }
