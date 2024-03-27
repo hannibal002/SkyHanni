@@ -49,7 +49,7 @@ class GardenVisitorSupercraft {
     @SubscribeEvent(priority = EventPriority.HIGH)
     fun onVisitorOpen(event: VisitorOpenEvent) {
         val visitor = event.visitor
-        val offerItem = visitor.offer!!.offerItem
+        val offerItem = visitor.offer?.offerItem ?: return
 
         val lore = offerItem.getLore()
         for (line in lore) {
