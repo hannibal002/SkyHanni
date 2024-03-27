@@ -3,7 +3,6 @@ package at.hannibal2.skyhanni.config;
 import at.hannibal2.skyhanni.SkyHanniMod;
 import at.hannibal2.skyhanni.config.features.About;
 import at.hannibal2.skyhanni.config.features.chat.ChatConfig;
-import at.hannibal2.skyhanni.config.features.chroma.ChromaConfig;
 import at.hannibal2.skyhanni.config.features.combat.CombatConfig;
 import at.hannibal2.skyhanni.config.features.commands.CommandsConfig;
 import at.hannibal2.skyhanni.config.features.crimsonisle.CrimsonIsleConfig;
@@ -80,10 +79,6 @@ public class Features extends Config {
     @Expose
     @Category(name = "Chat", desc = "Change how the chat looks.")
     public ChatConfig chat = new ChatConfig();
-
-    @Expose
-    @Category(name = "Chroma", desc = "Settings for Chroma text (Credit to SBA).")
-    public ChromaConfig chroma = new ChromaConfig();
 
     @Expose
     @Category(name = "Combat", desc = "Everything combat and PvE related.")

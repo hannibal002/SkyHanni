@@ -2,6 +2,7 @@ package at.hannibal2.skyhanni.config.features.gui;
 
 import at.hannibal2.skyhanni.config.FeatureToggle;
 import at.hannibal2.skyhanni.config.core.config.Position;
+import at.hannibal2.skyhanni.config.features.chroma.ChromaConfig;
 import at.hannibal2.skyhanni.config.features.gui.customscoreboard.CustomScoreboardConfig;
 import at.hannibal2.skyhanni.config.features.misc.DiscordRPCConfig;
 import at.hannibal2.skyhanni.config.features.misc.compacttablist.CompactTabListConfig;
@@ -43,19 +44,29 @@ public class GUIConfig {
     public CustomScoreboardConfig customScoreboard = new CustomScoreboardConfig();
 
     @Expose
+    @ConfigOption(name = "Discord Rich Presence", desc = "")
+    @Accordion
+    public DiscordRPCConfig discordRPC = new DiscordRPCConfig();
+
+    @Expose
     @ConfigOption(name = "Modify Visual Words", desc = "")
     @Accordion
     public ModifyWordsConfig modifyWords = new ModifyWordsConfig();
 
-    @ConfigOption(name = "Discord Rich Presence", desc = "")
-    @Accordion
     @Expose
-    public DiscordRPCConfig discordRPC = new DiscordRPCConfig();
+    @Category(name = "Chroma", desc = "Settings for Chroma text (Credit to SBA).")
+    @Accordion
+    public ChromaConfig chroma = new ChromaConfig();
 
     @Expose
     @ConfigOption(name = "Custom Text Box", desc = "")
     @Accordion
     public TextBoxConfig customTextBox = new TextBoxConfig();
+
+    @Expose
+    @ConfigOption(name = "In-Game Date", desc = "")
+    @Accordion
+    public InGameDateConfig inGameDate = new InGameDateConfig();
 
     @Expose
     @ConfigOption(name = "Real Time", desc = "Display the current computer time, a handy feature when playing in full-screen mode.")
@@ -70,11 +81,6 @@ public class GUIConfig {
 
     @Expose
     public Position realTimePosition = new Position(10, 10, false, true);
-
-    @Expose
-    @ConfigOption(name = "In-Game Date", desc = "")
-    @Accordion
-    public InGameDateConfig inGameDate = new InGameDateConfig();
 
     @Expose
     @Category(name = "Cosmetic", desc = "Cosmetics Settings")
