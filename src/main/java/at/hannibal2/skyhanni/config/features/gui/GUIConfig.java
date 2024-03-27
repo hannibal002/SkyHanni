@@ -4,6 +4,7 @@ import at.hannibal2.skyhanni.config.FeatureToggle;
 import at.hannibal2.skyhanni.config.core.config.Position;
 import at.hannibal2.skyhanni.config.features.gui.customscoreboard.CustomScoreboardConfig;
 import at.hannibal2.skyhanni.config.features.misc.compacttablist.CompactTabListConfig;
+import at.hannibal2.skyhanni.config.features.misc.cosmetic.CosmeticConfig;
 import at.hannibal2.skyhanni.data.GuiEditManager;
 import com.google.gson.annotations.Expose;
 import io.github.moulberry.moulconfig.annotations.Accordion;
@@ -68,6 +69,10 @@ public class GUIConfig {
     @ConfigOption(name = "In-Game Date", desc = "")
     @Accordion
     public InGameDateConfig inGameDate = new InGameDateConfig();
+
+    @Expose
+    @Category(name = "Cosmetic", desc = "Cosmetics Settings")
+    public CosmeticConfig cosmetic = new CosmeticConfig();
 
     @Expose
     @ConfigOption(name = "TPS Display", desc = "Show the TPS of the current server, like in Soopy.")

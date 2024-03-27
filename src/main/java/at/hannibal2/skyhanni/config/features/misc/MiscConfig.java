@@ -72,7 +72,6 @@ public class MiscConfig {
     @Category(name = "Cosmetic", desc = "Cosmetics Settings")
     public CosmeticConfig cosmetic = new CosmeticConfig();
 
-
     @Expose
     @ConfigOption(name = "Glowing Dropped Items", desc = "")
     @Accordion
