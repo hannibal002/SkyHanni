@@ -590,14 +590,14 @@ private fun getPowerShowWhen() = !inAnyIsland(IslandType.THE_RIFT)
 
 private fun getCookieDisplayPair() = buildList {
     val cookieTime = BitsAPI.cookieBuffTime
-    val text= if (cookieTime.isInPast()) "§cNot Active" else (cookieTime.timeUntil()).format(maxUnits = 2)
+    val text= if (cookieTime.isInPast()) "§cNot Active" else cookieTime.timeUntil().format(maxUnits = 2)
     add("§dCookie Buff§f: $text" to HorizontalAlignment.LEFT)
 }
 
 private fun getCookieShowWhen(): Boolean {
     if (HypixelData.bingo) return false
 
-    return (informationFilteringConfig.hideEmptyLines && !BitsAPI.cookieBuffTime.isInPast())
+    return informationFilteringConfig.hideEmptyLines && !BitsAPI.cookieBuffTime.isInPast()
 }
 
 private fun getObjectiveDisplayPair() = buildList {
