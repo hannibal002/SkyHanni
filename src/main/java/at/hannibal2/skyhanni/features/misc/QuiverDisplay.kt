@@ -157,6 +157,7 @@ class QuiverDisplay {
     @SubscribeEvent
     fun onRenderOverlay(event: GuiRenderEvent.GuiOverlayRenderEvent) {
         if (!isEnabled()) return
+        if (!QuiverAPI.hasBowInInventory()) return
         if (config.onlyWithBow && InventoryUtils.getItemInHand()?.item !is ItemBow) {
             if (display.isNotEmpty()) display = emptyList()
         } else {
