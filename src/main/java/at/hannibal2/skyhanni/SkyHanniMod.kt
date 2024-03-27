@@ -205,6 +205,7 @@ import at.hannibal2.skyhanni.features.garden.inventory.plots.GardenPlotIcon
 import at.hannibal2.skyhanni.features.garden.inventory.plots.GardenPlotMenuHighlighting
 import at.hannibal2.skyhanni.features.garden.pests.PestAPI
 import at.hannibal2.skyhanni.features.garden.pests.PestFinder
+import at.hannibal2.skyhanni.features.garden.pests.PestParticleWaypoint
 import at.hannibal2.skyhanni.features.garden.pests.PestSpawn
 import at.hannibal2.skyhanni.features.garden.pests.PestSpawnTimer
 import at.hannibal2.skyhanni.features.garden.pests.SprayDisplay
@@ -418,7 +419,7 @@ import org.apache.logging.log4j.Logger
     clientSideOnly = true,
     useMetadata = true,
     guiFactory = "at.hannibal2.skyhanni.config.ConfigGuiForgeInterop",
-    version = "0.24.Beta.20",
+    version = "0.24.Beta.21",
 )
 class SkyHanniMod {
 
@@ -782,6 +783,7 @@ class SkyHanniMod {
         loadModule(PestSpawn())
         loadModule(PestSpawnTimer)
         loadModule(PestFinder())
+        loadModule(PestParticleWaypoint())
         loadModule(SprayFeatures())
         loadModule(DojoRankDisplay())
         loadModule(SprayDisplay())

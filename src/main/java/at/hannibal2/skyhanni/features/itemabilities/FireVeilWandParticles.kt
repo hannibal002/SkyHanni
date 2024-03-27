@@ -28,7 +28,7 @@ class FireVeilWandParticles {
     private var lastClick = SimpleTimeMark.farPast()
 
     @SubscribeEvent
-    fun onChatPacket(event: ReceiveParticleEvent) {
+    fun onReceiveParticle(event: ReceiveParticleEvent) {
         if (!LorenzUtils.inSkyBlock) return
         if (config.display == DisplayEntry.PARTICLES) return
         if (lastClick.passedSince() > 5.5.seconds) return
