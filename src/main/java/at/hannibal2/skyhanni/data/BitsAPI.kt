@@ -43,9 +43,9 @@ object BitsAPI {
         }
 
     var cookieBuffTime: Long
-        get() = profileStorage?.boosterCookieExpireTime ?: 0
+        get() = profileStorage?.boosterCookieExpiryTime ?: 0
         private set(value) {
-            profileStorage?.boosterCookieExpireTime = value
+            profileStorage?.boosterCookieExpiryTime = value
         }
 
     private const val defaultcookiebits = 4800
