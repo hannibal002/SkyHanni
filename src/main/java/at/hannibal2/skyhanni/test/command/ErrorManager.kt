@@ -3,6 +3,7 @@ package at.hannibal2.skyhanni.test.command
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.KeyboardManager
+import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.OSUtils
 import at.hannibal2.skyhanni.utils.StringUtils
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
@@ -87,8 +88,9 @@ object ErrorManager {
         vararg extraData: Pair<String, Any?>,
         ignoreErrorCache: Boolean = false,
         noStackTrace: Boolean = false,
+        betaOnly: Boolean = false,
     ) {
-        logError(IllegalStateException(internalMessage), userMessage, ignoreErrorCache, noStackTrace, *extraData)
+        logError(IllegalStateException(internalMessage), userMessage, ignoreErrorCache, noStackTrace, *extraData, betaOnly = betaOnly)
     }
 
     @Deprecated("Use data as well", ReplaceWith("ErrorManager.logErrorWithData(throwable, message)"))
@@ -102,8 +104,9 @@ object ErrorManager {
         vararg extraData: Pair<String, Any?>,
         ignoreErrorCache: Boolean = false,
         noStackTrace: Boolean = false,
+        betaOnly: Boolean = false,
     ) {
-        logError(throwable, message, ignoreErrorCache, noStackTrace, *extraData)
+        logError(throwable, message, ignoreErrorCache, noStackTrace, *extraData, betaOnly = betaOnly)
     }
 
     private fun logError(
@@ -112,7 +115,9 @@ object ErrorManager {
         ignoreErrorCache: Boolean,
         noStackTrace: Boolean,
         vararg extraData: Pair<String, Any?>,
+        betaOnly: Boolean = false,
     ) {
+        if (betaOnly && !LorenzUtils.isBetaVersion()) return
         if (!ignoreErrorCache) {
             val pair = if (throwable.stackTrace.isNotEmpty()) {
                 throwable.stackTrace[0].let { (it.fileName ?: "<unknown>") to it.lineNumber }
