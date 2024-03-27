@@ -10,7 +10,7 @@ import at.hannibal2.skyhanni.events.PacketEvent
 import at.hannibal2.skyhanni.events.ReceiveParticleEvent
 import at.hannibal2.skyhanni.features.garden.GardenAPI
 import at.hannibal2.skyhanni.test.GriffinUtils.drawWaypointFilled
-import at.hannibal2.skyhanni.utils.LocationUtils.distanceToPlayer
+import at.hannibal2.skyhanni.utils.LocationUtils.distanceToPlayerIgnoreY
 import at.hannibal2.skyhanni.utils.LocationUtils.playerLocation
 import at.hannibal2.skyhanni.utils.LorenzColor
 import at.hannibal2.skyhanni.utils.LorenzVec
@@ -46,19 +46,19 @@ class PestParticleWaypoint {
         if (!isEnabled()) return
         if (PestAPI.hasVacuumInHand()) {
             if (event.clickType == ClickType.LEFT_CLICK && !Minecraft.getMinecraft().thePlayer.isSneaking) {
-                lastPestTrackerUse = SimpleTimeMark.now()
                 reset()
+                lastPestTrackerUse = SimpleTimeMark.now()
             }
         }
     }
 
     @SubscribeEvent
     fun onWorldChange(event: LorenzWorldChangeEvent) {
-        lastPestTrackerUse = SimpleTimeMark.farPast()
         reset()
     }
 
     private fun reset() {
+        lastPestTrackerUse = SimpleTimeMark.farPast()
         locations.clear()
         guessPoint = null
         lastParticlePoint = null
@@ -66,6 +66,7 @@ class PestParticleWaypoint {
         secondParticlePoint = null
         particles = 0
         lastParticles = 0
+        isPointingToPest = false
     }
 
     @SubscribeEvent(priority = EventPriority.LOW, receiveCanceled = true)
@@ -144,11 +145,10 @@ class PestParticleWaypoint {
     @SubscribeEvent
     fun onTick(event: LorenzTickEvent) {
         if (!isEnabled()) return
-        if (lastPestTrackerUse.passedSince() !in 1.seconds..config.showForSeconds.seconds) return
         val guessPoint = guessPoint ?: return
-        if (guessPoint.distanceToPlayer() > 8.0) return
 
-        lastPestTrackerUse = SimpleTimeMark.farPast()
+        if (guessPoint.distanceToPlayerIgnoreY() > 8) return
+        if (isPointingToPest && lastPestTrackerUse.passedSince() !in 1.seconds..config.showForSeconds.seconds) return
         reset()
     }
 
