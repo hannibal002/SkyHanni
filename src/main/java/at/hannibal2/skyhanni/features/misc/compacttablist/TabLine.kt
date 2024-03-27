@@ -1,4 +1,4 @@
-package at.hannibal2.skyhanni.features.gui.compacttablist
+package at.hannibal2.skyhanni.features.misc.compacttablist
 
 import net.minecraft.client.Minecraft
 import net.minecraft.client.network.NetworkPlayerInfo

@@ -1,4 +1,4 @@
-package at.hannibal2.skyhanni.features.gui.compacttablist
+package at.hannibal2.skyhanni.features.misc.compacttablist
 
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.events.LorenzTickEvent
