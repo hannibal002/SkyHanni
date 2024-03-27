@@ -20,6 +20,20 @@ import org.lwjgl.input.Keyboard;
 
 public class GUIConfig {
 
+    @Expose
+    @Category(name = "Compact Tab List", desc = "Compact Tab List Settings")
+    @Accordion
+    public CompactTabListConfig compactTabList = new CompactTabListConfig();
+
+    @Expose
+    @Category(name = "Custom Scoreboard", desc = "Custom Scoreboard Settings")
+    public CustomScoreboardConfig customScoreboard = new CustomScoreboardConfig();
+
+    @Expose
+    @Category(name = "Chroma", desc = "Settings for Chroma text (Credit to SBA).")
+    @Accordion
+    public ChromaConfig chroma = new ChromaConfig();
+
     @ConfigOption(name = "Edit GUI Locations", desc = "Change the position of SkyHanni's overlays.")
     @ConfigEditorButton(buttonText = "Edit")
     public Runnable positions = () -> GuiEditManager.openGuiPositionEditor(true);
@@ -35,15 +49,6 @@ public class GUIConfig {
     public float globalScale = 1F;
 
     @Expose
-    @Category(name = "Compact Tab List", desc = "Compact Tab List Settings")
-    @Accordion
-    public CompactTabListConfig compactTabList = new CompactTabListConfig();
-
-    @Expose
-    @Category(name = "Custom Scoreboard", desc = "Custom Scoreboard Settings")
-    public CustomScoreboardConfig customScoreboard = new CustomScoreboardConfig();
-
-    @Expose
     @ConfigOption(name = "Discord Rich Presence", desc = "")
     @Accordion
     public DiscordRPCConfig discordRPC = new DiscordRPCConfig();
@@ -52,11 +57,6 @@ public class GUIConfig {
     @ConfigOption(name = "Modify Visual Words", desc = "")
     @Accordion
     public ModifyWordsConfig modifyWords = new ModifyWordsConfig();
-
-    @Expose
-    @Category(name = "Chroma", desc = "Settings for Chroma text (Credit to SBA).")
-    @Accordion
-    public ChromaConfig chroma = new ChromaConfig();
 
     @Expose
     @ConfigOption(name = "Custom Text Box", desc = "")
