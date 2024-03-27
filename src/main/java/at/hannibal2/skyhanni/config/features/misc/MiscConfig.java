@@ -37,11 +37,6 @@ public class MiscConfig {
     @Accordion
     public ParticleHiderConfig particleHiders = new ParticleHiderConfig();
 
-    @Expose
-    @ConfigOption(name = "Estimated Item Value", desc = "(Prices for Enchantments, Reforge Stones, Gemstones, Drill Parts and more)")
-    @Accordion
-    public EstimatedItemValueConfig estimatedItemValues = new EstimatedItemValueConfig();
-
     @ConfigOption(name = "Trevor The Trapper", desc = "")
     @Accordion
     @Expose

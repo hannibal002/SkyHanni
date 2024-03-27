@@ -3,6 +3,7 @@ package at.hannibal2.skyhanni.config.features.inventory;
 import at.hannibal2.skyhanni.config.FeatureToggle;
 import at.hannibal2.skyhanni.config.HasLegacyId;
 import at.hannibal2.skyhanni.config.features.inventory.helper.HelperConfig;
+import at.hannibal2.skyhanni.config.features.misc.EstimatedItemValueConfig;
 import com.google.gson.annotations.Expose;
 import io.github.moulberry.moulconfig.annotations.Accordion;
 import io.github.moulberry.moulconfig.annotations.Category;
@@ -41,11 +42,15 @@ public class InventoryConfig {
     @Accordion
     public JacobFarmingContestConfig jacobFarmingContests = new JacobFarmingContestConfig();
 
-
     @Expose
     @ConfigOption(name = "Sack Items Display", desc = "")
     @Accordion
     public SackDisplayConfig sackDisplay = new SackDisplayConfig();
+
+    @Expose
+    @ConfigOption(name = "Estimated Item Value", desc = "(Prices for Enchantments, Reforge Stones, Gemstones, Drill Parts and more)")
+    @Accordion
+    public EstimatedItemValueConfig estimatedItemValues = new EstimatedItemValueConfig();
 
     @Expose
     @ConfigOption(name = "Chest Value", desc = "")
