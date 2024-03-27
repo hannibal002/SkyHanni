@@ -7,13 +7,16 @@ import at.hannibal2.skyhanni.events.LorenzChatEvent
 import at.hannibal2.skyhanni.events.ScoreboardChangeEvent
 import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.ChatUtils
+import at.hannibal2.skyhanni.utils.CollectionUtils.nextAfter
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.NumberUtil.formatInt
+import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.StringUtils.matches
 import at.hannibal2.skyhanni.utils.StringUtils.removeResets
 import at.hannibal2.skyhanni.utils.StringUtils.trimWhiteSpace
+import at.hannibal2.skyhanni.utils.TimeUtils
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
@@ -37,6 +40,12 @@ object BitsAPI {
         get() = profileStorage?.bitsToClaim ?: 0
         private set(value) {
             profileStorage?.bitsToClaim = value
+        }
+
+    var cookieBuffTime: Long
+        get() = profileStorage?.boosterCookieExpireTime ?: 0
+        private set(value) {
+            profileStorage?.boosterCookieExpireTime = value
         }
 
     private const val defaultcookiebits = 4800
@@ -73,6 +82,23 @@ object BitsAPI {
     private val fameRankSbMenuPattern by bitsGuiGroup.pattern(
         "sbmenufamerank",
         "§7Your rank: §e(?<rank>.*)"
+    )
+    /**
+     * REGEX-TEST:  §7Duration: §a140d 8h 35m 36s
+     */
+    private val cookieDurationPattern by bitsGuiGroup.pattern(
+        "cookieduration",
+        "\\s*§7Duration: §a(?<time>.*)"
+    )
+
+    private val noCookieActiveSBMenuPattern by bitsGuiGroup.pattern(
+        "sbmenunocookieactive",
+        " §7Status: §cNot active!"
+    )
+
+    private val noCookieActiveCookieMenuPattern by bitsGuiGroup.pattern(
+        "cookiemenucookieactive",
+        "(§7§cYou do not currently have a|§cBooster Cookie active!)"
     )
 
     private val fameRankCommunityShopPattern by bitsGuiGroup.pattern(
@@ -156,15 +182,19 @@ object BitsAPI {
             // If the cookie stack is null, then the player should not have any bits to claim
             if (cookieStack == null) {
                 bitsToClaim = 0
+                cookieBuffTime = 0L
                 return
             }
 
             for (line in cookieStack.getLore()) {
                 bitsAvailableMenuPattern.matchMatcher(line) {
                     bitsToClaim = group("toClaim").formatInt()
-
-                    return
                 }
+                cookieDurationPattern.matchMatcher(line) {
+                    val duration = TimeUtils.getDuration(group("time"))
+                    cookieBuffTime = SimpleTimeMark.now().plus(duration).toMillis()
+                }
+                if (noCookieActiveSBMenuPattern.matches(line)) cookieBuffTime = 0L
             }
             return
         }
@@ -172,6 +202,7 @@ object BitsAPI {
         if (fameRankGuiNamePattern.matches(event.inventoryName)) {
             val bitsStack = stacks.values.lastOrNull { bitsStackPattern.matches(it.displayName) } ?: return
             val fameRankStack = stacks.values.lastOrNull { fameRankGuiStackPattern.matches(it.displayName) } ?: return
+            val cookieStack = stacks.values.lastOrNull { cookieGuiStackPattern.matches(it.displayName)} ?: return
 
             line@ for (line in fameRankStack.getLore()) {
                 fameRankCommunityShopPattern.matchMatcher(line) {
@@ -210,6 +241,17 @@ object BitsAPI {
                     bitsToClaim = group("toClaim").formatInt()
 
                     continue@line
+                }
+            }
+
+            line@ for (line in cookieStack.getLore()) {
+                cookieDurationPattern.matchMatcher(line) {
+                    val duration = TimeUtils.getDuration(group("time"))
+                    cookieBuffTime = SimpleTimeMark.now().plus(duration).toMillis()
+                }
+                if (noCookieActiveCookieMenuPattern.matches(line)) {
+                    val nextLine = cookieStack.getLore().nextAfter(line) ?: continue@line
+                    if (noCookieActiveCookieMenuPattern.matches(nextLine)) cookieBuffTime = 0L
                 }
             }
         }
