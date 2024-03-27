@@ -27,7 +27,7 @@ import kotlin.time.Duration.Companion.minutes
 
 object AdvancedPlayerList {
 
-    private val config get() = SkyHanniMod.feature.misc.compactTabList.advancedPlayerList
+    private val config get() = SkyHanniMod.feature.gui.compactTabList.advancedPlayerList
 
     private val levelPattern by RepoPattern.pattern(
         "misc.compacttablist.advanced.level",

@@ -3,6 +3,7 @@ package at.hannibal2.skyhanni.config.features.gui;
 import at.hannibal2.skyhanni.config.FeatureToggle;
 import at.hannibal2.skyhanni.config.core.config.Position;
 import at.hannibal2.skyhanni.config.features.gui.customscoreboard.CustomScoreboardConfig;
+import at.hannibal2.skyhanni.config.features.misc.compacttablist.CompactTabListConfig;
 import at.hannibal2.skyhanni.data.GuiEditManager;
 import com.google.gson.annotations.Expose;
 import io.github.moulberry.moulconfig.annotations.Accordion;
@@ -29,6 +30,11 @@ public class GUIConfig {
     @ConfigOption(name = "Global GUI Scale", desc = "Globally scale all SkyHanni GUIs.")
     @ConfigEditorSlider(minValue = 0.1F, maxValue = 10, minStep = 0.05F)
     public float globalScale = 1F;
+
+    @Expose
+    @Category(name = "Compact Tab List", desc = "Compact Tab List Settings")
+    @Accordion
+    public CompactTabListConfig compactTabList = new CompactTabListConfig();
 
     @Expose
     @Category(name = "Custom Scoreboard", desc = "Custom Scoreboard Settings")
