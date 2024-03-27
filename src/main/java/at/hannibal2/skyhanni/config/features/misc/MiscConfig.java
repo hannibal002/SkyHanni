@@ -4,7 +4,6 @@ import at.hannibal2.skyhanni.config.FeatureToggle;
 import at.hannibal2.skyhanni.config.core.config.Position;
 import at.hannibal2.skyhanni.config.enums.OutsideSbFeature;
 import at.hannibal2.skyhanni.config.features.misc.compacttablist.CompactTabListConfig;
-import at.hannibal2.skyhanni.config.features.misc.cosmetic.CosmeticConfig;
 import at.hannibal2.skyhanni.config.features.misc.pets.PetConfig;
 import com.google.gson.annotations.Expose;
 import io.github.moulberry.moulconfig.annotations.Accordion;
@@ -67,10 +66,6 @@ public class MiscConfig {
     @Accordion
     @Expose
     public QuickModMenuSwitchConfig quickModMenuSwitch = new QuickModMenuSwitchConfig();
-
-    @Expose
-    @Category(name = "Cosmetic", desc = "Cosmetics Settings")
-    public CosmeticConfig cosmetic = new CosmeticConfig();
 
     @Expose
     @ConfigOption(name = "Glowing Dropped Items", desc = "")
