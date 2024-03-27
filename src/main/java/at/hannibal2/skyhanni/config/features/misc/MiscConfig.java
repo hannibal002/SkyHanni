@@ -46,11 +46,6 @@ public class MiscConfig {
     @Expose
     public TeleportPadConfig teleportPad = new TeleportPadConfig();
 
-    @ConfigOption(name = "Pocket Sack-In-A-Sack", desc = "")
-    @Accordion
-    @Expose
-    public PocketSackInASackConfig pocketSackInASack = new PocketSackInASackConfig();
-
     @ConfigOption(name = "Quick Mod Menu Switch", desc = "")
     @Accordion
     @Expose

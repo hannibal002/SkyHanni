@@ -4,6 +4,7 @@ import at.hannibal2.skyhanni.config.FeatureToggle;
 import at.hannibal2.skyhanni.config.HasLegacyId;
 import at.hannibal2.skyhanni.config.features.inventory.helper.HelperConfig;
 import at.hannibal2.skyhanni.config.features.misc.EstimatedItemValueConfig;
+import at.hannibal2.skyhanni.config.features.misc.PocketSackInASackConfig;
 import com.google.gson.annotations.Expose;
 import io.github.moulberry.moulconfig.annotations.Accordion;
 import io.github.moulberry.moulconfig.annotations.Category;
@@ -83,6 +84,11 @@ public class InventoryConfig {
     @ConfigOption(name = "Auctions Price Comparison", desc = "")
     @Accordion
     public AuctionHousePriceComparisonConfig auctionsPriceComparison = new AuctionHousePriceComparisonConfig();
+
+    @ConfigOption(name = "Pocket Sack-In-A-Sack", desc = "")
+    @Accordion
+    @Expose
+    public PocketSackInASackConfig pocketSackInASack = new PocketSackInASackConfig();
 
     @Expose
     @ConfigOption(
