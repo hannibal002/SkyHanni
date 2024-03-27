@@ -2,6 +2,7 @@ package at.hannibal2.skyhanni.config.features.mining;
 
 import at.hannibal2.skyhanni.config.FeatureToggle;
 import at.hannibal2.skyhanni.config.core.config.Position;
+import at.hannibal2.skyhanni.features.mining.eventtracker.MiningEventType.Companion.CompressFormat;
 import com.google.gson.annotations.Expose;
 import io.github.moulberry.moulconfig.annotations.ConfigEditorBoolean;
 import io.github.moulberry.moulconfig.annotations.ConfigEditorDropdown;
@@ -28,8 +29,8 @@ public class MiningEventConfig {
 
     @Expose
     @ConfigOption(name = "Compressed Format", desc = "Compresses the event names so that they are shorter.")
-    @ConfigEditorBoolean
-    public boolean compressedFormat = false;
+    @ConfigEditorDropdown
+    public CompressFormat compressedFormat = CompressFormat.NONE;
 
     @Expose
     @ConfigOption(name = "Show Passed Events", desc = "Shows the most recent passed event at the start greyed out. " +
