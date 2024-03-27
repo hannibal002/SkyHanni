@@ -80,11 +80,6 @@ public class InventoryConfig {
     @Accordion
     public AuctionHouseConfig auctions = new AuctionHouseConfig();
 
-    @Expose
-    @ConfigOption(name = "Auctions Price Comparison", desc = "")
-    @Accordion
-    public AuctionHousePriceComparisonConfig auctionsPriceComparison = new AuctionHousePriceComparisonConfig();
-
     @ConfigOption(name = "Pocket Sack-In-A-Sack", desc = "")
     @Accordion
     @Expose
