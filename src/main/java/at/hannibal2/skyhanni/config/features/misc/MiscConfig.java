@@ -42,11 +42,6 @@ public class MiscConfig {
     @Accordion
     public EstimatedItemValueConfig estimatedItemValues = new EstimatedItemValueConfig();
 
-    @ConfigOption(name = "Discord Rich Presence", desc = "")
-    @Accordion
-    @Expose
-    public DiscordRPCConfig discordRPC = new DiscordRPCConfig();
-
     @ConfigOption(name = "Trevor The Trapper", desc = "")
     @Accordion
     @Expose

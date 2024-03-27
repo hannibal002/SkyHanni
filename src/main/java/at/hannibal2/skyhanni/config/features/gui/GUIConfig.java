@@ -3,6 +3,7 @@ package at.hannibal2.skyhanni.config.features.gui;
 import at.hannibal2.skyhanni.config.FeatureToggle;
 import at.hannibal2.skyhanni.config.core.config.Position;
 import at.hannibal2.skyhanni.config.features.gui.customscoreboard.CustomScoreboardConfig;
+import at.hannibal2.skyhanni.config.features.misc.DiscordRPCConfig;
 import at.hannibal2.skyhanni.config.features.misc.compacttablist.CompactTabListConfig;
 import at.hannibal2.skyhanni.config.features.misc.cosmetic.CosmeticConfig;
 import at.hannibal2.skyhanni.data.GuiEditManager;
@@ -45,6 +46,11 @@ public class GUIConfig {
     @ConfigOption(name = "Modify Visual Words", desc = "")
     @Accordion
     public ModifyWordsConfig modifyWords = new ModifyWordsConfig();
+
+    @ConfigOption(name = "Discord Rich Presence", desc = "")
+    @Accordion
+    @Expose
+    public DiscordRPCConfig discordRPC = new DiscordRPCConfig();
 
     @Expose
     @ConfigOption(name = "Custom Text Box", desc = "")
