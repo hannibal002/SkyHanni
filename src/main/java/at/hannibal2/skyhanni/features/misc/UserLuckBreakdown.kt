@@ -28,15 +28,15 @@ class UserLuckBreakdown {
     private val storage get() = ProfileStorageData.playerSpecific
 
     private lateinit var mainLuckItem: ItemStack
-    private val mainLuckID = "ENDER_PEARL".asInternalName().getItemStack().item
+    private val mainLuckID = "ENDER_PEARL".asInternalName()
     private val mainLuckName = "§a✴ SkyHanni User Luck"
 
     private lateinit var fillerItem: ItemStack
-    private var fillerID = "STAINED_GLASS_PANE".asInternalName().getItemStack().item
+    private var fillerID = "STAINED_GLASS_PANE".asInternalName()
     private val fillerName = " "
 
     private lateinit var limboItem: ItemStack
-    private var limboID = "ENDER_PEARL".asInternalName().getItemStack().item
+    private var limboID = "ENDER_PEARL".asInternalName()
     private val limboName = "§a✴ Limbo Personal Best"
 
     private var showAllStats = true
@@ -83,7 +83,7 @@ class UserLuckBreakdown {
                     return
                 }
                 in invalidItemSlots -> {
-                    if (event.original.item == limboID) return
+                    if (event.original.item == limboID.getItemStack().item) return
                     event.replaceWith(fillerItem)
                     return
                 }
@@ -239,18 +239,18 @@ class UserLuckBreakdown {
     private fun createItems() {
         val limboUserLuck = storage?.limbo?.userLuck ?: 0.0f
         fillerItem = Utils.createItemStack(
-            fillerID,
+            fillerID.getItemStack().item,
             fillerName,
             15,
         )
         val luckString = tryTruncateFloat(limboUserLuck.round(1))
         mainLuckItem = Utils.createItemStack(
-            mainLuckID,
+            mainLuckID.getItemStack().item,
             "$mainLuckName §f$luckString",
             *createItemLore("mainMenu", limboUserLuck)
         )
         limboItem = Utils.createItemStack(
-            limboID,
+            limboID.getItemStack().item,
             limboName,
             *createItemLore("limbo", limboUserLuck)
         )
