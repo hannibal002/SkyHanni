@@ -12,6 +12,7 @@ import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.NumberUtil.formatInt
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
+import at.hannibal2.skyhanni.utils.SimpleTimeMark.Companion.asTimeMark
 import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.StringUtils.matches
 import at.hannibal2.skyhanni.utils.StringUtils.removeResets
@@ -19,6 +20,7 @@ import at.hannibal2.skyhanni.utils.StringUtils.trimWhiteSpace
 import at.hannibal2.skyhanni.utils.TimeUtils
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
+import kotlin.time.Duration.Companion.days
 
 object BitsAPI {
     private val profileStorage get() = ProfileStorageData.profileSpecific?.bits
@@ -42,10 +44,10 @@ object BitsAPI {
             profileStorage?.bitsToClaim = value
         }
 
-    var cookieBuffTime: Long
-        get() = profileStorage?.boosterCookieExpiryTime ?: 0
+    var cookieBuffTime: SimpleTimeMark
+        get() = profileStorage?.boosterCookieExpiryTime?.asTimeMark() ?: SimpleTimeMark.farPast()
         private set(value) {
-            profileStorage?.boosterCookieExpiryTime = value
+            profileStorage?.boosterCookieExpiryTime = value.toMillis()
         }
 
     private const val defaultcookiebits = 4800
@@ -165,7 +167,7 @@ object BitsAPI {
 
         boosterCookieAte.matchMatcher(message) {
             bitsToClaim += (defaultcookiebits * (currentFameRank?.bitsMultiplier ?: return)).toInt()
-            cookieBuffTime += 345600000 //4 days
+            cookieBuffTime += 4.days
 
             return
         }
@@ -183,7 +185,7 @@ object BitsAPI {
             // If the cookie stack is null, then the player should not have any bits to claim
             if (cookieStack == null) {
                 bitsToClaim = 0
-                cookieBuffTime = 0L
+                cookieBuffTime = SimpleTimeMark.farPast()
                 return
             }
 
@@ -193,9 +195,9 @@ object BitsAPI {
                 }
                 cookieDurationPattern.matchMatcher(line) {
                     val duration = TimeUtils.getDuration(group("time"))
-                    cookieBuffTime = SimpleTimeMark.now().plus(duration).toMillis()
+                    cookieBuffTime = SimpleTimeMark.now().plus(duration)
                 }
-                if (noCookieActiveSBMenuPattern.matches(line)) cookieBuffTime = 0L
+                if (noCookieActiveSBMenuPattern.matches(line)) cookieBuffTime = SimpleTimeMark.farPast()
             }
             return
         }
@@ -248,11 +250,11 @@ object BitsAPI {
             line@ for (line in cookieStack.getLore()) {
                 cookieDurationPattern.matchMatcher(line) {
                     val duration = TimeUtils.getDuration(group("time"))
-                    cookieBuffTime = SimpleTimeMark.now().plus(duration).toMillis()
+                    cookieBuffTime = SimpleTimeMark.now().plus(duration)
                 }
                 if (noCookieActiveCookieMenuPattern.matches(line)) {
                     val nextLine = cookieStack.getLore().nextAfter(line) ?: continue@line
-                    if (noCookieActiveCookieMenuPattern.matches(nextLine)) cookieBuffTime = 0L
+                    if (noCookieActiveCookieMenuPattern.matches(nextLine)) cookieBuffTime = SimpleTimeMark.farPast()
                 }
             }
         }

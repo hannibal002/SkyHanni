@@ -28,7 +28,6 @@ import at.hannibal2.skyhanni.utils.LorenzUtils.inDungeons
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.NumberUtil.percentageColor
 import at.hannibal2.skyhanni.utils.RenderUtils.HorizontalAlignment
-import at.hannibal2.skyhanni.utils.SimpleTimeMark.Companion.asTimeMark
 import at.hannibal2.skyhanni.utils.StringUtils
 import at.hannibal2.skyhanni.utils.StringUtils.firstLetterUppercase
 import at.hannibal2.skyhanni.utils.StringUtils.matches
@@ -37,7 +36,6 @@ import at.hannibal2.skyhanni.utils.TimeUtils.format
 import at.hannibal2.skyhanni.utils.TimeUtils.formatted
 import io.github.moulberry.notenoughupdates.util.SkyBlockTime
 import java.util.function.Supplier
-import kotlin.time.Duration.Companion.milliseconds
 
 internal var unknownLines = listOf<String>()
 internal var amountOfUnknownLines = 0
@@ -592,14 +590,14 @@ private fun getPowerShowWhen() = !inAnyIsland(IslandType.THE_RIFT)
 
 private fun getCookieDisplayPair() = buildList {
     val cookieTime = BitsAPI.cookieBuffTime
-    val text= if (cookieTime.asTimeMark().isInPast()) "§cNot Active" else (cookieTime - System.currentTimeMillis()).milliseconds.format(maxUnits = 2)
+    val text= if (cookieTime.isInPast()) "§cNot Active" else (cookieTime.timeUntil()).format(maxUnits = 2)
     add("§dCookie Buff§f: $text" to HorizontalAlignment.LEFT)
 }
 
 private fun getCookieShowWhen(): Boolean {
     if (HypixelData.bingo) return false
 
-    return (informationFilteringConfig.hideEmptyLines && !BitsAPI.cookieBuffTime.asTimeMark().isInPast())
+    return (informationFilteringConfig.hideEmptyLines && !BitsAPI.cookieBuffTime.isInPast())
 }
 
 private fun getObjectiveDisplayPair() = buildList {
