@@ -50,7 +50,7 @@ import at.hannibal2.skyhanni.utils.RenderUtils.drawString
 import at.hannibal2.skyhanni.utils.RenderUtils.renderStringsAndItems
 import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
-import at.hannibal2.skyhanni.utils.TimeUtils
+import at.hannibal2.skyhanni.utils.TimeUtils.format
 import at.hannibal2.skyhanni.utils.getLorenzVec
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
@@ -310,7 +310,7 @@ object GardenVisitorFeatures {
     private fun readToolTip(visitor: VisitorAPI.Visitor, itemStack: ItemStack?) {
         val stack = itemStack ?: error("Accept offer item not found for visitor ${visitor.visitorName}")
         var totalPrice = 0.0
-        var farmingTimeRequired = -1L
+        var farmingTimeRequired = 0.seconds
         var readingShoppingList = true
         lastFullPrice = 0.0
         val foundRewards = mutableListOf<NEUInternalName>()
@@ -367,11 +367,11 @@ object GardenVisitorFeatures {
             copperPattern.matchMatcher(formattedLine) {
                 val copper = group("amount").formatInt()
                 val pricePerCopper = NumberUtil.format((totalPrice / copper).toInt())
-                val timePerCopper = TimeUtils.formatDuration((farmingTimeRequired / copper) * 1000)
+                val timePerCopper = (farmingTimeRequired / copper).format()
                 var copperLine = formattedLine
                 if (config.inventory.copperPrice) copperLine += " §7(§6$pricePerCopper §7per)"
                 if (config.inventory.copperTime) {
-                    copperLine += if (farmingTimeRequired != -1L) " §7(§b$timePerCopper §7per)" else " §7(§cno speed data!§7)"
+                    copperLine += if (farmingTimeRequired != 0.seconds) " §7(§b$timePerCopper §7per)" else " §7(§cno speed data!§7)"
                 }
                 finalList.set(index, copperLine)
             }
@@ -400,8 +400,8 @@ object GardenVisitorFeatures {
             val cropAmount = multiplier.second.toLong() * amount
             val formattedName = "§e${cropAmount.addSeparators()}§7x ${cropType.cropName} "
             val formattedSpeed = cropType.getSpeed()?.let { speed ->
-                farmingTimeRequired = cropAmount / speed
-                val duration = TimeUtils.formatDuration(farmingTimeRequired * 1000)
+                val duration = (cropAmount / speed).seconds
+                farmingTimeRequired += duration
                 "in §b$duration"
             } ?: "§cno speed data!"
             if (config.inventory.exactAmountAndTime) {
