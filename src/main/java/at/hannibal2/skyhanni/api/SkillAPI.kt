@@ -109,7 +109,7 @@ object SkillAPI {
     }
 
     @SubscribeEvent
-    fun onActionBar(event: ActionBarUpdateEvent) {
+    fun onActionBarUpdate(event: ActionBarUpdateEvent) {
         val actionBar = event.actionBar.removeColor()
         val components = SPACE_SPLITTER.splitToList(actionBar)
         for (component in components) {

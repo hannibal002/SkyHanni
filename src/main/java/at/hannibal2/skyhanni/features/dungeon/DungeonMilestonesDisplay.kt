@@ -48,7 +48,7 @@ class DungeonMilestonesDisplay {
     }
 
     @SubscribeEvent(receiveCanceled = true)
-    fun onChatPacket(event: LorenzChatEvent) {
+    fun onChat(event: LorenzChatEvent) {
         if (!isEnabled()) return
 
         if (isMilestoneMessage(event.message)) {
