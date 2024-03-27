@@ -70,7 +70,8 @@ object MiningEventDisplay {
 
     fun updateData(eventData: MiningEventData) {
         eventData.runningEvents.forEach { (islandType, events) ->
-            val sorted = events.sortedBy { it.endsAt - it.event.defaultLength.inWholeMilliseconds }
+            val sorted = events.filter { islandType == IslandType.DWARVEN_MINES || !it.event.dwarvenSpecific }
+                .sortedBy { it.endsAt - it.event.defaultLength.inWholeMilliseconds }
 
             val oldData = islandEventData[islandType]
             if (oldData == null) {
