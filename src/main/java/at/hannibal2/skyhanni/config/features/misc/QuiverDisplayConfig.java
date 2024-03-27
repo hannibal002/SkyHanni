@@ -26,10 +26,10 @@ public class QuiverDisplayConfig {
     @ConfigOption(
         name = "Show only with bow",
         desc = "Only show the quiver display when\n" +
-            "a bow is in your inventory."
+            "holding a bow."
     )
     @ConfigEditorBoolean
-    public boolean onlyWithBow = true;
+    public boolean onlyWithBow = false;
 
     @Expose
     @ConfigOption(

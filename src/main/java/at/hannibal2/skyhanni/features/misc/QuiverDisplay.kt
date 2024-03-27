@@ -17,6 +17,7 @@ import at.hannibal2.skyhanni.events.ProfileJoinEvent
 import at.hannibal2.skyhanni.events.QuiverUpdateEvent
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.DelayedRun
+import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.getItemRarityOrNull
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.NEUItems
@@ -27,6 +28,7 @@ import at.hannibal2.skyhanni.utils.StringUtils
 import at.hannibal2.skyhanni.utils.StringUtils.createCommaSeparatedList
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 import net.minecraft.init.Items
+import net.minecraft.item.ItemBow
 import net.minecraft.item.ItemStack
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import kotlin.time.Duration.Companion.seconds
@@ -155,7 +157,7 @@ class QuiverDisplay {
     @SubscribeEvent
     fun onRenderOverlay(event: GuiRenderEvent.GuiOverlayRenderEvent) {
         if (!isEnabled()) return
-        if (config.onlyWithBow && !QuiverAPI.hasBowInInventory()) {
+        if (config.onlyWithBow && InventoryUtils.getItemInHand()?.item !is ItemBow) {
             if (display.isNotEmpty()) display = emptyList()
         } else {
             updateDisplay()
