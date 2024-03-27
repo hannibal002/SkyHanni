@@ -8,6 +8,7 @@ import at.hannibal2.skyhanni.events.LorenzTickEvent
 import at.hannibal2.skyhanni.events.LorenzWorldChangeEvent
 import at.hannibal2.skyhanni.events.PacketEvent
 import at.hannibal2.skyhanni.events.ReceiveParticleEvent
+import at.hannibal2.skyhanni.events.garden.pests.PestUpdateEvent
 import at.hannibal2.skyhanni.features.garden.GardenAPI
 import at.hannibal2.skyhanni.test.GriffinUtils.drawWaypointFilled
 import at.hannibal2.skyhanni.utils.LocationUtils.distanceToPlayerIgnoreY
@@ -150,6 +151,11 @@ class PestParticleWaypoint {
         if (guessPoint.distanceToPlayerIgnoreY() > 8) return
         if (isPointingToPest && lastPestTrackerUse.passedSince() !in 1.seconds..config.showForSeconds.seconds) return
         reset()
+    }
+
+    @SubscribeEvent
+    fun onPestUpdate(event: PestUpdateEvent) {
+        if (PestAPI.scoreboardPests == 0) reset()
     }
 
     private fun calculateWaypoint(list: MutableList<LorenzVec>): LorenzVec? {
