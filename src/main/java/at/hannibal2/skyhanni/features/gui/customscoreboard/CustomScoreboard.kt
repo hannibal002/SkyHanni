@@ -93,15 +93,15 @@ class CustomScoreboard {
 
     companion object {
         internal val config get() = SkyHanniMod.feature.gui.customScoreboard
-        internal val alignmentConfig get() = displayConfig.alignment
         internal val displayConfig get() = config.display
+        internal val alignmentConfig get() = displayConfig.alignment
         internal val arrowConfig get() = displayConfig.arrow
         internal val eventsConfig get() = displayConfig.events
-        internal val informationFilteringConfig get() = config.informationFiltering
-        internal val backgroundConfig get() = config.background
         internal val mayorConfig get() = displayConfig.mayor
         internal val partyConfig get() = displayConfig.party
         internal val maxwellConfig get() = displayConfig.maxwell
+        internal val informationFilteringConfig get() = config.informationFiltering
+        internal val backgroundConfig get() = config.background
         internal val devConfig get() = SkyHanniMod.feature.dev
     }
 
