@@ -627,7 +627,7 @@ class SkyHanniMod {
         loadModule(MiscFeatures())
         loadModule(GardenPlotMenuHighlighting())
         loadModule(SkyMartCopperPrice())
-        loadModule(GardenVisitorFeatures())
+        loadModule(GardenVisitorFeatures)
         loadModule(NPCVisitorFix)
         loadModule(GardenInventoryNumbers())
         loadModule(GardenVisitorTimer())

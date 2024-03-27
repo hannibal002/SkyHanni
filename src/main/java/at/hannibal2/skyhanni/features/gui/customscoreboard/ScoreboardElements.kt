@@ -496,7 +496,10 @@ fun getPlayerAmountDisplayPair() = buildList {
     } else {
         ""
     }
-    add("§7Players: §a${getPlayersOnCurrentServer()}$max" to HorizontalAlignment.LEFT)
+    if (displayConfig.displayNumbersFirst)
+        add("§a${getPlayersOnCurrentServer()}$max Players" to HorizontalAlignment.LEFT)
+    else
+        add("§7Players: §a${getPlayersOnCurrentServer()}$max" to HorizontalAlignment.LEFT)
 }
 
 private fun getVisitDisplayPair() =
@@ -689,21 +692,27 @@ private fun getQuiverShowWhen(): Boolean {
 
 private fun getPowderDisplayPair() = buildList {
     val powderTypes: List<Triple<String, String, String>> = listOf(
-        Triple("Mithril", "§2", getGroupFromPattern(
-            TabListData.getTabList(),
-            ScoreboardPattern.mithrilPowderPattern,
-            "mithrilpowder"
-        ).formatNum()),
-        Triple("Gemstone", "§d", getGroupFromPattern(
-            TabListData.getTabList(),
-            ScoreboardPattern.gemstonePowderPattern,
-            "gemstonepowder"
-        ).formatNum()),
-        Triple("Glacite", "§b", getGroupFromPattern(
-            TabListData.getTabList(),
-            ScoreboardPattern.glacitePowderPattern,
-            "glacitepowder"
-        ).formatNum())
+        Triple(
+            "Mithril", "§2", getGroupFromPattern(
+                TabListData.getTabList(),
+                ScoreboardPattern.mithrilPowderPattern,
+                "mithrilpowder"
+            ).formatNum()
+        ),
+        Triple(
+            "Gemstone", "§d", getGroupFromPattern(
+                TabListData.getTabList(),
+                ScoreboardPattern.gemstonePowderPattern,
+                "gemstonepowder"
+            ).formatNum()
+        ),
+        Triple(
+            "Glacite", "§b", getGroupFromPattern(
+                TabListData.getTabList(),
+                ScoreboardPattern.glacitePowderPattern,
+                "glacitepowder"
+            ).formatNum()
+        )
     )
 
     if (informationFilteringConfig.hideEmptyLines && powderTypes.all { it.third == "0" }) {
