@@ -165,6 +165,7 @@ object BitsAPI {
 
         boosterCookieAte.matchMatcher(message) {
             bitsToClaim += (defaultcookiebits * (currentFameRank?.bitsMultiplier ?: return)).toInt()
+            cookieBuffTime += 345600000 //4 days
 
             return
         }
