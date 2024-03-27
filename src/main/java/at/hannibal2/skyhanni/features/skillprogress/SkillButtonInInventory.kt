@@ -2,10 +2,10 @@ package at.hannibal2.skyhanni.features.skillprogress
 
 import at.hannibal2.skyhanni.api.SkillAPI.customGoalConfig
 import at.hannibal2.skyhanni.api.SkillAPI.overflowConfig
+import at.hannibal2.skyhanni.events.GuiContainerEvent
 import at.hannibal2.skyhanni.events.InventoryCloseEvent
 import at.hannibal2.skyhanni.events.InventoryFullyOpenedEvent
 import io.github.moulberry.notenoughupdates.events.ReplaceItemEvent
-import io.github.moulberry.notenoughupdates.events.SlotClickEvent
 import io.github.moulberry.notenoughupdates.util.Utils
 import net.minecraft.client.player.inventory.ContainerLocalMenu
 import net.minecraft.init.Blocks
@@ -114,7 +114,7 @@ class SkillButtonInInventory {
     }
 
     @SubscribeEvent(priority = EventPriority.HIGH)
-    fun onStackClick(event: SlotClickEvent) {
+    fun onStackClick(event: GuiContainerEvent.SlotClickEvent) {
         if (showItem) {
             if (event.slotId == 50 && overflowConfig.tooltipButtonInSkillMenu) {
                 event.isCanceled = true
