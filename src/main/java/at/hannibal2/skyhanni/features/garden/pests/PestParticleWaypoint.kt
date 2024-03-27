@@ -13,7 +13,6 @@ import at.hannibal2.skyhanni.features.garden.GardenAPI
 import at.hannibal2.skyhanni.test.GriffinUtils.drawWaypointFilled
 import at.hannibal2.skyhanni.utils.LocationUtils.distanceToPlayerIgnoreY
 import at.hannibal2.skyhanni.utils.LocationUtils.playerLocation
-import at.hannibal2.skyhanni.utils.LorenzColor
 import at.hannibal2.skyhanni.utils.LorenzVec
 import at.hannibal2.skyhanni.utils.RenderUtils.draw3DLine
 import at.hannibal2.skyhanni.utils.RenderUtils.drawDynamicText
@@ -24,6 +23,7 @@ import net.minecraft.network.play.server.S0EPacketSpawnObject
 import net.minecraft.util.EnumParticleTypes
 import net.minecraftforge.fml.common.eventhandler.EventPriority
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
+import java.awt.Color
 import kotlin.math.absoluteValue
 import kotlin.time.Duration.Companion.seconds
 
@@ -41,6 +41,7 @@ class PestParticleWaypoint {
     private var particles = 0
     private var lastParticles = 0
     private var isPointingToPest = false
+    private var color: Color? = null
 
     @SubscribeEvent
     fun onItemClick(event: ItemClickEvent) {
@@ -84,6 +85,9 @@ class PestParticleWaypoint {
             redPest, yellow, darkYellow -> true
             else -> return
         }
+
+        val (r, g, b) = event.offset.toDoubleArray().map { it.toFloat() }
+        color = Color(r, g, b)
         val location = event.location
 
         if (config.hideParticles) event.cancel()
@@ -127,14 +131,14 @@ class PestParticleWaypoint {
         val waypoint = getWaypoint() ?: return
 
         val text = if (isPointingToPest) "§aPest Guess" else "§cInfected Plot Guess"
-        val color = if (isPointingToPest) LorenzColor.GREEN else LorenzColor.RED
+        val color = color ?: error("color is null")
 
-        event.drawWaypointFilled(waypoint, color.toColor(), beacon = true)
+        event.drawWaypointFilled(waypoint, color, beacon = true)
         event.drawDynamicText(waypoint, text, 1.3)
         if (config.drawLine) event.draw3DLine(
             event.exactPlayerEyeLocation(),
             waypoint,
-            LorenzColor.AQUA.toColor(),
+            color,
             3,
             false
         )
