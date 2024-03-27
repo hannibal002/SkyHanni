@@ -75,9 +75,13 @@ class PestParticleWaypoint {
         if (!isEnabled()) return
         if (event.type != EnumParticleTypes.REDSTONE || event.speed != 1f) return
 
-        isPointingToPest = when (event.offset) {
-            LorenzVec(0.8, 0.0, 0.0) -> false
-            LorenzVec(0.8, 0.4, 0.0) -> true
+        val darkYellow = LorenzVec(0.0, 0.8, 0.0)
+        val yellow = LorenzVec(0.8, 0.8, 0.0)
+        val redPest = LorenzVec(0.8, 0.4, 0.0)
+        val redPlot = LorenzVec(0.8, 0.0, 0.0)
+        isPointingToPest = when (event.offset.round(5)) {
+            redPlot -> false
+            redPest, yellow, darkYellow -> true
             else -> return
         }
         val location = event.location
