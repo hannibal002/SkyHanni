@@ -1,6 +1,7 @@
 package at.hannibal2.skyhanni.features.garden.inventory
 
 import at.hannibal2.skyhanni.events.GuiRenderEvent
+import at.hannibal2.skyhanni.events.InventoryCloseEvent
 import at.hannibal2.skyhanni.events.InventoryFullyOpenedEvent
 import at.hannibal2.skyhanni.events.ProfileJoinEvent
 import at.hannibal2.skyhanni.features.garden.GardenAPI
@@ -71,7 +72,7 @@ class LogBookStats {
 
     @SubscribeEvent
     fun onBackgroundDraw(event: GuiRenderEvent.ChestGuiOverlayRenderEvent) {
-        if (inInventory) {
+        if (inInventory && config.showLogBookStats) {
             config.logBookStatsPos.renderRenderables(
                 display,
                 extraSpace = 5,
@@ -85,6 +86,11 @@ class LogBookStats {
         display = emptyList()
         loggedVisitors.clear()
         currentPage = 0
+        inInventory = false
+    }
+
+    @SubscribeEvent
+    fun onInventoryClosed(event: InventoryCloseEvent){
         inInventory = false
     }
 

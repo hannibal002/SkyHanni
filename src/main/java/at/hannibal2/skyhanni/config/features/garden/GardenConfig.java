@@ -235,5 +235,11 @@ public class GardenConfig {
     public boolean copyMilestoneData = true;
 
     @Expose
+    @ConfigOption(name = "Log Book Stats", desc = "Show total visited/accepted/denied visitors stats.")
+    @ConfigEditorBoolean
+    @FeatureToggle
+    public boolean showLogBookStats = true;
+
+    @Expose
     public Position logBookStatsPos = new Position(427, 92, false, true);
 }
