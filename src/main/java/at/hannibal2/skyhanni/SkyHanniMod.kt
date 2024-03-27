@@ -217,6 +217,9 @@ import at.hannibal2.skyhanni.features.garden.visitor.HighlightVisitorsOutsideOfG
 import at.hannibal2.skyhanni.features.garden.visitor.NPCVisitorFix
 import at.hannibal2.skyhanni.features.garden.visitor.VisitorAPI
 import at.hannibal2.skyhanni.features.garden.visitor.VisitorListener
+import at.hannibal2.skyhanni.features.gui.compacttablist.AdvancedPlayerList
+import at.hannibal2.skyhanni.features.gui.compacttablist.TabListReader
+import at.hannibal2.skyhanni.features.gui.compacttablist.TabListRenderer
 import at.hannibal2.skyhanni.features.gui.customscoreboard.CustomScoreboard
 import at.hannibal2.skyhanni.features.gui.customscoreboard.ScoreboardPattern
 import at.hannibal2.skyhanni.features.inventory.AuctionsHighlighter
@@ -298,9 +301,6 @@ import at.hannibal2.skyhanni.features.misc.SuperpairsClicksAlert
 import at.hannibal2.skyhanni.features.misc.TabWidgetSettings
 import at.hannibal2.skyhanni.features.misc.TimeFeatures
 import at.hannibal2.skyhanni.features.misc.TpsCounter
-import at.hannibal2.skyhanni.features.misc.compacttablist.AdvancedPlayerList
-import at.hannibal2.skyhanni.features.misc.compacttablist.TabListReader
-import at.hannibal2.skyhanni.features.misc.compacttablist.TabListRenderer
 import at.hannibal2.skyhanni.features.misc.discordrpc.DiscordRPCManager
 import at.hannibal2.skyhanni.features.misc.items.AuctionHouseCopyUnderbidPrice
 import at.hannibal2.skyhanni.features.misc.items.EstimatedItemValue

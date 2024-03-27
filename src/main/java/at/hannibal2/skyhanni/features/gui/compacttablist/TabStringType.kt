@@ -1,4 +1,4 @@
-package at.hannibal2.skyhanni.features.misc.compacttablist
+package at.hannibal2.skyhanni.features.gui.compacttablist
 
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 

@@ -4,7 +4,7 @@ import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.config.features.chat.ChatSymbols.SymbolLocationEntry
 import at.hannibal2.skyhanni.events.LorenzChatEvent
-import at.hannibal2.skyhanni.features.misc.compacttablist.TabStringType
+import at.hannibal2.skyhanni.features.gui.compacttablist.TabStringType
 import at.hannibal2.skyhanni.mixins.transformers.AccessorChatComponentText
 import at.hannibal2.skyhanni.utils.ConfigUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils
