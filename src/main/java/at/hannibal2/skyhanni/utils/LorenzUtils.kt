@@ -3,7 +3,7 @@ package at.hannibal2.skyhanni.utils
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.data.HypixelData
 import at.hannibal2.skyhanni.data.IslandType
-import at.hannibal2.skyhanni.data.MayorElection
+import at.hannibal2.skyhanni.data.Perk
 import at.hannibal2.skyhanni.data.TitleManager
 import at.hannibal2.skyhanni.events.GuiContainerEvent
 import at.hannibal2.skyhanni.features.dungeon.DungeonAPI
@@ -270,6 +270,8 @@ object LorenzUtils {
 
     fun IslandType.isInIsland() = inSkyBlock && skyBlockIsland == this
 
+    fun inAnyIsland(vararg islandTypes: IslandType) = inSkyBlock && islandTypes.any { it.isInIsland() }
+
     fun GuiContainerEvent.SlotClickEvent.makeShiftClick() {
         if (this.clickedButton == 1 && slot?.stack?.getItemCategoryOrNull() == ItemCategory.SACK) return
         slot?.slotNumber?.let { slotNumber ->
@@ -281,7 +283,7 @@ object LorenzUtils {
     }
 
     private val recalculateDerpy =
-        RecalculatingValue(1.seconds) { MayorElection.isPerkActive("Derpy", "DOUBLE MOBS HP!!!") }
+        RecalculatingValue(1.seconds) { Perk.DOUBLE_MOBS_HP.isActive }
 
     val isDerpy get() = recalculateDerpy.getValue()
 
@@ -315,6 +317,7 @@ object LorenzUtils {
     inline fun <reified T : Enum<T>> enumJoinToPattern(noinline transform: (T) -> CharSequence = { it.name }) =
         enumValues<T>().joinToString("|", transform = transform)
 
+    // TODO move to val by lazy
     fun isInDevEnviromen() = Launch.blackboard["fml.deobfuscatedEnvironment"] as Boolean
 
     fun shutdownMinecraft(reason: String? = null) {
@@ -364,7 +367,8 @@ object LorenzUtils {
     @Deprecated("moved", ReplaceWith("ChatUtils.sendMessageToServer(message)"))
     fun sendMessageToServer(message: String) = ChatUtils.sendMessageToServer(message)
 
-    fun inAdvancedMiningIsland() = IslandType.DWARVEN_MINES.isInIsland() || IslandType.CRYSTAL_HOLLOWS.isInIsland()
+    fun inAdvancedMiningIsland() =
+        IslandType.DWARVEN_MINES.isInIsland() || IslandType.CRYSTAL_HOLLOWS.isInIsland() || IslandType.MINESHAFT.isInIsland()
 
     fun inMiningIsland() = IslandType.GOLD_MINES.isInIsland() || IslandType.DEEP_CAVERNS.isInIsland()
         || inAdvancedMiningIsland()

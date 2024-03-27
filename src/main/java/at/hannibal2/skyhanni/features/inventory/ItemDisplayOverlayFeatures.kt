@@ -24,6 +24,7 @@ import at.hannibal2.skyhanni.config.features.inventory.InventoryConfig.ItemNumbe
 import at.hannibal2.skyhanni.config.features.inventory.InventoryConfig.ItemNumberEntry.VACUUM_GARDEN
 import at.hannibal2.skyhanni.data.PetAPI
 import at.hannibal2.skyhanni.events.RenderItemTipEvent
+import at.hannibal2.skyhanni.features.garden.GardenAPI
 import at.hannibal2.skyhanni.features.garden.pests.PestAPI
 import at.hannibal2.skyhanni.features.skillprogress.SkillType
 import at.hannibal2.skyhanni.utils.ConfigUtils
@@ -48,6 +49,8 @@ import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getRanchersSpeed
 import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
+import com.google.gson.JsonArray
+import com.google.gson.JsonElement
 import net.minecraft.item.ItemStack
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
@@ -184,13 +187,15 @@ object ItemDisplayOverlayFeatures {
 
         if (RANCHERS_BOOTS_SPEED.isSelected() && internalName == "RANCHERS_BOOTS".asInternalName()) {
             item.getRanchersSpeed()?.let {
-                return if (it > 400 && !(PetAPI.isCurrentPet("Black Cat") ||
-                        InventoryUtils.getHelmet()?.getInternalName() == "RACING_HELMET".asInternalName())
-                ) {
-                    "§c$it"
-                } else {
-                    "§a$it"
-                }
+                val isUsingBlackCat = PetAPI.isCurrentPet("Black Cat")
+                val helmet = InventoryUtils.getHelmet()?.getInternalName()
+                val hand = InventoryUtils.getItemInHand()?.getInternalName()
+                val racingHelmet = "RACING_HELMET".asInternalName()
+                val cactusKnife = "CACTUS_KNIFE".asInternalName()
+                val is500 = isUsingBlackCat || helmet == racingHelmet || (GardenAPI.inGarden() && hand == cactusKnife)
+                val effectiveSpeedCap = if (is500) 500 else 400
+                val text = if (it > 999) "1k" else "$it"
+                return if (it > effectiveSpeedCap) "§c$text" else "§a$text"
             }
         }
 
@@ -280,6 +285,19 @@ object ItemDisplayOverlayFeatures {
         event.transform(11, "inventory.itemNumberAsStackSize") { element ->
             ConfigUtils.migrateIntArrayListToEnumArrayList(element, ItemNumberEntry::class.java)
         }
+        event.transform(29, "inventory.itemNumberAsStackSize") { element ->
+            fixRemovedConfigElement(element)
+        }
+    }
+
+    private fun fixRemovedConfigElement(data: JsonElement): JsonElement {
+        if (!data.isJsonArray) return data
+        val newList = JsonArray()
+        for (element in data.asJsonArray) {
+            if (element.asString == "REMOVED") continue
+            newList.add(element)
+        }
+        return newList
     }
 
     fun ItemNumberEntry.isSelected() = config.itemNumberAsStackSize.contains(this)

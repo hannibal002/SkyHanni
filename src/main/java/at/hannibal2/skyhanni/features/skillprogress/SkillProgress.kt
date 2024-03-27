@@ -184,13 +184,13 @@ object SkillProgress {
         listOf(
             "§cThis will reset your",
             "§ccurrent session time."
-        ),
-    ) {
-        val xpInfo = skillXPInfoMap[activeSkill] ?: return@clickAndHover
-        xpInfo.sessionTimerActive = false
-        xpInfo.timeActive = 0L
-        chat("Timer for §b${activeSkill?.displayName} §ehas been reset!")
-    }
+        ), onClick = {
+            val xpInfo = skillXPInfoMap[activeSkill] ?: return@clickAndHover
+            xpInfo.sessionTimerActive = false
+            xpInfo.timeActive = 0L
+            chat("Timer for §b${activeSkill?.displayName} §ehas been reset!")
+        }
+    )
 
     @SubscribeEvent
     fun onLevelUp(event: SkillOverflowLevelupEvent) {
@@ -422,7 +422,6 @@ object SkillProgress {
             this[TextEntry.XP_HOUR] = Renderable.string("§7XP/h: §e${xpInterp.toLong().addSeparators()} " +
                 if (xpInfo.isActive) "" else "§c(PAUSED)")
         }
-
 
         val session = xpInfo.timeActive.seconds.format(TimeUnit.HOUR)
         this[TextEntry.SESSION] = Renderable.string("§7Session: §e$session ${if (xpInfo.sessionTimerActive) "" else "§c(PAUSED)"}")

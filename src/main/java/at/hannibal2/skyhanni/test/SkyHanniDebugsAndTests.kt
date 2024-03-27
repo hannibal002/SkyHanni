@@ -129,7 +129,7 @@ class SkyHanniDebugsAndTests {
 //            b = args[1].toDouble()
 //            c = args[2].toDouble()
 
-//            for (line in (Minecraft.getMinecraft().ingameGUI.tabList as AccessorGuiPlayerTabOverlay).footer.unformattedText
+//            for (line in getPlayerTabOverlay().footer.unformattedText
 //                .split("\n")) {
 //                println("footer: '$line'")
 //            }
@@ -500,7 +500,7 @@ class SkyHanniDebugsAndTests {
     }
 
     @SubscribeEvent
-    fun onParticlePlay(event: ReceiveParticleEvent) {
+    fun onReceiveParticle(event: ReceiveParticleEvent) {
 //        val particleType = event.type
 //        val distance = LocationUtils.playerLocation().distance(event.location).round(2)
 //
