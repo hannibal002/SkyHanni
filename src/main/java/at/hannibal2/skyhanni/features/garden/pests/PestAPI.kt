@@ -79,7 +79,7 @@ object PestAPI {
      */
     private val infectedPlotsTablistPattern by patternGroup.pattern(
         "tablist.infectedplots",
-        "\\sInfested Plots: (?<plots>.*)"
+        "\\sPlots: (?<plots>.*)"
     )
 
     private fun fixPests() {
