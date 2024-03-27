@@ -51,9 +51,10 @@ class UserLuckBreakdown {
             if (limboUserLuck == 0.0f && !isAdvanced) return
             if (itemCreateCoolDown.passedSince() > 3.seconds) {
                 itemCreateCoolDown = SimpleTimeMark.now()
+                val luckString = tryTruncateFloat(limboUserLuck.round(1))
                 luckItem = Utils.createItemStack(
                     itemID.getItemStack().item,
-                    "$itemName §f${limboUserLuck.round(1)}",
+                    "$itemName §f$luckString",
                     *createItemLore(limboUserLuck)
                 )
             }
@@ -62,10 +63,11 @@ class UserLuckBreakdown {
     }
 
     private fun createItemLore(luckInput: Float): Array<String> {
+        val luckString = tryTruncateFloat(luckInput.round(2))
         return if (luckInput == 0.0f) { arrayOf(
                 "§7SkyHanni User Luck is the best stat.",
                 "",
-                "§7Flat: §a+${luckInput.round(2)}✴",
+                "§7Flat: §a+$luckString✴",
                 "",
                 "§8You have none of this stat!",
                 "§cDON'T §eclick to view!"
@@ -73,7 +75,7 @@ class UserLuckBreakdown {
         } else { arrayOf(
                 "§7SkyHanni User Luck is the best stat.",
                 "",
-                "§7Flat: §a+${luckInput.round(2)}✴",
+                "§7Flat: §a+$luckString✴",
                 "",
                 "§cDON'T §eclick to view!"
             )
@@ -132,7 +134,8 @@ class UserLuckBreakdown {
                 val lastIndex = event.toolTip.indexOfLast { it == "§5§o" }
                 if (lastIndex == -1) return
 
-                event.toolTip.add(lastIndex, "$luckTooltipString${limboUserLuck.round(1)}")
+                val luckString = tryTruncateFloat(limboUserLuck.round(1))
+                event.toolTip.add(lastIndex, "$luckTooltipString$luckString")
             }
             "Your Stats Breakdown" -> {
                 if (!inMiscStats) return
@@ -140,7 +143,8 @@ class UserLuckBreakdown {
                 val limboUserLuck = storage?.limbo?.userLuck ?: 0.0f
                 if (limboUserLuck == 0.0f && !isAdvanced) return
 
-                event.toolTip.add("§5§o §a✴ SkyHanni User Luck §f${limboUserLuck.round(1)}")
+                val luckString = tryTruncateFloat(limboUserLuck.round(1))
+                event.toolTip.add("§5§o §a✴ SkyHanni User Luck §f$luckString")
             }
             "SkyBlock Menu" -> {
                 if (event.slot.slotIndex != 13) return
@@ -150,9 +154,16 @@ class UserLuckBreakdown {
                 val lastIndex = event.toolTip.indexOfLast { it == "§5§o" }
                 if (lastIndex == -1) return
 
-                event.toolTip.add(lastIndex, "$luckTooltipString${limboUserLuck.round(1)}")
+                val luckString = tryTruncateFloat(limboUserLuck.round(1))
+                event.toolTip.add(lastIndex, "$luckTooltipString$luckString")
             }
             else -> return
         }
+    }
+
+    private fun tryTruncateFloat(input: Float): String {
+        val string = input.toString()
+        return if (string.endsWith(".0")) return string.dropLast(2)
+        else string
     }
 }
