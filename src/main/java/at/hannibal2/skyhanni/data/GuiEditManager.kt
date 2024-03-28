@@ -47,11 +47,6 @@ class GuiEditManager {
         openGuiPositionEditor(hotkeyReminder = false)
     }
 
-    @SubscribeEvent(priority = EventPriority.HIGHEST)
-    fun e(event: GuiRenderEvent.GuiOverlayRenderEvent) {
-        GlStateManager.translate(0f, 0f, 0f)
-    }
-
     @SubscribeEvent(priority = EventPriority.LOWEST)
     fun onRenderOverlay(event: GuiRenderEvent.GuiOverlayRenderEvent) {
         latestPositions = currentPositions.toMap()
