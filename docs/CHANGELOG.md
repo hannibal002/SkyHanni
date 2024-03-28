@@ -188,6 +188,10 @@
     + Previously, we made the Jacob visitor messages not hidden to avoid hiding real Jacob messages.
 + Added the ability to get your current speed on the Garden even if it isn't shown in the tab list. - Alexia Luna (https://github.com/hannibal002/SkyHanni/pull/1277)
     + This also means the speed now updates faster.
++ Change the Pest Waypoint color depending on distance. - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/1296)
+    + It is the one from the Hypixel particles.
++ Better pest tracker waypoint detection for pest or center of plot. - Empa (https://github.com/hannibal002/SkyHanni/pull/1284)
++ Immediately hide waypoints when there are no pests left. - Empa (https://github.com/hannibal002/SkyHanni/pull/1284)
 
 #### Crimson Improvelemts
 
@@ -221,6 +225,16 @@
 
 + Add the ability to see Mineshaft mining events when that releases to main. - CalMWolfs (https://github.com/hannibal002/SkyHanni/pull/1236)
 
+##### Config Improvements
+
++ Changed a lot in the config. - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/1300)
+    + Main categories are reordered.
+    + Moved into GUI: Compact Tab List, Cosmetic, Discord Rich Presence, Chroma and Marked Players
+    + Moved into Inventory: Estimated Item Value, Pocket Sack in a Sack, Auction House and Item Abilities
+    + Moved into Misc: Commands, Stranded and Minions
++ Reordered custom scoreboard config options. - j10a1n15 (https://github.com/hannibal002/SkyHanni/pull/1294)
++ Changed SkyBlock Level Guide Highlighting Collections to no longer being default enabled. - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/1298)
+
 #### Misc Improvements
 
 + Added option to show some features outside SkyBlock. - Obsidian
@@ -246,6 +260,7 @@
 + Fixed a small typo in the Deep Caverns Parkour message. - Alexia Luna
 + Stopped Dwarven Mines events from showing in Crystal Hollows in the mining event tracker. -
   CalMWolfs (https://github.com/hannibal002/SkyHanni/pull/1142)
++ Further fixed Showing Dwarven specific events in Crystal Hollows/Mineshaft section of mining event display. - CalMWolfs (https://github.com/hannibal002/SkyHanni/pull/1289)
 
 #### Inventory Fixes
 
@@ -313,6 +328,10 @@
 + Fixed another Sensitivity Reducer + Mouse Lock incompatibility. -
   martimavocado (https://github.com/hannibal002/SkyHanni/pull/1253)
 + Fixed mouse locking not always working. - martimavocado (https://github.com/hannibal002/SkyHanni/pull/1272)
++ Fixed a bug that the seconds per copper is incorrect in garden visitors with multiple items. - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/1295)
++ Fixed some particles triggering the pest tracker waypoint. - Empa (https://github.com/hannibal002/SkyHanni/pull/1284)
++ Fixed not detecting infected plots from tab list. - Empa (https://github.com/hannibal002/SkyHanni/pull/1291)
++ Fixed visitor tooltip breaking when visitor data is disabled in tab list. - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/1251)
 
 #### Command Fixes
 
@@ -329,6 +348,7 @@
   hannibal2 (https://github.com/hannibal002/SkyHanni/pull/1218)
 + Fixed slayer cost from bank counting plus instead of minus profit. -
   hannibal2 (https://github.com/hannibal002/SkyHanni/pull/1220)
++ Fixed Server Player Amount not being affected by "display numbers first". - j10a1n15 (https://github.com/hannibal002/SkyHanni/pull/1285)
 
 #### Gui Fixes
 
@@ -390,6 +410,7 @@
 
 + Fixed error in Dungeon Finder Features. - Thunderblade73 (https://github.com/hannibal002/SkyHanni/pull/1162)
 + Fix getting current class in Party Finder. - martimavocado (https://github.com/hannibal002/SkyHanni/pull/1219)
++ Fixed showing the Dungeon Floor numbers in your inventory as well while inside the Catacombs Gate menu. - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/1297)
 
 #### Crimson Isle Fixes
 
@@ -433,6 +454,7 @@
 + Fixed detection of Party Leader when their username ends with an `s`. - Alexia
   Luna (https://github.com/hannibal002/SkyHanni/pull/1203)
 + Hover messages can't go off-screen anymore - Thunderblade73 (https://github.com/hannibal002/SkyHanni/pull/821)
++ Fix "Ghost Entities" feature breaking outside SkyBlock game modes on Hypixel. - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/1301)
 
 ### Technical Details
 
@@ -563,6 +585,7 @@
 + Repo Pattens now work inside Unit Tests. - Thunderblade73 (https://github.com/hannibal002/SkyHanni/pull/1258)
 + Added isBeingPasted variable for plots. - ILike2WatchMemes (https://github.com/hannibal002/SkyHanni/pull/1254)
 + Always use local repo patterns when in dev env. - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/1282)
++ Removed VisitorToolTipEvent. - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/1251)
 
 ### Removed Features
 
