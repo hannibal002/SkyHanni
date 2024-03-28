@@ -35,7 +35,7 @@ import kotlin.time.Duration.Companion.seconds
 
 class QuiverDisplay {
 
-    private val config get() = SkyHanniMod.feature.misc.quiverDisplay
+    private val config get() = SkyHanniMod.feature.gui.quiverDisplay
 
     private var display = emptyList<Renderable>()
     private var arrow: ArrowType? = null
@@ -171,6 +171,6 @@ class QuiverDisplay {
 
     @SubscribeEvent
     fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
-        event.move(28,"config.inventory.quiverAlert","config.misc.quiverDisplay.lowQuiverNotification")
+        event.move(31,"config.inventory.quiverAlert","config.gui.quiverDisplay.lowQuiverNotification")
     }
 }

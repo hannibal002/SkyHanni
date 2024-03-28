@@ -92,11 +92,6 @@ public class MiscConfig {
     public PetCandyDisplayConfig petCandy = new PetCandyDisplayConfig();
 
     @Expose
-    @ConfigOption(name = "Quiver Display", desc = "")
-    @Accordion
-    public QuiverDisplayConfig quiverDisplay = new QuiverDisplayConfig();
-
-    @Expose
     @ConfigOption(name = "Show Outside SB", desc = "Show these features outside of SkyBlock.")
     @ConfigEditorDraggableList
     public List<OutsideSbFeature> showOutsideSB = new ArrayList<>();
