@@ -1,6 +1,7 @@
 package at.hannibal2.skyhanni.features.mining.eventtracker
 
 import at.hannibal2.skyhanni.SkyHanniMod
+import at.hannibal2.skyhanni.features.misc.DarkenShader
 import at.hannibal2.skyhanni.utils.ItemUtils
 import at.hannibal2.skyhanni.utils.RenderUtils
 import at.hannibal2.skyhanni.utils.StringUtils.allLettersFirstUppercase
@@ -111,14 +112,15 @@ enum class MiningEventType(
     val compactTextWithIcon = icon + compactText
     val normalTextWithIcon = icon + normalText
 
-    private fun Renderable.darken() = object : Renderable {
+    private fun Renderable.darken(amount: Float = 0.0f) = object : Renderable {
         override val width = this@darken.width
         override val height = this@darken.height
         override val horizontalAlign = this@darken.horizontalAlign
         override val verticalAlign = this@darken.verticalAlign
 
         override fun render(posX: Int, posY: Int) {
-            ShaderManager.Shaders.DARKEN.enableShader()
+            DarkenShader.darknessLevel = amount
+            ShaderManager.enableShader("darken")
             this@darken.render(posX, posY)
             ShaderManager.disableShader()
         }

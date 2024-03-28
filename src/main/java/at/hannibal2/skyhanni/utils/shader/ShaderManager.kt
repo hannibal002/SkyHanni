@@ -29,7 +29,7 @@ object ShaderManager {
         DARKEN(DarkenShader.INSTANCE)
         ;
 
-        fun enableShader() = ShaderManager.enableShader(name)
+        fun enableShader() = ShaderManager.enableShader(name.lowercase())
 
         companion object {
 

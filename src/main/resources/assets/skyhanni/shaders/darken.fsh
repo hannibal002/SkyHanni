@@ -1,12 +1,11 @@
 #version 120
 
 // Fragment Shader
-uniform float darknessLevel; // Darkness level
+uniform sampler2D texture;
+uniform float darknessLevel;
 
-void main()
-{
-    // Make the object darker
-    vec4 color = gl_Color;
+void main() {
+    vec4 color = texture2D(texture, gl_TexCoord[0].st);
     vec3 darkenedColor = color.rgb * darknessLevel;
     gl_FragColor = vec4(darkenedColor, color.a);
 }
