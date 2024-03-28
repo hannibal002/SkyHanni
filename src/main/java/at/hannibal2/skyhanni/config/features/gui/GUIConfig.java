@@ -4,6 +4,7 @@ import at.hannibal2.skyhanni.config.FeatureToggle;
 import at.hannibal2.skyhanni.config.core.config.Position;
 import at.hannibal2.skyhanni.config.features.chroma.ChromaConfig;
 import at.hannibal2.skyhanni.config.features.gui.customscoreboard.CustomScoreboardConfig;
+import at.hannibal2.skyhanni.config.features.markedplayer.MarkedPlayerConfig;
 import at.hannibal2.skyhanni.config.features.misc.DiscordRPCConfig;
 import at.hannibal2.skyhanni.config.features.misc.compacttablist.CompactTabListConfig;
 import at.hannibal2.skyhanni.config.features.misc.cosmetic.CosmeticConfig;
@@ -52,6 +53,11 @@ public class GUIConfig {
     @ConfigOption(name = "Discord Rich Presence", desc = "")
     @Accordion
     public DiscordRPCConfig discordRPC = new DiscordRPCConfig();
+
+    @Expose
+    @ConfigOption(name = "Marked Players", desc = "Players that got marked with §e/shmarkplayer§7.")
+    @Accordion
+    public MarkedPlayerConfig markedPlayers = new MarkedPlayerConfig();
 
     @Expose
     @ConfigOption(name = "Modify Visual Words", desc = "")
