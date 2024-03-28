@@ -25,7 +25,7 @@ import kotlin.time.TimeSource
 @OptIn(ExperimentalTime::class)
 class HighlightBonzoMasks {
 
-    private val config get() = SkyHanniMod.feature.itemAbilities
+    private val config get() = SkyHanniMod.feature.inventory.itemAbilities
 
     private val maskTimers = mutableMapOf<String, CooldownTimer>()
 

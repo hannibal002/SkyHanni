@@ -22,6 +22,10 @@ class MovementSpeedDisplay {
     private val soulsandSpeeds = mutableListOf<Double>()
 
     companion object {
+        /**
+         * This speed value represents the movement speed in blocks per second.
+         * This has nothing to do with the speed stat.
+          */
         var speed = 0.0
         var usingSoulsandSpeed = false
     }
