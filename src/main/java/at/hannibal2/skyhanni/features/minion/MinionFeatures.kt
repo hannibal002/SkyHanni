@@ -59,7 +59,7 @@ import java.awt.Color
 
 class MinionFeatures {
 
-    private val config get() = SkyHanniMod.feature.minions
+    private val config get() = SkyHanniMod.feature.misc.minions
     private var lastClickedEntity: LorenzVec? = null
     private var newMinion: LorenzVec? = null
     private var newMinionName: String? = null
@@ -397,5 +397,7 @@ class MinionFeatures {
         event.move(3, "minions.lastOpenedMinionTime", "minions.lastClickedMinion.time")
         event.move(3, "minions.emptiedTimeDisplay", "minions.emptiedTime.display")
         event.move(3, "minions.distance", "minions.emptiedTime.distance")
+
+        event.move(31, "minions", "misc.minions")
     }
 }
