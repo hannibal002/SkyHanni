@@ -251,6 +251,7 @@ import at.hannibal2.skyhanni.features.inventory.tiarelay.TiaRelayWaypoints
 import at.hannibal2.skyhanni.features.itemabilities.ChickenHeadTimer
 import at.hannibal2.skyhanni.features.itemabilities.FireVeilWandParticles
 import at.hannibal2.skyhanni.features.itemabilities.abilitycooldown.ItemAbilityCooldown
+import at.hannibal2.skyhanni.features.mining.CommissionsCalculator
 import at.hannibal2.skyhanni.features.mining.DeepCavernsParkour
 import at.hannibal2.skyhanni.features.mining.HighlightMiningCommissionMobs
 import at.hannibal2.skyhanni.features.mining.KingTalismanHelper
@@ -729,6 +730,7 @@ class SkyHanniMod {
         loadModule(CustomTextBox())
         loadModule(RiftUpsideDownParkour())
         loadModule(RiftLavaMazeParkour())
+        loadModule(CommissionsCalculator())
         loadModule(HighlightMiningCommissionMobs())
         loadModule(ShowMotesNpcSellPrice())
         loadModule(LivingMetalSuitProgress())
