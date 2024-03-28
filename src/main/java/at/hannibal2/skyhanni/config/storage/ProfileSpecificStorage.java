@@ -1,6 +1,7 @@
 package at.hannibal2.skyhanni.config.storage;
 
 import at.hannibal2.skyhanni.api.SkillAPI;
+import at.hannibal2.skyhanni.data.jsonobjects.local.HotmTree;
 import at.hannibal2.skyhanni.data.MaxwellAPI;
 import at.hannibal2.skyhanni.data.model.ComposterUpgrade;
 import at.hannibal2.skyhanni.features.combat.endernodetracker.EnderNodeTracker;
@@ -373,6 +374,27 @@ public class ProfileSpecificStorage {
 
         @Expose
         public List<String> kingsTalkedTo = new ArrayList<>();
+
+        @Expose
+        public HotmTree hotmTree = new HotmTree();
+
+        @Expose
+        public long mithrilPowder;
+
+        @Expose
+        public long availableMithrilPowder;
+
+        @Expose
+        public long gemstonePowder;
+
+        @Expose
+        public long availableGemstonePowder;
+
+        @Expose
+        public int tokens;
+
+        @Expose
+        public int availableTokens;
     }
 
     @Expose
