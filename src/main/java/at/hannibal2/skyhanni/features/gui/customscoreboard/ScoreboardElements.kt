@@ -98,7 +98,7 @@ enum class ScoreboardElement(
     COLD(
         ::getColdDisplayPair,
         ::getColdShowWhen,
-        "Cold: §b❄ 0"
+        "Cold: §b0❄"
     ),
     NORTH_STARS(
         ::getNorthStarsDisplayPair,
@@ -452,8 +452,8 @@ private fun getColdDisplayPair(): List<ScoreboardElementType> {
     return listOf(
         when {
             informationFilteringConfig.hideEmptyLines && cold == "0" -> "<hidden>"
-            displayConfig.displayNumbersFirst -> "§b❄ $cold Cold"
-            else -> "Cold: §b❄ $cold"
+            displayConfig.displayNumbersFirst -> "§b$cold❄ Cold"
+            else -> "Cold: §b$cold❄"
         } to HorizontalAlignment.LEFT
     )
 }
