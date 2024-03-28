@@ -167,7 +167,6 @@ class DungeonFinderFeatures {
             val floorNum = floorNumberPattern.matchMatcher(floor) {
                 group("floorNum").romanToDecimalIfNecessary()
             }
-            "123".toPattern()
             map[slot] = getFloorName(floor, dungeon, floorNum)
         }
     }
