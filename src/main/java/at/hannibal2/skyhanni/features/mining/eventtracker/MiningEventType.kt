@@ -108,8 +108,8 @@ enum class MiningEventType(
     val compactText = Renderable.string("§$colourCode$shortName")
     val normalText = Renderable.string("§$colourCode$eventName")
 
-    val compactTextWithIcon = compactText + icon
-    val normalTextWithIcon = compactText + icon
+    val compactTextWithIcon = icon + compactText
+    val normalTextWithIcon = icon + normalText
 
     private fun Renderable.darken() = object : Renderable {
         override val width = this@darken.width
@@ -124,6 +124,16 @@ enum class MiningEventType(
         }
 
     }
+
+    fun getRenderable(): Renderable = when (config.compressedFormat) {
+        CompressFormat.COMPACT_TEXT -> compactTextWithIcon
+        CompressFormat.ICON_ONLY -> icon
+        CompressFormat.TEXT_WITHOUT_ICON -> normalText
+        CompressFormat.COMPACT_TEXT_WITHOUT_ICON -> compactText
+        CompressFormat.DEFAULT, null -> normalTextWithIcon
+    }
+
+    fun getRenderableAsPast(): Renderable = getRenderable().darken()
 
     override fun toString() = when (config.compressedFormat) {
         CompressFormat.COMPACT_TEXT -> "§$colourCode$shortName"
@@ -154,5 +164,6 @@ enum class MiningEventType(
     }
 }
 
+// Do not use anywhere else
 private operator fun Renderable.plus(other: Renderable): Renderable =
-    Renderable.horizontalContainer(listOf(this, other), 1)
+    Renderable.horizontalContainer(listOf(this, other), -2)

@@ -435,7 +435,7 @@ interface Renderable {
                 renderables.forEach {
                     it.renderYAligned(xOffset, 0, height)
                     xOffset += it.width + spacing
-                    GlStateManager.translate(it.width.toFloat(), 0f, 0f)
+                    GlStateManager.translate((it.width + spacing).toFloat(), 0f, 0f)
                 }
                 GlStateManager.translate(-width.toFloat() - spacing.toFloat(), 0f, 0f)
             }

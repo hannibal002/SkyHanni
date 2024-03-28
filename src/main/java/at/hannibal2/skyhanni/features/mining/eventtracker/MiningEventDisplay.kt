@@ -18,7 +18,7 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
 object MiningEventDisplay {
     private val config get() = SkyHanniMod.feature.mining.miningEvent
-    private var display = mutableListOf<String>()
+    private var display = mutableListOf<Renderable>()
 
     private val islandEventData: MutableMap<IslandType, MiningIslandEventInfo> = mutableMapOf()
 
@@ -31,14 +31,14 @@ object MiningEventDisplay {
     @SubscribeEvent
     fun onRenderOverlay(event: GuiRenderEvent.GuiOverlayRenderEvent) {
         if (!shouldDisplay()) return
-        config.position.renderRenderables(MiningEventType.entries.map {
+        /* config.position.renderRenderables(MiningEventType.entries.map {
             Renderable.horizontalContainer(
                 listOf(
                     it.icon, Renderable.string(" ${it.eventName}")
                 )
             )
-        }, posLabel = "Upcoming Events Display")
-        //config.position.renderStrings(display, posLabel = "Upcoming Events Display")
+        }, posLabel = "Upcoming Events Display") */
+        config.position.renderRenderables(display, posLabel = "Upcoming Events Display")
     }
 
     private fun updateDisplay() {
@@ -64,18 +64,33 @@ object MiningEventDisplay {
 
             if (shouldShow) {
                 val upcomingEvents = formatUpcomingEvents(eventDetails.islandEvents, eventDetails.lastEvent)
-                display.add("§a${islandType.displayName}§8: $upcomingEvents")
+                val island = Renderable.string("§a${islandType.displayName}§8:")
+                display.add(
+                    Renderable.horizontalContainer(
+                        listOf(
+                            island,
+                            *upcomingEvents
+                        ), 3
+                    )
+                )
             }
         }
     }
 
-    private fun formatUpcomingEvents(events: List<RunningEventType>, lastEvent: MiningEventType?): String {
-        val upcoming = events.filter { !it.endsAt.asTimeMark().isInPast() }
-            .map { if (it.isDoubleEvent) "${it.event} §8-> ${it.event}" else it.event.toString() }.toMutableList()
+    private val unknownDisplay = Renderable.string("§7???")
+    private val transitionDisplay = Renderable.string("§8->")
 
-        if (upcoming.isEmpty()) upcoming.add("§7???")
-        if (config.passedEvents && upcoming.size < 4) lastEvent?.let { upcoming.add(0, it.toPastString()) }
-        return upcoming.joinToString(" §8-> ")
+    private fun formatUpcomingEvents(events: List<RunningEventType>, lastEvent: MiningEventType?): Array<Renderable> {
+        val upcoming = events.filter { !it.endsAt.asTimeMark().isInPast() }
+            .flatMap {
+                if (it.isDoubleEvent) listOf(it.event, it.event) else listOf(it.event)
+                /* if (it.isDoubleEvent) "${it.event} §8-> ${it.event}" else it.event.toString() */
+            }.map { it.getRenderable() }.toMutableList()
+
+        if (upcoming.isEmpty()) upcoming.add(unknownDisplay)
+        if (config.passedEvents && upcoming.size < 4) lastEvent?.let { upcoming.add(0, it.getRenderableAsPast()) }
+        return upcoming.flatMap { listOf(it, transitionDisplay) }.dropLast(1).toTypedArray()
+        /* return upcoming.joinToString(" §8-> ") */
     }
 
     fun updateData(eventData: MiningEventData) {
