@@ -18,7 +18,6 @@ import at.hannibal2.skyhanni.config.features.misc.MiscConfig;
 import at.hannibal2.skyhanni.config.features.rift.RiftConfig;
 import at.hannibal2.skyhanni.config.features.skillprogress.SkillProgressConfig;
 import at.hannibal2.skyhanni.config.features.slayer.SlayerConfig;
-import at.hannibal2.skyhanni.config.features.stranded.StrandedConfig;
 import at.hannibal2.skyhanni.config.storage.Storage;
 import com.google.gson.annotations.Expose;
 import io.github.moulberry.moulconfig.Config;
@@ -120,10 +119,6 @@ public class Features extends Config {
     @Expose
     @Category(name = "Slayer", desc = "Slayer features.")
     public SlayerConfig slayer = new SlayerConfig();
-
-    @Expose
-    @Category(name = "Stranded", desc = "Features for the Stranded game mode.")
-    public StrandedConfig stranded = new StrandedConfig();
 
     @Expose
     @Category(name = "The Rift", desc = "Features for The Rift dimension.")

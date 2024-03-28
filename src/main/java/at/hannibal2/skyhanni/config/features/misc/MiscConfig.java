@@ -5,6 +5,7 @@ import at.hannibal2.skyhanni.config.core.config.Position;
 import at.hannibal2.skyhanni.config.enums.OutsideSbFeature;
 import at.hannibal2.skyhanni.config.features.commands.CommandsConfig;
 import at.hannibal2.skyhanni.config.features.misc.pets.PetConfig;
+import at.hannibal2.skyhanni.config.features.stranded.StrandedConfig;
 import com.google.gson.annotations.Expose;
 import io.github.moulberry.moulconfig.annotations.Accordion;
 import io.github.moulberry.moulconfig.annotations.Category;
@@ -24,6 +25,10 @@ public class MiscConfig {
     @Expose
     @Category(name = "Commands", desc = "Enable or disable commands.")
     public CommandsConfig commands = new CommandsConfig();
+
+    @Expose
+    @Category(name = "Stranded", desc = "Features for the Stranded game mode.")
+    public StrandedConfig stranded = new StrandedConfig();
 
     @ConfigOption(name = "Hide Armor", desc = "")
     @Accordion
