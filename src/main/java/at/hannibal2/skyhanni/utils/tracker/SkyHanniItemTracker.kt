@@ -129,21 +129,23 @@ class SkyHanniItemTracker<Data : ItemTrackerData>(
             }
 
             val lore = buildLore(data, itemProfit, hidden, newDrop, internalName)
-            val renderable = if (isInventoryOpen()) Renderable.clickAndHover(displayName, lore) {
-                if (System.currentTimeMillis() > lastClickDelay + 150) {
-                    if (KeyboardManager.isModifierKeyDown()) {
-                        data.items.remove(internalName)
-                        ChatUtils.chat("Removed $cleanName §efrom $name.")
-                        lastClickDelay = System.currentTimeMillis() + 500
-                    } else {
-                        modify {
-                            it.items[internalName]?.hidden = !hidden
+            val renderable = if (isInventoryOpen()) Renderable.clickAndHover(displayName, lore,
+                onClick = {
+                    if (System.currentTimeMillis() > lastClickDelay + 150) {
+                        if (KeyboardManager.isModifierKeyDown()) {
+                            data.items.remove(internalName)
+                            ChatUtils.chat("Removed $cleanName §efrom $name.")
+                            lastClickDelay = System.currentTimeMillis() + 500
+                        } else {
+                            modify {
+                                it.items[internalName]?.hidden = !hidden
+                            }
+                            lastClickDelay = System.currentTimeMillis()
                         }
-                        lastClickDelay = System.currentTimeMillis()
+                        update()
                     }
-                    update()
                 }
-            } else Renderable.string(displayName)
+            ) else Renderable.string(displayName)
 
             lists.addAsSingletonList(renderable)
         }

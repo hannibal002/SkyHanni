@@ -91,9 +91,7 @@ object StringUtils {
         return cleanedString.toString()
     }
 
-    fun UUID.toDashlessUUID(): String {
-        return toString().replace("-", "")
-    }
+    fun UUID.toDashlessUUID(): String = toString().replace("-", "")
 
     inline fun <T> Pattern.matchMatcher(text: String, consumer: Matcher.() -> T) =
         matcher(text).let { if (it.matches()) consumer(it) else null }
@@ -260,15 +258,9 @@ object StringUtils {
         return chatComponent
     }
 
-    fun String.getPlayerNameFromChatMessage(): String? {
-        val matcher = matchPlayerChatMessage(this) ?: return null
-        return matcher.group("username")
-    }
+    fun String.getPlayerNameFromChatMessage(): String? = matchPlayerChatMessage(this)?.group("username")
 
-    fun String.getPlayerNameAndRankFromChatMessage(): String? {
-        val matcher = matchPlayerChatMessage(this) ?: return null
-        return matcher.group("rankedName")
-    }
+    fun String.getPlayerNameAndRankFromChatMessage(): String? = matchPlayerChatMessage(this)?.group("rankedName")
 
     private fun matchPlayerChatMessage(string: String): Matcher? {
         var username = ""
@@ -304,7 +296,9 @@ object StringUtils {
 
     fun String?.equalsIgnoreColor(string: String?) = this?.let { it.removeColor() == string?.removeColor() } ?: false
 
-    fun String.isRoman(): Boolean {
-        return UtilsPatterns.isRomanPattern.matches(this)
-    }
+    fun String.isRoman(): Boolean = UtilsPatterns.isRomanPattern.matches(this)
+
+    fun isEmpty(message: String): Boolean = message.removeColor().trimWhiteSpaceAndResets().isEmpty()
+
+    fun generateRandomId() = UUID.randomUUID().toString()
 }

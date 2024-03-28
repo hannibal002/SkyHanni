@@ -284,8 +284,9 @@ object GhostCounter {
         }
         val moneyMadeWithClickableTips = Renderable.clickAndHover(
             textFormatting.moneyMadeFormat.formatText(moneyMade.addSeparators()),
-            moneyMadeTips
-        ) { OSUtils.copyToClipboard(moneyMadeTips.joinToString("\n").removeColor()) }
+            moneyMadeTips,
+            onClick = { OSUtils.copyToClipboard(moneyMadeTips.joinToString("\n").removeColor()) }
+        )
         addAsSingletonList(textFormatting.moneyHourFormat.formatText(final))
         addAsSingletonList(moneyMadeWithClickableTips)
     }

@@ -19,6 +19,7 @@ import at.hannibal2.skyhanni.features.garden.CropType;
 import at.hannibal2.skyhanni.features.garden.GardenPlotAPI;
 import at.hannibal2.skyhanni.features.garden.farming.ArmorDropTracker;
 import at.hannibal2.skyhanni.features.garden.farming.DicerRngDropTracker;
+import at.hannibal2.skyhanni.features.garden.farming.lane.FarmingLane;
 import at.hannibal2.skyhanni.features.garden.fortuneguide.FarmingItems;
 import at.hannibal2.skyhanni.features.garden.visitor.VisitorReward;
 import at.hannibal2.skyhanni.features.mining.powdertracker.PowderTracker;
@@ -229,6 +230,9 @@ public class ProfileSpecificStorage {
 
         @Expose
         public Map<CropType, LorenzVec> cropStartLocations = new HashMap<>();
+
+        @Expose
+        public Map<CropType, FarmingLane> farmingLanes = new HashMap<>();
 
         @Expose
         public GardenStorage.Fortune fortune = new GardenStorage.Fortune();
