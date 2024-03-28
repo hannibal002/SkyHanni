@@ -13,7 +13,6 @@ import at.hannibal2.skyhanni.config.features.fishing.FishingConfig;
 import at.hannibal2.skyhanni.config.features.garden.GardenConfig;
 import at.hannibal2.skyhanni.config.features.gui.GUIConfig;
 import at.hannibal2.skyhanni.config.features.inventory.InventoryConfig;
-import at.hannibal2.skyhanni.config.features.itemability.ItemAbilityConfig;
 import at.hannibal2.skyhanni.config.features.mining.MiningConfig;
 import at.hannibal2.skyhanni.config.features.minion.MinionsConfig;
 import at.hannibal2.skyhanni.config.features.misc.MiscConfig;
@@ -110,10 +109,6 @@ public class Features extends Config {
     @Expose
     @Category(name = "Inventory", desc = "Change the behavior of items and the inventory.")
     public InventoryConfig inventory = new InventoryConfig();
-
-    @Expose
-    @Category(name = "Item Abilities", desc = "Stuff about item abilities.")
-    public ItemAbilityConfig itemAbilities = new ItemAbilityConfig();
 
     @Expose
     @Category(name = "Minions", desc = "The minions on your private island.")

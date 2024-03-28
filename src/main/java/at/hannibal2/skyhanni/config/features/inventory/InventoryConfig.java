@@ -3,6 +3,7 @@ package at.hannibal2.skyhanni.config.features.inventory;
 import at.hannibal2.skyhanni.config.FeatureToggle;
 import at.hannibal2.skyhanni.config.HasLegacyId;
 import at.hannibal2.skyhanni.config.features.inventory.helper.HelperConfig;
+import at.hannibal2.skyhanni.config.features.itemability.ItemAbilityConfig;
 import at.hannibal2.skyhanni.config.features.misc.EstimatedItemValueConfig;
 import at.hannibal2.skyhanni.config.features.misc.PocketSackInASackConfig;
 import com.google.gson.annotations.Expose;
@@ -38,6 +39,10 @@ public class InventoryConfig {
     @Expose
     @Category(name = "Helpers", desc = "Settings for Helpers")
     public HelperConfig helper = new HelperConfig();
+
+    @Expose
+    @Category(name = "Item Abilities", desc = "Stuff about item abilities.")
+    public ItemAbilityConfig itemAbilities = new ItemAbilityConfig();
 
     @Expose
     @ConfigOption(name = "Not Clickable Items", desc = "")
