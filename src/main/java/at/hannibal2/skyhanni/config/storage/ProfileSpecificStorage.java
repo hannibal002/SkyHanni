@@ -81,7 +81,7 @@ public class ProfileSpecificStorage {
         public int bitsToClaim = -1;
 
         @Expose
-        public long boosterCookieExpiryTime = 0L;
+        public Long boosterCookieExpiryTime = null;
     }
 
     @Expose

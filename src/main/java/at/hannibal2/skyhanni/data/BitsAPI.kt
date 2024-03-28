@@ -44,10 +44,10 @@ object BitsAPI {
             profileStorage?.bitsToClaim = value
         }
 
-    var cookieBuffTime: SimpleTimeMark
-        get() = profileStorage?.boosterCookieExpiryTime?.asTimeMark() ?: SimpleTimeMark.farPast()
+    var cookieBuffTime: SimpleTimeMark?
+        get() = profileStorage?.boosterCookieExpiryTime?.asTimeMark()
         private set(value) {
-            profileStorage?.boosterCookieExpiryTime = value.toMillis()
+            profileStorage?.boosterCookieExpiryTime = value?.toMillis()
         }
 
     private const val defaultcookiebits = 4800
@@ -167,7 +167,8 @@ object BitsAPI {
 
         boosterCookieAte.matchMatcher(message) {
             bitsToClaim += (defaultcookiebits * (currentFameRank?.bitsMultiplier ?: return)).toInt()
-            cookieBuffTime += 4.days
+            val cookieTime = cookieBuffTime
+            cookieBuffTime = if (cookieTime == null) SimpleTimeMark.now() + 4.days else cookieTime + 4.days
 
             return
         }
@@ -195,9 +196,12 @@ object BitsAPI {
                 }
                 cookieDurationPattern.matchMatcher(line) {
                     val duration = TimeUtils.getDuration(group("time"))
-                    cookieBuffTime = SimpleTimeMark.now().plus(duration)
+                    cookieBuffTime = SimpleTimeMark.now() + duration
                 }
-                if (noCookieActiveSBMenuPattern.matches(line)) cookieBuffTime = SimpleTimeMark.farPast()
+                if (noCookieActiveSBMenuPattern.matches(line)) {
+                    val cookieTime = cookieBuffTime
+                    if (cookieTime == null || !cookieTime.isInPast()) cookieBuffTime = SimpleTimeMark.farPast()
+                }
             }
             return
         }
