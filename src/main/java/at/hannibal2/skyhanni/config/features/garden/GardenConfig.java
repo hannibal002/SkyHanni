@@ -182,7 +182,7 @@ public class GardenConfig {
     )
     @ConfigEditorBoolean
     @FeatureToggle
-    public boolean jacobContextTimes = true;
+    public boolean jacobContestTimes = true;
 
     @Expose
     @ConfigOption(
@@ -203,7 +203,7 @@ public class GardenConfig {
     public double jacobContestCustomBpsValue = 19.9;
 
     @Expose
-    public Position jacobContextTimesPos = new Position(-359, 149, false, true);
+    public Position jacobContestTimesPos = new Position(-359, 149, false, true);
 
     @Expose
     @ConfigOption(

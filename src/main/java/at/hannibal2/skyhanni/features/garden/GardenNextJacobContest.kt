@@ -513,7 +513,7 @@ object GardenNextJacobContest {
 
     private fun isEnabled() =
         config.display && ((LorenzUtils.inSkyBlock && (GardenAPI.inGarden() || config.showOutsideGarden)) ||
-            (OutsideSbFeature.NEXT_JACOB_CONTEXT.isSelected() && !LorenzUtils.inSkyBlock))
+            (OutsideSbFeature.NEXT_JACOB_CONTEST.isSelected() && !LorenzUtils.inSkyBlock))
 
     private fun isFetchEnabled() = isEnabled() && config.fetchAutomatically
     private fun isSendEnabled() =
@@ -645,6 +645,9 @@ object GardenNextJacobContest {
             ConfigUtils.migrateIntToEnum(element, ShareContestsEntry::class.java)
         }
         event.move(18, "garden.nextJacobContests.everywhere", "garden.nextJacobContests.showOutsideGarden")
+        event.move(32, "garden.jacobContextTimesPos", "garden.jacobContestTimesPos")
+        event.move(32, "garden.jacobContextTimes", "garden.jacobContestTimes")
+        event.move(32, "misc.showOutsideSB.NEXT_JACOB_CONTEXT", "misc.showOutsideSB.NEXT_JACOB_CONTEST")
     }
 }
 
