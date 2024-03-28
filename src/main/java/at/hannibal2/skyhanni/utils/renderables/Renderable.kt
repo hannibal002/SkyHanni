@@ -35,8 +35,7 @@ interface Renderable {
     val horizontalAlign: HorizontalAlignment
     val verticalAlign: VerticalAlignment
     fun isHovered(posX: Int, posY: Int) = currentRenderPassMousePosition?.let { (x, y) ->
-        x in (posX..posX + width)
-            && y in (posY..posY + height) // TODO: adjust for variable height?
+        x in (posX..posX + width) && y in (posY..posY + height) // TODO: adjust for variable height?
     } ?: false
 
     /**
@@ -78,8 +77,7 @@ interface Renderable {
             onClick: () -> Unit,
             bypassChecks: Boolean = false,
             condition: () -> Boolean = { true },
-        ): Renderable =
-            link(string(text), onClick, bypassChecks, condition)
+        ): Renderable = link(string(text), onClick, bypassChecks, condition)
 
         fun link(
             renderable: Renderable,
@@ -116,28 +114,26 @@ interface Renderable {
             button: Int = 0,
             bypassChecks: Boolean = false,
             condition: () -> Boolean = { true },
-        ) =
-            object : Renderable {
-                override val width = render.width
-                override val height = render.height
-                override val horizontalAlign = render.horizontalAlign
-                override val verticalAlign = render.verticalAlign
+        ) = object : Renderable {
+            override val width = render.width
+            override val height = render.height
+            override val horizontalAlign = render.horizontalAlign
+            override val verticalAlign = render.verticalAlign
 
-                private var wasDown = false
+            private var wasDown = false
 
-                override fun render(posX: Int, posY: Int) {
-                    val isDown = Mouse.isButtonDown(button)
-                    if (isDown > wasDown && isHovered(posX, posY) && condition() && shouldAllowLink(
-                            true,
-                            bypassChecks
-                        )
-                    ) {
-                        onClick()
-                    }
-                    wasDown = isDown
-                    render.render(posX, posY)
+            override fun render(posX: Int, posY: Int) {
+                val isDown = Mouse.isButtonDown(button)
+                if (isDown > wasDown && isHovered(posX, posY) && condition() && shouldAllowLink(
+                        true, bypassChecks
+                    )
+                ) {
+                    onClick()
                 }
+                wasDown = isDown
+                render.render(posX, posY)
             }
+        }
 
         fun hoverTips(
             content: Any,
@@ -205,8 +201,8 @@ interface Renderable {
             val isInNeuPv = openGui == "io.github.moulberry.notenoughupdates.profileviewer.GuiProfileViewer"
             val isInSkyTilsPv = openGui == "gg.skytils.skytilsmod.gui.profile.ProfileGui"
 
-            val result = isGuiScreen && isGuiPositionEditor && isNotInSignAndOnSlot && isConfigScreen &&
-                !isInNeuPv && !isInSkyTilsPv
+            val result =
+                isGuiScreen && isGuiPositionEditor && isNotInSignAndOnSlot && isConfigScreen && !isInNeuPv && !isInSkyTilsPv
 
             if (debug) {
                 if (!result) {
@@ -246,26 +242,25 @@ interface Renderable {
             unhovered: Renderable,
             bypassChecks: Boolean = false,
             condition: () -> Boolean = { true },
-        ) =
-            object : Renderable {
-                override val width: Int
-                    get() = max(hovered.width, unhovered.width)
-                override val height = 10
-                override val horizontalAlign get() = if (isHovered) hovered.horizontalAlign else unhovered.horizontalAlign
-                override val verticalAlign get() = if (isHovered) hovered.verticalAlign else unhovered.verticalAlign
+        ) = object : Renderable {
+            override val width: Int
+                get() = max(hovered.width, unhovered.width)
+            override val height = 10
+            override val horizontalAlign get() = if (isHovered) hovered.horizontalAlign else unhovered.horizontalAlign
+            override val verticalAlign get() = if (isHovered) hovered.verticalAlign else unhovered.verticalAlign
 
-                var isHovered = false
+            var isHovered = false
 
-                override fun render(posX: Int, posY: Int) {
-                    isHovered = if (isHovered(posX, posY) && condition() && shouldAllowLink(true, bypassChecks)) {
-                        hovered.render(posX, posY)
-                        true
-                    } else {
-                        unhovered.render(posX, posY)
-                        false
-                    }
+            override fun render(posX: Int, posY: Int) {
+                isHovered = if (isHovered(posX, posY) && condition() && shouldAllowLink(true, bypassChecks)) {
+                    hovered.render(posX, posY)
+                    true
+                } else {
+                    unhovered.render(posX, posY)
+                    false
                 }
             }
+        }
 
         fun itemStack(
             any: ItemStack,
@@ -292,19 +287,26 @@ interface Renderable {
 
         fun string(
             text: String,
+            scale: Double = 1.0,
             color: Color = Color.WHITE,
             horizontalAlign: HorizontalAlignment = HorizontalAlignment.LEFT,
             verticalAlign: VerticalAlignment = VerticalAlignment.TOP,
         ) = object : Renderable {
 
-            override val width: Int
-                get() = Minecraft.getMinecraft().fontRendererObj.getStringWidth(text)
-            override val height = 10
+            override val width by lazy { (Minecraft.getMinecraft().fontRendererObj.getStringWidth(text) * scale).toInt() + 1 }
+            override val height = (9 * scale).toInt() + 1
             override val horizontalAlign = horizontalAlign
             override val verticalAlign = verticalAlign
 
+            val inverseScale = 1 / scale
+
             override fun render(posX: Int, posY: Int) {
-                Minecraft.getMinecraft().fontRendererObj.drawStringWithShadow(text, 1f, 1f, color.rgb)
+                val fontRenderer = Minecraft.getMinecraft().fontRendererObj
+                GlStateManager.translate(1.0, 1.0, 0.0)
+                GlStateManager.scale(scale, scale, 1.0)
+                fontRenderer.drawStringWithShadow(text, 0f, 0f, color.rgb)
+                GlStateManager.scale(inverseScale, inverseScale, 1.0)
+                GlStateManager.translate(-1.0, -1.0, 0.0)
             }
         }
 
@@ -315,6 +317,47 @@ interface Renderable {
             override val verticalAlign = VerticalAlignment.TOP
 
             override fun render(posX: Int, posY: Int) {
+            }
+        }
+
+        fun wrappedString(
+            text: String,
+            width: Int,
+            scale: Double = 1.0,
+            color: Color = Color.WHITE,
+            horizontalAlign: HorizontalAlignment = HorizontalAlignment.LEFT,
+            verticalAlign: VerticalAlignment = VerticalAlignment.TOP,
+        ) = object : Renderable {
+
+            val list by lazy {
+                Minecraft.getMinecraft().fontRendererObj.listFormattedStringToWidth(
+                    text, (width / scale).toInt()
+                )
+            }
+
+            override val width by lazy {
+                if (list.size == 1) {
+                    (Minecraft.getMinecraft().fontRendererObj.getStringWidth(text) / scale).toInt() + 1
+                } else {
+                    (width / scale).toInt() + 1
+                }
+            }
+
+            override val height by lazy { list.size * ((9 * scale).toInt() + 1) }
+            override val horizontalAlign = horizontalAlign
+            override val verticalAlign = verticalAlign
+
+            val inverseScale = 1 / scale
+
+            override fun render(posX: Int, posY: Int) {
+                val fontRenderer = Minecraft.getMinecraft().fontRendererObj
+                GlStateManager.translate(1.0, 1.0, 0.0)
+                GlStateManager.scale(scale, scale, 1.0)
+                list.forEachIndexed { index, text ->
+                    fontRenderer.drawStringWithShadow(text, 0f, index * 10.0f, color.rgb)
+                }
+                GlStateManager.scale(inverseScale, inverseScale, 1.0)
+                GlStateManager.translate(-1.0, -1.0, 0.0)
             }
         }
 
@@ -364,18 +407,12 @@ interface Renderable {
                     }
                 } else {
                     val (textureX, textureY) = if (texture == SkillProgressBarConfig.TexturedBar.UsedTexture.MATCH_PACK) Pair(
-                        0,
-                        64
+                        0, 64
                     ) else Pair(0, 0)
 
                     Minecraft.getMinecraft().renderEngine.bindTexture(ResourceLocation(texture.path))
                     Minecraft.getMinecraft().ingameGUI.drawTexturedModalRect(
-                        posX,
-                        posY,
-                        textureX,
-                        textureY,
-                        width,
-                        height
+                        posX, posY, textureX, textureY, width, height
                     )
 
                     if (useChroma) {
@@ -385,12 +422,7 @@ interface Renderable {
                         GlStateManager.color(color.red / 255f, color.green / 255f, color.blue / 255f, 1f)
                     }
                     Minecraft.getMinecraft().ingameGUI.drawTexturedModalRect(
-                        posX,
-                        posY,
-                        textureX,
-                        textureY + height,
-                        progress,
-                        height
+                        posX, posY, textureX, textureY + height, progress, height
                     )
 
                     if (useChroma) {
