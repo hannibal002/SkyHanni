@@ -24,6 +24,22 @@ import static at.hannibal2.skyhanni.config.features.inventory.InventoryConfig.It
 public class InventoryConfig {
 
     @Expose
+    @Category(name = "Skyblock Guide", desc = "")
+    public SkyblockGuideConfig skyblockGuideConfig = new SkyblockGuideConfig();
+
+    @Expose
+    @Category(name = "Auction House", desc = "")
+    public AuctionHouseConfig auctions = new AuctionHouseConfig();
+
+    @Expose
+    @Category(name = "Bazaar", desc = "Bazaar settings.")
+    public BazaarConfig bazaar = new BazaarConfig();
+
+    @Expose
+    @Category(name = "Helpers", desc = "Settings for Helpers")
+    public HelperConfig helper = new HelperConfig();
+
+    @Expose
     @ConfigOption(name = "Not Clickable Items", desc = "")
     @Accordion
     public HideNotClickableConfig hideNotClickable = new HideNotClickableConfig();
@@ -59,26 +75,9 @@ public class InventoryConfig {
     public ChestValueConfig chestValueConfig = new ChestValueConfig();
 
     @Expose
-    @Category(name = "Skyblock Guide", desc = "")
-    public SkyblockGuideConfig skyblockGuideConfig = new SkyblockGuideConfig();
-
-    @Expose
-    @Category(name = "Bazaar", desc = "Bazaar settings.")
-    public BazaarConfig bazaar = new BazaarConfig();
-
-    @Expose
-    @Category(name = "Helpers", desc = "Settings for Helpers")
-    public HelperConfig helper = new HelperConfig();
-
-    @Expose
     @ConfigOption(name = "Get From Sack", desc = "")
     @Accordion
     public GetFromSackConfig gfs = new GetFromSackConfig();
-
-    @Expose
-    @ConfigOption(name = "Auctions", desc = "")
-    @Accordion
-    public AuctionHouseConfig auctions = new AuctionHouseConfig();
 
     @ConfigOption(name = "Pocket Sack-In-A-Sack", desc = "")
     @Accordion
