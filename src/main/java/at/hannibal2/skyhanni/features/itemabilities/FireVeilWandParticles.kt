@@ -22,7 +22,7 @@ import kotlin.time.Duration.Companion.seconds
 
 class FireVeilWandParticles {
 
-    private val config get() = SkyHanniMod.feature.itemAbilities.fireVeilWands
+    private val config get() = SkyHanniMod.feature.inventory.itemAbilities.fireVeilWands
     private val item by lazy { "FIRE_VEIL_WAND".asInternalName() }
 
     private var lastClick = SimpleTimeMark.farPast()

@@ -3,9 +3,10 @@ package at.hannibal2.skyhanni.config.features.misc;
 import at.hannibal2.skyhanni.config.FeatureToggle;
 import at.hannibal2.skyhanni.config.core.config.Position;
 import at.hannibal2.skyhanni.config.enums.OutsideSbFeature;
-import at.hannibal2.skyhanni.config.features.misc.compacttablist.CompactTabListConfig;
-import at.hannibal2.skyhanni.config.features.misc.cosmetic.CosmeticConfig;
+import at.hannibal2.skyhanni.config.features.commands.CommandsConfig;
+import at.hannibal2.skyhanni.config.features.minion.MinionsConfig;
 import at.hannibal2.skyhanni.config.features.misc.pets.PetConfig;
+import at.hannibal2.skyhanni.config.features.stranded.StrandedConfig;
 import com.google.gson.annotations.Expose;
 import io.github.moulberry.moulconfig.annotations.Accordion;
 import io.github.moulberry.moulconfig.annotations.Category;
@@ -21,6 +22,18 @@ public class MiscConfig {
     @Expose
     @Category(name = "Pets", desc = "Pets Settings")
     public PetConfig pets = new PetConfig();
+
+    @Expose
+    @Category(name = "Commands", desc = "Enable or disable commands.")
+    public CommandsConfig commands = new CommandsConfig();
+
+    @Expose
+    @Category(name = "Minions", desc = "The minions on your private island.")
+    public MinionsConfig minions = new MinionsConfig();
+
+    @Expose
+    @Category(name = "Stranded", desc = "Features for the Stranded game mode.")
+    public StrandedConfig stranded = new StrandedConfig();
 
     @ConfigOption(name = "Hide Armor", desc = "")
     @Accordion
@@ -38,16 +51,6 @@ public class MiscConfig {
     @Accordion
     public ParticleHiderConfig particleHiders = new ParticleHiderConfig();
 
-    @Expose
-    @ConfigOption(name = "Estimated Item Value", desc = "(Prices for Enchantments, Reforge Stones, Gemstones, Drill Parts and more)")
-    @Accordion
-    public EstimatedItemValueConfig estimatedItemValues = new EstimatedItemValueConfig();
-
-    @ConfigOption(name = "Discord Rich Presence", desc = "")
-    @Accordion
-    @Expose
-    public DiscordRPCConfig discordRPC = new DiscordRPCConfig();
-
     @ConfigOption(name = "Trevor The Trapper", desc = "")
     @Accordion
     @Expose
@@ -58,20 +61,10 @@ public class MiscConfig {
     @Expose
     public TeleportPadConfig teleportPad = new TeleportPadConfig();
 
-    @ConfigOption(name = "Pocket Sack-In-A-Sack", desc = "")
-    @Accordion
-    @Expose
-    public PocketSackInASackConfig pocketSackInASack = new PocketSackInASackConfig();
-
     @ConfigOption(name = "Quick Mod Menu Switch", desc = "")
     @Accordion
     @Expose
     public QuickModMenuSwitchConfig quickModMenuSwitch = new QuickModMenuSwitchConfig();
-
-    @Expose
-    @Category(name = "Cosmetic", desc = "Cosmetics Settings")
-    public CosmeticConfig cosmetic = new CosmeticConfig();
-
 
     @Expose
     @ConfigOption(name = "Glowing Dropped Items", desc = "")
@@ -82,11 +75,6 @@ public class MiscConfig {
     @ConfigOption(name = "Highlight Party Members", desc = "")
     @Accordion
     public HighlightPartyMembersConfig highlightPartyMembers = new HighlightPartyMembersConfig();
-
-    @Expose
-    @Category(name = "Compact Tab List", desc = "Compact Tab List Settings")
-    @Accordion
-    public CompactTabListConfig compactTabList = new CompactTabListConfig();
 
     @Expose
     @ConfigOption(name = "Kick Duration", desc = "")
