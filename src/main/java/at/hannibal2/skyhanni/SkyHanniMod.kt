@@ -78,6 +78,7 @@ import at.hannibal2.skyhanni.features.chat.Translator
 import at.hannibal2.skyhanni.features.chat.WatchdogHider
 import at.hannibal2.skyhanni.features.chat.playerchat.PlayerChatFilter
 import at.hannibal2.skyhanni.features.chat.playerchat.PlayerChatModifier
+import at.hannibal2.skyhanni.features.chroma.ChromaManager
 import at.hannibal2.skyhanni.features.combat.BestiaryData
 import at.hannibal2.skyhanni.features.combat.HideDamageSplash
 import at.hannibal2.skyhanni.features.combat.damageindicator.DamageIndicatorManager
@@ -205,6 +206,7 @@ import at.hannibal2.skyhanni.features.garden.inventory.plots.GardenPlotIcon
 import at.hannibal2.skyhanni.features.garden.inventory.plots.GardenPlotMenuHighlighting
 import at.hannibal2.skyhanni.features.garden.pests.PestAPI
 import at.hannibal2.skyhanni.features.garden.pests.PestFinder
+import at.hannibal2.skyhanni.features.garden.pests.PestParticleWaypoint
 import at.hannibal2.skyhanni.features.garden.pests.PestSpawn
 import at.hannibal2.skyhanni.features.garden.pests.PestSpawnTimer
 import at.hannibal2.skyhanni.features.garden.pests.SprayDisplay
@@ -419,7 +421,7 @@ import org.apache.logging.log4j.Logger
     clientSideOnly = true,
     useMetadata = true,
     guiFactory = "at.hannibal2.skyhanni.config.ConfigGuiForgeInterop",
-    version = "0.24.Beta.20",
+    version = "0.24.Beta.22",
 )
 class SkyHanniMod {
 
@@ -487,6 +489,7 @@ class SkyHanniMod {
         loadModule(BossbarData)
         loadModule(EntityUtils)
         loadModule(ChatUtils)
+        loadModule(ChromaManager)
         loadModule(TabWidget)
 
         // APIs
@@ -629,7 +632,7 @@ class SkyHanniMod {
         loadModule(MiscFeatures())
         loadModule(GardenPlotMenuHighlighting())
         loadModule(SkyMartCopperPrice())
-        loadModule(GardenVisitorFeatures())
+        loadModule(GardenVisitorFeatures)
         loadModule(NPCVisitorFix)
         loadModule(GardenInventoryNumbers())
         loadModule(GardenVisitorTimer())
@@ -785,6 +788,7 @@ class SkyHanniMod {
         loadModule(PestSpawn())
         loadModule(PestSpawnTimer)
         loadModule(PestFinder())
+        loadModule(PestParticleWaypoint())
         loadModule(SprayFeatures())
         loadModule(DojoRankDisplay())
         loadModule(SprayDisplay())

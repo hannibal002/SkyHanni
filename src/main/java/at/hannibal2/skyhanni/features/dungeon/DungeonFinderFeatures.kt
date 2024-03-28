@@ -311,7 +311,9 @@ class DungeonFinderFeatures {
     fun onRenderItemTip(event: RenderInventoryItemTipEvent) {
         if (!isEnabled()) return
         if (!config.floorAsStackSize) return
-        event.stackTip = (floorStackSize[event.slot.slotIndex]
+        val slot = event.slot
+        if (slot.slotNumber != slot.slotIndex) return
+        event.stackTip = (floorStackSize[slot.slotIndex]
             ?.takeIf { it.isNotEmpty() } ?: return)
     }
 

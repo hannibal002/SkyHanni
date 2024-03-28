@@ -11,7 +11,7 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
 object PartyCommands {
 
-    private val config get() = SkyHanniMod.feature.commands
+    private val config get() = SkyHanniMod.feature.misc.commands
 
     fun kickOffline() {
         if (!config.shortCommands) return
@@ -107,6 +107,8 @@ object PartyCommands {
     @SubscribeEvent
     fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
         event.move(5, "commands.usePartyTransferAlias", "commands.shortCommands")
+
+        event.move(31, "commands", "misc.commands")
     }
 }
 
