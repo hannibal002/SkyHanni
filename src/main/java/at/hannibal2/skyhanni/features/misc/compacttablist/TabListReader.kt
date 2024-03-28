@@ -2,20 +2,18 @@ package at.hannibal2.skyhanni.features.misc.compacttablist
 
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.events.LorenzTickEvent
-import at.hannibal2.skyhanni.mixins.transformers.AccessorGuiPlayerTabOverlay
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.StringUtils.removeResets
 import at.hannibal2.skyhanni.utils.StringUtils.removeSFormattingCode
 import at.hannibal2.skyhanni.utils.StringUtils.trimWhiteSpaceAndResets
 import at.hannibal2.skyhanni.utils.TabListData
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
-import net.minecraft.client.Minecraft
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
 // heavily inspired by SBA code
 object TabListReader {
 
-    private val config get() = SkyHanniMod.feature.misc.compactTabList
+    private val config get() = SkyHanniMod.feature.gui.compactTabList
 
     private val patternGroup = RepoPattern.group("misc.compacttablist")
     val usernamePattern by patternGroup.pattern(
@@ -99,7 +97,7 @@ object TabListReader {
     }
 
     private fun parseFooterAsColumn(): TabColumn? {
-        val tabList = Minecraft.getMinecraft().ingameGUI.tabList as AccessorGuiPlayerTabOverlay
+        val tabList = TabListData.getPlayerTabOverlay()
 
         if (tabList.footer_skyhanni == null) {
             return null

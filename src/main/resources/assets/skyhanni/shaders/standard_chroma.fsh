@@ -1,14 +1,14 @@
 // Chroma Fragment Shader
 // (Same as textured_chroma.fsh but isn't restricted to textured elements)
 
-#version 130
+#version 120
 
 uniform float chromaSize;
 uniform float timeOffset;
 uniform float saturation;
 uniform bool forwardDirection;
 
-in vec4 originalColor;
+varying vec4 originalColor;
 
 float rgb2b(vec3 rgb) {
     return max(max(rgb.r, rgb.g), rgb.b);

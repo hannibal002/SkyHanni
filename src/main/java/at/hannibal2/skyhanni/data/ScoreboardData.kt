@@ -35,13 +35,23 @@ class ScoreboardData {
         fun formatLines(rawList: List<String>): List<String> {
             val list = mutableListOf<String>()
             for (line in rawList) {
-                val seperator = splitIcons.find { line.contains(it) } ?: continue
-                val split = line.split(seperator)
+                val separator = splitIcons.find { line.contains(it) } ?: continue
+                val split = line.split(separator)
                 val start = split[0]
                 var end = split[1]
-                if (end.length >= 2) {
-                    end = end.substring(2)
+                // get last color code in start
+                val lastColorIndex = start.lastIndexOf('§')
+                val lastColor = when {
+                    lastColorIndex != -1 && lastColorIndex + 1 < start.length && (start[lastColorIndex + 1] in '0'..'9' || start[lastColorIndex + 1] in 'a'..'f') -> start.substring(
+                        lastColorIndex,
+                        lastColorIndex + 2
+                    )
+                    else -> ""
                 }
+
+                // remove first color code from end, when it is the same as the last color code in start
+                end = end.removePrefix(lastColor)
+
                 list.add(start + end)
             }
 
