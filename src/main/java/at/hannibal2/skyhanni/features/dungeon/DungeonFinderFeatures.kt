@@ -191,7 +191,6 @@ class DungeonFinderFeatures {
             } ?: continue
             map[slot] = getFloorName(name, name, floorNum)
         }
-
     }
 
     private fun getFloorName(floor: String, dungeon: String, floorNum: Int?): String =
