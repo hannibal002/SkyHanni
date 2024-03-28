@@ -323,11 +323,7 @@ object GriffinBurrowHelper {
         }
 
         if (!isEnabled()) {
-            if (!config.alwaysDiana) {
-                ChatUtils.clickableChat("§cEnable Always Diana in the config!", "sh always diana")
-            } else {
-                ChatUtils.userError("Have an Ancestral Spade in the inventory!")
-            }
+            ChatUtils.userError("Have an Ancestral Spade in the inventory!")
             return
         }
 

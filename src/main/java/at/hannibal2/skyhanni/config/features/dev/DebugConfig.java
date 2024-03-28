@@ -1,8 +1,10 @@
 package at.hannibal2.skyhanni.config.features.dev;
 
 import at.hannibal2.skyhanni.config.core.config.Position;
+import at.hannibal2.skyhanni.data.Mayor;
 import com.google.gson.annotations.Expose;
 import io.github.moulberry.moulconfig.annotations.ConfigEditorBoolean;
+import io.github.moulberry.moulconfig.annotations.ConfigEditorDropdown;
 import io.github.moulberry.moulconfig.annotations.ConfigEditorKeybind;
 import io.github.moulberry.moulconfig.annotations.ConfigOption;
 import org.lwjgl.input.Keyboard;
@@ -112,6 +114,11 @@ public class DebugConfig {
     @ConfigOption(name = "SkyBlock Area", desc = "Show your current area in SkyBlock while f3 is open.")
     @ConfigEditorBoolean
     public boolean currentAreaDebug = true;
+
+    @Expose
+    @ConfigOption(name = "Assume Mayor", desc = "Select a mayor to assume.")
+    @ConfigEditorDropdown
+    public Mayor assumeMayor = Mayor.NONE;
 
     @Expose
     public Position trackSoundPosition = new Position(0, 0);
