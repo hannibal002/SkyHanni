@@ -36,6 +36,14 @@ object CopyItemCommand {
     }
 
     fun copyItemToClipboard(itemStack: ItemStack) {
+        val resultList = grabItemData(itemStack)
+
+        val string = resultList.joinToString("\n")
+        OSUtils.copyToClipboard(string)
+        ChatUtils.chat("Item info copied into the clipboard!")
+    }
+
+    fun grabItemData(itemStack: ItemStack): List<String> {
         val resultList = mutableListOf<String>()
         resultList.add(itemStack.getInternalName().toString())
         resultList.add("display name: '" + itemStack.displayName.toString() + "'")
@@ -50,9 +58,6 @@ object CopyItemCommand {
             val tagCompound = itemStack.tagCompound
             recurseTag(tagCompound, "  ", resultList)
         }
-
-        val string = resultList.joinToString("\n")
-        OSUtils.copyToClipboard(string)
-        ChatUtils.chat("Item info copied into the clipboard!")
+        return resultList
     }
 }

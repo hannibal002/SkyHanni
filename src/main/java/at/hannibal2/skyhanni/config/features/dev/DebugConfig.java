@@ -2,6 +2,7 @@ package at.hannibal2.skyhanni.config.features.dev;
 
 import at.hannibal2.skyhanni.config.core.config.Position;
 import com.google.gson.annotations.Expose;
+import io.github.moulberry.moulconfig.annotations.Accordion;
 import io.github.moulberry.moulconfig.annotations.ConfigEditorBoolean;
 import io.github.moulberry.moulconfig.annotations.ConfigEditorKeybind;
 import io.github.moulberry.moulconfig.annotations.ConfigOption;
@@ -115,4 +116,9 @@ public class DebugConfig {
 
     @Expose
     public Position trackSoundPosition = new Position(0, 0);
+
+    @Expose
+    @ConfigOption(name = "Copy Inventory Data", desc = "")
+    @Accordion
+    public CopyInventoryConfig copyInventory = new CopyInventoryConfig();
 }
