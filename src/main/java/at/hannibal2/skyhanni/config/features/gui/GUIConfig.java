@@ -65,6 +65,11 @@ public class GUIConfig {
     public ModifyWordsConfig modifyWords = new ModifyWordsConfig();
 
     @Expose
+    @ConfigOption(name = "Quiver Display", desc = "")
+    @Accordion
+    public QuiverDisplayConfig quiverDisplay = new QuiverDisplayConfig();
+
+    @Expose
     @ConfigOption(name = "Custom Text Box", desc = "")
     @Accordion
     public TextBoxConfig customTextBox = new TextBoxConfig();
