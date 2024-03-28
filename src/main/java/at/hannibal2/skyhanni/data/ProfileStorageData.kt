@@ -4,17 +4,16 @@ import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.config.SackData
 import at.hannibal2.skyhanni.config.storage.PlayerSpecificStorage
 import at.hannibal2.skyhanni.config.storage.ProfileSpecificStorage
+import at.hannibal2.skyhanni.data.model.TabWidget
 import at.hannibal2.skyhanni.events.ConfigLoadEvent
 import at.hannibal2.skyhanni.events.HypixelJoinEvent
 import at.hannibal2.skyhanni.events.LorenzTickEvent
 import at.hannibal2.skyhanni.events.ProfileJoinEvent
-import at.hannibal2.skyhanni.events.TabListUpdateEvent
+import at.hannibal2.skyhanni.events.TabWidgetUpdate
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
-import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.TabListData
-import at.hannibal2.skyhanni.utils.UtilsPatterns
 import net.minecraftforge.fml.common.eventhandler.EventPriority
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import kotlin.time.Duration.Companion.seconds
@@ -48,17 +47,15 @@ object ProfileStorageData {
     }
 
     @SubscribeEvent
-    fun onTabListUpdate(event: TabListUpdateEvent) {
-        if (!LorenzUtils.inSkyBlock) return
-
-        for (line in event.tabList) {
-            UtilsPatterns.tabListProfilePattern.matchMatcher(line) {
-                noTabListTime = SimpleTimeMark.farPast()
-                return
-            }
-        }
-
+    fun onTabListUpdate(event: TabWidgetUpdate.Clear) {
+        if (!TabWidget.PROFILE.isEventForThis(event)) return
         noTabListTime = SimpleTimeMark.now()
+    }
+
+    @SubscribeEvent
+    fun onTabListUpdate(event: TabWidgetUpdate.NewValues) {
+        if (!TabWidget.PROFILE.isEventForThis(event)) return
+        noTabListTime = SimpleTimeMark.farPast()
     }
 
     @SubscribeEvent

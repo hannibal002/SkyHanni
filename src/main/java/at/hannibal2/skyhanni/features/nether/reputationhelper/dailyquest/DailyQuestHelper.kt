@@ -4,12 +4,13 @@ import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.config.storage.ProfileSpecificStorage
 import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.data.SackAPI.getAmountInSacksOrNull
+import at.hannibal2.skyhanni.data.model.TabWidget
 import at.hannibal2.skyhanni.events.GuiContainerEvent
 import at.hannibal2.skyhanni.events.InventoryFullyOpenedEvent
 import at.hannibal2.skyhanni.events.LorenzChatEvent
 import at.hannibal2.skyhanni.events.LorenzRenderWorldEvent
 import at.hannibal2.skyhanni.events.LorenzTickEvent
-import at.hannibal2.skyhanni.events.TabListUpdateEvent
+import at.hannibal2.skyhanni.events.TabWidgetUpdate
 import at.hannibal2.skyhanni.features.nether.reputationhelper.CrimsonIsleReputationHelper
 import at.hannibal2.skyhanni.features.nether.reputationhelper.FactionType
 import at.hannibal2.skyhanni.features.nether.reputationhelper.dailykuudra.KuudraTier
@@ -64,7 +65,8 @@ class DailyQuestHelper(val reputationHelper: CrimsonIsleReputationHelper) {
     }
 
     @SubscribeEvent
-    fun onTabListUpdate(event: TabListUpdateEvent) {
+    fun onTabListUpdate(event: TabWidgetUpdate.NewValues) {
+        if (!TabWidget.FACTION_QUESTS.isEventForThis(event)) return
         if (!isEnabled()) return
 
         questLoader.loadFromTabList()
@@ -177,8 +179,9 @@ class DailyQuestHelper(val reputationHelper: CrimsonIsleReputationHelper) {
     private fun renderTownBoard(event: LorenzRenderWorldEvent) {
         if (quests.any {
                 it.state == QuestState.READY_TO_COLLECT ||
-                it.state == QuestState.NOT_ACCEPTED ||
-                (it is RescueMissionQuest && it.state == QuestState.ACCEPTED) }) {
+                    it.state == QuestState.NOT_ACCEPTED ||
+                    (it is RescueMissionQuest && it.state == QuestState.ACCEPTED)
+            }) {
             val location = when (reputationHelper.factionType) {
                 FactionType.BARBARIAN -> townBoardBarbarian
                 FactionType.MAGE -> townBoardMage
