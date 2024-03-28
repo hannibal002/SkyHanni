@@ -60,6 +60,8 @@ data class LorenzVec(
     fun multiply(d: Int): LorenzVec =
         LorenzVec(x multiplyZeroSave d.toDouble(), y multiplyZeroSave d.toDouble(), z multiplyZeroSave d.toDouble())
 
+    fun divide(d : Double) = multiply(1.0/d)
+
     fun add(other: LorenzVec) = LorenzVec(x + other.x, y + other.y, z + other.z)
 
     fun subtract(other: LorenzVec) = LorenzVec(x - other.x, y - other.y, z - other.z)

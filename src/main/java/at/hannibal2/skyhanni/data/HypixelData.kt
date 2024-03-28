@@ -44,7 +44,7 @@ class HypixelData {
         private val patternGroup = RepoPattern.group("data.hypixeldata")
         private val serverIdScoreboardPattern by patternGroup.pattern(
             "serverid.scoreboard",
-            "§7\\d+/\\d+/\\d+ §8(?<servertype>[mM])(?<serverid>\\S+)"
+            "§7\\d+/\\d+/\\d+ §8(?<servertype>[mM])(?<serverid>\\S+).*"
         )
         private val serverIdTablistPattern by patternGroup.pattern(
             "serverid.tablist",
@@ -95,7 +95,7 @@ class HypixelData {
         var bingo = false
 
         var profileName = ""
-        var joinedWorld = 0L
+        var joinedWorld = SimpleTimeMark.farPast()
 
         var skyBlockArea = "?"
 
@@ -119,6 +119,8 @@ class HypixelData {
 
         fun checkCurrentServerId() {
             if (!LorenzUtils.inSkyBlock) return
+            if (LorenzUtils.lastWorldSwitch.passedSince() < 1.seconds) return
+            if (!TabListData.fullyLoaded) return
 
             ScoreboardData.sidebarLinesFormatted.forEach {
                 serverIdScoreboardPattern.matchMatcher(it) {
@@ -213,7 +215,7 @@ class HypixelData {
         inLimbo = false
         inLobby = false
         locraw.forEach { locraw[it.key] = "" }
-        joinedWorld = System.currentTimeMillis()
+        joinedWorld = SimpleTimeMark.now()
         serverId = null
     }
 

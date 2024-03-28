@@ -8,6 +8,7 @@ import at.hannibal2.skyhanni.features.misc.LockMouseLook
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.ItemUtils.name
+import at.hannibal2.skyhanni.utils.LocationUtils.isInside
 import at.hannibal2.skyhanni.utils.LocationUtils.isPlayerInside
 import at.hannibal2.skyhanni.utils.LorenzVec
 import at.hannibal2.skyhanni.utils.RenderUtils.draw3DLine
@@ -40,6 +41,27 @@ object GardenPlotAPI {
         "barnname",
         "§.(?<name>The Barn)"
     )
+    /**
+     * REGEX-TEST: §7Cleanup: §b0% Completed
+     */
+    private val uncleanedPlotPattern by patternGroup.pattern(
+        "uncleaned",
+        "§7Cleanup: .* (?:§.)*Completed"
+    )
+    /**
+     * REGEX-TEST: §aUnlocked Garden §r§aPlot §r§7- §r§b10§r§a!
+     */
+    private val unlockPlotChatPattern by patternGroup.pattern(
+        "chat.unlock",
+        "§aUnlocked Garden §r§aPlot §r§7- §r§b(?<plot>.*)§r§a!"
+    )
+    /**
+     * REGEX-TEST: §aPlot §r§7- §r§b10 §r§ais now clean!
+     */
+    private val cleanPlotChatPattern by patternGroup.pattern(
+        "chat.clean",
+        "§aPlot §r§7- §r§b(?<plot>.*) §r§ais now clean!"
+    )
     private val plotSprayedPattern by patternGroup.pattern(
         "spray.target",
         "§a§lSPRAYONATOR! §r§7You sprayed §r§aPlot §r§7- §r§b(?<plot>.*) §r§7with §r§a(?<spray>.*)§r§7!"
@@ -51,7 +73,7 @@ object GardenPlotAPI {
         return plots.firstOrNull { it.isPlayerInside() }
     }
 
-    class Plot(val id: Int, var unlocked: Boolean, var inventorySlot: Int, val box: AxisAlignedBB, val middle: LorenzVec)
+    class Plot(val id: Int, var inventorySlot: Int, val box: AxisAlignedBB, val middle: LorenzVec)
 
     class PlotData(
         @Expose
@@ -73,7 +95,16 @@ object GardenPlotAPI {
         var sprayHasNotified: Boolean,
 
         @Expose
+        var isBeingPasted: Boolean,
+
+        @Expose
         var isPestCountInaccurate: Boolean,
+
+        @Expose
+        var locked: Boolean,
+
+        @Expose
+        var uncleared: Boolean,
     )
 
     data class SprayData(
@@ -81,7 +112,7 @@ object GardenPlotAPI {
         val type: SprayType,
     )
 
-    private fun Plot.getData() = GardenAPI.storage?.plotData?.getOrPut(id) { PlotData(id, "$id", 0, null, null, false, false) }
+    private fun Plot.getData() = GardenAPI.storage?.plotData?.getOrPut(id) { PlotData(id, "$id", 0, null, null, false, false, false, true, false) }
 
     var Plot.name: String
         get() = getData()?.name ?: "$id"
@@ -107,10 +138,28 @@ object GardenPlotAPI {
             !it.sprayHasNotified && it.sprayExpiryTime?.isInPast() == true
         } == true
 
+    var Plot.isBeingPasted: Boolean
+        get() = this.getData()?.isBeingPasted ?: false
+        set(value) {
+            this.getData()?.isBeingPasted = value
+        }
+
     var Plot.isPestCountInaccurate: Boolean
         get() = this.getData()?.isPestCountInaccurate ?: false
         set(value) {
             this.getData()?.isPestCountInaccurate = value
+        }
+
+    var Plot.uncleared: Boolean
+        get() = this.getData()?.uncleared ?: false
+        set(value) {
+            this.getData()?.uncleared = value
+        }
+
+    var Plot.locked: Boolean
+        get() = this.getData()?.locked ?: false
+        set(value) {
+            this.getData()?.locked = value
         }
 
     fun Plot.markExpiredSprayAsNotified() {
@@ -128,6 +177,8 @@ object GardenPlotAPI {
     fun Plot.isBarn() = id == 0
 
     fun Plot.isPlayerInside() = box.isPlayerInside()
+
+    fun closestCenterPlot(location: LorenzVec) = plots.find {it.box.isInside(location)}?.middle
 
     fun Plot.sendTeleportTo() {
         if (isBarn()) ChatUtils.sendCommandToServer("tptoplot barn")
@@ -155,7 +206,7 @@ object GardenPlotAPI {
                 val b = LorenzVec(maxX, 256.0, maxY)
                 val middle = a.interpolate(b, 0.5).copy(y = 10.0)
                 val box = a.axisAlignedTo(b).expand(0.0001, 0.0, 0.0001)
-                list.add(Plot(id, false, slot, box, middle))
+                list.add(Plot(id, slot, box, middle))
                 slot++
             }
             slot += 4
@@ -176,6 +227,16 @@ object GardenPlotAPI {
 
             plot?.setSpray(spray, 30.minutes)
         }
+        cleanPlotChatPattern.matchMatcher(event.message) {
+            val plotId = group("plot").toInt()
+            val plot = getPlotByID(plotId)
+            plot?.uncleared = false
+        }
+        unlockPlotChatPattern.matchMatcher(event.message) {
+            val plotId = group("plot").toInt()
+            val plot = getPlotByID(plotId)
+            plot?.locked = false
+        }
     }
 
     @SubscribeEvent
@@ -185,7 +246,7 @@ object GardenPlotAPI {
 
         for (plot in plots) {
             val itemStack = event.inventoryItems[plot.inventorySlot] ?: continue
-            plot.unlocked = itemStack.getLore().all { !it.contains("§7Cost:") }
+            val lore = itemStack.getLore()
             plotNamePattern.matchMatcher(itemStack.name) {
                 val plotName = group("name")
                 plot.name = plotName
@@ -193,10 +254,22 @@ object GardenPlotAPI {
             barnNamePattern.matchMatcher(itemStack.name) {
                 plot.name = group("name")
             }
+            plot.locked = false
+            plot.isBeingPasted = false
+            for (line in lore) {
+                if (line.contains("§7Cost:")) plot.locked = true
+                if (line.contains("§7Pasting in progress:")) plot.isBeingPasted = true
+                plot.uncleared = false
+                uncleanedPlotPattern.matchMatcher(line) {
+                    plot.uncleared = true
+                }
+            }
         }
     }
 
     fun getPlotByName(plotName: String) = plots.firstOrNull { it.name == plotName }
+
+    fun getPlotByID(plotId: Int) = plots.firstOrNull { it.id == plotId }
 
     fun LorenzRenderWorldEvent.renderPlot(
         plot: Plot,

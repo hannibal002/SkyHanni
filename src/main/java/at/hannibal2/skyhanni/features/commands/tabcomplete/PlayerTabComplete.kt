@@ -13,7 +13,7 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
 object PlayerTabComplete {
 
-    private val config get() = SkyHanniMod.feature.commands.tabComplete
+    private val config get() = SkyHanniMod.feature.misc.commands.tabComplete
     private var vipVisits = listOf<String>()
 
     @SubscribeEvent

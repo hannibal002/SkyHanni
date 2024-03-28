@@ -10,7 +10,9 @@ import at.hannibal2.skyhanni.features.garden.GardenAPI
 import at.hannibal2.skyhanni.features.garden.GardenPlotAPI
 import at.hannibal2.skyhanni.features.garden.GardenPlotAPI.isBarn
 import at.hannibal2.skyhanni.features.garden.GardenPlotAPI.isPestCountInaccurate
+import at.hannibal2.skyhanni.features.garden.GardenPlotAPI.locked
 import at.hannibal2.skyhanni.features.garden.GardenPlotAPI.pests
+import at.hannibal2.skyhanni.features.garden.GardenPlotAPI.uncleared
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
@@ -73,11 +75,11 @@ object PestAPI {
         "§4§lൠ §cThis plot has §6(?<amount>\\d) Pests?§c!"
     )
     /**
-     * REGEX-TEST:  Infested Plots: §r§b4§r§f, §r§b12§r§f, §r§b13§r§f, §r§b18§r§f, §r§b20
+     * REGEX-TEST:  Plots: §r§b4§r§f, §r§b12§r§f, §r§b13§r§f, §r§b18§r§f, §r§b20
      */
     private val infectedPlotsTablistPattern by patternGroup.pattern(
         "tablist.infectedplots",
-        "\\sInfested Plots: (?<plots>.*)"
+        "\\sPlots: (?<plots>.*)"
     )
 
     private fun fixPests() {
@@ -88,8 +90,7 @@ object PestAPI {
                 plot.pests = 1
                 plot.isPestCountInaccurate = false
             }
-        }
-        if (inaccurateAmount == 1) { // if we can assume all the inaccurate pests are in the only inaccurate plot
+        } else if (inaccurateAmount == 1) { // if we can assume all the inaccurate pests are in the only inaccurate plot
             val plot = getPlotsWithInaccuratePests().firstOrNull()
             plot?.pests = scoreboardPests - accurateAmount
             plot?.isPestCountInaccurate = false
@@ -128,7 +129,7 @@ object PestAPI {
         if (event.inventoryName != "Configure Plots") return
 
         for (plot in GardenPlotAPI.plots) {
-            if (plot.isBarn()) continue
+            if (plot.isBarn() || plot.locked || plot.uncleared) continue
             plot.pests = 0
             plot.isPestCountInaccurate = false
             val item = event.inventoryItems[plot.inventorySlot] ?: continue

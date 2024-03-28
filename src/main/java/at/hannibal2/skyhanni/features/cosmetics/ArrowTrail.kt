@@ -22,7 +22,7 @@ import kotlin.time.toDuration
 
 class ArrowTrail {
 
-    private val config get() = SkyHanniMod.feature.misc.cosmetic.arrowTrail
+    private val config get() = SkyHanniMod.feature.gui.cosmetic.arrowTrail
 
     private data class Line(val start: LorenzVec, val end: LorenzVec, val deathTime: SimpleTimeMark)
 
