@@ -33,7 +33,7 @@ object FarmingContestAPI {
         "crop",
         "§8(?<crop>.*) Contest"
     )
-    val sidebarCropPattern by patternGroup.pattern(
+    private val sidebarCropPattern by patternGroup.pattern(
         "sidebarcrop",
         "(?:§e○|§6☘) §f(?<crop>.*) §a.*"
     )
@@ -110,13 +110,15 @@ object FarmingContestAPI {
         inInventory = false
     }
 
-    fun getSbTimeFor(text: String) = timePattern.matchMatcher(text) {
-        val month = group("month")
+    fun getSbDateFromItemName(text: String): List<String>? = timePattern.matchMatcher(text) {
+        listOf(group("year"), group("month"), group("day"))
+    }
+
+    fun getSbTimeFor(text: String): Long? {
+        val (year, month, day) = getSbDateFromItemName(text) ?: return null
         val monthNr = LorenzUtils.getSBMonthByName(month)
 
-        val year = group("year").toInt()
-        val day = group("day").toInt()
-        SkyBlockTime(year, monthNr, day).toMillis()
+        return SkyBlockTime(year.toInt(), monthNr, day.toInt()).toMillis()
     }
 
     fun addContest(time: Long, item: ItemStack) {
