@@ -1,6 +1,7 @@
 package at.hannibal2.skyhanni.utils
 
 import at.hannibal2.skyhanni.SkyHanniMod
+import at.hannibal2.skyhanni.data.model.TabWidget
 import at.hannibal2.skyhanni.events.LorenzTickEvent
 import at.hannibal2.skyhanni.events.TabListUpdateEvent
 import at.hannibal2.skyhanni.mixins.hooks.tabListGuard
@@ -59,7 +60,11 @@ class TabListData {
                 tabList.header_skyhanni.conditionalTransform(noColor, { unformattedText }, { formattedText })
             val tabFooter =
                 tabList.footer_skyhanni.conditionalTransform(noColor, { unformattedText }, { formattedText })
-            val string = "Header:\n\n$tabHeader\n\nBody:\n\n${resultList.joinToString("\n")}\n\nFooter:\n\n$tabFooter"
+
+            val widgets = TabWidget.entries.filter { it.isActive }
+                .joinToString("\n") { "\n${it.name} : \n${it.lines.joinToString("\n")}" }
+            val string =
+                "Header:\n\n$tabHeader\n\nBody:\n\n${resultList.joinToString("\n")}\n\nFooter:\n\n$tabFooter\n\nWidgets:$widgets"
             OSUtils.copyToClipboard(string)
             ChatUtils.chat("Tab list copied into the clipboard!")
         }

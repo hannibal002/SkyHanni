@@ -55,6 +55,7 @@ import at.hannibal2.skyhanni.data.jsonobjects.local.FriendsJson
 import at.hannibal2.skyhanni.data.jsonobjects.local.JacobContestsJson
 import at.hannibal2.skyhanni.data.jsonobjects.local.KnownFeaturesJson
 import at.hannibal2.skyhanni.data.jsonobjects.local.VisualWordsJson
+import at.hannibal2.skyhanni.data.model.TabWidget
 import at.hannibal2.skyhanni.data.repo.RepoManager
 import at.hannibal2.skyhanni.events.LorenzTickEvent
 import at.hannibal2.skyhanni.events.PreInitFinishedEvent
@@ -486,6 +487,7 @@ class SkyHanniMod {
         loadModule(BossbarData)
         loadModule(EntityUtils)
         loadModule(ChatUtils)
+        loadModule(TabWidget)
 
         // APIs
         loadModule(BazaarApi())
