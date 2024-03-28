@@ -47,10 +47,18 @@ class GuiEditManager {
         openGuiPositionEditor(hotkeyReminder = false)
     }
 
+    @SubscribeEvent(priority = EventPriority.HIGHEST)
+    fun e(event: GuiRenderEvent.GuiOverlayRenderEvent) {
+        GlStateManager.translate(0f, 0f, 0f)
+    }
+
     @SubscribeEvent(priority = EventPriority.LOWEST)
     fun onRenderOverlay(event: GuiRenderEvent.GuiOverlayRenderEvent) {
         latestPositions = currentPositions.toMap()
         currentPositions.clear()
+        GlStateManager.color(1f, 1f, 1f, 1f)
+        GlStateManager.enableBlend()
+        GlStateManager.tryBlendFuncSeparate(770, 771, 1, 0)
     }
 
     @SubscribeEvent
