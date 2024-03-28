@@ -57,6 +57,7 @@ import at.hannibal2.skyhanni.features.misc.limbo.LimboTimeTracker
 import at.hannibal2.skyhanni.features.misc.massconfiguration.DefaultConfigFeatures
 import at.hannibal2.skyhanni.features.misc.visualwords.VisualWordGui
 import at.hannibal2.skyhanni.features.rift.area.westvillage.VerminTracker
+import at.hannibal2.skyhanni.features.rift.everywhere.PunchcardHighlight
 import at.hannibal2.skyhanni.features.slayer.SlayerProfitTracker
 import at.hannibal2.skyhanni.test.DebugCommand
 import at.hannibal2.skyhanni.test.PacketTest
@@ -364,6 +365,10 @@ object Commands {
             "shkingfix",
             "Reseting the local King Talisman Helper offset."
         ) { KingTalismanHelper.kingFix() }
+        registerCommand(
+            "shresetpunchcard",
+            "Resets the Rift Punchcard Artifact player list."
+        ) { PunchcardHighlight().clearList() }
     }
 
     private fun developersDebugFeatures() {
