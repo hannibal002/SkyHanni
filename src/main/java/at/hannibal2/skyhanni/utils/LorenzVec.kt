@@ -1,6 +1,7 @@
 package at.hannibal2.skyhanni.utils
 
 import at.hannibal2.skyhanni.utils.LorenzUtils.round
+import net.minecraft.client.renderer.GlStateManager
 import net.minecraft.entity.Entity
 import net.minecraft.network.play.server.S2APacketParticles
 import net.minecraft.util.AxisAlignedBB
@@ -140,7 +141,14 @@ data class LorenzVec(
         return LorenzVec(scalar * x, scalar * y, scalar * z)
     }
 
+    fun applyTranslationToGL() {
+        GlStateManager.translate(x, y, z)
+    }
+
     fun axisAlignedTo(other: LorenzVec) = AxisAlignedBB(x, y, z, other.x, other.y, other.z)
+    fun up(offset: Double): LorenzVec {
+        return copy(y = y + offset)
+    }
 
     fun interpolate(other: LorenzVec, factor: Double): LorenzVec {
         require(factor in 0.0..1.0) { "Percentage must be between 0 and 1: $factor" }
