@@ -131,6 +131,12 @@ public class MiscConfig {
     public boolean colorMonthNames = false;
 
     @Expose
+    @ConfigOption(name = "No Bits Warning", desc = "Alerts you when you have no bits available.")
+    @ConfigEditorBoolean
+    @FeatureToggle
+    public boolean noBitsWarning = true;
+
+    @Expose
     @ConfigOption(name = "Explosions Hider", desc = "Hide explosions.")
     @ConfigEditorBoolean
     @FeatureToggle
