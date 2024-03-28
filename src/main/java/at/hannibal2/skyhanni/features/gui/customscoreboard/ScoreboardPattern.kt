@@ -20,7 +20,7 @@ object ScoreboardPattern {
     ) // this line is weird (either text or number), ill leave it as is; it even has different colors?
     val coldPattern by mainSb.pattern(
         "cold",
-        "^(?:§.)*Cold: §.❄ (?<cold>-?\\d+)$"
+        "^(?:§.)*Cold: §.(?<cold>-?\\d+)❄$"
     )
     val copperPattern by mainSb.pattern(
         "copper",
