@@ -97,7 +97,7 @@ class StatsTuning {
     }
 
     @SubscribeEvent(priority = EventPriority.LOW)
-    fun onDrawSelectedTemplate(event: GuiContainerEvent.BackgroundDrawnEvent) {
+    fun onBackgroundDrawn(event: GuiContainerEvent.BackgroundDrawnEvent) {
         if (!LorenzUtils.inSkyBlock) return
 
         val chestName = InventoryUtils.openInventoryName()

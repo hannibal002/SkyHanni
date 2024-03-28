@@ -127,7 +127,7 @@ object FarmingFortuneDisplay {
     }
 
     @SubscribeEvent
-    fun onRenderOverlay(event: GuiRenderEvent.ChestGuiOverlayRenderEvent) {
+    fun onBackgroundDraw(event: GuiRenderEvent.ChestGuiOverlayRenderEvent) {
         if (!isEnabled()) return
         if (!CropAccessoryData.isLoadingAccessories) return
         SkyHanniMod.feature.misc.inventoryLoadPos.renderString(

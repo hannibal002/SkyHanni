@@ -41,7 +41,7 @@ object Year300RaffleEvent {
         Instant.now().isBefore(SkyBlockTime(301).toInstant())
 
     @SubscribeEvent
-    fun onRender(event: GuiRenderEvent.GuiOverlayRenderEvent) {
+    fun onRenderOverlay(event: GuiRenderEvent.GuiOverlayRenderEvent) {
         config.activeTimerPosition.renderSingleLineWithItems(
             overlay ?: return,
             posLabel = "300þ Anniversary Active Timer"

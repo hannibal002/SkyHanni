@@ -64,7 +64,7 @@ class HighlightBonzoMasks {
     }
 
     @SubscribeEvent
-    fun onChatReceived(event: LorenzChatEvent) {
+    fun onChat(event: LorenzChatEvent) {
         val message = event.message.removeColor()
         if (bonzoMaskMessage.matches(message)) {
             maskTimers["BONZO_MASK"] = CooldownTimer(TimeSource.Monotonic.markNow(), bonzoMaskCooldown)

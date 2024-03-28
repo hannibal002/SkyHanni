@@ -143,7 +143,7 @@ object PestAPI {
     }
 
     @SubscribeEvent
-    fun onTablistUpdate(event: TabListUpdateEvent) {
+    fun onTabListUpdate(event: TabListUpdateEvent) {
         if (!GardenAPI.inGarden()) return
         var previousLine = ""
         for (line in event.tabList) {

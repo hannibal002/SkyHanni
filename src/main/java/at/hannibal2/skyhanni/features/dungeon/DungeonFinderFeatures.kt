@@ -291,7 +291,7 @@ class DungeonFinderFeatures {
     }
 
     @SubscribeEvent
-    fun onToolTipRender(event: LorenzToolTipEvent) {
+    fun onTooltip(event: LorenzToolTipEvent) {
         if (!isEnabled()) return
         if (!inInventory) return
         val toolTip = toolTipMap[event.slot.slotIndex]

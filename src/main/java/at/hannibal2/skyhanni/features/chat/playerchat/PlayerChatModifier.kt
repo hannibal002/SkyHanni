@@ -21,7 +21,7 @@ class PlayerChatModifier {
     }
 
     @SubscribeEvent
-    fun onChatReceive(event: LorenzChatEvent) {
+    fun onChat(event: LorenzChatEvent) {
         val foundCommands = mutableListOf<IChatComponent>()
         val message = event.chatComponent
 

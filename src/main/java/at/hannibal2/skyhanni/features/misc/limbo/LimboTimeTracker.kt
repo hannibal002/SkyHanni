@@ -54,7 +54,7 @@ object LimboTimeTracker {
     }
 
     @SubscribeEvent
-    fun catchPlaytime(event: MessageSendToServerEvent) {
+    fun onMessageSendToServer(event: MessageSendToServerEvent) {
         if (event.message.startsWith("/playtime") && inLimbo) {
             event.isCanceled
             printStats(true)
@@ -153,7 +153,7 @@ object LimboTimeTracker {
     }
 
     @SubscribeEvent
-    fun onDebugCollect(event: DebugDataCollectEvent) {
+    fun onDebugDataCollect(event: DebugDataCollectEvent) {
         event.title("Limbo")
         if (!inLimbo) {
             event.addIrrelevant("not in limbo")
@@ -173,7 +173,7 @@ object LimboTimeTracker {
     }
 
     @SubscribeEvent
-    fun onLogin(event: HypixelJoinEvent) {
+    fun onHypixelJoin(event: HypixelJoinEvent) {
         if (!doMigrate) return
         if (unmigratedPB != 0) {
             ChatUtils.debug("Migrating limbo personalBest")

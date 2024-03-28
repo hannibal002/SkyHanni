@@ -84,7 +84,7 @@ object GardenPlotIcon {
     }
 
     @SubscribeEvent(priority = EventPriority.HIGH)
-    fun onStackClick(event: GuiContainerEvent.SlotClickEvent) {
+    fun onSlotClick(event: GuiContainerEvent.SlotClickEvent) {
         if (!isEnabled()) return
         lastClickedSlotId = event.slotId
         if (event.slotId == 53) {

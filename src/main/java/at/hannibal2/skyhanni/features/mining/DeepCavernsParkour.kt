@@ -126,7 +126,7 @@ class DeepCavernsParkour {
     }
 
     @SubscribeEvent(priority = EventPriority.HIGH)
-    fun onStackClick(event: GuiContainerEvent.SlotClickEvent) {
+    fun onSlotClick(event: GuiContainerEvent.SlotClickEvent) {
         if (showStartIcon && event.slotId == 40) {
             event.isCanceled = true
             ChatUtils.chat("Manually enabled Deep Caverns Parkour.")

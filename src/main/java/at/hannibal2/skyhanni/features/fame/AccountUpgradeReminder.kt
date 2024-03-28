@@ -61,7 +61,7 @@ class AccountUpgradeReminder {
     }
 
     @SubscribeEvent
-    fun onInventoryLoad(event: InventoryFullyOpenedEvent) {
+    fun onInventoryOpen(event: InventoryFullyOpenedEvent) {
         if (!LorenzUtils.inSkyBlock) return
         inInventory = event.inventoryName == "Community Shop"
     }
@@ -84,7 +84,7 @@ class AccountUpgradeReminder {
     }
 
     @SubscribeEvent
-    fun onUpgradeStarted(event: LorenzChatEvent) {
+    fun onChat(event: LorenzChatEvent) {
         if (claimedRegex.matches(event.message)) {
             clearUpgrade()
         } else {

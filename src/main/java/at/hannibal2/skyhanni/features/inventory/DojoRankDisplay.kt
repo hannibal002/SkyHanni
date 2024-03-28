@@ -33,7 +33,7 @@ class DojoRankDisplay {
     private var belts = mapOf<String, Int>()
 
     @SubscribeEvent
-    fun onRenderOverlay(event: GuiRenderEvent.ChestGuiOverlayRenderEvent) {
+    fun onBackgroundDraw(event: GuiRenderEvent.ChestGuiOverlayRenderEvent) {
         if (!isEnabled()) return
         config.dojoRankDisplayPosition.renderStrings(display, posLabel = "Dojo Rank Display")
     }

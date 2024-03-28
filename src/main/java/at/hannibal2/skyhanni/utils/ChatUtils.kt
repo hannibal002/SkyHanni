@@ -206,7 +206,7 @@ object ChatUtils {
         (lastMessageSent + sendQueue.size * messageDelay).takeIf { !it.isInPast() } ?: SimpleTimeMark.now()
 
     @SubscribeEvent
-    fun sendQueuedChatMessages(event: LorenzTickEvent) {
+    fun onTick(event: LorenzTickEvent) {
         val player = Minecraft.getMinecraft().thePlayer
         if (player == null) {
             sendQueue.clear()

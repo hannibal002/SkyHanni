@@ -76,7 +76,7 @@ object TrackSoundsCommand {
     }
 
     @SubscribeEvent
-    fun onSoundEvent(event: PlaySoundEvent) {
+    fun onPlaySound(event: PlaySoundEvent) {
         if (cutOfTime.isInPast()) return
         if (event.soundName == "game.player.hurt" && event.pitch == 0f && event.volume == 0f) return // remove random useless sound
         if (event.soundName == "") return // sound with empty name aren't useful
@@ -85,7 +85,7 @@ object TrackSoundsCommand {
     }
 
     @SubscribeEvent
-    fun onRender(event: GuiRenderEvent.GuiOverlayRenderEvent) {
+    fun onRenderOverlay(event: GuiRenderEvent.GuiOverlayRenderEvent) {
         if (cutOfTime.isInPast()) return
         position.renderRenderables(display, posLabel = "Track sound log")
     }

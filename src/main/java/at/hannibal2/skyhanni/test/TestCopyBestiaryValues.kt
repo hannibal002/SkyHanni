@@ -49,7 +49,7 @@ object TestCopyBestiaryValues {
     )
 
     @SubscribeEvent(priority = EventPriority.LOW)
-    fun onLateInventoryOpen(event: InventoryUpdatedEvent) {
+    fun onInventoryUpdated(event: InventoryUpdatedEvent) {
         if (!SkyHanniMod.feature.dev.debug.copyBestiaryData) return
         SkyHanniDebugsAndTests.displayLine = ""
 

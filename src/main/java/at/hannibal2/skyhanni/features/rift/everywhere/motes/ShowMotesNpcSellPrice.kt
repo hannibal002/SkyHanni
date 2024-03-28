@@ -64,7 +64,7 @@ class ShowMotesNpcSellPrice {
     }
 
     @SubscribeEvent(priority = EventPriority.LOW)
-    fun onDrawSelectedTemplate(event: GuiContainerEvent.BackgroundDrawnEvent) {
+    fun onBackgroundDrawn(event: GuiContainerEvent.BackgroundDrawnEvent) {
         if (!isInventoryValueEnabled()) return
         val name = InventoryUtils.openInventoryName()
         if (!name.contains("Rift Storage")) return
@@ -78,7 +78,7 @@ class ShowMotesNpcSellPrice {
     }
 
     @SubscribeEvent
-    fun onItemTooltipLow(event: LorenzToolTipEvent) {
+    fun onTooltip(event: LorenzToolTipEvent) {
         if (!isShowPriceEnabled()) return
 
         val itemStack = event.itemStack

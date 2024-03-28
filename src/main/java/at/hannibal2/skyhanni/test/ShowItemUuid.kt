@@ -9,7 +9,7 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 class ShowItemUuid {
 
     @SubscribeEvent
-    fun onItemTooltipLow(event: LorenzToolTipEvent) {
+    fun onTooltip(event: LorenzToolTipEvent) {
         if (!SkyHanniMod.feature.dev.debug.showItemUuid) return
         event.itemStack.getItemUuid()?.let {
             event.toolTip.add("§7Item UUID: '$it'")

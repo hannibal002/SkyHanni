@@ -35,7 +35,7 @@ class PlayerChatSymbols {
     )
 
     @SubscribeEvent
-    fun onChatReceived(event: LorenzChatEvent) {
+    fun onChat(event: LorenzChatEvent) {
         if (!LorenzUtils.inSkyBlock) return
         if (!config.enabled) return
 

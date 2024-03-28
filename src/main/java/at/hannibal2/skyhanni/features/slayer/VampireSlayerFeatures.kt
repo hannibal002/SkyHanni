@@ -222,7 +222,7 @@ object VampireSlayerFeatures {
     }
 
     @SubscribeEvent
-    fun onEntityHit(event: EntityClickEvent) {
+    fun onEntityClick(event: EntityClickEvent) {
         if (!isEnabled()) return
         if (event.clickType != ClickType.LEFT_CLICK) return
         if (event.clickedEntity !is EntityOtherPlayerMP) return

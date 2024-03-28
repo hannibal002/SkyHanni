@@ -173,7 +173,7 @@ class CroesusChestTracker {
     }
 
     @SubscribeEvent
-    fun onSlotClicked(event: GuiContainerEvent.SlotClickEvent) {
+    fun onSlotClick(event: GuiContainerEvent.SlotClickEvent) {
         if (!LorenzUtils.inSkyBlock) return
         if (!config.showUsedKismets) return
         if (chestInventory != null && event.slotId == kismetSlotId) {
@@ -199,7 +199,7 @@ class CroesusChestTracker {
     }
 
     @SubscribeEvent
-    fun onRenderItemTipAmount(event: RenderItemTipEvent) {
+    fun onRenderItemTip(event: RenderItemTipEvent) {
         if (!LorenzUtils.inSkyBlock) return
         if (!config.kismetStackSize) return
         if (chestInventory == null) return

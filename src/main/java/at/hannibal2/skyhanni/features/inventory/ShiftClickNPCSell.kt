@@ -27,7 +27,7 @@ object ShiftClickNPCSell {
     fun isEnabled() = LorenzUtils.inSkyBlock && config
 
     @SubscribeEvent
-    fun onOpen(event: InventoryFullyOpenedEvent) {
+    fun onInventoryOpen(event: InventoryFullyOpenedEvent) {
         if (!LorenzUtils.inSkyBlock) return
         if (event.inventoryItems.isEmpty()) return
         val item = event.inventoryItems[event.inventoryItems.keys.last() + sellSlot] ?: return
@@ -36,7 +36,7 @@ object ShiftClickNPCSell {
     }
 
     @SubscribeEvent
-    fun onClose(event: InventoryCloseEvent) {
+    fun onInventoryClose(event: InventoryCloseEvent) {
         inInventory = false
     }
 

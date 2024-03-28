@@ -72,7 +72,7 @@ class LimboPlaytime {
     }
 
     @SubscribeEvent
-    fun onHoverItem(event: LorenzToolTipEvent) {
+    fun onTooltip(event: LorenzToolTipEvent) {
         if (!LorenzUtils.inSkyBlock) return
         if (!event.slot.inventory.name.startsWith("Detailed /playtime")) return
         if (event.slot.slotIndex != 4) return

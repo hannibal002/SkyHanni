@@ -141,7 +141,7 @@ class MinionXp {
     }
 
     @SubscribeEvent
-    fun onItemTooltipEvent(event: LorenzToolTipEvent) {
+    fun onTooltip(event: LorenzToolTipEvent) {
         if (!LorenzUtils.inSkyBlock) return
         if (!config.xpDisplay) return
         when {
@@ -168,7 +168,7 @@ class MinionXp {
     }
 
     @SubscribeEvent
-    fun onIslandChangeEvent(event: IslandChangeEvent) {
+    fun onIslandChange(event: IslandChangeEvent) {
         minionStorages.clear()
         xpItemMap.clear()
         collectItemXpList.clear()

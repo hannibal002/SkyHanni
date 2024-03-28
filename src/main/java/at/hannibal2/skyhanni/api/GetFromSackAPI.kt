@@ -110,7 +110,7 @@ object GetFromSackAPI {
     }
 
     @SubscribeEvent
-    fun onTooltipRender(event: LorenzToolTipEvent) {
+    fun onTooltip(event: LorenzToolTipEvent) {
         if (!LorenzUtils.inSkyBlock) return
         val list = inventoryMap[event.slot.slotIndex] ?: return
         event.toolTip.let { tip ->

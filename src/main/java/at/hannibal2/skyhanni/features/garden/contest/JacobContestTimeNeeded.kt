@@ -29,7 +29,7 @@ class JacobContestTimeNeeded {
     private var currentBracket = ContestBracket.GOLD
 
     @SubscribeEvent(priority = EventPriority.LOW)
-    fun onLateInventoryOpen(event: InventoryUpdatedEvent) {
+    fun onInventoryUpdated(event: InventoryUpdatedEvent) {
         if (FarmingContestAPI.inInventory) {
             update()
         }
@@ -185,7 +185,7 @@ class JacobContestTimeNeeded {
     } else getLatestBlocksPerSecond()
 
     @SubscribeEvent
-    fun onRenderOverlay(event: GuiRenderEvent.ChestGuiOverlayRenderEvent) {
+    fun onBackgroundDraw(event: GuiRenderEvent.ChestGuiOverlayRenderEvent) {
         if (!isEnabled()) return
         if (!FarmingContestAPI.inInventory) return
         config.jacobContextTimesPos.renderStringsAndItems(display, posLabel = "Jacob Contest Time Needed")

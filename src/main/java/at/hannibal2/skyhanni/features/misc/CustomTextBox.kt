@@ -27,7 +27,7 @@ class CustomTextBox {
     private fun String.format() = replace("&", "§").split("\\n").toList()
 
     @SubscribeEvent
-    fun onRenderGUIOverlay(event: GuiRenderEvent.ChestGuiOverlayRenderEvent) {
+    fun onBackgroundDraw(event: GuiRenderEvent.ChestGuiOverlayRenderEvent) {
         if (!config.onlyInGUI) return
         if (!isEnabled()) return
 

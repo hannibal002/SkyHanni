@@ -26,7 +26,7 @@ class JacobContestFFNeededDisplay {
     private val cache = mutableMapOf<ItemStack, List<List<Any>>>()
 
     @SubscribeEvent
-    fun onTooltip(event: RenderItemTooltipEvent) {
+    fun onRenderItemTooltip(event: RenderItemTooltipEvent) {
         if (!isEnabled()) return
 
         if (!InventoryUtils.openInventoryName().contains("Your Contests")) return
@@ -113,7 +113,7 @@ class JacobContestFFNeededDisplay {
     }
 
     @SubscribeEvent
-    fun onRenderOverlay(event: GuiRenderEvent.ChestGuiOverlayRenderEvent) {
+    fun onBackgroundDraw(event: GuiRenderEvent.ChestGuiOverlayRenderEvent) {
         if (!isEnabled()) return
         if (!FarmingContestAPI.inInventory) return
         if (System.currentTimeMillis() > lastToolTipTime + 200) return

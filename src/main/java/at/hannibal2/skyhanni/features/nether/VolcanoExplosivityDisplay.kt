@@ -27,7 +27,7 @@ class VolcanoExplosivityDisplay {
     private var display = ""
 
     @SubscribeEvent
-    fun onTick(event: TabListUpdateEvent) {
+    fun onTabListUpdate(event: TabListUpdateEvent) {
         if (!isEnabled()) return
         val text = event.tabList.nextAfter({ headerPattern.matches(it) }) ?: return
         statusPattern.matchMatcher(text) {

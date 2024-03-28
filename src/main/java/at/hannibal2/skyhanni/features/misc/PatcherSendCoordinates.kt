@@ -29,7 +29,7 @@ class PatcherSendCoordinates {
     )
 
     @SubscribeEvent
-    fun onPatcherCoordinates(event: LorenzChatEvent) {
+    fun onChat(event: LorenzChatEvent) {
         if (!SkyHanniMod.feature.misc.patcherSendCoordWaypoint) return
 
         val message = event.message.removeColor()
