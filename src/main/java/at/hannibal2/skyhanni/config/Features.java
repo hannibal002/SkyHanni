@@ -63,6 +63,9 @@ public class Features extends Config {
      * and Misc and Dev, which are to be at the bottom. Thanks!
      */
 
+
+    // Top
+
     @Expose
     @Category(name = "About", desc = "Information about SkyHanni and updates.")
     public About about = new About();
@@ -71,57 +74,67 @@ public class Features extends Config {
     @Category(name = "GUI", desc = "Change the locations of GUI elements (§e/sh gui§7).")
     public GUIConfig gui = new GUIConfig();
 
-    @Expose
-    @Category(name = "Chat", desc = "Change how the chat looks.")
-    public ChatConfig chat = new ChatConfig();
-
-    @Expose
-    @Category(name = "Combat", desc = "Everything combat and PvE related.")
-    public CombatConfig combat = new CombatConfig();
-
-    @Expose
-    @Category(name = "Crimson Isle", desc = "Things to do on the Crimson Isle/Nether island.")
-    public CrimsonIsleConfig crimsonIsle = new CrimsonIsleConfig();
-
-    @Expose
-    @Category(name = "Dungeon", desc = "Features that change the Dungeons experience in The Catacombs.")
-    public DungeonConfig dungeon = new DungeonConfig();
-
-    @Expose
-    @Category(name = "Events", desc = "Stuff that is not always available.")
-    public EventConfig event = new EventConfig();
-
-    @Expose
-    @Category(name = "Fishing", desc = "Fishing stuff.")
-    public FishingConfig fishing = new FishingConfig();
+    // Islands
 
     @Expose
     @Category(name = "Garden", desc = "Features for the Garden island.")
     public GardenConfig garden = new GardenConfig();
 
     @Expose
-    @Category(name = "Inventory", desc = "Change the behavior of items and the inventory.")
-    public InventoryConfig inventory = new InventoryConfig();
+    @Category(name = "Crimson Isle", desc = "Things to do on the Crimson Isle/Nether island.")
+    public CrimsonIsleConfig crimsonIsle = new CrimsonIsleConfig();
+
+    @Expose
+    @Category(name = "The Rift", desc = "Features for The Rift dimension.")
+    public RiftConfig rift = new RiftConfig();
+
+    // Skills
+
+    @Expose
+    @Category(name = "Fishing", desc = "Fishing stuff.")
+    public FishingConfig fishing = new FishingConfig();
 
     @Expose
     @Category(name = "Mining", desc = "Features that help you break blocks.")
     public MiningConfig mining = new MiningConfig();
 
+    // Combat like
+
     @Expose
-    @Category(name = "Skill Progress", desc = "Skill Progress related config options.")
-    public SkillProgressConfig skillProgress = new SkillProgressConfig();
+    @Category(name = "Combat", desc = "Everything combat and PvE related.")
+    public CombatConfig combat = new CombatConfig();
 
     @Expose
     @Category(name = "Slayer", desc = "Slayer features.")
     public SlayerConfig slayer = new SlayerConfig();
 
     @Expose
-    @Category(name = "The Rift", desc = "Features for The Rift dimension.")
-    public RiftConfig rift = new RiftConfig();
+    @Category(name = "Dungeon", desc = "Features that change the Dungeons experience in The Catacombs.")
+    public DungeonConfig dungeon = new DungeonConfig();
+
+    // Misc
+
+    @Expose
+    @Category(name = "Inventory", desc = "Change the behavior of items and the inventory.")
+    public InventoryConfig inventory = new InventoryConfig();
+
+    @Expose
+    @Category(name = "Events", desc = "Stuff that is not always available.")
+    public EventConfig event = new EventConfig();
+
+    @Expose
+    @Category(name = "Skill Progress", desc = "Skill Progress related config options.")
+    public SkillProgressConfig skillProgress = new SkillProgressConfig();
+
+    @Expose
+    @Category(name = "Chat", desc = "Change how the chat looks.")
+    public ChatConfig chat = new ChatConfig();
 
     @Expose
     @Category(name = "Misc", desc = "Settings without a category.")
     public MiscConfig misc = new MiscConfig();
+
+    // Bottom
 
     @Expose
     @Category(name = "Dev", desc = "Debug and test stuff. Developers are cool.")
