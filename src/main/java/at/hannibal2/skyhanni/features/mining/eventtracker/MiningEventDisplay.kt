@@ -11,9 +11,13 @@ import at.hannibal2.skyhanni.features.mining.eventtracker.MiningEventType.Compan
 import at.hannibal2.skyhanni.utils.ConfigUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils.isInIsland
+import at.hannibal2.skyhanni.utils.NEUInternalName.Companion.asInternalName
+import at.hannibal2.skyhanni.utils.NEUItems.getItemStack
 import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderables
 import at.hannibal2.skyhanni.utils.SimpleTimeMark.Companion.asTimeMark
 import at.hannibal2.skyhanni.utils.renderables.Renderable
+import net.minecraft.init.Blocks
+import net.minecraft.item.ItemStack
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
 object MiningEventDisplay {
@@ -64,7 +68,25 @@ object MiningEventDisplay {
 
             if (shouldShow) {
                 val upcomingEvents = formatUpcomingEvents(eventDetails.islandEvents, eventDetails.lastEvent)
-                val island = Renderable.string("§a${islandType.displayName}§8:")
+                val island =
+                    if (!config.islandAsIcon) Renderable.string("§a${islandType.displayName}§8:") else
+                        Renderable.horizontalContainer(
+                            listOf(
+                                when (islandType) {
+                                    IslandType.DWARVEN_MINES -> Renderable.itemStack(
+                                        "PERFECT_RUBY_GEM".asInternalName().getItemStack()
+                                    )
+
+                                    IslandType.CRYSTAL_HOLLOWS -> Renderable.itemStack(
+                                        "MITHRIL_ORE".asInternalName().getItemStack()
+                                    )
+
+                                    IslandType.MINESHAFT -> Renderable.itemStack(ItemStack(Blocks.packed_ice))
+                                    else -> unknownDisplay
+                                },
+                                Renderable.string("§8:")
+                            )
+                        )
                 display.add(
                     Renderable.horizontalContainer(
                         listOf(

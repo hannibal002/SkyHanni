@@ -433,7 +433,7 @@ interface Renderable {
             override fun render(posX: Int, posY: Int) {
                 var xOffset = 0
                 renderables.forEach {
-                    it.renderYAligned(xOffset, 0, height)
+                    it.renderYAligned(xOffset, posY, height)
                     xOffset += it.width + spacing
                     GlStateManager.translate((it.width + spacing).toFloat(), 0f, 0f)
                 }

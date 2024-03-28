@@ -33,10 +33,16 @@ public class MiningEventConfig {
     public CompressFormat compressedFormat = CompressFormat.DEFAULT;
 
     @Expose
+    @ConfigOption(name = "Compressed Island", desc = "Shows the islands only as icon.")
+    @ConfigEditorBoolean
+    public boolean islandAsIcon = false;
+
+    @Expose
     @ConfigOption(name = "Show Passed Events", desc = "Shows the most recent passed event at the start greyed out. " +
         "§eTakes a little while to save last event.")
     @ConfigEditorBoolean
     public boolean passedEvents = false;
+
 
     public enum ShowType {
         ALL("All Mining Islands"),
