@@ -53,13 +53,14 @@ format like "- #821" to illustrate the dependency.
   and [Java](https://www.oracle.com/java/technologies/javase/codeconventions-contents.html).
 - Do not copy features from other mods. Exceptions:
     - Mods that are paid to use.
-    - Mods that have reached their end of life. (Rip SBA, Dulkir and Soopy)
+  - Mods that have reached their end of life. (Rip SBA, Dulkir and Soopy).
     - The mod has, according to Hypixel rules, illegal features ("cheat mod/client").
     - If you can improve the existing feature in a meaningful way.
 - All new classes should be written in Kotlin, with a few exceptions:
     - Config files in `at.hannibal2.skyhanni.config.features`
     - Mixin classes in `at.hannibal2.skyhanni.mixins.transformers`
-  - Java classes that represent JSON data objects in `at.hannibal2.skyhanni.data.jsonobjects`
+- Future JSON data objects should be made in kotlin and placed in the directory `at.hannibal2.skyhanni.data.jsonobjects`
+    - Config files should still be made in Java.
 - Please use the existing event system, or expand on it. Do not use Forge events.
     - (We inject the calls with Mixin)
 - Please use existing utils methods.
@@ -70,7 +71,7 @@ format like "- #821" to illustrate the dependency.
 - Please try to avoid using `System.currentTimeMillis()`. Use our own class `SimpleTimeMark` instead.
     - See [this commit](https://github.com/hannibal002/SkyHanni/commit/3d748cb79f3a1afa7f1a9b7d0561e5d7bb284a9b)
       as an example.
-- Try to avoid using kotlin's `!!` (catch if not null) feature.
+- Try to avoid using Kotlin's `!!` (catch if not null) feature.
     - Replace it with `?:` (if null return this).
     - This will most likely not be possible to avoid when working with objects from java.
 - Don't forget to add `@FeatureToggle` to new standalone features (not options to that feature) in the config.
@@ -81,6 +82,8 @@ format like "- #821" to illustrate the dependency.
 for more information and usages.
     - The pattern variables are named in the scheme `variableNamePattern`
 - Please use Regex instead of String comparison when it is likely Hypixel will change the message in the future.
+- Do not use `fixedRateTimer` when possible and instead use `SecondPassedEvent` to safely execute the repeating event on
+  the main thread.
 
 ## Software Used in SkyHanni
 

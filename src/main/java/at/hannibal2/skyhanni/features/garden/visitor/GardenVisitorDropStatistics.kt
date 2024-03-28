@@ -8,6 +8,7 @@ import at.hannibal2.skyhanni.events.ConfigLoadEvent
 import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.LorenzChatEvent
 import at.hannibal2.skyhanni.events.ProfileJoinEvent
+import at.hannibal2.skyhanni.events.SecondPassedEvent
 import at.hannibal2.skyhanni.events.garden.visitor.VisitorAcceptEvent
 import at.hannibal2.skyhanni.features.garden.GardenAPI
 import at.hannibal2.skyhanni.test.command.ErrorManager
@@ -221,6 +222,12 @@ object GardenVisitorDropStatistics {
         if (amount is Int) return amount.addSeparators()
         if (amount is Long) return NumberUtil.format(amount)
         return "$amount"
+    }
+
+    //todo this should just save when changed not once a second
+    @SubscribeEvent
+    fun onSecondPassed(event: SecondPassedEvent) {
+        saveAndUpdate()
     }
 
     fun saveAndUpdate() {
