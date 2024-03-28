@@ -645,9 +645,9 @@ object GardenNextJacobContest {
             ConfigUtils.migrateIntToEnum(element, ShareContestsEntry::class.java)
         }
         event.move(18, "garden.nextJacobContests.everywhere", "garden.nextJacobContests.showOutsideGarden")
-        event.move(28, "garden.jacobContextTimesPos", "garden.jacobContestTimesPos")
-        event.move(28, "garden.jacobContextTimes", "garden.jacobContestTimes")
-        event.move(28, "misc.showOutsideSB.NEXT_JACOB_CONTEXT", "misc.showOutsideSB.NEXT_JACOB_CONTEST")
+        event.move(32, "garden.jacobContextTimesPos", "garden.jacobContestTimesPos")
+        event.move(32, "garden.jacobContextTimes", "garden.jacobContestTimes")
+        event.move(32, "misc.showOutsideSB.NEXT_JACOB_CONTEXT", "misc.showOutsideSB.NEXT_JACOB_CONTEST")
     }
 }
 
