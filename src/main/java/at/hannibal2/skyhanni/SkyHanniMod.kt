@@ -11,6 +11,7 @@ import at.hannibal2.skyhanni.config.SackData
 import at.hannibal2.skyhanni.config.commands.Commands.init
 import at.hannibal2.skyhanni.data.ActionBarData
 import at.hannibal2.skyhanni.data.ActionBarStatsData
+import at.hannibal2.skyhanni.data.BannedClasses
 import at.hannibal2.skyhanni.data.BitsAPI
 import at.hannibal2.skyhanni.data.BlockData
 import at.hannibal2.skyhanni.data.BossbarData
@@ -431,6 +432,7 @@ class SkyHanniMod {
 
         // data
         loadModule(this)
+        loadModule(BannedClasses)
         loadModule(ChatManager)
         loadModule(HypixelData())
         loadModule(LocationFixData)

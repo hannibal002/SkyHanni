@@ -36,7 +36,8 @@ object EventCounter {
         println("")
         var total = 0
         for ((name, amount) in map.entries.sortedBy { it.value }) {
-            println("$name (${amount.addSeparators()} times)")
+            val displayName =  name.replace("at.hannibal2.skyhanni.events", "events")
+            println("$displayName (${amount.addSeparators()} times)")
             total += amount
         }
         println("")

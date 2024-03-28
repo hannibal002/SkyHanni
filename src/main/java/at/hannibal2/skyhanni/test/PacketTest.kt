@@ -7,7 +7,6 @@ import at.hannibal2.skyhanni.utils.LocationUtils.distanceToPlayer
 import at.hannibal2.skyhanni.utils.LorenzUtils.round
 import at.hannibal2.skyhanni.utils.LorenzVec
 import at.hannibal2.skyhanni.utils.NumberUtil.isInt
-import at.hannibal2.skyhanni.utils.ReflectionUtils.makeAccessible
 import at.hannibal2.skyhanni.utils.getLorenzVec
 import at.hannibal2.skyhanni.utils.toLorenzVec
 import net.minecraft.client.Minecraft
@@ -248,8 +247,8 @@ object PacketTest {
         is S0CPacketSpawnPlayer -> entityID
         is S0FPacketSpawnMob -> entityID
         is S0EPacketSpawnObject -> entityID
-        is S19PacketEntityHeadLook -> javaClass.getDeclaredField("entityId").makeAccessible().get(this) as Int
-        is S19PacketEntityStatus -> javaClass.getDeclaredField("entityId").makeAccessible().get(this) as Int
+//         is S19PacketEntityHeadLook -> javaClass.getDeclaredField("entityId").makeAccessible().get(this) as Int
+//         is S19PacketEntityStatus -> javaClass.getDeclaredField("entityId").makeAccessible().get(this) as Int
         /* is S14PacketEntity.S15PacketEntityRelMove -> packet.javaClass.getDeclaredField("entityId").makeAccessible().get(packet) as Int
         is S14PacketEntity.S16PacketEntityLook -> packet.javaClass.getDeclaredField("entityId").makeAccessible().get(packet) as Int
         is S14PacketEntity.S17PacketEntityLookMove -> packet.javaClass.getDeclaredField("entityId").makeAccessible().get(packet) as Int */

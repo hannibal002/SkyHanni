@@ -238,7 +238,6 @@ object QuiverAPI {
 
     fun isEnabled() = LorenzUtils.inSkyBlock && storage != null
 
-
     // Load arrows from repo
     @SubscribeEvent
     fun onRepoReload(event: RepositoryReloadEvent) {
