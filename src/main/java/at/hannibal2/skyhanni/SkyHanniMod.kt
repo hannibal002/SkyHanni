@@ -274,6 +274,7 @@ import at.hannibal2.skyhanni.features.misc.ExpOrbsOnGroundHider
 import at.hannibal2.skyhanni.features.misc.FixGhostEntities
 import at.hannibal2.skyhanni.features.misc.FixNEUHeavyPearls
 import at.hannibal2.skyhanni.features.misc.HideArmor
+import at.hannibal2.skyhanni.features.misc.HideFarEntities
 import at.hannibal2.skyhanni.features.misc.InGameDateDisplay
 import at.hannibal2.skyhanni.features.misc.JoinCrystalHollows
 import at.hannibal2.skyhanni.features.misc.LesserOrbHider
@@ -806,6 +807,7 @@ class SkyHanniMod {
         loadModule(LimboPlaytime())
         loadModule(RareDropMessages())
         loadModule(CraftMaterialsFromBazaar())
+        loadModule(HideFarEntities())
 
         init()
 
