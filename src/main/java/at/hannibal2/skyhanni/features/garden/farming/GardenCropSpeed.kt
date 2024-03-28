@@ -173,9 +173,7 @@ object GardenCropSpeed {
         secondsStopped = 0
     }
 
-    fun finneganPerkActive(): Boolean {
-        return Perk.FARMING_SIMULATOR.isActive
-    }
+    fun finneganPerkActive() = Perk.FARMING_SIMULATOR.isActive
 
     fun isEnabled() = GardenAPI.inGarden()
 

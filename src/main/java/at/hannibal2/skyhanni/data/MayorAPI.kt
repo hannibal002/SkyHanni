@@ -38,7 +38,8 @@ object MayorAPI {
             val config = SkyHanniMod.feature.dev.debug.assumeMayor
             if (config == Mayor.NONE) return field
             config.perks.forEach { it.isActive = true }
-            config.activePerks += config.perks.filter { it !in config.activePerks }
+            config.activePerks.clear()
+            config.activePerks.addAll(config.perks)
             return config
         }
         private set

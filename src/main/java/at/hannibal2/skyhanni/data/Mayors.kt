@@ -28,6 +28,8 @@ enum class Mayor(
 
     val activePerks: MutableList<Perk> = mutableListOf()
 
+    override fun toString() = mayorName
+
     companion object {
 
         fun getMayorFromName(name: String) = entries.firstOrNull { it.mayorName == name } ?: UNKNOWN
