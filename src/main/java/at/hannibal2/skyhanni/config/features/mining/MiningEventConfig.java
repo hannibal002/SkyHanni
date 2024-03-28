@@ -30,7 +30,7 @@ public class MiningEventConfig {
     @Expose
     @ConfigOption(name = "Compressed Format", desc = "Compresses the event names so that they are shorter.")
     @ConfigEditorDropdown
-    public CompressFormat compressedFormat = CompressFormat.NONE;
+    public CompressFormat compressedFormat = CompressFormat.DEFAULT;
 
     @Expose
     @ConfigOption(name = "Show Passed Events", desc = "Shows the most recent passed event at the start greyed out. " +

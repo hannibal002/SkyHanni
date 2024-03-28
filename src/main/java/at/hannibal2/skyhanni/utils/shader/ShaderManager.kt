@@ -2,6 +2,7 @@ package at.hannibal2.skyhanni.utils.shader
 
 import at.hannibal2.skyhanni.features.chroma.StandardChromaShader
 import at.hannibal2.skyhanni.features.chroma.TexturedChromaShader
+import at.hannibal2.skyhanni.features.misc.DarkenShader
 import at.hannibal2.skyhanni.features.misc.RoundedRectangleShader
 import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.LorenzUtils
@@ -25,7 +26,10 @@ object ShaderManager {
         STANDARD_CHROMA(StandardChromaShader.INSTANCE),
         TEXTURED_CHROMA(TexturedChromaShader.INSTANCE),
         ROUNDED_RECTANGLE(RoundedRectangleShader.INSTANCE),
+        DARKEN(DarkenShader.INSTANCE)
         ;
+
+        fun enableShader() = ShaderManager.enableShader(name)
 
         companion object {
 
@@ -33,6 +37,7 @@ object ShaderManager {
                 "standard_chroma" -> STANDARD_CHROMA.shader
                 "textured_chroma" -> TEXTURED_CHROMA.shader
                 "rounded_rect" -> ROUNDED_RECTANGLE.shader
+                "darken" -> DARKEN.shader
                 else -> {
                     null
                 }

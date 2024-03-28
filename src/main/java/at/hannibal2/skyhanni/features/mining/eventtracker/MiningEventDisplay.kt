@@ -13,6 +13,7 @@ import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils.isInIsland
 import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderables
 import at.hannibal2.skyhanni.utils.SimpleTimeMark.Companion.asTimeMark
+import at.hannibal2.skyhanni.utils.renderables.Renderable
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
 object MiningEventDisplay {
@@ -30,7 +31,13 @@ object MiningEventDisplay {
     @SubscribeEvent
     fun onRenderOverlay(event: GuiRenderEvent.GuiOverlayRenderEvent) {
         if (!shouldDisplay()) return
-        config.position.renderRenderables(MiningEventType.entries.map { it.icon }, posLabel = "Upcoming Events Display")
+        config.position.renderRenderables(MiningEventType.entries.map {
+            Renderable.horizontalContainer(
+                listOf(
+                    it.icon, Renderable.string(" ${it.eventName}")
+                )
+            )
+        }, posLabel = "Upcoming Events Display")
         //config.position.renderStrings(display, posLabel = "Upcoming Events Display")
     }
 
@@ -64,8 +71,7 @@ object MiningEventDisplay {
 
     private fun formatUpcomingEvents(events: List<RunningEventType>, lastEvent: MiningEventType?): String {
         val upcoming = events.filter { !it.endsAt.asTimeMark().isInPast() }
-            .map { if (it.isDoubleEvent) "${it.event} §8-> ${it.event}" else it.event.toString() }
-            .toMutableList()
+            .map { if (it.isDoubleEvent) "${it.event} §8-> ${it.event}" else it.event.toString() }.toMutableList()
 
         if (upcoming.isEmpty()) upcoming.add("§7???")
         if (config.passedEvents && upcoming.size < 4) lastEvent?.let { upcoming.add(0, it.toPastString()) }
@@ -88,13 +94,13 @@ object MiningEventDisplay {
         }
     }
 
-    private fun shouldDisplay() = LorenzUtils.inSkyBlock && config.enabled && !ReminderUtils.isBusy() &&
-        !(!config.outsideMining && !LorenzUtils.inAdvancedMiningIsland())
+    private fun shouldDisplay() =
+        LorenzUtils.inSkyBlock && config.enabled && !ReminderUtils.isBusy() && !(!config.outsideMining && !LorenzUtils.inAdvancedMiningIsland())
 
     @SubscribeEvent
     fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
         event.transform(31, "mining.miningEvent.compressedFormat") {
-            ConfigUtils.migrateBooleanToEnum(it, CompressFormat.COMPACT_TEXT, CompressFormat.NONE)
+            ConfigUtils.migrateBooleanToEnum(it, CompressFormat.COMPACT_TEXT, CompressFormat.DEFAULT)
         }
     }
 }

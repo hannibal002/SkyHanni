@@ -6,6 +6,7 @@ import at.hannibal2.skyhanni.utils.RenderUtils
 import at.hannibal2.skyhanni.utils.StringUtils.allLettersFirstUppercase
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.renderables.Renderable
+import at.hannibal2.skyhanni.utils.shader.ShaderManager
 import net.minecraft.client.renderer.GlStateManager
 import net.minecraft.init.Items
 import net.minecraft.item.Item
@@ -75,7 +76,7 @@ enum class MiningEventType(
             steveHead.render(posX, posY)
 
             GlStateManager.translate(-2f, -2f, 2f)
-            pickaxe.render(posX, posY)
+
             GlStateManager.translate(0f, 0f, -2f)
         }
 
@@ -103,19 +104,36 @@ enum class MiningEventType(
         )
     )
 
-    val icon = Renderable.hoverTips(iconInput, listOf(eventName))
+    val icon = Renderable.hoverTips(iconInput, listOf(eventName)).darken()
     val compactText = Renderable.string("§$colourCode$shortName")
     val normalText = Renderable.string("§$colourCode$eventName")
 
+    val compactTextWithIcon = compactText + icon
+    val normalTextWithIcon = compactText + icon
+
+    private fun Renderable.darken() = object : Renderable {
+        override val width = this@darken.width
+        override val height = this@darken.height
+        override val horizontalAlign = this@darken.horizontalAlign
+        override val verticalAlign = this@darken.verticalAlign
+
+        override fun render(posX: Int, posY: Int) {
+            ShaderManager.Shaders.DARKEN.enableShader()
+            this@darken.render(posX, posY)
+            ShaderManager.disableShader()
+        }
+
+    }
+
     override fun toString() = when (config.compressedFormat) {
         CompressFormat.COMPACT_TEXT -> "§$colourCode$shortName"
-        CompressFormat.ICONS -> "WRONG VALUE"
+        CompressFormat.ICON_ONLY -> "WRONG VALUE"
         else -> "§$colourCode$eventName"
     }
 
     fun toPastString() = when (config.compressedFormat) {
         CompressFormat.COMPACT_TEXT -> "§7$shortName"
-        CompressFormat.ICONS -> TODO()
+        CompressFormat.ICON_ONLY -> TODO()
         else -> "§7$eventName"
     }
 
@@ -123,7 +141,7 @@ enum class MiningEventType(
         private val config get() = SkyHanniMod.feature.mining.miningEvent
 
         enum class CompressFormat {
-            NONE, COMPACT_TEXT, ICONS;
+            DEFAULT, COMPACT_TEXT, ICON_ONLY, TEXT_WITHOUT_ICON, COMPACT_TEXT_WITHOUT_ICON;
 
             override fun toString(): String {
                 return name.lowercase().allLettersFirstUppercase()
@@ -135,3 +153,6 @@ enum class MiningEventType(
         }
     }
 }
+
+private operator fun Renderable.plus(other: Renderable): Renderable =
+    Renderable.horizontalContainer(listOf(this, other), 1)
