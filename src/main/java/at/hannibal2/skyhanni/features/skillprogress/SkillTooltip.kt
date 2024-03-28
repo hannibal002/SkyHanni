@@ -2,12 +2,16 @@ package at.hannibal2.skyhanni.features.skillprogress
 
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.SkillAPI
+import at.hannibal2.skyhanni.api.SkillAPI.customGoalConfig
 import at.hannibal2.skyhanni.api.SkillAPI.excludedSkills
+import at.hannibal2.skyhanni.api.SkillAPI.overflowConfig
 import at.hannibal2.skyhanni.events.LorenzToolTipEvent
 import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.cleanName
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.ItemUtils.name
+import at.hannibal2.skyhanni.utils.KeyboardManager
+import at.hannibal2.skyhanni.utils.KeyboardManager.isKeyHeld
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.NumberUtil.roundToPrecision
@@ -17,16 +21,12 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
 class SkillTooltip {
 
-    private val config get() = SkyHanniMod.feature.skillProgress
-    private val overflowConfig get() = config.overflowConfig
-    private val customGoalConfig get() = config.customGoalConfig
-
     @SubscribeEvent
     fun onTooltip(event: LorenzToolTipEvent) {
         if (!LorenzUtils.inSkyBlock) return
         val inventoryName = InventoryUtils.openInventoryName()
         val stack = event.itemStack
-        if (inventoryName == "Your Skills" && stack.getLore().any { it.contains("Click to view!") }) {
+        if (inventoryName == "Your Skills" && stack.getLore().any { it.contains("Click to view!")})  {
             val iterator = event.toolTip.listIterator()
             val split = stack.cleanName().split(" ")
             val skillName = split.first()
@@ -83,6 +83,40 @@ class SkillTooltip {
                     if (line.contains(bar)) {
                         iterator.add("§b§lOVERFLOW XP:")
                         iterator.add("§7▸ ${skillInfo.overflowTotalXp.addSeparators()}")
+                    }
+                }
+            }
+        }
+
+
+        if ((inventoryName == "SkyBlock Menu" || inventoryName == "Your Skills") && stack.displayName == "§aYour Skills" && overflowConfig.enableSkillAvg){
+            val iterator = event.toolTip.listIterator()
+            for (line in iterator){
+                if (line.contains("Skill Avg.")){
+                    val storage = SkillAPI.storage ?: return
+                    var total = 0.0
+                    for ((_, skill) in storage){
+                        val level = skill.overflowLevel
+                        val have = skill.overflowTotalXp
+                        val need = skill.overflowCurrentXpMax
+                        val progress = have.toDouble() / need
+                        total += (level + progress)
+                    }
+                    val avg = (total / storage.size).roundToPrecision(2)
+                    iterator.set("§6$avg Skill Avg. §8(non-cosmetic)")
+
+                    if(overflowConfig.showAvgInfoKey.isKeyHeld()){
+                        iterator.add("")
+                        for((type, info) in storage){
+                            val level = info.overflowLevel
+                            val have = info.overflowCurrentXp
+                            val need = info.overflowCurrentXpMax
+                            val progress = have.toDouble() / need
+                            iterator.add("§7${type.displayName}: §6${(level + progress).roundToPrecision(2)}")
+                        }
+                    }else{
+                        iterator.add("")
+                        iterator.add("§8§oHold ${KeyboardManager.getKeyName(overflowConfig.showAvgInfoKey)} to show more info!")
                     }
                 }
             }

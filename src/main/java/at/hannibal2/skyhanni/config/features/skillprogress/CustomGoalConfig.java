@@ -1,5 +1,6 @@
 package at.hannibal2.skyhanni.config.features.skillprogress;
 
+import at.hannibal2.skyhanni.config.FeatureToggle;
 import com.google.gson.annotations.Expose;
 import io.github.moulberry.moulconfig.annotations.ConfigEditorBoolean;
 import io.github.moulberry.moulconfig.annotations.ConfigOption;
@@ -36,4 +37,9 @@ public class CustomGoalConfig {
     @ConfigEditorBoolean
     public boolean enableInChat = false;
 
+    @Expose
+    @ConfigOption(name = "Custom Goal Button", desc = "Show a button in the Skill menu to toggle custom goal in tooltip.")
+    @ConfigEditorBoolean
+    @FeatureToggle
+    public boolean customGoalButtonInSkillMenu = false;
 }

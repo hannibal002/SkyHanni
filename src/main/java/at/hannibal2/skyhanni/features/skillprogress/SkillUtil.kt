@@ -5,6 +5,7 @@ import at.hannibal2.skyhanni.api.SkillAPI.activeSkill
 import at.hannibal2.skyhanni.api.SkillAPI.exactLevelingMap
 import at.hannibal2.skyhanni.api.SkillAPI.excludedSkills
 import at.hannibal2.skyhanni.api.SkillAPI.levelingMap
+import at.hannibal2.skyhanni.api.SkillAPI.skillColorConfig
 import at.hannibal2.skyhanni.utils.Quad
 import com.google.common.base.Splitter
 import com.google.gson.JsonArray
@@ -137,4 +138,35 @@ object SkillUtil {
     fun levelArray(): JsonArray =
         Utils.getElement(Constants.LEVELING, "leveling_xp").asJsonArray
 
+    fun getColorForPercentage(percentage: Int): String {
+        val segments = skillColorConfig.displayPercentageColorString.split(";")
+        val rules = segments.map { segment ->
+            val parts = segment.split(":")
+            val start = parts[0].toInt()
+            val end = parts[1].toInt()
+            val color = parts[2]
+            IntRange(start, end) to color
+        }
+        val rule = rules.firstOrNull { (range, _) -> percentage in range }
+        return rule?.second ?: "6"
+    }
+
+    fun getColorForLevel(level: Int): String {
+        return when (level){
+            in 0 .. 9 -> "§7"
+            in 10 .. 19 -> "§f"
+            in 20 .. 29 -> "§d"
+            in 30 .. 39 -> "§a"
+            in 40 .. 49 -> "§3"
+            in 50 .. 59 -> "§b"
+            in 60 .. 69 -> "§3"
+            in 70 .. 79 -> "§9"
+            in 80 .. 89 -> "§d"
+            in 90 .. 99 -> "§5"
+            in 100 .. 109 -> "§6"
+            in 110 .. 119 -> "§c"
+            in 120 .. 129 -> "§4"
+            else -> "§Z"
+        }
+    }
 }

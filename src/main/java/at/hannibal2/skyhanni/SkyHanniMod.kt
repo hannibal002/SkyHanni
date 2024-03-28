@@ -352,6 +352,7 @@ import at.hannibal2.skyhanni.features.rift.everywhere.RiftHorsezookaHider
 import at.hannibal2.skyhanni.features.rift.everywhere.RiftTimer
 import at.hannibal2.skyhanni.features.rift.everywhere.motes.RiftMotesOrb
 import at.hannibal2.skyhanni.features.rift.everywhere.motes.ShowMotesNpcSellPrice
+import at.hannibal2.skyhanni.features.skillprogress.SkillButtonInInventory
 import at.hannibal2.skyhanni.features.skillprogress.SkillProgress
 import at.hannibal2.skyhanni.features.skillprogress.SkillTooltip
 import at.hannibal2.skyhanni.features.slayer.HideMobNames
@@ -798,6 +799,7 @@ class SkyHanniMod {
         loadModule(SkillProgress)
         loadModule(SkillTooltip())
         loadModule(QuiverNotification)
+        loadModule(SkillButtonInInventory())
         loadModule(MaxPurseItems())
         loadModule(SuperCraftFeatures())
         loadModule(InfernoMinionFeatures())
