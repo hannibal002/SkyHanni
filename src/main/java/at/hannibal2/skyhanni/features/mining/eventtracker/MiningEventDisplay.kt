@@ -38,7 +38,7 @@ object MiningEventDisplay {
         config.position.renderRenderables(MiningEventType.entries.map {
             Renderable.horizontalContainer(
                 listOf(
-                    it.getRenderableAsPast(), Renderable.string(" ${it.eventName}")
+                    it.getRenderable(), Renderable.string(" ${it.eventName}")
                 )
             )
         }, posLabel = "Upcoming Events Display")
@@ -110,7 +110,7 @@ object MiningEventDisplay {
             }.map { it.getRenderable() }.toMutableList()
 
         if (upcoming.isEmpty()) upcoming.add(unknownDisplay)
-        if (config.passedEvents && upcoming.size < 4) lastEvent?.let { upcoming.add(0, it.getRenderableAsPast()) }
+        if (config.passedEvents && upcoming.size < 4) lastEvent?.let { upcoming.add(0, it.getRenderable()) }
         return upcoming.flatMap { listOf(it, transitionDisplay) }.dropLast(1).toTypedArray()
         /* return upcoming.joinToString(" §8-> ") */
     }

@@ -26,36 +26,42 @@ enum class MiningEventType(
     val dwarvenSpecific: Boolean,
     iconInput: Renderable
 ) {
-    GONE_WITH_THE_WIND(
-        "GONE WITH THE WIND", "Wind", 18.minutes, '9', false, Items.feather.toItemStack()
-    ),
-    DOUBLE_POWDER("2X POWDER", "2x", 15.minutes, 'b', false,
-        object : Renderable {
-            override val width = 12
-            override val height = 10
-            override val horizontalAlign = RenderUtils.HorizontalAlignment.LEFT
-            override val verticalAlign = RenderUtils.VerticalAlignment.TOP
+    GONE_WITH_THE_WIND("GONE WITH THE WIND", "Wind", 18.minutes, '9', false, object : Renderable {
+        override val width = 12
+        override val height = 10
+        override val horizontalAlign = RenderUtils.HorizontalAlignment.LEFT
+        override val verticalAlign = RenderUtils.VerticalAlignment.TOP
 
-            val dyeGreen = Renderable.itemStack(Items.dye.toItemStack(10), 10.0 / 12.0)
-            val dyePink = Renderable.itemStack(Items.dye.toItemStack(9), 10.0 / 12.0)
+        val compass = Renderable.itemStack(Items.compass.toItemStack())
+        val wind = Renderable.string("§9≈")
 
-            override fun render(posX: Int, posY: Int) {
-                GlStateManager.translate(1f, -1.5f, 0f)
-                dyePink.render(posX + 1, posY - 1)
-                GlStateManager.translate(-2f, 1.5f, 0f)
-                dyeGreen.render(posX, posY)
-                GlStateManager.translate(1f, 0f, 0f)
-            }
-
+        override fun render(posX: Int, posY: Int) {
+            GlStateManager.translate(0f, 0f, -2f)
+            compass.render(posX, posY)
+            GlStateManager.translate(0f, 0f, 2f)
+            wind.render(posX, posY)
         }
-    ),
+    }),
+    DOUBLE_POWDER("2X POWDER", "2x", 15.minutes, 'b', false, object : Renderable {
+        override val width = 12
+        override val height = 10
+        override val horizontalAlign = RenderUtils.HorizontalAlignment.LEFT
+        override val verticalAlign = RenderUtils.VerticalAlignment.TOP
+
+        val dyeGreen = Renderable.itemStack(Items.dye.toItemStack(10), 10.0 / 12.0)
+        val dyePink = Renderable.itemStack(Items.dye.toItemStack(9), 10.0 / 12.0)
+
+        override fun render(posX: Int, posY: Int) {
+            GlStateManager.translate(1f, -1.5f, 0f)
+            dyePink.render(posX + 1, posY - 1)
+            GlStateManager.translate(-2f, 1.5f, 0f)
+            dyeGreen.render(posX, posY)
+            GlStateManager.translate(1f, 0f, 0f)
+        }
+
+    }),
     GOBLIN_RAID(
-        "GOBLIN RAID",
-        "Raid",
-        5.minutes,
-        'c',
-        true,
-        ItemUtils.createSkull(
+        "GOBLIN RAID", "Raid", 5.minutes, 'c', true, ItemUtils.createSkull(
             "Goblin",
             "32518c29-6127-3c71-b2a7-be4c3251e76f",
             "ewogICJ0aW1lc3RhbXAiIDogMTYwNzQ2NDg4MTMwOCwKICAicHJvZmlsZUlkIiA6ICJhMmY4MzQ1OTVjODk0YTI3YWRkMzA0OTcxNmNhOTEwYyIsCiAgInByb2ZpbGVOYW1lIiA6ICJiUHVuY2giLAogICJzaWduYXR1cmVSZXF1aXJlZCIgOiB0cnVlLAogICJ0ZXh0dXJlcyIgOiB7CiAgICAiU0tJTiIgOiB7CiAgICAgICJ1cmwiIDogImh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvMTcyODUwOTA2YjdmMGQ5NTJjMGU1MDgwNzNjYzQzOWZkMzM3NGNjZjViODg5YzA2ZjdlOGQ5MGNjMGNjMjU1YyIKICAgIH0KICB9Cn0="
@@ -68,11 +74,17 @@ enum class MiningEventType(
         override val verticalAlign = RenderUtils.VerticalAlignment.TOP
 
         val steveHead = Renderable.itemStack(Items.skull.toItemStack(3), 8.0 / 12.0)
-        val pickaxe = Renderable.itemStack(Items.iron_pickaxe.toItemStack(9), 12.0 / 12.0)
+        val alexHead = Renderable.itemStack(
+            ItemUtils.createSkull(
+                "Alex",
+                "6ab43178-89fd-4905-97f6-0f67d9d76fd9",
+                "fRBfVNlIWW6cL478st/8NsNEHVxjvwQDp4+MbKbFj1tPZvxXgpIXRaQsLeDl/0+E4tipPKNANAbmqj9EKAVx3b3gDqLLrTTk/NfuH2RD3I5ppzio8w5oYk1022SopaayGBP4+kuwktDHzlR8IgAUb1RiavldKp+TGRdCbqw8vHHBm9pnuOePzTOOADQgdanRj98bOcfIXe69tSS/VHxDe9tkpYFPkQR8zsJcjUxf+nS83iFU9CW9lKtQlyoU6/BPbHFILvcR1KDR5Imj7GJe2OJefghI6OqtHNZP2tzkia2IDU0Yc4ikwC+7yN3i6I3Do4G3gTtCZVfNXiSdFyU9nCMyBxggTaG9zaljZpN0BynG4FzYMujIVgeNa6FLqwoaFT0iELW2w9JgJFgyVlaDKEqMSGyxgqtcQMPBuvCwMFFjeFd2EhtfTjQ4hcpva+NXXoYPP7yfTk/0DErNZV2dUTasekar8lH6U58B7ECNxDUwcon4z7sSO5mdlPJoiT7zllgpwQn5NUPaxZxaKkGdUIFEGzjmBfnCmk6MOqzi05Rr18wnkdic9hz/fIzzTMhn9mbMG6VF9eBkE4mNu1K5jai6II5Mz9BV49U0ZcA874N1VHpJpQE6762TYv+u7ICTRIOf2LD9wEgu3py/nX+IHma5j22ClUtXH3hYdZmHg+s=\",Value:\"ewogICJ0aW1lc3RhbXAiIDogMTcxMTY1OTI2NDg1NSwKICAicHJvZmlsZUlkIiA6ICI2YWI0MzE3ODg5ZmQ0OTA1OTdmNjBmNjdkOWQ3NmZkOSIsCiAgInByb2ZpbGVOYW1lIiA6ICJNSEZfQWxleCIsCiAgInNpZ25hdHVyZVJlcXVpcmVkIiA6IHRydWUsCiAgInRleHR1cmVzIiA6IHsKICAgICJTS0lOIiA6IHsKICAgICAgInVybCIgOiAiaHR0cDovL3RleHR1cmVzLm1pbmVjcmFmdC5uZXQvdGV4dHVyZS84M2NlZTVjYTZhZmNkYjE3MTI4NWFhMDBlODA0OWMyOTdiMmRiZWJhMGVmYjhmZjk3MGE1Njc3YTFiNjQ0MDMyIiwKICAgICAgIm1ldGFkYXRhIiA6IHsKICAgICAgICAibW9kZWwiIDogInNsaW0iCiAgICAgIH0KICAgIH0KICB9Cn0="
+            ), 8.0 / 12.0
+        )
 
         override fun render(posX: Int, posY: Int) {
             GlStateManager.translate(-2f, -1f, 0f)
-            steveHead.render(posX, posY)
+            alexHead.render(posX, posY)
             GlStateManager.translate(+4f, +3f, 0f)
             steveHead.render(posX, posY)
 
@@ -83,12 +95,7 @@ enum class MiningEventType(
 
     }),
     RAFFLE(
-        "RAFFLE",
-        "Raffle",
-        160.seconds,
-        '6',
-        true,
-        Items.name_tag.toItemStack()
+        "RAFFLE", "Raffle", 160.seconds, '6', true, Items.name_tag.toItemStack()
     ),
     MITHRIL_GOURMAND("MITHRIL GOURMAND", "Gourmand", 10.minutes, 'b', true, Items.dye.toItemStack(6)), ;
 
@@ -105,14 +112,14 @@ enum class MiningEventType(
         )
     )
 
-    val icon = Renderable.hoverTips(iconInput, listOf(eventName)).darken()
+    val icon = Renderable.hoverTips(iconInput, listOf(eventName))
     val compactText = Renderable.string("§$colourCode$shortName")
     val normalText = Renderable.string("§$colourCode$eventName")
 
     val compactTextWithIcon = icon + compactText
     val normalTextWithIcon = icon + normalText
 
-    private fun Renderable.darken(amount: Float = 0.0f) = object : Renderable {
+    private fun Renderable.darken(amount: Float = 1.0f) = object : Renderable {
         override val width = this@darken.width
         override val height = this@darken.height
         override val horizontalAlign = this@darken.horizontalAlign
