@@ -4,7 +4,6 @@ import at.hannibal2.skyhanni.SkyHanniMod;
 import at.hannibal2.skyhanni.config.features.About;
 import at.hannibal2.skyhanni.config.features.chat.ChatConfig;
 import at.hannibal2.skyhanni.config.features.combat.CombatConfig;
-import at.hannibal2.skyhanni.config.features.commands.CommandsConfig;
 import at.hannibal2.skyhanni.config.features.crimsonisle.CrimsonIsleConfig;
 import at.hannibal2.skyhanni.config.features.dev.DevConfig;
 import at.hannibal2.skyhanni.config.features.dungeon.DungeonConfig;
@@ -81,10 +80,6 @@ public class Features extends Config {
     @Expose
     @Category(name = "Combat", desc = "Everything combat and PvE related.")
     public CombatConfig combat = new CombatConfig();
-
-    @Expose
-    @Category(name = "Commands", desc = "Enable or disable commands.")
-    public CommandsConfig commands = new CommandsConfig();
 
     @Expose
     @Category(name = "Crimson Isle", desc = "Things to do on the Crimson Isle/Nether island.")

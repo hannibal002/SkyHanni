@@ -3,6 +3,7 @@ package at.hannibal2.skyhanni.config.features.misc;
 import at.hannibal2.skyhanni.config.FeatureToggle;
 import at.hannibal2.skyhanni.config.core.config.Position;
 import at.hannibal2.skyhanni.config.enums.OutsideSbFeature;
+import at.hannibal2.skyhanni.config.features.commands.CommandsConfig;
 import at.hannibal2.skyhanni.config.features.misc.pets.PetConfig;
 import com.google.gson.annotations.Expose;
 import io.github.moulberry.moulconfig.annotations.Accordion;
@@ -19,6 +20,10 @@ public class MiscConfig {
     @Expose
     @Category(name = "Pets", desc = "Pets Settings")
     public PetConfig pets = new PetConfig();
+
+    @Expose
+    @Category(name = "Commands", desc = "Enable or disable commands.")
+    public CommandsConfig commands = new CommandsConfig();
 
     @ConfigOption(name = "Hide Armor", desc = "")
     @Accordion
