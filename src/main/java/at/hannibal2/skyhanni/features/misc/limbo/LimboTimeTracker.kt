@@ -146,7 +146,6 @@ object LimboTimeTracker {
         } else {
             val currentPB = storage?.personalBest ?: 0
             val userLuck = storage?.userLuck ?: 0f
-            storage?.userLuck = Float.NEGATIVE_INFINITY
             val limboPB: Int = if (currentPB < timeInLimbo) timeInLimbo else currentPB
             var luckString = tryTruncateFloat(userLuck.round(2))
             if (userLuck > 0) luckString = "+$luckString"
