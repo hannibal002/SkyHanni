@@ -60,11 +60,6 @@ public class DianaConfig {
     public boolean petWarning = true;
 
     @Expose
-    @ConfigOption(name = "Always Diana", desc = "Forcefully set the Diana event to be active. This is useful if the auto mayor detection fails.")
-    @ConfigEditorBoolean
-    public boolean alwaysDiana = false;
-
-    @Expose
     @ConfigOption(name = "Diana Profit Tracker", desc = "")
     @Accordion
     public DianaProfitTrackerConfig dianaProfitTracker = new DianaProfitTrackerConfig();

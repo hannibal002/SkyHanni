@@ -7,7 +7,7 @@ import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
 enum class Mayor(
     val mayorName: String,
     val color: String,
-    private vararg val perks: Perk,
+    vararg val perks: Perk,
 ) {
     AATROX("Aatrox", "§3", Perk.SLASHED_PRICING, Perk.SLAYER_XP_BUFF, Perk.PATHFINDER),
     COLE("Cole", "§e", Perk.PROSPECTION, Perk.MINING_XP_BUFF, Perk.MINING_FIESTA),
@@ -22,12 +22,14 @@ enum class Mayor(
     JERRY("Jerry", "§d", Perk.PERKPOCALYPSE, Perk.STATSPOCALYPSE, Perk.JERRYPOCALYPSE),
     DERPY("Derpy", "§d", Perk.TURBO_MINIONS, Perk.AH_CLOSED, Perk.DOUBLE_MOBS_HP, Perk.MOAR_SKILLZ),
 
+    NONE("Disable assume Mayor", "§7"),
     UNKNOWN("Unknown", "§c"),
     ;
 
     val activePerks: MutableList<Perk> = mutableListOf()
 
     companion object {
+
         fun getMayorFromName(name: String) = entries.firstOrNull { it.mayorName == name } ?: UNKNOWN
 
         fun setMayorWithActivePerks(name: String, perks: ArrayList<MayorJson.Perk>): Mayor {

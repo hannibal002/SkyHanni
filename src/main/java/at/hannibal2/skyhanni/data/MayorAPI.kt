@@ -34,6 +34,13 @@ object MayorAPI {
     var candidates = mapOf<Int, MayorJson.Candidate>()
         private set
     var currentMayor: Mayor? = null
+        get() {
+            val config = SkyHanniMod.feature.dev.debug.assumeMayor
+            if (config == Mayor.NONE) return field
+            config.perks.forEach { it.isActive = true }
+            config.activePerks += config.perks.filter { it !in config.activePerks }
+            return config
+        }
         private set
     var timeTillNextMayor = Duration.ZERO
         private set
