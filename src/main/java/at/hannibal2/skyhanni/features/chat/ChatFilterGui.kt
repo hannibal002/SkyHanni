@@ -63,10 +63,62 @@ class ChatFilterGui(private val history: List<ChatManager.MessageFilteringResult
                 )
             }
             val isHovered = mouseX in 0..w && mouseY in 0..(size * 10)
-            if (isHovered && msg.hoverInfo.isNotEmpty())
-                queuedTooltip = msg.hoverInfo
-            if (isHovered && KeyboardManager.isShiftKeyDown() && msg.hoverExtraInfo.isNotEmpty())
-                queuedTooltip = msg.hoverExtraInfo
+            val hoverEvent = msg.message.chatStyle.chatHoverEvent
+
+            val screenHeight = ScaledResolution(Minecraft.getMinecraft()).scaledHeight
+            val guiY = (screenHeight - h) / 2
+
+            if (originalMouseY >= guiY && originalMouseY < guiY + h) {
+                if (isHovered && msg.message.siblings.size != 0) {
+                    var index = -1
+                    for (element in msg.message.siblings) {
+                        index += 1
+                        if (element.chatStyle.chatHoverEvent != null) {
+                            var newX = 0
+                            if (index > 0) {
+                                var count = index - 1
+                                for (i in count downTo -1 + 1) {
+                                    newX += mc.fontRendererObj.getStringWidth(msg.message.siblings[count].formattedText)
+                                    count--
+                                }
+                            }
+
+                            var siblings = ""
+                            for (s in msg.message.siblings) {
+                                siblings += s.formattedText
+                            }
+                            val message: String = msg.message.formattedText.replace(siblings, "")
+
+                            val x = ChatManager.ActionKind.maxLength + reasonMaxLength + 10 + newX + mc.fontRendererObj.getStringWidth(message)
+                            val width = mc.fontRendererObj.getStringWidth(element.formattedText)
+                            val right = x + width
+
+                            if (mouseX in x ..right && mouseY in 0..(size * 10)) {
+                                val list: List<String> = if (element.chatStyle.chatHoverEvent.value.formattedText.contains("\n")) {
+                                    element.chatStyle.chatHoverEvent.value.formattedText.split("\n")
+                                } else {
+                                    listOf(element.chatStyle.chatHoverEvent.value.formattedText)
+                                }
+                                queuedTooltip = list
+                            }
+                        }
+                    }
+                }
+                else if (isHovered && hoverEvent != null) {
+                    val list: List<String> = if (hoverEvent.value.formattedText.contains("\n")) {
+                        hoverEvent.value.formattedText.split("\n")
+                    } else {
+                        listOf(hoverEvent.value.formattedText)
+                    }
+                    queuedTooltip = list
+                }
+
+                if (isHovered && msg.hoverInfo.isNotEmpty())
+                    queuedTooltip = msg.hoverInfo
+                if (isHovered && KeyboardManager.isShiftKeyDown() && msg.hoverExtraInfo.isNotEmpty())
+                    queuedTooltip = msg.hoverExtraInfo
+            }
+
             if (isHovered && (isMouseButtonDown && !wasMouseButtonDown)) {
                 if (KeyboardManager.isShiftKeyDown()) {
                     OSUtils.copyToClipboard(IChatComponent.Serializer.componentToJson(msg.message))
