@@ -133,6 +133,28 @@
 + Improved delete word/line functionality for text boxes/signs. -
   Obsidian (https://github.com/hannibal002/SkyHanni/pull/1090)
     + It's now consistent with Discord's.
++ Added Scoreboard Improvements. - j10a1n15 (https://github.com/hannibal002/SkyHanni/pull/1183)
+    + Now only showing the two biggest units in time until next mayor.
+    + Now only showing an active Slayer Quest while in the correct area.
+    + Added current server player count as an element with an option to show max player count.
+    + Added option to show the magical power.
++ Show Thaumaturgy Tuning in Custom Scoreboard. - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/1201)
+    + Option to show in compact mode.
+    + Supports "Values First" option.
+    + Change the number of tunings shown.
++ Improved the stats tuning message when Hypixel auto-adjusts your tuning points. -
+  j10a1n15 (https://github.com/hannibal002/SkyHanni/pull/1212)
++ Updating "bits to claim" in the Custom Scoreboard when opening the GUI /boostercookiemenu. -
+  j10a1n15 (https://github.com/hannibal002/SkyHanni/pull/1230)
++ Added "Curse of Greed" to non-God Potion effect display. - Alexia
+  Luna (https://github.com/hannibal002/SkyHanni/pull/1225)
++ Added cold as a Scoreboard Element. - j10a1n15 (https://github.com/hannibal002/SkyHanni/pull/1238)
++ Add 4 more empty lines into custom scoreboard. - j10a1n15 (https://github.com/hannibal002/SkyHanni/pull/1259)
++ Added customisable Events Priority in Custom Scoreboard. -
+  j10a1n15 (https://github.com/hannibal002/SkyHanni/pull/1221)
+    + Using a draggable list, you can fully customise, what events will be shown which what priority.
++ Updated default Scoreboard Elements config option. - j10a1n15 (https://github.com/hannibal002/SkyHanni/pull/1221)
++ Added feature to showcase foxy's extra in Custom Scoreboard. - j10a1n15 (https://github.com/hannibal002/SkyHanni/pull/1270)
 
 ##### Garden Improvements
 
@@ -179,31 +201,6 @@
     + Changed /shsendtranslation to /shtranslate and moved it from internal commands.
 + Adds a few keywords to `/shlimbostats` for better discoverability. -
   martimavocado (https://github.com/hannibal002/SkyHanni/pull/1252)
-
-#### Gui Improvements
-
-+ Added Scoreboard Improvements. - j10a1n15 (https://github.com/hannibal002/SkyHanni/pull/1183)
-    + Now only showing the two biggest units in time until next mayor.
-    + Now only showing an active Slayer Quest while in the correct area.
-    + Added current server player count as an element with an option to show max player count.
-    + Added option to show the magical power.
-+ Show Thaumaturgy Tuning in Custom Scoreboard. - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/1201)
-    + Option to show in compact mode.
-    + Supports "Values First" option.
-    + Change the number of tunings shown.
-+ Improved the stats tuning message when Hypixel auto-adjusts your tuning points. -
-  j10a1n15 (https://github.com/hannibal002/SkyHanni/pull/1212)
-+ Updating "bits to claim" in the Custom Scoreboard when opening the GUI /boostercookiemenu. -
-  j10a1n15 (https://github.com/hannibal002/SkyHanni/pull/1230)
-+ Added "Curse of Greed" to non-God Potion effect display. - Alexia
-  Luna (https://github.com/hannibal002/SkyHanni/pull/1225)
-+ Added cold as a Scoreboard Element. - j10a1n15 (https://github.com/hannibal002/SkyHanni/pull/1238)
-+ Add 4 more empty lines into custom scoreboard. - j10a1n15 (https://github.com/hannibal002/SkyHanni/pull/1259)
-+ Added customisable Events Priority in Custom Scoreboard. -
-  j10a1n15 (https://github.com/hannibal002/SkyHanni/pull/1221)
-    + Using a draggable list, you can fully customise, what events will be shown which what priority.
-+ Updated default Scoreboard Elements config option. - j10a1n15 (https://github.com/hannibal002/SkyHanni/pull/1221)
-+ Added feature to showcase foxy's extra in Custom Scoreboard. - j10a1n15 (https://github.com/hannibal002/SkyHanni/pull/1270)
 
 #### Fishing Improvements
 
