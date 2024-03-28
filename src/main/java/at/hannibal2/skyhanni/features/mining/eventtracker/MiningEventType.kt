@@ -142,7 +142,7 @@ enum class MiningEventType(
         CompressFormat.DEFAULT, null -> normalTextWithIcon
     }
 
-    fun getRenderableAsPast(): Renderable = getRenderable().darken()
+    fun getRenderableAsPast(): Renderable = getRenderable().darken(0.4f)
 
     override fun toString() = when (config.compressedFormat) {
         CompressFormat.COMPACT_TEXT -> "§$colourCode$shortName"

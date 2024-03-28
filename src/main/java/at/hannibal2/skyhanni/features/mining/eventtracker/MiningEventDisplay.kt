@@ -38,8 +38,8 @@ object MiningEventDisplay {
         config.position.renderRenderables(MiningEventType.entries.map {
             Renderable.horizontalContainer(
                 listOf(
-                    it.getRenderable(), Renderable.string(" ${it.eventName}")
-                )
+                    it.getRenderableAsPast(), it.getRenderable()
+                ), 2
             )
         }, posLabel = "Upcoming Events Display")
         // config.position.renderRenderables(display, posLabel = "Upcoming Events Display")
