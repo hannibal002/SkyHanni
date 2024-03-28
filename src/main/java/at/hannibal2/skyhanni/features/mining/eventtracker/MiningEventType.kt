@@ -32,14 +32,15 @@ enum class MiningEventType(
         override val horizontalAlign = RenderUtils.HorizontalAlignment.LEFT
         override val verticalAlign = RenderUtils.VerticalAlignment.TOP
 
-        val compass = Renderable.itemStack(Items.compass.toItemStack())
-        val wind = Renderable.string("§9≈")
+        val compass = Renderable.itemStack(Items.compass.toItemStack(), 10.0 / 12.0)
+        val wind = Renderable.string("§9≈", scale = 0.75)
 
         override fun render(posX: Int, posY: Int) {
-            GlStateManager.translate(0f, 0f, -2f)
+            GlStateManager.translate(-1f, 0f, -2f)
             compass.render(posX, posY)
-            GlStateManager.translate(0f, 0f, 2f)
+            GlStateManager.translate(-1f, -2f, 2f)
             wind.render(posX, posY)
+            GlStateManager.translate(2f, 0f, 0f)
         }
     }),
     DOUBLE_POWDER("2X POWDER", "2x", 15.minutes, 'b', false, object : Renderable {
