@@ -23,6 +23,7 @@ import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.APIUtil
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils
+import at.hannibal2.skyhanni.utils.LorenzUtils.round
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.OSUtils
 import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderables
@@ -37,6 +38,7 @@ import com.google.gson.stream.JsonReader
 import com.google.gson.stream.JsonWriter
 import kotlinx.coroutines.launch
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
+import kotlin.time.Duration.Companion.minutes
 import kotlin.time.Duration.Companion.seconds
 
 class FarmingWeightDisplay {
@@ -108,13 +110,13 @@ class FarmingWeightDisplay {
 
         private var display = emptyList<Renderable>()
         private var profileId = ""
-        private var lastLeaderboardUpdate = 0L
+        private var lastLeaderboardUpdate = SimpleTimeMark.farPast()
         private var apiError = false
         private var leaderboardPosition = -1
         private var weight = -1.0
         private var localWeight = 0.0
         private var weightPerSecond = -1.0
-        private var dirtyCropWeight = false
+        private var weightNeedsRecalculating = false
         private var isLoadingWeight = false
         private var isLoadingLeaderboard = false
         private var rankGoal = -1
@@ -220,7 +222,7 @@ class FarmingWeightDisplay {
             if (!config.leaderboard) return ""
 
             // Fetching new leaderboard position every 10.5 minutes
-            if (System.currentTimeMillis() > lastLeaderboardUpdate + 630_000) {
+            if (lastLeaderboardUpdate.passedSince() > 10.5.minutes) {
                 loadLeaderboardIfAble()
             }
 
@@ -233,16 +235,16 @@ class FarmingWeightDisplay {
         }
 
         private fun getWeight(): String {
-            if (dirtyCropWeight) {
+            if (weightNeedsRecalculating) {
                 val values = calculateCollectionWeight().values
                 if (values.isNotEmpty()) {
                     localWeight = values.sum()
-                    dirtyCropWeight = false
+                    weightNeedsRecalculating = false
                 }
             }
 
             val totalWeight = (localWeight + weight)
-            return "§e" + LorenzUtils.formatDouble(totalWeight, 2)
+            return "§e" + totalWeight.round(2).addSeparators()
         }
 
         private fun getRankGoal(): Int {
@@ -252,10 +254,9 @@ class FarmingWeightDisplay {
             // Check that the provided string is valid
             val parsed = value.toIntOrNull() ?: 0
             if (parsed < 1 || parsed > goal) {
-                ChatUtils.error("Invalid Farming Weight Overtake Goal!")
                 ChatUtils.chat(
-                    "§eEdit the Overtake Goal config value with a valid number [1-10000] to use this feature!",
-                    false
+                    "Invalid Farming Weight Overtake Goal!\n" +
+                        "§eEdit the Overtake Goal config value with a valid number [1-10000] to use this feature!"
                 )
                 config.ETAGoalRank = goal.toString()
             } else {
@@ -322,7 +323,7 @@ class FarmingWeightDisplay {
                 " §7(§b$format§7)"
             } else ""
 
-            val weightFormat = LorenzUtils.formatDouble(weightUntilOvertake, 2)
+            val weightFormat = weightUntilOvertake.round(2).addSeparators()
             val text = "§e$weightFormat$timeFormat §7behind §b$nextName"
             return if (showRankGoal) {
                 Renderable.string(text)
@@ -342,8 +343,8 @@ class FarmingWeightDisplay {
             weightPerSecond = -1.0
 
             leaderboardPosition = -1
-            dirtyCropWeight = true
-            lastLeaderboardUpdate = 0
+            weightNeedsRecalculating = true
+            lastLeaderboardUpdate = SimpleTimeMark.farPast()
 
             nextPlayers.clear()
             rankGoal = -1
@@ -374,7 +375,7 @@ class FarmingWeightDisplay {
 
             updateWeightPerSecond(crop, before, after, addedCounter)
 
-            dirtyCropWeight = true
+            weightNeedsRecalculating = true
         }
 
         private fun updateWeightPerSecond(crop: CropType, before: Double, after: Double, diff: Int) {
@@ -402,7 +403,7 @@ class FarmingWeightDisplay {
                 }
                 GardenAPI.storage?.farmingWeight?.lastFarmingWeightLeaderboard =
                     leaderboardPosition
-                lastLeaderboardUpdate = System.currentTimeMillis()
+                lastLeaderboardUpdate = SimpleTimeMark.now()
                 isLoadingLeaderboard = false
             }
         }
@@ -490,7 +491,7 @@ class FarmingWeightDisplay {
                     weight = selectedProfileEntry.totalWeight
 
                     localCounter.clear()
-                    dirtyCropWeight = true
+                    weightNeedsRecalculating = true
                     return
                 }
 
