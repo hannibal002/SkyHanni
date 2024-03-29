@@ -71,14 +71,16 @@ object LorenzUtils {
     val lastWorldSwitch get() = HypixelData.joinedWorld
 
     val isAprilFoolsDay: Boolean
-        get() = (!SkyHanniMod.feature.dev.debug.neverFunnyTime &&
-            SkyHanniMod.feature.dev.debug.alwaysFunnyTime || LocalDate.now().let {
-            it.month == Month.APRIL && it.dayOfMonth == 1
-        }).also {
+        get() {
+            val it = (!SkyHanniMod.feature.dev.debug.neverFunnyTime &&
+                (SkyHanniMod.feature.dev.debug.alwaysFunnyTime || LocalDate.now().let {
+                    it.month == Month.APRIL && it.dayOfMonth == 1
+                }))
             if (previousApril != it) {
                 ModifyVisualWords.textCache.clear()
             }
             previousApril = it
+            return it
         }
 
     private var previousApril = false
