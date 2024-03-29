@@ -162,6 +162,13 @@ object ComposterOverlay {
     }
 
     private fun update() {
+        val composterUpgrades = ComposterAPI.composterUpgrades ?: return
+        if (composterUpgrades.isEmpty()) {
+            val list = Collections.singletonList(listOf("§cOpen Composter Upgrades!"))
+            organicMatterDisplay = list
+            fuelExtraDisplay = list
+            return
+        }
         if (organicMatterFactors.isEmpty()) {
             organicMatterDisplay =
                 Collections.singletonList(
