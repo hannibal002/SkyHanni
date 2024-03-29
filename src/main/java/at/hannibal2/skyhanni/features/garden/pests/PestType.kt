@@ -13,4 +13,13 @@ enum class PestType(val displayName: String, val damageIndicatorBoss: BossType, 
     MOTH("Moth", BossType.GARDEN_PEST_MOTH, SprayType.HONEY_JAR),
     RAT("Rat", BossType.GARDEN_PEST_RAT, SprayType.TASTY_CHEESE),
     SLUG("Slug", BossType.GARDEN_PEST_SLUG, SprayType.PLANT_MATTER),
+    ;
+
+    companion object {
+        fun getByNameOrNull(name: String): PestType? {
+            return PestType.entries.firstOrNull { it.displayName.lowercase() == name }
+        }
+
+        fun getByName(name: String) = getByNameOrNull(name) ?: error("No valid pest type '$name'")
+    }
 }

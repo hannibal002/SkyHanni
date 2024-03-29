@@ -18,6 +18,7 @@ import at.hannibal2.skyhanni.events.ProfileJoinEvent
 import at.hannibal2.skyhanni.features.garden.CropType
 import at.hannibal2.skyhanni.features.garden.GardenAPI
 import at.hannibal2.skyhanni.features.garden.farming.GardenCropSpeed.getSpeed
+import at.hannibal2.skyhanni.features.garden.pests.PestType
 import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.APIUtil
 import at.hannibal2.skyhanni.utils.ChatUtils
@@ -31,6 +32,9 @@ import at.hannibal2.skyhanni.utils.TimeUtils
 import at.hannibal2.skyhanni.utils.fromJson
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 import com.google.gson.JsonObject
+import com.google.gson.TypeAdapter
+import com.google.gson.stream.JsonReader
+import com.google.gson.stream.JsonWriter
 import kotlinx.coroutines.launch
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import kotlin.time.Duration.Companion.seconds
@@ -122,6 +126,25 @@ class FarmingWeightDisplay {
             ({
                 resetData()
             })
+        }
+
+        private val eliteWeightApiGson by lazy {
+            ConfigManager.createBaseGsonBuilder()
+                .registerTypeAdapter(CropType::class.java, object : TypeAdapter<CropType>() {
+                    override fun write(out: JsonWriter, value: CropType) {}
+
+                    override fun read(reader: JsonReader): CropType {
+                        return CropType.getByName(reader.nextString())
+                    }
+                }.nullSafe())
+                .registerTypeAdapter(PestType::class.java, object : TypeAdapter<PestType>() {
+                    override fun write(out: JsonWriter, value: PestType) {}
+
+                    override fun read(reader: JsonReader): PestType {
+                        return PestType.getByName(reader.nextString())
+                    }
+                }.nullSafe())
+                .create()
         }
 
         private val errorMessage by lazy {
@@ -441,7 +464,7 @@ class FarmingWeightDisplay {
         private fun toEliteLeaderboardJson(obj: JsonObject): EliteLeaderboardJson {
             val jsonObject = JsonObject()
             jsonObject.add("data", obj)
-            return ConfigManager.gson.fromJson<EliteLeaderboardJson>(jsonObject)
+            return eliteWeightApiGson.fromJson<EliteLeaderboardJson>(jsonObject)
         }
 
         private fun loadWeight(localProfile: String) {
@@ -452,7 +475,8 @@ class FarmingWeightDisplay {
             var error: Throwable? = null
 
             try {
-                val apiData = ConfigManager.gson.fromJson<ElitePlayerWeightJson>(apiResponse)
+
+                val apiData = eliteWeightApiGson.fromJson<ElitePlayerWeightJson>(apiResponse)
 
                 val selectedProfileId = apiData.selectedProfileId
                 var selectedProfileEntry = apiData.profiles.find { it.profileId == selectedProfileId }
@@ -545,10 +569,10 @@ class FarmingWeightDisplay {
             val apiResponse = APIUtil.getJSONResponse(url)
 
             try {
-                val apiData = ConfigManager.gson.fromJson<EliteWeightsJson>(apiResponse)
+                val apiData = eliteWeightApiGson.fromJson<EliteWeightsJson>(apiResponse)
+                apiData.crops
                 for (crop in apiData.crops) {
-                    val cropType = CropType.getByName(crop.key)
-                    factorPerCrop[cropType] = crop.value
+                    factorPerCrop[crop.key] = crop.value
                 }
                 hasFetchedCropWeights = true
             } catch (e: Exception) {
