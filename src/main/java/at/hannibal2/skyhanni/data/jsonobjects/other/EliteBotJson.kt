@@ -11,7 +11,11 @@ data class ElitePlayerWeightJson(
 data class WeightProfile(
     @Expose val profileId: String,
     @Expose val profileName: String,
-    @Expose val totalWeight: Double
+    @Expose val totalWeight: Double,
+    @Expose val cropWeight: Map<String, Double>,
+    @Expose val bonusWeight: Map<String, Int>,
+    @Expose val uncountedCrops: Map<String, Int>,
+    @Expose val pests: Map<String, Int>
 )
 
 data class EliteLeaderboardJson(
