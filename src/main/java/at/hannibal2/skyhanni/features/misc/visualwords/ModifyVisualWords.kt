@@ -4,6 +4,7 @@ import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.config.ConfigFileType
 import at.hannibal2.skyhanni.config.enums.OutsideSbFeature
 import at.hannibal2.skyhanni.events.HypixelJoinEvent
+import at.hannibal2.skyhanni.mixins.hooks.FontRendererHook
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.StringUtils.convertToFormatted
 import at.hannibal2.skyhanni.utils.TimeLimitedCache
@@ -49,7 +50,7 @@ object ModifyVisualWords {
         }
 
 
-        if (LorenzUtils.isAprilFoolsDay && Random.nextBoolean() && Random.nextBoolean()) {
+        if (LorenzUtils.isAprilFoolsDay && !FontRendererHook.cameFromChat && Random.nextDouble() < 0.25) {
             modifiedText = modifiedText.replace("(§.|^|[\\s:()+-])([^§\\s:()+-]*)".toRegex()) {
                 it.groupValues[1] + it.groupValues[2].reversed()
             }
