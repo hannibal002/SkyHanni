@@ -72,7 +72,7 @@ object ProfileStorageData {
             if (foundSkyBlockTabList) {
                 ChatUtils.clickableChat(
                     "§cCan not read profile name from tab list! Open /widget and enable Profile Widget. " +
-                        "This is needed for the mod to function! And this warning cannot be disabled",
+                        "This is needed for the mod to function! And therefore this warning cannot be disabled",
                     command = "widget"
                 )
             } else {
