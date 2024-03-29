@@ -7,6 +7,7 @@ import at.hannibal2.skyhanni.data.Perk
 import at.hannibal2.skyhanni.data.TitleManager
 import at.hannibal2.skyhanni.events.GuiContainerEvent
 import at.hannibal2.skyhanni.features.dungeon.DungeonAPI
+import at.hannibal2.skyhanni.features.misc.visualwords.ModifyVisualWords
 import at.hannibal2.skyhanni.mixins.transformers.AccessorGuiEditSign
 import at.hannibal2.skyhanni.test.TestBingo
 import at.hannibal2.skyhanni.utils.ChatUtils.lastButtonClicked
@@ -70,9 +71,16 @@ object LorenzUtils {
     val lastWorldSwitch get() = HypixelData.joinedWorld
 
     val isAprilFoolsDay: Boolean
-        get() = SkyHanniMod.feature.dev.debug.alwaysFunnyTime || LocalDate.now().let {
+        get() = (SkyHanniMod.feature.dev.debug.alwaysFunnyTime || LocalDate.now().let {
             it.month == Month.APRIL && it.dayOfMonth == 1
+        }).also {
+            if (previousApril != it) {
+                ModifyVisualWords.textCache.clear()
+            }
+            previousApril = it
         }
+
+    private var previousApril = false
 
     fun SimpleDateFormat.formatCurrentTime(): String = this.format(System.currentTimeMillis())
 

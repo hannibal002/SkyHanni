@@ -8,6 +8,7 @@ import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.StringUtils.convertToFormatted
 import at.hannibal2.skyhanni.utils.TimeLimitedCache
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
+import kotlin.random.Random
 import kotlin.time.Duration.Companion.minutes
 
 object ModifyVisualWords {
@@ -42,13 +43,17 @@ object ModifyVisualWords {
                 if (phrase.isEmpty()) continue
 
                 modifiedText = modifiedText.replace(
-                    phrase,
-                    modifiedWord.replacement.convertToFormatted(),
-                    modifiedWord.isCaseSensitive()
+                    phrase, modifiedWord.replacement.convertToFormatted(), modifiedWord.isCaseSensitive()
                 )
             }
         }
 
+
+        if (LorenzUtils.isAprilFoolsDay && Random.nextBoolean() && Random.nextBoolean()) {
+            modifiedText = modifiedText.replace("(§.|^|[\\s:()+-])([^§\\s:()+-]*)".toRegex()) {
+                it.groupValues[1] + it.groupValues[2].reversed()
+            }
+        }
         textCache.put(originalText, modifiedText)
         return modifiedText
     }
