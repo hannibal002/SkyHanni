@@ -440,5 +440,29 @@ interface Renderable {
                 GlStateManager.translate(-width.toFloat() - spacing.toFloat(), 0f, 0f)
             }
         }
+
+        fun verticalContainer(
+            content: List<Renderable>,
+            spacing: Int = 0,
+            horizontalAlign: HorizontalAlignment = HorizontalAlignment.LEFT,
+            verticalAlign: VerticalAlignment = VerticalAlignment.TOP,
+        ) = object : Renderable {
+            val renderables = content
+
+            override val width = renderables.maxOf { it.width }
+            override val height = renderables.sumOf { it.height } + spacing * (renderables.size - 1)
+            override val horizontalAlign = horizontalAlign
+            override val verticalAlign = verticalAlign
+
+            override fun render(posX: Int, posY: Int) {
+                var yOffset = 0
+                renderables.forEach {
+                    it.renderXAligned(yOffset, posX, width)
+                    yOffset += it.height + spacing
+                    GlStateManager.translate(0f, (it.width + spacing).toFloat(), 0f)
+                }
+                GlStateManager.translate(0f, -height.toFloat() - spacing.toFloat(), 0f)
+            }
+        }
     }
 }
