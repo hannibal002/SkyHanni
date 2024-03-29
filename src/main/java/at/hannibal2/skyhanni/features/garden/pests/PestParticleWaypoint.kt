@@ -37,7 +37,7 @@ class PestParticleWaypoint {
     private var secondParticlePoint: LorenzVec? = null
     private var lastParticlePoint: LorenzVec? = null
     private var guessPoint: LorenzVec? = null
-    private var locations = mutableListOf<LorenzVec>()
+    private val locations = mutableListOf<LorenzVec>()
     private var particles = 0
     private var lastParticles = 0
     private var isPointingToPest = false
@@ -145,7 +145,7 @@ class PestParticleWaypoint {
     }
 
     private fun getWaypoint() = if (lastParticles != particles || guessPoint == null) {
-        calculateWaypoint(locations)?.also {
+        calculateWaypoint()?.also {
             guessPoint = it
             lastParticles = particles
         }
@@ -166,9 +166,9 @@ class PestParticleWaypoint {
         if (PestAPI.scoreboardPests == 0) reset()
     }
 
-    private fun calculateWaypoint(list: MutableList<LorenzVec>): LorenzVec? {
+    private fun calculateWaypoint(): LorenzVec? {
         val firstParticle = firstParticlePoint ?: return null
-
+        val list = locations.toMutableSet()
         var pos = LorenzVec(0.0, 0.0, 0.0)
         for ((i, particle) in list.withIndex()) {
             pos = pos.add(particle.subtract(firstParticle).divide(i.toDouble() + 1.0))
