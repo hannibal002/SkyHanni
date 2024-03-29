@@ -119,6 +119,7 @@ class HypixelData {
 
         fun checkCurrentServerId() {
             if (!LorenzUtils.inSkyBlock) return
+            if (serverId != null) return
             if (LorenzUtils.lastWorldSwitch.passedSince() < 1.seconds) return
             if (!TabListData.fullyLoaded) return
 
