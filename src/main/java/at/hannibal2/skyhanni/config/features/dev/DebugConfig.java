@@ -98,6 +98,11 @@ public class DebugConfig {
     public boolean hotSwapDetection = false;
 
     @Expose
+    @ConfigOption(name = "Always Outdated", desc = "For the sake of the auto updater, act like you are always oudated.")
+    @ConfigEditorBoolean
+    public boolean alwaysOutdated = false;
+
+    @Expose
     @ConfigOption(name = "SkyHanni Event Counter", desc = "Count once per second how many skyhanni events gets triggered, " +
         "show the total amount in console output.")
     @ConfigEditorBoolean
