@@ -80,7 +80,7 @@ class HypixelData {
         )
         private val scoreboardTitlePattern by patternGroup.pattern(
             "scoreboard.title",
-            "SK[YI]BLOCK( CO-OP)?"
+            "SK[YI]BLOCK(?: CO-OP| GUEST)?"
         )
 
         var hypixelLive = false
