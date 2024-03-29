@@ -98,6 +98,10 @@ class GardenVisitorTimer {
         loop@ for (line in TabListData.getTabList()) {
             timePattern.matchMatcher(line) {
                 val timeInfo = group("info").removeColor()
+                if (timeInfo == "Not Unlocked!") {
+                    display = "§cVisitors not unlocked!"
+                    return
+                }
                 if (timeInfo == "Queue Full!") {
                     queueFull = true
                     break@loop
