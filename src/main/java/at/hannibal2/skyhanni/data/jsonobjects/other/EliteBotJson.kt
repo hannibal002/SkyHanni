@@ -3,7 +3,7 @@ package at.hannibal2.skyhanni.data.jsonobjects.other
 import com.google.gson.annotations.Expose
 import com.google.gson.annotations.SerializedName
 
-data class EliteWeightJson(
+data class ElitePlayerWeightJson(
     @Expose val selectedProfileId: String,
     @Expose val profiles: List<WeightProfile>
 )
@@ -27,4 +27,14 @@ data class EliteLeaderboard(
 data class UpcomingLeaderboardPlayer(
     @Expose @SerializedName("ign") val name: String,
     @Expose @SerializedName("amount") val weight: Double
+)
+
+data class EliteWeightsJson(
+    @Expose val crops: Map<String, Double>,
+    @Expose val pests: PestWeightData
+)
+
+data class PestWeightData(
+    @Expose val brackets: Map<Int, Int>,
+    @Expose @SerializedName("values") val pestWeights: Map<String, Map<Int, Double>>
 )

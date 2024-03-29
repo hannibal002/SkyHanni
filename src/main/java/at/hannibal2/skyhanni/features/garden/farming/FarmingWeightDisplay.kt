@@ -7,7 +7,8 @@ import at.hannibal2.skyhanni.config.enums.OutsideSbFeature
 import at.hannibal2.skyhanni.data.HypixelData
 import at.hannibal2.skyhanni.data.ProfileStorageData
 import at.hannibal2.skyhanni.data.jsonobjects.other.EliteLeaderboardJson
-import at.hannibal2.skyhanni.data.jsonobjects.other.EliteWeightJson
+import at.hannibal2.skyhanni.data.jsonobjects.other.ElitePlayerWeightJson
+import at.hannibal2.skyhanni.data.jsonobjects.other.EliteWeightsJson
 import at.hannibal2.skyhanni.data.jsonobjects.other.UpcomingLeaderboardPlayer
 import at.hannibal2.skyhanni.events.GardenToolChangeEvent
 import at.hannibal2.skyhanni.events.GuiRenderEvent
@@ -30,7 +31,6 @@ import at.hannibal2.skyhanni.utils.TimeUtils
 import at.hannibal2.skyhanni.utils.fromJson
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 import com.google.gson.JsonObject
-import com.google.gson.reflect.TypeToken
 import kotlinx.coroutines.launch
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import kotlin.time.Duration.Companion.seconds
@@ -452,7 +452,7 @@ class FarmingWeightDisplay {
             var error: Throwable? = null
 
             try {
-                val apiData = ConfigManager.gson.fromJson<EliteWeightJson>(apiResponse)
+                val apiData = ConfigManager.gson.fromJson<ElitePlayerWeightJson>(apiResponse)
 
                 val selectedProfileId = apiData.selectedProfileId
                 var selectedProfileEntry = apiData.profiles.find { it.profileId == selectedProfileId }
@@ -541,15 +541,12 @@ class FarmingWeightDisplay {
         private fun getCropWeights() {
             if (attemptingCropWeightFetch || hasFetchedCropWeights) return
             attemptingCropWeightFetch = true
-            val url = "https://api.elitebot.dev/weights"
+            val url = "https://api.elitebot.dev/weights/all"
             val apiResponse = APIUtil.getJSONResponse(url)
 
             try {
-                val apiData = ConfigManager.gson.fromJson<Map<String, Double>>(
-                    apiResponse,
-                    object : TypeToken<Map<String, Double>>() {}.type
-                )
-                for (crop in apiData) {
+                val apiData = ConfigManager.gson.fromJson<EliteWeightsJson>(apiResponse)
+                for (crop in apiData.crops) {
                     val cropType = CropType.getByName(crop.key)
                     factorPerCrop[cropType] = crop.value
                 }
