@@ -7,6 +7,7 @@ import at.hannibal2.skyhanni.events.LorenzTickEvent
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.ConditionalUtils.onToggle
 import at.hannibal2.skyhanni.utils.LorenzLogger
+import com.google.gson.JsonElement
 import io.github.moulberry.moulconfig.processor.MoulConfigProcessor
 import io.github.moulberry.notenoughupdates.util.ApiUtil
 import io.github.moulberry.notenoughupdates.util.MinecraftExecutor
@@ -132,7 +133,24 @@ object UpdateManager {
     private val context = UpdateContext(
         UpdateSource.githubUpdateSource("hannibal002", "SkyHanni"),
         UpdateTarget.deleteAndSaveInTheSameFolder(UpdateManager::class.java),
-        CurrentVersion.ofTag(SkyHanniMod.version),
+        object : CurrentVersion {
+            val normalDelegate = CurrentVersion.ofTag(SkyHanniMod.version)
+            override fun display(): String {
+                if (SkyHanniMod.feature.dev.debug.alwaysOutdated)
+                    return "Force Outdated"
+                return normalDelegate.display()
+            }
+
+            override fun isOlderThan(element: JsonElement): Boolean {
+                if (SkyHanniMod.feature.dev.debug.alwaysOutdated)
+                    return true
+                return normalDelegate.isOlderThan(element)
+            }
+
+            override fun toString(): String {
+                return "ForceOutdateDelegate($normalDelegate)"
+            }
+        },
         SkyHanniMod.MODID,
     )
 
