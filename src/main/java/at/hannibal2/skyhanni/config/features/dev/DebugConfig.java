@@ -114,5 +114,10 @@ public class DebugConfig {
     public boolean currentAreaDebug = true;
 
     @Expose
+    @ConfigOption(name = "Always April Fools", desc = "Always show april fools jokes.")
+    @ConfigEditorBoolean
+    public boolean alwaysFunnyTime = false;
+
+    @Expose
     public Position trackSoundPosition = new Position(0, 0);
 }
