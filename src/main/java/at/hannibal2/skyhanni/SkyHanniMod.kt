@@ -206,6 +206,7 @@ import at.hannibal2.skyhanni.features.garden.inventory.plots.GardenPlotMenuHighl
 import at.hannibal2.skyhanni.features.garden.pests.PestAPI
 import at.hannibal2.skyhanni.features.garden.pests.PestFinder
 import at.hannibal2.skyhanni.features.garden.pests.PestParticleWaypoint
+import at.hannibal2.skyhanni.features.garden.pests.PestProfitTracker
 import at.hannibal2.skyhanni.features.garden.pests.PestSpawn
 import at.hannibal2.skyhanni.features.garden.pests.PestSpawnTimer
 import at.hannibal2.skyhanni.features.garden.pests.SprayDisplay
@@ -806,6 +807,7 @@ class SkyHanniMod {
         loadModule(LimboPlaytime())
         loadModule(RareDropMessages())
         loadModule(CraftMaterialsFromBazaar())
+        loadModule(PestProfitTracker)
 
         init()
 
