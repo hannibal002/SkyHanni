@@ -3,8 +3,10 @@ package at.hannibal2.skyhanni.features.misc.visualwords
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.config.ConfigFileType
 import at.hannibal2.skyhanni.config.enums.OutsideSbFeature
+import at.hannibal2.skyhanni.events.ConfigLoadEvent
 import at.hannibal2.skyhanni.events.HypixelJoinEvent
 import at.hannibal2.skyhanni.mixins.hooks.FontRendererHook
+import at.hannibal2.skyhanni.utils.ConditionalUtils.onToggle
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.StringUtils.convertToFormatted
 import at.hannibal2.skyhanni.utils.TimeLimitedCache
@@ -67,5 +69,10 @@ object ModifyVisualWords {
             SkyHanniMod.feature.storage.modifiedWords = emptyList()
             SkyHanniMod.configManager.saveConfig(ConfigFileType.VISUAL_WORDS, "Migrate visual words")
         }
+    }
+
+    @SubscribeEvent
+    fun onConfigLoad(event: ConfigLoadEvent) {
+        SkyHanniMod.feature.dev.debug.neverFunnyTime.onToggle { textCache.clear() }
     }
 }

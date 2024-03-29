@@ -5,6 +5,7 @@ import com.google.gson.annotations.Expose;
 import io.github.moulberry.moulconfig.annotations.ConfigEditorBoolean;
 import io.github.moulberry.moulconfig.annotations.ConfigEditorKeybind;
 import io.github.moulberry.moulconfig.annotations.ConfigOption;
+import io.github.moulberry.moulconfig.observer.Property;
 import org.lwjgl.input.Keyboard;
 
 public class DebugConfig {
@@ -126,7 +127,7 @@ public class DebugConfig {
     @Expose
     @ConfigOption(name = "Never April Fools", desc = "Admit it, you hate fun.")
     @ConfigEditorBoolean
-    public boolean neverFunnyTime = false;
+    public Property<Boolean> neverFunnyTime = Property.of(false);
 
     @Expose
     public Position trackSoundPosition = new Position(0, 0);
