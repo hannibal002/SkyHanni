@@ -28,6 +28,8 @@ import net.minecraft.util.ChatComponentText
 import net.minecraftforge.fml.common.FMLCommonHandler
 import java.text.DecimalFormat
 import java.text.SimpleDateFormat
+import java.time.LocalDate
+import java.time.Month
 import java.util.Timer
 import java.util.TimerTask
 import java.util.regex.Matcher
@@ -66,6 +68,11 @@ object LorenzUtils {
     val isIronmanProfile get() = inSkyBlock && HypixelData.ironman
 
     val lastWorldSwitch get() = HypixelData.joinedWorld
+
+    val isAprilFoolsDay: Boolean
+        get() = SkyHanniMod.feature.dev.debug.alwaysFunnyTime || LocalDate.now().let {
+            it.month == Month.APRIL && it.dayOfMonth == 1
+        }
 
     fun SimpleDateFormat.formatCurrentTime(): String = this.format(System.currentTimeMillis())
 
