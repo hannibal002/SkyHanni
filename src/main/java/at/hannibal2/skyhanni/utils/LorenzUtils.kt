@@ -72,15 +72,15 @@ object LorenzUtils {
 
     val isAprilFoolsDay: Boolean
         get() {
-            val it = (!SkyHanniMod.feature.dev.debug.neverFunnyTime &&
-                (SkyHanniMod.feature.dev.debug.alwaysFunnyTime || LocalDate.now().let {
-                    it.month == Month.APRIL && it.dayOfMonth == 1
-                }))
-            if (previousApril != it) {
+            val itsTime = LocalDate.now().let { it.month == Month.APRIL && it.dayOfMonth == 1 }
+            val always = SkyHanniMod.feature.dev.debug.alwaysFunnyTime
+            val never = SkyHanniMod.feature.dev.debug.neverFunnyTime
+            val result = (!never && (always || itsTime))
+            if (previousApril != result) {
                 ModifyVisualWords.textCache.clear()
             }
-            previousApril = it
-            return it
+            previousApril = result
+            return result
         }
 
     private var previousApril = false
