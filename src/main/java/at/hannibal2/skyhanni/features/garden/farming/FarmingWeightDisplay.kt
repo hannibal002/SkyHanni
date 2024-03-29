@@ -539,7 +539,7 @@ class FarmingWeightDisplay {
         private fun CropType.getLocalCounter() = localCounter[this] ?: 0L
 
         private fun CropType.getFactor(): Double {
-            return factorPerCrop[this] ?: backupFactors[this] ?: error("Crop $this not in backupFactors!")
+            return cropWeight[this] ?: backupCropWeights[this] ?: error("Crop $this not in backupFactors!")
         }
 
         fun lookUpCommand(it: Array<String>) {
@@ -558,7 +558,7 @@ class FarmingWeightDisplay {
             ChatUtils.chat("Opening Farming Profile of player §b$name")
         }
 
-        private val factorPerCrop = mutableMapOf<CropType, Double>()
+        private val cropWeight = mutableMapOf<CropType, Double>()
         private var attemptingCropWeightFetch = false
         private var hasFetchedCropWeights = false
 
@@ -572,7 +572,7 @@ class FarmingWeightDisplay {
                 val apiData = eliteWeightApiGson.fromJson<EliteWeightsJson>(apiResponse)
                 apiData.crops
                 for (crop in apiData.crops) {
-                    factorPerCrop[crop.key] = crop.value
+                    cropWeight[crop.key] = crop.value
                 }
                 hasFetchedCropWeights = true
             } catch (e: Exception) {
@@ -584,7 +584,7 @@ class FarmingWeightDisplay {
         }
 
         // still needed when first joining garden and if they cant make https requests
-        private val backupFactors by lazy {
+        private val backupCropWeights by lazy {
             mapOf(
                 CropType.WHEAT to 100_000.0,
                 CropType.CARROT to 302_061.86,
