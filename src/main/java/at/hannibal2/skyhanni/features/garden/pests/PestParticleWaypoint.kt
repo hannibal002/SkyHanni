@@ -86,8 +86,6 @@ class PestParticleWaypoint {
             else -> return
         }
 
-        val (r, g, b) = event.offset.toDoubleArray().map { it.toFloat() }
-        color = Color(r, g, b)
         val location = event.location
 
         if (config.hideParticles) event.cancel()
@@ -97,6 +95,8 @@ class PestParticleWaypoint {
         if (firstParticlePoint == null) {
             if (playerLocation().distance(location) > 5) return
             firstParticlePoint = location
+            val (r, g, b) = event.offset.toDoubleArray().map { it.toFloat() }
+            color = Color(r, g, b)
         } else if (secondParticlePoint == null) {
             secondParticlePoint = location
             lastParticlePoint = location
