@@ -147,8 +147,13 @@ object LimboTimeTracker {
             val currentPB = storage?.personalBest ?: 0
             val userLuck = storage?.userLuck ?: 0f
             val limboPB: Int = if (currentPB < timeInLimbo) timeInLimbo else currentPB
-            ChatUtils.chat("§fYour current PB is §e${limboPB.seconds}§f, granting you §a+${userLuck.round(2)}✴ SkyHanni User Luck§f!")
-            ChatUtils.chat("§fYou have §e${playtime.seconds} §fof playtime!")
+            var luckString = tryTruncateFloat(userLuck.round(2))
+            if (userLuck > 0) luckString = "+$luckString"
+            var firstMessage = "§fYour current PB is §e${limboPB.seconds}§f, granting you §a$luckString✴ SkyHanni User Luck§f!"
+            val secondMessage = "§fYou have §e${playtime.seconds} §fof playtime!"
+            if ((userLuck == Float.POSITIVE_INFINITY) || (userLuck == Float.NEGATIVE_INFINITY)) firstMessage = "$firstMessage §Zwhat"
+            ChatUtils.chat(firstMessage)
+            ChatUtils.chat(secondMessage)
         }
     }
 
@@ -189,4 +194,10 @@ object LimboTimeTracker {
     }
 
     fun isEnabled() = config.showTimeInLimbo
+
+    private fun tryTruncateFloat(input: Float): String {
+        val string = input.toString()
+        return if (string.endsWith(".0")) return string.dropLast(2)
+        else string
+    }
 }
