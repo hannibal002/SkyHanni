@@ -1,6 +1,5 @@
 package at.hannibal2.skyhanni.features.misc.items
 
-import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.CollectionUtils.sortedDesc
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName
@@ -56,7 +55,7 @@ import java.util.Locale
 
 object EstimatedItemValueCalculator {
 
-    private val config get() = SkyHanniMod.feature.misc.estimatedItemValues
+    private val config get() = EstimatedItemValue.config
     private val additionalCostFunctions = listOf(
         ::addAttributeCost,
         ::addReforgeStone,
@@ -546,6 +545,7 @@ object EstimatedItemValueCalculator {
         var totalPrice = 0.0
         val map = mutableMapOf<String, Double>()
 
+        //todo use repo
         val tieredEnchants = listOf("compact", "cultivating", "champion", "expertise", "hecatomb")
         val onlyTierOnePrices =
             listOf("ultimate_chimera", "ultimate_fatal_tempo", "smoldering", "ultimate_flash", "divine_gift")
