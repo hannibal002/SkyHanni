@@ -810,10 +810,10 @@ private fun getExtraDisplayPair(): List<ScoreboardElementType> {
 
     val size = unknownLines.size
     if (amountOfUnknownLines != size && devConfig.unknownLinesWarning) {
-        val message = "CustomScoreboard detected $size unknown line${if (size > 1) "s" else ""}"
+        val message = "CustomScoreboard detected ${pluralize(unknownLines.size, "unknown line", withNumber = true)}"
         ErrorManager.logErrorWithData(
-            CustomScoreboardUtils.UndetectedScoreboardLines("CustomScoreboard detected ${pluralize(unknownLines.size, "unknown line", withNumber = true)}"),
-            "CustomScoreboard detected ${pluralize(unknownLines.size, "unknown line", withNumber = true)}",
+            CustomScoreboardUtils.UndetectedScoreboardLines(message),
+            message,
             "Unknown Lines" to unknownLines,
             "Island" to HypixelData.skyBlockIsland,
             "Area" to HypixelData.skyBlockArea,
