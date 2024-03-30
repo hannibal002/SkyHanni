@@ -20,8 +20,8 @@ public class PestProfitTrackerConfig {
 
     @Expose
     @ConfigOption(
-        name = "Hide regular drop messages.",
-        desc = ""
+        name = "Hide messages",
+        desc = "Hides regular pest drop messages."
     )
     @ConfigEditorBoolean
     public boolean hideChat = true;
