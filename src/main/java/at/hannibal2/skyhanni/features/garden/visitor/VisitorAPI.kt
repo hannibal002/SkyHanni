@@ -26,7 +26,7 @@ object VisitorAPI {
     private val logger = LorenzLogger("garden/visitors/api")
 
     val patternGroup = RepoPattern.group("garden.visitor.api")
-    private val visitorCountPattern by patternGroup.pattern(
+    val visitorCountPattern by patternGroup.pattern(
         "visitor.count",
         "§b§lVisitors: §r§f\\((?<info>.*)\\)"
     )
@@ -121,7 +121,6 @@ object VisitorAPI {
         var entityId: Int = -1,
         var nameTagEntityId: Int = -1,
         var status: VisitorStatus,
-        var inSacks: Boolean = false,
         val shoppingList: MutableMap<NEUInternalName, Int> = mutableMapOf(),
         var offer: VisitorOffer? = null,
     ) {

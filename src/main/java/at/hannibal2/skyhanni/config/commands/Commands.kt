@@ -4,6 +4,7 @@ import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.SkillAPI
 import at.hannibal2.skyhanni.config.ConfigFileType
 import at.hannibal2.skyhanni.config.ConfigGuiManager
+import at.hannibal2.skyhanni.data.ChatClickActionManager
 import at.hannibal2.skyhanni.data.ChatManager
 import at.hannibal2.skyhanni.data.GardenCropMilestonesCommunityFix
 import at.hannibal2.skyhanni.data.GuiEditManager
@@ -40,8 +41,10 @@ import at.hannibal2.skyhanni.features.garden.farming.CropSpeedMeter
 import at.hannibal2.skyhanni.features.garden.farming.DicerRngDropTracker
 import at.hannibal2.skyhanni.features.garden.farming.FarmingWeightDisplay
 import at.hannibal2.skyhanni.features.garden.farming.GardenStartLocation
+import at.hannibal2.skyhanni.features.garden.farming.lane.FarmingLaneCreator
 import at.hannibal2.skyhanni.features.garden.fortuneguide.CaptureFarmingGear
 import at.hannibal2.skyhanni.features.garden.fortuneguide.FFGuideGUI
+import at.hannibal2.skyhanni.features.garden.visitor.GardenVisitorDropStatistics
 import at.hannibal2.skyhanni.features.mining.KingTalismanHelper
 import at.hannibal2.skyhanni.features.mining.powdertracker.PowderTracker
 import at.hannibal2.skyhanni.features.minion.MinionFeatures
@@ -209,6 +212,10 @@ object Commands {
             "shresetfishingtracker",
             "Resets the Fishing Profit Tracker"
         ) { FishingProfitTracker.resetCommand(it) }
+        registerCommand(
+            "shresetvisitordrops",
+            "Reset the Visitors Drop Statistics"
+        ) { GardenVisitorDropStatistics.resetCommand() }
         registerCommand("shbingotoggle", "Toggle the bingo card display mode") { BingoCardDisplay.toggleCommand() }
         registerCommand(
             "shfarmingprofile",
@@ -216,11 +223,13 @@ object Commands {
         ) { FarmingWeightDisplay.lookUpCommand(it) }
         registerCommand(
             "shcopytranslation",
-            "<language code (2 letters)> <messsage to translate>\n" +
-                "Requires the Chat > Translator feature to be enabled.\n" +
-                "Copies the translation for a given message to your clipboard. " +
-                "Language codes are at the end of the translation when you click on a message."
+            "Copy the English translation of a message in another language to the clipboard.\n" +
+                "Uses a 2 letter language code that can be found at the end of a translation message."
         ) { Translator.fromEnglish(it) }
+        registerCommand(
+            "shtranslate",
+            "Translate a message in another language to English."
+        ) { Translator.toEnglish(it) }
         registerCommand(
             "shmouselock",
             "Lock/Unlock the mouse so it will no longer rotate the player (for farming)"
@@ -285,12 +294,16 @@ object Commands {
         )
         registerCommand(
             "shlimbostats",
-            "Prints your Limbo Stats!"
+            "Prints your Limbo Stats.\n §7This includes your Personal Best, Playtime, and §aSkyHanni User Luck§7!"
         ) { LimboTimeTracker.printStats() }
         registerCommand(
             "shlimbo",
             "Warps you to Limbo."
         ) { MiscFeatures().goToLimbo() }
+        registerCommand(
+            "shlanedetection",
+            "Detect a farming lane in garden"
+        ) { FarmingLaneCreator.commandLaneDetection() }
     }
 
     private fun usersBugFix() {
@@ -391,7 +404,7 @@ object Commands {
         registerCommand("shtestwaypoint", "Set a waypoint on that location") { SkyHanniDebugsAndTests.waypoint(it) }
         registerCommand("shtesttablist", "Set your clipboard as a fake tab list.") { TabListData.toggleDebugCommand() }
         registerCommand("shreloadlocalrepo", "Reloading the local repo data") { SkyHanniMod.repo.reloadLocalRepo() }
-        registerCommand("shchathistory", "Show the unfiltered chat history") { ChatManager.openChatFilterGUI() }
+        registerCommand("shchathistory", "Show the unfiltered chat history") { ChatManager.openChatFilterGUI(it) }
         registerCommand(
             "shstoplisteners",
             "Unregistering all loaded forge event listeners"
@@ -482,10 +495,7 @@ object Commands {
         registerCommand("shsendcontests", "") { GardenNextJacobContest.shareContestConfirmed(it) }
         registerCommand("shwords", "Opens the config list for modifying visual words") { openVisualWords() }
         registerCommand("shstopaccountupgradereminder", "") { AccountUpgradeReminder.disable() }
-        registerCommand(
-            "shsendtranslation",
-            "Respond with a translation of the message that the user clicks"
-        ) { Translator.toEnglish(it) }
+        registerCommand("shaction", "") { ChatClickActionManager.onCommand(it) }
     }
 
     private fun shortenedCommands() {
