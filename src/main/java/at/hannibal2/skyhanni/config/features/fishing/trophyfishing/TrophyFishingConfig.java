@@ -39,4 +39,10 @@ public class TrophyFishingConfig {
     @ConfigEditorBoolean
     @FeatureToggle
     public boolean odgerLocation = true;
+
+    @Expose
+    @ConfigOption(name = "Load from NEU PV", desc = "Load Trophy fishing data when opening NEU PV.")
+    @ConfigEditorBoolean
+    @FeatureToggle
+    public boolean loadFromNeuPV = true;
 }

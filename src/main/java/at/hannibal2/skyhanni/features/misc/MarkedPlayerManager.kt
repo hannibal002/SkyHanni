@@ -1,6 +1,7 @@
 package at.hannibal2.skyhanni.features.misc
 
 import at.hannibal2.skyhanni.SkyHanniMod
+import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.config.enums.OutsideSbFeature
 import at.hannibal2.skyhanni.events.ConfigLoadEvent
 import at.hannibal2.skyhanni.events.LorenzTickEvent
@@ -18,7 +19,7 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 class MarkedPlayerManager {
     companion object {
 
-        private val config get() = SkyHanniMod.feature.markedPlayers
+        val config get() = SkyHanniMod.feature.gui.markedPlayers
 
         val playerNamesToMark = mutableListOf<String>()
         private val markedPlayers = mutableMapOf<String, EntityOtherPlayerMP>()
@@ -116,5 +117,10 @@ class MarkedPlayerManager {
                 playerNamesToMark.add(name)
             }
         }
+    }
+
+    @SubscribeEvent
+    fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
+        event.move(31, "markedPlayers", "gui.markedPlayers")
     }
 }

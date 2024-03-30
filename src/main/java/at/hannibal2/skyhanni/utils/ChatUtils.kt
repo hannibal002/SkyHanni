@@ -1,6 +1,7 @@
 package at.hannibal2.skyhanni.utils
 
 import at.hannibal2.skyhanni.SkyHanniMod
+import at.hannibal2.skyhanni.data.ChatClickActionManager
 import at.hannibal2.skyhanni.events.LorenzTickEvent
 import at.hannibal2.skyhanni.events.MessageSendToServerEvent
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
@@ -125,6 +126,20 @@ object ChatUtils {
         text.chatStyle.chatHoverEvent =
             HoverEvent(HoverEvent.Action.SHOW_TEXT, ChatComponentText("§eExecute $fullCommand"))
         Minecraft.getMinecraft().thePlayer.addChatMessage(text)
+    }
+
+    /**
+     * Sends a message to the user that they can click and run an action
+     * @param message The message to be sent
+     * @param onClick The runnable to be executed when the message is clicked
+     * @param prefix Whether to prefix the message with the chat prefix, default true
+     * @param prefixColor Color that the prefix should be, default yellow (§e)
+     *
+     * @see CHAT_PREFIX
+     */
+    fun clickableChat(message: String, onClick: () -> Any, prefix: Boolean = true, prefixColor: String = "§e") {
+        val msgPrefix = if (prefix) prefixColor + CHAT_PREFIX else ""
+        ChatClickActionManager.oneTimeClick(msgPrefix + message, onClick)
     }
 
     /**

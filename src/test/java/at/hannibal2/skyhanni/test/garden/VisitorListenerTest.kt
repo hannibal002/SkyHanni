@@ -5,6 +5,7 @@ import at.hannibal2.skyhanni.features.garden.GardenAPI
 import at.hannibal2.skyhanni.features.garden.visitor.VisitorAPI
 import at.hannibal2.skyhanni.features.garden.visitor.VisitorListener
 import at.hannibal2.skyhanni.utils.LorenzUtils
+import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import io.mockk.every
 import io.mockk.mockk
 import io.mockk.mockkObject
@@ -70,7 +71,7 @@ class VisitorListenerTest {
             mockk { every { visitorName } returns "§fJacob" },
         )
 
-        every { LorenzUtils.lastWorldSwitch } returns System.currentTimeMillis()
+        every { LorenzUtils.lastWorldSwitch } returns SimpleTimeMark.now()
 
         listener.onTabListUpdate(
             TabListUpdateEvent(
