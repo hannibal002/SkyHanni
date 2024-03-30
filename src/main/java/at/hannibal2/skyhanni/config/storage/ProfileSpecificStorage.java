@@ -20,6 +20,7 @@ import at.hannibal2.skyhanni.features.garden.farming.ArmorDropTracker;
 import at.hannibal2.skyhanni.features.garden.farming.DicerRngDropTracker;
 import at.hannibal2.skyhanni.features.garden.farming.lane.FarmingLane;
 import at.hannibal2.skyhanni.features.garden.fortuneguide.FarmingItems;
+import at.hannibal2.skyhanni.features.garden.pests.VinylType;
 import at.hannibal2.skyhanni.features.garden.visitor.VisitorReward;
 import at.hannibal2.skyhanni.features.mining.powdertracker.PowderTracker;
 import at.hannibal2.skyhanni.features.misc.trevor.TrevorTracker;
@@ -283,6 +284,9 @@ public class ProfileSpecificStorage {
 
         @Expose
         public Map<String, LorenzVec> npcVisitorLocations = new HashMap<>();
+
+        @Expose
+        public VinylType activeVinyl = null;
     }
 
     @Expose
