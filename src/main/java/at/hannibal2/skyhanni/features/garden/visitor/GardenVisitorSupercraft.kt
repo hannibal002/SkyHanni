@@ -1,6 +1,7 @@
 package at.hannibal2.skyhanni.features.garden.visitor
 
 import at.hannibal2.skyhanni.data.SackAPI
+import at.hannibal2.skyhanni.events.GuiContainerEvent
 import at.hannibal2.skyhanni.events.InventoryCloseEvent
 import at.hannibal2.skyhanni.events.garden.visitor.VisitorOpenEvent
 import at.hannibal2.skyhanni.test.command.ErrorManager
@@ -14,7 +15,6 @@ import at.hannibal2.skyhanni.utils.NEUItems
 import at.hannibal2.skyhanni.utils.NEUItems.getItemStack
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import io.github.moulberry.notenoughupdates.events.ReplaceItemEvent
-import io.github.moulberry.notenoughupdates.events.SlotClickEvent
 import io.github.moulberry.notenoughupdates.util.Utils
 import net.minecraft.entity.player.InventoryPlayer
 import net.minecraftforge.fml.common.eventhandler.EventPriority
@@ -105,7 +105,7 @@ class GardenVisitorSupercraft {
     }
 
     @SubscribeEvent(priority = EventPriority.HIGH)
-    fun onStackClick(event: SlotClickEvent) {
+    fun onStackClick(event: GuiContainerEvent.SlotClickEvent) {
         if (!hasIngredients) return
 
         if (event.slotId == 31) {
