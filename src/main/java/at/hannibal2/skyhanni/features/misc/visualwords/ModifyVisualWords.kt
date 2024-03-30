@@ -4,10 +4,12 @@ import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.config.ConfigFileType
 import at.hannibal2.skyhanni.config.enums.OutsideSbFeature
 import at.hannibal2.skyhanni.events.HypixelJoinEvent
+import at.hannibal2.skyhanni.mixins.hooks.FontRendererHook
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.StringUtils.convertToFormatted
 import at.hannibal2.skyhanni.utils.TimeLimitedCache
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
+import kotlin.random.Random
 import kotlin.time.Duration.Companion.minutes
 
 object ModifyVisualWords {
@@ -16,6 +18,8 @@ object ModifyVisualWords {
     var textCache = TimeLimitedCache<String, String>(5.minutes)
 
     var modifiedWords = mutableListOf<VisualWord>()
+
+    val reverseRegex = "(§.|^|[\\s:()+-])([^§\\s:()+-]*)".toRegex()
 
     fun modifyText(originalText: String?): String? {
         var modifiedText = originalText ?: return null
@@ -42,13 +46,17 @@ object ModifyVisualWords {
                 if (phrase.isEmpty()) continue
 
                 modifiedText = modifiedText.replace(
-                    phrase,
-                    modifiedWord.replacement.convertToFormatted(),
-                    modifiedWord.isCaseSensitive()
+                    phrase, modifiedWord.replacement.convertToFormatted(), modifiedWord.isCaseSensitive()
                 )
             }
         }
 
+
+        if (LorenzUtils.isAprilFoolsDay && !FontRendererHook.cameFromChat && Random.nextDouble() < 0.02) {
+            modifiedText = modifiedText.replace(reverseRegex) {
+                it.groupValues[1] + it.groupValues[2].reversed()
+            }
+        }
         textCache.put(originalText, modifiedText)
         return modifiedText
     }
