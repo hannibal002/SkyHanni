@@ -1,6 +1,7 @@
 package at.hannibal2.skyhanni.features.garden.visitor
 
 import at.hannibal2.skyhanni.data.SackAPI
+import at.hannibal2.skyhanni.data.SackAPI.getAmountInSacks
 import at.hannibal2.skyhanni.events.GuiContainerEvent
 import at.hannibal2.skyhanni.events.InventoryCloseEvent
 import at.hannibal2.skyhanni.events.garden.visitor.VisitorOpenEvent
@@ -14,6 +15,7 @@ import at.hannibal2.skyhanni.utils.NEUInternalName.Companion.asInternalName
 import at.hannibal2.skyhanni.utils.NEUItems
 import at.hannibal2.skyhanni.utils.NEUItems.getItemStack
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
+import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import io.github.moulberry.notenoughupdates.events.ReplaceItemEvent
 import io.github.moulberry.notenoughupdates.util.Utils
 import net.minecraft.entity.player.InventoryPlayer
@@ -25,7 +27,7 @@ class GardenVisitorSupercraft {
 
     private val isSupercraftEnabled get() = VisitorAPI.config.shoppingList.showSuperCraft
 
-    private var hasIngredients = false;
+    private var hasIngredients = false
     private var lastClick = SimpleTimeMark.farPast()
     private var lastSuperCraftMaterial = ""
 
@@ -46,7 +48,7 @@ class GardenVisitorSupercraft {
         }
     }
 
-    @SubscribeEvent(priority = EventPriority.HIGH)
+    @SubscribeEvent(priority = EventPriority.NORMAL)
     fun onVisitorOpen(event: VisitorOpenEvent) {
         val visitor = event.visitor
         val offerItem = visitor.offer?.offerItem ?: return
@@ -69,27 +71,23 @@ class GardenVisitorSupercraft {
             }
             val (itemName, amount) = pair
             val internalName = NEUInternalName.fromItemName(itemName)
-//
-//            GET SUPERCRAFT FOR SACKS CODE
-//
-            if (isSupercraftEnabled) {
-                val item =
-                    NEUItems.getRecipes(internalName).first { !it.ingredients.first().internalItemId.contains("PEST") }
-                val ingredients = item.ingredients
-                val ingredientReqs = mutableMapOf<String, Int>()
-                for (ingredient in ingredients) {
-                    val ing = ingredient.serialize().split(":")
-                    ingredientReqs[ing[0]] = ingredientReqs.getOrDefault(ing[0], 0) + ing[1].toDouble().toInt()
-                }
-                hasIngredients = true;
-                for ((key, value) in ingredientReqs) {
-                    val sackItem = SackAPI.fetchSackItem(key.asInternalName())
-                    lastSuperCraftMaterial = internalName.itemName
-                    if (sackItem.amount < value * amount) {
-                        hasIngredients = false;
-                        break;
-                    }
-                }
+            if (isSupercraftEnabled) getSupercraftForSacks(internalName, amount)
+        }
+    }
+
+    fun getSupercraftForSacks(internalName: NEUInternalName, amount: Int) {
+        val ingredients = NEUItems.getRecipes(internalName).first { !it.ingredients.first().internalItemId.contains("PEST") }.ingredients
+        val ingredientReqs = mutableMapOf<String, Int>()
+        for (ingredient in ingredients) {
+            ingredientReqs[ingredient.internalItemId] = ingredientReqs.getOrDefault(ingredient.internalItemId, 0) + ingredient.count.toInt()
+        }
+        hasIngredients = true
+        for ((key, value) in ingredientReqs) {
+            val sackItem = key.asInternalName().getAmountInSacks()
+            lastSuperCraftMaterial = internalName.itemName.removeColor()
+            if (sackItem < value * amount) {
+                hasIngredients = false
+                break
             }
         }
     }

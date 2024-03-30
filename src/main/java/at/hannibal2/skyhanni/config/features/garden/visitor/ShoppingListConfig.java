@@ -50,7 +50,7 @@ public class ShoppingListConfig {
     @ConfigOption(name = "Show Super Craft", desc = "Show super craft button if there are enough materials to make in the sack.")
     @ConfigEditorBoolean
     @FeatureToggle
-    public boolean showSuperCraft = true;
+    public boolean showSuperCraft = false;
 
     @Expose
     @ConfigOption(name = "Item Preview", desc = "Show the base type for the required items next to new visitors. §cNote that some visitors may require any crop.")
