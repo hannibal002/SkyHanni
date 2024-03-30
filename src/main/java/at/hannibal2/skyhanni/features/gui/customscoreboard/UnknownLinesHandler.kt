@@ -41,6 +41,7 @@ object UnknownLinesHandler {
             SbPattern.autoClosingPattern,
             SbPattern.startingInPattern,
             SbPattern.timeElapsedPattern,
+            SbPattern.instanceShutdownPattern,
             SbPattern.keysPattern,
             SbPattern.clearedPattern,
             SbPattern.soloPattern,
@@ -109,6 +110,9 @@ object UnknownLinesHandler {
             SbPattern.wtfAreThoseLinesPattern,
             SbPattern.timeLeftPattern,
             SbPattern.darkAuctionCurrentItemPattern,
+            SbPattern.coldPattern,
+            SbPattern.riftHotdogTitlePattern,
+            SbPattern.riftHotdogEatenPattern,
         )
 
         unknownLines = unknownLines.filterNot { line ->

@@ -22,13 +22,13 @@ import kotlin.time.Duration.Companion.seconds
 
 class FireVeilWandParticles {
 
-    private val config get() = SkyHanniMod.feature.itemAbilities.fireVeilWands
+    private val config get() = SkyHanniMod.feature.inventory.itemAbilities.fireVeilWands
     private val item by lazy { "FIRE_VEIL_WAND".asInternalName() }
 
     private var lastClick = SimpleTimeMark.farPast()
 
     @SubscribeEvent
-    fun onChatPacket(event: ReceiveParticleEvent) {
+    fun onReceiveParticle(event: ReceiveParticleEvent) {
         if (!LorenzUtils.inSkyBlock) return
         if (config.display == DisplayEntry.PARTICLES) return
         if (lastClick.passedSince() > 5.5.seconds) return

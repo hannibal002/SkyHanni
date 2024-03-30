@@ -25,7 +25,7 @@ import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraft.item.ItemStack
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
-class DungeonAPI {
+object DungeonAPI {
 
     private val floorPattern = " §7⏣ §cThe Catacombs §7\\((?<floor>.*)\\)".toPattern()
     private val uniqueClassBonus =
@@ -38,73 +38,84 @@ class DungeonAPI {
     private val killPattern = " +☠ Defeated (?<boss>\\w+).*".toPattern()
     private val totalKillsPattern = "§7Total Kills: §e(?<kills>.*)".toPattern()
 
-    companion object {
+    var dungeonFloor: String? = null
+    var started = false
+    var inBossRoom = false
+    var playerClass: DungeonClass? = null
+    var playerClassLevel = -1
+    var isUniqueClass = false
 
-        var dungeonFloor: String? = null
-        var started = false
-        var inBossRoom = false
-        var playerClass: DungeonClass? = null
-        var playerClassLevel = -1
-        var isUniqueClass = false
+    val bossStorage: MutableMap<DungeonFloor, Int>? get() = ProfileStorageData.profileSpecific?.dungeons?.bosses
+    private val timePattern =
+        "Time Elapsed:( )?(?:(?<minutes>\\d+)m)? (?<seconds>\\d+)s".toPattern() // Examples: Time Elapsed: 10m 10s, Time Elapsed: 2s
 
-        val bossStorage: MutableMap<DungeonFloor, Int>? get() = ProfileStorageData.profileSpecific?.dungeons?.bosses
-        private val timePattern =
-            "Time Elapsed:( )?(?:(?<minutes>\\d+)m)? (?<seconds>\\d+)s".toPattern() // Examples: Time Elapsed: 10m 10s, Time Elapsed: 2s
+    private val patternGroup = RepoPattern.group("dungeon")
 
-        private val patternGroup = RepoPattern.group("dungeon")
+    private val dungeonComplete by patternGroup.pattern(
+        "complete",
+        "§.\\s+§.§.(?:The|Master Mode) Catacombs §.§.- §.§.(?:Floor )?(?<floor>M?[IV]{1,3}|Entrance)"
+    )
 
-        private val dungeonComplete by patternGroup.pattern(
-            "complete",
-            "§.\\s+§.§.(?:The|Master Mode) Catacombs §.§.- §.§.(?:Floor )?(?<floor>M?[IV]{1,3}|Entrance)"
-        )
+    fun inDungeon() = dungeonFloor != null
 
-        fun inDungeon() = dungeonFloor != null
+    fun isOneOf(vararg floors: String) = dungeonFloor?.equalsOneOf(*floors) == true
 
-        fun isOneOf(vararg floors: String) = dungeonFloor?.equalsOneOf(*floors) == true
+    fun handleBossMessage(rawMessage: String) {
+        if (!inDungeon()) return
+        val message = rawMessage.removeColor()
+        val bossName = message.substringAfter("[BOSS] ").substringBefore(":").trim()
+        if ((bossName != "The Watcher") && dungeonFloor != null && checkBossName(bossName) && !inBossRoom) {
+            DungeonBossRoomEnterEvent().postAndCatch()
+            inBossRoom = true
+        }
+    }
 
-        fun handleBossMessage(rawMessage: String) {
-            if (!inDungeon()) return
-            val message = rawMessage.removeColor()
-            val bossName = message.substringAfter("[BOSS] ").substringBefore(":").trim()
-            if ((bossName != "The Watcher") && dungeonFloor != null && checkBossName(bossName) && !inBossRoom) {
-                DungeonBossRoomEnterEvent().postAndCatch()
-                inBossRoom = true
+    private fun checkBossName(bossName: String): Boolean {
+        val correctBoss = when (dungeonFloor!!) {
+            "E" -> "The Watcher"
+            "F1", "M1" -> "Bonzo"
+            "F2", "M2" -> "Scarf"
+            "F3", "M3" -> "The Professor"
+            "F4", "M4" -> "Thorn"
+            "F5", "M5" -> "Livid"
+            "F6", "M6" -> "Sadan"
+            "F7", "M7" -> "Maxor"
+            else -> null
+        } ?: return false
+
+        // Livid has a prefix in front of the name, so we check ends with to cover all the livids
+        return bossName.endsWith(correctBoss)
+    }
+
+    fun getTime(): String {
+        loop@ for (line in ScoreboardData.sidebarLinesFormatted) {
+            timePattern.matchMatcher(line.removeColor()) {
+                if (!matches()) continue@loop
+                return "${group("minutes") ?: "00"}:${group("seconds")}" // 03:14
             }
         }
+        return ""
+    }
 
-        private fun checkBossName(bossName: String): Boolean {
-            val correctBoss = when (dungeonFloor!!) {
-                "E" -> "The Watcher"
-                "F1", "M1" -> "Bonzo"
-                "F2", "M2" -> "Scarf"
-                "F3", "M3" -> "The Professor"
-                "F4", "M4" -> "Thorn"
-                "F5", "M5" -> "Livid"
-                "F6", "M6" -> "Sadan"
-                "F7", "M7" -> "Maxor"
-                else -> null
-            } ?: return false
+    fun getCurrentBoss(): DungeonFloor? {
+        val floor = dungeonFloor ?: return null
+        return DungeonFloor.valueOf(floor.replace("M", "F"))
+    }
 
-            // Livid has a prefix in front of the name, so we check ends with to cover all the livids
-            return bossName.endsWith(correctBoss)
-        }
+    fun getRoomID() = ScoreboardData.sidebarLines.firstOrNull()?.removeColor()?.split(" ")?.getOrNull(2)
 
-        fun getTime(): String {
-            loop@ for (line in ScoreboardData.sidebarLinesFormatted) {
-                timePattern.matchMatcher(line.removeColor()) {
-                    if (!matches()) continue@loop
-                    return "${group("minutes") ?: "00"}:${group("seconds")}" // 03:14
-                }
-            }
-            return ""
-        }
-
-        fun getCurrentBoss(): DungeonFloor? {
-            val floor = dungeonFloor ?: return null
-            return DungeonFloor.valueOf(floor.replace("M", "F"))
-        }
-
-        fun getRoomID() = ScoreboardData.sidebarLines.firstOrNull()?.removeColor()?.split(" ")?.getOrNull(2)
+    fun getColor(level: Int): String = when {
+        level >= 50 -> "§c§l"
+        level >= 45 -> "§c"
+        level >= 40 -> "§6"
+        level >= 35 -> "§d"
+        level >= 30 -> "§9"
+        level >= 25 -> "§b"
+        level >= 20 -> "§2"
+        level >= 15 -> "§a"
+        level >= 10 -> "§e"
+        level >= 5 -> "§f"
+        else -> "§7"
     }
 
     @SubscribeEvent

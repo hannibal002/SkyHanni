@@ -1,6 +1,8 @@
 package at.hannibal2.skyhanni.data
 
+import at.hannibal2.skyhanni.data.MayorAPI.foxyExtraEventPattern
 import at.hannibal2.skyhanni.data.jsonobjects.local.MayorJson
+import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
 
 enum class Mayor(
     val mayorName: String,
@@ -12,7 +14,7 @@ enum class Mayor(
     DIANA("Diana", "§2", Perk.LUCKY, Perk.MYTHOLOGICAL_RITUAL, Perk.PET_XP_BUFF),
     DIAZ("Diaz", "§6", Perk.BARRIER_STREET, Perk.SHOPPING_SPREE),
     FINNEGAN("Finnegan", "§c", Perk.FARMING_SIMULATOR, Perk.PELT_POCALYPSE, Perk.GOATED),
-    FOXY("Foxy", "§d", Perk.SWEET_TOOTH, Perk.BENEVOLENCE, Perk.EXTRA_EVENT),
+    FOXY("Foxy", "§d", Perk.SWEET_TOOTH, Perk.BENEVOLENCE, Perk.EXTRA_EVENT_MINING, Perk.EXTRA_EVENT_FISHING, Perk.EXTRA_EVENT_SPOOKY),
     MARINA("Marina", "§b", Perk.FISHING_XP_BUFF, Perk.LUCK_OF_THE_SEA, Perk.FISHING_FESTIVAL),
     PAUL("Paul", "§c", Perk.MARAUDER, Perk.EZPZ, Perk.BENEDICTION),
 
@@ -33,13 +35,26 @@ enum class Mayor(
 
             mayor.perks.forEach { it.isActive = false }
             mayor.activePerks.clear()
-            perks.mapNotNull { perk -> Perk.entries.firstOrNull { it.perkName == perk.name } }
+            perks.mapNotNull { perk -> Perk.entries.firstOrNull { it.perkName == perk.renameIfFoxyExtraEventPerkFound() } }
                 .filter { mayor.perks.contains(it) }.forEach {
                     it.isActive = true
                     mayor.activePerks.add(it)
                 }
 
             return mayor
+        }
+
+        private fun MayorJson.Perk.renameIfFoxyExtraEventPerkFound(): String? {
+            val foxyExtraEventPairs = mapOf(
+                "Spooky Festival" to "Extra Event (Spooky)",
+                "Mining Fiesta" to "Extra Event (Mining)",
+                "Fishing Festival" to "Extra Event (Fishing)"
+            )
+
+            foxyExtraEventPattern.matchMatcher(this.description) {
+                return foxyExtraEventPairs.entries.firstOrNull { it.key == group("event") }?.value
+            }
+            return this.name
         }
     }
 }
@@ -72,7 +87,9 @@ enum class Perk(val perkName: String) {
     // Foxy
     SWEET_TOOTH("Sweet Tooth"),
     BENEVOLENCE("Benevolence"),
-    EXTRA_EVENT("Extra Event"),
+    EXTRA_EVENT_MINING("Extra Event (Mining)"),
+    EXTRA_EVENT_FISHING("Extra Event (Fishing)"),
+    EXTRA_EVENT_SPOOKY("Extra Event (Spooky)"),
 
     // Marina
     FISHING_XP_BUFF("Fishing XP Buff"),
