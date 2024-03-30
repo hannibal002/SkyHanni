@@ -1,6 +1,5 @@
 package at.hannibal2.skyhanni.features.garden.pests
 
-import at.hannibal2.skyhanni.config.features.garden.pests.StereoHarmonyConfig
 import at.hannibal2.skyhanni.data.ProfileStorageData
 import at.hannibal2.skyhanni.events.ConfigLoadEvent
 import at.hannibal2.skyhanni.events.GuiRenderEvent
@@ -8,8 +7,10 @@ import at.hannibal2.skyhanni.events.LorenzChatEvent
 import at.hannibal2.skyhanni.events.LorenzWorldChangeEvent
 import at.hannibal2.skyhanni.features.garden.GardenAPI
 import at.hannibal2.skyhanni.utils.ConditionalUtils
+import at.hannibal2.skyhanni.utils.ItemUtils
 import at.hannibal2.skyhanni.utils.NEUItems.getItemStack
-import at.hannibal2.skyhanni.utils.RenderUtils.renderStringsAndItems
+import at.hannibal2.skyhanni.utils.RenderUtils
+import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderables
 import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.StringUtils.matches
 import at.hannibal2.skyhanni.utils.renderables.Renderable
@@ -47,6 +48,13 @@ class StereoHarmonyDisplay {
 
     private var display = emptyList<Renderable>()
 
+    private val questionMarkSkull = ItemUtils.createSkull(
+        "§c?",
+        "28aa984a-2077-40cc-8de7-e641adf2c497",
+        "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvNDZiY"+
+            "TYzMzQ0ZjQ5ZGQxYzRmNTQ4OGU5MjZiZjNkOWUyYjI5OTE2YTZjNTBkNjEwYmI0MGE1MjczZGM4YzgyIn19fQ=="
+    )
+
     private fun update() {
         display = drawDisplay()
     }
@@ -54,20 +62,15 @@ class StereoHarmonyDisplay {
     private fun drawDisplay() = buildList {
         val vinyl = activeVinyl ?: return@buildList
         val pest = vinyl.getPest()
-        val displayType = config.displayType.get()
 
-        if ((displayType == StereoHarmonyConfig.DisplayType.HEAD ||
-            displayType == StereoHarmonyConfig.DisplayType.BOTH) && pest != null) {
-            val itemStack = pest.internalName.getItemStack()
-            add(Renderable.itemStack(itemStack, 1.68))
-        }
+        val itemStack = pest?.internalName?.getItemStack() ?: questionMarkSkull
+        if (config.showHead.get()) add(Renderable.itemStack(itemStack, 2.9, verticalAlign = RenderUtils.VerticalAlignment.BOTTOM))
+        val list = mutableListOf<Renderable>()
         val vinylName = vinyl.displayName
-        add(Renderable.string("§ePlaying: §a$vinylName"))
-        if ((displayType == StereoHarmonyConfig.DisplayType.NAME ||
-            displayType == StereoHarmonyConfig.DisplayType.BOTH) && pest != null) {
-            val pestName = pest.displayName
-            add(Renderable.string(" §e(§c$pestName§e)"))
-        }
+        val pestName = pest?.displayName ?: "None"
+        list.add(Renderable.string("§ePlaying: §a$vinylName"))
+        list.add(Renderable.string("§ePest: §c$pestName"))
+        add(Renderable.verticalContainer(list))
     }
 
     @SubscribeEvent
@@ -86,26 +89,22 @@ class StereoHarmonyDisplay {
     @SubscribeEvent
     fun onRenderOverlay(event: GuiRenderEvent.GuiOverlayRenderEvent) {
         if (!isEnabled()) return
-        if (activeVinyl == VinylType.NONE && config.hideWhenNone.get()) return
+        if (activeVinyl == VinylType.NONE && config.hideWhenNone) return
         else if (display.isEmpty()) update()
-        config.position.renderStringsAndItems(listOf(display), posLabel = "Stereo Harmony Display")
+        val content = Renderable.horizontalContainer(display, 3, verticalAlign = RenderUtils.VerticalAlignment.CENTER)
+        val renderables = listOf(content)
+        config.position.renderRenderables(renderables, posLabel = "Stereo Harmony Display")
     }
 
     @SubscribeEvent
-    fun onWorldSwitch(event: LorenzWorldChangeEvent) {
+    fun onWorldChange(event: LorenzWorldChangeEvent) {
         display = emptyList()
     }
 
     @SubscribeEvent
     fun onConfigLoad(event: ConfigLoadEvent) {
-        ConditionalUtils.onToggle(
-            config.displayEnabled,
-            config.displayType,
-            config.hideWhenNone
-        ) {
-            update()
-        }
+        ConditionalUtils.onToggle(config.showHead) { update() }
     }
 
-    fun isEnabled() = GardenAPI.inGarden() && config.displayEnabled.get()
+    fun isEnabled() = GardenAPI.inGarden() && config.displayEnabled
 }

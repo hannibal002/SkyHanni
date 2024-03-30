@@ -4,7 +4,6 @@ import at.hannibal2.skyhanni.config.FeatureToggle;
 import at.hannibal2.skyhanni.config.core.config.Position;
 import com.google.gson.annotations.Expose;
 import io.github.moulberry.moulconfig.annotations.ConfigEditorBoolean;
-import io.github.moulberry.moulconfig.annotations.ConfigEditorDropdown;
 import io.github.moulberry.moulconfig.annotations.ConfigOption;
 import io.github.moulberry.moulconfig.observer.Property;
 
@@ -17,42 +16,21 @@ public class StereoHarmonyConfig {
     )
     @ConfigEditorBoolean
     @FeatureToggle
-    public Property<Boolean> displayEnabled = Property.of(true);
+    public boolean displayEnabled = true;
 
     @Expose
-    @ConfigOption(name = "Display Type", desc = "")
-    @ConfigEditorDropdown
-    public Property<DisplayType> displayType = Property.of(DisplayType.HEAD);
-
-    public enum DisplayType {
-        BOTH("Both"),
-        HEAD("Show Head"),
-        NAME("Show Name"),
-
-        NONE("None"),
-
-        ;
-        private final String str;
-
-        DisplayType(String str) {
-            this.str = str;
-        }
-
-        @Override
-        public String toString() {
-            return str;
-        }
-
-    }
+    @ConfigOption(name = "Show Pest Head", desc = "")
+    @ConfigEditorBoolean
+    public Property<Boolean> showHead = Property.of(true);
 
     @Expose
     @ConfigOption(
         name = "Hide when None",
-        desc = "hide when no vinyl selected selected."
+        desc = "Hide when no vinyl selected."
     )
     @ConfigEditorBoolean
-    public Property<Boolean> hideWhenNone = Property.of(false);
+    public boolean hideWhenNone = false;
 
     @Expose
-    public Position position = new Position(315, -200, 1f);
+    public Position position = new Position(205, 55, 1f);
 }
