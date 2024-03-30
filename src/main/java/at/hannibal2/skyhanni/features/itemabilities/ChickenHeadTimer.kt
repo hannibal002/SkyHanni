@@ -16,7 +16,7 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import kotlin.time.Duration.Companion.seconds
 
 class ChickenHeadTimer {
-    private val config get() = SkyHanniMod.feature.itemAbilities.chickenHead
+    private val config get() = SkyHanniMod.feature.inventory.itemAbilities.chickenHead
 
     private var hasChickenHead = false
     private var lastTime = SimpleTimeMark.farPast()
