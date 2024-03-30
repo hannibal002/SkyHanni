@@ -4,8 +4,10 @@ import at.hannibal2.skyhanni.config.FeatureToggle;
 import at.hannibal2.skyhanni.config.core.config.Position;
 import com.google.gson.annotations.Expose;
 import io.github.moulberry.moulconfig.annotations.ConfigEditorBoolean;
+import io.github.moulberry.moulconfig.annotations.ConfigEditorDropdown;
 import io.github.moulberry.moulconfig.annotations.ConfigEditorSlider;
 import io.github.moulberry.moulconfig.annotations.ConfigOption;
+import io.github.moulberry.moulconfig.observer.Property;
 
 public class QuiverDisplayConfig {
     @Expose
@@ -20,16 +22,33 @@ public class QuiverDisplayConfig {
     @Expose
     @ConfigOption(name = "Show arrow icon", desc = "Displays an icon next to the Quiver Display.")
     @ConfigEditorBoolean
-    public boolean showIcon = true;
+    public Property<Boolean> showIcon = Property.of(true);
 
     @Expose
     @ConfigOption(
-        name = "Show only with bow",
-        desc = "Only show the quiver display when\n" +
-            "holding a bow."
+        name = "When to show the display",
+        desc = ""
     )
-    @ConfigEditorBoolean
-    public boolean onlyWithBow = false;
+    @ConfigEditorDropdown
+    public Property<ShowWhen> whenToShow = Property.of(ShowWhen.ONLY_BOW_INVENTORY);
+
+    public enum ShowWhen {
+        ALWAYS("Always"),
+        ONLY_BOW_INVENTORY("Only with Bow in inventory"),
+        ONLY_BOW_HAND("Only with Bow in hand"),
+
+        ;
+        private final String str;
+
+        ShowWhen(String str) {
+            this.str = str;
+        }
+
+        @Override
+        public String toString() {
+            return str;
+        }
+    }
 
     @Expose
     @ConfigOption(

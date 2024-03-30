@@ -237,6 +237,12 @@ object QuiverAPI {
 
     fun hasBowInInventory() = hasBow
 
+    fun isHoldingBow(): Boolean {
+        InventoryUtils.getItemInHand()?.let {
+            return it.item is ItemBow && !fakeBowsPattern.matches(it.getInternalName().asString())
+        } ?: return false
+    }
+
     fun getArrowByNameOrNull(name: String): ArrowType? {
         return arrows.firstOrNull { it.arrow == name }
     }
@@ -251,7 +257,7 @@ object QuiverAPI {
 
     private fun shouldHideAmount() = wearingSkeletonMasterChestplate
 
-    private fun checkBow() {
+    private fun checkBowInventory() {
         hasBow = InventoryUtils.getItemsInOwnInventory().any {
             it.item is ItemBow && !fakeBowsPattern.matches(it.getInternalName().asString())
         }
@@ -269,9 +275,9 @@ object QuiverAPI {
     @SubscribeEvent
     fun onTick(event: LorenzTickEvent) {
         if (!isEnabled()) return
-        if (event.repeatSeconds(3)) {
+        if (event.repeatSeconds(2)) {
             checkChestplate()
-            checkBow()
+            checkBowInventory()
         }
     }
 

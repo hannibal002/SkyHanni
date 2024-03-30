@@ -2,11 +2,13 @@ package at.hannibal2.skyhanni.features.misc
 
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
+import at.hannibal2.skyhanni.config.features.gui.QuiverDisplayConfig.ShowWhen
 import at.hannibal2.skyhanni.data.ArrowType
 import at.hannibal2.skyhanni.data.QuiverAPI
 import at.hannibal2.skyhanni.data.QuiverAPI.NONE_ARROW_TYPE
 import at.hannibal2.skyhanni.data.QuiverAPI.arrowAmount
 import at.hannibal2.skyhanni.data.TitleManager
+import at.hannibal2.skyhanni.events.ConfigLoadEvent
 import at.hannibal2.skyhanni.events.DungeonCompleteEvent
 import at.hannibal2.skyhanni.events.DungeonEnterEvent
 import at.hannibal2.skyhanni.events.GuiRenderEvent
@@ -16,8 +18,8 @@ import at.hannibal2.skyhanni.events.LorenzWorldChangeEvent
 import at.hannibal2.skyhanni.events.ProfileJoinEvent
 import at.hannibal2.skyhanni.events.QuiverUpdateEvent
 import at.hannibal2.skyhanni.utils.ChatUtils
+import at.hannibal2.skyhanni.utils.ConditionalUtils
 import at.hannibal2.skyhanni.utils.DelayedRun
-import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.getItemRarityOrNull
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.NEUItems
@@ -28,7 +30,6 @@ import at.hannibal2.skyhanni.utils.StringUtils
 import at.hannibal2.skyhanni.utils.StringUtils.createCommaSeparatedList
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 import net.minecraft.init.Items
-import net.minecraft.item.ItemBow
 import net.minecraft.item.ItemStack
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import kotlin.time.Duration.Companion.seconds
@@ -125,7 +126,7 @@ class QuiverDisplay {
         rarity = itemStack.getItemRarityOrNull()?.chatColorCode ?: "§f"
         val arrowDisplayName = if (hideAmount || arrow == NONE_ARROW_TYPE) arrow.arrow else StringUtils.pluralize(amount, arrow.arrow)
 
-        if (config.showIcon) {
+        if (config.showIcon.get()) {
             add(Renderable.itemStack(itemStack,1.68))
         }
         if (!hideAmount) {
@@ -157,14 +158,23 @@ class QuiverDisplay {
     @SubscribeEvent
     fun onRenderOverlay(event: GuiRenderEvent.GuiOverlayRenderEvent) {
         if (!isEnabled()) return
-        if (!QuiverAPI.hasBowInInventory()) return
-        if (config.onlyWithBow && InventoryUtils.getItemInHand()?.item !is ItemBow) {
-            if (display.isNotEmpty()) display = emptyList()
-        } else {
-            updateDisplay()
-            if (display.isEmpty()) return
+        if (display.isEmpty()) updateDisplay()
+        val whenToShow = config.whenToShow.get()
+        if (whenToShow == ShowWhen.ALWAYS ||
+            whenToShow == ShowWhen.ONLY_BOW_INVENTORY && QuiverAPI.hasBowInInventory() ||
+            whenToShow == ShowWhen.ONLY_BOW_HAND && QuiverAPI.isHoldingBow()) {
+            config.quiverDisplayPos.renderStringsAndItems(listOf(display), posLabel = "Quiver Display")
         }
-        config.quiverDisplayPos.renderStringsAndItems(listOf(display), posLabel = "Quiver Display")
+    }
+
+    @SubscribeEvent
+    fun onConfigLoad(event: ConfigLoadEvent) {
+        ConditionalUtils.onToggle(
+            config.whenToShow,
+            config.showIcon
+        ) {
+            updateDisplay()
+        }
     }
 
     fun isEnabled() = LorenzUtils.inSkyBlock && config.enabled
