@@ -71,7 +71,8 @@ object ProfileStorageData {
             val foundSkyBlockTabList = TabListData.getTabList().any { it.contains("§b§lArea:") }
             if (foundSkyBlockTabList) {
                 ChatUtils.clickableChat(
-                    "§cCan not read profile name from tab list! Open /widget and enable Profile Widget",
+                    "§cCan not read profile name from tab list! Open /widget and enable Profile Widget. " +
+                        "This is needed for the mod to function! And therefore this warning cannot be disabled",
                     command = "widget"
                 )
             } else {

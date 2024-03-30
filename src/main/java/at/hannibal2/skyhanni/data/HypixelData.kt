@@ -78,6 +78,10 @@ class HypixelData {
             "guesting.scoreboard",
             "SKYBLOCK GUEST"
         )
+        private val scoreboardTitlePattern by patternGroup.pattern(
+            "scoreboard.title",
+            "SK[YI]BLOCK(?: CO-OP| GUEST)?"
+        )
 
         var hypixelLive = false
         var hypixelAlpha = false
@@ -119,6 +123,7 @@ class HypixelData {
 
         fun checkCurrentServerId() {
             if (!LorenzUtils.inSkyBlock) return
+            if (serverId != null) return
             if (LorenzUtils.lastWorldSwitch.passedSince() < 1.seconds) return
             if (!TabListData.fullyLoaded) return
 
@@ -401,7 +406,6 @@ class HypixelData {
         val objective = world.scoreboard.getObjectiveInDisplaySlot(1) ?: return false
         val displayName = objective.displayName
         val scoreboardTitle = displayName.removeColor()
-        return scoreboardTitle.contains("SKYBLOCK") ||
-            scoreboardTitle.contains("SKIBLOCK") // April 1st jokes are so funny
+        return scoreboardTitlePattern.matches(scoreboardTitle)
     }
 }
