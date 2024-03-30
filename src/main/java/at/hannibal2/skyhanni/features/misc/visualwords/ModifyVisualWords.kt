@@ -52,7 +52,7 @@ object ModifyVisualWords {
         }
 
 
-        if (LorenzUtils.isAprilFoolsDay && !FontRendererHook.cameFromChat && Random.nextDouble() < 0.25) {
+        if (LorenzUtils.isAprilFoolsDay && !FontRendererHook.cameFromChat && Random.nextDouble() < 0.02) {
             modifiedText = modifiedText.replace(reverseRegex) {
                 it.groupValues[1] + it.groupValues[2].reversed()
             }
