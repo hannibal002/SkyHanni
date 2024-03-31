@@ -75,6 +75,10 @@ object MaxwellAPI {
         "gui.thaumaturgy.data",
         "§(?<color>.)\\+(?<amount>[^ ]+)(?<icon>.) (?<name>.+)"
     )
+    private val thaumaturgyMagicalPowerPattern by group.pattern(
+        "gui.thaumaturgy.magicalpower",
+        "§7Total: §6(?<mp>\\d+) Magical Power"
+    )
     private val statsTuningGuiPattern by group.pattern(
         "gui.thaumaturgy.statstuning",
         "Stats Tuning"
@@ -139,6 +143,7 @@ object MaxwellAPI {
         if (isThaumaturgyInventory(event.inventoryName)) {
             loadThaumaturgyCurrentPower(event.inventoryItems)
             loadThaumaturgyTunings(event.inventoryItems)
+            loadThaumaturgyMagicalPower(event.inventoryItems)
         }
 
         if (yourBagsGuiPattern.matches(event.inventoryName)) {
@@ -200,7 +205,7 @@ object MaxwellAPI {
     private fun loadThaumaturgyTunings(inventoryItems: Map<Int, ItemStack>) {
         val tunings = tunings ?: return
 
-        // Only load those rounded values if we dont have any values at all
+        // Only load those rounded values if we don't have any values at all
         if (tunings.isNotEmpty()) return
 
         val item = inventoryItems[51] ?: return
@@ -218,6 +223,16 @@ object MaxwellAPI {
             }
         }
         this.tunings = map
+    }
+
+    private fun loadThaumaturgyMagicalPower(inventoryItems: Map<Int, ItemStack>) {
+        val item = inventoryItems[48] ?: return
+        for (line in item.getLore()) {
+            thaumaturgyMagicalPowerPattern.matchMatcher(line) {
+                magicalPower = group("mp").formatInt()
+                return
+            }
+        }
     }
 
     private fun processStack(stack: ItemStack) {
