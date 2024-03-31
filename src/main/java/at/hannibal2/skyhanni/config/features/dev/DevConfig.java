@@ -72,6 +72,6 @@ public class DevConfig {
 
     @Expose
     @Category(name = "Debug Mob", desc = "Every Debug related to the Mob System")
-    public DebugMob mobDebug = new DebugMob();
+    public DebugMobConfig mobDebug = new DebugMobConfig();
 
 }

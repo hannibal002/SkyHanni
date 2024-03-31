@@ -59,29 +59,29 @@ object MobFilter {
 
     val mobNameFilter by repoGroup.pattern(
         "filter.basic",
-        "(?:\\[\\w+(?<level>\\d+)\\] )?(?<corrupted>.Corrupted )?(?<name>.*) [\\d❤]+"
+        "(?:\\[\\w+(?<level>\\d+)] )?(?<corrupted>.Corrupted )?(?<name>.*) [\\d❤]+"
     )
     val slayerNameFilter by repoGroup.pattern("filter.slayer", "^. (?<name>.*) (?<tier>[IV]+) \\d+.*")
     val bossMobNameFilter by repoGroup.pattern(
         "filter.boss",
-        "^. (?:\\[\\w+(?<level>\\d+)\\] )?(?<name>.*) (?:[\\d\\/Mk.,❤]+|█+) .$"
+        "^. (?:\\[\\w+(?<level>\\d+)] )?(?<name>.*) (?:[\\d/Mk.,❤]+|█+) .$"
     )
     val dungeonNameFilter by repoGroup.pattern(
         "filter.dungeon",
-        "^(?:(?<star>✯)\\s)?(?:(?<attribute>${DungeonAttribute.toRegexLine})\\s)?(?:\\[[\\w\\d]+\\]\\s)?(?<name>.+)\\s[^\\s]+$"
+        "^(?:(?<star>✯)\\s)?(?:(?<attribute>${DungeonAttribute.toRegexLine})\\s)?(?:\\[[\\w\\d]+]\\s)?(?<name>.+)\\s[^\\s]+$"
     )
     val summonFilter by repoGroup.pattern("filter.summon", "^(?<owner>\\w+)'s (?<name>.*) \\d+.*")
     val dojoFilter by repoGroup.pattern("filter.dojo", "^(?:(?<points>\\d+) pts|(?<empty>\\w+))$")
     val jerryPattern by repoGroup.pattern(
         "jerry",
-        "(?:\\[\\w+(?<level>\\d+)\\] )?(?<owner>\\w+)'s (?<name>\\w+ Jerry) \\d+ Hits"
+        "(?:\\[\\w+(?<level>\\d+)] )?(?<owner>\\w+)'s (?<name>\\w+ Jerry) \\d+ Hits"
     )
 
-    val petCareNamePattern by repoGroup.pattern("pattern.petcare", "^\\[\\w+ (?<level>\\d+)\\] (?<name>.*)")
+    val petCareNamePattern by repoGroup.pattern("pattern.petcare", "^\\[\\w+ (?<level>\\d+)] (?<name>.*)")
     val wokeSleepingGolemPattern by repoGroup.pattern("pattern.dungeon.woke.golem", "(?:§c§lWoke|§5§lSleeping) Golem§r")
     val jerryMagmaCubePattern by repoGroup.pattern(
         "pattern.jerry.magma.cube",
-        "§c(?:Cubie|Maggie|Cubert|Cübe|Cubette|Magmalene|Lucky 7|8ball|Mega Cube|Super Cube) §a\\d+§8\\/§a\\d+§c❤"
+        "§c(?:Cubie|Maggie|Cubert|Cübe|Cubette|Magmalene|Lucky 7|8ball|Mega Cube|Super Cube) §a\\d+§8/§a\\d+§c❤"
     )
     val summonOwnerPattern by repoGroup.pattern("pattern.summon.owner", ".*Spawned by: (?<name>.*).*")
 

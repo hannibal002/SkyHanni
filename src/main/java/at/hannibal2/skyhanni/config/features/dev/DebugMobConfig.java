@@ -6,15 +6,15 @@ import io.github.moulberry.moulconfig.annotations.ConfigEditorBoolean;
 import io.github.moulberry.moulconfig.annotations.ConfigEditorDropdown;
 import io.github.moulberry.moulconfig.annotations.ConfigOption;
 
-public class DebugMob {
+public class DebugMobConfig {
 
     @Expose
-    @ConfigOption(name = "Mob Detection Enable", desc = "Turn off and on again to reset all Mobs")
+    @ConfigOption(name = "Mob Detection Enable", desc = "Turn off and on again to reset all Mobs.")
     @ConfigEditorBoolean
     public boolean enable = true;
 
     @Expose
-    @ConfigOption(name = "Mob Detection", desc = "Debug feature to check the Mob Detection")
+    @ConfigOption(name = "Mob Detection", desc = "Debug feature to check the Mob Detection.")
     @Accordion
     public MobDetection mobDetection = new MobDetection();
 
@@ -39,37 +39,37 @@ public class DebugMob {
     public static class MobDetection {
 
         @Expose
-        @ConfigOption(name = "Log Events", desc = "Logs the spawn and despawn event with full mob info")
+        @ConfigOption(name = "Log Events", desc = "Logs the spawn and despawn event with full mob info.")
         @ConfigEditorBoolean
         public boolean logEvents = false;
 
         @Expose
-        @ConfigOption(name = "Show RayHit", desc = "Highlights the mob that is currently in front of your view (only SkyblockMob)")
+        @ConfigOption(name = "Show RayHit", desc = "Highlights the mob that is currently in front of your view (only SkyblockMob).")
         @ConfigEditorBoolean
         public boolean showRayHit = false;
 
         @Expose
-        @ConfigOption(name = "Player Highlight", desc = "Highlight each entity that is a real Player in blue. (Yourself is also include in the list but won't be highlighted for obvious reason)")
+        @ConfigOption(name = "Player Highlight", desc = "Highlight each entity that is a real Player in blue. (You are also include in the list but won't be highlighted for obvious reason).")
         @ConfigEditorBoolean
         public boolean realPlayerHighlight = false;
 
         @Expose
-        @ConfigOption(name = "DisplayNPC", desc = "Shows the internal mobs that are 'DisplayNPC' as highlight (in red) or the name")
+        @ConfigOption(name = "DisplayNPC", desc = "Shows the internal mobs that are 'DisplayNPC' as highlight (in red) or the name.")
         @ConfigEditorDropdown
         public HowToShow displayNPC = HowToShow.OFF;
 
         @Expose
-        @ConfigOption(name = "SkyblockMob", desc = "Shows the internal mobs that are 'SkyblockMob' as highlight (in green) or the name")
+        @ConfigOption(name = "SkyblockMob", desc = "Shows the internal mobs that are 'SkyblockMob' as highlight (in green) or the name.")
         @ConfigEditorDropdown
         public HowToShow skyblockMob = HowToShow.OFF;
 
         @Expose
-        @ConfigOption(name = "Summon", desc = "Shows the internal mobs that are 'Summon' as highlight (in yellow) or the name")
+        @ConfigOption(name = "Summon", desc = "Shows the internal mobs that are 'Summon' as highlight (in yellow) or the name.")
         @ConfigEditorDropdown
         public HowToShow summon = HowToShow.OFF;
 
         @Expose
-        @ConfigOption(name = "Special", desc = "Shows the internal mobs that are 'Special' as highlight (in aqua) or the name")
+        @ConfigOption(name = "Special", desc = "Shows the internal mobs that are 'Special' as highlight (in aqua) or the name.")
         @ConfigEditorDropdown
         public HowToShow special = HowToShow.OFF;
 
