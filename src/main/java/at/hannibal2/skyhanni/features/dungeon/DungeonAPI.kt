@@ -20,6 +20,7 @@ import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.NumberUtil.formatLong
 import at.hannibal2.skyhanni.utils.NumberUtil.romanToDecimalIfNecessary
 import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
+import at.hannibal2.skyhanni.utils.StringUtils.matches
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.TabListData
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
@@ -60,13 +61,23 @@ object DungeonAPI {
         "blessings",
         "§r§r§fBlessing of (?<type>\\w+) (?<amount>\\w+)§r"
     )
+    private val noBlessingPattern by patternGroup.pattern(
+        "noblessings",
+        "§r§r§7No Buffs active. Find them by exploring the Dungeon!§r"
+    )
 
     enum class DungeonBlessings(var power: Int) {
         LIFE(0),
         POWER(0),
         STONE(0),
         WISDOM(0),
-        TIME(0)
+        TIME(0);
+
+        companion object {
+            fun reset() {
+                entries.forEach { it.power = 0 }
+            }
+        }
     }
 
     fun inDungeon() = dungeonFloor != null
@@ -165,6 +176,10 @@ object DungeonAPI {
         if (tabData.footer_skyhanni == null) return
         val tabList = tabData.footer_skyhanni.formattedText.split("\n")
         tabList.forEach {
+            if (noBlessingPattern.matches(it)) {
+                DungeonBlessings.reset()
+                return
+            }
             val matcher = blessingPattern.matcher(it)
             if (matcher.find()) {
                 val type = matcher.group("type") ?: return@forEach
