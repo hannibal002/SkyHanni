@@ -1,10 +1,13 @@
 package at.hannibal2.skyhanni.data.mob
 
 import at.hannibal2.skyhanni.events.MobEvent
+import at.hannibal2.skyhanni.utils.LocationUtils
+import at.hannibal2.skyhanni.utils.getLorenzVec
 import net.minecraft.entity.EntityLivingBase
 import net.minecraft.entity.item.EntityArmorStand
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import java.util.TreeMap
+import at.hannibal2.skyhanni.data.mob.Mob.Type as MobType
 
 class MobData {
 
@@ -56,14 +59,21 @@ class MobData {
         }
     }
 
-    class RetryEntityInstancing(
+    internal class RetryEntityInstancing(
         var entity: EntityLivingBase,
         var times: Int,
-        val roughType: Mob.Type
+        val roughType: MobType
     ) {
         override fun hashCode() = entity.entityId
         override fun equals(other: Any?) = (other as? RetryEntityInstancing).hashCode() == this.hashCode()
         fun toKeyValuePair() = entity.entityId to this
+
+        fun outsideRange() =
+            entity.getLorenzVec().distanceChebyshevIgnoreY(LocationUtils.playerLocation()) > when (roughType) {
+                MobType.DISPLAY_NPC -> DISPLAY_NPC_DETECTION_RANGE
+                MobType.PLAYER -> Double.POSITIVE_INFINITY
+                else -> DETECTION_RANGE
+            }
     }
 
     @SubscribeEvent

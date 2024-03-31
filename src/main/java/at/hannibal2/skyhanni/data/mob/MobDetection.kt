@@ -98,8 +98,8 @@ class MobDetection {
         MobData.previousEntityLiving.clear()
         MobData.previousEntityLiving.addAll(MobData.currentEntityLiving)
         MobData.currentEntityLiving.clear()
-        MobData.currentEntityLiving.addAll(
-            EntityUtils.getEntities<EntityLivingBase>().filter { it !is EntityArmorStand })
+        MobData.currentEntityLiving.addAll(EntityUtils.getEntities<EntityLivingBase>()
+            .filter { it !is EntityArmorStand })
 
         if (forceReset) {
             MobData.currentEntityLiving.clear() // Naturally removing the mobs using the despawn
@@ -150,13 +150,13 @@ class MobDetection {
                         when (mob.mobType) {
                             Mob.Type.SUMMON -> MobEvent.Spawn.Summon(mob)
 
-                            Mob.Type.BASIC, Mob.Type.DUNGEON, Mob.Type.BOSS, Mob.Type.SLAYER ->
-                                MobEvent.Spawn.SkyblockMob(mob)
+                            Mob.Type.BASIC, Mob.Type.DUNGEON, Mob.Type.BOSS, Mob.Type.SLAYER -> MobEvent.Spawn.SkyblockMob(
+                                mob
+                            )
 
                             Mob.Type.SPECIAL -> MobEvent.Spawn.Special(mob)
                             Mob.Type.PROJECTILE -> MobEvent.Spawn.Projectile(mob)
-                            Mob.Type.DISPLAY_NPC ->
-                                MobEvent.Spawn.DisplayNPC(mob) // Needed for some special cases
+                            Mob.Type.DISPLAY_NPC -> MobEvent.Spawn.DisplayNPC(mob) // Needed for some special cases
                             Mob.Type.PLAYER -> return mobDetectionError("An Player Ended Here. How?")
                         }.postAndCatch()
                     }
@@ -172,9 +172,7 @@ class MobDetection {
 
     /** For mobs that have default health of the entity */
     private enum class EntityPacketType {
-        SPIRIT_BAT,
-        VILLAGER,
-        CREEPER_VAIL
+        SPIRIT_BAT, VILLAGER, CREEPER_VAIL
     }
 
     /** Handles some mobs that have default health of the entity, specially using the [EntityHealthUpdateEvent] */
@@ -254,35 +252,32 @@ class MobDetection {
         val iterator = MobData.retries.iterator()
         while (iterator.hasNext()) {
             val (_, retry) = iterator.next()
+
             if (MobData.externRemoveOfRetryAmount > 0) {
                 iterator.remove()
                 MobData.externRemoveOfRetryAmount--
                 continue
             }
+
+            if (retry.outsideRange()) continue
+
             val entity = retry.entity
-            val type = retry.roughType
-            if (entity.getLorenzVec().distanceChebyshevIgnoreY(LocationUtils.playerLocation()) > when (type) {
-                    Mob.Type.DISPLAY_NPC -> MobData.DISPLAY_NPC_DETECTION_RANGE
-                    Mob.Type.PLAYER -> Double.POSITIVE_INFINITY
-                    else -> MobData.DETECTION_RANGE
-                }
-            ) {
-                continue
-            }
-            if (retry.times > MAX_RETRIES) {
-                mobDetectionError(
-                    "(`${retry.entity.name}`${retry.entity.entityId} missed (Found? ${MobData.entityToMob[retry.entity] != null}). Position: ${retry.entity.getLorenzVec()} Distance: ${
+            if (retry.times == MAX_RETRIES) {
+                logger.log(
+                    "`${retry.entity.name}`${retry.entity.entityId} missed {\n "
+                        + "is already Found: ${MobData.entityToMob[retry.entity] != null})."
+                        + "\n Position: ${retry.entity.getLorenzVec()}\n "
+                        + "DistanceC: ${
                         entity.getLorenzVec().distanceChebyshevIgnoreY(LocationUtils.playerLocation())
-                    } , ${
-                        entity.getLorenzVec().subtract(LocationUtils.playerLocation())
-                    }"
+                    }\n"
+                        + "Relative Position: ${entity.getLorenzVec().subtract(LocationUtils.playerLocation())}\n " +
+                        "}"
                 )
-                // Temporary Change
+                // Uncomment this to make it closed a loop
                 // iterator.remove()
-                retry.times = Int.MIN_VALUE
                 // continue
             }
-            if (!entitySpawn(entity, type)) {
+            if (!entitySpawn(entity, retry.roughType)) {
                 retry.times++
                 continue
             }
@@ -334,12 +329,11 @@ class MobDetection {
 
     private val allEntitiesViaPacketId = mutableSetOf<Int>()
 
-    private fun addEntityUpdate(id: Int) =
-        if (allEntitiesViaPacketId.contains(id)) {
-            entityUpdatePackets.add(id)
-        } else {
-            allEntitiesViaPacketId.add(id)
-        }
+    private fun addEntityUpdate(id: Int) = if (allEntitiesViaPacketId.contains(id)) {
+        entityUpdatePackets.add(id)
+    } else {
+        allEntitiesViaPacketId.add(id)
+    }
 
     @SubscribeEvent
     fun onDisconnect(event: FMLNetworkEvent.ClientDisconnectionFromServerEvent) {
@@ -352,7 +346,14 @@ class MobDetection {
         if (forceReset) {
             event.addData("Mob Detection is manually disabled!")
         } else {
-            event.addIrrelevant("normal enabled")
+            event.addIrrelevant {
+                add("normal enabled")
+                add("Active Mobs: ${MobData.currentMobs.size}")
+                val inDistanceMobs = MobData.retries.count { it.value.outsideRange() }
+                add("Searching for Mobs: ${MobData.retries.size - inDistanceMobs}")
+                add("Mobs over Max Search Count: ${MobData.retries.count { it.value.times > MAX_RETRIES }}")
+                add("Mobs outside of Range: $inDistanceMobs")
+            }
         }
     }
 
