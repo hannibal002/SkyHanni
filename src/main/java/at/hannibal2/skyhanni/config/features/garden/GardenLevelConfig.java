@@ -5,6 +5,7 @@ import at.hannibal2.skyhanni.config.core.config.Position;
 import com.google.gson.annotations.Expose;
 import io.github.moulberry.moulconfig.annotations.ConfigEditorBoolean;
 import io.github.moulberry.moulconfig.annotations.ConfigOption;
+import io.github.moulberry.moulconfig.observer.Property;
 
 public class GardenLevelConfig {
     @Expose
@@ -12,6 +13,18 @@ public class GardenLevelConfig {
     @ConfigEditorBoolean
     @FeatureToggle
     public boolean display = false;
+
+    @Expose
+    @ConfigOption(name = "Overflow", desc = "Enable overflow Garden levels")
+    @ConfigEditorBoolean
+    @FeatureToggle
+    public Property<Boolean> overflow = Property.of(true);
+
+    @Expose
+    @ConfigOption(name = "Overflow Chat", desc = "Enable overflow Garden level up messages in chat.")
+    @ConfigEditorBoolean
+    @FeatureToggle
+    public boolean overflowMessages = true;
 
     @Expose
     public Position pos = new Position(390, 40, false, true);

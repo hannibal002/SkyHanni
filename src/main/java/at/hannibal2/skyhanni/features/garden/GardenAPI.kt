@@ -220,7 +220,7 @@ object GardenAPI {
         return 0
     }
 
-    fun getGardenLevel(): Int {
+    fun getGardenLevel(overflow: Boolean = true): Int {
         val gardenExp = this.gardenExp ?: return 0
         var tier = 0
         var totalExp = 0L
@@ -231,11 +231,13 @@ object GardenAPI {
             }
             tier++
         }
-        totalExp += gardenOverflowExp
-
-        while (totalExp < gardenExp) {
-            tier++
+        if (overflow) {
             totalExp += gardenOverflowExp
+
+            while (totalExp < gardenExp) {
+                tier++
+                totalExp += gardenOverflowExp
+            }
         }
         return tier
     }
