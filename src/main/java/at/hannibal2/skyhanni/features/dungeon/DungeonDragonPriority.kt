@@ -16,7 +16,6 @@ import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import at.hannibal2.skyhanni.utils.toLorenzVec
 import net.minecraft.network.Packet
 import net.minecraft.network.play.server.S2APacketParticles
-import net.minecraft.util.EnumParticleTypes
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import kotlin.time.Duration.Companion.milliseconds
 
@@ -29,17 +28,24 @@ class DungeonDragonPriority {
         "(.+)§r§a picked the §r§cCorrupted Blue Relic§r§a!"
     )
 
-    enum class DragonInfo(val color: String, var hasSpawned: Boolean, val isEasy: Boolean, val priority: IntArray) {
-        POWER("Red", false, false, intArrayOf(1, 3)),
-        FLAME("Orange", false, true, intArrayOf(2, 1)),
-        ICE("Blue", false, false, intArrayOf(3, 4)),
-        SOUL("Purple", false, true, intArrayOf(4, 5)),
-        APEX("Green", false, true, intArrayOf(5, 2)),
-        NONE("None", false, false, intArrayOf(0, 0));
+    enum class DragonInfo(
+        val color: String,
+        var hasSpawned: Boolean,
+        val isEasy: Boolean,
+        val priority: IntArray,
+        val xRange: ClosedRange<Int>,
+        val zRange: ClosedRange<Int>
+    ) {
+        POWER("Red", false, false, intArrayOf(1, 3), 24..30, 56..62),
+        FLAME("Orange", false, true, intArrayOf(2, 1), 82..88, 56..62),
+        APEX("Green", false, true, intArrayOf(5, 2), 24..30, 91..97),
+        ICE("Blue", false, false, intArrayOf(3, 4), 82..88, 91..97),
+        SOUL("Purple", false, true, intArrayOf(4, 5), 53..59, 122..128),
+        NONE("None", false, false, intArrayOf(0, 0), 0..0, 0..0);
 
         companion object {
             fun clearSpawned() {
-                entries.forEach{ it.hasSpawned = false }
+                entries.forEach { it.hasSpawned = false }
             }
         }
     }
@@ -62,14 +68,6 @@ class DungeonDragonPriority {
         reset()
         ChatUtils.debug("starting p5")
         startP5()
-    }
-
-    @SubscribeEvent
-    fun onDungeon(event: DungeonStartEvent) {
-        if (DungeonAPI.dungeonFloor != "F1") return
-        reset()
-        ChatUtils.chat("searching")
-        isSearching = true
     }
 
     private fun startP5() {
@@ -118,7 +116,6 @@ class DungeonDragonPriority {
         isHealer = false
         isTank = false
         particleList.clear()
-        particleList.add("```")
     }
 
     private fun checkCoordinates(particle: Packet<*>) {
@@ -127,21 +124,12 @@ class DungeonDragonPriority {
         val x = vec.x.toInt()
         val y = vec.y.toInt()
         val z = vec.z.toInt()
-        if (y !in 14..19) return
-        when (x) {
-            in 27..32 -> {
-                when (z) {
-                    in 54..64 -> trySpawnDragon(DragonInfo.POWER)
-                    in 89..99 -> trySpawnDragon(DragonInfo.APEX)
-                }
+        if (y !in 15..22) return
+        DragonInfo.entries.forEach{
+            if (!it.hasSpawned && (x in it.xRange && z in it.zRange)) {
+                particleList.add("${particle.toLorenzVec()}, type: ${particle.particleType}")
+                trySpawnDragon(it)
             }
-            in 79..85 -> {
-                when (z) {
-                    in 54..64 -> trySpawnDragon(DragonInfo.FLAME)
-                    in 89..99 -> trySpawnDragon(DragonInfo.ICE)
-                }
-            }
-            in 51..61 -> trySpawnDragon(DragonInfo.SOUL)
         }
     }
 
@@ -228,10 +216,9 @@ class DungeonDragonPriority {
     fun onDungeonEnd(event: DungeonCompleteEvent) {
         if (isSearching) ChatUtils.chat("no longer searching")
         isSearching = false
-        particleList.add("```")
-        val output = particleList.joinToString ("\n")
+        val output = particleList.joinToString("\n")
         ChatUtils.clickableChat("click here to give me all the particles",
-            { OSUtils.copyToClipboard(output); ChatUtils.chat("copied")} )
+            { OSUtils.copyToClipboard(output); ChatUtils.chat("copied") })
     }
 
     @SubscribeEvent
@@ -240,9 +227,15 @@ class DungeonDragonPriority {
         if (!isSearching) return
         if (!DungeonAPI.inDungeon()) return
         if (DungeonAPI.dungeonFloor != "M7") return
-        if (event.packet.particleType != EnumParticleTypes.ENCHANTMENT_TABLE) return
-        particleList.add("${event.packet.toLorenzVec()}, type: ${event.packet.particleType}")
         checkCoordinates(event.packet)
+    }
+
+    @SubscribeEvent
+    fun onDungeon(event: DungeonStartEvent) {
+        if (DungeonAPI.dungeonFloor != "F1") return
+        if (isSearching) return
+        ChatUtils.chat("searching")
+        isSearching = true
     }
 
     @SubscribeEvent
