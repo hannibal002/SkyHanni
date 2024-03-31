@@ -4,14 +4,18 @@ import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.config.features.dungeon.DragPrioConfig
 import at.hannibal2.skyhanni.events.DebugDataCollectEvent
 import at.hannibal2.skyhanni.events.DungeonCompleteEvent
+import at.hannibal2.skyhanni.events.DungeonStartEvent
 import at.hannibal2.skyhanni.events.LorenzChatEvent
-import at.hannibal2.skyhanni.events.ReceiveParticleEvent
+import at.hannibal2.skyhanni.events.PacketEvent
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.DelayedRun
 import at.hannibal2.skyhanni.utils.LorenzUtils
-import at.hannibal2.skyhanni.utils.LorenzVec
+import at.hannibal2.skyhanni.utils.OSUtils
 import at.hannibal2.skyhanni.utils.StringUtils.matches
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
+import at.hannibal2.skyhanni.utils.toLorenzVec
+import net.minecraft.network.Packet
+import net.minecraft.network.play.server.S2APacketParticles
 import net.minecraft.util.EnumParticleTypes
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import kotlin.time.Duration.Companion.milliseconds
@@ -31,7 +35,13 @@ class DungeonDragonPriority {
         ICE("Blue", false, false, intArrayOf(3, 4)),
         SOUL("Purple", false, true, intArrayOf(4, 5)),
         APEX("Green", false, true, intArrayOf(5, 2)),
-        NONE("None", false, false, intArrayOf(0, 0))
+        NONE("None", false, false, intArrayOf(0, 0));
+
+        companion object {
+            fun clearSpawned() {
+                entries.forEach{ it.hasSpawned = false }
+            }
+        }
     }
 
     private var inBerserkTeam = false
@@ -40,6 +50,7 @@ class DungeonDragonPriority {
     private var isTank = false
 
     private var isSearching = false
+    private val particleList = mutableListOf<String>()
 
     private var dragonOrder = arrayOf(DragonInfo.NONE, DragonInfo.NONE)
 
@@ -51,6 +62,14 @@ class DungeonDragonPriority {
         reset()
         ChatUtils.debug("starting p5")
         startP5()
+    }
+
+    @SubscribeEvent
+    fun onDungeon(event: DungeonStartEvent) {
+        if (DungeonAPI.dungeonFloor != "F1") return
+        reset()
+        ChatUtils.chat("searching")
+        isSearching = true
     }
 
     private fun startP5() {
@@ -87,46 +106,55 @@ class DungeonDragonPriority {
                 }
             }
         }
+        ChatUtils.chat("searching")
         isSearching = true
     }
 
     private fun reset() {
-        DragonInfo.entries.forEach { it.hasSpawned = false }
+        DragonInfo.clearSpawned()
         dragonOrder = arrayOf(DragonInfo.NONE, DragonInfo.NONE)
         inArcherTeam = false
         inBerserkTeam = false
         isHealer = false
         isTank = false
+        particleList.clear()
+        particleList.add("```")
     }
 
-    private fun checkCoordinates(particle: LorenzVec) {
-        val x = particle.x.toInt()
-        val y = particle.y.toInt()
-        val z = particle.z.toInt()
-        if (y !in 14..19) return
+    private fun checkCoordinates(particle: Packet<*>, test: Boolean) {
+        if (particle !is S2APacketParticles) return
+        val vec = particle.toLorenzVec()
+        val x = vec.x.toInt()
+        val y = vec.y.toInt()
+        val z = vec.z.toInt()
+        if (y !in 14..19) {
+            particleList.add("vec: $vec, type: ${particle.particleType}")
+            return
+        }
         when (x) {
             in 27..32 -> {
                 when (z) {
-                    59 -> trySpawnDragon(DragonInfo.POWER)
-                    94 -> trySpawnDragon(DragonInfo.APEX)
+                    in 54..64 -> if (!test) trySpawnDragon(DragonInfo.POWER)
+                    in 89..99 -> if (!test) trySpawnDragon(DragonInfo.APEX)
+                    else -> particleList.add("vec: $vec, type: ${particle.particleType}")
                 }
             }
-
             in 79..85 -> {
                 when (z) {
-                    59 -> trySpawnDragon(DragonInfo.FLAME)
-                    94 -> trySpawnDragon(DragonInfo.ICE)
+                    in 54..64 -> if (!test) trySpawnDragon(DragonInfo.FLAME)
+                    in 89..99 -> if (!test) trySpawnDragon(DragonInfo.ICE)
+                    else -> particleList.add("vec: $vec, type: ${particle.particleType}")
                 }
             }
-
-            56 -> trySpawnDragon(DragonInfo.SOUL)
+            in 51..61 -> if (!test) trySpawnDragon(DragonInfo.SOUL)
+            else -> particleList.add("vec: $vec, type: ${particle.particleType}")
         }
     }
 
     private fun trySpawnDragon(dragon: DragonInfo) {
         if (dragon.hasSpawned) return
+        ChatUtils.chat("try spawning ${dragon.name}")
         dragon.hasSpawned = true
-        ChatUtils.chat("${dragon.name} spawning")
         assignDrag(dragon)
         DelayedRun.runDelayed(8000.milliseconds) {
             dragon.hasSpawned = false
@@ -184,12 +212,12 @@ class DungeonDragonPriority {
         split: Int
     ) {
         val purple = DragonInfo.SOUL in dragonOrder
-        if (config.sendMessage && split == 1) {
+        if (split == 1) {
             ChatUtils.chat("Berserk Team: ${berserkDragon.color}")
             ChatUtils.chat("Archer Team: ${archerDragon.color}")
         }
         if (split == 0) {
-            ChatUtils.chat("${normalDrag.color} is spawning! (title)")
+            ChatUtils.chat("${normalDrag.color} is spawning!")
         } else {
             if (inBerserkTeam || (purple && (
                         (isHealer && config.healerPurple == DragPrioConfig.HealerPurpleValue.BERSERK)
@@ -204,15 +232,23 @@ class DungeonDragonPriority {
 
     @SubscribeEvent
     fun onDungeonEnd(event: DungeonCompleteEvent) {
+        if (isSearching) ChatUtils.chat("no longer searching")
         isSearching = false
+        particleList.add("```")
+        val output = particleList.joinToString ("\n")
+        ChatUtils.clickableChat("click here to give me all the particles",
+            { OSUtils.copyToClipboard(output); ChatUtils.chat("copied")} )
     }
 
     @SubscribeEvent
-    fun onParticle(event: ReceiveParticleEvent) {
-        if (!DungeonAPI.inDungeon()) return
+    fun onParticle(event: PacketEvent.ReceiveEvent) {
+        if (event.packet !is S2APacketParticles) return
         if (!isSearching) return
-        if (event.type != EnumParticleTypes.ENCHANTMENT_TABLE) return
-        checkCoordinates(event.location)
+        if (!DungeonAPI.inDungeon()) return
+        if (DungeonAPI.dungeonFloor != "M7") return
+        var test = false
+        if (event.packet.particleType != EnumParticleTypes.ENCHANTMENT_TABLE) test = true
+        checkCoordinates(event.packet, test)
     }
 
     @SubscribeEvent
