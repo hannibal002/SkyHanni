@@ -128,6 +128,6 @@ object MobFactories {
         }
 
     fun minionMob(baseEntity: EntityLivingBase) =
-        Mob(baseEntity, Mob.Type.SPECIAL, name = MobFilter.minionMobPrefix + baseEntity.cleanName())
+        Mob(baseEntity, Mob.Type.SPECIAL, name = MobFilter.MINION_MOB_PREFIX + baseEntity.cleanName())
 
 }

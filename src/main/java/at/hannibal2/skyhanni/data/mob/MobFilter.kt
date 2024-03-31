@@ -86,18 +86,18 @@ object MobFilter {
     )
     val summonOwnerPattern by repoGroup.pattern("pattern.summon.owner", ".*Spawned by: (?<name>.*).*")
 
-    private val RatSkull =
+    private const val RAT_SKULL =
         "ewogICJ0aW1lc3RhbXAiIDogMTYxODQxOTcwMTc1MywKICAicHJvZmlsZUlkIiA6ICI3MzgyZGRmYmU0ODU0NTVjODI1ZjkwMGY4OGZkMzJmOCIsCiAgInByb2ZpbGVOYW1lIiA6ICJCdUlJZXQiLAogICJzaWduYXR1cmVSZXF1aXJlZCIgOiB0cnVlLAogICJ0ZXh0dXJlcyIgOiB7CiAgICAiU0tJTiIgOiB7CiAgICAgICJ1cmwiIDogImh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvYThhYmI0NzFkYjBhYjc4NzAzMDExOTc5ZGM4YjQwNzk4YTk0MWYzYTRkZWMzZWM2MWNiZWVjMmFmOGNmZmU4IiwKICAgICAgIm1ldGFkYXRhIiA6IHsKICAgICAgICAibW9kZWwiIDogInNsaW0iCiAgICAgIH0KICAgIH0KICB9Cn0="
-    private val HellwispTentacleSkull =
+    private const val HELLWISP_TENTACLE_SKULL =
         "ewogICJ0aW1lc3RhbXAiIDogMTY0OTM4MzAyMTQxNiwKICAicHJvZmlsZUlkIiA6ICIzYjgwOTg1YWU4ODY0ZWZlYjA3ODg2MmZkOTRhMTVkOSIsCiAgInByb2ZpbGVOYW1lIiA6ICJLaWVyYW5fVmF4aWxpYW4iLAogICJzaWduYXR1cmVSZXF1aXJlZCIgOiB0cnVlLAogICJ0ZXh0dXJlcyIgOiB7CiAgICAiU0tJTiIgOiB7CiAgICAgICJ1cmwiIDogImh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvZDI3MDQ2Mzg0OTM2MzhiODVjMzhkZDYzZmZkYmUyMjJmZTUzY2ZkNmE1MDk3NzI4NzU2MTE5MzdhZTViNWUyMiIsCiAgICAgICJtZXRhZGF0YSIgOiB7CiAgICAgICAgIm1vZGVsIiA6ICJzbGltIgogICAgICB9CiAgICB9CiAgfQp9"
-    private val RiftEyeSkull1 =
+    private const val RIFT_EYE_SKULL1 =
         "ewogICJ0aW1lc3RhbXAiIDogMTY0ODA5MTkzNTcyMiwKICAicHJvZmlsZUlkIiA6ICJhNzdkNmQ2YmFjOWE0NzY3YTFhNzU1NjYxOTllYmY5MiIsCiAgInByb2ZpbGVOYW1lIiA6ICIwOEJFRDUiLAogICJzaWduYXR1cmVSZXF1aXJlZCIgOiB0cnVlLAogICJ0ZXh0dXJlcyIgOiB7CiAgICAiU0tJTiIgOiB7CiAgICAgICJ1cmwiIDogImh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvZjI2YmRlNDUwNDljN2I3ZDM0NjA1ZDgwNmEwNjgyOWI2Zjk1NWI4NTZhNTk5MWZkMzNlN2VhYmNlNDRjMDgzNCIsCiAgICAgICJtZXRhZGF0YSIgOiB7CiAgICAgICAgIm1vZGVsIiA6ICJzbGltIgogICAgICB9CiAgICB9CiAgfQp9"
-    private val RiftEyeSkull2 =
+    private const val RIFT_EYE_SKULL2 =
         "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvMTdkYjE5MjNkMDNjNGVmNGU5ZjZlODcyYzVhNmFkMjU3OGIxYWZmMmIyODFmYmMzZmZhNzQ2NmM4MjVmYjkifX19"
-    private val NPCTurdSkull =
+    private const val NPC_TURD_SKULL =
         "ewogICJ0aW1lc3RhbXAiIDogMTYzOTUxMjYxNzc5MywKICAicHJvZmlsZUlkIiA6ICIwZjczMDA3NjEyNGU0NGM3YWYxMTE1NDY5YzQ5OTY3OSIsCiAgInByb2ZpbGVOYW1lIiA6ICJPcmVfTWluZXIxMjMiLAogICJzaWduYXR1cmVSZXF1aXJlZCIgOiB0cnVlLAogICJ0ZXh0dXJlcyIgOiB7CiAgICAiU0tJTiIgOiB7CiAgICAgICJ1cmwiIDogImh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvNjM2MzBkOWIwMjA4OGVhMTkyNGE4NzIyNDJhYmM3NWI2MjYyYzJhY2E5MmFlY2Y4NzE0YTU3YTQxZWVhMGI5ZCIKICAgIH0KICB9Cn0="
 
-    const val minionMobPrefix = "Minion Mob "
+    const val MINION_MOB_PREFIX = "Minion Mob "
 
     enum class DungeonAttribute {
         Flaming, Stormy, Speedy, Fortified, Healthy, Healing, Boomer, Golden, Stealth;
@@ -351,7 +351,7 @@ object MobFilter {
                     Mob(baseEntity, Mob.Type.BOSS, armorStand, name = "Mage Outlaw")
                 ) // fix for wierd name
                 baseEntity is EntityPigZombie && baseEntity.inventory?.get(4)
-                    ?.getSkullTexture() == NPCTurdSkull -> MobResult.found(
+                    ?.getSkullTexture() == NPC_TURD_SKULL -> MobResult.found(
                     Mob(
                         baseEntity,
                         Mob.Type.DISPLAY_NPC,
@@ -500,12 +500,12 @@ object MobFilter {
             armorStand.name.endsWith("'s Armadillo") -> return MobResult.illegal // Armadillo Pet
             armorStand.name.endsWith("'s Rat") -> return MobResult.illegal // Rat Pet
             baseEntity.riddenByEntity is EntityPlayer && MobUtils.getArmorStand(baseEntity, 2)?.inventory?.get(4)
-                ?.getSkullTexture() == RatSkull -> return MobResult.illegal // Rat Morph
+                ?.getSkullTexture() == RAT_SKULL -> return MobResult.illegal // Rat Morph
         }
         when (armorStand.inventory?.get(4)?.getSkullTexture()) {
-            HellwispTentacleSkull -> return MobResult.illegal // Hellwisp Tentacle
-            RiftEyeSkull1 -> return MobResult.found(MobFactories.special(baseEntity, "Rift Teleport Eye", armorStand))
-            RiftEyeSkull2 -> return MobResult.found(MobFactories.special(baseEntity, "Rift Teleport Eye", armorStand))
+            HELLWISP_TENTACLE_SKULL -> return MobResult.illegal // Hellwisp Tentacle
+            RIFT_EYE_SKULL1 -> return MobResult.found(MobFactories.special(baseEntity, "Rift Teleport Eye", armorStand))
+            RIFT_EYE_SKULL2 -> return MobResult.found(MobFactories.special(baseEntity, "Rift Teleport Eye", armorStand))
         }
         return null
     }
@@ -547,7 +547,7 @@ object MobFilter {
                 baseEntity, i
             )
         }.firstOrNull {
-            it != null && it.distanceTo(baseEntity) < 4.0 && it.inventory?.get(4)?.getSkullTexture() == RatSkull
+            it != null && it.distanceTo(baseEntity) < 4.0 && it.inventory?.get(4)?.getSkullTexture() == RAT_SKULL
         }?.let {
             MobResult.found(
                 Mob(

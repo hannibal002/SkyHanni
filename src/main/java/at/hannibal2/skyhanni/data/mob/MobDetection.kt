@@ -65,13 +65,14 @@ class MobDetection {
         MobFilter.bossMobNameFilter
         MobFilter.mobNameFilter
         MobFilter.dojoFilter
-        MobFilter.minionMobPrefix
         MobFilter.summonFilter
         MobFilter.dungeonNameFilter
         MobFilter.petCareNamePattern
         MobFilter.slayerNameFilter
         MobFilter.summonOwnerPattern
         MobFilter.wokeSleepingGolemPattern
+        MobFilter.jerryPattern
+        MobFilter.jerryMagmaCubePattern
     }
 
     private fun mobDetectionReset() {
