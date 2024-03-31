@@ -93,6 +93,11 @@ public class DungeonConfig {
     public TerracottaPhaseConfig terracottaPhase = new TerracottaPhaseConfig();
 
     @Expose
+    @ConfigOption(name = "Drag Prio", desc = "drag prio")
+    @Accordion
+    public DragPrioConfig dragPrio = new DragPrioConfig();
+
+    @Expose
     @ConfigOption(name = "Moving Skeleton Skulls", desc = "Highlight Skeleton Skulls when combining into an " +
         "orange Skeletor (not useful when combined with feature Hide Skeleton Skull).")
     @ConfigEditorBoolean
