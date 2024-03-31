@@ -69,7 +69,10 @@ class StereoHarmonyDisplay {
         val vinylName = vinyl.displayName
         val pestName = pest?.displayName ?: "None"
         list.add(Renderable.string("§ePlaying: §a$vinylName"))
-        list.add(Renderable.string("§ePest: §c$pestName"))
+        val pestLine = mutableListOf<Renderable>()
+        pestLine.add(Renderable.string("§ePest: §c$pestName "))
+        if (pest?.cropIcon != null && config.showCrop.get()) pestLine.add(Renderable.itemStack(pest.cropIcon))
+        list.add(Renderable.horizontalContainer(pestLine))
         add(Renderable.verticalContainer(list))
     }
 
@@ -91,6 +94,7 @@ class StereoHarmonyDisplay {
         if (!isEnabled()) return
         if (activeVinyl == VinylType.NONE && config.hideWhenNone) return
         else if (display.isEmpty()) update()
+        if (display.isEmpty()) return
         val content = Renderable.horizontalContainer(display, 3, verticalAlign = RenderUtils.VerticalAlignment.CENTER)
         val renderables = listOf(content)
         config.position.renderRenderables(renderables, posLabel = "Stereo Harmony Display")
@@ -103,7 +107,7 @@ class StereoHarmonyDisplay {
 
     @SubscribeEvent
     fun onConfigLoad(event: ConfigLoadEvent) {
-        ConditionalUtils.onToggle(config.showHead) { update() }
+        ConditionalUtils.onToggle(config.showHead, config.showCrop) { update() }
     }
 
     fun isEnabled() = GardenAPI.inGarden() && config.displayEnabled

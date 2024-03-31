@@ -24,6 +24,11 @@ public class StereoHarmonyConfig {
     public Property<Boolean> showHead = Property.of(true);
 
     @Expose
+    @ConfigOption(name = "Show Crop Icon", desc = "")
+    @ConfigEditorBoolean
+    public Property<Boolean> showCrop = Property.of(true);
+
+    @Expose
     @ConfigOption(
         name = "Hide when None",
         desc = "Hide when no vinyl selected."
