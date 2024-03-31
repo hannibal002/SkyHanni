@@ -12,11 +12,12 @@ import at.hannibal2.skyhanni.events.LorenzTickEvent
 import at.hannibal2.skyhanni.events.MobEvent
 import at.hannibal2.skyhanni.events.PacketEvent
 import at.hannibal2.skyhanni.utils.CollectionUtils.drainForEach
+import at.hannibal2.skyhanni.utils.CollectionUtils.drainTo
 import at.hannibal2.skyhanni.utils.CollectionUtils.put
 import at.hannibal2.skyhanni.utils.CollectionUtils.refreshReference
 import at.hannibal2.skyhanni.utils.EntityUtils
 import at.hannibal2.skyhanni.utils.LocationUtils
-import at.hannibal2.skyhanni.utils.LorenzDebug
+import at.hannibal2.skyhanni.utils.LorenzLogger
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.getLorenzVec
 import net.minecraft.client.Minecraft
@@ -32,7 +33,6 @@ import net.minecraft.network.play.server.S37PacketStatistics
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import net.minecraftforge.fml.common.network.FMLNetworkEvent
 import java.util.concurrent.ConcurrentLinkedQueue
-import java.util.concurrent.LinkedBlockingQueue
 import java.util.concurrent.atomic.AtomicBoolean
 
 private const val MAX_RETRIES = 20 * 5
@@ -58,6 +58,8 @@ class MobDetection {
     private val forceReset get() = !SkyHanniMod.feature.dev.mobDebug.enable
 
     private var shouldClear: AtomicBoolean = AtomicBoolean(false)
+
+    private val logger = LorenzLogger("mob/detection")
 
     init {
         MobFilter.bossMobNameFilter
@@ -129,7 +131,7 @@ class MobDetection {
     private fun getRetry(entity: EntityLivingBase) = MobData.retries[entity.entityId]
 
     /** @return always true */
-    private fun mobDetectionError(string: String) = LorenzDebug.log(MOB_DETECTION_LOG_PREFIX + string).let { true }
+    private fun mobDetectionError(string: String) = logger.log(string).let { true }
 
     /**@return a false means that it should try again (later)*/
     private fun entitySpawn(entity: EntityLivingBase, roughType: Mob.Type): Boolean {
@@ -288,7 +290,7 @@ class MobDetection {
         }
     }
 
-    private val entityUpdatePackets = LinkedBlockingQueue<Int>()
+    private val entityUpdatePackets = ConcurrentLinkedQueue<Int>()
     private val entitiesThatRequireUpdate = mutableSetOf<Int>() // needs to be distinct, therefore not using a queue
 
     /** Refreshes the references of the entities in entitiesThatRequireUpdate */
@@ -298,9 +300,7 @@ class MobDetection {
                 if (handleEntityUpdate(iterator.next())) iterator.remove()
             }
         }
-        while (entityUpdatePackets.isNotEmpty()) {
-            entitiesThatRequireUpdate.add(entityUpdatePackets.take())
-        }
+        entityUpdatePackets.drainTo(entitiesThatRequireUpdate)
     }
 
     private fun handleEntityUpdate(entityID: Int): Boolean {
@@ -329,18 +329,17 @@ class MobDetection {
 
     @SubscribeEvent
     fun onIslandChange(event: IslandChangeEvent) {
-        MobData.currentEntityLiving.remove(Minecraft.getMinecraft().thePlayer)
+        MobData.currentEntityLiving.remove(Minecraft.getMinecraft().thePlayer) // Fix for the Player
     }
 
     private val allEntitiesViaPacketId = mutableSetOf<Int>()
 
-    private fun addEntityUpdate(id: Int) {
+    private fun addEntityUpdate(id: Int) =
         if (allEntitiesViaPacketId.contains(id)) {
-            entityUpdatePackets.put(id)
+            entityUpdatePackets.add(id)
         } else {
             allEntitiesViaPacketId.add(id)
         }
-    }
 
     @SubscribeEvent
     fun onDisconnect(event: FMLNetworkEvent.ClientDisconnectionFromServerEvent) {
