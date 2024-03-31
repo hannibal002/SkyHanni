@@ -49,6 +49,7 @@ class DungeonDragonPriority {
         if (DungeonAPI.dungeonFloor != "M7") return
         if (!startPattern.matches(event.message)) return
         reset()
+        ChatUtils.debug("starting p5")
         startP5()
     }
 
@@ -71,17 +72,17 @@ class DungeonDragonPriority {
             val currentPower = getPower()
             when {
                 currentPower >= config.splitPower -> {
-                    ChatUtils.chat("power: $currentPower | split on all drags")
+                    ChatUtils.chat("Power: $currentPower | Split on all drags!")
                     return@runDelayed
                 }
 
                 currentPower >= config.easyPower -> {
-                    ChatUtils.chat("power: $currentPower | split on easy drags")
+                    ChatUtils.chat("Power: $currentPower | Split on easy drags!")
                     return@runDelayed
                 }
 
                 else -> {
-                    ChatUtils.chat("power: $currentPower | no split")
+                    ChatUtils.chat("Power: $currentPower | No split!")
                     return@runDelayed
                 }
             }
@@ -125,6 +126,7 @@ class DungeonDragonPriority {
     private fun trySpawnDragon(dragon: DragonInfo) {
         if (dragon.hasSpawned) return
         dragon.hasSpawned = true
+        ChatUtils.chat("${dragon.name} spawning")
         assignDrag(dragon)
         DelayedRun.runDelayed(8000.milliseconds) {
             dragon.hasSpawned = false
@@ -133,13 +135,16 @@ class DungeonDragonPriority {
 
     private fun assignDrag(dragon: DragonInfo) {
         when (DragonInfo.NONE) {
-            dragonOrder[0] -> dragonOrder[0] = dragon
+            dragonOrder[0] -> {
+                ChatUtils.chat("${dragon.name} is now dragon0")
+                dragonOrder[0] = dragon
+            }
             dragonOrder[1] -> {
+                ChatUtils.chat("${dragon.name} is now dragon1")
                 dragonOrder[1] = dragon
                 isSearching = false
                 determinePriority()
             }
-
             else -> return
         }
         if (config.showSingleDragons) {
@@ -154,6 +159,7 @@ class DungeonDragonPriority {
         val power = getPower()
         var split = 0
         val isEasy: Boolean = dragonOrder[0].isEasy && dragonOrder[1].isEasy
+        ChatUtils.chat("isEasy: $isEasy, ${dragonOrder[0].isEasy}, ${dragonOrder[1].isEasy}")
         when {
             power >= config.splitPower -> split = 1
             isEasy && power >= config.easyPower -> split = 1
@@ -168,6 +174,7 @@ class DungeonDragonPriority {
             archerDragon = dragonOrder[0]
         }
         displayDragons(berserkDragon, archerDragon, normalDrag, split)
+        ChatUtils.chat("${berserkDragon.name}, ${archerDragon.name}, ${normalDrag.name}, $split") //remove later
     }
 
     private fun displayDragons(
