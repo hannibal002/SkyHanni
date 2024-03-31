@@ -11,12 +11,13 @@ import at.hannibal2.skyhanni.events.InventoryFullyOpenedEvent
 import at.hannibal2.skyhanni.events.LorenzChatEvent
 import at.hannibal2.skyhanni.events.LorenzTickEvent
 import at.hannibal2.skyhanni.events.LorenzWorldChangeEvent
+import at.hannibal2.skyhanni.events.TabListUpdateEvent
 import at.hannibal2.skyhanni.utils.CollectionUtils.addOrPut
 import at.hannibal2.skyhanni.utils.CollectionUtils.equalsOneOf
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.ItemUtils.name
 import at.hannibal2.skyhanni.utils.LorenzUtils
-import at.hannibal2.skyhanni.utils.NumberUtil.formatNumber
+import at.hannibal2.skyhanni.utils.NumberUtil.formatLong
 import at.hannibal2.skyhanni.utils.NumberUtil.romanToDecimalIfNecessary
 import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
@@ -55,6 +56,18 @@ object DungeonAPI {
         "complete",
         "§.\\s+§.§.(?:The|Master Mode) Catacombs §.§.- §.§.(?:Floor )?(?<floor>M?[IV]{1,3}|Entrance)"
     )
+    private val blessingPattern by patternGroup.pattern(
+        "blessings",
+        "§r§r§fBlessing of (?<type>\\w+) (?<amount>\\w+)§r"
+    )
+
+    enum class DungeonBlessings(var power: Int) {
+        LIFE(0),
+        POWER(0),
+        STONE(0),
+        WISDOM(0),
+        TIME(0)
+    }
 
     fun inDungeon() = dungeonFloor != null
 
@@ -146,6 +159,24 @@ object DungeonAPI {
     }
 
     @SubscribeEvent
+    fun onTabUpdate(event: TabListUpdateEvent) {
+        if (!inDungeon()) return
+        val tabData = TabListData.getPlayerTabOverlay()
+        if (tabData.footer_skyhanni == null) return
+        val tabList = tabData.footer_skyhanni.formattedText.split("\n")
+        tabList.forEach {
+            val matcher = blessingPattern.matcher(it)
+            if (matcher.find()) {
+                val type = matcher.group("type") ?: return@forEach
+                val amount = matcher.group("amount").romanToDecimalIfNecessary()
+                if (DungeonBlessings.valueOf(type.uppercase()).power != amount) {
+                    DungeonBlessings.valueOf(type.uppercase()).power = amount
+                }
+            }
+        }
+    }
+
+    @SubscribeEvent
     fun onWorldChange(event: LorenzWorldChangeEvent) {
         dungeonFloor = null
         started = false
@@ -207,7 +238,7 @@ object DungeonAPI {
                         val lore = inventoryItems[4]?.getLore() ?: return
                         val line = lore.find { it.contains("Total Kills:") } ?: return
                         val kills = totalKillsPattern.matchMatcher(line) {
-                            group("kills").formatNumber().toInt()
+                            group("kills").formatLong().toInt()
                         } ?: return
                         bossCollections[floor] = kills
                     }
@@ -260,6 +291,12 @@ object DungeonAPI {
             add("playerClass: $playerClass")
             add("isUniqueClass: $isUniqueClass")
             add("playerClassLevel: $playerClassLevel")
+            add("")
+            add("Life: ${DungeonBlessings.LIFE.power}")
+            add("Stone: ${DungeonBlessings.STONE.power}")
+            add("Wisdom: ${DungeonBlessings.WISDOM.power}")
+            add("Power: ${DungeonBlessings.POWER.power}")
+            add("Time: ${DungeonBlessings.TIME.power}")
         }
     }
 
