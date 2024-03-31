@@ -62,7 +62,7 @@ object DungeonAPI {
         "§r§r§fBlessing of (?<type>\\w+) (?<amount>\\w+)§r"
     )
     private val noBlessingPattern by patternGroup.pattern(
-        "noBlessings",
+        "noblessings",
         "§r§r§7No Buffs active. Find them by exploring the Dungeon!§r"
     )
 
@@ -71,7 +71,13 @@ object DungeonAPI {
         POWER(0),
         STONE(0),
         WISDOM(0),
-        TIME(0)
+        TIME(0);
+
+        companion object {
+            fun reset() {
+                entries.forEach { it.power = 0 }
+            }
+        }
     }
 
     fun inDungeon() = dungeonFloor != null
@@ -169,9 +175,9 @@ object DungeonAPI {
         val tabData = TabListData.getPlayerTabOverlay()
         if (tabData.footer_skyhanni == null) return
         val tabList = tabData.footer_skyhanni.formattedText.split("\n")
-        tabList.forEach { it ->
+        tabList.forEach {
             if (noBlessingPattern.matches(it)) {
-                DungeonBlessings.entries.forEach { it.power = 0 }
+                DungeonBlessings.reset()
                 return
             }
             val matcher = blessingPattern.matcher(it)
