@@ -80,7 +80,7 @@ class HypixelData {
         )
         private val scoreboardTitlePattern by patternGroup.pattern(
             "scoreboard.title",
-            "SK[YI]BLOCK"
+            "SK[YI]BLOCK(?: CO-OP| GUEST)?"
         )
 
         var hypixelLive = false
@@ -123,6 +123,7 @@ class HypixelData {
 
         fun checkCurrentServerId() {
             if (!LorenzUtils.inSkyBlock) return
+            if (serverId != null) return
             if (LorenzUtils.lastWorldSwitch.passedSince() < 1.seconds) return
             if (!TabListData.fullyLoaded) return
 

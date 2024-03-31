@@ -17,6 +17,8 @@ object ModifyVisualWords {
 
     var modifiedWords = mutableListOf<VisualWord>()
 
+    val reverseRegex = "(§.|^|[\\s:()+-])([^§\\s:()+-]*)".toRegex()
+
     fun modifyText(originalText: String?): String? {
         var modifiedText = originalText ?: return null
         if (!LorenzUtils.onHypixel) return originalText
@@ -42,13 +44,18 @@ object ModifyVisualWords {
                 if (phrase.isEmpty()) continue
 
                 modifiedText = modifiedText.replace(
-                    phrase,
-                    modifiedWord.replacement.convertToFormatted(),
-                    modifiedWord.isCaseSensitive()
+                    phrase, modifiedWord.replacement.convertToFormatted(), modifiedWord.isCaseSensitive()
                 )
             }
         }
 
+        // Disabled, as its only a novelty for 30 seconds and will annoy after that everyone.
+
+//         if (LorenzUtils.isAprilFoolsDay && !FontRendererHook.cameFromChat && Random.nextDouble() < 0.02) {
+//             modifiedText = modifiedText.replace(reverseRegex) {
+//                 it.groupValues[1] + it.groupValues[2].reversed()
+//             }
+//         }
         textCache.put(originalText, modifiedText)
         return modifiedText
     }
