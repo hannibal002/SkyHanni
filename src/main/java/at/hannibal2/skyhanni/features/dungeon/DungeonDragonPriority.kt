@@ -121,33 +121,27 @@ class DungeonDragonPriority {
         particleList.add("```")
     }
 
-    private fun checkCoordinates(particle: Packet<*>, test: Boolean) {
+    private fun checkCoordinates(particle: Packet<*>) {
         if (particle !is S2APacketParticles) return
         val vec = particle.toLorenzVec()
         val x = vec.x.toInt()
         val y = vec.y.toInt()
         val z = vec.z.toInt()
-        if (y !in 14..19) {
-            particleList.add("vec: $vec, type: ${particle.particleType}")
-            return
-        }
+        if (y !in 14..19) return
         when (x) {
             in 27..32 -> {
                 when (z) {
-                    in 54..64 -> if (!test) trySpawnDragon(DragonInfo.POWER)
-                    in 89..99 -> if (!test) trySpawnDragon(DragonInfo.APEX)
-                    else -> particleList.add("vec: $vec, type: ${particle.particleType}")
+                    in 54..64 -> trySpawnDragon(DragonInfo.POWER)
+                    in 89..99 -> trySpawnDragon(DragonInfo.APEX)
                 }
             }
             in 79..85 -> {
                 when (z) {
-                    in 54..64 -> if (!test) trySpawnDragon(DragonInfo.FLAME)
-                    in 89..99 -> if (!test) trySpawnDragon(DragonInfo.ICE)
-                    else -> particleList.add("vec: $vec, type: ${particle.particleType}")
+                    in 54..64 -> trySpawnDragon(DragonInfo.FLAME)
+                    in 89..99 -> trySpawnDragon(DragonInfo.ICE)
                 }
             }
-            in 51..61 -> if (!test) trySpawnDragon(DragonInfo.SOUL)
-            else -> particleList.add("vec: $vec, type: ${particle.particleType}")
+            in 51..61 -> trySpawnDragon(DragonInfo.SOUL)
         }
     }
 
@@ -246,9 +240,9 @@ class DungeonDragonPriority {
         if (!isSearching) return
         if (!DungeonAPI.inDungeon()) return
         if (DungeonAPI.dungeonFloor != "M7") return
-        var test = false
-        if (event.packet.particleType != EnumParticleTypes.ENCHANTMENT_TABLE) test = true
-        checkCoordinates(event.packet, test)
+        if (event.packet.particleType != EnumParticleTypes.ENCHANTMENT_TABLE) return
+        particleList.add("${event.packet.toLorenzVec()}, type: ${event.packet.particleType}")
+        checkCoordinates(event.packet)
     }
 
     @SubscribeEvent
