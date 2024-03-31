@@ -105,6 +105,7 @@ import at.hannibal2.skyhanni.features.dungeon.DungeonChatFilter
 import at.hannibal2.skyhanni.features.dungeon.DungeonCleanEnd
 import at.hannibal2.skyhanni.features.dungeon.DungeonCopilot
 import at.hannibal2.skyhanni.features.dungeon.DungeonDeathCounter
+import at.hannibal2.skyhanni.features.dungeon.DungeonDragonPriority
 import at.hannibal2.skyhanni.features.dungeon.DungeonFinderFeatures
 import at.hannibal2.skyhanni.features.dungeon.DungeonHideItems
 import at.hannibal2.skyhanni.features.dungeon.DungeonHighlightClickedBlocks
@@ -806,6 +807,7 @@ class SkyHanniMod {
         loadModule(LimboPlaytime())
         loadModule(RareDropMessages())
         loadModule(CraftMaterialsFromBazaar())
+        loadModule(DungeonDragonPriority())
 
         init()
 
