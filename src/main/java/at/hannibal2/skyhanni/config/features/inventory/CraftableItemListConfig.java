@@ -11,7 +11,7 @@ public class CraftableItemListConfig {
     @Expose
     @ConfigOption(
         name = "Enabled",
-        desc = "Shows a list of items that can be crafted with the items in inventory. " +
+        desc = "Shows a list of items that can be crafted with the items in inventory when inside the crafting menu. " +
             "Click on the item to open §e/recipe§7."
     )
     @ConfigEditorBoolean
@@ -21,7 +21,7 @@ public class CraftableItemListConfig {
     @Expose
     @ConfigOption(
         name = "Include Sacks",
-        desc = "include items from inside the sacks.")
+        desc = "Include items from inside the sacks.")
     @ConfigEditorBoolean
     public boolean includeSacks = false;
 
