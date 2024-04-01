@@ -33,9 +33,13 @@ object FriendAPI {
         "addbest",
         ".*\n(?<name>.*)§a is now a best friend!§r§9§m\n.*"
     )
+    /**
+     * REGEX-TEST:
+     * §eClick here to view §bAaronL_Jackson§e's profile
+     */
     private val rawNamePattern by patternGroup.pattern(
         "rawname",
-        "\\n§eClick to view §.(?<name>.*)§e's profile"
+        "\\n§eClick here to view §.(?<name>.*)§e's profile"
     )
     private val readFriendListPattern by patternGroup.pattern(
         "readfriends",
