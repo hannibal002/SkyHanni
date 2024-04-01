@@ -427,16 +427,16 @@ interface Renderable {
             val renderables = content
 
             override val width = renderables.sumOf { it.width } + spacing * (renderables.size - 1)
-            override val height = renderables.maxOf { it.height }
+            override val height = renderables.maxOfOrNull { it.height } ?: 0
             override val horizontalAlign = horizontalAlign
             override val verticalAlign = verticalAlign
 
             override fun render(posX: Int, posY: Int) {
-                var xOffset = 0
+                var xOffset = posX
                 renderables.forEach {
-                    it.renderYAligned(xOffset, 0, height)
+                    it.renderYAligned(xOffset, posY, height)
                     xOffset += it.width + spacing
-                    GlStateManager.translate(it.width.toFloat(), 0f, 0f)
+                    GlStateManager.translate((it.width + spacing).toFloat(), 0f, 0f)
                 }
                 GlStateManager.translate(-width.toFloat() - spacing.toFloat(), 0f, 0f)
             }
@@ -472,13 +472,13 @@ interface Renderable {
         ) = object : Renderable {
             val renderables = content
 
-            override val width = renderables.maxOf { it.width }
+            override val width = renderables.maxOfOrNull { it.width } ?: 0
             override val height = renderables.sumOf { it.height } + spacing * (renderables.size - 1)
             override val horizontalAlign = horizontalAlign
             override val verticalAlign = verticalAlign
 
             override fun render(posX: Int, posY: Int) {
-                var yOffset = 0
+                var yOffset = posY
                 renderables.forEach {
                     it.renderXAligned(yOffset, posX, width)
                     yOffset += it.height + spacing

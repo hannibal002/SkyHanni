@@ -301,6 +301,7 @@ import at.hannibal2.skyhanni.features.misc.TabWidgetSettings
 import at.hannibal2.skyhanni.features.misc.TimeFeatures
 import at.hannibal2.skyhanni.features.misc.TpsCounter
 import at.hannibal2.skyhanni.features.misc.compacttablist.AdvancedPlayerList
+import at.hannibal2.skyhanni.features.misc.compacttablist.TabEditor
 import at.hannibal2.skyhanni.features.misc.compacttablist.TabListReader
 import at.hannibal2.skyhanni.features.misc.compacttablist.TabListRenderer
 import at.hannibal2.skyhanni.features.misc.discordrpc.DiscordRPCManager
@@ -586,6 +587,7 @@ class SkyHanniMod {
         loadModule(ThunderSparksHighlight())
         loadModule(BlazeSlayerDaggerHelper())
         loadModule(HellionShieldHelper())
+        loadModule(TabEditor())
         loadModule(BlazeSlayerFirePitsWarning())
         loadModule(BlazeSlayerClearView())
         loadModule(EndermanSlayerHideParticles())
@@ -778,7 +780,7 @@ class SkyHanniMod {
         loadModule(LockMouseLook)
         loadModule(SensitivityReducer)
         loadModule(DungeonFinderFeatures())
-        loadModule(TabWidgetSettings())
+        loadModule(TabWidgetSettings)
         loadModule(PabloHelper())
         loadModule(FishingBaitWarnings())
         loadModule(CustomScoreboard())
