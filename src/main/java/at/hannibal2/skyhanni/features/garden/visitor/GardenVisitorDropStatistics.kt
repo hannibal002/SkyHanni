@@ -1,8 +1,8 @@
 package at.hannibal2.skyhanni.features.garden.visitor
 
 import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
-import at.hannibal2.skyhanni.config.Storage
 import at.hannibal2.skyhanni.config.features.garden.visitor.DropsStatisticsConfig.DropsStatisticsTextEntry
+import at.hannibal2.skyhanni.config.storage.ProfileSpecificStorage
 import at.hannibal2.skyhanni.data.ProfileStorageData
 import at.hannibal2.skyhanni.events.ConfigLoadEvent
 import at.hannibal2.skyhanni.events.GuiRenderEvent
@@ -11,6 +11,7 @@ import at.hannibal2.skyhanni.events.ProfileJoinEvent
 import at.hannibal2.skyhanni.events.garden.visitor.VisitorAcceptEvent
 import at.hannibal2.skyhanni.features.garden.GardenAPI
 import at.hannibal2.skyhanni.test.command.ErrorManager
+import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.CollectionUtils.addAsSingletonList
 import at.hannibal2.skyhanni.utils.CollectionUtils.addOrPut
 import at.hannibal2.skyhanni.utils.CollectionUtils.editCopy
@@ -155,7 +156,7 @@ object GardenVisitorDropStatistics {
     /**
      * Do not change the order of the elements getting added to the list. See DropsStatisticsTextEntry for the order.
      */
-    private fun drawDisplay(storage: Storage.ProfileSpecific.GardenStorage.VisitorDrops) = buildList<List<Any>> {
+    private fun drawDisplay(storage: ProfileSpecificStorage.GardenStorage.VisitorDrops) = buildList<List<Any>> {
         addAsSingletonList("§e§lVisitor Statistics")
         addAsSingletonList(format(totalVisitors, "Total", "§e", ""))
         val visitorRarities = storage.visitorRarities
@@ -231,6 +232,26 @@ object GardenVisitorDropStatistics {
         storage.coinsSpent = coinsSpent
         storage.rewardsCount = rewardsCount
         display = formatDisplay(drawDisplay(storage))
+    }
+
+    fun resetCommand() {
+        val storage = GardenAPI.storage?.visitorDrops ?: return
+        ChatUtils.clickableChat("Click here to reset Visitor Drops Statistics.", onClick = {
+            acceptedVisitors = 0
+            deniedVisitors = 0
+            totalVisitors = 0
+            coinsSpent = 0
+            storage.copper = 0
+            storage.bits = 0
+            storage.farmingExp = 0
+            storage.gardenExp = 0
+            storage.gemstonePowder = 0
+            storage.mithrilPowder = 0
+            storage.visitorRarities = arrayListOf(0, 0, 0, 0, 0)
+            storage.rewardsCount = mapOf<VisitorReward, Int>()
+            ChatUtils.chat("Visitor Drop Statistics reset!")
+            saveAndUpdate()
+        })
     }
 
     @SubscribeEvent

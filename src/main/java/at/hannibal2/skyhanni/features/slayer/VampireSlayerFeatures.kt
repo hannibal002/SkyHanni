@@ -358,7 +358,7 @@ object VampireSlayerFeatures {
     }
 
     @SubscribeEvent
-    fun onParticle(event: ReceiveParticleEvent) {
+    fun onReceiveParticle(event: ReceiveParticleEvent) {
         if (!isEnabled()) return
         val loc = event.location
         EntityUtils.getEntitiesNearby<EntityOtherPlayerMP>(loc, 3.0).forEach {

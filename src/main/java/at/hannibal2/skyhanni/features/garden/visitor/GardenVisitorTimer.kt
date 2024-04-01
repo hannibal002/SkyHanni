@@ -98,6 +98,10 @@ class GardenVisitorTimer {
         loop@ for (line in TabListData.getTabList()) {
             timePattern.matchMatcher(line) {
                 val timeInfo = group("info").removeColor()
+                if (timeInfo == "Not Unlocked!") {
+                    display = "§cVisitors not unlocked!"
+                    return
+                }
                 if (timeInfo == "Queue Full!") {
                     queueFull = true
                     break@loop
@@ -202,7 +206,7 @@ class GardenVisitorTimer {
     }
 
     @SubscribeEvent
-    fun onBlockBreak(event: CropClickEvent) {
+    fun onCropClick(event: CropClickEvent) {
         if (!isEnabled()) return
         sixthVisitorArrivalTime -= 100.milliseconds
 

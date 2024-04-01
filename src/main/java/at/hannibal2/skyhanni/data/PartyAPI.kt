@@ -18,7 +18,7 @@ object PartyAPI {
     private val patternGroup = RepoPattern.group("data.party")
     private val youJoinedPartyPattern by patternGroup.pattern(
         "you.joined",
-        "§eYou have joined (?<name>.*)'s §eparty!"
+        "§eYou have joined (?<name>.*)'s? §eparty!"
     )
     private val othersJoinedPartyPattern by patternGroup.pattern(
         "others.joined",

@@ -1,6 +1,6 @@
 package at.hannibal2.skyhanni.features.garden.fortuneguide
 
-import at.hannibal2.skyhanni.config.Storage
+import at.hannibal2.skyhanni.config.storage.ProfileSpecificStorage
 import at.hannibal2.skyhanni.data.PetAPI
 import at.hannibal2.skyhanni.data.ProfileStorageData
 import at.hannibal2.skyhanni.events.GardenToolChangeEvent
@@ -183,7 +183,7 @@ object CaptureFarmingGear {
 
     private fun anita(
         items: Map<Int, ItemStack>,
-        storage: Storage.ProfileSpecific.GardenStorage.Fortune,
+        storage: ProfileSpecificStorage.GardenStorage.Fortune,
     ) {
         var level = -1
         for ((_, item) in items) {
@@ -205,7 +205,7 @@ object CaptureFarmingGear {
 
     private fun configurePlots(
         items: Map<Int, ItemStack>,
-        storage: Storage.ProfileSpecific.GardenStorage.Fortune,
+        storage: ProfileSpecificStorage.GardenStorage.Fortune,
     ) {
         var plotsUnlocked = 24
         for (slot in items) {
@@ -232,7 +232,7 @@ object CaptureFarmingGear {
 
     private fun skills(
         items: Map<Int, ItemStack>,
-        storage: Storage.ProfileSpecific.GardenStorage.Fortune,
+        storage: ProfileSpecificStorage.GardenStorage.Fortune,
     ) {
         for ((_, item) in items) {
             if (item.displayName.contains("Farming ")) {
