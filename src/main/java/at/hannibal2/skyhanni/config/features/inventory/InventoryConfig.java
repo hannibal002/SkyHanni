@@ -45,6 +45,10 @@ public class InventoryConfig {
     public ItemAbilityConfig itemAbilities = new ItemAbilityConfig();
 
     @Expose
+    @Category(name = "Craftable Item List", desc = "")
+    public CraftableItemListConfig craftableItemList = new CraftableItemListConfig();
+
+    @Expose
     @ConfigOption(name = "Not Clickable Items", desc = "")
     @Accordion
     public HideNotClickableConfig hideNotClickable = new HideNotClickableConfig();
