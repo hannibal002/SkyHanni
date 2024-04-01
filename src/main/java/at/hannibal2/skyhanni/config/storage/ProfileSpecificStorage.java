@@ -231,6 +231,9 @@ public class ProfileSpecificStorage {
         public Map<CropType, LorenzVec> cropStartLocations = new HashMap<>();
 
         @Expose
+        public Map<CropType, LorenzVec> cropLastFarmedLocations = new HashMap<>();
+
+        @Expose
         public Map<CropType, FarmingLane> farmingLanes = new HashMap<>();
 
         @Expose
