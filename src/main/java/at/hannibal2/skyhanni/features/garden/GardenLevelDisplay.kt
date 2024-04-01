@@ -50,7 +50,7 @@ class GardenLevelDisplay {
     )
     private val gardenMaxLevelPattern by patternGroup.pattern(
         "inventory.max",
-        "§7§8Max level reached!"
+        "§5§o§7§8Max level reached!"
     )
     private val visitorRewardPattern by patternGroup.pattern(
         "chat.increase",
