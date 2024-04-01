@@ -11,6 +11,7 @@ import at.hannibal2.skyhanni.utils.CollectionUtils.put
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.SimpleTimeMark.Companion.asTimeMark
+import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import io.github.moulberry.notenoughupdates.util.SkyBlockTime
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -20,6 +21,12 @@ import kotlin.time.Duration
 import kotlin.time.Duration.Companion.minutes
 
 object MayorAPI {
+
+    val foxyExtraEventPattern by RepoPattern.pattern(
+        "mayorapi.foxy.extraevent",
+        "Schedules an extra §.(?<event>.*) §.event during the year\\."
+    )
+
     var lastUpdate = SimpleTimeMark.farPast()
     private var dispatcher = Dispatchers.IO
 

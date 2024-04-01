@@ -1,7 +1,7 @@
 package at.hannibal2.skyhanni.config.features.garden;
 
 import at.hannibal2.skyhanni.config.FeatureToggle;
-import at.hannibal2.skyhanni.features.garden.inventory.GardenPlotIcon;
+import at.hannibal2.skyhanni.features.garden.inventory.plots.GardenPlotIcon;
 import at.hannibal2.skyhanni.utils.ChatUtils;
 import com.google.gson.annotations.Expose;
 import io.github.moulberry.moulconfig.annotations.ConfigEditorBoolean;
