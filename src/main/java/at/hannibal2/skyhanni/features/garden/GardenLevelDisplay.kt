@@ -1,6 +1,7 @@
 package at.hannibal2.skyhanni.features.garden
 
 import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
+import at.hannibal2.skyhanni.data.ProfileStorageData
 import at.hannibal2.skyhanni.events.ConfigLoadEvent
 import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.InventoryFullyOpenedEvent
@@ -13,6 +14,7 @@ import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.ItemUtils.name
 import at.hannibal2.skyhanni.utils.LorenzUtils
+import at.hannibal2.skyhanni.utils.LorenzUtils.groupOrNull
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.NumberUtil.format
 import at.hannibal2.skyhanni.utils.NumberUtil.formatLong
@@ -20,6 +22,7 @@ import at.hannibal2.skyhanni.utils.NumberUtil.romanToDecimalIfNecessary
 import at.hannibal2.skyhanni.utils.NumberUtil.toRoman
 import at.hannibal2.skyhanni.utils.RenderUtils.renderString
 import at.hannibal2.skyhanni.utils.StringUtils
+import at.hannibal2.skyhanni.utils.StringUtils.isRoman
 import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.StringUtils.matches
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
@@ -30,6 +33,11 @@ import kotlin.time.Duration.Companion.milliseconds
 class GardenLevelDisplay {
 
     private val config get() = GardenAPI.config.gardenLevels
+    private var useRomanNumerals: Boolean
+        get() = ProfileStorageData.playerSpecific?.useRomanNumerals ?: true
+        set(value) {
+            ProfileStorageData.playerSpecific?.useRomanNumerals = value
+        }
 
     private val patternGroup = RepoPattern.group("garden.level")
     private val expToNextLevelPattern by patternGroup.pattern(
@@ -101,7 +109,10 @@ class GardenLevelDisplay {
             "SkyBlock Menu" -> event.inventoryItems[10] ?: return
             else -> return
         }
-        gardenItemNamePattern.matchMatcher(item.name.removeColor()) {} ?: return
+        gardenItemNamePattern.matchMatcher(item.name.removeColor()) {
+            val level = groupOrNull("currentLevel")
+            if (level != null) useRomanNumerals = level.isRoman()
+        } ?: return
         var nextLevelExp = 0L
         var currentLevel = 0
         for (line in item.getLore()) {
@@ -144,11 +155,11 @@ class GardenLevelDisplay {
         val needForOnlyNextLvl = needForNextLevel - needForLevel
 
         val iterator = event.toolTip.listIterator()
-        if (slotIndex == 4 && currentLevel > 15) event.itemStack.name = "§aGarden Level ${currentLevel.toRoman()}"
+        if (slotIndex == 4 && currentLevel > 15) event.itemStack.name = "§aGarden Level ${currentLevel.toRomanIfNecessary()}"
         var next = false
         for (line in iterator) {
             if (gardenMaxLevelPattern.matches(line)) {
-                iterator.set("§7Progress to Level ${(currentLevel+1).toRoman()}")
+                iterator.set("§7Progress to Level ${(currentLevel+1).toRomanIfNecessary()}")
                 next = true
                 continue
             }
@@ -182,6 +193,10 @@ class GardenLevelDisplay {
             val needForOnlyNextLevel = needForNextLevel - needForLevel
             "§7(§e${overflow.addSeparators()}§7/§e${needForOnlyNextLevel.addSeparators()}§7)"
         }
+    }
+
+    private fun Int.toRomanIfNecessary(): String {
+        return if (useRomanNumerals) this.toRoman() else this.toString()
     }
 
     @SubscribeEvent
