@@ -16,6 +16,7 @@ import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import at.hannibal2.skyhanni.utils.toLorenzVec
 import net.minecraft.network.Packet
 import net.minecraft.network.play.server.S2APacketParticles
+import net.minecraft.util.EnumParticleTypes
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import kotlin.time.Duration.Companion.milliseconds
 
@@ -127,14 +128,17 @@ class DungeonDragonPriority {
         if (y !in 15..22) return
         DragonInfo.entries.forEach{
             if (!it.hasSpawned && (x in it.xRange && z in it.zRange)) {
-                particleList.add("${particle.toLorenzVec()}, type: ${particle.particleType}")
-                trySpawnDragon(it)
+                if (particle.particleType == EnumParticleTypes.FLAME) {
+                    particleList.add("${particle.toLorenzVec()}, type: ${particle.particleType}, FOUND ${it.name}")
+                    trySpawnDragon(it)
+                } else {
+                    particleList.add("${particle.toLorenzVec()}, type: ${particle.particleType}")
+                }
             }
         }
     }
 
     private fun trySpawnDragon(dragon: DragonInfo) {
-        if (dragon.hasSpawned) return
         ChatUtils.chat("try spawning ${dragon.name}")
         dragon.hasSpawned = true
         assignDrag(dragon)
