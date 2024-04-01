@@ -4,12 +4,11 @@ import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.config.features.dungeon.DragPrioConfig
 import at.hannibal2.skyhanni.events.DebugDataCollectEvent
 import at.hannibal2.skyhanni.events.DungeonCompleteEvent
-import at.hannibal2.skyhanni.events.DungeonStartEvent
 import at.hannibal2.skyhanni.events.LorenzChatEvent
 import at.hannibal2.skyhanni.events.PacketEvent
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.DelayedRun
-import at.hannibal2.skyhanni.utils.LorenzUtils
+import at.hannibal2.skyhanni.utils.LorenzColor
 import at.hannibal2.skyhanni.utils.OSUtils
 import at.hannibal2.skyhanni.utils.StringUtils.matches
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
@@ -35,14 +34,15 @@ class DungeonDragonPriority {
         val isEasy: Boolean,
         val priority: IntArray,
         val xRange: ClosedRange<Int>,
-        val zRange: ClosedRange<Int>
+        val zRange: ClosedRange<Int>,
+        val colorCode: LorenzColor
     ) {
-        POWER("Red", false, false, intArrayOf(1, 3), 24..30, 56..62),
-        FLAME("Orange", false, true, intArrayOf(2, 1), 82..88, 56..62),
-        APEX("Green", false, true, intArrayOf(5, 2), 24..30, 91..97),
-        ICE("Blue", false, false, intArrayOf(3, 4), 82..88, 91..97),
-        SOUL("Purple", false, true, intArrayOf(4, 5), 53..59, 122..128),
-        NONE("None", false, false, intArrayOf(0, 0), 0..0, 0..0);
+        POWER("Red", false, false, intArrayOf(1, 3), 24..30, 56..62, LorenzColor.RED),
+        FLAME("Orange", false, true, intArrayOf(2, 1), 82..88, 56..62, LorenzColor.GOLD),
+        APEX("Green", false, true, intArrayOf(5, 2), 24..30, 91..97, LorenzColor.GREEN),
+        ICE("Blue", false, false, intArrayOf(3, 4), 82..88, 91..97, LorenzColor.AQUA),
+        SOUL("Purple", false, true, intArrayOf(4, 5), 53..59, 122..128, LorenzColor.LIGHT_PURPLE),
+        NONE("None", false, false, intArrayOf(0, 0), 0..0, 0..0, LorenzColor.CHROMA);
 
         companion object {
             fun clearSpawned() {
@@ -89,23 +89,12 @@ class DungeonDragonPriority {
         DelayedRun.runDelayed(2000.milliseconds) {
             val currentPower = getPower()
             when {
-                currentPower >= config.splitPower -> {
-                    ChatUtils.chat("Power: $currentPower | Split on all drags!")
-                    return@runDelayed
-                }
-
-                currentPower >= config.easyPower -> {
-                    ChatUtils.chat("Power: $currentPower | Split on easy drags!")
-                    return@runDelayed
-                }
-
-                else -> {
-                    ChatUtils.chat("Power: $currentPower | No split!")
-                    return@runDelayed
-                }
+                currentPower >= config.splitPower ->  ChatUtils.chat("Power: $currentPower | Split on all drags!")
+                currentPower >= config.easyPower -> ChatUtils.chat("Power: $currentPower | Split on easy drags!")
+                else -> ChatUtils.chat("Power: $currentPower | No split!")
             }
         }
-        ChatUtils.chat("searching")
+        ChatUtils.debug("searching for particles")
         isSearching = true
     }
 
@@ -139,7 +128,7 @@ class DungeonDragonPriority {
     }
 
     private fun trySpawnDragon(dragon: DragonInfo) {
-        ChatUtils.chat("try spawning ${dragon.name}")
+        ChatUtils.debug("try spawning ${dragon.name}")
         dragon.hasSpawned = true
         assignDrag(dragon)
         DelayedRun.runDelayed(8000.milliseconds) {
@@ -150,11 +139,11 @@ class DungeonDragonPriority {
     private fun assignDrag(dragon: DragonInfo) {
         when (DragonInfo.NONE) {
             dragonOrder[0] -> {
-                ChatUtils.chat("${dragon.name} is now dragon0")
+                ChatUtils.debug("${dragon.name} is now dragon0")
                 dragonOrder[0] = dragon
             }
             dragonOrder[1] -> {
-                ChatUtils.chat("${dragon.name} is now dragon1")
+                ChatUtils.debug("${dragon.name} is now dragon1")
                 dragonOrder[1] = dragon
                 isSearching = false
                 determinePriority()
@@ -162,7 +151,7 @@ class DungeonDragonPriority {
             else -> return
         }
         if (config.showSingleDragons) {
-            ChatUtils.chat("${dragon.color} is spawning")
+            ChatUtils.debug("${dragon.color} is spawning")
         }
     }
 
@@ -170,10 +159,11 @@ class DungeonDragonPriority {
         val normalDrag = if (dragonOrder[0].priority[0] < dragonOrder[1].priority[0]) {
             dragonOrder[0]
         } else dragonOrder[1]
+        ChatUtils.debug("$normalDrag is now normaldragon")
         val power = getPower()
         var split = 0
         val isEasy: Boolean = dragonOrder[0].isEasy && dragonOrder[1].isEasy
-        ChatUtils.chat("isEasy: $isEasy, ${dragonOrder[0].isEasy}, ${dragonOrder[1].isEasy}")
+        ChatUtils.debug("isEasy: $isEasy")
         when {
             power >= config.splitPower -> split = 1
             isEasy && power >= config.easyPower -> split = 1
@@ -188,7 +178,6 @@ class DungeonDragonPriority {
             archerDragon = dragonOrder[0]
         }
         displayDragons(berserkDragon, archerDragon, normalDrag, split)
-        ChatUtils.chat("${berserkDragon.name}, ${archerDragon.name}, ${normalDrag.name}, $split") //remove later
     }
 
     private fun displayDragons(
@@ -199,30 +188,29 @@ class DungeonDragonPriority {
     ) {
         val purple = DragonInfo.SOUL in dragonOrder
         if (split == 1) {
-            ChatUtils.chat("Berserk Team: ${berserkDragon.color}")
-            ChatUtils.chat("Archer Team: ${archerDragon.color}")
+            ChatUtils.chat("Berserk Team: ${berserkDragon.color} (send in pc)")
+            ChatUtils.chat("Archer Team: ${archerDragon.color} (send in pc)")
         }
         if (split == 0) {
-            ChatUtils.chat("${normalDrag.color} is spawning!")
+            ChatUtils.chat("§${normalDrag.colorCode.chatColorCode}${normalDrag.name}§f is Spawning! (title)")
         } else {
             if (inBerserkTeam || (purple && (
                         (isHealer && config.healerPurple == DragPrioConfig.HealerPurpleValue.BERSERK)
                                 || (isTank && config.tankPurple == DragPrioConfig.TankPurpleValue.BERSERK)))
-            ) {
-                ChatUtils.chat("$berserkDragon is Spawning!!")
-            } else {
-                ChatUtils.chat("$archerDragon is Spawning!!")
-            }
+            ) ChatUtils.chat("§${berserkDragon.colorCode.chatColorCode}${berserkDragon.name}§f is Spawning! (title)")
+            else ChatUtils.chat("§${archerDragon.colorCode.chatColorCode}${archerDragon.name}§f is Spawning! (title)")
         }
     }
 
     @SubscribeEvent
     fun onDungeonEnd(event: DungeonCompleteEvent) {
-        if (isSearching) ChatUtils.chat("no longer searching")
+        if (!isSearching) return
+        ChatUtils.debug("no longer searching for particles")
         isSearching = false
         val output = particleList.joinToString("\n")
-        ChatUtils.clickableChat("click here to give me all the particles",
-            { OSUtils.copyToClipboard(output); ChatUtils.chat("copied") })
+        particleList.clear()
+        if (SkyHanniMod.feature.dev.debug.enabled) ChatUtils.clickableChat("Click to copy particle data from this run.",
+            { OSUtils.copyToClipboard(output); ChatUtils.chat("Copied to clipboard") })
     }
 
     @SubscribeEvent
@@ -235,21 +223,9 @@ class DungeonDragonPriority {
     }
 
     @SubscribeEvent
-    fun onDungeon(event: DungeonStartEvent) {
-        if (DungeonAPI.dungeonFloor != "F1") return
-        if (isSearching) return
-        ChatUtils.chat("searching")
-        isSearching = true
-    }
-
-    @SubscribeEvent
     fun onDebugCollect(event: DebugDataCollectEvent) {
-        event.title("DragPrio")
-        if (!LorenzUtils.inDungeons) {
-            event.addIrrelevant("not in dungeons")
-            return
-        }
-        if (DungeonAPI.dungeonFloor != "M7") {
+        event.title("Dragon Priority")
+        if (!DungeonAPI.inDungeon() || DungeonAPI.dungeonFloor != "M7") {
             event.addIrrelevant("not in m7")
             return
         }
