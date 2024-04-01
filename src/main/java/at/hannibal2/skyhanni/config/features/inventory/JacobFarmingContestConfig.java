@@ -23,7 +23,7 @@ public class JacobFarmingContestConfig {
     @Expose
     @ConfigOption(name = "Open On Elite", desc = "Opens the contest on §eelitebot.dev§7 when pressing this key in Jacob's menu or the calendar.")
     @ConfigEditorKeybind(defaultKey = Keyboard.KEY_NONE)
-    public int openOnline = Keyboard.KEY_NONE;
+    public int openOnElite = Keyboard.KEY_NONE;
 
     @Expose
     @ConfigOption(name = "Medal Icon", desc = "Adds a symbol that shows what medal you received in this Contest. " +
