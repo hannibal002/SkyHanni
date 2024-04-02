@@ -152,23 +152,15 @@ class DungeonDragonPriority {
 
     private fun determinePriority() {
         val power = getPower()
-        var split = 0
         val isEasy: Boolean = dragonOrder[0].isEasy && dragonOrder[1].isEasy
+        val split = if ((!isEasy && power >= config.splitPower) || (isEasy && power >= config.easyPower)) 1 else 0
 
         ChatUtils.debug("isEasy: $isEasy")
-        when {
-            !isEasy && power >= config.splitPower -> split = 1
-            isEasy && power >= config.easyPower -> split = 1
-        }
         ChatUtils.debug("split = $split")
-        val berserkDragon: DragonInfo
-        val archerDragon: DragonInfo
-        if (dragonOrder[0].priority[split] < dragonOrder[1].priority[split]) {
-            berserkDragon = dragonOrder[0]
-            archerDragon = dragonOrder[1]
+        val (berserkDragon, archerDragon) = if (dragonOrder[0].priority[split] < dragonOrder[1].priority[split]) {
+            dragonOrder[0] to dragonOrder[1]
         } else {
-            berserkDragon = dragonOrder[1]
-            archerDragon = dragonOrder[0]
+            dragonOrder[1] to dragonOrder[0]
         }
         displayDragons(berserkDragon, archerDragon, split)
     }
