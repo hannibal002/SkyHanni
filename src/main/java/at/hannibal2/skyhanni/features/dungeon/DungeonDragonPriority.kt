@@ -17,9 +17,11 @@ import at.hannibal2.skyhanni.utils.RenderUtils.renderString
 import at.hannibal2.skyhanni.utils.StringUtils.matches
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import at.hannibal2.skyhanni.utils.toLorenzVec
+import net.minecraft.entity.boss.EntityDragon
 import net.minecraft.network.Packet
 import net.minecraft.network.play.server.S2APacketParticles
 import net.minecraft.util.EnumParticleTypes
+import net.minecraftforge.event.entity.EntityJoinWorldEvent
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.milliseconds
@@ -36,7 +38,7 @@ class DungeonDragonPriority {
 
     enum class DragonInfo(
         val color: String,
-        var hasSpawned: Boolean,
+        var isSpawning: Boolean,
         val isEasy: Boolean,
         val priority: IntArray,
         val xRange: ClosedRange<Int>,
@@ -52,12 +54,12 @@ class DungeonDragonPriority {
 
         companion object {
             fun clearSpawned() {
-                entries.forEach { it.hasSpawned = false }
+                entries.forEach { it.isSpawning = false }
             }
 
             fun getSpawnedAmount(): Int {
                 var spawned = 0
-                entries.forEach { if (it.hasSpawned) spawned += 1 }
+                entries.forEach { if (it.isSpawning) spawned += 1 }
                 return spawned
             }
         }
@@ -127,13 +129,13 @@ class DungeonDragonPriority {
         val z = vec.z.toInt()
         if (y !in 15..22) return
         DragonInfo.entries.forEach {
-            if (!it.hasSpawned && (x in it.xRange && z in it.zRange)) assignDragon(it)
+            if (!it.isSpawning && (x in it.xRange && z in it.zRange)) assignDragon(it)
         }
     }
 
     private fun assignDragon(dragon: DragonInfo) {
         ChatUtils.debug("try spawning ${dragon.name}")
-        dragon.hasSpawned = true
+        dragon.isSpawning = true
         when (DragonInfo.NONE) {
             dragonOrder[0] -> {
                 ChatUtils.debug("${dragon.name} is now dragon0")
@@ -244,6 +246,17 @@ class DungeonDragonPriority {
         if (DungeonAPI.dungeonFloor != "M7") return
         if (titleString == "") return
         config.dragonSpawnedPosition.renderString(titleString, posLabel = "Dragon Priority Title")
+    }
+
+    @SubscribeEvent
+    fun onDragonSpawn(event: EntityJoinWorldEvent) {
+        if (!isSearching) return
+        if (event.entity !is EntityDragon) return
+        val x = event.entity.posX.toInt()
+        val z = event.entity.posX.toInt()
+        DragonInfo.entries.forEach {
+            if (x in it.xRange && z in it.zRange) it.isSpawning = false
+        }
     }
 
     private fun getPower(): Double {
