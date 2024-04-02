@@ -5,8 +5,10 @@ import at.hannibal2.skyhanni.config.core.config.Position;
 import com.google.gson.annotations.Expose;
 import io.github.moulberry.moulconfig.annotations.ConfigEditorBoolean;
 import io.github.moulberry.moulconfig.annotations.ConfigEditorDropdown;
+import io.github.moulberry.moulconfig.annotations.ConfigEditorKeybind;
 import io.github.moulberry.moulconfig.annotations.ConfigEditorSlider;
 import io.github.moulberry.moulconfig.annotations.ConfigOption;
+import org.lwjgl.input.Keyboard;
 
 public class DragPrioConfig {
     @Expose
@@ -161,4 +163,10 @@ public class DragPrioConfig {
         @Override
         public String toString() { return str; }
     }
+
+    @Expose
+    @ConfigOption(name = "Toggle Hotkey", desc = "Press this key to quickly toggle between Normal and Split modes." +
+            "\n§eRequires the relevant above settings to be toggled")
+    @ConfigEditorKeybind(defaultKey = Keyboard.KEY_NONE)
+    public int keyBindToggleModes = Keyboard.KEY_NONE;
 }

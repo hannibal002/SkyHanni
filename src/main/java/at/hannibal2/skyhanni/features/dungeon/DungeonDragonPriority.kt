@@ -8,16 +8,20 @@ import at.hannibal2.skyhanni.events.DebugDataCollectEvent
 import at.hannibal2.skyhanni.events.DungeonCompleteEvent
 import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.LorenzChatEvent
+import at.hannibal2.skyhanni.events.LorenzKeyPressEvent
 import at.hannibal2.skyhanni.events.PacketEvent
-import at.hannibal2.skyhanni.test.DebugCommand
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.DelayedRun
 import at.hannibal2.skyhanni.utils.LorenzColor
+import at.hannibal2.skyhanni.utils.NEUItems
 import at.hannibal2.skyhanni.utils.OSUtils
 import at.hannibal2.skyhanni.utils.RenderUtils.renderString
+import at.hannibal2.skyhanni.utils.SimpleTimeMark
+import at.hannibal2.skyhanni.utils.SoundUtils
 import at.hannibal2.skyhanni.utils.StringUtils.matches
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import at.hannibal2.skyhanni.utils.toLorenzVec
+import net.minecraft.client.Minecraft
 import net.minecraft.entity.boss.EntityDragon
 import net.minecraft.network.Packet
 import net.minecraft.network.play.server.S2APacketParticles
@@ -74,6 +78,9 @@ class DungeonDragonPriority {
     private var isSearching = false
     private val particleList = mutableListOf<String>()
     private var titleString = ""
+
+    private var shouldSplit = true
+    private var keyBindCoolDown = SimpleTimeMark.now()
 
     private var dragonOrder = arrayOf(DragonInfo.NONE, DragonInfo.NONE)
 
@@ -177,10 +184,12 @@ class DungeonDragonPriority {
     private fun determinePriority() {
         val power = getPower()
         val isEasy: Boolean = dragonOrder[0].isEasy && dragonOrder[1].isEasy
-        val split = if ((!isEasy && power >= config.splitPower) || (isEasy && power >= config.easyPower)) 1 else 0
+        val trySplit = if ((!isEasy && power >= config.splitPower) || (isEasy && power >= config.easyPower)) 1 else 0
 
         ChatUtils.debug("isEasy: $isEasy")
-        ChatUtils.debug("split = $split")
+        ChatUtils.debug("trySplit = $trySplit")
+        ChatUtils.debug("shouldSplit = $shouldSplit")
+        val split = if (!shouldSplit) trySplit else 0
         val (berserkDragon, archerDragon) = if (dragonOrder[0].priority[split] < dragonOrder[1].priority[split]) {
             dragonOrder[0] to dragonOrder[1]
         } else {
@@ -200,16 +209,12 @@ class DungeonDragonPriority {
             ChatUtils.chat("Berserk Team: ${berserkDragon.color} (send in pc)")
             ChatUtils.chat("Archer Team: ${archerDragon.color} (send in pc)")
         }
-        if (DragonInfo.getSpawnedAmount() <= 2) {
-            if (inBerserkTeam || (purple && (
-                        (isHealer && config.healerPurple == DragPrioConfig.HealerPurpleValue.BERSERK)
-                                || (isTank && config.tankPurple == DragPrioConfig.TankPurpleValue.BERSERK)))
-            ) sendTitle("§${berserkDragon.colorCode}${berserkDragon.color.uppercase()} is Spawning!")
-            else sendTitle("§${archerDragon.colorCode}${archerDragon.color.uppercase()} is Spawning!")
-        } else {
-            ChatUtils.chat("§cping me if you see this message")
-            DebugCommand.command(arrayOf("Dragon Priority"))
-        }
+
+        if (inBerserkTeam || (purple && (
+                    (isHealer && config.healerPurple == DragPrioConfig.HealerPurpleValue.BERSERK)
+                            || (isTank && config.tankPurple == DragPrioConfig.TankPurpleValue.BERSERK)))
+        ) sendTitle("§${berserkDragon.colorCode}${berserkDragon.color.uppercase()} is Spawning!")
+        else sendTitle("§${archerDragon.colorCode}${archerDragon.color.uppercase()} is Spawning!")
     }
 
     @SubscribeEvent
@@ -275,6 +280,7 @@ class DungeonDragonPriority {
 
     @SubscribeEvent
     fun onDragonSpawn(event: EntityJoinWorldEvent) {
+        if (!config.enabled) return
         if (!isSearching) return
         if (event.entity !is EntityDragon) return
         val x = event.entity.posX.toInt()
@@ -282,6 +288,27 @@ class DungeonDragonPriority {
         DragonInfo.entries.forEach {
             if (x in it.xRange && z in it.zRange) it.isSpawning = false
         }
+    }
+
+    @SubscribeEvent
+    fun onKeyClick(event: LorenzKeyPressEvent) {
+        if (!config.enabled) return
+        if (event.keyCode != config.keyBindToggleModes) return
+        if (Minecraft.getMinecraft().currentScreen != null) return
+        if (NEUItems.neuHasFocus()) return
+        if (!DungeonAPI.inDungeon()) return
+        if (DungeonAPI.dungeonFloor != "M7") return
+        if (keyBindCoolDown.passedSince() < 1.seconds) return
+        keyBindCoolDown = SimpleTimeMark.now()
+
+        if (shouldSplit) {
+            shouldSplit = false
+            ChatUtils.chat("Now in Normal Priority mode!")
+        } else {
+            shouldSplit = true
+            ChatUtils.chat("Now in Split Priority mode!")
+        }
+        SoundUtils.playPlingSound()
     }
 
     private fun getPower(): Double {
