@@ -87,7 +87,7 @@ enum class ChunkedStats(
     ),
     COLD(
         {
-            "§b${getCold()}"
+            "§b${getCold()} ❄"
         },
         {
             !(hideEmptyLines && getCold() == "0") && ScoreboardElement.COLD.showWhen()
