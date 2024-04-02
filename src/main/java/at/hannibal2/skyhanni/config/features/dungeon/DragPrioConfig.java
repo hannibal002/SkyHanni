@@ -48,8 +48,8 @@ public class DragPrioConfig {
     public boolean saySplit = true;
 
     @Expose
-    @ConfigOption(name = "Healer", desc = "Set the team the healer should be with")
-    @ConfigEditorDropdown
+//    @ConfigOption(name = "Healer", desc = "Set the team the healer should be with")
+//    @ConfigEditorDropdown
     public HealerNormalValue healerNormal = HealerNormalValue.ARCHER;
 
     public enum HealerNormalValue {
@@ -67,8 +67,8 @@ public class DragPrioConfig {
     }
 
     @Expose
-    @ConfigOption(name = "Tank", desc = "Set the team the tank should be with")
-    @ConfigEditorDropdown
+//    @ConfigOption(name = "Tank", desc = "Set the team the tank should be with")
+//    @ConfigEditorDropdown
     public TankNormalValue tankNormal = TankNormalValue.ARCHER;
 
     public enum TankNormalValue {

@@ -166,14 +166,14 @@ class DungeonDragonPriority {
         displayDragons(berserkDragon, archerDragon, split)
     }
 
-    private fun displayDragons(
+    private fun displayDragons( //TODO: cleanup this
         berserkDragon: DragonInfo,
         archerDragon: DragonInfo,
         split: Int
     ) {
         val purple = DragonInfo.SOUL in dragonOrder
         ChatUtils.debug("berserkDragon: ${berserkDragon.name} | archerDragon: ${archerDragon.name}")
-        if (split == 1 && config.saySplit) {
+        if (split == 1 && config.sendMessage) {
             ChatUtils.chat("Berserk Team: ${berserkDragon.color} (send in pc)")
             ChatUtils.chat("Archer Team: ${archerDragon.color} (send in pc)")
         }
