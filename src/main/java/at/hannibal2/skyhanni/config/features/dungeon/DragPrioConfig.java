@@ -9,6 +9,11 @@ import io.github.moulberry.moulconfig.annotations.ConfigOption;
 
 public class DragPrioConfig {
     @Expose
+    @ConfigOption(name = "Enabled", desc = "Enables the feature.")
+    @ConfigEditorBoolean
+    public boolean enabled = false;
+
+    @Expose
     @ConfigOption(name = "Set Power", desc = "Set the power that you split on.")
     @ConfigEditorSlider(
             minValue = 0,

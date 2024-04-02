@@ -73,6 +73,7 @@ class DungeonDragonPriority {
 
     @SubscribeEvent
     fun onChat(event: LorenzChatEvent) {
+        if (!config.enabled) return
         if (!DungeonAPI.inDungeon()) return
         if (DungeonAPI.dungeonFloor != "M7") return
         if (!startPattern.matches(event.message)) return
@@ -191,6 +192,7 @@ class DungeonDragonPriority {
 
     @SubscribeEvent
     fun onParticle(event: PacketEvent.ReceiveEvent) {
+        if (!config.enabled) return
         if (!DungeonAPI.inDungeon()) return
         if (DungeonAPI.dungeonFloor != "M7") return
         if (!isSearching) return
@@ -201,6 +203,7 @@ class DungeonDragonPriority {
 
     @SubscribeEvent
     fun onDungeonEnd(event: DungeonCompleteEvent) {
+        if (!config.enabled) return
         if (!isSearching) return
         isSearching = false
     }
@@ -235,6 +238,7 @@ class DungeonDragonPriority {
 
     @SubscribeEvent
     fun onRender(event: GuiRenderEvent.GuiOverlayRenderEvent) {
+        if (!config.enabled) return
         if (!DungeonAPI.inDungeon()) return
         if (DungeonAPI.dungeonFloor != "M7") return
         if (titleString == "") return
