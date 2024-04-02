@@ -126,12 +126,12 @@ class DungeonDragonPriority {
             if (!it.hasSpawned && (x in it.xRange && z in it.zRange)) {
                 ChatUtils.debug("try spawning ${it.name}")
                 it.hasSpawned = true
-                assignDrag(it)
+                assignDragon(it)
             }
         }
     }
 
-    private fun assignDrag(dragon: DragonInfo) {
+    private fun assignDragon(dragon: DragonInfo) {
         when (DragonInfo.NONE) {
             dragonOrder[0] -> {
                 ChatUtils.debug("${dragon.name} is now dragon0")
@@ -145,7 +145,6 @@ class DungeonDragonPriority {
             else -> {
                 ChatUtils.debug("dragonOrder was full")
                 if (config.showSingleDragons) sendTitle("§${dragon.colorCode}${dragon.color} is Spawning!")
-                return
             }
         }
     }
