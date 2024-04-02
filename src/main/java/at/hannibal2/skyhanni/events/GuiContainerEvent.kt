@@ -18,6 +18,15 @@ abstract class GuiContainerEvent(open val gui: GuiContainer, open val container:
     ) : GuiContainerEvent(gui, container)
 
     @Cancelable
+    data class BeforeDraw(
+        override val gui: GuiContainer,
+        override val container: Container,
+        val mouseX: Int,
+        val mouseY: Int,
+        val partialTicks: Float,
+    ) : GuiContainerEvent(gui, container)
+
+    @Cancelable
     data class CloseWindowEvent(override val gui: GuiContainer, override val container: Container) :
         GuiContainerEvent(gui, container)
 
@@ -58,7 +67,6 @@ abstract class GuiContainerEvent(open val gui: GuiContainer, open val container:
         val clickedButton: Int,
         val clickType: Int,
     ) : GuiContainerEvent(gui, container) {
-
 
         fun makePickblock() {
             if (this.clickedButton == 2 && this.clickType == 3) return

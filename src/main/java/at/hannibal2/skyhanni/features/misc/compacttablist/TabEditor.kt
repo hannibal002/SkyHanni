@@ -8,12 +8,15 @@ import at.hannibal2.skyhanni.events.GuiContainerEvent
 import at.hannibal2.skyhanni.events.InventoryCloseEvent
 import at.hannibal2.skyhanni.events.LorenzToolTipEvent
 import at.hannibal2.skyhanni.events.MessageSendToServerEvent
+import at.hannibal2.skyhanni.events.NEURenderEvent
 import at.hannibal2.skyhanni.features.dungeon.DungeonAPI
 import at.hannibal2.skyhanni.features.misc.TabWidgetSettings
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.ChatUtils.isCommand
 import at.hannibal2.skyhanni.utils.ChatUtils.senderIsSkyhanni
 import at.hannibal2.skyhanni.utils.CollectionUtils.toSingletonListOrEmpty
+import at.hannibal2.skyhanni.utils.DelayedRun
+import at.hannibal2.skyhanni.utils.GuiRenderUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.cleanName
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.LorenzColor
@@ -23,6 +26,7 @@ import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 import at.hannibal2.skyhanni.utils.renderables.RenderableUtils.renderXYAligned
 import at.hannibal2.skyhanni.utils.renderables.RenderableUtils.renderYAligned
+import io.github.moulberry.notenoughupdates.NEUApi
 import net.minecraft.client.Minecraft
 import net.minecraft.client.renderer.GlStateManager
 import net.minecraft.init.Blocks
@@ -46,6 +50,14 @@ class TabEditor {
     lateinit var activeStorage: TabProfile
 
     var inEditor = false
+        set(value) {
+            if (value) {
+                DelayedRun.runDelayed(200.milliseconds) {
+                    NEUApi.setInventoryButtonsToDisabled()
+                }
+            }
+            field = value
+        }
 
     fun updateStorage() {
         if (inEditor) return
@@ -78,27 +90,26 @@ class TabEditor {
 
     var lastClicked = SimpleTimeMark.farPast()
 
-    fun createItem(slot: Slot?, windowId: Int) =
-        if (slot?.stack == null) Renderable.placeholder(0, 0) else
-            Renderable.clickAndHover(
-                Renderable.drawInsideRoundedRect(
-                    Renderable.itemStack(slot.stack),
-                    (TabWidgetSettings.highlights[slot.slotIndex] ?: LorenzColor.GRAY).toColor()
-                ),
-                toolTips[slot.slotNumber]?.let { listOf(slot.stack.displayName) + it } ?: listOf("NULL"),
-                bypassChecks = true,
-                onClick = {
-                    if (lastClicked.passedSince() > 500.milliseconds) {
-                        Minecraft.getMinecraft().playerController.windowClick(
-                            windowId, slot.slotIndex, 0, 0, Minecraft.getMinecraft().thePlayer
-                        )
-                        lastClicked = SimpleTimeMark.now()
-                    }
-                }
-            )
+    fun createItem(slot: Slot?, windowId: Int) = if (slot?.stack == null) Renderable.placeholder(
+        0,
+        0
+    ) else Renderable.clickAndHover(Renderable.drawInsideRoundedRect(
+        Renderable.itemStack(slot.stack),
+        (TabWidgetSettings.highlights[slot.slotIndex] ?: LorenzColor.GRAY).toColor()
+    ),
+        toolTips[slot.slotNumber]?.let { listOf(slot.stack.displayName) + it } ?: listOf("NULL"),
+        bypassChecks = true,
+        onClick = {
+            if (lastClicked.passedSince() > 500.milliseconds) {
+                Minecraft.getMinecraft().playerController.windowClick(
+                    windowId, slot.slotIndex, 0, 0, Minecraft.getMinecraft().thePlayer
+                )
+                lastClicked = SimpleTimeMark.now()
+            }
+        })
 
     @SubscribeEvent
-    fun onDraw(event: GuiContainerEvent.ForegroundDrawnEvent) {
+    fun onDraw(event: GuiContainerEvent.BeforeDraw) {
         if (!inEditor) return
         val container = event.container
         val windowId = container.windowId
@@ -111,25 +122,28 @@ class TabEditor {
         GlStateManager.pushMatrix()
         val pre = RenderUtils.absoluteTranslation
         GlStateManager.loadIdentity()
-        GlStateManager.translate(0f, 0f, pre.third + 270f)
+        val height = event.gui.height
+        val width = event.gui.width
+        val zLevel = pre.third + 270f
+        GlStateManager.translate(0f, 0f, zLevel)
+        GuiRenderUtils.drawGradientRect(0, 0, width, height, -1072689136, -804253680, 0.0);
         Renderable.withMousePosition(event.mouseX, event.mouseY) {
             Renderable.horizontalContainer(
                 createItem(container.inventorySlots[13], windowId).toSingletonListOrEmpty(),
                 verticalAlign = RenderUtils.VerticalAlignment.CENTER
-            ).renderYAligned(0, 0, event.gui.height)
+            ).renderYAligned(0, 0, height)
 
-            Renderable.horizontalContainer(
-                container.inventorySlots.subList(19, 39)
-                    .filterNot { it.stack == null || it.stack.item == ItemBlock.getItemFromBlock(Blocks.stained_glass_pane) }
-                    .sortedBy { it.stack.cleanName().drop(2) }
-                    .map { createItem(it, windowId) },
+            Renderable.horizontalContainer(container.inventorySlots.subList(19, 39)
+                .filterNot { it.stack == null || it.stack.item == ItemBlock.getItemFromBlock(Blocks.stained_glass_pane) }
+                .sortedBy { it.stack.cleanName().drop(2) }.map { createItem(it, windowId) },
                 horizontalAlign = RenderUtils.HorizontalAlignment.CENTER,
                 verticalAlign = RenderUtils.VerticalAlignment.BOTTOM
-            ).renderXYAligned(0, 0, event.gui.width, event.gui.height)
+            ).renderXYAligned(0, 0, width, height)
 
-            drawTabList(event.gui.width, event.gui.height)
+            drawTabList(width, height)
         }
         GlStateManager.popMatrix()
+        event.cancel()
     }
 
     val toolTips = mutableMapOf<Int, List<String>>()
@@ -148,9 +162,7 @@ class TabEditor {
 
     val hypixelTabDisplay
         get() = listOf(
-            toolTips[3] ?: emptyList(),
-            toolTips[4] ?: emptyList(),
-            toolTips[5] ?: emptyList()
+            toolTips[3] ?: emptyList(), toolTips[4] ?: emptyList(), toolTips[5] ?: emptyList()
         )
 
     fun drawTabList(width: Int, height: Int) = if (compactConfig.enabled) {
@@ -159,16 +171,10 @@ class TabEditor {
     } else {
         Renderable.verticalContainer(
             listOf(
-                Renderable.placeholder(0, 15),
-                Renderable.drawInsideRoundedRect(
-                    Renderable.horizontalContainer(
-                        hypixelTabDisplay.map {
-                            Renderable.verticalContainer(
-                                it.map { Renderable.string(it) }
-                            )
-                        }),
-                    LorenzColor.DARK_GRAY.toColor(),
-                    radius = 0
+                Renderable.placeholder(0, 15), Renderable.drawInsideRoundedRect(
+                    Renderable.horizontalContainer(hypixelTabDisplay.map {
+                        Renderable.verticalContainer(it.map { Renderable.string(it) })
+                    }), LorenzColor.DARK_GRAY.toColor(), radius = 0
                 )
             ),
             horizontalAlign = RenderUtils.HorizontalAlignment.CENTER,
@@ -176,4 +182,10 @@ class TabEditor {
         ).renderXYAligned(0, 0, width, height)
         Unit
     }
+
+    @SubscribeEvent
+    fun onNEURender(event: NEURenderEvent) {
+        if (inEditor) event.cancel()
+    }
+
 }
