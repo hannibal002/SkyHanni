@@ -13,6 +13,7 @@ import at.hannibal2.skyhanni.test.DebugCommand
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.DelayedRun
 import at.hannibal2.skyhanni.utils.LorenzColor
+import at.hannibal2.skyhanni.utils.OSUtils
 import at.hannibal2.skyhanni.utils.RenderUtils.renderString
 import at.hannibal2.skyhanni.utils.StringUtils.matches
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
@@ -71,6 +72,7 @@ class DungeonDragonPriority {
     private var isTank = false
 
     private var isSearching = false
+    private val particleList = mutableListOf<String>()
     private var titleString = ""
 
     private var dragonOrder = arrayOf(DragonInfo.NONE, DragonInfo.NONE)
@@ -131,6 +133,7 @@ class DungeonDragonPriority {
         inBerserkTeam = false
         isHealer = false
         isTank = false
+        particleList.clear()
     }
 
     private fun checkCoordinates(particle: Packet<*>) {
@@ -141,7 +144,10 @@ class DungeonDragonPriority {
         val z = vec.z.toInt()
         if (y !in 15..22) return
         DragonInfo.entries.forEach {
-            if (!it.isSpawning && (x in it.xRange && z in it.zRange)) assignDragon(it)
+            if (!it.isSpawning) {
+                if (x in it.xRange && z in it.zRange) assignDragon(it)
+                else particleList.add(vec.toString())
+            }
         }
     }
 
@@ -218,6 +224,12 @@ class DungeonDragonPriority {
 
     @SubscribeEvent
     fun onDungeonEnd(event: DungeonCompleteEvent) {
+        if (particleList.isNotEmpty()) {
+            val stringList = particleList.joinToString("\n")
+            particleList.clear()
+            ChatUtils.clickableChat("i want particles again sorry",
+                { OSUtils.copyToClipboard(stringList); ChatUtils.chat("copied") })
+        }
         if (!config.enabled) return
         if (!isSearching) return
         isSearching = false
