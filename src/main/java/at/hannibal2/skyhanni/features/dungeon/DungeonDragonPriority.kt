@@ -52,9 +52,10 @@ class DungeonDragonPriority {
             fun clearSpawned() {
                 entries.forEach { it.hasSpawned = false }
             }
+
             fun getSpawnedAmount(): Int {
                 var spawned = 0
-                entries.forEach{ if (it.hasSpawned) spawned += 1}
+                entries.forEach { if (it.hasSpawned) spawned += 1 }
                 return spawned
             }
         }
@@ -98,7 +99,7 @@ class DungeonDragonPriority {
         DelayedRun.runDelayed(2000.milliseconds) {
             val currentPower = getPower()
             when {
-                currentPower >= config.splitPower ->  ChatUtils.chat("Power: $currentPower | Split on all drags!")
+                currentPower >= config.splitPower -> ChatUtils.chat("Power: $currentPower | Split on all drags!")
                 currentPower >= config.easyPower -> ChatUtils.chat("Power: $currentPower | Split on easy drags!")
                 else -> ChatUtils.chat("Power: $currentPower | No split!")
             }
@@ -122,7 +123,7 @@ class DungeonDragonPriority {
         val y = vec.y.toInt()
         val z = vec.z.toInt()
         if (y !in 15..22) return
-        DragonInfo.entries.forEach{
+        DragonInfo.entries.forEach {
             if (!it.hasSpawned && (x in it.xRange && z in it.zRange)) {
                 ChatUtils.debug("try spawning ${it.name}")
                 it.hasSpawned = true
@@ -137,11 +138,13 @@ class DungeonDragonPriority {
                 ChatUtils.debug("${dragon.name} is now dragon0")
                 dragonOrder[0] = dragon
             }
+
             dragonOrder[1] -> {
                 ChatUtils.debug("${dragon.name} is now dragon1")
                 dragonOrder[1] = dragon
                 determinePriority()
             }
+
             else -> {
                 ChatUtils.debug("dragonOrder was full")
                 if (config.showSingleDragons) sendTitle("§${dragon.colorCode}${dragon.color} is Spawning!")
