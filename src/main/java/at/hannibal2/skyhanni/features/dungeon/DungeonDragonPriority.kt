@@ -6,6 +6,7 @@ import at.hannibal2.skyhanni.data.MayorAPI
 import at.hannibal2.skyhanni.data.Perk
 import at.hannibal2.skyhanni.events.DebugDataCollectEvent
 import at.hannibal2.skyhanni.events.DungeonCompleteEvent
+import at.hannibal2.skyhanni.events.DungeonStartEvent
 import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.LorenzChatEvent
 import at.hannibal2.skyhanni.events.LorenzKeyPressEvent
@@ -150,7 +151,8 @@ class DungeonDragonPriority {
         val y = vec.y.toInt()
         val z = vec.z.toInt()
         if (y !in 15..22) return
-        particleList.add("Position: $vec | Count: ${particle.particleCount} | Speed: ${particle.particleSpeed} | Offset: ${particle.xOffset} ${particle.yOffset} ${particle.zOffset} | LongDistance: ${particle.isLongDistance}")
+        particleList.add("Position: $vec | Type: ${particle.particleType} | Count: ${particle.particleCount} | Speed: ${particle.particleSpeed} | Offset: ${particle.xOffset} ${particle.yOffset} ${particle.zOffset} | LongDistance: ${particle.isLongDistance}")
+        if (particle.particleType != EnumParticleTypes.FLAME) return
         DragonInfo.entries.forEach {
             if (!it.isSpawning && (x in it.xRange && z in it.zRange)) {
                 particleList.add("matched ${it.name}")
@@ -224,8 +226,14 @@ class DungeonDragonPriority {
         if (DungeonAPI.dungeonFloor != "M7") return
         if (!isSearching) return
         if (event.packet !is S2APacketParticles) return
-        if (event.packet.particleType != EnumParticleTypes.FLAME) return
         checkCoordinates(event.packet)
+    }
+
+    @SubscribeEvent
+    fun onDungeonStart(event: DungeonStartEvent) {
+        if (DungeonAPI.dungeonFloor != "F1") return
+        if (isSearching) return
+        isSearching = true
     }
 
     @SubscribeEvent
