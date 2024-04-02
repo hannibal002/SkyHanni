@@ -89,7 +89,7 @@ class DungeonDragonPriority {
     private fun startP5() {
         if (!config.saySplit) return
         val currentClass = DungeonAPI.playerClass
-        when (currentClass) {
+        if (config.forceClass == DragPrioConfig.ForceClass.NONE) when (currentClass) {
             DungeonAPI.DungeonClass.MAGE -> inBerserkTeam = true
             DungeonAPI.DungeonClass.BERSERK -> inBerserkTeam = true
             DungeonAPI.DungeonClass.ARCHER -> inArcherTeam = true
@@ -100,6 +100,18 @@ class DungeonDragonPriority {
 
             DungeonAPI.DungeonClass.HEALER -> isHealer = true
             else -> return
+        } else {
+            when (config.forceClass) {
+                DragPrioConfig.ForceClass.ARCHER -> inArcherTeam = true
+                DragPrioConfig.ForceClass.BERSERK -> inBerserkTeam = true
+                DragPrioConfig.ForceClass.MAGE -> inBerserkTeam = true
+                DragPrioConfig.ForceClass.TANK -> {
+                    inArcherTeam = true
+                    isTank = true
+                }
+                DragPrioConfig.ForceClass.HEALER -> isHealer = true
+                else -> return
+            }
         }
         DelayedRun.runDelayed(2000.milliseconds) {
             val currentPower = getPower()

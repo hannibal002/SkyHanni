@@ -137,4 +137,28 @@ public class DragPrioConfig {
 
     @Expose
     public Position dragonSpawnedPosition = new Position(332, 220, 3.2f);
+
+
+    @Expose
+    @ConfigOption(name = "(debug) force class", desc = "forces the logic to think you are this class")
+    @ConfigEditorDropdown
+    public ForceClass forceClass = ForceClass.NONE;
+
+    public enum ForceClass {
+        ARCHER("Archer"),
+        BERSERK("Berserk"),
+        MAGE("Mage"),
+        TANK("Tank"),
+        HEALER("Healer"),
+        NONE("Disabled");
+
+        private final String str;
+
+        ForceClass(String str) {
+            this.str = str;
+        }
+
+        @Override
+        public String toString() { return str; }
+    }
 }
