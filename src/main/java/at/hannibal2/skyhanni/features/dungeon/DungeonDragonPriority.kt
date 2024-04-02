@@ -143,10 +143,11 @@ class DungeonDragonPriority {
         val y = vec.y.toInt()
         val z = vec.z.toInt()
         if (y !in 15..22) return
+        particleList.add("Position: $vec | Count: ${particle.particleCount} | Speed: ${particle.particleSpeed} | Offset: ${particle.xOffset} ${particle.yOffset} ${particle.zOffset} | LongDistance: ${particle.isLongDistance}")
         DragonInfo.entries.forEach {
-            if (!it.isSpawning) {
-                if (x in it.xRange && z in it.zRange) assignDragon(it)
-                else particleList.add("$vec ${it.name}")
+            if (!it.isSpawning && (x in it.xRange && z in it.zRange)) {
+                particleList.add("matched ${it.name}")
+                assignDragon(it)
             }
         }
     }
