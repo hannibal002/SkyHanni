@@ -218,6 +218,7 @@ import at.hannibal2.skyhanni.features.garden.visitor.HighlightVisitorsOutsideOfG
 import at.hannibal2.skyhanni.features.garden.visitor.NPCVisitorFix
 import at.hannibal2.skyhanni.features.garden.visitor.VisitorAPI
 import at.hannibal2.skyhanni.features.garden.visitor.VisitorListener
+import at.hannibal2.skyhanni.features.gui.QuiverDisplay
 import at.hannibal2.skyhanni.features.gui.customscoreboard.CustomScoreboard
 import at.hannibal2.skyhanni.features.gui.customscoreboard.ScoreboardPattern
 import at.hannibal2.skyhanni.features.inventory.AuctionsHighlighter
@@ -291,7 +292,6 @@ import at.hannibal2.skyhanni.features.misc.PlayerChatSymbols
 import at.hannibal2.skyhanni.features.misc.PocketSackInASackDisplay
 import at.hannibal2.skyhanni.features.misc.PrivateIslandNoPickaxeAbility
 import at.hannibal2.skyhanni.features.misc.QuickModMenuSwitch
-import at.hannibal2.skyhanni.features.misc.QuiverDisplay
 import at.hannibal2.skyhanni.features.misc.RestorePieceOfWizardPortalLore
 import at.hannibal2.skyhanni.features.misc.ServerRestartTitle
 import at.hannibal2.skyhanni.features.misc.SkyBlockKickDuration
