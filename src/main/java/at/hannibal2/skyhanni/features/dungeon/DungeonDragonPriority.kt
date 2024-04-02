@@ -189,7 +189,7 @@ class DungeonDragonPriority {
         ChatUtils.debug("isEasy: $isEasy")
         ChatUtils.debug("trySplit = $trySplit")
         ChatUtils.debug("shouldSplit = $shouldSplit")
-        val split = if (!shouldSplit) trySplit else 0
+        val split = if (shouldSplit) trySplit else 0
         val (berserkDragon, archerDragon) = if (dragonOrder[0].priority[split] < dragonOrder[1].priority[split]) {
             dragonOrder[0] to dragonOrder[1]
         } else {
