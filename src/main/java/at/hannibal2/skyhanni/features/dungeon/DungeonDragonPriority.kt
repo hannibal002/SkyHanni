@@ -143,6 +143,7 @@ class DungeonDragonPriority {
                 determinePriority()
             }
             else -> {
+                ChatUtils.debug("dragonOrder was full")
                 if (config.showSingleDragons) sendTitle("§${dragon.colorCode}${dragon.color} is Spawning!")
                 return
             }
