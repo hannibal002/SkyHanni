@@ -140,7 +140,6 @@ class DungeonDragonPriority {
             dragonOrder[1] -> {
                 ChatUtils.debug("${dragon.name} is now dragon1")
                 dragonOrder[1] = dragon
-                isSearching = false
                 determinePriority()
             }
             else -> {
