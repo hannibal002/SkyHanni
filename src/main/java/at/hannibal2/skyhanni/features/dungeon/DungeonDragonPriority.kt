@@ -125,15 +125,13 @@ class DungeonDragonPriority {
         val z = vec.z.toInt()
         if (y !in 15..22) return
         DragonInfo.entries.forEach {
-            if (!it.hasSpawned && (x in it.xRange && z in it.zRange)) {
-                ChatUtils.debug("try spawning ${it.name}")
-                it.hasSpawned = true
-                assignDragon(it)
-            }
+            if (!it.hasSpawned && (x in it.xRange && z in it.zRange)) assignDragon(it)
         }
     }
 
     private fun assignDragon(dragon: DragonInfo) {
+        ChatUtils.debug("try spawning ${dragon.name}")
+        dragon.hasSpawned = true
         when (DragonInfo.NONE) {
             dragonOrder[0] -> {
                 ChatUtils.debug("${dragon.name} is now dragon0")
@@ -174,6 +172,7 @@ class DungeonDragonPriority {
         split: Int
     ) {
         val purple = DragonInfo.SOUL in dragonOrder
+        ChatUtils.debug("berserkDragon: ${berserkDragon.name} | archerDragon: ${archerDragon.name}")
         if (split == 1 && config.saySplit) {
             ChatUtils.chat("Berserk Team: ${berserkDragon.color} (send in pc)")
             ChatUtils.chat("Archer Team: ${archerDragon.color} (send in pc)")
