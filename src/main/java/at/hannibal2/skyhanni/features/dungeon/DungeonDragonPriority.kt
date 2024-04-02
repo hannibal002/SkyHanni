@@ -4,12 +4,14 @@ import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.config.features.dungeon.DragPrioConfig
 import at.hannibal2.skyhanni.events.DebugDataCollectEvent
 import at.hannibal2.skyhanni.events.DungeonCompleteEvent
+import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.LorenzChatEvent
 import at.hannibal2.skyhanni.events.PacketEvent
 import at.hannibal2.skyhanni.test.DebugCommand
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.DelayedRun
 import at.hannibal2.skyhanni.utils.LorenzColor
+import at.hannibal2.skyhanni.utils.RenderUtils.renderString
 import at.hannibal2.skyhanni.utils.StringUtils.matches
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import at.hannibal2.skyhanni.utils.toLorenzVec
@@ -17,7 +19,9 @@ import net.minecraft.network.Packet
 import net.minecraft.network.play.server.S2APacketParticles
 import net.minecraft.util.EnumParticleTypes
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
+import kotlin.time.Duration
 import kotlin.time.Duration.Companion.milliseconds
+import kotlin.time.Duration.Companion.seconds
 
 class DungeonDragonPriority {
 
@@ -62,6 +66,7 @@ class DungeonDragonPriority {
     private var isTank = false
 
     private var isSearching = false
+    private var titleString = ""
 
     private var dragonOrder = arrayOf(DragonInfo.NONE, DragonInfo.NONE)
 
@@ -139,7 +144,7 @@ class DungeonDragonPriority {
                 determinePriority()
             }
             else -> {
-                if (config.showSingleDragons) ChatUtils.chat("§${dragon.colorCode}${dragon.color} is Spawning! (title)")
+                if (config.showSingleDragons) sendTitle("§${dragon.colorCode}${dragon.color} is Spawning!")
                 return
             }
         }
@@ -182,8 +187,8 @@ class DungeonDragonPriority {
             if (inBerserkTeam || (purple && (
                         (isHealer && config.healerPurple == DragPrioConfig.HealerPurpleValue.BERSERK)
                                 || (isTank && config.tankPurple == DragPrioConfig.TankPurpleValue.BERSERK)))
-            ) ChatUtils.chat("§${berserkDragon.colorCode}${berserkDragon.name}§f is Spawning! (title)")
-            else ChatUtils.chat("§${archerDragon.colorCode}${archerDragon.name}§f is Spawning! (title)")
+            ) sendTitle("§${berserkDragon.colorCode}${berserkDragon.color.uppercase()} is Spawning!")
+            else sendTitle("§${archerDragon.colorCode}${archerDragon.color.uppercase()} is Spawning!")
         } else {
             ChatUtils.chat("§cping me if you see this message")
             DebugCommand.command(arrayOf("Dragon Priority"))
@@ -224,6 +229,22 @@ class DungeonDragonPriority {
             add("dragon0: ${dragonOrder[0].name}")
             add("dragon1: ${dragonOrder[1].name}")
         }
+    }
+
+    private fun sendTitle(input: String) {
+        titleString = input
+        val duration: Duration = config.titleDuration.toDouble().seconds
+        DelayedRun.runDelayed(duration) {
+            titleString = ""
+        }
+    }
+
+    @SubscribeEvent
+    fun onRender(event: GuiRenderEvent.GuiOverlayRenderEvent) {
+        if (!DungeonAPI.inDungeon()) return
+        if (DungeonAPI.dungeonFloor != "M7") return
+        if (titleString == "") return
+        config.dragonSpawnedPosition.renderString(titleString, posLabel = "Dragon Priority Title")
     }
 
     private fun getPower(): Double = DungeonAPI.DungeonBlessings.valueOf("POWER").power +

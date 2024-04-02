@@ -1,5 +1,6 @@
 package at.hannibal2.skyhanni.config.features.dungeon;
 
+import at.hannibal2.skyhanni.config.core.config.Position;
 import com.google.gson.annotations.Expose;
 import io.github.moulberry.moulconfig.annotations.ConfigEditorBoolean;
 import io.github.moulberry.moulconfig.annotations.ConfigEditorDropdown;
@@ -117,4 +118,16 @@ public class DragPrioConfig {
         @Override
         public String toString() { return str; }
     }
+
+    @Expose
+    @ConfigOption(name = "Title Duration", desc = "Sets for how long the title should be up.")
+    @ConfigEditorSlider(
+            minValue = 0f,
+            maxValue = 5f,
+            minStep = 0.1f
+    )
+    public float titleDuration = 2f;
+
+    @Expose
+    public Position dragonSpawnedPosition = new Position(332, 220, 3.2f);
 }
