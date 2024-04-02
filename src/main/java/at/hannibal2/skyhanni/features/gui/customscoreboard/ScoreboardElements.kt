@@ -375,7 +375,7 @@ private fun getBankDisplayPair(): List<ScoreboardElementType> {
 
     return listOf(
         when {
-            informationFilteringConfig.hideEmptyLines && bank == "0" -> "<hidden>"
+            informationFilteringConfig.hideEmptyLines && (bank == "0" || bank == "0§7 / §60") -> "<hidden>"
             displayConfig.displayNumbersFirst -> "§6$bank Bank"
             else -> "Bank: §6$bank"
         } to HorizontalAlignment.LEFT
@@ -547,11 +547,10 @@ private fun getLobbyDisplayPair(): List<ScoreboardElementType> {
 private fun getPowerDisplayPair() = listOf(
     (MaxwellAPI.currentPower?.let {
         val mp = if (maxwellConfig.showMagicalPower) "§7(§6${MaxwellAPI.magicalPower?.addSeparators()}§7)" else ""
-        val name = it.replace(" Power", "")
         if (displayConfig.displayNumbersFirst) {
-            "§a$name Power $mp"
+            "§a${it.replace(" Power", "")} Power $mp"
         } else {
-            "Power: §a$name $mp"
+            "Power: §a$it $mp"
         }
     }
         ?: "§cOpen \"Your Bags\"!") to HorizontalAlignment.LEFT

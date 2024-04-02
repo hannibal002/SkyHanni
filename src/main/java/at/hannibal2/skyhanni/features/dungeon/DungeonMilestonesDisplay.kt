@@ -4,12 +4,12 @@ import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.events.DungeonStartEvent
 import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.LorenzChatEvent
+import at.hannibal2.skyhanni.events.LorenzTickEvent
 import at.hannibal2.skyhanni.events.LorenzWorldChangeEvent
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.RenderUtils.renderString
 import at.hannibal2.skyhanni.utils.StringUtils.matches
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
-import kotlin.concurrent.fixedRateTimer
 
 class DungeonMilestonesDisplay {
 
@@ -33,22 +33,16 @@ class DungeonMilestonesDisplay {
         fun isMilestoneMessage(message: String): Boolean = milestonePatternList.any { it.matches(message) }
     }
 
-    init {
-        fixedRateTimer(name = "skyhanni-dungeon-milestone-display", period = 200) {
-            if (isEnabled()) {
-                checkVisibility()
-            }
-        }
-    }
-
-    private fun checkVisibility() {
+    @SubscribeEvent
+    fun onTick(event: LorenzTickEvent) {
+        if (!event.isMod(5)) return
         if (currentMilestone >= 3 && System.currentTimeMillis() > timeReached + 3_000 && display != "") {
             display = display.substring(1)
         }
     }
 
     @SubscribeEvent(receiveCanceled = true)
-    fun onChatPacket(event: LorenzChatEvent) {
+    fun onChat(event: LorenzChatEvent) {
         if (!isEnabled()) return
 
         if (isMilestoneMessage(event.message)) {
