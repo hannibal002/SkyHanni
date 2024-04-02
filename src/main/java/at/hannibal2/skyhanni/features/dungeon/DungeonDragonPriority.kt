@@ -146,7 +146,7 @@ class DungeonDragonPriority {
         DragonInfo.entries.forEach {
             if (!it.isSpawning) {
                 if (x in it.xRange && z in it.zRange) assignDragon(it)
-                else particleList.add(vec.toString())
+                else particleList.add("$vec ${it.name}")
             }
         }
     }
