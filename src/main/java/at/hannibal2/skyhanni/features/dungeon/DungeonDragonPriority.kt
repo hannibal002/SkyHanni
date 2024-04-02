@@ -2,6 +2,8 @@ package at.hannibal2.skyhanni.features.dungeon
 
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.config.features.dungeon.DragPrioConfig
+import at.hannibal2.skyhanni.data.MayorAPI
+import at.hannibal2.skyhanni.data.Perk
 import at.hannibal2.skyhanni.events.DebugDataCollectEvent
 import at.hannibal2.skyhanni.events.DungeonCompleteEvent
 import at.hannibal2.skyhanni.events.GuiRenderEvent
@@ -244,6 +246,9 @@ class DungeonDragonPriority {
         config.dragonSpawnedPosition.renderString(titleString, posLabel = "Dragon Priority Title")
     }
 
-    private fun getPower(): Double = DungeonAPI.DungeonBlessings.valueOf("POWER").power +
-            (DungeonAPI.DungeonBlessings.valueOf("TIME").power.toDouble() / 2)
+    private fun getPower(): Double {
+        val paulBoost = if (MayorAPI.currentMayor?.activePerks?.contains(Perk.BENEDICTION) == true) 1.25 else 1.0
+        return (DungeonAPI.DungeonBlessings.valueOf("POWER").power
+                + (DungeonAPI.DungeonBlessings.valueOf("TIME").power.toDouble() / 2)) * paulBoost
+    }
 }
