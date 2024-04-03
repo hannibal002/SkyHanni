@@ -59,11 +59,11 @@ object GardenNextJacobContest {
     private var inCalendar = false
 
     private val patternGroup = RepoPattern.group("garden.nextcontest")
-    private val dayPattern by patternGroup.pattern(
+    val dayPattern by patternGroup.pattern(
         "day",
         "§aDay (?<day>.*)"
     )
-    private val monthPattern by patternGroup.pattern(
+    val monthPattern by patternGroup.pattern(
         "month",
         "(?<month>.*), Year (?<year>.*)"
     )
@@ -499,7 +499,7 @@ object GardenNextJacobContest {
     }
 
     @SubscribeEvent
-    fun onRenderOverlay(event: GuiRenderEvent.ChestGuiOverlayRenderEvent) {
+    fun onBackgroundDraw(event: GuiRenderEvent.ChestGuiOverlayRenderEvent) {
         if (!config.display) return
         if (!inCalendar) return
 

@@ -1,5 +1,79 @@
 # SkyHanni - Change Log
 
+## Version 0.25 (In Beta)
+
+### New Features
+
+#### Garden Features
+
++ Added Pest Profit Tracker. - Empa (https://github.com/hannibal002/SkyHanni/pull/1321)
++ Added Open On Elite. - Obsidian (https://github.com/hannibal002/SkyHanni/pull/1185)
+    + Allow opening farming contest stats on elitebot.dev by pressing a keybind + mouse click onto a contest item.
+    + Works inside the menus Jacob's Farming Contest, Your Contests, and SkyBlock Calendar.
+
+#### Diana Features
+
++ Added customizable Inquisitor Highlight color. - Empa (https://github.com/hannibal002/SkyHanni/pull/1323)
++ Added mobs since last Inquisitor to Mythological Creature Tracker. - CuzImClicks (https://github.com/hannibal002/SkyHanni/pull/1346)
+
+### Improvements
+
+#### Garden Improvements
+
++ Added warnings when Farming Fortune/Crop Fortune aren't found in tab list. - Empa (https://github.com/hannibal002/SkyHanni/pull/1330)
+
+#### Diana Improvements
+
++ Now detecting inquisitor share chat messages from CT module "InquisitorChecker". - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/1315)
+
+#### Misc Improvements
+
++ Improved mod performance. - CalMWolfs, ThatGravyBoat (https://github.com/hannibal002/SkyHanni/pull/1342)
+
+### Fixes
+
+#### Fishing Fixes
+
++ Fixed not checking if in an area that thunder can spawn before checking for thunder sparks. - CalMWolfs (https://github.com/hannibal002/SkyHanni/pull/1345)
+
+#### Slayer Fixes
+
++ Made the fire pit warning actually make a sound. - CalMWolfs (https://github.com/hannibal002/SkyHanni/pull/1342)
+
+#### Garden Fixes
+
++ Fixed Farming Fortune Display not showing when no Crop Fortune in tab. - Empa (https://github.com/hannibal002/SkyHanni/pull/1330)
+
+#### Chat Fixes
+
++ Added names of lobby players to /p tab complete. - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/1340)
++ Fixed friend detection from chat. - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/1336)
+
+#### GUI Fixes
+
++ Fixed "No Power" being displayed as "No" in Custom Scoreboard. - j10a1n15 (https://github.com/hannibal002/SkyHanni/pull/1332)
++ Fixed coop banks not being affected by "hide empty numbers" in Custom Scoreboard. - j10a1n15 (https://github.com/hannibal002/SkyHanni/pull/1328)
+
+#### Misc Fixes
+
++ Fixed tick event being called twice a tick. - CalMWolfs (https://github.com/hannibal002/SkyHanni/pull/1342)
+
+### Technical Details
+
++ Added KuudraAPI. - Empa (https://github.com/hannibal002/SkyHanni/pull/1209)
++ Added KuudraEnterEvent and KuudraCompleteEvent. - Empa (https://github.com/hannibal002/SkyHanni/pull/1209)
++ Added intrinsic scalability of strings - Thunderblade73 (https://github.com/hannibal002/SkyHanni/pull/888)
++ Added Renderable.wrappedString. - Thunderblade73 (https://github.com/hannibal002/SkyHanni/pull/888)
+    + Wraps a string n times if it exceeds the specified length
++ Added Mob Detection - Thunderblade73 (https://github.com/hannibal002/SkyHanni/pull/712)
++ Make all event function names uniform. - CalMWolfs (https://github.com/hannibal002/SkyHanni/pull/1290)
++ Added offset to tick event. - CalMWolfs (https://github.com/hannibal002/SkyHanni/pull/1342)
++ Made dungeon milestone use repo instead of local patterns. - CalMWolfs (https://github.com/hannibal002/SkyHanni/pull/1342)
++ Unprivate LorenzVec.toCleanString. - martimavocado (https://github.com/hannibal002/SkyHanni/pull/1344)
++ Removed Old TimeMark Class. - Thunderblade73 (https://github.com/hannibal002/SkyHanni/pull/1322)
++ Remove a lot of usage of fixed rate timers and replace with a new event. - CalMWolfs (https://github.com/hannibal002/SkyHanni/pull/1264)
+    + This makes these events that need to repeat about every second execute on the main thread.
+
 ## Version 0.24
 
 ### New Features
