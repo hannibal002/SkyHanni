@@ -36,7 +36,7 @@ class BingoCardTips {
     )
 
     @SubscribeEvent
-    fun onItemTooltipLow(event: LorenzToolTipEvent) {
+    fun onTooltip(event: LorenzToolTipEvent) {
         if (!isEnabled()) return
         if (!inventoryPattern.matches(InventoryUtils.openInventoryName())) return
 
