@@ -109,9 +109,9 @@ object DicerRngDropTracker {
         }
     }
 
-    private fun drawDisplay(storage: Data) = buildList<List<Any>> {
+    private fun drawDisplay(data: Data) = buildList<List<Any>> {
         val cropInHand = cropInHand ?: return@buildList
-        val items = storage.drops.getOrPut(cropInHand) { mutableMapOf() }
+        val items = data.drops.getOrPut(cropInHand) { mutableMapOf() }
         addAsSingletonList("§7Dicer RNG Drop Tracker for $toolName§7:")
         for ((rarity, amount) in items.sortedDesc()) {
             val displayName = rarity.displayName

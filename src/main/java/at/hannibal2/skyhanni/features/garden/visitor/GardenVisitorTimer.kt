@@ -5,6 +5,7 @@ import at.hannibal2.skyhanni.events.CropClickEvent
 import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.LorenzWorldChangeEvent
 import at.hannibal2.skyhanni.events.ProfileJoinEvent
+import at.hannibal2.skyhanni.events.SecondPassedEvent
 import at.hannibal2.skyhanni.events.garden.visitor.VisitorArrivalEvent
 import at.hannibal2.skyhanni.features.garden.GardenAPI
 import at.hannibal2.skyhanni.test.command.ErrorManager
@@ -20,7 +21,6 @@ import at.hannibal2.skyhanni.utils.TimeUtils
 import at.hannibal2.skyhanni.utils.TimeUtils.format
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
-import kotlin.concurrent.fixedRateTimer
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.milliseconds
 import kotlin.time.Duration.Companion.minutes
@@ -65,20 +65,6 @@ class GardenVisitorTimer {
         visitorJustArrived = true
     }
 
-    init {
-        fixedRateTimer(name = "skyhanni-update-visitor-display", period = 1000L) {
-            try {
-                updateVisitorDisplay()
-            } catch (error: Throwable) {
-                ErrorManager.logErrorWithData(error, "Encountered an error when updating visitor display")
-            }
-            try {
-                GardenVisitorDropStatistics.saveAndUpdate()
-            } catch (_: Throwable) {
-            } // no config yet
-        }
-    }
-
     @SubscribeEvent
     fun onProfileJoin(event: ProfileJoinEvent) {
         display = ""
@@ -88,7 +74,8 @@ class GardenVisitorTimer {
         sixthVisitorReady = false
     }
 
-    private fun updateVisitorDisplay() {
+    @SubscribeEvent
+    fun onSecondPassed(event: SecondPassedEvent) {
         if (!isEnabled()) return
 
         var visitorsAmount = VisitorAPI.visitorsInTabList(TabListData.getTabList()).size
@@ -98,6 +85,10 @@ class GardenVisitorTimer {
         loop@ for (line in TabListData.getTabList()) {
             timePattern.matchMatcher(line) {
                 val timeInfo = group("info").removeColor()
+                if (timeInfo == "Not Unlocked!") {
+                    display = "§cVisitors not unlocked!"
+                    return
+                }
                 if (timeInfo == "Queue Full!") {
                     queueFull = true
                     break@loop
@@ -202,7 +193,7 @@ class GardenVisitorTimer {
     }
 
     @SubscribeEvent
-    fun onBlockBreak(event: CropClickEvent) {
+    fun onCropClick(event: CropClickEvent) {
         if (!isEnabled()) return
         sixthVisitorArrivalTime -= 100.milliseconds
 

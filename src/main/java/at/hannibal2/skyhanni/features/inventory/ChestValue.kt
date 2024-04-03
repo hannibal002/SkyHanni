@@ -86,7 +86,7 @@ class ChestValue {
     }
 
     @SubscribeEvent(priority = EventPriority.LOW)
-    fun onDrawBackground(event: GuiContainerEvent.BackgroundDrawnEvent) {
+    fun onBackgroundDrawn(event: GuiContainerEvent.BackgroundDrawnEvent) {
         if (!isEnabled()) return
         if (!config.enableHighlight) return
         if (inInventory) {
@@ -128,7 +128,7 @@ class ChestValue {
             totalPrice += total
             if (rendered >= config.itemToShow) continue
             if (total < config.hideBelow) continue
-            val textAmount = " §7x$amount:"
+            val textAmount = " §7x${amount.addSeparators()}:"
             val width = Minecraft.getMinecraft().fontRendererObj.getStringWidth(textAmount)
             val name = "${stack.itemName.reduceStringLength((config.nameLength - width), ' ')} $textAmount"
             val price = "§6${(total).formatPrice()}"
