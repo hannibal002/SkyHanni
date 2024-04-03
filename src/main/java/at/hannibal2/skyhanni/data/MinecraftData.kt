@@ -75,7 +75,6 @@ object MinecraftData {
         DelayedRun.checkRuns()
         totalTicks++
         LorenzTickEvent(totalTicks).postAndCatch()
-        DelayedRun.checkRuns()
     }
 
     @SubscribeEvent
