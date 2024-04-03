@@ -1,12 +1,10 @@
 package at.hannibal2.skyhanni.features.garden.pests
 
 import at.hannibal2.skyhanni.SkyHanniMod
-import at.hannibal2.skyhanni.data.jsonobjects.repo.PestDrops
 import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.LorenzChatEvent
 import at.hannibal2.skyhanni.events.PurseChangeCause
 import at.hannibal2.skyhanni.events.PurseChangeEvent
-import at.hannibal2.skyhanni.events.RepositoryReloadEvent
 import at.hannibal2.skyhanni.features.garden.GardenAPI
 import at.hannibal2.skyhanni.utils.CollectionUtils.addAsSingletonList
 import at.hannibal2.skyhanni.utils.LorenzUtils
@@ -36,6 +34,7 @@ object PestProfitTracker {
         "loot",
         "§eYou received §a(?<amount>[0-9]*)x (?<item>.*) §efor killing an? §6(?<pest>.*)§e!"
     )
+
     /**
      * REGEX-TEST: §6§lRARE DROP! §9Mutant Nether Wart §6(§6+1,344☘)
      * REGEX-TEST: §6§lPET DROP! §r§5Slug §6(§6+1300☘)
@@ -79,22 +78,20 @@ object PestProfitTracker {
         var totalPestsKills = 0L
     }
 
-    private var allowedItems = listOf<NEUInternalName>()
-
     @SubscribeEvent
     fun onChat(event: LorenzChatEvent) {
         if (!isEnabled()) return
         pestLootPattern.matchMatcher(event.message) {
             val amount = group("amount").toInt()
             val internalName = NEUInternalName.fromItemNameOrNull(group("item")) ?: return
-            if (!isAllowedItem(internalName)) return
-            tracker.addItem(internalName,amount)
+
+            tracker.addItem(internalName, amount)
             addKill()
             if (config.hideChat) event.blockedReason = "pest_drop"
         }
         pestRareDropPattern.matchMatcher(event.message) {
             val internalName = NEUInternalName.fromItemNameOrNull(group("item")) ?: return
-            if (!isAllowedItem(internalName)) return
+
             tracker.addItem(internalName, 1)
             // pests always have guaranteed loot, therefore there's no need to add kill here
         }
@@ -106,8 +103,6 @@ object PestProfitTracker {
         }
         lastPestKillTime = SimpleTimeMark.now()
     }
-
-    private fun isAllowedItem(internalName: NEUInternalName): Boolean = internalName in allowedItems
 
     private fun drawDisplay(data: Data): List<List<Any>> = buildList {
         addAsSingletonList("§e§lPest Profit Tracker")
@@ -132,7 +127,6 @@ object PestProfitTracker {
         if (lastPestKillTime.passedSince() > config.timeDisplayed.seconds && !PestAPI.hasVacuumInHand()) return
 
         tracker.renderDisplay(config.position)
-
     }
 
     @SubscribeEvent
@@ -142,11 +136,6 @@ object PestProfitTracker {
         if (event.reason == PurseChangeCause.GAIN_MOB_KILL && lastPestKillTime.passedSince() < 2.seconds) {
             tracker.addCoins(coins.toInt())
         }
-    }
-
-    @SubscribeEvent
-    fun onRepoReload(event: RepositoryReloadEvent) {
-        allowedItems = event.getConstant<PestDrops>("PestDrops").pest_drops
     }
 
     fun resetCommand(args: Array<String>) {
