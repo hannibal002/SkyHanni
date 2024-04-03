@@ -35,14 +35,7 @@ object MiningEventDisplay {
     @SubscribeEvent
     fun onRenderOverlay(event: GuiRenderEvent.GuiOverlayRenderEvent) {
         if (!shouldDisplay()) return
-        config.position.renderRenderables(MiningEventType.entries.map {
-            Renderable.horizontalContainer(
-                listOf(
-                    it.getRenderableAsPast(), it.getRenderable()
-                ), 2
-            )
-        }, posLabel = "Upcoming Events Display")
-        // config.position.renderRenderables(display, posLabel = "Upcoming Events Display")
+        config.position.renderRenderables(display, posLabel = "Upcoming Events Display")
     }
 
     private fun updateDisplay() {

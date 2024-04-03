@@ -1,13 +1,12 @@
 package at.hannibal2.skyhanni.features.mining.eventtracker
 
 import at.hannibal2.skyhanni.SkyHanniMod
-import at.hannibal2.skyhanni.features.misc.DarkenShader
 import at.hannibal2.skyhanni.utils.ItemUtils
 import at.hannibal2.skyhanni.utils.RenderUtils
 import at.hannibal2.skyhanni.utils.StringUtils.allLettersFirstUppercase
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.renderables.Renderable
-import at.hannibal2.skyhanni.utils.shader.ShaderManager
+import at.hannibal2.skyhanni.utils.renderables.Renderable.Companion.darken
 import net.minecraft.client.renderer.GlStateManager
 import net.minecraft.init.Items
 import net.minecraft.item.Item
@@ -88,10 +87,7 @@ enum class MiningEventType(
             alexHead.render(posX, posY)
             GlStateManager.translate(+4f, +3f, 0f)
             steveHead.render(posX, posY)
-
-            GlStateManager.translate(-2f, -2f, 2f)
-
-            GlStateManager.translate(0f, 0f, -2f)
+            GlStateManager.translate(-2f, -2f, 0f)
         }
 
     }),
@@ -117,23 +113,8 @@ enum class MiningEventType(
     val compactText = Renderable.string("§$colourCode$shortName")
     val normalText = Renderable.string("§$colourCode$eventName")
 
-    val compactTextWithIcon = icon + compactText
-    val normalTextWithIcon = icon + normalText
-
-    private fun Renderable.darken(amount: Float = 1.0f) = object : Renderable {
-        override val width = this@darken.width
-        override val height = this@darken.height
-        override val horizontalAlign = this@darken.horizontalAlign
-        override val verticalAlign = this@darken.verticalAlign
-
-        override fun render(posX: Int, posY: Int) {
-            DarkenShader.darknessLevel = amount
-            ShaderManager.enableShader("darken")
-            this@darken.render(posX, posY)
-            ShaderManager.disableShader()
-        }
-
-    }
+    val compactTextWithIcon = Renderable.horizontalContainer(listOf(icon, compactText), -2)
+    val normalTextWithIcon = Renderable.horizontalContainer(listOf(icon, normalText), -2)
 
     fun getRenderable(): Renderable = when (config.compressedFormat) {
         CompressFormat.COMPACT_TEXT -> compactTextWithIcon
@@ -144,18 +125,6 @@ enum class MiningEventType(
     }
 
     fun getRenderableAsPast(): Renderable = getRenderable().darken(0.4f)
-
-    override fun toString() = when (config.compressedFormat) {
-        CompressFormat.COMPACT_TEXT -> "§$colourCode$shortName"
-        CompressFormat.ICON_ONLY -> "WRONG VALUE"
-        else -> "§$colourCode$eventName"
-    }
-
-    fun toPastString() = when (config.compressedFormat) {
-        CompressFormat.COMPACT_TEXT -> "§7$shortName"
-        CompressFormat.ICON_ONLY -> TODO()
-        else -> "§7$eventName"
-    }
 
     companion object {
         private val config get() = SkyHanniMod.feature.mining.miningEvent
@@ -173,7 +142,3 @@ enum class MiningEventType(
         }
     }
 }
-
-// Do not use anywhere else
-private operator fun Renderable.plus(other: Renderable): Renderable =
-    Renderable.horizontalContainer(listOf(this, other), -2)
