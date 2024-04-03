@@ -13,6 +13,7 @@ import at.hannibal2.skyhanni.events.LorenzKeyPressEvent
 import at.hannibal2.skyhanni.events.PacketEvent
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.DelayedRun
+import at.hannibal2.skyhanni.utils.LocationUtils.isInside
 import at.hannibal2.skyhanni.utils.LorenzColor
 import at.hannibal2.skyhanni.utils.NEUItems
 import at.hannibal2.skyhanni.utils.OSUtils
@@ -26,8 +27,10 @@ import net.minecraft.client.Minecraft
 import net.minecraft.entity.boss.EntityDragon
 import net.minecraft.network.Packet
 import net.minecraft.network.play.server.S2APacketParticles
+import net.minecraft.util.AxisAlignedBB
 import net.minecraft.util.EnumParticleTypes
 import net.minecraftforge.event.entity.EntityJoinWorldEvent
+import net.minecraftforge.event.entity.living.LivingDeathEvent
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.milliseconds
@@ -44,31 +47,33 @@ class DungeonDragonPriority {
 
     enum class DragonInfo(
         val color: String,
-        var isSpawning: Boolean,
+        var status: SpawnedStatus,
         val isEasy: Boolean,
         val priority: IntArray,
-        val xRange: ClosedRange<Int>,
-        val zRange: ClosedRange<Int>,
+        val spawnBox: AxisAlignedBB,
+        val deathBox: AxisAlignedBB,
+        var id: Int,
         val colorCode: Char
     ) {
-        POWER("Red", false, false, intArrayOf(1, 3), 24..30, 56..62, LorenzColor.RED.chatColorCode),
-        FLAME("Orange", false, true, intArrayOf(2, 1), 82..88, 56..62, LorenzColor.GOLD.chatColorCode),
-        APEX("Green", false, true, intArrayOf(5, 2), 24..30, 91..97, LorenzColor.GREEN.chatColorCode),
-        ICE("Blue", false, false, intArrayOf(3, 4), 82..88, 91..97, LorenzColor.AQUA.chatColorCode),
-        SOUL("Purple", false, true, intArrayOf(4, 5), 53..59, 122..128, LorenzColor.LIGHT_PURPLE.chatColorCode),
-        NONE("None", false, false, intArrayOf(0, 0), 0..0, 0..0, LorenzColor.CHROMA.chatColorCode);
+        POWER("Red", SpawnedStatus.UNDEFEATED, false, intArrayOf(1, 3), AxisAlignedBB(24.0, 15.0, 30.0, 56.0, 22.0, 62.0), AxisAlignedBB(14.5, 13.0, 45.5, 39.5, 28.0, 70.5), -1, LorenzColor.RED.chatColorCode),
+        FLAME("Orange", SpawnedStatus.UNDEFEATED, true, intArrayOf(2, 1), AxisAlignedBB(82.0, 15.0, 88.0, 56.0, 22.0, 62.0), AxisAlignedBB(70.0, 8.0, 47.0, 102.0, 28.0, 77.0), -1, LorenzColor.GOLD.chatColorCode),
+        APEX("Green", SpawnedStatus.UNDEFEATED, true, intArrayOf(5, 2), AxisAlignedBB(24.0, 15.0, 30.0, 91.0, 22.0, 97.0), AxisAlignedBB(7.0, 8.0, 80.0, 37.0, 28.0, 110.0), -1, LorenzColor.GREEN.chatColorCode),
+        ICE("Blue", SpawnedStatus.UNDEFEATED, false, intArrayOf(3, 4), AxisAlignedBB(82.0, 15.0, 88.0, 91.0, 22.0, 97.0), AxisAlignedBB(71.5, 16.0, 82.5, 96.5, 26.0, 107.5), -1, LorenzColor.AQUA.chatColorCode),
+        SOUL("Purple", SpawnedStatus.UNDEFEATED, true, intArrayOf(4, 5), AxisAlignedBB(53.0, 15.0, 59.0, 122.0, 22.0, 128.0), AxisAlignedBB(45.5, 13.0, 113.5, 68.5, 23.0, 136.5), -1, LorenzColor.LIGHT_PURPLE.chatColorCode),
+        NONE("None", SpawnedStatus.UNDEFEATED, false, intArrayOf(0, 0), AxisAlignedBB(0.0, 0.0, 0.0, 0.0, 0.0, 0.0), AxisAlignedBB(0.0, 0.0, 0.0, 0.0, 0.0, 0.0), -1, LorenzColor.CHROMA.chatColorCode);
 
         companion object {
             fun clearSpawned() {
-                entries.forEach { it.isSpawning = false }
-            }
-
-            fun getSpawnedAmount(): Int {
-                var spawned = 0
-                entries.forEach { if (it.isSpawning) spawned += 1 }
-                return spawned
+                entries.forEach { it.status = SpawnedStatus.UNDEFEATED }
             }
         }
+    }
+
+    enum class SpawnedStatus {
+        UNDEFEATED,
+        SPAWNING,
+        ALIVE,
+        DEFEATED;
     }
 
     private var inBerserkTeam = false
@@ -147,14 +152,10 @@ class DungeonDragonPriority {
     private fun checkCoordinates(particle: Packet<*>) {
         if (particle !is S2APacketParticles) return
         val vec = particle.toLorenzVec()
-        val x = vec.x.toInt()
-        val y = vec.y.toInt()
-        val z = vec.z.toInt()
-        if (y !in 15..22) return
         particleList.add("Position: $vec | Type: ${particle.particleType} | Count: ${particle.particleCount} | Speed: ${particle.particleSpeed} | Offset: ${particle.xOffset} ${particle.yOffset} ${particle.zOffset} | LongDistance: ${particle.isLongDistance}")
         if (particle.particleType != EnumParticleTypes.FLAME) return
         DragonInfo.entries.forEach {
-            if (!it.isSpawning && (x in it.xRange && z in it.zRange)) {
+            if (it.status == SpawnedStatus.UNDEFEATED && it.spawnBox.isInside(vec)) {
                 particleList.add("matched ${it.name}")
                 assignDragon(it)
             }
@@ -163,7 +164,7 @@ class DungeonDragonPriority {
 
     private fun assignDragon(dragon: DragonInfo) {
         ChatUtils.debug("try spawning ${dragon.name}")
-        dragon.isSpawning = true
+        dragon.status = SpawnedStatus.SPAWNING
         when (DragonInfo.NONE) {
             dragonOrder[0] -> {
                 ChatUtils.debug("${dragon.name} is now dragon0")
@@ -291,10 +292,30 @@ class DungeonDragonPriority {
         if (!config.enabled) return
         if (!isSearching) return
         if (event.entity !is EntityDragon) return
-        val x = event.entity.posX.toInt()
-        val z = event.entity.posX.toInt()
-        DragonInfo.entries.forEach {
-            if (x in it.xRange && z in it.zRange) it.isSpawning = false
+        ChatUtils.debug("Dragon spawned at ${event.entity.position.toLorenzVec()} with id ${event.entity.entityId}")
+        DragonInfo.entries.filter { it.status == SpawnedStatus.SPAWNING }.forEach {
+            if (it.spawnBox.isInside(event.entity.position.toLorenzVec())) {
+                it.status = SpawnedStatus.ALIVE
+                it.id = event.entity.entityId
+            }
+        }
+    }
+
+    @SubscribeEvent
+    fun onDragonDeath(event: LivingDeathEvent) {
+        if (!config.enabled) return
+        if (!isSearching) return
+        if (event.entity !is EntityDragon) return
+        ChatUtils.debug("Dragon died at ${event.entity.position.toLorenzVec()} with id ${event.entity.entityId}")
+        DragonInfo.entries.filter { it.id == event.entity.entityId }.forEach {
+            if (it.deathBox.isInside(event.entity.position.toLorenzVec())) {
+                ChatUtils.debug("${it.color} died inside box")
+                it.status = SpawnedStatus.DEFEATED
+            } else {
+                ChatUtils.debug("${it.color} died outside box")
+                it.status = SpawnedStatus.UNDEFEATED
+            }
+            it.id = -1
         }
     }
 
