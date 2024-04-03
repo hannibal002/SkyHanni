@@ -13,7 +13,7 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 class SuperCraftFeatures {
     private val craftedPattern by RepoPattern.pattern(
         "inventory.supercrafting.craft",
-        "§eYou Supercrafted §r§r§r§.(?<item>[^§]+)(?:§r§8x(?<amount>\\d+))?§r§e!"
+        "§eYou Supercrafted §r§r§r§.(?<item>[^§]+)(?:§r§8x(?<amount>[\\d,]+))?§r§e!"
     )
     private val config get() = SkyHanniMod.feature.inventory.gfs
 
@@ -21,7 +21,7 @@ class SuperCraftFeatures {
     fun onChat(event: LorenzChatEvent) {
         if (!config.superCraftGFS) return
         val (internalName, amount) = craftedPattern.matchMatcher(event.message) {
-            NEUInternalName.fromItemName(this.group("item")) to (this.group("amount")?.toInt() ?: 1)
+            NEUInternalName.fromItemName(this.group("item")) to (this.group("amount")?.formatInt() ?: 1)
         } ?: return
         if (!GetFromSackAPI.sackListInternalNames.contains(internalName.asString())) return
         DelayedRun.runNextTick {
