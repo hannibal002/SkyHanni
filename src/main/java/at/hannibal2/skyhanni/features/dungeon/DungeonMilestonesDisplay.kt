@@ -9,34 +9,27 @@ import at.hannibal2.skyhanni.events.LorenzWorldChangeEvent
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.RenderUtils.renderString
 import at.hannibal2.skyhanni.utils.StringUtils.matches
+import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
-class DungeonMilestonesDisplay {
+object DungeonMilestonesDisplay {
 
     private val config get() = SkyHanniMod.feature.dungeon
 
-    companion object {
+    val milestonePattern by RepoPattern.pattern(
+        "dungeon.milestone",
+        "§e§l.*Milestone §r§e.§r§7: You have (?:tanked and )?(?:dealt|healed) §r§.*§r§7.*so far! §r§a.*"
+    )
 
-        // TODO USE SH-REPO
-        private val milestonePatternList = listOf(
-            "§e§l(.*) Milestone §r§e.§r§7: You have dealt §r§c(.*)§r§7 Total Damage so far! §r§a(.*)".toPattern(),
-            "§e§lArcher Milestone §r§e.§r§7: You have dealt §r§c(.*)§r§7 Ranged Damage so far! §r§a(.*)".toPattern(),
-            "§e§lHealer Milestone §r§e.§r§7: You have healed §r§a(.*)§r§7 Damage so far! §r§a(.*)".toPattern(),
-            "§e§lTank Milestone §r§e.§r§7: You have tanked and dealt §r§c(.*)§r§7 Total Damage so far! §r§a(.*)s".toPattern()
-        )
-
-        private var display = ""
-        var color = ""
-        var currentMilestone = 0
-        var timeReached = 0L
-
-        fun isMilestoneMessage(message: String): Boolean = milestonePatternList.any { it.matches(message) }
-    }
+    private var display = ""
+    private var currentMilestone = 0
+    private var timeReached = 0L
+    var colour = ""
 
     @SubscribeEvent
     fun onTick(event: LorenzTickEvent) {
         if (!event.isMod(5)) return
-        if (currentMilestone >= 3 && System.currentTimeMillis() > timeReached + 3_000 && display != "") {
+        if (currentMilestone >= 3 && System.currentTimeMillis() > timeReached + 3_000 && display.isNotEmpty()) {
             display = display.substring(1)
         }
     }
@@ -45,7 +38,7 @@ class DungeonMilestonesDisplay {
     fun onChat(event: LorenzChatEvent) {
         if (!isEnabled()) return
 
-        if (isMilestoneMessage(event.message)) {
+        if (milestonePattern.matches(event.message)) {
             event.blockedReason = "dungeon_milestone"
             currentMilestone++
             update()
@@ -58,7 +51,7 @@ class DungeonMilestonesDisplay {
             timeReached = System.currentTimeMillis()
         }
 
-        color = when (currentMilestone) {
+        colour = when (currentMilestone) {
             0, 1 -> "§c"
             2 -> "§e"
             else -> "§a"
@@ -83,7 +76,7 @@ class DungeonMilestonesDisplay {
         if (!isEnabled()) return
 
         config.showMileStonesDisplayPos.renderString(
-            color + display,
+            colour + display,
             posLabel = "Dungeon Milestone"
         )
     }

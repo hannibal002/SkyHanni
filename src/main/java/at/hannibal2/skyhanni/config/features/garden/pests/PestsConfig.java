@@ -27,6 +27,11 @@ public class PestsConfig {
     public PestTimerConfig pestTimer = new PestTimerConfig();
 
     @Expose
+    @ConfigOption(name = "Pest Profit Tracker", desc = "")
+    @Accordion
+    public PestProfitTrackerConfig pestProfitTacker = new PestProfitTrackerConfig();
+
+    @Expose
     @ConfigOption(name = "Spray", desc = "")
     @Accordion
     public SprayConfig spray = new SprayConfig();

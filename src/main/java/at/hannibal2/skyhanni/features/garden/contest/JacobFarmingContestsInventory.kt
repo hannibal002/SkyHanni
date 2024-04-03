@@ -53,7 +53,7 @@ class JacobFarmingContestsInventory {
     }
 
     @SubscribeEvent
-    fun onLateInventoryOpen(event: InventoryUpdatedEvent) {
+    fun onInventoryUpdated(event: InventoryUpdatedEvent) {
         if (!LorenzUtils.inSkyBlock) return
         if (event.inventoryName != "Your Contests") return
 
