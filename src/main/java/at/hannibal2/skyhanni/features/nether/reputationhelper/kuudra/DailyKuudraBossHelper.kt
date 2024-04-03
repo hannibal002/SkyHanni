@@ -6,7 +6,7 @@ import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.data.jsonobjects.repo.CrimsonIsleReputationJson.ReputationQuest
 import at.hannibal2.skyhanni.events.KuudraCompleteEvent
 import at.hannibal2.skyhanni.events.LorenzRenderWorldEvent
-import at.hannibal2.skyhanni.features.nether.KuudraAPI
+import at.hannibal2.skyhanni.features.nether.kuudra.KuudraTier
 import at.hannibal2.skyhanni.features.nether.reputationhelper.CrimsonIsleReputationHelper
 import at.hannibal2.skyhanni.test.GriffinUtils.drawWaypointFilled
 import at.hannibal2.skyhanni.utils.ChatUtils
@@ -20,7 +20,7 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
 class DailyKuudraBossHelper(private val reputationHelper: CrimsonIsleReputationHelper) {
 
-    val kuudraTiers = mutableListOf<KuudraAPI.KuudraTier>()
+    val kuudraTiers = mutableListOf<KuudraTier>()
 
     private var kuudraLocation: LorenzVec? = null
     private var allKuudraDone = true
@@ -93,7 +93,7 @@ class DailyKuudraBossHelper(private val reputationHelper: CrimsonIsleReputationH
             if (location != null) {
                 kuudraLocation = location
             }
-            kuudraTiers.add(KuudraAPI.KuudraTier(displayName, displayItem, location, tier))
+            kuudraTiers.add(KuudraTier(displayName, displayItem, location, tier))
 
             tier++
         }
