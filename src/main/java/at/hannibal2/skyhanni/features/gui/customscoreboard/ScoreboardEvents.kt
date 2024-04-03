@@ -3,7 +3,7 @@ package at.hannibal2.skyhanni.features.gui.customscoreboard
 import at.hannibal2.skyhanni.data.HypixelData
 import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.data.ScoreboardData
-import at.hannibal2.skyhanni.features.gui.customscoreboard.CustomScoreboard.Companion.config
+import at.hannibal2.skyhanni.features.gui.customscoreboard.CustomScoreboard.Companion.eventsConfig
 import at.hannibal2.skyhanni.features.gui.customscoreboard.ScoreboardEvents.VOTING
 import at.hannibal2.skyhanni.features.gui.customscoreboard.ScoreboardPattern
 import at.hannibal2.skyhanni.features.misc.ServerRestartTitle
@@ -31,116 +31,188 @@ private fun getSbLines(): List<String> {
     return ScoreboardData.sidebarLinesFormatted
 }
 
-enum class ScoreboardEvents(private val displayLine: Supplier<List<String>>, private val showWhen: () -> Boolean) {
+enum class ScoreboardEvents(
+    private val displayLine: Supplier<List<String>>,
+    private val showWhen: () -> Boolean,
+    private val configLine: String,
+) {
     VOTING(
         ::getVotingLines,
-        ::getVotingShowWhen
+        ::getVotingShowWhen,
+        "§7(All Voting Lines)"
     ),
     SERVER_CLOSE(
         ::getServerCloseLines,
-        ::getServerCloseShowWhen
+        ::getServerCloseShowWhen,
+        "§cServer closing soon!"
     ),
     DUNGEONS(
         ::getDungeonsLines,
-        ::getDungeonsShowWhen
+        ::getDungeonsShowWhen,
+        "§7(All Dungeons Lines)"
     ),
     KUUDRA(
         ::getKuudraLines,
-        ::getKuudraShowWhen
+        ::getKuudraShowWhen,
+        "§7(All Kuudra Lines)"
     ),
     DOJO(
         ::getDojoLines,
-        ::getDojoShowWhen
+        ::getDojoShowWhen,
+        "§7(All Dojo Lines)"
     ),
     DARK_AUCTION(
         ::getDarkAuctionLines,
-        ::getDarkAuctionShowWhen
+        ::getDarkAuctionShowWhen,
+        "Time Left: §b11\n" +
+            "Current Item:\n" +
+            " §5Travel Scroll to Sirius"
     ),
     JACOB_CONTEST(
         ::getJacobContestLines,
-        ::getJacobContestShowWhen
+        ::getJacobContestShowWhen,
+        "§eJacob's Contest\n" +
+            "§e○ §fCarrot §a18m17s\n" +
+            " Collected §e8,264"
     ),
     JACOB_MEDALS(
         ::getJacobMedalsLines,
-        ::getJacobMedalsShowWhen
+        ::getJacobMedalsShowWhen,
+        "§6§lGOLD §fmedals: §613\n" +
+            "§f§lSILVER §fmedals: §f3\n" +
+            "§c§lBRONZE §fmedals: §c4"
     ),
     TRAPPER(
         ::getTrapperLines,
-        ::getTrapperShowWhen
+        ::getTrapperShowWhen,
+        "Pelts: §5711\n" +
+            "Tracker Mob Location:\n" +
+            "§bMushroom Gorge"
     ),
     GARDEN_CLEAN_UP(
         ::getGardenCleanUpLines,
-        ::getGardenCleanUpShowWhen
+        ::getGardenCleanUpShowWhen,
+        "Cleanup: §c12.6%"
     ),
     GARDEN_PASTING(
         ::getGardenPastingLines,
-        ::getGardenPastingShowWhen
+        ::getGardenPastingShowWhen,
+        "§fBarn Pasting§7: §e12.3%"
     ),
     FLIGHT_DURATION(
         ::getFlightDurationLines,
-        ::getFlightDurationShowWhen
+        ::getFlightDurationShowWhen,
+        "Flight Duration: §a10m 0s"
     ),
     WINTER(
         ::getWinterLines,
-        ::getWinterShowWhen
+        ::getWinterShowWhen,
+        "§7(All Winter Event Lines)"
     ),
     SPOOKY(
         ::getSpookyLines,
-        ::getSpookyShowWhen
+        ::getSpookyShowWhen,
+        "§7(All Spooky Event Lines)"
     ),
     BROODMOTHER(
         ::getBroodmotherLines,
-        ::getBroodmotherShowWhen
-    ),
-    ORINGO(
-        ::getOringoLines,
-        ::getOringoShowWhen
+        ::getBroodmotherShowWhen,
+        "§4Broodmother§7: §eDormant"
     ),
     MINING_EVENTS(
         ::getMiningEventsLines,
-        ::getMiningEventsShowWhen
+        ::getMiningEventsShowWhen,
+        "§7(All Mining Event Lines)"
     ),
     DAMAGE(
         ::getDamageLines,
-        ::getDamageShowWhen
+        ::getDamageShowWhen,
+        "Dragon HP: §a6,180,925 §c❤\n" +
+            "Your Damage: §c375,298.5"
     ),
     MAGMA_BOSS(
         ::getMagmaBossLines,
-        ::getMagmaBossShowWhen
+        ::getMagmaBossShowWhen,
+        "§7(All Magma Boss Lines)\n" +
+            "§7Boss: §c0%\n" +
+            "§7Damage Soaked:\n" +
+            "§e▎▎▎▎▎▎▎▎▎▎▎▎▎▎▎▎▎▎▎▎§7▎▎▎▎▎"
+    ),
+    HOT_DOG_CONTEST(
+        ::getHotDogLines,
+        ::getHotDogShowWhen,
+        "§6Hot Dog Contest\n" +
+            "Eaten: §c0/50"
     ),
     ESSENCE(
         ::getEssenceLines,
-        ::getEssenceShowWhen
+        ::getEssenceShowWhen,
+        "Dragon Essence: §d1,285"
     ),
     EFFIGIES(
         ::getEffigiesLines,
-        ::getEffigiesShowWhen
+        ::getEffigiesShowWhen,
+        "Effigies: §c⧯§c⧯⧯§7⧯§c⧯§c⧯"
     ),
     ACTIVE_TABLIST_EVENTS(
         ::getActiveEventLine,
-        ::getActiveEventShowWhen
+        ::getActiveEventShowWhen,
+        "§7(All Active Tablist Events)"
     ),
     REDSTONE(
         ::getRedstoneLines,
-        ::getRedstoneShowWhen
+        ::getRedstoneShowWhen,
+        "§e§l⚡ §cRedstone: §e§b7%"
     ),
+    ;
 
-    NONE(
-        ::getNoneLines,
-        { false }
-    );
+    override fun toString(): String {
+        return configLine
+    }
 
     fun getLines(): List<String> {
         return displayLine.get()
     }
 
     companion object {
-        fun getEvent(): List<ScoreboardEvents> {
-            if (config.displayConfig.showAllActiveEvents) {
-                return entries.filter { it.showWhen() }
+        fun getEvent() = buildList<ScoreboardEvents?> {
+            if (eventsConfig.showAllActiveEvents) {
+                for (event in eventsConfig.eventEntries) {
+                    if (event.showWhen()) {
+                        add(event)
+                    }
+                }
+            } else {
+                add(eventsConfig.eventEntries.firstOrNull { it.showWhen() && it.getLines().isNotEmpty() })
             }
-            return listOf(entries.firstOrNull { it.showWhen() } ?: NONE)
         }
+
+        // I don't know why, but this field is needed for it to work
+        @JvmField
+        val defaultOption = listOf(
+            VOTING,
+            SERVER_CLOSE,
+            DUNGEONS,
+            KUUDRA,
+            DOJO,
+            DARK_AUCTION,
+            JACOB_CONTEST,
+            JACOB_MEDALS,
+            TRAPPER,
+            GARDEN_CLEAN_UP,
+            GARDEN_PASTING,
+            FLIGHT_DURATION,
+            WINTER,
+            SPOOKY,
+            BROODMOTHER,
+            MINING_EVENTS,
+            DAMAGE,
+            MAGMA_BOSS,
+            HOT_DOG_CONTEST,
+            ESSENCE,
+            EFFIGIES,
+            ACTIVE_TABLIST_EVENTS
+        )
     }
 }
 
@@ -159,7 +231,6 @@ private fun getVotingLines() = buildList {
         }
     }
 }
-
 
 private fun getVotingShowWhen(): Boolean {
     return SbPattern.yearVotesPattern.anyMatches(getSbLines())
@@ -228,8 +299,7 @@ private fun getDarkAuctionLines() = buildList {
     getSbLines().firstOrNull { SbPattern.startingInPattern.matches(it) }?.let { add(it) }
     getSbLines().firstOrNull { SbPattern.timeLeftPattern.matches(it) }?.let { add(it) }
 
-    val darkAuctionCurrentItemLine =
-        getSbLines().firstOrNull { SbPattern.darkAuctionCurrentItemPattern.matches(it) }
+    val darkAuctionCurrentItemLine = getSbLines().firstOrNull { SbPattern.darkAuctionCurrentItemPattern.matches(it) }
 
     if (darkAuctionCurrentItemLine != null) {
         add(darkAuctionCurrentItemLine)
@@ -366,14 +436,6 @@ private fun getBroodmotherShowWhen(): Boolean {
     return getSbLines().any { SbPattern.broodmotherPattern.matches(it) }
 }
 
-private fun getOringoLines(): List<String> {
-    return listOf(getSbLines().first { SbPattern.travelingZooPattern.matches(it) })
-}
-
-private fun getOringoShowWhen(): Boolean {
-    return getSbLines().any { SbPattern.travelingZooPattern.matches(it) }
-}
-
 private fun getMiningEventsLines() = buildList {
     // Wind
     if (getSbLines().any { SbPattern.windCompassPattern.matches(it) }
@@ -452,6 +514,16 @@ private fun getMagmaBossShowWhen(): Boolean {
     return SbPattern.magmaChamberPattern.matches(HypixelData.skyBlockArea)
 }
 
+private fun getHotDogLines(): List<String> {
+    return listOf(getSbLines().first { SbPattern.riftHotdogTitlePattern.matches(it) }) +
+        (getSbLines().first { SbPattern.timeLeftPattern.matches(it) }) +
+        (getSbLines().first { SbPattern.riftHotdogEatenPattern.matches(it) })
+}
+
+private fun getHotDogShowWhen(): Boolean {
+    return SbPattern.riftHotdogTitlePattern.anyMatches(getSbLines())
+}
+
 private fun getEssenceLines(): List<String> {
     return listOf(getSbLines().first { SbPattern.essencePattern.matches(it) })
 }
@@ -474,11 +546,4 @@ private fun getRedstoneLines(): List<String> {
 
 private fun getRedstoneShowWhen(): Boolean {
     return SbPattern.redstonePattern.anyMatches(getSbLines())
-}
-
-private fun getNoneLines(): List<String> {
-    return when {
-        config.informationFilteringConfig.hideEmptyLines -> listOf("<hidden>")
-        else -> listOf("§cNo Event")
-    }
 }

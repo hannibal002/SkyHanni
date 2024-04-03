@@ -56,6 +56,11 @@ public class FishingConfig {
     public FishingProfitTrackerConfig fishingProfitTracker = new FishingProfitTrackerConfig();
 
     @Expose
+    @ConfigOption(name = "Totem of Corruption", desc = "")
+    @Accordion
+    public TotemOfCorruptionConfig totemOfCorruption = new TotemOfCorruptionConfig();
+
+    @Expose
     @ConfigOption(name = "Sea Creature Tracker", desc = "")
     @Accordion
     public SeaCreatureTrackerConfig seaCreatureTracker = new SeaCreatureTrackerConfig();

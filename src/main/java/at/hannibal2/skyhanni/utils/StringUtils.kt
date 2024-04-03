@@ -299,4 +299,6 @@ object StringUtils {
     fun String.isRoman(): Boolean = UtilsPatterns.isRomanPattern.matches(this)
 
     fun isEmpty(message: String): Boolean = message.removeColor().trimWhiteSpaceAndResets().isEmpty()
+
+    fun generateRandomId() = UUID.randomUUID().toString()
 }

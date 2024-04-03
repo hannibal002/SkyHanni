@@ -63,92 +63,74 @@ object RenderLineTooltips {
         RenderHelper.disableStandardItemLighting()
         GlStateManager.enableDepth()
 
-        val zLevel = 300
-        val backgroundColor = -0xfeffff0
+        val zLevel = 300f
+        GlStateManager.translate(tooltipX.toFloat(), tooltipY.toFloat(), zLevel)
+
         drawGradientRect(
-            zLevel,
-            tooltipX - 3,
-            tooltipY - 4,
-            tooltipX + tooltipTextWidth + 3,
-            tooltipY - 3,
-            backgroundColor,
-            backgroundColor
+            left = -3,
+            top = -4,
+            right = tooltipTextWidth + 3,
+            bottom = -3,
         )
         drawGradientRect(
-            zLevel,
-            tooltipX - 3,
-            tooltipY + tooltipHeight + 3,
-            tooltipX + tooltipTextWidth + 3,
-            tooltipY + tooltipHeight + 4,
-            backgroundColor,
-            backgroundColor
+            left = -3,
+            top = tooltipHeight + 3,
+            right = tooltipTextWidth + 3,
+            bottom = tooltipHeight + 4,
         )
         drawGradientRect(
-            zLevel,
-            tooltipX - 3,
-            tooltipY - 3,
-            tooltipX + tooltipTextWidth + 3,
-            tooltipY + tooltipHeight + 3,
-            backgroundColor,
-            backgroundColor
+            left = -3,
+            top = -3,
+            right = tooltipTextWidth + 3,
+            bottom = tooltipHeight + 3,
         )
         drawGradientRect(
-            zLevel,
-            tooltipX - 4,
-            tooltipY - 3,
-            tooltipX - 3,
-            tooltipY + tooltipHeight + 3,
-            backgroundColor,
-            backgroundColor
+            left = -4,
+            top = -3,
+            right = -3,
+            bottom = tooltipHeight + 3,
         )
         drawGradientRect(
-            zLevel,
-            tooltipX + tooltipTextWidth + 3,
-            tooltipY - 3,
-            tooltipX + tooltipTextWidth + 4,
-            tooltipY + tooltipHeight + 3,
-            backgroundColor,
-            backgroundColor
+            left = tooltipTextWidth + 3,
+            top = -3,
+            right = tooltipTextWidth + 4,
+            bottom = tooltipHeight + 3,
         )
         val borderColorEnd = borderColorStart and 0xFEFEFE shr 1 or (borderColorStart and -0x1000000)
         drawGradientRect(
-            zLevel,
-            tooltipX - 3,
-            tooltipY - 3 + 1,
-            tooltipX - 3 + 1,
-            tooltipY + tooltipHeight + 3 - 1,
-            borderColorStart,
-            borderColorEnd
+            left = -3,
+            top = -3 + 1,
+            right = -3 + 1,
+            bottom = tooltipHeight + 3 - 1,
+            startColor = borderColorStart,
+            endColor = borderColorEnd
         )
         drawGradientRect(
-            zLevel,
-            tooltipX + tooltipTextWidth + 2,
-            tooltipY - 3 + 1,
-            tooltipX + tooltipTextWidth + 3,
-            tooltipY + tooltipHeight + 3 - 1,
-            borderColorStart,
-            borderColorEnd
+            left = tooltipTextWidth + 2,
+            top = -3 + 1,
+            right = tooltipTextWidth + 3,
+            bottom = tooltipHeight + 3 - 1,
+            startColor = borderColorStart,
+            endColor = borderColorEnd
         )
         drawGradientRect(
-            zLevel,
-            tooltipX - 3,
-            tooltipY - 3,
-            tooltipX + tooltipTextWidth + 3,
-            tooltipY - 3 + 1,
-            borderColorStart,
-            borderColorStart
+            left = -3,
+            top = -3,
+            right = tooltipTextWidth + 3,
+            bottom = -3 + 1,
+            startColor = borderColorStart,
+            endColor = borderColorStart
         )
         drawGradientRect(
-            zLevel,
-            tooltipX - 3,
-            tooltipY + tooltipHeight + 2,
-            tooltipX + tooltipTextWidth + 3,
-            tooltipY + tooltipHeight + 3,
-            borderColorEnd,
-            borderColorEnd
+            left = -3,
+            top = tooltipHeight + 2,
+            right = tooltipTextWidth + 3,
+            bottom = tooltipHeight + 3,
+            startColor = borderColorEnd,
+            endColor = borderColorEnd
         )
         GlStateManager.disableDepth()
-        GlStateManager.translate(tooltipX.toFloat(), tooltipY.toFloat(), 0f)
+        GlStateManager.translate(0f, 0f, -zLevel)
 
         var yTranslateSum = 0
         for (line in tips) {
@@ -167,13 +149,12 @@ object RenderLineTooltips {
     }
 
     private fun drawGradientRect(
-        zLevel: Int,
         left: Int,
         top: Int,
         right: Int,
         bottom: Int,
-        startColor: Int,
-        endColor: Int,
+        startColor: Int = -0xfeffff0,
+        endColor: Int = -0xfeffff0,
     ) {
         val startAlpha = (startColor shr 24 and 255).toFloat() / 255.0f
         val startRed = (startColor shr 16 and 255).toFloat() / 255.0f
@@ -191,13 +172,13 @@ object RenderLineTooltips {
         val tessellator = Tessellator.getInstance()
         val worldrenderer = tessellator.worldRenderer
         worldrenderer.begin(7, DefaultVertexFormats.POSITION_COLOR)
-        worldrenderer.pos(right.toDouble(), top.toDouble(), zLevel.toDouble())
+        worldrenderer.pos(right.toDouble(), top.toDouble(), 0.0)
             .color(startRed, startGreen, startBlue, startAlpha).endVertex()
-        worldrenderer.pos(left.toDouble(), top.toDouble(), zLevel.toDouble())
+        worldrenderer.pos(left.toDouble(), top.toDouble(), 0.0)
             .color(startRed, startGreen, startBlue, startAlpha).endVertex()
-        worldrenderer.pos(left.toDouble(), bottom.toDouble(), zLevel.toDouble())
+        worldrenderer.pos(left.toDouble(), bottom.toDouble(), 0.0)
             .color(endRed, endGreen, endBlue, endAlpha).endVertex()
-        worldrenderer.pos(right.toDouble(), bottom.toDouble(), zLevel.toDouble())
+        worldrenderer.pos(right.toDouble(), bottom.toDouble(), 0.0)
             .color(endRed, endGreen, endBlue, endAlpha).endVertex()
         tessellator.draw()
         GlStateManager.shadeModel(7424)

@@ -84,7 +84,7 @@ public class VisitorConfig {
     public boolean hypixelArrivedMessage = true;
 
     @Expose
-    @ConfigOption(name = "Hide Chat", desc = "Hide chat messages from the visitors in the garden. (Except Beth, Jacob and Spaceman)")
+    @ConfigOption(name = "Hide Chat", desc = "Hide chat messages from the visitors in the garden. (Except Beth and Spaceman)")
     @ConfigEditorBoolean
     @FeatureToggle
     public boolean hideChat = true;

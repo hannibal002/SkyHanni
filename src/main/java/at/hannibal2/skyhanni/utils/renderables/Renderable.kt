@@ -291,19 +291,26 @@ interface Renderable {
 
         fun string(
             text: String,
+            scale: Double = 1.0,
             color: Color = Color.WHITE,
             horizontalAlign: HorizontalAlignment = HorizontalAlignment.LEFT,
             verticalAlign: VerticalAlignment = VerticalAlignment.TOP,
         ) = object : Renderable {
 
-            override val width: Int
-                get() = Minecraft.getMinecraft().fontRendererObj.getStringWidth(text)
-            override val height = 10
+            override val width by lazy { (Minecraft.getMinecraft().fontRendererObj.getStringWidth(text) * scale).toInt() + 1 }
+            override val height = (9 * scale).toInt() + 1
             override val horizontalAlign = horizontalAlign
             override val verticalAlign = verticalAlign
 
+            val inverseScale = 1 / scale
+
             override fun render(posX: Int, posY: Int) {
-                Minecraft.getMinecraft().fontRendererObj.drawStringWithShadow(text, 1f, 1f, color.rgb)
+                val fontRenderer = Minecraft.getMinecraft().fontRendererObj
+                GlStateManager.translate(1.0, 1.0, 0.0)
+                GlStateManager.scale(scale, scale, 1.0)
+                fontRenderer.drawStringWithShadow(text, 0f, 0f, color.rgb)
+                GlStateManager.scale(inverseScale, inverseScale, 1.0)
+                GlStateManager.translate(-1.0, -1.0, 0.0)
             }
         }
 
@@ -314,6 +321,47 @@ interface Renderable {
             override val verticalAlign = VerticalAlignment.TOP
 
             override fun render(posX: Int, posY: Int) {
+            }
+        }
+
+        fun wrappedString(
+            text: String,
+            width: Int,
+            scale: Double = 1.0,
+            color: Color = Color.WHITE,
+            horizontalAlign: HorizontalAlignment = HorizontalAlignment.LEFT,
+            verticalAlign: VerticalAlignment = VerticalAlignment.TOP,
+        ) = object : Renderable {
+
+            val list by lazy {
+                Minecraft.getMinecraft().fontRendererObj.listFormattedStringToWidth(
+                    text, (width / scale).toInt()
+                )
+            }
+
+            override val width by lazy {
+                if (list.size == 1) {
+                    (Minecraft.getMinecraft().fontRendererObj.getStringWidth(text) / scale).toInt() + 1
+                } else {
+                    (width / scale).toInt() + 1
+                }
+            }
+
+            override val height by lazy { list.size * ((9 * scale).toInt() + 1) }
+            override val horizontalAlign = horizontalAlign
+            override val verticalAlign = verticalAlign
+
+            val inverseScale = 1 / scale
+
+            override fun render(posX: Int, posY: Int) {
+                val fontRenderer = Minecraft.getMinecraft().fontRendererObj
+                GlStateManager.translate(1.0, 1.0, 0.0)
+                GlStateManager.scale(scale, scale, 1.0)
+                list.forEachIndexed { index, text ->
+                    fontRenderer.drawStringWithShadow(text, 0f, index * 10.0f, color.rgb)
+                }
+                GlStateManager.scale(inverseScale, inverseScale, 1.0)
+                GlStateManager.translate(-1.0, -1.0, 0.0)
             }
         }
 

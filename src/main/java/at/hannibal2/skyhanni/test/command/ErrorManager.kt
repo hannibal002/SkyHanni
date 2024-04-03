@@ -4,10 +4,10 @@ import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.KeyboardManager
 import at.hannibal2.skyhanni.utils.OSUtils
+import at.hannibal2.skyhanni.utils.StringUtils
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.TimeLimitedSet
 import net.minecraft.client.Minecraft
-import java.util.UUID
 import kotlin.time.Duration.Companion.minutes
 
 object ErrorManager {
@@ -134,7 +134,7 @@ object ErrorManager {
             fullStackTrace = throwable.getCustomStackTrace(true).joinToString("\n")
             stackTrace = throwable.getCustomStackTrace(false).joinToString("\n")
         }
-        val randomId = UUID.randomUUID().toString()
+        val randomId = StringUtils.generateRandomId()
 
         val extraDataString = buildExtraDataString(extraData)
         val rawMessage = message.removeColor()
