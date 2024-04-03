@@ -59,8 +59,8 @@ class ShowMotesNpcSellPrice {
     @SubscribeEvent
     fun onTick(event: LorenzTickEvent) {
         if (!isInventoryValueEnabled()) return
-        if (event.isMod(10))
-            processItems()
+        if (!event.isMod(10, 1)) return
+        processItems()
     }
 
     @SubscribeEvent(priority = EventPriority.LOW)

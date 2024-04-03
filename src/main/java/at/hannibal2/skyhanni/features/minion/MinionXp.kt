@@ -28,7 +28,7 @@ import java.util.EnumMap
 
 class MinionXp {
 
-    private val config get() = SkyHanniMod.feature.minions
+    private val config get() = SkyHanniMod.feature.misc.minions
 
     private val xpItemMap: MutableMap<PrimitiveItemStack, String> = mutableMapOf()
     private val collectItemXpList: MutableList<String> = mutableListOf()

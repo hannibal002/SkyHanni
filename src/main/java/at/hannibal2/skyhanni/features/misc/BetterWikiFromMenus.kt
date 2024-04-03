@@ -13,7 +13,7 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
 class BetterWikiFromMenus {
 
-    private val config get() = SkyHanniMod.feature.commands.betterWiki
+    private val config get() = SkyHanniMod.feature.misc.commands.betterWiki
 
     @SubscribeEvent
     fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
