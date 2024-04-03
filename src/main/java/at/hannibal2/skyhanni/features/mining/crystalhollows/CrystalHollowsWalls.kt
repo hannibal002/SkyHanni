@@ -120,61 +120,73 @@ class CrystalHollowsWalls {
         drawHeatAreaForHeat(true, true, Areas.JUNGLE.color, heatHeight)
     }
 
-    private fun drawNucleus(event: LorenzRenderWorldEvent) = RenderUtils.QuadDrawer.draw3D(event.partialTicks) {
-        draw(
-            LorenzVec(nucleusBBInflate.minX, nucleusBBInflate.minY, nucleusBBInflate.minZ),
-            LorenzVec(nucleusBBInflate.minX, nucleusBBInflate.minY, nucleusBBInflate.maxZ),
-            LorenzVec(nucleusBBInflate.maxX, nucleusBBInflate.minY, nucleusBBInflate.minZ),
-            Areas.HEAT.color
-        )
-        draw(
-            LorenzVec(nucleusBBInflate.minX, nucleusBBInflate.minY, nucleusBBInflate.minZ),
-            LorenzVec(nucleusBBInflate.minX, nucleusBBInflate.maxY, nucleusBBInflate.minZ),
-            LorenzVec(nucleusBBInflate.minX, nucleusBBInflate.minY, middleZ),
-            Areas.JUNGLE.color
-        )
-        draw(
-            LorenzVec(nucleusBBInflate.minX, nucleusBBInflate.minY, nucleusBBInflate.minZ),
-            LorenzVec(nucleusBBInflate.minX, nucleusBBInflate.maxY, nucleusBBInflate.minZ),
-            LorenzVec(middleX, nucleusBBInflate.minY, nucleusBBInflate.minZ),
-            Areas.JUNGLE.color
-        )
-        draw(
-            LorenzVec(nucleusBBInflate.maxX, nucleusBBInflate.minY, nucleusBBInflate.maxZ),
-            LorenzVec(nucleusBBInflate.maxX, nucleusBBInflate.maxY, nucleusBBInflate.maxZ),
-            LorenzVec(nucleusBBInflate.maxX, nucleusBBInflate.minY, middleZ),
-            Areas.PRECURSOR.color
-        )
-        draw(
-            LorenzVec(nucleusBBInflate.maxX, nucleusBBInflate.minY, nucleusBBInflate.maxZ),
-            LorenzVec(nucleusBBInflate.maxX, nucleusBBInflate.maxY, nucleusBBInflate.maxZ),
-            LorenzVec(middleX, nucleusBBInflate.minY, nucleusBBInflate.maxZ),
-            Areas.PRECURSOR.color
-        )
-        draw(
-            LorenzVec(nucleusBBInflate.minX, nucleusBBInflate.minY, nucleusBBInflate.maxZ),
-            LorenzVec(nucleusBBInflate.minX, nucleusBBInflate.maxY, nucleusBBInflate.maxZ),
-            LorenzVec(nucleusBBInflate.minX, nucleusBBInflate.minY, middleZ),
-            Areas.GOBLIN.color,
-        )
-        draw(
-            LorenzVec(nucleusBBInflate.minX, nucleusBBInflate.minY, nucleusBBInflate.maxZ),
-            LorenzVec(nucleusBBInflate.minX, nucleusBBInflate.maxY, nucleusBBInflate.maxZ),
-            LorenzVec(middleX, nucleusBBInflate.minY, nucleusBBInflate.maxZ),
-            Areas.GOBLIN.color
-        )
-        draw(
-            LorenzVec(nucleusBBInflate.maxX, nucleusBBInflate.minY, nucleusBBInflate.minZ),
-            LorenzVec(nucleusBBInflate.maxX, nucleusBBInflate.maxY, nucleusBBInflate.minZ),
-            LorenzVec(nucleusBBInflate.maxX, nucleusBBInflate.minY, middleZ),
-            Areas.MITHRIL.color
-        )
-        draw(
-            LorenzVec(nucleusBBInflate.maxX, nucleusBBInflate.minY, nucleusBBInflate.minZ),
-            LorenzVec(nucleusBBInflate.maxX, nucleusBBInflate.maxY, nucleusBBInflate.minZ),
-            LorenzVec(middleX, nucleusBBInflate.minY, nucleusBBInflate.minZ),
-            Areas.MITHRIL.color
-        )
+    private fun drawNucleus(event: LorenzRenderWorldEvent) {
+        val southEastCorner = LorenzVec(nucleusBBInflate.minX, nucleusBBInflate.minY, nucleusBBInflate.minZ)
+        val southWestCorner = LorenzVec(nucleusBBInflate.minX, nucleusBBInflate.minY, nucleusBBInflate.maxZ)
+        val northEastCorner = LorenzVec(nucleusBBInflate.maxX, nucleusBBInflate.minY, nucleusBBInflate.minZ)
+        val northWestCorner = LorenzVec(nucleusBBInflate.maxX, nucleusBBInflate.minY, nucleusBBInflate.maxZ)
+
+        val southWestTopCorner = LorenzVec(nucleusBBInflate.minX, nucleusBBInflate.maxY, nucleusBBInflate.maxZ)
+        val southEastTopCorner = LorenzVec(nucleusBBInflate.minX, nucleusBBInflate.maxY, nucleusBBInflate.minZ)
+        val northEastTopCorner = LorenzVec(nucleusBBInflate.maxX, nucleusBBInflate.maxY, nucleusBBInflate.minZ)
+        val northWestTopCorner = LorenzVec(nucleusBBInflate.maxX, nucleusBBInflate.maxY, nucleusBBInflate.maxZ)
+
+        RenderUtils.QuadDrawer.draw3D(event.partialTicks) {
+            draw(
+                southEastCorner,
+                southWestCorner,
+                northEastCorner,
+                Areas.HEAT.color
+            )
+            draw(
+                southEastCorner,
+                southEastTopCorner,
+                LorenzVec(nucleusBBInflate.minX, nucleusBBInflate.minY, middleZ),
+                Areas.JUNGLE.color
+            )
+            draw(
+                southEastCorner,
+                southEastTopCorner,
+                LorenzVec(middleX, nucleusBBInflate.minY, nucleusBBInflate.minZ),
+                Areas.JUNGLE.color
+            )
+            draw(
+                northWestCorner,
+                northWestTopCorner,
+                LorenzVec(nucleusBBInflate.maxX, nucleusBBInflate.minY, middleZ),
+                Areas.PRECURSOR.color
+            )
+            draw(
+                northWestCorner,
+                northWestTopCorner,
+                LorenzVec(middleX, nucleusBBInflate.minY, nucleusBBInflate.maxZ),
+                Areas.PRECURSOR.color
+            )
+            draw(
+                southWestCorner,
+                southWestTopCorner,
+                LorenzVec(nucleusBBInflate.minX, nucleusBBInflate.minY, middleZ),
+                Areas.GOBLIN.color,
+            )
+            draw(
+                southWestCorner,
+                southWestTopCorner,
+                LorenzVec(middleX, nucleusBBInflate.minY, nucleusBBInflate.maxZ),
+                Areas.GOBLIN.color
+            )
+            draw(
+                northEastCorner,
+                northEastTopCorner,
+                LorenzVec(nucleusBBInflate.maxX, nucleusBBInflate.minY, middleZ),
+                Areas.MITHRIL.color
+            )
+            draw(
+                northEastCorner,
+                northEastTopCorner,
+                LorenzVec(middleX, nucleusBBInflate.minY, nucleusBBInflate.minZ),
+                Areas.MITHRIL.color
+            )
+        }
     }
 
     private fun RenderUtils.QuadDrawer.drawArea(
