@@ -133,7 +133,7 @@ object MaxwellAPI {
 
     // load earlier, so that other features can already use the api in this event
     @SubscribeEvent(priority = EventPriority.HIGH)
-    fun onInventoryFullyLoaded(event: InventoryOpenEvent) {
+    fun onInventoryOpen(event: InventoryOpenEvent) {
         if (!isEnabled()) return
 
         if (isThaumaturgyInventory(event.inventoryName)) {
