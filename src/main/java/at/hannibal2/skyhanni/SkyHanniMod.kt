@@ -537,6 +537,7 @@ class SkyHanniMod {
         loadModule(HideNotClickableItems())
         loadModule(ItemDisplayOverlayFeatures)
         loadModule(CurrentPetDisplay())
+        loadModule(HideFarEntities())
         loadModule(ExpOrbsOnGroundHider())
         loadModule(BetterWikiFromMenus())
         loadModule(DamageIndicatorManager())
@@ -818,7 +819,6 @@ class SkyHanniMod {
         loadModule(RareDropMessages())
         loadModule(CraftMaterialsFromBazaar())
         loadModule(PestProfitTracker)
-        loadModule(HideFarEntities())
 
         init()
 
