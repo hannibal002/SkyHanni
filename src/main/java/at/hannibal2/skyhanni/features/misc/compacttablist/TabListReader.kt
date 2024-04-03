@@ -50,7 +50,7 @@ object TabListReader {
     val renderColumns = mutableListOf<RenderColumn>()
 
     @SubscribeEvent
-    fun onTabUpdate(event: TabListUpdateEvent) {
+    fun onTabListUpdate(event: TabListUpdateEvent) {
         if (!LorenzUtils.inSkyBlock) return
         if (!config.enabled) return
 
