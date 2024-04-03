@@ -6,6 +6,7 @@ import at.hannibal2.skyhanni.events.DebugDataCollectEvent
 import at.hannibal2.skyhanni.events.DungeonBossRoomEnterEvent
 import at.hannibal2.skyhanni.events.DungeonCompleteEvent
 import at.hannibal2.skyhanni.events.DungeonEnterEvent
+import at.hannibal2.skyhanni.events.DungeonM7Phase5Start
 import at.hannibal2.skyhanni.events.DungeonStartEvent
 import at.hannibal2.skyhanni.events.InventoryFullyOpenedEvent
 import at.hannibal2.skyhanni.events.LorenzChatEvent
@@ -19,6 +20,7 @@ import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.NumberUtil.formatNumber
 import at.hannibal2.skyhanni.utils.NumberUtil.romanToDecimalIfNecessary
 import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
+import at.hannibal2.skyhanni.utils.StringUtils.matches
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.TabListData
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
@@ -54,6 +56,10 @@ object DungeonAPI {
     private val dungeonComplete by patternGroup.pattern(
         "complete",
         "§.\\s+§.§.(?:The|Master Mode) Catacombs §.§.- §.§.(?:Floor )?(?<floor>M?[IV]{1,3}|Entrance)"
+    )
+    private val phase5Start by patternGroup.pattern(
+        "m7.p5start",
+        "§4\\[BOSS] Necron§r§c: §r§cAll this, for nothing\\.\\.\\."
     )
 
     fun inDungeon() = dungeonFloor != null
@@ -161,6 +167,9 @@ object DungeonAPI {
         if (event.message == "§e[NPC] §bMort§f: §rHere, I found this map when I first entered the dungeon.") {
             started = true
             DungeonStartEvent(floor).postAndCatch()
+        }
+        if (phase5Start.matches(event.message)) {
+            DungeonM7Phase5Start().postAndCatch()
         }
         if (event.message.removeColor().matches(uniqueClassBonus)) {
             isUniqueClass = true
