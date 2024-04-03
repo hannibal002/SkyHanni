@@ -259,7 +259,7 @@ object MaxwellAPI {
 
     // Load powers from repo
     @SubscribeEvent
-    fun onRepoLoad(event: RepositoryReloadEvent) {
+    fun onRepoReload(event: RepositoryReloadEvent) {
         val data = event.getConstant<MaxwellPowersJson>("MaxwellPowers")
         powers = data.powers
     }

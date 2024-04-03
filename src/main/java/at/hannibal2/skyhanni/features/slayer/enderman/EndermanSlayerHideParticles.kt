@@ -25,7 +25,7 @@ class EndermanSlayerHideParticles {
     }
 
     @SubscribeEvent
-    fun onReceivePacket(event: ReceiveParticleEvent) {
+    fun onReceiveParticle(event: ReceiveParticleEvent) {
         if (!isEnabled()) return
 
         when (event.type) {
