@@ -110,7 +110,7 @@ object MythologicalCreatureTracker {
             addAsSingletonList(" §7- §e${amount.addSeparators()} ${creatureType.displayName}$percentageSuffix")
         }
         addAsSingletonList(" §7- §e${total.addSeparators()} §7Total Mythological Creatures")
-        addAsSingletonList("§e${data.mobsSinceLastInquisitor.addSeparators()} §7Since last Minos Inquisitor")
+        addAsSingletonList(" §7- §e${data.mobsSinceLastInquisitor.addSeparators()} §7Mobs since last Minos Inquisitor")
     }
 
     @SubscribeEvent
