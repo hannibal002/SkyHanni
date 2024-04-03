@@ -41,12 +41,12 @@ class PlayerDeathMessages {
         val message = event.message
         deathMessagePattern.matchMatcher(message) {
             val name = group("name")
-            if (SkyHanniMod.feature.markedPlayers.highlightInChat &&
+            if (MarkedPlayerManager.config.highlightInChat &&
                 !LorenzUtils.inDungeons && !LorenzUtils.inKuudraFight && MarkedPlayerManager.isMarkedPlayer(name)
             ) {
                 val reason = group("reason").removeColor()
 
-                val color = SkyHanniMod.feature.markedPlayers.chatColor.getChatColor()
+                val color = MarkedPlayerManager.config.chatColor.getChatColor()
                 ChatUtils.chat(" §c☠ $color$name §7$reason", false)
                 event.blockedReason = "marked_player_death"
                 return

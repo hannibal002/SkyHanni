@@ -29,15 +29,15 @@ class DungeonFinderFeatures {
     private val patternGroup = RepoPattern.group("dungeon.finder")
     private val pricePattern by patternGroup.pattern(
         "price",
-        "([0-9]{2,3}K|[0-9]{1,3}M|[0-9]+\\.[0-9]M|[0-9] ?MIL)"
+        "(?i).*([0-9]{2,3}K|[0-9]{1,3}M|[0-9]+\\.[0-9]M|[0-9] ?MIL).*"
     )
     private val carryPattern by patternGroup.pattern(
         "carry",
-        "(CARRY|CARY|CARRIES|CARIES|COMP|TO CATA [0-9]{2})"
+        "(?i).*(CARRY|CARY|CARRIES|CARIES|COMP|TO CATA [0-9]{2}).*"
     )
     private val nonPugPattern by patternGroup.pattern(
         "nonpug",
-        "(PERM|VC|DISCORD)"
+        "(?i).*(PERM|VC|DISCORD).*"
     )
     private val memberPattern by patternGroup.pattern(
         "member",
@@ -53,7 +53,7 @@ class DungeonFinderFeatures {
     )
     private val notePattern by patternGroup.pattern(
         "note",
-        "(§7§7Note: |§f[^§])"
+        "§7§7Note: §f(?<note>.*)"
     )
     private val floorTypePattern by patternGroup.pattern(
         "floor.type",
@@ -109,7 +109,7 @@ class DungeonFinderFeatures {
     )
     private val detectDungeonClassPattern by patternGroup.pattern(
         "detect.dungeon.class",
-        "(View and select a dungeon class.)"
+        "§7View and select a dungeon class."
     )
 
     private val allowedSlots = (10..34).filter { it !in listOf(17, 18, 26, 27) }
@@ -146,7 +146,6 @@ class DungeonFinderFeatures {
             val name = stack.displayName.removeColor()
             map[slot] = if (anyFloorPattern.matches(name)) {
                 "A"
-
             } else if (entranceFloorPattern.matches(name)) {
                 "E"
             } else if (floorPattern.matches(name)) {
@@ -168,7 +167,6 @@ class DungeonFinderFeatures {
             val floorNum = floorNumberPattern.matchMatcher(floor) {
                 group("floorNum").romanToDecimalIfNecessary()
             }
-
             map[slot] = getFloorName(floor, dungeon, floorNum)
         }
     }
@@ -193,7 +191,6 @@ class DungeonFinderFeatures {
             } ?: continue
             map[slot] = getFloorName(name, name, floorNum)
         }
-
     }
 
     private fun getFloorName(floor: String, dungeon: String, floorNum: Int?): String =
@@ -271,7 +268,7 @@ class DungeonFinderFeatures {
                     val playerName = group("playerName")
                     val className = group("className")
                     val level = group("level").toInt()
-                    val color = getColor(level)
+                    val color = DungeonAPI.getColor(level)
                     if (config.coloredClassLevel) toolTip[index] = " §b$playerName§f: §e$className $color$level"
                     classNames.remove(className)
                 }
@@ -312,7 +309,9 @@ class DungeonFinderFeatures {
     fun onRenderItemTip(event: RenderInventoryItemTipEvent) {
         if (!isEnabled()) return
         if (!config.floorAsStackSize) return
-        event.stackTip = (floorStackSize[event.slot.slotIndex]
+        val slot = event.slot
+        if (slot.slotNumber != slot.slotIndex) return
+        event.stackTip = (floorStackSize[slot.slotIndex]
             ?.takeIf { it.isNotEmpty() } ?: return)
     }
 
@@ -339,17 +338,6 @@ class DungeonFinderFeatures {
     @SubscribeEvent
     fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
         event.move(2, "dungeon.partyFinderColoredClassLevel", "dungeon.partyFinder.coloredClassLevel")
-    }
-
-    companion object {
-        fun getColor(level: Int): String = when {
-            level >= 30 -> "§a"
-            level >= 25 -> "§b"
-            level >= 20 -> "§e"
-            level >= 15 -> "§6"
-            level >= 10 -> "§c"
-            else -> "§4"
-        }
     }
 
     fun isEnabled() = LorenzUtils.inSkyBlock && LorenzUtils.skyBlockArea == "Dungeon Hub"

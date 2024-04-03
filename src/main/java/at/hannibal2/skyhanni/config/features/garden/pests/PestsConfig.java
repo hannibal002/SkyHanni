@@ -17,6 +17,11 @@ public class PestsConfig {
     public PestFinderConfig pestFinder = new PestFinderConfig();
 
     @Expose
+    @ConfigOption(name = "Pest Waypoint", desc = "")
+    @Accordion
+    public PestWaypointConfig pestWaypoint = new PestWaypointConfig();
+
+    @Expose
     @ConfigOption(name = "Pest Timer", desc = "")
     @Accordion
     public PestTimerConfig pestTimer = new PestTimerConfig();

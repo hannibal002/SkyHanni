@@ -5,9 +5,8 @@ import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.events.LorenzChatEvent
 import at.hannibal2.skyhanni.features.garden.GardenAPI
 import at.hannibal2.skyhanni.utils.LorenzUtils
+import at.hannibal2.skyhanni.utils.StringUtils
 import at.hannibal2.skyhanni.utils.StringUtils.matches
-import at.hannibal2.skyhanni.utils.StringUtils.removeColor
-import at.hannibal2.skyhanni.utils.StringUtils.trimWhiteSpaceAndResets
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import java.util.regex.Pattern
@@ -343,6 +342,11 @@ class ChatFilter {
         "§c♨ §r§eFire Sales? for .* §r§eended!".toPattern(),
         "§c {3}♨ §eAnd \\d+ more!".toPattern(),
     )
+    private val eventPatterns = listOf(
+        "§f +§r§7You are now §r§.Event Level §r§.*§r§7!".toPattern(),
+        "§f +§r§7You earned §r§.* Event Silver§r§7!".toPattern(),
+        "§f +§r§.§k#§r§. LEVEL UP! §r§.§k#".toPattern(),
+    )
     private val powderMiningMessages = listOf(
         "§aYou uncovered a treasure chest!",
         "§aYou received §r§f1 §r§aWishing Compass§r§a.",
@@ -355,6 +359,9 @@ class ChatFilter {
     private val fireSaleMessages = listOf(
         "§6§k§lA§r §c§lFIRE SALE §r§6§k§lA",
         "§c♨ §eSelling multiple items for a limited time!",
+    )
+    private val eventMessage = listOf(
+        "▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬",
     )
 
     private val patternsMap: Map<String, List<Pattern>> = mapOf(
@@ -372,6 +379,7 @@ class ChatFilter {
         "winter_gift" to winterGiftPatterns,
         "powder_mining" to powderMiningPatterns,
         "fire_sale" to fireSalePatterns,
+        "event" to eventPatterns,
     )
 
     private val messagesMap: Map<String, List<String>> = mapOf(
@@ -389,6 +397,7 @@ class ChatFilter {
         "annoying_spam" to annoyingSpamMessages,
         "powder_mining" to powderMiningMessages,
         "fire_sale" to fireSaleMessages,
+        "event" to eventMessage,
     )
     private val messagesContainsMap: Map<String, List<String>> = mapOf(
         "lobby" to lobbyMessagesContains,
@@ -414,7 +423,7 @@ class ChatFilter {
      */
     private fun block(message: String): String = when {
         config.hypixelHub && message.isPresent("lobby") -> "lobby"
-        config.empty && isEmpty(message) -> "empty"
+        config.empty && StringUtils.isEmpty(message) -> "empty"
         config.warping && message.isPresent("warping") -> "warping"
         config.welcome && message.isPresent("welcome") -> "welcome"
         config.guildExp && message.isPresent("guild_exp") -> "guild_exp"
@@ -425,19 +434,13 @@ class ChatFilter {
 
         config.winterGift && message.isPresent("winter_gift") -> "winter_gift"
         config.powderMining && message.isPresent("powder_mining") -> "powder_mining"
+        config.eventLevelUp && (message.isPresent("event") || StringUtils.isEmpty(message)) -> "event"
         config.fireSale && (fireSalePattern.matches(message) || message.isPresent("fire_sale")) -> "fire_sale"
         generalConfig.hideJacob && !GardenAPI.inGarden() && anitaFortunePattern.matches(message) -> "jacob_event"
         generalConfig.hideSkyMall && !LorenzUtils.inMiningIsland() && skymallPerkPattern.matches(message) -> "skymall"
 
         else -> ""
     }
-
-    /**
-     * Checks if the message is an empty message
-     * @param message The message to check
-     * @return True if the message is empty
-     */
-    private fun isEmpty(message: String) = message.removeColor().trimWhiteSpaceAndResets().isEmpty()
 
     private var othersMsg = ""
 
