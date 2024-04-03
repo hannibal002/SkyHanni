@@ -57,6 +57,9 @@ import at.hannibal2.skyhanni.data.jsonobjects.local.JacobContestsJson
 import at.hannibal2.skyhanni.data.jsonobjects.local.KnownFeaturesJson
 import at.hannibal2.skyhanni.data.jsonobjects.local.VisualWordsJson
 import at.hannibal2.skyhanni.data.model.TabWidget
+import at.hannibal2.skyhanni.data.mob.MobData
+import at.hannibal2.skyhanni.data.mob.MobDebug
+import at.hannibal2.skyhanni.data.mob.MobDetection
 import at.hannibal2.skyhanni.data.repo.RepoManager
 import at.hannibal2.skyhanni.events.LorenzTickEvent
 import at.hannibal2.skyhanni.events.PreInitFinishedEvent
@@ -208,6 +211,7 @@ import at.hannibal2.skyhanni.features.garden.inventory.plots.GardenPlotMenuHighl
 import at.hannibal2.skyhanni.features.garden.pests.PestAPI
 import at.hannibal2.skyhanni.features.garden.pests.PestFinder
 import at.hannibal2.skyhanni.features.garden.pests.PestParticleWaypoint
+import at.hannibal2.skyhanni.features.garden.pests.PestProfitTracker
 import at.hannibal2.skyhanni.features.garden.pests.PestSpawn
 import at.hannibal2.skyhanni.features.garden.pests.PestSpawnTimer
 import at.hannibal2.skyhanni.features.garden.pests.SprayDisplay
@@ -320,6 +324,7 @@ import at.hannibal2.skyhanni.features.misc.trevor.TrevorSolver
 import at.hannibal2.skyhanni.features.misc.trevor.TrevorTracker
 import at.hannibal2.skyhanni.features.misc.update.UpdateManager
 import at.hannibal2.skyhanni.features.misc.visualwords.ModifyVisualWords
+import at.hannibal2.skyhanni.features.nether.KuudraAPI
 import at.hannibal2.skyhanni.features.nether.PabloHelper
 import at.hannibal2.skyhanni.features.nether.SulphurSkitterBox
 import at.hannibal2.skyhanni.features.nether.VolcanoExplosivityDisplay
@@ -422,7 +427,7 @@ import org.apache.logging.log4j.Logger
     clientSideOnly = true,
     useMetadata = true,
     guiFactory = "at.hannibal2.skyhanni.config.ConfigGuiForgeInterop",
-    version = "0.24",
+    version = "0.25.Beta.1",
 )
 class SkyHanniMod {
 
@@ -443,6 +448,8 @@ class SkyHanniMod {
         loadModule(SeaCreatureManager())
         loadModule(ItemRenderBackground())
         loadModule(EntityData())
+        loadModule(MobData())
+        loadModule(MobDetection())
         loadModule(EntityMovementData())
         loadModule(TestExportTools)
         loadModule(ItemClickData())
@@ -486,7 +493,6 @@ class SkyHanniMod {
         loadModule(TrackerManager)
         loadModule(ScoreboardPattern)
         loadModule(UtilsPatterns)
-        loadModule(PetAPI)
         loadModule(BossbarData)
         loadModule(EntityUtils)
         loadModule(ChatUtils)
@@ -517,6 +523,8 @@ class SkyHanniMod {
         loadModule(MayorAPI)
         loadModule(SkillAPI)
         loadModule(VisitorAPI)
+        loadModule(KuudraAPI)
+        loadModule(PetAPI)
         loadModule(IsFishingDetection)
         loadModule(LorenzUtils)
         loadModule(NEUItems)
@@ -812,6 +820,7 @@ class SkyHanniMod {
         loadModule(LimboPlaytime())
         loadModule(RareDropMessages())
         loadModule(CraftMaterialsFromBazaar())
+        loadModule(PestProfitTracker)
 
         init()
 
@@ -831,6 +840,7 @@ class SkyHanniMod {
         loadModule(SkyHanniDebugsAndTests)
         loadModule(WorldEdit)
         PreInitFinishedEvent().postAndCatch()
+        loadModule(MobDebug())
     }
 
     @Mod.EventHandler
