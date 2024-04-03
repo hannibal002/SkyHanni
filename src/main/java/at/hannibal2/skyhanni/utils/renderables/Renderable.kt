@@ -35,7 +35,8 @@ interface Renderable {
     val horizontalAlign: HorizontalAlignment
     val verticalAlign: VerticalAlignment
     fun isHovered(posX: Int, posY: Int) = currentRenderPassMousePosition?.let { (x, y) ->
-        x in (posX..posX + width) && y in (posY..posY + height) // TODO: adjust for variable height?
+        x in (posX..posX + width)
+            && y in (posY..posY + height) // TODO: adjust for variable height?
     } ?: false
 
     /**
@@ -77,7 +78,8 @@ interface Renderable {
             onClick: () -> Unit,
             bypassChecks: Boolean = false,
             condition: () -> Boolean = { true },
-        ): Renderable = link(string(text), onClick, bypassChecks, condition)
+        ): Renderable =
+            link(string(text), onClick, bypassChecks, condition)
 
         fun link(
             renderable: Renderable,
@@ -114,26 +116,28 @@ interface Renderable {
             button: Int = 0,
             bypassChecks: Boolean = false,
             condition: () -> Boolean = { true },
-        ) = object : Renderable {
-            override val width = render.width
-            override val height = render.height
-            override val horizontalAlign = render.horizontalAlign
-            override val verticalAlign = render.verticalAlign
+        ) =
+            object : Renderable {
+                override val width = render.width
+                override val height = render.height
+                override val horizontalAlign = render.horizontalAlign
+                override val verticalAlign = render.verticalAlign
 
-            private var wasDown = false
+                private var wasDown = false
 
-            override fun render(posX: Int, posY: Int) {
-                val isDown = Mouse.isButtonDown(button)
-                if (isDown > wasDown && isHovered(posX, posY) && condition() && shouldAllowLink(
-                        true, bypassChecks
-                    )
-                ) {
-                    onClick()
+                override fun render(posX: Int, posY: Int) {
+                    val isDown = Mouse.isButtonDown(button)
+                    if (isDown > wasDown && isHovered(posX, posY) && condition() && shouldAllowLink(
+                            true,
+                            bypassChecks
+                        )
+                    ) {
+                        onClick()
+                    }
+                    wasDown = isDown
+                    render.render(posX, posY)
                 }
-                wasDown = isDown
-                render.render(posX, posY)
             }
-        }
 
         fun hoverTips(
             content: Any,
@@ -201,8 +205,8 @@ interface Renderable {
             val isInNeuPv = openGui == "io.github.moulberry.notenoughupdates.profileviewer.GuiProfileViewer"
             val isInSkyTilsPv = openGui == "gg.skytils.skytilsmod.gui.profile.ProfileGui"
 
-            val result =
-                isGuiScreen && isGuiPositionEditor && isNotInSignAndOnSlot && isConfigScreen && !isInNeuPv && !isInSkyTilsPv
+            val result = isGuiScreen && isGuiPositionEditor && isNotInSignAndOnSlot && isConfigScreen &&
+                !isInNeuPv && !isInSkyTilsPv
 
             if (debug) {
                 if (!result) {
@@ -242,25 +246,26 @@ interface Renderable {
             unhovered: Renderable,
             bypassChecks: Boolean = false,
             condition: () -> Boolean = { true },
-        ) = object : Renderable {
-            override val width: Int
-                get() = max(hovered.width, unhovered.width)
-            override val height = 10
-            override val horizontalAlign get() = if (isHovered) hovered.horizontalAlign else unhovered.horizontalAlign
-            override val verticalAlign get() = if (isHovered) hovered.verticalAlign else unhovered.verticalAlign
+        ) =
+            object : Renderable {
+                override val width: Int
+                    get() = max(hovered.width, unhovered.width)
+                override val height = 10
+                override val horizontalAlign get() = if (isHovered) hovered.horizontalAlign else unhovered.horizontalAlign
+                override val verticalAlign get() = if (isHovered) hovered.verticalAlign else unhovered.verticalAlign
 
-            var isHovered = false
+                var isHovered = false
 
-            override fun render(posX: Int, posY: Int) {
-                isHovered = if (isHovered(posX, posY) && condition() && shouldAllowLink(true, bypassChecks)) {
-                    hovered.render(posX, posY)
-                    true
-                } else {
-                    unhovered.render(posX, posY)
-                    false
+                override fun render(posX: Int, posY: Int) {
+                    isHovered = if (isHovered(posX, posY) && condition() && shouldAllowLink(true, bypassChecks)) {
+                        hovered.render(posX, posY)
+                        true
+                    } else {
+                        unhovered.render(posX, posY)
+                        false
+                    }
                 }
             }
-        }
 
         fun itemStack(
             any: ItemStack,
@@ -407,12 +412,18 @@ interface Renderable {
                     }
                 } else {
                     val (textureX, textureY) = if (texture == SkillProgressBarConfig.TexturedBar.UsedTexture.MATCH_PACK) Pair(
-                        0, 64
+                        0,
+                        64
                     ) else Pair(0, 0)
 
                     Minecraft.getMinecraft().renderEngine.bindTexture(ResourceLocation(texture.path))
                     Minecraft.getMinecraft().ingameGUI.drawTexturedModalRect(
-                        posX, posY, textureX, textureY, width, height
+                        posX,
+                        posY,
+                        textureX,
+                        textureY,
+                        width,
+                        height
                     )
 
                     if (useChroma) {
@@ -422,7 +433,12 @@ interface Renderable {
                         GlStateManager.color(color.red / 255f, color.green / 255f, color.blue / 255f, 1f)
                     }
                     Minecraft.getMinecraft().ingameGUI.drawTexturedModalRect(
-                        posX, posY, textureX, textureY + height, progress, height
+                        posX,
+                        posY,
+                        textureX,
+                        textureY + height,
+                        progress,
+                        height
                     )
 
                     if (useChroma) {
