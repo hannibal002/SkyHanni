@@ -16,6 +16,7 @@ import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.LorenzLogger
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
+import at.hannibal2.skyhanni.utils.StringUtils.matchFirst
 import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.StringUtils.matches
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
@@ -72,7 +73,7 @@ class HypixelData {
         )
         private val scoreboardVisitingAmoutPattern by patternGroup.pattern(
             "scoreboard.visiting.amount",
-            "\\s+§.✌ §.\\(§.(?<currentamount>\\d+)§.\\/(?<maxamount>\\d+)\\)"
+            "\\s+§.✌ §.\\(§.(?<currentamount>\\d+)§./(?<maxamount>\\d+)\\)"
         )
         private val guestPattern by patternGroup.pattern(
             "guesting.scoreboard",
@@ -127,19 +128,15 @@ class HypixelData {
             if (LorenzUtils.lastWorldSwitch.passedSince() < 1.seconds) return
             if (!TabListData.fullyLoaded) return
 
-            ScoreboardData.sidebarLinesFormatted.forEach {
-                serverIdScoreboardPattern.matchMatcher(it) {
-                    val serverType = if (group("servertype") == "M") "mega" else "mini"
-                    serverId = "$serverType${group("serverid")}"
-                    return
-                }
+            ScoreboardData.sidebarLinesFormatted.matchFirst(serverIdScoreboardPattern) {
+                val serverType = if (group("servertype") == "M") "mega" else "mini"
+                serverId = "$serverType${group("serverid")}"
+                return
             }
 
-            TabListData.getTabList().forEach {
-                serverIdTablistPattern.matchMatcher(it) {
-                    serverId = group("serverid")
-                    return
-                }
+            TabListData.getTabList().matchFirst(serverIdTablistPattern) {
+                serverId = group("serverid")
+                return
             }
 
             ErrorManager.logErrorWithData(
@@ -255,16 +252,14 @@ class HypixelData {
 
     @SubscribeEvent
     fun onTabListUpdate(event: TabListUpdateEvent) {
-        for (line in event.tabList) {
-            UtilsPatterns.tabListProfilePattern.matchMatcher(line) {
-                var newProfile = group("profile").lowercase()
-                // Hypixel shows the profile name reversed while in the Rift
-                if (RiftAPI.inRift()) newProfile = newProfile.reversed()
-                if (profileName == newProfile) return
-                profileName = newProfile
-                ProfileJoinEvent(newProfile).postAndCatch()
-                return
-            }
+        event.tabList.matchFirst(UtilsPatterns.tabListProfilePattern) {
+            var newProfile = group("profile").lowercase()
+
+            // Hypixel shows the profile name reversed while in the Rift
+            if (RiftAPI.inRift()) newProfile = newProfile.reversed()
+            if (profileName == newProfile) return
+            profileName = newProfile
+            ProfileJoinEvent(newProfile).postAndCatch()
         }
     }
 
@@ -321,15 +316,13 @@ class HypixelData {
         skyBlock = inSkyBlock
     }
 
-    private fun checkProfileName(): Boolean {
-        if (profileName.isEmpty()) {
-            val text = TabListData.getTabList().firstOrNull { it.contains("Profile:") } ?: return true
-            UtilsPatterns.tabListProfilePattern.matchMatcher(text) {
-                profileName = group("profile").lowercase()
-                ProfileJoinEvent(profileName).postAndCatch()
-            }
+    private fun checkProfileName() {
+        if (profileName.isNotEmpty()) return
+
+        TabListData.getTabList().matchFirst(UtilsPatterns.tabListProfilePattern) {
+            profileName = group("profile").lowercase()
+            ProfileJoinEvent(profileName).postAndCatch()
         }
-        return false
     }
 
     private fun checkHypixel() {
@@ -365,24 +358,22 @@ class HypixelData {
     }
 
     private fun checkIsland() {
-        var newIsland = ""
+        var foundIsland = ""
         TabListData.fullyLoaded = false
 
-        for (line in TabListData.getTabList()) {
-            islandNamePattern.matchMatcher(line) {
-                newIsland = group("island").removeColor()
-                TabListData.fullyLoaded = true
-            }
+        TabListData.getTabList().matchFirst(islandNamePattern) {
+            foundIsland = group("island").removeColor()
+            TabListData.fullyLoaded = true
         }
 
         // Can not use color coding, because of the color effect (§f§lSKYB§6§lL§e§lOCK§A§L GUEST)
         val guesting = guestPattern.matches(ScoreboardData.objectiveTitle.removeColor())
-        val islandType = getIslandType(newIsland, guesting)
+        val islandType = getIslandType(foundIsland, guesting)
         if (skyBlockIsland != islandType) {
             IslandChangeEvent(islandType, skyBlockIsland).postAndCatch()
             if (islandType == IslandType.UNKNOWN) {
-                ChatUtils.debug("Unknown island detected: '$newIsland'")
-                loggerIslandChange.log("Unknown: '$newIsland'")
+                ChatUtils.debug("Unknown island detected: '$foundIsland'")
+                loggerIslandChange.log("Unknown: '$foundIsland'")
             } else {
                 loggerIslandChange.log(islandType.name)
             }
