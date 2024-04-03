@@ -234,6 +234,7 @@ class ConfigManager {
             jsonHolder[fileType] = firstLoadFile(fileType.file, fileType, fileType.clazz.newInstance())
         }
 
+        // TODO use SecondPassedEvent
         fixedRateTimer(name = "skyhanni-config-auto-save", period = 60_000L, initialDelay = 60_000L) {
             saveConfig(ConfigFileType.FEATURES, "auto-save-60s")
         }

@@ -166,7 +166,7 @@ class DungeonHideItems {
     }
 
     @SubscribeEvent
-    fun onReceivePacket(event: ReceiveParticleEvent) {
+    fun onReceiveParticle(event: ReceiveParticleEvent) {
         if (!LorenzUtils.inDungeons) return
         if (!config.hideSuperboomTNT && !config.hideReviveStone) return
 

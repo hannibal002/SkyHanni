@@ -1,6 +1,6 @@
 # SkyHanni - Change Log
 
-## Version 0.24 (In Beta)
+## Version 0.24
 
 ### New Features
 

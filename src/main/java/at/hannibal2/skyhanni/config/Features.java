@@ -18,10 +18,13 @@ import at.hannibal2.skyhanni.config.features.rift.RiftConfig;
 import at.hannibal2.skyhanni.config.features.skillprogress.SkillProgressConfig;
 import at.hannibal2.skyhanni.config.features.slayer.SlayerConfig;
 import at.hannibal2.skyhanni.config.storage.Storage;
+import at.hannibal2.skyhanni.utils.LorenzUtils;
 import com.google.gson.annotations.Expose;
 import io.github.moulberry.moulconfig.Config;
 import io.github.moulberry.moulconfig.Social;
 import io.github.moulberry.moulconfig.annotations.Category;
+import io.github.moulberry.moulconfig.gui.HorizontalAlign;
+import io.github.moulberry.moulconfig.processor.ProcessedCategory;
 import net.minecraft.util.ResourceLocation;
 
 import java.util.Arrays;
@@ -36,6 +39,13 @@ public class Features extends Config {
     @Override
     public boolean shouldAutoFocusSearchbar() {
         return true;
+    }
+
+    @Override
+    public HorizontalAlign alignCategory(ProcessedCategory category, boolean isSelected) {
+        if (LorenzUtils.INSTANCE.isAprilFoolsDay())
+            return HorizontalAlign.RIGHT;
+        return super.alignCategory(category, isSelected);
     }
 
     @Override
@@ -54,7 +64,11 @@ public class Features extends Config {
 
     @Override
     public String getTitle() {
-        return "SkyHanni " + SkyHanniMod.getVersion() + " by §channibal2§r, config by §5Moulberry §rand §5nea89";
+        String modName = "SkyHanni";
+        if (LorenzUtils.INSTANCE.isAprilFoolsDay())
+            modName = new StringBuilder().append("اسکای هانی").reverse().toString(); // Minecraft does not render RTL strings very nicely, so we reverse the string here. Not authentic, but close enough.
+
+        return modName + " " + SkyHanniMod.getVersion() + " by §channibal2§r, config by §5Moulberry §rand §5nea89";
     }
 
     /*

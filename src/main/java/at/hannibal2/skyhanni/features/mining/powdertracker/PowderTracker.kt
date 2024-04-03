@@ -11,6 +11,7 @@ import at.hannibal2.skyhanni.events.IslandChangeEvent
 import at.hannibal2.skyhanni.events.LorenzChatEvent
 import at.hannibal2.skyhanni.events.LorenzTickEvent
 import at.hannibal2.skyhanni.events.LorenzWorldChangeEvent
+import at.hannibal2.skyhanni.events.SecondPassedEvent
 import at.hannibal2.skyhanni.utils.CollectionUtils.addAsSingletonList
 import at.hannibal2.skyhanni.utils.ConditionalUtils.afterChange
 import at.hannibal2.skyhanni.utils.ConfigUtils
@@ -25,7 +26,6 @@ import com.google.gson.JsonArray
 import com.google.gson.JsonNull
 import com.google.gson.annotations.Expose
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
-import kotlin.concurrent.fixedRateTimer
 
 object PowderTracker {
 
@@ -73,15 +73,16 @@ object PowderTracker {
 
     init {
         PowderChestReward.entries.forEach { it.chatPattern }
+    }
 
-        fixedRateTimer(name = "skyhanni-powder-tracker", period = 1000) {
-            if (!isEnabled()) return@fixedRateTimer
-            calculateResourceHour(gemstoneInfo)
-            calculateResourceHour(mithrilInfo)
-            calculateResourceHour(diamondEssenceInfo)
-            calculateResourceHour(goldEssenceInfo)
-            calculateResourceHour(chestInfo)
-        }
+    @SubscribeEvent
+    fun onSecondPassed(event: SecondPassedEvent) {
+        if (!isEnabled()) return
+        calculateResourceHour(gemstoneInfo)
+        calculateResourceHour(mithrilInfo)
+        calculateResourceHour(diamondEssenceInfo)
+        calculateResourceHour(goldEssenceInfo)
+        calculateResourceHour(chestInfo)
     }
 
     private val tracker = SkyHanniTracker("Powder Tracker", { Data() }, { it.powderTracker })
