@@ -86,7 +86,7 @@ class ChestValue {
     }
 
     @SubscribeEvent(priority = EventPriority.LOW)
-    fun onDrawBackground(event: GuiContainerEvent.BackgroundDrawnEvent) {
+    fun onBackgroundDrawn(event: GuiContainerEvent.BackgroundDrawnEvent) {
         if (!isEnabled()) return
         if (!config.enableHighlight) return
         if (inInventory) {

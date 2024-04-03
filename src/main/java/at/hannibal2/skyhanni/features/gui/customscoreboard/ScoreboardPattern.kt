@@ -20,7 +20,7 @@ object ScoreboardPattern {
     ) // this line is weird (either text or number), ill leave it as is; it even has different colors?
     val coldPattern by mainSb.pattern(
         "cold",
-        "^(?:§.)*Cold: §.❄ (?<cold>-?\\d+)$"
+        "^(?:§.)*Cold: §.(?<cold>-?\\d+)❄$"
     )
     val copperPattern by mainSb.pattern(
         "copper",
@@ -383,6 +383,14 @@ object ScoreboardPattern {
         "dimension",
         "^\\s*§fRift Dimension$"
     )
+    val riftHotdogTitlePattern by riftSb.pattern(
+        "hotdogtitle",
+        "^§6Hot Dog Contest$"
+    )
+    val riftHotdogEatenPattern by riftSb.pattern(
+        "hotdogeaten",
+        "^Eaten: §.\\d+\\/\\d+$"
+    )
 
 
     // Stats from the tablist
@@ -414,5 +422,13 @@ object ScoreboardPattern {
     val eventTimeEndsPattern by tablistGroup.pattern(
         "eventtime",
         "^\\s+Ends In: §r§e(?<time>.*)$"
+    )
+    val boosterCookieEffectsWidgetPattern by tablistGroup.pattern(
+        "boostereffects",
+        "\\s*(?:§.)*Cookie Buff(?:§.)*: (?:§r)*(?<time>.*)"
+    )
+    val cookieNotActivePattern by tablistGroup.pattern(
+        "cookienotactive",
+        "((?:§.)*Not active.*)|(§c§lINACTIVE)"
     )
 }
