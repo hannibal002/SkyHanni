@@ -598,7 +598,7 @@ private fun getCookieDisplayPair() = listOf(
 private fun getCookieShowWhen(): Boolean {
     if (HypixelData.bingo) return false
     BitsAPI.cookieBuffTime?.let {
-        return informationFilteringConfig.hideEmptyLines && !it.isInPast()
+        return informationFilteringConfig.hideEmptyLines && BitsAPI.hasCookieBuff()
     } ?: return true
 }
 

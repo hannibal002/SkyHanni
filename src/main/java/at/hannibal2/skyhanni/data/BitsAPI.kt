@@ -200,7 +200,7 @@ object BitsAPI {
                 }
                 if (noCookieActiveSBMenuPattern.matches(line)) {
                     val cookieTime = cookieBuffTime
-                    if (cookieTime == null || !cookieTime.isInPast()) cookieBuffTime = SimpleTimeMark.farPast()
+                    if (cookieTime == null || cookieTime.isInFuture()) cookieBuffTime = SimpleTimeMark.farPast()
                 }
             }
             return
@@ -263,6 +263,8 @@ object BitsAPI {
             }
         }
     }
+
+    fun hasCookieBuff() = !(cookieBuffTime?.isInFuture() ?: true)
 
     fun isEnabled() = LorenzUtils.inSkyBlock && profileStorage != null
 
