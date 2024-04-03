@@ -15,6 +15,7 @@ import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.LorenzLogger
 import at.hannibal2.skyhanni.utils.LorenzUtils
+import at.hannibal2.skyhanni.utils.LorenzUtils.isInIsland
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.StringUtils.matches
@@ -102,6 +103,7 @@ class HypixelData {
         var joinedWorld = SimpleTimeMark.farPast()
 
         var skyBlockArea = "?"
+        var skyBlockAreaWithSymbol = "?"
 
         // Data from locraw
         var locrawData: JsonObject? = null
@@ -158,7 +160,7 @@ class HypixelData {
                 playerAmountGuestingPattern
             )
 
-            out@for (pattern in playerPatternList) {
+            out@ for (pattern in playerPatternList) {
                 for (line in TabListData.getTabList()) {
                     pattern.matchMatcher(line) {
                         amount += group("amount").toInt()
@@ -291,9 +293,10 @@ class HypixelData {
         if (LorenzUtils.inSkyBlock) {
             val originalLocation = ScoreboardData.sidebarLinesFormatted
                 .firstOrNull { it.startsWith(" §7⏣ ") || it.startsWith(" §5ф ") }
-                ?.substring(5)?.removeColor()
+                ?.substring(5)
                 ?: "?"
-            skyBlockArea = LocationFixData.fixLocation(skyBlockIsland) ?: originalLocation
+            skyBlockArea = LocationFixData.fixLocation(skyBlockIsland) ?: originalLocation.removeColor()
+            skyBlockAreaWithSymbol = "§${if (IslandType.THE_RIFT.isInIsland()) "5ф" else "7⏣"} $originalLocation"
 
             checkProfileName()
         }
