@@ -7,11 +7,12 @@ import at.hannibal2.skyhanni.data.PartyAPI
 import at.hannibal2.skyhanni.events.MessageSendToServerEvent
 import at.hannibal2.skyhanni.features.misc.limbo.LimboTimeTracker
 import at.hannibal2.skyhanni.utils.ChatUtils
+import at.hannibal2.skyhanni.utils.EntityUtils
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
 object PartyCommands {
 
-    private val config get() = SkyHanniMod.feature.commands
+    private val config get() = SkyHanniMod.feature.misc.commands
 
     fun kickOffline() {
         if (!config.shortCommands) return
@@ -63,7 +64,7 @@ object PartyCommands {
     }
 
     @SubscribeEvent
-    fun onSendCommand(event: MessageSendToServerEvent) {
+    fun onMessageSendToServer(event: MessageSendToServerEvent) {
         if (!config.partyKickReason) {
             return
         }
@@ -93,7 +94,8 @@ object PartyCommands {
             } else {
                 emptyList<String>()
             }
-            return friends + getPartyCommands()
+            val allOnLobby = EntityUtils.getPlayerEntities().map { it.name }
+            return friends + getPartyCommands() + allOnLobby
         }
         return null
     }
@@ -107,6 +109,8 @@ object PartyCommands {
     @SubscribeEvent
     fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
         event.move(5, "commands.usePartyTransferAlias", "commands.shortCommands")
+
+        event.move(31, "commands", "misc.commands")
     }
 }
 

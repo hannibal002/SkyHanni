@@ -4,7 +4,7 @@ import at.hannibal2.skyhanni.config.features.gui.customscoreboard.DisplayConfig
 import at.hannibal2.skyhanni.data.HypixelData
 import at.hannibal2.skyhanni.data.ScoreboardData
 import at.hannibal2.skyhanni.features.bingo.BingoAPI
-import at.hannibal2.skyhanni.features.gui.customscoreboard.CustomScoreboard.Companion.config
+import at.hannibal2.skyhanni.features.gui.customscoreboard.CustomScoreboard.Companion.displayConfig
 import at.hannibal2.skyhanni.utils.NumberUtil
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.NumberUtil.formatDouble
@@ -15,7 +15,6 @@ import at.hannibal2.skyhanni.utils.TabListData
 import java.util.regex.Pattern
 
 object CustomScoreboardUtils {
-    private val numberFormat get() = config.displayConfig.numberFormat
 
     internal fun getGroupFromPattern(list: List<String>, pattern: Pattern, group: String) = list.map {
         it.removeResets().trimWhiteSpace()
@@ -41,7 +40,7 @@ object CustomScoreboardUtils {
         return tabList.footer_skyhanni.formattedText.replace("§r", "")
     }
 
-    internal fun Number.formatNum(): String = when (numberFormat) {
+    internal fun Number.formatNum(): String = when (displayConfig.numberFormat) {
         DisplayConfig.NumberFormat.SHORT -> NumberUtil.format(this)
         DisplayConfig.NumberFormat.LONG -> this.addSeparators()
         else -> "0"

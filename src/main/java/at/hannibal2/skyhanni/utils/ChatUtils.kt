@@ -1,6 +1,7 @@
 package at.hannibal2.skyhanni.utils
 
 import at.hannibal2.skyhanni.SkyHanniMod
+import at.hannibal2.skyhanni.data.ChatClickActionManager
 import at.hannibal2.skyhanni.events.LorenzTickEvent
 import at.hannibal2.skyhanni.events.MessageSendToServerEvent
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
@@ -128,6 +129,20 @@ object ChatUtils {
     }
 
     /**
+     * Sends a message to the user that they can click and run an action
+     * @param message The message to be sent
+     * @param onClick The runnable to be executed when the message is clicked
+     * @param prefix Whether to prefix the message with the chat prefix, default true
+     * @param prefixColor Color that the prefix should be, default yellow (§e)
+     *
+     * @see CHAT_PREFIX
+     */
+    fun clickableChat(message: String, onClick: () -> Any, prefix: Boolean = true, prefixColor: String = "§e") {
+        val msgPrefix = if (prefix) prefixColor + CHAT_PREFIX else ""
+        ChatClickActionManager.oneTimeClick(msgPrefix + message, onClick)
+    }
+
+    /**
      * Sends a message to the user that they can click and run a command
      * @param message The message to be sent
      * @param hover The message to be shown when the message is hovered
@@ -191,7 +206,7 @@ object ChatUtils {
         (lastMessageSent + sendQueue.size * messageDelay).takeIf { !it.isInPast() } ?: SimpleTimeMark.now()
 
     @SubscribeEvent
-    fun sendQueuedChatMessages(event: LorenzTickEvent) {
+    fun onTick(event: LorenzTickEvent) {
         val player = Minecraft.getMinecraft().thePlayer
         if (player == null) {
             sendQueue.clear()

@@ -331,6 +331,11 @@ object SackAPI {
         var price: Long = 0,
         var magmaFish: Long = 0,
     )
+
+    fun NEUInternalName.getAmountInSacksOrNull(): Long? =
+        fetchSackItem(this).takeIf { it.statusIsCorrectOrAlright() }?.amount
+
+    fun NEUInternalName.getAmountInSacks(): Long = getAmountInSacksOrNull() ?: 0
 }
 
 data class SackItem(

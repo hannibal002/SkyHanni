@@ -3,8 +3,8 @@ package at.hannibal2.skyhanni.features.garden.visitor
 import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.config.features.garden.visitor.VisitorConfig.HighlightMode
 import at.hannibal2.skyhanni.data.IslandType
-import at.hannibal2.skyhanni.data.SackAPI
-import at.hannibal2.skyhanni.data.SackStatus
+import at.hannibal2.skyhanni.data.SackAPI.getAmountInSacks
+import at.hannibal2.skyhanni.data.SackAPI.getAmountInSacksOrNull
 import at.hannibal2.skyhanni.events.DebugDataCollectEvent
 import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.LorenzChatEvent
@@ -12,14 +12,12 @@ import at.hannibal2.skyhanni.events.LorenzTickEvent
 import at.hannibal2.skyhanni.events.OwnInventoryItemUpdateEvent
 import at.hannibal2.skyhanni.events.ProfileJoinEvent
 import at.hannibal2.skyhanni.events.SackDataUpdateEvent
-import at.hannibal2.skyhanni.events.SkyHanniRenderEntityEvent
 import at.hannibal2.skyhanni.events.garden.visitor.VisitorAcceptEvent
 import at.hannibal2.skyhanni.events.garden.visitor.VisitorAcceptedEvent
 import at.hannibal2.skyhanni.events.garden.visitor.VisitorArrivalEvent
 import at.hannibal2.skyhanni.events.garden.visitor.VisitorOpenEvent
 import at.hannibal2.skyhanni.events.garden.visitor.VisitorRefusedEvent
 import at.hannibal2.skyhanni.events.garden.visitor.VisitorRenderEvent
-import at.hannibal2.skyhanni.events.garden.visitor.VisitorToolTipEvent
 import at.hannibal2.skyhanni.features.garden.CropType.Companion.getByNameOrNull
 import at.hannibal2.skyhanni.features.garden.GardenAPI
 import at.hannibal2.skyhanni.features.garden.farming.GardenCropSpeed.getSpeed
@@ -30,7 +28,7 @@ import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.CollectionUtils.addAsSingletonList
 import at.hannibal2.skyhanni.utils.ConfigUtils
 import at.hannibal2.skyhanni.utils.EntityUtils
-import at.hannibal2.skyhanni.utils.InventoryUtils
+import at.hannibal2.skyhanni.utils.InventoryUtils.getAmountInInventory
 import at.hannibal2.skyhanni.utils.ItemBlink
 import at.hannibal2.skyhanni.utils.ItemUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName
@@ -52,7 +50,7 @@ import at.hannibal2.skyhanni.utils.RenderUtils.drawString
 import at.hannibal2.skyhanni.utils.RenderUtils.renderStringsAndItems
 import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
-import at.hannibal2.skyhanni.utils.TimeUtils
+import at.hannibal2.skyhanni.utils.TimeUtils.format
 import at.hannibal2.skyhanni.utils.getLorenzVec
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
@@ -64,14 +62,13 @@ import net.minecraft.entity.EntityLivingBase
 import net.minecraft.entity.item.EntityArmorStand
 import net.minecraft.item.ItemStack
 import net.minecraftforge.client.event.GuiScreenEvent.DrawScreenEvent
-import net.minecraftforge.fml.common.eventhandler.EventPriority
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import kotlin.math.round
 import kotlin.time.Duration.Companion.seconds
 
 private val config get() = VisitorAPI.config
 
-class GardenVisitorFeatures {
+object GardenVisitorFeatures {
 
     private var display = emptyList<List<Any>>()
 
@@ -90,7 +87,7 @@ class GardenVisitorFeatures {
     )
     private val visitorChatMessagePattern by patternGroup.pattern(
         "visitorchat",
-        "§e\\[NPC] (§.)?(?<name>.*)§f: §r.*"
+        "§e\\[NPC] (?<color>§.)?(?<name>.*)§f: §r.*"
     )
     private val partialAcceptedPattern by patternGroup.pattern(
         "partialaccepted",
@@ -200,12 +197,9 @@ class GardenVisitorFeatures {
                 }
 
                 if (config.shoppingList.showSackCount) {
-                    val sackItemData = SackAPI.fetchSackItem(internalName)
-                    val itemStatus = sackItemData.getStatus()
-                    val itemAmount = sackItemData.amount
-                    if (itemStatus != SackStatus.OUTDATED) {
-                        val textColour = if (itemAmount >= amount) "a" else "e"
-                        list.add(" §7(§${textColour}x${sackItemData.amount.addSeparators()} §7in sacks)")
+                    internalName.getAmountInSacksOrNull()?.let {
+                        val textColour = if (it >= amount) "a" else "e"
+                        list.add(" §7(§${textColour}x${it.addSeparators()} §7in sacks)")
                     }
                 }
 
@@ -301,16 +295,13 @@ class GardenVisitorFeatures {
         }
     }
 
-    @SubscribeEvent(priority = EventPriority.HIGH)
-    fun onVisitorTooltip(event: VisitorToolTipEvent) {
-        if (event.itemStack.name != "§aAccept Offer") return
+    fun onTooltip(visitor: VisitorAPI.Visitor, itemStack: ItemStack, toolTip: MutableList<String>) {
+        if (itemStack.name != "§aAccept Offer") return
 
-        val visitor = event.visitor
-        val toolTip = event.toolTip
         toolTip.clear()
 
         if (visitor.lastLore.isEmpty()) {
-            readToolTip(visitor, event.itemStack)
+            readToolTip(visitor, itemStack)
         }
 
         toolTip.addAll(visitor.lastLore)
@@ -319,7 +310,7 @@ class GardenVisitorFeatures {
     private fun readToolTip(visitor: VisitorAPI.Visitor, itemStack: ItemStack?) {
         val stack = itemStack ?: error("Accept offer item not found for visitor ${visitor.visitorName}")
         var totalPrice = 0.0
-        var farmingTimeRequired = -1L
+        var farmingTimeRequired = 0.seconds
         var readingShoppingList = true
         lastFullPrice = 0.0
         val foundRewards = mutableListOf<NEUInternalName>()
@@ -376,11 +367,11 @@ class GardenVisitorFeatures {
             copperPattern.matchMatcher(formattedLine) {
                 val copper = group("amount").formatInt()
                 val pricePerCopper = NumberUtil.format((totalPrice / copper).toInt())
-                val timePerCopper = TimeUtils.formatDuration((farmingTimeRequired / copper) * 1000)
+                val timePerCopper = (farmingTimeRequired / copper).format()
                 var copperLine = formattedLine
                 if (config.inventory.copperPrice) copperLine += " §7(§6$pricePerCopper §7per)"
                 if (config.inventory.copperTime) {
-                    copperLine += if (farmingTimeRequired != -1L) " §7(§b$timePerCopper §7per)" else " §7(§cno speed data!§7)"
+                    copperLine += if (farmingTimeRequired != 0.seconds) " §7(§b$timePerCopper §7per)" else " §7(§cno speed data!§7)"
                 }
                 finalList.set(index, copperLine)
             }
@@ -409,8 +400,8 @@ class GardenVisitorFeatures {
             val cropAmount = multiplier.second.toLong() * amount
             val formattedName = "§e${cropAmount.addSeparators()}§7x ${cropType.cropName} "
             val formattedSpeed = cropType.getSpeed()?.let { speed ->
-                farmingTimeRequired = cropAmount / speed
-                val duration = TimeUtils.formatDuration(farmingTimeRequired * 1000)
+                val duration = (cropAmount / speed).seconds
+                farmingTimeRequired += duration
                 "in §b$duration"
             } ?: "§cno speed data!"
             if (config.inventory.exactAmountAndTime) {
@@ -425,7 +416,7 @@ class GardenVisitorFeatures {
     fun onTick(event: LorenzTickEvent) {
         if (!GardenAPI.inGarden()) return
         if (!config.shoppingList.display && config.highlightStatus == HighlightMode.DISABLED) return
-        if (!event.isMod(10)) return
+        if (!event.isMod(10, 2)) return
 
         if (GardenAPI.onBarnPlot && config.highlightStatus != HighlightMode.DISABLED) {
             checkVisitorsReady()
@@ -440,8 +431,9 @@ class GardenVisitorFeatures {
         update()
 
         logger.log("New visitor detected: '$name'")
+        val recentWorldSwitch = LorenzUtils.lastWorldSwitch.passedSince() < 2.seconds
 
-        if (config.notificationTitle && System.currentTimeMillis() > LorenzUtils.lastWorldSwitch + 2_000) {
+        if (config.notificationTitle && !recentWorldSwitch) {
             LorenzUtils.sendTitle("§eNew Visitor", 5.seconds)
         }
         if (config.notificationChat) {
@@ -449,7 +441,7 @@ class GardenVisitorFeatures {
             ChatUtils.chat("$displayName §eis visiting your garden!")
         }
 
-        if (System.currentTimeMillis() > LorenzUtils.lastWorldSwitch + 2_000) {
+        if (!recentWorldSwitch) {
             if (name.removeColor().contains("Jerry")) {
                 logger.log("Jerry!")
                 ItemBlink.setBlink(NEUItems.getItemStackOrNull("JERRY;4"), 5_000)
@@ -462,7 +454,7 @@ class GardenVisitorFeatures {
     }
 
     @SubscribeEvent
-    fun onChatMessage(event: LorenzChatEvent) {
+    fun onChat(event: LorenzChatEvent) {
         if (config.hypixelArrivedMessage && visitorArrivePattern.matcher(event.message).matches()) {
             event.blockedReason = "new_visitor_arrived"
         }
@@ -479,8 +471,10 @@ class GardenVisitorFeatures {
     }
 
     private fun hideVisitorMessage(message: String) = visitorChatMessagePattern.matchMatcher(message) {
+        val color = group("color")
+        if (color == null || color == "§e") return false // Non-visitor NPC, probably Jacob
+
         val name = group("name")
-        if (name == "Jacob") return false
         if (name == "Spaceman") return false
         if (name == "Beth") return false
 
@@ -537,13 +531,7 @@ class GardenVisitorFeatures {
     private fun hasItems(visitor: VisitorAPI.Visitor): Boolean {
         var ready = true
         for ((internalName, required) in visitor.shoppingList) {
-            val inventoryAmount = InventoryUtils.getAmountOfItemInInventory(internalName)
-
-            val sackItemData = SackAPI.fetchSackItem(internalName)
-            val sacksAmount = sackItemData.amount
-
-            val having = inventoryAmount + sacksAmount
-
+            val having = internalName.getAmountInInventory() + internalName.getAmountInSacks()
             if (having < required) {
                 ready = false
             }
