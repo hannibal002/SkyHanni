@@ -95,7 +95,7 @@ object GardenAPI {
     @SubscribeEvent
     fun onTick(event: LorenzTickEvent) {
         if (!inGarden()) return
-        if (event.isMod(10)) {
+        if (event.isMod(10, 1)) {
             inBarn = barnArea.isPlayerInside()
 
             // We ignore random hypixel moments
@@ -183,7 +183,7 @@ object GardenAPI {
     private var lastLocation: LorenzVec? = null
 
     @SubscribeEvent
-    fun onBlockBreak(event: BlockClickEvent) {
+    fun onBlockClick(event: BlockClickEvent) {
         if (!inGarden()) return
 
         val blockState = event.getBlockState

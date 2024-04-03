@@ -75,11 +75,11 @@ object PestAPI {
         "§4§lൠ §cThis plot has §6(?<amount>\\d) Pests?§c!"
     )
     /**
-     * REGEX-TEST:  Infested Plots: §r§b4§r§f, §r§b12§r§f, §r§b13§r§f, §r§b18§r§f, §r§b20
+     * REGEX-TEST:  Plots: §r§b4§r§f, §r§b12§r§f, §r§b13§r§f, §r§b18§r§f, §r§b20
      */
     private val infectedPlotsTablistPattern by patternGroup.pattern(
         "tablist.infectedplots",
-        "\\sInfested Plots: (?<plots>.*)"
+        "\\sPlots: (?<plots>.*)"
     )
 
     private fun fixPests() {
@@ -143,7 +143,7 @@ object PestAPI {
     }
 
     @SubscribeEvent
-    fun onTablistUpdate(event: TabListUpdateEvent) {
+    fun onTabListUpdate(event: TabListUpdateEvent) {
         if (!GardenAPI.inGarden()) return
         var previousLine = ""
         for (line in event.tabList) {

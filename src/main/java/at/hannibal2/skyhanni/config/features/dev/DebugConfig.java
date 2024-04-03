@@ -98,6 +98,11 @@ public class DebugConfig {
     public boolean hotSwapDetection = false;
 
     @Expose
+    @ConfigOption(name = "Always Outdated", desc = "For the sake of the auto updater, act like you are always oudated.")
+    @ConfigEditorBoolean
+    public boolean alwaysOutdated = false;
+
+    @Expose
     @ConfigOption(name = "SkyHanni Event Counter", desc = "Count once per second how many skyhanni events gets triggered, " +
         "show the total amount in console output.")
     @ConfigEditorBoolean
@@ -112,6 +117,16 @@ public class DebugConfig {
     @ConfigOption(name = "SkyBlock Area", desc = "Show your current area in SkyBlock while f3 is open.")
     @ConfigEditorBoolean
     public boolean currentAreaDebug = true;
+
+    @Expose
+    @ConfigOption(name = "Always April Fools", desc = "Always show April fools jokes.")
+    @ConfigEditorBoolean
+    public boolean alwaysFunnyTime = false;
+
+    @Expose
+    @ConfigOption(name = "Never April Fools", desc = "Admit it, you hate fun.")
+    @ConfigEditorBoolean
+    public boolean neverFunnyTime = false;
 
     @Expose
     public Position trackSoundPosition = new Position(0, 0);
