@@ -57,7 +57,11 @@ object MythologicalCreatureTracker {
 
         override fun reset() {
             count.clear()
+            mobsSinceLastInquisitor = 0
         }
+
+        @Expose
+        var mobsSinceLastInquisitor: Int = 0
 
         @Expose
         var count: MutableMap<MythologicalCreatureType, Int> = mutableMapOf()
@@ -78,7 +82,14 @@ object MythologicalCreatureTracker {
             if (creatureType.pattern.matches(event.message)) {
                 BurrowAPI.lastBurrowRelatedChatMessage = SimpleTimeMark.now()
                 tracker.modify { it.count.addOrPut(creatureType, 1) }
-
+                when (creatureType) {
+                    MythologicalCreatureType.MINOS_INQUISITOR -> {
+                        tracker.modify { it.mobsSinceLastInquisitor = 0 }
+                    }
+                    else -> {
+                        tracker.modify { it.mobsSinceLastInquisitor += 1 }
+                    }
+                }
                 if (config.hideChat) {
                     event.blockedReason = "mythological_creature_dug"
                 }
@@ -99,6 +110,7 @@ object MythologicalCreatureTracker {
             addAsSingletonList(" §7- §e${amount.addSeparators()} ${creatureType.displayName}$percentageSuffix")
         }
         addAsSingletonList(" §7- §e${total.addSeparators()} §7Total Mythological Creatures")
+        addAsSingletonList("§e${data.mobsSinceLastInquisitor.addSeparators()} §7Since last Minos Inquisitor")
     }
 
     @SubscribeEvent
