@@ -26,11 +26,10 @@ object HighlightOnHoverSlot {
     @SubscribeEvent(priority = EventPriority.LOW)
     fun onDrawBackground(event: GuiContainerEvent.BackgroundDrawnEvent) {
         if (!LorenzUtils.inSkyBlock) return
-        for ((_, indexes) in currentSlots) {
-            for (slot in InventoryUtils.getItemsInOpenChest()) {
-                if (indexes.contains(slot.slotIndex)) {
-                    slot highlight LorenzColor.GREEN
-                }
+        val list = currentSlots.flatMapTo(mutableSetOf()) { it.value }
+        for (slot in InventoryUtils.getItemsInOpenChest()) {
+            if (slot.slotNumber in list) {
+                slot highlight LorenzColor.GREEN
             }
         }
     }
