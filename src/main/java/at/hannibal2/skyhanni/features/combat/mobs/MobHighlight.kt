@@ -81,7 +81,7 @@ class MobHighlight {
                         entity,
                         LorenzColor.GREEN.toColor().withAlpha(127)
                     )
-                    { config.zealotBruiserHighlighter }
+                    { config.chestZealotHighlighter }
                 }
             }
 
