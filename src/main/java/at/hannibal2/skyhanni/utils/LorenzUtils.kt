@@ -330,13 +330,13 @@ object LorenzUtils {
 
     inline fun <reified T : Enum<T>> enumValueOf(name: String) =
         enumValueOfOrNull<T>(name)
-            ?: kotlin.error("Unknown enum constant for ${enumValues<T>().first().name.javaClass.simpleName}: '$name'")
+            ?: error("Unknown enum constant for ${enumValues<T>().first().name.javaClass.simpleName}: '$name'")
 
     inline fun <reified T : Enum<T>> enumJoinToPattern(noinline transform: (T) -> CharSequence = { it.name }) =
         enumValues<T>().joinToString("|", transform = transform)
 
     // TODO move to val by lazy
-    fun isInDevEnviromen() = Launch.blackboard["fml.deobfuscatedEnvironment"] as Boolean
+    fun isInDevEnvironment() = Launch.blackboard["fml.deobfuscatedEnvironment"] as Boolean
 
     fun shutdownMinecraft(reason: String? = null) {
         System.err.println("SkyHanni-${SkyHanniMod.version} forced the game to shutdown.")
