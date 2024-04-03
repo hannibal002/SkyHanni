@@ -12,7 +12,7 @@ import at.hannibal2.skyhanni.utils.NEUInternalName.Companion.asInternalName
 import at.hannibal2.skyhanni.utils.NEUItems.getPrice
 import at.hannibal2.skyhanni.utils.NumberUtil
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
-import at.hannibal2.skyhanni.utils.NumberUtil.formatNumber
+import at.hannibal2.skyhanni.utils.NumberUtil.formatDouble
 import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
@@ -29,7 +29,7 @@ class AnitaExtraFarmingFortune {
     private var levelPrice = mapOf<Int, Price>()
 
     @SubscribeEvent
-    fun onItemTooltip(event: LorenzToolTipEvent) {
+    fun onTooltip(event: LorenzToolTipEvent) {
         if (!config.extraFarmingFortune) return
 
         if (InventoryUtils.openInventoryName() != "Anita") return
@@ -42,7 +42,7 @@ class AnitaExtraFarmingFortune {
         val baseAmount = levelPrice[anitaUpgrade + 1]?.jacob_tickets ?: return
         for (line in event.toolTip) {
             realAmountPattern.matchMatcher(line) {
-                val realAmount = group("realAmount").formatNumber().toDouble()
+                val realAmount = group("realAmount").formatDouble()
                 contributionFactor = realAmount / baseAmount
             }
         }

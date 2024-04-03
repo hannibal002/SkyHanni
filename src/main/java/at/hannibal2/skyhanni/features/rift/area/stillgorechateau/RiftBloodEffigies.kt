@@ -2,6 +2,7 @@ package at.hannibal2.skyhanni.features.rift.area.stillgorechateau
 
 import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.data.jsonobjects.repo.RiftEffigiesJson
+import at.hannibal2.skyhanni.events.DebugDataCollectEvent
 import at.hannibal2.skyhanni.events.LorenzRenderWorldEvent
 import at.hannibal2.skyhanni.events.LorenzTickEvent
 import at.hannibal2.skyhanni.events.LorenzWorldChangeEvent
@@ -28,16 +29,6 @@ class RiftBloodEffigies {
 
     private val config get() = RiftAPI.config.area.stillgoreChateau.bloodEffigies
 
-    private val patternGroup = RepoPattern.group("rift.area.stillgore.effegies")
-    private val effigiesTimerPattern by patternGroup.pattern(
-        "respawn",
-        "§eRespawn §c(?<time>.*) §7\\(or click!\\)"
-    )
-    private val effegieHeartPattern by patternGroup.pattern(
-        "heart",
-        "Effigies: (?<hearts>.*)"
-    )
-
     private var locations: List<LorenzVec> = emptyList()
     private var effigiesTimes = mapOf(
         0 to -1L,
@@ -47,6 +38,18 @@ class RiftBloodEffigies {
         4 to -1L,
         5 to -1L,
     )
+
+    companion object {
+        private val group = RepoPattern.group("rift.area.stillgore.effegies")
+        val effigiesTimerPattern by group.pattern(
+            "respawn",
+            "§eRespawn §c(?<time>.*) §7\\(or click!\\)"
+        )
+        val heartsPattern by group.pattern(
+            "heart",
+            "Effigies: (?<hearts>((§[7c])?⧯)*)"
+        )
+    }
 
     @SubscribeEvent
     fun onWorldChange(event: LorenzWorldChangeEvent) {
@@ -58,6 +61,23 @@ class RiftBloodEffigies {
             4 to -1L,
             5 to -1L,
         )
+    }
+
+    @SubscribeEvent
+    fun onDebugDataCollect(event: DebugDataCollectEvent) {
+        event.title("Rift Blood Effigies")
+
+        if (!isEnabled()) {
+            event.addIrrelevant("Not in Stillgore Château or not enabled ")
+            return
+        }
+        event.addData {
+            for ((number, duration) in effigiesTimes) {
+                val diff = duration - System.currentTimeMillis()
+                val time = TimeUtils.formatDuration(diff - 999)
+                add("$number: $time ($duration)")
+            }
+        }
     }
 
     @SubscribeEvent
@@ -74,7 +94,7 @@ class RiftBloodEffigies {
         if (!isEnabled()) return
 
         val line = event.newList.firstOrNull { it.startsWith("Effigies:") } ?: return
-        val hearts = effegieHeartPattern.matchMatcher(line) {
+        val hearts = heartsPattern.matchMatcher(line) {
             group("hearts")
         } ?: return
 

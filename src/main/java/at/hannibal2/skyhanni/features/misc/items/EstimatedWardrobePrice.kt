@@ -1,6 +1,5 @@
 package at.hannibal2.skyhanni.features.misc.items
 
-import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.events.InventoryFullyOpenedEvent
 import at.hannibal2.skyhanni.events.LorenzToolTipEvent
@@ -14,7 +13,7 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
 class EstimatedWardrobePrice {
 
-    private val config get() = SkyHanniMod.feature.misc.estimatedItemValues
+    private val config get() = EstimatedItemValue.config
     var data = mutableMapOf<Int, MutableList<ItemStack>>()
 
     @SubscribeEvent
@@ -37,11 +36,10 @@ class EstimatedWardrobePrice {
 
         var totalPrice = 0.0
         for (item in items) {
-            val name = item.name
             val price = EstimatedItemValueCalculator.calculate(item, mutableListOf()).first
             totalPrice += price
 
-            toolTip.add(index++, "  §7- $name: §6${NumberUtil.format(price)}")
+            toolTip.add(index++, "  §7- ${item.name}: §6${NumberUtil.format(price)}")
         }
         toolTip.add(index, " §aTotal Value: §6§l${NumberUtil.format(totalPrice)} coins")
     }

@@ -182,7 +182,7 @@ object GhostCounter {
         val bestiary = if (config.showMax) {
             when (nextLevel) {
                 26 -> bestiaryFormatting.maxed.replace("%currentKill%", currentKill.addSeparators())
-                in 1 .. 25 -> {
+                in 1..25 -> {
                     val sum = bestiaryData.filterKeys { it <= nextLevel - 1 }.values.sum()
 
                     val cKill = sum + currentKill
@@ -195,7 +195,7 @@ object GhostCounter {
         } else {
             when (nextLevel) {
                 26 -> bestiaryFormatting.maxed
-                in 1 .. 25 -> bestiaryFormatting.progress
+                in 1..25 -> bestiaryFormatting.progress
                 else -> bestiaryFormatting.openMenu
             }
         }
@@ -284,8 +284,9 @@ object GhostCounter {
         }
         val moneyMadeWithClickableTips = Renderable.clickAndHover(
             textFormatting.moneyMadeFormat.formatText(moneyMade.addSeparators()),
-            moneyMadeTips
-        ) { OSUtils.copyToClipboard(moneyMadeTips.joinToString("\n").removeColor()) }
+            moneyMadeTips,
+            onClick = { OSUtils.copyToClipboard(moneyMadeTips.joinToString("\n").removeColor()) }
+        )
         addAsSingletonList(textFormatting.moneyHourFormat.formatText(final))
         addAsSingletonList(moneyMadeWithClickableTips)
     }
@@ -301,7 +302,7 @@ object GhostCounter {
                     val res = current.formatNumber().toString()
                     gain = (res.toLong() - lastXp.toLong()).toDouble().roundToInt()
                     num = (gain.toDouble() / gained)
-                    if (gained in 150.0 .. 450.0 && lastXp != "0" && num >= 0) {
+                    if (gained in 150.0..450.0 && lastXp != "0" && num >= 0) {
                         KILLS.add(num)
                         KILLS.add(num, true)
                         Option.GHOSTSINCESORROW.add(num)
@@ -390,7 +391,7 @@ object GhostCounter {
     }
 
     @SubscribeEvent
-    fun onTabUpdate(event: TabListUpdateEvent) {
+    fun onTabListUpdate(event: TabListUpdateEvent) {
         if (!isEnabled()) return
         for (line in event.tabList) {
             skillLevelPattern.matchMatcher(line) {
@@ -403,7 +404,6 @@ object GhostCounter {
     @SubscribeEvent
     fun onChat(event: LorenzChatEvent) {
         if (!isEnabled()) return
-        if (LorenzUtils.skyBlockIsland != IslandType.DWARVEN_MINES) return
         for (opt in Option.entries) {
             val pattern = opt.pattern ?: continue
             pattern.matchMatcher(event.message) {
@@ -517,5 +517,5 @@ object GhostCounter {
         }
     }
 
-    fun isEnabled() = config.enabled && IslandType.DWARVEN_MINES.isInIsland()
+    fun isEnabled() = IslandType.DWARVEN_MINES.isInIsland() && config.enabled
 }

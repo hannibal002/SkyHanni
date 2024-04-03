@@ -34,7 +34,7 @@ class MaxPurseItems {
         "createinstant",
         "§aBuy Instantly"
     )
-    
+
     private var buyOrderPrice: Double? = null
     private var instantBuyPrice: Double? = null
 
@@ -45,7 +45,7 @@ class MaxPurseItems {
                 for (info in item.getLore()) {
                     orderPattern.matchMatcher(info) {
                         // +0.1 because I expect people to use the gold nugget option
-                        buyOrderPrice = group("coins").formatDouble()?.let { it + 0.1 } ?: 0.0
+                        buyOrderPrice = group("coins").formatDouble() + 0.1
                         // If we get to this point, we have the instant price because instant is earlier in the list of items
                         // So we can return
                         return
@@ -55,7 +55,7 @@ class MaxPurseItems {
             createInstantPattern.matchMatcher(name) {
                 for (info in item.getLore()) {
                     instantPattern.matchMatcher(info) {
-                        instantBuyPrice = group("coins").formatDouble() ?: 0.0
+                        instantBuyPrice = group("coins").formatDouble()
                     }
                 }
             }
@@ -63,7 +63,7 @@ class MaxPurseItems {
     }
 
     @SubscribeEvent
-    fun onRenderOverlay(event: GuiRenderEvent.ChestGuiOverlayRenderEvent) {
+    fun onBackgroundDraw(event: GuiRenderEvent.ChestGuiOverlayRenderEvent) {
         if (!isEnabled()) return
         if (!BazaarApi.inBazaarInventory) return
         // I would use BazaarAPI for price info, but as soon as NEU's data goes out of date, it will be wrong

@@ -8,7 +8,7 @@ import at.hannibal2.skyhanni.utils.StringUtils.cleanPlayerName
 import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.StringUtils.removeResets
-import at.hannibal2.skyhanni.utils.StringUtils.trimWhiteSpaceAndResets
+import at.hannibal2.skyhanni.utils.StringUtils.trimWhiteSpace
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import kotlin.random.Random
@@ -18,7 +18,7 @@ object PartyAPI {
     private val patternGroup = RepoPattern.group("data.party")
     private val youJoinedPartyPattern by patternGroup.pattern(
         "you.joined",
-        "§eYou have joined (?<name>.*)'s §eparty!"
+        "§eYou have joined (?<name>.*)'s? §eparty!"
     )
     private val othersJoinedPartyPattern by patternGroup.pattern(
         "others.joined",
@@ -94,7 +94,7 @@ object PartyAPI {
 
     @SubscribeEvent
     fun onChat(event: LorenzChatEvent) {
-        val message = event.message.trimWhiteSpaceAndResets().removeResets()
+        val message = event.message.trimWhiteSpace().removeResets()
 
         // new member joined
         youJoinedPartyPattern.matchMatcher(message) {

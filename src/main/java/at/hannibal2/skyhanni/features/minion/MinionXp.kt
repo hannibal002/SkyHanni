@@ -1,7 +1,7 @@
 package at.hannibal2.skyhanni.features.minion
 
 import at.hannibal2.skyhanni.SkyHanniMod
-import at.hannibal2.skyhanni.data.MayorElection
+import at.hannibal2.skyhanni.data.Perk
 import at.hannibal2.skyhanni.data.jsonobjects.repo.MinionXPJson
 import at.hannibal2.skyhanni.events.IslandChangeEvent
 import at.hannibal2.skyhanni.events.LorenzToolTipEvent
@@ -28,7 +28,7 @@ import java.util.EnumMap
 
 class MinionXp {
 
-    private val config get() = SkyHanniMod.feature.minions
+    private val config get() = SkyHanniMod.feature.misc.minions
 
     private val xpItemMap: MutableMap<PrimitiveItemStack, String> = mutableMapOf()
     private val collectItemXpList: MutableList<String> = mutableListOf()
@@ -47,7 +47,7 @@ class MinionXp {
 
     private fun toPrimitiveItemStack(itemStack: ItemStack) =
         PrimitiveItemStack(itemStack.getInternalName(), itemStack.stackSize)
-    
+
     @SubscribeEvent
     fun onMinionOpen(event: MinionOpenEvent) {
         if (!config.xpDisplay) return
@@ -89,10 +89,13 @@ class MinionXp {
         }
     }
 
+    // TODO find the correct name of the list
+    private val listWithMissingName = listOf(21..26, 30..35, 39..44)
+
     private fun handleItems(inventoryItems: Map<Int, ItemStack>, isMinion: Boolean): EnumMap<SkillType, Double> {
         val xpTotal = EnumMap<SkillType, Double>(SkillType::class.java)
         inventoryItems.filter {
-            it.value.getLore().isNotEmpty() && (!isMinion || it.key in listOf(21 .. 26, 30 .. 35, 39 .. 44).flatten())
+            it.value.getLore().isNotEmpty() && (!isMinion || it.key in listWithMissingName.flatten())
         }.forEach { (_, itemStack) ->
             val item = toPrimitiveItemStack(itemStack)
             val name = item.internalName
@@ -100,7 +103,7 @@ class MinionXp {
 
             // TODO add wisdom and temporary skill exp (Events) to calculation
             val baseXp = xp.amount * item.amount
-            val xpAmount = if (MayorElection.isPerkActive("Derpy", "MOAR SKILLZ!!!")) {
+            val xpAmount = if (Perk.MOAR_SKILLZ.isActive) {
                 baseXp * 1.5
             } else baseXp
 
@@ -138,7 +141,7 @@ class MinionXp {
     }
 
     @SubscribeEvent
-    fun onItemTooltipEvent(event: LorenzToolTipEvent) {
+    fun onTooltip(event: LorenzToolTipEvent) {
         if (!LorenzUtils.inSkyBlock) return
         if (!config.xpDisplay) return
         when {
@@ -165,7 +168,7 @@ class MinionXp {
     }
 
     @SubscribeEvent
-    fun onIslandChangeEvent(event: IslandChangeEvent) {
+    fun onIslandChange(event: IslandChangeEvent) {
         minionStorages.clear()
         xpItemMap.clear()
         collectItemXpList.clear()

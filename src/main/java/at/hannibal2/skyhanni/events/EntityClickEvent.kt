@@ -6,4 +6,5 @@ import net.minecraft.item.ItemStack
 import net.minecraftforge.fml.common.eventhandler.Cancelable
 
 @Cancelable
-class EntityClickEvent(clickType: ClickType, val clickedEntity: Entity?, itemInHand: ItemStack?) : WorldClickEvent(itemInHand, clickType)
+class EntityClickEvent(clickType: ClickType, val clickedEntity: Entity?, itemInHand: ItemStack?) :
+    WorldClickEvent(itemInHand, clickType)

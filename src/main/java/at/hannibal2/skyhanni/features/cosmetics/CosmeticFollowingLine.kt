@@ -2,6 +2,7 @@ package at.hannibal2.skyhanni.features.cosmetics
 
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
+import at.hannibal2.skyhanni.config.enums.OutsideSbFeature
 import at.hannibal2.skyhanni.events.LorenzRenderWorldEvent
 import at.hannibal2.skyhanni.events.LorenzTickEvent
 import at.hannibal2.skyhanni.events.LorenzWorldChangeEvent
@@ -21,7 +22,7 @@ import kotlin.time.Duration.Companion.seconds
 
 class CosmeticFollowingLine {
 
-    private val config get() = SkyHanniMod.feature.misc.cosmetic.followingLine
+    private val config get() = SkyHanniMod.feature.gui.cosmetic.followingLine
 
     private var locations = mapOf<LorenzVec, LocationSpot>()
     private var latestLocations = mapOf<LorenzVec, LocationSpot>()
@@ -35,8 +36,7 @@ class CosmeticFollowingLine {
 
     @SubscribeEvent
     fun onRenderWorld(event: LorenzRenderWorldEvent) {
-        if (!LorenzUtils.inSkyBlock) return
-        if (!config.enabled) return
+        if (!isEnabled()) return
 
         updateClose(event)
 
@@ -99,8 +99,7 @@ class CosmeticFollowingLine {
 
     @SubscribeEvent
     fun onTick(event: LorenzTickEvent) {
-        if (!LorenzUtils.inSkyBlock) return
-        if (!config.enabled) return
+        if (!isEnabled()) return
 
         if (event.isMod(5)) {
             locations = locations.editCopy { values.removeIf { it.time.passedSince() > config.secondsAlive.seconds } }
@@ -124,10 +123,13 @@ class CosmeticFollowingLine {
         }
     }
 
+    private fun isEnabled() = (LorenzUtils.inSkyBlock || OutsideSbFeature.FOLLOWING_LINE.isSelected()) && config.enabled
+
     @SubscribeEvent
     fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
         event.move(9, "misc.cosmeticConfig", "misc.cosmetic")
         event.move(9, "misc.cosmeticConfig.followingLineConfig", "misc.cosmetic.followingLine")
         event.move(9, "misc.cosmeticConfig.arrowTrailConfig", "misc.cosmetic.arrowTrail")
+        event.move(31, "misc.cosmetic", "gui.cosmetic")
     }
 }

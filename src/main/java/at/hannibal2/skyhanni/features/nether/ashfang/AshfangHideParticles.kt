@@ -27,7 +27,7 @@ class AshfangHideParticles {
     }
 
     @SubscribeEvent
-    fun onReceivePacket(event: ReceiveParticleEvent) {
+    fun onReceiveParticle(event: ReceiveParticleEvent) {
         if (isEnabled()) {
             event.isCanceled = true
         }
@@ -41,7 +41,7 @@ class AshfangHideParticles {
         if (entity is EntityArmorStand) {
             for (stack in entity.inventory) {
                 if (stack == null) continue
-                val name = stack.name ?: continue
+                val name = stack.name
                 if (name == "§aFairy Souls") continue
                 if (name == "Glowstone") {
                     event.isCanceled = true

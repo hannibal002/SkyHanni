@@ -5,10 +5,10 @@ import at.hannibal2.skyhanni.events.CheckRenderEntityEvent
 import at.hannibal2.skyhanni.events.LorenzRenderWorldEvent
 import at.hannibal2.skyhanni.events.LorenzTickEvent
 import at.hannibal2.skyhanni.events.LorenzWorldChangeEvent
-import at.hannibal2.skyhanni.events.withAlpha
 import at.hannibal2.skyhanni.mixins.hooks.RenderLivingEntityHelper
 import at.hannibal2.skyhanni.test.GriffinUtils.drawWaypointFilled
 import at.hannibal2.skyhanni.utils.BlockUtils.getBlockStateAt
+import at.hannibal2.skyhanni.utils.ColorUtils.withAlpha
 import at.hannibal2.skyhanni.utils.EntityUtils
 import at.hannibal2.skyhanni.utils.LocationUtils.distanceSqToPlayer
 import at.hannibal2.skyhanni.utils.LorenzColor
@@ -41,7 +41,6 @@ object DungeonLividFinder {
     @SubscribeEvent
     fun onTick(event: LorenzTickEvent) {
         if (!inDungeon()) return
-        if (!event.isMod(2)) return
 
         val isCurrentlyBlind = isCurrentlyBlind()
         if (!gotBlinded) {
@@ -77,8 +76,10 @@ object DungeonLividFinder {
         if (!newLivid.name.contains("Livid")) return
 
         lividEntity = newLivid
-        RenderLivingEntityHelper.setEntityColor(newLivid, color.toColor().withAlpha(30)) { shouldHighlight() }
-        RenderLivingEntityHelper.setNoHurtTime(newLivid) { shouldHighlight() }
+        RenderLivingEntityHelper.setEntityColorWithNoHurtTime(
+            newLivid,
+            color.toColor().withAlpha(30)
+        ) { shouldHighlight() }
     }
 
     private fun shouldHighlight() = getLividAlive() != null && config.enabled

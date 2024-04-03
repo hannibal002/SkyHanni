@@ -6,6 +6,7 @@ import at.hannibal2.skyhanni.events.GuiContainerEvent
 import at.hannibal2.skyhanni.events.LorenzToolTipEvent
 import at.hannibal2.skyhanni.events.RepositoryReloadEvent
 import at.hannibal2.skyhanni.utils.InventoryUtils
+import at.hannibal2.skyhanni.utils.InventoryUtils.getAllItems
 import at.hannibal2.skyhanni.utils.ItemUtils.name
 import at.hannibal2.skyhanni.utils.KeyboardManager
 import at.hannibal2.skyhanni.utils.LorenzColor
@@ -61,12 +62,9 @@ class QuickCraftFeatures {
         if (event.gui !is GuiChest) return
         val chest = event.gui.inventorySlots as ContainerChest
 
-        for (slot in chest.inventorySlots) {
-            if (slot == null) continue
+        for ((slot, stack) in chest.getAllItems()) {
             if (inventoryType.ignoreSlot(slot.slotNumber)) continue
-            val stack = slot.stack ?: continue
-            val name = stack.name ?: continue
-            if (name == "§cQuick Crafting Slot") continue
+            if (stack.name == "§cQuick Crafting Slot") continue
             if (needsQuickCraftConfirmation(stack)) {
                 val color = LorenzColor.DARK_GRAY.addOpacity(180)
                 stack.background = color.rgb
