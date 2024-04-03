@@ -8,10 +8,13 @@ import at.hannibal2.skyhanni.SkyHanniMod.Companion.feature
 import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.config.features.misc.DiscordRPCConfig.LineEntry
 import at.hannibal2.skyhanni.config.features.misc.DiscordRPCConfig.PriorityEntry
+import at.hannibal2.skyhanni.data.jsonobjects.repo.StackingEnchantData
+import at.hannibal2.skyhanni.data.jsonobjects.repo.StackingEnchantsJson
 import at.hannibal2.skyhanni.events.ConfigLoadEvent
 import at.hannibal2.skyhanni.events.LorenzKeyPressEvent
 import at.hannibal2.skyhanni.events.LorenzTickEvent
 import at.hannibal2.skyhanni.events.LorenzWorldChangeEvent
+import at.hannibal2.skyhanni.events.RepositoryReloadEvent
 import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.ConditionalUtils
@@ -36,7 +39,7 @@ object DiscordRPCManager : IPCListener {
     private const val applicationID = 1093298182735282176L
     private const val updatePeriod = 4200L
 
-    private val config get() = feature.misc.discordRPC
+    val config get() = feature.gui.discordRPC
 
     private var client: IPCClient? = null
     private lateinit var secondLine: DiscordStatus
@@ -48,6 +51,8 @@ object DiscordRPCManager : IPCListener {
     private var connected = false
 
     private val DiscordLocationKey = DiscordLocationKey()
+
+    var stackingEnchants: Map<String, StackingEnchantData> = emptyMap()
 
     fun start(fromCommand: Boolean = false) {
         coroutineScope.launch {
@@ -115,6 +120,11 @@ object DiscordRPCManager : IPCListener {
                 stop()
             }
         }
+    }
+
+    @SubscribeEvent
+    fun onRepoReload(event: RepositoryReloadEvent) {
+        stackingEnchants = event.getConstant<StackingEnchantsJson>("StackingEnchants").enchants
     }
 
     fun updatePresence() {
@@ -211,7 +221,7 @@ object DiscordRPCManager : IPCListener {
         try {
             start(true)
         } catch (e: Exception) {
-            ErrorManager.logError(
+            ErrorManager.logErrorWithData(
                 e,
                 "Unable to start Discord Rich Presence! Please report this on Discord and ping @netheriteminer."
             )
@@ -220,7 +230,7 @@ object DiscordRPCManager : IPCListener {
 
     // Events that change things in DiscordStatus
     @SubscribeEvent
-    fun onKeybind(event: LorenzKeyPressEvent) {
+    fun onKeyClick(event: LorenzKeyPressEvent) {
         if (!isEnabled() || !PriorityEntry.AFK.isSelected()) return // autoPriority 4 is dynamic afk
         beenAfkFor = SimpleTimeMark.now()
     }
@@ -239,6 +249,8 @@ object DiscordRPCManager : IPCListener {
         event.transform(11, "misc.discordRPC.autoPriority") { element ->
             ConfigUtils.migrateIntArrayListToEnumArrayList(element, PriorityEntry::class.java)
         }
+
+        event.move(31, "misc.discordRPC", "gui.discordRPC")
     }
 
     private fun PriorityEntry.isSelected() = config.autoPriority.contains(this)

@@ -16,7 +16,6 @@ import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.CollectionUtils.addAsSingletonList
 import at.hannibal2.skyhanni.utils.ConditionalUtils.onToggle
 import at.hannibal2.skyhanni.utils.InventoryUtils
-import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalNameOrNull
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.ItemUtils.isRune
@@ -39,7 +38,7 @@ import kotlin.math.roundToLong
 
 object EstimatedItemValue {
 
-    private val config get() = SkyHanniMod.feature.misc.estimatedItemValues
+    val config get() = SkyHanniMod.feature.inventory.estimatedItemValues
     private var display = emptyList<List<Any>>()
     private val cache = mutableMapOf<ItemStack, List<List<Any>>>()
     private var lastToolTipTime = 0L
@@ -55,7 +54,10 @@ object EstimatedItemValue {
             ErrorManager.skyHanniError("Gemstone Slot Unlock Costs failed to load from neu repo!")
         }
 
-        gemstoneUnlockCosts = ConfigManager.gson.fromJson(data, object : TypeToken<HashMap<NEUInternalName, HashMap<String, List<String>>>>() {}.type)
+        gemstoneUnlockCosts = ConfigManager.gson.fromJson(
+            data,
+            object : TypeToken<HashMap<NEUInternalName, HashMap<String, List<String>>>>() {}.type
+        )
     }
 
     @SubscribeEvent
@@ -87,7 +89,7 @@ object EstimatedItemValue {
     private var renderedItems = 0
 
     @SubscribeEvent
-    fun onRenderOverlayGui(event: GuiRenderEvent.GuiOverlayRenderEvent) {
+    fun onRenderOverlay(event: GuiRenderEvent.GuiOverlayRenderEvent) {
         renderedItems = 0
     }
 
@@ -99,7 +101,7 @@ object EstimatedItemValue {
     }
 
     @SubscribeEvent
-    fun onRenderOverlay(event: GuiRenderEvent.ChestGuiOverlayRenderEvent) {
+    fun onBackgroundDraw(event: GuiRenderEvent.ChestGuiOverlayRenderEvent) {
         tryRendering()
     }
 
@@ -158,9 +160,11 @@ object EstimatedItemValue {
         } catch (e: Exception) {
             ErrorManager.logErrorWithData(
                 e, "Error in Estimated Item Value renderer",
+                "openInventoryName" to openInventoryName,
                 "item" to item,
-                "itemName" to item.itemName,
-                "getInternalName" to item.getInternalName(),
+                "item name" to item.itemName,
+                "internal name" to item.getInternalNameOrNull(),
+                "lore" to item.getLore(),
             )
             listOf()
         }
@@ -174,7 +178,7 @@ object EstimatedItemValue {
         val internalName = stack.getInternalNameOrNull() ?: return listOf()
 
         // Stats Breakdown
-        val name = stack.name ?: return listOf()
+        val name = stack.name
         if (name == "§6☘ Category: Item Ability (Passive)") return listOf()
         if (name.contains("Salesperson")) return listOf()
 
@@ -231,5 +235,7 @@ object EstimatedItemValue {
         event.move(3, "misc.estimatedIemValueEnchantmentsCap", "misc.estimatedItemValues.enchantmentsCap")
         event.move(3, "misc.estimatedIemValueExactPrice", "misc.estimatedItemValues.exactPrice")
         event.move(3, "misc.itemPriceDataPos", "misc.estimatedItemValues.itemPriceDataPos")
+
+        event.move(31, "misc.estimatedItemValues", "inventory.estimatedItemValues")
     }
 }

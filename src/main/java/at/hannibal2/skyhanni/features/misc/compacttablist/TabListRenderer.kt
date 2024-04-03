@@ -1,13 +1,14 @@
 package at.hannibal2.skyhanni.features.misc.compacttablist
 
 import at.hannibal2.skyhanni.SkyHanniMod
+import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.SkipTabListLineEvent
-import at.hannibal2.skyhanni.mixins.transformers.AccessorGuiPlayerTabOverlay
 import at.hannibal2.skyhanni.utils.CollectionUtils.filterToMutable
 import at.hannibal2.skyhanni.utils.KeyboardManager.isActive
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.StringUtils.matches
+import at.hannibal2.skyhanni.utils.TabListData.Companion.getPlayerTabOverlay
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraft.client.Minecraft
 import net.minecraft.client.gui.Gui
@@ -19,7 +20,7 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
 object TabListRenderer {
 
-    private val config get() = SkyHanniMod.feature.misc.compactTabList
+    private val config get() = SkyHanniMod.feature.gui.compactTabList
 
     const val maxLines = 22
     private const val lineHeight = 8 + 1
@@ -62,10 +63,14 @@ object TabListRenderer {
         }
     }
 
+    private val tabZOffest = 10f
+
     private fun drawTabList() {
         val columns = TabListReader.renderColumns
 
         if (columns.isEmpty()) return
+
+        GlStateManager.translate(0f, 0f, tabZOffest)
 
         var maxLines = 0
         var totalWidth = 0 - columnSpacing
@@ -76,7 +81,7 @@ object TabListRenderer {
         }
 
         var totalHeight = maxLines * lineHeight
-        val tabList = Minecraft.getMinecraft().ingameGUI.tabList as AccessorGuiPlayerTabOverlay
+        val tabList = getPlayerTabOverlay()
 
         var header = listOf<String>()
         if (tabList.header_skyhanni != null) {
@@ -171,7 +176,8 @@ object TabListRenderer {
                     middleX += 8 + 2
                 }
 
-                val text = if (AdvancedPlayerList.ignoreCustomTabList()) tabLine.text else tabLine.customName
+                var text = if (AdvancedPlayerList.ignoreCustomTabList()) tabLine.text else tabLine.customName
+                if (text.contains("§l")) text = "§r$text"
                 if (tabLine.type == TabStringType.TITLE) {
                     minecraft.fontRendererObj.drawStringWithShadow(
                         text,
@@ -205,6 +211,7 @@ object TabListRenderer {
                 footerY += lineHeight
             }
         }
+        GlStateManager.translate(0f, 0f, -tabZOffest)
     }
 
     private val fireSalePattern by RepoPattern.pattern(
@@ -213,9 +220,14 @@ object TabListRenderer {
     )
 
     @SubscribeEvent
-    fun hideFireFromTheTabListBecauseWhoWantsThose(event: SkipTabListLineEvent) {
+    fun onSkipTablistLine(event: SkipTabListLineEvent) {
         if (config.hideFiresales && event.lastSubTitle != null && fireSalePattern.matches(event.lastSubTitle.text)) {
             event.cancel()
         }
+    }
+
+    @SubscribeEvent
+    fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
+        event.move(31, "misc.compactTabList", "gui.compactTabList")
     }
 }

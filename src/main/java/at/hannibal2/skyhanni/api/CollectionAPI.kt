@@ -9,8 +9,10 @@ import at.hannibal2.skyhanni.utils.CollectionUtils.addOrPut
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.ItemUtils.name
 import at.hannibal2.skyhanni.utils.NEUInternalName
+import at.hannibal2.skyhanni.utils.NEUInternalName.Companion.asInternalName
 import at.hannibal2.skyhanni.utils.NEUItems
 import at.hannibal2.skyhanni.utils.NEUItems.getItemStackOrNull
+import at.hannibal2.skyhanni.utils.NumberUtil.formatLong
 import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.StringUtils.matches
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
@@ -34,21 +36,26 @@ object CollectionAPI {
 
     val collectionValue = mutableMapOf<NEUInternalName, Long>()
 
+    // TODO repo
+    private val incorrectCollectionNames = mapOf(
+        "Mushroom" to "RED_MUSHROOM".asInternalName()
+    )
+
     @SubscribeEvent
     fun onProfileJoin(event: ProfileJoinEvent) {
         collectionValue.clear()
     }
 
     @SubscribeEvent
-    fun onTick(event: InventoryFullyOpenedEvent) {
+    fun onInventoryOpen(event: InventoryFullyOpenedEvent) {
         val inventoryName = event.inventoryName
         if (inventoryName.endsWith(" Collection")) {
             val stack = event.inventoryItems[4] ?: return
             loop@ for (line in stack.getLore()) {
                 singleCounterPattern.matchMatcher(line) {
-                    val counter = group("amount").replace(",", "").toLong()
+                    val counter = group("amount").formatLong()
                     val name = inventoryName.split(" ").dropLast(1).joinToString(" ")
-                    val internalName = NEUItems.getInternalNameOrNull(name) ?: continue@loop
+                    val internalName = incorrectCollectionNames[name] ?: NEUInternalName.fromItemName(name)
                     collectionValue[internalName] = counter
                 }
             }
@@ -59,7 +66,7 @@ object CollectionAPI {
             if (inventoryName == "Boss Collections") return
 
             for ((_, stack) in event.inventoryItems) {
-                var name = stack.name?.removeColor() ?: continue
+                var name = stack.name.removeColor()
                 if (name.contains("Collections")) continue
 
                 val lore = stack.getLore()
@@ -69,10 +76,10 @@ object CollectionAPI {
                     name = name.split(" ").dropLast(1).joinToString(" ")
                 }
 
+                val internalName = incorrectCollectionNames[name] ?: NEUInternalName.fromItemName(name)
                 loop@ for (line in lore) {
                     counterPattern.matchMatcher(line) {
-                        val counter = group("amount").replace(",", "").toLong()
-                        val internalName = NEUItems.getInternalNameOrNull(name) ?: continue@loop
+                        val counter = group("amount").formatLong()
                         collectionValue[internalName] = counter
                     }
                 }
