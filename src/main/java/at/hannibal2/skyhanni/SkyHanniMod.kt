@@ -55,6 +55,9 @@ import at.hannibal2.skyhanni.data.TrackerManager
 import at.hannibal2.skyhanni.data.jsonobjects.local.FriendsJson
 import at.hannibal2.skyhanni.data.jsonobjects.local.JacobContestsJson
 import at.hannibal2.skyhanni.data.jsonobjects.local.KnownFeaturesJson
+import at.hannibal2.skyhanni.data.mob.MobData
+import at.hannibal2.skyhanni.data.mob.MobDebug
+import at.hannibal2.skyhanni.data.mob.MobDetection
 import at.hannibal2.skyhanni.data.jsonobjects.local.VisualWordsJson
 import at.hannibal2.skyhanni.data.repo.RepoManager
 import at.hannibal2.skyhanni.events.LorenzTickEvent
@@ -441,6 +444,8 @@ class SkyHanniMod {
         loadModule(SeaCreatureManager())
         loadModule(ItemRenderBackground())
         loadModule(EntityData())
+        loadModule(MobData())
+        loadModule(MobDetection())
         loadModule(EntityMovementData())
         loadModule(TestExportTools)
         loadModule(ItemClickData())
@@ -827,6 +832,7 @@ class SkyHanniMod {
         loadModule(SkyHanniDebugsAndTests)
         loadModule(WorldEdit)
         PreInitFinishedEvent().postAndCatch()
+        loadModule(MobDebug())
     }
 
     @Mod.EventHandler
