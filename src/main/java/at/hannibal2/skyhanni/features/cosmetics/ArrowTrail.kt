@@ -35,10 +35,10 @@ class ArrowTrail {
         val secondsAlive = config.secondsAlive.toDouble().toDuration(DurationUnit.SECONDS)
         val time = SimpleTimeMark.now()
         val deathTime = time.plus(secondsAlive)
-        if (event.isMod(2)) {
-            listAllArrow.removeIf { it.deathTime.isInPast() }
-            listYourArrow.removeIf { it.deathTime.isInPast() }
-        }
+
+        listAllArrow.removeIf { it.deathTime.isInPast() }
+        listYourArrow.removeIf { it.deathTime.isInPast() }
+
         EntityUtils.getEntities<EntityArrow>().forEach {
             val line = Line(it.getPrevLorenzVec(), it.getLorenzVec(), deathTime)
             if (it.shootingEntity == Minecraft.getMinecraft().thePlayer) {

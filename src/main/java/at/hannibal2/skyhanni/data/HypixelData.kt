@@ -78,6 +78,10 @@ class HypixelData {
             "guesting.scoreboard",
             "SKYBLOCK GUEST"
         )
+        private val scoreboardTitlePattern by patternGroup.pattern(
+            "scoreboard.title",
+            "SK[YI]BLOCK(?: CO-OP| GUEST)?"
+        )
 
         var hypixelLive = false
         var hypixelAlpha = false
@@ -119,6 +123,7 @@ class HypixelData {
 
         fun checkCurrentServerId() {
             if (!LorenzUtils.inSkyBlock) return
+            if (serverId != null) return
             if (LorenzUtils.lastWorldSwitch.passedSince() < 1.seconds) return
             if (!TabListData.fullyLoaded) return
 
@@ -271,7 +276,6 @@ class HypixelData {
             // So, as requested by Hannibal, use locraw from
             // NEU and have NEU send it.
             // Remove this when NEU dependency is removed
-            val currentTime = System.currentTimeMillis()
             if (LorenzUtils.onHypixel &&
                 locrawData == null &&
                 lastLocRaw.passedSince() > 15.seconds
@@ -284,7 +288,7 @@ class HypixelData {
             }
         }
 
-        if (event.isMod(2) && LorenzUtils.inSkyBlock) {
+        if (LorenzUtils.inSkyBlock) {
             val originalLocation = ScoreboardData.sidebarLinesFormatted
                 .firstOrNull { it.startsWith(" §7⏣ ") || it.startsWith(" §5ф ") }
                 ?.substring(5)?.removeColor()
@@ -401,7 +405,6 @@ class HypixelData {
         val objective = world.scoreboard.getObjectiveInDisplaySlot(1) ?: return false
         val displayName = objective.displayName
         val scoreboardTitle = displayName.removeColor()
-        return scoreboardTitle.contains("SKYBLOCK") ||
-            scoreboardTitle.contains("SKIBLOCK") // April 1st jokes are so funny
+        return scoreboardTitlePattern.matches(scoreboardTitle)
     }
 }
