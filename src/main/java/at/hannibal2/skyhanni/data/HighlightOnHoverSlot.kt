@@ -11,22 +11,22 @@ import net.minecraftforge.fml.common.eventhandler.EventPriority
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
 object HighlightOnHoverSlot {
-    val map = mutableMapOf<Pair<Int, Int>, List<Int>>()
+    val currentSlots = mutableMapOf<Pair<Int, Int>, List<Int>>()
 
     @SubscribeEvent
     fun onInventoryOpen(event: InventoryOpenEvent) {
-        map.clear()
+        currentSlots.clear()
     }
 
     @SubscribeEvent
     fun onInventoryClose(event: InventoryCloseEvent) {
-        map.clear()
+        currentSlots.clear()
     }
 
     @SubscribeEvent(priority = EventPriority.LOW)
     fun onDrawBackground(event: GuiContainerEvent.BackgroundDrawnEvent) {
         if (!LorenzUtils.inSkyBlock) return
-        for ((_, indexes) in map) {
+        for ((_, indexes) in currentSlots) {
             for (slot in InventoryUtils.getItemsInOpenChest()) {
                 if (indexes.contains(slot.slotIndex)) {
                     slot highlight LorenzColor.GREEN

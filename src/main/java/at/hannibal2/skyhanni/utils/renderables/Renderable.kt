@@ -166,7 +166,7 @@ interface Renderable {
                     if (isHovered(posX, posY)) {
                         if (condition() && shouldAllowLink(true, bypassChecks)) {
                             onHover.invoke()
-                            HighlightOnHoverSlot.map[pair] = highlightsOnHoverSlots
+                            HighlightOnHoverSlot.currentSlots[pair] = highlightsOnHoverSlots
                             GlStateManager.pushMatrix()
                             GlStateManager.translate(0F, 0F, 400F)
 
@@ -183,7 +183,7 @@ interface Renderable {
                             GlStateManager.popMatrix()
                         }
                     } else {
-                        HighlightOnHoverSlot.map.remove(pair)
+                        HighlightOnHoverSlot.currentSlots.remove(pair)
                     }
                 }
             }
