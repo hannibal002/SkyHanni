@@ -12,21 +12,19 @@ import at.hannibal2.skyhanni.utils.StringUtils.matches
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
-class DungeonMilestonesDisplay {
+object DungeonMilestonesDisplay {
 
     private val config get() = SkyHanniMod.feature.dungeon
 
-    private val milestonePattern by RepoPattern.pattern(
+    val milestonePattern by RepoPattern.pattern(
         "dungeon.milestone",
         "§e§l.*Milestone §r§e.§r§7: You have (?:tanked and )?(?:dealt|healed) §r§.*§r§7.*so far! §r§a.*"
     )
 
-    companion object {
-        private var display = ""
-        var color = ""
-        var currentMilestone = 0
-        var timeReached = 0L
-    }
+    private var display = ""
+    private var currentMilestone = 0
+    private var timeReached = 0L
+    var colour = ""
 
     @SubscribeEvent
     fun onTick(event: LorenzTickEvent) {
@@ -53,7 +51,7 @@ class DungeonMilestonesDisplay {
             timeReached = System.currentTimeMillis()
         }
 
-        color = when (currentMilestone) {
+        colour = when (currentMilestone) {
             0, 1 -> "§c"
             2 -> "§e"
             else -> "§a"
@@ -78,7 +76,7 @@ class DungeonMilestonesDisplay {
         if (!isEnabled()) return
 
         config.showMileStonesDisplayPos.renderString(
-            color + display,
+            colour + display,
             posLabel = "Dungeon Milestone"
         )
     }

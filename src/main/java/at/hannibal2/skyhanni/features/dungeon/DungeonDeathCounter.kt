@@ -92,7 +92,7 @@ class DungeonDeathCounter {
         if (!isEnabled()) return
 
         SkyHanniMod.feature.dungeon.deathCounterPos.renderString(
-            DungeonMilestonesDisplay.color + display,
+            DungeonMilestonesDisplay.colour + display,
             posLabel = "Dungeon Death Counter"
         )
     }
