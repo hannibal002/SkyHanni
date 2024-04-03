@@ -19,7 +19,7 @@ import kotlin.math.min
 object FarmingLaneCreator {
     val config get() = FarmingLaneAPI.config
 
-    private var detection = false
+    var detection = false
     private var start: LorenzVec? = null
     private var lastLocation: LorenzVec? = null
     private var potentialEnd: LorenzVec? = null
@@ -54,7 +54,7 @@ object FarmingLaneCreator {
             reset()
             return
         }
-        if (lastLocation.distance(location) < 1) return
+        if (lastLocation.distance(location) < 0.5) return
 
         this.lastLocation = location
         val start = start ?: error("start can not be null")
@@ -67,7 +67,7 @@ object FarmingLaneCreator {
                 potentialEnd = location
                 return
             }
-            if (potentialEnd.distance(location) > 5) {
+            if (potentialEnd.distance(location) > 2) {
                 val crop = crop ?: error("crop can not be null")
                 saveLane(start, potentialEnd, crop)
             }

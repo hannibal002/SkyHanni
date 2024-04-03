@@ -2,24 +2,31 @@ package at.hannibal2.skyhanni.features.garden.contest
 
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
+import at.hannibal2.skyhanni.data.HypixelData
 import at.hannibal2.skyhanni.events.GuiContainerEvent
 import at.hannibal2.skyhanni.events.GuiRenderItemEvent
 import at.hannibal2.skyhanni.events.InventoryCloseEvent
 import at.hannibal2.skyhanni.events.InventoryUpdatedEvent
 import at.hannibal2.skyhanni.events.LorenzToolTipEvent
+import at.hannibal2.skyhanni.features.garden.GardenNextJacobContest
+import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.InventoryUtils.getUpperItems
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.ItemUtils.name
+import at.hannibal2.skyhanni.utils.KeyboardManager.isKeyHeld
 import at.hannibal2.skyhanni.utils.LorenzColor
 import at.hannibal2.skyhanni.utils.LorenzUtils
+import at.hannibal2.skyhanni.utils.OSUtils
 import at.hannibal2.skyhanni.utils.RenderUtils.drawSlotText
 import at.hannibal2.skyhanni.utils.RenderUtils.highlight
 import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
+import io.github.moulberry.notenoughupdates.util.SkyBlockTime
 import net.minecraft.client.gui.inventory.GuiChest
 import net.minecraft.inventory.ContainerChest
+import net.minecraft.inventory.Slot
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import java.text.SimpleDateFormat
 import java.util.Locale
@@ -46,7 +53,7 @@ class JacobFarmingContestsInventory {
     }
 
     @SubscribeEvent
-    fun onLateInventoryOpen(event: InventoryUpdatedEvent) {
+    fun onInventoryUpdated(event: InventoryUpdatedEvent) {
         if (!LorenzUtils.inSkyBlock) return
         if (event.inventoryName != "Your Contests") return
 
@@ -71,6 +78,83 @@ class JacobFarmingContestsInventory {
         val startTimeFormat = formatTime.format(time)
         val endTimeFormat = formatTime.format(time + 1000 * 60 * 20)
         realTime[slot] = "$dayFormat $startTimeFormat-$endTimeFormat"
+    }
+
+    @SubscribeEvent
+    fun onSlotClick(event: GuiContainerEvent.SlotClickEvent) {
+        if (!config.openOnElite.isKeyHeld()) return
+        if (!LorenzUtils.inSkyBlock) return
+
+        val slot = event.slot ?: return
+        val itemName = slot.stack.name
+
+        when (val chestName = InventoryUtils.openInventoryName()) {
+            "Your Contests" -> {
+                val (year, month, day) = FarmingContestAPI.getSbDateFromItemName(itemName) ?: return
+                openContest(year, month, day)
+                event.isCanceled = true
+            }
+
+            "Jacob's Farming Contests" -> {
+                openFromJacobMenu(itemName)
+                event.isCanceled = true
+            }
+
+            else -> {
+                openFromCalendar(chestName, itemName, event, slot)
+            }
+        }
+    }
+
+    private fun openContest(year: String, month: String, day: String) {
+        val date = "$year/${LorenzUtils.getSBMonthByName(month)}/$day"
+        OSUtils.openBrowser("https://elitebot.dev/contests/$date")
+        ChatUtils.chat("Opening contest in elitebot.dev")
+    }
+
+    private fun openFromJacobMenu(itemName: String) {
+        when (itemName) {
+            "§6Upcoming Contests" -> {
+                OSUtils.openBrowser("https://elitebot.dev/contests/upcoming")
+                ChatUtils.chat("Opening upcoming contests in elitebot.dev")
+            }
+
+            "§bClaim your rewards!" -> {
+                OSUtils.openBrowser("https://elitebot.dev/@${LorenzUtils.getPlayerName()}/${HypixelData.profileName}/contests")
+                ChatUtils.chat("Opening your contests in elitebot.dev")
+            }
+
+            "§aWhat is this?" -> {
+                OSUtils.openBrowser("https://elitebot.dev/contests")
+                ChatUtils.chat("Opening contest page in elitebot.dev")
+            }
+
+            else -> return
+        }
+    }
+
+    private fun openFromCalendar(
+        chestName: String,
+        itemName: String,
+        event: GuiContainerEvent.SlotClickEvent,
+        slot: Slot,
+    ) {
+        GardenNextJacobContest.monthPattern.matchMatcher(chestName) {
+            if (!slot.stack.getLore().any { it.contains("§eJacob's Farming Contest") }) return
+
+            val day = GardenNextJacobContest.dayPattern.matchMatcher(itemName) { group("day") } ?: return
+            val year = group("year")
+            val month = group("month")
+            val time = SkyBlockTime(year.toInt(), LorenzUtils.getSBMonthByName(month), day.toInt()).toMillis()
+            if (time < SkyBlockTime.now().toMillis()) {
+                openContest(year, month, day)
+            } else {
+                val timestamp = time / 1000
+                OSUtils.openBrowser("https://elitebot.dev/contests/upcoming#$timestamp")
+                ChatUtils.chat("Opening upcoming contests in elitebot.dev")
+            }
+            event.isCanceled = true
+        }
     }
 
     @SubscribeEvent

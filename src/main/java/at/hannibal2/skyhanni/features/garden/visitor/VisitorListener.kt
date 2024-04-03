@@ -2,6 +2,7 @@ package at.hannibal2.skyhanni.features.garden.visitor
 
 import at.hannibal2.skyhanni.config.features.garden.visitor.VisitorConfig
 import at.hannibal2.skyhanni.events.CheckRenderEntityEvent
+import at.hannibal2.skyhanni.events.GuiContainerEvent
 import at.hannibal2.skyhanni.events.GuiKeyPressEvent
 import at.hannibal2.skyhanni.events.InventoryCloseEvent
 import at.hannibal2.skyhanni.events.InventoryFullyOpenedEvent
@@ -11,11 +12,11 @@ import at.hannibal2.skyhanni.events.ProfileJoinEvent
 import at.hannibal2.skyhanni.events.TabListUpdateEvent
 import at.hannibal2.skyhanni.events.garden.visitor.VisitorOpenEvent
 import at.hannibal2.skyhanni.events.garden.visitor.VisitorRenderEvent
-import at.hannibal2.skyhanni.events.garden.visitor.VisitorToolTipEvent
 import at.hannibal2.skyhanni.features.garden.GardenAPI
 import at.hannibal2.skyhanni.features.garden.visitor.VisitorAPI.VisitorStatus
 import at.hannibal2.skyhanni.mixins.transformers.gui.AccessorGuiContainer
 import at.hannibal2.skyhanni.utils.ChatUtils
+import at.hannibal2.skyhanni.utils.DelayedRun
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.ItemUtils.name
 import at.hannibal2.skyhanni.utils.KeyboardManager.isKeyHeld
@@ -23,8 +24,8 @@ import at.hannibal2.skyhanni.utils.LocationUtils.distanceToPlayer
 import at.hannibal2.skyhanni.utils.LorenzLogger
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.RenderUtils.exactLocation
+import at.hannibal2.skyhanni.utils.StringUtils.matches
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
-import io.github.moulberry.notenoughupdates.events.SlotClickEvent
 import net.minecraft.client.Minecraft
 import net.minecraft.client.gui.inventory.GuiContainer
 import net.minecraft.entity.item.EntityArmorStand
@@ -33,7 +34,7 @@ import net.minecraftforge.event.entity.player.ItemTooltipEvent
 import net.minecraftforge.fml.common.eventhandler.EventPriority
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import org.lwjgl.input.Keyboard
-
+import kotlin.time.Duration.Companion.seconds
 
 class VisitorListener {
 
@@ -43,7 +44,6 @@ class VisitorListener {
     private val logger = LorenzLogger("garden/visitors/listener")
 
     companion object {
-
         private val VISITOR_INFO_ITEM_SLOT = 13
         private val VISITOR_ACCEPT_ITEM_SLOT = 29
         private val VISITOR_REFUSE_ITEM_SLOT = 33
@@ -70,15 +70,19 @@ class VisitorListener {
     @SubscribeEvent
     fun onTabListUpdate(event: TabListUpdateEvent) {
         if (!GardenAPI.inGarden()) return
-        val visitorsInTab = VisitorAPI.visitorsInTabList(event.tabList)
 
-        VisitorAPI.getVisitors().forEach {
-            val name = it.visitorName
-            val time = System.currentTimeMillis() - LorenzUtils.lastWorldSwitch
-            val removed = name !in visitorsInTab && time > 2_000
-            if (removed) {
-                logger.log("Removed old visitor: '$name'")
-                VisitorAPI.removeVisitor(name)
+        val hasVisitorInfo = event.tabList.any { VisitorAPI.visitorCountPattern.matches(it) }
+        if (!hasVisitorInfo) return
+
+        val visitorsInTab = VisitorAPI.visitorsInTabList(event.tabList)
+        if (LorenzUtils.lastWorldSwitch.passedSince() > 2.seconds) {
+            VisitorAPI.getVisitors().forEach {
+                val name = it.visitorName
+                val removed = name !in visitorsInTab
+                if (removed) {
+                    logger.log("Removed old visitor: '$name'")
+                    VisitorAPI.removeVisitor(name)
+                }
             }
         }
 
@@ -129,14 +133,14 @@ class VisitorListener {
     }
 
     @SubscribeEvent(priority = EventPriority.HIGH)
-    fun onStackClick(event: SlotClickEvent) {
+    fun onSlotClick(event: GuiContainerEvent.SlotClickEvent) {
         if (!VisitorAPI.inInventory) return
         if (event.clickType != 0) return
 
         val visitor = VisitorAPI.getVisitor(lastClickedNpc) ?: return
 
         if (event.slotId == VISITOR_REFUSE_ITEM_SLOT) {
-            if (event.slot.stack?.name != "§cRefuse Offer") return
+            if (event.slot?.stack?.name != "§cRefuse Offer") return
 
             visitor.hasReward()?.let {
                 if (config.rewardWarning.preventRefusing) {
@@ -159,9 +163,13 @@ class VisitorListener {
             }
 
             VisitorAPI.changeStatus(visitor, VisitorStatus.REFUSED, "refused")
+            // fallback if tab list is disabled
+            DelayedRun.runDelayed(10.seconds) {
+                VisitorAPI.removeVisitor(visitor.visitorName)
+            }
             return
         }
-        if (event.slotId == VISITOR_ACCEPT_ITEM_SLOT && event.slot.stack?.getLore()
+        if (event.slotId == VISITOR_ACCEPT_ITEM_SLOT && event.slot?.stack?.getLore()
                 ?.any { it == "§eClick to give!" } == true
         ) {
             VisitorAPI.changeStatus(visitor, VisitorStatus.ACCEPTED, "accepted")
@@ -174,7 +182,7 @@ class VisitorListener {
         if (!GardenAPI.onBarnPlot) return
         if (!VisitorAPI.inInventory) return
         val visitor = VisitorAPI.getVisitor(lastClickedNpc) ?: return
-        VisitorToolTipEvent(visitor, event.itemStack, event.toolTip).postAndCatch()
+        GardenVisitorFeatures.onTooltip(visitor, event.itemStack, event.toolTip)
     }
 
     @SubscribeEvent

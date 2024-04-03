@@ -53,4 +53,9 @@ public class PestFinderConfig {
     @ConfigOption(name = "Teleport Hotkey", desc = "Press this key to warp to the nearest plot with pests on it.")
     @ConfigEditorKeybind(defaultKey = Keyboard.KEY_NONE)
     public int teleportHotkey = Keyboard.KEY_NONE;
+
+    @Expose
+    @ConfigOption(name = "Always Teleport", desc = "Allow teleporting with the Teleport Hotkey even when you're already in an infested plot.")
+    @ConfigEditorBoolean
+    public boolean alwaysTp = false;
 }
