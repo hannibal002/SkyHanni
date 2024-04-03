@@ -243,6 +243,7 @@ import at.hannibal2.skyhanni.features.inventory.ShiftClickBrewing
 import at.hannibal2.skyhanni.features.inventory.ShiftClickEquipment
 import at.hannibal2.skyhanni.features.inventory.ShiftClickNPCSell
 import at.hannibal2.skyhanni.features.inventory.SkyblockGuideHighlightFeature
+import at.hannibal2.skyhanni.features.inventory.SoulboundItemIcon
 import at.hannibal2.skyhanni.features.inventory.StatsTuning
 import at.hannibal2.skyhanni.features.inventory.SuperCraftFeatures
 import at.hannibal2.skyhanni.features.inventory.bazaar.BazaarApi
@@ -300,7 +301,6 @@ import at.hannibal2.skyhanni.features.misc.QuickModMenuSwitch
 import at.hannibal2.skyhanni.features.misc.RestorePieceOfWizardPortalLore
 import at.hannibal2.skyhanni.features.misc.ServerRestartTitle
 import at.hannibal2.skyhanni.features.misc.SkyBlockKickDuration
-import at.hannibal2.skyhanni.features.inventory.SoulboundItemIcon
 import at.hannibal2.skyhanni.features.misc.SuperpairsClicksAlert
 import at.hannibal2.skyhanni.features.misc.TabWidgetSettings
 import at.hannibal2.skyhanni.features.misc.TimeFeatures
@@ -683,6 +683,7 @@ class SkyHanniMod {
         loadModule(CropSpeedMeter())
         loadModule(AshfangMinisNametagHider())
         loadModule(TeleportPadInventoryNumber())
+        loadModule(SoulboundItemIcon())
         loadModule(ComposterOverlay)
         loadModule(DiscordRPCManager)
         loadModule(GardenCropMilestoneFix())
@@ -818,7 +819,6 @@ class SkyHanniMod {
         loadModule(RareDropMessages())
         loadModule(CraftMaterialsFromBazaar())
         loadModule(PestProfitTracker)
-        loadModule(SoulboundItemIcon())
 
         init()
 
