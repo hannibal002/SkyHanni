@@ -1,6 +1,7 @@
 package at.hannibal2.skyhanni.features.stranded
 
 import at.hannibal2.skyhanni.SkyHanniMod
+import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.events.GuiContainerEvent
 import at.hannibal2.skyhanni.events.InventoryCloseEvent
 import at.hannibal2.skyhanni.events.InventoryFullyOpenedEvent
@@ -16,7 +17,7 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
 class HighlightPlaceableNpcs {
 
-    private val config get() = SkyHanniMod.feature.stranded
+    private val config get() = SkyHanniMod.feature.misc.stranded
 
     private val locationPattern by RepoPattern.pattern(
         "stranded.highlightplacement.location",
@@ -57,6 +58,11 @@ class HighlightPlaceableNpcs {
                 slot highlight LorenzColor.GREEN
             }
         }
+    }
+
+    @SubscribeEvent
+    fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
+        event.move(31, "stranded", "misc.stranded")
     }
 
     private fun isPlaceableNpc(lore: List<String>): Boolean {

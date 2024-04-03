@@ -31,7 +31,7 @@ object VisitorAPI {
     const val REFUSE_SLOT = 33
 
     val patternGroup = RepoPattern.group("garden.visitor.api")
-    private val visitorCountPattern by patternGroup.pattern(
+    val visitorCountPattern by patternGroup.pattern(
         "visitor.count",
         "§b§lVisitors: §r§f\\((?<info>.*)\\)"
     )

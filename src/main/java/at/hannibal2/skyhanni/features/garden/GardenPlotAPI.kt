@@ -8,6 +8,7 @@ import at.hannibal2.skyhanni.features.misc.LockMouseLook
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.ItemUtils.name
+import at.hannibal2.skyhanni.utils.LocationUtils.isInside
 import at.hannibal2.skyhanni.utils.LocationUtils.isPlayerInside
 import at.hannibal2.skyhanni.utils.LorenzVec
 import at.hannibal2.skyhanni.utils.RenderUtils.draw3DLine
@@ -176,6 +177,8 @@ object GardenPlotAPI {
     fun Plot.isBarn() = id == 0
 
     fun Plot.isPlayerInside() = box.isPlayerInside()
+
+    fun closestCenterPlot(location: LorenzVec) = plots.find {it.box.isInside(location)}?.middle
 
     fun Plot.sendTeleportTo() {
         if (isBarn()) ChatUtils.sendCommandToServer("tptoplot barn")
