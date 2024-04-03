@@ -264,7 +264,7 @@ object BitsAPI {
         }
     }
 
-    fun hasCookieBuff() = !(cookieBuffTime?.isInFuture() ?: true)
+    fun hasCookieBuff() = cookieBuffTime?.isInFuture() ?: false
 
     fun isEnabled() = LorenzUtils.inSkyBlock && profileStorage != null
 
