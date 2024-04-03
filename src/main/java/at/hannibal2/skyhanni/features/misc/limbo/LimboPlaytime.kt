@@ -31,7 +31,7 @@ class LimboPlaytime {
         "§5§o§b([\\d.,]+) hours.+\$"
     )
 
-    private var wholeMinutes: Long = 0
+    private var wholeMinutes = 0
     private var hoursString: String = ""
 
     private val storage get() = ProfileStorageData.playerSpecific?.limbo
@@ -44,29 +44,40 @@ class LimboPlaytime {
     @SubscribeEvent
     fun replaceItem(event: ReplaceItemEvent) {
         if (event.inventory !is ContainerLocalMenu) return
-        if (event.inventory.displayName.unformattedText != "Detailed /playtime") return
+        if (event.inventory.name != "Detailed /playtime") return
         if (event.slotNumber != 43) return
-        if (storage?.playtime == 0) return
+        val playtime = storage?.playtime ?: 0
+        if (playtime < 60) return
 
         if (lastCreateCooldown.passedSince() > 3.seconds) {
             lastCreateCooldown = SimpleTimeMark.now()
-            limboItem = if (wholeMinutes >= 60) Utils.createItemStack(
+            limboItem = Utils.createItemStack(
                 itemID.getItemStack().item,
                 itemName,
-                "§7Playtime: §a${wholeMinutes.addSeparators()} minutes",
-                "§7Or: §b$hoursString hours"
+                *createItemLore()
             )
-            else Utils.createItemStack(itemID.getItemStack().item, itemName, "§7Playtime: §a$wholeMinutes minutes")
         }
         event.replaceWith(limboItem)
     }
 
+    private fun createItemLore(): Array<String> = when {
+        wholeMinutes >= 60 -> arrayOf(
+            "§7Playtime: §a${wholeMinutes.addSeparators()} minutes",
+            "§7Or: §b$hoursString hours"
+        )
+
+        wholeMinutes == 1 -> arrayOf("§7Playtime: §a$wholeMinutes minute")
+
+        else -> arrayOf("§7Playtime: §a$wholeMinutes minutes")
+    }
+
     @SubscribeEvent
-    fun onHoverItem(event: LorenzToolTipEvent) {
+    fun onTooltip(event: LorenzToolTipEvent) {
         if (!LorenzUtils.inSkyBlock) return
-        if (!event.slot.inventory.displayName.unformattedText.startsWith("Detailed /playtime")) return
+        if (!event.slot.inventory.name.startsWith("Detailed /playtime")) return
         if (event.slot.slotIndex != 4) return
-        if (storage?.playtime == 0) return
+        val playtime = storage?.playtime ?: 0
+        if (playtime <= 120) return
 
         val lore = event.toolTip
         val hoursList = lore.filter { hoursPattern.matches(it) }.toMutableList()
@@ -79,27 +90,27 @@ class LimboPlaytime {
     @SubscribeEvent
     fun onRenderGUI(event: InventoryOpenEvent) {
         if (event.inventoryName != "Detailed /playtime") return
-        val storedPlaytime = storage?.playtime ?: 0
-        if (storedPlaytime < 60) return
-        val playtime = storedPlaytime.seconds
+        val playtime = (storage?.playtime ?: 0).seconds
+        if (playtime < 60.seconds) return
         val wholeHours = playtime.inWholeHours
-        wholeMinutes = playtime.inWholeMinutes
-        if ((wholeMinutes % 60).toInt() == 0) {
+        wholeMinutes = playtime.inWholeMinutes.toInt()
+        if ((wholeMinutes % 60) == 0) {
             hoursString = "$wholeHours"
         } else {
-            val minutes: Float = ((wholeMinutes - wholeHours * 60).toFloat() / 60)
-            hoursString = wholeHours.addSeparators() + minutes.round(1).toString().replace("0", "")
+            val minutes: Float = ((wholeMinutes - wholeHours * 60).toFloat() / 60).round(1)
+            hoursString = wholeHours.addSeparators()
+            if (findFloatDecimalPlace(minutes) != 0) {
+                val minutesString = minutes.toString()
+                hoursString += minutesString.substring(minutesString.indexOf("."))
+            }
         }
     }
 
     private fun addLimbo(hoursList: MutableList<String>, minutesList: MutableList<String>) {
         val storedPlaytime = storage?.playtime ?: 0
         if (wholeMinutes >= 60) {
-            val hours = storedPlaytime.seconds.inWholeHours
-            val minutes = (storedPlaytime.seconds.inWholeMinutes - (hours * 60).toFloat() / 6).toInt()
             modifiedList = hoursList
-            if (minutes == 0) modifiedList.add("§5§o§b$hours hours §7on Limbo")
-            else modifiedList.add("§5§o§b$hoursString hours §7on Limbo")
+            modifiedList.add("§5§o§b$hoursString hours §7on Limbo")
             modifiedList = modifiedList.sortedByDescending {
                 val matcher = hoursPattern.matcher(it)
                 if (matcher.find()) {
@@ -110,9 +121,12 @@ class LimboPlaytime {
         } else {
             val minutes = storedPlaytime.seconds.inWholeMinutes
             modifiedList = minutesList
-            modifiedList.add("§a$minutes minutes §7on Limbo")
+            modifiedList.add("§5§o§a$minutes minutes §7on Limbo")
             modifiedList = modifiedList.sortedByDescending {
-                it.substringAfter("§a").substringBefore(" minutes").toDoubleOrNull()
+                val matcher = minutesPattern.matcher(it)
+                if (matcher.find()) {
+                    matcher.group(1).toDoubleOrNull() ?: 0.0
+                } else 0.0
             }.toMutableList()
             setMinutes = true
         }
@@ -121,12 +135,24 @@ class LimboPlaytime {
     private fun remakeList(
         toolTip: MutableList<String>,
         minutesList: MutableList<String>,
-        hoursList: MutableList<String>
+        hoursList: MutableList<String>,
     ) {
-        val firstLine = toolTip.first()
-        val totalPlaytime = toolTip.last()
+        val firstList = mutableListOf<String>()
+        val lastList = mutableListOf<String>()
+        var hasPassed = false
+        toolTip.forEach {
+            if (!(hoursPattern.matches(it) || minutesPattern.matches(it)) && !hasPassed) {
+                firstList.add(it)
+            } else hasPassed = true
+        }
+        hasPassed = false
+        toolTip.forEach {
+            if (!(hoursPattern.matches(it) || minutesPattern.matches(it)) && hasPassed) {
+                lastList.add(it)
+            } else hasPassed = true
+        }
         toolTip.clear()
-        toolTip.add(firstLine)
+        toolTip.addAll(firstList)
         if (!setMinutes) {
             toolTip.addAll(modifiedList)
             toolTip.addAll(minutesList)
@@ -134,6 +160,12 @@ class LimboPlaytime {
             toolTip.addAll(hoursList)
             toolTip.addAll(modifiedList)
         }
-        toolTip.add(totalPlaytime)
+        toolTip.addAll(lastList)
+    }
+
+    private fun findFloatDecimalPlace(input: Float): Int {
+        val string = input.toString()
+        val dotIndex = string.indexOf(".")
+        return (string[dotIndex + 1].toString().toInt())
     }
 }

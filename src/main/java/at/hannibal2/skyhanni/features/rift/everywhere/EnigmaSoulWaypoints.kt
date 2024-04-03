@@ -20,7 +20,6 @@ import at.hannibal2.skyhanni.utils.RenderUtils.drawDynamicText
 import at.hannibal2.skyhanni.utils.RenderUtils.highlight
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import io.github.moulberry.notenoughupdates.events.ReplaceItemEvent
-import io.github.moulberry.notenoughupdates.events.SlotClickEvent
 import io.github.moulberry.notenoughupdates.util.Utils
 import net.minecraft.client.gui.inventory.GuiChest
 import net.minecraft.client.player.inventory.ContainerLocalMenu
@@ -80,11 +79,11 @@ object EnigmaSoulWaypoints {
     }
 
     @SubscribeEvent(priority = EventPriority.HIGH)
-    fun onSlotClick(event: SlotClickEvent) {
+    fun onSlotClick(event: GuiContainerEvent.SlotClickEvent) {
         if (!inInventory || !isEnabled()) return
 
         if (event.slotId == 31 && inventoryUnfound.isNotEmpty()) {
-            event.usePickblockInstead()
+            event.makePickblock()
             if (adding) {
                 trackedSouls.addAll(inventoryUnfound)
                 adding = false
@@ -94,10 +93,10 @@ object EnigmaSoulWaypoints {
             }
         }
 
-        if (event.slot.stack == null) return
+        if (event.slot?.stack == null) return
         val split = event.slot.stack.displayName.split("Enigma: ")
         if (split.size == 2) {
-            event.usePickblockInstead()
+            event.makePickblock()
             if (soulLocations.contains(split.last())) {
                 if (!trackedSouls.contains(split.last())) {
                     ChatUtils.chat("§5Tracking the ${split.last()} Enigma Soul!", prefixColor = "§5")
