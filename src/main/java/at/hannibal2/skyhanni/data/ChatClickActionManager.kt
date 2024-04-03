@@ -14,7 +14,7 @@ object ChatClickActionManager {
     }
 
     private fun ClickableAction.sendToChat() {
-        ChatUtils.clickableChat(message, "shaction $token")
+        ChatUtils.clickableChat(message, "shaction $token", prefix = false)
     }
 
     fun onCommand(args: Array<String>) {

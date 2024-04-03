@@ -5,8 +5,8 @@ import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.data.jsonobjects.local.FriendsJson
 import at.hannibal2.skyhanni.data.jsonobjects.local.JacobContestsJson
 import at.hannibal2.skyhanni.data.jsonobjects.local.KnownFeaturesJson
-import at.hannibal2.skyhanni.data.jsonobjects.other.HypixelApiTrophyFish
 import at.hannibal2.skyhanni.data.jsonobjects.local.VisualWordsJson
+import at.hannibal2.skyhanni.data.jsonobjects.other.HypixelApiTrophyFish
 import at.hannibal2.skyhanni.features.fishing.trophy.TrophyRarity
 import at.hannibal2.skyhanni.features.misc.update.UpdateManager
 import at.hannibal2.skyhanni.utils.KotlinTypeAdapterFactory
@@ -195,6 +195,7 @@ class ConfigManager {
             jsonHolder[fileType] = firstLoadFile(fileType.file, fileType, fileType.clazz.newInstance())
         }
 
+        // TODO use SecondPassedEvent
         fixedRateTimer(name = "skyhanni-config-auto-save", period = 60_000L, initialDelay = 60_000L) {
             saveConfig(ConfigFileType.FEATURES, "auto-save-60s")
         }

@@ -1,8 +1,8 @@
 package at.hannibal2.skyhanni.config.features.chroma;
 
-import at.hannibal2.skyhanni.SkyHanniMod;
 import at.hannibal2.skyhanni.config.FeatureToggle;
 import at.hannibal2.skyhanni.config.HasLegacyId;
+import at.hannibal2.skyhanni.features.chroma.ChromaManager;
 import com.google.gson.annotations.Expose;
 import io.github.moulberry.moulconfig.annotations.ConfigEditorBoolean;
 import io.github.moulberry.moulconfig.annotations.ConfigEditorButton;
@@ -76,7 +76,7 @@ public class ChromaConfig {
 
     @ConfigOption(name = "Reset to Default", desc = "Resets all chroma settings to the default.")
     @ConfigEditorButton(buttonText = "Reset")
-    public Runnable resetSettings = this::resetChromaSettings;
+    public Runnable resetSettings = ChromaManager::resetChromaSettings;
 
     @Expose
     @ConfigOption(name = "Everything Chroma", desc = "Renders §4§l§oALL §r§7text in chroma. (Some enchants may appear white with SBA enchant parsing)")
@@ -88,12 +88,4 @@ public class ChromaConfig {
     @ConfigEditorBoolean
     public boolean ignoreChat = false;
 
-    private void resetChromaSettings() {
-        SkyHanniMod.getFeature().chroma.chromaSize = 30f;
-        SkyHanniMod.getFeature().chroma.chromaSpeed = 6f;
-        SkyHanniMod.getFeature().chroma.chromaSaturation = 0.75f;
-        SkyHanniMod.getFeature().chroma.allChroma = false;
-        SkyHanniMod.getFeature().chroma.ignoreChat = false;
-        SkyHanniMod.getFeature().chroma.chromaDirection = Direction.FORWARD_RIGHT;
-    }
 }

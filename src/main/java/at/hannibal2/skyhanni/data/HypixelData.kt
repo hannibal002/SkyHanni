@@ -44,7 +44,7 @@ class HypixelData {
         private val patternGroup = RepoPattern.group("data.hypixeldata")
         private val serverIdScoreboardPattern by patternGroup.pattern(
             "serverid.scoreboard",
-            "§7\\d+/\\d+/\\d+ §8(?<servertype>[mM])(?<serverid>\\S+)"
+            "§7\\d+/\\d+/\\d+ §8(?<servertype>[mM])(?<serverid>\\S+).*"
         )
         private val serverIdTablistPattern by patternGroup.pattern(
             "serverid.tablist",
@@ -78,6 +78,10 @@ class HypixelData {
             "guesting.scoreboard",
             "SKYBLOCK GUEST"
         )
+        private val scoreboardTitlePattern by patternGroup.pattern(
+            "scoreboard.title",
+            "SK[YI]BLOCK(?: CO-OP| GUEST)?"
+        )
 
         var hypixelLive = false
         var hypixelAlpha = false
@@ -95,7 +99,7 @@ class HypixelData {
         var bingo = false
 
         var profileName = ""
-        var joinedWorld = 0L
+        var joinedWorld = SimpleTimeMark.farPast()
 
         var skyBlockArea = "?"
 
@@ -119,6 +123,9 @@ class HypixelData {
 
         fun checkCurrentServerId() {
             if (!LorenzUtils.inSkyBlock) return
+            if (serverId != null) return
+            if (LorenzUtils.lastWorldSwitch.passedSince() < 1.seconds) return
+            if (!TabListData.fullyLoaded) return
 
             ScoreboardData.sidebarLinesFormatted.forEach {
                 serverIdScoreboardPattern.matchMatcher(it) {
@@ -213,7 +220,7 @@ class HypixelData {
         inLimbo = false
         inLobby = false
         locraw.forEach { locraw[it.key] = "" }
-        joinedWorld = System.currentTimeMillis()
+        joinedWorld = SimpleTimeMark.now()
         serverId = null
     }
 
@@ -399,7 +406,6 @@ class HypixelData {
         val objective = world.scoreboard.getObjectiveInDisplaySlot(1) ?: return false
         val displayName = objective.displayName
         val scoreboardTitle = displayName.removeColor()
-        return scoreboardTitle.contains("SKYBLOCK") ||
-            scoreboardTitle.contains("SKIBLOCK") // April 1st jokes are so funny
+        return scoreboardTitlePattern.matches(scoreboardTitle)
     }
 }

@@ -2,7 +2,12 @@ package at.hannibal2.skyhanni.config.features.gui;
 
 import at.hannibal2.skyhanni.config.FeatureToggle;
 import at.hannibal2.skyhanni.config.core.config.Position;
+import at.hannibal2.skyhanni.config.features.chroma.ChromaConfig;
 import at.hannibal2.skyhanni.config.features.gui.customscoreboard.CustomScoreboardConfig;
+import at.hannibal2.skyhanni.config.features.markedplayer.MarkedPlayerConfig;
+import at.hannibal2.skyhanni.config.features.misc.DiscordRPCConfig;
+import at.hannibal2.skyhanni.config.features.misc.compacttablist.CompactTabListConfig;
+import at.hannibal2.skyhanni.config.features.misc.cosmetic.CosmeticConfig;
 import at.hannibal2.skyhanni.data.GuiEditManager;
 import com.google.gson.annotations.Expose;
 import io.github.moulberry.moulconfig.annotations.Accordion;
@@ -15,6 +20,20 @@ import io.github.moulberry.moulconfig.annotations.ConfigOption;
 import org.lwjgl.input.Keyboard;
 
 public class GUIConfig {
+
+    @Expose
+    @Category(name = "Compact Tab List", desc = "Compact Tab List Settings")
+    @Accordion
+    public CompactTabListConfig compactTabList = new CompactTabListConfig();
+
+    @Expose
+    @Category(name = "Custom Scoreboard", desc = "Custom Scoreboard Settings")
+    public CustomScoreboardConfig customScoreboard = new CustomScoreboardConfig();
+
+    @Expose
+    @Category(name = "Chroma", desc = "Settings for Chroma text (Credit to SBA).")
+    @Accordion
+    public ChromaConfig chroma = new ChromaConfig();
 
     @ConfigOption(name = "Edit GUI Locations", desc = "Change the position of SkyHanni's overlays.")
     @ConfigEditorButton(buttonText = "Edit")
@@ -31,8 +50,14 @@ public class GUIConfig {
     public float globalScale = 1F;
 
     @Expose
-    @Category(name = "Custom Scoreboard", desc = "Custom Scoreboard Settings")
-    public CustomScoreboardConfig customScoreboard = new CustomScoreboardConfig();
+    @ConfigOption(name = "Discord Rich Presence", desc = "")
+    @Accordion
+    public DiscordRPCConfig discordRPC = new DiscordRPCConfig();
+
+    @Expose
+    @ConfigOption(name = "Marked Players", desc = "Players that got marked with §e/shmarkplayer§7.")
+    @Accordion
+    public MarkedPlayerConfig markedPlayers = new MarkedPlayerConfig();
 
     @Expose
     @ConfigOption(name = "Modify Visual Words", desc = "")
@@ -43,6 +68,11 @@ public class GUIConfig {
     @ConfigOption(name = "Custom Text Box", desc = "")
     @Accordion
     public TextBoxConfig customTextBox = new TextBoxConfig();
+
+    @Expose
+    @ConfigOption(name = "In-Game Date", desc = "")
+    @Accordion
+    public InGameDateConfig inGameDate = new InGameDateConfig();
 
     @Expose
     @ConfigOption(name = "Real Time", desc = "Display the current computer time, a handy feature when playing in full-screen mode.")
@@ -59,9 +89,8 @@ public class GUIConfig {
     public Position realTimePosition = new Position(10, 10, false, true);
 
     @Expose
-    @ConfigOption(name = "In-Game Date", desc = "")
-    @Accordion
-    public InGameDateConfig inGameDate = new InGameDateConfig();
+    @Category(name = "Cosmetic", desc = "Cosmetics Settings")
+    public CosmeticConfig cosmetic = new CosmeticConfig();
 
     @Expose
     @ConfigOption(name = "TPS Display", desc = "Show the TPS of the current server, like in Soopy.")

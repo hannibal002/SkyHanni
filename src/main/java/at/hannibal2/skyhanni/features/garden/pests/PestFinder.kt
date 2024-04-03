@@ -47,7 +47,7 @@ class PestFinder {
     }
 
     private fun drawDisplay() = buildList {
-        add(Renderable.string("§6Total pests in garden: §e${PestAPI.scoreboardPests}§6/§e8"))
+        add(Renderable.string("§6Total pests: §e${PestAPI.scoreboardPests}§6/§e8"))
 
         for (plot in PestAPI.getInfestedPlots()) {
             val pests = plot.pests
@@ -143,7 +143,7 @@ class PestFinder {
             return
         }
 
-        if (plot.isPlayerInside()) {
+        if (plot.isPlayerInside() && !config.alwaysTp) {
             ChatUtils.userError("You're already in an infested plot!")
             return
         }

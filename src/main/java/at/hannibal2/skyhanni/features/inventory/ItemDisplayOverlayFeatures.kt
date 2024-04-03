@@ -25,6 +25,7 @@ import at.hannibal2.skyhanni.data.PetAPI
 import at.hannibal2.skyhanni.events.RenderItemTipEvent
 import at.hannibal2.skyhanni.features.garden.GardenAPI
 import at.hannibal2.skyhanni.features.garden.pests.PestAPI
+import at.hannibal2.skyhanni.features.skillprogress.SkillProgress
 import at.hannibal2.skyhanni.features.skillprogress.SkillType
 import at.hannibal2.skyhanni.utils.ConfigUtils
 import at.hannibal2.skyhanni.utils.InventoryUtils
@@ -48,6 +49,8 @@ import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getRanchersSpeed
 import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
+import com.google.gson.JsonArray
+import com.google.gson.JsonElement
 import net.minecraft.item.ItemStack
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
@@ -166,7 +169,7 @@ object ItemDisplayOverlayFeatures {
                 val level = "" + text.romanToDecimalIfNecessary()
                 val skill = SkillType.getByNameOrNull(skillName) ?: return level
                 val skillInfo = SkillAPI.storage?.get(skill) ?: return level
-                return if (SkyHanniMod.feature.skillProgress.overflowConfig.enableInSkillMenuAsStackSize)
+                return if (SkillProgress.config.overflowConfig.enableInSkillMenuAsStackSize)
                     "" + skillInfo.overflowLevel else level
             }
         }
@@ -282,6 +285,19 @@ object ItemDisplayOverlayFeatures {
         event.transform(11, "inventory.itemNumberAsStackSize") { element ->
             ConfigUtils.migrateIntArrayListToEnumArrayList(element, ItemNumberEntry::class.java)
         }
+        event.transform(29, "inventory.itemNumberAsStackSize") { element ->
+            fixRemovedConfigElement(element)
+        }
+    }
+
+    private fun fixRemovedConfigElement(data: JsonElement): JsonElement {
+        if (!data.isJsonArray) return data
+        val newList = JsonArray()
+        for (element in data.asJsonArray) {
+            if (element.asString == "REMOVED") continue
+            newList.add(element)
+        }
+        return newList
     }
 
     fun ItemNumberEntry.isSelected() = config.itemNumberAsStackSize.contains(this)
