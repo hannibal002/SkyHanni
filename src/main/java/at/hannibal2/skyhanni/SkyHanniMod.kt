@@ -813,12 +813,12 @@ class SkyHanniMod {
         loadModule(QuiverNotification)
         loadModule(MaxPurseItems())
         loadModule(SuperCraftFeatures())
+        loadModule(CraftMaterialsFromBazaar())
+        loadModule(CraftableItemList())
         loadModule(InfernoMinionFeatures())
         loadModule(LimboPlaytime())
         loadModule(RareDropMessages())
-        loadModule(CraftMaterialsFromBazaar())
         loadModule(PestProfitTracker)
-        loadModule(CraftableItemList())
 
         init()
 
