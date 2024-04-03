@@ -169,10 +169,8 @@ class HypixelData {
         }
 
         fun getMaxPlayersForCurrentServer(): Int {
-            for (line in ScoreboardData.sidebarLinesFormatted) {
-                scoreboardVisitingAmoutPattern.matchMatcher(line) {
-                    return group("maxamount").toInt()
-                }
+            ScoreboardData.sidebarLinesFormatted.matchFirst(scoreboardVisitingAmoutPattern) {
+                return group("maxamount").toInt()
             }
             return if (serverId?.startsWith("mega") == true) 80 else 26
         }
