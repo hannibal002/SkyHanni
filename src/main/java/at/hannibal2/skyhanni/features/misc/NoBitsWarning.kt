@@ -1,8 +1,6 @@
 package at.hannibal2.skyhanni.features.misc
 
 import at.hannibal2.skyhanni.SkyHanniMod
-import at.hannibal2.skyhanni.data.BitsAPI
-import at.hannibal2.skyhanni.data.ProfileStorageData
 import at.hannibal2.skyhanni.events.BitsUpdateEvent
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils
@@ -15,17 +13,18 @@ class NoBitsWarning {
 
     private val config get() = SkyHanniMod.feature.misc.noBitsWarning
 
-    private val profileStorage get() = ProfileStorageData.profileSpecific?.bits
-
     @SubscribeEvent
     fun onBitsUpdate(event: BitsUpdateEvent) {
         if (!isEnabled()) return
-        if (BitsAPI.bitsToClaim == 0) {
-            ChatUtils.clickableChat("§bNo Bits Available! §eClick to run /bz booster cookie.", "bz booster cookie")
+        if (event.bitsToClaim == 0) {
+            ChatUtils.clickableChat(
+                "§bNo Bits Available! §eClick to run /bz booster cookie.",
+                "bz booster cookie"
+            )
             LorenzUtils.sendTitle("§bNo Bits Available", 5.seconds)
             SoundUtils.repeatSound(100,10, createSound("note.pling", 0.6f))
         }
     }
 
-    private fun isEnabled() = LorenzUtils.inSkyBlock && profileStorage != null && config
+    private fun isEnabled() = LorenzUtils.inSkyBlock && config
 }

@@ -117,10 +117,10 @@ object BitsAPI {
 
                 if (amount > bits) {
                     bitsToClaim -= amount - bits
+                    bits
                     ChatUtils.debug("You have gained §3${amount - bits} Bits §7according to the scoreboard!")
-                    BitsUpdateEvent().postAndCatch()
+                    BitsUpdateEvent(bits, bitsToClaim).postAndCatch()
                 }
-                bits = amount
 
                 return
             }
@@ -135,14 +135,14 @@ object BitsAPI {
         bitsFromFameRankUpChatPattern.matchMatcher(message) {
             val amount = group("amount").formatInt()
             bitsToClaim += amount
-            BitsUpdateEvent().postAndCatch()
+            BitsUpdateEvent(bits, bitsToClaim).postAndCatch()
 
             return
         }
 
         boosterCookieAte.matchMatcher(message) {
             bitsToClaim += (defaultcookiebits * (currentFameRank?.bitsMultiplier ?: return)).toInt()
-            BitsUpdateEvent().postAndCatch()
+            BitsUpdateEvent(bits, bitsToClaim).postAndCatch()
 
             return
         }
@@ -168,7 +168,7 @@ object BitsAPI {
                     val amount = group("toClaim").formatInt()
                     if (bitsToClaim != amount) {
                         bitsToClaim = amount
-                        BitsUpdateEvent().postAndCatch()
+                        BitsUpdateEvent(bits, bitsToClaim).postAndCatch()
                     }
 
                     return
@@ -218,7 +218,7 @@ object BitsAPI {
                     val amount = group("toClaim").formatInt()
                     if (amount != bitsToClaim) {
                         bitsToClaim = amount
-                        BitsUpdateEvent().postAndCatch()
+                        BitsUpdateEvent(bits, bitsToClaim).postAndCatch()
                     }
 
 
