@@ -133,7 +133,7 @@ class VisitorListener {
     }
 
     @SubscribeEvent(priority = EventPriority.HIGH)
-    fun onStackClick(event: GuiContainerEvent.SlotClickEvent) {
+    fun onSlotClick(event: GuiContainerEvent.SlotClickEvent) {
         if (!VisitorAPI.inInventory) return
         if (event.clickType != 0) return
 

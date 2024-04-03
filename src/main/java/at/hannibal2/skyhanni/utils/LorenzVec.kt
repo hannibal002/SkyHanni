@@ -82,7 +82,7 @@ data class LorenzVec(
         }
     }
 
-    private fun toCleanString(): String {
+    fun toCleanString(): String {
         return "$x $y $z"
     }
 

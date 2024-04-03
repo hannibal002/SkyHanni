@@ -19,6 +19,7 @@ import at.hannibal2.skyhanni.data.CropAccessoryData
 import at.hannibal2.skyhanni.data.EntityData
 import at.hannibal2.skyhanni.data.EntityMovementData
 import at.hannibal2.skyhanni.data.FameRanks
+import at.hannibal2.skyhanni.data.FixedRateTimerManager
 import at.hannibal2.skyhanni.data.FriendAPI
 import at.hannibal2.skyhanni.data.GardenComposterUpgradesData
 import at.hannibal2.skyhanni.data.GardenCropMilestones
@@ -421,7 +422,7 @@ import org.apache.logging.log4j.Logger
     clientSideOnly = true,
     useMetadata = true,
     guiFactory = "at.hannibal2.skyhanni.config.ConfigGuiForgeInterop",
-    version = "0.24.Beta.22",
+    version = "0.24",
 )
 class SkyHanniMod {
 
@@ -489,6 +490,7 @@ class SkyHanniMod {
         loadModule(BossbarData)
         loadModule(EntityUtils)
         loadModule(ChatUtils)
+        loadModule(FixedRateTimerManager())
         loadModule(ChromaManager)
         loadModule(TabWidget)
 
@@ -534,7 +536,7 @@ class SkyHanniMod {
         loadModule(DamageIndicatorManager())
         loadModule(ItemAbilityCooldown())
         loadModule(DungeonHighlightClickedBlocks())
-        loadModule(DungeonMilestonesDisplay())
+        loadModule(DungeonMilestonesDisplay)
         loadModule(DungeonDeathCounter())
         loadModule(DungeonCleanEnd())
         loadModule(DungeonBossMessages())

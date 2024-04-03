@@ -7,6 +7,7 @@ import at.hannibal2.skyhanni.utils.LocationUtils.distanceTo
 import at.hannibal2.skyhanni.utils.LorenzUtils.baseMaxHealth
 import net.minecraft.block.state.IBlockState
 import net.minecraft.client.Minecraft
+import net.minecraft.client.entity.EntityOtherPlayerMP
 import net.minecraft.entity.Entity
 import net.minecraft.entity.EntityLivingBase
 import net.minecraft.entity.item.EntityArmorStand
@@ -56,6 +57,16 @@ object EntityUtils {
             }
             result
         }
+    }
+
+    fun getPlayerEntities(): MutableList<EntityOtherPlayerMP> {
+        val list = mutableListOf<EntityOtherPlayerMP>()
+        for (entity in Minecraft.getMinecraft().theWorld.playerEntities) {
+            if (!entity.isNPC() && entity is EntityOtherPlayerMP) {
+                list.add(entity)
+            }
+        }
+        return list
     }
 
     fun EntityLivingBase.getAllNameTagsInRadiusWith(
