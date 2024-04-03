@@ -27,7 +27,7 @@ class SprayDisplay {
 
     @SubscribeEvent
     fun onTick(event: LorenzTickEvent) {
-        if (!GardenAPI.inGarden() || !event.isMod(5)) return
+        if (!GardenAPI.inGarden() || !event.isMod(5, 3)) return
 
         if (config.displayEnabled) {
             display = GardenPlotAPI.getCurrentPlot()?.takeIf { !it.isBarn() }?.let { plot ->
