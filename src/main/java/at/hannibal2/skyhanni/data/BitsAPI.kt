@@ -117,7 +117,6 @@ object BitsAPI {
 
                 if (amount > bits) {
                     bitsToClaim -= amount - bits
-                    bits
                     ChatUtils.debug("You have gained §3${amount - bits} Bits §7according to the scoreboard!")
                     BitsUpdateEvent(bits, bitsToClaim).postAndCatch()
                 }
