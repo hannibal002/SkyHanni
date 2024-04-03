@@ -137,7 +137,7 @@ object MaxwellAPI {
 
     // load earlier, so that other features can already use the api in this event
     @SubscribeEvent(priority = EventPriority.HIGH)
-    fun onInventoryFullyLoaded(event: InventoryOpenEvent) {
+    fun onInventoryOpen(event: InventoryOpenEvent) {
         if (!isEnabled()) return
 
         if (isThaumaturgyInventory(event.inventoryName)) {
@@ -274,7 +274,7 @@ object MaxwellAPI {
 
     // Load powers from repo
     @SubscribeEvent
-    fun onRepoLoad(event: RepositoryReloadEvent) {
+    fun onRepoReload(event: RepositoryReloadEvent) {
         val data = event.getConstant<MaxwellPowersJson>("MaxwellPowers")
         powers = data.powers
     }

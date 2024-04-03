@@ -475,22 +475,20 @@ class SkyHanniDebugsAndTests {
     }
 
     @SubscribeEvent
-    fun onRenderLocation(event: GuiRenderEvent.GuiOverlayRenderEvent) {
-        if (LorenzUtils.inSkyBlock && Minecraft.getMinecraft().gameSettings.showDebugInfo && debugConfig.currentAreaDebug) {
-            config.debugLocationPos.renderString(
-                "Current Area: ${HypixelData.skyBlockArea}",
-                posLabel = "SkyBlock Area (Debug)"
-            )
-        }
-    }
-
-    @SubscribeEvent
     fun onChat(event: LorenzChatEvent) {
     }
 
     @SubscribeEvent
     fun onRenderOverlay(event: GuiRenderEvent.GuiOverlayRenderEvent) {
         if (!LorenzUtils.inSkyBlock) return
+
+        if (Minecraft.getMinecraft().gameSettings.showDebugInfo && debugConfig.currentAreaDebug) {
+            config.debugLocationPos.renderString(
+                "Current Area: ${HypixelData.skyBlockArea}",
+                posLabel = "SkyBlock Area (Debug)"
+            )
+        }
+
         if (!debugConfig.enabled) return
 
         if (displayLine.isNotEmpty()) {
