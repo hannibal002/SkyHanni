@@ -8,12 +8,11 @@ import at.hannibal2.skyhanni.events.LorenzTickEvent
 import at.hannibal2.skyhanni.events.LorenzWorldChangeEvent
 import at.hannibal2.skyhanni.events.PacketEvent
 import at.hannibal2.skyhanni.events.ReceiveParticleEvent
+import at.hannibal2.skyhanni.events.garden.pests.PestUpdateEvent
 import at.hannibal2.skyhanni.features.garden.GardenAPI
-import at.hannibal2.skyhanni.features.garden.GardenPlotAPI
 import at.hannibal2.skyhanni.test.GriffinUtils.drawWaypointFilled
-import at.hannibal2.skyhanni.utils.LocationUtils.distanceToPlayer
+import at.hannibal2.skyhanni.utils.LocationUtils.distanceToPlayerIgnoreY
 import at.hannibal2.skyhanni.utils.LocationUtils.playerLocation
-import at.hannibal2.skyhanni.utils.LorenzColor
 import at.hannibal2.skyhanni.utils.LorenzVec
 import at.hannibal2.skyhanni.utils.RenderUtils.draw3DLine
 import at.hannibal2.skyhanni.utils.RenderUtils.drawDynamicText
@@ -24,6 +23,7 @@ import net.minecraft.network.play.server.S0EPacketSpawnObject
 import net.minecraft.util.EnumParticleTypes
 import net.minecraftforge.fml.common.eventhandler.EventPriority
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
+import java.awt.Color
 import kotlin.math.absoluteValue
 import kotlin.time.Duration.Companion.seconds
 
@@ -37,28 +37,30 @@ class PestParticleWaypoint {
     private var secondParticlePoint: LorenzVec? = null
     private var lastParticlePoint: LorenzVec? = null
     private var guessPoint: LorenzVec? = null
-    private var locations = mutableListOf<LorenzVec>()
+    private val locations = mutableListOf<LorenzVec>()
     private var particles = 0
     private var lastParticles = 0
+    private var isPointingToPest = false
+    private var color: Color? = null
 
     @SubscribeEvent
     fun onItemClick(event: ItemClickEvent) {
         if (!isEnabled()) return
         if (PestAPI.hasVacuumInHand()) {
             if (event.clickType == ClickType.LEFT_CLICK && !Minecraft.getMinecraft().thePlayer.isSneaking) {
-                lastPestTrackerUse = SimpleTimeMark.now()
                 reset()
+                lastPestTrackerUse = SimpleTimeMark.now()
             }
         }
     }
 
     @SubscribeEvent
     fun onWorldChange(event: LorenzWorldChangeEvent) {
-        lastPestTrackerUse = SimpleTimeMark.farPast()
         reset()
     }
 
     private fun reset() {
+        lastPestTrackerUse = SimpleTimeMark.farPast()
         locations.clear()
         guessPoint = null
         lastParticlePoint = null
@@ -66,13 +68,26 @@ class PestParticleWaypoint {
         secondParticlePoint = null
         particles = 0
         lastParticles = 0
+        isPointingToPest = false
     }
 
     @SubscribeEvent(priority = EventPriority.LOW, receiveCanceled = true)
     fun onReceiveParticle(event: ReceiveParticleEvent) {
         if (!isEnabled()) return
-        if (event.type != EnumParticleTypes.REDSTONE) return
+        if (event.type != EnumParticleTypes.REDSTONE || event.speed != 1f) return
+
+        val darkYellow = LorenzVec(0.0, 0.8, 0.0)
+        val yellow = LorenzVec(0.8, 0.8, 0.0)
+        val redPest = LorenzVec(0.8, 0.4, 0.0)
+        val redPlot = LorenzVec(0.8, 0.0, 0.0)
+        isPointingToPest = when (event.offset.round(5)) {
+            redPlot -> false
+            redPest, yellow, darkYellow -> true
+            else -> return
+        }
+
         val location = event.location
+
         if (config.hideParticles) event.cancel()
         if (lastPestTrackerUse.passedSince() > 3.seconds) return
 
@@ -80,6 +95,8 @@ class PestParticleWaypoint {
         if (firstParticlePoint == null) {
             if (playerLocation().distance(location) > 5) return
             firstParticlePoint = location
+            val (r, g, b) = event.offset.toDoubleArray().map { it.toFloat() }
+            color = Color(r, g, b)
         } else if (secondParticlePoint == null) {
             secondParticlePoint = location
             lastParticlePoint = location
@@ -112,25 +129,23 @@ class PestParticleWaypoint {
         }
 
         val waypoint = getWaypoint() ?: return
-        val distance = GardenPlotAPI.closestCenterPlot(waypoint)?.distanceIgnoreY(waypoint) ?: return
-        val isCloseToPlotCenter = distance < 4
 
-        val text = if (isCloseToPlotCenter) "§cInfected Plot Guess" else "§aPest Guess"
-        val color = if (isCloseToPlotCenter) LorenzColor.RED else LorenzColor.GREEN
+        val text = if (isPointingToPest) "§aPest Guess" else "§cInfected Plot Guess"
+        val color = color ?: error("color is null")
 
-        event.drawWaypointFilled(waypoint, color.toColor(), beacon = true)
+        event.drawWaypointFilled(waypoint, color, beacon = true)
         event.drawDynamicText(waypoint, text, 1.3)
         if (config.drawLine) event.draw3DLine(
             event.exactPlayerEyeLocation(),
             waypoint,
-            LorenzColor.AQUA.toColor(),
+            color,
             3,
             false
         )
     }
 
     private fun getWaypoint() = if (lastParticles != particles || guessPoint == null) {
-        calculateWaypoint(locations)?.also {
+        calculateWaypoint()?.also {
             guessPoint = it
             lastParticles = particles
         }
@@ -139,17 +154,21 @@ class PestParticleWaypoint {
     @SubscribeEvent
     fun onTick(event: LorenzTickEvent) {
         if (!isEnabled()) return
-        if (lastPestTrackerUse.passedSince() !in 1.seconds..config.showForSeconds.seconds) return
         val guessPoint = guessPoint ?: return
-        if (guessPoint.distanceToPlayer() > 8.0) return
 
-        lastPestTrackerUse = SimpleTimeMark.farPast()
+        if (guessPoint.distanceToPlayerIgnoreY() > 8) return
+        if (isPointingToPest && lastPestTrackerUse.passedSince() !in 1.seconds..config.showForSeconds.seconds) return
         reset()
     }
 
-    private fun calculateWaypoint(list: MutableList<LorenzVec>): LorenzVec? {
-        val firstParticle = firstParticlePoint ?: return null
+    @SubscribeEvent
+    fun onPestUpdate(event: PestUpdateEvent) {
+        if (PestAPI.scoreboardPests == 0) reset()
+    }
 
+    private fun calculateWaypoint(): LorenzVec? {
+        val firstParticle = firstParticlePoint ?: return null
+        val list = locations.toMutableSet()
         var pos = LorenzVec(0.0, 0.0, 0.0)
         for ((i, particle) in list.withIndex()) {
             pos = pos.add(particle.subtract(firstParticle).divide(i.toDouble() + 1.0))

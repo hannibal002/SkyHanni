@@ -145,7 +145,7 @@ object BitsAPI {
     }
 
     @SubscribeEvent
-    fun onInventoryFullyLoaded(event: InventoryFullyOpenedEvent) {
+    fun onInventoryOpen(event: InventoryFullyOpenedEvent) {
         if (!isEnabled()) return
 
         val stacks = event.inventoryItems
