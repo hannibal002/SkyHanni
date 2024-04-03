@@ -6,9 +6,7 @@ import at.hannibal2.skyhanni.data.FriendAPI
 import at.hannibal2.skyhanni.data.PartyAPI
 import at.hannibal2.skyhanni.data.jsonobjects.repo.VipVisitsJson
 import at.hannibal2.skyhanni.events.RepositoryReloadEvent
-import at.hannibal2.skyhanni.utils.EntityUtils.isNPC
-import net.minecraft.client.Minecraft
-import net.minecraft.client.entity.EntityOtherPlayerMP
+import at.hannibal2.skyhanni.utils.EntityUtils
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
 object PlayerTabComplete {
@@ -59,10 +57,8 @@ object PlayerTabComplete {
             }
 
             if (config.islandPlayers && PlayerCategory.ISLAND_PLAYERS !in ignored) {
-                for (entity in Minecraft.getMinecraft().theWorld.playerEntities) {
-                    if (!entity.isNPC() && entity is EntityOtherPlayerMP) {
-                        add(entity.name)
-                    }
+                for (entity in EntityUtils.getPlayerEntities()) {
+                    add(entity.name)
                 }
             }
 

@@ -54,6 +54,7 @@ class BazaarDataHolder {
             npcPrices = loadNpcPrices()
         }
 
+        // TODO use SecondPassedEvent
         fixedRateTimer(name = "skyhanni-bazaar-update", period = 10_000L) {
             bazaarData.clear()
         }
