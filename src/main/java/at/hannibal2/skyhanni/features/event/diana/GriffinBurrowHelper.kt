@@ -326,7 +326,7 @@ object GriffinBurrowHelper {
 
         if (!isEnabled()) {
             if (currentMayor != Mayor.DIANA) {
-                ChatUtils.userError("§cSelect Diana as mayor overwrite!")
+                ChatUtils.clickableChat("§cSelect Diana as mayor overwrite!", "sh assume mayor")
             } else {
                 ChatUtils.userError("Have an Ancestral Spade in the inventory!")
             }
