@@ -76,10 +76,7 @@ object InventoryUtils {
         return screen.slotUnderMouse.inventory is InventoryPlayer && screen.slotUnderMouse.stack == itemStack
     }
 
-    fun getAmountOfItemInInventory(name: NEUInternalName) =
-        countItemsInLowerInventory { it.getInternalNameOrNull() == name }
-
-    fun isItemInInventory(name: NEUInternalName) = getAmountOfItemInInventory(name) > 0
+    fun isItemInInventory(name: NEUInternalName) = name.getAmountInInventory() > 0
 
     fun ContainerChest.getUpperItems(): Map<Slot, ItemStack> = buildMap {
         for ((slot, stack) in getAllItems()) {
@@ -102,4 +99,6 @@ object InventoryUtils {
             this[slot] = stack
         }
     }
+
+    fun NEUInternalName.getAmountInInventory(): Int = countItemsInLowerInventory { it.getInternalNameOrNull() == this }
 }

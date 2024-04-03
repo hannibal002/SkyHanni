@@ -19,7 +19,7 @@ public class SkyblockGuideConfig {
         desc = "Highlights missing collections.")
     @ConfigEditorBoolean
     @FeatureToggle
-    public boolean collectionGuide = true;
+    public boolean collectionGuide = false;
 
     @Expose
     @ConfigOption(name = "Abiphone Highlight",

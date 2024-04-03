@@ -1,9 +1,9 @@
 package at.hannibal2.skyhanni.features.dungeon
 
 import at.hannibal2.skyhanni.SkyHanniMod
-import at.hannibal2.skyhanni.config.Storage.ProfileSpecific.DungeonStorage.DungeonRunInfo
+import at.hannibal2.skyhanni.config.storage.ProfileSpecificStorage.DungeonStorage.DungeonRunInfo
 import at.hannibal2.skyhanni.data.ProfileStorageData
-import at.hannibal2.skyhanni.data.SackAPI
+import at.hannibal2.skyhanni.data.SackAPI.getAmountInSacks
 import at.hannibal2.skyhanni.events.DungeonCompleteEvent
 import at.hannibal2.skyhanni.events.GuiContainerEvent
 import at.hannibal2.skyhanni.events.InventoryCloseEvent
@@ -13,6 +13,7 @@ import at.hannibal2.skyhanni.events.RenderItemTipEvent
 import at.hannibal2.skyhanni.features.dungeon.DungeonAPI.DungeonChest
 import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.InventoryUtils
+import at.hannibal2.skyhanni.utils.InventoryUtils.getAmountInInventory
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.ItemUtils.name
 import at.hannibal2.skyhanni.utils.LorenzColor
@@ -89,7 +90,9 @@ class CroesusChestTracker {
     @SubscribeEvent
     fun onInventoryOpen(event: InventoryFullyOpenedEvent) {
         if (!LorenzUtils.inSkyBlock) return
-        if ((SkyHanniMod.feature.dungeon.croesusUnopenedChestTracker || config.showUsedKismets) && croesusPattern.matches(event.inventoryName)) {
+        if ((SkyHanniMod.feature.dungeon.croesusUnopenedChestTracker || config.showUsedKismets) &&
+            croesusPattern.matches(event.inventoryName)
+        ) {
             pageSetup(event)
 
             if (croesusEmpty) {
@@ -170,7 +173,7 @@ class CroesusChestTracker {
     }
 
     @SubscribeEvent
-    fun onSlotClicked(event: GuiContainerEvent.SlotClickEvent) {
+    fun onSlotClick(event: GuiContainerEvent.SlotClickEvent) {
         if (!LorenzUtils.inSkyBlock) return
         if (!config.showUsedKismets) return
         if (chestInventory != null && event.slotId == kismetSlotId) {
@@ -196,7 +199,7 @@ class CroesusChestTracker {
     }
 
     @SubscribeEvent
-    fun onRenderItemTipAmount(event: RenderItemTipEvent) {
+    fun onRenderItemTip(event: RenderItemTipEvent) {
         if (!LorenzUtils.inSkyBlock) return
         if (!config.kismetStackSize) return
         if (chestInventory == null) return
@@ -238,9 +241,7 @@ class CroesusChestTracker {
 
     private fun getKismetUsed(runIndex: Int) = getRun0(runIndex)?.kismetUsed ?: false
 
-    private fun getKismetAmount() =
-        (SackAPI.fetchSackItem(kismetInternalName).takeIf { it.statusIsCorrectOrAlright() }?.amount
-            ?: 0) + InventoryUtils.getAmountOfItemInInventory(kismetInternalName)
+    private fun getKismetAmount() = kismetInternalName.getAmountInSacks() + kismetInternalName.getAmountInInventory()
 
     private fun croesusSlotMapToRun(slotId: Int) = when (slotId) {
         in 10..16 -> slotId - 10 // 0 - 6
@@ -265,11 +266,11 @@ class CroesusChestTracker {
                 it.floor != null &&
                     (it.openState == OpenedState.UNOPENED || (includeDungeonKey && it.openState == OpenedState.OPENED))
             } ?: -1) + 1
+    }
 
-        enum class OpenedState {
-            UNOPENED,
-            OPENED,
-            KEY_USED,
-        }
+    enum class OpenedState {
+        UNOPENED,
+        OPENED,
+        KEY_USED,
     }
 }

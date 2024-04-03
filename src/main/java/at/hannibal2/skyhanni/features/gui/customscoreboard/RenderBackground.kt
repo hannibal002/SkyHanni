@@ -5,6 +5,7 @@ import at.hannibal2.skyhanni.data.GuiEditManager
 import at.hannibal2.skyhanni.data.GuiEditManager.Companion.getAbsX
 import at.hannibal2.skyhanni.data.GuiEditManager.Companion.getAbsY
 import at.hannibal2.skyhanni.data.GuiEditManager.Companion.getDummySize
+import at.hannibal2.skyhanni.features.gui.customscoreboard.CustomScoreboard.Companion.alignmentConfig
 import at.hannibal2.skyhanni.features.gui.customscoreboard.CustomScoreboard.Companion.backgroundConfig
 import at.hannibal2.skyhanni.features.gui.customscoreboard.CustomScoreboard.Companion.config
 import at.hannibal2.skyhanni.utils.RenderUtils
@@ -19,7 +20,7 @@ import org.lwjgl.opengl.GL11
 class RenderBackground {
     fun renderBackground() {
         val position = config.position
-        val border = 5
+        val border = backgroundConfig.borderSize
 
         val x = position.getAbsX()
         val y = position.getAbsY()
@@ -32,15 +33,15 @@ class RenderBackground {
 
         // Update the position to the alignment options
         if (
-            config.displayConfig.alignment.alignRight
-            || config.displayConfig.alignment.alignCenterVertically
+            alignmentConfig.alignRight
+            || alignmentConfig.alignCenterVertically
         ) {
             position.set(
                 Position(
-                    if (config.displayConfig.alignment.alignRight)
-                        scaledWidth - elementWidth - (backgroundConfig.borderSize * 2)
+                    if (alignmentConfig.alignRight)
+                        scaledWidth - elementWidth - (border * 2)
                     else x,
-                    if (config.displayConfig.alignment.alignCenterVertically)
+                    if (alignmentConfig.alignCenterVertically)
                         scaledHeight / 2 - elementHeight / 2
                     else y,
                     position.getScale(),
@@ -63,18 +64,18 @@ class RenderBackground {
                 Minecraft.getMinecraft().textureManager.bindTexture(textureLocation)
 
                 Utils.drawTexturedRect(
-                    (x - backgroundConfig.borderSize).toFloat(),
-                    (y - backgroundConfig.borderSize).toFloat(),
-                    (elementWidth + backgroundConfig.borderSize * 3).toFloat(),
+                    (x - border).toFloat(),
+                    (y - border).toFloat(),
+                    (elementWidth + border * 3).toFloat(),
                     (elementHeight + border * 2).toFloat(),
                     GL11.GL_NEAREST
                 )
             } else {
                 RenderUtils.drawRoundRect(
-                    x - backgroundConfig.borderSize,
-                    y - backgroundConfig.borderSize,
-                    elementWidth + backgroundConfig.borderSize * 3,
-                    elementHeight + backgroundConfig.borderSize * 2,
+                    x - border,
+                    y - border,
+                    elementWidth + border * 3,
+                    elementHeight + border * 2,
                     SpecialColour.specialToChromaRGB(backgroundConfig.color),
                     backgroundConfig.roundedCornerSmoothness
                 )
