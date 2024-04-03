@@ -13,7 +13,7 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 class SuperCraftFeatures {
     private val craftedPattern by RepoPattern.pattern(
         "inventory.supercrafting.craft",
-        "§eYou Supercrafted §r§r§r§.(?<item>[^§]+)(?:§r§8x(?<amount>\\d+))?§r§e!"
+        "§eYou Supercrafted §r§r§r§.(?<item>[^§]+)(?:§r§8x(?<amount>[0-9,]+))?§r§e!"
     )
     private val config get() = SkyHanniMod.feature.inventory.gfs
 
