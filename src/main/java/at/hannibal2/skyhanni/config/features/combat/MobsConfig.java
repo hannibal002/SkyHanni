@@ -31,6 +31,12 @@ public class MobsConfig {
     public boolean zealotBruiserHighlighter = false;
 
     @Expose
+    @ConfigOption(name = "Zealot with Chest", desc = "Highlight Zealots holding a Chest in a different color.")
+    @ConfigEditorBoolean
+    @FeatureToggle
+    public boolean chestZealotHighlighter = false;
+
+    @Expose
     @ConfigOption(
         name = "Special Zealots",
         desc = "Highlight Special Zealots (the ones that drop Summoning Eyes) in the End."
