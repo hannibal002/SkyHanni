@@ -31,6 +31,7 @@ class MovementSpeedDisplay {
     }
 
     init {
+        // TODO use LorenzTickEvent
         fixedRateTimer(name = "skyhanni-movement-speed-display", period = 250, initialDelay = 1_000) {
             checkSpeed()
         }

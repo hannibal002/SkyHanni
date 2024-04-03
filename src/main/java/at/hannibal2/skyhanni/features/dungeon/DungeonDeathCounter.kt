@@ -51,7 +51,7 @@ class DungeonDeathCounter {
         deathPatternsList.any { it.matches(message) }
 
     @SubscribeEvent(receiveCanceled = true)
-    fun onChatPacket(event: LorenzChatEvent) {
+    fun onChat(event: LorenzChatEvent) {
         if (!isEnabled()) return
 
         if (isDeathMessage(event.message)) {
@@ -92,7 +92,7 @@ class DungeonDeathCounter {
         if (!isEnabled()) return
 
         SkyHanniMod.feature.dungeon.deathCounterPos.renderString(
-            DungeonMilestonesDisplay.color + display,
+            DungeonMilestonesDisplay.colour + display,
             posLabel = "Dungeon Death Counter"
         )
     }

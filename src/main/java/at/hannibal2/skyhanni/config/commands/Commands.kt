@@ -44,6 +44,7 @@ import at.hannibal2.skyhanni.features.garden.farming.GardenStartLocation
 import at.hannibal2.skyhanni.features.garden.farming.lane.FarmingLaneCreator
 import at.hannibal2.skyhanni.features.garden.fortuneguide.CaptureFarmingGear
 import at.hannibal2.skyhanni.features.garden.fortuneguide.FFGuideGUI
+import at.hannibal2.skyhanni.features.garden.pests.PestProfitTracker
 import at.hannibal2.skyhanni.features.garden.visitor.GardenVisitorDropStatistics
 import at.hannibal2.skyhanni.features.mining.KingTalismanHelper
 import at.hannibal2.skyhanni.features.mining.powdertracker.PowderTracker
@@ -246,6 +247,10 @@ object Commands {
             "shresetdianaprofittracker",
             "Resets the Diana Profit Tracker"
         ) { DianaProfitTracker.resetCommand(it) }
+        registerCommand(
+            "shresetpestprofittracker",
+            "Resets the Pest Profit Tracker"
+        ) { PestProfitTracker.resetCommand(it) }
         registerCommand(
             "shresetmythologicalcreatureracker",
             "Resets the Mythological Creature Tracker"
