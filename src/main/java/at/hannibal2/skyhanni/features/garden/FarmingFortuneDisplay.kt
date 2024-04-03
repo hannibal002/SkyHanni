@@ -3,13 +3,15 @@ package at.hannibal2.skyhanni.features.garden
 import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.data.GardenCropMilestones
 import at.hannibal2.skyhanni.data.GardenCropMilestones.getCounter
+import at.hannibal2.skyhanni.events.CropClickEvent
 import at.hannibal2.skyhanni.events.GardenToolChangeEvent
 import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.LorenzTickEvent
-import at.hannibal2.skyhanni.events.ProfileJoinEvent
+import at.hannibal2.skyhanni.events.LorenzWorldChangeEvent
 import at.hannibal2.skyhanni.events.TabListUpdateEvent
 import at.hannibal2.skyhanni.features.garden.CropType.Companion.getTurboCrop
 import at.hannibal2.skyhanni.features.garden.pests.PestAPI
+import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.CollectionUtils.nextAfter
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
@@ -29,6 +31,7 @@ import net.minecraft.item.ItemStack
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import kotlin.math.floor
 import kotlin.math.log10
+import kotlin.time.Duration.Companion.minutes
 import kotlin.time.Duration.Companion.seconds
 
 object FarmingFortuneDisplay {
@@ -82,10 +85,12 @@ object FarmingFortuneDisplay {
     var itemBaseFortune = 0.0
     var greenThumbFortune = 0.0
 
-    @SubscribeEvent
-    fun onProfileJoin(event: ProfileJoinEvent) {
-        display = emptyList()
-    }
+    private var foundTabUniversalFortune = false
+    private var foundTabCropFortune = false
+    private var gardenJoinTime = SimpleTimeMark.farPast()
+    private var firstBrokenCropTime = SimpleTimeMark.farPast()
+    private var lastUniversalFortuneMissingError = SimpleTimeMark.farPast()
+    private var lastCropFortuneMissingError = SimpleTimeMark.farPast()
 
     @SubscribeEvent
     fun onTabListUpdate(event: TabListUpdateEvent) {
@@ -93,6 +98,7 @@ object FarmingFortuneDisplay {
         event.tabList.firstNotNullOfOrNull {
             universalTabFortunePattern.matchMatcher(it) {
                 val fortune = group("fortune").toDouble()
+                foundTabUniversalFortune = true
                 if (fortune != tabFortuneUniversal) {
                     tabFortuneUniversal = fortune
                     update()
@@ -100,8 +106,10 @@ object FarmingFortuneDisplay {
             }
             cropSpecificTabFortunePattern.matchMatcher(it) {
                 val crop = CropType.getByName(group("crop"))
-                currentCrop = crop
                 val cropFortune = group("fortune").toDouble()
+
+                currentCrop = crop
+                foundTabCropFortune = true
                 if (cropFortune != tabFortuneCrop) {
                     tabFortuneCrop = cropFortune
                     update()
@@ -119,7 +127,7 @@ object FarmingFortuneDisplay {
     }
 
     @SubscribeEvent
-    fun onRenderOverlay(event: GuiRenderEvent.GuiOverlayRenderEvent) {
+    fun onRenderOverlay(event: GuiRenderEvent) {
         if (!isEnabled()) return
         if (GardenAPI.hideExtraGuis()) return
         if (GardenAPI.toolInHand == null) return
@@ -127,7 +135,11 @@ object FarmingFortuneDisplay {
     }
 
     private fun update() {
-        display = drawDisplay()
+        display = if (gardenJoinTime.passedSince() > 5.seconds && !foundTabUniversalFortune && !gardenJoinTime.isFarPast()) {
+            drawMissingFortuneDisplay(false)
+        } else if (firstBrokenCropTime.passedSince() > 10.seconds && !foundTabCropFortune && !firstBrokenCropTime.isFarPast()) {
+            drawMissingFortuneDisplay(true)
+        } else drawDisplay()
     }
 
     private fun drawDisplay() = buildList {
@@ -166,10 +178,67 @@ object FarmingFortuneDisplay {
         }
     }
 
+    private fun drawMissingFortuneDisplay(cropFortune: Boolean) = buildList {
+        if (cropFortune) {
+            add(Renderable.clickAndHover(
+                "§cNo Crop Fortune Found! Enable The Stats Widget",
+                listOf(
+                    "§cEnable the Stats widget and enable",
+                    "§cshowing latest Crop Fortune."
+                ),
+                onClick = {
+                    ChatUtils.sendCommandToServer("widget")
+                }
+            ))
+        } else {
+            add(Renderable.clickAndHover(
+                "§cNo Farming Fortune Found! Enable The Stats Widget",
+                listOf(
+                    "§cEnable the Stats widget and enable",
+                    "§cshowing the Farming Fortune stat."
+                ),
+                onClick = {
+                    ChatUtils.sendCommandToServer("widget")
+                }
+            ))
+        }
+    }
+
     @SubscribeEvent
     fun onTick(event: LorenzTickEvent) {
-        if (!event.isMod(2)) return
-        update()
+        if (!GardenAPI.inGarden()) return
+        if (event.isMod(2)) update()
+        if (gardenJoinTime.passedSince() > 5.seconds && !foundTabUniversalFortune && !gardenJoinTime.isFarPast()) {
+            if (lastUniversalFortuneMissingError.passedSince() < 1.minutes) return
+            ChatUtils.clickableChat(
+                "§cCan not read Farming Fortune from tab list! Open /widget and enable the Stats Widget" +
+                "and showing the Farming Fortune stat.",
+                command = "widget"
+            )
+            lastUniversalFortuneMissingError = SimpleTimeMark.now()
+        }
+        if (firstBrokenCropTime.passedSince() > 10.seconds && !foundTabCropFortune && !firstBrokenCropTime.isFarPast()) {
+            if (lastCropFortuneMissingError.passedSince() < 1.minutes) return
+            ChatUtils.clickableChat(
+                "§cCan not read Crop Fortune from tab list! Open /widget and enable the Stats Widget" +
+                    "and showing latest Crop Fortune.",
+                command = "widget"
+            )
+        }
+    }
+
+    @SubscribeEvent
+    fun onCropClick(event: CropClickEvent) {
+        if (firstBrokenCropTime == SimpleTimeMark.farPast()) firstBrokenCropTime = SimpleTimeMark.now()
+    }
+
+    @SubscribeEvent
+    fun onWorldChange(event: LorenzWorldChangeEvent) {
+        display = emptyList()
+        gardenJoinTime = SimpleTimeMark.now()
+        firstBrokenCropTime = SimpleTimeMark.farPast()
+        foundTabUniversalFortune = false
+        foundTabCropFortune = false
     }
 
     private fun isEnabled(): Boolean = GardenAPI.inGarden() && config.display
