@@ -46,6 +46,7 @@ object DungeonAPI {
     var playerClass: DungeonClass? = null
     var playerClassLevel = -1
     var isUniqueClass = false
+    var inMaster7Phase5 = false
 
     val bossStorage: MutableMap<DungeonFloor, Int>? get() = ProfileStorageData.profileSpecific?.dungeons?.bosses
     private val timePattern =
@@ -169,6 +170,7 @@ object DungeonAPI {
             DungeonStartEvent(floor).postAndCatch()
         }
         if (phase5Start.matches(event.message)) {
+            inMaster7Phase5 = true
             DungeonM7Phase5Start().postAndCatch()
         }
         if (event.message.removeColor().matches(uniqueClassBonus)) {

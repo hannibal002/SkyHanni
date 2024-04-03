@@ -1,8 +1,12 @@
 package at.hannibal2.skyhanni.features.dungeon.m7
 
+import at.hannibal2.skyhanni.data.Mayor
 import at.hannibal2.skyhanni.utils.LorenzColor
 import at.hannibal2.skyhanni.utils.LorenzVec
+import net.minecraft.entity.boss.EntityDragon
 import net.minecraft.util.AxisAlignedBB
+import net.minecraftforge.event.entity.EntityJoinWorldEvent
+import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
 enum class DragonInfo(
     val color: String,
