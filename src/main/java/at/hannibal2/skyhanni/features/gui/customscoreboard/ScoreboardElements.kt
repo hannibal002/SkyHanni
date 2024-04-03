@@ -590,16 +590,14 @@ private fun getPowerShowWhen() = !inAnyIsland(IslandType.THE_RIFT)
 
 private fun getCookieDisplayPair() = listOf(
     "§dCookie Buff§f: " + (BitsAPI.cookieBuffTime?.let {
-        if (it.isInPast()) "§cNot Active" else it.timeUntil().format(maxUnits = 2)
+        if (!BitsAPI.hasCookieBuff()) "§cNot Active" else it.timeUntil().format(maxUnits = 2)
     }
         ?: "§cOpen SbMenu!") to HorizontalAlignment.LEFT
 )
 
 private fun getCookieShowWhen(): Boolean {
     if (HypixelData.bingo) return false
-    BitsAPI.cookieBuffTime?.let {
-        return informationFilteringConfig.hideEmptyLines && BitsAPI.hasCookieBuff()
-    } ?: return true
+    return informationFilteringConfig.hideEmptyLines && BitsAPI.hasCookieBuff()
 }
 
 private fun getObjectiveDisplayPair() = buildList {
