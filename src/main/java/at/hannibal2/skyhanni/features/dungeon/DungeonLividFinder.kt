@@ -41,7 +41,6 @@ object DungeonLividFinder {
     @SubscribeEvent
     fun onTick(event: LorenzTickEvent) {
         if (!inDungeon()) return
-        if (!event.isMod(2)) return
 
         val isCurrentlyBlind = isCurrentlyBlind()
         if (!gotBlinded) {
