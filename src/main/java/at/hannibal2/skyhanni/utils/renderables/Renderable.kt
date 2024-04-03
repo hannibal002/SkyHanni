@@ -314,16 +314,6 @@ interface Renderable {
             }
         }
 
-        fun placeholder(width: Int, height: Int = 10) = object : Renderable {
-            override val width = width
-            override val height = height
-            override val horizontalAlign = HorizontalAlignment.LEFT
-            override val verticalAlign = VerticalAlignment.TOP
-
-            override fun render(posX: Int, posY: Int) {
-            }
-        }
-
         fun wrappedString(
             text: String,
             width: Int,
@@ -351,8 +341,6 @@ interface Renderable {
             override val horizontalAlign = horizontalAlign
             override val verticalAlign = verticalAlign
 
-            val inverseScale = 1 / scale
-
             override fun render(posX: Int, posY: Int) {
                 val fontRenderer = Minecraft.getMinecraft().fontRendererObj
                 GlStateManager.translate(1.0, 1.0, 0.0)
@@ -362,6 +350,16 @@ interface Renderable {
                 }
                 GlStateManager.scale(inverseScale, inverseScale, 1.0)
                 GlStateManager.translate(-1.0, -1.0, 0.0)
+            }
+        }
+
+        fun placeholder(width: Int, height: Int = 10) = object : Renderable {
+            override val width = width
+            override val height = height
+            override val horizontalAlign = HorizontalAlignment.LEFT
+            override val verticalAlign = VerticalAlignment.TOP
+
+            override fun render(posX: Int, posY: Int) {
             }
         }
 

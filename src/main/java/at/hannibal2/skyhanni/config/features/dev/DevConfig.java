@@ -70,4 +70,8 @@ public class DevConfig {
     @Category(name = "Minecraft Console", desc = "Minecraft Console Settings")
     public MinecraftConsoleConfig minecraftConsoles = new MinecraftConsoleConfig();
 
+    @Expose
+    @Category(name = "Debug Mob", desc = "Every Debug related to the Mob System")
+    public DebugMobConfig mobDebug = new DebugMobConfig();
+
 }
