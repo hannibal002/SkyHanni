@@ -753,6 +753,7 @@ class SkyHanniMod {
         loadModule(RiftBloodEffigies())
         loadModule(RiftWiltedBerberisHelper())
         loadModule(RiftHorsezookaHider())
+        loadModule(PunchcardHighlight())
         loadModule(GriffinPetWarning())
         loadModule(BestiaryData)
         loadModule(KingTalismanHelper())
@@ -818,7 +819,6 @@ class SkyHanniMod {
         loadModule(RareDropMessages())
         loadModule(CraftMaterialsFromBazaar())
         loadModule(PestProfitTracker)
-        loadModule(PunchcardHighlight())
 
         init()
 
