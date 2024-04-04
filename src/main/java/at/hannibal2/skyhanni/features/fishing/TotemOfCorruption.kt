@@ -50,7 +50,7 @@ class TotemOfCorruption {
     )
 
     @SubscribeEvent
-    fun onRender(event: GuiRenderEvent.GuiOverlayRenderEvent) {
+    fun onRenderOverlay(event: GuiRenderEvent.GuiOverlayRenderEvent) {
         if (!isOverlayEnabled() || display.isEmpty()) return
         config.position.renderStrings(display, posLabel = "Totem of Corruption")
     }
