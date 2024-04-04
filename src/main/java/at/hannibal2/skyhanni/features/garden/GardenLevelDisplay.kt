@@ -100,7 +100,6 @@ class GardenLevelDisplay {
         update()
     }
 
-
     @SubscribeEvent
     fun onInventoryOpen(event: InventoryFullyOpenedEvent) {
         if (!GardenAPI.inGarden()) return

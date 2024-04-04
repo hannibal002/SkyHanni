@@ -69,14 +69,16 @@ object MinecraftData {
 
     @SubscribeEvent
     fun onTick(event: TickEvent.ClientTickEvent) {
+        if (event.phase == TickEvent.Phase.START) return
         Minecraft.getMinecraft().thePlayer ?: return
+
+        DelayedRun.checkRuns()
         totalTicks++
         LorenzTickEvent(totalTicks).postAndCatch()
     }
 
     @SubscribeEvent
     fun onTick(event: LorenzTickEvent) {
-        DelayedRun.checkRuns()
         if (!LorenzUtils.inSkyBlock) return
         val hand = InventoryUtils.getItemInHand()
         val newItem = hand?.getInternalName() ?: NEUInternalName.NONE
