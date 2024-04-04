@@ -186,9 +186,13 @@ object LorenzUtils {
                 displayName += " "
             }
 
-            val hover = entry.hover
+            val renderable = Renderable.hoverTips(
+                "$displayName   ${entry.right}",
+                tips = entry.hover,
+                highlightsOnHoverSlots = entry.highlightsOnHoverSlots
+            )
             entry.item.getItemStackOrNull()?.let {
-                add(listOf(it, Renderable.hoverTips("$displayName   ${entry.right}", tips = hover)))
+                add(listOf(it, renderable))
             }
         }
     }

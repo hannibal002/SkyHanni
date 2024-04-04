@@ -27,6 +27,7 @@ import at.hannibal2.skyhanni.data.GardenCropMilestonesCommunityFix
 import at.hannibal2.skyhanni.data.GardenCropUpgrades
 import at.hannibal2.skyhanni.data.GuiEditManager
 import at.hannibal2.skyhanni.data.GuildAPI
+import at.hannibal2.skyhanni.data.HighlightOnHoverSlot
 import at.hannibal2.skyhanni.data.HypixelData
 import at.hannibal2.skyhanni.data.ItemAddManager
 import at.hannibal2.skyhanni.data.ItemClickData
@@ -505,6 +506,7 @@ class SkyHanniMod {
         loadModule(DataWatcherAPI())
         loadModule(CollectionAPI)
         loadModule(FarmingContestAPI)
+        loadModule(HighlightOnHoverSlot)
         loadModule(FriendAPI)
         loadModule(PartyAPI)
         loadModule(GuildAPI)
