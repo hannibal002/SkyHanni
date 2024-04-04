@@ -14,6 +14,7 @@ import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils.groupOrNull
 import at.hannibal2.skyhanni.utils.LorenzUtils.isInIsland
 import at.hannibal2.skyhanni.utils.NumberUtil.formatInt
+import at.hannibal2.skyhanni.utils.StringUtils.matchFirst
 import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.StringUtils.matches
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
@@ -227,11 +228,8 @@ object MaxwellAPI {
 
     private fun loadThaumaturgyMagicalPower(inventoryItems: Map<Int, ItemStack>) {
         val item = inventoryItems[48] ?: return
-        for (line in item.getLore()) {
-            thaumaturgyMagicalPowerPattern.matchMatcher(line) {
-                magicalPower = group("mp").formatInt()
-                return
-            }
+        item.getLore().matchFirst(thaumaturgyMagicalPowerPattern) {
+            magicalPower = group("mp").formatInt()
         }
     }
 
