@@ -137,8 +137,9 @@ class PestFinder {
         if (event.keyCode != config.teleportHotkey) return
         if (lastKeyPress.passedSince() < 2.seconds) return
         lastKeyPress = SimpleTimeMark.now()
+        val shouldTeleportToCurrentPlot = PestAPI.lastPestKillTime.passedSince() > 3.seconds
 
-        val plot = PestAPI.getNearestInfestedPlot() ?: run {
+        val plot = PestAPI.getNearestInfestedPlot(shouldTeleportToCurrentPlot) ?: run {
             ChatUtils.userError("No infested plots detected to warp to!")
             return
         }

@@ -2,6 +2,7 @@ package at.hannibal2.skyhanni.features.garden.pests
 
 import at.hannibal2.skyhanni.events.InventoryFullyOpenedEvent
 import at.hannibal2.skyhanni.events.LorenzChatEvent
+import at.hannibal2.skyhanni.events.LorenzWorldChangeEvent
 import at.hannibal2.skyhanni.events.ScoreboardChangeEvent
 import at.hannibal2.skyhanni.events.TabListUpdateEvent
 import at.hannibal2.skyhanni.events.garden.pests.PestSpawnEvent
@@ -10,6 +11,7 @@ import at.hannibal2.skyhanni.features.garden.GardenAPI
 import at.hannibal2.skyhanni.features.garden.GardenPlotAPI
 import at.hannibal2.skyhanni.features.garden.GardenPlotAPI.isBarn
 import at.hannibal2.skyhanni.features.garden.GardenPlotAPI.isPestCountInaccurate
+import at.hannibal2.skyhanni.features.garden.GardenPlotAPI.isPlayerInside
 import at.hannibal2.skyhanni.features.garden.GardenPlotAPI.locked
 import at.hannibal2.skyhanni.features.garden.GardenPlotAPI.pests
 import at.hannibal2.skyhanni.features.garden.GardenPlotAPI.uncleared
@@ -21,6 +23,7 @@ import at.hannibal2.skyhanni.utils.NEUInternalName.Companion.asInternalName
 import at.hannibal2.skyhanni.utils.NumberUtil.formatNumber
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
+import at.hannibal2.skyhanni.utils.StringUtils.matches
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
@@ -30,6 +33,8 @@ object PestAPI {
     val config get() = GardenAPI.config.pests
 
     var scoreboardPests = 0
+
+    var lastPestKillTime = SimpleTimeMark.farPast()
 
     val vacuumVariants = listOf(
         "SKYMART_VACUUM".asInternalName(),
@@ -80,6 +85,19 @@ object PestAPI {
     private val infectedPlotsTablistPattern by patternGroup.pattern(
         "tablist.infectedplots",
         "\\sPlots: (?<plots>.*)"
+    )
+
+    /**
+     * REGEX-TEST: §eYou received §a7x Enchanted Potato §efor killing a §6Locust§e!
+     * REGEX-TEST: §eYou received §a6x Enchanted Cocoa Beans §efor killing a §6Moth§e!
+     */
+    private val pestDeathChatPattern by patternGroup.pattern(
+        "chat.pestdeath",
+        "§eYou received §a(?<amount>[0-9]*)x (?<item>.*) §efor killing an? §6(?<pest>.*)§e!"
+    )
+    private val noPestsChatPattern by patternGroup.pattern(
+        "chat.nopests",
+        "§cThere are not any Pests on your Garden right now! Keep farming!"
     )
 
     private fun fixPests() {
@@ -220,9 +238,17 @@ object PestAPI {
     @SubscribeEvent
     fun onChat(event: LorenzChatEvent) {
         if (!GardenAPI.inGarden()) return
-        if (event.message == "§cThere are not any Pests on your Garden right now! Keep farming!") {
+        if (pestDeathChatPattern.matches(event.message)) {
+            lastPestKillTime = SimpleTimeMark.now()
+        }
+        if (noPestsChatPattern.matches(event.message)) {
             resetAllPests()
         }
+    }
+
+    @SubscribeEvent
+    fun onWorldChange(event: LorenzWorldChangeEvent) {
+        lastPestKillTime = SimpleTimeMark.farPast()
     }
 
     private fun getPlotsWithAccuratePests() = GardenPlotAPI.plots.filter { it.pests > 0 && !it.isPestCountInaccurate }
@@ -233,7 +259,10 @@ object PestAPI {
 
     fun getPlotsWithoutPests() = GardenPlotAPI.plots.filter { it.pests == 0 || !it.isPestCountInaccurate }
 
-    fun getNearestInfestedPlot() = getInfestedPlots().minByOrNull { it.middle.distanceSqToPlayer() }
+    fun getNearestInfestedPlot(ignoreCurrent: Boolean = false): GardenPlotAPI.Plot? {
+        return getInfestedPlots().filterNot { ignoreCurrent && it.isPlayerInside() }
+            .minByOrNull { it.middle.distanceSqToPlayer() }
+    }
 
     private fun removePests(removedPests: Int) {
         if (removedPests < 1) return
