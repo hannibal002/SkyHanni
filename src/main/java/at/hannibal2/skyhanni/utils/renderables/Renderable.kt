@@ -2,6 +2,7 @@ package at.hannibal2.skyhanni.utils.renderables
 
 import at.hannibal2.skyhanni.config.core.config.gui.GuiPositionEditor
 import at.hannibal2.skyhanni.config.features.skillprogress.SkillProgressBarConfig
+import at.hannibal2.skyhanni.data.HighlightOnHoverSlot
 import at.hannibal2.skyhanni.data.ToolTipData
 import at.hannibal2.skyhanni.features.chroma.ChromaShaderManager
 import at.hannibal2.skyhanni.features.chroma.ChromaType
@@ -48,7 +49,6 @@ interface Renderable {
     companion object {
 
         val logger = LorenzLogger("debug/renderable")
-        val list = mutableMapOf<Pair<Int, Int>, List<Int>>()
         var currentRenderPassMousePosition: Pair<Int, Int>? = null
             set
 
@@ -142,7 +142,7 @@ interface Renderable {
         fun hoverTips(
             content: Any,
             tips: List<Any>,
-            indexes: List<Int> = listOf(),
+            highlightsOnHoverSlots: List<Int> = listOf(),
             stack: ItemStack? = null,
             color: LorenzColor? = null,
             bypassChecks: Boolean = false,
@@ -162,10 +162,11 @@ interface Renderable {
 
                 override fun render(posX: Int, posY: Int) {
                     render.render(posX, posY)
+                    val pair = Pair(posX, posY)
                     if (isHovered(posX, posY)) {
                         if (condition() && shouldAllowLink(true, bypassChecks)) {
                             onHover.invoke()
-                            list[Pair(posX, posY)] = indexes
+                            HighlightOnHoverSlot.currentSlots[pair] = highlightsOnHoverSlots
                             GlStateManager.pushMatrix()
                             GlStateManager.translate(0F, 0F, 400F)
 
@@ -182,9 +183,7 @@ interface Renderable {
                             GlStateManager.popMatrix()
                         }
                     } else {
-                        if (list.contains(Pair(posX, posY))) {
-                            list.remove(Pair(posX, posY))
-                        }
+                        HighlightOnHoverSlot.currentSlots.remove(pair)
                     }
                 }
             }
@@ -375,7 +374,7 @@ interface Renderable {
             width: Int = 182,
             height: Int = 5,
             horizontalAlign: HorizontalAlignment = HorizontalAlignment.LEFT,
-            verticalAlign: VerticalAlignment = VerticalAlignment.TOP
+            verticalAlign: VerticalAlignment = VerticalAlignment.TOP,
         ) = object : Renderable {
             override val width = width
             override val height = height
