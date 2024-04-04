@@ -9,7 +9,6 @@ import at.hannibal2.skyhanni.features.garden.GardenAPI
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.NumberUtil.formatLong
 import at.hannibal2.skyhanni.utils.StringUtils.matchFirst
-import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraft.item.ItemStack
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
@@ -26,11 +25,9 @@ object GardenCropMilestones {
     )
 
     fun getCropTypeByLore(itemStack: ItemStack): CropType? {
-        for (line in itemStack.getLore()) {
-            cropPattern.matchMatcher(line) {
-                val name = group("name")
-                return CropType.getByNameOrNull(name)
-            }
+        itemStack.getLore().matchFirst(cropPattern) {
+            val name = group("name")
+            return CropType.getByNameOrNull(name)
         }
         return null
     }

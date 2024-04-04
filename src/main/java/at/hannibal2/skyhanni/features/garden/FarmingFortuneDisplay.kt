@@ -328,7 +328,7 @@ object FarmingFortuneDisplay {
         itemBaseFortune = 0.0
         greenThumbFortune = 0.0
 
-        //TODO matchFirst
+        //TODO code cleanup
 
         for (line in tool?.getLore()!!) {
             tooltipFortunePattern.matchMatcher(line) {
