@@ -127,6 +127,9 @@ object FarmingContestAPI {
 
     private fun createContest(time: Long, item: ItemStack): FarmingContest {
         val lore = item.getLore()
+
+        //TODO matchFirst
+
         val crop = lore.firstNotNullOfOrNull {
             cropPattern.matchMatcher(it) { CropType.getByName(group("crop")) }
         } ?: error("Crop not found in lore!")

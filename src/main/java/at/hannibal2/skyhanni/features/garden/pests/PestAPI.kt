@@ -20,6 +20,7 @@ import at.hannibal2.skyhanni.utils.LocationUtils.distanceSqToPlayer
 import at.hannibal2.skyhanni.utils.NEUInternalName.Companion.asInternalName
 import at.hannibal2.skyhanni.utils.NumberUtil.formatNumber
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
+import at.hannibal2.skyhanni.utils.StringUtils.matchFirst
 import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
@@ -133,10 +134,8 @@ object PestAPI {
             plot.pests = 0
             plot.isPestCountInaccurate = false
             val item = event.inventoryItems[plot.inventorySlot] ?: continue
-            for (line in item.getLore()) {
-                pestInventoryPattern.matchMatcher(line) {
-                    plot.pests = group("amount").toInt()
-                }
+            item.getLore().matchFirst(pestInventoryPattern) {
+                plot.pests = group("amount").toInt()
             }
         }
         updatePests()

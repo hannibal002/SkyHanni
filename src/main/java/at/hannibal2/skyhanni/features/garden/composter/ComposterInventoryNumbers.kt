@@ -7,6 +7,7 @@ import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.NumberUtil
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.NumberUtil.formatInt
+import at.hannibal2.skyhanni.utils.StringUtils.matchFirst
 import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
@@ -50,28 +51,25 @@ class ComposterInventoryNumbers {
 
         // Organic Matter or Fuel
         if (slotNumber == 46 || slotNumber == 52) {
-            for (line in stack.getLore()) {
-                valuePattern.matchMatcher(line) {
-                    val having = group("having").removeColor().formatInt()
-                    val havingFormat = NumberUtil.format(having)
-                    val total = group("total").removeColor()
+            stack.getLore().matchFirst(valuePattern) {
+                val having = group("having").removeColor().formatInt()
+                val havingFormat = NumberUtil.format(having)
+                val total = group("total").removeColor()
 
-                    val color = if (slotNumber == 46) {
-                        // Organic Matter
-                        event.offsetY = -95
-                        event.offsetX = 5
-                        event.alignLeft = false
-                        "§e"
-                    } else {
-                        // Fuel
-                        event.offsetY = -41
-                        event.offsetX = -20
-                        "§a"
-                    }
-
-                    event.stackTip = "$color$havingFormat/$total"
-                    return
+                val color = if (slotNumber == 46) {
+                    // Organic Matter
+                    event.offsetY = -95
+                    event.offsetX = 5
+                    event.alignLeft = false
+                    "§e"
+                } else {
+                    // Fuel
+                    event.offsetY = -41
+                    event.offsetX = -20
+                    "§a"
                 }
+
+                event.stackTip = "$color$havingFormat/$total"
             }
         }
     }

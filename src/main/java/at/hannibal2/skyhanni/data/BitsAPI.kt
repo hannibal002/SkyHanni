@@ -10,6 +10,7 @@ import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.NumberUtil.formatInt
+import at.hannibal2.skyhanni.utils.StringUtils.matchFirst
 import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.StringUtils.matches
 import at.hannibal2.skyhanni.utils.StringUtils.removeResets
@@ -159,12 +160,8 @@ object BitsAPI {
                 return
             }
 
-            for (line in cookieStack.getLore()) {
-                bitsAvailableMenuPattern.matchMatcher(line) {
-                    bitsToClaim = group("toClaim").formatInt()
-
-                    return
-                }
+            cookieStack.getLore().matchFirst(bitsAvailableMenuPattern) {
+                bitsToClaim = group("toClaim").formatInt()
             }
             return
         }

@@ -39,6 +39,8 @@ class GardenInventoryNumbers {
         if (InventoryUtils.openInventoryName() == "Crop Upgrades") {
             if (!config.cropUpgrades) return
 
+            //TODO matchFirst
+
             event.stack.getLore()
                 .map { upgradeTierPattern.matcher(it) }
                 .filter { it.matches() }
