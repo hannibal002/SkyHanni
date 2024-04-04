@@ -11,7 +11,6 @@ import at.hannibal2.skyhanni.features.garden.GardenAPI
 import at.hannibal2.skyhanni.features.garden.GardenPlotAPI
 import at.hannibal2.skyhanni.features.garden.GardenPlotAPI.isBarn
 import at.hannibal2.skyhanni.features.garden.GardenPlotAPI.isPestCountInaccurate
-import at.hannibal2.skyhanni.features.garden.GardenPlotAPI.isPlayerInside
 import at.hannibal2.skyhanni.features.garden.GardenPlotAPI.locked
 import at.hannibal2.skyhanni.features.garden.GardenPlotAPI.pests
 import at.hannibal2.skyhanni.features.garden.GardenPlotAPI.uncleared
@@ -201,7 +200,6 @@ object PestAPI {
             pestsInScoreboardPattern.matchMatcher(line) {
                 val newPests = group("pests").formatLong().toInt()
                 if (newPests != scoreboardPests) {
-                    removePests(scoreboardPests - newPests)
                     scoreboardPests = newPests
                     updatePests()
                 }
@@ -244,6 +242,7 @@ object PestAPI {
         if (!GardenAPI.inGarden()) return
         if (pestDeathChatPattern.matches(event.message)) {
             lastPestKillTime = SimpleTimeMark.now()
+            removeNearestPest()
         }
         if (noPestsChatPattern.matches(event.message)) {
             resetAllPests()
@@ -263,10 +262,7 @@ object PestAPI {
 
     fun getPlotsWithoutPests() = GardenPlotAPI.plots.filter { it.pests == 0 || !it.isPestCountInaccurate }
 
-    fun getNearestInfestedPlot(ignoreCurrent: Boolean = false): GardenPlotAPI.Plot? {
-        return getInfestedPlots().filterNot { ignoreCurrent && it.isPlayerInside() }
-            .minByOrNull { it.middle.distanceSqToPlayer() }
-    }
+    fun getNearestInfestedPlot() = getInfestedPlots().minByOrNull { it.middle.distanceSqToPlayer() }
 
     private fun removePests(removedPests: Int) {
         if (removedPests < 1) return
