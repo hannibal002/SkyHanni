@@ -27,6 +27,7 @@ import at.hannibal2.skyhanni.data.GardenCropMilestonesCommunityFix
 import at.hannibal2.skyhanni.data.GardenCropUpgrades
 import at.hannibal2.skyhanni.data.GuiEditManager
 import at.hannibal2.skyhanni.data.GuildAPI
+import at.hannibal2.skyhanni.data.HighlightOnHoverSlot
 import at.hannibal2.skyhanni.data.HypixelData
 import at.hannibal2.skyhanni.data.ItemAddManager
 import at.hannibal2.skyhanni.data.ItemClickData
@@ -286,6 +287,7 @@ import at.hannibal2.skyhanni.features.misc.LockMouseLook
 import at.hannibal2.skyhanni.features.misc.MarkedPlayerManager
 import at.hannibal2.skyhanni.features.misc.MiscFeatures
 import at.hannibal2.skyhanni.features.misc.MovementSpeedDisplay
+import at.hannibal2.skyhanni.features.misc.NoBitsWarning
 import at.hannibal2.skyhanni.features.misc.NonGodPotEffectDisplay
 import at.hannibal2.skyhanni.features.misc.ParticleHider
 import at.hannibal2.skyhanni.features.misc.PartyMemberOutlines
@@ -504,6 +506,7 @@ class SkyHanniMod {
         loadModule(DataWatcherAPI())
         loadModule(CollectionAPI)
         loadModule(FarmingContestAPI)
+        loadModule(HighlightOnHoverSlot)
         loadModule(FriendAPI)
         loadModule(PartyAPI)
         loadModule(GuildAPI)
@@ -817,6 +820,7 @@ class SkyHanniMod {
         loadModule(RareDropMessages())
         loadModule(CraftMaterialsFromBazaar())
         loadModule(PestProfitTracker)
+        loadModule(NoBitsWarning())
 
         init()
 
