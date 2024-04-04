@@ -19,7 +19,7 @@ import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.LocationUtils.distanceSqToPlayer
 import at.hannibal2.skyhanni.utils.NEUInternalName.Companion.asInternalName
-import at.hannibal2.skyhanni.utils.NumberUtil.formatLong
+import at.hannibal2.skyhanni.utils.NumberUtil.formatInt
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.StringUtils.matches
@@ -198,7 +198,7 @@ object PestAPI {
         for (line in event.newList) {
             // gets the total amount of pests in the garden
             pestsInScoreboardPattern.matchMatcher(line) {
-                val newPests = group("pests").formatLong().toInt()
+                val newPests = group("pests").formatInt()
                 if (newPests != scoreboardPests) {
                     scoreboardPests = newPests
                     updatePests()
