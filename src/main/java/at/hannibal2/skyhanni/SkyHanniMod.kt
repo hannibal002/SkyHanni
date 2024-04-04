@@ -799,6 +799,7 @@ class SkyHanniMod {
         loadModule(PestSpawnTimer)
         loadModule(PestFinder())
         loadModule(PestParticleWaypoint())
+        loadModule(StereoHarmonyDisplay())
         loadModule(SprayFeatures())
         loadModule(DojoRankDisplay())
         loadModule(SprayDisplay())
@@ -822,7 +823,6 @@ class SkyHanniMod {
         loadModule(CraftMaterialsFromBazaar())
         loadModule(PestProfitTracker)
         loadModule(NoBitsWarning())
-        loadModule(StereoHarmonyDisplay())
 
         init()
 
