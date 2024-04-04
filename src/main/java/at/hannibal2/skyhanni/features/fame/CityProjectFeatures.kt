@@ -27,7 +27,7 @@ import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.RenderUtils.highlight
 import at.hannibal2.skyhanni.utils.RenderUtils.renderStringsAndItems
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
-import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
+import at.hannibal2.skyhanni.utils.StringUtils.matchFirst
 import at.hannibal2.skyhanni.utils.StringUtils.matches
 import at.hannibal2.skyhanni.utils.TimeUtils
 import at.hannibal2.skyhanni.utils.renderables.Renderable
@@ -123,15 +123,13 @@ class CityProjectFeatures {
                 val lore = item.getLore()
                 val completed = lore.lastOrNull()?.let { completedPattern.matches(it) } ?: false
                 if (completed) continue
-                for (line in lore) {
-                    contributeAgainPattern.matchMatcher(line) {
-                        val rawTime = group("time")
-                        if (rawTime.contains("Soon!")) return@matchMatcher
-                        val duration = TimeUtils.getDuration(rawTime)
-                        val endTime = now + duration
-                        if (endTime < nextTime) {
-                            nextTime = endTime
-                        }
+                lore.matchFirst(contributeAgainPattern) {
+                    val rawTime = group("time")
+                    if (!rawTime.contains("Soon!")) return@matchFirst
+                    val duration = TimeUtils.getDuration(rawTime)
+                    val endTime = now + duration
+                    if (endTime < nextTime) {
+                        nextTime = endTime
                     }
                 }
                 if (item.name != "§eContribute this component!") continue
