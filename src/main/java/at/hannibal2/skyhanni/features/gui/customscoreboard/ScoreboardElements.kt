@@ -807,16 +807,18 @@ private fun getFooterDisplayPair() = listOf(
 private fun getExtraDisplayPair(): List<ScoreboardElementType> {
     if (unknownLines.isEmpty()) return listOf("<hidden>" to HorizontalAlignment.LEFT)
 
-    if (amountOfUnknownLines != unknownLines.size && devConfig.unknownLinesWarning) {
+    val size = unknownLines.size
+    if (amountOfUnknownLines != size && devConfig.unknownLinesWarning) {
+        val message = "CustomScoreboard detected ${pluralize(unknownLines.size, "unknown line", withNumber = true)}"
         ErrorManager.logErrorWithData(
-            CustomScoreboardUtils.UndetectedScoreboardLines("CustomScoreboard detected ${pluralize(unknownLines.size, "unknown line", withNumber = true)}"),
-            "CustomScoreboard detected ${pluralize(unknownLines.size, "unknown line", withNumber = true)}",
+            CustomScoreboardUtils.UndetectedScoreboardLines(message),
+            message,
             "Unknown Lines" to unknownLines,
             "Island" to HypixelData.skyBlockIsland,
             "Area" to HypixelData.skyBlockArea,
-            noStackTrace = true
+            noStackTrace = true,
         )
-        amountOfUnknownLines = unknownLines.size
+        amountOfUnknownLines = size
     }
 
     return listOf("§cUndetected Lines:" to HorizontalAlignment.LEFT) + unknownLines.map { it to HorizontalAlignment.LEFT }

@@ -27,6 +27,7 @@ import at.hannibal2.skyhanni.data.GardenCropMilestonesCommunityFix
 import at.hannibal2.skyhanni.data.GardenCropUpgrades
 import at.hannibal2.skyhanni.data.GuiEditManager
 import at.hannibal2.skyhanni.data.GuildAPI
+import at.hannibal2.skyhanni.data.HighlightOnHoverSlot
 import at.hannibal2.skyhanni.data.HypixelData
 import at.hannibal2.skyhanni.data.ItemAddManager
 import at.hannibal2.skyhanni.data.ItemClickData
@@ -287,6 +288,7 @@ import at.hannibal2.skyhanni.features.misc.LockMouseLook
 import at.hannibal2.skyhanni.features.misc.MarkedPlayerManager
 import at.hannibal2.skyhanni.features.misc.MiscFeatures
 import at.hannibal2.skyhanni.features.misc.MovementSpeedDisplay
+import at.hannibal2.skyhanni.features.misc.NoBitsWarning
 import at.hannibal2.skyhanni.features.misc.NonGodPotEffectDisplay
 import at.hannibal2.skyhanni.features.misc.ParticleHider
 import at.hannibal2.skyhanni.features.misc.PartyMemberOutlines
@@ -323,7 +325,6 @@ import at.hannibal2.skyhanni.features.misc.trevor.TrevorSolver
 import at.hannibal2.skyhanni.features.misc.trevor.TrevorTracker
 import at.hannibal2.skyhanni.features.misc.update.UpdateManager
 import at.hannibal2.skyhanni.features.misc.visualwords.ModifyVisualWords
-import at.hannibal2.skyhanni.features.nether.KuudraAPI
 import at.hannibal2.skyhanni.features.nether.PabloHelper
 import at.hannibal2.skyhanni.features.nether.SulphurSkitterBox
 import at.hannibal2.skyhanni.features.nether.VolcanoExplosivityDisplay
@@ -334,6 +335,7 @@ import at.hannibal2.skyhanni.features.nether.ashfang.AshfangGravityOrbs
 import at.hannibal2.skyhanni.features.nether.ashfang.AshfangHideDamageIndicator
 import at.hannibal2.skyhanni.features.nether.ashfang.AshfangHideParticles
 import at.hannibal2.skyhanni.features.nether.ashfang.AshfangNextResetCooldown
+import at.hannibal2.skyhanni.features.nether.kuudra.KuudraAPI
 import at.hannibal2.skyhanni.features.nether.reputationhelper.CrimsonIsleReputationHelper
 import at.hannibal2.skyhanni.features.rift.RiftAPI
 import at.hannibal2.skyhanni.features.rift.area.colosseum.BlobbercystsHighlight
@@ -505,6 +507,7 @@ class SkyHanniMod {
         loadModule(DataWatcherAPI())
         loadModule(CollectionAPI)
         loadModule(FarmingContestAPI)
+        loadModule(HighlightOnHoverSlot)
         loadModule(FriendAPI)
         loadModule(PartyAPI)
         loadModule(GuildAPI)
@@ -819,6 +822,7 @@ class SkyHanniMod {
         loadModule(LimboPlaytime())
         loadModule(RareDropMessages())
         loadModule(PestProfitTracker)
+        loadModule(NoBitsWarning())
 
         init()
 
