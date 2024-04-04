@@ -47,7 +47,7 @@ class CraftableItemList {
         val lines = mutableMapOf<NEUInternalName, Renderable>()
         val avaliableMaterial = readItems()
         for (internalName in NEUItems.allInternalNames) {
-            if (!config.includeVanillaItems && !internalName.isVanillaItem()) continue
+            if (config.excludeVanillaItems && !internalName.isVanillaItem()) continue
 
             val recipes = NEUItems.getRecipes(internalName)
 

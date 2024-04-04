@@ -27,10 +27,10 @@ public class CraftableItemListConfig {
 
     @Expose
     @ConfigOption(
-        name = "Include Vanilla Items",
-        desc = "Include vanilla items.")
+        name = "Exclude Vanilla Items",
+        desc = "Hide vanilla items from the craftable item list.")
     @ConfigEditorBoolean
-    public boolean includeVanillaItems = false;
+    public boolean excludeVanillaItems = true;
 
     @Expose
     public Position position = new Position(144, 139, false, true);
