@@ -12,9 +12,9 @@ import at.hannibal2.skyhanni.utils.CollectionUtils.nextAfter
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.NumberUtil.formatInt
-import at.hannibal2.skyhanni.utils.StringUtils.matchFirst
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.SimpleTimeMark.Companion.asTimeMark
+import at.hannibal2.skyhanni.utils.StringUtils.matchFirst
 import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.StringUtils.matches
 import at.hannibal2.skyhanni.utils.StringUtils.removeResets
@@ -87,6 +87,7 @@ object BitsAPI {
         "sbmenufamerank",
         "§7Your rank: §e(?<rank>.*)"
     )
+
     /**
      * REGEX-TEST:  §7Duration: §a140d 8h 35m 36s
      */
@@ -194,18 +195,19 @@ object BitsAPI {
                 return
             }
 
-            cookieStack.getLore().matchFirst(bitsAvailableMenuPattern) {
+            val lore = cookieStack.getLore()
+            lore.matchFirst(bitsAvailableMenuPattern) {
                 val amount = group("toClaim").formatInt()
                 if (bitsToClaim != amount) {
                     bitsToClaim = amount
                     sendEvent()
                 }
             }
-            cookieDurationPattern.matchMatcher(line) {
+            lore.matchFirst(cookieDurationPattern) {
                 val duration = TimeUtils.getDuration(group("time"))
                 cookieBuffTime = SimpleTimeMark.now() + duration
             }
-            if (noCookieActiveSBMenuPattern.matches(line)) {
+            lore.matchFirst(noCookieActiveSBMenuPattern) {
                 val cookieTime = cookieBuffTime
                 if (cookieTime == null || cookieTime.isInFuture()) cookieBuffTime = SimpleTimeMark.farPast()
             }
@@ -215,7 +217,7 @@ object BitsAPI {
         if (fameRankGuiNamePattern.matches(event.inventoryName)) {
             val bitsStack = stacks.values.lastOrNull { bitsStackPattern.matches(it.displayName) } ?: return
             val fameRankStack = stacks.values.lastOrNull { fameRankGuiStackPattern.matches(it.displayName) } ?: return
-            val cookieStack = stacks.values.lastOrNull { cookieGuiStackPattern.matches(it.displayName)} ?: return
+            val cookieStack = stacks.values.lastOrNull { cookieGuiStackPattern.matches(it.displayName) } ?: return
 
             line@ for (line in fameRankStack.getLore()) {
                 fameRankCommunityShopPattern.matchMatcher(line) {
