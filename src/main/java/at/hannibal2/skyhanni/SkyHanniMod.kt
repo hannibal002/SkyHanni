@@ -204,6 +204,7 @@ import at.hannibal2.skyhanni.features.garden.fortuneguide.CaptureFarmingGear
 import at.hannibal2.skyhanni.features.garden.inventory.AnitaExtraFarmingFortune
 import at.hannibal2.skyhanni.features.garden.inventory.GardenCropMilestoneInventory
 import at.hannibal2.skyhanni.features.garden.inventory.GardenInventoryNumbers
+import at.hannibal2.skyhanni.features.garden.inventory.LogBookStats
 import at.hannibal2.skyhanni.features.garden.inventory.SkyMartCopperPrice
 import at.hannibal2.skyhanni.features.garden.inventory.plots.GardenNextPlotPrice
 import at.hannibal2.skyhanni.features.garden.inventory.plots.GardenPlotIcon
@@ -709,6 +710,8 @@ class SkyHanniMod {
         loadModule(ServerRestartTitle())
         loadModule(CityProjectFeatures())
         loadModule(GardenPlotIcon)
+        loadModule(GardenPlotBorders)
+        loadModule(LogBookStats())
         loadModule(PocketSackInASackDisplay())
         loadModule(ShowFishingItemName())
         loadModule(WarpTabComplete)
@@ -766,7 +769,6 @@ class SkyHanniMod {
         loadModule(AccountUpgradeReminder())
         loadModule(PetExpTooltip())
         loadModule(Translator())
-        loadModule(GardenPlotBorders)
         loadModule(CosmeticFollowingLine())
         loadModule(SuperpairsClicksAlert())
         loadModule(PowderTracker)
