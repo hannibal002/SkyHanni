@@ -16,14 +16,14 @@ class NoBitsWarning {
     @SubscribeEvent
     fun onBitsUpdate(event: BitsUpdateEvent) {
         if (!isEnabled()) return
-        if (event.bitsToClaim == 0) {
-            ChatUtils.clickableChat(
-                "§bNo Bits Available! §eClick to run /bz booster cookie.",
-                "bz booster cookie"
-            )
-            LorenzUtils.sendTitle("§bNo Bits Available", 5.seconds)
-            SoundUtils.repeatSound(100,10, createSound("note.pling", 0.6f))
-        }
+        if (event.bitsToClaim != 0) return
+
+        ChatUtils.clickableChat(
+            "§bNo Bits Available! §eClick to run /bz booster cookie.",
+            "bz booster cookie"
+        )
+        LorenzUtils.sendTitle("§bNo Bits Available", 5.seconds)
+        SoundUtils.repeatSound(100,10, createSound("note.pling", 0.6f))
     }
 
     private fun isEnabled() = LorenzUtils.inSkyBlock && config
