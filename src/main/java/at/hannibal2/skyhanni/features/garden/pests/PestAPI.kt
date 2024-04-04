@@ -20,7 +20,7 @@ import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.LocationUtils.distanceSqToPlayer
 import at.hannibal2.skyhanni.utils.NEUInternalName.Companion.asInternalName
-import at.hannibal2.skyhanni.utils.NumberUtil.formatNumber
+import at.hannibal2.skyhanni.utils.NumberUtil.formatLong
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.StringUtils.matches
@@ -53,6 +53,7 @@ object PestAPI {
         "scoreboard.pests",
         " §7⏣ §[ac]The Garden §4§lൠ§7 x(?<pests>.*)"
     )
+
     /**
      * REGEX-TEST:  §7⏣ §aPlot §7- §b22a
      * REGEX-TEST:  §7⏣ §aThe Garden
@@ -61,6 +62,7 @@ object PestAPI {
         "scoreboard.nopests",
         " §7⏣ §a(?:The Garden|Plot §7- §b.+)$"
     )
+
     /**
      * REGEX-TEST:    §aPlot §7- §b4 §4§lൠ§7 x1
      */
@@ -68,6 +70,7 @@ object PestAPI {
         "scoreboard.plot.pests",
         "\\s*(?:§.)*Plot (?:§.)*- (?:§.)*(?<plot>.+) (?:§.)*ൠ(?:§.)* x(?<pests>\\d+)"
     )
+
     /**
      * REGEX-TEST:  §aPlot §7- §b3
      */
@@ -79,6 +82,7 @@ object PestAPI {
         "inventory",
         "§4§lൠ §cThis plot has §6(?<amount>\\d) Pests?§c!"
     )
+
     /**
      * REGEX-TEST:  Plots: §r§b4§r§f, §r§b12§r§f, §r§b13§r§f, §r§b18§r§f, §r§b20
      */
@@ -195,7 +199,7 @@ object PestAPI {
         for (line in event.newList) {
             // gets the total amount of pests in the garden
             pestsInScoreboardPattern.matchMatcher(line) {
-                val newPests = group("pests").formatNumber().toInt()
+                val newPests = group("pests").formatLong().toInt()
                 if (newPests != scoreboardPests) {
                     removePests(scoreboardPests - newPests)
                     scoreboardPests = newPests
