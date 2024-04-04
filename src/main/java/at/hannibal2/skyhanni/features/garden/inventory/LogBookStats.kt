@@ -94,7 +94,7 @@ class LogBookStats {
     }
 
     @SubscribeEvent
-    fun onInventoryClosed(event: InventoryCloseEvent) {
+    fun onInventoryClose(event: InventoryCloseEvent) {
         inInventory = false
     }
 
