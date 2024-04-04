@@ -87,7 +87,7 @@ object GardenAPI {
     }
 
     @SubscribeEvent
-    fun onCloseWindow(event: InventoryCloseEvent) {
+    fun onInventoryClose(event: InventoryCloseEvent) {
         if (!inGarden()) return
         checkItemInHand()
     }

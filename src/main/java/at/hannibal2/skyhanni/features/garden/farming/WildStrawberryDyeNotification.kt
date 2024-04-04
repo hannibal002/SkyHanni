@@ -20,7 +20,7 @@ class WildStrawberryDyeNotification {
     val item by lazy { "DYE_WILD_STRAWBERRY".asInternalName() }
 
     @SubscribeEvent
-    fun onCloseWindow(event: InventoryCloseEvent) {
+    fun onInventoryClose(event: InventoryCloseEvent) {
         lastCloseTime = System.currentTimeMillis()
     }
 
