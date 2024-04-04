@@ -15,6 +15,7 @@ import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.NumberUtil.formatInt
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
+import at.hannibal2.skyhanni.utils.StringUtils.matchFirst
 import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import io.github.moulberry.notenoughupdates.util.SkyBlockTime
@@ -127,16 +128,15 @@ object FarmingContestAPI {
 
     private fun createContest(time: Long, item: ItemStack): FarmingContest {
         val lore = item.getLore()
-        val crop = lore.firstNotNullOfOrNull {
-            cropPattern.matchMatcher(it) { CropType.getByName(group("crop")) }
+
+        val crop = lore.matchFirst(cropPattern) {
+            CropType.getByName(group("crop"))
         } ?: error("Crop not found in lore!")
 
         val brackets = buildMap {
             for (bracket in ContestBracket.entries) {
-                val amount = lore.firstNotNullOfOrNull {
-                    bracket.bracketPattern.matchMatcher(it) {
-                        group("amount").formatInt()
-                    }
+                val amount = lore.matchFirst(bracket.bracketPattern) {
+                    group("amount").formatInt()
                 } ?: continue
                 put(bracket, amount)
             }
