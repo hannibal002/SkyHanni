@@ -8,7 +8,7 @@ import at.hannibal2.skyhanni.utils.CollectionUtils.filterToMutable
 import at.hannibal2.skyhanni.utils.KeyboardManager.isActive
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.StringUtils.matches
-import at.hannibal2.skyhanni.utils.TabListData.Companion.getPlayerTabOverlay
+import at.hannibal2.skyhanni.utils.TabListData
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraft.client.Minecraft
 import net.minecraft.client.gui.Gui
@@ -81,28 +81,21 @@ object TabListRenderer {
         }
 
         var totalHeight = maxLines * lineHeight
-        val tabList = getPlayerTabOverlay()
 
         var header = listOf<String>()
-        if (tabList.header_skyhanni != null) {
-            header = tabList.header_skyhanni.formattedText.split("\n").toMutableList()
-            header.removeIf { line -> !line.contains(TabListReader.hypixelAdvertisingString) }
-            if (config.hideAdverts) {
-                header = listOf()
-            } else {
-                totalHeight += header.size * lineHeight + padding
-            }
+
+        if (!config.hideAdverts) {
+            header = TabListData.getHeader().split("\n").toMutableList()
+            header.removeIf { line -> line.isEmpty() }
+            totalHeight += header.size * lineHeight + padding
         }
 
         var footer = listOf<String>()
-        if (tabList.footer_skyhanni != null) {
-            footer = tabList.footer_skyhanni.formattedText.split("\n").toMutableList()
-            footer.removeIf { line -> !line.contains(TabListReader.hypixelAdvertisingString) }
-            if (config.hideAdverts) {
-                footer = listOf()
-            } else {
-                totalHeight += footer.size * lineHeight + padding
-            }
+
+        if (!config.hideAdverts) {
+            footer = TabListData.getFooter().split("\n").toMutableList()
+            footer.removeIf { line -> line.isEmpty() }
+            totalHeight += footer.size * lineHeight + padding
         }
 
         val minecraft = Minecraft.getMinecraft()

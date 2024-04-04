@@ -3,6 +3,8 @@ package at.hannibal2.skyhanni.features.misc.compacttablist
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.events.TabListUpdateEvent
 import at.hannibal2.skyhanni.utils.LorenzUtils
+import at.hannibal2.skyhanni.utils.StringUtils.findMatcher
+import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.StringUtils.removeResets
 import at.hannibal2.skyhanni.utils.StringUtils.removeSFormattingCode
 import at.hannibal2.skyhanni.utils.StringUtils.trimWhiteSpaceAndResets
@@ -96,53 +98,45 @@ object TabListReader {
     }
 
     private fun parseFooterAsColumn(): TabColumn? {
-        val tabList = TabListData.getPlayerTabOverlay()
+        var footer = TabListData.getFooter().removeSFormattingCode()
+        if (footer.isEmpty()) return null
 
-        if (tabList.footer_skyhanni == null) {
-            return null
+        footer = godPotPattern.findMatcher(footer) {
+            activeEffectPattern.matcher(footer)
+                .replaceAll("Active Effects:\n§cGod Potion§r: ${group("timer")}")
+        } ?: run {
+            effectCountPattern.findMatcher(footer) {
+                activeEffectPattern.matcher(footer).replaceAll("Active Effects: §r§e" + group("effectCount"))
+            } ?: activeEffectPattern.matcher(footer).replaceAll("Active Effects: §r§e0")
         }
 
-        val column = TabColumn("§2§lOther")
-
-        var footer = tabList.footer_skyhanni.formattedText.removeSFormattingCode()
-
-        var matcher = godPotPattern.matcher(tabList.footer_skyhanni.unformattedText)
-        if (matcher.find()) {
-            footer = activeEffectPattern.matcher(footer)
-                .replaceAll("Active Effects:\n§cGod Potion§r: ${matcher.group("timer")}")
-        } else {
-            matcher = effectCountPattern.matcher(tabList.footer_skyhanni.unformattedText)
-            footer = if (matcher.find()) {
-                activeEffectPattern.matcher(footer).replaceAll("Active Effects: §r§e" + matcher.group("effectCount"))
-            } else {
-                activeEffectPattern.matcher(footer).replaceAll("Active Effects: §r§e0")
+        cookiePattern.findMatcher(footer) {
+            if (group().contains("Not active!")) {
+                footer = this.replaceAll("Cookie Buff \n§r§7Not Active")
             }
         }
 
-        matcher = cookiePattern.matcher(footer)
-        if (matcher.find() && matcher.group().contains("Not active!")) {
-            footer = matcher.replaceAll("Cookie Buff \n§r§7Not Active")
+        dungeonBuffPattern.findMatcher(footer) {
+            if (group().contains("No Buffs active.")) {
+                footer = this.replaceAll("Dungeon Buffs \n§r§7None Found")
+            }
         }
 
-        matcher = dungeonBuffPattern.matcher(footer)
-        if (matcher.find() && matcher.group().contains("No Buffs active.")) {
-            footer = matcher.replaceAll("Dungeon Buffs \n§r§7None Found")
-        }
+        val column = TabColumn("§2§lOther")
 
         for (line in footer.split("\n")) {
             if (line.contains(hypixelAdvertisingString)) continue
 
             var newLine = line
-            matcher = upgradesPattern.matcher(newLine.removeResets())
 
-            if (matcher.matches()) {
-                var firstPart = matcher.group("firstPart").trimWhiteSpaceAndResets()
+            upgradesPattern.matchMatcher(newLine.removeResets()) {
+                var firstPart = group("firstPart").trimWhiteSpaceAndResets()
                 if (!firstPart.contains("§l")) {
                     firstPart = " $firstPart"
                 }
                 column.addLine(firstPart)
 
-                newLine = matcher.group("secondPart")
+                newLine = group("secondPart")
             }
 
             newLine = newLine.trimWhiteSpaceAndResets()

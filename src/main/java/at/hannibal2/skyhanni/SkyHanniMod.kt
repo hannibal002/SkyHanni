@@ -458,7 +458,7 @@ class SkyHanniMod {
         loadModule(RenderLivingEntityHelper())
         loadModule(SkillExperience())
         loadModule(OtherInventoryData)
-        loadModule(TabListData())
+        loadModule(TabListData)
         loadModule(RenderData())
         loadModule(GardenCropMilestones)
         loadModule(GardenCropMilestonesCommunityFix)
