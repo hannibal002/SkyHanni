@@ -55,5 +55,5 @@ object FixGhostEntities {
         }
     }
 
-    fun isEnabled() = LorenzUtils.connectedToHypixel && config.fixGhostEntities
+    fun isEnabled() = LorenzUtils.inSkyBlock && config.fixGhostEntities
 }

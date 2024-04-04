@@ -5,5 +5,6 @@ class DisplayTableEntry(
     val right: String,
     val sort: Double,
     val item: NEUInternalName,
-    val hover: List<String>,
+    val hover: List<String> = emptyList(),
+    val highlightsOnHoverSlots: List<Int> = emptyList(),
 )

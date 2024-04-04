@@ -2,6 +2,7 @@ package at.hannibal2.skyhanni.data
 
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.data.FameRanks.getFameRankByNameOrNull
+import at.hannibal2.skyhanni.events.BitsUpdateEvent
 import at.hannibal2.skyhanni.events.InventoryFullyOpenedEvent
 import at.hannibal2.skyhanni.events.LorenzChatEvent
 import at.hannibal2.skyhanni.events.ScoreboardChangeEvent
@@ -11,6 +12,7 @@ import at.hannibal2.skyhanni.utils.CollectionUtils.nextAfter
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.NumberUtil.formatInt
+import at.hannibal2.skyhanni.utils.StringUtils.matchFirst
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.SimpleTimeMark.Companion.asTimeMark
 import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
@@ -145,8 +147,8 @@ object BitsAPI {
                 if (amount > bits) {
                     bitsToClaim -= amount - bits
                     ChatUtils.debug("You have gained §3${amount - bits} Bits §7according to the scoreboard!")
+                    sendEvent()
                 }
-                bits = amount
 
                 return
             }
@@ -161,6 +163,7 @@ object BitsAPI {
         bitsFromFameRankUpChatPattern.matchMatcher(message) {
             val amount = group("amount").formatInt()
             bitsToClaim += amount
+            sendEvent()
 
             return
         }
@@ -169,13 +172,14 @@ object BitsAPI {
             bitsToClaim += (defaultcookiebits * (currentFameRank?.bitsMultiplier ?: return)).toInt()
             val cookieTime = cookieBuffTime
             cookieBuffTime = if (cookieTime == null) SimpleTimeMark.now() + 4.days else cookieTime + 4.days
+            sendEvent()
 
             return
         }
     }
 
     @SubscribeEvent
-    fun onInventoryFullyLoaded(event: InventoryFullyOpenedEvent) {
+    fun onInventoryOpen(event: InventoryFullyOpenedEvent) {
         if (!isEnabled()) return
 
         val stacks = event.inventoryItems
@@ -190,18 +194,20 @@ object BitsAPI {
                 return
             }
 
-            for (line in cookieStack.getLore()) {
-                bitsAvailableMenuPattern.matchMatcher(line) {
-                    bitsToClaim = group("toClaim").formatInt()
+            cookieStack.getLore().matchFirst(bitsAvailableMenuPattern) {
+                val amount = group("toClaim").formatInt()
+                if (bitsToClaim != amount) {
+                    bitsToClaim = amount
+                    sendEvent()
                 }
-                cookieDurationPattern.matchMatcher(line) {
-                    val duration = TimeUtils.getDuration(group("time"))
-                    cookieBuffTime = SimpleTimeMark.now() + duration
-                }
-                if (noCookieActiveSBMenuPattern.matches(line)) {
-                    val cookieTime = cookieBuffTime
-                    if (cookieTime == null || cookieTime.isInFuture()) cookieBuffTime = SimpleTimeMark.farPast()
-                }
+            }
+            cookieDurationPattern.matchMatcher(line) {
+                val duration = TimeUtils.getDuration(group("time"))
+                cookieBuffTime = SimpleTimeMark.now() + duration
+            }
+            if (noCookieActiveSBMenuPattern.matches(line)) {
+                val cookieTime = cookieBuffTime
+                if (cookieTime == null || cookieTime.isInFuture()) cookieBuffTime = SimpleTimeMark.farPast()
             }
             return
         }
@@ -245,7 +251,12 @@ object BitsAPI {
 
             line@ for (line in bitsStack.getLore()) {
                 bitsAvailableMenuPattern.matchMatcher(line) {
-                    bitsToClaim = group("toClaim").formatInt()
+                    val amount = group("toClaim").formatInt()
+                    if (amount != bitsToClaim) {
+                        bitsToClaim = amount
+                        sendEvent()
+                    }
+
 
                     continue@line
                 }
@@ -265,6 +276,10 @@ object BitsAPI {
     }
 
     fun hasCookieBuff() = cookieBuffTime?.isInFuture() ?: false
+
+    private fun sendEvent() {
+        BitsUpdateEvent(bits, bitsToClaim).postAndCatch()
+    }
 
     fun isEnabled() = LorenzUtils.inSkyBlock && profileStorage != null
 
