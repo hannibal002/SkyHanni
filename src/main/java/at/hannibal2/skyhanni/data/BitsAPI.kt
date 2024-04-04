@@ -144,14 +144,14 @@ object BitsAPI {
 
             bitsScoreboardPattern.matchMatcher(message) {
                 val amount = group("amount").formatInt()
+                if (amount == bits) return
 
                 if (amount > bits) {
                     bitsToClaim -= amount - bits
                     ChatUtils.debug("You have gained §3${amount - bits} Bits §7according to the scoreboard!")
-                    sendEvent()
                 }
-
-                return
+                bits = amount
+                sendEvent()
             }
         }
     }
