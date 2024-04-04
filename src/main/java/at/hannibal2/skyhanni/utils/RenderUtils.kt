@@ -7,6 +7,7 @@ import at.hannibal2.skyhanni.data.GuiEditManager.Companion.getAbsY
 import at.hannibal2.skyhanni.data.GuiEditManager.Companion.getDummySize
 import at.hannibal2.skyhanni.events.GuiRenderItemEvent
 import at.hannibal2.skyhanni.events.LorenzRenderWorldEvent
+import at.hannibal2.skyhanni.features.misc.RoundedRectangleOutlineShader
 import at.hannibal2.skyhanni.features.misc.RoundedRectangleShader
 import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.renderables.Renderable
@@ -1371,6 +1372,41 @@ object RenderUtils {
 
         GlStateManager.pushMatrix()
         ShaderManager.enableShader("rounded_rect")
+
+        Gui.drawRect(x, y, x + width, y + height, color)
+
+        ShaderManager.disableShader()
+        GlStateManager.popMatrix()
+    }
+
+    /**
+     * Method to draw a rounded rectangle outline.
+     * **NOTE:** If you are using [GlStateManager.translate] or [GlStateManager.scale]
+     * with this method, ensure they are invoked in the correct order if you use both. That is, [GlStateManager.translate]
+     * is called **BEFORE** [GlStateManager.scale], otherwise the rectangle will not be rendered correctly
+     * @param color color of rect
+     * @param radius the radius of the corners (default 10)
+     * @param smoothness how smooth the corners will appear (default 2). NOTE: This does very
+     * little to the smoothness of the corners in reality due to how the final pixel color is calculated.
+     * It is best kept at its default.
+     * @param outlineWidth the width of the outline (default 5)
+     */
+    fun drawRoundedRectOutline(x: Int, y: Int, width: Int, height: Int, color: Int, radius: Int = 10, smoothness: Int = 1, outlineWidth: Int = 5) {
+        val scaledRes = ScaledResolution(Minecraft.getMinecraft())
+        val widthIn = width * scaledRes.scaleFactor
+        val heightIn = height * scaledRes.scaleFactor
+        val xIn = x * scaledRes.scaleFactor
+        val yIn = y * scaledRes.scaleFactor
+
+        RoundedRectangleOutlineShader.scaleFactor = scaledRes.scaleFactor.toFloat()
+        RoundedRectangleOutlineShader.radius = radius.toFloat()
+        RoundedRectangleOutlineShader.smoothness = smoothness.toFloat()
+        RoundedRectangleOutlineShader.halfSize = floatArrayOf(widthIn / 2f, heightIn / 2f)
+        RoundedRectangleOutlineShader.centerPos = floatArrayOf(xIn + (widthIn / 2f), yIn + (heightIn / 2f))
+        RoundedRectangleOutlineShader.outlineWidth = outlineWidth.toFloat()
+
+        GlStateManager.pushMatrix()
+        ShaderManager.enableShader("rounded_rect_outline")
 
         Gui.drawRect(x, y, x + width, y + height, color)
 

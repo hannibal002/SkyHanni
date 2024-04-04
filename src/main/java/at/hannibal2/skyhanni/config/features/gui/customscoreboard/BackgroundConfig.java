@@ -49,6 +49,11 @@ public class BackgroundConfig {
     public int roundedCornerSmoothness = 10;
 
     @Expose
+    @ConfigOption(name = "color", desc = "color")
+    @ConfigEditorColour
+    public String borderColor = "0:0:0:0:0";
+
+    @Expose
     @ConfigOption(
         name = "Use Custom Background Image",
         desc = "Put that image into a resource pack, using the path \"skyhanni/scoreboard.png\"."

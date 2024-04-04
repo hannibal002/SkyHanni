@@ -71,14 +71,23 @@ class RenderBackground {
                     GL11.GL_NEAREST
                 )
             } else {
-                RenderUtils.drawRoundRect(
+                RenderUtils.drawRoundedRectOutline(
+                    x - border,
+                    y - border,
+                    elementWidth + border * 3,
+                    elementHeight + border * 2,
+                    backgroundConfig.roundedCornerSmoothness,
+                    backgroundConfig.borderSize,
+                    SpecialColour.specialToChromaRGB(backgroundConfig.borderColor)
+                )
+                /*RenderUtils.drawRoundRect(
                     x - border,
                     y - border,
                     elementWidth + border * 3,
                     elementHeight + border * 2,
                     SpecialColour.specialToChromaRGB(backgroundConfig.color),
                     backgroundConfig.roundedCornerSmoothness
-                )
+                )*/
             }
         }
 
