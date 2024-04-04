@@ -7,6 +7,9 @@ import at.hannibal2.skyhanni.data.Perk
 import at.hannibal2.skyhanni.data.TitleManager
 import at.hannibal2.skyhanni.events.GuiContainerEvent
 import at.hannibal2.skyhanni.features.dungeon.DungeonAPI
+import at.hannibal2.skyhanni.features.misc.update.UpdateManager
+import at.hannibal2.skyhanni.features.misc.visualwords.ModifyVisualWords
+import at.hannibal2.skyhanni.features.nether.kuudra.KuudraAPI
 import at.hannibal2.skyhanni.mixins.transformers.AccessorGuiEditSign
 import at.hannibal2.skyhanni.test.TestBingo
 import at.hannibal2.skyhanni.utils.ChatUtils.lastButtonClicked
@@ -28,6 +31,8 @@ import net.minecraft.util.ChatComponentText
 import net.minecraftforge.fml.common.FMLCommonHandler
 import java.text.DecimalFormat
 import java.text.SimpleDateFormat
+import java.time.LocalDate
+import java.time.Month
 import java.util.Timer
 import java.util.TimerTask
 import java.util.regex.Matcher
@@ -55,7 +60,7 @@ object LorenzUtils {
 
     val skyBlockArea get() = if (inSkyBlock) HypixelData.skyBlockArea else "?"
 
-    val inKuudraFight get() = IslandType.KUUDRA_ARENA.isInIsland()
+    val inKuudraFight get() = inSkyBlock && KuudraAPI.inKuudra()
 
     val noTradeMode get() = HypixelData.noTrade
 
@@ -66,6 +71,21 @@ object LorenzUtils {
     val isIronmanProfile get() = inSkyBlock && HypixelData.ironman
 
     val lastWorldSwitch get() = HypixelData.joinedWorld
+
+    val isAprilFoolsDay: Boolean
+        get() {
+            val itsTime = LocalDate.now().let { it.month == Month.APRIL && it.dayOfMonth == 1 }
+            val always = SkyHanniMod.feature.dev.debug.alwaysFunnyTime
+            val never = SkyHanniMod.feature.dev.debug.neverFunnyTime
+            val result = (!never && (always || itsTime))
+            if (previousApril != result) {
+                ModifyVisualWords.textCache.clear()
+            }
+            previousApril = result
+            return result
+        }
+
+    private var previousApril = false
 
     fun SimpleDateFormat.formatCurrentTime(): String = this.format(System.currentTimeMillis())
 
@@ -167,9 +187,13 @@ object LorenzUtils {
                 displayName += " "
             }
 
-            val hover = entry.hover
+            val renderable = Renderable.hoverTips(
+                "$displayName   ${entry.right}",
+                tips = entry.hover,
+                highlightsOnHoverSlots = entry.highlightsOnHoverSlots
+            )
             entry.item.getItemStackOrNull()?.let {
-                add(listOf(it, Renderable.hoverTips("$displayName   ${entry.right}", tips = hover)))
+                add(listOf(it, renderable))
             }
         }
     }
@@ -317,6 +341,7 @@ object LorenzUtils {
     inline fun <reified T : Enum<T>> enumJoinToPattern(noinline transform: (T) -> CharSequence = { it.name }) =
         enumValues<T>().joinToString("|", transform = transform)
 
+    // TODO move to val by lazy
     fun isInDevEnviromen() = Launch.blackboard["fml.deobfuscatedEnvironment"] as Boolean
 
     fun shutdownMinecraft(reason: String? = null) {
@@ -366,8 +391,11 @@ object LorenzUtils {
     @Deprecated("moved", ReplaceWith("ChatUtils.sendMessageToServer(message)"))
     fun sendMessageToServer(message: String) = ChatUtils.sendMessageToServer(message)
 
-    fun inAdvancedMiningIsland() = IslandType.DWARVEN_MINES.isInIsland() || IslandType.CRYSTAL_HOLLOWS.isInIsland()
+    fun inAdvancedMiningIsland() =
+        IslandType.DWARVEN_MINES.isInIsland() || IslandType.CRYSTAL_HOLLOWS.isInIsland() || IslandType.MINESHAFT.isInIsland()
 
     fun inMiningIsland() = IslandType.GOLD_MINES.isInIsland() || IslandType.DEEP_CAVERNS.isInIsland()
         || inAdvancedMiningIsland()
+
+    fun isBetaVersion() = UpdateManager.isCurrentlyBeta()
 }

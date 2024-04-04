@@ -2,6 +2,7 @@ package at.hannibal2.skyhanni.data
 
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.data.FameRanks.getFameRankByNameOrNull
+import at.hannibal2.skyhanni.events.BitsUpdateEvent
 import at.hannibal2.skyhanni.events.InventoryFullyOpenedEvent
 import at.hannibal2.skyhanni.events.LorenzChatEvent
 import at.hannibal2.skyhanni.events.ScoreboardChangeEvent
@@ -10,6 +11,7 @@ import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.NumberUtil.formatInt
+import at.hannibal2.skyhanni.utils.StringUtils.matchFirst
 import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.StringUtils.matches
 import at.hannibal2.skyhanni.utils.StringUtils.removeResets
@@ -20,7 +22,7 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 object BitsAPI {
     private val profileStorage get() = ProfileStorageData.profileSpecific?.bits
     private val playerStorage get() = SkyHanniMod.feature.storage
-    
+
     var bits: Int
         get() = profileStorage?.bits ?: 0
         private set(value) {
@@ -85,9 +87,14 @@ object BitsAPI {
         "^SkyBlock Menu$"
     )
 
-    private val bitsGuiStackPattern by bitsGuiGroup.pattern(
+    private val cookieGuiStackPattern by bitsGuiGroup.pattern(
         "mainmenustack",
         "^§6Booster Cookie$"
+    )
+
+    private val bitsStackPattern by bitsGuiGroup.pattern(
+        "bitsstack",
+        "§bBits"
     )
 
     private val fameRankGuiNamePattern by bitsGuiGroup.pattern(
@@ -112,8 +119,8 @@ object BitsAPI {
                 if (amount > bits) {
                     bitsToClaim -= amount - bits
                     ChatUtils.debug("You have gained §3${amount - bits} Bits §7according to the scoreboard!")
+                    sendEvent()
                 }
-                bits = amount
 
                 return
             }
@@ -128,36 +135,46 @@ object BitsAPI {
         bitsFromFameRankUpChatPattern.matchMatcher(message) {
             val amount = group("amount").formatInt()
             bitsToClaim += amount
+            sendEvent()
 
             return
         }
 
         boosterCookieAte.matchMatcher(message) {
             bitsToClaim += (defaultcookiebits * (currentFameRank?.bitsMultiplier ?: return)).toInt()
+            sendEvent()
 
             return
         }
     }
 
     @SubscribeEvent
-    fun onInventoryFullyLoaded(event: InventoryFullyOpenedEvent) {
+    fun onInventoryOpen(event: InventoryFullyOpenedEvent) {
         if (!isEnabled()) return
 
         val stacks = event.inventoryItems
 
         if (bitsGuiNamePattern.matches(event.inventoryName)) {
-            val cookieStack = stacks.values.lastOrNull { bitsGuiStackPattern.matches(it.displayName) } ?: return
-                for (line in cookieStack.getLore()) {
-                    bitsAvailableMenuPattern.matchMatcher(line) {
-                        bitsToClaim = group("toClaim").formatInt()
+            val cookieStack = stacks.values.lastOrNull { cookieGuiStackPattern.matches(it.displayName) }
 
-                        return
-                    }
+            // If the cookie stack is null, then the player should not have any bits to claim
+            if (cookieStack == null) {
+                bitsToClaim = 0
+                return
+            }
+
+            cookieStack.getLore().matchFirst(bitsAvailableMenuPattern) {
+                val amount = group("toClaim").formatInt()
+                if (bitsToClaim != amount) {
+                    bitsToClaim = amount
+                    sendEvent()
                 }
+            }
             return
         }
 
         if (fameRankGuiNamePattern.matches(event.inventoryName)) {
+            val bitsStack = stacks.values.lastOrNull { bitsStackPattern.matches(it.displayName) } ?: return
             val fameRankStack = stacks.values.lastOrNull { fameRankGuiStackPattern.matches(it.displayName) } ?: return
 
             line@ for (line in fameRankStack.getLore()) {
@@ -191,7 +208,24 @@ object BitsAPI {
                     continue@line
                 }
             }
+
+            line@ for (line in bitsStack.getLore()) {
+                bitsAvailableMenuPattern.matchMatcher(line) {
+                    val amount = group("toClaim").formatInt()
+                    if (amount != bitsToClaim) {
+                        bitsToClaim = amount
+                        sendEvent()
+                    }
+
+
+                    continue@line
+                }
+            }
         }
+    }
+
+    private fun sendEvent() {
+        BitsUpdateEvent(bits, bitsToClaim).postAndCatch()
     }
 
     fun isEnabled() = LorenzUtils.inSkyBlock && profileStorage != null

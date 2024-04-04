@@ -4,7 +4,7 @@ import at.hannibal2.skyhanni.config.FeatureToggle;
 import at.hannibal2.skyhanni.config.core.config.Position;
 import at.hannibal2.skyhanni.config.features.garden.composter.ComposterConfig;
 import at.hannibal2.skyhanni.config.features.garden.cropmilestones.CropMilestonesConfig;
-import at.hannibal2.skyhanni.config.features.garden.laneswitch.LaneSwitchConfig;
+import at.hannibal2.skyhanni.config.features.garden.laneswitch.FarmingLaneConfig;
 import at.hannibal2.skyhanni.config.features.garden.optimalspeed.OptimalSpeedConfig;
 import at.hannibal2.skyhanni.config.features.garden.pests.PestsConfig;
 import at.hannibal2.skyhanni.config.features.garden.visitor.VisitorConfig;
@@ -45,9 +45,9 @@ public class GardenConfig {
     public OptimalSpeedConfig optimalSpeeds = new OptimalSpeedConfig();
 
     @Expose
-    @ConfigOption(name = "Lane Switching", desc = "")
+    @ConfigOption(name = "Farming Lane", desc = "")
     @Accordion
-    public LaneSwitchConfig laneswitch = new LaneSwitchConfig();
+    public FarmingLaneConfig farmingLane = new FarmingLaneConfig();
 
     @Expose
     @ConfigOption(name = "Garden Level", desc = "")
@@ -118,6 +118,11 @@ public class GardenConfig {
     @ConfigOption(name = "Crop Start Location", desc = "")
     @Accordion
     public CropStartLocationConfig cropStartLocation = new CropStartLocationConfig();
+
+    @Expose
+    @ConfigOption(name = "Plot Menu Highlighting", desc = "")
+    @Accordion
+    public PlotMenuHighlightingConfig plotMenuHighlighting = new PlotMenuHighlightingConfig();
 
     @Expose
     @ConfigOption(name = "Garden Plot Icon", desc = "")
@@ -228,4 +233,13 @@ public class GardenConfig {
     @ConfigEditorBoolean
     @FeatureToggle
     public boolean copyMilestoneData = true;
+
+    @Expose
+    @ConfigOption(name = "Log Book Stats", desc = "Show total visited/accepted/denied visitors stats.")
+    @ConfigEditorBoolean
+    @FeatureToggle
+    public boolean showLogBookStats = true;
+
+    @Expose
+    public Position logBookStatsPos = new Position(427, 92, false, true);
 }

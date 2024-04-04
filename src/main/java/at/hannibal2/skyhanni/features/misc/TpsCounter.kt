@@ -31,6 +31,7 @@ class TpsCounter {
     private var display = ""
 
     init {
+        // TODO use SecondPassedEvent + passedSince
         fixedRateTimer(name = "skyhanni-tps-counter-seconds", period = 1000L) {
             if (!isEnabled()) return@fixedRateTimer
             if (packetsFromLastSecond == 0) return@fixedRateTimer
@@ -60,6 +61,7 @@ class TpsCounter {
                 "§eTPS: $color$tps"
             }
         }
+        // TODO use DelayedRun
         fixedRateTimer(name = "skyhanni-tps-counter-ticks", period = 50L) {
             if (!isEnabled()) return@fixedRateTimer
 
