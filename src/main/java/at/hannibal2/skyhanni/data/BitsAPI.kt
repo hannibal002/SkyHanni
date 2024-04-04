@@ -163,15 +163,11 @@ object BitsAPI {
                 return
             }
 
-            for (line in cookieStack.getLore()) {
-                bitsAvailableMenuPattern.matchMatcher(line) {
-                    val amount = group("toClaim").formatInt()
-                    if (bitsToClaim != amount) {
-                        bitsToClaim = amount
-                        sendEvent()
-                    }
-
-                    return
+            cookieStack.getLore().matchFirst(bitsAvailableMenuPattern) {
+                val amount = group("toClaim").formatInt()
+                if (bitsToClaim != amount) {
+                    bitsToClaim = amount
+                    sendEvent()
                 }
             }
             return
