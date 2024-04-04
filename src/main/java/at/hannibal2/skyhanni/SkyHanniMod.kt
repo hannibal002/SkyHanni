@@ -812,6 +812,7 @@ class SkyHanniMod {
         loadModule(VerminTracker)
         loadModule(SkillProgress)
         loadModule(SkillTooltip())
+        loadModule(QuiverDisplay())
         loadModule(MaxPurseItems())
         loadModule(SuperCraftFeatures())
         loadModule(InfernoMinionFeatures())
@@ -820,7 +821,6 @@ class SkyHanniMod {
         loadModule(CraftMaterialsFromBazaar())
         loadModule(PestProfitTracker)
         loadModule(NoBitsWarning())
-        loadModule(QuiverDisplay())
 
         init()
 
