@@ -15,7 +15,6 @@ import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.LorenzLogger
 import at.hannibal2.skyhanni.utils.LorenzUtils
-import at.hannibal2.skyhanni.utils.LorenzUtils.isInIsland
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.StringUtils.matches
@@ -82,6 +81,15 @@ class HypixelData {
         private val scoreboardTitlePattern by patternGroup.pattern(
             "scoreboard.title",
             "SK[YI]BLOCK(?: CO-OP| GUEST)?"
+        )
+
+        /**
+         * REGEX-TEST:  §7⏣ §bVillage
+         * REGEX-TEST:  §5ф §dWizard Tower
+         */
+        private val skyblockAreaPattern by patternGroup.pattern(
+            "skyblock.area",
+            "\\s*§(?<symbol>7⏣|5ф) §(?<color>.)(?<area>.*)"
         )
 
         var hypixelLive = false
@@ -291,12 +299,14 @@ class HypixelData {
         }
 
         if (LorenzUtils.inSkyBlock) {
-            val originalLocation = ScoreboardData.sidebarLinesFormatted
-                .firstOrNull { it.startsWith(" §7⏣ ") || it.startsWith(" §5ф ") }
-                ?.substring(5)
-                ?: "?"
-            skyBlockArea = LocationFixData.fixLocation(skyBlockIsland) ?: originalLocation.removeColor()
-            skyBlockAreaWithSymbol = "§${if (IslandType.THE_RIFT.isInIsland()) "5ф" else "7⏣"} $originalLocation"
+            loop@ for (line in ScoreboardData.sidebarLinesFormatted) {
+                skyblockAreaPattern.matchMatcher(line) {
+                    val originalLocation = group("area")
+                    skyBlockArea = LocationFixData.fixLocation(skyBlockIsland) ?: originalLocation
+                    skyBlockAreaWithSymbol = line.trim()
+                    break@loop
+                }
+            }
 
             checkProfileName()
         }
