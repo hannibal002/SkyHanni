@@ -118,7 +118,7 @@ object BitsAPI {
                 if (amount > bits) {
                     bitsToClaim -= amount - bits
                     ChatUtils.debug("You have gained §3${amount - bits} Bits §7according to the scoreboard!")
-                    BitsUpdateEvent(bits, bitsToClaim).postAndCatch()
+                    sendEvent()
                 }
 
                 return
@@ -134,14 +134,14 @@ object BitsAPI {
         bitsFromFameRankUpChatPattern.matchMatcher(message) {
             val amount = group("amount").formatInt()
             bitsToClaim += amount
-            BitsUpdateEvent(bits, bitsToClaim).postAndCatch()
+            sendEvent()
 
             return
         }
 
         boosterCookieAte.matchMatcher(message) {
             bitsToClaim += (defaultcookiebits * (currentFameRank?.bitsMultiplier ?: return)).toInt()
-            BitsUpdateEvent(bits, bitsToClaim).postAndCatch()
+            sendEvent()
 
             return
         }
@@ -167,7 +167,7 @@ object BitsAPI {
                     val amount = group("toClaim").formatInt()
                     if (bitsToClaim != amount) {
                         bitsToClaim = amount
-                        BitsUpdateEvent(bits, bitsToClaim).postAndCatch()
+                        sendEvent()
                     }
 
                     return
@@ -217,7 +217,7 @@ object BitsAPI {
                     val amount = group("toClaim").formatInt()
                     if (amount != bitsToClaim) {
                         bitsToClaim = amount
-                        BitsUpdateEvent(bits, bitsToClaim).postAndCatch()
+                        sendEvent()
                     }
 
 
@@ -225,6 +225,10 @@ object BitsAPI {
                 }
             }
         }
+    }
+
+    private fun sendEvent() {
+        BitsUpdateEvent(bits, bitsToClaim).postAndCatch()
     }
 
     fun isEnabled() = LorenzUtils.inSkyBlock && profileStorage != null
