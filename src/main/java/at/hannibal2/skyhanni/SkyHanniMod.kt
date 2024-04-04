@@ -55,10 +55,10 @@ import at.hannibal2.skyhanni.data.TrackerManager
 import at.hannibal2.skyhanni.data.jsonobjects.local.FriendsJson
 import at.hannibal2.skyhanni.data.jsonobjects.local.JacobContestsJson
 import at.hannibal2.skyhanni.data.jsonobjects.local.KnownFeaturesJson
+import at.hannibal2.skyhanni.data.jsonobjects.local.VisualWordsJson
 import at.hannibal2.skyhanni.data.mob.MobData
 import at.hannibal2.skyhanni.data.mob.MobDebug
 import at.hannibal2.skyhanni.data.mob.MobDetection
-import at.hannibal2.skyhanni.data.jsonobjects.local.VisualWordsJson
 import at.hannibal2.skyhanni.data.repo.RepoManager
 import at.hannibal2.skyhanni.events.LorenzTickEvent
 import at.hannibal2.skyhanni.events.PreInitFinishedEvent
@@ -333,6 +333,7 @@ import at.hannibal2.skyhanni.features.nether.ashfang.AshfangGravityOrbs
 import at.hannibal2.skyhanni.features.nether.ashfang.AshfangHideDamageIndicator
 import at.hannibal2.skyhanni.features.nether.ashfang.AshfangHideParticles
 import at.hannibal2.skyhanni.features.nether.ashfang.AshfangNextResetCooldown
+import at.hannibal2.skyhanni.features.nether.kuudra.KuudraAPI
 import at.hannibal2.skyhanni.features.nether.reputationhelper.CrimsonIsleReputationHelper
 import at.hannibal2.skyhanni.features.rift.RiftAPI
 import at.hannibal2.skyhanni.features.rift.area.colosseum.BlobbercystsHighlight
@@ -425,7 +426,7 @@ import org.apache.logging.log4j.Logger
     clientSideOnly = true,
     useMetadata = true,
     guiFactory = "at.hannibal2.skyhanni.config.ConfigGuiForgeInterop",
-    version = "0.24",
+    version = "0.25.Beta.1",
 )
 class SkyHanniMod {
 
@@ -491,7 +492,6 @@ class SkyHanniMod {
         loadModule(TrackerManager)
         loadModule(ScoreboardPattern)
         loadModule(UtilsPatterns)
-        loadModule(PetAPI)
         loadModule(BossbarData)
         loadModule(EntityUtils)
         loadModule(ChatUtils)
@@ -521,6 +521,8 @@ class SkyHanniMod {
         loadModule(MayorAPI)
         loadModule(SkillAPI)
         loadModule(VisitorAPI)
+        loadModule(KuudraAPI)
+        loadModule(PetAPI)
         loadModule(IsFishingDetection)
         loadModule(LorenzUtils)
         loadModule(NEUItems)
