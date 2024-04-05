@@ -10,7 +10,6 @@ import at.hannibal2.skyhanni.utils.CollectionUtils.addOrPut
 import at.hannibal2.skyhanni.utils.CollectionUtils.sortedDesc
 import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.itemName
-import at.hannibal2.skyhanni.utils.ItemUtils.itemNameWithoutColor
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.NEUInternalName
 import at.hannibal2.skyhanni.utils.NEUInternalName.Companion.asInternalName
@@ -60,7 +59,7 @@ class CraftableItemList {
                 if (amount > 0) {
                     pricePer[internalName] = pricePer(neededItems)
                     lines[internalName] = Renderable.clickAndHover("§8x$amount ${internalName.itemName}",
-                        tips = listOf("Click to craft ${internalName.itemNameWithoutColor}!"),
+                        tips = listOf("Click to craft ${internalName.itemName}!"),
                         onClick = {
                             ChatUtils.sendCommandToServer("recipe ${internalName.asString()}")
                         })
