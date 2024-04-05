@@ -16,7 +16,6 @@ class ScoreboardData {
 
         private val minecraftColorCodesPattern = "(?i)[0-9a-fkmolnr]".toPattern()
 
-
         // TODO USE SH-REPO
         private val splitIcons = listOf(
             "\uD83C\uDF6B",
@@ -45,17 +44,11 @@ class ScoreboardData {
                 var end = split[1]
                 // get last color code in start
                 val lastColorIndex = start.lastIndexOf('§')
-                val lastColor = when {
-                    lastColorIndex != -1
-                        && lastColorIndex + 1 < start.length
-                        && (minecraftColorCodesPattern.matches( start[lastColorIndex + 1].toString()))
-                    -> start.substring(
-                        lastColorIndex,
-                        lastColorIndex + 2
-                    )
-
-                    else -> ""
-                }
+                val lastColor = if (lastColorIndex != -1
+                    && lastColorIndex + 1 < start.length
+                    && (minecraftColorCodesPattern.matches(start[lastColorIndex + 1].toString()))
+                ) start.substring(lastColorIndex, lastColorIndex + 2)
+                else ""
 
                 // remove first color code from end, when it is the same as the last color code in start
                 end = end.removePrefix(lastColor)
