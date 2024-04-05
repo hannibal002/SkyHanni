@@ -44,7 +44,7 @@ import net.minecraft.entity.passive.EntityVillager
 import net.minecraft.entity.player.EntityPlayer
 
 @Suppress("RegExpRedundantEscape")
-internal object MobFilter {
+object MobFilter {
 
     private val repoGroup = RepoPattern.group("mob.detection")
 
