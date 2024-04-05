@@ -119,6 +119,7 @@ import at.hannibal2.skyhanni.features.dungeon.DungeonRankTabListColor
 import at.hannibal2.skyhanni.features.dungeon.DungeonTeammateOutlines
 import at.hannibal2.skyhanni.features.dungeon.HighlightDungeonDeathmite
 import at.hannibal2.skyhanni.features.dungeon.TerracottaPhase
+import at.hannibal2.skyhanni.features.dungeon.m7.DragonInfoUtils
 import at.hannibal2.skyhanni.features.event.UniqueGiftingOpportunitiesFeatures
 import at.hannibal2.skyhanni.features.event.diana.AllBurrowsList
 import at.hannibal2.skyhanni.features.event.diana.BurrowWarpHelper
@@ -823,6 +824,7 @@ class SkyHanniMod {
         loadModule(CraftMaterialsFromBazaar())
         loadModule(PestProfitTracker)
         loadModule(NoBitsWarning())
+        loadModule(DragonInfoUtils())
 
         init()
 
