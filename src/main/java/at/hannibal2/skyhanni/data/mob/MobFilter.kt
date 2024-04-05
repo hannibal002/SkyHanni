@@ -61,12 +61,12 @@ object MobFilter {
     /** REGEX-TEST: Wither Husk 500M❤ */
     val mobNameFilter by repoGroup.pattern(
         "filter.basic",
-        "(?:\\[\\w+(?<level>\\d+)\\] )?(?<corrupted>.Corrupted )?(?<name>.*) [\\dMk.,❤]+"
+        "(?:\\[\\w+(?<level>\\d+)\\] )?(?<corrupted>.Corrupted )?(?<name>.*) [\\dBMk.,❤]+"
     )
     val slayerNameFilter by repoGroup.pattern("filter.slayer", "^. (?<name>.*) (?<tier>[IV]+) \\d+.*")
     val bossMobNameFilter by repoGroup.pattern(
         "filter.boss",
-        "^. (?:\\[\\w+(?<level>\\d+)\\] )?(?<name>.*) (?:[\\d\\/Mk.,❤]+|█+) .$"
+        "^. (?:\\[\\w+(?<level>\\d+)\\] )?(?<name>.*) (?:[\\d\\/BMk.,❤]+|█+) .$"
     )
     val dungeonNameFilter by repoGroup.pattern(
         "filter.dungeon",
