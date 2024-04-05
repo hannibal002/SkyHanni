@@ -213,7 +213,7 @@ object MobFilter {
         baseEntity is EntityDragon -> when (LorenzUtils.skyBlockIsland) {
             IslandType.CATACOMBS -> (8..16).map { MobUtils.getArmorStand(baseEntity, it) }
                 .makeMobResult {
-                    MobFactories.basic(baseEntity, it.first(), it.drop(1))
+                    MobFactories.boss(baseEntity, it.first(), it.drop(1))
                 }
 
             else -> MobResult.found(MobFactories.basic(baseEntity, baseEntity.cleanName()))
