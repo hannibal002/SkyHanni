@@ -1,6 +1,7 @@
 package at.hannibal2.skyhanni.data.mob
 
 import at.hannibal2.skyhanni.events.MobEvent
+import at.hannibal2.skyhanni.utils.CollectionUtils.takeIfAllNotNull
 import at.hannibal2.skyhanni.utils.LocationUtils
 import at.hannibal2.skyhanni.utils.getLorenzVec
 import net.minecraft.entity.EntityLivingBase
@@ -54,6 +55,11 @@ class MobData {
 
             fun EntityArmorStand?.makeMobResult(mob: (EntityArmorStand) -> Mob?) =
                 this?.let { armor ->
+                    mob.invoke(armor)?.let { found(it) } ?: somethingWentWrong
+                } ?: notYetFound
+
+            fun List<EntityArmorStand?>.makeMobResult(mob: (List<EntityArmorStand>) -> Mob?) =
+                this.takeIfAllNotNull()?.let { armor ->
                     mob.invoke(armor)?.let { found(it) } ?: somethingWentWrong
                 } ?: notYetFound
         }

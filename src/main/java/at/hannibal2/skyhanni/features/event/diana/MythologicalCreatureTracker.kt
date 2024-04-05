@@ -16,6 +16,7 @@ import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import at.hannibal2.skyhanni.utils.tracker.SkyHanniTracker
 import at.hannibal2.skyhanni.utils.tracker.TrackerData
 import com.google.gson.annotations.Expose
+import net.minecraft.util.ChatComponentText
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import java.util.regex.Pattern
 
@@ -83,15 +84,15 @@ object MythologicalCreatureTracker {
                 BurrowAPI.lastBurrowRelatedChatMessage = SimpleTimeMark.now()
                 tracker.modify {
                     it.count.addOrPut(creatureType, 1)
+
                     // TODO migrate to abstract feature in the future
-                    it.creaturesSinceLastInquisitor = when (creatureType) {
-                        MythologicalCreatureType.MINOS_INQUISITOR -> 0
-                        else -> it.creaturesSinceLastInquisitor + 1
-                    }
+                    if (creatureType == MythologicalCreatureType.MINOS_INQUISITOR) {
+                        event.chatComponent =
+                            ChatComponentText(event.message + " §e(${it.creaturesSinceLastInquisitor})")
+                        it.creaturesSinceLastInquisitor = 0
+                    } else it.creaturesSinceLastInquisitor++
                 }
-                if (config.hideChat) {
-                    event.blockedReason = "mythological_creature_dug"
-                }
+                if (config.hideChat) event.blockedReason = "mythological_creature_dug"
             }
         }
     }
