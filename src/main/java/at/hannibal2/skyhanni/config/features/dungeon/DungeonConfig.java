@@ -116,5 +116,5 @@ public class DungeonConfig {
         "to jump on you.")
     @ConfigEditorBoolean
     @FeatureToggle
-    public boolean shadowAssassinJumpNotifier = true;
+    public boolean shadowAssassinJumpNotifier = false;
 }
