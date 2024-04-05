@@ -319,9 +319,10 @@ object PestAPI {
             event.addIrrelevant("not in garden")
             return
         }
-        if (!config.pestFinder.showDisplay && !config.pestFinder.showPlotInWorld &&
-            config.pestFinder.teleportHotkey == Keyboard.KEY_NONE
-        ) {
+        val disabled = with(config.pestFinder) {
+            !showDisplay && !showPlotInWorld && teleportHotkey == Keyboard.KEY_NONE
+        }
+        if (disabled) {
             event.addIrrelevant("disabled in config")
             return
         }
@@ -331,10 +332,10 @@ object PestAPI {
             add("")
             getInfestedPlots().forEach {
                 add("id: ${it.id}")
-                add("name: ${it.name}")
-                add("isPestCountInaccurate: ${it.isPestCountInaccurate}")
-                add("pests: ${it.pests}")
-                add("")
+                add(" name: ${it.name}")
+                add(" isPestCountInaccurate: ${it.isPestCountInaccurate}")
+                add(" pests: ${it.pests}")
+                add(" ")
             }
         }
     }
