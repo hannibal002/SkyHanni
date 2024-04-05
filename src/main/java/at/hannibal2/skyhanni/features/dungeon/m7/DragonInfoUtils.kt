@@ -1,5 +1,6 @@
 package at.hannibal2.skyhanni.features.dungeon.m7
 
+import at.hannibal2.skyhanni.data.mob.Mob
 import at.hannibal2.skyhanni.events.DungeonCompleteEvent
 import at.hannibal2.skyhanni.events.DungeonM7Phase5Start
 import at.hannibal2.skyhanni.events.LorenzWorldChangeEvent
@@ -19,6 +20,7 @@ class DragonInfoUtils {
     @SubscribeEvent
     fun onDragonSpawn(event: MobEvent.Spawn.SkyblockMob) {
         if (inPhase5) return
+        if (event.mob.mobType != Mob.Type.BOSS) return
         if (event.mob.name != "Withered Dragon") return
 
         val location = event.mob.baseEntity.position.toLorenzVec()
@@ -33,6 +35,7 @@ class DragonInfoUtils {
     @SubscribeEvent
     fun onDragonKill(event: MobEvent.DeSpawn.SkyblockMob) {
         if (inPhase5) return
+        if (event.mob.mobType != Mob.Type.BOSS) return
         if (event.mob.name != "Withered Dragon") return
 
         val location = event.mob.baseEntity.position.toLorenzVec()
