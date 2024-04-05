@@ -60,9 +60,9 @@ object HolographicEntities {
         var isChild: Boolean = false
         var lastPosition: LorenzVec = position
         var lastYaw: Float = yaw
-        val createdAt = TimeMark.now()
+        val createdAt = SimpleTimeMark.now()
 
-        val monotonicProgress get() = createdAt.passedTime().inWholeTicks
+        val monotonicProgress get() = createdAt.passedSince().inWholeTicks
 
         /**
          * Should be called exactly once per tick or never over the lifetime of this [HolographicEntity].
