@@ -99,6 +99,13 @@ object StringUtils {
     inline fun <T> Pattern.findMatcher(text: String, consumer: Matcher.() -> T) =
         matcher(text).let { if (it.find()) consumer(it) else null }
 
+    inline fun <T> List<String>.matchFirst(pattern: Pattern, consumer: Matcher.() -> T): T? {
+        for (line in this) {
+            pattern.matcher(line).let { if (it.matches()) return consumer(it) }
+        }
+        return null
+    }
+
     private fun String.internalCleanPlayerName(): String {
         val split = trim().split(" ")
         return if (split.size > 1) {

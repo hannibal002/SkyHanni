@@ -46,6 +46,7 @@ import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getEdition
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getExtraAttributes
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getPetLevel
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getRanchersSpeed
+import at.hannibal2.skyhanni.utils.StringUtils.matchFirst
 import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
@@ -200,14 +201,12 @@ object ItemDisplayOverlayFeatures {
         }
 
         if (LARVA_HOOK.isSelected() && internalName == "LARVA_HOOK".asInternalName()) {
-            for (line in lore) {
-                harvestPattern.matchMatcher(line) {
-                    val amount = group("amount").toInt()
-                    return when {
-                        amount > 4 -> "§a$amount"
-                        amount > 2 -> "§e$amount"
-                        else -> "§c$amount"
-                    }
+            lore.matchFirst(harvestPattern) {
+                val amount = group("amount").toInt()
+                return when {
+                    amount > 4 -> "§a$amount"
+                    amount > 2 -> "§e$amount"
+                    else -> "§c$amount"
                 }
             }
         }
@@ -224,18 +223,16 @@ object ItemDisplayOverlayFeatures {
         }
 
         if (VACUUM_GARDEN.isSelected() && internalName in PestAPI.vacuumVariants && isOwnVacuum(lore)) {
-            for (line in lore) {
-                gardenVacuumPatterm.matchMatcher(line) {
-                    val pests = group("amount").formatLong()
-                    return if (config.vacuumBagCap) {
-                        if (pests > 39) "§640+" else "$pests"
-                    } else {
-                        when {
-                            pests < 40 -> "$pests"
-                            pests < 1_000 -> "§6$pests"
-                            pests < 100_000 -> "§c${pests / 1000}k"
-                            else -> "§c${pests / 100_000 / 10.0}m"
-                        }
+            lore.matchFirst(gardenVacuumPatterm) {
+                val pests = group("amount").formatLong()
+                return if (config.vacuumBagCap) {
+                    if (pests > 39) "§640+" else "$pests"
+                } else {
+                    when {
+                        pests < 40 -> "$pests"
+                        pests < 1_000 -> "§6$pests"
+                        pests < 100_000 -> "§c${pests / 1000}k"
+                        else -> "§c${pests / 100_000 / 10.0}m"
                     }
                 }
             }
@@ -255,11 +252,9 @@ object ItemDisplayOverlayFeatures {
         }
 
         if (BINGO_GOAL_RANK.isSelected() && chestName == "Bingo Card" && lore.lastOrNull() == "§aGOAL REACHED") {
-            for (line in lore) {
-                bingoGoalRankPattern.matchMatcher(line) {
-                    val rank = group("rank").formatLong()
-                    if (rank < 10000) return "§6${NumberUtil.format(rank)}"
-                }
+            lore.matchFirst(bingoGoalRankPattern) {
+                val rank = group("rank").formatLong()
+                if (rank < 10000) return "§6${NumberUtil.format(rank)}"
             }
         }
 

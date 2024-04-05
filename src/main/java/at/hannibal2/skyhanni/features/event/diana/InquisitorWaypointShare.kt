@@ -39,8 +39,8 @@ object InquisitorWaypointShare {
     /**
      * REGEX-TEST: §9Party §8> User Name§f: §rx: 2.3, y: 4.5, z: 6.7
      */
-    private val partyPattern by patternGroup.pattern(
-        "party",
+    private val partyOnlyCoordsPattern by patternGroup.pattern(
+        "party.onlycoords",
         "(?<party>§9Party §8> )?(?<playerName>.+)§f: §rx: (?<x>[^ ]+),? y: (?<y>[^ ]+),? z: (?<z>[^ ]+)"
     )
 
@@ -48,8 +48,8 @@ object InquisitorWaypointShare {
     /**
      * REGEX-TEST: §9Party §8> UserName§f: §rA MINOS INQUISITOR has spawned near [Foraging Island ] at Coords 1 2 3
      */
-    private val inquisitorCheckerPattern by patternGroup.pattern(
-        "party",
+    private val partyInquisitorCheckerPattern by patternGroup.pattern(
+        "party.inquisitorchecker",
         "(?<party>§9Party §8> )?(?<playerName>.+)§f: §rA MINOS INQUISITOR has spawned near \\[(?<area>.*)] at Coords (?<x>[^ ]+) (?<y>[^ ]+) (?<z>[^ ]+)"
     )
     private val diedPattern by patternGroup.pattern(
@@ -248,13 +248,13 @@ object InquisitorWaypointShare {
         val message = LorenzUtils.stripVanillaMessage(messageComponent.formattedText)
         if (packet.type.toInt() != 0) return
 
-        inquisitorCheckerPattern.matchMatcher(message) {
+        partyInquisitorCheckerPattern.matchMatcher(message) {
             if (detectFromChat()) {
                 event.isCanceled = true
             }
         }
 
-        partyPattern.matchMatcher(message) {
+        partyOnlyCoordsPattern.matchMatcher(message) {
             if (detectFromChat()) {
                 event.isCanceled = true
             }

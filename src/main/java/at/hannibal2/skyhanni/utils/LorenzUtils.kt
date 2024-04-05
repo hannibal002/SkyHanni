@@ -7,7 +7,9 @@ import at.hannibal2.skyhanni.data.Perk
 import at.hannibal2.skyhanni.data.TitleManager
 import at.hannibal2.skyhanni.events.GuiContainerEvent
 import at.hannibal2.skyhanni.features.dungeon.DungeonAPI
+import at.hannibal2.skyhanni.features.misc.update.UpdateManager
 import at.hannibal2.skyhanni.features.misc.visualwords.ModifyVisualWords
+import at.hannibal2.skyhanni.features.nether.kuudra.KuudraAPI
 import at.hannibal2.skyhanni.mixins.transformers.AccessorGuiEditSign
 import at.hannibal2.skyhanni.test.TestBingo
 import at.hannibal2.skyhanni.utils.ChatUtils.lastButtonClicked
@@ -58,7 +60,7 @@ object LorenzUtils {
 
     val skyBlockArea get() = if (inSkyBlock) HypixelData.skyBlockArea else "?"
 
-    val inKuudraFight get() = IslandType.KUUDRA_ARENA.isInIsland()
+    val inKuudraFight get() = inSkyBlock && KuudraAPI.inKuudra()
 
     val noTradeMode get() = HypixelData.noTrade
 
@@ -185,9 +187,13 @@ object LorenzUtils {
                 displayName += " "
             }
 
-            val hover = entry.hover
+            val renderable = Renderable.hoverTips(
+                "$displayName   ${entry.right}",
+                tips = entry.hover,
+                highlightsOnHoverSlots = entry.highlightsOnHoverSlots
+            )
             entry.item.getItemStackOrNull()?.let {
-                add(listOf(it, Renderable.hoverTips("$displayName   ${entry.right}", tips = hover)))
+                add(listOf(it, renderable))
             }
         }
     }
@@ -390,4 +396,6 @@ object LorenzUtils {
 
     fun inMiningIsland() = IslandType.GOLD_MINES.isInIsland() || IslandType.DEEP_CAVERNS.isInIsland()
         || inAdvancedMiningIsland()
+
+    fun isBetaVersion() = UpdateManager.isCurrentlyBeta()
 }
