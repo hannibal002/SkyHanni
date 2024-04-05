@@ -33,7 +33,6 @@ import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.NumberUtil.percentageColor
 import at.hannibal2.skyhanni.utils.RenderUtils.HorizontalAlignment
 import at.hannibal2.skyhanni.utils.StringUtils.firstLetterUppercase
-import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.StringUtils.matches
 import at.hannibal2.skyhanni.utils.StringUtils.pluralize
 import at.hannibal2.skyhanni.utils.TabListData
@@ -157,7 +156,7 @@ enum class ScoreboardElement(
     COOKIE(
         ::getCookieDisplayPair,
         ::getCookieShowWhen,
-        "§d§lCookie Buff\n §f3days, 17hours"
+        "§dCookie Buff§f: 3d 17h"
     ),
     EMPTY_LINE2(
         ::getEmptyLineDisplayPair,
@@ -590,41 +589,16 @@ private fun getTuningDisplayPair(): List<Pair<String, HorizontalAlignment>> {
 
 private fun getPowerShowWhen() = !inAnyIsland(IslandType.THE_RIFT)
 
-private fun getCookieTime(): String? {
-    return CustomScoreboardUtils.getTablistFooter().split("\n")
-        .nextAfter("§d§lCookie Buff")
-        ?: run {
-            for (line in TabListData.getTabList()) {
-                ScoreboardPattern.boosterCookieEffectsWidgetPattern.matchMatcher(line) {
-                    return group("time")
-                }
-            }
-            null
-        }
-}
-
-private fun getCookieDisplayPair(): List<ScoreboardElementType> {
-    val timeLine: String = getCookieTime()
-        ?: return listOf(
-            "§d§lCookie Buff" to HorizontalAlignment.LEFT,
-            " §7- §cNot active" to HorizontalAlignment.LEFT
-        )
-
-    return listOf(
-        "§d§lCookie Buff" to HorizontalAlignment.LEFT,
-        if (ScoreboardPattern.cookieNotActivePattern.matches(timeLine))
-            " §7- §cNot active" to HorizontalAlignment.LEFT
-        else
-            " §7- §f${timeLine}" to HorizontalAlignment.LEFT
-    )
-}
+private fun getCookieDisplayPair() = listOf(
+    "§dCookie Buff§f: " + (BitsAPI.cookieBuffTime?.let {
+        if (!BitsAPI.hasCookieBuff()) "§cNot Active" else it.timeUntil().format(maxUnits = 2)
+    }
+        ?: "§cOpen SbMenu!") to HorizontalAlignment.LEFT
+)
 
 private fun getCookieShowWhen(): Boolean {
     if (HypixelData.bingo) return false
-
-    return if (informationFilteringConfig.hideEmptyLines) {
-        getCookieTime() != null
-    } else true
+    return informationFilteringConfig.hideEmptyLines && BitsAPI.hasCookieBuff()
 }
 
 private fun getObjectiveDisplayPair() = buildList {
