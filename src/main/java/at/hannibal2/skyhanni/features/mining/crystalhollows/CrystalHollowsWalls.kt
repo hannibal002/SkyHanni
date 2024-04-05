@@ -18,7 +18,7 @@ class CrystalHollowsWalls {
 
     val config get() = SkyHanniMod.feature.mining.crystalHollowsAreaWalls
 
-    fun isEnabled() = config.enable && IslandType.CRYSTAL_HOLLOWS.isInIsland()
+    fun isEnabled() = config.enabled && IslandType.CRYSTAL_HOLLOWS.isInIsland()
 
     private enum class Areas(val color: Color) {
         MITHRIL(LorenzColor.GREEN.addOpacity(60)),
