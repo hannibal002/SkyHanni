@@ -11,6 +11,4 @@ public interface AccessorWorldBoarderPacket {
 
     @Accessor("warningTime")
     int getWarningTime();
-
-
 }

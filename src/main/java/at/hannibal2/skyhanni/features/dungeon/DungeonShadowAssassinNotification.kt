@@ -11,18 +11,23 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import kotlin.time.Duration.Companion.seconds
 
 class DungeonShadowAssassinNotification {
+    private val config get() = SkyHanniMod.feature.dungeon
+
     @SubscribeEvent
     fun onWorldBoarderChange(event: PacketEvent.ReceiveEvent) {
-        if (!LorenzUtils.inSkyBlock || !LorenzUtils.inDungeons) return
-        if (!SkyHanniMod.feature.dungeon.shadowAssassinJumpNotifier) return
+        if (!isEnabled()) return
         if (DungeonAPI.dungeonFloor?.contains("3") == true && DungeonAPI.inBossRoom) return
         if (event.packet !is S44PacketWorldBorder) return
-        val packet: AccessorWorldBoarderPacket = event.packet as AccessorWorldBoarderPacket
-        val action: S44PacketWorldBorder.Action = packet.action
-        val warningTime: Int = packet.warningTime
-        if (action == S44PacketWorldBorder.Action.INITIALIZE && warningTime == 10000){
-            TitleManager.sendTitle("§cShadow Assassin Jump!", 2.seconds, 3.6, 7.0)
+
+        event.packet as AccessorWorldBoarderPacket
+        val action = event.packet.action
+        val warningTime = event.packet.warningTime
+
+        if (action == S44PacketWorldBorder.Action.INITIALIZE && warningTime == 10000) {
+            TitleManager.sendTitle("§cShadow Assassin Jumping!", 2.seconds, 3.6, 7.0f)
             SoundUtils.playBeepSound()
         }
     }
+
+    private fun isEnabled() = LorenzUtils.inDungeons && config.shadowAssassinJumpNotifier
 }
