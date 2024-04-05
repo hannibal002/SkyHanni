@@ -211,7 +211,7 @@ object FarmingFortuneDisplay {
         if (gardenJoinTime.passedSince() > 5.seconds && !foundTabUniversalFortune && !gardenJoinTime.isFarPast()) {
             if (lastUniversalFortuneMissingError.passedSince() < 1.minutes) return
             ChatUtils.clickableChat(
-                "§cCan not read Farming Fortune from tab list! Open /widget and enable the Stats Widget" +
+                "§cCan not read Farming Fortune from tab list! Open /widget and enable the Stats Widget " +
                 "and showing the Farming Fortune stat.",
                 command = "widget"
             )
@@ -220,10 +220,11 @@ object FarmingFortuneDisplay {
         if (firstBrokenCropTime.passedSince() > 10.seconds && !foundTabCropFortune && !firstBrokenCropTime.isFarPast()) {
             if (lastCropFortuneMissingError.passedSince() < 1.minutes) return
             ChatUtils.clickableChat(
-                "§cCan not read Crop Fortune from tab list! Open /widget and enable the Stats Widget" +
+                "§cCan not read Crop Fortune from tab list! Open /widget and enable the Stats Widget " +
                     "and showing latest Crop Fortune.",
                 command = "widget"
             )
+            lastCropFortuneMissingError = SimpleTimeMark.now()
         }
     }
 
@@ -327,6 +328,9 @@ object FarmingFortuneDisplay {
         reforgeFortune = 0.0
         itemBaseFortune = 0.0
         greenThumbFortune = 0.0
+
+        //TODO code cleanup
+
         for (line in tool?.getLore()!!) {
             tooltipFortunePattern.matchMatcher(line) {
                 displayedFortune = group(1)!!.toDouble()

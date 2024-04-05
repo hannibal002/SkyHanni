@@ -14,6 +14,7 @@ import at.hannibal2.skyhanni.utils.NEUInternalName
 import at.hannibal2.skyhanni.utils.NEUItems
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.NumberUtil.romanToDecimalIfNecessary
+import at.hannibal2.skyhanni.utils.StringUtils.matchFirst
 import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
@@ -78,15 +79,12 @@ class GardenCropMilestoneFix {
 
     @SubscribeEvent
     fun onTabListUpdate(event: TabListUpdateEvent) {
-        for (line in event.tabList) {
-            tabListPattern.matchMatcher(line) {
-                val tier = group("tier").toInt()
-                val percentage = group("percentage").toDouble()
-                val cropName = group("crop")
+        event.tabList.matchFirst(tabListPattern) {
+            val tier = group("tier").toInt()
+            val percentage = group("percentage").toDouble()
+            val cropName = group("crop")
 
-                check(cropName, tier, percentage)
-                return
-            }
+            check(cropName, tier, percentage)
         }
     }
 
