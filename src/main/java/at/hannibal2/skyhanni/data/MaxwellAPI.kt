@@ -100,6 +100,10 @@ object MaxwellAPI {
         "gui.selectedpower",
         "§aPower is selected!"
     )
+    private val noPowerSelectedPattern by group.pattern(
+        "gui.noselectedpower",
+        "(?:§.)*Visit Maxwell in the Hub to learn"
+    )
     private val accessoryBagStack by group.pattern(
         "stack.accessorybag",
         "§.Accessory Bag"
@@ -241,6 +245,8 @@ object MaxwellAPI {
                 magicalPower = 0
                 return
             }
+
+            if (noPowerSelectedPattern.matches(line)) currentPower = getPowerByNameOrNull("No Power")
 
             inventoryMPPattern.matchMatcher(line) {
                 // MagicalPower is boosted in catacombs
