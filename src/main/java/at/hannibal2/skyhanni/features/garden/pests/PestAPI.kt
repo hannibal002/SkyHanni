@@ -2,6 +2,7 @@ package at.hannibal2.skyhanni.features.garden.pests
 
 import at.hannibal2.skyhanni.events.InventoryFullyOpenedEvent
 import at.hannibal2.skyhanni.events.LorenzChatEvent
+import at.hannibal2.skyhanni.events.LorenzWorldChangeEvent
 import at.hannibal2.skyhanni.events.ScoreboardChangeEvent
 import at.hannibal2.skyhanni.events.TabListUpdateEvent
 import at.hannibal2.skyhanni.events.garden.pests.PestSpawnEvent
@@ -18,9 +19,11 @@ import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.LocationUtils.distanceSqToPlayer
 import at.hannibal2.skyhanni.utils.NEUInternalName.Companion.asInternalName
-import at.hannibal2.skyhanni.utils.NumberUtil.formatNumber
+import at.hannibal2.skyhanni.utils.NumberUtil.formatInt
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
+import at.hannibal2.skyhanni.utils.StringUtils.matchFirst
 import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
+import at.hannibal2.skyhanni.utils.StringUtils.matches
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
@@ -30,6 +33,8 @@ object PestAPI {
     val config get() = GardenAPI.config.pests
 
     var scoreboardPests = 0
+
+    var lastPestKillTime = SimpleTimeMark.farPast()
 
     val vacuumVariants = listOf(
         "SKYMART_VACUUM".asInternalName(),
@@ -48,6 +53,7 @@ object PestAPI {
         "scoreboard.pests",
         " §7⏣ §[ac]The Garden §4§lൠ§7 x(?<pests>.*)"
     )
+
     /**
      * REGEX-TEST:  §7⏣ §aPlot §7- §b22a
      * REGEX-TEST:  §7⏣ §aThe Garden
@@ -56,6 +62,7 @@ object PestAPI {
         "scoreboard.nopests",
         " §7⏣ §a(?:The Garden|Plot §7- §b.+)$"
     )
+
     /**
      * REGEX-TEST:    §aPlot §7- §b4 §4§lൠ§7 x1
      */
@@ -63,6 +70,7 @@ object PestAPI {
         "scoreboard.plot.pests",
         "\\s*(?:§.)*Plot (?:§.)*- (?:§.)*(?<plot>.+) (?:§.)*ൠ(?:§.)* x(?<pests>\\d+)"
     )
+
     /**
      * REGEX-TEST:  §aPlot §7- §b3
      */
@@ -74,12 +82,26 @@ object PestAPI {
         "inventory",
         "§4§lൠ §cThis plot has §6(?<amount>\\d) Pests?§c!"
     )
+
     /**
      * REGEX-TEST:  Plots: §r§b4§r§f, §r§b12§r§f, §r§b13§r§f, §r§b18§r§f, §r§b20
      */
     private val infectedPlotsTablistPattern by patternGroup.pattern(
         "tablist.infectedplots",
         "\\sPlots: (?<plots>.*)"
+    )
+
+    /**
+     * REGEX-TEST: §eYou received §a7x Enchanted Potato §efor killing a §6Locust§e!
+     * REGEX-TEST: §eYou received §a6x Enchanted Cocoa Beans §efor killing a §6Moth§e!
+     */
+    val pestDeathChatPattern by patternGroup.pattern(
+        "chat.pestdeath",
+        "§eYou received §a(?<amount>[0-9]*)x (?<item>.*) §efor killing an? §6(?<pest>.*)§e!"
+    )
+    private val noPestsChatPattern by patternGroup.pattern(
+        "chat.nopests",
+        "§cThere are not any Pests on your Garden right now! Keep farming!"
     )
 
     private fun fixPests() {
@@ -133,17 +155,15 @@ object PestAPI {
             plot.pests = 0
             plot.isPestCountInaccurate = false
             val item = event.inventoryItems[plot.inventorySlot] ?: continue
-            for (line in item.getLore()) {
-                pestInventoryPattern.matchMatcher(line) {
-                    plot.pests = group("amount").toInt()
-                }
+            item.getLore().matchFirst(pestInventoryPattern) {
+                plot.pests = group("amount").toInt()
             }
         }
         updatePests()
     }
 
     @SubscribeEvent
-    fun onTablistUpdate(event: TabListUpdateEvent) {
+    fun onTabListUpdate(event: TabListUpdateEvent) {
         if (!GardenAPI.inGarden()) return
         var previousLine = ""
         for (line in event.tabList) {
@@ -177,9 +197,8 @@ object PestAPI {
         for (line in event.newList) {
             // gets the total amount of pests in the garden
             pestsInScoreboardPattern.matchMatcher(line) {
-                val newPests = group("pests").formatNumber().toInt()
+                val newPests = group("pests").formatInt()
                 if (newPests != scoreboardPests) {
-                    removePests(scoreboardPests - newPests)
                     scoreboardPests = newPests
                     updatePests()
                 }
@@ -220,9 +239,18 @@ object PestAPI {
     @SubscribeEvent
     fun onChat(event: LorenzChatEvent) {
         if (!GardenAPI.inGarden()) return
-        if (event.message == "§cThere are not any Pests on your Garden right now! Keep farming!") {
+        if (pestDeathChatPattern.matches(event.message)) {
+            lastPestKillTime = SimpleTimeMark.now()
+            removeNearestPest()
+        }
+        if (noPestsChatPattern.matches(event.message)) {
             resetAllPests()
         }
+    }
+
+    @SubscribeEvent
+    fun onWorldChange(event: LorenzWorldChangeEvent) {
+        lastPestKillTime = SimpleTimeMark.farPast()
     }
 
     private fun getPlotsWithAccuratePests() = GardenPlotAPI.plots.filter { it.pests > 0 && !it.isPestCountInaccurate }

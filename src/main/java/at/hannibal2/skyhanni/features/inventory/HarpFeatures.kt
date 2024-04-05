@@ -128,7 +128,7 @@ object HarpFeatures {
     }
 
     @SubscribeEvent
-    fun onInventoryCloseEvent(event: InventoryCloseEvent) {
+    fun onInventoryClose(event: InventoryCloseEvent) {
         if (!LorenzUtils.inSkyBlock) return
         if (!config.guiScale) return
         unSetGUIScale()

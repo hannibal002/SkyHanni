@@ -391,7 +391,7 @@ object GhostCounter {
     }
 
     @SubscribeEvent
-    fun onTabUpdate(event: TabListUpdateEvent) {
+    fun onTabListUpdate(event: TabListUpdateEvent) {
         if (!isEnabled()) return
         for (line in event.tabList) {
             skillLevelPattern.matchMatcher(line) {
