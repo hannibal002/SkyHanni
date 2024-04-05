@@ -58,9 +58,10 @@ object MobFilter {
 
     private val repoGroup = RepoPattern.group("mob.detection")
 
+    /** REGEX-TEST: Wither Husk 500M❤ */
     val mobNameFilter by repoGroup.pattern(
         "filter.basic",
-        "(?:\\[\\w+(?<level>\\d+)\\] )?(?<corrupted>.Corrupted )?(?<name>.*) [\\d❤]+"
+        "(?:\\[\\w+(?<level>\\d+)\\] )?(?<corrupted>.Corrupted )?(?<name>.*) [\\dMk.,❤]+"
     )
     val slayerNameFilter by repoGroup.pattern("filter.slayer", "^. (?<name>.*) (?<tier>[IV]+) \\d+.*")
     val bossMobNameFilter by repoGroup.pattern(
@@ -209,7 +210,15 @@ object MobFilter {
         baseEntity is EntityBat -> createBat(baseEntity)
 
         baseEntity.isFarmMob() -> createFarmMobs(baseEntity)?.let { MobResult.found(it) }
-        baseEntity is EntityDragon -> MobResult.found(MobFactories.basic(baseEntity, baseEntity.cleanName()))
+        baseEntity is EntityDragon -> when (LorenzUtils.skyBlockIsland) {
+            IslandType.CATACOMBS -> (8..16).map { MobUtils.getArmorStand(baseEntity, it) }
+                .makeMobResult {
+                    MobFactories.basic(baseEntity, it.first(), it.drop(1))
+                }
+
+            else -> MobResult.found(MobFactories.basic(baseEntity, baseEntity.cleanName()))
+        }
+
         baseEntity is EntityGiantZombie && baseEntity.name == "Dinnerbone" -> MobResult.found(
             MobFactories.projectile(
                 baseEntity,
@@ -226,6 +235,13 @@ object MobFilter {
             MobFactories.special(
                 baseEntity,
                 "Mini Wither"
+            )
+        )
+
+        baseEntity is EntityOtherPlayerMP && baseEntity.name == "Decoy " -> MobResult.found(
+            MobFactories.special(
+                baseEntity,
+                "Decoy"
             )
         )
 
