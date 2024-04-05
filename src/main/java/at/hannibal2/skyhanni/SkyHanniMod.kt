@@ -116,6 +116,7 @@ import at.hannibal2.skyhanni.features.dungeon.DungeonHighlightClickedBlocks
 import at.hannibal2.skyhanni.features.dungeon.DungeonLividFinder
 import at.hannibal2.skyhanni.features.dungeon.DungeonMilestonesDisplay
 import at.hannibal2.skyhanni.features.dungeon.DungeonRankTabListColor
+import at.hannibal2.skyhanni.features.dungeon.DungeonShadowAssassinNotification
 import at.hannibal2.skyhanni.features.dungeon.DungeonTeammateOutlines
 import at.hannibal2.skyhanni.features.dungeon.HighlightDungeonDeathmite
 import at.hannibal2.skyhanni.features.dungeon.TerracottaPhase
@@ -821,6 +822,7 @@ class SkyHanniMod {
         loadModule(LimboPlaytime())
         loadModule(RareDropMessages())
         loadModule(CraftMaterialsFromBazaar())
+        loadModule(DungeonShadowAssassinNotification())
         loadModule(PestProfitTracker)
         loadModule(NoBitsWarning())
 
