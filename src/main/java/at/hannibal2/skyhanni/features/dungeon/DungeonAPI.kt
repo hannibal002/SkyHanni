@@ -19,6 +19,7 @@ import at.hannibal2.skyhanni.utils.ItemUtils.name
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.NumberUtil.formatNumber
 import at.hannibal2.skyhanni.utils.NumberUtil.romanToDecimalIfNecessary
+import at.hannibal2.skyhanni.utils.StringUtils.matchFirst
 import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.StringUtils.matches
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
@@ -94,11 +95,8 @@ object DungeonAPI {
     }
 
     fun getTime(): String {
-        loop@ for (line in ScoreboardData.sidebarLinesFormatted) {
-            timePattern.matchMatcher(line.removeColor()) {
-                if (!matches()) continue@loop
-                return "${group("minutes") ?: "00"}:${group("seconds")}" // 03:14
-            }
+        ScoreboardData.sidebarLinesFormatted.matchFirst(timePattern) {
+            return "${group("minutes") ?: "00"}:${group("seconds")}" // 03:14
         }
         return ""
     }
@@ -127,12 +125,10 @@ object DungeonAPI {
     @SubscribeEvent
     fun onTick(event: LorenzTickEvent) {
         if (dungeonFloor == null) {
-            for (line in ScoreboardData.sidebarLinesFormatted) {
-                floorPattern.matchMatcher(line) {
-                    val floor = group("floor")
-                    dungeonFloor = floor
-                    DungeonEnterEvent(floor).postAndCatch()
-                }
+            ScoreboardData.sidebarLinesFormatted.matchFirst(floorPattern) {
+                val floor = group("floor")
+                dungeonFloor = floor
+                DungeonEnterEvent(floor).postAndCatch()
             }
         }
         if (dungeonFloor != null && playerClass == null) {

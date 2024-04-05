@@ -27,15 +27,6 @@ object PestProfitTracker {
     private val patternGroup = RepoPattern.group("garden.pests.tracker")
 
     /**
-     * REGEX-TEST: §eYou received §a7x Enchanted Potato §efor killing a §6Locust§e!
-     * REGEX-TEST: §eYou received §a6x Enchanted Cocoa Beans §efor killing a §6Moth§e!
-     */
-    private val pestLootPattern by patternGroup.pattern(
-        "loot",
-        "§eYou received §a(?<amount>[0-9]*)x (?<item>.*) §efor killing an? §6(?<pest>.*)§e!"
-    )
-
-    /**
      * REGEX-TEST: §6§lRARE DROP! §9Mutant Nether Wart §6(§6+1,344☘)
      * REGEX-TEST: §6§lPET DROP! §r§5Slug §6(§6+1300☘)
      */
@@ -81,7 +72,7 @@ object PestProfitTracker {
     @SubscribeEvent
     fun onChat(event: LorenzChatEvent) {
         if (!isEnabled()) return
-        pestLootPattern.matchMatcher(event.message) {
+        PestAPI.pestDeathChatPattern.matchMatcher(event.message) {
             val amount = group("amount").toInt()
             val internalName = NEUInternalName.fromItemNameOrNull(group("item")) ?: return
 
@@ -133,6 +124,7 @@ object PestProfitTracker {
     fun onPurseChange(event: PurseChangeEvent) {
         if (!isEnabled()) return
         val coins = event.coins
+        if (coins > 1000) return
         if (event.reason == PurseChangeCause.GAIN_MOB_KILL && lastPestKillTime.passedSince() < 2.seconds) {
             tracker.addCoins(coins.toInt())
         }

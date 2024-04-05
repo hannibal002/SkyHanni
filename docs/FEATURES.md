@@ -409,6 +409,8 @@ Use `/sh` or `/skyhanni` to open the SkyHanni config in game.
     + Hide the chat messages when digging up a mythological mob.
 + Diana Chat hider. - hannibal2
     + Hide chat messages around griffin burrow chains and griffin feather drops and coin drops.
++ Customizable Inquisitor Highlight color. - Empa (https://github.com/hannibal002/SkyHanni/pull/1323)
++ Mobs since last Inquisitor to Mythological Creature Tracker. - CuzImClicks (https://github.com/hannibal002/SkyHanni/pull/1346)
 
 </details>
 <details open><summary>
@@ -647,6 +649,10 @@ Use `/sh` or `/skyhanni` to open the SkyHanni config in game.
     + Uses the particles and math to detect the location from everywhere in the garden.
     + Option to draw a line to waypoint.
     + Option to change the number of seconds until the waypoint will disappear.
++ Pest Profit Tracker. - Empa (https://github.com/hannibal002/SkyHanni/pull/1321)
++ Open On Elite. - Obsidian (https://github.com/hannibal002/SkyHanni/pull/1185)
+    + Allow opening farming contest stats on elitebot.dev by pressing a keybind + mouse click onto a contest item.
+    + Works inside the menus Jacob's Farming Contest, Your Contests, and SkyBlock Calendar.
 
 </details>
 <details open><summary>
