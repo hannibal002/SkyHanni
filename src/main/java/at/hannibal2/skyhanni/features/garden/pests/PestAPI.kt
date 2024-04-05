@@ -16,6 +16,7 @@ import at.hannibal2.skyhanni.features.garden.GardenPlotAPI.locked
 import at.hannibal2.skyhanni.features.garden.GardenPlotAPI.name
 import at.hannibal2.skyhanni.features.garden.GardenPlotAPI.pests
 import at.hannibal2.skyhanni.features.garden.GardenPlotAPI.uncleared
+import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
@@ -120,11 +121,13 @@ object PestAPI {
             plot?.pests = scoreboardPests - accurateAmount
             plot?.isPestCountInaccurate = false
         } else if (accurateAmount + inaccurateAmount > scoreboardPests) {
+            sendPestError(true)
             getInfestedPlots().forEach {
                 it.pests = 0
                 it.isPestCountInaccurate = true
             }
             if (loop > 0) fixPests(loop - 1)
+            else sendPestError(false)
         }
     }
 
@@ -285,6 +288,7 @@ object PestAPI {
             return
         }
         if (!plot.isPestCountInaccurate) plot.pests--
+        scoreboardPests--
         updatePests()
     }
 
@@ -295,6 +299,16 @@ object PestAPI {
             it.isPestCountInaccurate = false
         }
         updatePests()
+    }
+
+    private fun sendPestError(betaOnly: Boolean) {
+        ErrorManager.logErrorStateWithData(
+            "Error getting pest count",
+            "Impossible pest count",
+            "scoreboardPests" to scoreboardPests,
+            "plots" to getInfestedPlots().map { "id: ${it.id} pests: ${it.pests} isInaccurate: ${it.isPestCountInaccurate}" },
+            noStackTrace = true, betaOnly = betaOnly
+        )
     }
 
     @SubscribeEvent
