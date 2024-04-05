@@ -17,10 +17,9 @@ class DragonInfoUtils {
     private var inPhase5 = false
 
     @SubscribeEvent
-    fun onDragonSpawn(event: MobEvent.Spawn) {
+    fun onDragonSpawn(event: MobEvent.Spawn.SkyblockMob) {
         if (inPhase5) return
-        if (!event.mob.mobType.isSkyblockMob()) return
-        if (event.mob.name != "Ender Dragon") return
+        if (event.mob.name != "Withered Dragon") return
 
         val location = event.mob.baseEntity.position.toLorenzVec()
         M7DragonInfo.entries.filter { it.dragonLocation.spawnLocation == location && it != M7DragonInfo.NONE }.forEach {
@@ -32,10 +31,9 @@ class DragonInfoUtils {
     }
 
     @SubscribeEvent
-    fun onDragonKill(event: MobEvent.DeSpawn) {
+    fun onDragonKill(event: MobEvent.DeSpawn.SkyblockMob) {
         if (inPhase5) return
-        if (!event.mob.mobType.isSkyblockMob()) return
-        if (event.mob.name != "Ender Dragon") return
+        if (event.mob.name != "Withered Dragon") return
 
         val location = event.mob.baseEntity.position.toLorenzVec()
         M7DragonInfo.entries.filter { it.status.id == event.mob.baseEntity.entityId && it != M7DragonInfo.NONE }.forEach {
