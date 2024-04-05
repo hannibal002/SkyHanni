@@ -188,6 +188,7 @@ object DungeonAPI {
         }
         dungeonComplete.matchMatcher(event.message) {
             DungeonCompleteEvent(floor).postAndCatch()
+            inMaster7Phase5 = false
             return
         }
     }

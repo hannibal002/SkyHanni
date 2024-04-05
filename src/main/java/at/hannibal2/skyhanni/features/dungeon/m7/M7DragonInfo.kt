@@ -1,79 +1,75 @@
 package at.hannibal2.skyhanni.features.dungeon.m7
 
-import at.hannibal2.skyhanni.data.Mayor
 import at.hannibal2.skyhanni.utils.LorenzColor
 import at.hannibal2.skyhanni.utils.LorenzVec
-import net.minecraft.entity.boss.EntityDragon
 import net.minecraft.util.AxisAlignedBB
-import net.minecraftforge.event.entity.EntityJoinWorldEvent
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
-enum class DragonInfo(
+enum class M7DragonInfo(
     val color: String,
     val isEasy: Boolean,
     val priority: IntArray,
-    val dragonLocation: DragonLocation,
+    val dragonLocation: M7DragonLocation,
     val colorCode: Char,
-    var status: SpawnedStatus = SpawnedStatus.UNDEFEATED
+    var status: M7SpawnedStatus = M7SpawnedStatus.UNDEFEATED
 ) {
     POWER(
         "Red",
         false,
         intArrayOf(1, 3),
-        DragonLocation.POWER,
+        M7DragonLocation.POWER,
         LorenzColor.RED.chatColorCode
     ),
     FLAME(
         "Orange",
         true,
         intArrayOf(2, 1),
-        DragonLocation.FLAME,
+        M7DragonLocation.FLAME,
         LorenzColor.GOLD.chatColorCode
     ),
     APEX(
         "Green",
         true,
         intArrayOf(5, 2),
-        DragonLocation.APEX,
+        M7DragonLocation.APEX,
         LorenzColor.GREEN.chatColorCode
     ),
     ICE(
         "Blue",
         false,
         intArrayOf(3, 4),
-        DragonLocation.ICE,
+        M7DragonLocation.ICE,
         LorenzColor.AQUA.chatColorCode
     ),
     SOUL(
         "Purple",
         true,
         intArrayOf(4, 5),
-        DragonLocation.SOUL,
+        M7DragonLocation.SOUL,
         LorenzColor.LIGHT_PURPLE.chatColorCode
     ),
     NONE(
         "None",
         false,
         intArrayOf(0, 0),
-        DragonLocation.NONE,
+        M7DragonLocation.NONE,
         LorenzColor.CHROMA.chatColorCode
     );
 
     companion object {
         fun clearSpawned() {
-            entries.forEach { it.status = SpawnedStatus.UNDEFEATED }
+            entries.forEach { it.status = M7SpawnedStatus.UNDEFEATED }
         }
     }
 }
 
-enum class SpawnedStatus(var id: Int = -1) {
+enum class M7SpawnedStatus(var id: Int = -1) {
     UNDEFEATED,
     SPAWNING,
     ALIVE,
     DEFEATED;
 }
 
-enum class DragonLocation(
+enum class M7DragonLocation(
     val particleBox: AxisAlignedBB,
     val deathBox: AxisAlignedBB,
     val spawnLocation: LorenzVec
