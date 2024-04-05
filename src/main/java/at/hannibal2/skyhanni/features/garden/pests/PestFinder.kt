@@ -1,5 +1,6 @@
 package at.hannibal2.skyhanni.features.garden.pests
 
+import at.hannibal2.skyhanni.config.features.garden.pests.PestFinderConfig.VisibilityType
 import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.IslandChangeEvent
 import at.hannibal2.skyhanni.events.ItemInHandChangeEvent
@@ -109,20 +110,27 @@ class PestFinder {
 
         val playerLocation = event.exactPlayerEyeLocation()
         for (plot in PestAPI.getInfestedPlots()) {
-            if (plot.isPlayerInside()) {
-                event.renderPlot(plot, LorenzColor.RED.toColor(), LorenzColor.DARK_RED.toColor())
-                continue
+            if (config.visibilityType == VisibilityType.BOTH || config.visibilityType == VisibilityType.BORDER) {
+                if (plot.isPlayerInside()) {
+                    event.renderPlot(plot, LorenzColor.RED.toColor(), LorenzColor.DARK_RED.toColor())
+                    continue
+                }
+                event.renderPlot(plot, LorenzColor.GOLD.toColor(), LorenzColor.RED.toColor())
             }
-            event.renderPlot(plot, LorenzColor.GOLD.toColor(), LorenzColor.RED.toColor())
-
-            val pests = plot.pests
-            val pestsName = StringUtils.pluralize(pests, "pest")
-            val plotName = plot.name
-            val middle = plot.middle
-            val isInaccurate = plot.isPestCountInaccurate
-            val location = playerLocation.copy(x = middle.x, z = middle.z)
-            event.drawWaypointFilled(location, LorenzColor.RED.toColor())
-            event.drawDynamicText(location, "§e" + if (isInaccurate) "?" else {pests} + " §c$pestsName §7in §b$plotName", 1.5)
+            if (config.visibilityType == VisibilityType.BOTH || config.visibilityType == VisibilityType.NAME) {
+                val pests = plot.pests
+                val pestsName = StringUtils.pluralize(pests, "pest")
+                val plotName = plot.name
+                val middle = plot.middle
+                val isInaccurate = plot.isPestCountInaccurate
+                val location = playerLocation.copy(x = middle.x, z = middle.z)
+                event.drawWaypointFilled(location, LorenzColor.RED.toColor())
+                event.drawDynamicText(
+                    location, "§e" + if (isInaccurate) "?" else {
+                        pests
+                    } + " §c$pestsName §7in §b$plotName", 1.5
+                )
+            }
         }
     }
 
