@@ -58,18 +58,19 @@ object MobFilter {
 
     private val repoGroup = RepoPattern.group("mob.detection")
 
+    /** REGEX-TEST: Wither Husk 500M❤ */
     val mobNameFilter by repoGroup.pattern(
         "filter.basic",
-        "(?:\\[\\w+(?<level>\\d+)\\] )?(?<corrupted>.Corrupted )?(?<name>.*) [\\d❤]+"
+        "(?:\\[\\w+(?<level>\\d+)\\] )?(?<corrupted>.Corrupted )?(?<name>[^ᛤ]*)(?: ᛤ)? [\\dBMk.,❤]+"
     )
     val slayerNameFilter by repoGroup.pattern("filter.slayer", "^. (?<name>.*) (?<tier>[IV]+) \\d+.*")
     val bossMobNameFilter by repoGroup.pattern(
         "filter.boss",
-        "^. (?:\\[\\w+(?<level>\\d+)\\] )?(?<name>.*) (?:[\\d\\/Mk.,❤]+|█+) .$"
+        "^. (?:\\[\\w+(?<level>\\d+)\\] )?(?<name>[^ᛤ]*)(?: ᛤ)? (?:[\\d\\/BMk.,❤]+|█+) .$"
     )
     val dungeonNameFilter by repoGroup.pattern(
         "filter.dungeon",
-        "^(?:(?<star>✯)\\s)?(?:(?<attribute>${DungeonAttribute.toRegexLine})\\s)?(?:\\[[\\w\\d]+\\]\\s)?(?<name>.+)\\s[^\\s]+$"
+        "^(?:(?<star>✯)\\s)?(?:(?<attribute>${DungeonAttribute.toRegexLine})\\s)?(?:\\[[\\w\\d]+\\]\\s)?(?<name>[^ᛤ]+)(?: ᛤ)?\\s[^\\s]+$"
     )
     val summonFilter by repoGroup.pattern("filter.summon", "^(?<owner>\\w+)'s (?<name>.*) \\d+.*")
     val dojoFilter by repoGroup.pattern("filter.dojo", "^(?:(?<points>\\d+) pts|(?<empty>\\w+))$")
@@ -82,7 +83,7 @@ object MobFilter {
     val wokeSleepingGolemPattern by repoGroup.pattern("pattern.dungeon.woke.golem", "(?:§c§lWoke|§5§lSleeping) Golem§r")
     val jerryMagmaCubePattern by repoGroup.pattern(
         "pattern.jerry.magma.cube",
-        "§c(?:Cubie|Maggie|Cubert|Cübe|Cubette|Magmalene|Lucky 7|8ball|Mega Cube|Super Cube) §a\\d+§8\\/§a\\d+§c❤"
+        "§c(?:Cubie|Maggie|Cubert|Cübe|Cubette|Magmalene|Lucky 7|8ball|Mega Cube|Super Cube)(?: ᛤ)? §a\\d+§8\\/§a\\d+§c❤"
     )
     val summonOwnerPattern by repoGroup.pattern("pattern.summon.owner", ".*Spawned by: (?<name>.*).*")
 
@@ -209,7 +210,15 @@ object MobFilter {
         baseEntity is EntityBat -> createBat(baseEntity)
 
         baseEntity.isFarmMob() -> createFarmMobs(baseEntity)?.let { MobResult.found(it) }
-        baseEntity is EntityDragon -> MobResult.found(MobFactories.basic(baseEntity, baseEntity.cleanName()))
+        baseEntity is EntityDragon -> when (LorenzUtils.skyBlockIsland) {
+            IslandType.CATACOMBS -> (8..16).map { MobUtils.getArmorStand(baseEntity, it) }
+                .makeMobResult {
+                    MobFactories.boss(baseEntity, it.first(), it.drop(1))
+                }
+
+            else -> MobResult.found(MobFactories.basic(baseEntity, baseEntity.cleanName()))
+        }
+
         baseEntity is EntityGiantZombie && baseEntity.name == "Dinnerbone" -> MobResult.found(
             MobFactories.projectile(
                 baseEntity,
@@ -226,6 +235,13 @@ object MobFilter {
             MobFactories.special(
                 baseEntity,
                 "Mini Wither"
+            )
+        )
+
+        baseEntity is EntityOtherPlayerMP && baseEntity.name == "Decoy " -> MobResult.found(
+            MobFactories.special(
+                baseEntity,
+                "Decoy"
             )
         )
 
