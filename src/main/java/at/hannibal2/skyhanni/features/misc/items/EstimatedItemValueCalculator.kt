@@ -9,7 +9,6 @@ import at.hannibal2.skyhanni.utils.ItemUtils.isRune
 import at.hannibal2.skyhanni.utils.ItemUtils.itemName
 import at.hannibal2.skyhanni.utils.ItemUtils.itemNameWithoutColor
 import at.hannibal2.skyhanni.utils.ItemUtils.name
-import at.hannibal2.skyhanni.utils.ItemUtils.nameWithEnchantment
 import at.hannibal2.skyhanni.utils.LorenzRarity
 import at.hannibal2.skyhanni.utils.NEUInternalName
 import at.hannibal2.skyhanni.utils.NEUInternalName.Companion.asInternalName
@@ -482,7 +481,7 @@ object EstimatedItemValueCalculator {
 
     private fun NEUInternalName.getNameOrRepoError(): String? {
         val stack = getItemStackOrNull() ?: return null
-        return stack.nameWithEnchantment ?: "§cItem Name Error"
+        return stack.itemName
     }
 
     private fun addAbilityScrolls(stack: ItemStack, list: MutableList<String>): Double {
@@ -684,7 +683,7 @@ object EstimatedItemValueCalculator {
                 totalPrice += if (ingredient.isCoins) {
                     ingredient.count
                 } else {
-                    getPrice(ingredient.internalItemId) * ingredient.count
+                    ingredient.internalItemId.asInternalName().getPrice() * ingredient.count
                 }
             }
 

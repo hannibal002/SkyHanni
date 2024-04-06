@@ -132,12 +132,6 @@ object LorenzUtils {
     fun formatPercentage(percentage: Double, format: String?): String =
         DecimalFormat(format).format(percentage * 100).replace(',', '.') + "%"
 
-    @Deprecated("old code", ReplaceWith("i.addSeparators()"))
-    fun formatInteger(i: Int): String = i.addSeparators()
-
-    @Deprecated("old code", ReplaceWith("l.addSeparators()"))
-    fun formatInteger(l: Long): String = l.addSeparators()
-
     @Deprecated("old code", ReplaceWith("d.round(round).addSeparators()"))
     fun formatDouble(d: Double, round: Int = 1): String {
         return d.round(round).addSeparators()
@@ -336,7 +330,7 @@ object LorenzUtils {
 
     inline fun <reified T : Enum<T>> enumValueOf(name: String) =
         enumValueOfOrNull<T>(name)
-            ?: kotlin.error("Unknown enum constant for ${enumValues<T>().first().name.javaClass.simpleName}: '$name'")
+            ?: error("Unknown enum constant for ${enumValues<T>().first().name.javaClass.simpleName}: '$name'")
 
     inline fun <reified T : Enum<T>> enumJoinToPattern(noinline transform: (T) -> CharSequence = { it.name }) =
         enumValues<T>().joinToString("|", transform = transform)
