@@ -1,6 +1,7 @@
 package at.hannibal2.skyhanni.utils
 
 import at.hannibal2.skyhanni.utils.LorenzUtils.round
+import net.minecraft.client.renderer.GlStateManager
 import net.minecraft.entity.Entity
 import net.minecraft.network.play.server.S2APacketParticles
 import net.minecraft.util.AxisAlignedBB
@@ -178,6 +179,8 @@ data class LorenzVec(
         return LorenzVec(x, y, z)
     }
 
+    fun negated() = LorenzVec(-x, -y, -z)
+
     fun rotateXY(theta: Double) = LorenzVec(x * cos(theta) - y * sin(theta), x * sin(theta) + y * cos(theta), z)
     fun rotateXZ(theta: Double) = LorenzVec(x * cos(theta) + z * sin(theta), y, -x * sin(theta) + z * cos(theta))
     fun rotateYZ(theta: Double) = LorenzVec(x, y * cos(theta) - z * sin(theta), y * sin(theta) + z * cos(theta))
@@ -201,6 +204,8 @@ data class LorenzVec(
         }
 
         fun getBlockBelowPlayer() = LocationUtils.playerLocation().roundLocationToBlock().add(y = -1.0)
+
+        val expandVector = LorenzVec(0.0020000000949949026, 0.0020000000949949026, 0.0020000000949949026)
     }
 }
 
@@ -224,3 +229,7 @@ fun S2APacketParticles.toLorenzVec() = LorenzVec(xCoordinate, yCoordinate, zCoor
 fun Array<Double>.toLorenzVec(): LorenzVec {
     return LorenzVec(this[0], this[1], this[2])
 }
+
+fun RenderUtils.translate(vec: LorenzVec) = GlStateManager.translate(vec.x, vec.y, vec.z)
+
+fun AxisAlignedBB.expand(vec: LorenzVec) = this.expand(vec.x, vec.y, vec.z)
