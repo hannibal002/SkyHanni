@@ -1004,6 +1004,16 @@ object RenderUtils {
         return LorenzVec(x, y, z)
     }
 
+    fun LorenzRenderWorldEvent.exactLocation2(location: LorenzVec) = exactLocation2(location, partialTicks)
+
+    fun exactLocation2(location: LorenzVec, partialTicks: Float): LorenzVec {
+        val entity = Minecraft.getMinecraft().thePlayer
+        val x = location.x - (entity.lastTickPosX - entity.posX) * partialTicks
+        val y = location.y - (entity.lastTickPosY - entity.posY) * partialTicks
+        val z = location.z - (entity.lastTickPosZ - entity.posZ) * partialTicks
+        return LorenzVec(x, y, z)
+    }
+
     fun drawFilledBoundingBox(aabb: AxisAlignedBB, c: Color, alphaMultiplier: Float = 1f) {
         GlStateManager.enableBlend()
         GlStateManager.disableLighting()
