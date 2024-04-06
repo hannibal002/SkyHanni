@@ -37,7 +37,6 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import java.util.Collections
 import kotlin.time.Duration.Companion.seconds
 
-
 object GardenCropMilestoneDisplay {
 
     private var progressDisplay = emptyList<List<Any>>()

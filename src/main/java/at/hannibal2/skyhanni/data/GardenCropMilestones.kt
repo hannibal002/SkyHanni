@@ -61,34 +61,6 @@ object GardenCropMilestones {
         GardenCropMilestonesCommunityFix.openInventory(event.inventoryItems)
     }
 
-    /**
-     * Just for me testing
-     */
-    var enabled = false
-    var menabled = false
-    var curr = 0L
-    var mcurr = 0L
-    var add = 0L
-    var madd = 0L
-
-    @SubscribeEvent
-    fun onTick(event: LorenzTickEvent) {
-        if (enabled) {
-            val stack = InventoryUtils.getItemInHand()
-            val crop = stack?.getCropType() ?: return
-            val old = crop.getCounter()
-            val toAdd = old + add
-            crop.setCounter(toAdd)
-            curr = toAdd
-        } else if (menabled) {
-            val mush = CropType.MUSHROOM
-            val mold = mush.getCounter()
-            val mtoAdd = mold + madd
-            mush.setCounter(mtoAdd)
-            mcurr = mtoAdd
-        }
-    }
-
     @SubscribeEvent
     fun onCropMilestoneOverflowLevelUp(event: CropMilestoneOverflowLevelUpEvent) {
         val crop = event.cropType
@@ -199,14 +171,11 @@ object GardenCropMilestones {
             tier++
         }
 
-        if (requestedTier > definedTiers && allowOverflow) {
+        val additionalTiers = requestedTier - definedTiers
 
-            val additionalTiers = requestedTier - definedTiers
+        val lastIncrement = cropMilestone.last().toLong()
 
-            val lastIncrement = cropMilestone.last().toLong()
-
-            totalCrops += lastIncrement * additionalTiers
-        }
+        totalCrops += lastIncrement * additionalTiers
 
         return totalCrops
     }

@@ -50,10 +50,7 @@ object FarmingMilestoneCommand {
 
         val currentAmount = GardenCropMilestones.getCropsForTier(currentMilestone, enteredCrop, allowOverflow = true)
         val targetAmount = GardenCropMilestones.getCropsForTier(targetMilestone, enteredCrop, allowOverflow = true)
-        println("current: $currentMilestone")
-        println("target: $targetMilestone")
         val output = (targetAmount - currentAmount).formatOutput(needsTime, enteredCrop)
-        println("out: $output")
         ChatUtils.chat("§7$output needed for milestone §7$currentMilestone §a-> §7$targetMilestone")
     }
 
@@ -70,7 +67,7 @@ object FarmingMilestoneCommand {
             return
         }
 
-        val targetLevel = target?.toIntOrNull()
+        val targetLevel = target?.formatIntOrUserError()
         if (targetLevel == null) {
             ChatUtils.userError("$target is not a valid number.")
             return
