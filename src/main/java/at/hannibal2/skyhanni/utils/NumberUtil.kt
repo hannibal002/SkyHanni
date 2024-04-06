@@ -3,15 +3,12 @@ package at.hannibal2.skyhanni.utils
 import at.hannibal2.skyhanni.utils.LorenzUtils.round
 import at.hannibal2.skyhanni.utils.StringUtils.matches
 import java.text.NumberFormat
-import java.util.Locale
 import java.util.TreeMap
 import kotlin.math.pow
 import kotlin.math.roundToInt
 
 object NumberUtil {
 
-    @JvmField
-    val nf: NumberFormat = NumberFormat.getInstance(Locale.US)
     private val suffixes = TreeMap<Long, String>().apply {
         this[1000L] = "k"
         this[1000000L] = "M"
@@ -20,6 +17,7 @@ object NumberUtil {
         this[1000000000000000L] = "P"
         this[1000000000000000000L] = "E"
     }
+
     private val romanSymbols = TreeMap(
         mapOf(
             1000 to "M",
