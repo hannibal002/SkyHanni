@@ -60,7 +60,6 @@ class ConfigManager {
             return GsonBuilder().setPrettyPrinting()
                 .excludeFieldsWithoutExposeAnnotation()
                 .serializeSpecialFloatingPointValues()
-                .reigsterIfBeta(FeatureTogglesByDefaultAdapter)
                 .registerTypeAdapterFactory(PropertyTypeAdapterFactory())
                 .registerTypeAdapterFactory(KotlinTypeAdapterFactory())
                 .registerTypeAdapter(UUID::class.java, object : TypeAdapter<UUID>() {
@@ -148,7 +147,9 @@ class ConfigManager {
                 .enableComplexMapKeySerialization()
         }
 
-        val gson: Gson = createBaseGsonBuilder().create()
+        val gson: Gson = createBaseGsonBuilder()
+            .reigsterIfBeta(FeatureTogglesByDefaultAdapter)
+            .create()
 
         var configDirectory = File("config/skyhanni")
     }
