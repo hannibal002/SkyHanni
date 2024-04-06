@@ -20,7 +20,6 @@ import at.hannibal2.skyhanni.utils.NEUInternalName.Companion.asInternalName
 import at.hannibal2.skyhanni.utils.NEUItems.getNpcPriceOrNull
 import at.hannibal2.skyhanni.utils.NEUItems.getPrice
 import at.hannibal2.skyhanni.utils.NumberUtil.formatInt
-import at.hannibal2.skyhanni.utils.NumberUtil.formatLong
 import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.StringUtils.matches
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
@@ -99,18 +98,12 @@ object SackAPI {
             else null
     }
 
-    private fun NEUInternalName.sackPrice(stored: String) = when (sackDisplayConfig.priceFrom) {
-        PriceFrom.BAZAAR -> (getPrice(true) * stored.formatLong()).toLong()
-            .let { if (it < 0) 0L else it }
-
-        PriceFrom.NPC -> try {
-            val npcPrice = getNpcPriceOrNull() ?: 0.0
-            (npcPrice * stored.formatLong()).toLong()
-        } catch (e: Exception) {
-            0L
+    private fun NEUInternalName.sackPrice(stored: Int): Long {
+        return when (sackDisplayConfig.priceFrom) {
+            PriceFrom.BAZAAR -> (getPrice() * stored).toLong().coerceAtLeast(0)
+            PriceFrom.NPC -> (getNpcPriceOrNull() ?: 0.0).toLong() * stored
+            else -> 0L
         }
-
-        else -> 0L
     }
 
     fun getSacksData(savingSacks: Boolean) {
@@ -118,14 +111,12 @@ object SackAPI {
         for ((_, stack) in stackList) {
             val name = stack.name
             val lore = stack.getLore()
-            val gem = SackGemstone()
-            val rune = SackRune()
-            val item = SackOtherItem()
             loop@ for (line in lore) {
                 if (isGemstoneSack) {
+                    val gem = SackGemstone()
                     gemstonePattern.matchMatcher(line) {
                         val rarity = group("gemrarity")
-                        val stored = group("stored")
+                        val stored = group("stored").formatInt()
                         gem.internalName = gemstoneMap[name.removeColor()] ?: NEUInternalName.NONE
                         if (gemstoneMap.containsKey(name.removeColor())) {
                             val internalName = "${rarity.uppercase()}_${
@@ -136,19 +127,19 @@ object SackAPI {
                                 "Rough" -> {
                                     gem.rough = stored
                                     gem.roughPrice = internalName.sackPrice(stored)
-                                    if (savingSacks) setSackItem(internalName, stored.formatLong())
+                                    if (savingSacks) setSackItem(internalName, stored)
                                 }
 
                                 "Flawed" -> {
                                     gem.flawed = stored
                                     gem.flawedPrice = internalName.sackPrice(stored)
-                                    if (savingSacks) setSackItem(internalName, stored.formatLong())
+                                    if (savingSacks) setSackItem(internalName, stored)
                                 }
 
                                 "Fine" -> {
                                     gem.fine = stored
                                     gem.finePrice = internalName.sackPrice(stored)
-                                    if (savingSacks) setSackItem(internalName, stored.formatLong())
+                                    if (savingSacks) setSackItem(internalName, stored)
                                 }
                             }
                             gemstoneItem[name] = gem
@@ -156,25 +147,27 @@ object SackAPI {
                     }
                 } else {
                     numPattern.matchMatcher(line) {
-                        val stored = group("stored")
+                        val item = SackOtherItem()
+                        val stored = group("stored").formatInt()
                         val internalName = stack.getInternalName()
                         item.internalName = internalName
                         item.colorCode = group("color")
-                        item.stored = stored
-                        item.total = group("total")
+                        item.stored = group("stored").formatInt()
+                        item.total = group("total").formatInt()
 
-                        if (savingSacks) setSackItem(item.internalName, item.stored.formatLong())
+                        if (savingSacks) setSackItem(item.internalName, item.stored)
                         item.price = if (isTrophySack) {
                             val filletPerTrophy = FishingAPI.getFilletPerTrophy(stack.getInternalName())
-                            val filletValue = filletPerTrophy * stored.formatLong()
+                            val filletValue = filletPerTrophy * stored
                             item.magmaFish = filletValue
-                            "MAGMA_FISH".asInternalName().sackPrice(filletValue.toString())
+                            "MAGMA_FISH".asInternalName().sackPrice(filletValue)
                         } else {
                             internalName.sackPrice(stored).coerceAtLeast(0)
                         }
 
 
                         if (isRuneSack) {
+                            val rune = SackRune()
                             val level = group("level")
                             rune.stack = stack
                             if (level == "I") {
@@ -261,7 +254,7 @@ object SackAPI {
             if (sackData.containsKey(item.key)) {
                 val oldData = sackData[item.key]
                 var newAmount = oldData!!.amount + item.value
-                var changed = (newAmount - oldData.amount).toInt()
+                var changed = (newAmount - oldData.amount)
                 if (newAmount < 0) {
                     newAmount = 0
                     changed = 0
@@ -270,7 +263,7 @@ object SackAPI {
             } else {
                 val newAmount = if (item.value > 0) item.value else 0
                 sackData =
-                    sackData.editCopy { this[item.key] = SackItem(newAmount.toLong(), newAmount, SackStatus.OUTDATED) }
+                    sackData.editCopy { this[item.key] = SackItem(newAmount, newAmount, SackStatus.OUTDATED) }
             }
         }
 
@@ -284,7 +277,7 @@ object SackAPI {
         saveSackData()
     }
 
-    private fun setSackItem(item: NEUInternalName, amount: Long) {
+    private fun setSackItem(item: NEUInternalName, amount: Int) {
         sackData = sackData.editCopy { this[item] = SackItem(amount, 0, SackStatus.CORRECT) }
     }
 
@@ -308,9 +301,9 @@ object SackAPI {
 
     data class SackGemstone(
         var internalName: NEUInternalName = NEUInternalName.NONE,
-        var rough: String = "0",
-        var flawed: String = "0",
-        var fine: String = "0",
+        var rough: Int = 0,
+        var flawed: Int = 0,
+        var fine: Int = 0,
         var roughPrice: Long = 0,
         var flawedPrice: Long = 0,
         var finePrice: Long = 0,
@@ -318,28 +311,28 @@ object SackAPI {
 
     data class SackRune(
         var stack: ItemStack? = null,
-        var lvl1: String = "0",
-        var lvl2: String = "0",
-        var lvl3: String = "0",
+        var lvl1: Int = 0,
+        var lvl2: Int = 0,
+        var lvl3: Int = 0,
     )
 
     data class SackOtherItem(
         var internalName: NEUInternalName = NEUInternalName.NONE,
         var colorCode: String = "",
-        var stored: String = "0",
-        var total: String = "0",
+        var stored: Int = 0,
+        var total: Int = 0,
         var price: Long = 0,
-        var magmaFish: Long = 0,
+        var magmaFish: Int = 0,
     )
 
-    fun NEUInternalName.getAmountInSacksOrNull(): Long? =
+    fun NEUInternalName.getAmountInSacksOrNull(): Int? =
         fetchSackItem(this).takeIf { it.statusIsCorrectOrAlright() }?.amount
 
-    fun NEUInternalName.getAmountInSacks(): Long = getAmountInSacksOrNull() ?: 0
+    fun NEUInternalName.getAmountInSacks(): Int = getAmountInSacksOrNull() ?: 0
 }
 
 data class SackItem(
-    @Expose val amount: Long,
+    @Expose val amount: Int,
     @Expose val lastChange: Int,
     @Expose private val status: SackStatus?,
 ) {
