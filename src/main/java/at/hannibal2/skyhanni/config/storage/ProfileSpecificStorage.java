@@ -465,10 +465,14 @@ public class ProfileSpecificStorage {
         public DianaProfitTracker.Data dianaProfitTracker = new DianaProfitTracker.Data();
 
         @Expose
-        // TODO renmae
+        // TODO rename
         public MythologicalCreatureTracker.Data mythologicalMobTracker = new MythologicalCreatureTracker.Data();
     }
 
     @Expose
     public Map<SkillType, SkillAPI.SkillInfo> skillData = new HashMap<>();
+
+    @Expose
+    public Long flightDuration = null;
+
 }
