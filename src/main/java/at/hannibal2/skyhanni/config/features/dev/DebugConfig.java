@@ -7,6 +7,7 @@ import io.github.moulberry.moulconfig.annotations.ConfigEditorBoolean;
 import io.github.moulberry.moulconfig.annotations.ConfigEditorDropdown;
 import io.github.moulberry.moulconfig.annotations.ConfigEditorKeybind;
 import io.github.moulberry.moulconfig.annotations.ConfigOption;
+import io.github.moulberry.moulconfig.observer.Property;
 import org.lwjgl.input.Keyboard;
 
 public class DebugConfig {
@@ -123,7 +124,7 @@ public class DebugConfig {
     @Expose
     @ConfigOption(name = "Assume Mayor", desc = "Select a mayor to assume.")
     @ConfigEditorDropdown
-    public Mayor assumeMayor = Mayor.NONE;
+    public Property<Mayor> assumeMayor = Property.of(Mayor.NONE);
   
     @Expose
     @ConfigOption(name = "Always April Fools", desc = "Always show April fools jokes.")

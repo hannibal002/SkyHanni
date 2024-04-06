@@ -48,6 +48,19 @@ enum class Mayor(
             return mayor
         }
 
+        fun setMayorWithActivePerks(name: String, perks: Array<out Perk>): Mayor {
+            val mayor = getMayorFromName(name)
+
+            mayor.perks.forEach { it.isActive = false }
+            mayor.activePerks.clear()
+            perks.filter { mayor.perks.contains(it) }.forEach {
+                it.isActive = true
+                mayor.activePerks.add(it)
+            }
+
+            return mayor
+        }
+
         private fun MayorJson.Perk.renameIfFoxyExtraEventPerkFound(): String? {
             val foxyExtraEventPairs = mapOf(
                 "Spooky Festival" to "Extra Event (Spooky)",

@@ -4,10 +4,12 @@ import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.config.ConfigManager
 import at.hannibal2.skyhanni.data.Mayor.Companion.setMayorWithActivePerks
 import at.hannibal2.skyhanni.data.jsonobjects.local.MayorJson
+import at.hannibal2.skyhanni.events.ConfigLoadEvent
 import at.hannibal2.skyhanni.events.DebugDataCollectEvent
 import at.hannibal2.skyhanni.events.LorenzTickEvent
 import at.hannibal2.skyhanni.utils.APIUtil
 import at.hannibal2.skyhanni.utils.CollectionUtils.put
+import at.hannibal2.skyhanni.utils.ConditionalUtils.onToggle
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.SimpleTimeMark.Companion.asTimeMark
@@ -34,14 +36,6 @@ object MayorAPI {
     var candidates = mapOf<Int, MayorJson.Candidate>()
         private set
     var currentMayor: Mayor? = null
-        get() {
-            val config = SkyHanniMod.feature.dev.debug.assumeMayor
-            if (config == Mayor.NONE) return field
-            config.perks.forEach { it.isActive = true }
-            config.activePerks.clear()
-            config.activePerks.addAll(config.perks)
-            return config
-        }
         private set
     var timeTillNextMayor = Duration.ZERO
         private set
@@ -122,6 +116,20 @@ object MayorAPI {
     private fun MayorJson.Election.getPairs() = year + 1 to candidates.bestCandidate()
 
     private fun List<MayorJson.Candidate>.bestCandidate() = maxBy { it.votes }
+
+    @SubscribeEvent
+    fun onConfigReload(event: ConfigLoadEvent) {
+        SkyHanniMod.feature.dev.debug.assumeMayor.onToggle {
+            val config = SkyHanniMod.feature.dev.debug.assumeMayor.get()
+
+            if (config == Mayor.NONE) {
+                checkCurrentMayor()
+            } else {
+                currentMayor = setMayorWithActivePerks(config.mayorName, config.perks)
+            }
+        }
+    }
+
 
     @SubscribeEvent
     fun onDebugDataCollect(event: DebugDataCollectEvent) {
