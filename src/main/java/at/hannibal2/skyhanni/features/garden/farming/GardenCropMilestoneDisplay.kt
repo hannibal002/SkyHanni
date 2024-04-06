@@ -10,7 +10,6 @@ import at.hannibal2.skyhanni.data.GardenCropMilestones.isMaxed
 import at.hannibal2.skyhanni.data.GardenCropMilestones.setCounter
 import at.hannibal2.skyhanni.data.ProfileStorageData
 import at.hannibal2.skyhanni.events.ConfigLoadEvent
-import at.hannibal2.skyhanni.events.CropMilestoneOverflowLevelUpEvent
 import at.hannibal2.skyhanni.events.CropMilestoneUpdateEvent
 import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.OwnInventoryItemUpdateEvent
@@ -225,7 +224,7 @@ object GardenCropMilestoneDisplay {
 
         if (config.overflow.chat) {
             if (currentTier >= 46 && currentTier == previousNext && nextRealTier == currentTier + 1 && lastWarnedLevel != currentTier) {
-                CropMilestoneOverflowLevelUpEvent(crop, currentTier - 1, nextRealTier - 1).postAndCatch()
+                GardenCropMilestones.onOverflowLevelUp(crop, currentTier - 1, nextRealTier - 1)
                 lastWarnedLevel = currentTier
             }
         }
@@ -321,7 +320,7 @@ object GardenCropMilestoneDisplay {
         lineMap[4] = Collections.singletonList("§7Percentage: §e$percentageFormat")
 
         if (currentTier >= 46 && currentTier == previousMushNext && nextTier == currentTier + 1 && lastMushWarnedLevel != currentTier) {
-            CropMilestoneOverflowLevelUpEvent(mushroom, currentTier - 1, nextTier - 1).postAndCatch()
+            GardenCropMilestones.onOverflowLevelUp(mushroom, currentTier - 1, nextTier - 1)
             lastMushWarnedLevel = currentTier
         }
 

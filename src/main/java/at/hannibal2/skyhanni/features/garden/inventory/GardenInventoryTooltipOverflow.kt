@@ -34,7 +34,7 @@ class GardenInventoryTooltipOverflow {
         val split = stack.cleanName().split(" ")
         val useRoman = split.last().toIntOrNull() == null
         val cropName = split.dropLast(1).joinToString(" ")
-        val crop = CropType.entries.firstOrNull { it.cropName == cropName.removeColor() } ?: return
+        val crop = CropType.getByName(cropName.removeColor()) ?: return
         val counter = crop.getCounter()
         val currentTier = GardenCropMilestones.getTierForCropCount(counter, crop, allowOverflow = true)
         val nextTier = currentTier + 1

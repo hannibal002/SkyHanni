@@ -1,7 +1,6 @@
 package at.hannibal2.skyhanni.data
 
 import at.hannibal2.skyhanni.data.jsonobjects.repo.GardenJson
-import at.hannibal2.skyhanni.events.CropMilestoneOverflowLevelUpEvent
 import at.hannibal2.skyhanni.events.CropMilestoneUpdateEvent
 import at.hannibal2.skyhanni.events.InventoryFullyOpenedEvent
 import at.hannibal2.skyhanni.events.LorenzTickEvent
@@ -61,11 +60,7 @@ object GardenCropMilestones {
         GardenCropMilestonesCommunityFix.openInventory(event.inventoryItems)
     }
 
-    @SubscribeEvent
-    fun onCropMilestoneOverflowLevelUp(event: CropMilestoneOverflowLevelUpEvent) {
-        val crop = event.cropType
-        val oldLevel = event.oldLevel
-        val newLevel = event.newLevel
+    fun onOverflowLevelUp(crop: CropType, oldLevel: Int, newLevel: Int) {
         val customGoalLevel = ProfileStorageData.profileSpecific?.garden?.customGoalMilestone?.get(crop) ?: 0
         val goalReached = newLevel == customGoalLevel
 

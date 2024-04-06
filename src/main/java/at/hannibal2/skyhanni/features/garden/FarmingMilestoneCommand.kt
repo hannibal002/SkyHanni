@@ -18,7 +18,7 @@ object FarmingMilestoneCommand {
             return
         }
 
-        val enteredCrop = CropType.entries.firstOrNull { it.simpleName == crop.lowercase() } ?: run {
+        val enteredCrop = CropType.getByName(crop) ?: run {
             ChatUtils.userError("Invalid crop type entered")
             return
         }
@@ -63,7 +63,7 @@ object FarmingMilestoneCommand {
             return
         }
 
-        val enteredCrop = CropType.entries.firstOrNull { it.simpleName == crop.lowercase() } ?: run {
+        val enteredCrop = CropType.getByName(crop) ?: run {
             ChatUtils.userError("Invalid crop type entered")
             return
         }
