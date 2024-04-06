@@ -309,14 +309,16 @@ enum class ScoreboardElement(
     }
 }
 
-private fun getTitleDisplayPair() = if (displayConfig.titleAndFooter.useHypixelTitleAnimation) {
-    listOf(ScoreboardData.objectiveTitle to displayConfig.titleAndFooter.alignTitleAndFooter)
-} else {
-    listOf(
-        displayConfig.titleAndFooter.customTitle.get().toString()
-            .replace("&", "§") to displayConfig.titleAndFooter.alignTitleAndFooter
-    )
-}
+private fun getTitleDisplayPair(): List<ScoreboardElementType> =
+    if (displayConfig.titleAndFooter.useHypixelTitleAnimation) {
+        listOf(ScoreboardData.objectiveTitle to displayConfig.titleAndFooter.alignTitleAndFooter)
+    } else {
+        listOf(displayConfig.titleAndFooter.customTitle.get().toString()
+            .replace("&", "§")
+            .split("\\n")
+            .map { it to displayConfig.titleAndFooter.alignTitleAndFooter }
+        ).flatten()
+    }
 
 private fun getProfileDisplayPair() =
     listOf(CustomScoreboardUtils.getProfileTypeSymbol() + HypixelData.profileName.firstLetterUppercase() to HorizontalAlignment.LEFT)
@@ -794,10 +796,13 @@ private fun getPartyShowWhen() = if (inDungeons) {
     }
 }
 
-private fun getFooterDisplayPair() = listOf(
-    displayConfig.titleAndFooter.customFooter.get().toString()
-        .replace("&", "§") to displayConfig.titleAndFooter.alignTitleAndFooter
-)
+private fun getFooterDisplayPair(): List<ScoreboardElementType> =
+    listOf(displayConfig.titleAndFooter.customFooter.get().toString()
+        .replace("&", "§")
+        .split("\\n")
+        .map { it to displayConfig.titleAndFooter.alignTitleAndFooter }
+    ).flatten()
+
 
 private fun getExtraDisplayPair(): List<ScoreboardElementType> {
     if (unknownLines.isEmpty()) return listOf("<hidden>" to HorizontalAlignment.LEFT)
