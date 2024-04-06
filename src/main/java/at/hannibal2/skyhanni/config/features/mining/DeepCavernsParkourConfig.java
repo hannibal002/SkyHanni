@@ -32,7 +32,7 @@ public class DeepCavernsParkourConfig {
     public Property<String> monochromeColor = Property.of("0:60:0:0:255");
 
     @Expose
-    @ConfigOption(name = "Hilight all Lines", desc = "Show all lines in gray. Useful for debugging.")
+    @ConfigOption(name = "Highlight all Lines", desc = "Show all lines in gray. Useful for debugging.")
     @ConfigEditorBoolean
     public boolean highlightAllLines = false;
 }

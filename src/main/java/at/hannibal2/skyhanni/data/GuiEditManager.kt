@@ -51,6 +51,9 @@ class GuiEditManager {
     fun onRenderOverlay(event: GuiRenderEvent.GuiOverlayRenderEvent) {
         latestPositions = currentPositions.toMap()
         currentPositions.clear()
+        GlStateManager.color(1f, 1f, 1f, 1f)
+        GlStateManager.enableBlend()
+        GlStateManager.tryBlendFuncSeparate(770, 771, 1, 0)
     }
 
     @SubscribeEvent

@@ -86,9 +86,6 @@ class SkyblockGuideHighlightFeature private constructor(
         fun onInventoryClose(event: InventoryCloseEvent) = close()
 
         @SubscribeEvent
-        fun onInventoryClose(event: GuiContainerEvent.CloseWindowEvent) = close()
-
-        @SubscribeEvent
         fun onSlotClick(event: GuiContainerEvent.SlotClickEvent) {
             if (!isEnabled()) return
             val current = activeObject ?: return
