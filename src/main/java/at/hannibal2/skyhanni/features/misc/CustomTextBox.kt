@@ -27,7 +27,7 @@ class CustomTextBox {
     private fun String.format() = replace("&", "§").split("\\n").toList()
 
     @SubscribeEvent
-    fun onRenderGUIOverlay(event: GuiRenderEvent.ChestGuiOverlayRenderEvent) {
+    fun onBackgroundDraw(event: GuiRenderEvent.ChestGuiOverlayRenderEvent) {
         if (!config.onlyInGUI) return
         if (!isEnabled()) return
 
@@ -43,7 +43,7 @@ class CustomTextBox {
     }
 
     private fun isEnabled() =
-        config.enabled && (LorenzUtils.inSkyBlock || OutsideSbFeature.CUSTOM_TEXT_BOX.isSelected())
+        (LorenzUtils.inSkyBlock || OutsideSbFeature.CUSTOM_TEXT_BOX.isSelected()) && config.enabled
 
     @SubscribeEvent
     fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {

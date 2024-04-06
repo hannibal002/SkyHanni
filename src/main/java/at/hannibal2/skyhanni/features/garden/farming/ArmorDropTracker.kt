@@ -109,7 +109,7 @@ object ArmorDropTracker {
         if (!GardenAPI.inGarden()) return
         if (!config.enabled) return
 
-        if (event.isMod(30)) {
+        if (event.repeatSeconds(1)) {
             checkArmor()
         }
     }

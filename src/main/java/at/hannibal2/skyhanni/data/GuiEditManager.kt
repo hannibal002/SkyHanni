@@ -3,8 +3,10 @@ package at.hannibal2.skyhanni.data
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.config.core.config.Position
 import at.hannibal2.skyhanni.config.core.config.gui.GuiPositionEditor
+import at.hannibal2.skyhanni.events.GuiPositionMovedEvent
 import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.LorenzKeyPressEvent
+import at.hannibal2.skyhanni.events.LorenzTickEvent
 import at.hannibal2.skyhanni.test.SkyHanniDebugsAndTests
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils.isRancherSign
@@ -49,6 +51,17 @@ class GuiEditManager {
     fun onRenderOverlay(event: GuiRenderEvent.GuiOverlayRenderEvent) {
         latestPositions = currentPositions.toMap()
         currentPositions.clear()
+        GlStateManager.color(1f, 1f, 1f, 1f)
+        GlStateManager.enableBlend()
+        GlStateManager.tryBlendFuncSeparate(770, 771, 1, 0)
+    }
+
+    @SubscribeEvent
+    fun onTick(event: LorenzTickEvent) {
+        lastMovedGui?.let {
+            GuiPositionMovedEvent(it).postAndCatch()
+            lastMovedGui = null
+        }
     }
 
     companion object {
@@ -56,6 +69,7 @@ class GuiEditManager {
         var currentPositions = mutableMapOf<String, Position>()
         private var latestPositions = mapOf<String, Position>()
         private var currentBorderSize = mutableMapOf<String, Pair<Int, Int>>()
+        private var lastMovedGui: String? = null
 
         @JvmStatic
         fun add(position: Position, posLabel: String, x: Int, y: Int) {
@@ -116,6 +130,10 @@ class GuiEditManager {
 
         fun GuiProfileViewer.anyTextBoxFocused() =
             this.getPropertiesWithType<GuiElementTextField>().any { it.focus }
+
+        fun handleGuiPositionMoved(guiName: String) {
+            lastMovedGui = guiName
+        }
     }
 }
 

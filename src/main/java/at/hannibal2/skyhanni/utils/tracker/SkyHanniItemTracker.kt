@@ -1,8 +1,8 @@
 package at.hannibal2.skyhanni.utils.tracker
 
 import at.hannibal2.skyhanni.SkyHanniMod
-import at.hannibal2.skyhanni.config.Storage
 import at.hannibal2.skyhanni.config.features.misc.TrackerConfig.PriceFromEntry
+import at.hannibal2.skyhanni.config.storage.ProfileSpecificStorage
 import at.hannibal2.skyhanni.data.SlayerAPI
 import at.hannibal2.skyhanni.test.PriceSource
 import at.hannibal2.skyhanni.utils.ChatUtils
@@ -22,7 +22,7 @@ import kotlin.time.Duration.Companion.seconds
 class SkyHanniItemTracker<Data : ItemTrackerData>(
     name: String,
     createNewSession: () -> Data,
-    getStorage: (Storage.ProfileSpecific) -> Data,
+    getStorage: (ProfileSpecificStorage) -> Data,
     drawDisplay: (Data) -> List<List<Any>>,
 ) : SkyHanniTracker<Data>(name, createNewSession, getStorage, drawDisplay) {
 
@@ -129,31 +129,29 @@ class SkyHanniItemTracker<Data : ItemTrackerData>(
             }
 
             val lore = buildLore(data, itemProfit, hidden, newDrop, internalName)
-            val renderable = if (isInventoryOpen()) Renderable.clickAndHover(displayName, lore) {
-                if (System.currentTimeMillis() > lastClickDelay + 150) {
-                    if (KeyboardManager.isModifierKeyDown()) {
-                        data.items.remove(internalName)
-                        ChatUtils.chat("Removed $cleanName §efrom $name.")
-                        lastClickDelay = System.currentTimeMillis() + 500
-                    } else {
-                        modify {
-                            it.items[internalName]?.hidden = !hidden
+            val renderable = if (isInventoryOpen()) Renderable.clickAndHover(displayName, lore,
+                onClick = {
+                    if (System.currentTimeMillis() > lastClickDelay + 150) {
+                        if (KeyboardManager.isModifierKeyDown()) {
+                            data.items.remove(internalName)
+                            ChatUtils.chat("Removed $cleanName §efrom $name.")
+                            lastClickDelay = System.currentTimeMillis() + 500
+                        } else {
+                            modify {
+                                it.items[internalName]?.hidden = !hidden
+                            }
+                            lastClickDelay = System.currentTimeMillis()
                         }
-                        lastClickDelay = System.currentTimeMillis()
+                        update()
                     }
-                    update()
                 }
-            } else Renderable.string(displayName)
+            ) else Renderable.string(displayName)
 
             lists.addAsSingletonList(renderable)
         }
         if (hiddenItemTexts.size > 0) {
-            lists.addAsSingletonList(
-                Renderable.hoverTips(
-                    " §7${hiddenItemTexts.size} cheap items are hidden.",
-                    hiddenItemTexts
-                )
-            )
+            val text = Renderable.hoverTips(" §7${hiddenItemTexts.size} cheap items are hidden.", hiddenItemTexts)
+            lists.addAsSingletonList(text)
         }
 
         return profit

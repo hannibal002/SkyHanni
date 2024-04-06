@@ -331,6 +331,11 @@ object SackAPI {
         var price: Long = 0,
         var magmaFish: Long = 0,
     )
+
+    fun NEUInternalName.getAmountInSacksOrNull(): Long? =
+        fetchSackItem(this).takeIf { it.statusIsCorrectOrAlright() }?.amount
+
+    fun NEUInternalName.getAmountInSacks(): Long = getAmountInSacksOrNull() ?: 0
 }
 
 data class SackItem(
@@ -340,6 +345,7 @@ data class SackItem(
 ) {
 
     fun getStatus() = status ?: SackStatus.MISSING
+    fun statusIsCorrectOrAlright() = getStatus().let { it == SackStatus.CORRECT || it == SackStatus.ALRIGHT }
 }
 
 private val gemstoneMap = mapOf(
@@ -355,7 +361,6 @@ private val gemstoneMap = mapOf(
 
 // ideally should be correct but using alright should also be fine unless they sold their whole sacks
 enum class SackStatus {
-
     MISSING,
     CORRECT,
     ALRIGHT,

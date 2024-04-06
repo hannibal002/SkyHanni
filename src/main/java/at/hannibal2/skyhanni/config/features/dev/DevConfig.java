@@ -44,6 +44,17 @@ public class DevConfig {
     @ConfigEditorBoolean
     public boolean worldEdit = false;
 
+    @Expose
+    @ConfigOption(name = "Bow Sound distance", desc = "The distance in blocks where the sound of shooting a bow will be used for the QuiverAPI.")
+    @ConfigEditorSlider(minValue = 0, maxValue = 50, minStep = 1)
+    public int bowSoundDistance = 5;
+
+    @Expose
+    @ConfigOption(name = "Unknown Lines warning", desc = "Gives a chat warning when unknown lines are found in the scoreboard." +
+        "\nCustom Scoreboard debug option")
+    @ConfigEditorBoolean
+    public boolean unknownLinesWarning = false;
+
     @ConfigOption(name = "Parkour Waypoints", desc = "")
     @Accordion
     @Expose
@@ -58,5 +69,9 @@ public class DevConfig {
     @Expose
     @Category(name = "Minecraft Console", desc = "Minecraft Console Settings")
     public MinecraftConsoleConfig minecraftConsoles = new MinecraftConsoleConfig();
+
+    @Expose
+    @Category(name = "Debug Mob", desc = "Every Debug related to the Mob System")
+    public DebugMobConfig mobDebug = new DebugMobConfig();
 
 }

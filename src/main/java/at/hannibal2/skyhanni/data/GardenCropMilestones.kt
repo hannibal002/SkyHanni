@@ -11,9 +11,10 @@ import at.hannibal2.skyhanni.features.garden.GardenAPI.getCropType
 import at.hannibal2.skyhanni.utils.ChatUtils.chat
 import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
-import at.hannibal2.skyhanni.utils.NumberUtil.formatNumber
+import at.hannibal2.skyhanni.utils.NumberUtil.formatLong
 import at.hannibal2.skyhanni.utils.SoundUtils
 import at.hannibal2.skyhanni.utils.SoundUtils.playSound
+import at.hannibal2.skyhanni.utils.StringUtils.matchFirst
 import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraft.item.ItemStack
@@ -34,11 +35,9 @@ object GardenCropMilestones {
     private val config get() = GardenAPI.config.cropMilestones
 
     fun getCropTypeByLore(itemStack: ItemStack): CropType? {
-        for (line in itemStack.getLore()) {
-            cropPattern.matchMatcher(line) {
-                val name = group("name")
-                return CropType.getByNameOrNull(name)
-            }
+        itemStack.getLore().matchFirst(cropPattern) {
+            val name = group("name")
+            return CropType.getByNameOrNull(name)
         }
         return null
     }
@@ -49,11 +48,9 @@ object GardenCropMilestones {
 
         for ((_, stack) in event.inventoryItems) {
             val crop = getCropTypeByLore(stack) ?: continue
-            for (line in stack.getLore()) {
-                totalPattern.matchMatcher(line) {
-                    val amount = group("name").formatNumber()
-                    crop.setCounter(amount)
-                }
+            stack.getLore().matchFirst(totalPattern) {
+                val amount = group("name").formatLong()
+                crop.setCounter(amount)
             }
         }
         CropMilestoneUpdateEvent().postAndCatch()

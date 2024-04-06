@@ -50,6 +50,7 @@ enum class ItemCategory {
     MEMENTO,
     PORTAL,
     SACK,
+    CHISEL,
 
     NONE,
     ;

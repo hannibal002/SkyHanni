@@ -100,9 +100,21 @@ public class DungeonConfig {
     public boolean highlightSkeletonSkull = true;
 
     @Expose
+    @ConfigOption(name = "Chests Config", desc = "")
+    @Accordion
+    public DungeonChestConfig chest = new DungeonChestConfig();
+
+    @Expose
     @ConfigOption(name = "Croesus Chest", desc = "Adds a visual highlight to the Croesus inventory that " +
-        "shows unopened chests.")
+        "shows unopened chests.") // TODO move( , "dungeon.croesusUnopenedChestTracker" ,"dungeon.chest.showUnopened" )
     @ConfigEditorBoolean
     @FeatureToggle
     public boolean croesusUnopenedChestTracker = true;
+
+    @Expose
+    @ConfigOption(name = "SA Jump Notification", desc = "Notifies you when a Shadow Assassin is about " +
+        "to jump on you.")
+    @ConfigEditorBoolean
+    @FeatureToggle
+    public boolean shadowAssassinJumpNotifier = false;
 }

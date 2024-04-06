@@ -53,7 +53,7 @@ class GardenCropMilestoneInventory {
     }
 
     @SubscribeEvent
-    fun onItemTooltip(event: LorenzToolTipEvent) {
+    fun onTooltip(event: LorenzToolTipEvent) {
         if (!LorenzUtils.inSkyBlock) return
         if (!config.tooltipTweak.cropMilestoneTotalProgress) return
 

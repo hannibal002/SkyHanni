@@ -2,7 +2,6 @@ package at.hannibal2.skyhanni.features.misc.discordrpc
 
 // SkyblockAddons code, adapted for SkyHanni with some additions and fixes
 
-import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.data.ActionBarStatsData
 import at.hannibal2.skyhanni.data.GardenCropMilestones.getCounter
 import at.hannibal2.skyhanni.data.GardenCropMilestones.getTierForCropCount
@@ -210,12 +209,12 @@ enum class DiscordStatus(private val displayMessageSupplier: Supplier<String>?) 
     }),
 
     CUSTOM({
-        SkyHanniMod.feature.misc.discordRPC.customText.get() // custom field in the config
+        DiscordRPCManager.config.customText.get() // custom field in the config
     }),
 
     AUTO({
         var autoReturn = ""
-        for (statusID in SkyHanniMod.feature.misc.discordRPC.autoPriority) { // for every dynamic that the user wants to see...
+        for (statusID in DiscordRPCManager.config.autoPriority) { // for every dynamic that the user wants to see...
             // TODO, change functionality to use enum rather than ordinals
             val autoStatus = AutoStatus.entries[statusID.ordinal]
             val result =
@@ -228,7 +227,7 @@ enum class DiscordStatus(private val displayMessageSupplier: Supplier<String>?) 
         if (autoReturn == "") { // if we didn't find any useful information, display the fallback
             val statusNoAuto = DiscordStatus.entries.toMutableList()
             statusNoAuto.remove(AUTO)
-            autoReturn = statusNoAuto[SkyHanniMod.feature.misc.discordRPC.auto.get().ordinal].getDisplayString()
+            autoReturn = statusNoAuto[DiscordRPCManager.config.auto.get().ordinal].getDisplayString()
         }
         autoReturn
     }),

@@ -28,7 +28,7 @@ object DebugCommand {
                 if (search.equalsIgnoreColor("all")) {
                     "search for everything:"
                 } else "search '$search':"
-            } else "search is not specified, show only interesting stuff:"
+            } else "no search specified, only showing interesting stuff:"
         )
 
         val event = DebugDataCollectEvent(list, search)
@@ -58,7 +58,7 @@ object DebugCommand {
     private fun profileType(event: DebugDataCollectEvent) {
         event.title("Profile Type")
         if (!LorenzUtils.inSkyBlock) {
-            event.addIrrelevant("Not on SkyBlcok")
+            event.addIrrelevant("Not on SkyBlock")
             return
         }
 
@@ -81,7 +81,7 @@ object DebugCommand {
     private fun profileName(event: DebugDataCollectEvent) {
         event.title("Profile Name")
         if (!LorenzUtils.inSkyBlock) {
-            event.addIrrelevant("Not on SkyBlcok")
+            event.addIrrelevant("Not on SkyBlock")
             return
         }
 
