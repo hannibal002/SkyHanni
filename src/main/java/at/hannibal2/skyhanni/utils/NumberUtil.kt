@@ -198,10 +198,6 @@ object NumberUtil {
         return "${color.getChatColor()}$amount%"
     }
 
-    // TODO create new function formatLong, and eventually deprecate this function.
-    @Deprecated("renamed", ReplaceWith("this.formatLong()"))
-    fun String.formatNumber(): Long = formatLong()
-
     fun String.formatDouble(): Double =
         formatDoubleOrNull() ?: throw NumberFormatException("formatDouble failed for '$this'")
 
@@ -210,6 +206,9 @@ object NumberUtil {
 
     fun String.formatInt(): Int =
         formatDoubleOrNull()?.toInt() ?: throw NumberFormatException("formatInt failed for '$this'")
+
+    fun String.formatFloat(): Float =
+        formatDoubleOrNull()?.toFloat() ?: throw NumberFormatException("formatFloat failed for '$this'")
 
     fun String.formatDoubleOrUserError(): Double? = formatDoubleOrNull() ?: run {
         ChatUtils.userError("Not a valid number: '$this'")
@@ -222,6 +221,11 @@ object NumberUtil {
     }
 
     fun String.formatIntOrUserError(): Int? = formatDoubleOrNull()?.toInt() ?: run {
+        ChatUtils.userError("Not a valid number: '$this'")
+        return@run null
+    }
+
+    fun String.formatFloatOrUserError(): Float? = formatDoubleOrNull()?.toFloat() ?: run {
         ChatUtils.userError("Not a valid number: '$this'")
         return@run null
     }
