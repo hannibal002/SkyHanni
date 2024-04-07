@@ -3,7 +3,6 @@ package at.hannibal2.skyhanni.features.dungeon
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.data.EntityMovementData
-import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.events.CheckRenderEntityEvent
 import at.hannibal2.skyhanni.events.EntityMoveEvent
 import at.hannibal2.skyhanni.events.LorenzWorldChangeEvent
@@ -13,7 +12,6 @@ import at.hannibal2.skyhanni.utils.ColorUtils.withAlpha
 import at.hannibal2.skyhanni.utils.ItemUtils.cleanName
 import at.hannibal2.skyhanni.utils.ItemUtils.getSkullTexture
 import at.hannibal2.skyhanni.utils.LorenzColor
-import at.hannibal2.skyhanni.utils.LorenzUtils.isInIsland
 import at.hannibal2.skyhanni.utils.getLorenzVec
 import net.minecraft.entity.Entity
 import net.minecraft.entity.item.EntityArmorStand
@@ -58,7 +56,7 @@ class DungeonHideItems {
 
     @SubscribeEvent
     fun onCheckRender(event: CheckRenderEntityEvent<*>) {
-        if (!IslandType.CATACOMBS.isInIsland()) return
+        if (!DungeonAPI.inDungeon()) return
 
         val entity = event.entity
 
@@ -168,7 +166,7 @@ class DungeonHideItems {
 
     @SubscribeEvent
     fun onReceiveParticle(event: ReceiveParticleEvent) {
-        if (!IslandType.CATACOMBS.isInIsland()) return
+        if (!DungeonAPI.inDungeon()) return
         if (!config.hideSuperboomTNT && !config.hideReviveStone) return
 
         val packetLocation = event.location
@@ -187,7 +185,7 @@ class DungeonHideItems {
 
     @SubscribeEvent
     fun onEntityMove(event: EntityMoveEvent) {
-        if (!IslandType.CATACOMBS.isInIsland()) return
+        if (!DungeonAPI.inDungeon()) return
 
         val entity = event.entity
         if (entity !is EntityArmorStand) return

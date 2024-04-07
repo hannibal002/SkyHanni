@@ -2,7 +2,6 @@ package at.hannibal2.skyhanni.features.dungeon
 
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
-import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.events.CheckRenderEntityEvent
 import at.hannibal2.skyhanni.events.DungeonBossRoomEnterEvent
 import at.hannibal2.skyhanni.events.DungeonEnterEvent
@@ -11,7 +10,6 @@ import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.LorenzChatEvent
 import at.hannibal2.skyhanni.events.LorenzWorldChangeEvent
 import at.hannibal2.skyhanni.utils.LorenzUtils
-import at.hannibal2.skyhanni.utils.LorenzUtils.isInIsland
 import at.hannibal2.skyhanni.utils.RenderUtils.renderString
 import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
 import net.minecraft.entity.item.EntityArmorStand
@@ -93,7 +91,7 @@ class DungeonCopilot {
 
     @SubscribeEvent
     fun onCheckRender(event: CheckRenderEntityEvent<*>) {
-        if (!IslandType.CATACOMBS.isInIsland()) return
+        if (!DungeonAPI.inDungeon()) return
 
         val entity = event.entity
         if (entity !is EntityArmorStand) return

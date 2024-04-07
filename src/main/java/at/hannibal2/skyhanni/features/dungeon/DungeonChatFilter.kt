@@ -2,10 +2,8 @@ package at.hannibal2.skyhanni.features.dungeon
 
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.config.features.chat.ChatConfig
-import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.events.LorenzChatEvent
 import at.hannibal2.skyhanni.utils.LorenzUtils
-import at.hannibal2.skyhanni.utils.LorenzUtils.isInIsland
 import at.hannibal2.skyhanni.utils.StringUtils.matches
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import java.util.regex.Pattern
@@ -210,7 +208,7 @@ class DungeonChatFilter {
             message.isFiltered(MessageTypes.START) -> return "start"
         }
 
-        if (!IslandType.CATACOMBS.isInIsland()) return ""
+        if (!DungeonAPI.inDungeon()) return ""
 
         return when {
             message.isFiltered(MessageTypes.AMBIENCE) -> "ambience"

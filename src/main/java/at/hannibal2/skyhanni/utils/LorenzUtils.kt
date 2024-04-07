@@ -51,8 +51,8 @@ object LorenzUtils {
 
     val inHypixelLobby get() = onHypixel && HypixelData.inLobby
 
-    @Deprecated("Use IslandType.isInIsland instead", ReplaceWith("IslandType.CATACOMBS.isInIsland"))
-    val inDungeons get() = inSkyBlock && DungeonAPI.inDungeon()
+    @Deprecated("Use DungeonAPI.inDungeon() instead", ReplaceWith("DungeonAPI.inDungeon()"))
+    val inDungeons get() = DungeonAPI.inDungeon()
 
     /**
      * Consider using [IslandType.isInIsland] instead

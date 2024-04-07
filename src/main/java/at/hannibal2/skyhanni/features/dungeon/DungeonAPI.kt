@@ -244,7 +244,7 @@ object DungeonAPI {
     fun onDebugDataCollect(event: DebugDataCollectEvent) {
         event.title("Dungeon")
 
-        if (!IslandType.CATACOMBS.isInIsland()) {
+        if (!inDungeon()) {
             event.addIrrelevant("not in dungeons")
             return
         }

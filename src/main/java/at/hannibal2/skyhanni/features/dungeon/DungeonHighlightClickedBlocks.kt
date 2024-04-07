@@ -32,7 +32,7 @@ class DungeonHighlightClickedBlocks {
     @SubscribeEvent
     fun onChat(event: LorenzChatEvent) {
         if (!SkyHanniMod.feature.dungeon.highlightClickedBlocks) return
-        if (!IslandType.CATACOMBS.isInIsland()) return
+        if (!DungeonAPI.inDungeon()) return
 
         if (event.message == "§cYou hear the sound of something opening...") {
             event.blockedReason = "dungeon_highlight_clicked_block"
@@ -42,7 +42,7 @@ class DungeonHighlightClickedBlocks {
     @SubscribeEvent
     fun onBlockClick(event: BlockClickEvent) {
         if (!SkyHanniMod.feature.dungeon.highlightClickedBlocks) return
-        if (!IslandType.CATACOMBS.isInIsland()) return
+        if (!DungeonAPI.inDungeon()) return
         if (DungeonAPI.inBossRoom) return
         if (event.clickType != ClickType.RIGHT_CLICK) return
 
@@ -77,7 +77,7 @@ class DungeonHighlightClickedBlocks {
     @SubscribeEvent
     fun onWorldRender(event: LorenzRenderWorldEvent) {
         if (!SkyHanniMod.feature.dungeon.highlightClickedBlocks) return
-        if (!IslandType.CATACOMBS.isInIsland()) return
+        if (!DungeonAPI.inDungeon()) return
 
         blocks.removeAll { System.currentTimeMillis() > it.time + 3000 }
         blocks.forEach {

@@ -511,7 +511,7 @@ class MobFinder {
     }
 
     fun handleChat(message: String) {
-        if (!IslandType.CATACOMBS.isInIsland()) return
+        if (!DungeonAPI.inDungeon()) return
         when (message) {
             // F1
             "§c[BOSS] Bonzo§r§f: Gratz for making it this far, but I'm basically unbeatable." -> {

@@ -43,9 +43,7 @@ class PlayerDeathMessages {
         deathMessagePattern.matchMatcher(message) {
             val name = group("name")
             if (MarkedPlayerManager.config.highlightInChat &&
-                !DungeonAPI.inDungeon() && !LorenzUtils.inKuudraFight && MarkedPlayerManager.isMarkedPlayer(
-                    name
-                )
+                !DungeonAPI.inDungeon() && !LorenzUtils.inKuudraFight && MarkedPlayerManager.isMarkedPlayer(name)
             ) {
                 val reason = group("reason").removeColor()
 
