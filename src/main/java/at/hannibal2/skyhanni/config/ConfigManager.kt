@@ -29,10 +29,10 @@ import com.google.gson.TypeAdapterFactory
 import com.google.gson.stream.JsonReader
 import com.google.gson.stream.JsonToken
 import com.google.gson.stream.JsonWriter
-import io.github.moulberry.moulconfig.observer.PropertyTypeAdapterFactory
-import io.github.moulberry.moulconfig.processor.BuiltinMoulConfigGuis
-import io.github.moulberry.moulconfig.processor.ConfigProcessorDriver
-import io.github.moulberry.moulconfig.processor.MoulConfigProcessor
+import io.github.notenoughupdates.moulconfig.observer.PropertyTypeAdapterFactory
+import io.github.notenoughupdates.moulconfig.processor.BuiltinMoulConfigGuis
+import io.github.notenoughupdates.moulconfig.processor.ConfigProcessorDriver
+import io.github.notenoughupdates.moulconfig.processor.MoulConfigProcessor
 import net.minecraft.item.ItemStack
 import java.io.BufferedReader
 import java.io.BufferedWriter
@@ -213,11 +213,7 @@ class ConfigManager {
         processor = MoulConfigProcessor(SkyHanniMod.feature)
         BuiltinMoulConfigGuis.addProcessors(processor)
         UpdateManager.injectConfigProcessor(processor)
-        ConfigProcessorDriver.processConfig(
-            features.javaClass,
-            features,
-            processor
-        )
+        ConfigProcessorDriver(processor).processConfig(features)
     }
 
     private fun firstLoadFile(file: File?, fileType: ConfigFileType, defaultValue: Any): Any {

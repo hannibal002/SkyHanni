@@ -1,9 +1,9 @@
 package at.hannibal2.skyhanni.features.misc.update
 
 import at.hannibal2.skyhanni.SkyHanniMod
-import io.github.moulberry.moulconfig.gui.GuiOptionEditor
-import io.github.moulberry.moulconfig.internal.TextRenderUtils
-import io.github.moulberry.moulconfig.processor.ProcessedOption
+import io.github.notenoughupdates.moulconfig.gui.GuiOptionEditor
+import io.github.notenoughupdates.moulconfig.internal.TextRenderUtils
+import io.github.notenoughupdates.moulconfig.processor.ProcessedOption
 import io.github.moulberry.notenoughupdates.itemeditor.GuiElementButton
 import net.minecraft.client.Minecraft
 import net.minecraft.client.renderer.GlStateManager
