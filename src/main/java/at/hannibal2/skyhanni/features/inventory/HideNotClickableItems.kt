@@ -29,6 +29,7 @@ import at.hannibal2.skyhanni.utils.LorenzColor
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.MultiFilter
 import at.hannibal2.skyhanni.utils.NEUInternalName.Companion.asInternalName
+import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getExtraAttributes
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.isRiftExportable
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.isRiftTransferable
 import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
@@ -490,6 +491,12 @@ class HideNotClickableItems {
                 hideReason = "This item should not be salvaged! (Legendary)"
                 return true
             }
+        }
+
+        val museumDonated = stack.getExtraAttributes()?.getBoolean("donated_museum") ?: false
+        if (museumDonated) {
+            hideReason = "This item cannot be salvaged! (Donated to Museum)"
+            return true
         }
 
         if (ItemUtils.isSkyBlockMenuItem(stack)) {
