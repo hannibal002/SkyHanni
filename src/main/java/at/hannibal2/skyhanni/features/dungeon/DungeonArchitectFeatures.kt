@@ -17,11 +17,11 @@ class DungeonArchitectFeatures {
     private val patternGroup = RepoPattern.group("dungeon.architectsdraft")
 
     private val puzzleFailPattern by patternGroup.pattern(
-        "normal.puzzle.fail",
+        "puzzle.fail.normal",
         "(?:§c§lPUZZLE FAIL!|§4) §.§.(?<name>\\S*) .*"
     )
     private val quizPuzzleFailPattern by patternGroup.pattern(
-        "quiz.puzzle.fail",
+        "puzzle.fail.quiz",
         "§4\\[STATUE] Oruo the Omniscient§r§f: (?:§.)*(?<name>\\S*) (?:§.)*chose the wrong .*"
     )
 
