@@ -10,35 +10,37 @@ import at.hannibal2.skyhanni.data.SackAPI
 import at.hannibal2.skyhanni.events.GuiContainerEvent
 import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.features.inventory.bazaar.BazaarApi
-import at.hannibal2.skyhanni.utils.CollectionUtils.addAsSingletonList
 import at.hannibal2.skyhanni.utils.ConfigUtils
 import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.LorenzColor
 import at.hannibal2.skyhanni.utils.LorenzUtils
-import at.hannibal2.skyhanni.utils.LorenzUtils.addButton
-import at.hannibal2.skyhanni.utils.LorenzUtils.addSelector
 import at.hannibal2.skyhanni.utils.NEUInternalName.Companion.asInternalName
 import at.hannibal2.skyhanni.utils.NEUItems
 import at.hannibal2.skyhanni.utils.NEUItems.getItemStack
 import at.hannibal2.skyhanni.utils.NumberUtil
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.RenderUtils.highlight
-import at.hannibal2.skyhanni.utils.RenderUtils.renderStringsAndItems
+import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderables
 import at.hannibal2.skyhanni.utils.renderables.Renderable
+import at.hannibal2.skyhanni.utils.renderables.RenderableUtils.addButton
+import at.hannibal2.skyhanni.utils.renderables.RenderableUtils.addItemStack
+import at.hannibal2.skyhanni.utils.renderables.RenderableUtils.addSelector
+import at.hannibal2.skyhanni.utils.renderables.RenderableUtils.addString
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
 object SackDisplay {
 
-    private var display = emptyList<List<Any>>()
+    private var display = emptyList<Renderable>()
     private val config get() = SkyHanniMod.feature.inventory.sackDisplay
 
     @SubscribeEvent
     fun onBackgroundDraw(event: GuiRenderEvent.ChestGuiOverlayRenderEvent) {
         if (SackAPI.inSackInventory) {
             if (!isEnabled()) return
-            config.position.renderStringsAndItems(
-                display, extraSpace = config.extraSpace, itemScale = 1.3, posLabel = "Sacks Items"
+            config.position.renderRenderables(
+//                 display, extraSpace = config.extraSpace, itemScale = 1.3, posLabel = "Sacks Items"
+                display, extraSpace = config.extraSpace, posLabel = "Sacks Items"
             )
         }
     }
@@ -59,8 +61,8 @@ object SackDisplay {
         display = drawDisplay(savingSacks)
     }
 
-    private fun drawDisplay(savingSacks: Boolean): List<List<Any>> {
-        val list = mutableListOf<List<Any>>()
+    private fun drawDisplay(savingSacks: Boolean): List<Renderable> {
+        val list = mutableListOf<Renderable>()
         var totalPrice = 0L
         totalPrice += drawNormalList(savingSacks, list)
         totalPrice += drawGemstoneDisplay(list)
@@ -69,7 +71,7 @@ object SackDisplay {
         return list
     }
 
-    private fun drawNormalList(savingSacks: Boolean, newDisplay: MutableList<List<Any>>): Long {
+    private fun drawNormalList(savingSacks: Boolean, list: MutableList<Renderable>): Long {
         SackAPI.getSacksData(savingSacks)
         val sackItems = SackAPI.sackItem.toList()
         if (sackItems.isEmpty()) return 0L
@@ -91,7 +93,8 @@ object SackDisplay {
             }
         }
         val amountShowing = if (config.itemToShow > sortedPairs.size) sortedPairs.size else config.itemToShow
-        newDisplay.addAsSingletonList("§7Items in Sacks: §o(Rendering $amountShowing of ${sortedPairs.size} items)")
+        list.addString("§7Items in Sacks: §o(Rendering $amountShowing of ${sortedPairs.size} items)")
+        val table = mutableListOf<List<Renderable>>()
         for ((itemName, item) in sortedPairs) {
 
             val (internalName, colorCode, stored, total, price, magmaFish) = item
@@ -99,15 +102,15 @@ object SackDisplay {
             if (rendered >= config.itemToShow) continue
             if (stored == 0 && !config.showEmpty) continue
             val itemStack = internalName.getItemStack()
-            newDisplay.add(buildList {
-                add(" §7- ")
-                add(itemStack)
+            table.add(buildList {
+                addString(" §7- ")
+                addItemStack(itemStack)
                 if (!SackAPI.isTrophySack) add(Renderable.optionalLink("${itemName.replace("§k", "")}: ", {
                     BazaarApi.searchForBazaarItem(itemName)
                 }) { !NEUItems.neuHasFocus() })
-                else add("${itemName.replace("§k", "")}: ")
+                else addString("${itemName.replace("§k", "")}: ")
 
-                add(
+                addString(
                     when (config.numberFormat) {
                         NumberFormatEntry.DEFAULT -> "$colorCode${stored}§7/§b${NumberUtil.format(total)}"
                         NumberFormatEntry.FORMATTED -> {
@@ -122,7 +125,7 @@ object SackDisplay {
                     }
                 )
 
-                if (colorCode == "§a") add(" §c§l(Full!)")
+                if (colorCode == "§a") addString(" §c§l(Full!)")
                 if (SackAPI.isTrophySack && magmaFish > 0) {
                     totalMagmaFish += magmaFish
                     add(
@@ -135,23 +138,25 @@ object SackDisplay {
                             )
                         )
                     )
-                    add("MAGMA_FISH".asInternalName().getItemStack())
-                    add("§7)")
+                    //TOOD add cache
+                    addItemStack("MAGMA_FISH".asInternalName().getItemStack())
+                    addString("§7)")
                 }
-                if (config.showPrice && price != 0L) add(" §7(§6${format(price)}§7)")
+                if (config.showPrice && price != 0L) addString(" §7(§6${format(price)}§7)")
             })
             rendered++
         }
+        list.add(Renderable.table(table))
 
-        if (SackAPI.isTrophySack) newDisplay.addAsSingletonList("§cTotal Magmafish: §6${totalMagmaFish.addSeparators()}")
+        if (SackAPI.isTrophySack) list.addString("§cTotal Magmafish: §6${totalMagmaFish.addSeparators()}")
         return totalPrice
     }
 
-    private fun drawOptions(newDisplay: MutableList<List<Any>>, totalPrice: Long) {
+    private fun drawOptions(list: MutableList<Renderable>, totalPrice: Long) {
         val name = SortType.entries[config.sortingType.ordinal].longName // todo avoid ordinal
-        newDisplay.addAsSingletonList("§7Sorted By: §c$name")
+        list.addString("§7Sorted By: §c$name")
 
-        newDisplay.addSelector<SortType>(" ",
+        list.addSelector<SortType>(" ",
             getName = { type -> type.shortName },
             isCurrent = { it.ordinal == config.sortingType.ordinal }, // todo avoid ordinal
             onChange = {
@@ -159,7 +164,7 @@ object SackDisplay {
                 update(false)
             })
 
-        newDisplay.addButton(
+        list.addButton(
             prefix = "§7Number format: ",
             getName = NumberFormat.entries[config.numberFormat.ordinal].displayName, // todo avoid ordinal
             onChange = {
@@ -171,14 +176,14 @@ object SackDisplay {
         )
 
         if (config.showPrice) {
-            newDisplay.addSelector<PriceFrom>(" ",
+            list.addSelector<PriceFrom>(" ",
                 getName = { type -> type.displayName },
                 isCurrent = { it.ordinal == config.priceFrom.ordinal }, // todo avoid ordinal
                 onChange = {
                     config.priceFrom = SackDisplayConfig.PriceFrom.entries[it.ordinal] // todo avoid ordinal
                     update(false)
                 })
-            newDisplay.addButton(
+            list.addButton(
                 prefix = "§7Price Format: ",
                 getName = PriceFormat.entries[config.priceFormat.ordinal].displayName, // todo avoid ordinal
                 onChange = {
@@ -188,43 +193,47 @@ object SackDisplay {
                     update(false)
                 }
             )
-            newDisplay.addAsSingletonList("§eTotal price: §6${format(totalPrice)}")
+            list.addString("§eTotal price: §6${format(totalPrice)}")
         }
     }
 
-    private fun drawRunesDisplay(newDisplay: MutableList<List<Any>>) {
+    private fun drawRunesDisplay(list: MutableList<Renderable>) {
         if (SackAPI.runeItem.isEmpty()) return
-        newDisplay.addAsSingletonList("§7Runes:")
+        list.addString("§7Runes:")
+        val table = mutableListOf<List<Renderable>>()
         for ((name, rune) in SackAPI.runeItem) {
-            val list = mutableListOf<Any>()
             val (stack, lv1, lv2, lv3) = rune
-            list.add(" §7- ")
-            stack?.let { list.add(it) }
-            list.add(name)
-            list.add(" §f(§e$lv1§7-§e$lv2§7-§e$lv3§f)")
-            newDisplay.add(list)
+            table.add(buildList {
+                addString(" §7- ")
+                stack?.let { addItemStack(it) }
+                addString(name)
+                addString(" §f(§e$lv1§7-§e$lv2§7-§e$lv3§f)")
+            })
         }
+        list.add(Renderable.table(table))
     }
 
-    private fun drawGemstoneDisplay(newDisplay: MutableList<List<Any>>): Long {
+    private fun drawGemstoneDisplay(list: MutableList<Renderable>): Long {
         if (SackAPI.gemstoneItem.isEmpty()) return 0L
-        newDisplay.addAsSingletonList("§7Gemstones:")
+        list.addString("§7Gemstones:")
         var totalPrice = 0L
+        val table = mutableListOf<List<Renderable>>()
         for ((name, gem) in SackAPI.gemstoneItem) {
             val (internalName, rough, flawed, fine, roughprice, flawedprice, fineprice) = gem
-            newDisplay.add(buildList {
-                add(" §7- ")
-                add(internalName.getItemStack())
+            table.add(buildList {
+                addString(" §7- ")
+                addItemStack(internalName.getItemStack())
                 add(Renderable.optionalLink("$name: ", {
                     BazaarApi.searchForBazaarItem(name.dropLast(1))
                 }) { !NEUItems.neuHasFocus() })
-                add(" (${rough.addSeparators()}-§a${flawed.addSeparators()}-§9${fine.addSeparators()})")
+                addString(" (${rough.addSeparators()}-§a${flawed.addSeparators()}-§9${fine.addSeparators()})")
                 val price = roughprice + flawedprice + fineprice
                 totalPrice += price
-                if (config.showPrice && price != 0L) add(" §7(§6${format(price)}§7)")
+                if (config.showPrice && price != 0L) addString(" §7(§6${format(price)}§7)")
             })
         }
-        newDisplay.addAsSingletonList("§eTotal price: §6${format(totalPrice)}")
+        list.add(Renderable.table(table))
+        list.addString("§eTotal price: §6${format(totalPrice)}")
         return totalPrice
     }
 

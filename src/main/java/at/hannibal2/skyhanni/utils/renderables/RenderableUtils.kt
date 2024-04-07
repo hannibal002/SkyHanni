@@ -1,8 +1,11 @@
 package at.hannibal2.skyhanni.utils.renderables
 
+import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.RenderUtils.HorizontalAlignment
 import at.hannibal2.skyhanni.utils.RenderUtils.VerticalAlignment
+import at.hannibal2.skyhanni.utils.SoundUtils
 import net.minecraft.client.renderer.GlStateManager
+import net.minecraft.item.ItemStack
 
 internal object RenderableUtils {
 
@@ -65,4 +68,69 @@ internal object RenderableUtils {
         GlStateManager.translate(0f, -yOffset.toFloat(), 0f)
     }
 
+    // TODO add cache
+    fun MutableList<Renderable>.addString(text: String) {
+        add(Renderable.string(text))
+    }
+
+    // TODO add internal name support, and caching
+    fun MutableList<Renderable>.addItemStack(itemStack: ItemStack) {
+        add(Renderable.itemStack(itemStack))
+    }
+
+    inline fun <reified T : Enum<T>> MutableList<Renderable>.addSelector(
+        prefix: String,
+        getName: (T) -> String,
+        isCurrent: (T) -> Boolean,
+        crossinline onChange: (T) -> Unit,
+    ) {
+        add(Renderable.horizontalContainer(buildSelector<T>(prefix, getName, isCurrent, onChange)))
+    }
+
+    inline fun <reified T : Enum<T>> buildSelector(
+        prefix: String,
+        getName: (T) -> String,
+        isCurrent: (T) -> Boolean,
+        crossinline onChange: (T) -> Unit,
+    ) = buildList {
+        addString(prefix)
+        for (entry in enumValues<T>()) {
+            val display = getName(entry)
+            if (isCurrent(entry)) {
+                addString("§a[$display]")
+            } else {
+                addString("§e[")
+                add(Renderable.link("§e$display") {
+                    onChange(entry)
+                })
+                addString("§e]")
+            }
+            addString(" ")
+        }
+    }
+
+    inline fun MutableList<Renderable>.addButton(
+        prefix: String,
+        getName: String,
+        crossinline onChange: () -> Unit,
+        tips: List<String> = emptyList(),
+    ) {
+        val onClick = {
+            if ((System.currentTimeMillis() - ChatUtils.lastButtonClicked) > 150) { // funny thing happen if I don't do that
+                onChange()
+                SoundUtils.playClickSound()
+                ChatUtils.lastButtonClicked = System.currentTimeMillis()
+            }
+        }
+        add(Renderable.horizontalContainer(buildList {
+            addString(prefix)
+            addString("§a[")
+            if (tips.isEmpty()) {
+                add(Renderable.link("§e$getName", false, onClick))
+            } else {
+                add(Renderable.clickAndHover("§e$getName", tips, false, onClick))
+            }
+            addString("§a]")
+        }))
+    }
 }
