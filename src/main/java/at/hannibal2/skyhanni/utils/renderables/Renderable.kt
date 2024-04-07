@@ -13,7 +13,10 @@ import at.hannibal2.skyhanni.utils.LorenzLogger
 import at.hannibal2.skyhanni.utils.NEUItems.renderOnScreen
 import at.hannibal2.skyhanni.utils.RenderUtils.HorizontalAlignment
 import at.hannibal2.skyhanni.utils.RenderUtils.VerticalAlignment
+import at.hannibal2.skyhanni.utils.renderables.RenderableUtils.calculateTableXOffsets
+import at.hannibal2.skyhanni.utils.renderables.RenderableUtils.calculateTableYOffsets
 import at.hannibal2.skyhanni.utils.renderables.RenderableUtils.renderXAligned
+import at.hannibal2.skyhanni.utils.renderables.RenderableUtils.renderXYAligned
 import at.hannibal2.skyhanni.utils.renderables.RenderableUtils.renderYAligned
 import io.github.moulberry.moulconfig.gui.GuiScreenElementWrapper
 import io.github.moulberry.notenoughupdates.util.Utils
@@ -314,16 +317,6 @@ interface Renderable {
             }
         }
 
-        fun placeholder(width: Int, height: Int = 10) = object : Renderable {
-            override val width = width
-            override val height = height
-            override val horizontalAlign = HorizontalAlignment.LEFT
-            override val verticalAlign = VerticalAlignment.TOP
-
-            override fun render(posX: Int, posY: Int) {
-            }
-        }
-
         fun wrappedString(
             text: String,
             width: Int,
@@ -362,6 +355,51 @@ interface Renderable {
                 }
                 GlStateManager.scale(inverseScale, inverseScale, 1.0)
                 GlStateManager.translate(-1.0, -1.0, 0.0)
+            }
+        }
+
+        fun placeholder(width: Int, height: Int = 10) = object : Renderable {
+            override val width = width
+            override val height = height
+            override val horizontalAlign = HorizontalAlignment.LEFT
+            override val verticalAlign = VerticalAlignment.TOP
+
+            override fun render(posX: Int, posY: Int) {
+            }
+        }
+
+        /**
+         * @param content the list of rows the table should render
+         */
+        fun table(
+            content: List<List<Renderable?>>,
+            xPadding: Int = 1,
+            yPadding: Int = 0,
+            horizontalAlign: HorizontalAlignment = HorizontalAlignment.LEFT,
+            verticalAlign: VerticalAlignment = VerticalAlignment.TOP,
+        ) = object : Renderable {
+            val xOffsets: List<Int> = calculateTableXOffsets(content, xPadding)
+            val yOffsets: List<Int> = calculateTableYOffsets(content, yPadding)
+            override val horizontalAlign = horizontalAlign
+            override val verticalAlign = verticalAlign
+
+            override val width = xOffsets.last() - xPadding
+            override val height = yOffsets.last() - yPadding
+
+            override fun render(posX: Int, posY: Int) {
+                content.forEachIndexed { rowIndex, row ->
+                    row.forEachIndexed { index, renderable ->
+                        GlStateManager.pushMatrix()
+                        GlStateManager.translate(xOffsets[index].toFloat(), yOffsets[rowIndex].toFloat(), 0F)
+                        renderable?.renderXYAligned(
+                            posX + xOffsets[index],
+                            posY + yOffsets[rowIndex],
+                            xOffsets[index + 1] - xOffsets[index],
+                            yOffsets[rowIndex + 1] - yOffsets[rowIndex]
+                        )
+                        GlStateManager.popMatrix()
+                    }
+                }
             }
         }
 
