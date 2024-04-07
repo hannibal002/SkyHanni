@@ -109,21 +109,15 @@ data class LorenzVec(
         }
     }
 
-    fun toCleanString(): String {
-        return "$x $y $z"
-    }
+    fun toCleanString(): String = "$x $y $z"
 
-    fun length(): Double {
-        return sqrt(x * x + y * y + z * z)
-    }
+    fun length(): Double = sqrt(x * x + y * y + z * z)
 
     fun isZero(): Boolean = x == 0.0 && y == 0.0 && z == 0.0
 
     fun clone(): LorenzVec = LorenzVec(x, y, z)
 
-    fun toDoubleArray(): Array<Double> {
-        return arrayOf(x, y, z)
-    }
+    fun toDoubleArray(): Array<Double> = arrayOf(x, y, z)
 
     fun equalsIgnoreY(other: LorenzVec) = x == other.x && z == other.z
 
@@ -163,9 +157,7 @@ data class LorenzVec(
     fun boundingToOffset(offX: Double, offY: Double, offZ: Double) =
         AxisAlignedBB(x, y, z, x + offX, y + offY, z + offZ)
 
-    fun scale(scalar: Double): LorenzVec {
-        return LorenzVec(scalar * x, scalar * y, scalar * z)
-    }
+    fun scale(scalar: Double): LorenzVec = LorenzVec(scalar * x, scalar * y, scalar * z)
 
     fun applyTranslationToGL() {
         GlStateManager.translate(x, y, z)
@@ -173,9 +165,7 @@ data class LorenzVec(
 
     fun axisAlignedTo(other: LorenzVec) = AxisAlignedBB(x, y, z, other.x, other.y, other.z)
 
-    fun up(offset: Double): LorenzVec {
-        return copy(y = y + offset)
-    }
+    fun up(offset: Double): LorenzVec = copy(y = y + offset)
 
     fun interpolate(other: LorenzVec, factor: Double): LorenzVec {
         require(factor in 0.0..1.0) { "Percentage must be between 0 and 1: $factor" }
