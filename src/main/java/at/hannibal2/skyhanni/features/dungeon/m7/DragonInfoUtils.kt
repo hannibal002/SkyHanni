@@ -1,6 +1,7 @@
 package at.hannibal2.skyhanni.features.dungeon.m7
 
 import at.hannibal2.skyhanni.data.mob.Mob
+import at.hannibal2.skyhanni.events.DebugDataCollectEvent
 import at.hannibal2.skyhanni.events.DungeonCompleteEvent
 import at.hannibal2.skyhanni.events.DungeonM7Phase5Start
 import at.hannibal2.skyhanni.events.LorenzWorldChangeEvent
@@ -96,5 +97,20 @@ class DragonInfoUtils {
     @SubscribeEvent
     fun onLeave(event: LorenzWorldChangeEvent) {
         if (inPhase5) inPhase5 = false
+    }
+
+    @SubscribeEvent
+    fun onDebug(event: DebugDataCollectEvent) {
+        event.title("M7 Dragon Info")
+        if (!inPhase5) {
+            event.addIrrelevant("not in phase5")
+            return
+        }
+
+        event.addData("Power: ${M7DragonInfo.POWER.status}, ${M7DragonInfo.POWER.status.id}")
+        event.addData("Flame: ${M7DragonInfo.FLAME.status}, ${M7DragonInfo.FLAME.status.id}")
+        event.addData("Apex: ${M7DragonInfo.APEX.status}, ${M7DragonInfo.APEX.status.id}")
+        event.addData("Ice: ${M7DragonInfo.ICE.status}, ${M7DragonInfo.ICE.status.id}")
+        event.addData("Soul: ${M7DragonInfo.SOUL.status}, ${M7DragonInfo.SOUL.status.id}")
     }
 }
