@@ -23,7 +23,6 @@ import at.hannibal2.skyhanni.utils.NEUItems
 import at.hannibal2.skyhanni.utils.NEUItems.getItemStack
 import at.hannibal2.skyhanni.utils.NumberUtil
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
-import at.hannibal2.skyhanni.utils.NumberUtil.formatNumber
 import at.hannibal2.skyhanni.utils.RenderUtils.highlight
 import at.hannibal2.skyhanni.utils.RenderUtils.renderStringsAndItems
 import at.hannibal2.skyhanni.utils.renderables.Renderable
@@ -70,15 +69,15 @@ object SackDisplay {
         val sackItems = SackAPI.sackItem.toList()
         if (sackItems.isNotEmpty()) {
             val sortedPairs: MutableMap<String, SackAPI.SackOtherItem> = when (config.sortingType) {
-                SortingTypeEntry.DESC_STORED -> sackItems.sortedByDescending { it.second.stored.formatNumber() }
-                SortingTypeEntry.ASC_STORED -> sackItems.sortedBy { it.second.stored.formatNumber() }
+                SortingTypeEntry.DESC_STORED -> sackItems.sortedByDescending { it.second.stored }
+                SortingTypeEntry.ASC_STORED -> sackItems.sortedBy { it.second.stored }
                 SortingTypeEntry.DESC_PRICE -> sackItems.sortedByDescending { it.second.price }
                 SortingTypeEntry.ASC_PRICE -> sackItems.sortedBy { it.second.price }
-                else -> sackItems.sortedByDescending { it.second.stored.formatNumber() }
+                else -> sackItems.sortedByDescending { it.second.stored }
             }.toMap().toMutableMap()
 
             sortedPairs.toList().forEach { (k, v) ->
-                if (v.stored == "0" && !config.showEmpty) {
+                if (v.stored == 0 && !config.showEmpty) {
                     sortedPairs.remove(k)
                 }
             }
@@ -90,7 +89,7 @@ object SackDisplay {
                 val (internalName, colorCode, stored, total, price, magmaFish) = item
                 totalPrice += price
                 if (rendered >= config.itemToShow) continue
-                if (stored == "0" && !config.showEmpty) continue
+                if (stored == 0 && !config.showEmpty) continue
                 val itemStack = internalName.getItemStack()
                 newDisplay.add(buildList {
                     add(" §7- ")
@@ -102,10 +101,13 @@ object SackDisplay {
 
                     add(
                         when (config.numberFormat) {
-                            NumberFormatEntry.DEFAULT -> "$colorCode${stored}§7/§b${total}"
-                            NumberFormatEntry.FORMATTED -> "$colorCode${NumberUtil.format(stored.formatNumber())}§7/§b${total}"
+                            NumberFormatEntry.DEFAULT -> "$colorCode${stored}§7/§b${NumberUtil.format(total)}"
+                            NumberFormatEntry.FORMATTED -> {
+                                "$colorCode${NumberUtil.format(stored)}§7/§b${NumberUtil.format(total)}"
+                            }
+
                             NumberFormatEntry.UNFORMATTED -> "$colorCode${stored}§7/§b${
-                                total.formatNumber().addSeparators()
+                                total.addSeparators()
                             }"
 
                             else -> "$colorCode${stored}§7/§b${total}"
@@ -121,7 +123,7 @@ object SackDisplay {
                                 listOf(
                                     "§6Magmafish: §b${magmaFish.addSeparators()}",
                                     "§6Magmafish value: §b${price / magmaFish}",
-                                    "§6Magmafish per: §b${magmaFish / stored.formatNumber()}"
+                                    "§6Magmafish per: §b${magmaFish / stored}"
                                 )
                             )
                         )
@@ -148,7 +150,7 @@ object SackDisplay {
 
             newDisplay.addButton(
                 prefix = "§7Number format: ",
-                getName = NumberFormat.entries[config.numberFormat.ordinal].DisplayName, // todo avoid ordinal
+                getName = NumberFormat.entries[config.numberFormat.ordinal].displayName, // todo avoid ordinal
                 onChange = {
                     // todo avoid ordinal
                     config.numberFormat =
@@ -202,7 +204,7 @@ object SackDisplay {
                     add(Renderable.optionalLink("$name: ", {
                         BazaarApi.searchForBazaarItem(name.dropLast(1))
                     }) { !NEUItems.neuHasFocus() })
-                    add(" ($rough-§a$flawed-§9$fine)")
+                    add(" (${rough.addSeparators()}-§a${flawed.addSeparators()}-§9${fine.addSeparators()})")
                     val price = roughprice + flawedprice + fineprice
                     totalPrice += price
                     if (config.showPrice && price != 0L) add(" §7(§6${format(price)}§7)")
@@ -234,14 +236,15 @@ object SackDisplay {
 
     enum class PriceFormat(val displayName: String) {
         FORMATED("Formatted"),
-        UNFORMATED("Unformatted")
+        UNFORMATED("Unformatted"),
         ;
     }
 
-    enum class NumberFormat(val DisplayName: String) {
+    enum class NumberFormat(val displayName: String) {
         DEFAULT("Default"),
         FORMATTED("Formatted"),
-        UNFORMATTED("Unformatted")
+        UNFORMATTED("Unformatted"),
+        ;
     }
 
     @SubscribeEvent

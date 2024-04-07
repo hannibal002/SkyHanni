@@ -132,12 +132,6 @@ object LorenzUtils {
     fun formatPercentage(percentage: Double, format: String?): String =
         DecimalFormat(format).format(percentage * 100).replace(',', '.') + "%"
 
-    @Deprecated("old code", ReplaceWith("i.addSeparators()"))
-    fun formatInteger(i: Int): String = i.addSeparators()
-
-    @Deprecated("old code", ReplaceWith("l.addSeparators()"))
-    fun formatInteger(l: Long): String = l.addSeparators()
-
     @Deprecated("old code", ReplaceWith("d.round(round).addSeparators()"))
     fun formatDouble(d: Double, round: Int = 1): String {
         return d.round(round).addSeparators()
