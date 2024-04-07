@@ -148,9 +148,9 @@ object SackAPI {
                     }
                 }
             } else if (isRuneSack) {
+                val rune = SackRune()
                 for (line in lore) {
                     numPattern.matchMatcher(line) {
-                        val rune = SackRune()
                         val level = group("level").romanToDecimal()
                         val stored = group("stored").formatInt()
                         rune.stack = stack
