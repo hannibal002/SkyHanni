@@ -18,6 +18,17 @@
 + Added customizable Inquisitor Highlight color. - Empa (https://github.com/hannibal002/SkyHanni/pull/1323)
 + Added mobs since last Inquisitor to Mythological Creature Tracker. - CuzImClicks (https://github.com/hannibal002/SkyHanni/pull/1346)
 
+#### Mining Features
+
++ Added Area Walls. - Thunderblade73 (https://github.com/hannibal002/SkyHanni/pull/1266)
+    + Show walls between the main areas of the Crystal Hollows.
+    + Option to show the walls also when inside the Nucleus.
+
+#### Dungeon Features
+
++ Added SA Jump Notification. - CarsCupcake (https://github.com/hannibal002/SkyHanni/pull/852)
+    + Warn shorty before a Shadow Assassin jumps to you in dungeons.
+
 #### Misc Features
 
 + Added No Bits Available Warning. - Empa (https://github.com/hannibal002/SkyHanni/pull/1286)
@@ -29,11 +40,16 @@
 
 + Added warnings when Farming Fortune/Crop Fortune aren't found in tab list. - Empa (https://github.com/hannibal002/SkyHanni/pull/1330)
 + Added highlight slot while hovering over line for Anita medal profit and SkyMart copper price. - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/1118)
++ SkyMart and Anita Medal prices are now perfectly aligned in the displays. - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/1376)
++ Clear plot sprays when Portable Washer is used. - Alexia Luna (https://github.com/hannibal002/SkyHanni/pull/1178)
 
 #### Diana Improvements
 
 + Now detecting inquisitor share chat messages from CT module "InquisitorChecker". - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/1315)
 + Added kills since last inquis to chat message when digging one up. - Empa (https://github.com/hannibal002/SkyHanni/pull/1363)
++ Inquisitor sharing can now detect coordinates from all chat. - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/1316)
+    + Disabled per default.
++ Now detecting inquisitor share messages sent from CT module "InquisitorChecker". - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/1359)
 
 #### GUI Improvements
 
@@ -66,6 +82,7 @@
 + Fixed crop fortune message spam. - Empa (https://github.com/hannibal002/SkyHanni/pull/1364)
 + Fixed coins from leveling up farming counting to Pest Profit Tracker. - Empa (https://github.com/hannibal002/SkyHanni/pull/1358)
 + Fixed not being able to teleport to other infested plots immediately after killing a pest. - Empa (https://github.com/hannibal002/SkyHanni/pull/1357)
++ Fixed Jacob's contest detection. - HiZe (https://github.com/hannibal002/SkyHanni/pull/1375)
 
 #### Chat Fixes
 
@@ -79,6 +96,15 @@
 + Fixed coop banks not being affected by "hide empty numbers" in Custom Scoreboard. - j10a1n15 (https://github.com/hannibal002/SkyHanni/pull/1328)
 + Fixed bits available being subtracted in an infinite loop. - Empa (https://github.com/hannibal002/SkyHanni/pull/1292)
 + Fixed not setting No Power Active. - Empa (https://github.com/hannibal002/SkyHanni/pull/1366)
++ Fixed Objective Lines never being shown in Custom Scoreboard. - j10a1n15 (https://github.com/hannibal002/SkyHanni/pull/1377)
+
+#### Dungeon Fixes
+
++ Dungeon Copilot no longer tells you to enter the nonexistent boss room in The Catacombs - Entrance. - Alexia Luna (https://github.com/hannibal002/SkyHanni/pull/1374)
+
+#### Bingo Fixes
+
++ Fixes rare error when hovering over a row item in Bingo Card. - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/1370)
 
 #### Misc Fixes
 
@@ -116,6 +142,19 @@
 + Added HighlightOnHoverSlot. - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/1118)
 + Added BitsUpdateEvent. - Empa (https://github.com/hannibal002/SkyHanni/pull/1286)
 + Fixed default fame rank being null. - Empa (https://github.com/hannibal002/SkyHanni/pull/1286)
++ Mob Detection logEvents to file. - Thunderblade73 (https://github.com/hannibal002/SkyHanni/pull/1379)
++ Split sack display render code into multiple functions. - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/1380)
++ Added Renderable.verticalContainer. - Thunderblade73 (https://github.com/hannibal002/SkyHanni/pull/1318)
++ Remove a lot of deprecated methods. - CalMWolfs (https://github.com/hannibal002/SkyHanni/pull/1371)
++ Added Renderable.table - Thunderblade73 (https://github.com/hannibal002/SkyHanni/pull/822)
++ Add API for rendering fake ghostly/holograhpic entities in the world - !nea (https://github.com/hannibal002/SkyHanni/pull/731)
++ Added a `removeSpray` method to `Plot`. - Alexia Luna (https://github.com/hannibal002/SkyHanni/pull/1178)
++ Changed stuff around with chat messages. - CalMWolfs (https://github.com/hannibal002/SkyHanni/pull/1227)
++ Added config option to overwrite current mayor. - j10a1n15 (https://github.com/hannibal002/SkyHanni/pull/1302)
+    + This replaces all "Always <mayor>" options.
++ Add isEnabled to BasketWaypoints and remove unused code line. - CalMWolfs (https://github.com/hannibal002/SkyHanni/pull/1207)
++ Added feature toggle adapter to automatically turn on features. - nea (https://github.com/hannibal002/SkyHanni/pull/581)
++ Fixed mob detection: decoy, m7 dragon, husks. - Thunderblade73 (https://github.com/hannibal002/SkyHanni/pull/1367)
 
 ### Removed Features
 
