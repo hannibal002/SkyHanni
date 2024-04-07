@@ -59,7 +59,7 @@ object DungeonAPI {
         "§.\\s+§.§.(?:The|Master Mode) Catacombs §.§.- §.§.(?:Floor )?(?<floor>M?[IV]{1,3}|Entrance)"
     )
 
-    fun inDungeon() = dungeonFloor != null
+    fun inDungeon() = IslandType.CATACOMBS.isInIsland()
 
     fun isOneOf(vararg floors: String) = dungeonFloor?.equalsOneOf(*floors) == true
 

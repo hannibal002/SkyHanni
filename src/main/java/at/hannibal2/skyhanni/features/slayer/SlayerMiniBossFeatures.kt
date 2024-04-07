@@ -70,7 +70,7 @@ class SlayerMiniBossFeatures {
         }
     }
 
-    private fun isEnabled() = LorenzUtils.inSkyBlock && !IslandType.CATACOMBS.isInIsland() && !LorenzUtils.inKuudraFight
+    private fun isEnabled() = LorenzUtils.inSkyBlock && !DungeonAPI.inDungeon() && !LorenzUtils.inKuudraFight
 
     enum class SlayerMiniBossType(val clazz: Class<out EntityCreature>, vararg val health: Int) {
         REVENANT(EntityZombie::class.java, 24_000, 90_000, 360_000, 600_000, 2_400_000),

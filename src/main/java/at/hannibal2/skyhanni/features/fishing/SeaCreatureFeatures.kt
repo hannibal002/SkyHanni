@@ -96,7 +96,7 @@ class SeaCreatureFeatures {
         event.move(2, "fishing.rareSeaCreatureHighlight", "fishing.rareCatches.highlight")
     }
 
-    private fun isEnabled() = LorenzUtils.inSkyBlock && !IslandType.CATACOMBS.isInIsland() && !LorenzUtils.inKuudraFight
+    private fun isEnabled() = LorenzUtils.inSkyBlock && !DungeonAPI.inDungeon() && !LorenzUtils.inKuudraFight
 
     private val getEntityOutlineColor: (entity: Entity) -> Int? = { entity ->
         if (entity is EntityLivingBase && entity in rareSeaCreatures && entity.distanceToPlayer() < 30) {

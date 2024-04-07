@@ -2,13 +2,13 @@ package at.hannibal2.skyhanni.features.inventory.bazaar
 
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
-import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.events.BazaarOpenedProductEvent
 import at.hannibal2.skyhanni.events.GuiContainerEvent
 import at.hannibal2.skyhanni.events.InventoryCloseEvent
 import at.hannibal2.skyhanni.events.InventoryFullyOpenedEvent
 import at.hannibal2.skyhanni.events.LorenzChatEvent
 import at.hannibal2.skyhanni.events.LorenzTickEvent
+import at.hannibal2.skyhanni.features.dungeon.DungeonAPI
 import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.InventoryUtils.getAllItems
@@ -17,7 +17,6 @@ import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.ItemUtils.name
 import at.hannibal2.skyhanni.utils.LorenzColor
 import at.hannibal2.skyhanni.utils.LorenzUtils
-import at.hannibal2.skyhanni.utils.LorenzUtils.isInIsland
 import at.hannibal2.skyhanni.utils.NEUInternalName
 import at.hannibal2.skyhanni.utils.NEUItems
 import at.hannibal2.skyhanni.utils.OSUtils
@@ -61,7 +60,7 @@ class BazaarApi {
             if (!LorenzUtils.inSkyBlock) return
             if (NEUItems.neuHasFocus()) return
             if (LorenzUtils.noTradeMode) return
-            if (IslandType.CATACOMBS.isInIsland() || LorenzUtils.inKuudraFight) return
+            if (DungeonAPI.inDungeon() || LorenzUtils.inKuudraFight) return
             ChatUtils.sendCommandToServer("bz ${displayName.removeColor()}")
             if (amount != -1) OSUtils.copyToClipboard(amount.toString())
             currentSearchedItem = displayName.removeColor()

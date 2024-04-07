@@ -82,7 +82,7 @@ class MobFinder {
     private var floor6SadanSpawnTime = 0L
 
     internal fun tryAdd(entity: EntityLivingBase) = when {
-        IslandType.CATACOMBS.isInIsland() -> tryAddDungeon(entity)
+        DungeonAPI.inDungeon() -> tryAddDungeon(entity)
         RiftAPI.inRift() -> tryAddRift(entity)
         GardenAPI.inGarden() -> tryAddGarden(entity)
         else -> {
@@ -608,7 +608,7 @@ class MobFinder {
     }
 
     fun handleNewEntity(entity: Entity) {
-        if (IslandType.CATACOMBS.isInIsland() && floor3ProfessorGuardian && entity is EntityGuardian && floor3ProfessorGuardianEntity == null) {
+        if (DungeonAPI.inDungeon() && floor3ProfessorGuardian && entity is EntityGuardian && floor3ProfessorGuardianEntity == null) {
             floor3ProfessorGuardianEntity = entity
             floor3ProfessorGuardianPrepare = false
         }

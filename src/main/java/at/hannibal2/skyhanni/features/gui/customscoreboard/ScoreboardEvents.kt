@@ -3,6 +3,7 @@ package at.hannibal2.skyhanni.features.gui.customscoreboard
 import at.hannibal2.skyhanni.data.HypixelData
 import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.data.ScoreboardData
+import at.hannibal2.skyhanni.features.dungeon.DungeonAPI
 import at.hannibal2.skyhanni.features.gui.customscoreboard.CustomScoreboard.Companion.eventsConfig
 import at.hannibal2.skyhanni.features.gui.customscoreboard.ScoreboardEvents.VOTING
 import at.hannibal2.skyhanni.features.gui.customscoreboard.ScoreboardPattern
@@ -259,7 +260,7 @@ private fun getDungeonsLines() = listOf(
     getSbLines().filter { line -> patterns.any { it.matches(line) } }.map { it.removePrefix("§r") }
 }
 
-private fun getDungeonsShowWhen(): Boolean = IslandType.CATACOMBS.isInIsland()
+private fun getDungeonsShowWhen(): Boolean = DungeonAPI.inDungeon()
 
 private fun getKuudraLines() = listOf(
     SbPattern.autoClosingPattern,

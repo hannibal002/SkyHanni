@@ -132,7 +132,7 @@ class DungeonCopilot {
         changeNextStep("")
     }
 
-    private fun isEnabled(): Boolean = IslandType.CATACOMBS.isInIsland() && config.enabled
+    private fun isEnabled(): Boolean = DungeonAPI.inDungeon() && config.enabled
 
     @SubscribeEvent
     fun onRenderOverlay(event: GuiRenderEvent.GuiOverlayRenderEvent) {
