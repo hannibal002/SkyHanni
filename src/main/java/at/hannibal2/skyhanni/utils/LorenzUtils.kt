@@ -176,26 +176,23 @@ object LorenzUtils {
 
     fun getPlayerName(): String = Minecraft.getMinecraft().thePlayer.name
 
-    fun MutableList<List<Any>>.fillTable(data: List<DisplayTableEntry>) {
+    fun fillTable(data: List<DisplayTableEntry>, padding: Int = 1, itemScale: Double = 1.0): Renderable {
         val sorted = data.sortedByDescending { it.sort }
-        val renderer = Minecraft.getMinecraft().fontRendererObj
-        val longest = sorted.maxOfOrNull { renderer.getStringWidth(it.left.removeColor()) } ?: 0
 
+        val outerList = mutableListOf<List<Renderable>>()
         for (entry in sorted) {
-            var displayName = entry.left
-            while (renderer.getStringWidth(displayName.removeColor()) < longest) {
-                displayName += " "
-            }
-
-            val renderable = Renderable.hoverTips(
-                "$displayName   ${entry.right}",
+            val item = entry.item.getItemStackOrNull()?.let {
+                Renderable.itemStack(it, scale = itemScale)
+            } ?: continue
+            val left = Renderable.hoverTips(
+                entry.left,
                 tips = entry.hover,
                 highlightsOnHoverSlots = entry.highlightsOnHoverSlots
             )
-            entry.item.getItemStackOrNull()?.let {
-                add(listOf(it, renderable))
-            }
+            val right = Renderable.string(entry.right)
+            outerList.add(listOf(item, left, right))
         }
+        return Renderable.table(outerList, xPadding = 5, yPadding = padding)
     }
 
     fun setTextIntoSign(text: String, line: Int = 0) {
