@@ -69,8 +69,12 @@ internal object RenderableUtils {
     }
 
     // TODO add cache
-    fun MutableList<Renderable>.addString(text: String) {
-        add(Renderable.string(text))
+    fun MutableList<Renderable>.addString(
+        text: String,
+        horizontalAlign: HorizontalAlignment = HorizontalAlignment.LEFT,
+        verticalAlign: VerticalAlignment = VerticalAlignment.TOP,
+    ) {
+        add(Renderable.string(text, horizontalAlign = horizontalAlign, verticalAlign = verticalAlign))
     }
 
     // TODO add internal name support, and caching

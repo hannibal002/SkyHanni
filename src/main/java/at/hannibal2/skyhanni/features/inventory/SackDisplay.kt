@@ -105,44 +105,61 @@ object SackDisplay {
             table.add(buildList {
                 addString(" §7- ")
                 addItemStack(itemStack)
-                if (!SackAPI.isTrophySack) add(Renderable.optionalLink("${itemName.replace("§k", "")}: ", {
+                // TODO move replace into itemName
+                if (!SackAPI.isTrophySack) add(Renderable.optionalLink(itemName.replace("§k", ""), {
                     BazaarApi.searchForBazaarItem(itemName)
                 }) { !NEUItems.neuHasFocus() })
-                else addString("${itemName.replace("§k", "")}: ")
+                else addString("${itemName.replace("§k", "")} ")
 
-                addString(
-                    when (config.numberFormat) {
-                        NumberFormatEntry.DEFAULT -> "$colorCode${stored}§7/§b${NumberUtil.format(total)}"
-                        NumberFormatEntry.FORMATTED -> {
-                            "$colorCode${NumberUtil.format(stored)}§7/§b${NumberUtil.format(total)}"
-                        }
-
-                        NumberFormatEntry.UNFORMATTED -> "$colorCode${stored}§7/§b${
-                            total.addSeparators()
-                        }"
-
-                        else -> "$colorCode${stored}§7/§b${total}"
+                when (config.numberFormat) {
+                    NumberFormatEntry.DEFAULT -> {
+                        addAlignedNumber("$colorCode${stored.addSeparators()}")
+                        addString("§7/")
+                        addAlignedNumber("§b${NumberUtil.format(total)}")
                     }
-                )
 
-                if (colorCode == "§a") addString(" §c§l(Full!)")
+                    NumberFormatEntry.FORMATTED -> {
+                        addAlignedNumber("$colorCode${NumberUtil.format(stored)}")
+                        addString("§7/")
+                        addAlignedNumber("§b${NumberUtil.format(total)}")
+                    }
+
+                    NumberFormatEntry.UNFORMATTED -> {
+                        addAlignedNumber("$colorCode${stored.addSeparators()}")
+                        addString("§7/")
+                        addAlignedNumber("§b${total.addSeparators()}")
+
+                    }
+
+                    else -> {
+                        addAlignedNumber("$colorCode${stored.addSeparators()}")
+                        addString("§7/")
+                        addAlignedNumber("§b${total.addSeparators()}")
+                    }
+                }
+
+                // TODO change color of amount if full
+//                 if (colorCode == "§a") addString("§c§l(Full!)")
+
                 if (SackAPI.isTrophySack && magmaFish > 0) {
                     totalMagmaFish += magmaFish
                     add(
                         Renderable.hoverTips(
-                            " §7(§d${magmaFish} ",
+                            Renderable.string(
+                                "§d${magmaFish}",
+                                horizontalAlign = config.alignment
+                            ),
                             listOf(
                                 "§6Magmafish: §b${magmaFish.addSeparators()}",
                                 "§6Magmafish value: §b${price / magmaFish}",
                                 "§6Magmafish per: §b${magmaFish / stored}"
-                            )
+                            ),
                         )
                     )
                     //TOOD add cache
                     addItemStack("MAGMA_FISH".asInternalName().getItemStack())
-                    addString("§7)")
                 }
-                if (config.showPrice && price != 0L) addString(" §7(§6${format(price)}§7)")
+                if (config.showPrice && price != 0L) addAlignedNumber("§6${format(price)}")
             })
             rendered++
         }
@@ -174,6 +191,17 @@ object SackDisplay {
                 update(false)
             }
         )
+        // only in gui
+//         list.addButton(
+//             prefix = "§7Number alignment:",
+//             getName = RenderUtils.HorizontalAlignment.entries[config.alignment.ordinal].toString(), // todo avoid ordinal
+//             onChange = {
+//                 // todo avoid ordinal
+//                 config.alignment =
+//                     RenderUtils.HorizontalAlignment.entries[(config.alignment.ordinal + 1) % 3]
+//                 update(false)
+//             }
+//         )
 
         if (config.showPrice) {
             list.addSelector<PriceFrom>(" ",
@@ -207,7 +235,9 @@ object SackDisplay {
                 addString(" §7- ")
                 stack?.let { addItemStack(it) }
                 addString(name)
-                addString(" §f(§e$lv1§7-§e$lv2§7-§e$lv3§f)")
+                addAlignedNumber("§e$lv1")
+                addAlignedNumber("§e$lv2")
+                addAlignedNumber("§e$lv3")
             })
         }
         list.add(Renderable.table(table))
@@ -223,18 +253,23 @@ object SackDisplay {
             table.add(buildList {
                 addString(" §7- ")
                 addItemStack(internalName.getItemStack())
-                add(Renderable.optionalLink("$name: ", {
+                add(Renderable.optionalLink("$name:", {
                     BazaarApi.searchForBazaarItem(name.dropLast(1))
                 }) { !NEUItems.neuHasFocus() })
-                addString(" (${rough.addSeparators()}-§a${flawed.addSeparators()}-§9${fine.addSeparators()})")
+                addAlignedNumber(rough.addSeparators())
+                addAlignedNumber("§a${flawed.addSeparators()}")
+                addAlignedNumber("§9${fine.addSeparators()}")
                 val price = roughprice + flawedprice + fineprice
                 totalPrice += price
-                if (config.showPrice && price != 0L) addString(" §7(§6${format(price)}§7)")
+                if (config.showPrice && price != 0L) addAlignedNumber("§7(§6${format(price)}§7)")
             })
         }
         list.add(Renderable.table(table))
-        list.addString("§eTotal price: §6${format(totalPrice)}")
         return totalPrice
+    }
+
+    fun MutableList<Renderable>.addAlignedNumber(string: String) {
+        addString(string, horizontalAlign = config.alignment)
     }
 
     private fun format(price: Long) =
