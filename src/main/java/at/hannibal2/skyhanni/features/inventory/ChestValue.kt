@@ -41,7 +41,7 @@ class ChestValue {
     @SubscribeEvent
     fun onBackgroundDraw(event: GuiRenderEvent.ChestGuiOverlayRenderEvent) {
         if (!isEnabled()) return
-        if (LorenzUtils.inDungeons && !config.enableInDungeons) return
+        if (IslandType.CATACOMBS.isInIsland() && !config.enableInDungeons) return
         if (InventoryUtils.openInventoryName() == "") return
 
         if (!config.showDuringEstimatedItemValue) {

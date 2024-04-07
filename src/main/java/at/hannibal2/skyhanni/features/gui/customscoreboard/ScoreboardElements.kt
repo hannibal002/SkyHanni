@@ -28,7 +28,7 @@ import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.CollectionUtils.nextAfter
 import at.hannibal2.skyhanni.utils.LorenzUtils.inAdvancedMiningIsland
 import at.hannibal2.skyhanni.utils.LorenzUtils.inAnyIsland
-import at.hannibal2.skyhanni.utils.LorenzUtils.inDungeons
+import at.hannibal2.skyhanni.utils.LorenzUtils.isInIsland
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.NumberUtil.percentageColor
 import at.hannibal2.skyhanni.utils.RenderUtils.HorizontalAlignment
@@ -754,7 +754,7 @@ private fun getPartyDisplayPair() =
         listOf(title, *partyList).map { it to HorizontalAlignment.LEFT }
     }
 
-private fun getPartyShowWhen() = if (inDungeons) {
+private fun getPartyShowWhen() = if (IslandType.CATACOMBS.isInIsland()) {
     false // Hidden bc the scoreboard lines already exist
 } else {
     if (partyConfig.showPartyEverywhere) {
