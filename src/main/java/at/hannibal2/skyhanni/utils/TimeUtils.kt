@@ -127,7 +127,7 @@ object TimeUtils {
             else -> {
                 throw RuntimeException("Invalid format: '$string'")
             }
-        }.toLong().toDuration(DurationUnit.MILLISECONDS)
+        }.milliseconds
     }
 
     fun SkyBlockTime.formatted(

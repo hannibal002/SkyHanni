@@ -33,14 +33,7 @@ class RiftBloodEffigies {
     private val config get() = RiftAPI.config.area.stillgoreChateau.bloodEffigies
 
     private var locations: List<LorenzVec> = emptyList()
-    private var effigiesTimes = mapOf(
-        0 to SimpleTimeMark.farPast(),
-        1 to SimpleTimeMark.farPast(),
-        2 to SimpleTimeMark.farPast(),
-        3 to SimpleTimeMark.farPast(),
-        4 to SimpleTimeMark.farPast(),
-        5 to SimpleTimeMark.farPast(),
-    )
+    private var effigiesTimes = cleanMap()
 
     companion object {
         private val group = RepoPattern.group("rift.area.stillgore.effegies")
@@ -56,15 +49,10 @@ class RiftBloodEffigies {
 
     @SubscribeEvent
     fun onWorldChange(event: LorenzWorldChangeEvent) {
-        effigiesTimes = mapOf(
-            0 to SimpleTimeMark.farPast(),
-            1 to SimpleTimeMark.farPast(),
-            2 to SimpleTimeMark.farPast(),
-            3 to SimpleTimeMark.farPast(),
-            4 to SimpleTimeMark.farPast(),
-            5 to SimpleTimeMark.farPast(),
-        )
+        effigiesTimes = cleanMap()
     }
+
+    private fun cleanMap() = (0..5).associateWith { SimpleTimeMark.farPast() }
 
     @SubscribeEvent
     fun onDebugDataCollect(event: DebugDataCollectEvent) {

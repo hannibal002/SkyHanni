@@ -64,7 +64,7 @@ object FortuneUpgrades {
     // todo fix NEU price data not being loaded if run too early
     private fun MutableList<FortuneUpgrade>.populateAndSort(style: Int) {
         this.map { upgrade ->
-            val cost = (upgrade.requiredItem.asInternalName().getPrice() * (upgrade.itemQuantity)).toInt()
+            val cost = (upgrade.requiredItem.asInternalName().getPrice() * upgrade.itemQuantity).toInt()
             upgrade.cost = cost
             upgrade.costPerFF = (cost / upgrade.fortuneIncrease).toInt()
         }

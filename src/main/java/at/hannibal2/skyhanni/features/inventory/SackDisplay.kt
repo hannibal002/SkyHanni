@@ -102,11 +102,10 @@ object SackDisplay {
                     add(
                         when (config.numberFormat) {
                             NumberFormatEntry.DEFAULT -> "$colorCode${stored}§7/§b${NumberUtil.format(total)}"
-                            NumberFormatEntry.FORMATTED -> "$colorCode${NumberUtil.format(stored)}§7/§b${
-                                NumberUtil.format(
-                                    total
-                                )
-                            }"
+                            NumberFormatEntry.FORMATTED -> {
+                                "$colorCode${NumberUtil.format(stored)}§7/§b${NumberUtil.format(total)}"
+                            }
+
                             NumberFormatEntry.UNFORMATTED -> "$colorCode${stored}§7/§b${
                                 total.addSeparators()
                             }"
@@ -205,7 +204,7 @@ object SackDisplay {
                     add(Renderable.optionalLink("$name: ", {
                         BazaarApi.searchForBazaarItem(name.dropLast(1))
                     }) { !NEUItems.neuHasFocus() })
-                    add(" ($rough-§a$flawed-§9$fine)")
+                    add(" (${rough.addSeparators()}-§a${flawed.addSeparators()}-§9${fine.addSeparators()})")
                     val price = roughprice + flawedprice + fineprice
                     totalPrice += price
                     if (config.showPrice && price != 0L) add(" §7(§6${format(price)}§7)")
@@ -237,14 +236,15 @@ object SackDisplay {
 
     enum class PriceFormat(val displayName: String) {
         FORMATED("Formatted"),
-        UNFORMATED("Unformatted")
+        UNFORMATED("Unformatted"),
         ;
     }
 
     enum class NumberFormat(val displayName: String) {
         DEFAULT("Default"),
         FORMATTED("Formatted"),
-        UNFORMATTED("Unformatted")
+        UNFORMATTED("Unformatted"),
+        ;
     }
 
     @SubscribeEvent

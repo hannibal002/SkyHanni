@@ -209,6 +209,7 @@ object GriffinBurrowHelper {
                 event.drawColor(location, LorenzColor.LIGHT_PURPLE)
                 val distance = location.distance(playerLocation)
                 if (distance > 10) {
+                    // TODO use round(1)
                     val formattedDistance = distance.toInt().addSeparators()
                     event.drawDynamicText(location.add(y = 1), "§d§lInquisitor §e${formattedDistance}m", 1.7)
                 } else {

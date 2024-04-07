@@ -479,10 +479,7 @@ object EstimatedItemValueCalculator {
         return addCosmetic(internalName, list, "Rune", config.ignoreRunes)
     }
 
-    private fun NEUInternalName.getNameOrRepoError(): String? {
-        val stack = getItemStackOrNull() ?: return null
-        return stack.itemName
-    }
+    private fun NEUInternalName.getNameOrRepoError(): String? = getItemStackOrNull()?.itemName
 
     private fun addAbilityScrolls(stack: ItemStack, list: MutableList<String>): Double {
         val abilityScrolls = stack.getAbilityScrolls() ?: return 0.0

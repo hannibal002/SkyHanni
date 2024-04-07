@@ -28,6 +28,7 @@ class TrophyFishFillet {
         val rarity = TrophyRarity.getByName(trophyRarityName) ?: return
         val multiplier = if (Keyboard.KEY_LSHIFT.isKeyHeld()) event.itemStack.stackSize else 1
         val filletValue = info.getFilletValue(rarity) * multiplier
+        // TODO use magma fish member
         val filletPrice = filletValue * "MAGMA_FISH".asInternalName().getPrice()
         event.toolTip.add("§7Fillet: §8${filletValue.addSeparators()} Magmafish §7(§6${NumberUtil.format(filletPrice)}§7)")
     }
