@@ -24,9 +24,9 @@ import at.hannibal2.skyhanni.utils.RenderUtils.highlight
 import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderables
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 import at.hannibal2.skyhanni.utils.renderables.RenderableUtils.addButton
-import at.hannibal2.skyhanni.utils.renderables.RenderableUtils.addItemStack
 import at.hannibal2.skyhanni.utils.renderables.RenderableUtils.addSelector
 import at.hannibal2.skyhanni.utils.renderables.RenderableUtils.addString
+import net.minecraft.item.ItemStack
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
 object SackDisplay {
@@ -39,7 +39,6 @@ object SackDisplay {
         if (SackAPI.inSackInventory) {
             if (!isEnabled()) return
             config.position.renderRenderables(
-//                 display, extraSpace = config.extraSpace, itemScale = 1.3, posLabel = "Sacks Items"
                 display, extraSpace = config.extraSpace, posLabel = "Sacks Items"
             )
         }
@@ -104,7 +103,7 @@ object SackDisplay {
             val itemStack = internalName.getItemStack()
             table.add(buildList {
                 addString(" §7- ")
-                addItemStack(itemStack)
+                addItemStackScaled(itemStack)
                 // TODO move replace into itemName
                 if (!SackAPI.isTrophySack) add(Renderable.optionalLink(itemName.replace("§k", ""), {
                     BazaarApi.searchForBazaarItem(itemName)
@@ -157,7 +156,7 @@ object SackDisplay {
                         )
                     )
                     //TOOD add cache
-                    addItemStack("MAGMA_FISH".asInternalName().getItemStack())
+                    addItemStackScaled("MAGMA_FISH".asInternalName().getItemStack())
                 }
                 if (config.showPrice && price != 0L) addAlignedNumber("§6${format(price)}")
             })
@@ -233,7 +232,7 @@ object SackDisplay {
             val (stack, lv1, lv2, lv3) = rune
             table.add(buildList {
                 addString(" §7- ")
-                stack?.let { addItemStack(it) }
+                stack?.let { addItemStackScaled(it) }
                 addString(name)
                 addAlignedNumber("§e$lv1")
                 addAlignedNumber("§e$lv2")
@@ -252,7 +251,7 @@ object SackDisplay {
             val (internalName, rough, flawed, fine, roughprice, flawedprice, fineprice) = gem
             table.add(buildList {
                 addString(" §7- ")
-                addItemStack(internalName.getItemStack())
+                addItemStackScaled(internalName.getItemStack())
                 add(Renderable.optionalLink("$name:", {
                     BazaarApi.searchForBazaarItem(name.dropLast(1))
                 }) { !NEUItems.neuHasFocus() })
@@ -268,12 +267,19 @@ object SackDisplay {
         return totalPrice
     }
 
-    fun MutableList<Renderable>.addAlignedNumber(string: String) {
+    private fun MutableList<Renderable>.addAlignedNumber(string: String) {
         addString(string, horizontalAlign = config.alignment)
     }
 
-    private fun format(price: Long) =
-        if (config.priceFormat == PriceFormatEntry.FORMATTED) NumberUtil.format(price) else price.addSeparators()
+    private fun MutableList<Renderable>.addItemStackScaled(stack: ItemStack) {
+        add(Renderable.itemStack(stack, scale = 1.3))
+    }
+
+    private fun format(price: Long) = if (config.priceFormat == PriceFormatEntry.FORMATTED) {
+        NumberUtil.format(price)
+    } else {
+        price.addSeparators()
+    }
 
     private fun isEnabled() = LorenzUtils.inSkyBlock && config.enabled
 
