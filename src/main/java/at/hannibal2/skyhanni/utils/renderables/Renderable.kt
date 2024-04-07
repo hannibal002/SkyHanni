@@ -80,18 +80,24 @@ interface Renderable {
             text: String,
             onClick: () -> Unit,
             bypassChecks: Boolean = false,
+            highlightsOnHoverSlots: List<Int> = emptyList(),
             condition: () -> Boolean = { true },
         ): Renderable =
-            link(string(text), onClick, bypassChecks, condition)
+            link(string(text), onClick, bypassChecks, highlightsOnHoverSlots = highlightsOnHoverSlots, condition)
 
         fun link(
             renderable: Renderable,
             onClick: () -> Unit,
             bypassChecks: Boolean = false,
+            highlightsOnHoverSlots: List<Int> = emptyList(),
             condition: () -> Boolean = { true },
         ): Renderable {
             return clickable(
-                hoverable(underlined(renderable), renderable, bypassChecks, condition = condition),
+                hoverable(
+                    underlined(renderable), renderable, bypassChecks,
+                    condition = condition,
+                    highlightsOnHoverSlots = highlightsOnHoverSlots
+                ),
                 onClick,
                 0,
                 bypassChecks,
@@ -248,6 +254,7 @@ interface Renderable {
             unhovered: Renderable,
             bypassChecks: Boolean = false,
             condition: () -> Boolean = { true },
+            highlightsOnHoverSlots: List<Int> = emptyList(),
         ) =
             object : Renderable {
                 override val width: Int
@@ -259,11 +266,14 @@ interface Renderable {
                 var isHovered = false
 
                 override fun render(posX: Int, posY: Int) {
+                    val pair = Pair(posX, posY)
                     isHovered = if (isHovered(posX, posY) && condition() && shouldAllowLink(true, bypassChecks)) {
                         hovered.render(posX, posY)
+                        HighlightOnHoverSlot.currentSlots[pair] = highlightsOnHoverSlots
                         true
                     } else {
                         unhovered.render(posX, posY)
+                        HighlightOnHoverSlot.currentSlots.remove(pair)
                         false
                     }
                 }

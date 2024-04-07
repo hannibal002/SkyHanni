@@ -110,7 +110,7 @@ object SackAPI {
 
     fun getSacksData(savingSacks: Boolean) {
         if (savingSacks) sackData = ProfileStorageData.sackProfiles?.sackContents ?: return
-        for ((_, stack) in stackList) {
+        for ((slot, stack) in stackList) {
             val name = stack.name
             val lore = stack.getLore()
 
@@ -166,6 +166,7 @@ object SackAPI {
                     }
                 }
             } else {
+                // normal sack
                 lore.matchFirst(numPattern) {
                     val item = SackOtherItem()
                     val stored = group("stored").formatInt()
@@ -184,6 +185,7 @@ object SackAPI {
                     } else {
                         internalName.sackPrice(stored).coerceAtLeast(0)
                     }
+                    item.slot = slot
                     sackItem[name] = item
                 }
             }
@@ -322,6 +324,7 @@ object SackAPI {
         var total: Int = 0,
         var price: Long = 0,
         var magmaFish: Int = 0,
+        var slot: Int = -1,
     )
 
     fun NEUInternalName.getAmountInSacksOrNull(): Int? =

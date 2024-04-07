@@ -95,8 +95,7 @@ object SackDisplay {
         list.addString("§7Items in Sacks: §o(Rendering $amountShowing of ${sortedPairs.size} items)")
         val table = mutableListOf<List<Renderable>>()
         for ((itemName, item) in sortedPairs) {
-
-            val (internalName, colorCode, stored, total, price, magmaFish) = item
+            val (internalName, colorCode, stored, total, price, magmaFish, slot) = item
             totalPrice += price
             if (rendered >= config.itemToShow) continue
             if (stored == 0 && !config.showEmpty) continue
@@ -105,9 +104,12 @@ object SackDisplay {
                 addString(" §7- ")
                 addItemStackScaled(itemStack)
                 // TODO move replace into itemName
-                if (!SackAPI.isTrophySack) add(Renderable.optionalLink(itemName.replace("§k", ""), {
-                    BazaarApi.searchForBazaarItem(itemName)
-                }) { !NEUItems.neuHasFocus() })
+                if (!SackAPI.isTrophySack) add(Renderable.optionalLink(
+                    itemName.replace("§k", ""), {
+                        BazaarApi.searchForBazaarItem(itemName)
+                    },
+                    highlightsOnHoverSlots = listOf(slot)
+                ) { !NEUItems.neuHasFocus() })
                 else addString("${itemName.replace("§k", "")} ")
 
                 when (config.numberFormat) {
