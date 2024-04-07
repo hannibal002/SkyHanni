@@ -85,7 +85,7 @@ object EstimatedItemValue {
     private var renderedItems = 0
 
     @SubscribeEvent
-    fun onRenderOverlayGui(event: GuiRenderEvent.GuiOverlayRenderEvent) {
+    fun onRenderOverlay(event: GuiRenderEvent.GuiOverlayRenderEvent) {
         renderedItems = 0
     }
 
@@ -97,7 +97,7 @@ object EstimatedItemValue {
     }
 
     @SubscribeEvent
-    fun onRenderOverlay(event: GuiRenderEvent.ChestGuiOverlayRenderEvent) {
+    fun onBackgroundDraw(event: GuiRenderEvent.ChestGuiOverlayRenderEvent) {
         tryRendering()
     }
 

@@ -8,18 +8,18 @@ import at.hannibal2.skyhanni.data.jsonobjects.repo.neu.NeuRNGScore
 import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.InventoryFullyOpenedEvent
 import at.hannibal2.skyhanni.events.LorenzChatEvent
-import at.hannibal2.skyhanni.events.LorenzTickEvent
 import at.hannibal2.skyhanni.events.NeuRepositoryReloadEvent
+import at.hannibal2.skyhanni.events.SecondPassedEvent
 import at.hannibal2.skyhanni.events.SlayerChangeEvent
 import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
-import at.hannibal2.skyhanni.utils.ItemUtils.nameWithEnchantment
+import at.hannibal2.skyhanni.utils.ItemUtils.itemName
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.NEUInternalName
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
-import at.hannibal2.skyhanni.utils.NumberUtil.formatNumber
+import at.hannibal2.skyhanni.utils.NumberUtil.formatLong
 import at.hannibal2.skyhanni.utils.RenderUtils.renderString
 import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
@@ -53,10 +53,10 @@ class SlayerRngMeterDisplay {
     var rngScore = mapOf<String, Map<NEUInternalName, Long>>()
 
     @SubscribeEvent
-    fun onTick(event: LorenzTickEvent) {
+    fun onSecondPassed(event: SecondPassedEvent) {
         if (!isEnabled()) return
 
-        if (event.repeatSeconds(1) && lastItemDroppedTime != 0L && System.currentTimeMillis() > lastItemDroppedTime + 4_000) {
+        if (lastItemDroppedTime != 0L && System.currentTimeMillis() > lastItemDroppedTime + 4_000) {
             lastItemDroppedTime = 0L
             update()
         }
@@ -69,7 +69,6 @@ class SlayerRngMeterDisplay {
 
     @SubscribeEvent
     fun onChat(event: LorenzChatEvent) {
-
         if (!isEnabled()) return
 
         if (config.hideChat && SlayerAPI.isInCorrectArea) {
@@ -79,7 +78,7 @@ class SlayerRngMeterDisplay {
         }
 
         val currentMeter = updatePattern.matchMatcher(event.message) {
-            group("exp").formatNumber()
+            group("exp").formatLong()
         } ?: return
 
         val storage = getStorage() ?: return
@@ -142,7 +141,7 @@ class SlayerRngMeterDisplay {
             storage.itemGoal = ""
             storage.goalNeeded = -1
         } else {
-            storage.itemGoal = selectedItem.nameWithEnchantment
+            storage.itemGoal = selectedItem.itemName
             storage.goalNeeded = rngScore[getCurrentSlayer()]?.get(selectedItem.getInternalName())
                 ?: ErrorManager.skyHanniError(
                     "RNG Meter goal setting failed",
@@ -151,7 +150,6 @@ class SlayerRngMeterDisplay {
                     "currentSlayer" to getCurrentSlayer(),
                     "repo" to rngScore
                 )
-
         }
         update()
     }

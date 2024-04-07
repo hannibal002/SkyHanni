@@ -56,10 +56,6 @@ object UpdateManager {
             checkUpdate()
     }
 
-    fun getCurrentVersion(): String {
-        return SkyHanniMod.version
-    }
-
     fun injectConfigProcessor(processor: MoulConfigProcessor<*>) {
         processor.registerConfigEditor(ConfigVersionDisplay::class.java) { option, _ ->
             GuiOptionEditorUpdateCheck(option)
@@ -67,7 +63,7 @@ object UpdateManager {
     }
 
     fun isCurrentlyBeta(): Boolean {
-        return getCurrentVersion().contains("beta", ignoreCase = true)
+        return SkyHanniMod.version.contains("beta", ignoreCase = true)
     }
 
     private val config get() = SkyHanniMod.feature.about

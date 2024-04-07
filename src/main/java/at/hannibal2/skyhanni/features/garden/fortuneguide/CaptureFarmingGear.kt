@@ -18,6 +18,7 @@ import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.NumberUtil.romanToDecimal
 import at.hannibal2.skyhanni.utils.NumberUtil.romanToDecimalIfNecessary
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getEnchantments
+import at.hannibal2.skyhanni.utils.StringUtils.matchFirst
 import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.TabListData
@@ -106,10 +107,9 @@ object CaptureFarmingGear {
                 }
             }
         }
-        for (line in TabListData.getTabList()) {
-            strengthPattern.matchMatcher(line) {
-                GardenAPI.storage?.fortune?.farmingStrength = group("strength").toInt()
-            }
+
+        TabListData.getTabList().matchFirst(strengthPattern) {
+            GardenAPI.storage?.fortune?.farmingStrength = group("strength").toInt()
         }
     }
 
@@ -189,10 +189,9 @@ object CaptureFarmingGear {
         for ((_, item) in items) {
             if (item.displayName.contains("Extra Farming Fortune")) {
                 level = 0
-                for (line in item.getLore()) {
-                    anitaMenuPattern.matchMatcher(line) {
-                        level = group("level").toInt() / 4
-                    }
+
+                item.getLore().matchFirst(anitaMenuPattern) {
+                    level = group("level").toInt() / 4
                 }
             }
         }

@@ -2,6 +2,7 @@ package at.hannibal2.skyhanni.utils.renderables
 
 import at.hannibal2.skyhanni.config.core.config.gui.GuiPositionEditor
 import at.hannibal2.skyhanni.config.features.skillprogress.SkillProgressBarConfig
+import at.hannibal2.skyhanni.data.HighlightOnHoverSlot
 import at.hannibal2.skyhanni.data.ToolTipData
 import at.hannibal2.skyhanni.features.chroma.ChromaShaderManager
 import at.hannibal2.skyhanni.features.chroma.ChromaType
@@ -12,7 +13,10 @@ import at.hannibal2.skyhanni.utils.LorenzLogger
 import at.hannibal2.skyhanni.utils.NEUItems.renderOnScreen
 import at.hannibal2.skyhanni.utils.RenderUtils.HorizontalAlignment
 import at.hannibal2.skyhanni.utils.RenderUtils.VerticalAlignment
+import at.hannibal2.skyhanni.utils.renderables.RenderableUtils.calculateTableXOffsets
+import at.hannibal2.skyhanni.utils.renderables.RenderableUtils.calculateTableYOffsets
 import at.hannibal2.skyhanni.utils.renderables.RenderableUtils.renderXAligned
+import at.hannibal2.skyhanni.utils.renderables.RenderableUtils.renderXYAligned
 import at.hannibal2.skyhanni.utils.renderables.RenderableUtils.renderYAligned
 import io.github.moulberry.moulconfig.gui.GuiScreenElementWrapper
 import io.github.moulberry.notenoughupdates.util.Utils
@@ -48,7 +52,6 @@ interface Renderable {
     companion object {
 
         val logger = LorenzLogger("debug/renderable")
-        val list = mutableMapOf<Pair<Int, Int>, List<Int>>()
         var currentRenderPassMousePosition: Pair<Int, Int>? = null
             set
 
@@ -142,7 +145,7 @@ interface Renderable {
         fun hoverTips(
             content: Any,
             tips: List<Any>,
-            indexes: List<Int> = listOf(),
+            highlightsOnHoverSlots: List<Int> = listOf(),
             stack: ItemStack? = null,
             color: LorenzColor? = null,
             bypassChecks: Boolean = false,
@@ -162,10 +165,11 @@ interface Renderable {
 
                 override fun render(posX: Int, posY: Int) {
                     render.render(posX, posY)
+                    val pair = Pair(posX, posY)
                     if (isHovered(posX, posY)) {
                         if (condition() && shouldAllowLink(true, bypassChecks)) {
                             onHover.invoke()
-                            list[Pair(posX, posY)] = indexes
+                            HighlightOnHoverSlot.currentSlots[pair] = highlightsOnHoverSlots
                             GlStateManager.pushMatrix()
                             GlStateManager.translate(0F, 0F, 400F)
 
@@ -182,9 +186,7 @@ interface Renderable {
                             GlStateManager.popMatrix()
                         }
                     } else {
-                        if (list.contains(Pair(posX, posY))) {
-                            list.remove(Pair(posX, posY))
-                        }
+                        HighlightOnHoverSlot.currentSlots.remove(pair)
                     }
                 }
             }
@@ -292,19 +294,67 @@ interface Renderable {
 
         fun string(
             text: String,
+            scale: Double = 1.0,
             color: Color = Color.WHITE,
             horizontalAlign: HorizontalAlignment = HorizontalAlignment.LEFT,
             verticalAlign: VerticalAlignment = VerticalAlignment.TOP,
         ) = object : Renderable {
 
-            override val width: Int
-                get() = Minecraft.getMinecraft().fontRendererObj.getStringWidth(text)
-            override val height = 10
+            override val width by lazy { (Minecraft.getMinecraft().fontRendererObj.getStringWidth(text) * scale).toInt() + 1 }
+            override val height = (9 * scale).toInt() + 1
             override val horizontalAlign = horizontalAlign
             override val verticalAlign = verticalAlign
 
+            val inverseScale = 1 / scale
+
             override fun render(posX: Int, posY: Int) {
-                Minecraft.getMinecraft().fontRendererObj.drawStringWithShadow(text, 1f, 1f, color.rgb)
+                val fontRenderer = Minecraft.getMinecraft().fontRendererObj
+                GlStateManager.translate(1.0, 1.0, 0.0)
+                GlStateManager.scale(scale, scale, 1.0)
+                fontRenderer.drawStringWithShadow(text, 0f, 0f, color.rgb)
+                GlStateManager.scale(inverseScale, inverseScale, 1.0)
+                GlStateManager.translate(-1.0, -1.0, 0.0)
+            }
+        }
+
+        fun wrappedString(
+            text: String,
+            width: Int,
+            scale: Double = 1.0,
+            color: Color = Color.WHITE,
+            horizontalAlign: HorizontalAlignment = HorizontalAlignment.LEFT,
+            verticalAlign: VerticalAlignment = VerticalAlignment.TOP,
+        ) = object : Renderable {
+
+            val list by lazy {
+                Minecraft.getMinecraft().fontRendererObj.listFormattedStringToWidth(
+                    text, (width / scale).toInt()
+                )
+            }
+
+            override val width by lazy {
+                if (list.size == 1) {
+                    (Minecraft.getMinecraft().fontRendererObj.getStringWidth(text) / scale).toInt() + 1
+                } else {
+                    (width / scale).toInt() + 1
+                }
+            }
+
+            override val height by lazy { list.size * ((9 * scale).toInt() + 1) }
+            override val horizontalAlign = horizontalAlign
+            override val verticalAlign = verticalAlign
+
+            val inverseScale = 1 / scale
+
+            override fun render(posX: Int, posY: Int) {
+                val fontRenderer = Minecraft.getMinecraft().fontRendererObj
+                GlStateManager.translate(1.0, 1.0, 0.0)
+                GlStateManager.scale(scale, scale, 1.0)
+                list.forEachIndexed { index, text ->
+                    fontRenderer.drawStringWithShadow(text, 0f, index * 10.0f, color.rgb)
+                }
+                GlStateManager.scale(inverseScale, inverseScale, 1.0)
+                GlStateManager.translate(-1.0, -1.0, 0.0)
             }
         }
 
@@ -318,6 +368,41 @@ interface Renderable {
             }
         }
 
+        /**
+         * @param content the list of rows the table should render
+         */
+        fun table(
+            content: List<List<Renderable?>>,
+            xPadding: Int = 1,
+            yPadding: Int = 0,
+            horizontalAlign: HorizontalAlignment = HorizontalAlignment.LEFT,
+            verticalAlign: VerticalAlignment = VerticalAlignment.TOP,
+        ) = object : Renderable {
+            val xOffsets: List<Int> = calculateTableXOffsets(content, xPadding)
+            val yOffsets: List<Int> = calculateTableYOffsets(content, yPadding)
+            override val horizontalAlign = horizontalAlign
+            override val verticalAlign = verticalAlign
+
+            override val width = xOffsets.last() - xPadding
+            override val height = yOffsets.last() - yPadding
+
+            override fun render(posX: Int, posY: Int) {
+                content.forEachIndexed { rowIndex, row ->
+                    row.forEachIndexed { index, renderable ->
+                        GlStateManager.pushMatrix()
+                        GlStateManager.translate(xOffsets[index].toFloat(), yOffsets[rowIndex].toFloat(), 0F)
+                        renderable?.renderXYAligned(
+                            posX + xOffsets[index],
+                            posY + yOffsets[rowIndex],
+                            xOffsets[index + 1] - xOffsets[index],
+                            yOffsets[rowIndex + 1] - yOffsets[rowIndex]
+                        )
+                        GlStateManager.popMatrix()
+                    }
+                }
+            }
+        }
+
         fun progressBar(
             percent: Double,
             startColor: Color = Color(255, 0, 0),
@@ -327,7 +412,7 @@ interface Renderable {
             width: Int = 182,
             height: Int = 5,
             horizontalAlign: HorizontalAlignment = HorizontalAlignment.LEFT,
-            verticalAlign: VerticalAlignment = VerticalAlignment.TOP
+            verticalAlign: VerticalAlignment = VerticalAlignment.TOP,
         ) = object : Renderable {
             override val width = width
             override val height = height

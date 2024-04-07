@@ -63,7 +63,7 @@ class SpawnTimers {
     }
 
     @SubscribeEvent
-    fun onChatReceived(event: LorenzChatEvent) {
+    fun onChat(event: LorenzChatEvent) {
         if (!isEnabled()) return
         val message = event.message.removeColor().lowercase()
 
