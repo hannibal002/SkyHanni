@@ -124,8 +124,8 @@ public class DebugConfig {
     @Expose
     @ConfigOption(name = "Assume Mayor", desc = "Select a mayor to assume.")
     @ConfigEditorDropdown
-    public Property<Mayor> assumeMayor = Property.of(Mayor.NONE);
-  
+    public Property<Mayor> assumeMayor = Property.of(Mayor.DISABLED);
+
     @Expose
     @ConfigOption(name = "Always April Fools", desc = "Always show April fools jokes.")
     @ConfigEditorBoolean
