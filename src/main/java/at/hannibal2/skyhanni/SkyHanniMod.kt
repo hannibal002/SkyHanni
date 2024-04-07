@@ -226,9 +226,10 @@ import at.hannibal2.skyhanni.features.garden.visitor.HighlightVisitorsOutsideOfG
 import at.hannibal2.skyhanni.features.garden.visitor.NPCVisitorFix
 import at.hannibal2.skyhanni.features.garden.visitor.VisitorAPI
 import at.hannibal2.skyhanni.features.garden.visitor.VisitorListener
-import at.hannibal2.skyhanni.features.gui.QuiverDisplay
 import at.hannibal2.skyhanni.features.gui.customscoreboard.CustomScoreboard
 import at.hannibal2.skyhanni.features.gui.customscoreboard.ScoreboardPattern
+import at.hannibal2.skyhanni.features.gui.quiver.QuiverDisplay
+import at.hannibal2.skyhanni.features.gui.quiver.QuiverWarning
 import at.hannibal2.skyhanni.features.inventory.AuctionsHighlighter
 import at.hannibal2.skyhanni.features.inventory.ChestValue
 import at.hannibal2.skyhanni.features.inventory.DojoRankDisplay
@@ -817,7 +818,6 @@ class SkyHanniMod {
         loadModule(VerminTracker)
         loadModule(SkillProgress)
         loadModule(SkillTooltip())
-        loadModule(QuiverDisplay())
         loadModule(MaxPurseItems())
         loadModule(SuperCraftFeatures())
         loadModule(InfernoMinionFeatures())
@@ -827,6 +827,8 @@ class SkyHanniMod {
         loadModule(DungeonShadowAssassinNotification())
         loadModule(PestProfitTracker)
         loadModule(NoBitsWarning())
+        loadModule(QuiverDisplay())
+        loadModule(QuiverWarning())
 
         init()
 

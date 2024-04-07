@@ -1,63 +1,41 @@
-package at.hannibal2.skyhanni.features.gui
+package at.hannibal2.skyhanni.features.gui.quiver
 
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
-import at.hannibal2.skyhanni.config.features.gui.QuiverDisplayConfig.ShowWhen
 import at.hannibal2.skyhanni.data.ArrowType
 import at.hannibal2.skyhanni.data.QuiverAPI
-import at.hannibal2.skyhanni.data.QuiverAPI.NONE_ARROW_TYPE
 import at.hannibal2.skyhanni.data.QuiverAPI.arrowAmount
 import at.hannibal2.skyhanni.data.TitleManager
-import at.hannibal2.skyhanni.events.ConfigLoadEvent
 import at.hannibal2.skyhanni.events.DungeonCompleteEvent
 import at.hannibal2.skyhanni.events.DungeonEnterEvent
-import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.KuudraCompleteEvent
 import at.hannibal2.skyhanni.events.KuudraEnterEvent
 import at.hannibal2.skyhanni.events.LorenzWorldChangeEvent
-import at.hannibal2.skyhanni.events.ProfileJoinEvent
 import at.hannibal2.skyhanni.events.QuiverUpdateEvent
 import at.hannibal2.skyhanni.utils.ChatUtils
-import at.hannibal2.skyhanni.utils.ConditionalUtils
 import at.hannibal2.skyhanni.utils.DelayedRun
 import at.hannibal2.skyhanni.utils.ItemUtils.getItemRarityOrNull
-import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.NEUItems
-import at.hannibal2.skyhanni.utils.RenderUtils.renderStringsAndItems
+import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.SoundUtils
-import at.hannibal2.skyhanni.utils.StringUtils
 import at.hannibal2.skyhanni.utils.StringUtils.createCommaSeparatedList
-import at.hannibal2.skyhanni.utils.renderables.Renderable
-import net.minecraft.init.Items
-import net.minecraft.item.ItemStack
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import kotlin.time.Duration.Companion.seconds
 
-class QuiverDisplay {
+class QuiverWarning {
 
-    private val config get() = SkyHanniMod.feature.gui.quiverDisplay
+    private val config get() = SkyHanniMod.feature.combat.quiverConfig.quiverWarning
 
-    private var display = emptyList<Renderable>()
     private var arrow: ArrowType? = null
     private var amount = QuiverAPI.currentAmount
-    private var rarity = "§f"
     private var lastLowQuiverReminder = SimpleTimeMark.farPast()
-    private var hideAmount = false
     private var arrowsUsedInRun = mutableListOf<ArrowType>()
     private var arrowsToAlert = mutableListOf<String>()
     private var inInstance = false
 
     @SubscribeEvent
-    fun onProfileJoin(event: ProfileJoinEvent) {
-        display = emptyList()
-        arrow = QuiverAPI.currentArrow
-        amount = QuiverAPI.currentAmount
-        updateDisplay()
-    }
-
-    @SubscribeEvent
-    fun onWorldSwitch(event: LorenzWorldChangeEvent) {
+    fun onWorldChange(event: LorenzWorldChangeEvent) {
         arrowsUsedInRun = mutableListOf()
         arrowsToAlert = mutableListOf()
         inInstance = false
@@ -111,40 +89,16 @@ class QuiverDisplay {
     private fun lowQuiverAlert() {
         if (lastLowQuiverReminder.passedSince() < 30.seconds) return
         lastLowQuiverReminder = SimpleTimeMark.now()
+        val itemStack = NEUItems.getItemStackOrNull(arrow?.internalName?.asString() ?: return) ?: return
+        val rarity = itemStack.getItemRarityOrNull()?.chatColorCode ?: "§f"
         TitleManager.sendTitle("§cLow on $rarity${arrow?.arrow}!", 5.seconds, 3.6, 7f)
-        ChatUtils.chat("Low on $rarity${arrow?.arrow} §e($amount left)")
-    }
-
-    private fun updateDisplay() {
-        display = drawDisplay()
-    }
-
-    private fun drawDisplay() = buildList {
-        val arrow = arrow ?: return@buildList
-        val itemStack = NEUItems.getItemStackOrNull(arrow.internalName.asString()) ?: ItemStack(Items.arrow)
-
-        rarity = itemStack.getItemRarityOrNull()?.chatColorCode ?: "§f"
-        val arrowDisplayName = if (hideAmount || arrow == NONE_ARROW_TYPE) arrow.arrow else StringUtils.pluralize(amount, arrow.arrow)
-
-        if (config.showIcon.get()) {
-            add(Renderable.itemStack(itemStack,1.68))
-        }
-        if (!hideAmount) {
-            add(Renderable.string(" §b${amount}x"))
-        }
-        add(Renderable.string(" $rarity$arrowDisplayName"))
+        ChatUtils.chat("Low on $rarity${arrow?.arrow} §e(${amount.addSeparators()} left)")
     }
 
     @SubscribeEvent
     fun onQuiverUpdate(event: QuiverUpdateEvent) {
         val lastArrow = arrow
         val lastAmount = amount
-
-        arrow = event.currentArrow
-        amount = event.currentAmount
-        hideAmount = event.hideAmount
-
-        updateDisplay()
 
         if (config.lowQuiverNotification && amount <= config.lowQuiverAmount) {
             if (arrow != lastArrow || (arrow == lastArrow && amount <= lastAmount)) lowQuiverAlert()
@@ -156,31 +110,7 @@ class QuiverDisplay {
     }
 
     @SubscribeEvent
-    fun onRenderOverlay(event: GuiRenderEvent.GuiOverlayRenderEvent) {
-        if (!isEnabled()) return
-        if (display.isEmpty()) updateDisplay()
-        val whenToShow = config.whenToShow.get()
-        if (whenToShow == ShowWhen.ALWAYS ||
-            whenToShow == ShowWhen.ONLY_BOW_INVENTORY && QuiverAPI.hasBowInInventory() ||
-            whenToShow == ShowWhen.ONLY_BOW_HAND && QuiverAPI.isHoldingBow()) {
-            config.quiverDisplayPos.renderStringsAndItems(listOf(display), posLabel = "Quiver Display")
-        }
-    }
-
-    @SubscribeEvent
-    fun onConfigLoad(event: ConfigLoadEvent) {
-        ConditionalUtils.onToggle(
-            config.whenToShow,
-            config.showIcon
-        ) {
-            updateDisplay()
-        }
-    }
-
-    fun isEnabled() = LorenzUtils.inSkyBlock && config.enabled
-
-    @SubscribeEvent
     fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
-        event.move(31,"config.inventory.quiverAlert","config.gui.quiverDisplay.lowQuiverNotification")
+        event.move(31, "inventory.quiverAlert", "combat.quiverConfig.quiverWarning.lowQuiverNotification")
     }
 }

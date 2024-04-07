@@ -1,11 +1,10 @@
-package at.hannibal2.skyhanni.config.features.gui;
+package at.hannibal2.skyhanni.config.features.combat;
 
 import at.hannibal2.skyhanni.config.FeatureToggle;
 import at.hannibal2.skyhanni.config.core.config.Position;
 import com.google.gson.annotations.Expose;
 import io.github.moulberry.moulconfig.annotations.ConfigEditorBoolean;
 import io.github.moulberry.moulconfig.annotations.ConfigEditorDropdown;
-import io.github.moulberry.moulconfig.annotations.ConfigEditorSlider;
 import io.github.moulberry.moulconfig.annotations.ConfigOption;
 import io.github.moulberry.moulconfig.observer.Property;
 
@@ -26,16 +25,16 @@ public class QuiverDisplayConfig {
 
     @Expose
     @ConfigOption(
-        name = "When to show the display",
-        desc = ""
+        name = "When to show",
+        desc = "Decides in what conditions to show the display."
     )
     @ConfigEditorDropdown
-    public Property<ShowWhen> whenToShow = Property.of(ShowWhen.ONLY_BOW_INVENTORY);
+    public Property<ShowWhen> whenToShow = Property.of(ShowWhen.ONLY_BOW_HAND);
 
     public enum ShowWhen {
         ALWAYS("Always"),
-        ONLY_BOW_INVENTORY("Only with Bow in inventory"),
-        ONLY_BOW_HAND("Only with Bow in hand"),
+        ONLY_BOW_INVENTORY("Bow in inventory"),
+        ONLY_BOW_HAND("Bow in hand"),
 
         ;
         private final String str;
@@ -49,29 +48,4 @@ public class QuiverDisplayConfig {
             return str;
         }
     }
-
-    @Expose
-    @ConfigOption(
-        name = "Low Quiver Alert",
-        desc = "Notifies you when your quiver\n" +
-            "reaches an amount of arrows."
-    )
-    @ConfigEditorBoolean
-    @FeatureToggle
-    public boolean lowQuiverNotification = false;
-
-    @Expose
-    @ConfigOption(
-        name = "Reminder After Run",
-        desc = "Reminds you to buy arrows after\n" +
-            "a Dungeons/Kuudra run if you're low."
-    )
-    @ConfigEditorBoolean
-    @FeatureToggle
-    public boolean reminderAfterRun = false;
-
-    @Expose
-    @ConfigOption(name = "Low Quiver Amount", desc = "Amount at which to notify you.")
-    @ConfigEditorSlider(minValue = 50, maxValue = 500, minStep = 50)
-    public int lowQuiverAmount = 100;
 }
