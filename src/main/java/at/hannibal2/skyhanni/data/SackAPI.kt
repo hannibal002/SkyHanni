@@ -154,11 +154,13 @@ object SackAPI {
                         val level = group("level").romanToDecimal()
                         val stored = group("stored").formatInt()
                         rune.stack = stack
+                        rune.stored += stored
 
                         when (level) {
                             1 -> rune.lvl1 = stored
                             2 -> rune.lvl2 = stored
                             3 -> {
+                                rune.slot = slot
                                 rune.lvl3 = stored
                                 runeItem[name] = rune
                             }
@@ -315,15 +317,18 @@ object SackAPI {
         var lvl1: Int = 0,
         var lvl2: Int = 0,
         var lvl3: Int = 0,
-    )
+    ): AbstractSackItem()
 
     data class SackOtherItem(
         var internalName: NEUInternalName = NEUInternalName.NONE,
         var colorCode: String = "",
-        var stored: Int = 0,
         var total: Int = 0,
-        var price: Long = 0,
         var magmaFish: Int = 0,
+    ): AbstractSackItem()
+
+    abstract class AbstractSackItem(
+        var stored: Int = 0,
+        var price: Long = 0,
         var slot: Int = -1,
     )
 

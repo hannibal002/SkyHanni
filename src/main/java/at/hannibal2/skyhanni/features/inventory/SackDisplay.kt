@@ -15,6 +15,7 @@ import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.LorenzColor
 import at.hannibal2.skyhanni.utils.LorenzUtils
+import at.hannibal2.skyhanni.utils.NEUInternalName
 import at.hannibal2.skyhanni.utils.NEUInternalName.Companion.asInternalName
 import at.hannibal2.skyhanni.utils.NEUItems
 import at.hannibal2.skyhanni.utils.NEUItems.getItemStack
@@ -95,14 +96,17 @@ object SackDisplay {
         list.addString("§7Items in Sacks: §o(Rendering $amountShowing of ${sortedPairs.size} items)")
         val table = mutableListOf<List<Renderable>>()
         for ((itemName, item) in sortedPairs) {
-            val (internalName, colorCode, stored, total, price, magmaFish, slot) = item
+            val (internalName, colorCode, total, magmaFish) = item
+            val stored = item.stored
+            val price = item.price
+            val slot = item.slot
+
             totalPrice += price
             if (rendered >= config.itemToShow) continue
             if (stored == 0 && !config.showEmpty) continue
-            val itemStack = internalName.getItemStack()
             table.add(buildList {
                 addString(" §7- ")
-                addItemStackScaled(itemStack)
+                addItemStackScaled(internalName)
                 // TODO move replace into itemName
                 if (!SackAPI.isTrophySack) add(Renderable.optionalLink(
                     itemName.replace("§k", ""), {
@@ -129,7 +133,6 @@ object SackDisplay {
                         addAlignedNumber("$colorCode${stored.addSeparators()}")
                         addString("§7/")
                         addAlignedNumber("§b${total.addSeparators()}")
-
                     }
 
                     else -> {
@@ -158,7 +161,7 @@ object SackDisplay {
                         )
                     )
                     //TOOD add cache
-                    addItemStackScaled("MAGMA_FISH".asInternalName().getItemStack())
+                    addItemStackScaled("MAGMA_FISH".asInternalName())
                 }
                 if (config.showPrice && price != 0L) addAlignedNumber("§6${format(price)}")
             })
@@ -235,7 +238,13 @@ object SackDisplay {
             table.add(buildList {
                 addString(" §7- ")
                 stack?.let { addItemStackScaled(it) }
-                addString(name)
+                add(
+                    Renderable.optionalLink(
+                        name,
+                        onClick = {},
+                        highlightsOnHoverSlots = listOf(rune.slot)
+                    )
+                )
                 addAlignedNumber("§e$lv1")
                 addAlignedNumber("§e$lv2")
                 addAlignedNumber("§e$lv3")
@@ -253,7 +262,7 @@ object SackDisplay {
             val (internalName, rough, flawed, fine, roughprice, flawedprice, fineprice) = gem
             table.add(buildList {
                 addString(" §7- ")
-                addItemStackScaled(internalName.getItemStack())
+                addItemStackScaled(internalName)
                 add(Renderable.optionalLink("$name:", {
                     BazaarApi.searchForBazaarItem(name.dropLast(1))
                 }) { !NEUItems.neuHasFocus() })
@@ -271,6 +280,10 @@ object SackDisplay {
 
     private fun MutableList<Renderable>.addAlignedNumber(string: String) {
         addString(string, horizontalAlign = config.alignment)
+    }
+
+    private fun MutableList<Renderable>.addItemStackScaled(internalName: NEUInternalName) {
+        addItemStackScaled(internalName.getItemStack())
     }
 
     private fun MutableList<Renderable>.addItemStackScaled(stack: ItemStack) {
