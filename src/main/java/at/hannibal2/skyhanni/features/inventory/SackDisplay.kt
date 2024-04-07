@@ -204,17 +204,6 @@ object SackDisplay {
                 update(false)
             }
         )
-        // only in gui
-//         list.addButton(
-//             prefix = "§7Number alignment:",
-//             getName = RenderUtils.HorizontalAlignment.entries[config.alignment.ordinal].toString(), // todo avoid ordinal
-//             onChange = {
-//                 // todo avoid ordinal
-//                 config.alignment =
-//                     RenderUtils.HorizontalAlignment.entries[(config.alignment.ordinal + 1) % 3]
-//                 update(false)
-//             }
-//         )
 
         if (config.showPrice) {
             list.addSelector<PriceFrom>(" ",
