@@ -192,8 +192,8 @@ object TabListReader {
 
                 var currentCount = firstColumnCopy.size()
 
-                if (sectionSize >= TabListRenderer.maxLines / 2) {
-                    if (currentCount >= TabListRenderer.maxLines) {
+                if (sectionSize >= TabListRenderer.MAX_LINES / 2) {
+                    if (currentCount >= TabListRenderer.MAX_LINES) {
                         renderColumns.add(RenderColumn().also { firstColumnCopy = it })
                         currentCount = 1
                     } else {
@@ -209,7 +209,7 @@ object TabListReader {
                     }
 
                     for (line in section.lines) {
-                        if (currentCount >= TabListRenderer.maxLines) {
+                        if (currentCount >= TabListRenderer.MAX_LINES) {
                             renderColumns.add(RenderColumn().also { firstColumnCopy = it })
                             currentCount = 1
                         }
@@ -218,7 +218,7 @@ object TabListReader {
                         currentCount++
                     }
                 } else {
-                    if (currentCount + sectionSize > TabListRenderer.maxLines) {
+                    if (currentCount + sectionSize > TabListRenderer.MAX_LINES) {
                         renderColumns.add(RenderColumn().also { firstColumnCopy = it })
                     } else {
                         if (firstColumnCopy.size() > 0) {
