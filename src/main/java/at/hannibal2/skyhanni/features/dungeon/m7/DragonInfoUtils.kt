@@ -24,8 +24,9 @@ class DragonInfoUtils {
         if (event.mob.name != "Withered Dragon") return
 
         val location = event.mob.baseEntity.position.toLorenzVec()
+        ChatUtils.debug("a dragon spawned at ${location.toCleanString()}")
         M7DragonInfo.entries.filter { it.dragonLocation.spawnLocation == location && it != M7DragonInfo.NONE }.forEach {
-            ChatUtils.debug("Spawned Dragon ${it.name}")
+            ChatUtils.debug("Spawned Dragon ${it.name}, id: ${event.mob.baseEntity.entityId}")
             M7DragonChangeEvent(it, M7SpawnedStatus.ALIVE).postAndCatch()
             it.status = M7SpawnedStatus.ALIVE
             it.status.id = event.mob.baseEntity.entityId
@@ -39,13 +40,14 @@ class DragonInfoUtils {
         if (event.mob.name != "Withered Dragon") return
 
         val location = event.mob.baseEntity.position.toLorenzVec()
+        ChatUtils.debug("a dragon died at ${location.toCleanString()}")
         M7DragonInfo.entries.filter { it.status.id == event.mob.baseEntity.entityId && it != M7DragonInfo.NONE }.forEach {
             if (it.dragonLocation.deathBox.isInside(location)) {
-                ChatUtils.debug("Killed Dragon ${it.name}, inside box")
+                ChatUtils.debug("Killed Dragon ${it.name}, inside box, id: ${event.mob.baseEntity.entityId}")
                 it.status = M7SpawnedStatus.DEFEATED
                 M7DragonChangeEvent(it, M7SpawnedStatus.DEFEATED).postAndCatch()
             } else {
-                ChatUtils.debug("Killed Dragon ${it.name}, outside box")
+                ChatUtils.debug("Killed Dragon ${it.name}, outside box, id: ${event.mob.baseEntity.entityId}")
                 it.status = M7SpawnedStatus.UNDEFEATED
                 M7DragonChangeEvent(it, M7SpawnedStatus.UNDEFEATED).postAndCatch()
             }
@@ -69,7 +71,7 @@ class DragonInfoUtils {
             particle.xCoordinate % 1 != 0.0 ||
             particle.yCoordinate % 1 != 0.0 ||
             particle.zCoordinate % 1 != 0.0) return
-
+        ChatUtils.debug("found a match at ${event.packet.toLorenzVec().toCleanString()}")
         M7DragonInfo.entries.filter { it.status == M7SpawnedStatus.UNDEFEATED && it != M7DragonInfo.NONE}.forEach {
             if (it.dragonLocation.particleBox.isInside(event.packet.toLorenzVec())) {
                 it.status = M7SpawnedStatus.SPAWNING
