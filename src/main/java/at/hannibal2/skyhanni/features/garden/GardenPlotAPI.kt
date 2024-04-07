@@ -182,7 +182,7 @@ object GardenPlotAPI {
         getData()?.apply {
             sprayType = null
             sprayExpiryTime = SimpleTimeMark.now()
-            sprayHasNotified = false
+            sprayHasNotified = true
         }
     }
 
