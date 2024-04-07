@@ -184,7 +184,7 @@ object SackDisplay {
                     update(false)
                 }
             )
-            newDisplay.addAsSingletonList("§cTotal price: §6${format(totalPrice)}")
+            newDisplay.addAsSingletonList("§eTotal price: §6${format(totalPrice)}")
         }
     }
 
@@ -220,7 +220,7 @@ object SackDisplay {
                 if (config.showPrice && price != 0L) add(" §7(§6${format(price)}§7)")
             })
         }
-        if (config.showPrice) newDisplay.addAsSingletonList("§eTotal price: §6${format(totalPrice)}")
+        newDisplay.addAsSingletonList("§eTotal price: §6${format(totalPrice)}")
     }
 
     private fun format(price: Long) =
