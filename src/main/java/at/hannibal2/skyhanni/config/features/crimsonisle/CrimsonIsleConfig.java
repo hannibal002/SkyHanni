@@ -21,6 +21,11 @@ public class CrimsonIsleConfig {
     public ReputationHelperConfig reputationHelper = new ReputationHelperConfig();
 
     @Expose
+    @ConfigOption(name = "Matriach Helper", desc = "Helper for Heavy Pearls")
+    @Accordion
+    public MatriarchHelperConfig matriarchHelper = new MatriarchHelperConfig();
+
+    @Expose
     @ConfigOption(name = "Pablo NPC Helper", desc = "Shows a clickable message that grabs the flower needed from your sacks.")
     @ConfigEditorBoolean
     @FeatureToggle
@@ -44,4 +49,5 @@ public class CrimsonIsleConfig {
 
     @Expose
     public Position dojoRankDisplayPosition = new Position(-378, 206, false, true);
+
 }
