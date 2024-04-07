@@ -17,6 +17,7 @@ import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.LorenzLogger
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
+import at.hannibal2.skyhanni.utils.StringUtils.matchFirst
 import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.StringUtils.matches
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
@@ -69,7 +70,7 @@ class HypixelData {
         )
         private val scoreboardVisitingAmoutPattern by patternGroup.pattern(
             "scoreboard.visiting.amount",
-            "\\s+§.✌ §.\\(§.(?<currentamount>\\d+)§.\\/(?<maxamount>\\d+)\\)"
+            "\\s+§.✌ §.\\(§.(?<currentamount>\\d+)§./(?<maxamount>\\d+)\\)"
         )
         private val guestPattern by patternGroup.pattern(
             "guesting.scoreboard",
@@ -78,6 +79,15 @@ class HypixelData {
         private val scoreboardTitlePattern by patternGroup.pattern(
             "scoreboard.title",
             "SK[YI]BLOCK(?: CO-OP| GUEST)?"
+        )
+
+        /**
+         * REGEX-TEST:  §7⏣ §bVillage
+         * REGEX-TEST:  §5ф §dWizard Tower
+         */
+        private val skyblockAreaPattern by patternGroup.pattern(
+            "skyblock.area",
+            "\\s*§(?<symbol>7⏣|5ф) §(?<color>.)(?<area>.*)"
         )
 
         var hypixelLive = false
@@ -99,6 +109,7 @@ class HypixelData {
         var joinedWorld = SimpleTimeMark.farPast()
 
         var skyBlockArea = "?"
+        var skyBlockAreaWithSymbol = "?"
 
         // Data from locraw
         var locrawData: JsonObject? = null
@@ -129,12 +140,10 @@ class HypixelData {
                 return
             }
 
-            ScoreboardData.sidebarLinesFormatted.forEach {
-                serverIdScoreboardPattern.matchMatcher(it) {
-                    val serverType = if (group("servertype") == "M") "mega" else "mini"
-                    serverId = "$serverType${group("serverid")}"
-                    return
-                }
+            ScoreboardData.sidebarLinesFormatted.matchFirst(serverIdScoreboardPattern) {
+                val serverType = if (group("servertype") == "M") "mega" else "mini"
+                serverId = "$serverType${group("serverid")}"
+                return
             }
 
             ErrorManager.logErrorWithData(
@@ -167,10 +176,8 @@ class HypixelData {
         }
 
         fun getMaxPlayersForCurrentServer(): Int {
-            for (line in ScoreboardData.sidebarLinesFormatted) {
-                scoreboardVisitingAmoutPattern.matchMatcher(line) {
-                    return group("maxamount").toInt()
-                }
+            ScoreboardData.sidebarLinesFormatted.matchFirst(scoreboardVisitingAmoutPattern) {
+                return group("maxamount").toInt()
             }
             return if (serverId?.startsWith("mega") == true) 80 else 26
         }
@@ -283,11 +290,14 @@ class HypixelData {
         }
 
         if (LorenzUtils.inSkyBlock) {
-            val originalLocation = ScoreboardData.sidebarLinesFormatted
-                .firstOrNull { it.startsWith(" §7⏣ ") || it.startsWith(" §5ф ") }
-                ?.substring(5)?.removeColor()
-                ?: "?"
-            skyBlockArea = LocationFixData.fixLocation(skyBlockIsland) ?: originalLocation
+            loop@ for (line in ScoreboardData.sidebarLinesFormatted) {
+                skyblockAreaPattern.matchMatcher(line) {
+                    val originalLocation = group("area")
+                    skyBlockArea = LocationFixData.fixLocation(skyBlockIsland) ?: originalLocation
+                    skyBlockAreaWithSymbol = line.trim()
+                    break@loop
+                }
+            }
 
             checkProfileName()
         }
@@ -321,15 +331,13 @@ class HypixelData {
         }
     }
 
-    private fun checkProfileName(): Boolean {
-        if (profileName.isEmpty()) {
-            val text = TabListData.getTabList().firstOrNull { it.contains("Profile:") } ?: return true
-            UtilsPatterns.tabListProfilePattern.matchMatcher(text) {
-                profileName = group("profile").lowercase()
-                ProfileJoinEvent(profileName).postAndCatch()
-            }
+    private fun checkProfileName() {
+        if (profileName.isNotEmpty()) return
+
+        TabListData.getTabList().matchFirst(UtilsPatterns.tabListProfilePattern) {
+            profileName = group("profile").lowercase()
+            ProfileJoinEvent(profileName).postAndCatch()
         }
-        return false
     }
 
     private fun checkHypixel() {
@@ -366,19 +374,19 @@ class HypixelData {
 
     private fun checkIsland(event: TabWidgetUpdate) {
         val islandType: IslandType
-        val newIsland: String
+        val foundIsland: String
         when (event) {
             is TabWidgetUpdate.Clear -> {
                 TabListData.fullyLoaded = false
                 islandType = IslandType.NONE
-                newIsland = ""
+                foundIsland = ""
             }
 
             is TabWidgetUpdate.NewValues -> {
                 TabListData.fullyLoaded = true
                 // Can not use color coding, because of the color effect (§f§lSKYB§6§lL§e§lOCK§A§L GUEST)
                 val guesting = guestPattern.matches(ScoreboardData.objectiveTitle.removeColor())
-                newIsland = TabWidget.AREA.matchMatcherFirstLine { group("island").removeColor() } ?: ""
+                foundIsland = TabWidget.AREA.matchMatcherFirstLine { group("island").removeColor() } ?: ""
                 islandType = getIslandType(newIsland, guesting)
             }
 
@@ -387,8 +395,8 @@ class HypixelData {
         if (skyBlockIsland != islandType) {
             IslandChangeEvent(islandType, skyBlockIsland).postAndCatch()
             if (islandType == IslandType.UNKNOWN) {
-                ChatUtils.debug("Unknown island detected: '$newIsland'")
-                loggerIslandChange.log("Unknown: '$newIsland'")
+                ChatUtils.debug("Unknown island detected: '$foundIsland'")
+                loggerIslandChange.log("Unknown: '$foundIsland'")
             } else {
                 loggerIslandChange.log(islandType.name)
             }

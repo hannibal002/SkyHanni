@@ -1,5 +1,6 @@
 package at.hannibal2.skyhanni.features.misc.update
 
+import at.hannibal2.skyhanni.SkyHanniMod
 import io.github.moulberry.moulconfig.gui.GuiOptionEditor
 import io.github.moulberry.moulconfig.internal.TextRenderUtils
 import io.github.moulberry.moulconfig.processor.ProcessedOption
@@ -44,7 +45,7 @@ class GuiOptionEditorUpdateCheck(option: ProcessedOption) : GuiOptionEditor(opti
         val widthRemaining = width - button.width - 10
 
         GlStateManager.scale(2F, 2F, 1F)
-        val currentVersion = UpdateManager.getCurrentVersion()
+        val currentVersion = SkyHanniMod.version
         val sameVersion = currentVersion.equals(nextVersion, true)
         TextRenderUtils.drawStringCenteredScaledMaxWidth(
             "${if (UpdateManager.updateState == UpdateManager.UpdateState.NONE) GREEN else RED}$currentVersion" +
