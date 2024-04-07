@@ -336,13 +336,13 @@ object LorenzUtils {
 
     inline fun <reified T : Enum<T>> enumValueOf(name: String) =
         enumValueOfOrNull<T>(name)
-            ?: kotlin.error("Unknown enum constant for ${enumValues<T>().first().name.javaClass.simpleName}: '$name'")
+            ?: error("Unknown enum constant for ${enumValues<T>().first().name.javaClass.simpleName}: '$name'")
 
     inline fun <reified T : Enum<T>> enumJoinToPattern(noinline transform: (T) -> CharSequence = { it.name }) =
         enumValues<T>().joinToString("|", transform = transform)
 
     // TODO move to val by lazy
-    fun isInDevEnviromen() = Launch.blackboard["fml.deobfuscatedEnvironment"] as Boolean
+    fun isInDevEnvironment() = Launch.blackboard["fml.deobfuscatedEnvironment"] as Boolean
 
     fun shutdownMinecraft(reason: String? = null) {
         System.err.println("SkyHanni-${SkyHanniMod.version} forced the game to shutdown.")
@@ -352,11 +352,6 @@ object LorenzUtils {
         FMLCommonHandler.instance().handleExit(-1)
     }
 
-    @Deprecated("moved", ReplaceWith("ChatUtils.sendCommandToServer(command)"))
-    fun sendCommandToServer(command: String) {
-        ChatUtils.sendCommandToServer(command)
-    }
-
     /**
      * Get the group, otherwise, return null
      * @param groupName The group name in the pattern
@@ -364,32 +359,6 @@ object LorenzUtils {
     fun Matcher.groupOrNull(groupName: String): String? {
         return runCatching { this.group(groupName) }.getOrNull()
     }
-
-    @Deprecated("moved", ReplaceWith("ChatUtils.debug(message)"))
-    fun debug(message: String) = ChatUtils.debug(message)
-
-    @Deprecated("moved", ReplaceWith("ChatUtils.userError(message)"))
-    fun userError(message: String) = ChatUtils.userError(message)
-
-    @Deprecated("moved", ReplaceWith("ChatUtils.chat(message, prefix, prefixColor)"))
-    fun chat(message: String, prefix: Boolean = true, prefixColor: String = "§e") =
-        ChatUtils.chat(message, prefix, prefixColor)
-
-    @Deprecated("moved", ReplaceWith("ChatUtils.clickableChat(message, command, prefix, prefixColor)"))
-    fun clickableChat(message: String, command: String, prefix: Boolean = true, prefixColor: String = "§e") =
-        ChatUtils.clickableChat(message, command, prefix, prefixColor)
-
-    @Deprecated("moved", ReplaceWith("ChatUtils.hoverableChat(message, hover, command, prefix, prefixColor)"))
-    fun hoverableChat(
-        message: String,
-        hover: List<String>,
-        command: String? = null,
-        prefix: Boolean = true,
-        prefixColor: String = "§e",
-    ) = ChatUtils.hoverableChat(message, hover, command, prefix, prefixColor)
-
-    @Deprecated("moved", ReplaceWith("ChatUtils.sendMessageToServer(message)"))
-    fun sendMessageToServer(message: String) = ChatUtils.sendMessageToServer(message)
 
     fun inAdvancedMiningIsland() =
         IslandType.DWARVEN_MINES.isInIsland() || IslandType.CRYSTAL_HOLLOWS.isInIsland() || IslandType.MINESHAFT.isInIsland()

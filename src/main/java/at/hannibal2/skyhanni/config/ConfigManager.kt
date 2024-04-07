@@ -236,7 +236,7 @@ class ConfigManager {
                     val jsonObject = gson.fromJson(bufferedReader.readText(), JsonObject::class.java)
                     val newJsonObject = ConfigUpdaterMigrator.fixConfig(jsonObject)
                     val run = { gson.fromJson(newJsonObject, defaultValue.javaClass) }
-                    if (LorenzUtils.isInDevEnviromen()) {
+                    if (LorenzUtils.isInDevEnvironment()) {
                         try {
                             run()
                         } catch (e: Throwable) {
