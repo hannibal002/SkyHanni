@@ -1,6 +1,5 @@
 package at.hannibal2.skyhanni.features.dungeon.m7
 
-import at.hannibal2.skyhanni.data.mob.Mob
 import at.hannibal2.skyhanni.events.DebugDataCollectEvent
 import at.hannibal2.skyhanni.events.DungeonCompleteEvent
 import at.hannibal2.skyhanni.events.DungeonM7Phase5Start
@@ -11,6 +10,7 @@ import at.hannibal2.skyhanni.events.PacketEvent
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.LocationUtils.isInside
 import at.hannibal2.skyhanni.utils.toLorenzVec
+import net.minecraft.entity.boss.EntityDragon
 import net.minecraft.network.play.server.S2APacketParticles
 import net.minecraft.util.EnumParticleTypes
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
@@ -21,8 +21,10 @@ class DragonInfoUtils {
     @SubscribeEvent
     fun onDragonSpawn(event: MobEvent.Spawn.SkyblockMob) {
         if (inPhase5) return
-        if (event.mob.mobType != Mob.Type.BOSS) return
-        if (event.mob.name != "Withered Dragon") return
+//        if (event.mob.mobType != Mob.Type.BOSS) return
+//        if (event.mob.name != "Withered Dragon") return
+        if (event.mob.baseEntity !is EntityDragon) return
+        ChatUtils.debug("name: '${event.mob.name}', type: '${event.mob.mobType}")
 
         val location = event.mob.baseEntity.position.toLorenzVec()
         ChatUtils.debug("a dragon spawned at ${location.toCleanString()}")
@@ -37,11 +39,12 @@ class DragonInfoUtils {
     @SubscribeEvent
     fun onDragonKill(event: MobEvent.DeSpawn.SkyblockMob) {
         if (inPhase5) return
-        if (event.mob.mobType != Mob.Type.BOSS) return
-        if (event.mob.name != "Withered Dragon") return
+//        if (event.mob.mobType != Mob.Type.BOSS) return
+//        if (event.mob.name != "Withered Dragon") return
+        if (event.mob.baseEntity !is EntityDragon) return
+        ChatUtils.debug("name: '${event.mob.name}', type: '${event.mob.mobType}")
 
         val location = event.mob.baseEntity.position.toLorenzVec()
-        ChatUtils.debug("a dragon died at ${location.toCleanString()}")
         M7DragonInfo.entries.filter { it.status.id == event.mob.baseEntity.entityId && it != M7DragonInfo.NONE }.forEach {
             if (it.dragonLocation.deathBox.isInside(location)) {
                 ChatUtils.debug("Killed Dragon ${it.name}, inside box, id: ${event.mob.baseEntity.entityId}")
@@ -72,7 +75,6 @@ class DragonInfoUtils {
             particle.xCoordinate % 1 != 0.0 ||
             particle.yCoordinate % 1 != 0.0 ||
             particle.zCoordinate % 1 != 0.0) return
-        ChatUtils.debug("found a match at ${event.packet.toLorenzVec().toCleanString()}")
         M7DragonInfo.entries.filter { it.status == M7SpawnedStatus.UNDEFEATED && it != M7DragonInfo.NONE}.forEach {
             if (it.dragonLocation.particleBox.isInside(event.packet.toLorenzVec())) {
                 it.status = M7SpawnedStatus.SPAWNING
