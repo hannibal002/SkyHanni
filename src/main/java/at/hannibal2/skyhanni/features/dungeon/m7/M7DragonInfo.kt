@@ -57,7 +57,10 @@ enum class M7DragonInfo(
 
     companion object {
         fun clearSpawned() {
-            entries.forEach { it.status = M7SpawnedStatus.UNDEFEATED }
+            entries.forEach {
+                it.status = M7SpawnedStatus.UNDEFEATED
+                it.status.id = -1
+            }
         }
     }
 }

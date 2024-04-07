@@ -93,11 +93,13 @@ class DragonInfoUtils {
 
     @SubscribeEvent
     fun onEnd(event: DungeonCompleteEvent) {
+        M7DragonInfo.clearSpawned()
         if (inPhase5) inPhase5 = false
     }
 
     @SubscribeEvent
     fun onLeave(event: LorenzWorldChangeEvent) {
+        M7DragonInfo.clearSpawned()
         if (inPhase5) inPhase5 = false
     }
 
