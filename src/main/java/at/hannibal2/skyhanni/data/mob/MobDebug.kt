@@ -86,12 +86,10 @@ class MobDebug {
     @SubscribeEvent
     fun onMobEvent(event: MobEvent) {
         if (!config.logEvents) return
-        LorenzDebug.log(
-            "Mob ${if (event is MobEvent.Spawn) "Spawn" else "Despawn"}: ${
-                getMobInfo(event.mob).joinToString(
-                    ", "
-                )
-            }"
-        )
+        val text = "Mob ${if (event is MobEvent.Spawn) "Spawn" else "Despawn"}: ${
+            getMobInfo(event.mob).joinToString(", ")
+        }"
+        MobData.logger.log(text)
+        LorenzDebug.log(text)
     }
 }
