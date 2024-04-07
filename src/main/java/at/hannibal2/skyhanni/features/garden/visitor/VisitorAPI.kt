@@ -26,7 +26,7 @@ object VisitorAPI {
     private val logger = LorenzLogger("garden/visitors/api")
 
     val patternGroup = RepoPattern.group("garden.visitor.api")
-    private val visitorCountPattern by patternGroup.pattern(
+    val visitorCountPattern by patternGroup.pattern(
         "visitor.count",
         "§b§lVisitors: §r§f\\((?<info>.*)\\)"
     )

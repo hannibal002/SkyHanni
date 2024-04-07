@@ -7,6 +7,9 @@ import at.hannibal2.skyhanni.data.Perk
 import at.hannibal2.skyhanni.data.TitleManager
 import at.hannibal2.skyhanni.events.GuiContainerEvent
 import at.hannibal2.skyhanni.features.dungeon.DungeonAPI
+import at.hannibal2.skyhanni.features.misc.update.UpdateManager
+import at.hannibal2.skyhanni.features.misc.visualwords.ModifyVisualWords
+import at.hannibal2.skyhanni.features.nether.kuudra.KuudraAPI
 import at.hannibal2.skyhanni.mixins.transformers.AccessorGuiEditSign
 import at.hannibal2.skyhanni.test.TestBingo
 import at.hannibal2.skyhanni.utils.ChatUtils.lastButtonClicked
@@ -28,6 +31,8 @@ import net.minecraft.util.ChatComponentText
 import net.minecraftforge.fml.common.FMLCommonHandler
 import java.text.DecimalFormat
 import java.text.SimpleDateFormat
+import java.time.LocalDate
+import java.time.Month
 import java.util.Timer
 import java.util.TimerTask
 import java.util.regex.Matcher
@@ -55,7 +60,7 @@ object LorenzUtils {
 
     val skyBlockArea get() = if (inSkyBlock) HypixelData.skyBlockArea else "?"
 
-    val inKuudraFight get() = IslandType.KUUDRA_ARENA.isInIsland()
+    val inKuudraFight get() = inSkyBlock && KuudraAPI.inKuudra()
 
     val noTradeMode get() = HypixelData.noTrade
 
@@ -66,6 +71,21 @@ object LorenzUtils {
     val isIronmanProfile get() = inSkyBlock && HypixelData.ironman
 
     val lastWorldSwitch get() = HypixelData.joinedWorld
+
+    val isAprilFoolsDay: Boolean
+        get() {
+            val itsTime = LocalDate.now().let { it.month == Month.APRIL && it.dayOfMonth == 1 }
+            val always = SkyHanniMod.feature.dev.debug.alwaysFunnyTime
+            val never = SkyHanniMod.feature.dev.debug.neverFunnyTime
+            val result = (!never && (always || itsTime))
+            if (previousApril != result) {
+                ModifyVisualWords.textCache.clear()
+            }
+            previousApril = result
+            return result
+        }
+
+    private var previousApril = false
 
     fun SimpleDateFormat.formatCurrentTime(): String = this.format(System.currentTimeMillis())
 
@@ -167,9 +187,13 @@ object LorenzUtils {
                 displayName += " "
             }
 
-            val hover = entry.hover
+            val renderable = Renderable.hoverTips(
+                "$displayName   ${entry.right}",
+                tips = entry.hover,
+                highlightsOnHoverSlots = entry.highlightsOnHoverSlots
+            )
             entry.item.getItemStackOrNull()?.let {
-                add(listOf(it, Renderable.hoverTips("$displayName   ${entry.right}", tips = hover)))
+                add(listOf(it, renderable))
             }
         }
     }
@@ -312,13 +336,13 @@ object LorenzUtils {
 
     inline fun <reified T : Enum<T>> enumValueOf(name: String) =
         enumValueOfOrNull<T>(name)
-            ?: kotlin.error("Unknown enum constant for ${enumValues<T>().first().name.javaClass.simpleName}: '$name'")
+            ?: error("Unknown enum constant for ${enumValues<T>().first().name.javaClass.simpleName}: '$name'")
 
     inline fun <reified T : Enum<T>> enumJoinToPattern(noinline transform: (T) -> CharSequence = { it.name }) =
         enumValues<T>().joinToString("|", transform = transform)
 
     // TODO move to val by lazy
-    fun isInDevEnviromen() = Launch.blackboard["fml.deobfuscatedEnvironment"] as Boolean
+    fun isInDevEnvironment() = Launch.blackboard["fml.deobfuscatedEnvironment"] as Boolean
 
     fun shutdownMinecraft(reason: String? = null) {
         System.err.println("SkyHanni-${SkyHanniMod.version} forced the game to shutdown.")
@@ -328,48 +352,19 @@ object LorenzUtils {
         FMLCommonHandler.instance().handleExit(-1)
     }
 
-    @Deprecated("moved", ReplaceWith("ChatUtils.sendCommandToServer(command)"))
-    fun sendCommandToServer(command: String) {
-        ChatUtils.sendCommandToServer(command)
-    }
-
     /**
      * Get the group, otherwise, return null
      * @param groupName The group name in the pattern
      */
-    fun Matcher.groupOrNull(groupName: String): String? {
-        return runCatching { this.group(groupName) }.getOrNull()
-    }
+    fun Matcher.groupOrNull(groupName: String): String? = runCatching { this.group(groupName) }.getOrNull()
 
-    @Deprecated("moved", ReplaceWith("ChatUtils.debug(message)"))
-    fun debug(message: String) = ChatUtils.debug(message)
-
-    @Deprecated("moved", ReplaceWith("ChatUtils.userError(message)"))
-    fun userError(message: String) = ChatUtils.userError(message)
-
-    @Deprecated("moved", ReplaceWith("ChatUtils.chat(message, prefix, prefixColor)"))
-    fun chat(message: String, prefix: Boolean = true, prefixColor: String = "§e") =
-        ChatUtils.chat(message, prefix, prefixColor)
-
-    @Deprecated("moved", ReplaceWith("ChatUtils.clickableChat(message, command, prefix, prefixColor)"))
-    fun clickableChat(message: String, command: String, prefix: Boolean = true, prefixColor: String = "§e") =
-        ChatUtils.clickableChat(message, command, prefix, prefixColor)
-
-    @Deprecated("moved", ReplaceWith("ChatUtils.hoverableChat(message, hover, command, prefix, prefixColor)"))
-    fun hoverableChat(
-        message: String,
-        hover: List<String>,
-        command: String? = null,
-        prefix: Boolean = true,
-        prefixColor: String = "§e",
-    ) = ChatUtils.hoverableChat(message, hover, command, prefix, prefixColor)
-
-    @Deprecated("moved", ReplaceWith("ChatUtils.sendMessageToServer(message)"))
-    fun sendMessageToServer(message: String) = ChatUtils.sendMessageToServer(message)
+    fun Matcher.hasGroup(groupName: String): Boolean = groupOrNull(groupName) != null
 
     fun inAdvancedMiningIsland() =
         IslandType.DWARVEN_MINES.isInIsland() || IslandType.CRYSTAL_HOLLOWS.isInIsland() || IslandType.MINESHAFT.isInIsland()
 
     fun inMiningIsland() = IslandType.GOLD_MINES.isInIsland() || IslandType.DEEP_CAVERNS.isInIsland()
         || inAdvancedMiningIsland()
+
+    fun isBetaVersion() = UpdateManager.isCurrentlyBeta()
 }

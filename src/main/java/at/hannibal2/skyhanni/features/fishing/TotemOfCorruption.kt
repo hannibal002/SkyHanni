@@ -50,7 +50,7 @@ class TotemOfCorruption {
     )
 
     @SubscribeEvent
-    fun onRender(event: GuiRenderEvent.GuiOverlayRenderEvent) {
+    fun onRenderOverlay(event: GuiRenderEvent.GuiOverlayRenderEvent) {
         if (!isOverlayEnabled() || display.isEmpty()) return
         config.position.renderStrings(display, posLabel = "Totem of Corruption")
     }
@@ -80,6 +80,7 @@ class TotemOfCorruption {
     @SubscribeEvent
     fun onRenderWorld(event: LorenzRenderWorldEvent) {
         if (!isEffectiveAreaEnabled()) return
+        if (totems.isEmpty()) return
 
         val color = config.color.toChromaColor()
         for (totem in totems) {

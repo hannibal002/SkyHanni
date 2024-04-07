@@ -52,7 +52,7 @@ class CustomScoreboard {
         RenderBackground().renderBackground()
 
         val render =
-            if (!TabListData.fullyLoaded && config.displayConfig.cacheScoreboardOnIslandSwitch && cache.isNotEmpty()) {
+            if (!TabListData.fullyLoaded && displayConfig.cacheScoreboardOnIslandSwitch && cache.isNotEmpty()) {
                 cache
             } else {
                 display
@@ -67,7 +67,6 @@ class CustomScoreboard {
     @SubscribeEvent
     fun onGuiPositionMoved(event: GuiPositionMovedEvent) {
         if (event.guiName == guiName) {
-            val alignmentConfig = config.displayConfig.alignment
             if (alignmentConfig.alignRight || alignmentConfig.alignCenterVertically) {
                 alignmentConfig.alignRight = false
                 alignmentConfig.alignCenterVertically = false
@@ -94,10 +93,16 @@ class CustomScoreboard {
 
     companion object {
         internal val config get() = SkyHanniMod.feature.gui.customScoreboard
-        internal val displayConfig get() = config.displayConfig
-        internal val eventsConfig get() = displayConfig.eventsConfig
-        internal val informationFilteringConfig get() = config.informationFilteringConfig
-        internal val backgroundConfig get() = config.backgroundConfig
+        internal val displayConfig get() = config.display
+        internal val alignmentConfig get() = displayConfig.alignment
+        internal val arrowConfig get() = displayConfig.arrow
+        internal val eventsConfig get() = displayConfig.events
+        internal val mayorConfig get() = displayConfig.mayor
+        internal val partyConfig get() = displayConfig.party
+        internal val maxwellConfig get() = displayConfig.maxwell
+        internal val informationFilteringConfig get() = config.informationFiltering
+        internal val backgroundConfig get() = config.background
+        internal val devConfig get() = SkyHanniMod.feature.dev
     }
 
     private fun createLines() = buildList<ScoreboardElementType> {
@@ -129,7 +134,7 @@ class CustomScoreboard {
     }
 
     private fun List<ScoreboardElementType>.removeEmptyLinesFromEdges(): List<ScoreboardElementType> {
-        if (config.informationFilteringConfig.hideEmptyLinesAtTopAndBottom) {
+        if (config.informationFiltering.hideEmptyLinesAtTopAndBottom) {
             return this
                 .dropWhile { it.first.isEmpty() }
                 .dropLastWhile { it.first.isEmpty() }
@@ -164,16 +169,39 @@ class CustomScoreboard {
     }
 
     private fun isEnabled() = LorenzUtils.inSkyBlock && config.enabled
-    private fun isHideVanillaScoreboardEnabled() = isEnabled() && config.displayConfig.hideVanillaScoreboard
+    private fun isHideVanillaScoreboardEnabled() = isEnabled() && displayConfig.hideVanillaScoreboard
 
     @SubscribeEvent
     fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
-        val prefix = "gui.customScoreboard.displayConfig"
-        event.move(28, "$prefix.showAllActiveEvents", "$prefix.eventsConfig.showAllActiveEvents")
-        event.transform(30, "$prefix.eventsConfig.eventEntries") { element ->
+        val prefix = "gui.customScoreboard"
+        val displayConfigPrefix = "$prefix.displayConfig"
+        val displayPrefix = "$prefix.display"
+        event.move(28, "$prefix.displayConfig.showAllActiveEvents", "$prefix.displayConfig.eventsConfig.showAllActiveEvents")
+        event.transform(30, "$prefix.displayConfig.eventsConfig.eventEntries") { element ->
             val array = element.asJsonArray
             array.add(JsonPrimitive(ScoreboardEvents.HOT_DOG_CONTEST.name))
             array
         }
+
+        event.move(31, "$displayConfigPrefix.arrowAmountDisplay", "$displayPrefix.arrow.amountDisplay")
+        event.move(31, "$displayConfigPrefix.colorArrowAmount", "$displayPrefix.arrow.colorArrowAmount")
+        event.move(31, "$displayConfigPrefix.showMagicalPower", "$displayPrefix.maxwell.showMagicalPower")
+        event.move(31, "$displayConfigPrefix.compactTuning", "$displayPrefix.maxwell.compactTuning")
+        event.move(31, "$displayConfigPrefix.tuningAmount", "$displayPrefix.maxwell.tuningAmount")
+        event.move(31, "$displayConfigPrefix.hideVanillaScoreboard", "$displayPrefix.hideVanillaScoreboard")
+        event.move(31, "$displayConfigPrefix.displayNumbersFirst", "$displayPrefix.displayNumbersFirst")
+        event.move(31, "$displayConfigPrefix.showUnclaimedBits", "$displayPrefix.showUnclaimedBits")
+        event.move(31, "$displayConfigPrefix.showMaxIslandPlayers", "$displayPrefix.showMaxIslandPlayers")
+        event.move(31, "$displayConfigPrefix.numberFormat", "$displayPrefix.numberFormat")
+        event.move(31, "$displayConfigPrefix.lineSpacing", "$displayPrefix.lineSpacing")
+        event.move(31, "$displayConfigPrefix.cacheScoreboardOnIslandSwitch", "$displayPrefix.cacheScoreboardOnIslandSwitch")
+        // Categories
+        event.move(31, "$displayConfigPrefix.alignment", "$displayPrefix.alignment")
+        event.move(31, "$displayConfigPrefix.titleAndFooter", "$displayPrefix.titleAndFooter")
+        event.move(31, "$prefix.backgroundConfig", "$prefix.background")
+        event.move(31, "$prefix.informationFilteringConfig", "$prefix.informationFiltering")
+        event.move(31, "$displayConfigPrefix.eventsConfig", "$displayPrefix.events")
+        event.move(31, "$prefix.mayorConfig", "$displayPrefix.mayor")
+        event.move(31, "$prefix.partyConfig", "$displayPrefix.party")
     }
 }

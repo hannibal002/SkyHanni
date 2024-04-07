@@ -72,7 +72,7 @@ class LimboPlaytime {
     }
 
     @SubscribeEvent
-    fun onHoverItem(event: LorenzToolTipEvent) {
+    fun onTooltip(event: LorenzToolTipEvent) {
         if (!LorenzUtils.inSkyBlock) return
         if (!event.slot.inventory.name.startsWith("Detailed /playtime")) return
         if (event.slot.slotIndex != 4) return
@@ -137,10 +137,22 @@ class LimboPlaytime {
         minutesList: MutableList<String>,
         hoursList: MutableList<String>,
     ) {
-        val firstLine = toolTip.first()
-        val totalPlaytime = toolTip.last()
+        val firstList = mutableListOf<String>()
+        val lastList = mutableListOf<String>()
+        var hasPassed = false
+        toolTip.forEach {
+            if (!(hoursPattern.matches(it) || minutesPattern.matches(it)) && !hasPassed) {
+                firstList.add(it)
+            } else hasPassed = true
+        }
+        hasPassed = false
+        toolTip.forEach {
+            if (!(hoursPattern.matches(it) || minutesPattern.matches(it)) && hasPassed) {
+                lastList.add(it)
+            } else hasPassed = true
+        }
         toolTip.clear()
-        toolTip.add(firstLine)
+        toolTip.addAll(firstList)
         if (!setMinutes) {
             toolTip.addAll(modifiedList)
             toolTip.addAll(minutesList)
@@ -148,7 +160,7 @@ class LimboPlaytime {
             toolTip.addAll(hoursList)
             toolTip.addAll(modifiedList)
         }
-        toolTip.add(totalPlaytime)
+        toolTip.addAll(lastList)
     }
 
     private fun findFloatDecimalPlace(input: Float): Int {

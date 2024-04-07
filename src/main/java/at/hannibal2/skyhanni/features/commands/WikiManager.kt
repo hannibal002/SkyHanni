@@ -22,7 +22,7 @@ object WikiManager {
     private const val FANDOM_URL_PREFIX = "https://hypixel-skyblock.fandom.com/wiki/"
     private const val FANDOM_SEARCH_PREFIX = "Special:Search?query="
 
-    private val config get() = SkyHanniMod.feature.commands.betterWiki
+    private val config get() = SkyHanniMod.feature.misc.commands.betterWiki
 
     @SubscribeEvent
     fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
@@ -48,7 +48,7 @@ object WikiManager {
         }
         if (message == ("/wikithis")) {
             val itemInHand = InventoryUtils.getItemInHand() ?: run {
-                LorenzUtils.chat("§cYou must be holding an item to use this command!")
+                ChatUtils.chat("§cYou must be holding an item to use this command!")
                 return
             }
             wikiTheItem(itemInHand, config.autoOpenWiki)
