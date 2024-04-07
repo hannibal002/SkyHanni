@@ -54,6 +54,7 @@ object LorenzUtils {
     /**
      * Consider using [IslandType.CATACOMBS.isInIsland] instead
      */
+    @Deprecated("Use IslandType.isInIsland instead", ReplaceWith("IslandType.CATACOMBS.isInIsland"))
     val inDungeons get() = inSkyBlock && DungeonAPI.inDungeon()
 
     /**
