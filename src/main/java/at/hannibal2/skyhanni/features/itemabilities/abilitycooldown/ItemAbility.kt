@@ -5,6 +5,7 @@ import at.hannibal2.skyhanni.utils.LorenzColor
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.NEUInternalName
 import at.hannibal2.skyhanni.utils.NEUInternalName.Companion.asInternalName
+import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import kotlin.math.floor
 
 enum class ItemAbility(
@@ -106,7 +107,7 @@ enum class ItemAbility(
         } else {
             duration /= 1000
             duration++
-            LorenzUtils.formatInteger(duration)
+            duration.addSeparators()
         }
     }
 
