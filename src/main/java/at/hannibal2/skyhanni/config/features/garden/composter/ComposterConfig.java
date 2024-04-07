@@ -3,10 +3,12 @@ package at.hannibal2.skyhanni.config.features.garden.composter;
 import at.hannibal2.skyhanni.config.FeatureToggle;
 import at.hannibal2.skyhanni.config.HasLegacyId;
 import at.hannibal2.skyhanni.config.core.config.Position;
+import at.hannibal2.skyhanni.config.features.About;
 import com.google.gson.annotations.Expose;
 import io.github.notenoughupdates.moulconfig.annotations.Accordion;
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorBoolean;
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorDropdown;
+import io.github.notenoughupdates.moulconfig.annotations.ConfigLink;
 import io.github.notenoughupdates.moulconfig.annotations.ConfigOption;
 
 public class ComposterConfig {
@@ -86,9 +88,11 @@ public class ComposterConfig {
     }
 
     @Expose
+    @ConfigLink(owner = ComposterConfig.class, field = "overlay")
     public Position overlayOrganicMatterPos = new Position(140, 152, false, true);
 
     @Expose
+    @ConfigLink(owner = ComposterConfig.class, field = "overlay")
     public Position overlayFuelExtrasPos = new Position(-320, 152, false, true);
 
     @Expose
@@ -158,8 +162,10 @@ public class ComposterConfig {
     public NotifyLowConfig notifyLow = new NotifyLowConfig();
 
     @Expose
+    @ConfigLink(owner = ComposterConfig.class, field = "displayEnabled")
     public Position displayPos = new Position(-390, 10, false, true);
 
     @Expose
+    @ConfigLink(owner = ComposterConfig.class, field = "displayEnabled")
     public Position outsideGardenPos = new Position(-363, 13, false, true);
 }
