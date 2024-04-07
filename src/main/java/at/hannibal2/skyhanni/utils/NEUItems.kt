@@ -83,9 +83,6 @@ object NEUItems {
         }
     }
 
-    @Deprecated("Use NEUInternalName rather than String", ReplaceWith("NEUInternalName.fromItemName(itemName)"))
-    fun getRawInternalName(itemName: String): String = NEUInternalName.fromItemName(itemName).asString()
-
     fun readAllNeuItems(): Map<String, NEUInternalName> {
         allInternalNames.clear()
         val map = mutableMapOf<String, NEUInternalName>()
@@ -140,20 +137,11 @@ object NEUItems {
         return getNpcPriceOrNull()
     }
 
-    @Deprecated("Use NEUInternalName", ReplaceWith("internalName.asInternalName().getPrice(useSellingPrice)"))
-    fun getPrice(internalName: String, useSellingPrice: Boolean = false): Double =
-        internalName.asInternalName().getPrice(useSellingPrice)
-
     fun NEUInternalName.getItemStackOrNull(): ItemStack? = ItemResolutionQuery(manager)
         .withKnownInternalName(asString())
         .resolveToItemStack()?.copy()
 
     fun getItemStackOrNull(internalName: String) = internalName.asInternalName().getItemStackOrNull()
-
-    // TODO remove
-    @Deprecated("Use NEUInternalName rather than String", ReplaceWith("internalName.asInternalName().getItemStack()"))
-    fun getItemStack(internalName: String): ItemStack =
-        internalName.asInternalName().getItemStack()
 
     fun NEUInternalName.getItemStack(): ItemStack =
         getItemStackOrNull() ?: run {
@@ -212,7 +200,7 @@ object NEUItems {
         private const val lightScaling = 2.47f // Adjust as needed
         private const val g = 0.6f // Original Value taken from RenderHelper
         private const val lightIntensity = lightScaling * g
-        private val itemLightBuffer = GLAllocation.createDirectFloatBuffer(16);
+        private val itemLightBuffer = GLAllocation.createDirectFloatBuffer(16)
 
         init {
             itemLightBuffer.clear()

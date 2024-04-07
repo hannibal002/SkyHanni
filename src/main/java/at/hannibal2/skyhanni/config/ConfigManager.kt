@@ -11,6 +11,7 @@ import at.hannibal2.skyhanni.data.jsonobjects.other.HypixelApiTrophyFish
 import at.hannibal2.skyhanni.data.jsonobjects.local.VisualWordsJson
 import at.hannibal2.skyhanni.features.fishing.trophy.TrophyRarity
 import at.hannibal2.skyhanni.features.misc.update.UpdateManager
+import at.hannibal2.skyhanni.utils.FeatureTogglesByDefaultAdapter
 import at.hannibal2.skyhanni.utils.KotlinTypeAdapterFactory
 import at.hannibal2.skyhanni.utils.LorenzLogger
 import at.hannibal2.skyhanni.utils.LorenzRarity
@@ -26,6 +27,7 @@ import at.hannibal2.skyhanni.utils.tracker.SkyHanniTracker
 import com.google.gson.GsonBuilder
 import com.google.gson.JsonObject
 import com.google.gson.TypeAdapter
+import com.google.gson.TypeAdapterFactory
 import com.google.gson.stream.JsonReader
 import com.google.gson.stream.JsonToken
 import com.google.gson.stream.JsonWriter
@@ -50,12 +52,19 @@ import kotlin.concurrent.fixedRateTimer
 
 typealias TrackerDisplayMode = SkyHanniTracker.DefaultDisplayMode
 
+private fun GsonBuilder.reigsterIfBeta(create: TypeAdapterFactory): GsonBuilder {
+    return if (LorenzUtils.isBetaVersion()) {
+        registerTypeAdapterFactory(create)
+    } else this
+}
+
 class ConfigManager {
     companion object {
 
         val gson = GsonBuilder().setPrettyPrinting()
             .excludeFieldsWithoutExposeAnnotation()
             .serializeSpecialFloatingPointValues()
+            .reigsterIfBeta(FeatureTogglesByDefaultAdapter)
             .registerTypeAdapterFactory(PropertyTypeAdapterFactory())
             .registerTypeAdapterFactory(KotlinTypeAdapterFactory())
             .registerTypeAdapter(UUID::class.java, object : TypeAdapter<UUID>() {
@@ -266,7 +275,7 @@ class ConfigManager {
                     val jsonObject = gson.fromJson(bufferedReader.readText(), JsonObject::class.java)
                     val newJsonObject = ConfigUpdaterMigrator.fixConfig(jsonObject)
                     val run = { gson.fromJson(newJsonObject, defaultValue.javaClass) }
-                    if (LorenzUtils.isInDevEnviromen()) {
+                    if (LorenzUtils.isInDevEnvironment()) {
                         try {
                             run()
                         } catch (e: Throwable) {

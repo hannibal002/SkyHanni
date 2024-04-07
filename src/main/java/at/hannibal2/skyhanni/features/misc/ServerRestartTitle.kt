@@ -51,6 +51,7 @@ class ServerRestartTitle {
                         "restartPattern" to restartingPattern.pattern(),
                     )
                 }
+                return
             }
         }
     }
