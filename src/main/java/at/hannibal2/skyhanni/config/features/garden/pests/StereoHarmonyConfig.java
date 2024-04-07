@@ -19,12 +19,24 @@ public class StereoHarmonyConfig {
     public boolean displayEnabled = true;
 
     @Expose
-    @ConfigOption(name = "Show Pest Head", desc = "")
+    @ConfigOption(
+        name = "Always Show",
+        desc = "Always show the display."
+    )
+    @ConfigEditorBoolean
+    public boolean alwaysShow = false;
+
+    @Expose
+    @ConfigOption(name = "Show Pest Head", desc = "Show the head of the pest being boosted.")
     @ConfigEditorBoolean
     public Property<Boolean> showHead = Property.of(true);
 
     @Expose
-    @ConfigOption(name = "Show Crop Icon", desc = "")
+    @ConfigOption(
+        name = "Show Crop Icon",
+        desc = "Show the icon of the crops dropped by the pests\n" +
+            "being boosted."
+    )
     @ConfigEditorBoolean
     public Property<Boolean> showCrop = Property.of(true);
 

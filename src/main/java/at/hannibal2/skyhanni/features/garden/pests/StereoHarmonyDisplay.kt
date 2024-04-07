@@ -92,6 +92,8 @@ class StereoHarmonyDisplay {
     @SubscribeEvent
     fun onRenderOverlay(event: GuiRenderEvent.GuiOverlayRenderEvent) {
         if (!isEnabled()) return
+        if (!GardenAPI.isCurrentlyFarming() && !config.alwaysShow) return
+
         if (activeVinyl == VinylType.NONE && config.hideWhenNone) return
         else if (display.isEmpty()) update()
         if (display.isEmpty()) return
