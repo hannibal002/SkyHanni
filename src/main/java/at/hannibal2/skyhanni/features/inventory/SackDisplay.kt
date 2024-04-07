@@ -79,19 +79,7 @@ object SackDisplay {
         var totalPrice = 0L
         var rendered = 0
         var totalMagmaFish = 0L
-        val sortedPairs: MutableMap<String, SackAPI.SackOtherItem> = when (config.sortingType) {
-            SortingTypeEntry.DESC_STORED -> sackItems.sortedByDescending { it.second.stored }
-            SortingTypeEntry.ASC_STORED -> sackItems.sortedBy { it.second.stored }
-            SortingTypeEntry.DESC_PRICE -> sackItems.sortedByDescending { it.second.price }
-            SortingTypeEntry.ASC_PRICE -> sackItems.sortedBy { it.second.price }
-            else -> sackItems.sortedByDescending { it.second.stored }
-        }.toMap().toMutableMap()
-
-        sortedPairs.toList().forEach { (k, v) ->
-            if (v.stored == 0 && !config.showEmpty) {
-                sortedPairs.remove(k)
-            }
-        }
+        val sortedPairs = sort(sackItems)
         val amountShowing = if (config.itemToShow > sortedPairs.size) sortedPairs.size else config.itemToShow
         list.addString("§7Items in Sacks: §o(Rendering $amountShowing of ${sortedPairs.size} items)")
         val table = mutableListOf<List<Renderable>>()
@@ -173,6 +161,23 @@ object SackDisplay {
         return totalPrice
     }
 
+    private fun <T : SackAPI.AbstractSackItem> sort(sackItems: List<Pair<String, T>>): MutableMap<String, T> {
+        val sortedPairs: MutableMap<String, T> = when (config.sortingType) {
+            SortingTypeEntry.DESC_STORED -> sackItems.sortedByDescending { it.second.stored }
+            SortingTypeEntry.ASC_STORED -> sackItems.sortedBy { it.second.stored }
+            SortingTypeEntry.DESC_PRICE -> sackItems.sortedByDescending { it.second.price }
+            SortingTypeEntry.ASC_PRICE -> sackItems.sortedBy { it.second.price }
+            else -> sackItems.sortedByDescending { it.second.stored }
+        }.toMap().toMutableMap()
+
+        sortedPairs.toList().forEach { (k, v) ->
+            if (v.stored == 0 && !config.showEmpty) {
+                sortedPairs.remove(k)
+            }
+        }
+        return sortedPairs
+    }
+
     private fun drawOptions(list: MutableList<Renderable>, totalPrice: Long) {
         val name = SortType.entries[config.sortingType.ordinal].longName // todo avoid ordinal
         list.addString("§7Sorted By: §c$name")
@@ -233,7 +238,7 @@ object SackDisplay {
         if (SackAPI.runeItem.isEmpty()) return
         list.addString("§7Runes:")
         val table = mutableListOf<List<Renderable>>()
-        for ((name, rune) in SackAPI.runeItem) {
+        for ((name, rune) in sort(SackAPI.runeItem.toList())) {
             val (stack, lv1, lv2, lv3) = rune
             table.add(buildList {
                 addString(" §7- ")
