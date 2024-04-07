@@ -21,6 +21,7 @@ import net.minecraft.client.gui.ScaledResolution
 import net.minecraft.client.renderer.GLAllocation
 import net.minecraft.client.renderer.GlStateManager
 import net.minecraft.client.renderer.Tessellator
+import net.minecraft.client.renderer.WorldRenderer
 import net.minecraft.client.renderer.vertex.DefaultVertexFormats
 import net.minecraft.enchantment.Enchantment
 import net.minecraft.entity.Entity
@@ -138,7 +139,8 @@ object RenderUtils {
 
     fun getViewerPos(partialTicks: Float) = exactLocation(Minecraft.getMinecraft().renderViewEntity, partialTicks)
 
-    fun AxisAlignedBB.expandBlock() = expand(0.0020000000949949026, 0.0020000000949949026, 0.0020000000949949026)
+    fun AxisAlignedBB.expandBlock(n: Int = 1) = expand(LorenzVec.expandVector.multiply(n))
+    fun AxisAlignedBB.inflateBlock(n: Int = 1) = expand(LorenzVec.expandVector.multiply(-n))
 
     /**
      * Taken from NotEnoughUpdates under Creative Commons Attribution-NonCommercial 3.0
@@ -1145,6 +1147,69 @@ object RenderUtils {
         GlStateManager.enableTexture2D()
         GlStateManager.enableCull()
         GlStateManager.disableBlend()
+    }
+
+    fun WorldRenderer.pos(vec: LorenzVec) = this.pos(vec.x, vec.y, vec.z)
+
+    fun draw3DQuad(
+        middlePoint: LorenzVec,
+        sidePoint1: LorenzVec,
+        sidePoint2: LorenzVec,
+        c: Color,
+        partialTicks: Float = 0F,
+    ) = QuadDrawer.draw3D(partialTicks) {
+        draw(
+            middlePoint,
+            sidePoint1,
+            sidePoint2,
+            c
+        )
+    }
+
+    class QuadDrawer @PublishedApi internal constructor(val tessellator: Tessellator) {
+        val worldRenderer = tessellator.worldRenderer
+        inline fun draw(
+            middlePoint: LorenzVec,
+            sidePoint1: LorenzVec,
+            sidePoint2: LorenzVec,
+            c: Color
+        ) {
+            GlStateManager.color(c.red / 255f, c.green / 255f, c.blue / 255f, c.alpha / 255f)
+            worldRenderer.begin(GL11.GL_QUADS, DefaultVertexFormats.POSITION)
+            worldRenderer.pos(sidePoint1).endVertex()
+            worldRenderer.pos(middlePoint).endVertex()
+            worldRenderer.pos(sidePoint2).endVertex()
+            worldRenderer.pos(sidePoint1.add(sidePoint2).subtract(middlePoint)).endVertex()
+            tessellator.draw()
+        }
+
+        companion object {
+            inline fun draw3D(
+                partialTicks: Float = 0F,
+                crossinline quads: QuadDrawer.() -> Unit
+            ) {
+
+                GlStateManager.enableBlend()
+                GlStateManager.disableLighting()
+                GlStateManager.tryBlendFuncSeparate(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA, 1, 0)
+                GlStateManager.disableTexture2D()
+                GlStateManager.disableCull()
+
+                val tessellator = Tessellator.getInstance()
+
+                GlStateManager.pushMatrix()
+                RenderUtils.translate(getViewerPos(partialTicks).negated())
+                getViewerPos(partialTicks)
+
+                quads.invoke(QuadDrawer(Tessellator.getInstance()))
+
+                GlStateManager.popMatrix()
+
+                GlStateManager.enableTexture2D()
+                GlStateManager.enableCull()
+                GlStateManager.disableBlend()
+            }
+        }
     }
 
     fun drawFilledBoundingBox_nea(

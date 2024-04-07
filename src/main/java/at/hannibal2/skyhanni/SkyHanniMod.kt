@@ -116,6 +116,7 @@ import at.hannibal2.skyhanni.features.dungeon.DungeonHighlightClickedBlocks
 import at.hannibal2.skyhanni.features.dungeon.DungeonLividFinder
 import at.hannibal2.skyhanni.features.dungeon.DungeonMilestonesDisplay
 import at.hannibal2.skyhanni.features.dungeon.DungeonRankTabListColor
+import at.hannibal2.skyhanni.features.dungeon.DungeonShadowAssassinNotification
 import at.hannibal2.skyhanni.features.dungeon.DungeonTeammateOutlines
 import at.hannibal2.skyhanni.features.dungeon.HighlightDungeonDeathmite
 import at.hannibal2.skyhanni.features.dungeon.TerracottaPhase
@@ -262,6 +263,7 @@ import at.hannibal2.skyhanni.features.mining.DeepCavernsParkour
 import at.hannibal2.skyhanni.features.mining.HighlightMiningCommissionMobs
 import at.hannibal2.skyhanni.features.mining.KingTalismanHelper
 import at.hannibal2.skyhanni.features.mining.crystalhollows.CrystalHollowsNamesInCore
+import at.hannibal2.skyhanni.features.mining.crystalhollows.CrystalHollowsWalls
 import at.hannibal2.skyhanni.features.mining.eventtracker.MiningEventDisplay
 import at.hannibal2.skyhanni.features.mining.eventtracker.MiningEventTracker
 import at.hannibal2.skyhanni.features.mining.powdertracker.PowderTracker
@@ -564,6 +566,7 @@ class SkyHanniMod {
         loadModule(SeaCreatureMessageShortener())
         loadModule(AshfangFreezeCooldown)
         loadModule(AshfangNextResetCooldown())
+        loadModule(CrystalHollowsWalls())
         loadModule(SummoningSoulsName())
         loadModule(AshfangGravityOrbs())
         loadModule(AshfangBlazingSouls())
@@ -821,6 +824,7 @@ class SkyHanniMod {
         loadModule(LimboPlaytime())
         loadModule(RareDropMessages())
         loadModule(CraftMaterialsFromBazaar())
+        loadModule(DungeonShadowAssassinNotification())
         loadModule(PestProfitTracker)
         loadModule(NoBitsWarning())
 

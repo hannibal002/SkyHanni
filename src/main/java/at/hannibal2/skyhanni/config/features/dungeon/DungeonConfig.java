@@ -110,4 +110,11 @@ public class DungeonConfig {
     @ConfigEditorBoolean
     @FeatureToggle
     public boolean croesusUnopenedChestTracker = true;
+
+    @Expose
+    @ConfigOption(name = "SA Jump Notification", desc = "Notifies you when a Shadow Assassin is about " +
+        "to jump on you.")
+    @ConfigEditorBoolean
+    @FeatureToggle
+    public boolean shadowAssassinJumpNotifier = false;
 }
