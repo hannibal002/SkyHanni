@@ -48,7 +48,7 @@ object WikiManager {
         }
         if (message == ("/wikithis")) {
             val itemInHand = InventoryUtils.getItemInHand() ?: run {
-                LorenzUtils.chat("§cYou must be holding an item to use this command!")
+                ChatUtils.chat("§cYou must be holding an item to use this command!")
                 return
             }
             wikiTheItem(itemInHand, config.autoOpenWiki)

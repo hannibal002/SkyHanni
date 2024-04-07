@@ -10,21 +10,40 @@
 + Added Open On Elite. - Obsidian (https://github.com/hannibal002/SkyHanni/pull/1185)
     + Allow opening farming contest stats on elitebot.dev by pressing a keybind + mouse click onto a contest item.
     + Works inside the menus Jacob's Farming Contest, Your Contests, and SkyBlock Calendar.
++ Added Visitor's Logbook Stats. - HiZe (https://github.com/hannibal002/SkyHanni/pull/1287)
+    + Show all your visited/accepted/denied visitors stats in a display.
 
 #### Diana Features
 
 + Added customizable Inquisitor Highlight color. - Empa (https://github.com/hannibal002/SkyHanni/pull/1323)
 + Added mobs since last Inquisitor to Mythological Creature Tracker. - CuzImClicks (https://github.com/hannibal002/SkyHanni/pull/1346)
 
+#### Misc Features
+
++ Added No Bits Available Warning. - Empa (https://github.com/hannibal002/SkyHanni/pull/1286)
+    + Warns when you run out of available bits to generate.
+
 ### Improvements
 
 #### Garden Improvements
 
 + Added warnings when Farming Fortune/Crop Fortune aren't found in tab list. - Empa (https://github.com/hannibal002/SkyHanni/pull/1330)
++ Added highlight slot while hovering over line for Anita medal profit and SkyMart copper price. - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/1118)
 
 #### Diana Improvements
 
 + Now detecting inquisitor share chat messages from CT module "InquisitorChecker". - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/1315)
++ Added kills since last inquis to chat message when digging one up. - Empa (https://github.com/hannibal002/SkyHanni/pull/1363)
+
+#### GUI Improvements
+
++ Made Cookie Buff timer in Custom Scoreboard work without tab list. - Empa (https://github.com/hannibal002/SkyHanni/pull/1292)
++ Update Magical Power from Maxwell as well. - j10a1n15 (https://github.com/hannibal002/SkyHanni/pull/1327)
++ Improved SkyBlock Area in Custom Scoreboard. - j10a1n15 (https://github.com/hannibal002/SkyHanni/pull/1350)
+
+#### Commands Improvements
+
++ Add /trade to tab completeable commands. - CalMWolfs (https://github.com/hannibal002/SkyHanni/pull/1354)
 
 #### Misc Improvements
 
@@ -43,20 +62,29 @@
 #### Garden Fixes
 
 + Fixed Farming Fortune Display not showing when no Crop Fortune in tab. - Empa (https://github.com/hannibal002/SkyHanni/pull/1330)
++ Fixed impossible pest counts. - Empa (https://github.com/hannibal002/SkyHanni/pull/1362)
++ Fixed crop fortune message spam. - Empa (https://github.com/hannibal002/SkyHanni/pull/1364)
++ Fixed coins from leveling up farming counting to Pest Profit Tracker. - Empa (https://github.com/hannibal002/SkyHanni/pull/1358)
++ Fixed not being able to teleport to other infested plots immediately after killing a pest. - Empa (https://github.com/hannibal002/SkyHanni/pull/1357)
 
 #### Chat Fixes
 
 + Added names of lobby players to /p tab complete. - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/1340)
 + Fixed friend detection from chat. - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/1336)
++ Fixed the Supercraft /gfs prompt not showing when you crafted 1,000 or more items. - Alexia Luna (https://github.com/hannibal002/SkyHanni/pull/1351)
 
 #### GUI Fixes
 
 + Fixed "No Power" being displayed as "No" in Custom Scoreboard. - j10a1n15 (https://github.com/hannibal002/SkyHanni/pull/1332)
 + Fixed coop banks not being affected by "hide empty numbers" in Custom Scoreboard. - j10a1n15 (https://github.com/hannibal002/SkyHanni/pull/1328)
++ Fixed bits available being subtracted in an infinite loop. - Empa (https://github.com/hannibal002/SkyHanni/pull/1292)
++ Fixed not setting No Power Active. - Empa (https://github.com/hannibal002/SkyHanni/pull/1366)
 
 #### Misc Fixes
 
 + Fixed tick event being called twice a tick. - CalMWolfs (https://github.com/hannibal002/SkyHanni/pull/1342)
++ Fixes random error in mob detection. - Thunderblade73 (https://github.com/hannibal002/SkyHanni/pull/1361)
++ Fixed a spelling mistake in the Deep Caverns Parkour config. - jani (https://github.com/hannibal002/SkyHanni/pull/1349)
 
 ### Technical Details
 
@@ -73,6 +101,25 @@
 + Removed Old TimeMark Class. - Thunderblade73 (https://github.com/hannibal002/SkyHanni/pull/1322)
 + Remove a lot of usage of fixed rate timers and replace with a new event. - CalMWolfs (https://github.com/hannibal002/SkyHanni/pull/1264)
     + This makes these events that need to repeat about every second execute on the main thread.
++ Added Booster Cookie expiry time and hasCookieBuff to BitsAPI. - Empa (https://github.com/hannibal002/SkyHanni/pull/1292)
++ Added SimpleTimeMark.isInFuture(). - Empa (https://github.com/hannibal002/SkyHanni/pull/1292)
++ Added pest data to /shdebug. - Empa (https://github.com/hannibal002/SkyHanni/pull/1362)
++ Improved Scoreboard Line joining with special formatting codes. - j10a1n15 (https://github.com/hannibal002/SkyHanni/pull/1333)
++ Use InventoryCloseEvent over GuiContainerEvent.CloseWindowEvent when able. - CalMWolfs (https://github.com/hannibal002/SkyHanni/pull/1184)
++ Added an option to copy the raw scoreboard. - Alexia Luna (https://github.com/hannibal002/SkyHanni/pull/1356)
+    + This is accessed with `/shcopyscoreboard -raw`.
+    + `/shcopyscoreboard true` has been changed to `/shcopyscoreboard -nocolor`.
++ Added HypixelData.skyblockAreaWithSymbol which includes the symbol and color of the SkyBlock area. - j10a1n15 (https://github.com/hannibal002/SkyHanni/pull/1350)
++ Created `List<String>.matchFirst(pattern)`. - CalMWolfs (https://github.com/hannibal002/SkyHanni/pull/1353)
++ Error Manager now has a parameter to only show for beta users. - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/1299)
+    + Less spam for full version users, still enough reports from beat users.
++ Added HighlightOnHoverSlot. - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/1118)
++ Added BitsUpdateEvent. - Empa (https://github.com/hannibal002/SkyHanni/pull/1286)
++ Fixed default fame rank being null. - Empa (https://github.com/hannibal002/SkyHanni/pull/1286)
+
+### Removed Features
+
++ Removed the option to change the highlight color in chest value. - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/1118)
 
 ## Version 0.24
 

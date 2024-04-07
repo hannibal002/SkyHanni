@@ -82,6 +82,10 @@ object TimeUtils {
         return builder.toString().trim()
     }
 
+    val Duration.inWholeTicks: Int
+        get() = (inWholeMilliseconds / 50).toInt()
+
+
     @Deprecated("Do no longer use long for time", ReplaceWith("TimeUtils.getDuration(string)"))
     fun getMillis(string: String) = getDuration(string).inWholeMilliseconds
 

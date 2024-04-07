@@ -1,6 +1,6 @@
 package at.hannibal2.skyhanni.features.garden.farming
 
-import at.hannibal2.skyhanni.events.GuiContainerEvent
+import at.hannibal2.skyhanni.events.InventoryCloseEvent
 import at.hannibal2.skyhanni.events.OwnInventoryItemUpdateEvent
 import at.hannibal2.skyhanni.features.garden.GardenAPI
 import at.hannibal2.skyhanni.utils.ChatUtils
@@ -20,7 +20,7 @@ class WildStrawberryDyeNotification {
     val item by lazy { "DYE_WILD_STRAWBERRY".asInternalName() }
 
     @SubscribeEvent
-    fun onCloseWindow(event: GuiContainerEvent.CloseWindowEvent) {
+    fun onInventoryClose(event: InventoryCloseEvent) {
         lastCloseTime = System.currentTimeMillis()
     }
 
