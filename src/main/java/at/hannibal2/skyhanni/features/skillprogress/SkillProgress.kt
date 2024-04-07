@@ -20,6 +20,7 @@ import at.hannibal2.skyhanni.events.ConfigLoadEvent
 import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.LorenzTickEvent
 import at.hannibal2.skyhanni.events.ProfileJoinEvent
+import at.hannibal2.skyhanni.events.SecondPassedEvent
 import at.hannibal2.skyhanni.events.SkillOverflowLevelupEvent
 import at.hannibal2.skyhanni.features.chroma.ChromaShaderManager
 import at.hannibal2.skyhanni.features.chroma.ChromaType
@@ -156,20 +157,16 @@ object SkillProgress {
     }
 
     @SubscribeEvent
-    fun onTick(event: LorenzTickEvent) {
+    fun onSecondPass(event: SecondPassedEvent) {
         if (!isEnabled()) return
+
         if (lastUpdate.passedSince() > 3.seconds) showDisplay = config.alwaysShow.get()
         inventoryOpen = Minecraft.getMinecraft().currentScreen is GuiInventory
+        allDisplay = formatAllDisplay(drawAllDisplay())
+        etaDisplay = buildFinalDisplay(formatETADisplay(drawETADisplay()))
 
-        if (event.repeatSeconds(1)) {
-            allDisplay = formatAllDisplay(drawAllDisplay())
-            etaDisplay = buildFinalDisplay(formatETADisplay(drawETADisplay()))
-        }
-
-        if (event.repeatSeconds(2)) {
-            update()
-            updateSkillInfo()
-        }
+        update()
+        updateSkillInfo()
     }
 
     private fun buildFinalDisplay(rawList: List<Renderable>): List<Renderable> = rawList.toMutableList().also {
@@ -458,7 +455,7 @@ object SkillProgress {
         if (config.showLevel.get()) {
             val colorLevel = if (config.skillColorConfig.scalingColorLevel.get()) getColorForLevel(level) else "§d"
             val levelString = if (matchColor) "[$level] " else "§9[$colorLevel$level§9] "
-            add(Renderable.string(levelString, color))
+            add(Renderable.string(levelString, color = color))
         }
 
         if (config.useIcon.get()) {
@@ -512,7 +509,7 @@ object SkillProgress {
                     append("$percentColor∞ Left")
                 }
             }
-        }, color))
+        }, color = color))
     }
 
     private fun updateSkillInfo() {

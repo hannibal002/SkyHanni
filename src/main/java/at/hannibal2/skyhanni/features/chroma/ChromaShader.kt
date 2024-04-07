@@ -1,6 +1,5 @@
 package at.hannibal2.skyhanni.features.chroma
 
-import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.config.features.chroma.ChromaConfig.Direction
 import at.hannibal2.skyhanni.data.MinecraftData
 import at.hannibal2.skyhanni.mixins.transformers.AccessorMinecraft
@@ -15,30 +14,29 @@ import net.minecraft.client.Minecraft
  */
 
 abstract class ChromaShader(vertex: String, fragment: String) : Shader(vertex, fragment) {
-    val config get() = SkyHanniMod.feature.chroma
 
     override fun registerUniforms() {
         registerUniform(Uniform.UniformType.FLOAT, "chromaSize") {
-            config.chromaSize * (Minecraft.getMinecraft().displayWidth / 100f)
+            ChromaManager.config.chromaSize * (Minecraft.getMinecraft().displayWidth / 100f)
         }
         registerUniform(Uniform.UniformType.FLOAT, "timeOffset") {
             var ticks =
-                (MinecraftData.totalTicks / 2) + (Minecraft.getMinecraft() as AccessorMinecraft).timer.renderPartialTicks
+                (MinecraftData.totalTicks) + (Minecraft.getMinecraft() as AccessorMinecraft).timer.renderPartialTicks
 
-            ticks = when (config.chromaDirection) {
+            ticks = when (ChromaManager.config.chromaDirection) {
                 Direction.FORWARD_RIGHT, Direction.BACKWARD_RIGHT -> ticks
                 Direction.FORWARD_LEFT, Direction.BACKWARD_LEFT -> -ticks
                 else -> ticks
             }
 
-            val chromaSpeed = config.chromaSpeed / 360f
+            val chromaSpeed = ChromaManager.config.chromaSpeed / 360f
             ticks * chromaSpeed
         }
         registerUniform(Uniform.UniformType.FLOAT, "saturation") {
-            config.chromaSaturation
+            ChromaManager.config.chromaSaturation
         }
         registerUniform(Uniform.UniformType.BOOL, "forwardDirection") {
-            when (config.chromaDirection) {
+            when (ChromaManager.config.chromaDirection) {
                 Direction.FORWARD_RIGHT, Direction.FORWARD_LEFT -> true
                 Direction.BACKWARD_RIGHT, Direction.BACKWARD_LEFT -> false
                 else -> true

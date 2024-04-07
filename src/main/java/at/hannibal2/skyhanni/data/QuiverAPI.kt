@@ -134,20 +134,18 @@ object QuiverAPI {
         clearedPattern.matchMatcher(message) {
             currentAmount = 0
             arrowAmount.clear()
-
             return
         }
 
         arrowResetPattern.matchMatcher(message) {
             currentArrow = NONE_ARROW_TYPE
             currentAmount = 0
-
             return
         }
     }
 
     @SubscribeEvent
-    fun onInventoryFullyLoaded(event: InventoryFullyOpenedEvent) {
+    fun onInventoryOpen(event: InventoryFullyOpenedEvent) {
         if (!isEnabled()) return
         if (!quiverInventoryNamePattern.matches(event.inventoryName)) return
 
@@ -158,9 +156,7 @@ object QuiverAPI {
         val stacks = event.inventoryItems
         for (stack in stacks.values) {
             if (stack.getItemCategoryOrNull() != ItemCategory.ARROW) continue
-
             val arrow = stack.getInternalNameOrNull() ?: continue
-
             val arrowType = getArrowByNameOrNull(arrow) ?: continue
 
             arrowAmount.addOrPut(arrowType.internalName, stack.stackSize.toFloat())

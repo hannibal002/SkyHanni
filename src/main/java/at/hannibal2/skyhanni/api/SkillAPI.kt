@@ -6,6 +6,7 @@ import at.hannibal2.skyhanni.events.ActionBarUpdateEvent
 import at.hannibal2.skyhanni.events.ConfigLoadEvent
 import at.hannibal2.skyhanni.events.DebugDataCollectEvent
 import at.hannibal2.skyhanni.events.InventoryFullyOpenedEvent
+import at.hannibal2.skyhanni.events.SecondPassedEvent
 import at.hannibal2.skyhanni.events.SkillOverflowLevelupEvent
 import at.hannibal2.skyhanni.features.skillprogress.SkillProgress
 import at.hannibal2.skyhanni.features.skillprogress.SkillType
@@ -42,7 +43,6 @@ import net.minecraft.item.ItemStack
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import java.util.LinkedList
 import java.util.regex.Matcher
-import kotlin.concurrent.fixedRateTimer
 import kotlin.time.Duration.Companion.seconds
 
 object SkillAPI {
@@ -98,13 +98,8 @@ object SkillAPI {
     var showDisplay = false
     var lastUpdate = SimpleTimeMark.farPast()
 
-    init {
-        fixedRateTimer(name = "skyhanni-skillprogress-timer", initialDelay = 1_000L, period = 1_000L) {
-            tickSkill()
-        }
-    }
-
-    private fun tickSkill() {
+    @SubscribeEvent
+    fun onSecondPassed(event: SecondPassedEvent) {
         val activeSkill = activeSkill ?: return
         val info = skillXPInfoMap[activeSkill] ?: return
         if (!info.sessionTimerActive) return
@@ -126,7 +121,7 @@ object SkillAPI {
     }
 
     @SubscribeEvent
-    fun onActionBar(event: ActionBarUpdateEvent) {
+    fun onActionBarUpdate(event: ActionBarUpdateEvent) {
         val actionBar = event.actionBar.removeColor()
         val components = SPACE_SPLITTER.splitToList(actionBar)
         for (component in components) {

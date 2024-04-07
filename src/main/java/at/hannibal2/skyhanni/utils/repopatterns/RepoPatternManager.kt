@@ -92,7 +92,7 @@ object RepoPatternManager {
     }
 
     @SubscribeEvent
-    fun onConfigInit(event: ConfigLoadEvent) {
+    fun onConfigLoad(event: ConfigLoadEvent) {
         config.forceLocal.afterChange { reloadPatterns() }
     }
 

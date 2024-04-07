@@ -1,6 +1,5 @@
 package at.hannibal2.skyhanni.features.skillprogress
 
-import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.SkillAPI
 import at.hannibal2.skyhanni.api.SkillAPI.customGoalConfig
 import at.hannibal2.skyhanni.api.SkillAPI.excludedSkills
