@@ -416,7 +416,7 @@ object GardenVisitorFeatures {
     fun onTick(event: LorenzTickEvent) {
         if (!GardenAPI.inGarden()) return
         if (!config.shoppingList.display && config.highlightStatus == HighlightMode.DISABLED) return
-        if (!event.isMod(10)) return
+        if (!event.isMod(10, 2)) return
 
         if (GardenAPI.onBarnPlot && config.highlightStatus != HighlightMode.DISABLED) {
             checkVisitorsReady()
@@ -454,7 +454,7 @@ object GardenVisitorFeatures {
     }
 
     @SubscribeEvent
-    fun onChatMessage(event: LorenzChatEvent) {
+    fun onChat(event: LorenzChatEvent) {
         if (config.hypixelArrivedMessage && visitorArrivePattern.matcher(event.message).matches()) {
             event.blockedReason = "new_visitor_arrived"
         }

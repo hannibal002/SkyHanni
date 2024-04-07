@@ -72,7 +72,7 @@ class BazaarBestSellMethod {
     }
 
     @SubscribeEvent(priority = EventPriority.HIGH)
-    fun onStackClick(event: GuiContainerEvent.SlotClickEvent) {
+    fun onSlotClick(event: GuiContainerEvent.SlotClickEvent) {
         lastClickedItem = event.slot?.stack
         nextCloseWillResetItem = false
     }

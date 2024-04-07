@@ -70,7 +70,7 @@ object BestiaryData {
     }
 
     @SubscribeEvent
-    fun onRender(event: GuiContainerEvent.BackgroundDrawnEvent) {
+    fun onBackgroundDrawn(event: GuiContainerEvent.BackgroundDrawnEvent) {
         if (!isEnabled()) return
         if (inInventory) {
             for (slot in InventoryUtils.getItemsInOpenChest()) {
