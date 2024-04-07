@@ -125,22 +125,30 @@ object SackAPI {
                             name.uppercase().split(" ")[0].removeColor()
                         }_GEM".asInternalName()
 
+                        gem.slot = slot
+
                         when (rarity) {
                             "Rough" -> {
                                 gem.rough = stored
+                                gem.stored += stored
                                 gem.roughPrice = internalName.sackPrice(stored)
+                                gem.price += gem.roughPrice
                                 if (savingSacks) setSackItem(internalName, stored)
                             }
 
                             "Flawed" -> {
                                 gem.flawed = stored
+                                gem.stored += stored
                                 gem.flawedPrice = internalName.sackPrice(stored)
+                                gem.price += gem.flawedPrice
                                 if (savingSacks) setSackItem(internalName, stored)
                             }
 
                             "Fine" -> {
                                 gem.fine = stored
+                                gem.stored += stored
                                 gem.finePrice = internalName.sackPrice(stored)
+                                gem.price += gem.finePrice
                                 if (savingSacks) setSackItem(internalName, stored)
                             }
                         }
@@ -310,7 +318,7 @@ object SackAPI {
         var roughPrice: Long = 0,
         var flawedPrice: Long = 0,
         var finePrice: Long = 0,
-    )
+    ): AbstractSackItem()
 
     data class SackRune(
         var stack: ItemStack? = null,

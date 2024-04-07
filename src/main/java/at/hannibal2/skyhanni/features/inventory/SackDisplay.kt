@@ -263,14 +263,18 @@ object SackDisplay {
         list.addString("§7Gemstones:")
         var totalPrice = 0L
         val table = mutableListOf<List<Renderable>>()
-        for ((name, gem) in SackAPI.gemstoneItem) {
+        for ((name, gem) in sort(SackAPI.gemstoneItem.toList())) {
             val (internalName, rough, flawed, fine, roughprice, flawedprice, fineprice) = gem
             table.add(buildList {
                 addString(" §7- ")
                 addItemStackScaled(internalName)
-                add(Renderable.optionalLink("$name:", {
-                    BazaarApi.searchForBazaarItem(name.dropLast(1))
-                }) { !NEUItems.neuHasFocus() })
+                add(Renderable.optionalLink(
+                    "$name:",
+                    onClick = {
+                        BazaarApi.searchForBazaarItem(name.dropLast(1))
+                    },
+                    highlightsOnHoverSlots = listOf(gem.slot)
+                ) { !NEUItems.neuHasFocus() })
                 addAlignedNumber(rough.addSeparators())
                 addAlignedNumber("§a${flawed.addSeparators()}")
                 addAlignedNumber("§9${fine.addSeparators()}")
