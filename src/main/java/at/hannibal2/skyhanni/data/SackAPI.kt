@@ -57,6 +57,15 @@ object SackAPI {
     var isTrophySack = false
     private var sackRarity: TrophyRarity? = null
 
+    /**
+     * TODO merge all 3 lists into one:
+     *
+     * move item name (currently key) into AbstractSackItem
+     * work with instance check
+     * add custom function for render behaviour.
+     * have only one render display function
+     */
+    //
     val sackItem = mutableMapOf<String, SackOtherItem>()
     val runeItem = mutableMapOf<String, SackRune>()
     val gemstoneItem = mutableMapOf<String, SackGemstone>()

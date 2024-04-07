@@ -96,13 +96,17 @@ object SackDisplay {
                 addString(" §7- ")
                 addItemStackScaled(internalName)
                 // TODO move replace into itemName
-                if (!SackAPI.isTrophySack) add(Renderable.optionalLink(
-                    itemName.replace("§k", ""), {
-                        BazaarApi.searchForBazaarItem(itemName)
+                val nameText = Renderable.optionalLink(
+                    itemName.replace("§k", ""),
+                    onClick = {
+                        if (!SackAPI.isTrophySack) {
+                            BazaarApi.searchForBazaarItem(itemName)
+                        }
                     },
                     highlightsOnHoverSlots = listOf(slot)
-                ) { !NEUItems.neuHasFocus() })
-                else addString("${itemName.replace("§k", "")} ")
+                ) { !NEUItems.neuHasFocus() }
+                add(nameText)
+
 
                 when (config.numberFormat) {
                     NumberFormatEntry.DEFAULT -> {
@@ -269,7 +273,7 @@ object SackDisplay {
                 addString(" §7- ")
                 addItemStackScaled(internalName)
                 add(Renderable.optionalLink(
-                    "$name:",
+                    name,
                     onClick = {
                         BazaarApi.searchForBazaarItem(name.dropLast(1))
                     },
