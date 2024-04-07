@@ -14,6 +14,7 @@ import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils.groupOrNull
 import at.hannibal2.skyhanni.utils.LorenzUtils.isInIsland
 import at.hannibal2.skyhanni.utils.NumberUtil.formatInt
+import at.hannibal2.skyhanni.utils.StringUtils.matchFirst
 import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.StringUtils.matches
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
@@ -75,6 +76,10 @@ object MaxwellAPI {
         "gui.thaumaturgy.data",
         "§(?<color>.)\\+(?<amount>[^ ]+)(?<icon>.) (?<name>.+)"
     )
+    private val thaumaturgyMagicalPowerPattern by group.pattern(
+        "gui.thaumaturgy.magicalpower",
+        "§7Total: §6(?<mp>\\d+) Magical Power"
+    )
     private val statsTuningGuiPattern by group.pattern(
         "gui.thaumaturgy.statstuning",
         "Stats Tuning"
@@ -94,6 +99,10 @@ object MaxwellAPI {
     private val powerSelectedPattern by group.pattern(
         "gui.selectedpower",
         "§aPower is selected!"
+    )
+    private val noPowerSelectedPattern by group.pattern(
+        "gui.noselectedpower",
+        "(?:§.)*Visit Maxwell in the Hub to learn"
     )
     private val accessoryBagStack by group.pattern(
         "stack.accessorybag",
@@ -139,6 +148,7 @@ object MaxwellAPI {
         if (isThaumaturgyInventory(event.inventoryName)) {
             loadThaumaturgyCurrentPower(event.inventoryItems)
             loadThaumaturgyTunings(event.inventoryItems)
+            loadThaumaturgyMagicalPower(event.inventoryItems)
         }
 
         if (yourBagsGuiPattern.matches(event.inventoryName)) {
@@ -200,7 +210,7 @@ object MaxwellAPI {
     private fun loadThaumaturgyTunings(inventoryItems: Map<Int, ItemStack>) {
         val tunings = tunings ?: return
 
-        // Only load those rounded values if we dont have any values at all
+        // Only load those rounded values if we don't have any values at all
         if (tunings.isNotEmpty()) return
 
         val item = inventoryItems[51] ?: return
@@ -220,6 +230,13 @@ object MaxwellAPI {
         this.tunings = map
     }
 
+    private fun loadThaumaturgyMagicalPower(inventoryItems: Map<Int, ItemStack>) {
+        val item = inventoryItems[48] ?: return
+        item.getLore().matchFirst(thaumaturgyMagicalPowerPattern) {
+            magicalPower = group("mp").formatInt()
+        }
+    }
+
     private fun processStack(stack: ItemStack) {
         for (line in stack.getLore()) {
             redstoneCollectionRequirementPattern.matchMatcher(line) {
@@ -228,6 +245,8 @@ object MaxwellAPI {
                 magicalPower = 0
                 return
             }
+
+            if (noPowerSelectedPattern.matches(line)) currentPower = getPowerByNameOrNull("No Power")
 
             inventoryMPPattern.matchMatcher(line) {
                 // MagicalPower is boosted in catacombs
