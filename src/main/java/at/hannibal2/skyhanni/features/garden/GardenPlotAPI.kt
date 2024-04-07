@@ -66,6 +66,10 @@ object GardenPlotAPI {
         "spray.target",
         "§a§lSPRAYONATOR! §r§7You sprayed §r§aPlot §r§7- §r§b(?<plot>.*) §r§7with §r§a(?<spray>.*)§r§7!"
     )
+    private val portableWasherPattern by patternGroup.pattern(
+        "spray.cleared.portablewasher",
+        "§9§lSPLASH! §r§6Your §r§bGarden §r§6was cleared of all active §r§aSprayonator §r§6effects!"
+    )
 
     var plots = listOf<Plot>()
 
@@ -174,6 +178,14 @@ object GardenPlotAPI {
         }
     }
 
+    private fun Plot.removeSpray() {
+        getData()?.apply {
+            sprayType = null
+            sprayExpiryTime = SimpleTimeMark.now()
+            sprayHasNotified = true
+        }
+    }
+
     fun Plot.isBarn() = id == 0
 
     fun Plot.isPlayerInside() = box.isPlayerInside()
@@ -236,6 +248,14 @@ object GardenPlotAPI {
             val plotId = group("plot").toInt()
             val plot = getPlotByID(plotId)
             plot?.locked = false
+        }
+
+        portableWasherPattern.matchMatcher(event.message) {
+            for (plot in plots) {
+                if (plot.currentSpray != null) {
+                    plot.removeSpray()
+                }
+            }
         }
     }
 

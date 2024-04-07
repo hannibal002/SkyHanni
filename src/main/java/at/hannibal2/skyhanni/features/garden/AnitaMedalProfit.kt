@@ -57,9 +57,9 @@ class AnitaMedalProfit {
         inInventory = true
 
         val table = mutableListOf<DisplayTableEntry>()
-        for ((_, item) in event.inventoryItems) {
+        for ((slot, item) in event.inventoryItems) {
             try {
-                readItem(item, table)
+                readItem(slot, item, table)
             } catch (e: Throwable) {
                 ErrorManager.logErrorWithData(
                     e, "Error in AnitaMedalProfit while reading item '${item.itemName}'",
@@ -76,7 +76,7 @@ class AnitaMedalProfit {
         display = newList
     }
 
-    private fun readItem(item: ItemStack, table: MutableList<DisplayTableEntry>) {
+    private fun readItem(slot: Int, item: ItemStack, table: MutableList<DisplayTableEntry>) {
         val itemName = getItemName(item) ?: return
         if (itemName == " ") return
         if (itemName == "§cClose") return
@@ -108,7 +108,7 @@ class AnitaMedalProfit {
             "§7Material cost: §6${NumberUtil.format(fullCost)} ",
             "§7Final profit: §6${profitFormat} ",
         )
-        table.add(DisplayTableEntry(itemName, "$color$profitFormat", profit, internalName, hover))
+        table.add(DisplayTableEntry(itemName, "$color$profitFormat", profit, internalName, hover, highlightsOnHoverSlots = listOf(slot)))
     }
 
     private fun getItemName(item: ItemStack): String? {
