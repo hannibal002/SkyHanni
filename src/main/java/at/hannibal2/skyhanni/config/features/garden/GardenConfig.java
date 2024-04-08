@@ -9,11 +9,11 @@ import at.hannibal2.skyhanni.config.features.garden.optimalspeed.OptimalSpeedCon
 import at.hannibal2.skyhanni.config.features.garden.pests.PestsConfig;
 import at.hannibal2.skyhanni.config.features.garden.visitor.VisitorConfig;
 import com.google.gson.annotations.Expose;
-import io.github.moulberry.moulconfig.annotations.Accordion;
-import io.github.moulberry.moulconfig.annotations.Category;
-import io.github.moulberry.moulconfig.annotations.ConfigEditorBoolean;
-import io.github.moulberry.moulconfig.annotations.ConfigEditorSlider;
-import io.github.moulberry.moulconfig.annotations.ConfigOption;
+import io.github.notenoughupdates.moulconfig.annotations.Accordion;
+import io.github.notenoughupdates.moulconfig.annotations.Category;
+import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorBoolean;
+import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorSlider;
+import io.github.notenoughupdates.moulconfig.annotations.ConfigOption;
 
 public class GardenConfig {
     @Expose
@@ -215,11 +215,6 @@ public class GardenConfig {
     public boolean jacobContestSummary = true;
 
     @Expose
-    @ConfigOption(name = "Always Finnegan", desc = "Forcefully set the Finnegan Farming Simulator perk to be active. This is useful if the auto mayor detection fails.")
-    @ConfigEditorBoolean
-    public boolean forcefullyEnabledAlwaysFinnegan = false;
-
-    @Expose
     public Position cropSpeedMeterPos = new Position(278, -236, false, true);
 
     @Expose
@@ -233,4 +228,13 @@ public class GardenConfig {
     @ConfigEditorBoolean
     @FeatureToggle
     public boolean copyMilestoneData = true;
+
+    @Expose
+    @ConfigOption(name = "Log Book Stats", desc = "Show total visited/accepted/denied visitors stats.")
+    @ConfigEditorBoolean
+    @FeatureToggle
+    public boolean showLogBookStats = true;
+
+    @Expose
+    public Position logBookStatsPos = new Position(427, 92, false, true);
 }

@@ -1,4 +1,4 @@
-package at.hannibal2.skyhanni.features.nether
+package at.hannibal2.skyhanni.features.nether.kuudra
 
 import at.hannibal2.skyhanni.data.ScoreboardData
 import at.hannibal2.skyhanni.events.KuudraCompleteEvent
@@ -6,8 +6,7 @@ import at.hannibal2.skyhanni.events.KuudraEnterEvent
 import at.hannibal2.skyhanni.events.LorenzChatEvent
 import at.hannibal2.skyhanni.events.LorenzTickEvent
 import at.hannibal2.skyhanni.events.LorenzWorldChangeEvent
-import at.hannibal2.skyhanni.utils.LorenzVec
-import at.hannibal2.skyhanni.utils.NEUInternalName
+import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
@@ -30,13 +29,13 @@ object KuudraAPI {
 
     @SubscribeEvent
     fun onTick(event: LorenzTickEvent) {
-        if (kuudraTier == null) {
-            for (line in ScoreboardData.sidebarLinesFormatted) {
-                tierPattern.matchMatcher(line) {
-                    val tier = group("tier").toInt()
-                    kuudraTier = tier
-                    KuudraEnterEvent(tier).postAndCatch()
-                }
+        if (!LorenzUtils.inSkyBlock) return
+        if (kuudraTier != null) return
+        for (line in ScoreboardData.sidebarLinesFormatted) {
+            tierPattern.matchMatcher(line) {
+                val tier = group("tier").toInt()
+                kuudraTier = tier
+                KuudraEnterEvent(tier).postAndCatch()
             }
         }
     }
@@ -55,13 +54,4 @@ object KuudraAPI {
         }
     }
 
-    class KuudraTier(
-        val name: String,
-        val displayItem: NEUInternalName,
-        val location: LorenzVec?,
-        val tierNumber: Int,
-        var doneToday: Boolean = false,
-    ) {
-        fun getDisplayName() = "Tier $tierNumber ($name)"
-    }
 }

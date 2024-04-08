@@ -9,7 +9,6 @@ import at.hannibal2.skyhanni.utils.ItemUtils.isRune
 import at.hannibal2.skyhanni.utils.ItemUtils.itemName
 import at.hannibal2.skyhanni.utils.ItemUtils.itemNameWithoutColor
 import at.hannibal2.skyhanni.utils.ItemUtils.name
-import at.hannibal2.skyhanni.utils.ItemUtils.nameWithEnchantment
 import at.hannibal2.skyhanni.utils.LorenzRarity
 import at.hannibal2.skyhanni.utils.NEUInternalName
 import at.hannibal2.skyhanni.utils.NEUInternalName.Companion.asInternalName
@@ -480,10 +479,7 @@ object EstimatedItemValueCalculator {
         return addCosmetic(internalName, list, "Rune", config.ignoreRunes)
     }
 
-    private fun NEUInternalName.getNameOrRepoError(): String? {
-        val stack = getItemStackOrNull() ?: return null
-        return stack.nameWithEnchantment ?: "§cItem Name Error"
-    }
+    private fun NEUInternalName.getNameOrRepoError(): String? = getItemStackOrNull()?.itemName
 
     private fun addAbilityScrolls(stack: ItemStack, list: MutableList<String>): Double {
         val abilityScrolls = stack.getAbilityScrolls() ?: return 0.0
@@ -684,7 +680,7 @@ object EstimatedItemValueCalculator {
                 totalPrice += if (ingredient.isCoins) {
                     ingredient.count
                 } else {
-                    getPrice(ingredient.internalItemId) * ingredient.count
+                    ingredient.internalItemId.asInternalName().getPrice() * ingredient.count
                 }
             }
 

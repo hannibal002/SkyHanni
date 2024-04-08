@@ -33,7 +33,7 @@ import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.LorenzVec
 import at.hannibal2.skyhanni.utils.NEUInternalName
 import at.hannibal2.skyhanni.utils.NEUInternalName.Companion.asInternalName
-import at.hannibal2.skyhanni.utils.NEUItems
+import at.hannibal2.skyhanni.utils.NEUItems.getItemStack
 import at.hannibal2.skyhanni.utils.NEUItems.getItemStackOrNull
 import at.hannibal2.skyhanni.utils.NEUItems.getNpcPriceOrNull
 import at.hannibal2.skyhanni.utils.NEUItems.getPriceOrNull
@@ -240,8 +240,8 @@ class SkyHanniDebugsAndTests {
                 list.add("$coloredName§7 (")
                 for (itemName in item.value) {
                     try {
-                        val internalName = NEUItems.getRawInternalName(itemName)
-                        list.add(NEUItems.getItemStack(internalName))
+                        val internalName = NEUInternalName.fromItemName(itemName)
+                        list.add(internalName.getItemStack())
                     } catch (e: Error) {
                         ChatUtils.debug("itemName '$itemName' is invalid for visitor '$name'")
                         errors++
