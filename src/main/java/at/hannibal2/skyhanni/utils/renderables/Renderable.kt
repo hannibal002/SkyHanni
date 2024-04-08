@@ -20,7 +20,7 @@ import at.hannibal2.skyhanni.utils.renderables.RenderableUtils.renderXAligned
 import at.hannibal2.skyhanni.utils.renderables.RenderableUtils.renderXYAligned
 import at.hannibal2.skyhanni.utils.renderables.RenderableUtils.renderYAligned
 import at.hannibal2.skyhanni.utils.shader.ShaderManager
-import io.github.moulberry.moulconfig.gui.GuiScreenElementWrapper
+import io.github.notenoughupdates.moulconfig.gui.GuiScreenElementWrapper
 import io.github.moulberry.notenoughupdates.util.Utils
 import net.minecraft.client.Minecraft
 import net.minecraft.client.gui.Gui
@@ -527,7 +527,7 @@ interface Renderable {
             val renderables = content
 
             override val width = renderables.sumOf { it.width } + spacing * (renderables.size - 1)
-            override val height = renderables.maxOf { it.height }
+            override val height = renderables.maxOfOrNull { it.height } ?: 0
             override val horizontalAlign = horizontalAlign
             override val verticalAlign = verticalAlign
 
@@ -539,6 +539,30 @@ interface Renderable {
                     GlStateManager.translate((it.width + spacing).toFloat(), 0f, 0f)
                 }
                 GlStateManager.translate(-width.toFloat() - spacing.toFloat(), 0f, 0f)
+            }
+        }
+
+        fun verticalContainer(
+            content: List<Renderable>,
+            spacing: Int = 0,
+            horizontalAlign: HorizontalAlignment = HorizontalAlignment.LEFT,
+            verticalAlign: VerticalAlignment = VerticalAlignment.TOP,
+        ) = object : Renderable {
+            val renderables = content
+
+            override val width = renderables.maxOfOrNull { it.width } ?: 0
+            override val height = renderables.sumOf { it.height } + spacing * (renderables.size - 1)
+            override val horizontalAlign = horizontalAlign
+            override val verticalAlign = verticalAlign
+
+            override fun render(posX: Int, posY: Int) {
+                var yOffset = posY
+                renderables.forEach {
+                    it.renderXAligned(yOffset, posX, width)
+                    yOffset += it.height + spacing
+                    GlStateManager.translate(0f, (it.height + spacing).toFloat(), 0f)
+                }
+                GlStateManager.translate(0f, -height.toFloat() - spacing.toFloat(), 0f)
             }
         }
     }
