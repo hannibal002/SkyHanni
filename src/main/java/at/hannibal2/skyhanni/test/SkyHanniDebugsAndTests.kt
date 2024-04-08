@@ -491,7 +491,7 @@ class SkyHanniDebugsAndTests {
         if (!LorenzUtils.inSkyBlock) return
 
         @Suppress("ConstantConditionIf")
-        if (true) {
+        if (false) {
             itemRenderDebug()
         }
 
