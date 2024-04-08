@@ -2,9 +2,9 @@ package at.hannibal2.skyhanni.config.features.event.diana;
 
 import at.hannibal2.skyhanni.config.FeatureToggle;
 import com.google.gson.annotations.Expose;
-import io.github.moulberry.moulconfig.annotations.ConfigEditorBoolean;
-import io.github.moulberry.moulconfig.annotations.ConfigEditorKeybind;
-import io.github.moulberry.moulconfig.annotations.ConfigOption;
+import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorBoolean;
+import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorKeybind;
+import io.github.notenoughupdates.moulconfig.annotations.ConfigOption;
 import org.lwjgl.input.Keyboard;
 
 public class InquisitorSharingConfig {
@@ -34,4 +34,9 @@ public class InquisitorSharingConfig {
     @ConfigOption(name = "Show Despawn Time", desc = "Show the time until the shared Inquisitor will despawn.")
     @ConfigEditorBoolean
     public boolean showDespawnTime = true;
+
+    @Expose
+    @ConfigOption(name = "Read Global Chat", desc = "Also read the global chat for detecting inquistiors, not only party chat.")
+    @ConfigEditorBoolean
+    public boolean globalChat = false;
 }

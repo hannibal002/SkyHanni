@@ -1,8 +1,8 @@
 package at.hannibal2.skyhanni.config.features.combat.ghostcounter.textformatting;
 
 import com.google.gson.annotations.Expose;
-import io.github.moulberry.moulconfig.annotations.ConfigEditorText;
-import io.github.moulberry.moulconfig.annotations.ConfigOption;
+import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorText;
+import io.github.notenoughupdates.moulconfig.annotations.ConfigOption;
 
 public class KillHourFormattingConfig {
     @Expose
