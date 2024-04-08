@@ -1,7 +1,9 @@
 package at.hannibal2.skyhanni.features.garden.pests
 
 import at.hannibal2.skyhanni.SkyHanniMod
+import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.events.GuiRenderEvent
+import at.hannibal2.skyhanni.events.IslandChangeEvent
 import at.hannibal2.skyhanni.events.LorenzChatEvent
 import at.hannibal2.skyhanni.events.PurseChangeCause
 import at.hannibal2.skyhanni.events.PurseChangeEvent
@@ -140,6 +142,11 @@ object PestProfitTracker {
         if (event.reason == PurseChangeCause.GAIN_MOB_KILL && lastPestKillTime.passedSince() < 2.seconds) {
             tracker.addCoins(coins.toInt())
         }
+    }
+
+    @SubscribeEvent
+    fun onIslandChange(event: IslandChangeEvent) {
+        if (event.newIsland == IslandType.GARDEN) tracker.firstUpdate()
     }
 
     fun resetCommand(args: Array<String>) {
