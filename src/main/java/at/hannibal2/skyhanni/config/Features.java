@@ -51,9 +51,9 @@ public class Features extends Config {
     @Override
     public List<Social> getSocials() {
         return Arrays.asList(
-                Social.forLink("Discord", DISCORD, "https://discord.com/invite/skyhanni-997079228510117908"),
-                Social.forLink("GitHub", GITHUB, "https://github.com/hannibal002/SkyHanni"),
-                Social.forLink("Patreon", PATREON, "https://www.patreon.com/hannibal2")
+            Social.forLink("Discord", DISCORD, "https://discord.com/invite/skyhanni-997079228510117908"),
+            Social.forLink("GitHub", GITHUB, "https://github.com/hannibal002/SkyHanni"),
+            Social.forLink("Patreon", PATREON, "https://www.patreon.com/hannibal2")
         );
     }
 
