@@ -467,6 +467,7 @@ interface Renderable {
             }
         }
 
+        // TODO use this to render current boosted crop in next jacob contest crops
         fun Renderable.renderBounds(color: Color = LorenzColor.GREEN.toColor()) = object : Renderable {
             override val width = this@renderBounds.width
             override val height = this@renderBounds.height
