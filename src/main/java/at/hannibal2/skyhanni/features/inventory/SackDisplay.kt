@@ -94,7 +94,7 @@ object SackDisplay {
             if (stored == 0 && !config.showEmpty) continue
             table.add(buildList {
                 addString(" §7- ")
-                addItemStackScaled(internalName)
+                addItemStack(internalName)
                 // TODO move replace into itemName
                 val nameText = Renderable.optionalLink(
                     itemName.replace("§k", ""),
@@ -153,7 +153,7 @@ object SackDisplay {
                         )
                     )
                     //TOOD add cache
-                    addItemStackScaled("MAGMA_FISH".asInternalName())
+                    addItemStack("MAGMA_FISH".asInternalName())
                 }
                 if (config.showPrice && price != 0L) addAlignedNumber("§6${format(price)}")
             })
@@ -235,7 +235,7 @@ object SackDisplay {
             val (stack, lv1, lv2, lv3) = rune
             table.add(buildList {
                 addString(" §7- ")
-                stack?.let { addItemStackScaled(it) }
+                stack?.let { addItemStack(it) }
                 add(
                     Renderable.optionalLink(
                         name,
@@ -260,7 +260,7 @@ object SackDisplay {
             val (internalName, rough, flawed, fine, roughprice, flawedprice, fineprice) = gem
             table.add(buildList {
                 addString(" §7- ")
-                addItemStackScaled(internalName)
+                addItemStack(internalName)
                 add(Renderable.optionalLink(
                     name,
                     onClick = {
@@ -284,12 +284,12 @@ object SackDisplay {
         addString(string, horizontalAlign = config.alignment)
     }
 
-    private fun MutableList<Renderable>.addItemStackScaled(internalName: NEUInternalName) {
-        addItemStackScaled(internalName.getItemStack())
+    private fun MutableList<Renderable>.addItemStack(internalName: NEUInternalName) {
+        addItemStack(internalName.getItemStack())
     }
 
-    private fun MutableList<Renderable>.addItemStackScaled(stack: ItemStack) {
-        add(Renderable.itemStack(stack, scale = 1.3))
+    private fun MutableList<Renderable>.addItemStack(stack: ItemStack) {
+        add(Renderable.itemStack(stack))
     }
 
     private fun format(price: Long) = if (config.priceFormat == PriceFormatEntry.FORMATTED) {
