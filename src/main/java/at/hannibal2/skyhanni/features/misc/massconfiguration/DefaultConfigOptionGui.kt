@@ -1,8 +1,8 @@
 package at.hannibal2.skyhanni.features.misc.massconfiguration
 
-import io.github.moulberry.moulconfig.internal.GlScissorStack
-import io.github.moulberry.moulconfig.internal.RenderUtils
-import io.github.moulberry.moulconfig.internal.TextRenderUtils
+import io.github.notenoughupdates.moulconfig.internal.GlScissorStack
+import io.github.notenoughupdates.moulconfig.internal.RenderUtils
+import io.github.notenoughupdates.moulconfig.internal.TextRenderUtils
 import io.github.moulberry.notenoughupdates.util.Utils
 import net.minecraft.client.gui.GuiScreen
 import net.minecraft.client.gui.ScaledResolution
