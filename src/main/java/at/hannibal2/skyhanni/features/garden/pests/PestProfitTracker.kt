@@ -7,8 +7,10 @@ import at.hannibal2.skyhanni.events.PurseChangeCause
 import at.hannibal2.skyhanni.events.PurseChangeEvent
 import at.hannibal2.skyhanni.features.garden.GardenAPI
 import at.hannibal2.skyhanni.utils.CollectionUtils.addAsSingletonList
+import at.hannibal2.skyhanni.utils.LorenzRarity
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.NEUInternalName
+import at.hannibal2.skyhanni.utils.NEUInternalName.Companion.asInternalName
 import at.hannibal2.skyhanni.utils.NumberUtil
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
@@ -32,7 +34,7 @@ object PestProfitTracker {
      */
     private val pestRareDropPattern by patternGroup.pattern(
         "raredrop",
-        "§6§l(?:RARE|PET) DROP! (?:§.)*(?<item>.+) §6\\(§6\\+.*☘\\)"
+        "§6§l(?<dropType>RARE|PET) DROP! (?:§.)*§(?<rarity>.)(?<item>.+) §6\\(§6\\+.*☘\\)"
     )
 
     private var lastPestKillTime = SimpleTimeMark.farPast()
@@ -81,7 +83,17 @@ object PestProfitTracker {
             if (config.hideChat) event.blockedReason = "pest_drop"
         }
         pestRareDropPattern.matchMatcher(event.message) {
-            val internalName = NEUInternalName.fromItemNameOrNull(group("item")) ?: return
+            val isPetDrop = group("dropType") == "PET"
+            val rarity = group("rarity")
+            val internalName = if (isPetDrop) {
+                val petName = "[Lvl 1➡100] " + group("item")
+                val neuName =
+                    NEUInternalName.fromItemNameOrNull(petName)?.asString()?.replace(";\\d".toRegex(), "") ?: return
+                val id = LorenzRarity.getByName(LorenzUtils.colorCodeToRarity(rarity.first()).uppercase())?.id ?: return
+                "$neuName;$id".asInternalName()
+            } else {
+                NEUInternalName.fromItemNameOrNull(group("item")) ?: return
+            }
 
             tracker.addItem(internalName, 1)
             // pests always have guaranteed loot, therefore there's no need to add kill here
