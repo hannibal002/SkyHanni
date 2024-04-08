@@ -159,7 +159,7 @@ object NEUItems {
     fun isVanillaItem(item: ItemStack): Boolean =
         manager.auctionManager.isVanillaItem(item.getInternalName().asString())
 
-    val itemFontSize = 0.67
+    val itemFontSize = 2.0 / 3.0
 
     fun ItemStack.renderOnScreen(x: Float, y: Float, scaleMultiplier: Double = itemFontSize) {
         val item = checkBlinkItem()
