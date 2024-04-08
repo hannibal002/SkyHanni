@@ -337,7 +337,7 @@ object LorenzUtils {
         enumValues<T>().joinToString("|", transform = transform)
 
     // TODO move to val by lazy
-    fun isInDevEnvironment() = Launch.blackboard["fml.deobfuscatedEnvironment"] as Boolean
+    fun isInDevEnvironment() = ((Launch.blackboard ?: mapOf())["fml.deobfuscatedEnvironment"] as Boolean?) ?: true
 
     fun shutdownMinecraft(reason: String? = null) {
         System.err.println("SkyHanni-${SkyHanniMod.version} forced the game to shutdown.")

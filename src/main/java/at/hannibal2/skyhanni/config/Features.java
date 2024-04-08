@@ -20,11 +20,11 @@ import at.hannibal2.skyhanni.config.features.slayer.SlayerConfig;
 import at.hannibal2.skyhanni.config.storage.Storage;
 import at.hannibal2.skyhanni.utils.LorenzUtils;
 import com.google.gson.annotations.Expose;
-import io.github.moulberry.moulconfig.Config;
-import io.github.moulberry.moulconfig.Social;
-import io.github.moulberry.moulconfig.annotations.Category;
-import io.github.moulberry.moulconfig.gui.HorizontalAlign;
-import io.github.moulberry.moulconfig.processor.ProcessedCategory;
+import io.github.notenoughupdates.moulconfig.Config;
+import io.github.notenoughupdates.moulconfig.Social;
+import io.github.notenoughupdates.moulconfig.annotations.Category;
+import io.github.notenoughupdates.moulconfig.gui.HorizontalAlign;
+import io.github.notenoughupdates.moulconfig.processor.ProcessedCategory;
 import net.minecraft.util.ResourceLocation;
 
 import java.util.Arrays;
