@@ -29,6 +29,11 @@ public class MiningConfig {
     public DeepCavernsParkourConfig deepCavernsParkour = new DeepCavernsParkourConfig();
 
     @Expose
+    @ConfigOption(name = "Area Walls", desc = "")
+    @Accordion
+    public AreaWallsConfig crystalHollowsAreaWalls = new AreaWallsConfig();
+
+    @Expose
     @ConfigOption(name = "Highlight Commission Mobs", desc = "Highlight Mobs that are part of active commissions.")
     @ConfigEditorBoolean
     @FeatureToggle

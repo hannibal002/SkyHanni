@@ -19,13 +19,13 @@ object ShaderManager {
 
     /**
      * For any future shaders add the object instance in this enum and
-     * in the when expression
+     * in the when-expression
      */
     enum class Shaders(val shader: Shader) {
-
         STANDARD_CHROMA(StandardChromaShader.INSTANCE),
         TEXTURED_CHROMA(TexturedChromaShader.INSTANCE),
-        ROUNDED_RECTANGLE(RoundedRectangleShader.INSTANCE);
+        ROUNDED_RECTANGLE(RoundedRectangleShader.INSTANCE),
+        ;
 
         companion object {
 

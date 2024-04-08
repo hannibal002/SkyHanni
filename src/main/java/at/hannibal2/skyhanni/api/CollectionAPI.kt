@@ -9,10 +9,11 @@ import at.hannibal2.skyhanni.utils.CollectionUtils.addOrPut
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.ItemUtils.name
 import at.hannibal2.skyhanni.utils.NEUInternalName
+import at.hannibal2.skyhanni.utils.NEUInternalName.Companion.asInternalName
 import at.hannibal2.skyhanni.utils.NEUItems
 import at.hannibal2.skyhanni.utils.NEUItems.getItemStackOrNull
 import at.hannibal2.skyhanni.utils.NumberUtil.formatLong
-import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
+import at.hannibal2.skyhanni.utils.StringUtils.matchFirst
 import at.hannibal2.skyhanni.utils.StringUtils.matches
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
@@ -35,22 +36,26 @@ object CollectionAPI {
 
     val collectionValue = mutableMapOf<NEUInternalName, Long>()
 
+    // TODO repo
+    private val incorrectCollectionNames = mapOf(
+        "Mushroom" to "RED_MUSHROOM".asInternalName()
+    )
+
     @SubscribeEvent
     fun onProfileJoin(event: ProfileJoinEvent) {
         collectionValue.clear()
     }
 
     @SubscribeEvent
-    fun onTick(event: InventoryFullyOpenedEvent) {
+    fun onInventoryOpen(event: InventoryFullyOpenedEvent) {
         val inventoryName = event.inventoryName
         if (inventoryName.endsWith(" Collection")) {
             val stack = event.inventoryItems[4] ?: return
-            loop@ for (line in stack.getLore()) {
-                singleCounterPattern.matchMatcher(line) {
-                    val counter = group("amount").formatLong()
-                    val name = inventoryName.split(" ").dropLast(1).joinToString(" ")
-                    collectionValue[NEUInternalName.fromItemName(name)] = counter
-                }
+            stack.getLore().matchFirst(singleCounterPattern) {
+                val counter = group("amount").formatLong()
+                val name = inventoryName.split(" ").dropLast(1).joinToString(" ")
+                val internalName = incorrectCollectionNames[name] ?: NEUInternalName.fromItemName(name)
+                collectionValue[internalName] = counter
             }
             CollectionUpdateEvent().postAndCatch()
         }
@@ -69,11 +74,10 @@ object CollectionAPI {
                     name = name.split(" ").dropLast(1).joinToString(" ")
                 }
 
-                loop@ for (line in lore) {
-                    counterPattern.matchMatcher(line) {
-                        val counter = group("amount").formatLong()
-                        collectionValue[NEUInternalName.fromItemName(name)] = counter
-                    }
+                val internalName = incorrectCollectionNames[name] ?: NEUInternalName.fromItemName(name)
+                lore.matchFirst(counterPattern) {
+                    val counter = group("amount").formatLong()
+                    collectionValue[internalName] = counter
                 }
             }
             CollectionUpdateEvent().postAndCatch()

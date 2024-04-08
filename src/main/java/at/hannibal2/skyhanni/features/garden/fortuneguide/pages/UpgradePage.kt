@@ -4,8 +4,9 @@ import at.hannibal2.skyhanni.features.garden.fortuneguide.FFGuideGUI
 import at.hannibal2.skyhanni.features.garden.fortuneguide.FortuneUpgrades
 import at.hannibal2.skyhanni.features.inventory.bazaar.BazaarApi
 import at.hannibal2.skyhanni.utils.GuiRenderUtils
-import at.hannibal2.skyhanni.utils.ItemUtils.nameWithEnchantment
-import at.hannibal2.skyhanni.utils.NEUItems
+import at.hannibal2.skyhanni.utils.ItemUtils.itemName
+import at.hannibal2.skyhanni.utils.NEUInternalName.Companion.asInternalName
+import at.hannibal2.skyhanni.utils.NEUItems.getItemStack
 import at.hannibal2.skyhanni.utils.NumberUtil
 import net.minecraft.client.renderer.GlStateManager
 import net.minecraft.util.MathHelper
@@ -56,8 +57,8 @@ class UpgradePage : FFGuideGUI.FFGuidePage() {
         for ((index, upgrade) in upgradeList.withIndex()) {
             if (adjustedY + 25 * index < FFGuideGUI.guiTop + 20) continue
             if (adjustedY + 25 * index > FFGuideGUI.guiTop + 160) continue
-            val upgradeItem = upgrade.requiredItem.let { NEUItems.getItemStack(it) }
-            var formattedUpgrade = upgradeItem.nameWithEnchantment ?: return
+            val upgradeItem = upgrade.requiredItem.asInternalName().getItemStack()
+            var formattedUpgrade = upgradeItem.itemName
             if (adjustedY + 25 * index - 5 < FFGuideGUI.lastClickedHeight && FFGuideGUI.lastClickedHeight < adjustedY + 25 * index + 10) {
                 FFGuideGUI.lastClickedHeight = 0
                 BazaarApi.searchForBazaarItem(formattedUpgrade, upgrade.itemQuantity)

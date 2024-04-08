@@ -2,7 +2,7 @@ package at.hannibal2.skyhanni.features.minion
 
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
-import at.hannibal2.skyhanni.config.Storage
+import at.hannibal2.skyhanni.config.storage.ProfileSpecificStorage
 import at.hannibal2.skyhanni.data.ClickType
 import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.data.ProfileStorageData
@@ -59,7 +59,7 @@ import java.awt.Color
 
 class MinionFeatures {
 
-    private val config get() = SkyHanniMod.feature.minions
+    private val config get() = SkyHanniMod.feature.misc.minions
     private var lastClickedEntity: LorenzVec? = null
     private var newMinion: LorenzVec? = null
     private var newMinionName: String? = null
@@ -88,7 +88,7 @@ class MinionFeatures {
 
     @SubscribeEvent
     fun onPlayerInteract(event: PlayerInteractEvent) {
-        if (!enable()) return
+        if (!isEnabled()) return
         if (event.action != PlayerInteractEvent.Action.RIGHT_CLICK_BLOCK) return
 
         val lookingAt = event.pos.offset(event.face).toLorenzVec()
@@ -176,7 +176,7 @@ class MinionFeatures {
         val name = getMinionName(openInventory)
         if (!minions.contains(entity) && LorenzUtils.skyBlockIsland != IslandType.HUB) {
             MinionFeatures.minions = minions.editCopy {
-                this[entity] = Storage.ProfileSpecific.MinionConfig().apply {
+                this[entity] = ProfileSpecificStorage.MinionConfig().apply {
                     displayName = name
                     lastClicked = 0
                 }
@@ -219,7 +219,7 @@ class MinionFeatures {
 
     @SubscribeEvent
     fun onTick(event: LorenzTickEvent) {
-        if (!enable()) return
+        if (!isEnabled()) return
         if (coinsPerDay != "") return
 
         if (Minecraft.getMinecraft().currentScreen is GuiChest && config.hopperProfitDisplay) {
@@ -272,7 +272,7 @@ class MinionFeatures {
 
     @SubscribeEvent
     fun onChat(event: LorenzChatEvent) {
-        if (!enable()) return
+        if (!isEnabled()) return
 
         val message = event.message
         if (minionCoinPattern.matches(message) && System.currentTimeMillis() - lastInventoryClosed < 2_000) {
@@ -288,7 +288,7 @@ class MinionFeatures {
         }
         if (message.startsWith("§bYou placed a minion!") && newMinion != null) {
             minions = minions?.editCopy {
-                this[newMinion!!] = Storage.ProfileSpecific.MinionConfig().apply {
+                this[newMinion!!] = ProfileSpecificStorage.MinionConfig().apply {
                     displayName = newMinionName
                     lastClicked = 0
                 }
@@ -308,7 +308,7 @@ class MinionFeatures {
 
     @SubscribeEvent
     fun onRenderLastEmptied(event: LorenzRenderWorldEvent) {
-        if (!enable()) return
+        if (!isEnabled()) return
 
         val playerLocation = LocationUtils.playerLocation()
         val minions = minions ?: return
@@ -338,7 +338,7 @@ class MinionFeatures {
 
     @SubscribeEvent(priority = EventPriority.HIGH)
     fun onRenderLiving(event: SkyHanniRenderEntityEvent.Specials.Pre<EntityLivingBase>) {
-        if (!enable()) return
+        if (!isEnabled()) return
         if (!config.hideMobsNametagNearby) return
 
         val entity = event.entity
@@ -355,9 +355,9 @@ class MinionFeatures {
         }
     }
 
-    private fun enable() = IslandType.PRIVATE_ISLAND.isInIsland()
+    private fun isEnabled() = IslandType.PRIVATE_ISLAND.isInIsland()
 
-    private fun enableWithHub() = enable() || IslandType.HUB.isInIsland()
+    private fun enableWithHub() = isEnabled() || IslandType.HUB.isInIsland()
 
     @SubscribeEvent(priority = EventPriority.LOWEST)
     fun renderOverlay(event: GuiScreenEvent.BackgroundDrawnEvent) {
@@ -376,7 +376,7 @@ class MinionFeatures {
         var minionInventoryOpen = false
         var minionStorageInventoryOpen = false
 
-        private var minions: Map<LorenzVec, Storage.ProfileSpecific.MinionConfig>?
+        private var minions: Map<LorenzVec, ProfileSpecificStorage.MinionConfig>?
             get() {
                 return ProfileStorageData.profileSpecific?.minions
             }
@@ -397,5 +397,7 @@ class MinionFeatures {
         event.move(3, "minions.lastOpenedMinionTime", "minions.lastClickedMinion.time")
         event.move(3, "minions.emptiedTimeDisplay", "minions.emptiedTime.display")
         event.move(3, "minions.distance", "minions.emptiedTime.distance")
+
+        event.move(31, "minions", "misc.minions")
     }
 }

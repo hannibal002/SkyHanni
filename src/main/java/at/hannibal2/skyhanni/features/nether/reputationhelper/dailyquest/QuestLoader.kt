@@ -1,6 +1,6 @@
 package at.hannibal2.skyhanni.features.nether.reputationhelper.dailyquest
 
-import at.hannibal2.skyhanni.config.Storage
+import at.hannibal2.skyhanni.config.storage.ProfileSpecificStorage
 import at.hannibal2.skyhanni.data.jsonobjects.repo.CrimsonIsleReputationJson.ReputationQuest
 import at.hannibal2.skyhanni.events.InventoryFullyOpenedEvent
 import at.hannibal2.skyhanni.features.nether.reputationhelper.dailyquest.quest.DojoQuest
@@ -17,6 +17,7 @@ import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.LorenzUtils
+import at.hannibal2.skyhanni.utils.StringUtils.matches
 import at.hannibal2.skyhanni.utils.TabListData
 
 class QuestLoader(private val dailyQuestHelper: DailyQuestHelper) {
@@ -51,6 +52,8 @@ class QuestLoader(private val dailyQuestHelper: DailyQuestHelper) {
     }
 
     private fun readQuest(line: String) {
+        if (!dailyQuestHelper.reputationHelper.tabListQuestPattern.matches(line)) return
+
         if (line.contains("The Great Spook")) {
             dailyQuestHelper.greatSpook = true
             dailyQuestHelper.update()
@@ -167,7 +170,7 @@ class QuestLoader(private val dailyQuestHelper: DailyQuestHelper) {
         }
     }
 
-    fun loadConfig(storage: Storage.ProfileSpecific.CrimsonIsleStorage) {
+    fun loadConfig(storage: ProfileSpecificStorage.CrimsonIsleStorage) {
         if (dailyQuestHelper.greatSpook) return
         if (storage.quests.toList().any { hasGreatSpookLine(it) }) {
             dailyQuestHelper.greatSpook = true
