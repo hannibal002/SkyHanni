@@ -173,7 +173,7 @@ object LorenzUtils {
     fun fillTable(
         data: List<DisplayTableEntry>,
         padding: Int = 1,
-        itemScale: Double = NEUItems.itemFontSize
+        itemScale: Double = NEUItems.itemFontSize,
     ): Renderable {
         val sorted = data.sortedByDescending { it.sort }
 

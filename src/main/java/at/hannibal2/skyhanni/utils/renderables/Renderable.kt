@@ -19,8 +19,8 @@ import at.hannibal2.skyhanni.utils.renderables.RenderableUtils.calculateTableYOf
 import at.hannibal2.skyhanni.utils.renderables.RenderableUtils.renderXAligned
 import at.hannibal2.skyhanni.utils.renderables.RenderableUtils.renderXYAligned
 import at.hannibal2.skyhanni.utils.renderables.RenderableUtils.renderYAligned
-import io.github.notenoughupdates.moulconfig.gui.GuiScreenElementWrapper
 import io.github.moulberry.notenoughupdates.util.Utils
+import io.github.notenoughupdates.moulconfig.gui.GuiScreenElementWrapper
 import net.minecraft.client.Minecraft
 import net.minecraft.client.gui.Gui
 import net.minecraft.client.gui.inventory.GuiEditSign
@@ -128,9 +128,8 @@ interface Renderable {
 
             override fun render(posX: Int, posY: Int) {
                 val isDown = Mouse.isButtonDown(button)
-                if (isDown > wasDown && isHovered(posX, posY) && condition() && shouldAllowLink(
-                        true, bypassChecks
-                    )
+                if (isDown > wasDown && isHovered(posX, posY) && condition() &&
+                    shouldAllowLink(true, bypassChecks)
                 ) {
                     onClick()
                 }
@@ -204,8 +203,8 @@ interface Renderable {
             val isInNeuPv = openGui == "io.github.moulberry.notenoughupdates.profileviewer.GuiProfileViewer"
             val isInSkyTilsPv = openGui == "gg.skytils.skytilsmod.gui.profile.ProfileGui"
 
-            val result =
-                isGuiScreen && isGuiPositionEditor && isNotInSignAndOnSlot && isConfigScreen && !isInNeuPv && !isInSkyTilsPv
+            val result = isGuiScreen && isGuiPositionEditor && isNotInSignAndOnSlot && isConfigScreen &&
+                !isInNeuPv && !isInSkyTilsPv
 
             if (debug) {
                 if (!result) {
