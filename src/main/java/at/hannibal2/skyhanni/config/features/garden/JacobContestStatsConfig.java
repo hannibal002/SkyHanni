@@ -37,10 +37,10 @@ public class JacobContestStatsConfig {
 
     public enum ContestStatsTextEntry {
         TITLE("§e§lSugar Cane Contest Stats"),
-        TIME("§7Started §b3.1s §7into contest"),
+        TIME("§7Started §b3s §7into contest"),
         BLOCKS_BROKEN("§7Blocks Broken: §e14,781"),
         BPS("§7Blocks per Second: §c19.94"),
-        POSITION("§7Est. Position: §b2nd §7§7(Top §b0.1% §7◆ 675)"),
+        POSITION("§7Position: Top §b0.1%"),
         PREDICTED_SCORE("§7Predicted Score: §e915,430");
 
         private final String str;
