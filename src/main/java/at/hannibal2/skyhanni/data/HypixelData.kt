@@ -84,6 +84,15 @@ class HypixelData {
             "SK[YI]BLOCK(?: CO-OP| GUEST)?"
         )
 
+        /**
+         * REGEX-TEST:  §7⏣ §bVillage
+         * REGEX-TEST:  §5ф §dWizard Tower
+         */
+        private val skyblockAreaPattern by patternGroup.pattern(
+            "skyblock.area",
+            "\\s*§(?<symbol>7⏣|5ф) §(?<color>.)(?<area>.*)"
+        )
+
         var hypixelLive = false
         var hypixelAlpha = false
         var inLobby = false
@@ -103,6 +112,7 @@ class HypixelData {
         var joinedWorld = SimpleTimeMark.farPast()
 
         var skyBlockArea = "?"
+        var skyBlockAreaWithSymbol = "?"
 
         // Data from locraw
         var locrawData: JsonObject? = null
@@ -155,7 +165,7 @@ class HypixelData {
                 playerAmountGuestingPattern
             )
 
-            out@for (pattern in playerPatternList) {
+            out@ for (pattern in playerPatternList) {
                 for (line in TabListData.getTabList()) {
                     pattern.matchMatcher(line) {
                         amount += group("amount").toInt()
@@ -282,11 +292,14 @@ class HypixelData {
         }
 
         if (LorenzUtils.inSkyBlock) {
-            val originalLocation = ScoreboardData.sidebarLinesFormatted
-                .firstOrNull { it.startsWith(" §7⏣ ") || it.startsWith(" §5ф ") }
-                ?.substring(5)?.removeColor()
-                ?: "?"
-            skyBlockArea = LocationFixData.fixLocation(skyBlockIsland) ?: originalLocation
+            loop@ for (line in ScoreboardData.sidebarLinesFormatted) {
+                skyblockAreaPattern.matchMatcher(line) {
+                    val originalLocation = group("area")
+                    skyBlockArea = LocationFixData.fixLocation(skyBlockIsland) ?: originalLocation
+                    skyBlockAreaWithSymbol = line.trim()
+                    break@loop
+                }
+            }
 
             checkProfileName()
         }

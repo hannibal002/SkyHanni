@@ -1,5 +1,6 @@
 package at.hannibal2.skyhanni.features.garden.pests
 
+import at.hannibal2.skyhanni.events.DebugDataCollectEvent
 import at.hannibal2.skyhanni.events.InventoryFullyOpenedEvent
 import at.hannibal2.skyhanni.events.LorenzChatEvent
 import at.hannibal2.skyhanni.events.LorenzWorldChangeEvent
@@ -12,8 +13,10 @@ import at.hannibal2.skyhanni.features.garden.GardenPlotAPI
 import at.hannibal2.skyhanni.features.garden.GardenPlotAPI.isBarn
 import at.hannibal2.skyhanni.features.garden.GardenPlotAPI.isPestCountInaccurate
 import at.hannibal2.skyhanni.features.garden.GardenPlotAPI.locked
+import at.hannibal2.skyhanni.features.garden.GardenPlotAPI.name
 import at.hannibal2.skyhanni.features.garden.GardenPlotAPI.pests
 import at.hannibal2.skyhanni.features.garden.GardenPlotAPI.uncleared
+import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
@@ -27,6 +30,7 @@ import at.hannibal2.skyhanni.utils.StringUtils.matches
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
+import org.lwjgl.input.Keyboard
 
 object PestAPI {
 
@@ -104,7 +108,7 @@ object PestAPI {
         "§cThere are not any Pests on your Garden right now! Keep farming!"
     )
 
-    private fun fixPests() {
+    private fun fixPests(loop: Int = 2) {
         val accurateAmount = getPlotsWithAccuratePests().sumOf { it.pests }
         val inaccurateAmount = getPlotsWithInaccuratePests().size
         if (scoreboardPests == accurateAmount + inaccurateAmount) { // if we can assume all inaccurate plots have 1 pest each
@@ -116,6 +120,14 @@ object PestAPI {
             val plot = getPlotsWithInaccuratePests().firstOrNull()
             plot?.pests = scoreboardPests - accurateAmount
             plot?.isPestCountInaccurate = false
+        } else if (accurateAmount + inaccurateAmount > scoreboardPests) {
+            sendPestError(true)
+            getInfestedPlots().forEach {
+                it.pests = 0
+                it.isPestCountInaccurate = true
+            }
+            if (loop > 0) fixPests(loop - 1)
+            else sendPestError(false)
         }
     }
 
@@ -276,6 +288,7 @@ object PestAPI {
             return
         }
         if (!plot.isPestCountInaccurate) plot.pests--
+        scoreboardPests--
         updatePests()
     }
 
@@ -286,5 +299,44 @@ object PestAPI {
             it.isPestCountInaccurate = false
         }
         updatePests()
+    }
+
+    private fun sendPestError(betaOnly: Boolean) {
+        ErrorManager.logErrorStateWithData(
+            "Error getting pest count",
+            "Impossible pest count",
+            "scoreboardPests" to scoreboardPests,
+            "plots" to getInfestedPlots().map { "id: ${it.id} pests: ${it.pests} isInaccurate: ${it.isPestCountInaccurate}" },
+            noStackTrace = true, betaOnly = betaOnly
+        )
+    }
+
+    @SubscribeEvent
+    fun onDebugDataCollect(event: DebugDataCollectEvent) {
+        event.title("Garden Pests")
+
+        if (!GardenAPI.inGarden()) {
+            event.addIrrelevant("not in garden")
+            return
+        }
+        val disabled = with(config.pestFinder) {
+            !showDisplay && !showPlotInWorld && teleportHotkey == Keyboard.KEY_NONE
+        }
+        if (disabled) {
+            event.addIrrelevant("disabled in config")
+            return
+        }
+
+        event.addIrrelevant {
+            add("scoreboardPests is $scoreboardPests")
+            add("")
+            getInfestedPlots().forEach {
+                add("id: ${it.id}")
+                add(" name: ${it.name}")
+                add(" isPestCountInaccurate: ${it.isPestCountInaccurate}")
+                add(" pests: ${it.pests}")
+                add(" ")
+            }
+        }
     }
 }
