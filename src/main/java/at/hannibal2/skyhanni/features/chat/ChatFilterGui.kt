@@ -5,8 +5,8 @@ import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.KeyboardManager
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.OSUtils
-import io.github.moulberry.moulconfig.internal.GlScissorStack
-import io.github.moulberry.moulconfig.internal.RenderUtils
+import io.github.notenoughupdates.moulconfig.internal.GlScissorStack
+import io.github.notenoughupdates.moulconfig.internal.RenderUtils
 import io.github.moulberry.notenoughupdates.util.Utils
 import net.minecraft.client.Minecraft
 import net.minecraft.client.gui.GuiScreen
@@ -23,7 +23,11 @@ class ChatFilterGui(private val history: List<ChatManager.MessageFilteringResult
     private var wasMouseButtonDown = false
     private val h = 300
     private val reasonMaxLength =
-        history.maxOf { it.actionReason?.let { Minecraft.getMinecraft().fontRendererObj.getStringWidth(it) } ?: 0 }
+        history.maxOf { reasonLength(it) }
+
+    private fun reasonLength(result: ChatManager.MessageFilteringResult): Int =
+        result.actionReason?.let { Minecraft.getMinecraft().fontRendererObj.getStringWidth(it) } ?: 0
+
     private val historySize by lazy {
         history.sumOf { splitLine(it.message).size * 10 + if (it.modified != null) splitLine(it.modified).size * 10 else 0 }
     }

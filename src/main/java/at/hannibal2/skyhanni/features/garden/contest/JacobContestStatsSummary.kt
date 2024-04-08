@@ -131,7 +131,7 @@ class JacobContestStatsSummary {
     }
 
     @SubscribeEvent
-    fun onFarmingContestEvent(event: FarmingContestEvent) {
+    fun onFarmingContest(event: FarmingContestEvent) {
         if (!isEnabled()) return
 
         when (event.phase) {

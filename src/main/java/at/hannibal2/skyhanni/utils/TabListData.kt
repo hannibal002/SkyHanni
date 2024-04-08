@@ -104,7 +104,7 @@ class TabListData {
 
     @SubscribeEvent
     fun onTick(event: LorenzTickEvent) {
-        if (!event.isMod(5)) return
+        if (!event.isMod(2)) return
 
         val tabList = readTabList() ?: return
         if (cache != tabList) {
