@@ -494,7 +494,7 @@ object GardenNextJacobContest {
         if (display.isEmpty()) {
             config.pos.renderStrings(simpleDisplay, posLabel = "Next Jacob Contest")
         } else {
-            config.pos.renderSingleLineWithItems(display, 1.7, posLabel = "Next Jacob Contest")
+            config.pos.renderSingleLineWithItems(display, 1.0, posLabel = "Next Jacob Contest")
         }
     }
 
