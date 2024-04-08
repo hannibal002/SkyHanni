@@ -7,6 +7,7 @@ import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.InventoryFullyOpenedEvent
 import at.hannibal2.skyhanni.events.LorenzChatEvent
 import at.hannibal2.skyhanni.events.LorenzTickEvent
+import at.hannibal2.skyhanni.events.SecondPassedEvent
 import at.hannibal2.skyhanni.features.garden.contest.FarmingContestAPI
 import at.hannibal2.skyhanni.features.garden.contest.FarmingContestPhase
 import at.hannibal2.skyhanni.utils.ChatUtils
@@ -91,9 +92,8 @@ class AnitaPersonalBest {
     }
 
     @SubscribeEvent
-    fun onTick(event: LorenzTickEvent) {
+    fun onSecondPassed(event: SecondPassedEvent){
         if (!isEnabled()) return
-        if (!event.repeatSeconds(1)) return
         display = drawDisplay()
 
         for (line in ScoreboardData.sidebarLines) {
