@@ -383,6 +383,9 @@ object ItemUtils {
         if (name.endsWith("Enchanted Book")) {
             return itemStack.getLore()[0]
         }
+        if (name.endsWith("Enchanted Book Bundle")) {
+            return name.replace("Enchanted Book", itemStack.getLore()[0].removeColor())
+        }
 
         // hide pet level
         PetAPI.getCleanName(name)?.let {
