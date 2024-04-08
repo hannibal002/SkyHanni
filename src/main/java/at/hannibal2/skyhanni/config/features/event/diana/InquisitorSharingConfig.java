@@ -34,4 +34,9 @@ public class InquisitorSharingConfig {
     @ConfigOption(name = "Show Despawn Time", desc = "Show the time until the shared Inquisitor will despawn.")
     @ConfigEditorBoolean
     public boolean showDespawnTime = true;
+
+    @Expose
+    @ConfigOption(name = "Read Global Chat", desc = "Also read the global chat for detecting inquistiors, not only party chat.")
+    @ConfigEditorBoolean
+    public boolean globalChat = false;
 }
