@@ -9,6 +9,7 @@ import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorBoolean;
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorDraggableList;
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorDropdown;
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorSlider;
+import io.github.notenoughupdates.moulconfig.annotations.ConfigLink;
 import io.github.notenoughupdates.moulconfig.annotations.ConfigOption;
 
 import java.util.ArrayList;
@@ -99,5 +100,6 @@ public class NextJacobContestConfig {
     public List<CropType> warnFor = new ArrayList<>(CropType.getEntries());
 
     @Expose
+    @ConfigLink(owner = NextJacobContestConfig.class, field = "display")
     public Position pos = new Position(-200, 10, false, true);
 }
