@@ -1,10 +1,8 @@
 package at.hannibal2.skyhanni.features.itemabilities.abilitycooldown
 
-import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.features.dungeon.DungeonAPI
 import at.hannibal2.skyhanni.utils.LorenzColor
 import at.hannibal2.skyhanni.utils.LorenzUtils
-import at.hannibal2.skyhanni.utils.LorenzUtils.isInIsland
 import at.hannibal2.skyhanni.utils.NEUInternalName
 import at.hannibal2.skyhanni.utils.NEUInternalName.Companion.asInternalName
 import kotlin.math.floor
@@ -128,7 +126,7 @@ enum class ItemAbility(
 
         private fun ItemAbility.getMageCooldownReduction(): Double? {
             if (ignoreMageCooldownReduction) return null
-            if (!IslandType.CATACOMBS.isInIsland()) return null
+            if (!LorenzUtils.inDungeons) return null
             if (DungeonAPI.playerClass != DungeonAPI.DungeonClass.MAGE) return null
 
             var abilityCooldownMultiplier = 1.0

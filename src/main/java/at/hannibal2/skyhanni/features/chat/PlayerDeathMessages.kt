@@ -1,7 +1,6 @@
 package at.hannibal2.skyhanni.features.chat
 
 import at.hannibal2.skyhanni.SkyHanniMod
-import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.events.LorenzChatEvent
 import at.hannibal2.skyhanni.events.LorenzTickEvent
 import at.hannibal2.skyhanni.features.misc.MarkedPlayerManager
@@ -9,7 +8,6 @@ import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.EntityUtils
 import at.hannibal2.skyhanni.utils.LocationUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils
-import at.hannibal2.skyhanni.utils.LorenzUtils.isInIsland
 import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.getLorenzVec
@@ -44,9 +42,7 @@ class PlayerDeathMessages {
         deathMessagePattern.matchMatcher(message) {
             val name = group("name")
             if (MarkedPlayerManager.config.highlightInChat &&
-                !IslandType.CATACOMBS.isInIsland() && !LorenzUtils.inKuudraFight && MarkedPlayerManager.isMarkedPlayer(
-                    name
-                )
+                !LorenzUtils.inDungeons && !LorenzUtils.inKuudraFight && MarkedPlayerManager.isMarkedPlayer(name)
             ) {
                 val reason = group("reason").removeColor()
 
@@ -72,6 +68,6 @@ class PlayerDeathMessages {
     }
 
     private fun isHideFarDeathsEnabled(): Boolean {
-        return LorenzUtils.inSkyBlock && SkyHanniMod.feature.chat.hideFarDeathMessages && !IslandType.CATACOMBS.isInIsland() && !LorenzUtils.inKuudraFight
+        return LorenzUtils.inSkyBlock && SkyHanniMod.feature.chat.hideFarDeathMessages && !LorenzUtils.inDungeons && !LorenzUtils.inKuudraFight
     }
 }

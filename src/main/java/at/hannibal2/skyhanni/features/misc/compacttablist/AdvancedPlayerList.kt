@@ -42,7 +42,7 @@ object AdvancedPlayerList {
 
     fun newSorting(original: List<String>): List<String> {
         if (LorenzUtils.inKuudraFight) return original
-        if (IslandType.CATACOMBS.isInIsland()) return original
+        if (LorenzUtils.inDungeons) return original
 
         if (ignoreCustomTabList()) return original
         val newList = mutableListOf<String>()

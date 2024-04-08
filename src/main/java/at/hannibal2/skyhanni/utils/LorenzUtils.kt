@@ -51,13 +51,10 @@ object LorenzUtils {
 
     val inHypixelLobby get() = onHypixel && HypixelData.inLobby
 
-    /**
-     * Consider using [IslandType.CATACOMBS.isInIsland] instead
-     */
     val inDungeons get() = inSkyBlock && DungeonAPI.inDungeon()
 
     /**
-     * Consider using [IslandType.isInIsland] instead
+     * Consider using IslandType.isInIsland() instead
      */
     val skyBlockIsland get() = HypixelData.skyBlockIsland
 

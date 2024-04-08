@@ -2,7 +2,6 @@ package at.hannibal2.skyhanni.features.dungeon
 
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
-import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.events.CheckRenderEntityEvent
 import at.hannibal2.skyhanni.events.DamageIndicatorFinalBossEvent
 import at.hannibal2.skyhanni.events.EntityHealthUpdateEvent
@@ -11,7 +10,7 @@ import at.hannibal2.skyhanni.events.LorenzWorldChangeEvent
 import at.hannibal2.skyhanni.events.PlaySoundEvent
 import at.hannibal2.skyhanni.events.ReceiveParticleEvent
 import at.hannibal2.skyhanni.utils.ChatUtils
-import at.hannibal2.skyhanni.utils.LorenzUtils.isInIsland
+import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraft.client.Minecraft
@@ -34,7 +33,7 @@ class DungeonCleanEnd {
 
     @SubscribeEvent
     fun onChat(event: LorenzChatEvent) {
-        if (!IslandType.CATACOMBS.isInIsland()) return
+        if (!LorenzUtils.inDungeons) return
         if (!config.enabled) return
 
         val message = event.message
@@ -45,7 +44,7 @@ class DungeonCleanEnd {
     }
 
     private fun shouldBlock(): Boolean {
-        if (!IslandType.CATACOMBS.isInIsland()) return false
+        if (!LorenzUtils.inDungeons) return false
         if (!config.enabled) return false
 
         if (!bossDone) return false
@@ -62,7 +61,7 @@ class DungeonCleanEnd {
 
     @SubscribeEvent
     fun onBossDead(event: DamageIndicatorFinalBossEvent) {
-        if (!IslandType.CATACOMBS.isInIsland()) return
+        if (!LorenzUtils.inDungeons) return
         if (bossDone) return
 
         if (lastBossId == -1) {
@@ -72,7 +71,7 @@ class DungeonCleanEnd {
 
     @SubscribeEvent
     fun onEntityHealthUpdate(event: EntityHealthUpdateEvent) {
-        if (!IslandType.CATACOMBS.isInIsland()) return
+        if (!LorenzUtils.inDungeons) return
         if (!config.enabled) return
         if (bossDone) return
         if (lastBossId == -1) return

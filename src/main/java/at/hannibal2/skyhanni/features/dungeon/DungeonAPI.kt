@@ -1,6 +1,5 @@
 package at.hannibal2.skyhanni.features.dungeon
 
-import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.data.ProfileStorageData
 import at.hannibal2.skyhanni.data.ScoreboardData
 import at.hannibal2.skyhanni.events.DebugDataCollectEvent
@@ -17,7 +16,6 @@ import at.hannibal2.skyhanni.utils.CollectionUtils.equalsOneOf
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.ItemUtils.name
 import at.hannibal2.skyhanni.utils.LorenzUtils
-import at.hannibal2.skyhanni.utils.LorenzUtils.isInIsland
 import at.hannibal2.skyhanni.utils.NumberUtil.formatNumber
 import at.hannibal2.skyhanni.utils.NumberUtil.romanToDecimalIfNecessary
 import at.hannibal2.skyhanni.utils.StringUtils.matchFirst
@@ -244,7 +242,7 @@ object DungeonAPI {
     fun onDebugDataCollect(event: DebugDataCollectEvent) {
         event.title("Dungeon")
 
-        if (!IslandType.CATACOMBS.isInIsland()) {
+        if (!LorenzUtils.inDungeons) {
             event.addIrrelevant("not in dungeons")
             return
         }
