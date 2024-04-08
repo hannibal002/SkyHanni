@@ -21,6 +21,7 @@ import at.hannibal2.skyhanni.events.garden.visitor.VisitorRenderEvent
 import at.hannibal2.skyhanni.features.garden.CropType.Companion.getByNameOrNull
 import at.hannibal2.skyhanni.features.garden.GardenAPI
 import at.hannibal2.skyhanni.features.garden.farming.GardenCropSpeed.getSpeed
+import at.hannibal2.skyhanni.features.garden.visitor.VisitorAPI.blockReason
 import at.hannibal2.skyhanni.features.inventory.bazaar.BazaarApi
 import at.hannibal2.skyhanni.mixins.hooks.RenderLivingEntityHelper
 import at.hannibal2.skyhanni.test.command.ErrorManager
@@ -128,7 +129,9 @@ object GardenVisitorFeatures {
             visitor.shoppingList[internalName] = amount
         }
 
-        readToolTip(visitor, offerItem)
+        visitor.lastLore = listOf()
+        visitor.blockedLore = listOf()
+        visitor.blockReason = visitor.blockReason()
 
         val alreadyReady = offerItem.getLore().any { it == "§eClick to give!" }
         if (alreadyReady) {
@@ -298,16 +301,14 @@ object GardenVisitorFeatures {
     fun onTooltip(visitor: VisitorAPI.Visitor, itemStack: ItemStack, toolTip: MutableList<String>) {
         if (itemStack.name != "§aAccept Offer") return
 
-        toolTip.clear()
-
         if (visitor.lastLore.isEmpty()) {
-            readToolTip(visitor, itemStack)
+            readToolTip(visitor, itemStack, toolTip)
         }
-
+        toolTip.clear()
         toolTip.addAll(visitor.lastLore)
     }
 
-    private fun readToolTip(visitor: VisitorAPI.Visitor, itemStack: ItemStack?) {
+    private fun readToolTip(visitor: VisitorAPI.Visitor, itemStack: ItemStack?, toolTip: MutableList<String>) {
         val stack = itemStack ?: error("Accept offer item not found for visitor ${visitor.visitorName}")
         var totalPrice = 0.0
         var farmingTimeRequired = 0.seconds
@@ -352,7 +353,7 @@ object GardenVisitorFeatures {
         }
 
         readingShoppingList = true
-        val finalList = stack.getLore().toMutableList()
+        val finalList = toolTip.map { it.removePrefix("§5§o")}.toMutableList()
         var offset = 0
         for ((i, formattedLine) in finalList.toMutableList().withIndex()) {
             val index = i + offset
@@ -380,7 +381,6 @@ object GardenVisitorFeatures {
             if (formattedLine.contains("Rewards")) {
                 readingShoppingList = false
             }
-
             val (itemName, amount) = ItemUtils.readItemAmount(formattedLine) ?: continue
             val internalName = NEUInternalName.fromItemNameOrNull(itemName)?.replace("◆_", "") ?: continue
 

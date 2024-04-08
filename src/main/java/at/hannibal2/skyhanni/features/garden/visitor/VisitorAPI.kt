@@ -135,6 +135,7 @@ object VisitorAPI {
         var allRewards = listOf<NEUInternalName>()
         var lastLore = listOf<String>()
         var blockedLore = listOf<String>()
+        var blockReason: VisitorBlockReason? = null
 
         fun getEntity() = EntityUtils.getEntityByID(entityId)
         fun getNameTagEntity() = EntityUtils.getEntityByID(nameTagEntityId)
@@ -190,5 +191,31 @@ object VisitorAPI {
             visitorsRemaining--
         }
         return visitorsInTab
+    }
+
+    fun Visitor.blockReason(): VisitorBlockReason? {
+
+        val visitorHasReward = config.rewardWarning.preventRefusing && this.hasReward() != null
+        if (visitorHasReward) {
+            return VisitorBlockReason.RARE_REWARD
+        }
+        else if (config.rewardWarning.preventRefusingNew && this.offersAccepted == 0) {
+            return VisitorBlockReason.NEVER_ACCEPTED
+        }
+        val pricePerCopper = this.pricePerCopper ?: return VisitorBlockReason.EXPENSIVE_COPPER
+        return if (config.rewardWarning.preventRefusingCopper && pricePerCopper <= config.rewardWarning.coinsPerCopperPrice) {
+            VisitorBlockReason.CHEAP_COPPER
+        }
+        else if (config.rewardWarning.preventAcceptingCopper && pricePerCopper > config.rewardWarning.coinsPerCopperPrice) {
+            VisitorBlockReason.EXPENSIVE_COPPER
+        }
+        else null
+    }
+
+    enum class VisitorBlockReason(val description: String, val blockRefusing: Boolean) {
+        NEVER_ACCEPTED("§cNever accepted", true),
+        RARE_REWARD("§aRare visitor reward found", true),
+        CHEAP_COPPER("§aCheap copper", true),
+        EXPENSIVE_COPPER("§cExpensive copper", false)
     }
 }

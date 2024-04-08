@@ -16,8 +16,6 @@ import at.hannibal2.skyhanni.features.garden.visitor.VisitorAPI.ACCEPT_SLOT
 import at.hannibal2.skyhanni.features.garden.visitor.VisitorAPI.INFO_SLOT
 import at.hannibal2.skyhanni.features.garden.visitor.VisitorAPI.lastClickedNpc
 import at.hannibal2.skyhanni.mixins.transformers.gui.AccessorGuiContainer
-import at.hannibal2.skyhanni.utils.ChatUtils
-import at.hannibal2.skyhanni.utils.DelayedRun
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.ItemUtils.name
 import at.hannibal2.skyhanni.utils.KeyboardManager.isKeyHeld
@@ -25,8 +23,8 @@ import at.hannibal2.skyhanni.utils.LocationUtils.distanceToPlayer
 import at.hannibal2.skyhanni.utils.LorenzLogger
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.RenderUtils.exactLocation
-import at.hannibal2.skyhanni.utils.StringUtils.matches
 import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
+import at.hannibal2.skyhanni.utils.StringUtils.matches
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraft.client.Minecraft

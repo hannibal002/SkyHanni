@@ -6,6 +6,7 @@ import at.hannibal2.skyhanni.events.GuiContainerEvent
 import at.hannibal2.skyhanni.features.garden.GardenAPI
 import at.hannibal2.skyhanni.features.garden.visitor.VisitorAPI.ACCEPT_SLOT
 import at.hannibal2.skyhanni.features.garden.visitor.VisitorAPI.REFUSE_SLOT
+import at.hannibal2.skyhanni.features.garden.visitor.VisitorAPI.VisitorBlockReason
 import at.hannibal2.skyhanni.features.garden.visitor.VisitorAPI.lastClickedNpc
 import at.hannibal2.skyhanni.utils.ItemUtils.name
 import at.hannibal2.skyhanni.utils.KeyboardManager.isKeyHeld
@@ -28,9 +29,9 @@ class VisitorRewardWarning {
         if (!config.preventRefusing && !config.preventRefusingCopper && !config.preventAcceptingCopper) return
 
         val visitor = VisitorAPI.getVisitor(lastClickedNpc) ?: return
-        val blockReason = visitor.blockReason(isAcceptSlot = true, isRefuseSlot = true, ignoreBypassKey = true)?: return
-        val refuseOfferStack = event.gui.inventorySlots.getSlot(REFUSE_SLOT).stack ?: return
-        val acceptOfferStack = event.gui.inventorySlots.getSlot(ACCEPT_SLOT).stack ?: return
+        val refuseOfferStack = event.gui.inventorySlots.getSlot(REFUSE_SLOT).stack
+        val acceptOfferStack = event.gui.inventorySlots.getSlot(ACCEPT_SLOT).stack
+        val blockReason = visitor.blockReason ?: return
 
         if (blockReason.blockRefusing) {
             renderColor(refuseOfferStack, acceptOfferStack, LorenzColor.GREEN)
@@ -39,9 +40,9 @@ class VisitorRewardWarning {
         }
     }
 
-    private fun renderColor(backgroundStack: ItemStack, outlineStack: ItemStack, outlineColor: LorenzColor) {
-        if (!config.bypassKey.isKeyHeld()) backgroundStack.background = LorenzColor.DARK_GRAY.addOpacity(config.opacity).rgb
-        if (config.optionOutline) outlineStack.borderLine = outlineColor.addOpacity(200).rgb
+    private fun renderColor(backgroundStack: ItemStack?, outlineStack: ItemStack?, outlineColor: LorenzColor) {
+        if (!config.bypassKey.isKeyHeld()) backgroundStack?.background = LorenzColor.DARK_GRAY.addOpacity(config.opacity).rgb
+        if (config.optionOutline) outlineStack?.borderLine = outlineColor.addOpacity(200).rgb
     }
 
     @SubscribeEvent(priority = EventPriority.HIGH)
@@ -50,19 +51,22 @@ class VisitorRewardWarning {
         val slot = event.slot ?: return
 
         val visitor = VisitorAPI.getVisitor(lastClickedNpc) ?: return
-        val blockReason = visitor.blockReason(event.slotId == ACCEPT_SLOT, event.slotId == REFUSE_SLOT)
+        val blockReason = visitor.blockReason
 
-        if (blockReason != null) {
+        val isRefuseSlot = slot.stack.name == "§cRefuse Offer"
+        val isAcceptSlot = slot.stack.name == "§aAccept Offer"
+
+        if (blockReason != null && !config.bypassKey.isKeyHeld() &&
+            ((blockReason.blockRefusing && isRefuseSlot) || !blockReason.blockRefusing && isAcceptSlot)) {
             event.isCanceled = true
             return
         }
 
-        if (event.slotId == REFUSE_SLOT) {
-            if (slot.stack?.name != "§cRefuse Offer") return
+        if (isRefuseSlot) {
             VisitorAPI.changeStatus(visitor, VisitorAPI.VisitorStatus.REFUSED, "refused")
             return
         }
-        if (event.slotId == ACCEPT_SLOT) {
+        if (isAcceptSlot) {
             if (slot.stack?.name != "§eClick to give!") return
             VisitorAPI.changeStatus(visitor, VisitorAPI.VisitorStatus.ACCEPTED, "accepted")
             return
@@ -74,14 +78,16 @@ class VisitorRewardWarning {
         if (!GardenAPI.onBarnPlot) return
         if (!VisitorAPI.inInventory) return
         val visitor = VisitorAPI.getVisitor(lastClickedNpc) ?: return
+        if (config.bypassKey.isKeyHeld()) return
 
         val isRefuseSlot = event.itemStack.name == "§cRefuse Offer"
         val isAcceptSlot = event.itemStack.name == "§aAccept Offer"
 
-        val blockReason = visitor.blockReason(isAcceptSlot, isRefuseSlot)?: return
+        val blockReason = visitor.blockReason?: return
+        if (blockReason.blockRefusing && !isRefuseSlot) return
+        if (!blockReason.blockRefusing && !isAcceptSlot) return
 
         if (visitor.blockedLore.isEmpty()) {
-            println("Rendering blocked tooltip now")
             val copiedTooltip = event.toolTip.toList()
             val blockedToolTip = mutableListOf<String>()
 
@@ -96,45 +102,15 @@ class VisitorRewardWarning {
             }
             blockedToolTip.add("")
             val pricePerCopper = visitor.pricePerCopper?.let { NumberUtil.format(it) }
-            if (blockReason == VisitorBlockReason.CHEAP_COPPER || blockReason == VisitorBlockReason.EXPENSIVE_COPPER) {
-                blockedToolTip.add("${blockReason.description} §7(§6$pricePerCopper §7per)")
-            } else blockedToolTip.add(blockReason.description)
+            blockedToolTip.add(
+                if (blockReason == VisitorBlockReason.CHEAP_COPPER || blockReason == VisitorBlockReason.EXPENSIVE_COPPER)
+                    "${blockReason.description} §7(§6$pricePerCopper §7per)" else blockReason.description
+            )
             blockedToolTip.add("  §7(Bypass by holding ${Keyboard.getKeyName(config.bypassKey)})")
 
             visitor.blockedLore = blockedToolTip
         }
         event.toolTip.clear()
         event.toolTip.addAll(visitor.blockedLore)
-    }
-
-    private fun VisitorAPI.Visitor.blockReason(
-        isAcceptSlot: Boolean,
-        isRefuseSlot: Boolean,
-        ignoreBypassKey: Boolean = false
-    ): VisitorBlockReason? {
-        if (!ignoreBypassKey && config.bypassKey.isKeyHeld()) return null
-
-        val visitorHasReward = config.preventRefusing && this.hasReward() != null
-        if (visitorHasReward && isRefuseSlot) {
-            return VisitorBlockReason.RARE_REWARD
-        }
-        else if (config.preventRefusingNew && this.offersAccepted == 0) {
-            return VisitorBlockReason.NEVER_ACCEPTED
-        }
-        val pricePerCopper = this.pricePerCopper ?: return VisitorBlockReason.EXPENSIVE_COPPER
-        return if (config.preventRefusingCopper && isRefuseSlot && pricePerCopper <= config.coinsPerCopperPrice) {
-            VisitorBlockReason.CHEAP_COPPER
-        }
-        else if (config.preventAcceptingCopper && isAcceptSlot && pricePerCopper > config.coinsPerCopperPrice && !visitorHasReward) {
-            VisitorBlockReason.EXPENSIVE_COPPER
-        }
-        else null
-    }
-
-    enum class VisitorBlockReason(val description: String, val blockRefusing: Boolean) {
-        NEVER_ACCEPTED("§cNever accepted", true),
-        RARE_REWARD("§aRare visitor reward found", true,),
-        CHEAP_COPPER("§aCheap copper", true),
-        EXPENSIVE_COPPER("§cExpensive copper", false)
     }
 }
