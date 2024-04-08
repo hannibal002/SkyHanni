@@ -7,6 +7,7 @@ import com.google.gson.annotations.Expose;
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorBoolean;
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorDraggableList;
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorSlider;
+import io.github.notenoughupdates.moulconfig.annotations.ConfigLink;
 import io.github.notenoughupdates.moulconfig.annotations.ConfigOption;
 
 import java.util.ArrayList;
@@ -156,5 +157,6 @@ public class MoneyPerHourConfig {
     public boolean hideTitle = false;
 
     @Expose
+    @ConfigLink(owner = MoneyPerHourConfig.class, field = "display")
     public Position pos = new Position(-330, 170, false, true);
 }
