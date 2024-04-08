@@ -4,8 +4,10 @@ import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.config.features.enchantparsing.EnchantParsingConfig
 import at.hannibal2.skyhanni.config.features.enchantparsing.EnchantParsingConfig.CommaFormat
 import at.hannibal2.skyhanni.events.ChatHoverEvent
+import at.hannibal2.skyhanni.events.ConfigLoadEvent
 import at.hannibal2.skyhanni.events.LorenzToolTipEvent
 import at.hannibal2.skyhanni.events.RepositoryReloadEvent
+import at.hannibal2.skyhanni.mixins.hooks.GuiChatHook
 import at.hannibal2.skyhanni.utils.ItemUtils.isEnchanted
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.NumberUtil.romanToDecimal
@@ -24,7 +26,7 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
  */
 object EnchantParser {
 
-    private val config get() = SkyHanniMod.feature.enchantParsing
+    private val config get() = SkyHanniMod.feature.gui.enchantParsing
 
     val patternGroup = RepoPattern.group("misc.items.enchantparsing")
     val ENCHANTMENT_PATTERN by patternGroup.pattern("enchants", "(?<enchant>[A-Za-z][A-Za-z -]+) (?<levelNumeral>[IVXLCDM]+)(?<stacking>, |\$| \\d{1,3}(,\\d{3})*)")
@@ -51,6 +53,20 @@ object EnchantParser {
         this.enchants = event.getConstant<Enchants>("Enchants")
     }
 
+    @Suppress("DuplicatedCode")
+    @SubscribeEvent
+    fun onConfigLoad(event: ConfigLoadEvent) {
+        // Add observers to config options that would need us to mark cache dirty
+        config.format.addObserver { _, _ -> markCacheDirty() }
+        config.perfectEnchantColor.addObserver { _, _ -> markCacheDirty() }
+        config.greatEnchantColor.addObserver { _, _ -> markCacheDirty() }
+        config.goodEnchantColor.addObserver { _, _ -> markCacheDirty() }
+        config.poorEnchantColor.addObserver { _, _ -> markCacheDirty() }
+        config.commaFormat.addObserver { _, _ -> markCacheDirty() }
+        config.hideVanillaEnchants.addObserver { _, _ -> markCacheDirty() }
+        config.hideEnchantDescriptions.addObserver { _, _ -> markCacheDirty() }
+    }
+
     @SubscribeEvent
     fun onTooltipEvent(event: LorenzToolTipEvent) {
         // If enchants doesn't have any enchant data then we have no data to parse enchants correctly
@@ -70,10 +86,10 @@ object EnchantParser {
      */
     @SubscribeEvent
     fun onChatHoverEvent(event: ChatHoverEvent) {
-        if (event.action != HoverEvent.Action.SHOW_TEXT) return
+        if (event.getHoverEvent().action != HoverEvent.Action.SHOW_TEXT) return
         if (!isEnabled() || !this.enchants.hasEnchantData()) return
 
-        val lore = event.component.formattedText.split("\n").toMutableList()
+        val lore = event.getHoverEvent().value.formattedText.split("\n").toMutableList()
 
         // Since we don't get given an item stack from /show, we pass an empty enchants map and
         // use all enchants from the Enchants class instead
@@ -112,7 +128,7 @@ object EnchantParser {
 
         // If we have color parsing off and hide enchant descriptions on, remove them and return from method
         if (!config.colorParsing) {
-            if (config.hideEnchantDescriptions) {
+            if (config.hideEnchantDescriptions.get()) {
                 loreList.removeAll(loreLines)
                 loreCache.updateAfter(loreList)
                 if (chatComponent != null) editChatComponent(chatComponent, loreList)
@@ -201,10 +217,10 @@ object EnchantParser {
     }
 
     private fun formatEnchants(insertEnchants: MutableList<String>) {
-        val commaFormat = config.commaFormat
+        val commaFormat = config.commaFormat.get()
 
         // Normal is leaving the formatting as Hypixel provides it
-        if (config.format == EnchantParsingConfig.EnchantFormat.NORMAL) {
+        if (config.format.get() == EnchantParsingConfig.EnchantFormat.NORMAL) {
             var builder = StringBuilder()
 
             for ((i, orderedEnchant: FormattedEnchant) in orderedEnchants.withIndex()) {
@@ -217,7 +233,7 @@ object EnchantParser {
                     insertEnchants.add(builder.toString())
 
                     // This will only add enchant descriptions if there were any to begin with
-                    if (!config.hideEnchantDescriptions) insertEnchants.addAll(orderedEnchant.getLore())
+                    if (!config.hideEnchantDescriptions.get()) insertEnchants.addAll(orderedEnchant.getLore())
 
                     builder = StringBuilder()
                 }
@@ -231,7 +247,7 @@ object EnchantParser {
             }
 
         // Compressed is always forcing 3 enchants per line, except when there is stacking enchant progress visible
-        } else if (config.format == EnchantParsingConfig.EnchantFormat.COMPRESSED && !shouldBeSingleColumn) {
+        } else if (config.format.get() == EnchantParsingConfig.EnchantFormat.COMPRESSED && !shouldBeSingleColumn) {
             var builder = StringBuilder()
 
             for ((i, orderedEnchant: FormattedEnchant) in orderedEnchants.withIndex()) {
@@ -255,7 +271,7 @@ object EnchantParser {
 
         // Stacked is always forcing 1 enchant per line
         } else {
-            if (!config.hideEnchantDescriptions) {
+            if (!config.hideEnchantDescriptions.get()) {
                 for (enchant: FormattedEnchant in orderedEnchants) {
                     insertEnchants.add(enchant.getFormattedString())
                     insertEnchants.addAll(enchant.getLore())
@@ -269,16 +285,13 @@ object EnchantParser {
     }
 
     private fun editChatComponent(chatComponent: IChatComponent, loreList: MutableList<String>) {
-        // Drop 1st 2 and last 2 characters since when being rendered, the chat tooltip
-        // adds formatting in front of, and at the end of the text, so we get rid of them
-        // here and let Minecraft add them back, otherwise the text grows infinitely
-        (chatComponent as ChatComponentText).text = loreList.joinToString("\n").drop(2).dropLast(2)
+        val text = loreList.joinToString("\n").dropLast(2)
 
-        val iterator = chatComponent.siblings.iterator()
-        while (iterator.hasNext()) {
-            iterator.next()
-            iterator.remove()
-        }
+        // Just set the component text to the entire lore list instead of reconstructing the entire siblings tree
+        val chatComponentText = ChatComponentText(text)
+        val hoverEvent = HoverEvent(chatComponent.chatStyle.chatHoverEvent.action, chatComponentText)
+
+        GuiChatHook.replaceOnlyHoverEvent(hoverEvent)
     }
 
     private fun accountForAndRemoveGrayEnchants(loreList: MutableList<String>, item: ItemStack) : Int {
@@ -286,7 +299,7 @@ object EnchantParser {
         if (!item.isEnchanted() || item.enchantmentTagList.tagCount() == 0) return -1
 
         var lastGrayEnchant = -1
-        val removeGrayEnchants = config.hideVanillaEnchants
+        val removeGrayEnchants = config.hideVanillaEnchants.get()
 
         var i = 1
         for (total in 0 until (1 + item.enchantmentTagList.tagCount())) {
@@ -305,7 +318,7 @@ object EnchantParser {
 
     fun isEnabled() = LorenzUtils.inSkyBlock
 
-    fun markCacheDirty() {
+    private fun markCacheDirty() {
         loreCache.configChanged = true
     }
 

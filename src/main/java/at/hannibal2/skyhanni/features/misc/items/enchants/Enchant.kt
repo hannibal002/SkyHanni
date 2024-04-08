@@ -21,12 +21,12 @@ open class Enchant : Comparable<Enchant> {
     open fun getFormattedName(level: Int) = getFormat(level) + loreName
 
     open fun getFormat(level: Int) : String {
-        val config = SkyHanniMod.feature.enchantParsing
+        val config = SkyHanniMod.feature.gui.enchantParsing
 
-        if (level >= maxLevel) return config.perfectEnchantColor.getChatColor()
-        if (level > goodLevel) return config.greatEnchantColor.getChatColor()
-        if (level == goodLevel) return config.goodEnchantColor.getChatColor()
-        return config.poorEnchantColor.getChatColor()
+        if (level >= maxLevel) return config.perfectEnchantColor.get().getChatColor()
+        if (level > goodLevel) return config.greatEnchantColor.get().getChatColor()
+        if (level == goodLevel) return config.goodEnchantColor.get().getChatColor()
+        return config.poorEnchantColor.get().getChatColor()
     }
 
     override fun toString() = "$nbtName $goodLevel $maxLevel\n"
