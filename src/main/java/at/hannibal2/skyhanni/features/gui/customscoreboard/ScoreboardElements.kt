@@ -16,6 +16,7 @@ import at.hannibal2.skyhanni.data.QuiverAPI.asArrowPercentage
 import at.hannibal2.skyhanni.data.ScoreboardData
 import at.hannibal2.skyhanni.data.SlayerAPI
 import at.hannibal2.skyhanni.features.gui.customscoreboard.ChunkedStats.Companion.getChunkedStats
+import at.hannibal2.skyhanni.features.gui.customscoreboard.ChunkedStats.Companion.shouldShowChunkedStats
 import at.hannibal2.skyhanni.features.gui.customscoreboard.CustomScoreboard.Companion.arrowConfig
 import at.hannibal2.skyhanni.features.gui.customscoreboard.CustomScoreboard.Companion.chunkedConfig
 import at.hannibal2.skyhanni.features.gui.customscoreboard.CustomScoreboard.Companion.devConfig
@@ -116,8 +117,8 @@ enum class ScoreboardElement(
         "North Stars: §d756"
     ),
     CHUNKED_STATS(
-        ::getLongStatsDisplayPair,
-        ::getLongStatsShowWhen,
+        ::getChunkedStatsDisplayPair,
+        ::shouldShowChunkedStats,
         "§652,763,737 §7| §d64,647 §7| §6249M §7| §b59,264 §7| §c23,495 §7| §a57,873 §7| §c♨ 0 §7| §b0❄ §7| §d756"
     ),
     EMPTY_LINE(
@@ -475,12 +476,10 @@ private fun getNorthStarsDisplayPair(): List<ScoreboardElementType> {
 
 private fun getNorthStarsShowWhen() = inAnyIsland(IslandType.WINTER)
 
-private fun getLongStatsDisplayPair(): List<ScoreboardElementType> =
+private fun getChunkedStatsDisplayPair(): List<ScoreboardElementType> =
     getChunkedStats().chunked(chunkedConfig.maxStatsPerLine)
         .map { it.joinToString(separator = " §f| ") }
         .map { it to HorizontalAlignment.LEFT }
-
-private fun getLongStatsShowWhen() = true
 
 private fun getEmptyLineDisplayPair() = listOf("<empty>" to HorizontalAlignment.LEFT)
 

@@ -118,5 +118,7 @@ enum class ChunkedStats(
                 }
             }
         }
+
+        fun shouldShowChunkedStats() = chunkedConfig.chunkedStats.any { it.showWhen() }
     }
 }
