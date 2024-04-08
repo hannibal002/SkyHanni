@@ -8,21 +8,20 @@ import io.github.moulberry.moulconfig.annotations.ConfigOption;
 public class AnitaPersonalBestConfig {
 
     @Expose
-    @ConfigOption(name = "Enabled", desc = "Show your your personal best for the current active crop (held tool)")
+    @ConfigOption(name = "Enabled", desc = "Show your personal best for the current active crop (held tool)")
     @ConfigEditorBoolean
     public boolean enabled = false;
 
     @Expose
-    @ConfigOption(name = "", desc = "")
+    @ConfigOption(name = "Show Bonus", desc = "Show your current farming fortune bonus.")
     @ConfigEditorBoolean
     public boolean showBonus = false;
 
     @Expose
-    @ConfigOption(name = "", desc = "")
+    @ConfigOption(name = "Only In Contest", desc = "Show only when a contest is active.")
     @ConfigEditorBoolean
     public boolean onlyInContest = false;
 
     @Expose
-    public Position position = new Position(100, 100, false, true);
-
+    public Position position = new Position(-405, 3, false, true);
 }
