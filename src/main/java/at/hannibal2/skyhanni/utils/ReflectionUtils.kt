@@ -80,4 +80,5 @@ object ReflectionUtils {
         return packageLookup[shPackageName]
     }
 
+    fun Class<*>.getDeclaredFieldOrNull(name: String): Field? = declaredFields.firstOrNull { it.name == name }
 }

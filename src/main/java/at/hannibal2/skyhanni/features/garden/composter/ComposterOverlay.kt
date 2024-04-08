@@ -4,8 +4,7 @@ import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.config.features.garden.composter.ComposterConfig
 import at.hannibal2.skyhanni.config.features.garden.composter.ComposterConfig.OverlayPriceTypeEntry
 import at.hannibal2.skyhanni.config.features.garden.composter.ComposterConfig.RetrieveFromEntry
-import at.hannibal2.skyhanni.data.SackAPI
-import at.hannibal2.skyhanni.data.SackStatus
+import at.hannibal2.skyhanni.data.SackAPI.getAmountInSacksOrNull
 import at.hannibal2.skyhanni.data.jsonobjects.repo.GardenJson
 import at.hannibal2.skyhanni.data.model.ComposterUpgrade
 import at.hannibal2.skyhanni.events.GuiRenderEvent
@@ -25,7 +24,7 @@ import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.CollectionUtils.addAsSingletonList
 import at.hannibal2.skyhanni.utils.CollectionUtils.sortedDesc
 import at.hannibal2.skyhanni.utils.ConfigUtils
-import at.hannibal2.skyhanni.utils.InventoryUtils
+import at.hannibal2.skyhanni.utils.InventoryUtils.getAmountInInventory
 import at.hannibal2.skyhanni.utils.ItemUtils.name
 import at.hannibal2.skyhanni.utils.KeyboardManager
 import at.hannibal2.skyhanni.utils.LorenzUtils
@@ -45,7 +44,6 @@ import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.SoundUtils
 import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
-import at.hannibal2.skyhanni.utils.TimeUtils
 import at.hannibal2.skyhanni.utils.TimeUtils.format
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 import net.minecraftforge.fml.common.eventhandler.EventPriority
@@ -55,7 +53,6 @@ import kotlin.math.ceil
 import kotlin.math.floor
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.milliseconds
-import kotlin.time.DurationUnit
 
 object ComposterOverlay {
 
@@ -163,6 +160,13 @@ object ComposterOverlay {
     }
 
     private fun update() {
+        val composterUpgrades = ComposterAPI.composterUpgrades ?: return
+        if (composterUpgrades.isEmpty()) {
+            val list = Collections.singletonList(listOf("§cOpen Composter Upgrades!"))
+            organicMatterDisplay = list
+            fuelExtraDisplay = list
+            return
+        }
         if (organicMatterFactors.isEmpty()) {
             organicMatterDisplay =
                 Collections.singletonList(
@@ -314,20 +318,20 @@ object ComposterOverlay {
         list.add(fuelItem.getItemStack())
         newList.add(list)
 
-        val timePerCompost = ComposterAPI.timePerCompost(null).toLong(DurationUnit.MILLISECONDS)
+        val timePerCompost = ComposterAPI.timePerCompost(null)
         val upgrade = if (maxLevel) null else extraComposterUpgrade
-        val timePerCompostPreview = ComposterAPI.timePerCompost(upgrade).toLong(DurationUnit.MILLISECONDS)
-        val format = TimeUtils.formatDuration(timePerCompost)
+        val timePerCompostPreview = ComposterAPI.timePerCompost(upgrade)
+        val format = timePerCompost.format()
         val formatPreview =
-            if (timePerCompostPreview != timePerCompost) " §c➜ §b" + TimeUtils.formatDuration(timePerCompostPreview) else ""
+            if (timePerCompostPreview != timePerCompost) " §c➜ §b" + timePerCompostPreview.format() else ""
         newList.addAsSingletonList(" §7Time per Compost: §b$format$formatPreview")
 
         val timeText = currentTimeType.display.lowercase()
         val timeMultiplier = if (currentTimeType != TimeType.COMPOST) {
-            (currentTimeType.multiplier * 1000 / (timePerCompost.toDouble()))
+            (currentTimeType.multiplier * 1000.0 / (timePerCompost.inWholeMilliseconds))
         } else 1.0
         val timeMultiplierPreview = if (currentTimeType != TimeType.COMPOST) {
-            (currentTimeType.multiplier * 1000 / (timePerCompostPreview.toDouble()))
+            (currentTimeType.multiplier * 1000.0 / (timePerCompostPreview.inWholeMilliseconds))
         } else 1.0
 
         val multiDropFactor = ComposterAPI.multiDropChance(null) + 1
@@ -479,18 +483,14 @@ object ComposterOverlay {
             BazaarApi.searchForBazaarItem(itemName, itemsNeeded)
             return
         }
-        val having = InventoryUtils.getAmountOfItemInInventory(internalName)
-        if (having >= itemsNeeded) {
+        val havingInInventory = internalName.getAmountInInventory()
+        if (havingInInventory >= itemsNeeded) {
             ChatUtils.chat("$itemName §8x${itemsNeeded} §ealready found in inventory!")
             return
         }
 
-        val sackItem = SackAPI.fetchSackItem(internalName)
-        val amountInSacks = sackItem.amount
-        val sackStatus = sackItem.getStatus()
-
-        if (sackStatus == SackStatus.MISSING || sackStatus == SackStatus.OUTDATED) {
-            ChatUtils.sendCommandToServer("gfs ${internalName.asString()} ${itemsNeeded - having}")
+        val havingInSacks = internalName.getAmountInSacksOrNull() ?: run {
+            ChatUtils.sendCommandToServer("gfs ${internalName.asString()} ${itemsNeeded - havingInInventory}")
             // TODO Add sack type repo data
 
             val isDwarvenMineable =
@@ -501,7 +501,8 @@ object ComposterOverlay {
                 "sax"
             )
             return
-        } else if (amountInSacks == 0L) {
+        }
+        if (havingInSacks == 0) {
             SoundUtils.playErrorSound()
             if (LorenzUtils.noTradeMode) {
                 ChatUtils.chat("No $itemName §efound in sacks.")
@@ -512,8 +513,8 @@ object ComposterOverlay {
             return
         }
 
-        ChatUtils.sendCommandToServer("gfs ${internalName.asString()} ${itemsNeeded - having}")
-        if (amountInSacks <= itemsNeeded - having) {
+        ChatUtils.sendCommandToServer("gfs ${internalName.asString()} ${itemsNeeded - havingInInventory}")
+        if (itemsNeeded > havingInInventory - havingInSacks) {
             if (LorenzUtils.noTradeMode) {
                 ChatUtils.chat("You're out of $itemName §ein your sacks!")
             } else {

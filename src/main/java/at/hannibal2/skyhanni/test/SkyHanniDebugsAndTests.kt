@@ -33,7 +33,7 @@ import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.LorenzVec
 import at.hannibal2.skyhanni.utils.NEUInternalName
 import at.hannibal2.skyhanni.utils.NEUInternalName.Companion.asInternalName
-import at.hannibal2.skyhanni.utils.NEUItems
+import at.hannibal2.skyhanni.utils.NEUItems.getItemStack
 import at.hannibal2.skyhanni.utils.NEUItems.getItemStackOrNull
 import at.hannibal2.skyhanni.utils.NEUItems.getNpcPriceOrNull
 import at.hannibal2.skyhanni.utils.NEUItems.getPriceOrNull
@@ -240,8 +240,8 @@ class SkyHanniDebugsAndTests {
                 list.add("$coloredName§7 (")
                 for (itemName in item.value) {
                     try {
-                        val internalName = NEUItems.getRawInternalName(itemName)
-                        list.add(NEUItems.getItemStack(internalName))
+                        val internalName = NEUInternalName.fromItemName(itemName)
+                        list.add(internalName.getItemStack())
                     } catch (e: Error) {
                         ChatUtils.debug("itemName '$itemName' is invalid for visitor '$name'")
                         errors++
@@ -475,22 +475,20 @@ class SkyHanniDebugsAndTests {
     }
 
     @SubscribeEvent
-    fun onRenderLocation(event: GuiRenderEvent.GuiOverlayRenderEvent) {
-        if (LorenzUtils.inSkyBlock && Minecraft.getMinecraft().gameSettings.showDebugInfo && debugConfig.currentAreaDebug) {
-            config.debugLocationPos.renderString(
-                "Current Area: ${HypixelData.skyBlockArea}",
-                posLabel = "SkyBlock Area (Debug)"
-            )
-        }
-    }
-
-    @SubscribeEvent
     fun onChat(event: LorenzChatEvent) {
     }
 
     @SubscribeEvent
     fun onRenderOverlay(event: GuiRenderEvent.GuiOverlayRenderEvent) {
         if (!LorenzUtils.inSkyBlock) return
+
+        if (Minecraft.getMinecraft().gameSettings.showDebugInfo && debugConfig.currentAreaDebug) {
+            config.debugLocationPos.renderString(
+                "Current Area: ${HypixelData.skyBlockArea}",
+                posLabel = "SkyBlock Area (Debug)"
+            )
+        }
+
         if (!debugConfig.enabled) return
 
         if (displayLine.isNotEmpty()) {
@@ -500,7 +498,7 @@ class SkyHanniDebugsAndTests {
     }
 
     @SubscribeEvent
-    fun onParticlePlay(event: ReceiveParticleEvent) {
+    fun onReceiveParticle(event: ReceiveParticleEvent) {
 //        val particleType = event.type
 //        val distance = LocationUtils.playerLocation().distance(event.location).round(2)
 //

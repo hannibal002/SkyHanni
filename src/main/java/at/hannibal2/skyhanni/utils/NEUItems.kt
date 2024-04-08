@@ -1,7 +1,9 @@
 package at.hannibal2.skyhanni.utils
 
 import at.hannibal2.skyhanni.config.ConfigManager
+import at.hannibal2.skyhanni.data.jsonobjects.other.HypixelPlayerApiJson
 import at.hannibal2.skyhanni.data.jsonobjects.repo.MultiFilterJson
+import at.hannibal2.skyhanni.events.NeuProfileDataLoadedEvent
 import at.hannibal2.skyhanni.events.NeuRepositoryReloadEvent
 import at.hannibal2.skyhanni.events.RepositoryReloadEvent
 import at.hannibal2.skyhanni.features.inventory.bazaar.BazaarDataHolder
@@ -15,6 +17,7 @@ import com.google.gson.JsonPrimitive
 import io.github.moulberry.notenoughupdates.NEUManager
 import io.github.moulberry.notenoughupdates.NEUOverlay
 import io.github.moulberry.notenoughupdates.NotEnoughUpdates
+import io.github.moulberry.notenoughupdates.events.ProfileDataLoadedEvent
 import io.github.moulberry.notenoughupdates.overlays.AuctionSearchOverlay
 import io.github.moulberry.notenoughupdates.overlays.BazaarSearchOverlay
 import io.github.moulberry.notenoughupdates.recipes.CraftingRecipe
@@ -63,8 +66,20 @@ object NEUItems {
         allItemsCache = readAllNeuItems()
     }
 
-    @Deprecated("Use NEUInternalName rather than String", ReplaceWith("NEUInternalName.fromItemName(itemName)"))
-    fun getRawInternalName(itemName: String): String = NEUInternalName.fromItemName(itemName).asString()
+    @SubscribeEvent
+    fun onProfileDataLoaded(event: ProfileDataLoadedEvent) {
+        val apiData = event.data ?: return
+        try {
+            val playerData = ConfigManager.gson.fromJson<HypixelPlayerApiJson>(apiData)
+            NeuProfileDataLoadedEvent(playerData).postAndCatch()
+
+        } catch (e: Exception) {
+            ErrorManager.logErrorWithData(
+                e, "Error reading hypixel player api data",
+                "data" to apiData
+            )
+        }
+    }
 
     fun readAllNeuItems(): Map<String, NEUInternalName> {
         allInternalNames.clear()
@@ -120,20 +135,11 @@ object NEUItems {
         return getNpcPriceOrNull()
     }
 
-    @Deprecated("Use NEUInternalName", ReplaceWith("internalName.asInternalName().getPrice(useSellingPrice)"))
-    fun getPrice(internalName: String, useSellingPrice: Boolean = false): Double =
-        internalName.asInternalName().getPrice(useSellingPrice)
-
     fun NEUInternalName.getItemStackOrNull(): ItemStack? = ItemResolutionQuery(manager)
         .withKnownInternalName(asString())
         .resolveToItemStack()?.copy()
 
     fun getItemStackOrNull(internalName: String) = internalName.asInternalName().getItemStackOrNull()
-
-    // TODO remove
-    @Deprecated("Use NEUInternalName rather than String", ReplaceWith("internalName.asInternalName().getItemStack()"))
-    fun getItemStack(internalName: String): ItemStack =
-        internalName.asInternalName().getItemStack()
 
     fun NEUInternalName.getItemStack(): ItemStack =
         getItemStackOrNull() ?: run {
@@ -192,7 +198,7 @@ object NEUItems {
         private const val lightScaling = 2.47f // Adjust as needed
         private const val g = 0.6f // Original Value taken from RenderHelper
         private const val lightIntensity = lightScaling * g
-        private val itemLightBuffer = GLAllocation.createDirectFloatBuffer(16);
+        private val itemLightBuffer = GLAllocation.createDirectFloatBuffer(16)
 
         init {
             itemLightBuffer.clear()

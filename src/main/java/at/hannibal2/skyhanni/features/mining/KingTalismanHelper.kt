@@ -71,7 +71,7 @@ class KingTalismanHelper {
 
     @SubscribeEvent
     fun onTick(event: LorenzTickEvent) {
-        if (!event.isMod(20)) return
+        if (!event.repeatSeconds(1)) return
         if (!isEnabled()) return
         val storage = storage ?: return
 
