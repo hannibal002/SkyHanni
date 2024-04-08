@@ -71,7 +71,7 @@ class StereoHarmonyDisplay {
         list.add(Renderable.string("§ePlaying: §a$vinylName"))
         val pestLine = mutableListOf<Renderable>()
         pestLine.add(Renderable.string("§ePest: §c$pestName "))
-        if (pest?.cropIcon != null && config.showCrop.get()) pestLine.add(Renderable.itemStack(pest.cropIcon))
+        if (pest?.crop != null && config.showCrop.get()) pestLine.add(Renderable.itemStack(pest.crop.icon))
         list.add(Renderable.horizontalContainer(pestLine))
         add(Renderable.verticalContainer(list))
     }
