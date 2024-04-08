@@ -290,6 +290,12 @@ public class ProfileSpecificStorage {
 
         @Expose
         public PestProfitTracker.Data pestProfitTracker = new PestProfitTracker.Data();
+
+        @Expose
+        public Map<CropType, Long> cropPersonalBest = new HashMap<>();
+
+        @Expose
+        public Map<CropType, Double> cropBonus = new HashMap<>();
     }
 
     @Expose

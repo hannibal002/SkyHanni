@@ -140,6 +140,11 @@ public class GardenConfig {
     public AtmosphericFilterDisplayConfig atmosphericFilterDisplay = new AtmosphericFilterDisplayConfig();
 
     @Expose
+    @ConfigOption(name = "Personal Best", desc = "")
+    @Accordion
+    public AnitaPersonalBestConfig anitaPersonalBestConfig = new AnitaPersonalBestConfig();
+
+    @Expose
     @ConfigOption(name = "Plot Price", desc = "Show the price of the plot in coins when inside the Configure Plots inventory.")
     @ConfigEditorBoolean
     @FeatureToggle
