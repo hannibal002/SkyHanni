@@ -159,7 +159,9 @@ object NEUItems {
     fun isVanillaItem(item: ItemStack): Boolean =
         manager.auctionManager.isVanillaItem(item.getInternalName().asString())
 
-    fun ItemStack.renderOnScreen(x: Float, y: Float, scaleMultiplier: Double = 0.55) {
+    val itemFontSize = 0.67
+
+    fun ItemStack.renderOnScreen(x: Float, y: Float, scaleMultiplier: Double = itemFontSize) {
         val item = checkBlinkItem()
         val isSkull = item.item === Items.skull
 

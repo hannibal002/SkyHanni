@@ -170,7 +170,11 @@ object LorenzUtils {
 
     fun getPlayerName(): String = Minecraft.getMinecraft().thePlayer.name
 
-    fun fillTable(data: List<DisplayTableEntry>, padding: Int = 1, itemScale: Double = 1.0): Renderable {
+    fun fillTable(
+        data: List<DisplayTableEntry>,
+        padding: Int = 1,
+        itemScale: Double = NEUItems.itemFontSize
+    ): Renderable {
         val sorted = data.sortedByDescending { it.sort }
 
         val outerList = mutableListOf<List<Renderable>>()
