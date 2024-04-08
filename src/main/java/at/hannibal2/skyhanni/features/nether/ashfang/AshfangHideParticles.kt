@@ -27,7 +27,7 @@ class AshfangHideParticles {
     }
 
     @SubscribeEvent
-    fun onReceivePacket(event: ReceiveParticleEvent) {
+    fun onReceiveParticle(event: ReceiveParticleEvent) {
         if (isEnabled()) {
             event.isCanceled = true
         }

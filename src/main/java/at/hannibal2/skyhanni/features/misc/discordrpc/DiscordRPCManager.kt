@@ -39,7 +39,7 @@ object DiscordRPCManager : IPCListener {
     private const val applicationID = 1093298182735282176L
     private const val updatePeriod = 4200L
 
-    private val config get() = feature.misc.discordRPC
+    val config get() = feature.gui.discordRPC
 
     private var client: IPCClient? = null
     private lateinit var secondLine: DiscordStatus
@@ -230,7 +230,7 @@ object DiscordRPCManager : IPCListener {
 
     // Events that change things in DiscordStatus
     @SubscribeEvent
-    fun onKeybind(event: LorenzKeyPressEvent) {
+    fun onKeyClick(event: LorenzKeyPressEvent) {
         if (!isEnabled() || !PriorityEntry.AFK.isSelected()) return // autoPriority 4 is dynamic afk
         beenAfkFor = SimpleTimeMark.now()
     }
@@ -249,6 +249,8 @@ object DiscordRPCManager : IPCListener {
         event.transform(11, "misc.discordRPC.autoPriority") { element ->
             ConfigUtils.migrateIntArrayListToEnumArrayList(element, PriorityEntry::class.java)
         }
+
+        event.move(31, "misc.discordRPC", "gui.discordRPC")
     }
 
     private fun PriorityEntry.isSelected() = config.autoPriority.contains(this)

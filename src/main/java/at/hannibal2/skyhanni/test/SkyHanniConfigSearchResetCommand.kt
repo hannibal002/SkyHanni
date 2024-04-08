@@ -224,7 +224,7 @@ object SkyHanniConfigSearchResetCommand {
                 if (!classFilter(className)) continue
                 val objectName = obj.getObjectName()
                 if (obj !is Runnable && objectName.startsWith(className) && (objectName.startsWith("at.hannibal2.skyhanni.config.features.") ||
-                        objectName.startsWith("at.hannibal2.skyhanni.config.Storage"))
+                        objectName.startsWith("at.hannibal2.skyhanni.config.storage.Storage"))
                 ) {
                     "<category>"
                 } else if (onlyValue) {
@@ -283,7 +283,7 @@ object SkyHanniConfigSearchResetCommand {
     }
 
     private fun Any.getClassName(): String {
-        if (this is io.github.moulberry.moulconfig.observer.Property<*>) {
+        if (this is io.github.notenoughupdates.moulconfig.observer.Property<*>) {
             val value = javaClass.getDeclaredField("value").makeAccessible().get(this)
             val name = value.getClassName()
             return "moulconfig.Property<$name>"
@@ -299,7 +299,7 @@ object SkyHanniConfigSearchResetCommand {
             "java.lang.Long" -> "Long"
             "java.lang.String" -> "String"
             "java.lang.Double" -> "Double"
-            "io.github.moulberry.moulconfig.observer.Property" -> "moulconfig.Property"
+            "io.github.notenoughupdates.moulconfig.observer.Property" -> "moulconfig.Property"
             "com.google.gson.internal.LinkedTreeMap" -> "LinkedTreeMap"
             "java.util.ArrayList" -> "List"
             "java.util.HashMap" -> "Map"
@@ -324,7 +324,7 @@ object SkyHanniConfigSearchResetCommand {
             }
         }
 
-        if (this is io.github.moulberry.moulconfig.observer.Property<*>) {
+        if (this is io.github.notenoughupdates.moulconfig.observer.Property<*>) {
             val value = javaClass.getDeclaredField("value").makeAccessible().get(this)
             return value.getObjectName()
         }
