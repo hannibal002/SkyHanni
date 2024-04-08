@@ -159,7 +159,7 @@ object NEUItems {
     fun isVanillaItem(item: ItemStack): Boolean =
         manager.auctionManager.isVanillaItem(item.getInternalName().asString())
 
-    val itemFontSize = 2.0 / 3.0
+    const val itemFontSize = 2.0 / 3.0
 
     fun ItemStack.renderOnScreen(x: Float, y: Float, scaleMultiplier: Double = itemFontSize) {
         val item = checkBlinkItem()
@@ -167,17 +167,16 @@ object NEUItems {
 
         val baseScale = (if (isSkull) 4f / 3f else 1f)
         val finalScale = baseScale * scaleMultiplier
-        val diff = 0f //((finalScale - baseScale) * 10).toFloat()
 
         val translateX: Float
         val translateY: Float
         if (isSkull) {
             val skulldiff = ((scaleMultiplier) * 2.5).toFloat()
-            translateX = x - skulldiff - diff
-            translateY = y - skulldiff - diff
+            translateX = x - skulldiff
+            translateY = y - skulldiff
         } else {
-            translateX = x - diff
-            translateY = y - diff
+            translateX = x
+            translateY = y
         }
 
         GlStateManager.pushMatrix()

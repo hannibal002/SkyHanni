@@ -278,9 +278,7 @@ interface Renderable {
             override val verticalAlign = verticalAlign
 
             override fun render(posX: Int, posY: Int) {
-                GlStateManager.pushMatrix()
                 item.renderOnScreen(xSpacing / 2.0f, 0F, scaleMultiplier = scale)
-                GlStateManager.popMatrix()
             }
         }
 
