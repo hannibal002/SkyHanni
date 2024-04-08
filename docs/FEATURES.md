@@ -87,6 +87,8 @@ Use `/sh` or `/skyhanni` to open the SkyHanni config in game.
 + Kismet tracking for dungeon chests. - Thunderblade73
     + Highlight chests which have been rerolled inside Croesus
     + Shows kismet amount at the reroll button
++ Added SA Jump Notification. - CarsCupcake (https://github.com/hannibal002/SkyHanni/pull/852)
+    + Warn shorty before a Shadow Assassin jumps to you in dungeons.
 
 </details>
 <details open><summary>
@@ -409,6 +411,8 @@ Use `/sh` or `/skyhanni` to open the SkyHanni config in game.
     + Hide the chat messages when digging up a mythological mob.
 + Diana Chat hider. - hannibal2
     + Hide chat messages around griffin burrow chains and griffin feather drops and coin drops.
++ Customizable Inquisitor Highlight color. - Empa (https://github.com/hannibal002/SkyHanni/pull/1323)
++ Mobs since last Inquisitor to Mythological Creature Tracker. - CuzImClicks (https://github.com/hannibal002/SkyHanni/pull/1346)
 
 </details>
 <details open><summary>
@@ -647,6 +651,12 @@ Use `/sh` or `/skyhanni` to open the SkyHanni config in game.
     + Uses the particles and math to detect the location from everywhere in the garden.
     + Option to draw a line to waypoint.
     + Option to change the number of seconds until the waypoint will disappear.
++ Pest Profit Tracker. - Empa (https://github.com/hannibal002/SkyHanni/pull/1321)
++ Open On Elite. - Obsidian (https://github.com/hannibal002/SkyHanni/pull/1185)
+    + Allow opening farming contest stats on elitebot.dev by pressing a keybind + mouse click onto a contest item.
+    + Works inside the menus Jacob's Farming Contest, Your Contests, and SkyBlock Calendar.
++ Visitor's Logbook Stats. - HiZe (https://github.com/hannibal002/SkyHanni/pull/1287)
+    + Show all your visited/accepted/denied visitors stats in a display.
 
 </details>
 <details open><summary>
@@ -744,6 +754,9 @@ Use `/sh` or `/skyhanni` to open the SkyHanni config in game.
     + Shows a parkour to the bottom of Deep Caverns and to Rhys.
 + Display upcoming mining events. - CalMWolfs
     + Show what mining events are currently occurring in both the Dwarven Mines and Crystal Hollows.
++ Area Walls. - Thunderblade73 (https://github.com/hannibal002/SkyHanni/pull/1266)
+    + Show walls between the main areas of the Crystal Hollows.
+    + Option to show the walls also when inside the Nucleus.
 
 </details>
 <details open><summary>
@@ -1029,6 +1042,8 @@ Use `/sh` or `/skyhanni` to open the SkyHanni config in game.
     + Hide the Hypixel Scoreboard, add a custom Image as a background, rounded corners.
     + Supports colored month names & better garden plot names.
     + A ton of settings.
++ No Bits Available Warning. - Empa (https://github.com/hannibal002/SkyHanni/pull/1286)
+    + Warns when you run out of available bits to generate.
 
 </details>
 <details open><summary>
