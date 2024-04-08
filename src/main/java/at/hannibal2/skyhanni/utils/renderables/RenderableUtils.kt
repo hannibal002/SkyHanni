@@ -1,6 +1,8 @@
 package at.hannibal2.skyhanni.utils.renderables
 
 import at.hannibal2.skyhanni.utils.ChatUtils
+import at.hannibal2.skyhanni.utils.NEUInternalName
+import at.hannibal2.skyhanni.utils.NEUItems.getItemStack
 import at.hannibal2.skyhanni.utils.RenderUtils.HorizontalAlignment
 import at.hannibal2.skyhanni.utils.RenderUtils.VerticalAlignment
 import at.hannibal2.skyhanni.utils.SoundUtils
@@ -80,6 +82,10 @@ internal object RenderableUtils {
     // TODO add internal name support, and caching
     fun MutableList<Renderable>.addItemStack(itemStack: ItemStack) {
         add(Renderable.itemStack(itemStack))
+    }
+
+    fun MutableList<Renderable>.addItemStack(internalName: NEUInternalName) {
+        addItemStack(internalName.getItemStack())
     }
 
     inline fun <reified T : Enum<T>> MutableList<Renderable>.addSelector(

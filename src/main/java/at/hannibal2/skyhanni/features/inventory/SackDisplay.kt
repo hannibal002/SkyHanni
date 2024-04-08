@@ -15,19 +15,17 @@ import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.LorenzColor
 import at.hannibal2.skyhanni.utils.LorenzUtils
-import at.hannibal2.skyhanni.utils.NEUInternalName
 import at.hannibal2.skyhanni.utils.NEUInternalName.Companion.asInternalName
 import at.hannibal2.skyhanni.utils.NEUItems
-import at.hannibal2.skyhanni.utils.NEUItems.getItemStack
 import at.hannibal2.skyhanni.utils.NumberUtil
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.RenderUtils.highlight
 import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderables
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 import at.hannibal2.skyhanni.utils.renderables.RenderableUtils.addButton
+import at.hannibal2.skyhanni.utils.renderables.RenderableUtils.addItemStack
 import at.hannibal2.skyhanni.utils.renderables.RenderableUtils.addSelector
 import at.hannibal2.skyhanni.utils.renderables.RenderableUtils.addString
-import net.minecraft.item.ItemStack
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
 object SackDisplay {
@@ -282,14 +280,6 @@ object SackDisplay {
 
     private fun MutableList<Renderable>.addAlignedNumber(string: String) {
         addString(string, horizontalAlign = config.alignment)
-    }
-
-    private fun MutableList<Renderable>.addItemStack(internalName: NEUInternalName) {
-        addItemStack(internalName.getItemStack())
-    }
-
-    private fun MutableList<Renderable>.addItemStack(stack: ItemStack) {
-        add(Renderable.itemStack(stack))
     }
 
     private fun format(price: Long) = if (config.priceFormat == PriceFormatEntry.FORMATTED) {
