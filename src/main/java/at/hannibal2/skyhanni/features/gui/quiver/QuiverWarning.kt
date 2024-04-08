@@ -25,7 +25,7 @@ import kotlin.time.Duration.Companion.seconds
 
 class QuiverWarning {
 
-    private val config get() = SkyHanniMod.feature.combat.quiverConfig.quiverWarning
+    private val config get() = SkyHanniMod.feature.combat.quiverConfig
 
     private var arrow: ArrowType? = null
     private var amount = QuiverAPI.currentAmount
@@ -111,6 +111,6 @@ class QuiverWarning {
 
     @SubscribeEvent
     fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
-        event.move(31, "inventory.quiverAlert", "combat.quiverConfig.quiverWarning.lowQuiverNotification")
+        event.move(31, "inventory.quiverAlert", "combat.quiverConfig.lowQuiverNotification")
     }
 }
