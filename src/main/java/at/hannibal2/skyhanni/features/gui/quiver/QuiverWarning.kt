@@ -72,7 +72,10 @@ class QuiverWarning {
         if (arrowsUsedInRun.isEmpty()) return
         for (arrow in arrowsUsedInRun) {
             if ((arrowAmount[arrow.internalName] ?: return) <= config.lowQuiverAmount) {
-                arrowsToAlert.add(arrow.arrow)
+                val rarity =
+                    NEUItems.getItemStackOrNull(arrow.internalName.asString())?.getItemRarityOrNull()?.chatColorCode
+                        ?: "§f"
+                arrowsToAlert.add(rarity + arrow.arrow)
             }
         }
         if (arrowsToAlert.isNotEmpty()) instanceAlert()
