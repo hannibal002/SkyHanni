@@ -17,7 +17,7 @@ public class SkyMartConfig {
     @Expose
     @ConfigOption(name = "Item Scale", desc = "Change the size of the items.")
     @ConfigEditorSlider(minValue = 0.3f, maxValue = 5, minStep = 0.1f)
-    public double itemScale = 1.7;
+    public double itemScale = 1;
 
     @Expose
     public Position copperPricePos = new Position(211, 132, false, true);

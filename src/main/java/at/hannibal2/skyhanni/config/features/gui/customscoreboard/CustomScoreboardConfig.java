@@ -7,6 +7,7 @@ import com.google.gson.annotations.Expose;
 import io.github.notenoughupdates.moulconfig.annotations.Accordion;
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorBoolean;
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorDraggableList;
+import io.github.notenoughupdates.moulconfig.annotations.ConfigLink;
 import io.github.notenoughupdates.moulconfig.annotations.ConfigOption;
 
 import java.util.ArrayList;
@@ -45,7 +46,7 @@ public class CustomScoreboardConfig {
     @Accordion
     public InformationFilteringConfig informationFiltering = new InformationFilteringConfig();
 
-
     @Expose
+    @ConfigLink(owner = CustomScoreboardConfig.class, field = "enabled")
     public Position position = new Position(10, 80, false, true);
 }

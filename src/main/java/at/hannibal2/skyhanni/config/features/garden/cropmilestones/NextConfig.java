@@ -7,6 +7,7 @@ import com.google.gson.annotations.Expose;
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorBoolean;
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorDropdown;
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorSlider;
+import io.github.notenoughupdates.moulconfig.annotations.ConfigLink;
 import io.github.notenoughupdates.moulconfig.annotations.ConfigOption;
 
 // TODO moulconfig runnable support
@@ -91,5 +92,6 @@ public class NextConfig {
     public boolean bestHideTitle = false;
 
     @Expose
+    @ConfigLink(owner = NextConfig.class, field = "bestDisplay")
     public Position displayPos = new Position(-200, -200, false, true);
 }

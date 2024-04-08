@@ -16,6 +16,7 @@ import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorBoolean;
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorButton;
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorKeybind;
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorSlider;
+import io.github.notenoughupdates.moulconfig.annotations.ConfigLink;
 import io.github.notenoughupdates.moulconfig.annotations.ConfigOption;
 import org.lwjgl.input.Keyboard;
 
@@ -99,6 +100,7 @@ public class GUIConfig {
     public boolean tpsDisplay = false;
 
     @Expose
+    @ConfigLink(owner = GUIConfig.class, field = "tpsDisplay")
     public Position tpsDisplayPosition = new Position(10, 10, false, true);
 
     @Expose

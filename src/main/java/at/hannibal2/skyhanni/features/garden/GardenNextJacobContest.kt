@@ -492,9 +492,9 @@ object GardenNextJacobContest {
         if (!isEnabled()) return
 
         if (display.isEmpty()) {
-            config.pos.renderStrings(simpleDisplay, posLabel = "Garden Next Jacob Contest")
+            config.pos.renderStrings(simpleDisplay, posLabel = "Next Jacob Contest")
         } else {
-            config.pos.renderSingleLineWithItems(display, 1.7, posLabel = "Garden Next Jacob Contest")
+            config.pos.renderSingleLineWithItems(display, 1.0, posLabel = "Next Jacob Contest")
         }
     }
 
