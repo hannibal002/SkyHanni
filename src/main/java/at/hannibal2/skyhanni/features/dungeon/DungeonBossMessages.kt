@@ -1,9 +1,8 @@
 package at.hannibal2.skyhanni.features.dungeon
 
 import at.hannibal2.skyhanni.SkyHanniMod
-import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.events.LorenzChatEvent
-import at.hannibal2.skyhanni.utils.LorenzUtils.isInIsland
+import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
@@ -46,7 +45,7 @@ class DungeonBossMessages {
 
     @SubscribeEvent
     fun onChat(event: LorenzChatEvent) {
-        if (!IslandType.CATACOMBS.isInIsland()) return
+        if (!LorenzUtils.inDungeons) return
         if (!isBoss(event.message)) return
 
         DungeonAPI.handleBossMessage(event.message)

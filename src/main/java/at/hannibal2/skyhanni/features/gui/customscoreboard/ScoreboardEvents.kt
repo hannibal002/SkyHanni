@@ -10,6 +10,7 @@ import at.hannibal2.skyhanni.features.misc.ServerRestartTitle
 import at.hannibal2.skyhanni.features.rift.area.stillgorechateau.RiftBloodEffigies
 import at.hannibal2.skyhanni.utils.CollectionUtils.nextAfter
 import at.hannibal2.skyhanni.utils.LorenzUtils.inAdvancedMiningIsland
+import at.hannibal2.skyhanni.utils.LorenzUtils.inDungeons
 import at.hannibal2.skyhanni.utils.LorenzUtils.isInIsland
 import at.hannibal2.skyhanni.utils.StringUtils.anyMatches
 import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
@@ -259,7 +260,9 @@ private fun getDungeonsLines() = listOf(
     getSbLines().filter { line -> patterns.any { it.matches(line) } }.map { it.removePrefix("§r") }
 }
 
-private fun getDungeonsShowWhen(): Boolean = IslandType.CATACOMBS.isInIsland()
+private fun getDungeonsShowWhen(): Boolean {
+    return IslandType.CATACOMBS.isInIsland() || inDungeons
+}
 
 private fun getKuudraLines() = listOf(
     SbPattern.autoClosingPattern,

@@ -11,6 +11,7 @@ import at.hannibal2.skyhanni.utils.EntityUtils.hasBossHealth
 import at.hannibal2.skyhanni.utils.EntityUtils.hasMaxHealth
 import at.hannibal2.skyhanni.utils.EntityUtils.hasNameTagWith
 import at.hannibal2.skyhanni.utils.LocationUtils.distanceToPlayer
+import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils.baseMaxHealth
 import at.hannibal2.skyhanni.utils.LorenzUtils.derpy
 import at.hannibal2.skyhanni.utils.LorenzUtils.ignoreDerpy
@@ -82,7 +83,7 @@ class MobFinder {
     private var floor6SadanSpawnTime = 0L
 
     internal fun tryAdd(entity: EntityLivingBase) = when {
-        IslandType.CATACOMBS.isInIsland() -> tryAddDungeon(entity)
+        LorenzUtils.inDungeons -> tryAddDungeon(entity)
         RiftAPI.inRift() -> tryAddRift(entity)
         GardenAPI.inGarden() -> tryAddGarden(entity)
         else -> {
@@ -511,7 +512,7 @@ class MobFinder {
     }
 
     fun handleChat(message: String) {
-        if (!IslandType.CATACOMBS.isInIsland()) return
+        if (!LorenzUtils.inDungeons) return
         when (message) {
             // F1
             "§c[BOSS] Bonzo§r§f: Gratz for making it this far, but I'm basically unbeatable." -> {
@@ -608,7 +609,7 @@ class MobFinder {
     }
 
     fun handleNewEntity(entity: Entity) {
-        if (IslandType.CATACOMBS.isInIsland() && floor3ProfessorGuardian && entity is EntityGuardian && floor3ProfessorGuardianEntity == null) {
+        if (LorenzUtils.inDungeons && floor3ProfessorGuardian && entity is EntityGuardian && floor3ProfessorGuardianEntity == null) {
             floor3ProfessorGuardianEntity = entity
             floor3ProfessorGuardianPrepare = false
         }
