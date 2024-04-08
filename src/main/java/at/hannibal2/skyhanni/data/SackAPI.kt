@@ -11,6 +11,7 @@ import at.hannibal2.skyhanni.events.SackDataUpdateEvent
 import at.hannibal2.skyhanni.features.fishing.FishingAPI
 import at.hannibal2.skyhanni.features.fishing.trophy.TrophyRarity
 import at.hannibal2.skyhanni.features.inventory.SackDisplay
+import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.CollectionUtils.editCopy
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
@@ -328,6 +329,14 @@ object SackAPI {
         fetchSackItem(this).takeIf { it.statusIsCorrectOrAlright() }?.amount
 
     fun NEUInternalName.getAmountInSacks(): Int = getAmountInSacksOrNull() ?: 0
+
+    fun testSackAPI (args: Array<String>) {
+        if (args.size == 1 ) {
+            val amountInSacks = args[0].asInternalName().getAmountInSacksOrNull()
+            ChatUtils.chat("Amount of ${args[0]} in sacks: $amountInSacks")
+        }
+        else ChatUtils.userError("/shtestsackapi <internal name>")
+    }
 }
 
 data class SackItem(
