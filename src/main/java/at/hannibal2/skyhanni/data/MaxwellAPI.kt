@@ -4,6 +4,7 @@ import at.hannibal2.skyhanni.data.jsonobjects.repo.MaxwellPowersJson
 import at.hannibal2.skyhanni.events.InventoryOpenEvent
 import at.hannibal2.skyhanni.events.LorenzChatEvent
 import at.hannibal2.skyhanni.events.RepositoryReloadEvent
+import at.hannibal2.skyhanni.features.dungeon.DungeonAPI
 import at.hannibal2.skyhanni.features.gui.customscoreboard.CustomScoreboard
 import at.hannibal2.skyhanni.features.gui.customscoreboard.ScoreboardElement
 import at.hannibal2.skyhanni.test.command.ErrorManager
@@ -12,7 +13,6 @@ import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.ItemUtils.name
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils.groupOrNull
-import at.hannibal2.skyhanni.utils.LorenzUtils.isInIsland
 import at.hannibal2.skyhanni.utils.NumberUtil.formatInt
 import at.hannibal2.skyhanni.utils.StringUtils.matchFirst
 import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
@@ -99,6 +99,10 @@ object MaxwellAPI {
     private val powerSelectedPattern by group.pattern(
         "gui.selectedpower",
         "§aPower is selected!"
+    )
+    private val noPowerSelectedPattern by group.pattern(
+        "gui.noselectedpower",
+        "(?:§.)*Visit Maxwell in the Hub to learn"
     )
     private val accessoryBagStack by group.pattern(
         "stack.accessorybag",
@@ -242,9 +246,11 @@ object MaxwellAPI {
                 return
             }
 
+            if (noPowerSelectedPattern.matches(line)) currentPower = getPowerByNameOrNull("No Power")
+
             inventoryMPPattern.matchMatcher(line) {
                 // MagicalPower is boosted in catacombs
-                if (IslandType.CATACOMBS.isInIsland()) return@matchMatcher
+                if (DungeonAPI.inDungeon()) return@matchMatcher
 
                 val mp = group("mp")
                 magicalPower = mp.formatInt()

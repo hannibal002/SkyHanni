@@ -1,6 +1,6 @@
 package at.hannibal2.skyhanni.config
 
-import io.github.moulberry.moulconfig.gui.GuiScreenElementWrapper
+import io.github.notenoughupdates.moulconfig.gui.GuiScreenElementWrapper
 import net.minecraft.client.Minecraft
 import net.minecraft.client.gui.GuiScreen
 import net.minecraftforge.fml.client.IModGuiFactory
