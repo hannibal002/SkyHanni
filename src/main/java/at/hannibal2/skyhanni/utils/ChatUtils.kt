@@ -294,7 +294,7 @@ object ChatUtils {
         splitMessage.takeIf { it.isNotEmpty() }?.get(0) in commandsWithSlash
 
     fun MessageSendToServerEvent.senderIsSkyhanni() =
-        originatingModContainer?.modId == "skyhanni" || originatingModContainer?.modId == "moulconfig"
+        originatingModContainer?.modId == "skyhanni" || originatingModContainer?.modId == "moulconfig" // TODO remove the "moulconfig" check if moulconfig bug is fixed
 
     fun MessageSendToServerEvent.eventWithNewMessage(message: String) =
         MessageSendToServerEvent(message, message.split(" "), this.originatingModContainer)
