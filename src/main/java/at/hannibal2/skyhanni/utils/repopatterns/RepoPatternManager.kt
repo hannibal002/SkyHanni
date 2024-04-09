@@ -9,11 +9,15 @@ import at.hannibal2.skyhanni.events.PreInitFinishedEvent
 import at.hannibal2.skyhanni.events.RepositoryReloadEvent
 import at.hannibal2.skyhanni.utils.ConditionalUtils.afterChange
 import at.hannibal2.skyhanni.utils.LorenzUtils
+import at.hannibal2.skyhanni.utils.StringUtils
 import at.hannibal2.skyhanni.utils.StringUtils.matches
+import at.hannibal2.skyhanni.utils.StringUtils.substringBeforeLastOrNull
 import net.minecraft.launchwrapper.Launch
 import net.minecraftforge.fml.common.FMLCommonHandler
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import java.io.File
+import java.util.NavigableMap
+import java.util.TreeMap
 import java.util.regex.Pattern
 import java.util.regex.PatternSyntaxException
 
@@ -22,7 +26,7 @@ import java.util.regex.PatternSyntaxException
  */
 object RepoPatternManager {
 
-    val allPatterns: Collection<RepoPatternImpl> get() = usedKeys.values
+    val allPatterns: Collection<CommonPatternInfo<*, *>> get() = usedKeys.values
 
     /**
      * Remote loading data that will be used to compile regexes from, once such a regex is needed.
@@ -38,7 +42,7 @@ object RepoPatternManager {
      * Map containing all keys and their repo patterns. Used for filling in new regexes after an update, and for
      * checking duplicate registrations.
      */
-    private var usedKeys = mutableMapOf<String, RepoPatternImpl>()
+    private var usedKeys: NavigableMap<String, CommonPatternInfo<*, *>> = TreeMap()
 
     private var wasPreinitialized = false
     private val isInDevEnv = try {
@@ -76,12 +80,24 @@ object RepoPatternManager {
      */
     fun checkExclusivity(owner: RepoPatternKeyOwner, key: String) {
         synchronized(exclusivity) {
-            val previousOwner = exclusivity.get(key)
-            if (previousOwner != owner && previousOwner != null) {
-                if (!config.tolerateDuplicateUsage)
-                    crash("Non unique access to regex at \"$key\". First obtained by ${previousOwner.ownerClass} / ${previousOwner.property}, tried to use at ${owner.ownerClass} / ${owner.property}")
-            } else {
-                exclusivity[key] = owner
+            run {
+                val previousOwner = exclusivity[key]
+                if (previousOwner != owner && previousOwner != null) {
+                    if (!config.tolerateDuplicateUsage)
+                        crash("Non unique access to regex at \"$key\". First obtained by ${previousOwner.ownerClass} / ${previousOwner.property}, tried to use at ${owner.ownerClass} / ${owner.property}")
+                } else {
+                    exclusivity[key] = owner
+                }
+            }
+            run {
+                val parent = key.substringBeforeLastOrNull(".") ?: return
+                val previousParentOwner = exclusivity[parent]
+                if (previousParentOwner != null && !previousParentOwner.shared) {
+                    if (!config.tolerateDuplicateUsage)
+                        crash("Non unique access to array regex at \"$parent\". First obtained by ${previousParentOwner.ownerClass} / ${previousParentOwner.property}, tried to use at ${owner.ownerClass} / ${owner.property}")
+                } else {
+                    exclusivity[parent] = owner.copy(shared = true)
+                }
             }
         }
     }
@@ -107,25 +123,65 @@ object RepoPatternManager {
      */
     private fun reloadPatterns() {
         val remotePatterns =
-            if (localLoading) mapOf()
-            else regexes?.regexes ?: mapOf()
-
+            TreeMap(
+                if (localLoading) mapOf()
+                else regexes?.regexes ?: mapOf()
+            )
         for (it in usedKeys.values) {
-            val remotePattern = remotePatterns[it.key]
-            try {
-                if (remotePattern != null) {
-                    it.compiledPattern = Pattern.compile(remotePattern)
-                    it.wasLoadedRemotely = true
-                    it.wasOverridden = remotePattern != it.defaultPattern
-                    continue
-                }
-            } catch (e: PatternSyntaxException) {
-                SkyHanniMod.logger.error("Error while loading pattern from repo", e)
+            when (it) {
+                is RepoPatternListImpl -> loadArrayPatterns(remotePatterns, it)
+                is RepoPatternImpl -> loadStandalonePattern(remotePatterns, it)
             }
-            it.compiledPattern = Pattern.compile(it.defaultPattern)
-            it.wasLoadedRemotely = false
-            it.wasOverridden = false
         }
+    }
+
+    private fun loadStandalonePattern(remotePatterns: TreeMap<String, String>, it: RepoPatternImpl) {
+        val remotePattern = remotePatterns[it.key]
+        try {
+            if (remotePattern != null) {
+                it.value = Pattern.compile(remotePattern)
+                it.isLoadedRemotely = true
+                it.wasOverridden = remotePattern != it.defaultPattern
+                return
+            }
+        } catch (e: PatternSyntaxException) {
+            SkyHanniMod.logger.error("Error while loading pattern from repo", e)
+        }
+        it.value = Pattern.compile(it.defaultPattern)
+        it.isLoadedRemotely = false
+        it.wasOverridden = false
+    }
+
+    private fun loadArrayPatterns(remotePatterns: TreeMap<String, String>, arrayPattern: RepoPatternListImpl) {
+        val prefix = arrayPattern.key + "."
+        val remotePatternList = StringUtils.subMapOfStringsStartingWith(prefix, remotePatterns)
+        val patternMap = remotePatternList.mapNotNull {
+            val index = it.key.removePrefix(prefix).toIntOrNull()
+            if (index == null) null
+            else index to it.value
+        }
+
+        fun setDefaultPatterns() {
+            arrayPattern.value = arrayPattern.defaultPattern.map(Pattern::compile)
+            arrayPattern.isLoadedRemotely = false
+            arrayPattern.wasOverridden = false
+        }
+
+        if (patternMap.mapTo(mutableSetOf()) { it.first } != patternMap.indices.toSet()) {
+            SkyHanniMod.logger.error("Incorrect index set for $arrayPattern")
+            setDefaultPatterns()
+        }
+
+        val patternStrings = patternMap.sortedBy { it.first }.map { it.second }
+        try {
+            arrayPattern.value = patternStrings.map(Pattern::compile)
+            arrayPattern.isLoadedRemotely = true
+            arrayPattern.wasOverridden = patternStrings != arrayPattern.defaultPattern
+            return
+        } catch (e: PatternSyntaxException) {
+            SkyHanniMod.logger.error("Error while loading pattern from repo", e)
+        }
+        setDefaultPatterns()
     }
 
     val keyShape = Pattern.compile("^(?:[a-z0-9]+\\.)*[a-z0-9]+$")
@@ -145,7 +201,8 @@ object RepoPatternManager {
             ConfigManager.gson.toJson(
                 RepoPatternDump(
                     sourceLabel,
-                    usedKeys.values.associate { it.key to it.defaultPattern })
+                    usedKeys.values.flatMap { it.dump().toList() }.toMap()
+                )
             )
         file.parentFile.mkdirs()
         file.writeText(data)
@@ -170,9 +227,24 @@ object RepoPatternManager {
             crash("Illegal late initialization of repo pattern. Repo pattern needs to be created during pre-initialization.")
         }
         if (key in usedKeys) {
-            exclusivity[key] = RepoPatternKeyOwner(null, null)
             usedKeys[key]?.hasObtainedLock = false
         }
         return RepoPatternImpl(fallback, key).also { usedKeys[key] = it }
     }
+
+    fun ofList(key: String, fallbacks: Array<out String>): RepoPatternList {
+        verifyKeyShape(key)
+        if (wasPreinitialized && !config.tolerateLateRegistration) {
+            crash("Illegal late initialization of repo pattern. Repo pattern needs to be created during pre-initialization.")
+        }
+        if (key in usedKeys) {
+            usedKeys[key]?.hasObtainedLock = false
+        }
+        StringUtils.subMapOfStringsStartingWith(key, usedKeys).forEach {
+            it.value.hasObtainedLock = false
+        }
+        return RepoPatternListImpl(fallbacks.toList(), key).also { usedKeys[key] = it }
+
+    }
+
 }

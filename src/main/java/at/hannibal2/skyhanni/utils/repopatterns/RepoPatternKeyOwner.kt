@@ -5,4 +5,5 @@ import kotlin.reflect.KProperty
 data class RepoPatternKeyOwner(
     val ownerClass: Class<*>?,
     val property: KProperty<*>?,
+    val shared: Boolean = false,
 )
