@@ -93,20 +93,31 @@ class TabEditor {
     fun createItem(slot: Slot?, windowId: Int) = if (slot?.stack == null) Renderable.placeholder(
         0,
         0
-    ) else Renderable.clickAndHover(Renderable.drawInsideRoundedRect(
+    ) else Renderable.multiClickAndHover(Renderable.drawInsideRoundedRect(
         Renderable.itemStack(slot.stack),
         (TabWidgetSettings.highlights[slot.slotIndex] ?: LorenzColor.GRAY).toColor()
     ),
         toolTips[slot.slotNumber]?.let { listOf(slot.stack.displayName) + it } ?: listOf("NULL"),
         bypassChecks = true,
-        onClick = {
-            if (lastClicked.passedSince() > 500.milliseconds) {
-                Minecraft.getMinecraft().playerController.windowClick(
-                    windowId, slot.slotIndex, 0, 0, Minecraft.getMinecraft().thePlayer
-                )
-                lastClicked = SimpleTimeMark.now()
+        click = listOf(
+            0 to {
+                if (lastClicked.passedSince() > 500.milliseconds) {
+                    Minecraft.getMinecraft().playerController.windowClick(
+                        windowId, slot.slotIndex, 0, 0, Minecraft.getMinecraft().thePlayer
+                    )
+                    lastClicked = SimpleTimeMark.now()
+                }
+            },
+            1 to {
+                if (lastClicked.passedSince() > 500.milliseconds) {
+                    Minecraft.getMinecraft().playerController.windowClick(
+                        windowId, slot.slotIndex, 1, 0, Minecraft.getMinecraft().thePlayer
+                    )
+                    lastClicked = SimpleTimeMark.now()
+                }
             }
-        })
+        )
+    )
 
     @SubscribeEvent
     fun onDraw(event: GuiContainerEvent.BeforeDraw) {
@@ -157,7 +168,7 @@ class TabEditor {
     @SubscribeEvent
     fun onInventoryClose(event: InventoryCloseEvent) {
         if (event.reopenSameName) return
-        inEditor = false // TODO
+        //inEditor = false // TODO
     }
 
     val hypixelTabDisplay
