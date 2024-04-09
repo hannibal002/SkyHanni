@@ -31,7 +31,9 @@ import at.hannibal2.skyhanni.utils.TabListData
 import at.hannibal2.skyhanni.utils.TimeUtils.format
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import com.google.gson.Gson
+import com.google.gson.JsonPrimitive
 import io.github.moulberry.notenoughupdates.util.SkyBlockTime
+import io.github.moulberry.notenoughupdates.util.toJsonArray
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
@@ -645,9 +647,12 @@ object GardenNextJacobContest {
             ConfigUtils.migrateIntToEnum(element, ShareContestsEntry::class.java)
         }
         event.move(18, "garden.nextJacobContests.everywhere", "garden.nextJacobContests.showOutsideGarden")
-        event.move(32, "garden.jacobContextTimesPos", "garden.jacobContestTimesPos")
-        event.move(32, "garden.jacobContextTimes", "garden.jacobContestTimes")
-        event.move(32, "misc.showOutsideSB.NEXT_JACOB_CONTEXT", "misc.showOutsideSB.NEXT_JACOB_CONTEST")
+        event.move(33, "garden.jacobContextTimesPos", "garden.jacobContestTimesPos")
+        event.move(33, "garden.jacobContextTimes", "garden.jacobContestTimes")
+        event.transform(33, "misc.showOutsideSB") { element ->
+            element.asJsonArray.map { setting ->
+                if (setting.asString == "NEXT_JACOB_CONTEXT") JsonPrimitive("NEXT_JACOB_CONTEST") else setting
+            }.toJsonArray()
+        }
     }
 }
-
