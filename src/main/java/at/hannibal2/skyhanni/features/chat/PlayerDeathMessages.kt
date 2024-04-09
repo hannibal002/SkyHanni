@@ -2,6 +2,7 @@ package at.hannibal2.skyhanni.features.chat
 
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.events.LorenzChatEvent
+import at.hannibal2.skyhanni.features.dungeon.DungeonAPI
 import at.hannibal2.skyhanni.events.SecondPassedEvent
 import at.hannibal2.skyhanni.features.misc.MarkedPlayerManager
 import at.hannibal2.skyhanni.utils.ChatUtils
@@ -40,7 +41,7 @@ class PlayerDeathMessages {
         deathMessagePattern.matchMatcher(message) {
             val name = group("name")
             if (MarkedPlayerManager.config.highlightInChat &&
-                !LorenzUtils.inDungeons && !LorenzUtils.inKuudraFight && MarkedPlayerManager.isMarkedPlayer(name)
+                !DungeonAPI.inDungeon() && !LorenzUtils.inKuudraFight && MarkedPlayerManager.isMarkedPlayer(name)
             ) {
                 val reason = group("reason").removeColor()
 
@@ -66,6 +67,6 @@ class PlayerDeathMessages {
     }
 
     private fun isHideFarDeathsEnabled(): Boolean {
-        return LorenzUtils.inSkyBlock && SkyHanniMod.feature.chat.hideFarDeathMessages && !LorenzUtils.inDungeons && !LorenzUtils.inKuudraFight
+        return LorenzUtils.inSkyBlock && SkyHanniMod.feature.chat.hideFarDeathMessages && !DungeonAPI.inDungeon() && !LorenzUtils.inKuudraFight
     }
 }
