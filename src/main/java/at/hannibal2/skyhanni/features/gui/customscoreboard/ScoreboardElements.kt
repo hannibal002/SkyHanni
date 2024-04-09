@@ -15,6 +15,7 @@ import at.hannibal2.skyhanni.data.QuiverAPI.NONE_ARROW_TYPE
 import at.hannibal2.skyhanni.data.QuiverAPI.asArrowPercentage
 import at.hannibal2.skyhanni.data.ScoreboardData
 import at.hannibal2.skyhanni.data.SlayerAPI
+import at.hannibal2.skyhanni.features.dungeon.DungeonAPI
 import at.hannibal2.skyhanni.features.gui.customscoreboard.ChunkedStats.Companion.getChunkedStats
 import at.hannibal2.skyhanni.features.gui.customscoreboard.ChunkedStats.Companion.shouldShowChunkedStats
 import at.hannibal2.skyhanni.features.gui.customscoreboard.CustomScoreboard.Companion.arrowConfig
@@ -39,7 +40,6 @@ import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.CollectionUtils.nextAfter
 import at.hannibal2.skyhanni.utils.LorenzUtils.inAdvancedMiningIsland
 import at.hannibal2.skyhanni.utils.LorenzUtils.inAnyIsland
-import at.hannibal2.skyhanni.utils.LorenzUtils.inDungeons
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.NumberUtil.percentageColor
 import at.hannibal2.skyhanni.utils.RenderUtils.HorizontalAlignment
@@ -758,7 +758,7 @@ private fun getPartyDisplayPair() =
         listOf(title, *partyList).map { it to HorizontalAlignment.LEFT }
     }
 
-private fun getPartyShowWhen() = if (inDungeons) {
+private fun getPartyShowWhen() = if (DungeonAPI.inDungeon()) {
     false // Hidden bc the scoreboard lines already exist
 } else {
     if (partyConfig.showPartyEverywhere) {

@@ -51,10 +51,11 @@ object LorenzUtils {
 
     val inHypixelLobby get() = onHypixel && HypixelData.inLobby
 
-    val inDungeons get() = inSkyBlock && DungeonAPI.inDungeon()
+    @Deprecated("Use DungeonAPI.inDungeon() instead", ReplaceWith("DungeonAPI.inDungeon()"))
+    val inDungeons get() = DungeonAPI.inDungeon()
 
     /**
-     * Consider using IslandType.isInIsland() instead
+     * Consider using [IslandType.isInIsland] instead
      */
     val skyBlockIsland get() = HypixelData.skyBlockIsland
 
@@ -170,7 +171,11 @@ object LorenzUtils {
 
     fun getPlayerName(): String = Minecraft.getMinecraft().thePlayer.name
 
-    fun fillTable(data: List<DisplayTableEntry>, padding: Int = 1, itemScale: Double = 1.0): Renderable {
+    fun fillTable(
+        data: List<DisplayTableEntry>,
+        padding: Int = 1,
+        itemScale: Double = NEUItems.itemFontSize,
+    ): Renderable {
         val sorted = data.sortedByDescending { it.sort }
 
         val outerList = mutableListOf<List<Renderable>>()
@@ -333,7 +338,7 @@ object LorenzUtils {
         enumValues<T>().joinToString("|", transform = transform)
 
     // TODO move to val by lazy
-    fun isInDevEnvironment() = Launch.blackboard["fml.deobfuscatedEnvironment"] as Boolean
+    fun isInDevEnvironment() = ((Launch.blackboard ?: mapOf())["fml.deobfuscatedEnvironment"] as Boolean?) ?: true
 
     fun shutdownMinecraft(reason: String? = null) {
         System.err.println("SkyHanni-${SkyHanniMod.version} forced the game to shutdown.")

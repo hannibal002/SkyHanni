@@ -70,7 +70,7 @@ object CropMoneyDisplay {
         if (!isEnabled()) return
 
         if (!GardenAPI.hideExtraGuis()) {
-            config.pos.renderStringsAndItems(display, posLabel = "Garden Crop Money Per Hour")
+            config.pos.renderStringsAndItems(display, posLabel = "Garden Money Per Hour")
         }
     }
 
