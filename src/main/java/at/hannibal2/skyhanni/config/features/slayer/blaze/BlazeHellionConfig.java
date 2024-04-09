@@ -3,9 +3,11 @@ package at.hannibal2.skyhanni.config.features.slayer.blaze;
 import at.hannibal2.skyhanni.config.FeatureToggle;
 import at.hannibal2.skyhanni.config.HasLegacyId;
 import at.hannibal2.skyhanni.config.core.config.Position;
+import at.hannibal2.skyhanni.config.features.skillprogress.SkillProgressConfig;
 import com.google.gson.annotations.Expose;
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorBoolean;
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorDropdown;
+import io.github.notenoughupdates.moulconfig.annotations.ConfigLink;
 import io.github.notenoughupdates.moulconfig.annotations.ConfigOption;
 
 public class BlazeHellionConfig {
@@ -67,8 +69,10 @@ public class BlazeHellionConfig {
     public boolean hideDaggerWarning = false;
 
     @Expose
+    @ConfigLink(owner = BlazeHellionConfig.class, field = "daggers")
     public Position positionTop = new Position(-475, 173, 4.4f, true);
 
     @Expose
+    @ConfigLink(owner = BlazeHellionConfig.class, field = "daggers")
     public Position positionBottom = new Position(-475, 230, 3.2f, true);
 }

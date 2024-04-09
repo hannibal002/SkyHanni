@@ -2,9 +2,11 @@ package at.hannibal2.skyhanni.config.features.minion;
 
 import at.hannibal2.skyhanni.config.FeatureToggle;
 import at.hannibal2.skyhanni.config.core.config.Position;
+import at.hannibal2.skyhanni.config.features.mining.KingTalismanConfig;
 import com.google.gson.annotations.Expose;
 import io.github.notenoughupdates.moulconfig.annotations.Accordion;
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorBoolean;
+import io.github.notenoughupdates.moulconfig.annotations.ConfigLink;
 import io.github.notenoughupdates.moulconfig.annotations.ConfigOption;
 
 public class MinionsConfig {
@@ -43,6 +45,7 @@ public class MinionsConfig {
     public boolean xpDisplay = true;
 
     @Expose
+    @ConfigLink(owner = MinionsConfig.class, field = "hopperProfitDisplay")
     public Position hopperProfitPos = new Position(360, 90, false, true);
 
     @Expose
