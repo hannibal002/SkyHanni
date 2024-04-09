@@ -238,7 +238,6 @@ object GardenVisitorFeatures {
                         list.add(" §7(§c?§7)")
                         continue
                     }
-                    list.add(" ")
                     if (items.isEmpty()) {
                         list.add("§7(§fAny§7)")
                     } else {
