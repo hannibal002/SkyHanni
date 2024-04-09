@@ -32,6 +32,7 @@ import at.hannibal2.skyhanni.utils.LorenzUtils.inDungeons
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.NumberUtil.percentageColor
 import at.hannibal2.skyhanni.utils.RenderUtils.HorizontalAlignment
+import at.hannibal2.skyhanni.utils.StringUtils.anyMatches
 import at.hannibal2.skyhanni.utils.StringUtils.firstLetterUppercase
 import at.hannibal2.skyhanni.utils.StringUtils.matches
 import at.hannibal2.skyhanni.utils.StringUtils.pluralize
@@ -617,8 +618,7 @@ private fun getObjectiveDisplayPair() = buildList {
 }
 
 private fun getObjectiveShowWhen(): Boolean =
-    !inAnyIsland(IslandType.KUUDRA_ARENA)
-        && ScoreboardData.sidebarLinesFormatted.none { ScoreboardPattern.objectivePattern.matches(it) }
+    ScoreboardPattern.objectivePattern.anyMatches(ScoreboardData.sidebarLinesFormatted)
 
 private fun getSlayerDisplayPair(): List<ScoreboardElementType> = listOf(
     (if (SlayerAPI.hasActiveSlayerQuest()) "Slayer Quest" else "<hidden>") to HorizontalAlignment.LEFT,

@@ -53,6 +53,19 @@ object ChatUtils {
     }
 
     /**
+     * Sends a message to the user that they did something incorrectly.
+     * Runs a command when clicked to fix the issue.
+     *
+     * @param message The message to be sent
+     * @param command The command to be executed when the message is clicked
+     *
+     * @see USER_ERROR_PREFIX
+     */
+    fun clickableUserError(message: String, command: String) {
+        internalChat(createClickableChat(USER_ERROR_PREFIX + message, command))
+    }
+
+    /**
      * Sends a message to the user that an error occurred caused by something in the code.
      * This should be used for errors that are not caused by the user.
      *
