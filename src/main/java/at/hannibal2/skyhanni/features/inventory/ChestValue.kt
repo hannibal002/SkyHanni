@@ -52,7 +52,7 @@ class ChestValue {
             config.position.renderStringsAndItems(
                 display,
                 extraSpace = -1,
-                itemScale = 1.3,
+                itemScale = 0.7,
                 posLabel = "Estimated Chest Value"
             )
         }

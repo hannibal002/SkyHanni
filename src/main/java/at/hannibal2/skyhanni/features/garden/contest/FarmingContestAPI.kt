@@ -35,7 +35,7 @@ object FarmingContestAPI {
     )
     private val sidebarCropPattern by patternGroup.pattern(
         "sidebarcrop",
-        "(?:§e○|§6☘) §f(?<crop>.*) §a.*"
+        "\\s*(?:§e○|§6☘) §f(?<crop>.*) §a.*"
     )
 
     private val contests = mutableMapOf<Long, FarmingContest>()
