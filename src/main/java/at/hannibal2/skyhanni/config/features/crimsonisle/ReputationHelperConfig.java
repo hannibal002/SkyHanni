@@ -21,20 +21,19 @@ public class ReputationHelperConfig {
     public boolean enabled = true;
 
     @Expose
-    @ConfigOption(name = "Use Hotkey", desc = "Only show the Reputation Helper while pressing the hotkey.")
-    @ConfigEditorBoolean
-    public boolean useHotkey = false;
-
-    @Expose
     @ConfigOption(name = "Hide Completed", desc = "Hides tasks after they've been completed.")
     @ConfigEditorBoolean
     public Property<Boolean> hideComplete = Property.of(true);
 
     @Expose
+    @ConfigOption(name = "Use Hotkey", desc = "Only show the Reputation Helper while pressing the hotkey.")
+    @ConfigEditorBoolean
+    public boolean useHotkey = false;
+
+    @Expose
     @ConfigOption(name = "Hotkey", desc = "Press this hotkey to show the Reputation Helper.")
     @ConfigEditorKeybind(defaultKey = Keyboard.KEY_NONE)
     public int hotkey = Keyboard.KEY_NONE;
-
 
     @Expose
     @ConfigLink(owner = ReputationHelperConfig.class, field = "enabled")

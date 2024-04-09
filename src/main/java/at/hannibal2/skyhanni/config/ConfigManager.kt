@@ -239,7 +239,13 @@ class ConfigManager {
                 findPositionLinks(field.get(obj), slog)
                 continue
             }
-            val configLink = field.getAnnotation(ConfigLink::class.java) ?: continue
+            val configLink = field.getAnnotation(ConfigLink::class.java)
+            if (configLink == null) {
+                val abc = "${field.declaringClass.name}.${field.name}"
+                val def = abc.replace("at.hannibal2.skyhanni.config.", "")
+                println("WEE WOO WEE WOO HIER FEHLT EIN @CONFIGLINK: $def")
+                continue
+            }
             val position = field.get(obj) as Position
             position.setLink(configLink)
         }
