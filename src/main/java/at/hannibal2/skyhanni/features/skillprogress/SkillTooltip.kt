@@ -1,6 +1,5 @@
 package at.hannibal2.skyhanni.features.skillprogress
 
-import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.SkillAPI
 import at.hannibal2.skyhanni.api.SkillAPI.excludedSkills
 import at.hannibal2.skyhanni.events.LorenzToolTipEvent
@@ -17,9 +16,8 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
 class SkillTooltip {
 
-    private val config get() = SkyHanniMod.feature.skillProgress
-    private val overflowConfig get() = config.overflowConfig
-    private val customGoalConfig get() = config.customGoalConfig
+    private val overflowConfig get() = SkillProgress.config.overflowConfig
+    private val customGoalConfig get() = SkillProgress.config.customGoalConfig
 
     @SubscribeEvent
     fun onTooltip(event: LorenzToolTipEvent) {
@@ -66,9 +64,9 @@ class SkillTooltip {
                     val xpFor50 = SkillUtil.xpRequiredForLevel(50.0)
                     val xpFor60 = SkillUtil.xpRequiredForLevel(60.0)
 
-                    have += if (skillInfo.overflowLevel >= 60 && skill in excludedSkills || skillInfo.overflowLevel in 50 .. 59) xpFor50
-                        else if (skillInfo.overflowLevel >= 60 && skill !in excludedSkills) xpFor60
-                        else 0
+                    have += if (skillInfo.overflowLevel >= 60 && skill in excludedSkills || skillInfo.overflowLevel in 50..59) xpFor50
+                    else if (skillInfo.overflowLevel >= 60 && skill !in excludedSkills) xpFor60
+                    else 0
 
                     val progress = have.toDouble() / need
                     val progressBar = StringUtils.progressBar(progress)

@@ -14,8 +14,9 @@ object QuiverNotification {
         "inventory.quiver.chat.low",
         "§cYou only have (?<arrowsLeft>.*) arrows left in your Quiver!"
     )
+
     @SubscribeEvent
-    fun onChatMessage(event: LorenzChatEvent) {
+    fun onChat(event: LorenzChatEvent) {
         if (!SkyHanniMod.configManager.features.inventory.quiverAlert) return
         quiverChatPattern.matchMatcher(event.message) {
             TitleManager.sendTitle("§c${group("arrowsLeft")} arrows left!", 3.seconds, 3.6, 7f)

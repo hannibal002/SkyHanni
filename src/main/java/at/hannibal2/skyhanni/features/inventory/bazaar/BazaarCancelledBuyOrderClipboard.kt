@@ -8,7 +8,7 @@ import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.ItemUtils.name
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.OSUtils
-import at.hannibal2.skyhanni.utils.StringUtils.findMatcher
+import at.hannibal2.skyhanni.utils.StringUtils.matchFirst
 import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
@@ -32,13 +32,10 @@ class BazaarCancelledBuyOrderClipboard {
         if (!isEnabled()) return
 
         val stack = event.itemStack
-        val name = stack.name ?: return
-        if (!name.contains("Cancel Order")) return
+        if (!stack.name.contains("Cancel Order")) return
 
-        for (line in stack.getLore()) {
-            lastAmountPattern.findMatcher(line) {
-                latestAmount = group("amount")
-            }
+        stack.getLore().matchFirst(lastAmountPattern) {
+            latestAmount = group("amount")
         }
     }
 

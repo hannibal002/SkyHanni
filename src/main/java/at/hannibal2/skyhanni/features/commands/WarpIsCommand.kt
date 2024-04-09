@@ -11,7 +11,7 @@ class WarpIsCommand {
     @SubscribeEvent
     fun onMessageSendToServer(event: MessageSendToServerEvent) {
         if (!LorenzUtils.inSkyBlock) return
-        if (!SkyHanniMod.feature.commands.replaceWarpIs) return
+        if (!SkyHanniMod.feature.misc.commands.replaceWarpIs) return
 
         if (event.message.lowercase() == "/warp is") {
             event.isCanceled = true

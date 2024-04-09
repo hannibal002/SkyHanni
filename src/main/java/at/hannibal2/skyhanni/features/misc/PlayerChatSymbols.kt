@@ -31,11 +31,11 @@ class PlayerChatSymbols {
     )
     private val symbolPattern by patternGroup.pattern(
         "symbol",
-        "((?:§\\w)+\\S)"
+        "(?:§.)+(\\S)"
     )
 
     @SubscribeEvent
-    fun onChatReceived(event: LorenzChatEvent) {
+    fun onChat(event: LorenzChatEvent) {
         if (!LorenzUtils.inSkyBlock) return
         if (!config.enabled) return
 

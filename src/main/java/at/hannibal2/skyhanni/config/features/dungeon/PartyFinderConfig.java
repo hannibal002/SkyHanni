@@ -2,9 +2,9 @@ package at.hannibal2.skyhanni.config.features.dungeon;
 
 import at.hannibal2.skyhanni.config.FeatureToggle;
 import com.google.gson.annotations.Expose;
-import io.github.moulberry.moulconfig.annotations.ConfigEditorBoolean;
-import io.github.moulberry.moulconfig.annotations.ConfigEditorSlider;
-import io.github.moulberry.moulconfig.annotations.ConfigOption;
+import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorBoolean;
+import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorSlider;
+import io.github.notenoughupdates.moulconfig.annotations.ConfigOption;
 
 public class PartyFinderConfig {
     @Expose
@@ -47,4 +47,10 @@ public class PartyFinderConfig {
     @ConfigEditorBoolean
     @FeatureToggle
     public boolean markMissingClass = true;
+
+    @Expose
+    @ConfigOption(name = "Show Missing Classes", desc = "Show missing classes in a party in the tooltip.")
+    @ConfigEditorBoolean
+    @FeatureToggle
+    public boolean showMissingClasses = true;
 }

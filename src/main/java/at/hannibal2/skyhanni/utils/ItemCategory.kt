@@ -43,12 +43,14 @@ enum class ItemCategory {
     ITEM,
     PET_ITEM,
     ENCHANTED_BOOK,
+    FISHING_BAIT,
     POTION,
     RIFT_TIMECHARM,
     COSMETIC,
     MEMENTO,
     PORTAL,
     SACK,
+    CHISEL,
 
     NONE,
     ;

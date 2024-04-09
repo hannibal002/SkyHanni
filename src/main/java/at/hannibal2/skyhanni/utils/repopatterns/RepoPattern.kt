@@ -63,7 +63,7 @@ interface RepoPattern : ReadOnlyProperty<Any?, Pattern> {
     val defaultPattern: String
 
     /**
-     * Key for this pattern. Used as an identifier when loading from the repo. Should be consistent accross versions.
+     * Key for this pattern. Used as an identifier when loading from the repo. Should be consistent across versions.
      */
     val key: String
 
@@ -84,6 +84,11 @@ interface RepoPattern : ReadOnlyProperty<Any?, Pattern> {
         /**
          * Obtain a reference to a [Pattern] backed by either a local regex, or a remote regex.
          * Check the documentation of [RepoPattern] for more information.
+         *
+         * This method supports "Open regex101.com" using [LivePlugin](https://plugins.jetbrains.com/plugin/7282-liveplugin).
+         * To use it, install LivePlugin, enable "Run plugins on IDE start" and "Run project specific plugins".
+         * Now you can use ALT+ENTER while hovering over a [pattern] call using your text cursor to access the "Open in regex101.com" intention.
+         * Add a KDoc comment to the associated variable containing lines starting with `REGEX-TEST: ` to pre-fill examples.
          */
         fun pattern(key: String, @Language("RegExp") fallback: String): RepoPattern {
             return RepoPatternManager.of(key, fallback)

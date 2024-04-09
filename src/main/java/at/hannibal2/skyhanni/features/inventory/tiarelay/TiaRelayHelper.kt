@@ -25,7 +25,7 @@ class TiaRelayHelper {
     private var resultDisplay = mutableMapOf<Int, Int>()
 
     @SubscribeEvent
-    fun onSoundPlay(event: PlaySoundEvent) {
+    fun onPlaySound(event: PlaySoundEvent) {
         if (!LorenzUtils.inSkyBlock) return
         val soundName = event.soundName
 

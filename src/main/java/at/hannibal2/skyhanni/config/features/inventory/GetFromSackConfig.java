@@ -2,8 +2,8 @@ package at.hannibal2.skyhanni.config.features.inventory;
 
 import at.hannibal2.skyhanni.config.FeatureToggle;
 import com.google.gson.annotations.Expose;
-import io.github.moulberry.moulconfig.annotations.ConfigEditorBoolean;
-import io.github.moulberry.moulconfig.annotations.ConfigOption;
+import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorBoolean;
+import io.github.notenoughupdates.moulconfig.annotations.ConfigOption;
 
 public class GetFromSackConfig {
 
@@ -17,4 +17,10 @@ public class GetFromSackConfig {
     @ConfigOption(name = "Bazaar GfS", desc = "If you don't have enough items in sack get a prompt to buy them from bazaar.")
     @ConfigEditorBoolean
     public boolean bazaarGFS = false;
+
+    @Expose
+    @ConfigOption(name = "Super Craft GfS", desc = "Send a clickable message after supercrafting an item that grabs the item from your sacks when clicked.")
+    @ConfigEditorBoolean
+    @FeatureToggle
+    public boolean superCraftGFS = true;
 }

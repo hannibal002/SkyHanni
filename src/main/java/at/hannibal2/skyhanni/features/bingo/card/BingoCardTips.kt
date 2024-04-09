@@ -8,6 +8,7 @@ import at.hannibal2.skyhanni.features.bingo.BingoAPI.getData
 import at.hannibal2.skyhanni.features.bingo.card.goals.GoalType
 import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.InventoryUtils
+import at.hannibal2.skyhanni.utils.InventoryUtils.getAllItems
 import at.hannibal2.skyhanni.utils.LorenzColor
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.RenderUtils.highlight
@@ -33,9 +34,13 @@ class BingoCardTips {
         "reward.contribution",
         "§.§.§7Contribution Rewards.*"
     )
+    private val rowNamePattern by patternGroup.pattern(
+        "row.name",
+        "§o§.Row #.*"
+    )
 
     @SubscribeEvent
-    fun onItemTooltipLow(event: LorenzToolTipEvent) {
+    fun onTooltip(event: LorenzToolTipEvent) {
         if (!isEnabled()) return
         if (!inventoryPattern.matches(InventoryUtils.openInventoryName())) return
 
@@ -43,7 +48,10 @@ class BingoCardTips {
         val goal = BingoAPI.bingoGoals[slot.slotNumber] ?: return
 
         val toolTip = event.toolTip
+        // When hovering over a row
+        if (rowNamePattern.matches(toolTip.firstOrNull())) return
         val bingoTip = goal.getData() ?: return
+
         val communityGoal = goal.type == GoalType.COMMUNITY
 
         val difficulty = Difficulty.valueOf(bingoTip.difficulty.uppercase())
@@ -83,9 +91,7 @@ class BingoCardTips {
 
         val guiChest = event.gui
         val chest = guiChest.inventorySlots as ContainerChest
-        for (slot in chest.inventorySlots) {
-            if (slot == null) continue
-
+        for ((slot, _) in chest.getAllItems()) {
             val goal = BingoAPI.bingoGoals[slot.slotNumber] ?: continue
             if (config.hideDoneDifficulty && goal.done) continue
 

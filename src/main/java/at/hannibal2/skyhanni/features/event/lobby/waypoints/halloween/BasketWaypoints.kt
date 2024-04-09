@@ -11,7 +11,6 @@ import at.hannibal2.skyhanni.test.GriffinUtils.drawWaypointFilled
 import at.hannibal2.skyhanni.utils.LocationUtils.distanceSqToPlayer
 import at.hannibal2.skyhanni.utils.LorenzColor
 import at.hannibal2.skyhanni.utils.LorenzUtils
-import at.hannibal2.skyhanni.utils.LorenzUtils.anyContains
 import at.hannibal2.skyhanni.utils.RenderUtils.drawDynamicText
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
@@ -26,8 +25,7 @@ class BasketWaypoints {
         if (!config.allWaypoints && !config.allEntranceWaypoints) return
         if (!isHalloween) return
 
-        if (!HypixelData.hypixelLive) return // don't show outside live hypixel network (it's disabled on alpha)
-        if (LorenzUtils.inSkyBlock) return
+        if (!isEnabled()) return
 
         val message = event.message
         if (message.startsWith("§a§lYou found a Candy Basket! §r") || message == "§cYou already found this Candy Basket!") {
@@ -42,8 +40,7 @@ class BasketWaypoints {
     @SubscribeEvent
     fun onTick(event: LorenzTickEvent) {
         if (!config.allWaypoints && !config.allEntranceWaypoints) return
-        if (!HypixelData.hypixelLive) return // don't show outside live hypixel network (it's disabled on alpha)
-        if (LorenzUtils.inSkyBlock) return
+        if (!isEnabled()) return
 
         if (event.repeatSeconds(1)) {
             isHalloween = checkScoreboardHalloweenSpecific()
@@ -62,8 +59,7 @@ class BasketWaypoints {
 
     @SubscribeEvent
     fun onRenderWorld(event: LorenzRenderWorldEvent) {
-        if (!HypixelData.hypixelLive) return // don't show outside live hypixel network (it's disabled on alpha)
-        if (LorenzUtils.inSkyBlock) return
+        if (!isEnabled()) return
         if (!isHalloween) return
 
         if (config.allWaypoints) {
@@ -82,8 +78,6 @@ class BasketWaypoints {
             }
             return
         }
-
-        if (LorenzUtils.skyBlockArea == "?") return
     }
 
     private fun Basket.shouldShow(): Boolean {
@@ -94,10 +88,15 @@ class BasketWaypoints {
         return if (config.onlyClosest) closest == this else true
     }
 
+    // TODO use regex with the help of knowing the original lore. Will most likely need to wait until next halloween event
     private fun checkScoreboardHalloweenSpecific(): Boolean {
-        val list = ScoreboardData.sidebarLinesFormatted
-        return list.anyContains("Hypixel Level") && list.anyContains("Halloween") && list.anyContains("Baskets")
+        val a = ScoreboardData.sidebarLinesFormatted.any { it.contains("Hypixel Level") }
+        val b = ScoreboardData.sidebarLinesFormatted.any { it.contains("Halloween") }
+        val c = ScoreboardData.sidebarLinesFormatted.any { it.contains("Baskets") }
+        return a && b && c
     }
+
+    private fun isEnabled() = HypixelData.hypixelLive && !LorenzUtils.inSkyBlock
 
     @SubscribeEvent
     fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {

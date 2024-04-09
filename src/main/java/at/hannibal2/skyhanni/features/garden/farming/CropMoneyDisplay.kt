@@ -11,7 +11,6 @@ import at.hannibal2.skyhanni.features.garden.CropType
 import at.hannibal2.skyhanni.features.garden.CropType.Companion.getByNameOrNull
 import at.hannibal2.skyhanni.features.garden.GardenAPI
 import at.hannibal2.skyhanni.features.garden.GardenNextJacobContest
-import at.hannibal2.skyhanni.features.garden.composter.ComposterOverlay
 import at.hannibal2.skyhanni.features.garden.farming.GardenCropSpeed.getSpeed
 import at.hannibal2.skyhanni.features.garden.farming.GardenCropSpeed.isSpeedDataEmpty
 import at.hannibal2.skyhanni.features.inventory.bazaar.BazaarApi.Companion.getBazaarData
@@ -59,6 +58,8 @@ object CropMoneyDisplay {
     private val cropNames = mutableMapOf<NEUInternalName, CropType>()
     private val toolHasBountiful get() = GardenAPI.storage?.toolWithBountiful
 
+    val BOX_OF_SEEDS by lazy { "BOX_OF_SEEDS".asInternalName().getItemStack() }
+
     @SubscribeEvent
     fun onProfileJoin(event: ProfileJoinEvent) {
         display = emptyList()
@@ -69,7 +70,7 @@ object CropMoneyDisplay {
         if (!isEnabled()) return
 
         if (!GardenAPI.hideExtraGuis()) {
-            config.pos.renderStringsAndItems(display, posLabel = "Garden Crop Money Per Hour")
+            config.pos.renderStringsAndItems(display, posLabel = "Garden Money Per Hour")
         }
     }
 
@@ -143,12 +144,17 @@ object CropMoneyDisplay {
                 extraMushroomCowPerkCoins = perSecond * 60 * 60
             }
 
-            if (InventoryUtils.getItemInHand()?.getInternalName()?.contains("DICER") == true && config.dicer) {
+            val itemInHand = InventoryUtils.getItemInHand()?.getInternalName()
+            if (itemInHand?.contains("DICER") == true && config.dicer) {
                 val (dicerDrops, internalName) = when (it) {
                     CropType.MELON -> GardenCropSpeed.latestMelonDicer to "ENCHANTED_MELON".asInternalName()
                     CropType.PUMPKIN -> GardenCropSpeed.latestPumpkinDicer to "ENCHANTED_PUMPKIN".asInternalName()
 
-                    else -> ErrorManager.skyHanniError("Unknown dicer: $it")
+                    else -> ErrorManager.skyHanniError(
+                        "Unknown dicer detected.",
+                        "crop" to it,
+                        "item in hand" to itemInHand,
+                    )
                 }
                 val bazaarData = internalName.getBazaarData()
                 val price =
@@ -196,13 +202,13 @@ object CropMoneyDisplay {
 
             try {
                 if (isSeeds(internalName)) {
-                    list.add(getItemStack("BOX_OF_SEEDS"))
+                    list.add(BOX_OF_SEEDS)
                 } else {
                     list.add(internalName.getItemStack())
                 }
 
                 if (cropNames[internalName] == CropType.WHEAT && config.mergeSeeds) {
-                    list.add(getItemStack("BOX_OF_SEEDS"))
+                    list.add(BOX_OF_SEEDS)
                 }
             } catch (e: NullPointerException) {
                 ErrorManager.logErrorWithData(
@@ -275,7 +281,7 @@ object CropMoneyDisplay {
     private fun format(moneyPerHour: Double) = if (config.compactPrice) {
         NumberUtil.format(moneyPerHour)
     } else {
-        LorenzUtils.formatInteger(moneyPerHour.toLong())
+        moneyPerHour.toLong().addSeparators()
     }
 
     private fun calculateMoneyPerHour(debugList: MutableList<List<Any>>): Map<NEUInternalName, Array<Double>> {

@@ -16,6 +16,7 @@ import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import at.hannibal2.skyhanni.utils.tracker.SkyHanniTracker
 import at.hannibal2.skyhanni.utils.tracker.TrackerData
 import com.google.gson.annotations.Expose
+import net.minecraft.util.ChatComponentText
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import java.util.regex.Pattern
 
@@ -49,14 +50,19 @@ object MythologicalCreatureTracker {
         ".* §r§eYou dug out a §r§2Minos Inquisitor§r§e!"
     )
 
-    private val tracker = SkyHanniTracker("Mythological Creature Tracker", { Data() }, { it.diana.mythologicalMobTracker })
-    { drawDisplay(it) }
+    private val tracker =
+        SkyHanniTracker("Mythological Creature Tracker", { Data() }, { it.diana.mythologicalMobTracker })
+        { drawDisplay(it) }
 
     class Data : TrackerData() {
 
         override fun reset() {
             count.clear()
+            creaturesSinceLastInquisitor = 0
         }
+
+        @Expose
+        var creaturesSinceLastInquisitor: Int = 0
 
         @Expose
         var count: MutableMap<MythologicalCreatureType, Int> = mutableMapOf()
@@ -76,11 +82,17 @@ object MythologicalCreatureTracker {
         MythologicalCreatureType.entries.forEach { creatureType ->
             if (creatureType.pattern.matches(event.message)) {
                 BurrowAPI.lastBurrowRelatedChatMessage = SimpleTimeMark.now()
-                tracker.modify { it.count.addOrPut(creatureType, 1) }
+                tracker.modify {
+                    it.count.addOrPut(creatureType, 1)
 
-                if (config.hideChat) {
-                    event.blockedReason = "mythological_creature_dug"
+                    // TODO migrate to abstract feature in the future
+                    if (creatureType == MythologicalCreatureType.MINOS_INQUISITOR) {
+                        event.chatComponent =
+                            ChatComponentText(event.message + " §e(${it.creaturesSinceLastInquisitor})")
+                        it.creaturesSinceLastInquisitor = 0
+                    } else it.creaturesSinceLastInquisitor++
                 }
+                if (config.hideChat) event.blockedReason = "mythological_creature_dug"
             }
         }
     }
@@ -98,6 +110,7 @@ object MythologicalCreatureTracker {
             addAsSingletonList(" §7- §e${amount.addSeparators()} ${creatureType.displayName}$percentageSuffix")
         }
         addAsSingletonList(" §7- §e${total.addSeparators()} §7Total Mythological Creatures")
+        addAsSingletonList(" §7- §e${data.creaturesSinceLastInquisitor.addSeparators()} §7Creatures since last Minos Inquisitor")
     }
 
     @SubscribeEvent

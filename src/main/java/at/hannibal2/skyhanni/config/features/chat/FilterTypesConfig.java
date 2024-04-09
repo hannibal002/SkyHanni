@@ -2,8 +2,8 @@ package at.hannibal2.skyhanni.config.features.chat;
 
 import at.hannibal2.skyhanni.config.FeatureToggle;
 import com.google.gson.annotations.Expose;
-import io.github.moulberry.moulconfig.annotations.ConfigEditorBoolean;
-import io.github.moulberry.moulconfig.annotations.ConfigOption;
+import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorBoolean;
+import io.github.notenoughupdates.moulconfig.annotations.ConfigOption;
 
 public class FilterTypesConfig {
 
@@ -79,6 +79,12 @@ public class FilterTypesConfig {
     @ConfigEditorBoolean
     @FeatureToggle
     public boolean fireSale = true;
+
+    @Expose
+    @ConfigOption(name = "Event Level Up", desc = "Hide the message that shows on event level up.")
+    @ConfigEditorBoolean
+    @FeatureToggle
+    public boolean eventLevelUp = false;
 
     @Expose
     @ConfigOption(name = "Diana", desc = "Hide chat messages around griffin burrow chains and griffin feather drops and coin drops.")

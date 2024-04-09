@@ -3,9 +3,9 @@ package at.hannibal2.skyhanni.config.features.garden;
 import at.hannibal2.skyhanni.config.FeatureToggle;
 import at.hannibal2.skyhanni.config.core.config.Position;
 import com.google.gson.annotations.Expose;
-import io.github.moulberry.moulconfig.annotations.ConfigEditorBoolean;
-import io.github.moulberry.moulconfig.annotations.ConfigEditorSlider;
-import io.github.moulberry.moulconfig.annotations.ConfigOption;
+import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorBoolean;
+import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorSlider;
+import io.github.notenoughupdates.moulconfig.annotations.ConfigOption;
 
 public class YawPitchDisplayConfig {
 
@@ -50,7 +50,7 @@ public class YawPitchDisplayConfig {
     @Expose
     @ConfigOption(name = "Show Outside Garden", desc = "The overlay will work outside of the Garden.")
     @ConfigEditorBoolean
-    public boolean showEverywhere = false;
+    public boolean showOutsideGarden = false;
 
     @Expose
     @ConfigOption(name = "Ignore Timeout", desc = "Ignore the timeout after not moving mouse.")

@@ -4,7 +4,7 @@ import at.hannibal2.skyhanni.data.PetAPI
 import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.NEUInternalName.Companion.asInternalName
 import at.hannibal2.skyhanni.utils.NEUItems.getItemStackOrNull
-import at.hannibal2.skyhanni.utils.NumberUtil.formatNumber
+import at.hannibal2.skyhanni.utils.NumberUtil.formatInt
 import at.hannibal2.skyhanni.utils.SimpleTimeMark.Companion.asTimeMark
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.cachedData
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getEnchantments
@@ -74,25 +74,6 @@ object ItemUtils {
             list.add(player.inventory.itemStack)
         }
         return list
-    }
-
-    fun getItemsInInventoryWithSlots(withCursorItem: Boolean = false): Map<ItemStack, Int> {
-        val map: LinkedHashMap<ItemStack, Int> = LinkedHashMap()
-        val player = Minecraft.getMinecraft().thePlayer
-        if (player == null) {
-            ChatUtils.error("getItemsInInventoryWithSlots: player is null!")
-            return map
-        }
-        for (slot in player.openContainer.inventorySlots) {
-            if (slot.hasStack) {
-                map[slot.stack] = slot.slotNumber
-            }
-        }
-
-        if (withCursorItem && player.inventory != null && player.inventory.itemStack != null) {
-            map[player.inventory.itemStack] = -1
-        }
-        return map
     }
 
     fun hasAttributes(stack: ItemStack): Boolean {
@@ -203,7 +184,6 @@ object ItemUtils {
     fun ItemStack.getItemRarityOrCommon() = getItemRarityOrNull() ?: LorenzRarity.COMMON
 
     private fun ItemStack.readItemCategoryAndRarity(): Pair<LorenzRarity?, ItemCategory?> {
-        val name = this.name ?: ""
         val cleanName = this.cleanName()
 
         if (PetAPI.hasPetName(cleanName)) {
@@ -250,6 +230,7 @@ object ItemUtils {
         if (itemCategory.isEmpty()) when {
             UtilsPatterns.abiPhonePattern.matches(name) -> ItemCategory.ABIPHONE
             PetAPI.hasPetName(cleanName) -> ItemCategory.PET
+            UtilsPatterns.baitPattern.matches(cleanName) -> ItemCategory.FISHING_BAIT
             UtilsPatterns.enchantedBookPattern.matches(name) -> ItemCategory.ENCHANTED_BOOK
             UtilsPatterns.potionPattern.matches(name) -> ItemCategory.POTION
             UtilsPatterns.sackPattern.matches(name) -> ItemCategory.SACK
@@ -291,16 +272,20 @@ object ItemUtils {
     private fun itemRarityLastCheck(data: CachedItemData) =
         data.itemRarityLastCheck.asTimeMark().passedSince() > 10.seconds
 
-    // extra method for shorter name and kotlin nullability logic
-    var ItemStack.name: String?
-        get() = this.displayName
+    /**
+     * Use when comparing the name (e.g. regex), not for showing to the user
+     * Member that provides the item name, is null save or throws visual error
+     */
+    var ItemStack.name: String
+        get() = this.displayName ?: ErrorManager.skyHanniError(
+            "Could not get name if ItemStack",
+            "itemStack" to this,
+            "displayName" to displayName,
+            "internal name" to getInternalNameOrNull(),
+        )
         set(value) {
             setStackDisplayName(value)
         }
-
-    @Deprecated("outdated", ReplaceWith("itemName"))
-    val ItemStack.nameWithEnchantment: String?
-        get() = getInternalNameOrNull()?.itemName
 
     fun isSkyBlockMenuItem(stack: ItemStack?): Boolean = stack?.getInternalName()?.equals("SKYBLOCK_MENU") ?: false
 
@@ -340,7 +325,7 @@ object ItemUtils {
 
     private fun makePair(input: String, itemName: String, matcher: Matcher): Pair<String, Int> {
         val matcherAmount = matcher.group("amount")
-        val amount = matcherAmount?.formatNumber()?.toInt() ?: 1
+        val amount = matcherAmount?.formatInt() ?: 1
         val pair = Pair(itemName, amount)
         itemAmountCache[input] = pair
         return pair
@@ -365,11 +350,13 @@ object ItemUtils {
 
     fun NEUInternalName.isRune(): Boolean = contains("_RUNE;")
 
+    // use when showing the item name to the user (in guis, chat message, etc), not for comparing
     val ItemStack.itemName: String
         get() = getInternalName().itemName
 
     val ItemStack.itemNameWithoutColor: String get() = itemName.removeColor()
 
+    // use when showing the item name to the user (in guis, chat message, etc), not for comparing
     val NEUInternalName.itemName: String
         get() = itemNameCache.getOrPut(this) { grabItemName() }
 
@@ -384,6 +371,9 @@ object ItemUtils {
         }
         if (this == NEUInternalName.NONE) {
             error("NEUInternalName.NONE has no name!")
+        }
+        if (NEUItems.ignoreItemsFilter.match(this.asString())) {
+            return "§cBugged Item"
         }
 
         val itemStack = getItemStackOrNull()

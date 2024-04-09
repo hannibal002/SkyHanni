@@ -3,6 +3,7 @@ package at.hannibal2.skyhanni.features.garden
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.config.ConfigFileType
 import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
+import at.hannibal2.skyhanni.config.enums.OutsideSbFeature
 import at.hannibal2.skyhanni.config.features.garden.NextJacobContestConfig.ShareContestsEntry
 import at.hannibal2.skyhanni.events.ConfigLoadEvent
 import at.hannibal2.skyhanni.events.DebugDataCollectEvent
@@ -58,11 +59,11 @@ object GardenNextJacobContest {
     private var inCalendar = false
 
     private val patternGroup = RepoPattern.group("garden.nextcontest")
-    private val dayPattern by patternGroup.pattern(
+    val dayPattern by patternGroup.pattern(
         "day",
         "§aDay (?<day>.*)"
     )
-    private val monthPattern by patternGroup.pattern(
+    val monthPattern by patternGroup.pattern(
         "month",
         "(?<month>.*), Year (?<year>.*)"
     )
@@ -184,8 +185,7 @@ object GardenNextJacobContest {
         if (!config.display) return
 
         val backItem = event.inventoryItems[48] ?: return
-        val backName = backItem.name
-        if (backName != "§aGo Back") return
+        if (backItem.name != "§aGo Back") return
         val lore = backItem.getLore()
         if (lore.size != 1) return
         if (lore[0] != "§7To Calendar and Events") return
@@ -226,8 +226,7 @@ object GardenNextJacobContest {
             val lore = item.getLore()
             if (!lore.any { it.contains("§6§eJacob's Farming Contest") }) continue
 
-            val name = item.name ?: continue
-            val day = dayPattern.matchMatcher(name) { group("day").toInt() } ?: continue
+            val day = dayPattern.matchMatcher(item.name) { group("day").toInt() } ?: continue
 
             val startTime = SkyBlockTime(year, month, day).asTimeMark()
 
@@ -493,14 +492,14 @@ object GardenNextJacobContest {
         if (!isEnabled()) return
 
         if (display.isEmpty()) {
-            config.pos.renderStrings(simpleDisplay, posLabel = "Garden Next Jacob Contest")
+            config.pos.renderStrings(simpleDisplay, posLabel = "Next Jacob Contest")
         } else {
-            config.pos.renderSingleLineWithItems(display, 1.7, posLabel = "Garden Next Jacob Contest")
+            config.pos.renderSingleLineWithItems(display, 1.0, posLabel = "Next Jacob Contest")
         }
     }
 
     @SubscribeEvent
-    fun onRenderOverlay(event: GuiRenderEvent.ChestGuiOverlayRenderEvent) {
+    fun onBackgroundDraw(event: GuiRenderEvent.ChestGuiOverlayRenderEvent) {
         if (!config.display) return
         if (!inCalendar) return
 
@@ -512,8 +511,9 @@ object GardenNextJacobContest {
         }
     }
 
-    private fun isEnabled() = LorenzUtils.inSkyBlock && config.display
-        && (GardenAPI.inGarden() || config.everywhere)
+    private fun isEnabled() =
+        config.display && ((LorenzUtils.inSkyBlock && (GardenAPI.inGarden() || config.showOutsideGarden)) ||
+            (OutsideSbFeature.NEXT_JACOB_CONTEXT.isSelected() && !LorenzUtils.inSkyBlock))
 
     private fun isFetchEnabled() = isEnabled() && config.fetchAutomatically
     private fun isSendEnabled() =
@@ -611,8 +611,10 @@ object GardenNextJacobContest {
         if (result) {
             ChatUtils.chat("Successfully submitted this years upcoming contests, thank you for helping everyone out!")
         } else {
-            ErrorManager.logErrorStateWithData("Something went wrong submitting upcoming contests!",
-                "submitContestsToElite not sucessful")
+            ErrorManager.logErrorStateWithData(
+                "Something went wrong submitting upcoming contests!",
+                "submitContestsToElite not sucessful"
+            )
         }
     } catch (e: Exception) {
         ErrorManager.logErrorWithData(
@@ -642,6 +644,7 @@ object GardenNextJacobContest {
         event.transform(15, "garden.nextJacobContests.shareAutomatically") { element ->
             ConfigUtils.migrateIntToEnum(element, ShareContestsEntry::class.java)
         }
+        event.move(18, "garden.nextJacobContests.everywhere", "garden.nextJacobContests.showOutsideGarden")
     }
 }
 

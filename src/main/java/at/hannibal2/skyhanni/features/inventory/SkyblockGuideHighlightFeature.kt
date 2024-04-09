@@ -5,6 +5,7 @@ import at.hannibal2.skyhanni.events.GuiContainerEvent
 import at.hannibal2.skyhanni.events.InventoryCloseEvent
 import at.hannibal2.skyhanni.events.InventoryFullyOpenedEvent
 import at.hannibal2.skyhanni.events.LorenzToolTipEvent
+import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.ItemUtils.name
@@ -85,9 +86,6 @@ class SkyblockGuideHighlightFeature private constructor(
         fun onInventoryClose(event: InventoryCloseEvent) = close()
 
         @SubscribeEvent
-        fun onInventoryClose(event: GuiContainerEvent.CloseWindowEvent) = close()
-
-        @SubscribeEvent
         fun onSlotClick(event: GuiContainerEvent.SlotClickEvent) {
             if (!isEnabled()) return
             val current = activeObject ?: return
@@ -124,7 +122,7 @@ class SkyblockGuideHighlightFeature private constructor(
 
             for ((slot, item) in event.inventoryItems) {
                 if (slot == 4) continue // Overview Item
-                val loreAndName = listOf(item.name ?: "") + item.getLore()
+                val loreAndName = listOf(item.name) + item.getLore()
                 if (!current.conditionPattern.anyMatches(loreAndName)) continue
                 missing.add(slot)
             }
@@ -144,7 +142,7 @@ class SkyblockGuideHighlightFeature private constructor(
         private val openWikiOnClick: (GuiContainerEvent.SlotClickEvent) -> Unit = { event ->
             val internalName = event.item?.getInternalName()
             if (internalName != null) {
-                LorenzUtils.sendCommandToServer("wiki ${internalName.asString()}")
+                ChatUtils.sendCommandToServer("wiki ${internalName.asString()}")
             }
         }
 
@@ -174,7 +172,7 @@ class SkyblockGuideHighlightFeature private constructor(
                 "travel",
                 "Core ➜ Fast Travels Unlocked",
                 taskOnlyCompleteOncePattern,
-                { LorenzUtils.sendCommandToServer("wiki MUSEUM_TRAVEL_SCROLL") }, // The items do not have proper internal names and using the fact that all travel scrolls lead to the same wiki page
+                { ChatUtils.sendCommandToServer("wiki MUSEUM_TRAVEL_SCROLL") }, // The items do not have proper internal names and using the fact that all travel scrolls lead to the same wiki page
                 openWikiTooltip
             )
             SkyblockGuideHighlightFeature(

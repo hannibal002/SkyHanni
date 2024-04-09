@@ -11,17 +11,23 @@ import at.hannibal2.skyhanni.events.LorenzTickEvent
 import at.hannibal2.skyhanni.features.inventory.bazaar.BazaarApi
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.CollectionUtils.addAsSingletonList
+import at.hannibal2.skyhanni.utils.InventoryUtils.getUpperItems
 import at.hannibal2.skyhanni.utils.ItemUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
+import at.hannibal2.skyhanni.utils.ItemUtils.itemName
 import at.hannibal2.skyhanni.utils.ItemUtils.name
 import at.hannibal2.skyhanni.utils.LorenzColor
 import at.hannibal2.skyhanni.utils.LorenzUtils
+import at.hannibal2.skyhanni.utils.NEUInternalName
 import at.hannibal2.skyhanni.utils.NEUItems
+import at.hannibal2.skyhanni.utils.NEUItems.getItemStack
+import at.hannibal2.skyhanni.utils.NEUItems.getPrice
 import at.hannibal2.skyhanni.utils.NumberUtil
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.RenderUtils.highlight
 import at.hannibal2.skyhanni.utils.RenderUtils.renderStringsAndItems
-import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
+import at.hannibal2.skyhanni.utils.SimpleTimeMark
+import at.hannibal2.skyhanni.utils.StringUtils.matchFirst
 import at.hannibal2.skyhanni.utils.StringUtils.matches
 import at.hannibal2.skyhanni.utils.TimeUtils
 import at.hannibal2.skyhanni.utils.renderables.Renderable
@@ -100,10 +106,9 @@ class CityProjectFeatures {
 
         if (config.showMaterials) {
             // internal name -> amount
-            val materials = mutableMapOf<String, Int>()
+            val materials = mutableMapOf<NEUInternalName, Int>()
             for ((_, item) in event.inventoryItems) {
-                val itemName = item.name ?: continue
-                if (itemName != "§eContribute this component!") continue
+                if (item.name != "§eContribute this component!") continue
                 fetchMaterials(item, materials)
             }
 
@@ -111,28 +116,26 @@ class CityProjectFeatures {
         }
 
         if (config.showReady) {
-            var nextTime = Long.MAX_VALUE
+            var nextTime = SimpleTimeMark.farFuture()
+            val now = SimpleTimeMark.now()
             for ((_, item) in event.inventoryItems) {
-                val itemName = item.name ?: continue
 
                 val lore = item.getLore()
                 val completed = lore.lastOrNull()?.let { completedPattern.matches(it) } ?: false
                 if (completed) continue
-                for (line in lore) {
-                    contributeAgainPattern.matchMatcher(line) {
-                        val rawTime = group("time")
-                        if (rawTime.contains("Soon!")) return@matchMatcher
-                        val duration = TimeUtils.getMillis(rawTime)
-                        val endTime = System.currentTimeMillis() + duration
-                        if (endTime < nextTime) {
-                            nextTime = endTime
-                        }
+                lore.matchFirst(contributeAgainPattern) {
+                    val rawTime = group("time")
+                    if (!rawTime.contains("Soon!")) return@matchFirst
+                    val duration = TimeUtils.getDuration(rawTime)
+                    val endTime = now + duration
+                    if (endTime < nextTime) {
+                        nextTime = endTime
                     }
                 }
-                if (itemName != "§eContribute this component!") continue
-                nextTime = System.currentTimeMillis()
+                if (item.name != "§eContribute this component!") continue
+                nextTime = now
             }
-            ProfileStorageData.playerSpecific?.nextCityProjectParticipationTime = nextTime
+            ProfileStorageData.playerSpecific?.nextCityProjectParticipationTime = nextTime.toMillis()
         }
     }
 
@@ -143,7 +146,7 @@ class CityProjectFeatures {
         return true
     }
 
-    private fun buildList(materials: MutableMap<String, Int>) = buildList<List<Any>> {
+    private fun buildList(materials: MutableMap<NEUInternalName, Int>) = buildList<List<Any>> {
         addAsSingletonList("§7City Project Materials")
 
         if (materials.isEmpty()) {
@@ -152,8 +155,8 @@ class CityProjectFeatures {
         }
 
         for ((internalName, amount) in materials) {
-            val stack = NEUItems.getItemStack(internalName)
-            val name = stack.name ?: continue
+            val stack = internalName.getItemStack()
+            val name = internalName.itemName
             val list = mutableListOf<Any>()
             list.add(" §7- ")
             list.add(stack)
@@ -166,14 +169,14 @@ class CityProjectFeatures {
                 }
             }) { inInventory && !NEUItems.neuHasFocus() })
 
-            val price = NEUItems.getPrice(internalName) * amount
+            val price = internalName.getPrice(false) * amount
             val format = NumberUtil.format(price)
             list.add(" §7(§6$format§7)")
             add(list)
         }
     }
 
-    private fun fetchMaterials(item: ItemStack, materials: MutableMap<String, Int>) {
+    private fun fetchMaterials(item: ItemStack, materials: MutableMap<NEUInternalName, Int>) {
         var next = false
         val lore = item.getLore()
         val completed = lore.lastOrNull()?.let { completedPattern.matches(it) } ?: false
@@ -188,7 +191,7 @@ class CityProjectFeatures {
             if (line.contains("Bits")) break
 
             val (name, amount) = ItemUtils.readItemAmount(line) ?: continue
-            val internalName = NEUItems.getRawInternalName(name)
+            val internalName = NEUInternalName.fromItemName(name)
             val old = materials.getOrPut(internalName) { 0 }
             materials[internalName] = old + amount
         }
@@ -214,10 +217,7 @@ class CityProjectFeatures {
         val guiChest = event.gui
         val chest = guiChest.inventorySlots as ContainerChest
 
-        for (slot in chest.inventorySlots) {
-            if (slot == null) continue
-            if (slot.slotNumber != slot.slotIndex) continue
-            val stack = slot.stack ?: continue
+        for ((slot, stack) in chest.getUpperItems()) {
             val lore = stack.getLore()
             if (lore.isEmpty()) continue
             val last = lore.last()
