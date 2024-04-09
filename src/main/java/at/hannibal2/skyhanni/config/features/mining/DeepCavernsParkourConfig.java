@@ -2,11 +2,11 @@ package at.hannibal2.skyhanni.config.features.mining;
 
 import at.hannibal2.skyhanni.config.FeatureToggle;
 import com.google.gson.annotations.Expose;
-import io.github.moulberry.moulconfig.annotations.ConfigEditorBoolean;
-import io.github.moulberry.moulconfig.annotations.ConfigEditorColour;
-import io.github.moulberry.moulconfig.annotations.ConfigEditorSlider;
-import io.github.moulberry.moulconfig.annotations.ConfigOption;
-import io.github.moulberry.moulconfig.observer.Property;
+import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorBoolean;
+import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorColour;
+import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorSlider;
+import io.github.notenoughupdates.moulconfig.annotations.ConfigOption;
+import io.github.notenoughupdates.moulconfig.observer.Property;
 
 public class DeepCavernsParkourConfig {
 
@@ -32,7 +32,7 @@ public class DeepCavernsParkourConfig {
     public Property<String> monochromeColor = Property.of("0:60:0:0:255");
 
     @Expose
-    @ConfigOption(name = "Hilight all Lines", desc = "Show all lines in gray. Useful for debugging.")
+    @ConfigOption(name = "Highlight all Lines", desc = "Show all lines in gray. Useful for debugging.")
     @ConfigEditorBoolean
     public boolean highlightAllLines = false;
 }

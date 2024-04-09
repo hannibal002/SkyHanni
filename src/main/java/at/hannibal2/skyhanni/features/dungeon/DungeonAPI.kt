@@ -17,8 +17,9 @@ import at.hannibal2.skyhanni.utils.CollectionUtils.equalsOneOf
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.ItemUtils.name
 import at.hannibal2.skyhanni.utils.LorenzUtils
-import at.hannibal2.skyhanni.utils.NumberUtil.formatLong
+import at.hannibal2.skyhanni.utils.NumberUtil.formatInt
 import at.hannibal2.skyhanni.utils.NumberUtil.romanToDecimalIfNecessary
+import at.hannibal2.skyhanni.utils.StringUtils.matchFirst
 import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.StringUtils.matches
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
@@ -112,11 +113,8 @@ object DungeonAPI {
     }
 
     fun getTime(): String {
-        loop@ for (line in ScoreboardData.sidebarLinesFormatted) {
-            timePattern.matchMatcher(line.removeColor()) {
-                if (!matches()) continue@loop
-                return "${group("minutes") ?: "00"}:${group("seconds")}" // 03:14
-            }
+        ScoreboardData.sidebarLinesFormatted.matchFirst(timePattern) {
+            return "${group("minutes") ?: "00"}:${group("seconds")}" // 03:14
         }
         return ""
     }
@@ -145,12 +143,10 @@ object DungeonAPI {
     @SubscribeEvent
     fun onTick(event: LorenzTickEvent) {
         if (dungeonFloor == null) {
-            for (line in ScoreboardData.sidebarLinesFormatted) {
-                floorPattern.matchMatcher(line) {
-                    val floor = group("floor")
-                    dungeonFloor = floor
-                    DungeonEnterEvent(floor).postAndCatch()
-                }
+            ScoreboardData.sidebarLinesFormatted.matchFirst(floorPattern) {
+                val floor = group("floor")
+                dungeonFloor = floor
+                DungeonEnterEvent(floor).postAndCatch()
             }
         }
         if (dungeonFloor != null && playerClass == null) {
@@ -253,7 +249,7 @@ object DungeonAPI {
                         val lore = inventoryItems[4]?.getLore() ?: return
                         val line = lore.find { it.contains("Total Kills:") } ?: return
                         val kills = totalKillsPattern.matchMatcher(line) {
-                            group("kills").formatLong().toInt()
+                            group("kills").formatInt()
                         } ?: return
                         bossCollections[floor] = kills
                     }
@@ -312,22 +308,6 @@ object DungeonAPI {
             add("Wisdom: ${DungeonBlessings.WISDOM.power}")
             add("Power: ${DungeonBlessings.POWER.power}")
             add("Time: ${DungeonBlessings.TIME.power}")
-        }
-    }
-
-    enum class DungeonFloor(private val bossName: String) {
-        ENTRANCE("The Watcher"),
-        F1("Bonzo"),
-        F2("Scarf"),
-        F3("The Professor"),
-        F4("Thorn"),
-        F5("Livid"),
-        F6("Sadan"),
-        F7("Necron");
-
-        companion object {
-
-            fun byBossName(bossName: String) = DungeonFloor.entries.firstOrNull { it.bossName == bossName }
         }
     }
 

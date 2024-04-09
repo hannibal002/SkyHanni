@@ -1,8 +1,8 @@
 package at.hannibal2.skyhanni.config.features.garden.pests;
 
 import com.google.gson.annotations.Expose;
-import io.github.moulberry.moulconfig.annotations.Accordion;
-import io.github.moulberry.moulconfig.annotations.ConfigOption;
+import io.github.notenoughupdates.moulconfig.annotations.Accordion;
+import io.github.notenoughupdates.moulconfig.annotations.ConfigOption;
 
 public class PestsConfig {
 
@@ -25,6 +25,11 @@ public class PestsConfig {
     @ConfigOption(name = "Pest Timer", desc = "")
     @Accordion
     public PestTimerConfig pestTimer = new PestTimerConfig();
+
+    @Expose
+    @ConfigOption(name = "Pest Profit Tracker", desc = "")
+    @Accordion
+    public PestProfitTrackerConfig pestProfitTacker = new PestProfitTrackerConfig();
 
     @Expose
     @ConfigOption(name = "Spray", desc = "")

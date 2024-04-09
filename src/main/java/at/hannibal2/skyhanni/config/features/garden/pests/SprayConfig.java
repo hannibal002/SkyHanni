@@ -3,8 +3,9 @@ package at.hannibal2.skyhanni.config.features.garden.pests;
 import at.hannibal2.skyhanni.config.FeatureToggle;
 import at.hannibal2.skyhanni.config.core.config.Position;
 import com.google.gson.annotations.Expose;
-import io.github.moulberry.moulconfig.annotations.ConfigEditorBoolean;
-import io.github.moulberry.moulconfig.annotations.ConfigOption;
+import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorBoolean;
+import io.github.notenoughupdates.moulconfig.annotations.ConfigLink;
+import io.github.notenoughupdates.moulconfig.annotations.ConfigOption;
 
 public class SprayConfig {
 
@@ -24,6 +25,7 @@ public class SprayConfig {
     public boolean drawPlotsBorderWhenInHands = true;
 
     @Expose
+    @ConfigLink(owner = SprayConfig.class, field = "pestWhenSelector")
     public Position position = new Position(315, -200, 2.3f);
 
     @Expose
@@ -54,5 +56,6 @@ public class SprayConfig {
     public boolean expiryNotification = true;
 
     @Expose
+    @ConfigLink(owner = SprayConfig.class, field = "displayEnabled")
     public Position displayPosition = new Position(390, 75, false, true);
 }
