@@ -18,6 +18,7 @@ import at.hannibal2.skyhanni.features.garden.GardenPlotAPI.pests
 import at.hannibal2.skyhanni.features.garden.GardenPlotAPI.uncleared
 import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.ChatUtils
+import at.hannibal2.skyhanni.utils.DelayedRun
 import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.LocationUtils.distanceSqToPlayer
@@ -31,6 +32,7 @@ import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import org.lwjgl.input.Keyboard
+import kotlin.time.Duration.Companion.seconds
 
 object PestAPI {
 
@@ -132,8 +134,11 @@ object PestAPI {
     }
 
     private fun updatePests() {
-        fixPests()
         PestUpdateEvent().postAndCatch()
+        DelayedRun.runDelayed(3.seconds) {
+            fixPests()
+            PestUpdateEvent().postAndCatch()
+        }
     }
 
     @SubscribeEvent
