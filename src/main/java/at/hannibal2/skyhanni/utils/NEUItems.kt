@@ -223,7 +223,7 @@ object NEUItems {
         }
         if (tryCount == 10) {
             ErrorManager.logErrorStateWithData(
-                "Cound not load recipe data.",
+                "Could not load recipe data.",
                 "Failed to find item multiplier",
                 "internalName" to internalName
             )
