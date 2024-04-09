@@ -9,7 +9,7 @@ import at.hannibal2.skyhanni.events.BlockClickEvent
 import at.hannibal2.skyhanni.events.ConfigLoadEvent
 import at.hannibal2.skyhanni.events.CropClickEvent
 import at.hannibal2.skyhanni.events.GardenToolChangeEvent
-import at.hannibal2.skyhanni.events.GuiContainerEvent
+import at.hannibal2.skyhanni.events.InventoryCloseEvent
 import at.hannibal2.skyhanni.events.LorenzTickEvent
 import at.hannibal2.skyhanni.events.LorenzWorldChangeEvent
 import at.hannibal2.skyhanni.events.PacketEvent
@@ -87,7 +87,7 @@ object GardenAPI {
     }
 
     @SubscribeEvent
-    fun onCloseWindow(event: GuiContainerEvent.CloseWindowEvent) {
+    fun onInventoryClose(event: InventoryCloseEvent) {
         if (!inGarden()) return
         checkItemInHand()
     }
@@ -95,7 +95,7 @@ object GardenAPI {
     @SubscribeEvent
     fun onTick(event: LorenzTickEvent) {
         if (!inGarden()) return
-        if (event.isMod(10)) {
+        if (event.isMod(10, 1)) {
             inBarn = barnArea.isPlayerInside()
 
             // We ignore random hypixel moments
@@ -183,7 +183,7 @@ object GardenAPI {
     private var lastLocation: LorenzVec? = null
 
     @SubscribeEvent
-    fun onBlockBreak(event: BlockClickEvent) {
+    fun onBlockClick(event: BlockClickEvent) {
         if (!inGarden()) return
 
         val blockState = event.getBlockState

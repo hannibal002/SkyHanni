@@ -64,13 +64,13 @@ object BestiaryData {
         if (!isEnabled()) return
         if (inInventory) {
             config.position.renderStringsAndItems(
-                display, extraSpace = -1, itemScale = 1.3, posLabel = "Bestiary Data"
+                display, extraSpace = -1, itemScale = 0.7, posLabel = "Bestiary Data"
             )
         }
     }
 
     @SubscribeEvent
-    fun onRender(event: GuiContainerEvent.BackgroundDrawnEvent) {
+    fun onBackgroundDrawn(event: GuiContainerEvent.BackgroundDrawnEvent) {
         if (!isEnabled()) return
         if (inInventory) {
             for (slot in InventoryUtils.getItemsInOpenChest()) {
