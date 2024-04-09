@@ -161,22 +161,24 @@ object NEUItems {
     fun isVanillaItem(item: ItemStack): Boolean =
         manager.auctionManager.isVanillaItem(item.getInternalName().asString())
 
-    fun ItemStack.renderOnScreen(x: Float, y: Float, scaleMultiplier: Double = 1.0) {
+    const val itemFontSize = 2.0 / 3.0
+
+    fun ItemStack.renderOnScreen(x: Float, y: Float, scaleMultiplier: Double = itemFontSize) {
         val item = checkBlinkItem()
         val isSkull = item.item === Items.skull
 
-        val baseScale = (if (isSkull) 0.8f else 0.6f)
+        val baseScale = (if (isSkull) 4f / 3f else 1f)
         val finalScale = baseScale * scaleMultiplier
-        val diff = ((finalScale - baseScale) * 10).toFloat()
 
         val translateX: Float
         val translateY: Float
         if (isSkull) {
-            translateX = x - 2 - diff
-            translateY = y - 2 - diff
+            val skulldiff = ((scaleMultiplier) * 2.5).toFloat()
+            translateX = x - skulldiff
+            translateY = y - skulldiff
         } else {
-            translateX = x - diff
-            translateY = y - diff
+            translateX = x
+            translateY = y
         }
 
         GlStateManager.pushMatrix()

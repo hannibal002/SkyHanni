@@ -5,6 +5,7 @@ import at.hannibal2.skyhanni.config.core.config.Position;
 import com.google.gson.annotations.Expose;
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorBoolean;
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorText;
+import io.github.notenoughupdates.moulconfig.annotations.ConfigLink;
 import io.github.notenoughupdates.moulconfig.annotations.ConfigOption;
 
 public class EliteFarmingWeightConfig {
@@ -17,6 +18,7 @@ public class EliteFarmingWeightConfig {
     public boolean display = true;
 
     @Expose
+    @ConfigLink(owner = EliteFarmingWeightConfig.class, field = "display")
     public Position pos = new Position(180, 10, false, true);
 
     @Expose
