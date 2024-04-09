@@ -32,8 +32,8 @@ import at.hannibal2.skyhanni.utils.LorenzUtils.inDungeons
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.NumberUtil.percentageColor
 import at.hannibal2.skyhanni.utils.RenderUtils.HorizontalAlignment
+import at.hannibal2.skyhanni.utils.StringUtils.anyMatches
 import at.hannibal2.skyhanni.utils.StringUtils.firstLetterUppercase
-import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.StringUtils.matches
 import at.hannibal2.skyhanni.utils.StringUtils.pluralize
 import at.hannibal2.skyhanni.utils.TabListData
@@ -157,7 +157,7 @@ enum class ScoreboardElement(
     COOKIE(
         ::getCookieDisplayPair,
         ::getCookieShowWhen,
-        "§d§lCookie Buff\n §f3days, 17hours"
+        "§dCookie Buff§f: 3d 17h"
     ),
     EMPTY_LINE2(
         ::getEmptyLineDisplayPair,
@@ -361,7 +361,7 @@ private fun getBankDisplayPair(): List<ScoreboardElementType> {
 
     return listOf(
         when {
-            informationFilteringConfig.hideEmptyLines && bank == "0" -> "<hidden>"
+            informationFilteringConfig.hideEmptyLines && (bank == "0" || bank == "0§7 / §60") -> "<hidden>"
             displayConfig.displayNumbersFirst -> "§6$bank Bank"
             else -> "Bank: §6$bank"
         } to HorizontalAlignment.LEFT
@@ -482,13 +482,8 @@ private fun getEmptyLineDisplayPair() = listOf("<empty>" to HorizontalAlignment.
 private fun getIslandDisplayPair() =
     listOf("§7㋖ §a" + HypixelData.skyBlockIsland.displayName to HorizontalAlignment.LEFT)
 
-// TODO merge with LorenzUtils.skyBlockArea
 private fun getLocationDisplayPair() = buildList {
-    val location =
-        getGroupFromPattern(ScoreboardData.sidebarLinesFormatted, ScoreboardPattern.locationPattern, "location").trim()
-    if (location == "0") return@buildList
-
-    add(location to HorizontalAlignment.LEFT)
+    add(HypixelData.skyBlockAreaWithSymbol to HorizontalAlignment.LEFT)
 
     ScoreboardData.sidebarLinesFormatted.firstOrNull { ScoreboardPattern.plotPattern.matches(it) }
         ?.let { add(it to HorizontalAlignment.LEFT) }
@@ -542,11 +537,10 @@ private fun getLobbyDisplayPair(): List<ScoreboardElementType> {
 private fun getPowerDisplayPair() = listOf(
     (MaxwellAPI.currentPower?.let {
         val mp = if (maxwellConfig.showMagicalPower) "§7(§6${MaxwellAPI.magicalPower?.addSeparators()}§7)" else ""
-        val name = it.replace(" Power", "")
         if (displayConfig.displayNumbersFirst) {
-            "§a$name Power $mp"
+            "§a${it.replace(" Power", "")} Power $mp"
         } else {
-            "Power: §a$name $mp"
+            "Power: §a$it $mp"
         }
     }
         ?: "§cOpen \"Your Bags\"!") to HorizontalAlignment.LEFT
@@ -596,41 +590,16 @@ private fun getTuningDisplayPair(): List<Pair<String, HorizontalAlignment>> {
 
 private fun getPowerShowWhen() = !inAnyIsland(IslandType.THE_RIFT)
 
-private fun getCookieTime(): String? {
-    return CustomScoreboardUtils.getTablistFooter().split("\n")
-        .nextAfter("§d§lCookie Buff")
-        ?: run {
-            for (line in TabListData.getTabList()) {
-                ScoreboardPattern.boosterCookieEffectsWidgetPattern.matchMatcher(line) {
-                    return group("time")
-                }
-            }
-            null
-        }
-}
-
-private fun getCookieDisplayPair(): List<ScoreboardElementType> {
-    val timeLine: String = getCookieTime()
-        ?: return listOf(
-            "§d§lCookie Buff" to HorizontalAlignment.LEFT,
-            " §7- §cNot active" to HorizontalAlignment.LEFT
-        )
-
-    return listOf(
-        "§d§lCookie Buff" to HorizontalAlignment.LEFT,
-        if (ScoreboardPattern.cookieNotActivePattern.matches(timeLine))
-            " §7- §cNot active" to HorizontalAlignment.LEFT
-        else
-            " §7- §f${timeLine}" to HorizontalAlignment.LEFT
-    )
-}
+private fun getCookieDisplayPair() = listOf(
+    "§dCookie Buff§f: " + (BitsAPI.cookieBuffTime?.let {
+        if (!BitsAPI.hasCookieBuff()) "§cNot Active" else it.timeUntil().format(maxUnits = 2)
+    }
+        ?: "§cOpen SbMenu!") to HorizontalAlignment.LEFT
+)
 
 private fun getCookieShowWhen(): Boolean {
     if (HypixelData.bingo) return false
-
-    return if (informationFilteringConfig.hideEmptyLines) {
-        getCookieTime() != null
-    } else true
+    return informationFilteringConfig.hideEmptyLines && BitsAPI.hasCookieBuff()
 }
 
 private fun getObjectiveDisplayPair() = buildList {
@@ -649,8 +618,7 @@ private fun getObjectiveDisplayPair() = buildList {
 }
 
 private fun getObjectiveShowWhen(): Boolean =
-    !inAnyIsland(IslandType.KUUDRA_ARENA)
-        && ScoreboardData.sidebarLinesFormatted.none { ScoreboardPattern.objectivePattern.matches(it) }
+    ScoreboardPattern.objectivePattern.anyMatches(ScoreboardData.sidebarLinesFormatted)
 
 private fun getSlayerDisplayPair(): List<ScoreboardElementType> = listOf(
     (if (SlayerAPI.hasActiveSlayerQuest()) "Slayer Quest" else "<hidden>") to HorizontalAlignment.LEFT,
@@ -808,16 +776,18 @@ private fun getFooterDisplayPair() = listOf(
 private fun getExtraDisplayPair(): List<ScoreboardElementType> {
     if (unknownLines.isEmpty()) return listOf("<hidden>" to HorizontalAlignment.LEFT)
 
-    if (amountOfUnknownLines != unknownLines.size && devConfig.unknownLinesWarning) {
+    val size = unknownLines.size
+    if (amountOfUnknownLines != size && devConfig.unknownLinesWarning) {
+        val message = "CustomScoreboard detected ${pluralize(unknownLines.size, "unknown line", withNumber = true)}"
         ErrorManager.logErrorWithData(
-            CustomScoreboardUtils.UndetectedScoreboardLines("CustomScoreboard detected ${pluralize(unknownLines.size, "unknown line", withNumber = true)}"),
-            "CustomScoreboard detected ${pluralize(unknownLines.size, "unknown line", withNumber = true)}",
+            CustomScoreboardUtils.UndetectedScoreboardLines(message),
+            message,
             "Unknown Lines" to unknownLines,
             "Island" to HypixelData.skyBlockIsland,
             "Area" to HypixelData.skyBlockArea,
-            noStackTrace = true
+            noStackTrace = true,
         )
-        amountOfUnknownLines = unknownLines.size
+        amountOfUnknownLines = size
     }
 
     return listOf("§cUndetected Lines:" to HorizontalAlignment.LEFT) + unknownLines.map { it to HorizontalAlignment.LEFT }

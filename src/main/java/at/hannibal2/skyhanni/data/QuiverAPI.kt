@@ -17,7 +17,7 @@ import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils.round
 import at.hannibal2.skyhanni.utils.NEUInternalName
 import at.hannibal2.skyhanni.utils.NEUInternalName.Companion.asInternalName
-import at.hannibal2.skyhanni.utils.NumberUtil.formatNumber
+import at.hannibal2.skyhanni.utils.NumberUtil.formatFloat
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getEnchantments
 import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.StringUtils.matches
@@ -97,7 +97,7 @@ object QuiverAPI {
 
         fillUpJaxPattern.matchMatcher(message) {
             val type = group("type")
-            val amount = group("amount").formatNumber().toFloat()
+            val amount = group("amount").formatFloat()
             val filledUpType = getArrowByNameOrNull(type)
                 ?: return ErrorManager.logErrorWithData(
                     UnknownArrowType("Unknown arrow type: $type"),
@@ -110,7 +110,7 @@ object QuiverAPI {
         }
 
         fillUpPattern.matchMatcher(message) {
-            val flintAmount = group("flintAmount").formatNumber().toFloat()
+            val flintAmount = group("flintAmount").formatFloat()
 
             FLINT_ARROW_TYPE?.let { arrowAmount.addOrPut(it.internalName, flintAmount) }
             return
@@ -118,7 +118,7 @@ object QuiverAPI {
 
         addedToQuiverPattern.matchMatcher(message) {
             val type = group("type")
-            val amount = group("amount").formatNumber().toFloat()
+            val amount = group("amount").formatFloat()
 
             val filledUpType = getArrowByNameOrNull(type)
                 ?: return ErrorManager.logErrorWithData(
@@ -134,20 +134,18 @@ object QuiverAPI {
         clearedPattern.matchMatcher(message) {
             currentAmount = 0
             arrowAmount.clear()
-
             return
         }
 
         arrowResetPattern.matchMatcher(message) {
             currentArrow = NONE_ARROW_TYPE
             currentAmount = 0
-
             return
         }
     }
 
     @SubscribeEvent
-    fun onInventoryFullyLoaded(event: InventoryFullyOpenedEvent) {
+    fun onInventoryOpen(event: InventoryFullyOpenedEvent) {
         if (!isEnabled()) return
         if (!quiverInventoryNamePattern.matches(event.inventoryName)) return
 
@@ -158,9 +156,7 @@ object QuiverAPI {
         val stacks = event.inventoryItems
         for (stack in stacks.values) {
             if (stack.getItemCategoryOrNull() != ItemCategory.ARROW) continue
-
             val arrow = stack.getInternalNameOrNull() ?: continue
-
             val arrowType = getArrowByNameOrNull(arrow) ?: continue
 
             arrowAmount.addOrPut(arrowType.internalName, stack.stackSize.toFloat())

@@ -59,7 +59,7 @@ object RepoPatternManager {
             }
         }
 
-    val localLoading: Boolean get() = config.forceLocal.get() || LorenzUtils.isInDevEnviromen()
+    val localLoading: Boolean get() = config.forceLocal.get() || LorenzUtils.isInDevEnvironment()
 
     /**
      * Crash if in a development environment, or if inside a guarded event handler.
@@ -93,7 +93,7 @@ object RepoPatternManager {
     }
 
     @SubscribeEvent
-    fun onConfigInit(event: ConfigLoadEvent) {
+    fun onConfigLoad(event: ConfigLoadEvent) {
         config.forceLocal.afterChange { reloadPatterns() }
     }
 
