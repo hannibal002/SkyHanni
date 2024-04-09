@@ -31,7 +31,9 @@ import at.hannibal2.skyhanni.utils.TabListData
 import at.hannibal2.skyhanni.utils.TimeUtils.format
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import com.google.gson.Gson
+import com.google.gson.JsonPrimitive
 import io.github.moulberry.notenoughupdates.util.SkyBlockTime
+import io.github.moulberry.notenoughupdates.util.toJsonArray
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
@@ -512,7 +514,7 @@ object GardenNextJacobContest {
 
     private fun isEnabled() =
         config.display && ((LorenzUtils.inSkyBlock && (GardenAPI.inGarden() || config.showOutsideGarden)) ||
-            (OutsideSbFeature.NEXT_JACOB_CONTEXT.isSelected() && !LorenzUtils.inSkyBlock))
+            (OutsideSbFeature.NEXT_JACOB_CONTEST.isSelected() && !LorenzUtils.inSkyBlock))
 
     private fun isFetchEnabled() = isEnabled() && config.fetchAutomatically
     private fun isSendEnabled() =
@@ -644,6 +646,13 @@ object GardenNextJacobContest {
             ConfigUtils.migrateIntToEnum(element, ShareContestsEntry::class.java)
         }
         event.move(18, "garden.nextJacobContests.everywhere", "garden.nextJacobContests.showOutsideGarden")
+        event.move(33, "garden.jacobContextTimesPos", "garden.jacobContestTimesPosition")
+        event.move(33, "garden.jacobContextTimes", "garden.jacobContestTimes")
+        event.move(33, "garden.everywhere", "garden.outsideGarden")
+        event.transform(33, "misc.showOutsideSB") { element ->
+            element.asJsonArray.map { setting ->
+                if (setting.asString == "NEXT_JACOB_CONTEXT") JsonPrimitive("NEXT_JACOB_CONTEST") else setting
+            }.toJsonArray()
+        }
     }
 }
-
