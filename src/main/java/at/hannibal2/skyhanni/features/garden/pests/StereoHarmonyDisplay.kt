@@ -64,7 +64,7 @@ class StereoHarmonyDisplay {
         val pest = vinyl.getPest()
 
         val itemStack = pest?.internalName?.getItemStack() ?: questionMarkSkull
-        if (config.showHead.get()) add(Renderable.itemStack(itemStack, 2.9, verticalAlign = RenderUtils.VerticalAlignment.BOTTOM))
+        if (config.showHead.get()) add(Renderable.itemStack(itemStack, 1.67))
         val list = mutableListOf<Renderable>()
         val vinylName = vinyl.displayName
         val pestName = pest?.displayName ?: "None"
@@ -73,7 +73,7 @@ class StereoHarmonyDisplay {
         pestLine.add(Renderable.string("§ePest: §c$pestName "))
         if (pest?.crop != null && config.showCrop.get()) pestLine.add(Renderable.itemStack(pest.crop.icon))
         list.add(Renderable.horizontalContainer(pestLine))
-        add(Renderable.verticalContainer(list))
+        add(Renderable.verticalContainer(list, verticalAlign = RenderUtils.VerticalAlignment.CENTER))
     }
 
     @SubscribeEvent
@@ -97,7 +97,7 @@ class StereoHarmonyDisplay {
         if (activeVinyl == VinylType.NONE && config.hideWhenNone) return
         else if (display.isEmpty()) update()
         if (display.isEmpty()) return
-        val content = Renderable.horizontalContainer(display, 3, verticalAlign = RenderUtils.VerticalAlignment.CENTER)
+        val content = Renderable.horizontalContainer(display, 1, verticalAlign = RenderUtils.VerticalAlignment.CENTER)
         val renderables = listOf(content)
         config.position.renderRenderables(renderables, posLabel = "Stereo Harmony Display")
     }
