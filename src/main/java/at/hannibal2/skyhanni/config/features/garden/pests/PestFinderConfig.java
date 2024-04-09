@@ -6,6 +6,7 @@ import com.google.gson.annotations.Expose;
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorBoolean;
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorKeybind;
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorSlider;
+import io.github.notenoughupdates.moulconfig.annotations.ConfigLink;
 import io.github.notenoughupdates.moulconfig.annotations.ConfigOption;
 import org.lwjgl.input.Keyboard;
 
@@ -47,6 +48,7 @@ public class PestFinderConfig {
     public int showBorderForSeconds = 1;
 
     @Expose
+    @ConfigLink(owner = PestFinderConfig.class, field = "showDisplay")
     public Position position = new Position(-350, 200, 1.3f);
 
     @Expose
