@@ -3,7 +3,6 @@ package at.hannibal2.skyhanni.utils.renderables
 import at.hannibal2.skyhanni.utils.RenderUtils.HorizontalAlignment
 import at.hannibal2.skyhanni.utils.RenderUtils.VerticalAlignment
 import net.minecraft.client.renderer.GlStateManager
-import org.lwjgl.input.Mouse
 
 internal object RenderableUtils {
 
@@ -64,54 +63,6 @@ internal object RenderableUtils {
         GlStateManager.translate(0f, yOffset.toFloat(), 0f)
         this.render(posX, posY + yOffset)
         GlStateManager.translate(0f, -yOffset.toFloat(), 0f)
-    }
-
-    abstract class ScrollInput(
-        protected val minValue: Int,
-        protected val maxValue: Int,
-        protected val velocity: Double,
-        protected val dragScrollMouseButton: Int?,
-        startValue: Double?
-    ) {
-
-        protected var scroll = startValue ?: minValue.toDouble()
-
-        private var mouseEventTime = 0L
-
-        fun asInt() = scroll.toInt()
-        fun asDouble() = scroll
-
-        protected fun isMouseEventValid(): Boolean {
-            val mouseEvent = Mouse.getEventNanoseconds()
-            val mouseEventsValid = mouseEvent - mouseEventTime > 20L
-            mouseEventTime = mouseEvent
-            return mouseEventsValid
-        }
-
-        abstract fun update(isValid: Boolean)
-    }
-
-    class VerticalScrollInput(
-        minHeight: Int,
-        maxHeight: Int,
-        velocity: Double,
-        dragScrollMouseButton: Int?,
-        startValue: Double? = null
-    ) : ScrollInput(minHeight, maxHeight, velocity, dragScrollMouseButton, startValue) {
-        override fun update(isValid: Boolean) {
-            if (maxValue < minValue) {
-                scroll = minValue.toDouble()
-                return
-            }
-            if (!isValid || !isMouseEventValid()) return
-            if (dragScrollMouseButton != null && Mouse.isButtonDown(dragScrollMouseButton)) {
-                scroll += Mouse.getEventDY() * velocity
-            }
-            val deltaWheel = Mouse.getEventDWheel()
-            scroll += -deltaWheel.coerceIn(-1, 1) * 2.5 * velocity
-            scroll = scroll.coerceIn(minValue.toDouble(), maxValue.toDouble())
-        }
-
     }
 
 }

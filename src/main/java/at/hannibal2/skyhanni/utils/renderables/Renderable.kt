@@ -431,6 +431,7 @@ interface Renderable {
         fun scrollList(
             list: List<Renderable>,
             height: Int,
+            scrollValue: ScrollValue = ScrollValue(),
             velocity: Double = 2.5,
             button: Int? = null,
             horizontalAlign: HorizontalAlignment = HorizontalAlignment.LEFT,
@@ -443,7 +444,8 @@ interface Renderable {
 
             private val virtualHeight = list.maxOf { it.height }
 
-            private val scroll = RenderableUtils.VerticalScrollInput(
+            private val scroll = ScrollInput.Companion.Vertical(
+                scrollValue,
                 0,
                 virtualHeight - height,
                 velocity,
@@ -474,6 +476,7 @@ interface Renderable {
         fun scrollTable(
             content: List<List<Renderable?>>,
             height: Int,
+            scrollValue: ScrollValue = ScrollValue(),
             velocity: Double = 2.5,
             button: Int? = null,
             xPadding: Int = 1,
@@ -495,7 +498,8 @@ interface Renderable {
 
             private val end get() = scroll.asInt() + height - yPadding - 1
 
-            private val scroll = RenderableUtils.VerticalScrollInput(
+            private val scroll = ScrollInput.Companion.Vertical(
+                scrollValue,
                 if (hasHeader) yOffsets[1] else 0,
                 virtualHeight - height,
                 velocity,
