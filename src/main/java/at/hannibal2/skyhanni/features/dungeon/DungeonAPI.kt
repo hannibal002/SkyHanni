@@ -195,6 +195,7 @@ object DungeonAPI {
         isUniqueClass = false
         playerClass = null
         playerClassLevel = -1
+        DungeonBlessings.reset()
     }
 
     @SubscribeEvent
