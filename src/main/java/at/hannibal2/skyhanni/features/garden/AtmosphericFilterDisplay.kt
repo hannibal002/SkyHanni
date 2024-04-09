@@ -41,6 +41,8 @@ class AtmosphericFilterDisplay {
         append(season.getPerk(config.abbreviatePerk))
     }
 
-    private fun isEnabled() = config.enabled && (OutsideSbFeature.ATMOSPHERIC_FILTER.isSelected() && !LorenzUtils.inSkyBlock) ||
-        (LorenzUtils.inSkyBlock && (GardenAPI.inGarden() || config.outsideGarden))
+    private fun isEnabled() = LorenzUtils.onHypixel && config.enabled && (
+        (OutsideSbFeature.ATMOSPHERIC_FILTER.isSelected() && !LorenzUtils.inSkyBlock) ||
+            (LorenzUtils.inSkyBlock && (GardenAPI.inGarden() || config.outsideGarden))
+        )
 }

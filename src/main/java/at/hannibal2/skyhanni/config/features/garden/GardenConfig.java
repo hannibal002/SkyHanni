@@ -205,8 +205,8 @@ public class GardenConfig {
     public double jacobContestCustomBpsValue = 19.9;
 
     @Expose
-    @ConfigLink(owner = GardenConfig.class, field = "jacobContextTimes")
-    public Position jacobContestTimesPos = new Position(-359, 149, false, true);
+    @ConfigLink(owner = GardenConfig.class, field = "jacobContestTimes")
+    public Position jacobContestTimesPosition = new Position(-359, 149, false, true);
 
     @Expose
     @ConfigOption(

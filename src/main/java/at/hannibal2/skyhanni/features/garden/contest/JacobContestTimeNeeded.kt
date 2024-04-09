@@ -188,7 +188,7 @@ class JacobContestTimeNeeded {
     fun onBackgroundDraw(event: GuiRenderEvent.ChestGuiOverlayRenderEvent) {
         if (!isEnabled()) return
         if (!FarmingContestAPI.inInventory) return
-        config.jacobContestTimesPos.renderStringsAndItems(display, posLabel = "Jacob Contest Time Needed")
+        config.jacobContestTimesPosition.renderStringsAndItems(display, posLabel = "Jacob Contest Time Needed")
     }
 
     fun isEnabled() = LorenzUtils.inSkyBlock && config.jacobContestTimes

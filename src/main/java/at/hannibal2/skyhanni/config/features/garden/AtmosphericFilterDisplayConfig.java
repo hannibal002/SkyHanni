@@ -40,7 +40,7 @@ public class AtmosphericFilterDisplayConfig {
     @ConfigLink(owner = AtmosphericFilterDisplayConfig.class, field = "enabled")
     public Position position = new Position(10, 10, true, true);
     @Expose
-    @ConfigLink(owner = AtmosphericFilterDisplayConfig.class, field = "everywhere")
+    @ConfigLink(owner = AtmosphericFilterDisplayConfig.class, field = "outsideGarden")
     public Position positionOutside = new Position(20, 20, true, true);
 
 }

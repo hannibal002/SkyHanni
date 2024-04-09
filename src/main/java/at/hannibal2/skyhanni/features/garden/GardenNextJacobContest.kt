@@ -646,8 +646,9 @@ object GardenNextJacobContest {
             ConfigUtils.migrateIntToEnum(element, ShareContestsEntry::class.java)
         }
         event.move(18, "garden.nextJacobContests.everywhere", "garden.nextJacobContests.showOutsideGarden")
-        event.move(33, "garden.jacobContextTimesPos", "garden.jacobContestTimesPos")
+        event.move(33, "garden.jacobContextTimesPos", "garden.jacobContestTimesPosition")
         event.move(33, "garden.jacobContextTimes", "garden.jacobContestTimes")
+        event.move(33, "garden.everywhere", "garden.outsideGarden")
         event.transform(33, "misc.showOutsideSB") { element ->
             element.asJsonArray.map { setting ->
                 if (setting.asString == "NEXT_JACOB_CONTEXT") JsonPrimitive("NEXT_JACOB_CONTEST") else setting
