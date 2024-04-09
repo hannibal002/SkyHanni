@@ -14,7 +14,7 @@ public class PestFinderConfig {
     @Expose
     @ConfigOption(
         name = "Display",
-        desc = "Show a display with all know pest locations."
+        desc = "Show a display with all known pest locations."
     )
     @ConfigEditorBoolean
     @FeatureToggle
