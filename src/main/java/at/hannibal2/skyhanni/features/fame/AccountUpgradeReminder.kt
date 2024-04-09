@@ -6,7 +6,7 @@ import at.hannibal2.skyhanni.events.GuiContainerEvent
 import at.hannibal2.skyhanni.events.InventoryCloseEvent
 import at.hannibal2.skyhanni.events.InventoryFullyOpenedEvent
 import at.hannibal2.skyhanni.events.LorenzChatEvent
-import at.hannibal2.skyhanni.events.LorenzTickEvent
+import at.hannibal2.skyhanni.events.SecondPassedEvent
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.LorenzUtils
@@ -15,13 +15,11 @@ import at.hannibal2.skyhanni.utils.SimpleTimeMark.Companion.asTimeMark
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.days
-import kotlin.time.Duration.Companion.seconds
 
 class AccountUpgradeReminder {
 
     private var inInventory = false
     private var duration: Duration? = null
-    private var lastReminderSend = SimpleTimeMark.farPast()
 
     // TODO: find a way to save SimpleTimeMark directly in the config
     private var nextCompletionTime: SimpleTimeMark?
@@ -32,16 +30,11 @@ class AccountUpgradeReminder {
             }
         }
 
-    @SubscribeEvent
-    fun onTick(event: LorenzTickEvent) {
-        if (!LorenzUtils.inSkyBlock) return
-        if (event.repeatSeconds(1)) {
-            checkReminder()
-        }
-    }
-
     // TODO: Merge this logic with CityProjectFeatures reminder to reduce duplication
-    private fun checkReminder() {
+    @SubscribeEvent
+    fun onSecondPassed(event: SecondPassedEvent) {
+        if (!LorenzUtils.inSkyBlock) return
+
         if (!isEnabled()) return
         val playerSpecific = ProfileStorageData.playerSpecific ?: return
         if (ReminderUtils.isBusy()) return
@@ -50,9 +43,6 @@ class AccountUpgradeReminder {
         val upgrade = playerSpecific.currentAccountUpgrade ?: return
         val nextCompletionTime = nextCompletionTime ?: return
         if (!nextCompletionTime.isInPast()) return
-
-        if (lastReminderSend.passedSince() < 30.seconds) return
-        lastReminderSend = SimpleTimeMark.now()
 
         ChatUtils.clickableChat(
             "The §a$upgrade §eupgrade has completed! §c(Click to disable these reminders)",

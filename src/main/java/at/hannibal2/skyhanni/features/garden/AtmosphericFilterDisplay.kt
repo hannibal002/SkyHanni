@@ -2,7 +2,7 @@ package at.hannibal2.skyhanni.features.garden
 
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.events.GuiRenderEvent
-import at.hannibal2.skyhanni.events.LorenzTickEvent
+import at.hannibal2.skyhanni.events.SecondPassedEvent
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.RenderUtils.renderString
 import at.hannibal2.skyhanni.utils.Season
@@ -15,10 +15,9 @@ class AtmosphericFilterDisplay {
     private var display = ""
 
     @SubscribeEvent
-    fun onTick(event: LorenzTickEvent) {
+    fun onSecondPassed(event: SecondPassedEvent) {
         if (!isEnabled()) return
         if (!GardenAPI.inGarden() && !config.everywhere) return
-        if (!event.repeatSeconds(1)) return
         display = drawDisplay(Season.getCurrentSeason() ?: return)
     }
 
