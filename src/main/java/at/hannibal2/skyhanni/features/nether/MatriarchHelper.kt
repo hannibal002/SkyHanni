@@ -60,7 +60,7 @@ class MatriarchHelper {
             val color = config.lineColor.toChromaColor()
             var prePoint = event.exactPlayerEyeLocation()
             pearlList.forEach {
-                val point = it.baseEntity.getLorenzVec()
+                val point = it.baseEntity.getLorenzVec().add(y = 1.5)
                 event.draw3DLine(prePoint, point, color, 10, true)
                 prePoint = point
             }
