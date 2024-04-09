@@ -390,7 +390,6 @@ object GardenNextJacobContest {
             duration -= contestDuration
         }
         for (crop in nextContest.crops) {
-            list.add(" ")
             list.addCropIcon(crop, highlight = (crop == boostedCrop))
             nextContestCrops.add(crop)
         }
@@ -494,7 +493,7 @@ object GardenNextJacobContest {
         if (display.isEmpty()) {
             config.pos.renderStrings(simpleDisplay, posLabel = "Next Jacob Contest")
         } else {
-            config.pos.renderSingleLineWithItems(display, 1.0, posLabel = "Next Jacob Contest")
+            config.pos.renderSingleLineWithItems(display, posLabel = "Next Jacob Contest")
         }
     }
 
