@@ -112,6 +112,20 @@ interface Renderable {
             )
         }
 
+        fun multiClickAndHover(
+            text: Any,
+            tips: List<Any>,
+            bypassChecks: Boolean = false,
+            click: List<Pair<Int, () -> Unit>>,
+            onHover: () -> Unit = {},
+        ): Renderable {
+            return multiClickable(
+                hoverTips(text, tips, bypassChecks = bypassChecks, onHover = onHover),
+                click,
+                bypassChecks = bypassChecks
+            )
+        }
+
         fun clickable(
             render: Renderable,
             onClick: () -> Unit,
@@ -129,6 +143,28 @@ interface Renderable {
                     shouldAllowLink(true, bypassChecks) && (button - 100).isKeyClicked()
                 ) {
                     onClick()
+                }
+                render.render(posX, posY)
+            }
+        }
+
+        fun multiClickable(
+            render: Renderable,
+            click: List<Pair<Int, () -> Unit>>,
+            bypassChecks: Boolean = false,
+            condition: () -> Boolean = { true },
+        ) = object : Renderable {
+            override val width = render.width
+            override val height = render.height
+            override val horizontalAlign = render.horizontalAlign
+            override val verticalAlign = render.verticalAlign
+
+            override fun render(posX: Int, posY: Int) {
+                if (isHovered(posX, posY) && condition() &&
+                    shouldAllowLink(true, bypassChecks)
+                ) for ((button, onClick) in click) {
+                    if ((button - 100).isKeyClicked())
+                        onClick()
                 }
                 render.render(posX, posY)
             }
