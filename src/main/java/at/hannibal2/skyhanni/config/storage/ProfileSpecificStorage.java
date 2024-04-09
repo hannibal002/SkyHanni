@@ -6,7 +6,7 @@ import at.hannibal2.skyhanni.data.model.ComposterUpgrade;
 import at.hannibal2.skyhanni.features.combat.endernodetracker.EnderNodeTracker;
 import at.hannibal2.skyhanni.features.combat.ghostcounter.GhostData;
 import at.hannibal2.skyhanni.features.dungeon.CroesusChestTracker;
-import at.hannibal2.skyhanni.features.dungeon.DungeonAPI;
+import at.hannibal2.skyhanni.features.dungeon.DungeonFloor;
 import at.hannibal2.skyhanni.features.event.diana.DianaProfitTracker;
 import at.hannibal2.skyhanni.features.event.diana.MythologicalCreatureTracker;
 import at.hannibal2.skyhanni.features.event.jerry.frozentreasure.FrozenTreasureTracker;
@@ -409,7 +409,7 @@ public class ProfileSpecificStorage {
     public static class DungeonStorage {
 
         @Expose
-        public Map<DungeonAPI.DungeonFloor, Integer> bosses = new HashMap<>();
+        public Map<DungeonFloor, Integer> bosses = new HashMap<>();
 
         @Expose
         public List<DungeonStorage.DungeonRunInfo> runs = Stream.generate(DungeonStorage.DungeonRunInfo::new)

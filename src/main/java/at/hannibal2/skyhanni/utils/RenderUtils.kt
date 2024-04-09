@@ -12,8 +12,8 @@ import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 import at.hannibal2.skyhanni.utils.renderables.RenderableUtils.renderXAligned
 import at.hannibal2.skyhanni.utils.shader.ShaderManager
-import io.github.moulberry.moulconfig.internal.TextRenderUtils
 import io.github.moulberry.notenoughupdates.util.Utils
+import io.github.notenoughupdates.moulconfig.internal.TextRenderUtils
 import net.minecraft.client.Minecraft
 import net.minecraft.client.gui.FontRenderer
 import net.minecraft.client.gui.Gui
@@ -21,6 +21,7 @@ import net.minecraft.client.gui.ScaledResolution
 import net.minecraft.client.renderer.GLAllocation
 import net.minecraft.client.renderer.GlStateManager
 import net.minecraft.client.renderer.Tessellator
+import net.minecraft.client.renderer.WorldRenderer
 import net.minecraft.client.renderer.vertex.DefaultVertexFormats
 import net.minecraft.enchantment.Enchantment
 import net.minecraft.entity.Entity
@@ -138,7 +139,8 @@ object RenderUtils {
 
     fun getViewerPos(partialTicks: Float) = exactLocation(Minecraft.getMinecraft().renderViewEntity, partialTicks)
 
-    fun AxisAlignedBB.expandBlock() = expand(0.0020000000949949026, 0.0020000000949949026, 0.0020000000949949026)
+    fun AxisAlignedBB.expandBlock(n: Int = 1) = expand(LorenzVec.expandVector.multiply(n))
+    fun AxisAlignedBB.inflateBlock(n: Int = 1) = expand(LorenzVec.expandVector.multiply(-n))
 
     /**
      * Taken from NotEnoughUpdates under Creative Commons Attribution-NonCommercial 3.0
@@ -526,7 +528,7 @@ object RenderUtils {
     fun Position.renderStringsAndItems(
         list: List<List<Any?>>,
         extraSpace: Int = 0,
-        itemScale: Double = 1.0,
+        itemScale: Double = NEUItems.itemFontSize,
         posLabel: String,
     ) {
         if (list.isEmpty()) return
@@ -554,13 +556,20 @@ object RenderUtils {
      * Accepts a single line to print.
      * This  line is a list of things to print. Can print String or ItemStack objects.
      */
-    fun Position.renderSingleLineWithItems(list: List<Any?>, itemScale: Double = 1.0, posLabel: String) {
+    fun Position.renderSingleLineWithItems(
+        list: List<Any?>,
+        posLabel: String
+    ) {
         if (list.isEmpty()) return
-        val longestX = renderLine(list, 0, itemScale)
-        GuiEditManager.add(this, posLabel, longestX, 10)
+        renderRenderables(
+            listOf(
+                Renderable.horizontalContainer(
+                    list.mapNotNull { Renderable.fromAny(it) }
+                )), posLabel = posLabel)
+        // TODO Future write that better
     }
 
-    private fun Position.renderLine(line: List<Any?>, offsetY: Int, itemScale: Double = 1.0): Int {
+    private fun Position.renderLine(line: List<Any?>, offsetY: Int, itemScale: Double = NEUItems.itemFontSize): Int {
         GlStateManager.pushMatrix()
         val (x, y) = transform()
         GlStateManager.translate(0f, offsetY.toFloat(), 0F)
@@ -578,13 +587,17 @@ object RenderUtils {
         return offsetX
     }
 
-    fun MutableList<Any>.addItemIcon(item: ItemStack, highlight: Boolean = false) {
+    fun MutableList<Any>.addItemIcon(
+        item: ItemStack,
+        highlight: Boolean = false,
+        scale: Double = NEUItems.itemFontSize
+    ) {
         try {
             if (highlight) {
                 // Hack to add enchant glint, like Hypixel does it
                 item.addEnchantment(Enchantment.protection, 0)
             }
-            add(item)
+            add(Renderable.itemStack(item, scale))
         } catch (e: NullPointerException) {
             ErrorManager.logErrorWithData(
                 e, "Add item icon to renderable list",
@@ -737,9 +750,11 @@ object RenderUtils {
                 worldrenderer.pos(x1, y1, z1).endVertex()
                 worldrenderer.pos(x2, y2, z2).endVertex()
 
-                val x3 = x + radius * sin(Math.PI * (phi + 1) / segments) * cos(2.0 * Math.PI * (theta + 1) / (segments * 2))
+                val x3 =
+                    x + radius * sin(Math.PI * (phi + 1) / segments) * cos(2.0 * Math.PI * (theta + 1) / (segments * 2))
                 val y3 = y + radius * cos(Math.PI * (phi + 1) / segments)
-                val z3 = z + radius * sin(Math.PI * (phi + 1) / segments) * sin(2.0 * Math.PI * (theta + 1) / (segments * 2))
+                val z3 =
+                    z + radius * sin(Math.PI * (phi + 1) / segments) * sin(2.0 * Math.PI * (theta + 1) / (segments * 2))
 
                 val x4 = x + radius * sin(Math.PI * phi / segments) * cos(2.0 * Math.PI * (theta + 1) / (segments * 2))
                 val y4 = y + radius * cos(Math.PI * phi / segments)
@@ -798,9 +813,11 @@ object RenderUtils {
                 val y2 = y + radius * cos(Math.PI * (phi + 1) / segments)
                 val z2 = z + radius * sin(Math.PI * (phi + 1) / segments) * sin(2.0 * Math.PI * theta / (segments * 2))
 
-                val x3 = x + radius * sin(Math.PI * (phi + 1) / segments) * cos(2.0 * Math.PI * (theta + 1) / (segments * 2))
+                val x3 =
+                    x + radius * sin(Math.PI * (phi + 1) / segments) * cos(2.0 * Math.PI * (theta + 1) / (segments * 2))
                 val y3 = y + radius * cos(Math.PI * (phi + 1) / segments)
-                val z3 = z + radius * sin(Math.PI * (phi + 1) / segments) * sin(2.0 * Math.PI * (theta + 1) / (segments * 2))
+                val z3 =
+                    z + radius * sin(Math.PI * (phi + 1) / segments) * sin(2.0 * Math.PI * (theta + 1) / (segments * 2))
 
                 val x4 = x + radius * sin(Math.PI * phi / segments) * cos(2.0 * Math.PI * (theta + 1) / (segments * 2))
                 val y4 = y + radius * cos(Math.PI * phi / segments)
@@ -1145,6 +1162,69 @@ object RenderUtils {
         GlStateManager.enableTexture2D()
         GlStateManager.enableCull()
         GlStateManager.disableBlend()
+    }
+
+    fun WorldRenderer.pos(vec: LorenzVec) = this.pos(vec.x, vec.y, vec.z)
+
+    fun draw3DQuad(
+        middlePoint: LorenzVec,
+        sidePoint1: LorenzVec,
+        sidePoint2: LorenzVec,
+        c: Color,
+        partialTicks: Float = 0F,
+    ) = QuadDrawer.draw3D(partialTicks) {
+        draw(
+            middlePoint,
+            sidePoint1,
+            sidePoint2,
+            c
+        )
+    }
+
+    class QuadDrawer @PublishedApi internal constructor(val tessellator: Tessellator) {
+        val worldRenderer = tessellator.worldRenderer
+        inline fun draw(
+            middlePoint: LorenzVec,
+            sidePoint1: LorenzVec,
+            sidePoint2: LorenzVec,
+            c: Color
+        ) {
+            GlStateManager.color(c.red / 255f, c.green / 255f, c.blue / 255f, c.alpha / 255f)
+            worldRenderer.begin(GL11.GL_QUADS, DefaultVertexFormats.POSITION)
+            worldRenderer.pos(sidePoint1).endVertex()
+            worldRenderer.pos(middlePoint).endVertex()
+            worldRenderer.pos(sidePoint2).endVertex()
+            worldRenderer.pos(sidePoint1.add(sidePoint2).subtract(middlePoint)).endVertex()
+            tessellator.draw()
+        }
+
+        companion object {
+            inline fun draw3D(
+                partialTicks: Float = 0F,
+                crossinline quads: QuadDrawer.() -> Unit
+            ) {
+
+                GlStateManager.enableBlend()
+                GlStateManager.disableLighting()
+                GlStateManager.tryBlendFuncSeparate(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA, 1, 0)
+                GlStateManager.disableTexture2D()
+                GlStateManager.disableCull()
+
+                val tessellator = Tessellator.getInstance()
+
+                GlStateManager.pushMatrix()
+                RenderUtils.translate(getViewerPos(partialTicks).negated())
+                getViewerPos(partialTicks)
+
+                quads.invoke(QuadDrawer(Tessellator.getInstance()))
+
+                GlStateManager.popMatrix()
+
+                GlStateManager.enableTexture2D()
+                GlStateManager.enableCull()
+                GlStateManager.disableBlend()
+            }
+        }
     }
 
     fun drawFilledBoundingBox_nea(

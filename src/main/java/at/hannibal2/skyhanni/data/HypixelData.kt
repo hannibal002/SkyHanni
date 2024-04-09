@@ -15,6 +15,7 @@ import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.LorenzLogger
 import at.hannibal2.skyhanni.utils.LorenzUtils
+import at.hannibal2.skyhanni.utils.LorenzUtils.isInIsland
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.StringUtils.matchFirst
 import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
@@ -84,6 +85,15 @@ class HypixelData {
             "SK[YI]BLOCK(?: CO-OP| GUEST)?"
         )
 
+        /**
+         * REGEX-TEST:  §7⏣ §bVillage
+         * REGEX-TEST:  §5ф §dWizard Tower
+         */
+        private val skyblockAreaPattern by patternGroup.pattern(
+            "skyblock.area",
+            "\\s*§(?<symbol>7⏣|5ф) §(?<color>.)(?<area>.*)"
+        )
+
         var hypixelLive = false
         var hypixelAlpha = false
         var inLobby = false
@@ -103,6 +113,7 @@ class HypixelData {
         var joinedWorld = SimpleTimeMark.farPast()
 
         var skyBlockArea = "?"
+        var skyBlockAreaWithSymbol = "?"
 
         // Data from locraw
         var locrawData: JsonObject? = null
@@ -155,7 +166,7 @@ class HypixelData {
                 playerAmountGuestingPattern
             )
 
-            out@for (pattern in playerPatternList) {
+            out@ for (pattern in playerPatternList) {
                 for (line in TabListData.getTabList()) {
                     pattern.matchMatcher(line) {
                         amount += group("amount").toInt()
@@ -172,6 +183,7 @@ class HypixelData {
             ScoreboardData.sidebarLinesFormatted.matchFirst(scoreboardVisitingAmoutPattern) {
                 return group("maxamount").toInt()
             }
+            if (IslandType.CRYSTAL_HOLLOWS.isInIsland()) return 24
             return if (serverId?.startsWith("mega") == true) 80 else 26
         }
 
@@ -282,11 +294,14 @@ class HypixelData {
         }
 
         if (LorenzUtils.inSkyBlock) {
-            val originalLocation = ScoreboardData.sidebarLinesFormatted
-                .firstOrNull { it.startsWith(" §7⏣ ") || it.startsWith(" §5ф ") }
-                ?.substring(5)?.removeColor()
-                ?: "?"
-            skyBlockArea = LocationFixData.fixLocation(skyBlockIsland) ?: originalLocation
+            loop@ for (line in ScoreboardData.sidebarLinesFormatted) {
+                skyblockAreaPattern.matchMatcher(line) {
+                    val originalLocation = group("area")
+                    skyBlockArea = LocationFixData.fixLocation(skyBlockIsland) ?: originalLocation
+                    skyBlockAreaWithSymbol = line.trim()
+                    break@loop
+                }
+            }
 
             checkProfileName()
         }

@@ -5,6 +5,7 @@ import at.hannibal2.skyhanni.utils.LorenzColor
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.NEUInternalName
 import at.hannibal2.skyhanni.utils.NEUInternalName.Companion.asInternalName
+import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import kotlin.math.floor
 
 enum class ItemAbility(
@@ -106,7 +107,7 @@ enum class ItemAbility(
         } else {
             duration /= 1000
             duration++
-            LorenzUtils.formatInteger(duration)
+            duration.addSeparators()
         }
     }
 
@@ -126,7 +127,7 @@ enum class ItemAbility(
 
         private fun ItemAbility.getMageCooldownReduction(): Double? {
             if (ignoreMageCooldownReduction) return null
-            if (!LorenzUtils.inDungeons) return null
+            if (!DungeonAPI.inDungeon()) return null
             if (DungeonAPI.playerClass != DungeonAPI.DungeonClass.MAGE) return null
 
             var abilityCooldownMultiplier = 1.0
