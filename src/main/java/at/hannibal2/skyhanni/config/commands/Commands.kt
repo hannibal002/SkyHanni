@@ -553,8 +553,7 @@ object Commands {
         if (!LorenzUtils.inSkyBlock) {
             ChatUtils.userError("Join SkyBlock to open the fortune guide!")
         } else {
-            CaptureFarmingGear.captureFarmingGear()
-            SkyHanniMod.screenToOpen = FFGuideGUI()
+            FFGuideGUI.open()
         }
     }
 

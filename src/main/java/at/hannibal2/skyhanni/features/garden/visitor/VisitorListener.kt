@@ -131,6 +131,49 @@ class VisitorListener {
         inventory.handleMouseClick_skyhanni(slot, slot.slotIndex, 0, 0)
     }
 
+    @SubscribeEvent(priority = EventPriority.HIGH)
+    fun onSlotClick(event: GuiContainerEvent.SlotClickEvent) {
+        if (!VisitorAPI.inInventory) return
+        if (event.clickType != 0) return
+
+        val visitor = VisitorAPI.getVisitor(lastClickedNpc) ?: return
+
+        if (event.slotId == VISITOR_REFUSE_ITEM_SLOT) {
+            if (event.slot?.stack?.name != "§cRefuse Offer") return
+
+            visitor.hasReward()?.let {
+                if (config.rewardWarning.preventRefusing) {
+                    if (config.rewardWarning.bypassKey.isKeyHeld()) {
+                        ChatUtils.chat("§cBypassed blocking refusal of visitor ${visitor.visitorName} §7(${it.displayName}§7)")
+                        return
+                    }
+                    event.isCanceled = true
+                    ChatUtils.chat("§cBlocked refusing visitor ${visitor.visitorName} §7(${it.displayName}§7)")
+                    if (config.rewardWarning.bypassKey == Keyboard.KEY_NONE) {
+                        ChatUtils.chatAndOpenConfig(
+                            "§eIf you want to deny this visitor, set a keybind in §e/sh bypass",
+                            GardenAPI.config.visitors.rewardWarning::bypassKey
+                        )
+                    }
+                    Minecraft.getMinecraft().thePlayer.closeScreen()
+                    return
+                }
+            }
+
+            VisitorAPI.changeStatus(visitor, VisitorStatus.REFUSED, "refused")
+            // fallback if tab list is disabled
+            DelayedRun.runDelayed(10.seconds) {
+                VisitorAPI.removeVisitor(visitor.visitorName)
+            }
+            return
+        }
+        if (event.slotId == VISITOR_ACCEPT_ITEM_SLOT && event.slot?.stack?.getLore()
+                ?.any { it == "§eClick to give!" } == true
+        ) {
+            VisitorAPI.changeStatus(visitor, VisitorStatus.ACCEPTED, "accepted")
+            return
+        }
+    }
 
     @SubscribeEvent(priority = EventPriority.HIGH)
     fun onTooltip(event: ItemTooltipEvent) {

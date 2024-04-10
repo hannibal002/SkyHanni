@@ -5,6 +5,7 @@ import at.hannibal2.skyhanni.config.core.config.Position;
 import com.google.gson.annotations.Expose;
 import io.github.notenoughupdates.moulconfig.annotations.Accordion;
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorBoolean;
+import io.github.notenoughupdates.moulconfig.annotations.ConfigLink;
 import io.github.notenoughupdates.moulconfig.annotations.ConfigOption;
 
 public class WinterConfig {
@@ -36,6 +37,7 @@ public class WinterConfig {
     public boolean islandCloseTime = true;
 
     @Expose
+    @ConfigLink(owner = WinterConfig.class, field = "islandCloseTime")
     public Position islandCloseTimePosition = new Position(10, 10, false, true);
 
     @Expose

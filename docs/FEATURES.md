@@ -1044,6 +1044,9 @@ Use `/sh` or `/skyhanni` to open the SkyHanni config in game.
     + A ton of settings.
 + No Bits Available Warning. - Empa (https://github.com/hannibal002/SkyHanni/pull/1286)
     + Warns when you run out of available bits to generate.
++ Link from HUD elements to config options. - nea (https://github.com/hannibal002/SkyHanni/pull/1383)
+    + Simply right-click a HUD element in the HUD editor to jump to its associated options.
+    + Does not yet work on every GUI element. Wait for the missing elements in the following betas.
 
 </details>
 <details open><summary>
