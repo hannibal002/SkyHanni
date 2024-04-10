@@ -16,7 +16,7 @@ import java.awt.Color
 
 class CrystalHollowsWalls {
 
-    val config get() = SkyHanniMod.feature.mining.crystalHollowsAreaWalls
+    private val config get() = SkyHanniMod.feature.mining.crystalHollowsAreaWalls
 
     fun isEnabled() = config.enabled && IslandType.CRYSTAL_HOLLOWS.isInIsland()
 
