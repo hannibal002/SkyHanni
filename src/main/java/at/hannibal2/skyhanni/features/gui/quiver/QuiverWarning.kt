@@ -16,6 +16,7 @@ import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.DelayedRun
 import at.hannibal2.skyhanni.utils.ItemUtils.getItemRarityOrNull
 import at.hannibal2.skyhanni.utils.NEUItems
+import at.hannibal2.skyhanni.utils.NEUItems.getItemStackOrNull
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.SoundUtils
@@ -71,12 +72,11 @@ class QuiverWarning {
         if (!config.reminderAfterRun) return
         if (arrowsUsedInRun.isEmpty()) return
         for (arrow in arrowsUsedInRun) {
-            if ((arrowAmount[arrow.internalName] ?: return) <= config.lowQuiverAmount) {
-                val rarity =
-                    NEUItems.getItemStackOrNull(arrow.internalName.asString())?.getItemRarityOrNull()?.chatColorCode
-                        ?: "§f"
-                arrowsToAlert.add(rarity + arrow.arrow)
-            }
+            val internalName = arrow.internalName
+            val amount = arrowAmount[internalName] ?: continue
+            if (amount > config.lowQuiverAmount) continue
+            val rarity = internalName.getItemStackOrNull()?.getItemRarityOrNull()?.chatColorCode ?: "§f"
+            arrowsToAlert.add(rarity + arrow.arrow)
         }
         if (arrowsToAlert.isNotEmpty()) instanceAlert()
     }
