@@ -14,7 +14,7 @@ class GriffinPetWarning {
 
     @SubscribeEvent
     fun onTick(event: LorenzTickEvent) {
-        if (!event.isMod(20)) return
+        if (!event.isMod(10)) return
         if (!SkyHanniMod.feature.event.diana.petWarning) return
         if (!DianaAPI.isDoingDiana()) return
         if (!DianaAPI.hasSpadeInHand()) return

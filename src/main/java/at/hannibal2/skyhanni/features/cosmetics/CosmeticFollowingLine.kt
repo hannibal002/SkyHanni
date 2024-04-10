@@ -22,7 +22,7 @@ import kotlin.time.Duration.Companion.seconds
 
 class CosmeticFollowingLine {
 
-    private val config get() = SkyHanniMod.feature.misc.cosmetic.followingLine
+    private val config get() = SkyHanniMod.feature.gui.cosmetic.followingLine
 
     private var locations = mapOf<LorenzVec, LocationSpot>()
     private var latestLocations = mapOf<LorenzVec, LocationSpot>()
@@ -130,5 +130,6 @@ class CosmeticFollowingLine {
         event.move(9, "misc.cosmeticConfig", "misc.cosmetic")
         event.move(9, "misc.cosmeticConfig.followingLineConfig", "misc.cosmetic.followingLine")
         event.move(9, "misc.cosmeticConfig.arrowTrailConfig", "misc.cosmetic.arrowTrail")
+        event.move(31, "misc.cosmetic", "gui.cosmetic")
     }
 }

@@ -1,6 +1,6 @@
 package at.hannibal2.skyhanni.features.nether.reputationhelper.dailyquest.quest
 
-import at.hannibal2.skyhanni.features.nether.reputationhelper.dailykuudra.KuudraTier
+import at.hannibal2.skyhanni.features.nether.kuudra.KuudraTier
 
 class KuudraQuest(val kuudraTier: KuudraTier, state: QuestState) :
     Quest(

@@ -3,9 +3,7 @@ package at.hannibal2.skyhanni.config;
 import at.hannibal2.skyhanni.SkyHanniMod;
 import at.hannibal2.skyhanni.config.features.About;
 import at.hannibal2.skyhanni.config.features.chat.ChatConfig;
-import at.hannibal2.skyhanni.config.features.chroma.ChromaConfig;
 import at.hannibal2.skyhanni.config.features.combat.CombatConfig;
-import at.hannibal2.skyhanni.config.features.commands.CommandsConfig;
 import at.hannibal2.skyhanni.config.features.crimsonisle.CrimsonIsleConfig;
 import at.hannibal2.skyhanni.config.features.dev.DevConfig;
 import at.hannibal2.skyhanni.config.features.dungeon.DungeonConfig;
@@ -14,20 +12,19 @@ import at.hannibal2.skyhanni.config.features.fishing.FishingConfig;
 import at.hannibal2.skyhanni.config.features.garden.GardenConfig;
 import at.hannibal2.skyhanni.config.features.gui.GUIConfig;
 import at.hannibal2.skyhanni.config.features.inventory.InventoryConfig;
-import at.hannibal2.skyhanni.config.features.itemability.ItemAbilityConfig;
-import at.hannibal2.skyhanni.config.features.markedplayer.MarkedPlayerConfig;
 import at.hannibal2.skyhanni.config.features.mining.MiningConfig;
-import at.hannibal2.skyhanni.config.features.minion.MinionsConfig;
 import at.hannibal2.skyhanni.config.features.misc.MiscConfig;
 import at.hannibal2.skyhanni.config.features.rift.RiftConfig;
 import at.hannibal2.skyhanni.config.features.skillprogress.SkillProgressConfig;
 import at.hannibal2.skyhanni.config.features.slayer.SlayerConfig;
-import at.hannibal2.skyhanni.config.features.stranded.StrandedConfig;
 import at.hannibal2.skyhanni.config.storage.Storage;
+import at.hannibal2.skyhanni.utils.LorenzUtils;
 import com.google.gson.annotations.Expose;
-import io.github.moulberry.moulconfig.Config;
-import io.github.moulberry.moulconfig.Social;
-import io.github.moulberry.moulconfig.annotations.Category;
+import io.github.notenoughupdates.moulconfig.Config;
+import io.github.notenoughupdates.moulconfig.Social;
+import io.github.notenoughupdates.moulconfig.annotations.Category;
+import io.github.notenoughupdates.moulconfig.gui.HorizontalAlign;
+import io.github.notenoughupdates.moulconfig.processor.ProcessedCategory;
 import net.minecraft.util.ResourceLocation;
 
 import java.util.Arrays;
@@ -42,6 +39,13 @@ public class Features extends Config {
     @Override
     public boolean shouldAutoFocusSearchbar() {
         return true;
+    }
+
+    @Override
+    public HorizontalAlign alignCategory(ProcessedCategory category, boolean isSelected) {
+        if (LorenzUtils.INSTANCE.isAprilFoolsDay())
+            return HorizontalAlign.RIGHT;
+        return super.alignCategory(category, isSelected);
     }
 
     @Override
@@ -60,7 +64,11 @@ public class Features extends Config {
 
     @Override
     public String getTitle() {
-        return "SkyHanni " + SkyHanniMod.getVersion() + " by §channibal2§r, config by §5Moulberry §rand §5nea89";
+        String modName = "SkyHanni";
+        if (LorenzUtils.INSTANCE.isAprilFoolsDay())
+            modName = new StringBuilder().append("اسکای هانی").reverse().toString(); // Minecraft does not render RTL strings very nicely, so we reverse the string here. Not authentic, but close enough.
+
+        return modName + " " + SkyHanniMod.getVersion() + " by §channibal2§r, config by §5Moulberry §rand §5nea89";
     }
 
     /*
@@ -68,6 +76,9 @@ public class Features extends Config {
      * The only exceptions to this are About and GUI, which are pinned to the top
      * and Misc and Dev, which are to be at the bottom. Thanks!
      */
+
+
+    // Top
 
     @Expose
     @Category(name = "About", desc = "Information about SkyHanni and updates.")
@@ -77,81 +88,67 @@ public class Features extends Config {
     @Category(name = "GUI", desc = "Change the locations of GUI elements (§e/sh gui§7).")
     public GUIConfig gui = new GUIConfig();
 
-    @Expose
-    @Category(name = "Chat", desc = "Change how the chat looks.")
-    public ChatConfig chat = new ChatConfig();
-
-    @Expose
-    @Category(name = "Chroma", desc = "Settings for Chroma text (Credit to SBA).")
-    public ChromaConfig chroma = new ChromaConfig();
-
-    @Expose
-    @Category(name = "Combat", desc = "Everything combat and PvE related.")
-    public CombatConfig combat = new CombatConfig();
-
-    @Expose
-    @Category(name = "Commands", desc = "Enable or disable commands.")
-    public CommandsConfig commands = new CommandsConfig();
-
-    @Expose
-    @Category(name = "Crimson Isle", desc = "Things to do on the Crimson Isle/Nether island.")
-    public CrimsonIsleConfig crimsonIsle = new CrimsonIsleConfig();
-
-    @Expose
-    @Category(name = "Dungeon", desc = "Features that change the Dungeons experience in The Catacombs.")
-    public DungeonConfig dungeon = new DungeonConfig();
-
-    @Expose
-    @Category(name = "Events", desc = "Stuff that is not always available.")
-    public EventConfig event = new EventConfig();
-
-    @Expose
-    @Category(name = "Fishing", desc = "Fishing stuff.")
-    public FishingConfig fishing = new FishingConfig();
+    // Islands
 
     @Expose
     @Category(name = "Garden", desc = "Features for the Garden island.")
     public GardenConfig garden = new GardenConfig();
 
     @Expose
-    @Category(name = "Inventory", desc = "Change the behavior of items and the inventory.")
-    public InventoryConfig inventory = new InventoryConfig();
+    @Category(name = "Crimson Isle", desc = "Things to do on the Crimson Isle/Nether island.")
+    public CrimsonIsleConfig crimsonIsle = new CrimsonIsleConfig();
 
     @Expose
-    @Category(name = "Item Abilities", desc = "Stuff about item abilities.")
-    public ItemAbilityConfig itemAbilities = new ItemAbilityConfig();
+    @Category(name = "The Rift", desc = "Features for The Rift dimension.")
+    public RiftConfig rift = new RiftConfig();
+
+    // Skills
 
     @Expose
-    @Category(name = "Marked Players", desc = "Players that got marked with §e/shmarkplayer§7.")
-    public MarkedPlayerConfig markedPlayers = new MarkedPlayerConfig();
-
-    @Expose
-    @Category(name = "Minions", desc = "The minions on your private island.")
-    public MinionsConfig minions = new MinionsConfig();
+    @Category(name = "Fishing", desc = "Fishing stuff.")
+    public FishingConfig fishing = new FishingConfig();
 
     @Expose
     @Category(name = "Mining", desc = "Features that help you break blocks.")
     public MiningConfig mining = new MiningConfig();
 
+    // Combat like
+
     @Expose
-    @Category(name = "Skill Progress", desc = "Skill Progress related config options.")
-    public SkillProgressConfig skillProgress = new SkillProgressConfig();
+    @Category(name = "Combat", desc = "Everything combat and PvE related.")
+    public CombatConfig combat = new CombatConfig();
 
     @Expose
     @Category(name = "Slayer", desc = "Slayer features.")
     public SlayerConfig slayer = new SlayerConfig();
 
     @Expose
-    @Category(name = "Stranded", desc = "Features for the Stranded game mode.")
-    public StrandedConfig stranded = new StrandedConfig();
+    @Category(name = "Dungeon", desc = "Features that change the Dungeons experience in The Catacombs.")
+    public DungeonConfig dungeon = new DungeonConfig();
+
+    // Misc
 
     @Expose
-    @Category(name = "The Rift", desc = "Features for The Rift dimension.")
-    public RiftConfig rift = new RiftConfig();
+    @Category(name = "Inventory", desc = "Change the behavior of items and the inventory.")
+    public InventoryConfig inventory = new InventoryConfig();
+
+    @Expose
+    @Category(name = "Events", desc = "Stuff that is not always available.")
+    public EventConfig event = new EventConfig();
+
+    @Expose
+    @Category(name = "Skill Progress", desc = "Skill Progress related config options.")
+    public SkillProgressConfig skillProgress = new SkillProgressConfig();
+
+    @Expose
+    @Category(name = "Chat", desc = "Change how the chat looks.")
+    public ChatConfig chat = new ChatConfig();
 
     @Expose
     @Category(name = "Misc", desc = "Settings without a category.")
     public MiscConfig misc = new MiscConfig();
+
+    // Bottom
 
     @Expose
     @Category(name = "Dev", desc = "Debug and test stuff. Developers are cool.")

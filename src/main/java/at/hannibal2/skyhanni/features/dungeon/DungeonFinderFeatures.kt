@@ -29,15 +29,15 @@ class DungeonFinderFeatures {
     private val patternGroup = RepoPattern.group("dungeon.finder")
     private val pricePattern by patternGroup.pattern(
         "price",
-        "([0-9]{2,3}K|[0-9]{1,3}M|[0-9]+\\.[0-9]M|[0-9] ?MIL)"
+        "(?i).*([0-9]{2,3}K|[0-9]{1,3}M|[0-9]+\\.[0-9]M|[0-9] ?MIL).*"
     )
     private val carryPattern by patternGroup.pattern(
         "carry",
-        "(CARRY|CARY|CARRIES|CARIES|COMP|TO CATA [0-9]{2})"
+        "(?i).*(CARRY|CARY|CARRIES|CARIES|COMP|TO CATA [0-9]{2}).*"
     )
     private val nonPugPattern by patternGroup.pattern(
         "nonpug",
-        "(PERM|VC|DISCORD)"
+        "(?i).*(PERM|VC|DISCORD).*"
     )
     private val memberPattern by patternGroup.pattern(
         "member",
@@ -53,7 +53,7 @@ class DungeonFinderFeatures {
     )
     private val notePattern by patternGroup.pattern(
         "note",
-        "(§7§7Note: |§f[^§])"
+        "§7§7Note: §f(?<note>.*)"
     )
     private val floorTypePattern by patternGroup.pattern(
         "floor.type",
@@ -167,7 +167,6 @@ class DungeonFinderFeatures {
             val floorNum = floorNumberPattern.matchMatcher(floor) {
                 group("floorNum").romanToDecimalIfNecessary()
             }
-
             map[slot] = getFloorName(floor, dungeon, floorNum)
         }
     }
@@ -192,7 +191,6 @@ class DungeonFinderFeatures {
             } ?: continue
             map[slot] = getFloorName(name, name, floorNum)
         }
-
     }
 
     private fun getFloorName(floor: String, dungeon: String, floorNum: Int?): String =
@@ -291,7 +289,7 @@ class DungeonFinderFeatures {
     }
 
     @SubscribeEvent
-    fun onToolTipRender(event: LorenzToolTipEvent) {
+    fun onTooltip(event: LorenzToolTipEvent) {
         if (!isEnabled()) return
         if (!inInventory) return
         val toolTip = toolTipMap[event.slot.slotIndex]
@@ -311,7 +309,9 @@ class DungeonFinderFeatures {
     fun onRenderItemTip(event: RenderInventoryItemTipEvent) {
         if (!isEnabled()) return
         if (!config.floorAsStackSize) return
-        event.stackTip = (floorStackSize[event.slot.slotIndex]
+        val slot = event.slot
+        if (slot.slotNumber != slot.slotIndex) return
+        event.stackTip = (floorStackSize[slot.slotIndex]
             ?.takeIf { it.isNotEmpty() } ?: return)
     }
 

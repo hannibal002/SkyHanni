@@ -3,9 +3,10 @@ package at.hannibal2.skyhanni.config.features.garden;
 import at.hannibal2.skyhanni.config.FeatureToggle;
 import at.hannibal2.skyhanni.config.core.config.Position;
 import com.google.gson.annotations.Expose;
-import io.github.moulberry.moulconfig.annotations.ConfigEditorBoolean;
-import io.github.moulberry.moulconfig.annotations.ConfigEditorSlider;
-import io.github.moulberry.moulconfig.annotations.ConfigOption;
+import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorBoolean;
+import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorSlider;
+import io.github.notenoughupdates.moulconfig.annotations.ConfigLink;
+import io.github.notenoughupdates.moulconfig.annotations.ConfigOption;
 
 public class YawPitchDisplayConfig {
 
@@ -58,7 +59,9 @@ public class YawPitchDisplayConfig {
     public boolean showAlways = false;
 
     @Expose
+    @ConfigLink(owner = YawPitchDisplayConfig.class, field = "enabled")
     public Position pos = new Position(445, 225, false, true);
     @Expose
+    @ConfigLink(owner = YawPitchDisplayConfig.class, field = "showOutsideGarden")
     public Position posOutside = new Position(445, 225, false, true);
 }
