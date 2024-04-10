@@ -87,6 +87,7 @@ public class GUIConfig {
     public boolean realTimeFormatToggle = false;
 
     @Expose
+    @ConfigLink(owner = GUIConfig.class, field = "realTime")
     public Position realTimePosition = new Position(10, 10, false, true);
 
     @Expose

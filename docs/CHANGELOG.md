@@ -48,6 +48,7 @@
 + Added highlight slot while hovering over line for Anita medal profit and SkyMart copper price. - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/1118)
 + SkyMart and Anita Medal prices are now perfectly aligned in the displays. - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/1376)
 + Clear plot sprays when Portable Washer is used. - Alexia Luna (https://github.com/hannibal002/SkyHanni/pull/1178)
++ Added option to show atmospheric filter display outside SB. - Obsidian (https://github.com/hannibal002/SkyHanni/pull/1131)
 
 #### Diana Improvements
 
@@ -70,6 +71,15 @@
 #### Config Improvements
 
 + Added right click support for many garden GUI elements. - hannibal2 + nea (https://github.com/hannibal002/SkyHanni/pull/1395)
++ Added config links to most features. - jani (https://github.com/hannibal002/SkyHanni/pull/1404)
+
+#### Inventory Improvements
+
++ Items that cannot be salvaged because you have donated them to the Museum are now greyed out in the Salvage menu. - Alexia Luna (https://github.com/hannibal002/SkyHanni/pull/1384)
+
+#### Slayer Improvements
+
++ Added Dragon's Nest as a valid Enderman Slayer location. - Alexia Luna (https://github.com/hannibal002/SkyHanni/pull/1399)
 
 #### Misc Improvements
 
@@ -95,6 +105,8 @@
 + Fixed Jacob's contest detection. - HiZe (https://github.com/hannibal002/SkyHanni/pull/1375)
 + Fixed updating pests before pest count got updated. - Empa (https://github.com/hannibal002/SkyHanni/pull/1386)
 + Fixed being able to have duplicate custom key binds. - Empa (https://github.com/hannibal002/SkyHanni/pull/1387)
++ Fixed typo in Show outside list for Jacobs contest. - Obsidian (https://github.com/hannibal002/SkyHanni/pull/1131)
++ Next contest overlay now looks like before. - Thunderblade73 (https://github.com/hannibal002/SkyHanni/pull/1403)
 
 #### Chat Fixes
 
@@ -111,6 +123,7 @@
 + Fixed Objective Lines never being shown in Custom Scoreboard. - j10a1n15 (https://github.com/hannibal002/SkyHanni/pull/1377)
 + Fixed Crystal Hollows Island size being 26 instead of 24 in Custom Scoreboard. - j10a1n15 (https://github.com/hannibal002/SkyHanni/pull/1389)
 + Fixed "unknown lines" error with an objective line in Custom Scoreboard. - j10a1n15 (https://github.com/hannibal002/SkyHanni/pull/1394)
++ Fixed Powder not being shown in the Custom Scoreboard. - j10a1n15 (https://github.com/hannibal002/SkyHanni/pull/1414)
 
 #### Dungeon Fixes
 
@@ -119,6 +132,7 @@
 #### Bingo Fixes
 
 + Fixes rare error when hovering over a row item in Bingo Card. - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/1370)
++ Fixed bingo card reward line not found error. - CalMWolfs (https://github.com/hannibal002/SkyHanni/pull/1400)
 
 #### Misc Fixes
 
@@ -126,6 +140,9 @@
 + Fixes random error in mob detection. - Thunderblade73 (https://github.com/hannibal002/SkyHanni/pull/1361)
 + Fixed a spelling mistake in the Deep Caverns Parkour config. - jani (https://github.com/hannibal002/SkyHanni/pull/1349)
 + Rendered Items in SkyHanni GUIs no longer have partially broken textures. (on default size) - Empa (https://github.com/hannibal002/SkyHanni/pull/1390)
++ Fixes skill progress item scale being bigger than intended. - martimavocado (https://github.com/hannibal002/SkyHanni/pull/1413)
++ Fixed modid of SkyHanni classes being wrong, causing various issues, like the gfs queue not working - nea (https://github.com/hannibal002/SkyHanni/pull/1411)
++ Fixed some typos. - Alexia Luna (https://github.com/hannibal002/SkyHanni/pull/1408)
 
 ### Technical Details
 
@@ -175,6 +192,10 @@
 + Bump MoulConfig to 3.0.0 betas - !nea (https://github.com/hannibal002/SkyHanni/pull/1382)
     + Adds jumps, links and portals.
     + Changes the package from a mix of `io.github.moulberry.moulconfig` and `io.github.notenoughupdates.moulconfig` to just `io.github.notenoughupdates.moulconfig`
++ Added Renderable.renderInsideRoundedRect - Thunderblade73 (https://github.com/hannibal002/SkyHanni/pull/890)
++ Switch from LorenzUtils.inDungeons to DungeonAPI.inDungeon(). - j10a1n15 (https://github.com/hannibal002/SkyHanni/pull/1378)
++ Bumped MoulConfig - nea (https://github.com/hannibal002/SkyHanni/pull/1411)
++ Deleted two empty files. - CalMWolfs (https://github.com/hannibal002/SkyHanni/pull/1401)
 
 ### Removed Features
 

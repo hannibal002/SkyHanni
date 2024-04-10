@@ -151,10 +151,9 @@ class VisitorListener {
                     event.isCanceled = true
                     ChatUtils.chat("§cBlocked refusing visitor ${visitor.visitorName} §7(${it.displayName}§7)")
                     if (config.rewardWarning.bypassKey == Keyboard.KEY_NONE) {
-                        ChatUtils.clickableChat(
+                        ChatUtils.chatAndOpenConfig(
                             "§eIf you want to deny this visitor, set a keybind in §e/sh bypass",
-                            "sh bypass",
-                            false
+                            GardenAPI.config.visitors.rewardWarning::bypassKey
                         )
                     }
                     Minecraft.getMinecraft().thePlayer.closeScreen()

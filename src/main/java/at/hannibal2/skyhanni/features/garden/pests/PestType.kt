@@ -11,7 +11,7 @@ enum class PestType(
     val spray: SprayType,
     val vinyl: VinylType,
     val internalName: NEUInternalName,
-    val crop: CropType
+    val crop: CropType,
 ) {
     BEETLE(
         "Beetle",
@@ -19,7 +19,7 @@ enum class PestType(
         SprayType.DUNG,
         VinylType.NOT_JUST_A_PEST,
         "PEST_BEETLE_MONSTER".asInternalName(),
-        CropType.NETHER_WART
+        CropType.NETHER_WART,
     ),
     CRICKET(
         "Cricket",
@@ -27,7 +27,7 @@ enum class PestType(
         SprayType.HONEY_JAR,
         VinylType.CRICKET_CHOIR,
         "PEST_CRICKET_MONSTER".asInternalName(),
-        CropType.CARROT
+        CropType.CARROT,
     ),
     EARTHWORM(
         "Earthworm",
@@ -35,7 +35,7 @@ enum class PestType(
         SprayType.COMPOST,
         VinylType.EARTHWORM_ENSEMBLE,
         "PEST_EARTHWORM_MONSTER".asInternalName(),
-        CropType.MELON
+        CropType.MELON,
     ),
     FLY(
         "Fly",
@@ -43,7 +43,7 @@ enum class PestType(
         SprayType.DUNG,
         VinylType.PRETTY_FLY,
         "PEST_FLY_MONSTER".asInternalName(),
-        CropType.WHEAT
+        CropType.WHEAT,
     ),
     LOCUST(
         "Locust",
@@ -51,7 +51,7 @@ enum class PestType(
         SprayType.PLANT_MATTER,
         VinylType.CICADA_SYMPHONY,
         "PEST_LOCUST_MONSTER".asInternalName(),
-        CropType.POTATO
+        CropType.POTATO,
     ),
     MITE(
         "Mite",
@@ -59,7 +59,7 @@ enum class PestType(
         SprayType.TASTY_CHEESE,
         VinylType.DYNAMITES,
         "PEST_MITE_MONSTER".asInternalName(),
-        CropType.CACTUS
+        CropType.CACTUS,
     ),
     MOSQUITO(
         "Mosquito",
@@ -67,7 +67,7 @@ enum class PestType(
         SprayType.COMPOST,
         VinylType.BUZZIN_BEATS,
         "PEST_MOSQUITO_MONSTER".asInternalName(),
-        CropType.SUGAR_CANE
+        CropType.SUGAR_CANE,
     ),
     MOTH(
         "Moth",
@@ -75,7 +75,7 @@ enum class PestType(
         SprayType.HONEY_JAR,
         VinylType.WINGS_OF_HARMONY,
         "PEST_MOTH_MONSTER".asInternalName(),
-        CropType.COCOA_BEANS
+        CropType.COCOA_BEANS,
     ),
     RAT(
         "Rat",
@@ -83,7 +83,7 @@ enum class PestType(
         SprayType.TASTY_CHEESE,
         VinylType.RODENT_REVOLUTION,
         "PEST_RAT_MONSTER".asInternalName(),
-        CropType.COCOA_BEANS
+        CropType.COCOA_BEANS,
     ),
     SLUG(
         "Slug",
@@ -91,6 +91,6 @@ enum class PestType(
         SprayType.PLANT_MATTER,
         VinylType.SLOW_AND_GROOVY,
         "PEST_SLUG_MONSTER".asInternalName(),
-        CropType.MUSHROOM
+        CropType.MUSHROOM,
     ),
 }
