@@ -21,7 +21,7 @@ public class StereoHarmonyConfig {
     @Expose
     @ConfigOption(
         name = "Always Show",
-        desc = "Always show the display."
+        desc = "Shows the display even while farming."
     )
     @ConfigEditorBoolean
     public boolean alwaysShow = false;
