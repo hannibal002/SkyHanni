@@ -1,14 +1,18 @@
 package at.hannibal2.skyhanni.config
 
 import at.hannibal2.skyhanni.SkyHanniMod
+import at.hannibal2.skyhanni.config.core.config.Position
 import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.data.jsonobjects.local.FriendsJson
 import at.hannibal2.skyhanni.data.jsonobjects.local.JacobContestsJson
 import at.hannibal2.skyhanni.data.jsonobjects.local.KnownFeaturesJson
 import at.hannibal2.skyhanni.data.jsonobjects.local.VisualWordsJson
 import at.hannibal2.skyhanni.data.jsonobjects.other.HypixelApiTrophyFish
+import at.hannibal2.skyhanni.events.LorenzEvent
 import at.hannibal2.skyhanni.features.fishing.trophy.TrophyRarity
 import at.hannibal2.skyhanni.features.misc.update.UpdateManager
+import at.hannibal2.skyhanni.utils.FeatureTogglesByDefaultAdapter
+import at.hannibal2.skyhanni.utils.IdentityCharacteristics
 import at.hannibal2.skyhanni.utils.KotlinTypeAdapterFactory
 import at.hannibal2.skyhanni.utils.LorenzLogger
 import at.hannibal2.skyhanni.utils.LorenzRarity
@@ -24,13 +28,15 @@ import at.hannibal2.skyhanni.utils.tracker.SkyHanniTracker
 import com.google.gson.GsonBuilder
 import com.google.gson.JsonObject
 import com.google.gson.TypeAdapter
+import com.google.gson.TypeAdapterFactory
 import com.google.gson.stream.JsonReader
 import com.google.gson.stream.JsonToken
 import com.google.gson.stream.JsonWriter
-import io.github.moulberry.moulconfig.observer.PropertyTypeAdapterFactory
-import io.github.moulberry.moulconfig.processor.BuiltinMoulConfigGuis
-import io.github.moulberry.moulconfig.processor.ConfigProcessorDriver
-import io.github.moulberry.moulconfig.processor.MoulConfigProcessor
+import io.github.notenoughupdates.moulconfig.annotations.ConfigLink
+import io.github.notenoughupdates.moulconfig.observer.PropertyTypeAdapterFactory
+import io.github.notenoughupdates.moulconfig.processor.BuiltinMoulConfigGuis
+import io.github.notenoughupdates.moulconfig.processor.ConfigProcessorDriver
+import io.github.notenoughupdates.moulconfig.processor.MoulConfigProcessor
 import net.minecraft.item.ItemStack
 import java.io.BufferedReader
 import java.io.BufferedWriter
@@ -48,12 +54,19 @@ import kotlin.concurrent.fixedRateTimer
 
 typealias TrackerDisplayMode = SkyHanniTracker.DefaultDisplayMode
 
+private fun GsonBuilder.reigsterIfBeta(create: TypeAdapterFactory): GsonBuilder {
+    return if (LorenzUtils.isBetaVersion()) {
+        registerTypeAdapterFactory(create)
+    } else this
+}
+
 class ConfigManager {
     companion object {
 
         val gson = GsonBuilder().setPrettyPrinting()
             .excludeFieldsWithoutExposeAnnotation()
             .serializeSpecialFloatingPointValues()
+            .reigsterIfBeta(FeatureTogglesByDefaultAdapter)
             .registerTypeAdapterFactory(PropertyTypeAdapterFactory())
             .registerTypeAdapterFactory(KotlinTypeAdapterFactory())
             .registerTypeAdapter(UUID::class.java, object : TypeAdapter<UUID>() {
@@ -204,11 +217,32 @@ class ConfigManager {
         processor = MoulConfigProcessor(SkyHanniMod.feature)
         BuiltinMoulConfigGuis.addProcessors(processor)
         UpdateManager.injectConfigProcessor(processor)
-        ConfigProcessorDriver.processConfig(
-            features.javaClass,
-            features,
-            processor
-        )
+        ConfigProcessorDriver(processor).processConfig(features)
+
+        try {
+            findPositionLinks(features, mutableSetOf())
+        } catch (e: Exception) {
+            if (LorenzEvent.isInGuardedEventHandler)
+                throw e
+        }
+    }
+
+    private fun findPositionLinks(obj: Any?, slog: MutableSet<IdentityCharacteristics<Any>>) {
+        if (obj == null) return
+        if (!obj.javaClass.name.startsWith("at.hannibal2.skyhanni.")) return
+        val ic = IdentityCharacteristics(obj)
+        if (ic in slog) return
+        slog.add(ic)
+        for (field in obj.javaClass.fields) {
+            field.isAccessible = true
+            if (field.type != Position::class.java) {
+                findPositionLinks(field.get(obj), slog)
+                continue
+            }
+            val configLink = field.getAnnotation(ConfigLink::class.java) ?: continue
+            val position = field.get(obj) as Position
+            position.setLink(configLink)
+        }
     }
 
     private fun firstLoadFile(file: File?, fileType: ConfigFileType, defaultValue: Any): Any {
@@ -227,7 +261,7 @@ class ConfigManager {
                     val jsonObject = gson.fromJson(bufferedReader.readText(), JsonObject::class.java)
                     val newJsonObject = ConfigUpdaterMigrator.fixConfig(jsonObject)
                     val run = { gson.fromJson(newJsonObject, defaultValue.javaClass) }
-                    if (LorenzUtils.isInDevEnviromen()) {
+                    if (LorenzUtils.isInDevEnvironment()) {
                         try {
                             run()
                         } catch (e: Throwable) {

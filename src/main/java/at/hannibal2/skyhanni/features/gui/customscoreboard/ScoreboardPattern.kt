@@ -331,7 +331,7 @@ object ScoreboardPattern {
     // collection of lines that just randomly exist and I have no clue how on earth to effectively remove them
     val wtfAreThoseLinesPattern by miscSb.pattern(
         "wtfarethoselines",
-        "^§eMine 10 Rubies$"
+        "^(§eMine 10 Rubies|§eKill 100 Automatons)$"
     )
     val darkAuctionCurrentItemPattern by miscSb.pattern(
         "darkauction.currentitem",

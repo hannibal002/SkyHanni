@@ -80,6 +80,7 @@ class TotemOfCorruption {
     @SubscribeEvent
     fun onRenderWorld(event: LorenzRenderWorldEvent) {
         if (!isEffectiveAreaEnabled()) return
+        if (totems.isEmpty()) return
 
         val color = config.color.toChromaColor()
         for (totem in totems) {

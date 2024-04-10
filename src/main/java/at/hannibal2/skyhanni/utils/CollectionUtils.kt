@@ -163,4 +163,12 @@ object CollectionUtils {
         this.add(newValue)
         true
     } else false
+
+    @Suppress("UNCHECKED_CAST")
+    fun <T> Iterable<T?>.takeIfAllNotNull(): Iterable<T>? =
+        takeIf { null !in this } as? Iterable<T>
+
+    @Suppress("UNCHECKED_CAST")
+    fun <T> List<T?>.takeIfAllNotNull(): List<T>? =
+        takeIf { null !in this } as? List<T>
 }
