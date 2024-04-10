@@ -25,7 +25,7 @@ class PunchcardHighlight {
 
     private val punchedPattern by RepoPattern.pattern(
         "rift.punchcard.new",
-        "§5§lPUNCHCARD! §r§eYou punched §r§[\\da-z](?:.*?)?(?<name>\\w+)§r§[\\da-z] §r§eand both regained §r§a\\+25ф Rift Time§r§e!"
+        "§5§lPUNCHCARD! §r§eYou punched §r§.(?:.*?)?(?<name>\\w+)§r§. §r§eand both regained §r§a\\+25ф Rift Time§r§e!"
     )
 
     private val playerList: MutableSet<String> = mutableSetOf()
