@@ -106,9 +106,14 @@ object GardenVisitorFeatures {
     @SubscribeEvent
     fun onVisitorOpen(event: VisitorOpenEvent) {
         val visitor = event.visitor
-        val offerItem = visitor.offer!!.offerItem
+        val offerItem = visitor.offer?.offerItem ?: return
 
         val lore = offerItem.getLore()
+
+        // TODO make this workaround unnecessary (only read non lore info)
+        readToolTip(visitor, offerItem, lore.toMutableList())
+        visitor.lastLore = emptyList()
+
         for (line in lore) {
             if (line == "§7Items Required:") continue
             if (line.isEmpty()) break

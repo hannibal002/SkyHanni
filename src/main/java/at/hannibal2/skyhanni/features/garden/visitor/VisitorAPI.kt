@@ -193,23 +193,22 @@ object VisitorAPI {
         return visitorsInTab
     }
 
-    fun Visitor.blockReason(): VisitorBlockReason? {
-
-        val visitorHasReward = config.rewardWarning.preventRefusing && this.hasReward() != null
+    fun Visitor.blockReason(): VisitorBlockReason? = with(config.rewardWarning) {
+        val visitorHasReward = preventRefusing && hasReward() != null
         if (visitorHasReward) {
             return VisitorBlockReason.RARE_REWARD
         }
-        else if (config.rewardWarning.preventRefusingNew && this.offersAccepted == 0) {
+        if (preventRefusingNew && offersAccepted == 0) {
             return VisitorBlockReason.NEVER_ACCEPTED
         }
-        val pricePerCopper = this.pricePerCopper ?: return VisitorBlockReason.EXPENSIVE_COPPER
-        return if (config.rewardWarning.preventRefusingCopper && pricePerCopper <= config.rewardWarning.coinsPerCopperPrice) {
-            VisitorBlockReason.CHEAP_COPPER
+        val pricePerCopper = pricePerCopper ?: error("pricePerCopper is null")
+        if (preventRefusingCopper && pricePerCopper <= coinsPerCopperPrice) {
+            return VisitorBlockReason.CHEAP_COPPER
         }
-        else if (config.rewardWarning.preventAcceptingCopper && pricePerCopper > config.rewardWarning.coinsPerCopperPrice) {
-            VisitorBlockReason.EXPENSIVE_COPPER
+        if (preventAcceptingCopper && pricePerCopper > coinsPerCopperPrice) {
+            return VisitorBlockReason.EXPENSIVE_COPPER
         }
-        else null
+        return null
     }
 
     enum class VisitorBlockReason(val description: String, val blockRefusing: Boolean) {
