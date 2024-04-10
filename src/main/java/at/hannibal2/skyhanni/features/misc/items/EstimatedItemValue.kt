@@ -38,7 +38,7 @@ import kotlin.math.roundToLong
 
 object EstimatedItemValue {
 
-    val config get() = SkyHanniMod.feature.inventory.estimatedItemValues
+    private val config get() = SkyHanniMod.feature.inventory.estimatedItemValues
     private var display = emptyList<List<Any>>()
     private val cache = mutableMapOf<ItemStack, List<List<Any>>>()
     private var lastToolTipTime = 0L
