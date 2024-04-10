@@ -15,7 +15,6 @@ import at.hannibal2.skyhanni.events.QuiverUpdateEvent
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.DelayedRun
 import at.hannibal2.skyhanni.utils.ItemUtils.getItemRarityOrNull
-import at.hannibal2.skyhanni.utils.NEUItems
 import at.hannibal2.skyhanni.utils.NEUItems.getItemStackOrNull
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
@@ -92,7 +91,7 @@ class QuiverWarning {
     private fun lowQuiverAlert() {
         if (lastLowQuiverReminder.passedSince() < 30.seconds) return
         lastLowQuiverReminder = SimpleTimeMark.now()
-        val itemStack = NEUItems.getItemStackOrNull(arrow?.internalName?.asString() ?: return) ?: return
+        val itemStack = getItemStackOrNull(arrow?.internalName?.asString() ?: return) ?: return
         val rarity = itemStack.getItemRarityOrNull()?.chatColorCode ?: "§f"
         TitleManager.sendTitle("§cLow on $rarity${arrow?.arrow}!", 5.seconds, 3.6, 7f)
         ChatUtils.chat("Low on $rarity${arrow?.arrow} §e(${amount.addSeparators()} left)")
@@ -114,6 +113,6 @@ class QuiverWarning {
 
     @SubscribeEvent
     fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
-        event.move(31, "inventory.quiverAlert", "combat.quiverConfig.lowQuiverNotification")
+        event.move(35, "inventory.quiverAlert", "combat.quiverConfig.lowQuiverNotification")
     }
 }

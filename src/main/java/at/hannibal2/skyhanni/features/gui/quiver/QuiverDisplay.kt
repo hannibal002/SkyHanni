@@ -14,7 +14,8 @@ import at.hannibal2.skyhanni.utils.ItemUtils.getItemRarityOrNull
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.NEUItems
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
-import at.hannibal2.skyhanni.utils.RenderUtils.renderStringsAndItems
+import at.hannibal2.skyhanni.utils.RenderUtils
+import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderables
 import at.hannibal2.skyhanni.utils.StringUtils
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 import net.minecraft.init.Items
@@ -51,10 +52,10 @@ class QuiverDisplay {
             if (hideAmount || arrow == NONE_ARROW_TYPE) arrow.arrow else StringUtils.pluralize(amount, arrow.arrow)
 
         if (config.showIcon.get()) {
-            add(Renderable.itemStack(itemStack, 1.68))
+            add(Renderable.itemStack(itemStack, 1.0))
         }
         if (!hideAmount) {
-            add(Renderable.string(" §b${amount.addSeparators()}x"))
+            add(Renderable.string("§b${amount.addSeparators()}x"))
         }
         add(Renderable.string(" $rarity$arrowDisplayName"))
     }
@@ -77,7 +78,9 @@ class QuiverDisplay {
             whenToShow == ShowWhen.ONLY_BOW_INVENTORY && QuiverAPI.hasBowInInventory() ||
             whenToShow == ShowWhen.ONLY_BOW_HAND && QuiverAPI.isHoldingBow()
         ) {
-            config.quiverDisplayPos.renderStringsAndItems(listOf(display), posLabel = "Quiver Display")
+            val content =
+                Renderable.horizontalContainer(display, 1, verticalAlign = RenderUtils.VerticalAlignment.CENTER)
+            config.quiverDisplayPos.renderRenderables(listOf(content), posLabel = "Quiver Display")
         }
     }
 
