@@ -175,11 +175,15 @@ object SkyBlockItemModifierUtils {
 
     fun ItemStack.hasArtOfPeace() = getAttributeBoolean("artOfPeaceApplied")
 
+    fun ItemStack.isMuseumDonated() = getAttributeBoolean("donated_museum")
+
     fun ItemStack.getLivingMetalProgress() = getAttributeInt("lm_evo")
 
     fun ItemStack.getBottleOfJyrreSeconds() = getAttributeInt("bottle_of_jyrre_seconds")
 
     fun ItemStack.getEdition() = getAttributeInt("edition")
+
+    fun ItemStack.getNewYearCake() = getAttributeInt("new_years_cake")
 
     fun ItemStack.getEnchantments() = getExtraAttributes()?.takeIf { it.hasKey("enchantments") }?.run {
         val enchantments = this.getCompoundTag("enchantments")
@@ -251,7 +255,7 @@ object SkyBlockItemModifierUtils {
         getExtraAttributes()?.getLong(label)?.takeUnless { it == 0L }
 
     private fun ItemStack.getAttributeBoolean(label: String): Boolean {
-        return getExtraAttributes()?.hasKey(label) ?: false
+        return getExtraAttributes()?.getBoolean(label) ?: false
     }
 
     fun ItemStack.getExtraAttributes() = tagCompound?.getCompoundTag("ExtraAttributes")
@@ -284,6 +288,10 @@ object SkyBlockItemModifierUtils {
         JASPER("Jasper"),
         RUBY("Ruby"),
         OPAL("Opal"),
+        ONYX("Onyx"),
+        AQUAMARINE("Aquamarine"),
+        CITRINE("Citrine"),
+        PERIDOT("Peridot"),
         ;
 
         companion object {
@@ -301,8 +309,11 @@ object SkyBlockItemModifierUtils {
         JASPER('d'),
         RUBY('c'),
         OPAL('f'),
+        ONYX('8'),
+        AQUAMARINE('3'),
+        CITRINE('4'),
+        PERIDOT('2'),
         COMBAT('4'),
-        OFFENSIVE('9'),
         DEFENSIVE('a'),
         MINING('5'),
         UNIVERSAL('f')

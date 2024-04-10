@@ -431,7 +431,7 @@ import org.apache.logging.log4j.Logger
     clientSideOnly = true,
     useMetadata = true,
     guiFactory = "at.hannibal2.skyhanni.config.ConfigGuiForgeInterop",
-    version = "0.25.Beta.4",
+    version = "0.25.Beta.5",
 )
 class SkyHanniMod {
 
@@ -711,7 +711,7 @@ class SkyHanniMod {
         loadModule(SackDisplay)
         loadModule(GardenStartLocation)
         loadModule(PetCandyUsedDisplay())
-        loadModule(ServerRestartTitle())
+        loadModule(ServerRestartTitle)
         loadModule(CityProjectFeatures())
         loadModule(GardenPlotIcon)
         loadModule(GardenPlotBorders)
@@ -759,7 +759,7 @@ class SkyHanniMod {
         loadModule(RiftMotesOrb())
         loadModule(ChestValue())
         loadModule(SlayerBossSpawnSoon())
-        loadModule(RiftBloodEffigies())
+        loadModule(RiftBloodEffigies)
         loadModule(RiftWiltedBerberisHelper())
         loadModule(RiftHorsezookaHider())
         loadModule(GriffinPetWarning())
