@@ -52,8 +52,8 @@ object FlightDurationAPI {
     @SubscribeEvent
     fun onIslandSwitch(event: IslandChangeEvent) {
         if (!LorenzUtils.inSkyBlock) return
-        if (flightDuration == null) return
-        if (flightDuration == 0L) return
+        //if (flightDuration == null) return
+        //if (flightDuration == 0L) return
 
         val flightIslands = listOf(
             IslandType.PRIVATE_ISLAND,
@@ -61,6 +61,8 @@ object FlightDurationAPI {
             IslandType.GARDEN,
             IslandType.GARDEN_GUEST
         )
+
+        ChatUtils.chat("Moved from ${event.oldIsland} to ${event.newIsland}.")
 
         if (event.newIsland in flightIslands && event.oldIsland !in flightIslands) {
             flightDurationEndTime = flightDuration?.let { SimpleTimeMark.now().plus(it.milliseconds) }
