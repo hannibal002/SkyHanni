@@ -231,14 +231,6 @@ object ScoreboardPattern {
         "mineshaft.notstarted",
         "(?:§.)*Not started.*"
     )
-    val mineshaftQueuedPattern by miningSb.pattern(
-        "mineshaft.queued",
-        "Queued: Glacite Mineshafts"
-    )
-    val mineshaftQueuePositionPattern by miningSb.pattern(
-        "mineshaft.queueposition",
-        "Position: (?:§.)*#\\d+ (?:§.)*Since: (?:§.)*.*"
-    )
 
     // combat
     private val combatSb = scoreboardGroup.group("combat")
@@ -332,6 +324,14 @@ object ScoreboardPattern {
     val objectivePattern by miscSb.pattern(
         "objective",
         "^(§.)*(Objective|Quest).*"
+    )
+    val queuePattern by miscSb.pattern(
+        "queued",
+        "Queued:.*"
+    )
+    val queuePositionPattern by miscSb.pattern(
+        "queueposition",
+        "Position: (?:§.)*#\\d+ (?:§.)*Since: (?:§.)*.*"
     )
 
     // this thirdObjectiveLinePattern includes all those weird objective lines that go into a third scoreboard line
