@@ -65,7 +65,7 @@ class GlowingDroppedItems {
     }
 
     private val isShowcaseArea = RecalculatingValue(1.seconds) {
-        showcaseItemIslands.contains(LorenzUtils.skyBlockIsland) || showcaseItemLocations.contains(LorenzUtils.skyBlockArea)
+        showcaseItemIslands.contains(LorenzUtils.skyBlockIsland) || (LorenzUtils.skyBlockArea?.let { showcaseItemLocations.contains(it) } ?: false)
     }
 
     private fun shouldHideShowcaseItem(entity: EntityItem): Boolean {

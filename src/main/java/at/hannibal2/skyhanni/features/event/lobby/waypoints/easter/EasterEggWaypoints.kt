@@ -78,7 +78,7 @@ class EasterEggWaypoints {
             return
         }
 
-        if (LorenzUtils.skyBlockArea == "?") return
+        if (LorenzUtils.skyBlockArea == null) return
     }
 
     private fun EasterEgg.shouldShow(): Boolean {
