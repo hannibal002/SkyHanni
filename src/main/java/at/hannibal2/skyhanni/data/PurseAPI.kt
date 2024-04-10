@@ -1,20 +1,30 @@
 package at.hannibal2.skyhanni.data
 
 import at.hannibal2.skyhanni.events.InventoryCloseEvent
-import at.hannibal2.skyhanni.events.LorenzTickEvent
 import at.hannibal2.skyhanni.events.PurseChangeCause
 import at.hannibal2.skyhanni.events.PurseChangeEvent
-import at.hannibal2.skyhanni.utils.NumberUtil.formatNumber
-import at.hannibal2.skyhanni.utils.NumberUtil.milion
-import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
+import at.hannibal2.skyhanni.events.ScoreboardChangeEvent
+import at.hannibal2.skyhanni.utils.NumberUtil.formatDouble
+import at.hannibal2.skyhanni.utils.NumberUtil.million
+import at.hannibal2.skyhanni.utils.StringUtils.matchFirst
+import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraft.client.Minecraft
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
-class PurseAPI {
-    // TODO USE SH-REPO
-    private val pattern = "(Piggy|Purse): §6(?<coins>[\\d,]*).*".toPattern()
-    private var currentPurse = 0.0
+object PurseAPI {
+    private val patternGroup = RepoPattern.group("data.purse")
+    val coinsPattern by patternGroup.pattern(
+        "coins",
+        "(§.)*(Piggy|Purse): §6(?<coins>[\\d,.]+)( ?(§.)*\\([+-](?<earned>[\\d,.]+)\\)?|.*)?$"
+    )
+    val piggyPattern by patternGroup.pattern(
+        "piggy",
+        "Piggy: (?<coins>.*)"
+    )
+
     private var inventoryCloseTime = 0L
+    var currentPurse = 0.0
+      private set
 
     @SubscribeEvent
     fun onInventoryClose(event: InventoryCloseEvent) {
@@ -22,14 +32,11 @@ class PurseAPI {
     }
 
     @SubscribeEvent
-    fun onTick(event: LorenzTickEvent) {
-
-        for (line in ScoreboardData.sidebarLinesFormatted) {
-            val newPurse = pattern.matchMatcher(line) {
-                group("coins").formatNumber().toDouble()
-            } ?: continue
+    fun onScoreboardChange(event: ScoreboardChangeEvent) {
+        event.newList.matchFirst(coinsPattern) {
+            val newPurse = group("coins").formatDouble()
             val diff = newPurse - currentPurse
-            if (diff == 0.0) continue
+            if (diff == 0.0) return
             currentPurse = newPurse
 
             PurseChangeEvent(diff, getCause(diff)).postAndCatch()
@@ -43,7 +50,7 @@ class PurseAPI {
                 return PurseChangeCause.GAIN_TALISMAN_OF_COINS
             }
 
-            if (diff == 15.milion || diff == 100.milion) {
+            if (diff == 15.million || diff == 100.million) {
                 return PurseChangeCause.GAIN_DICE_ROLL
             }
 
@@ -67,4 +74,6 @@ class PurseAPI {
             return PurseChangeCause.LOSE_UNKNOWN
         }
     }
+
+    fun getPurse(): Double = currentPurse
 }

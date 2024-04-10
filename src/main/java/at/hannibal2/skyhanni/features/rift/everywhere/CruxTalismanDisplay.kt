@@ -2,25 +2,29 @@ package at.hannibal2.skyhanni.features.rift.everywhere
 
 import at.hannibal2.skyhanni.events.ConfigLoadEvent
 import at.hannibal2.skyhanni.events.GuiRenderEvent
-import at.hannibal2.skyhanni.events.LorenzTickEvent
+import at.hannibal2.skyhanni.events.SecondPassedEvent
 import at.hannibal2.skyhanni.features.rift.RiftAPI
+import at.hannibal2.skyhanni.utils.CollectionUtils.addAsSingletonList
+import at.hannibal2.skyhanni.utils.ConditionalUtils
 import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.LorenzUtils
-import at.hannibal2.skyhanni.utils.LorenzUtils.addAsSingletonList
 import at.hannibal2.skyhanni.utils.NumberUtil.roundToPrecision
 import at.hannibal2.skyhanni.utils.RenderUtils.renderStringsAndItems
 import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
+import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
 object CruxTalismanDisplay {
+
     private val config get() = RiftAPI.config.cruxTalisman
 
-    // TODO USE SH-REPO
-    private val progressPattern =
-        ".*(?<tier>§[0-9a-z][IV1-4-]+)\\s+(?<name>§[0-9a-z]\\w+)§[0-9a-z]:\\s*(?<progress>§[0-9a-z](?:§[0-9a-z])?MAXED|§[0-9a-z]\\d+§[0-9a-z]/§[0-9a-z]\\d+).*".toPattern()
+    private val progressPattern by RepoPattern.pattern(
+        "rift.everywhere.crux.progress",
+        ".*(?<tier>§[0-9a-z][IV1-4-]+)\\s+(?<name>§[0-9a-z]\\w+)§[0-9a-z]:\\s*(?<progress>§[0-9a-z](?:§[0-9a-z])?MAXED|§[0-9a-z]\\d+§[0-9a-z]/§[0-9a-z]\\d+).*"
+    )
 
     private val partialName = "CRUX_TALISMAN"
     private var display = emptyList<List<Any>>()
@@ -81,9 +85,8 @@ object CruxTalismanDisplay {
         }
     }
 
-
     @SubscribeEvent
-    fun onTick(event: LorenzTickEvent) {
+    fun onSecondPassed(event: SecondPassedEvent) {
         if (!isEnabled()) return
         if (!event.repeatSeconds(2)) return
         if (!InventoryUtils.getItemsInOwnInventory().any { it.getInternalName().startsWith(partialName) }) return
@@ -120,7 +123,7 @@ object CruxTalismanDisplay {
 
     @SubscribeEvent
     fun onConfigLoad(event: ConfigLoadEvent) {
-        LorenzUtils.onToggle(config.showBonuses) { update() }
+        ConditionalUtils.onToggle(config.showBonuses) { update() }
     }
 
     data class Crux(val name: String, val tier: String, val progress: String, val maxed: Boolean)

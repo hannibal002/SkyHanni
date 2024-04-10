@@ -3,15 +3,19 @@ package at.hannibal2.skyhanni.features.garden
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.config.ConfigFileType
 import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
+import at.hannibal2.skyhanni.config.enums.OutsideSbFeature
 import at.hannibal2.skyhanni.config.features.garden.NextJacobContestConfig.ShareContestsEntry
 import at.hannibal2.skyhanni.events.ConfigLoadEvent
+import at.hannibal2.skyhanni.events.DebugDataCollectEvent
 import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.InventoryCloseEvent
 import at.hannibal2.skyhanni.events.InventoryFullyOpenedEvent
-import at.hannibal2.skyhanni.events.LorenzTickEvent
+import at.hannibal2.skyhanni.events.SecondPassedEvent
 import at.hannibal2.skyhanni.events.TabListUpdateEvent
 import at.hannibal2.skyhanni.features.garden.GardenAPI.addCropIcon
+import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.APIUtil
+import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.ConfigUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.ItemUtils.name
@@ -20,14 +24,16 @@ import at.hannibal2.skyhanni.utils.RenderUtils.renderSingleLineWithItems
 import at.hannibal2.skyhanni.utils.RenderUtils.renderStrings
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.SimpleTimeMark.Companion.asTimeMark
-import at.hannibal2.skyhanni.utils.SimpleTimeMark.Companion.now
 import at.hannibal2.skyhanni.utils.SoundUtils
 import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.TabListData
 import at.hannibal2.skyhanni.utils.TimeUtils.format
+import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import com.google.gson.Gson
+import com.google.gson.JsonPrimitive
 import io.github.moulberry.notenoughupdates.util.SkyBlockTime
+import io.github.moulberry.notenoughupdates.util.toJsonArray
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
@@ -42,22 +48,35 @@ import javax.swing.JOptionPane
 import javax.swing.UIManager
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.days
+import kotlin.time.Duration.Companion.hours
 import kotlin.time.Duration.Companion.minutes
 import kotlin.time.Duration.Companion.seconds
 
 object GardenNextJacobContest {
+
     private var dispatcher = Dispatchers.IO
     private var display = emptyList<Any>()
     private var simpleDisplay = emptyList<String>()
     var contests = mutableMapOf<SimpleTimeMark, FarmingContest>()
     private var inCalendar = false
 
-    private val patternDay = "§aDay (?<day>.*)".toPattern()
-    private val patternMonth = "(?<month>.*), Year (?<year>.*)".toPattern()
-    private val patternCrop = "§(e○|6☘) §7(?<crop>.*)".toPattern()
+    private val patternGroup = RepoPattern.group("garden.nextcontest")
+    val dayPattern by patternGroup.pattern(
+        "day",
+        "§aDay (?<day>.*)"
+    )
+    val monthPattern by patternGroup.pattern(
+        "month",
+        "(?<month>.*), Year (?<year>.*)"
+    )
+    private val cropPattern by patternGroup.pattern(
+        "crop",
+        "§(e○|6☘) §7(?<crop>.*)"
+    )
 
-    private val closeToNewYear = "§7Close to new SB year!"
-    private const val maxContestsPerYear = 124
+    private const val CLOSE_TO_NEW_YEAR_TEXT = "§7Close to new SB year!"
+    private const val MAX_CONTESTS_PER_YEAR = 124
+
     private val contestDuration = 20.minutes
 
     private var lastWarningTime = SimpleTimeMark.farPast()
@@ -68,6 +87,45 @@ object GardenNextJacobContest {
     var isFetchingContests = false
     var fetchedFromElite = false
     private var isSendingContests = false
+
+    @SubscribeEvent
+    fun onDebugDataCollect(event: DebugDataCollectEvent) {
+        event.title("Garden Next Jacob Contest")
+
+        if (!GardenAPI.inGarden()) {
+            event.addIrrelevant("not in garden")
+            return
+        }
+
+        event.addData {
+            add("Current time: ${SimpleTimeMark.now()}")
+            add("")
+
+            val display = display.filterIsInstance<String>().joinToString("")
+            add("Display: '$display'")
+            add("")
+
+            add("Contests:")
+            for (contest in contests) {
+                val time = contest.key
+                val passedSince = time.passedSince()
+                val timeUntil = time.timeUntil()
+                val farmingContest = contest.value
+                val crops = farmingContest.crops
+                val recently = 0.seconds..2.hours
+                if (passedSince in recently || timeUntil in recently) {
+                    add(" Time: $time")
+                    if (passedSince.isPositive()) {
+                        add("  Passed since: $passedSince")
+                    }
+                    if (timeUntil.isPositive()) {
+                        add("  Time until: $timeUntil")
+                    }
+                    add("  Crops: $crops")
+                }
+            }
+        }
+    }
 
     @SubscribeEvent
     fun onTabListUpdate(event: TabListUpdateEvent) {
@@ -89,7 +147,7 @@ object GardenNextJacobContest {
         }
 
         if (isCloseToNewYear()) {
-            newList.add(closeToNewYear)
+            newList.add(CLOSE_TO_NEW_YEAR_TEXT)
         } else {
             newList.add("§cOpen calendar for")
             newList.add("§cmore exact data!")
@@ -109,9 +167,8 @@ object GardenNextJacobContest {
     }
 
     @SubscribeEvent
-    fun onTick(event: LorenzTickEvent) {
+    fun onSecondPassed(event: SecondPassedEvent) {
         if (!isEnabled()) return
-        if (!event.repeatSeconds(2)) return
 
         if (inCalendar) return
         update()
@@ -130,15 +187,14 @@ object GardenNextJacobContest {
         if (!config.display) return
 
         val backItem = event.inventoryItems[48] ?: return
-        val backName = backItem.name
-        if (backName != "§aGo Back") return
+        if (backItem.name != "§aGo Back") return
         val lore = backItem.getLore()
         if (lore.size != 1) return
         if (lore[0] != "§7To Calendar and Events") return
 
         inCalendar = true
 
-        patternMonth.matchMatcher(event.inventoryName) {
+        monthPattern.matchMatcher(event.inventoryName) {
             val month = LorenzUtils.getSBMonthByName(group("month"))
             val year = group("year").toInt()
 
@@ -165,35 +221,34 @@ object GardenNextJacobContest {
         }
 
         // Skip if contests are already loaded for this year
-        if (contests.size == maxContestsPerYear) return
+        if (contests.size == MAX_CONTESTS_PER_YEAR) return
 
         // Manually loading contests
         for (item in items) {
             val lore = item.getLore()
             if (!lore.any { it.contains("§6§eJacob's Farming Contest") }) continue
 
-            val name = item.name ?: continue
-            val day = patternDay.matchMatcher(name) { group("day").toInt() } ?: continue
+            val day = dayPattern.matchMatcher(item.name) { group("day").toInt() } ?: continue
 
             val startTime = SkyBlockTime(year, month, day).asTimeMark()
 
             val crops = mutableListOf<CropType>()
             for (line in lore) {
-                patternCrop.matchMatcher(line) { crops.add(CropType.getByName(group("crop"))) }
+                cropPattern.matchMatcher(line) { crops.add(CropType.getByName(group("crop"))) }
             }
 
             contests[startTime] = FarmingContest(startTime + contestDuration, crops)
         }
 
         // If contests were just fully saved
-        if (contests.size == maxContestsPerYear) {
+        if (contests.size == MAX_CONTESTS_PER_YEAR) {
             nextContestsAvailableAt = SkyBlockTime(SkyBlockTime.now().year + 1, 1, 2).toMillis()
 
             if (isSendEnabled()) {
                 if (!askToSendContests()) {
                     sendContests()
                 } else {
-                    LorenzUtils.clickableChat(
+                    ChatUtils.clickableChat(
                         "§2Click here to submit this year's farming contests. Thank you for helping everyone out!",
                         "shsendcontests"
                     )
@@ -243,15 +298,15 @@ object GardenNextJacobContest {
             if (array[0] == "enable") {
                 config.shareAutomatically = ShareContestsEntry.AUTO
                 SkyHanniMod.feature.storage.contestSendingAsked = true
-                LorenzUtils.chat("§2Enabled automatic sharing of future contests!")
+                ChatUtils.chat("§2Enabled automatic sharing of future contests!")
             }
             return
         }
-        if (contests.size == maxContestsPerYear) {
+        if (contests.size == MAX_CONTESTS_PER_YEAR) {
             sendContests()
         }
         if (!SkyHanniMod.feature.storage.contestSendingAsked && config.shareAutomatically == ShareContestsEntry.ASK) {
-            LorenzUtils.clickableChat(
+            ChatUtils.clickableChat(
                 "§2Click here to automatically share future contests!",
                 "shsendcontests enable"
             )
@@ -283,7 +338,7 @@ object GardenNextJacobContest {
 
         if (inCalendar) {
             val size = contests.size
-            val percentage = size.toDouble() / maxContestsPerYear
+            val percentage = size.toDouble() / MAX_CONTESTS_PER_YEAR
             val formatted = LorenzUtils.formatPercentage(percentage)
             list.add("§eDetected $formatted of farming contests this year")
 
@@ -292,7 +347,7 @@ object GardenNextJacobContest {
 
         if (contests.isEmpty()) {
             if (isCloseToNewYear()) {
-                list.add(closeToNewYear)
+                list.add(CLOSE_TO_NEW_YEAR_TEXT)
             } else {
                 list.add("§cOpen calendar to read Jacob contest times!")
             }
@@ -306,7 +361,7 @@ object GardenNextJacobContest {
         if (nextContest != null) return drawNextContest(nextContest, list)
 
         if (isCloseToNewYear()) {
-            list.add(closeToNewYear)
+            list.add(CLOSE_TO_NEW_YEAR_TEXT)
         } else {
             list.add("§cOpen calendar to read Jacob contest times!")
         }
@@ -323,7 +378,7 @@ object GardenNextJacobContest {
     ): MutableList<Any> {
         var duration = nextContest.endTime.timeUntil()
         if (duration > 4.days) {
-            list.add(closeToNewYear)
+            list.add(CLOSE_TO_NEW_YEAR_TEXT)
             return list
         }
 
@@ -337,7 +392,6 @@ object GardenNextJacobContest {
             duration -= contestDuration
         }
         for (crop in nextContest.crops) {
-            list.add(" ")
             list.addCropIcon(crop, highlight = (crop == boostedCrop))
             nextContestCrops.add(crop)
         }
@@ -372,9 +426,9 @@ object GardenNextJacobContest {
         // Check that it only gets called once for the current event
         if (lastWarningTime.passedSince() < config.warnTime.seconds) return
 
-        lastWarningTime = now()
+        lastWarningTime = SimpleTimeMark.now()
         val cropText = crops.joinToString("§7, ") { (if (it == boostedCrop) "§6" else "§a") + it.cropName }
-        LorenzUtils.chat("Next farming contest: $cropText")
+        ChatUtils.chat("Next farming contest: $cropText")
         LorenzUtils.sendTitle("§eFarming Contest!", 5.seconds)
         SoundUtils.playBeepSound()
 
@@ -398,7 +452,10 @@ object GardenNextJacobContest {
         try {
             UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName())
         } catch (e: java.lang.Exception) {
-            e.printStackTrace()
+            ErrorManager.logErrorWithData(
+                e, "Failed to open a popup window",
+                "message" to message
+            )
         }
 
         val frame = JFrame()
@@ -436,14 +493,14 @@ object GardenNextJacobContest {
         if (!isEnabled()) return
 
         if (display.isEmpty()) {
-            config.pos.renderStrings(simpleDisplay, posLabel = "Garden Next Jacob Contest")
+            config.pos.renderStrings(simpleDisplay, posLabel = "Next Jacob Contest")
         } else {
-            config.pos.renderSingleLineWithItems(display, 1.7, posLabel = "Garden Next Jacob Contest")
+            config.pos.renderSingleLineWithItems(display, posLabel = "Next Jacob Contest")
         }
     }
 
     @SubscribeEvent
-    fun onRenderOverlay(event: GuiRenderEvent.ChestGuiOverlayRenderEvent) {
+    fun onBackgroundDraw(event: GuiRenderEvent.ChestGuiOverlayRenderEvent) {
         if (!config.display) return
         if (!inCalendar) return
 
@@ -455,8 +512,9 @@ object GardenNextJacobContest {
         }
     }
 
-    private fun isEnabled() = LorenzUtils.inSkyBlock && config.display
-        && (GardenAPI.inGarden() || config.everywhere)
+    private fun isEnabled() =
+        config.display && ((LorenzUtils.inSkyBlock && (GardenAPI.inGarden() || config.showOutsideGarden)) ||
+            (OutsideSbFeature.NEXT_JACOB_CONTEST.isSelected() && !LorenzUtils.inSkyBlock))
 
     private fun isFetchEnabled() = isEnabled() && config.fetchAutomatically
     private fun isSendEnabled() =
@@ -466,7 +524,7 @@ object GardenNextJacobContest {
         config.shareAutomatically == ShareContestsEntry.ASK // (Only call if isSendEnabled())
 
     private fun fetchContestsIfAble() {
-        if (isFetchingContests || contests.size == maxContestsPerYear || !isFetchEnabled()) return
+        if (isFetchingContests || contests.size == MAX_CONTESTS_PER_YEAR || !isFetchEnabled()) return
         // Allows retries every 10 minutes when it's after 1 day into the new year
         val currentMills = System.currentTimeMillis()
         if (lastFetchAttempted + 600_000 > currentMills || currentMills < nextContestsAvailableAt) return
@@ -503,12 +561,12 @@ object GardenNextJacobContest {
                     newContests[timeMark + contestDuration] = FarmingContest(timeMark + contestDuration, crops)
                 }
             } else {
-                LorenzUtils.chat("This year's contests aren't available to fetch automatically yet, please load them from your calendar or wait 10 minutes.")
-                LorenzUtils.clickableChat("Click here to open your calendar!", "calendar")
+                ChatUtils.chat("This year's contests aren't available to fetch automatically yet, please load them from your calendar or wait 10 minutes.")
+                ChatUtils.clickableChat("Click here to open your calendar!", "calendar")
             }
 
-            if (newContests.count() == maxContestsPerYear) {
-                LorenzUtils.chat("Successfully loaded this year's contests from elitebot.dev automatically!")
+            if (newContests.count() == MAX_CONTESTS_PER_YEAR) {
+                ChatUtils.chat("Successfully loaded this year's contests from elitebot.dev automatically!")
 
                 contests = newContests
                 fetchedFromElite = true
@@ -518,13 +576,16 @@ object GardenNextJacobContest {
                 saveConfig()
             }
         } catch (e: Exception) {
-            e.printStackTrace()
-            LorenzUtils.error("Failed to fetch upcoming contests. Please report this error if it continues to occur.")
+            ErrorManager.logErrorWithData(
+                e,
+                "Failed to fetch upcoming contests. Please report this error if it continues to occur"
+            )
+
         }
     }
 
     private fun sendContests() {
-        if (isSendingContests || contests.size != maxContestsPerYear || isCloseToNewYear()) return
+        if (isSendingContests || contests.size != MAX_CONTESTS_PER_YEAR || isCloseToNewYear()) return
 
         isSendingContests = true
 
@@ -549,13 +610,18 @@ object GardenNextJacobContest {
         val result = withContext(dispatcher) { APIUtil.postJSONIsSuccessful(url, body) }
 
         if (result) {
-            LorenzUtils.chat("Successfully submitted this years upcoming contests, thank you for helping everyone out!")
+            ChatUtils.chat("Successfully submitted this years upcoming contests, thank you for helping everyone out!")
         } else {
-            LorenzUtils.error("Something went wrong submitting upcoming contests!")
+            ErrorManager.logErrorStateWithData(
+                "Something went wrong submitting upcoming contests!",
+                "submitContestsToElite not successful"
+            )
         }
     } catch (e: Exception) {
-        e.printStackTrace()
-        LorenzUtils.error("Failed to submit upcoming contests. Please report this error if it continues to occur.")
+        ErrorManager.logErrorWithData(
+            e, "Failed to submit upcoming contests. Please report this error if it continues to occur.",
+            "contests" to contests
+        )
         null
     }
 
@@ -578,6 +644,15 @@ object GardenNextJacobContest {
 
         event.transform(15, "garden.nextJacobContests.shareAutomatically") { element ->
             ConfigUtils.migrateIntToEnum(element, ShareContestsEntry::class.java)
+        }
+        event.move(18, "garden.nextJacobContests.everywhere", "garden.nextJacobContests.showOutsideGarden")
+        event.move(33, "garden.jacobContextTimesPos", "garden.jacobContestTimesPosition")
+        event.move(33, "garden.jacobContextTimes", "garden.jacobContestTimes")
+        event.move(33, "garden.everywhere", "garden.outsideGarden")
+        event.transform(33, "misc.showOutsideSB") { element ->
+            element.asJsonArray.map { setting ->
+                if (setting.asString == "NEXT_JACOB_CONTEXT") JsonPrimitive("NEXT_JACOB_CONTEST") else setting
+            }.toJsonArray()
         }
     }
 }

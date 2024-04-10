@@ -1,8 +1,8 @@
 package at.hannibal2.skyhanni.features.misc.massconfiguration
 
-import io.github.moulberry.moulconfig.internal.GlScissorStack
-import io.github.moulberry.moulconfig.internal.RenderUtils
-import io.github.moulberry.moulconfig.internal.TextRenderUtils
+import io.github.notenoughupdates.moulconfig.internal.GlScissorStack
+import io.github.notenoughupdates.moulconfig.internal.RenderUtils
+import io.github.notenoughupdates.moulconfig.internal.TextRenderUtils
 import io.github.moulberry.notenoughupdates.util.Utils
 import net.minecraft.client.gui.GuiScreen
 import net.minecraft.client.gui.ScaledResolution
@@ -14,9 +14,10 @@ import kotlin.math.min
 class DefaultConfigOptionGui(
     private val orderedOptions: Map<Category, List<FeatureToggleableOption>>,
     old: String,
-    new: String
+    new: String,
 ) :
     GuiScreen() {
+
     val title = if (old == "null") {
         if (new == "null")
             "§5SkyHanni Default Options"
@@ -181,7 +182,6 @@ class DefaultConfigOptionGui(
         if (hoveringTextToDraw != null) {
             Utils.drawHoveringText(hoveringTextToDraw, mouseX, mouseY, width, height, 100, mc.fontRendererObj)
         }
-
     }
 
     private fun scroll(s: Int) {

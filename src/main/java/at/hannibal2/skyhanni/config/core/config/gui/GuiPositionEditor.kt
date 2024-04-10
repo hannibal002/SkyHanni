@@ -19,6 +19,7 @@
 package at.hannibal2.skyhanni.config.core.config.gui
 
 import at.hannibal2.skyhanni.config.core.config.Position
+import at.hannibal2.skyhanni.data.GuiEditManager
 import at.hannibal2.skyhanni.data.GuiEditManager.Companion.getAbsX
 import at.hannibal2.skyhanni.data.GuiEditManager.Companion.getAbsY
 import at.hannibal2.skyhanni.data.GuiEditManager.Companion.getDummySize
@@ -35,6 +36,7 @@ import org.lwjgl.input.Mouse
 import java.io.IOException
 
 class GuiPositionEditor(private val positions: List<Position>, private val border: Int) : GuiScreen() {
+
     private var grabbedX = 0
     private var grabbedY = 0
     private var clickedPos = -1
@@ -42,6 +44,9 @@ class GuiPositionEditor(private val positions: List<Position>, private val borde
     override fun onGuiClosed() {
         super.onGuiClosed()
         clickedPos = -1
+        for (position in positions) {
+            position.clicked = false
+        }
         OtherInventoryData.close()
     }
 
@@ -88,6 +93,12 @@ class GuiPositionEditor(private val positions: List<Position>, private val borde
         val location = "§7x: §e${pos.rawX}§7, y: §e${pos.rawY}§7, scale: §e${pos.scale.round(2)}"
         GuiRenderUtils.drawStringCentered("§b" + pos.internalName, getScaledWidth() / 2, 18)
         GuiRenderUtils.drawStringCentered(location, getScaledWidth() / 2, 28)
+        if (pos.canJumpToConfigOptions())
+            GuiRenderUtils.drawStringCentered(
+                "§aRight-Click to open associated config options",
+                getScaledWidth() / 2,
+                38
+            )
     }
 
     private fun renderRectangles(): Int {
@@ -137,7 +148,6 @@ class GuiPositionEditor(private val positions: List<Position>, private val borde
     override fun mouseClicked(originalX: Int, priginalY: Int, mouseButton: Int) {
         super.mouseClicked(originalX, priginalY, mouseButton)
 
-        if (mouseButton != 0) return
 
         val mouseX = Mouse.getX() * width / Minecraft.getMinecraft().displayWidth
         val mouseY = height - Mouse.getY() * height / Minecraft.getMinecraft().displayHeight - 1
@@ -147,19 +157,20 @@ class GuiPositionEditor(private val positions: List<Position>, private val borde
             val elementHeight = position.getDummySize().y
             val x = position.getAbsX()
             val y = position.getAbsY()
-            if (!position.clicked &&
-                GuiRenderUtils.isPointInRect(
-
-                    mouseX,
-                    mouseY,
-                    x - border,
-                    y - border,
-                    elementWidth + border * 2,
-                    elementHeight + border * 2
-
-                )
-
-            ) {
+            val isHovered = GuiRenderUtils.isPointInRect(
+                mouseX,
+                mouseY,
+                x - border,
+                y - border,
+                elementWidth + border * 2,
+                elementHeight + border * 2
+            )
+            if (!isHovered) continue
+            if (mouseButton == 1) {
+                position.jumpToConfigOptions()
+                break
+            }
+            if (!position.clicked && mouseButton == 0) {
                 clickedPos = i
                 position.clicked = true
                 grabbedX = mouseX
@@ -212,6 +223,7 @@ class GuiPositionEditor(private val positions: List<Position>, private val borde
             val elementHeight = position.getDummySize(true).y
             grabbedX += position.moveX(mouseX - grabbedX, elementWidth)
             grabbedY += position.moveY(mouseY - grabbedY, elementHeight)
+            GuiEditManager.handleGuiPositionMoved(position.internalName)
         }
     }
 

@@ -5,8 +5,8 @@ import at.hannibal2.skyhanni.events.LorenzTickEvent
 import at.hannibal2.skyhanni.events.TabListUpdateEvent
 import at.hannibal2.skyhanni.mixins.hooks.tabListGuard
 import at.hannibal2.skyhanni.mixins.transformers.AccessorGuiPlayerTabOverlay
-import at.hannibal2.skyhanni.utils.LorenzUtils.conditionalTransform
-import at.hannibal2.skyhanni.utils.LorenzUtils.transformIf
+import at.hannibal2.skyhanni.utils.ConditionalUtils.conditionalTransform
+import at.hannibal2.skyhanni.utils.ConditionalUtils.transformIf
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import com.google.common.collect.ComparisonChain
 import com.google.common.collect.Ordering
@@ -21,28 +21,30 @@ import net.minecraftforge.fml.relauncher.SideOnly
 class TabListData {
 
     companion object {
+
         private var cache = emptyList<String>()
         private var debugCache: List<String>? = null
+        var fullyLoaded = false
 
         // TODO replace with TabListUpdateEvent
         fun getTabList() = debugCache ?: cache
 
         fun toggleDebugCommand() {
             if (debugCache != null) {
-                LorenzUtils.chat("Disabled tab list debug.")
+                ChatUtils.chat("Disabled tab list debug.")
                 debugCache = null
                 return
             }
             SkyHanniMod.coroutineScope.launch {
                 val clipboard = OSUtils.readFromClipboard() ?: return@launch
                 debugCache = clipboard.lines()
-                LorenzUtils.chat("Enabled tab list debug with your clipboard.")
+                ChatUtils.chat("Enabled tab list debug with your clipboard.")
             }
         }
 
         fun copyCommand(args: Array<String>) {
             if (debugCache != null) {
-                LorenzUtils.clickableChat("Tab list debug is enabled!", "shdebugtablist")
+                ChatUtils.clickableChat("Tab list debug is enabled!", "shdebugtablist")
                 return
             }
 
@@ -52,12 +54,18 @@ class TabListData {
                 val tabListLine = line.transformIf({ noColor }) { removeColor() }
                 if (tabListLine != "") resultList.add("'$tabListLine'")
             }
-            val tabList = Minecraft.getMinecraft().ingameGUI.tabList as AccessorGuiPlayerTabOverlay
-            val tabHeader = tabList.header_skyhanni.conditionalTransform(noColor, { unformattedText }, { formattedText })
-            val tabFooter = tabList.footer_skyhanni.conditionalTransform(noColor, { unformattedText }, { formattedText })
+            val tabList = getPlayerTabOverlay()
+            val tabHeader =
+                tabList.header_skyhanni.conditionalTransform(noColor, { unformattedText }, { formattedText })
+            val tabFooter =
+                tabList.footer_skyhanni.conditionalTransform(noColor, { unformattedText }, { formattedText })
             val string = "Header:\n\n$tabHeader\n\nBody:\n\n${resultList.joinToString("\n")}\n\nFooter:\n\n$tabFooter"
             OSUtils.copyToClipboard(string)
-            LorenzUtils.chat("Tab list copied into the clipboard!")
+            ChatUtils.chat("Tab list copied into the clipboard!")
+        }
+
+        fun getPlayerTabOverlay(): AccessorGuiPlayerTabOverlay {
+            return Minecraft.getMinecraft().ingameGUI.tabList as AccessorGuiPlayerTabOverlay
         }
     }
 
@@ -65,6 +73,7 @@ class TabListData {
 
     @SideOnly(Side.CLIENT)
     internal class PlayerComparator : Comparator<NetworkPlayerInfo> {
+
         override fun compare(o1: NetworkPlayerInfo, o2: NetworkPlayerInfo): Int {
             val team1 = o1.playerTeam
             val team2 = o2.playerTeam
@@ -95,7 +104,7 @@ class TabListData {
 
     @SubscribeEvent
     fun onTick(event: LorenzTickEvent) {
-        if (!event.isMod(5)) return
+        if (!event.isMod(2)) return
 
         val tabList = readTabList() ?: return
         if (cache != tabList) {

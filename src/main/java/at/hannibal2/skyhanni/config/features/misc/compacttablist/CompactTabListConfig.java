@@ -2,9 +2,9 @@ package at.hannibal2.skyhanni.config.features.misc.compacttablist;
 
 import at.hannibal2.skyhanni.config.FeatureToggle;
 import com.google.gson.annotations.Expose;
-import io.github.moulberry.moulconfig.annotations.Accordion;
-import io.github.moulberry.moulconfig.annotations.ConfigEditorBoolean;
-import io.github.moulberry.moulconfig.annotations.ConfigOption;
+import io.github.notenoughupdates.moulconfig.annotations.Accordion;
+import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorBoolean;
+import io.github.notenoughupdates.moulconfig.annotations.ConfigOption;
 
 public class CompactTabListConfig {
     @Expose
@@ -14,6 +14,15 @@ public class CompactTabListConfig {
     @ConfigEditorBoolean
     @FeatureToggle
     public boolean enabled = false;
+
+    @Expose
+    @ConfigOption(
+        name = "Toggle Tab",
+        desc = "Use the tab key to toggle the tab list, not show tab list while the key is pressed. " +
+            "Similar to patcher's feature."
+    )
+    @ConfigEditorBoolean
+    public boolean toggleTab = false;
 
     @Expose
     @ConfigOption(name = "Hide Hypixel Adverts", desc = "Hides text from advertising the Hypixel server or store in the tablist.")

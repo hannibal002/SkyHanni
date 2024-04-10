@@ -4,10 +4,10 @@ import at.hannibal2.skyhanni.config.FeatureToggle;
 import at.hannibal2.skyhanni.config.HasLegacyId;
 import at.hannibal2.skyhanni.config.core.config.Position;
 import com.google.gson.annotations.Expose;
-import io.github.moulberry.moulconfig.annotations.ConfigEditorBoolean;
-import io.github.moulberry.moulconfig.annotations.ConfigEditorDropdown;
-import io.github.moulberry.moulconfig.annotations.ConfigEditorSlider;
-import io.github.moulberry.moulconfig.annotations.ConfigOption;
+import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorBoolean;
+import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorDropdown;
+import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorSlider;
+import io.github.notenoughupdates.moulconfig.annotations.ConfigOption;
 
 public class SackDisplayConfig {
 
@@ -32,7 +32,7 @@ public class SackDisplayConfig {
         "§eDefault: §72,240/2.2k\n" +
         "§eFormatted: §72.2k/2.2k\n" +
         "§eUnformatted: §72,240/2,200")
-    @ConfigEditorDropdown()
+    @ConfigEditorDropdown
     public NumberFormatEntry numberFormat = NumberFormatEntry.FORMATTED;
 
     public enum NumberFormatEntry implements HasLegacyId {
@@ -74,7 +74,7 @@ public class SackDisplayConfig {
 
     @Expose
     @ConfigOption(name = "Sorting Type", desc = "Sorting type of items in sack.")
-    @ConfigEditorDropdown()
+    @ConfigEditorDropdown
     public SortingTypeEntry sortingType = SortingTypeEntry.DESC_STORED;
 
     public enum SortingTypeEntry implements HasLegacyId {
@@ -131,7 +131,7 @@ public class SackDisplayConfig {
     @ConfigOption(name = "Price Format", desc = "Format of the price displayed.\n" +
         "§eFormatted: §7(12k)\n" +
         "§eUnformatted: §7(12,421)")
-    @ConfigEditorDropdown()
+    @ConfigEditorDropdown
     public PriceFormatEntry priceFormat = PriceFormatEntry.FORMATTED;
 
     public enum PriceFormatEntry implements HasLegacyId {
@@ -164,7 +164,7 @@ public class SackDisplayConfig {
 
     @Expose
     @ConfigOption(name = "Show Price From", desc = "Show price from Bazaar or NPC.")
-    @ConfigEditorDropdown()
+    @ConfigEditorDropdown
     public PriceFrom priceFrom = PriceFrom.BAZAAR;
 
     public enum PriceFrom implements HasLegacyId {

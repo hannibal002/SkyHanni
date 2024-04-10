@@ -1,8 +1,9 @@
 package at.hannibal2.skyhanni.features.misc.update
 
-import io.github.moulberry.moulconfig.gui.GuiOptionEditor
-import io.github.moulberry.moulconfig.internal.TextRenderUtils
-import io.github.moulberry.moulconfig.processor.ProcessedOption
+import at.hannibal2.skyhanni.SkyHanniMod
+import io.github.notenoughupdates.moulconfig.gui.GuiOptionEditor
+import io.github.notenoughupdates.moulconfig.internal.TextRenderUtils
+import io.github.notenoughupdates.moulconfig.processor.ProcessedOption
 import io.github.moulberry.notenoughupdates.itemeditor.GuiElementButton
 import net.minecraft.client.Minecraft
 import net.minecraft.client.renderer.GlStateManager
@@ -11,6 +12,7 @@ import net.minecraft.util.EnumChatFormatting.RED
 import org.lwjgl.input.Mouse
 
 class GuiOptionEditorUpdateCheck(option: ProcessedOption) : GuiOptionEditor(option) {
+
     val button = GuiElementButton("", -1) { }
 
     override fun render(x: Int, y: Int, width: Int) {
@@ -43,7 +45,7 @@ class GuiOptionEditorUpdateCheck(option: ProcessedOption) : GuiOptionEditor(opti
         val widthRemaining = width - button.width - 10
 
         GlStateManager.scale(2F, 2F, 1F)
-        val currentVersion = UpdateManager.getCurrentVersion()
+        val currentVersion = SkyHanniMod.version
         val sameVersion = currentVersion.equals(nextVersion, true)
         TextRenderUtils.drawStringCenteredScaledMaxWidth(
             "${if (UpdateManager.updateState == UpdateManager.UpdateState.NONE) GREEN else RED}$currentVersion" +

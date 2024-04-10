@@ -5,35 +5,32 @@ import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.config.features.inventory.ChestValueConfig.NumberFormatEntry
 import at.hannibal2.skyhanni.config.features.inventory.ChestValueConfig.SortingTypeEntry
 import at.hannibal2.skyhanni.data.IslandType
-import at.hannibal2.skyhanni.events.GuiContainerEvent
 import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.InventoryCloseEvent
 import at.hannibal2.skyhanni.events.InventoryOpenEvent
 import at.hannibal2.skyhanni.events.LorenzTickEvent
+import at.hannibal2.skyhanni.features.dungeon.DungeonAPI
 import at.hannibal2.skyhanni.features.misc.items.EstimatedItemValue
 import at.hannibal2.skyhanni.features.misc.items.EstimatedItemValueCalculator
+import at.hannibal2.skyhanni.utils.CollectionUtils.addAsSingletonList
 import at.hannibal2.skyhanni.utils.ConfigUtils
 import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalNameOrNull
+import at.hannibal2.skyhanni.utils.ItemUtils.itemName
 import at.hannibal2.skyhanni.utils.LorenzUtils
-import at.hannibal2.skyhanni.utils.LorenzUtils.addAsSingletonList
 import at.hannibal2.skyhanni.utils.LorenzUtils.addButton
 import at.hannibal2.skyhanni.utils.LorenzUtils.isInIsland
 import at.hannibal2.skyhanni.utils.NEUItems.getItemStackOrNull
 import at.hannibal2.skyhanni.utils.NumberUtil
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
-import at.hannibal2.skyhanni.utils.RenderUtils.highlight
 import at.hannibal2.skyhanni.utils.RenderUtils.renderStringsAndItems
-import at.hannibal2.skyhanni.utils.SpecialColour
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 import net.minecraft.client.Minecraft
 import net.minecraft.client.gui.inventory.GuiChest
 import net.minecraft.init.Items
 import net.minecraft.item.ItemStack
-import net.minecraftforge.fml.common.eventhandler.EventPriority
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
-import java.awt.Color
 
 class ChestValue {
 
@@ -45,7 +42,7 @@ class ChestValue {
     @SubscribeEvent
     fun onBackgroundDraw(event: GuiRenderEvent.ChestGuiOverlayRenderEvent) {
         if (!isEnabled()) return
-        if (LorenzUtils.inDungeons && !config.enableInDungeons) return
+        if (DungeonAPI.inDungeon() && !config.enableInDungeons) return
         if (InventoryUtils.openInventoryName() == "") return
 
         if (!config.showDuringEstimatedItemValue) {
@@ -56,7 +53,7 @@ class ChestValue {
             config.position.renderStringsAndItems(
                 display,
                 extraSpace = -1,
-                itemScale = 1.3,
+                itemScale = 0.7,
                 posLabel = "Estimated Chest Value"
             )
         }
@@ -81,22 +78,6 @@ class ChestValue {
     @SubscribeEvent
     fun onInventoryClose(event: InventoryCloseEvent) {
         chestItems.clear()
-        Renderable.list.clear()
-    }
-
-    @SubscribeEvent(priority = EventPriority.LOW)
-    fun onDrawBackground(event: GuiContainerEvent.BackgroundDrawnEvent) {
-        if (!isEnabled()) return
-        if (!config.enableHighlight) return
-        if (inInventory) {
-            for ((_, indexes) in Renderable.list) {
-                for (slot in InventoryUtils.getItemsInOpenChest()) {
-                    if (indexes.contains(slot.slotIndex)) {
-                        slot highlight Color(SpecialColour.specialToChromaRGB(config.highlightColor), true)
-                    }
-                }
-            }
-        }
     }
 
     private fun update() {
@@ -127,20 +108,20 @@ class ChestValue {
             totalPrice += total
             if (rendered >= config.itemToShow) continue
             if (total < config.hideBelow) continue
-            val textAmount = " §7x$amount:"
+            val textAmount = " §7x${amount.addSeparators()}:"
             val width = Minecraft.getMinecraft().fontRendererObj.getStringWidth(textAmount)
-            val name = "${stack.displayName.reduceStringLength((config.nameLength - width), ' ')} $textAmount"
+            val name = "${stack.itemName.reduceStringLength((config.nameLength - width), ' ')} $textAmount"
             val price = "§6${(total).formatPrice()}"
             val text = if (config.alignedDisplay)
                 "$name $price"
             else
-                "${stack.displayName} §7x$amount: §6${total.formatPrice()}"
+                "${stack.itemName} §7x$amount: §6${total.formatPrice()}"
             newDisplay.add(buildList {
                 val renderable = Renderable.hoverTips(
                     text,
                     tips,
                     stack = stack,
-                    indexes = index
+                    highlightsOnHoverSlots = if (config.enableHighlight) index else emptyList()
                 )
                 add(" §7- ")
                 if (config.showStacks) add(stack)
@@ -155,7 +136,7 @@ class ChestValue {
         SortingTypeEntry.DESCENDING -> chestItems.values.sortedByDescending { it.total }
         SortingTypeEntry.ASCENDING -> chestItems.values.sortedBy { it.total }
         else -> chestItems.values.sortedByDescending { it.total }
-    }.toMutableList()
+    }
 
     private fun addButton(newDisplay: MutableList<List<Any>>) {
         newDisplay.addButton("§7Sorted By: ",
@@ -285,7 +266,7 @@ class ChestValue {
         var amount: Int,
         val stack: ItemStack,
         var total: Double,
-        val tips: MutableList<String>
+        val tips: MutableList<String>,
     )
 
     private fun isEnabled() = LorenzUtils.inSkyBlock && config.enabled

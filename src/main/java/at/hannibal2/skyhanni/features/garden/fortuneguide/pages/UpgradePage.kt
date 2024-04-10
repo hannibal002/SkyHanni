@@ -1,5 +1,6 @@
 package at.hannibal2.skyhanni.features.garden.fortuneguide.pages
 
+import at.hannibal2.skyhanni.features.bazaar.BazaarApi
 import at.hannibal2.skyhanni.features.garden.fortuneguide.FFGuideGUI
 import at.hannibal2.skyhanni.features.garden.fortuneguide.FortuneUpgrades
 import at.hannibal2.skyhanni.utils.ItemUtils.nameWithEnchantment

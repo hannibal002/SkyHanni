@@ -2,9 +2,9 @@ package at.hannibal2.skyhanni.config.features.inventory.helper;
 
 import at.hannibal2.skyhanni.config.FeatureToggle;
 import com.google.gson.annotations.Expose;
-import io.github.moulberry.moulconfig.annotations.Accordion;
-import io.github.moulberry.moulconfig.annotations.ConfigEditorBoolean;
-import io.github.moulberry.moulconfig.annotations.ConfigOption;
+import io.github.notenoughupdates.moulconfig.annotations.Accordion;
+import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorBoolean;
+import io.github.notenoughupdates.moulconfig.annotations.ConfigOption;
 
 public class HelperConfig {
     @Expose
@@ -13,6 +13,17 @@ public class HelperConfig {
     public HarpConfig harp = new HarpConfig();
 
     public static class HarpConfig {
+        @Expose
+        @ConfigOption(name = "GUI Scale", desc = "Automatically sets the GUI scale to \"AUTO\" when entering the Harp.")
+        @ConfigEditorBoolean
+        public boolean guiScale = false;
+
+        @Expose
+        @ConfigOption(name = "Quick Restart", desc = "Once you've launched the Harp, quickly hit the close button in the Harp Menu to initiate the selected song.")
+        @ConfigEditorBoolean
+        @FeatureToggle
+        public boolean quickRestart = false;
+
         @Expose
         @ConfigOption(name = "Use Keybinds", desc = "In the Harp, press buttons with your number row on the keyboard instead of clicking.")
         @ConfigEditorBoolean

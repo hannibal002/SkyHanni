@@ -1,6 +1,5 @@
 package at.hannibal2.skyhanni.features.chroma
 
-import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.config.features.chroma.ChromaConfig.Direction
 import at.hannibal2.skyhanni.data.MinecraftData
 import at.hannibal2.skyhanni.mixins.transformers.AccessorMinecraft
@@ -14,33 +13,30 @@ import net.minecraft.client.Minecraft
  * Credit: [ChromaShader.java](https://github.com/BiscuitDevelopment/SkyblockAddons/blob/main/src/main/java/codes/biscuit/skyblockaddons/shader/chroma/ChromaShader.java)
  */
 
-object ChromaShader : Shader("chroma", "chroma") {
-    val config get() = SkyHanniMod.feature.chroma
-    val INSTANCE: ChromaShader
-        get() = this
+abstract class ChromaShader(vertex: String, fragment: String) : Shader(vertex, fragment) {
 
     override fun registerUniforms() {
         registerUniform(Uniform.UniformType.FLOAT, "chromaSize") {
-            config.chromaSize * (Minecraft.getMinecraft().displayWidth / 100f)
+            ChromaManager.config.chromaSize * (Minecraft.getMinecraft().displayWidth / 100f)
         }
         registerUniform(Uniform.UniformType.FLOAT, "timeOffset") {
             var ticks =
-                (MinecraftData.totalTicks / 2) + (Minecraft.getMinecraft() as AccessorMinecraft).timer.renderPartialTicks
+                (MinecraftData.totalTicks) + (Minecraft.getMinecraft() as AccessorMinecraft).timer.renderPartialTicks
 
-            ticks = when (config.chromaDirection) {
+            ticks = when (ChromaManager.config.chromaDirection) {
                 Direction.FORWARD_RIGHT, Direction.BACKWARD_RIGHT -> ticks
                 Direction.FORWARD_LEFT, Direction.BACKWARD_LEFT -> -ticks
                 else -> ticks
             }
 
-            val chromaSpeed = config.chromaSpeed / 360f
+            val chromaSpeed = ChromaManager.config.chromaSpeed / 360f
             ticks * chromaSpeed
         }
         registerUniform(Uniform.UniformType.FLOAT, "saturation") {
-            config.chromaSaturation
+            ChromaManager.config.chromaSaturation
         }
         registerUniform(Uniform.UniformType.BOOL, "forwardDirection") {
-            when (config.chromaDirection) {
+            when (ChromaManager.config.chromaDirection) {
                 Direction.FORWARD_RIGHT, Direction.FORWARD_LEFT -> true
                 Direction.BACKWARD_RIGHT, Direction.BACKWARD_LEFT -> false
                 else -> true

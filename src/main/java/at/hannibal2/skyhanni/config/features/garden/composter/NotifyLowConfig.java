@@ -2,9 +2,9 @@ package at.hannibal2.skyhanni.config.features.garden.composter;
 
 import at.hannibal2.skyhanni.config.FeatureToggle;
 import com.google.gson.annotations.Expose;
-import io.github.moulberry.moulconfig.annotations.ConfigEditorBoolean;
-import io.github.moulberry.moulconfig.annotations.ConfigEditorSlider;
-import io.github.moulberry.moulconfig.annotations.ConfigOption;
+import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorBoolean;
+import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorSlider;
+import io.github.notenoughupdates.moulconfig.annotations.ConfigOption;
 
 public class NotifyLowConfig {
     @Expose
@@ -28,7 +28,7 @@ public class NotifyLowConfig {
     public int organicMatter = 20_000;
 
     @Expose
-    @ConfigOption(name = "Min Fuel Cap", desc = "Warn when Fuel is below this value.")
+    @ConfigOption(name = "Min Fuel", desc = "Warn when Fuel is below this value.")
     @ConfigEditorSlider(
         minValue = 500,
         maxValue = 40_000,

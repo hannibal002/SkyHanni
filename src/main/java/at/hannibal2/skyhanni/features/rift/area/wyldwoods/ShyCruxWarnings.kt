@@ -10,15 +10,14 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import kotlin.time.Duration.Companion.milliseconds
 
 class ShyCruxWarnings {
+
     private val config get() = RiftAPI.config.area.wyldWoods
     private val shyNames = arrayOf("I'm ugly! :(", "Eek!", "Don't look at me!", "Look away!")
 
     @SubscribeEvent
     fun onTick(event: LorenzTickEvent) {
         if (!RiftAPI.inRift() || !config.shyWarning) return
-        if (event.isMod(2)) {
-            checkForShy()
-        }
+        checkForShy()
     }
 
     private fun checkForShy() {

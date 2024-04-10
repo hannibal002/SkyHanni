@@ -20,10 +20,12 @@ import at.hannibal2.skyhanni.features.garden.GardenAPI.addCropIcon
 import at.hannibal2.skyhanni.features.garden.GardenAPI.getCropType
 import at.hannibal2.skyhanni.features.garden.farming.GardenCropSpeed.setSpeed
 import at.hannibal2.skyhanni.test.command.ErrorManager
+import at.hannibal2.skyhanni.utils.CollectionUtils.addAsSingletonList
+import at.hannibal2.skyhanni.utils.ConditionalUtils
 import at.hannibal2.skyhanni.utils.ConfigUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils
-import at.hannibal2.skyhanni.utils.LorenzUtils.addAsSingletonList
 import at.hannibal2.skyhanni.utils.LorenzUtils.round
+import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.RenderUtils.renderStringsAndItems
 import at.hannibal2.skyhanni.utils.SoundUtils
 import at.hannibal2.skyhanni.utils.TimeUnit
@@ -34,6 +36,7 @@ import java.util.Collections
 import kotlin.time.Duration.Companion.seconds
 
 object GardenCropMilestoneDisplay {
+
     private var progressDisplay = emptyList<List<Any>>()
     private var mushroomCowPerkDisplay = emptyList<List<Any>>()
     private val cultivatingData = mutableMapOf<CropType, Long>()
@@ -45,7 +48,7 @@ object GardenCropMilestoneDisplay {
 
     @SubscribeEvent
     fun onConfigLoad(event: ConfigLoadEvent) {
-        LorenzUtils.onToggle(
+        ConditionalUtils.onToggle(
             config.bestShowMaxedNeeded,
             config.highestTimeFormat,
         ) {
@@ -114,7 +117,7 @@ object GardenCropMilestoneDisplay {
             }
             cultivatingData[crop] = counter
         } catch (e: Throwable) {
-            ErrorManager.logError(e, "Updating crop counter by reading farming tool nbt data.")
+            ErrorManager.logErrorWithData(e, "Updating crop counter by reading farming tool nbt data.")
         }
     }
 
@@ -145,7 +148,7 @@ object GardenCropMilestoneDisplay {
         if (crop.isMaxed()) {
             list.add("§7" + crop.cropName + " §eMAXED")
         } else {
-            list.add("§7" + crop.cropName + " $currentTier➜$nextTier")
+            list.add("§7" + crop.cropName + " §8$currentTier➜§3$nextTier")
         }
         lineMap[1] = list
 
@@ -160,11 +163,11 @@ object GardenCropMilestoneDisplay {
         }
 
         lineMap[2] = if (crop.isMaxed()) {
-            val haveFormat = LorenzUtils.formatInteger(counter)
+            val haveFormat = counter.addSeparators()
             Collections.singletonList("§7Counter: §e$haveFormat")
         } else {
-            val haveFormat = LorenzUtils.formatInteger(have)
-            val needFormat = LorenzUtils.formatInteger(need)
+            val haveFormat = have.addSeparators()
+            val needFormat = need.addSeparators()
             Collections.singletonList("§e$haveFormat§8/§e$needFormat")
         }
 
@@ -192,9 +195,9 @@ object GardenCropMilestoneDisplay {
                 }
             }
 
-            val format = LorenzUtils.formatInteger(farmingFortuneSpeed * 60)
+            val format = (farmingFortuneSpeed * 60).addSeparators()
             lineMap[4] = Collections.singletonList("§7Crops/Minute§8: §e$format")
-            val formatBps = LorenzUtils.formatDouble(speed, config.blocksBrokenPrecision)
+            val formatBps = speed.round(config.blocksBrokenPrecision).addSeparators()
             lineMap[5] = Collections.singletonList("§7Blocks/Second§8: §e$formatBps")
         }
 
@@ -264,8 +267,8 @@ object GardenCropMilestoneDisplay {
         val have = counter - cropsForCurrentTier
         val need = cropsForNextTier - cropsForCurrentTier
 
-        val haveFormat = LorenzUtils.formatInteger(have)
-        val needFormat = LorenzUtils.formatInteger(need)
+        val haveFormat = have.addSeparators()
+        val needFormat = need.addSeparators()
 
         val missing = need - have
 

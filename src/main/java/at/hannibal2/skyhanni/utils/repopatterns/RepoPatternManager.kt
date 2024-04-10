@@ -2,11 +2,13 @@ package at.hannibal2.skyhanni.utils.repopatterns
 
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.config.ConfigManager
+import at.hannibal2.skyhanni.config.features.dev.RepoPatternConfig
 import at.hannibal2.skyhanni.events.ConfigLoadEvent
 import at.hannibal2.skyhanni.events.LorenzEvent
 import at.hannibal2.skyhanni.events.PreInitFinishedEvent
 import at.hannibal2.skyhanni.events.RepositoryReloadEvent
-import at.hannibal2.skyhanni.utils.LorenzUtils.afterChange
+import at.hannibal2.skyhanni.utils.ConditionalUtils.afterChange
+import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.StringUtils.matches
 import net.minecraft.launchwrapper.Launch
 import net.minecraftforge.fml.common.FMLCommonHandler
@@ -19,6 +21,7 @@ import java.util.regex.PatternSyntaxException
  * Manages [RepoPattern]s.
  */
 object RepoPatternManager {
+
     val allPatterns: Collection<RepoPatternImpl> get() = usedKeys.values
 
     /**
@@ -38,8 +41,24 @@ object RepoPatternManager {
     private var usedKeys = mutableMapOf<String, RepoPatternImpl>()
 
     private var wasPreinitialized = false
-    private val isInDevEnv = Launch.blackboard["fml.deobfuscatedEnvironment"] as Boolean
-    private val config get() = SkyHanniMod.feature.dev.repoPattern
+    private val isInDevEnv = try {
+        Launch.blackboard["fml.deobfuscatedEnvironment"] as Boolean
+    } catch (_: Exception) {
+        true
+    }
+
+    private val insideTest = Launch.blackboard == null
+
+    private val config
+        get() = if (!insideTest) {
+            SkyHanniMod.feature.dev.repoPattern
+        } else {
+            RepoPatternConfig().apply {
+                tolerateDuplicateUsage = true
+            }
+        }
+
+    val localLoading: Boolean get() = config.forceLocal.get() || LorenzUtils.isInDevEnvironment()
 
     /**
      * Crash if in a development environment, or if inside a guarded event handler.
@@ -72,9 +91,8 @@ object RepoPatternManager {
         reloadPatterns()
     }
 
-
     @SubscribeEvent
-    fun onConfigInit(event: ConfigLoadEvent) {
+    fun onConfigLoad(event: ConfigLoadEvent) {
         config.forceLocal.afterChange { reloadPatterns() }
     }
 
@@ -83,7 +101,7 @@ object RepoPatternManager {
      */
     private fun reloadPatterns() {
         val remotePatterns =
-            if (config.forceLocal.get()) mapOf()
+            if (localLoading) mapOf()
             else regexes?.regexes ?: mapOf()
 
         for (it in usedKeys.values) {

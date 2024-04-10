@@ -2,6 +2,7 @@ package at.hannibal2.skyhanni.features.misc
 
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
+import at.hannibal2.skyhanni.config.enums.OutsideSbFeature
 import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.LorenzWorldChangeEvent
 import at.hannibal2.skyhanni.events.PacketEvent
@@ -13,9 +14,11 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import kotlin.concurrent.fixedRateTimer
 
 class TpsCounter {
+
     private val config get() = SkyHanniMod.feature.gui
 
     companion object {
+
         private const val minDataAmount = 5
         private const val waitAfterWorldSwitch = 6
     }
@@ -28,9 +31,9 @@ class TpsCounter {
     private var display = ""
 
     init {
+        // TODO use SecondPassedEvent + passedSince
         fixedRateTimer(name = "skyhanni-tps-counter-seconds", period = 1000L) {
-            if (!LorenzUtils.inSkyBlock) return@fixedRateTimer
-            if (!config.tpsDisplay) return@fixedRateTimer
+            if (!isEnabled()) return@fixedRateTimer
             if (packetsFromLastSecond == 0) return@fixedRateTimer
 
             if (ignoreFirstTicks > 0) {
@@ -58,9 +61,9 @@ class TpsCounter {
                 "§eTPS: $color$tps"
             }
         }
+        // TODO use DelayedRun
         fixedRateTimer(name = "skyhanni-tps-counter-ticks", period = 50L) {
-            if (!LorenzUtils.inSkyBlock) return@fixedRateTimer
-            if (!config.tpsDisplay) return@fixedRateTimer
+            if (!isEnabled()) return@fixedRateTimer
 
             if (hasPacketReceived) {
                 hasPacketReceived = false
@@ -85,11 +88,13 @@ class TpsCounter {
 
     @SubscribeEvent
     fun onRenderOverlay(event: GuiRenderEvent.GuiOverlayRenderEvent) {
-        if (!LorenzUtils.inSkyBlock) return
-        if (!config.tpsDisplay) return
+        if (!isEnabled()) return
 
         config.tpsDisplayPosition.renderString(display, posLabel = "Tps Display")
     }
+
+    private fun isEnabled() = LorenzUtils.onHypixel && config.tpsDisplay &&
+        (LorenzUtils.inSkyBlock || OutsideSbFeature.TPS_DISPLAY.isSelected())
 
     @SubscribeEvent
     fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {

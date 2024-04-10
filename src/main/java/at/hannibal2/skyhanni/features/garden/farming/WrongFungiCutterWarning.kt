@@ -14,11 +14,12 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import kotlin.time.Duration.Companion.seconds
 
 class WrongFungiCutterWarning {
+
     private var mode = FungiMode.UNKNOWN
     private var lastPlaySoundTime = 0L
 
     @SubscribeEvent
-    fun onChatMessage(event: LorenzChatEvent) {
+    fun onChat(event: LorenzChatEvent) {
         val message = event.message
         if (message == "§eFungi Cutter Mode: §r§cRed Mushrooms") {
             mode = FungiMode.RED
@@ -29,7 +30,7 @@ class WrongFungiCutterWarning {
     }
 
     @SubscribeEvent
-    fun onBlockClick(event: CropClickEvent) {
+    fun onCropClick(event: CropClickEvent) {
         if (event.clickType != ClickType.LEFT_CLICK) return
         if (event.crop != CropType.MUSHROOM) return
 
@@ -74,6 +75,7 @@ class WrongFungiCutterWarning {
         ;
 
         companion object {
+
             fun getOrNull(mode: String) =
                 entries.firstOrNull { it.name == mode } ?: error("Unknown fungi mode: '$mode'")
         }

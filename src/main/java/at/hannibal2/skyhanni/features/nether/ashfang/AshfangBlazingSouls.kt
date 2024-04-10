@@ -8,18 +8,18 @@ import at.hannibal2.skyhanni.events.LorenzWorldChangeEvent
 import at.hannibal2.skyhanni.features.combat.damageindicator.BossType
 import at.hannibal2.skyhanni.features.combat.damageindicator.DamageIndicatorManager
 import at.hannibal2.skyhanni.test.GriffinUtils.drawWaypointFilled
+import at.hannibal2.skyhanni.utils.ColorUtils.toChromaColor
 import at.hannibal2.skyhanni.utils.EntityUtils
 import at.hannibal2.skyhanni.utils.EntityUtils.hasSkullTexture
 import at.hannibal2.skyhanni.utils.LocationUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.RenderUtils.drawString
-import at.hannibal2.skyhanni.utils.SpecialColour
 import at.hannibal2.skyhanni.utils.getLorenzVec
 import net.minecraft.entity.item.EntityArmorStand
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
-import java.awt.Color
 
 class AshfangBlazingSouls {
+
     private val config get() = SkyHanniMod.feature.crimsonIsle.ashfang.blazingSouls
 
     private val texture =
@@ -39,7 +39,7 @@ class AshfangBlazingSouls {
     fun onRenderWorld(event: LorenzRenderWorldEvent) {
         if (!isEnabled()) return
 
-        val color = Color(SpecialColour.specialToChromaRGB(config.color), true)
+        val color = config.color.toChromaColor()
 
         val playerLocation = LocationUtils.playerLocation()
         for (orb in souls) {
@@ -47,7 +47,7 @@ class AshfangBlazingSouls {
             val orbLocation = orb.getLorenzVec()
             event.drawWaypointFilled(orbLocation.add(-0.5, 1.25, -0.5), color, extraSize = -0.15)
             if (orbLocation.distance(playerLocation) < 10) {
-                //TODO find way to dynamically change color
+                // TODO find way to dynamically change color
                 event.drawString(orbLocation.add(y = 2.5), "§bBlazing Soul")
             }
         }

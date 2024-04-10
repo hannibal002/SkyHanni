@@ -7,20 +7,21 @@ import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.LorenzTickEvent
 import at.hannibal2.skyhanni.features.garden.CropType
 import at.hannibal2.skyhanni.features.garden.GardenAPI
-import at.hannibal2.skyhanni.utils.LorenzUtils
+import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils.round
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.RenderUtils.renderStrings
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
 class CropSpeedMeter {
+
     private var display = emptyList<String>()
     private var currentCrop: CropType? = null
     private var currentBlocks = 0
     private var snapshot = emptyList<String>()
 
     @SubscribeEvent
-    fun onBlockBreak(event: CropClickEvent) {
+    fun onCropClick(event: CropClickEvent) {
         if (!isEnabled()) return
         if (startCrops.isEmpty()) return
 
@@ -36,7 +37,7 @@ class CropSpeedMeter {
     @SubscribeEvent
     fun onTick(event: LorenzTickEvent) {
         if (!isEnabled()) return
-        if (!event.isMod(30)) return
+        if (!event.isMod(15)) return
 
         updateDisplay()
     }
@@ -112,14 +113,14 @@ class CropSpeedMeter {
     }
 
     companion object {
+
         var enabled = false
         private var startCrops = mapOf<CropType, Long>()
 
         fun toggle() {
             enabled = !enabled
-            LorenzUtils.chat("Crop Speed Meter " + if (enabled) "§aEnabled" else "§cDisabled")
+            ChatUtils.chat("Crop Speed Meter " + if (enabled) "§aEnabled" else "§cDisabled")
             startCrops = emptyMap()
-
         }
     }
 

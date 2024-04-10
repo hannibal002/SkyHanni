@@ -1,6 +1,7 @@
 package at.hannibal2.skyhanni.utils
 
 import at.hannibal2.skyhanni.SkyHanniMod
+import at.hannibal2.skyhanni.config.enums.OutsideSbFeature
 import at.hannibal2.skyhanni.events.LorenzTickEvent
 import at.hannibal2.skyhanni.events.RenderEntityOutlineEvent
 import at.hannibal2.skyhanni.mixins.transformers.CustomRenderGlobal
@@ -32,6 +33,7 @@ import java.lang.reflect.Method
  *
  */
 object EntityOutlineRenderer {
+
     private val entityRenderCache: CachedInfo = CachedInfo(null, null, null)
     private var stopLookingForOptifine = false
     private var isMissingMixin = false
@@ -219,14 +221,10 @@ object EntityOutlineRenderer {
     @JvmStatic
     fun shouldRenderEntityOutlines(): Boolean {
         // SkyBlock Conditions
-        if (!LorenzUtils.inSkyBlock) {
-            return false
-        }
+        if (!LorenzUtils.inSkyBlock && !OutsideSbFeature.HIGHLIGHT_PARTY_MEMBERS.isSelected()) return false
 
         // Main toggle for outlines features
-        if (!isEnabled()) {
-            return false
-        }
+        if (!isEnabled()) return false
 
         // Vanilla Conditions
         val renderGlobal = mc.renderGlobal as CustomRenderGlobal
@@ -400,6 +398,6 @@ object EntityOutlineRenderer {
     private class CachedInfo(
         var xrayCache: HashMap<Entity, Int>?,
         var noXrayCache: HashMap<Entity, Int>?,
-        var noOutlineCache: HashSet<Entity>?
+        var noOutlineCache: HashSet<Entity>?,
     )
 }

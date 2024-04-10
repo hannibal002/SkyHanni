@@ -12,9 +12,10 @@ import at.hannibal2.skyhanni.features.garden.GardenAPI.getCropType
 import at.hannibal2.skyhanni.features.garden.fortuneguide.FFGuideGUI.Companion.currentPet
 import at.hannibal2.skyhanni.features.garden.fortuneguide.FFGuideGUI.Companion.getItem
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName
-import at.hannibal2.skyhanni.utils.ItemUtils.getItemName
 import at.hannibal2.skyhanni.utils.ItemUtils.getItemRarityOrCommon
-import at.hannibal2.skyhanni.utils.NEUItems
+import at.hannibal2.skyhanni.utils.ItemUtils.itemName
+import at.hannibal2.skyhanni.utils.NEUInternalName.Companion.asInternalName
+import at.hannibal2.skyhanni.utils.NEUItems.getPrice
 import at.hannibal2.skyhanni.utils.NumberUtil.addSuffix
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getEnchantments
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getFarmingForDummiesCount
@@ -23,6 +24,7 @@ import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.isRecombobulated
 import net.minecraft.item.ItemStack
 
 object FortuneUpgrades {
+
     private val equipment = listOf(FarmingItems.NECKLACE, FarmingItems.CLOAK, FarmingItems.BELT, FarmingItems.BRACELET)
     private val armor = listOf(FarmingItems.HELMET, FarmingItems.CHESTPLATE, FarmingItems.LEGGINGS, FarmingItems.BOOTS)
     private val axeCrops = listOf(CropType.MELON, CropType.PUMPKIN, CropType.COCOA_BEANS)
@@ -59,10 +61,10 @@ object FortuneUpgrades {
         genericUpgrades.populateAndSort(0)
     }
 
-    //todo fix NEU price data not being loaded if run too early
+    // todo fix NEU price data not being loaded if run too early
     private fun MutableList<FortuneUpgrade>.populateAndSort(style: Int) {
         this.map { upgrade ->
-            val cost = (NEUItems.getPrice(upgrade.requiredItem) * (upgrade.itemQuantity)).toInt()
+            val cost = (upgrade.requiredItem.asInternalName().getPrice() * upgrade.itemQuantity).toInt()
             upgrade.cost = cost
             upgrade.costPerFF = (cost / upgrade.fortuneIncrease).toInt()
         }
@@ -83,7 +85,7 @@ object FortuneUpgrades {
             val nextTalisman = CropAccessory.entries[currentTalismanTier + 1]
             genericUpgrades.add(
                 FortuneUpgrade(
-                    "§7Upgrade your talisman to ${nextTalisman.internalName?.getItemName()}",
+                    "§7Upgrade your talisman to ${nextTalisman.internalName?.itemName}",
                     null, nextTalisman.upgradeCost?.first!!, nextTalisman.upgradeCost.second, 10.0
                 )
             )
@@ -94,7 +96,7 @@ object FortuneUpgrades {
         val visitors = GardenAPI.storage?.uniqueVisitors?.toDouble() ?: 0.0
         for (piece in equipment) {
             val item = piece.getItem()
-            //todo tell them to buy the missing item
+            // todo tell them to buy the missing item
             if (!item.getInternalName().contains("LOTUS")) return
             val enchantments = item.getEnchantments() ?: emptyMap()
             val greenThumbLvl = enchantments["green_thumb"] ?: 0
@@ -119,12 +121,12 @@ object FortuneUpgrades {
             }
         }
     }
-    //todo adding armor tier upgrades later
+    // todo adding armor tier upgrades later
 
     private fun getArmorUpgrades() {
         for (piece in armor) {
             val item = piece.getItem()
-            //todo skip if it doesnt exist -> tell them to buy it later
+            // todo skip if it doesnt exist -> tell them to buy it later
 
             if (FFGuideGUI.isFallbackItem(item)) return
 
@@ -142,17 +144,17 @@ object FortuneUpgrades {
         }
     }
 
-    //todo needs to be called when switching pets
+    // todo needs to be called when switching pets
     private fun getPetUpgrades() {
         if (currentPet.getItem().getInternalName().contains(";")) {
             when (FFStats.currentPetItem) {
                 "GREEN_BANDANA" -> {}
                 "YELLOW_BANDANA" -> {
-                    //todo once auction stuff is done
+                    // todo once auction stuff is done
                 }
 
                 else -> {
-                    //give pet yellow bandana
+                    // give pet yellow bandana
                 }
             }
         }
@@ -273,7 +275,7 @@ object FortuneUpgrades {
         item: ItemStack,
         reforge: FarmingReforges,
         list: MutableList<FortuneUpgrade>,
-        copperPrice: Int? = null
+        copperPrice: Int? = null,
     ) {
         FarmingFortuneDisplay.loadFortuneLineData(item, 0.0)
         val increase = reforge[item.getItemRarityOrCommon().id, FarmingFortuneDisplay.reforgeFortune] ?: return

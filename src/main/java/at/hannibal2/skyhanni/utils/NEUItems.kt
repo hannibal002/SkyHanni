@@ -1,19 +1,23 @@
 package at.hannibal2.skyhanni.utils
 
 import at.hannibal2.skyhanni.config.ConfigManager
-import at.hannibal2.skyhanni.features.bazaar.BazaarDataHolder
+import at.hannibal2.skyhanni.data.jsonobjects.other.HypixelPlayerApiJson
+import at.hannibal2.skyhanni.data.jsonobjects.repo.MultiFilterJson
+import at.hannibal2.skyhanni.events.NeuProfileDataLoadedEvent
+import at.hannibal2.skyhanni.events.NeuRepositoryReloadEvent
+import at.hannibal2.skyhanni.events.RepositoryReloadEvent
+import at.hannibal2.skyhanni.features.inventory.bazaar.BazaarDataHolder
 import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.ItemBlink.checkBlinkItem
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName
 import at.hannibal2.skyhanni.utils.NEUInternalName.Companion.asInternalName
-import at.hannibal2.skyhanni.utils.NumberUtil.romanToDecimal
-import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import com.google.gson.JsonObject
 import com.google.gson.JsonPrimitive
 import io.github.moulberry.notenoughupdates.NEUManager
 import io.github.moulberry.notenoughupdates.NEUOverlay
 import io.github.moulberry.notenoughupdates.NotEnoughUpdates
+import io.github.moulberry.notenoughupdates.events.ProfileDataLoadedEvent
 import io.github.moulberry.notenoughupdates.overlays.AuctionSearchOverlay
 import io.github.moulberry.notenoughupdates.overlays.BazaarSearchOverlay
 import io.github.moulberry.notenoughupdates.recipes.CraftingRecipe
@@ -29,18 +33,19 @@ import net.minecraft.init.Blocks
 import net.minecraft.init.Items
 import net.minecraft.item.ItemStack
 import net.minecraft.nbt.NBTTagCompound
+import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import org.lwjgl.opengl.GL11
-import java.util.regex.Pattern
 
 object NEUItems {
+
     val manager: NEUManager get() = NotEnoughUpdates.INSTANCE.manager
-    private val itemNameCache = mutableMapOf<String, NEUInternalName>() // item name -> internal name
     private val multiplierCache = mutableMapOf<NEUInternalName, Pair<NEUInternalName, Int>>()
     private val recipesCache = mutableMapOf<NEUInternalName, Set<NeuRecipe>>()
     private val ingredientsCache = mutableMapOf<NeuRecipe, Set<Ingredient>>()
-    private val enchantmentNamePattern = Pattern.compile("^(?<format>(?:§.)+)(?<name>[^§]+) (?<level>[IVXL]+)$")
+
     var allItemsCache = mapOf<String, NEUInternalName>() // item name -> internal name
-    var allInternalNames = mutableListOf<NEUInternalName>()
+    val allInternalNames = mutableListOf<NEUInternalName>()
+    val ignoreItemsFilter = MultiFilter()
 
     private val fallbackItem by lazy {
         Utils.createItemStack(
@@ -50,31 +55,30 @@ object NEUItems {
         )
     }
 
-    // TODO remove
-    @Deprecated("Use NEUInternalName rather than String", ReplaceWith("getInternalNameFromItemName()"))
-    fun getRawInternalName(itemName: String): String {
-        return getInternalNameFromItemName(itemName).asString()
+    @SubscribeEvent
+    fun onRepoReload(event: RepositoryReloadEvent) {
+        val ignoredItems = event.getConstant<MultiFilterJson>("IgnoredItems")
+        ignoreItemsFilter.load(ignoredItems)
     }
 
-    fun getInternalNameFromItemName(itemName: String): NEUInternalName {
-        return getInternalNameOrNull(itemName) ?: throw Error("Internal name is null for '$itemName'")
+    @SubscribeEvent
+    fun onNeuRepoReload(event: NeuRepositoryReloadEvent) {
+        allItemsCache = readAllNeuItems()
     }
 
-    fun getInternalNameOrNullIgnoreCase(itemName: String): NEUInternalName? {
-        val lowercase = itemName.removeColor().lowercase()
-        if (itemNameCache.containsKey(lowercase)) {
-            return itemNameCache[lowercase]!!
-        }
+    @SubscribeEvent
+    fun onProfileDataLoaded(event: ProfileDataLoadedEvent) {
+        val apiData = event.data ?: return
+        try {
+            val playerData = ConfigManager.gson.fromJson<HypixelPlayerApiJson>(apiData)
+            NeuProfileDataLoadedEvent(playerData).postAndCatch()
 
-        if (allItemsCache.isEmpty()) {
-            allItemsCache = readAllNeuItems()
+        } catch (e: Exception) {
+            ErrorManager.logErrorWithData(
+                e, "Error reading hypixel player api data",
+                "data" to apiData
+            )
         }
-        allItemsCache[lowercase]?.let {
-            itemNameCache[lowercase] = it
-            return it
-        }
-
-        return null
     }
 
     fun readAllNeuItems(): Map<String, NEUInternalName> {
@@ -87,52 +91,6 @@ object NEUItems {
             allInternalNames.add(internalName)
         }
         return map
-    }
-
-    fun getInternalNameOrNull(itemName: String): NEUInternalName? {
-        val lowercase = itemName.lowercase()
-        if (itemNameCache.containsKey(lowercase)) {
-            return itemNameCache[lowercase]!!
-        }
-
-        if (itemName == "§cmissing repo item") {
-            itemNameCache[lowercase] = NEUInternalName.MISSING_ITEM
-            return NEUInternalName.MISSING_ITEM
-        }
-
-        resolveEnchantmentByName(itemName)?.let {
-            val enchantmentName = fixEnchantmentName(it)
-            itemNameCache[itemName] = enchantmentName
-            return enchantmentName
-        }
-        var rawInternalName = ItemResolutionQuery.findInternalNameByDisplayName(itemName, false) ?: return null
-
-        // This fixes a NEU bug with §9Hay Bale (cosmetic item)
-        // TODO remove workaround when this is fixed in neu
-        rawInternalName = if (rawInternalName == "HAY_BALE") "HAY_BLOCK" else rawInternalName
-
-        val internalName = rawInternalName.asInternalName()
-
-        itemNameCache[lowercase] = internalName
-        return internalName
-    }
-
-    // Workaround for duplex
-    private val duplexPattern = "ULTIMATE_DUPLEX;(?<tier>.*)".toPattern()
-
-    private fun fixEnchantmentName(originalName: String): NEUInternalName {
-        duplexPattern.matchMatcher(originalName) {
-            val tier = group("tier")
-            return "ULTIMATE_REITERATE;$tier".asInternalName()
-        }
-        // TODO USE SH-REPO
-        return originalName.asInternalName()
-    }
-
-    private fun turboCheck(text: String): String {
-        if (text == "Turbo-Cocoa") return "Turbo-Coco"
-        if (text == "Turbo-Cacti") return "Turbo-Cactus"
-        return text
     }
 
     fun getInternalName(itemStack: ItemStack): String? = ItemResolutionQuery(manager)
@@ -148,7 +106,7 @@ object NEUItems {
     fun NEUInternalName.getNpcPrice() = getNpcPriceOrNull() ?: -1.0
 
     fun NEUInternalName.getNpcPriceOrNull(): Double? {
-        if (equals("WISP_POTION")) {
+        if (this == NEUInternalName.WISP_POTION) {
             return 20_000.0
         }
         return BazaarDataHolder.getNpcPrice(this)
@@ -158,14 +116,14 @@ object NEUItems {
         manager.auctionManager.transformHypixelBazaarToNEUItemId(hypixelId).asInternalName()
 
     fun NEUInternalName.getPriceOrNull(useSellingPrice: Boolean = false): Double? {
-        if (equals("WISP_POTION")) {
+        if (this == NEUInternalName.WISP_POTION) {
             return 20_000.0
         }
         val result = manager.auctionManager.getBazaarOrBin(asString(), useSellingPrice)
         if (result != -1.0) return result
 
         if (equals("JACK_O_LANTERN")) {
-            return getPrice("PUMPKIN", useSellingPrice) + 1
+            return "PUMPKIN".asInternalName().getPrice(useSellingPrice) + 1
         }
         if (equals("GOLDEN_CARROT")) {
             // 6.8 for some players
@@ -174,28 +132,23 @@ object NEUItems {
         return getNpcPriceOrNull()
     }
 
-    fun getPrice(internalName: String, useSellingPrice: Boolean = false): Double =
-        internalName.asInternalName().getPrice(useSellingPrice)
-
     fun NEUInternalName.getItemStackOrNull(): ItemStack? = ItemResolutionQuery(manager)
         .withKnownInternalName(asString())
         .resolveToItemStack()?.copy()
 
     fun getItemStackOrNull(internalName: String) = internalName.asInternalName().getItemStackOrNull()
 
-    // TODO remove
-    @Deprecated("Use NEUInternalName rather than String", ReplaceWith("getItemStack()"))
-    fun getItemStack(internalName: String): ItemStack =
-        internalName.asInternalName().getItemStack()
-
     fun NEUInternalName.getItemStack(): ItemStack =
         getItemStackOrNull() ?: run {
-            if (getPriceOrNull() == null) return@run fallbackItem
-            ErrorManager.logError(
+            getPriceOrNull() ?: return@run fallbackItem
+            if (ignoreItemsFilter.match(this.asString())) return@run fallbackItem
+            ErrorManager.logErrorWithData(
                 IllegalStateException("Something went wrong!"),
                 "Encountered an error getting the item for §7$this§c. " +
                     "This may be because your NEU repo is outdated. Please ask in the SkyHanni " +
-                    "Discord if this is the case"
+                    "Discord if this is the case.",
+                "Item name" to this.asString(),
+                "repo commit" to manager.latestRepoCommit
             )
             fallbackItem
         }
@@ -203,23 +156,24 @@ object NEUItems {
     fun isVanillaItem(item: ItemStack): Boolean =
         manager.auctionManager.isVanillaItem(item.getInternalName().asString())
 
+    const val itemFontSize = 2.0 / 3.0
 
-    fun ItemStack.renderOnScreen(x: Float, y: Float, scaleMultiplier: Double = 1.0) {
+    fun ItemStack.renderOnScreen(x: Float, y: Float, scaleMultiplier: Double = itemFontSize) {
         val item = checkBlinkItem()
         val isSkull = item.item === Items.skull
 
-        val baseScale = (if (isSkull) 0.8f else 0.6f)
+        val baseScale = (if (isSkull) 4f / 3f else 1f)
         val finalScale = baseScale * scaleMultiplier
-        val diff = ((finalScale - baseScale) * 10).toFloat()
 
         val translateX: Float
         val translateY: Float
         if (isSkull) {
-            translateX = x - 2 - diff
-            translateY = y - 2 - diff
+            val skullDiff = ((scaleMultiplier) * 2.5).toFloat()
+            translateX = x - skullDiff
+            translateY = y - skullDiff
         } else {
-            translateX = x - diff
-            translateY = y - diff
+            translateX = x
+            translateY = y
         }
 
         GlStateManager.pushMatrix()
@@ -243,7 +197,7 @@ object NEUItems {
         private const val lightScaling = 2.47f // Adjust as needed
         private const val g = 0.6f // Original Value taken from RenderHelper
         private const val lightIntensity = lightScaling * g
-        private val itemLightBuffer = GLAllocation.createDirectFloatBuffer(16);
+        private val itemLightBuffer = GLAllocation.createDirectFloatBuffer(16)
 
         init {
             itemLightBuffer.clear()
@@ -259,13 +213,14 @@ object NEUItems {
 
     fun allNeuRepoItems(): Map<String, JsonObject> = NotEnoughUpdates.INSTANCE.manager.itemInformation
 
+    // TODO create extended function
     fun getMultiplier(internalName: NEUInternalName, tryCount: Int = 0): Pair<NEUInternalName, Int> {
         if (multiplierCache.contains(internalName)) {
             return multiplierCache[internalName]!!
         }
         if (tryCount == 10) {
             ErrorManager.logErrorStateWithData(
-                "Cound not load recipe data.",
+                "Could not load recipe data.",
                 "Failed to find item multiplier",
                 "internalName" to internalName
             )
@@ -317,22 +272,12 @@ object NEUItems {
         val result = Pair(internalName, 1)
         multiplierCache[internalName] = result
         return result
-
-    }
-
-    @Deprecated("Do not use strings as id", ReplaceWith("getMultiplier with NEUInternalName"))
-    fun getMultiplier(internalName: String, tryCount: Int = 0): Pair<String, Int> {
-        val pair = getMultiplier(internalName.asInternalName(), tryCount)
-        return Pair(pair.first.asString(), pair.second)
     }
 
     fun getRecipes(internalName: NEUInternalName): Set<NeuRecipe> {
-        if (recipesCache.contains(internalName)) {
-            return recipesCache[internalName]!!
+        return recipesCache.getOrPut(internalName) {
+            manager.getRecipesFor(internalName.asString())
         }
-        val recipes = manager.getRecipesFor(internalName.asString())
-        recipesCache[internalName] = recipes
-        return recipes
     }
 
     fun NeuRecipe.getCachedIngredients() = ingredientsCache.getOrPut(this) { ingredients }
@@ -345,16 +290,6 @@ object NEUItems {
 
         return false
     }
-
-    // Taken and edited from NEU
-    private fun resolveEnchantmentByName(enchantmentName: String) =
-        enchantmentNamePattern.matchMatcher(enchantmentName) {
-            val name = group("name").trim { it <= ' ' }
-            val ultimate = group("format").lowercase().contains("§l")
-            ((if (ultimate && name != "Ultimate Wise") "ULTIMATE_" else "")
-                + turboCheck(name).replace(" ", "_").replace("-", "_").uppercase()
-                + ";" + group("level").romanToDecimal())
-        }
 
     // Uses NEU
     fun saveNBTData(item: ItemStack, removeLore: Boolean = true): String {

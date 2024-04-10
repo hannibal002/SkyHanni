@@ -2,7 +2,6 @@ package at.hannibal2.skyhanni.features.dungeon
 
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.events.LorenzChatEvent
-import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
@@ -16,7 +15,7 @@ class DungeonBossMessages {
     )
 
     private val messageList = listOf(
-        //M7 – Dragons
+        // M7 – Dragons
         "§cThe Crystal withers your soul as you hold it in your hands!",
         "§cIt doesn't seem like that is supposed to go there."
     )
@@ -44,8 +43,8 @@ class DungeonBossMessages {
     )
 
     @SubscribeEvent
-    fun onChatMessage(event: LorenzChatEvent) {
-        if (!LorenzUtils.inDungeons) return
+    fun onChat(event: LorenzChatEvent) {
+        if (!DungeonAPI.inDungeon()) return
         if (!isBoss(event.message)) return
 
         DungeonAPI.handleBossMessage(event.message)

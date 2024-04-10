@@ -9,10 +9,10 @@ import at.hannibal2.skyhanni.utils.ItemUtils.name
 import at.hannibal2.skyhanni.utils.KeyboardManager
 import at.hannibal2.skyhanni.utils.LorenzRarity
 import at.hannibal2.skyhanni.utils.LorenzUtils
-import at.hannibal2.skyhanni.utils.LorenzUtils.makeAccessible
 import at.hannibal2.skyhanni.utils.LorenzUtils.round
 import at.hannibal2.skyhanni.utils.NumberUtil
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
+import at.hannibal2.skyhanni.utils.ReflectionUtils.makeAccessible
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getPetExp
 import at.hannibal2.skyhanni.utils.StringUtils
 import io.github.moulberry.notenoughupdates.NotEnoughUpdates
@@ -21,6 +21,7 @@ import net.minecraftforge.fml.common.eventhandler.EventPriority
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
 class PetExpTooltip {
+
     private val config get() = SkyHanniMod.feature.misc.pets.petExperienceToolTip
     private val level100Common = 5_624_785
     private val level100Legendary = 25_353_230
@@ -34,7 +35,7 @@ class PetExpTooltip {
 
         val itemStack = event.itemStack ?: return
         val petExperience = itemStack.getPetExp()?.round(1) ?: return
-        val name = itemStack.name ?: return
+        val name = itemStack.name
         try {
 
             val index = findIndex(event.toolTip) ?: return
@@ -44,10 +45,8 @@ class PetExpTooltip {
             val percentage = petExperience / maxXp
             val percentageFormat = LorenzUtils.formatPercentage(percentage)
 
-            event.toolTip.add(index, " ")
-            if (percentage >= 1) {
-                event.toolTip.add(index, "§7Total experience: §e${NumberUtil.format(petExperience)}")
-            } else {
+            if (percentage < 1) {
+                event.toolTip.add(index, " ")
                 val progressBar = StringUtils.progressBar(percentage)
                 val isBelowLegendary = itemStack.getItemRarityOrNull()?.let { it < LorenzRarity.LEGENDARY } ?: false
                 val addLegendaryColor = if (isBelowLegendary) "§6" else ""

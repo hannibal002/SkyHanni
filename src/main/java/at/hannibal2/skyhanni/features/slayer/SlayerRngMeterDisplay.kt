@@ -1,42 +1,57 @@
 package at.hannibal2.skyhanni.features.slayer
 
 import at.hannibal2.skyhanni.SkyHanniMod
-import at.hannibal2.skyhanni.config.Storage
+import at.hannibal2.skyhanni.config.storage.ProfileSpecificStorage
 import at.hannibal2.skyhanni.data.ProfileStorageData
 import at.hannibal2.skyhanni.data.SlayerAPI
 import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.InventoryFullyOpenedEvent
 import at.hannibal2.skyhanni.events.LorenzChatEvent
-import at.hannibal2.skyhanni.events.LorenzTickEvent
+import at.hannibal2.skyhanni.events.SecondPassedEvent
 import at.hannibal2.skyhanni.events.SlayerChangeEvent
+import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
-import at.hannibal2.skyhanni.utils.ItemUtils.nameWithEnchantment
+import at.hannibal2.skyhanni.utils.ItemUtils.itemName
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
-import at.hannibal2.skyhanni.utils.NumberUtil.formatNumber
+import at.hannibal2.skyhanni.utils.NumberUtil.formatLong
 import at.hannibal2.skyhanni.utils.RenderUtils.renderString
 import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.StringUtils.removeWordsAtEnd
+import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import io.github.moulberry.notenoughupdates.util.Constants
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import kotlin.math.ceil
 import kotlin.time.Duration.Companion.seconds
 
 class SlayerRngMeterDisplay {
+
     private val config get() = SkyHanniMod.feature.slayer.rngMeterDisplay
+
+    private val patternGroup = RepoPattern.group("slayer.rngmeter")
+    private val inventoryNamePattern by patternGroup.pattern(
+        "inventoryname",
+        "(?<name>.*) RNG Meter"
+    )
+    private val updatePattern by patternGroup.pattern(
+        "update",
+        " {3}§dRNG Meter §f- §d(?<exp>.*) Stored XP"
+    )
+    private val changedItemPattern by patternGroup.pattern(
+        "changeditem",
+        "§aYou set your §r.* RNG Meter §r§ato drop §r.*§a!"
+    )
+
     private var display = ""
-    private val inventoryNamePattern = "(?<name>.*) RNG Meter".toPattern()
-    private val updatePattern = " {3}§dRNG Meter §f- §d(?<exp>.*) Stored XP".toPattern()
-    private val changedItemPattern = "§aYou set your §r.* RNG Meter §r§ato drop §r.*§a!".toPattern()
     private var lastItemDroppedTime = 0L
 
     @SubscribeEvent
-    fun onTick(event: LorenzTickEvent) {
+    fun onSecondPassed(event: SecondPassedEvent) {
         if (!isEnabled()) return
 
-        if (event.repeatSeconds(1) && lastItemDroppedTime != 0L && System.currentTimeMillis() > lastItemDroppedTime + 4_000) {
+        if (lastItemDroppedTime != 0L && System.currentTimeMillis() > lastItemDroppedTime + 4_000) {
             lastItemDroppedTime = 0L
             update()
         }
@@ -49,7 +64,6 @@ class SlayerRngMeterDisplay {
 
     @SubscribeEvent
     fun onChat(event: LorenzChatEvent) {
-
         if (!isEnabled()) return
 
         if (config.hideChat && SlayerAPI.isInCorrectArea) {
@@ -59,7 +73,7 @@ class SlayerRngMeterDisplay {
         }
 
         val currentMeter = updatePattern.matchMatcher(event.message) {
-            group("exp").formatNumber()
+            group("exp").formatLong()
         } ?: return
 
         val storage = getStorage() ?: return
@@ -70,7 +84,7 @@ class SlayerRngMeterDisplay {
             val item = storage.itemGoal
             val hasItemSelected = item != "" && item != "?"
             if (!hasItemSelected && config.warnEmpty) {
-                LorenzUtils.userError("No Slayer RNG Meter Item selected!")
+                ChatUtils.userError("No Slayer RNG Meter Item selected!")
                 LorenzUtils.sendTitle("§cNo RNG Meter Item!", 3.seconds)
             }
             var blockChat = config.hideChat && hasItemSelected
@@ -86,7 +100,7 @@ class SlayerRngMeterDisplay {
                 var rawPercentage = old.toDouble() / storage.goalNeeded
                 if (rawPercentage > 1) rawPercentage = 1.0
                 val percentage = LorenzUtils.formatPercentage(rawPercentage)
-                LorenzUtils.chat("§dRNG Meter §7dropped at §e$percentage §7XP ($from/${to}§7)")
+                ChatUtils.chat("§dRNG Meter §7dropped at §e$percentage §7XP ($from/${to}§7)")
                 lastItemDroppedTime = System.currentTimeMillis()
             }
             if (blockChat) {
@@ -96,9 +110,9 @@ class SlayerRngMeterDisplay {
         update()
     }
 
-    private fun getStorage(): Storage.ProfileSpecific.SlayerRngMeterStorage? {
+    private fun getStorage(): ProfileSpecificStorage.SlayerRngMeterStorage? {
         return ProfileStorageData.profileSpecific?.slayerRngMeter?.getOrPut(getCurrentSlayer()) {
-            Storage.ProfileSpecific.SlayerRngMeterStorage()
+            ProfileSpecificStorage.SlayerRngMeterStorage()
         }
     }
 
@@ -122,7 +136,7 @@ class SlayerRngMeterDisplay {
             storage.itemGoal = ""
             storage.goalNeeded = -1
         } else {
-            storage.itemGoal = selectedItem.nameWithEnchantment
+            storage.itemGoal = selectedItem.itemName
             val jsonObject = Constants.RNGSCORE["slayer"].asJsonObject.get(getCurrentSlayer()).asJsonObject
             storage.goalNeeded = jsonObject.get(selectedItem.getInternalName().asString()).asLong
         }

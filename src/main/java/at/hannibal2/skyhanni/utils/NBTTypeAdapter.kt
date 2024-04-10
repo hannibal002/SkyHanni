@@ -10,6 +10,7 @@ import java.io.ByteArrayOutputStream
 import java.util.Base64
 
 object NBTTypeAdapter : TypeAdapter<NBTTagCompound>() {
+
     override fun write(out: JsonWriter, value: NBTTagCompound) {
         val baos = ByteArrayOutputStream()
         CompressedStreamTools.writeCompressed(value, baos)

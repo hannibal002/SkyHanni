@@ -2,15 +2,15 @@ package at.hannibal2.skyhanni.config.features.misc;
 
 import at.hannibal2.skyhanni.config.HasLegacyId;
 import com.google.gson.annotations.Expose;
-import io.github.moulberry.moulconfig.annotations.ConfigEditorBoolean;
-import io.github.moulberry.moulconfig.annotations.ConfigEditorDropdown;
-import io.github.moulberry.moulconfig.annotations.ConfigOption;
+import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorBoolean;
+import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorDropdown;
+import io.github.notenoughupdates.moulconfig.annotations.ConfigOption;
 
 public class HideArmorConfig {
 
     @Expose
     @ConfigOption(name = "Mode", desc = "Hide the armor of players.")
-    @ConfigEditorDropdown()
+    @ConfigEditorDropdown
     public ModeEntry mode = ModeEntry.OFF;
 
     public enum ModeEntry implements HasLegacyId {
@@ -44,7 +44,7 @@ public class HideArmorConfig {
 
     @Expose
     @ConfigOption(name = "Only Helmet", desc = "Only hide the helmet.")
-    @ConfigEditorBoolean()
+    @ConfigEditorBoolean
     public Boolean onlyHelmet = false;
 
 }

@@ -13,6 +13,7 @@ import net.minecraft.network.play.server.S2FPacketSetSlot
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
 object OtherInventoryData {
+
     private var currentInventory: Inventory? = null
     private var acceptItems = false
     private var lateEvent: InventoryUpdatedEvent? = null
@@ -23,10 +24,8 @@ object OtherInventoryData {
     }
 
     fun close(reopenSameName: Boolean = false) {
-        currentInventory?.let {
-            InventoryCloseEvent(it, reopenSameName).postAndCatch()
-            currentInventory = null
-        }
+        InventoryCloseEvent(reopenSameName).postAndCatch()
+        currentInventory = null
     }
 
     @SubscribeEvent
@@ -49,8 +48,7 @@ object OtherInventoryData {
             val windowId = packet.windowId
             val title = packet.windowTitle.unformattedText
             val slotCount = packet.slotCount
-            val reopenSameName = title == currentInventory?.title
-            close(reopenSameName)
+            close(reopenSameName = title == currentInventory?.title)
 
             currentInventory = Inventory(windowId, title, slotCount)
             acceptItems = true
@@ -105,6 +103,6 @@ object OtherInventoryData {
         val title: String,
         val slotCount: Int,
         val items: MutableMap<Int, ItemStack> = mutableMapOf(),
-        var fullyOpenedOnce: Boolean = false
+        var fullyOpenedOnce: Boolean = false,
     )
 }

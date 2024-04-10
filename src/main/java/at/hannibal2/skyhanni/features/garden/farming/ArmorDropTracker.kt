@@ -7,18 +7,19 @@ import at.hannibal2.skyhanni.data.jsonobjects.repo.ArmorDropsJson.DropInfo
 import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.IslandChangeEvent
 import at.hannibal2.skyhanni.events.LorenzChatEvent
-import at.hannibal2.skyhanni.events.LorenzTickEvent
-import at.hannibal2.skyhanni.events.PreProfileSwitchEvent
+import at.hannibal2.skyhanni.events.ProfileJoinEvent
 import at.hannibal2.skyhanni.events.RepositoryReloadEvent
+import at.hannibal2.skyhanni.events.SecondPassedEvent
 import at.hannibal2.skyhanni.features.garden.CropType
 import at.hannibal2.skyhanni.features.garden.GardenAPI
+import at.hannibal2.skyhanni.utils.CollectionUtils.addAsSingletonList
+import at.hannibal2.skyhanni.utils.CollectionUtils.addOrPut
+import at.hannibal2.skyhanni.utils.CollectionUtils.sortedDesc
 import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName
-import at.hannibal2.skyhanni.utils.LorenzUtils.addAsSingletonList
-import at.hannibal2.skyhanni.utils.LorenzUtils.addOrPut
-import at.hannibal2.skyhanni.utils.LorenzUtils.sortedDesc
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
+import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import at.hannibal2.skyhanni.utils.tracker.SkyHanniTracker
 import at.hannibal2.skyhanni.utils.tracker.TrackerData
 import com.google.gson.JsonObject
@@ -28,14 +29,20 @@ import kotlin.time.Duration.Companion.seconds
 
 object ArmorDropTracker {
 
-    private var hasArmor = false
-    private val armorPattern = "(FERMENTO|CROPIE|SQUASH|MELON)_(LEGGINGS|CHESTPLATE|BOOTS|HELMET)".toPattern()
     private val config get() = GardenAPI.config.farmingArmorDrop
+
+    private val armorPattern by RepoPattern.pattern(
+        "garden.armordrops.armor",
+        "(FERMENTO|CROPIE|SQUASH|MELON)_(LEGGINGS|CHESTPLATE|BOOTS|HELMET)"
+    )
+
+    private var hasArmor = false
 
     private val tracker = SkyHanniTracker("Armor Drop Tracker", { Data() }, { it.garden.armorDropTracker })
     { drawDisplay(it) }
 
     class Data : TrackerData() {
+
         override fun reset() {
             drops.clear()
         }
@@ -44,6 +51,7 @@ object ArmorDropTracker {
         var drops: MutableMap<ArmorDropType, Int> = mutableMapOf()
     }
 
+    // Todo use repo pattern
     enum class ArmorDropType(val dropName: String, val chatMessage: String) {
         CROPIE("§9Cropie", "§6§lRARE CROP! §r§f§r§9Cropie §r§b(Armor Set Bonus)"),
         SQUASH("§5Squash", "§6§lRARE CROP! §r§f§r§5Squash §r§b(Armor Set Bonus)"),
@@ -51,7 +59,7 @@ object ArmorDropTracker {
     }
 
     @SubscribeEvent
-    fun onPreProfileSwitch(event: PreProfileSwitchEvent) {
+    fun onProfileJoin(event: ProfileJoinEvent) {
         hasArmor = false
     }
 
@@ -98,13 +106,11 @@ object ArmorDropTracker {
     }
 
     @SubscribeEvent
-    fun onTick(event: LorenzTickEvent) {
+    fun onSecondPassed(event: SecondPassedEvent) {
         if (!GardenAPI.inGarden()) return
         if (!config.enabled) return
 
-        if (event.isMod(30)) {
-            checkArmor()
-        }
+        checkArmor()
     }
 
     private fun checkArmor() {

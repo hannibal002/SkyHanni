@@ -1,9 +1,9 @@
 package at.hannibal2.skyhanni.data.jsonobjects.repo;
 
 import at.hannibal2.skyhanni.features.garden.CropType;
-import at.hannibal2.skyhanni.utils.NEUInternalName;
 import at.hannibal2.skyhanni.utils.LorenzRarity;
 import at.hannibal2.skyhanni.utils.LorenzVec;
+import at.hannibal2.skyhanni.utils.NEUInternalName;
 import com.google.gson.annotations.Expose;
 import org.jetbrains.annotations.Nullable;
 

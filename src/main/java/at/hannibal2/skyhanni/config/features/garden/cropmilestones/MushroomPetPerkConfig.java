@@ -4,9 +4,10 @@ import at.hannibal2.skyhanni.config.FeatureToggle;
 import at.hannibal2.skyhanni.config.HasLegacyId;
 import at.hannibal2.skyhanni.config.core.config.Position;
 import com.google.gson.annotations.Expose;
-import io.github.moulberry.moulconfig.annotations.ConfigEditorBoolean;
-import io.github.moulberry.moulconfig.annotations.ConfigEditorDraggableList;
-import io.github.moulberry.moulconfig.annotations.ConfigOption;
+import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorBoolean;
+import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorDraggableList;
+import io.github.notenoughupdates.moulconfig.annotations.ConfigLink;
+import io.github.notenoughupdates.moulconfig.annotations.ConfigOption;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -33,7 +34,7 @@ public class MushroomPetPerkConfig {
         desc = "Drag text to change the appearance of the overlay.\n" +
             "Hold a farming tool to show the overlay."
     )
-    @ConfigEditorDraggableList()
+    @ConfigEditorDraggableList
     public List<MushroomTextEntry> text = new ArrayList<>(Arrays.asList(
         TITLE,
         MUSHROOM_TIER,
@@ -74,5 +75,6 @@ public class MushroomPetPerkConfig {
     }
 
     @Expose
+    @ConfigLink(owner = MushroomPetPerkConfig.class, field = "enabled")
     public Position pos = new Position(-112, -143, false, true);
 }

@@ -2,34 +2,51 @@ package at.hannibal2.skyhanni.features.garden.contest
 
 import at.hannibal2.skyhanni.data.ScoreboardData
 import at.hannibal2.skyhanni.events.FarmingContestEvent
-import at.hannibal2.skyhanni.events.GuiContainerEvent
 import at.hannibal2.skyhanni.events.InventoryCloseEvent
 import at.hannibal2.skyhanni.events.InventoryFullyOpenedEvent
 import at.hannibal2.skyhanni.events.LorenzTickEvent
 import at.hannibal2.skyhanni.features.garden.CropType
 import at.hannibal2.skyhanni.features.garden.GardenAPI
+import at.hannibal2.skyhanni.utils.CollectionUtils.addOrPut
+import at.hannibal2.skyhanni.utils.CollectionUtils.nextAfter
+import at.hannibal2.skyhanni.utils.CollectionUtils.sortedDesc
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.LorenzUtils
-import at.hannibal2.skyhanni.utils.LorenzUtils.addOrPut
-import at.hannibal2.skyhanni.utils.LorenzUtils.nextAfter
-import at.hannibal2.skyhanni.utils.LorenzUtils.sortedDesc
+import at.hannibal2.skyhanni.utils.NumberUtil.formatInt
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
+import at.hannibal2.skyhanni.utils.StringUtils.matchFirst
 import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
+import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import io.github.moulberry.notenoughupdates.util.SkyBlockTime
 import net.minecraft.item.ItemStack
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import kotlin.time.Duration.Companion.minutes
 
 object FarmingContestAPI {
-    private val timePattern = "§a(?<month>.*) (?<day>.*)(?:rd|st|nd|th), Year (?<year>.*)".toPattern()
+
+    private val patternGroup = RepoPattern.group("garden.farming.contest")
+    private val timePattern by patternGroup.pattern(
+        "time",
+        "§a(?<month>.*) (?<day>.*)(?:rd|st|nd|th), Year (?<year>.*)"
+    )
+    private val cropPattern by patternGroup.pattern(
+        "crop",
+        "§8(?<crop>.*) Contest"
+    )
+    private val sidebarCropPattern by patternGroup.pattern(
+        "sidebarcrop",
+        "\\s*(?:§e○|§6☘) §f(?<crop>.*) §a.*"
+    )
+
     private val contests = mutableMapOf<Long, FarmingContest>()
-    private val cropPattern = "§8(?<crop>.*) Contest".toPattern()
     var inContest = false
     var contestCrop: CropType? = null
     private var startTime = SimpleTimeMark.farPast()
-    private val sidebarCropPattern = "(?:§e○|§6☘) §f(?<crop>.*) §a.*".toPattern()
-
     var inInventory = false
+
+    init {
+        ContestBracket.entries.forEach { it.bracketPattern }
+    }
 
     @SubscribeEvent
     fun onTick(event: LorenzTickEvent) {
@@ -84,22 +101,19 @@ object FarmingContestAPI {
     }
 
     @SubscribeEvent
-    fun onInventoryClose(event: GuiContainerEvent.CloseWindowEvent) {
-        inInventory = false
-    }
-
-    @SubscribeEvent
     fun onInventoryClose(event: InventoryCloseEvent) {
         inInventory = false
     }
 
-    fun getSbTimeFor(text: String) = timePattern.matchMatcher(text) {
-        val month = group("month")
+    fun getSbDateFromItemName(text: String): List<String>? = timePattern.matchMatcher(text) {
+        listOf(group("year"), group("month"), group("day"))
+    }
+
+    fun getSbTimeFor(text: String): Long? {
+        val (year, month, day) = getSbDateFromItemName(text) ?: return null
         val monthNr = LorenzUtils.getSBMonthByName(month)
 
-        val year = group("year").toInt()
-        val day = group("day").toInt()
-        SkyBlockTime(year, monthNr, day).toMillis()
+        return SkyBlockTime(year.toInt(), monthNr, day.toInt()).toMillis()
     }
 
     fun addContest(time: Long, item: ItemStack) {
@@ -108,16 +122,15 @@ object FarmingContestAPI {
 
     private fun createContest(time: Long, item: ItemStack): FarmingContest {
         val lore = item.getLore()
-        val crop = lore.firstNotNullOfOrNull {
-            cropPattern.matchMatcher(it) { CropType.getByName(group("crop")) }
+
+        val crop = lore.matchFirst(cropPattern) {
+            CropType.getByName(group("crop"))
         } ?: error("Crop not found in lore!")
 
         val brackets = buildMap {
             for (bracket in ContestBracket.entries) {
-                val amount = lore.firstNotNullOfOrNull {
-                    bracket.pattern.matchMatcher(it) {
-                        group("amount").replace(",", "").toInt()
-                    }
+                val amount = lore.matchFirst(bracket.bracketPattern) {
+                    group("amount").formatInt()
                 } ?: continue
                 put(bracket, amount)
             }

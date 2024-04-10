@@ -6,16 +6,15 @@ import at.hannibal2.skyhanni.config.features.combat.ghostcounter.GhostCounterCon
 import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.data.ProfileStorageData
 import at.hannibal2.skyhanni.data.SkillExperience
+import at.hannibal2.skyhanni.events.ActionBarUpdateEvent
 import at.hannibal2.skyhanni.events.ConfigLoadEvent
 import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.InventoryFullyOpenedEvent
-import at.hannibal2.skyhanni.events.LorenzActionBarEvent
 import at.hannibal2.skyhanni.events.LorenzChatEvent
-import at.hannibal2.skyhanni.events.LorenzTickEvent
 import at.hannibal2.skyhanni.events.PurseChangeCause
 import at.hannibal2.skyhanni.events.PurseChangeEvent
+import at.hannibal2.skyhanni.events.SecondPassedEvent
 import at.hannibal2.skyhanni.events.TabListUpdateEvent
-import at.hannibal2.skyhanni.features.bazaar.BazaarApi.Companion.getBazaarData
 import at.hannibal2.skyhanni.features.combat.ghostcounter.GhostData.Option
 import at.hannibal2.skyhanni.features.combat.ghostcounter.GhostData.Option.KILLS
 import at.hannibal2.skyhanni.features.combat.ghostcounter.GhostData.bestiaryData
@@ -24,6 +23,10 @@ import at.hannibal2.skyhanni.features.combat.ghostcounter.GhostUtil.formatText
 import at.hannibal2.skyhanni.features.combat.ghostcounter.GhostUtil.isUsingCTGhostCounter
 import at.hannibal2.skyhanni.features.combat.ghostcounter.GhostUtil.preFormat
 import at.hannibal2.skyhanni.features.combat.ghostcounter.GhostUtil.prettyTime
+import at.hannibal2.skyhanni.features.inventory.bazaar.BazaarApi.Companion.getBazaarData
+import at.hannibal2.skyhanni.utils.ChatUtils.chat
+import at.hannibal2.skyhanni.utils.ChatUtils.clickableChat
+import at.hannibal2.skyhanni.utils.CollectionUtils.addAsSingletonList
 import at.hannibal2.skyhanni.utils.CombatUtils._isKilling
 import at.hannibal2.skyhanni.utils.CombatUtils.calculateETA
 import at.hannibal2.skyhanni.utils.CombatUtils.calculateXP
@@ -38,13 +41,11 @@ import at.hannibal2.skyhanni.utils.CombatUtils.xpGainHourLast
 import at.hannibal2.skyhanni.utils.ConfigUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.LorenzUtils
-import at.hannibal2.skyhanni.utils.LorenzUtils.addAsSingletonList
-import at.hannibal2.skyhanni.utils.LorenzUtils.chat
-import at.hannibal2.skyhanni.utils.LorenzUtils.clickableChat
 import at.hannibal2.skyhanni.utils.LorenzUtils.isInIsland
 import at.hannibal2.skyhanni.utils.NEUInternalName.Companion.asInternalName
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
-import at.hannibal2.skyhanni.utils.NumberUtil.formatNumber
+import at.hannibal2.skyhanni.utils.NumberUtil.formatDouble
+import at.hannibal2.skyhanni.utils.NumberUtil.formatLong
 import at.hannibal2.skyhanni.utils.NumberUtil.romanToDecimal
 import at.hannibal2.skyhanni.utils.NumberUtil.roundToPrecision
 import at.hannibal2.skyhanni.utils.OSUtils
@@ -52,6 +53,7 @@ import at.hannibal2.skyhanni.utils.RenderUtils.renderStringsAndItems
 import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.renderables.Renderable
+import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import io.github.moulberry.notenoughupdates.util.Utils
 import io.github.moulberry.notenoughupdates.util.XPInformation
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
@@ -68,16 +70,33 @@ object GhostCounter {
     private var display = emptyList<List<Any>>()
     var ghostCounterV3File =
         File("." + File.separator + "config" + File.separator + "ChatTriggers" + File.separator + "modules" + File.separator + "GhostCounterV3" + File.separator + ".persistantData.json")
-    private val skillXPPattern = "[+](?<gained>[0-9,.]+) \\((?<current>[0-9,.]+)(?:/(?<total>[0-9,.]+))?\\)".toPattern()
-    private val combatSectionPattern =
-        ".*[+](?<gained>[0-9,.]+) (?<skillName>[A-Za-z]+) \\((?<progress>(?<current>[0-9.,]+)/(?<total>[0-9.,]+)|(?<percent>[0-9.]+)%)\\).*".toPattern()
-    private val killComboExpiredPattern =
-        "§cYour Kill Combo has expired! You reached a (?<combo>.*) Kill Combo!".toPattern()
-    private val ghostXPPattern =
-        "(?<current>\\d+(?:\\.\\d+)?(?:,\\d+)?[kK]?)/(?<total>\\d+(?:\\.\\d+)?(?:,\\d+)?[kKmM]?)".toPattern()
-    private val bestiaryPattern =
-        ".*(?:§\\d|§\\w)+BESTIARY (?:§\\d|§\\w)+Ghost (?:§\\d|§\\w)(?<previousLevel>\\d+)➜(?:§\\d|§\\w)(?<nextLevel>\\d+).*".toPattern() //   &3&lBESTIARY &b&lGhost &89➜&b10
-    private val skillLevelPattern = ".*§e§lSkills: §r§a(?<skillName>.*) (?<skillLevel>\\d+).*".toPattern()
+
+    private val patternGroup = RepoPattern.group("combat.ghostcounter")
+    private val skillXPPattern by patternGroup.pattern(
+        "skillxp",
+        "[+](?<gained>[0-9,.]+) \\((?<current>[0-9,.]+)(?:/(?<total>[0-9,.]+))?\\)"
+    )
+    private val combatSectionPattern by patternGroup.pattern(
+        "combatsection",
+        ".*[+](?<gained>[0-9,.]+) (?<skillName>[A-Za-z]+) \\((?<progress>(?<current>[0-9.,]+)/(?<total>[0-9.,]+)|(?<percent>[0-9.]+)%)\\).*"
+    )
+    private val killComboExpiredPattern by patternGroup.pattern(
+        "killcomboexpired",
+        "§cYour Kill Combo has expired! You reached a (?<combo>.*) Kill Combo!"
+    )
+    private val ghostXPPattern by patternGroup.pattern(
+        "ghostxp",
+        "(?<current>\\d+(?:\\.\\d+)?(?:,\\d+)?[kK]?)/(?<total>\\d+(?:\\.\\d+)?(?:,\\d+)?[kKmM]?)"
+    )
+    private val bestiaryPattern by patternGroup.pattern(
+        "bestiary",
+        ".*(?:§\\d|§\\w)+BESTIARY (?:§\\d|§\\w)+Ghost (?:§\\d|§\\w)(?<previousLevel>\\d+)➜(?:§\\d|§\\w)(?<nextLevel>\\d+).*"
+    )
+    private val skillLevelPattern by patternGroup.pattern(
+        "skilllevel",
+        ".*§e§lSkills: §r§a(?<skillName>.*) (?<skillLevel>\\d+).*"
+    )
+
     private val format = NumberFormat.getInstance()
     private var percent: Float = 0.0f
     private var totalSkillXp = 0
@@ -85,7 +104,7 @@ object GhostCounter {
     private var skillText = ""
     private var lastParsedSkillSection = ""
     private var lastSkillProgressString: String? = null
-    private var lastXp: String = "0"
+    private var lastXp: Long = 0
     private var gain: Int = 0
     private var num: Double = 0.0
     private var inMist = false
@@ -131,7 +150,10 @@ object GhostCounter {
         }
         val avgMagicFind = when (Option.TOTALDROPS.get()) {
             0.0 -> "0"
-            else -> "${((((storage?.totalMF!! / Option.TOTALDROPS.get()) + Math.ulp(1.0)) * 100) / 100).roundToPrecision(2)}"
+            else -> {
+                val mf = (((storage?.totalMF!! / Option.TOTALDROPS.get()) + Math.ulp(1.0)) * 100) / 100
+                mf.roundToPrecision(2).toString()
+            }
         }
 
         val xpHourFormatting = textFormatting.xpHourFormatting
@@ -263,48 +285,50 @@ object GhostCounter {
         }
         val moneyMadeWithClickableTips = Renderable.clickAndHover(
             textFormatting.moneyMadeFormat.formatText(moneyMade.addSeparators()),
-            moneyMadeTips, onClick =
-        { OSUtils.copyToClipboard(moneyMadeTips.joinToString("\n").removeColor()) })
+            moneyMadeTips,
+            onClick = { OSUtils.copyToClipboard(moneyMadeTips.joinToString("\n").removeColor()) }
+        )
         addAsSingletonList(textFormatting.moneyHourFormat.formatText(final))
         addAsSingletonList(moneyMadeWithClickableTips)
     }
 
     @SubscribeEvent
-    fun onTick(event: LorenzTickEvent) {
+    fun onSecondPassed(event: SecondPassedEvent) {
         if (!isEnabled()) return
-        if (event.repeatSeconds(1)) {
-            skillXPPattern.matchMatcher(skillText) {
-                val gained = group("gained").formatNumber().toDouble()
-                val current = group("current")
-                if (current != lastXp) {
-                    val res = current.formatNumber().toString()
-                    gain = (res.toLong() - lastXp.toLong()).toDouble().roundToInt()
-                    num = (gain.toDouble() / gained)
-                    if (gained in 150.0..450.0 && lastXp != "0" && num >= 0) {
-                        KILLS.add(num)
-                        KILLS.add(num, true)
-                        Option.GHOSTSINCESORROW.add(num)
-                        Option.KILLCOMBO.add(num)
-                        Option.SKILLXPGAINED.add(gained * num.roundToLong())
-                        Option.SKILLXPGAINED.add(gained * num.roundToLong(), true)
-                        storage?.bestiaryCurrentKill = storage?.bestiaryCurrentKill?.plus(num) ?: num
-                    }
-                    lastXp = res
+
+        skillXPPattern.matchMatcher(skillText) {
+            val gained = group("gained").formatDouble()
+            val current = group("current").formatLong()
+            if (current != lastXp) {
+                gain = (current - lastXp).toDouble().roundToInt()
+                num = (gain.toDouble() / gained)
+                if (gained in 150.0..450.0 && lastXp != 0L && num >= 0) {
+                    KILLS.add(num)
+                    KILLS.add(num, true)
+                    Option.GHOSTSINCESORROW.add(num)
+                    Option.KILLCOMBO.add(num)
+                    Option.SKILLXPGAINED.add(gained * num.roundToLong())
+                    Option.SKILLXPGAINED.add(gained * num.roundToLong(), true)
+                    storage?.bestiaryCurrentKill = storage?.bestiaryCurrentKill?.plus(num) ?: num
                 }
+                lastXp = current
             }
-            if (notifyCTModule && ProfileStorageData.profileSpecific?.ghostCounter?.ctDataImported != true) {
-                notifyCTModule = false
-                if (isUsingCTGhostCounter()) {
-                    clickableChat(
-                        "GhostCounterV3 ChatTriggers module has been detected, do you want to import saved data ? Click here to import data",
-                        "shimportghostcounterdata",
-                        prefixColor = "§6",
-                    )
-                }
-            }
-            inMist = LorenzUtils.skyBlockArea == "The Mist"
-            update()
         }
+
+        if (notifyCTModule && ProfileStorageData.profileSpecific?.ghostCounter?.ctDataImported != true) {
+            notifyCTModule = false
+            if (isUsingCTGhostCounter()) {
+                clickableChat(
+                    "GhostCounterV3 ChatTriggers module has been detected, do you want to import saved data ? Click here to import data",
+                    "shimportghostcounterdata",
+                    prefixColor = "§6",
+                )
+            }
+        }
+
+        inMist = LorenzUtils.skyBlockArea == "The Mist"
+        update()
+
         if (event.repeatSeconds(2)) {
             calculateXP()
             calculateETA()
@@ -312,12 +336,12 @@ object GhostCounter {
     }
 
     @SubscribeEvent
-    fun onActionBar(event: LorenzActionBarEvent) {
+    fun onActionBarUpdate(event: ActionBarUpdateEvent) {
         if (!isEnabled()) return
         if (!inMist) return
-        combatSectionPattern.matchMatcher(event.message) {
+        combatSectionPattern.matchMatcher(event.actionBar) {
             if (group("skillName").lowercase() != "combat") return
-            parseCombatSection(event.message)
+            parseCombatSection(event.actionBar)
         }
     }
 
@@ -369,7 +393,7 @@ object GhostCounter {
     }
 
     @SubscribeEvent
-    fun onTabUpdate(event: TabListUpdateEvent) {
+    fun onTabListUpdate(event: TabListUpdateEvent) {
         if (!isEnabled()) return
         for (line in event.tabList) {
             skillLevelPattern.matchMatcher(line) {
@@ -382,7 +406,6 @@ object GhostCounter {
     @SubscribeEvent
     fun onChat(event: LorenzChatEvent) {
         if (!isEnabled()) return
-        if (LorenzUtils.skyBlockIsland != IslandType.DWARVEN_MINES) return
         for (opt in Option.entries) {
             val pattern = opt.pattern ?: continue
             pattern.matchMatcher(event.message) {
@@ -415,10 +438,10 @@ object GhostCounter {
         }
         killComboExpiredPattern.matchMatcher(event.message) {
             if (Option.KILLCOMBO.getInt() > Option.MAXKILLCOMBO.getInt()) {
-                Option.MAXKILLCOMBO.set(group("combo").formatNumber().toDouble())
+                Option.MAXKILLCOMBO.set(group("combo").formatDouble())
             }
             if (Option.KILLCOMBO.getInt() > Option.MAXKILLCOMBO.getInt(true)) {
-                Option.MAXKILLCOMBO.set(group("combo").formatNumber().toDouble(), true)
+                Option.MAXKILLCOMBO.set(group("combo").formatDouble(), true)
             }
             Option.KILLCOMBOCOINS.set(0.0)
             Option.KILLCOMBO.set(0.0)
@@ -469,11 +492,11 @@ object GhostCounter {
         for (line in ghostStack.getLore()) {
             val l = line.removeColor().trim()
             if (l.startsWith("Kills: ")) {
-                kills = "Kills: (.*)".toRegex().find(l)?.groupValues?.get(1)?.formatNumber()?.toDouble() ?: 0.0
+                kills = "Kills: (.*)".toRegex().find(l)?.groupValues?.get(1)?.formatDouble() ?: 0.0
             }
             ghostXPPattern.matchMatcher(line.removeColor().trim()) {
-                storage?.bestiaryCurrentKill = if (kills > 0) kills else group("current").formatNumber().toDouble()
-                storage?.bestiaryKillNeeded = group("total").formatNumber().toDouble()
+                storage?.bestiaryCurrentKill = if (kills > 0) kills else group("current").formatDouble()
+                storage?.bestiaryKillNeeded = group("total").formatDouble()
             }
         }
         update()
@@ -496,5 +519,5 @@ object GhostCounter {
         }
     }
 
-    fun isEnabled() = config.enabled && IslandType.DWARVEN_MINES.isInIsland()
+    fun isEnabled() = IslandType.DWARVEN_MINES.isInIsland() && config.enabled
 }

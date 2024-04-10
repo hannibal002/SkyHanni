@@ -2,8 +2,8 @@ package at.hannibal2.skyhanni.data
 
 import at.hannibal2.skyhanni.events.InventoryCloseEvent
 import at.hannibal2.skyhanni.events.InventoryFullyOpenedEvent
-import at.hannibal2.skyhanni.events.LorenzTickEvent
 import at.hannibal2.skyhanni.events.ProfileJoinEvent
+import at.hannibal2.skyhanni.events.SecondPassedEvent
 import at.hannibal2.skyhanni.features.garden.CropAccessory
 import at.hannibal2.skyhanni.features.garden.GardenAPI
 import at.hannibal2.skyhanni.utils.InventoryUtils
@@ -11,6 +11,7 @@ import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.NEUItems
 import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
+import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import com.google.gson.JsonElement
 import net.minecraft.item.ItemStack
 import net.minecraft.nbt.CompressedStreamTools
@@ -20,10 +21,13 @@ import java.io.ByteArrayInputStream
 import java.util.Base64
 
 class CropAccessoryData {
-    // TODO USE SH-REPO
-    private val accessoryBagNamePattern = "Accessory Bag \\((?<current>\\d)/(?<total>\\d)\\)".toPattern()
+
+    private val accessoryBagNamePattern by RepoPattern.pattern(
+        "data.accessory.bagname",
+        "Accessory Bag \\((?<current>\\d)/(?<total>\\d)\\)"
+    )
+
     private var loadedAccessoryThisProfile = false
-    private var ticks = 0
     private var accessoryInBag: CropAccessory? = null
     private var accessoryInInventory = CropAccessory.NONE
 
@@ -79,8 +83,7 @@ class CropAccessoryData {
 
     // Handle inventory detection
     @SubscribeEvent
-    fun onTick(event: LorenzTickEvent) {
-        if (!event.repeatSeconds(1)) return
+    fun onSecondPassed(event: SecondPassedEvent) {
         if (!LorenzUtils.inSkyBlock) return
         accessoryInInventory = bestCropAccessory(InventoryUtils.getItemsInOwnInventory())
         if (accessoryInInventory == CropAccessory.NONE) return
@@ -89,12 +92,12 @@ class CropAccessoryData {
         }
     }
 
-
     private fun bestCropAccessory(items: Iterable<ItemStack>) =
         items.mapNotNull { item -> CropAccessory.getByName(item.getInternalName()) }
             .maxOrNull() ?: CropAccessory.NONE
 
     companion object {
+
         var accessoryBagPageCount = 0
             private set
 

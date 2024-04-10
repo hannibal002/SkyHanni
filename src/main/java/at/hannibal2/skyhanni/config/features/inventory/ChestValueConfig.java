@@ -4,11 +4,10 @@ import at.hannibal2.skyhanni.config.FeatureToggle;
 import at.hannibal2.skyhanni.config.HasLegacyId;
 import at.hannibal2.skyhanni.config.core.config.Position;
 import com.google.gson.annotations.Expose;
-import io.github.moulberry.moulconfig.annotations.ConfigEditorBoolean;
-import io.github.moulberry.moulconfig.annotations.ConfigEditorColour;
-import io.github.moulberry.moulconfig.annotations.ConfigEditorDropdown;
-import io.github.moulberry.moulconfig.annotations.ConfigEditorSlider;
-import io.github.moulberry.moulconfig.annotations.ConfigOption;
+import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorBoolean;
+import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorDropdown;
+import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorSlider;
+import io.github.notenoughupdates.moulconfig.annotations.ConfigOption;
 
 public class ChestValueConfig {
     @Expose
@@ -49,13 +48,8 @@ public class ChestValueConfig {
     public boolean enableHighlight = true;
 
     @Expose
-    @ConfigOption(name = "Highlight Color", desc = "Choose the highlight color.")
-    @ConfigEditorColour
-    public String highlightColor = "0:249:0:255:88";
-
-    @Expose
     @ConfigOption(name = "Sorting Type", desc = "Price sorting type.")
-    @ConfigEditorDropdown()
+    @ConfigEditorDropdown
     public SortingTypeEntry sortingType = SortingTypeEntry.DESCENDING;
 
     public enum SortingTypeEntry implements HasLegacyId {
@@ -88,7 +82,7 @@ public class ChestValueConfig {
 
     @Expose
     @ConfigOption(name = "Value formatting Type", desc = "Format of the price.")
-    @ConfigEditorDropdown()
+    @ConfigEditorDropdown
     public NumberFormatEntry formatType = NumberFormatEntry.SHORT;
 
     public enum NumberFormatEntry implements HasLegacyId {

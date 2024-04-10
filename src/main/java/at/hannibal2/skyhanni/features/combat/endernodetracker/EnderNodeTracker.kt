@@ -11,12 +11,16 @@ import at.hannibal2.skyhanni.events.IslandChangeEvent
 import at.hannibal2.skyhanni.events.LorenzChatEvent
 import at.hannibal2.skyhanni.events.OwnInventoryItemUpdateEvent
 import at.hannibal2.skyhanni.events.SackChangeEvent
+import at.hannibal2.skyhanni.utils.CollectionUtils.addAsSingletonList
+import at.hannibal2.skyhanni.utils.CollectionUtils.addOrPut
+import at.hannibal2.skyhanni.utils.ConditionalUtils.afterChange
 import at.hannibal2.skyhanni.utils.ConfigUtils
+import at.hannibal2.skyhanni.utils.InventoryUtils
+import at.hannibal2.skyhanni.utils.ItemCategory
+import at.hannibal2.skyhanni.utils.ItemCategory.Companion.containsItem
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalNameOrNull
 import at.hannibal2.skyhanni.utils.LorenzUtils
-import at.hannibal2.skyhanni.utils.LorenzUtils.addAsSingletonList
-import at.hannibal2.skyhanni.utils.LorenzUtils.addOrPut
-import at.hannibal2.skyhanni.utils.LorenzUtils.afterChange
+import at.hannibal2.skyhanni.utils.LorenzUtils.isInIsland
 import at.hannibal2.skyhanni.utils.NEUItems.getNpcPriceOrNull
 import at.hannibal2.skyhanni.utils.NEUItems.getPriceOrNull
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
@@ -28,6 +32,7 @@ import net.minecraft.client.Minecraft
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
 object EnderNodeTracker {
+
     private val config get() = SkyHanniMod.feature.combat.enderNodeTracker
 
     private var miteGelInInventory = 0
@@ -61,9 +66,8 @@ object EnderNodeTracker {
 
     @SubscribeEvent
     fun onChat(event: LorenzChatEvent) {
-        if (!config.enabled) return
+        if (!isEnabled()) return
         if (!ProfileStorageData.loaded) return
-        if (!isInTheEnd()) return
 
         // don't call removeColor because we want to distinguish enderman pet rarity
         val message = event.message.trim()
@@ -101,8 +105,7 @@ object EnderNodeTracker {
 
     @SubscribeEvent
     fun onIslandChange(event: IslandChangeEvent) {
-        if (!config.enabled) return
-        if (event.newIsland != IslandType.THE_END) return
+        if (!isEnabled()) return
         miteGelInInventory = Minecraft.getMinecraft().thePlayer.inventory.mainInventory
             .filter { it?.getInternalNameOrNull() == EnderNode.MITE_GEL.internalName }
             .sumOf { it.stackSize }
@@ -110,9 +113,8 @@ object EnderNodeTracker {
 
     @SubscribeEvent
     fun onSackChange(event: SackChangeEvent) {
-        if (!config.enabled) return
+        if (!isEnabled()) return
         if (!ProfileStorageData.loaded) return
-        if (!isInTheEnd()) return
 
         val change = event.sackChanges
             .firstOrNull { it.internalName == EnderNode.MITE_GEL.internalName && it.delta > 0 }
@@ -124,9 +126,8 @@ object EnderNodeTracker {
     }
 
     @SubscribeEvent
-    fun onInventoryUpdate(event: OwnInventoryItemUpdateEvent) {
-        if (!config.enabled) return
-        if (!isInTheEnd()) return
+    fun onOwnInventoryItemUpdate(event: OwnInventoryItemUpdateEvent) {
+        if (!isEnabled()) return
         if (!ProfileStorageData.loaded) return
 
         val newMiteGelInInventory = Minecraft.getMinecraft().thePlayer.inventory.mainInventory
@@ -143,8 +144,7 @@ object EnderNodeTracker {
 
     @SubscribeEvent
     fun onRenderOverlay(event: GuiRenderEvent) {
-        if (!config.enabled) return
-        if (!isInTheEnd()) return
+        if (!isEnabled()) return
 
         tracker.renderDisplay(config.position)
     }
@@ -165,7 +165,7 @@ object EnderNodeTracker {
         }
     }
 
-    private fun calculateProfit(storage: Data): Map<EnderNode, Double> {
+    private fun getLootProfit(storage: Data): Map<EnderNode, Double> {
         if (!ProfileStorageData.loaded) return emptyMap()
 
         val newProfit = mutableMapOf<EnderNode, Double>()
@@ -183,7 +183,10 @@ object EnderNodeTracker {
         return newProfit
     }
 
-    private fun isInTheEnd() = LorenzUtils.skyBlockArea == "The End"
+    private fun isEnabled() = IslandType.THE_END.isInIsland() && config.enabled &&
+        (!config.onlyPickaxe || hasItemInHand())
+
+    private fun hasItemInHand() = ItemCategory.miningTools.containsItem(InventoryUtils.getItemInHand())
 
     private fun isEnderArmor(displayName: EnderNode) = when (displayName) {
         EnderNode.END_HELMET,
@@ -191,7 +194,8 @@ object EnderNodeTracker {
         EnderNode.END_LEGGINGS,
         EnderNode.END_BOOTS,
         EnderNode.ENDER_NECKLACE,
-        EnderNode.ENDER_GAUNTLET -> true
+        EnderNode.ENDER_GAUNTLET,
+        -> true
 
         else -> false
     }
@@ -205,34 +209,34 @@ object EnderNodeTracker {
         else -> null
     }
 
-    private fun drawDisplay(storage: Data) = buildList<List<Any>> {
-        val lootProfit = calculateProfit(storage)
+    private fun drawDisplay(data: Data) = buildList<List<Any>> {
+        val lootProfit = getLootProfit(data)
 
         addAsSingletonList("§5§lEnder Node Tracker")
-        addAsSingletonList("§d${storage.totalNodesMined.addSeparators()} Ender Nodes mined")
+        addAsSingletonList("§d${data.totalNodesMined.addSeparators()} Ender Nodes mined")
         addAsSingletonList("§6${format(lootProfit.values.sum())} Coins made")
         addAsSingletonList(" ")
-        addAsSingletonList("§b${storage.totalEndermiteNests.addSeparators()} §cEndermite Nest")
+        addAsSingletonList("§b${data.totalEndermiteNests.addSeparators()} §cEndermite Nest")
 
         for (item in EnderNode.entries.subList(0, 11)) {
-            val count = (storage.lootCount[item] ?: 0).addSeparators()
+            val count = (data.lootCount[item] ?: 0).addSeparators()
             val profit = format(lootProfit[item] ?: 0.0)
             addAsSingletonList("§b$count ${item.displayName} §7(§6$profit§7)")
         }
         addAsSingletonList(" ")
 
-        val totalEnderArmor = calculateEnderArmor(storage)
+        val totalEnderArmor = calculateEnderArmor(data)
         addAsSingletonList(
             "§b${totalEnderArmor.addSeparators()} §5Ender Armor " +
                 "§7(§6${format(totalEnderArmor * 10_000)}§7)"
         )
         for (item in EnderNode.entries.subList(11, 16)) {
-            val count = (storage.lootCount[item] ?: 0).addSeparators()
+            val count = (data.lootCount[item] ?: 0).addSeparators()
             val profit = format(lootProfit[item] ?: 0.0)
             addAsSingletonList("§b$count ${item.displayName} §7(§6$profit§7)")
         }
         // enderman pet rarities
-        val (c, u, r, e, l) = EnderNode.entries.subList(16, 21).map { (storage.lootCount[it] ?: 0).addSeparators() }
+        val (c, u, r, e, l) = EnderNode.entries.subList(16, 21).map { (data.lootCount[it] ?: 0).addSeparators() }
         val profit = format(EnderNode.entries.subList(16, 21).sumOf { lootProfit[it] ?: 0.0 })
         addAsSingletonList("§f$c§7-§a$u§7-§9$r§7-§5$e§7-§6$l §fEnderman Pet §7(§6$profit§7)")
     }

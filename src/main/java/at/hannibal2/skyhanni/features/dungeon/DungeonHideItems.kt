@@ -7,14 +7,13 @@ import at.hannibal2.skyhanni.events.CheckRenderEntityEvent
 import at.hannibal2.skyhanni.events.EntityMoveEvent
 import at.hannibal2.skyhanni.events.LorenzWorldChangeEvent
 import at.hannibal2.skyhanni.events.ReceiveParticleEvent
-import at.hannibal2.skyhanni.events.RenderMobColoredEvent
-import at.hannibal2.skyhanni.events.ResetEntityHurtEvent
-import at.hannibal2.skyhanni.events.withAlpha
+import at.hannibal2.skyhanni.mixins.hooks.RenderLivingEntityHelper
+import at.hannibal2.skyhanni.utils.ColorUtils.withAlpha
 import at.hannibal2.skyhanni.utils.ItemUtils.cleanName
 import at.hannibal2.skyhanni.utils.ItemUtils.getSkullTexture
 import at.hannibal2.skyhanni.utils.LorenzColor
-import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.getLorenzVec
+import net.minecraft.entity.Entity
 import net.minecraft.entity.item.EntityArmorStand
 import net.minecraft.entity.item.EntityItem
 import net.minecraft.util.EnumParticleTypes
@@ -57,7 +56,7 @@ class DungeonHideItems {
 
     @SubscribeEvent
     fun onCheckRender(event: CheckRenderEntityEvent<*>) {
-        if (!LorenzUtils.inDungeons) return
+        if (!DungeonAPI.inDungeon()) return
 
         val entity = event.entity
 
@@ -166,8 +165,8 @@ class DungeonHideItems {
     }
 
     @SubscribeEvent
-    fun onReceivePacket(event: ReceiveParticleEvent) {
-        if (!LorenzUtils.inDungeons) return
+    fun onReceiveParticle(event: ReceiveParticleEvent) {
+        if (!DungeonAPI.inDungeon()) return
         if (!config.hideSuperboomTNT && !config.hideReviveStone) return
 
         val packetLocation = event.location
@@ -186,41 +185,22 @@ class DungeonHideItems {
 
     @SubscribeEvent
     fun onEntityMove(event: EntityMoveEvent) {
-        if (!LorenzUtils.inDungeons) return
+        if (!DungeonAPI.inDungeon()) return
 
         val entity = event.entity
         if (entity !is EntityArmorStand) return
 
         if (isSkeletonSkull(entity)) {
             movingSkeletonSkulls[entity] = System.currentTimeMillis()
-        }
-    }
-
-    @SubscribeEvent
-    fun onRenderMobColored(event: RenderMobColoredEvent) {
-        if (!LorenzUtils.inDungeons) return
-        if (!SkyHanniMod.feature.dungeon.highlightSkeletonSkull) return
-        val entity = event.entity
-        if (entity is EntityArmorStand && isSkeletonSkull(entity)) {
-            val lastMove = movingSkeletonSkulls.getOrDefault(entity, 0)
-            if (lastMove + 200 > System.currentTimeMillis()) {
-                event.color = LorenzColor.GOLD.toColor().withAlpha(60)
+            RenderLivingEntityHelper.setEntityColorWithNoHurtTime(entity, LorenzColor.GOLD.toColor().withAlpha(60))
+            {
+                shouldColorMovingSkull(entity)
             }
         }
     }
 
-    @SubscribeEvent
-    fun onResetEntityHurtTime(event: ResetEntityHurtEvent) {
-        if (!LorenzUtils.inDungeons) return
-        if (!SkyHanniMod.feature.dungeon.highlightSkeletonSkull) return
-        val entity = event.entity
-        if (entity is EntityArmorStand && isSkeletonSkull(entity)) {
-            val lastMove = movingSkeletonSkulls.getOrDefault(entity, 0)
-            if (lastMove + 200 > System.currentTimeMillis()) {
-                event.shouldReset = true
-            }
-        }
-    }
+    private fun shouldColorMovingSkull(entity: Entity) =
+        SkyHanniMod.feature.dungeon.highlightSkeletonSkull && movingSkeletonSkulls[entity]?.let { it + 200 > System.currentTimeMillis() } ?: false
 
     @SubscribeEvent
     fun onWorldChange(event: LorenzWorldChangeEvent) {

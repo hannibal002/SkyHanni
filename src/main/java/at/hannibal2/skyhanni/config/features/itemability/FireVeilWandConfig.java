@@ -2,14 +2,14 @@ package at.hannibal2.skyhanni.config.features.itemability;
 
 import at.hannibal2.skyhanni.config.HasLegacyId;
 import com.google.gson.annotations.Expose;
-import io.github.moulberry.moulconfig.annotations.ConfigEditorColour;
-import io.github.moulberry.moulconfig.annotations.ConfigEditorDropdown;
-import io.github.moulberry.moulconfig.annotations.ConfigOption;
+import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorColour;
+import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorDropdown;
+import io.github.notenoughupdates.moulconfig.annotations.ConfigOption;
 
 public class FireVeilWandConfig {
     @Expose
     @ConfigOption(name = "Fire Veil Design", desc = "Changes the flame particles of the Fire Veil Wand ability.")
-    @ConfigEditorDropdown()
+    @ConfigEditorDropdown
     public DisplayEntry display = DisplayEntry.PARTICLES;
 
     public enum DisplayEntry implements HasLegacyId {

@@ -4,9 +4,10 @@ import at.hannibal2.skyhanni.config.FeatureToggle;
 import at.hannibal2.skyhanni.config.HasLegacyId;
 import at.hannibal2.skyhanni.config.core.config.Position;
 import com.google.gson.annotations.Expose;
-import io.github.moulberry.moulconfig.annotations.ConfigEditorBoolean;
-import io.github.moulberry.moulconfig.annotations.ConfigEditorDropdown;
-import io.github.moulberry.moulconfig.annotations.ConfigOption;
+import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorBoolean;
+import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorDropdown;
+import io.github.notenoughupdates.moulconfig.annotations.ConfigLink;
+import io.github.notenoughupdates.moulconfig.annotations.ConfigOption;
 
 public class RiftInventoryValueConfig {
     @Expose
@@ -18,7 +19,7 @@ public class RiftInventoryValueConfig {
     @Expose
     @ConfigOption(name = "Number Format Type", desc = "Short: 1.2M\n" +
         "Long: 1,200,000")
-    @ConfigEditorDropdown()
+    @ConfigEditorDropdown
     public NumberFormatEntry formatType = NumberFormatEntry.SHORT;
 
     public enum NumberFormatEntry implements HasLegacyId {
@@ -50,5 +51,6 @@ public class RiftInventoryValueConfig {
     }
 
     @Expose
+    @ConfigLink(owner = RiftInventoryValueConfig.class, field = "enabled")
     public Position position = new Position(126, 156, false, true);
 }

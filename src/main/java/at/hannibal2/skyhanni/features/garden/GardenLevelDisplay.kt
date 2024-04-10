@@ -5,25 +5,48 @@ import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.InventoryFullyOpenedEvent
 import at.hannibal2.skyhanni.events.LorenzChatEvent
 import at.hannibal2.skyhanni.events.ProfileJoinEvent
+import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.ItemUtils.name
 import at.hannibal2.skyhanni.utils.LorenzUtils
-import at.hannibal2.skyhanni.utils.NumberUtil.formatNumber
+import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
+import at.hannibal2.skyhanni.utils.NumberUtil.formatLong
 import at.hannibal2.skyhanni.utils.NumberUtil.romanToDecimalIfNecessary
 import at.hannibal2.skyhanni.utils.RenderUtils.renderString
 import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
+import at.hannibal2.skyhanni.utils.StringUtils.matches
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import kotlin.time.Duration.Companion.milliseconds
 
 class GardenLevelDisplay {
+
     private val config get() = GardenAPI.config.gardenLevels
-    private val expToNextLevelPattern by RepoPattern.pattern("garden.level.inventory.nextxp", ".* §e(?<nextLevelExp>.*)§6/.*")
-    private val overflowPattern by RepoPattern.pattern("garden.level.inventory.overflow", ".*§r §6(?<overflow>.*)")
-    private val currentLevelPattern by RepoPattern.pattern("garden.level.inventory.currentlevel", "Garden Level (?<currentLevel>.*)")
+
+    private val patternGroup = RepoPattern.group("garden.level")
+    private val expToNextLevelPattern by patternGroup.pattern(
+        "inventory.nextxp",
+        ".* §e(?<nextLevelExp>.*)§6/.*"
+    )
+    private val gardenItemNamePattern by patternGroup.pattern(
+        "inventory.name",
+        "Garden (?:Desk|Level (?<currentLevel>.*))"
+    )
+    private val overflowPattern by patternGroup.pattern(
+        "inventory.overflow",
+        ".*§r §6(?<overflow>.*)"
+    )
+    private val gardenLevelPattern by patternGroup.pattern(
+        "inventory.levelprogress",
+        "§7Progress to Level (?<currentLevel>[^:]*).*"
+    )
+    private val visitorRewardPattern by patternGroup.pattern(
+        "chat.increase",
+        " {4}§r§8\\+§r§2(?<exp>.*) §r§7Garden Experience"
+    )
+
     private var display = ""
-    private val visitorRewardPattern by RepoPattern.pattern("garden.level.chat.increase", " {4}§r§8\\+§r§2(?<exp>.*) §r§7Garden Experience")
 
     @SubscribeEvent
     fun onProfileJoin(event: ProfileJoinEvent) {
@@ -31,7 +54,7 @@ class GardenLevelDisplay {
     }
 
     @SubscribeEvent(receiveCanceled = true)
-    fun onChatMessage(event: LorenzChatEvent) {
+    fun onChat(event: LorenzChatEvent) {
         if (!GardenAPI.inGarden()) return
 
         visitorRewardPattern.matchMatcher(event.message) {
@@ -46,7 +69,7 @@ class GardenLevelDisplay {
         val newLevel = GardenAPI.getGardenLevel()
         if (newLevel == oldLevel + 1 && newLevel > 15) {
             LorenzUtils.runDelayed(50.milliseconds) {
-                LorenzUtils.clickableChat(
+                ChatUtils.clickableChat(
                     " \n§b§lGARDEN LEVEL UP §8$oldLevel ➜ §b$newLevel\n" +
                         " §8+§aRespect from Elite Farmers and SkyHanni members :)\n ",
                     "/gardenlevels",
@@ -60,19 +83,24 @@ class GardenLevelDisplay {
     @SubscribeEvent
     fun onInventoryOpen(event: InventoryFullyOpenedEvent) {
         if (!GardenAPI.inGarden()) return
-        if (event.inventoryName != "Desk") return
-        val item = event.inventoryItems[4]!!
-
-        val currentLevel = currentLevelPattern.matchMatcher(item.name!!.removeColor()) {
-            group("currentLevel").romanToDecimalIfNecessary()
-        } ?: return
+        val item = when (event.inventoryName) {
+            "Desk" -> event.inventoryItems[4] ?: return
+            "SkyBlock Menu" -> event.inventoryItems[10] ?: return
+            else -> return
+        }
+        if (!gardenItemNamePattern.matches(item.name.removeColor())) return
         var nextLevelExp = 0L
+        var currentLevel = 0
         for (line in item.getLore()) {
+            gardenLevelPattern.matchMatcher(line) {
+                currentLevel = group("currentLevel").romanToDecimalIfNecessary() - 1
+            }
+            if (line == "§7§8Max level reached!") currentLevel = 15
             expToNextLevelPattern.matchMatcher(line) {
-                nextLevelExp = group("nextLevelExp").formatNumber()
+                nextLevelExp = group("nextLevelExp").formatLong()
             }
             overflowPattern.matchMatcher(line) {
-                val overflow = group("overflow").formatNumber()
+                val overflow = group("overflow").formatLong()
                 GardenAPI.gardenExp = overflow
                 update()
                 return
@@ -98,9 +126,7 @@ class GardenLevelDisplay {
             val overflow = gardenExp - needForLevel
             val needForOnlyNextLvl = needForNextLevel - needForLevel
 
-            val need = LorenzUtils.formatInteger(overflow)
-            val have = LorenzUtils.formatInteger(needForOnlyNextLvl)
-            " §7(§e$need§7/§e$have§7)"
+            " §7(§e${overflow.addSeparators()}§7/§e${needForOnlyNextLvl.addSeparators()}§7)"
         } else ""
     }
 

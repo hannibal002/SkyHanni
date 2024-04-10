@@ -14,10 +14,13 @@ import at.hannibal2.skyhanni.events.LorenzChatEvent
 import at.hannibal2.skyhanni.events.LorenzRenderWorldEvent
 import at.hannibal2.skyhanni.events.LorenzTickEvent
 import at.hannibal2.skyhanni.events.LorenzWorldChangeEvent
+import at.hannibal2.skyhanni.events.SkyHanniRenderEntityEvent
 import at.hannibal2.skyhanni.features.dungeon.DungeonAPI
 import at.hannibal2.skyhanni.features.slayer.blaze.HellionShield
 import at.hannibal2.skyhanni.features.slayer.blaze.setHellionShield
 import at.hannibal2.skyhanni.test.command.ErrorManager
+import at.hannibal2.skyhanni.utils.CollectionUtils.editCopy
+import at.hannibal2.skyhanni.utils.CollectionUtils.put
 import at.hannibal2.skyhanni.utils.ConfigUtils
 import at.hannibal2.skyhanni.utils.EntityUtils
 import at.hannibal2.skyhanni.utils.EntityUtils.canBeSeen
@@ -28,17 +31,19 @@ import at.hannibal2.skyhanni.utils.LocationUtils.distanceToPlayer
 import at.hannibal2.skyhanni.utils.LorenzColor
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils.baseMaxHealth
-import at.hannibal2.skyhanni.utils.LorenzUtils.editCopy
-import at.hannibal2.skyhanni.utils.LorenzUtils.put
 import at.hannibal2.skyhanni.utils.LorenzUtils.round
 import at.hannibal2.skyhanni.utils.LorenzVec
 import at.hannibal2.skyhanni.utils.NumberUtil
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.RenderUtils.drawDynamicText
+import at.hannibal2.skyhanni.utils.SimpleTimeMark
+import at.hannibal2.skyhanni.utils.SimpleTimeMark.Companion.asTimeMark
 import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
-import at.hannibal2.skyhanni.utils.TimeUtils
+import at.hannibal2.skyhanni.utils.TimeUtils.format
+import at.hannibal2.skyhanni.utils.TimeUtils.ticks
 import at.hannibal2.skyhanni.utils.getLorenzVec
+import com.google.gson.JsonArray
 import net.minecraft.client.Minecraft
 import net.minecraft.client.entity.EntityOtherPlayerMP
 import net.minecraft.client.renderer.GlStateManager
@@ -49,12 +54,13 @@ import net.minecraft.entity.monster.EntityEnderman
 import net.minecraft.entity.monster.EntityMagmaCube
 import net.minecraft.entity.monster.EntityZombie
 import net.minecraft.entity.passive.EntityWolf
-import net.minecraftforge.client.event.RenderLivingEvent
 import net.minecraftforge.event.entity.EntityJoinWorldEvent
 import net.minecraftforge.fml.common.eventhandler.EventPriority
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import java.util.UUID
 import kotlin.math.max
+import kotlin.time.Duration
+import kotlin.time.Duration.Companion.seconds
 
 class DamageIndicatorManager {
 
@@ -65,6 +71,7 @@ class DamageIndicatorManager {
     private val enderSlayerHitsNumberPattern = ".* §[5fd]§l(?<hits>\\d+) Hits?".toPattern()
 
     companion object {
+
         private var data = mapOf<UUID, EntityData>()
         private val damagePattern = "[✧✯]?(\\d+[⚔+✧❤♞☄✷ﬗ✯]*)".toPattern()
 
@@ -97,6 +104,12 @@ class DamageIndicatorManager {
                 .map { it.entity.getLorenzVec() }
                 .minOfOrNull { it.distance(location) } ?: Double.MAX_VALUE
         }
+
+        fun removeDamageIndicator(type: BossType) {
+            data = data.editCopy {
+                values.removeIf { it.bossType == type }
+            }
+        }
     }
 
     @SubscribeEvent
@@ -106,7 +119,7 @@ class DamageIndicatorManager {
     }
 
     @SubscribeEvent(receiveCanceled = true)
-    fun onChatMessage(event: LorenzChatEvent) {
+    fun onChat(event: LorenzChatEvent) {
         mobFinder?.handleChat(event.message)
     }
 
@@ -117,7 +130,7 @@ class DamageIndicatorManager {
         GlStateManager.disableDepth()
         GlStateManager.disableCull()
 
-        //TODO config to define between 100ms and 5 sec
+        // TODO config to define between 100ms and 5 sec
         val filter = data.filter {
             val waitForRemoval = if (it.value.dead && !noDeathDisplay(it.value.bossType)) 4_000 else 100
             (System.currentTimeMillis() > it.value.timeLastTick + waitForRemoval) || (it.value.dead && noDeathDisplay(it.value.bossType))
@@ -157,7 +170,7 @@ class DamageIndicatorManager {
 
         for (data in data.values) {
 
-            //TODO test end stone protector in hole? - maybe change eye pos
+            // TODO test end stone protector in hole? - maybe change eye pos
 //            data.ignoreBlocks =
 //                data.bossType == BossType.END_ENDSTONE_PROTECTOR && Minecraft.getMinecraft().thePlayer.isSneaking
 
@@ -168,9 +181,11 @@ class DamageIndicatorManager {
 
             var healthText = data.healthText
             val delayedStart = data.delayedStart
-            if (delayedStart != -1L && delayedStart > System.currentTimeMillis()) {
-                val delay = delayedStart - System.currentTimeMillis()
-                healthText = formatDelay(delay)
+            delayedStart?.let {
+                if (!it.isInPast()) {
+                    val delay = it.timeUntil()
+                    healthText = formatDelay(delay)
+                }
             }
 
             val location = if (data.dead && data.deathLocation != null) {
@@ -252,7 +267,6 @@ class DamageIndicatorManager {
                     diff += 9f
                 }
             }
-
         }
         GlStateManager.enableDepth()
         GlStateManager.enableCull()
@@ -271,7 +285,7 @@ class DamageIndicatorManager {
             BossType.SLAYER_BLAZE_QUAZII_3,
             BossType.SLAYER_BLAZE_QUAZII_4,
 
-                //TODO f3/m3 4 guardians, f2/m2 4 boss room fighters
+                // TODO f3/m3 4 guardians, f2/m2 4 boss room fighters
             -> true
 
             else -> false
@@ -297,14 +311,14 @@ class DamageIndicatorManager {
         damageCounter.oldDamages.removeIf { now > it.time + 5_000 }
     }
 
-    private fun formatDelay(delay: Long): String {
+    private fun formatDelay(delay: Duration): String {
         val color = when {
-            delay < 1_000 -> LorenzColor.DARK_PURPLE
-            delay < 3_000 -> LorenzColor.LIGHT_PURPLE
+            delay < 1.seconds -> LorenzColor.DARK_PURPLE
+            delay < 3.seconds -> LorenzColor.LIGHT_PURPLE
 
             else -> LorenzColor.WHITE
         }
-        val format = TimeUtils.formatDuration(delay, showMilliSeconds = true)
+        val format = delay.format(showMilliSeconds = true)
         return color.getChatColor() + format
     }
 
@@ -319,7 +333,7 @@ class DamageIndicatorManager {
     private fun checkEntity(entity: EntityLivingBase): Pair<UUID, EntityData>? {
         try {
             val entityData = grabData(entity) ?: return null
-            if (LorenzUtils.inDungeons) {
+            if (DungeonAPI.inDungeon()) {
                 checkFinalBoss(entityData.finalDungeonBoss, entity.entityId)
             }
 
@@ -385,7 +399,13 @@ class DamageIndicatorManager {
                 val thorn = checkThorn(health, maxHealth)
                 if (thorn == null) {
                     val floor = DungeonAPI.dungeonFloor
-                    LorenzUtils.error("problems with thorn detection! ($floor, $health/$maxHealth)")
+                    ErrorManager.logErrorStateWithData(
+                        "Could not detect thorn",
+                        "checkThorn returns null",
+                        "health" to health,
+                        "maxHealth" to maxHealth,
+                        "floor" to floor,
+                    )
                 }
                 return thorn
             }
@@ -423,7 +443,7 @@ class DamageIndicatorManager {
 
             BossType.SLAYER_ZOMBIE_5 -> {
                 if ((entity as EntityZombie).hasNameTagWith(3, "§fBoom!")) {
-                    //TODO fix
+                    // TODO fix
 //                    val ticksAlive = entity.ticksExisted % (20 * 5)
 //                    val remainingTicks = (5 * 20).toLong() - ticksAlive
 //                    val format = formatDelay(remainingTicks * 50)
@@ -531,9 +551,9 @@ class DamageIndicatorManager {
             }
         } + " §f"
 
-        //hide while in the middle
+        // hide while in the middle
 //        val position = entity.getLorenzVec()
-        //TODO other logic or something
+        // TODO other logic or something
 //        entityData.healthLineHidden = position.x == -368.0 && position.z == -804.0
 
         var calcHealth = -1
@@ -548,7 +568,16 @@ class DamageIndicatorManager {
                     calcHealth = 0
                     break
                 } else {
-                    LorenzUtils.error("unknown magma boss health sidebar format!")
+                    ErrorManager.logErrorStateWithData(
+                        "Unknown magma boss health sidebar format",
+                        "Damage Indicator could not find magma boss bar data",
+                        "line" to line,
+                        "ScoreboardData.sidebarLinesRaw" to ScoreboardData.sidebarLinesRaw,
+                        "calcHealth" to calcHealth,
+                        "slimeSize" to slimeSize,
+                        "entity" to entity,
+                        "entityData" to entityData,
+                    )
                     break
                 }
 
@@ -627,7 +656,8 @@ class DamageIndicatorManager {
             entityData.namePrefix = ""
         }
 
-        //Hit phase
+        // Hit phase
+        var hitPhaseText: String? = null
         val armorStandHits = entity.getNameTagWith(3, " Hit")
         if (armorStandHits != null) {
             val maxHits = when (entityData.bossType) {
@@ -641,21 +671,24 @@ class DamageIndicatorManager {
                 group("hits").toInt()
             } ?: error("No hits number found in ender slayer name '${armorStandHits.name}'")
 
-            return NumberUtil.percentageColor(hits.toLong(), maxHits.toLong()).getChatColor() + "$hits Hits"
+            hitPhaseText = NumberUtil.percentageColor(hits.toLong(), maxHits.toLong()).getChatColor() + "$hits Hits"
         }
 
-        //Laser phase
+        // Laser phase
         if (config.enderSlayer.laserPhaseTimer && entity.ridingEntity != null) {
-            val ticksAlive = entity.ridingEntity.ticksExisted.toLong()
-            //TODO more tests, more exact values, better logic? idk make this working perfectly pls
-            //val remainingTicks = 8 * 20 - ticksAlive
-            val remainingTicks = (7.4 * 20).toLong() - ticksAlive
+            val totalTimeAlive = 8.2.seconds
 
-            if (config.enderSlayer.showHealthDuringLaser) {
-                entityData.nameSuffix = " §f" + formatDelay(remainingTicks * 50)
+            val ticksAlive = entity.ridingEntity.ticksExisted.ticks
+            val remainingTime = totalTimeAlive - ticksAlive
+            val formatDelay = formatDelay(remainingTime)
+            if (config.enderSlayer.showHealthDuringLaser || hitPhaseText != null) {
+                entityData.nameSuffix = " §f$formatDelay"
             } else {
-                return formatDelay(remainingTicks * 50)
+                return formatDelay
             }
+        }
+        hitPhaseText?.let {
+            return it
         }
 
         return result
@@ -758,7 +791,11 @@ class DamageIndicatorManager {
                 }
             }
         } else {
-            LorenzUtils.error("Invalid/impossible thorn floor!")
+            ErrorManager.logErrorStateWithData(
+                "Thorn in wrong floor detected",
+                "Invalid floor for thorn",
+                "dungeonFloor" to DungeonAPI.dungeonFloor,
+            )
             return null
         }
         val color = NumberUtil.percentageColor(health.toLong(), maxHealth.toLong())
@@ -773,7 +810,7 @@ class DamageIndicatorManager {
             damageCounter.currentDamage += damage
         }
         if (healing > 0) {
-            //Hide auto heal every 10 ticks (with rounding errors)
+            // Hide auto heal every 10 ticks (with rounding errors)
             if ((healing == 15_000L || healing == 15_001L) && entityData.bossType == BossType.SLAYER_ZOMBIE_5) return
 
             val damageCounter = entityData.damageCounter
@@ -789,10 +826,10 @@ class DamageIndicatorManager {
         val entityData = EntityData(
             entity,
             entityResult.ignoreBlocks,
-            entityResult.delayedStart,
+            entityResult.delayedStart?.asTimeMark(),
             entityResult.finalDungeonBoss,
             entityResult.bossType,
-            foundTime = System.currentTimeMillis()
+            foundTime = SimpleTimeMark.now()
         )
         DamageIndicatorDetectedEvent(entityData).postAndCatch()
         return entityData
@@ -820,7 +857,7 @@ class DamageIndicatorManager {
     private val dummyDamageCache = mutableListOf<UUID>()
 
     @SubscribeEvent(priority = EventPriority.HIGH)
-    fun onRenderLiving(event: RenderLivingEvent.Specials.Pre<EntityLivingBase>) {
+    fun onRenderLiving(event: SkyHanniRenderEntityEvent.Specials.Pre<EntityLivingBase>) {
         val entity = event.entity
 
         val entityData = data.values.find {
@@ -877,6 +914,15 @@ class DamageIndicatorManager {
 
         event.transform(15, "combat.damageIndicator.bossName") { element ->
             ConfigUtils.migrateIntToEnum(element, NameVisibility::class.java)
+        }
+        event.transform(23, "combat.damageIndicator.bossesToShow") { element ->
+            val result = JsonArray()
+            for (bossType in element as JsonArray) {
+                if (bossType.asString == "DUNGEON_ALL") continue
+                result.add(bossType)
+            }
+
+            result
         }
     }
 

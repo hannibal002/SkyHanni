@@ -10,22 +10,36 @@ import at.hannibal2.skyhanni.features.rift.RiftAPI
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.RenderUtils.renderString
+import at.hannibal2.skyhanni.utils.StringUtils.matchFirst
 import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.StringUtils.matches
+import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
 class CurrentPetDisplay {
+
     private val config get() = SkyHanniMod.feature.misc.pets
 
-    // TODO USE SH-REPO
-    private val inventoryNamePattern = "Pets( \\(\\d+/\\d+\\) )?".toPattern()
-    private val inventorySelectedPetPattern = "§7§7Selected pet: (?<pet>.*)".toPattern()
-    private val chatSpawnPattern = "§aYou summoned your §r(?<pet>.*)§r§a!".toPattern()
-    private val chatDespawnPattern = "§aYou despawned your §r.*§r§a!".toPattern()
-    private val chatPetRulePattern = "§cAutopet §eequipped your §7\\[Lvl .*] (?<pet>.*)! §a§lVIEW RULE".toPattern()
+    private val patternGroup = RepoPattern.group("misc.currentpet")
+    private val inventorySelectedPetPattern by patternGroup.pattern(
+        "inventory.selected",
+        "§7§7Selected pet: (?<pet>.*)"
+    )
+    private val chatSpawnPattern by patternGroup.pattern(
+        "chat.spawn",
+        "§aYou summoned your §r(?<pet>.*)§r§a!"
+    )
+    private val chatDespawnPattern by patternGroup.pattern(
+        "chat.despawn",
+        "§aYou despawned your §r.*§r§a!"
+    )
+    private val chatPetRulePattern by patternGroup.pattern(
+        "chat.rule",
+        "§cAutopet §eequipped your §7\\[Lvl .*] (?<pet>.*)! §a§lVIEW RULE"
+    )
 
     @SubscribeEvent
-    fun onChatMessage(event: LorenzChatEvent) {
+    fun onChat(event: LorenzChatEvent) {
         findPetInChat(event.message)?.let {
             PetAPI.currentPet = it
             if (config.hideAutopet) {
@@ -50,14 +64,12 @@ class CurrentPetDisplay {
 
     @SubscribeEvent
     fun onInventoryOpen(event: InventoryFullyOpenedEvent) {
-        if (!inventoryNamePattern.matches(event.inventoryName)) return
+        if (!PetAPI.isPetMenu(event.inventoryName)) return
 
         val lore = event.inventoryItems[4]?.getLore() ?: return
-        for (line in lore) {
-            inventorySelectedPetPattern.matchMatcher(line) {
-                val newPet = group("pet")
-                PetAPI.currentPet = if (newPet != "§cNone") newPet else ""
-            }
+        lore.matchFirst(inventorySelectedPetPattern) {
+            val newPet = group("pet")
+            PetAPI.currentPet = if (newPet != "§cNone") newPet else ""
         }
     }
 

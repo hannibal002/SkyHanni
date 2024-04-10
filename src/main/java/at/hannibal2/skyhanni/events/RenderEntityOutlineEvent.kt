@@ -111,8 +111,8 @@ class RenderEntityOutlineEvent(theType: Type?, potentialEntities: HashSet<Entity
      * [.NO_XRAY] means that this directly precedes entities whose outlines are rendered only when visible to the client
      */
     enum class Type {
+
         XRAY,
         NO_XRAY
     }
-
 }

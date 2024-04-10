@@ -4,12 +4,12 @@ import at.hannibal2.skyhanni.config.FeatureToggle;
 import at.hannibal2.skyhanni.config.HasLegacyId;
 import at.hannibal2.skyhanni.utils.tracker.SkyHanniTracker;
 import com.google.gson.annotations.Expose;
-import io.github.moulberry.moulconfig.annotations.Accordion;
-import io.github.moulberry.moulconfig.annotations.ConfigEditorBoolean;
-import io.github.moulberry.moulconfig.annotations.ConfigEditorDropdown;
-import io.github.moulberry.moulconfig.annotations.ConfigEditorSlider;
-import io.github.moulberry.moulconfig.annotations.ConfigOption;
-import io.github.moulberry.moulconfig.observer.Property;
+import io.github.notenoughupdates.moulconfig.annotations.Accordion;
+import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorBoolean;
+import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorDropdown;
+import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorSlider;
+import io.github.notenoughupdates.moulconfig.annotations.ConfigOption;
+import io.github.notenoughupdates.moulconfig.observer.Property;
 
 public class TrackerConfig {
 
@@ -20,7 +20,7 @@ public class TrackerConfig {
 
     @Expose
     @ConfigOption(name = "Show Price From", desc = "Show price from Bazaar or NPC.")
-    @ConfigEditorDropdown()
+    @ConfigEditorDropdown
     public PriceFromEntry priceFrom = PriceFromEntry.SELL_OFFER;
 
     public enum PriceFromEntry implements HasLegacyId {
@@ -118,6 +118,10 @@ public class TrackerConfig {
         @ConfigOption(name = "Still Show Above", desc = "Always show items above this §6price in 1k §7even when not in the top # of items.")
         @ConfigEditorSlider(minValue = 5, maxValue = 500, minStep = 5)
         public Property<Integer> minPrice = Property.of(100);
-
     }
+
+    @Expose
+    @ConfigOption(name = "Hide outside Inventory", desc = "Hide Profit Trackers while not insidie an inventory.")
+    @ConfigEditorBoolean
+    public boolean hideItemTrackersOutsideInventory = false;
 }

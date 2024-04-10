@@ -6,7 +6,8 @@ import at.hannibal2.skyhanni.events.GuiContainerEvent
 import at.hannibal2.skyhanni.events.InventoryCloseEvent
 import at.hannibal2.skyhanni.events.InventoryFullyOpenedEvent
 import at.hannibal2.skyhanni.events.LorenzChatEvent
-import at.hannibal2.skyhanni.events.LorenzTickEvent
+import at.hannibal2.skyhanni.events.SecondPassedEvent
+import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
@@ -17,6 +18,7 @@ import kotlin.time.Duration.Companion.days
 import kotlin.time.Duration.Companion.seconds
 
 class AccountUpgradeReminder {
+
     private var inInventory = false
     private var duration: Duration? = null
     private var lastReminderSend = SimpleTimeMark.farPast()
@@ -30,17 +32,11 @@ class AccountUpgradeReminder {
             }
         }
 
-
-    @SubscribeEvent
-    fun onTick(event: LorenzTickEvent) {
-        if (!LorenzUtils.inSkyBlock) return
-        if (event.repeatSeconds(1)) {
-            checkReminder()
-        }
-    }
-
     // TODO: Merge this logic with CityProjectFeatures reminder to reduce duplication
-    private fun checkReminder() {
+    @SubscribeEvent
+    fun onSecondPassed(event: SecondPassedEvent) {
+        if (!LorenzUtils.inSkyBlock) return
+
         if (!isEnabled()) return
         val playerSpecific = ProfileStorageData.playerSpecific ?: return
         if (ReminderUtils.isBusy()) return
@@ -49,18 +45,17 @@ class AccountUpgradeReminder {
         val upgrade = playerSpecific.currentAccountUpgrade ?: return
         val nextCompletionTime = nextCompletionTime ?: return
         if (!nextCompletionTime.isInPast()) return
-
         if (lastReminderSend.passedSince() < 30.seconds) return
         lastReminderSend = SimpleTimeMark.now()
 
-        LorenzUtils.clickableChat(
+        ChatUtils.clickableChat(
             "The §a$upgrade §eupgrade has completed! §c(Click to disable these reminders)",
             "shstopaccountupgradereminder"
         )
     }
 
     @SubscribeEvent
-    fun onInventoryLoad(event: InventoryFullyOpenedEvent) {
+    fun onInventoryOpen(event: InventoryFullyOpenedEvent) {
         if (!LorenzUtils.inSkyBlock) return
         inInventory = event.inventoryName == "Community Shop"
     }
@@ -83,7 +78,7 @@ class AccountUpgradeReminder {
     }
 
     @SubscribeEvent
-    fun onUpgradeStarted(event: LorenzChatEvent) {
+    fun onChat(event: LorenzChatEvent) {
         if (claimedRegex.matches(event.message)) {
             clearUpgrade()
         } else {
@@ -107,6 +102,7 @@ class AccountUpgradeReminder {
     }
 
     companion object {
+
         private val durationRegex = "§8Duration: (\\d{1,3})d".toRegex()
         private val startedRegex = "§eYou started the §r§a(.+) §r§eupgrade!".toRegex()
         private val claimedRegex = "§eYou claimed the §r§a.+ §r§eupgrade!".toRegex()

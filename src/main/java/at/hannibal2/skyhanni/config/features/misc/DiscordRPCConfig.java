@@ -3,12 +3,12 @@ package at.hannibal2.skyhanni.config.features.misc;
 import at.hannibal2.skyhanni.config.FeatureToggle;
 import at.hannibal2.skyhanni.config.HasLegacyId;
 import com.google.gson.annotations.Expose;
-import io.github.moulberry.moulconfig.annotations.ConfigEditorBoolean;
-import io.github.moulberry.moulconfig.annotations.ConfigEditorDraggableList;
-import io.github.moulberry.moulconfig.annotations.ConfigEditorDropdown;
-import io.github.moulberry.moulconfig.annotations.ConfigEditorText;
-import io.github.moulberry.moulconfig.annotations.ConfigOption;
-import io.github.moulberry.moulconfig.observer.Property;
+import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorBoolean;
+import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorDraggableList;
+import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorDropdown;
+import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorText;
+import io.github.notenoughupdates.moulconfig.annotations.ConfigOption;
+import io.github.notenoughupdates.moulconfig.observer.Property;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -31,12 +31,12 @@ public class DiscordRPCConfig {
 
     @Expose
     @ConfigOption(name = "First Line", desc = "Decide what to show in the first line.")
-    @ConfigEditorDropdown()
+    @ConfigEditorDropdown
     public Property<LineEntry> firstLine = Property.of(NOTHING);
 
     @Expose
     @ConfigOption(name = "Second Line", desc = "Decide what to show in the second line.")
-    @ConfigEditorDropdown()
+    @ConfigEditorDropdown
     public Property<LineEntry> secondLine = Property.of(NOTHING);
 
     @Expose
@@ -46,7 +46,7 @@ public class DiscordRPCConfig {
 
     @Expose
     @ConfigOption(name = "Dynamic Priority", desc = "Disable certain dynamic statuses, or change the priority in case two are triggered at the same time (higher up means higher priority).")
-    @ConfigEditorDraggableList()
+    @ConfigEditorDraggableList
     public List<PriorityEntry> autoPriority = new ArrayList<>(Arrays.asList(
         CROP_MILESTONES,
         SLAYER,
@@ -89,7 +89,7 @@ public class DiscordRPCConfig {
 
     @Expose
     @ConfigOption(name = "Dynamic Fallback", desc = "What to show when none of your \"Dynamic Priority\" statuses are active.")
-    @ConfigEditorDropdown()
+    @ConfigEditorDropdown
     public Property<LineEntry> auto = Property.of(NOTHING);
 
     public enum LineEntry implements HasLegacyId {

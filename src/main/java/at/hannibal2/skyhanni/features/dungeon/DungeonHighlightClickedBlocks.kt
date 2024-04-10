@@ -8,7 +8,6 @@ import at.hannibal2.skyhanni.events.LorenzRenderWorldEvent
 import at.hannibal2.skyhanni.utils.BlockUtils
 import at.hannibal2.skyhanni.utils.BlockUtils.getBlockAt
 import at.hannibal2.skyhanni.utils.LorenzColor
-import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.LorenzVec
 import at.hannibal2.skyhanni.utils.RenderUtils.drawColor
 import at.hannibal2.skyhanni.utils.RenderUtils.drawString
@@ -29,9 +28,9 @@ class DungeonHighlightClickedBlocks {
     }
 
     @SubscribeEvent
-    fun onChatMessage(event: LorenzChatEvent) {
+    fun onChat(event: LorenzChatEvent) {
         if (!SkyHanniMod.feature.dungeon.highlightClickedBlocks) return
-        if (!LorenzUtils.inDungeons) return
+        if (!DungeonAPI.inDungeon()) return
 
         if (event.message == "§cYou hear the sound of something opening...") {
             event.blockedReason = "dungeon_highlight_clicked_block"
@@ -41,7 +40,7 @@ class DungeonHighlightClickedBlocks {
     @SubscribeEvent
     fun onBlockClick(event: BlockClickEvent) {
         if (!SkyHanniMod.feature.dungeon.highlightClickedBlocks) return
-        if (!LorenzUtils.inDungeons) return
+        if (!DungeonAPI.inDungeon()) return
         if (DungeonAPI.inBossRoom) return
         if (event.clickType != ClickType.RIGHT_CLICK) return
 
@@ -55,11 +54,6 @@ class DungeonHighlightClickedBlocks {
             else -> return
         }
 
-        // Water room
-        if (DungeonAPI.getRoomID() == "-60,-60") {
-            return
-        }
-
         if (type == ClickedBlockType.WITHER_ESSENCE) {
             val text = BlockUtils.getTextureFromSkull(position.toBlockPos())
             if (text != "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQ" +
@@ -70,8 +64,8 @@ class DungeonHighlightClickedBlocks {
             }
         }
 
-        // TODO hide in water room
-//        if (nearWaterRoom() && type == ClickedBlockType.LEVER) return
+        val inWaterRoom = DungeonAPI.getRoomID() == "-60,-60"
+        if (inWaterRoom && type == ClickedBlockType.LEVER) return
 
         val color = getNextColor()
         val displayText = color.getChatColor() + "Clicked " + type.display
@@ -81,7 +75,7 @@ class DungeonHighlightClickedBlocks {
     @SubscribeEvent
     fun onWorldRender(event: LorenzRenderWorldEvent) {
         if (!SkyHanniMod.feature.dungeon.highlightClickedBlocks) return
-        if (!LorenzUtils.inDungeons) return
+        if (!DungeonAPI.inDungeon()) return
 
         blocks.removeAll { System.currentTimeMillis() > it.time + 3000 }
         blocks.forEach {

@@ -3,11 +3,12 @@ package at.hannibal2.skyhanni.config.features.misc;
 import at.hannibal2.skyhanni.config.FeatureToggle;
 import at.hannibal2.skyhanni.config.core.config.Position;
 import com.google.gson.annotations.Expose;
-import io.github.moulberry.moulconfig.annotations.ConfigEditorBoolean;
-import io.github.moulberry.moulconfig.annotations.ConfigEditorKeybind;
-import io.github.moulberry.moulconfig.annotations.ConfigEditorSlider;
-import io.github.moulberry.moulconfig.annotations.ConfigOption;
-import io.github.moulberry.moulconfig.observer.Property;
+import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorBoolean;
+import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorKeybind;
+import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorSlider;
+import io.github.notenoughupdates.moulconfig.annotations.ConfigLink;
+import io.github.notenoughupdates.moulconfig.annotations.ConfigOption;
+import io.github.notenoughupdates.moulconfig.observer.Property;
 import org.lwjgl.input.Keyboard;
 
 public class EstimatedItemValueConfig {
@@ -48,5 +49,21 @@ public class EstimatedItemValueConfig {
     public boolean armor = true;
 
     @Expose
+    @ConfigOption(name = "Ignore Helmet Skins", desc = "Ignore helmet Skins from the total value.")
+    @ConfigEditorBoolean
+    public boolean ignoreHelmetSkins = false;
+
+    @Expose
+    @ConfigOption(name = "Ignore Armor Dyes", desc = "Ignore Armor Dyes from the total value.")
+    @ConfigEditorBoolean
+    public boolean ignoreArmorDyes = false;
+
+    @Expose
+    @ConfigOption(name = "Ignore Runes", desc = "Ignore Runes from the total value.")
+    @ConfigEditorBoolean
+    public boolean ignoreRunes = false;
+
+    @Expose
+    @ConfigLink(owner = EstimatedItemValueConfig.class, field = "enabled")
     public Position itemPriceDataPos = new Position(140, 90, false, true);
 }

@@ -1,29 +1,35 @@
 package at.hannibal2.skyhanni.features.misc.visualwords
 
 import at.hannibal2.skyhanni.SkyHanniMod
+import at.hannibal2.skyhanni.config.ConfigFileType
+import at.hannibal2.skyhanni.config.enums.OutsideSbFeature
+import at.hannibal2.skyhanni.events.HypixelJoinEvent
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.StringUtils.convertToFormatted
-import com.google.common.cache.Cache
-import com.google.common.cache.CacheBuilder
-import java.util.concurrent.TimeUnit
+import at.hannibal2.skyhanni.utils.TimeLimitedCache
+import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
+import kotlin.time.Duration.Companion.minutes
 
 object ModifyVisualWords {
+
     private val config get() = SkyHanniMod.feature.gui.modifyWords
-    var textCache: Cache<String, String> = CacheBuilder.newBuilder().expireAfterWrite(5, TimeUnit.MINUTES).build()
+    var textCache = TimeLimitedCache<String, String>(5.minutes)
 
     var modifiedWords = mutableListOf<VisualWord>()
+
+    val reverseRegex = "(§.|^|[\\s:()+-])([^§\\s:()+-]*)".toRegex()
 
     fun modifyText(originalText: String?): String? {
         var modifiedText = originalText ?: return null
         if (!LorenzUtils.onHypixel) return originalText
         if (!config.enabled) return originalText
-        if (!LorenzUtils.inSkyBlock && !config.workOutside) return originalText
+        if (!LorenzUtils.inSkyBlock && !OutsideSbFeature.MODIFY_VISUAL_WORDS.isSelected()) return originalText
 
         if (modifiedWords.isEmpty()) {
-            modifiedWords = SkyHanniMod.feature.storage.modifiedWords
+            modifiedWords.addAll(SkyHanniMod.visualWordsData.modifiedWords)
         }
 
-        val cachedResult = textCache.getIfPresent(originalText)
+        val cachedResult = textCache.getOrNull(originalText)
         if (cachedResult != null) {
             return cachedResult
         }
@@ -38,14 +44,29 @@ object ModifyVisualWords {
                 if (phrase.isEmpty()) continue
 
                 modifiedText = modifiedText.replace(
-                    phrase,
-                    modifiedWord.replacement.convertToFormatted(),
-                    modifiedWord.isCaseSensitive()
+                    phrase, modifiedWord.replacement.convertToFormatted(), modifiedWord.isCaseSensitive()
                 )
             }
         }
 
+        // Disabled, as its only a novelty for 30 seconds and will annoy after that everyone.
+
+//         if (LorenzUtils.isAprilFoolsDay && !FontRendererHook.cameFromChat && Random.nextDouble() < 0.02) {
+//             modifiedText = modifiedText.replace(reverseRegex) {
+//                 it.groupValues[1] + it.groupValues[2].reversed()
+//             }
+//         }
         textCache.put(originalText, modifiedText)
         return modifiedText
+    }
+
+    @SubscribeEvent
+    fun onHypixelJoin(event: HypixelJoinEvent) {
+        val oldModifiedWords = SkyHanniMod.feature.storage.modifiedWords
+        if (oldModifiedWords.isNotEmpty()) {
+            SkyHanniMod.visualWordsData.modifiedWords = oldModifiedWords
+            SkyHanniMod.feature.storage.modifiedWords = emptyList()
+            SkyHanniMod.configManager.saveConfig(ConfigFileType.VISUAL_WORDS, "Migrate visual words")
+        }
     }
 }

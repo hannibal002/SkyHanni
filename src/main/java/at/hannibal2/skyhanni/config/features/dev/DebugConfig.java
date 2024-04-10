@@ -1,9 +1,13 @@
 package at.hannibal2.skyhanni.config.features.dev;
 
+import at.hannibal2.skyhanni.config.core.config.Position;
+import at.hannibal2.skyhanni.data.Mayor;
 import com.google.gson.annotations.Expose;
-import io.github.moulberry.moulconfig.annotations.ConfigEditorBoolean;
-import io.github.moulberry.moulconfig.annotations.ConfigEditorKeybind;
-import io.github.moulberry.moulconfig.annotations.ConfigOption;
+import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorBoolean;
+import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorDropdown;
+import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorKeybind;
+import io.github.notenoughupdates.moulconfig.annotations.ConfigOption;
+import io.github.notenoughupdates.moulconfig.observer.Property;
 import org.lwjgl.input.Keyboard;
 
 public class DebugConfig {
@@ -45,6 +49,11 @@ public class DebugConfig {
     @ConfigOption(name = "Show Item Category", desc = "Show item categories in item lore.")
     @ConfigEditorBoolean
     public boolean showItemCategory = false;
+
+    @Expose
+    @ConfigOption(name = "Show Item Name", desc = "Show the SkyHanni item name for an item.")
+    @ConfigEditorBoolean
+    public boolean showItemName = false;
 
     @Expose
     @ConfigOption(name = "Copy Internal Name", desc = "Copies the internal name of an item on key press in the clipboard.")
@@ -92,13 +101,41 @@ public class DebugConfig {
     public boolean hotSwapDetection = false;
 
     @Expose
+    @ConfigOption(name = "Always Outdated", desc = "For the sake of the auto updater, act like you are always oudated.")
+    @ConfigEditorBoolean
+    public boolean alwaysOutdated = false;
+
+    @Expose
     @ConfigOption(name = "SkyHanni Event Counter", desc = "Count once per second how many skyhanni events gets triggered, " +
         "show the total amount in console output.")
     @ConfigEditorBoolean
     public boolean eventCounter = false;
 
     @Expose
-    @ConfigOption(name = "Bypass Advanced Tab List", desc = "The Advaced Player Tab list is disabled whie pressing this hotkey.")
+    @ConfigOption(name = "Bypass Advanced Tab List", desc = "The Advanced Player Tab list is disabled whie pressing this hotkey.")
     @ConfigEditorKeybind(defaultKey = Keyboard.KEY_NONE)
     public int bypassAdvancedPlayerTabList = Keyboard.KEY_NONE;
+
+    @Expose
+    @ConfigOption(name = "SkyBlock Area", desc = "Show your current area in SkyBlock while f3 is open.")
+    @ConfigEditorBoolean
+    public boolean currentAreaDebug = true;
+
+    @Expose
+    @ConfigOption(name = "Assume Mayor", desc = "Select a mayor to assume.")
+    @ConfigEditorDropdown
+    public Property<Mayor> assumeMayor = Property.of(Mayor.DISABLED);
+
+    @Expose
+    @ConfigOption(name = "Always April Fools", desc = "Always show April fools jokes.")
+    @ConfigEditorBoolean
+    public boolean alwaysFunnyTime = false;
+
+    @Expose
+    @ConfigOption(name = "Never April Fools", desc = "Admit it, you hate fun.")
+    @ConfigEditorBoolean
+    public boolean neverFunnyTime = false;
+
+    @Expose
+    public Position trackSoundPosition = new Position(0, 0);
 }

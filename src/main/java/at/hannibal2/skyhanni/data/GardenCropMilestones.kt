@@ -1,28 +1,33 @@
 package at.hannibal2.skyhanni.data
 
+import at.hannibal2.skyhanni.data.jsonobjects.repo.GardenJson
 import at.hannibal2.skyhanni.events.CropMilestoneUpdateEvent
 import at.hannibal2.skyhanni.events.InventoryFullyOpenedEvent
 import at.hannibal2.skyhanni.events.RepositoryReloadEvent
 import at.hannibal2.skyhanni.features.garden.CropType
 import at.hannibal2.skyhanni.features.garden.GardenAPI
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
-import at.hannibal2.skyhanni.utils.NumberUtil.formatNumber
-import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
-import at.hannibal2.skyhanni.data.jsonobjects.repo.GardenJson
+import at.hannibal2.skyhanni.utils.NumberUtil.formatLong
+import at.hannibal2.skyhanni.utils.StringUtils.matchFirst
+import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraft.item.ItemStack
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
 object GardenCropMilestones {
-    // TODO USE SH-REPO
-    private val cropPattern = "§7Harvest §f(?<name>.*) §7on .*".toPattern()
-    val totalPattern = "§7Total: §a(?<name>.*)".toPattern()
+    private val patternGroup = RepoPattern.group("data.garden.milestone")
+    private val cropPattern by patternGroup.pattern(
+        "crop",
+        "§7Harvest §f(?<name>.*) §7on .*"
+    )
+    val totalPattern by patternGroup.pattern(
+        "total",
+        "§7Total: §a(?<name>.*)"
+    )
 
     fun getCropTypeByLore(itemStack: ItemStack): CropType? {
-        for (line in itemStack.getLore()) {
-            cropPattern.matchMatcher(line) {
-                val name = group("name")
-                return CropType.getByNameOrNull(name)
-            }
+        itemStack.getLore().matchFirst(cropPattern) {
+            val name = group("name")
+            return CropType.getByNameOrNull(name)
         }
         return null
     }
@@ -33,11 +38,9 @@ object GardenCropMilestones {
 
         for ((_, stack) in event.inventoryItems) {
             val crop = getCropTypeByLore(stack) ?: continue
-            for (line in stack.getLore()) {
-                totalPattern.matchMatcher(line) {
-                    val amount = group("name").formatNumber()
-                    crop.setCounter(amount)
-                }
+            stack.getLore().matchFirst(totalPattern) {
+                val amount = group("name").formatLong()
+                crop.setCounter(amount)
             }
         }
         CropMilestoneUpdateEvent().postAndCatch()

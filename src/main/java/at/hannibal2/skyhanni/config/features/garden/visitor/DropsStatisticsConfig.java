@@ -4,15 +4,27 @@ import at.hannibal2.skyhanni.config.FeatureToggle;
 import at.hannibal2.skyhanni.config.HasLegacyId;
 import at.hannibal2.skyhanni.config.core.config.Position;
 import com.google.gson.annotations.Expose;
-import io.github.moulberry.moulconfig.annotations.ConfigEditorBoolean;
-import io.github.moulberry.moulconfig.annotations.ConfigEditorDraggableList;
-import io.github.moulberry.moulconfig.annotations.ConfigOption;
+import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorBoolean;
+import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorDraggableList;
+import io.github.notenoughupdates.moulconfig.annotations.ConfigLink;
+import io.github.notenoughupdates.moulconfig.annotations.ConfigOption;
 
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-import static at.hannibal2.skyhanni.config.features.garden.visitor.DropsStatisticsConfig.DropsStatisticsTextEntry.*;
+import static at.hannibal2.skyhanni.config.features.garden.visitor.DropsStatisticsConfig.DropsStatisticsTextEntry.ACCEPTED;
+import static at.hannibal2.skyhanni.config.features.garden.visitor.DropsStatisticsConfig.DropsStatisticsTextEntry.COINS_SPENT;
+import static at.hannibal2.skyhanni.config.features.garden.visitor.DropsStatisticsConfig.DropsStatisticsTextEntry.COPPER;
+import static at.hannibal2.skyhanni.config.features.garden.visitor.DropsStatisticsConfig.DropsStatisticsTextEntry.DEDICATION_IV;
+import static at.hannibal2.skyhanni.config.features.garden.visitor.DropsStatisticsConfig.DropsStatisticsTextEntry.DENIED;
+import static at.hannibal2.skyhanni.config.features.garden.visitor.DropsStatisticsConfig.DropsStatisticsTextEntry.FARMING_EXP;
+import static at.hannibal2.skyhanni.config.features.garden.visitor.DropsStatisticsConfig.DropsStatisticsTextEntry.GREEN_BANDANA;
+import static at.hannibal2.skyhanni.config.features.garden.visitor.DropsStatisticsConfig.DropsStatisticsTextEntry.OVERGROWN_GRASS;
+import static at.hannibal2.skyhanni.config.features.garden.visitor.DropsStatisticsConfig.DropsStatisticsTextEntry.SPACER_1;
+import static at.hannibal2.skyhanni.config.features.garden.visitor.DropsStatisticsConfig.DropsStatisticsTextEntry.TITLE;
+import static at.hannibal2.skyhanni.config.features.garden.visitor.DropsStatisticsConfig.DropsStatisticsTextEntry.TOTAL_VISITORS;
+import static at.hannibal2.skyhanni.config.features.garden.visitor.DropsStatisticsConfig.DropsStatisticsTextEntry.VISITORS_BY_RARITY;
 
 public class DropsStatisticsConfig {
 
@@ -30,7 +42,7 @@ public class DropsStatisticsConfig {
         name = "Text Format",
         desc = "Drag text to change the appearance of the overlay."
     )
-    @ConfigEditorDraggableList()
+    @ConfigEditorDraggableList
     public List<DropsStatisticsTextEntry> textFormat = new ArrayList<>(Arrays.asList(
         TITLE,
         TOTAL_VISITORS,
@@ -121,5 +133,6 @@ public class DropsStatisticsConfig {
     public boolean onlyOnBarn = true;
 
     @Expose
+    @ConfigLink(owner = DropsStatisticsConfig.class, field = "enabled")
     public Position pos = new Position(5, 20, false, true);
 }

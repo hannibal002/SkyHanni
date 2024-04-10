@@ -24,7 +24,8 @@ import kotlin.time.TimeSource
  */
 @OptIn(ExperimentalTime::class)
 class HighlightBonzoMasks {
-    private val config get() = SkyHanniMod.feature.itemAbilities
+
+    private val config get() = SkyHanniMod.feature.inventory.itemAbilities
 
     private val maskTimers = mutableMapOf<String, CooldownTimer>()
 
@@ -63,7 +64,7 @@ class HighlightBonzoMasks {
     }
 
     @SubscribeEvent
-    fun onChatReceived(event: LorenzChatEvent) {
+    fun onChat(event: LorenzChatEvent) {
         val message = event.message.removeColor()
         if (bonzoMaskMessage.matches(message)) {
             maskTimers["BONZO_MASK"] = CooldownTimer(TimeSource.Monotonic.markNow(), bonzoMaskCooldown)
@@ -84,12 +85,12 @@ class HighlightBonzoMasks {
 
     companion object {
         data class CooldownTimer(val timeMark: TimeMark, val duration: Duration) {
+
             val percentComplete: Double
                 get() =
                     timeMark.elapsedNow().toDouble(DurationUnit.SECONDS) / duration.toDouble(DurationUnit.SECONDS)
 
             val isActive: Boolean get() = timeMark.elapsedNow() < duration
-
         }
     }
 }

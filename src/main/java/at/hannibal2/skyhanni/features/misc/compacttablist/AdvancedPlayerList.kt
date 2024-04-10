@@ -10,24 +10,30 @@ import at.hannibal2.skyhanni.data.PartyAPI
 import at.hannibal2.skyhanni.data.jsonobjects.repo.ContributorListJson
 import at.hannibal2.skyhanni.events.RepositoryReloadEvent
 import at.hannibal2.skyhanni.features.bingo.BingoAPI
+import at.hannibal2.skyhanni.features.dungeon.DungeonAPI
 import at.hannibal2.skyhanni.features.misc.MarkedPlayerManager
 import at.hannibal2.skyhanni.test.SkyHanniDebugsAndTests
+import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.ConfigUtils
 import at.hannibal2.skyhanni.utils.KeyboardManager.isKeyHeld
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils.isInIsland
 import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
-import com.google.common.cache.CacheBuilder
+import at.hannibal2.skyhanni.utils.TimeLimitedCache
+import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
-import java.util.concurrent.TimeUnit
 import kotlin.random.Random
+import kotlin.time.Duration.Companion.minutes
 
 object AdvancedPlayerList {
-    private val config get() = SkyHanniMod.feature.misc.compactTabList.advancedPlayerList
 
-    // TODO USE SH-REPO
-    private val pattern = ".*\\[(?<level>.*)] §r(?<name>.*)".toPattern()
+    private val config get() = SkyHanniMod.feature.gui.compactTabList.advancedPlayerList
+
+    private val levelPattern by RepoPattern.pattern(
+        "misc.compacttablist.advanced.level",
+        ".*\\[(?<level>.*)] §r(?<name>.*)"
+    )
 
     private var playerDatas = mutableMapOf<String, PlayerData>()
 
@@ -37,7 +43,7 @@ object AdvancedPlayerList {
 
     fun newSorting(original: List<String>): List<String> {
         if (LorenzUtils.inKuudraFight) return original
-        if (LorenzUtils.inDungeons) return original
+        if (DungeonAPI.inDungeon()) return original
 
         if (ignoreCustomTabList()) return original
         val newList = mutableListOf<String>()
@@ -51,11 +57,12 @@ object AdvancedPlayerList {
             i++
             if (i == 1) continue
             if (line.isEmpty() || line.contains("Server Info")) break
+            if (line == "               §r§3§lInfo") break
             if (line.contains("§r§a§lPlayers")) {
                 extraTitles++
                 continue
             }
-            pattern.matchMatcher(line) {
+            levelPattern.matchMatcher(line) {
                 val levelText = group("level")
                 val removeColor = levelText.removeColor()
                 try {
@@ -97,11 +104,12 @@ object AdvancedPlayerList {
                     } else {
                         playerData.nameSuffix = ""
                     }
-
                 } catch (e: NumberFormatException) {
-                    val message = "Special user (youtube or admin?): '$line'"
-                    LorenzUtils.debug(message)
-                    println(message)
+                    ErrorManager.logErrorWithData(e, "Advanced Player List failed to parse user name",
+                        "line" to line,
+                        "i" to i,
+                        "original" to original,
+                        )
                 }
             }
         }
@@ -188,11 +196,10 @@ object AdvancedPlayerList {
         return "$level $playerName ${suffix.trim()}"
     }
 
-    private var randomOrderCache =
-        CacheBuilder.newBuilder().expireAfterWrite(20, TimeUnit.MINUTES).build<String, Int>()
+    private var randomOrderCache = TimeLimitedCache<String, Int>(20.minutes)
 
     private fun getRandomOrder(name: String): Int {
-        val saved = randomOrderCache.getIfPresent(name)
+        val saved = randomOrderCache.getOrNull(name)
         if (saved != null) {
             return saved
         }
@@ -214,7 +221,7 @@ object AdvancedPlayerList {
     private fun getSocialScoreIcon(score: Int) = when (score) {
 //        10 -> "§c§lME"
         10 -> ""
-        8 -> "${SkyHanniMod.feature.markedPlayers.chatColor.getChatColor()}§lMARKED"
+        8 -> "${MarkedPlayerManager.config.chatColor.getChatColor()}§lMARKED"
         5 -> "§9§lP"
         4 -> "§d§lF"
         3 -> "§2§lG"
@@ -232,6 +239,7 @@ object AdvancedPlayerList {
     }
 
     class PlayerData(val sbLevel: Int) {
+
         var name: String = "?"
         var coloredName: String = "?"
         var nameSuffix: String = "?"
