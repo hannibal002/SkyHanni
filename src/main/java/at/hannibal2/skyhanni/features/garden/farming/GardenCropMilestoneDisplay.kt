@@ -63,17 +63,17 @@ object GardenCropMilestoneDisplay {
         if (GardenAPI.hideExtraGuis()) return
 
         config.progressDisplayPos.renderStringsAndItems(
-            progressDisplay, posLabel = "Crop Milestone Progress"
+            progressDisplay, posLabel = "Crop Milestone Progress", itemScale = 0.8
         )
 
         if (config.mushroomPetPerk.enabled) {
             config.mushroomPetPerk.pos.renderStringsAndItems(
-                mushroomCowPerkDisplay, posLabel = "Mushroom Cow Perk"
+                mushroomCowPerkDisplay, posLabel = "Mushroom Cow Perk", itemScale = 0.8
             )
         }
 
         if (config.next.bestDisplay) {
-            config.next.displayPos.renderStringsAndItems(bestCropTime.display, posLabel = "Best Crop Time")
+            config.next.displayPos.renderStringsAndItems(bestCropTime.display, posLabel = "Best Crop Time", itemScale = 0.8)
         }
     }
 
