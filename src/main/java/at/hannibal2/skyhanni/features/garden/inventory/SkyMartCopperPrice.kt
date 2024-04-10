@@ -10,6 +10,7 @@ import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.ItemUtils.itemName
 import at.hannibal2.skyhanni.utils.LorenzUtils
+import at.hannibal2.skyhanni.utils.LorenzUtils.round
 import at.hannibal2.skyhanni.utils.NEUInternalName
 import at.hannibal2.skyhanni.utils.NEUItems.getPrice
 import at.hannibal2.skyhanni.utils.NEUItems.getPriceOrNull
@@ -20,6 +21,7 @@ import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderables
 import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
+import com.google.gson.JsonPrimitive
 import net.minecraft.item.ItemStack
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
@@ -93,7 +95,16 @@ class SkyMartCopperPrice {
                     add("§7Copper amount: §c${copper.addSeparators()} ")
                     add("§7Profit per copper: §6${perFormat} ")
                 }
-                table.add(DisplayTableEntry("$itemName§f:", "§6§l$perFormat", factor, internalName, hover, highlightsOnHoverSlots = listOf(slot)))
+                table.add(
+                    DisplayTableEntry(
+                        "$itemName§f:",
+                        "§6§l$perFormat",
+                        factor,
+                        internalName,
+                        hover,
+                        highlightsOnHoverSlots = listOf(slot)
+                    )
+                )
             }
         }
 
@@ -126,5 +137,8 @@ class SkyMartCopperPrice {
         event.move(3, "garden.skyMartCopperPrice", "garden.skyMart.copperPrice")
         event.move(3, "garden.skyMartCopperPriceAdvancedStats", "garden.skyMart.copperPriceAdvancedStats")
         event.move(3, "garden.skyMartCopperPricePos", "garden.skyMart.copperPricePos")
+        event.transform(32, "garden.skyMart.itemScale") {
+            JsonPrimitive((it.asDouble / 1.851).round(1))
+        }
     }
 }

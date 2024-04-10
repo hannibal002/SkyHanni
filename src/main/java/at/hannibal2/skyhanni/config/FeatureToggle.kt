@@ -1,6 +1,6 @@
 package at.hannibal2.skyhanni.config
 
-import io.github.moulberry.moulconfig.annotations.ConfigEditorBoolean
+import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorBoolean
 
 /**
  * Annotate a [ConfigEditorBoolean] to indicate that it is a feature toggle.

@@ -4,14 +4,14 @@ import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.events.GuiContainerEvent
 import at.hannibal2.skyhanni.events.LorenzToolTipEvent
 import at.hannibal2.skyhanni.features.garden.GardenAPI
-import at.hannibal2.skyhanni.utils.ChatUtils
+import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.InventoryUtils.getUpperItems
 import at.hannibal2.skyhanni.utils.ItemUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.LorenzColor
 import at.hannibal2.skyhanni.utils.LorenzUtils
-import at.hannibal2.skyhanni.utils.NEUItems
+import at.hannibal2.skyhanni.utils.NEUInternalName
 import at.hannibal2.skyhanni.utils.NEUItems.getPrice
 import at.hannibal2.skyhanni.utils.NumberUtil
 import at.hannibal2.skyhanni.utils.RenderUtils.highlight
@@ -48,14 +48,18 @@ class GardenComposterInventoryFeatures {
                 if (line.endsWith(" Copper")) continue
                 if (line == "") break
                 val (itemName, amount) = ItemUtils.readItemAmount(line) ?: run {
-                    ChatUtils.error("Could not read item '$line'")
+                    ErrorManager.logErrorStateWithData(
+                        "Error reading item line",
+                        "could not read item line",
+                        "line" to line
+                    )
                     continue
                 }
-                val internalName = NEUItems.getInternalNameOrNull(itemName)
-                if (internalName == null) {
-                    ChatUtils.error(
-                        "Error reading internal name for item '$itemName§c' " +
-                            "(in GardenComposterInventoryFeatures)"
+                val internalName = NEUInternalName.fromItemNameOrNull(itemName) ?: run {
+                    ErrorManager.logErrorStateWithData(
+                        "Error reading internal name for item: $itemName",
+                        "could not find internal name for",
+                        "itemName" to itemName
                     )
                     continue
                 }

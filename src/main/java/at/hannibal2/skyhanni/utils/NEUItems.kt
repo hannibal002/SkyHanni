@@ -93,9 +93,6 @@ object NEUItems {
         return map
     }
 
-    @Deprecated("moved", ReplaceWith("NEUInternalName.fromItemNameOrNull(itemName)"))
-    fun getInternalNameOrNull(itemName: String): NEUInternalName? = NEUInternalName.fromItemNameOrNull(itemName)
-
     fun getInternalName(itemStack: ItemStack): String? = ItemResolutionQuery(manager)
         .withCurrentGuiContext()
         .withItemStack(itemStack)
@@ -159,22 +156,24 @@ object NEUItems {
     fun isVanillaItem(item: ItemStack): Boolean =
         manager.auctionManager.isVanillaItem(item.getInternalName().asString())
 
-    fun ItemStack.renderOnScreen(x: Float, y: Float, scaleMultiplier: Double = 1.0) {
+    const val itemFontSize = 2.0 / 3.0
+
+    fun ItemStack.renderOnScreen(x: Float, y: Float, scaleMultiplier: Double = itemFontSize) {
         val item = checkBlinkItem()
         val isSkull = item.item === Items.skull
 
-        val baseScale = (if (isSkull) 0.8f else 0.6f)
+        val baseScale = (if (isSkull) 4f / 3f else 1f)
         val finalScale = baseScale * scaleMultiplier
-        val diff = ((finalScale - baseScale) * 10).toFloat()
 
         val translateX: Float
         val translateY: Float
         if (isSkull) {
-            translateX = x - 2 - diff
-            translateY = y - 2 - diff
+            val skullDiff = ((scaleMultiplier) * 2.5).toFloat()
+            translateX = x - skullDiff
+            translateY = y - skullDiff
         } else {
-            translateX = x - diff
-            translateY = y - diff
+            translateX = x
+            translateY = y
         }
 
         GlStateManager.pushMatrix()
@@ -214,13 +213,14 @@ object NEUItems {
 
     fun allNeuRepoItems(): Map<String, JsonObject> = NotEnoughUpdates.INSTANCE.manager.itemInformation
 
+    // TODO create extended function
     fun getMultiplier(internalName: NEUInternalName, tryCount: Int = 0): Pair<NEUInternalName, Int> {
         if (multiplierCache.contains(internalName)) {
             return multiplierCache[internalName]!!
         }
         if (tryCount == 10) {
             ErrorManager.logErrorStateWithData(
-                "Cound not load recipe data.",
+                "Could not load recipe data.",
                 "Failed to find item multiplier",
                 "internalName" to internalName
             )
@@ -274,19 +274,10 @@ object NEUItems {
         return result
     }
 
-    @Deprecated("Do not use strings as id", ReplaceWith("NEUItems.getMultiplier(internalName.asInternalName())"))
-    fun getMultiplier(internalName: String, tryCount: Int = 0): Pair<String, Int> {
-        val pair = getMultiplier(internalName.asInternalName(), tryCount)
-        return Pair(pair.first.asString(), pair.second)
-    }
-
     fun getRecipes(internalName: NEUInternalName): Set<NeuRecipe> {
-        if (recipesCache.contains(internalName)) {
-            return recipesCache[internalName]!!
+        return recipesCache.getOrPut(internalName) {
+            manager.getRecipesFor(internalName.asString())
         }
-        val recipes = manager.getRecipesFor(internalName.asString())
-        recipesCache[internalName] = recipes
-        return recipes
     }
 
     fun NeuRecipe.getCachedIngredients() = ingredientsCache.getOrPut(this) { ingredients }

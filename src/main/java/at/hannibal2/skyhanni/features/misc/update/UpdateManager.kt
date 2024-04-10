@@ -8,7 +8,7 @@ import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.ConditionalUtils.onToggle
 import at.hannibal2.skyhanni.utils.LorenzLogger
 import com.google.gson.JsonElement
-import io.github.moulberry.moulconfig.processor.MoulConfigProcessor
+import io.github.notenoughupdates.moulconfig.processor.MoulConfigProcessor
 import io.github.moulberry.notenoughupdates.util.ApiUtil
 import io.github.moulberry.notenoughupdates.util.MinecraftExecutor
 import moe.nea.libautoupdate.CurrentVersion

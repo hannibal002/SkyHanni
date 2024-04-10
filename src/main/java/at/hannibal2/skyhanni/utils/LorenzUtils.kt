@@ -15,7 +15,6 @@ import at.hannibal2.skyhanni.test.TestBingo
 import at.hannibal2.skyhanni.utils.ChatUtils.lastButtonClicked
 import at.hannibal2.skyhanni.utils.ItemUtils.getItemCategoryOrNull
 import at.hannibal2.skyhanni.utils.NEUItems.getItemStackOrNull
-import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.StringUtils.capAtMinecraftLength
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.StringUtils.toDashlessUUID
@@ -51,10 +50,11 @@ object LorenzUtils {
 
     val inHypixelLobby get() = onHypixel && HypixelData.inLobby
 
-    val inDungeons get() = inSkyBlock && DungeonAPI.inDungeon()
+    @Deprecated("Use DungeonAPI.inDungeon() instead", ReplaceWith("DungeonAPI.inDungeon()"))
+    val inDungeons get() = DungeonAPI.inDungeon()
 
     /**
-     * Consider using IslandType.isInIsland() instead
+     * Consider using [IslandType.isInIsland] instead
      */
     val skyBlockIsland get() = HypixelData.skyBlockIsland
 
@@ -132,11 +132,6 @@ object LorenzUtils {
     fun formatPercentage(percentage: Double, format: String?): String =
         DecimalFormat(format).format(percentage * 100).replace(',', '.') + "%"
 
-    @Deprecated("old code", ReplaceWith("d.round(round).addSeparators()"))
-    fun formatDouble(d: Double, round: Int = 1): String {
-        return d.round(round).addSeparators()
-    }
-
     fun consoleLog(text: String) {
         SkyHanniMod.consoleLog(text)
     }
@@ -170,7 +165,11 @@ object LorenzUtils {
 
     fun getPlayerName(): String = Minecraft.getMinecraft().thePlayer.name
 
-    fun fillTable(data: List<DisplayTableEntry>, padding: Int = 1, itemScale: Double = 1.0): Renderable {
+    fun fillTable(
+        data: List<DisplayTableEntry>,
+        padding: Int = 1,
+        itemScale: Double = NEUItems.itemFontSize,
+    ): Renderable {
         val sorted = data.sortedByDescending { it.sort }
 
         val outerList = mutableListOf<List<Renderable>>()
@@ -333,7 +332,7 @@ object LorenzUtils {
         enumValues<T>().joinToString("|", transform = transform)
 
     // TODO move to val by lazy
-    fun isInDevEnvironment() = Launch.blackboard["fml.deobfuscatedEnvironment"] as Boolean
+    fun isInDevEnvironment() = ((Launch.blackboard ?: mapOf())["fml.deobfuscatedEnvironment"] as Boolean?) ?: true
 
     fun shutdownMinecraft(reason: String? = null) {
         System.err.println("SkyHanni-${SkyHanniMod.version} forced the game to shutdown.")
