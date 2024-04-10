@@ -229,6 +229,8 @@ class HypixelData {
         locraw.forEach { locraw[it.key] = "" }
         joinedWorld = SimpleTimeMark.now()
         serverId = null
+        skyBlockArea = "?"
+        skyBlockAreaWithSymbol = "?"
     }
 
     @SubscribeEvent
@@ -239,6 +241,8 @@ class HypixelData {
         inLobby = false
         locraw.forEach { locraw[it.key] = "" }
         locrawData = null
+        skyBlockArea = "?"
+        skyBlockAreaWithSymbol = "?"
     }
 
     @SubscribeEvent
