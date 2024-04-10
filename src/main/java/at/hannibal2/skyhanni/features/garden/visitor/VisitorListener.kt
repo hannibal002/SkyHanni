@@ -2,6 +2,7 @@ package at.hannibal2.skyhanni.features.garden.visitor
 
 import at.hannibal2.skyhanni.config.features.garden.visitor.VisitorConfig
 import at.hannibal2.skyhanni.events.CheckRenderEntityEvent
+import at.hannibal2.skyhanni.events.GuiContainerEvent
 import at.hannibal2.skyhanni.events.GuiKeyPressEvent
 import at.hannibal2.skyhanni.events.InventoryCloseEvent
 import at.hannibal2.skyhanni.events.InventoryFullyOpenedEvent
@@ -16,6 +17,8 @@ import at.hannibal2.skyhanni.features.garden.visitor.VisitorAPI.ACCEPT_SLOT
 import at.hannibal2.skyhanni.features.garden.visitor.VisitorAPI.INFO_SLOT
 import at.hannibal2.skyhanni.features.garden.visitor.VisitorAPI.lastClickedNpc
 import at.hannibal2.skyhanni.mixins.transformers.gui.AccessorGuiContainer
+import at.hannibal2.skyhanni.utils.ChatUtils
+import at.hannibal2.skyhanni.utils.DelayedRun
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.ItemUtils.name
 import at.hannibal2.skyhanni.utils.KeyboardManager.isKeyHeld
@@ -34,6 +37,7 @@ import net.minecraft.network.play.client.C02PacketUseEntity
 import net.minecraftforge.event.entity.player.ItemTooltipEvent
 import net.minecraftforge.fml.common.eventhandler.EventPriority
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
+import org.lwjgl.input.Keyboard
 import kotlin.time.Duration.Companion.seconds
 
 class VisitorListener {
@@ -45,6 +49,13 @@ class VisitorListener {
     private val config get() = VisitorAPI.config
 
     private val logger = LorenzLogger("garden/visitors/listener")
+
+
+    companion object {
+        private val VISITOR_INFO_ITEM_SLOT = 13
+        private val VISITOR_ACCEPT_ITEM_SLOT = 29
+        private val VISITOR_REFUSE_ITEM_SLOT = 33
+    }
 
     @SubscribeEvent
     fun onProfileJoin(event: ProfileJoinEvent) {
@@ -160,7 +171,7 @@ class VisitorListener {
                 }
             }
 
-            VisitorAPI.changeStatus(visitor, VisitorStatus.REFUSED, "refused")
+            VisitorAPI.changeStatus(visitor, VisitorAPI.VisitorStatus.REFUSED, "refused")
             // fallback if tab list is disabled
             DelayedRun.runDelayed(10.seconds) {
                 VisitorAPI.removeVisitor(visitor.visitorName)
@@ -170,7 +181,7 @@ class VisitorListener {
         if (event.slotId == VISITOR_ACCEPT_ITEM_SLOT && event.slot?.stack?.getLore()
                 ?.any { it == "§eClick to give!" } == true
         ) {
-            VisitorAPI.changeStatus(visitor, VisitorStatus.ACCEPTED, "accepted")
+            VisitorAPI.changeStatus(visitor, VisitorAPI.VisitorStatus.ACCEPTED, "accepted")
             return
         }
     }
