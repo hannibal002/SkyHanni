@@ -58,7 +58,10 @@ object GardenCustomKeybinds {
             .let { values -> values.size != values.toSet().size }
         if (areDuplicates) {
             if (lastDuplicateKeybindsWarnTime.passedSince() > 30.seconds) {
-                ChatUtils.clickableUserError("Duplicate Custom Keybinds aren't allowed!", "sh custom keybinds")
+                ChatUtils.chatAndOpenConfig(
+                    "Duplicate Custom Keybinds aren't allowed!",
+                    GardenAPI.config::keyBind
+                )
                 lastDuplicateKeybindsWarnTime = SimpleTimeMark.now()
             }
             return false
